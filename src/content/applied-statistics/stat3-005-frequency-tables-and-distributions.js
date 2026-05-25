@@ -61,13 +61,13 @@ export default {
     visualizations: [],
   },
 
-  code: {
+  python: {
     cells: [
       {
         id: 'stat3-005-cell-1',
         type: 'python',
-        label: 'Build a frequency table manually and with pandas',
-        starterCode: `# Exam scores for 20 students
+        cellTitle: 'Build a frequency table manually and with pandas',
+        code: `# Exam scores for 20 students
 scores = [55, 60, 62, 68, 70, 72, 73, 75, 76, 78,
           78, 80, 82, 83, 85, 88, 90, 92, 95, 98]
 
@@ -91,13 +91,13 @@ for (lo, hi), lbl in zip(classes, labels):
 print("-" * 38)
 print(f"{'Total':<10} {sum(freqs):>6} {'1.000':>10}")
 `,
-        hint: 'Check that all relative frequencies sum to 1.000 and that cumulative frequency in the last row equals 1.000. Which class interval has the most scores (modal class)?',
+        instructions: 'Check that all relative frequencies sum to 1.000 and that cumulative frequency in the last row equals 1.000. Which class interval has the most scores (modal class)?',
       },
       {
         id: 'stat3-005-cell-2',
         type: 'python',
-        label: 'Frequency table from categorical data + bar chart',
-        starterCode: `# Major selection for 30 students
+        cellTitle: 'Frequency table from categorical data + bar chart',
+        code: `# Major selection for 30 students
 majors = ["CS","Bio","CS","Math","Bio","CS","Eng","CS","Bio","Math",
           "Eng","CS","CS","Bio","Math","Eng","Bio","CS","CS","Eng",
           "Math","CS","Bio","Bio","CS","Eng","Math","CS","Bio","CS"]
@@ -129,7 +129,7 @@ fig.bars(labels=labels_list, values=values_list, color="steelblue")
 fig.text((len(labels_list)-1)/2, max(values_list)+1.5, "Student Majors", size=12, bold=True)
 fig.show()
 `,
-        hint: 'Notice that the table is sorted by frequency (descending). This is called a Pareto arrangement and makes the modal category immediately obvious. The bar chart should match the table ordering.',
+        instructions: 'Notice that the table is sorted by frequency (descending). This is called a Pareto arrangement and makes the modal category immediately obvious. The bar chart should match the table ordering.',
       },
     ],
   },
@@ -249,7 +249,7 @@ fig.show()
         text: 'A frequency table has classes [10,20), [20,30), [30,40) with cumulative relative frequencies of 0.25, 0.70, 1.00 respectively. What percentage of data falls in [20,30)?',
         options: ['70%', '45%', '25%', '30%'],
         answer: '45%',
-        hint: 'Relative frequency of [20,30) = cumulative frequency at end of [20,30) minus cumulative frequency at end of [10,20) = 0.70 − 0.25 = 0.45 = 45%.',
+        instructions: 'Relative frequency of [20,30) = cumulative frequency at end of [20,30) minus cumulative frequency at end of [10,20) = 0.70 − 0.25 = 0.45 = 45%.',
       },
     ],
   },

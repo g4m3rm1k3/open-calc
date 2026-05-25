@@ -61,13 +61,13 @@ export default {
     visualizations: [],
   },
 
-  code: {
+  python: {
     cells: [
       {
         id: 'stat2-002-cell-1',
         type: 'python',
-        label: 'Histogram of exam scores',
-        starterCode: `# Build a histogram of 20 exam scores
+        cellTitle: 'Histogram of exam scores',
+        code: `# Build a histogram of 20 exam scores
 scores = [72, 85, 91, 63, 77, 88, 95, 70, 82, 76,
           58, 89, 74, 67, 93, 81, 71, 86, 62, 78]
 
@@ -78,13 +78,13 @@ fig.text(75, 8.5, "Midterm Score Distribution", size=13, bold=True)
 fig.show()
 `,
         expectedOutput: 'A histogram with 5 bars showing the distribution of scores from 50 to 100.',
-        hint: 'Try changing `bins=5` to `bins=10`. How does the shape of the distribution change?',
+        instructions: 'Try changing `bins=5` to `bins=10`. How does the shape of the distribution change?',
       },
       {
         id: 'stat2-002-cell-2',
         type: 'python',
-        label: 'Scatter plot: study hours vs. exam score',
-        starterCode: `# Scatter plot: hours studied vs. exam score
+        cellTitle: 'Scatter plot: study hours vs. exam score',
+        code: `# Scatter plot: hours studied vs. exam score
 hours  = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5,
           6.0, 6.5, 7.0, 7.5, 8.0, 1.0, 3.0, 5.0, 7.0, 4.0]
 scores = [52,  57,  63,  65,  70,  73,  78,  79,  85,  86,
@@ -97,13 +97,13 @@ fig.text(4.5, 98, "Hours Studied vs. Exam Score", size=13, bold=True)
 fig.show()
 `,
         expectedOutput: 'A scatter plot showing a positive relationship between study hours and exam scores.',
-        hint: 'Notice the point at (1.0, 49) and the point at (1.0, 52). They have the same x-value but different y-values. What does that tell you about the relationship?',
+        instructions: 'Notice the point at (1.0, 49) and the point at (1.0, 52). They have the same x-value but different y-values. What does that tell you about the relationship?',
       },
       {
         id: 'stat2-002-cell-3',
         type: 'python',
-        label: 'Bar chart: students per major',
-        starterCode: `# Bar chart: number of students per major
+        cellTitle: 'Bar chart: students per major',
+        code: `# Bar chart: number of students per major
 majors  = ["CS", "Math", "Physics", "Stats", "Biology"]
 counts  = [42,   31,     18,        25,       38]
 
@@ -114,13 +114,13 @@ fig.text(2, 48, "Students per Major", size=13, bold=True)
 fig.show()
 `,
         expectedOutput: 'A bar chart with five bars showing enrollment by major.',
-        hint: 'Try sorting: `sorted_pairs = sorted(zip(counts, majors), reverse=True); counts, majors = zip(*sorted_pairs)`. Does sorting by count make the chart easier to read?',
+        instructions: 'Try sorting: `sorted_pairs = sorted(zip(counts, majors), reverse=True); counts, majors = zip(*sorted_pairs)`. Does sorting by count make the chart easier to read?',
       },
       {
         id: 'stat2-002-cell-4',
         type: 'python',
-        label: 'Pie chart: grade distribution',
-        starterCode: `# Pie chart: grade distribution in a class
+        cellTitle: 'Pie chart: grade distribution',
+        code: `# Pie chart: grade distribution in a class
 labels = ["A", "B", "C", "D", "F"]
 values = [22,  35,  28,  10,  5]
 
@@ -131,7 +131,7 @@ fig.text(0, 1.15, "Grade Distribution", size=13, bold=True)
 fig.show()
 `,
         expectedOutput: 'A pie chart with five slices labeled A through F with percentages.',
-        hint: 'Pie charts work best with 5 or fewer categories and large proportion differences. This chart has 5 categories — is it readable?',
+        instructions: 'Pie charts work best with 5 or fewer categories and large proportion differences. This chart has 5 categories — is it readable?',
       },
     ],
   },
@@ -251,7 +251,7 @@ fig.show()
         text: 'You have a list of 200 raw continuous measurements. Which opencalc method should you use to display their distribution?',
         options: ['fig.bars()', 'fig.histogram()', 'fig.scatter()', 'fig.plot()'],
         answer: 'fig.histogram()',
-        hint: '`histogram()` takes raw data and bins it automatically. `bars()` requires pre-computed category counts.',
+        instructions: '`histogram()` takes raw data and bins it automatically. `bars()` requires pre-computed category counts.',
       },
     ],
   },

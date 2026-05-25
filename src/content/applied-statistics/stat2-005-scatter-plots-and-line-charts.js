@@ -61,13 +61,13 @@ export default {
     visualizations: [],
   },
 
-  code: {
+  python: {
     cells: [
       {
         id: 'stat2-005-cell-1',
         type: 'python',
-        label: 'Scatter plot: describe the relationship',
-        starterCode: `# Hours of sleep vs. reaction time (milliseconds)
+        cellTitle: 'Scatter plot: describe the relationship',
+        code: `# Hours of sleep vs. reaction time (milliseconds)
 sleep  = [5.0, 5.5, 6.0, 6.5, 7.0, 7.0, 7.5, 7.5, 8.0, 8.0, 8.5, 9.0]
 react  = [310, 285, 270, 250, 235, 245, 220, 230, 210, 225, 205, 195]
 
@@ -86,13 +86,13 @@ sy = (sum((y-ybar)**2 for y in react)/(n-1))**0.5
 r = sum((sleep[i]-xbar)*(react[i]-ybar) for i in range(n)) / ((n-1)*sx*sy)
 print(f"r = {r:.3f}")
 `,
-        hint: 'Describe the scatter plot using all four features: direction, form, strength, unusual features. Then check if r matches your visual assessment.',
+        instructions: 'Describe the scatter plot using all four features: direction, form, strength, unusual features. Then check if r matches your visual assessment.',
       },
       {
         id: 'stat2-005-cell-2',
         type: 'python',
-        label: 'Scatter plot with trend line overlay',
-        starterCode: `import pandas as pd
+        cellTitle: 'Scatter plot with trend line overlay',
+        code: `import pandas as pd
 
 # Study hours vs. exam score (from stat2-002)
 hours  = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5,
@@ -121,13 +121,13 @@ fig.plot(xs=line_x, ys=line_y, color="navy", lw=2)
 fig.text(4.5, 98, "Study Hours vs. Exam Score", size=13, bold=True)
 fig.show()
 `,
-        hint: 'The regression line passes through (x̄, ȳ). Verify: compute the line y-value at x=xbar and check it equals ybar.',
+        instructions: 'The regression line passes through (x̄, ȳ). Verify: compute the line y-value at x=xbar and check it equals ybar.',
       },
       {
         id: 'stat2-005-cell-3',
         type: 'python',
-        label: 'Line chart: monthly temperature trend',
-        starterCode: `# Average monthly temperature (°C)
+        cellTitle: 'Line chart: monthly temperature trend',
+        code: `# Average monthly temperature (°C)
 months = list(range(1, 13))  # 1=Jan, 12=Dec
 temps  = [2.1, 3.4, 7.8, 13.2, 18.5, 22.3, 24.7, 23.9, 19.4, 13.1, 7.2, 3.0]
 
@@ -141,7 +141,7 @@ fig.show()
 print("Max temperature:", max(temps), "in month", months[temps.index(max(temps))])
 print("Min temperature:", min(temps), "in month", months[temps.index(min(temps))])
 `,
-        hint: 'The line chart shows a clear seasonal pattern — temperature peaks in summer (month 7) and bottoms in winter (month 1). Try overlaying a scatter() call with the same data to highlight individual data points.',
+        instructions: 'The line chart shows a clear seasonal pattern — temperature peaks in summer (month 7) and bottoms in winter (month 1). Try overlaying a scatter() call with the same data to highlight individual data points.',
       },
     ],
   },
@@ -260,7 +260,7 @@ print("Min temperature:", min(temps), "in month", months[temps.index(min(temps))
         text: 'A scatter plot shows a perfect U-shape (parabola) with no outliers. The Pearson correlation r would be approximately:',
         options: ['1.0', '-1.0', '0', '0.5'],
         answer: '0',
-        hint: 'r measures linear association. A symmetric parabola has equal upward and downward trends that cancel out.',
+        instructions: 'r measures linear association. A symmetric parabola has equal upward and downward trends that cancel out.',
       },
     ],
   },

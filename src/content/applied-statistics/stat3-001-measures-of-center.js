@@ -62,13 +62,13 @@ export default {
     visualizations: [],
   },
 
-  code: {
+  python: {
     cells: [
       {
         id: 'stat3-001-cell-1',
         type: 'python',
-        label: 'Compute and compare mean vs. median',
-        starterCode: `import pandas as pd
+        cellTitle: 'Compute and compare mean vs. median',
+        code: `import pandas as pd
 
 # Household incomes (in thousands) — 9 households, 1 high earner
 incomes = [42, 45, 48, 51, 53, 55, 58, 61, 980]
@@ -81,8 +81,8 @@ sorted_incomes = sorted(incomes)
 median_income = sorted_incomes[n // 2]
 
 print(f"n = {n}")
-print(f"Mean income:   ${mean_income:,.0f}k = ${mean_income*1000:,.0f}")
-print(f"Median income: ${median_income:,.0f}k = ${median_income*1000:,.0f}")
+print(f"Mean income:   \${mean_income:,.0f}k = \${mean_income*1000:,.0f}")
+print(f"Median income: \${median_income:,.0f}k = \${median_income*1000:,.0f}")
 print(f"Ratio mean/median: {mean_income/median_income:.2f}x")
 
 # Visualize
@@ -92,13 +92,13 @@ fig.histogram(values=incomes, bins=10, color="steelblue")
 fig.text(500, 3.7, "Household Income Distribution", size=12, bold=True)
 fig.show()
 `,
-        hint: 'The histogram reveals why mean and median diverge: 8 values cluster under $100k while one value ($980k) is far to the right. The mean is pulled into a region where no household actually lives.',
+        instructions: 'The histogram reveals why mean and median diverge: 8 values cluster under $100k while one value ($980k) is far to the right. The mean is pulled into a region where no household actually lives.',
       },
       {
         id: 'stat3-001-cell-2',
         type: 'python',
-        label: 'Weighted mean — GPA calculation',
-        starterCode: `# Course grades and credit weights
+        cellTitle: 'Weighted mean — GPA calculation',
+        code: `# Course grades and credit weights
 courses = ["Calculus", "English", "Chemistry", "PE", "Statistics"]
 grades  = [3.3, 3.7, 3.0, 4.0, 3.5]   # grade points (A=4.0, B=3.0, ...)
 credits = [4, 3, 4, 1, 3]              # credit hours
@@ -119,7 +119,7 @@ print(f"Simple (unweighted) GPA: {simple_gpa:.3f}")
 print(f"Weighted GPA:            {weighted_gpa:.3f}")
 print(f"Difference:              {abs(weighted_gpa - simple_gpa):.3f}")
 `,
-        hint: 'PE (4.0, 1 credit) has outsized influence in the simple mean. The weighted GPA correctly gives more weight to the 4-credit courses (Calculus, Chemistry). When weights differ substantially, the difference between weighted and unweighted means is significant.',
+        instructions: 'PE (4.0, 1 credit) has outsized influence in the simple mean. The weighted GPA correctly gives more weight to the 4-credit courses (Calculus, Chemistry). When weights differ substantially, the difference between weighted and unweighted means is significant.',
       },
     ],
   },
@@ -245,7 +245,7 @@ print(f"Difference:              {abs(weighted_gpa - simple_gpa):.3f}")
           'The data has errors because mean and median differ',
         ],
         answer: 'The distribution is right-skewed; a few high earners pull the mean above most salaries',
-        hint: 'When mean > median, the right tail (high values) is pulling the mean upward.',
+        instructions: 'When mean > median, the right tail (high values) is pulling the mean upward.',
       },
     ],
   },

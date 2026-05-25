@@ -62,13 +62,13 @@ export default {
     visualizations: [],
   },
 
-  code: {
+  python: {
     cells: [
       {
         id: 'stat3-003-cell-1',
         type: 'python',
-        label: 'Compute quartiles and percentiles manually',
-        starterCode: `# Exam scores for 12 students
+        cellTitle: 'Compute quartiles and percentiles manually',
+        code: `# Exam scores for 12 students
 scores = [62, 70, 74, 77, 78, 80, 82, 85, 88, 90, 93, 97]
 n = len(scores)
 sorted_scores = sorted(scores)
@@ -94,13 +94,13 @@ print(f"  IQR = {iqr}")
 print(f"  Outlier fences: ({lower_fence:.1f}, {upper_fence:.1f})")
 print(f"  Outliers: {[x for x in scores if x < lower_fence or x > upper_fence]}")
 `,
-        hint: 'Check: are there any outliers in this dataset? Compute (Q1 - 1.5×IQR) and (Q3 + 1.5×IQR). Any values outside these fences would be flagged.',
+        instructions: 'Check: are there any outliers in this dataset? Compute (Q1 - 1.5×IQR) and (Q3 + 1.5×IQR). Any values outside these fences would be flagged.',
       },
       {
         id: 'stat3-003-cell-2',
         type: 'python',
-        label: 'Z-scores: comparing across distributions',
-        starterCode: `# Comparing two student performances (from the hook)
+        cellTitle: 'Z-scores: comparing across distributions',
+        code: `# Comparing two student performances (from the hook)
 math_score  = 78;  math_mean  = 72;  math_sd  = 8
 sci_score   = 82;  sci_mean   = 75;  sci_sd   = 14
 
@@ -123,7 +123,7 @@ print("Original → Z-score:")
 for orig, z in zip(scores, z_scores):
     print(f"  {orig} → {z:+.2f}")
 `,
-        hint: 'After standardization, the z-scores should have mean ≈ 0 and SD ≈ 1. Verify this. Also note: which original scores correspond to positive z-scores (above mean) and which to negative?',
+        instructions: 'After standardization, the z-scores should have mean ≈ 0 and SD ≈ 1. Verify this. Also note: which original scores correspond to positive z-scores (above mean) and which to negative?',
       },
     ],
   },
@@ -251,7 +251,7 @@ for orig, z in zip(scores, z_scores):
           'Is at the 1.5th percentile',
         ],
         answer: 'Scored 1.5 standard deviations below the class mean',
-        hint: 'Z-score measures SDs from the mean — not raw points, not percentile (unless we know the distribution shape).',
+        instructions: 'Z-score measures SDs from the mean — not raw points, not percentile (unless we know the distribution shape).',
       },
     ],
   },

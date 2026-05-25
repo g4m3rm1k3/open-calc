@@ -172,37 +172,30 @@ export function crossProduct(a, b) {
 export function dotMultiply(a, b) {
   const pa = toPlain(a), pb = toPlain(b);
   if (Array.isArray(pa) && Array.isArray(pb)) {
-    if (Array.isArray(pa[0]))
-      return pa.map((row, i) => row.map((v, j) => v * (pb[i]?.[j] ?? pb[i] ?? pb)));
-    return pa.map((v, i) => v * (Array.isArray(pb) ? pb[i] : pb));
+    return pa.map((v, i) => dotMultiply(v, pb[i] ?? pb));
   }
-  if (Array.isArray(pa)) return pa.map(v => v * Number(pb));
-  if (Array.isArray(pb)) return pb.map(v => Number(pa) * v);
+  if (Array.isArray(pa)) return pa.map((v) => dotMultiply(v, pb));
+  if (Array.isArray(pb)) return pb.map((v) => dotMultiply(pa, v));
   return Number(pa) * Number(pb);
 }
 
 export function dotDivide(a, b) {
   const pa = toPlain(a), pb = toPlain(b);
   if (Array.isArray(pa) && Array.isArray(pb)) {
-    if (Array.isArray(pa[0]))
-      return pa.map((row, i) => row.map((v, j) => v / (pb[i]?.[j] ?? pb[i] ?? pb)));
-    return pa.map((v, i) => v / (Array.isArray(pb) ? pb[i] : pb));
+    return pa.map((v, i) => dotDivide(v, pb[i] ?? pb));
   }
-  if (Array.isArray(pa)) return pa.map(v => v / Number(pb));
-  if (Array.isArray(pb)) return pb.map(v => Number(pa) / v);
+  if (Array.isArray(pa)) return pa.map((v) => dotDivide(v, pb));
+  if (Array.isArray(pb)) return pb.map((v) => dotDivide(pa, v));
   return Number(pa) / Number(pb);
 }
 
 export function dotPow(a, b) {
   const pa = toPlain(a), pb = toPlain(b);
-  if (Array.isArray(pa) && Array.isArray(pb))
-    return pa.map((v, i) =>
-      Array.isArray(v)
-        ? v.map((u, j) => u ** realValue(pb[i]?.[j] ?? pb[i] ?? pb))
-        : v ** realValue(pb[i] ?? pb));
-  if (Array.isArray(pa))
-    return pa.map(v => Array.isArray(v) ? v.map(u => u ** Number(pb)) : v ** Number(pb));
-  if (Array.isArray(pb)) return pb.map(v => Number(pa) ** v);
+  if (Array.isArray(pa) && Array.isArray(pb)) {
+    return pa.map((v, i) => dotPow(v, pb[i] ?? pb));
+  }
+  if (Array.isArray(pa)) return pa.map((v) => dotPow(v, pb));
+  if (Array.isArray(pb)) return pb.map((v) => dotPow(pa, v));
   return Number(pa) ** Number(pb);
 }
 
@@ -518,11 +511,18 @@ export function orthonormalBasis(A, mode = "orth") {
   const singular = normalizeVector(math.diag(S)).map((entry) => Math.abs(Number(entry)));
   const tol = Math.max(...singular, 0) * Math.max(inferSize(A)[0], inferSize(A)[1]) * 1e-10;
   const source = mode === "null" ? toPlain(V) : toPlain(U);
-  const columns = math.transpose(source);
-  const keep = columns.filter((_, index) =>
-    mode === "null" ? singular[index] <= tol : singular[index] > tol,
+  const rowCount = Array.isArray(source) ? source.length : 0;
+  const colCount = rowCount ? Math.max(...source.map((row) => (Array.isArray(row) ? row.length : 0)), 0) : 0;
+  const columns = Array.from({ length: colCount }, (_, col) =>
+    Array.from({ length: rowCount }, (_, row) => realValue(source[row]?.[col] ?? 0)),
   );
-  return keep.length ? math.transpose(keep) : [];
+  const keep = columns.filter((column, index) => {
+    if (!column.some((value) => Number.isFinite(value))) return false;
+    return mode === "null" ? singular[index] <= tol : singular[index] > tol;
+  });
+  return keep.length
+    ? Array.from({ length: keep[0].length }, (_, row) => keep.map((col) => col[row] ?? 0))
+    : [];
 }
 
 export function svdDecomp(A) {
@@ -955,7 +955,9 @@ function splitTopLevelCells(row) {
         const nextIsOperandStart = /[A-Za-z0-9(\[{]/.test(nextChar);
         const lastCurChar = current.trimEnd().slice(-1);
         const curEndsWithOperand = /[A-Za-z0-9\])'"]/.test(lastCurChar);
-        if (nextIsOperandStart && curEndsWithOperand) pushCell();
+        const prevChar = current.trimEnd().slice(-1);
+        const prevIsOperator = /[+\-*/^:<>=~&,([]/.test(prevChar);
+        if (nextIsOperandStart && curEndsWithOperand && !prevIsOperator) pushCell();
       }
       index += next.length - 1;
       continue;
@@ -998,10 +1000,10 @@ function replaceElementwiseBinaryOperators(line) {
         index -= 1;
       }
       let start = index + 1;
-      while (start > 0 && /[\w.]/.test(text[start - 1])) start -= 1;
+      while (start > 0 && /[\w]/.test(text[start - 1])) start -= 1;
       return { start, end };
     }
-    while (index >= 0 && /[\w.\]]/.test(text[index])) index -= 1;
+    while (index >= 0 && /[\w\]]/.test(text[index])) index -= 1;
     return { start: index + 1, end };
   };
   const scanRight = (text, from) => {
@@ -1010,7 +1012,7 @@ function replaceElementwiseBinaryOperators(line) {
     if (index >= text.length) return null;
     const start = index;
     if (/[A-Za-z_]/.test(text[index])) {
-      while (index < text.length && /[\w.]/.test(text[index])) index += 1;
+      while (index < text.length && /[\w]/.test(text[index])) index += 1;
       if (text[index] === "(") {
         let depth = 1; index += 1;
         while (index < text.length && depth > 0) {
@@ -1041,7 +1043,7 @@ function replaceElementwiseBinaryOperators(line) {
       }
       return { start, end: index };
     }
-    while (index < text.length && /[\w.]/.test(text[index])) index += 1;
+    while (index < text.length && /[\w]/.test(text[index])) index += 1;
     return { start, end: index };
   };
   let output = line;
@@ -1080,12 +1082,15 @@ function replaceIndexing(line, variables, functionNames = new Set()) {
 }
 
 function replaceBackslash(expr) {
+  let hasTopLevelEquals = false;
   let depth = 0;
   for (let i = 0; i < expr.length; i += 1) {
     const char = expr[i];
     if (char === "[" || char === "(" || char === "{") depth += 1;
     if (char === "]" || char === ")" || char === "}") depth -= 1;
+    if (char === "=" && depth === 0) hasTopLevelEquals = true;
     if (char === "\\" && depth === 0) {
+      if (hasTopLevelEquals) return expr;
       const left = expr.slice(0, i).trim();
       const right = expr.slice(i + 1).trim();
       return `mldivide(${left}, ${right})`;
@@ -1108,8 +1113,22 @@ export function preprocessLine(line, variables, functionNames = new Set()) {
   output = replaceElementwiseBinaryOperators(output);
   output = normalizeMatrixSyntax(output);
   output = replaceIndexing(output, variables, functionNames);
-  output = replaceBackslash(output);
   return output;
+}
+
+function merge3DRequest(current, next, hold) {
+  if (!next) return current;
+  if (!hold || !current || current.mode !== "3d") return next;
+  return {
+    ...next,
+    replace: false,
+    functions: [...(current.functions || []), ...(next.functions || [])],
+    settings: {
+      ...(current.settings || {}),
+      ...(next.settings || {}),
+      range: Math.max(current.settings?.range || 0, next.settings?.range || 0),
+    },
+  };
 }
 
 export { preprocessLine as normalizeLine };
@@ -1271,7 +1290,11 @@ export function createExecutionEngine(options = {}) {
   parser.set("real", (value) => isCollection(value) ? mapDeep(value, math.re) : math.re(value));
   parser.set("imag", (value) => isCollection(value) ? mapDeep(value, math.im) : math.im(value));
 
-  parser.set("mldivide", (A, b) => toPlain(math.lusolve(A, b)));
+  parser.set("mldivide", (A, b) => {
+    const size = inferSize(A);
+    if (size[0] === size[1]) return toPlain(math.lusolve(A, b));
+    return toPlain(math.multiply(math.pinv(A), b));
+  });
   parser.set("linspace", (a, b, n = 100) => buildLinspace(a, b, n));
   parser.set("logspace", (a, b, n = 50) => buildLogspace(a, b, n));
   parser.set("rand", (...shape) => {
@@ -1287,9 +1310,9 @@ export function createExecutionEngine(options = {}) {
   parser.set("cross", (a, b) => crossProduct(a, b));
   parser.set("polyfit", (x, y, degree) => polyfit(x, y, degree));
   parser.set("polyval", (coefficients, x) => polyval(coefficients, x));
-  parser.set("dotPow", (a, b) => toPlain(math.dotPow(a, b)));
-  parser.set("dotMultiply", (a, b) => toPlain(math.dotMultiply(a, b)));
-  parser.set("dotDivide", (a, b) => toPlain(math.dotDivide(a, b)));
+  parser.set("dotPow", (a, b) => toPlain(dotPow(a, b)));
+  parser.set("dotMultiply", (a, b) => toPlain(dotMultiply(a, b)));
+  parser.set("dotDivide", (a, b) => toPlain(dotDivide(a, b)));
   parser.set("size", (value, dim) => {
     const size = toPlain(math.size(value));
     return dim == null ? size : size[Number(dim) - 1];
@@ -1382,27 +1405,27 @@ export function createExecutionEngine(options = {}) {
   parser.set("null", (A) => orthonormalBasis(A, "null"));
   parser.set("lu", (A) => luFactorization(A));
   parser.set("surf", (...args) => {
-    plot3DRequest = convertSurfaceTo3DConfig("surf", args, plotState);
+    plot3DRequest = merge3DRequest(plot3DRequest, convertSurfaceTo3DConfig("surf", args, plotState), plotState.hold);
     logs.push("3D surface ready in the OpenMAT viewport.");
     return args[args.length - 1] ?? null;
   });
   parser.set("mesh", (...args) => {
-    plot3DRequest = convertSurfaceTo3DConfig("mesh", args, plotState);
+    plot3DRequest = merge3DRequest(plot3DRequest, convertSurfaceTo3DConfig("mesh", args, plotState), plotState.hold);
     logs.push("3D mesh ready in the OpenMAT viewport.");
     return args[args.length - 1] ?? null;
   });
   parser.set("surfc", (...args) => {
-    plot3DRequest = convertSurfaceTo3DConfig("surf", args, plotState);
+    plot3DRequest = merge3DRequest(plot3DRequest, convertSurfaceTo3DConfig("surf", args, plotState), plotState.hold);
     logs.push("3D shaded surface ready in the OpenMAT viewport.");
     return args[args.length - 1] ?? null;
   });
   parser.set("plot3", (...args) => {
-    plot3DRequest = convertPointSeries3DConfig("plot3", args, plotState);
+    plot3DRequest = merge3DRequest(plot3DRequest, convertPointSeries3DConfig("plot3", args, plotState), plotState.hold);
     logs.push("3D curve ready in the OpenMAT viewport.");
     return args[args.length - 1] ?? null;
   });
   parser.set("scatter3", (...args) => {
-    plot3DRequest = convertPointSeries3DConfig("scatter3", args, plotState);
+    plot3DRequest = merge3DRequest(plot3DRequest, convertPointSeries3DConfig("scatter3", args, plotState), plotState.hold);
     logs.push("3D scatter ready in the OpenMAT viewport.");
     return args[args.length - 1] ?? null;
   });
@@ -1802,7 +1825,7 @@ export function executeScript(source, options = {}) {
       const multiAssign = line.match(/^\[([^\]]+)\]\s*=\s*(.+)$/);
       if (multiAssign) {
         const names = multiAssign[1].split(",").map((n) => n.trim()).filter(Boolean);
-        const rhs = preprocessLine(multiAssign[2], variables, functionNames);
+        const rhs = replaceBackslash(preprocessLine(multiAssign[2], variables, functionNames));
         const result = toPlain(parser.evaluate(rhs));
         const values = result?.__multi || [];
         names.forEach((name, idx) => { parser.set(name, values[idx]); variables.add(name); });
@@ -1823,13 +1846,13 @@ export function executeScript(source, options = {}) {
       const assign = line.match(/^([A-Za-z_]\w*)\s*=\s*(.+)$/);
       if (assign) {
         const [, name, expr] = assign;
-        const result = toPlain(parser.evaluate(expr));
+        const result = toPlain(parser.evaluate(replaceBackslash(expr)));
         parser.set(name, result);
         parser.set("ans", result);
         variables.add(name);
         return hasSemicolon ? null : result;
       }
-      const result = toPlain(parser.evaluate(line));
+      const result = toPlain(parser.evaluate(replaceBackslash(line)));
       parser.set("ans", result);
       return (hasSemicolon || result == null || result === "") ? null : result;
     } catch (error) {
@@ -1851,7 +1874,7 @@ export function executeScript(source, options = {}) {
     if (node.type === "line") return executeLine(node.raw, node.lineNo ?? null);
     if (node.type === "if") {
       for (const branch of node.branches) {
-        const condExpr = preprocessLine(branch.cond.replace(/;\s*$/, ""), variables, functionNames);
+        const condExpr = replaceBackslash(preprocessLine(branch.cond.replace(/;\s*$/, ""), variables, functionNames));
         const condVal = toPlain(parser.evaluate(condExpr));
         if (isTruthy(condVal)) return executeBlock(branch.body);
       }
@@ -1859,7 +1882,7 @@ export function executeScript(source, options = {}) {
       return null;
     }
     if (node.type === "for") {
-      const iterExpr = preprocessLine(node.iterExpr.replace(/;\s*$/, ""), variables, functionNames);
+      const iterExpr = replaceBackslash(preprocessLine(node.iterExpr.replace(/;\s*$/, ""), variables, functionNames));
       const iterVal = toPlain(parser.evaluate(iterExpr));
       const items = Array.isArray(iterVal) ? normalizeVector(iterVal) : [realValue(iterVal)];
       let last = null;
@@ -1878,7 +1901,7 @@ export function executeScript(source, options = {}) {
       const WHILE_LIMIT = 100000;
       let guard = 0;
       while (guard++ < WHILE_LIMIT) {
-        const condExpr = preprocessLine(node.condExpr.replace(/;\s*$/, ""), variables, functionNames);
+        const condExpr = replaceBackslash(preprocessLine(node.condExpr.replace(/;\s*$/, ""), variables, functionNames));
         const condVal = toPlain(parser.evaluate(condExpr));
         if (!isTruthy(condVal)) break;
         const sig = executeBlock(node.body);
@@ -1928,11 +1951,11 @@ export function executeScript(source, options = {}) {
     }
     // switch/case/otherwise block
     if (node.type === "switch") {
-      const exprPrep = preprocessLine(String(node.expr).replace(/;\s*$/, ""), variables, functionNames);
+      const exprPrep = replaceBackslash(preprocessLine(String(node.expr).replace(/;\s*$/, ""), variables, functionNames));
       let switchVal;
       try { switchVal = toPlain(parser.evaluate(exprPrep)); } catch { return null; }
       for (const caseNode of node.cases) {
-        const casePrep = preprocessLine(String(caseNode.val).replace(/;\s*$/, ""), variables, functionNames);
+        const casePrep = replaceBackslash(preprocessLine(String(caseNode.val).replace(/;\s*$/, ""), variables, functionNames));
         let caseVal;
         try { caseVal = toPlain(parser.evaluate(casePrep)); } catch { continue; }
         const svNum = realValue(switchVal), cvNum = realValue(caseVal);

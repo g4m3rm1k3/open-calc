@@ -61,8 +61,67 @@ export default {
     visualizations: [],
   },
 
-  code: {
-    cells: [],
+  python: {
+    cells: [
+      {
+        id: 'stat2-001-cell-1',
+        type: 'python',
+        cellTitle: 'Choose the right chart type for each variable',
+        code: `# Decide which chart is appropriate for each variable type
+
+# --- Categorical variable → Bar chart ---
+favorite_colors = ["Blue", "Red", "Blue", "Green", "Blue", "Red",
+                   "Green", "Blue", "Yellow", "Red", "Blue", "Green"]
+
+from collections import Counter
+color_counts = Counter(favorite_colors)
+sorted_colors = sorted(color_counts.items(), key=lambda x: x[1], reverse=True)
+
+labels = [item[0] for item in sorted_colors]
+values = [item[1] for item in sorted_colors]
+
+print("Favorite colors (categorical) → Bar chart:")
+for lbl, val in zip(labels, values):
+    bar = "█" * val
+    print(f"  {lbl:<8}: {bar} ({val})")
+
+fig = Figure(width=7, height=5)
+fig.axes(xmin=-0.5, xmax=len(labels)-0.5, ymin=0, ymax=max(values)+1)
+fig.bars(labels=labels, values=values, color="steelblue")
+fig.text((len(labels)-1)/2, max(values)+0.7, "Favorite Colors", size=12, bold=True)
+fig.show()
+`,
+        instructions: 'Bar charts work for categorical data because the x-axis categories have no inherent numeric order. The bars are separated by gaps to show this. If the variable were ordered (e.g., satisfaction level: Low/Medium/High), we would preserve that order rather than sorting by frequency.',
+      },
+      {
+        id: 'stat2-001-cell-2',
+        type: 'python',
+        cellTitle: 'Misleading vs. honest visualization — the same data told two ways',
+        code: `# Sales data for two products
+months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"]
+product_a = [100, 102, 101, 103, 102, 104]
+product_b = [100, 105, 108, 112, 115, 120]
+
+# --- MISLEADING: y-axis starts at 99 (exaggerates Product A's "flat" line)
+fig1 = Figure(width=8, height=5)
+fig1.axes(xmin=0, xmax=5, ymin=99, ymax=121)
+for i, (a, b) in enumerate(zip(product_a, product_b)):
+    fig1.point(i, a, color="steelblue", size=6)
+    fig1.point(i, b, color="tomato", size=6)
+    if i > 0:
+        fig1.line(i-1, product_a[i-1], i, product_a[i], color="steelblue")
+        fig1.line(i-1, product_b[i-1], i, product_b[i], color="tomato")
+fig1.text(2.5, 120.5, "MISLEADING: Y starts at 99", size=11, bold=True)
+fig1.show()
+
+print("\nProduct A range: 100–104 (4% change)")
+print("Product B range: 100–120 (20% change)")
+print("Both charts show identical data — but truncated y-axis")
+print("makes Product A look FLAT when it actually grew slightly.")
+`,
+        instructions: 'When the y-axis does not start at zero, small differences get magnified. This is one of the most common chart manipulations in media and business reports. Ask: does the y-axis start at zero? If not, is there a good reason, and is it labeled clearly?',
+      },
+    ],
   },
 
   examples: [
@@ -172,7 +231,7 @@ export default {
         text: 'Which chart type is most appropriate for displaying the relationship between two continuous quantitative variables?',
         options: ['Bar chart', 'Pie chart', 'Scatter plot', 'Histogram'],
         answer: 'Scatter plot',
-        hint: 'Think about which chart uses both axes to encode quantitative values.',
+        instructions: 'Think about which chart uses both axes to encode quantitative values.',
       },
     ],
   },

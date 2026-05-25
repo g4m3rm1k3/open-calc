@@ -63,13 +63,13 @@ export default {
     visualizations: [],
   },
 
-  code: {
+  python: {
     cells: [
       {
         id: 'stat2-003-cell-1',
         type: 'python',
-        label: 'Create and inspect a DataFrame',
-        starterCode: `import pandas as pd
+        cellTitle: 'Create and inspect a DataFrame',
+        code: `import pandas as pd
 
 # Create a small dataset
 data = {
@@ -88,13 +88,13 @@ print(df.dtypes)
 print("\\nSummary statistics:")
 print(df.describe())
 `,
-        hint: 'Notice that `df.describe()` only shows GPA and credits — it skips student and major because they are strings, not numbers.',
+        instructions: 'Notice that `df.describe()` only shows GPA and credits — it skips student and major because they are strings, not numbers.',
       },
       {
         id: 'stat2-003-cell-2',
         type: 'python',
-        label: 'Selecting columns and filtering rows',
-        starterCode: `import pandas as pd
+        cellTitle: 'Selecting columns and filtering rows',
+        code: `import pandas as pd
 
 data = {
     "student": ["Alice", "Bob", "Carol", "Dave", "Eve", "Frank"],
@@ -116,13 +116,13 @@ print(df[df["gpa"] >= 3.5])
 print("\\nMath majors with GPA >= 3.5:")
 print(df[(df["major"] == "Math") & (df["gpa"] >= 3.5)])
 `,
-        hint: 'Try adding a third condition: credits >= 100. Remember: wrap each condition in parentheses and use `&`.',
+        instructions: 'Try adding a third condition: credits >= 100. Remember: wrap each condition in parentheses and use `&`.',
       },
       {
         id: 'stat2-003-cell-3',
         type: 'python',
-        label: 'GroupBy: average GPA per major',
-        starterCode: `import pandas as pd
+        cellTitle: 'GroupBy: average GPA per major',
+        code: `import pandas as pd
 
 data = {
     "student": ["Alice","Bob","Carol","Dave","Eve","Frank","Grace","Hank"],
@@ -144,13 +144,13 @@ print(df.groupby("major")["gpa"].count())
 print("\\nGPA stats by major:")
 print(df.groupby("major")["gpa"].agg(["mean", "std", "count"]))
 `,
-        hint: 'What does `df.groupby("major")["gpa"].std()` give you? How would you use those values to set up a stratified sampling design?',
+        instructions: 'What does `df.groupby("major")["gpa"].std()` give you? How would you use those values to set up a stratified sampling design?',
       },
       {
         id: 'stat2-003-cell-4',
         type: 'python',
-        label: 'Add a column and visualize with opencalc',
-        starterCode: `import pandas as pd
+        cellTitle: 'Add a column and visualize with opencalc',
+        code: `import pandas as pd
 
 data = {
     "major":   ["Math","CS","Stats","CS","Math","Stats","CS","Math"],
@@ -174,7 +174,7 @@ fig.bars(labels=labels, values=counts, color="steelblue")
 fig.text(0.5, 8.3, "Students by Letter Grade", size=13, bold=True)
 fig.show()
 `,
-        hint: 'Try changing the cutoff: `"A" if x >= 3.7`. How does the bar chart change?',
+        instructions: 'Try changing the cutoff: `"A" if x >= 3.7`. How does the bar chart change?',
       },
     ],
   },
@@ -297,7 +297,7 @@ fig.show()
           'df.groupby("salary")["department"].mean()',
         ],
         answer: 'df.groupby("department")["salary"].mean()',
-        hint: 'The groupby column comes first (what you are grouping by), then you select the column to aggregate.',
+        instructions: 'The groupby column comes first (what you are grouping by), then you select the column to aggregate.',
       },
     ],
   },

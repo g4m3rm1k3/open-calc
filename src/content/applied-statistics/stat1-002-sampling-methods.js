@@ -70,8 +70,79 @@ export default {
     visualizations: [],
   },
 
-  code: {
-    cells: [],
+  python: {
+    cells: [
+      {
+        id: 'stat1-002-cell-1',
+        type: 'python',
+        cellTitle: 'Simulate simple random sampling and check for bias',
+        code: `import random
+random.seed(42)
+
+# "Population": 100 students, GPAs from 2.0 to 4.0
+random.seed(0)
+population_gpas = [round(2.0 + random.random() * 2.0, 2) for _ in range(100)]
+true_mean = sum(population_gpas) / len(population_gpas)
+print(f"True population mean GPA: {true_mean:.3f}")
+
+# Simple Random Sample (SRS) — each member equally likely
+random.seed(42)
+srs = random.sample(population_gpas, 20)
+srs_mean = sum(srs) / len(srs)
+print(f"SRS sample mean (n=20):   {srs_mean:.3f}  (error: {abs(srs_mean-true_mean):.3f})")
+
+# Convenience sample — just take the first 20 (order = enrollment date)
+# Suppose early-enrollers tend to be higher GPA (pre-sorted, high GPA first)
+sorted_pop = sorted(population_gpas, reverse=True)
+convenience = sorted_pop[:20]
+conv_mean = sum(convenience) / len(convenience)
+print(f"Convenience sample mean:  {conv_mean:.3f}  (error: {abs(conv_mean-true_mean):.3f})")
+
+print()
+print("SRS: small random error — unbiased estimator.")
+print("Convenience: systematically high — biased estimator.")
+`,
+        instructions: 'Run the cell. The convenience sample mean is consistently higher than the population mean because we are sampling from the top of a sorted list. Change the sorting to reverse=False (low GPA first) — the bias flips. SRS error is small and random, not systematic.',
+      },
+      {
+        id: 'stat1-002-cell-2',
+        type: 'python',
+        cellTitle: 'Stratified vs. simple random sampling — compare precision',
+        code: `import random
+random.seed(1)
+
+# Population: 3 strata (Freshman, Sophomore, Senior)
+freshmen  = [round(2.5 + random.random()*0.8, 2) for _ in range(60)]  # n=60, lower GPA
+sophomores= [round(3.0 + random.random()*0.8, 2) for _ in range(30)]  # n=30
+seniors   = [round(3.3 + random.random()*0.8, 2) for _ in range(10)]  # n=10, higher GPA
+population = freshmen + sophomores + seniors
+true_mean = sum(population) / len(population)
+
+# SRS: random 20 from all 100
+srs_estimates = []
+for _ in range(1000):
+    samp = random.sample(population, 20)
+    srs_estimates.append(sum(samp)/len(samp))
+
+# Stratified: proportional allocation (60%/30%/10% of sample size 20)
+strat_estimates = []
+for _ in range(1000):
+    s = (random.sample(freshmen, 12) +
+         random.sample(sophomores, 6) +
+         random.sample(seniors, 2))
+    strat_estimates.append(sum(s)/len(s))
+
+srs_sd   = (sum((x-sum(srs_estimates)/1000)**2 for x in srs_estimates)/999)**0.5
+strat_sd = (sum((x-sum(strat_estimates)/1000)**2 for x in strat_estimates)/999)**0.5
+
+print(f"True mean: {true_mean:.3f}")
+print(f"SRS estimate SD (over 1000 trials):        {srs_sd:.4f}")
+print(f"Stratified estimate SD (over 1000 trials): {strat_sd:.4f}")
+print(f"Stratified is {srs_sd/strat_sd:.1f}x more precise than SRS for this population.")
+`,
+        instructions: 'Stratified sampling has lower standard deviation of estimates — more precise. This advantage is largest when strata have very different means (like freshmen vs. seniors here). If all strata had the same mean, stratified and SRS would be equally precise.',
+      },
+    ],
   },
 
   examples: [
@@ -201,7 +272,7 @@ export default {
         text: 'A researcher divides a city into 100 zip codes, randomly selects 10 zip codes, then surveys every household in the selected zip codes. What sampling method is this?',
         options: ['Simple random sample', 'Systematic sample', 'Stratified sample', 'Cluster sample'],
         answer: 'Cluster sample',
-        hint: 'The city is divided into groups (zip codes), some groups are selected at random, and all units within the selected groups are measured.',
+        instructions: 'The city is divided into groups (zip codes), some groups are selected at random, and all units within the selected groups are measured.',
       },
     ],
   },

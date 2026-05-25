@@ -59,13 +59,13 @@ export default {
     visualizations: [],
   },
 
-  code: {
+  python: {
     cells: [
       {
         id: 'stat2-006-cell-1',
         type: 'python',
-        label: 'Step 1: Inspect the dataset',
-        starterCode: `import pandas as pd
+        cellTitle: 'Step 1: Inspect the dataset',
+        code: `import pandas as pd
 
 # Simulated student dataset: 30 students
 data = {
@@ -98,13 +98,13 @@ print()
 print("Describe:")
 print(df.describe())
 `,
-        hint: 'This is the mandatory first step: understand what you have before plotting. Note which columns are numeric vs. categorical. Are there any impossible values in describe()?',
+        instructions: 'This is the mandatory first step: understand what you have before plotting. Note which columns are numeric vs. categorical. Are there any impossible values in describe()?',
       },
       {
         id: 'stat2-006-cell-2',
         type: 'python',
-        label: 'Step 2: Univariate analysis',
-        starterCode: `import pandas as pd
+        cellTitle: 'Step 2: Univariate analysis',
+        code: `import pandas as pd
 
 data = {
     "age":           [18,19,20,21,22,18,19,20,21,22,18,19,20,21,22,
@@ -143,13 +143,13 @@ fig2.bars(labels=major_counts.index.tolist(), values=major_counts.values.tolist(
 fig2.text(1, 13.5, "Students per Major", size=13, bold=True)
 fig2.show()
 `,
-        hint: 'Describe the GPA histogram: what is the shape? Is it symmetric or skewed? Are there outliers? Then examine the major bar chart: are the three majors balanced?',
+        instructions: 'Describe the GPA histogram: what is the shape? Is it symmetric or skewed? Are there outliers? Then examine the major bar chart: are the three majors balanced?',
       },
       {
         id: 'stat2-006-cell-3',
         type: 'python',
-        label: 'Step 3: Bivariate analysis — hours studied vs. GPA',
-        starterCode: `import pandas as pd
+        cellTitle: 'Step 3: Bivariate analysis — hours studied vs. GPA',
+        code: `import pandas as pd
 
 data = {
     "gpa":           [3.5,3.2,3.8,2.9,3.6,3.1,3.4,2.7,3.9,3.0,
@@ -191,13 +191,13 @@ fig.plot(xs=[2, 14], ys=line_y, color="navy", lw=2)
 fig.text(8, 4.07, "Hours Studied vs. GPA", size=13, bold=True)
 fig.show()
 `,
-        hint: 'Interpret r: is the association strong, moderate, or weak? Positive or negative? Does the scatter plot show any outliers or clusters that r might be hiding?',
+        instructions: 'Interpret r: is the association strong, moderate, or weak? Positive or negative? Does the scatter plot show any outliers or clusters that r might be hiding?',
       },
       {
         id: 'stat2-006-cell-4',
         type: 'python',
-        label: 'Step 4: Pass rate by major',
-        starterCode: `import pandas as pd
+        cellTitle: 'Step 4: Pass rate by major',
+        code: `import pandas as pd
 
 data = {
     "major":  ["CS","CS","Math","Math","CS","Bio","Bio","CS","Math","Bio",
@@ -223,7 +223,7 @@ fig.bars(labels=labels, values=values, color="teal")
 fig.text(1, 0.97, "Exam Pass Rate by Major", size=13, bold=True)
 fig.show()
 `,
-        hint: 'Are pass rates substantially different across majors? Is this difference meaningful, or could it be explained by chance? (The chi-square test in stat7 will answer this formally.)',
+        instructions: 'Are pass rates substantially different across majors? Is this difference meaningful, or could it be explained by chance? (The chi-square test in stat7 will answer this formally.)',
       },
     ],
   },
@@ -352,7 +352,7 @@ fig.show()
           'Instead of a scatter plot for large datasets',
         ],
         answer: 'After looking at the scatter plot, to quantify what you already see visually',
-        hint: 'The "plot first" rule: r can be 0.8 for very different scatter patterns. Plot first to understand what you are quantifying.',
+        instructions: 'The "plot first" rule: r can be 0.8 for very different scatter patterns. Plot first to understand what you are quantifying.',
       },
     ],
   },

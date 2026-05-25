@@ -76,8 +76,66 @@ export default {
   },
 
   // ── Code / Notebooks ──────────────────────────────────────────
-  code: {
-    cells: [],
+  python: {
+    cells: [
+      {
+        id: 'stat1-001-cell-1',
+        type: 'python',
+        cellTitle: 'Population vs. sample — computing a statistic from data',
+        code: `# Population: all 10 students in a tiny school
+population = [68, 72, 75, 71, 69, 74, 73, 70, 76, 68]
+
+# Sample: randomly pick 4
+import random
+random.seed(7)
+sample = random.sample(population, 4)
+
+# Population parameter (mu) vs. sample statistic (x-bar)
+pop_mean = sum(population) / len(population)
+samp_mean = sum(sample) / len(sample)
+
+print(f"Population (N={len(population)}): {population}")
+print(f"Population mean μ  = {pop_mean:.2f}  ← parameter")
+print()
+print(f"Sample     (n={len(sample)}): {sample}")
+print(f"Sample mean x̄     = {samp_mean:.2f}  ← statistic")
+print()
+print(f"Estimation error  = {abs(samp_mean - pop_mean):.2f} points")
+`,
+        instructions: 'Re-run the cell a few times by changing random.seed(). Notice how the sample mean changes each time but the population mean stays fixed — this is sampling variability. The parameter is fixed; the statistic varies.',
+      },
+      {
+        id: 'stat1-001-cell-2',
+        type: 'python',
+        cellTitle: 'Classify variables: categorical vs. quantitative',
+        code: `# A small dataset about students
+students = [
+    {"name": "Alice",   "major": "Biology",  "gpa": 3.7, "year": 2, "full_time": True},
+    {"name": "Bob",     "major": "CS",       "gpa": 3.2, "year": 1, "full_time": True},
+    {"name": "Carmen",  "major": "English",  "gpa": 3.9, "year": 4, "full_time": False},
+    {"name": "David",   "major": "CS",       "gpa": 2.8, "year": 3, "full_time": True},
+    {"name": "Eva",     "major": "Biology",  "gpa": 3.5, "year": 2, "full_time": False},
+]
+
+print("Variable classification:")
+print(f"  major      → categorical (nominal):  {[s['major'] for s in students]}")
+print(f"  year       → categorical (ordinal):  {[s['year'] for s in students]}")
+print(f"  gpa        → quantitative (continuous): {[s['gpa'] for s in students]}")
+print(f"  full_time  → categorical (binary):   {[s['full_time'] for s in students]}")
+
+# Descriptive statistics on GPA (quantitative variable)
+gpas = [s['gpa'] for s in students]
+mean_gpa = sum(gpas) / len(gpas)
+print(f"\nMean GPA = {mean_gpa:.2f}  (makes sense — GPA is quantitative)")
+
+# Count majors (categorical variable)
+from collections import Counter
+major_counts = Counter(s['major'] for s in students)
+print(f"Major counts = {dict(major_counts)}  (count, not mean — major is categorical)")
+`,
+        instructions: 'Computing a mean of a categorical variable (like major) is meaningless. Verify: what operation makes sense for each variable type? Count/frequency for categorical; arithmetic (mean, SD) for quantitative.',
+      },
+    ],
   },
 
   // ── Examples ──────────────────────────────────────────────────
@@ -208,7 +266,7 @@ export default {
         text: 'A researcher records the finishing positions (1st, 2nd, 3rd, …) of runners in a race. What is the measurement scale of "finishing position"?',
         options: ['Nominal', 'Ordinal', 'Interval', 'Ratio'],
         answer: 'Ordinal',
-        hint: 'Finishing positions have a clear order (1st < 2nd < 3rd) but the time gap between 1st and 2nd is not necessarily the same as between 2nd and 3rd. No true zero and no equal intervals.',
+        instructions: 'Finishing positions have a clear order (1st < 2nd < 3rd) but the time gap between 1st and 2nd is not necessarily the same as between 2nd and 3rd. No true zero and no equal intervals.',
       },
     ],
   },

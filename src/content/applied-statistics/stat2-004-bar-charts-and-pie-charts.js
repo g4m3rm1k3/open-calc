@@ -61,13 +61,13 @@ export default {
     visualizations: [],
   },
 
-  code: {
+  python: {
     cells: [
       {
         id: 'stat2-004-cell-1',
         type: 'python',
-        label: 'Basic bar chart from counts',
-        starterCode: `import pandas as pd
+        cellTitle: 'Basic bar chart from counts',
+        code: `import pandas as pd
 
 # Survey responses (Likert scale)
 responses = ["SA","A","A","N","SA","A","D","A","SA","N",
@@ -91,13 +91,13 @@ fig.bars(labels=labels, values=values, color="steelblue")
 fig.text(2, 14.5, "Survey Response Distribution", size=13, bold=True)
 fig.show()
 `,
-        hint: 'Notice the bars are in Likert order (SD→SA) because we manually specified `order`. If you used `Counter` directly, the order would be arbitrary.',
+        instructions: 'Notice the bars are in Likert order (SD→SA) because we manually specified `order`. If you used `Counter` directly, the order would be arbitrary.',
       },
       {
         id: 'stat2-004-cell-2',
         type: 'python',
-        label: 'Proportion bar chart with pandas',
-        starterCode: `import pandas as pd
+        cellTitle: 'Proportion bar chart with pandas',
+        code: `import pandas as pd
 
 # Customer segments in two cities
 data = {
@@ -122,13 +122,13 @@ fig.bars(labels=labels_a, values=vals_a, color="coral")
 fig.text(1, 0.53, "City A — Segment Proportions", size=12, bold=True)
 fig.show()
 `,
-        hint: 'Try changing to City B proportions and compare. Are the customer segments distributed differently across the two cities?',
+        instructions: 'Try changing to City B proportions and compare. Are the customer segments distributed differently across the two cities?',
       },
       {
         id: 'stat2-004-cell-3',
         type: 'python',
-        label: 'Pie chart for part-to-whole',
-        starterCode: `# Budget allocation
+        cellTitle: 'Pie chart for part-to-whole',
+        code: `# Budget allocation
 categories = ["Personnel", "Equipment", "Travel", "Overhead"]
 amounts    = [450_000, 120_000, 35_000, 95_000]
 
@@ -142,7 +142,7 @@ fig.pie(labels=categories, values=amounts)
 fig.text(0, 1.15, "Budget Allocation", size=13, bold=True)
 fig.show()
 `,
-        hint: 'Four well-separated categories with clear proportions — this is a good use case for a pie chart. Now try adding a 5th category: "Other: 30000". Is the chart still readable?',
+        instructions: 'Four well-separated categories with clear proportions — this is a good use case for a pie chart. Now try adding a 5th category: "Other: 30000". Is the chart still readable?',
       },
     ],
   },
@@ -258,7 +258,7 @@ fig.show()
         text: 'A dataset has 12 different product categories. Which chart type is most appropriate for showing their frequencies?',
         options: ['Pie chart', 'Bar chart sorted by frequency', 'Histogram', 'Line chart'],
         answer: 'Bar chart sorted by frequency',
-        hint: '12 categories is too many for a pie chart. A bar chart sorted by frequency lets the reader immediately identify the most and least common categories.',
+        instructions: '12 categories is too many for a pie chart. A bar chart sorted by frequency lets the reader immediately identify the most and least common categories.',
       },
     ],
   },

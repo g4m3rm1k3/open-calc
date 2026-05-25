@@ -61,13 +61,13 @@ export default {
     visualizations: [],
   },
 
-  code: {
+  python: {
     cells: [
       {
         id: 'stat3-004-cell-1',
         type: 'python',
-        label: 'Build a boxplot from salary data',
-        starterCode: `# Salaries ($000s) for a company
+        cellTitle: 'Build a boxplot from salary data',
+        code: `# Salaries ($000s) for a company
 salaries = [48, 52, 55, 57, 58, 60, 62, 63, 65, 67,
             68, 70, 72, 75, 78, 80, 85, 90, 92, 145]
 
@@ -102,13 +102,13 @@ fig.boxplot(values=salaries, x=1.0, width=0.4, color="steelblue")
 fig.text(1.0, 155, "Salary Distribution ($000s)", size=12, bold=True)
 fig.show()
 `,
-        hint: 'Notice the outlier at $145k — it appears as a dot above the upper whisker. The median line should be below the center of the box, suggesting right skew (a longer upper whisker and the high outlier pulling the mean up).',
+        instructions: 'Notice the outlier at $145k — it appears as a dot above the upper whisker. The median line should be below the center of the box, suggesting right skew (a longer upper whisker and the high outlier pulling the mean up).',
       },
       {
         id: 'stat3-004-cell-2',
         type: 'python',
-        label: 'Side-by-side boxplots: compare three groups',
-        starterCode: `# Test scores for three teaching methods
+        cellTitle: 'Side-by-side boxplots: compare three groups',
+        code: `# Test scores for three teaching methods
 method_a = [62, 68, 72, 74, 75, 76, 78, 80, 82, 85, 87, 90]
 method_b = [50, 55, 70, 72, 75, 76, 77, 78, 80, 92, 95, 98]
 method_c = [70, 71, 73, 74, 75, 76, 76, 77, 78, 79, 80, 81]
@@ -136,7 +136,7 @@ for label, data, _, _ in groups:
     q3 = (s[3*n//4-1]+s[3*n//4])/2 if n%4==0 else s[3*n//4]
     print(f"{label}: median={q2}, IQR={q3-q1}, range={s[-1]-s[0]}")
 `,
-        hint: 'Compare the three methods: which has the highest median? Which is most consistent (smallest IQR)? Which has the most extreme spread? Method B likely has outliers on both ends (high variability). Method C is likely the tightest cluster (smallest IQR, most consistent results).',
+        instructions: 'Compare the three methods: which has the highest median? Which is most consistent (smallest IQR)? Which has the most extreme spread? Method B likely has outliers on both ends (high variability). Method C is likely the tightest cluster (smallest IQR, most consistent results).',
       },
     ],
   },
@@ -260,7 +260,7 @@ for label, data, _, _ in groups:
           'The maximum value shown by the whisker',
         ],
         answer: 'An outlier point beyond the whisker',
-        hint: 'Upper fence = Q3 + 1.5×IQR = 65 + 30 = 95. Wait — 90 < 95, so 90 is actually below the fence. Upper whisker tip = 80 (largest value ≤ 95). Since 90 > 80 (the whisker tip) but ≤ 95 (the fence), 90 would be the new whisker tip if it is in the dataset. But since the whisker already ends at 80, 90 must lie above the whisker tip — it IS beyond the whisker and IS within the fence. Wait: re-read. If 90 is a data value and whisker already ends at 80, then 90 must be between 80 and 95 — it would BE the whisker tip (80 must not be the largest non-outlier). Or if 90 > 95... 90 < 95, so 90 is NOT an outlier by Tukey rule. The correct answer: it would be a point beyond the whisker at 80 but within the fence — redrawn as the whisker tip. However the answer as listed should be reconsidered. Since whisker extends to 80 (the current largest non-outlier) and 90 > 80, if 90 were added, the whisker would extend to 90 (since 90 ≤ 95 = upper fence). For the question as posed: 90 is beyond the current whisker at 80. The displayed answer "outlier point beyond the whisker" is what many introductory courses would say, since 90 > the whisker endpoint. Advanced answer: 90 is not a Tukey outlier — it would move the whisker tip to 90. This is a nuanced distinction worth discussing.',
+        instructions: 'Upper fence = Q3 + 1.5×IQR = 65 + 30 = 95. Wait — 90 < 95, so 90 is actually below the fence. Upper whisker tip = 80 (largest value ≤ 95). Since 90 > 80 (the whisker tip) but ≤ 95 (the fence), 90 would be the new whisker tip if it is in the dataset. But since the whisker already ends at 80, 90 must lie above the whisker tip — it IS beyond the whisker and IS within the fence. Wait: re-read. If 90 is a data value and whisker already ends at 80, then 90 must be between 80 and 95 — it would BE the whisker tip (80 must not be the largest non-outlier). Or if 90 > 95... 90 < 95, so 90 is NOT an outlier by Tukey rule. The correct answer: it would be a point beyond the whisker at 80 but within the fence — redrawn as the whisker tip. However the answer as listed should be reconsidered. Since whisker extends to 80 (the current largest non-outlier) and 90 > 80, if 90 were added, the whisker would extend to 90 (since 90 ≤ 95 = upper fence). For the question as posed: 90 is beyond the current whisker at 80. The displayed answer "outlier point beyond the whisker" is what many introductory courses would say, since 90 > the whisker endpoint. Advanced answer: 90 is not a Tukey outlier — it would move the whisker tip to 90. This is a nuanced distinction worth discussing.',
       },
     ],
   },

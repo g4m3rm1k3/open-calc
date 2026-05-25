@@ -62,13 +62,13 @@ export default {
     visualizations: [],
   },
 
-  code: {
+  python: {
     cells: [
       {
         id: 'stat3-002-cell-1',
         type: 'python',
-        label: 'Compute spread measures from scratch',
-        starterCode: `# Wait times (minutes) for two clinics
+        cellTitle: 'Compute spread measures from scratch',
+        code: `# Wait times (minutes) for two clinics
 clinic_a = [20, 21, 22, 22, 23, 23, 22, 21, 22, 24]
 clinic_b = [2, 42, 3, 41, 22, 2, 42, 22, 2, 42]
 
@@ -98,13 +98,13 @@ def spread_summary(label, data):
 spread_summary("Clinic A", clinic_a)
 spread_summary("Clinic B", clinic_b)
 `,
-        hint: 'Both clinics have mean ≈ 22 minutes. Compare the standard deviations — they tell you about the reliability of each clinic. A patient who values predictability would choose Clinic A.',
+        instructions: 'Both clinics have mean ≈ 22 minutes. Compare the standard deviations — they tell you about the reliability of each clinic. A patient who values predictability would choose Clinic A.',
       },
       {
         id: 'stat3-002-cell-2',
         type: 'python',
-        label: 'Empirical Rule visualization',
-        starterCode: `import pandas as pd
+        cellTitle: 'Empirical Rule visualization',
+        code: `import pandas as pd
 
 # Simulate normally distributed data: exam scores
 # Mean=75, SD=10
@@ -131,7 +131,7 @@ fig.histogram(values=scores, bins=15, color="steelblue")
 fig.text(75, 29, "Exam Scores (Mean=75, SD=10)", size=12, bold=True)
 fig.show()
 `,
-        hint: 'The histogram should look roughly bell-shaped. Verify that the empirical 68-95-99.7 rule holds approximately for this simulated normal data.',
+        instructions: 'The histogram should look roughly bell-shaped. Verify that the empirical 68-95-99.7 rule holds approximately for this simulated normal data.',
       },
     ],
   },
@@ -258,7 +258,7 @@ fig.show()
           'Mode and variance',
         ],
         answer: 'Median and IQR',
-        hint: 'Outliers distort both the mean and SD. The median and IQR are resistant to outliers.',
+        instructions: 'Outliers distort both the mean and SD. The median and IQR are resistant to outliers.',
       },
     ],
   },

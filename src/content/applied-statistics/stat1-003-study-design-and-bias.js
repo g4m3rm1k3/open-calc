@@ -70,8 +70,89 @@ export default {
     visualizations: [],
   },
 
-  code: {
-    cells: [],
+  python: {
+    cells: [
+      {
+        id: 'stat1-003-cell-1',
+        type: 'python',
+        cellTitle: 'Simulate confounding: lurking variable distorts a relationship',
+        code: `import random
+random.seed(42)
+
+# Scenario: "Does ice cream cause drowning?"
+# True cause of both: summer (temperature)
+# n = 100 days
+
+temperature = [random.uniform(50, 100) for _ in range(100)]  # degrees F
+
+# Ice cream sales: driven by temperature + noise
+ice_cream = [0.8 * t + random.gauss(0, 5) for t in temperature]
+
+# Drowning incidents: driven by temperature + noise (more swimming in heat)
+drowning = [0.05 * t + random.gauss(0, 1.5) for t in temperature]
+drowning = [max(0, round(d)) for d in drowning]  # non-negative counts
+
+# Compute naive correlation between ice cream and drowning
+n = len(temperature)
+xbar = sum(ice_cream)/n
+ybar = sum(drowning)/n
+sx = (sum((x-xbar)**2 for x in ice_cream)/(n-1))**0.5
+sy = (sum((y-ybar)**2 for y in drowning)/(n-1))**0.5
+r = sum((x-xbar)*(y-ybar) for x,y in zip(ice_cream,drowning)) / ((n-1)*sx*sy)
+
+print(f"Correlation(ice cream, drowning) = {r:.3f}  ← looks strong!")
+print("But this is entirely explained by temperature (confounding variable).")
+print()
+print("If you only observe ice cream vs. drowning, you see a real correlation.")
+print("But there is NO causal link — temperature drives both.")
+print("Conclusion: correlation ≠ causation when a lurking variable is present.")
+`,
+        instructions: 'The correlation is strong (~0.8) even though ice cream has zero direct effect on drowning. To detect confounding in a real study, you would need to hold temperature constant (control for it) or use random assignment. This is why observational data alone cannot establish causation.',
+      },
+      {
+        id: 'stat1-003-cell-2',
+        type: 'python',
+        cellTitle: 'Simulate a randomized experiment — eliminate confounding',
+        code: `import random
+random.seed(99)
+
+# Drug trial: does Drug X reduce blood pressure?
+# True effect: Drug X reduces BP by 8 points on average
+# Confound if not randomized: older patients tend to have higher BP AND get drug more
+
+n = 100
+ages = [random.randint(30, 80) for _ in range(n)]
+baseline_bp = [100 + 0.5 * age + random.gauss(0, 8) for age in ages]
+
+# --- Observational (biased) assignment: older → more likely to get drug
+def assign_biased(age):
+    prob = (age - 30) / 50  # older = higher probability of getting drug
+    return 1 if random.random() < prob else 0
+
+treated_obs  = [assign_biased(a) for a in ages]
+
+# --- Randomized assignment: 50/50 coin flip
+treated_rand = [1 if random.random() < 0.5 else 0 for _ in ages]
+
+def estimate_effect(treated, bp_baseline):
+    treated_bp  = [bp + (-8 + random.gauss(0,3)) for bp, t in zip(bp_baseline, treated) if t==1]
+    control_bp  = [bp               for bp, t in zip(bp_baseline, treated) if t==0]
+    if not treated_bp or not control_bp:
+        return None
+    return sum(treated_bp)/len(treated_bp) - sum(control_bp)/len(control_bp)
+
+random.seed(99)
+biased_est   = estimate_effect(treated_obs, baseline_bp)
+random.seed(99)
+random_est   = estimate_effect(treated_rand, baseline_bp)
+
+print(f"True treatment effect:         -8.0 points")
+print(f"Biased (observational) estimate: {biased_est:.1f} points  ← confounded by age")
+print(f"Randomized experiment estimate:  {random_est:.1f} points  ← close to truth")
+`,
+        instructions: 'The observational estimate is distorted by age (older patients both receive the drug more AND have higher baseline BP). Random assignment breaks this link — the treated and control groups have similar age distributions by chance, so the estimate is close to the true −8 point effect.',
+      },
+    ],
   },
 
   examples: [
@@ -202,7 +283,7 @@ export default {
           'A case-control study',
         ],
         answer: 'A randomized controlled trial',
-        hint: 'The key feature is random assignment to treatment conditions by the researchers.',
+        instructions: 'The key feature is random assignment to treatment conditions by the researchers.',
       },
     ],
   },
