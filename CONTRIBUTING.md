@@ -1,4 +1,4 @@
-# Contributing to open-calc
+# Contributing to upSkillOS
 
 Thanks for helping improve open-calc. This guide covers everything you need to add a lesson, a visualization, or fix a bug — including the pitfalls that are easy to miss.
 
