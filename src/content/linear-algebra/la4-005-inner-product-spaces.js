@@ -16,7 +16,7 @@ export default {
 
   intuition: {
     prose: [
-      '**What an inner product is.** An inner product on a vector space $V$ is a function $\\langle \\cdot, \\cdot \\rangle: V \\times V \\to \\mathbb{R}$ (or $\\mathbb{C}$) that satisfies three properties: (1) **Symmetry**: $\\langle \\mathbf{u}, \\mathbf{v} \\rangle = \\langle \\mathbf{v}, \\mathbf{u} \\rangle$; (2) **Linearity in the first argument**: $\\langle c\\mathbf{u} + \\mathbf{w}, \\mathbf{v} \\rangle = c\\langle \\mathbf{u}, \\mathbf{v} \\rangle + \\langle \\mathbf{w}, \\mathbf{v} \\rangle$; (3) **Positive definiteness**: $\\langle \\mathbf{v}, \\mathbf{v} \\rangle > 0$ for all $\\mathbf{v} \\neq \\mathbf{0}$.',
+      'Two polynomials: $f(x) = x$ and $g(x) = x^2$ on $[0,1]$. Their "similarity": $\\langle f,g \\rangle = \\int_0^1 x \\cdot x^2\\,dx = \\int_0^1 x^3\\,dx = 1/4$. Their "lengths": $\\|f\\| = \\sqrt{1/3}$, $\\|g\\| = \\sqrt{1/5}$. Angle: $\\cos\\theta = (1/4)/(\\sqrt{1/3}\\sqrt{1/5}) = (\\sqrt{15}/4) \\approx 0.968$ — these polynomials are nearly aligned ($\\theta \\approx 15°$). There are no components here, just an integral — yet we get length, angle, and orthogonality exactly like in $\\mathbb{R}^n$. An inner product is any function that extends this geometry to any vector space.',
       '**The standard dot product.** On $\\mathbb{R}^n$: $\\langle \\mathbf{u}, \\mathbf{v} \\rangle = \\mathbf{u}^\\top \\mathbf{v} = \\sum_{i=1}^n u_i v_i$. This is the canonical example. The norm it induces is $\\|\\mathbf{v}\\| = \\sqrt{\\langle \\mathbf{v}, \\mathbf{v} \\rangle} = \\sqrt{\\sum v_i^2}$ — Euclidean length.',
       '**A weighted inner product.** On $\\mathbb{R}^n$ with positive weights $w_1, \\ldots, w_n$: $\\langle \\mathbf{u}, \\mathbf{v} \\rangle_W = \\sum w_i u_i v_i = \\mathbf{u}^\\top W \\mathbf{v}$ where $W = \\text{diag}(w_1, \\ldots, w_n)$. This inner product arises in statistics (weighted least squares) and finite elements (energy-based norms).',
       '**Inner products on function spaces.** On the space of continuous functions $C[a,b]$: $\\langle f, g \\rangle = \\int_a^b f(x)g(x)\\,dx$. Two functions are orthogonal if this integral is zero. This makes the sine and cosine functions of different frequencies orthogonal — the basis for Fourier series.',
@@ -37,6 +37,11 @@ export default {
         type: 'insight',
         title: 'Gram-Schmidt in an Inner Product Space',
         body: 'Gram-Schmidt works in any inner product space. Given linearly independent $\\{\\mathbf{v}_1, \\ldots, \\mathbf{v}_k\\}$, produce orthonormal $\\{\\mathbf{q}_1, \\ldots, \\mathbf{q}_k\\}$ using the same algorithm — just replace the dot product with $\\langle \\cdot, \\cdot \\rangle$ throughout.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Prediction',
+        body: 'For the weighted inner product $\\langle \\mathbf{u}, \\mathbf{v} \\rangle_W = 2u_1v_1 + 5u_2v_2$: are $\\mathbf{u} = [5,-2]^T$ and $\\mathbf{v} = [1,1]^T$ orthogonal under this inner product? Are they orthogonal under the standard dot product? Predict both answers, then compute.',
       },
     ],
     visualizations: [
@@ -358,6 +363,42 @@ for freq in test_freqs:
         },
       ],
     },
+    {
+      id: 'ex-la4-005-3',
+      title: 'Fourier orthogonality: sin and cos are perpendicular',
+      problem: 'Using the function inner product $\\langle f, g \\rangle = \\int_{-\\pi}^{\\pi} f(x)g(x)\\,dx$, verify that $f(x) = \\sin(x)$ and $g(x) = \\cos(x)$ are orthogonal, and compute $\\|\\sin(x)\\|$ and $\\|\\cos(x)\\|$.',
+      steps: [
+        {
+          expression: '\\langle \\sin(x), \\cos(x) \\rangle = \\int_{-\\pi}^{\\pi} \\sin(x)\\cos(x)\\,dx = \\frac{1}{2}\\int_{-\\pi}^{\\pi} \\sin(2x)\\,dx',
+          annotation: 'Use the identity $\\sin(x)\\cos(x) = \\frac{1}{2}\\sin(2x)$.',
+          strategyTitle: 'Apply product-to-sum identity',
+          checkpoint: 'Why do we expect this to be zero before computing?',
+          hints: ['sin(x)cos(x) is an odd function (f(-x) = -f(x)). The integral of any odd function over a symmetric interval [-π,π] is zero.'],
+        },
+        {
+          expression: '= \\frac{1}{2}\\left[-\\frac{\\cos(2x)}{2}\\right]_{-\\pi}^{\\pi} = \\frac{1}{2}\\left(-\\frac{\\cos(2\\pi)}{2} + \\frac{\\cos(-2\\pi)}{2}\\right) = 0',
+          annotation: '$\\cos(2\\pi) = \\cos(-2\\pi) = 1$, so the antiderivative evaluates to the same value at both endpoints — difference is zero. ✓',
+          strategyTitle: 'Evaluate integral',
+          checkpoint: '',
+          hints: [],
+        },
+        {
+          expression: '\\|\\sin(x)\\|^2 = \\int_{-\\pi}^{\\pi} \\sin^2(x)\\,dx = \\int_{-\\pi}^{\\pi} \\frac{1-\\cos(2x)}{2}\\,dx = \\left[\\frac{x}{2} - \\frac{\\sin(2x)}{4}\\right]_{-\\pi}^{\\pi} = \\pi',
+          annotation: 'Use $\\sin^2(x) = (1-\\cos(2x))/2$. The $\\cos(2x)$ term integrates to zero over a full period.',
+          strategyTitle: 'Compute norm of sin(x)',
+          checkpoint: '',
+          hints: [],
+        },
+        {
+          expression: '\\|\\cos(x)\\|^2 = \\int_{-\\pi}^{\\pi} \\cos^2(x)\\,dx = \\pi \\quad (\\text{by symmetry})',
+          annotation: '$\\cos^2(x) = (1+\\cos(2x))/2$, same argument. So $\\|\\sin(x)\\| = \\|\\cos(x)\\| = \\sqrt{\\pi}$.',
+          strategyTitle: 'Compute norm of cos(x)',
+          checkpoint: 'What is the orthonormal pair (unit-length vectors)?',
+          hints: ['Divide by the norm: e₁ = sin(x)/√π and e₂ = cos(x)/√π. These form an orthonormal pair in function space — the same role as standard basis vectors in ℝⁿ.'],
+        },
+      ],
+      conclusion: '$\\sin(x) \\perp \\cos(x)$ in function space, with $\\|\\sin(x)\\| = \\|\\cos(x)\\| = \\sqrt{\\pi}$. Normalized: $\\{\\sin(x)/\\sqrt{\\pi}, \\cos(x)/\\sqrt{\\pi}\\}$ is an orthonormal pair. This orthogonality is the reason Fourier series work: each frequency is independent (contributes independently to the total signal).',
+    },
   ],
 
   challenges: [
@@ -399,9 +440,14 @@ for freq in test_freqs:
   ],
 
   checkpoints: [
-    { id: 'cp-la4-005-1', question: 'What three properties define an inner product?', answer: 'Symmetry, linearity in first argument, positive definiteness.' },
-    { id: 'cp-la4-005-2', question: 'When does equality hold in Cauchy-Schwarz?', answer: 'When $\\mathbf{u}$ and $\\mathbf{v}$ are linearly dependent (parallel).' },
-    { id: 'cp-la4-005-3', question: 'What is the inner product of $\\sin(x)$ and $\\cos(x)$ on $[-\\pi, \\pi]$?', answer: '0 — they are orthogonal.' },
+    { id: 'cp-la4-005-1', label: 'Read: State the three inner product axioms', type: 'read' },
+    { id: 'cp-la4-005-2', label: 'Read: State the Cauchy-Schwarz inequality and when equality holds', type: 'read' },
+    { id: 'cp-la4-005-3', label: 'Read: Explain what makes a space a Hilbert space', type: 'read' },
+    { id: 'cp-la4-005-4', label: 'Lab: Compute function inner products and verify orthogonality', type: 'lab' },
+    { id: 'cp-la4-005-5', label: 'Lab: Compute angle between two functions using inner product', type: 'lab' },
+    { id: 'cp-la4-005-6', label: 'Example: Compute inner products in function space', type: 'example' },
+    { id: 'cp-la4-005-7', label: 'Example: Verify weighted inner product axioms', type: 'example' },
+    { id: 'cp-la4-005-8', label: 'Challenge: Apply Gram-Schmidt to polynomials', type: 'challenge' },
   ],
 
   assessment: {
@@ -465,5 +511,125 @@ for freq in test_freqs:
       hints: ['Use the product-to-sum identity: $\\sin(mx)\\sin(nx) = \\frac{1}{2}[\\cos((m-n)x) - \\cos((m+n)x)]$. The integral of $\\cos(kx)$ over a full period is $0$ when $k \\neq 0$. Since $m \\neq n$, both terms vanish.'],
       reviewSection: 'examples',
     },
+    {
+      id: 'q-la4-005-5',
+      type: 'choice',
+      text: 'Under the weighted inner product $\\langle \\mathbf{u}, \\mathbf{v} \\rangle_W = 2u_1v_1 + 5u_2v_2$, are $\\mathbf{u} = [5,-2]^T$ and $\\mathbf{v} = [1,1]^T$ orthogonal?',
+      options: ['Yes — $\\langle \\mathbf{u}, \\mathbf{v} \\rangle_W = 0$', 'No — $\\langle \\mathbf{u}, \\mathbf{v} \\rangle_W = 3$', 'No — $\\mathbf{u}^T\\mathbf{v} = 3 \\neq 0$', 'Yes — both are unit vectors'],
+      answer: 'Yes — $\\langle \\mathbf{u}, \\mathbf{v} \\rangle_W = 0$',
+      hints: ['⟨u,v⟩_W = 2·5·1 + 5·(-2)·1 = 10 - 10 = 0. They are W-orthogonal even though u·v = 3 ≠ 0 under the standard dot product.'],
+      reviewSection: 'Examples — weighted inner product',
+    },
+    {
+      id: 'q-la4-005-6',
+      type: 'choice',
+      text: 'Which of the following is NOT a valid inner product on $\\mathbb{R}^2$?',
+      options: [
+        '$\\langle \\mathbf{u}, \\mathbf{v} \\rangle = 3u_1v_1 + 7u_2v_2$',
+        '$\\langle \\mathbf{u}, \\mathbf{v} \\rangle = u_1v_1 - u_2v_2$',
+        '$\\mathbf{u}^T A \\mathbf{v}$ for $A = \\begin{bmatrix}2&1\\\\1&3\\end{bmatrix}$',
+        '$\\langle \\mathbf{u}, \\mathbf{v} \\rangle = u_1v_1 + 2u_2v_2$',
+      ],
+      answer: '$\\langle \\mathbf{u}, \\mathbf{v} \\rangle = u_1v_1 - u_2v_2$',
+      hints: ['Take v=[0,1]ᵀ: ⟨v,v⟩ = 0 - 1 = -1 < 0. Positive definiteness fails — inner products require ⟨v,v⟩ > 0 for all non-zero v.'],
+      reviewSection: 'Intuition — positive definiteness axiom',
+    },
+    {
+      id: 'q-la4-005-7',
+      type: 'choice',
+      text: 'Parseval\'s identity $\\|f\\|^2 = \\sum_n |\\langle f, e_n \\rangle|^2$ (for an orthonormal basis $\\{e_n\\}$) is the infinite-dimensional version of:',
+      options: ['Cauchy-Schwarz inequality', 'The Pythagorean theorem', 'The triangle inequality', 'Gram-Schmidt'],
+      answer: 'The Pythagorean theorem',
+      hints: ['In ℝⁿ: ‖v‖² = Σᵢ|⟨v,eᵢ⟩|² (sum of squared components along an ONB). Parseval says the same thing holds in infinite dimensions: total energy = sum of squared Fourier coefficients.'],
+      reviewSection: 'Rigor — Parseval and completeness',
+    },
+    {
+      id: 'q-la4-005-8',
+      type: 'choice',
+      text: 'A complete inner product space is called a Hilbert space. The space of continuous functions $C[0,1]$ under $\\langle f,g\\rangle = \\int_0^1 fg$ is NOT Hilbert because:',
+      options: [
+        'The inner product is not symmetric',
+        'A Cauchy sequence of continuous functions can converge to a discontinuous limit (not in the space)',
+        'The space has infinite dimension',
+        'Cauchy-Schwarz does not hold there',
+      ],
+      answer: 'A Cauchy sequence of continuous functions can converge to a discontinuous limit (not in the space)',
+      hints: ['Completeness requires every Cauchy sequence to converge within the space. Example: a sequence of continuous functions approximating the step function — the limit is discontinuous, hence not in C[0,1]. The completion is L²[0,1].'],
+      reviewSection: 'Rigor — Hilbert vs. inner product spaces',
+    },
+    {
+      id: 'q-la4-005-9',
+      type: 'choice',
+      text: 'Gram-Schmidt applied to polynomials $\\{1, x, x^2\\}$ on $[-1,1]$ with the $L^2$ inner product produces:',
+      options: ['The monomials $\\{1, x, x^2\\}$ unchanged', 'The Legendre polynomials $\\{P_0, P_1, P_2\\}$', 'The Taylor basis', 'The Fourier basis'],
+      answer: 'The Legendre polynomials $\\{P_0, P_1, P_2\\}$',
+      hints: ['Gram-Schmidt orthogonalizes the monomial basis using the L² inner product on [-1,1]. The output is the Legendre polynomial basis — the natural orthogonal basis for polynomial approximation on [-1,1].'],
+      reviewSection: 'Challenges — Gram-Schmidt on polynomial space',
+    },
+    {
+      id: 'q-la4-005-10',
+      type: 'choice',
+      text: 'In quantum mechanics, $|\\langle \\psi_n, \\psi \\rangle|^2$ gives the probability of measuring eigenvalue $n$. This is meaningful because:',
+      options: [
+        'Wave functions are always real-valued',
+        'The eigenstates $\\{\\psi_n\\}$ form an orthonormal basis — Parseval guarantees the probabilities sum to 1',
+        'The Schrödinger equation is linear',
+        'Energy levels are always integers',
+      ],
+      answer: 'The eigenstates $\\{\\psi_n\\}$ form an orthonormal basis — Parseval guarantees the probabilities sum to 1',
+      hints: ['Parseval: ‖ψ‖² = Σₙ|⟨ψₙ,ψ⟩|². If ‖ψ‖=1 (normalized state), then Σₙ|⟨ψₙ,ψ⟩|² = 1. The probabilities |⟨ψₙ,ψ⟩|² automatically sum to 1 by the inner product structure.'],
+      reviewSection: 'Transfer — quantum mechanics',
+    },
   ],
+
+  misconceptions: [
+    {
+      falseBelief: 'An inner product is the same as the dot product.',
+      whyStudentsThinkIt: 'The dot product is the first inner product students encounter, so they generalize it incorrectly as the only option.',
+      correctionExample: 'The function inner product $\\langle f, g \\rangle = \\int_a^b f(x)g(x)\\,dx$ satisfies all three axioms but involves no components at all. The weighted dot product $\\sum w_i u_i v_i$ is also a valid inner product when all weights $w_i > 0$, giving a different geometry.',
+      contrastCase: 'Under the weighted inner product with $w_1=2, w_2=5$, the vectors $[5,-2]^T$ and $[1,1]^T$ are orthogonal — but under the standard dot product they are not. Same vectors, different "angle" depending on the inner product.',
+    },
+    {
+      falseBelief: 'Orthogonality is an intrinsic property of two vectors, independent of the inner product.',
+      whyStudentsThinkIt: 'Students learn orthogonality as a geometric property (perpendicularity) and think it is absolute.',
+      correctionExample: 'The same pair of vectors can be orthogonal under one inner product and not orthogonal under another. "Orthogonal" means $\\langle \\mathbf{u}, \\mathbf{v} \\rangle = 0$ — which depends on the specific inner product being used.',
+      contrastCase: 'In weighted least squares, the "normal equations" use the weighted inner product, not the standard dot product. The residual is orthogonal to the column space under the correct (weighted) inner product.',
+    },
+  ],
+
+  transferPrompts: [
+    {
+      situation: 'You want to find the best polynomial approximation to a function $f$ on $[-1,1]$ in the $L^2$ sense.',
+      competingTechniques: ['Taylor expansion', 'Interpolation at chosen nodes', 'Projection via function inner product'],
+      whyThisTechniqueWins: 'The $L^2$ projection onto the polynomial subspace (using Legendre polynomials as ONB) minimizes $\\|f - p\\|_{L^2}^2$ — the average squared error. Taylor minimizes pointwise error near a single point; interpolation forces exact agreement at discrete points. The inner product projection gives the globally best fit.',
+    },
+    {
+      situation: 'In signal processing, you want to extract the amplitude of a specific frequency $\\omega_0$ from a noisy signal $f(t)$.',
+      competingTechniques: ['Bandpass filter', 'Fourier transform at $\\omega_0$', 'Inner product with the basis function'],
+      whyThisTechniqueWins: 'The Fourier coefficient is $c_n = \\langle f, e^{i\\omega_0 t} \\rangle / \\|e^{i\\omega_0 t}\\|^2$ — an inner product. Because the Fourier basis is orthogonal, this extracts exactly the $\\omega_0$ component without contamination from other frequencies.',
+    },
+  ],
+
+  debugging: [
+    {
+      commonError: 'Trying to define an inner product with a negative weight, like $\\langle u,v \\rangle = u_1v_1 - u_2v_2$.',
+      symptom: '$\\langle \\mathbf{v}, \\mathbf{v} \\rangle < 0$ for $\\mathbf{v} = [0,1]^T$ — violates positive definiteness.',
+      whyItHappened: 'For a weighted inner product $\\sum w_i u_i v_i$ to satisfy positive definiteness, all weights must be positive. The minus sign makes $w_2 = -1 < 0$.',
+      repairStrategy: 'Check: for every non-zero $\\mathbf{v}$, compute $\\langle \\mathbf{v}, \\mathbf{v} \\rangle$ — must be $> 0$. For the matrix form $\\mathbf{u}^T A \\mathbf{v}$: $A$ must be symmetric positive definite (all eigenvalues positive).',
+    },
+    {
+      commonError: 'Computing the inner product of two functions by evaluating $f(x) \\cdot g(x)$ at a single point instead of integrating.',
+      symptom: 'Gets a number that varies with $x$ — an inner product is a single fixed scalar, not a function of $x$.',
+      whyItHappened: 'Confusing pointwise multiplication with integration. The function inner product is $\\int_a^b f(x)g(x)\\,dx$ — a definite integral that outputs one number.',
+      repairStrategy: 'Always check: inner product inputs are two vectors/functions, output is one scalar. If you have $x$ in your answer, you have not finished the computation.',
+    },
+  ],
+
+  mastery: {
+    targetLevel: 2,
+    solveIndependently: 'Verify inner product axioms, compute norms and angles in function space, identify orthogonal pairs, and state Cauchy-Schwarz.',
+    explainVerbally: 'Explain what an inner product generalizes beyond the dot product, why orthogonality depends on the inner product choice, and what completeness (Hilbert space) means.',
+    detectIncorrectApplication: 'Catch negative-weight inner products (fails positive definiteness); catch pointwise vs. integral confusion; catch assuming orthogonality is absolute.',
+    transferToUnfamiliar: 'Apply function inner products to Fourier series, quantum mechanics, or polynomial approximation — any context where geometry extends to infinite-dimensional function spaces.',
+  },
 };

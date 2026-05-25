@@ -16,7 +16,7 @@ export default {
 
   intuition: {
     prose: [
-      '**The two surprising facts.** For a real symmetric matrix $A = A^\\top$: (1) All eigenvalues are real — even though the characteristic polynomial could in principle have complex roots. (2) Eigenvectors for distinct eigenvalues are orthogonal — this is not true for general matrices. Together, these mean every real symmetric matrix has an orthonormal basis of eigenvectors.',
+      'Take $A = \\begin{bmatrix}3&1\\\\1&3\\end{bmatrix}$ — a real symmetric matrix ($A = A^\\top$). Characteristic polynomial: $(3-\\lambda)^2 - 1 = \\lambda^2 - 6\\lambda + 8 = (\\lambda-2)(\\lambda-4) = 0$, giving $\\lambda_1 = 2$, $\\lambda_2 = 4$ — both real. Eigenvectors: $\\mathbf{v}_1 = (1,-1)^\\top$ and $\\mathbf{v}_2 = (1,1)^\\top$. Check: $\\mathbf{v}_1 \\cdot \\mathbf{v}_2 = 1 \\cdot 1 + (-1) \\cdot 1 = 0$ ✓. Two facts emerge: eigenvalues are real, and eigenvectors are perpendicular — nobody forced them to be, the symmetry made it happen. Contrast with $B = \\begin{bmatrix}1&2\\\\0&3\\end{bmatrix}$ (not symmetric): eigenvalues $1$ and $3$ are also real, but eigenvectors $(1,0)^\\top$ and $(1,1)^\\top$ give dot product $1 \\neq 0$ — not orthogonal. Symmetry is what forces the eigenvectors to be perpendicular.',
       '**Why eigenvalues are real.** Suppose $\\lambda$ is an eigenvalue with eigenvector $\\mathbf{v}$ (potentially complex): $A\\mathbf{v} = \\lambda \\mathbf{v}$. Take the conjugate transpose: $\\bar{\\mathbf{v}}^\\top A^\\top = \\bar{\\lambda} \\bar{\\mathbf{v}}^\\top$. Since $A = A^\\top$ (real, symmetric): $\\bar{\\mathbf{v}}^\\top A = \\bar{\\lambda} \\bar{\\mathbf{v}}^\\top$. Multiply the original equation on the left by $\\bar{\\mathbf{v}}^\\top$: $\\bar{\\mathbf{v}}^\\top A \\mathbf{v} = \\lambda \\bar{\\mathbf{v}}^\\top \\mathbf{v}$. Also $\\bar{\\mathbf{v}}^\\top A \\mathbf{v} = \\bar{\\lambda} \\bar{\\mathbf{v}}^\\top \\mathbf{v}$. So $\\lambda = \\bar{\\lambda}$, meaning $\\lambda$ is real.',
       '**Why eigenvectors for distinct eigenvalues are orthogonal.** Let $A\\mathbf{u} = \\lambda\\mathbf{u}$ and $A\\mathbf{v} = \\mu\\mathbf{v}$ with $\\lambda \\neq \\mu$. Then $\\lambda \\mathbf{u}^\\top \\mathbf{v} = (A\\mathbf{u})^\\top \\mathbf{v} = \\mathbf{u}^\\top A^\\top \\mathbf{v} = \\mathbf{u}^\\top A \\mathbf{v} = \\mu \\mathbf{u}^\\top \\mathbf{v}$. So $(\\lambda - \\mu) \\mathbf{u}^\\top \\mathbf{v} = 0$. Since $\\lambda \\neq \\mu$: $\\mathbf{u}^\\top \\mathbf{v} = 0$.',
       '**The spectral theorem.** Every real symmetric $n \\times n$ matrix $A$ can be written as $A = Q\\Lambda Q^\\top$ where $Q$ is orthogonal ($Q^\\top = Q^{-1}$, columns are orthonormal eigenvectors) and $\\Lambda = \\text{diag}(\\lambda_1, \\ldots, \\lambda_n)$ has real eigenvalues. This is **orthogonal diagonalization** — special because $P^{-1} = P^\\top$.',
@@ -37,6 +37,11 @@ export default {
         type: 'insight',
         title: 'Symmetric vs Non-symmetric Diagonalization',
         body: 'General: $A = PDP^{-1}$ (P not necessarily orthogonal, eigenvalues may be complex)\nSymmetric: $A = Q\\Lambda Q^\\top$ (Q orthogonal, all eigenvalues real)\nThe orthogonal version is much better: no matrix inverse needed ($Q^{-1} = Q^\\top$), numerically stable, and geometrically natural.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Prediction',
+        body: 'Before reading on: take $A = \\begin{bmatrix}5&0\\\\0&3\\end{bmatrix}$ (diagonal and symmetric). Without computing, predict: What are the eigenvalues? What are the eigenvectors? Are they orthogonal? Now perturb to $B = \\begin{bmatrix}5&1\\\\1&3\\end{bmatrix}$. Will the eigenvectors still be orthogonal? Will they point in the same directions as before, or rotate?',
       },
     ],
     visualizations: [
@@ -342,6 +347,34 @@ print(f"  Worn:  {ev_worn[1]/ev_worn[0]:.3f}  (higher = more chatter energy in s
         },
       ],
     },
+    {
+      id: 'ex-la4-006-3',
+      title: 'Matrix exponential via spectral decomposition',
+      problem: 'Compute $e^A$ for $A = \\begin{bmatrix}3&1\\\\1&3\\end{bmatrix}$, using the spectral decomposition found in Example 1. Express the result in exact form and verify numerically.',
+      steps: [
+        {
+          expression: 'A = Q\\Lambda Q^\\top, \\quad Q = \\tfrac{1}{\\sqrt{2}}\\begin{bmatrix}1&1\\\\-1&1\\end{bmatrix}, \\quad \\Lambda = \\begin{bmatrix}2&0\\\\0&4\\end{bmatrix}',
+          annotation: 'From Example 1. The spectral decomposition is already done — we just apply $f$ to the eigenvalues.',
+          strategyTitle: 'Recall the spectral decomposition',
+        },
+        {
+          expression: 'e^A = Q\\,e^\\Lambda\\, Q^\\top = Q\\begin{bmatrix}e^2&0\\\\0&e^4\\end{bmatrix}Q^\\top',
+          annotation: 'Key identity: for any $A = Q\\Lambda Q^\\top$, any function $f(A) = Qf(\\Lambda)Q^\\top$ where $f$ is applied entry-wise to the diagonal. The spectral decomposition makes matrix functions trivial.',
+          strategyTitle: 'Apply $f(A) = Qf(\\Lambda)Q^\\top$',
+        },
+        {
+          expression: 'e^A = \\frac{e^2}{2}\\begin{bmatrix}1&-1\\\\-1&1\\end{bmatrix} + \\frac{e^4}{2}\\begin{bmatrix}1&1\\\\1&1\\end{bmatrix} = \\frac{1}{2}\\begin{bmatrix}e^2+e^4 & -e^2+e^4 \\\\ -e^2+e^4 & e^2+e^4\\end{bmatrix}',
+          annotation: 'Expand: $Q\\begin{bmatrix}e^2&0\\\\0&e^4\\end{bmatrix}Q^\\top = e^2 \\mathbf{q}_1\\mathbf{q}_1^\\top + e^4 \\mathbf{q}_2\\mathbf{q}_2^\\top$. This is the spectral decomposition of $e^A$ — same eigenvectors, eigenvalues transformed.',
+          strategyTitle: 'Expand using outer products',
+        },
+        {
+          expression: 'e^A = e^3\\begin{bmatrix}\\cosh 1 & \\sinh 1 \\\\ \\sinh 1 & \\cosh 1\\end{bmatrix} \\approx \\begin{bmatrix}30.09 & 23.93 \\\\ 23.93 & 30.09\\end{bmatrix}',
+          annotation: 'Factor $e^{(2+4)/2} = e^3$: entries $(e^2+e^4)/2 = e^3\\cosh 1$ and $(e^4-e^2)/2 = e^3\\sinh 1$. The result is symmetric (as expected — $e^A$ inherits the symmetry of $A$) and positive definite (all eigenvalues $e^2, e^4 > 0$).',
+          strategyTitle: 'Compact form and verification',
+          checkpoint: 'For symmetric $A$, $e^A$ is symmetric and positive definite (all eigenvalues positive). The spectral theorem makes matrix functions a one-line computation.',
+        },
+      ],
+    },
   ],
 
   challenges: [
@@ -385,9 +418,14 @@ print(f"  Worn:  {ev_worn[1]/ev_worn[0]:.3f}  (higher = more chatter energy in s
   ],
 
   checkpoints: [
-    { id: 'cp-la4-006-1', question: 'What property guarantees that eigenvalues of a real symmetric matrix are real?', answer: 'Symmetry $A = A^\\top$; the proof uses $A\\mathbf{v} = \\lambda\\mathbf{v}$ and $\\bar{\\mathbf{v}}^\\top A\\mathbf{v} = \\lambda\\|\\mathbf{v}\\|^2$ must equal its conjugate.' },
-    { id: 'cp-la4-006-2', question: 'What is the spectral decomposition of $A$?', answer: '$A = \\sum_{i=1}^n \\lambda_i \\mathbf{q}_i\\mathbf{q}_i^\\top$ — a sum of scaled rank-1 outer products.' },
-    { id: 'cp-la4-006-3', question: 'Why is $Q^{-1} = Q^\\top$ in orthogonal diagonalization?', answer: 'Because the eigenvector columns of $Q$ are orthonormal: $Q^\\top Q = I$.' },
+    { id: 'cp-la4-006-1', label: 'Read intuition: concrete symmetric matrix example', type: 'read' },
+    { id: 'cp-la4-006-2', label: 'Read math: proof of real eigenvalues', type: 'read' },
+    { id: 'cp-la4-006-3', label: 'Read rigor: Hermitian and Courant-Fischer', type: 'read' },
+    { id: 'cp-la4-006-4', label: 'Run orthogonal diagonalization lab', type: 'lab' },
+    { id: 'cp-la4-006-5', label: 'Run spectral decomposition and PCA lab', type: 'lab' },
+    { id: 'cp-la4-006-6', label: 'Work example 1: diagonalize symmetric 2×2', type: 'example' },
+    { id: 'cp-la4-006-7', label: 'Work example 2: PCA covariance matrix', type: 'example' },
+    { id: 'cp-la4-006-8', label: 'Solve matrix square root challenge', type: 'challenge' },
   ],
 
   assessment: {
@@ -465,6 +503,141 @@ print(f"  Worn:  {ev_worn[1]/ev_worn[0]:.3f}  (higher = more chatter energy in s
       answer: 'The variance of the data projected onto $\\mathbf{q}_i$',
       hints: ['If the covariance is $C = \\frac{1}{N}X^\\top X$ and $C\\mathbf{q}_i = \\lambda_i \\mathbf{q}_i$, then the projected data $X\\mathbf{q}_i$ has variance $\\mathbf{q}_i^\\top C \\mathbf{q}_i = \\lambda_i$. The Courant-Fischer theorem says $\\lambda_1 = \\max_{\\|\\mathbf{q}\\|=1} \\mathbf{q}^\\top C \\mathbf{q}$ — the first PC maximizes explained variance.'],
       reviewSection: 'rigor',
+    },
+    {
+      id: 'q-la4-006-5',
+      type: 'choice',
+      text: 'A symmetric matrix has a repeated eigenvalue $\\lambda = 3$ with multiplicity 2. What does the spectral theorem guarantee about the eigenvectors for this eigenspace?',
+      options: [
+        'They are automatically orthogonal — the spectral theorem forces it',
+        'There is only one eigenvector, so we cannot orthogonally diagonalize',
+        'We can choose an orthonormal basis for the eigenspace using Gram-Schmidt — the theorem guarantees this is possible',
+        'The matrix is not diagonalizable when eigenvalues repeat',
+      ],
+      answer: 'We can choose an orthonormal basis for the eigenspace using Gram-Schmidt — the theorem guarantees this is possible',
+      hints: ['For distinct eigenvalues, orthogonality of eigenvectors is automatic. For repeated eigenvalues, the eigenspace has dimension $\\geq 1$. The spectral theorem guarantees we can always find an orthonormal basis for each eigenspace (using Gram-Schmidt within the space), giving the full $Q$ with $Q^\\top Q = I$.'],
+      reviewSection: 'intuition',
+    },
+    {
+      id: 'q-la4-006-6',
+      type: 'choice',
+      text: 'Given $A = Q\\Lambda Q^\\top$ with $\\Lambda = \\text{diag}(4, 9)$, what is $A^{-1}$?',
+      options: [
+        '$Q^{-1}\\Lambda^{-1}Q$',
+        '$Q\\Lambda^{-1}Q^\\top$ where $\\Lambda^{-1} = \\text{diag}(1/4, 1/9)$',
+        '$Q^\\top\\Lambda Q$',
+        '$Q\\Lambda Q^{-1}$',
+      ],
+      answer: '$Q\\Lambda^{-1}Q^\\top$ where $\\Lambda^{-1} = \\text{diag}(1/4, 1/9)$',
+      hints: ['From $A = Q\\Lambda Q^\\top$: $A^{-1} = (Q^\\top)^{-1}\\Lambda^{-1}Q^{-1} = Q\\Lambda^{-1}Q^\\top$ since $Q^{-1} = Q^\\top$ (and $(Q^\\top)^{-1} = Q$). The eigenvalues of $A^{-1}$ are $1/\\lambda_i$ — just invert the diagonal.'],
+      reviewSection: 'math',
+    },
+    {
+      id: 'q-la4-006-7',
+      type: 'choice',
+      text: 'A $4 \\times 4$ symmetric matrix has spectral decomposition $A = 6\\mathbf{q}_1\\mathbf{q}_1^\\top + 4\\mathbf{q}_2\\mathbf{q}_2^\\top + 2\\mathbf{q}_3\\mathbf{q}_3^\\top + 1\\mathbf{q}_4\\mathbf{q}_4^\\top$. The best rank-2 approximation and its spectral-norm error are:',
+      options: [
+        '$6\\mathbf{q}_1\\mathbf{q}_1^\\top + 4\\mathbf{q}_2\\mathbf{q}_2^\\top$, error $= 2$',
+        '$6\\mathbf{q}_1\\mathbf{q}_1^\\top$, error $= 4$',
+        '$2\\mathbf{q}_3\\mathbf{q}_3^\\top + 1\\mathbf{q}_4\\mathbf{q}_4^\\top$, error $= 4$',
+        '$6\\mathbf{q}_1\\mathbf{q}_1^\\top + 4\\mathbf{q}_2\\mathbf{q}_2^\\top$, error $= 3$',
+      ],
+      answer: '$6\\mathbf{q}_1\\mathbf{q}_1^\\top + 4\\mathbf{q}_2\\mathbf{q}_2^\\top$, error $= 2$',
+      hints: ['Eckart-Young: best rank-$k$ approximation keeps the $k$ largest eigenvalue terms. Rank-2: $A_2 = 6\\mathbf{q}_1\\mathbf{q}_1^\\top + 4\\mathbf{q}_2\\mathbf{q}_2^\\top$. Spectral-norm error $= |\\lambda_3| = 2$ (the first dropped eigenvalue).'],
+      reviewSection: 'rigor',
+    },
+    {
+      id: 'q-la4-006-8',
+      type: 'choice',
+      text: 'In CNC vibration analysis, why are the natural frequencies $\\omega_i$ in $K\\boldsymbol{\\phi} = \\omega^2 M\\boldsymbol{\\phi}$ guaranteed to be real (not complex)?',
+      options: [
+        'Because $K$ and $M$ happen to commute',
+        'The generalized eigenvalues of two symmetric positive definite matrices are always real and non-negative',
+        'The eigenvalues are complex — the real part gives frequency, imaginary part gives damping',
+        'Only if the structure is undamped',
+      ],
+      answer: 'The generalized eigenvalues of two symmetric positive definite matrices are always real and non-negative',
+      hints: ['Rewrite as $M^{-1/2}KM^{-1/2}\\mathbf{y} = \\omega^2\\mathbf{y}$ (standard eigenvalue problem). The matrix $M^{-1/2}KM^{-1/2}$ is symmetric and PSD (since $K$ is PSD), so by the spectral theorem all eigenvalues $\\omega^2 \\geq 0$, hence $\\omega = \\sqrt{\\omega^2} \\in \\mathbb{R}$.'],
+      reviewSection: 'rigor',
+    },
+    {
+      id: 'q-la4-006-9',
+      type: 'choice',
+      text: 'A dataset has covariance matrix with eigenvalues $10, 8, 5, 3, 2, 1, 1$ (trace $= 30$). How many principal components capture at least $90\\%$ of total variance?',
+      options: [
+        '3 (captures $23/30 \\approx 77\\%$)',
+        '4 (captures $26/30 \\approx 87\\%$)',
+        '5 (captures $28/30 \\approx 93\\%$)',
+        '2 (captures $18/30 = 60\\%$)',
+      ],
+      answer: '5 (captures $28/30 \\approx 93\\%$)',
+      hints: ['Cumulative sums: $10 (33\\%)$, $18 (60\\%)$, $23 (77\\%)$, $26 (87\\%)$, $28 (93\\%) > 90\\%$. Stop at 5 components. The threshold $0.9 \\times 30 = 27$; cumulative sum first exceeds 27 at 5 components ($10+8+5+3+2 = 28$).'],
+      reviewSection: 'rigor',
+    },
+    {
+      id: 'q-la4-006-10',
+      type: 'choice',
+      text: 'Non-symmetric $B = \\begin{bmatrix}1&2\\\\0&3\\end{bmatrix}$ has real eigenvalues $1$ and $3$ with eigenvectors $(1,0)^\\top$ and $(1,1)^\\top$. Does $B$ satisfy the spectral theorem?',
+      options: [
+        'Yes — it has real eigenvalues, which is all the theorem requires',
+        'No — the eigenvectors are not orthogonal: $(1,0)\\cdot(1,1) = 1 \\neq 0$',
+        'Yes — any diagonalizable matrix satisfies the spectral theorem',
+        'No — non-symmetric matrices always have complex eigenvalues',
+      ],
+      answer: 'No — the eigenvectors are not orthogonal: $(1,0)\\cdot(1,1) = 1 \\neq 0$',
+      hints: ['The spectral theorem requires orthogonal diagonalization: $A = Q\\Lambda Q^\\top$ with $Q^\\top Q = I$. This needs orthonormal eigenvectors. $B$ can be diagonalized ($B = PDP^{-1}$) but $P^{-1} \\neq P^\\top$. Real eigenvalues alone are not enough — symmetry forces the eigenvectors to be orthogonal.'],
+      reviewSection: 'intuition',
+    },
+  ],
+
+  mastery: {
+    targetLevel: 3,
+    solveIndependently: 'Orthogonally diagonalize a symmetric matrix, write its spectral decomposition as a sum of rank-1 projections, and compute a matrix function (square root, inverse, exponential) via the decomposition.',
+    explainVerbally: 'Explain why symmetry forces eigenvalues to be real and eigenvectors to be orthogonal, using the two-way computation of $\\mathbf{u}^\\top A \\mathbf{v}$.',
+    detectIncorrectApplication: 'Catch claims that any diagonalizable matrix has orthogonal eigenvectors, or that real eigenvalues imply orthogonal eigenvectors — both require symmetry.',
+    transferToUnfamiliar: 'Apply the spectral theorem to compute matrix functions, recognize PCA as spectral decomposition of a covariance matrix, and interpret the Courant-Fischer characterization.',
+  },
+
+  misconceptions: [
+    {
+      falseBelief: 'If a matrix has real eigenvalues, its eigenvectors are orthogonal.',
+      whyStudentsThinkIt: 'The spectral theorem associates real eigenvalues with orthogonal eigenvectors, so students conflate the two conditions.',
+      correctionExample: '$B = \\begin{bmatrix}1&2\\\\0&3\\end{bmatrix}$ has real eigenvalues $1$ and $3$, but eigenvectors $(1,0)^\\top$ and $(1,1)^\\top$ give dot product $1 \\neq 0$. Real eigenvalues are a consequence of symmetry, not a cause of orthogonality.',
+      contrastCase: '$A = \\begin{bmatrix}3&1\\\\1&3\\end{bmatrix}$ (symmetric) has real eigenvalues AND orthogonal eigenvectors. Both properties come from $A = A^\\top$.',
+    },
+    {
+      falseBelief: 'Orthogonal diagonalization $A = Q\\Lambda Q^\\top$ is the same as regular diagonalization $A = PDP^{-1}$.',
+      whyStudentsThinkIt: 'Both decompose $A$ into eigenvalue form; students do not notice the crucial difference $Q^{-1} = Q^\\top$.',
+      correctionExample: 'Regular diagonalization requires computing $P^{-1}$ (expensive, unstable). Orthogonal diagonalization has $Q^{-1} = Q^\\top$ (just transpose), which is exact, cheap, and numerically stable. Also, $P^{-1} = Q^\\top$ only holds when eigenvectors are orthonormal.',
+      contrastCase: 'For any symmetric matrix, $P$ in $A = PDP^{-1}$ can always be chosen orthogonal (columns normalized), and then $P^{-1} = P^\\top$. For non-symmetric, you cannot do this in general.',
+    },
+  ],
+
+  transferPrompts: [
+    {
+      situation: 'You need to compute $\\sqrt{A}$, $A^{-1/2}$, or $e^A$ for a symmetric positive definite matrix $A$.',
+      competingTechniques: 'Schur decomposition (works for any matrix), series expansion, direct factorization.',
+      whyThisTechniqueWins: 'For SPD $A$: spectral decomposition gives $f(A) = Qf(\\Lambda)Q^\\top$ in one step, with $f$ applied entry-wise to the diagonal. No series convergence issues, no complex numbers, and the result is guaranteed to be real and symmetric. Schur works but wastes the symmetry structure.',
+    },
+    {
+      situation: 'You are doing PCA on a dataset and want to choose how many components to keep.',
+      competingTechniques: 'Keep a fixed number, keep until cumulative variance exceeds 90%, use cross-validation.',
+      whyThisTechniqueWins: 'The spectral theorem guarantees the covariance matrix $C = Q\\Lambda Q^\\top$ where eigenvalues are the explained variances. The cumulative eigenvalue fraction $\\sum_{i=1}^k \\lambda_i / \\text{tr}(C)$ gives an exact, interpretable criterion. This is only possible because $C$ is symmetric — its eigenvalues are real and sum to the total variance.',
+    },
+  ],
+
+  debugging: [
+    {
+      commonError: 'Using `numpy.linalg.eig` instead of `numpy.linalg.eigh` for symmetric matrices.',
+      symptom: '`eig` returns complex eigenvectors and eigenvalues with small imaginary parts (e.g., $10^{-16}i$) even for a perfectly symmetric matrix, and $Q^\\top Q \\neq I$.',
+      whyItHappened: '`eig` is for general matrices and uses non-symmetric algorithms (like QR iteration without symmetry exploitation). `eigh` knows the matrix is symmetric/Hermitian and uses a symmetric algorithm that guarantees real output and orthonormal eigenvectors.',
+      repairStrategy: 'Replace `np.linalg.eig(A)` with `np.linalg.eigh(A)`. Also verify `np.allclose(A, A.T)` before calling — if not symmetric, the result of `eigh` is undefined.',
+    },
+    {
+      commonError: 'Applying the matrix function formula $f(A) = Qf(\\Lambda)Q^\\top$ to a non-symmetric or non-diagonalizable matrix.',
+      symptom: 'The result is wrong: e.g., $\\sqrt{A}^2 \\neq A$, or the reconstructed matrix differs from the original.',
+      whyItHappened: 'The formula $f(A) = Qf(\\Lambda)Q^\\top$ requires $A$ to be orthogonally diagonalizable — i.e., symmetric. For a general diagonalizable matrix $A = PDP^{-1}$, the correct formula is $f(A) = Pf(D)P^{-1}$, not $Pf(D)P^\\top$.',
+      repairStrategy: 'Check $A = A^\\top$ before applying the spectral formula. For general matrices, compute $P^{-1}$ explicitly and use $f(A) = Pf(D)P^{-1}$. For non-diagonalizable matrices, use `scipy.linalg.funm` (Schur decomposition).',
     },
   ],
 };

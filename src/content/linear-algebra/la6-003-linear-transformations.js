@@ -16,7 +16,7 @@ export default {
 
   intuition: {
     prose: [
-      '**Definition.** A function $T: V \\to W$ between vector spaces is a **linear transformation** if:\n(1) $T(\\mathbf{u} + \\mathbf{v}) = T(\\mathbf{u}) + T(\\mathbf{v})$ (preserves addition)\n(2) $T(c\\mathbf{v}) = cT(\\mathbf{v})$ (preserves scalar multiplication)\n\nEquivalently: $T(c\\mathbf{u} + d\\mathbf{v}) = cT(\\mathbf{u}) + dT(\\mathbf{v})$ for all scalars $c, d$.',
+      'Take differentiation $D: P_3 \\to P_3$, $D(p) = p\'$. Test linearity: $D(p+q) = (p+q)\' = p\'+q\' = D(p)+D(q)$ ✓; $D(cp) = (cp)\' = cp\' = cD(p)$ ✓. Now find the kernel: $D(p) = 0$ iff $p\' = 0$ iff $p$ is constant — $\\ker(D) = P_0$ (constants), dimension 1. Image: $D(a_0 + a_1x + a_2x^2 + a_3x^3) = a_1 + 2a_2x + 3a_3x^2$ — any polynomial of degree $\\leq 2$ appears, so $\\text{im}(D) = P_2$, dimension 3. Rank-Nullity: $1 + 3 = 4 = \\dim P_3$ ✓. Contrast: $T(p) = p^2$ is NOT linear — $T(p+q) = (p+q)^2 = p^2 + 2pq + q^2 \\neq p^2 + q^2$. Linearity is preserved-combinations, not any function.',
       '**Key structural maps.** The **kernel** (or null space) of $T$ is $\\ker(T) = \\{\\mathbf{v} \\in V : T(\\mathbf{v}) = \\mathbf{0}_W\\}$ — the set of vectors that get mapped to zero. The **image** (or range) is $\\text{im}(T) = \\{T(\\mathbf{v}) : \\mathbf{v} \\in V\\} \\subseteq W$ — the set of all possible outputs. Both the kernel and image are subspaces (of $V$ and $W$ respectively).',
       '**Rank-nullity for linear transformations.** $\\dim(\\ker T) + \\dim(\\text{im } T) = \\dim V$. This is the abstract version of the rank-nullity theorem. The "rank" of $T$ is $\\dim(\\text{im } T)$ and the "nullity" is $\\dim(\\ker T)$.',
       '**From abstract to matrix.** Given a linear transformation $T: V \\to W$ and bases $\\mathcal{B}$ for $V$ and $\\mathcal{C}$ for $W$, there is a unique matrix $[T]_{\\mathcal{B}}^{\\mathcal{C}}$ that represents $T$ in those coordinates: $[T(\\mathbf{v})]_{\\mathcal{C}} = [T]_{\\mathcal{B}}^{\\mathcal{C}} [\\mathbf{v}]_{\\mathcal{B}}$. Every linear transformation between finite-dimensional spaces is represented by a matrix — once you pick bases.',
@@ -31,6 +31,11 @@ export default {
         type: 'insight',
         title: 'Differentiation as a Linear Map',
         body: '$D: P_n \\to P_{n-1}$, $D(p) = p\'$\n$\\ker(D) = P_0 = \\{$constants$\\}$ (dim 1 — constant polynomials have zero derivative)\n$\\text{im}(D) = P_{n-1}$ (dim $n$ — every polynomial of degree ≤ $n-1$ is a derivative)\nRank-Nullity: $1 + n = n+1 = \\dim P_n$ ✓',
+      },
+      {
+        type: 'sequencing',
+        title: 'Prediction',
+        body: 'Before reading on: the map $T: P_2 \\to P_3$ defined by $T(p) = \\int_0^x p(t)\\,dt$ — is it linear? What is $T(1)$, $T(x)$, $T(x^2)$? What is $\\ker(T)$? What is $\\dim(\\text{im}(T))$?',
       },
       {
         type: 'warning',
@@ -235,6 +240,62 @@ print(kernel_basis.round(10))
         },
       ],
     },
+    {
+      id: 'ex-la6-003-2',
+      title: 'Kernel and image of $T(p) = xp\'(x)$',
+      problem: 'For $T: P_2 \\to P_2$ defined by $T(p) = x \\cdot p\'(x)$: (a) show $T$ is linear, (b) find the matrix in basis $\\{1,x,x^2\\}$, (c) find $\\ker(T)$ and $\\text{im}(T)$, (d) verify rank-nullity.',
+      steps: [
+        {
+          expression: 'T(ap + bq) = x(ap+bq)\' = x(ap\'+bq\') = axp\' + bxq\' = aT(p) + bT(q) \\checkmark',
+          annotation: 'Both linearity conditions are satisfied: $T$ distributes over addition and scalar multiplication.',
+          strategyTitle: 'Verify linearity',
+        },
+        {
+          expression: 'T(1) = x \\cdot 0 = 0, \\quad T(x) = x \\cdot 1 = x, \\quad T(x^2) = x \\cdot 2x = 2x^2',
+          annotation: 'Apply $T$ to each basis vector. The derivative of $1$ is 0; derivative of $x$ is 1; derivative of $x^2$ is $2x$.',
+          strategyTitle: 'Apply to basis vectors',
+        },
+        {
+          expression: '[T] = \\begin{bmatrix}0&0&0\\\\0&1&0\\\\0&0&2\\end{bmatrix}',
+          annotation: 'Columns are the coordinate vectors $[T(1)], [T(x)], [T(x^2)]$ in basis $\\{1,x,x^2\\}$. Diagonal — $T$ acts as a scaling on each basis vector.',
+          strategyTitle: 'Assemble matrix',
+        },
+        {
+          expression: '\\ker(T) = \\{p : T(p) = 0\\} = \\{$constants$\\}, \\quad \\dim(\\ker T) = 1',
+          annotation: '$T(p)=0$ iff $xp\'=0$ iff $p\'=0$ iff $p$ is constant.',
+          strategyTitle: 'Find kernel',
+        },
+        {
+          expression: '\\text{im}(T) = \\text{Span}\\{T(1), T(x), T(x^2)\\} = \\text{Span}\\{0, x, 2x^2\\} = \\text{Span}\\{x, x^2\\}, \\quad \\dim = 2',
+          annotation: 'Rank-Nullity: $1 + 2 = 3 = \\dim P_2$ ✓. $T$ is neither injective (kernel nontrivial) nor surjective (image misses constants).',
+          strategyTitle: 'Find image and verify rank-nullity',
+          checkpoint: 'The diagonal matrix $\\text{diag}(0,1,2)$ shows $T$ kills the constant term (eigenvalue 0) and scales $x$ by 1 and $x^2$ by 2.',
+        },
+      ],
+    },
+    {
+      id: 'ex-la6-003-3',
+      title: 'Proving a map is NOT linear',
+      problem: 'Show that $T: \\mathbb{R}^2 \\to \\mathbb{R}^2$ defined by $T(x,y) = (x+1, y)$ (horizontal translation by 1) is NOT a linear transformation.',
+      steps: [
+        {
+          expression: 'T(\\mathbf{0}) = T(0,0) = (0+1, 0) = (1,0) \\neq (0,0)',
+          annotation: 'A linear transformation must always send zero to zero: $T(\\mathbf{0}) = T(0\\cdot\\mathbf{v}) = 0T(\\mathbf{v}) = \\mathbf{0}$. Since $T(\\mathbf{0}) \\neq \\mathbf{0}$, $T$ is not linear.',
+          strategyTitle: 'Check $T(\\mathbf{0}) = \\mathbf{0}$ first',
+        },
+        {
+          expression: 'T((1,0)+(2,0)) = T(3,0) = (4,0)',
+          annotation: 'Check additivity with a concrete pair.',
+          strategyTitle: 'Check additivity',
+        },
+        {
+          expression: 'T(1,0) + T(2,0) = (2,0) + (3,0) = (5,0) \\neq (4,0)',
+          annotation: '$T(\\mathbf{u}+\\mathbf{v}) \\neq T(\\mathbf{u})+T(\\mathbf{v})$: the translation adds 1 each time, not just once.',
+          strategyTitle: 'Demonstrate failure of additivity',
+          checkpoint: 'The fastest test: compute $T(\\mathbf{0})$. Any function with $T(\\mathbf{0}) \\neq \\mathbf{0}$ fails linearity immediately. Translation, absolute value, and squaring all fail this test.',
+        },
+      ],
+    },
   ],
 
   challenges: [
@@ -263,9 +324,14 @@ print(kernel_basis.round(10))
   ],
 
   checkpoints: [
-    { id: 'cp-la6-003-1', question: 'What two properties define a linear transformation?', answer: 'Preserves addition: $T(\\mathbf{u}+\\mathbf{v}) = T(\\mathbf{u})+T(\\mathbf{v})$; preserves scalar mult: $T(c\\mathbf{v}) = cT(\\mathbf{v})$.' },
-    { id: 'cp-la6-003-2', question: 'Is the kernel of a linear map always a subspace?', answer: 'Yes — it contains 0 and is closed under addition and scalar multiplication.' },
-    { id: 'cp-la6-003-3', question: 'What does the rank-nullity theorem say for linear maps?', answer: '$\\dim(\\ker T) + \\dim(\\text{im } T) = \\dim V$.' },
+    { id: 'cp-la6-003-1', label: 'Read intuition: linearity examples and kernel/image', type: 'read' },
+    { id: 'cp-la6-003-2', label: 'Read math: rank-nullity and matrix representation', type: 'read' },
+    { id: 'cp-la6-003-3', label: 'Read rigor: dual space and change-of-basis similarity', type: 'read' },
+    { id: 'cp-la6-003-4', label: 'Run kernel and image lab', type: 'lab' },
+    { id: 'cp-la6-003-5', label: 'Run differentiation matrix lab', type: 'lab' },
+    { id: 'cp-la6-003-6', label: 'Work example 1: integration as linear map', type: 'example' },
+    { id: 'cp-la6-003-7', label: 'Work example 2: kernel and image of xp\'(x)', type: 'example' },
+    { id: 'cp-la6-003-8', label: 'Solve challenge: rank-nullity for T(p) = p + p\'', type: 'challenge' },
   ],
 
   assessment: {
@@ -321,6 +387,136 @@ print(kernel_basis.round(10))
       answer: '$[T]_{\\mathcal{B}\'} = P^{-1} [T]_{\\mathcal{B}} P$',
       hints: ['This is matrix similarity: $A \\sim B$ iff $B = P^{-1}AP$ for some invertible $P$. Similarity means "same linear map, different coordinate systems." Diagonalization $A = PDP^{-1}$ is exactly finding the basis where $[T]$ is diagonal.'],
       reviewSection: 'rigor',
+    },
+    {
+      id: 'q-la6-003-5',
+      type: 'choice',
+      text: 'Is $T: \\mathbb{R}^2 \\to \\mathbb{R}^2$ defined by $T(x,y) = (x+y, xy)$ a linear transformation?',
+      options: [
+        'Yes — it is defined on a vector space',
+        'No — $T(\\mathbf{0}) = (0,0)$ so the zero test passes, but $xy$ is not linear',
+        'Yes — it preserves addition since $(x+y)$ is linear',
+        'No — its range is not a vector space',
+      ],
+      answer: 'No — $T(\\mathbf{0}) = (0,0)$ so the zero test passes, but $xy$ is not linear',
+      hints: ['The zero test: $T(0,0) = (0,0)$ ✓ — passes. But the second component $xy$ is bilinear (quadratic), not linear. Check: $T((1,0)+(0,1)) = T(1,1) = (2,1)$, but $T(1,0)+T(0,1) = (1,0)+(1,0) = (2,0) \\neq (2,1)$. The zero test is necessary but not sufficient.'],
+      reviewSection: 'intuition',
+    },
+    {
+      id: 'q-la6-003-6',
+      type: 'choice',
+      text: 'For $T: V \\to W$ with $\\dim V = 5$ and $\\dim(\\ker T) = 2$, the dimension of the image $\\text{im}(T)$ is:',
+      options: ['2', '3', '5', '7'],
+      answer: '3',
+      hints: ['Rank-Nullity: $\\dim(\\ker T) + \\dim(\\text{im } T) = \\dim V$. So $2 + \\dim(\\text{im } T) = 5$, giving $\\dim(\\text{im } T) = 3$. This is independent of $\\dim W$ — the image could be a 3D subspace of a 100-dimensional $W$.'],
+      reviewSection: 'math',
+    },
+    {
+      id: 'q-la6-003-7',
+      type: 'choice',
+      text: 'The matrix representation $[T]_{\\mathcal{B}}^{\\mathcal{C}}$ has its $j$-th column equal to:',
+      options: [
+        'The $j$-th basis vector of $V$ in standard coordinates',
+        'The $\\mathcal{C}$-coordinates of $T(\\mathbf{b}_j)$',
+        'The $\\mathcal{B}$-coordinates of $\\mathbf{c}_j$',
+        'The standard coordinates of $T(\\mathbf{b}_j)$',
+      ],
+      answer: 'The $\\mathcal{C}$-coordinates of $T(\\mathbf{b}_j)$',
+      hints: ['To build $[T]$: apply $T$ to the $j$-th basis vector of $V$, getting $T(\\mathbf{b}_j) \\in W$. Then express this vector in the basis $\\mathcal{C}$ of $W$. The resulting coordinate vector is the $j$-th column of $[T]$.'],
+      reviewSection: 'math',
+    },
+    {
+      id: 'q-la6-003-8',
+      type: 'choice',
+      text: 'The Fourier transform maps a function $f(t)$ to its frequency representation $\\hat{f}(\\omega)$. It is a linear transformation because:',
+      options: [
+        '$\\widehat{af+bg}(\\omega) = a\\hat{f}(\\omega) + b\\hat{g}(\\omega)$ for all constants $a, b$',
+        'The Fourier transform has an inverse',
+        'It maps continuous functions to continuous functions',
+        'It preserves the $L^2$ norm (Parseval\'s theorem)',
+      ],
+      answer: '$\\widehat{af+bg}(\\omega) = a\\hat{f}(\\omega) + b\\hat{g}(\\omega)$ for all constants $a, b$',
+      hints: ['The Fourier transform $\\mathcal{F}[f](\\omega) = \\int_{-\\infty}^\\infty f(t)e^{-i\\omega t}dt$ is linear because the integral is linear: $\\mathcal{F}[af+bg] = a\\mathcal{F}[f] + b\\mathcal{F}[g]$. Invertibility (option b) and norm preservation (option d) are additional properties — not the definition of linearity.'],
+      reviewSection: 'intuition',
+    },
+    {
+      id: 'q-la6-003-9',
+      type: 'choice',
+      text: 'For $T: P_3 \\to P_3$, $T(p) = p + p\'$ (add the derivative to the polynomial): is $T$ injective, surjective, both, or neither?',
+      options: [
+        'Neither — kernel is nontrivial and image is a proper subspace',
+        'Injective only — kernel is trivial but image is a proper subspace',
+        'Surjective only — image is all of $P_3$ but kernel is nontrivial',
+        'Both (isomorphism) — kernel is trivial and image is all of $P_3$',
+      ],
+      answer: 'Both (isomorphism) — kernel is trivial and image is all of $P_3$',
+      hints: ['The matrix $[T] = \\begin{bmatrix}1&1&0&0\\\\0&1&2&0\\\\0&0&1&3\\\\0&0&0&1\\end{bmatrix}$ is upper triangular with diagonal entries all = 1. Its determinant is 1 (product of diagonal) ≠ 0, so $[T]$ is invertible. Trivial kernel means injective; full image means surjective.'],
+      reviewSection: 'intuition',
+    },
+    {
+      id: 'q-la6-003-10',
+      type: 'choice',
+      text: 'In image compression (e.g., JPEG), the image is transformed using a Discrete Cosine Transform (DCT). The DCT is linear because:',
+      options: [
+        'You can compress the image by keeping only the large coefficients',
+        'Superimposing two images and transforming gives the same result as transforming and superimposing',
+        'It maps 2D pixel arrays to 2D frequency arrays',
+        'It is invertible (lossless before quantization)',
+      ],
+      answer: 'Superimposing two images and transforming gives the same result as transforming and superimposing',
+      hints: ['Linearity: $\\text{DCT}(aX + bY) = a\\,\\text{DCT}(X) + b\\,\\text{DCT}(Y)$. This is exactly what "linear transformation" means. Compressibility (option a) uses the result of linearity but isn\'t the definition. Invertibility (option d) is a separate property.'],
+      reviewSection: 'intuition',
+    },
+  ],
+
+  mastery: {
+    targetLevel: 2,
+    solveIndependently: 'Verify that a map between vector spaces is linear; find its matrix representation in given bases; compute kernel and image; apply rank-nullity.',
+    explainVerbally: 'Explain why $T(\\mathbf{0}) = \\mathbf{0}$ is a necessary test for linearity and why two matrix representations of the same map are related by similarity.',
+    detectIncorrectApplication: 'Catch non-linear maps (squaring, translating, absolute value) that pass some linearity tests but not others — especially those that pass the zero test.',
+    transferToUnfamiliar: 'Identify differentiation, integration, and Fourier transform as linear maps; find their kernels and images; apply rank-nullity.',
+  },
+
+  misconceptions: [
+    {
+      falseBelief: 'Any map that looks linear (because it has "+" and scalar factors) is a linear transformation.',
+      whyStudentsThinkIt: 'Students scan for addition and multiplication and conclude linearity without checking the superposition property.',
+      correctionExample: '$T(x,y) = (x+1, y)$ has "addition" in it but is not linear: $T(\\mathbf{u}+\\mathbf{v}) = (u_1+v_1+1,\\ldots) \\neq T(\\mathbf{u})+T(\\mathbf{v}) = (u_1+1+v_1+1,\\ldots)$ — the translation adds 1 twice. Always verify the superposition condition algebraically.',
+      contrastCase: '$T(x,y) = (x+y, x-y)$ is linear: $T(a\\mathbf{u}+b\\mathbf{v}) = aT(\\mathbf{u})+bT(\\mathbf{v})$ holds because both components are linear in $x, y$.',
+    },
+    {
+      falseBelief: 'The kernel and image of $T: V \\to W$ are both subspaces of $W$.',
+      whyStudentsThinkIt: 'Students confuse the two structural sets — both are subspaces, so which lives where?',
+      correctionExample: 'For differentiation $D: P_3 \\to P_3$: $\\ker(D) = \\{$constants$\\} \\subseteq P_3$ (the domain/input space); $\\text{im}(D) = P_2 \\subseteq P_3$ (the codomain/output space). Kernel ⊆ domain; image ⊆ codomain.',
+      contrastCase: 'For $T: \\mathbb{R}^3 \\to \\mathbb{R}^2$ given by a $2\\times3$ matrix: $\\ker(T) \\subseteq \\mathbb{R}^3$, $\\text{im}(T) \\subseteq \\mathbb{R}^2$. They live in different spaces.',
+    },
+  ],
+
+  transferPrompts: [
+    {
+      situation: 'You are building the matrix representation of a linear map between polynomial spaces.',
+      competingTechniques: 'Directly compute the matrix by definition; use the adjoint/transpose.',
+      whyThisTechniqueWins: 'Apply $T$ to each basis vector of the domain and express the result in the basis of the codomain — these become columns of $[T]$. This is the only systematic method and works for any linear map, including differentiation, integration, and evaluation.',
+    },
+    {
+      situation: 'You need to verify that two similar matrices $A = P^{-1}BP$ represent the same linear map.',
+      competingTechniques: 'Check all eigenvalues match; check rank and trace.',
+      whyThisTechniqueWins: 'Similar matrices have the same characteristic polynomial, eigenvalues, trace, determinant, rank, and nullity — all of these are preserved by similarity. But the converse fails: matrices with the same eigenvalues are not necessarily similar (Jordan form distinguishes them). The geometric picture is "same map, rotated basis."',
+    },
+  ],
+
+  debugging: [
+    {
+      commonError: 'Forgetting to express $T(\\mathbf{b}_j)$ in the OUTPUT basis $\\mathcal{C}$ when building the matrix.',
+      symptom: 'The matrix representation gives wrong results when applied to coordinate vectors.',
+      whyItHappened: 'After computing $T(\\mathbf{b}_j)$ (a vector in $W$), students write its standard coordinates instead of its $\\mathcal{C}$-coordinates. If $\\mathcal{C}$ is not the standard basis, these differ.',
+      repairStrategy: 'Always write the full formula: $[T]_{\\mathcal{B}}^{\\mathcal{C}}$ — superscript $\\mathcal{C}$ means "express in $\\mathcal{C}$." After computing $T(\\mathbf{b}_j)$, solve $\\mathcal{C}$-coordinate vector: $\\mathbf{c} = C^{-1} T(\\mathbf{b}_j)$ where $C = [\\mathbf{c}_1 | \\ldots | \\mathbf{c}_m]$.',
+    },
+    {
+      commonError: 'Applying rank-nullity as rank + nullity = number of rows instead of columns.',
+      symptom: 'For a $3 \\times 5$ matrix, student computes nullity $= 3 - \\text{rank}$ instead of $5 - \\text{rank}$.',
+      whyItHappened: 'Rank-Nullity is a theorem about the DOMAIN ($n$ = columns), not the codomain ($m$ = rows). The null space lives in the domain.',
+      repairStrategy: 'Write it as: $\\text{rank}(T) + \\text{nullity}(T) = \\dim(\\text{domain}) = n$. The number of rows is the dimension of the codomain — unrelated to rank-nullity.',
     },
   ],
 };

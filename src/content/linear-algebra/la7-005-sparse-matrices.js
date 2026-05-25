@@ -16,6 +16,7 @@ export default {
 
   intuition: {
     prose: [
+      'A $1000 \\times 1000$ grid of points produces a stiffness matrix of size $10^6 \\times 10^6$. Dense storage: $10^{12}$ entries $\\times$ 8 bytes = **8 terabytes** — impossible. But each interior point connects only to its 4 grid neighbors (up, down, left, right), so the matrix has only $\\approx 5 \\times 10^6$ non-zero entries. CSR sparse storage: $5 \\times 10^6 \\times 8$ bytes = **40 MB** — fits in a laptop. As a concrete mini-example, the $3 \\times 3$ matrix $A = \\begin{bmatrix}1&0&2\\\\0&3&0\\\\4&0&5\\end{bmatrix}$ has only 5 non-zeros out of 9 entries. CSR encodes it as: `values = [1,2,3,4,5]`, `col_idx = [0,2,1,0,2]`, `row_ptr = [0,2,3,5]`. To compute $A\\mathbf{x}$, you loop only over those 5 non-zeros — $O(nnz)$ flops instead of $O(n^2)$.',
       '**Sparsity.** A matrix is **sparse** if most of its entries are zero. The sparsity pattern (which entries are non-zero) often has geometric or graph-theoretic meaning. A matrix with $nnz$ non-zeros in an $n \\times n$ matrix has **density** $nnz/n^2$. Typical sparse matrices have $nnz = O(n)$ or $O(n \\log n)$, while dense matrices have $nnz = n^2$.',
       '**Storage formats.** Dense: store all $n^2$ entries. Compressed Sparse Row (CSR): store `values[]` (non-zeros), `col_idx[]` (column index of each non-zero), `row_ptr[]` ($n+1$ pointers — where each row starts). Memory: $O(nnz)$ instead of $O(n^2)$. Compressed Sparse Column (CSC) is the column-oriented variant. COO (coordinate) format just stores $(i, j, v)$ triples — easy to build, but slow to use.',
       '**Sparse matrix-vector product.** The core operation for iterative solvers: $\\mathbf{y} = A\\mathbf{x}$. With CSR, each non-zero contributes one multiply-add: $O(nnz)$ flops instead of $O(n^2)$. For $nnz = O(n)$, this is $O(n)$ — linear in problem size. This is the basis for all large-scale sparse solvers.',
@@ -31,6 +32,11 @@ export default {
         type: 'insight',
         title: 'Sparse vs Dense Complexity',
         body: 'For $n \\times n$ sparse matrices with $nnz = O(n)$:\n\n| Operation | Dense | Sparse |\n|-----------|-------|--------|\n| Storage | $O(n^2)$ | $O(n)$ |\n| Matvec $Ax$ | $O(n^2)$ | $O(n)$ |\n| LU factor | $O(n^3)$ | $O(n^{1.5})$ (2D) |\n| Iterative solve | — | $O(n)$/iteration |\n\n For $n = 10^6$: dense LU is impossible; sparse iterative is routine.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Predict the Fill-In',
+        body: 'Consider the $5 \\times 5$ tridiagonal matrix from Example 1 (2 on diagonal, -1 off-diagonal). Before looking: when you run LU factorization on this matrix, do you expect fill-in? (Hint: think about what the first elimination step does to row 2 — does it create non-zeros in column 1 outside the tridiagonal band?)',
       },
       {
         type: 'insight',
@@ -139,6 +145,65 @@ nnz(L) + nnz(U)
       problem: 'Write out the $5 \\times 5$ tridiagonal matrix $T$ with 2 on the diagonal and -1 on sub- and superdiagonals. How many non-zeros does it have?',
       solution: '$T = \\begin{bmatrix}2&-1&0&0&0\\\\-1&2&-1&0&0\\\\0&-1&2&-1&0\\\\0&0&-1&2&-1\\\\0&0&0&-1&2\\end{bmatrix}$. Non-zeros: $5 \\cdot 2 - 2 \\cdot (5-1)/2 \\cdot 2 = 5 + 2(n-1) = 5 + 8 = 13$ out of $25$ entries.',
     },
+    {
+      id: 'ex-la7-005-2',
+      title: 'CSR format construction and matrix-vector product',
+      problem: 'Build the CSR representation of $A = \\begin{bmatrix}4&0&1\\\\0&2&0\\\\3&0&7\\end{bmatrix}$ and use it to compute $A\\mathbf{x}$ for $\\mathbf{x} = (1,2,3)^\\top$ without touching zeros.',
+      steps: [
+        {
+          expression: '\\text{Non-zeros: } (0,0,4),\\, (0,2,1),\\, (1,1,2),\\, (2,0,3),\\, (2,2,7)',
+          annotation: 'List (row, col, value) for each non-zero, row by row.',
+          strategyTitle: 'Identify non-zeros',
+        },
+        {
+          expression: '\\text{values} = [4,1,2,3,7], \\quad \\text{col\\_idx} = [0,2,1,0,2], \\quad \\text{row\\_ptr} = [0,2,3,5]',
+          annotation: '`row_ptr[i]` is the index into `values` where row $i$ starts. Row 0 has entries at positions 0–1; row 1 at position 2; row 2 at positions 3–4.',
+          strategyTitle: 'Build CSR arrays',
+        },
+        {
+          expression: 'y_0 = 4 \\cdot x_0 + 1 \\cdot x_2 = 4(1) + 1(3) = 7',
+          annotation: 'Row 0: multiply each non-zero value by the corresponding $x$ entry.',
+          strategyTitle: 'Compute row 0 of $A\\mathbf{x}$',
+        },
+        {
+          expression: 'y_1 = 2 \\cdot x_1 = 2(2) = 4, \\quad y_2 = 3 \\cdot x_0 + 7 \\cdot x_2 = 3(1)+7(3) = 24',
+          annotation: 'Row 1 has one non-zero; row 2 has two. Total: 5 multiply-adds for a $3 \\times 3$ matrix with 5 non-zeros — zero multiplications were skipped.',
+          strategyTitle: 'Rows 1 and 2',
+        },
+        {
+          expression: 'A\\mathbf{x} = (7, 4, 24)^\\top',
+          annotation: 'Verify: dense matrix multiplication also gives $(4+0+3, 0+4+0, 3+0+21) = (7,4,24)$ ✓.',
+          strategyTitle: 'Result',
+        },
+      ],
+    },
+    {
+      id: 'ex-la7-005-3',
+      title: 'Fill-in during LU factorization',
+      problem: 'Show the fill-in pattern when you apply LU factorization (no pivoting) to the $4\\times 4$ arrowhead matrix $A = \\begin{bmatrix}1&1&1&1\\\\1&2&0&0\\\\1&0&3&0\\\\1&0&0&4\\end{bmatrix}$.',
+      steps: [
+        {
+          expression: 'A = \\begin{bmatrix}1&1&1&1\\\\1&2&0&0\\\\1&0&3&0\\\\1&0&0&4\\end{bmatrix} \\quad \\text{(5 non-zeros per row 0; 2 each for rows 1-3)}',
+          annotation: 'The matrix has 11 non-zeros out of 16: the first row and column are full, rest is diagonal.',
+          strategyTitle: 'Original sparsity pattern',
+        },
+        {
+          expression: 'R_2 \\leftarrow R_2 - 1 \\cdot R_1: \\begin{bmatrix}1&1&1&1\\\\0&1&-1&-1\\\\1&0&3&0\\\\1&0&0&4\\end{bmatrix}',
+          annotation: 'Eliminating column 1 from row 2 creates fill-in in positions (1,2) and (1,3) — new non-zeros!',
+          strategyTitle: 'Step 1: fill created in row 2',
+        },
+        {
+          expression: 'R_3,R_4 \\leftarrow \\text{similar}: \\quad L_\\text{lower} = \\begin{bmatrix}1&0&0&0\\\\1&1&0&0\\\\1&*&1&0\\\\1&*&*&1\\end{bmatrix}',
+          annotation: 'Each subsequent elimination propagates fill. The final $L$ and $U$ are nearly dense — the sparsity of the original matrix is destroyed.',
+          strategyTitle: 'Full dense fill-in after all eliminations',
+        },
+        {
+          expression: '\\text{Reversed arrowhead: } A\' = P^\\top A P \\Rightarrow \\text{LU has no fill-in}',
+          annotation: 'Reordering: move the hub node (row 0) to last position. Then elimination proceeds from the leaf nodes, which don\'t interact with each other, producing no fill. This is why reordering is crucial.',
+          strategyTitle: 'Fix: reorder the matrix to minimize fill',
+        },
+      ],
+    },
   ],
 
   challenges: [
@@ -161,9 +226,14 @@ nnz(L) + nnz(U)
   ],
 
   checkpoints: [
-    { id: 'cp-la7-005-1', question: 'What is fill-in in sparse Gaussian elimination?', answer: 'New non-zeros created in positions that were zero in the original matrix, as eliminations modify other entries.' },
-    { id: 'cp-la7-005-2', question: 'For a sparse matrix with $n$ rows and $O(n)$ non-zeros, how expensive is one matrix-vector product?', answer: '$O(n)$ flops — linear in $n$.' },
-    { id: 'cp-la7-005-3', question: 'Why is matrix reordering important for sparse factorizations?', answer: 'Different orderings produce different fill-in patterns. Good orderings (AMD, METIS) minimize fill, reducing storage and flops for the factorization.' },
+    { id: 'cp-la7-005-1', label: 'Read: sparsity and storage formats', type: 'read' },
+    { id: 'cp-la7-005-2', label: 'Read: sparse matvec and fill-in', type: 'read' },
+    { id: 'cp-la7-005-3', label: 'Read: reordering and graph theory', type: 'read' },
+    { id: 'cp-la7-005-4', label: 'Try: build and use sparse matrix in code', type: 'lab' },
+    { id: 'cp-la7-005-5', label: 'Try: observe fill-in with and without reordering', type: 'lab' },
+    { id: 'cp-la7-005-6', label: 'Work: tridiagonal matrix non-zero count', type: 'example' },
+    { id: 'cp-la7-005-7', label: 'Work: CSR construction and matvec', type: 'example' },
+    { id: 'cp-la7-005-8', label: 'Challenge: CSR construction by hand', type: 'challenge' },
   ],
 
   assessment: 'The $n \\times n$ tridiagonal matrix (1D Laplacian) has $3n-2$ non-zeros. Estimate the storage savings of CSR over dense for $n = 10^6$. Then estimate how many floating-point operations a dense LU vs sparse tridiagonal factorization would require.',

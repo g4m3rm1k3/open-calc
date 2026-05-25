@@ -16,7 +16,7 @@ export default {
 
   intuition: {
     prose: [
-      '**Building the matrix column by column.** Given $T: V \\to W$, an ordered basis $\\mathcal{B} = (\\mathbf{b}_1, \\ldots, \\mathbf{b}_n)$ for $V$, and an ordered basis $\\mathcal{C} = (\\mathbf{c}_1, \\ldots, \\mathbf{c}_m)$ for $W$: compute $T(\\mathbf{b}_j)$ for each $j$, express the result as a linear combination $T(\\mathbf{b}_j) = a_{1j}\\mathbf{c}_1 + \\cdots + a_{mj}\\mathbf{c}_m$, and put $(a_{1j}, \\ldots, a_{mj})$ as the $j$-th column. The result is the $m \\times n$ matrix $[T]_{\\mathcal{B}}^{\\mathcal{C}}$.',
+      'Let $T: \\mathbb{R}^2 \\to \\mathbb{R}^2$ be rotation by $90°$ counterclockwise. Where do the standard basis vectors go? $T(\\mathbf{e}_1) = T(1,0) = (0,1)$ and $T(\\mathbf{e}_2) = T(0,1) = (-1,0)$. Write these as columns: the matrix is $\\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$. To verify: $T(3,2) = \\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}\\begin{bmatrix}3\\\\2\\end{bmatrix} = \\begin{bmatrix}-2\\\\3\\end{bmatrix}$ ✓. That\'s the whole algorithm — apply $T$ to each basis vector, use the outputs as columns.',
       '**Coordinates.** For a vector $\\mathbf{v} \\in V$, write $\\mathbf{v} = x_1 \\mathbf{b}_1 + \\cdots + x_n \\mathbf{b}_n$. The coordinate vector is $[\\mathbf{v}]_{\\mathcal{B}} = (x_1, \\ldots, x_n)^\\top \\in \\mathbb{R}^n$. Then matrix multiplication gives: $[T(\\mathbf{v})]_{\\mathcal{C}} = [T]_{\\mathcal{B}}^{\\mathcal{C}} \\cdot [\\mathbf{v}]_{\\mathcal{B}}$. This is the fundamental formula: matrices multiply coordinate vectors.',
       '**Change of basis.** If $T: V \\to V$ (same space) and you switch from basis $\\mathcal{B}$ to basis $\\mathcal{B}\'$, the matrix changes by conjugation: $[T]_{\\mathcal{B}\'} = P^{-1}[T]_{\\mathcal{B}}P$, where $P$ is the **change-of-basis matrix** — its $j$-th column is $[\\mathbf{b}_j]_{\\mathcal{B}\'} =$ coordinates of the old basis vectors in the new basis. Two matrices $A$ and $B$ represent the same linear map in different bases iff $B = P^{-1}AP$ for some invertible $P$.',
     ],
@@ -35,6 +35,11 @@ export default {
         type: 'warning',
         title: 'Order of Bases Matters',
         body: 'The matrix $[T]_{\\mathcal{B}}^{\\mathcal{C}}$ is not just "the matrix of $T$" — it depends on the ordered pair of bases $(\\mathcal{B}, \\mathcal{C})$. Reordering either basis permutes rows or columns. Swapping to a different basis entirely changes the matrix significantly. Always track which bases you\'re using.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Prediction',
+        body: 'Before reading the math section: if you apply differentiation $D$ to the polynomial basis $\\{1, x, x^2, x^3\\}$ and write each result as a coordinate vector, what shape will the resulting matrix be, and where will the non-zero entries appear? Write down your prediction, then check it in the lab.',
       },
     ],
     visualizations: [
@@ -148,6 +153,65 @@ norm(A - A_check)
         },
       ],
     },
+    {
+      id: 'ex-la6-004-2',
+      title: 'Differentiation map $D: P_2 \\to P_2$ — build matrix column by column',
+      problem: 'Let $D: P_2 \\to P_2$ be the differentiation map $D(p) = p\'$. Use the basis $\\mathcal{B} = \\{1, x, x^2\\}$ for both domain and codomain. Find $[D]_{\\mathcal{B}}^{\\mathcal{B}}$.',
+      steps: [
+        {
+          expression: 'D(1) = 0 = 0\\cdot 1 + 0\\cdot x + 0\\cdot x^2',
+          annotation: 'The derivative of the constant $1$ is $0$. In the basis $\\{1,x,x^2\\}$, zero has coordinate vector $(0,0,0)^\\top$.',
+          strategyTitle: 'Column 1: $D(1)$',
+        },
+        {
+          expression: 'D(x) = 1 = 1\\cdot 1 + 0\\cdot x + 0\\cdot x^2',
+          annotation: 'The derivative of $x$ is $1$. In the basis, $1$ has coordinates $(1,0,0)^\\top$.',
+          strategyTitle: 'Column 2: $D(x)$',
+        },
+        {
+          expression: 'D(x^2) = 2x = 0\\cdot 1 + 2\\cdot x + 0\\cdot x^2',
+          annotation: 'The derivative of $x^2$ is $2x$. In the basis, $2x$ has coordinates $(0,2,0)^\\top$.',
+          strategyTitle: 'Column 3: $D(x^2)$',
+        },
+        {
+          expression: '[D]_{\\mathcal{B}}^{\\mathcal{B}} = \\begin{bmatrix}0&1&0\\\\0&0&2\\\\0&0&0\\end{bmatrix}',
+          annotation: 'Assemble the three column vectors. The matrix is strictly upper triangular — differentiation lowers the degree by one, so it maps each basis vector to an earlier one.',
+          strategyTitle: 'Assemble and interpret',
+        },
+        {
+          expression: 'D(3 + 5x - 2x^2): \\quad [D]\\begin{bmatrix}3\\\\5\\\\-2\\end{bmatrix} = \\begin{bmatrix}0&1&0\\\\0&0&2\\\\0&0&0\\end{bmatrix}\\begin{bmatrix}3\\\\5\\\\-2\\end{bmatrix} = \\begin{bmatrix}5\\\\-4\\\\0\\end{bmatrix}',
+          annotation: 'Verify: $\\frac{d}{dx}(3 + 5x - 2x^2) = 5 - 4x$. Coordinate vector $(5,-4,0)^\\top$ corresponds to $5 - 4x$ in the basis $\\{1,x,x^2\\}$ ✓.',
+          strategyTitle: 'Verify on a concrete polynomial',
+        },
+      ],
+    },
+    {
+      id: 'ex-la6-004-3',
+      title: 'Same map, different basis: how the matrix changes',
+      problem: 'Let $T: \\mathbb{R}^2 \\to \\mathbb{R}^2$ be the linear map with standard matrix $A = \\begin{bmatrix}3&1\\\\0&2\\end{bmatrix}$. Find the matrix of $T$ in the basis $\\mathcal{B} = \\left\\{\\begin{bmatrix}1\\\\1\\end{bmatrix}, \\begin{bmatrix}1\\\\0\\end{bmatrix}\\right\\}$.',
+      steps: [
+        {
+          expression: 'P = \\begin{bmatrix}1&1\\\\1&0\\end{bmatrix}',
+          annotation: 'The change-of-basis matrix has the new basis vectors as its columns. $P$ converts $\\mathcal{B}$-coordinates to standard coordinates.',
+          strategyTitle: 'Form $P$: columns = new basis vectors',
+        },
+        {
+          expression: 'P^{-1} = \\frac{1}{\\det P}\\begin{bmatrix}0&-1\\\\-1&1\\end{bmatrix} = \\frac{1}{-1}\\begin{bmatrix}0&-1\\\\-1&1\\end{bmatrix} = \\begin{bmatrix}0&1\\\\1&-1\\end{bmatrix}',
+          annotation: '$\\det(P) = 0 - 1 = -1$. For a $2\\times 2$ matrix: swap the diagonal, negate off-diagonal, divide by determinant.',
+          strategyTitle: 'Compute $P^{-1}$',
+        },
+        {
+          expression: 'AP = \\begin{bmatrix}3&1\\\\0&2\\end{bmatrix}\\begin{bmatrix}1&1\\\\1&0\\end{bmatrix} = \\begin{bmatrix}4&3\\\\2&2\\end{bmatrix}',
+          annotation: 'First multiply $A$ and $P$.',
+          strategyTitle: 'Compute $AP$',
+        },
+        {
+          expression: '[T]_{\\mathcal{B}} = P^{-1}AP = \\begin{bmatrix}0&1\\\\1&-1\\end{bmatrix}\\begin{bmatrix}4&3\\\\2&2\\end{bmatrix} = \\begin{bmatrix}2&2\\\\2&1\\end{bmatrix}',
+          annotation: 'The matrix of $T$ in the $\\mathcal{B}$ basis. Note: $\\det([T]_{\\mathcal{B}}) = 2\\cdot 1 - 2\\cdot 2 = -2 = \\det(A)$ — the determinant is a similarity invariant ✓.',
+          strategyTitle: 'Final answer: $P^{-1}AP$',
+        },
+      ],
+    },
   ],
 
   challenges: [
@@ -176,9 +240,14 @@ norm(A - A_check)
   ],
 
   checkpoints: [
-    { id: 'cp-la6-004-1', question: 'How do you build the $j$-th column of $[T]_{\\mathcal{B}}^{\\mathcal{C}}$?', answer: 'Apply $T$ to the $j$-th basis vector of $\\mathcal{B}$, then express the result in the basis $\\mathcal{C}$.' },
-    { id: 'cp-la6-004-2', question: 'What does it mean for two matrices to be similar?', answer: '$B = P^{-1}AP$ for some invertible $P$ — they represent the same linear map in different bases.' },
-    { id: 'cp-la6-004-3', question: 'Why is matrix multiplication not commutative?', answer: 'It represents function composition, which is not commutative: $S \\circ T \\neq T \\circ S$ in general.' },
+    { id: 'cp-la6-004-1', label: 'Read intuition section', type: 'read' },
+    { id: 'cp-la6-004-2', label: 'Read math section', type: 'read' },
+    { id: 'cp-la6-004-3', label: 'Read rigor section', type: 'read' },
+    { id: 'cp-la6-004-4', label: 'Run differentiation matrix lab', type: 'lab' },
+    { id: 'cp-la6-004-5', label: 'Run change of basis to eigenbasis lab', type: 'lab' },
+    { id: 'cp-la6-004-6', label: 'Work example 1: evaluation map Vandermonde', type: 'example' },
+    { id: 'cp-la6-004-7', label: 'Work example 2: differentiation matrix column by column', type: 'example' },
+    { id: 'cp-la6-004-8', label: 'Solve challenge: change of basis for rotation', type: 'challenge' },
   ],
 
   assessment: {
@@ -229,6 +298,111 @@ norm(A - A_check)
       answer: 'Both B and C',
       hints: ['Similarity invariants: $\\det(P^{-1}AP) = \\det(P^{-1})\\det(A)\\det(P) = \\det(A)$. Also $\\det(P^{-1}AP - \\lambda I) = \\det(P^{-1}(A-\\lambda I)P) = \\det(A-\\lambda I)$. So both determinant and characteristic polynomial are invariants.'],
       reviewSection: 'rigor',
+    },
+    {
+      id: 'q-la6-004-5',
+      type: 'choice',
+      text: 'The differentiation matrix $D$ for $P_3$ (using basis $\\{1, x, x^2, x^3\\}$) is $4\\times 4$. Which entry is in position $(1,2)$ (row 1, column 2)?',
+      options: ['0', '1', '2', '3'],
+      answer: '1',
+      hints: ['Column 2 comes from $D(x) = 1$. In the basis $\\{1,x,x^2,x^3\\}$, the polynomial $1$ is the first basis vector, so its coordinates are $(1,0,0,0)^\\top$. Row 1, column 2 is the first entry of that column vector, which is $1$.'],
+      reviewSection: 'intuition',
+    },
+    {
+      id: 'q-la6-004-6',
+      type: 'choice',
+      text: 'The matrix of the $90°$ counterclockwise rotation $T: \\mathbb{R}^2 \\to \\mathbb{R}^2$ in the standard basis is:',
+      options: ['$\\begin{bmatrix}0&1\\\\-1&0\\end{bmatrix}$', '$\\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$', '$\\begin{bmatrix}1&0\\\\0&-1\\end{bmatrix}$', '$\\begin{bmatrix}-1&0\\\\0&1\\end{bmatrix}$'],
+      answer: '$\\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$',
+      hints: ['Compute where $T$ sends the basis vectors: $T(1,0) = (0,1)$ (column 1) and $T(0,1) = (-1,0)$ (column 2). Assemble into a matrix.'],
+      reviewSection: 'intuition',
+    },
+    {
+      id: 'q-la6-004-7',
+      type: 'choice',
+      text: 'If $T: \\mathbb{R}^3 \\to \\mathbb{R}^2$ is linear and represented by a $2\\times 3$ matrix in standard bases, what is the size of $[T]_{\\mathcal{B}}^{\\mathcal{C}}$ for any bases $\\mathcal{B}$ of $\\mathbb{R}^3$ and $\\mathcal{C}$ of $\\mathbb{R}^2$?',
+      options: ['$3 \\times 2$', '$2 \\times 3$', '$3 \\times 3$', 'Depends on the bases chosen'],
+      answer: '$2 \\times 3$',
+      hints: ['The shape of the matrix is $\\dim(W) \\times \\dim(V)$ for $T: V \\to W$. Here $\\dim(\\mathbb{R}^2) = 2$ (rows) and $\\dim(\\mathbb{R}^3) = 3$ (columns). Changing bases does not change the shape of the matrix — only its entries.'],
+      reviewSection: 'math',
+    },
+    {
+      id: 'q-la6-004-8',
+      type: 'choice',
+      text: 'In the differentiation matrix for $P_2$ (basis $\\{1, x, x^2\\}$), what is the rank?',
+      options: ['1', '2', '3', '0'],
+      answer: '2',
+      hints: ['The differentiation matrix is $\\begin{bmatrix}0&1&0\\\\0&0&2\\\\0&0&0\\end{bmatrix}$. It has two nonzero rows in RREF, so rank $= 2$. Equivalently, $\\ker D = $ constants (dimension 1), so by rank-nullity, rank $= 3 - 1 = 2$.'],
+      reviewSection: 'math',
+    },
+    {
+      id: 'q-la6-004-9',
+      type: 'choice',
+      text: 'Diagonalization $A = PDP^{-1}$ is equivalent to saying:',
+      options: ['$A$ and $D$ are similar matrices', '$A$ and $D$ have the same entries', '$A$ is an orthogonal matrix', '$P$ and $D$ commute'],
+      answer: '$A$ and $D$ are similar matrices',
+      hints: ['Rearranging $A = PDP^{-1}$ gives $D = P^{-1}AP$, which is exactly the definition of similar matrices. Diagonalization is a special case of similarity where the target matrix is diagonal.'],
+      reviewSection: 'rigor',
+    },
+    {
+      id: 'q-la6-004-10',
+      type: 'choice',
+      text: 'If $T: V \\to W$ has matrix $[T]_{\\mathcal{B}}^{\\mathcal{C}}$ and you change only the input basis to $\\mathcal{B}\'$ (keeping $\\mathcal{C}$ the same), how does the matrix change?',
+      options: ['Multiply on the left by $P^{-1}$', 'Multiply on the right by $P$', 'Multiply on the right by $P^{-1}$', 'Multiply on the left by $P$'],
+      answer: 'Multiply on the right by $P$',
+      hints: ['The new matrix is $[T]_{\\mathcal{B}\'}^{\\mathcal{C}} = [T]_{\\mathcal{B}}^{\\mathcal{C}} \\cdot P_{\\mathcal{B}\' \\to \\mathcal{B}}$. Changing only the input basis multiplies on the right by the change-of-basis matrix. Changing the output basis multiplies on the left.'],
+      reviewSection: 'math',
+    },
+  ],
+
+  mastery: {
+    targetLevel: 2,
+    solveIndependently: 'Given any linear map $T: V \\to W$ and ordered bases for $V$ and $W$, build $[T]_{\\mathcal{B}}^{\\mathcal{C}}$ from scratch by applying $T$ to each basis vector and expressing outputs in the codomain basis.',
+    explainVerbally: 'Explain why two matrices representing the same linear map must satisfy $B = P^{-1}AP$, and identify what $P$ represents geometrically.',
+    detectIncorrectApplication: 'Spot when someone assembles the matrix with rows instead of columns, or uses the wrong basis for the output coordinates.',
+    transferToUnfamiliar: 'Apply the column-by-column construction to a new vector space (e.g., symmetric matrices, trigonometric polynomials) without being told the procedure.',
+  },
+
+  misconceptions: [
+    {
+      falseBelief: 'The matrix of a linear map is a fixed, intrinsic object.',
+      whyStudentsThinkIt: 'In early linear algebra, every matrix problem uses the standard basis implicitly, so students never see the basis dependence.',
+      correctionExample: 'The $90°$ rotation $T$ has matrix $\\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$ in the standard basis but a different matrix in the eigenvector basis over $\\mathbb{C}$.',
+      contrastCase: 'The eigenvalues of $T$ ARE intrinsic — they do not change when you change bases.',
+    },
+    {
+      falseBelief: 'To find the matrix column, just write $T(\\mathbf{b}_j)$ as a vector directly.',
+      whyStudentsThinkIt: 'When the codomain has the standard basis, this accidentally works. Students overgeneralize.',
+      correctionExample: 'For $T: P_2 \\to P_2$, $T(x^2) = 2x$. You cannot write $2x$ as a column of real numbers without first expressing it in the codomain basis: $(0, 2, 0)^\\top$ in $\\{1, x, x^2\\}$.',
+      contrastCase: 'For $T: \\mathbb{R}^2 \\to \\mathbb{R}^2$ with the standard basis on both sides, writing the output vector directly as a column IS correct because the standard basis IS the coordinate system.',
+    },
+  ],
+
+  transferPrompts: [
+    {
+      situation: 'You have a linear map on polynomials (like integration or multiplication by $x$) and need to work with it computationally.',
+      competingTechniques: 'Could try to work with the polynomials abstractly, or guess the matrix pattern.',
+      whyThisTechniqueWins: 'The column-by-column construction gives the exact matrix in $O(n)$ steps for $n$-dimensional spaces — no guessing needed. Once you have the matrix, all of numerical linear algebra applies.',
+    },
+    {
+      situation: 'Two matrices $A$ and $B$ are given and you want to know if they represent the same linear map.',
+      competingTechniques: 'Could compare all entries (fails — different bases give different entries) or compute $P^{-1}AP = B$ directly (hard to find $P$).',
+      whyThisTechniqueWins: 'Compute similarity invariants: if $\\det(A) \\neq \\det(B)$ or $\\text{tr}(A) \\neq \\text{tr}(B)$ or characteristic polynomials differ, they are NOT similar. If all invariants agree, they might be similar.',
+    },
+  ],
+
+  debugging: [
+    {
+      commonError: 'Assembling matrix rows instead of columns.',
+      symptom: 'The matrix is the transpose of the correct answer; $[T(\\mathbf{v})]_{\\mathcal{C}} = [T]^\\top [\\mathbf{v}]_{\\mathcal{B}}$ appears to work for specific examples but is wrong in general.',
+      whyItHappened: 'Students write $T(\\mathbf{b}_j)$ as a row vector instead of a column vector when assembling the matrix.',
+      repairStrategy: 'Always write each $T(\\mathbf{b}_j)$ as a column, then stack the columns side by side. Verify with the fundamental formula: $[T]\\mathbf{v}$ should give $[T(\\mathbf{v})]_{\\mathcal{C}}$.',
+    },
+    {
+      commonError: 'Using the wrong basis for the output coordinates.',
+      symptom: 'The matrix entries are the coefficients of $T(\\mathbf{b}_j)$ in the wrong basis, giving a matrix that does not satisfy the fundamental formula.',
+      whyItHappened: 'Forgetting that the column entries must be the coordinates in the OUTPUT basis $\\mathcal{C}$, not just the "natural" representation of $T(\\mathbf{b}_j)$.',
+      repairStrategy: 'After computing $T(\\mathbf{b}_j)$, always ask: "How do I write this in the basis $\\mathcal{C}$?" Solve $T(\\mathbf{b}_j) = a_1 \\mathbf{c}_1 + \\cdots + a_m \\mathbf{c}_m$ for the $a_i$, then use $(a_1, \\ldots, a_m)^\\top$ as the column.',
     },
   ],
 };

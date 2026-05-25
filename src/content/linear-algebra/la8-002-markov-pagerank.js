@@ -16,6 +16,7 @@ export default {
 
   intuition: {
     prose: [
+      '**Power iteration on a 3-page web — numbers first.** Consider three web pages: page 1 links to pages 2 and 3; page 2 links only to page 3; page 3 links only back to page 1. The column-stochastic link matrix is $M = \\begin{bmatrix}0&0&1\\\\1/2&0&0\\\\1/2&1&0\\end{bmatrix}$ (column $j$ = where page $j$ sends its rank). Start with equal rank $\\mathbf{r}^{(0)} = (1/3, 1/3, 1/3)^\\top$. After step 1: $\\mathbf{r}^{(1)} = M\\mathbf{r}^{(0)} = (1/3,\\, 1/6,\\, 1/2)^\\top$. After step 2: $\\mathbf{r}^{(2)} = M\\mathbf{r}^{(1)} = (1/2,\\, 1/6,\\, 1/3)^\\top$. Page 3 starts highest (receives from two pages), but page 1 gains rank over iterations because page 3 — which receives the most links — sends all its rank back to page 1.',
       '**Markov chains.** A finite Markov chain has $n$ states and a **transition matrix** $P$ (row-stochastic: all entries $\\geq 0$, each row sums to 1). $P_{ij}$ = probability of going from state $i$ to state $j$. The distribution after $k$ steps: $\\boldsymbol{\\pi}_k = \\boldsymbol{\\pi}_0 P^k$ (if distributions are row vectors). A **stationary distribution** satisfies $\\boldsymbol{\\pi} P = \\boldsymbol{\\pi}$ (or equivalently $P^\\top \\boldsymbol{\\pi}^\\top = \\boldsymbol{\\pi}^\\top$) — it is an eigenvector of $P^\\top$ for eigenvalue 1.',
       '**Perron-Frobenius theorem.** For an irreducible (every state reachable from every other) and aperiodic Markov chain: (1) eigenvalue 1 exists and has multiplicity 1; (2) all other eigenvalues satisfy $|\\lambda| < 1$; (3) the unique stationary distribution $\\boldsymbol{\\pi}$ has all positive entries; (4) $\\boldsymbol{\\pi}_0 P^k \\to \\boldsymbol{\\pi}$ for any starting distribution.',
       '**PageRank.** The original PageRank treats the web as a directed graph. For a page $i$ with out-links to pages $j_1, \\ldots, j_k$: column $i$ of the column-stochastic link matrix has $1/k$ in rows $j_1, \\ldots, j_k$. To ensure irreducibility and aperiodicity, add a "teleportation" probability $\\alpha$ (typically 0.85): $G = \\alpha M + (1-\\alpha) \\mathbf{e}\\mathbf{e}^\\top/n$ (the "Google matrix"). The PageRank vector is the dominant eigenvector of $G$.',
@@ -31,6 +32,11 @@ export default {
         type: 'insight',
         title: 'Spectral Gap Controls Mixing Time',
         body: 'The **spectral gap** $1 - |\\lambda_2|$ controls how fast the chain mixes.\n\nLarge spectral gap $\\Rightarrow$ fast convergence to stationary distribution.\nSmall spectral gap $\\Rightarrow$ slow mixing ("torpid mixing").\n\nFor PageRank with teleportation $\\alpha = 0.85$: spectral gap $\\geq 0.15$, so convergence in $\\sim 50$ iterations.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Prediction',
+        body: 'In the 3-page web example above (page 1 → {2,3}, page 2 → {3}, page 3 → {1}), which page do you predict will have the highest final PageRank after power iteration converges? Think about who receives rank from whom before computing.',
       },
     ],
     visualizations: [
@@ -143,6 +149,18 @@ order
       problem: 'Find the stationary distribution of $P = \\begin{bmatrix}0.8&0.2\\\\0.4&0.6\\end{bmatrix}$.',
       solution: '$\\boldsymbol{\\pi}P = \\boldsymbol{\\pi}$ with $\\pi_1 + \\pi_2 = 1$: $0.8\\pi_1 + 0.4\\pi_2 = \\pi_1 \\Rightarrow 0.4\\pi_2 = 0.2\\pi_1 \\Rightarrow \\pi_1 = 2\\pi_2$. With $\\pi_1 + \\pi_2 = 1$: $\\pi = (2/3, 1/3)$.',
     },
+    {
+      id: 'ex-la8-002-2',
+      title: '3-page PageRank by hand',
+      problem: 'For the 3-page web (page 1→{2,3}, page 2→{3}, page 3→{1}) compute the exact stationary distribution of the link matrix $M$ (no teleportation).',
+      solution: 'Column-stochastic matrix: $M = \\begin{bmatrix}0&0&1\\\\1/2&0&0\\\\1/2&1&0\\end{bmatrix}$. Stationary: $M\\mathbf{r} = \\mathbf{r}$ with $r_1+r_2+r_3=1$. Row 1: $r_3 = r_1$. Row 2: $r_1/2 = r_2$. Row 3: $r_1/2 + r_2 = r_3$. Substituting: $r_1/2 + r_1/2 = r_1$ — consistent. With $r_1 + r_1/2 + r_1 = 1$: $5r_1/2 = 1$, so $r_1 = 2/5$, $r_2 = 1/5$, $r_3 = 2/5$. Pages 1 and 3 tie for highest rank.',
+    },
+    {
+      id: 'ex-la8-002-3',
+      title: 'Spectral gap and convergence speed',
+      problem: 'A Markov chain has eigenvalues $1, 0.9, 0.3, -0.2$. How many power iterations are needed to reduce the error to $\\varepsilon = 10^{-6}$?',
+      solution: 'The second-largest magnitude eigenvalue is $|\\lambda_2| = 0.9$. Error after $k$ steps $\\leq C \\cdot 0.9^k$. Solve $0.9^k \\leq 10^{-6}$: $k \\geq \\log(10^{-6})/\\log(0.9) = -6\\log 10 / \\log 0.9 \\approx 6 \\times 2.303 / 0.1054 \\approx 131$ iterations. A spectral gap of only 0.1 means very slow mixing — compare to PageRank\'s gap of 0.15 which needs only ~50 iterations.',
+    },
   ],
 
   challenges: [
@@ -165,16 +183,42 @@ order
   ],
 
   checkpoints: [
-    { id: 'cp-la8-002-1', question: 'What is the stationary distribution of a Markov chain?', answer: 'The probability vector $\\boldsymbol{\\pi}$ satisfying $\\boldsymbol{\\pi}P = \\boldsymbol{\\pi}$ (row vector) — the left eigenvector of $P$ for eigenvalue 1.' },
-    { id: 'cp-la8-002-2', question: 'What does the spectral gap control?', answer: 'How fast the chain mixes (converges to stationarity). Larger gap = faster convergence.' },
-    { id: 'cp-la8-002-3', question: 'Why does PageRank need the teleportation parameter?', answer: 'To handle dangling nodes and ensure irreducibility and aperiodicity, guaranteeing a unique stationary distribution.' },
+    { id: 'cp-la8-002-1', label: 'Read intuition section', type: 'read' },
+    { id: 'cp-la8-002-2', label: 'Read math section', type: 'read' },
+    { id: 'cp-la8-002-3', label: 'Read rigor section', type: 'read' },
+    { id: 'cp-la8-002-4', label: 'Run first lab', type: 'lab' },
+    { id: 'cp-la8-002-5', label: 'Run second lab', type: 'lab' },
+    { id: 'cp-la8-002-6', label: 'Work example 1', type: 'example' },
+    { id: 'cp-la8-002-7', label: 'Work example 2', type: 'example' },
+    { id: 'cp-la8-002-8', label: 'Solve challenge', type: 'challenge' },
   ],
 
   assessment: 'Model a 3-state Markov chain (e.g., states A, B, C) with a transition matrix of your choice. Verify it is row-stochastic, compute the stationary distribution analytically and via power iteration, and check they agree.',
 
   quiz: [
-    { id: 'q-la8-002-1', question: 'The stationary distribution $\\boldsymbol{\\pi}$ of a Markov chain satisfies:', options: ['$P\\boldsymbol{\\pi} = \\mathbf{0}$', '$\\boldsymbol{\\pi}P = \\boldsymbol{\\pi}$ (row vector)', '$P^\\top \\boldsymbol{\\pi} = \\mathbf{0}$', '$\\det(P - I) = \\pi$'], answer: '$\\boldsymbol{\\pi}P = \\boldsymbol{\\pi}$ (row vector)' },
-    { id: 'q-la8-002-2', question: 'Power iteration for PageRank converges at rate:', options: ['$|\\lambda_2|^k$ per iteration', '$1/k$', '$e^{-k}$', '$\\sigma_1^k$'], answer: '$|\\lambda_2|^k$ per iteration' },
-    { id: 'q-la8-002-3', question: 'The HITS algorithm computes authority scores as:', options: ['Dominant eigenvector of $A$', 'Dominant eigenvector of $A^\\top A$', 'Dominant singular value of $A$', 'Null space of $A$'], answer: 'Dominant eigenvector of $A^\\top A$' },
+    { id: 'q-la8-002-1', type: 'choice', question: 'The stationary distribution $\\boldsymbol{\\pi}$ of a Markov chain satisfies:', options: ['$P\\boldsymbol{\\pi} = \\mathbf{0}$', '$\\boldsymbol{\\pi}P = \\boldsymbol{\\pi}$ (row vector)', '$P^\\top \\boldsymbol{\\pi} = \\mathbf{0}$', '$\\det(P - I) = \\pi$'], answer: '$\\boldsymbol{\\pi}P = \\boldsymbol{\\pi}$ (row vector)', hints: ['The stationary distribution is unchanged by one step of the chain.', 'As a row vector, multiply on the right by $P$.'], reviewSection: 'intuition' },
+    { id: 'q-la8-002-2', type: 'choice', question: 'Power iteration for PageRank converges at rate:', options: ['$|\\lambda_2|^k$ per iteration', '$1/k$', '$e^{-k}$', '$\\sigma_1^k$'], answer: '$|\\lambda_2|^k$ per iteration', hints: ['The error is dominated by the second-largest eigenvalue.', 'Each iteration multiplies the error by the spectral gap.'], reviewSection: 'math' },
+    { id: 'q-la8-002-3', type: 'choice', question: 'The HITS algorithm computes authority scores as:', options: ['Dominant eigenvector of $A$', 'Dominant eigenvector of $A^\\top A$', 'Dominant singular value of $A$', 'Null space of $A$'], answer: 'Dominant eigenvector of $A^\\top A$', hints: ['Authority = cited by good hubs; hub = cites good authorities.', '$A^\\top A$ captures "cited by good hubs" in a single matrix.'], reviewSection: 'math' },
+    { id: 'q-la8-002-4', type: 'choice', question: 'For an irreducible aperiodic Markov chain, the Perron-Frobenius theorem guarantees:', options: ['All eigenvalues equal 1', 'A unique stationary distribution with all positive entries', 'The chain is symmetric', 'The stationary distribution is uniform'], answer: 'A unique stationary distribution with all positive entries', hints: ['Perron-Frobenius is about the dominant eigenvalue and its eigenvector.', 'Irreducible = every state reachable from every other.'], reviewSection: 'intuition' },
+    { id: 'q-la8-002-5', type: 'choice', question: 'A Markov chain with spectral gap 0.01 compared to one with gap 0.5 will:', options: ['Mix faster', 'Mix at the same speed', 'Mix much more slowly', 'Not converge at all'], answer: 'Mix much more slowly', hints: ['Mixing time scales as $1/\\text{spectral gap}$.', 'Gap 0.01 means $|\\lambda_2| = 0.99$ — very slow decay.'], reviewSection: 'math' },
+    { id: 'q-la8-002-6', type: 'choice', question: 'Detailed balance $\\pi_i P_{ij} = \\pi_j P_{ji}$ implies:', options: ['The chain is irreducible', 'The chain is time-reversible and $\\boldsymbol{\\pi}$ is stationary', 'All eigenvalues are real', 'The chain mixes in one step'], answer: 'The chain is time-reversible and $\\boldsymbol{\\pi}$ is stationary', hints: ['Detailed balance is a sufficient condition for stationarity.', 'Time-reversibility means the chain looks the same forwards and backwards.'], reviewSection: 'rigor' },
+    { id: 'q-la8-002-7', type: 'choice', question: 'The teleportation parameter $\\alpha = 0.85$ in PageRank means:', options: ['85% of the time follow a link; 15% jump to a random page', 'The top 85% of pages get rank', 'Convergence takes 85 iterations', '85% of rank is passed to each linked page'], answer: '85% of the time follow a link; 15% jump to a random page', hints: ['Teleportation models a random surfer who sometimes types a new URL.', '$\\alpha$ scales the link matrix; $(1-\\alpha)$ scales the uniform teleportation.'], reviewSection: 'intuition' },
+    { id: 'q-la8-002-8', type: 'choice', question: 'In MCMC, a Markov chain is constructed so that:', options: ['The chain mixes as slowly as possible', 'The stationary distribution equals the target distribution $p(x)$', 'The chain is always reversible', 'Every state is visited exactly once'], answer: 'The stationary distribution equals the target distribution $p(x)$', hints: ['MCMC = Markov Chain Monte Carlo — sample from $p(x)$ by running the chain.', 'Metropolis-Hastings satisfies detailed balance with respect to $p(x)$.'], reviewSection: 'rigor' },
+    { id: 'q-la8-002-9', type: 'choice', question: 'A row-stochastic matrix $P$ always has eigenvalue 1 because:', options: ['$\\det(P) = 1$', 'The all-ones vector $\\mathbf{1}$ satisfies $P\\mathbf{1} = \\mathbf{1}$', '$P$ is symmetric', '$P$ is diagonalizable'], answer: 'The all-ones vector $\\mathbf{1}$ satisfies $P\\mathbf{1} = \\mathbf{1}$', hints: ['Each row sums to 1 means $P\\mathbf{1} = \\mathbf{1}$.', 'This means $\\mathbf{1}$ is a right eigenvector with eigenvalue 1.'], reviewSection: 'intuition' },
+    { id: 'q-la8-002-10', type: 'choice', question: 'The main computational challenge with PageRank on the real web (5 billion pages) is:', options: ['Finding all eigenvalues of the $5\\times10^9$ matrix', 'The matrix is not stochastic', 'Storing and multiplying by the sparse link matrix at scale', 'Power iteration does not converge for large matrices'], answer: 'Storing and multiplying by the sparse link matrix at scale', hints: ['A $5\\times10^9 \\times 5\\times10^9$ dense matrix is impossible to store.', 'The web graph is extremely sparse — each page links to only a handful of others.'], reviewSection: 'intuition' },
+  ],
+
+  mastery: { targetLevel: 2, solveIndependently: 'Given a small transition matrix, verify it is stochastic, compute the stationary distribution analytically, and verify via 10 steps of power iteration.', explainVerbally: 'Explain why PageRank uses teleportation, what the spectral gap controls, and how power iteration converges to the dominant eigenvector.', detectIncorrectApplication: 'Recognize when a Markov chain has multiple stationary distributions (reducible chain) and understand why teleportation fixes this.', transferToUnfamiliar: 'Apply the PageRank idea to a new domain — e.g., rank academic papers by citation, or rank players in a tournament by outcomes.' },
+  misconceptions: [
+    { falseBelief: 'A page with many out-links has high PageRank.', whyStudentsThinkIt: 'Students confuse out-degree (linking to many pages) with in-degree (being linked to by many pages).', correctionExample: 'PageRank measures how much rank flows *into* a page. A page that links to many others distributes its rank thinly outward; it gains rank only from who links *to* it.', contrastCase: 'In the 3-page example, page 2 links only to page 3 (high out-degree), but page 3 sends all rank to page 1 — so page 1 ends up with high rank despite linking to two pages.' },
+    { falseBelief: 'Power iteration always converges to the stationary distribution regardless of starting point.', whyStudentsThinkIt: 'The Perron-Frobenius theorem guarantees uniqueness, so students assume any starting vector works.', correctionExample: 'For a reducible chain without teleportation, power iteration starting in one component stays there. Teleportation fixes this for PageRank.', contrastCase: 'Try power iteration on a block-diagonal stochastic matrix — it converges to a component-specific distribution, not the global one.' },
+  ],
+  transferPrompts: [
+    { situation: 'You want to rank academic papers by importance using their citation graph.', competingTechniques: 'Count raw citations; use PageRank on the citation graph; use HITS.', whyThisTechniqueWins: 'PageRank weights citations by the importance of the citing paper — a citation from a landmark paper counts more. Raw counts treat all citations equally. HITS additionally distinguishes survey papers (hubs) from foundational papers (authorities).' },
+    { situation: 'You are building a recommendation system and want to model user behavior as a Markov chain.', competingTechniques: 'Collaborative filtering; Markov chain transition model; deep learning.', whyThisTechniqueWins: 'Markov transition model captures sequential behavior (what users click next) efficiently. The stationary distribution predicts long-run preferences. It is interpretable and fast to update.' },
+  ],
+  debugging: [
+    { commonError: 'Using a row-stochastic matrix instead of column-stochastic for PageRank column-vector formulation.', symptom: 'Power iteration $\\mathbf{r} \\leftarrow M\\mathbf{r}$ does not preserve the sum of $\\mathbf{r}$ to 1.', whyItHappened: 'Confusion between row-stochastic (rows sum to 1, used with row-vector distributions) and column-stochastic (columns sum to 1, used with column-vector distributions).', repairStrategy: 'Check: if $\\mathbf{r}$ is a column vector and you compute $M\\mathbf{r}$, then $M$ must be column-stochastic ($\\mathbf{1}^\\top M = \\mathbf{1}^\\top$). Verify with `sum(M, 1)` (MATLAB) or `M.sum(0)` (Python).' },
+    { commonError: 'Forgetting to add teleportation, leaving dangling nodes in the graph.', symptom: 'Some columns of $M$ sum to 0 (dangling nodes); power iteration diverges or rank leaks out of the system.', whyItHappened: 'Pages with no out-links absorb rank without redistributing it.', repairStrategy: 'Replace dangling-node columns with $\\mathbf{1}/n$ before adding teleportation, or use the Google matrix formula directly: $G = \\alpha M + (1-\\alpha)\\mathbf{e}\\mathbf{e}^\\top/n$.' },
   ],
 };

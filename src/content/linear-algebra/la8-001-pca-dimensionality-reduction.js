@@ -16,7 +16,8 @@ export default {
 
   intuition: {
     prose: [
-      '**What PCA does.** Given a data matrix $X$ ($n$ samples × $p$ features, mean-centered), PCA finds an orthonormal basis $\\{\\mathbf{v}_1, \\ldots, \\mathbf{v}_k\\}$ for a $k$-dimensional subspace that captures as much variance in $X$ as possible. The $i$-th principal component $\\mathbf{v}_i$ is the direction of maximum remaining variance after removing all previous components.',
+      '**PCA in action — concrete numbers first.** Start with three data points: $(0,0)$, $(2,1)$, $(4,2)$. Mean: $(2,1)$. Centered: $(-2,-1)$, $(0,0)$, $(2,1)$. The centered data matrix is $X = \\begin{bmatrix}-2&-1\\\\0&0\\\\2&1\\end{bmatrix}$. The covariance matrix $C = \\frac{1}{n-1}X^\\top X = \\frac{1}{2}\\begin{bmatrix}8&4\\\\4&2\\end{bmatrix} = \\begin{bmatrix}4&2\\\\2&1\\end{bmatrix}$. Eigenvalues: $\\lambda_1 = 5$, $\\lambda_2 = 0$. Eigenvector for $\\lambda_1 = 5$: $\\mathbf{v}_1 = (2/\\sqrt{5},\\, 1/\\sqrt{5})$. Project first point onto PC1: $(-2,-1)\\cdot(2/\\sqrt{5},1/\\sqrt{5}) = -5/\\sqrt{5} = -\\sqrt{5}$. The entire dataset lies on one line — PCA finds it exactly.',
+      '**What PCA does in general.** Given a data matrix $X$ ($n$ samples × $p$ features, mean-centered), PCA finds an orthonormal basis $\\{\\mathbf{v}_1, \\ldots, \\mathbf{v}_k\\}$ for a $k$-dimensional subspace that captures as much variance in $X$ as possible. The $i$-th principal component $\\mathbf{v}_i$ is the direction of maximum remaining variance after removing all previous components.',
       '**Connection to SVD and covariance.** The $p \\times p$ sample covariance matrix is $C = \\frac{1}{n-1}X^\\top X$. Its eigenvectors are the principal components; its eigenvalues are the variances along each component. Equivalently: compute the SVD $X = U\\Sigma V^\\top$. The columns of $V$ are the principal components; $\\sigma_i^2/(n-1)$ are the variances. The $k$-rank approximation $X_k = U_k \\Sigma_k V_k^\\top$ is the best rank-$k$ approximation to $X$ in the Frobenius norm (Eckart-Young theorem).',
       '**How much to keep.** The "explained variance ratio" of component $i$ is $\\lambda_i / \\sum_j \\lambda_j$ (eigenvalue fraction). Plot the cumulative explained variance vs number of components ("scree plot"). Keep enough components to explain 90-99% of variance, or use the "elbow" heuristic.',
     ],
@@ -30,6 +31,11 @@ export default {
         type: 'insight',
         title: 'Eckart-Young Theorem',
         body: 'The best rank-$k$ approximation of $X$ (in 2-norm or Frobenius norm) is $X_k = \\sum_{i=1}^k \\sigma_i \\mathbf{u}_i \\mathbf{v}_i^\\top$.\n\nApproximation error: $\\|X - X_k\\|_F = \\sqrt{\\sum_{i>k} \\sigma_i^2}$\n\nThis is why SVD-based PCA is optimal — no other rank-$k$ subspace captures more variance.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Prediction',
+        body: 'If the data is perfectly correlated — every point satisfies $y = x$ — what is the rank of the covariance matrix $C$? What does that imply about the number of nonzero eigenvalues and how many principal components are needed to capture 100% of the variance?',
       },
     ],
     visualizations: [
@@ -132,6 +138,18 @@ var_explained
       problem: 'You have 1000 face images, each 64×64 pixels (4096 features). The top 50 singular values capture 95% of variance. How much storage is needed for the compressed representation vs original?',
       solution: 'Original: $1000 \\times 4096 = 4.1 \\times 10^6$ values. Compressed: $1000 \\times 50$ (scores) + $50 \\times 4096$ (components) + $4096$ (mean) $\\approx 2.6 \\times 10^5$ values — a 16× compression at 95% quality.',
     },
+    {
+      id: 'ex-la8-001-2',
+      title: 'Finding PC1 by hand',
+      problem: 'Given mean-centered data $X = \\begin{bmatrix}1&1\\\\-1&-1\\\\0&0\\end{bmatrix}$, compute the $2\\times2$ covariance matrix and find the first principal component.',
+      solution: '$C = \\frac{1}{2}X^\\top X = \\frac{1}{2}\\begin{bmatrix}2&2\\\\2&2\\end{bmatrix} = \\begin{bmatrix}1&1\\\\1&1\\end{bmatrix}$. This is rank 1. Eigenvalues: $\\lambda_1 = 2$, $\\lambda_2 = 0$. Eigenvector for $\\lambda_1 = 2$: $\\mathbf{v}_1 = (1/\\sqrt{2}, 1/\\sqrt{2})$. PC1 is the $(1,1)$ direction — as expected since both columns are identical.',
+    },
+    {
+      id: 'ex-la8-001-3',
+      title: 'Scree plot and component selection',
+      problem: 'A dataset has eigenvalues $\\lambda = [8, 3, 0.5, 0.3, 0.2]$. How many components explain at least 90% of variance? Compute the cumulative explained variance.',
+      solution: 'Total variance $= 8+3+0.5+0.3+0.2 = 12$. Cumulative ratios: $8/12 \\approx 66.7\\%$; $(8+3)/12 \\approx 91.7\\%$; adding more approaches 100%. Two components explain $\\approx 91.7\\% \\geq 90\\%$. The scree "elbow" is after component 2, confirming the choice $k=2$.',
+    },
   ],
 
   challenges: [
@@ -153,16 +171,42 @@ var_explained
   ],
 
   checkpoints: [
-    { id: 'cp-la8-001-1', question: 'How are the principal components related to the SVD of the data matrix?', answer: 'The principal components are the columns of $V$ in $X = U\\Sigma V^\\top$ (right singular vectors).' },
-    { id: 'cp-la8-001-2', question: 'What does "explained variance" of a principal component mean?', answer: 'The fraction of total variance captured by that component: $\\lambda_i / \\sum_j \\lambda_j$.' },
-    { id: 'cp-la8-001-3', question: 'What theorem justifies that SVD gives the best low-rank approximation?', answer: 'The Eckart-Young theorem: the rank-$k$ truncated SVD minimizes approximation error in any unitarily invariant norm.' },
+    { id: 'cp-la8-001-1', label: 'Read intuition section', type: 'read' },
+    { id: 'cp-la8-001-2', label: 'Read math section', type: 'read' },
+    { id: 'cp-la8-001-3', label: 'Read rigor section', type: 'read' },
+    { id: 'cp-la8-001-4', label: 'Run first lab', type: 'lab' },
+    { id: 'cp-la8-001-5', label: 'Run second lab', type: 'lab' },
+    { id: 'cp-la8-001-6', label: 'Work example 1', type: 'example' },
+    { id: 'cp-la8-001-7', label: 'Work example 2', type: 'example' },
+    { id: 'cp-la8-001-8', label: 'Solve challenge', type: 'challenge' },
   ],
 
   assessment: 'Given a $100 \\times 5$ data matrix, describe how to perform PCA step by step, how to choose the number of components, and how to compute the reconstruction error for a rank-2 approximation.',
 
   quiz: [
-    { id: 'q-la8-001-1', question: 'The principal components of a dataset are:', options: ['The rows of the data matrix', 'The eigenvectors of the covariance matrix', 'The sample means', 'The rows of $U$ in the SVD'], answer: 'The eigenvectors of the covariance matrix' },
-    { id: 'q-la8-001-2', question: 'Why must the data be mean-centered before PCA?', options: ['To make eigenvalues positive', 'So variance measures spread around the mean, not origin', 'To make $X^\\top X$ symmetric', 'To ensure $X$ is full rank'], answer: 'So variance measures spread around the mean, not origin' },
-    { id: 'q-la8-001-3', question: 'The Eckart-Young theorem says the best rank-$k$ approximation is given by:', options: ['The first $k$ rows of $X$', 'The first $k$ eigenvalues of $C$', 'The truncated SVD $\\sum_{i=1}^k \\sigma_i \\mathbf{u}_i \\mathbf{v}_i^\\top$', 'The $k$ largest entries of $X$'], answer: 'The truncated SVD $\\sum_{i=1}^k \\sigma_i \\mathbf{u}_i \\mathbf{v}_i^\\top$' },
+    { id: 'q-la8-001-1', type: 'choice', question: 'The principal components of a dataset are:', options: ['The rows of the data matrix', 'The eigenvectors of the covariance matrix', 'The sample means', 'The rows of $U$ in the SVD'], answer: 'The eigenvectors of the covariance matrix', hints: ['Think about which matrix captures variance structure.', 'The covariance matrix $C = X^\\top X/(n-1)$ is the key.'], reviewSection: 'intuition' },
+    { id: 'q-la8-001-2', type: 'choice', question: 'Why must the data be mean-centered before PCA?', options: ['To make eigenvalues positive', 'So variance measures spread around the mean, not origin', 'To make $X^\\top X$ symmetric', 'To ensure $X$ is full rank'], answer: 'So variance measures spread around the mean, not origin', hints: ['Variance is defined relative to the mean.', 'Without centering, PC1 would point toward the mean, not the spread direction.'], reviewSection: 'intuition' },
+    { id: 'q-la8-001-3', type: 'choice', question: 'The Eckart-Young theorem says the best rank-$k$ approximation is given by:', options: ['The first $k$ rows of $X$', 'The first $k$ eigenvalues of $C$', 'The truncated SVD $\\sum_{i=1}^k \\sigma_i \\mathbf{u}_i \\mathbf{v}_i^\\top$', 'The $k$ largest entries of $X$'], answer: 'The truncated SVD $\\sum_{i=1}^k \\sigma_i \\mathbf{u}_i \\mathbf{v}_i^\\top$', hints: ['Best approximation means minimizing Frobenius error.', 'The SVD provides the optimal low-rank factorization.'], reviewSection: 'math' },
+    { id: 'q-la8-001-4', type: 'choice', question: 'If the covariance matrix $C$ has eigenvalues $[10, 4, 1]$, what fraction of variance does the first PC explain?', options: ['$1/3$', '$10/15$', '$10/14$', '$4/15$'], answer: '$10/15$', hints: ['Explained variance = eigenvalue / sum of all eigenvalues.', 'Total = $10+4+1 = 15$.'], reviewSection: 'intuition' },
+    { id: 'q-la8-001-5', type: 'choice', question: 'In the SVD $X = U\\Sigma V^\\top$, the principal components are:', options: ['Columns of $U$', 'Diagonal entries of $\\Sigma$', 'Columns of $V$', 'Rows of $X$'], answer: 'Columns of $V$', hints: ['The right singular vectors span the PC directions in feature space.', 'Columns of $V$ are the eigenvectors of $X^\\top X$.'], reviewSection: 'intuition' },
+    { id: 'q-la8-001-6', type: 'choice', question: 'Kernel PCA differs from standard PCA in that it:', options: ['Uses the covariance matrix instead of kernel matrix', 'Can find nonlinear structure by implicitly mapping to a high-dimensional space', 'Requires fewer data points', 'Only works on image data'], answer: 'Can find nonlinear structure by implicitly mapping to a high-dimensional space', hints: ['The key word is "nonlinear".', 'The kernel trick avoids explicit feature computation.'], reviewSection: 'rigor' },
+    { id: 'q-la8-001-7', type: 'choice', question: 'The reconstruction error of a rank-$k$ approximation in the Frobenius norm equals:', options: ['$\\sum_{i=1}^k \\sigma_i^2$', '$\\sqrt{\\sum_{i>k} \\sigma_i^2}$', '$\\sigma_{k+1}$', '$\\|X\\|_F / k$'], answer: '$\\sqrt{\\sum_{i>k} \\sigma_i^2}$', hints: ['Error = norm of the discarded part of $X$.', 'Frobenius norm squares and sums all entries.'], reviewSection: 'math' },
+    { id: 'q-la8-001-8', type: 'choice', question: 'A scree plot shows eigenvalues dropping from 9, 8, 1, 0.5, 0.3. The best choice of $k$ using the elbow heuristic is:', options: ['$k=1$', '$k=2$', '$k=4$', '$k=5$'], answer: '$k=2$', hints: ['Look for where the curve bends sharply.', 'After $k=2$ there is a big drop from 8 to 1.'], reviewSection: 'intuition' },
+    { id: 'q-la8-001-9', type: 'choice', question: 'Compressing a $1000 \\times 500$ data matrix to rank 10 requires storing:', options: ['$1000 \\times 500$ numbers', '$1000 \\times 10$ scores plus $10 \\times 500$ components', 'Only 10 numbers', '$500 \\times 500$ numbers'], answer: '$1000 \\times 10$ scores plus $10 \\times 500$ components', hints: ['You store the projected scores and the component directions.', 'Count: $U_k$ is $1000 \\times 10$, $V_k^\\top$ is $10 \\times 500$.'], reviewSection: 'intuition' },
+    { id: 'q-la8-001-10', type: 'choice', question: 'The covariance matrix $C = X^\\top X/(n-1)$ is always:', options: ['Diagonal', 'Symmetric positive semi-definite', 'Orthogonal', 'Skew-symmetric'], answer: 'Symmetric positive semi-definite', hints: ['$C = C^\\top$ by construction.', 'For any vector $\\mathbf{v}$: $\\mathbf{v}^\\top C \\mathbf{v} = \\|X\\mathbf{v}\\|^2/(n-1) \\geq 0$.'], reviewSection: 'math' },
+  ],
+
+  mastery: { targetLevel: 2, solveIndependently: 'Given a small data matrix, compute the covariance matrix, find eigenvalues/eigenvectors, and project data onto the top principal component.', explainVerbally: 'Explain why PCA finds the directions of maximum variance and how the SVD makes this computation efficient.', detectIncorrectApplication: 'Recognize when PCA is inappropriate — e.g., when structure is nonlinear and t-SNE or UMAP would be better.', transferToUnfamiliar: 'Apply PCA to a new domain (e.g., financial time series) by identifying the data matrix, centering, and interpreting principal components as latent factors.' },
+  misconceptions: [
+    { falseBelief: 'PCA requires the data to be Gaussian.', whyStudentsThinkIt: 'Many derivations assume Gaussian distributions because variance is a natural measure for Gaussians.', correctionExample: 'PCA is purely geometric — it finds directions of max variance regardless of the distribution. Apply it to any numeric data.', contrastCase: 'Compare PCA on uniformly distributed vs Gaussian data on the same ellipse — PC directions are identical.' },
+    { falseBelief: 'The first PC is the feature with the largest variance.', whyStudentsThinkIt: 'Students conflate marginal variance of individual features with the variance in a direction combining all features.', correctionExample: 'In 2D data where $x_1$ has variance 4 and $x_2$ has variance 4 but they are correlated, PC1 is the diagonal direction $(1/\\sqrt{2}, 1/\\sqrt{2})$, not $(1,0)$ or $(0,1)$.', contrastCase: 'Compute PC1 on correlated data and show it differs from the highest-variance feature direction.' },
+  ],
+  transferPrompts: [
+    { situation: 'You have a $50000 \\times 20000$ gene expression matrix and want to visualize samples.', competingTechniques: 'Use all 20000 genes directly; use t-SNE; use PCA then t-SNE.', whyThisTechniqueWins: 'PCA reduces to ~50 components first (removing noise), then t-SNE on the 50-dim scores is fast and captures nonlinear structure. Direct t-SNE on 20000 features is computationally prohibitive.' },
+    { situation: 'You want to remove correlated noise from a signal measured by 10 sensors.', competingTechniques: 'Average all sensors; use PCA; use ICA.', whyThisTechniqueWins: 'PCA identifies the dominant signal directions. Discard low-variance PCs (which capture noise) and reconstruct from the top PCs. Simple averaging ignores the variance structure.' },
+  ],
+  debugging: [
+    { commonError: 'Forgetting to mean-center the data before PCA.', symptom: 'PC1 points in the direction of the data mean rather than the spread direction; explained variance ratios do not reflect true structure.', whyItHappened: 'The covariance formula assumes centered data. Without centering, $X^\\top X$ measures second moments, not variance.', repairStrategy: 'Always subtract the column means: $X \\leftarrow X - \\mathbf{1}\\bar{\\mathbf{x}}^\\top$ before computing SVD or covariance.' },
+    { commonError: 'Using the wrong singular vectors (columns of $U$ instead of $V$) as principal components.', symptom: 'Projected scores have wrong dimension; reconstruction fails.', whyItHappened: 'Confusion between left ($U$, $n \\times n$) and right ($V$, $p \\times p$) singular vectors. PCs live in feature space (dimension $p$), so they come from $V$.', repairStrategy: 'Remember: $Z = XV_k$ (project data onto $V_k$). $U_k$ contains the normalized scores, not the component directions.' },
   ],
 };

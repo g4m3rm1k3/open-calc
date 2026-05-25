@@ -16,7 +16,7 @@ export default {
 
   intuition: {
     prose: [
-      '**The ten axioms.** A vector space $V$ over a field $\\mathbb{F}$ is a set with two operations — vector addition and scalar multiplication — satisfying ten properties: closure under addition and scalar multiplication, commutativity and associativity of addition, existence of a zero vector, existence of additive inverses, and the four scalar multiplication rules. These ten properties are exactly what you need to do linear algebra.',
+      'Take the polynomials $p(x) = 1 + 2x$ and $q(x) = 3 - x$ in $P_1$ (degree $\\leq 1$). Add them: $(p+q)(x) = 4 + x$. Scale: $(5p)(x) = 5 + 10x$. Negate: $(-p)(x) = -1 - 2x$, so $p + (-p) = 0$. The zero polynomial $0(x) = 0$ acts as the additive identity. These operations feel exactly like $\\mathbb{R}^2$ — and that is not a coincidence: $P_1$ and $\\mathbb{R}^2$ satisfy the same ten rules, making them both vector spaces. Now try $W_1 = \\{(x,y) : x + y = 0\\}$ vs. $W_2 = \\{(x,y) : x + y = 1\\}$: check closure under addition for $W_2$: $(1,0) + (0,1) = (1,1)$ — but $1 + 1 = 2 \\neq 1$, so $W_2$ is closed under NOTHING. $W_1$ works (closed under all linear combinations). The homogeneous constraint defines a subspace; the inhomogeneous does not.',
       '**Why the axioms matter.** The axioms say nothing about what vectors "look like." They only specify how vectors behave under the two operations. Anything that satisfies all ten axioms is a vector space, and every theorem proved from those axioms applies automatically. This is the power of abstraction: prove once, apply everywhere.',
       '**Key examples.** $\\mathbb{R}^n$ (columns of $n$ real numbers) — the prototype. $P_n$ (polynomials of degree $\\leq n$) — with $(p+q)(x) = p(x) + q(x)$ and $(cp)(x) = c \\cdot p(x)$. $M_{m \\times n}$ (all $m \\times n$ matrices) — with entry-wise addition and scalar multiplication. $C[a,b]$ (continuous functions on $[a,b]$) — with pointwise operations. All are vector spaces.',
       '**Subspaces.** A subset $W \\subseteq V$ is a subspace if (1) $\\mathbf{0} \\in W$, (2) closed under addition, and (3) closed under scalar multiplication. The three-condition check is all you need — the other axioms are inherited from $V$. Examples: any line through the origin in $\\mathbb{R}^2$; the set of polynomials with zero constant term; the set of all solutions to a homogeneous linear ODE.',
@@ -37,6 +37,11 @@ export default {
         type: 'warning',
         title: 'Not Everything Is a Vector Space',
         body: 'The set $\\{(x,y) : x \\geq 0, y \\geq 0\\}$ (first quadrant) is NOT a vector space — it fails closure under scalar multiplication (multiplying by $-1$ leaves the quadrant). A vector space must contain $\\mathbf{0}$ and be closed under all linear combinations, including those with negative and non-integer scalars.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Prediction',
+        body: 'Before working through the subspace examples: which of these is a subspace of $\\mathbb{R}^3$? (a) $\\{(x,y,z) : x + y + z = 0\\}$; (b) $\\{(x,y,z) : x + y + z = 1\\}$; (c) $\\{(x,y,z) : x \\geq 0\\}$; (d) $\\{(x,y,z) : x = 0\\}$. For each, ask: does it contain $\\mathbf{0}$? Is it closed under addition and scalar multiplication?',
       },
     ],
     visualizations: [
@@ -299,6 +304,39 @@ print("  (Each choice of c1,c2 gives a DIFFERENT solution — 2D space)")
         },
       ],
     },
+    {
+      id: 'ex-la6-001-3',
+      title: 'Antisymmetric matrices: a subspace of $M_{2\\times 2}$',
+      problem: 'Let $W = \\{A \\in M_{2\\times 2} : A^\\top = -A\\}$ be the set of antisymmetric (skew-symmetric) $2\\times 2$ matrices. Show $W$ is a subspace, find a basis, and state $\\dim(W)$.',
+      steps: [
+        {
+          expression: 'A \\in W \\Leftrightarrow A = \\begin{bmatrix}0 & a \\\\ -a & 0\\end{bmatrix} \\text{ for some } a \\in \\mathbb{R}',
+          annotation: 'An antisymmetric $2\\times2$ matrix has zero diagonal (since $A_{ii} = -A_{ii}$ forces $A_{ii} = 0$) and off-diagonals that are negatives of each other.',
+          strategyTitle: 'Characterize elements of $W$',
+        },
+        {
+          expression: '\\mathbf{0} = \\begin{bmatrix}0&0\\\\0&0\\end{bmatrix}: \\quad \\mathbf{0}^\\top = \\mathbf{0} = -\\mathbf{0} \\checkmark',
+          annotation: 'The zero matrix is antisymmetric (trivially: $0 = -0$).',
+          strategyTitle: 'Check condition 1: zero',
+        },
+        {
+          expression: 'A + B = \\begin{bmatrix}0&a\\\\-a&0\\end{bmatrix} + \\begin{bmatrix}0&b\\\\-b&0\\end{bmatrix} = \\begin{bmatrix}0&a+b\\\\-(a+b)&0\\end{bmatrix} \\in W \\checkmark',
+          annotation: '$(A+B)^\\top = A^\\top + B^\\top = -A + (-B) = -(A+B)$. Antisymmetric matrices are closed under addition.',
+          strategyTitle: 'Check condition 2: closed under addition',
+        },
+        {
+          expression: 'cA = \\begin{bmatrix}0&ca\\\\-ca&0\\end{bmatrix} \\in W \\checkmark',
+          annotation: '$(cA)^\\top = cA^\\top = c(-A) = -(cA)$.',
+          strategyTitle: 'Check condition 3: closed under scalar mult.',
+        },
+        {
+          expression: '\\text{Basis: } \\left\\{\\begin{bmatrix}0&1\\\\-1&0\\end{bmatrix}\\right\\}, \\quad \\dim(W) = 1',
+          annotation: 'Every element of $W$ is $a \\begin{bmatrix}0&1\\\\-1&0\\end{bmatrix}$ for a single scalar $a$. One basis vector, dimension 1. Note: the symmetric matrices have dimension 3 and antisymmetric have dimension 1 — together: $3 + 1 = 4 = \\dim(M_{2\\times 2})$. Every matrix decomposes uniquely as symmetric + antisymmetric: $A = \\frac{A+A^\\top}{2} + \\frac{A-A^\\top}{2}$.',
+          strategyTitle: 'Find dimension and basis',
+          checkpoint: 'Two complementary subspaces of $M_{2\\times 2}$: symmetric (dim 3) and antisymmetric (dim 1). Their dimensions add up to $\\dim(M_{2\\times 2}) = 4$.',
+        },
+      ],
+    },
   ],
 
   challenges: [
@@ -338,9 +376,14 @@ print("  (Each choice of c1,c2 gives a DIFFERENT solution — 2D space)")
   ],
 
   checkpoints: [
-    { id: 'cp-la6-001-1', question: 'Name two vector spaces that are NOT $\\mathbb{R}^n$ for any $n$.', answer: '$P_n$ (polynomials of degree ≤ n), $C[a,b]$ (continuous functions), $M_{m\\times n}$ (matrices), etc.' },
-    { id: 'cp-la6-001-2', question: 'What are the three conditions for a subspace?', answer: 'Contains zero, closed under addition, closed under scalar multiplication.' },
-    { id: 'cp-la6-001-3', question: 'Is the span of any set of vectors always a subspace?', answer: 'Yes — it is the smallest subspace containing those vectors.' },
+    { id: 'cp-la6-001-1', label: 'Read intuition: polynomial and subspace examples', type: 'read' },
+    { id: 'cp-la6-001-2', label: 'Read math: span and independence in abstract spaces', type: 'read' },
+    { id: 'cp-la6-001-3', label: 'Read rigor: fields, modules, isomorphism', type: 'read' },
+    { id: 'cp-la6-001-4', label: 'Run subspace condition lab', type: 'lab' },
+    { id: 'cp-la6-001-5', label: 'Run polynomial vector space lab', type: 'lab' },
+    { id: 'cp-la6-001-6', label: 'Work example 1: symmetric matrices subspace', type: 'example' },
+    { id: 'cp-la6-001-7', label: 'Work example 2: span of polynomials', type: 'example' },
+    { id: 'cp-la6-001-8', label: 'Solve challenge: non-example of a vector space', type: 'challenge' },
   ],
 
   assessment: {
@@ -408,6 +451,131 @@ print("  (Each choice of c1,c2 gives a DIFFERENT solution — 2D space)")
       answer: '2',
       hints: ['The characteristic equation $r^2 + 4 = 0$ has two roots $r = \\pm 2i$, giving solutions $\\{\\cos(2t), \\sin(2t)\\}$. A 2nd-order linear homogeneous ODE always has a 2-dimensional solution space — one dimension per order.'],
       reviewSection: 'intuition',
+    },
+    {
+      id: 'q-la6-001-5',
+      type: 'choice',
+      text: 'Which set is a subspace of $\\mathbb{R}^3$?',
+      options: [
+        '$\\{(x,y,z) : x + y + z = 1\\}$',
+        '$\\{(x,y,z) : x^2 + y^2 = z^2\\}$',
+        '$\\{(x,y,z) : 2x - y + 3z = 0\\}$',
+        '$\\{(x,y,z) : x \\geq 0, y \\geq 0, z \\geq 0\\}$',
+      ],
+      answer: '$\\{(x,y,z) : 2x - y + 3z = 0\\}$',
+      hints: ['$x+y+z=1$ fails the zero vector test ($0+0+0 \\neq 1$). $x^2+y^2=z^2$ is quadratic — not closed under addition. The first quadrant fails closure under scalar multiplication (multiply by $-1$). Only $2x-y+3z=0$ is homogeneous and linear — it is the null space of $[2,-1,3]$.'],
+      reviewSection: 'intuition',
+    },
+    {
+      id: 'q-la6-001-6',
+      type: 'choice',
+      text: 'What is the dimension of the space of $3 \\times 3$ symmetric matrices?',
+      options: ['3', '6', '9', '5'],
+      answer: '6',
+      hints: ['A $3\\times3$ symmetric matrix has 3 diagonal entries and 3 entries above the diagonal (which determine the 3 below by symmetry). Total free entries: $3 + 3 = 6$. Basis: $E_{11}, E_{22}, E_{33}$ (diagonal) and $E_{12}+E_{21}, E_{13}+E_{31}, E_{23}+E_{32}$ (off-diagonal pairs).'],
+      reviewSection: 'math',
+    },
+    {
+      id: 'q-la6-001-7',
+      type: 'choice',
+      text: 'The span of any finite set of vectors $\\{\\mathbf{v}_1, \\ldots, \\mathbf{v}_k\\}$ is:',
+      options: [
+        'A subspace only if the vectors are linearly independent',
+        'Always a subspace of $V$',
+        'The entire space $V$ if $k \\geq \\dim(V)$',
+        'A subspace only if all vectors are nonzero',
+      ],
+      answer: 'Always a subspace of $V$',
+      hints: ['The span is always a subspace, regardless of independence. Proof: zero = $0\\mathbf{v}_1 + \\cdots + 0\\mathbf{v}_k$ ✓; linear combinations of linear combinations are linear combinations ✓. Independence determines whether the span has dimension $k$ (if independent) or less (if dependent).'],
+      reviewSection: 'math',
+    },
+    {
+      id: 'q-la6-001-8',
+      type: 'choice',
+      text: 'The set of antisymmetric $2\\times 2$ matrices ($A^\\top = -A$) has which dimension?',
+      options: ['1', '2', '3', '4'],
+      answer: '1',
+      hints: ['An antisymmetric $2\\times2$ matrix must have $A_{11} = -A_{11}$ (so $A_{11}=0$), $A_{22}=0$, and $A_{21} = -A_{12}$. One free parameter: $a = A_{12}$. Basis: $\\begin{bmatrix}0&1\\\\-1&0\\end{bmatrix}$. Dimension = 1.'],
+      reviewSection: 'intuition',
+    },
+    {
+      id: 'q-la6-001-9',
+      type: 'choice',
+      text: 'Two finite-dimensional vector spaces are isomorphic if and only if:',
+      options: [
+        'They are both over $\\mathbb{R}$',
+        'They have the same dimension',
+        'One is a subspace of the other',
+        'They have the same basis vectors',
+      ],
+      answer: 'They have the same dimension',
+      hints: ['Isomorphic means there exists a bijective linear map between them. For finite-dimensional vector spaces, this is equivalent to having the same dimension. So $P_3 \\cong \\mathbb{R}^4 \\cong M_{2\\times2}$ — all different "looking" but same dimension 4, hence algebraically identical.'],
+      reviewSection: 'rigor',
+    },
+    {
+      id: 'q-la6-001-10',
+      type: 'choice',
+      text: 'In CNC motion control, the set of all velocity profiles satisfying $v(0) = v(T) = 0$ (zero start/end speed) is a function space. Which linear algebra operation would you use to find the "smoothest" profile among all valid profiles?',
+      options: [
+        'Determinant — the smooth profile maximizes the determinant of the function matrix',
+        'Minimization of a norm (e.g., minimize $\\|v\'\'\\|^2$) over the subspace of valid profiles',
+        'Eigenvalue decomposition of the velocity function',
+        'Gram-Schmidt orthogonalization of the velocity space',
+      ],
+      answer: 'Minimization of a norm (e.g., minimize $\\|v\'\'\\|^2$) over the subspace of valid profiles',
+      hints: ['The valid profiles form a vector space (subspace satisfying the linear boundary conditions). "Smoothest" means minimizing jerk or acceleration, which is a norm constraint on the function. This is optimization over an infinite-dimensional vector space — the abstract structure (norm, subspace) carries over from $\\mathbb{R}^n$ to function spaces.'],
+      reviewSection: 'intuition',
+    },
+  ],
+
+  mastery: {
+    targetLevel: 2,
+    solveIndependently: 'Determine whether a set is a vector space or subspace by checking the three conditions; find a basis and dimension for standard examples like polynomial spaces and matrix spaces.',
+    explainVerbally: 'Explain why the span of any set is always a subspace, and why the subspace test only needs three conditions (not all ten axioms).',
+    detectIncorrectApplication: 'Catch the two most common errors: (1) forgetting to check the zero vector first — if $\\mathbf{0} \\notin W$, it\'s immediately not a subspace; (2) applying the subspace test to a set defined by a non-linear constraint.',
+    transferToUnfamiliar: 'Recognize that ODE solution spaces, function spaces, and matrix subspaces all behave like $\\mathbb{R}^n$ — span, independence, basis, dimension all apply identically.',
+  },
+
+  misconceptions: [
+    {
+      falseBelief: 'Any set defined by an equation is a subspace.',
+      whyStudentsThinkIt: 'Lines and planes in $\\mathbb{R}^3$ are often given as equations, and lines/planes through the origin ARE subspaces — students overgeneralize.',
+      correctionExample: '$\\{(x,y) : x + y = 1\\}$ is a line but NOT a subspace: it misses the zero vector ($0+0=1$ is false) and is not closed under addition ($((0.5,0.5)+(0.5,0.5)=(1,1)$ but $1+1=2 \\neq 1$).',
+      contrastCase: '$\\{(x,y) : x + y = 0\\}$ IS a subspace — the difference is the homogeneous (= 0) vs. inhomogeneous (= 1) constraint. Only homogeneous linear constraints define subspaces.',
+    },
+    {
+      falseBelief: 'A vector space is only a collection of arrows in $\\mathbb{R}^n$.',
+      whyStudentsThinkIt: 'The visual picture of vectors as arrows dominates early linear algebra courses.',
+      correctionExample: 'The set of continuous functions $C[0,1]$ with $(f+g)(x)=f(x)+g(x)$ and $(cf)(x)=c f(x)$ satisfies all 10 axioms. Functions ARE vectors — you can take linear combinations, they have a zero element ($f=0$), and negatives ($-f$).',
+      contrastCase: '$\\mathbb{R}^n$ is one specific vector space where vectors happen to look like arrows. The abstract definition admits any set with the right operations.',
+    },
+  ],
+
+  transferPrompts: [
+    {
+      situation: 'You are solving a linear ODE $y\'\' + p(t)y\' + q(t)y = 0$ and want to know how many free parameters the general solution has.',
+      competingTechniques: 'Guess particular solutions and check by substitution, use series solutions.',
+      whyThisTechniqueWins: 'The solution set is a vector space of dimension equal to the order of the ODE (2 for a 2nd-order ODE). You need exactly as many independent basis solutions as the order. This tells you the general solution has exactly 2 free parameters — no guesswork.',
+    },
+    {
+      situation: 'You want to verify that a proposed subspace of a matrix space is valid.',
+      competingTechniques: 'Check all 10 axioms, compute a basis and verify closure.',
+      whyThisTechniqueWins: 'The three-condition subspace test (zero, closed addition, closed scalar mult.) is sufficient and minimal — the other 7 axioms are inherited from the ambient space. This collapses a 10-step check to 3.',
+    },
+  ],
+
+  debugging: [
+    {
+      commonError: 'Concluding a set is a subspace without checking the zero vector first.',
+      symptom: 'A set like $\\{(x,y,z) : x+y+z=1\\}$ gets declared a subspace after checking (incorrect) closure.',
+      whyItHappened: 'The zero vector check is the cheapest and most often decisive test — it immediately rules out all affine (inhomogeneous) sets. Students sometimes skip it and proceed to the harder closures.',
+      repairStrategy: 'Always start with the zero vector test. If $\\mathbf{0} \\notin W$, stop — it\'s not a subspace. Only proceed to closure tests after the zero test passes.',
+    },
+    {
+      commonError: 'Applying subspace reasoning to a non-linear constraint like $\\{x^2 + y^2 = 1\\}$.',
+      symptom: 'Check: $(1,0) \\in W$ ✓ and $(0,1) \\in W$ ✓. Then wrongly conclude $W$ is a subspace because the boundary conditions seem to hold.',
+      whyItHappened: 'Non-linear sets can contain the zero vector ($0^2+0^2=0 \\neq 1$ so actually it fails here) and might appear closed at a glance. The closure test must be checked algebraically, not geometrically.',
+      repairStrategy: 'Test closure algebraically: take two arbitrary elements of $W$ (parameterize them), add them, and check if the result satisfies the defining condition. For $x^2+y^2=1$: $(1,0)+(0,1)=(1,1)$, $1^2+1^2=2 \\neq 1$ — fails.',
     },
   ],
 };

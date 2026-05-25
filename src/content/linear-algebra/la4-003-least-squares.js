@@ -50,6 +50,11 @@ export default {
         body: 'A^T A \\hat{\\mathbf{x}} = A^T \\mathbf{b}\n\nWhen $A$ has linearly independent columns, $A^TA$ is invertible and:\n$\\hat{\\mathbf{x}} = (A^T A)^{-1} A^T \\mathbf{b}$',
       },
       {
+        type: 'sequencing',
+        title: 'Prediction',
+        body: 'You have 4 data points $(1,2),(2,3),(3,5),(4,6)$ and want the best-fit line $y = ax + b$. Before computing: will the residual be zero or non-zero? Is $\\mathbf{b}$ in $\\text{col}(A)$? Predict the slope — is it closer to 1 or to 2? Then set up $A$ and $A^T A$ and solve.',
+      },
+      {
         type: 'warning',
         title: 'Normal Equations Can Be Ill-Conditioned',
         body: 'Squaring the matrix ($A^TA$) also squares the condition number, amplifying numerical errors. In practice, solve least squares via QR decomposition ($A = QR$, so $\\hat{\\mathbf{x}} = R^{-1}Q^T\\mathbf{b}$) rather than forming $A^TA$ explicitly.',
@@ -396,6 +401,42 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2x² + x + 1
       ],
       conclusion: 'The best-fit line is $y = \\frac{3}{2}x - \\frac{2}{3}$. None of the three points lie exactly on the line, but this line minimizes the sum of squared vertical distances from the points to the line.',
     },
+    {
+      id: 'la4-003-ex3',
+      title: 'When b is in col(A): least squares recovers the exact solution',
+      problem: 'For $A = \\begin{bmatrix}1&0\\\\0&1\\\\1&1\\end{bmatrix}$ and $\\mathbf{b} = [2,3,5]^\\top$: solve the normal equations and verify the residual is zero.',
+      steps: [
+        {
+          expression: '\\mathbf{b} = \\begin{bmatrix}2\\\\3\\\\5\\end{bmatrix} = 2\\begin{bmatrix}1\\\\0\\\\1\\end{bmatrix} + 3\\begin{bmatrix}0\\\\1\\\\1\\end{bmatrix} = A\\begin{bmatrix}2\\\\3\\end{bmatrix}',
+          annotation: '$\\mathbf{b}$ is exactly $A[2,3]^T$ — it lies in the column space of $A$. An exact solution exists.',
+          strategyTitle: 'Recognize b is in col(A)',
+          checkpoint: 'If an exact solution exists, what should the least squares solution be?',
+          hints: ['If Ax=b has an exact solution x*, then x* also minimizes ‖Ax-b‖² = 0. The least squares solution must equal the exact solution.'],
+        },
+        {
+          expression: 'A^TA = \\begin{bmatrix}2&1\\\\1&2\\end{bmatrix}, \\quad A^T\\mathbf{b} = \\begin{bmatrix}1&0&1\\\\0&1&1\\end{bmatrix}\\begin{bmatrix}2\\\\3\\\\5\\end{bmatrix} = \\begin{bmatrix}7\\\\8\\end{bmatrix}',
+          annotation: '$A^TA$ entry $(i,j)$ = dot product of columns $i$ and $j$ of $A$. Diagonal: $\\|\\mathbf{a}_1\\|^2=2$, $\\|\\mathbf{a}_2\\|^2=2$. Off-diagonal: $\\mathbf{a}_1\\cdot\\mathbf{a}_2=1$.',
+          strategyTitle: 'Form normal equations',
+          checkpoint: '',
+          hints: [],
+        },
+        {
+          expression: '\\hat{\\mathbf{x}} = (A^TA)^{-1}A^T\\mathbf{b} = \\frac{1}{3}\\begin{bmatrix}2&-1\\\\-1&2\\end{bmatrix}\\begin{bmatrix}7\\\\8\\end{bmatrix} = \\frac{1}{3}\\begin{bmatrix}6\\\\9\\end{bmatrix} = \\begin{bmatrix}2\\\\3\\end{bmatrix}',
+          annotation: '$\\det(A^TA) = 4-1=3$. Normal equations give $\\hat{\\mathbf{x}} = [2,3]^T$ — exactly the exact solution.',
+          strategyTitle: 'Solve normal equations',
+          checkpoint: '',
+          hints: [],
+        },
+        {
+          expression: '\\mathbf{e} = \\mathbf{b} - A\\hat{\\mathbf{x}} = \\begin{bmatrix}2\\\\3\\\\5\\end{bmatrix} - \\begin{bmatrix}1&0\\\\0&1\\\\1&1\\end{bmatrix}\\begin{bmatrix}2\\\\3\\end{bmatrix} = \\begin{bmatrix}2\\\\3\\\\5\\end{bmatrix} - \\begin{bmatrix}2\\\\3\\\\5\\end{bmatrix} = \\begin{bmatrix}0\\\\0\\\\0\\end{bmatrix}',
+          annotation: 'Zero residual — $\\mathbf{b}$ is exactly in the column space, so the projection equals $\\mathbf{b}$ itself.',
+          strategyTitle: 'Verify residual is zero',
+          checkpoint: '',
+          hints: [],
+        },
+      ],
+      conclusion: 'When $\\mathbf{b} \\in \\text{col}(A)$, the least squares solution is the exact solution and the residual is zero. Least squares is a generalization of exact solving: it works whether or not an exact solution exists. The normal equations $A^TA\\hat{\\mathbf{x}} = A^T\\mathbf{b}$ always produce the best possible $\\hat{\\mathbf{x}}$.',
+    },
   ],
 
   // ── Challenges ─────────────────────────────────────────────────
@@ -516,14 +557,14 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2x² + x + 1
 
   // ── Checkpoints ──────────────────────────────────────────────────
   checkpoints: [
-    'read-intuition',
-    'read-math',
-    'read-rigor',
-    'completed-example-1',
-    'completed-example-2',
-    'attempted-challenge-easy',
-    'attempted-challenge-medium',
-    'attempted-challenge-hard',
+    { id: 'cp-la4-003-1', label: 'Read: State the normal equations and where they come from', type: 'read' },
+    { id: 'cp-la4-003-2', label: 'Read: Explain the geometric picture of least squares', type: 'read' },
+    { id: 'cp-la4-003-3', label: 'Read: Describe when the residual is zero vs. non-zero', type: 'read' },
+    { id: 'cp-la4-003-4', label: 'Lab: Fit a line and visualize the squared residuals', type: 'lab' },
+    { id: 'cp-la4-003-5', label: 'Lab: Verify Aᵀe = 0 after solving normal equations', type: 'lab' },
+    { id: 'cp-la4-003-6', label: 'Example: Solve an overdetermined 3×2 system', type: 'example' },
+    { id: 'cp-la4-003-7', label: 'Example: Fit a line to data using normal equations', type: 'example' },
+    { id: 'cp-la4-003-8', label: 'Challenge: Show least squares recovers exact solution when b ∈ col(A)', type: 'challenge' },
   ],
 
   // ── Assessment ───────────────────────────────────────────────────
@@ -578,5 +619,144 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2x² + x + 1
       hints: ['One row per data point (50 equations), one column per parameter: slope $a$ and intercept $b$ (2 unknowns).'],
       reviewSection: 'Math tab — Linear Regression',
     },
+    {
+      id: 'q-la4-003-4',
+      type: 'choice',
+      text: 'The normal equations $A^TA\\hat{\\mathbf{x}} = A^T\\mathbf{b}$ are derived by requiring that:',
+      options: [
+        '$A\\hat{\\mathbf{x}} = \\mathbf{b}$ exactly',
+        'The residual $\\mathbf{e} = \\mathbf{b} - A\\hat{\\mathbf{x}}$ is perpendicular to every column of $A$',
+        '$\\|\\hat{\\mathbf{x}}\\|$ is minimized',
+        '$\\det(A^TA) = 0$',
+      ],
+      answer: 'The residual $\\mathbf{e} = \\mathbf{b} - A\\hat{\\mathbf{x}}$ is perpendicular to every column of $A$',
+      hints: ['The perpendicularity condition Aᵀ(b - Ax̂) = 0 is what makes the projection optimal. Rearranging gives AᵀAx̂ = Aᵀb.'],
+      reviewSection: 'Math — Deriving the normal equations',
+    },
+    {
+      id: 'q-la4-003-5',
+      type: 'choice',
+      text: 'When fitting a quadratic $y = ax^2 + bx + c$ to 10 data points, the matrix $A$ has how many rows and columns?',
+      options: ['3 × 10', '10 × 3', '10 × 10', '3 × 3'],
+      answer: '10 × 3',
+      hints: ['One row per data point (10 rows). Three columns: one for x², one for x, one for the constant term (3 unknowns: a, b, c).'],
+      reviewSection: 'Math — linear regression setup',
+    },
+    {
+      id: 'q-la4-003-6',
+      type: 'choice',
+      text: 'If $\\mathbf{b}$ lies exactly in the column space of $A$, the least squares residual $\\|\\mathbf{e}\\|$ equals:',
+      options: ['1', 'Some positive number', '0', '$\\|\\mathbf{b}\\|$'],
+      answer: '0',
+      hints: ['If b ∈ col(A), the projection of b onto col(A) is b itself. The residual e = b - Pb = b - b = 0.'],
+      reviewSection: 'Examples — exact solution case',
+    },
+    {
+      id: 'q-la4-003-7',
+      type: 'choice',
+      text: 'Why is solving via QR ($A = QR$, then $\\hat{\\mathbf{x}} = R^{-1}Q^T\\mathbf{b}$) preferred over forming $A^TA$ explicitly?',
+      options: [
+        'QR is always faster',
+        'Forming $A^TA$ squares the condition number, making numerical errors worse; QR preserves the conditioning of $A$',
+        'QR only works for square matrices',
+        '$A^TA$ is not always invertible when $A$ is not square',
+      ],
+      answer: 'Forming $A^TA$ squares the condition number, making numerical errors worse; QR preserves the conditioning of $A$',
+      hints: ['If κ(A) = 100, then κ(AᵀA) = κ(A)² = 10,000. Tiny rounding errors get amplified 10,000× instead of 100×. QR factorization avoids forming AᵀA.'],
+      reviewSection: 'Intuition — Normal Equations Can Be Ill-Conditioned',
+    },
+    {
+      id: 'q-la4-003-8',
+      type: 'choice',
+      text: 'The projection matrix $P = A(A^TA)^{-1}A^T$ satisfies $P^2 = P$ because:',
+      options: [
+        '$A^TA$ is always invertible',
+        'Projecting a vector that is already in the column space of $A$ leaves it unchanged',
+        '$P$ is a diagonal matrix',
+        'The columns of $A$ are always orthonormal',
+      ],
+      answer: 'Projecting a vector that is already in the column space of $A$ leaves it unchanged',
+      hints: ['If w = Pb is already in col(A), then Pw = P(Pb) = P²b = Pb = w (unchanged). That idempotency is what P² = P captures.'],
+      reviewSection: 'Math — Projection onto the column space',
+    },
+    {
+      id: 'q-la4-003-9',
+      type: 'choice',
+      text: 'In GPS, position is solved as a least squares problem because:',
+      options: [
+        'GPS uses exactly 3 satellites for 3 unknowns',
+        'More than 4 satellites give more equations than unknowns (overdetermined) — the least squares solution minimizes combined distance errors',
+        'GPS signals are orthogonal by construction',
+        'The exact system has no solution due to Earth\'s curvature',
+      ],
+      answer: 'More than 4 satellites give more equations than unknowns (overdetermined) — the least squares solution minimizes combined distance errors',
+      hints: ['Modern GPS uses 8–12 satellites. Each gives one distance equation for 4 unknowns (x,y,z,clock offset). The overdetermined system is solved via least squares.'],
+      reviewSection: 'Hook — real-world context',
+    },
+    {
+      id: 'q-la4-003-10',
+      type: 'choice',
+      text: 'For the least squares solution $\\hat{\\mathbf{x}} = (A^TA)^{-1}A^T\\mathbf{b}$, the matrix $(A^TA)^{-1}A^T$ is called:',
+      options: [
+        'The projection matrix',
+        'The pseudoinverse of $A$',
+        'The transpose of $A$',
+        'The covariance matrix',
+      ],
+      answer: 'The pseudoinverse of $A$',
+      hints: ['The pseudoinverse A⁺ = (AᵀA)⁻¹Aᵀ generalizes the inverse to rectangular matrices. For square invertible A, A⁺ = A⁻¹. More generally, A⁺ = VΣ⁺Uᵀ via SVD.'],
+      reviewSection: 'Math — pseudoinverse',
+    },
   ],
+
+  misconceptions: [
+    {
+      falseBelief: 'The least squares solution makes $A\\hat{\\mathbf{x}} = \\mathbf{b}$ exactly.',
+      whyStudentsThinkIt: 'Students confuse "solve" with "approximate." The term "solution" implies exactness.',
+      correctionExample: 'For $A = \\begin{bmatrix}1\\\\1\\\\1\\end{bmatrix}$, $\\mathbf{b} = [1,2,4]^T$: no single scalar $\\hat{x}$ satisfies all three equations $\\hat{x}=1$, $\\hat{x}=2$, $\\hat{x}=4$. The least squares solution $\\hat{x} = 7/3$ minimizes the sum of squared errors — it does NOT satisfy any of the three equations exactly.',
+      contrastCase: 'The residual $\\mathbf{e} = \\mathbf{b} - A\\hat{\\mathbf{x}}$ is only zero when $\\mathbf{b}$ is exactly in the column space of $A$.',
+    },
+    {
+      falseBelief: 'Least squares minimizes the maximum error (the largest residual).',
+      whyStudentsThinkIt: 'Students confuse least squares ($\\ell^2$ norm) with minimax / Chebyshev ($\\ell^\\infty$ norm) optimization.',
+      correctionExample: 'Least squares minimizes $\\sum e_i^2$ — the sum of squared residuals. Minimizing the maximum error ($\\max |e_i|$) is a different problem called Chebyshev approximation. Least squares is generally easier to compute (linear system), while minimax requires linear programming.',
+      contrastCase: 'For three residuals $[-2, 1, 1]$ (sum of squares = 6) vs $[-1, -1, 2]$ (sum of squares = 6), both have the same least squares cost but different maximum errors (2 vs 2).',
+    },
+  ],
+
+  transferPrompts: [
+    {
+      situation: 'You have sensor data from an accelerometer on a CNC axis. You want to estimate velocity and position from noisy acceleration readings using a Kalman filter.',
+      competingTechniques: ['Numerical integration (trapezoid)', 'Low-pass filter', 'Least squares batch estimation'],
+      whyThisTechniqueWins: 'Least squares (or its recursive variant, the Kalman filter) fits the physical model $\\mathbf{x}_{k+1} = A\\mathbf{x}_k + B\\mathbf{u}_k + \\mathbf{w}_k$ to all measurements simultaneously, minimizing squared prediction errors. It combines all readings optimally — much better than integrating forward from noisy individual readings.',
+    },
+    {
+      situation: 'In machine learning, you want to find the weights $\\mathbf{w}$ of a linear model that best fit training data $(\\mathbf{x}_1, y_1), \\ldots, (\\mathbf{x}_n, y_n)$.',
+      competingTechniques: ['Gradient descent', 'Direct formula', 'Normal equations'],
+      whyThisTechniqueWins: 'For small to medium datasets, the normal equations $X^TX\\mathbf{w} = X^T\\mathbf{y}$ give the exact least squares solution in one shot — no iteration, no learning rate. Gradient descent is preferred for large $n$ (millions of samples) where forming $X^TX$ is prohibitively expensive.',
+    },
+  ],
+
+  debugging: [
+    {
+      commonError: 'Setting up $A$ with columns for data values but forgetting the column of ones for the intercept.',
+      symptom: 'The fitted line passes through the origin (intercept forced to zero) even when the data clearly has a non-zero y-intercept.',
+      whyItHappened: 'For $y = ax + b$, the model has two parameters: slope $a$ and intercept $b$. The column of ones in $A$ corresponds to $b$ (the coefficient of the constant term 1). Without it, you are forcing $b = 0$.',
+      repairStrategy: 'For fitting $y = a_1 f_1(x) + a_2 f_2(x) + \\cdots$, column $j$ of $A$ is $[f_j(x_1), f_j(x_2), \\ldots, f_j(x_m)]^T$. For a constant term, $f_j(x) = 1$ for all $x$ — a column of all ones.',
+    },
+    {
+      commonError: 'Using $A^T(A^T)^{-1}\\mathbf{b}$ instead of $(A^TA)^{-1}A^T\\mathbf{b}$.',
+      symptom: 'Shape mismatch — $A^T$ is $n\\times m$ and cannot be inverted when $m \\neq n$.',
+      whyItHappened: 'Confusing the order: the pseudoinverse is $(A^TA)^{-1}A^T$, not $A^T(A^T)^{-1}$. The matrix $A^TA$ (an $n\\times n$ square matrix) is what gets inverted.',
+      repairStrategy: 'Memorize the shape: $A$ is $m\\times n$, $A^TA$ is $n\\times n$ (invertible if columns are independent), $(A^TA)^{-1}A^T$ is $n\\times m$. The pseudoinverse maps from $\\mathbb{R}^m$ (right-hand side) back to $\\mathbb{R}^n$ (solution space).',
+    },
+  ],
+
+  mastery: {
+    targetLevel: 2,
+    solveIndependently: 'Set up the normal equations for any overdetermined linear system, solve for $\\hat{\\mathbf{x}}$, and verify the residual is perpendicular to the column space.',
+    explainVerbally: 'Explain why the normal equations arise from the perpendicularity condition, what the geometric picture is, and when the residual is zero.',
+    detectIncorrectApplication: 'Catch missing intercept column; catch wrong pseudoinverse formula order; catch using least squares when an exact solution exists (redundant).',
+    transferToUnfamiliar: 'Apply least squares to polynomial fitting, GPS position estimation, machine learning linear regression, or sensor fusion — any scenario with more equations than unknowns.',
+  },
 };

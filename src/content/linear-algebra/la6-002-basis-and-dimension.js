@@ -16,7 +16,7 @@ export default {
 
   intuition: {
     prose: [
-      '**What a basis is.** A set $\\{\\mathbf{b}_1, \\ldots, \\mathbf{b}_n\\}$ of vectors in a vector space $V$ is a **basis** if (1) the set spans $V$ — every element of $V$ is a linear combination — and (2) the set is linearly independent — no element is a combination of the others. Either condition alone is not enough: a spanning set might have redundant vectors; an independent set might not reach all of $V$.',
+      'Consider $P_2$ (polynomials of degree $\\leq 2$). Standard basis: $\\{1, x, x^2\\}$. Every polynomial $3 + 2x - 5x^2$ has a unique representation: coefficients $(3, 2, -5)$. Now try $\\{1+x,\\; 1-x,\\; x^2\\}$: solve $a(1+x) + b(1-x) + cx^2 = 3 + 2x - 5x^2$ by matching coefficients: $a+b=3$, $a-b=2$, $c=-5$, giving $a = 5/2$, $b = 1/2$, $c=-5$ — unique, different numbers but same polynomial. Both sets are bases: they span (every polynomial has a representation) and are independent (the representation is unique). Any basis of $P_2$ has exactly 3 vectors — no matter which 3 you choose. That count, 3, is the dimension.',
       '**Uniqueness of coefficients.** If $\\{\\mathbf{b}_1, \\ldots, \\mathbf{b}_n\\}$ is a basis, every $\\mathbf{v} \\in V$ can be written uniquely as $\\mathbf{v} = c_1 \\mathbf{b}_1 + \\cdots + c_n \\mathbf{b}_n$. The scalars $(c_1, \\ldots, c_n)$ are the **coordinates** of $\\mathbf{v}$ with respect to this basis. Different bases give different coordinate representations of the same vector.',
       '**Dimension is basis-independent.** The most important theorem about bases: every basis of a vector space has the same number of elements. This common number is the **dimension** of $V$. It does not matter which basis you use — any two bases have the same size. This is the theorem that makes "dimension" a well-defined property of $V$, not just of a particular basis.',
       '**Standard examples.** $\\dim \\mathbb{R}^n = n$ (standard basis $\\mathbf{e}_1, \\ldots, \\mathbf{e}_n$). $\\dim P_n = n+1$ (basis $1, x, x^2, \\ldots, x^n$). $\\dim M_{m\\times n} = mn$ (basis of matrices with a single 1 and rest 0s). $\\dim C[a,b] = \\infty$ (no finite basis exists).',
@@ -31,6 +31,11 @@ export default {
         type: 'insight',
         title: 'Basis Hunting Strategy',
         body: 'To find a basis for a subspace $W$:\n**Method 1:** Find the null space or column space, extract pivot columns.\n**Method 2:** Write the general element with free parameters, pull out each coefficient vector.\n**Method 3:** Start with too many vectors, reduce using Gram-Schmidt or row reduction.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Prediction',
+        body: 'Before computing: the subspace $W = \\{p \\in P_3 : p(0) = 0\\}$ (degree $\\leq 3$ polynomials vanishing at $0$). How many free parameters does a polynomial in $W$ have? What is $\\dim(W)$? Name a basis for $W$ without computing — use the structure of the constraint.',
       },
       {
         type: 'insight',
@@ -230,6 +235,67 @@ print("Standard coordinates of v:", coords_std, "(same as v itself)")
         },
       ],
     },
+    {
+      id: 'ex-la6-002-2',
+      title: 'Basis for a subspace defined by constraints',
+      problem: 'Find a basis and dimension of $W = \\{p \\in P_3 : p(0) = 0 \\text{ and } p\'(0) = 0\\}$.',
+      steps: [
+        {
+          expression: 'p(x) = a_0 + a_1x + a_2x^2 + a_3x^3',
+          annotation: 'Write the general element of $P_3$ with four free parameters.',
+          strategyTitle: 'Write general element',
+        },
+        {
+          expression: 'p(0) = a_0 = 0 \\implies a_0 = 0',
+          annotation: 'First constraint: the polynomial vanishes at $x=0$, so the constant term is zero.',
+          strategyTitle: 'Apply constraint 1',
+        },
+        {
+          expression: 'p\'(x) = a_1 + 2a_2x + 3a_3x^2, \\quad p\'(0) = a_1 = 0',
+          annotation: 'Second constraint: the derivative vanishes at $x=0$, so the linear coefficient is zero.',
+          strategyTitle: 'Apply constraint 2',
+        },
+        {
+          expression: 'p(x) = a_2x^2 + a_3x^3 = a_2 \\cdot x^2 + a_3 \\cdot x^3',
+          annotation: 'Two free parameters remain ($a_2, a_3$). Each basis vector corresponds to one free parameter.',
+          strategyTitle: 'Identify free parameters',
+        },
+        {
+          expression: '\\text{Basis: } \\{x^2,\\; x^3\\}, \\quad \\dim(W) = 2',
+          annotation: 'Each constraint eliminates one dimension: $P_3$ starts at dimension 4, two constraints reduce it by 2 (if independent), giving dimension 2. Verify: $x^2 \\in W$ ($x^2|_0 = 0$, $(x^2)\'|_0 = 0$) ✓; same for $x^3$.',
+          strategyTitle: 'State basis and dimension',
+          checkpoint: 'Each independent linear constraint on an $n$-dimensional space reduces dimension by exactly 1. Two independent constraints on $P_3$ (dim 4) give a subspace of dim 2.',
+        },
+      ],
+    },
+    {
+      id: 'ex-la6-002-3',
+      title: 'Coordinates in a non-standard basis',
+      problem: 'In $\\mathbb{R}^2$, let $\\mathcal{B} = \\{\\mathbf{b}_1, \\mathbf{b}_2\\} = \\{(1,2)^\\top, (3,1)^\\top\\}$. Find the $\\mathcal{B}$-coordinates of $\\mathbf{v} = (7,5)^\\top$.',
+      steps: [
+        {
+          expression: '\\mathbf{v} = c_1 \\mathbf{b}_1 + c_2 \\mathbf{b}_2: \\quad \\begin{bmatrix}7\\\\5\\end{bmatrix} = c_1\\begin{bmatrix}1\\\\2\\end{bmatrix} + c_2\\begin{bmatrix}3\\\\1\\end{bmatrix}',
+          annotation: 'Finding coordinates = solving $B\\mathbf{c} = \\mathbf{v}$ where $B = [\\mathbf{b}_1|\\mathbf{b}_2]$.',
+          strategyTitle: 'Set up the coordinate equation',
+        },
+        {
+          expression: '\\begin{bmatrix}1&3\\\\2&1\\end{bmatrix}\\begin{bmatrix}c_1\\\\c_2\\end{bmatrix} = \\begin{bmatrix}7\\\\5\\end{bmatrix}',
+          annotation: 'The change-of-basis matrix $B$ has basis vectors as columns.',
+          strategyTitle: 'Write as linear system',
+        },
+        {
+          expression: '\\det(B) = 1\\cdot1 - 3\\cdot2 = -5, \\quad B^{-1} = \\frac{1}{-5}\\begin{bmatrix}1&-3\\\\-2&1\\end{bmatrix}',
+          annotation: 'Invert the $2\\times2$ matrix.',
+          strategyTitle: 'Invert $B$',
+        },
+        {
+          expression: '\\begin{bmatrix}c_1\\\\c_2\\end{bmatrix} = B^{-1}\\mathbf{v} = \\frac{1}{-5}\\begin{bmatrix}1\\cdot7 - 3\\cdot5\\\\-2\\cdot7 + 1\\cdot5\\end{bmatrix} = \\frac{1}{-5}\\begin{bmatrix}-8\\\\-9\\end{bmatrix} = \\begin{bmatrix}8/5\\\\9/5\\end{bmatrix}',
+          annotation: 'The $\\mathcal{B}$-coordinates are $(8/5, 9/5)$. Verify: $(8/5)(1,2)^\\top + (9/5)(3,1)^\\top = (8/5+27/5,\\;16/5+9/5) = (35/5,25/5) = (7,5)^\\top$ ✓.',
+          strategyTitle: 'Compute coordinates',
+          checkpoint: 'Coordinates depend on the basis. Same vector, different basis, different numbers — but they represent the same geometric object.',
+        },
+      ],
+    },
   ],
 
   challenges: [
@@ -256,9 +322,14 @@ print("Standard coordinates of v:", coords_std, "(same as v itself)")
   ],
 
   checkpoints: [
-    { id: 'cp-la6-002-1', question: 'What are the two properties a basis must have?', answer: 'Spans $V$ and is linearly independent.' },
-    { id: 'cp-la6-002-2', question: 'What is $\\dim P_4$ (polynomials of degree ≤ 4)?', answer: '5 (basis: $1, x, x^2, x^3, x^4$).' },
-    { id: 'cp-la6-002-3', question: 'If $V$ has dimension $n$ and a set of $n$ vectors is linearly independent, is it a basis?', answer: 'Yes — independent set of size = dim is automatically spanning, hence a basis.' },
+    { id: 'cp-la6-002-1', label: 'Read intuition: basis and dimension examples', type: 'read' },
+    { id: 'cp-la6-002-2', label: 'Read math: Steinitz exchange and basis extension', type: 'read' },
+    { id: 'cp-la6-002-3', label: 'Read rigor: infinite-dimensional spaces', type: 'read' },
+    { id: 'cp-la6-002-4', label: 'Run null space basis lab', type: 'lab' },
+    { id: 'cp-la6-002-5', label: 'Run coordinates in non-standard basis lab', type: 'lab' },
+    { id: 'cp-la6-002-6', label: 'Work example 1: polynomial basis check', type: 'example' },
+    { id: 'cp-la6-002-7', label: 'Work example 2: constrained subspace basis', type: 'example' },
+    { id: 'cp-la6-002-8', label: 'Solve challenge: dimension of intersection', type: 'challenge' },
   ],
 
   assessment: {
@@ -309,6 +380,136 @@ print("Standard coordinates of v:", coords_std, "(same as v itself)")
       answer: 'The inclusion-exclusion formula for dimensions',
       hints: ['This is the vector space analogue of the inclusion-exclusion principle for set cardinalities: $|A \\cup B| = |A| + |B| - |A \\cap B|$. Here union is replaced by sum and cardinality by dimension.'],
       reviewSection: 'math',
+    },
+    {
+      id: 'q-la6-002-5',
+      type: 'choice',
+      text: 'Which of the following is a basis for $P_2$?',
+      options: [
+        '$\\{1, x, x^2, x^3\\}$',
+        '$\\{1+x, 2+2x, x^2\\}$',
+        '$\\{x, x^2\\}$',
+        '$\\{1-x, 1+x, x^2\\}$',
+      ],
+      answer: '$\\{1-x, 1+x, x^2\\}$',
+      hints: ['$\\{1,x,x^2,x^3\\}$ has 4 vectors in a 3-dimensional space — too many (linearly dependent). $\\{1+x, 2+2x, x^2\\}$ is dependent: $2+2x = 2(1+x)$. $\\{x, x^2\\}$ only has 2 vectors — cannot span the 3-dimensional $P_2$. $\\{1-x, 1+x, x^2\\}$: check independence — the only solution to $a(1-x)+b(1+x)+cx^2=0$ is $a=b=c=0$. ✓'],
+      reviewSection: 'intuition',
+    },
+    {
+      id: 'q-la6-002-6',
+      type: 'choice',
+      text: 'The subspace $W = \\{(x,y,z) \\in \\mathbb{R}^3 : x - y + 2z = 0\\}$ has dimension:',
+      options: ['1', '2', '3', '0'],
+      answer: '2',
+      hints: ['$W$ is the null space of the $1 \\times 3$ matrix $[1,-1,2]$. Rank-Nullity: $\\text{rank} + \\text{nullity} = 3$. Rank = 1 (one nonzero row), so nullity = 2. Or: $x = y - 2z$ leaves $y, z$ free — two parameters, dimension 2. Basis: set $(y,z)=(1,0)$ → $(1,1,0)$; set $(y,z)=(0,1)$ → $(-2,0,1)$.'],
+      reviewSection: 'intuition',
+    },
+    {
+      id: 'q-la6-002-7',
+      type: 'choice',
+      text: 'In quantum mechanics, the state of an $n$-level system is a vector in $\\mathbb{C}^n$. A measurement outcome corresponds to an eigenvalue of a Hermitian operator. The dimension of the system determines:',
+      options: [
+        'The maximum number of distinct measurement outcomes',
+        'The probability of each outcome',
+        'The energy of the ground state',
+        'The speed of quantum operations',
+      ],
+      answer: 'The maximum number of distinct measurement outcomes',
+      hints: ['A Hermitian operator on $\\mathbb{C}^n$ has at most $n$ distinct eigenvalues (the characteristic polynomial has degree $n$). The dimension of the state space bounds the number of distinguishable measurement outcomes — more dimensions = more information capacity.'],
+      reviewSection: 'intuition',
+    },
+    {
+      id: 'q-la6-002-8',
+      type: 'choice',
+      text: 'The vector $\\mathbf{v} = (7, 5)^\\top$ in the basis $\\mathcal{B} = \\{(1,2)^\\top, (3,1)^\\top\\}$ has $\\mathcal{B}$-coordinates $(8/5, 9/5)$. What is the $\\mathcal{B}$-coordinate of $3\\mathbf{v}$?',
+      options: [
+        '$(3, 3)^\\top$',
+        '$(24/5, 27/5)^\\top$',
+        '$(8/5, 27/5)^\\top$',
+        'Cannot determine without computing',
+      ],
+      answer: '$(24/5, 27/5)^\\top$',
+      hints: ['Coordinate maps are linear: $[c\\mathbf{v}]_\\mathcal{B} = c[\\mathbf{v}]_\\mathcal{B}$. So $[3\\mathbf{v}]_\\mathcal{B} = 3(8/5, 9/5) = (24/5, 27/5)$. No need to redo the solve.'],
+      reviewSection: 'math',
+    },
+    {
+      id: 'q-la6-002-9',
+      type: 'choice',
+      text: 'In machine learning, a model with $p$ features lives in a $p$-dimensional feature space. The "curse of dimensionality" refers to:',
+      options: [
+        'The determinant of the feature matrix becoming too large',
+        'The volume of the $p$-dimensional unit hypercube shrinking to zero',
+        'Data becoming increasingly sparse as dimension grows — exponentially more data needed to fill the space',
+        'The basis vectors becoming linearly dependent in high dimensions',
+      ],
+      answer: 'Data becoming increasingly sparse as dimension grows — exponentially more data needed to fill the space',
+      hints: ['In dimension $p$, to have $k$ samples per unit length in each dimension requires $k^p$ total samples. As $p$ grows, the space has exponentially more "volume" — any fixed dataset becomes increasingly sparse. This is purely a consequence of the dimension of the feature vector space.'],
+      reviewSection: 'intuition',
+    },
+    {
+      id: 'q-la6-002-10',
+      type: 'choice',
+      text: 'If $A$ is a $5 \\times 8$ matrix with rank 3, what are the dimensions of the null space and column space?',
+      options: [
+        'Null space dim $= 5$, column space dim $= 3$',
+        'Null space dim $= 5$, column space dim $= 8$',
+        'Null space dim $= 5$, column space dim $= 5$',
+        'Null space dim $= 5$, column space dim $= 3$',
+      ],
+      answer: 'Null space dim $= 5$, column space dim $= 3$',
+      hints: ['Rank-Nullity: $\\text{rank}(A) + \\text{nullity}(A) = n = 8$ (columns). So nullity $= 8 - 3 = 5$. Column space has dimension = rank = 3. Note: the column space is a subspace of $\\mathbb{R}^5$ (the codomain), but has dimension 3.'],
+      reviewSection: 'intuition',
+    },
+  ],
+
+  mastery: {
+    targetLevel: 2,
+    solveIndependently: 'Find a basis for a subspace defined by linear constraints on polynomials, matrices, or $\\mathbb{R}^n$; determine the dimension; and compute coordinates in a non-standard basis.',
+    explainVerbally: 'Explain why all bases of a finite-dimensional space have the same size, and why knowing the count matches the dimension lets you test only independence or only spanning (not both).',
+    detectIncorrectApplication: 'Catch misuse of the dimension theorem — e.g., $n+1$ vectors in dimension $n$ cannot be independent; $n-1$ vectors cannot span.',
+    transferToUnfamiliar: 'Apply rank-nullity to determine the dimensions of any kernel/image pair; use the constraint-counting argument to find dimensions of subspaces in polynomial and matrix spaces.',
+  },
+
+  misconceptions: [
+    {
+      falseBelief: 'A spanning set is a basis.',
+      whyStudentsThinkIt: 'Spanning is part of the definition — students focus on it and forget about independence.',
+      correctionExample: '$\\{1, x, x^2, x+1\\}$ spans $P_2$ but is NOT a basis: it has 4 vectors in a 3-dimensional space, so at least one is redundant (and indeed $x+1 = 1+x$ is a combination of the others). A spanning set must also be independent to be a basis.',
+      contrastCase: '$\\{1, x, x^2\\}$ spans $P_2$ AND is independent — it is a basis. To remove redundancy from a spanning set, keep reducing until independence holds.',
+    },
+    {
+      falseBelief: 'Different bases of the same space have different sizes.',
+      whyStudentsThinkIt: 'Students may think that some bases are "more efficient" than others and could have fewer vectors.',
+      correctionExample: '$\\{(1,0), (0,1)\\}$ and $\\{(1,1), (1,-1)\\}$ are both bases for $\\mathbb{R}^2$ — both have exactly 2 vectors. The Steinitz exchange lemma guarantees any two bases of the same space have the same size, making "dimension" well-defined.',
+      contrastCase: 'In $P_2$, any basis has exactly 3 vectors. You cannot find a 2-vector basis (it would only span a 2D subspace) or need more than 3 (they would be dependent).',
+    },
+  ],
+
+  transferPrompts: [
+    {
+      situation: 'You need to determine how many independent parameters describe a family of matrices (e.g., symmetric, upper triangular).',
+      competingTechniques: 'Count by inspection, enumerate all elements, use rank.',
+      whyThisTechniqueWins: 'The dimension of the space equals the number of free parameters in the general element. Write the general element with unknowns, read off the number of free variables — that\'s the dimension. This avoids explicit basis construction.',
+    },
+    {
+      situation: 'You want to check if a set of $n$ vectors is a basis for an $n$-dimensional space.',
+      competingTechniques: 'Check both span and independence; compute the determinant.',
+      whyThisTechniqueWins: 'By the dimension theorem, for a set of exactly $n$ vectors in an $n$-dimensional space, independence and spanning are equivalent — you only need to check one. For $\\mathbb{R}^n$, form the matrix of the vectors and check if it\'s invertible (det $\\neq 0$). This halves the work.',
+    },
+  ],
+
+  debugging: [
+    {
+      commonError: 'Using a spanning set with too many vectors as a "basis."',
+      symptom: 'The coordinate representation is not unique — different coefficient choices give the same vector.',
+      whyItHappened: 'If the set is linearly dependent, some vector is a combination of others. The extra vector creates multiple representations: add and subtract it to redistribute coefficients.',
+      repairStrategy: 'Row-reduce the matrix of basis candidates. Keep only the pivot columns (rows) — these form a maximally independent subset. The number of pivots = the rank = the dimension.',
+    },
+    {
+      commonError: 'Confusing the dimension of the domain/codomain with the rank when applying rank-nullity.',
+      symptom: 'For a $5 \\times 8$ matrix, student says nullity = $5 - \\text{rank}$ instead of $8 - \\text{rank}$.',
+      whyItHappened: 'Rank-Nullity sums over COLUMNS ($n$), not rows ($m$). The null space lives in the domain $\\mathbb{R}^n$ (columns), not the codomain $\\mathbb{R}^m$ (rows).',
+      repairStrategy: 'Remember: rank + nullity = number of COLUMNS. The null space is a subspace of the domain (columns). Write it as "pivot columns + free columns = total columns."',
     },
   ],
 };
