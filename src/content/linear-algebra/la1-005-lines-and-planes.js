@@ -8,10 +8,14 @@ export default {
   tags: ['lines', 'planes', 'parametric equations', 'normal vector', 'dot product geometry', 'distance', 'intersection'],
   aliases: 'parametric line equation plane equation normal vector point-normal form vector equation line plane intersection distance',
 
-  hook: {
+  timeToComplete: 35,
+  coreConcept: 'Lines and planes in 3D are described using vectors: a line needs a base point and a direction vector; a plane needs a base point and a normal vector (found via the cross product).',
+  prerequisites: ['la1-003', 'la1-004'],
+  nextLesson: 'la1-006',
+
     question: "You're designing a robot arm. The end-effector must travel in a straight line in 3D space. How do you describe that line mathematically — and how do you tell if two robot paths will collide?",
     realWorldContext: "Every 3D graphics engine, robotics planner, and physics simulator must answer questions about lines and planes thousands of times per second. Collision detection is a line-plane intersection test. Flight simulators check whether a wing intersects the ground plane. Ray tracing (the rendering algorithm inside Pixar films) fires rays — lines — and finds intersections with planes to determine what a camera sees. The math is all here.",
-    previewVisualizationId: 'LinesAndPlanesViz',
+    previewVisualizationId: 'ProjectionMatrixViz',
   },
 
   intuition: {
@@ -19,8 +23,7 @@ export default {
       '**Where you are in the story:** You know what vectors are and how to take dot and cross products. Now we use those tools to describe geometric objects — lines and planes — in a way that extends naturally to any dimension.',
       'Think of a line in 3D. You need two pieces of information: a **point** you start from, and a **direction** to travel. If you start at point $P_0$ and walk in direction $\\mathbf{d}$, after time $t$ you are at $P_0 + t\\mathbf{d}$. That simple idea is the parametric equation of a line.',
       'A plane needs a different description. Instead of a direction to travel ALONG the plane, it is easier to give a direction PERPENDICULAR to the plane — the **normal vector** $\\mathbf{n}$. Every point $\\mathbf{x}$ on the plane satisfies $\\mathbf{n} \\cdot (\\mathbf{x} - P_0) = 0$: the vector from $P_0$ to $\\mathbf{x}$ is perpendicular to $\\mathbf{n}$.',
-      '**Why does the cross product appear here?** If you know two vectors lying IN a plane (say the edges of a triangle), their cross product is perpendicular to both — it IS the normal vector. So the cross product is the machine for finding plane equations from geometric data.',
-      'Lines and planes are the 1D and 2D linear subspaces (shifted by a point) of 3D space. Every linear algebra concept — span, basis, orthogonality — has a concrete geometric home in lines and planes.',
+      '**Why does the cross product appear here?** If you know two vectors lying IN a plane (say the edges of a triangle), their cross product is perpendicular to both — it IS the normal vector. So the cross product is the machine for finding plane equations from geometric data.',      '**Predict before reading the intersection formula:** the line $\\mathbf{r}(t) = (2,0,1) + t[1,2,-1]$ and the plane $x + 2y - z = 4$. Compute $\\mathbf{n} \\cdot \\mathbf{d}_{\\text{line}} = [1,2,-1]\\cdot[1,2,-1]$ mentally. Is the line parallel to the plane, or will it intersect at one point? Hold your answer until Example 3.',      'Lines and planes are the 1D and 2D linear subspaces (shifted by a point) of 3D space. Every linear algebra concept — span, basis, orthogonality — has a concrete geometric home in lines and planes.',
     ],
     callouts: [
       {
@@ -37,6 +40,11 @@ export default {
         type: 'insight',
         title: 'Two Ways to Describe a Plane',
         body: '**Normal form:** $\\mathbf{n} \\cdot (\\mathbf{x} - P_0) = 0$\nEvery point $\\mathbf{x}$ on the plane satisfies this.\n\n**Scalar form:** $ax + by + cz = d$\nwhere $\\mathbf{n} = [a, b, c]$ and $d = \\mathbf{n} \\cdot P_0$.',
+      },
+      {
+        type: 'procedure',
+        title: 'Procedure: Line-Plane Intersection',
+        body: 'Step 1. From the plane $ax+by+cz=d$, read off $\\mathbf{n}=[a,b,c]$ and $d$.\nStep 2. From the parametric line, read off base point $P_0$ and direction $\\mathbf{d}_{\\text{line}}$.\nStep 3. Compute the denominator: $\\mathbf{n}\\cdot\\mathbf{d}_{\\text{line}}$. If zero \u2014 line is parallel to the plane (stop).\nStep 4. Compute $t = (d - \\mathbf{n}\\cdot P_0)\\;/\\;(\\mathbf{n}\\cdot\\mathbf{d}_{\\text{line}})$.\nStep 5. Compute the intersection point: $\\mathbf{r}(t) = P_0 + t\\,\\mathbf{d}_{\\text{line}}$.\nStep 6. Verify: substitute the intersection point into $ax+by+cz$ and confirm it equals $d$.',
       },
       {
         type: 'warning',
@@ -56,10 +64,10 @@ export default {
     ],
     visualizations: [
       {
-        id: 'LinesAndPlanesViz',
-        title: 'Interactive Lines and Planes in 3D',
-        mathBridge: 'Drag the direction vector to change the line. Drag the normal vector to tilt the plane. Watch how the parametric equation and the scalar equation update live. Check the "intersection" box to find where the line pierces the plane.',
-        caption: 'Lines and planes as geometric objects driven by vectors.',
+        id: 'ProjectionMatrixViz',
+        title: 'Lines and Planes: Geometric Intuition',
+        mathBridge: 'Visualize parametric lines and normal-vector planes in 3D. The normal vector is always perpendicular to every in-plane direction. The line-plane intersection is the single point where a moving ray meets a flat surface.',
+        caption: 'Direction vectors drive lines; normal vectors define planes.',
       },
     ],
   },
@@ -127,7 +135,7 @@ t_from_z = (Q(3) - P0(3)) / d(3)
               cellTitle: 'Plane equation: test and distance',
               prose: [
                 'The plane n·x = d is verified by: if a point x satisfies dot(n,x) == d, it is on the plane.',
-                'Distance from point Q to the plane: abs(dot(n,Q) - d) / norm(n). This is the most important formula in 3D geometry.',
+                'Distance from point Q to the plane: abs(dot(n,Q) - d) / sqrt(dot(n,n)). This is the most important formula in 3D geometry.',
               ],
               code: `n = [1; 2; -1];    % normal vector
 d = 4;             % right-hand side: n·x = 4
@@ -143,7 +151,7 @@ disp('n·Q = (should not be 4):')
 dot(n, Q)          % = 1+4-3 = 2 ≠ 4
 
 % Distance from Q to the plane
-distance = abs(dot(n, Q) - d) / norm(n)
+distance = abs(dot(n, Q) - d) / sqrt(dot(n, n))
 % = |2 - 4| / sqrt(1+4+1) = 2/sqrt(6) ≈ 0.816`,
             },
             {
@@ -390,10 +398,10 @@ C = np.array([0.0, 0.0, 3.0])
     ],
     visualizations: [
       {
-        id: 'OrthogonalityIntuition',
-        title: 'The Normal Vector: Perpendicularity as a Constraint',
-        mathBridge: 'The plane equation $\\mathbf{n} \\cdot (\\mathbf{x} - P_0) = 0$ is an orthogonality constraint: the vector from $P_0$ to any plane point must be perpendicular to $\\mathbf{n}$. This visualization shows the normal vector and the plane it defines. Drag $\\mathbf{n}$ to tilt the plane — the plane always stays perpendicular to $\\mathbf{n}$. This is orthogonality as geometry.',
-        caption: 'Normal vector = the unique direction perpendicular to every in-plane direction.',
+        id: 'ProjectionMatrixViz',
+        title: 'Projection and Perpendicularity',
+        mathBridge: 'The distance from a point to a plane is a projection: decompose the displacement vector into a component parallel to the normal and a component within the plane. The normal component is the distance.',
+        caption: 'Distance = projection onto the unit normal.',
       },
     ],
   },
@@ -522,38 +530,34 @@ C = np.array([0.0, 0.0, 3.0])
       difficulty: 'easy',
       problem: 'Write parametric equations for the line through $P = (0, 1, -2)$ and $Q = (3, -1, 4)$.',
       walkthrough: [
-        '**Find the direction vector.** Compute $\\mathbf{d} = Q - P = [3-0,\\ -1-1,\\ 4-(-2)] = [3, -2, 6]$. The direction vector points from $P$ toward $Q$.',
-        '**Write the parametric form.** Use $P$ as the base point: $\\mathbf{r}(t) = (0,1,-2) + t[3,-2,6] = (3t,\\ 1-2t,\\ -2+6t)$.',
-        '**Check the endpoints.** At $t=0$: $\\mathbf{r}(0) = (0,1,-2) = P$ ✓. At $t=1$: $\\mathbf{r}(1) = (3,-1,4) = Q$ ✓.',
-        '**Note about direction choice.** Any nonzero scalar multiple of $\\mathbf{d}$ gives the same line. Using $Q - P$ or $P - Q$ both work — they just travel in opposite directions along the same line.',
+        { expression: '\\mathbf{d} = Q - P = [3-0,\ -1-1,\ 4-(-2)] = [3,-2,6]', annotation: 'The direction vector points from P toward Q. Any scalar multiple of d gives the same line \u2014 both P\u2192Q and Q\u2192P describe the same line.' },
+        { expression: '\\mathbf{r}(t) = (0,1,-2) + t[3,-2,6] = (3t,\ 1-2t,\ -2+6t)', annotation: 'Use P as the base point in the formula r(t) = P\u2080 + t\u00b7d. At t=0 you get P; at t=1 you get Q.' },
+        { expression: 't=0:\; (0,1,-2)=P\; \\checkmark;\quad t=1:\; (3,-1,4)=Q\; \\checkmark', annotation: 'Verify both endpoints. t=0 returns P, t=1 returns Q. The line passes through both.' },
       ],
-      answer: 'r(t) = (3t, 1-2t, -2+6t)',
+      answer: '$\\mathbf{r}(t) = (3t,\ 1-2t,\ -2+6t)$ for $t \\in \\mathbb{R}$.',
     },
     {
       id: 'la1-005-ch2',
       difficulty: 'medium',
       problem: 'Find the plane containing the three points $P=(2,1,0)$, $Q=(1,3,-1)$, $R=(0,0,4)$. Give the equation in the form $ax+by+cz=d$.',
       walkthrough: [
-        '**Two in-plane vectors.** Compute $\\mathbf{u} = Q - P = [-1, 2, -1]$ and $\\mathbf{v} = R - P = [-2, -1, 4]$. Both vectors connect two points on the plane, so they lie in the plane.',
-        '**Normal via cross product.** $\\mathbf{n} = \\mathbf{u} \\times \\mathbf{v} = \\begin{vmatrix}\\mathbf{i}&\\mathbf{j}&\\mathbf{k}\\\\-1&2&-1\\\\-2&-1&4\\end{vmatrix} = [8-1,\\ -(-4-2),\\ 1+4] = [7, 6, 5]$.',
-        '**Point-normal form.** Using $P = (2,1,0)$: $7(x-2) + 6(y-1) + 5(z-0) = 0$. Expand: $7x - 14 + 6y - 6 + 5z = 0$.',
-        '**Scalar equation.** $7x + 6y + 5z = 20$.',
-        '**Verify all three points.** $P$: $14+6+0=20$ ✓. $Q$: $7+18-5=20$ ✓. $R$: $0+0+20=20$ ✓.',
+        { expression: '\\mathbf{u}=Q-P=[-1,2,-1],\\quad\\mathbf{v}=R-P=[-2,-1,4]', annotation: 'Two vectors lying in the plane: subtract the base point P from each of the other two points.' },
+        { expression: '\\mathbf{n}=\\mathbf{u}\\times\\mathbf{v}=\\begin{vmatrix}\\mathbf{i}&\\mathbf{j}&\\mathbf{k}\\\\-1&2&-1\\\\-2&-1&4\\end{vmatrix}=[7,6,5]', annotation: 'Cross product gives the normal. Verify: n\u00b7u = -7+12-5=0 \u2713 and n\u00b7v = -14-6+20=0 \u2713.' },
+        { expression: '7(x-2)+6(y-1)+5(z-0)=0', annotation: 'Point-normal form using P=(2,1,0). Expand: 7x-14+6y-6+5z=0.' },
+        { expression: '7x+6y+5z=20', annotation: 'Scalar form. Verify: P: 14+6+0=20 \u2713; Q: 7+18-5=20 \u2713; R: 0+0+20=20 \u2713.' },
       ],
-      answer: '7x + 6y + 5z = 20',
+      answer: '$7x + 6y + 5z = 20$',
     },
     {
       id: 'la1-005-ch3',
       difficulty: 'hard',
       problem: 'Find the distance between the two parallel planes $x + 2y - 2z = 4$ and $x + 2y - 2z = 13$.',
       walkthrough: [
-        '**Why they are parallel.** Both planes have the same normal vector $\\mathbf{n} = [1, 2, -2]$ (same coefficients of $x$, $y$, $z$). Different right-hand sides mean they are offset — parallel but distinct.',
-        '**Pick a point on one plane.** Set $y = z = 0$ in $P_1: x + 2y - 2z = 4$ to get $Q = (4, 0, 0)$.',
-        '**Magnitude of the normal.** $\\|\\mathbf{n}\\| = \\sqrt{1^2 + 2^2 + (-2)^2} = \\sqrt{1+4+4} = 3$.',
-        '**Apply the distance formula from Q to P₂.** $\\text{dist} = \\frac{|\\mathbf{n} \\cdot Q - d_2|}{\\|\\mathbf{n}\\|} = \\frac{|1(4)+2(0)-2(0)-13|}{3} = \\frac{|4-13|}{3} = \\frac{9}{3} = 3$.',
-        '**Interpret the result.** The two parallel planes are exactly 3 units apart in the direction of the normal $[1,2,-2]$.  This is also equal to $\\frac{|d_2 - d_1|}{\\|\\mathbf{n}\\|} = \\frac{|13-4|}{3} = 3$ — a useful shortcut for parallel planes with the same normal.',
+        { expression: '\\|\\mathbf{n}\\|=\\sqrt{1^2+2^2+(-2)^2}=\\sqrt{9}=3', annotation: 'Extract the normal n=[1,2,-2] from both planes (same coefficients). Compute its magnitude once \u2014 you will use it for the distance formula.' },
+        { expression: 'Q=(4,0,0)\;\\in\;P_1:\quad 1(4)+2(0)-2(0)=4\;\\checkmark', annotation: 'Pick any point on plane P\u2081 by setting y=z=0, giving x=4.' },
+        { expression: '\\text{dist}=\\dfrac{|1(4)+2(0)-2(0)-13|}{3}=\\dfrac{|4-13|}{3}=\\dfrac{9}{3}=3', annotation: 'Apply the distance formula from Q to plane P\u2082. Shortcut: for parallel planes ax+by+cz=d\u2081 and d\u2082, the distance is |d\u2082-d\u2081|/\u2016n\u2016 = |13-4|/3 = 3.' },
       ],
-      answer: 'Distance = 3',
+      answer: 'Distance = 3 units.',
     },
   ],
 
@@ -578,8 +582,9 @@ C = np.array([0.0, 0.0, 3.0])
       { lessonId: 'la1-003', label: 'Dot and Cross Products', note: 'The dot product underpins the plane equation (n·x = d). The cross product produces the normal from two edge vectors.' },
     ],
     futureLinks: [
-      { lessonId: 'la2-001', label: 'Matrices as Transformations', note: 'The parametric form of a line (P₀ + t·d) becomes a matrix equation when you express the constraint as Ax=b — connecting geometry back to linear systems.' },
+      { lessonId: 'la2-001', label: 'Matrices as Transformations', note: 'The parametric form P\u2080 + t\u00b7d becomes a matrix equation when you express the constraint as Ax=b \u2014 connecting geometry back to linear systems.' },
       { lessonId: 'la4-001', label: 'Orthogonal Projections', note: 'The distance formula is a projection: you project the point onto the normal direction. The full machinery of projections generalizes this to any subspace.' },
+      { lessonId: 'la1-006', label: 'Gauss-Jordan RREF', note: 'Finding the intersection of two or three planes is exactly a linear system solved by Gaussian elimination \u2014 reinforcing the algebraic side of geometric intersection.' },
     ],
   },
 
@@ -592,26 +597,32 @@ C = np.array([0.0, 0.0, 3.0])
   ],
 
   checkpoints: [
-    { id: 'cp-la1-005-1', question: 'What is the parametric equation of a line through point $P_0$ with direction $\\mathbf{d}$?', answer: '$\\mathbf{r}(t) = P_0 + t\\mathbf{d}$. The parameter $t$ traces the full line; $t=0$ gives $P_0$.' },
-    { id: 'cp-la1-005-2', question: 'Given two vectors in a plane, how do you find the plane\'s normal vector?', answer: 'Compute their cross product: $\\mathbf{n} = \\mathbf{u} \\times \\mathbf{v}$. The result is perpendicular to both in-plane vectors.' },
-    { id: 'cp-la1-005-3', question: 'What is the formula for the distance from point $Q$ to the plane $ax+by+cz=d$?', answer: '$\\dfrac{|aQ_x + bQ_y + cQ_z - d|}{\\sqrt{a^2+b^2+c^2}}$. Numerator = how far off the plane $Q$ is; denominator = magnitude of normal.' },
+    { id: 'cp-la1-005-1', label: 'Read: Write parametric form of a line given point and direction', type: 'read' },
+    { id: 'cp-la1-005-2', label: 'Read: Identify normal vector from scalar plane equation', type: 'read' },
+    { id: 'cp-la1-005-3', label: 'Read: Compute distance from point to plane', type: 'read' },
+    { id: 'cp-la1-005-4', label: 'Run: OpenMAT \u2014 parametric line and distance formula', type: 'lab' },
+    { id: 'cp-la1-005-5', label: 'Run: Python \u2014 plane dot-product test and line-plane intersection', type: 'lab' },
+    { id: 'cp-la1-005-6', label: 'Complete: Example 2 \u2014 find plane through three points', type: 'example' },
+    { id: 'cp-la1-005-7', label: 'Complete: Example 3 \u2014 line-plane intersection', type: 'example' },
+    { id: 'cp-la1-005-8', label: 'Attempt: Challenge 3 \u2014 distance between parallel planes', type: 'challenge' },
   ],
 
   assessment: {
     questions: [
       {
         id: 'la1-005-assess-1',
-        type: 'input',
+        type: 'choice',
         text: 'What is the normal vector to the plane $3x - y + 4z = 7$?',
+        options: ['[3, -1, 4]', '[7, 0, 0]', '[1, 1, 1]', '[-3, 1, -4]'],
         answer: '[3, -1, 4]',
-        hint: 'The coefficients of x, y, z in the scalar plane equation ARE the normal vector.',
+        hint: 'The normal vector is formed directly from the coefficients of x, y, z in the scalar plane equation.',
       },
     ],
   },
 
   quiz: [
     {
-      id: 'la1-005-q1',
+      id: 'la1-005-quiz-1',
       type: 'choice',
       text: 'In 3D, the equation $2x - y + 3z = 5$ defines which geometric object?',
       options: ['A line', 'A plane', 'A point', 'A sphere'],
@@ -620,7 +631,7 @@ C = np.array([0.0, 0.0, 3.0])
       reviewSection: 'Intuition — warning callout',
     },
     {
-      id: 'la1-005-q2',
+      id: 'la1-005-quiz-2',
       type: 'choice',
       text: 'You have two vectors $\\mathbf{u}$ and $\\mathbf{v}$ lying in a plane. Which operation gives the normal vector?',
       options: ['u + v', 'u · v', 'u × v', '|u| − |v|'],
@@ -629,7 +640,7 @@ C = np.array([0.0, 0.0, 3.0])
       reviewSection: 'Intuition — cross product insight',
     },
     {
-      id: 'la1-005-q3',
+      id: 'la1-005-quiz-3',
       type: 'choice',
       text: 'The line $\\mathbf{r}(t) = (1,0,2) + t[3,-1,1]$ is tested for intersection with the plane $\\mathbf{n}\\cdot\\mathbf{x}=d$ where $\\mathbf{n}=[3,-1,1]$. Since $\\mathbf{n}\\cdot\\mathbf{d} = 9+1+1 = 11 \\neq 0$, the line:',
       options: ['Is parallel to the plane', 'Lies inside the plane', 'Intersects the plane at exactly one point', 'Is perpendicular to the normal'],
@@ -638,7 +649,7 @@ C = np.array([0.0, 0.0, 3.0])
       reviewSection: 'Math — line-plane intersection',
     },
     {
-      id: 'la1-005-q4',
+      id: 'la1-005-quiz-4',
       type: 'choice',
       text: 'What is the distance from the origin $(0,0,0)$ to the plane $x + y + z = 3$?',
       options: ['1', '√3', '3', '3/√3 = √3'],
@@ -647,7 +658,7 @@ C = np.array([0.0, 0.0, 3.0])
       reviewSection: 'Math — distance formula',
     },
     {
-      id: 'la1-005-q5',
+      id: 'la1-005-quiz-5',
       type: 'choice',
       text: 'Two planes $ax+by+cz=d_1$ and $ax+by+cz=d_2$ (with $d_1 \\neq d_2$) are:',
       options: ['Identical', 'Intersecting along a line', 'Parallel and distinct', 'Perpendicular'],
@@ -656,7 +667,7 @@ C = np.array([0.0, 0.0, 3.0])
       reviewSection: 'Rigor — parallel planes',
     },
     {
-      id: 'la1-005-q6',
+      id: 'la1-005-quiz-6',
       type: 'choice',
       text: 'The plane $3x + y - 2z = 7$ has normal vector $\\mathbf{n} = [3, 1, -2]$. A student uses $[3,1,-2]$ as the direction vector of a line and claims the line lies in the plane. What is wrong?',
       options: [
@@ -670,4 +681,59 @@ C = np.array([0.0, 0.0, 3.0])
       reviewSection: 'Intuition — warning callout: normal vs direction',
     },
   ],
+
+  // ── Misconceptions ────────────────────────────────────────────────
+  misconceptions: [
+    {
+      falseBelief: 'One equation in 3D defines a line.',
+      whyStudentsThinkIt: 'In 2D, one equation defines a line — students carry this pattern to 3D without adjustment.',
+      correctionExample: 'x + 2y - z = 4 in 3D defines a PLANE (infinitely many points). To get a line in 3D you need TWO equations (two planes intersecting). Parametric form r(t) = P₀ + t·d uses one free parameter and is the clean way to express a line.',
+      contrastCase: '2D: ax+by=c → line. 3D: ax+by+cz=d → plane. Line in 3D: intersection of TWO planes (two equations).',
+    },
+    {
+      falseBelief: 'The normal vector to a plane can be used as a direction vector for a line lying in the plane.',
+      whyStudentsThinkIt: 'Students know the normal "belongs" to the plane and confuse "associated with" with "lying in".',
+      correctionExample: 'The normal n=[1,2,-1] to the plane x+2y-z=4 is PERPENDICULAR to the plane. A line IN the plane must have direction d satisfying n·d=0. Using n as d gives a line that drills through the plane perpendicularly.',
+      contrastCase: 'Direction IN the plane: any d with n·d=0, e.g., d=[2,-1,0] (verify: 2-2+0=0 ✓). Normal direction: d=n=[1,2,-1] (n·d=6≠0 → perpendicular to plane).',
+    },
+  ],
+
+  // ── Transfer Prompts ──────────────────────────────────────────────
+  transferPrompts: [
+    {
+      situation: 'A game engine must check whether a bullet (modeled as a ray) hits a wall (modeled as a plane). Which formula applies?',
+      competingTechniques: ['Line-plane intersection formula', 'Distance formula', 'Cross product'],
+      whyThisTechniqueWins: 'The line-plane intersection formula t=(d-n·P₀)/(n·d) gives the exact parameter t where the ray hits the plane. If t>0, the hit is in front of the camera. If t<0, the ray is going away from the wall. Distance only tells you how far off-plane a static point is — it does not give intersection timing.',
+    },
+    {
+      situation: 'A mesh triangle is defined by vertices A, B, C. A renderer must shade the surface correctly, which requires a unit normal. What is the workflow?',
+      competingTechniques: ['Cross product of edge vectors', 'Average of vertex positions', 'Dot product of edges'],
+      whyThisTechniqueWins: 'u = B-A and v = C-A are vectors lying in the triangle plane. n = u×v is perpendicular to both — it is the triangle normal. Normalize: n̂ = n/‖n‖. The dot product gives a scalar (angle), not a direction; averaging positions gives the centroid, not the normal.',
+    },
+  ],
+
+  // ── Debugging ─────────────────────────────────────────────────────
+  debugging: [
+    {
+      commonError: 'np.cross(u, v) returns the zero vector.',
+      symptom: 'Normal vector is [0, 0, 0] — plane equation degenerates.',
+      whyItHappened: 'u and v are parallel (or one is zero). Parallel vectors do not span a plane — they lie on the same line, so there is no unique normal.',
+      repairStrategy: 'Check that np.linalg.norm(u) > 0, np.linalg.norm(v) > 0, and that u and v are not scalar multiples of each other (np.cross(u,v) == 0 confirms they are parallel). Pick a third point that is genuinely off the line to get a non-degenerate second edge.',
+    },
+    {
+      commonError: 'Distance formula gives an incorrect result.',
+      symptom: 'The distance is computed but does not match geometric intuition.',
+      whyItHappened: 'The most common slip is forgetting to divide by ‖n‖ — computing |n·Q - d| alone gives the unnormalized projection, not the true distance.',
+      repairStrategy: 'Always divide by np.linalg.norm(n) (or sqrt(dot(n,n)) in OpenMAT). Verify with a sanity check: if Q is the point P₀ used to define the plane, the distance should be 0.',
+    },
+  ],
+
+  // ── Mastery ────────────────────────────────────────────────────────
+  mastery: {
+    targetLevel: 'Write parametric and scalar equations for lines and planes; compute normals via cross product; apply the line-plane intersection formula; compute point-to-plane distance.',
+    solveIndependently: 'Given three points in ℝ³, find the plane equation (ax+by+cz=d) by hand and verify all three points satisfy it.',
+    explainVerbally: 'Explain why a normal vector cannot be used as a line direction lying in the plane, and why a single equation in 3D defines a plane rather than a line.',
+    detectIncorrectApplication: 'Catch when a classmate uses norm(n) in OpenMAT (fails on column vectors — use sqrt(dot(n,n))), or writes a single equation and calls it a line in 3D.',
+    transferToUnfamiliar: 'Apply the distance formula in ℝⁿ: for a hyperplane n·x=d in ℝ⁴, the distance from Q is |n·Q-d|/‖n‖ — the same formula works in any dimension.',
+  },
 };

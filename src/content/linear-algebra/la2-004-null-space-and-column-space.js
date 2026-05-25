@@ -57,6 +57,12 @@ export default {
         mathBridge: 'Observe the 3D space being flattened into a 2D plane. Step 1: Drag the camera to see how the Column Space (the purple plane) contains all final destinations. Step 2: Notice the glowing red line piercing straight through the plane. That is the Null Space. Every vector that started on that red line was physically crushed directly into the origin $(0,0,0)$.',
         caption: 'The Column Space is what survives. The Null Space is what gets crushed to zero.',
       },
+      {
+        id: 'LALesson06_Inverses',
+        title: 'Null Space Grows as Determinant Shrinks',
+        mathBridge: 'Slide the transformation matrix toward singularity and watch two things happen simultaneously: the determinant approaches 0, and the column space collapses from a 2D plane to a 1D line. The null space grows from just the origin to a full line through the origin. At det = 0, the null space has dimension 1 and the Rank-Nullity theorem snaps into view: rank drops by 1, nullity rises by 1. Total dimensions are conserved.',
+        caption: 'As det → 0, column space collapses and null space grows — Rank-Nullity in motion.',
+      },
     ],
   },
 
@@ -74,6 +80,16 @@ export default {
         type: 'strategy',
         title: 'Column Space Trick',
         body: 'Do not use the columns of the row-reduced matrix as the basis for the Column Space! Row operations change the Column Space. You must trace the pivots back to the completely original matrix $A$.',
+      },
+      {
+        type: 'definition',
+        title: 'How to Find the Null Space — Step by Step',
+        body: 'Set up $A\\mathbf{x} = \\mathbf{0}$ and row-reduce. Identify free variables (non-pivot columns). For each free variable: set it to 1, all other free variables to 0, back-substitute for the pivot variables. The result is one null space basis vector. Repeat for every free variable. The full set spans $N(A)$.\n\n**Example:** if columns 1 and 3 are pivots and column 2 is free ($x_2$), set $x_2 = 1$, solve for $x_1$ and $x_3$ from the equations, assemble into a vector.',
+      },
+      {
+        type: 'theorem',
+        title: 'General Solution Structure for Ax = b',
+        body: 'If $A\\mathbf{x} = \\mathbf{b}$ is consistent (i.e., $\\mathbf{b} \\in C(A)$), then its **general solution** is:\n\n$$\\mathbf{x} = \\mathbf{x}_p + \\mathbf{x}_h$$\n\n$\\mathbf{x}_p$ = any **particular solution**; $\\mathbf{x}_h \\in N(A)$ = any null space vector.\n\nThe solution set is an affine subspace — a shifted copy of the null space. The null space dimension equals the number of free parameters in the solution.',
       },
     ],
     visualizations: [
@@ -282,7 +298,7 @@ A = np.array([[1., 2., 3.],
   // ── Examples ───────────────────────────────────────────────────
   examples: [
     {
-      id: "ex-1",
+      id: "la2-004-ex1",
       title: "Analyzing a Squished Matrix",
       problem: "Find the basis for the Column Space and the Null Space of $A = \\begin{bmatrix} 1 & 2 \\\\ 3 & 6 \\end{bmatrix}$.",
       steps: [
@@ -316,13 +332,69 @@ A = np.array([[1., 2., 3.],
         }
       ],
       conclusion: "The Rank is 1, and the Nullity is 1. (1 + 1 = 2 original dimensions). The Column space is the line spanned by [1, 3], and the Null space is the perpendicular line spanned by [-2, 1] that gets crushed."
+    },
+    {
+      id: "la2-004-ex2",
+      title: "Null Space of a 3×4 Matrix — Two Free Variables",
+      problem: "Find a basis for the null space of $A = \\begin{bmatrix} 1 & 2 & 0 & 3 \\\\ 2 & 4 & 1 & 5 \\\\ 0 & 0 & 1 & -1 \\end{bmatrix}$. State the rank and nullity.",
+      steps: [
+        {
+          expression: "\\begin{bmatrix}1&2&0&3\\\\2&4&1&5\\\\0&0&1&{-1}\\end{bmatrix} \\xrightarrow{R_2-2R_1} \\begin{bmatrix}1&2&0&3\\\\0&0&1&{-1}\\\\0&0&1&{-1}\\end{bmatrix} \\xrightarrow{R_3-R_2} \\begin{bmatrix}1&2&0&3\\\\0&0&1&{-1}\\\\0&0&0&0\\end{bmatrix}",
+          annotation: "Row-reduce to RREF. Pivots appear in columns 1 and 3. Columns 2 and 4 have no pivots — they are the free variable columns. Therefore rank = 2, nullity = 4 − 2 = 2.",
+          strategyTitle: "Row-reduce to find pivot and free columns",
+          checkpoint: "How many pivot columns? How many free variables?",
+          hints: ["Pivots in columns 1 and 3. Free variables: $x_2$ and $x_4$. Rank-Nullity: 2 + 2 = 4 ✓"],
+        },
+        {
+          expression: "x_1 + 2x_2 + 3x_4 = 0 \\implies x_1 = -2x_2 - 3x_4 \\qquad x_3 - x_4 = 0 \\implies x_3 = x_4",
+          annotation: "Read equations from the RREF rows: row 1 gives $x_1 = -2x_2 - 3x_4$, row 2 gives $x_3 = x_4$. Express each pivot variable in terms of the free variables.",
+          strategyTitle: "Express pivot variables in terms of free variables",
+          hints: ["Each RREF row with a pivot variable gives you one equation. Isolate the pivot variable on the left."],
+        },
+        {
+          expression: "\\mathbf{v}_1 = \\begin{bmatrix}-2\\\\1\\\\0\\\\0\\end{bmatrix} \\;(x_2=1, x_4=0), \\qquad \\mathbf{v}_2 = \\begin{bmatrix}-3\\\\0\\\\1\\\\1\\end{bmatrix} \\;(x_2=0, x_4=1)",
+          annotation: "Set each free variable to 1 in turn while holding others at 0. For $x_2=1, x_4=0$: $x_1=-2, x_3=0$ → $\\mathbf{v}_1$. For $x_2=0, x_4=1$: $x_1=-3, x_3=1$ → $\\mathbf{v}_2$. One basis vector per free variable.",
+          strategyTitle: "Build one basis vector per free variable",
+          hints: ["Each free variable 'turns on' one dimension of the null space. Set it to 1, set all other free variables to 0, back-substitute for the pivot variables."],
+        },
+        {
+          expression: "N(A) = \\text{Span}\\left\\{\\begin{bmatrix}-2\\\\1\\\\0\\\\0\\end{bmatrix},\\begin{bmatrix}-3\\\\0\\\\1\\\\1\\end{bmatrix}\\right\\}",
+          annotation: "The null space is a 2D subspace of $\\mathbb{R}^4$. Verify: rank 2 + nullity 2 = 4 = number of columns ✓. Check: $A\\mathbf{v}_1 = \\mathbf{0}$ and $A\\mathbf{v}_2 = \\mathbf{0}$.",
+          strategyTitle: "Assemble and verify",
+        }
+      ],
+      conclusion: "rank = 2, nullity = 2, confirming rank + nullity = 4 = number of columns. Each free variable column contributes exactly one basis vector to the null space, built by the back-substitution method."
+    },
+    {
+      id: "la2-004-ex3",
+      title: "Is Ax = b Consistent? Testing b ∈ C(A)",
+      problem: "For $A = \\begin{bmatrix} 1 & 2 \\\\ 3 & 6 \\end{bmatrix}$ (from Example 1), determine whether (a) $\\mathbf{b}_1 = \\begin{bmatrix}2\\\\6\\end{bmatrix}$ and (b) $\\mathbf{b}_2 = \\begin{bmatrix}1\\\\2\\end{bmatrix}$ are in the column space.",
+      steps: [
+        {
+          expression: "C(A) = \\text{Span}\\left\\{\\begin{bmatrix}1\\\\3\\end{bmatrix}\\right\\} \\quad (\\text{only vectors of the form } c\\begin{bmatrix}1\\\\3\\end{bmatrix} \\text{ are reachable})",
+          annotation: "From Example 1: $A$ has rank 1. The entire column space is the line through the origin in direction $[1,3]^T$. Any vector not on this line is unreachable.",
+          strategyTitle: "Recall the column space from Example 1",
+        },
+        {
+          expression: "(a)\\; \\mathbf{b}_1 = \\begin{bmatrix}2\\\\6\\end{bmatrix} = 2\\begin{bmatrix}1\\\\3\\end{bmatrix} \\in C(A) \\implies \\textbf{CONSISTENT}",
+          annotation: "$\\mathbf{b}_1 = 2 \\cdot [1,3]^T$ — it lies exactly on the column space line. A particular solution: $\\mathbf{x}_p = [2,0]^T$ (check: $A[2,0]^T = 2[1,3]^T = [2,6]^T$ ✓). The general solution is $\\mathbf{x} = [2,0]^T + t[-2,1]^T$ (adding any null space vector).",
+          strategyTitle: "Check b₁: is it a scalar multiple of [1,3]ᵀ?",
+        },
+        {
+          expression: "(b)\\; \\mathbf{b}_2 = \\begin{bmatrix}1\\\\2\\end{bmatrix}: \\text{ need } c=1 \\text{ (from row 1) but } 3c = 3 \\neq 2 \\text{ (row 2)} \\implies \\mathbf{b}_2 \\notin C(A) \\implies \\textbf{INCONSISTENT}",
+          annotation: "For $[1,2]^T$ to equal $c[1,3]^T$: component 1 forces $c=1$, but then component 2 requires $3(1)=3 \\neq 2$. Contradiction. Equivalently: row-reduce $[A|\\mathbf{b}_2]$ to get the row $[0,0|{-1}]$ — a contradiction meaning no solution exists.",
+          strategyTitle: "Check b₂: contradiction in the components",
+          hints: ["The augmented matrix test: row-reduce $[A|\\mathbf{b}]$. If any row looks like $[0,0,\\ldots,0|c]$ with $c \\neq 0$, the system is inconsistent."],
+        }
+      ],
+      conclusion: "b₁ = [2,6]ᵀ is reachable (2× the column space basis). b₂ = [1,2]ᵀ lies off the column space line — inconsistent. The key rule: Ax = b is solvable if and only if b ∈ C(A)."
     }
   ],
 
   // ── Challenges ─────────────────────────────────────────────────
   challenges: [
     {
-      id: "ch-1",
+      id: "la2-004-ch1",
       difficulty: "easy",
       problem: "What is the Rank and Nullity of the $3\\times3$ Identity Matrix $I = \\begin{bmatrix} 1 & 0 & 0 \\\\ 0 & 1 & 0 \\\\ 0 & 0 & 1 \\end{bmatrix}$?",
       hint: "The identity matrix does not squish space at all. It leaves all 3 dimensions perfectly intact.",
@@ -339,7 +411,7 @@ A = np.array([[1., 2., 3.],
       answer: "Rank = 3, Nullity = 0"
     },
     {
-      id: "ch-2",
+      id: "la2-004-ch2",
       difficulty: "medium",
       problem: "A $5 \\times 7$ matrix has a Rank of 4. What is the dimension of its Null Space?",
       hint: "Use the Rank-Nullity theorem: Rank + Nullity = Number of Columns.",
@@ -358,6 +430,31 @@ A = np.array([[1., 2., 3.],
         }
       ],
       answer: "3"
+    },
+    {
+      id: "la2-004-ch3",
+      difficulty: "hard",
+      problem: "For $A = \\begin{bmatrix}2&4&2\\\\1&2&3\\\\3&6&5\\end{bmatrix}$: (a) find a basis for $N(A)$ by hand, (b) state rank and nullity, (c) verify rank + nullity = n, (d) determine whether $\\mathbf{b} = [4,3,7]^T$ is in the column space (and if so, write the general solution).",
+      hint: "Row-reduce $A$ to RREF. Column 2 will be free (watch: column 2 = 2 × column 1 throughout). For part (d), row-reduce $[A|\\mathbf{b}]$ — if no contradiction row appears, $\\mathbf{b} \\in C(A)$.",
+      walkthrough: [
+        {
+          expression: "\\text{RREF}(A) = \\begin{bmatrix}1&2&0\\\\0&0&1\\\\0&0&0\\end{bmatrix}",
+          annotation: "Divide $R_1$ by 2, then $R_2 \\leftarrow R_2 - R_1/2$, $R_3 \\leftarrow R_3 - 3R_1/2$, then eliminate $x_3$ from $R_1$. Pivots in columns 1 and 3. Column 2 is free. rank = 2, nullity = 3 - 2 = 1."
+        },
+        {
+          expression: "x_1 = -2x_2, \\; x_3 = 0 \\implies N(A) = \\text{Span}\\left\\{\\begin{bmatrix}-2\\\\1\\\\0\\end{bmatrix}\\right\\}",
+          annotation: "Set free variable $x_2 = 1$: from RREF row 1, $x_1 + 2(1) = 0 \\implies x_1 = -2$; from row 2, $x_3 = 0$. One basis vector: $[-2,1,0]^T$."
+        },
+        {
+          expression: "\\text{rank}(2) + \\text{nullity}(1) = 3 = n \\checkmark",
+          annotation: "Rank-Nullity theorem confirmed."
+        },
+        {
+          expression: "[A|\\mathbf{b}] \\to \\begin{bmatrix}1&2&0&\\tfrac{3}{2}\\\\0&0&1&\\tfrac{1}{2}\\\\0&0&0&0\\end{bmatrix} \\implies \\mathbf{b} \\in C(A)",
+          annotation: "No contradiction row $[0,0,0|\\neq 0]$. $\\mathbf{b}$ is reachable. Particular solution: $x_p = [3/2, 0, 1/2]^T$. General solution: $\\mathbf{x} = [3/2, 0, 1/2]^T + t[-2,1,0]^T$."
+        }
+      ],
+      answer: "$N(A) = \\text{Span}\\{[-2,1,0]^T\\}$; rank 2, nullity 1; $2+1=3=n$ ✓; $\\mathbf{b} \\in C(A)$, general solution $\\mathbf{x} = [3/2,\\,0,\\,1/2]^T + t[-2,1,0]^T$"
     }
   ],
 
@@ -406,7 +503,7 @@ A = np.array([[1., 2., 3.],
   assessment: {
     questions: [
       {
-        id: "assess-1",
+        id: "la2-004-assess-1",
         type: "input",
         text: "If a 4x4 matrix flattens 4D space into a completely flat 2D plane, what is the dimension of its Null Space? (Enter a number).",
         answer: "2",
@@ -425,18 +522,21 @@ A = np.array([[1., 2., 3.],
 
   // ── Checkpoints ──────────────────────────────────────────────────
   checkpoints: [
-    'read-intuition',
-    'read-math',
-    'read-rigor',
-    'completed-example-1',
-    'attempted-challenge-easy',
-    'attempted-challenge-medium',
+    { id: 'cp-la2-004-1', label: 'Read intuition — understand column space vs null space', type: 'read' },
+    { id: 'cp-la2-004-2', label: 'Read math — trace the null space algorithm for a 2×2 matrix', type: 'read' },
+    { id: 'cp-la2-004-3', label: 'Read rigor — study Rank-Nullity proof and Fundamental Theorem', type: 'read' },
+    { id: 'cp-la2-004-4', label: 'Run OpenMAT cell 1 — verify A * null(A) ≈ 0', type: 'lab' },
+    { id: 'cp-la2-004-5', label: 'Run OpenMAT cell 2 — verify rank + nullity = n for a 3×4 matrix', type: 'lab' },
+    { id: 'cp-la2-004-6', label: 'Complete example 1: find column space and null space of a 2×2 singular matrix', type: 'example' },
+    { id: 'cp-la2-004-7', label: 'Complete example 2: find the 2D null space of a 3×4 matrix', type: 'example' },
+    { id: 'cp-la2-004-8', label: 'Attempt challenge 2: apply rank-nullity to a 5×7 matrix', type: 'challenge' },
+    { id: 'cp-la2-004-9', label: 'Attempt challenge 3: find N(A) by hand for a 3×3 matrix', type: 'challenge' },
   ],
 
   // ── Final Quiz ─────────────────────────────────────────────────
   quiz: [
     {
-      id: 'quiz-1',
+      id: 'la2-004-quiz-1',
       type: 'choice',
       text: "If a 3x3 matrix has a Column Space of dimension 2 (it flattens space to a plane), what is the dimension of its Null Space?",
       options: [
@@ -450,7 +550,7 @@ A = np.array([[1., 2., 3.],
       reviewSection: 'Intuition tab — Rank-Nullity Theorem'
     },
     {
-      id: 'quiz-2',
+      id: 'la2-004-quiz-2',
       type: 'choice',
       text: "Geometrically, what does it mean to be a vector in the Null Space of a transformation matrix A?",
       options: [
@@ -462,6 +562,62 @@ A = np.array([[1., 2., 3.],
       answer: "The vector gets entirely crushed to the origin (0,0) during the transformation.",
       hints: ["The definition of the Null Space is that A(v) = 0."],
       reviewSection: 'Intuition tab — The Graveyard'
+    },
+    {
+      id: 'la2-004-quiz-3',
+      type: 'choice',
+      text: "You row-reduce $A$ and find that columns 1 and 3 are pivot columns (out of 4 total columns). To form a basis for the column space, which columns do you use?",
+      options: [
+        "Columns 1 and 3 of the ORIGINAL (pre-reduction) matrix $A$.",
+        "Columns 1 and 3 of the RREF of $A$.",
+        "All 4 columns of $A$.",
+        "The nonzero rows of the RREF of $A$."
+      ],
+      answer: "Columns 1 and 3 of the ORIGINAL (pre-reduction) matrix $A$.",
+      hints: ["Row operations change column vectors but preserve which columns are pivots. Always use the pivot columns from the ORIGINAL matrix for the column space basis."],
+      reviewSection: 'Math tab — Column Space Trick callout'
+    },
+    {
+      id: 'la2-004-quiz-4',
+      type: 'choice',
+      text: "The system $A\\mathbf{x} = \\mathbf{b}$ has no solution. What does this tell you about $\\mathbf{b}$?",
+      options: [
+        "$\\mathbf{b}$ is not in the column space of $A$ — the transformation cannot reach that output.",
+        "$\\mathbf{b}$ is in the null space of $A$.",
+        "$A$ must be square.",
+        "The rank of $A$ is zero."
+      ],
+      answer: "$\\mathbf{b}$ is not in the column space of $A$ — the transformation cannot reach that output.",
+      hints: ["$A\\mathbf{x}=\\mathbf{b}$ is consistent if and only if $\\mathbf{b} \\in C(A)$. No solution means $\\mathbf{b}$ lies outside the column space."],
+      reviewSection: 'Rigor tab — Consistency theorem'
+    },
+    {
+      id: 'la2-004-quiz-5',
+      type: 'choice',
+      text: "A $6 \\times 3$ matrix $A$ has rank 2. What is the dimension of its null space?",
+      options: [
+        "1 — because nullity = n − rank = 3 − 2 = 1.",
+        "4 — because nullity = m − rank = 6 − 2 = 4.",
+        "2 — same as the rank.",
+        "0 — the null space is always trivial for rectangular matrices."
+      ],
+      answer: "1 — because nullity = n − rank = 3 − 2 = 1.",
+      hints: ["Rank-Nullity theorem: rank + nullity = n (number of COLUMNS, not rows). $n = 3$, rank $= 2$, so nullity $= 1$."],
+      reviewSection: 'Intuition tab — Rank-Nullity theorem callout'
+    },
+    {
+      id: 'la2-004-quiz-6',
+      type: 'choice',
+      text: "If $A\\mathbf{x} = \\mathbf{b}$ has infinitely many solutions, what must be true about $A$?",
+      options: [
+        "The null space of $A$ is non-trivial (nullity ≥ 1): adding any null space vector to one particular solution gives another valid solution.",
+        "The column space of $A$ is all of $\\mathbb{R}^m$.",
+        "The rank of $A$ equals $m$ (the number of rows).",
+        "The matrix $A$ must be square."
+      ],
+      answer: "The null space of $A$ is non-trivial (nullity ≥ 1): adding any null space vector to one particular solution gives another valid solution.",
+      hints: ["If $\\mathbf{x}_p$ solves $A\\mathbf{x}=\\mathbf{b}$ and $\\mathbf{v} \\in N(A)$, then $\\mathbf{x}_p + \\mathbf{v}$ is also a solution. Infinitely many solutions ↔ nullity ≥ 1."],
+      reviewSection: 'Rigor tab — General solution theorem'
     }
   ]
 };

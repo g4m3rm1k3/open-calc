@@ -9,19 +9,25 @@ export default {
   tags: ['systems', 'gaussian elimination', 'row reduction', 'augmented matrix', 'RREF', 'linear equations', 'Ax=b'],
   aliases: 'simultaneous equations row echelon reduced row echelon form back substitution pivot free variable consistent inconsistent',
 
+  timeToComplete: 30,
+  coreConcept: 'A system Ax=b has exactly one solution, no solution, or infinitely many solutions. Gaussian elimination reveals which case via row operations on the augmented matrix.',
+  prerequisites: ['la1-002'],
+  nextLesson: 'la1-005',
+
   // ── Hook ──────────────────────────────────────────────────────
   hook: {
     question: "You mix two chemical solutions to hit an exact target concentration. You have two unknowns, two constraints — how do you find the answer systematically, every time, without guessing?",
     realWorldContext: "Every time a computer solves a circuit (Kirchhoff's laws), balances a budget, or fits a curve to data, it is solving a system of linear equations. GPS works by solving a 4-equation system to find your position. Machine learning models update millions of parameters by solving enormous systems at every training step. This is not a niche skill — it is the engine that runs modern computing.",
-    previewVisualizationId: 'SystemsOfEquationsGeometric',
+    previewVisualizationId: 'GaussianEliminationStepper',
   },
 
   // ── Intuition ──────────────────────────────────────────────────
   intuition: {
     prose: [
-      '**Where you are in the story:** You know what vectors are, you know about span and basis, and you can measure angles and areas with dot and cross products. Now we ask the fundamental question that ALL of linear algebra is built around: given a target vector $\\mathbf{b}$, can we find a combination of our column vectors that equals it? That question is a system of linear equations.',
+      'Start with a concrete example: $2x + y = 5$ and $x - y = 1$. Check that $(x, y) = (2, 1)$ works: $4 + 1 = 5$ \u2713 and $2 - 1 = 1$ \u2713. But how do we find $(2, 1)$ without guessing, and what do we do with 10 equations in 10 unknowns? The answer is Gaussian elimination \u2014 a systematic algorithm that applies three simple operations to transform any system into a form you can read off directly.',
       'Let\'s start with two unknowns. Suppose you want to find numbers $x$ and $y$ that satisfy both of these at once: $2x + y = 5$ and $x - y = 1$. Geometrically, each equation is a LINE in the $xy$-plane. The solution is the point where those lines cross.',
       '**The Row Picture.** Each equation draws a line (in 2D) or a plane (in 3D). You are looking for the intersection point. If the lines cross, there is exactly one solution. If the lines are parallel, there is no solution — the system is inconsistent. If the lines are identical, every point on the line works — infinitely many solutions.',
+      '**Predict before reading on:** Take the system $x + 2y = 4$ and $2x + 4y = 8$. Notice that equation 2 = $2\\times$ equation 1. Without any computation, predict: how many solutions does this system have? Hold your answer until Example 3.',
       '**The Column Picture.** Rewrite the same system as a single vector equation: $x \\begin{bmatrix}2\\\\1\\end{bmatrix} + y \\begin{bmatrix}1\\\\-1\\end{bmatrix} = \\begin{bmatrix}5\\\\1\\end{bmatrix}$. Now you are asking: what scalar combination of the two column vectors reaches the target vector $[5, 1]$? This is a span question — and you already know exactly what that means.',
       'These two pictures (row and column) are the same system viewed from different angles. Learning to flip between them is one of the most powerful habits in linear algebra.',
       '**Gaussian Elimination: the algorithm.** The key insight is that you can do three things to a system of equations without changing the solution: (1) swap two equations, (2) multiply an equation by a non-zero number, (3) add a multiple of one equation to another. These are the three elementary row operations. Gaussian elimination uses them systematically to create zeros below each leading entry, turning the system into a staircase shape — called row echelon form — where back-substitution becomes trivial.',
@@ -44,6 +50,11 @@ export default {
         body: '1. Swap two rows: $R_i \\leftrightarrow R_j$\n2. Scale a row: $R_i \\to c \\cdot R_i \\quad (c \\neq 0)$\n3. Row replacement: $R_i \\to R_i + c \\cdot R_j$\n\nNone of these change the solution set.',
       },
       {
+        type: 'procedure',
+        title: 'Procedure: Gaussian Elimination (Row Reduction)',
+        body: 'Step 1. Write the augmented matrix $[A \\mid \\mathbf{b}]$.\nStep 2. Find the leftmost non-zero column \u2014 the pivot column.\nStep 3. Swap rows if needed to place a non-zero entry in the pivot position.\nStep 4. Scale the pivot row so the pivot entry = 1.\nStep 5. Add multiples of the pivot row to ALL other rows to create zeros in the pivot column.\nStep 6. Repeat from step 2 on the submatrix below and to the right.\nStep 7. Read off: pivot variables determined directly; assign parameter $t$ to each free variable.',
+      },
+      {
         type: 'warning',
         title: 'Common Mistake: Multiplying a Row by Zero',
         body: `The three valid row operations all require **nonzero** scalars. Multiplying a row by zero is **not** a legal row operation — it destroys information and changes the solution set.\n\n**Wrong:** $R_2 \\to 0 \\cdot R_2$ (turns an equation into $0 = 0$, loses a constraint)\n\n**Correct:** $R_2 \\to \\frac{1}{3} R_2$ scales the row but keeps all information.\n\nThe rule: the scalar $c$ in operations 2 and 3 must satisfy $c \\neq 0$.`,
@@ -61,10 +72,10 @@ export default {
     ],
     visualizations: [
       {
-        id: 'SystemsOfEquationsGeometric',
-        title: 'The Row Picture: Two Lines in the Plane',
-        mathBridge: 'Drag the sliders to change the coefficients of each equation. Observe the three cases: (1) two lines crossing at one point → unique solution, (2) two parallel lines → no solution, (3) two identical lines → infinitely many solutions. Notice how the algebraic case (determinant = 0) matches the geometric case (no crossing point).',
-        caption: 'Every 2×2 system has a geometric story.',
+        id: 'GaussianEliminationStepper',
+        title: 'Gaussian Elimination Step by Step',
+        mathBridge: 'Step through Gaussian elimination on a live system. Each step applies one row operation and shows how the augmented matrix changes. Observe how a contradiction row $[0\ 0\ |\  c]$ signals inconsistency, while a zero row $[0\ 0\ |\  0]$ signals a free variable.',
+        caption: 'Watch the staircase form emerge one row operation at a time.',
       },
     ],
   },
@@ -418,55 +429,53 @@ b = np.array([9.0, 3.0, 1.0])
       difficulty: 'easy',
       problem: 'Use Gaussian elimination to solve: $x + y = 6$ and $x - y = 2$.',
       walkthrough: [
-        '**Form the augmented matrix.** Write $\\left[\\begin{array}{cc|c}1&1&6\\\\1&-1&2\\end{array}\\right]$. The left block is the coefficient matrix $A$ and the right column is $\\mathbf{b}$.',
-        '**Eliminate below the first pivot.** Apply $R_2 \\to R_2 - R_1$: $\\left[\\begin{array}{cc|c}1&1&6\\\\0&-2&-4\\end{array}\\right]$. The $x$ term has been eliminated from row 2.',
-        '**Scale the second pivot.** Apply $R_2 \\to -\\frac{1}{2}R_2$: $\\left[\\begin{array}{cc|c}1&1&6\\\\0&1&2\\end{array}\\right]$. Row 2 now reads $y = 2$.',
-        '**Back-eliminate.** Apply $R_1 \\to R_1 - R_2$: $\\left[\\begin{array}{cc|c}1&0&4\\\\0&1&2\\end{array}\\right]$. RREF reached.',
-        '**Read the solution.** Row 1: $x = 4$. Row 2: $y = 2$. Verify: $4 + 2 = 6$ ✓ and $4 - 2 = 2$ ✓.',
+        { expression: '\\left[\\begin{array}{cc|c}1&1&6\\\\1&-1&2\\end{array}\\right]', annotation: 'Form the augmented matrix [A | b]. The left block holds coefficients, the right column holds the right-hand side targets.' },
+        { expression: 'R_2 \\to R_2 - R_1:\\quad\\left[\\begin{array}{cc|c}1&1&6\\\\0&-2&-4\\end{array}\\right]', annotation: 'Eliminate x from row 2 by subtracting row 1. The x-coefficient in row 2 becomes 0.' },
+        { expression: 'R_2 \\to -\\tfrac{1}{2}R_2:\\quad\\left[\\begin{array}{cc|c}1&1&6\\\\0&1&2\\end{array}\\right]', annotation: 'Scale row 2 so the pivot = 1. Row 2 now reads y = 2 directly.' },
+        { expression: 'R_1 \\to R_1-R_2:\\quad\\left[\\begin{array}{cc|c}1&0&4\\\\0&1&2\\end{array}\\right]', annotation: 'Back-eliminate: zero out the y-coefficient in row 1. RREF reached. Read: x = 4, y = 2. Verify: 4+2=6 \u2713 and 4-2=2 \u2713.' },
       ],
-      answer: 'x = 4, y = 2',
+      answer: '$x = 4$, $y = 2$ \u2014 the unique intersection point of the two lines.',
     },
     {
       id: 'la1-004-ch2',
       difficulty: 'medium',
       problem: 'Determine whether the system is consistent, and if so find all solutions: $x + y - z = 2$, $2x + 3y + z = 7$, $3x + 4y = 9$.',
       walkthrough: [
-        '**Form the augmented matrix.** $\\left[\\begin{array}{ccc|c}1&1&-1&2\\\\2&3&1&7\\\\3&4&0&9\\end{array}\\right]$. Three equations in three unknowns $x$, $y$, $z$.',
-        '**Eliminate column 1.** Apply $R_2 \\to R_2 - 2R_1$ and $R_3 \\to R_3 - 3R_1$: $\\left[\\begin{array}{ccc|c}1&1&-1&2\\\\0&1&3&3\\\\0&1&3&3\\end{array}\\right]$. Rows 2 and 3 are now identical.',
-        '**Eliminate the duplicate row.** Apply $R_3 \\to R_3 - R_2$: $\\left[\\begin{array}{ccc|c}1&1&-1&2\\\\0&1&3&3\\\\0&0&0&0\\end{array}\\right]$. The zero row confirms that equation 3 was a combination of equations 1 and 2.',
-        '**Back-eliminate to RREF.** Apply $R_1 \\to R_1 - R_2$: $\\left[\\begin{array}{ccc|c}1&0&-4&-1\\\\0&1&3&3\\\\0&0&0&0\\end{array}\\right]$. Column 3 has no pivot — $z$ is a free variable.',
-        '**Write the general solution.** Let $z = t$. Row 2: $y = 3 - 3t$. Row 1: $x = -1 + 4t$. The system is consistent with infinitely many solutions forming a line in 3D.',
+        { expression: '\\left[\\begin{array}{ccc|c}1&1&-1&2\\\\2&3&1&7\\\\3&4&0&9\\end{array}\\right]', annotation: 'Form the 3\u00d74 augmented matrix. Three equations in three unknowns x, y, z.' },
+        { expression: 'R_2-2R_1,\\;R_3-3R_1:\\quad\\left[\\begin{array}{ccc|c}1&1&-1&2\\\\0&1&3&3\\\\0&1&3&3\\end{array}\\right]', annotation: 'Eliminate column 1 from rows 2 and 3. Rows 2 and 3 are now identical \u2014 equation 3 was a linear combination of equations 1 and 2.' },
+        { expression: 'R_3-R_2:\\quad\\left[\\begin{array}{ccc|c}1&1&-1&2\\\\0&1&3&3\\\\0&0&0&0\\end{array}\\right]', annotation: 'Subtract row 2 from row 3. The zero row confirms equation 3 was redundant. Column 3 has no pivot \u2014 z is a free variable.' },
+        { expression: 'R_1-R_2:\\quad\\left[\\begin{array}{ccc|c}1&0&-4&-1\\\\0&1&3&3\\\\0&0&0&0\\end{array}\\right]', annotation: 'Back-eliminate to RREF. Let z = t. Row 2: y = 3 \u2212 3t. Row 1: x = \u22121 + 4t. Infinitely many solutions forming a line in 3D.' },
       ],
-      answer: 'x = -1+4t, y = 3-3t, z = t',
+      answer: 'Infinitely many solutions: $x = -1+4t$, $y = 3-3t$, $z = t$ for any $t \\in \\mathbb{R}$.',
     },
     {
       id: 'la1-004-ch3',
       difficulty: 'hard',
       problem: 'For what value of $k$ does the system have infinitely many solutions: $x + 2y = 3$ and $3x + 6y = k$?',
       walkthrough: [
-        '**Form the augmented matrix.** $\\left[\\begin{array}{cc|c}1&2&3\\\\3&6&k\\end{array}\\right]$. Notice the second row of coefficients $[3,6]$ is exactly $3 \\times [1,2]$ — the rows are proportional.',
-        '**Eliminate below the first pivot.** Apply $R_2 \\to R_2 - 3R_1$: $\\left[\\begin{array}{cc|c}1&2&3\\\\0&0&k-9\\end{array}\\right]$. The second row of coefficients becomes zero.',
-        '**Analyze the second row.** The row reads $0x + 0y = k - 9$. This is either $0 = 0$ (if $k = 9$) or $0 = k-9 \\neq 0$ (if $k \\neq 9$).',
-        '**Two cases.** If $k \\neq 9$: the row is a contradiction — NO solution. If $k = 9$: the row is $0 = 0$ — no contradiction, but $y$ is a free variable.',
-        '**Conclusion.** For $k = 9$, the system is consistent with one free variable $y$, giving infinitely many solutions. For any other value of $k$, the system is inconsistent.',
+        { expression: '\\left[\\begin{array}{cc|c}1&2&3\\\\3&6&k\\end{array}\\right]', annotation: 'Form the augmented matrix. Notice: row 2 coefficients [3,6] = 3\u00d7[1,2] \u2014 proportional rows signal a critical case.' },
+        { expression: 'R_2-3R_1:\\quad\\left[\\begin{array}{cc|c}1&2&3\\\\0&0&k-9\\end{array}\\right]', annotation: 'Eliminate below the first pivot. The coefficient part of row 2 becomes all zeros. The right side becomes k \u2212 9.' },
+        { expression: 'k-9=0 \\Rightarrow k=9\\;(\\text{infinite solutions});\\quad k-9\\neq 0\\;(\\text{no solution})', annotation: 'Two cases: if k=9, row 2 reads 0=0 (redundant \u2014 free variable y \u2192 infinitely many solutions). If k\u22609, row 2 reads 0=k\u22129\u22600 (contradiction \u2192 no solution).' },
       ],
-      answer: 'k = 9',
+      answer: '$k = 9$ \u2014 the only value for which the system is consistent and has a free variable (infinitely many solutions).',
     },
   ],
 
   // ── Semantics ────────────────────────────────────────────────────
   semantics: {
     core: [
-      { symbol: 'A\\mathbf{x} = \\mathbf{b}', meaning: 'Matrix form of a linear system: A is coefficients, x is unknowns, b is targets' },
-      { symbol: '[A \\mid \\mathbf{b}]', meaning: 'Augmented matrix — coefficient matrix with the target vector appended as an extra column' },
-      { symbol: '\\text{RREF}', meaning: 'Reduced Row Echelon Form — pivots are 1, all other entries in pivot columns are 0' },
-      { symbol: '\\text{rank}(A)', meaning: 'Number of pivot columns — measures how many independent constraints A provides' },
+      { symbol: 'A\\mathbf{x} = \\mathbf{b}', meaning: 'Matrix form of a linear system: A is the coefficient matrix, x is the unknown vector, b is the target vector' },
+      { symbol: '[A \\mid \\mathbf{b}]', meaning: 'Augmented matrix \u2014 coefficient matrix with the target vector appended as an extra column; row operations on it transform both sides simultaneously' },
+      { symbol: '\\text{RREF}', meaning: 'Reduced Row Echelon Form \u2014 pivots are 1, all other entries in pivot columns are 0; canonical simplified form of any system' },
+      { symbol: '\\text{rank}(A)', meaning: 'Number of pivot columns \u2014 measures how many independent constraints A provides; determines the solution structure' },
+      { symbol: 'x = x_p + x_h', meaning: 'General solution = particular solution + homogeneous (null-space) solution; the complete solution structure for any consistent system' },
     ],
     rulesOfThumb: [
-      'Pivot in the augmented column → no solution (inconsistent).',
-      'No free variables → at most one solution.',
+      'Pivot in the augmented column (last column) \u2192 no solution (inconsistent system).',
+      'No free variables (rank(A) = n) \u2192 at most one solution.',
       'Every free variable adds one dimension to the solution set.',
-      'The column picture reframes any system as a span question.',
+      'The column picture reframes any system as a span question: is b in the column space of A?',
+      'For code: use np.linalg.solve for unique solutions; np.linalg.lstsq for overdetermined systems; always verify with np.allclose(A @ x, b).',
     ],
   },
 
@@ -490,6 +499,11 @@ b = np.array([9.0, 3.0, 1.0])
         label: 'Null Space and Column Space',
         note: 'The solution set of $A\\mathbf{x}=\\mathbf{0}$ is the null space of $A$. The set of all reachable $\\mathbf{b}$ is the column space. Both are precisely characterized by the RREF you learned here.',
       },
+      {
+        lessonId: 'la1-006',
+        label: 'Gauss-Jordan and RREF',
+        note: 'The next lesson formalizes the Gauss-Jordan variant of elimination and studies the RREF theorem in depth, including the rank-nullity theorem.',
+      },
     ],
   },
 
@@ -504,9 +518,14 @@ b = np.array([9.0, 3.0, 1.0])
 
   // ── Checkpoints ──────────────────────────────────────────────────
   checkpoints: [
-    { id: 'cp-la1-004-1', question: 'What does the augmented matrix $[A \\mid \\mathbf{b}]$ represent?', answer: 'The coefficient matrix $A$ with the right-hand side vector $\\mathbf{b}$ appended as an extra column. Row operations on it transform both sides simultaneously.' },
-    { id: 'cp-la1-004-2', question: 'What are the three possible solution counts for a linear system?', answer: 'Exactly one solution (unique), no solution (inconsistent), or infinitely many solutions (free variables). Never exactly two.' },
-    { id: 'cp-la1-004-3', question: 'How do you know a system is inconsistent from its RREF?', answer: 'A pivot appears in the augmented column — you get a row like $[0 \\ 0 \\ | \\ 5]$ which means $0 = 5$, a contradiction.' },
+    { id: 'cp-la1-004-1', label: 'Read: Define augmented matrix and three row operations', type: 'read' },
+    { id: 'cp-la1-004-2', label: 'Read: Identify the three solution cases from RREF', type: 'read' },
+    { id: 'cp-la1-004-3', label: 'Read: Explain row vs column picture of Ax=b', type: 'read' },
+    { id: 'cp-la1-004-4', label: 'Run: OpenMAT \u2014 solve with backslash and rref()', type: 'lab' },
+    { id: 'cp-la1-004-5', label: 'Run: Python \u2014 detect solution case using rank', type: 'lab' },
+    { id: 'cp-la1-004-6', label: 'Complete: Example 1 \u2014 unique solution via row reduction', type: 'example' },
+    { id: 'cp-la1-004-7', label: 'Complete: Example 2 \u2014 identify inconsistent system', type: 'example' },
+    { id: 'cp-la1-004-8', label: 'Attempt: Challenge 3 \u2014 find k for infinite solutions', type: 'challenge' },
   ],
 
   // ── Assessment ───────────────────────────────────────────────────
@@ -514,10 +533,11 @@ b = np.array([9.0, 3.0, 1.0])
     questions: [
       {
         id: 'la1-004-assess-1',
-        type: 'input',
+        type: 'choice',
         text: 'How many solutions does the system $x + y = 3$, $2x + 2y = 6$ have?',
-        answer: 'infinitely many',
-        hint: 'The second equation is 2 times the first.',
+        options: ['Exactly one', 'No solution', 'Infinitely many', 'Exactly two'],
+        answer: 'Infinitely many',
+        hint: 'The second equation is 2 times the first \u2014 it is redundant. Row-reduce to get a zero row, revealing a free variable.',
       },
     ],
   },
@@ -525,7 +545,7 @@ b = np.array([9.0, 3.0, 1.0])
   // ── Quiz ─────────────────────────────────────────────────────────
   quiz: [
     {
-      id: 'q-la1-004-1',
+      id: 'la1-004-quiz-1',
       type: 'choice',
       text: 'During Gaussian elimination, you reach a row that reads $[0\\ 0\\ |\\ 5]$. What does this tell you?',
       options: [
@@ -539,7 +559,7 @@ b = np.array([9.0, 3.0, 1.0])
       reviewSection: 'Math tab — Consistency Condition',
     },
     {
-      id: 'q-la1-004-2',
+      id: 'la1-004-quiz-2',
       type: 'choice',
       text: 'A 3×4 system (3 equations, 4 unknowns) has 2 pivot columns. How many free variables are there?',
       options: ['1', '2', '3', '4'],
@@ -548,7 +568,7 @@ b = np.array([9.0, 3.0, 1.0])
       reviewSection: 'Math tab — Free Variables',
     },
     {
-      id: 'q-la1-004-3',
+      id: 'la1-004-quiz-3',
       type: 'choice',
       text: 'Which elementary row operation can change the solution set of a system?',
       options: [
@@ -562,7 +582,7 @@ b = np.array([9.0, 3.0, 1.0])
       reviewSection: 'Intuition tab — Three Elementary Row Operations',
     },
     {
-      id: 'q-la1-004-4',
+      id: 'la1-004-quiz-4',
       type: 'choice',
       text: 'The "column picture" of $A\\mathbf{x} = \\mathbf{b}$ asks which question?',
       options: [
@@ -576,7 +596,7 @@ b = np.array([9.0, 3.0, 1.0])
       reviewSection: 'Intuition tab — Row vs Column Picture',
     },
     {
-      id: 'q-la1-004-5',
+      id: 'la1-004-quiz-5',
       type: 'choice',
       text: 'A system $A\\mathbf{x}=\\mathbf{b}$ with RREF $\\left[\\begin{smallmatrix}1&0&2\\\\0&1&-1\\\\0&0&0\\end{smallmatrix}\\middle|\\begin{smallmatrix}3\\\\1\\\\0\\end{smallmatrix}\\right]$ has how many solutions?',
       options: [
@@ -590,7 +610,7 @@ b = np.array([9.0, 3.0, 1.0])
       reviewSection: 'Math tab — Free Variables',
     },
     {
-      id: 'q-la1-004-6',
+      id: 'la1-004-quiz-6',
       type: 'choice',
       text: 'You apply $R_2 \\to 0 \\cdot R_2$ (multiply row 2 by zero) to an augmented matrix. Why is this NOT a valid row operation?',
       options: [
@@ -604,4 +624,65 @@ b = np.array([9.0, 3.0, 1.0])
       reviewSection: 'Intuition tab — warning callout',
     },
   ],
+
+  // ── Misconceptions ────────────────────────────────────────────────
+  misconceptions: [
+    {
+      falseBelief: 'If I get a row of all zeros, the system has no solution.',
+      whyStudentsThinkIt: 'Students associate "something went wrong" with a zero row, confusing it with the contradiction row [0 0 | c≠0].',
+      correctionExample: 'A zero row [0 0 0 | 0] means one equation was redundant — it adds no new constraint. The system may still be consistent (with a free variable). Only a pivot in the augmented column [0 0 | 5] means no solution.',
+      contrastCase: 'Contradiction row [0 0 | 5] → no solution. Zero row [0 0 | 0] → free variable, infinitely many solutions.',
+    },
+    {
+      falseBelief: 'A system of n equations in n unknowns always has exactly one solution.',
+      whyStudentsThinkIt: 'Square systems look "balanced" — same number of equations and unknowns — so students expect a unique answer.',
+      correctionExample: 'The system x + y = 3, 2x + 2y = 6 is 2×2 but has infinitely many solutions (the two equations are the same line). The system x + y = 3, 2x + 2y = 7 is also 2×2 but has no solution (parallel lines).',
+      contrastCase: 'Only when rank(A) = n and the system is consistent is the solution unique.',
+    },
+    {
+      falseBelief: 'Row operations change the solution, so I must undo them at the end.',
+      whyStudentsThinkIt: 'Students see the matrix changing and worry the problem itself is being modified.',
+      correctionExample: 'Row operations on the augmented matrix [A|b] transform both sides simultaneously, preserving the solution set. The RREF matrix represents a DIFFERENT but EQUIVALENT system — one with the same solutions but easier to read.',
+      contrastCase: 'Compare: 2x+y=5 and the equivalent x+0y=2 (from RREF). Both have x=2 as part of the solution — the system changed form but not substance.',
+    },
+  ],
+
+  // ── Transfer Prompts ──────────────────────────────────────────────
+  transferPrompts: [
+    {
+      situation: 'You are given a 5×3 overdetermined system (more equations than unknowns) representing sensor measurements with noise. Which technique applies?',
+      competingTechniques: ['Gaussian elimination (exact solution)', 'Least squares (np.linalg.lstsq)', 'Ignoring extra equations'],
+      whyThisTechniqueWins: 'Gaussian elimination finds exact solutions when they exist, but overdetermined systems usually have no exact solution. Least squares minimizes the residual ||Ax−b||² and is the right tool for noisy data. Gaussian elimination remains essential as a subroutine inside the least-squares solver.',
+    },
+    {
+      situation: 'You need to check whether three vectors in ℝ³ are linearly independent — without computing a determinant.',
+      competingTechniques: ['Row-reduce the matrix formed by the three column vectors', 'Compute the determinant', 'Check by inspection'],
+      whyThisTechniqueWins: 'Form the 3×3 matrix with the vectors as columns and row-reduce. If you get 3 pivot columns (rank 3), they are independent. If rank < 3, they are dependent. This generalizes to any size — determinants only work for square matrices and give less insight into which vectors are redundant.',
+    },
+  ],
+
+  // ── Debugging ─────────────────────────────────────────────────────
+  debugging: [
+    {
+      commonError: 'np.linalg.solve raises LinAlgError: Singular matrix.',
+      symptom: 'Code crashes when trying to solve Ax = b.',
+      whyItHappened: 'A is singular (det = 0), meaning the system either has no solution or infinitely many. np.linalg.solve only handles the unique-solution case.',
+      repairStrategy: 'Check np.linalg.matrix_rank(A) vs np.linalg.matrix_rank(np.column_stack([A, b])). If ranks differ → no solution. If rank(A) < n → free variables. Use np.linalg.lstsq for a minimum-norm solution in the infinite-solutions case.',
+    },
+    {
+      commonError: 'Arithmetic error during row reduction gives the wrong pivot.',
+      symptom: 'The RREF looks wrong — pivot is not 1, or zeros are not where expected.',
+      whyItHappened: 'A common slip is using the wrong row as the pivot row, or forgetting to update ALL rows (not just the one below the pivot).',
+      repairStrategy: 'For RREF, eliminate ABOVE and BELOW the pivot. After each step, verify by checking the pivot column: it should have exactly one non-zero entry (the pivot = 1) and zeros everywhere else. Use rref([A b]) in OpenMAT or sympy.Matrix([A_b]).rref() in Python to verify.',
+    },
+  ],
+
+  // ── Mastery ────────────────────────────────────────────────────────
+  mastery: {
+    targetLevel: 3,
+    solveIndependently: 'Row-reduce a 3×3 augmented matrix to RREF by hand, identify pivot and free variables, and write the complete general solution with parameters.',
+    explainVerbally: 'Explain why multiplying a row by zero is illegal, and why a pivot in the augmented column means no solution. Articulate the row picture vs the column picture using a specific 2×2 example.',
+    detectIncorrectApplication: 'Spot when a classmate calls np.linalg.solve on a singular matrix, explains that "a zero row means no solution", or forgets to eliminate ABOVE the pivot (stopping at echelon form instead of RREF).',
+    transferToUnfamiliar: 'Apply row reduction to test whether a vector b is in the column space of A (augment A with b and check if rank increases), and use the RREF to find a basis for the null space of a non-square matrix.',
+  },
 };

@@ -370,7 +370,7 @@ A = np.array([[2., 0., 1.],
   // ── Examples ───────────────────────────────────────────────────
   examples: [
     {
-      id: "ex-1",
+      id: "la2-005-ex1",
       title: "3×3 Determinant by Cofactor Expansion",
       problem: "Compute $\\det(A)$ for $A = \\begin{bmatrix} 2 & -1 & 0 \\\\ 3 & 2 & 1 \\\\ 0 & 1 & 4 \\end{bmatrix}$ by expanding along row 1.",
       steps: [
@@ -406,7 +406,7 @@ A = np.array([[2., 0., 1.],
       conclusion: "det(A) = 26. The matrix is invertible. The zero entry in row 1 reduced the work from three 2×2 computations to two. Choosing a row or column with zeros is always a strategic advantage.",
     },
     {
-      id: "ex-2",
+      id: "la2-005-ex2",
       title: "Using Row Operations to Compute a Determinant Efficiently",
       problem: "Compute $\\det(A)$ for $A = \\begin{bmatrix} 1 & 2 & 3 \\\\ 2 & 5 & 4 \\\\ 1 & 3 & 2 \\end{bmatrix}$ by reducing to upper triangular form.",
       steps: [
@@ -446,7 +446,7 @@ A = np.array([[2., 0., 1.],
   // ── Challenges ─────────────────────────────────────────────────
   challenges: [
     {
-      id: "ch-1",
+      id: "la2-005-ch1",
       difficulty: "easy",
       problem: "Compute $\\det\\begin{bmatrix} 3 & 1 & 0 \\\\ 2 & -1 & 4 \\\\ 0 & 2 & 1 \\end{bmatrix}$ by expanding along row 1. The zero entry in position (1,3) eliminates one computation.",
       hint: "Expansion along row 1: $3 \\cdot C_{11} + 1 \\cdot C_{12} + 0 \\cdot C_{13}$. The last term drops out. Signs: $C_{11}$ is positive (odd+odd = even), $C_{12}$ is negative.",
@@ -467,7 +467,7 @@ A = np.array([[2., 0., 1.],
       answer: "-29"
     },
     {
-      id: "ch-2",
+      id: "la2-005-ch2",
       difficulty: "medium",
       problem: "A matrix $A$ has $\\det(A) = 4$. A student applies two operations: (1) multiplies row 2 by $-3$, then (2) swaps rows 1 and 3. What is the determinant of the resulting matrix?",
       hint: "Property 3: multiplying a row by $k$ multiplies det by $k$. Property 2: each row swap multiplies det by $-1$. Track each operation in sequence.",
@@ -484,7 +484,7 @@ A = np.array([[2., 0., 1.],
       answer: "12"
     },
     {
-      id: "ch-3",
+      id: "la2-005-ch3",
       difficulty: "hard",
       problem: "Compute $\\det\\begin{bmatrix} 0 & 2 & 1 \\\\ 3 & -1 & 2 \\\\ 1 & 0 & 4 \\end{bmatrix}$ using row operations. The leading zero in position (1,1) means you must swap rows before eliminating — track the sign change carefully.",
       hint: "Since $a_{11} = 0$, swap row 1 with a row that has a non-zero first entry (e.g., swap with row 3). This flip counts as one sign change. Then use row replacements (no more sign changes) to reach upper triangular form.",
@@ -566,7 +566,7 @@ A = np.array([[2., 0., 1.],
   assessment: {
     questions: [
       {
-        id: "assess-1",
+        id: "la2-005-assess-1",
         type: "input",
         text: "What is the determinant of $\\begin{bmatrix} 2 & 0 & 0 \\\\ 1 & -3 & 0 \\\\ 4 & 2 & 5 \\end{bmatrix}$?",
         answer: "-30",
@@ -586,20 +586,21 @@ A = np.array([[2., 0., 1.],
 
   // ── Checkpoints ──────────────────────────────────────────────────
   checkpoints: [
-    'read-intuition',
-    'read-math',
-    'read-rigor',
-    'completed-example-1',
-    'completed-example-2',
-    'attempted-challenge-easy',
-    'attempted-challenge-medium',
-    'attempted-challenge-hard',
+    { id: 'cp-la2-005-1', label: 'Read intuition — understand cofactor expansion conceptually', type: 'read' },
+    { id: 'cp-la2-005-2', label: 'Read math — memorize the 7 properties and their geometric meanings', type: 'read' },
+    { id: 'cp-la2-005-3', label: 'Read rigor — understand why cofactor expansion is O(n!) vs O(n³)', type: 'read' },
+    { id: 'cp-la2-005-4', label: 'Run OpenMAT cell 1 — verify manual cofactor expansion matches det()', type: 'lab' },
+    { id: 'cp-la2-005-5', label: 'Run OpenMAT cell 2 — verify all 7 properties numerically', type: 'lab' },
+    { id: 'cp-la2-005-6', label: 'Complete example 1: trace all 3 cofactors of the 3×3 matrix', type: 'example' },
+    { id: 'cp-la2-005-7', label: 'Complete example 2: reduce to upper triangular using row operations', type: 'example' },
+    { id: 'cp-la2-005-8', label: 'Attempt challenge 1: cofactor expansion with a zero entry', type: 'challenge' },
+    { id: 'cp-la2-005-9', label: 'Attempt challenge 3: hard — row swap + row reduction, track sign carefully', type: 'challenge' },
   ],
 
   // ── Final Quiz ─────────────────────────────────────────────────
   quiz: [
     {
-      id: 'quiz-1',
+      id: 'la2-005-quiz-1',
       type: 'choice',
       text: "You row-reduce a 3×3 matrix using two row replacements and one row swap. The upper triangular result has diagonal entries 2, −3, and 1. What is the determinant of the original matrix?",
       options: [
@@ -613,7 +614,7 @@ A = np.array([[2., 0., 1.],
       reviewSection: 'Math tab — Properties 2, 4, and triangular'
     },
     {
-      id: 'quiz-2',
+      id: 'la2-005-quiz-2',
       type: 'choice',
       text: "For a 3×3 matrix $A$, which row operation does NOT change $\\det(A)$?",
       options: [
@@ -625,6 +626,62 @@ A = np.array([[2., 0., 1.],
       answer: "Adding 4 times row 1 to row 3",
       hints: ["Row replacement (adding a multiple of one row to another) is the only elementary row operation that does not change the determinant — Property 4."],
       reviewSection: 'Math tab — The Seven Properties'
+    },
+    {
+      id: 'la2-005-quiz-3',
+      type: 'choice',
+      text: "What does $\\det(AB) = \\det(A) \\cdot \\det(B)$ mean geometrically?",
+      options: [
+        "Applying transformation $A$ then $B$ scales volume by $\\det(A) \\cdot \\det(B)$ — the area-scaling factors multiply.",
+        "The entries of $AB$ are products of entries from $A$ and $B$.",
+        "The column spaces of $A$ and $B$ multiply.",
+        "The trace of $AB$ equals the trace of $A$ times the trace of $B$."
+      ],
+      answer: "Applying transformation $A$ then $B$ scales volume by $\\det(A) \\cdot \\det(B)$ — the area-scaling factors multiply.",
+      hints: ["The determinant measures how a transformation scales area/volume. Composing two transformations multiplies their scaling factors, just as composing a 3× scale with a 2× scale gives a 6× scale."],
+      reviewSection: 'Math tab — Multiplicative property'
+    },
+    {
+      id: 'la2-005-quiz-4',
+      type: 'choice',
+      text: "A $4\\times 4$ upper triangular matrix has diagonal entries $2, -1, 3, -4$. What is its determinant?",
+      options: [
+        "24 — product of diagonal: $2 \\times (-1) \\times 3 \\times (-4) = 24$.",
+        "0 — triangular matrices are always singular.",
+        "−24 — because there are two negative diagonal entries.",
+        "It cannot be computed without full cofactor expansion."
+      ],
+      answer: "24 — product of diagonal: $2 \\times (-1) \\times 3 \\times (-4) = 24$.",
+      hints: ["Triangular matrix rule: det = product of all diagonal entries. Two negatives multiply to a positive. $2 \\times (-1) = -2$; $-2 \\times 3 = -6$; $-6 \\times (-4) = 24$."],
+      reviewSection: 'Math tab — Triangular matrix'
+    },
+    {
+      id: 'la2-005-quiz-5',
+      type: 'choice',
+      text: "Why should you never use Sarrus\u2019s rule on a $4 \\times 4$ matrix?",
+      options: [
+        "Sarrus\u2019s rule only works for $3 \\times 3$ matrices; it does not generalize to larger matrices and gives wrong answers for $n \\geq 4$.",
+        "Sarrus\u2019s rule only works for matrices with integer entries.",
+        "Sarrus\u2019s rule is too slow for $4 \\times 4$ — use cofactor expansion instead.",
+        "Sarrus\u2019s rule requires a square determinant, which $4\\times 4$ matrices don\u2019t have."
+      ],
+      answer: "Sarrus\u2019s rule only works for $3 \\times 3$ matrices; it does not generalize to larger matrices and gives wrong answers for $n \\geq 4$.",
+      hints: ["Sarrus\u2019s rule is a mnemonic trick specific to $3\\times 3$. The diagonal pattern it uses does not capture all the permutation terms needed for larger determinants. Always use cofactor expansion or row reduction for $n \\geq 4$."],
+      reviewSection: 'Intuition tab — Sarrus\u2019s Rule callout'
+    },
+    {
+      id: 'la2-005-quiz-6',
+      type: 'choice',
+      text: "You have a $10 \\times 10$ matrix and need to compute its determinant in a program. Which approach is correct?",
+      options: [
+        "Use LU decomposition (or call `np.linalg.det()`) — it runs in $O(n^3)$ time.",
+        "Use cofactor expansion — it is the most direct formula.",
+        "Use Sarrus\u2019s rule extended to $10 \\times 10$.",
+        "Take the trace divided by the rank."
+      ],
+      answer: "Use LU decomposition (or call `np.linalg.det()`) — it runs in $O(n^3)$ time.",
+      hints: ["Cofactor expansion is $O(10!) = 3{,}628{,}800$ multiplications. LU decomposition is $O(10^3) = 1{,}000$. Both give the same answer, but LU is 3,628× faster for $n=10$ and astronomically faster for larger matrices."],
+      reviewSection: 'Rigor tab — Computational complexity'
     }
   ]
 };

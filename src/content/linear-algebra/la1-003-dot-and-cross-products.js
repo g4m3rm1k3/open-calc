@@ -11,7 +11,7 @@ export default {
   timeToComplete: 25,
   coreConcept: 'The dot product measures how much two vectors align (producing a scalar), while the cross product measures how perpendicular they are (producing a new vector in 3D).',
   prerequisites: ['la1-002'],
-  nextLesson: 'matrices-as-transformations',
+  nextLesson: 'la1-004',
 
   hook: {
     question: "If you push an object along a train track, does a force pushing sideways help you move the train forward?",
@@ -21,8 +21,9 @@ export default {
 
   intuition: {
     prose: [
-      '**Where you are in the story:** You can add, scale, and build spaces from vectors. But vectors also interact geometrically. We need a way to multiply them to measure angles, areas, and alignments.',
+      'Take $\\mathbf{u} = [3, 0]^T$ and $\\mathbf{v} = [0, 4]^T$. Multiply matching components and sum: $(3)(0) + (0)(4) = 0$. Zero means exactly perpendicular. Now try $\\mathbf{u} = [3, 0]^T$ and $\\mathbf{w} = [1, 0]^T$ (both pointing right): $(3)(1) + (0)(0) = 3$ — positive, because they fully agree in direction. This component-multiply-and-sum operation is the **dot product**, and its sign is the universal test for directional agreement between any two vectors in any dimension.',
       'Think of the **Dot Product** as the ultimate measure of agreement. If two vectors point in exactly the same direction, their dot product is large. If they point in opposite directions, it is large and negative. If they are perfectly perpendicular — they have absolutely nothing in common — their dot product is exactly zero. The dot product crushes two vectors down into a single scalar.',
+      '**Predict before reading on:** Take $\\mathbf{p} = [1, 1]^T$ (pointing at 45°) and $\\mathbf{q} = [-1, 1]^T$ (pointing at 135°). Predict the sign of $\\mathbf{p}\\cdot\\mathbf{q}$: positive, zero, or negative? Compute it and check whether the result matches your geometric intuition.',
       'Geometrically, the dot product is shining a flashlight down onto one vector and seeing how long its shadow is on the other vector. This "shadow" is called a *projection*. Multiplying the shadow length by the length of the vector it lies on gives the dot product.',
       'The **Cross Product** is the opposite: it measures disagreement. Defined only in 3D, when you cross two 3D arrows, the result is a brand new 3D vector with two magical properties: (1) Its length equals the area of the parallelogram formed by the original two vectors, and (2) it points completely perpendicular to BOTH original vectors.',
       '**Where this is heading:** The dot product is the foundation of matrix multiplication. When you multiply a row of a matrix by a column vector, you are doing a dot product. Orthogonality (dot product = 0) will eventually lead to the Singular Value Decomposition (SVD).',
@@ -47,6 +48,11 @@ export default {
         type: 'insight',
         title: 'The Compass Needle Analogy for Dot Product Sign',
         body: 'Imagine $\\mathbf{w}$ is a compass needle pointing North. The dot product $\\mathbf{v} \\cdot \\mathbf{w}$ tells you: **positive** if $\\mathbf{v}$ has any Northward component (angle < 90°), **zero** if $\\mathbf{v}$ points perfectly East or West (angle = 90°), **negative** if $\\mathbf{v}$ has any Southward component (angle > 90°).',
+      },
+      {
+        type: 'procedure',
+        title: 'Procedure: Computing the Angle Between Two Vectors',
+        body: 'Step 1. Compute the dot product: $\\mathbf{u}\\cdot\\mathbf{v} = u_1v_1 + u_2v_2 + \\cdots$\nStep 2. Compute magnitudes: $\\|\\mathbf{u}\\| = \\sqrt{\\mathbf{u}\\cdot\\mathbf{u}}$, $\\|\\mathbf{v}\\| = \\sqrt{\\mathbf{v}\\cdot\\mathbf{v}}$\nStep 3. Divide: $\\cos\\theta = (\\mathbf{u}\\cdot\\mathbf{v})/(\\|\\mathbf{u}\\|\\|\\mathbf{v}\\|)$\nStep 4. $\\theta = \\arccos(\\cos\\theta)$\n\nOrthogonality shortcut: skip steps 2–4. If $\\mathbf{u}\\cdot\\mathbf{v} = 0$, the vectors are perpendicular.',
       },
       {
         type: 'warning',
@@ -136,8 +142,8 @@ dot(w, w)`,
 b = [1; 0];
 
 d = dot(a, b)
-na = norm(a)
-nb = norm(b)
+na = sqrt(dot(a, a))
+nb = sqrt(dot(b, b))
 cos_theta = d / (na * nb)
 theta_deg = rad2deg(acos(cos_theta))
 
@@ -270,7 +276,7 @@ b = np.array([3.0, 3.0])
 
   examples: [
     {
-      id: 'ex-la1-003-1',
+      id: 'la1-003-ex1',
       title: 'Calculating a Dot Product',
       problem: 'Compute $\\mathbf{v} \\cdot \\mathbf{w}$ where $\\mathbf{v} = \\begin{bmatrix} 3 \\\\ -2 \\end{bmatrix}$ and $\\mathbf{w} = \\begin{bmatrix} 4 \\\\ 5 \\end{bmatrix}$.',
       steps: [
@@ -296,7 +302,7 @@ b = np.array([3.0, 3.0])
       conclusion: 'The dot product is 2. A positive result confirms the angle is acute — the vectors partially agree in direction.',
     },
     {
-      id: 'ex-la1-003-2',
+      id: 'la1-003-ex2',
       title: 'Checking for Orthogonality',
       problem: 'Determine if $\\mathbf{a} = \\begin{bmatrix} 6 \\\\ -3 \\end{bmatrix}$ and $\\mathbf{b} = \\begin{bmatrix} 1 \\\\ 2 \\end{bmatrix}$ are perpendicular.',
       steps: [
@@ -316,7 +322,7 @@ b = np.array([3.0, 3.0])
       conclusion: 'Because the dot product is exactly 0, the vectors are perpendicular (orthogonal). This test takes seconds and works in any dimension.',
     },
     {
-      id: 'ex-la1-003-3',
+      id: 'la1-003-ex3',
       title: 'Finding the Angle Between Two Vectors',
       problem: 'Find the angle between $\\mathbf{u} = \\begin{bmatrix} 1 \\\\ 1 \\end{bmatrix}$ and $\\mathbf{v} = \\begin{bmatrix} 1 \\\\ 0 \\end{bmatrix}$.',
       steps: [
@@ -348,7 +354,7 @@ b = np.array([3.0, 3.0])
       conclusion: 'The angle is 45°. Procedure: (1) compute dot product, (2) compute magnitudes, (3) divide to get $\\cos\\theta$, (4) take arccos. Works in any dimension.',
     },
     {
-      id: 'ex-la1-003-4',
+      id: 'la1-003-ex4',
       title: 'Computing a 3D Cross Product',
       problem: 'Compute $\\mathbf{u} \\times \\mathbf{v}$ for $\\mathbf{u} = \\begin{bmatrix} 2 \\\\ -1 \\\\ 3 \\end{bmatrix}$ and $\\mathbf{v} = \\begin{bmatrix} 1 \\\\ 4 \\\\ -1 \\end{bmatrix}$. Verify the result is perpendicular to both $\\mathbf{u}$ and $\\mathbf{v}$.',
       steps: [
@@ -389,79 +395,80 @@ b = np.array([3.0, 3.0])
 
   challenges: [
     {
-      id: 'ch-la1-003-1',
+      id: 'la1-003-ch1',
       difficulty: 'easy',
       problem: 'Calculate the dot product of $\\begin{bmatrix} 0 \\\\ -7 \\end{bmatrix}$ and $\\begin{bmatrix} 4 \\\\ 2 \\end{bmatrix}$. Is the angle acute, right, or obtuse?',
       hint: 'Multiply the top numbers together, multiply the bottom numbers together, and sum.',
       walkthrough: [
-        '**Set up:** $\\mathbf{v} \\cdot \\mathbf{w} = v_1 w_1 + v_2 w_2 = (0)(4) + (-7)(2)$.',
-        '**Compute products:** $(0)(4) = 0$ and $(-7)(2) = -14$.',
-        '**Sum:** $0 + (-14) = -14$.',
-        '**Interpret the sign:** The result is negative, so $\\cos\\theta < 0$, which means $\\theta > 90°$ — the angle is obtuse.',
-        '**Verify direction intuition:** $[0,-7]^T$ points straight down and $[4,2]^T$ points right-and-up — they are in "opposite" half-spaces, confirming an obtuse angle.',
+        { expression: '\\mathbf{v}\\cdot\\mathbf{w} = (0)(4) + (-7)(2) = 0 + (-14)', annotation: 'Apply the dot product formula: multiply matching components and sum the products.' },
+        { expression: '= -14', annotation: 'The result is negative, so $\\cos\\theta < 0$, meaning $\\theta > 90\\degree$ \u2014 the angle is obtuse.' },
+        { expression: '[0,-7]^T\\text{ points down},\\quad [4,2]^T\\text{ points right-up}', annotation: 'Direction check: one points down, the other up-right. They face opposite half-spaces, confirming an obtuse angle.' },
       ],
-      answer: '$-14$; the angle is obtuse (greater than 90°).',
+      answer: 'The dot product is $-14$; the angle is obtuse (greater than 90\\degree) because the result is negative.',
     },
     {
-      id: 'ch-la1-003-2',
+      id: 'la1-003-ch2',
       difficulty: 'medium',
       problem: 'Find the missing component $x$ so that $\\mathbf{v} = \\begin{bmatrix} x \\\\ 4 \\end{bmatrix}$ and $\\mathbf{w} = \\begin{bmatrix} 2 \\\\ -3 \\end{bmatrix}$ are orthogonal.',
       hint: 'Set the dot product equal to 0 (orthogonality condition) and solve for $x$.',
       walkthrough: [
-        '**Set up:** $\\mathbf{v} \\cdot \\mathbf{w} = 0$ for orthogonality. Compute: $(x)(2) + (4)(-3) = 0$.',
-        '**Simplify:** $2x - 12 = 0$.',
-        '**Solve:** $2x = 12 \\Rightarrow x = 6$.',
-        '**Verify:** $[6,4]^T \\cdot [2,-3]^T = (6)(2) + (4)(-3) = 12 - 12 = 0$ ✓.',
-        '**Geometric check:** The vector $[6,4]^T$ and $[2,-3]^T$ are perpendicular. Confirm visually: one goes up-right, the other goes right-and-down — they form an L shape.',
+        { expression: '\\mathbf{v}\\cdot\\mathbf{w}=0 \\Rightarrow (x)(2)+(4)(-3)=0', annotation: 'Set the dot product to zero: orthogonality requires the sum of component products to equal zero.' },
+        { expression: '2x - 12 = 0 \\Rightarrow x = 6', annotation: 'Solve the resulting linear equation: $2x = 12$, so $x = 6$.' },
+        { expression: '[6,4]^T\\cdot[2,-3]^T = 12-12 = 0\\checkmark', annotation: 'Verify: substitute $x=6$ and confirm the dot product is exactly zero.' },
       ],
-      answer: '$x = 6$',
+      answer: '$x = 6$ \u2014 the vector $[6, 4]^T$ is orthogonal to $[2, -3]^T$, confirmed by dot product equal to zero.',
     },
     {
-      id: 'ch-la1-003-3',
+      id: 'la1-003-ch3',
       difficulty: 'hard',
       problem: 'Compute $\\mathbf{u} \\times \\mathbf{v}$ for $\\mathbf{u} = [2,-1,3]^T$ and $\\mathbf{v} = [1,4,-1]^T$. Then verify that $\\mathbf{u} \\times \\mathbf{v}$ is perpendicular to both $\\mathbf{u}$ and $\\mathbf{v}$.',
       hint: 'Use the cross product formula: component $i$ = $(u_2v_3 - u_3v_2)$, component $j$ = $(u_3v_1 - u_1v_3)$, component $k$ = $(u_1v_2 - u_2v_1)$. The indices cycle.',
       walkthrough: [
-        '**Component 1:** $(u_2v_3 - u_3v_2) = (-1)(-1) - (3)(4) = 1 - 12 = -11$.',
-        '**Component 2:** $(u_3v_1 - u_1v_3) = (3)(1) - (2)(-1) = 3 + 2 = 5$.',
-        '**Component 3:** $(u_1v_2 - u_2v_1) = (2)(4) - (-1)(1) = 8 + 1 = 9$.',
-        '**Result:** $\\mathbf{u} \\times \\mathbf{v} = [-11, 5, 9]^T$.',
-        '**Verify perpendicularity:** $[-11,5,9]\\cdot[2,-1,3] = -22-5+27 = 0$ ✓ and $[-11,5,9]\\cdot[1,4,-1] = -11+20-9 = 0$ ✓.',
+        { expression: '(\\mathbf{u}\\times\\mathbf{v})_1 = (-1)(-1)-(3)(4) = 1-12 = -11', annotation: 'First component uses rows 2 and 3. Pattern: (row2 of u)(row3 of v) minus (row3 of u)(row2 of v).' },
+        { expression: '(\\mathbf{u}\\times\\mathbf{v})_2 = (3)(1)-(2)(-1) = 3+2 = 5', annotation: 'Second component uses rows 3 and 1 (cyclic shift). Indices cycle: 1\u21922\u21923\u21921.' },
+        { expression: '(\\mathbf{u}\\times\\mathbf{v})_3 = (2)(4)-(-1)(1) = 8+1 = 9', annotation: 'Third component uses rows 1 and 2.' },
+        { expression: '[-11,5,9]\\cdot[2,-1,3]=-22-5+27=0\\checkmark,\\quad[-11,5,9]\\cdot[1,4,-1]=-11+20-9=0\\checkmark', annotation: 'Verify perpendicularity: dot the result with BOTH original vectors. Both must equal zero \u2014 this is the universal self-check for any cross product.' },
       ],
-      answer: '$[-11, 5, 9]^T$',
+      answer: '$[-11, 5, 9]^T$ is perpendicular to both $\\mathbf{u}$ and $\\mathbf{v}$, verified by both dot products equaling zero.',
     },
   ],
 
   semantics: {
     core: [
-      { symbol: '\\mathbf{v} \\cdot \\mathbf{w}', meaning: 'Dot Product: measures alignment between $\\mathbf{v}$ and $\\mathbf{w}$. Returns a scalar.' },
-      { symbol: '\\mathbf{v} \\times \\mathbf{w}', meaning: 'Cross Product: produces a vector perpendicular to both $\\mathbf{v}$ and $\\mathbf{w}$. Returns a 3D vector.' },
-      { symbol: '\\mathbf{v} \\cdot \\mathbf{w} = 0', meaning: 'Orthogonality condition: vectors are perfectly perpendicular.' },
+      { symbol: '\\mathbf{v} \\cdot \\mathbf{w}', meaning: 'Dot product: sum of component products. Positive = vectors share a direction, zero = perpendicular, negative = opposing directions.' },
+      { symbol: '\\mathbf{v} \\times \\mathbf{w}', meaning: 'Cross product (3D only): a new vector perpendicular to both inputs, with magnitude equal to the parallelogram area.' },
+      { symbol: '\\mathbf{v} \\cdot \\mathbf{w} = 0', meaning: 'Orthogonality condition: the two vectors are perfectly perpendicular, sharing no directional component.' },
+      { symbol: '\\|\\mathbf{v}\\|^2 = \\mathbf{v}\\cdot\\mathbf{v}', meaning: 'Squared magnitude: dot a vector with itself to get length-squared without computing a square root.' },
+      { symbol: '\\cos\\theta = \\mathbf{u}\\cdot\\mathbf{v}/(\\|\\mathbf{u}\\|\\|\\mathbf{v}\\|)', meaning: 'Angle formula: rearrange the geometric dot product definition to isolate the angle between two vectors in any dimension.' },
     ],
     rulesOfThumb: [
-      'Dot product: fastest way to check for 90° angles in any dimension.',
-      'Cross product: use when you need a new axis pointing out of a 3D plane.',
-      'A dot product of a vector with itself: $\\mathbf{v}\\cdot\\mathbf{v} = \\|\\mathbf{v}\\|^2$.',
+      'Dot product: fastest way to check for 90\u00b0 angles in any dimension \u2014 one computation, no arccos needed.',
+      'Cross product: use when you need a vector pointing out of a 3D plane (normals, torque, area).',
+      '$\\mathbf{v}\\cdot\\mathbf{v} = \\|\\mathbf{v}\\|^2$ \u2014 a faster path to squared magnitude than the distance formula.',
+      'For the cross product, always verify by dotting the result with both originals \u2014 both must be zero.',
+      'Dot and cross are complementary: dot uses $\\cos\\theta$ (measures alignment), cross uses $\\sin\\theta$ (measures divergence).',
     ],
   },
 
   spiral: {
     recoveryPoints: [
-      { lessonId: 'algebra-trig', label: 'Trigonometry: Cosine and Sine', note: 'cos(0)=1 (complete alignment), cos(90°)=0 (orthogonal), cos(180°)=-1 (opposite). This maps exactly to dot product behavior.' },
+      { lessonId: 'algebra-trig', label: 'Trigonometry: Cosine and Sine', note: 'cos(0)=1 (full alignment), cos(90\u00b0)=0 (orthogonal), cos(180\u00b0)=\u22121 (opposite). This maps exactly to dot product sign behavior.' },
     ],
     futureLinks: [
-      { lessonId: 'la2-002', label: 'Matrix Multiplication', note: 'Multiplying two matrices is doing many dot products simultaneously between rows and columns.' },
+      { lessonId: 'la2-002', label: 'Matrix Multiplication', note: 'Multiplying two matrices is computing many dot products simultaneously \u2014 one for every (row, column) pair.' },
+      { lessonId: 'la1-005', label: 'Lines and Planes', note: 'The normal vector to a plane is the cross product of two edge vectors; the dot product with the normal tests whether a point lies on the plane.' },
     ],
   },
 
   assessment: {
     questions: [
       {
-        id: 'assess-la1-003-1',
-        type: 'input',
-        text: 'Are the vectors $[5, 2]^T$ and $[-2, 5]^T$ orthogonal? Type exactly "Yes" or "No".',
-        answer: 'Yes',
-        hint: '$(5)(-2) + (2)(5) = -10 + 10 = 0$ → dot product is zero → orthogonal.',
+        id: 'la1-003-assess-1',
+        type: 'choice',
+        text: 'Are the vectors $[5, 2]^T$ and $[-2, 5]^T$ orthogonal?',
+        options: ['Yes \u2014 their dot product is zero', 'No \u2014 their dot product is non-zero', 'Cannot be determined without knowing their magnitudes', 'Yes \u2014 they have the same magnitude'],
+        answer: 'Yes \u2014 their dot product is zero',
+        hint: '$(5)(-2) + (2)(5) = -10 + 10 = 0$. A dot product of exactly zero means perpendicular (orthogonal).',
       },
     ],
   },
@@ -475,14 +482,19 @@ b = np.array([3.0, 3.0])
   ],
 
   checkpoints: [
-    { id: 'cp-la1-003-1', question: 'What does a dot product of zero tell you about two vectors?', answer: 'They are orthogonal (perpendicular) — the angle between them is exactly 90°.' },
-    { id: 'cp-la1-003-2', question: 'How do you find the angle $\\theta$ between two vectors using the dot product?', answer: '$\\theta = \\arccos\\!\\left(\\frac{\\mathbf{u}\\cdot\\mathbf{v}}{\\|\\mathbf{u}\\|\\|\\mathbf{v}\\|}\\right)$' },
-    { id: 'cp-la1-003-3', question: 'How do you verify a cross product result is correct?', answer: 'Dot the result with both original vectors — both dot products must be zero (perpendicularity check).' },
+    { id: 'cp-la1-003-1', label: 'Read: Define dot product and its geometric meaning', type: 'read' },
+    { id: 'cp-la1-003-2', label: 'Read: State the orthogonality condition', type: 'read' },
+    { id: 'cp-la1-003-3', label: 'Read: State the cross product formula and right-hand rule', type: 'read' },
+    { id: 'cp-la1-003-4', label: 'Run: OpenMAT cell \u2014 compute dot product and angle', type: 'lab' },
+    { id: 'cp-la1-003-5', label: 'Run: Python cell \u2014 cross product and perpendicularity check', type: 'lab' },
+    { id: 'cp-la1-003-6', label: 'Complete: Example 1 \u2014 compute a dot product', type: 'example' },
+    { id: 'cp-la1-003-7', label: 'Complete: Example 3 \u2014 find the angle between two vectors', type: 'example' },
+    { id: 'cp-la1-003-8', label: 'Attempt: Challenge 3 \u2014 compute and verify a 3D cross product', type: 'challenge' },
   ],
 
   quiz: [
     {
-      id: 'quiz-la1-003-1',
+      id: 'la1-003-quiz-1',
       type: 'choice',
       text: 'What does the Dot Product mathematically tell you?',
       options: [
@@ -496,7 +508,7 @@ b = np.array([3.0, 3.0])
       reviewSection: 'Intuition tab — Shadow of the Dot Product',
     },
     {
-      id: 'quiz-la1-003-2',
+      id: 'la1-003-quiz-2',
       type: 'choice',
       text: 'If you compute the cross product of two vectors lying flat on your desk (in the XY plane), where will the resulting vector point?',
       options: [
@@ -510,7 +522,7 @@ b = np.array([3.0, 3.0])
       reviewSection: 'Intuition tab — Cross Product',
     },
     {
-      id: 'quiz-la1-003-3',
+      id: 'la1-003-quiz-3',
       type: 'choice',
       text: 'The dot product of a vector $\\mathbf{v}$ with itself, $\\mathbf{v} \\cdot \\mathbf{v}$, equals what?',
       options: [
@@ -524,7 +536,7 @@ b = np.array([3.0, 3.0])
       reviewSection: 'Math tab — Dot Product',
     },
     {
-      id: 'quiz-la1-003-4',
+      id: 'la1-003-quiz-4',
       type: 'choice',
       text: 'If $\\mathbf{u} \\cdot \\mathbf{v} > 0$, then the angle $\\theta$ between them satisfies:',
       options: [
@@ -538,7 +550,7 @@ b = np.array([3.0, 3.0])
       reviewSection: 'Intuition tab — Compass analogy',
     },
     {
-      id: 'quiz-la1-003-5',
+      id: 'la1-003-quiz-5',
       type: 'choice',
       text: 'Why is the cross product only defined in $\\mathbb{R}^3$?',
       options: [
@@ -552,13 +564,64 @@ b = np.array([3.0, 3.0])
       reviewSection: 'Intuition tab — Cross Product',
     },
     {
-      id: 'quiz-la1-003-6',
+      id: 'la1-003-quiz-6',
       type: 'choice',
       text: 'Two vectors $\\mathbf{u} = [3, 0, 0]^T$ and $\\mathbf{v} = [0, 5, 0]^T$. What is $\\|\\mathbf{u} \\times \\mathbf{v}\\|$?',
       options: ['0', '8', '15', '$\\sqrt{34}$'],
       answer: '15',
       hints: ['$\\|\\mathbf{u}\\| = 3$, $\\|\\mathbf{v}\\| = 5$, angle between them = 90° (perpendicular). $\\|\\mathbf{u}\\times\\mathbf{v}\\| = \\|\\mathbf{u}\\|\\|\\mathbf{v}\\|\\sin(90°) = 3 \\times 5 \\times 1 = 15$. This is the area of the $3\\times 5$ rectangle they form.'],
-      reviewSection: 'Math tab — Cross Product magnitude',
+      reviewSection: 'Math tab \u2014 Cross Product magnitude',
     },
   ],
+
+  misconceptions: [
+    {
+      falseBelief: 'A larger dot product always means the vectors are more aligned.',
+      whyStudentsThinkIt: 'Students conflate the raw magnitude of the dot product with the angle, forgetting that longer vectors produce larger dot products even if their angle is the same.',
+      correctionExample: '$[100, 0]^T \\cdot [100, 0]^T = 10000$, but $[1, 0]^T \\cdot [1, 0]^T = 1$ \u2014 both pairs have angle 0\u00b0. The dot product value depends on both angle AND magnitudes.',
+      contrastCase: 'To measure angle alone, divide by magnitudes: $\\cos\\theta = (\\mathbf{u}\\cdot\\mathbf{v})/(\\|\\mathbf{u}\\|\\|\\mathbf{v}\\|)$. This normalizes out the size effect.',
+    },
+    {
+      falseBelief: 'The cross product is commutative: $\\mathbf{u}\\times\\mathbf{v} = \\mathbf{v}\\times\\mathbf{u}$.',
+      whyStudentsThinkIt: 'Students treat the cross product like multiplication of numbers, where $ab = ba$.',
+      correctionExample: '$[1,0,0]^T\\times[0,1,0]^T = [0,0,1]^T$ (pointing up), but $[0,1,0]^T\\times[1,0,0]^T = [0,0,-1]^T$ (pointing down) \u2014 the sign flips.',
+      contrastCase: 'The cross product is anti-commutative: $\\mathbf{u}\\times\\mathbf{v} = -(\\mathbf{v}\\times\\mathbf{u})$. Use the right-hand rule to determine which direction your specific pair gives.',
+    },
+  ],
+
+  transferPrompts: [
+    {
+      situation: 'A CNC machinist is checking whether a cutting tool force vector $\\mathbf{F} = [8, 6, 0]^T$ is doing useful work in the feed direction $\\mathbf{d} = [1, 0, 0]^T$. What fraction of the force is effective?',
+      competingTechniques: ['Measuring angles with a protractor', 'Dot product projection'],
+      whyThisTechniqueWins: 'The effective component is the dot product projection: $(\\mathbf{F}\\cdot\\hat{\\mathbf{d}}) = 8$. Total force magnitude is 10. So only 80% is effective. This generalizes to any direction in any dimension instantly.',
+    },
+    {
+      situation: 'A 3D graphics shader needs to decide how brightly to illuminate a triangle face. The light direction is $\\mathbf{L}$ and the face normal is $\\mathbf{n}$. How should it compute brightness?',
+      competingTechniques: ['Angle-based lookup table', 'Dot product of normal and light direction'],
+      whyThisTechniqueWins: 'Brightness = $\\max(0, \\hat{\\mathbf{n}}\\cdot\\hat{\\mathbf{L}})$. When normal and light fully align (angle 0\u00b0), brightness = 1. When perpendicular, brightness = 0. This runs in one GPU operation per pixel.',
+    },
+  ],
+
+  debugging: [
+    {
+      commonError: 'Forgetting to divide by magnitudes when computing the angle.',
+      symptom: 'Student uses $\\arccos(\\mathbf{u}\\cdot\\mathbf{v})$ directly and gets a domain error or wrong angle.',
+      whyItHappened: 'The formula $\\cos\\theta = \\mathbf{u}\\cdot\\mathbf{v}/(\\|\\mathbf{u}\\|\\|\\mathbf{v}\\|)$ requires dividing, but students remember only the numerator.',
+      repairStrategy: 'Write the formula explicitly before computing: $\\cos\\theta = (\\mathbf{u}\\cdot\\mathbf{v})/(\\|\\mathbf{u}\\|\\|\\mathbf{v}\\|)$. Compute numerator and denominator separately, then divide.',
+    },
+    {
+      commonError: 'Getting the wrong sign on the second component of a cross product.',
+      symptom: 'The perpendicularity check fails for one of the two original vectors.',
+      whyItHappened: 'The second component formula is $u_3v_1 - u_1v_3$, which has a sign reversal compared to the other two components \u2014 easy to miss under time pressure.',
+      repairStrategy: 'Use the mnemonic: first component positive, second component negative sign (or swap the formula order), third positive. Always run the perpendicularity check \u2014 dot with both originals, both must be zero.',
+    },
+  ],
+
+  mastery: {
+    targetLevel: 2,
+    solveIndependently: 'Compute dot products, check orthogonality, find angles between vectors, and compute 3D cross products with perpendicularity verification.',
+    explainVerbally: 'Describe why the dot product can be negative, why it equals zero for perpendicular vectors, and why the cross product is anti-commutative.',
+    detectIncorrectApplication: 'Recognize when someone applies the cross product in 2D (invalid), or computes an angle without dividing by magnitudes.',
+    transferToUnfamiliar: 'Compute the vector projection of $\\mathbf{b}$ onto $\\mathbf{a}$ using $\\text{proj}_{\\mathbf{a}}(\\mathbf{b}) = (\\mathbf{b}\\cdot\\mathbf{a}/\\mathbf{a}\\cdot\\mathbf{a})\\mathbf{a}$ and verify the remainder $\\mathbf{b}-\\text{proj}$ is perpendicular to $\\mathbf{a}$.',
+  },
 };

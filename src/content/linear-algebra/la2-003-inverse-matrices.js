@@ -62,6 +62,12 @@ export default {
         mathBridge: 'Observe the yellow 1x1 unit square. Its area is exactly 1. As you slide the transformation matrix slider, watch the matrix morph. Note how the area of the yellow square perfectly matches the calculated Determinant at all times. Finally, push the slider until the columns become parallel (Dependent). Watch the determinant hit exactly 0 as the square flattens into a 1D line. The key lesson: A determinant of 0 destroys area irreparably.',
         caption: 'The determinant visually tracks the scaling factor of the grid\'s area.',
       },
+      {
+        id: 'LALesson05_MatrixMult',
+        title: 'A then A⁻¹ = Identity',
+        mathBridge: 'Set the first transformation to any invertible matrix A (try a shear or rotation). Then set the second transformation to its inverse A⁻¹ (use the formula: swap main diagonal, negate off-diagonal, scale by 1/det). Press "compose" and watch the combined transformation snap back to the identity — the grid returns to its original, undistorted state. This is the meaning of $A^{-1}A = I$: the inverse perfectly cancels the original warp.',
+        caption: 'Composing A with its inverse returns the grid exactly to where it started — the identity transformation.',
+      },
     ],
   },
 
@@ -314,7 +320,7 @@ C = np.array([[2., -1.], [4., 3.]])
   // ── Examples ───────────────────────────────────────────────────
   examples: [
     {
-      id: "ex-1",
+      id: "la2-003-ex1",
       title: "Finding an Inverse",
       problem: "Let $A = \\begin{bmatrix} 4 & 2 \\\\ 3 & 2 \\end{bmatrix}$. Find $A^{-1}$.",
       steps: [
@@ -343,7 +349,7 @@ C = np.array([[2., -1.], [4., 3.]])
       conclusion: "The inverse matrix is [1, -1; -1.5, 2]. If you multiply this matrix by A, you will get the Identity matrix."
     },
     {
-      id: "ex-2",
+      id: "la2-003-ex2",
       title: "Solving a System",
       problem: "Given $A = \\begin{bmatrix} 4 & 2 \\\\ 3 & 2 \\end{bmatrix}$ (from above), solve the equation $A\\vec{x} = \\begin{bmatrix} 10 \\\\ 8 \\end{bmatrix}$ for the unknown vector $\\vec{x}$.",
       steps: [
@@ -370,13 +376,42 @@ C = np.array([[2., -1.], [4., 3.]])
         }
       ],
       conclusion: "The original input vector must have been [2, 1]. We played the transformation in reverse on the output vector [10, 8] to find where it started."
+    },
+    {
+      id: "la2-003-ex3",
+      title: "Identifying a Singular Matrix",
+      problem: "Without a calculator, determine whether $B = \\begin{bmatrix} 6 & 9 \\\\ 2 & 3 \\end{bmatrix}$ is invertible. If not, explain why geometrically.",
+      steps: [
+        {
+          expression: "\\det(B) = (6)(3) - (9)(2) = 18 - 18 = 0",
+          annotation: "Compute $ad - bc$. Both cross-products evaluate to 18, so they cancel perfectly. The determinant is exactly 0.",
+          strategyTitle: "Compute the determinant",
+          checkpoint: "What does a determinant of 0 mean geometrically?",
+          hints: ["$\\det = 0$ means the two column vectors land on the same line. Space collapses from 2D to 1D — area is permanently destroyed."],
+        },
+        {
+          expression: "\\text{Column 2} = \\tfrac{3}{2} \\times \\text{Column 1}: \\quad \\begin{bmatrix}9 \\\\ 3\\end{bmatrix} = 1.5 \\cdot \\begin{bmatrix}6 \\\\ 2\\end{bmatrix}",
+          annotation: "Column 2 is a scalar multiple of column 1 — they are linearly dependent. Both $\\hat{i}$ and $\\hat{j}$ land on the exact same line, so the entire 2D plane collapses onto that line. No information about the perpendicular direction survives.",
+          strategyTitle: "Geometric reason: columns are proportional",
+          checkpoint: "",
+          hints: [],
+        },
+        {
+          expression: "B^{-1} \\text{ does not exist.}",
+          annotation: "The formula $B^{-1} = \\frac{1}{\\det(B)} \\begin{bmatrix} d & -b \\\\ -c & a \\end{bmatrix}$ requires dividing by $\\det(B) = 0$, which is undefined. The transformation is irreversible: infinitely many input vectors all map to the same output line, so you cannot reconstruct which input produced a given output.",
+          strategyTitle: "Conclude: B is singular, no inverse exists",
+          checkpoint: "",
+          hints: [],
+        }
+      ],
+      conclusion: "Matrix B is singular (det = 0) because its columns are proportional. The transformation crushes the 2D plane onto a single line, permanently destroying the perpendicular component of every input vector. No inverse can recover that lost dimension."
     }
   ],
 
   // ── Challenges ─────────────────────────────────────────────────
   challenges: [
     {
-      id: "ch-1",
+      id: "la2-003-ch1",
       difficulty: "easy",
       problem: "Calculate the determinant of $\\begin{bmatrix} 5 & 3 \\\\ 4 & 2 \\end{bmatrix}$.",
       hint: "Use the formula ad - bc.",
@@ -397,7 +432,7 @@ C = np.array([[2., -1.], [4., 3.]])
       answer: "-2"
     },
     {
-      id: "ch-2",
+      id: "la2-003-ch2",
       difficulty: "medium",
       problem: "Given a $2 \\times 2$ matrix with columns $[1, 2]^T$ and $[3, c]^T$. For what value of $c$ does the matrix have NO inverse (is singular)?",
       hint: "A matrix is singular when its determinant is exactly 0. Set up the determinant equation with c, and set it equal to 0.",
@@ -420,6 +455,31 @@ C = np.array([[2., -1.], [4., 3.]])
         }
       ],
       answer: "6"
+    },
+    {
+      id: "la2-003-ch3",
+      difficulty: "hard",
+      problem: "A 2D encryption scheme transforms the message vector $\\mathbf{m} = \\begin{bmatrix} 3 \\\\ 5 \\end{bmatrix}$ using the key matrix $K = \\begin{bmatrix} 3 & 5 \\\\ 1 & 2 \\end{bmatrix}$, producing the ciphertext $\\mathbf{c} = K\\mathbf{m}$. (a) Compute $\\mathbf{c}$. (b) Find $K^{-1}$. (c) Verify that $K^{-1}\\mathbf{c}$ recovers $\\mathbf{m}$.",
+      hint: "Use the 2×2 inverse formula: $K^{-1} = \\frac{1}{ad-bc}\\begin{bmatrix}d & -b \\\\ -c & a\\end{bmatrix}$. For part (c), apply $K^{-1}$ to $\\mathbf{c}$ and check that you get back $\\mathbf{m} = [3, 5]^T$.",
+      walkthrough: [
+        {
+          expression: "\\mathbf{c} = \\begin{bmatrix} 3 & 5 \\\\ 1 & 2 \\end{bmatrix}\\begin{bmatrix} 3 \\\\ 5 \\end{bmatrix} = \\begin{bmatrix} 9+25 \\\\ 3+10 \\end{bmatrix} = \\begin{bmatrix} 34 \\\\ 13 \\end{bmatrix}",
+          annotation: "Apply $K$ to $\\mathbf{m}$ via row-dot-column. This is the 'encrypted' output."
+        },
+        {
+          expression: "\\det(K) = (3)(2) - (5)(1) = 6 - 5 = 1",
+          annotation: "$\\det = 1$: the transformation preserves area exactly. This also means the inverse formula has a clean $1/1$ scalar — ideal for a key matrix."
+        },
+        {
+          expression: "K^{-1} = \\frac{1}{1}\\begin{bmatrix} 2 & -5 \\\\ -1 & 3 \\end{bmatrix} = \\begin{bmatrix} 2 & -5 \\\\ -1 & 3 \\end{bmatrix}",
+          annotation: "Swap the main diagonal entries ($3$ and $2$), negate the off-diagonal entries ($5$ becomes $-5$, $1$ becomes $-1$), then scale by $1/\\det = 1$."
+        },
+        {
+          expression: "K^{-1}\\mathbf{c} = \\begin{bmatrix} 2 & -5 \\\\ -1 & 3 \\end{bmatrix}\\begin{bmatrix} 34 \\\\ 13 \\end{bmatrix} = \\begin{bmatrix} 68-65 \\\\ -34+39 \\end{bmatrix} = \\begin{bmatrix} 3 \\\\ 5 \\end{bmatrix} = \\mathbf{m}",
+          annotation: "Applying $K^{-1}$ to the ciphertext perfectly recovers the original message. The inverse matrix 'plays the encryption backwards.'"
+        }
+      ],
+      answer: "$\\mathbf{c} = \\begin{bmatrix} 34 \\\\ 13 \\end{bmatrix}$, $\\; K^{-1} = \\begin{bmatrix} 2 & -5 \\\\ -1 & 3 \\end{bmatrix}$, $\\; K^{-1}\\mathbf{c} = \\begin{bmatrix} 3 \\\\ 5 \\end{bmatrix} = \\mathbf{m}$"
     }
   ],
 
@@ -468,7 +528,7 @@ C = np.array([[2., -1.], [4., 3.]])
   assessment: {
     questions: [
       {
-        id: "assess-1",
+        id: "la2-003-assess-1",
         type: "input",
         text: "What is the determinant of the matrix [[1, 2], [2, 4]]?",
         answer: "0",
@@ -488,19 +548,21 @@ C = np.array([[2., -1.], [4., 3.]])
 
   // ── Checkpoints ──────────────────────────────────────────────────
   checkpoints: [
-    'read-intuition',
-    'read-math',
-    'read-rigor',
-    'completed-example-1',
-    'completed-example-2',
-    'attempted-challenge-easy',
-    'attempted-challenge-medium',
+    { id: 'cp-la2-003-1', label: 'Read intuition — understand why det = 0 means no inverse', type: 'read' },
+    { id: 'cp-la2-003-2', label: 'Read math — trace the 2×2 inverse formula by hand', type: 'read' },
+    { id: 'cp-la2-003-3', label: 'Read rigor — study the Invertible Matrix Theorem (9 equivalences)', type: 'read' },
+    { id: 'cp-la2-003-4', label: 'Run OpenMAT cell 1 — compute det manually and verify via MATLAB', type: 'lab' },
+    { id: 'cp-la2-003-5', label: 'Run OpenMAT cell 3 — use backslash to solve Ax=b (not inv)', type: 'lab' },
+    { id: 'cp-la2-003-6', label: 'Complete example 1: trace the 2×2 inverse formula step by step', type: 'example' },
+    { id: 'cp-la2-003-7', label: 'Complete example 2: recover the input vector by applying A⁻¹', type: 'example' },
+    { id: 'cp-la2-003-8', label: 'Attempt challenge 1: compute det by hand using ad − bc', type: 'challenge' },
+    { id: 'cp-la2-003-9', label: 'Attempt challenge 2: find the value of c that makes the matrix singular', type: 'challenge' },
   ],
 
   // ── Final Quiz ─────────────────────────────────────────────────
   quiz: [
     {
-      id: 'quiz-1',
+      id: 'la2-003-quiz-1',
       type: 'choice',
       text: "If a 3x3 transformation matrix has a determinant of 0, what does it physically mean geometrically?",
       options: [
@@ -514,7 +576,7 @@ C = np.array([[2., -1.], [4., 3.]])
       reviewSection: 'Intuition tab — Determinant of 0'
     },
     {
-      id: 'quiz-2',
+      id: 'la2-003-quiz-2',
       type: 'choice',
       text: "If a matrix has linearly dependent columns (where the second column is just a scaled copy of the first), what will its determinant be?",
       options: [
@@ -526,6 +588,62 @@ C = np.array([[2., -1.], [4., 3.]])
       answer: "Exactly 0.",
       hints: ["If the columns are dependent, they land on the same line. If the basis vectors land on the same line, the grid collapses and area is 0."],
       reviewSection: 'Semantics tab — Rules of Thumb'
+    },
+    {
+      id: 'la2-003-quiz-3',
+      type: 'choice',
+      text: "Matrix $A = \\begin{bmatrix} 2 & 4 \\\\ 1 & 2 \\end{bmatrix}$. What is $\\det(A)$ and what does it tell you about the inverse?",
+      options: [
+        "$\\det = 0$; the matrix is singular and has no inverse.",
+        "$\\det = 8$; the matrix is invertible with a positive determinant.",
+        "$\\det = 0$; the inverse exists but equals the zero matrix.",
+        "$\\det = -4$; the matrix flips orientation but is still invertible."
+      ],
+      answer: "$\\det = 0$; the matrix is singular and has no inverse.",
+      hints: ["$\\det = (2)(2) - (4)(1) = 4 - 4 = 0$. Column 2 = $[4, 2]^T$ is exactly $2 \\times$ column 1 = $[2, 1]^T$. Proportional columns always give $\\det = 0$."],
+      reviewSection: 'Math tab — Determinant formula'
+    },
+    {
+      id: 'la2-003-quiz-4',
+      type: 'choice',
+      text: "Why does the 2×2 inverse formula $A^{-1} = \\frac{1}{ad-bc}\\begin{bmatrix}d & -b \\\\ -c & a\\end{bmatrix}$ break down when $\\det(A) = 0$?",
+      options: [
+        "Division by zero — the formula requires scaling by $1/\\det(A)$, and dividing by 0 is undefined.",
+        "The rearranged matrix $\\begin{bmatrix}d & -b \\\\ -c & a\\end{bmatrix}$ becomes the zero matrix when det = 0.",
+        "The formula only applies to positive determinants.",
+        "The matrix dimensions change when det = 0."
+      ],
+      answer: "Division by zero — the formula requires scaling by $1/\\det(A)$, and dividing by 0 is undefined.",
+      hints: ["The formula multiplies the rearranged matrix by $1/(ad-bc)$. If $ad-bc=0$, you divide by zero. This algebraic impossibility mirrors the geometric reality: you cannot invert a squished space."],
+      reviewSection: 'Math tab — Inverse formula'
+    },
+    {
+      id: 'la2-003-quiz-5',
+      type: 'choice',
+      text: "To solve $A\\mathbf{x} = \\mathbf{b}$, a programmer writes `x = inv(A) * b`. What is the better professional approach?",
+      options: [
+        "Use `A \\\\ b` (MATLAB) or `np.linalg.solve(A, b)` (Python) — LU factorization is faster and numerically stabler than computing the full inverse.",
+        "Use `A' * b` — the transpose avoids numerical issues.",
+        "Use `b / A` — this is the matrix division operator and avoids forming the inverse.",
+        "There is no meaningful difference; `inv(A) * b` is the correct approach."
+      ],
+      answer: "Use `A \\\\ b` (MATLAB) or `np.linalg.solve(A, b)` (Python) — LU factorization is faster and numerically stabler than computing the full inverse.",
+      hints: ["Computing the full $A^{-1}$ wastes computation if all you need is one solution. LU factorization solves $A\\mathbf{x} = \\mathbf{b}$ directly in $O(n^3)$ without materializing $A^{-1}$."],
+      reviewSection: 'Intuition tab — Professional warning callout'
+    },
+    {
+      id: 'la2-003-quiz-6',
+      type: 'choice',
+      text: "If $\\det(A) = -3$, what is $\\det(A^{-1})$?",
+      options: [
+        "$-1/3$ — because $\\det(A) \\cdot \\det(A^{-1}) = \\det(AA^{-1}) = \\det(I) = 1$.",
+        "$3$ — the inverse negates the sign and flips the magnitude.",
+        "$1/3$ — the inverse always has a positive determinant.",
+        "$9$ — the determinant squares when you invert."
+      ],
+      answer: "$-1/3$ — because $\\det(A) \\cdot \\det(A^{-1}) = \\det(AA^{-1}) = \\det(I) = 1$.",
+      hints: ["Use $\\det(AB) = \\det(A)\\det(B)$. Set $B = A^{-1}$: $\\det(A) \\cdot \\det(A^{-1}) = \\det(I) = 1$, so $\\det(A^{-1}) = 1/\\det(A) = 1/(-3) = -1/3$."],
+      reviewSection: 'Rigor tab — Key properties of the determinant'
     }
   ]
 };

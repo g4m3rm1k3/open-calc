@@ -421,7 +421,7 @@ b = np.array([6., 14., 10.])
   // ── Examples ───────────────────────────────────────────────────
   examples: [
     {
-      id: "ex-1",
+      id: "la2-006-ex1",
       title: "Computing LU Decomposition by Hand",
       problem: "Find $L$ and $U$ such that $A = LU$ for $A = \\begin{bmatrix} 2 & 1 & 1 \\\\ 4 & 3 & 3 \\\\ 8 & 7 & 9 \\end{bmatrix}$.",
       steps: [
@@ -457,7 +457,7 @@ b = np.array([6., 14., 10.])
       conclusion: "L stores the elimination multipliers below a diagonal of 1s. U is the upper triangular result of elimination. Together: A = LU. det(A) = product of U's diagonal = 4.",
     },
     {
-      id: "ex-2",
+      id: "la2-006-ex2",
       title: "Solving Ax = b via Forward and Back Substitution",
       problem: "Using the factorization $A = LU$ from Example 1, solve $A\\mathbf{x} = \\begin{bmatrix} 4 \\\\ 10 \\\\ 20 \\end{bmatrix}$.",
       steps: [
@@ -497,7 +497,7 @@ b = np.array([6., 14., 10.])
   // ── Challenges ─────────────────────────────────────────────────
   challenges: [
     {
-      id: "ch-1",
+      id: "la2-006-ch1",
       difficulty: "easy",
       problem: "For $A = \\begin{bmatrix} 3 & 6 \\\\ 1 & 4 \\end{bmatrix}$, find $L$ and $U$ such that $A = LU$. Then compute $\\det(A)$ directly from $U$.",
       hint: "There is only one multiplier: $m_{21} = 1/3$. After the single row replacement, the result is $U$. $L$ has 1s on the diagonal and $m_{21}$ below.",
@@ -518,7 +518,7 @@ b = np.array([6., 14., 10.])
       answer: "det(A) = 6"
     },
     {
-      id: "ch-2",
+      id: "la2-006-ch2",
       difficulty: "medium",
       problem: "Using the LU decomposition $L = \\begin{bmatrix} 1 & 0 & 0 \\\\ 2 & 1 & 0 \\\\ 1 & 3 & 1 \\end{bmatrix}$, $U = \\begin{bmatrix} 2 & 4 & -2 \\\\ 0 & 1 & 5 \\\\ 0 & 0 & 3 \\end{bmatrix}$, solve $A\\mathbf{x} = \\begin{bmatrix} 0 \\\\ 1 \\\\ 8 \\end{bmatrix}$ via forward substitution then back substitution.",
       hint: "Phase 1: Ly = b. y₁ = b₁ = 0, then y₂ = b₂ − 2y₁, then y₃ = b₃ − 1·y₁ − 3·y₂. Phase 2: Ux = y. x₃ = y₃/3, then x₂ = (y₂ − 5x₃)/1, then x₁ = (y₁ − 4x₂ − (−2)x₃)/2.",
@@ -539,7 +539,7 @@ b = np.array([6., 14., 10.])
       answer: "x = [49/3, −22/3, 5/3]"
     },
     {
-      id: "ch-3",
+      id: "la2-006-ch3",
       difficulty: "hard",
       problem: "The matrix $A = \\begin{bmatrix} 0 & 2 & 1 \\\\ 1 & 3 & 2 \\\\ 3 & 2 & 4 \\end{bmatrix}$ requires a row swap before LU decomposition can begin because $a_{11} = 0$. (1) Swap rows 1 and 2 to get $A'$. (2) Compute $L$ and $U$ for $A'$ by Gaussian elimination. (3) What is $\\det(A)$? Remember the row swap affected the sign.",
       hint: "After swapping rows 1 and 2: A' = [[1,3,2],[0,2,1],[3,2,4]]. Then eliminate column 1 of A'. Multiplier m31 = 3/1 = 3. Then eliminate column 2. Record all multipliers into L. det(A) = −det(A') because of the one row swap.",
@@ -621,7 +621,7 @@ b = np.array([6., 14., 10.])
   assessment: {
     questions: [
       {
-        id: "assess-1",
+        id: "la2-006-assess-1",
         type: "choice",
         text: "You need to solve Ax = b for 500 different vectors b, all with the same matrix A. Which approach is computationally cheapest?",
         options: [
@@ -647,20 +647,21 @@ b = np.array([6., 14., 10.])
 
   // ── Checkpoints ──────────────────────────────────────────────────
   checkpoints: [
-    'read-intuition',
-    'read-math',
-    'read-rigor',
-    'completed-example-1',
-    'completed-example-2',
-    'attempted-challenge-easy',
-    'attempted-challenge-medium',
-    'attempted-challenge-hard',
+    { id: 'cp-la2-006-1', label: 'Read intuition — understand how LU stores Gaussian elimination', type: 'read' },
+    { id: 'cp-la2-006-2', label: 'Read math — trace forward and back substitution formulas', type: 'read' },
+    { id: 'cp-la2-006-3', label: 'Read rigor — understand pivoting and the existence theorem', type: 'read' },
+    { id: 'cp-la2-006-4', label: 'Run OpenMAT cell 1 — compute LU with lu() and verify P*A = L*U', type: 'lab' },
+    { id: 'cp-la2-006-5', label: 'Run OpenMAT cell 3 — reuse factorization to solve two systems', type: 'lab' },
+    { id: 'cp-la2-006-6', label: 'Complete example 1: trace all 3 multipliers into L by hand', type: 'example' },
+    { id: 'cp-la2-006-7', label: 'Complete example 2: perform both substitution phases', type: 'example' },
+    { id: 'cp-la2-006-8', label: 'Attempt challenge 1: 2×2 LU and det from U diagonal', type: 'challenge' },
+    { id: 'cp-la2-006-9', label: 'Attempt challenge 3: LU with pivoting on a zero-diagonal matrix', type: 'challenge' },
   ],
 
   // ── Final Quiz ─────────────────────────────────────────────────
   quiz: [
     {
-      id: 'quiz-1',
+      id: 'la2-006-quiz-1',
       type: 'choice',
       text: "What is stored in the matrix $L$ during LU decomposition?",
       options: [
@@ -674,7 +675,7 @@ b = np.array([6., 14., 10.])
       reviewSection: 'Intuition tab — The core observation'
     },
     {
-      id: 'quiz-2',
+      id: 'la2-006-quiz-2',
       type: 'choice',
       text: "Why does partial pivoting improve numerical stability?",
       options: [
@@ -686,6 +687,62 @@ b = np.array([6., 14., 10.])
       answer: "It prevents large multipliers (values greater than 1 in L) by ensuring the pivot is always the largest entry in its column",
       hints: ["If a pivot is small relative to the entries below it, the multiplier m_ik = entry/pivot can be very large. Large multipliers amplify rounding errors. Partial pivoting guarantees |L_ij| ≤ 1 by always choosing the largest available pivot."],
       reviewSection: 'Intuition tab — Partial Pivoting'
+    },
+    {
+      id: 'la2-006-quiz-3',
+      type: 'choice',
+      text: "You need to solve $A\\mathbf{x} = \\mathbf{b}$ for 500 different $\\mathbf{b}$ vectors. You have already computed the LU factorization. How many operations does each subsequent solve require?",
+      options: [
+        "$O(n^2)$ — forward substitution and back substitution each cost $O(n^2)$.",
+        "$O(n^3)$ — same as the original factorization.",
+        "$O(n)$ — since $L$ and $U$ are triangular, each row is solved in one step.",
+        "$O(n^4)$ — the inverse must be recomputed each time."
+      ],
+      answer: "$O(n^2)$ — forward substitution and back substitution each cost $O(n^2)$.",
+      hints: ["Forward substitution (through $L$) requires $n(n-1)/2$ multiply-adds. Back substitution (through $U$) also requires $n(n-1)/2$. Both are $O(n^2)$, far cheaper than the $O(n^3)$ factorization."],
+      reviewSection: 'Math tab — Computational Complexity callout'
+    },
+    {
+      id: 'la2-006-quiz-4',
+      type: 'choice',
+      text: "How is $\\det(A)$ computed from the LU factorization $PA = LU$?",
+      options: [
+        "Product of all entries of $L$ and $U$.",
+        "$\\det(L) \\cdot \\det(U) \\cdot \\det(P)$, which simplifies to $\\pm$ product of $U$'s diagonal entries.",
+        "Trace of $U$ (sum of diagonal entries).",
+        "Rank of $U$."
+      ],
+      answer: "$\\det(L) \\cdot \\det(U) \\cdot \\det(P)$, which simplifies to $\\pm$ product of $U$'s diagonal entries.",
+      hints: ["$\\det(L) = 1$ (L has 1s on diagonal). $\\det(P) = \\pm 1$ (one flip per row swap). $\\det(U)$ = product of diagonal entries. So $\\det(A) = (\\pm 1) \\times \\prod U_{ii}$."],
+      reviewSection: 'Intuition tab — Determinant as byproduct'
+    },
+    {
+      id: 'la2-006-quiz-5',
+      type: 'choice',
+      text: "In forward substitution solving $L\\mathbf{y} = \\mathbf{b}$, you compute $y_3 = b_3 - L_{31}y_1 - L_{32}y_2$. Why can you compute $y_3$ directly without solving a full system?",
+      options: [
+        "Because $L$ is lower triangular: by the time you compute $y_3$, the values $y_1$ and $y_2$ are already known from the previous two rows.",
+        "Because $L$ is always symmetric.",
+        "Because forward substitution runs backward from $y_n$.",
+        "Because $L_{33} = 0$ so the equation simplifies."
+      ],
+      answer: "Because $L$ is lower triangular: by the time you compute $y_3$, the values $y_1$ and $y_2$ are already known from the previous two rows.",
+      hints: ["Lower triangular structure means row $i$ of $L\\mathbf{y} = \\mathbf{b}$ only involves $y_1, y_2, \\ldots, y_i$. Since $y_1$ through $y_{i-1}$ are already computed, $y_i$ follows immediately."],
+      reviewSection: 'Math tab — Forward substitution formula'
+    },
+    {
+      id: 'la2-006-quiz-6',
+      type: 'choice',
+      text: "Which MATLAB/NumPy idiom is correct for solving $A\\mathbf{x} = \\mathbf{b}$ numerically?",
+      options: [
+        "`x = inv(A) * b` in MATLAB — compute the inverse first.",
+        "`x = A \\ b` in MATLAB (or `np.linalg.solve(A, b)` in Python) — use LU decomposition directly.",
+        "`x = det(A) * b` — scale by the determinant.",
+        "`x = A' * b` — use the transpose instead of the inverse."
+      ],
+      answer: "`x = A \\ b` in MATLAB (or `np.linalg.solve(A, b)` in Python) — use LU decomposition directly.",
+      hints: ["Computing `inv(A)` is more expensive AND less numerically stable than solving directly via LU. Professional code always uses `A \\ b` (MATLAB backslash) or `np.linalg.solve(A, b)`, which call LAPACK LU routines internally."],
+      reviewSection: 'Math tab — Never compute A⁻¹ callout'
     }
   ]
 };

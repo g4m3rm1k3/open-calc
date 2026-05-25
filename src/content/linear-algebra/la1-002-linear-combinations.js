@@ -11,7 +11,7 @@ export default {
   timeToComplete: 20,
   coreConcept: 'Every vector in a space can be represented as a scaled sum (linear combination) of fundamental basis vectors. The set of all possible combinations forms the span.',
   prerequisites: ['la1-001'],
-  nextLesson: 'dot-and-cross-products',
+  nextLesson: 'la1-003',
 
   hook: {
     question: "If you only had two arrows, how could you reach any point on an infinite 2D plane?",
@@ -21,9 +21,10 @@ export default {
 
   intuition: {
     prose: [
-      '**Where you are in the story:** In the last lesson, we defined what a vector is. But a single vector by itself is lonely. What happens when we take two vectors and allow ourselves to stretch them, squish them, and add them together? We are about to build entire spaces from scratch.',
+      'Take $\\mathbf{v}_1 = [2, 0]^T$ and $\\mathbf{v}_2 = [0, 1]^T$. Scale $\\mathbf{v}_1$ by $3$ to get $[6, 0]^T$. Scale $\\mathbf{v}_2$ by $-2$ to get $[0, -2]^T$. Add them: $[6, -2]^T$. Change the scalars to $c_1 = 5$, $c_2 = 4$: you get $[10, 4]^T$. Every choice of scalars $(c_1, c_2)$ lands you at a different output vector. This operation — scaling vectors and adding the results — is called a **linear combination**, and it is the engine that drives all of linear algebra.',
       'There are exactly two operations in linear algebra: **scalar multiplication** (stretching or shrinking a vector) and **vector addition** (placing the tail of one vector at the tip of another). When you do both at once — scaling a bunch of vectors and adding them — you have created a **Linear Combination**.',
       'If you have two vectors $\\mathbf{v}$ and $\\mathbf{w}$, ask: "If I scale and add these two vectors in every possible way, what set of points can I reach?" The answer is called the **Span**.',
+      '**Predict before reading on:** Take $\\mathbf{v} = [1, 0]^T$ and $\\mathbf{w} = [2, 0]^T$. Can you reach the point $[0, 1]^T$ using some linear combination $c_1\\mathbf{v} + c_2\\mathbf{w}$? Try to find $c_1, c_2$ that work — hold your answer until the next paragraph.',
       'If $\\mathbf{v}$ and $\\mathbf{w}$ point in totally different directions, you can reach every single point on the 2D plane — their span is the entire 2D universe. But if they point in the exact same direction, you are trapped on a single 1D line. The second vector is redundant. That is **Linearly Dependent**.',
       'If the vectors point in different directions, they are **Linearly Independent**. When a set of vectors spans the entire space AND has zero redundancies, we call it a **Basis** — the absolute minimum number of building blocks needed to construct a universe.',
       '**Where this is heading:** The coordinates $[3, -2]$ are a secret linear combination of the standard basis (3 steps right, 2 steps down). Later, when we get to matrices, a matrix is a machine that moves the basis vectors to new locations, dragging all of space with them.',
@@ -38,6 +39,11 @@ export default {
         type: 'insight',
         title: 'The Coordinate Illusion',
         body: 'When you write $\\begin{bmatrix} 3 \\\\ -2 \\end{bmatrix}$, you are implicitly saying: "Take 3 copies of $\\hat{\\mathbf{i}}$ (the horizontal unit vector) and $-2$ copies of $\\hat{\\mathbf{j}}$ (the vertical unit vector)." Coordinates ARE the scalar multipliers in a linear combination.',
+      },
+      {
+        type: 'procedure',
+        title: 'Procedure: Testing Linear Independence',
+        body: 'Step 1. Write $c_1\\mathbf{v}_1 + c_2\\mathbf{v}_2 + \\cdots + c_k\\mathbf{v}_k = \\mathbf{0}$.\nStep 2. Match each component row to get one scalar equation per row.\nStep 3. Solve the resulting system for $c_1, c_2, \\ldots, c_k$.\nStep 4. If the only solution is all $c_i = 0$ → **linearly independent**.\nStep 5. If any non-zero solution exists → **linearly dependent**; write the explicit relationship.',
       },
       {
         type: 'warning',
@@ -260,7 +266,8 @@ P1_machine = G54_offset + P1_part
 P2_machine = G54_offset + P2_part
 G55_offset = [300; 80; 0];
 P1_new = G55_offset + P1_part
-norm(P1_part - P2_part)   % distance unchanged by offset`,
+diff_vec = P1_part - P2_part;
+sqrt(dot(diff_vec, diff_vec))   % distance unchanged by offset`,
             },
           ],
         },
@@ -304,7 +311,7 @@ norm(P1_part - P2_part)   % distance unchanged by offset`,
 
   examples: [
     {
-      id: 'ex-la1-002-1',
+      id: 'la1-002-ex1',
       title: 'Computing a Linear Combination',
       problem: 'Given $\\mathbf{u} = \\begin{bmatrix} 1 \\\\ -2 \\end{bmatrix}$ and $\\mathbf{v} = \\begin{bmatrix} 3 \\\\ 1 \\end{bmatrix}$, compute the linear combination $2\\mathbf{u} - \\mathbf{v}$.',
       steps: [
@@ -330,7 +337,7 @@ norm(P1_part - P2_part)   % distance unchanged by offset`,
       conclusion: 'The resulting vector is $[-1, -5]^T$. Geometrically: walk twice as far along $\\mathbf{u}$, then walk backward along $\\mathbf{v}$.',
     },
     {
-      id: 'ex-la1-002-2',
+      id: 'la1-002-ex2',
       title: 'Checking for Linear Dependence',
       problem: 'Are $\\mathbf{v}_1 = \\begin{bmatrix} 4 \\\\ 6 \\end{bmatrix}$ and $\\mathbf{v}_2 = \\begin{bmatrix} -2 \\\\ -3 \\end{bmatrix}$ linearly independent?',
       steps: [
@@ -356,7 +363,7 @@ norm(P1_part - P2_part)   % distance unchanged by offset`,
       conclusion: 'The vectors are linearly dependent because $\\mathbf{v}_2 = (-1/2)\\mathbf{v}_1$. Their span is a 1D line, not the full 2D plane.',
     },
     {
-      id: 'ex-la1-002-3',
+      id: 'la1-002-ex3',
       title: 'Expressing a Vector as a Linear Combination',
       problem: 'Express $\\mathbf{b} = \\begin{bmatrix} 7 \\\\ -3 \\end{bmatrix}$ as $c_1\\mathbf{v}_1 + c_2\\mathbf{v}_2$ where $\\mathbf{v}_1 = \\begin{bmatrix} 2 \\\\ 1 \\end{bmatrix}$ and $\\mathbf{v}_2 = \\begin{bmatrix} 1 \\\\ -1 \\end{bmatrix}$.',
       steps: [
@@ -411,58 +418,57 @@ norm(P1_part - P2_part)   % distance unchanged by offset`,
 
   challenges: [
     {
-      id: 'ch-la1-002-1',
+      id: 'la1-002-ch1',
       difficulty: 'easy',
       problem: 'Compute $3\\begin{bmatrix} 2 \\\\ 1 \\end{bmatrix} + 2\\begin{bmatrix} -1 \\\\ 4 \\end{bmatrix}$.',
       hint: 'Scale both vectors first (multiply each component by the scalar), then add component-by-component.',
       walkthrough: [
-        '**Scale both vectors:** $3[2,1]^T = [6,3]^T$ and $2[-1,4]^T = [-2,8]^T$.',
-        '**Add component-by-component:** top: $6 + (-2) = 4$; bottom: $3 + 8 = 11$.',
-        '**Result:** $[4, 11]^T$.',
-        '**Verify:** $3(2)+2(-1) = 6-2 = 4$ ✓ and $3(1)+2(4) = 3+8 = 11$ ✓.',
-        '**Interpretation:** You walked 3 steps in the $[2,1]$ direction, then 2 steps in the $[-1,4]$ direction. Combined displacement: $[4,11]$.',
+        { expression: '3[2,1]^T = [6,3]^T,\\quad 2[-1,4]^T = [-2,8]^T', annotation: 'Scale each vector separately: multiply every component by its scalar weight.' },
+        { expression: '[6,3]^T + [-2,8]^T = [4,11]^T', annotation: 'Add component-by-component: top 6+(\u22122)=4, bottom 3+8=11.' },
+        { expression: '3(2)+2(-1)=4\\checkmark,\\quad 3(1)+2(4)=11\\checkmark', annotation: 'Verify by substituting directly into the original formula to confirm no arithmetic error.' },
       ],
-      answer: '\\begin{bmatrix} 4 \\\\ 11 \\end{bmatrix}',
+      answer: '$\\begin{bmatrix} 4 \\\\ 11 \\end{bmatrix}$ \u2014 you walked 3 steps along $[2,1]^T$ then 2 steps along $[-1,4]^T$.',
     },
     {
-      id: 'ch-la1-002-2',
+      id: 'la1-002-ch2',
       difficulty: 'medium',
       problem: 'Are the vectors $\\begin{bmatrix} 1 \\\\ 0 \\end{bmatrix}$ and $\\begin{bmatrix} 0 \\\\ 1 \\end{bmatrix}$ linearly independent?',
       hint: 'Set up $c_1[1,0]^T + c_2[0,1]^T = [0,0]^T$ and read off the equations.',
       walkthrough: [
-        '**Set up:** $c_1[1,0]^T + c_2[0,1]^T = [0,0]^T$.',
-        '**Top component:** $c_1(1) + c_2(0) = 0 \\Rightarrow c_1 = 0$.',
-        '**Bottom component:** $c_1(0) + c_2(1) = 0 \\Rightarrow c_2 = 0$.',
-        '**Conclusion:** Only the trivial solution $c_1 = c_2 = 0$ exists — the vectors are **linearly independent**.',
-        '**These are $\\hat{\\mathbf{i}}$ and $\\hat{\\mathbf{j}}$** — the standard basis vectors. They are perpendicular and span all of $\\mathbb{R}^2$. This is the prototypical independent pair.',
+        { expression: 'c_1[1,0]^T + c_2[0,1]^T = [0,0]^T', annotation: 'Set up the independence test: find all scalars making the combination equal to the zero vector.' },
+        { expression: 'c_1 = 0,\\quad c_2 = 0', annotation: 'Top component gives c\u2081\u00b71=0 \u2192 c\u2081=0; bottom gives c\u2082\u00b71=0 \u2192 c\u2082=0. The only solution is trivial.' },
+        { expression: '\\Rightarrow \\text{Linearly INDEPENDENT}', annotation: 'Only the trivial solution exists. These are \u00ee and \u0135 \u2014 the standard basis vectors, the prototypical independent pair that spans all of \u211d\u00b2.' },
       ],
-      answer: 'Yes, linearly independent.',
+      answer: 'Yes, linearly independent \u2014 these are $\\hat{\\mathbf{i}}$ and $\\hat{\\mathbf{j}}$, which are perpendicular and together span all of $\\mathbb{R}^2$.',
     },
     {
-      id: 'ch-la1-002-3',
+      id: 'la1-002-ch3',
       difficulty: 'hard',
       problem: 'Are $[1,2,3]^T$, $[4,5,6]^T$, $[7,8,9]^T$ linearly independent? Use the rank test.',
       hint: 'Stack as rows, row-reduce. Notice the arithmetic pattern: differences between consecutive rows are all equal.',
       walkthrough: [
-        '**Spot the pattern:** Row 2 $-$ Row 1 $= [3,3,3]^T$ and Row 3 $-$ Row 2 $= [3,3,3]^T$. The differences are equal — strong sign of dependence.',
-        '**Row reduce:** $\\xrightarrow{R_2-4R_1,\\;R_3-7R_1} \\begin{bmatrix}1&2&3\\\\0&-3&-6\\\\0&-6&-12\\end{bmatrix} \\xrightarrow{R_3-2R_2} \\begin{bmatrix}1&2&3\\\\0&-3&-6\\\\0&0&0\\end{bmatrix}$',
-        '**Row 3 becomes all zeros** — rank$(M) = 2 < 3$.',
-        '**Conclusion:** Linearly **dependent**. Explicit relationship: $\\mathbf{v}_3 = 2\\mathbf{v}_2 - \\mathbf{v}_1$.',
-        '**Geometric meaning:** All three vectors lie on the same 2D plane through the origin in $\\mathbb{R}^3$ — they cannot span all of 3D space.',
+        { expression: 'M = \\begin{bmatrix}1&2&3\\\\4&5&6\\\\7&8&9\\end{bmatrix}', annotation: 'Stack vectors as rows. Spot the pattern: Row2\u2212Row1=[3,3,3] and Row3\u2212Row2=[3,3,3] \u2014 equal differences signal dependence before any computation.' },
+        { expression: '\\xrightarrow{R_2-4R_1,\\;R_3-7R_1}\\begin{bmatrix}1&2&3\\\\0&-3&-6\\\\0&-6&-12\\end{bmatrix}\\xrightarrow{R_3-2R_2}\\begin{bmatrix}1&2&3\\\\0&-3&-6\\\\0&0&0\\end{bmatrix}', annotation: 'Row reduce: subtract multiples of Row 1 to clear the first column, then use Row 2 to eliminate Row 3 entirely.' },
+        { expression: '\\text{rank}(M)=2<3 \\Rightarrow \\text{Linearly DEPENDENT},\\quad \\mathbf{v}_3 = 2\\mathbf{v}_2 - \\mathbf{v}_1', annotation: 'A zero row means rank < 3. All three vectors lie on the same 2D plane through the origin in \u211d\u00b3 and cannot span the full 3D space.' },
       ],
-      answer: 'Linearly dependent (rank = 2).',
+      answer: 'Linearly dependent \u2014 rank$(M)=2<3$, with explicit relationship $\\mathbf{v}_3 = 2\\mathbf{v}_2 - \\mathbf{v}_1$.',
     },
   ],
 
   semantics: {
     core: [
-      { symbol: 'c_1\\mathbf{v}_1 + c_2\\mathbf{v}_2', meaning: 'Linear combination: $c_1$ = scalar weight for $\\mathbf{v}_1$, $c_2$ = scalar weight for $\\mathbf{v}_2$' },
-      { symbol: '\\text{Span}(\\mathbf{v}_1, \\mathbf{v}_2)', meaning: 'All vectors reachable via every possible linear combination of $\\mathbf{v}_1$ and $\\mathbf{v}_2$' },
+      { symbol: 'c_1\\mathbf{v}_1 + c_2\\mathbf{v}_2', meaning: 'Linear combination: scale each vector by its weight, then add. Scalars $c_1, c_2$ control how much of each direction you take.' },
+      { symbol: '\\text{Span}(\\mathbf{v}_1, \\mathbf{v}_2)', meaning: 'All vectors reachable by every possible linear combination \u2014 the infinite universe these vectors can build.' },
+      { symbol: '\\text{rank}(A)', meaning: 'Number of independent columns in $A$; equals the dimension of the span of the columns.' },
+      { symbol: 'c_1\\mathbf{v}_1 + \\cdots + c_k\\mathbf{v}_k = \\mathbf{0}', meaning: 'Independence test: if the only solution is all $c_i=0$, vectors are independent; any non-zero solution reveals dependence.' },
+      { symbol: '\\text{Basis for } \\mathbb{R}^n', meaning: 'Exactly $n$ vectors that are linearly independent AND span $\\mathbb{R}^n$ \u2014 the minimal non-redundant coordinate toolkit.' },
     ],
     rulesOfThumb: [
-      'To combine vectors, scale first, then add component by component.',
-      'If vectors lie on the same line through the origin, they are dependent.',
-      'A basis gives you a coordinate system. A space can have infinitely many different bases.',
+      'To compute a linear combination: scale each vector first, then add component by component.',
+      'If two vectors lie on the same line through the origin, they are dependent \u2014 their span is 1D regardless of their magnitudes.',
+      'A basis for $\\mathbb{R}^n$ has exactly $n$ vectors \u2014 not more, not fewer.',
+      'rank$(A)$ = number of independent directions in $A$ = dimension of the column span.',
+      '"Is $\\mathbf{b}$ in the span?" is the same question as "Does $A\\mathbf{c} = \\mathbf{b}$ have a solution?"',
     ],
   },
 
@@ -471,18 +477,20 @@ norm(P1_part - P2_part)   % distance unchanged by offset`,
       { lessonId: 'la1-001', label: 'What is a vector?', note: 'Be comfortable visualizing a column matrix as an arrow before combining multiples of them.' },
     ],
     futureLinks: [
-      { lessonId: 'la2-001', label: 'Matrices as Transformations', note: 'A matrix is a compact way to write a linear combination of its column vectors.' },
+      { lessonId: 'la2-001', label: 'Matrices as Transformations', note: 'A matrix-vector product $A\\mathbf{x}$ is a linear combination of the columns of $A$, weighted by the entries of $\\mathbf{x}$ \u2014 the column picture of multiplication.' },
+      { lessonId: 'la1-004', label: 'Systems of Equations', note: '"Can $\\mathbf{b}$ be written as a linear combination of the columns?" is exactly the question Gaussian elimination answers.' },
     ],
   },
 
   assessment: {
     questions: [
       {
-        id: 'assess-la1-002-1',
-        type: 'input',
-        text: 'Compute $2[1, 5]^T - [3, 2]^T$. Give the answer as [top, bottom].',
-        answer: '[-1, 8]',
-        hint: 'Scale: $[2,10]^T$. Subtract: $[2-3, 10-2]^T = [-1, 8]^T$.',
+        id: 'la1-002-assess-1',
+        type: 'choice',
+        text: 'Compute $2[1, 5]^T - [3, 2]^T$.',
+        options: ['$[-1, 8]^T$', '$[5, 12]^T$', '$[-1, 3]^T$', '$[1, 8]^T$'],
+        answer: '$[-1, 8]^T$',
+        hint: 'Scale first: $2[1,5]^T = [2,10]^T$. Then subtract component-by-component: $[2-3,\\; 10-2]^T = [-1, 8]^T$.',
       },
     ],
   },
@@ -496,14 +504,19 @@ norm(P1_part - P2_part)   % distance unchanged by offset`,
   ],
 
   checkpoints: [
-    { id: 'cp-la1-002-1', question: 'What is a linear combination of vectors $\\mathbf{v}_1$ and $\\mathbf{v}_2$?', answer: 'Any expression $c_1\\mathbf{v}_1 + c_2\\mathbf{v}_2$ where $c_1, c_2$ are real scalars.' },
-    { id: 'cp-la1-002-2', question: 'What does it mean for two vectors to be linearly dependent?', answer: 'One is a scalar multiple of the other — equivalently, $c_1\\mathbf{v}_1 + c_2\\mathbf{v}_2 = \\mathbf{0}$ has a non-trivial solution.' },
-    { id: 'cp-la1-002-3', question: 'What two requirements must a set of vectors satisfy to form a basis?', answer: '(1) Linearly independent — no redundancies. (2) Spans the space — reaches everywhere.' },
+    { id: 'cp-la1-002-1', label: 'Read: Define linear combination and span', type: 'read' },
+    { id: 'cp-la1-002-2', label: 'Read: State the linear independence test', type: 'read' },
+    { id: 'cp-la1-002-3', label: 'Read: Define basis and its two requirements', type: 'read' },
+    { id: 'cp-la1-002-4', label: 'Run: Python cell \u2014 compute and visualize linear combinations', type: 'lab' },
+    { id: 'cp-la1-002-5', label: 'Run: OpenMAT cell \u2014 column picture of matrix-vector product', type: 'lab' },
+    { id: 'cp-la1-002-6', label: 'Complete: Example 1 \u2014 compute a linear combination', type: 'example' },
+    { id: 'cp-la1-002-7', label: 'Complete: Example 2 \u2014 check linear dependence', type: 'example' },
+    { id: 'cp-la1-002-8', label: 'Attempt: Challenge 3 \u2014 rank test for three 3D vectors', type: 'challenge' },
   ],
 
   quiz: [
     {
-      id: 'quiz-la1-002-1',
+      id: 'la1-002-quiz-1',
       type: 'choice',
       text: "What defines a 'basis' of a vector space?",
       options: [
@@ -517,7 +530,7 @@ norm(P1_part - P2_part)   % distance unchanged by offset`,
       reviewSection: 'Math tab — Basis definition',
     },
     {
-      id: 'quiz-la1-002-2',
+      id: 'la1-002-quiz-2',
       type: 'choice',
       text: 'Three vectors in $\\mathbb{R}^2$ (like $[1,0]^T$, $[0,1]^T$, $[1,1]^T$) are always:',
       options: [
@@ -531,7 +544,7 @@ norm(P1_part - P2_part)   % distance unchanged by offset`,
       reviewSection: 'Rigor tab — Dimension inequality',
     },
     {
-      id: 'quiz-la1-002-3',
+      id: 'la1-002-quiz-3',
       type: 'choice',
       text: 'What is the span of two linearly independent vectors in $\\mathbb{R}^2$?',
       options: [
@@ -545,7 +558,7 @@ norm(P1_part - P2_part)   % distance unchanged by offset`,
       reviewSection: 'Intuition tab — Span',
     },
     {
-      id: 'quiz-la1-002-4',
+      id: 'la1-002-quiz-4',
       type: 'choice',
       text: 'How many vectors must be in a basis for $\\mathbb{R}^3$?',
       options: ['1', '2', '3', '4 or more'],
@@ -554,7 +567,7 @@ norm(P1_part - P2_part)   % distance unchanged by offset`,
       reviewSection: 'Math tab — Basis',
     },
     {
-      id: 'quiz-la1-002-5',
+      id: 'la1-002-quiz-5',
       type: 'choice',
       text: 'The vectors $[1, 0]^T$ and $[-3, 0]^T$ are linearly ________ because ________.',
       options: [
@@ -568,7 +581,7 @@ norm(P1_part - P2_part)   % distance unchanged by offset`,
       reviewSection: 'Intuition tab — Linear Dependence',
     },
     {
-      id: 'quiz-la1-002-6',
+      id: 'la1-002-quiz-6',
       type: 'choice',
       text: 'The coordinates $[5, 7]^T$ relative to the standard basis mean:',
       options: [
@@ -582,4 +595,55 @@ norm(P1_part - P2_part)   % distance unchanged by offset`,
       reviewSection: 'Intuition tab — Coordinate Illusion',
     },
   ],
+
+  misconceptions: [
+    {
+      falseBelief: 'The span of two vectors is just those two vectors and the line segment between them.',
+      whyStudentsThinkIt: 'Students visualize "combining" as joining two specific points, forgetting that scalars range over all real numbers \u2014 including negatives and fractions.',
+      correctionExample: 'Span([1,0]\u1d40, [0,1]\u1d40) contains [100,\u221257]\u1d40, [\u03c0, \u221a2]\u1d40, and every other point on the plane \u2014 infinitely many vectors, not two.',
+      contrastCase: 'If scalars were restricted to {0, 1}, you could only reach four specific points. Span requires ALL real scalars.',
+    },
+    {
+      falseBelief: 'Adding more vectors to a set always expands the span.',
+      whyStudentsThinkIt: 'More vectors feels like more coverage; students expect each addition to contribute new directions.',
+      correctionExample: 'Adding [2,4]\u1d40 to {[1,2]\u1d40} does nothing: [2,4]\u1d40 = 2\u00b7[1,2]\u1d40. The span remains a single line.',
+      contrastCase: 'Adding [0,1]\u1d40 to {[1,0]\u1d40} expands span from a line to the full plane \u2014 only because [0,1]\u1d40 points in a genuinely new direction.',
+    },
+  ],
+
+  transferPrompts: [
+    {
+      situation: 'A graphics engineer has pure red=[1,0,0], green=[0,1,0], blue=[0,0,1]. A designer requests color [0.8, 0.2, 0.6]. Can she produce it, and what are the RGB intensity values?',
+      competingTechniques: ['Trial and error with color sliders', 'Linear combination decomposition'],
+      whyThisTechniqueWins: 'Since {red, green, blue} form a basis for color space, every color has a unique decomposition. The answer is directly [0.8, 0.2, 0.6] \u2014 the coordinates ARE the intensity scalars.',
+    },
+    {
+      situation: 'A surveyor has two landmark reference vectors for her coordinate system. Both landmarks happen to lie due North at different distances. Can she express every 2D position in the region as a linear combination of those two reference vectors?',
+      competingTechniques: ['Three-point triangulation', 'Two-vector span test'],
+      whyThisTechniqueWins: 'Both vectors point North \u2014 they are collinear. Their span is a 1D line, not the plane. A span test reveals the system is insufficient before any field measurements are taken.',
+    },
+  ],
+
+  debugging: [
+    {
+      commonError: 'Declaring vectors independent because they look different or have different magnitudes.',
+      symptom: 'Student writes "independent" without performing the zero-sum test.',
+      whyItHappened: 'Visually distinct vectors can still be scalar multiples: [4,6]\u1d40 and [\u22122,\u22123]\u1d40 look different, but [4,6]\u1d40 = \u22122\u00b7[\u22122,\u22123]\u1d40.',
+      repairStrategy: 'Always check proportionality first: compare component ratios. If ratios match, vectors are dependent. For 3+ vectors, compute rank.',
+    },
+    {
+      commonError: 'Confusing the span with the original vectors themselves.',
+      symptom: 'Student says "the span of [1,0] and [0,1] is just those two vectors."',
+      whyItHappened: 'The word "span" is new; students anchor it to the specific examples rather than the infinite generated set.',
+      repairStrategy: 'Substitute specific scalars into the definition and enumerate: c\u2081=5, c\u2082=3 gives [5,3]; c\u2081=100, c\u2082=\u2212\u03c0 also gives a member. The span is infinite \u2014 enumerate three examples to make this concrete.',
+    },
+  ],
+
+  mastery: {
+    targetLevel: 2,
+    solveIndependently: 'Compute any linear combination of 2\u20133 vectors, apply the zero-sum independence test, and determine whether a given target vector lies in the span.',
+    explainVerbally: 'Describe why "is b in the span?" and "does Ac=b have a solution?" are the same question, and why adding a dependent vector never expands the span.',
+    detectIncorrectApplication: 'Identify when a claimed basis is invalid \u2014 e.g., three vectors in \u211d\u00b2, or two parallel vectors claimed to span the plane.',
+    transferToUnfamiliar: 'Determine whether {1, t, t\u00b2} forms a basis for P\u2082 (polynomials of degree \u22642) by analogy with the standard basis in \u211d\u00b3.',
+  },
 };

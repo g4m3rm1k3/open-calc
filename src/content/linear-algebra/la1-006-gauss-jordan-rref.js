@@ -8,24 +8,35 @@ export default {
   tags: ['RREF', 'row reduction', 'Gauss-Jordan', 'pivot', 'free variable', 'augmented matrix', 'solution types'],
   aliases: 'reduced row echelon form RREF Gauss-Jordan elimination pivot column free variable unique solution inconsistent infinite solutions parametric',
 
+  timeToComplete: 30,
+  coreConcept: 'Gauss-Jordan elimination reduces any augmented matrix to RREF — a canonical form from which the solution (unique, none, or infinite) can be read directly without back-substitution.',
+  prerequisites: ['la1-004'],
+  nextLesson: 'la2-001',
+
   hook: {
     question: "You have a system of 4 equations in 5 unknowns. Before you start, can you predict how many solutions it will have — and why?",
     realWorldContext: "RREF is the universal algorithm for solving any linear system, finding the rank of any matrix, testing linear independence, and computing null spaces. Every major linear algebra software package (NumPy, MATLAB, Mathematica) uses a variant of this algorithm internally. A data scientist uses it when fitting models with too few observations. A robotics engineer uses it to find the joint angles that achieve a given end-effector position. The algorithm's three outputs — unique solution, no solution, infinite solutions — correspond directly to three geometric configurations you will encounter throughout your career.",
-    previewVisualizationId: 'LALesson04_Systems',
+    previewVisualizationId: 'GaussianEliminationStepper',
   },
 
   intuition: {
     prose: [
-      '**Where you are in the story:** You have seen Gaussian elimination for 2×2 and 3×3 systems. RREF (Reduced Row Echelon Form) is the completion of that idea: go all the way up as well as down, and scale every pivot row so the pivot equals 1. The result is a canonical form from which reading off the solution requires no further work.',
+      'Take the $2 \\times 2$ system: $2x + 4y = 10$ and $x + 3y = 8$. Gaussian elimination gets you to REF in two steps: you end up with $\\left[\\begin{array}{cc|c}1&3&8\\\\0&1&3\\end{array}\\right]$. That is Row Echelon Form \u2014 you still need to back-substitute ($y=3$ \u2192 $x=8-9=-1$). Gauss-Jordan goes one step further: apply $R_1 \\to R_1 - 3R_2$ to get $\\left[\\begin{array}{cc|c}1&0&-1\\\\0&1&3\\end{array}\\right]$. Now the solution reads directly from the last column: $x=-1$, $y=3$. No substitution. That one extra pass is the difference between REF and RREF.',
       '**The three-step Gauss-Jordan process:** (1) Forward elimination — create zeros below each pivot (same as Gaussian elimination). (2) Scale — divide each pivot row by its pivot so the pivot becomes 1. (3) Back-elimination — create zeros ABOVE each pivot as well. The resulting matrix is in RREF.',
       '**Pivot positions matter enormously.** A pivot column is a column that contains a leading 1 (after reduction) with zeros everywhere else in that column. A non-pivot column is a free variable column. The number of pivot columns equals the rank. The number of free variable columns equals the dimension of the null space (the nullity).',
       '**Three outcome cases:**',
+      '**Predict before reading:** You are given the augmented matrix $\\left[\\begin{array}{ccc|c}1&2&3&4\\\\2&4&6&9\\\\3&6&9&12\\end{array}\\right]$. Look at the coefficient block (first three columns). All three rows are multiples of $[1,2,3]$. Without computing, predict: does this system have 0, 1, or infinitely many solutions? Write your answer before working through Challenge 1.',
       '• **Unique solution:** Every variable is a pivot variable (no free variables). The RREF augmented matrix looks like $[I | \\mathbf{c}]$.',
       '• **No solution:** A row of the form $[0\\ 0\\ \\cdots\\ 0\\ |\\ k]$ with $k \\neq 0$ appears — this is a contradiction.',
       '• **Infinitely many solutions:** There are free variables (non-pivot columns in the coefficient part) and no contradictions. The solution is a parametric family.',
       '**The "row of zeros" test is your diagnostic:** If you see $[0\\ 0\\ \\cdots\\ 0\\ |\\ k \\neq 0]$, the system is inconsistent. If you see only $[0\\ 0\\ \\cdots\\ 0\\ |\\ 0]$, the system is consistent with free variables.',
     ],
     callouts: [
+      {
+        type: 'procedure',
+        title: 'Procedure: Gauss-Jordan Elimination (Full RREF)',
+        body: 'Step 1. Form the augmented matrix $[A \\mid \\mathbf{b}]$.\nStep 2. Forward pass \u2014 for each column left to right:\n  a. If no nonzero entry in that column at or below current row: skip (free variable column).\n  b. Swap to bring the best nonzero entry to the current pivot row.\n  c. Scale: divide the pivot row by the pivot entry so pivot = 1.\n  d. Eliminate BELOW: subtract multiples of the pivot row from all rows BELOW.\nStep 3. Back pass \u2014 for each pivot row (bottom to top): eliminate ABOVE by subtracting multiples of the pivot row from all rows ABOVE.\nStep 4. Check the augmented column: any row $[0\\cdots 0 \\mid k \\ne 0]$ \u2192 INCONSISTENT.\nStep 5. Assign parameter $t$ to each free variable. Express pivot variables in terms of parameters.',
+      },
       {
         type: 'sequencing',
         title: 'Lesson 6 of LA1 — Vectors & Spaces',
@@ -59,7 +70,7 @@ export default {
     ],
     visualizations: [
       {
-        id: 'LALesson04_Systems',
+        id: 'GaussianEliminationStepper',
         title: 'RREF Step-by-Step Visualizer',
         mathBridge: 'Enter a 3×4 or 4×5 augmented matrix and step through the full Gauss-Jordan reduction. Each pivot is highlighted in red. The pivot columns turn green once complete. Watch how the three outcome types appear.',
         caption: 'Interactive Gauss-Jordan elimination showing all three solution types.',
@@ -456,8 +467,16 @@ A = np.array([
       { symbol: '\\text{RREF}', meaning: 'Reduced Row Echelon Form — every pivot is 1, zeros above and below each pivot, staircase advancing left to right' },
       { symbol: '\\text{rank}(A)', meaning: 'Number of pivot columns — equals the number of nonzero rows in RREF' },
       { symbol: '\\text{nullity}(A)', meaning: 'Number of free variable columns — equals n minus rank(A)' },
+      { symbol: '[0\\;0\\;\\cdots\\;0\\mid k\\neq 0]', meaning: 'Contradiction row \u2014 reads 0=k, impossible; system is inconsistent' },
+      { symbol: 'x_j = t_j', meaning: 'Assigning parameter t to free variable x_j \u2014 each free column generates one dimension of the solution family' },
     ],
-    bridges: ['systems-of-equations', 'null-space', 'column-space'],
+    rulesOfThumb: [
+      'Pivot in augmented column \u2192 inconsistent (no solution).',
+      'Free variable columns = n \u2212 rank(A) \u2014 each adds one dimension to the solution family.',
+      'RREF is unique: every matrix has exactly one RREF, regardless of the row operations used.',
+      'REF only eliminates below pivots; RREF eliminates above too \u2014 always go to RREF to read answers directly.',
+      'For code: sympy.Matrix.rref() for exact results; np.linalg.matrix_rank() to count pivots.',
+    ],
   },
 
   spiral: {
@@ -467,6 +486,7 @@ A = np.array([
     futureLinks: [
       { lessonId: 'la2-004', label: 'Null Space and Column Space', note: 'The null space of A is the solution set of Ax = 0. RREF reveals it directly: free variable columns give the null space basis vectors.' },
       { lessonId: 'la6-004', label: 'Rank-Nullity Theorem', note: 'rank(A) + nullity(A) = n is the formal statement of the counting identity you observed here. It is one of the deepest results in linear algebra.' },
+      { lessonId: 'la2-001', label: 'Matrices as Transformations', note: 'Each elementary row operation corresponds to multiplying by an invertible matrix. The RREF process is secretly a product of elementary matrices \u2014 the algebraic machinery of Chapter 2 makes this precise.' },
     ],
   },
 
@@ -485,11 +505,22 @@ A = np.array([
     { id: 'cp-la1-006-4', question: 'What is the difference between Gaussian elimination and Gauss-Jordan elimination?', answer: 'Gaussian elimination creates zeros only BELOW pivots (reaching REF). Gauss-Jordan creates zeros both ABOVE and BELOW every pivot (reaching RREF), so the solution can be read without back-substitution.' },
   ],
 
-  assessment: { questions: [] },
+  assessment: {
+    questions: [
+      {
+        id: 'la1-006-assess-1',
+        type: 'choice',
+        text: 'A consistent system has 5 unknowns and rank(A) = 3. How many free variables are there?',
+        options: ['2', '3', '5', '1'],
+        answer: '2',
+        hint: 'Free variables = n \u2212 rank(A) = 5 \u2212 3 = 2.',
+      },
+    ],
+  },
 
   quiz: [
     {
-      id: 'la1-006-q1',
+      id: 'la1-006-quiz-1',
       type: 'choice',
       text: 'A system has 4 equations and 6 unknowns. The coefficient matrix has rank 3. How many free variables are there?',
       options: ['1', '2', '3', '4'],
@@ -498,7 +529,7 @@ A = np.array([
       reviewSection: 'Math tab — RREF and rank',
     },
     {
-      id: 'la1-006-q2',
+      id: 'la1-006-quiz-2',
       type: 'choice',
       text: 'After row reducing an augmented matrix, you get the row $[0\\ 0\\ 0\\ |\\ 5]$. What does this mean?',
       options: [
@@ -512,7 +543,7 @@ A = np.array([
       reviewSection: 'Intuition tab — three outcome cases',
     },
     {
-      id: 'la1-006-q3',
+      id: 'la1-006-quiz-3',
       type: 'choice',
       text: 'What is the RREF of the 2×2 identity matrix?',
       options: [
@@ -526,7 +557,7 @@ A = np.array([
       reviewSection: 'Intuition tab — RREF definition',
     },
     {
-      id: 'la1-006-q4',
+      id: 'la1-006-quiz-4',
       type: 'choice',
       text: 'What does Gauss-Jordan elimination do that ordinary Gaussian elimination does NOT?',
       options: [
@@ -540,7 +571,7 @@ A = np.array([
       reviewSection: 'Intuition tab — three-step Gauss-Jordan process',
     },
     {
-      id: 'la1-006-q5',
+      id: 'la1-006-quiz-5',
       type: 'choice',
       text: 'A consistent system $A\\mathbf{x} = \\mathbf{b}$ has rank($A$) = $n$, where $n$ is the number of unknowns. How many solutions does it have?',
       options: [
@@ -554,7 +585,7 @@ A = np.array([
       reviewSection: 'Math tab — Solution Existence and Uniqueness',
     },
     {
-      id: 'la1-006-q6',
+      id: 'la1-006-quiz-6',
       type: 'choice',
       text: 'In the RREF of a system, variable $x_3$ corresponds to a non-pivot column. This means:',
       options: [
@@ -568,7 +599,7 @@ A = np.array([
       reviewSection: 'Intuition tab — Free Variables Need a Parameter Name',
     },
     {
-      id: 'la1-006-q7',
+      id: 'la1-006-quiz-7',
       type: 'choice',
       text: 'You have a $3 \\times 5$ augmented matrix (3 equations, 4 unknowns). Its RREF has exactly 2 pivot columns among the coefficient columns. The system is consistent. How many free variables are there?',
       options: ['2', '1', '3', '4'],
