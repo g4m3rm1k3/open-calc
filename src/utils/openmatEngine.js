@@ -728,9 +728,21 @@ export function convertSurfaceTo3DConfig(kind, args, plotState) {
     Z = args[args.length - 1];
   }
   const surfaceData = normalizeSurfaceMatrices(X, Y, Z);
-  const zValues = normalizeVector(surfaceData.Z);
-  const zFinite = zValues.filter((value) => Number.isFinite(Number(value))).map(Number);
-  const zRange = zFinite.length ? [Math.min(...zFinite), Math.max(...zFinite)] : [0, 1];
+
+  // Compute tight data extents for auto axis limits
+  const flatX = surfaceData.X.flat().filter(Number.isFinite);
+  const flatY = surfaceData.Y.flat().filter(Number.isFinite);
+  const flatZ = surfaceData.Z.flat().map(Number).filter(Number.isFinite);
+  const autoXlim = flatX.length ? [Math.min(...flatX), Math.max(...flatX)] : [-6, 6];
+  const autoYlim = flatY.length ? [Math.min(...flatY), Math.max(...flatY)] : [-6, 6];
+  const autoZlim = flatZ.length ? [Math.min(...flatZ), Math.max(...flatZ)] : [0, 1];
+  const zRange = flatZ.length ? autoZlim : [0, 1];
+
+  // Use explicit plotState limits if set, otherwise fall back to data extents
+  const xlim = (Array.isArray(plotState.xlim) && plotState.xlim.length >= 2) ? plotState.xlim : autoXlim;
+  const ylim = (Array.isArray(plotState.ylim) && plotState.ylim.length >= 2) ? plotState.ylim : autoYlim;
+  const zlim = (Array.isArray(plotState.zlim) && plotState.zlim.length >= 2) ? plotState.zlim : autoZlim;
+
   return {
     mode: "3d",
     title: plotState.title || `OpenMAT ${kind === "mesh" ? "Mesh" : "Surface"} Lab`,
@@ -740,24 +752,26 @@ export function convertSurfaceTo3DConfig(kind, args, plotState) {
       latex: kind === "mesh" ? "mesh data" : "surface data",
       color: "#6366f1",
       visible: true,
+      plotType: kind === "mesh" ? "mesh" : "surf",
       wireframe: kind === "mesh",
-      opacity: kind === "mesh" ? 1 : 0.82,
+      opacity: kind === "mesh" ? 1 : 0.9,
       surfaceData,
-      colorMap: plotState.colormap,
+      colorMap: plotState.colormap || "parula",
       colorRange: zRange,
     }],
     settings: {
-      range: Math.max(surfaceData.Z.length, surfaceData.Z[0]?.length || 10),
-      resolution: Math.min(128, Math.max(surfaceData.Z.length, surfaceData.Z[0]?.length || 32)),
-      xlim: plotState.xlim,
-      ylim: plotState.ylim,
-      zlim: plotState.zlim,
+      range: Math.max(xlim[1] - xlim[0], ylim[1] - ylim[0], zlim[1] - zlim[0], 4),
+      resolution: Math.min(128, Math.max(surfaceData.Z.length, surfaceData.Z[0]?.length || 32, 32)),
+      xlim,
+      ylim,
+      zlim,
       view: plotState.view,
-      colorbar: plotState.colorbar,
-      colormap: plotState.colormap,
-      xlabel: plotState.xlabel,
-      ylabel: plotState.ylabel,
-      zlabel: plotState.zlabel,
+      colorbar: plotState.colorbar !== false,  // show colorbar by default for surf
+      colormap: plotState.colormap || "parula",
+      xlabel: plotState.xlabel || "X",
+      ylabel: plotState.ylabel || "Y",
+      zlabel: plotState.zlabel || "Z",
+      title: plotState.title || "",
     },
   };
 }
@@ -771,14 +785,32 @@ export function convertPointSeries3DConfig(kind, args, plotState) {
   const numericExtras = extraArgs.filter((arg) => typeof arg !== "string");
   const stringExtras = extraArgs.filter((arg) => typeof arg === "string").map((arg) => String(arg).toLowerCase());
   const filled = stringExtras.includes("filled");
+
+  // Parse MATLAB short color names from string args
+  const matlabColors = { r: "#e84040", g: "#22c55e", b: "#4d7cff", k: "#111111", w: "#ffffff",
+    m: "#d946ef", c: "#06b6d4", y: "#facc15" };
+  const colorStringArg = stringExtras.find((s) => matlabColors[s]);
+  const colorFromString = colorStringArg ? matlabColors[colorStringArg] : null;
+
   let sizeArg = null;
   let colorArg = null;
   if (numericExtras.length >= 1) sizeArg = numericExtras[0];
   if (numericExtras.length >= 2) colorArg = numericExtras[1];
   const sizeValues = sizeArg == null ? [] : normalizeVector(sizeArg).map(Number);
   const colorValues = colorArg == null ? [] : normalizeVector(colorArg).map(Number);
-  const extent = [...xs.slice(0, count), ...ys.slice(0, count), ...zs.slice(0, count)].filter((value) => Number.isFinite(value));
-  const maxAbs = extent.length ? Math.max(...extent.map((value) => Math.abs(value))) : 10;
+
+  // Tight axis limits from the point cloud
+  const xSlice = xs.slice(0, count).filter(Number.isFinite);
+  const ySlice = ys.slice(0, count).filter(Number.isFinite);
+  const zSlice = zs.slice(0, count).filter(Number.isFinite);
+  const pad = (v) => v * 0.05 + 0.5;
+  const autoXlim = xSlice.length ? [Math.min(...xSlice) - pad(Math.abs(Math.min(...xSlice))), Math.max(...xSlice) + pad(Math.abs(Math.max(...xSlice)))] : [-10, 10];
+  const autoYlim = ySlice.length ? [Math.min(...ySlice) - pad(Math.abs(Math.min(...ySlice))), Math.max(...ySlice) + pad(Math.abs(Math.max(...ySlice)))] : [-10, 10];
+  const autoZlim = zSlice.length ? [Math.min(...zSlice) - pad(Math.abs(Math.min(...zSlice))), Math.max(...zSlice) + pad(Math.abs(Math.max(...zSlice)))] : [-10, 10];
+  const xlim = (Array.isArray(plotState.xlim) && plotState.xlim.length >= 2) ? plotState.xlim : autoXlim;
+  const ylim = (Array.isArray(plotState.ylim) && plotState.ylim.length >= 2) ? plotState.ylim : autoYlim;
+  const zlim = (Array.isArray(plotState.zlim) && plotState.zlim.length >= 2) ? plotState.zlim : autoZlim;
+
   const colorFinite = colorValues.filter((value) => Number.isFinite(value));
   return {
     mode: "3d",
@@ -787,7 +819,7 @@ export function convertPointSeries3DConfig(kind, args, plotState) {
     functions: [{
       id: Date.now(),
       latex: kind === "scatter3" ? "scatter3 data" : "plot3 data",
-      color: kind === "scatter3" ? "#f97316" : "#22c55e",
+      color: colorFromString || (kind === "scatter3" ? "#f97316" : "#22c55e"),
       visible: true,
       opacity: kind === "scatter3" ? 0.95 : 1,
       plotType: kind === "scatter3" ? "scatter3" : "line3",
@@ -797,22 +829,23 @@ export function convertPointSeries3DConfig(kind, args, plotState) {
       pointSize: kind === "scatter3" ? 0.14 : 0.1,
       pointSizes: kind === "scatter3" ? sizeValues.slice(0, count) : [],
       colorValues: kind === "scatter3" ? colorValues.slice(0, count) : [],
-      colorMap: plotState.colormap,
+      colorMap: plotState.colormap || "parula",
       colorRange: colorFinite.length ? [Math.min(...colorFinite), Math.max(...colorFinite)] : null,
       filled,
     }],
     settings: {
-      range: Math.max(10, Math.ceil(maxAbs * 2.4)),
+      range: Math.max(xlim[1] - xlim[0], ylim[1] - ylim[0], zlim[1] - zlim[0], 4),
       resolution: 64,
-      xlim: plotState.xlim,
-      ylim: plotState.ylim,
-      zlim: plotState.zlim,
+      xlim,
+      ylim,
+      zlim,
       view: plotState.view,
       colorbar: plotState.colorbar && kind === "scatter3" && colorFinite.length > 0,
-      colormap: plotState.colormap,
-      xlabel: plotState.xlabel,
-      ylabel: plotState.ylabel,
-      zlabel: plotState.zlabel,
+      colormap: plotState.colormap || "parula",
+      xlabel: plotState.xlabel || "X",
+      ylabel: plotState.ylabel || "Y",
+      zlabel: plotState.zlabel || "Z",
+      title: plotState.title || "",
     },
   };
 }

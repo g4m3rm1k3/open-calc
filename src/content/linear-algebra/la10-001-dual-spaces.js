@@ -16,12 +16,17 @@ export default {
 
   intuition: {
     prose: [
-      '**Linear functionals.** A **linear functional** on $V$ is a linear map $f: V \\to \\mathbb{F}$. Examples: (1) Evaluation functional: $\\text{ev}_t: p \\mapsto p(t)$ on the polynomial space $P_n$. (2) Integration: $I: f \\mapsto \\int_0^1 f(x)\\,dx$ on continuous functions. (3) In $\\mathbb{R}^n$: every linear functional has the form $f(\\mathbf{x}) = \\mathbf{a}^\\top \\mathbf{x}$ for some fixed $\\mathbf{a}$.',
+      '**Linear functionals — a concrete start.** Let $V = \\mathbb{R}^2$ with standard basis $\\mathbf{e}_1=(1,0)$, $\\mathbf{e}_2=(0,1)$. The function $f(x,y) = 3x - 2y$ is a **linear functional**: $f(1,0)=3$, $f(0,1)=-2$, $f(2,5)=3(2)-2(5)=-4$. The **dual basis** consists of $e^1(x,y)=x$ and $e^2(x,y)=y$, satisfying $e^1(\\mathbf{e}_1)=1$, $e^1(\\mathbf{e}_2)=0$, $e^2(\\mathbf{e}_1)=0$, $e^2(\\mathbf{e}_2)=1$ (Kronecker delta). Then $f = 3e^1 + (-2)e^2$: check, $3e^1(2,5)+(-2)e^2(2,5)=3(2)+(-2)(5)=-4$ ✓. The **dual space** $V^* = $ all such linear functionals — a new vector space, same dimension as $V$.',
       '**The dual space $V^*$.** The **dual space** of $V$ is $V^* = \\mathcal{L}(V, \\mathbb{F})$ — the set of all linear functionals on $V$. It is itself a vector space (pointwise addition and scalar multiplication). Key fact: $\\dim V^* = \\dim V$ for finite-dimensional spaces. The **dual basis** of a basis $\\{\\mathbf{e}_1, \\ldots, \\mathbf{e}_n\\}$ is $\\{\\mathbf{e}^1, \\ldots, \\mathbf{e}^n\\} \\subset V^*$ defined by $\\mathbf{e}^i(\\mathbf{e}_j) = \\delta^i_j$ (Kronecker delta). In coordinates: if $\\mathbf{v} = \\sum v_j \\mathbf{e}_j$ then $\\mathbf{e}^i(\\mathbf{v}) = v_i$ (picks out the $i$-th coordinate).',
       '**Row vectors as covectors.** In $\\mathbb{R}^n$, a column vector $\\mathbf{x}$ is a point in $\\mathbb{R}^n$. A row vector $\\mathbf{a}^\\top$ is a covector — an element of $(\\mathbb{R}^n)^*$. The action is $\\mathbf{a}^\\top(\\mathbf{x}) = \\mathbf{a}^\\top \\mathbf{x}$ (dot product). This is why $\\mathbf{a}^\\top\\mathbf{x}$ is well-typed: covector applied to vector.',
       '**The double dual $V^{**}$.** The dual of the dual: $V^{**} = (V^*)^*$. There is a natural (basis-independent) isomorphism $\\iota: V \\to V^{**}$ given by $\\iota(\\mathbf{v})(f) = f(\\mathbf{v})$ for $f \\in V^*$. This is an isomorphism for finite-dimensional $V$ (not for infinite-dimensional spaces in general).',
     ],
     callouts: [
+      {
+        type: 'sequencing',
+        title: 'Prediction: dual basis for a non-standard basis',
+        body: 'Let $B = \\{\\mathbf{b}_1=(1,1),\\, \\mathbf{b}_2=(1,-1)\\}$ be a basis of $\\mathbb{R}^2$. **Before computing:** predict — should the dual basis vector $e^1_B$ give $e^1_B(1,1)=1$ and $e^1_B(1,-1)=0$? What formula $e^1_B(x,y) = ax+by$ satisfies both? After predicting, solve the 2×2 system: $a+b=1$ and $a-b=0$, giving $a=b=\\tfrac{1}{2}$, so $e^1_B(x,y)=\\tfrac{x+y}{2}$. Check: $e^1_B(1,1)=1$ ✓, $e^1_B(1,-1)=0$ ✓.',
+      },
       {
         type: 'theorem',
         title: 'Dual Basis Theorem',
@@ -126,9 +131,37 @@ disp('Adjoint check: (Av)^T w = v^T (A^T w):')
   examples: [
     {
       id: 'ex-la10-001-1',
-      title: 'Evaluation functional',
-      problem: 'In $P_2$ (polynomials of degree $\\leq 2$) with standard basis $\\{1, x, x^2\\}$, find the dual basis vector $\\mathbf{e}^2$ (which picks out the $x$ coefficient).',
-      solution: '$\\mathbf{e}^2(a_0 + a_1 x + a_2 x^2) = a_1$. In terms of polynomial operations: $\\mathbf{e}^2 = $ "coefficient of $x$" functional. Explicit formula: $\\mathbf{e}^2(p) = p\'(0)$ (derivative at 0) — the dual basis vector is the derivative functional evaluated at 0.',
+      title: 'Dual basis for a non-standard basis',
+      problem: 'Find the dual basis of $B = \\{\\mathbf{b}_1=(1,1),\\, \\mathbf{b}_2=(1,-1)\\}$ in $\\mathbb{R}^2$. Then express the functional $f(x,y) = 5x + y$ in the dual basis.',
+      steps: [
+        { explanation: 'The dual basis vector $e^1_B$ must satisfy $e^1_B(\\mathbf{b}_1)=1$ and $e^1_B(\\mathbf{b}_2)=0$. Write $e^1_B(x,y) = ax+by$.' },
+        { explanation: 'System: $a+b=1$ (from $e^1_B(1,1)=1$) and $a-b=0$ (from $e^1_B(1,-1)=0$). Solving: $a=\\tfrac{1}{2}$, $b=\\tfrac{1}{2}$, so $e^1_B(x,y) = \\tfrac{x+y}{2}$.' },
+        { explanation: 'For $e^2_B$: $e^2_B(1,1)=0$ and $e^2_B(1,-1)=1$. System: $c+d=0$ and $c-d=1$, giving $c=\\tfrac{1}{2}$, $d=-\\tfrac{1}{2}$. So $e^2_B(x,y)=\\tfrac{x-y}{2}$.' },
+        { explanation: 'Verify Kronecker delta: $e^1_B(1,1)=\\tfrac{2}{2}=1$ ✓, $e^1_B(1,-1)=0$ ✓, $e^2_B(1,1)=0$ ✓, $e^2_B(1,-1)=1$ ✓.' },
+        { explanation: 'Express $f(x,y)=5x+y$ in dual basis: $f = f(\\mathbf{b}_1)\\cdot e^1_B + f(\\mathbf{b}_2)\\cdot e^2_B$. Compute $f(1,1)=6$, $f(1,-1)=4$. So $f = 6e^1_B + 4e^2_B$. Check: $6\\cdot\\tfrac{x+y}{2}+4\\cdot\\tfrac{x-y}{2} = 3(x+y)+2(x-y)=5x+y$ ✓.' },
+      ],
+    },
+    {
+      id: 'ex-la10-001-2',
+      title: 'Dual map equals transpose',
+      problem: 'Let $T: \\mathbb{R}^2 \\to \\mathbb{R}^2$ have matrix $A = \\begin{pmatrix}2&1\\\\0&3\\end{pmatrix}$. Let $g: \\mathbb{R}^2 \\to \\mathbb{R}$ be the functional $g(x,y) = x - y$. Compute the dual map $T^*(g)$ and verify it equals pre-composing: $(g \\circ T)(v)$.',
+      steps: [
+        { explanation: 'Dual map definition: $T^*(g) = g \\circ T$. So $(T^*(g))(v) = g(Tv)$ for any $v \\in \\mathbb{R}^2$.' },
+        { explanation: 'Compute $T(x,y) = (2x+y,\\, 3y)$. Then $g(T(x,y)) = (2x+y) - (3y) = 2x - 2y$.' },
+        { explanation: 'So $T^*(g) = $ the functional $h(x,y) = 2x - 2y$, which has row vector $[2, -2]$.' },
+        { explanation: 'Matrix check: $g$ has row vector $[1,-1]$. The dual map $T^*$ uses matrix $A^\\top = \\begin{pmatrix}2&0\\\\1&3\\end{pmatrix}$. Then $A^\\top [1,-1]^\\top = [2\\cdot1+0\\cdot(-1),\\, 1\\cdot1+3\\cdot(-1)]^\\top = [2,-2]^\\top$ ✓.' },
+      ],
+    },
+    {
+      id: 'ex-la10-001-3',
+      title: 'Annihilator and dimension count',
+      problem: 'In $\\mathbb{R}^3$, let $W = \\text{span}\\{(1,0,0),(0,1,0)\\}$ (the $xy$-plane). Find the annihilator $W^0 \\subseteq (\\mathbb{R}^3)^*$ and verify $\\dim W + \\dim W^0 = \\dim \\mathbb{R}^3$.',
+      steps: [
+        { explanation: 'The annihilator $W^0 = \\{f \\in V^* : f(w)=0 \\text{ for all } w \\in W\\}$. Write $f(x,y,z) = ax+by+cz$.' },
+        { explanation: '$f$ must vanish on $(1,0,0)$: $a=0$. And on $(0,1,0)$: $b=0$. So $f(x,y,z) = cz$ for any $c \\in \\mathbb{R}$.' },
+        { explanation: '$W^0 = \\text{span}\\{e^3\\}$ where $e^3(x,y,z)=z$ — the functional that picks out the $z$-coordinate.' },
+        { explanation: 'Dimension check: $\\dim W = 2$, $\\dim W^0 = 1$, $\\dim \\mathbb{R}^3 = 3$. Indeed $2+1=3$ ✓. The annihilator is the "orthogonal complement in dual space."' },
+      ],
     },
   ],
 
@@ -152,16 +185,174 @@ disp('Adjoint check: (Av)^T w = v^T (A^T w):')
   ],
 
   checkpoints: [
-    { id: 'cp-la10-001-1', question: 'What is the dual space $V^*$?', answer: 'The set of all linear functionals $f: V \\to \\mathbb{F}$, itself a vector space with $\\dim V^* = \\dim V$.' },
-    { id: 'cp-la10-001-2', question: 'What is the dual basis?', answer: 'The basis $\\{e^1, \\ldots, e^n\\}$ of $V^*$ satisfying $e^i(e_j) = \\delta^i_j$ (Kronecker delta).' },
-    { id: 'cp-la10-001-3', question: 'How is the transpose related to the dual map?', answer: 'The transpose $A^\\top$ is the matrix representation of the dual map $T^*: W^* \\to V^*$ of $T: V \\to W$.' },
+    { id: 'cp-la10-001-1', label: 'Read the concrete functional example', type: 'read' },
+    { id: 'cp-la10-001-2', label: 'Read the dual basis Kronecker delta definition', type: 'read' },
+    { id: 'cp-la10-001-3', label: 'Read how transpose equals the dual map', type: 'read' },
+    { id: 'cp-la10-001-4', label: 'Work the dual basis computation in the notebook', type: 'lab' },
+    { id: 'cp-la10-001-5', label: 'Verify adjoint property in the dual map cell', type: 'lab' },
+    { id: 'cp-la10-001-6', label: 'Trace the non-standard basis dual basis example', type: 'example' },
+    { id: 'cp-la10-001-7', label: 'Trace the transpose-as-dual-map example', type: 'example' },
+    { id: 'cp-la10-001-8', label: 'Find the annihilator for a subspace of your choice', type: 'challenge' },
   ],
 
   assessment: 'For the basis $B = \\{(1,1), (1,-1)\\}$ of $\\mathbb{R}^2$: (a) find the dual basis $\\{e^1, e^2\\}$, (b) verify $e^i(e_j) = \\delta^i_j$, (c) express the linear functional $f(x,y) = 2x + 3y$ in terms of the dual basis.',
 
   quiz: [
-    { id: 'q-la10-001-1', question: 'The dual space $V^*$ consists of:', options: ['All subspaces of $V$', 'All linear maps $V \\to \\mathbb{F}$', 'The orthogonal complement of $V$', 'The inverse of $V$'], answer: 'All linear maps $V \\to \\mathbb{F}$' },
-    { id: 'q-la10-001-2', question: 'For a finite-dimensional space $V$, $\\dim V^*$ equals:', options: ['$0$', '$\\dim V - 1$', '$\\dim V$', '$\\dim V^2$'], answer: '$\\dim V$' },
-    { id: 'q-la10-001-3', question: 'The transpose $A^\\top$ is the matrix of:', options: ['The inverse of $T$', 'The dual map $T^*: W^* \\to V^*$', 'The adjoint in the usual inner product', 'The projection onto the column space'], answer: 'The dual map $T^*: W^* \\to V^*$' },
+    {
+      id: 'q-la10-001-1',
+      type: 'choice',
+      text: 'The dual space $V^*$ consists of:',
+      options: ['All subspaces of $V$', 'All linear maps $V \\to \\mathbb{F}$', 'The orthogonal complement of $V$', 'The set of invertible maps on $V$'],
+      answer: 'All linear maps $V \\to \\mathbb{F}$',
+      hints: ['A linear functional is a scalar-valued linear map.', 'The dual space collects ALL such maps.'],
+      reviewSection: 'intuition',
+    },
+    {
+      id: 'q-la10-001-2',
+      type: 'choice',
+      text: 'For finite-dimensional $V$, what is $\\dim V^*$?',
+      options: ['$0$', '$\\dim V - 1$', '$\\dim V$', '$(\\dim V)^2$'],
+      answer: '$\\dim V$',
+      hints: ['The dual basis has the same number of elements as the primal basis.', 'Each basis vector $e_i$ gives one dual basis vector $e^i$.'],
+      reviewSection: 'intuition',
+    },
+    {
+      id: 'q-la10-001-3',
+      type: 'choice',
+      text: 'For the standard basis $\\{e_1, e_2\\}$ of $\\mathbb{R}^2$, what is $e^1(e_2)$?',
+      options: ['$1$', '$0$', '$-1$', 'Undefined'],
+      answer: '$0$',
+      hints: ['Dual basis satisfies $e^i(e_j) = \\delta^i_j$.', '$\\delta^1_2 = 0$ since $1 \\neq 2$.'],
+      reviewSection: 'intuition',
+    },
+    {
+      id: 'q-la10-001-4',
+      type: 'choice',
+      text: 'In $\\mathbb{R}^2$ with basis $\\{(1,1),(1,-1)\\}$, the dual functional $e^1_B$ must satisfy which pair of conditions?',
+      options: [
+        '$e^1_B(1,1)=1$ and $e^1_B(1,-1)=0$',
+        '$e^1_B(1,1)=0$ and $e^1_B(1,-1)=1$',
+        '$e^1_B(1,1)=1$ and $e^1_B(1,-1)=1$',
+        '$e^1_B(1,0)=1$ and $e^1_B(0,1)=0$',
+      ],
+      answer: '$e^1_B(1,1)=1$ and $e^1_B(1,-1)=0$',
+      hints: ['Dual basis satisfies $e^i(b_j) = \\delta^i_j$.', '$e^1_B$ must be 1 on $b_1$ and 0 on $b_2$.'],
+      reviewSection: 'examples',
+    },
+    {
+      id: 'q-la10-001-5',
+      type: 'choice',
+      text: 'The formula for $e^1_B(x,y)$ when $B = \\{(1,1),(1,-1)\\}$ is:',
+      options: ['$\\frac{x+y}{2}$', '$\\frac{x-y}{2}$', '$x + y$', '$x - y$'],
+      answer: '$\\frac{x+y}{2}$',
+      hints: ['Solve: $a+b=1$, $a-b=0$ for $e^1_B(x,y)=ax+by$.', 'Adding: $2a=1$, so $a=b=\\frac{1}{2}$.'],
+      reviewSection: 'examples',
+    },
+    {
+      id: 'q-la10-001-6',
+      type: 'choice',
+      text: 'If $T: V \\to W$ has matrix $A$, the dual map $T^*: W^* \\to V^*$ has matrix:',
+      options: ['$A$', '$A^{-1}$', '$A^\\top$', '$A^{-\\top}$'],
+      answer: '$A^\\top$',
+      hints: ['The dual map pre-composes with $T$: $T^*(g) = g \\circ T$.', 'In coordinates this gives the matrix transpose.'],
+      reviewSection: 'intuition',
+    },
+    {
+      id: 'q-la10-001-7',
+      type: 'choice',
+      text: 'A row vector $\\mathbf{a}^\\top$ is best interpreted as:',
+      options: ['A column vector laid sideways', 'An element of $(\\mathbb{R}^n)^*$ — a linear functional', 'The transpose of a square matrix', 'A gradient vector only'],
+      answer: 'An element of $(\\mathbb{R}^n)^*$ — a linear functional',
+      hints: ['$\\mathbf{a}^\\top \\mathbf{x}$ computes the value of the functional $\\mathbf{a}^\\top$ on $\\mathbf{x}$.', 'Row vectors and column vectors live in dual spaces of each other.'],
+      reviewSection: 'intuition',
+    },
+    {
+      id: 'q-la10-001-8',
+      type: 'choice',
+      text: 'For $W \\subseteq V$ with $\\dim V = 5$ and $\\dim W = 2$, what is $\\dim W^0$ (the annihilator)?',
+      options: ['$2$', '$3$', '$5$', '$7$'],
+      answer: '$3$',
+      hints: ['The annihilator theorem: $\\dim W + \\dim W^0 = \\dim V$.', '$5 - 2 = 3$.'],
+      reviewSection: 'math',
+    },
+    {
+      id: 'q-la10-001-9',
+      type: 'choice',
+      text: 'The natural isomorphism $V \\cong V^{**}$ sends $\\mathbf{v}$ to:',
+      options: [
+        'The functional $f \\mapsto f(\\mathbf{v})$ in $V^{**}$',
+        'The dual basis vector $e^i$ corresponding to $\\mathbf{v}$',
+        'The projection onto the span of $\\mathbf{v}$',
+        'The linear map $T: V \\to V$ that fixes $\\mathbf{v}$',
+      ],
+      answer: 'The functional $f \\mapsto f(\\mathbf{v})$ in $V^{**}$',
+      hints: ['$V^{**} = (V^*)^*$ — functionals that eat functionals.', 'Evaluation: $\\iota(\\mathbf{v})$ eats $f \\in V^*$ and returns $f(\\mathbf{v})$.'],
+      reviewSection: 'math',
+    },
+    {
+      id: 'q-la10-001-10',
+      type: 'choice',
+      text: 'The annihilator of the $xy$-plane in $\\mathbb{R}^3$ is spanned by:',
+      options: [
+        'The functional $f(x,y,z) = z$',
+        'The functional $f(x,y,z) = x$',
+        'The functional $f(x,y,z) = x + y$',
+        'The zero functional',
+      ],
+      answer: 'The functional $f(x,y,z) = z$',
+      hints: ['Annihilator: must vanish on all of $W = \\{z=0\\}$.', 'Only the $z$-component survives; $x$ and $y$ terms must be zero.'],
+      reviewSection: 'examples',
+    },
+  ],
+
+  mastery: {
+    targetLevel: 2,
+    solveIndependently: 'Compute the dual basis for any given basis of $\\mathbb{R}^n$ by solving the Kronecker delta system; express any functional in the dual basis.',
+    explainVerbally: 'Explain why row vectors are naturally dual to column vectors, and why the transpose is the coordinate form of the dual map.',
+    detectIncorrectApplication: 'Catch the error of treating the dual basis as the same as the original basis, or confusing $V^*$ with an inner product orthogonal complement.',
+    transferToUnfamiliar: 'Apply duality to identify the annihilator of a given subspace and verify the dimension formula $\\dim W + \\dim W^0 = \\dim V$.',
+  },
+
+  misconceptions: [
+    {
+      falseBelief: 'The dual basis is the same as the original basis.',
+      whyStudentsThinkIt: 'For the standard basis $\\{e_1,e_2\\}$ of $\\mathbb{R}^2$, the dual basis functionals $e^1(x,y)=x$ and $e^2(x,y)=y$ look like they "extract $e_1$ and $e_2$," leading to confusion between basis vectors and dual basis functionals.',
+      correctionExample: 'For basis $B=\\{(1,1),(1,-1)\\}$, the dual basis $e^1_B(x,y)=\\frac{x+y}{2}$ is NOT $(1,1)$. It\'s a functional, not a vector — it lives in a different space.',
+      contrastCase: 'The standard basis dual IS coordinate projection, but only because $e_i$ is already orthonormal. For general bases, dual basis $\\neq$ primal basis.',
+    },
+    {
+      falseBelief: 'Dual space is the same as orthogonal complement.',
+      whyStudentsThinkIt: 'Both involve "vectors that vanish on $W$," and the annihilator $W^0$ sounds like $W^\\perp$. Students conflate dual space (no inner product needed) with orthogonal complement (inner product required).',
+      correctionExample: 'The annihilator $W^0$ lives in $V^*$ (functional space), not in $V$. Without an inner product, there is no notion of perpendicularity — but there IS a notion of a functional vanishing on $W$.',
+      contrastCase: 'In $\\mathbb{R}^n$ with the standard inner product, $W^0$ and $W^\\perp$ are related by the Riesz identification $V^* \\cong V$, but they live in different spaces conceptually.',
+    },
+  ],
+
+  transferPrompts: [
+    {
+      situation: 'You have a machine learning model that outputs $\\mathbf{w}^\\top \\mathbf{x}$ (a linear classifier). A colleague says "the weight vector and input are the same kind of thing." How would you respond using dual space language?',
+      competingTechniques: ['Treat $\\mathbf{w}$ and $\\mathbf{x}$ as both column vectors in $\\mathbb{R}^n$', 'Recognize $\\mathbf{w}^\\top$ as an element of the dual space $(\\mathbb{R}^n)^*$'],
+      whyThisTechniqueWins: 'Dual space language clarifies the type: $\\mathbf{x}$ is a data point (vector), $\\mathbf{w}^\\top$ is a decision functional (covector). This distinction matters when changing coordinates — a basis change transforms them differently (contravariant vs. covariant).',
+    },
+    {
+      situation: 'A system $A\\mathbf{x} = \\mathbf{b}$ has a solution iff $\\mathbf{b}$ is in the column space of $A$. Use duality (annihilator) to reformulate this condition in terms of the left null space.',
+      competingTechniques: ['Check column space membership directly (row reduce and verify)', 'Use the annihilator: $\\mathbf{b} \\in \\text{col}(A)$ iff $f(\\mathbf{b})=0$ for all $f \\in \\text{col}(A)^0$'],
+      whyThisTechniqueWins: 'The dual condition is $A^\\top \\mathbf{y} = 0 \\Rightarrow \\mathbf{y}^\\top \\mathbf{b} = 0$ (Fredholm alternative), which is useful in theory and in sensitivity analysis — it characterizes solvability without explicitly constructing the column space.',
+    },
+  ],
+
+  debugging: [
+    {
+      commonError: 'Writing the dual basis as column vectors instead of as functionals (linear maps).',
+      symptom: 'Student computes $e^1_B = (\\frac{1}{2}, \\frac{1}{2})$ as a column vector, then tries to use it as a vector in $V$ instead of a functional on $V$.',
+      whyItHappened: 'For $\\mathbb{R}^n$ with the standard inner product, the Riesz map identifies functionals with vectors, making them look the same. Students skip the conceptual distinction.',
+      repairStrategy: 'Always write dual basis elements as functions: $e^1_B(x,y) = \\frac{x+y}{2}$. Test: apply it to a vector and confirm you get a scalar. If you\'re "adding" a dual basis element to a primal basis element, something went wrong.',
+    },
+    {
+      commonError: 'Applying the dual map in the wrong direction — using $A$ instead of $A^\\top$ for the dual map.',
+      symptom: 'Given $T: V \\to W$ with matrix $A$, student computes $T^*(g)$ by multiplying $A$ (not $A^\\top$) times the row vector of $g$.',
+      whyItHappened: 'The dual map goes from $W^*$ to $V^*$ (reversed direction), which is easy to forget. Students apply $T$ when they should apply $T^*$.',
+      repairStrategy: 'Remember: $T^*$ reverses direction and uses $A^\\top$. Always check dimensions: if $T: \\mathbb{R}^n \\to \\mathbb{R}^m$, then $T^*: (\\mathbb{R}^m)^* \\to (\\mathbb{R}^n)^*$, so the matrix must be $m \\times n$ (which is $A^\\top$, not $A$).',
+    },
   ],
 };
