@@ -195,4 +195,11 @@ export const COURSES = [
     desc: "Data, Inference & Statistical Modeling",
     color: "violet",
   },
+  {
+    key: "cli-0",
+    label: "Command Line",
+    path: "/course/cli-0",
+    desc: "Terminal, Filesystem & Shell Mastery",
+    color: "slate",
+  },
 ];

@@ -23,6 +23,7 @@ const VIZ_REGISTRY = {
   GitWorkspace: lazy(() => import("./git/GitWorkspace.jsx")),
   GitTerminal: lazy(() => import("./git/GitTerminal.jsx")),
   GitKrakenView: lazy(() => import("./git/GitKrakenView.jsx")),
+  ShellTerminal: lazy(() => import("./shell/ShellTerminal.jsx")),
   VideoCarousel: lazy(() => import("./react/VideoCarousel.jsx")),
   RosettaStoneViz: lazy(() => import("./react/RosettaStoneViz.jsx")),
   DistributivePropertyViz: lazy(

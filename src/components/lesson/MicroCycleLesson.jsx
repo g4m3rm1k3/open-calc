@@ -293,6 +293,7 @@ const VIZ_TAB_LABELS = {
   GitWorkspace: "VS Code Panel",
   GitTerminal: "Terminal",
   GitKrakenView: "GitKraken",
+  ShellTerminal: "Terminal",
 };
 
 function VizTabGroup({ vizzes, lessonId }) {
