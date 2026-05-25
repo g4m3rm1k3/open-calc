@@ -29,6 +29,53 @@ const lesson = {
         body: "Open a PR as a draft to share work-in-progress. Draft PRs can't be merged until marked ready for review. Useful for getting early feedback on an approach without full review overhead. Mark ready when you want reviewers to approve.",
       },
     ],
+    visualizations: [
+      {
+        id: "GitWorkspace",
+        mathBridge:
+          "**Practice the feature branch workflow** — the foundation of every GitHub Pull Request.\n\n1. Create a branch: click the branch name in the panel → New Branch → name it `feature/score-system`\n2. Edit `game-design.txt` to add a scoring section\n3. Stage and commit: click **+** next to the file, write a message, click **✓ Commit**\n4. Push: click **Publish Branch** (or the sync icon)\n\nIn a real GitHub project, you'd then open a PR to merge this branch back to `main`.",
+        props: {
+          label: "dungeon-explorer",
+          instanceId: "git-0-project",
+          initialFiles: {
+            "game-design.txt":
+              "GAME CONCEPT: Dungeon Explorer\n\nWin condition: reach the key room and exit.\nLose condition: health drops to zero.\n\nDifficulty levels:\n- Easy: 3 traps, 2 health potions\n- Normal: 5 traps, 1 health potion\n- Hard: 8 traps, no potions",
+            "controls.txt":
+              "CONTROLS\n\nArrow keys: move\nSpace: interact\nEsc: pause\nI: inventory",
+          },
+        },
+      },
+      {
+        id: "GitTerminal",
+        mathBridge:
+          "**Run the full feature branch workflow in the terminal:**\n\n- `git switch -c feature/score-system` — create and switch to a new branch\n- `# edit a file`\n- `git add game-design.txt`\n- `git commit -m 'Add scoring system design'`\n- `git push -u origin feature/score-system` — push the branch to remote\n\nAt this point you'd open GitHub in your browser and click 'Compare & pull request'.",
+        props: {
+          label: "dungeon-explorer",
+          instanceId: "git-0-project",
+          initialFiles: {
+            "game-design.txt":
+              "GAME CONCEPT: Dungeon Explorer\n\nWin condition: reach the key room and exit.\nLose condition: health drops to zero.\n\nDifficulty levels:\n- Easy: 3 traps, 2 health potions\n- Normal: 5 traps, 1 health potion\n- Hard: 8 traps, no potions",
+            "controls.txt":
+              "CONTROLS\n\nArrow keys: move\nSpace: interact\nEsc: pause\nI: inventory",
+          },
+        },
+      },
+      {
+        id: "GitKrakenView",
+        mathBridge:
+          "**The graph shows the complete lifecycle of a feature branch.** After running the GitHub Flow in the panel — branch, commit, push, merge — switch here to see the shape it produced. A PR merged without rebasing creates a fork-and-rejoin: two lanes that split at the branch point and converge at the merge commit. A PR merged with a fast-forward produces a straight single line. Both are valid; the graph makes the difference visible at a glance.",
+        props: {
+          label: "dungeon-explorer",
+          instanceId: "git-0-project",
+          initialFiles: {
+            "game-design.txt":
+              "GAME CONCEPT: Dungeon Explorer\n\nWin condition: reach the key room and exit.\nLose condition: health drops to zero.\n\nDifficulty levels:\n- Easy: 3 traps, 2 health potions\n- Normal: 5 traps, 1 health potion\n- Hard: 8 traps, no potions",
+            "controls.txt":
+              "CONTROLS\n\nArrow keys: move\nSpace: interact\nEsc: pause\nI: inventory",
+          },
+        },
+      },
+    ],
   },
 
   rigor: {
@@ -69,7 +116,8 @@ const lesson = {
           "A way to download someone else's code",
           "A request for someone to push to your branch",
         ],
-        answer: "A GitHub/GitLab feature for proposing and reviewing branch merges",
+        answer:
+          "A GitHub/GitLab feature for proposing and reviewing branch merges",
       },
       {
         id: "git0-012-q2",

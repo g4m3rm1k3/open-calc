@@ -29,6 +29,53 @@ const lesson = {
         body: "Every commit that gets rebased gets a new SHA-1 hash, even if the content is identical. The commit message, timestamp, author, and code changes are preserved — but the hash changes because the parent changed. This is why pushing a rebased branch requires `git push --force-with-lease`, which can cause problems for collaborators.",
       },
     ],
+    visualizations: [
+      {
+        id: "GitWorkspace",
+        mathBridge:
+          "**Use this panel to set up the rebase scenario.** Create a feature branch (click the branch name → New Branch → `feature/rooms`), make 2 commits, then switch back to `main` and make 1 more commit. Now both branches have diverged. Switch to GitTerminal and run `git rebase main` from your feature branch. Come back here after — the Source Control panel shows your working tree is clean and the feature branch now sits ahead of main with no merge commit.",
+        props: {
+          label: "dungeon-explorer",
+          instanceId: "git-0-project",
+          initialFiles: {
+            "game-design.txt":
+              "GAME CONCEPT: Dungeon Explorer\n\nWin condition: reach the key room and exit.\nLose condition: health drops to zero.\n\nDifficulty levels:\n- Easy: 3 traps, 2 health potions\n- Normal: 5 traps, 1 health potion\n- Hard: 8 traps, no potions",
+            "controls.txt":
+              "CONTROLS\n\nArrow keys: move\nSpace: interact\nEsc: pause\nI: inventory",
+          },
+        },
+      },
+      {
+        id: "GitTerminal",
+        mathBridge:
+          "**Practice rebasing in the terminal.**\n\n1. Create a feature branch: `git switch -c feature/rooms`\n2. Make 2 commits on it (edit a file, commit twice)\n3. Switch back to main: `git switch main`\n4. Make 1 commit on main\n5. Switch back: `git switch feature/rooms`\n6. Rebase: `git rebase main` — your feature commits move on top of main\n7. Inspect: `git log --oneline` — see the clean linear history\n\nIf a conflict occurs: edit the file, `git add <file>`, `git rebase --continue`.",
+        props: {
+          label: "dungeon-explorer",
+          instanceId: "git-0-project",
+          initialFiles: {
+            "game-design.txt":
+              "GAME CONCEPT: Dungeon Explorer\n\nWin condition: reach the key room and exit.\nLose condition: health drops to zero.\n\nDifficulty levels:\n- Easy: 3 traps, 2 health potions\n- Normal: 5 traps, 1 health potion\n- Hard: 8 traps, no potions",
+            "controls.txt":
+              "CONTROLS\n\nArrow keys: move\nSpace: interact\nEsc: pause\nI: inventory",
+          },
+        },
+      },
+      {
+        id: "GitKrakenView",
+        mathBridge:
+          "**Compare rebase vs merge in the graph.** After a merge, the graph shows a fork-and-rejoin — two parallel lanes meeting at a merge commit. After a rebase + fast-forward, the graph is a single straight line with no merge commit. Make commits on two branches, merge one way, compare visually. The code result is identical; only the history shape differs.",
+        props: {
+          label: "dungeon-explorer",
+          instanceId: "git-0-project",
+          initialFiles: {
+            "game-design.txt":
+              "GAME CONCEPT: Dungeon Explorer\n\nWin condition: reach the key room and exit.\nLose condition: health drops to zero.\n\nDifficulty levels:\n- Easy: 3 traps, 2 health potions\n- Normal: 5 traps, 1 health potion\n- Hard: 8 traps, no potions",
+            "controls.txt":
+              "CONTROLS\n\nArrow keys: move\nSpace: interact\nEsc: pause\nI: inventory",
+          },
+        },
+      },
+    ],
   },
 
   rigor: {
@@ -69,7 +116,8 @@ const lesson = {
           "They get new SHA hashes, replayed on top of main's current tip",
           "They stay unchanged but main's pointer moves",
         ],
-        answer: "They get new SHA hashes, replayed on top of main's current tip",
+        answer:
+          "They get new SHA hashes, replayed on top of main's current tip",
       },
       {
         id: "git0-013-q2",
@@ -81,7 +129,8 @@ const lesson = {
           "Only rebase if there are more than 5 commits",
           "Rebase before every `git push`",
         ],
-        answer: "Never rebase commits that have been pushed to shared/public branches",
+        answer:
+          "Never rebase commits that have been pushed to shared/public branches",
       },
       {
         id: "git0-013-q3",

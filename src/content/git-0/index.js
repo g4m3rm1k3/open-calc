@@ -8,6 +8,16 @@ import lesson7 from "./git0-007-merging.js";
 import lesson8 from "./git0-008-conflicts.js";
 import lesson9 from "./git0-009-remotes.js";
 import lesson10 from "./git0-010-collaboration.js";
+import lesson11 from "./git0-011-fetch-pull-push.js";
+import lesson12 from "./git0-012-github-workflow.js";
+import lesson13 from "./git0-013-rebasing.js";
+import lesson14 from "./git0-014-interactive-rebase.js";
+import lesson15 from "./git0-015-stashing.js";
+import lesson16 from "./git0-016-tags-and-releases.js";
+import lesson17 from "./git0-017-gitignore-and-config.js";
+import lesson18 from "./git0-018-searching-history.js";
+import lesson19 from "./git0-019-git-internals.js";
+import lesson20 from "./git0-020-git-workflows.js";
 
 export default {
   id: "git-0",
@@ -28,5 +38,15 @@ export default {
     lesson8,
     lesson9,
     lesson10,
+    lesson11,
+    lesson12,
+    lesson13,
+    lesson14,
+    lesson15,
+    lesson16,
+    lesson17,
+    lesson18,
+    lesson19,
+    lesson20,
   ],
 };

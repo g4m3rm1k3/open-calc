@@ -29,6 +29,63 @@ const lesson = {
         body: "If you commit an API key, password, or private key — even for one second — assume it's compromised. It exists in the repository history forever. Anyone who clones the repo, now or in the future, can recover it from the history. Revoke and rotate any key that was ever committed. Use tools like `git-secrets` or GitHub's secret scanning to prevent this.",
       },
     ],
+    visualizations: [
+      {
+        id: "GitWorkspace",
+        mathBridge:
+          "**See .gitignore in action.** Create a `.gitignore` file in the panel and add patterns like `*.log`, `build/`, `.env`. Then create those files (`app.log`, `build/output.js`, `.env`) — notice that gitignored files appear grayed out or absent from the Source Control panel. Only the `.gitignore` itself shows as a change to stage and commit.",
+        props: {
+          label: "dungeon-explorer",
+          instanceId: "git-0-project",
+          initialFiles: {
+            "game-design.txt":
+              "GAME CONCEPT: Dungeon Explorer\n\nWin condition: reach the key room and exit.\nLose condition: health drops to zero.\n\nDifficulty levels:\n- Easy: 3 traps, 2 health potions\n- Normal: 5 traps, 1 health potion\n- Hard: 8 traps, no potions",
+            "controls.txt":
+              "CONTROLS\n\nArrow keys: move\nSpace: interact\nEsc: pause\nI: inventory",
+            ".gitignore":
+              "# Build outputs\nbuild/\ndist/\n\n# Environment secrets\n.env\n.env.local\n\n# Logs\n*.log\n\n# OS files\n.DS_Store\nThumbs.db",
+            "debug.log":
+              "[2026-01-15 09:00] Game started\n[2026-01-15 09:01] Player moved to room 2",
+            ".env": "API_KEY=abc123\nDB_PASSWORD=secret",
+          },
+        },
+      },
+      {
+        id: "GitTerminal",
+        mathBridge:
+          "**Practice git config in the terminal.**\n\n- `git config --list` — see all current config\n- `git config user.name` — see your name\n- `git config --global user.email 'you@example.com'` — set globally\n- `git config --global alias.st status` — create `git st` shortcut\n- `git config --global alias.lg 'log --oneline --graph --decorate'` — pretty log\n- `git config --global core.editor 'code --wait'` — use VS Code as editor\n\nAfter setting the aliases, try `git st` and `git lg`.",
+        props: {
+          label: "dungeon-explorer",
+          instanceId: "git-0-project",
+          initialFiles: {
+            "game-design.txt":
+              "GAME CONCEPT: Dungeon Explorer\n\nWin condition: reach the key room and exit.\nLose condition: health drops to zero.\n\nDifficulty levels:\n- Easy: 3 traps, 2 health potions\n- Normal: 5 traps, 1 health potion\n- Hard: 8 traps, no potions",
+            "controls.txt":
+              "CONTROLS\n\nArrow keys: move\nSpace: interact\nEsc: pause\nI: inventory",
+          },
+        },
+      },
+      {
+        id: "GitKrakenView",
+        mathBridge:
+          "**Gitignored files never appear in the commit graph** because they're never committed. After adding `.gitignore` patterns for `*.log` and `.env`, try creating those files and staging — they won't show up. The graph stays clean: only intentional tracked changes produce commit nodes. The graph is a record of what Git was explicitly told to save — `.gitignore` is how you keep noise, secrets, and build artifacts out of that permanent record.",
+        props: {
+          label: "dungeon-explorer",
+          instanceId: "git-0-project",
+          initialFiles: {
+            "game-design.txt":
+              "GAME CONCEPT: Dungeon Explorer\n\nWin condition: reach the key room and exit.\nLose condition: health drops to zero.\n\nDifficulty levels:\n- Easy: 3 traps, 2 health potions\n- Normal: 5 traps, 1 health potion\n- Hard: 8 traps, no potions",
+            "controls.txt":
+              "CONTROLS\n\nArrow keys: move\nSpace: interact\nEsc: pause\nI: inventory",
+            ".gitignore":
+              "# Build outputs\nbuild/\ndist/\n\n# Environment secrets\n.env\n.env.local\n\n# Logs\n*.log\n\n# OS files\n.DS_Store\nThumbs.db",
+            "debug.log":
+              "[2026-01-15 09:00] Game started\n[2026-01-15 09:01] Player moved to room 2",
+            ".env": "API_KEY=abc123\nDB_PASSWORD=secret",
+          },
+        },
+      },
+    ],
   },
 
   rigor: {
@@ -69,7 +126,8 @@ const lesson = {
           "`debug.log` is already tracked by Git — .gitignore only affects untracked files",
           "You need to restart Git for .gitignore changes to take effect",
         ],
-        answer: "`debug.log` is already tracked by Git — .gitignore only affects untracked files",
+        answer:
+          "`debug.log` is already tracked by Git — .gitignore only affects untracked files",
       },
       {
         id: "git0-017-q2",
@@ -81,7 +139,8 @@ const lesson = {
           "Revoke and rotate the API key immediately — assume it's compromised",
           "Push a new commit that removes the key from the file",
         ],
-        answer: "Revoke and rotate the API key immediately — assume it's compromised",
+        answer:
+          "Revoke and rotate the API key immediately — assume it's compromised",
       },
       {
         id: "git0-017-q3",
@@ -93,7 +152,8 @@ const lesson = {
           "It syncs your ignore patterns to GitHub",
           "It prevents `git push` of ignored files",
         ],
-        answer: "It applies OS/editor-specific ignores (like .DS_Store) to all repos on your machine",
+        answer:
+          "It applies OS/editor-specific ignores (like .DS_Store) to all repos on your machine",
       },
     ],
   },

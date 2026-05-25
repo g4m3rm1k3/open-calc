@@ -6,7 +6,13 @@ const lesson = {
   title: "Searching with grep and find",
   subtitle: "Find text inside files. Find files by name.",
   tags: ["cli", "grep", "find", "search", "which", "regex"],
-  aliases: ["search files terminal", "grep command", "find command", "find files by name", "search text in files"],
+  aliases: [
+    "search files terminal",
+    "grep command",
+    "find command",
+    "find files by name",
+    "search text in files",
+  ],
 
   hook: `Two questions come up constantly in development: "Which file contains this text?" and "Where is this file?". grep answers the first. find answers the second.`,
 
@@ -33,13 +39,19 @@ const lesson = {
           initialCwd: "/home/user/project",
           initialFiles: {
             "/home/user/project/": null,
-            "/home/user/project/app.js": "const express = require('express');\nconst db = require('./db');\n\n// TODO: add authentication middleware\n\nconst app = express();\n\napp.get('/', (req, res) => {\n  res.send('Hello world');\n});\n\napp.get('/users', async (req, res) => {\n  // TODO: add pagination\n  const users = await db.getAll();\n  res.json(users);\n});\n\napp.listen(3000);\n",
-            "/home/user/project/db.js": "const { Pool } = require('pg');\n\n// TODO: use environment variable for connection string\nconst pool = new Pool({\n  connectionString: 'postgres://localhost/myapp',\n});\n\nasync function getAll() {\n  const result = await pool.query('SELECT * FROM users');\n  return result.rows;\n}\n\nmodule.exports = { getAll };\n",
-            "/home/user/project/app.log": "[ERROR] 2026-05-20 DB connection timeout\n[INFO]  2026-05-20 Server started on port 3000\n[WARN]  2026-05-20 Auth token expiring soon\n[ERROR] 2026-05-20 User not found: id=42\n[INFO]  2026-05-20 Request completed in 3ms\n",
-            "/home/user/project/config.json": '{\n  "port": 3000,\n  "dbUrl": "postgres://localhost/myapp",\n  "debug": true\n}\n',
+            "/home/user/project/app.js":
+              "const express = require('express');\nconst db = require('./db');\n\n// TODO: add authentication middleware\n\nconst app = express();\n\napp.get('/', (req, res) => {\n  res.send('Hello world');\n});\n\napp.get('/users', async (req, res) => {\n  // TODO: add pagination\n  const users = await db.getAll();\n  res.json(users);\n});\n\napp.listen(3000);\n",
+            "/home/user/project/db.js":
+              "const { Pool } = require('pg');\n\n// TODO: use environment variable for connection string\nconst pool = new Pool({\n  connectionString: 'postgres://localhost/myapp',\n});\n\nasync function getAll() {\n  const result = await pool.query('SELECT * FROM users');\n  return result.rows;\n}\n\nmodule.exports = { getAll };\n",
+            "/home/user/project/app.log":
+              "[ERROR] 2026-05-20 DB connection timeout\n[INFO]  2026-05-20 Server started on port 3000\n[WARN]  2026-05-20 Auth token expiring soon\n[ERROR] 2026-05-20 User not found: id=42\n[INFO]  2026-05-20 Request completed in 3ms\n",
+            "/home/user/project/config.json":
+              '{\n  "port": 3000,\n  "dbUrl": "postgres://localhost/myapp",\n  "debug": true\n}\n',
             "/home/user/project/src/": null,
-            "/home/user/project/src/utils.js": "// Utility functions\n\nfunction formatDate(d) {\n  // TODO: support timezone parameter\n  return new Date(d).toISOString();\n}\n\nfunction slugify(str) {\n  return str.toLowerCase().replace(/\\s+/g, '-');\n}\n\nmodule.exports = { formatDate, slugify };\n",
-            "/home/user/project/src/auth.js": "// Authentication helpers\n\nfunction validateToken(token) {\n  if (!token) return false;\n  // TODO: verify JWT signature\n  return token.length > 10;\n}\n\nmodule.exports = { validateToken };\n",
+            "/home/user/project/src/utils.js":
+              "// Utility functions\n\nfunction formatDate(d) {\n  // TODO: support timezone parameter\n  return new Date(d).toISOString();\n}\n\nfunction slugify(str) {\n  return str.toLowerCase().replace(/\\s+/g, '-');\n}\n\nmodule.exports = { formatDate, slugify };\n",
+            "/home/user/project/src/auth.js":
+              "// Authentication helpers\n\nfunction validateToken(token) {\n  if (!token) return false;\n  // TODO: verify JWT signature\n  return token.length > 10;\n}\n\nmodule.exports = { validateToken };\n",
           },
         },
       },
@@ -90,7 +102,8 @@ const lesson = {
           "`grep -l 'password' .`",
         ],
         answer: 1,
-        explanation: "`-r` makes grep recursive (searches subdirectories), `-n` adds line numbers. Combined: `grep -rn 'password' .` shows every match as `filename:linenum:line content`. Option A only searches files in the current directory (not subdirectories). `-l` lists only filenames, not matching lines.",
+        explanation:
+          "`-r` makes grep recursive (searches subdirectories), `-n` adds line numbers. Combined: `grep -rn 'password' .` shows every match as `filename:linenum:line content`. Option A only searches files in the current directory (not subdirectories). `-l` lists only filenames, not matching lines.",
       },
       {
         id: "cli0-009-q2",
@@ -103,7 +116,8 @@ const lesson = {
           "Finds the first .test.js file and stops",
         ],
         answer: 2,
-        explanation: "`-type f` restricts results to regular files (excluding directories, symlinks, etc.). `-name '*.test.js'` matches names ending in `.test.js`. Together they find all test files in the directory tree — a common pattern in JavaScript projects.",
+        explanation:
+          "`-type f` restricts results to regular files (excluding directories, symlinks, etc.). `-name '*.test.js'` matches names ending in `.test.js`. Together they find all test files in the directory tree — a common pattern in JavaScript projects.",
       },
     ],
   },

@@ -29,6 +29,53 @@ const lesson = {
         body: "For clarity, many experienced developers run `git fetch` first, inspect with `git log origin/main`, then `git merge origin/main` deliberately. This separates 'seeing what changed' from 'applying it'. `git pull` is fine but hides the intermediate inspection step.",
       },
     ],
+    visualizations: [
+      {
+        id: "GitWorkspace",
+        mathBridge:
+          "**The Source Control panel shows the sync state between your local branch and the remote.** After a `git fetch`, incoming commits appear as a notification in the panel's sync indicator. After `git pull`, the working tree updates to match. Make a commit here, then use GitTerminal to push it — watch the panel's ahead/behind indicator change as your local branch gets ahead of the remote, then sync back to zero after the push.",
+        props: {
+          label: "dungeon-explorer",
+          instanceId: "git-0-project",
+          initialFiles: {
+            "game-design.txt":
+              "GAME CONCEPT: Dungeon Explorer\n\nWin condition: reach the key room and exit.\nLose condition: health drops to zero.\n\nDifficulty levels:\n- Easy: 3 traps, 2 health potions\n- Normal: 5 traps, 1 health potion\n- Hard: 8 traps, no potions",
+            "controls.txt":
+              "CONTROLS\n\nArrow keys: move\nSpace: interact\nEsc: pause\nI: inventory",
+          },
+        },
+      },
+      {
+        id: "GitTerminal",
+        mathBridge:
+          "**Practice fetch, pull, and push in the terminal.**\n\n- `git fetch origin` — download remote updates (nothing changes locally)\n- `git log --oneline origin/main` — see what commits are on the remote\n- `git merge origin/main` — integrate remote commits into your branch\n- `git push` — send your local commits to the remote\n- `git push -u origin feature/nav` — push and set upstream tracking\n\nAfter committing a change, run `git log --oneline` and then `git push` to see it in action.",
+        props: {
+          label: "dungeon-explorer",
+          instanceId: "git-0-project",
+          initialFiles: {
+            "game-design.txt":
+              "GAME CONCEPT: Dungeon Explorer\n\nWin condition: reach the key room and exit.\nLose condition: health drops to zero.\n\nDifficulty levels:\n- Easy: 3 traps, 2 health potions\n- Normal: 5 traps, 1 health potion\n- Hard: 8 traps, no potions",
+            "controls.txt":
+              "CONTROLS\n\nArrow keys: move\nSpace: interact\nEsc: pause\nI: inventory",
+          },
+        },
+      },
+      {
+        id: "GitKrakenView",
+        mathBridge:
+          "**The graph shows the ahead/behind state between local and remote branches.** When your branch has commits the remote doesn't, it shows ahead. When the remote has commits you don't, it shows behind. After `git pull` you'll see the branches converge; after `git push` you'll see `origin/main` move to match your local `main`.",
+        props: {
+          label: "dungeon-explorer",
+          instanceId: "git-0-project",
+          initialFiles: {
+            "game-design.txt":
+              "GAME CONCEPT: Dungeon Explorer\n\nWin condition: reach the key room and exit.\nLose condition: health drops to zero.\n\nDifficulty levels:\n- Easy: 3 traps, 2 health potions\n- Normal: 5 traps, 1 health potion\n- Hard: 8 traps, no potions",
+            "controls.txt":
+              "CONTROLS\n\nArrow keys: move\nSpace: interact\nEsc: pause\nI: inventory",
+          },
+        },
+      },
+    ],
   },
 
   rigor: {
@@ -93,7 +140,8 @@ const lesson = {
           "Pulls all branches, not just the current one",
           "Automatically resolves conflicts",
         ],
-        answer: "Rebases your commits on top of remote commits instead of creating a merge commit",
+        answer:
+          "Rebases your commits on top of remote commits instead of creating a merge commit",
       },
     ],
   },

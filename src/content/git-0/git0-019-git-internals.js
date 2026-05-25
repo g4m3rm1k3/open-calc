@@ -5,8 +5,23 @@ const lesson = {
   order: 19,
   title: "Git Internals",
   subtitle: "What's actually happening inside .git/",
-  tags: ["git", "internals", "objects", "SHA", "blob", "tree", "commit", "reflog"],
-  aliases: ["git objects", "SHA hash", "git internals", "how git works", "reflog"],
+  tags: [
+    "git",
+    "internals",
+    "objects",
+    "SHA",
+    "blob",
+    "tree",
+    "commit",
+    "reflog",
+  ],
+  aliases: [
+    "git objects",
+    "SHA hash",
+    "git internals",
+    "how git works",
+    "reflog",
+  ],
 
   hook: `Everything you do in Git ultimately creates a small file in \`.git/objects/\`. Understanding those four file types explains why Git is so fast, why history is immutable, and how to recover from things that seem unrecoverable.`,
 
@@ -27,6 +42,53 @@ const lesson = {
         type: "tip",
         title: "Inspect objects with git cat-file",
         body: "`git cat-file -t <hash>` — shows the type of a Git object (blob, tree, commit, tag)\n`git cat-file -p <hash>` — pretty-prints the content\nTry: `git cat-file -p HEAD` — shows your last commit object\nThen copy the tree hash from the output and: `git cat-file -p <tree-hash>` — shows the directory listing",
+      },
+    ],
+    visualizations: [
+      {
+        id: "GitWorkspace",
+        mathBridge:
+          "**Every commit you make here creates three Git objects in `.git/objects/`.** Stage and commit a file change in this panel. Under the hood Git: (1) hashes the file content into a **blob** object, (2) hashes the directory snapshot into a **tree** object, (3) creates a **commit** object pointing to that tree plus author metadata. The panel shows you the surface; switch to GitTerminal and run `git cat-file -p HEAD` to read the raw commit object that this single button click produced.",
+        props: {
+          label: "dungeon-explorer",
+          instanceId: "git-0-project",
+          initialFiles: {
+            "game-design.txt":
+              "GAME CONCEPT: Dungeon Explorer\n\nWin condition: reach the key room and exit.\nLose condition: health drops to zero.\n\nDifficulty levels:\n- Easy: 3 traps, 2 health potions\n- Normal: 5 traps, 1 health potion\n- Hard: 8 traps, no potions",
+            "controls.txt":
+              "CONTROLS\n\nArrow keys: move\nSpace: interact\nEsc: pause\nI: inventory",
+          },
+        },
+      },
+      {
+        id: "GitTerminal",
+        mathBridge:
+          "**Explore Git's object store.** Make a commit first, then peel back the layers:\n\n- `git cat-file -p HEAD` — see the raw commit object: tree hash, parent hash, author, message\n- Copy the tree hash and run `git cat-file -p <tree-hash>` — see the directory listing as Git sees it\n- Copy a blob hash and run `git cat-file -p <blob-hash>` — see the raw file content\n- `git ls-tree HEAD` — shortcut to list the tree\n- `git rev-parse HEAD` — get the full SHA of HEAD\n- `git hash-object controls.txt` — compute the SHA of a file without storing it\n\nEvery file version, every directory snapshot, every commit — they're all just objects in `.git/objects/`.",
+        props: {
+          label: "dungeon-explorer",
+          instanceId: "git-0-project",
+          initialFiles: {
+            "game-design.txt":
+              "GAME CONCEPT: Dungeon Explorer\n\nWin condition: reach the key room and exit.\nLose condition: health drops to zero.\n\nDifficulty levels:\n- Easy: 3 traps, 2 health potions\n- Normal: 5 traps, 1 health potion\n- Hard: 8 traps, no potions",
+            "controls.txt":
+              "CONTROLS\n\nArrow keys: move\nSpace: interact\nEsc: pause\nI: inventory",
+          },
+        },
+      },
+      {
+        id: "GitKrakenView",
+        mathBridge:
+          "**Every node in this graph IS a commit object in `.git/objects/`.** Click any commit dot — the hash shown is exactly what `git cat-file -p <hash>` reads. The connecting lines represent the `parent:` field inside each commit object: a pointer to the previous commit's hash. The graph isn't a separate data structure; it's a rendering of the linked list of commit objects that Git has always maintained. The visual graph and the raw object store are the same thing, seen two different ways.",
+        props: {
+          label: "dungeon-explorer",
+          instanceId: "git-0-project",
+          initialFiles: {
+            "game-design.txt":
+              "GAME CONCEPT: Dungeon Explorer\n\nWin condition: reach the key room and exit.\nLose condition: health drops to zero.\n\nDifficulty levels:\n- Easy: 3 traps, 2 health potions\n- Normal: 5 traps, 1 health potion\n- Hard: 8 traps, no potions",
+            "controls.txt":
+              "CONTROLS\n\nArrow keys: move\nSpace: interact\nEsc: pause\nI: inventory",
+          },
+        },
       },
     ],
   },
@@ -81,7 +143,8 @@ const lesson = {
           "Use `git reflog` to find the commit hash, then create a branch pointing to it",
           "Use `git stash pop` to restore them",
         ],
-        answer: "Use `git reflog` to find the commit hash, then create a branch pointing to it",
+        answer:
+          "Use `git reflog` to find the commit hash, then create a branch pointing to it",
       },
       {
         id: "git0-019-q3",

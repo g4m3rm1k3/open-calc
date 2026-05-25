@@ -6,7 +6,12 @@ const lesson = {
   title: "Deleting Files",
   subtitle: "rm, rm -r, and why rm -rf demands respect",
   tags: ["cli", "rm", "delete", "remove", "rm -rf"],
-  aliases: ["delete file terminal", "rm command", "remove file", "rm -rf explained"],
+  aliases: [
+    "delete file terminal",
+    "rm command",
+    "remove file",
+    "rm -rf explained",
+  ],
 
   hook: `The terminal has no trash can. When you delete with rm, it's gone. Not in Trash. Not recoverable with Ctrl+Z. Gone. This lesson is about using that power correctly.`,
 
@@ -29,19 +34,25 @@ const lesson = {
         mathBridge:
           "**Practice safe deletion:**\n\n```bash\n# Inspect before deleting\nls\n\n# Delete a single file\nrm temp.txt\nls   # confirm it's gone\n\n# Delete a directory (requires -r)\nrm -r old-build/\n\n# Try to delete a non-empty directory without -r\nrm src/\n# Error: src is a directory\n\n# Delete with confirmation prompt (-i flag)\nrm -i important.txt\n# respond 'y' to confirm\n```\n\n⚠️ There is no undo. Verify paths before deleting.",
         props: {
-          welcomeMessage: "Practice rm carefully. Use ls before and after to verify.",
+          welcomeMessage:
+            "Practice rm carefully. Use ls before and after to verify.",
           initialCwd: "/home/user/project",
           initialFiles: {
             "/home/user/project/": null,
-            "/home/user/project/temp.txt": "This is a temporary file. Safe to delete.",
-            "/home/user/project/important.txt": "This file has important data. Be careful!",
-            "/home/user/project/notes.txt": "Meeting notes\n- Ship by Friday\n- Review PRs",
+            "/home/user/project/temp.txt":
+              "This is a temporary file. Safe to delete.",
+            "/home/user/project/important.txt":
+              "This file has important data. Be careful!",
+            "/home/user/project/notes.txt":
+              "Meeting notes\n- Ship by Friday\n- Review PRs",
             "/home/user/project/old-build/": null,
-            "/home/user/project/old-build/app.min.js": "// minified build output\n(function(){var a=1;})();",
+            "/home/user/project/old-build/app.min.js":
+              "// minified build output\n(function(){var a=1;})();",
             "/home/user/project/old-build/style.min.css": "body{margin:0}",
             "/home/user/project/src/": null,
             "/home/user/project/src/game.js": "// game logic — do not delete!",
-            "/home/user/project/src/player.js": "// player state — do not delete!",
+            "/home/user/project/src/player.js":
+              "// player state — do not delete!",
           },
         },
       },
@@ -92,7 +103,8 @@ const lesson = {
           "It stays on disk until the system is rebooted",
         ],
         answer: 2,
-        explanation: "`rm` removes the filesystem entry immediately. There is no Trash, no undo, no built-in recovery. The disk blocks may be recoverable with forensic tools until overwritten, but from a normal user perspective the file is gone.",
+        explanation:
+          "`rm` removes the filesystem entry immediately. There is no Trash, no undo, no built-in recovery. The disk blocks may be recoverable with forensic tools until overwritten, but from a normal user perspective the file is gone.",
       },
       {
         id: "cli0-008-q2",
@@ -105,7 +117,8 @@ const lesson = {
           "Deletes files immediately without moving to any buffer",
         ],
         answer: 1,
-        explanation: "`-f` (force) suppresses error messages when files don't exist. Without `-f`, `rm nonexistent.txt` prints an error. With `-f`, it exits silently. Combined with `-r`, `rm -rf` deletes recursively and silently ignores missing files — commonly used in build scripts where some targets may not exist.",
+        explanation:
+          "`-f` (force) suppresses error messages when files don't exist. Without `-f`, `rm nonexistent.txt` prints an error. With `-f`, it exits silently. Combined with `-r`, `rm -rf` deletes recursively and silently ignores missing files — commonly used in build scripts where some targets may not exist.",
       },
     ],
   },

@@ -26,7 +26,54 @@ const lesson = {
       {
         type: "tip",
         title: "Name your stashes",
-        body: "`git stash push -m \"WIP: search feature UI\"` saves the stash with a descriptive name, making `git stash list` readable when you have multiple stashes. Without a name they just show the branch name and last commit message, which is often not enough context.",
+        body: '`git stash push -m "WIP: search feature UI"` saves the stash with a descriptive name, making `git stash list` readable when you have multiple stashes. Without a name they just show the branch name and last commit message, which is often not enough context.',
+      },
+    ],
+    visualizations: [
+      {
+        id: "GitWorkspace",
+        mathBridge:
+          "**Experience the stash workflow visually.** Edit `game-design.txt` — add a half-finished feature. Notice it appears as a modified file in the Source Control panel. Now imagine you need to switch tasks. Stash your work, switch branches (your file goes back to its last committed state), fix the urgent thing, then pop the stash to get your WIP back.",
+        props: {
+          label: "dungeon-explorer",
+          instanceId: "git-0-project",
+          initialFiles: {
+            "game-design.txt":
+              "GAME CONCEPT: Dungeon Explorer\n\nWin condition: reach the key room and exit.\nLose condition: health drops to zero.\n\nDifficulty levels:\n- Easy: 3 traps, 2 health potions\n- Normal: 5 traps, 1 health potion\n- Hard: 8 traps, no potions",
+            "controls.txt":
+              "CONTROLS\n\nArrow keys: move\nSpace: interact\nEsc: pause\nI: inventory",
+          },
+        },
+      },
+      {
+        id: "GitTerminal",
+        mathBridge:
+          "**Practice stashing in the terminal.**\n\n1. Edit a file without committing\n2. `git stash push -m 'WIP: dungeon room redesign'` — stash it\n3. `git stash list` — see your saved stash\n4. `git status` — working tree is clean\n5. Make an unrelated commit (e.g., fix a typo in `controls.txt`)\n6. `git stash pop` — restore your WIP on top of the new commit\n\nTo apply without removing from the stash list: `git stash apply stash@{0}`.",
+        props: {
+          label: "dungeon-explorer",
+          instanceId: "git-0-project",
+          initialFiles: {
+            "game-design.txt":
+              "GAME CONCEPT: Dungeon Explorer\n\nWin condition: reach the key room and exit.\nLose condition: health drops to zero.\n\nDifficulty levels:\n- Easy: 3 traps, 2 health potions\n- Normal: 5 traps, 1 health potion\n- Hard: 8 traps, no potions",
+            "controls.txt":
+              "CONTROLS\n\nArrow keys: move\nSpace: interact\nEsc: pause\nI: inventory",
+          },
+        },
+      },
+      {
+        id: "GitKrakenView",
+        mathBridge:
+          "**Stashes are invisible in the commit graph** — they're stored in `refs/stash`, not on any branch. Notice: no matter how many times you `git stash push` and `git stash pop`, the graph doesn't change. Only committed work appears as nodes. This is the contract: the graph shows your permanent history; the stash is a temporary side pocket. If you want stashed work to appear in the graph, you have to commit it or create a branch from the stash with `git stash branch`.",
+        props: {
+          label: "dungeon-explorer",
+          instanceId: "git-0-project",
+          initialFiles: {
+            "game-design.txt":
+              "GAME CONCEPT: Dungeon Explorer\n\nWin condition: reach the key room and exit.\nLose condition: health drops to zero.\n\nDifficulty levels:\n- Easy: 3 traps, 2 health potions\n- Normal: 5 traps, 1 health potion\n- Hard: 8 traps, no potions",
+            "controls.txt":
+              "CONTROLS\n\nArrow keys: move\nSpace: interact\nEsc: pause\nI: inventory",
+          },
+        },
       },
     ],
   },
@@ -41,7 +88,7 @@ const lesson = {
       {
         type: "definition",
         title: "Stash Commands",
-        body: "`git stash` or `git stash push` — save current dirty state\n`git stash push -m \"name\"` — save with description\n`git stash push -u` — also include untracked files\n`git stash list` — see all stash entries\n`git stash pop` — apply most recent and remove from stack\n`git stash apply stash@{N}` — apply specific stash, keep in stack\n`git stash drop stash@{N}` — delete without applying\n`git stash clear` — delete all stashes",
+        body: '`git stash` or `git stash push` — save current dirty state\n`git stash push -m "name"` — save with description\n`git stash push -u` — also include untracked files\n`git stash list` — see all stash entries\n`git stash pop` — apply most recent and remove from stack\n`git stash apply stash@{N}` — apply specific stash, keep in stack\n`git stash drop stash@{N}` — delete without applying\n`git stash clear` — delete all stashes',
       },
     ],
   },
@@ -49,11 +96,11 @@ const lesson = {
   examples: [
     {
       title: "Classic interrupt workflow",
-      body: "`# Mid-feature, urgent bug reported`\n`git stash push -m \"WIP: user settings page\"`\n`git switch main && git switch -c hotfix/payment-null`\n`# Fix bug, commit, merge, push`\n`git switch feature/user-settings`\n`git stash pop` — pick up exactly where you left off",
+      body: '`# Mid-feature, urgent bug reported`\n`git stash push -m "WIP: user settings page"`\n`git switch main && git switch -c hotfix/payment-null`\n`# Fix bug, commit, merge, push`\n`git switch feature/user-settings`\n`git stash pop` — pick up exactly where you left off',
     },
     {
       title: "Save untracked files too",
-      body: "`git stash push -u -m \"WIP: new onboarding files\"`\nWithout `-u`, brand new files you haven't committed yet would be left in the working directory when stashing.",
+      body: '`git stash push -u -m "WIP: new onboarding files"`\nWithout `-u`, brand new files you haven\'t committed yet would be left in the working directory when stashing.',
     },
   ],
 
@@ -69,7 +116,8 @@ const lesson = {
           "Modified tracked files and staged changes are saved, and the working tree is cleaned to HEAD",
           "All files including untracked ones are deleted",
         ],
-        answer: "Modified tracked files and staged changes are saved, and the working tree is cleaned to HEAD",
+        answer:
+          "Modified tracked files and staged changes are saved, and the working tree is cleaned to HEAD",
       },
       {
         id: "git0-015-q2",
@@ -81,7 +129,8 @@ const lesson = {
           "Apply applies to the current branch; pop applies to main",
           "They are identical",
         ],
-        answer: "Pop applies and removes the stash entry; apply applies but keeps the entry",
+        answer:
+          "Pop applies and removes the stash entry; apply applies but keeps the entry",
       },
       {
         id: "git0-015-q3",

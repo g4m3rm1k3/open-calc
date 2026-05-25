@@ -6,7 +6,13 @@ const lesson = {
   title: "Navigating the Filesystem",
   subtitle: "ls, cd, and the difference between absolute and relative paths",
   tags: ["cli", "ls", "cd", "paths", "navigation"],
-  aliases: ["cd command", "ls command", "file paths", "relative absolute", "navigate terminal"],
+  aliases: [
+    "cd command",
+    "ls command",
+    "file paths",
+    "relative absolute",
+    "navigate terminal",
+  ],
 
   hook: `The filesystem is a tree. You are always standing at one node of that tree — your current working directory. Every command you run either reads from or writes to a path, and understanding paths means understanding everything else.`,
 
@@ -29,18 +35,24 @@ const lesson = {
         mathBridge:
           "**Navigate the directory structure below:**\n\n```\n/home/user/\n├── projects/\n│   ├── website/\n│   │   ├── index.html\n│   │   └── style.css\n│   └── api/\n│       └── server.js\n└── documents/\n    └── notes.txt\n```\n\n- `ls` — see what's here\n- `cd projects` — go into projects (relative)\n- `ls -la` — see all files including hidden\n- `cd ..` — go back up\n- `cd ~/documents` — go to documents using ~\n- `cd /` — go to root (absolute)\n- `pwd` — confirm where you are",
         props: {
-          welcomeMessage: "Explore the filesystem. Start with: pwd, ls, then try cd.",
+          welcomeMessage:
+            "Explore the filesystem. Start with: pwd, ls, then try cd.",
           initialCwd: "/home/user",
           initialFiles: {
             "/home/user/projects/": null,
             "/home/user/projects/website/": null,
-            "/home/user/projects/website/index.html": "<!DOCTYPE html>\n<html>\n<head><title>My Site</title></head>\n<body>\n  <h1>Hello World</h1>\n</body>\n</html>",
-            "/home/user/projects/website/style.css": "body {\n  margin: 0;\n  font-family: sans-serif;\n  background: #0d1117;\n  color: white;\n}",
+            "/home/user/projects/website/index.html":
+              "<!DOCTYPE html>\n<html>\n<head><title>My Site</title></head>\n<body>\n  <h1>Hello World</h1>\n</body>\n</html>",
+            "/home/user/projects/website/style.css":
+              "body {\n  margin: 0;\n  font-family: sans-serif;\n  background: #0d1117;\n  color: white;\n}",
             "/home/user/projects/api/": null,
-            "/home/user/projects/api/server.js": "const express = require('express');\nconst app = express();\n\napp.get('/', (req, res) => {\n  res.send('API running');\n});\n\napp.listen(3000);",
+            "/home/user/projects/api/server.js":
+              "const express = require('express');\nconst app = express();\n\napp.get('/', (req, res) => {\n  res.send('API running');\n});\n\napp.listen(3000);",
             "/home/user/documents/": null,
-            "/home/user/documents/notes.txt": "Meeting notes\n- Ship by Friday\n- Fix the login bug\n- Write integration tests\n- Review PR from Sarah",
-            "/home/user/.bashrc": "# Shell configuration file\nexport PATH=$PATH:/usr/local/bin\nalias ll='ls -la'\nalias gs='git status'",
+            "/home/user/documents/notes.txt":
+              "Meeting notes\n- Ship by Friday\n- Fix the login bug\n- Write integration tests\n- Review PR from Sarah",
+            "/home/user/.bashrc":
+              "# Shell configuration file\nexport PATH=$PATH:/usr/local/bin\nalias ll='ls -la'\nalias gs='git status'",
           },
         },
       },
@@ -91,7 +103,8 @@ const lesson = {
           "`cd ~/projects/../documents`",
         ],
         answer: 2,
-        explanation: "`..` goes up one level to `/home/user`, then `documents` goes into that directory. `cd documents` would look for `/home/user/projects/documents` (doesn't exist). `cd /documents` would look for a top-level `/documents` (wrong). Option 4 works too but is unnecessarily long.",
+        explanation:
+          "`..` goes up one level to `/home/user`, then `documents` goes into that directory. `cd documents` would look for `/home/user/projects/documents` (doesn't exist). `cd /documents` would look for a top-level `/documents` (wrong). Option 4 works too but is unnecessarily long.",
       },
       {
         id: "cli0-003-q2",
@@ -104,7 +117,8 @@ const lesson = {
           "Files sorted alphabetically",
         ],
         answer: 1,
-        explanation: "`-a` (all) shows files whose names start with `.` — these are hidden by default to reduce clutter. Common hidden files include `.bashrc`, `.gitignore`, `.env`, and config directories like `.vscode/`.",
+        explanation:
+          "`-a` (all) shows files whose names start with `.` — these are hidden by default to reduce clutter. Common hidden files include `.bashrc`, `.gitignore`, `.env`, and config directories like `.vscode/`.",
       },
     ],
   },

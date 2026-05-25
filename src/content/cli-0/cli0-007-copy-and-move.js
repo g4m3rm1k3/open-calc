@@ -6,7 +6,13 @@ const lesson = {
   title: "Moving and Copying",
   subtitle: "cp, cp -r, and mv — two operations that cover everything",
   tags: ["cli", "cp", "mv", "copy", "move", "rename"],
-  aliases: ["copy file terminal", "move file terminal", "rename file", "cp command", "mv command"],
+  aliases: [
+    "copy file terminal",
+    "move file terminal",
+    "rename file",
+    "cp command",
+    "mv command",
+  ],
 
   hook: `Every file management task — copy, move, rename, reorganize — comes down to two commands: cp and mv. Rename is just mv with a new name in the same directory.`,
 
@@ -33,11 +39,15 @@ const lesson = {
           initialCwd: "/home/user/project",
           initialFiles: {
             "/home/user/project/": null,
-            "/home/user/project/game-design.txt": "# Dungeon Game Design\n\n## Concept\nTop-down dungeon crawler with procedural generation.\n\n## Win condition\nReach level 10 and defeat the boss.\n\n## Mechanics\n- Turn-based movement\n- Item collection\n- Random enemy spawns",
-            "/home/user/project/controls.txt": "# Controls\n\nWASD — move\nE    — interact\nI    — inventory\nEsc  — pause\nQ    — quit to menu",
+            "/home/user/project/game-design.txt":
+              "# Dungeon Game Design\n\n## Concept\nTop-down dungeon crawler with procedural generation.\n\n## Win condition\nReach level 10 and defeat the boss.\n\n## Mechanics\n- Turn-based movement\n- Item collection\n- Random enemy spawns",
+            "/home/user/project/controls.txt":
+              "# Controls\n\nWASD — move\nE    — interact\nI    — inventory\nEsc  — pause\nQ    — quit to menu",
             "/home/user/project/src/": null,
-            "/home/user/project/src/game.js": "// Main game loop\nfunction tick() {\n  processInput();\n  updateWorld();\n  render();\n}\n\nsetInterval(tick, 100);",
-            "/home/user/project/src/player.js": "// Player state\nconst player = {\n  x: 0, y: 0,\n  hp: 100,\n  inventory: [],\n};",
+            "/home/user/project/src/game.js":
+              "// Main game loop\nfunction tick() {\n  processInput();\n  updateWorld();\n  render();\n}\n\nsetInterval(tick, 100);",
+            "/home/user/project/src/player.js":
+              "// Player state\nconst player = {\n  x: 0, y: 0,\n  hp: 100,\n  inventory: [],\n};",
           },
         },
       },
@@ -88,7 +98,8 @@ const lesson = {
           "An error — mv cannot rename files",
         ],
         answer: 1,
-        explanation: "When the destination doesn't exist as a directory, `mv` renames the source to that name. If `settings.txt` already existed, it's silently overwritten. Use `mv -i` to be prompted before overwriting.",
+        explanation:
+          "When the destination doesn't exist as a directory, `mv` renames the source to that name. If `settings.txt` already existed, it's silently overwritten. Use `mv -i` to be prompted before overwriting.",
       },
       {
         id: "cli0-007-q2",
@@ -101,7 +112,8 @@ const lesson = {
           "The destination name must match the source name",
         ],
         answer: 1,
-        explanation: "`cp -r src/ backup/` copies the directory and all its contents. The `-r` (recursive) flag is required because directories can contain other directories — cp needs explicit permission to descend into the tree.",
+        explanation:
+          "`cp -r src/ backup/` copies the directory and all its contents. The `-r` (recursive) flag is required because directories can contain other directories — cp needs explicit permission to descend into the tree.",
       },
     ],
   },

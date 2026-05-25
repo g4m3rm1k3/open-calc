@@ -29,7 +29,8 @@ const lesson = {
         mathBridge:
           "**Build a project structure from scratch:**\n\nYour starting point is an empty `/home/user/`. Try:\n```\nmkdir projects\ncd projects\nmkdir -p dungeon-game/src dungeon-game/assets dungeon-game/tests\nls dungeon-game\ncd dungeon-game\nls\n```\n\nThen try removing a directory:\n```\nrmdir tests           # works (empty)\nrmdir src             # works (empty)\ncd ..\nrmdir dungeon-game    # fails — still has assets/\n```",
         props: {
-          welcomeMessage: "Build a project structure. Start with: mkdir projects",
+          welcomeMessage:
+            "Build a project structure. Start with: mkdir projects",
           initialFiles: {},
         },
       },
@@ -80,7 +81,8 @@ const lesson = {
           "`mkdir ui/components/src`",
         ],
         answer: 1,
-        explanation: "`mkdir -p src/components/ui` creates all three directories in order, even if `src/` and `src/components/` don't exist yet. Plain `mkdir src/components/ui` would fail if any parent is missing.",
+        explanation:
+          "`mkdir -p src/components/ui` creates all three directories in order, even if `src/` and `src/components/` don't exist yet. Plain `mkdir src/components/ui` would fail if any parent is missing.",
       },
       {
         id: "cli0-004-q2",
@@ -93,7 +95,8 @@ const lesson = {
           "rmdir only works with the -r flag for non-empty directories",
         ],
         answer: 0,
-        explanation: "`rmdir` is intentionally designed to only remove empty directories. This prevents you from accidentally deleting an entire directory tree with a typo. To remove a directory and its contents, you must deliberately use `rm -r`, which makes the destructive intent explicit.",
+        explanation:
+          "`rmdir` is intentionally designed to only remove empty directories. This prevents you from accidentally deleting an entire directory tree with a typo. To remove a directory and its contents, you must deliberately use `rm -r`, which makes the destructive intent explicit.",
       },
     ],
   },

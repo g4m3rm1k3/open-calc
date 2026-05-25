@@ -188,7 +188,7 @@ export const COURSES = [
     desc: "Document Stores, CAP Theorem & Scale",
     color: "green",
   },
-    {
+  {
     key: "applied-statistics",
     label: "Applied Statistics",
     path: "/course/applied-statistics",
@@ -201,5 +201,12 @@ export const COURSES = [
     path: "/course/cli-0",
     desc: "Terminal, Filesystem & Shell Mastery",
     color: "slate",
+  },
+  {
+    key: "cpp-0",
+    label: "C++ Programming",
+    path: "/course/cpp-0",
+    desc: "Write, Compile & Run — C++ from First Principles",
+    color: "blue",
   },
 ];

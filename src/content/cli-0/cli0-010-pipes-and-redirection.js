@@ -5,8 +5,23 @@ const lesson = {
   order: 10,
   title: "Pipes, Redirection, and the Shell Environment",
   subtitle: "Composing commands with |, >, >>, env vars, and aliases",
-  tags: ["cli", "pipe", "redirect", "env", "export", "alias", "$PATH", "environment variables"],
-  aliases: ["pipe command", "redirect output", "environment variables", "export variable", "alias terminal"],
+  tags: [
+    "cli",
+    "pipe",
+    "redirect",
+    "env",
+    "export",
+    "alias",
+    "$PATH",
+    "environment variables",
+  ],
+  aliases: [
+    "pipe command",
+    "redirect output",
+    "environment variables",
+    "export variable",
+    "alias terminal",
+  ],
 
   hook: `The pipe operator \`|\` is Unix's most powerful idea: small tools that do one thing well, chained together to do anything. This lesson teaches you how to compose commands and understand the shell environment they run in.`,
 
@@ -33,11 +48,15 @@ const lesson = {
           initialCwd: "/home/user/project",
           initialFiles: {
             "/home/user/project/": null,
-            "/home/user/project/app.log": "[ERROR] 2026-05-20 09:00:01 DB connection timeout\n[INFO]  2026-05-20 09:00:02 Server started on port 3000\n[INFO]  2026-05-20 09:01:15 GET /api/users 200 12ms\n[WARN]  2026-05-20 09:15:30 Auth token expiring in 5min\n[ERROR] 2026-05-20 09:15:55 JWT validation failed: expired token\n[INFO]  2026-05-20 09:16:00 Token refreshed for user:42\n[ERROR] 2026-05-20 10:00:00 Unhandled promise rejection: Cannot read property 'id' of undefined\n[INFO]  2026-05-20 10:00:01 Process crashed, restarting...\n[INFO]  2026-05-20 10:00:03 Server started on port 3000\n",
-            "/home/user/project/data.csv": "name,age,city\nAlice,30,New York\nBob,25,London\nCarol,35,Tokyo\nDave,28,Berlin\nEve,32,Sydney\n",
+            "/home/user/project/app.log":
+              "[ERROR] 2026-05-20 09:00:01 DB connection timeout\n[INFO]  2026-05-20 09:00:02 Server started on port 3000\n[INFO]  2026-05-20 09:01:15 GET /api/users 200 12ms\n[WARN]  2026-05-20 09:15:30 Auth token expiring in 5min\n[ERROR] 2026-05-20 09:15:55 JWT validation failed: expired token\n[INFO]  2026-05-20 09:16:00 Token refreshed for user:42\n[ERROR] 2026-05-20 10:00:00 Unhandled promise rejection: Cannot read property 'id' of undefined\n[INFO]  2026-05-20 10:00:01 Process crashed, restarting...\n[INFO]  2026-05-20 10:00:03 Server started on port 3000\n",
+            "/home/user/project/data.csv":
+              "name,age,city\nAlice,30,New York\nBob,25,London\nCarol,35,Tokyo\nDave,28,Berlin\nEve,32,Sydney\n",
             "/home/user/project/src/": null,
-            "/home/user/project/src/app.js": "const express = require('express');\nconst app = express();\n\napp.get('/api/users', (req, res) => {\n  res.json([{ id: 1, name: 'Alice' }]);\n});\n\napp.listen(process.env.PORT || 3000);\n",
-            "/home/user/project/src/config.js": "module.exports = {\n  port: process.env.PORT || 3000,\n  dbUrl: process.env.DATABASE_URL,\n  apiKey: process.env.API_KEY,\n};\n",
+            "/home/user/project/src/app.js":
+              "const express = require('express');\nconst app = express();\n\napp.get('/api/users', (req, res) => {\n  res.json([{ id: 1, name: 'Alice' }]);\n});\n\napp.listen(process.env.PORT || 3000);\n",
+            "/home/user/project/src/config.js":
+              "module.exports = {\n  port: process.env.PORT || 3000,\n  dbUrl: process.env.DATABASE_URL,\n  apiKey: process.env.API_KEY,\n};\n",
           },
         },
       },
@@ -88,7 +107,8 @@ const lesson = {
           "The total number of lines in app.log",
         ],
         answer: 2,
-        explanation: "The pipeline works left to right: `cat app.log` outputs the file; `grep 'ERROR'` filters to matching lines; `wc -l` counts those lines. The final output is a single number — the count of error lines.",
+        explanation:
+          "The pipeline works left to right: `cat app.log` outputs the file; `grep 'ERROR'` filters to matching lines; `wc -l` counts those lines. The final output is a single number — the count of error lines.",
       },
       {
         id: "cli0-010-q2",
@@ -101,7 +121,8 @@ const lesson = {
           "'secret123' only if you restart the terminal first",
         ],
         answer: 1,
-        explanation: "`export` marks a variable for inheritance by child processes. When you run `node app.js` from that terminal, Node receives a copy of the shell's environment including `API_KEY`. `process.env.API_KEY` returns 'secret123'. This is the standard way to inject secrets and config into applications without hardcoding them.",
+        explanation:
+          "`export` marks a variable for inheritance by child processes. When you run `node app.js` from that terminal, Node receives a copy of the shell's environment including `API_KEY`. `process.env.API_KEY` returns 'secret123'. This is the standard way to inject secrets and config into applications without hardcoding them.",
       },
     ],
   },

@@ -29,11 +29,15 @@ const lesson = {
         mathBridge:
           "**Practice the command anatomy pattern:**\n\n- `echo hello` — print text (argument: `hello`)\n- `echo -n hello` — print without newline (flag: `-n`)\n- `ls` — list current directory (no flags, no arguments)\n- `ls -l` — long format (flag: `-l`)\n- `ls -la` — long format + hidden files (flags: `-l` `-a`)\n- `man ls` — read the full manual for `ls`\n\nPay attention to how adding a flag changes the output.",
         props: {
-          welcomeMessage: "Practice command anatomy. Try: echo, ls, pwd, man ls",
+          welcomeMessage:
+            "Practice command anatomy. Try: echo, ls, pwd, man ls",
           initialFiles: {
-            "/home/user/README.md": "# My Terminal Notes\n\nCommands I've learned:\n- pwd\n- echo\n- ls",
-            "/home/user/.hidden-config": "# This file is hidden (starts with .)\n# Use ls -a to see it",
-            "/home/user/notes.txt": "Meeting notes\nShip by Friday\nFix login bug\nWrite tests",
+            "/home/user/README.md":
+              "# My Terminal Notes\n\nCommands I've learned:\n- pwd\n- echo\n- ls",
+            "/home/user/.hidden-config":
+              "# This file is hidden (starts with .)\n# Use ls -a to see it",
+            "/home/user/notes.txt":
+              "Meeting notes\nShip by Friday\nFix login bug\nWrite tests",
             "/home/user/projects/": null,
           },
         },
@@ -85,7 +89,8 @@ const lesson = {
           "Limits output to 10 files",
         ],
         answer: 1,
-        explanation: "`-l` activates long listing format, showing permissions, number of links, owner, group, size, timestamp, and filename for each entry.",
+        explanation:
+          "`-l` activates long listing format, showing permissions, number of links, owner, group, size, timestamp, and filename for each entry.",
       },
       {
         id: "cli0-002-q2",
@@ -98,7 +103,8 @@ const lesson = {
           "Double quotes are required for text with spaces",
         ],
         answer: 1,
-        explanation: "Without quotes, the shell splits on spaces, so `echo` receives two separate arguments. With single quotes, the entire string (including the space) is one argument. Both happen to print the same output here, but the distinction matters for commands that behave differently with multiple arguments.",
+        explanation:
+          "Without quotes, the shell splits on spaces, so `echo` receives two separate arguments. With single quotes, the entire string (including the space) is one argument. Both happen to print the same output here, but the distinction matters for commands that behave differently with multiple arguments.",
       },
     ],
   },

@@ -29,9 +29,11 @@ const lesson = {
         mathBridge:
           "**Try these commands to get oriented:**\n\n- `pwd` — print your current location (working directory)\n- `whoami` — print your username\n- `echo hello` — print any text to the screen\n- `help` — see all available commands\n- `man ls` — read the manual page for any command\n\nThe prompt `user@upskill:~$` shows: username, hostname, and current directory. `~` is shorthand for `/home/user` — your home directory.",
         props: {
-          welcomeMessage: "Terminal ready. Type 'help' to see all commands, or 'man <cmd>' for details on any command.",
+          welcomeMessage:
+            "Terminal ready. Type 'help' to see all commands, or 'man <cmd>' for details on any command.",
           initialFiles: {
-            "/home/user/README.md": "# Welcome to the Terminal\n\nYou are in your home directory (~).\n\nTry these commands:\n  pwd       — where am I?\n  whoami    — who am I?\n  ls        — what's here?\n  echo hi   — print text\n  help      — all commands",
+            "/home/user/README.md":
+              "# Welcome to the Terminal\n\nYou are in your home directory (~).\n\nTry these commands:\n  pwd       — where am I?\n  whoami    — who am I?\n  ls        — what's here?\n  echo hi   — print text\n  help      — all commands",
           },
         },
       },
@@ -82,7 +84,8 @@ const lesson = {
           "Terminal is for Mac; shell is for Linux",
         ],
         answer: 1,
-        explanation: "The terminal emulator is the window that displays text and handles input. The shell (bash, zsh, etc.) is the program running inside it that reads your commands and tells the OS what to do.",
+        explanation:
+          "The terminal emulator is the window that displays text and handles input. The shell (bash, zsh, etc.) is the program running inside it that reads your commands and tells the OS what to do.",
       },
       {
         id: "cli0-001-q2",
@@ -95,7 +98,8 @@ const lesson = {
           "A temporary directory",
         ],
         answer: 1,
-        explanation: "`~` is a shorthand for your home directory — `/home/user` on Linux, `/Users/user` on macOS. It's the directory the terminal starts in and where your personal files live.",
+        explanation:
+          "`~` is a shorthand for your home directory — `/home/user` on Linux, `/Users/user` on macOS. It's the directory the terminal starts in and where your personal files live.",
       },
     ],
   },

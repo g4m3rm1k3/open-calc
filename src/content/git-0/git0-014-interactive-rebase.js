@@ -6,7 +6,12 @@ const lesson = {
   title: "Interactive Rebase",
   subtitle: "Rewriting commit history precisely",
   tags: ["git", "rebase", "interactive", "squash", "fixup", "amend"],
-  aliases: ["git rebase -i", "squash commits", "edit history", "interactive rebase"],
+  aliases: [
+    "git rebase -i",
+    "squash commits",
+    "edit history",
+    "interactive rebase",
+  ],
 
   hook: `Your feature branch has 12 commits: "WIP", "fix bug", "actually fix it", "fix typo", "trying something". Before merging into main, clean it up into 3 meaningful commits. Interactive rebase is the editing tool for history.`,
 
@@ -27,6 +32,53 @@ const lesson = {
         type: "tip",
         title: "Reorder commits by reordering lines",
         body: "In the interactive rebase editor, the order of lines determines the order of commits. Move lines up or down to reorder commits. Git will replay them in the new order. This can create conflicts if commits depend on each other — be thoughtful about what you reorder.",
+      },
+    ],
+    visualizations: [
+      {
+        id: "GitWorkspace",
+        mathBridge:
+          "**Use this panel to generate messy commits to clean up.** Edit `game-design.txt` three times, committing after each with rough messages: `'wip'`, `'fix typo'`, `'more changes'`. These are the kind of in-progress commits you'd squash before opening a PR. Then switch to GitTerminal and run `git rebase -i HEAD~3` to collapse them into one polished commit. The panel's commit history is the before; after the rebase it shows only the single clean commit.",
+        props: {
+          label: "dungeon-explorer",
+          instanceId: "git-0-project",
+          initialFiles: {
+            "game-design.txt":
+              "GAME CONCEPT: Dungeon Explorer\n\nWin condition: reach the key room and exit.\nLose condition: health drops to zero.\n\nDifficulty levels:\n- Easy: 3 traps, 2 health potions\n- Normal: 5 traps, 1 health potion\n- Hard: 8 traps, no potions",
+            "controls.txt":
+              "CONTROLS\n\nArrow keys: move\nSpace: interact\nEsc: pause\nI: inventory",
+          },
+        },
+      },
+      {
+        id: "GitTerminal",
+        mathBridge:
+          "**Practice interactive rebase in the terminal.**\n\n1. Make 3 small commits on a feature branch (edit a file 3 times, commit after each)\n2. Run `git rebase -i HEAD~3` — an editor opens listing 3 commits\n3. In the editor, change `pick` to `squash` (or `s`) on commits 2 and 3\n4. Save and close — Git opens another editor for the combined commit message\n5. Write a clean message and save\n6. Run `git log --oneline` — 3 commits are now 1\n\n**Common actions:** `pick` (keep), `squash` (combine with previous), `fixup` (squash, discard message), `reword` (edit message), `drop` (delete).",
+        props: {
+          label: "dungeon-explorer",
+          instanceId: "git-0-project",
+          initialFiles: {
+            "game-design.txt":
+              "GAME CONCEPT: Dungeon Explorer\n\nWin condition: reach the key room and exit.\nLose condition: health drops to zero.\n\nDifficulty levels:\n- Easy: 3 traps, 2 health potions\n- Normal: 5 traps, 1 health potion\n- Hard: 8 traps, no potions",
+            "controls.txt":
+              "CONTROLS\n\nArrow keys: move\nSpace: interact\nEsc: pause\nI: inventory",
+          },
+        },
+      },
+      {
+        id: "GitKrakenView",
+        mathBridge:
+          "**The graph shows the before and after of squashing.** Before `git rebase -i HEAD~3`, you'll see 3 separate commit nodes on the branch. After squashing them to 1, those 3 nodes are replaced by a single commit with a new SHA. The branch becomes shorter and cleaner — exactly the kind of history you want before merging a feature branch. The old commit hashes are gone; only the new squashed commit's hash remains in the graph.",
+        props: {
+          label: "dungeon-explorer",
+          instanceId: "git-0-project",
+          initialFiles: {
+            "game-design.txt":
+              "GAME CONCEPT: Dungeon Explorer\n\nWin condition: reach the key room and exit.\nLose condition: health drops to zero.\n\nDifficulty levels:\n- Easy: 3 traps, 2 health potions\n- Normal: 5 traps, 1 health potion\n- Hard: 8 traps, no potions",
+            "controls.txt":
+              "CONTROLS\n\nArrow keys: move\nSpace: interact\nEsc: pause\nI: inventory",
+          },
+        },
       },
     ],
   },
@@ -69,7 +121,8 @@ const lesson = {
           "Fixup only works on the last commit; squash works on any",
           "They are identical commands",
         ],
-        answer: "Fixup discards the commit message; squash prompts you to combine messages",
+        answer:
+          "Fixup discards the commit message; squash prompts you to combine messages",
       },
       {
         id: "git0-014-q2",
@@ -87,12 +140,7 @@ const lesson = {
         id: "git0-014-q3",
         type: "choice",
         text: "You want to split one large commit into two smaller ones. What's the interactive rebase command for that commit?",
-        options: [
-          "`squash`",
-          "`split`",
-          "`edit`",
-          "`reword`",
-        ],
+        options: ["`squash`", "`split`", "`edit`", "`reword`"],
         answer: "`edit`",
       },
     ],

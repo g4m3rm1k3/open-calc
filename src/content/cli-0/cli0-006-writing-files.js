@@ -6,7 +6,13 @@ const lesson = {
   title: "Writing to Files",
   subtitle: "echo >, echo >>, and output redirection",
   tags: ["cli", "redirection", "echo", "append", "overwrite", "stdout"],
-  aliases: ["write file terminal", "echo redirect", "append file", "overwrite file", "output redirection"],
+  aliases: [
+    "write file terminal",
+    "echo redirect",
+    "append file",
+    "overwrite file",
+    "output redirection",
+  ],
 
   hook: `Every program that prints output is actually writing to a stream called stdout. The \`>\` operator redirects that stream into a file instead of the screen. Understanding this unlocks one of the most powerful ideas in Unix.`,
 
@@ -29,10 +35,13 @@ const lesson = {
         mathBridge:
           "**Practice redirection:**\n\n```bash\n# Create a file by redirecting echo\necho '# Shopping List' > list.txt\ncat list.txt\n\n# Append more items\necho 'Apples' >> list.txt\necho 'Bananas' >> list.txt\necho 'Oat milk' >> list.txt\ncat list.txt\n\n# Overwrite — replaces everything\necho 'Replaced!' > list.txt\ncat list.txt\n\n# Capture ls output\nls -la > filelist.txt\ncat filelist.txt\n```",
         props: {
-          welcomeMessage: "Practice > and >>. Try: echo 'hello' > greet.txt, then cat greet.txt",
+          welcomeMessage:
+            "Practice > and >>. Try: echo 'hello' > greet.txt, then cat greet.txt",
           initialFiles: {
-            "/home/user/notes.txt": "# Project Notes\n\nRemember to:\n- Write tests\n- Update README",
-            "/home/user/app.log": "[ERROR] Database timeout\n[INFO] Server started\n[ERROR] Auth failed\n[INFO] Request complete",
+            "/home/user/notes.txt":
+              "# Project Notes\n\nRemember to:\n- Write tests\n- Update README",
+            "/home/user/app.log":
+              "[ERROR] Database timeout\n[INFO] Server started\n[ERROR] Auth failed\n[INFO] Request complete",
           },
         },
       },
@@ -83,7 +92,8 @@ const lesson = {
           "An error — cannot overwrite existing file",
         ],
         answer: 1,
-        explanation: "`>` overwrites the entire file. The old content ('line 1') is gone and the file now contains only 'line 2'. To preserve the old content and add a new line, use `>>` instead.",
+        explanation:
+          "`>` overwrites the entire file. The old content ('line 1') is gone and the file now contains only 'line 2'. To preserve the old content and add a new line, use `>>` instead.",
       },
       {
         id: "cli0-006-q2",
@@ -96,7 +106,8 @@ const lesson = {
           "`echo ERROR app.log > errors.txt`",
         ],
         answer: 1,
-        explanation: "`grep 'ERROR' app.log` prints all matching lines to stdout. `> errors.txt` redirects that output into the file. Using `>>` (option C) would also work but would append rather than start fresh — for a one-time extraction, either works.",
+        explanation:
+          "`grep 'ERROR' app.log` prints all matching lines to stdout. `> errors.txt` redirects that output into the file. Using `>>` (option C) would also work but would append rather than start fresh — for a one-time extraction, either works.",
       },
     ],
   },
