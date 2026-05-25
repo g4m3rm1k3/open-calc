@@ -411,7 +411,11 @@ z = linspace(0, 6, 320);
 
 plot3(x, y, z)
 title('3D Helix')
-`,
+xlabel('X')
+ylabel('Y')
+zlabel('Height')
+view(3)
+  `,
   },
   {
     id: "scatter3-cloud",
@@ -422,11 +426,16 @@ title('3D Helix')
 r = linspace(0.4, 2.2, 240);
 x = dotMultiply(r, cos(t));
 y = dotMultiply(r, sin(t));
-z = linspace(-2, 2, 240) + dotMultiply(0.3, sin(3*t));
+z = linspace(-2, 2, 240) + dotMultiply(0.3, sin(dotMultiply(3, t)));
+c = z;
+s = 25 + dotMultiply(35, dotDivide(z + 2, 4));
 
-scatter3(x, y, z)
+scatter3(x, y, z, s, c, 'filled')
 title('3D Spiral Point Cloud')
-`,
+colormap('parula')
+colorbar
+view(3)
+  `,
   },
   {
     id: "interactive-surface-3d",
@@ -443,7 +452,13 @@ Z = amp * sin(freq * R) ./ R;
 
 surf(X, Y, Z)
 title('Interactive Ripple Surface')
-`,
+colormap('jet')
+colorbar
+xlabel('X')
+ylabel('Y')
+zlabel('Amplitude')
+view(3)
+  `,
   },
   {
     id: "matlab-surface-demo",

@@ -1,9 +1,53 @@
 import React, { useRef, useState, useMemo, useEffect } from "react";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls, Grid, Text, Line } from "@react-three/drei";
 import * as THREE from "three";
 import { X, Box, Layers, Settings2, Trash2, Plus, Info, Activity } from "lucide-react";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
+
+const COLOR_MAPS = {
+  parula: ["#352a87", "#0f5cdd", "#00b5a6", "#7fd34e", "#f5e663"],
+  jet: ["#00007f", "#0055ff", "#00d4ff", "#ffe600", "#ff5500", "#7f0000"],
+  viridis: ["#440154", "#414487", "#2a788e", "#22a884", "#7ad151", "#fde725"],
+  hot: ["#200000", "#7f0000", "#ff5500", "#ffd200", "#ffffcc"],
+};
+
+const clamp01 = (value) => Math.min(1, Math.max(0, value));
+
+const sampleColorMap = (name = "parula", t = 0) => {
+  const palette = COLOR_MAPS[String(name).toLowerCase()] || COLOR_MAPS.parula;
+  const normalized = clamp01(t);
+  if (palette.length === 1) return new THREE.Color(palette[0]);
+  const scaled = normalized * (palette.length - 1);
+  const index = Math.floor(scaled);
+  const localT = scaled - index;
+  const start = new THREE.Color(palette[index]);
+  const end = new THREE.Color(palette[Math.min(index + 1, palette.length - 1)]);
+  return start.lerp(end, localT);
+};
+
+const normalizeRange = (range, fallbackValues = []) => {
+  if (Array.isArray(range) && range.length >= 2 && Number.isFinite(range[0]) && Number.isFinite(range[1]) && range[0] !== range[1]) {
+    return [Number(range[0]), Number(range[1])];
+  }
+  const values = fallbackValues.filter((value) => Number.isFinite(value));
+  if (!values.length) return [0, 1];
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  return min === max ? [min, min + 1] : [min, max];
+};
+
+const valuesToColorAttribute = (values = [], range, colorMap = "parula") => {
+  const [min, max] = normalizeRange(range, values);
+  const colors = new Float32Array(values.length * 3);
+  values.forEach((value, index) => {
+    const mapped = sampleColorMap(colorMap, (Number(value) - min) / (max - min || 1));
+    colors[index * 3] = mapped.r;
+    colors[index * 3 + 1] = mapped.g;
+    colors[index * 3 + 2] = mapped.b;
+  });
+  return colors;
+};
 
 const buildPointsGeometry = (xs = [], ys = [], zs = []) => {
   const count = Math.min(xs.length, ys.length, zs.length);
@@ -27,72 +71,128 @@ const buildLinePoints = (xs = [], ys = [], zs = []) => {
   return points;
 };
 
-const BoxFrame = ({ range, isDark }) => {
-  const half = Math.max(range / 2, 2);
-  const top = half;
+const BoxFrame = ({ xlim, ylim, zlim, isDark }) => {
+  const minX = xlim?.[0] ?? -6;
+  const maxX = xlim?.[1] ?? 6;
+  const minY = ylim?.[0] ?? -6;
+  const maxY = ylim?.[1] ?? 6;
+  const minZ = zlim?.[0] ?? -6;
+  const maxZ = zlim?.[1] ?? 6;
   const color = isDark ? "#334a74" : "#9fb7df";
   const axisColor = isDark ? "#1a2740" : "#d4e2f5";
+  const sizeX = Math.max(maxX - minX, 4);
+  const sizeY = Math.max(maxY - minY, 4);
+  const sizeZ = Math.max(maxZ - minZ, 4);
+  const centerX = (minX + maxX) / 2;
+  const centerY = (minY + maxY) / 2;
+  const centerZ = (minZ + maxZ) / 2;
 
   const edges = [
-    [[-half, -half, -half], [half, -half, -half]],
-    [[-half, -half, half], [half, -half, half]],
-    [[-half, -half, -half], [-half, -half, half]],
-    [[half, -half, -half], [half, -half, half]],
-    [[-half, top, -half], [half, top, -half]],
-    [[-half, top, half], [half, top, half]],
-    [[-half, top, -half], [-half, top, half]],
-    [[half, top, -half], [half, top, half]],
-    [[-half, -half, -half], [-half, top, -half]],
-    [[half, -half, -half], [half, top, -half]],
-    [[-half, -half, half], [-half, top, half]],
-    [[half, -half, half], [half, top, half]],
+    [[minX, minZ, minY], [maxX, minZ, minY]],
+    [[minX, minZ, maxY], [maxX, minZ, maxY]],
+    [[minX, minZ, minY], [minX, minZ, maxY]],
+    [[maxX, minZ, minY], [maxX, minZ, maxY]],
+    [[minX, maxZ, minY], [maxX, maxZ, minY]],
+    [[minX, maxZ, maxY], [maxX, maxZ, maxY]],
+    [[minX, maxZ, minY], [minX, maxZ, maxY]],
+    [[maxX, maxZ, minY], [maxX, maxZ, maxY]],
+    [[minX, minZ, minY], [minX, maxZ, minY]],
+    [[maxX, minZ, minY], [maxX, maxZ, minY]],
+    [[minX, minZ, maxY], [minX, maxZ, maxY]],
+    [[maxX, minZ, maxY], [maxX, maxZ, maxY]],
   ];
 
   return (
     <group>
       <Grid
-        args={[range, range]}
-        cellSize={Math.max(range / 20, 0.5)}
+        args={[sizeX, sizeY]}
+        cellSize={Math.max(Math.max(sizeX, sizeY) / 20, 0.5)}
         cellThickness={0.6}
         cellColor={axisColor}
-        sectionSize={Math.max(range / 4, 2)}
+        sectionSize={Math.max(Math.max(sizeX, sizeY) / 4, 2)}
         sectionThickness={1.2}
         sectionColor={color}
         fadeDistance={0}
         infiniteGrid={false}
-        position={[0, -half, 0]}
+        position={[centerX, minZ, centerY]}
       />
       <Grid
-        args={[range, range]}
-        cellSize={Math.max(range / 20, 0.5)}
+        args={[sizeX, sizeZ]}
+        cellSize={Math.max(Math.max(sizeX, sizeZ) / 20, 0.5)}
         cellThickness={0.45}
         cellColor={axisColor}
-        sectionSize={Math.max(range / 4, 2)}
+        sectionSize={Math.max(Math.max(sizeX, sizeZ) / 4, 2)}
         sectionThickness={1}
         sectionColor={color}
         fadeDistance={0}
         infiniteGrid={false}
         rotation={[Math.PI / 2, 0, 0]}
-        position={[0, 0, -half]}
+        position={[centerX, centerZ, minY]}
       />
       <Grid
-        args={[range, range]}
-        cellSize={Math.max(range / 20, 0.5)}
+        args={[sizeZ, sizeY]}
+        cellSize={Math.max(Math.max(sizeZ, sizeY) / 20, 0.5)}
         cellThickness={0.45}
         cellColor={axisColor}
-        sectionSize={Math.max(range / 4, 2)}
+        sectionSize={Math.max(Math.max(sizeZ, sizeY) / 4, 2)}
         sectionThickness={1}
         sectionColor={color}
         fadeDistance={0}
         infiniteGrid={false}
         rotation={[Math.PI / 2, 0, Math.PI / 2]}
-        position={[-half, 0, 0]}
+        position={[minX, centerZ, centerY]}
       />
       {edges.map((points, index) => (
         <Line key={index} points={points} color={color} lineWidth={1} transparent opacity={0.95} />
       ))}
     </group>
   );
+};
+
+const OpenMatCameraController = ({ view, bounds, autoRotate = false }) => {
+  const { camera } = useThree();
+
+  useEffect(() => {
+    const xlim = bounds.xlim || [-6, 6];
+    const ylim = bounds.ylim || [-6, 6];
+    const zlim = bounds.zlim || [-6, 6];
+    const center = new THREE.Vector3(
+      (xlim[0] + xlim[1]) / 2,
+      (zlim[0] + zlim[1]) / 2,
+      (ylim[0] + ylim[1]) / 2,
+    );
+    const span = Math.max(xlim[1] - xlim[0], ylim[1] - ylim[0], zlim[1] - zlim[0], 6);
+    let position;
+    if (Array.isArray(view) && view.length >= 2) {
+      const az = THREE.MathUtils.degToRad(Number(view[0]) || 45);
+      const el = THREE.MathUtils.degToRad(Number(view[1]) || 30);
+      const radius = span * 1.45;
+      position = new THREE.Vector3(
+        center.x + radius * Math.cos(el) * Math.cos(az),
+        center.y + radius * Math.sin(el),
+        center.z + radius * Math.cos(el) * Math.sin(az),
+      );
+    } else {
+      switch (String(view ?? "3")) {
+        case "2":
+          position = new THREE.Vector3(center.x, center.y + span * 1.6, center.z);
+          break;
+        case "front":
+          position = new THREE.Vector3(center.x, center.y + span * 0.35, center.z + span * 1.45);
+          break;
+        case "side":
+          position = new THREE.Vector3(center.x + span * 1.45, center.y + span * 0.35, center.z);
+          break;
+        default:
+          position = new THREE.Vector3(center.x + span * 1.15, center.y + span * 0.85, center.z + span * 1.15);
+      }
+    }
+    camera.position.copy(position);
+    camera.lookAt(center);
+    camera.updateProjectionMatrix();
+  }, [bounds.xlim, bounds.ylim, bounds.zlim, camera, view, autoRotate]);
+
+  return null;
 };
 
 const OpenMatFunction3D = ({ fn, settings }) => {
@@ -105,7 +205,12 @@ const OpenMatFunction3D = ({ fn, settings }) => {
 
   const geometry = useMemo(() => {
     if (fn.plotType === "scatter3") {
-      return buildPointsGeometry(fn.xs || [], fn.ys || [], fn.zs || []);
+      const geo = buildPointsGeometry(fn.xs || [], fn.ys || [], fn.zs || []);
+      if (Array.isArray(fn.colorValues) && fn.colorValues.length) {
+        const colorValues = fn.colorValues.slice(0, Math.min(fn.xs?.length || 0, fn.ys?.length || 0, fn.zs?.length || 0)).map(Number);
+        geo.setAttribute("color", new THREE.BufferAttribute(valuesToColorAttribute(colorValues, fn.colorRange, fn.colorMap), 3));
+      }
+      return geo;
     }
     if (fn.surfaceData?.Z) {
       const { X, Y, Z } = fn.surfaceData;
@@ -122,6 +227,8 @@ const OpenMatFunction3D = ({ fn, settings }) => {
           pos.setY(index, Z?.[row]?.[col] ?? 0);
         }
       }
+      const flatZ = Z.flat().map(Number);
+      geo.setAttribute("color", new THREE.BufferAttribute(valuesToColorAttribute(flatZ, fn.colorRange, fn.colorMap), 3));
       geo.computeVertexNormals();
       return geo;
     }
@@ -164,14 +271,19 @@ const OpenMatFunction3D = ({ fn, settings }) => {
   }
 
   if (fn.plotType === "scatter3") {
+    const pointSizeValues = Array.isArray(fn.pointSizes) ? fn.pointSizes.map(Number).filter((value) => Number.isFinite(value)) : [];
+    const pointSize = pointSizeValues.length
+      ? Math.max(0.05, Math.min(0.45, pointSizeValues.reduce((sum, value) => sum + value, 0) / pointSizeValues.length / 100))
+      : (fn.pointSize ?? 0.12);
     return (
       <points geometry={geometry}>
         <pointsMaterial
           color={fn.color}
-          size={fn.pointSize ?? 0.12}
+          size={pointSize}
           transparent
           opacity={fn.opacity ?? 0.95}
           sizeAttenuation
+          vertexColors={geometry.getAttribute("color") != null}
         />
       </points>
     );
@@ -186,6 +298,7 @@ const OpenMatFunction3D = ({ fn, settings }) => {
           wireframe={fn.wireframe}
           transparent
           opacity={fn.opacity ?? 0.82}
+          vertexColors={geometry.getAttribute("color") != null}
         />
       </mesh>
       {!fn.wireframe && (
@@ -198,27 +311,36 @@ const OpenMatFunction3D = ({ fn, settings }) => {
 };
 
 const OpenMatScene = ({ functions, settings }) => {
-  const range = Math.max(settings.range || 10, 4);
-  const half = range / 2;
+  const xlim = settings.xlim || [-Math.max(settings.range || 10, 4) / 2, Math.max(settings.range || 10, 4) / 2];
+  const ylim = settings.ylim || [-Math.max(settings.range || 10, 4) / 2, Math.max(settings.range || 10, 4) / 2];
+  const zlim = settings.zlim || [-Math.max(settings.range || 10, 4) / 2, Math.max(settings.range || 10, 4) / 2];
+  const centerX = (xlim[0] + xlim[1]) / 2;
+  const centerY = (ylim[0] + ylim[1]) / 2;
+  const centerZ = (zlim[0] + zlim[1]) / 2;
 
   return (
     <>
       <ambientLight intensity={0.7} />
       <directionalLight position={[10, 14, 8]} intensity={1.2} />
       <directionalLight position={[-8, 6, -4]} intensity={0.35} />
-      <OrbitControls makeDefault dampingFactor={0.1} target={[0, 0, 0]} autoRotate={settings?.autoRotate} autoRotateSpeed={0.5} />
-      {settings.showGrid && <BoxFrame range={range} isDark={settings.isDark} />}
+      <OpenMatCameraController
+        view={settings.view}
+        bounds={{ xlim, ylim, zlim }}
+        autoRotate={settings?.autoRotate}
+      />
+      <OrbitControls makeDefault dampingFactor={0.1} target={[centerX, centerZ, centerY]} autoRotate={settings?.autoRotate} autoRotateSpeed={0.5} />
+      {settings.showGrid && <BoxFrame xlim={xlim} ylim={ylim} zlim={zlim} isDark={settings.isDark} />}
       {functions.map((fn) => (
         <OpenMatFunction3D key={fn.id} fn={fn} settings={settings} />
       ))}
-      <Text position={[half + 0.9, -half, 0]} fontSize={0.45} color="#ff5d5d">
-        X
+      <Text position={[xlim[1] + 0.9, zlim[0], centerY]} fontSize={0.45} color="#ff5d5d">
+        {settings.xlabel || "X"}
       </Text>
-      <Text position={[0, -half, half + 0.9]} fontSize={0.45} color="#30d158">
-        Y
+      <Text position={[centerX, zlim[0], ylim[1] + 0.9]} fontSize={0.45} color="#30d158">
+        {settings.ylabel || "Y"}
       </Text>
-      <Text position={[-half - 0.9, half, -half]} fontSize={0.45} color="#4d7cff">
-        Z
+      <Text position={[xlim[0] - 0.9, zlim[1], ylim[0]]} fontSize={0.45} color="#4d7cff">
+        {settings.zlabel || "Z"}
       </Text>
     </>
   );
@@ -269,6 +391,11 @@ const OpenMatGrapher3D = ({ isOpen, onClose, onSwitchTo2D, onSwitchToJSX, launch
         ys: fn.ys ?? [],
         zs: fn.zs ?? [],
         pointSize: fn.pointSize ?? 0.12,
+        pointSizes: fn.pointSizes ?? [],
+        colorValues: fn.colorValues ?? [],
+        colorMap: fn.colorMap ?? launchConfig.settings?.colormap ?? "parula",
+        colorRange: fn.colorRange ?? null,
+        filled: !!fn.filled,
       }));
       setFunctions((current) => (launchConfig.replace === false ? [...current, ...nextFunctions] : nextFunctions));
     }
@@ -303,6 +430,18 @@ const OpenMatGrapher3D = ({ isOpen, onClose, onSwitchTo2D, onSwitchToJSX, launch
   const updateSetting = (key, val) => {
     setSettings((prev) => ({ ...prev, [key]: val }));
   };
+
+  const colorbarInfo = useMemo(() => {
+    if (!settings.colorbar) return null;
+    const coloredFunction = functions.find((fn) =>
+      Array.isArray(fn.colorValues) && fn.colorValues.length && Array.isArray(fn.colorRange) && fn.colorRange.length >= 2,
+    ) || functions.find((fn) => Array.isArray(fn.colorRange) && fn.colorRange.length >= 2);
+    if (!coloredFunction) return null;
+    return {
+      map: coloredFunction.colorMap || settings.colormap || "parula",
+      range: normalizeRange(coloredFunction.colorRange, coloredFunction.colorValues || []),
+    };
+  }, [functions, settings.colorbar, settings.colormap]);
 
   return (
     <div className={embedded ? "h-full w-full overflow-hidden" : "fixed inset-0 z-[70] overflow-hidden bg-slate-900/80 backdrop-blur-xl sm:flex sm:items-center sm:justify-center sm:p-4"}>
@@ -426,16 +565,24 @@ const OpenMatGrapher3D = ({ isOpen, onClose, onSwitchTo2D, onSwitchToJSX, launch
                   />
                   <span className="text-[11px] text-slate-500 dark:text-slate-400">Auto-Rotate Camera</span>
                 </div>
+                <div className="grid grid-cols-2 gap-2 text-[11px]">
+                  <div className="rounded-xl bg-slate-100 px-2 py-1.5 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                    View: <span className="font-semibold text-slate-800 dark:text-slate-100">{Array.isArray(settings.view) ? `${settings.view[0]}°, ${settings.view[1]}°` : (settings.view || "3")}</span>
+                  </div>
+                  <div className="rounded-xl bg-slate-100 px-2 py-1.5 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                    Map: <span className="font-semibold text-slate-800 dark:text-slate-100">{settings.colormap || "parula"}</span>
+                  </div>
+                </div>
               </div>
             </div>
 
             <div className="border-t border-slate-200 bg-indigo-50/30 p-6 dark:border-slate-800 dark:bg-indigo-950/10">
-              <div className="flex items-start gap-3">
+                <div className="flex items-start gap-3">
                 <Info className="mt-1 h-4 w-4 text-indigo-500" />
                 <div className="space-y-1 text-[11px] text-slate-500 dark:text-slate-400">
                   <p className="font-bold text-indigo-600 dark:text-indigo-400">OpenMAT 3D Syntax</p>
                   <p>OpenMAT renders into a boxed lab viewport instead of the general-purpose grapher scene.</p>
-                  <p>Try: <code className="italic">surf(X,Y,Z)</code>, <code className="italic">plot3(x,y,z)</code>, <code className="italic">scatter3(x,y,z)</code>, or animate with <code className="italic">animate(...)</code>.</p>
+                  <p>Try: <code className="italic">surf(X,Y,Z)</code>, <code className="italic">scatter3(x,y,z,s,c,'filled')</code>, <code className="italic">colorbar</code>, <code className="italic">colormap('parula')</code>, or <code className="italic">view(3)</code>.</p>
                 </div>
               </div>
             </div>
@@ -479,6 +626,21 @@ const OpenMatGrapher3D = ({ isOpen, onClose, onSwitchTo2D, onSwitchToJSX, launch
                 </div>
               </div>
             </div>
+            {colorbarInfo && (
+              <div className="pointer-events-auto flex items-center gap-3 rounded-2xl border border-slate-200 bg-white/85 px-4 py-3 shadow-xl backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/85">
+                <div
+                  className="h-24 w-4 rounded-full"
+                  style={{
+                    background: `linear-gradient(to top, ${(COLOR_MAPS[colorbarInfo.map] || COLOR_MAPS.parula).join(", ")})`,
+                  }}
+                />
+                <div className="flex h-24 flex-col justify-between text-[10px] font-semibold text-slate-500 dark:text-slate-300">
+                  <span>{Number(colorbarInfo.range[1]).toFixed(2)}</span>
+                  <span className="uppercase tracking-[0.2em] text-slate-400">{colorbarInfo.map}</span>
+                  <span>{Number(colorbarInfo.range[0]).toFixed(2)}</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

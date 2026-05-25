@@ -608,7 +608,23 @@ export function buildWorkspaceSnapshot(parser, variables) {
 export const SERIES_COLORS = ["teal", "blue", "amber", "purple", "red", "green"];
 
 export function makePlotState() {
-  return { series: [], hold: false, title: "", xlabel: "", ylabel: "", legend: [], grid: true, xlim: null, ylim: null, axisMode: "auto" };
+  return {
+    series: [],
+    hold: false,
+    title: "",
+    xlabel: "",
+    ylabel: "",
+    zlabel: "",
+    legend: [],
+    grid: true,
+    xlim: null,
+    ylim: null,
+    zlim: null,
+    axisMode: "auto",
+    view: "3",
+    colormap: "parula",
+    colorbar: false,
+  };
 }
 
 export function buildFigureFromPlotState(plotState) {
@@ -712,6 +728,9 @@ export function convertSurfaceTo3DConfig(kind, args, plotState) {
     Z = args[args.length - 1];
   }
   const surfaceData = normalizeSurfaceMatrices(X, Y, Z);
+  const zValues = normalizeVector(surfaceData.Z);
+  const zFinite = zValues.filter((value) => Number.isFinite(Number(value))).map(Number);
+  const zRange = zFinite.length ? [Math.min(...zFinite), Math.max(...zFinite)] : [0, 1];
   return {
     mode: "3d",
     title: plotState.title || `OpenMAT ${kind === "mesh" ? "Mesh" : "Surface"} Lab`,
@@ -724,10 +743,21 @@ export function convertSurfaceTo3DConfig(kind, args, plotState) {
       wireframe: kind === "mesh",
       opacity: kind === "mesh" ? 1 : 0.82,
       surfaceData,
+      colorMap: plotState.colormap,
+      colorRange: zRange,
     }],
     settings: {
       range: Math.max(surfaceData.Z.length, surfaceData.Z[0]?.length || 10),
       resolution: Math.min(128, Math.max(surfaceData.Z.length, surfaceData.Z[0]?.length || 32)),
+      xlim: plotState.xlim,
+      ylim: plotState.ylim,
+      zlim: plotState.zlim,
+      view: plotState.view,
+      colorbar: plotState.colorbar,
+      colormap: plotState.colormap,
+      xlabel: plotState.xlabel,
+      ylabel: plotState.ylabel,
+      zlabel: plotState.zlabel,
     },
   };
 }
@@ -737,8 +767,19 @@ export function convertPointSeries3DConfig(kind, args, plotState) {
   const ys = normalizeVector(args[1]).map(Number);
   const zs = normalizeVector(args[2]).map(Number);
   const count = Math.min(xs.length, ys.length, zs.length);
+  const extraArgs = args.slice(3);
+  const numericExtras = extraArgs.filter((arg) => typeof arg !== "string");
+  const stringExtras = extraArgs.filter((arg) => typeof arg === "string").map((arg) => String(arg).toLowerCase());
+  const filled = stringExtras.includes("filled");
+  let sizeArg = null;
+  let colorArg = null;
+  if (numericExtras.length >= 1) sizeArg = numericExtras[0];
+  if (numericExtras.length >= 2) colorArg = numericExtras[1];
+  const sizeValues = sizeArg == null ? [] : normalizeVector(sizeArg).map(Number);
+  const colorValues = colorArg == null ? [] : normalizeVector(colorArg).map(Number);
   const extent = [...xs.slice(0, count), ...ys.slice(0, count), ...zs.slice(0, count)].filter((value) => Number.isFinite(value));
   const maxAbs = extent.length ? Math.max(...extent.map((value) => Math.abs(value))) : 10;
+  const colorFinite = colorValues.filter((value) => Number.isFinite(value));
   return {
     mode: "3d",
     title: plotState.title || `OpenMAT ${kind === "scatter3" ? "3D Scatter" : "3D Curve"}`,
@@ -754,10 +795,24 @@ export function convertPointSeries3DConfig(kind, args, plotState) {
       ys: ys.slice(0, count),
       zs: zs.slice(0, count),
       pointSize: kind === "scatter3" ? 0.14 : 0.1,
+      pointSizes: kind === "scatter3" ? sizeValues.slice(0, count) : [],
+      colorValues: kind === "scatter3" ? colorValues.slice(0, count) : [],
+      colorMap: plotState.colormap,
+      colorRange: colorFinite.length ? [Math.min(...colorFinite), Math.max(...colorFinite)] : null,
+      filled,
     }],
     settings: {
       range: Math.max(10, Math.ceil(maxAbs * 2.4)),
       resolution: 64,
+      xlim: plotState.xlim,
+      ylim: plotState.ylim,
+      zlim: plotState.zlim,
+      view: plotState.view,
+      colorbar: plotState.colorbar && kind === "scatter3" && colorFinite.length > 0,
+      colormap: plotState.colormap,
+      xlabel: plotState.xlabel,
+      ylabel: plotState.ylabel,
+      zlabel: plotState.zlabel,
     },
   };
 }
@@ -1336,6 +1391,7 @@ export function createExecutionEngine(options = {}) {
   parser.set("title", (text) => { plotState.title = String(text); return text; });
   parser.set("xlabel", (text) => { plotState.xlabel = String(text); return text; });
   parser.set("ylabel", (text) => { plotState.ylabel = String(text); return text; });
+  parser.set("zlabel", (text) => { plotState.zlabel = String(text); return text; });
   parser.set("xlim", (min, max) => {
     if (max !== undefined) { plotState.xlim = [Number(min), Number(max)]; }
     else { plotState.xlim = normalizeVector(min).slice(0, 2); }
@@ -1346,12 +1402,31 @@ export function createExecutionEngine(options = {}) {
     else { plotState.ylim = normalizeVector(min).slice(0, 2); }
     return plotState.ylim;
   });
+  parser.set("zlim", (min, max) => {
+    if (max !== undefined) { plotState.zlim = [Number(min), Number(max)]; }
+    else { plotState.zlim = normalizeVector(min).slice(0, 2); }
+    return plotState.zlim;
+  });
+  parser.set("view", (azimuth = 3, elevation) => {
+    if (elevation !== undefined) {
+      plotState.view = [Number(azimuth), Number(elevation)];
+      return plotState.view;
+    }
+    const normalized = String(azimuth).trim().toLowerCase();
+    if (normalized === "2" || normalized === "3") {
+      plotState.view = normalized;
+      return normalized;
+    }
+    const numeric = Number(azimuth);
+    plotState.view = Number.isFinite(numeric) ? [numeric, 30] : "3";
+    return plotState.view;
+  });
   parser.set("axis", (mode) => {
     if (typeof mode === "string") {
       const normalized = mode.toLowerCase();
       if (["equal", "tight", "auto"].includes(normalized)) {
         plotState.axisMode = normalized;
-        if (normalized === "auto") { plotState.xlim = null; plotState.ylim = null; }
+        if (normalized === "auto") { plotState.xlim = null; plotState.ylim = null; plotState.zlim = null; }
         return normalized;
       }
     }
@@ -1635,8 +1710,14 @@ export function createExecutionEngine(options = {}) {
   parser.set("quiver",    () => { logs.push("quiver: vector field not yet rendered."); return null; });
   parser.set("polarplot", (...args) => registerPlot("plot", args[0], args[1]));
   parser.set("pie",       (v)       => registerPlot("bar", v, null));
-  parser.set("colorbar",  () => null);
-  parser.set("colormap",  () => null);
+    parser.set("colorbar",  () => {
+      plotState.colorbar = true;
+      return true;
+    });
+    parser.set("colormap",  (name) => {
+      plotState.colormap = String(name ?? "parula").toLowerCase();
+      return plotState.colormap;
+    });
   parser.set("shading",   () => null);
   parser.set("sgtitle",   (t)       => { plotState.title = String(t); return t; });
   parser.set("text",      () => null);
