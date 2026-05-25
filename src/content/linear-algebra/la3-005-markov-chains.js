@@ -428,7 +428,6 @@ print(f"(Long-run fraction of time actually cutting)")`,
   ],
 
   checkpoints: [
-  checkpoints: [
     { id: 'cp-la3-005-1', label: 'Read: understand stochastic matrices, steady states, and why λ=1 always exists', type: 'read' },
     { id: 'cp-la3-005-2', label: 'Read: follow the proof that column sums = 1 implies eigenvalue 1', type: 'read' },
     { id: 'cp-la3-005-3', label: 'Read: understand Perron-Frobenius and the spectral gap convergence analysis', type: 'read' },
