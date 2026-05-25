@@ -105,6 +105,13 @@ export const COURSES = [
     color: "slate",
   },
   {
+    key: "git-0",
+    label: "Git: Zero to Mastery",
+    path: "/course/git-0",
+    desc: "Commit, Branch, Merge, Rebase & Collaborate",
+    color: "emerald",
+  },
+  {
     key: "git-logic",
     label: "Git Systems",
     path: "/course/git-logic",
