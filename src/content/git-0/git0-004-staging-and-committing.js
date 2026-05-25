@@ -1,43 +1,76 @@
 const lesson = {
   id: "git-0-004",
-  slug: "staging-and-committing",
+  slug: "commit-messages-matter",
   chapter: "git-0",
   order: 4,
-  title: "Staging & Committing",
-  subtitle: "The two-step that creates history",
-  tags: ["git", "add", "commit", "staging", "index"],
-  aliases: ["git add", "git commit", "stage changes", "make a commit"],
+  title: "Commit Messages Matter",
+  subtitle: "Your history is only useful if you can read it",
+  tags: ["git", "commits", "messages", "best-practices"],
+  aliases: [
+    "git commit message",
+    "how to write commit messages",
+    "git history",
+  ],
 
-  hook: `Git has a step most version control systems skip: the staging area. You don't commit all your changes at once — you choose exactly what goes into each commit. This two-step is the most important habit in all of Git.`,
+  hook: `Six months from now you're looking at a bug in production. You run \`git log\` and see: "fix", "wip", "updates", "stuff", "changes2". No idea which commit introduced it. Now imagine those same commits read: "Fix auth timeout on slow connections", "Add inventory system", "Refactor combat to remove global state". The second history tells a story. The first is just noise.`,
 
   mentalModel: [
-    "`git add` moves changes from your working directory into the staging area — a precise preview of the next commit.",
-    "`git commit` permanently saves everything in the staging area as a new snapshot with a message explaining why.",
-    "The staging area exists so you can make 5 changes but commit them as 3 logical units, each with its own clear message.",
+    "Write commit messages for the person who has to debug at 2am — they have no context. That person is often future you.",
+    "The subject line is the headline: 50 characters, imperative mood ('Add', 'Fix', 'Remove'), no period at the end. Put detail in the body.",
+    "A commit message answers WHY — the diff already shows WHAT changed. The message is the one place to explain the reasoning.",
   ],
 
   intuition: {
     prose: [
-      "**`git add`: choosing what to include.** Running `git add filename` moves that file's current state into the staging area. You can add individual files (`git add README.md`), a directory (`git add src/`), or everything changed (`git add .` — but be careful with this). Nothing is committed yet — you're building a draft of the next snapshot.",
-      "**`git commit`: making it permanent.** Once you've staged the right things, `git commit -m \"Your message here\"` creates a permanent snapshot. The message should explain *why* this change exists, not *what* changed (the diff already shows the what). Good: `\"Fix login bug when email has uppercase letters\"`. Bad: `\"fixed stuff\"`.",
-      "**Why the two-step?** Suppose you fixed a bug AND added a new feature in the same editing session. If you commit everything together, history is muddy. With staging, you add just the bug-fix files, commit them as `\"Fix login redirect\"`, then add the feature files and commit them as `\"Add dashboard export\"`. Clean, logical, searchable history.",
-    ],
-    callouts: [
-      {
-        type: "tip",
-        title: "Shortcuts",
-        body: "`git commit -am \"message\"` stages all *tracked* modified files and commits in one step (skips `git add` for tracked files — does NOT add untracked files).\n`git add -p` lets you stage partial file changes — individual hunks within a file — for surgical commits.",
-      },
+      "There are two kinds of commit history. The first is a graveyard of 'fix', 'wip', 'update stuff' — technically it's history, but it's useless. You can't search it, you can't read it, and when something breaks you're reading the full diff of every commit looking for the culprit. The second kind is a readable narrative: 'Add difficulty scaling to combat rooms', 'Fix divide-by-zero crash when player has no health potions', 'Remove deprecated map generation algorithm'. Each entry tells you what changed and why, without reading a single line of code.",
+      "In VS Code, the Source Control sidebar has a message input field at the top of the panel — it's where you write the commit subject line before clicking ✓. If you're in the terminal, it's `git commit -m 'your message here'`. For multi-line messages with a subject and body, use `git commit` without the `-m` flag to open your editor, or `git commit -m 'Subject' -m 'Body paragraph here.'`",
+      "The format professionals use: start with a verb in imperative mood. Not 'Fixed the thing' (past tense), not 'Fixing the thing' (present participle), but 'Fix the thing' (imperative, as if issuing an instruction). This matches how Git itself writes generated messages ('Merge branch feature', 'Revert commit abc1234') and makes every message read consistently.",
+      "Try it here intentionally. Make three commits — one with a completely vague message ('stuff'), one with a decent but vague one ('update game'), and one with a properly formatted message like `Add difficulty levels to combat rooms`. Then open the git graph and compare how the three entries read. The difference is immediately obvious. You're building your own empirical case for why this matters.",
     ],
     visualizations: [
       {
-        id: "GitLab",
+        id: "GitWorkspace",
+        mathBridge:
+          "**The message input field above the ✓ Commit button** is VS Code's commit message box. In the terminal: `git commit -m 'message'`. For multiline messages: `git commit` opens your default editor (usually nano or vim — set with `git config --global core.editor 'code --wait'` to use VS Code).\n\nAfter committing, run `git log --oneline` in the terminal to see your messages as a list. You'll immediately see which ones are readable and which ones are noise.",
         props: {
+          label: "dungeon-explorer",
+          instanceId: "git-0-project",
           initialFiles: {
-            "app.js": "// Main application\nconst PORT = 3000;\nconsole.log('Server starting on port ' + PORT);",
-            "README.md": "# My App\nA simple Node.js application.",
+            "game-design.txt":
+              "GAME CONCEPT: Dungeon Explorer\n\nWin condition: reach the key room and exit.\nLose condition: health drops to zero.\n\nDifficulty levels:\n- Easy: 3 traps, 2 health potions\n- Normal: 5 traps, 1 health potion\n- Hard: 8 traps, no potions",
+            "controls.txt":
+              "CONTROLS\n\nArrow keys: move\nSpace: interact\nEsc: pause\nI: inventory",
           },
-          mission: "Practice the two-step: edit a file, then click 'Take Snapshot'. Try editing both files but only snapshotting one at a time to see how selective staging works.",
+        },
+      },
+      {
+        id: "GitTerminal",
+        mathBridge:
+          "**In the terminal, commit message quality is obvious at a glance.** `git log --oneline` prints one line per commit — your message is the entire entry. A message like `stuff` tells you nothing. A message like `Add difficulty levels to combat rooms` tells you exactly what changed.\n\nTry: make commits in the VS Code panel tab with both vague and precise messages, then run `git log --oneline` here to see the difference immediately.",
+        props: {
+          label: "dungeon-explorer",
+          instanceId: "git-0-project",
+          initialFiles: {
+            "game-design.txt":
+              "GAME CONCEPT: Dungeon Explorer\n\nWin condition: reach the key room and exit.\nLose condition: health drops to zero.\n\nDifficulty levels:\n- Easy: 3 traps, 2 health potions\n- Normal: 5 traps, 1 health potion\n- Hard: 8 traps, no potions",
+            "controls.txt":
+              "CONTROLS\n\nArrow keys: move\nSpace: interact\nEsc: pause\nI: inventory",
+          },
+        },
+      },
+      {
+        id: "GitKrakenView",
+        mathBridge:
+          "**The commit message is the only label on each dot in the graph.** In GitKraken, the central lane shows your message next to each commit. A vague message like `fix` leaves you scanning diffs to figure out what happened. A precise message lets you navigate history by reading the graph alone.\n\nMake commits in the VS Code panel or terminal tabs and watch the messages appear here.",
+        props: {
+          label: "dungeon-explorer",
+          instanceId: "git-0-project",
+          initialFiles: {
+            "game-design.txt":
+              "GAME CONCEPT: Dungeon Explorer\n\nWin condition: reach the key room and exit.\nLose condition: health drops to zero.\n\nDifficulty levels:\n- Easy: 3 traps, 2 health potions\n- Normal: 5 traps, 1 health potion\n- Hard: 8 traps, no potions",
+            "controls.txt":
+              "CONTROLS\n\nArrow keys: move\nSpace: interact\nEsc: pause\nI: inventory",
+          },
         },
       },
     ],
@@ -45,28 +78,27 @@ const lesson = {
 
   rigor: {
     prose: [
-      "**What a commit object contains.** A commit is an immutable object in Git's object store containing: a pointer to a **tree** (the snapshot of all files), a pointer to the **parent** commit (or two parents for merges), the **author** (name, email, timestamp), the **committer** (may differ if someone else applied the patch), and the **commit message**. The SHA-1 hash of all this content is the commit ID.",
-      "**The commit graph.** Each commit points to its parent, forming a linked list backwards through time. The branch label (`main`, `feature`) is just a pointer to the most recent commit. When you commit, Git creates the new commit object pointing to the previous HEAD, then updates the branch pointer.",
-      "**`git add` variants.** `git add .` stages all changes in the current directory and below. `git add -A` stages all changes in the entire repo (including deletions). `git add -u` stages modifications and deletions but NOT new untracked files. `git add -p` (patch mode) lets you review and selectively stage individual change hunks within files.",
-      "**Amending the last commit.** `git commit --amend` replaces the most recent commit with a new one (new snapshot + optionally new message). Use it to fix a typo in the message or to add a file you forgot to stage. WARNING: never amend commits that have been pushed to a shared remote — it rewrites history.",
+      "**The 50/72 convention.** The subject line should be 50 characters or fewer — GitHub truncates at 72, and most git tools show only the subject in one-line views. If you need more detail, leave a blank line after the subject and write a body. The body can be as long as needed and should be wrapped at 72 characters per line. `git log --oneline` shows only the subject, so the subject must work standalone.",
+      "**Imperative mood.** Write commit messages as commands: `Add`, `Fix`, `Remove`, `Refactor`, `Update`, `Implement`, `Revert`. Not `Added`, `Fixes`, `Removing`. The convention comes from the fact that a commit message describes what the commit *does* when applied to the codebase — not what you *did* while writing it. It also matches Git's own generated messages exactly.",
+      "**The body answers why, not what.** The diff tells you what changed. The body of a commit message is for context that the diff can't show: why you chose this approach over another, what a non-obvious bug was, a link to the ticket or discussion, a note about what you explicitly didn't change and why. A body paragraph that says 'changed the loop variable from i to index' is redundant — any reader can see that in the diff. A body that says 'switched from O(n²) lookup to a hash map after profiling showed this running 400ms on large maps' is genuinely useful.",
     ],
     callouts: [
       {
-        type: "warning",
-        title: "Empty commits are rejected",
-        body: "If nothing is staged, `git commit` will say 'nothing to commit, working tree clean' and abort. You must have at least one staged change. Use `git commit --allow-empty` only for special cases like marking deployment points.",
+        type: "tip",
+        title: "The completion test",
+        body: 'Apply this to every commit message: "If applied, this commit will ___"\n\n`"Fix race condition in auth timeout"` → If applied, this commit will fix race condition in auth timeout. ✓\n`"stuff"` → If applied, this commit will stuff. ✗\n\nIf the blank reads as a coherent sentence, the message is good.',
       },
     ],
   },
 
   examples: [
     {
-      title: "A clean workflow",
-      body: "`git status` — check what's changed\n`git add src/auth.js` — stage just the auth fix\n`git commit -m \"Fix: require email verification before login\"`\n`git add src/dashboard.js src/dashboard.css` — stage the feature files\n`git commit -m \"Feature: add CSV export to dashboard\"`\nTwo commits. Two clear units of work. Readable history.",
+      title: "Before and after",
+      body: 'Bad:  git commit -m "fix"\nGood: git commit -m "Fix login crash when password contains special characters"\n\nBad:  git commit -m "changes to the game"\nGood: git commit -m "Add health potion pickup to treasure rooms"\n\nBad:  git commit -m "wip"\nGood: git commit -m "Implement basic combat: attack and dodge actions"',
     },
     {
-      title: "Viewing what's staged before committing",
-      body: "`git diff --staged` — shows the exact diff of what's in the staging area (what will be in the next commit). Always worth running before `git commit` on important changes.",
+      title: "Multi-line commit for complex changes",
+      body: 'git commit -m "Refactor dungeon generation algorithm\n\nPrevious algorithm was O(n²) and caused freezes on large maps.\nNew algorithm uses a union-find structure, reducing complexity to O(n log n).\nAll existing dungeon seeds produce identical output."',
     },
   ],
 
@@ -75,38 +107,38 @@ const lesson = {
       {
         id: "git0-004-q1",
         type: "choice",
-        text: "You've edited three files. You only want two of them in the next commit. What do you do?",
+        text: "What question should a commit message primarily answer?",
         options: [
-          "Use `git commit --partial` to select files",
-          "`git add` only the two files, then `git commit`",
-          "Delete the third file before committing",
-          "`git commit -m` and specify the filenames in the message",
+          "What files were changed",
+          "How many lines of code were added",
+          "Why this change exists",
+          "Who wrote the code",
         ],
-        answer: "`git add` only the two files, then `git commit`",
+        answer: "Why this change exists",
       },
       {
         id: "git0-004-q2",
         type: "choice",
-        text: "What does a Git commit object directly contain?",
+        text: "Which commit message follows best practices?",
         options: [
-          "The full text of every changed file",
-          "A list of line-by-line diffs from the previous commit",
-          "A pointer to a tree, parent commit hash, author, and message",
-          "A zip archive of the project at that point",
+          "fixed the thing",
+          "Add win condition check to dungeon exit logic",
+          "Added the win condition stuff and also fixed some other things while I was in there",
+          "WIP",
         ],
-        answer: "A pointer to a tree, parent commit hash, author, and message",
+        answer: "Add win condition check to dungeon exit logic",
       },
       {
         id: "git0-004-q3",
         type: "choice",
-        text: "`git commit -am \"msg\"` is a shortcut that:",
+        text: "The 50-character limit applies to:",
         options: [
-          "Stages and commits all files including new untracked files",
-          "Stages and commits only already-tracked modified files",
-          "Commits without requiring a message",
-          "Amends the previous commit",
+          "The total commit including all file changes",
+          "The commit body paragraph",
+          "The subject line of the commit message",
+          "The author field",
         ],
-        answer: "Stages and commits only already-tracked modified files",
+        answer: "The subject line of the commit message",
       },
     ],
   },

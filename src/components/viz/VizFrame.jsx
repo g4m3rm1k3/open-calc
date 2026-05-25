@@ -20,6 +20,9 @@ const VIZ_REGISTRY = {
     () => import("./cnc/LinearInterpolationViz.jsx"),
   ),
   GitLab: lazy(() => import("./git/GitLab.jsx")),
+  GitWorkspace: lazy(() => import("./git/GitWorkspace.jsx")),
+  GitTerminal: lazy(() => import("./git/GitTerminal.jsx")),
+  GitKrakenView: lazy(() => import("./git/GitKrakenView.jsx")),
   VideoCarousel: lazy(() => import("./react/VideoCarousel.jsx")),
   RosettaStoneViz: lazy(() => import("./react/RosettaStoneViz.jsx")),
   DistributivePropertyViz: lazy(

@@ -1,43 +1,73 @@
 const lesson = {
   id: "git-0-003",
-  slug: "git-init-and-status",
+  slug: "the-three-zones",
   chapter: "git-0",
   order: 3,
-  title: "git init & git status",
-  subtitle: "Starting a repository and reading its state",
-  tags: ["git", "init", "status", "repository"],
-  aliases: ["git init", "git status", "new repo"],
+  title: "The Three Zones",
+  subtitle: "Where your work lives before it becomes history",
+  tags: ["git", "staging", "working-directory", "repository"],
+  aliases: ["working directory", "staging area", "git add", "three areas"],
 
-  hook: `Before you can commit anything, you need a repository. Before you commit, you want to know what Git can see. Two commands — \`git init\` and \`git status\` — are the foundation of every Git workflow.`,
+  hook: `It's end of day. You fixed a crash in the combat system, added a new treasure room, and updated the README. Three separate things. Committing them all together with a message like "stuff" makes your history useless. Committing them separately, with clear messages, makes your history a story you can actually navigate. Staging is how you do it.`,
 
   mentalModel: [
-    "`git init` turns any folder into a Git repository by creating a `.git` subdirectory — your folder's files are untouched.",
-    "`git status` is the single most useful Git command — it tells you exactly what state every file is in.",
-    "Files in a Git repo can be untracked, modified, staged, or committed — `git status` shows which state each file is in.",
+    "In VS Code's Source Control sidebar, 'Changes' is the working directory and 'Staged Changes' is the staging area. Clicking **+** runs `git add`. Clicking **–** unstages.",
+    "Stage commits should be logically atomic — one idea per commit. Use staging to separate 'fixed a bug' from 'added a feature' even if you wrote both at the same time.",
+    "The staging area gives you control over the story your history tells. Use it deliberately, not as a checkbox to get past.",
   ],
 
   intuition: {
     prose: [
-      "**`git init` creates a repository.** Run it inside any project folder: `git init`. Git creates a hidden `.git/` directory and prints 'Initialized empty Git repository'. That's it — your project folder becomes a Git repo. None of your existing files are changed or tracked yet.",
-      "**`git status` reads the current state.** Before doing anything, check the status: `git status`. It shows: which branch you're on, which files Git doesn't know about (untracked), which tracked files have changed (modified/deleted), and which changes are staged for the next commit. Read this before every commit.",
-      "**File states.** Every file in your repo is in one of these states: **Untracked** — Git sees the file but has never been told to track it. **Modified** — Git is tracking this file and it has changed since the last commit. **Staged** — the change has been added to the index, ready to be committed. **Committed** — the current version is safely stored in the repository. `git status` shows all four.",
-    ],
-    callouts: [
-      {
-        type: "tip",
-        title: "git status -s",
-        body: "`git status -s` gives a compact summary. Two-character codes: `??` = untracked, `M ` = modified and staged, ` M` = modified but not staged, `A ` = new file staged, `D ` = deleted. The left character is the staging area; the right is the working directory.",
-      },
+      "Every change you make starts in the **working directory** — the actual files on your disk. Git watches those files but doesn't record anything yet. Changes in the working directory are unsaved as far as git history is concerned, even after you've clicked Save in your editor. They're just edits that exist on disk.",
+      "The **staging area** (also called the index) is your preparation zone. You choose which changes to include in the next commit by staging them. In VS Code's Source Control sidebar, staged files appear under a separate **Staged Changes** section. In GitKraken, you drag files from the 'Unstaged Files' panel to 'Staged Files'. In the terminal, you run `git add filename`. All three UIs do the same thing: they tell Git 'include this in the next commit.'",
+      "Once you click **✓ Commit** (or run `git commit -m 'message'` in the terminal), Git takes everything in the staging area and creates a permanent commit from it. The working directory files you didn't stage stay right where they are — just not in this commit. You can stage and commit them separately, in a different commit with a different message.",
+      "Try it here. Both files are already populated. Edit `game-design.txt` — add a room idea or change the win condition. In the panel, it appears under **Changes** with a yellow M (modified). Click the **+** button next to it only — not `controls.txt`. It moves to **Staged Changes**. Now write a message about just that one thing and click **✓ Commit**. Then edit `controls.txt`, stage it, and commit it separately. You've just written two clean, focused commits instead of one messy mixed one.",
     ],
     visualizations: [
       {
-        id: "GitLab",
+        id: "GitWorkspace",
+        mathBridge:
+          "**The panel above is VS Code's Source Control staging UI.** The two sections map directly:\n\n- **Changes** (yellow M) = working directory — modified but not staged\n- **Staged Changes** (green S) = staging area — ready to commit\n\nTerminal equivalents for each action:\n- Click **+** next to a file → `git add filename`\n- Click **–** next to a staged file → `git restore --staged filename`\n- Click **✓ Commit** with a message → `git commit -m 'message'`\n- `git status` in the terminal shows both sections at once\n\nIn GitKraken: drag files between 'Unstaged Files' and 'Staged Files'. In Fork: click the checkboxes. Same operation, different UI.",
         props: {
+          showStaging: true,
+          label: "dungeon-explorer",
+          instanceId: "git-0-project",
           initialFiles: {
-            "README.md": "# My Project\n\nA brand new Git repository.",
-            "index.js": "console.log('Hello, Git!');",
+            "game-design.txt":
+              "GAME CONCEPT: Dungeon Explorer\n\nPlayer starts in a room with three doors.\nEach door leads to a different challenge.\n\nWin condition: reach the key room and exit.\nLose condition: health drops to zero.",
+            "controls.txt":
+              "CONTROLS (draft)\n\nArrow keys: move\nSpace: interact\nEsc: pause\n\n// TODO: add inventory key",
           },
-          mission: "Explore the workspace. Edit a file, then take a snapshot. Notice how the Timeline tab shows your commit history. This is what git init + git status + git add + git commit looks like in action.",
+        },
+      },
+      {
+        id: "GitTerminal",
+        mathBridge:
+          "**The terminal above runs real Git commands against the same repository.** Try these now:\n\n```\ngit status          # see both zones at once\ngit add game-design.txt   # stage one file\ngit status          # note: it moved to Staged Changes above\ngit commit -m 'Initial game concept'\ngit log --oneline   # see the commit in history\n```\n\nEvery button click in the VS Code panel has a terminal equivalent. The terminal is not an alternative — it's the same operation, just typed. Professionals switch between both depending on what's faster.",
+        props: {
+          label: "dungeon-explorer",
+          instanceId: "git-0-project",
+          initialFiles: {
+            "game-design.txt":
+              "GAME CONCEPT: Dungeon Explorer\n\nPlayer starts in a room with three doors.\nEach door leads to a different challenge.\n\nWin condition: reach the key room and exit.\nLose condition: health drops to zero.",
+            "controls.txt":
+              "CONTROLS (draft)\n\nArrow keys: move\nSpace: interact\nEsc: pause\n\n// TODO: add inventory key",
+          },
+        },
+      },
+      {
+        id: "GitKrakenView",
+        mathBridge:
+          "**The graph above is a GitKraken-style visual history.** Once you make commits (in the terminal or VS Code panel), each one appears here as a circle on a timeline.\n\n- Click any commit circle to see its files in the right panel\n- Click a branch name on the left to switch branches\n- The blue `HEAD` badge shows where you are right now\n\nGUI clients like GitKraken, Fork, and Sourcetree all show this same graph. They're visualizing the exact same data as `git log --oneline --graph`. Make a commit in the terminal above and watch it appear here.",
+        props: {
+          label: "dungeon-explorer",
+          instanceId: "git-0-project",
+          initialFiles: {
+            "game-design.txt":
+              "GAME CONCEPT: Dungeon Explorer\n\nPlayer starts in a room with three doors.\nEach door leads to a different challenge.\n\nWin condition: reach the key room and exit.\nLose condition: health drops to zero.",
+            "controls.txt":
+              "CONTROLS (draft)\n\nArrow keys: move\nSpace: interact\nEsc: pause\n\n// TODO: add inventory key",
+          },
         },
       },
     ],
@@ -45,27 +75,27 @@ const lesson = {
 
   rigor: {
     prose: [
-      "**What's inside `.git/`.** `HEAD` — a text file pointing to the current branch (e.g. `ref: refs/heads/main`). `config` — repo-local configuration. `objects/` — the content-addressable object store (all blobs, trees, commits). `refs/heads/` — branch pointers (each file contains a commit hash). `index` — the staging area (binary format). `logs/` — reflog (history of where HEAD has been).",
-      "**Reinitializing an existing repo.** Running `git init` in a folder that already has `.git/` just prints 'Reinitialized existing Git repository' — it doesn't reset your history or delete anything.",
-      "**`git status` verbose output.** The full output groups files into three sections: 'Changes to be committed' (staged), 'Changes not staged for commit' (modified tracked files), and 'Untracked files'. If all three sections are empty, the output is 'nothing to commit, working tree clean' — the ideal state before switching branches or pulling.",
+      "**The working directory is not the repo.** Files you edit live on disk until you `git add` them. Git watches them but doesn't record them. The `.git/` folder is completely separate — a hidden directory that stores the history objects. Your working files are just a checked-out view of those objects.",
+      "**`git add` copies content, not files.** When you run `git add game-design.txt`, Git hashes the current bytes of that file and stores the hash in the staging area (called the index). If you keep editing the file after `git add`, the staged version stays as it was at the moment you ran `git add`. Running `git add .` again updates the staged version to match your latest edits. The working copy and the staged copy can differ.",
+      "**`git commit` snapshots the index, not the working directory.** When you commit, Git creates a tree object from everything currently in the staging area and wraps it in a commit. Files you edited but didn't `git add` are not in the commit — they're only in the working directory. This is by design: the staging area is your explicit, deliberate selection of what this commit contains.",
     ],
     callouts: [
       {
-        type: "definition",
-        title: "Tracked vs Untracked",
-        body: "**Tracked files** are files Git knows about — they appeared in at least one previous commit or have been staged. **Untracked files** exist on disk but Git has never been told to include them. Until you `git add` a file, Git will never commit it, never track its changes, and never show it as 'modified'.",
+        type: "tip",
+        title: "git add . stages everything — use with intention",
+        body: "`git add .` adds all modified and untracked files in the current directory at once. Fast when you want everything, but easy to accidentally include a debug file, a temporary config, or a secret. Reviewing what you're staging with `git diff --staged` before committing is a habit worth building.",
       },
     ],
   },
 
   examples: [
     {
-      title: "Starting a new project from scratch",
-      body: "`mkdir my-project && cd my-project`\n`git init`\n`echo '# My Project' > README.md`\n`git status` — shows README.md as untracked\n`git add README.md`\n`git status` — shows README.md staged\n`git commit -m \"Initial commit\"`\n`git status` — 'nothing to commit, working tree clean'",
+      title: "Two changes, two commits",
+      body: 'You fixed a typo in game-design.txt and added a new control to controls.txt.\n\n`git add game-design.txt`\n`git commit -m "Fix typo in game concept"`\n\n`git add controls.txt`\n`git commit -m "Add inventory control"`\n\nNow history is clean: one commit per logical change.',
     },
     {
-      title: "Reading status output correctly",
-      body: "`On branch main` — your current branch\n`Changes to be committed:` — staged, will go into next commit\n`Changes not staged for commit:` — modified, but not yet staged\n`Untracked files:` — Git sees them but ignores them until you `git add`",
+      title: "What 'M' means in the file tree",
+      body: "In the workspace, files with a yellow M are modified in your working directory but not yet staged.\nFiles with a green S are staged — they're ready to be committed.\nOnce committed, they show no indicator — the working copy matches the last commit.",
     },
   ],
 
@@ -74,38 +104,39 @@ const lesson = {
       {
         id: "git0-003-q1",
         type: "choice",
-        text: "What does `git init` create inside your project folder?",
+        text: "You edit controls.txt but do NOT run git add. Which zone is the change in?",
         options: [
-          "A new GitHub repository",
-          "A hidden `.git/` directory",
-          "A `git.config` file in your home directory",
-          "A `commits/` folder with your file history",
+          "The repository",
+          "The staging area",
+          "The working directory only",
+          "It has been committed automatically",
         ],
-        answer: "A hidden `.git/` directory",
+        answer: "The working directory only",
       },
       {
         id: "git0-003-q2",
         type: "choice",
-        text: "A file shows under 'Untracked files' in `git status`. What does this mean?",
+        text: "Why does the staging area exist?",
         options: [
-          "The file is corrupted",
-          "Git is tracking the file but it hasn't changed",
-          "Git has never been told to include this file in commits",
-          "The file has been staged and is ready to commit",
+          "Git requires it for security reasons",
+          "So you can choose exactly which changes to include in a commit",
+          "It compresses files before storing them",
+          "It backs up your files to the cloud",
         ],
-        answer: "Git has never been told to include this file in commits",
+        answer:
+          "So you can choose exactly which changes to include in a commit",
       },
       {
         id: "git0-003-q3",
         type: "choice",
-        text: "You run `git status` and see 'nothing to commit, working tree clean'. This means:",
+        text: "You run git add game-design.txt and then keep editing the file. What does the commit include?",
         options: [
-          "Your repo is empty with no commits",
-          "All tracked files match the last commit exactly",
-          "You have no untracked files at all",
-          "Git is paused and waiting for a command",
+          "The version of the file at the time you ran git add",
+          "The latest version you saved after git add",
+          "Both versions as separate entries",
+          "Neither — you must git add again after every edit",
         ],
-        answer: "All tracked files match the last commit exactly",
+        answer: "The version of the file at the time you ran git add",
       },
     ],
   },

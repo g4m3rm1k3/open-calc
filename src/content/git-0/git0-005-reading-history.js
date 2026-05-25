@@ -1,59 +1,105 @@
 const lesson = {
   id: "git-0-005",
-  slug: "reading-history",
+  slug: "time-travel",
   chapter: "git-0",
   order: 5,
-  title: "Reading History",
-  subtitle: "git log, git show, and git diff",
-  tags: ["git", "log", "diff", "show", "history"],
-  aliases: ["git log", "git show", "git diff", "view history"],
+  title: "Time Travel",
+  subtitle: "Navigating the history you've built",
+  tags: ["git", "checkout", "history", "fundamentals"],
+  aliases: [
+    "git checkout",
+    "navigate history",
+    "git log",
+    "restore previous version",
+  ],
 
-  hook: `Commits are only useful if you can read them. Git's history tools let you see what changed, when, by whom, and why — across any span of time. Reading history is half the job.`,
+  hook: `Something broke sometime last week. It worked on Monday, it's broken now, and you have no idea which change introduced it. If you've been committing regularly, you don't need to read every change — you can walk backward through the chain, test each checkpoint, and pinpoint the exact commit that broke things. That's git history in action.`,
 
   mentalModel: [
-    "`git log` shows the list of commits — who, when, and the message. Flags customize the output from one-line summaries to full diffs.",
-    "`git diff` compares two states: your working directory vs staging, staging vs last commit, or any two commits.",
-    "`git show` shows a single commit's full content — metadata plus the diff of what changed.",
+    "Every commit has a short hash (like `a4f3b12`) — that's its permanent address in history. You can jump to it, inspect it, or restore files from it at any time.",
+    "`git log --oneline` is your map. It prints one line per commit: hash + message. The top entry is the most recent. Read it like a timeline scrolling backward.",
+    "Checking out a past commit doesn't delete anything that came after it. You're just visiting. `git checkout main` brings you back to the present.",
   ],
 
   intuition: {
     prose: [
-      "**`git log`: the commit list.** Run `git log` to see every commit on the current branch in reverse chronological order. Each entry shows the SHA-1 hash, author, date, and message. The default output is verbose — use `git log --oneline` for a compact one-line-per-commit view. Use `git log --oneline --graph` to add a visual branch graph.",
-      "**`git show`: one commit in detail.** `git show <hash>` displays the commit metadata followed by the full diff — every line added (+) and removed (-) in that commit. You can use the first 7 characters of the hash instead of the full 40. `git show HEAD` shows the most recent commit. `git show HEAD~2` shows the commit two steps back.",
-      "**`git diff`: comparing states.** `git diff` (no arguments) shows changes in your working directory that are NOT yet staged. `git diff --staged` shows what IS staged (what goes into the next commit). `git diff <hash1> <hash2>` compares two commits. `git diff main feature/new` compares two branches.",
+      "Git history is a chain you can walk. Every commit knows its parent, which knows its parent, all the way back to the first commit ever made. In VS Code, the Timeline view in the Source Control sidebar shows this chain — click any entry to see what the file looked like at that moment. In GitKraken, the entire chain is the visual diagram in the center of the app. In the terminal, `git log --oneline` prints it as a scrollable list.",
+      "The hash at the start of each log entry (something like `a4f3b12`) is that commit's permanent address. It never changes. You can use it in `git show a4f3b12` to see exactly what changed in that commit, or `git checkout a4f3b12` to make your entire project look exactly as it did at that moment. When you're done looking around, `git checkout main` brings everything back to the present.",
+      "The workflow for hunting a bug: run `git log --oneline` in your terminal (or open the git graph in VS Code or GitKraken). Find the last commit where you're sure the code worked. `git checkout <that hash>`. Test — does the bug exist? If not, the bug was introduced after this point. If yes, go further back. Narrow it down until you find the first commit where the bug appears. Then `git show <that hash>` to see exactly what changed. `git checkout main` to return.",
+      "Build a timeline here and walk it. Make four commits — each a distinct change: add a room type, update the controls, change the difficulty numbers, fix a typo. Once you have four nodes in the graph, click an older one. The files snap to that moment — later changes disappear from the editor. They're not gone; they're just not part of the current checkpoint. Click the most recent node or use the **↩ Return to latest** button to come back.",
     ],
-    callouts: [
+    visualizations: [
       {
-        type: "tip",
-        title: "Most useful log flags",
-        body: "`git log --oneline` — compact, one commit per line\n`git log --oneline --graph --all` — visual branch tree for all branches\n`git log --author=\"Alice\"` — filter by author\n`git log --since=\"2 weeks ago\"` — filter by date\n`git log --grep=\"login\"` — filter by commit message content\n`git log -p` — show the diff for each commit inline",
+        id: "GitWorkspace",
+        mathBridge:
+          "**The git graph below each commit in this panel is the same history VS Code's Timeline view shows,** and what GitKraken displays as its central branching diagram. Each dot is a commit. Click a dot to check it out.\n\nTerminal equivalents:\n- View history → `git log --oneline`\n- See what changed in a commit → `git show <hash>`\n- Jump to a past commit → `git checkout <hash>`\n- Return to present → `git checkout main`\n- Restore one file from any commit → `git restore --source=<hash> filename`",
+        props: {
+          label: "dungeon-explorer",
+          instanceId: "git-0-project",
+          initialFiles: {
+            "game-design.txt":
+              "GAME CONCEPT: Dungeon Explorer\n\nWin condition: reach the exit room.\nLose condition: health drops to zero.\n\nRooms: 10 per level\nLevels: 3",
+            "controls.txt":
+              "CONTROLS\n\nMove: arrow keys\nInteract: space\nPause: escape\nInventory: I",
+          },
+        },
+      },
+      {
+        id: "GitTerminal",
+        mathBridge:
+          "**The terminal has the richest history tools.** Make commits in the VS Code panel tab, then explore the history here:\n\n- `git log --oneline` — compact list, newest first\n- `git log --oneline --graph` — add ASCII branch visualization\n- `git show <hash>` — see exactly what changed in any commit\n- `git checkout <hash>` — travel to a past commit (then `git checkout main` to return)",
+        props: {
+          label: "dungeon-explorer",
+          instanceId: "git-0-project",
+          initialFiles: {
+            "game-design.txt":
+              "GAME CONCEPT: Dungeon Explorer\n\nWin condition: reach the exit room.\nLose condition: health drops to zero.\n\nRooms: 10 per level\nLevels: 3",
+            "controls.txt":
+              "CONTROLS\n\nMove: arrow keys\nInteract: space\nPause: escape\nInventory: I",
+          },
+        },
+      },
+      {
+        id: "GitKrakenView",
+        mathBridge:
+          "**Click any commit dot to see its full diff.** The right panel shows which files changed and which lines were added (+) or removed (−) — this is what `git show <hash>` prints in the terminal, just displayed visually.\n\nMake commits in the VS Code panel or terminal tabs, then come back here and click through the dots to read your project's history.",
+        props: {
+          label: "dungeon-explorer",
+          instanceId: "git-0-project",
+          initialFiles: {
+            "game-design.txt":
+              "GAME CONCEPT: Dungeon Explorer\n\nWin condition: reach the exit room.\nLose condition: health drops to zero.\n\nRooms: 10 per level\nLevels: 3",
+            "controls.txt":
+              "CONTROLS\n\nMove: arrow keys\nInteract: space\nPause: escape\nInventory: I",
+          },
+        },
       },
     ],
   },
 
   rigor: {
     prose: [
-      "**Relative references.** `HEAD` is the current commit. `HEAD~1` (or `HEAD~`) is one commit before HEAD. `HEAD~3` is three commits back. `HEAD^1` and `HEAD^2` refer to the first and second parents of a merge commit. Branch names and tags are also valid references — they all resolve to a commit hash.",
-      "**`git log -S` and `git log -G`.** `-S \"searchterm\"` (the pickaxe) finds commits that introduced or removed that exact string — useful for finding when a function was added. `-G \"regex\"` finds commits where the diff matches the regex. These are powerful debugging tools.",
-      "**The diff format.** Git diffs use unified diff format: lines starting with `-` were removed, `+` were added, context lines (no prefix) show surrounding unchanged code. `@@` markers show the line numbers. Diffs are computed on demand from the stored snapshots — Git never stores diffs, only computes them when asked.",
+      "**`git log` has dozens of useful flags.** `git log --oneline` gives compact output. `git log --oneline --graph` adds ASCII branch visualization. `git log --oneline --graph --all` shows all branches. `git log --follow filename` shows only commits that touched a specific file. `git log --since='1 week ago'` filters by date. `git log --author='Name'` filters by author. You'll use these constantly in a real project.",
+      "**Detached HEAD.** When you check out a commit by hash, Git puts you in 'detached HEAD' state — HEAD points directly to the commit instead of a branch. You can look around, and even make new commits. But those commits aren't attached to any branch, and Git will warn you they may be 'lost' if you navigate away. To save work from detached HEAD, create a branch: `git checkout -b rescue-work`. To discard it, just `git checkout main`.",
+      "**`git checkout` vs `git switch` vs `git restore`.** In Git 2.23+ (released 2019), the overloaded `git checkout` was split into two dedicated commands: `git switch` for changing branches and `git restore` for restoring files. `git checkout` still works for both but the newer commands are more explicit. Most tutorials still use `git checkout` — both work.",
     ],
     callouts: [
       {
-        type: "definition",
-        title: "Commit References",
-        body: "**HEAD** — the currently checked-out commit (usually the tip of a branch).\n**HEAD~N** — N commits before HEAD in a straight line.\n**HEAD^2** — the second parent of a merge commit.\n**@{upstream}** — the tracking remote branch. Any commit hash (full or shortened to ≥7 chars) works anywhere Git expects a ref.",
+        type: "warning",
+        title: "Detached HEAD sounds scary, it isn't",
+        body: "Git shows a long warning when you enter detached HEAD mode. It's not an error — it's an informational message. Your history is completely intact. Detached HEAD just means HEAD is pointing to a commit hash directly instead of a branch name. `git checkout main` ends detached HEAD immediately and nothing is lost.",
       },
     ],
   },
 
   examples: [
     {
-      title: "See the last 5 commits as a graph",
-      body: "`git log --oneline --graph --all -n 5`\nShows the last 5 commits across all branches as a compact ASCII graph. Essential for understanding where branches diverge.",
+      title: "Walk the history",
+      body: "`git log --oneline`\na4f3b12 Add difficulty levels\n9c2a871 Add win and lose conditions\n3d8e014 Add initial game concept\n\n`git checkout 9c2a871` — project snaps to that state\n`git checkout main` — back to present",
     },
     {
-      title: "Find when a function was deleted",
-      body: "`git log -S \"function authenticate\"` — lists every commit that added or removed that exact string. Then `git show <hash>` to see what happened.",
+      title: "Time travel to find a bug",
+      body: "Your game crashed after commit five. You don't know which commit broke it.\n\n`git checkout <commit3>` — test. Works.\n`git checkout <commit4>` — test. Works.\n`git checkout <commit5>` — test. Broken.\n\nCommit 5 introduced the bug. Now you know exactly what changed:\n`git show <commit5>`",
     },
   ],
 
@@ -62,38 +108,38 @@ const lesson = {
       {
         id: "git0-005-q1",
         type: "choice",
-        text: "What does `git diff --staged` show?",
+        text: "You have commits 1, 2, 3, 4, 5. You check out commit 3. What happens to commits 4 and 5?",
         options: [
-          "Changes in your working directory not yet saved to disk",
-          "Changes that are staged and will go into the next commit",
-          "The diff between the last two commits",
-          "Changes on the remote that you haven't pulled yet",
+          "They are deleted permanently",
+          "They are hidden until you run git restore",
+          "They still exist — you are just visiting commit 3",
+          "They are moved to a temporary branch",
         ],
-        answer: "Changes that are staged and will go into the next commit",
+        answer: "They still exist — you are just visiting commit 3",
       },
       {
         id: "git0-005-q2",
         type: "choice",
-        text: "What does `HEAD~3` refer to?",
+        text: "What does `git log --oneline` show?",
         options: [
-          "The third branch in the repo",
-          "Three commits in the future",
-          "The commit three steps before the current HEAD",
-          "The HEAD of the third remote",
+          "The full diff of every commit",
+          "A one-line-per-commit list with short hash and message",
+          "Only the most recent commit",
+          "All files currently in the working directory",
         ],
-        answer: "The commit three steps before the current HEAD",
+        answer: "A one-line-per-commit list with short hash and message",
       },
       {
         id: "git0-005-q3",
         type: "choice",
-        text: "In a unified diff, lines prefixed with `+` mean:",
+        text: "What is HEAD in Git?",
         options: [
-          "Lines that exist in the old version",
-          "Lines that were added in the newer version",
-          "Lines that are unchanged context",
-          "Line numbers in the diff header",
+          "The first commit ever made in the repository",
+          "A pointer to wherever you currently are in history",
+          "The name of the default branch",
+          "The author of the most recent commit",
         ],
-        answer: "Lines that were added in the newer version",
+        answer: "A pointer to wherever you currently are in history",
       },
     ],
   },

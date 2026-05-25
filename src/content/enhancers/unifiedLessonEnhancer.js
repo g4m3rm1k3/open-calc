@@ -1,30 +1,48 @@
-import { pickTopicMissionPack } from './topicMissionPlaybook.js';
-import { getVideosForLesson, formatAsVisualization } from '../videos/VideoProvider.js';
+import { pickTopicMissionPack } from "./topicMissionPlaybook.js";
+import {
+  getVideosForLesson,
+  formatAsVisualization,
+} from "../videos/VideoProvider.js";
 
 const REAL_WORLD_LIBRARY = {
-  limits: 'In control systems and robotics, limits model what happens as sensor lag shrinks toward zero so engineers can stabilize feedback loops.',
-  continuity: 'In manufacturing and 3D printing, continuity means tiny knob adjustments do not cause sudden jumps in output geometry.',
-  derivatives: 'In driving analytics, derivatives convert position logs into speed and acceleration so teams can detect harsh braking and optimize routes.',
-  'chain rule': 'In machine learning backpropagation, each layer contributes a local rate and the total sensitivity is the product of rates along the network.',
-  trigonometric: 'In signal processing, trig derivatives describe phase and frequency changes in audio, radar, and communication waveforms.',
-  implicit: 'In navigation and robotics, implicit curves model constraints like safe-distance boundaries where slope must be inferred indirectly.',
-  optimization: 'In operations and business, optimization selects prices, dimensions, or schedules that maximize gain or minimize cost under constraints.',
-  integrals: 'In medicine and engineering, integrals accumulate dosage, flow, and energy over time rather than at single instants.',
-  series: 'In graphics and simulation, series approximations let systems compute expensive functions quickly with controlled error bounds.',
-  vectors: 'In physics engines and game development, vectors encode direction and magnitude for motion, forces, and camera orientation.',
-  probability: 'In risk analysis and forecasting, probability models uncertainty in outcomes such as failures, demand surges, or queue delays.',
-  default: 'This concept appears in real systems where variables depend on each other across time, and calculus/discrete structure predicts how small changes propagate.',
+  limits:
+    "In control systems and robotics, limits model what happens as sensor lag shrinks toward zero so engineers can stabilize feedback loops.",
+  continuity:
+    "In manufacturing and 3D printing, continuity means tiny knob adjustments do not cause sudden jumps in output geometry.",
+  derivatives:
+    "In driving analytics, derivatives convert position logs into speed and acceleration so teams can detect harsh braking and optimize routes.",
+  "chain rule":
+    "In machine learning backpropagation, each layer contributes a local rate and the total sensitivity is the product of rates along the network.",
+  trigonometric:
+    "In signal processing, trig derivatives describe phase and frequency changes in audio, radar, and communication waveforms.",
+  implicit:
+    "In navigation and robotics, implicit curves model constraints like safe-distance boundaries where slope must be inferred indirectly.",
+  optimization:
+    "In operations and business, optimization selects prices, dimensions, or schedules that maximize gain or minimize cost under constraints.",
+  integrals:
+    "In medicine and engineering, integrals accumulate dosage, flow, and energy over time rather than at single instants.",
+  series:
+    "In graphics and simulation, series approximations let systems compute expensive functions quickly with controlled error bounds.",
+  vectors:
+    "In physics engines and game development, vectors encode direction and magnitude for motion, forces, and camera orientation.",
+  probability:
+    "In risk analysis and forecasting, probability models uncertainty in outcomes such as failures, demand surges, or queue delays.",
+  default:
+    "This concept appears in real systems where variables depend on each other across time, and calculus/discrete structure predicts how small changes propagate.",
 };
 
 function inferTopicKey(lesson) {
-  const text = `${lesson.title ?? ''} ${lesson.subtitle ?? ''} ${(lesson.tags ?? []).join(' ')}`.toLowerCase();
-  const keys = Object.keys(REAL_WORLD_LIBRARY).filter((k) => k !== 'default');
+  const text =
+    `${lesson.title ?? ""} ${lesson.subtitle ?? ""} ${(lesson.tags ?? []).join(" ")}`.toLowerCase();
+  const keys = Object.keys(REAL_WORLD_LIBRARY).filter((k) => k !== "default");
   const hit = keys.find((k) => text.includes(k));
-  return hit ?? 'default';
+  return hit ?? "default";
 }
 
 function hasCallout(callouts, title) {
-  return (callouts ?? []).some((c) => (c?.title ?? '').trim().toLowerCase() === title.trim().toLowerCase());
+  return (callouts ?? []).some(
+    (c) => (c?.title ?? "").trim().toLowerCase() === title.trim().toLowerCase(),
+  );
 }
 
 function ensureArray(value) {
@@ -39,14 +57,14 @@ function filterLegacyVideos(data) {
   if (Array.isArray(data)) {
     return data
       .filter((item) => {
-        if (item && typeof item === 'object') {
+        if (item && typeof item === "object") {
           const id = item.id || (item.props && item.props.id);
-          if (id === 'VideoEmbed' || id === 'VideoCarousel') return false;
+          if (id === "VideoEmbed" || id === "VideoCarousel") return false;
         }
         return true;
       })
       .map(filterLegacyVideos);
-  } else if (data !== null && typeof data === 'object') {
+  } else if (data !== null && typeof data === "object") {
     const newData = {};
     for (const key in data) {
       newData[key] = filterLegacyVideos(data[key]);
@@ -66,8 +84,10 @@ function ensureSection(section) {
 }
 
 function sectionHasContent(section) {
-  const hasProse = (section?.prose?.length ?? 0) > 0 || (section?.blocks?.length ?? 0) > 0;
-  const hasViz = !!(section?.visualizationId) || (section?.visualizations?.length ?? 0) > 0;
+  const hasProse =
+    (section?.prose?.length ?? 0) > 0 || (section?.blocks?.length ?? 0) > 0;
+  const hasViz =
+    !!section?.visualizationId || (section?.visualizations?.length ?? 0) > 0;
   return hasProse || hasViz;
 }
 
@@ -75,33 +95,34 @@ function addConnectorCallouts(intuition, math, rigor, topicMessage) {
   // Only inject bridge callouts into sections that already have real content.
   // Injecting into empty sections creates phantom "Mathematics" / "Formal Proof"
   // expandable blocks that confuse readers.
-  if (sectionHasContent(intuition)) {
-    const nextMathTitle = 'Bridge: Visual -> Formula';
+  // Only bridge intuition → math if a math section actually exists.
+  if (sectionHasContent(intuition) && sectionHasContent(math)) {
+    const nextMathTitle = "Bridge: Visual -> Formula";
     if (!hasCallout(intuition.callouts, nextMathTitle)) {
       intuition.callouts.push({
-        type: 'insight',
+        type: "insight",
         title: nextMathTitle,
-        body: 'Use the visual model to name the changing quantities first, then map each quantity to a symbol before applying formulas.',
+        body: "Use the visual model to name the changing quantities first, then map each quantity to a symbol before applying formulas.",
       });
     }
   }
 
   if (sectionHasContent(math)) {
-    const nextRigorTitle = 'Bridge: Formula -> Proof Logic';
+    const nextRigorTitle = "Bridge: Formula -> Proof Logic";
     if (!hasCallout(math.callouts, nextRigorTitle)) {
       math.callouts.push({
-        type: 'strategy',
+        type: "strategy",
         title: nextRigorTitle,
-        body: 'Ask two questions: what assumptions make this formula legal, and what breaks if one assumption fails?',
+        body: "Ask two questions: what assumptions make this formula legal, and what breaks if one assumption fails?",
       });
     }
   }
 
   if (sectionHasContent(rigor)) {
-    const backToRealityTitle = 'Bridge: Proof -> Real World';
+    const backToRealityTitle = "Bridge: Proof -> Real World";
     if (!hasCallout(rigor.callouts, backToRealityTitle)) {
       rigor.callouts.push({
-        type: 'real-world',
+        type: "real-world",
         title: backToRealityTitle,
         body: topicMessage,
       });
@@ -115,7 +136,7 @@ function ensureHook(lesson, topicMessage) {
   };
 
   if (!hook.question || !String(hook.question).trim()) {
-    hook.question = `Why does ${lesson.title ?? 'this concept'} matter when solving real problems?`;
+    hook.question = `Why does ${lesson.title ?? "this concept"} matter when solving real problems?`;
   }
 
   if (!hook.realWorldContext || !String(hook.realWorldContext).trim()) {
@@ -129,9 +150,9 @@ export function enhanceExamples(examples, lessonId) {
   const safeExamples = ensureArray(examples);
   return safeExamples.map((example) => {
     const steps = ensureArray(example.steps);
-    
+
     // Inject Videos into Example
-    const videos = getVideosForLesson(lessonId, 'examples', example.id);
+    const videos = getVideosForLesson(lessonId, "examples", example.id);
     const viz = formatAsVisualization(videos, lessonId);
     const visualizations = ensureArray(example.visualizations);
     if (viz) {
@@ -152,9 +173,11 @@ export function enhanceExamples(examples, lessonId) {
         if (step.strategy || step.strategyTitle || step.checkpoint) return step;
         return {
           ...step,
-          strategyTitle: 'Intent',
-          strategy: step.annotation ?? 'Identify the structural purpose of this move before computing.',
-          checkpoint: 'State why this move is valid before continuing.',
+          strategyTitle: "Intent",
+          strategy:
+            step.annotation ??
+            "Identify the structural purpose of this move before computing.",
+          checkpoint: "State why this move is valid before continuing.",
         };
       }),
     };
@@ -165,7 +188,8 @@ export function enhanceLessonForUnifiedLearning(lesson) {
   if (!lesson) return lesson;
 
   const topicKey = inferTopicKey(lesson);
-  const topicMessage = REAL_WORLD_LIBRARY[topicKey] ?? REAL_WORLD_LIBRARY.default;
+  const topicMessage =
+    REAL_WORLD_LIBRARY[topicKey] ?? REAL_WORLD_LIBRARY.default;
   const missionPack = pickTopicMissionPack(lesson);
 
   const intuition = ensureSection(lesson.intuition);
@@ -174,7 +198,7 @@ export function enhanceLessonForUnifiedLearning(lesson) {
   const hook = ensureHook(lesson, topicMessage);
 
   // Inject Videos
-  const sections = ['hook', 'intuition', 'math', 'rigor'];
+  const sections = ["hook", "intuition", "math", "rigor"];
   const dataMap = { hook, intuition, math, rigor };
 
   sections.forEach((s) => {
