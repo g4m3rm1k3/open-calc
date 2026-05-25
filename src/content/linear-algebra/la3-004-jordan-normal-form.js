@@ -16,11 +16,13 @@ export default {
 
   intuition: {
     prose: [
+      'Take $A = \\begin{bmatrix}3&1\\\\0&3\\end{bmatrix}$. It has eigenvalue $\\lambda = 3$ with algebraic multiplicity 2. But $(A-3I) = \\begin{bmatrix}0&1\\\\0&0\\end{bmatrix}$ has only one independent null vector: $\\mathbf{v}_1 = [1,0]^\\top$. One eigenvector, two needed — diagonalization fails. Jordan form is the answer: $A$ itself IS already in Jordan form $J_2(3) = \\begin{bmatrix}3&1\\\\0&3\\end{bmatrix}$. The 1 on the superdiagonal encodes the "missing" eigenvector. Powers: $A^n = \\begin{bmatrix}3^n & n\\cdot3^{n-1}\\\\0&3^n\\end{bmatrix}$ — not just $3^n$ on the diagonal, but a polynomial growth term $n\\cdot3^{n-1}$ that diagonalization cannot capture.',
       '**Review: what diagonalization requires.** From la3-002, an $n \\times n$ matrix is diagonalizable iff it has $n$ linearly independent eigenvectors. When a matrix has a repeated eigenvalue $\\lambda$ but fewer independent eigenvectors than the multiplicity of $\\lambda$, it is called **defective** — and diagonalization is impossible. Jordan form is the answer to the question: if we cannot fully diagonalize, what is the closest we can get?',
       '**What a Jordan block looks like.** A Jordan block $J_k(\\lambda)$ is a $k \\times k$ matrix with $\\lambda$ on the main diagonal and 1s on the superdiagonal, zeros elsewhere:\n\n$J_k(\\lambda) = \\begin{bmatrix}\\lambda & 1 & 0 & 0 \\\\ 0 & \\lambda & 1 & 0 \\\\ 0 & 0 & \\lambda & 1 \\\\ 0 & 0 & 0 & \\lambda\\end{bmatrix}$\n\nA $1\\times 1$ block is just $[\\lambda]$. When all blocks are $1\\times 1$, you have the diagonal form you know. The 1s on the superdiagonal are the mark of a defective matrix — they encode the "missing" eigenvectors.',
       '**The Jordan Normal Form theorem.** Every $n \\times n$ complex matrix is similar to a block-diagonal matrix whose blocks are Jordan blocks. This is the Jordan Normal Form (JNF). The block structure is unique (up to reordering blocks): the sizes and eigenvalues of the blocks are fingerprints of the matrix. What is not unique is the change-of-basis matrix $P$.',
       '**Generalized eigenvectors — filling the gap.** For a size-$k$ Jordan block, there is only ONE linearly independent eigenvector. The remaining $k-1$ basis vectors are **generalized eigenvectors**: they satisfy $(A - \\lambda I)^j \\mathbf{v}_j = \\mathbf{0}$ for some $j > 1$ but not for $j-1$. Together they form a **Jordan chain**: starting from the true eigenvector $\\mathbf{v}_1$ (satisfying $(A-\\lambda I)\\mathbf{v}_1 = 0$), each next vector is found by solving $(A - \\lambda I)\\mathbf{v}_{i+1} = \\mathbf{v}_i$.',
       '**CNC application: critically damped axes.** A CNC axis controller modeled as a second-order system has a characteristic equation $s^2 + 2\\zeta\\omega_n s + \\omega_n^2 = 0$. At **critical damping** ($\\zeta = 1$), this has a repeated root: $s = -\\omega_n$ with multiplicity 2. The corresponding state matrix is a Jordan block $J_2(-\\omega_n)$ — defective by design. The solution is $x(t) = (c_1 + c_2 t)e^{-\\omega_n t}$: the polynomial factor $c_2 t$ is the signature of the Jordan block. CNC axes are often tuned near critical damping for the fastest non-oscillatory response. Overdamped axes settle more slowly; underdamped axes ring. The Jordan block is the math behind the "sweet spot."',
+      '**Predict before reading on.** A $4 \\times 4$ matrix has eigenvalue $\\lambda = 5$ with algebraic multiplicity 4 and geometric multiplicity 2. How many Jordan blocks are there? What are the possible block size configurations? Write your answers before continuing.',
       '**Why Jordan form matters theoretically.** Jordan form classifies all linear maps up to change-of-basis — two matrices are similar (represent the same transformation) if and only if they have the same Jordan form. It also makes computing matrix exponentials tractable: $e^{Jt}$ for a Jordan block has a clean formula involving polynomials in $t$ multiplied by exponentials, which is exactly the solution structure of differential equations with repeated eigenvalues.',
     ],
     callouts: [
@@ -342,6 +344,35 @@ print("The linear term 'c2*t' is the Jordan block's signature.")`,
       ],
       conclusion: 'With only algebraic and geometric multiplicity, you can narrow down the Jordan structure but may not determine it uniquely. The ranks of $(A-\\lambda I)^k$ for $k = 1, 2, \\ldots$ give the full picture.',
     },
+    {
+      id: 'ex-la3-004-3',
+      title: 'Computing A^n for a Jordan Block',
+      problem: 'Let $J = \\begin{bmatrix}2&1\\\\0&2\\end{bmatrix}$ (a Jordan block with $\\lambda=2$). Compute $J^3$ using the binomial theorem formula, and verify by direct multiplication.',
+      steps: [
+        {
+          expression: 'J = \\lambda I + N \\text{ where } N = \\begin{bmatrix}0&1\\\\0&0\\end{bmatrix}, \\; N^2 = \\begin{bmatrix}0&0\\\\0&0\\end{bmatrix}',
+          annotation: 'Decompose: $J = \\lambda I + N$ where $N$ is nilpotent ($N^2 = 0$). This is always valid for Jordan blocks.',
+          strategyTitle: 'Decompose J into scalar + nilpotent',
+          checkpoint: 'Why does N^2 = 0 matter?',
+          hints: ['$N^2 = 0$ means the binomial expansion $(\\lambda I + N)^n$ terminates after two terms: $\\lambda^n I + n\\lambda^{n-1}N$. All higher terms vanish.'],
+        },
+        {
+          expression: 'J^n = (\\lambda I + N)^n = \\lambda^n I + n\\lambda^{n-1}N = \\begin{bmatrix}\\lambda^n & n\\lambda^{n-1}\\\\0&\\lambda^n\\end{bmatrix}',
+          annotation: 'Binomial theorem with $N^2 = 0$: only the $k=0$ and $k=1$ terms survive.',
+          strategyTitle: 'Apply the Jordan block power formula',
+          checkpoint: '',
+          hints: [],
+        },
+        {
+          expression: 'J^3 = \\begin{bmatrix}2^3 & 3\\cdot2^2\\\\0&2^3\\end{bmatrix} = \\begin{bmatrix}8&12\\\\0&8\\end{bmatrix}',
+          annotation: '$\\lambda = 2$, $n = 3$: diagonal entry $2^3 = 8$, off-diagonal $3 \\cdot 4 = 12$.',
+          strategyTitle: 'Evaluate for λ=2, n=3',
+          checkpoint: 'Verify by direct computation: J·J·J.',
+          hints: ['$J^2 = \\begin{bmatrix}4&4\\\\0&4\\end{bmatrix}$, then $J^3 = J^2 J = \\begin{bmatrix}4&4\\\\0&4\\end{bmatrix}\\begin{bmatrix}2&1\\\\0&2\\end{bmatrix} = \\begin{bmatrix}8&12\\\\0&8\\end{bmatrix}$ ✓'],
+        },
+      ],
+      conclusion: 'For a Jordan block $J_2(\\lambda)$: $J^n = \\begin{bmatrix}\\lambda^n & n\\lambda^{n-1}\\\\0&\\lambda^n\\end{bmatrix}$. The off-diagonal grows polynomially in $n$ — not just exponentially like $\\lambda^n$. This polynomial×exponential growth is the signature of a defective matrix and makes Jordan form essential for differential equations with repeated roots.',
+    },
   ],
 
   challenges: [
@@ -414,9 +445,14 @@ print("The linear term 'c2*t' is the Jordan block's signature.")`,
   ],
 
   checkpoints: [
-    { id: 'cp-la3-004-1', question: 'What makes a matrix defective?', answer: 'Geometric multiplicity < algebraic multiplicity for some eigenvalue.' },
-    { id: 'cp-la3-004-2', question: 'What is a generalized eigenvector?', answer: '$(A - \\lambda I)^k \\mathbf{v} = 0$ but $(A - \\lambda I)^{k-1} \\mathbf{v} \\neq 0$.' },
-    { id: 'cp-la3-004-3', question: 'If all Jordan blocks are $1 \\times 1$, what does that mean?', answer: 'The matrix is diagonalizable.' },
+    { id: 'cp-la3-004-1', label: 'Read: understand why defective matrices cannot be diagonalized and what Jordan blocks encode', type: 'read' },
+    { id: 'cp-la3-004-2', label: 'Read: follow the generalized eigenvector construction and Jordan chain algorithm', type: 'read' },
+    { id: 'cp-la3-004-3', label: 'Read: understand the Jordan Normal Form theorem and its uniqueness', type: 'read' },
+    { id: 'cp-la3-004-4', label: 'Run code cell — compute Jordan form numerically and verify P J P⁻¹ = A', type: 'lab' },
+    { id: 'cp-la3-004-5', label: 'Run code cell — simulate critically damped CNC axis using Jordan block matrix exponential', type: 'lab' },
+    { id: 'cp-la3-004-6', label: 'Complete example 1: find Jordan form from eigenvalues and multiplicities', type: 'example' },
+    { id: 'cp-la3-004-7', label: 'Complete example 2: determine Jordan structure from rank analysis', type: 'example' },
+    { id: 'cp-la3-004-8', label: 'Attempt challenge 3: use binomial theorem to compute J^n for a 2×2 Jordan block', type: 'challenge' },
   ],
 
   assessment: {
@@ -473,5 +509,135 @@ print("The linear term 'c2*t' is the Jordan block's signature.")`,
       hints: ['A defective matrix is on the boundary between distinct and repeated eigenvalues. A tiny ε perturbation can split λ (mult 2) into two eigenvalues differing by ~√ε — making the computed form wildly sensitive.'],
       reviewSection: 'Intuition — Warning: Jordan Form Is Numerically Unstable',
     },
+    {
+      id: 'q-la3-004-5',
+      type: 'choice',
+      text: 'A $5 \\times 5$ matrix has a single eigenvalue $\\lambda = 4$ with geometric multiplicity 3. How many Jordan blocks are there, and what sizes are possible?',
+      options: [
+        '5 blocks of size 1 each',
+        '3 blocks whose sizes sum to 5',
+        '1 block of size 5',
+        '2 blocks: one of size 4, one of size 1',
+      ],
+      answer: '3 blocks whose sizes sum to 5',
+      hints: ['Number of Jordan blocks = geometric multiplicity = 3. Sum of block sizes = algebraic multiplicity = 5. With 3 blocks summing to 5, the options are: 3+1+1, 2+2+1.'],
+      reviewSection: 'Intuition tab — Reading the Jordan Structure',
+    },
+    {
+      id: 'q-la3-004-6',
+      type: 'choice',
+      text: 'For a $2 \\times 2$ Jordan block $J = \\begin{bmatrix}\\lambda&1\\\\0&\\lambda\\end{bmatrix}$, what is $J^n$?',
+      options: [
+        '$\\begin{bmatrix}\\lambda^n&1\\\\0&\\lambda^n\\end{bmatrix}$',
+        '$\\begin{bmatrix}\\lambda^n&n\\lambda^{n-1}\\\\0&\\lambda^n\\end{bmatrix}$',
+        '$\\lambda^n I$',
+        '$\\begin{bmatrix}\\lambda^n&n\\\\0&\\lambda^n\\end{bmatrix}$',
+      ],
+      answer: '$\\begin{bmatrix}\\lambda^n&n\\lambda^{n-1}\\\\0&\\lambda^n\\end{bmatrix}$',
+      hints: ['$J = \\lambda I + N$ where $N^2 = 0$. Binomial theorem: $J^n = \\lambda^n I + n\\lambda^{n-1}N$. The off-diagonal of $N$ is 1, giving off-diagonal $n\\lambda^{n-1}$.'],
+      reviewSection: 'Challenges — Challenge 3',
+    },
+    {
+      id: 'q-la3-004-7',
+      type: 'choice',
+      text: 'Two matrices $A$ and $B$ are similar (same transformation, different bases) if and only if:',
+      options: [
+        'They have the same trace and determinant.',
+        'They have the same characteristic polynomial.',
+        'They have the same Jordan Normal Form.',
+        'They have the same rank.',
+      ],
+      answer: 'They have the same Jordan Normal Form.',
+      hints: ['Trace, det, and char. poly. are necessary but not sufficient — $A = \\begin{bmatrix}2&0\\\\0&2\\end{bmatrix}$ and $B = \\begin{bmatrix}2&1\\\\0&2\\end{bmatrix}$ have the same char. poly. but different Jordan forms (1+1 blocks vs. one 2-block) and are not similar.'],
+      reviewSection: 'Rigor tab — Jordan classification theorem',
+    },
+    {
+      id: 'q-la3-004-8',
+      type: 'choice',
+      text: 'A differential equation $\\dot{\\mathbf{x}} = J\\mathbf{x}$ has $J = \\begin{bmatrix}\\lambda&1\\\\0&\\lambda\\end{bmatrix}$ (Jordan block). The solution has the form:',
+      options: [
+        '$\\mathbf{x}(t) = e^{\\lambda t}(c_1\\mathbf{v}_1 + c_2\\mathbf{v}_2)$ with two eigenvectors $\\mathbf{v}_1, \\mathbf{v}_2$',
+        '$\\mathbf{x}(t) = e^{\\lambda t}(c_1\\mathbf{v}_1 + c_2 t\\mathbf{v}_1 + c_2\\mathbf{v}_2^*)$ — polynomial times exponential',
+        '$\\mathbf{x}(t) = c_1 e^{\\lambda t} + c_2 e^{-\\lambda t}$',
+        '$\\mathbf{x}(t) = c_1 \\cos(\\lambda t) + c_2 \\sin(\\lambda t)$',
+      ],
+      answer: '$\\mathbf{x}(t) = e^{\\lambda t}(c_1\\mathbf{v}_1 + c_2 t\\mathbf{v}_1 + c_2\\mathbf{v}_2^*)$ — polynomial times exponential',
+      hints: ['Jordan blocks produce $t^k e^{\\lambda t}$ solutions. For a size-2 block, the two independent solutions are $e^{\\lambda t}\\mathbf{v}_1$ and $e^{\\lambda t}(\\mathbf{v}_2^* + t\\mathbf{v}_1)$ where $\\mathbf{v}_1$ is the eigenvector and $\\mathbf{v}_2^*$ is a generalized eigenvector.'],
+      reviewSection: 'Intuition tab — CNC critically damped axes',
+    },
+    {
+      id: 'q-la3-004-9',
+      type: 'choice',
+      text: 'The nilpotent part $N$ of a Jordan block satisfies $N^k = 0$ for $k \\geq $ (block size). For a size-3 Jordan block, what is the first power where $N^k = 0$?',
+      options: ['$k = 1$', '$k = 2$', '$k = 3$', '$k = 4$'],
+      answer: '$k = 3$',
+      hints: ['$N = \\begin{bmatrix}0&1&0\\\\0&0&1\\\\0&0&0\\end{bmatrix}$: $N^2 = \\begin{bmatrix}0&0&1\\\\0&0&0\\\\0&0&0\\end{bmatrix}$, $N^3 = 0$. The nilpotency index equals the block size.'],
+      reviewSection: 'Math tab — Jordan block powers',
+    },
+    {
+      id: 'q-la3-004-10',
+      type: 'choice',
+      text: 'A defective matrix has a repeated eigenvalue with geometric multiplicity strictly less than algebraic multiplicity. Why can this NOT be fixed by choosing a better eigenvector basis?',
+      options: [
+        'Because the eigenvectors are not orthogonal.',
+        'Because there literally do not exist enough linearly independent eigenvectors — the eigenspace is too small, not just poorly chosen.',
+        'Because we need complex numbers to find the remaining eigenvectors.',
+        'Because defective matrices have zero determinant.',
+      ],
+      answer: 'Because there literally do not exist enough linearly independent eigenvectors — the eigenspace is too small, not just poorly chosen.',
+      hints: ['Geometric multiplicity = dim ker(A - λI) = maximum number of independent eigenvectors. This is a fixed number, not a choice. If geometric multiplicity = 1 < algebraic multiplicity = 2, there is exactly one independent eigenvector, no matter how you search. Jordan form uses generalized eigenvectors to fill the gap.'],
+      reviewSection: 'Intuition tab — what a Jordan block looks like',
+    },
   ],
+
+  misconceptions: [
+    {
+      falseBelief: 'Jordan form and diagonalization are the same thing, or that Jordan form is just the diagonal form with eigenvalues.',
+      whyStudentsThinkIt: 'Both $A = PDP^{-1}$ (diagonal) and $A = PJP^{-1}$ (Jordan) use a similarity transformation. Students conflate them.',
+      correctionExample: '$A = \\begin{bmatrix}3&1\\\\0&3\\end{bmatrix}$ already IS in Jordan form: $J_2(3)$. Its Jordan form is not $\\text{diag}(3,3)$ because only one eigenvector exists. In Jordan form, the 1 on the superdiagonal is essential — removing it would change the matrix.',
+      contrastCase: 'A diagonalizable matrix\'s Jordan form has all 1×1 blocks: $J = D$ (diagonal). Only for non-defective matrices does Jordan form equal diagonal form.',
+    },
+    {
+      falseBelief: 'If a matrix has all distinct eigenvalues, it might still be defective.',
+      whyStudentsThinkIt: 'Students know defective = "not enough eigenvectors" and confuse this with having few eigenvalues.',
+      correctionExample: 'Distinct eigenvalues always produce independent eigenvectors. A $3 \\times 3$ matrix with eigenvalues $1, 2, 3$ (all different) has exactly 3 independent eigenvectors — it is diagonalizable. Defectiveness only arises when an eigenvalue has algebraic multiplicity $> 1$.',
+      contrastCase: 'A repeated eigenvalue ($\\lambda$ with algebraic multiplicity $\\geq 2$) CAN be defective or not. $\\text{diag}(2,2)$ has algebraic multiplicity 2 and geometric multiplicity 2 — not defective. $\\begin{bmatrix}2&1\\\\0&2\\end{bmatrix}$ has algebraic 2 and geometric 1 — defective.',
+    },
+  ],
+
+  transferPrompts: [
+    {
+      situation: 'A mechanical engineer models the response of a critically damped oscillator (like a car suspension at exactly critical damping). The system ODE is $m\\ddot{x} + c\\dot{x} + kx = 0$ with $c = 2\\sqrt{mk}$ (critical damping). They need the time-domain solution.',
+      competingTechniques: 'Assume underdamped form $e^{-\\zeta\\omega_n t}\\cos(\\omega_d t)$ (wrong — no imaginary part at critical damping), use standard ODE solver, or apply Jordan form theory.',
+      whyThisTechniqueWins: 'Critical damping creates a repeated eigenvalue $s = -\\omega_n$ (multiplicity 2). The Jordan block structure gives solution $x(t) = (c_1 + c_2 t)e^{-\\omega_n t}$. The polynomial factor $c_2 t$ is unique to Jordan blocks — it cannot arise from diagonalization. Jordan theory is the only way to predict this "slowest possible decay without oscillation" behavior.',
+    },
+    {
+      situation: 'A control engineer finds that a linearized system matrix has eigenvalue $\\lambda = 0$ with algebraic multiplicity 2 but geometric multiplicity 1 (a Jordan block at zero). They need to check stability.',
+      competingTechniques: 'Lyapunov stability theory, eigenvalue criteria for stability, Jordan form analysis.',
+      whyThisTechniqueWins: 'A Jordan block at $\\lambda = 0$ is marginally unstable in continuous time: the solution has a term $te^{0\\cdot t} = t$ that grows polynomially. Even though $\\text{Re}(\\lambda) = 0$, the system is NOT stable — it drifts. The Jordan form reveals this polynomial growth that eigenvalue magnitude alone misses. The fix: design a controller that moves the Jordan block off zero, eliminating the defective structure.',
+    },
+  ],
+
+  debugging: [
+    {
+      commonError: 'Confusing the size of a Jordan block with the algebraic multiplicity of the corresponding eigenvalue.',
+      symptom: 'For eigenvalue $\\lambda$ with algebraic multiplicity 3 and geometric multiplicity 2, the student writes two Jordan blocks of size 3 each — giving a $6 \\times 6$ form for what should be a $3 \\times 3$ matrix.',
+      whyItHappened: 'Algebraic multiplicity is the TOTAL size across all blocks for that eigenvalue (the sum of block sizes), not the size of each block.',
+      repairStrategy: 'For eigenvalue $\\lambda$: geometric multiplicity = number of blocks; algebraic multiplicity = sum of all block sizes for that eigenvalue. The two blocks must sum to 3 total, with 2 blocks: possible only as 2+1.',
+    },
+    {
+      commonError: 'When finding a generalized eigenvector $\\mathbf{v}_2$ via $(A-\\lambda I)\\mathbf{v}_2 = \\mathbf{v}_1$, picking a $\\mathbf{v}_2$ that is itself an eigenvector (null vector of $A-\\lambda I$).',
+      symptom: 'The Jordan basis $\\{\\mathbf{v}_1, \\mathbf{v}_2\\}$ does not produce $P^{-1}AP = J$ — instead $P^{-1}AP$ has zeros where there should be 1s.',
+      whyItHappened: 'If $(A-\\lambda I)\\mathbf{v}_2 = \\mathbf{0}$, then $\\mathbf{v}_2$ is another eigenvector, not a generalized one. We need $(A-\\lambda I)\\mathbf{v}_2 = \\mathbf{v}_1 \\neq \\mathbf{0}$.',
+      repairStrategy: 'Check that the chosen $\\mathbf{v}_2$ satisfies $(A-\\lambda I)\\mathbf{v}_2 = \\mathbf{v}_1$, not just that $(A-\\lambda I)^2\\mathbf{v}_2 = \\mathbf{0}$. The latter is necessary but not sufficient for a valid generalized eigenvector in the Jordan chain.',
+    },
+  ],
+
+  mastery: {
+    targetLevel: 2,
+    solveIndependently: 'Given a defective matrix, determine its Jordan structure (number and sizes of blocks) from algebraic and geometric multiplicities, find the generalized eigenvectors, and use the Jordan block power formula to compute $A^n$.',
+    explainVerbally: 'Explain why defective matrices cannot be diagonalized (eigenspace too small), what a Jordan block encodes (eigenvalue + the "missing" generalized eigenvectors), and what the 1s on the superdiagonal mean geometrically.',
+    detectIncorrectApplication: 'Spot when someone uses the diagonal power formula $A^n = PD^nP^{-1}$ for a defective matrix, or conflates Jordan block size with algebraic multiplicity, or assumes all repeated-eigenvalue matrices are defective.',
+    transferToUnfamiliar: 'Apply Jordan form to analyze a new system (critically damped oscillator, marginally stable control system) by recognizing the Jordan block structure in the state matrix and predicting the $t^k e^{\\lambda t}$ solution form.',
+  },
 };

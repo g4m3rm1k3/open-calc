@@ -16,7 +16,7 @@ export default {
 
   intuition: {
     prose: [
-      '**From scalar to matrix.** The scalar exponential $e^{at} = 1 + at + \\frac{(at)^2}{2!} + \\cdots$ solves $\\dot{x} = ax$ with $x(0) = x_0$. We define the matrix exponential by the same power series:\n\n$e^{At} = I + At + \\frac{(At)^2}{2!} + \\frac{(At)^3}{3!} + \\cdots = \\sum_{k=0}^{\\infty} \\frac{(At)^k}{k!}$\n\nThis series converges for every matrix $A$ and every $t \\in \\mathbb{R}$.',
+      'Take $A = \\begin{bmatrix}-2&0\\\\0&-3\\end{bmatrix}$ and initial state $\\mathbf{x}_0 = [1,\\,1]^\\top$. The solution to $\\dot{\\mathbf{x}} = A\\mathbf{x}$ at time $t=1$ is $\\mathbf{x}(1) = e^{A}\\mathbf{x}_0$. Since $A$ is diagonal, $e^{At} = \\begin{bmatrix}e^{-2t}&0\\\\0&e^{-3t}\\end{bmatrix}$, giving $\\mathbf{x}(1) \\approx [0.135,\\, 0.050]^\\top$. Both decay because both eigenvalues are negative. Flip one entry to $+2$ and that component explodes — unstable. The matrix exponential $e^{At} = I + At + \\frac{(At)^2}{2!} + \\cdots$ is defined by the same power series as the scalar version, and it is the exact solution formula for every constant-coefficient linear system $\\dot{\\mathbf{x}} = A\\mathbf{x}$.',
       '**It solves the matrix ODE.** Check: if $\\mathbf{x}(t) = e^{At}\\mathbf{x}_0$, then $\\dot{\\mathbf{x}} = \\frac{d}{dt}e^{At}\\mathbf{x}_0 = Ae^{At}\\mathbf{x}_0 = A\\mathbf{x}(t)$. And $\\mathbf{x}(0) = e^0 \\mathbf{x}_0 = I\\mathbf{x}_0 = \\mathbf{x}_0$. The matrix exponential is the unique solution.',
       '**Computing via diagonalization.** If $A = PDP^{-1}$ (diagonal $D = \\text{diag}(\\lambda_1, \\ldots, \\lambda_n)$), then:\n\n$e^{At} = Pe^{Dt}P^{-1}$ where $e^{Dt} = \\text{diag}(e^{\\lambda_1 t}, \\ldots, e^{\\lambda_n t})$\n\nThis works because $(PDP^{-1})^k = PD^kP^{-1}$, and $e^D$ of a diagonal matrix is just the exponential of each diagonal entry.',
       '**What the eigenvalues tell you about stability.** The behavior of $e^{At}$ as $t \\to \\infty$ is governed entirely by the eigenvalues of $A$. If all eigenvalues have negative real part (Re$(\\lambda) < 0$ for all $\\lambda$): all solutions decay to zero — the system is **stable**. If any eigenvalue has positive real part: solutions blow up — the system is **unstable**. If eigenvalues are purely imaginary: solutions oscillate — the system is **neutrally stable**.',
@@ -32,6 +32,11 @@ export default {
         type: 'theorem',
         title: 'Properties of the Matrix Exponential',
         body: '• $e^{A \\cdot 0} = I$\n• $\\frac{d}{dt} e^{At} = A e^{At} = e^{At} A$\n• $\\det(e^A) = e^{\\text{tr}(A)}$\n• If $AB = BA$: $e^{A+B} = e^A e^B$ (commutativity required!)\n• $(e^A)^{-1} = e^{-A}$',
+      },
+      {
+        type: 'sequencing',
+        title: 'Prediction',
+        body: 'For $A = \\begin{bmatrix}0&-\\omega\\\\\\omega&0\\end{bmatrix}$ (pure rotation at rate $\\omega$), eigenvalues are $\\pm i\\omega$ — purely imaginary. Before computing $e^{At}$: predict whether trajectories grow, decay, or orbit. What form do you expect for $e^{At}$? (Hint: $e^{i\\omega t} = \\cos(\\omega t) + i\\sin(\\omega t)$.)',
       },
       {
         type: 'warning',
@@ -335,6 +340,35 @@ print("Settling time ≈ 2/|Re(λ)| seconds")`,
       ],
       conclusion: '$\\mathbf{x}(t) = [2e^{-t} - e^{-3t},\\, e^{-3t}]^\\top$. The system is stable (both eigenvalues $< 0$). The $e^{-t}$ mode dominates at large $t$ since it decays more slowly.',
     },
+    {
+      id: 'ex-la3-007-3',
+      title: 'Matrix exponential of a Jordan block',
+      problem: 'Compute $e^{At}$ for the Jordan block $A = \\begin{bmatrix}2&1\\\\0&2\\end{bmatrix}$ and write the ODE solution from $\\mathbf{x}_0 = [1,0]^\\top$.',
+      steps: [
+        {
+          expression: 'A = 2I + N, \\quad N = \\begin{bmatrix}0&1\\\\0&0\\end{bmatrix}, \\quad N^2 = 0',
+          annotation: 'Decompose: scalar part $\\lambda I = 2I$ plus nilpotent $N$. Since $N^2 = 0$, the exponential series for $N$ truncates.',
+          strategyTitle: 'Decompose into scalar + nilpotent',
+          checkpoint: 'What property of N makes the series finite?',
+          hints: ['N^2 = 0 means e^(Nt) = I + Nt (series terminates after k=1).'],
+        },
+        {
+          expression: 'e^{At} = e^{(2I+N)t} = e^{2It} \\cdot e^{Nt} = e^{2t}I \\cdot (I + Nt) = e^{2t}\\begin{bmatrix}1&t\\\\0&1\\end{bmatrix}',
+          annotation: 'Since $2I$ and $N$ commute ($2I$ commutes with everything), $e^{(2I+N)t} = e^{2It}e^{Nt}$. Then $e^{Nt} = I + Nt + N^2t^2/2 + \\cdots = I + Nt$.',
+          strategyTitle: 'Apply commutativity and truncation',
+          checkpoint: '',
+          hints: [],
+        },
+        {
+          expression: '\\mathbf{x}(t) = e^{At}\\mathbf{x}_0 = e^{2t}\\begin{bmatrix}1&t\\\\0&1\\end{bmatrix}\\begin{bmatrix}1\\\\0\\end{bmatrix} = e^{2t}\\begin{bmatrix}1\\\\0\\end{bmatrix}',
+          annotation: 'For $\\mathbf{x}_0 = [1,0]^\\top$, the solution is $e^{2t}[1,0]^\\top$. The $t \\cdot e^{2t}$ term does not appear for this initial condition.',
+          strategyTitle: 'Apply to initial condition',
+          checkpoint: 'What initial condition would make the t·e^(2t) term appear?',
+          hints: ['Try x₀ = [0,1]ᵀ: then x(t) = e^(2t)[t, 1]ᵀ — the t factor appears in x₁.'],
+        },
+      ],
+      conclusion: '$e^{At} = e^{2t}\\begin{bmatrix}1&t\\\\0&1\\end{bmatrix}$. Jordan blocks produce $t^k e^{\\lambda t}$ terms in solutions — the off-diagonal $t$ factor is the hallmark of defective (non-diagonalizable) matrices. The system is unstable since $\\lambda = 2 > 0$.',
+    },
   ],
 
   challenges: [
@@ -386,9 +420,14 @@ print("Settling time ≈ 2/|Re(λ)| seconds")`,
   ],
 
   checkpoints: [
-    { id: 'cp-la3-007-1', question: 'What ODE does $\\mathbf{x}(t) = e^{At}\\mathbf{x}_0$ solve?', answer: '$\\dot{\\mathbf{x}} = A\\mathbf{x}$ with initial condition $\\mathbf{x}(0) = \\mathbf{x}_0$.' },
-    { id: 'cp-la3-007-2', question: 'If all eigenvalues of $A$ have negative real part, what happens to solutions of $\\dot{\\mathbf{x}} = A\\mathbf{x}$?', answer: 'They all decay to zero — the system is asymptotically stable.' },
-    { id: 'cp-la3-007-3', question: 'What is $\\det(e^A)$?', answer: '$e^{\\text{tr}(A)}$.' },
+    { id: 'cp-la3-007-1', label: 'Read: State the ODE that e^(At)x₀ solves', type: 'read' },
+    { id: 'cp-la3-007-2', label: 'Read: Identify the stability criterion from eigenvalues', type: 'read' },
+    { id: 'cp-la3-007-3', label: 'Read: State det(e^A) and explain why', type: 'read' },
+    { id: 'cp-la3-007-4', label: 'Lab: Compute e^A and verify det(e^A) = e^tr(A)', type: 'lab' },
+    { id: 'cp-la3-007-5', label: 'Lab: Trace ODE trajectory and compare with odeint', type: 'lab' },
+    { id: 'cp-la3-007-6', label: 'Example: Compute e^(At) for a diagonal matrix', type: 'example' },
+    { id: 'cp-la3-007-7', label: 'Example: Solve an ODE via eigendecomposition', type: 'example' },
+    { id: 'cp-la3-007-8', label: 'Challenge: Classify stability of a damped oscillator', type: 'challenge' },
   ],
 
   assessment: {
@@ -460,5 +499,140 @@ print("Settling time ≈ 2/|Re(λ)| seconds")`,
       hints: ['Re(λ) = -1 < 0 → e^(Re(λ)t) = e^(-t) → 0. Im(λ) = ±3 → oscillation at frequency 3/(2π). Combined: decaying oscillation = inward spiral.'],
       reviewSection: 'Intuition — Eigenvalue → Solution Behavior',
     },
+    {
+      id: 'q-la3-007-5',
+      type: 'choice',
+      text: 'For the Jordan block $A = \\begin{bmatrix}3&1\\\\0&3\\end{bmatrix}$, the matrix exponential $e^{At}$ contains which type of term?',
+      options: [
+        '$e^{3t}$ only',
+        '$t\\,e^{3t}$ terms alongside $e^{3t}$',
+        '$e^{3t}$ and $e^{t}$',
+        '$t^2 e^{3t}$ terms',
+      ],
+      answer: '$t\\,e^{3t}$ terms alongside $e^{3t}$',
+      hints: ['Jordan block of size 2: e^(Jt) = e^(λt)(I + Nt) where N is the superdiagonal of ones. This gives e^(3t) on diagonal and t·e^(3t) in the upper-right entry.'],
+      reviewSection: 'Math — Jordan case',
+    },
+    {
+      id: 'q-la3-007-6',
+      type: 'choice',
+      text: 'Which of the following is TRUE about $e^{A+B}$?',
+      options: [
+        '$e^{A+B} = e^A e^B$ always',
+        '$e^{A+B} = e^B e^A$ always',
+        '$e^{A+B} = e^A e^B$ only when $AB = BA$',
+        '$e^{A+B} = (e^A + e^B)/2$',
+      ],
+      answer: '$e^{A+B} = e^A e^B$ only when $AB = BA$',
+      hints: ['The scalar rule e^(a+b) = e^a e^b relied on commutativity of numbers. Matrices do not commute in general, so the rule fails unless AB = BA.'],
+      reviewSection: 'Intuition — Warning: Commutativity',
+    },
+    {
+      id: 'q-la3-007-7',
+      type: 'choice',
+      text: '$\\det(e^A)$ for any matrix $A$ is:',
+      options: [
+        'Always 1',
+        '$e^{\\text{tr}(A)}$',
+        'Always positive',
+        '$e^{\\det(A)}$',
+      ],
+      answer: '$e^{\\text{tr}(A)}$',
+      hints: ['For diagonal D, det(e^D) = product of e^(λᵢ) = e^(Σλᵢ) = e^(tr(D)). Similarity invariance extends this to all matrices. Also: e^(tr(A)) is always positive, so e^A is always invertible.'],
+      reviewSection: 'Intuition — Properties of the Matrix Exponential',
+    },
+    {
+      id: 'q-la3-007-8',
+      type: 'choice',
+      text: 'A discrete-time system $\\mathbf{x}_{k+1} = A\\mathbf{x}_k$ is stable when:',
+      options: [
+        'All eigenvalues have $\\text{Re}(\\lambda) < 0$',
+        'All eigenvalues have $|\\lambda| < 1$',
+        'The trace of $A$ is negative',
+        '$\\det(A) > 0$',
+      ],
+      answer: 'All eigenvalues have $|\\lambda| < 1$',
+      hints: ['Discrete-time: x_k = A^k x₀. This decays iff |λ|^k → 0 for all eigenvalues, i.e. |λ| < 1. Continuous-time uses Re(λ) < 0 — different criterion.'],
+      reviewSection: 'Math — Stability criterion (discrete vs continuous)',
+    },
+    {
+      id: 'q-la3-007-9',
+      type: 'choice',
+      text: 'In the CNC servo model, eigenvalues $a \\pm bi$ with $a < 0$ and $b \\neq 0$ produce:',
+      options: [
+        'Pure exponential decay (no oscillation)',
+        'Pure oscillation at frequency $b/(2\\pi)$',
+        'Decaying oscillation that rings then settles',
+        'Unstable growth',
+      ],
+      answer: 'Decaying oscillation that rings then settles',
+      hints: ['Complex eigenvalues a±bi give e^(at)(cos(bt) + i·sin(bt)). Since a<0, the amplitude e^(at)→0 while the oscillation at frequency b/(2π) persists temporarily — classically called "ringing."'],
+      reviewSection: 'Intuition — CNC servo drives',
+    },
+    {
+      id: 'q-la3-007-10',
+      type: 'choice',
+      text: 'Why does MATLAB\'s `expm` use Padé approximation + scaling-and-squaring instead of summing the power series directly?',
+      options: [
+        'The power series always diverges',
+        'The power series converges but is numerically unstable for large $\\|A\\|$',
+        'Padé gives an exact answer while the series is only approximate',
+        'The power series requires eigenvalues to be real',
+      ],
+      answer: 'The power series converges but is numerically unstable for large $\\|A\\|$',
+      hints: ['For large ‖A‖, early terms of the series grow huge and then cancel — catastrophic cancellation causes large floating-point errors. Scaling A down to ‖A‖≈1, applying Padé, then squaring up avoids this.'],
+      reviewSection: 'Rigor — Numerical Computation of e^A',
+    },
   ],
+
+  misconceptions: [
+    {
+      falseBelief: '$e^{A+B} = e^A e^B$ for any two matrices $A$ and $B$.',
+      whyStudentsThinkIt: 'The scalar rule $e^{a+b} = e^a e^b$ is so familiar that students apply it without checking whether $A$ and $B$ commute.',
+      correctionExample: 'Let $A = \\begin{bmatrix}0&1\\\\0&0\\end{bmatrix}$ and $B = \\begin{bmatrix}0&0\\\\1&0\\end{bmatrix}$. Then $AB \\neq BA$, so $e^{A+B} \\neq e^A e^B$. The Baker-Campbell-Hausdorff formula says $e^A e^B = e^{A+B+[A,B]/2+\\cdots}$ where $[A,B] = AB-BA$ is the commutator.',
+      contrastCase: 'Correct application: for $A = PDP^{-1}$, $e^{At} = Pe^{Dt}P^{-1}$ because $P$ and $e^{Dt}$ have a special relationship, not just arbitrary matrices.',
+    },
+    {
+      falseBelief: 'The stability of $\\dot{\\mathbf{x}} = A\\mathbf{x}$ requires $|\\lambda| < 1$ for all eigenvalues.',
+      whyStudentsThinkIt: 'Students mix up the discrete-time stability criterion ($|\\lambda| < 1$) with the continuous-time criterion (Re$\\lambda < 0$).',
+      correctionExample: 'For $A = \\begin{bmatrix}-1&0\\\\0&-2\\end{bmatrix}$: eigenvalues are $-1$ and $-2$. Both have Re$\\lambda < 0$ so the continuous-time system is stable, even though $|-1| = 1$ (exactly on the boundary for discrete-time).',
+      contrastCase: 'Discrete-time $\\mathbf{x}_{k+1} = A\\mathbf{x}_k$ is stable iff $|\\lambda| < 1$. Continuous-time $\\dot{\\mathbf{x}} = A\\mathbf{x}$ is stable iff Re$\\lambda < 0$. Different systems, different criteria.',
+    },
+  ],
+
+  transferPrompts: [
+    {
+      situation: 'You need to simulate a CNC servo axis responding to a step command — modeling position and velocity over time.',
+      competingTechniques: ['Numerical ODE solver (Euler, Runge-Kutta)', 'Laplace transforms', 'Matrix exponential solution'],
+      whyThisTechniqueWins: 'The matrix exponential gives the exact closed-form solution $\\mathbf{x}(t) = e^{At}\\mathbf{x}_0$ at any time $t$, no discretization error. You can directly read off the settling time (≈$2/|\\text{Re}(\\lambda)|$) and oscillation frequency ($\\text{Im}(\\lambda)/2\\pi$) from the eigenvalues without running the simulation.',
+    },
+    {
+      situation: 'In quantum mechanics, you need to compute the state of a two-level system at time $t$ given initial state $|\\psi_0\\rangle$ and Hamiltonian $H$.',
+      competingTechniques: ['Numerical integration of Schrödinger equation', 'Perturbation theory', 'Exact matrix exponential'],
+      whyThisTechniqueWins: 'The time-evolution operator is exactly $U(t) = e^{-iHt/\\hbar}$ — a matrix exponential. For small matrices (qubits), this is exact and efficient. The eigenvalues of $H$ give the energy levels; their differences give the oscillation frequencies in the solution.',
+    },
+  ],
+
+  debugging: [
+    {
+      commonError: 'Computing $e^A$ entry-by-entry by exponentiating each matrix entry: $[e^A]_{ij} = e^{A_{ij}}$.',
+      symptom: 'Result fails verification: $e^A \\cdot e^{-A} \\neq I$, or $\\det(e^A) \\neq e^{\\text{tr}(A)}$.',
+      whyItHappened: 'The matrix exponential is NOT entry-wise exponentiation — it is defined by the power series $I + A + A^2/2! + \\cdots$. Entry-wise exponentiation ($\\exp(A)$ in numpy notation) is a different operation entirely.',
+      repairStrategy: 'Use `scipy.linalg.expm(A)` (not `np.exp(A)`). In MATLAB, use `expm(A)` (not `exp(A)`). Always verify with `expm(A) @ expm(-A) ≈ I`.',
+    },
+    {
+      commonError: 'Concluding a system is stable because the determinant of $A$ is negative (or positive).',
+      symptom: 'A matrix with $\\det(A) > 0$ is claimed stable, but simulations diverge.',
+      whyItHappened: '$\\det(A)$ is the product of all eigenvalues — it tells you nothing about their signs or real parts individually. You could have $\\det(A) = (-2)(3) = -6 < 0$ (one negative, one positive — unstable) or $(−1)(−2) = 2 > 0$ (both negative — stable).',
+      repairStrategy: 'Always check eigenvalues directly: `np.linalg.eigvals(A)`. For stability: verify all `np.real(evals) < 0`. Determinant and trace together give partial information but not the full picture.',
+    },
+  ],
+
+  mastery: {
+    targetLevel: 2,
+    solveIndependently: 'Compute $e^{At}$ for diagonal matrices and 2×2 systems via eigendecomposition; write the ODE solution; classify stability from eigenvalues.',
+    explainVerbally: 'Explain why $e^{At}$ solves $\\dot{\\mathbf{x}} = A\\mathbf{x}$, what eigenvalues determine about long-term behavior, and why $e^{A+B} \\neq e^A e^B$ in general.',
+    detectIncorrectApplication: 'Catch entry-wise exponentiation vs. matrix exponentiation; catch confusing discrete (|λ|<1) and continuous (Re λ<0) stability criteria; catch incorrect commutator claims.',
+    transferToUnfamiliar: 'Analyze stability of a physical system from its state matrix; compute $e^{At}$ for a Jordan block system; apply the spectral mapping theorem to a new matrix function.',
+  },
 };

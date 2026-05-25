@@ -19,12 +19,14 @@ export default {
   // ── Intuition ──────────────────────────────────────────────────
   intuition: {
     prose: [
+      'Take $A = \\begin{bmatrix}4&2\\\\1&3\\end{bmatrix}$ and apply it to $\\mathbf{v} = [2,1]^\\top$: $A\\mathbf{v} = [8+2, 2+3]^\\top = [10, 5]^\\top = 5[2,1]^\\top$. The output is exactly 5 times the input — $\\mathbf{v}$ was not rotated at all, only stretched. That is an eigenvector ($\\mathbf{v} = [2,1]^\\top$) with eigenvalue ($\\lambda = 5$). Now try $\\mathbf{u} = [1,-1]^\\top$: $A\\mathbf{u} = [4-2, 1-3]^\\top = [2,-2]^\\top = 2[1,-1]^\\top$. Another eigenvector with $\\lambda = 2$. Any other vector you try will come out pointing in a new direction — these two are the only invariant directions for $A$.',
       '**Where you are in the story:** You have spent all of Phase 2 learning what matrices DO — they stretch, squish, shear, and rotate space. You can multiply them, invert them, find what they destroy (null space) and what they can reach (column space). Now we ask the deepest question yet: does a matrix have any preferred directions? Any directions it never rotates, only scales?',
       'Here is the core idea. When a matrix $A$ acts on a vector $\\mathbf{v}$, it generally knocks that vector off its original line — both the direction and magnitude change. But there exist special vectors where the matrix only changes the magnitude, not the direction. The output $A\\mathbf{v}$ points in exactly the same direction as $\\mathbf{v}$, just scaled by some factor. Those are the **eigenvectors**. The scaling factor is the **eigenvalue**.',
       'Think about stretching a rubber sheet along two perpendicular axes — say, horizontally and vertically. Draw any diagonal line on the sheet. After the stretch, that diagonal gets rotated to a new angle. But the two lines you pulled along (horizontal and vertical) do not rotate at all — they only get longer or shorter. Those are the eigenvectors of the stretch.',
       'For a 3D rotation around an axis (like the Earth rotating around its polar axis), the rotation axis itself is an eigenvector — it does not move at all under the rotation. Its eigenvalue is $\\lambda = 1$, meaning it is scaled by a factor of 1 (not stretched or squished, just left alone).',
       'The equation that captures this is beautifully compact:\n\n$A\\mathbf{v} = \\lambda\\mathbf{v}$\n\nMatrix multiplication on the left equals scalar multiplication on the right. The vector $\\mathbf{v}$ is treated identically whether $A$ acts on it as a full transformation or $\\lambda$ scales it as a plain number. That equivalence is what makes eigenvectors special.',
       '**CNC machine resonance — eigenvalues determine danger zones.** A CNC machine frame is a physical structure with mass and stiffness. The equation of motion for the frame is $M\\ddot{\\mathbf{x}} + K\\mathbf{x} = \\mathbf{0}$, where $M$ is the mass matrix and $K$ is the stiffness matrix. The natural vibration frequencies of the machine are $\\omega_i = \\sqrt{\\lambda_i}$, where $\\lambda_i$ are eigenvalues of $M^{-1}K$. The eigenvectors are the **mode shapes** — which parts of the machine shake in which direction for each frequency.\n\nWhy this matters: if the spindle rotation frequency matches a natural frequency (an eigenvalue), the machine enters resonance and you get **chatter** — violent vibration that destroys surface finish and can break tools. A machine shop engineer consults a Frequency Response Function (FRF) — essentially a plot of eigenvalues — to choose spindle speeds that stay away from the danger zones.',
+      '**Predict before reading on.** You have $A = \\begin{bmatrix}3&0\\\\0&-2\\end{bmatrix}$ (diagonal). Without computing anything, predict: what are the eigenvalues? What are the eigenvectors? If you apply $A$ many times to $\\mathbf{u} = [1,1]^\\top$, which direction does the output eventually dominate? Write your answers before continuing.',
       '**Where this is heading:** Eigenvectors are the natural axes of a transformation — the directions where everything is simplest. In the very next lesson, you will rebuild your entire coordinate system so the $x$- and $y$-axes align with the eigenvectors. When you do, the complicated matrix $A$ becomes a beautiful diagonal matrix where the only non-zero entries are the eigenvalues themselves.',
     ],
     callouts: [
@@ -452,6 +454,35 @@ A = np.array([[5., 2.],
       ],
       conclusion: 'The symmetric matrix $A$ squishes the $[1,-1]$ direction by factor 1 (leaves it unchanged) and stretches the $[1,1]$ direction by factor 3. The eigenvectors are perpendicular — this is guaranteed for symmetric matrices and is why symmetric matrices are especially nice to work with.',
     },
+    {
+      id: 'la3-001-ex3',
+      title: 'Eigenvalues of a 3×3 Matrix via the Characteristic Polynomial',
+      problem: 'Find the eigenvalues of $A = \\begin{bmatrix}2&0&0\\\\1&3&0\\\\0&2&4\\end{bmatrix}$ (lower triangular). Then find an eigenvector for $\\lambda = 4$.',
+      steps: [
+        {
+          expression: '\\det(A - \\lambda I) = (2-\\lambda)(3-\\lambda)(4-\\lambda) = 0',
+          annotation: 'Lower triangular matrix: determinant equals the product of the diagonal entries $(2-\\lambda)$, $(3-\\lambda)$, $(4-\\lambda)$.',
+          strategyTitle: 'Read eigenvalues from the diagonal (triangular matrix shortcut)',
+          checkpoint: 'What are the three eigenvalues?',
+          hints: ['$\\lambda_1 = 2$, $\\lambda_2 = 3$, $\\lambda_3 = 4$. Check: trace $= 2+3+4 = 9 = $ sum of eigenvalues.'],
+        },
+        {
+          expression: '(A - 4I)\\mathbf{v} = \\begin{bmatrix}-2&0&0\\\\1&-1&0\\\\0&2&0\\end{bmatrix}\\mathbf{v} = \\mathbf{0}',
+          annotation: 'Subtract $4I$ from $A$ and set up the homogeneous system.',
+          strategyTitle: 'Form A − 4I for λ = 4',
+          checkpoint: 'Row-reduce A − 4I to find the null space.',
+          hints: ['Row 1: $-2v_1 = 0 \\Rightarrow v_1 = 0$. Row 2: $v_1 - v_2 = 0 \\Rightarrow v_2 = 0$. Row 3: $2v_2 = 0$ (redundant). So $v_1 = v_2 = 0$ and $v_3$ is free.'],
+        },
+        {
+          expression: '\\mathbf{v}_3 = \\begin{bmatrix}0\\\\0\\\\1\\end{bmatrix}',
+          annotation: 'Set $v_3 = 1$. The eigenvector for $\\lambda = 4$ is the standard basis vector $\\mathbf{e}_3$.',
+          strategyTitle: 'Extract the eigenvector',
+          checkpoint: 'Verify: $A\\mathbf{e}_3 = [0, 0, 4]^\\top = 4\\mathbf{e}_3$ ✓',
+          hints: ['Multiply $A\\mathbf{e}_3$: this picks out the third column of $A$, which is $[0,0,4]^\\top = 4[0,0,1]^\\top$.'],
+        },
+      ],
+      conclusion: 'For triangular matrices, eigenvalues are the diagonal entries — no determinant expansion needed. Finding each eigenvector still requires solving $(A - \\lambda I)\\mathbf{v} = \\mathbf{0}$, but since the matrix is triangular, back substitution is especially easy.',
+    },
   ],
 
   // ── Challenges ─────────────────────────────────────────────────
@@ -571,14 +602,14 @@ A = np.array([[5., 2.],
 
   // ── Checkpoints ──────────────────────────────────────────────────
   checkpoints: [
-    'read-intuition',
-    'read-math',
-    'read-rigor',
-    'completed-example-1',
-    'completed-example-2',
-    'attempted-challenge-easy',
-    'attempted-challenge-medium',
-    'attempted-challenge-hard',
+    { id: 'cp-la3-001-1', label: 'Read: understand eigenvectors as invariant directions and eigenvalues as stretch factors', type: 'read' },
+    { id: 'cp-la3-001-2', label: 'Read: follow the derivation of the characteristic equation det(A − λI) = 0', type: 'read' },
+    { id: 'cp-la3-001-3', label: 'Read: understand algebraic vs geometric multiplicity and defective matrices', type: 'read' },
+    { id: 'cp-la3-001-4', label: 'Run OpenMAT cell 1 — compute eigenpairs and verify Av = λv', type: 'lab' },
+    { id: 'cp-la3-001-5', label: 'Run Python cell 1 — compute eigenpairs with numpy and verify the defining equation', type: 'lab' },
+    { id: 'cp-la3-001-6', label: 'Complete example 1: find eigenvalues and eigenvectors of a triangular matrix step by step', type: 'example' },
+    { id: 'cp-la3-001-7', label: 'Complete example 2: find perpendicular eigenvectors of a symmetric matrix', type: 'example' },
+    { id: 'cp-la3-001-8', label: 'Attempt challenge 3: analyze the defective shear matrix and explain why it cannot be diagonalized', type: 'challenge' },
   ],
 
   // ── Assessment ───────────────────────────────────────────────────
@@ -612,10 +643,11 @@ A = np.array([[5., 2.],
     },
     {
       id: 'eigenvectors-and-eigenvalues-q2',
-      type: 'input',
+      type: 'choice',
       text: 'A $2 \\times 2$ matrix has eigenvalues $\\lambda_1 = 4$ and $\\lambda_2 = -1$. What is the determinant of the matrix?',
-      answer: '-4',
-      hints: ['$\\det(A) = \\lambda_1 \\cdot \\lambda_2 = 4 \\cdot (-1)$.'],
+      options: ['$4$', '$-4$', '$3$', '$-1$'],
+      answer: '$-4$',
+      hints: ['$\\det(A) = \\lambda_1 \\cdot \\lambda_2 = 4 \\cdot (-1) = -4$. The determinant equals the product of all eigenvalues.'],
       reviewSection: 'Math tab — Two Signatures',
     },
     {
@@ -641,5 +673,130 @@ A = np.array([[5., 2.],
       hints: ['$A(2\\mathbf{v}) = 2(A\\mathbf{v}) = 2(3\\mathbf{v}) = 6\\mathbf{v}$. Scalar multiples of eigenvectors are also eigenvectors with the same eigenvalue.'],
       reviewSection: 'Math tab — Eigenspace',
     },
+    {
+      id: 'eigenvectors-and-eigenvalues-q5',
+      type: 'choice',
+      text: 'For $A = \\begin{bmatrix}5&0\\\\0&-2\\end{bmatrix}$, what are the eigenvectors?',
+      options: [
+        '$\\mathbf{v}_1 = [5,0]^\\top$ and $\\mathbf{v}_2 = [0,-2]^\\top$',
+        '$\\mathbf{v}_1 = [1,0]^\\top$ and $\\mathbf{v}_2 = [0,1]^\\top$',
+        '$\\mathbf{v}_1 = [1,1]^\\top$ and $\\mathbf{v}_2 = [1,-1]^\\top$',
+        'There are no eigenvectors since eigenvalues have different signs.',
+      ],
+      answer: '$\\mathbf{v}_1 = [1,0]^\\top$ and $\\mathbf{v}_2 = [0,1]^\\top$',
+      hints: ['Diagonal matrices always use the standard basis vectors as eigenvectors. $A\\mathbf{e}_1 = 5\\mathbf{e}_1$ and $A\\mathbf{e}_2 = -2\\mathbf{e}_2$.'],
+      reviewSection: 'Challenges — Challenge 1',
+    },
+    {
+      id: 'eigenvectors-and-eigenvalues-q6',
+      type: 'choice',
+      text: 'A matrix $A$ has characteristic polynomial $p(\\lambda) = \\lambda^2 - 5\\lambda + 6$. What are its eigenvalues?',
+      options: ['$\\lambda = 5$ and $\\lambda = 6$', '$\\lambda = 2$ and $\\lambda = 3$', '$\\lambda = -2$ and $\\lambda = -3$', '$\\lambda = 1$ and $\\lambda = 6$'],
+      answer: '$\\lambda = 2$ and $\\lambda = 3$',
+      hints: ['Factor: $\\lambda^2 - 5\\lambda + 6 = (\\lambda-2)(\\lambda-3) = 0$. Roots are $\\lambda = 2$ and $\\lambda = 3$. Sanity check: $2+3 = 5 = $ trace and $2 \\cdot 3 = 6 = $ det.'],
+      reviewSection: 'Math tab — Characteristic Equation',
+    },
+    {
+      id: 'eigenvectors-and-eigenvalues-q7',
+      type: 'choice',
+      text: 'Two eigenvectors $\\mathbf{v}_1$ and $\\mathbf{v}_2$ correspond to different eigenvalues $\\lambda_1 \\neq \\lambda_2$. What can you conclude about $\\{\\mathbf{v}_1, \\mathbf{v}_2\\}$?',
+      options: [
+        'They are orthogonal (perpendicular).',
+        'They are linearly independent.',
+        'They span the same subspace.',
+        'Nothing — their relationship depends on the specific matrix.',
+      ],
+      answer: 'They are linearly independent.',
+      hints: ['Eigenvectors from distinct eigenvalues are always linearly independent (proved in the Rigor section). They are NOT necessarily orthogonal — that only holds for symmetric matrices by the Spectral Theorem.'],
+      reviewSection: 'Rigor tab — Eigenvectors from Distinct Eigenvalues theorem',
+    },
+    {
+      id: 'eigenvectors-and-eigenvalues-q8',
+      type: 'choice',
+      text: 'Matrix $A$ has eigenvalue $\\lambda_0$ with algebraic multiplicity 3 and geometric multiplicity 1. What can you conclude?',
+      options: [
+        '$A$ is the zero matrix.',
+        '$A$ is defective and cannot be diagonalized.',
+        '$A$ has exactly three linearly independent eigenvectors for $\\lambda_0$.',
+        '$A$ is invertible.',
+      ],
+      answer: '$A$ is defective and cannot be diagonalized.',
+      hints: ['Geometric multiplicity (dimension of eigenspace) $= 1 <$ algebraic multiplicity $= 3$. When these are unequal for any eigenvalue, the matrix is defective and lacks a full set of $n$ independent eigenvectors — diagonalization is impossible.'],
+      reviewSection: 'Rigor tab — Algebraic vs Geometric Multiplicity',
+    },
+    {
+      id: 'eigenvectors-and-eigenvalues-q9',
+      type: 'choice',
+      text: 'For an $n \\times n$ matrix $A$, the characteristic polynomial $\\det(A - \\lambda I)$ has degree:',
+      options: ['$1$', '$n-1$', '$n$', '$n^2$'],
+      answer: '$n$',
+      hints: ['The determinant of an $n \\times n$ matrix with entries linear in $\\lambda$ gives a polynomial of degree $n$. By the Fundamental Theorem of Algebra, there are exactly $n$ roots in $\\mathbb{C}$ (counting multiplicity) — so an $n \\times n$ matrix has exactly $n$ eigenvalues.'],
+      reviewSection: 'Math tab — Characteristic Equation',
+    },
+    {
+      id: 'eigenvectors-and-eigenvalues-q10',
+      type: 'choice',
+      text: 'Similar matrices $B = P^{-1}AP$ have:',
+      options: [
+        'The same entries as $A$.',
+        'The same eigenvalues as $A$ (and hence the same characteristic polynomial).',
+        'The same eigenvectors as $A$.',
+        'The same trace and determinant as $A$, but different eigenvalues.',
+      ],
+      answer: 'The same eigenvalues as $A$ (and hence the same characteristic polynomial).',
+      hints: ['$\\det(B - \\lambda I) = \\det(P^{-1}AP - \\lambda I) = \\det(P^{-1}(A - \\lambda I)P) = \\det(P^{-1})\\det(A-\\lambda I)\\det(P) = \\det(A-\\lambda I)$. Eigenvalues are intrinsic to the linear map, not the basis.'],
+      reviewSection: 'Rigor tab — Similar Matrices Share Eigenvalues',
+    },
   ],
+
+  misconceptions: [
+    {
+      falseBelief: 'The eigenvector of $A$ for eigenvalue $\\lambda$ is the same as $\\lambda$ itself (confusing the vector and the scalar).',
+      whyStudentsThinkIt: 'The word "eigen" applies to both, and the equation $A\\mathbf{v} = \\lambda\\mathbf{v}$ has both on the right side. Students sometimes write the eigenvector as $[\\lambda]$ or confuse which is which.',
+      correctionExample: 'For $A = \\begin{bmatrix}3&1\\\\0&2\\end{bmatrix}$ and $\\lambda = 3$: the eigenvector is the vector $[1,0]^\\top$ (a direction in space), and the eigenvalue is the scalar $3$ (a stretch factor). $A[1,0]^\\top = [3,0]^\\top = 3[1,0]^\\top$. The scalar $3$ is not a vector.',
+      contrastCase: 'For $\\lambda = 0$: the eigenvalue is zero (a scalar) but the eigenvector is a non-zero vector in the null space of $A$. Zero eigenvalue does not mean zero eigenvector.',
+    },
+    {
+      falseBelief: 'If $\\mathbf{v}$ is an eigenvector of $A$, then it is also an eigenvector of $A + I$ with the same eigenvalue.',
+      whyStudentsThinkIt: 'Students believe the eigenvectors of $A$ are fixed properties of the "direction," independent of the specific matrix. Adding $I$ seems like a small change.',
+      correctionExample: 'If $A\\mathbf{v} = \\lambda\\mathbf{v}$, then $(A+I)\\mathbf{v} = A\\mathbf{v} + I\\mathbf{v} = \\lambda\\mathbf{v} + \\mathbf{v} = (\\lambda+1)\\mathbf{v}$. So $\\mathbf{v}$ IS an eigenvector of $A+I$, but with eigenvalue $\\lambda+1$, not $\\lambda$.',
+      contrastCase: 'This is actually a useful theorem: if $A$ and $B$ are simultaneously diagonalizable (share the same eigenvectors), then they commute ($AB = BA$). Adding $I$ to $A$ never changes the eigenvectors, only shifts all eigenvalues by 1.',
+    },
+  ],
+
+  transferPrompts: [
+    {
+      situation: 'You are analyzing Google PageRank. The web is modeled as a transition matrix $P$ where $P_{ij}$ is the probability of going from page $i$ to page $j$. You want to find the "most important" pages — the steady-state distribution that the random surfer converges to.',
+      competingTechniques: 'Solve the linear system $\\boldsymbol{\\pi}^\\top P = \\boldsymbol{\\pi}^\\top$ directly (setting up $n$ equations), or run many matrix-vector multiplications hoping to converge.',
+      whyThisTechniqueWins: 'The steady-state $\\boldsymbol{\\pi}$ is exactly the eigenvector of $P^\\top$ (or $P$ depending on convention) corresponding to eigenvalue $\\lambda = 1$. Power iteration — repeatedly multiplying by $P$ and normalizing — converges to this dominant eigenvector. PageRank is eigenvalue computation at web scale.',
+    },
+    {
+      situation: 'A structural engineer needs the resonant frequencies of a bridge to ensure they do not match wind frequencies (which would cause catastrophic resonance). The bridge equations of motion are $M\\ddot{\\mathbf{u}} + K\\mathbf{u} = \\mathbf{0}$.',
+      competingTechniques: 'Frequency sweep testing (measure at many frequencies, expensive), numerical simulation (time-domain, slow), or solve the generalized eigenvalue problem $K\\mathbf{v} = \\omega^2 M\\mathbf{v}$.',
+      whyThisTechniqueWins: 'The eigenvalues $\\omega_i^2$ of $M^{-1}K$ give the squared natural frequencies directly. The eigenvectors give the mode shapes (which parts move how during each resonance). One eigen-analysis gives all resonant frequencies simultaneously. For the Tacoma Narrows Bridge collapse: a frequency match (an eigenvalue coincidence) caused the catastrophe.',
+    },
+  ],
+
+  debugging: [
+    {
+      commonError: 'Finding eigenvalues correctly but then solving the wrong system for eigenvectors — e.g., solving $A\\mathbf{v} = \\mathbf{0}$ instead of $(A - \\lambda I)\\mathbf{v} = \\mathbf{0}$.',
+      symptom: 'The "eigenvectors" found do not satisfy $A\\mathbf{v} = \\lambda\\mathbf{v}$. Verification $A\\mathbf{v}$ produces a vector that is not a multiple of $\\mathbf{v}$.',
+      whyItHappened: 'Students confuse finding the null space of $A$ (which gives eigenvectors for $\\lambda = 0$) with finding eigenvectors for general $\\lambda$. The shift $A - \\lambda I$ is easy to forget.',
+      repairStrategy: 'Always write out $(A - \\lambda I)$ explicitly for the specific value of $\\lambda$, then row-reduce THAT matrix. Verify the result: compute $A\\mathbf{v}$ and check it equals $\\lambda\\mathbf{v}$.',
+    },
+    {
+      commonError: 'Listing eigenvalue $\\lambda = 2$ twice (as two separate eigenvalues) when it is a repeated root of the characteristic polynomial with algebraic multiplicity 2.',
+      symptom: 'The student finds "eigenvalues $\\lambda_1 = 2$ and $\\lambda_2 = 2$" and then tries to find two independent eigenvectors, gets confused when only one is found.',
+      whyItHappened: 'Algebraic multiplicity (root multiplicity in the characteristic polynomial) does not guarantee geometric multiplicity (number of independent eigenvectors). A repeated eigenvalue may have only 1 independent eigenvector (defective matrix) or 2 (full eigenspace).',
+      repairStrategy: 'For eigenvalue $\\lambda_0$ with algebraic multiplicity $k$: solve $(A - \\lambda_0 I)\\mathbf{v} = \\mathbf{0}$ and find the dimension of the null space. That dimension (geometric multiplicity) tells you how many independent eigenvectors exist. If it is less than $k$, the matrix is defective.',
+    },
+  ],
+
+  mastery: {
+    targetLevel: 2,
+    solveIndependently: 'Find all eigenvalues and eigenvectors of a 2×2 or 3×3 matrix: set up the characteristic equation, solve it, then for each eigenvalue solve the homogeneous system $(A - \\lambda I)\\mathbf{v} = \\mathbf{0}$.',
+    explainVerbally: 'Explain eigenvectors as the invariant directions of a transformation — the directions the matrix only stretches or flips, never rotates. Explain why we set det$(A - \\lambda I) = 0$: we need the matrix to be singular so a non-zero solution exists.',
+    detectIncorrectApplication: 'Spot when someone confuses the eigenvalue (scalar) with the eigenvector (vector), or solves $A\\mathbf{v} = \\mathbf{0}$ instead of $(A - \\lambda I)\\mathbf{v} = \\mathbf{0}$, or assumes a repeated eigenvalue always has a full eigenspace.',
+    transferToUnfamiliar: 'Apply eigenvalue analysis to a new application context (PageRank, resonance frequencies, covariance matrix in PCA) by identifying which matrix\'s eigenvectors and eigenvalues are needed and what they physically represent.',
+  },
 };

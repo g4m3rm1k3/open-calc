@@ -16,10 +16,12 @@ export default {
 
   intuition: {
     prose: [
+      'A simple weather model has two states: Sunny and Rainy. Transition matrix $P = \\begin{bmatrix}0.8&0.4\\\\0.2&0.6\\end{bmatrix}$ (columns sum to 1). Start with $\\mathbf{x}_0 = [1,0]^\\top$ (all Sunny). After one step: $P\\mathbf{x}_0 = [0.8, 0.2]^\\top$. After many steps, $P^k\\mathbf{x}_0 \\to \\mathbf{q}$. Solve $(P-I)\\mathbf{q} = \\mathbf{0}$ with $q_1+q_2=1$: $\\mathbf{q} = [2/3, 1/3]^\\top$. Long run: 67% sunny, 33% rainy — regardless of where you started.',
       '**What is a Markov chain?** A Markov chain describes a system that jumps between states over time, where the probability of jumping from state $i$ to state $j$ depends only on the current state (not the history). This "memoryless" property is the Markov property. The transition probabilities are encoded in a matrix.',
       '**Transition matrix.** For a system with $n$ states, the transition matrix $P$ has $P_{ij} = $ probability of moving from state $j$ to state $i$ (column-stochastic convention). Each column sums to 1 (all probability from state $j$ must go somewhere). A column vector $\\mathbf{x}$ where $x_i \\geq 0$ and $\\sum x_i = 1$ represents a probability distribution over states.',
       '**Matrix-vector product = one time step.** If $\\mathbf{x}_t$ is the distribution at time $t$, then $\\mathbf{x}_{t+1} = P\\mathbf{x}_t$. After $k$ steps: $\\mathbf{x}_k = P^k \\mathbf{x}_0$. As $k \\to \\infty$, the distribution often converges to a **steady state** $\\mathbf{q}$ satisfying $P\\mathbf{q} = \\mathbf{q}$ — an eigenvector of $P$ with eigenvalue 1.',
       '**Why eigenvalue 1 always exists.** For any column-stochastic matrix, the vector of all ones $\\mathbf{1}$ satisfies $P^\\top \\mathbf{1} = \\mathbf{1}$ (each row of $P^\\top$ sums to 1). Therefore $P^\\top - I$ has $\\mathbf{1}$ in its null space, so $\\det(P^\\top - I) = \\det(P - I) = 0$, which means $\\lambda = 1$ is an eigenvalue of $P$. The steady-state distribution is the normalized eigenvector corresponding to $\\lambda = 1$.',
+      '**Predict before reading on.** The weather matrix $P = \\begin{bmatrix}0.9&0.3\\\\0.1&0.7\\end{bmatrix}$ has larger diagonal entries (the system tends to stay in its current state). Will the steady state be closer to $[1,0]^\\top$ (all Sunny) or $[0.5, 0.5]^\\top$ (equal)? Which eigenvalue equals 1? Predict, then verify.',
       '**CNC machine availability — Markov analysis.** A CNC machine cycles through states: Cutting, Setup/Tool-change, Idle (waiting for parts), and Fault. From shift data, you can estimate transition probabilities between these states. The steady-state distribution tells you the long-run fraction of time in each state — and therefore machine **availability** (fraction of time Cutting). Availability = $q_{\\text{Cutting}}$ where $\\mathbf{q}$ is the steady-state distribution. If the fault-recovery probability is low, availability can be optimized by improving it — eigenvalue analysis shows exactly how much the steady state shifts per unit improvement.',
     ],
     callouts: [
@@ -342,6 +344,35 @@ print(f"(Long-run fraction of time actually cutting)")`,
       ],
       conclusion: 'PageRank: A = 40%, B = 20%, C = 40%. Despite B only linking to C, A and C share equal rank because of the cycle. B is lowest because it has only one inlink (from A with weight 1/2).',
     },
+    {
+      id: 'ex-la3-005-3',
+      title: 'Convergence Rate via the Second Eigenvalue',
+      problem: 'For $P = \\begin{bmatrix}0.8&0.4\\\\0.2&0.6\\end{bmatrix}$, find both eigenvalues and determine how many steps are needed to be within 1% of the steady state starting from $\\mathbf{x}_0 = [1,0]^\\top$.',
+      steps: [
+        {
+          expression: '\\det(P - \\lambda I) = (0.8-\\lambda)(0.6-\\lambda) - 0.08 = \\lambda^2 - 1.4\\lambda + 0.4 = 0',
+          annotation: 'Characteristic equation. Products: $(0.8)(0.6) = 0.48$ and $(0.4)(0.2) = 0.08$, so constant term = $0.48 - 0.08 = 0.40$.',
+          strategyTitle: 'Find the characteristic polynomial',
+          checkpoint: '',
+          hints: [],
+        },
+        {
+          expression: '\\lambda = \\frac{1.4 \\pm \\sqrt{1.96 - 1.6}}{2} = \\frac{1.4 \\pm 0.6}{2} \\implies \\lambda_1 = 1, \\; \\lambda_2 = 0.4',
+          annotation: 'Two eigenvalues: 1 (steady state) and 0.4 (convergence rate).',
+          strategyTitle: 'Solve for eigenvalues',
+          checkpoint: 'Verify: trace = 1.4 = 1 + 0.4 ✓; det = 0.40 = 1 × 0.4 ✓',
+          hints: [],
+        },
+        {
+          expression: '|\\lambda_2^k| < 0.01 \\implies |0.4|^k < 0.01 \\implies k > \\ln(0.01)/\\ln(0.4) \\approx 4.6/0.916 \\approx 5.0',
+          annotation: 'After $k$ steps, the error is proportional to $|\\lambda_2|^k = 0.4^k$. For error $< 1\\%$: $k > 5$.',
+          strategyTitle: 'Compute convergence steps',
+          checkpoint: 'What would happen if λ₂ = 0.99 instead of 0.4?',
+          hints: ['$0.99^k < 0.01$ requires $k > \\ln(0.01)/\\ln(0.99) \\approx 458$ steps. Eigenvalue close to 1 → slow convergence; eigenvalue close to 0 → fast convergence.'],
+        },
+      ],
+      conclusion: 'With $\\lambda_2 = 0.4$ (spectral gap $= 0.6$), this chain converges quickly: within 6 steps. The spectral gap $1 - |\\lambda_2|$ directly controls convergence rate. Large gap → fast convergence to steady state.',
+    },
   ],
 
   challenges: [
@@ -397,9 +428,15 @@ print(f"(Long-run fraction of time actually cutting)")`,
   ],
 
   checkpoints: [
-    { id: 'cp-la3-005-1', question: 'What property makes a matrix column-stochastic?', answer: 'All entries non-negative; each column sums to 1.' },
-    { id: 'cp-la3-005-2', question: 'Why does every column-stochastic matrix have eigenvalue 1?', answer: 'Because $\\mathbf{1}^\\top P = \\mathbf{1}^\\top$, so $\\lambda = 1$ is a left eigenvalue, and therefore also a right eigenvalue.' },
-    { id: 'cp-la3-005-3', question: 'What is the spectral gap and why does it matter?', answer: 'Gap $= 1 - |\\lambda_2|$; controls convergence rate to steady state.' },
+  checkpoints: [
+    { id: 'cp-la3-005-1', label: 'Read: understand stochastic matrices, steady states, and why λ=1 always exists', type: 'read' },
+    { id: 'cp-la3-005-2', label: 'Read: follow the proof that column sums = 1 implies eigenvalue 1', type: 'read' },
+    { id: 'cp-la3-005-3', label: 'Read: understand Perron-Frobenius and the spectral gap convergence analysis', type: 'read' },
+    { id: 'cp-la3-005-4', label: 'Run code cell — compute steady state via eig and verify P*q = q', type: 'lab' },
+    { id: 'cp-la3-005-5', label: 'Run power iteration code — watch convergence to steady state from any start', type: 'lab' },
+    { id: 'cp-la3-005-6', label: 'Complete example 1: find steady state of a 2×2 stochastic matrix', type: 'example' },
+    { id: 'cp-la3-005-7', label: 'Complete example 2: compute PageRank for a 3-page web graph', type: 'example' },
+    { id: 'cp-la3-005-8', label: 'Attempt challenge 2: design a stochastic matrix with a target steady state', type: 'challenge' },
   ],
 
   assessment: {
@@ -471,5 +508,130 @@ print(f"(Long-run fraction of time actually cutting)")`,
       hints: ['$\\mathbf{1}^\\top P = \\mathbf{1}^\\top$ means $\\mathbf{1}$ is a left eigenvector of P for λ=1. Since P and P^T have the same eigenvalues, λ=1 is also a right eigenvalue.'],
       reviewSection: 'Math tab — Existence of eigenvalue 1',
     },
+    {
+      id: 'q-la3-005-5',
+      type: 'choice',
+      text: 'A $2 \\times 2$ stochastic matrix has eigenvalues 1 and 0.7. Starting from any probability vector, within how many steps is the error below $0.1\\%$?',
+      options: [
+        'About 7 steps ($0.7^7 \\approx 0.082$)',
+        'About 20 steps ($0.7^{20} \\approx 0.0008$)',
+        'About 100 steps',
+        'It never converges below 0.1%',
+      ],
+      answer: 'About 20 steps ($0.7^{20} \\approx 0.0008$)',
+      hints: ['Error $\\propto |\\lambda_2|^k = 0.7^k$. Need $0.7^k < 0.001$: $k > \\ln(0.001)/\\ln(0.7) \\approx 19.4$. Round up to 20.'],
+      reviewSection: 'Examples tab — Example 3',
+    },
+    {
+      id: 'q-la3-005-6',
+      type: 'choice',
+      text: 'A Markov chain has a "dangling node" — a page with no outgoing links. In PageRank, this is handled by:',
+      options: [
+        'Removing the page from the model.',
+        'Setting all transition probabilities to 0 from that page.',
+        'Adding a "teleportation" step: with probability $d$, teleport to any page uniformly.',
+        'Assigning the page a rank of 0.',
+      ],
+      answer: 'Adding a "teleportation" step: with probability $d$, teleport to any page uniformly.',
+      hints: ['Google\'s PageRank uses $G = dP + (1-d)/n \\cdot \\mathbf{1}\\mathbf{1}^\\top$ where $d \\approx 0.85$ is the damping factor. This ensures the matrix is regular (all entries positive) and has a unique steady state — Perron-Frobenius applies.'],
+      reviewSection: 'Examples tab — Example 2 (PageRank)',
+    },
+    {
+      id: 'q-la3-005-7',
+      type: 'choice',
+      text: 'The power iteration algorithm for finding the steady state: $\\mathbf{x}_{k+1} = P\\mathbf{x}_k$. Why does it converge to the eigenvector for $\\lambda = 1$?',
+      options: [
+        'Because $\\lambda = 1$ is the largest eigenvalue, and all other eigenvalues satisfy $|\\lambda_i| \\leq 1$.',
+        'Because the algorithm explicitly searches for the eigenvector.',
+        'Because stochastic matrices are symmetric.',
+        'Because the power method always converges to the dominant eigenvector.',
+      ],
+      answer: 'Because $\\lambda = 1$ is the largest eigenvalue, and all other eigenvalues satisfy $|\\lambda_i| \\leq 1$.',
+      hints: ['Stochastic matrices satisfy $|\\lambda_i| \\leq 1$ for all $i$, with $\\lambda_1 = 1$ being the largest. Power iteration converges to the dominant eigenvector (largest magnitude eigenvalue). For regular stochastic matrices, this is unique and equals the steady state.'],
+      reviewSection: 'Math tab — Power Iteration',
+    },
+    {
+      id: 'q-la3-005-8',
+      type: 'choice',
+      text: 'A system starts at state 1 with probability 1: $\\mathbf{x}_0 = [1,0]^\\top$. The steady state is $\\mathbf{q} = [0.6, 0.4]^\\top$. After many steps, what is the probability of being in state 1?',
+      options: ['1 (stays in state 1)', '0.6 (converges to steady state)', '0 (moves away from state 1)', 'Cannot determine without the transition matrix.'],
+      answer: '0.6 (converges to steady state)',
+      hints: ['For a regular Markov chain, $P^k\\mathbf{x}_0 \\to \\mathbf{q}$ as $k \\to \\infty$ regardless of starting point. Starting at state 1 just determines how quickly you converge, not where you end up.'],
+      reviewSection: 'Intuition — Perron-Frobenius',
+    },
+    {
+      id: 'q-la3-005-9',
+      type: 'choice',
+      text: 'A machine spends fractions $q_1 = 0.7$, $q_2 = 0.2$, $q_3 = 0.1$ of its time in states Cutting, Setup, and Fault (steady-state distribution). What is the machine availability (fraction of time cutting)?',
+      options: ['$0.9$', '$0.7$', '$0.1$', '$0.2$'],
+      answer: '$0.7$',
+      hints: ['Machine availability = fraction of time in the productive state (Cutting) = $q_1 = 0.7$. The steady-state distribution directly gives long-run time fractions.'],
+      reviewSection: 'Intuition — CNC machine availability',
+    },
+    {
+      id: 'q-la3-005-10',
+      type: 'choice',
+      text: 'Two stochastic matrices $P_1$ (spectral gap 0.9) and $P_2$ (spectral gap 0.01) model two different Markov chains. Which converges faster to its steady state, and why?',
+      options: [
+        '$P_2$ because smaller gap means smaller second eigenvalue.',
+        '$P_1$ because larger gap means $|\\lambda_2|$ is smaller, so $|\\lambda_2|^k$ decays faster.',
+        'They converge at the same rate.',
+        'Cannot determine from the spectral gap.',
+      ],
+      answer: '$P_1$ because larger gap means $|\\lambda_2|$ is smaller, so $|\\lambda_2|^k$ decays faster.',
+      hints: ['Spectral gap $= 1 - |\\lambda_2|$. Gap 0.9 → $|\\lambda_2| = 0.1$ → $0.1^k$ decays very fast. Gap 0.01 → $|\\lambda_2| = 0.99$ → $0.99^k$ decays very slowly. $P_1$ mixes much faster.'],
+      reviewSection: 'Math tab — Convergence Proof Sketch',
+    },
   ],
+
+  misconceptions: [
+    {
+      falseBelief: 'The steady state depends on the starting distribution — different starting points give different steady states.',
+      whyStudentsThinkIt: 'In deterministic systems, different initial conditions lead to different final states. Students apply the same intuition to Markov chains.',
+      correctionExample: 'For the regular stochastic matrix $P = \\begin{bmatrix}0.8&0.4\\\\0.2&0.6\\end{bmatrix}$, try $\\mathbf{x}_0 = [1,0]^\\top$ or $\\mathbf{x}_0 = [0,1]^\\top$. After 20 steps, both converge to $\\mathbf{q} = [2/3, 1/3]^\\top$. The Perron-Frobenius theorem guarantees this for regular matrices.',
+      contrastCase: 'An absorbing Markov chain (with absorbing states that you cannot leave) does depend on the starting distribution — different starting states may lead to absorption in different absorbing states.',
+    },
+    {
+      falseBelief: 'The steady-state distribution is the same as the uniform distribution.',
+      whyStudentsThinkIt: 'Since all probabilities must sum to 1, students think the "equilibrium" means equal probabilities.',
+      correctionExample: 'For $P = \\begin{bmatrix}0.9&0.3\\\\0.1&0.7\\end{bmatrix}$, the steady state is $[0.75, 0.25]^\\top$. Not uniform. The high diagonal entry 0.9 for state 1 (tends to stay in state 1) makes state 1 more probable in the long run.',
+      contrastCase: 'A doubly stochastic matrix (rows AND columns sum to 1) does have the uniform distribution as its steady state. Doubly stochastic → uniform steady state.',
+    },
+  ],
+
+  transferPrompts: [
+    {
+      situation: 'A genomicist models the evolution of a DNA sequence as a Markov chain over the four bases A, C, G, T. The substitution rate matrix determines how likely each base is to mutate to another in one generation. After millions of generations, what is the base composition at equilibrium?',
+      competingTechniques: 'Simulate millions of generations (expensive), solve the detailed balance equations, compute the steady-state eigenvector of the transition matrix.',
+      whyThisTechniqueWins: 'The steady-state distribution is the eigenvector of the $4 \\times 4$ transition matrix for eigenvalue 1. This directly gives the equilibrium base frequencies, providing a genetic prediction without simulation. The spectral gap tells you how quickly a sequence converges to equilibrium composition after a mutation event.',
+    },
+    {
+      situation: 'A factory manager wants to know the long-run fraction of time each machine spends in Cutting, Setup, Idle, and Fault states. Transition probabilities were estimated from sensor data.',
+      competingTechniques: 'Record data for months (slow), simulate from multiple starting conditions, compute Markov steady state.',
+      whyThisTechniqueWins: 'Build the $4 \\times 4$ transition matrix $P$ from the sensor data and find the steady-state eigenvector. This gives the long-run time fractions in one computation. Availability = component for Cutting state. Optimization: change one transition probability and recompute — eigenvalue sensitivity analysis tells you which improvement gives the biggest availability gain.',
+    },
+  ],
+
+  debugging: [
+    {
+      commonError: 'Building a row-stochastic matrix (rows sum to 1) and then applying it as $P\\mathbf{x}$ to update a column vector probability distribution.',
+      symptom: 'The update $P\\mathbf{x}$ does not produce a valid probability vector — the entries do not sum to 1, and the probabilities make no sense.',
+      whyItHappened: 'Row-stochastic convention: $\\mathbf{x}_{t+1}^\\top = \\mathbf{x}_t^\\top P$ (row vector times matrix). Column-stochastic convention: $\\mathbf{x}_{t+1} = P\\mathbf{x}_t$ (matrix times column vector). Mixing conventions breaks the model.',
+      repairStrategy: 'Choose one convention consistently. Column-stochastic: each COLUMN sums to 1, use $\\mathbf{x}_{t+1} = P\\mathbf{x}_t$ with column vectors. Row-stochastic: each ROW sums to 1, use $\\mathbf{x}_{t+1}^\\top = \\mathbf{x}_t^\\top P$ with row vectors. Most textbooks use column-stochastic.',
+    },
+    {
+      commonError: 'Finding the null space of $P$ to get the steady state, instead of the null space of $P - I$.',
+      symptom: 'The "steady state" found does not satisfy $P\\mathbf{q} = \\mathbf{q}$ — it satisfies $P\\mathbf{q} = \\mathbf{0}$ instead.',
+      whyItHappened: 'Confusing two different null space problems: the null space of $P$ gives vectors mapped to zero (not useful here). The steady state satisfies $P\\mathbf{q} = \\mathbf{q}$, which rearranges to $(P-I)\\mathbf{q} = \\mathbf{0}$ — the null space of $P - I$.',
+      repairStrategy: 'Always set up the equation $(P - I)\\mathbf{q} = \\mathbf{0}$ to find the steady state. Then normalize: divide $\\mathbf{q}$ by the sum of its entries to make it a probability vector.',
+    },
+  ],
+
+  mastery: {
+    targetLevel: 2,
+    solveIndependently: 'Set up the steady-state equation $(P-I)\\mathbf{q} = \\mathbf{0}$ with normalization constraint, solve for $\\mathbf{q}$, and compute how quickly the chain converges using $|\\lambda_2|$.',
+    explainVerbally: 'Explain why every column-stochastic matrix has eigenvalue 1 (columns sum to 1), why the steady state is an eigenvector for λ=1, and why larger spectral gap means faster convergence.',
+    detectIncorrectApplication: 'Spot when someone uses a row-stochastic matrix with column-vector updates, or when someone solves $P\\mathbf{q} = \\mathbf{0}$ instead of $(P-I)\\mathbf{q} = \\mathbf{0}$.',
+    transferToUnfamiliar: 'Given a new Markov model (genetics, queuing, web graph), build the transition matrix, find the steady state, and interpret the result in the application domain.',
+  },
 };

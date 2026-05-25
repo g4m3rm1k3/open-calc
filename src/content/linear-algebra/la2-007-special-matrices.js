@@ -20,10 +20,12 @@ export default {
 
   intuition: {
     prose: [
+      'Matrix $A = \\begin{bmatrix}1&2\\\\2&5\\end{bmatrix}$: note $a_{12} = a_{21} = 2$ — it equals its own transpose, so it is **symmetric**. Its eigenvalues are real: $(3 \\pm \\sqrt{5})/2 \\approx 0.38$ and $2.62$ — both positive, so it is also **positive definite**. Compare $Q = \\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$: $Q^\\top Q = \\begin{bmatrix}1&0\\\\0&1\\end{bmatrix} = I$ — it is **orthogonal** (rotation 90°). Structure is not just notation: symmetric → real eigenvalues → special algorithms. Orthogonal → inverse = transpose → near-zero round-off error. The structures in this lesson unlock specific, faster algorithms.',
       '**Symmetric matrices ($A = A^\\top$):** A matrix is symmetric if it equals its own transpose. Geometrically, this means the entry $a_{ij}$ (row $i$, column $j$) always equals $a_{ji}$. These matrices arise whenever a relationship is mutual: if node $i$ connects to node $j$ with weight $w$, then $j$ connects to $i$ with the same weight. The **spectral theorem** guarantees symmetric matrices have real eigenvalues and orthogonal eigenvectors.',
       '**Orthogonal matrices ($A^{-1} = A^\\top$):** An orthogonal matrix has columns that are orthonormal — pairwise perpendicular unit vectors. The key property is $A^\\top A = I$, which means the inverse equals the transpose. Multiplying by $A$ is a **rigid motion** (rotation or reflection) — it preserves lengths and angles. Rotation matrices, reflection matrices, and the $Q$ in QR decomposition are all orthogonal.',
       '**Positive definite matrices:** A symmetric matrix $A$ is **positive definite** (SPD) if $\\mathbf{x}^\\top A \\mathbf{x} > 0$ for all nonzero $\\mathbf{x}$. This means the associated quadratic form $f(\\mathbf{x}) = \\mathbf{x}^\\top A \\mathbf{x}$ is like a bowl — it has a single minimum at the origin. SPD matrices have all positive eigenvalues, admit a Cholesky factorization $A = LL^\\top$, and are what optimization algorithms (gradient descent, conjugate gradient) require to guarantee convergence.',
       '**Diagonal matrices** are the simplest: operations reduce to scalar operations on each diagonal entry. **Triangular matrices** (upper and lower) make linear systems trivially solvable by substitution. These are not just special cases — they are the targets of most matrix factorization algorithms (LU produces triangular matrices, Schur decomposition produces triangular, eigendecomposition of symmetric matrices produces diagonal).',
+      '**Predict before reading on.** Matrix $B = \\begin{bmatrix}4&1\\\\1&2\\end{bmatrix}$. Is $B$ symmetric? Is $B$ positive definite? (Compute $\\det(B) = 8-1 = 7 > 0$ and check the top-left entry $4 > 0$.) Write your answer before checking with the Sylvester criterion callout.',
     ],
     callouts: [
       {
@@ -557,5 +559,98 @@ for i, M in enumerate([M1, M2, M3], 1):
       hints: ['At least one positive eigenvalue (3, 5) and one negative ($-1$). This means $\\mathbf{x}^\\top A\\mathbf{x}$ can be positive or negative depending on $\\mathbf{x}$ — indefinite.'],
       reviewSection: 'Math tab — Positive definite: three equivalent definitions',
     },
+    {
+      id: 'la2-007-quiz-8',
+      type: 'choice',
+      text: 'A rotation matrix $R_{45°}$ (45° CCW) is orthogonal. What is $R_{45°}^{-1}$?',
+      options: [
+        '$R_{45°}^\\top = R_{-45°}$ — the transpose equals the inverse, which is a 45° clockwise rotation',
+        '$-R_{45°}$ — negate all entries',
+        'There is no inverse since rotations are not invertible',
+        '$2R_{45°}$ — scale to undo the rotation',
+      ],
+      answer: '$R_{45°}^\\top = R_{-45°}$ — the transpose equals the inverse, which is a 45° clockwise rotation',
+      hints: ['For orthogonal $Q$: $Q^{-1} = Q^\\top$. For a rotation matrix: $R_\\theta^\\top = R_{-\\theta}$ (rotation in the opposite direction). No costly Gaussian elimination needed — just transpose.'],
+      reviewSection: 'Intuition tab — Orthogonal matrices',
+    },
+    {
+      id: 'la2-007-quiz-9',
+      type: 'choice',
+      text: 'Matrix $A = \\begin{bmatrix}3&1\\\\1&2\\end{bmatrix}$. Use Sylvester\'s criterion to check positive definiteness.',
+      options: [
+        'Positive definite: top-left $= 3 > 0$, $\\det(A) = 6-1 = 5 > 0$',
+        'Not positive definite: $\\det(A) < 0$',
+        'Indefinite: one eigenvalue is negative',
+        'Positive semidefinite: $\\det(A) = 0$',
+      ],
+      answer: 'Positive definite: top-left $= 3 > 0$, $\\det(A) = 6-1 = 5 > 0$',
+      hints: ['Sylvester criterion: all leading principal minors positive. Minor 1: $a_{11} = 3 > 0$ ✓. Minor 2: $\\det(A) = 3(2)-1(1) = 5 > 0$ ✓. Both positive → $A$ is SPD.'],
+      reviewSection: 'Math tab — Positive definite: three equivalent definitions',
+    },
+    {
+      id: 'la2-007-quiz-10',
+      type: 'choice',
+      text: 'A covariance matrix $\\Sigma$ from a dataset of $n$ samples always satisfies which property?',
+      options: [
+        'Symmetric and positive semidefinite ($\\mathbf{x}^\\top\\Sigma\\mathbf{x} \\geq 0$)',
+        'Orthogonal',
+        'Symmetric and positive definite (all eigenvalues strictly positive)',
+        'Diagonal',
+      ],
+      answer: 'Symmetric and positive semidefinite ($\\mathbf{x}^\\top\\Sigma\\mathbf{x} \\geq 0$)',
+      hints: ['$\\Sigma = \\frac{1}{n}X^\\top X$ for centered data matrix $X$. This is a Gram matrix — always PSD. It is strictly PD only if the features are linearly independent (full column rank of $X$). With redundant features, $\\Sigma$ is singular (PSD but not PD).'],
+      reviewSection: 'Rigor tab — Gram Matrix definition',
+    },
   ],
+
+  misconceptions: [
+    {
+      falseBelief: 'A symmetric matrix is always positive definite.',
+      whyStudentsThinkIt: 'Students first encounter SPD matrices (symmetric AND positive definite) together. They merge the properties into one concept.',
+      correctionExample: '$A = \\begin{bmatrix}1&0\\\\0&-2\\end{bmatrix}$ is symmetric ($A = A^\\top$) but NOT positive definite ($\\mathbf{x}^\\top A\\mathbf{x} = x_1^2 - 2x_2^2 < 0$ for $x_1=0, x_2=1$). It is **indefinite**.',
+      contrastCase: 'PD requires symmetry PLUS all positive eigenvalues (or all positive leading principal minors). Symmetry alone only guarantees real eigenvalues — they could be negative or zero.',
+    },
+    {
+      falseBelief: 'The transpose of a matrix is always its inverse.',
+      whyStudentsThinkIt: 'Students learn $Q^{-1} = Q^\\top$ for orthogonal matrices and over-generalize.',
+      correctionExample: 'For $A = \\begin{bmatrix}2&1\\\\0&3\\end{bmatrix}$: $A^\\top = \\begin{bmatrix}2&0\\\\1&3\\end{bmatrix}$. Compute $AA^\\top = \\begin{bmatrix}5&3\\\\3&9\\end{bmatrix} \\neq I$. The transpose-equals-inverse property is EXCLUSIVE to orthogonal matrices ($Q^\\top Q = I$).',
+      contrastCase: 'Test orthogonality with $A^\\top A$: if the result is $I$, then yes, $A^{-1} = A^\\top$. Otherwise, compute the inverse via LU.',
+    },
+  ],
+
+  transferPrompts: [
+    {
+      situation: 'A machine learning engineer trains a linear regression model. The normal equations require solving $(X^\\top X)\\mathbf{w} = X^\\top\\mathbf{y}$. She recognizes that $X^\\top X$ has a special structure. What is it and how does it affect the choice of solver?',
+      competingTechniques: ['Use general LU decomposition', 'Use Cholesky decomposition (since $X^\\top X$ is SPD when X has full column rank)'],
+      whyThisTechniqueWins: '$X^\\top X$ is symmetric positive definite (it is a Gram matrix). Cholesky decomposition uses about half the operations of LU ($n^3/6$ vs $n^3/3$) and is numerically stabler. Never use general LU when the matrix is SPD.',
+    },
+    {
+      situation: 'A simulation uses a $1000 \\times 1000$ rotation matrix $R$ at every time step. The code computes $R^{-1}$ via LU decomposition each time. A colleague says "just use the transpose." Who is right and why?',
+      competingTechniques: ['Compute LU and solve for $R^{-1}$ ($O(n^3)$ per step)', 'Transpose $R$ to get $R^{-1}$ ($O(n^2)$ per step)'],
+      whyThisTechniqueWins: 'Rotation matrices are orthogonal ($R^\\top R = I$), so $R^{-1} = R^\\top$. Transposing is $O(n^2)$ — just rearranging memory. LU inversion is $O(n^3)$. For $n = 1000$ at every time step, this is a $1000\\times$ speedup per inversion.',
+    },
+  ],
+
+  debugging: [
+    {
+      commonError: 'Using `numpy.linalg.eig()` on a symmetric matrix instead of `numpy.linalg.eigh()`.',
+      symptom: 'Eigenvalues come back with small imaginary parts (e.g., $2.99 + 1e-16j$) due to floating-point errors, or eigenvectors are not exactly orthogonal.',
+      whyItHappened: '`eig()` uses a general complex algorithm. For symmetric matrices, `eigh()` uses a specialized real symmetric algorithm (divide-and-conquer) that is faster, more accurate, and guarantees real eigenvalues and orthonormal eigenvectors.',
+      repairStrategy: 'Always use `numpy.linalg.eigh(A)` (or MATLAB `eig(A)` — it auto-detects symmetric). Check: `np.allclose(eigvecs.T @ eigvecs, np.eye(n))` to verify orthonormality.',
+    },
+    {
+      commonError: 'Attempting Cholesky decomposition on a matrix that is not positive definite.',
+      symptom: 'Python throws `numpy.linalg.LinAlgError: Matrix is not positive definite`, or MATLAB returns complex entries in $L$.',
+      whyItHappened: 'Cholesky requires ALL eigenvalues to be strictly positive. Near-zero or negative eigenvalues (common in ill-conditioned covariance matrices) cause the algorithm to try to take the square root of a negative number.',
+      repairStrategy: 'Check: run `np.linalg.eigvalsh(A)` and verify all eigenvalues are positive. If near-zero eigenvalues appear, add a small regularization: `A_reg = A + 1e-8 * np.eye(n)`. If eigenvalues are significantly negative, the matrix is not SPD and Cholesky cannot be used — switch to LU.',
+    },
+  ],
+
+  mastery: {
+    targetLevel: 2,
+    solveIndependently: 'Classify a matrix as symmetric, orthogonal, positive definite, triangular, or diagonal by checking the appropriate criteria, and choose the corresponding optimal algorithm (Cholesky for SPD, transpose for orthogonal, substitution for triangular).',
+    explainVerbally: 'Explain why $Q^{-1} = Q^\\top$ for orthogonal matrices, why Cholesky is twice as fast as LU for SPD matrices, and what Sylvester\'s criterion tests.',
+    detectIncorrectApplication: 'Identify when a student uses general LU on an SPD matrix (should use Cholesky), or claims a matrix is PD based only on symmetry.',
+    transferToUnfamiliar: 'Given a Gram matrix $G = A^\\top A$ from a machine learning pipeline, predict its properties (symmetric, PSD) and recommend the appropriate solver.',
+  },
 };

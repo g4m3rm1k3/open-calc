@@ -19,11 +19,13 @@ export default {
   // ── Intuition ──────────────────────────────────────────────────
   intuition: {
     prose: [
+      'Take the rotation matrix $A = \\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$ (90° counterclockwise). The characteristic equation: $\\det(A - \\lambda I) = \\lambda^2 + 1 = 0$, so $\\lambda = \\pm i$. No real solutions. Yet the algebra forced a clean answer: eigenvalue $i = 0+1\\cdot i$ has magnitude $|i| = 1$ (no scaling), angle $\\arg(i) = 90°$ (rotation by 90°). After $k$ applications of $A$: eigenvalue $i^k$ spirals around the unit circle. After 4 steps: $i^4 = 1$ — back to the start. The imaginary number $i$ is encoding the rotation you can see geometrically.',
       '**Where you are in the story:** You know how to find eigenvalues from the characteristic equation $\\det(A - \\lambda I) = 0$, and you know how to diagonalize a matrix when it has enough real eigenvectors. But what about a matrix that only rotates — like a 90° rotation? Geometrically, it pushes every single vector off its original line. There are no real eigenvectors at all.',
       'Yet the characteristic equation is a polynomial — and by the Fundamental Theorem of Algebra, every polynomial with real coefficients has roots. They might just be complex numbers. This is not a failure of linear algebra; it is algebra doing exactly what it is supposed to do.',
       'Here is the key: when a matrix has complex eigenvalues, those eigenvalues come in **conjugate pairs** $a + bi$ and $a - bi$ (for real matrices). The real part $a$ controls stretching/shrinking, and the imaginary part $b$ controls rotation.',
       'Think of the complex eigenvalue $\\lambda = a + bi$ in polar form: its **magnitude** is $r = \\sqrt{a^2 + b^2}$ (the stretch factor) and its **angle** is $\\theta = \\arctan(b/a)$ (the rotation angle). Multiplying repeatedly by $\\lambda$ spirals outward if $r > 1$, spirals inward if $r < 1$, and circles if $r = 1$.',
       'For the 90° rotation matrix, $\\lambda = i = 0 + 1\\cdot i$. The real part is 0 (no stretching), the imaginary part is 1. Magnitude = $\\sqrt{0^2+1^2} = 1$ (no scaling), angle = 90° (pure rotation). Exactly what a rotation matrix should do.',
+      '**Predict before reading on.** Matrix $A = \\begin{bmatrix}0.8&-0.6\\\\0.6&0.8\\end{bmatrix}$. Without computing: do you expect real or complex eigenvalues? Will repeated application spiral inward, outward, or circle? Write your prediction, then compute $\\det(A - \\lambda I)$.',
       '**Why this matters practically.** If you are analyzing a dynamical system — anything that evolves over time — the eigenvalues of its matrix tell you everything about long-term behavior: do things grow, shrink, or oscillate? Complex eigenvalues with $|\\lambda| > 1$ mean spiral growth. $|\\lambda| < 1$ means spiral decay toward equilibrium. $|\\lambda| = 1$ means perfect sustained oscillation. The eigenvalues are the system\'s fate, written in complex numbers.',
       '**CNC spindle control — when complex eigenvalues cause chatter.** A CNC spindle speed controller has a transfer function with a characteristic equation — and its roots are eigenvalues. When all roots are real and negative (continuous-time) or inside the unit circle (discrete-time), the spindle holds stable speed. When a root crosses into the right half-plane (or outside the unit circle), the controller becomes unstable and the spindle oscillates — this is **chatter**, the ringing vibration that ruins surface finish and tool life. Complex eigenvalues near the stability boundary ($|\\lambda| \\approx 1$) produce lightly-damped oscillations: the spindle "rings" but eventually settles. The frequency of the chatter ring is exactly $\\omega = \\arctan(b/a)$ radians per sample — the imaginary part of the eigenvalue.',
       '**Where this is heading:** Phase 4 moves to non-square matrices and the most powerful factorization in linear algebra: the Singular Value Decomposition (SVD), which generalizes everything you have learned about eigenvalues.',
@@ -369,6 +371,35 @@ C = np.array([[0.5, 0.2],
       ],
       conclusion: '$\\lambda = 0.5 + 0.5i$ produces a stable spiral: each step rotates 45° and shrinks by $1/\\sqrt{2} \\approx 0.707$. In the long run, every vector decays to the origin. The system is stable.',
     },
+    {
+      id: 'la3-003-ex3',
+      title: 'Connecting Complex Eigenvalues to Trace and Determinant',
+      problem: 'A $2 \\times 2$ real matrix has eigenvalues $\\lambda = 3 \\pm 2i$. Find its trace and determinant without knowing the matrix entries. What does the determinant tell you about invertibility?',
+      steps: [
+        {
+          expression: '\\text{trace}(A) = \\lambda_1 + \\lambda_2 = (3+2i) + (3-2i) = 6',
+          annotation: 'Sum of eigenvalues equals trace. The imaginary parts cancel for conjugate pairs.',
+          strategyTitle: 'Compute trace from eigenvalues',
+          checkpoint: 'Why does trace always come out real for real matrices with complex eigenvalues?',
+          hints: ['Conjugate pairs sum to $2a$ where $a$ is the real part. The imaginary parts $+bi$ and $-bi$ always cancel.'],
+        },
+        {
+          expression: '\\det(A) = \\lambda_1 \\cdot \\lambda_2 = (3+2i)(3-2i) = 9 + 4 = 13',
+          annotation: 'Product of conjugate pair: $(a+bi)(a-bi) = a^2 + b^2$. Always real and positive.',
+          strategyTitle: 'Compute determinant from eigenvalues',
+          checkpoint: 'Is A invertible?',
+          hints: ['$\\det(A) = 13 \\neq 0$, so $A$ is invertible (IMT). Complex eigenvalues are never zero (they have positive magnitude), so any matrix with only complex eigenvalues is automatically invertible.'],
+        },
+        {
+          expression: '|\\lambda| = \\sqrt{3^2 + 2^2} = \\sqrt{13} \\approx 3.61 > 1',
+          annotation: 'The magnitude exceeds 1. Under repeated application, vectors spiral outward.',
+          strategyTitle: 'Determine stability from magnitude',
+          checkpoint: 'What is the rotation angle per step?',
+          hints: ['$\\theta = \\arctan(2/3) \\approx 33.7°$ per step.'],
+        },
+      ],
+      conclusion: 'For conjugate pair eigenvalues $a \\pm bi$: trace $= 2a$ (real), determinant $= a^2 + b^2 > 0$ (always positive, always invertible). The magnitude $\\sqrt{a^2+b^2}$ determines stability — exactly the same as the determinant.',
+    },
   ],
 
   // ── Challenges ─────────────────────────────────────────────────
@@ -483,14 +514,14 @@ C = np.array([[0.5, 0.2],
 
   // ── Checkpoints ──────────────────────────────────────────────────
   checkpoints: [
-    'read-intuition',
-    'read-math',
-    'read-rigor',
-    'completed-example-1',
-    'completed-example-2',
-    'attempted-challenge-easy',
-    'attempted-challenge-medium',
-    'attempted-challenge-hard',
+    { id: 'cp-la3-003-1', label: 'Read: understand how complex eigenvalues encode rotation and scaling via magnitude and angle', type: 'read' },
+    { id: 'cp-la3-003-2', label: 'Read: follow why real matrices produce conjugate pairs and how they factor through real 2×2 blocks', type: 'read' },
+    { id: 'cp-la3-003-3', label: 'Read: understand the stability condition |λ| < 1 and the Jury/Lyapunov connection', type: 'read' },
+    { id: 'cp-la3-003-4', label: 'Run the lab visualization — see vectors spiraling under repeated matrix application', type: 'lab' },
+    { id: 'cp-la3-003-5', label: 'Run Python/OpenMAT code — compute complex eigenvalues and trace the spiral trajectory', type: 'lab' },
+    { id: 'cp-la3-003-6', label: 'Complete example 1: find complex eigenvalues of the 90° rotation matrix', type: 'example' },
+    { id: 'cp-la3-003-7', label: 'Complete example 2: analyze a spiral matrix using |λ| and arg(λ)', type: 'example' },
+    { id: 'cp-la3-003-8', label: 'Attempt challenge 3: design a rotation-scaling matrix with given complex eigenvalue', type: 'challenge' },
   ],
 
   // ── Assessment ───────────────────────────────────────────────────
@@ -538,10 +569,11 @@ C = np.array([[0.5, 0.2],
     },
     {
       id: 'complex-eigenvalues-q3',
-      type: 'input',
+      type: 'choice',
       text: 'A real $2\\times 2$ matrix has eigenvalues $2 \\pm 3i$. What is its determinant?',
-      answer: '13',
-      hints: ['$\\det = \\lambda_1 \\cdot \\lambda_2 = (2+3i)(2-3i) = 4+9 = 13$.'],
+      options: ['$4$', '$6$', '$13$', '$9$'],
+      answer: '$13$',
+      hints: ['$\\det = \\lambda_1 \\cdot \\lambda_2 = (2+3i)(2-3i) = 4+9 = 13$. For conjugate pairs, det $= a^2+b^2$.'],
       reviewSection: 'Rigor tab — Trace and Determinant Still Apply',
     },
     {
@@ -553,5 +585,130 @@ C = np.array([[0.5, 0.2],
       hints: ['$i^4 = i^2 \\cdot i^2 = (-1)(-1) = 1$. Four 90° rotations = 360° = full circle back to the start.'],
       reviewSection: 'Examples tab — 90° Rotation Matrix',
     },
+    {
+      id: 'complex-eigenvalues-q5',
+      type: 'choice',
+      text: 'A real $3 \\times 3$ matrix has one real eigenvalue $\\lambda_1 = 2$ and one pair of complex eigenvalues $\\lambda_{2,3} = 1 \\pm i$. What is its trace?',
+      options: ['$4 + i$', '$2$', '$4$', '$6$'],
+      answer: '$4$',
+      hints: ['Trace $= \\lambda_1 + \\lambda_2 + \\lambda_3 = 2 + (1+i) + (1-i) = 2 + 2 = 4$. Complex conjugate pair always contributes $2a$ to the trace.'],
+      reviewSection: 'Rigor tab — Trace and Determinant',
+    },
+    {
+      id: 'complex-eigenvalues-q6',
+      type: 'choice',
+      text: 'A feedback control system has characteristic equation $\\lambda^2 - 2\\lambda + 5 = 0$. Are the poles (eigenvalues) stable in discrete time ($|\\lambda| < 1$)?',
+      options: [
+        'Yes — both eigenvalues have negative real part.',
+        'No — both eigenvalues have magnitude $\\sqrt{5} > 1$.',
+        'Yes — the discriminant is negative.',
+        'Cannot determine without more information.',
+      ],
+      answer: 'No — both eigenvalues have magnitude $\\sqrt{5} > 1$.',
+      hints: ['$\\lambda = 1 \\pm 2i$. Magnitude: $|1+2i| = \\sqrt{1+4} = \\sqrt{5} \\approx 2.24 > 1$. In discrete-time systems, stability requires $|\\lambda| < 1$. This system is unstable — it oscillates with growing amplitude.'],
+      reviewSection: 'Intuition tab — long-term behavior',
+    },
+    {
+      id: 'complex-eigenvalues-q7',
+      type: 'choice',
+      text: 'Complex eigenvalues come in conjugate pairs for real matrices because:',
+      options: [
+        'The characteristic polynomial has even degree.',
+        'Complex conjugation maps real matrix eigenpairs to eigenpairs: if $A\\mathbf{v} = \\lambda\\mathbf{v}$ and $A = \\bar{A}$, then $A\\bar{\\mathbf{v}} = \\bar{\\lambda}\\bar{\\mathbf{v}}$.',
+        'All matrices have an even number of eigenvalues.',
+        'Complex eigenvalues are always roots of quadratic factors.',
+      ],
+      answer: 'Complex conjugation maps real matrix eigenpairs to eigenpairs: if $A\\mathbf{v} = \\lambda\\mathbf{v}$ and $A = \\bar{A}$, then $A\\bar{\\mathbf{v}} = \\bar{\\lambda}\\bar{\\mathbf{v}}$.',
+      hints: ['Take $A\\mathbf{v} = \\lambda\\mathbf{v}$. Conjugate both sides. Since $A$ is real, $\\bar{A} = A$, so $A\\bar{\\mathbf{v}} = \\bar{\\lambda}\\bar{\\mathbf{v}}$. This proves $\\bar{\\lambda}$ is automatically an eigenvalue with eigenvector $\\bar{\\mathbf{v}}$.'],
+      reviewSection: 'Rigor tab — Why Conjugate Pairs?',
+    },
+    {
+      id: 'complex-eigenvalues-q8',
+      type: 'choice',
+      text: 'For a $2 \\times 2$ real rotation-scaling matrix, the real Jordan form (without complex entries) looks like $\\begin{bmatrix}a&-b\\\\b&a\\end{bmatrix}$ instead of $\\begin{bmatrix}a+bi&0\\\\0&a-bi\\end{bmatrix}$. Why is the real form preferred?',
+      options: [
+        'Because real matrices cannot have complex eigenvalues.',
+        'Because working with purely real numbers avoids complex arithmetic in simulations and numerical software.',
+        'Because the real block form has smaller determinant.',
+        'Because the complex form does not represent a valid matrix.',
+      ],
+      answer: 'Because working with purely real numbers avoids complex arithmetic in simulations and numerical software.',
+      hints: ['The real Jordan block $\\begin{bmatrix}a&-b\\\\b&a\\end{bmatrix}$ represents the same rotation-scaling as $\\lambda = a+bi$, but uses only real entries. Numerical software (MATLAB, NumPy) returns real matrices for real inputs, avoiding complex arithmetic overhead when the eigenvalues happen to be complex.'],
+      reviewSection: 'Rigor tab — Real Jordan Form',
+    },
+    {
+      id: 'complex-eigenvalues-q9',
+      type: 'choice',
+      text: 'A $2 \\times 2$ matrix has trace $= 6$ and determinant $= 13$. What are its eigenvalues?',
+      options: ['$3 \\pm 2i$', '$6 \\pm i$', '$2 \\pm 3i$', '$1 \\pm 2\\sqrt{3}i$'],
+      answer: '$3 \\pm 2i$',
+      hints: ['$\\lambda^2 - 6\\lambda + 13 = 0$ (use trace $= \\lambda_1+\\lambda_2$ and det $= \\lambda_1\\lambda_2$). Quadratic formula: $\\lambda = (6 \\pm \\sqrt{36-52})/2 = (6 \\pm \\sqrt{-16})/2 = 3 \\pm 2i$.'],
+      reviewSection: 'Examples tab — Example 3',
+    },
+    {
+      id: 'complex-eigenvalues-q10',
+      type: 'choice',
+      text: 'A matrix has eigenvalue $\\lambda = e^{i\\pi/6} = \\cos(30°) + i\\sin(30°)$. After 12 applications, every vector returns exactly to its starting position. Why?',
+      options: [
+        'Because $|\\lambda| = 1$, so there is no scaling.',
+        'Because $\\lambda^{12} = e^{i \\cdot 12\\pi/6} = e^{i2\\pi} = 1$ — 12 rotations of 30° complete a full circle.',
+        'Because eigenvalue 1 means the identity transformation.',
+        'Because real and imaginary parts cancel after many applications.',
+      ],
+      answer: 'Because $\\lambda^{12} = e^{i \\cdot 12\\pi/6} = e^{i2\\pi} = 1$ — 12 rotations of 30° complete a full circle.',
+      hints: ['$\\lambda^k = e^{ik\\pi/6}$. This has period $T$ where $k\\pi/6 = 2\\pi$, so $k = 12$. After 12 steps, the angle returns to 0 and $\\lambda^{12} = 1$. Every vector is back to its original position.'],
+      reviewSection: 'Intuition tab — repeated application',
+    },
   ],
+
+  misconceptions: [
+    {
+      falseBelief: 'A real matrix with complex eigenvalues has "no eigenvectors" and cannot be analyzed.',
+      whyStudentsThinkIt: 'Students know eigenvectors must be non-zero, and the complex eigenvectors of a real matrix are complex-valued — not real vectors. They conclude there is nothing geometric to say.',
+      correctionExample: 'The rotation matrix $A = \\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$ has eigenvectors $[1,-i]^\\top$ and $[1,i]^\\top$ (complex). These do not correspond to real directions, but the real-form Jordan block $\\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$ (which IS $A$ itself here!) reveals the geometry: 90° rotation. The behavior of REAL vectors under $A$ is still fully determined.',
+      contrastCase: 'Symmetric matrices have only real eigenvalues and real eigenvectors — the Spectral Theorem. Complex eigenvalues arise precisely when the transformation includes a rotation component that cannot be described purely by real stretching.',
+    },
+    {
+      falseBelief: 'Complex eigenvalues always come from "complicated" matrices. Simple-looking matrices have real eigenvalues.',
+      whyStudentsThinkIt: 'Students associate complexity of matrix entries with complexity of eigenvalues. A simple 2×2 matrix with small integers seems like it should have simple real eigenvalues.',
+      correctionExample: '$A = \\begin{bmatrix}1&-1\\\\1&1\\end{bmatrix}$ has entries 0 and 1, but eigenvalues $1 \\pm i$. The off-diagonal entries $-1$ and $+1$ create a rotation component. Simple entries, complex eigenvalues.',
+      contrastCase: 'Triangular matrices always have real eigenvalues (the diagonal entries). Symmetric matrices always have real eigenvalues (Spectral Theorem). For these special cases, simple structure guarantees real eigenvalues regardless of entry complexity.',
+    },
+  ],
+
+  transferPrompts: [
+    {
+      situation: 'An electrical engineer analyzes an RLC circuit. The characteristic equation of the circuit is $s^2 + Rs/L + 1/(LC) = 0$. For $R = 2$, $L = 1$, $C = 1/2$, the roots are $s = -1 \\pm i$.',
+      competingTechniques: 'Time-domain simulation (accurate but slow), Laplace transform (requires complex analysis), eigenvalue analysis of the state-space matrix.',
+      whyThisTechniqueWins: 'The complex roots $s = -1 \\pm i$ reveal everything: real part $-1$ means exponential decay (damping), imaginary part $1$ means oscillation at 1 rad/s. The circuit response is $e^{-t}\\cos(t)$ — a damped sinusoid. No simulation needed; the eigenvalue gives the full qualitative picture.',
+    },
+    {
+      situation: 'A robotics engineer needs to verify that a discrete-time control loop (running at 100 Hz) will not oscillate unstably. The state transition matrix $A$ has been computed numerically, and its largest eigenvalue has magnitude $0.98$ and argument $15°$.',
+      competingTechniques: 'Run the simulation for many time steps (finds instability but slowly), check all eigenvalue magnitudes algebraically, use Lyapunov stability theory.',
+      whyThisTechniqueWins: 'The criterion is immediate: $|\\lambda| = 0.98 < 1$ → stable. The imaginary part (15°/step) predicts a damped oscillation at frequency $15° \\times 100$ Hz $/ 360° \\approx 4.2$ Hz. If the mechanical resonance of the robot arm is near 4.2 Hz, the controller will excite it — an eigenvalue check predicts the resonance interaction without simulation.',
+    },
+  ],
+
+  debugging: [
+    {
+      commonError: 'Forgetting that complex eigenvalues of real matrices always come in conjugate pairs, and listing only one.',
+      symptom: 'For a $2 \\times 2$ real matrix, the student finds one complex eigenvalue $3+2i$ and stops. The characteristic equation has degree 2 — both roots must be found.',
+      whyItHappened: 'The quadratic formula produces both roots simultaneously, but students sometimes only use $\\sqrt{\\Delta}$ (not $\\pm\\sqrt{\\Delta}$), missing the conjugate.',
+      repairStrategy: 'For the characteristic polynomial $\\lambda^2 - b\\lambda + c = 0$ with $b^2 - 4c < 0$: the two roots are always $\\frac{b \\pm \\sqrt{b^2-4c}}{2}$, which are conjugates. Always write both.',
+    },
+    {
+      commonError: 'Confusing the magnitude $|\\lambda|$ with the real part $a$ when checking stability.',
+      symptom: 'For $\\lambda = -0.5 + 0.9i$, student says "negative real part → stable" without checking $|\\lambda| = \\sqrt{0.25+0.81} = \\sqrt{1.06} > 1$.',
+      whyItHappened: 'Continuous-time stability (differential equations, $\\dot{\\mathbf{x}} = A\\mathbf{x}$) requires real part $< 0$. Discrete-time stability (difference equations, $\\mathbf{x}_{n+1} = A\\mathbf{x}_n$) requires magnitude $< 1$. The two criteria are different.',
+      repairStrategy: 'Always identify which type of system before checking: continuous-time → check $\\text{Re}(\\lambda) < 0$; discrete-time → check $|\\lambda| < 1$. In this course, matrix powers use discrete-time criterion.',
+    },
+  ],
+
+  mastery: {
+    targetLevel: 2,
+    solveIndependently: 'Find complex eigenvalues of a 2×2 real matrix using the quadratic formula, interpret them geometrically as rotation-scaling, and determine stability ($|\\lambda|$ vs 1).',
+    explainVerbally: 'Explain why complex eigenvalues come in conjugate pairs for real matrices, why $|\\lambda|$ determines long-term growth/decay, and how the argument of $\\lambda$ determines rotation angle.',
+    detectIncorrectApplication: 'Spot when someone applies the continuous-time stability criterion (Re(λ) < 0) to a discrete-time system, or when someone finds only one of the two conjugate eigenvalues.',
+    transferToUnfamiliar: 'Given a new physical system (circuit, control system, vibration) with a state matrix, compute eigenvalues and predict the qualitative behavior (stable/unstable, oscillating, frequency of oscillation).',
+  },
 };

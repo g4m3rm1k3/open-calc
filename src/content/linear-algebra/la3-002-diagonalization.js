@@ -19,11 +19,13 @@ export default {
   // ── Intuition ──────────────────────────────────────────────────
   intuition: {
     prose: [
+      'Take $A = \\begin{bmatrix}4&2\\\\1&3\\end{bmatrix}$ with eigenvectors $\\mathbf{v}_1 = [2,1]^\\top$ ($\\lambda_1=5$) and $\\mathbf{v}_2 = [1,-1]^\\top$ ($\\lambda_2=2$). Build $P = \\begin{bmatrix}2&1\\\\1&-1\\end{bmatrix}$ and $D = \\begin{bmatrix}5&0\\\\0&2\\end{bmatrix}$. Then $A^{100} = PD^{100}P^{-1}$ where $D^{100} = \\begin{bmatrix}5^{100}&0\\\\0&2^{100}\\end{bmatrix}$ — two scalar exponentiations and three matrix multiplications, regardless of the power. Without diagonalization: 99 matrix multiplications.',
       '**Where you are in the story:** You just found eigenvectors — the directions a matrix never rotates. You know the defining equation $A\\mathbf{v} = \\lambda\\mathbf{v}$. Now comes the payoff: what happens if you rebuild your entire coordinate system so its axes ARE the eigenvectors?',
       'In your regular coordinate system, a matrix looks messy — a grid of numbers with no obvious meaning. But in the eigenvector coordinate system, something beautiful happens: the matrix becomes **diagonal** — zeros everywhere except the main diagonal, where the eigenvalues sit. A diagonal matrix does the simplest possible thing: it just scales each axis independently.',
       'Here is the key idea: a change of basis is just a matrix multiplication. If $P$ is the matrix whose columns are the eigenvectors, then $P^{-1}$ transforms coordinates from the eigenvector basis back to the standard basis, and $P$ transforms the other way. The whole pipeline looks like:\n\n$A = P D P^{-1}$\n\nwhere $D$ is the diagonal matrix of eigenvalues.',
       '**Why this unlocks matrix powers.** Watch what happens when you square $A$:\n\n$A^2 = (PDP^{-1})(PDP^{-1}) = PD(P^{-1}P)DP^{-1} = PD^2P^{-1}$\n\nThe $P^{-1}P$ in the middle collapses to $I$. So $A^2 = PD^2P^{-1}$. By the same logic, $A^k = PD^kP^{-1}$ for any power $k$. And $D^k$ is trivial — you just raise each diagonal entry to the $k$th power. A matrix that would take hundreds of multiplications now takes three.',
       'Think of it this way: $P^{-1}$ rotates from standard coordinates into the eigenvector coordinate system. $D$ does the scaling — trivially — in that clean system. $P$ rotates back to standard coordinates. Three operations replace a hundred.',
+      '**Predict before reading on.** You are given $A = \\begin{bmatrix}3&0\\\\0&-2\\end{bmatrix}$ (diagonal). What are $P$, $D$, and $P^{-1}$ in the diagonalization $A = PDP^{-1}$? What is $A^{50}$? Write your answers before continuing.',
       '**Where this is heading:** Not every matrix has enough eigenvectors to diagonalize — some are defective. And some matrices have complex eigenvalues, which produce rotation instead of scaling. The next lesson explores what happens when the characteristic equation has no real solutions.',
     ],
     callouts: [
@@ -386,6 +388,42 @@ A = np.array([[2., 1.],
       ],
       conclusion: '$A^3 = \\begin{bmatrix}86&78\\\\39&47\\end{bmatrix}$. For $A^{100}$, the approach is identical — only the diagonal entries $5^{100}$ and $2^{100}$ change. Diagonalization makes arbitrary powers trivial.',
     },
+    {
+      id: 'la3-002-ex3',
+      title: 'Determining Whether a Matrix is Diagonalizable',
+      problem: 'For each matrix, determine whether it is diagonalizable: (a) $A = \\begin{bmatrix}5&1\\\\0&5\\end{bmatrix}$, (b) $B = \\begin{bmatrix}5&0\\\\0&5\\end{bmatrix}$.',
+      steps: [
+        {
+          expression: 'p_A(\\lambda) = (5-\\lambda)^2 = 0 \\implies \\lambda = 5 \\text{ with algebraic multiplicity 2}',
+          annotation: 'Both matrices are upper triangular with identical diagonal entries. The characteristic polynomial is $(5-\\lambda)^2$ for both.',
+          strategyTitle: 'Find eigenvalues of both matrices',
+          checkpoint: 'Both have the same eigenvalues. Do they have the same eigenvectors?',
+          hints: ['Not necessarily. Algebraic multiplicity only tells you about the characteristic polynomial. The number of independent eigenvectors (geometric multiplicity) requires solving $(A - 5I)\\mathbf{v} = \\mathbf{0}$.'],
+        },
+        {
+          expression: '(A - 5I)\\mathbf{v} = \\begin{bmatrix}0&1\\\\0&0\\end{bmatrix}\\mathbf{v} = \\mathbf{0} \\implies v_2 = 0, \\; v_1 \\text{ free} \\implies \\text{eigenspace} = \\text{span}\\{[1,0]^\\top\\}',
+          annotation: 'For $A$: the eigenspace is 1-dimensional. Geometric multiplicity $= 1 <$ algebraic multiplicity $= 2$.',
+          strategyTitle: 'Check eigenspace dimension for A',
+          checkpoint: '',
+          hints: [],
+        },
+        {
+          expression: '(B - 5I)\\mathbf{v} = \\begin{bmatrix}0&0\\\\0&0\\end{bmatrix}\\mathbf{v} = \\mathbf{0} \\implies v_1, v_2 \\text{ both free} \\implies \\text{eigenspace} = \\mathbb{R}^2',
+          annotation: 'For $B$: the eigenspace is all of $\\mathbb{R}^2$ — 2-dimensional. Geometric multiplicity $= 2 = $ algebraic multiplicity.',
+          strategyTitle: 'Check eigenspace dimension for B',
+          checkpoint: '',
+          hints: [],
+        },
+        {
+          expression: 'A \\text{ is DEFECTIVE (not diagonalizable)}; \\quad B = 5I \\text{ is ALREADY DIAGONAL (diagonalizable)}',
+          annotation: '$A$ lacks enough eigenvectors — only one independent eigenvector for a 2×2 matrix. $B = 5I$ is already diagonal: every nonzero vector is an eigenvector.',
+          strategyTitle: 'Conclude',
+          checkpoint: 'What is the diagonalization of B?',
+          hints: ['$B = 5I = I \\cdot 5I \\cdot I^{-1} = P D P^{-1}$ with $P = I$ and $D = 5I$. The identity matrix itself is P.'],
+        },
+      ],
+      conclusion: 'Two matrices can have identical eigenvalues but different diagonalizability. The shear matrix $A$ is defective; the scalar multiple of identity $B = 5I$ is trivially diagonal. Always check geometric multiplicity, not just eigenvalues.',
+    },
   ],
 
   // ── Challenges ─────────────────────────────────────────────────
@@ -502,14 +540,14 @@ A = np.array([[2., 1.],
 
   // ── Checkpoints ──────────────────────────────────────────────────
   checkpoints: [
-    'read-intuition',
-    'read-math',
-    'read-rigor',
-    'completed-example-1',
-    'completed-example-2',
-    'attempted-challenge-easy',
-    'attempted-challenge-medium',
-    'attempted-challenge-hard',
+    { id: 'cp-la3-002-1', label: 'Read: understand why eigenvector coordinates make A diagonal', type: 'read' },
+    { id: 'cp-la3-002-2', label: 'Read: follow the derivation A = PDP⁻¹ and the matrix powers formula A^k = PD^kP⁻¹', type: 'read' },
+    { id: 'cp-la3-002-3', label: 'Read: understand the diagonalizability criterion and when defective matrices fail', type: 'read' },
+    { id: 'cp-la3-002-4', label: 'Run OpenMAT cell 1 — build P and D, verify A = P*D*inv(P)', type: 'lab' },
+    { id: 'cp-la3-002-5', label: 'Run Python cell 2 — compute A^k via diagonalization and verify against numpy', type: 'lab' },
+    { id: 'cp-la3-002-6', label: 'Complete example 1: construct P and D, compute P⁻¹, verify A = PDP⁻¹', type: 'example' },
+    { id: 'cp-la3-002-7', label: 'Complete example 2: compute A³ using PD³P⁻¹', type: 'example' },
+    { id: 'cp-la3-002-8', label: 'Attempt challenge 3: derive A^n as a closed-form formula and analyze long-run behavior', type: 'challenge' },
   ],
 
   // ── Assessment ───────────────────────────────────────────────────
@@ -571,11 +609,147 @@ A = np.array([[2., 1.],
     },
     {
       id: 'diagonalization-q4',
-      type: 'input',
+      type: 'choice',
       text: 'A matrix $A$ has eigenvalues 3 and 7. What is the $(1,1)$ entry of $D^2$ if $3$ is the first diagonal entry?',
-      answer: '9',
-      hints: ['$D^2$ raises each diagonal entry to the 2nd power: $3^2 = 9$.'],
+      options: ['$6$', '$9$', '$49$', '$21$'],
+      answer: '$9$',
+      hints: ['$D^2$ raises each diagonal entry to the 2nd power: $3^2 = 9$ in position $(1,1)$ and $7^2 = 49$ in position $(2,2)$.'],
+      reviewSection: 'Math tab — Matrix Powers',
+    },
+    {
+      id: 'diagonalization-q5',
+      type: 'choice',
+      text: 'If $A = PDP^{-1}$ and you swap the order of columns in $P$ (putting eigenvector 2 first), what must you change in $D$?',
+      options: [
+        'Nothing — $D$ stays the same.',
+        'Swap the eigenvalues in $D$ to match the new column order.',
+        'Take the transpose of $D$.',
+        'Replace $D$ with $D^{-1}$.',
+      ],
+      answer: 'Swap the eigenvalues in $D$ to match the new column order.',
+      hints: ['Column $i$ of $P$ and entry $(i,i)$ of $D$ must be a matching pair. If you reorder columns in $P$, you must reorder the diagonal in $D$ the same way — otherwise $AP \\neq PD$.'],
+      reviewSection: 'Math tab — Column Order callout',
+    },
+    {
+      id: 'diagonalization-q6',
+      type: 'choice',
+      text: 'A $4 \\times 4$ matrix has eigenvalues $1, 2, 3, 4$ (all distinct). Is it diagonalizable?',
+      options: [
+        'Only if all eigenvalues are positive.',
+        'Only if it is symmetric.',
+        'Yes — $n$ distinct eigenvalues always guarantee $n$ independent eigenvectors.',
+        'Cannot determine without computing eigenvectors.',
+      ],
+      answer: 'Yes — $n$ distinct eigenvalues always guarantee $n$ independent eigenvectors.',
+      hints: ['Eigenvectors from distinct eigenvalues are always linearly independent (proved in la3-001). So $n$ distinct eigenvalues → $n$ independent eigenvectors → diagonalizable.'],
+      reviewSection: 'Rigor tab — Diagonalizability Criterion',
+    },
+    {
+      id: 'diagonalization-q7',
+      type: 'choice',
+      text: 'What does it mean for two matrices to be "similar"?',
+      options: [
+        'They have the same entries.',
+        'They have the same rank.',
+        '$B = P^{-1}AP$ for some invertible $P$ — they represent the same transformation in different coordinate systems.',
+        'They have the same dimensions.',
+      ],
+      answer: '$B = P^{-1}AP$ for some invertible $P$ — they represent the same transformation in different coordinate systems.',
+      hints: ['Similar matrices represent the same linear map in different bases. They share eigenvalues, trace, determinant, rank — all invariants of the transformation, not of the coordinate system.'],
+      reviewSection: 'Rigor tab — Similar Matrices',
+    },
+    {
+      id: 'diagonalization-q8',
+      type: 'choice',
+      text: 'A long-run population model has $\\mathbf{x}_{n+1} = A\\mathbf{x}_n$. Eigenvalues of $A$ are $\\lambda_1 = 1.2$ and $\\lambda_2 = 0.8$. What happens to the population as $n \\to \\infty$?',
+      options: [
+        'The population grows, dominated by the $\\lambda_1 = 1.2$ eigenvector direction.',
+        'The population shrinks to zero, dominated by $\\lambda_2 = 0.8$.',
+        'The population oscillates between the two eigenvector directions.',
+        'The population converges to a fixed point along the $\\lambda_2$ direction.',
+      ],
+      answer: 'The population grows, dominated by the $\\lambda_1 = 1.2$ eigenvector direction.',
+      hints: ['$A^n\\mathbf{x}_0 = PD^nP^{-1}\\mathbf{x}_0$. As $n \\to \\infty$: $1.2^n \\to \\infty$ while $0.8^n \\to 0$. The $\\lambda_1$ term dominates. $\\mathbf{x}_n \\approx c_1 \\cdot 1.2^n \\cdot \\mathbf{v}_1$ for large $n$ — exponential growth along $\\mathbf{v}_1$.'],
+      reviewSection: 'Challenges — Challenge 3 (long-run behavior)',
+    },
+    {
+      id: 'diagonalization-q9',
+      type: 'choice',
+      text: 'The Spectral Theorem says every real symmetric matrix $A = A^\\top$ is orthogonally diagonalizable: $A = QDQ^\\top$. What is special about $Q$ compared to a general $P$?',
+      options: [
+        '$Q$ is diagonal.',
+        '$Q$ is invertible (same as any $P$).',
+        '$Q$ is orthogonal: $Q^\\top = Q^{-1}$, so inverting it is free.',
+        '$Q$ is the identity matrix.',
+      ],
+      answer: '$Q$ is orthogonal: $Q^\\top = Q^{-1}$, so inverting it is free.',
+      hints: ['For symmetric matrices, eigenvectors from distinct eigenvalues are orthogonal. If we normalize them, we get an orthonormal basis — the columns of $Q$. An orthogonal matrix satisfies $Q^{-1} = Q^\\top$: transposing is free, inversion is free.'],
+      reviewSection: 'Rigor tab — Spectral Theorem',
+    },
+    {
+      id: 'diagonalization-q10',
+      type: 'choice',
+      text: 'You want to solve the recurrence $a_{n+1} = 5a_n - 6b_n$, $b_{n+1} = a_n$ with $a_0 = 1$, $b_0 = 0$. After writing this as $\\mathbf{x}_{n+1} = A\\mathbf{x}_n$, you diagonalize $A$ and find eigenvalues 2 and 3. What is the long-run growth rate?',
+      options: [
+        'Linear growth (rate 5)',
+        'Exponential growth like $3^n$',
+        'Exponential growth like $2^n$',
+        'Convergence to zero',
+      ],
+      answer: 'Exponential growth like $3^n$',
+      hints: ['$a_n = c_1 \\cdot 2^n + c_2 \\cdot 3^n$. For large $n$, the $3^n$ term dominates (since $3 > 2$). The largest eigenvalue always controls long-run growth.'],
       reviewSection: 'Math tab — Matrix Powers',
     },
   ],
+
+  misconceptions: [
+    {
+      falseBelief: 'Every matrix can be diagonalized if you just find all the eigenvalues.',
+      whyStudentsThinkIt: 'The characteristic polynomial always has $n$ roots (in $\\mathbb{C}$). Students think $n$ roots = $n$ eigenvalues = $n$ eigenvectors = diagonalizable.',
+      correctionExample: 'The shear matrix $A = \\begin{bmatrix}1&1\\\\0&1\\end{bmatrix}$ has characteristic polynomial $(1-\\lambda)^2 = 0$, so $\\lambda = 1$ with algebraic multiplicity 2. But $(A-I) = \\begin{bmatrix}0&1\\\\0&0\\end{bmatrix}$ has only a 1D null space — geometric multiplicity 1. Only one independent eigenvector, not two. Not diagonalizable.',
+      contrastCase: '$B = \\begin{bmatrix}1&0\\\\0&1\\end{bmatrix} = I$ also has $\\lambda = 1$ with algebraic multiplicity 2, but geometric multiplicity 2 (every vector is an eigenvector). Diagonalizable (already diagonal).',
+    },
+    {
+      falseBelief: 'In $A = PDP^{-1}$, the matrix $P$ must be the identity matrix or an orthogonal matrix.',
+      whyStudentsThinkIt: 'Students confuse the general diagonalization $A = PDP^{-1}$ (any basis of eigenvectors) with the orthogonal diagonalization $A = QDQ^\\top$ guaranteed only for symmetric matrices.',
+      correctionExample: 'For $A = \\begin{bmatrix}4&2\\\\1&3\\end{bmatrix}$, the eigenvectors $[2,1]^\\top$ and $[1,-1]^\\top$ are not orthogonal (dot product $= 2-1 = 1 \\neq 0$). The diagonalization works perfectly with this non-orthogonal $P$.',
+      contrastCase: 'For symmetric $A = \\begin{bmatrix}2&1\\\\1&2\\end{bmatrix}$, eigenvectors $[1,1]^\\top$ and $[1,-1]^\\top$ are orthogonal. Normalized, they form an orthogonal $Q$. The Spectral Theorem guarantees this only for symmetric matrices.',
+    },
+  ],
+
+  transferPrompts: [
+    {
+      situation: 'A wildlife biologist models a two-stage population (juveniles and adults). Each year, 30% of juveniles survive to become adults, and 80% of adults survive while each adult produces 2 new juveniles. The population vector after $n$ years is $A^n\\mathbf{x}_0$.',
+      competingTechniques: 'Simulate year by year (accurate but slow for large $n$), use a closed-form solution (requires diagonalization), or use population ecology software.',
+      whyThisTechniqueWins: 'Diagonalization gives the exact closed-form: $\\mathbf{x}_n = PD^nP^{-1}\\mathbf{x}_0$. From this, the long-run growth rate is the dominant eigenvalue ($\\lambda_1$), and the stable age distribution is the corresponding eigenvector. One eigenanalysis answers all future-state questions.',
+    },
+    {
+      situation: 'A data scientist has a covariance matrix $\\Sigma$ from a 100-dimensional dataset. They need to find the directions of maximum variance (for PCA) and the Mahalanobis distance metric.',
+      competingTechniques: 'Iterative power method for top eigenvectors, full eigendecomposition, or SVD of the data matrix.',
+      whyThisTechniqueWins: 'Since $\\Sigma$ is symmetric positive semidefinite, the Spectral Theorem guarantees orthogonal diagonalization: $\\Sigma = QDQ^\\top$ with real non-negative eigenvalues. The PCA directions are columns of $Q$ (principal components), and $\\Sigma^{-1} = QD^{-1}Q^\\top$ computes the inverse efficiently. Diagonalization makes both PCA and Mahalanobis distance trivial.',
+    },
+  ],
+
+  debugging: [
+    {
+      commonError: 'Placing eigenvalues in $D$ in a different order from the eigenvectors in $P$, then getting $AP \\neq PD$.',
+      symptom: 'Verification $PDP^{-1}$ does not reconstruct $A$. The reconstruction is wrong even though the eigenvalues and eigenvectors are individually correct.',
+      whyItHappened: 'Column $i$ of $P$ and position $(i,i)$ of $D$ must be a matching pair: the $i$th eigenvector and its corresponding eigenvalue. If you put eigenvector 1 in column 2 of $P$ but keep eigenvalue 1 in position $(1,1)$ of $D$, the pairing is broken.',
+      repairStrategy: 'Always construct $P$ and $D$ together: for each eigenpair $(\\lambda_i, \\mathbf{v}_i)$, place $\\mathbf{v}_i$ in column $i$ of $P$ and $\\lambda_i$ in entry $(i,i)$ of $D$ simultaneously. Verify: compute $AP - PD$ and check it is the zero matrix.',
+    },
+    {
+      commonError: 'Using $A^k = P^kD^k(P^{-1})^k$ instead of $A^k = PD^kP^{-1}$.',
+      symptom: 'The computed $A^k$ is completely wrong. The error grows with $k$.',
+      whyItHappened: 'Students misapply power rules from scalars: $(abc)^k = a^k b^k c^k$. But for matrices, powers do not distribute like this unless the matrices commute. The correct derivation: $A^2 = (PDP^{-1})(PDP^{-1}) = PD(P^{-1}P)DP^{-1} = PD^2P^{-1}$.',
+      repairStrategy: 'Remember: only the middle factor $D$ gets raised to the power. $P$ and $P^{-1}$ appear exactly once each, regardless of $k$: $A^k = P D^k P^{-1}$.',
+    },
+  ],
+
+  mastery: {
+    targetLevel: 2,
+    solveIndependently: 'Given a diagonalizable matrix with its eigenpairs, construct $P$ and $D$, compute $P^{-1}$, verify $A = PDP^{-1}$, and use the decomposition to compute $A^k$ for large $k$.',
+    explainVerbally: 'Explain why $A^k = PD^kP^{-1}$ — specifically, why $P^{-1}P$ collapses to $I$ when you expand $A \\cdot A \\cdots A$, leaving only $D$ raised to the power.',
+    detectIncorrectApplication: 'Spot mismatched column ordering between $P$ and $D$, catch the error $A^k = P^kD^k(P^{-1})^k$, and identify when a matrix is defective (not diagonalizable) by checking geometric vs algebraic multiplicity.',
+    transferToUnfamiliar: 'Use diagonalization to solve a new application (Markov chain steady state, recurrence relation, population model) by identifying the relevant matrix, diagonalizing it, and interpreting eigenvalues as growth rates.',
+  },
 };

@@ -25,12 +25,13 @@ export default {
   // ── Intuition ──────────────────────────────────────────────────
   intuition: {
     prose: [
-      '**Where you are in the story:** A singular matrix ($\\det = 0$) permanently destroys some information. This lesson gives that destruction a name and a structure. Meet the two fundamental subspaces of every matrix: the **column space** (what survives) and the **null space** (what gets annihilated).',
+      'Take $A = \\begin{bmatrix}1&2\\\\2&4\\end{bmatrix}$. Apply $A$ to $[2,-1]^T$: result is $[1\\cdot2+2\\cdot(-1),\\ 2\\cdot2+4\\cdot(-1)]^T = [0,0]^T$. The vector $[2,-1]^T$ gets crushed to zero. So does every scalar multiple: $[-4,2]^T \\to \\mathbf{0}$, $[6,-3]^T \\to \\mathbf{0}$. This entire line is the **null space**. Now ask: what outputs CAN $A$ produce? $A\\mathbf{x} = x_1[1,2]^T + x_2[2,4]^T = (x_1 + 2x_2)[1,2]^T$ — always a multiple of $[1,2]^T$. Every output lives on that single line: the **column space**. One direction is crushed (null space); one direction survives (column space). Rank-Nullity: $1 + 1 = 2$ columns.',
       '**The column space — the range of the transformation.** When you apply matrix $A$ to every possible input vector $\\mathbf{x} \\in \\mathbb{R}^n$, the set of all resulting output vectors $A\\mathbf{x}$ is called the **column space** of $A$ (written $\\text{col}(A)$ or $C(A)$, or in abstract algebra, the **image** $\\text{im}(A)$). Geometrically, it is the subspace spanned by the columns of $A$. If $A$ maps $\\mathbb{R}^3$ to a 2D plane, that plane is the column space. Any point *not* on that plane is unreachable — no input exists that lands there.',
       '**The null space — the graveyard.** The **null space** of $A$ (written $N(A)$, $\\ker(A)$, or the **kernel**) is the set of all vectors that $A$ sends to the zero vector: $N(A) = \\{\\mathbf{x} : A\\mathbf{x} = \\mathbf{0}\\}$. If $A$ squishes a 3D space to a 2D plane, one entire direction (a line through the origin) collapses to the origin. Every vector along that line maps to $\\mathbf{0}$. That line is the null space.',
       '**The Rank-Nullity theorem.** Dimensions balance perfectly:\n\n$$\\underbrace{\\text{rank}(A)}_{\\text{dim of column space}} + \\underbrace{\\text{nullity}(A)}_{\\text{dim of null space}} = \\underbrace{n}_{\\text{number of columns}}$$\n\nA $3 \\times 3$ matrix with rank 2 must have a 1D null space. $2 + 1 = 3$. Dimensions are conserved — they just get rerouted from "useful output" into "crushed directions."',
       '**The MRI connection.** An MRI scanner captures 2D cross-sectional slices (the column space of the scan operator). Depth — the coordinate pointing into the scanner — is not recorded per-slice: it is in the null space. Reconstruction algorithms like filtered back-projection implicitly compute the pre-image of each slice, combining many slices to recover the 3D structure. They are inverting the operator over its column space while knowing that the null space is informationless.',
       '**CNC probe calibration.** A CNC machine probes the workpiece at reference points to establish its coordinate frame. If you probe only collinear points (all on one line), the probe data matrix has rank 1 — its column space is 1D. You cannot recover the 2D plane of the part surface. The null space of the measurement matrix has dimension 1, meaning one direction of the surface is completely undetermined. Quality standards require probe points spread in 2D (non-collinear) so that rank = 2 and the full surface plane is uniquely determined.',
+      '**Predict before reading on.** Matrix $A = \\begin{bmatrix}1&0&2\\\\0&1&-1\\\\0&0&0\\end{bmatrix}$. Without computing: what is the rank? What is the nullity? What is the dimension of the column space? Write your answers, then check in Example 2.',
       '**Where this is heading:** We understand the four fundamental subspaces of any matrix. The next chapter asks: which special vectors completely resist rotation — they only get scaled by a factor? Those are the eigenvectors, and they are built from the null space idea applied to shifted matrices.',
     ],
     callouts: [
@@ -617,7 +618,114 @@ A = np.array([[1., 2., 3.],
       ],
       answer: "The null space of $A$ is non-trivial (nullity ≥ 1): adding any null space vector to one particular solution gives another valid solution.",
       hints: ["If $\\mathbf{x}_p$ solves $A\\mathbf{x}=\\mathbf{b}$ and $\\mathbf{v} \\in N(A)$, then $\\mathbf{x}_p + \\mathbf{v}$ is also a solution. Infinitely many solutions ↔ nullity ≥ 1."],
-      reviewSection: 'Rigor tab — General solution theorem'
-    }
-  ]
+      reviewSection: 'Rigor tab — General solution theorem',
+    },
+    {
+      id: 'la2-004-quiz-7',
+      type: 'choice',
+      text: 'For a $5 \\times 4$ matrix with rank 3, what are the dimensions of the column space and null space?',
+      options: [
+        'Column space: 3 (in $\\mathbb{R}^5$), Null space: 1 (in $\\mathbb{R}^4$)',
+        'Column space: 3 (in $\\mathbb{R}^4$), Null space: 2 (in $\\mathbb{R}^5$)',
+        'Column space: 4, Null space: 1',
+        'Column space: 5, Null space: 0',
+      ],
+      answer: 'Column space: 3 (in $\\mathbb{R}^5$), Null space: 1 (in $\\mathbb{R}^4$)',
+      hints: ['Column space lives in the output space: $\\mathbb{R}^5$ (5 rows), dimension = rank = 3. Null space lives in the input space: $\\mathbb{R}^4$ (4 columns), nullity = 4 − 3 = 1.'],
+      reviewSection: 'Intuition tab — Rank-Nullity theorem',
+    },
+    {
+      id: 'la2-004-quiz-8',
+      type: 'choice',
+      text: 'Which of the following is always true about the null space $N(A)$?',
+      options: [
+        'It is a subspace — it always contains the zero vector and is closed under addition and scaling',
+        'It is always the zero subspace $\\{\\mathbf{0}\\}$',
+        'It always has the same dimension as the column space',
+        'It is non-empty only when $A$ is square',
+      ],
+      answer: 'It is a subspace — it always contains the zero vector and is closed under addition and scaling',
+      hints: ['$A\\mathbf{0} = \\mathbf{0}$ so $\\mathbf{0} \\in N(A)$ always. If $A\\mathbf{u} = \\mathbf{0}$ and $A\\mathbf{v} = \\mathbf{0}$, then $A(\\mathbf{u}+\\mathbf{v}) = A\\mathbf{u}+A\\mathbf{v} = \\mathbf{0}$ and $A(c\\mathbf{u}) = cA\\mathbf{u} = \\mathbf{0}$. Closed under both operations.'],
+      reviewSection: 'Rigor tab — Subspace verification',
+    },
+    {
+      id: 'la2-004-quiz-9',
+      type: 'choice',
+      text: 'Matrix $A$ has columns $[1,0]^T$ and $[2,0]^T$. What is the column space of $A$?',
+      options: [
+        'The $x$-axis — both columns lie on the $x$-axis, so the column space is the 1D line $y = 0$',
+        'All of $\\mathbb{R}^2$',
+        'The $y$-axis',
+        'Just the origin',
+      ],
+      answer: 'The $x$-axis — both columns lie on the $x$-axis, so the column space is the 1D line $y = 0$',
+      hints: ['Column space = span of the columns. $[1,0]^T$ and $[2,0]^T$ are both horizontal — their span is just the $x$-axis. You can reach any $[t, 0]^T$ but no point with a nonzero $y$-coordinate.'],
+      reviewSection: 'Intuition tab — column space definition',
+    },
+    {
+      id: 'la2-004-quiz-10',
+      type: 'choice',
+      text: 'If $\\mathbf{x}_p$ is one particular solution to $A\\mathbf{x} = \\mathbf{b}$ and $\\mathbf{v}$ is in the null space of $A$, what can you say about $\\mathbf{x}_p + 2\\mathbf{v}$?',
+      options: [
+        'It is also a solution to $A\\mathbf{x} = \\mathbf{b}$',
+        'It solves $A\\mathbf{x} = 2\\mathbf{b}$',
+        'It is in the null space of $A$',
+        'It is the unique solution only if $\\mathbf{v} = \\mathbf{0}$',
+      ],
+      answer: 'It is also a solution to $A\\mathbf{x} = \\mathbf{b}$',
+      hints: ['$A(\\mathbf{x}_p + 2\\mathbf{v}) = A\\mathbf{x}_p + 2A\\mathbf{v} = \\mathbf{b} + 2\\mathbf{0} = \\mathbf{b}$. Adding any null space vector to a particular solution gives another solution.'],
+      reviewSection: 'Rigor tab — General solution theorem',
+    },
+  ],
+
+  misconceptions: [
+    {
+      falseBelief: 'The null space and the column space are both subsets of the same space.',
+      whyStudentsThinkIt: 'Both are "subspaces of the matrix" — students don\'t distinguish the input space from the output space.',
+      correctionExample: 'For a $3 \\times 2$ matrix $A$: the null space lives in $\\mathbb{R}^2$ (input space — 2 columns), and the column space lives in $\\mathbb{R}^3$ (output space — 3 rows). They can have different dimensions and live in completely different spaces.',
+      contrastCase: 'The null space asks: "Which inputs map to zero?" (input space). The column space asks: "Which outputs are reachable?" (output space). These are different questions about different spaces.',
+    },
+    {
+      falseBelief: 'Choosing pivot columns from the RREF (not the original matrix) gives the column space basis.',
+      whyStudentsThinkIt: 'After row reduction, the pivot columns of RREF look clean (all zeros except a single 1). Students use those instead of the original.',
+      correctionExample: 'Let $A = \\begin{bmatrix}1&2\\\\3&4\\end{bmatrix}$. After RREF: $\\begin{bmatrix}1&0\\\\0&1\\end{bmatrix}$. The RREF pivot columns are $[1,0]^T$ and $[0,1]^T$ — these span $\\mathbb{R}^2$ trivially, but they are NOT columns of $A$. The correct column space basis is $[1,3]^T$ and $[2,4]^T$ — the original pivot columns.',
+      contrastCase: 'Null space vectors CAN be read from RREF (they are the free variable solutions to $R\\mathbf{x} = \\mathbf{0}$). Column space must use the ORIGINAL matrix\'s pivot columns.',
+    },
+  ],
+
+  transferPrompts: [
+    {
+      situation: 'A data scientist fits a linear model $A\\mathbf{x} = \\mathbf{b}$ to predict housing prices. She has 1000 data points (rows) but only 3 features (columns: square footage, bedrooms, bathrooms). She finds the RREF has rank 2. What does this tell her about her features?',
+      competingTechniques: ['Inspect feature correlations visually', 'Compute rank of the design matrix'],
+      whyThisTechniqueWins: 'Rank 2 means only 2 features are truly independent — one is a linear combination of the others (e.g., "bedrooms" may be proportional to "square footage" in this dataset). The null space has dimension 1, revealing the redundant direction. Removing the redundant feature avoids multicollinearity in regression.',
+    },
+    {
+      situation: 'A graphics engineer applies a "depth collapse" matrix that squishes 3D coordinates to 2D screen pixels. A depth-recovery algorithm tries to invert this to reconstruct 3D positions. Why will this always fail, and what does null space theory say?',
+      competingTechniques: ['Try to compute the inverse of the projection matrix', 'Analyze null space dimension'],
+      whyThisTechniqueWins: 'The projection matrix has nullity ≥ 1 (the z-direction maps to zero). You cannot reconstruct which z-depth produced a given pixel — infinitely many 3D points project to the same 2D point. Null space theory says: no inverse exists; the entire z-axis is in the null space and is permanently unrecoverable from screen coordinates alone.',
+    },
+  ],
+
+  debugging: [
+    {
+      commonError: 'Confusing "null space of $A$" with "null space of $A^T$" — picking the wrong space entirely.',
+      symptom: 'Student finds vectors orthogonal to the rows of $A$ and calls them the null space.',
+      whyItHappened: 'There are actually FOUR fundamental subspaces: $C(A)$, $N(A)$, $C(A^T)$, $N(A^T)$. Students conflate them.',
+      repairStrategy: 'Keep the definitions sharp: $N(A)$ solves $A\\mathbf{x} = \\mathbf{0}$ — always in the INPUT space. $C(A)$ is spanned by the columns of $A$ — always in the OUTPUT space. When in doubt, check dimensions: $N(A)$ lives in $\\mathbb{R}^n$, $C(A)$ in $\\mathbb{R}^m$.',
+    },
+    {
+      commonError: 'Forgetting that Rank-Nullity uses the number of COLUMNS, not rows.',
+      symptom: 'For a $6 \\times 4$ matrix with rank 3, student says nullity = $6 - 3 = 3$ (using rows) instead of $4 - 3 = 1$ (correct, using columns).',
+      whyItHappened: 'The rank can look like "how many rows survived," leading students to subtract rank from the number of rows.',
+      repairStrategy: 'The theorem is rank$(A)$ + nullity$(A)$ = $n$ (number of COLUMNS). The null space lives in the INPUT space $\\mathbb{R}^n$ where $n$ is the number of columns. Repeat: COLUMNS, not rows.',
+    },
+  ],
+
+  mastery: {
+    targetLevel: 3,
+    solveIndependently: 'Find a basis for the null space and column space of any matrix by computing RREF, identifying pivot and free columns, and reading off the free-variable solution vectors.',
+    explainVerbally: 'Explain the Rank-Nullity theorem geometrically (each crushed input dimension corresponds to a null space dimension), and explain why $A\\mathbf{x} = \\mathbf{b}$ is consistent iff $\\mathbf{b}$ is in the column space.',
+    detectIncorrectApplication: 'Identify when a student uses RREF pivot columns instead of original matrix pivot columns for the column space basis, or applies Rank-Nullity with the number of rows instead of columns.',
+    transferToUnfamiliar: 'Given a linear regression design matrix, interpret its rank and null space in terms of feature independence and model identifiability.',
+  },
 };

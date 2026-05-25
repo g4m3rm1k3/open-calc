@@ -19,7 +19,7 @@ export default {
   // ── Intuition ──────────────────────────────────────────────────
   intuition: {
     prose: [
-      '**Where you are in the story:** You now know how to find eigenvectors, diagonalize square matrices, project onto subspaces, build orthonormal bases, and solve least squares problems. SVD ties it all together. It is the capstone of the linear algebra course — and arguably the most important single theorem in applied mathematics.',
+      'Take $A = \\begin{bmatrix}4&3\\\\0&0\\end{bmatrix}$. Compute $A^TA = \\begin{bmatrix}16&12\\\\12&9\\end{bmatrix}$ — eigenvalues 25 and 0, eigenvectors $\\mathbf{v}_1 = [4/5,3/5]^\\top$, $\\mathbf{v}_2 = [-3/5,4/5]^\\top$. Singular values: $\\sigma_1 = 5$, $\\sigma_2 = 0$. Left singular vector: $\\mathbf{u}_1 = (1/5)A\\mathbf{v}_1 = [1,0]^\\top$. SVD: $A = 5\\cdot[1,0]^\\top[4/5,3/5] = \\begin{bmatrix}4&3\\\\0&0\\end{bmatrix}$ ✓. Any matrix — any shape, any rank — factors this way as $A = U\\Sigma V^T$. The singular values tell you how much stretching happens in each direction.',
       'We need SVD because diagonalization has a limitation: it only works for square matrices with enough independent eigenvectors. SVD has no such restriction. It works for any matrix, any shape, any rank.',
       '**The geometric picture.** Any linear transformation — any matrix $A$ — takes a sphere in $\\mathbb{R}^n$ and maps it to an ellipse (possibly flattened) in $\\mathbb{R}^m$. SVD breaks this down into three clean steps:\n\n1. **Rotate** the input sphere to align it with the "right" coordinate axes ($V^T$)\n2. **Stretch** each axis independently — no mixing, no rotating — by the singular values ($\\Sigma$)\n3. **Rotate** again to place the ellipse in the output space ($U$)\n\nEvery matrix does exactly this, no matter how complicated it looks.',
       'The stretching amounts $\\sigma_1 \\geq \\sigma_2 \\geq \\cdots \\geq 0$ are the **singular values**. They are always non-negative real numbers, even if the original matrix has complex entries. The largest singular value tells you the maximum amount any unit vector gets stretched by $A$. The smallest tells you the minimum.',
@@ -42,6 +42,11 @@ export default {
         type: 'insight',
         title: 'SVD vs. Diagonalization',
         body: '**Diagonalization** $A = PDP^{-1}$:\n• Square matrices only\n• May not exist (defective matrices)\n• $P$ not necessarily orthogonal\n\n**SVD** $A = U\\Sigma V^T$:\n• Any matrix, any shape\n• Always exists\n• $U$ and $V$ are always orthogonal',
+      },
+      {
+        type: 'sequencing',
+        title: 'Prediction',
+        body: 'For $A = \\begin{bmatrix}2&0\\\\0&3\\end{bmatrix}$ (diagonal): before computing, what are the singular values? What are $U$ and $V$? What does $\\Sigma$ look like? After you predict, compute $A^TA$ and verify your answer.',
       },
       {
         type: 'insight',
@@ -378,6 +383,42 @@ A = np.array([[1., 2.],
       ],
       conclusion: 'The best rank-1 approximation retains 96% of the information ($\\sigma_1^2/\\sum\\sigma_i^2 = 25/26$) with half the storage (4 numbers down to 2). This is the essence of data compression via SVD.',
     },
+    {
+      id: 'la4-002-svd-ex3',
+      title: 'Eckart-Young: verifying the best rank-1 approximation',
+      problem: 'For $A = \\begin{bmatrix}4&1\\\\1&4\\end{bmatrix}$, find the SVD, the best rank-1 approximation $A_1$, and verify the Frobenius error $\\|A - A_1\\|_F = \\sigma_2$.',
+      steps: [
+        {
+          expression: 'A = A^T \\Rightarrow \\text{SVD} = \\text{eigendecomposition.} \\quad p(\\lambda) = (\\lambda-4)^2-1 = 0 \\Rightarrow \\lambda_1=5,\\; \\lambda_2=3',
+          annotation: '$A$ is symmetric, so its singular values are its (positive) eigenvalues. Characteristic polynomial: $\\lambda^2 - 8\\lambda + 15 = (\\lambda-5)(\\lambda-3)$.',
+          strategyTitle: 'Find singular values',
+          checkpoint: 'For a symmetric PD matrix, how do singular values relate to eigenvalues?',
+          hints: ['For symmetric positive definite A, singular values = eigenvalues (both are positive real). For general symmetric A, singular values = |eigenvalues|.'],
+        },
+        {
+          expression: '\\mathbf{v}_1 = \\frac{1}{\\sqrt{2}}\\begin{bmatrix}1\\\\1\\end{bmatrix}, \\quad \\mathbf{v}_2 = \\frac{1}{\\sqrt{2}}\\begin{bmatrix}-1\\\\1\\end{bmatrix}',
+          annotation: 'Eigenvectors of $A$. For $\\lambda=5$: $(A-5I)\\mathbf{v}=0$ → $[-1,1;1,-1]\\mathbf{v}=0$ → $v_1=v_2$. Normalize. For $\\lambda=3$: $v_1=-v_2$.',
+          strategyTitle: 'Find singular vectors',
+          checkpoint: '',
+          hints: [],
+        },
+        {
+          expression: 'A_1 = \\sigma_1 \\mathbf{u}_1\\mathbf{v}_1^T = 5 \\cdot \\frac{1}{\\sqrt{2}}\\begin{bmatrix}1\\\\1\\end{bmatrix} \\cdot \\frac{1}{\\sqrt{2}}\\begin{bmatrix}1&1\\end{bmatrix} = \\frac{5}{2}\\begin{bmatrix}1&1\\\\1&1\\end{bmatrix}',
+          annotation: 'Rank-1 term: $\\sigma_1\\mathbf{u}_1\\mathbf{v}_1^T$. Since $A$ is symmetric, $\\mathbf{u}_1 = \\mathbf{v}_1$.',
+          strategyTitle: 'Compute rank-1 approximation',
+          checkpoint: '',
+          hints: [],
+        },
+        {
+          expression: '\\|A - A_1\\|_F = \\left\\|\\sigma_2\\mathbf{u}_2\\mathbf{v}_2^T\\right\\|_F = \\sigma_2\\|\\mathbf{u}_2\\|\\|\\mathbf{v}_2\\| = 3 \\cdot 1 \\cdot 1 = 3',
+          annotation: 'By Eckart-Young, $\\|A - A_1\\|_F = \\sigma_2 = 3$. Direct check: $A - A_1 = \\begin{bmatrix}4-5/2 & 1-5/2\\\\1-5/2 & 4-5/2\\end{bmatrix} = \\frac{3}{2}\\begin{bmatrix}1&-1\\\\-1&1\\end{bmatrix}$, and $\\|\\cdot\\|_F = \\sqrt{4\\cdot(3/2)^2} = 3$ ✓.',
+          strategyTitle: 'Verify Eckart-Young error',
+          checkpoint: 'Could any other rank-1 matrix achieve error < 3?',
+          hints: ['No — Eckart-Young theorem proves the rank-1 truncated SVD is the best rank-1 approximation in Frobenius norm. Any other rank-1 matrix has error ≥ σ₂.'],
+        },
+      ],
+      conclusion: '$A_1 = (5/2)\\begin{bmatrix}1&1\\\\1&1\\end{bmatrix}$ is the best rank-1 approximation to $A = \\begin{bmatrix}4&1\\\\1&4\\end{bmatrix}$. The Frobenius error equals $\\sigma_2 = 3$. The information retained: $\\sigma_1^2/(\\sigma_1^2+\\sigma_2^2) = 25/34 \\approx 74\\%$.',
+    },
   ],
 
   // ── Challenges ─────────────────────────────────────────────────
@@ -499,14 +540,14 @@ A = np.array([[1., 2.],
 
   // ── Checkpoints ──────────────────────────────────────────────────
   checkpoints: [
-    'read-intuition',
-    'read-math',
-    'read-rigor',
-    'completed-example-1',
-    'completed-example-2',
-    'attempted-challenge-easy',
-    'attempted-challenge-medium',
-    'attempted-challenge-hard',
+    { id: 'cp-la4-svd-1', label: 'Read: State the three matrices in A = UΣVᵀ', type: 'read' },
+    { id: 'cp-la4-svd-2', label: 'Read: Explain how singular values differ from eigenvalues', type: 'read' },
+    { id: 'cp-la4-svd-3', label: 'Read: State the Eckart-Young theorem', type: 'read' },
+    { id: 'cp-la4-svd-4', label: 'Lab: Visualize Vᵀ → Σ → U acting on the unit circle', type: 'lab' },
+    { id: 'cp-la4-svd-5', label: 'Lab: Compute rank-k approximation and measure compression ratio', type: 'lab' },
+    { id: 'cp-la4-svd-6', label: 'Example: SVD of a diagonal matrix', type: 'example' },
+    { id: 'cp-la4-svd-7', label: 'Example: Best rank-1 approximation', type: 'example' },
+    { id: 'cp-la4-svd-8', label: 'Challenge: Verify Eckart-Young error bound numerically', type: 'challenge' },
   ],
 
   // ── Assessment ───────────────────────────────────────────────────
@@ -574,5 +615,140 @@ A = np.array([[1., 2.],
       hints: ['Eckart-Young: $\\min_{\\text{rank}(B)\\leq k}\\|A-B\\|_F = \\|A-A_k\\|_F = \\sqrt{\\sigma_{k+1}^2+\\cdots}$. Proved, not just claimed.'],
       reviewSection: 'Math tab — Low-Rank Approximation',
     },
+    {
+      id: 'q-la4-svd-5',
+      type: 'choice',
+      text: 'For a matrix $A$ with SVD $A = U\\Sigma V^T$, what is the pseudoinverse $A^+$?',
+      options: [
+        '$(A^TA)^{-1}A^T$',
+        '$V\\Sigma^+ U^T$, where $\\Sigma^+$ inverts each non-zero singular value',
+        '$U^T\\Sigma^{-1}V$',
+        '$(AA^T)^{-1}A$',
+      ],
+      answer: '$V\\Sigma^+ U^T$, where $\\Sigma^+$ inverts each non-zero singular value',
+      hints: ['Σ⁺ replaces each non-zero σᵢ with 1/σᵢ and keeps zeros as zeros. A⁺ = VΣ⁺Uᵀ is valid for any rank matrix — it handles rank-deficient cases gracefully.'],
+      reviewSection: 'Math — pseudoinverse via SVD',
+    },
+    {
+      id: 'q-la4-svd-6',
+      type: 'choice',
+      text: 'The condition number $\\sigma_1/\\sigma_n$ of a matrix measures:',
+      options: [
+        'The largest singular value',
+        'The rank of the matrix',
+        'How much small changes in $\\mathbf{b}$ can amplify errors in the solution $\\hat{\\mathbf{x}}$ to $A\\mathbf{x} = \\mathbf{b}$',
+        'The determinant of $A$',
+      ],
+      answer: 'How much small changes in $\\mathbf{b}$ can amplify errors in the solution $\\hat{\\mathbf{x}}$ to $A\\mathbf{x} = \\mathbf{b}$',
+      hints: ['A perturbation δb in b causes a change δx with ‖δx‖/‖x‖ ≤ κ(A)·‖δb‖/‖b‖, where κ(A)=σ₁/σₙ. Large κ means tiny changes in b cause large changes in x.'],
+      reviewSection: 'Math — condition number',
+    },
+    {
+      id: 'q-la4-svd-7',
+      type: 'choice',
+      text: 'The number of non-zero singular values of $A$ equals:',
+      options: [
+        'The number of rows of $A$',
+        'The number of columns of $A$',
+        'The rank of $A$',
+        'The trace of $A$',
+      ],
+      answer: 'The rank of $A$',
+      hints: ['σᵢ = 0 iff the ith right singular vector is in the null space of A. The number of non-zero σᵢ equals the dimension of the row space = rank(A).'],
+      reviewSection: 'Math — SVD and rank',
+    },
+    {
+      id: 'q-la4-svd-8',
+      type: 'choice',
+      text: 'For a rank-2 matrix with singular values $\\sigma_1 = 10, \\sigma_2 = 2$, what percentage of the Frobenius norm squared is captured by the rank-1 approximation?',
+      options: [
+        '$50\\%$',
+        '$80\\%$',
+        '$96\\%$',
+        '$100\\%$',
+      ],
+      answer: '$96\\%$',
+      hints: ['σ₁²/(σ₁² + σ₂²) = 100/(100+4) = 100/104 ≈ 96.15%.'],
+      reviewSection: 'Math — low-rank approximation',
+    },
+    {
+      id: 'q-la4-svd-9',
+      type: 'choice',
+      text: 'For a symmetric positive definite matrix $A$, the relationship between eigenvalues and singular values is:',
+      options: [
+        'Singular values = negative eigenvalues',
+        'Singular values = square roots of eigenvalues',
+        'Singular values = eigenvalues exactly',
+        'They are unrelated',
+      ],
+      answer: 'Singular values = eigenvalues exactly',
+      hints: ['For SPD A: A = QΛQᵀ (spectral theorem), and A^TA = QΛ²Qᵀ. So σᵢ = √λᵢ(AᵀA) = √λᵢ² = λᵢ (since λᵢ > 0).'],
+      reviewSection: 'Intuition — Singular Values ≠ Eigenvalues callout',
+    },
+    {
+      id: 'q-la4-svd-10',
+      type: 'choice',
+      text: 'In the SVD $A = U\\Sigma V^T$, the columns of $V$ are:',
+      options: [
+        'Left singular vectors (in the output space)',
+        'Right singular vectors (in the input space) — eigenvectors of $A^TA$',
+        'The eigenvectors of $AA^T$',
+        'The columns of $A$ normalized',
+      ],
+      answer: 'Right singular vectors (in the input space) — eigenvectors of $A^TA$',
+      hints: ['V comes from the eigendecomposition of AᵀA. The transformation A = UΣVᵀ first applies Vᵀ (rotate input), then Σ (scale), then U (rotate output). V acts in the input space (domain of A).'],
+      reviewSection: 'Math — computing SVD from eigenvalues',
+    },
   ],
+
+  misconceptions: [
+    {
+      falseBelief: 'Singular values are the same as eigenvalues.',
+      whyStudentsThinkIt: 'Both appear as diagonal entries in matrix factorizations ($D$ in $PDP^{-1}$ and $\\Sigma$ in $U\\Sigma V^T$), so students conflate them.',
+      correctionExample: 'For $A = \\begin{bmatrix}0&2\\\\0&0\\end{bmatrix}$: eigenvalues are both 0, but $A^TA = \\begin{bmatrix}0&0\\\\0&4\\end{bmatrix}$ has eigenvalues 0 and 4, giving singular values 0 and 2. They are completely different.',
+      contrastCase: 'Singular values are always non-negative real numbers; eigenvalues can be negative or complex. Only for symmetric positive definite matrices do they coincide.',
+    },
+    {
+      falseBelief: 'The rank-$k$ truncated SVD is an approximation but not necessarily the best rank-$k$ approximation.',
+      whyStudentsThinkIt: 'It seems like an intuitive choice rather than a provably optimal one.',
+      correctionExample: 'The Eckart-Young theorem proves it: for any rank-$k$ matrix $B$, $\\|A - B\\|_F \\geq \\sqrt{\\sigma_{k+1}^2 + \\cdots + \\sigma_r^2}$. The truncated SVD achieves this bound — no other rank-$k$ matrix can do better.',
+      contrastCase: 'For compression: if you truncate to rank 1 and lose $\\sigma_2 = 3$ in the example, no other rank-1 matrix has a smaller Frobenius error than 3.',
+    },
+  ],
+
+  transferPrompts: [
+    {
+      situation: 'You need to compress a high-resolution image stored as a matrix of pixel values (1000×1000 = 1M numbers) for efficient transmission.',
+      competingTechniques: ['JPEG compression (DCT-based)', 'Random sampling', 'SVD truncation'],
+      whyThisTechniqueWins: 'SVD rank-$k$ truncation is the provably optimal linear compression: for a given storage budget ($k(m+n+1)$ numbers vs $mn$ original), it minimizes Frobenius error. In practice, JPEG is faster to compute, but SVD gives the theoretical baseline for quality.',
+    },
+    {
+      situation: 'In recommendation systems, users × items ratings matrix has many missing entries and is approximately low-rank. You want to predict missing ratings.',
+      competingTechniques: ['Fill missing values with average', 'Nearest neighbor', 'SVD / matrix factorization'],
+      whyThisTechniqueWins: 'The observed entries approximately follow a low-rank structure (users can be described by a few "taste factors"). SVD (or its variant, truncated matrix factorization) recovers this structure and generalizes to predict unseen ratings — the basis of Netflix Prize-winning algorithms.',
+    },
+  ],
+
+  debugging: [
+    {
+      commonError: 'Confusing $U$ (left singular vectors, $m\\times m$) with $V$ (right singular vectors, $n\\times n$) in $A = U\\Sigma V^T$.',
+      symptom: 'Shape mismatch when trying to reconstruct $A$ from the SVD — the matrix product dimensions do not work out.',
+      whyItHappened: 'For a rectangular $m\\times n$ matrix, $U$ is $m\\times m$ and $V$ is $n\\times n$. The left singular vectors live in the output space, right singular vectors in the input space.',
+      repairStrategy: 'Always check: $U$ is $m\\times m$, $\\Sigma$ is $m\\times n$, $V^T$ is $n\\times n$. The product $(m\\times m)(m\\times n)(n\\times n) = m\\times n$, matching $A$. Also: $\\mathbf{u}_i = (1/\\sigma_i)A\\mathbf{v}_i$ (not the other way).',
+    },
+    {
+      commonError: 'Using eigenvalues of $A$ as singular values for a non-symmetric matrix.',
+      symptom: 'Negative "singular values" or complex "singular values" — which are impossible.',
+      whyItHappened: 'Singular values are eigenvalues of $A^TA$ (not $A$), and $A^TA$ is always positive semidefinite, so its eigenvalues are always non-negative.',
+      repairStrategy: 'For singular values: form $A^TA$, find its eigenvalues $\\lambda_i \\geq 0$, then $\\sigma_i = \\sqrt{\\lambda_i}$. If you get any negative eigenvalues of $A^TA$, re-check the computation — $A^TA$ can never have negative eigenvalues.',
+    },
+  ],
+
+  mastery: {
+    targetLevel: 3,
+    solveIndependently: 'Compute the SVD of a 2×2 matrix via $A^TA$ eigendecomposition, perform rank-$k$ approximation, and state the Frobenius error.',
+    explainVerbally: 'Explain the geometric meaning of each matrix in $A = U\\Sigma V^T$, why singular values differ from eigenvalues, and what Eckart-Young guarantees.',
+    detectIncorrectApplication: 'Catch eigenvalue-singular value confusion; catch $U$/$V$ shape mismatches; recognize when a condition number signals numerical trouble.',
+    transferToUnfamiliar: 'Apply SVD to image compression, recommendation systems, PCA, or pseudoinverse computation — any context requiring a stable matrix factorization.',
+  },
 };

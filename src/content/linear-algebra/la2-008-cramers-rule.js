@@ -20,10 +20,11 @@ export default {
 
   intuition: {
     prose: [
-      '**The formula, stated directly.** If $A\\mathbf{x} = \\mathbf{b}$ and $\\det(A) \\neq 0$, then:\n$$x_i = \\frac{\\det(A_i(\\mathbf{b}))}{\\det(A)}$$\nwhere $A_i(\\mathbf{b})$ is the matrix $A$ with its $i$-th column replaced by $\\mathbf{b}$.',
+      'Solve $2x_1 + x_2 = 5$, $x_1 - 3x_2 = -2$. Here $A = \\begin{bmatrix}2&1\\\\1&-3\\end{bmatrix}$, $\\mathbf{b} = \\begin{bmatrix}5\\\\-2\\end{bmatrix}$, $\\det(A) = -7$. Replace column 1 with $\\mathbf{b}$: $\\det\\begin{bmatrix}5&1\\\\-2&-3\\end{bmatrix} = -13$. So $x_1 = -13/(-7) = 13/7$. Replace column 2 with $\\mathbf{b}$: $\\det\\begin{bmatrix}2&5\\\\1&-2\\end{bmatrix} = -9$. So $x_2 = -9/(-7) = 9/7$. This is **Cramer\'s Rule**: each solution variable = (determinant with that variable\'s column replaced by $\\mathbf{b}$) / $\\det(A)$. The general formula: $x_i = \\det(A_i(\\mathbf{b})) / \\det(A)$.',
       '**Why does this work geometrically?** Think in 2D. The solution $\\mathbf{x} = [x_1, x_2]^\\top$ must satisfy $A\\mathbf{x} = \\mathbf{b}$. The determinant $\\det(A)$ is the area of the parallelogram formed by $A$\'s columns. When you replace column 1 with $\\mathbf{b}$, you get $\\det(A_1)$, which is the area of a different parallelogram. Cramer\'s rule says these area ratios directly give you the coordinates.',
       '**The Adjugate and the Inverse Formula.** The adjugate (also called the classical adjoint) of $A$ is the transpose of the cofactor matrix. It gives the explicit formula:\n$$A^{-1} = \\frac{1}{\\det(A)} \\text{adj}(A)$$\nThis is the theoretical origin of the formula you may have used for 2×2 inverses: $\\begin{bmatrix}a&b\\\\c&d\\end{bmatrix}^{-1} = \\frac{1}{ad-bc}\\begin{bmatrix}d&-b\\\\-c&a\\end{bmatrix}$.',
       '**When to use Cramer\'s Rule.** In practice: almost never for computation. In theory: constantly. Cramer\'s Rule appears in proofs, in symbolic computation, in understanding how the solution depends continuously on the data (implicit function theorem), and in control theory (transfer functions).',
+      '**Predict before reading on.** A system $A\\mathbf{x} = \\mathbf{b}$ has $\\det(A) = 4$ and you replace column 2 with $\\mathbf{b}$ to get a matrix with $\\det = 12$. What is $x_2$? Write your answer, then check with the formula.',
     ],
     callouts: [
       {
@@ -503,5 +504,112 @@ print("Match:", np.allclose(inv_formula, np.linalg.inv(A)))`,
       hints: ['For a 2×2 matrix $\\begin{bmatrix}a&b\\\\c&d\\end{bmatrix}$: the cofactor matrix is $\\begin{bmatrix}d&-c\\\\-b&a\\end{bmatrix}$, and its transpose (the adjugate) is $\\begin{bmatrix}d&-b\\\\-c&a\\end{bmatrix}$. Dividing by $\\det = ad-bc$ gives the familiar formula.'],
       reviewSection: 'Math tab — Inverse via Adjugate theorem callout',
     },
+    {
+      id: 'la2-008-quiz-7',
+      type: 'choice',
+      text: 'Why is Cramer\'s Rule impractical for solving a $100 \\times 100$ linear system numerically?',
+      options: [
+        'It requires computing $101$ determinants of $100 \\times 100$ matrices — each costing $O(n^3)$, giving $O(n^4)$ total vs $O(n^3)$ for LU',
+        'Cramer\'s Rule only works for $2 \\times 2$ systems',
+        'Cramer\'s Rule requires all entries to be integers',
+        'Modern computers cannot compute determinants larger than $10 \\times 10$',
+      ],
+      answer: 'It requires computing $101$ determinants of $100 \\times 100$ matrices — each costing $O(n^3)$, giving $O(n^4)$ total vs $O(n^3)$ for LU',
+      hints: ['For an $n\\times n$ system: Cramer\'s Rule needs $n+1$ determinants (one for $\\det(A)$, one for each $x_i$). Each determinant costs $O(n^3)$ via LU. Total: $O(n^4)$. LU solve: $O(n^3)$ once. At $n=100$: $100\\times$ slower.'],
+      reviewSection: 'Intuition tab — When to use Cramer\'s Rule',
+    },
+    {
+      id: 'la2-008-quiz-8',
+      type: 'choice',
+      text: 'Solve using Cramer\'s Rule: $3x_1 + x_2 = 7$, $x_1 + 2x_2 = 4$. What is $x_1$?',
+      options: [
+        '$x_1 = 2$ — $\\det(A_1) = 14-4 = 10$, $\\det(A) = 6-1 = 5$, $x_1 = 10/5 = 2$',
+        '$x_1 = 4/5$',
+        '$x_1 = 7/3$',
+        '$x_1 = 3$',
+      ],
+      answer: '$x_1 = 2$ — $\\det(A_1) = 14-4 = 10$, $\\det(A) = 6-1 = 5$, $x_1 = 10/5 = 2$',
+      hints: ['$\\det(A) = 3(2) - 1(1) = 5$. Replace column 1 with $\\mathbf{b} = [7,4]^T$: $A_1 = \\begin{bmatrix}7&1\\\\4&2\\end{bmatrix}$, $\\det(A_1) = 14-4 = 10$. $x_1 = 10/5 = 2$.'],
+      reviewSection: 'Example 1 — Cramer\'s Rule computation',
+    },
+    {
+      id: 'la2-008-quiz-9',
+      type: 'choice',
+      text: 'The adjugate matrix $\\text{adj}(A)$ is defined as the transpose of the cofactor matrix. What is $\\text{adj}(A)$ for $A = \\begin{bmatrix}3&1\\\\2&4\\end{bmatrix}$?',
+      options: [
+        '$\\begin{bmatrix}4&-1\\\\-2&3\\end{bmatrix}$',
+        '$\\begin{bmatrix}4&2\\\\1&3\\end{bmatrix}$',
+        '$\\begin{bmatrix}3&-1\\\\-2&4\\end{bmatrix}$',
+        '$\\begin{bmatrix}-4&1\\\\2&-3\\end{bmatrix}$',
+      ],
+      answer: '$\\begin{bmatrix}4&-1\\\\-2&3\\end{bmatrix}$',
+      hints: ['Cofactor matrix: $C_{11}=4$, $C_{12}=-2$, $C_{21}=-1$, $C_{22}=3$. Cofactor matrix: $\\begin{bmatrix}4&-2\\\\-1&3\\end{bmatrix}$. Its transpose (the adjugate): $\\begin{bmatrix}4&-1\\\\-2&3\\end{bmatrix}$. Check: $A \\cdot \\text{adj}(A) = \\det(A) \\cdot I$ — verify with $\\det = 10$.'],
+      reviewSection: 'Math tab — Inverse via adjugate',
+    },
+    {
+      id: 'la2-008-quiz-10',
+      type: 'choice',
+      text: 'How does Cramer\'s Rule show that the solution $\\mathbf{x}$ to $A\\mathbf{x} = \\mathbf{b}$ depends continuously on $\\mathbf{b}$?',
+      options: [
+        'Each $x_i = \\det(A_i(\\mathbf{b}))/\\det(A)$ is a rational function of the entries of $\\mathbf{b}$ — rational functions are continuous',
+        'The LU factorization is continuous in $\\mathbf{b}$',
+        'Solutions are always continuous in the right-hand side',
+        'Cramer\'s Rule does not show continuity',
+      ],
+      answer: 'Each $x_i = \\det(A_i(\\mathbf{b}))/\\det(A)$ is a rational function of the entries of $\\mathbf{b}$ — rational functions are continuous',
+      hints: ['The determinant is a polynomial in the matrix entries — hence continuous. Since $\\det(A)\\neq 0$ is fixed and $\\det(A_i(\\mathbf{b}))$ is a polynomial in $\\mathbf{b}$\'s entries, $x_i(\\mathbf{b})$ is continuous (even differentiable). This is the implicit function theorem in action.'],
+      reviewSection: 'Intuition tab — implicit function theorem connection',
+    },
   ],
+
+  misconceptions: [
+    {
+      falseBelief: 'Cramer\'s Rule is efficient and should be used for any system where the determinant is easy to compute.',
+      whyStudentsThinkIt: 'Cramer\'s Rule is elegant and formulaic — it looks like a direct, clean method. Students don\'t account for the factorial explosion in cofactor expansion for large matrices.',
+      correctionExample: 'For a $5\\times 5$ system: Cramer\'s Rule needs 6 determinants. Each $5\\times 5$ det via cofactor expansion: $5! = 120$ term products. Via LU: $O(5^3)=125$ operations. For $n=10$: cofactor expansion is $10! = 3.6$ million multiplications per determinant vs $O(n^3)$ for LU.',
+      contrastCase: 'Cramer\'s Rule IS optimal for $2\\times 2$ systems (one formula gives both answers). For $n \\geq 3$, LU solve is almost always faster. Use Cramer\'s Rule when you need the symbolic form of the solution.',
+    },
+    {
+      falseBelief: 'In Cramer\'s Rule, you replace the column corresponding to the EQUATION NUMBER, not the VARIABLE number.',
+      whyStudentsThinkIt: 'Students confuse the column index $i$ (which variable) with the row index $i$ (which equation). The variable $x_i$ corresponds to column $i$, not row $i$.',
+      correctionExample: 'To solve for $x_2$: replace column 2 of $A$ with $\\mathbf{b}$. Row operations (which equation) are irrelevant. The denominator is always $\\det(A)$, the same for all variables.',
+      contrastCase: 'The formula: $x_i = \\det(A_i(\\mathbf{b}))/\\det(A)$ where $A_i(\\mathbf{b})$ = matrix $A$ with its $i$-th COLUMN replaced by $\\mathbf{b}$. Column $i$ corresponds to variable $x_i$.',
+    },
+  ],
+
+  transferPrompts: [
+    {
+      situation: 'An electrical engineer derives the steady-state currents in a 2-node circuit as a function of voltage $V$. She has the system $A\\mathbf{I}(V) = \\mathbf{b}(V)$ where both $A$ and $\\mathbf{b}$ depend on the parameter $V$. She needs a formula for $I_1(V)$ that she can differentiate. Should she use LU or Cramer\'s Rule?',
+      competingTechniques: ['LU decomposition (numerical)', 'Cramer\'s Rule (symbolic)'],
+      whyThisTechniqueWins: 'Cramer\'s Rule gives $I_1(V) = \\det(A_1(\\mathbf{b}(V)))/\\det(A(V))$ — a rational function of $V$ that can be differentiated analytically. LU would give a numerical answer for each specific $V$, but not a differentiable formula. Symbolic differentiation tools can process the Cramer formula.',
+    },
+    {
+      situation: 'A control engineer needs to find the transfer function $H(s) = x_1(s)/u(s)$ for a MIMO system described by a $3\\times 3$ matrix equation $A(s)\\mathbf{x}(s) = \\mathbf{b}(s)$ in the Laplace domain. How does Cramer\'s Rule help?',
+      competingTechniques: ['Invert the matrix symbolically', 'Apply Cramer\'s Rule to each output'],
+      whyThisTechniqueWins: 'Cramer\'s Rule gives each transfer function as a ratio of two determinants: $H_i(s) = \\det(A_i(\\mathbf{b}(s)))/\\det(A(s))$. The denominator $\\det(A(s))$ is the characteristic polynomial (poles). The numerator gives the zeros. This directly exposes the system\'s stability properties in terms of poles and zeros.',
+    },
+  ],
+
+  debugging: [
+    {
+      commonError: 'Replacing the wrong column when applying Cramer\'s Rule.',
+      symptom: 'Student gets a correct $\\det(A)$ but replaces row $i$ or uses the wrong column, getting the wrong variable.',
+      whyItHappened: 'The variable $x_i$ corresponds to column $i$ of $A$, not row $i$. Students sometimes mix up row/column after seeing row-based equation systems.',
+      repairStrategy: 'Write out $A\\mathbf{x} = \\mathbf{b}$ explicitly: identify which column of $A$ has coefficient of $x_i$. That is the column to replace with $\\mathbf{b}$. For example, if $A = [\\mathbf{a}_1 | \\mathbf{a}_2 | \\mathbf{a}_3]$ and you want $x_2$: form $[\\mathbf{a}_1 | \\mathbf{b} | \\mathbf{a}_3]$.',
+    },
+    {
+      commonError: 'Using the adjugate formula $A^{-1} = \\text{adj}(A)/\\det(A)$ for large matrix inversion in code.',
+      symptom: 'Code is extremely slow for matrices larger than $5\\times 5$, or accuracy is poor.',
+      whyItHappened: 'The adjugate requires computing $n^2$ cofactors, each a $(n-1)\\times(n-1)$ determinant — astronomically expensive.',
+      repairStrategy: 'Use `np.linalg.inv(A)` or `scipy.linalg.inv(A)` (which internally use LU). Only use the adjugate formula symbolically or for $2\\times 2$ matrices.',
+    },
+  ],
+
+  mastery: {
+    targetLevel: 2,
+    solveIndependently: 'Apply Cramer\'s Rule to solve any $2\\times 2$ or $3\\times 3$ linear system by computing the required determinants and their ratios, and recognize when Cramer\'s Rule is theoretically valuable vs. computationally impractical.',
+    explainVerbally: 'Explain the geometric interpretation of Cramer\'s Rule (ratio of parallelogram areas), the connection between the adjugate formula and the $2\\times 2$ inverse, and why Cramer\'s Rule is preferred for symbolic computation.',
+    detectIncorrectApplication: 'Identify when a student replaces the wrong column in the Cramer formula, or applies Cramer\'s Rule to a large system that should use LU.',
+    transferToUnfamiliar: 'Use Cramer\'s Rule to derive an explicit formula for the solution of a parametric system $A(t)\\mathbf{x} = \\mathbf{b}(t)$, expressing each $x_i$ as a rational function of the parameter $t$.',
+  },
 };

@@ -8,7 +8,7 @@ const lesson = {
   tags: ["git", "gitignore", "config", "ignore", "security"],
   aliases: ["gitignore", ".gitignore", "ignore files", "git config"],
 
-  hook: `Node modules, build folders, API keys, editor files. None of these belong in your repo — they're either too large, generated automatically, or dangerously private. `.gitignore` is your gatekeeper.`,
+  hook: `Node modules, build folders, API keys, editor files. None of these belong in your repo — they're either too large, generated automatically, or dangerously private. \`.gitignore\` is your gatekeeper.`,
 
   mentalModel: [
     "`.gitignore` tells Git to completely ignore matching files — they won't appear as untracked and will never be committed.",

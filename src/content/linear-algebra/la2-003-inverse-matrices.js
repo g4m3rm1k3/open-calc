@@ -25,12 +25,13 @@ export default {
   // ── Intuition ──────────────────────────────────────────────────
   intuition: {
     prose: [
-      '**Where you are in the story:** You can chain multiple transformations into one matrix product. Now the next question: can you run a transformation *backwards*? If $A$ encrypted a vector into a new position, is there a matrix that decrypts it?',
+      'Take $A = \\begin{bmatrix}2&1\\\\5&3\\end{bmatrix}$. Compute $\\det(A) = 2 \\cdot 3 - 1 \\cdot 5 = 1$. Because $\\det \\neq 0$, the inverse exists: $A^{-1} = \\begin{bmatrix}3&-1\\\\-5&2\\end{bmatrix}$. Verify: $A^{-1}A = \\begin{bmatrix}6-5&3-3\\\\-10+10&-5+6\\end{bmatrix} = \\begin{bmatrix}1&0\\\\0&1\\end{bmatrix} = I$. Now try $B = \\begin{bmatrix}2&4\\\\1&2\\end{bmatrix}$: $\\det(B) = 4-4 = 0$. Column 2 is twice column 1 — $B$ squishes the whole plane onto a single line. Once that happens, information is lost forever and no inverse can recover it. The **determinant** is the test: non-zero means reversible, zero means irreversible.',
       '**The inverse machine.** If you apply $A$ then immediately apply $A^{-1}$, the vector must return to where it started. So $A^{-1}A\\mathbf{v} = \\mathbf{v}$ for every vector — which means $A^{-1}A = I$, the identity matrix (the "do nothing" transformation). The inverse undoes the warp completely.',
       '**Not every matrix has an inverse.** Here is where the **determinant** enters. The determinant, written $\\det(A)$ or $|A|$, is a single number measuring how much $A$ scales area. A $2 \\times 2$ matrix with $\\det = 3$ triples all areas. With $\\det = -2$ it doubles areas AND flips space like a mirror (the negative sign is the flip).',
       '**The fatal case: $\\det(A) = 0$.** This means $A$ squishes the entire 2D plane flat onto a line (or a point). Once space collapses, information is destroyed permanently — infinitely many different input vectors land on the same output. You cannot reconstruct the input from the output. No inverse exists.',
       '**The 3D projection example.** When a 3D video game is projected onto your 2D screen, depth information (the Z-coordinate) is permanently discarded. Short character far away = tall character close up — you cannot distinguish them from the flat image. This is a linear transformation with $\\det = 0$: the 3D space was collapsed to 2D. The projection matrix has no inverse.',
       '**CNC application: workpiece coordinate frame.** When a CNC machine calibrates its work coordinate system, it measures 3 reference points on the workpiece. These 3 points define three vectors, and the machine computes their determinant. If the determinant is 0 (or near 0), the three points are collinear — they all lie on a single line, which is not enough to define a unique flat plane. The calibration fails. A well-set-up fixture keeps the three points spread wide apart, maximizing the determinant and ensuring a stable, invertible coordinate frame.',
+      '**Predict before reading on.** You are given $A = \\begin{bmatrix}3&6\\\\2&4\\end{bmatrix}$. Without computing the full inverse formula: does $A$ have an inverse? Compute $\\det(A) = 3 \\cdot 4 - 6 \\cdot 2 = ?$. Write your answer, then check in Example 2.',
       '**Where this is heading:** When $\\det(A) = 0$, the transformation crushes space onto a line. The next lesson (Null Space and Column Space) names exactly what that line is and what input vectors got annihilated in the crush.',
     ],
     callouts: [
@@ -643,7 +644,114 @@ C = np.array([[2., -1.], [4., 3.]])
       ],
       answer: "$-1/3$ — because $\\det(A) \\cdot \\det(A^{-1}) = \\det(AA^{-1}) = \\det(I) = 1$.",
       hints: ["Use $\\det(AB) = \\det(A)\\det(B)$. Set $B = A^{-1}$: $\\det(A) \\cdot \\det(A^{-1}) = \\det(I) = 1$, so $\\det(A^{-1}) = 1/\\det(A) = 1/(-3) = -1/3$."],
-      reviewSection: 'Rigor tab — Key properties of the determinant'
-    }
-  ]
+      reviewSection: 'Rigor tab — Key properties of the determinant',
+    },
+    {
+      id: 'la2-003-quiz-7',
+      type: 'choice',
+      text: 'Compute $\\det\\begin{bmatrix}4&2\\\\6&3\\end{bmatrix}$ and state whether the matrix is invertible.',
+      options: [
+        '$\\det = 0$; not invertible — column 2 is $\\frac{1}{2}$ column 1',
+        '$\\det = 12$; invertible',
+        '$\\det = -6$; invertible with a negative determinant',
+        '$\\det = 24$; invertible because all entries are positive',
+      ],
+      answer: '$\\det = 0$; not invertible — column 2 is $\\frac{1}{2}$ column 1',
+      hints: ['$\\det = (4)(3) - (2)(6) = 12 - 12 = 0$. Column 2 = $\\frac{1}{2} \\times$ column 1. Dependent columns always give $\\det = 0$.'],
+      reviewSection: 'Math tab — Determinant formula',
+    },
+    {
+      id: 'la2-003-quiz-8',
+      type: 'choice',
+      text: 'Use the $2 \\times 2$ inverse formula to find $A^{-1}$ for $A = \\begin{bmatrix}3&1\\\\2&1\\end{bmatrix}$.',
+      options: [
+        '$A^{-1} = \\begin{bmatrix}1&-1\\\\-2&3\\end{bmatrix}$',
+        '$A^{-1} = \\begin{bmatrix}1&2\\\\-1&3\\end{bmatrix}$',
+        '$A^{-1} = \\begin{bmatrix}3&-1\\\\-2&1\\end{bmatrix}$',
+        '$A^{-1} = \\begin{bmatrix}-3&-1\\\\-2&-1\\end{bmatrix}$',
+      ],
+      answer: '$A^{-1} = \\begin{bmatrix}1&-1\\\\-2&3\\end{bmatrix}$',
+      hints: ['$\\det = 3-2=1$. Formula: swap $a$ and $d$, negate $b$ and $c$, divide by det. $A^{-1} = \\frac{1}{1}\\begin{bmatrix}1&-1\\\\-2&3\\end{bmatrix}$. Verify: $AA^{-1} = I$.'],
+      reviewSection: 'Example 1 — 2×2 inverse formula',
+    },
+    {
+      id: 'la2-003-quiz-9',
+      type: 'choice',
+      text: 'A transformation $A$ has $|\\det(A)| = 5$. What does this tell you about areas under $A$?',
+      options: [
+        'Areas are scaled by a factor of 5',
+        'Areas are divided by 5',
+        'Areas are unchanged — only lengths change',
+        'Areas shrink to zero',
+      ],
+      answer: 'Areas are scaled by a factor of 5',
+      hints: ['$|\\det(A)|$ is the area scaling factor. A unit square has area 1; after applying $A$ its area becomes $|\\det(A)| = 5$. If $\\det < 0$, orientation flips but area magnitude still scales by $|\\det|$.'],
+      reviewSection: 'Intuition tab — determinant and area',
+    },
+    {
+      id: 'la2-003-quiz-10',
+      type: 'choice',
+      text: 'If $A$ and $B$ are both $2 \\times 2$ invertible matrices, which of the following correctly gives $(AB)^{-1}$?',
+      options: [
+        '$B^{-1}A^{-1}$ — reverse the order when inverting a product',
+        '$A^{-1}B^{-1}$ — invert each factor in the same order',
+        '$A^{-1} + B^{-1}$ — the inverse of a sum is the sum of inverses',
+        '$(A+B)^{-1}$ — combine first then invert',
+      ],
+      answer: '$B^{-1}A^{-1}$ — reverse the order when inverting a product',
+      hints: ['Verify: $(AB)(B^{-1}A^{-1}) = A(BB^{-1})A^{-1} = AIA^{-1} = AA^{-1} = I$. Just like undoing "put on socks then shoes" requires removing shoes first, then socks.'],
+      reviewSection: 'Rigor tab — Key properties of the determinant',
+    },
+  ],
+
+  misconceptions: [
+    {
+      falseBelief: 'The inverse of $A$ is computed by just taking the reciprocal of each entry: $(A^{-1})_{ij} = 1/a_{ij}$.',
+      whyStudentsThinkIt: 'In scalar arithmetic, the inverse of $x$ is $1/x$. Students apply this entry-wise thinking to matrices.',
+      correctionExample: 'For $A = \\begin{bmatrix}2&1\\\\5&3\\end{bmatrix}$: the entry-wise "inverse" would be $\\begin{bmatrix}0.5&1\\\\0.2&0.33\\end{bmatrix}$. But $A \\cdot \\begin{bmatrix}0.5&1\\\\0.2&0.33\\end{bmatrix} \\neq I$. The true inverse via $ad-bc=1$ is $\\begin{bmatrix}3&-1\\\\-5&2\\end{bmatrix}$.',
+      contrastCase: 'The scalar analogy is: the inverse of $2$ is $0.5$ because $2 \\times 0.5 = 1$. The matrix analogy is: $A^{-1}$ is the matrix such that $A \\cdot A^{-1} = I$. That constraint forces a very specific formula, not entry-wise reciprocals.',
+    },
+    {
+      falseBelief: 'A matrix with all nonzero entries always has an inverse.',
+      whyStudentsThinkIt: 'Students equate "has entries" with "can be inverted." If the matrix has numbers, surely it does something?',
+      correctionExample: '$A = \\begin{bmatrix}1&2\\\\2&4\\end{bmatrix}$ has all nonzero entries but $\\det(A) = 4-4=0$ — no inverse. The matrix collapses $\\mathbb{R}^2$ onto the line $y=2x$. Every input on the same line through the origin maps to the same output.',
+      contrastCase: 'Even the zero matrix (all zeros) has a determinant of 0 and no inverse. But a matrix need not be zero to be non-invertible — it just needs at least one pair of proportional columns.',
+    },
+  ],
+
+  transferPrompts: [
+    {
+      situation: 'A CNC probe measures the positions of three reference holes on a fixture. The machine needs to compute the coordinate transformation from "fixture frame" to "machine frame." What happens if two of the three holes happen to be at the same X-coordinate?',
+      competingTechniques: ['Proceed with the transformation calculation', 'Check the determinant of the setup matrix first'],
+      whyThisTechniqueWins: 'If two reference points share an X-coordinate, the setup matrix has proportional columns — $\\det = 0$. The coordinate transformation is undefined. The machine controller should check $\\det$ and refuse to proceed rather than computing a singular or near-singular transformation that would crash the tool.',
+    },
+    {
+      situation: 'In 3D computer graphics, a "view matrix" transforms 3D world coordinates to camera coordinates. A projective "perspective matrix" then collapses 3D to 2D screen coordinates. Why can you invert the view matrix but not the perspective matrix?',
+      competingTechniques: ['Try to invert both matrices', 'Check the determinant of each'],
+      whyThisTechniqueWins: 'The view matrix is a rigid rotation/translation ($\\det \\neq 0$, invertible — you can reverse the camera placement). The perspective matrix deliberately collapses the $z$-dimension to create depth cues, making $\\det = 0$. You cannot recover 3D depth from a 2D projection — the $z$-information is permanently destroyed.',
+    },
+  ],
+
+  debugging: [
+    {
+      commonError: 'Computing the inverse formula correctly but in the wrong order: writing $\\frac{1}{ad-bc}\\begin{bmatrix}a&-b\\\\-c&d\\end{bmatrix}$ instead of $\\frac{1}{ad-bc}\\begin{bmatrix}d&-b\\\\-c&a\\end{bmatrix}$.',
+      symptom: 'Student gets $A^{-1}A \\neq I$ when checking the answer.',
+      whyItHappened: 'The formula requires swapping $a$ and $d$ (top-left and bottom-right), not leaving them in place.',
+      repairStrategy: 'Mnemonic: "swap the diagonal, negate the off-diagonal." The top-left becomes $d$, the bottom-right becomes $a$. Then negate $b$ (top-right) and $c$ (bottom-left). Always verify: $A^{-1}A$ should give $I$.',
+    },
+    {
+      commonError: 'Using `inv(A)` or `numpy.linalg.inv(A)` to solve $A\\mathbf{x} = \\mathbf{b}$ in code.',
+      symptom: 'The solution is numerically inaccurate, especially for large or ill-conditioned matrices.',
+      whyItHappened: 'Computing the full inverse is more arithmetic operations than necessary and amplifies numerical errors. The inverse is only needed when you need $A^{-1}$ itself (e.g., for repeated solves with different $\\mathbf{b}$).',
+      repairStrategy: 'Use `A \\\\ b` (MATLAB) or `numpy.linalg.solve(A, b)`. These use LU factorization internally — they solve the system without materializing $A^{-1}$, which is both faster and numerically stabler.',
+    },
+  ],
+
+  mastery: {
+    targetLevel: 3,
+    solveIndependently: 'Compute $\\det(A)$ and $A^{-1}$ for any $2 \\times 2$ matrix using the formula, determine invertibility by checking the determinant, and solve $A\\mathbf{x} = \\mathbf{b}$ by multiplying both sides by $A^{-1}$.',
+    explainVerbally: 'Explain why a zero determinant means no inverse exists (the transformation squishes space irreversibly), and why the determinant equals the area-scaling factor of the transformation.',
+    detectIncorrectApplication: 'Identify when a student swaps the wrong entries in the $2 \\times 2$ inverse formula, or when they try to invert a matrix with $\\det = 0$.',
+    transferToUnfamiliar: 'Given a $3 \\times 3$ matrix, decide invertibility by computing the determinant using cofactor expansion, and explain geometrically what $\\det = 0$ means for 3D volume.',
+  },
 };

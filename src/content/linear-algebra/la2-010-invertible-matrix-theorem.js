@@ -20,11 +20,13 @@ export default {
 
   intuition: {
     prose: [
+      'Take $A = \\begin{bmatrix}2&1\\\\5&3\\end{bmatrix}$: $\\det(A) = 1 \\neq 0$, rank $= 2$, RREF $= I$, null space $= \\{\\mathbf{0}\\}$, eigenvalues $\\approx 0.27$ and $4.73$ (both nonzero). All conditions pass. Now take $B = \\begin{bmatrix}1&2\\\\2&4\\end{bmatrix}$: $\\det(B) = 0$, rank $= 1 < 2$, RREF $\\neq I$, eigenvalue $0$ exists, $B\\mathbf{x} = \\mathbf{b}$ has no unique solution. Every condition fails. This is the Invertible Matrix Theorem: twelve seemingly different conditions are all the same condition. A matrix passes all twelve at once or fails all twelve at once — there is no middle ground.',
       '**The theorem says: you either have it all or you have nothing.** For an $n \\times n$ matrix $A$, there is no middle ground. Either $A$ is a fully functional, information-preserving transformation — and then every one of the twelve conditions holds — or $A$ is a broken, information-losing transformation — and then every single condition fails simultaneously.',
       '**Think geometrically.** An invertible matrix maps $\\mathbb{R}^n$ to $\\mathbb{R}^n$ in a one-to-one, onto way. Every output has exactly one input. No two different inputs land on the same output. No output is unreachable. This geometric "bijectivity" is what all twelve conditions are secretly saying, in twelve different algebraic languages.',
       '**The null space test.** If $A\\mathbf{x} = \\mathbf{0}$ has a non-trivial solution $\\mathbf{x} \\neq \\mathbf{0}$, then $A$ maps two vectors ($\\mathbf{0}$ and $\\mathbf{x}$) to the same output ($\\mathbf{0}$). A function that maps two inputs to the same output can never be inverted — which one would the inverse pick? Non-trivial null space → not invertible.',
       '**The determinant test.** The determinant measures how much $A$ scales $n$-dimensional volume. If det$(A) = 0$, the transformation collapses space — it smashes a full $n$-dimensional solid flat into a lower-dimensional shadow. That squishing can never be undone, so $A$ is not invertible. If det$(A) \\neq 0$, volume is preserved (up to a constant factor), and the transformation is reversible.',
       '**The rank test.** Rank is the number of independent directions the columns span. An $n \\times n$ matrix is invertible iff all $n$ columns are independent — meaning the columns together span all of $\\mathbb{R}^n$ with no redundancy. Full rank means full coverage with no waste.',
+      '**Predict before reading on.** You are told that $A$ is a $3 \\times 3$ matrix with $\\text{rank}(A) = 2$. Without computing det or eigenvalues, how many of the 12 IMT conditions fail? What is the dimension of the null space? Write your answers before continuing.',
     ],
     callouts: [
       {
@@ -510,5 +512,112 @@ for k in [10.0, 1.0, 0.1, 0.01, 0.001]:
       hints: ['The IMT is binary and exact. Mathematically, det $= 10^{-15} \\neq 0$ means invertible. But numerically, the condition number $\\kappa = 10^{14}$ means relative error in $\\hat{\\mathbf{x}}$ can be $10^{14}$ times the relative error in $\\mathbf{b}$. The matrix is invertible in theory but unreliable in practice.'],
       reviewSection: 'Rigor tab — Near-Singular Matrices callout',
     },
+    {
+      id: 'la2-010-quiz-7',
+      type: 'choice',
+      text: '$A$ and $B$ are both $n \\times n$ invertible matrices. Which of the following is also guaranteed to be invertible?',
+      options: [
+        '$A + B$',
+        '$A - B$',
+        '$AB$',
+        'None of the above are guaranteed.',
+      ],
+      answer: '$AB$',
+      hints: ['$AB$ is invertible with $(AB)^{-1} = B^{-1}A^{-1}$ — proved in the math section. Neither $A + B$ nor $A - B$ is guaranteed invertible: $A + (-A) = 0$ (singular), and $A - A = 0$ even when $A$ is invertible.'],
+      reviewSection: 'Rigor tab — Product of Invertibles theorem',
+    },
+    {
+      id: 'la2-010-quiz-8',
+      type: 'choice',
+      text: 'For a $4 \\times 4$ matrix with rank $3$, what does the IMT say about the null space?',
+      options: [
+        'Null space is trivial (just the zero vector).',
+        'Null space has dimension $1$ (rank-nullity: $4 - 3 = 1$).',
+        'Null space has dimension $3$.',
+        'The null space dimension cannot be determined from rank alone.',
+      ],
+      answer: 'Null space has dimension $1$ (rank-nullity: $4 - 3 = 1$).',
+      hints: ['Rank-Nullity: rank + nullity = n. With rank = 3 and n = 4: nullity = 1. Since nullity > 0, the matrix is singular (IMT condition 7 fails). There exists a non-zero vector $\\mathbf{x}$ with $A\\mathbf{x} = \\mathbf{0}$.'],
+      reviewSection: 'Math tab — Rank-Nullity Bridge theorem',
+    },
+    {
+      id: 'la2-010-quiz-9',
+      type: 'choice',
+      text: 'If $AB$ is invertible (both $A$ and $B$ are $n \\times n$), what can you conclude about $A$ and $B$ individually?',
+      options: [
+        'Nothing — $AB$ being invertible says nothing about $A$ or $B$ alone.',
+        'Both $A$ and $B$ must be invertible.',
+        '$A$ must be invertible, but $B$ may not be.',
+        '$B$ must be invertible, but $A$ may not be.',
+      ],
+      answer: 'Both $A$ and $B$ must be invertible.',
+      hints: ['If $AB$ is invertible, $\\det(AB) = \\det(A)\\det(B) \\neq 0$, so $\\det(A) \\neq 0$ AND $\\det(B) \\neq 0$ — both are invertible. You cannot have $AB$ invertible if either factor is singular.'],
+      reviewSection: 'Rigor tab — Product of Invertibles',
+    },
+    {
+      id: 'la2-010-quiz-10',
+      type: 'choice',
+      text: 'The IMT says: for a square matrix, injective (one-to-one) implies surjective (onto), and vice versa. Why does this fail for linear maps on infinite-dimensional spaces?',
+      options: [
+        'Because infinite-dimensional spaces have no basis.',
+        'Because rank-nullity does not hold in infinite dimensions — a map can inject without filling the range space.',
+        'Because determinants are not defined for infinite matrices.',
+        'Because all linear maps on infinite-dimensional spaces are invertible.',
+      ],
+      answer: 'Because rank-nullity does not hold in infinite dimensions — a map can inject without filling the range space.',
+      hints: ['The shift operator $T(x_1, x_2, x_3, \\ldots) = (0, x_1, x_2, \\ldots)$ on $\\ell^2$ is injective (no non-zero input maps to zero) but NOT surjective (nothing maps to $(1,0,0,\\ldots)$). The IMT is a finite-dimensional theorem; the rank-nullity identity rank + nullity = n has no infinite-dimensional analogue.'],
+      reviewSection: 'Rigor tab — IMT for Linear Maps',
+    },
   ],
+
+  misconceptions: [
+    {
+      falseBelief: 'A matrix with small determinant is "almost singular" and the IMT says it is effectively non-invertible.',
+      whyStudentsThinkIt: 'Students confuse the mathematical condition $\\det \\neq 0$ with numerical stability. A matrix with $\\det = 0.0001$ looks "almost zero" and students assume the IMT puts it in the singular category.',
+      correctionExample: 'The matrix $0.001 I_{1000}$ has $\\det = (0.001)^{1000} \\approx 10^{-3000}$ — astronomically small — but it is perfectly invertible: $(0.001 I)^{-1} = 1000 I$. The IMT says $\\det \\neq 0$ ↔ invertible, period. Scale has nothing to do with it.',
+      contrastCase: 'The condition number $\\kappa = \\|A\\|\\|A^{-1}\\|$ is the correct measure of near-singularity for numerical work. A matrix can have $\\kappa = 10^{14}$ (dangerously ill-conditioned) while being perfectly invertible per the IMT.',
+    },
+    {
+      falseBelief: 'If $A^2 = 0$ (nilpotent) then all eigenvalues are zero, so $A$ must be the zero matrix.',
+      whyStudentsThinkIt: 'Students know the eigenvalues of $A^2$ are squares of eigenvalues of $A$. If all eigenvalues of $A^2$ are zero, all eigenvalues of $A$ must be zero. They then incorrectly conclude a matrix with all-zero eigenvalues must itself be zero.',
+      correctionExample: 'The matrix $N = \\begin{bmatrix}0&1\\\\0&0\\end{bmatrix}$ satisfies $N^2 = \\begin{bmatrix}0&0\\\\0&0\\end{bmatrix}$ and has eigenvalues $0, 0$, yet $N \\neq 0$. Eigenvalues tell you determinant and trace, not the full structure of the matrix.',
+      contrastCase: 'By the IMT: $N$ has a zero eigenvalue → $N$ is singular. This is correct. But singular ≠ zero. There are many singular matrices; the zero matrix is just one of them.',
+    },
+  ],
+
+  transferPrompts: [
+    {
+      situation: 'A structural engineer models a truss with $n$ joints as a system $K\\mathbf{u} = \\mathbf{f}$, where $K$ is the stiffness matrix, $\\mathbf{u}$ is the displacement vector, and $\\mathbf{f}$ is the load vector. Before solving, you need to check whether the structure is properly constrained (not free to move as a rigid body).',
+      competingTechniques: 'Compute $\\det(K)$ (expensive for large $n$), compute rank via RREF (moderate cost), check for zero eigenvalues (most expensive), use physical analysis to count degrees of freedom.',
+      whyThisTechniqueWins: 'The IMT says all methods are equivalent. In practice, check rank via sparse factorization — it is the cheapest for large stiffness matrices. If $K$ is singular, the structure has a rigid-body mode (it can move without deforming), and boundary conditions are missing. The IMT tells you that fixing any one of the equivalent conditions (e.g., adding a support to remove the zero eigenvalue) automatically fixes all of them.',
+    },
+    {
+      situation: 'In a Markov chain model of page-rank, the transition matrix $P$ (rows sum to 1) is used to solve for the steady-state distribution $\\boldsymbol{\\pi}^\\top P = \\boldsymbol{\\pi}^\\top$. This is equivalent to $(P - I)^\\top\\boldsymbol{\\pi} = \\mathbf{0}$.',
+      competingTechniques: 'Directly compute eigenvalues of $P$ looking for eigenvalue 1 (Perron-Frobenius), apply IMT to $P - I$ to check singularity, use power iteration.',
+      whyThisTechniqueWins: 'The steady-state exists iff $1$ is an eigenvalue of $P$ ↔ $P - I$ is singular ↔ $\\det(P - I) = 0$ ↔ the null space of $(P - I)^\\top$ is nontrivial. This is the IMT applied to $P - I$: every equivalent condition tells you the same thing. Power iteration exploits the eigenvalue structure to converge to $\\boldsymbol{\\pi}$ without needing to invert anything.',
+    },
+  ],
+
+  debugging: [
+    {
+      commonError: 'Concluding that if $A\\mathbf{x} = \\mathbf{b}$ has a solution for ONE specific $\\mathbf{b}$, then $A$ is invertible.',
+      symptom: 'A student solves $A\\mathbf{x} = \\mathbf{b}$ for a particular $\\mathbf{b}$ (which happens to be in the column space), finds a solution, and incorrectly concludes $A$ must be invertible. Later, they try a different $\\mathbf{b}$ and find no solution.',
+      whyItHappened: 'IMT condition 10 says: "$A\\mathbf{x} = \\mathbf{b}$ has a unique solution for EVERY $\\mathbf{b}$." The word "every" is crucial. A singular matrix can still have solutions for $\\mathbf{b}$ values that happen to lie in the column space — it just cannot solve for all $\\mathbf{b}$.',
+      repairStrategy: 'Test with a $\\mathbf{b}$ outside the column space — if no solution exists, $A$ is singular. Better yet, check a cheaper condition: compute $\\det(A)$ or row-reduce $A$ to check if RREF $= I$.',
+    },
+    {
+      commonError: 'Applying the IMT to a non-square matrix — e.g., checking if a $3 \\times 4$ matrix is "invertible" because its columns are independent.',
+      symptom: 'A student finds that a $3 \\times 4$ matrix has rank 3 (full row rank) and concludes "it is invertible with $(A^\\top A)^{-1}A^\\top$ as its inverse." This confuses the pseudoinverse with a two-sided inverse.',
+      whyItHappened: 'The IMT requires $A$ to be $n \\times n$. For a $3 \\times 4$ matrix, rank $= 3$ means full row rank — it has a right inverse ($A$ can achieve any output) but NOT a left inverse ($A$ loses information since there are 4 inputs for 3 outputs).',
+      repairStrategy: 'Check the dimensions first. A two-sided inverse $A^{-1}$ with $AA^{-1} = A^{-1}A = I$ requires $A$ to be square. For non-square matrices, use the pseudoinverse $A^+ = (A^\\top A)^{-1}A^\\top$ (left inverse, for full column rank) or $A^+ = A^\\top(AA^\\top)^{-1}$ (right inverse, for full row rank) — but be explicit that these are one-sided.',
+    },
+  ],
+
+  mastery: {
+    targetLevel: 2,
+    solveIndependently: 'Given an $n \\times n$ matrix, choose the most efficient IMT condition to check, determine whether it is invertible, and use the IMT to immediately state all other equivalent conditions that follow.',
+    explainVerbally: 'Explain why the twelve IMT conditions are all equivalent — what geometric property of a linear map makes them all describe the same phenomenon (bijectivity).',
+    detectIncorrectApplication: 'Spot when someone applies the IMT to a non-square matrix, or concludes invertibility from a solution to $A\\mathbf{x} = \\mathbf{b}$ for a single specific $\\mathbf{b}$, or confuses small determinant with singularity.',
+    transferToUnfamiliar: 'Use the IMT to analyze a new matrix (e.g., the stiffness matrix of a physical system or a Jacobian in optimization) by identifying one checkable condition and inferring all twelve.',
+  },
 };

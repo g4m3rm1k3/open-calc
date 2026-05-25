@@ -8,7 +8,7 @@ const lesson = {
   tags: ["git", "init", "status", "repository"],
   aliases: ["git init", "git status", "new repo"],
 
-  hook: `Before you can commit anything, you need a repository. Before you commit, you want to know what Git can see. Two commands — `git init` and `git status` — are the foundation of every Git workflow.`,
+  hook: `Before you can commit anything, you need a repository. Before you commit, you want to know what Git can see. Two commands — \`git init\` and \`git status\` — are the foundation of every Git workflow.`,
 
   mentalModel: [
     "`git init` turns any folder into a Git repository by creating a `.git` subdirectory — your folder's files are untouched.",

@@ -19,7 +19,7 @@ export default {
   // ── Intuition ──────────────────────────────────────────────────
   intuition: {
     prose: [
-      '**Where you are in the story:** You have spent all of Phase 3 studying square matrices — their eigenvectors, their diagonal form, and what complex eigenvalues mean. Phase 4 moves to a new question: what is the closest we can get to a target when we are constrained to a subspace? That question is answered by projection.',
+      'Take $\\mathbf{b} = [3,4]^\\top$ and the $x$-axis spanned by $\\mathbf{a} = [1,0]^\\top$. The point on the $x$-axis closest to $\\mathbf{b}$: drop a perpendicular and land at $\\mathbf{p} = [3,0]^\\top$. Error: $\\mathbf{e} = \\mathbf{b} - \\mathbf{p} = [0,4]^\\top$. Check perpendicularity: $\\mathbf{a} \\cdot \\mathbf{e} = 1\\cdot 0 + 0\\cdot 4 = 0$ ✓. The formula: $c = \\mathbf{a}^\\top\\mathbf{b}/\\mathbf{a}^\\top\\mathbf{a} = 3/1 = 3$, so $\\mathbf{p} = 3\\mathbf{a} = [3,0]^\\top$. That perpendicularity condition $\\mathbf{a}\\cdot(\\mathbf{b}-c\\mathbf{a}) = 0$ is what determines $c$ — and why orthogonal projection is the closest point.',
       'Here is the core picture. Imagine a line drawn through the origin in 2D (or a plane in 3D). You have a target vector $\\mathbf{b}$ that does not lie on that line. The question is: what point ON the line is closest to $\\mathbf{b}$? The answer is the point you reach by dropping a perpendicular from $\\mathbf{b}$ straight down to the line. That foot of the perpendicular is the **orthogonal projection** of $\\mathbf{b}$.',
       'The word "orthogonal" means perpendicular. The projection is orthogonal because the error vector — the gap between $\\mathbf{b}$ and its projection — is perpendicular to the line (or subspace). This is not just aesthetically pleasing; it is the mathematical definition of "closest." Any other point on the line is farther from $\\mathbf{b}$ than the orthogonal projection, because the orthogonal path is the shortest path.',
       '**From a line to a subspace.** When the target line is spanned by a single unit vector $\\hat{u}$, the projection is $(\\mathbf{b} \\cdot \\hat{u})\\hat{u}$ — the dot product picks off how much of $\\mathbf{b}$ points in the $\\hat{u}$ direction, and then we scale $\\hat{u}$ by that amount. For a non-unit vector $\\mathbf{a}$, we need to divide by the length: $\\text{proj} = \\frac{\\mathbf{a}\\cdot\\mathbf{b}}{\\mathbf{a}\\cdot\\mathbf{a}}\\mathbf{a}$.',
@@ -48,6 +48,11 @@ export default {
         type: 'insight',
         title: 'The Orthogonal Decomposition',
         body: '\\mathbf{b} = \\underbrace{P\\mathbf{b}}_{\\text{projection (in subspace)}} + \\underbrace{\\mathbf{b} - P\\mathbf{b}}_{\\text{error (perpendicular to subspace)}}\n\nThese two pieces are always perpendicular. Their Pythagorean sum equals $\\|\\mathbf{b}\\|^2$.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Prediction',
+        body: 'For $\\mathbf{b} = [2,5]^\\top$ and the line spanned by $\\mathbf{a} = [3,4]^\\top$: before computing, estimate the projection. Is it closer to $[0,0]^\\top$ or to $\\mathbf{b}$? Predict $c = \\mathbf{a}\\cdot\\mathbf{b}/\\mathbf{a}\\cdot\\mathbf{a}$ — is $c < 1$ or $c > 1$? Then verify: does the error vector $\\mathbf{e} = \\mathbf{b} - c\\mathbf{a}$ dot with $\\mathbf{a}$ to give 0?',
       },
     ],
     visualizations: [
@@ -358,6 +363,42 @@ b = np.array([1., 2., 3.])
       ],
       conclusion: 'The projection matrix $P = \\frac{1}{5}\\begin{bmatrix}1&2\\\\2&4\\end{bmatrix}$ projects any vector onto the line $\\mathbf{a} = [1,2]^T$. Applied to $\\mathbf{b} = [3,1]^T$, it gives $[1,2]^T$. The idempotency $P^2 = P$ confirms correctness.',
     },
+    {
+      id: 'la4-001-ex3',
+      title: 'Projecting onto a 2D Subspace using P = A(AᵀA)⁻¹Aᵀ',
+      problem: 'Project $\\mathbf{b} = \\begin{bmatrix}0\\\\0\\\\1\\end{bmatrix}$ onto the subspace spanned by $\\mathbf{a}_1 = \\begin{bmatrix}1\\\\0\\\\1\\end{bmatrix}$ and $\\mathbf{a}_2 = \\begin{bmatrix}0\\\\1\\\\1\\end{bmatrix}$. Form the matrix $A = [\\mathbf{a}_1 \\; \\mathbf{a}_2]$ and use the formula $\\mathbf{p} = A(A^TA)^{-1}A^T\\mathbf{b}$.',
+      steps: [
+        {
+          expression: 'A^TA = \\begin{bmatrix}1&0&1\\\\0&1&1\\end{bmatrix}\\begin{bmatrix}1&0\\\\0&1\\\\1&1\\end{bmatrix} = \\begin{bmatrix}2&1\\\\1&2\\end{bmatrix}',
+          annotation: 'Entry $(i,j)$ = dot product of column $i$ with column $j$ of $A$. Diagonal: $\\|\\mathbf{a}_1\\|^2=2$, $\\|\\mathbf{a}_2\\|^2=2$. Off-diagonal: $\\mathbf{a}_1 \\cdot \\mathbf{a}_2 = 1$.',
+          strategyTitle: 'Compute AᵀA',
+          checkpoint: 'Why must AᵀA be invertible here?',
+          hints: ['The columns of A are linearly independent (neither is a multiple of the other), which guarantees AᵀA is invertible.'],
+        },
+        {
+          expression: '(A^TA)^{-1} = \\frac{1}{3}\\begin{bmatrix}2&-1\\\\-1&2\\end{bmatrix}, \\quad A^T\\mathbf{b} = \\begin{bmatrix}0+0+1\\\\0+0+1\\end{bmatrix} = \\begin{bmatrix}1\\\\1\\end{bmatrix}',
+          annotation: 'det$(A^TA) = 4-1 = 3$. Standard $2\\times 2$ inverse formula. $A^T\\mathbf{b}$ picks up the third component of $\\mathbf{b}$ since $\\mathbf{a}_1, \\mathbf{a}_2$ both have a $1$ in their third entry.',
+          strategyTitle: 'Invert and compute Aᵀb',
+          checkpoint: '',
+          hints: [],
+        },
+        {
+          expression: '\\hat{\\mathbf{x}} = (A^TA)^{-1}A^T\\mathbf{b} = \\frac{1}{3}\\begin{bmatrix}2&-1\\\\-1&2\\end{bmatrix}\\begin{bmatrix}1\\\\1\\end{bmatrix} = \\frac{1}{3}\\begin{bmatrix}1\\\\1\\end{bmatrix}',
+          annotation: 'The optimal coefficients: $\\mathbf{p} = \\frac{1}{3}\\mathbf{a}_1 + \\frac{1}{3}\\mathbf{a}_2$.',
+          strategyTitle: 'Solve for x̂',
+          checkpoint: '',
+          hints: [],
+        },
+        {
+          expression: '\\mathbf{p} = A\\hat{\\mathbf{x}} = \\frac{1}{3}\\begin{bmatrix}1\\\\0\\\\1\\end{bmatrix} + \\frac{1}{3}\\begin{bmatrix}0\\\\1\\\\1\\end{bmatrix} = \\begin{bmatrix}1/3\\\\1/3\\\\2/3\\end{bmatrix}',
+          annotation: 'Verify: $A^T\\mathbf{e} = A^T(\\mathbf{b}-\\mathbf{p}) = A^T[{-1/3},{-1/3},{1/3}]^T = [0,0]^T$ ✓.',
+          strategyTitle: 'Compute projection',
+          checkpoint: 'Verify Aᵀe = 0',
+          hints: ['Row 1 of Aᵀ times e: 1·(-1/3) + 0·(-1/3) + 1·(1/3) = 0 ✓. Row 2: 0·(-1/3) + 1·(-1/3) + 1·(1/3) = 0 ✓.'],
+        },
+      ],
+      conclusion: '$\\mathbf{p} = [1/3,\\, 1/3,\\, 2/3]^T$. The error $\\mathbf{e} = [-1/3,-1/3,1/3]^T$ is perpendicular to both columns of $A$. This generalizes the line projection to any dimension: the formula $P = A(A^TA)^{-1}A^T$ always works as long as the columns of $A$ are independent.',
+    },
   ],
 
   // ── Challenges ─────────────────────────────────────────────────
@@ -470,14 +511,14 @@ b = np.array([1., 2., 3.])
 
   // ── Checkpoints ──────────────────────────────────────────────────
   checkpoints: [
-    'read-intuition',
-    'read-math',
-    'read-rigor',
-    'completed-example-1',
-    'completed-example-2',
-    'attempted-challenge-easy',
-    'attempted-challenge-medium',
-    'attempted-challenge-hard',
+    { id: 'cp-la4-001-1', label: 'Read: State the perpendicularity condition for projection', type: 'read' },
+    { id: 'cp-la4-001-2', label: 'Read: Explain why the projection is the closest point', type: 'read' },
+    { id: 'cp-la4-001-3', label: 'Read: Write both projection formulas (line and subspace)', type: 'read' },
+    { id: 'cp-la4-001-4', label: 'Lab: Drag the vector and verify error stays perpendicular', type: 'lab' },
+    { id: 'cp-la4-001-5', label: 'Lab: Compute P = aaᵀ/aᵀa and verify P² = P', type: 'lab' },
+    { id: 'cp-la4-001-6', label: 'Example: Project onto a line in ℝ³', type: 'example' },
+    { id: 'cp-la4-001-7', label: 'Example: Build a projection matrix and apply it', type: 'example' },
+    { id: 'cp-la4-001-8', label: 'Challenge: Project onto a 2D subspace with AᵀA formula', type: 'challenge' },
   ],
 
   // ── Assessment ───────────────────────────────────────────────────
@@ -540,5 +581,130 @@ b = np.array([1., 2., 3.])
       hints: ['Projection onto the $x$-axis: $\\mathbf{p} = [3,0]^T$. Error: $\\mathbf{e} = [3,4]^T - [3,0]^T = [0,4]^T$. It points straight up — perpendicular to the $x$-axis. ✓'],
       reviewSection: 'Examples tab — Error Vector',
     },
+    {
+      id: 'q-la4-001-5',
+      type: 'choice',
+      text: 'For $\\mathbf{a} = [2,1]^T$ and $\\mathbf{b} = [3,0]^T$, compute the scalar projection $c$.',
+      options: ['$6/5$', '$3/5$', '$6/\\sqrt{5}$', '$3$'],
+      answer: '$6/5$',
+      hints: ['c = aᵀb / aᵀa = (2·3 + 1·0)/(4+1) = 6/5.'],
+      reviewSection: 'Math — projection onto a line',
+    },
+    {
+      id: 'q-la4-001-6',
+      type: 'choice',
+      text: 'Which of the following is always true for a projection matrix $P = A(A^TA)^{-1}A^T$?',
+      options: [
+        '$P$ is invertible',
+        '$P^T = P$ and $P^2 = P$',
+        '$\\det(P) = 1$',
+        '$P\\mathbf{b} = \\mathbf{b}$ for all $\\mathbf{b}$',
+      ],
+      answer: '$P^T = P$ and $P^2 = P$',
+      hints: ['P is symmetric: P = A(AᵀA)⁻¹Aᵀ — taking transpose gives the same matrix. Idempotent: P² = A(AᵀA)⁻¹AᵀA(AᵀA)⁻¹Aᵀ = A(AᵀA)⁻¹Aᵀ = P.'],
+      reviewSection: 'Math — key properties of projection matrices',
+    },
+    {
+      id: 'q-la4-001-7',
+      type: 'choice',
+      text: 'The complementary projection matrix $(I - P)$ projects onto:',
+      options: [
+        'The column space of $A$',
+        'The null space of $A$',
+        'The orthogonal complement of $\\text{col}(A)$',
+        'The zero vector',
+      ],
+      answer: 'The orthogonal complement of $\\text{col}(A)$',
+      hints: ['Any vector b splits as b = Pb + (I-P)b. Pb lands in col(A); (I-P)b is perpendicular to col(A). So (I-P) is the projection onto the orthogonal complement.'],
+      reviewSection: 'Math — orthogonal decomposition',
+    },
+    {
+      id: 'q-la4-001-8',
+      type: 'choice',
+      text: 'If $\\mathbf{b}$ already lies in the column space of $A$, then $P\\mathbf{b} =$',
+      options: ['$\\mathbf{0}$', '$\\mathbf{b}$', '$A\\mathbf{b}$', '$2\\mathbf{b}$'],
+      answer: '$\\mathbf{b}$',
+      hints: ['If b is already in col(A), it is its own projection. P² = P confirms: if Pb = b, then P²b = P(Pb) = Pb = b.'],
+      reviewSection: 'Math — idempotency',
+    },
+    {
+      id: 'q-la4-001-9',
+      type: 'choice',
+      text: 'In least squares, the normal equations $A^TA\\hat{\\mathbf{x}} = A^T\\mathbf{b}$ arise because:',
+      options: [
+        '$A$ is always square and invertible',
+        'The error $\\mathbf{b} - A\\hat{\\mathbf{x}}$ must be perpendicular to every column of $A$',
+        'We minimize $\\|\\hat{\\mathbf{x}}\\|$ rather than $\\|\\mathbf{b} - A\\hat{\\mathbf{x}}\\|$',
+        'The projection formula requires $A^T = A$',
+      ],
+      answer: 'The error $\\mathbf{b} - A\\hat{\\mathbf{x}}$ must be perpendicular to every column of $A$',
+      hints: ['Aᵀ(b - Ax̂) = 0 is the perpendicularity condition applied to all columns of A simultaneously. This is exactly the projection condition — Ax̂ is the closest point in col(A) to b.'],
+      reviewSection: 'Math — projection onto a subspace',
+    },
+    {
+      id: 'q-la4-001-10',
+      type: 'choice',
+      text: 'For GPS position estimation, why is orthogonal projection (least squares) used instead of solving an exact system?',
+      options: [
+        'GPS always has exactly 3 equations',
+        'There are more satellite equations than unknowns — an overdetermined system — so the least squares projection gives the best-fit position',
+        'The projection formula avoids computing inverses',
+        'GPS signals are orthogonal by definition',
+      ],
+      answer: 'There are more satellite equations than unknowns — an overdetermined system — so the least squares projection gives the best-fit position',
+      hints: ['4+ satellites give 4+ distance equations for 3 unknowns (x,y,z). No exact solution exists due to noise; the projection Pb = A(AᵀA)⁻¹Aᵀb minimizes total squared error.'],
+      reviewSection: 'Hook — real-world context',
+    },
   ],
+
+  misconceptions: [
+    {
+      falseBelief: 'The projection of $\\mathbf{b}$ onto the line spanned by $\\mathbf{a}$ is just the component of $\\mathbf{b}$ with the largest magnitude.',
+      whyStudentsThinkIt: 'Students confuse scalar projection ($c = \\mathbf{a}\\cdot\\mathbf{b}/\\|\\mathbf{a}\\|^2$) with the magnitude of $\\mathbf{b}$.',
+      correctionExample: 'For $\\mathbf{b} = [1, 10]^T$ and $\\mathbf{a} = [1, 0]^T$: the projection is $[1, 0]^T$ (the $x$-component), not $[0, 10]^T$ (the largest component). The formula picks the component along $\\mathbf{a}$, not the largest component overall.',
+      contrastCase: 'If you project $\\mathbf{b}$ onto the $y$-axis ($\\mathbf{a} = [0,1]^T$), the projection is $[0, 10]^T$ — the $y$-component.',
+    },
+    {
+      falseBelief: 'The outer product $\\mathbf{a}\\mathbf{a}^T$ and the inner product $\\mathbf{a}^T\\mathbf{a}$ are the same thing.',
+      whyStudentsThinkIt: 'Both involve the same two vectors, just in different order. Students sometimes mix them up in the projection formula.',
+      correctionExample: 'For $\\mathbf{a} = [1,2]^T$: $\\mathbf{a}^T\\mathbf{a} = 1+4 = 5$ (a scalar), while $\\mathbf{a}\\mathbf{a}^T = \\begin{bmatrix}1&2\\\\2&4\\end{bmatrix}$ (a $2\\times 2$ matrix). In $P = \\mathbf{a}\\mathbf{a}^T / \\mathbf{a}^T\\mathbf{a}$: the numerator is a matrix, the denominator is a scalar that rescales it.',
+      contrastCase: 'A scalar times a matrix is still a matrix. The projection matrix $P$ is a $2\\times 2$ matrix, not a scalar.',
+    },
+  ],
+
+  transferPrompts: [
+    {
+      situation: 'In data science, you want to project a high-dimensional dataset onto its first principal component — the direction of greatest variance.',
+      competingTechniques: ['Computing the full covariance matrix eigendecomposition', 'Random projection', 'Orthogonal projection formula'],
+      whyThisTechniqueWins: 'The first principal component is the unit vector $\\mathbf{u}$ that maximizes variance. Projecting each data point onto $\\mathbf{u}$ is exactly $\\text{proj}_{\\mathbf{u}}\\mathbf{x}_i = (\\mathbf{u}^T\\mathbf{x}_i)\\mathbf{u}$. The scalar $\\mathbf{u}^T\\mathbf{x}_i$ is the new 1D coordinate. Orthogonal projection is the mathematical core of PCA.',
+    },
+    {
+      situation: 'In signal processing, you want to extract the component of a signal at a specific frequency from a noisy measurement.',
+      competingTechniques: ['Fourier transform', 'Low-pass filter', 'Orthogonal projection onto frequency basis'],
+      whyThisTechniqueWins: 'Each frequency basis function is a vector; the signal is projected onto it. The projection coefficient is the Fourier coefficient. Orthogonality of the Fourier basis makes each coefficient independent — projecting onto one frequency does not affect others.',
+    },
+  ],
+
+  debugging: [
+    {
+      commonError: 'Computing $P = \\mathbf{a}^T\\mathbf{a}/\\mathbf{a}\\mathbf{a}^T$ (inner product over outer product) instead of $P = \\mathbf{a}\\mathbf{a}^T/\\mathbf{a}^T\\mathbf{a}$.',
+      symptom: 'You get a scalar divided by a matrix — which is undefined — or you accidentally get just a number.',
+      whyItHappened: 'The order matters: $\\mathbf{a}^T\\mathbf{a}$ is a scalar (goes in the denominator); $\\mathbf{a}\\mathbf{a}^T$ is a rank-1 matrix (goes in the numerator).',
+      repairStrategy: 'Remember: the projection matrix must be an $n\\times n$ matrix. If your calculation gives a scalar, you have the fraction upside down. Check dimensions: outer product $\\mathbf{a}\\mathbf{a}^T$ is $n\\times n$; inner product $\\mathbf{a}^T\\mathbf{a}$ is $1\\times 1$ (scalar).',
+    },
+    {
+      commonError: 'Forgetting to verify $\\mathbf{a} \\cdot \\mathbf{e} = 0$ after computing the projection.',
+      symptom: 'The computed projection seems reasonable but is actually wrong due to an arithmetic error in $c = \\mathbf{a}^T\\mathbf{b}/\\mathbf{a}^T\\mathbf{a}$.',
+      whyItHappened: 'The perpendicularity check is the gold standard for correctness — if the error is not perpendicular to the subspace, the projection is wrong. Students skip this verification.',
+      repairStrategy: 'Always compute $\\mathbf{e} = \\mathbf{b} - \\mathbf{p}$ and verify $\\mathbf{a}^T\\mathbf{e} = 0$ (or $A^T\\mathbf{e} = \\mathbf{0}$ for the subspace case). If not zero, re-check your computation of $c$.',
+    },
+  ],
+
+  mastery: {
+    targetLevel: 2,
+    solveIndependently: 'Project any vector onto a given line or 2D subspace, compute the projection matrix, and verify correctness using the perpendicularity condition.',
+    explainVerbally: 'Explain why the projection is the closest point (Pythagorean argument), why $P^2 = P$ geometrically, and how $A^TA\\hat{x} = A^Tb$ arises from perpendicularity.',
+    detectIncorrectApplication: 'Catch inner/outer product order reversal in the formula; catch a projection that fails the $A^T e = 0$ check; recognize when $A^TA$ is singular (linearly dependent columns).',
+    transferToUnfamiliar: 'Apply projection to data fitting (least squares), frequency extraction (Fourier), or PCA — anywhere you need the closest point in a linear subspace.',
+  },
 };

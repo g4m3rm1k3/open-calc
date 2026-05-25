@@ -25,7 +25,7 @@ export default {
   // ── Intuition ──────────────────────────────────────────────────
   intuition: {
     prose: [
-      '**Where you are in the story:** You have mastered Gaussian elimination — you can reduce any matrix to row echelon form. You have mastered determinants. Now you learn that Gaussian elimination itself can be packaged as a product of two triangular matrices. This packaging is LU decomposition.',
+      'Gaussian-eliminate $A = \\begin{bmatrix}2&1\\\\4&3\\end{bmatrix}$: $R_2 \\to R_2 - 2R_1$ gives $U = \\begin{bmatrix}2&1\\\\0&1\\end{bmatrix}$. The multiplier used was $m_{21} = 4/2 = 2$. Store it below the diagonal: $L = \\begin{bmatrix}1&0\\\\2&1\\end{bmatrix}$. Verify: $LU = \\begin{bmatrix}1&0\\\\2&1\\end{bmatrix}\\begin{bmatrix}2&1\\\\0&1\\end{bmatrix} = \\begin{bmatrix}2&1\\\\4+0&2+1\\end{bmatrix} = \\begin{bmatrix}2&1\\\\4&3\\end{bmatrix} = A$. The elimination multipliers ARE the entries of $L$. This is LU decomposition — you get it for free while running Gaussian elimination.',
       '**The core observation:** When you perform Gaussian elimination on $A$, you subtract multiples of rows from each other to create zeros below the diagonal. Each multiplier you use — the number you multiply the pivot row by before subtracting — gets recorded into a matrix called $L$ (Lower). The resulting upper triangular matrix is $U$ (Upper). Together, $A = L \\cdot U$.',
       'Concretely: if you eliminate column 1 of $A$ by subtracting $m_{21}$ times row 1 from row 2, and $m_{31}$ times row 1 from row 3, those multipliers $m_{21}$ and $m_{31}$ go directly into $L$ at positions $(2,1)$ and $(3,1)$. The $L$ matrix has 1s on its diagonal and the elimination multipliers below the diagonal.',
       '**Why this is useful: the two-phase solve**',
@@ -38,6 +38,7 @@ export default {
       'A **permutation matrix** $P$ is a matrix with exactly one 1 in each row and column and 0s everywhere else. Multiplying $PA$ reorders the rows of $A$ according to the swaps made.',
       '**Determinant as a byproduct**',
       'Once you have $PA = LU$, the determinant is immediate: $\\det(A) = \\det(P^{-1}) \\cdot \\det(U)$. Since $L$ has 1s on its diagonal, $\\det(L) = 1$. Since $P$ is a permutation, $\\det(P^{-1}) = \\pm 1$ (depending on the number of row swaps). And $\\det(U)$ is just the product of $U$\'s diagonal entries. This is exactly why NumPy computes determinants via LU — never via cofactor expansion.',
+      '**Predict before reading on.** If you use LU decomposition to factor $A$ once ($O(n^3)$ cost), then solve $A\\mathbf{x} = \\mathbf{b}$ for 100 different right-hand sides: how many total $O(n^2)$ solves do you perform? What is the total cost vs. factoring fresh each time? Write your estimate, then check the Computational Complexity callout.',
       '**Where this is heading:** LU decomposition is foundational for numerical linear algebra. The QR decomposition (used in eigenvalue algorithms and least squares) and the SVD (the ultimate factorization) both rely on the same factorization-then-solve pattern.',
     ],
     callouts: [
@@ -742,7 +743,114 @@ b = np.array([6., 14., 10.])
       ],
       answer: "`x = A \\ b` in MATLAB (or `np.linalg.solve(A, b)` in Python) — use LU decomposition directly.",
       hints: ["Computing `inv(A)` is more expensive AND less numerically stable than solving directly via LU. Professional code always uses `A \\ b` (MATLAB backslash) or `np.linalg.solve(A, b)`, which call LAPACK LU routines internally."],
-      reviewSection: 'Math tab — Never compute A⁻¹ callout'
-    }
-  ]
+      reviewSection: 'Math tab — Never compute A⁻¹ callout',
+    },
+    {
+      id: 'la2-006-quiz-7',
+      type: 'choice',
+      text: 'If $L = \\begin{bmatrix}1&0\\\\3&1\\end{bmatrix}$ and $U = \\begin{bmatrix}2&5\\\\0&4\\end{bmatrix}$, what is the original matrix $A = LU$?',
+      options: [
+        '$\\begin{bmatrix}2&5\\\\6&19\\end{bmatrix}$',
+        '$\\begin{bmatrix}2&5\\\\3&4\\end{bmatrix}$',
+        '$\\begin{bmatrix}5&2\\\\19&6\\end{bmatrix}$',
+        '$\\begin{bmatrix}2&5\\\\0&12\\end{bmatrix}$',
+      ],
+      answer: '$\\begin{bmatrix}2&5\\\\6&19\\end{bmatrix}$',
+      hints: ['$LU$: row 1 = $[1,0] \\cdot$ columns of $U$ = $[2,5]$. Row 2 = $[3,1] \\cdot$ columns: entry $(2,1) = 3(2)+1(0)=6$; entry $(2,2) = 3(5)+1(4)=19$.'],
+      reviewSection: 'Example 1 — verifying LU factorization',
+    },
+    {
+      id: 'la2-006-quiz-8',
+      type: 'choice',
+      text: 'To solve $L\\mathbf{y} = \\mathbf{b}$ where $L = \\begin{bmatrix}1&0\\\\2&1\\end{bmatrix}$ and $\\mathbf{b} = \\begin{bmatrix}3\\\\8\\end{bmatrix}$, what is $y_2$?',
+      options: [
+        '$y_2 = 2$ — forward substitution: $y_1 = 3$, then $2y_1 + y_2 = 8 \\Rightarrow y_2 = 2$',
+        '$y_2 = 8$',
+        '$y_2 = 14$',
+        '$y_2 = 4$',
+      ],
+      answer: '$y_2 = 2$ — forward substitution: $y_1 = 3$, then $2y_1 + y_2 = 8 \\Rightarrow y_2 = 2$',
+      hints: ['Row 1: $y_1 = 3$. Row 2: $2(3) + y_2 = 8 \\Rightarrow y_2 = 8 - 6 = 2$.'],
+      reviewSection: 'Math tab — Forward substitution formula',
+    },
+    {
+      id: 'la2-006-quiz-9',
+      type: 'choice',
+      text: 'What does partial pivoting add to the standard LU factorization?',
+      options: [
+        'A permutation matrix $P$ such that $PA = LU$ — rows are swapped before each elimination step to put the largest entry in the pivot position',
+        'An extra triangular factor $P$ that represents the permutation',
+        'Scaling of each row to make diagonal entries equal to 1',
+        'Iterative refinement to improve accuracy',
+      ],
+      answer: 'A permutation matrix $P$ such that $PA = LU$ — rows are swapped before each elimination step to put the largest entry in the pivot position',
+      hints: ['Without pivoting, a small pivot entry makes the multiplier $m_{ik} = a_{ik}/a_{kk}$ very large, amplifying rounding errors. Partial pivoting swaps the row with the largest entry to the pivot position, guaranteeing $|L_{ij}| \\leq 1$.'],
+      reviewSection: 'Intuition tab — Partial Pivoting',
+    },
+    {
+      id: 'la2-006-quiz-10',
+      type: 'choice',
+      text: 'An $n \\times n$ matrix $A$ fails to have an LU factorization without pivoting (a zero appears in the pivot position during elimination). What must be done?',
+      options: [
+        'Apply partial pivoting — swap a row to bring a nonzero entry to the pivot position, producing $PA = LU$',
+        'The matrix has no LU factorization at all and cannot be solved',
+        'Replace the zero pivot with a very small number ($\\epsilon$) to avoid division by zero',
+        'Transpose the matrix and try again',
+      ],
+      answer: 'Apply partial pivoting — swap a row to bring a nonzero entry to the pivot position, producing $PA = LU$',
+      hints: ['Every invertible matrix has an LU factorization with pivoting ($PA = LU$). Even singular matrices have a factorization (though $U$ will have a zero on its diagonal). Substituting $\\epsilon$ for zero is a numerical trick but introduces errors.'],
+      reviewSection: 'Intuition tab — Partial Pivoting',
+    },
+  ],
+
+  misconceptions: [
+    {
+      falseBelief: 'LU decomposition requires storing two separate matrices — it uses twice as much memory as $A$.',
+      whyStudentsThinkIt: 'Students think of $L$ and $U$ as two complete $n\\times n$ matrices stored separately.',
+      correctionExample: 'In practice, $L$ and $U$ are stored IN-PLACE in the same memory as $A$: the upper triangle holds $U$, and the strict lower triangle holds the multipliers of $L$ (since $L$\'s diagonal is always 1, it need not be stored). Total memory: one $n\\times n$ matrix.',
+      contrastCase: 'Contrast with eigendecomposition $A = PDP^{-1}$, which requires storing $P$, $D$, and $P^{-1}$ as three separate matrices.',
+    },
+    {
+      falseBelief: 'Solving with LU is more complex than directly applying the inverse: why not just compute $A^{-1}\\mathbf{b}$?',
+      whyStudentsThinkIt: 'Inverting a matrix and multiplying feels like one "mathematical step" — students don\'t account for the cost of computing $A^{-1}$.',
+      correctionExample: 'Computing $A^{-1}$ requires $O(n^3)$ operations and stores an additional $n\\times n$ matrix. For a single right-hand side, this is identical cost to LU but numerically less stable. For 100 right-hand sides: LU factorization once ($O(n^3)$) + 100 triangular solves ($100 \\times O(n^2)$) vs 100 full solves ($100 \\times O(n^3)$). LU is 100× cheaper.',
+      contrastCase: 'The only time computing $A^{-1}$ is justified is when you need the inverse matrix itself (e.g., for analysis or symbolic computation), not just solutions to linear systems.',
+    },
+  ],
+
+  transferPrompts: [
+    {
+      situation: 'A finite element solver must assemble a $10000 \\times 10000$ stiffness matrix and solve it for 50 different load vectors (different structural loads on the same mesh). Why is LU factorization the right approach, and what is the computational saving?',
+      competingTechniques: ['Solve the full system fresh each time using Gaussian elimination', 'Factor once with LU, then solve each load vector with triangular substitutions'],
+      whyThisTechniqueWins: 'Factoring once: $O(n^3)$ = $10^{12}$ operations. Each subsequent solve: $O(n^2) = 10^8$ operations. For 50 loads: $10^{12} + 50 \\times 10^8 = 1.05 \\times 10^{12}$ operations vs $50 \\times 10^{12}$ fresh solves — a 47.6× speedup for the amortized loads.',
+    },
+    {
+      situation: 'A robotics simulation uses LU decomposition to solve dynamics equations in real-time at 1000 Hz. Between time steps, the mass matrix $M$ (which determines how mass resists acceleration) changes slightly. Should the simulation re-factor $M$ every step, or cache and reuse the LU factorization?',
+      competingTechniques: ['Re-factor $M$ every time step', 'Cache the LU factorization and only update when $M$ changes significantly'],
+      whyThisTechniqueWins: 'If $M$ changes every time step (robot joint positions change), refactoring every step is unavoidable. But if the dynamics include slowly-changing terms, caching and reusing the factorization (or doing low-rank updates) saves significant computation. The engineer must profile the update rate vs. the factorization cost.',
+    },
+  ],
+
+  debugging: [
+    {
+      commonError: 'Placing the multiplier in the wrong position of $L$ — storing $m_{ki}$ instead of $m_{ik}$.',
+      symptom: 'The product $LU \\neq A$ — the off-diagonal entry of $L$ is in the wrong row or column.',
+      whyItHappened: 'The multiplier $m_{ik}$ eliminates row $i$ using row $k$ — it goes at position $(i,k)$ in $L$. Students sometimes store it at $(k,i)$.',
+      repairStrategy: 'Remember: $m_{ik}$ = (the entry you want to zero) / (the pivot). Row $i$, column $k$ in $L$ (below the diagonal means $i > k$). Verify: $L_{ik} \\times U_{kk}$ should reconstruct the entry in $A$ at position $(i,k)$ that was eliminated.',
+    },
+    {
+      commonError: 'Forgetting that the diagonal of $L$ must be 1s.',
+      symptom: 'Student writes a diagonal entry of $L$ as the pivot value (copying it from $A$) instead of 1.',
+      whyItHappened: '$L$ has the pivot values ON the diagonal, and students confuse $L$\'s role with $U$\'s.',
+      repairStrategy: '$L$ has 1s on its diagonal ALWAYS. The pivot values go on $U$\'s diagonal. After each elimination step, normalize: the current pivot row becomes a row of $U$ (with the pivot entry as its diagonal); the multipliers (how much of the pivot row was subtracted from lower rows) become entries of $L$ below the diagonal.',
+    },
+  ],
+
+  mastery: {
+    targetLevel: 3,
+    solveIndependently: 'Perform LU decomposition by hand on a $3\\times 3$ matrix (recording multipliers in $L$ during forward elimination), then use forward and back substitution to solve $A\\mathbf{x} = \\mathbf{b}$ for a given $\\mathbf{b}$.',
+    explainVerbally: 'Explain why LU decomposition is preferred over computing $A^{-1}$ for repeated solves, and why partial pivoting is necessary for numerical stability.',
+    detectIncorrectApplication: 'Identify when a student stores multipliers in the wrong position of $L$, forgets the 1s on $L$\'s diagonal, or accounts incorrectly for row swaps in the determinant formula.',
+    transferToUnfamiliar: 'Given a finite element stiffness matrix that changes slightly between time steps, explain the trade-off between re-factoring and updating the LU decomposition.',
+  },
 };

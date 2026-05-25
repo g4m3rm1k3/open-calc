@@ -436,6 +436,19 @@ A = np.array([
 
   challenges: [
     {
+      id: 'la1-006-ch3',
+      difficulty: 'easy',
+      problem: 'Row-reduce the augmented matrix $\\left[\\begin{array}{cc|c}2&4&10\\\\1&3&8\\end{array}\\right]$ to RREF. Identify pivot columns and write the solution.',
+      hint: 'Swap rows first to get a leading 1 without fractions. After the forward pass (zeros below pivots) you have REF — continue with back-elimination to zero out entries ABOVE the second pivot.',
+      walkthrough: [
+        { expression: 'R_1 \\leftrightarrow R_2:\\;\\left[\\begin{array}{cc|c}1&3&8\\\\2&4&10\\end{array}\\right]', annotation: 'Swap to bring a leading 1 to position (1,1). This avoids fractions from scaling row 1 by 1/2.' },
+        { expression: 'R_2-2R_1:\\;\\left[\\begin{array}{cc|c}1&3&8\\\\0&-2&-6\\end{array}\\right]', annotation: 'Forward elimination: subtract 2 × row 1 from row 2. The entry below pivot 1 is now zero.' },
+        { expression: '-\\tfrac{1}{2}R_2:\\;\\left[\\begin{array}{cc|c}1&3&8\\\\0&1&3\\end{array}\\right]', annotation: 'Scale row 2 so second pivot = 1. This is REF — note the 3 above the second pivot is still nonzero.' },
+        { expression: 'R_1-3R_2:\\;\\left[\\begin{array}{cc|c}1&0&-1\\\\0&1&3\\end{array}\\right]', annotation: 'Back-eliminate: subtract 3 × row 2 from row 1. Both pivot columns are now identity columns — this is RREF. Read: x = −1, y = 3.' },
+      ],
+      answer: 'Unique solution: $x = -1$, $y = 3$. Both columns 1 and 2 are pivot columns — no free variables.',
+    },
+    {
       id: 'la1-006-ch1',
       title: 'Classify without solving',
       difficulty: 'medium',
@@ -499,10 +512,14 @@ A = np.array([
   ],
 
   checkpoints: [
-    { id: 'cp-la1-006-1', question: 'What are the four conditions that define RREF?', answer: '(1) Leading entry in each row is 1. (2) All other entries in each pivot column are 0. (3) Each pivot is strictly right of the pivot above. (4) All-zero rows are at the bottom.' },
-    { id: 'cp-la1-006-2', question: 'What does a row $[0\\ 0\\ 0\\ |\\ 5]$ in the augmented matrix tell you?', answer: 'The system is inconsistent — no solution exists. The row reads $0 = 5$, a contradiction that no values of the variables can satisfy.' },
-    { id: 'cp-la1-006-3', question: 'How do you read the general solution when there is one free variable?', answer: 'Assign the free variable a parameter $t \\in \\mathbb{R}$. Express each pivot variable in terms of $t$ by reading its row in the RREF. The solution is a line: a particular solution plus $t$ times a null-space vector.' },
-    { id: 'cp-la1-006-4', question: 'What is the difference between Gaussian elimination and Gauss-Jordan elimination?', answer: 'Gaussian elimination creates zeros only BELOW pivots (reaching REF). Gauss-Jordan creates zeros both ABOVE and BELOW every pivot (reaching RREF), so the solution can be read without back-substitution.' },
+    { id: 'cp-la1-006-1', label: 'Read: State the four conditions that define RREF', type: 'read' },
+    { id: 'cp-la1-006-2', label: 'Read: Identify the three solution outcomes from a RREF augmented matrix', type: 'read' },
+    { id: 'cp-la1-006-3', label: 'Read: Explain the difference between REF and RREF', type: 'read' },
+    { id: 'cp-la1-006-4', label: 'Run: OpenMAT — reduce a system to RREF and classify', type: 'lab' },
+    { id: 'cp-la1-006-5', label: 'Run: Python — SymPy rref() to classify all three solution cases', type: 'lab' },
+    { id: 'cp-la1-006-6', label: 'Complete: Example 1 — full Gauss-Jordan on a 3×3 unique solution', type: 'example' },
+    { id: 'cp-la1-006-7', label: 'Complete: Example 3 — identify free variables and write general solution', type: 'example' },
+    { id: 'cp-la1-006-8', label: 'Attempt: Challenge 1 — classify system using rank without full reduction', type: 'challenge' },
   ],
 
   assessment: {
@@ -607,5 +624,98 @@ A = np.array([
       hints: ['Free variables = (number of unknowns) − (number of pivot columns) = 4 − 2 = 2. The solution is a 2-parameter family.'],
       reviewSection: 'Math tab — RREF and rank',
     },
+    {
+      id: 'la1-006-quiz-8',
+      type: 'choice',
+      text: 'The RREF of the augmented matrix is $\\left[\\begin{array}{ccc|c}1&0&2&5\\\\0&1&-1&3\\\\0&0&0&0\\end{array}\\right]$. Which expression gives the general solution?',
+      options: [
+        '$x_1 = 5 - 2t,\\; x_2 = 3 + t,\\; x_3 = t$ for any $t \\in \\mathbb{R}$',
+        '$x_1 = 5,\\; x_2 = 3,\\; x_3 = 0$',
+        'No solution — a zero row is a contradiction',
+        '$x_1 = 5 + 2t,\\; x_2 = 3 - t,\\; x_3 = 0$',
+      ],
+      answer: '$x_1 = 5 - 2t,\\; x_2 = 3 + t,\\; x_3 = t$ for any $t \\in \\mathbb{R}$',
+      hints: ['Column 3 has no leading 1 — $x_3$ is free; assign $x_3 = t$. Row 1: $x_1 + 2t = 5 \\Rightarrow x_1 = 5 - 2t$. Row 2: $x_2 - t = 3 \\Rightarrow x_2 = 3 + t$. The zero row says $0 = 0$ — redundant, not a contradiction.'],
+      reviewSection: 'Example 3 — Free Variables',
+    },
+    {
+      id: 'la1-006-quiz-9',
+      type: 'choice',
+      text: 'A system has $\\text{rank}(A) = 2$ and $\\text{rank}([A|\\mathbf{b}]) = 3$. What can you conclude?',
+      options: [
+        'The system is inconsistent — no solution exists',
+        'The system has exactly one solution',
+        'The system has infinitely many solutions',
+        'Need more information to decide',
+      ],
+      answer: 'The system is inconsistent — no solution exists',
+      hints: ['The consistency theorem: a system is consistent iff $\\text{rank}(A) = \\text{rank}([A|\\mathbf{b}])$. Here rank jumped from 2 to 3 when $\\mathbf{b}$ was appended — $\\mathbf{b}$ is outside the column space of $A$.'],
+      reviewSection: 'Math tab — Solution Existence and Uniqueness',
+    },
+    {
+      id: 'la1-006-quiz-10',
+      type: 'choice',
+      text: 'You row-reduce two different augmented matrices for the same system and get different intermediate steps, but the same final RREF. Is this possible?',
+      options: [
+        'Yes — every matrix has a unique RREF regardless of which row operations are used',
+        'No — different operations produce different RREFs',
+        'Only if you use the same number of row swaps',
+        'Only if the system has a unique solution',
+      ],
+      answer: 'Yes — every matrix has a unique RREF regardless of which row operations are used',
+      hints: ['RREF uniqueness theorem: the RREF of a matrix is unique, no matter what sequence of elementary row operations is used to reach it. Different paths → same destination.'],
+      reviewSection: 'Rigor tab — Why RREF is Unique',
+    },
   ],
+
+  misconceptions: [
+    {
+      falseBelief: 'Stopping at Row Echelon Form (REF) is the same as reaching RREF.',
+      whyStudentsThinkIt: 'Students see the staircase shape in REF and think the work is done — leading entries exist and zeros appear below pivots.',
+      correctionExample: '$\\left[\\begin{array}{cc|c}1&2&5\\\\0&1&3\\end{array}\\right]$ is REF but NOT RREF — the 2 above the second pivot is still there. RREF requires $R_1 \\to R_1 - 2R_2$, giving $\\left[\\begin{array}{cc|c}1&0&-1\\\\0&1&3\\end{array}\\right]$ where $x=-1$ reads directly.',
+      contrastCase: 'From REF you still need back-substitution ($y=3$, then $x=5-2(3)=-1$). From RREF you just read the last column directly. Both give $x=-1$, $y=3$.',
+    },
+    {
+      falseBelief: 'A zero row $[0\\ 0\\ 0\\ |\\ 0]$ in the augmented matrix means no solution.',
+      whyStudentsThinkIt: 'Students see zeros and think "something went wrong," confusing the harmless all-zero row with the contradiction row $[0\\ 0\\ 0\\ |\\ k \\neq 0]$.',
+      correctionExample: 'The row $[0\\ 0\\ |\\ 0]$ reads $0x + 0y = 0$, i.e., $0 = 0$ — true for ALL values. It is redundant (one equation was a multiple of another). The row $[0\\ 0\\ |\\ 5]$ reads $0 = 5$ — THAT is the contradiction.',
+      contrastCase: 'Zero row → redundant equation → free variable may exist. Contradiction row $[0 \\cdots 0 \\mid k \\neq 0]$ → inconsistent, no solution.',
+    },
+  ],
+
+  transferPrompts: [
+    {
+      situation: 'You need to find the null space of a 3×4 matrix A (all x such that Ax=0). Which tool applies?',
+      competingTechniques: ['np.linalg.solve (for Ax=b with specific b)', 'RREF of [A|0]', 'np.linalg.det(A)'],
+      whyThisTechniqueWins: 'Set up [A|0] and compute RREF. Free variable columns directly yield null space basis vectors. np.linalg.solve only handles unique solutions; det only applies to square matrices and gives no vector information.',
+    },
+    {
+      situation: 'Given 5 vectors in ℝ³, determine if they are linearly independent and identify any redundant ones.',
+      competingTechniques: ['RREF of matrix with vectors as columns', 'Compute a 5×5 determinant', 'Visual inspection'],
+      whyThisTechniqueWins: 'Form a 3×5 matrix with the vectors as columns and compute RREF. Pivot columns are independent; non-pivot columns are linear combinations of earlier pivots. Determinants only work on square matrices and give a single number, not which vectors are redundant.',
+    },
+  ],
+
+  debugging: [
+    {
+      commonError: 'Eliminating only below each pivot — stopping at REF instead of completing RREF.',
+      symptom: 'Nonzero entries remain above pivot positions; reading the solution requires back-substitution that was skipped.',
+      whyItHappened: 'Students learn forward elimination first and treat it as the complete algorithm, forgetting the back-elimination pass that zeroes entries ABOVE each pivot.',
+      repairStrategy: 'After all pivots are set to 1 with zeros below, do a second pass from bottom to top: for each pivot row, subtract the appropriate multiple from every row above it. Verify: each pivot column should look exactly like an identity column (1 in one spot, 0 everywhere else).',
+    },
+    {
+      commonError: 'Confusing pivot variables and free variables when writing the general solution.',
+      symptom: 'The general solution fails verification — plugging the parameterized answer back into the original equations gives a nonzero result.',
+      whyItHappened: 'Students sometimes express a pivot variable as the parameter or solve a free-variable column instead of the pivot column.',
+      repairStrategy: 'Mark pivot columns first (columns with a leading 1 and all other entries 0). Free variables come from non-pivot columns — assign those the parameters ($t$, $s$). Then read each pivot variable from its row. Verify with $t=0$ (particular solution) and $t=1$.',
+    },
+  ],
+
+  mastery: {
+    targetLevel: 3,
+    solveIndependently: 'Row-reduce any augmented matrix to RREF by hand, identify pivot and free columns, and write the complete general solution with parameters.',
+    explainVerbally: 'Explain why a pivot in the augmented column signals no solution, why a zero row signals a free variable, and how RREF differs from REF.',
+    detectIncorrectApplication: 'Identify when a student stops at REF instead of RREF, confuses free and pivot variables, or misreads a zero row as a contradiction.',
+    transferToUnfamiliar: 'Use RREF to find a basis for the null space of a non-square matrix: compute RREF of [A|0] and extract the free-variable direction vectors.',
+  },
 };

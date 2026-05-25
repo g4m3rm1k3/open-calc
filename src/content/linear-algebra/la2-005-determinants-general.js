@@ -25,7 +25,7 @@ export default {
   // ── Intuition ──────────────────────────────────────────────────
   intuition: {
     prose: [
-      '**Where you are in the story:** In the last lesson you learned that the determinant of a 2×2 matrix measures how much area is scaled — and that a determinant of zero means space collapses irreversibly. Now you face a 3×3 matrix. The formula $ad - bc$ does not even have enough letters. You need a systematic method.',
+      'Expand $\\det\\begin{bmatrix}1&2&3\\\\4&5&6\\\\7&8&9\\end{bmatrix}$ along row 1: $1\\cdot\\det\\begin{bmatrix}5&6\\\\8&9\\end{bmatrix} - 2\\cdot\\det\\begin{bmatrix}4&6\\\\7&9\\end{bmatrix} + 3\\cdot\\det\\begin{bmatrix}4&5\\\\7&8\\end{bmatrix}$. The three $2\\times 2$ determinants: $(45-48)=-3$, $(36-42)=-6$, $(32-35)=-3$. Total: $1(-3)-2(-6)+3(-3) = -3+12-9 = 0$. Zero — space collapses. Notice: row 3 = row 1 + row 2. Dependent rows ALWAYS give $\\det = 0$. The pattern for $3\\times 3$ (expand along a row, peel off $2\\times 2$ minors) extends the $ad-bc$ idea to any size matrix.',
       'The key insight is: **a 3×3 determinant can be reduced to a sum of three 2×2 determinants**. Pick any row or column. Multiply each entry by the determinant of the "leftover" 2×2 matrix you get by deleting that entry\'s row and column. Apply a checkerboard of plus and minus signs. Add everything up. This is called **cofactor expansion**.',
       '**Before cofactor expansion makes sense, two terms must be defined:**',
       '**Minor $M_{ij}$** — For the entry at row $i$, column $j$, delete that entire row and that entire column from the matrix. The determinant of what remains is the minor $M_{ij}$. For a 3×3 matrix, each minor is a 2×2 determinant you already know how to compute.',
@@ -37,6 +37,7 @@ export default {
       '• **Row replacement**: Adding a multiple of one row to another row is a shear — it does not change volume. Determinant is unchanged. This is the most important property for computation.',
       '• **Triangular matrices**: All the volume information lives on the diagonal. $\\det = $ product of diagonal entries — no cofactor expansion needed.',
       '• **$\\det(AB) = \\det(A) \\cdot \\det(B)$**: If $A$ scales volume by 3 and $B$ scales it by 2, composing them scales by 6. This is the most important property for theory.',
+      '**Predict before reading on.** If you double row 2 of a $3\\times 3$ matrix $A$, what happens to $\\det(A)$? If you swap rows 1 and 2? Write your guesses, then verify with the Seven Properties callout.',
       '**Where this is heading:** The next lesson (LU Decomposition) is Gaussian elimination tracked as a product of matrices. Because row replacements do not change the determinant, the LU process computes $\\det(A)$ as a free byproduct — just the product of the diagonal of $U$, adjusted for any row swaps.',
     ],
     callouts: [
@@ -681,7 +682,114 @@ A = np.array([[2., 0., 1.],
       ],
       answer: "Use LU decomposition (or call `np.linalg.det()`) — it runs in $O(n^3)$ time.",
       hints: ["Cofactor expansion is $O(10!) = 3{,}628{,}800$ multiplications. LU decomposition is $O(10^3) = 1{,}000$. Both give the same answer, but LU is 3,628× faster for $n=10$ and astronomically faster for larger matrices."],
-      reviewSection: 'Rigor tab — Computational complexity'
-    }
-  ]
+      reviewSection: 'Rigor tab — Computational complexity',
+    },
+    {
+      id: 'la2-005-quiz-7',
+      type: 'choice',
+      text: 'Expand $\\det\\begin{bmatrix}2&0&0\\\\1&3&0\\\\4&5&6\\end{bmatrix}$ along column 1. What is the determinant?',
+      options: [
+        '36 — lower triangular, so det = product of diagonal = $2 \\times 3 \\times 6$',
+        '0 — the last column has a zero in the first row',
+        '11 — sum of the diagonal entries',
+        '−36 — the negative diagonal product',
+      ],
+      answer: '36 — lower triangular, so det = product of diagonal = $2 \\times 3 \\times 6$',
+      hints: ['Lower triangular: det = product of diagonal entries (same rule as upper triangular). $2 \\times 3 \\times 6 = 36$. You can verify with cofactor expansion along column 1 but the triangular rule is faster.'],
+      reviewSection: 'Math tab — Triangular matrix determinant',
+    },
+    {
+      id: 'la2-005-quiz-8',
+      type: 'choice',
+      text: 'You scale a $3 \\times 3$ matrix $A$ (every entry multiplied by 5) to get $5A$. What is $\\det(5A)$ in terms of $\\det(A)$?',
+      options: [
+        '$125 \\det(A)$ — each row is scaled by 5, so the det is scaled by $5^3$',
+        '$5 \\det(A)$ — you scale by 5 once',
+        '$25 \\det(A)$ — you scale by $5^2$',
+        '$\\det(A)$ — scaling the matrix does not change the determinant',
+      ],
+      answer: '$125 \\det(A)$ — each row is scaled by 5, so the det is scaled by $5^3$',
+      hints: ['Scaling an entire $n \\times n$ matrix by $c$ scales the determinant by $c^n$. For $n=3$: $\\det(5A) = 5^3 \\det(A) = 125\\det(A)$. Each row scale-by-5 multiplies the determinant by 5, and there are 3 rows.'],
+      reviewSection: 'Math tab — Property 3: scaling a row',
+    },
+    {
+      id: 'la2-005-quiz-9',
+      type: 'choice',
+      text: 'A $3\\times 3$ matrix $A$ has two identical rows. What is $\\det(A)$?',
+      options: [
+        '0 — identical rows mean the matrix is singular',
+        '1 — identical rows cancel each other out',
+        'Impossible to determine without knowing all entries',
+        '2 — the identical rows contribute double',
+      ],
+      answer: '0 — identical rows mean the matrix is singular',
+      hints: ['If rows $i$ and $j$ are identical, swapping them changes nothing (the matrix is the same), but a row swap multiplies the determinant by $-1$. So $\\det = -\\det \\Rightarrow \\det = 0$.'],
+      reviewSection: 'Math tab — Property 6: identical rows',
+    },
+    {
+      id: 'la2-005-quiz-10',
+      type: 'choice',
+      text: 'Which row to expand along to minimize cofactor computation in $A = \\begin{bmatrix}0&0&1\\\\2&3&4\\\\0&5&0\\end{bmatrix}$?',
+      options: [
+        'Row 1 — it has the most zeros, so two of the three cofactors multiply by 0 and can be skipped',
+        'Row 2 — it has the largest entries, giving the most accurate computation',
+        'Row 3 — it has two zeros, equally good',
+        'Column 1 — columns cannot be used in cofactor expansion',
+      ],
+      answer: 'Row 1 — it has the most zeros, so two of the three cofactors multiply by 0 and can be skipped',
+      hints: ['Pick the row (or column) with the most zeros — each zero eliminates one cofactor computation. Row 1 = $[0,0,1]$ has two zeros: expand along it and only one $2\\times 2$ minor needs computing. Row 3 = $[0,5,0]$ also has two zeros — equally efficient.'],
+      reviewSection: 'Math tab — Cofactor expansion strategy',
+    },
+  ],
+
+  misconceptions: [
+    {
+      falseBelief: 'Scaling an $n\\times n$ matrix by $c$ multiplies the determinant by $c$ (not $c^n$).',
+      whyStudentsThinkIt: 'Students apply the scalar multiplication rule entry-by-entry: "I scaled every entry by $c$, so everything scales by $c$."',
+      correctionExample: '$A = \\begin{bmatrix}1&0\\\\0&1\\end{bmatrix}$, $\\det = 1$. Now $3A = \\begin{bmatrix}3&0\\\\0&3\\end{bmatrix}$, $\\det = 9 = 3^2$. Each ROW gets scaled by 3, and each scaling multiplies the det by 3. With 2 rows: $3^2 = 9$.',
+      contrastCase: '$\\det(cA) = c^n \\det(A)$ for $n\\times n$ matrices. This is completely different from the scalar case where $c \\cdot (\\det A)$ would only scale once. Always raise $c$ to the $n$-th power.',
+    },
+    {
+      falseBelief: 'Cofactor expansion always gives a different answer depending on which row you expand along.',
+      whyStudentsThinkIt: 'The computation looks different when you use different rows or columns — students assume the result changes too.',
+      correctionExample: 'The determinant is unique — cofactor expansion along ANY row or column gives the same value. Row 1 expansion of $\\begin{bmatrix}1&2\\\\3&4\\end{bmatrix}$: $1(4) - 2(3) = -2$. Column 2 expansion: $-2(3) + 4(1) = -2$. Always $-2$.',
+      contrastCase: 'This is analogous to computing the area of a parallelogram — you can use base×height along any side and you always get the same area.',
+    },
+  ],
+
+  transferPrompts: [
+    {
+      situation: 'A structural engineer writes a system of 3 equations for the forces in a truss. She sets up the $3\\times 3$ coefficient matrix and computes its determinant — it comes out to 0. What does this tell her about the truss?',
+      competingTechniques: ['Attempt to solve the system anyway', 'Interpret the zero determinant geometrically'],
+      whyThisTechniqueWins: 'Determinant 0 means the system is singular — either no solution (the truss is over-constrained with contradictory forces) or infinitely many (under-determined, meaning the truss can deform without any applied forces — a structural failure mode). The determinant gives this diagnosis before any solving.',
+    },
+    {
+      situation: 'In 3D computer graphics, a bounding-box computation needs to check whether three points are collinear (all on one line). You have three 3D points $P_1, P_2, P_3$. How do you test collinearity using a determinant?',
+      competingTechniques: ['Compute parametric line equations and check each point', 'Form a 3×3 matrix with the points as rows and compute the determinant'],
+      whyThisTechniqueWins: 'Form the matrix with rows $[P_1, 1]$, $[P_2, 1]$, $[P_3, 1]$ (homogeneous coordinates). $\\det = 0$ iff the three points are collinear (lie on one line). This is one matrix computation instead of three parametric substitutions, and it generalizes naturally to higher dimensions.',
+    },
+  ],
+
+  debugging: [
+    {
+      commonError: 'Sign error in cofactor expansion — forgetting the alternating $+, -, +, -, \\ldots$ sign pattern.',
+      symptom: 'Student computes each minor correctly but the final determinant has the wrong sign.',
+      whyItHappened: 'The cofactor $C_{ij} = (-1)^{i+j} M_{ij}$. Students forget the $(-1)^{i+j}$ factor, especially for off-diagonal entries.',
+      repairStrategy: 'Use the checkerboard pattern: $\\begin{bmatrix}+&-&+\\\\-&+&-\\\\+&-&+\\end{bmatrix}$. Write the signs on the matrix before computing. The top-left is always $+$, and signs alternate. For expansion along row $i$, start at $+$ if $i$ is odd, $-$ if $i$ is even (column 1), and alternate.',
+    },
+    {
+      commonError: 'Confusing the minor $M_{ij}$ (the sub-matrix) with the cofactor $C_{ij}$ (the signed minor).',
+      symptom: 'Student correctly deletes row $i$ and column $j$ but omits the sign $(-1)^{i+j}$.',
+      whyItHappened: 'Two different but related terms; students remember to delete but forget to sign.',
+      repairStrategy: 'Always write both steps: (1) delete row $i$ and column $j$ to get minor $M_{ij}$; (2) multiply by $(-1)^{i+j}$ to get cofactor $C_{ij}$; (3) multiply by entry $a_{ij}$. The determinant is $\\sum_j a_{ij} C_{ij}$.',
+    },
+  ],
+
+  mastery: {
+    targetLevel: 3,
+    solveIndependently: 'Compute the determinant of any $3\\times 3$ matrix by cofactor expansion along the row or column with the most zeros, track sign changes through row swaps in row reduction, and compute $\\det(AB)$ using multiplicativity.',
+    explainVerbally: 'Explain why identical rows give $\\det = 0$, why a row swap flips the sign, and why LU decomposition is preferred over cofactor expansion for large matrices.',
+    detectIncorrectApplication: 'Identify when a student forgets the $(-1)^{i+j}$ sign in cofactor expansion, or applies $\\det(cA) = c\\det(A)$ instead of $c^n\\det(A)$.',
+    transferToUnfamiliar: 'Given a system of equations representing a physical network, use the determinant to predict (before solving) whether the system has a unique solution, no solution, or infinitely many.',
+  },
 };

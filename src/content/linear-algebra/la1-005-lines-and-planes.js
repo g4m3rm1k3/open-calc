@@ -13,6 +13,7 @@ export default {
   prerequisites: ['la1-003', 'la1-004'],
   nextLesson: 'la1-006',
 
+  hook: {
     question: "You're designing a robot arm. The end-effector must travel in a straight line in 3D space. How do you describe that line mathematically — and how do you tell if two robot paths will collide?",
     realWorldContext: "Every 3D graphics engine, robotics planner, and physics simulator must answer questions about lines and planes thousands of times per second. Collision detection is a line-plane intersection test. Flight simulators check whether a wing intersects the ground plane. Ray tracing (the rendering algorithm inside Pixar films) fires rays — lines — and finds intersections with planes to determine what a camera sees. The math is all here.",
     previewVisualizationId: 'ProjectionMatrixViz',
@@ -20,7 +21,7 @@ export default {
 
   intuition: {
     prose: [
-      '**Where you are in the story:** You know what vectors are and how to take dot and cross products. Now we use those tools to describe geometric objects — lines and planes — in a way that extends naturally to any dimension.',
+      'Start at the point $(1, 2, -1)$ and walk in direction $[3, -1, 2]$. After $t = 0$: you are at $(1, 2, -1)$. After $t = 1$: $(4, 1, 1)$. After $t = -1$: $(-2, 3, -3)$. The formula $(1+3t,\\ 2-t,\\ -1+2t)$ visits every point on an infinite straight line — one free parameter $t$ traces the whole thing. This is the **parametric form** of a line. Now, to describe a flat surface (a plane) in 3D, a direction to walk *along* the surface is not enough — you need the one direction that is perpendicular to the entire surface: the **normal vector**.',
       'Think of a line in 3D. You need two pieces of information: a **point** you start from, and a **direction** to travel. If you start at point $P_0$ and walk in direction $\\mathbf{d}$, after time $t$ you are at $P_0 + t\\mathbf{d}$. That simple idea is the parametric equation of a line.',
       'A plane needs a different description. Instead of a direction to travel ALONG the plane, it is easier to give a direction PERPENDICULAR to the plane — the **normal vector** $\\mathbf{n}$. Every point $\\mathbf{x}$ on the plane satisfies $\\mathbf{n} \\cdot (\\mathbf{x} - P_0) = 0$: the vector from $P_0$ to $\\mathbf{x}$ is perpendicular to $\\mathbf{n}$.',
       '**Why does the cross product appear here?** If you know two vectors lying IN a plane (say the edges of a triangle), their cross product is perpendicular to both — it IS the normal vector. So the cross product is the machine for finding plane equations from geometric data.',      '**Predict before reading the intersection formula:** the line $\\mathbf{r}(t) = (2,0,1) + t[1,2,-1]$ and the plane $x + 2y - z = 4$. Compute $\\mathbf{n} \\cdot \\mathbf{d}_{\\text{line}} = [1,2,-1]\\cdot[1,2,-1]$ mentally. Is the line parallel to the plane, or will it intersect at one point? Hold your answer until Example 3.',      'Lines and planes are the 1D and 2D linear subspaces (shifted by a point) of 3D space. Every linear algebra concept — span, basis, orthogonality — has a concrete geometric home in lines and planes.',
@@ -730,7 +731,7 @@ C = np.array([0.0, 0.0, 3.0])
 
   // ── Mastery ────────────────────────────────────────────────────────
   mastery: {
-    targetLevel: 'Write parametric and scalar equations for lines and planes; compute normals via cross product; apply the line-plane intersection formula; compute point-to-plane distance.',
+    targetLevel: 2,
     solveIndependently: 'Given three points in ℝ³, find the plane equation (ax+by+cz=d) by hand and verify all three points satisfy it.',
     explainVerbally: 'Explain why a normal vector cannot be used as a line direction lying in the plane, and why a single equation in 3D defines a plane rather than a line.',
     detectIncorrectApplication: 'Catch when a classmate uses norm(n) in OpenMAT (fails on column vectors — use sqrt(dot(n,n))), or writes a single equation and calls it a line in 3D.',

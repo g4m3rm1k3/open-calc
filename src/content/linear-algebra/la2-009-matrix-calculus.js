@@ -20,10 +20,12 @@ export default {
 
   intuition: {
     prose: [
+      'Take $\\mathbf{x}_0 = [1, 2]^\\top$ and $A = \\begin{bmatrix}3&1\\\\1&2\\end{bmatrix}$. The function $f(\\mathbf{x}) = \\mathbf{x}^\\top A \\mathbf{x}$ evaluates to $15$ at $\\mathbf{x}_0$. One formula gives the gradient instantly: $\\nabla f = 2A\\mathbf{x}_0 = 2\\begin{bmatrix}3&1\\\\1&2\\end{bmatrix}\\begin{bmatrix}1\\\\2\\end{bmatrix} = \\begin{bmatrix}10\\\\10\\end{bmatrix}$. This tells you: from $\\mathbf{x}_0$, moving in direction $[10,10]^\\top$ increases $f$ fastest; gradient descent steps the opposite way. That single formula — $\\nabla(\\mathbf{x}^\\top A\\mathbf{x}) = 2A\\mathbf{x}$ — drives least squares, ridge regression, and neural network training.',
       '**Derivatives of scalars with respect to vectors — the gradient.** If $f(\\mathbf{x})$ maps a vector $\\mathbf{x} \\in \\mathbb{R}^n$ to a scalar, the gradient $\\nabla f$ is a column vector of partial derivatives: $\\nabla f = \\bigl[\\partial f/\\partial x_1, \\ldots, \\partial f/\\partial x_n\\bigr]^\\top$. The gradient points in the direction of steepest ascent. Gradient descent moves opposite to it.',
       '**Derivatives of vectors with respect to vectors — the Jacobian.** If $\\mathbf{f}(\\mathbf{x})$ maps $\\mathbf{x} \\in \\mathbb{R}^n$ to $\\mathbf{f} \\in \\mathbb{R}^m$, the Jacobian $J$ is an $m \\times n$ matrix where $J_{ij} = \\partial f_i / \\partial x_j$. The Jacobian is the best linear approximation to $\\mathbf{f}$ at a point — the multivariable analogue of the single-variable derivative.',
       '**The Hessian — second-order information.** For a scalar function $f: \\mathbb{R}^n \\to \\mathbb{R}$, the Hessian $H$ is the $n \\times n$ matrix of second partial derivatives: $H_{ij} = \\partial^2 f / \\partial x_i \\partial x_j$. By Schwarz\'s theorem, the Hessian is always symmetric ($H = H^\\top$). Its eigenvalues tell you the curvature in each principal direction. Positive definite Hessian → local minimum. Indefinite Hessian → saddle point.',
       '**Two critical formulas to memorize.** For $f(\\mathbf{x}) = \\mathbf{a}^\\top \\mathbf{x}$ (linear), the gradient is $\\nabla f = \\mathbf{a}$. For $f(\\mathbf{x}) = \\mathbf{x}^\\top A \\mathbf{x}$ (quadratic form with symmetric $A$), the gradient is $\\nabla f = 2A\\mathbf{x}$, and the Hessian is $H = 2A$. These two formulas appear everywhere in statistics (least squares), physics (energy), and ML (loss functions).',
+      '**Predict before reading on.** A neural network has two layers: $\\mathbf{z} = W_1\\mathbf{x}$ then $\\mathbf{y} = W_2\\mathbf{z}$, so $\\mathbf{y} = W_2 W_1 \\mathbf{x}$. If the loss is $L = \\frac{1}{2}\\|\\mathbf{y} - \\mathbf{t}\\|^2$, what is $\\partial L/\\partial \\mathbf{x}$? Write your answer in terms of $W_1$, $W_2$, $\\mathbf{y}$, and $\\mathbf{t}$ before continuing.',
     ],
     callouts: [
       {
@@ -545,5 +547,112 @@ print(f"f(x*) = {f(x_star):.6f}  (minimum value)")`,
       hints: ['Each layer is a function. The loss gradient w.r.t. the first layer\'s input is $J_1^\\top J_2^\\top \\cdots J_L^\\top \\nabla_{\\text{output}} L$ — the chain rule applied in reverse (backpropagation). Each $J_k^\\top$ is a transposed weight matrix times a diagonal activation derivative matrix.'],
       reviewSection: 'Rigor tab — Chain Rule as Matrix Multiplication',
     },
+    {
+      id: 'la2-009-quiz-7',
+      type: 'choice',
+      text: 'For $f(\\mathbf{x}) = \\mathbf{a}^\\top\\mathbf{x}$ with constant $\\mathbf{a} \\in \\mathbb{R}^n$, the gradient $\\nabla f$ and Hessian $H$ are:',
+      options: [
+        '$\\nabla f = \\mathbf{a}$, $H = \\mathbf{a}\\mathbf{a}^\\top$',
+        '$\\nabla f = \\mathbf{a}$, $H = 0$ (zero matrix)',
+        '$\\nabla f = \\mathbf{a}^\\top$, $H = I$',
+        '$\\nabla f = \\|\\mathbf{a}\\|$, $H = 0$',
+      ],
+      answer: '$\\nabla f = \\mathbf{a}$, $H = 0$ (zero matrix)',
+      hints: ['$\\mathbf{a}^\\top\\mathbf{x} = a_1x_1 + \\cdots + a_nx_n$. Each partial $\\partial f/\\partial x_k = a_k$, so $\\nabla f = \\mathbf{a}$. The gradient is constant, so all second partials are zero: $H = 0$.'],
+      reviewSection: 'Intuition tab — critical formulas',
+    },
+    {
+      id: 'la2-009-quiz-8',
+      type: 'choice',
+      text: 'The Jacobian of $\\mathbf{f}(\\mathbf{x}) = A\\mathbf{x}$ (a linear map) is:',
+      options: [
+        'The matrix $A^\\top$',
+        'The matrix $A$ itself',
+        'The identity matrix $I$',
+        'The matrix $A^\\top A$',
+      ],
+      answer: 'The matrix $A$ itself',
+      hints: ['$f_i(\\mathbf{x}) = \\sum_j a_{ij} x_j$, so $\\partial f_i/\\partial x_j = a_{ij}$. The Jacobian entry $(i,j)$ is exactly $a_{ij}$. The Jacobian of a linear map is the map itself — $J = A$.'],
+      reviewSection: 'Examples tab — Example 3 (Jacobian of a vector function)',
+    },
+    {
+      id: 'la2-009-quiz-9',
+      type: 'choice',
+      text: 'You minimize $f(\\mathbf{x}) = \\|A\\mathbf{x} - \\mathbf{b}\\|^2$ by setting $\\nabla f = \\mathbf{0}$. The resulting system is:',
+      options: [
+        '$A\\mathbf{x} = \\mathbf{b}$',
+        '$A^\\top A\\mathbf{x} = A^\\top\\mathbf{b}$',
+        '$AA^\\top\\mathbf{x} = A\\mathbf{b}$',
+        '$A^\\top\\mathbf{x} = \\mathbf{b}$',
+      ],
+      answer: '$A^\\top A\\mathbf{x} = A^\\top\\mathbf{b}$',
+      hints: ['$\\nabla f = 2A^\\top(A\\mathbf{x} - \\mathbf{b}) = \\mathbf{0}$ gives $A^\\top A\\mathbf{x} = A^\\top\\mathbf{b}$. These are the normal equations of least squares. The factor of 2 cancels when you divide both sides.'],
+      reviewSection: 'Math tab — least squares normal equation',
+    },
+    {
+      id: 'la2-009-quiz-10',
+      type: 'choice',
+      text: 'For gradient descent on $f(\\mathbf{x}) = \\mathbf{x}^\\top A\\mathbf{x}$ (symmetric positive definite $A$), convergence slows when:',
+      options: [
+        'The matrix $A$ is large (high dimension).',
+        'The condition number $\\kappa = \\lambda_{\\max}/\\lambda_{\\min}$ is much larger than 1.',
+        'The gradient at the starting point is small.',
+        'The learning rate $\\alpha$ is exactly $1/\\lambda_{\\max}$.',
+      ],
+      answer: 'The condition number $\\kappa = \\lambda_{\\max}/\\lambda_{\\min}$ is much larger than 1.',
+      hints: ['Convergence rate per step is $(\\kappa-1)/(\\kappa+1)$. When $\\kappa \\gg 1$ (ill-conditioned), this is close to 1, meaning each step barely reduces the error. The function is elongated like an ellipse: gradient descent zigzags along the long axis instead of heading straight to the minimum.'],
+      reviewSection: 'Rigor tab — Convergence Rate callout',
+    },
   ],
+
+  misconceptions: [
+    {
+      falseBelief: 'The gradient of $f(\\mathbf{x})$ is a row vector (same as $\\mathbf{x}^\\top$).',
+      whyStudentsThinkIt: 'Many ML papers and textbooks use numerator layout, where $\\nabla f$ is written as a row vector so that $df = \\nabla f \\, d\\mathbf{x}$ is a scalar product of two row/column vectors. This convention switch causes confusion when switching resources.',
+      correctionExample: 'In denominator layout (used here), $\\nabla f \\in \\mathbb{R}^n$ is a column vector — same shape as $\\mathbf{x}$. At $\\mathbf{x} = [1,2]^\\top$ with $f(\\mathbf{x}) = 3x_1 + x_2$, $\\nabla f = [3, 1]^\\top$ (column). The gradient update $\\mathbf{x} \\leftarrow \\mathbf{x} - \\alpha\\nabla f$ must be column minus column.',
+      contrastCase: 'The Fréchet derivative $Df_{\\mathbf{x}_0}$ acts as a linear functional on displacement vectors $\\mathbf{h}$, so it is naturally a row vector $\\nabla f^\\top$. The gradient itself is the column vector obtained by transposing this row.',
+    },
+    {
+      falseBelief: 'The Hessian $H = \\nabla^2 f$ is the derivative of the gradient vector — so it should be a vector, not a matrix.',
+      whyStudentsThinkIt: 'Students apply 1D intuition: the second derivative of $f(x)$ is a scalar. In multiple dimensions the "derivative of the gradient" is the Jacobian of the gradient map $\\nabla f: \\mathbb{R}^n \\to \\mathbb{R}^n$, which is an $n \\times n$ matrix.',
+      correctionExample: 'For $f(\\mathbf{x}) = x_1^2 + 3x_1x_2 + x_2^2$, $\\nabla f = [2x_1 + 3x_2, 3x_1 + 2x_2]^\\top$. The Hessian is $H = \\begin{bmatrix}2&3\\\\3&2\\end{bmatrix}$ — the Jacobian of $\\nabla f$. Entry $H_{ij} = \\partial^2 f/\\partial x_i\\partial x_j$.',
+      contrastCase: 'For a truly linear function $f(\\mathbf{x}) = \\mathbf{c}^\\top\\mathbf{x}$, the gradient is constant $\\nabla f = \\mathbf{c}$, so its Jacobian (the Hessian) is the zero matrix — analogous to how the second derivative of a linear 1D function is zero.',
+    },
+  ],
+
+  transferPrompts: [
+    {
+      situation: 'You are calibrating a camera. The reprojection error $E(\\boldsymbol{\\theta}) = \\sum_i \\|\\mathbf{p}_i - \\hat{\\mathbf{p}}_i(\\boldsymbol{\\theta})\\|^2$ is a nonlinear function of camera parameters $\\boldsymbol{\\theta}$. You want to minimize $E$ using Gauss-Newton.',
+      competingTechniques: 'Gradient descent (first-order, slow near minimum), Gauss-Newton (approximate Hessian using Jacobian $J^\\top J$), full Newton\'s method (exact Hessian, expensive to compute).',
+      whyThisTechniqueWins: 'Gauss-Newton approximates the Hessian as $J^\\top J$ where $J = \\partial\\hat{\\mathbf{p}}/\\partial\\boldsymbol{\\theta}$ is the Jacobian of the prediction function. This avoids second-derivative computation while achieving near-quadratic convergence near the optimum — exploiting matrix calculus knowledge about Jacobians and normal equations.',
+    },
+    {
+      situation: 'A physical simulation tracks how a particle\'s position $\\mathbf{p}(t)$ evolves. You need to propagate uncertainty: if initial position has covariance $\\Sigma_0$, what is the covariance $\\Sigma_t$ at time $t$?',
+      competingTechniques: 'Monte Carlo sampling (simulate many particles, expensive), linearization via Jacobian (first-order approximation, cheap), unscented transform (sigma-point approximation, moderate cost).',
+      whyThisTechniqueWins: 'The extended Kalman filter uses the Jacobian $J = \\partial\\mathbf{p}_t/\\partial\\mathbf{p}_0$ to propagate uncertainty: $\\Sigma_t \\approx J\\Sigma_0 J^\\top$. This covariance propagation formula is exactly the Jacobian-as-linear-approximation idea — the local linearization of the dynamics maps the uncertainty ellipsoid forward in time.',
+    },
+  ],
+
+  debugging: [
+    {
+      commonError: 'Forgetting the transpose in the least-squares gradient: writing $\\nabla\\|A\\mathbf{x}-\\mathbf{b}\\|^2 = 2A(A\\mathbf{x}-\\mathbf{b})$ instead of $2A^\\top(A\\mathbf{x}-\\mathbf{b})$.',
+      symptom: 'The resulting normal equations $AA\\mathbf{x} = A\\mathbf{b}$ have dimension mismatch if $A$ is not square: $A$ is $m\\times n$, $A(A\\mathbf{x}-\\mathbf{b})$ would require multiplying an $m\\times n$ matrix by an $m$-vector — dimension error.',
+      whyItHappened: 'The chain rule for $\\|\\mathbf{v}\\|^2 = \\mathbf{v}^\\top\\mathbf{v}$ gives gradient $2\\mathbf{v}$ with respect to $\\mathbf{v}$, but then the chain rule through $\\mathbf{v} = A\\mathbf{x}$ introduces $A^\\top$ (the Jacobian of $A\\mathbf{x}$ w.r.t. $\\mathbf{x}$ transposed): $\\partial/\\partial\\mathbf{x}[\\mathbf{v}(\\mathbf{x})^\\top\\mathbf{v}(\\mathbf{x})] = 2(\\partial\\mathbf{v}/\\partial\\mathbf{x})^\\top\\mathbf{v} = 2A^\\top\\mathbf{v}$.',
+      repairStrategy: 'Always check dimension consistency. The gradient must be in $\\mathbb{R}^n$ (same as $\\mathbf{x}$). $A^\\top(A\\mathbf{x}-\\mathbf{b})$: $A^\\top$ is $n\\times m$, $(A\\mathbf{x}-\\mathbf{b})$ is $m\\times 1$, product is $n\\times 1$. Dimensions match.',
+    },
+    {
+      commonError: 'Applying the formula $\\nabla(\\mathbf{x}^\\top A\\mathbf{x}) = 2A\\mathbf{x}$ when $A$ is not symmetric, getting a wrong gradient.',
+      symptom: 'The gradient computed symbolically disagrees with numerical finite differences. For non-symmetric $A$, the formula gives $2A\\mathbf{x}$ but the correct answer is $(A + A^\\top)\\mathbf{x}$.',
+      whyItHappened: 'The derivation $\\partial f/\\partial x_k = \\sum_j a_{kj}x_j + \\sum_i a_{ik}x_i = 2\\sum_j a_{kj}x_j$ uses $a_{kj} = a_{jk}$ (symmetry) to combine the two sums. Without symmetry, the two sums give different terms: $(A\\mathbf{x})_k$ and $(A^\\top\\mathbf{x})_k$.',
+      repairStrategy: 'Either symmetrize first: $\\mathbf{x}^\\top A\\mathbf{x} = \\mathbf{x}^\\top\\frac{A+A^\\top}{2}\\mathbf{x}$ (the antisymmetric part cancels), then apply the formula. Or use the general identity $\\nabla(\\mathbf{x}^\\top A\\mathbf{x}) = (A + A^\\top)\\mathbf{x}$, which reduces to $2A\\mathbf{x}$ when $A = A^\\top$.',
+    },
+  ],
+
+  mastery: {
+    targetLevel: 2,
+    solveIndependently: 'Compute the gradient and Hessian of a quadratic form $\\mathbf{x}^\\top A\\mathbf{x} + \\mathbf{b}^\\top\\mathbf{x} + c$ using the memorized formulas, and minimize it by setting $\\nabla f = 0$.',
+    explainVerbally: 'Explain the difference between gradient (scalar→vector derivative), Jacobian (vector→vector derivative), and Hessian (second-order scalar derivative), including their shapes and what they represent geometrically.',
+    detectIncorrectApplication: 'Spot when someone writes the gradient as a row vector instead of a column vector, or forgets the transpose $A^\\top$ in the least-squares gradient, or applies the symmetric formula to a non-symmetric $A$.',
+    transferToUnfamiliar: 'Derive the gradient of a new loss function (e.g., logistic loss, Frobenius norm) by expanding it into known forms and applying the chain rule and standard identities.',
+  },
 };

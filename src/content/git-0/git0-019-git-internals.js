@@ -8,7 +8,7 @@ const lesson = {
   tags: ["git", "internals", "objects", "SHA", "blob", "tree", "commit", "reflog"],
   aliases: ["git objects", "SHA hash", "git internals", "how git works", "reflog"],
 
-  hook: `Everything you do in Git ultimately creates a small file in `.git/objects/`. Understanding those four file types explains why Git is so fast, why history is immutable, and how to recover from things that seem unrecoverable.`,
+  hook: `Everything you do in Git ultimately creates a small file in \`.git/objects/\`. Understanding those four file types explains why Git is so fast, why history is immutable, and how to recover from things that seem unrecoverable.`,
 
   mentalModel: [
     "Git stores four object types: blob (file content), tree (directory), commit (snapshot + metadata), tag (annotated tag). Every object is identified by its SHA-1 hash.",
