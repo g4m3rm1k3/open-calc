@@ -145,6 +145,29 @@ class Figure:
         self._elements.append({'type':'tangent','x0':x0,'y0':y0,'slope':slope,'x1':x0-length/2,'x2':x0+length/2,'color':color,'width':width,'label':label or f'slope = {slope:.3f}'});return self
     def bars(self,labels,values,color='blue',alpha=0.8):
         self._elements.append({'type':'bars','labels':[str(l) for l in labels],'values':[float(v) for v in values],'color':color,'alpha':alpha});return self
+    def histogram(self,data,bins=10,color='blue',alpha=0.7,density=False):
+        if not data:return self
+        mn,mx=min(data),max(data)
+        if mn==mx:mn-=0.5;mx+=0.5
+        bw=(mx-mn)/bins;counts=[0]*bins
+        for v in data:
+            idx=min(int((v-mn)/bw),bins-1);counts[idx]+=1
+        if density:
+            tot=sum(counts);counts=[c/(tot*bw) for c in counts]
+        edges=[mn+i*bw for i in range(bins+1)]
+        self._elements.append({'type':'histogram','edges':edges,'counts':counts,'color':color,'alpha':alpha,'density':density,'xmin':mn,'xmax':mx});return self
+    def boxplot(self,data,x=0.5,width=0.35,color='blue',label=None):
+        s=sorted(data);n=len(s)
+        def pct(p):
+            idx=p/100*(n-1);lo=int(idx);hi=min(lo+1,n-1)
+            return s[lo]+(s[hi]-s[lo])*(idx-lo)
+        q1,med,q3=pct(25),pct(50),pct(75);iqr=q3-q1
+        lf,uf=q1-1.5*iqr,q3+1.5*iqr
+        lw=min(v for v in s if v>=lf);uw=max(v for v in s if v<=uf)
+        outliers=[v for v in s if v<lf or v>uf]
+        self._elements.append({'type':'boxplot','x':x,'xmax':self._xmax,'width':width,'color':color,'q1':q1,'median':med,'q3':q3,'lower_whisker':lw,'upper_whisker':uw,'outliers':outliers,'label':label,'ymin':self._ymin,'ymax':self._ymax});return self
+    def pie(self,labels,values,colors=None):
+        self._elements.append({'type':'pie','labels':[str(l) for l in labels],'values':[float(v) for v in values],'colors':colors});return self
     def show(self):
         return json.dumps({'type':'opencalc_figure','width':self._width,'height':self._height,'square':self._square,'xmin':self._xmin,'xmax':self._xmax,'ymin':self._ymin,'ymax':self._ymax,'title':self._title,'elements':self._elements})
 

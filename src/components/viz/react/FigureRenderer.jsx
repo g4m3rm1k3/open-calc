@@ -396,6 +396,103 @@ export default function FigureRenderer({ figureJson, C }) {
             break
           }
 
+          case 'histogram': {
+            ctx.restore(); ctx.save()
+            const edges = el.edges, counts = el.counts
+            const dataMin = el.xmin, dataMax = el.xmax
+            const dataRange = dataMax - dataMin || 1
+            const maxCount = Math.max(...counts, 1)
+            const histColor = resolveColor(el.color || 'blue', C)
+            const baseY = pt + ih
+            for (let i = 0; i < counts.length; i++) {
+              const bx = pl + ((edges[i] - dataMin) / dataRange) * iw
+              const bw = Math.max(((edges[i + 1] - edges[i]) / dataRange) * iw - 1, 1)
+              const bh = (counts[i] / maxCount) * ih * 0.92
+              ctx.fillStyle = histColor
+              ctx.globalAlpha = el.alpha || 0.7
+              ctx.fillRect(bx, baseY - bh, bw, bh)
+              ctx.globalAlpha = 1
+              ctx.strokeStyle = C.surface; ctx.lineWidth = 1
+              ctx.strokeRect(bx, baseY - bh, bw, bh)
+            }
+            // x-axis tick labels
+            ctx.fillStyle = C.muted; ctx.font = '10px sans-serif'; ctx.textAlign = 'center'
+            const tickStep = counts.length > 15 ? 2 : 1
+            for (let i = 0; i <= counts.length; i += tickStep) {
+              const bx = pl + ((edges[i] - dataMin) / dataRange) * iw
+              ctx.fillText(Number(edges[i].toFixed(2)), bx, baseY + 14)
+            }
+            break
+          }
+
+          case 'boxplot': {
+            ctx.restore(); ctx.save()
+            const { q1, median, q3, lower_whisker: lw2, upper_whisker: uw2, outliers: bpOutliers = [],
+                    color: bpColorRaw, x: bpX2 = 0.5, xmax: bpXMax = 1, width: bpW2 = 0.35,
+                    label: bpLabel, ymin: bpYMin, ymax: bpYMax } = el
+            const bpCol = resolveColor(bpColorRaw || 'blue', C)
+            const bpYRange = (bpYMax - bpYMin) || 1
+            const toCanvasY2 = v => pt + ih - ((v - bpYMin) / bpYRange) * ih
+            const cx3 = pl + (bpX2 / bpXMax) * iw
+            const hw = (bpW2 / bpXMax) * iw * 0.5
+            // IQR box
+            const boxTop = toCanvasY2(q3), boxBot = toCanvasY2(q1)
+            ctx.fillStyle = bpCol; ctx.globalAlpha = 0.2
+            ctx.fillRect(cx3 - hw, boxTop, hw * 2, boxBot - boxTop)
+            ctx.globalAlpha = 1
+            ctx.strokeStyle = bpCol; ctx.lineWidth = 1.5
+            ctx.strokeRect(cx3 - hw, boxTop, hw * 2, boxBot - boxTop)
+            // Median line
+            ctx.lineWidth = 2.5
+            ctx.beginPath(); ctx.moveTo(cx3 - hw, toCanvasY2(median)); ctx.lineTo(cx3 + hw, toCanvasY2(median)); ctx.stroke()
+            // Whiskers
+            ctx.lineWidth = 1.5
+            ctx.beginPath(); ctx.moveTo(cx3, toCanvasY2(q1)); ctx.lineTo(cx3, toCanvasY2(lw2)); ctx.stroke()
+            ctx.beginPath(); ctx.moveTo(cx3 - hw * 0.5, toCanvasY2(lw2)); ctx.lineTo(cx3 + hw * 0.5, toCanvasY2(lw2)); ctx.stroke()
+            ctx.beginPath(); ctx.moveTo(cx3, toCanvasY2(q3)); ctx.lineTo(cx3, toCanvasY2(uw2)); ctx.stroke()
+            ctx.beginPath(); ctx.moveTo(cx3 - hw * 0.5, toCanvasY2(uw2)); ctx.lineTo(cx3 + hw * 0.5, toCanvasY2(uw2)); ctx.stroke()
+            // Outliers
+            ctx.fillStyle = bpCol
+            for (const o of bpOutliers) {
+              ctx.beginPath(); ctx.arc(cx3, toCanvasY2(o), 3, 0, Math.PI * 2); ctx.fill()
+            }
+            if (bpLabel) {
+              ctx.fillStyle = C.muted; ctx.font = '11px sans-serif'; ctx.textAlign = 'center'
+              ctx.fillText(bpLabel, cx3, pt + ih + 14)
+            }
+            break
+          }
+
+          case 'pie': {
+            ctx.restore(); ctx.save()
+            const pieTotalVal = el.values.reduce((a, b) => a + b, 0)
+            const pieCx = pl + iw / 2, pieCy = pt + ih / 2
+            const pieRadius = Math.min(iw, ih) * 0.42
+            const palette = [C.blue, C.amber, C.green, C.red, C.purple, C.teal]
+            let pieAngle = -Math.PI / 2
+            el.values.forEach((v, i) => {
+              const slice = (v / pieTotalVal) * Math.PI * 2
+              const pieColor = el.colors?.[i] ? resolveColor(el.colors[i], C) : palette[i % palette.length]
+              ctx.fillStyle = pieColor
+              ctx.beginPath(); ctx.moveTo(pieCx, pieCy)
+              ctx.arc(pieCx, pieCy, pieRadius, pieAngle, pieAngle + slice)
+              ctx.closePath(); ctx.fill()
+              ctx.strokeStyle = C.surface; ctx.lineWidth = 2; ctx.stroke()
+              if (slice > 0.15) {
+                const midA = pieAngle + slice / 2
+                const pct = ((v / pieTotalVal) * 100).toFixed(1)
+                ctx.fillStyle = '#fff'; ctx.font = '500 11px sans-serif'; ctx.textAlign = 'center'
+                ctx.fillText(
+                  `${el.labels[i]} (${pct}%)`,
+                  pieCx + Math.cos(midA) * pieRadius * 0.65,
+                  pieCy + Math.sin(midA) * pieRadius * 0.65 + 4
+                )
+              }
+              pieAngle += slice
+            })
+            break
+          }
+
         }
         ctx.restore()
       }

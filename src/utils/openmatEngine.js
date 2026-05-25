@@ -781,12 +781,25 @@ export function detectMatlabCompatibilityWarnings(source) {
 export function parseBlocks(lines) {
   const stack = [{ type: "root", body: [] }];
   const top = () => stack[stack.length - 1];
+
+  const getTargetBody = (node) => {
+    if (node.type === "if") return node.elseBody !== null ? node.elseBody : node.branches[node.branches.length - 1].body;
+    if (node.type === "try") return node._state === "catch" ? node.catchBody : node.tryBody;
+    if (node.type === "switch") {
+      if (node.otherwise !== null) return node.otherwise;
+      if (node._lastCase) return node._lastCase.body;
+      return [];
+    }
+    return node.body;
+  };
+
   for (let i = 0; i < lines.length; i++) {
     const raw = lines[i];
     const lineNo = i + 1;
     const stripped = raw.replace(/%.*$/, "").trim();
     if (!stripped) continue;
     const lower = stripped.toLowerCase();
+
     const fnMatch = stripped.match(/^function\s+(?:\[([^\]]*)\]\s*=\s*|([A-Za-z_]\w*)\s*=\s*)?([A-Za-z_]\w*)\s*\(([^)]*)\)/i);
     if (fnMatch) {
       const outMulti = fnMatch[1] ? fnMatch[1].split(",").map(s => s.trim()).filter(Boolean) : null;
@@ -797,6 +810,7 @@ export function parseBlocks(lines) {
       stack.push(node);
       continue;
     }
+
     const forMatch = stripped.match(/^for\s+([A-Za-z_]\w*)\s*=\s*(.+)$/i);
     if (forMatch) {
       const node = { type: "for", varName: forMatch[1], iterExpr: forMatch[2], body: [], lineNo };
@@ -804,6 +818,7 @@ export function parseBlocks(lines) {
       stack.push(node);
       continue;
     }
+
     const whileMatch = stripped.match(/^while\s+(.+)$/i);
     if (whileMatch) {
       const node = { type: "while", condExpr: whileMatch[1], body: [], lineNo };
@@ -811,6 +826,7 @@ export function parseBlocks(lines) {
       stack.push(node);
       continue;
     }
+
     const ifMatch = stripped.match(/^if\s+(.+)$/i);
     if (ifMatch) {
       const node = { type: "if", branches: [{ cond: ifMatch[1], body: [], lineNo }], elseBody: null, lineNo };
@@ -818,18 +834,66 @@ export function parseBlocks(lines) {
       stack.push(node);
       continue;
     }
+
     const elseifMatch = stripped.match(/^elseif\s+(.+)$/i);
     if (elseifMatch) {
       const ifNode = top();
       if (ifNode.type === "if") ifNode.branches.push({ cond: elseifMatch[1], body: [], lineNo });
       continue;
     }
+
     if (lower === "else") { const ifNode = top(); if (ifNode.type === "if") ifNode.elseBody = []; continue; }
+
+    // try block
+    if (lower === "try") {
+      const node = { type: "try", tryBody: [], catchVar: null, catchBody: null, _state: "try", lineNo };
+      top().body.push(node);
+      stack.push(node);
+      continue;
+    }
+
+    // catch [errvar]
+    const catchMatch = stripped.match(/^catch(?:\s+([A-Za-z_]\w*))?$/i);
+    if (catchMatch) {
+      const tryNode = top();
+      if (tryNode.type === "try") {
+        tryNode.catchVar = catchMatch[1] || null;
+        tryNode.catchBody = [];
+        tryNode._state = "catch";
+      }
+      continue;
+    }
+
+    // switch expr
+    const switchMatch = stripped.match(/^switch\s+(.+)$/i);
+    if (switchMatch) {
+      const node = { type: "switch", expr: switchMatch[1], cases: [], otherwise: null, _lastCase: null, lineNo };
+      top().body.push(node);
+      stack.push(node);
+      continue;
+    }
+
+    // case val (inside switch)
+    const caseMatch = stripped.match(/^case\s+(.+)$/i);
+    if (caseMatch) {
+      const swNode = top();
+      if (swNode.type === "switch") {
+        const newCase = { val: caseMatch[1], body: [] };
+        swNode.cases.push(newCase);
+        swNode._lastCase = newCase;
+      }
+      continue;
+    }
+
+    // otherwise (inside switch)
+    if (lower === "otherwise") {
+      const swNode = top();
+      if (swNode.type === "switch") { swNode.otherwise = []; swNode._lastCase = null; }
+      continue;
+    }
+
     if (lower === "end") { if (stack.length > 1) stack.pop(); continue; }
-    const getTargetBody = (node) => {
-      if (node.type === "if") return node.elseBody !== null ? node.elseBody : node.branches[node.branches.length - 1].body;
-      return node.body;
-    };
+
     if (lower === "break") { getTargetBody(top()).push({ type: "break", lineNo }); continue; }
     if (lower === "continue") { getTargetBody(top()).push({ type: "continue", lineNo }); continue; }
     if (lower === "return") { getTargetBody(top()).push({ type: "return", lineNo }); continue; }
@@ -882,7 +946,17 @@ function splitTopLevelCells(row) {
     if (topLevel && /\s/.test(char)) {
       const next = row.slice(index).match(/^\s+/)?.[0] || "";
       const nextChar = row[index + next.length];
-      if (current.trim() && nextChar && nextChar !== "," && nextChar !== ";") pushCell();
+      if (current.trim() && nextChar && nextChar !== "," && nextChar !== ";") {
+        // Only split if the next token looks like a new operand (letter, digit, open bracket)
+        // AND the current token ends with an operand (letter, digit, close bracket, quote).
+        // If the next char is an operator (+, -, *, /, ^, ., &, |, ~, <, >, =)
+        // then this is a binary operator — stay in the same cell so [a + b] isn't split
+        // into the three nonsensical cells [a, +, b].
+        const nextIsOperandStart = /[A-Za-z0-9(\[{]/.test(nextChar);
+        const lastCurChar = current.trimEnd().slice(-1);
+        const curEndsWithOperand = /[A-Za-z0-9\])'"]/.test(lastCurChar);
+        if (nextIsOperandStart && curEndsWithOperand) pushCell();
+      }
       index += next.length - 1;
       continue;
     }
@@ -999,7 +1073,9 @@ function replaceIndexing(line, variables, functionNames = new Set()) {
   if (variables.size === 0) return line;
   return line.replace(/\b([A-Za-z_]\w*)\s*\(([^()]+)\)/g, (match, name, inner) => {
     if (!variables.has(name) || functionNames.has(name)) return match;
-    return `${name}[${inner}]`;
+    // Replace MATLAB 'end' keyword with length(name) for last-element access
+    const expandedInner = inner.replace(/\bend\b/g, `length(${name})`);
+    return `${name}[${expandedInner}]`;
   });
 }
 
@@ -1277,9 +1353,14 @@ export function createExecutionEngine(options = {}) {
   );
   parser.set("eig", (A) => {
     const result = math.eigs(A);
-    const values = normalizeVector(result.values);
-    const vectors = result.eigenvectors.map((entry) => toPlain(entry.vector));
-    return { __multi: [math.transpose(vectors), makeDiagonal(values)], values, eigenvectors: vectors };
+    const rawValues = toPlain(result.values);
+    const values = (Array.isArray(rawValues) ? rawValues : [rawValues]).map(realValue);
+    // Build V where each COLUMN is an eigenvector (MATLAB convention)
+    const eigvecs = result.eigenvectors.map((entry) => normalizeVector(entry.vector));
+    const n = eigvecs[0]?.length || 0;
+    const V = Array.from({ length: n }, (_, row) => eigvecs.map((col) => col[row] ?? 0));
+    const D = makeDiagonal(values);
+    return { __multi: [V, D], values, eigenvectors: eigvecs };
   });
   parser.set("qr", (A) => {
     const { Q, R } = math.qr(A);
@@ -1382,12 +1463,13 @@ export function createExecutionEngine(options = {}) {
   parser.set("isempty", (v) => (normalizeVector(v).length === 0 ? 1 : 0));
   parser.set("zeros", (m, n = null) => {
     const r = Number(m), c = n == null ? r : Number(n);
-    if (r === 1) return Array(c).fill(0);
+    // Treat pure row or column vectors as flat 1D arrays so indexed assignment works
+    if (r === 1 || (n != null && c === 1)) return Array(r * c).fill(0);
     return Array.from({ length: r }, () => Array(c).fill(0));
   });
   parser.set("ones", (m, n = null) => {
     const r = Number(m), c = n == null ? r : Number(n);
-    if (r === 1) return Array(c).fill(1);
+    if (r === 1 || (n != null && c === 1)) return Array(r * c).fill(1);
     return Array.from({ length: r }, () => Array(c).fill(1));
   });
   parser.set("randn", (...shape) => {
@@ -1401,6 +1483,230 @@ export function createExecutionEngine(options = {}) {
       return fill(makeRandomArray(shape.map(Number)));
     })() : bm();
   });
+
+  // ── Constants ────────────────────────────────────────────────────────────────
+  parser.set("eps", Number.EPSILON);
+  parser.set("Inf", Infinity); parser.set("inf", Infinity);
+  parser.set("NaN", NaN); parser.set("nan", NaN);
+  parser.set("true", 1); parser.set("false", 0);
+  parser.set("pi", Math.PI); parser.set("e", Math.E);
+
+  // ── Extended elementwise math (properly handle matrices) ─────────────────────
+  const _ew = (fn) => (v) => isCollection(v) ? mapDeep(v, (x) => fn(Number(x))) : fn(Number(v));
+  parser.set("floor", _ew(Math.floor));
+  parser.set("ceil",  _ew(Math.ceil));
+  parser.set("round", (v, n) => { const p = n != null ? 10 ** Number(n) : 1; return isCollection(v) ? mapDeep(v, (x) => Math.round(Number(x) * p) / p) : Math.round(Number(v) * p) / p; });
+  parser.set("sign",  _ew(Math.sign));
+  parser.set("sqrt",  _ew(Math.sqrt));
+  parser.set("exp",   _ew(Math.exp));
+  parser.set("log",   _ew(Math.log));
+  parser.set("log2",  _ew(Math.log2));
+  parser.set("log10", _ew(Math.log10));
+  parser.set("abs", (v) => { const fn = (x) => isComplexLike(x) ? Math.hypot(Number(x.re ?? 0), Number(x.im ?? 0)) : Math.abs(Number(x)); return isCollection(v) ? mapDeep(v, fn) : fn(v); });
+  parser.set("real", (v) => { const fn = (x) => isComplexLike(x) ? Number(x.re ?? 0) : Number(x); return isCollection(v) ? mapDeep(v, fn) : fn(v); });
+  parser.set("imag", (v) => { const fn = (x) => isComplexLike(x) ? Number(x.im ?? 0) : 0; return isCollection(v) ? mapDeep(v, fn) : fn(v); });
+  parser.set("conj", (v) => { const fn = (x) => isComplexLike(x) ? { re: Number(x.re ?? 0), im: -Number(x.im ?? 0) } : x; return isCollection(v) ? mapDeep(v, fn) : fn(v); });
+  parser.set("angle", (v) => { const fn = (x) => isComplexLike(x) ? Math.atan2(Number(x.im ?? 0), Number(x.re ?? 0)) : 0; return isCollection(v) ? mapDeep(v, fn) : fn(v); });
+  parser.set("atan2", (y, x) => Math.atan2(Number(y), Number(x)));
+  parser.set("hypot", (...a) => Math.hypot(...a.map(Number)));
+  parser.set("log1p", _ew(Math.log1p));
+  parser.set("expm1", _ew(Math.expm1));
+
+  // ── Linear algebra extras ───────────────────────────────────────────────────
+  parser.set("norm", (v, p) => {
+    const vec = normalizeVector(v);
+    const pn = p == null ? 2 : (String(p).toLowerCase() === "inf" ? Infinity : Number(p));
+    if (!isFinite(pn)) return pn > 0 ? Math.max(...vec.map(Math.abs)) : Math.min(...vec.map(Math.abs));
+    return Math.pow(vec.reduce((s, x) => s + Math.abs(x) ** pn, 0), 1 / pn);
+  });
+  parser.set("trace", (A) => { const m = toNumericMatrix(A); return m ? m.reduce((s, r, i) => s + (r[i] ?? 0), 0) : 0; });
+  parser.set("diag", (v, k = 0) => {
+    const plain = toPlain(v); const kn = Number(k) || 0;
+    if (isMatrix(plain)) return plain.flatMap((row, i) => { const j = i + kn; return j >= 0 && j < row.length ? [row[j]] : []; });
+    return makeDiagonal(v);
+  });
+  parser.set("triu", (A, k = 0) => { const m = toNumericMatrix(A); if (!m) return []; const kn = Number(k) || 0; return m.map((r, i) => r.map((v, j) => j - i >= kn ? v : 0)); });
+  parser.set("tril", (A, k = 0) => { const m = toNumericMatrix(A); if (!m) return []; const kn = Number(k) || 0; return m.map((r, i) => r.map((v, j) => j - i <= kn ? v : 0)); });
+  parser.set("fliplr", (v) => { const p = toPlain(v); return isMatrix(p) ? p.map((r) => [...r].reverse()) : [...normalizeVector(v)].reverse(); });
+  parser.set("flipud", (v) => { const p = toPlain(v); return isMatrix(p) ? [...p].reverse() : [...normalizeVector(v)].reverse(); });
+  parser.set("kron", (A, B) => { const a = toNumericMatrix(A), b = toNumericMatrix(B); if (!a || !b) return []; const res = []; for (const ar of a) { res.push(...b.map((br) => ar.flatMap((av) => br.map((bv) => av * bv)))); } return res; });
+  parser.set("linsolve", (A, b) => toPlain(math.lusolve(A, b)));
+  parser.set("horzcat", (...args) => {
+    const ps = args.map(toPlain);
+    if (ps.every((p) => !isMatrix(p))) return ps.flatMap((p) => normalizeVector(p));
+    const mats = ps.map((p) => isMatrix(p) ? p : [normalizeVector(p)]);
+    return mats[0].map((_, i) => mats.flatMap((m) => m[i] || []));
+  });
+  parser.set("vertcat", (...args) => args.flatMap((a) => { const p = toPlain(a); return isMatrix(p) ? p : [normalizeVector(p)]; }));
+  parser.set("cat", (dim, ...args) => {
+    if (Number(dim) === 1) return args.flatMap((a) => { const p = toPlain(a); return isMatrix(p) ? p : [normalizeVector(p)]; });
+    const ps = args.map(toPlain);
+    if (ps.every((p) => !isMatrix(p))) return ps.flatMap((p) => normalizeVector(p));
+    const mats = ps.map((p) => isMatrix(p) ? p : [normalizeVector(p)]);
+    return mats[0].map((_, i) => mats.flatMap((m) => m[i] || []));
+  });
+
+  // ── Array utilities ─────────────────────────────────────────────────────────
+  parser.set("isnan",    (v) => isCollection(v) ? mapDeep(v, (x) => isNaN(Number(x)) ? 1 : 0) : (isNaN(Number(v)) ? 1 : 0));
+  parser.set("isinf",    (v) => isCollection(v) ? mapDeep(v, (x) => (!isFinite(Number(x)) && !isNaN(Number(x))) ? 1 : 0) : ((!isFinite(Number(v)) && !isNaN(Number(v))) ? 1 : 0));
+  parser.set("isfinite", (v) => isCollection(v) ? mapDeep(v, (x) => isFinite(Number(x)) ? 1 : 0) : (isFinite(Number(v)) ? 1 : 0));
+  parser.set("cummax", (v) => { let mx = -Infinity; return normalizeVector(v).map((x) => { mx = Math.max(mx, x); return mx; }); });
+  parser.set("cummin", (v) => { let mn = Infinity;  return normalizeVector(v).map((x) => { mn = Math.min(mn, x); return mn; }); });
+  parser.set("arrayfun", (f, v, ...rest) => normalizeVector(v).map((x, i) => { const extra = rest.map((r) => normalizeVector(r)[i]); return realValue(toPlain(f(x, ...extra))); }));
+  parser.set("cellfun",  (f, v, ...rest) => normalizeVector(v).map((x, i) => { const extra = rest.map((r) => normalizeVector(r)[i]); return realValue(toPlain(f(x, ...extra))); }));
+  parser.set("cell",     (m, n) => { const r = Number(m || 1), c = n != null ? Number(n) : r; return Array.from({ length: r }, () => Array(c).fill(null)); });
+
+  // ── Bitwise / logical ───────────────────────────────────────────────────────
+  parser.set("bitand",  (a, b)    => (Number(a) | 0) & (Number(b) | 0));
+  parser.set("bitor",   (a, b)    => (Number(a) | 0) | (Number(b) | 0));
+  parser.set("bitxor",  (a, b)    => (Number(a) | 0) ^ (Number(b) | 0));
+  parser.set("bitshift",(a, n)    => { const nn = Number(n); return nn >= 0 ? (Number(a)|0) << nn : (Number(a)|0) >> (-nn); });
+  parser.set("xor",     (a, b)    => (Boolean(a) !== Boolean(b)) ? 1 : 0);
+  parser.set("not",     (v)       => isCollection(v) ? mapDeep(v, (x) => x ? 0 : 1) : (v ? 0 : 1));
+
+  // ── String utilities ────────────────────────────────────────────────────────
+  parser.set("strcmp",    (a, b)       => String(a) === String(b) ? 1 : 0);
+  parser.set("strcmpi",   (a, b)       => String(a).toLowerCase() === String(b).toLowerCase() ? 1 : 0);
+  parser.set("strcat",    (...a)       => a.map(String).join(""));
+  parser.set("strtrim",   (s)          => String(s).trim());
+  parser.set("upper",     (s)          => String(s).toUpperCase());
+  parser.set("lower",     (s)          => String(s).toLowerCase());
+  parser.set("strsplit",  (s, d = " ") => String(s).split(String(d)));
+  parser.set("strrep",    (s, o, r)    => String(s).split(String(o)).join(String(r)));
+  parser.set("strfind",   (s, p)       => { const str = String(s), pat = String(p); const idxs = []; let i = 0; while ((i = str.indexOf(pat, i)) !== -1) { idxs.push(i + 1); i++; } return idxs; });
+  parser.set("contains",  (s, p)       => String(s).includes(String(p)) ? 1 : 0);
+  parser.set("num2str",   (v, fmt) => {
+    if (fmt != null) { if (typeof fmt === "number") return Number(v).toFixed(Math.round(fmt)); return sprintfFormat(`%${fmt}`, v); }
+    const n = Number(v); return Number.isInteger(n) ? String(n) : parseFloat(n.toPrecision(5)).toString();
+  });
+  parser.set("str2double", (s) => Number(s));
+  parser.set("char", (v) => { if (typeof v === "number") return String.fromCharCode(v); return normalizeVector(v).map((x) => String.fromCharCode(Number(x))).join(""); });
+  parser.set("int2str", (v) => String(Math.round(Number(v))));
+
+  // ── Timing ──────────────────────────────────────────────────────────────────
+  const _ticStart = { t: 0 };
+  parser.set("tic",   () => { _ticStart.t = Date.now(); return null; });
+  parser.set("toc",   () => (Date.now() - _ticStart.t) / 1000);
+  parser.set("clock", () => { const d = new Date(); return [d.getFullYear(), d.getMonth() + 1, d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds()]; });
+
+  // ── I/O stubs ───────────────────────────────────────────────────────────────
+  parser.set("input",  (prompt) => { logs.push(`input('${prompt}'): interactive input not supported — returning 0.`); return 0; });
+  parser.set("pause",  () => null);
+  parser.set("figure", (n)      => { logs.push(`figure(${n != null ? n : ""}): multiple figure windows not yet supported.`); return null; });
+  parser.set("format", () => null);
+
+  // ── Plot extras ─────────────────────────────────────────────────────────────
+  parser.set("semilogy",  (...args) => registerPlot("plot", args[0], args[1]));
+  parser.set("semilogx",  (...args) => registerPlot("plot", args[0], args[1]));
+  parser.set("loglog",    (...args) => registerPlot("plot", args[0], args[1]));
+  parser.set("errorbar",  (...args) => registerPlot("plot", args[0], args[1]));
+  parser.set("fill",      (...args) => registerPlot("area", args[0], args[1]));
+  parser.set("contour",   (...args) => { logs.push("contour: rendered as 3D surface."); plot3DRequest = convertSurfaceTo3DConfig("surf", args.slice(0, 3), plotState); return null; });
+  parser.set("contourf",  (...args) => { logs.push("contourf: rendered as 3D surface."); plot3DRequest = convertSurfaceTo3DConfig("surf", args.slice(0, 3), plotState); return null; });
+  parser.set("imagesc",   (Z)       => { logs.push("imagesc: rendered as heatmap surface."); plot3DRequest = convertSurfaceTo3DConfig("surf", [Z], plotState); return null; });
+  parser.set("quiver",    () => { logs.push("quiver: vector field not yet rendered."); return null; });
+  parser.set("polarplot", (...args) => registerPlot("plot", args[0], args[1]));
+  parser.set("pie",       (v)       => registerPlot("bar", v, null));
+  parser.set("colorbar",  () => null);
+  parser.set("colormap",  () => null);
+  parser.set("shading",   () => null);
+  parser.set("sgtitle",   (t)       => { plotState.title = String(t); return t; });
+  parser.set("text",      () => null);
+  parser.set("gca",       () => null);
+  parser.set("gcf",       () => null);
+  parser.set("set",       () => null);
+  parser.set("get",       () => null);
+  parser.set("drawnow",   () => null);
+  parser.set("print",     () => null);
+  parser.set("saveas",    () => null);
+
+  // ── Numerical methods ───────────────────────────────────────────────────────
+  // ode45: RK4 fixed-step solver
+  parser.set("ode45", (f, tspan, y0) => {
+    const tv = normalizeVector(tspan), t0 = tv[0], tf = tv[tv.length - 1];
+    const yInit = normalizeVector(y0);
+    const steps = Math.min(5000, Math.max(50, Math.ceil(Math.abs(tf - t0) / 0.01)));
+    const h = (tf - t0) / steps;
+    const T = [t0], Y = [yInit.slice()];
+    let t = t0, y = yInit.slice();
+    for (let s = 0; s < steps; s++) {
+      const k1 = normalizeVector(toPlain(f(t, y)));
+      const y2 = y.map((yi, i) => yi + 0.5 * h * k1[i]);
+      const k2 = normalizeVector(toPlain(f(t + 0.5 * h, y2)));
+      const y3 = y.map((yi, i) => yi + 0.5 * h * k2[i]);
+      const k3 = normalizeVector(toPlain(f(t + 0.5 * h, y3)));
+      const y4 = y.map((yi, i) => yi + h * k3[i]);
+      const k4 = normalizeVector(toPlain(f(t + h, y4)));
+      y = y.map((yi, i) => yi + (h / 6) * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]));
+      t += h; T.push(t); Y.push(y.slice());
+    }
+    return { __multi: [T, Y] };
+  });
+
+  // ode23: same as ode45 (simpler alias)
+  parser.set("ode23", (f, tspan, y0) => parser.get("ode45")(f, tspan, y0));
+
+  // fzero: bisection or secant root finder
+  parser.set("fzero", (f, x0) => {
+    const xv = normalizeVector(x0);
+    if (xv.length >= 2) {
+      let [a, b] = xv, fa = realValue(toPlain(f(a))), fb = realValue(toPlain(f(b)));
+      for (let i = 0; i < 100; i++) {
+        const c = (a + b) / 2, fc = realValue(toPlain(f(c)));
+        if (Math.abs(fc) < 1e-12 || (b - a) / 2 < 1e-12) return c;
+        if (fa * fc < 0) { b = c; fb = fc; } else { a = c; fa = fc; }
+      }
+      return (a + b) / 2;
+    }
+    let x = xv[0], dx = Math.abs(x) * 0.01 + 0.01;
+    for (let i = 0; i < 80; i++) {
+      const fx = realValue(toPlain(f(x))), fx2 = realValue(toPlain(f(x + dx)));
+      if (fx2 === fx) break;
+      const xn = x - fx * dx / (fx2 - fx); dx = xn - x; x = xn;
+      if (Math.abs(realValue(toPlain(f(x)))) < 1e-12) break;
+    }
+    return x;
+  });
+
+  // integral: adaptive Simpson's rule
+  parser.set("integral", (f, a, b) => {
+    const simp = (f, lo, hi, tol, depth) => {
+      const c = (lo + hi) / 2;
+      const fa = realValue(toPlain(f(lo))), fb = realValue(toPlain(f(hi))), fc = realValue(toPlain(f(c)));
+      const s1 = (hi - lo) * (fa + 4 * fc + fb) / 6;
+      const d = (lo + c) / 2, e = (c + hi) / 2;
+      const fd = realValue(toPlain(f(d))), fe = realValue(toPlain(f(e)));
+      const s2 = (c - lo) * (fa + 4 * fd + fc) / 6 + (hi - c) * (fc + 4 * fe + fb) / 6;
+      if (depth >= 12 || Math.abs(s2 - s1) < 15 * tol) return s2 + (s2 - s1) / 15;
+      return simp(f, lo, c, tol / 2, depth + 1) + simp(f, c, hi, tol / 2, depth + 1);
+    };
+    return simp(f, Number(a), Number(b), 1e-6, 0);
+  });
+
+  // fminbnd: golden section minimum search
+  parser.set("fminbnd", (f, a, b) => {
+    const phi = (Math.sqrt(5) - 1) / 2;
+    let lo = Number(a), hi = Number(b);
+    let c = hi - phi * (hi - lo), d = lo + phi * (hi - lo);
+    for (let i = 0; i < 100; i++) {
+      if (realValue(toPlain(f(c))) < realValue(toPlain(f(d)))) hi = d; else lo = c;
+      if (hi - lo < 1e-10) break;
+      c = hi - phi * (hi - lo); d = lo + phi * (hi - lo);
+    }
+    return (lo + hi) / 2;
+  });
+
+  // fminsearch: Nelder-Mead simplex (1D fallback to fminbnd)
+  parser.set("fminsearch", (f, x0) => {
+    const xv = normalizeVector(x0);
+    if (xv.length === 1) {
+      // 1D: golden section around x0
+      const a = xv[0] - 10, b = xv[0] + 10;
+      return [parser.get("fminbnd")(f, a, b)];
+    }
+    return xv; // multi-D: stub
+  });
+
 
   extensions.forEach((extension) => {
     Object.entries(extension?.functions || {}).forEach(([name, fn]) => {
@@ -1489,8 +1795,8 @@ export function executeScript(source, options = {}) {
           return result;
         };
         parser.set(name, anonymousFn);
+        functionNames.add(name);  // Add to functionNames FIRST so replaceIndexing won't treat it as a variable
         variables.add(name);
-        functionNames.add(name);
         return hasSemicolon ? null : anonymousFn;
       }
       const multiAssign = line.match(/^\[([^\]]+)\]\s*=\s*(.+)$/);
@@ -1569,8 +1875,9 @@ export function executeScript(source, options = {}) {
     }
     if (node.type === "while") {
       let last = null;
+      const WHILE_LIMIT = 100000;
       let guard = 0;
-      while (guard++ < 100000) {
+      while (guard++ < WHILE_LIMIT) {
         const condExpr = preprocessLine(node.condExpr.replace(/;\s*$/, ""), variables, functionNames);
         const condVal = toPlain(parser.evaluate(condExpr));
         if (!isTruthy(condVal)) break;
@@ -1579,6 +1886,7 @@ export function executeScript(source, options = {}) {
         if (sig === RETURN) return sig;
         if (sig !== CONTINUE && sig != null) last = sig;
       }
+      if (guard >= WHILE_LIMIT) logs.push(`\u26a0 while loop exceeded ${WHILE_LIMIT.toLocaleString()} iterations and was stopped.`);
       return last;
     }
     if (node.type === "function") {
@@ -1588,6 +1896,9 @@ export function executeScript(source, options = {}) {
         const saved = {};
         ins.forEach((param, i) => { saved[param] = parser.get(param); parser.set(param, args[i] ?? null); });
         outs.forEach((o) => { saved[o] = parser.get(o); });
+        // nargin / nargout support inside user functions
+        parser.set("nargin",  args.length);
+        parser.set("nargout", outs.length);
         executeBlock(body);
         const result = outs.length === 1
           ? parser.get(outs[0])
@@ -1598,13 +1909,76 @@ export function executeScript(source, options = {}) {
       functionNames.add(name);
       return null;
     }
+    // try/catch block
+    if (node.type === "try") {
+      try {
+        const sig = executeBlock(node.tryBody);
+        if (sig === BREAK || sig === CONTINUE || sig === RETURN) return sig;
+        return sig;
+      } catch (err) {
+        if (node.catchBody) {
+          if (node.catchVar) {
+            parser.set(node.catchVar, err?.message || String(err));
+            variables.add(node.catchVar);
+          }
+          return executeBlock(node.catchBody);
+        }
+        return null;
+      }
+    }
+    // switch/case/otherwise block
+    if (node.type === "switch") {
+      const exprPrep = preprocessLine(String(node.expr).replace(/;\s*$/, ""), variables, functionNames);
+      let switchVal;
+      try { switchVal = toPlain(parser.evaluate(exprPrep)); } catch { return null; }
+      for (const caseNode of node.cases) {
+        const casePrep = preprocessLine(String(caseNode.val).replace(/;\s*$/, ""), variables, functionNames);
+        let caseVal;
+        try { caseVal = toPlain(parser.evaluate(casePrep)); } catch { continue; }
+        const svNum = realValue(switchVal), cvNum = realValue(caseVal);
+        const svStr = typeof switchVal === "string" ? switchVal : null;
+        const cvStr = typeof caseVal  === "string" ? caseVal  : null;
+        const matches = Array.isArray(caseVal)
+          ? normalizeVector(caseVal).some((v) => v === svNum)
+          : (svStr != null && cvStr != null ? svStr === cvStr : svNum === cvNum);
+        if (matches) return executeBlock(caseNode.body);
+      }
+      if (node.otherwise) return executeBlock(node.otherwise);
+      return null;
+    }
     if (node.type === "break") return BREAK;
     if (node.type === "continue") return CONTINUE;
     if (node.type === "return") return RETURN;
     return null;
   }
 
-  const normalizedSource = joinContinuationLines(source);
+  // Expand mid-line semicolons into separate lines (e.g., a = 1; b = 2; c = 3)
+  function expandMidLineSemicolons(src) {
+    const result = [];
+    for (const rawLine of src.split(/\r?\n/)) {
+      const code = rawLine.replace(/%.*$/, "");
+      if (!code.includes(";")) { result.push(rawLine); continue; }
+      const parts = [];
+      let cur = "", depth = 0, inStr = false, strCh = null;
+      for (const ch of code) {
+        if (inStr) { cur += ch; if (ch === strCh) inStr = false; continue; }
+        if (ch === "'" || ch === '"') { inStr = true; strCh = ch; cur += ch; continue; }
+        if ("[(".includes(ch)) depth++;
+        else if ("])".includes(ch)) depth = Math.max(0, depth - 1);
+        if (ch === ";" && depth === 0) { parts.push(cur.trim()); cur = ""; }
+        else cur += ch;
+      }
+      parts.push(cur.trim());
+      const nonEmpty = parts.filter(Boolean);
+      if (nonEmpty.length <= 1) { result.push(rawLine); continue; }
+      // All but last get semicolon (suppress output); last keeps its own trailing state
+      nonEmpty.slice(0, -1).forEach((p) => result.push(p + ";"));
+      if (nonEmpty[nonEmpty.length - 1]) result.push(nonEmpty[nonEmpty.length - 1]);
+    }
+    return result.join("\n");
+  }
+
+  const normalizedSource = expandMidLineSemicolons(joinContinuationLines(source));
   const lines = normalizedSource.split(/\r?\n/);
   const tree = parseBlocks(lines);
   let lastVisibleResult = null;

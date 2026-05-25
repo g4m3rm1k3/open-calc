@@ -47,6 +47,7 @@ import gcodeParser1 from "./gcode-parser-1/index.js";
 import sql0 from "./sql-0/index.js";
 import sql1 from "./sql-1/index.js";
 import nosql1 from "./nosql-1/index.js";
+import appliedStatistics from "./applied-statistics/index.js";
 
 const CALC_CURRICULUM = [ch0, ch1, ch2, ch3, ch4, ch5, ch6].map((ch) => ({
   ...ch,
@@ -116,6 +117,7 @@ const GCODE_PARSER_CURRICULUM = gcodeParser1.map((ch) => ({
 const SQL0_CURRICULUM = [sql0].map((ch) => ({ ...ch, course: "sql-0" }));
 const SQL1_CURRICULUM = [sql1].map((ch) => ({ ...ch, course: "sql-1" }));
 const NOSQL1_CURRICULUM = [nosql1].map((ch) => ({ ...ch, course: "nosql-1" }));
+const APPLIED_STATS_CURRICULUM = appliedStatistics.map((ch) => ({ ...ch, course: "applied-statistics" }));
 const AI_ENGINEERING_CURRICULUM = [...aiEngineering0, ...aiEngineering11].map(
   (ch) => ({ ...ch, course: "ai-engineering" }),
 );
@@ -149,6 +151,7 @@ export const CURRICULUM = [
   ...SQL0_CURRICULUM,
   ...SQL1_CURRICULUM,
   ...NOSQL1_CURRICULUM,
+  ...APPLIED_STATS_CURRICULUM,
 ];
 
 // Flat map for O(1) lookup by slug within chapter

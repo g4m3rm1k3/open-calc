@@ -188,4 +188,11 @@ export const COURSES = [
     desc: "Document Stores, CAP Theorem & Scale",
     color: "green",
   },
+    {
+    key: "applied-statistics",
+    label: "Applied Statistics",
+    path: "/course/applied-statistics",
+    desc: "Data, Inference & Statistical Modeling",
+    color: "violet",
+  },
 ];

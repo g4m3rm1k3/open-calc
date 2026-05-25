@@ -412,6 +412,121 @@ class Figure:
         })
         return self
 
+    def histogram(self, data, bins=10, color='blue', alpha=0.7, density=False):
+        """
+        Compute a histogram from raw data and add it as a drawable element.
+
+        Args:
+            data:    list or array of numeric values
+            bins:    number of equal-width bins (default 10)
+            color:   bar fill color token (default 'blue')
+            alpha:   opacity 0-1 (default 0.7)
+            density: if True, y-axis shows probability density instead of counts
+
+        Example:
+            import random
+            data = [random.gauss(0, 1) for _ in range(500)]
+            fig = Figure(xmin=-4, xmax=4, title='Normal distribution')
+            fig.histogram(data, bins=20)
+            fig.show()
+        """
+        if not data:
+            return self
+        mn, mx = min(data), max(data)
+        if mn == mx:
+            mn -= 0.5; mx += 0.5
+        bw = (mx - mn) / bins
+        counts = [0] * bins
+        for v in data:
+            idx = min(int((v - mn) / bw), bins - 1)
+            counts[idx] += 1
+        if density:
+            tot = sum(counts)
+            counts = [c / (tot * bw) for c in counts]
+        edges = [mn + i * bw for i in range(bins + 1)]
+        self._elements.append({
+            'type': 'histogram',
+            'edges': edges,
+            'counts': counts,
+            'color': color,
+            'alpha': alpha,
+            'density': density,
+            'xmin': mn,
+            'xmax': mx,
+        })
+        return self
+
+    def boxplot(self, data, x=0.5, width=0.35, color='blue', label=None):
+        """
+        Draw a box-and-whisker plot for a numeric dataset.
+
+        Args:
+            data:   list or array of numeric values
+            x:      horizontal centre position in figure coordinates (default 0.5)
+            width:  half-width of the box in figure x-units (default 0.35)
+            color:  color token (default 'blue')
+            label:  optional text label shown below the box
+
+        Set Figure ymin/ymax to cover the data range.
+
+        Example:
+            data = [12, 15, 14, 10, 18, 35, 9, 14, 16, 21]
+            fig = Figure(xmin=0, xmax=1, ymin=0, ymax=40, title='Boxplot')
+            fig.boxplot(data, x=0.5, width=0.3, color='blue')
+            fig.show()
+        """
+        s = sorted(data)
+        n = len(s)
+        def pct(p):
+            idx = p / 100 * (n - 1)
+            lo = int(idx); hi = min(lo + 1, n - 1)
+            return s[lo] + (s[hi] - s[lo]) * (idx - lo)
+        q1, med, q3 = pct(25), pct(50), pct(75)
+        iqr = q3 - q1
+        lf, uf = q1 - 1.5 * iqr, q3 + 1.5 * iqr
+        lw = min(v for v in s if v >= lf)
+        uw = max(v for v in s if v <= uf)
+        outliers = [v for v in s if v < lf or v > uf]
+        self._elements.append({
+            'type': 'boxplot',
+            'x': x,
+            'xmax': self._xmax,
+            'width': width,
+            'color': color,
+            'q1': q1,
+            'median': med,
+            'q3': q3,
+            'lower_whisker': lw,
+            'upper_whisker': uw,
+            'outliers': outliers,
+            'label': label,
+            'ymin': self._ymin,
+            'ymax': self._ymax,
+        })
+        return self
+
+    def pie(self, labels, values, colors=None):
+        """
+        Draw a pie chart.
+
+        Args:
+            labels: list of category name strings
+            values: list of numeric values (need not sum to 100)
+            colors: optional list of color tokens; cycles through theme palette if omitted
+
+        Example:
+            fig = Figure(title='Market Share')
+            fig.pie(['A', 'B', 'C'], [45, 30, 25])
+            fig.show()
+        """
+        self._elements.append({
+            'type': 'pie',
+            'labels': [str(l) for l in labels],
+            'values': [float(v) for v in values],
+            'colors': colors,
+        })
+        return self
+
     # ── Serialise and show ────────────────────────────────────────────────────
 
     def show(self):
