@@ -311,6 +311,7 @@ async function getPyodide() {
       "matplotlib",
       "scikit-learn",
       "scipy",
+      "sqlite3",
     ]);
 
     await py.runPythonAsync(

@@ -22,7 +22,9 @@ const VIZ_REGISTRY = {
   GitLab: lazy(() => import("./git/GitLab.jsx")),
   VideoCarousel: lazy(() => import("./react/VideoCarousel.jsx")),
   RosettaStoneViz: lazy(() => import("./react/RosettaStoneViz.jsx")),
-  DistributivePropertyViz: lazy(() => import("./react/DistributivePropertyViz.jsx")),
+  DistributivePropertyViz: lazy(
+    () => import("./react/DistributivePropertyViz.jsx"),
+  ),
   ExponentLawsViz: lazy(() => import("./react/ExponentLawsViz.jsx")),
   NumberLine: lazy(() => import("./d3/NumberLine.jsx")),
   FunctionMachine: lazy(() => import("./d3/FunctionMachine.jsx")),
@@ -37,7 +39,9 @@ const VIZ_REGISTRY = {
   SqueezeTheorem: lazy(() => import("./d3/SqueezeTheorem.jsx")),
   ContinuityViz: lazy(() => import("./d3/ContinuityViz.jsx")),
   RiemannSum: lazy(() => import("./d3/RiemannSum.jsx")),
-  RiemannSumDefinitionWalkthrough: lazy(() => import("./react/RiemannSumDefinitionWalkthrough.jsx")),
+  RiemannSumDefinitionWalkthrough: lazy(
+    () => import("./react/RiemannSumDefinitionWalkthrough.jsx"),
+  ),
   FTCProofWalkthrough: lazy(() => import("./react/FTCProofWalkthrough.jsx")),
   PowerRulePattern: lazy(() => import("./d3/PowerRulePattern.jsx")),
   AntiderivativeFamilyViz: lazy(
@@ -287,6 +291,7 @@ const VIZ_REGISTRY = {
   PythonNotebook: lazy(() => import("./react/PythonNotebook.jsx")),
   OpenMatNotebook: lazy(() => import("./react/OpenMatNotebook.jsx")),
   JSNotebook: lazy(() => import("./react/JSNotebook.jsx")),
+  SQLNotebook: lazy(() => import("./react/SQLNotebook.jsx")),
   ScienceNotebook: lazy(() => import("./react/ScienceNotebook.jsx")),
   // Chemistry lessons
   WhyChemistry: lazy(() => import("./react/WhyChemistry.jsx")),
@@ -1074,15 +1079,16 @@ const VIZ_REGISTRY = {
   BlindChainRuleLab: lazy(() => import("./react/BlindChainRuleLab.jsx")),
   LeastSquaresFit: lazy(() => import("./react/LeastSquaresFit.jsx")),
   MVTIntegralExplorer: lazy(() => import("./d3/MVTIntegralExplorer.jsx")),
-  AverageValueExplorerMVT: lazy(() => import("./d3/AverageValueExplorerMVT.jsx")),
+  AverageValueExplorerMVT: lazy(
+    () => import("./d3/AverageValueExplorerMVT.jsx"),
+  ),
   CounterexampleMVT: lazy(() => import("./d3/CounterexampleMVT.jsx")),
   RealWorldMVT: lazy(() => import("./d3/RealWorldMVT.jsx")),
   GeometricIntuitionMVT: lazy(() => import("./d3/GeometricIntuitionMVT.jsx")),
   MVTIntegralProof: lazy(() => import("./d3/MVTIntegralProof.jsx")),
-  HigherOrderDerivativesExplorer: lazy(()=> import("./d3/HigherOrderDerivativesExplorer")),
-
-
-
+  HigherOrderDerivativesExplorer: lazy(
+    () => import("./d3/HigherOrderDerivativesExplorer"),
+  ),
 
   // ─── Discrete Math additional vizzes ─────────────────────────────────────
   ProofStrategySelector: lazy(
@@ -1098,6 +1104,7 @@ const PHONE_OK = new Set([
   "PythonNotebook",
   "OpenMatNotebook",
   "JSNotebook",
+  "SQLNotebook",
   "ScienceNotebook",
   "VideoEmbed",
   "VideoCarousel",
