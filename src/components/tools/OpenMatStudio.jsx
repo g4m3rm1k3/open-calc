@@ -32,7 +32,7 @@ import { useLocalStorage } from "../../hooks/useLocalStorage.js";
 import { useGrapher } from "../../context/GrapherContext.jsx";
 import { setupOpenCalcMonaco } from "../../utils/monacoThemes.js";
 import openMatGuide from "../../../docs/OpenMAT.md?raw";
-import { createExecutionEngine, executeScript } from "../../utils/openmatEngine.js";
+import { createExecutionEngine, executeScript, normalizeLine as normalizeOpenMatLine } from "../../utils/openmatEngine.js";
 
 const math = create(all);
 math.config({ matrix: "Array", number: "number" });
@@ -6012,7 +6012,7 @@ export default function OpenMatStudio() {
   const applyExecutionResult = useCallback((result, source, nextControlValues, commandLabel = "") => {
       const normalized = source
         .split(/\r?\n/)
-        .map((line) => preprocessLine(line.replace(/;\s*$/, ""), new Set()))
+        .map((line) => normalizeOpenMatLine(line.replace(/;\s*$/, ""), new Set()))
         .filter(Boolean)
         .join("\n");
       setNormalizedPreview(normalized);

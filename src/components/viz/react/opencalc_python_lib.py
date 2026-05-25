@@ -61,8 +61,13 @@ class Figure:
         })
         return self
 
-    def axes(self, labels=True, ticks=True):
-        """Draw x and y axes with optional labels and tick marks."""
+    def axes(self, labels=True, ticks=True, xmin=None, xmax=None, ymin=None, ymax=None):
+        """Draw x and y axes with optional labels and tick marks.
+        Passing xmin/xmax/ymin/ymax overrides the bounds set in the constructor."""
+        if xmin is not None: self._xmin = xmin
+        if xmax is not None: self._xmax = xmax
+        if ymin is not None: self._ymin = ymin
+        if ymax is not None: self._ymax = ymax
         self._elements.append({
             'type': 'axes',
             'labels': labels,
@@ -195,14 +200,15 @@ class Figure:
         })
         return self
 
-    def scatter(self, xs, ys, color='blue', radius=4, labels=None):
-        """Scatter plot of points."""
+    def scatter(self, xs, ys, color='blue', radius=4, labels=None, size=None):
+        """Scatter plot of points. `size` is an alias for `radius`."""
+        r = size if size is not None else radius
         self._elements.append({
             'type': 'scatter',
             'xs': list(xs),
             'ys': list(ys),
             'color': color,
-            'radius': radius,
+            'radius': r,
             'labels': labels,
         })
         return self
@@ -264,12 +270,18 @@ class Figure:
 
     # ── Text ──────────────────────────────────────────────────────────────────
 
-    def text(self, pos, content, color='text', size=13, align='center', bold=False):
-        """Draw text at data position pos = [x, y]."""
+    def text(self, x_or_pos, y_or_content, content_or_color=None, color='text', size=13, align='center', bold=False):
+        """Draw text. Supports text(x, y, content) and text([x, y], content)."""
+        if isinstance(x_or_pos, (int, float)):
+            pos = [x_or_pos, y_or_content]
+            txt = content_or_color
+        else:
+            pos = list(x_or_pos)
+            txt = y_or_content
         self._elements.append({
             'type': 'text',
-            'pos': list(pos),
-            'content': str(content),
+            'pos': pos,
+            'content': str(txt),
             'color': color,
             'size': size,
             'align': align,
@@ -412,12 +424,13 @@ class Figure:
         })
         return self
 
-    def histogram(self, data, bins=10, color='blue', alpha=0.7, density=False):
+    def histogram(self, data=None, bins=10, color='blue', alpha=0.7, density=False, values=None):
         """
         Compute a histogram from raw data and add it as a drawable element.
+        Pass either data= or values= (alias).
 
         Args:
-            data:    list or array of numeric values
+            data:    list or array of numeric values (also accepted as values=)
             bins:    number of equal-width bins (default 10)
             color:   bar fill color token (default 'blue')
             alpha:   opacity 0-1 (default 0.7)
@@ -430,6 +443,7 @@ class Figure:
             fig.histogram(data, bins=20)
             fig.show()
         """
+        data = data if data is not None else values
         if not data:
             return self
         mn, mx = min(data), max(data)

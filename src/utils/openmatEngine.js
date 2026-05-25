@@ -952,7 +952,10 @@ function splitTopLevelCells(row) {
         // If the next char is an operator (+, -, *, /, ^, ., &, |, ~, <, >, =)
         // then this is a binary operator — stay in the same cell so [a + b] isn't split
         // into the three nonsensical cells [a, +, b].
-        const nextIsOperandStart = /[A-Za-z0-9(\[{]/.test(nextChar);
+        const signTarget = row[index + next.length + 1];
+        const nextIsSignedOperand =
+          /[+-]/.test(nextChar) && signTarget && /[A-Za-z0-9.(\[{]/.test(signTarget);
+        const nextIsOperandStart = /[A-Za-z0-9(\[{]/.test(nextChar) || nextIsSignedOperand;
         const lastCurChar = current.trimEnd().slice(-1);
         const curEndsWithOperand = /[A-Za-z0-9\])'"]/.test(lastCurChar);
         const prevChar = current.trimEnd().slice(-1);

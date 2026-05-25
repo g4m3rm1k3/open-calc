@@ -78,7 +78,11 @@ class Figure:
         self._xmin=xmin;self._xmax=xmax;self._ymin=ymin;self._ymax=ymax;self._title=title
     def grid(self,step=1,color='border'):
         self._elements.append({'type':'grid','step':step,'color':color});return self
-    def axes(self,labels=True,ticks=True):
+    def axes(self,labels=True,ticks=True,xmin=None,xmax=None,ymin=None,ymax=None):
+        if xmin is not None:self._xmin=xmin
+        if xmax is not None:self._xmax=xmax
+        if ymin is not None:self._ymin=ymin
+        if ymax is not None:self._ymax=ymax
         self._elements.append({'type':'axes','labels':labels,'ticks':ticks});return self
     def arrow(self,start,end,color='blue',label=None,width=2.5,dashed=False,alpha=1.0):
         self._elements.append({'type':'arrow','start':list(start),'end':list(end),'color':color,'label':label,'width':width,'dashed':dashed,'alpha':alpha});return self
@@ -100,8 +104,9 @@ class Figure:
                 y=fn(x);ys.append(float('inf') if y!=y else y)
             except:ys.append(None)
         self._elements.append({'type':'curve','xs':xs,'ys':ys,'color':color,'width':width,'label':label,'fill':fill,'fill_alpha':fill_alpha,'dashed':dashed});return self
-    def scatter(self,xs,ys,color='blue',radius=4,labels=None):
-        self._elements.append({'type':'scatter','xs':list(xs),'ys':list(ys),'color':color,'radius':radius,'labels':labels});return self
+    def scatter(self,xs,ys,color='blue',radius=4,labels=None,size=None):
+        r=size if size is not None else radius
+        self._elements.append({'type':'scatter','xs':list(xs),'ys':list(ys),'color':color,'radius':r,'labels':labels});return self
     def parametric(self,xfn,yfn,tmin=0,tmax=2*math.pi,steps=300,color='purple',width=2):
         ts=[tmin+(tmax-tmin)*i/steps for i in range(steps+1)];xs=[];ys=[]
         for t in ts:
@@ -121,8 +126,13 @@ class Figure:
                 except:bottoms.append(None)
             else:bottoms.append(0)
         self._elements.append({'type':'region','xs':xs,'tops':tops,'bottoms':bottoms,'color':color,'alpha':alpha});return self
-    def text(self,pos,content,color='text',size=13,align='center',bold=False):
-        self._elements.append({'type':'text','pos':list(pos),'content':str(content),'color':color,'size':size,'align':align,'bold':bold});return self
+    def text(self,x_or_pos,y_or_content,content_or_color=None,color='text',size=13,align='center',bold=False):
+        if isinstance(x_or_pos,(int,float)):
+            pos=[x_or_pos,y_or_content];txt=content_or_color
+        else:
+            pos=list(x_or_pos);txt=y_or_content
+            if content_or_color is not None and isinstance(content_or_color,str) and content_or_color not in ('text','blue','red','green','amber','purple','teal','gray','muted'):color=content_or_color
+        self._elements.append({'type':'text','pos':pos,'content':str(txt),'color':color,'size':size,'align':align,'bold':bold});return self
     def polygon(self,points,color='blue',fill=True,alpha=0.2,stroke=True,stroke_width=1.5):
         self._elements.append({'type':'polygon','points':[list(p) for p in points],'color':color,'fill':fill,'alpha':alpha,'stroke':stroke,'stroke_width':stroke_width});return self
     def rect(self,x,y,w,h,color='blue',fill=True,alpha=0.2):
@@ -145,7 +155,8 @@ class Figure:
         self._elements.append({'type':'tangent','x0':x0,'y0':y0,'slope':slope,'x1':x0-length/2,'x2':x0+length/2,'color':color,'width':width,'label':label or f'slope = {slope:.3f}'});return self
     def bars(self,labels,values,color='blue',alpha=0.8):
         self._elements.append({'type':'bars','labels':[str(l) for l in labels],'values':[float(v) for v in values],'color':color,'alpha':alpha});return self
-    def histogram(self,data,bins=10,color='blue',alpha=0.7,density=False):
+    def histogram(self,data=None,bins=10,color='blue',alpha=0.7,density=False,values=None):
+        data=data if data is not None else values
         if not data:return self
         mn,mx=min(data),max(data)
         if mn==mx:mn-=0.5;mx+=0.5

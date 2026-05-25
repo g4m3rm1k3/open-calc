@@ -270,12 +270,12 @@ const OpenMatGrapher3D = ({ isOpen, onClose, onSwitchTo2D, onSwitchToJSX, launch
         zs: fn.zs ?? [],
         pointSize: fn.pointSize ?? 0.12,
       }));
-      setFunctions(launchConfig.replace === false ? [...functions, ...nextFunctions] : nextFunctions);
+      setFunctions((current) => (launchConfig.replace === false ? [...current, ...nextFunctions] : nextFunctions));
     }
     if (launchConfig.settings) {
       setSettings((current) => ({ ...current, ...launchConfig.settings }));
     }
-  }, [functions, isOpen, launchConfig, setFunctions, setSettings]);
+  }, [isOpen, launchConfig, setFunctions, setSettings]);
 
   if (!isOpen) return null;
 
