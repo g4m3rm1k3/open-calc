@@ -880,7 +880,10 @@ export default function GitTerminal({ params = {} }) {
       </div>
 
       {/* Output area */}
-      <div ref={outputRef} className="flex-1 overflow-auto p-4 text-xs space-y-0">
+      <div
+        ref={outputRef}
+        className="flex-1 overflow-auto p-4 text-xs space-y-0"
+      >
         {history.map((entry, i) => (
           <Line key={i} parts={entry.parts} />
         ))}
@@ -902,7 +905,6 @@ export default function GitTerminal({ params = {} }) {
             autoCorrect="off"
           />
         </div>
-
       </div>
 
       {/* Status bar */}
