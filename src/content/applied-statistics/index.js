@@ -13,6 +13,12 @@ import stat3_003 from './stat3-003-percentiles-and-quartiles.js';
 import stat3_004 from './stat3-004-boxplots.js';
 import stat3_005 from './stat3-005-frequency-tables-and-distributions.js';
 import stat3_006 from './stat3-006-shape-of-a-distribution.js';
+import stat4_001 from './stat4-001-introduction-to-probability.js';
+import stat4_002 from './stat4-002-complement-union-intersection.js';
+import stat4_003 from './stat4-003-conditional-probability.js';
+import stat4_004 from './stat4-004-bayes-theorem.js';
+import stat4_005 from './stat4-005-counting-principles.js';
+import stat4_006 from './stat4-006-probability-rules-summary.js';
 
 // Chapter 1: Foundations of Statistical Thinking
 const STAT1 = {
@@ -56,4 +62,19 @@ const STAT3 = {
   ],
 };
 
-export default [STAT1, STAT2, STAT3];
+// Chapter 4: Probability and Counting
+const STAT4 = {
+  title: 'Probability and Counting',
+  number: 'stat4',
+  slug: 'probability-and-counting',
+  lessons: [
+    stat4_001,
+    stat4_002,
+    stat4_003,
+    stat4_004,
+    stat4_005,
+    stat4_006,
+  ],
+};
+
+export default [STAT1, STAT2, STAT3, STAT4];

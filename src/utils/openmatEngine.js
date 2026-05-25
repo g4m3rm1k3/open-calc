@@ -1105,6 +1105,7 @@ function replaceBackslash(expr) {
 export function preprocessLine(line, variables, functionNames = new Set()) {
   let output = line.replace(/%.*$/, "").trim();
   if (!output) return "";
+  output = output.replace(/\bnull\s*\(/g, "nullspace(");
   output = output.replace(/^hold\s+on$/i, "hold('on')");
   output = output.replace(/^hold\s+off$/i, "hold('off')");
   output = output.replace(/^grid\s+on$/i, "grid('on')");
@@ -1406,6 +1407,7 @@ export function createExecutionEngine(options = {}) {
   parser.set("cond", (A) => conditionNumber(A));
   parser.set("orth", (A) => orthonormalBasis(A, "orth"));
   parser.set("null", (A) => orthonormalBasis(A, "null"));
+  parser.set("nullspace", (A) => orthonormalBasis(A, "null"));
   parser.set("lu", (A) => luFactorization(A));
   parser.set("surf", (...args) => {
     plot3DRequest = merge3DRequest(plot3DRequest, convertSurfaceTo3DConfig("surf", args, plotState), plotState.hold);
