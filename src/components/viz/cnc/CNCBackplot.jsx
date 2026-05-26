@@ -21,6 +21,7 @@ export default function CNCBackplot({
   const toolRef = useRef(null);
   const gridRef = useRef(null);
   const rafRef = useRef(null);
+  const pathFittedRef = useRef(false);
 
   // Colors based on theme
   const colors = {
@@ -54,7 +55,7 @@ export default function CNCBackplot({
 
     const camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 10000);
     camera.up.set(0, 0, 1);
-    camera.position.set(200, -200, 250);
+    camera.position.set(300, -300, 400);
     cameraRef.current = camera;
 
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -88,8 +89,9 @@ export default function CNCBackplot({
     };
     animate();
 
-    const onResize = () => {
+    const doResize = () => {
       const nw = el.clientWidth;
+      if (!nw) return; // still hidden
       const nh = height.endsWith("%")
         ? el.clientHeight || 400
         : parseInt(height) || 400;
@@ -97,11 +99,12 @@ export default function CNCBackplot({
       camera.updateProjectionMatrix();
       renderer.setSize(nw, nh);
     };
-    window.addEventListener("resize", onResize);
+    const ro = new ResizeObserver(doResize);
+    ro.observe(el);
 
     return () => {
       cancelAnimationFrame(rafRef.current);
-      window.removeEventListener("resize", onResize);
+      ro.disconnect();
       renderer.dispose();
       if (el.contains(renderer.domElement)) el.removeChild(renderer.domElement);
     };
@@ -133,7 +136,10 @@ export default function CNCBackplot({
 
     while (group.children.length) group.remove(group.children[0]);
 
-    if (pathPoints.length < 2) return;
+    if (pathPoints.length < 2) {
+      pathFittedRef.current = false;
+      return;
+    }
 
     // Group segments by motion mode to draw with different colors
     const segments = [];
@@ -197,6 +203,7 @@ export default function CNCBackplot({
       );
       controlsRef.current.target.copy(center);
       controlsRef.current.update();
+      pathFittedRef.current = true;
     }
 
   }, [pathPoints, isDark]);
@@ -205,6 +212,14 @@ export default function CNCBackplot({
   useEffect(() => {
     if (!toolRef.current) return;
     _buildTool(toolRef.current, toolDiameter / 2, toolLength, toolLenCut);
+    // Fit camera to show full tool only when no path has been loaded
+    if (!pathFittedRef.current && cameraRef.current && controlsRef.current) {
+      const halfLen = toolLength / 2;
+      const dist = toolLength * 3;
+      cameraRef.current.position.set(dist * 0.7, -dist, halfLen + dist * 0.8);
+      controlsRef.current.target.set(0, 0, halfLen);
+      controlsRef.current.update();
+    }
   }, [toolDiameter, toolLength, toolLenCut]);
 
   // Move tool

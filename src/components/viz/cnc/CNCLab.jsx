@@ -1706,13 +1706,16 @@ export default function CNCLab({
               height="100%"
               isDark={isDark}
               toolDiameter={
-                (toolTable[ms?.activeT ?? 1] ?? toolTable[1])?.dia ?? 10
+                ((toolTable[ms?.activeT ?? 1] ?? toolTable[1])?.dia ?? 10) /
+                (ms?.units === "inch" ? 25.4 : 1)
               }
               toolLength={
-                (toolTable[ms?.activeT ?? 1] ?? toolTable[1])?.len ?? 75
+                ((toolTable[ms?.activeT ?? 1] ?? toolTable[1])?.len ?? 75) /
+                (ms?.units === "inch" ? 25.4 : 1)
               }
               toolLenCut={
-                (toolTable[ms?.activeT ?? 1] ?? toolTable[1])?.lenCut ?? null
+                (((toolTable[ms?.activeT ?? 1] ?? toolTable[1])?.lenCut ?? null) /
+                (ms?.units === "inch" ? 25.4 : 1)) || null
               }
             />
           </div>
