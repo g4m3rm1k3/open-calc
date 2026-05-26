@@ -77,6 +77,12 @@ export default {
         mathBridge: 'Step through Gaussian elimination on a live system. Each step applies one row operation and shows how the augmented matrix changes. Observe how a contradiction row $[0\ 0\ |\  c]$ signals inconsistency, while a zero row $[0\ 0\ |\  0]$ signals a free variable.',
         caption: 'Watch the staircase form emerge one row operation at a time.',
       },
+      {
+        id: 'LALinearSystemsModule',
+        title: 'Linear Systems — Concept to CNC',
+        mathBridge: 'A five-tab module: Concept reviews the three outcomes and EROs; Canonical walks through a full 3×3 solve step by step; Real World shows how CNC firmware solves a sensor system every millisecond; Interactive lets you perform swap/scale/replace on any system and auto-RREF it; Practice gives five applied problems to work by hand.',
+        caption: 'From row operations to real machine positioning — one unified module.',
+      },
     ],
   },
 

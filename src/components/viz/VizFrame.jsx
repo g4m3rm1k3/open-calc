@@ -293,6 +293,11 @@ const VIZ_REGISTRY = {
   LowRankApproximationViz: lazy(
     () => import("./react/LowRankApproximationViz.jsx"),
   ),
+  LALinearSystemsModule: lazy(() => import("./react/LALinearSystemsModule.jsx")),
+  LAMatrixAlgebraModule: lazy(() => import("./react/LAMatrixAlgebraModule.jsx")),
+  LALinearAlgebraRealWorld: lazy(
+    () => import("./react/LALinearAlgebraRealWorld.jsx"),
+  ),
   PythonNotebook: lazy(() => import("./react/PythonNotebook.jsx")),
   OpenMatNotebook: lazy(() => import("./react/OpenMatNotebook.jsx")),
   JSNotebook: lazy(() => import("./react/JSNotebook.jsx")),

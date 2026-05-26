@@ -15,6 +15,7 @@ import la2_007 from './la2-007-special-matrices.js';
 import la2_008 from './la2-008-cramers-rule.js';
 import la2_009 from './la2-009-matrix-calculus.js';
 import la2_010 from './la2-010-invertible-matrix-theorem.js';
+import la2_011 from './la2-011-four-fundamental-subspaces.js';
 
 import la3_001 from './la3-001-eigenvectors-and-eigenvalues.js';
 import la3_002 from './la3-002-diagonalization.js';
@@ -31,6 +32,8 @@ import la4_004 from './la4-002-svd.js';
 import la4_005 from './la4-005-inner-product-spaces.js';
 import la4_006 from './la4-006-spectral-theorem.js';
 import la4_007 from './la4-007-quadratic-forms.js';
+import la4_008 from './la4-008-pseudoinverse.js';
+import la4_009 from './la4-009-low-rank-approximation.js';
 
 import la_sandbox from './la-sandbox.js';
 
@@ -46,6 +49,8 @@ import la7_002 from './la7-002-cholesky-decomposition.js';
 import la7_003 from './la7-003-matrix-norms-conditioning.js';
 import la7_004 from './la7-004-numerical-stability.js';
 import la7_005 from './la7-005-sparse-matrices.js';
+import la7_006 from './la7-006-schur-decomposition.js';
+import la7_007 from './la7-007-householder-givens.js';
 
 import la8_001 from './la8-001-pca-dimensionality-reduction.js';
 import la8_002 from './la8-002-markov-pagerank.js';
@@ -95,6 +100,7 @@ const LA2 = {
     la2_008,
     la2_009,
     la2_010,
+    la2_011,
   ],
 };
 
@@ -127,6 +133,8 @@ const LA4 = {
     la4_005,
     la4_006,
     la4_007,
+    la4_008,
+    la4_009,
   ],
 };
 
@@ -166,6 +174,8 @@ const LA7 = {
     la7_003,
     la7_004,
     la7_005,
+    la7_006,
+    la7_007,
   ],
 };
 

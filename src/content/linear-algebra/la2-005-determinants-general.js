@@ -74,6 +74,12 @@ export default {
         mathBridge: 'The yellow shape starts as the unit square (area = 1). Watch the determinant value as you adjust the matrix entries. The key insight extends to 3×3: the determinant is the signed volume of the parallelepiped formed by the three column vectors. A determinant of 2 means volumes double. A determinant of 0 means the three column vectors are coplanar and volume collapses to zero — space is irreversibly flattened.',
         caption: 'The determinant measures signed volume scaling.',
       },
+      {
+        id: 'LALinearAlgebraRealWorld',
+        title: 'Linear Algebra in the Real World — Applied Module',
+        mathBridge: 'A six-tab applied module spanning chapters 1 and 2: Systems→CNC shows two sensor equations as intersecting lines and computes the tool position via RREF; Matrices→Graphics applies rotation/scale/shear to a 2D shape and displays the combined matrix T with det(T); Vectors→Forces decomposes two cable tensions into a linear system and solves for T₁ and T₂; Dot→Normals shows how the dot product controls surface brightness and cutting-tool contact angle; Det→Area/Vol draws the parallelogram spanned by two vectors and shows area = |det|; Practice has five hand-calculation problems with real manufacturing context.',
+        caption: 'The five core tools of linear algebra — systems, matrices, vectors, dot products, determinants — each doing real engineering work.',
+      },
     ],
   },
 

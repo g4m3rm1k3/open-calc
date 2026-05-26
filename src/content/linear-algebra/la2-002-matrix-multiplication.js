@@ -68,6 +68,12 @@ export default {
         mathBridge: 'Two transformation buttons (Shear A, Rotate B) apply in sequence. Use the playback slider to watch the plane undergo shear first, then rotation. Notice that the final positions of $\\hat{i}$ and $\\hat{j}$ match the columns of the algebraically computed product $BA$. Also try applying them in reverse order ($AB$) to see non-commutativity.',
         caption: 'Applying A then B is the same as applying the single matrix BA. The product captures both transformations simultaneously.',
       },
+      {
+        id: 'LAMatrixAlgebraModule',
+        title: 'Matrix Algebra — Concept to Graphics Pipeline',
+        mathBridge: 'A five-tab module: Concept covers addition, multiplication, identity, inverse, and LU; Canonical walks through a 2×3 × 3×2 product entry by entry, a 2×2 inverse by row reduction, and an LU factorisation; Real World shows the 3D graphics pipeline and FEA usage; Interactive lets you enter any 2×2 matrices A and B and instantly computes AB, BA, det(A), A⁻¹, and A⁻¹b, plus a live graphics canvas with rotation/scale/shear sliders; Practice has five hand-calculation problems.',
+        caption: 'The same math that renders every polygon in a 3D game — rotation, scale, and shear combined into a single matrix multiply.',
+      },
     ],
   },
 
