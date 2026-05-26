@@ -33,7 +33,7 @@ const lesson = {
   intuition: {
     prose: [
       "Before C++ executes, it goes through a **build pipeline**: the preprocessor expands `#include` directives, the compiler translates your code to machine instructions, and the linker bundles everything into one executable. When you run `g++ main.cpp -o hello`, all three stages happen in one command.",
-      "`cout << \"Hello, World!\" << endl;` is your first output statement. `cout` is the standard output stream connected to your terminal. The `<<` operator feeds data into it. `endl` terminates the line and flushes the buffer so the text appears immediately.",
+      '`cout << "Hello, World!" << endl;` is your first output statement. `cout` is the standard output stream connected to your terminal. The `<<` operator feeds data into it. `endl` terminates the line and flushes the buffer so the text appears immediately.',
       "The `#include <iostream>` line is an import statement — it tells the preprocessor to pull in the standard I/O library, giving you `cout`, `cin`, `cerr`, and related tools. Without it, the compiler doesn't know what `cout` means.",
       "In the lab below, the `// __OUTPUT__: Hello, World!` comment is a **simulator annotation** — it tells the virtual `g++` what text the compiled program should print when run. In a real compiler this would be ignored (it's just a comment). Once you compile and run, try editing the message in the editor, saving with ⌘S, then recompiling.",
     ],
@@ -67,7 +67,7 @@ const lesson = {
       {
         type: "info",
         title: "C++ vs C: a quick distinction",
-        body: "`cout` and `<iostream>` are C++ additions. In C, output is `printf(\"Hello, World!\\n\")` with `#include <stdio.h>`. C++ is a strict superset of C — everything valid in C is valid in C++ — but C++ adds classes, templates, references, RAII, and the standard library.",
+        body: '`cout` and `<iostream>` are C++ additions. In C, output is `printf("Hello, World!\\n")` with `#include <stdio.h>`. C++ is a strict superset of C — everything valid in C is valid in C++ — but C++ adds classes, templates, references, RAII, and the standard library.',
       },
       {
         type: "warning",

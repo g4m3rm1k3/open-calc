@@ -59,7 +59,8 @@ export default function CppLab({ params = {} }) {
 
   const handleSave = useCallback(() => {
     setSavedCode((prev) => {
-      const _ = prev; void _;
+      const _ = prev;
+      void _;
       return code;
     });
     setIsDirty(false);

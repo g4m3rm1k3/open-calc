@@ -257,23 +257,29 @@ const MAN_PAGES = {
   cut: "cut — cut sections from lines\n\nUsage: cut [options] [file]\n  -d DELIM   field delimiter (default: tab)\n  -f N       field number(s), e.g. -f1 or -f1-3\n  -c N       character position(s)\nExample: cut -d: -f1 /etc/passwd",
   tr: "tr — translate or delete characters\n\nUsage: tr [options] SET1 [SET2]\n  -d       delete characters in SET1\n  -s       squeeze repeated chars\nExample: echo hello | tr 'a-z' 'A-Z'\nExample: echo 'a b c' | tr -d ' '",
   sed: "sed — stream editor\n\nUsage: sed 's/PATTERN/REPLACEMENT/FLAGS' [file]\n  g    replace all occurrences\n  i    case-insensitive\nExample: sed 's/foo/bar/g' file.txt\nExample: echo hello | sed 's/ell/ELL/'",
-  printf: "printf — formatted output\n\nUsage: printf FORMAT [args...]\n  %s   string\n  %d   integer\n  %f   float\n  \\n   newline\nExample: printf '%s is %d years old\\n' Alice 30",
+  printf:
+    "printf — formatted output\n\nUsage: printf FORMAT [args...]\n  %s   string\n  %d   integer\n  %f   float\n  \\n   newline\nExample: printf '%s is %d years old\\n' Alice 30",
   tee: "tee — read stdin and write to stdout AND file\n\nUsage: tee [-a] file\n  -a   append instead of overwrite\nExample: ls | tee output.txt",
   diff: "diff — compare two files line by line\n\nUsage: diff file1 file2\nLines from file1 shown with <\nLines from file2 shown with >\n(identical lines not shown)",
   stat: "stat — display file status\n\nUsage: stat file\nShows: size, inode, permissions, modification time.",
   file: "file — determine file type\n\nUsage: file filename\nDetects: directory, ELF binary, shell script, C++ source, ASCII text.",
   type: "type — identify a command type\n\nUsage: type name\nShows whether the name is a builtin, alias, or file path.",
-  unset: "unset — remove variable or alias\n\nUsage: unset NAME\nRemoves the named environment variable or alias.",
-  sleep: "sleep — pause execution\n\nUsage: sleep N\nSimulates a delay of N seconds (instant in this emulator).",
+  unset:
+    "unset — remove variable or alias\n\nUsage: unset NAME\nRemoves the named environment variable or alias.",
+  sleep:
+    "sleep — pause execution\n\nUsage: sleep N\nSimulates a delay of N seconds (instant in this emulator).",
   less: "less — view file contents (pager)\n\nUsage: less file\nDisplays file one screen at a time. Type q to quit (simulated: shows all).",
   bc: "bc — basic calculator\n\nUsage: echo 'EXPR' | bc\nSupports: + - * / % ** and parentheses\nExample: echo '(3+4)*2' | bc\nExample: echo '2**10' | bc",
   ln: "ln — create links\n\nUsage: ln [-s] target linkname\n  -s   create symbolic (soft) link\nWithout -s creates a hard link (copies entry).",
-  chmod: "chmod — change file permissions\n\nUsage: chmod MODE file\nExample: chmod 755 script.sh\nExample: chmod +x program\n(Permissions are simulated for learning purposes.)",
-  "g++": "g++ — GNU C++ compiler\n\nUsage: g++ [options] source.cpp [-o output]\n  -o name    output executable name\n  -Wall      enable warnings\n  -std=c++17 use C++17 standard\nExample: g++ main.cpp -o game\nTip: add // __OUTPUT__: text to your .cpp to define simulated output.",
+  chmod:
+    "chmod — change file permissions\n\nUsage: chmod MODE file\nExample: chmod 755 script.sh\nExample: chmod +x program\n(Permissions are simulated for learning purposes.)",
+  "g++":
+    "g++ — GNU C++ compiler\n\nUsage: g++ [options] source.cpp [-o output]\n  -o name    output executable name\n  -Wall      enable warnings\n  -std=c++17 use C++17 standard\nExample: g++ main.cpp -o game\nTip: add // __OUTPUT__: text to your .cpp to define simulated output.",
   gcc: "gcc — GNU C compiler\n\nUsage: gcc [options] source.c [-o output]\n  -o name   output executable name\nExample: gcc hello.c -o hello",
   make: "make — build automation\n\nUsage: make [target]\nReads Makefile in current directory.\nExample Makefile:\n  all:\n\tg++ main.cpp -o game\n\n  clean:\n\trm -f game",
   bash: "bash — run a shell script\n\nUsage: bash script.sh\nExecutes each non-comment line of the script.\nSee also: source",
-  source: "source — execute commands from a file in current shell\n\nUsage: source file.sh  OR  . file.sh\nUnlike bash, runs in current shell (shares env/cwd).",
+  source:
+    "source — execute commands from a file in current shell\n\nUsage: source file.sh  OR  . file.sh\nUnlike bash, runs in current shell (shares env/cwd).",
 };
 
 // ── Main command executor ─────────────────────────────────────────────────────
@@ -325,7 +331,7 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
       const safe = expr.replace(/[^0-9+\-*/%\s()]/g, "");
       if (!safe.trim()) return "0";
       // eslint-disable-next-line no-new-func
-      const val = Function('"use strict"; return (' + safe + ')')();
+      const val = Function('"use strict"; return (' + safe + ")")();
       return Number.isFinite(val) ? String(Math.trunc(val)) : "0";
     } catch {
       return "0";
@@ -819,13 +825,62 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
 
       case "which": {
         const builtins = [
-          "pwd","ls","cd","mkdir","rmdir","touch","cat","echo",
-          "head","tail","wc","cp","mv","rm","grep","find",
-          "which","env","export","alias","clear","history","man","help",
-          "whoami","hostname","date","sort","uniq","cut","tr","sed",
-          "printf","tee","diff","stat","file","type","unset","sleep",
-          "exit","logout","less","more","bc","ln","chmod",
-          "g++","gcc","clang++","cc","make","bash","sh","source",".",
+          "pwd",
+          "ls",
+          "cd",
+          "mkdir",
+          "rmdir",
+          "touch",
+          "cat",
+          "echo",
+          "head",
+          "tail",
+          "wc",
+          "cp",
+          "mv",
+          "rm",
+          "grep",
+          "find",
+          "which",
+          "env",
+          "export",
+          "alias",
+          "clear",
+          "history",
+          "man",
+          "help",
+          "whoami",
+          "hostname",
+          "date",
+          "sort",
+          "uniq",
+          "cut",
+          "tr",
+          "sed",
+          "printf",
+          "tee",
+          "diff",
+          "stat",
+          "file",
+          "type",
+          "unset",
+          "sleep",
+          "exit",
+          "logout",
+          "less",
+          "more",
+          "bc",
+          "ln",
+          "chmod",
+          "g++",
+          "gcc",
+          "clang++",
+          "cc",
+          "make",
+          "bash",
+          "sh",
+          "source",
+          ".",
         ];
         for (const a of args) {
           if (builtins.includes(a)) segPlain(`/usr/bin/${a} (shell builtin)`);
@@ -864,9 +919,13 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
           segErr(`sort: ${fileArg ?? "(no input)"}: No such file or directory`);
           break;
         }
-        if (source === "DIR") { segErr("sort: Is a directory"); break; }
+        if (source === "DIR") {
+          segErr("sort: Is a directory");
+          break;
+        }
         let sLines = source.split("\n");
-        if (flags.includes("n")) sLines.sort((a, b) => parseFloat(a) - parseFloat(b));
+        if (flags.includes("n"))
+          sLines.sort((a, b) => parseFloat(a) - parseFloat(b));
         else sLines.sort((a, b) => a.localeCompare(b));
         if (flags.includes("r")) sLines.reverse();
         if (flags.includes("u")) sLines = [...new Set(sLines)];
@@ -880,9 +939,12 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
         const source =
           pipeInput !== null && !fileArg
             ? pipeInput
-            : fileArg ? fs.get(resolvePath(cwd, fileArg)) : null;
+            : fileArg
+              ? fs.get(resolvePath(cwd, fileArg))
+              : null;
         if (source === null || source === undefined) {
-          segErr("uniq: No input"); break;
+          segErr("uniq: No input");
+          break;
         }
         const uGroups = [];
         for (const l of source.split("\n")) {
@@ -894,7 +956,10 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
           if (flags.includes("d") && count === 1) continue;
           if (flags.includes("u") && count > 1) continue;
           if (flags.includes("c"))
-            segPush([col(String(count).padStart(4) + " ", C.yellow), plain(val)]);
+            segPush([
+              col(String(count).padStart(4) + " ", C.yellow),
+              plain(val),
+            ]);
           else segPlain(val);
         }
         break;
@@ -908,15 +973,22 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
         const fieldSpec = fIdx !== -1 ? args[fIdx + 1] : null;
         const charSpec = cIdx !== -1 ? args[cIdx + 1] : null;
         const skipIdxs = new Set(
-          [dIdx, dIdx + 1, fIdx, fIdx + 1, cIdx, cIdx + 1].filter((i) => i >= 0),
+          [dIdx, dIdx + 1, fIdx, fIdx + 1, cIdx, cIdx + 1].filter(
+            (i) => i >= 0,
+          ),
         );
-        const fileArg = args.find((a, i) => !a.startsWith("-") && !skipIdxs.has(i));
+        const fileArg = args.find(
+          (a, i) => !a.startsWith("-") && !skipIdxs.has(i),
+        );
         const source =
           pipeInput !== null && !fileArg
             ? pipeInput
-            : fileArg ? fs.get(resolvePath(cwd, fileArg)) : null;
+            : fileArg
+              ? fs.get(resolvePath(cwd, fileArg))
+              : null;
         if (source === null || source === undefined) {
-          segErr("cut: No input"); break;
+          segErr("cut: No input");
+          break;
         }
         const parseRange = (spec) => {
           const nums = new Set();
@@ -926,7 +998,10 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
               nums.add(parseInt(part) - 1);
             } else {
               const from = parseInt(part.slice(0, dash) || "1") - 1;
-              const to = dash === part.length - 1 ? 200 : parseInt(part.slice(dash + 1)) - 1;
+              const to =
+                dash === part.length - 1
+                  ? 200
+                  : parseInt(part.slice(dash + 1)) - 1;
               for (let i = from; i <= to; i++) nums.add(i);
             }
           }
@@ -935,9 +1010,13 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
         for (const line of source.split("\n")) {
           if (fieldSpec) {
             const parts2 = line.split(delim);
-            segPlain(parts2.filter((_, i) => parseRange(fieldSpec).has(i)).join(delim));
+            segPlain(
+              parts2.filter((_, i) => parseRange(fieldSpec).has(i)).join(delim),
+            );
           } else if (charSpec) {
-            segPlain([...line].filter((_, i) => parseRange(charSpec).has(i)).join(""));
+            segPlain(
+              [...line].filter((_, i) => parseRange(charSpec).has(i)).join(""),
+            );
           } else {
             segPlain(line);
           }
@@ -995,17 +1074,27 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
         const source =
           pipeInput !== null && !fileArg
             ? pipeInput
-            : fileArg ? fs.get(resolvePath(cwd, fileArg)) : null;
+            : fileArg
+              ? fs.get(resolvePath(cwd, fileArg))
+              : null;
         if (source === null || source === undefined) {
-          segErr("sed: No input"); break;
+          segErr("sed: No input");
+          break;
         }
-        if (!scriptArg) { segErr("sed: no script"); break; }
+        if (!scriptArg) {
+          segErr("sed: no script");
+          break;
+        }
         const m = scriptArg.match(/^s([^a-zA-Z0-9\s])(.*?)\1(.*?)\1([gim]*)$/);
-        if (!m) { segErr(`sed: invalid script: ${scriptArg}`); break; }
+        if (!m) {
+          segErr(`sed: invalid script: ${scriptArg}`);
+          break;
+        }
         const [, , pattern, replacement, rFlags] = m;
         try {
           const re = new RegExp(pattern, rFlags.includes("g") ? "g" : "");
-          for (const line of source.split("\n")) segPlain(line.replace(re, replacement));
+          for (const line of source.split("\n"))
+            segPlain(line.replace(re, replacement));
         } catch {
           segErr(`sed: invalid regex: ${pattern}`);
         }
@@ -1013,7 +1102,10 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
       }
 
       case "printf": {
-        if (!args.length) { segPlain(""); break; }
+        if (!args.length) {
+          segPlain("");
+          break;
+        }
         const fmt = args[0]
           .replace(/\\n/g, "\n")
           .replace(/\\t/g, "\t")
@@ -1039,19 +1131,36 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
         for (const f of fileArgs2) {
           const tp = resolvePath(cwd, f);
           const existing = fs.get(tp);
-          fs.set(tp, hasA && existing && existing !== "DIR" ? existing + "\n" + teeSource : teeSource);
+          fs.set(
+            tp,
+            hasA && existing && existing !== "DIR"
+              ? existing + "\n" + teeSource
+              : teeSource,
+          );
         }
         break;
       }
 
       case "diff": {
         const diffFiles = args.filter((a) => !a.startsWith("-"));
-        if (diffFiles.length < 2) { segErr("diff: missing operand"); break; }
+        if (diffFiles.length < 2) {
+          segErr("diff: missing operand");
+          break;
+        }
         const df1 = fs.get(resolvePath(cwd, diffFiles[0]));
         const df2 = fs.get(resolvePath(cwd, diffFiles[1]));
-        if (df1 === undefined) { segErr(`diff: ${diffFiles[0]}: No such file`); break; }
-        if (df2 === undefined) { segErr(`diff: ${diffFiles[1]}: No such file`); break; }
-        if (df1 === "DIR" || df2 === "DIR") { segErr("diff: cannot compare directories"); break; }
+        if (df1 === undefined) {
+          segErr(`diff: ${diffFiles[0]}: No such file`);
+          break;
+        }
+        if (df2 === undefined) {
+          segErr(`diff: ${diffFiles[1]}: No such file`);
+          break;
+        }
+        if (df1 === "DIR" || df2 === "DIR") {
+          segErr("diff: cannot compare directories");
+          break;
+        }
         const dl1 = df1.split("\n");
         const dl2 = df2.split("\n");
         let hasDiff = false;
@@ -1071,10 +1180,16 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
 
       case "stat": {
         const statArg = args.find((a) => !a.startsWith("-"));
-        if (!statArg) { segErr("stat: missing operand"); break; }
+        if (!statArg) {
+          segErr("stat: missing operand");
+          break;
+        }
         const statPath = resolvePath(cwd, statArg);
         const statEntry = fs.get(statPath);
-        if (statEntry === undefined) { segErr(`stat: ${statArg}: No such file or directory`); break; }
+        if (statEntry === undefined) {
+          segErr(`stat: ${statArg}: No such file or directory`);
+          break;
+        }
         const statIsDir = statEntry === "DIR";
         const statSize = statIsDir ? 4096 : statEntry.length;
         const statInode = (Math.abs(hashStr(statPath)) % 999999) + 100000;
@@ -1082,11 +1197,26 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
         segPush([
           col("  Size: ", C.dim),
           col(String(statSize), C.yellow),
-          col(statIsDir ? "\tBlocks: 8\tIO Block: 4096\tdirectory" : `\tBlocks: ${Math.ceil(statSize / 512)}\tIO Block: 4096\tregular file`, C.dim),
+          col(
+            statIsDir
+              ? "\tBlocks: 8\tIO Block: 4096\tdirectory"
+              : `\tBlocks: ${Math.ceil(statSize / 512)}\tIO Block: 4096\tregular file`,
+            C.dim,
+          ),
         ]);
-        segPush([col("Inode: ", C.dim), col(String(statInode), C.white), col("  Links: 1", C.dim)]);
-        segPush([col("Access: ", C.dim), plain(statIsDir ? "drwxr-xr-x" : "-rw-r--r--")]);
-        segPush([col("Modify: ", C.dim), plain(new Date().toISOString().replace("T", " ").slice(0, 19))]);
+        segPush([
+          col("Inode: ", C.dim),
+          col(String(statInode), C.white),
+          col("  Links: 1", C.dim),
+        ]);
+        segPush([
+          col("Access: ", C.dim),
+          plain(statIsDir ? "drwxr-xr-x" : "-rw-r--r--"),
+        ]);
+        segPush([
+          col("Modify: ", C.dim),
+          plain(new Date().toISOString().replace("T", " ").slice(0, 19)),
+        ]);
         break;
       }
 
@@ -1094,11 +1224,24 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
         for (const a of args.filter((x) => !x.startsWith("-"))) {
           const fp = resolvePath(cwd, a);
           const fe = fs.get(fp);
-          if (fe === undefined) { segErr(`file: ${a}: No such file or directory`); continue; }
-          if (fe === "DIR") segPush([col(`${a}: `, C.white), plain("directory")]);
-          else if (fe.startsWith("__ELF__:")) segPush([col(`${a}: `, C.white), plain("ELF 64-bit LSB executable, x86-64")]);
-          else if (fe.startsWith("#!")) segPush([col(`${a}: `, C.white), plain("POSIX shell script, ASCII text executable")]);
-          else if (fe.includes("#include") || fe.includes("int main(")) segPush([col(`${a}: `, C.white), plain("C++ source, ASCII text")]);
+          if (fe === undefined) {
+            segErr(`file: ${a}: No such file or directory`);
+            continue;
+          }
+          if (fe === "DIR")
+            segPush([col(`${a}: `, C.white), plain("directory")]);
+          else if (fe.startsWith("__ELF__:"))
+            segPush([
+              col(`${a}: `, C.white),
+              plain("ELF 64-bit LSB executable, x86-64"),
+            ]);
+          else if (fe.startsWith("#!"))
+            segPush([
+              col(`${a}: `, C.white),
+              plain("POSIX shell script, ASCII text executable"),
+            ]);
+          else if (fe.includes("#include") || fe.includes("int main("))
+            segPush([col(`${a}: `, C.white), plain("C++ source, ASCII text")]);
           else segPush([col(`${a}: `, C.white), plain("ASCII text")]);
         }
         break;
@@ -1106,17 +1249,70 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
 
       case "type": {
         const typeBuiltins = new Set([
-          "pwd","ls","cd","mkdir","rmdir","touch","cat","echo","head","tail",
-          "wc","cp","mv","rm","grep","find","which","env","export","alias",
-          "clear","history","man","help","whoami","hostname","date","sort",
-          "uniq","cut","tr","sed","printf","tee","diff","stat","file","type",
-          "unset","sleep","exit","logout","less","more","bc","ln","chmod",
-          "g++","gcc","clang++","cc","make","bash","sh","source",".",
+          "pwd",
+          "ls",
+          "cd",
+          "mkdir",
+          "rmdir",
+          "touch",
+          "cat",
+          "echo",
+          "head",
+          "tail",
+          "wc",
+          "cp",
+          "mv",
+          "rm",
+          "grep",
+          "find",
+          "which",
+          "env",
+          "export",
+          "alias",
+          "clear",
+          "history",
+          "man",
+          "help",
+          "whoami",
+          "hostname",
+          "date",
+          "sort",
+          "uniq",
+          "cut",
+          "tr",
+          "sed",
+          "printf",
+          "tee",
+          "diff",
+          "stat",
+          "file",
+          "type",
+          "unset",
+          "sleep",
+          "exit",
+          "logout",
+          "less",
+          "more",
+          "bc",
+          "ln",
+          "chmod",
+          "g++",
+          "gcc",
+          "clang++",
+          "cc",
+          "make",
+          "bash",
+          "sh",
+          "source",
+          ".",
         ]);
         for (const a of args) {
-          if (aliases[a]) segPush([col(a, C.green), plain(` is aliased to '${aliases[a]}'`)]);
-          else if (typeBuiltins.has(a)) segPush([col(a, C.green), plain(" is a shell builtin")]);
-          else if (fs.has(`/usr/bin/${a}`)) segPush([col(a, C.green), plain(` is /usr/bin/${a}`)]);
+          if (aliases[a])
+            segPush([col(a, C.green), plain(` is aliased to '${aliases[a]}'`)]);
+          else if (typeBuiltins.has(a))
+            segPush([col(a, C.green), plain(" is a shell builtin")]);
+          else if (fs.has(`/usr/bin/${a}`))
+            segPush([col(a, C.green), plain(` is /usr/bin/${a}`)]);
           else segCol(`type: ${a}: not found`, C.red);
         }
         break;
@@ -1125,7 +1321,10 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
       // ── Misc utilities ─────────────────────────────────────────────────────
 
       case "unset": {
-        for (const a of args) { delete env[a]; delete aliases[a]; }
+        for (const a of args) {
+          delete env[a];
+          delete aliases[a];
+        }
         break;
       }
 
@@ -1148,9 +1347,17 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
         const source2 =
           pipeInput !== null && !fileArg2
             ? pipeInput
-            : fileArg2 ? fs.get(resolvePath(cwd, fileArg2)) : null;
-        if (source2 === null || source2 === undefined) { segErr(`${cmd}: No such file`); break; }
-        if (source2 === "DIR") { segErr(`${cmd}: Is a directory`); break; }
+            : fileArg2
+              ? fs.get(resolvePath(cwd, fileArg2))
+              : null;
+        if (source2 === null || source2 === undefined) {
+          segErr(`${cmd}: No such file`);
+          break;
+        }
+        if (source2 === "DIR") {
+          segErr(`${cmd}: Is a directory`);
+          break;
+        }
         for (const l of source2.split("\n")) segPlain(l);
         segPush([col("(END)", C.dim)]);
         break;
@@ -1164,14 +1371,21 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
           break;
         }
         try {
-          const safe = expr.replace(/\^/g, "**").replace(/[^0-9+\-*/.%\s()]/g, "");
+          const safe = expr
+            .replace(/\^/g, "**")
+            .replace(/[^0-9+\-*/.%\s()]/g, "");
           if (!/^[\d\s+\-*/.%()]+$/.test(safe.trim())) {
-            segErr("bc: syntax error"); break;
+            segErr("bc: syntax error");
+            break;
           }
           // eslint-disable-next-line no-new-func
           const val = Function('"use strict"; return (' + safe + ")")();
           if (Number.isFinite(val))
-            segPlain(Number.isInteger(val) ? String(val) : String(parseFloat(val.toFixed(10))));
+            segPlain(
+              Number.isInteger(val)
+                ? String(val)
+                : String(parseFloat(val.toFixed(10))),
+            );
           else segErr("bc: computation error");
         } catch {
           segErr("bc: syntax error");
@@ -1182,12 +1396,21 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
       case "ln": {
         const hasS = args.includes("-s");
         const lnPaths = args.filter((a) => !a.startsWith("-"));
-        if (lnPaths.length < 2) { segErr("ln: missing operand"); break; }
+        if (lnPaths.length < 2) {
+          segErr("ln: missing operand");
+          break;
+        }
         const [lnTarget, lnLink] = lnPaths;
         const lnTargetPath = resolvePath(cwd, lnTarget);
         const lnLinkPath = resolvePath(cwd, lnLink);
-        if (!fs.has(lnTargetPath)) { segErr(`ln: ${lnTarget}: No such file or directory`); break; }
-        if (fs.has(lnLinkPath)) { segErr(`ln: ${lnLink}: File exists`); break; }
+        if (!fs.has(lnTargetPath)) {
+          segErr(`ln: ${lnTarget}: No such file or directory`);
+          break;
+        }
+        if (fs.has(lnLinkPath)) {
+          segErr(`ln: ${lnLink}: File exists`);
+          break;
+        }
         if (hasS) fs.set(lnLinkPath, `__SYMLINK__:${lnTargetPath}`);
         else copyEntry(fs, lnTargetPath, lnLinkPath);
         break;
@@ -1195,10 +1418,14 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
 
       case "chmod": {
         const chmodPaths = args.filter((a) => !a.startsWith("-"));
-        if (chmodPaths.length < 2) { segErr("chmod: missing operand"); break; }
+        if (chmodPaths.length < 2) {
+          segErr("chmod: missing operand");
+          break;
+        }
         const [modeStr, ...chmodTargets] = chmodPaths;
         for (const t of chmodTargets) {
-          if (!fs.has(resolvePath(cwd, t))) segErr(`chmod: ${t}: No such file or directory`);
+          if (!fs.has(resolvePath(cwd, t)))
+            segErr(`chmod: ${t}: No such file or directory`);
           else segPush([col(`mode of '${t}' changed to ${modeStr}`, C.dim)]);
         }
         break;
@@ -1376,12 +1603,20 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
         );
         const oIdx = args.indexOf("-o");
         const outName = oIdx !== -1 ? args[oIdx + 1] : "a.out";
-        if (srcFiles.length === 0) { segErr(`${cmd}: no input files`); break; }
+        if (srcFiles.length === 0) {
+          segErr(`${cmd}: no input files`);
+          break;
+        }
         let compileErr = false;
         for (const src of srcFiles) {
           const sp = resolvePath(cwd, src);
-          if (!fs.has(sp)) { segErr(`${cmd}: ${src}: No such file or directory`); compileErr = true; }
-          else if (fs.get(sp) === "DIR") { segErr(`${cmd}: ${src}: Is a directory`); compileErr = true; }
+          if (!fs.has(sp)) {
+            segErr(`${cmd}: ${src}: No such file or directory`);
+            compileErr = true;
+          } else if (fs.get(sp) === "DIR") {
+            segErr(`${cmd}: ${src}: Is a directory`);
+            compileErr = true;
+          }
         }
         if (compileErr) break;
         // Check for // __OUTPUT__: annotation in source for simulation output
@@ -1404,21 +1639,36 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
         const makeTarget = args.find((a) => !a.startsWith("-")) ?? "all";
         const mfPath = resolvePath(cwd, "Makefile");
         const mf = fs.get(mfPath);
-        if (!mf || mf === "DIR") { segErr("make: *** No Makefile found. Stop."); break; }
+        if (!mf || mf === "DIR") {
+          segErr("make: *** No Makefile found. Stop.");
+          break;
+        }
         let inTarget = false;
         const recipes = [];
         for (const ml of mf.split("\n")) {
           if (/^[\w.\-]+(\s*):/.test(ml)) {
-            inTarget = ml.startsWith(makeTarget + ":") || ml.startsWith(makeTarget + " :");
+            inTarget =
+              ml.startsWith(makeTarget + ":") ||
+              ml.startsWith(makeTarget + " :");
             if (!inTarget) recipes.length = 0;
           } else if (inTarget && ml.startsWith("\t")) {
             recipes.push(ml.slice(1));
           }
         }
-        if (recipes.length === 0) { segErr(`make: *** No rule to make target '${makeTarget}'. Stop.`); break; }
+        if (recipes.length === 0) {
+          segErr(`make: *** No rule to make target '${makeTarget}'. Stop.`);
+          break;
+        }
         for (const recipe of recipes) {
           segPush([col(`  ${recipe}`, C.dim)]);
-          const rr = runCommand(recipe, { fs, cwd, env, aliases, cmdHistory: [], programs });
+          const rr = runCommand(recipe, {
+            fs,
+            cwd,
+            env,
+            aliases,
+            cmdHistory: [],
+            programs,
+          });
           lines.push(...rr.output);
           for (const [k, v] of rr.newFs) fs.set(k, v);
           Object.assign(env, rr.newEnv);
@@ -1436,19 +1686,37 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
         const scriptFile = args.find((a) => !a.startsWith("-"));
         if (!scriptFile) {
           if (cmd === "bash" || cmd === "sh")
-            segPush([col(`${cmd}: interactive mode not supported. Use: ${cmd} script.sh`, C.dim)]);
+            segPush([
+              col(
+                `${cmd}: interactive mode not supported. Use: ${cmd} script.sh`,
+                C.dim,
+              ),
+            ]);
           else segErr(`${cmd}: filename argument required`);
           break;
         }
         const scriptPath2 = resolvePath(cwd, scriptFile);
         const scriptContent = fs.get(scriptPath2);
-        if (scriptContent === undefined) { segErr(`${cmd}: ${scriptFile}: No such file or directory`); break; }
-        if (scriptContent === "DIR") { segErr(`${cmd}: ${scriptFile}: Is a directory`); break; }
+        if (scriptContent === undefined) {
+          segErr(`${cmd}: ${scriptFile}: No such file or directory`);
+          break;
+        }
+        if (scriptContent === "DIR") {
+          segErr(`${cmd}: ${scriptFile}: Is a directory`);
+          break;
+        }
         const scriptLines2 = scriptContent
           .split("\n")
           .filter((l) => l.trim() && !l.trim().startsWith("#"));
         for (const sl of scriptLines2) {
-          const sr = runCommand(sl, { fs, cwd, env, aliases, cmdHistory: [], programs });
+          const sr = runCommand(sl, {
+            fs,
+            cwd,
+            env,
+            aliases,
+            cmdHistory: [],
+            programs,
+          });
           lines.push(...sr.output);
           for (const [k, v] of sr.newFs) fs.set(k, v);
           cwd = sr.newCwd;
@@ -1665,7 +1933,9 @@ export default function ShellTerminal({ params = {} }) {
       }
 
       const newHistory = clearHistory
-        ? allOutput.length ? [promptLine, ...allOutput] : []
+        ? allOutput.length
+          ? [promptLine, ...allOutput]
+          : []
         : [...history, promptLine, ...allOutput];
 
       setHistory(newHistory);

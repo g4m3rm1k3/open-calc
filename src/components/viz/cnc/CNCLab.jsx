@@ -1,13 +1,14 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
-import { CNCInterpreter } from '../../../scripts/cnc/CNCInterpreter.js'
-import CNCBackplot from './CNCBackplot.jsx'
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { CNCInterpreter } from "../../../scripts/cnc/CNCInterpreter.js";
+import CNCBackplot from "./CNCBackplot.jsx";
 
 // ─── Preset program library ────────────────────────────────────────────────────
 const PROGRAM_LIBRARY = {
   fanuc: [
     {
-      id: 'O0001', name: 'Simple Square Pocket',
-      desc: 'G01 linear moves in a square pattern. Teaches: G00, G01, G90.',
+      id: "O0001",
+      name: "Simple Square Pocket",
+      desc: "G01 linear moves in a square pattern. Teaches: G00, G01, G90.",
       code: `O0001 (SIMPLE SQUARE POCKET)
 G10 L2 P1 X0 Y0 Z0 (G54 PART ORIGIN AT MACHINE HOME)
 G21 G90 G17 G40 G49 G80
@@ -25,11 +26,12 @@ G01 Y0
 G00 Z50.
 M09
 M05
-M30`
+M30`,
     },
     {
-      id: 'O0002', name: 'Bolt Circle (WHILE Loop)',
-      desc: 'Drills 8 holes equally spaced on a circle using a WHILE macro loop. Teaches: #vars, WHILE, SIN, COS.',
+      id: "O0002",
+      name: "Bolt Circle (WHILE Loop)",
+      desc: "Drills 8 holes equally spaced on a circle using a WHILE macro loop. Teaches: #vars, WHILE, SIN, COS.",
       code: `O0002 (BOLT CIRCLE - 8 HOLES)
 G10 L2 P1 X0 Y0 Z0 (G54 PART ORIGIN)
 G21 G90 G17 G40 G49 G80
@@ -51,11 +53,12 @@ END1
 G80
 G00 Z50.
 M05
-M30`
+M30`,
     },
     {
-      id: 'O0003', name: 'Arc Pocket (G02/G03)',
-      desc: 'Circular pocket using arc interpolation. Teaches: G02, G03, I, J.',
+      id: "O0003",
+      name: "Arc Pocket (G02/G03)",
+      desc: "Circular pocket using arc interpolation. Teaches: G02, G03, I, J.",
       code: `O0003 (CIRCULAR POCKET)
 G10 L2 P1 X0 Y0 Z0 (G54 PART ORIGIN)
 G21 G90 G17
@@ -68,11 +71,12 @@ G01 X20. F150
 G02 X20. Y0 I-20. J0 F200
 G00 Z50.
 M05
-M30`
+M30`,
     },
     {
-      id: 'O0004', name: 'Subroutine Demo (M98/M99)',
-      desc: 'Main program calls a drilling subroutine at multiple positions. Teaches: M98, M99, L repeats.',
+      id: "O0004",
+      name: "Subroutine Demo (M98/M99)",
+      desc: "Main program calls a drilling subroutine at multiple positions. Teaches: M98, M99, L repeats.",
       code: `O0004 (SUBROUTINE DEMO)
 G10 L2 P1 X0 Y0 Z0 (G54 PART ORIGIN)
 G21 G90
@@ -92,11 +96,12 @@ N9001
 G00 Z5.
 G01 Z-8. F60
 G00 Z5.
-M99`
+M99`,
     },
     {
-      id: 'O0006', name: 'Named Variables (#_ALM, #[NAME])',
-      desc: 'Fanuc Macro B named variables. Teaches: #[RADIUS], #_ALM, system vars #5041-5043, #3011.',
+      id: "O0006",
+      name: "Named Variables (#_ALM, #[NAME])",
+      desc: "Fanuc Macro B named variables. Teaches: #[RADIUS], #_ALM, system vars #5041-5043, #3011.",
       code: `O0006 (NAMED MACRO VARIABLES DEMO)
 G10 L2 P1 X0 Y0 Z0 (G54 PART ORIGIN)
 G21 G90 G17 G40 G49 G80
@@ -126,11 +131,12 @@ END1
 (VERIFY FINAL POSITION USING SYSTEM VARS)
 (#5041=X #5042=Y #5043=Z work pos)
 G00 Z50. M09 M05
-M30`
+M30`,
     },
     {
-      id: 'O0007', name: 'Extended Work Offsets (G54.1)',
-      desc: 'Programs G54.1 P1-P3 extended offsets via G10, then machines a pattern in each. Teaches: G54.1, G10 L2.',
+      id: "O0007",
+      name: "Extended Work Offsets (G54.1)",
+      desc: "Programs G54.1 P1-P3 extended offsets via G10, then machines a pattern in each. Teaches: G54.1, G10 L2.",
       code: `O0007 (EXTENDED WORK OFFSETS G54.1)
 G21 G90 G40 G49 G80
 (SET EWO P1 VIA G10)
@@ -161,11 +167,12 @@ G01 Z-2. F80
 G01 X20. F150
 G00 Z50.
 M09 M05
-M30`
+M30`,
     },
     {
-      id: 'O0005', name: 'Work Offsets (G54-G56)',
-      desc: 'Machines the same pattern in three different work coordinate systems. Teaches: G54, G55, G56.',
+      id: "O0005",
+      name: "Work Offsets (G54-G56)",
+      desc: "Machines the same pattern in three different work coordinate systems. Teaches: G54, G55, G56.",
       code: `O0005 (WORK OFFSETS DEMO)
 G21 G90
 T1 M06
@@ -188,13 +195,14 @@ G01 Z-2. F80
 G01 X20. F150
 G00 Z50.
 M05
-M30`
-    }
+M30`,
+    },
   ],
   siemens: [
     {
-      id: 'MPF001', name: 'Simple Contour',
-      desc: 'Basic linear moves. Siemens syntax uses = for assignment.',
+      id: "MPF001",
+      name: "Simple Contour",
+      desc: "Basic linear moves. Siemens syntax uses = for assignment.",
       code: `; SIMPLE CONTOUR - SIEMENS 840D
 G21 G90 G17
 T1 D1
@@ -208,11 +216,12 @@ G01 X0
 G01 Y0
 G00 Z50
 M05
-M30`
+M30`,
     },
     {
-      id: 'MPF002', name: 'Bolt Circle (R-variables)',
-      desc: 'Bolt circle using Siemens R-variables and GOTOF. Teaches: R-vars, IF, GOTOF.',
+      id: "MPF002",
+      name: "Bolt Circle (R-variables)",
+      desc: "Bolt circle using Siemens R-variables and GOTOF. Teaches: R-vars, IF, GOTOF.",
       code: `; BOLT CIRCLE - SIEMENS R-VARS
 G21 G90
 T1 D1 M06
@@ -231,13 +240,14 @@ R1 = R1 + 1
 IF R1 < R2 GOTOB STARTHOLE
 G00 Z50
 M05
-M30`
-    }
+M30`,
+    },
   ],
   okuma: [
     {
-      id: 'O1001', name: 'Okuma Basic Contour',
-      desc: 'Okuma OSP syntax. Uses VCALL for subroutines.',
+      id: "O1001",
+      name: "Okuma Basic Contour",
+      desc: "Okuma OSP syntax. Uses VCALL for subroutines.",
       code: `O1001 (OKUMA BASIC CONTOUR)
 G15 H1
 BLK FORM 0.1 Z-30 X0 Y0
@@ -253,10 +263,10 @@ X0
 Y0
 G00 Z50
 M05
-M30`
-    }
-  ]
-}
+M30`,
+    },
+  ],
+};
 
 // ─── Default tool table ────────────────────────────────────────────────────────
 // dia = cutting diameter (mm)
@@ -264,256 +274,405 @@ M30`
 // lenCut = flute / length of cut (how deep the tool can cut)
 // lenTotal = overall body length (for clearance checking)
 const DEFAULT_TOOLS = {
-  1: { dia: 10,  len: 75.0,  lenCut: 22.0,  lenTotal: 75.0,  desc: '#1 - 10mm 4-Flute End Mill' },
-  2: { dia: 6,   len: 82.0,  lenCut: 28.0,  lenTotal: 82.0,  desc: '#2 - 6mm Drill' },
-  3: { dia: 8,   len: 79.0,  lenCut: 20.0,  lenTotal: 79.0,  desc: '#3 - 8mm Ball End Mill' },
-  4: { dia: 12,  len: 68.0,  lenCut: 30.0,  lenTotal: 68.0,  desc: '#4 - 12mm Face Mill' },
-  5: { dia: 3,   len: 60.0,  lenCut: 8.0,   lenTotal: 60.0,  desc: '#5 - 3mm Slot Drill' },
-}
+  1: {
+    dia: 10,
+    len: 75.0,
+    lenCut: 22.0,
+    lenTotal: 75.0,
+    desc: "#1 - 10mm 4-Flute End Mill",
+  },
+  2: {
+    dia: 6,
+    len: 82.0,
+    lenCut: 28.0,
+    lenTotal: 82.0,
+    desc: "#2 - 6mm Drill",
+  },
+  3: {
+    dia: 8,
+    len: 79.0,
+    lenCut: 20.0,
+    lenTotal: 79.0,
+    desc: "#3 - 8mm Ball End Mill",
+  },
+  4: {
+    dia: 12,
+    len: 68.0,
+    lenCut: 30.0,
+    lenTotal: 68.0,
+    desc: "#4 - 12mm Face Mill",
+  },
+  5: {
+    dia: 3,
+    len: 60.0,
+    lenCut: 8.0,
+    lenTotal: 60.0,
+    desc: "#5 - 3mm Slot Drill",
+  },
+};
 
-const DIALECTS = ['fanuc', 'okuma', 'siemens']
-const DIALECT_LABELS = { fanuc: 'FANUC', okuma: 'OKUMA OSP', siemens: 'SIEMENS 840D' }
-const DIALECT_COLORS = { fanuc: '#3b82f6', okuma: '#f59e0b', siemens: '#10b981' }
+const DIALECTS = ["fanuc", "okuma", "siemens"];
+const DIALECT_LABELS = {
+  fanuc: "FANUC",
+  okuma: "OKUMA OSP",
+  siemens: "SIEMENS 840D",
+};
+const DIALECT_COLORS = {
+  fanuc: "#3b82f6",
+  okuma: "#f59e0b",
+  siemens: "#10b981",
+};
 
 // ─── Component ────────────────────────────────────────────────────────────────
-export default function CNCLab({ initialCode = '', dialect: initialDialect = 'fanuc', lessonProgram = null }) {
+export default function CNCLab({
+  initialCode = "",
+  dialect: initialDialect = "fanuc",
+  lessonProgram = null,
+  params = {},
+  onParamChange,
+}) {
+  // When used via VizFrame, lesson props arrive in `params` not as direct props
+  const _initialCode = params.initialCode ?? initialCode;
+  const _initialDialect = params.dialect ?? initialDialect;
+  const _lessonProgram = params.lessonProgram ?? lessonProgram;
   // Theme awareness
-  const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'))
+  const [isDark, setIsDark] = useState(() =>
+    document.documentElement.classList.contains("dark"),
+  );
   useEffect(() => {
     const observer = new MutationObserver(() => {
-      setIsDark(document.documentElement.classList.contains('dark'))
-    })
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
-    return () => observer.disconnect()
-  }, [])
+      setIsDark(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    return () => observer.disconnect();
+  }, []);
 
-  const C = useMemo(() => isDark ? {
-    bg:      '#0f172a',
-    surface: '#1e293b',
-    border:  '#334155',
-    text:    '#f1f5f9',
-    muted:   '#94a3b8',
-    hint:    '#475569',
-    green:   '#4ade80',
-    amber:   '#fbbf24',
-    red:     '#f87171',
-    blue:    '#38bdf8',
-    teal:    '#2dd4bf',
-    purple:  '#a78bfa',
-  } : {
-    bg:      '#f1f5f9',
-    surface: '#ffffff',
-    border:  '#cbd5e1',
-    text:    '#0f172a',
-    muted:   '#475569',
-    hint:    '#94a3b8',
-    green:   '#16a34a',
-    amber:   '#d97706',
-    red:     '#dc2626',
-    blue:    '#2563eb',
-    teal:    '#0d9488',
-    purple:  '#7c3aed',
-  }, [isDark])
+  const C = useMemo(
+    () =>
+      isDark
+        ? {
+            bg: "#0f172a",
+            surface: "#1e293b",
+            border: "#334155",
+            text: "#f1f5f9",
+            muted: "#94a3b8",
+            hint: "#475569",
+            green: "#4ade80",
+            amber: "#fbbf24",
+            red: "#f87171",
+            blue: "#38bdf8",
+            teal: "#2dd4bf",
+            purple: "#a78bfa",
+          }
+        : {
+            bg: "#f1f5f9",
+            surface: "#ffffff",
+            border: "#cbd5e1",
+            text: "#0f172a",
+            muted: "#475569",
+            hint: "#94a3b8",
+            green: "#16a34a",
+            amber: "#d97706",
+            red: "#dc2626",
+            blue: "#2563eb",
+            teal: "#0d9488",
+            purple: "#7c3aed",
+          },
+    [isDark],
+  );
   // ── Dialect & machine ──────────────────────────────────────────────────────
-  const [dialect, setDialect] = useState(initialDialect)
-  const [singleBlock, setSingleBlock] = useState(false)
-  const [isPlaying, setIsPlaying] = useState(false)
+  const [dialect, setDialect] = useState(_initialDialect);
+  const [singleBlock, setSingleBlock] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   // ── Program management ──────────────────────────────────────────────────────
-  const [code, setCode] = useState(lessonProgram ?? initialCode ?? (PROGRAM_LIBRARY.fanuc[0]?.code ?? ''))
-  const [panel, setPanel] = useState('dro')   // dro | offsets | macros | tools | code | program
+  const [code, setCode] = useState(
+    _lessonProgram ?? _initialCode ?? PROGRAM_LIBRARY.fanuc[0]?.code ?? "",
+  );
+  const [panel, setPanel] = useState("dro"); // dro | offsets | macros | tools | code | program
 
   // ── Interpreter ────────────────────────────────────────────────────────────
-  const interpRef    = useRef(null)
-  const stepCountRef  = useRef(0)   // monotonic step call counter — indexes into pathPoints
-  const [machineState, setMachineState] = useState(null)
-  const [pathPoints, setPathPoints]   = useState([])
-  const [currentStep, setCurrentStep] = useState(0)
+  const interpRef = useRef(null);
+  const stepCountRef = useRef(0); // monotonic step call counter — indexes into pathPoints
+  const [machineState, setMachineState] = useState(null);
+  const [pathPoints, setPathPoints] = useState([]);
+  const [currentStep, setCurrentStep] = useState(0);
 
   // ── Tool table ──────────────────────────────────────────────────────────────
-  const [toolTable, setToolTable] = useState({ ...DEFAULT_TOOLS })
-  const [editingTool, setEditingTool] = useState(null)  // tool number being edited
+  const [toolTable, setToolTable] = useState({ ...DEFAULT_TOOLS });
+  const [editingTool, setEditingTool] = useState(null); // tool number being edited
 
   // ── Jog ─────────────────────────────────────────────────────────────────────
-  const [jogAxis, setJogAxis] = useState('X')
-  const [jogStep, setJogStep] = useState(1.0)
-  const [jogPos, setJogPos] = useState({ X:0, Y:0, Z:0 })
+  const [jogAxis, setJogAxis] = useState("X");
+  const [jogStep, setJogStep] = useState(1.0);
 
   // ── Work offset editing ──────────────────────────────────────────────────────
-  const [editingOffset, setEditingOffset] = useState(null)
+  const [editingOffset, setEditingOffset] = useState(null);
 
   // ── Upload ref ───────────────────────────────────────────────────────────────
-  const fileInputRef = useRef(null)
+  const fileInputRef = useRef(null);
+  const ewoJumpRef = useRef(null);
+  const traceContainerRef = useRef(null);
+  const activeTraceRef = useRef(null);
 
   // ─── Init / reload interpreter ─────────────────────────────────────────────
   const loadAndRun = useCallback((prog, dial, tbl) => {
-    const interp = new CNCInterpreter(dial)
-    interp.setToolTable(tbl)
-    interp.loadProgram(prog)
-    interpRef.current = interp
+    const interp = new CNCInterpreter(dial);
+    interp.setToolTable(tbl);
+    interp.loadProgram(prog);
+    interpRef.current = interp;
 
     // Pre-run for backplot
-    const preview = new CNCInterpreter(dial)
-    preview.setToolTable(tbl)
-    preview.loadProgram(prog)
-    const snaps = preview.runAll(12000)
+    const preview = new CNCInterpreter(dial);
+    preview.setToolTable(tbl);
+    preview.loadProgram(prog);
+    const snaps = preview.runAll(12000);
     // Use work coords (X/Y/Z) not machine coords: MZ includes TLO which
     // offsets the whole path upward relative to the workpiece visually.
-    setPathPoints(snaps.map(s => ({ 
-      machineX: s.X ?? 0, 
-      machineY: s.Y ?? 0, 
-      machineZ: s.Z ?? 0,
-      motionMode: s.motionMode
-    })))
-    stepCountRef.current = 0
-    setCurrentStep(0)
-    setMachineState({ ...interp.state })
-    setIsPlaying(false)
-  }, [])
+    setPathPoints(
+      snaps.map((s) => ({
+        machineX: s.X ?? 0,
+        machineY: s.Y ?? 0,
+        machineZ: s.Z ?? 0,
+        motionMode: s.motionMode,
+      })),
+    );
+    stepCountRef.current = 0;
+    setCurrentStep(0);
+    setMachineState({ ...interp.state });
+    setIsPlaying(false);
+  }, []);
 
   useEffect(() => {
-    loadAndRun(code, dialect, toolTable)
-  }, [code, dialect, toolTable])
+    loadAndRun(code, dialect, toolTable);
+  }, [code, dialect, toolTable]);
 
   // ─── Step ──────────────────────────────────────────────────────────────────
   const stepNext = useCallback(() => {
-    if (!interpRef.current) return
-    if (interpRef.current.state.isDone || interpRef.current.state.isError) return
-    const s = interpRef.current.step()
-    setMachineState({ ...s })
+    if (!interpRef.current) return;
+    if (interpRef.current.state.isDone || interpRef.current.state.isError)
+      return;
+    const s = interpRef.current.step();
+    setMachineState({ ...s });
     // Use a monotonic counter so backplot tool position indexes correctly into pathPoints
-    stepCountRef.current++
-    setCurrentStep(stepCountRef.current)
-  }, [])
+    stepCountRef.current++;
+    setCurrentStep(stepCountRef.current);
+  }, []);
 
   const resetProgram = useCallback(() => {
-    loadAndRun(code, dialect, toolTable)
-  }, [code, dialect, toolTable, loadAndRun])
+    loadAndRun(code, dialect, toolTable);
+  }, [code, dialect, toolTable, loadAndRun]);
 
   // Auto-play with single-block awareness
   useEffect(() => {
-    let timer
-    if (isPlaying && machineState && !machineState.isDone && !machineState.isError) {
-      timer = setTimeout(() => {
-        stepNext()
-        if (singleBlock) setIsPlaying(false)
-      }, singleBlock ? 0 : 280)
+    let timer;
+    if (
+      isPlaying &&
+      machineState &&
+      !machineState.isDone &&
+      !machineState.isError
+    ) {
+      timer = setTimeout(
+        () => {
+          stepNext();
+          if (singleBlock) setIsPlaying(false);
+        },
+        singleBlock ? 0 : 280,
+      );
     } else {
-      setIsPlaying(false)
+      setIsPlaying(false);
     }
-    return () => clearTimeout(timer)
-  }, [isPlaying, machineState, singleBlock])
+    return () => clearTimeout(timer);
+  }, [isPlaying, machineState, singleBlock]);
 
-  // ─── Jog ──────────────────────────────────────────────────────────────────
-  const jog = useCallback((dir) => {
-    setJogPos(prev => ({
-      ...prev,
-      [jogAxis]: parseFloat((prev[jogAxis] + dir * jogStep).toFixed(4))
-    }))
-  }, [jogAxis, jogStep])
+  // ─── Jog ─────────────────────────────────────────────────────────────────
+  const jog = useCallback(
+    (dir) => {
+      if (!interpRef.current) return;
+      const delta = dir * jogStep;
+      const mAx = `M${jogAxis}`;
+      const next = parseFloat(
+        ((interpRef.current.state[mAx] ?? 0) + delta).toFixed(4),
+      );
+      interpRef.current.state[mAx] = next;
+      const off =
+        interpRef.current.state.offsets?.[
+          interpRef.current.state.activeOffset
+        ] ?? {};
+      interpRef.current.state[jogAxis] = parseFloat(
+        (next - (off[jogAxis] ?? 0)).toFixed(4),
+      );
+      setMachineState({ ...interpRef.current.state });
+    },
+    [jogAxis, jogStep],
+  );
+
+  // ─── Auto-scroll program trace to active block ─────────────────────────────
+  useEffect(() => {
+    if (activeTraceRef.current) {
+      activeTraceRef.current.scrollIntoView({
+        block: "nearest",
+        behavior: "smooth",
+      });
+    }
+  }, [machineState?.programPointer]);
 
   // ─── File upload ──────────────────────────────────────────────────────────
   const handleUpload = useCallback((e) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = (ev) => { setCode(ev.target.result) }
-    reader.readAsText(file)
-    e.target.value = ''
-  }, [])
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      setCode(ev.target.result);
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  }, []);
 
   // ─── Download program ───────────────────────────────────────────────────────────
   const downloadProgram = useCallback(() => {
-    const ext = dialect === 'siemens' ? '.mpf' : dialect === 'okuma' ? '.min' : '.nc'
-    const blob = new Blob([code], { type: 'text/plain' })
-    const url  = URL.createObjectURL(blob)
-    const a    = document.createElement('a')
-    a.href     = url
-    a.download = `cnc_program${ext}`
-    a.click()
-    URL.revokeObjectURL(url)
-  }, [code, dialect])
+    const ext =
+      dialect === "siemens" ? ".mpf" : dialect === "okuma" ? ".min" : ".nc";
+    const blob = new Blob([code], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `cnc_program${ext}`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [code, dialect]);
 
   // ─── LocalStorage save / load ───────────────────────────────────────────────────────
-  const LS_KEY = 'cnc_saved_programs'
+  const LS_KEY = "cnc_saved_programs";
   const [savedPrograms, setSavedPrograms] = useState(() => {
-    try { return JSON.parse(localStorage.getItem(LS_KEY) ?? '[]') } catch { return [] }
-  })
-  const [saveNameInput, setSaveNameInput] = useState('')
+    try {
+      return JSON.parse(localStorage.getItem(LS_KEY) ?? "[]");
+    } catch {
+      return [];
+    }
+  });
+  const [saveNameInput, setSaveNameInput] = useState("");
 
   const saveToMemory = useCallback(() => {
-    const name = saveNameInput.trim() || `Program ${new Date().toLocaleTimeString()}`
-    const entry = { name, code, dialect, savedAt: Date.now() }
-    setSavedPrograms(prev => {
-      const next = [...prev, entry]
-      localStorage.setItem(LS_KEY, JSON.stringify(next))
-      return next
-    })
-    setSaveNameInput('')
-  }, [code, dialect, saveNameInput])
+    const name =
+      saveNameInput.trim() || `Program ${new Date().toLocaleTimeString()}`;
+    const entry = { name, code, dialect, savedAt: Date.now() };
+    setSavedPrograms((prev) => {
+      const next = [...prev, entry];
+      localStorage.setItem(LS_KEY, JSON.stringify(next));
+      return next;
+    });
+    setSaveNameInput("");
+  }, [code, dialect, saveNameInput]);
 
   const deleteSaved = useCallback((idx) => {
-    setSavedPrograms(prev => {
-      const next = prev.filter((_, i) => i !== idx)
-      localStorage.setItem(LS_KEY, JSON.stringify(next))
-      return next
-    })
-  }, [])
+    setSavedPrograms((prev) => {
+      const next = prev.filter((_, i) => i !== idx);
+      localStorage.setItem(LS_KEY, JSON.stringify(next));
+      return next;
+    });
+  }, []);
 
   // ─── Load preset program ───────────────────────────────────────────────────
   const loadPreset = useCallback((prog) => {
-    setCode(prog.code)
-    setPanel('code')
-  }, [])
+    setCode(prog.code);
+    setPanel("code");
+  }, []);
 
-  const ms = machineState
+  const ms = machineState;
 
   return (
-    <div className="flex flex-col font-mono text-xs select-none"
-      style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 12, overflow: 'hidden' }}>
-
+    <div
+      className="flex flex-col font-mono text-xs select-none"
+      style={{
+        background: C.bg,
+        border: `1px solid ${C.border}`,
+        borderRadius: 12,
+        overflow: "hidden",
+      }}
+    >
       {/* ── TOP STATUS BAR ─────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between px-4 py-2"
-        style={{ background: C.surface, borderBottom: `1px solid ${C.border}` }}>
-
+      <div
+        className="flex items-center justify-between px-4 py-2"
+        style={{ background: C.surface, borderBottom: `1px solid ${C.border}` }}
+      >
         {/* Status indicators */}
         <div className="flex items-center gap-4">
           {/* Run light */}
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full"
-              style={{ background: isPlaying ? C.green : ms?.isDone ? C.amber : C.hint,
-                boxShadow: isPlaying ? `0 0 8px ${C.green}` : 'none' }} />
+            <div
+              className="w-3 h-3 rounded-full"
+              style={{
+                background: isPlaying ? C.green : ms?.isDone ? C.amber : C.hint,
+                boxShadow: isPlaying ? `0 0 8px ${C.green}` : "none",
+              }}
+            />
             <span style={{ color: C.muted, fontSize: 9, letterSpacing: 2 }}>
-              {ms?.isError ? 'ALARM' : ms?.isDone ? 'COMPLETED' : isPlaying ? 'EXECUTING' : 'READY'}
+              {ms?.isError
+                ? "ALARM"
+                : ms?.isDone
+                  ? "COMPLETED"
+                  : isPlaying
+                    ? "EXECUTING"
+                    : "READY"}
             </span>
           </div>
           {/* Coolant indicator */}
           <div className="flex items-center gap-1.5">
-            <div className="w-2 h-2 rounded-full"
-              style={{ background: ms?.coolant ? C.blue : C.hint }} />
+            <div
+              className="w-2 h-2 rounded-full"
+              style={{ background: ms?.coolant ? C.blue : C.hint }}
+            />
             <span style={{ color: C.hint, fontSize: 9 }}>COOLANT</span>
           </div>
           {/* Spindle direction */}
-          <span style={{ color: ms?.spindleDir === 'M03' ? C.green : ms?.spindleDir === 'M04' ? C.amber : C.hint, fontSize: 9 }}>
-            {ms?.spindleDir === 'M03' ? 'CW ▶' : ms?.spindleDir === 'M04' ? '◀ CCW' : 'SPN OFF'}
+          <span
+            style={{
+              color:
+                ms?.spindleDir === "M03"
+                  ? C.green
+                  : ms?.spindleDir === "M04"
+                    ? C.amber
+                    : C.hint,
+              fontSize: 9,
+            }}
+          >
+            {ms?.spindleDir === "M03"
+              ? "CW ▶"
+              : ms?.spindleDir === "M04"
+                ? "◀ CCW"
+                : "SPN OFF"}
           </span>
           {/* Block */}
-          <span style={{ color: C.hint, fontSize: 9 }}>BLK {ms?.programPointer ?? 0}</span>
+          <span style={{ color: C.hint, fontSize: 9 }}>
+            BLK {ms?.programPointer ?? 0}
+          </span>
           {/* Error */}
-          {ms?.isError && <span style={{ color: C.red, fontSize: 9 }}>ERR: {ms.error}</span>}
-          {ms?.message && !ms.isError && <span style={{ color: C.teal, fontSize: 9 }}>{ms.message}</span>}
+          {ms?.isError && (
+            <span style={{ color: C.red, fontSize: 9 }}>ERR: {ms.error}</span>
+          )}
+          {ms?.message && !ms.isError && (
+            <span style={{ color: C.teal, fontSize: 9 }}>{ms.message}</span>
+          )}
         </div>
 
         {/* Dialect selector */}
         <div className="flex items-center gap-2">
-          {DIALECTS.map(d => (
-            <button key={d} onClick={() => setDialect(d)}
+          {DIALECTS.map((d) => (
+            <button
+              key={d}
+              onClick={() => setDialect(d)}
               className="px-2 py-1 rounded text-[9px] font-bold transition"
               style={{
-                background: dialect === d ? DIALECT_COLORS[d] + '30' : 'transparent',
+                background:
+                  dialect === d ? DIALECT_COLORS[d] + "30" : "transparent",
                 color: dialect === d ? DIALECT_COLORS[d] : C.hint,
-                border: `1px solid ${dialect === d ? DIALECT_COLORS[d] + '60' : C.border}`,
-              }}>
+                border: `1px solid ${dialect === d ? DIALECT_COLORS[d] + "60" : C.border}`,
+              }}
+            >
               {DIALECT_LABELS[d]}
             </button>
           ))}
@@ -521,42 +680,48 @@ export default function CNCLab({ initialCode = '', dialect: initialDialect = 'fa
       </div>
 
       {/* ── CONTROL PANEL ROW ──────────────────────────────────────────── */}
-      <div className="flex items-center gap-2 px-4 py-2"
-        style={{ background: '#0d1b2a', borderBottom: `1px solid ${C.border}` }}>
-
+      <div
+        className="flex items-center gap-2 px-4 py-2"
+        style={{ background: "#0d1b2a", borderBottom: `1px solid ${C.border}` }}
+      >
         {/* CYCLE START */}
-        <button onClick={() => setIsPlaying(p => !p)}
+        <button
+          onClick={() => setIsPlaying((p) => !p)}
           className="px-4 py-2 rounded text-xs font-bold transition"
           style={{
-            background: isPlaying ? C.amber + '20' : C.green + '20',
+            background: isPlaying ? C.amber + "20" : C.green + "20",
             color: isPlaying ? C.amber : C.green,
-            border: `1px solid ${isPlaying ? C.amber + '50' : C.green + '50'}`,
-            minWidth: 120
-          }}>
-          {isPlaying ? '⏹ STOP' : '▶ CYCLE START'}
+            border: `1px solid ${isPlaying ? C.amber + "50" : C.green + "50"}`,
+            minWidth: 120,
+          }}
+        >
+          {isPlaying ? "⏹ STOP" : "▶ CYCLE START"}
         </button>
 
         {/* SINGLE BLOCK toggle + step button */}
         <div className="flex items-center gap-1">
           <button
-            onClick={() => setSingleBlock(p => !p)}
+            onClick={() => setSingleBlock((p) => !p)}
             className="px-3 py-2 rounded text-[10px] font-bold transition"
             style={{
-              background: singleBlock ? C.blue + '25' : 'transparent',
+              background: singleBlock ? C.blue + "25" : "transparent",
               color: singleBlock ? C.blue : C.hint,
-              border: `1px solid ${singleBlock ? C.blue + '60' : C.border}`,
-            }}>
-            SBK {singleBlock ? 'ON' : 'OFF'}
+              border: `1px solid ${singleBlock ? C.blue + "60" : C.border}`,
+            }}
+          >
+            SBK {singleBlock ? "ON" : "OFF"}
           </button>
-          <button onClick={stepNext}
+          <button
+            onClick={stepNext}
             disabled={ms?.isDone || ms?.isError}
             className="px-3 py-2 rounded text-[10px] font-bold transition"
             style={{
-              background: C.blue + '15',
+              background: C.blue + "15",
               color: C.blue,
-              border: `1px solid ${C.blue + '40'}`,
-              opacity: (ms?.isDone || ms?.isError) ? 0.3 : 1
-            }}>
+              border: `1px solid ${C.blue + "40"}`,
+              opacity: ms?.isDone || ms?.isError ? 0.3 : 1,
+            }}
+          >
             STEP ▸
           </button>
         </div>
@@ -564,61 +729,95 @@ export default function CNCLab({ initialCode = '', dialect: initialDialect = 'fa
         <div style={{ width: 1, height: 28, background: C.border }} />
 
         {/* RESET */}
-        <button onClick={resetProgram}
+        <button
+          onClick={resetProgram}
           className="px-3 py-2 rounded text-[10px] font-bold"
-          style={{ background: C.hint + '15', color: C.muted, border: `1px solid ${C.border}` }}>
+          style={{
+            background: C.hint + "15",
+            color: C.muted,
+            border: `1px solid ${C.border}`,
+          }}
+        >
           ↺ RESET
         </button>
 
         {/* Upload */}
-        <button onClick={() => fileInputRef.current?.click()}
+        <button
+          onClick={() => fileInputRef.current?.click()}
           className="px-3 py-2 rounded text-[10px] font-bold"
-          style={{ background: C.purple + '15', color: C.purple, border: `1px solid ${C.purple}40` }}>
+          style={{
+            background: C.purple + "15",
+            color: C.purple,
+            border: `1px solid ${C.purple}40`,
+          }}
+        >
           ⬆ UPLOAD
         </button>
         {/* Download */}
-        <button onClick={downloadProgram}
+        <button
+          onClick={downloadProgram}
           className="px-3 py-2 rounded text-[10px] font-bold"
-          style={{ background: C.teal + '15', color: C.teal, border: `1px solid ${C.teal}40` }}>
+          style={{
+            background: C.teal + "15",
+            color: C.teal,
+            border: `1px solid ${C.teal}40`,
+          }}
+        >
           ⬇ DOWNLOAD
         </button>
-        <input ref={fileInputRef} type="file" accept=".nc,.txt,.cnc,.mpf,.min"
-          style={{ display: 'none' }} onChange={handleUpload} />
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".nc,.txt,.cnc,.mpf,.min"
+          style={{ display: "none" }}
+          onChange={handleUpload}
+        />
 
         <div style={{ flex: 1 }} />
 
         {/* Speed */}
         {isPlaying && (
-          <span style={{ color: C.muted, fontSize: 9 }}>
-            AUTO PLAY
-          </span>
+          <span style={{ color: C.muted, fontSize: 9 }}>AUTO PLAY</span>
         )}
       </div>
 
       {/* ── MAIN LAYOUT ────────────────────────────────────────────────── */}
       <div className="flex" style={{ minHeight: 520 }}>
-
         {/* ── LEFT PANEL: Control Screen ───────────────────────────────── */}
-        <div className="flex flex-col" style={{ width: 280, borderRight: `1px solid ${C.border}`, background: C.surface }}>
-
+        <div
+          className="flex flex-col"
+          style={{
+            width: 280,
+            borderRight: `1px solid ${C.border}`,
+            background: C.surface,
+          }}
+        >
           {/* Screen tabs */}
-          <div className="flex" style={{ borderBottom: `1px solid ${C.border}`, background: C.bg }}>
+          <div
+            className="flex"
+            style={{ borderBottom: `1px solid ${C.border}`, background: C.bg }}
+          >
             {[
-              { k: 'dro',     l: 'DRO' },
-              { k: 'offsets', l: 'WCS' },
-              { k: 'macros',  l: 'VARS' },
-              { k: 'tools',   l: 'TOOLS' },
-              { k: 'code',    l: 'CODE' },
-              { k: 'program', l: 'PROG' },
-            ].map(t => (
-              <button key={t.k} onClick={() => setPanel(t.k)}
+              { k: "dro", l: "DRO" },
+              { k: "offsets", l: "WCS" },
+              { k: "macros", l: "VARS" },
+              { k: "tools", l: "TOOLS" },
+              { k: "code", l: "CODE" },
+              { k: "program", l: "PROG" },
+            ].map((t) => (
+              <button
+                key={t.k}
+                onClick={() => setPanel(t.k)}
                 className="flex-1 py-1.5 transition"
                 style={{
-                  fontSize: 8, fontWeight: 'bold', letterSpacing: 1,
+                  fontSize: 8,
+                  fontWeight: "bold",
+                  letterSpacing: 1,
                   color: panel === t.k ? C.blue : C.hint,
-                  borderBottom: `2px solid ${panel === t.k ? C.blue : 'transparent'}`,
-                  background: panel === t.k ? C.blue + '10' : 'transparent',
-                }}>
+                  borderBottom: `2px solid ${panel === t.k ? C.blue : "transparent"}`,
+                  background: panel === t.k ? C.blue + "10" : "transparent",
+                }}
+              >
                 {t.l}
               </button>
             ))}
@@ -626,103 +825,225 @@ export default function CNCLab({ initialCode = '', dialect: initialDialect = 'fa
 
           {/* Screen content */}
           <div className="flex-1 overflow-y-auto p-3" style={{ fontSize: 10 }}>
-
             {/* ── DRO ── */}
-            {panel === 'dro' && ms && (
+            {panel === "dro" && ms && (
               <div className="flex flex-col gap-3">
                 {/* Big coordinate display */}
-                <div style={{ color: C.hint, fontSize: 8, letterSpacing: 3 }}>{ms.activeOffset} WORK POSITION</div>
-                {['X','Y','Z'].map(ax => (
-                  <div key={ax} className="flex items-center justify-between px-3 py-2 rounded"
-                    style={{ background: C.bg, border: `1px solid ${C.border}` }}>
-                    <span style={{ fontSize: 22, fontWeight: 900, color: C.hint }}>{ax}</span>
-                    <span style={{ fontSize: 28, fontWeight: 900, color: C.green, fontVariantNumeric: 'tabular-nums' }}>
+                <div style={{ color: C.hint, fontSize: 8, letterSpacing: 3 }}>
+                  {ms.activeOffset} WORK POSITION
+                </div>
+                {["X", "Y", "Z"].map((ax) => (
+                  <div
+                    key={ax}
+                    className="flex items-center justify-between px-3 py-2 rounded"
+                    style={{
+                      background: C.bg,
+                      border: `1px solid ${C.border}`,
+                    }}
+                  >
+                    <span
+                      style={{ fontSize: 22, fontWeight: 900, color: C.hint }}
+                    >
+                      {ax}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 28,
+                        fontWeight: 900,
+                        color: C.green,
+                        fontVariantNumeric: "tabular-nums",
+                      }}
+                    >
                       {(ms[ax] ?? 0).toFixed(4)}
                     </span>
                   </div>
                 ))}
                 {/* Machine (G53) position */}
-                <div style={{ color: C.hint, fontSize: 8, letterSpacing: 3, marginTop: 4 }}>G53 MACHINE POSITION</div>
-                {['MX','MY','MZ'].map((ax, i) => (
-                  <div key={ax} className="flex items-center justify-between px-3 py-1 rounded"
-                    style={{ background: C.bg, border: `1px solid ${C.border}` }}>
-                    <span style={{ color: C.hint, fontSize: 13, fontWeight: 700 }}>{'XYZ'[i]}</span>
-                    <span style={{ color: C.muted, fontSize: 14, fontVariantNumeric: 'tabular-nums' }}>
+                <div
+                  style={{
+                    color: C.hint,
+                    fontSize: 8,
+                    letterSpacing: 3,
+                    marginTop: 4,
+                  }}
+                >
+                  G53 MACHINE POSITION
+                </div>
+                {["MX", "MY", "MZ"].map((ax, i) => (
+                  <div
+                    key={ax}
+                    className="flex items-center justify-between px-3 py-1 rounded"
+                    style={{
+                      background: C.bg,
+                      border: `1px solid ${C.border}`,
+                    }}
+                  >
+                    <span
+                      style={{ color: C.hint, fontSize: 13, fontWeight: 700 }}
+                    >
+                      {"XYZ"[i]}
+                    </span>
+                    <span
+                      style={{
+                        color: C.muted,
+                        fontSize: 14,
+                        fontVariantNumeric: "tabular-nums",
+                      }}
+                    >
                       {(ms[ax] ?? 0).toFixed(4)}
                     </span>
                   </div>
                 ))}
                 {/* Feed / Spindle */}
                 <div className="grid grid-cols-2 gap-2 mt-1">
-                  <div className="p-2 rounded" style={{ background: C.bg, border: `1px solid ${C.border}` }}>
+                  <div
+                    className="p-2 rounded"
+                    style={{
+                      background: C.bg,
+                      border: `1px solid ${C.border}`,
+                    }}
+                  >
                     <div style={{ color: C.hint, fontSize: 8 }}>FEEDRATE</div>
-                    <div style={{ color: C.amber, fontSize: 16 }}>{ms.feedrate.toFixed(0)} <span style={{ fontSize: 9, color: C.hint }}>{ms.units === 'inch' ? 'IPM' : 'MM/MIN'}</span></div>
+                    <div style={{ color: C.amber, fontSize: 16 }}>
+                      {ms.feedrate.toFixed(0)}{" "}
+                      <span style={{ fontSize: 9, color: C.hint }}>
+                        {ms.units === "inch" ? "IPM" : "MM/MIN"}
+                      </span>
+                    </div>
                   </div>
-                  <div className="p-2 rounded" style={{ background: C.bg, border: `1px solid ${C.border}` }}>
+                  <div
+                    className="p-2 rounded"
+                    style={{
+                      background: C.bg,
+                      border: `1px solid ${C.border}`,
+                    }}
+                  >
                     <div style={{ color: C.hint, fontSize: 8 }}>SPINDLE</div>
-                    <div style={{ color: C.blue, fontSize: 16 }}>{ms.spindleRPM} <span style={{ fontSize: 9, color: C.hint }}>RPM</span></div>
+                    <div style={{ color: C.blue, fontSize: 16 }}>
+                      {ms.spindleRPM}{" "}
+                      <span style={{ fontSize: 9, color: C.hint }}>RPM</span>
+                    </div>
                   </div>
                 </div>
                 {/* Modal codes */}
                 <div className="flex flex-wrap gap-1 mt-1">
-                  {[ms.motionMode, ms.posMode, ms.plane, ms.units === 'inch' ? 'G20' : 'G21',
-                    ms.cutterComp, ms.tlOffset, ms.cycleMode, `T${ms.activeT}`, `H${ms.activeH}`].map(m => (
-                    <span key={m} className="px-1.5 py-0.5 rounded" style={{ background: C.hint + '25', color: C.muted, fontSize: 9 }}>{m}</span>
+                  {[
+                    ms.motionMode,
+                    ms.posMode,
+                    ms.plane,
+                    ms.units === "inch" ? "G20" : "G21",
+                    ms.cutterComp,
+                    ms.tlOffset,
+                    ms.cycleMode,
+                    `T${ms.activeT}`,
+                    `H${ms.activeH}`,
+                  ].map((m) => (
+                    <span
+                      key={m}
+                      className="px-1.5 py-0.5 rounded"
+                      style={{
+                        background: C.hint + "25",
+                        color: C.muted,
+                        fontSize: 9,
+                      }}
+                    >
+                      {m}
+                    </span>
                   ))}
                 </div>
 
                 {/* ── JOG PANEL ── */}
-                <div className="mt-2 p-2 rounded" style={{ background: C.bg, border: `1px solid ${C.border}` }}>
-                  <div style={{ color: C.hint, fontSize: 8, letterSpacing: 2, marginBottom: 6 }}>JOG / HANDWHEEL</div>
+                <div
+                  className="mt-2 p-2 rounded"
+                  style={{ background: C.bg, border: `1px solid ${C.border}` }}
+                >
+                  <div
+                    style={{
+                      color: C.hint,
+                      fontSize: 8,
+                      letterSpacing: 2,
+                      marginBottom: 6,
+                    }}
+                  >
+                    JOG / HANDWHEEL
+                  </div>
                   {/* Axis select */}
                   <div className="flex gap-1 mb-2">
-                    {['X','Y','Z'].map(ax => (
-                      <button key={ax} onClick={() => setJogAxis(ax)}
+                    {["X", "Y", "Z"].map((ax) => (
+                      <button
+                        key={ax}
+                        onClick={() => setJogAxis(ax)}
                         className="flex-1 py-1 rounded font-bold"
                         style={{
-                          background: jogAxis === ax ? C.purple + '30' : 'transparent',
+                          background:
+                            jogAxis === ax ? C.purple + "30" : "transparent",
                           color: jogAxis === ax ? C.purple : C.hint,
                           border: `1px solid ${jogAxis === ax ? C.purple : C.border}`,
-                          fontSize: 11
-                        }}>
+                          fontSize: 11,
+                        }}
+                      >
                         {ax}
                       </button>
                     ))}
                   </div>
                   {/* Step size */}
                   <div className="flex gap-1 mb-2">
-                    {[0.001, 0.01, 0.1, 1.0, 10.0].map(s => (
-                      <button key={s} onClick={() => setJogStep(s)}
+                    {[0.001, 0.01, 0.1, 1.0, 10.0].map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => setJogStep(s)}
                         className="flex-1 py-0.5 rounded"
                         style={{
-                          background: jogStep === s ? C.blue + '25' : 'transparent',
+                          background:
+                            jogStep === s ? C.blue + "25" : "transparent",
                           color: jogStep === s ? C.blue : C.hint,
                           border: `1px solid ${jogStep === s ? C.blue : C.border}`,
-                          fontSize: 8
-                        }}>
+                          fontSize: 8,
+                        }}
+                      >
                         {s}
                       </button>
                     ))}
                   </div>
                   {/* +/- buttons */}
                   <div className="flex gap-2">
-                    <button onClick={() => jog(-1)}
+                    <button
+                      onClick={() => jog(-1)}
                       className="flex-1 py-2 rounded font-bold text-sm"
-                      style={{ background: C.red + '20', color: C.red, border: `1px solid ${C.red}50` }}>
+                      style={{
+                        background: C.red + "20",
+                        color: C.red,
+                        border: `1px solid ${C.red}50`,
+                      }}
+                    >
                       − {jogAxis}
                     </button>
-                    <button onClick={() => jog(+1)}
+                    <button
+                      onClick={() => jog(+1)}
                       className="flex-1 py-2 rounded font-bold text-sm"
-                      style={{ background: C.green + '20', color: C.green, border: `1px solid ${C.green}50` }}>
+                      style={{
+                        background: C.green + "20",
+                        color: C.green,
+                        border: `1px solid ${C.green}50`,
+                      }}
+                    >
                       + {jogAxis}
                     </button>
                   </div>
-                  {/* Jog position display */}
+                  {/* Jog position display (machine coords) */}
                   <div className="flex justify-between mt-2">
-                    {['X','Y','Z'].map(ax => (
+                    {["X", "Y", "Z"].map((ax) => (
                       <div key={ax} className="text-center">
                         <div style={{ color: C.hint, fontSize: 8 }}>{ax}</div>
-                        <div style={{ color: C.muted, fontSize: 10, fontVariantNumeric: 'tabular-nums' }}>{jogPos[ax].toFixed(3)}</div>
+                        <div
+                          style={{
+                            color: C.muted,
+                            fontSize: 10,
+                            fontVariantNumeric: "tabular-nums",
+                          }}
+                        >
+                          {(ms?.["M" + ax] ?? 0).toFixed(3)}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -731,132 +1052,277 @@ export default function CNCLab({ initialCode = '', dialect: initialDialect = 'fa
             )}
 
             {/* ── WORK OFFSETS ── */}
-            {panel === 'offsets' && ms && (() => {
-              // Standard G54-G59 always shown;
-              // Extended EWO_Pn / G5xx shown only if active or if dialect matches
-              const stdKeys = ['G54','G55','G56','G57','G58','G59']
-              const activeIsEwo = ms.activeOffset.startsWith('EWO_P')
-              const activeIsGxx = /^G[5-9]\d\d$/.test(ms.activeOffset)
-              const ewoKeys = activeIsEwo ? [ms.activeOffset] : []
-              const gxxKeys = (activeIsGxx && dialect === 'siemens') ? [ms.activeOffset] : []
-              const visibleKeys = [...stdKeys, ...ewoKeys, ...gxxKeys]
-              const OffsetRow = ({ name, vals }) => (
-                <div key={name} className="rounded p-2"
-                  style={{
-                    background: ms.activeOffset === name ? C.blue + '15' : C.bg,
-                    border: `1px solid ${ms.activeOffset === name ? C.blue : C.border}`
-                  }}>
-                  <div className="flex items-center justify-between mb-1">
-                    <span style={{ fontWeight: 700, color: ms.activeOffset === name ? C.blue : C.text }}>
-                      {name.startsWith('EWO_P') ? `G54.1 P${name.slice(5)}` : name}
-                    </span>
-                    <div className="flex items-center gap-1">
-                      {ms.activeOffset === name && (
-                        <span style={{ fontSize: 7, background: C.blue, color: '#fff', borderRadius: 3, padding: '1px 4px' }}>ACTIVE</span>
-                      )}
-                      <button onClick={() => setEditingOffset(editingOffset === name ? null : name)}
-                        style={{ color: C.hint, fontSize: 9 }}>✎</button>
-                    </div>
-                  </div>
-                  {editingOffset === name ? (
-                    <div className="flex flex-col gap-1 mt-1">
-                      {['X','Y','Z'].map(ax => (
-                        <div key={ax} className="flex items-center gap-1">
-                          <span style={{ color: C.hint, width: 12 }}>{ax}:</span>
-                          <input type="number" step="0.001"
-                            defaultValue={vals[ax] ?? 0}
-                            className="rounded px-1 py-0.5 text-right"
-                            style={{ background: C.bg, color: C.text, border: `1px solid ${C.border}`, width: '100%', fontSize: 10 }}
-                            onChange={(ev) => {
-                              const v = parseFloat(ev.target.value) || 0
-                              if (interpRef.current) {
-                                interpRef.current.state.offsets[name][ax] = v
-                                setMachineState({ ...interpRef.current.state })
-                              }
-                            }} />
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-3 gap-1 mt-1">
-                      {['X','Y','Z'].map(ax => (
-                        <div key={ax} style={{ color: C.muted, fontSize: 9 }}>
-                          {ax}: <span style={{ color: (vals[ax] ?? 0) !== 0 ? C.amber : C.text }}>{(vals[ax] ?? 0).toFixed(4)}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )
-              return (
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center justify-between">
-                    <span style={{ color: C.hint, fontSize: 8, letterSpacing: 3 }}>WORK COORDINATE OFFSETS</span>
-                    {dialect === 'fanuc' && <span style={{ color: C.hint, fontSize: 8 }}>G54.1 P1-P48 extended available</span>}
-                  </div>
-                  {visibleKeys.map(k => ms.offsets[k] && <OffsetRow key={k} name={k} vals={ms.offsets[k]} />)}
-                  {dialect === 'fanuc' && (
-                    <div className="mt-1">
-                      <div style={{ color: C.hint, fontSize: 8, letterSpacing: 2, marginBottom: 4 }}>JUMP TO EWO (G54.1 Pn)</div>
-                      <div className="flex gap-1">
-                        <input type="number" min="1" max="48" placeholder="P#" id="ewo-jump"
-                          className="rounded px-2 py-1 flex-1"
-                          style={{ background: C.bg, color: C.text, border: `1px solid ${C.border}`, fontSize: 10 }} />
+            {panel === "offsets" &&
+              ms &&
+              (() => {
+                // Standard G54-G59 always shown;
+                // Extended EWO_Pn / G5xx shown only if active or if dialect matches
+                const stdKeys = ["G54", "G55", "G56", "G57", "G58", "G59"];
+                const activeIsEwo = ms.activeOffset.startsWith("EWO_P");
+                const activeIsGxx = /^G[5-9]\d\d$/.test(ms.activeOffset);
+                const ewoKeys = activeIsEwo ? [ms.activeOffset] : [];
+                const gxxKeys =
+                  activeIsGxx && dialect === "siemens" ? [ms.activeOffset] : [];
+                const visibleKeys = [...stdKeys, ...ewoKeys, ...gxxKeys];
+                const OffsetRow = ({ name, vals }) => (
+                  <div
+                    key={name}
+                    className="rounded p-2"
+                    style={{
+                      background:
+                        ms.activeOffset === name ? C.blue + "15" : C.bg,
+                      border: `1px solid ${ms.activeOffset === name ? C.blue : C.border}`,
+                    }}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span
+                        style={{
+                          fontWeight: 700,
+                          color: ms.activeOffset === name ? C.blue : C.text,
+                        }}
+                      >
+                        {name.startsWith("EWO_P")
+                          ? `G54.1 P${name.slice(5)}`
+                          : name}
+                      </span>
+                      <div className="flex items-center gap-1">
+                        {ms.activeOffset === name && (
+                          <span
+                            style={{
+                              fontSize: 7,
+                              background: C.blue,
+                              color: "#fff",
+                              borderRadius: 3,
+                              padding: "1px 4px",
+                            }}
+                          >
+                            ACTIVE
+                          </span>
+                        )}
                         <button
-                          className="px-2 py-1 rounded text-[9px]"
-                          style={{ background: C.blue + '20', color: C.blue, border: `1px solid ${C.blue}40` }}
-                          onClick={() => {
-                            const pn = parseInt(document.getElementById('ewo-jump')?.value)
-                            if (pn >= 1 && pn <= 48 && interpRef.current) {
-                              interpRef.current.state.activeOffset = `EWO_P${pn}`
-                              setMachineState({ ...interpRef.current.state })
-                              setEditingOffset(`EWO_P${pn}`)
-                            }
-                          }}>GO</button>
+                          onClick={() =>
+                            setEditingOffset(
+                              editingOffset === name ? null : name,
+                            )
+                          }
+                          style={{ color: C.hint, fontSize: 9 }}
+                        >
+                          ✎
+                        </button>
                       </div>
                     </div>
-                  )}
-                </div>
-              )
-            })()}
+                    {editingOffset === name ? (
+                      <div className="flex flex-col gap-1 mt-1">
+                        {["X", "Y", "Z"].map((ax) => (
+                          <div key={ax} className="flex items-center gap-1">
+                            <span style={{ color: C.hint, width: 12 }}>
+                              {ax}:
+                            </span>
+                            <input
+                              type="number"
+                              step="0.001"
+                              defaultValue={vals[ax] ?? 0}
+                              className="rounded px-1 py-0.5 text-right"
+                              style={{
+                                background: C.bg,
+                                color: C.text,
+                                border: `1px solid ${C.border}`,
+                                width: "100%",
+                                fontSize: 10,
+                              }}
+                              onChange={(ev) => {
+                                const v = parseFloat(ev.target.value) || 0;
+                                if (interpRef.current) {
+                                  interpRef.current.state.offsets[name][ax] = v;
+                                  setMachineState({
+                                    ...interpRef.current.state,
+                                  });
+                                }
+                              }}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-3 gap-1 mt-1">
+                        {["X", "Y", "Z"].map((ax) => (
+                          <div key={ax} style={{ color: C.muted, fontSize: 9 }}>
+                            {ax}:{" "}
+                            <span
+                              style={{
+                                color: (vals[ax] ?? 0) !== 0 ? C.amber : C.text,
+                              }}
+                            >
+                              {(vals[ax] ?? 0).toFixed(4)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+                return (
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between">
+                      <span
+                        style={{ color: C.hint, fontSize: 8, letterSpacing: 3 }}
+                      >
+                        WORK COORDINATE OFFSETS
+                      </span>
+                      {dialect === "fanuc" && (
+                        <span style={{ color: C.hint, fontSize: 8 }}>
+                          G54.1 P1-P48 extended available
+                        </span>
+                      )}
+                    </div>
+                    {visibleKeys.map(
+                      (k) =>
+                        ms.offsets[k] && (
+                          <OffsetRow key={k} name={k} vals={ms.offsets[k]} />
+                        ),
+                    )}
+                    {dialect === "fanuc" && (
+                      <div className="mt-1">
+                        <div
+                          style={{
+                            color: C.hint,
+                            fontSize: 8,
+                            letterSpacing: 2,
+                            marginBottom: 4,
+                          }}
+                        >
+                          JUMP TO EWO (G54.1 Pn)
+                        </div>
+                        <div className="flex gap-1">
+                          <input
+                            ref={ewoJumpRef}
+                            type="number"
+                            min="1"
+                            max="48"
+                            placeholder="P#"
+                            className="rounded px-2 py-1 flex-1"
+                            style={{
+                              background: C.bg,
+                              color: C.text,
+                              border: `1px solid ${C.border}`,
+                              fontSize: 10,
+                            }}
+                          />
+                          <button
+                            className="px-2 py-1 rounded text-[9px]"
+                            style={{
+                              background: C.blue + "20",
+                              color: C.blue,
+                              border: `1px solid ${C.blue}40`,
+                            }}
+                            onClick={() => {
+                              const pn = parseInt(ewoJumpRef.current?.value);
+                              if (pn >= 1 && pn <= 48 && interpRef.current) {
+                                interpRef.current.state.activeOffset = `EWO_P${pn}`;
+                                setMachineState({ ...interpRef.current.state });
+                                setEditingOffset(`EWO_P${pn}`);
+                              }
+                            }}
+                          >
+                            GO
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
 
             {/* ── VARIABLE WATCH ── */}
-            {panel === 'macros' && ms && (
+            {panel === "macros" && ms && (
               <div className="flex flex-col gap-2">
-                <div style={{ color: C.hint, fontSize: 8, letterSpacing: 3, marginBottom: 4 }}>
-                  {dialect === 'siemens' ? 'R-VARIABLE' : dialect === 'okuma' ? 'V-VARIABLE' : 'MACRO-VARIABLE'} WATCH
+                <div
+                  style={{
+                    color: C.hint,
+                    fontSize: 8,
+                    letterSpacing: 3,
+                    marginBottom: 4,
+                  }}
+                >
+                  {dialect === "siemens"
+                    ? "R-VARIABLE"
+                    : dialect === "okuma"
+                      ? "V-VARIABLE"
+                      : "MACRO-VARIABLE"}{" "}
+                  WATCH
                 </div>
                 {/* Named variables (#[NAME] / user named) */}
                 {ms.namedVars && ms.namedVars.size > 0 && (
                   <>
-                    <div style={{ color: C.teal, fontSize: 8, letterSpacing: 2 }}>NAMED VARIABLES</div>
+                    <div
+                      style={{ color: C.teal, fontSize: 8, letterSpacing: 2 }}
+                    >
+                      NAMED VARIABLES
+                    </div>
                     <div className="grid grid-cols-2 gap-1 mb-2">
                       {[...ms.namedVars.entries()].map(([name, val]) => (
-                        <div key={name} className="flex justify-between px-2 py-1 rounded"
-                          style={{ background: C.bg, border: `1px solid ${C.teal}30` }}>
-                          <span style={{ color: C.teal, fontSize: 9 }}>{name.startsWith('_') ? `#${name}` : `#[${name}]`}</span>
-                          <span style={{ color: C.purple }}>{typeof val === 'number' ? val.toFixed(3) : String(val)}</span>
+                        <div
+                          key={name}
+                          className="flex justify-between px-2 py-1 rounded"
+                          style={{
+                            background: C.bg,
+                            border: `1px solid ${C.teal}30`,
+                          }}
+                        >
+                          <span style={{ color: C.teal, fontSize: 9 }}>
+                            {name.startsWith("_") ? `#${name}` : `#[${name}]`}
+                          </span>
+                          <span style={{ color: C.purple }}>
+                            {typeof val === "number"
+                              ? val.toFixed(3)
+                              : String(val)}
+                          </span>
                         </div>
                       ))}
                     </div>
                   </>
                 )}
                 {/* Numeric variables — skip system position vars updated automatically */}
-                {ms.vars.size === 0 && (!ms.namedVars || ms.namedVars.size === 0) ? (
-                  <div style={{ color: C.hint, textAlign: 'center', padding: '2rem 0', fontSize: 10 }}>
-                    No variables defined yet.<br/>Run a program with #100=... assignments.
+                {ms.vars.size === 0 &&
+                (!ms.namedVars || ms.namedVars.size === 0) ? (
+                  <div
+                    style={{
+                      color: C.hint,
+                      textAlign: "center",
+                      padding: "2rem 0",
+                      fontSize: 10,
+                    }}
+                  >
+                    No variables defined yet.
+                    <br />
+                    Run a program with #100=... assignments.
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 gap-1">
                     {[...ms.vars.entries()]
-                      .filter(([id]) => { const n = parseInt(id); return !(n >= 5020 && n <= 5050) })
+                      .filter(([id]) => {
+                        const n = parseInt(id);
+                        return !(n >= 5020 && n <= 5050);
+                      })
                       .map(([id, val]) => (
-                        <div key={id} className="flex justify-between px-2 py-1 rounded"
-                          style={{ background: C.bg, border: `1px solid ${C.border}` }}>
+                        <div
+                          key={id}
+                          className="flex justify-between px-2 py-1 rounded"
+                          style={{
+                            background: C.bg,
+                            border: `1px solid ${C.border}`,
+                          }}
+                        >
                           <span style={{ color: C.hint }}>
-                            {dialect === 'siemens' ? `R${id}` : dialect === 'okuma' ? `V${id}` : `#${id}`}
+                            {dialect === "siemens"
+                              ? `R${id}`
+                              : dialect === "okuma"
+                                ? `V${id}`
+                                : `#${id}`}
                           </span>
-                          <span style={{ color: C.purple }}>{typeof val === 'number' ? val.toFixed(3) : val}</span>
+                          <span style={{ color: C.purple }}>
+                            {typeof val === "number" ? val.toFixed(3) : val}
+                          </span>
                         </div>
                       ))}
                   </div>
@@ -865,150 +1331,361 @@ export default function CNCLab({ initialCode = '', dialect: initialDialect = 'fa
             )}
 
             {/* ── TOOL TABLE ── */}
-            {panel === 'tools' && (
+            {panel === "tools" && (
               <div className="flex flex-col gap-2">
-                <div style={{ color: C.hint, fontSize: 8, letterSpacing: 3, marginBottom: 4 }}>TOOL TABLE</div>
-                <div style={{ color: C.text, fontWeight: 700, marginBottom: 4 }}>
+                <div
+                  style={{
+                    color: C.hint,
+                    fontSize: 8,
+                    letterSpacing: 3,
+                    marginBottom: 4,
+                  }}
+                >
+                  TOOL TABLE
+                </div>
+                <div
+                  style={{ color: C.text, fontWeight: 700, marginBottom: 4 }}
+                >
                   Active: T{ms?.activeT ?? 0} / H{ms?.activeH ?? 0}
                 </div>
-                {Array.from({ length: 10 }, (_, i) => i + 1).map(tNum => {
-                  const tool = toolTable[tNum] ?? {}
-                  const isActive = ms?.activeT === tNum
-                  const isEditing = editingTool === tNum
+                {Array.from({ length: 10 }, (_, i) => i + 1).map((tNum) => {
+                  const tool = toolTable[tNum] ?? {};
+                  const isActive = ms?.activeT === tNum;
+                  const isEditing = editingTool === tNum;
                   return (
-                    <div key={tNum} className="rounded p-2"
+                    <div
+                      key={tNum}
+                      className="rounded p-2"
                       style={{
-                        background: isActive ? C.amber + '10' : C.bg,
-                        border: `1px solid ${isActive ? C.amber : C.border}`
-                      }}>
+                        background: isActive ? C.amber + "10" : C.bg,
+                        border: `1px solid ${isActive ? C.amber : C.border}`,
+                      }}
+                    >
                       <div className="flex items-center justify-between mb-1">
-                        <span style={{ fontWeight: 700, color: isActive ? C.amber : C.text }}>T{tNum}</span>
-                        {isActive && <span style={{ fontSize: 7, background: C.amber, color: '#000', borderRadius: 3, padding: '1px 4px' }}>IN SPINDLE</span>}
-                        <button onClick={() => setEditingTool(isEditing ? null : tNum)}
-                          style={{ color: C.hint, fontSize: 9, marginLeft: 'auto' }}>✎</button>
+                        <span
+                          style={{
+                            fontWeight: 700,
+                            color: isActive ? C.amber : C.text,
+                          }}
+                        >
+                          T{tNum}
+                        </span>
+                        {isActive && (
+                          <span
+                            style={{
+                              fontSize: 7,
+                              background: C.amber,
+                              color: "#000",
+                              borderRadius: 3,
+                              padding: "1px 4px",
+                            }}
+                          >
+                            IN SPINDLE
+                          </span>
+                        )}
+                        <button
+                          onClick={() =>
+                            setEditingTool(isEditing ? null : tNum)
+                          }
+                          style={{
+                            color: C.hint,
+                            fontSize: 9,
+                            marginLeft: "auto",
+                          }}
+                        >
+                          ✎
+                        </button>
                       </div>
                       {isEditing ? (
                         <div className="flex flex-col gap-1 mt-1">
                           {[
-                            ['desc',     'Description',     'text'],
-                            ['dia',      'Dia ⌀ (mm)',       'number'],
-                            ['len',      'TLO / Gauge (mm)', 'number'],
-                            ['lenCut',   'Len of Cut (mm)',  'number'],
-                            ['lenTotal', 'Total Body (mm)',  'number'],
+                            ["desc", "Description", "text"],
+                            ["dia", "Dia ⌀ (mm)", "number"],
+                            ["len", "TLO / Gauge (mm)", "number"],
+                            ["lenCut", "Len of Cut (mm)", "number"],
+                            ["lenTotal", "Total Body (mm)", "number"],
                           ].map(([field, label, type]) => (
-                            <div key={field} className="flex items-center gap-1">
-                              <span style={{ color: C.hint, width: 80, fontSize: 8, flexShrink: 0 }}>{label}</span>
+                            <div
+                              key={field}
+                              className="flex items-center gap-1"
+                            >
+                              <span
+                                style={{
+                                  color: C.hint,
+                                  width: 80,
+                                  fontSize: 8,
+                                  flexShrink: 0,
+                                }}
+                              >
+                                {label}
+                              </span>
                               <input
                                 type={type}
                                 step="0.001"
-                                defaultValue={tool[field] ?? ''}
+                                defaultValue={tool[field] ?? ""}
                                 className="rounded px-1 py-0.5"
-                                style={{ background: C.bg, color: C.text, border: `1px solid ${C.border}`, flex: 1, fontSize: 9 }}
-                                onChange={(e) => {
-                                  const v = type === 'text' ? e.target.value : (parseFloat(e.target.value) || 0)
-                                  setToolTable(prev => ({
+                                style={{
+                                  background: C.bg,
+                                  color: C.text,
+                                  border: `1px solid ${C.border}`,
+                                  flex: 1,
+                                  fontSize: 9,
+                                }}
+                                onBlur={(e) => {
+                                  const v =
+                                    type === "text"
+                                      ? e.target.value
+                                      : parseFloat(e.target.value) || 0;
+                                  setToolTable((prev) => ({
                                     ...prev,
-                                    [tNum]: { ...prev[tNum], [field]: v }
-                                  }))
+                                    [tNum]: { ...prev[tNum], [field]: v },
+                                  }));
                                 }}
                               />
                             </div>
                           ))}
                         </div>
                       ) : (
-                        <div style={{ color: C.muted, fontSize: 9, lineHeight: 1.8 }}>
-                          <div>{tool.desc ?? '(empty slot)'}</div>
-                          {tool.dia      && <span style={{ color: C.hint }}>⌀{tool.dia}  </span>}
-                          {tool.len      && <span style={{ color: C.hint }}>TLO:{tool.len}  </span>}
-                          {tool.lenCut   && <span style={{ color: C.hint }}>LC:{tool.lenCut}  </span>}
-                          {tool.lenTotal && <span style={{ color: C.hint }}>LT:{tool.lenTotal}</span>}
+                        <div
+                          style={{
+                            color: C.muted,
+                            fontSize: 9,
+                            lineHeight: 1.8,
+                          }}
+                        >
+                          <div>{tool.desc ?? "(empty slot)"}</div>
+                          {tool.dia && (
+                            <span style={{ color: C.hint }}>⌀{tool.dia} </span>
+                          )}
+                          {tool.len && (
+                            <span style={{ color: C.hint }}>
+                              TLO:{tool.len}{" "}
+                            </span>
+                          )}
+                          {tool.lenCut && (
+                            <span style={{ color: C.hint }}>
+                              LC:{tool.lenCut}{" "}
+                            </span>
+                          )}
+                          {tool.lenTotal && (
+                            <span style={{ color: C.hint }}>
+                              LT:{tool.lenTotal}
+                            </span>
+                          )}
                         </div>
                       )}
                     </div>
-                  )
+                  );
                 })}
               </div>
             )}
 
             {/* ── CODE EDITOR ── */}
-            {panel === 'code' && (
-              <div className="flex flex-col h-full gap-2" style={{ height: 420 }}>
+            {panel === "code" && (
+              <div
+                className="flex flex-col h-full gap-2"
+                style={{ height: 420 }}
+              >
                 <textarea
                   value={code}
-                  onChange={e => setCode(e.target.value)}
+                  onChange={(e) => setCode(e.target.value)}
                   spellCheck={false}
                   className="flex-1 p-3 rounded resize-none"
                   style={{
-                    background: '#000', color: C.green, fontFamily: 'monospace',
-                    fontSize: 11, border: `1px solid ${C.border}`, lineHeight: 1.6,
-                    height: 390, outline: 'none'
+                    background: "#000",
+                    color: C.green,
+                    fontFamily: "monospace",
+                    fontSize: 11,
+                    border: `1px solid ${C.border}`,
+                    lineHeight: 1.6,
+                    height: 390,
+                    outline: "none",
                   }}
                   placeholder={`G-Code / ${DIALECT_LABELS[dialect]} program...`}
                 />
-                <button onClick={() => fileInputRef.current?.click()}
+                <button
+                  onClick={() => fileInputRef.current?.click()}
                   className="py-1 rounded text-[10px]"
-                  style={{ background: C.purple + '15', color: C.purple, border: `1px solid ${C.purple}40` }}>
+                  style={{
+                    background: C.purple + "15",
+                    color: C.purple,
+                    border: `1px solid ${C.purple}40`,
+                  }}
+                >
                   ⬆ Upload .nc / .mpf / .min file
                 </button>
               </div>
             )}
 
             {/* ── PROGRAM LIBRARY ── */}
-            {panel === 'program' && (
+            {panel === "program" && (
               <div className="flex flex-col gap-2">
-                <div style={{ color: C.hint, fontSize: 8, letterSpacing: 3, marginBottom: 4 }}>MEMORY — PROGRAM LIST</div>
-                {(PROGRAM_LIBRARY[dialect] ?? []).map(prog => (
-                  <div key={prog.id} className="rounded p-2 cursor-pointer"
-                    style={{ background: C.bg, border: `1px solid ${C.border}` }}
-                    onClick={() => loadPreset(prog)}>
+                <div
+                  style={{
+                    color: C.hint,
+                    fontSize: 8,
+                    letterSpacing: 3,
+                    marginBottom: 4,
+                  }}
+                >
+                  MEMORY — PROGRAM LIST
+                </div>
+                {(PROGRAM_LIBRARY[dialect] ?? []).map((prog) => (
+                  <div
+                    key={prog.id}
+                    className="rounded p-2 cursor-pointer"
+                    style={{
+                      background: C.bg,
+                      border: `1px solid ${C.border}`,
+                    }}
+                    onClick={() => loadPreset(prog)}
+                  >
                     <div className="flex items-center justify-between">
-                      <span style={{ fontWeight: 700, color: C.blue }}>{prog.id}</span>
-                      <span style={{ color: C.green, fontSize: 9 }}>LOAD ▸</span>
+                      <span style={{ fontWeight: 700, color: C.blue }}>
+                        {prog.id}
+                      </span>
+                      <span style={{ color: C.green, fontSize: 9 }}>
+                        LOAD ▸
+                      </span>
                     </div>
-                    <div style={{ color: C.text, fontWeight: 600, marginTop: 2 }}>{prog.name}</div>
-                    <div style={{ color: C.muted, fontSize: 9, marginTop: 2, lineHeight: 1.5 }}>{prog.desc}</div>
+                    <div
+                      style={{ color: C.text, fontWeight: 600, marginTop: 2 }}
+                    >
+                      {prog.name}
+                    </div>
+                    <div
+                      style={{
+                        color: C.muted,
+                        fontSize: 9,
+                        marginTop: 2,
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      {prog.desc}
+                    </div>
                   </div>
                 ))}
-                {(PROGRAM_LIBRARY[dialect]?.length === 0) && (
-                  <div style={{ color: C.hint, textAlign: 'center', padding: '2rem 0' }}>No programs for {DIALECT_LABELS[dialect]}</div>
+                {PROGRAM_LIBRARY[dialect]?.length === 0 && (
+                  <div
+                    style={{
+                      color: C.hint,
+                      textAlign: "center",
+                      padding: "2rem 0",
+                    }}
+                  >
+                    No programs for {DIALECT_LABELS[dialect]}
+                  </div>
                 )}
-                <div style={{ color: C.hint, fontSize: 8, marginTop: 8, letterSpacing: 2 }}>UPLOAD FROM DISK</div>
-                <button onClick={() => fileInputRef.current?.click()}
+                <div
+                  style={{
+                    color: C.hint,
+                    fontSize: 8,
+                    marginTop: 8,
+                    letterSpacing: 2,
+                  }}
+                >
+                  UPLOAD FROM DISK
+                </div>
+                <button
+                  onClick={() => fileInputRef.current?.click()}
                   className="py-2 rounded"
-                  style={{ background: C.purple + '15', color: C.purple, border: `1px solid ${C.purple}40` }}>
+                  style={{
+                    background: C.purple + "15",
+                    color: C.purple,
+                    border: `1px solid ${C.purple}40`,
+                  }}
+                >
                   ⬆ Upload .nc / .mpf / .min
                 </button>
                 {/* Saved to memory */}
-                <div style={{ color: C.hint, fontSize: 8, marginTop: 8, letterSpacing: 2 }}>SAVE TO MACHINE MEMORY</div>
+                <div
+                  style={{
+                    color: C.hint,
+                    fontSize: 8,
+                    marginTop: 8,
+                    letterSpacing: 2,
+                  }}
+                >
+                  SAVE TO MACHINE MEMORY
+                </div>
                 <div className="flex gap-1">
                   <input
                     value={saveNameInput}
-                    onChange={e => setSaveNameInput(e.target.value)}
+                    onChange={(e) => setSaveNameInput(e.target.value)}
                     placeholder="Program name..."
                     className="flex-1 rounded px-2 py-1"
-                    style={{ background: C.bg, color: C.text, border: `1px solid ${C.border}`, fontSize: 9 }}
+                    style={{
+                      background: C.bg,
+                      color: C.text,
+                      border: `1px solid ${C.border}`,
+                      fontSize: 9,
+                    }}
                   />
-                  <button onClick={saveToMemory}
+                  <button
+                    onClick={saveToMemory}
                     className="px-2 py-1 rounded text-[9px] font-bold"
-                    style={{ background: C.green + '20', color: C.green, border: `1px solid ${C.green}40` }}>
+                    style={{
+                      background: C.green + "20",
+                      color: C.green,
+                      border: `1px solid ${C.green}40`,
+                    }}
+                  >
                     SAVE
                   </button>
                 </div>
                 {savedPrograms.length > 0 && (
                   <>
-                    <div style={{ color: C.hint, fontSize: 8, marginTop: 6, letterSpacing: 2 }}>SAVED PROGRAMS</div>
+                    <div
+                      style={{
+                        color: C.hint,
+                        fontSize: 8,
+                        marginTop: 6,
+                        letterSpacing: 2,
+                      }}
+                    >
+                      SAVED PROGRAMS
+                    </div>
                     {savedPrograms.map((sp, idx) => (
-                      <div key={idx} className="rounded p-2 flex items-center justify-between"
-                        style={{ background: C.bg, border: `1px solid ${C.border}` }}>
+                      <div
+                        key={idx}
+                        className="rounded p-2 flex items-center justify-between"
+                        style={{
+                          background: C.bg,
+                          border: `1px solid ${C.border}`,
+                        }}
+                      >
                         <div>
-                          <div style={{ color: C.text, fontSize: 9, fontWeight: 700 }}>{sp.name}</div>
-                          <div style={{ color: C.hint, fontSize: 8 }}>{DIALECT_LABELS[sp.dialect] ?? sp.dialect} · {new Date(sp.savedAt).toLocaleDateString()}</div>
+                          <div
+                            style={{
+                              color: C.text,
+                              fontSize: 9,
+                              fontWeight: 700,
+                            }}
+                          >
+                            {sp.name}
+                          </div>
+                          <div style={{ color: C.hint, fontSize: 8 }}>
+                            {DIALECT_LABELS[sp.dialect] ?? sp.dialect} ·{" "}
+                            {new Date(sp.savedAt).toLocaleDateString()}
+                          </div>
                         </div>
                         <div className="flex gap-1">
-                          <button onClick={() => { setCode(sp.code); if (sp.dialect) setDialect(sp.dialect); setPanel('code') }}
-                            style={{ color: C.green, fontSize: 9 }}>LOAD ▸</button>
-                          <button onClick={() => deleteSaved(idx)}
-                            style={{ color: C.red, fontSize: 9 }}>✕</button>
+                          <button
+                            onClick={() => {
+                              setCode(sp.code);
+                              if (sp.dialect) setDialect(sp.dialect);
+                              setPanel("code");
+                            }}
+                            style={{ color: C.green, fontSize: 9 }}
+                          >
+                            LOAD ▸
+                          </button>
+                          <button
+                            onClick={() => deleteSaved(idx)}
+                            style={{ color: C.red, fontSize: 9 }}
+                          >
+                            ✕
+                          </button>
                         </div>
                       </div>
                     ))}
@@ -1022,35 +1699,73 @@ export default function CNCLab({ initialCode = '', dialect: initialDialect = 'fa
         {/* ── RIGHT: Backplot + Program trace ─────────────────────────── */}
         <div className="flex flex-col flex-1 min-w-0">
           <div className="flex-[3] relative" style={{ minHeight: 480 }}>
-            <CNCBackplot pathPoints={pathPoints} currentStep={currentStep} width="100%" height="100%" isDark={isDark} />
+            <CNCBackplot
+              pathPoints={pathPoints}
+              currentStep={currentStep}
+              width="100%"
+              height="100%"
+              isDark={isDark}
+              toolDiameter={
+                (toolTable[ms?.activeT ?? 1] ?? toolTable[1])?.dia ?? 10
+              }
+              toolLength={
+                (toolTable[ms?.activeT ?? 1] ?? toolTable[1])?.len ?? 75
+              }
+              toolLenCut={
+                (toolTable[ms?.activeT ?? 1] ?? toolTable[1])?.lenCut ?? null
+              }
+            />
           </div>
 
           {/* Program trace */}
-          <div className="overflow-hidden flex flex-col" style={{ height: 160, borderTop: `1px solid ${C.border}`, background: C.surface }}>
-            <div style={{ color: C.hint, fontSize: 8, letterSpacing: 3, padding: '6px 12px', borderBottom: `1px solid ${C.border}` }}>
+          <div
+            className="overflow-hidden flex flex-col"
+            style={{
+              height: 160,
+              borderTop: `1px solid ${C.border}`,
+              background: C.surface,
+            }}
+          >
+            <div
+              style={{
+                color: C.hint,
+                fontSize: 8,
+                letterSpacing: 3,
+                padding: "6px 12px",
+                borderBottom: `1px solid ${C.border}`,
+              }}
+            >
               PROGRAM TRACE — N{ms?.programPointer ?? 0}
             </div>
-            <div className="flex-1 overflow-y-auto px-2 py-1 space-y-0.5">
+            <div
+              ref={traceContainerRef}
+              className="flex-1 overflow-y-auto px-2 py-1 space-y-0.5"
+            >
               {interpRef.current?.blocks?.map((b, idx) => {
-                const isActive = ms?.programPointer === idx
+                const isActive = ms?.programPointer === idx;
                 return (
-                  <div key={idx}
+                  <div
+                    key={idx}
+                    ref={isActive ? activeTraceRef : null}
                     className="px-2 py-0.5 rounded transition-colors"
                     style={{
-                      background: isActive ? C.blue + '20' : 'transparent',
+                      background: isActive ? C.blue + "20" : "transparent",
                       color: isActive ? C.blue : C.hint,
-                      borderLeft: `2px solid ${isActive ? C.blue : 'transparent'}`,
-                      fontSize: 10
-                    }}>
-                    <span style={{ opacity: 0.4, marginRight: 8, fontSize: 8 }}>{idx}</span>
+                      borderLeft: `2px solid ${isActive ? C.blue : "transparent"}`,
+                      fontSize: 10,
+                    }}
+                  >
+                    <span style={{ opacity: 0.4, marginRight: 8, fontSize: 8 }}>
+                      {idx}
+                    </span>
                     {b.raw}
                   </div>
-                )
+                );
               })}
             </div>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
