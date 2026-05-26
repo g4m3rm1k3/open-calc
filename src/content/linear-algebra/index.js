@@ -16,6 +16,7 @@ import la2_008 from './la2-008-cramers-rule.js';
 import la2_009 from './la2-009-matrix-calculus.js';
 import la2_010 from './la2-010-invertible-matrix-theorem.js';
 import la2_011 from './la2-011-four-fundamental-subspaces.js';
+import la2_012 from './la2-012-cofactor-expansion.js';
 
 import la3_001 from './la3-001-eigenvectors-and-eigenvalues.js';
 import la3_002 from './la3-002-diagonalization.js';
@@ -101,6 +102,7 @@ const LA2 = {
     la2_009,
     la2_010,
     la2_011,
+    la2_012,
   ],
 };
 

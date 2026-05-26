@@ -371,7 +371,14 @@ A = np.array([[2., 0., 1.],
         body: 'Cofactor expansion runs in $O(n!)$ time. For $n = 20$: $20! = 2.4 \\times 10^{18}$ operations. At $10^9$ operations/second, that is 76 years.\n\nLU decomposition computes the determinant in $O(n^3)$ time. For $n = 20$: $8{,}000$ operations. Same answer, in microseconds.\n\nThis is why `np.linalg.det()` and MATLAB\'s `det()` both use LU internally — never cofactor expansion for $n \\geq 4$.',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'LALinearAlgebraRealWorld',
+        title: 'Linear Algebra in the Real World — Applied Module',
+        mathBridge: 'A six-tab applied module spanning chapters 1 and 2: Systems→CNC shows two sensor equations as intersecting lines and computes the tool position via RREF; Matrices→Graphics applies rotation/scale/shear to a 2D shape and displays the combined matrix T with det(T); Vectors→Forces decomposes two cable tensions into a linear system and solves for T₁ and T₂; Dot→Normals shows how the dot product controls surface brightness and cutting-tool contact angle; Det→Area/Vol draws the parallelogram spanned by two vectors and shows area = |det|; Practice has five hand-calculation problems with real manufacturing context.',
+        caption: 'The five core tools of linear algebra — systems, matrices, vectors, dot products, determinants — each doing real engineering work.',
+      },
+    ],
   },
 
   // ── Examples ───────────────────────────────────────────────────

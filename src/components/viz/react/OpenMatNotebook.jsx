@@ -428,7 +428,7 @@ function openInOpenMat(code, cellTitle) {
     const updated = Array.isArray(docs) ? [...docs, newDoc] : [newDoc];
     localStorage.setItem("openmat-documents", JSON.stringify(updated));
     localStorage.setItem("openmat-active-document-id", JSON.stringify(id));
-    window.location.href = "/openmat";
+    window.location.href = "/#/openmat";
   } catch (e) {
     console.error("Failed to hand off to OpenMAT:", e);
   }

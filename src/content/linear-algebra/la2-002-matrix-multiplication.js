@@ -333,7 +333,14 @@ v = np.array([1.0, 0.0])
         body: '$((AB)C)_{ij} = \\sum_l (AB)_{il} C_{lj} = \\sum_l \\left(\\sum_k A_{ik}B_{kl}\\right) C_{lj}$\n\n$= \\sum_k A_{ik} \\sum_l B_{kl} C_{lj} = \\sum_k A_{ik} (BC)_{kj} = (A(BC))_{ij}$\n\nThe interchange of summation order (Fubini for finite sums) is the key step.',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'LAMatrixAlgebraModule',
+        title: 'Matrix Algebra — Concept to Graphics Pipeline',
+        mathBridge: 'A five-tab module: Concept covers addition, multiplication, identity, inverse, and LU; Canonical walks through a 2×3 × 3×2 product entry by entry, a 2×2 inverse by row reduction, and an LU factorisation; Real World shows the 3D graphics pipeline and FEA usage; Interactive lets you enter any 2×2 matrices A and B and instantly computes AB, BA, det(A), A⁻¹, and A⁻¹b, plus a live graphics canvas with rotation/scale/shear sliders; Practice has five hand-calculation problems.',
+        caption: 'The same math that renders every polygon in a 3D game — rotation, scale, and shear combined into a single matrix multiply.',
+      },
+    ],
   },
 
   examples: [

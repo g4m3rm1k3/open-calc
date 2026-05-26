@@ -346,6 +346,7 @@ async function getPyodide() {
       "scikit-learn",
       "scipy",
       "sqlite3",
+      "sympy",
     ]);
 
     await py.runPythonAsync(
@@ -905,6 +906,44 @@ const CellComponent = React.memo(
 );
 
 // ── Main notebook ─────────────────────────────────────────────────────────────
+// Rejoin lines broken inside Python string literals due to real \n in JS template literals.
+// Handles single-quoted, double-quoted strings. Skips triple-quoted strings (they're fine).
+function fixPythonBrokenStrings(src) {
+  const rawLines = src.split(/\r?\n/);
+  const out = [];
+  let pending = null;
+  let strCh = null; // '"' or "'"
+
+  for (const line of rawLines) {
+    const working = pending !== null ? pending + "\\n" + line : line;
+    let inStr = false, ch = null;
+    let i = 0;
+    while (i < working.length) {
+      const c = working[i];
+      if (inStr) {
+        if (c === "\\") { i += 2; continue; } // skip escape
+        if (c === ch) { inStr = false; ch = null; }
+      } else {
+        if (c === "#") break; // comment
+        // check for triple quote first
+        if ((c === '"' || c === "'") && working[i + 1] === c && working[i + 2] === c) {
+          // triple-quoted string — find its end (may span actual lines, but those are fine)
+          const tripleQ = c + c + c;
+          const end = working.indexOf(tripleQ, i + 3);
+          if (end !== -1) { i = end + 3; continue; }
+          else { i = working.length; break; } // unclosed triple — pass through as-is
+        }
+        if (c === '"' || c === "'") { inStr = true; ch = c; }
+      }
+      i++;
+    }
+    if (inStr) { pending = working; strCh = ch; }
+    else { out.push(working); pending = null; strCh = null; }
+  }
+  if (pending !== null) out.push(pending);
+  return out.join("\n");
+}
+
 export default function PythonNotebook({ params, onParamChange }) {
   const C = useColors();
   const [pyodide, setPyodide] = useState(null);
@@ -979,15 +1018,17 @@ export default function PythonNotebook({ params, onParamChange }) {
       });
 
       try {
-        // 1. Run user code
-        const result = await pyodide.runPythonAsync(cell.code);
+        // 1. Run user code — preprocess to rejoin lines where a real newline was
+        // embedded inside a string literal (happens with \n in JS template literals).
+        const userCode = fixPythonBrokenStrings(cell.code);
+        const result = await pyodide.runPythonAsync(userCode);
 
         let testFeedback = null;
 
         // 2. Run test code if provided
         if (cell.testCode) {
           try {
-            const testResult = await pyodide.runPythonAsync(cell.testCode);
+            const testResult = await pyodide.runPythonAsync(fixPythonBrokenStrings(cell.testCode));
             // Look for 'SUCCESS' or True
             const isSuccess =
               testResult === true ||

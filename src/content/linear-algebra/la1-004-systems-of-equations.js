@@ -201,12 +201,6 @@ end`,
         },
       },
       {
-        id: 'GaussianEliminationStepper',
-        title: 'Step Through Gaussian Elimination',
-        mathBridge: 'Enter a 3×3 system and press "Next Step". The visualization highlights the current pivot row in blue and the row being eliminated in red. Watch the augmented matrix transform row by row into echelon form, then RREF. At each step, confirm that the solution set has not changed — only our view of it.',
-        caption: 'Gaussian elimination in slow motion.',
-      },
-      {
         id: 'PythonNotebook',
         title: 'Code: Solving Linear Systems',
         mathBridge: 'np.linalg.solve(A, b) computes A⁻¹b efficiently via LU factorization. np.linalg.matrix_rank() counts pivots. Always verify with np.allclose(A @ x, b).',

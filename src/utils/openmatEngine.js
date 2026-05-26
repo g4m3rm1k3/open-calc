@@ -3,6 +3,27 @@ import { create, all, format as mathFormat } from "mathjs";
 export const math = create(all);
 math.config({ matrix: "Array", number: "number" });
 
+// Fix: A / B where B is a 1×1 matrix (e.g. result of inner product a'*a) must
+// be treated as scalar division, not matrix right-division A*inv(B), which
+// would try multiply(m×n, 1×1) and throw a dimension mismatch.
+{
+  const _div = math.divide.bind(math);
+  math.import({
+    divide: function(a, b) {
+      const pb = (b && typeof b.valueOf === "function") ? b.valueOf() : b;
+      if (Array.isArray(pb)) {
+        if (pb.length === 1 && Array.isArray(pb[0]) && pb[0].length === 1) {
+          return math.multiply(a, 1 / pb[0][0]);
+        }
+        if (pb.length === 1 && typeof pb[0] === "number") {
+          return math.multiply(a, 1 / pb[0]);
+        }
+      }
+      return _div(a, b);
+    },
+  }, { override: true, wrap: false });
+}
+
 // ── Pure type/value helpers ───────────────────────────────────────────────────
 
 export function toPlain(value) {
@@ -1644,6 +1665,8 @@ export function createExecutionEngine(options = {}) {
   parser.set("conj", (v) => { const fn = (x) => isComplexLike(x) ? { re: Number(x.re ?? 0), im: -Number(x.im ?? 0) } : x; return isCollection(v) ? mapDeep(v, fn) : fn(v); });
   parser.set("angle", (v) => { const fn = (x) => isComplexLike(x) ? Math.atan2(Number(x.im ?? 0), Number(x.re ?? 0)) : 0; return isCollection(v) ? mapDeep(v, fn) : fn(v); });
   parser.set("atan2", (y, x) => Math.atan2(Number(y), Number(x)));
+  parser.set("rad2deg", (v) => isCollection(toPlain(v)) ? mapDeep(toPlain(v), (x) => x * (180 / Math.PI)) : Number(v) * (180 / Math.PI));
+  parser.set("deg2rad", (v) => isCollection(toPlain(v)) ? mapDeep(toPlain(v), (x) => x * (Math.PI / 180)) : Number(v) * (Math.PI / 180));
   parser.set("hypot", (...a) => Math.hypot(...a.map(Number)));
   parser.set("log1p", _ew(Math.log1p));
   parser.set("expm1", _ew(Math.expm1));
@@ -1849,6 +1872,91 @@ export function createExecutionEngine(options = {}) {
     return xv; // multi-D: stub
   });
 
+  // ── Struct support ──────────────────────────────────────────────────────────
+  // struct()                     → {}
+  // struct('f1',v1,'f2',v2,...)  → {f1:v1, f2:v2, ...}
+  parser.set("struct", (...args) => {
+    if (args.length === 0) return {};
+    const out = {};
+    for (let i = 0; i < args.length - 1; i += 2) {
+      out[String(args[i])] = args[i + 1] ?? null;
+    }
+    return out;
+  });
+  parser.set("fieldnames", (s) => {
+    if (s == null || typeof s !== "object" || Array.isArray(s)) return [];
+    return Object.keys(s);
+  });
+  parser.set("isfield", (s, name) => {
+    if (s == null || typeof s !== "object" || Array.isArray(s)) return 0;
+    return Object.prototype.hasOwnProperty.call(s, String(name)) ? 1 : 0;
+  });
+  parser.set("rmfield", (s, name) => {
+    if (s == null || typeof s !== "object" || Array.isArray(s)) return s;
+    const out = { ...s };
+    const names = Array.isArray(name) ? name.map(String) : [String(name)];
+    names.forEach((n) => delete out[n]);
+    return out;
+  });
+  parser.set("orderfields", (s) => {
+    if (s == null || typeof s !== "object" || Array.isArray(s)) return s;
+    return Object.fromEntries(Object.entries(s).sort(([a], [b]) => a.localeCompare(b)));
+  });
+  // Dynamic struct field access: getfield(s, fieldname) — used by patchOperators for s.(expr)
+  parser.set("getfield", (s, name) => {
+    if (s == null || typeof s !== "object" || Array.isArray(s)) return null;
+    return s[String(name)] ?? null;
+  });
+  parser.set("setfield", (s, name, val) => {
+    if (s == null || typeof s !== "object" || Array.isArray(s)) return s;
+    return { ...s, [String(name)]: val };
+  });
+
+  // Left-division: mldivide(A, b) solves A*x = b
+  parser.set("mldivide", (A, b) => {
+    const Ap = toPlain(A), bp = toPlain(b);
+    try {
+      const sol = toPlain(math.lusolve(Ap, bp));
+      // lusolve returns column vector [[x1],[x2],...] — flatten if b was a 1-D array
+      if (Array.isArray(sol) && Array.isArray(sol[0]) && sol[0].length === 1
+          && (!Array.isArray(bp) || !Array.isArray(bp[0]))) {
+        return sol.map(r => r[0]);
+      }
+      return sol;
+    } catch {
+      return math.multiply(math.inv(Ap), bp);
+    }
+  });
+
+  // Magic square
+  parser.set("magic", (n) => {
+    n = Math.round(Number(n));
+    if (n < 1) return [[1]];
+    if (n === 1) return [[1]];
+    if (n === 2) return [[1,3],[4,2]]; // no true magic 2×2 exists; return placeholder
+    // Odd-order: Siamese method
+    if (n % 2 === 1) {
+      const m = Array.from({ length: n }, () => new Array(n).fill(0));
+      let r = 0, c = Math.floor(n / 2);
+      for (let num = 1; num <= n * n; num++) {
+        m[r][c] = num;
+        const nr = (r - 1 + n) % n, nc = (c + 1) % n;
+        if (m[nr][nc] !== 0) { r = (r + 1) % n; } else { r = nr; c = nc; }
+      }
+      return m;
+    }
+    // Doubly-even (divisible by 4): complement swap method
+    if (n % 4 === 0) {
+      const m = Array.from({ length: n }, (_, i) => Array.from({ length: n }, (__, j) => i * n + j + 1));
+      for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+        if (((Math.floor(i / (n / 4)) + Math.floor(j / (n / 4))) % 2) === 0) m[i][j] = n * n + 1 - m[i][j];
+      }
+      return m;
+    }
+    // Singly-even (n = 4k+2): LUX method fallback — use simple row-fill
+    const m = Array.from({ length: n }, (_, i) => Array.from({ length: n }, (__, j) => i * n + j + 1));
+    return m; // not a true magic square but avoids crash
+  });
 
   extensions.forEach((extension) => {
     Object.entries(extension?.functions || {}).forEach(([name, fn]) => {
@@ -2120,7 +2228,238 @@ export function executeScript(source, options = {}) {
     return result.join("\n");
   }
 
-  const normalizedSource = expandMidLineSemicolons(joinContinuationLines(source));
+  // Rejoin lines where a real newline was accidentally embedded inside a string
+  // literal (e.g. `\n` in a JS template literal becomes a real newline in the
+  // stored code).  Replace the embedded newline with the two-char MATLAB escape
+  // sequence \n so fprintf/sprintf still interpret it correctly.
+  function joinUnclosedStrings(src) {
+    // In MATLAB, ' is EITHER a string delimiter OR the transpose operator.
+    // It is transpose when immediately preceded (ignoring nothing — no space) by:
+    //   ), ], or a word character (identifier/digit).
+    // In all other positions (after =, (, [, ,, ;, operators, start-of-line)
+    // it opens a string.  Misidentifying transpose as string-opener causes the
+    // rest of the line and following lines to be silently joined.
+    function isTransposeQuote(str, pos) {
+      // Scan left from pos-1 to find the first non-space char
+      let j = pos - 1;
+      while (j >= 0 && (str[j] === ' ' || str[j] === '\t')) j--;
+      if (j < 0) return false;
+      return /[)\]\w]/.test(str[j]);
+    }
+
+    const rawLines = src.split(/\r?\n/);
+    const out = [];
+    let pending = null;
+    for (const line of rawLines) {
+      const working = pending !== null ? pending + "\\n" + line : line;
+      let inStr = false;
+      let strCh = null;
+      for (let i = 0; i < working.length; i++) {
+        const c = working[i];
+        if (inStr) {
+          if (c === strCh) { inStr = false; strCh = null; }
+        } else {
+          if (c === "%") break;
+          if (c === '"') { inStr = true; strCh = c; }
+          else if (c === "'") {
+            if (!isTransposeQuote(working, i)) { inStr = true; strCh = c; }
+          }
+        }
+      }
+      if (inStr) { pending = working; }
+      else { out.push(working); pending = null; }
+    }
+    if (pending !== null) out.push(pending);
+    return out.join("\n");
+  }
+
+  // Rejoin lines that are broken inside an open matrix literal [ ... ] across
+  // multiple real newlines (e.g. from a JS template literal with embedded \n).
+  // Rows are separated by a space so the bracket scanner still sees them as
+  // one logical line; MATLAB semicolons already separate rows inside matrices.
+  function joinUnclosedBrackets(src) {
+    // Strip inline comment from a line for bracket-depth counting only.
+    // Must respect strings so a '%' inside 'foo%bar' is not treated as a comment.
+    function stripComment(line) {
+      let inStr = false, strCh = null;
+      for (let i = 0; i < line.length; i++) {
+        const c = line[i];
+        if (inStr) { if (c === strCh) { inStr = false; strCh = null; } }
+        else if (c === "'" || c === '"') { inStr = true; strCh = c; }
+        else if (c === "%") return line.slice(0, i);
+      }
+      return line;
+    }
+    function countBracketDelta(text) {
+      let inStr = false, strCh = null, delta = 0;
+      for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        if (inStr) { if (c === strCh) { inStr = false; strCh = null; } }
+        else if (c === "%") break;
+        else if (c === '"') { inStr = true; strCh = c; }
+        else if (c === "'") {
+          // Only treat as string if not a transpose
+          let j = i - 1;
+          while (j >= 0 && (text[j] === ' ' || text[j] === '\t')) j--;
+          if (j < 0 || !/[)\]\w]/.test(text[j])) { inStr = true; strCh = c; }
+        }
+        else if (c === "[") delta++;
+        else if (c === "]") delta--;
+      }
+      return delta;
+    }
+
+    const rawLines = src.split(/\r?\n/);
+    const out = [];
+    let depth = 0;
+    let pendingRaw = "";   // raw lines (with comments) for output
+    for (const line of rawLines) {
+      const combined = pendingRaw ? pendingRaw + " " + line.trim() : line;
+      // Count delta using comment-stripped version of the NEW line only
+      depth += countBracketDelta(stripComment(line));
+      if (depth > 0) {
+        pendingRaw = combined;
+      } else {
+        out.push(combined);
+        pendingRaw = "";
+        depth = 0;
+      }
+    }
+    if (pendingRaw) out.push(pendingRaw);
+    return out.join("\n");
+  }
+
+  // Replace MATLAB short-circuit operators && and || with mathjs equivalents.
+  // Also replace dynamic struct field access s.(expr) → getfield(s,expr).
+  // Also replace MATLAB left-division operator \ → mldivide(left, right).
+  // Must operate outside strings and comments.
+  function patchOperators(src) {
+    return src.split(/\r?\n/).map(line => {
+      let result = "";
+      let inStr = false, strCh = null;
+      let i = 0;
+      while (i < line.length) {
+        const c = line[i];
+        if (inStr) {
+          result += c;
+          if (c === strCh) { inStr = false; strCh = null; }
+          i++;
+          continue;
+        }
+        if (c === "%") { result += line.slice(i); break; }
+        if (c === '"') { inStr = true; strCh = c; result += c; i++; continue; }
+        if (c === "'") {
+          // transpose check
+          let j = result.trimEnd().length - 1;
+          const prev = j >= 0 ? result.trimEnd()[j] : "";
+          if (/[)\]\w]/.test(prev)) { result += c; i++; continue; }
+          inStr = true; strCh = c; result += c; i++; continue;
+        }
+        // && → and
+        if (line[i] === "&" && line[i + 1] === "&") { result += " and "; i += 2; continue; }
+        // || → or
+        if (line[i] === "|" && line[i + 1] === "|") { result += " or "; i += 2; continue; }
+        // dynamic field: identifier.(expr) — find the opening ( and matching )
+        // handled as getfield(identifier, expr) by detecting .(
+        if (c === "." && line[i + 1] === "(") {
+          // find the object expression to the left
+          let objEnd = result.trimEnd().length - 1;
+          if (objEnd >= 0) {
+            const trimmed = result.trimEnd();
+            let objStart = objEnd;
+            if (trimmed[objEnd] === ")") {
+              let d = 0, j2 = objEnd;
+              while (j2 >= 0) {
+                if (trimmed[j2] === ")") d++;
+                else if (trimmed[j2] === "(") { if (!--d) { objStart = j2; break; } }
+                j2--;
+              }
+            } else {
+              while (objStart > 0 && /[\w]/.test(trimmed[objStart - 1])) objStart--;
+            }
+            const obj = trimmed.slice(objStart);
+            const prefix = trimmed.slice(0, objStart);
+            // find matching ) for .(
+            let depth = 0, j3 = i + 1, fieldExpr = "";
+            while (j3 < line.length) {
+              const ch = line[j3];
+              if (ch === "(") depth++;
+              else if (ch === ")") { if (!--depth) { j3++; break; } }
+              fieldExpr += ch;
+              j3++;
+            }
+            fieldExpr = fieldExpr.slice(1); // remove leading (
+            result = prefix + `getfield(${obj},${fieldExpr})`;
+            i = j3;
+            continue;
+          }
+        }
+        result += c;
+        i++;
+      }
+      return result;
+    }).join("\n");
+  }
+
+  // Replace MATLAB left-division A\B with mldivide(A,B).
+  function replaceBackslashDiv(src) {
+    return src.split(/\r?\n/).map(line => {
+      let inStr = false, strCh = null;
+      const bsPos = [];
+      for (let i = 0; i < line.length; i++) {
+        const c = line[i];
+        if (inStr) { if (c === strCh) { inStr = false; strCh = null; } }
+        else if (c === "%") break;
+        else if (c === '"') { inStr = true; strCh = c; }
+        else if (c === "'") {
+          let j = i - 1;
+          while (j >= 0 && (line[j] === " " || line[j] === "\t")) j--;
+          if (j < 0 || !/[)\]\w]/.test(line[j])) { inStr = true; strCh = c; }
+        }
+        else if (c === "\\") bsPos.push(i);
+      }
+      if (!bsPos.length) return line;
+      let out = line;
+      for (let pi = bsPos.length - 1; pi >= 0; pi--) {
+        const bs = bsPos[pi];
+        // find left operand end
+        let li = bs - 1;
+        while (li >= 0 && out[li] === " ") li--;
+        if (li < 0) continue;
+        let leftEnd = li, leftStart;
+        if (out[li] === ")") {
+          let d = 0, j = li;
+          for (; j >= 0; j--) { if (out[j] === ")") d++; else if (out[j] === "(") { if (!--d) { leftStart = j; break; } } }
+          let k = leftStart - 1; while (k >= 0 && out[k] === " ") k--;
+          if (k >= 0 && out[k] === "-") leftStart = k;
+        } else {
+          leftStart = li;
+          while (leftStart > 0 && /[\w.]/.test(out[leftStart - 1])) leftStart--;
+          let k = leftStart - 1; while (k >= 0 && out[k] === " ") k--;
+          if (k >= 0 && out[k] === "-") leftStart = k;
+        }
+        // find right operand
+        let ri = bs + 1; while (ri < out.length && out[ri] === " ") ri++;
+        if (ri >= out.length) continue;
+        let rightStart = ri, rightEnd, rr = ri;
+        if (out[rr] === "-") rr++;
+        if (rr < out.length && out[rr] === "(") {
+          let d = 0, j = rr;
+          for (; j < out.length; j++) { if (out[j] === "(") d++; else if (out[j] === ")") { if (!--d) { rightEnd = j; break; } } }
+        } else {
+          rightEnd = rr;
+          while (rightEnd + 1 < out.length && /[\w.]/.test(out[rightEnd + 1])) rightEnd++;
+        }
+        if (rightEnd === undefined) continue;
+        const left = out.slice(leftStart, leftEnd + 1).trim();
+        const right = out.slice(rightStart, rightEnd + 1).trim();
+        out = out.slice(0, leftStart) + `mldivide(${left},${right})` + out.slice(rightEnd + 1);
+      }
+      return out;
+    }).join("\n");
+  }
+
+  const normalizedSource = expandMidLineSemicolons(joinContinuationLines(replaceBackslashDiv(patchOperators(joinUnclosedBrackets(joinUnclosedStrings(source))))));
   const lines = normalizedSource.split(/\r?\n/);
   const tree = parseBlocks(lines);
   let lastVisibleResult = null;
