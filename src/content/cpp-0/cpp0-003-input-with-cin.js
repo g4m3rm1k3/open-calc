@@ -76,7 +76,7 @@ const lesson = {
       {
         id: "CppLab",
         mathBridge:
-          "**The code simulates age=25, name=\"Alice\". Experiment:**\n\n1. Compile and run: `g++ main.cpp -o greet && ./greet`\n2. Change the `__OUTPUT__` annotation to simulate different input (e.g., age=30, name=Bob)\n3. Switch to the getline version: copy `getline.cpp` code into the editor\n4. Practice the `cin.ignore()` pattern by reading an int THEN a full name\n5. Try `cin >> x >> y` — chained extraction reads two values",
+          '**The code simulates age=25, name="Alice". Experiment:**\n\n1. Compile and run: `g++ main.cpp -o greet && ./greet`\n2. Change the `__OUTPUT__` annotation to simulate different input (e.g., age=30, name=Bob)\n3. Switch to the getline version: copy `getline.cpp` code into the editor\n4. Practice the `cin.ignore()` pattern by reading an int THEN a full name\n5. Try `cin >> x >> y` — chained extraction reads two values',
         props: {
           mainFile: "main.cpp",
           initialFiles: {
@@ -108,7 +108,7 @@ const lesson = {
       {
         type: "tip",
         title: "Check if input succeeded",
-        body: '`if (cin >> x)` evaluates to true if extraction succeeded, false if it failed (wrong type or EOF). This lets you write validation loops: `while (!(cin >> age)) { cin.clear(); cin.ignore(1000, \'\\n\'); cout << "Invalid, enter a number: "; }`',
+        body: "`if (cin >> x)` evaluates to true if extraction succeeded, false if it failed (wrong type or EOF). This lets you write validation loops: `while (!(cin >> age)) { cin.clear(); cin.ignore(1000, '\\n'); cout << \"Invalid, enter a number: \"; }`",
       },
     ],
   },

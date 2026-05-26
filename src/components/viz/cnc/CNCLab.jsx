@@ -1714,8 +1714,8 @@ export default function CNCLab({
                 (ms?.units === "inch" ? 25.4 : 1)
               }
               toolLenCut={
-                (((toolTable[ms?.activeT ?? 1] ?? toolTable[1])?.lenCut ?? null) /
-                (ms?.units === "inch" ? 25.4 : 1)) || null
+                ((toolTable[ms?.activeT ?? 1] ?? toolTable[1])?.lenCut ??
+                  null) / (ms?.units === "inch" ? 25.4 : 1) || null
               }
             />
           </div>

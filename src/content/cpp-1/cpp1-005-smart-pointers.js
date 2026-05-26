@@ -71,8 +71,18 @@ const lesson = {
   chapter: "cpp-1",
   order: 5,
   title: "Smart Pointers and Memory Management",
-  subtitle: "Use unique_ptr, shared_ptr, and weak_ptr to manage heap memory safely",
-  tags: ["c++", "cpp", "smart-pointers", "unique_ptr", "shared_ptr", "weak_ptr", "RAII", "memory-management"],
+  subtitle:
+    "Use unique_ptr, shared_ptr, and weak_ptr to manage heap memory safely",
+  tags: [
+    "c++",
+    "cpp",
+    "smart-pointers",
+    "unique_ptr",
+    "shared_ptr",
+    "weak_ptr",
+    "RAII",
+    "memory-management",
+  ],
   aliases: [
     "c++ smart pointers",
     "c++ unique_ptr",
@@ -120,7 +130,8 @@ const lesson = {
     callouts: [
       {
         type: "warning",
-        title: "Never create two separate shared_ptr owning the same raw pointer",
+        title:
+          "Never create two separate shared_ptr owning the same raw pointer",
         body: "`shared_ptr<T> p1(raw); shared_ptr<T> p2(raw);` — two separate control blocks, each with ref count 1. Both will try to delete the object. Double-free, undefined behavior. Always use `make_shared` or copy a single `shared_ptr`: `shared_ptr<T> p2 = p1`.",
       },
       {
@@ -228,8 +239,8 @@ n2->next = n3;  n3->prev = n2;
         "Member: unique_ptr<FILE, decltype(&fclose)> fp;",
         "Constructor: fp(fopen(name, mode), fclose)",
         "isOpen: return fp != nullptr",
-        "write: fprintf(fp.get(), \"%s\", s.c_str())",
-        "In main: SafeFile f(\"test.txt\", \"w\"); f.write(\"line 1\n\"); // fclose automatic",
+        'write: fprintf(fp.get(), "%s", s.c_str())',
+        'In main: SafeFile f("test.txt", "w"); f.write("line 1\n"); // fclose automatic',
       ],
     },
   ],

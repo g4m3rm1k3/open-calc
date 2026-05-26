@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { CNCEngine, MACHINE_DEFINITIONS, TOOL_TEMPLATES } from "./CNCEngine.js";
+import CNCBackplot from "./CNCBackplot.jsx";
 
 function channelStateToMs(ch) {
   const base = initMS();
@@ -1587,7 +1588,7 @@ export default function CNCSimPro() {
     tool: true,
     removal: true,
   });
-  const [vpView, setVpView] = useState("auto");
+  const [vpView, setVpView] = useState("iso");
   const [geoms, setGeoms] = useState([]);
   const [drawTool, setDrawTool] = useState("select");
   const [drawPts, setDrawPts] = useState([]);
@@ -3537,7 +3538,34 @@ export default function CNCSimPro() {
             ? C.purple
             : C.amber;
   const activeT = tools[ms.activeT];
+  const activeTool = activeT || tools[1] || null;
   const currentChannel = channelStates[activeChannel];
+  const backplotPathPoints = useMemo(
+    () =>
+      pathPts.map((p) => ({
+        machineX: p.x ?? 0,
+        machineY: p.y ?? 0,
+        machineZ: p.z ?? 0,
+        motionMode: p.m ?? p.motionMode ?? "G00",
+      })),
+    [pathPts],
+  );
+  const backplotCurrentStep = useMemo(() => {
+    if (!pathPts.length) return 0;
+    let idx = 0;
+    for (let i = 0; i < pathPts.length; i++) {
+      if ((pathPts[i]?.bi ?? 0) <= curPt) idx = i;
+      else break;
+    }
+    return idx;
+  }, [pathPts, curPt]);
+  const unitScale = ms.units === "inch" ? 25.4 : 1;
+  const backplotToolDiameter = (activeTool?.dia ?? 10) / unitScale;
+  const backplotToolLength = (activeTool?.lt ?? activeTool?.hlen ?? 75) / unitScale;
+  const backplotToolLenCut =
+    activeTool && (activeTool?.lc ?? activeTool?.lt) != null
+      ? ((activeTool?.lc ?? activeTool?.lt) || null) / unitScale
+      : null;
 
   const moveProjectFile = useCallback(
     (fileId, bucket, channel = null) => {
@@ -4907,22 +4935,35 @@ export default function CNCSimPro() {
             </div>
 
             <div id="vpWrap" ref={vpRef}>
-              <canvas
-                id="vpCvs"
-                ref={cvsRef}
-                onMouseDown={onMouseDown}
-                onMouseMove={onMouseMove}
-                onMouseUp={onMouseUp}
-                onContextMenu={onContextMenu}
-                style={{
-                  cursor:
-                    drawTool !== "select"
-                      ? "crosshair"
-                      : mach.isLathe
-                        ? "default"
-                        : "default",
-                }}
-              />
+              {!mach.isLathe && vpView === "iso" ? (
+                <CNCBackplot
+                  pathPoints={backplotPathPoints}
+                  currentStep={backplotCurrentStep}
+                  width="100%"
+                  height="100%"
+                  isDark={dark}
+                  toolDiameter={backplotToolDiameter}
+                  toolLength={backplotToolLength}
+                  toolLenCut={backplotToolLenCut}
+                />
+              ) : (
+                <canvas
+                  id="vpCvs"
+                  ref={cvsRef}
+                  onMouseDown={onMouseDown}
+                  onMouseMove={onMouseMove}
+                  onMouseUp={onMouseUp}
+                  onContextMenu={onContextMenu}
+                  style={{
+                    cursor:
+                      drawTool !== "select"
+                        ? "crosshair"
+                        : mach.isLathe
+                          ? "default"
+                          : "default",
+                  }}
+                />
+              )}
               <div className="vp-hud">
                 {channelStates.length > 1 && (
                   <>

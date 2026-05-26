@@ -74,8 +74,20 @@ const lesson = {
   chapter: "cpp-1",
   order: 8,
   title: "STL Containers",
-  subtitle: "Choose the right data structure: map, set, unordered_map, queue, deque, priority_queue",
-  tags: ["c++", "cpp", "STL", "map", "set", "unordered_map", "queue", "priority_queue", "deque", "data-structures"],
+  subtitle:
+    "Choose the right data structure: map, set, unordered_map, queue, deque, priority_queue",
+  tags: [
+    "c++",
+    "cpp",
+    "STL",
+    "map",
+    "set",
+    "unordered_map",
+    "queue",
+    "priority_queue",
+    "deque",
+    "data-structures",
+  ],
   aliases: [
     "c++ map",
     "c++ set",
@@ -96,7 +108,7 @@ const lesson = {
 
   intuition: {
     prose: [
-      "**`map::operator[]` creates entries.** `m[\"key\"]` does not just look up \"key\" — if \"key\" doesn't exist, it inserts a default-constructed value (0 for int, \"\" for string) and returns a reference to it. This is convenient for counting (`wordCount[word]++`) but dangerous for read-only access: `m[\"typo\"]` silently creates an entry. For read-only lookup, use `m.find(key)` (returns iterator) or `m.at(key)` (throws `out_of_range`).",
+      '**`map::operator[]` creates entries.** `m["key"]` does not just look up "key" — if "key" doesn\'t exist, it inserts a default-constructed value (0 for int, "" for string) and returns a reference to it. This is convenient for counting (`wordCount[word]++`) but dangerous for read-only access: `m["typo"]` silently creates an entry. For read-only lookup, use `m.find(key)` (returns iterator) or `m.at(key)` (throws `out_of_range`).',
       "**`count` vs `find` for membership.** `set.count(x)` returns 0 or 1 (it's a set — at most one occurrence). `set.find(x) != set.end()` does the same thing. For `multiset`/`multimap`, `count` returns the actual count; `find` returns the first match. In modern C++ (C++20), `set.contains(x)` is cleaner and reads like English. For unordered containers, `count` is O(1) average; for ordered, O(log n).",
       "**Priority queue ordering.** `priority_queue<int>` is a max-heap: `top()` gives the largest element. For a min-heap: `priority_queue<int, vector<int>, greater<int>>`. For custom types, provide a comparator. Common pattern: Dijkstra's algorithm uses `priority_queue<pair<int,int>, vector<...>, greater<...>>` where `pair.first` is the distance — the unvisited node with the smallest distance is always at the top.",
       "**Structured bindings and range-for.** `for (const auto& [key, val] : myMap)` uses C++17 structured bindings to unpack each `pair<const Key, Value>`. Without it: `for (const auto& p : myMap) { p.first; p.second; }`. Always use `const auto&` in range-for to avoid copying heavy objects. If you need to modify values: `for (auto& [key, val] : myMap) val *= 2;` — note: keys in map are always `const`, only values are modifiable.",
@@ -105,7 +117,7 @@ const lesson = {
       {
         id: "CppLab",
         mathBridge:
-          "**Explore container operations:**\n\n1. Compile and run — observe sorted order in `map`, dropped duplicates in `set`\n2. Add `inventory[\"apple\"] += 10` then print — map updates in place\n3. Try `inventory[\"newFruit\"]` without assigning — notice it creates an entry with value 0\n4. Change `priority_queue<int>` to `priority_queue<int, vector<int>, greater<int>>` — now it's a min-heap\n5. Add a `multiset<int>` with duplicate values — count() returns actual count\n6. Benchmark: add 1M elements to `map` vs `unordered_map` and compare insert speed",
+          '**Explore container operations:**\n\n1. Compile and run — observe sorted order in `map`, dropped duplicates in `set`\n2. Add `inventory["apple"] += 10` then print — map updates in place\n3. Try `inventory["newFruit"]` without assigning — notice it creates an entry with value 0\n4. Change `priority_queue<int>` to `priority_queue<int, vector<int>, greater<int>>` — now it\'s a min-heap\n5. Add a `multiset<int>` with duplicate values — count() returns actual count\n6. Benchmark: add 1M elements to `map` vs `unordered_map` and compare insert speed',
         props: {
           mainFile: "main.cpp",
           initialFiles: {
@@ -120,13 +132,14 @@ const lesson = {
     prose: [
       "**Iterator invalidation rules by container.** `map`/`set`/`unordered_map`: insertion never invalidates existing iterators (tree/hash table). `unordered_map` rehashing invalidates ALL iterators. `deque`: inserting at front/back invalidates all iterators (but not references to existing elements for back-only insertions). Rule of thumb: after any mutating operation, assume iterators are invalid unless you know the specific container's guarantee.",
       "**Custom hash functions for `unordered_map`.** Built-in types (int, string, pointer) have standard hashes. For custom types as keys, provide a hash specialization: `template<> struct std::hash<MyType> { size_t operator()(const MyType& x) const { return hash<string>()(x.id); } };` and an `operator==`. Without these, `unordered_map<MyType, ...>` won't compile.",
-      "**`emplace` vs `insert`.** `m.insert({\"key\", value})` constructs a `pair` then copies/moves it into the map. `m.emplace(\"key\", value)` constructs the pair *in-place* inside the map — no intermediate object. For containers of complex objects, `emplace_back` / `emplace` can be significantly faster than `push_back` / `insert`. In modern C++, prefer `emplace` for containers of non-trivial types.",
+      '**`emplace` vs `insert`.** `m.insert({"key", value})` constructs a `pair` then copies/moves it into the map. `m.emplace("key", value)` constructs the pair *in-place* inside the map — no intermediate object. For containers of complex objects, `emplace_back` / `emplace` can be significantly faster than `push_back` / `insert`. In modern C++, prefer `emplace` for containers of non-trivial types.',
     ],
     callouts: [
       {
         type: "warning",
-        title: "map::operator[] creates entries — use find() for read-only access",
-        body: "`if (m[\"key\"] == 0)` is not a safe way to check if a key is absent. It inserts a zero-valued entry if the key doesn't exist. Always use `m.find(\"key\") != m.end()` or `m.count(\"key\")` to check membership, and `m.at(\"key\")` (throws on missing) or `find` for safe read access.",
+        title:
+          "map::operator[] creates entries — use find() for read-only access",
+        body: '`if (m["key"] == 0)` is not a safe way to check if a key is absent. It inserts a zero-valued entry if the key doesn\'t exist. Always use `m.find("key") != m.end()` or `m.count("key")` to check membership, and `m.at("key")` (throws on missing) or `find` for safe read access.',
       },
       {
         type: "info",
@@ -238,7 +251,7 @@ public:
     {
       difficulty: "medium",
       problem:
-        "Implement a phone book using `map<string, string>` (name → number). Support: `add(name, number)`, `lookup(name)` (returns number or \"Not found\"), `remove(name)`, `listAll()` (prints all contacts in alphabetical order). Test with 5+ contacts, look up existing and nonexistent names, remove one, list remaining.",
+        'Implement a phone book using `map<string, string>` (name → number). Support: `add(name, number)`, `lookup(name)` (returns number or "Not found"), `remove(name)`, `listAll()` (prints all contacts in alphabetical order). Test with 5+ contacts, look up existing and nonexistent names, remove one, list remaining.',
       hint: "Use `find()` for safe lookup. `erase(name)` removes a key. Range-for over `map` already gives alphabetical order.",
       walkthrough: [
         "map<string,string> book;",
@@ -268,10 +281,10 @@ public:
       {
         id: "cpp1-008-q1",
         type: "choice",
-        text: "What does `myMap[\"key\"]` do if \"key\" does not exist in the map?",
+        text: 'What does `myMap["key"]` do if "key" does not exist in the map?',
         options: [
           "Returns a default-constructed value without modifying the map",
-          "Inserts a default-constructed entry for \"key\" and returns a reference to it",
+          'Inserts a default-constructed entry for "key" and returns a reference to it',
           "Throws `std::out_of_range`",
           "Returns `end()` iterator",
         ],

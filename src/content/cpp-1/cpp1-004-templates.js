@@ -96,8 +96,17 @@ const lesson = {
   chapter: "cpp-1",
   order: 4,
   title: "Templates",
-  subtitle: "Write code once that works with any type — generic programming with function and class templates",
-  tags: ["c++", "cpp", "templates", "generics", "function-template", "class-template", "type-parameters"],
+  subtitle:
+    "Write code once that works with any type — generic programming with function and class templates",
+  tags: [
+    "c++",
+    "cpp",
+    "templates",
+    "generics",
+    "function-template",
+    "class-template",
+    "type-parameters",
+  ],
   aliases: [
     "c++ templates",
     "c++ generic programming",
@@ -125,7 +134,7 @@ const lesson = {
       {
         id: "CppLab",
         mathBridge:
-          "**Explore templates:**\n\n1. Compile and run — the same Stack and Pair work with int, string, double\n2. Try `Stack<string> ss; ss.push(\"hello\"); ss.push(\"world\");`\n3. Add `template<typename T> void printAll(const vector<T>& v)` — works with any vector type\n4. Add a non-type template parameter: `template<typename T, int N> struct Array { T data[N]; };`\n5. Try calling `maxOf(3, 3.14)` (without explicit type) — what error do you get? Why?\n6. Add template specialization for string that compares case-insensitively",
+          '**Explore templates:**\n\n1. Compile and run — the same Stack and Pair work with int, string, double\n2. Try `Stack<string> ss; ss.push("hello"); ss.push("world");`\n3. Add `template<typename T> void printAll(const vector<T>& v)` — works with any vector type\n4. Add a non-type template parameter: `template<typename T, int N> struct Array { T data[N]; };`\n5. Try calling `maxOf(3, 3.14)` (without explicit type) — what error do you get? Why?\n6. Add template specialization for string that compares case-insensitively',
         props: {
           mainFile: "main.cpp",
           initialFiles: {

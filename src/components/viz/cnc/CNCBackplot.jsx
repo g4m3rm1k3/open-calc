@@ -205,7 +205,6 @@ export default function CNCBackplot({
       controlsRef.current.update();
       pathFittedRef.current = true;
     }
-
   }, [pathPoints, isDark]);
 
   // Rebuild tool when dimensions change
@@ -280,7 +279,7 @@ function _buildTool(group, radius, length, lenCut) {
   // Profile: (radius, height-from-tip). LatheGeometry revolves around Y;
   // we rotate +π/2 on X so Y→Z (tip at z=0, shank goes +Z).
   const fluteProfile = [
-    new THREE.Vector2(r, 0),  // tip edge
+    new THREE.Vector2(r, 0), // tip edge
     new THREE.Vector2(r, fl), // top of flute zone
   ];
   const fluteMesh = new THREE.Mesh(
@@ -292,9 +291,9 @@ function _buildTool(group, radius, length, lenCut) {
 
   // ── Neck taper + Shank — LatheGeometry ────────────────────────────────────
   const shankProfile = [
-    new THREE.Vector2(r,  fl),       // join flute top
-    new THREE.Vector2(sr, fl + nk),  // neck taper
-    new THREE.Vector2(sr, len),      // shank top
+    new THREE.Vector2(r, fl), // join flute top
+    new THREE.Vector2(sr, fl + nk), // neck taper
+    new THREE.Vector2(sr, len), // shank top
   ];
   const shankMesh = new THREE.Mesh(
     new THREE.LatheGeometry(shankProfile, 24),
@@ -319,7 +318,7 @@ function _buildTool(group, radius, length, lenCut) {
     ]);
     return new THREE.Line(geo, new THREE.LineBasicMaterial({ color }));
   };
-  group.add(mkLine(-cx, 0, 0, cx, 0, 0, 0xef4444));         // X — red
-  group.add(mkLine(0, -cx, 0, 0, cx, 0, 0x22c55e));         // Y — green
+  group.add(mkLine(-cx, 0, 0, cx, 0, 0, 0xef4444)); // X — red
+  group.add(mkLine(0, -cx, 0, 0, cx, 0, 0x22c55e)); // Y — green
   group.add(mkLine(0, 0, -cx * 0.4, 0, 0, cx * 0.4, 0x38bdf8)); // Z — blue
 }

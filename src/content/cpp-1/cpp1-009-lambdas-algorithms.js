@@ -84,8 +84,20 @@ const lesson = {
   chapter: "cpp-1",
   order: 9,
   title: "Lambdas and STL Algorithms",
-  subtitle: "Write expressive, functional-style code with lambda expressions and the STL algorithm library",
-  tags: ["c++", "cpp", "lambda", "algorithm", "std::function", "capture", "transform", "sort", "accumulate", "functional"],
+  subtitle:
+    "Write expressive, functional-style code with lambda expressions and the STL algorithm library",
+  tags: [
+    "c++",
+    "cpp",
+    "lambda",
+    "algorithm",
+    "std::function",
+    "capture",
+    "transform",
+    "sort",
+    "accumulate",
+    "functional",
+  ],
   aliases: [
     "c++ lambda",
     "c++ lambda expression",
@@ -135,7 +147,8 @@ const lesson = {
     callouts: [
       {
         type: "warning",
-        title: "Never capture local variables by reference in a lambda that outlives them",
+        title:
+          "Never capture local variables by reference in a lambda that outlives them",
         body: "Returning a `[&]` lambda, storing it in a class field, or passing it to an async operation while the captured variables are on the stack creates a dangling reference. The lambda appears to work locally but crashes or corrupts memory when called later. Capture by value (`[=]` or explicit `[x, y]`) for any lambda that might outlive the current scope.",
       },
       {

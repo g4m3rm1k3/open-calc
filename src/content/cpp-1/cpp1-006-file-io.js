@@ -87,7 +87,16 @@ const lesson = {
   order: 6,
   title: "File I/O with fstream",
   subtitle: "Read and write files using ifstream, ofstream, and stringstream",
-  tags: ["c++", "cpp", "file-io", "fstream", "ifstream", "ofstream", "stringstream", "csv"],
+  tags: [
+    "c++",
+    "cpp",
+    "file-io",
+    "fstream",
+    "ifstream",
+    "ofstream",
+    "stringstream",
+    "csv",
+  ],
   aliases: [
     "c++ file reading",
     "c++ write to file",
@@ -99,23 +108,23 @@ const lesson = {
   hook: `Programs that can't persist data restart from scratch every run. File I/O bridges the gap between runtime and storage. C++'s stream library uses the same \`<<\` and \`>>\` interface as \`cout\`/\`cin\` — so once you know console I/O, file I/O is 90% familiar. The remaining 10% is about error handling, modes, and binary vs text.`,
 
   mentalModel: [
-    "**`ifstream` is a file-backed input stream.** `ifstream in(\"data.txt\");` opens the file for reading. Then use `in >> x` or `getline(in, line)` exactly as you would with `cin`. The destructor closes the file when `in` goes out of scope (RAII). If the file doesn't exist, the stream is in a fail state — always check `if (!in)` after opening.",
-    "**`ofstream` is a file-backed output stream.** `ofstream out(\"results.txt\");` creates/overwrites the file. Write with `out << data`. The file is flushed and closed when `out` destructs. Open modes: `ios::app` (append), `ios::binary` (binary mode), `ios::trunc` (truncate, default). Passing a non-existent path's parent directory causes failure — check the result.",
-    "**`stringstream` treats a string like a stream.** Build a string using `<<`: `stringstream ss; ss << 3.14 << \" \" << 42;`. Parse a string using `>>`: `stringstream ss(\"3.14 42\"); double d; int i; ss >> d >> i;`. Excellent for type conversions and for parsing structured text (CSV lines, configuration files).",
+    '**`ifstream` is a file-backed input stream.** `ifstream in("data.txt");` opens the file for reading. Then use `in >> x` or `getline(in, line)` exactly as you would with `cin`. The destructor closes the file when `in` goes out of scope (RAII). If the file doesn\'t exist, the stream is in a fail state — always check `if (!in)` after opening.',
+    '**`ofstream` is a file-backed output stream.** `ofstream out("results.txt");` creates/overwrites the file. Write with `out << data`. The file is flushed and closed when `out` destructs. Open modes: `ios::app` (append), `ios::binary` (binary mode), `ios::trunc` (truncate, default). Passing a non-existent path\'s parent directory causes failure — check the result.',
+    '**`stringstream` treats a string like a stream.** Build a string using `<<`: `stringstream ss; ss << 3.14 << " " << 42;`. Parse a string using `>>`: `stringstream ss("3.14 42"); double d; int i; ss >> d >> i;`. Excellent for type conversions and for parsing structured text (CSV lines, configuration files).',
   ],
 
   intuition: {
     prose: [
       "**All `*stream` classes share the same interface.** `cin`/`cout` use `basic_istream`/`basic_ostream` under the hood. `ifstream`/`ofstream` also inherit from these. `stringstream` also inherits from them. This means any function that takes `istream&` works with `cin`, `ifstream`, or `stringstream` — write once, use with any input source. This design pattern (stream abstraction) is extremely powerful for testing: pass a `stringstream` in tests instead of a real file.",
-      "**Error handling for file operations.** Always check the stream state after opening: `if (!in) { cerr << \"Error: \" << ...; }`. After reads: `if (in.fail())` or just `if (!in)`. After writes: `if (!out.good())`. For production code, also handle `out.flush()` failing (full disk, network error). Using RAII (scoped streams) ensures files are always closed even on exceptions.",
-      "**Text mode vs binary mode.** By default, `fstream` opens in text mode — on Windows, `\\n` in your string becomes `\\r\\n` on disk (CRLF). Open with `ios::binary` for exact byte-for-byte I/O: `ifstream in(\"image.png\", ios::binary)`. Always use binary mode for non-text files (images, binaries, compressed data) to prevent platform-specific newline translation.",
+      '**Error handling for file operations.** Always check the stream state after opening: `if (!in) { cerr << "Error: " << ...; }`. After reads: `if (in.fail())` or just `if (!in)`. After writes: `if (!out.good())`. For production code, also handle `out.flush()` failing (full disk, network error). Using RAII (scoped streams) ensures files are always closed even on exceptions.',
+      '**Text mode vs binary mode.** By default, `fstream` opens in text mode — on Windows, `\\n` in your string becomes `\\r\\n` on disk (CRLF). Open with `ios::binary` for exact byte-for-byte I/O: `ifstream in("image.png", ios::binary)`. Always use binary mode for non-text files (images, binaries, compressed data) to prevent platform-specific newline translation.',
       "**`stringstream` for CSV parsing.** The classic pattern: `getline(fullStream, line)` reads one line; then `stringstream ss(line); getline(ss, field, ',')` extracts comma-separated fields. This is robust to spaces within fields and is cleaner than manually scanning for commas. `stoi(str)`, `stod(str)` convert field strings to numbers.",
     ],
     visualizations: [
       {
         id: "CppLab",
         mathBridge:
-          "**File I/O hands-on:**\n\n1. Compile and run — watch the file create/read/append cycle\n2. After running: `cat students.txt` to see the file content\n3. Run `./app` twice — does it append or overwrite on second run?\n4. Modify to read binary: `ifstream in(\"students.txt\", ios::binary)` — use `in.read(buf, n)`\n5. Add error handling: what if you try to open `/root/secret.txt`?\n6. Use stringstream to build a formatted report string before writing it to a file",
+          '**File I/O hands-on:**\n\n1. Compile and run — watch the file create/read/append cycle\n2. After running: `cat students.txt` to see the file content\n3. Run `./app` twice — does it append or overwrite on second run?\n4. Modify to read binary: `ifstream in("students.txt", ios::binary)` — use `in.read(buf, n)`\n5. Add error handling: what if you try to open `/root/secret.txt`?\n6. Use stringstream to build a formatted report string before writing it to a file',
         props: {
           mainFile: "main.cpp",
           initialFiles: {
@@ -136,7 +145,7 @@ const lesson = {
       {
         type: "warning",
         title: "Always check if the file opened successfully",
-        body: "If `ifstream in(\"file.txt\")` fails (file not found, permission denied), the stream is in a fail state. Subsequent reads return nothing or empty. Always check: `if (!in) { cerr << \"Cannot open file\\n\"; return 1; }`. Don't silently process an empty stream as if data was read.",
+        body: 'If `ifstream in("file.txt")` fails (file not found, permission denied), the stream is in a fail state. Subsequent reads return nothing or empty. Always check: `if (!in) { cerr << "Cannot open file\\n"; return 1; }`. Don\'t silently process an empty stream as if data was read.',
       },
       {
         type: "info",
@@ -230,12 +239,12 @@ map<string, string> parseConfig(const string& filename) {
       difficulty: "easy",
       problem:
         "Write a word frequency counter that reads a text file (create it with `echo 'hello world hello foo bar foo foo' > words.txt`), counts how many times each word appears using `map<string, int>`, and writes the results to `freq.txt` as 'word: count' sorted alphabetically. Verify with `cat freq.txt`.",
-      hint: "Use `ifstream in(\"words.txt\"); while (in >> word) freq[word]++;` Then `ofstream out(\"freq.txt\"); for (auto& [w,c] : freq) out << w << \": \" << c << endl;`",
+      hint: 'Use `ifstream in("words.txt"); while (in >> word) freq[word]++;` Then `ofstream out("freq.txt"); for (auto& [w,c] : freq) out << w << ": " << c << endl;`',
       walkthrough: [
         "Create words.txt: `echo 'hello world hello foo' > words.txt`",
         "Open ifstream, while (in >> word) freq[word]++",
         "Open ofstream for output",
-        "for (auto& [k,v] : freq) out << k << \": \" << v << endl",
+        'for (auto& [k,v] : freq) out << k << ": " << v << endl',
         "map auto-sorts by key, so output is alphabetical",
       ],
     },
@@ -281,17 +290,17 @@ map<string, string> parseConfig(const string& filename) {
         ],
         answer: 1,
         explanation:
-          "`stringstream` lets you use stream operations (`<<`, `>>`, `getline`) on a string. Use it to parse structured text (`\"3.14 42\"` → double + int), to build strings incrementally, or as a drop-in replacement for file/cin streams in testing.",
+          '`stringstream` lets you use stream operations (`<<`, `>>`, `getline`) on a string. Use it to parse structured text (`"3.14 42"` → double + int), to build strings incrementally, or as a drop-in replacement for file/cin streams in testing.',
       },
       {
         id: "cpp1-006-q3",
         type: "choice",
         text: "How do you open a file for appending (adding to the end without overwriting)?",
         options: [
-          "`ofstream out(\"file.txt\", ios::write)`",
-          "`ofstream out(\"file.txt\", ios::app)`",
-          "`ofstream out(\"file.txt\", ios::append_only)`",
-          "`ifstream out(\"file.txt\")`",
+          '`ofstream out("file.txt", ios::write)`',
+          '`ofstream out("file.txt", ios::app)`',
+          '`ofstream out("file.txt", ios::append_only)`',
+          '`ifstream out("file.txt")`',
         ],
         answer: 1,
         explanation:
