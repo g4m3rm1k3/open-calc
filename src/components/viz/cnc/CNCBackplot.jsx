@@ -11,6 +11,9 @@ export default function CNCBackplot({
   toolDiameter = 10,
   toolLength = 75,
   toolLenCut = null,
+  stockDimensions = { width: 100, height: 80, depth: 40 },
+  stockOrigin = { x: 0, y: 0, z: 0 },
+  showStock = true,
 }) {
   const mountRef = useRef(null);
   const rendererRef = useRef(null);
@@ -18,6 +21,7 @@ export default function CNCBackplot({
   const cameraRef = useRef(null);
   const controlsRef = useRef(null);
   const pathLayerRef = useRef(null);
+  const stockLayerRef = useRef(null);
   const toolRef = useRef(null);
   const gridRef = useRef(null);
   const rafRef = useRef(null);
@@ -30,6 +34,8 @@ export default function CNCBackplot({
     gridAlt: isDark ? 0x1e293b : 0xcbd5e1,
     rapid: isDark ? 0xfacc15 : 0xd97706, // G00
     feed: isDark ? 0x38bdf8 : 0x2563eb, // G01/02/03
+    stockFill: isDark ? 0x3b82f6 : 0x2563eb,
+    stockEdge: isDark ? 0x93c5fd : 0x1d4ed8,
   };
 
   // ── Bootstrap Three.js (once) ─────────────────────────────────────────────
@@ -78,6 +84,10 @@ export default function CNCBackplot({
     scene.add(pathLayer);
     pathLayerRef.current = pathLayer;
 
+    const stockLayer = new THREE.Group();
+    scene.add(stockLayer);
+    stockLayerRef.current = stockLayer;
+
     const toolGroup = new THREE.Group();
     scene.add(toolGroup);
     toolRef.current = toolGroup;
@@ -110,6 +120,22 @@ export default function CNCBackplot({
     };
   }, []);
 
+  const clearGroup = (group) => {
+    if (!group) return;
+    while (group.children.length) {
+      const child = group.children.pop();
+      if (child.geometry) child.geometry.dispose();
+      if (child.material) {
+        if (Array.isArray(child.material)) {
+          child.material.forEach((m) => m?.dispose?.());
+        } else {
+          child.material.dispose?.();
+        }
+      }
+      group.remove(child);
+    }
+  };
+
   // Update background/fog when theme changes
   useEffect(() => {
     if (rendererRef.current) rendererRef.current.setClearColor(colors.bg);
@@ -127,6 +153,53 @@ export default function CNCBackplot({
       gridRef.current = newGrid;
     }
   }, [isDark]);
+
+  // ── Rebuild stock block ──────────────────────────────────────────────────
+  useEffect(() => {
+    const group = stockLayerRef.current;
+    if (!group) return;
+    clearGroup(group);
+    if (!showStock) return;
+
+    const w = Math.max(stockDimensions?.width ?? 100, 0.1);
+    const h = Math.max(stockDimensions?.height ?? 80, 0.1);
+    const d = Math.max(stockDimensions?.depth ?? 40, 0.1);
+    const ox = stockOrigin?.x ?? 0;
+    const oy = stockOrigin?.y ?? 0;
+    const oz = stockOrigin?.z ?? 0;
+
+    const mesh = new THREE.Mesh(
+      new THREE.BoxGeometry(w, h, d),
+      new THREE.MeshPhongMaterial({
+        color: colors.stockFill,
+        transparent: true,
+        opacity: isDark ? 0.22 : 0.18,
+        shininess: 40,
+      }),
+    );
+    mesh.position.set(ox + w / 2, oy + h / 2, oz + d / 2);
+    group.add(mesh);
+
+    const edges = new THREE.LineSegments(
+      new THREE.EdgesGeometry(new THREE.BoxGeometry(w, h, d)),
+      new THREE.LineBasicMaterial({ color: colors.stockEdge }),
+    );
+    edges.position.copy(mesh.position);
+    group.add(edges);
+
+    if (!pathPoints.length && cameraRef.current && controlsRef.current) {
+      const center = new THREE.Vector3(ox + w / 2, oy + h / 2, oz + d / 2);
+      const maxDim = Math.max(w, h, d, 20);
+      const dist = maxDim * 2.2;
+      cameraRef.current.position.set(
+        center.x + dist * 0.7,
+        center.y - dist,
+        center.z + dist * 0.8,
+      );
+      controlsRef.current.target.copy(center);
+      controlsRef.current.update();
+    }
+  }, [stockDimensions, stockOrigin, showStock, isDark, pathPoints.length]);
 
   // ── Rebuild path ──────────────────────────────────────────────────────────
   useEffect(() => {

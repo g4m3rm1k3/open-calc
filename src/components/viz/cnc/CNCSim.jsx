@@ -3561,11 +3561,28 @@ export default function CNCSimPro() {
   }, [pathPts, curPt]);
   const unitScale = ms.units === "inch" ? 25.4 : 1;
   const backplotToolDiameter = (activeTool?.dia ?? 10) / unitScale;
-  const backplotToolLength = (activeTool?.lt ?? activeTool?.hlen ?? 75) / unitScale;
+  const backplotToolLength =
+    (activeTool?.lt ?? activeTool?.hlen ?? 75) / unitScale;
   const backplotToolLenCut =
     activeTool && (activeTool?.lc ?? activeTool?.lt) != null
       ? ((activeTool?.lc ?? activeTool?.lt) || null) / unitScale
       : null;
+  const backplotStockDimensions = useMemo(
+    () => ({
+      width: (stock.width ?? 100) / unitScale,
+      height: (stock.height ?? 80) / unitScale,
+      depth: (stock.depth ?? 40) / unitScale,
+    }),
+    [stock.width, stock.height, stock.depth, unitScale],
+  );
+  const backplotStockOrigin = useMemo(
+    () => ({
+      x: (stock.x ?? 0) / unitScale,
+      y: (stock.y ?? 0) / unitScale,
+      z: (stock.z ?? 0) / unitScale,
+    }),
+    [stock.x, stock.y, stock.z, unitScale],
+  );
 
   const moveProjectFile = useCallback(
     (fileId, bucket, channel = null) => {
@@ -4945,6 +4962,9 @@ export default function CNCSimPro() {
                   toolDiameter={backplotToolDiameter}
                   toolLength={backplotToolLength}
                   toolLenCut={backplotToolLenCut}
+                  stockDimensions={backplotStockDimensions}
+                  stockOrigin={backplotStockOrigin}
+                  showStock={layers.stock}
                 />
               ) : (
                 <canvas
