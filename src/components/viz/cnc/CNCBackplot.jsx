@@ -15,6 +15,8 @@ export default function CNCBackplot({
   stockShape = "box",
   stockDimensions = { width: 100, height: 80, depth: 40 },
   stockOrigin = { x: 0, y: 0, z: 0 },
+  showGrid = true,
+  showTool = true,
   showStock = true,
 }) {
   const mountRef = useRef(null);
@@ -157,6 +159,14 @@ export default function CNCBackplot({
     }
   }, [isDark]);
 
+  useEffect(() => {
+    if (gridRef.current) gridRef.current.visible = !!showGrid;
+  }, [showGrid]);
+
+  useEffect(() => {
+    if (toolRef.current) toolRef.current.visible = !!showTool;
+  }, [showTool]);
+
   // ── Rebuild stock block ──────────────────────────────────────────────────
   useEffect(() => {
     const group = stockLayerRef.current;
@@ -191,7 +201,9 @@ export default function CNCBackplot({
       group.add(mesh);
 
       const edges = new THREE.LineSegments(
-        new THREE.EdgesGeometry(new THREE.CylinderGeometry(radius, radius, len, 32)),
+        new THREE.EdgesGeometry(
+          new THREE.CylinderGeometry(radius, radius, len, 32),
+        ),
         new THREE.LineBasicMaterial({ color: colors.stockEdge }),
       );
       edges.rotation.copy(mesh.rotation);
@@ -271,7 +283,10 @@ export default function CNCBackplot({
       const mode = pt.motionMode || "G00";
       const channelId = pt.channelId ?? 0;
 
-      if (mode !== currentSegment.mode || channelId !== currentSegment.channelId) {
+      if (
+        mode !== currentSegment.mode ||
+        channelId !== currentSegment.channelId
+      ) {
         segments.push(currentSegment);
         currentSegment = {
           points: [currentSegment.points[currentSegment.points.length - 1], v],
@@ -341,8 +356,16 @@ export default function CNCBackplot({
     if (!toolRef.current || pathPoints.length === 0) return;
     const targetIndex = Math.min(currentStep, pathPoints.length - 1);
     let pt = pathPoints[targetIndex];
-    const fallback = [...pathPoints].reverse().find((p) => p.channelId === activeChannel);
-    if ((pt?.channelId ?? activeChannel) !== activeChannel && fallback) {
+    const channelAtStep = pathPoints
+      .slice(0, targetIndex + 1)
+      .reverse()
+      .find((p) => p.channelId === activeChannel);
+    const fallback = [...pathPoints]
+      .reverse()
+      .find((p) => p.channelId === activeChannel);
+    if (channelAtStep) {
+      pt = channelAtStep;
+    } else if ((pt?.channelId ?? activeChannel) !== activeChannel && fallback) {
       pt = fallback;
     }
     if (pt) toolRef.current.position.set(pt.machineX, pt.machineY, pt.machineZ);

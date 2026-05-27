@@ -3544,9 +3544,9 @@ export default function CNCSimPro() {
   const backplotPathPoints = useMemo(
     () =>
       pathPts.map((p) => ({
-        machineX: mach.isLathe ? p.z ?? 0 : p.x ?? 0,
-        machineY: mach.isLathe ? 0 : p.y ?? 0,
-        machineZ: mach.isLathe ? (p.x ?? 0) / 2 : p.z ?? 0,
+        machineX: mach.isLathe ? (p.z ?? 0) : (p.x ?? 0),
+        machineY: mach.isLathe ? 0 : (p.y ?? 0),
+        machineZ: mach.isLathe ? (p.x ?? 0) / 2 : (p.z ?? 0),
         motionMode: p.m ?? p.motionMode ?? "G00",
         channelId: p.channelId ?? 0,
       })),
@@ -4986,6 +4986,8 @@ export default function CNCSimPro() {
                   toolDiameter={backplotToolDiameter}
                   toolLength={backplotToolLength}
                   toolLenCut={backplotToolLenCut}
+                  showGrid={layers.grid}
+                  showTool={layers.tool}
                   stockShape={stock.shape === "cyl" ? "cylinder" : "box"}
                   stockDimensions={backplotStockDimensions}
                   stockOrigin={backplotStockOrigin}
