@@ -1,14 +1,11 @@
-const TEMPLATES_CODE = `#include <iostream>
-#include <vector>
+const FUNC_TPL_CODE = `#include <iostream>
 #include <string>
-#include <stdexcept>
 using namespace std;
 
-// ── Function template ─────────────────────────────────────────
+// __OUTPUT__: max(3,7)=7\\nmax(3.14,2.71)=3.14\\nmax(hello,world)=world\\nclamp(15,0,10)=10
+
 template<typename T>
-T maxOf(T a, T b) {
-    return (a > b) ? a : b;
-}
+T maxOf(T a, T b) { return (a > b) ? a : b; }
 
 template<typename T>
 T clamp(T val, T lo, T hi) {
@@ -17,76 +14,98 @@ T clamp(T val, T lo, T hi) {
     return val;
 }
 
-// ── Class template ─────────────────────────────────────────────
-template<typename T>
-class Pair {
-    T first, second;
-public:
-    Pair(T a, T b) : first(a), second(b) {}
-    T getFirst()  const { return first;  }
-    T getSecond() const { return second; }
-    Pair<T> swap() const { return {second, first}; }
-    void print() const {
-        cout << "(" << first << ", " << second << ")";
-    }
-};
+int main() {
+    cout << "max(3,7)="       << maxOf(3, 7)                         << endl;
+    cout << "max(3.14,2.71)=" << maxOf(3.14, 2.71)                   << endl;
+    cout << "max(hello,world)="<< maxOf(string("hello"),string("world")) << endl;
+    cout << "clamp(15,0,10)=" << clamp(15, 0, 10)                    << endl;
+    return 0;
+}`;
 
-// ── Stack class template ───────────────────────────────────────
+const CLASS_TPL_CODE = `#include <iostream>
+#include <vector>
+#include <stdexcept>
+using namespace std;
+
+// __OUTPUT__: push 1 2 3\\npop: 3\\npeek: 2  size: 2
+
 template<typename T>
 class Stack {
     vector<T> data;
 public:
     void push(const T& val) { data.push_back(val); }
+
     T pop() {
-        if (data.empty()) throw runtime_error("Stack is empty");
-        T top = data.back();
-        data.pop_back();
-        return top;
+        if (data.empty()) throw runtime_error("empty");
+        T top = data.back(); data.pop_back(); return top;
     }
+
     const T& peek() const {
-        if (data.empty()) throw runtime_error("Stack is empty");
+        if (data.empty()) throw runtime_error("empty");
         return data.back();
     }
+
     bool   empty() const { return data.empty(); }
     size_t size()  const { return data.size(); }
 };
 
-// ── Template with multiple type parameters ────────────────────
+int main() {
+    Stack<int> s;
+    for (int x : {1, 2, 3}) { s.push(x); cout << "push " << x << "\\n"; }
+    cout << "pop: " << s.pop() << "\\n";
+    cout << "peek: " << s.peek() << "  size: " << s.size() << "\\n";
+    return 0;
+}`;
+
+const MULTI_TPL_CODE = `#include <iostream>
+#include <string>
+using namespace std;
+
+// __OUTPUT__: name => Alice\\nage => 30\\ntemperature => 98.6
+
 template<typename K, typename V>
-struct KeyValue {
+struct Pair {
     K key; V value;
     void print() const { cout << key << " => " << value << endl; }
 };
 
-// __OUTPUT__: --- Function templates ---\\nmax(3, 7) = 7\\nmax(3.14, 2.71) = 3.14\\nmax(hello, world) = world\\nclamp(15, 0, 10) = 10\\n--- Class templates ---\\nIntPair: (1, 2)  Swapped: (2, 1)\\nStringPair: (Alice, Bob)\\n--- Stack<int> ---\\nPushed: 1 2 3\\nPop: 3\\nPeek: 2  Size: 2\\n--- KeyValue template ---\\nname => Alice\\nage => 30
+// Template function with multiple types
+template<typename A, typename B>
+auto add(A a, B b) { return a + b; }   // return type deduced
 
 int main() {
-    cout << "--- Function templates ---" << endl;
-    cout << "max(3, 7) = "            << maxOf(3, 7)         << endl;
-    cout << "max(3.14, 2.71) = "      << maxOf(3.14, 2.71)   << endl;
-    cout << "max(hello, world) = "    << maxOf(string("hello"), string("world")) << endl;
-    cout << "clamp(15, 0, 10) = "     << clamp(15, 0, 10)    << endl;
+    Pair<string,string>{"name","Alice"}.print();
+    Pair<string,int>   {"age", 30}    .print();
+    Pair<string,double>{"temperature",98.6}.print();
 
-    cout << "--- Class templates ---" << endl;
-    Pair<int>    ip(1, 2);
-    cout << "IntPair: "; ip.print();
-    cout << "  Swapped: "; ip.swap().print(); cout << endl;
+    cout << add(3, 4.5)   << endl;   // 7.5 (int + double = double)
+    cout << add(string("Hi"), string(" there")) << endl;
 
-    Pair<string> sp("Alice", "Bob");
-    cout << "StringPair: "; sp.print(); cout << endl;
+    return 0;
+}`;
 
-    cout << "--- Stack<int> ---" << endl;
-    Stack<int> s;
-    for (int i : {1, 2, 3}) { s.push(i); cout << "Pushed: " << i << " "; }
-    cout << endl;
-    cout << "Pop: "  << s.pop() << endl;
-    cout << "Peek: " << s.peek() << "  Size: " << s.size() << endl;
+const SPEC_TPL_CODE = `#include <iostream>
+#include <string>
+using namespace std;
 
-    cout << "--- KeyValue template ---" << endl;
-    KeyValue<string, string> kv1{"name", "Alice"};
-    KeyValue<string, int>    kv2{"age",  30};
-    kv1.print(); kv2.print();
+// __OUTPUT__: print<int>: 42\\nprint<double>: 3.14\\nprint<string>: "hello" (length 5)
 
+// Generic template
+template<typename T>
+void print(const T& val) {
+    cout << "print<" << typeid(val).name() << ">: " << val << endl;
+}
+
+// Specialization for string — different behavior for strings
+template<>
+void print<string>(const string& val) {
+    cout << "print<string>: \\"" << val << "\\" (length " << val.length() << ")" << endl;
+}
+
+int main() {
+    print(42);
+    print(3.14);
+    print(string("hello"));   // uses the specialization
     return 0;
 }`;
 
@@ -96,50 +115,43 @@ const lesson = {
   chapter: "cpp-1",
   order: 4,
   title: "Templates",
-  subtitle:
-    "Write code once that works with any type — generic programming with function and class templates",
-  tags: [
-    "c++",
-    "cpp",
-    "templates",
-    "generics",
-    "function-template",
-    "class-template",
-    "type-parameters",
-  ],
+  subtitle: "Write code once that works with any type — generic programming",
+  tags: ["c++", "cpp", "templates", "generic-programming", "type-parameters", "specialization"],
   aliases: [
     "c++ templates",
     "c++ generic programming",
-    "c++ function templates",
-    "c++ class templates",
-    "c++ template parameters",
+    "c++ function template",
+    "c++ class template",
+    "c++ template specialization",
   ],
 
-  hook: `Without templates, you'd write \`sort\` for int arrays, then again for double arrays, then again for string arrays. With templates, you write it once and the compiler generates the specific version for each type you use. Templates are the foundation of the entire STL (sort, vector, map, all of them). They're also the mechanism behind zero-cost abstractions — the abstraction lives in the source code, the runtime code is as fast as hand-written type-specific code.`,
+  hook: `Why write `\`max(int, int)\`` and `\`max(double, double)\`` and `\`max(string, string)\`` separately when the logic is identical? Templates let you write code once and have the compiler generate type-specific versions for you. Every STL container — `\`vector<T>\``, `\`map<K,V>\``, `\`pair<T,U>\`` — is a template. Once you understand templates, the entire standard library opens up.`,
 
   mentalModel: [
-    "**A template is a blueprint that the compiler instantiates for each type used.** `maxOf<int>(3, 7)` causes the compiler to generate a concrete `int` version of `maxOf`. `maxOf<double>(3.14, 2.71)` generates a `double` version. This happens at compile time — there's no runtime overhead from 'being generic'. The binary contains the specific compiled code for each instantiation.",
-    "**Template argument deduction lets you omit type parameters.** `maxOf(3, 7)` — the compiler sees `int` arguments and deduces `T = int`. `maxOf(3.14, 2.71)` — deduces `T = double`. You only need `maxOf<int>(3.0, 7)` when the arguments are ambiguous or you want to force a specific type. Deduction makes templates as easy to call as regular functions.",
-    "**Class templates are parameterized types.** `Stack<int>` and `Stack<string>` are distinct types — the compiler generates separate code for each. A `Stack<int>` can't hold strings. This is stronger type safety than a `Stack` that holds `void*` — misuse is caught at compile time, not runtime.",
+    "**`template<typename T>` creates a blueprint.** The compiler generates a concrete function or class for each type you use it with. `maxOf(3, 7)` generates an `int` version; `maxOf(3.14, 2.71)` generates a `double` version. The generated code is identical to writing them by hand — zero runtime overhead.",
+    "**Class templates parameterize the type of stored data.** `Stack<int>` is a stack of ints. `Stack<string>` is a stack of strings. Same implementation, different types. The compiler generates both classes from one template definition.",
+    "**Template specialization overrides the generic behavior for specific types.** `template<> void print<string>(...)` provides custom behavior when `T` is `string`. The generic template handles everything else. Specialization is how the standard library provides type-specific optimizations.",
   ],
 
   intuition: {
     prose: [
-      "**Template instantiation happens at compile time.** When you write `vector<int>`, the compiler literally generates the code for an integer vector — inline, specialized for `int`. This is why templates must be in header files (or the translation unit that uses them): the compiler needs to see the template definition to generate the instantiation. You can't 'compile a template' separately like a regular function.",
-      "**Type requirements are implicit.** `template<typename T> T maxOf(T a, T b) { return a > b ? a : b; }` works for any `T` that supports `>`. If you call `maxOf(Point{1,2}, Point{3,4})` and `Point` doesn't have `operator>`, you get a compile error — usually a long template error message. C++20 Concepts (next module) make these requirements explicit and give better error messages.",
-      "**Template specialization lets you handle specific types differently.** The general `maxOf<T>` works for most types. But what if you want `maxOf<const char*>` to compare strings by content, not pointer? You write a specialization: `template<> const char* maxOf<const char*>(const char* a, const char* b) { return strcmp(a, b) > 0 ? a : b; }`. The compiler uses the specialization when the type matches exactly.",
-      "**`typename` vs `class` in template parameters.** `template<typename T>` and `template<class T>` are identical — both say 'T is a type parameter'. `typename` is more modern and clear (T doesn't have to be a class — it can be `int`, `double`, a pointer, etc.). `class` is historical. Use `typename` in new code.",
+      "**The compiler writes the code, you write the pattern.** `template<typename T> T maxOf(T a, T b)` is a pattern. Each time you call `maxOf(3, 7)`, the compiler generates `int maxOf(int a, int b)`. This happens at compile time — by runtime, the functions are fully specialized. Template instantiation is compile-time polymorphism (vs virtual functions which are runtime).",
     ],
     visualizations: [
       {
         id: "CppLab",
-        mathBridge:
-          '**Explore templates:**\n\n1. Compile and run — the same Stack and Pair work with int, string, double\n2. Try `Stack<string> ss; ss.push("hello"); ss.push("world");`\n3. Add `template<typename T> void printAll(const vector<T>& v)` — works with any vector type\n4. Add a non-type template parameter: `template<typename T, int N> struct Array { T data[N]; };`\n5. Try calling `maxOf(3, 3.14)` (without explicit type) — what error do you get? Why?\n6. Add template specialization for string that compares case-insensitively',
+        mathBridge: "**Function templates — run it then explore:**\n\n- Try `maxOf(3, 3.14)` — compile error. Why? (T must be the same for both arguments)\n- Fix it: `maxOf<double>(3, 3.14)` — explicit type argument forces promotion.\n- Add `template<typename T> T minOf(T a, T b)` — same pattern, different operation.\n- Try `maxOf(true, false)` — bool is comparable, returns true.",
         props: {
           mainFile: "main.cpp",
-          initialFiles: {
-            "/home/user/main.cpp": TEMPLATES_CODE,
-          },
+          initialFiles: { "/home/user/main.cpp": FUNC_TPL_CODE },
+        },
+      },
+      {
+        id: "CppLab",
+        mathBridge: "**Class template Stack — run it then explore:**\n\n- Try `Stack<string> ss; ss.push(\"hello\"); ss.push(\"world\");` — strings work identically.\n- Try `Stack<double>` — same template, different type.\n- What happens when you `pop()` an empty stack? (throws runtime_error)\n- Add a `void print() const` method that prints all elements without modifying the stack.",
+        props: {
+          mainFile: "main.cpp",
+          initialFiles: { "/home/user/main.cpp": CLASS_TPL_CODE },
         },
       },
     ],
@@ -147,142 +159,104 @@ const lesson = {
 
   rigor: {
     prose: [
-      "**Two-phase name lookup.** Templates go through two phases of name resolution. In phase 1 (when the template is defined), non-dependent names (names that don't involve T) are looked up immediately. In phase 2 (when the template is instantiated with a specific type), dependent names (involving T) are looked up. This means template errors can appear at seemingly random places. Understanding this helps debug complex template errors.",
-      "**Template specialization vs overloading.** Function templates and regular functions can coexist. `maxOf(int, int)` (regular) takes priority over `maxOf<T>(T, T)` (template) when called with ints. Partial specialization is only available for class templates, not function templates — for functions, use overloads instead. Full specialization is available for both.",
-      "**Non-type template parameters.** Beyond types, templates can take integers: `template<typename T, size_t N> class FixedArray { T data[N]; }`. `FixedArray<int, 10>` is a completely different type from `FixedArray<int, 20>`. This enables stack-allocated, zero-overhead generic arrays. `std::array<T, N>` is implemented this way. Non-type parameters must be compile-time constants.",
+      "**Multiple type parameters.** `template<typename K, typename V> struct Pair` has two independent type parameters. `Pair<string, int>` generates a struct with a string key and int value. `auto add(A a, B b)` with two template parameters handles mixed-type arithmetic — `add(3, 4.5)` returns a `double`. The `auto` return type lets the compiler deduce from the expression.",
+      "**Template specialization is full replacement.** `template<> void print<string>` completely replaces the generic template for `string`. The compiler looks for the most specific match: exact specialization > partial specialization > generic template. Use it when the generic implementation is incorrect or suboptimal for a specific type.",
+    ],
+    visualizations: [
+      {
+        id: "CppLab",
+        mathBridge: "**Multiple type parameters — run it then explore:**\n\n- Add `Pair<int, vector<string>>` — templates can have complex type parameters.\n- Change `add` to return the sum of a vector of mixed-type values using a fold.\n- Try `Pair<Pair<int,int>, string>` — nested templates.\n- Add a `swap(Pair<K,V>&)` method that swaps key and value.",
+        props: {
+          mainFile: "main.cpp",
+          initialFiles: { "/home/user/main.cpp": MULTI_TPL_CODE },
+        },
+      },
+      {
+        id: "CppLab",
+        mathBridge: "**Template specialization — run it then explore:**\n\n- Add a specialization for `double` that formats to 2 decimal places.\n- Try `print(42)` and `print(42.0)` — which specialization is called for each?\n- What does `typeid(val).name()` print for different types? (compiler-specific names)\n- Add `print(vector<int>{1,2,3})` — does the generic template handle it?",
+        props: {
+          mainFile: "main.cpp",
+          initialFiles: { "/home/user/main.cpp": SPEC_TPL_CODE },
+        },
+      },
     ],
     callouts: [
       {
-        type: "warning",
-        title: "Templates must be defined in header files",
-        body: "Because the compiler needs to generate instantiations at each point of use, template definitions must be in header files (or in the `.cpp` file that uses them). You can't put a template definition in a `.cpp` file and use it from another `.cpp` — the linker won't find it. This is the main practical constraint of templates.",
-      },
-      {
         type: "info",
-        title: "Template error messages can be long",
-        body: "Pre-C++20, template errors produce long chains of messages showing the instantiation stack. Start reading from the first error and from the bottom of the chain where it mentions your code. The error is usually a type mismatch or a missing operator. C++20 Concepts dramatically improve template error messages.",
+        title: "Templates are instantiated at compile time",
+        body: "The compiler generates a separate function or class for each type combination used. `maxOf<int>` and `maxOf<double>` are two separate functions in the compiled binary. This is why template code must be in headers (not .cpp files) — the compiler needs the definition at each instantiation site.",
       },
       {
         type: "tip",
-        title: "Use auto for template-deduced return types",
-        body: "In C++14+, `template<typename T, typename U> auto add(T a, U b) { return a + b; }` lets the compiler deduce the return type. For `add(1, 2.5)`, it returns `double`. Without `auto`, you'd need `decltype(a + b)` or make both types the same. `auto` return types are convenient for lambdas and generic code.",
+        title: "Prefer `auto` return types for mixed-type arithmetic",
+        body: "`template<typename A, typename B> auto add(A a, B b) { return a + b; }` deduces the return type from the expression. Without `auto`, you'd need to specify the return type (or use `decltype(a+b)`). C++14 auto return type deduction makes this natural.",
       },
     ],
   },
 
   examples: [
     {
-      title: "Generic algorithms as function templates",
-      body: `// Generic linear search — works on any container element type
+      title: "Generic min/max/clamp functions",
+      body: `template<typename T>
+T clamp(T val, T lo, T hi) {
+    return (val < lo) ? lo : (val > hi) ? hi : val;
+}
+
 template<typename T>
-int linearSearch(const T* arr, int n, const T& target) {
-    for (int i = 0; i < n; i++)
-        if (arr[i] == target) return i;
+const T& minOf(const T& a, const T& b) { return (a < b) ? a : b; }
+
+template<typename T>
+const T& maxOf(const T& a, const T& b) { return (a > b) ? a : b; }
+
+// Works with any comparable type
+cout << clamp(15, 0, 10)    << endl;   // 10
+cout << minOf(3.14, 2.71)   << endl;   // 2.71
+cout << maxOf(string("a"), string("z")) << endl;  // z`,
+    },
+    {
+      title: "Generic find in container",
+      body: `template<typename Container, typename T>
+int findIndex(const Container& c, const T& target) {
+    int i = 0;
+    for (const auto& x : c) {
+        if (x == target) return i;
+        i++;
+    }
     return -1;
 }
 
-// Generic swap — works for any assignable type
-template<typename T>
-void swap(T& a, T& b) {
-    T tmp = a; a = b; b = tmp;
-}
+vector<int>    v = {3, 1, 4, 1, 5};
+vector<string> s = {"a", "b", "c"};
 
-// Generic print all — works for any printable element
-template<typename Container>
-void printAll(const Container& c) {
-    for (const auto& x : c) cout << x << " ";
-    cout << endl;
-}
-
-// Usage
-int ints[]     = {1, 2, 3, 4, 5};
-string words[] = {"cat", "dog", "bird"};
-cout << linearSearch(ints, 5, 3) << endl;      // 2
-cout << linearSearch(words, 3, string("dog")) << endl;  // 1`,
-    },
-    {
-      title: "Class template: generic matrix",
-      body: `template<typename T, int ROWS, int COLS>
-class Matrix {
-    T data[ROWS][COLS];
-public:
-    Matrix() { for (int i = 0; i < ROWS*COLS; i++) data[0][i] = T{}; }
-
-    T& at(int r, int c)             { return data[r][c]; }
-    const T& at(int r, int c) const { return data[r][c]; }
-
-    void fill(T val) {
-        for (int r = 0; r < ROWS; r++)
-            for (int c = 0; c < COLS; c++)
-                data[r][c] = val;
-    }
-
-    Matrix<T, ROWS, COLS> operator+(const Matrix& other) const {
-        Matrix result;
-        for (int r = 0; r < ROWS; r++)
-            for (int c = 0; c < COLS; c++)
-                result.data[r][c] = data[r][c] + other.data[r][c];
-        return result;
-    }
-};
-
-// 3×3 double matrix — all on the stack
-Matrix<double, 3, 3> A, B;
-A.fill(1.0);  B.fill(2.0);
-auto C = A + B;   // C is all 3.0`,
-    },
-    {
-      title: "Template specialization",
-      body: `// General template
-template<typename T>
-string describe(T val) {
-    return "value: " + to_string(val);
-}
-
-// Specialization for bool
-template<>
-string describe<bool>(bool val) {
-    return val ? "true" : "false";
-}
-
-// Specialization for char*
-template<>
-string describe<const char*>(const char* val) {
-    return string("string: '") + val + "'";
-}
-
-cout << describe(42)         << endl;  // value: 42
-cout << describe(3.14)       << endl;  // value: 3.14
-cout << describe(true)       << endl;  // true
-cout << describe("hello")    << endl;  // string: 'hello'`,
+cout << findIndex(v, 4) << endl;       // 2
+cout << findIndex(s, "b") << endl;     // 1
+cout << findIndex(v, 99) << endl;      // -1`,
     },
   ],
 
   challenges: [
     {
-      difficulty: "medium",
+      difficulty: "easy",
       problem:
-        "Write a `template<typename T> class Queue` backed by a vector. Implement `enqueue(T val)`, `dequeue()` (removes and returns front), `front()`, `empty()`, `size()`. Note: dequeue from a vector's front is O(n) — that's fine for now. Test with `Queue<int>` and `Queue<string>`.",
-      hint: "For dequeue: `T val = data.front(); data.erase(data.begin()); return val;`. Or use indices.",
+        "Write a `template<typename T> class MinStack` that supports `push(T)`, `pop()`, `top()`, and `getMin()` — all O(1). The trick: maintain a second stack of minimums. When pushing x, push `min(x, current_min)` to the min stack. When popping, pop both stacks.",
+      hint: "Two stacks: `stack<T> data` and `stack<T> minStack`. `getMin()` returns `minStack.top()`.",
       walkthrough: [
-        "Private: vector<T> data;",
-        "enqueue: data.push_back(val)",
-        "front: return data.front() (throw if empty)",
-        "dequeue: T val = data[0]; data.erase(data.begin()); return val;",
-        "Test both Queue<int> and Queue<string>",
+        "private: stack<T> data, minStack;",
+        "push(x): data.push(x); minStack.push(minStack.empty() ? x : min(x, minStack.top()));",
+        "pop(): data.pop(); minStack.pop();",
+        "getMin(): return minStack.top();",
       ],
     },
     {
-      difficulty: "hard",
+      difficulty: "medium",
       problem:
-        "Implement `template<typename T> T accumulate(T* arr, int n, T init, /* function */ )` that takes a binary function (or lambda) and folds the array. Then test: sum (init=0, f=add), product (init=1, f=multiply), max (init=INT_MIN, f=max). Hint: the function parameter type is `function<T(T,T)>` from `<functional>`.",
-      hint: "`#include <functional>`. Parameter: `function<T(T,T)> f`. Body: `for (int i=0; i<n; i++) init = f(init, arr[i]); return init;`",
+        "Write `template<typename T> vector<T> filter(const vector<T>& v, function<bool(T)> pred)` and `template<typename T, typename R> vector<R> transform(const vector<T>& v, function<R(T)> f)`. Test with a vector of ints: filter even numbers, then transform to their squares.",
+      hint: "`#include <functional>`. filter: loop and push if pred(x). transform: loop and push f(x).",
       walkthrough: [
-        "Include <functional>",
-        "Signature: template<typename T> T fold(T* arr, int n, T init, function<T(T,T)> f)",
-        "Body: for each element: init = f(init, arr[i])",
-        "Sum: fold(arr, n, 0, [](int a, int b){ return a+b; })",
-        "Max: fold(arr, n, INT_MIN, [](int a, int b){ return a>b?a:b; })",
+        "filter: vector<T> result; for (auto& x : v) if (pred(x)) result.push_back(x); return result;",
+        "transform: vector<R> result; for (auto& x : v) result.push_back(f(x)); return result;",
+        "Test: auto evens = filter(v, [](int x){ return x%2==0; });",
+        "auto squares = transform<int,int>(evens, [](int x){ return x*x; });",
       ],
     },
   ],
@@ -292,58 +266,58 @@ cout << describe("hello")    << endl;  // string: 'hello'`,
       {
         id: "cpp1-004-q1",
         type: "choice",
-        text: "When does the compiler generate a template instantiation?",
+        text: "When does template instantiation occur?",
         options: [
-          "When you include the header containing the template",
-          "When the template is used with a specific type",
-          "At runtime, when the function is first called",
-          "When you define the template class",
+          "At runtime, the first time the function is called",
+          "At compile time, for each unique type combination used",
+          "Only once, regardless of how many types are used",
+          "When the program is linked",
         ],
         answer: 1,
         explanation:
-          "Template instantiation happens at compile time when the template is used with a specific type. `vector<int>` causes instantiation of the vector template for `int`. Each distinct type usage generates separate code.",
+          "Templates are instantiated at compile time. Each unique combination of type arguments generates a separate compiled function or class. By runtime, all template code is already compiled into type-specific machine code.",
       },
       {
         id: "cpp1-004-q2",
         type: "choice",
-        text: "Why must template definitions usually be in header files?",
+        text: "Why does `maxOf(3, 3.14)` fail to compile without explicit type arguments?",
         options: [
-          "It's a C++ standard requirement",
-          "The compiler needs the full definition to generate instantiations at each point of use",
-          "Templates can't be compiled into object files",
-          "Templates are slower when in separate .cpp files",
+          "Templates don't support floating-point types",
+          "T must be the same for both arguments — 3 is int, 3.14 is double, they don't match",
+          "You can't use templates with mixed arithmetic",
+          "maxOf doesn't support comparison between numbers",
         ],
         answer: 1,
         explanation:
-          "The compiler generates template code (instantiations) where the template is used. It needs to see the full template definition at that point. If the definition is in a separate `.cpp`, it's not visible to other translation units, causing linker errors.",
+          "Template argument deduction requires unambiguous type inference. `maxOf(3, 3.14)` tries to deduce `T` as both `int` (from 3) and `double` (from 3.14) — a conflict. Fix: `maxOf<double>(3, 3.14)` forces both to double, or use two type parameters.",
       },
       {
         id: "cpp1-004-q3",
         type: "choice",
-        text: "What is a non-type template parameter?",
+        text: "What does template specialization `template<> void print<string>(...)` do?",
         options: [
-          "A template parameter that isn't a class type",
-          "A compile-time constant value (integer, pointer, etc.) used as a template argument, like `Array<int, 10>`",
-          "A parameter that has a default value",
-          "A parameter that can be either a type or a value",
+          "Creates a new template with string type",
+          "Replaces the generic template's behavior specifically for string arguments",
+          "Makes the generic template incompatible with string",
+          "Creates an overloaded function alongside the template",
         ],
         answer: 1,
         explanation:
-          "Non-type template parameters are compile-time constant values. `template<typename T, size_t N>` — N is a non-type parameter. `std::array<int, 5>` uses this: the array size is baked into the type at compile time, allowing stack allocation.",
+          "Template specialization provides a custom implementation for a specific type. When `print` is called with a `string`, the specialized version is used instead of the generic template. All other types still use the generic version.",
       },
       {
         id: "cpp1-004-q4",
         type: "choice",
-        text: "What does template specialization allow?",
+        text: "Why must template definitions typically be in header files (not .cpp files)?",
         options: [
-          "Making a template work faster for all types",
-          "Providing a custom implementation for a specific type while keeping the general template for others",
-          "Using a template without specifying any type parameters",
-          "Preventing a template from being instantiated for certain types",
+          "C++ requires it by specification",
+          "The compiler needs the full definition at each instantiation site to generate type-specific code",
+          "Templates use special compilation that only works in headers",
+          "Templates can't have implementation — only declarations",
         ],
         answer: 1,
         explanation:
-          "Template specialization provides an alternative implementation for a specific type. The general template handles most types; specializations handle specific types differently. Example: a general string conversion template, but a specialized version for `bool` that returns 'true'/'false' instead of '1'/'0'.",
+          "The compiler generates code for each type used with a template. It needs the full template definition (not just a declaration) at every place the template is used. Since .cpp files are compiled independently, placing templates in headers ensures the definition is visible wherever they're instantiated.",
       },
     ],
   },

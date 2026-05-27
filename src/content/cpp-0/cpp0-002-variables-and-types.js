@@ -1,49 +1,89 @@
-const VARS_CODE = `#include <iostream>
+const INT_CODE = `#include <iostream>
+using namespace std;
+
+// __OUTPUT__: a = 42\\nb = -7\\nsum = 35\\nproduct = -294\\na / b = -6\\na % b = 0
+
+int main() {
+    int a = 42;
+    int b = -7;
+
+    cout << "a = "       << a     << endl;
+    cout << "b = "       << b     << endl;
+    cout << "sum = "     << a + b << endl;
+    cout << "product = " << a * b << endl;
+    cout << "a / b = "   << a / b << endl;
+    cout << "a % b = "   << a % b << endl;
+
+    return 0;
+}`;
+
+const FLOAT_CODE = `#include <iostream>
+using namespace std;
+
+// __OUTPUT__: 7 / 2 = 3\\n7.0 / 2 = 3.5\\npi = 3.14159\\nprecision trap: 0.30000000000000004
+
+int main() {
+    // Integer division truncates — this surprises beginners
+    cout << "7 / 2 = "   << 7 / 2   << endl;   // 3, not 3.5
+    cout << "7.0 / 2 = " << 7.0 / 2 << endl;   // 3.5
+
+    double pi = 3.14159265358979;
+    cout << "pi = " << pi << endl;
+
+    // 0.1 cannot be stored exactly in binary
+    double x = 0.1 + 0.2;
+    cout << "precision trap: " << x << endl;
+
+    return 0;
+}`;
+
+const AUTO_CODE = `#include <iostream>
 #include <string>
 using namespace std;
 
-// __OUTPUT__: --- Integer types ---\\nint i = 42\\nlong long big = 9000000000\\nsize = int:4 double:8 char:1 bool:1\\n--- Floating point ---\\ndouble pi = 3.14159\\nfloat approx = 3.14159 (less precise)\\n--- Text and logic ---\\nchar grade = 'A'\\nbool passed = 1\\nstring name = Alice\\n--- auto deduction ---\\nauto x = 100 (int)\\nauto y = 2.718 (double)\\n--- const ---\\nconst double TAX_RATE = 0.13
+// __OUTPUT__: count = 0\\nname = Alice\\ntemp = 36.6\\nflag = 1\\nPI = 3.14159
 
 int main() {
-    // ── Integer types ──────────────────────────────────────────
-    int i = 42;
-    long long big = 9000000000LL;
-    cout << "--- Integer types ---" << endl;
-    cout << "int i = " << i << endl;
-    cout << "long long big = " << big << endl;
-    cout << "size = int:" << sizeof(int)
-         << " double:" << sizeof(double)
-         << " char:"   << sizeof(char)
-         << " bool:"   << sizeof(bool) << endl;
+    // auto: compiler deduces type from the initial value
+    auto count = 0;                // int
+    auto name  = string("Alice");  // std::string
+    auto temp  = 36.6;             // double
+    auto flag  = true;             // bool
 
-    // ── Floating-point ─────────────────────────────────────────
-    double pi = 3.14159265358979;
-    float  approx = 3.14159265358979f;   // f suffix = float literal
-    cout << "--- Floating point ---" << endl;
-    cout << "double pi = "    << pi     << endl;
-    cout << "float approx = " << approx << " (less precise)" << endl;
+    cout << "count = " << count << endl;
+    cout << "name = "  << name  << endl;
+    cout << "temp = "  << temp  << endl;
+    cout << "flag = "  << flag  << endl;
 
-    // ── Text and booleans ──────────────────────────────────────
-    char   grade  = 'A';
-    bool   passed = true;
-    string name   = "Alice";
-    cout << "--- Text and logic ---" << endl;
-    cout << "char grade = "  << grade  << endl;
-    cout << "bool passed = " << passed << endl;  // prints 0 or 1
-    cout << "string name = " << name   << endl;
+    // const: value locked after initialization
+    const double PI = 3.14159;
+    cout << "PI = " << PI << endl;
 
-    // ── auto keyword ───────────────────────────────────────────
-    auto x = 100;        // compiler deduces int
-    auto y = 2.718;      // compiler deduces double
-    cout << "--- auto deduction ---" << endl;
-    cout << "auto x = " << x << " (int)"    << endl;
-    cout << "auto y = " << y << " (double)" << endl;
+    // PI = 3.0;  // ← compile error: assignment to const
 
-    // ── const ──────────────────────────────────────────────────
-    const double TAX_RATE = 0.13;
-    cout << "--- const ---" << endl;
-    cout << "const double TAX_RATE = " << TAX_RATE << endl;
-    // TAX_RATE = 0.15;  // ← compiler error: cannot assign to const
+    return 0;
+}`;
+
+const SIZES_CODE = `#include <iostream>
+#include <climits>
+using namespace std;
+
+// __OUTPUT__: sizeof(int) = 4\\nsizeof(double) = 8\\nsizeof(char) = 1\\nINT_MAX = 2147483647\\nOverflow wraps: -2147483648\\n'A' as int = 65
+
+int main() {
+    cout << "sizeof(int) = "    << sizeof(int)    << endl;
+    cout << "sizeof(double) = " << sizeof(double) << endl;
+    cout << "sizeof(char) = "   << sizeof(char)   << endl;
+
+    cout << "INT_MAX = " << INT_MAX << endl;
+
+    // Signed overflow: silently wraps around
+    int overflow = INT_MAX + 1;
+    cout << "Overflow wraps: " << overflow << endl;
+
+    // char is just a small integer — 'A' is ASCII 65
+    char letter = 'A';
+    cout << "'A' as int = " << (int)letter << endl;
 
     return 0;
 }`;
@@ -54,41 +94,44 @@ const lesson = {
   chapter: "cpp-0",
   order: 2,
   title: "Variables and Types",
-  subtitle: "Store data in memory: integers, doubles, booleans, characters, strings",
-  tags: ["c++", "cpp", "variables", "types", "int", "double", "string", "auto", "const"],
+  subtitle: "Store numbers, text, and truth values — the type determines what your data can do",
+  tags: ["c++", "cpp", "variables", "int", "double", "bool", "auto", "const", "overflow"],
   aliases: [
     "c++ variables",
+    "c++ int double",
+    "c++ auto keyword",
+    "c++ const",
     "c++ data types",
-    "int double char bool",
-    "c++ string",
-    "auto keyword c++",
+    "c++ integer overflow",
   ],
 
-  hook: `Every program stores data in memory. Variables give names to memory locations, and types tell the compiler how many bytes to allocate and what operations are legal. C++ is statically typed: the compiler knows every variable's type at compile time, which is why it generates such fast code — no type-checking at runtime.`,
+  hook: `Every program manipulates data. Before you can manipulate it, you store it in a variable — and the type you choose determines what operations are valid, how much memory it uses, and what happens at the edges. Get the type wrong and \`7/2\` gives you \`3\`, not \`3.5\`.`,
 
   mentalModel: [
-    "A **variable** is a named memory location. `int x = 5;` tells the compiler: reserve 4 bytes, name them `x`, and store the bit pattern for 5 there. Every subsequent use of `x` reads from or writes to those same bytes.",
-    "**Types constrain operations.** `int / int` performs integer division (truncates). `double / double` performs floating-point division. The type system prevents you from accidentally mixing apples and oranges — or flags the conversion explicitly.",
-    "**`auto` asks the compiler to deduce the type** from the initializer. `auto x = 42;` makes `x` an `int`. `auto y = 42.0;` makes `y` a `double`. Use `auto` when the type is obvious from context; spell out the type when clarity matters.",
+    "**The type determines what the bits mean.** `int x = 65` and `char c = 65` store the same bits, but `cout << c` prints `A` while `cout << x` prints `65`. Every type is a contract: these operations are legal, this is the range, this is the meaning.",
+    "**Integer division truncates — no rounding.** `7 / 2` is `3` in C++. If either operand is a `double`, the result is `double`: `7.0 / 2` is `3.5`. This surprises almost every beginner at least once.",
+    "**`auto` deduces, `const` forbids change.** `auto x = 3.14` makes `x` a `double` — the compiler infers from the right side. `const double PI = 3.14` locks `PI` permanently; any reassignment is a compile error.",
   ],
 
   intuition: {
     prose: [
-      "C++ has a small set of **fundamental types** built into the language. Integer types (`int`, `long long`, `short`, `unsigned int`) store whole numbers. Floating-point types (`double`, `float`) store approximations of real numbers using IEEE 754 binary encoding. `char` stores a single character as its ASCII code. `bool` stores `true` (1) or `false` (0).",
-      "**`sizeof` is your ruler.** `sizeof(int)` returns 4 on nearly all modern 64-bit systems — meaning an `int` occupies 4 bytes = 32 bits, so it can represent values from −2 147 483 648 to 2 147 483 647. `sizeof(double)` returns 8 (64-bit double). Understanding sizes prevents overflow surprises and informs how much memory your data structures use.",
-      "`std::string` is not a fundamental type — it's a class in the standard library that manages heap-allocated character arrays for you. Include `<string>` to use it. You can concatenate strings with `+`, compare them with `==`, get their length with `.length()`, and index individual characters with `[i]`. Unlike C-style `char` arrays, `std::string` handles memory automatically.",
-      "**`const` is a contract.** Declaring `const double PI = 3.14159` tells the compiler (and every reader) that this value never changes. The compiler enforces it — any assignment to `PI` after initialization is a compile error. Use `const` liberally: it documents intent, catches bugs, and enables optimizations.",
+      "**Integers first.** `int` is the default whole-number type — 32 bits, range roughly ±2 billion. Arithmetic works as expected except for two traps: integer division truncates toward zero, and overflow wraps silently. Run the code and experiment — change the values, push them to the limits.",
     ],
     visualizations: [
       {
         id: "CppLab",
-        mathBridge:
-          "**Try these experiments:**\n\n1. Compile and run to see all output\n2. Change `int i = 42` to `int i = 2147483647` — that's `INT_MAX`. Now add 1 (`i + 1`) and print: what happens? (overflow wraps around)\n3. Try `auto z = 'X'` — what type does it deduce?\n4. Uncomment the `TAX_RATE = 0.15` line and try to compile: read the error\n5. Try `sizeof(long long)` vs `sizeof(int)` — what's the difference?",
+        mathBridge: "**Run it, then explore:**\n\n- What does `%` (modulo) actually compute? Try `10 % 3`, `15 % 4`.\n- Try `a / b` with `b = 5`. Does it round or truncate?\n- Set `a = 2147483647` and add 1. What do you get? Include `<climits>` and use `INT_MAX`.",
         props: {
           mainFile: "main.cpp",
-          initialFiles: {
-            "/home/user/main.cpp": VARS_CODE,
-          },
+          initialFiles: { "/home/user/main.cpp": INT_CODE },
+        },
+      },
+      {
+        id: "CppLab",
+        mathBridge: "**The integer division trap:**\n\n- Run it. Why does `7 / 2` give `3` but `7.0 / 2` gives `3.5`?\n- Fix it a third way: cast — `(double)7 / 2`.\n- Can you ever make `0.1 + 0.2` print exactly `0.3`? Why not?\n- Add: `bool equal = (0.1 + 0.2 == 0.3); cout << equal;` — what prints?",
+        props: {
+          mainFile: "main.cpp",
+          initialFiles: { "/home/user/main.cpp": FLOAT_CODE },
         },
       },
     ],
@@ -96,79 +139,64 @@ const lesson = {
 
   rigor: {
     prose: [
-      "**Integer overflow is undefined behavior in C++.** Adding 1 to `INT_MAX` (2 147 483 647) for a signed `int` doesn't wrap around cleanly — it's *undefined behavior*, meaning the compiler can assume it never happens and optimize accordingly, producing surprising results. To avoid this, use `long long` for large values or the `<limits>` header: `std::numeric_limits<int>::max()`. For truly arbitrary integers, use a library.",
-      "**Floating-point is not exact.** `0.1 + 0.2 == 0.3` is `false` in C++. IEEE 754 represents real numbers in base 2, and most decimal fractions can't be represented exactly — they round to the nearest representable value. Never compare floats with `==`; instead use `std::abs(a - b) < epsilon` for some small tolerance. `double` gives 15–17 significant decimal digits; `float` gives only 6–9.",
-      "**Initialization vs assignment.** C++ has three initialization syntaxes: `int x = 5;` (copy-init), `int x(5);` (direct-init), and `int x{5};` (brace-init, C++11). Prefer `int x{5}` — it's the most uniform and prevents narrowing conversions: `int x{3.14}` is a compile error, but `int x = 3.14` silently truncates. For local variables with no initializer like `int x;`, the value is *indeterminate* (garbage) — always initialize.",
+      "**Floating-point is binary, not decimal.** `0.1` in decimal is a repeating fraction in binary — like `1/3` in decimal. It gets stored as the closest representable value. Tiny rounding errors accumulate. Never use `==` to compare floats; use `abs(a - b) < epsilon`.",
+      "**Signed integer overflow is undefined behavior.** The C++ standard says signed overflow can do anything — the compiler assumes it never happens and optimizes accordingly. On most hardware it wraps (INT_MAX + 1 → INT_MIN), but never rely on it. Use `long long` for large values.",
+    ],
+    visualizations: [
+      {
+        id: "CppLab",
+        mathBridge: "**auto, const, and type sizes:**\n\n- Run it. Add `auto z = 42;` — use `sizeof(z)` to confirm it's an int (4 bytes).\n- Try to reassign `PI = 3.0;` — read the compiler error carefully.\n- Change `auto temp = 36.6;` to `auto temp = 36.6f;` — use `sizeof` to see the difference.\n- Add `long long big = 9000000000LL;` — print it and its size.",
+        props: {
+          mainFile: "main.cpp",
+          initialFiles: { "/home/user/main.cpp": AUTO_CODE },
+        },
+      },
+      {
+        id: "CppLab",
+        mathBridge: "**Sizes, limits, and overflow — run and observe:**\n\n- Change `INT_MAX + 1` to `INT_MAX + 1LL` (64-bit addition). No overflow!\n- Change `char letter = 'A'` to `'Z'` — what number is it?\n- Add `unsigned int u = 0; u -= 1;` — unsigned wraps differently than signed. What do you get?",
+        props: {
+          mainFile: "main.cpp",
+          initialFiles: { "/home/user/main.cpp": SIZES_CODE },
+        },
+      },
     ],
     callouts: [
       {
         type: "warning",
-        title: "Uninitialized variables hold garbage",
-        body: "`int x;` does NOT set `x` to 0. It holds whatever bytes happened to be in that memory location. Reading an uninitialized variable is undefined behavior. Always write `int x = 0;` or `int x{};` (zero-initializes to 0).",
-      },
-      {
-        type: "info",
-        title: "C++ fixed-width integer types",
-        body: "For portable, exact-size integers, use `<cstdint>`: `int32_t` (exactly 32 bits), `int64_t` (exactly 64 bits), `uint8_t` (8-bit unsigned). These guarantee the same size on every platform — important for file formats, network protocols, and embedded systems.",
+        title: "Never compare floats with ==",
+        body: "`if (x == 0.3)` is almost always wrong — floating-point representation errors mean `0.1 + 0.2` is not exactly `0.3`. Use `fabs(x - 0.3) < 1e-9` or restructure to avoid equality comparison entirely.",
       },
       {
         type: "tip",
-        title: "String literals vs char arrays",
-        body: '`"hello"` is a C-style string literal (a `const char*` pointing to read-only memory). `std::string s = "hello"` copies it into a heap-managed object. Use `std::string` in modern C++ — it\'s safer, composable with `+`, and handles memory for you.',
+        title: "Use long long for anything that might exceed 2 billion",
+        body: "`int` maxes out around 2.1 billion. Population counts, file sizes, timestamps, and loop counters over large arrays can all exceed this. `long long` goes to 9.2 × 10^18. When in doubt, use `long long` — it has the same speed as `int` on 64-bit systems.",
       },
     ],
   },
 
   examples: [
     {
-      title: "Type sizes and limits",
-      body: `#include <iostream>
-#include <climits>    // INT_MAX, LLONG_MAX
-#include <cfloat>     // DBL_MAX, FLT_EPSILON
-using namespace std;
+      title: "Declaring and using variables",
+      body: `int age = 25;
+double height = 1.75;   // meters
+char initial = 'M';
+bool isStudent = true;
+string name = "Alice";  // #include <string>
 
-int main() {
-    cout << "int:       " << sizeof(int)       << " bytes, max = " << INT_MAX  << endl;
-    cout << "long long: " << sizeof(long long) << " bytes, max = " << LLONG_MAX << endl;
-    cout << "double:    " << sizeof(double)    << " bytes" << endl;
-    cout << "float eps: " << FLT_EPSILON << endl;  // smallest representable difference
-    return 0;
-}`,
+// sizeof shows memory usage
+cout << sizeof(int)    << endl;  // 4
+cout << sizeof(double) << endl;  // 8`,
     },
     {
-      title: "String operations",
-      body: `#include <iostream>
-#include <string>
-using namespace std;
+      title: "auto and const in practice",
+      body: `auto count = 0;        // int — deduced from 0
+auto ratio = 1.0 / 3;  // double — one operand is double
 
-int main() {
-    string first = "Alice";
-    string last  = "Smith";
-    string full  = first + " " + last;   // concatenation
+const int MAX_RETRIES = 3;   // can never change
+const double TAX = 0.13;
 
-    cout << full << endl;                     // Alice Smith
-    cout << full.length() << endl;            // 11
-    cout << full[0] << endl;                  // A
-    cout << full.substr(6, 5) << endl;        // Smith (start, length)
-    cout << full.find("Smith") << endl;       // 6 (index)
-
-    if (first == "Alice") cout << "Hello, Alice!" << endl;
-    return 0;
-}`,
-    },
-    {
-      title: "Brace initialization prevents narrowing",
-      body: `// int x = 3.7;    // silently truncates to 3 (legal but lossy)
-// int x{3.7};       // COMPILE ERROR: narrowing conversion — good!
-
-int a{42};           // OK: exact integer
-double b{3.14};      // OK
-// int c{3.14};      // ERROR caught at compile time
-
-// Zero-initialize with empty braces
-int zero{};          // = 0
-double d{};          // = 0.0
-std::string s{};     // = ""`,
+// const is good style for values that shouldn't change:
+// it documents intent and catches accidental reassignment`,
     },
   ],
 
@@ -176,25 +204,23 @@ std::string s{};     // = ""`,
     {
       difficulty: "easy",
       problem:
-        "Declare variables for a student record: name (string), age (int), GPA (double), enrolled (bool). Print them all with labels. Then try changing `enrolled` to `const bool enrolled = true;` and verify the compiler stops you from reassigning it.",
-      hint: "Use `const bool enrolled = true;` and then try `enrolled = false;` below it.",
+        "Create a student record with four variables: `name` (string), `age` (int), `gpa` (double), `enrolled` (bool). Initialize each, then print them with labels. Change `age` to use `auto` and verify it still compiles.",
+      hint: "Include `<string>`. Print with `cout << \"Name: \" << name << endl;`",
       walkthrough: [
-        "Declare each variable with an appropriate type and sensible test value",
-        "Print each variable with cout using labels like `Name: Alice`",
-        "Add `const bool enrolled = true;` and then try to assign `enrolled = false;` below",
-        "The compile error you get is the compiler enforcing your const contract",
+        "string name = \"Alice\"; int age = 20; double gpa = 3.7; bool enrolled = true;",
+        "cout << \"Name: \" << name << endl; etc.",
+        "auto age = 20; — works the same",
       ],
     },
     {
       difficulty: "medium",
       problem:
-        "Demonstrate integer overflow. Declare `int x = 2147483647` (INT_MAX). Print `x`, then print `x + 1`, then print `x * 2`. What values do you see? Now change `x` to `long long` — does overflow still occur?",
-      hint: "The value wraps to a large negative number. With long long, the maximum is 9 223 372 036 854 775 807.",
+        "Demonstrate integer overflow. Set `int x = 2000000000`. Add 500000000 to it and print the result — observe the overflow. Fix it by using `long long`. Print `sizeof(int)` and `sizeof(long long)` to confirm the size difference. Then write a safe addition: check if `x + y > INT_MAX` before adding.",
+      hint: "Use `INT_MAX` from `<climits>`. `long long y = 2000000000LL; y += 500000000;`",
       walkthrough: [
-        "Start with `int x = 2147483647` — this is the largest representable int (2^31 - 1)",
-        "Print `x + 1` — you should see −2147483648 (overflow wraps around for signed int)",
-        "Change the type to `long long x = 2147483647LL` — now `x + 1` works correctly",
-        "The lesson: always pick a type large enough for your expected range",
+        "int x = 2000000000; x += 500000000; — overflow, prints negative",
+        "long long safe = 2000000000LL; safe += 500000000; — correct",
+        "if (x > INT_MAX - 500000000) { overflow! } else { x += 500000000; }",
       ],
     },
   ],
@@ -204,53 +230,48 @@ std::string s{};     // = ""`,
       {
         id: "cpp0-002-q1",
         type: "choice",
-        text: "What does `int x;` initialize `x` to?",
-        options: [
-          "0",
-          "nullptr",
-          "An indeterminate (garbage) value",
-          "−1",
-        ],
-        answer: 2,
+        text: "What does `7 / 2` evaluate to in C++?",
+        options: ["3.5", "3", "4", "3.0"],
+        answer: 1,
         explanation:
-          "Local variables with no initializer hold whatever bytes happened to be in that stack memory. This is undefined behavior when read. Always write `int x = 0;` or `int x{};`.",
+          "When both operands are integers, C++ performs integer division — the result is truncated toward zero. `7 / 2 = 3`. To get `3.5`, make at least one operand a double: `7.0 / 2` or `(double)7 / 2`.",
       },
       {
         id: "cpp0-002-q2",
         type: "choice",
-        text: "Which initialization syntax prevents narrowing conversions at compile time?",
-        options: [
-          "`int x = 3.7;`",
-          "`int x(3.7);`",
-          "`int x{3.7};`",
-          "All three prevent it",
-        ],
-        answer: 2,
+        text: "What type does `auto x = 3.14;` give `x`?",
+        options: ["float", "double", "int", "long double"],
+        answer: 1,
         explanation:
-          "Brace-initialization `{...}` (C++11 uniform initialization) rejects narrowing conversions with a compile error. `int x{3.7}` fails to compile. The other forms silently truncate to 3.",
+          "Floating-point literals without a suffix are `double` in C++. `auto` deduces the type from the initializer, so `x` is `double`. Use `3.14f` for `float` or `3.14L` for `long double`.",
       },
       {
         id: "cpp0-002-q3",
         type: "choice",
-        text: "What type does `auto x = 42.0f;` deduce?",
-        options: ["double", "float", "int", "long double"],
+        text: "Why is `if (a + b == 0.3)` dangerous when `a = 0.1` and `b = 0.2`?",
+        options: [
+          "Floating-point addition is always exact",
+          "0.1 and 0.2 can't be represented exactly in binary — their sum may differ from 0.3 by a tiny rounding error",
+          "The `==` operator is not defined for double",
+          "You must cast to int before comparing",
+        ],
         answer: 1,
         explanation:
-          "The `f` suffix makes `42.0f` a `float` literal (not `double`). `auto` deduces `float`. Without the `f`, `42.0` is a `double` literal.",
+          "Floating-point numbers are stored in binary, and 0.1 and 0.2 are repeating fractions in binary — like 1/3 in decimal. The nearest representable values add up to something like 0.30000000000000004, not exactly 0.3. Use `fabs(a + b - 0.3) < 1e-9` for floating-point comparisons.",
       },
       {
         id: "cpp0-002-q4",
         type: "choice",
-        text: "Why is `0.1 + 0.2 == 0.3` false in C++?",
+        text: "What does `const double PI = 3.14159;` prevent?",
         options: [
-          "C++ has a bug in its + operator",
-          "IEEE 754 floating-point cannot represent 0.1 or 0.2 exactly in binary",
-          "The == operator doesn't work for doubles",
-          "You need to include <cmath> first",
+          "PI from being used in expressions",
+          "PI from being reassigned after initialization",
+          "PI from being printed with cout",
+          "PI from being passed to functions",
         ],
         answer: 1,
         explanation:
-          "0.1 and 0.2 have no exact binary representation (like 1/3 in decimal). The sum rounds slightly off from the stored approximation of 0.3. Compare floats with `abs(a - b) < 1e-9` instead.",
+          "`const` makes a variable read-only after initialization. You can use `PI` in expressions, pass it to functions, and print it — but any attempt to assign a new value is a compile error. It documents intent and catches accidental modifications.",
       },
     ],
   },

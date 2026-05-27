@@ -1,69 +1,110 @@
-const STL_CODE = `#include <iostream>
+const VECTOR_CODE = `#include <iostream>
 #include <vector>
-#include <string>
-#include <algorithm>  // sort, find, accumulate, etc.
-#include <numeric>    // accumulate
 using namespace std;
 
-// __OUTPUT__: --- vector basics ---\\nv: 10 20 30 40 50 \\nSize: 5  Front: 10  Back: 50\\nAfter push_back(60): 10 20 30 40 50 60 \\nAfter pop_back: size=5\\n--- sorting and searching ---\\nSorted: 1 2 3 5 7 8 9 \\nMax: 9  Min: 1  Sum: 35\\nfind(5): found at index 3\\n--- string as container ---\\nChars: H e l l o \\nSorted string: Helo\\n--- 2D vector (matrix) ---\\n1 2 3 \\n4 5 6 \\n7 8 9
+// __OUTPUT__: size=5 front=10 back=50\\n10 20 30 40 50\\nafter push: 10 20 30 40 50 60\\nafter pop: size=5
 
 int main() {
-    // ── vector basics ──────────────────────────────────────────
-    cout << "--- vector basics ---" << endl;
     vector<int> v = {10, 20, 30, 40, 50};
 
-    cout << "v: ";
+    cout << "size=" << v.size()
+         << " front=" << v.front()
+         << " back=" << v.back() << endl;
+
     for (int x : v) cout << x << " ";
     cout << endl;
 
-    cout << "Size: " << v.size()
-         << "  Front: " << v.front()
-         << "  Back: " << v.back() << endl;
-
     v.push_back(60);
-    cout << "After push_back(60): ";
+    cout << "after push: ";
     for (int x : v) cout << x << " ";
     cout << endl;
 
     v.pop_back();
-    cout << "After pop_back: size=" << v.size() << endl;
+    cout << "after pop: size=" << v.size() << endl;
 
-    // ── sorting and searching ──────────────────────────────────
-    cout << "--- sorting and searching ---" << endl;
+    return 0;
+}`;
+
+const SORT_SEARCH_CODE = `#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <numeric>
+using namespace std;
+
+// __OUTPUT__: sorted: 1 2 3 5 7 8 9\\nmax=9 min=1 sum=35\\n5 found at index 3
+
+int main() {
     vector<int> nums = {5, 2, 8, 1, 9, 3, 7};
-    sort(nums.begin(), nums.end());     // ascending
-    cout << "Sorted: ";
+
+    sort(nums.begin(), nums.end());
+    cout << "sorted: ";
     for (int n : nums) cout << n << " ";
     cout << endl;
 
-    cout << "Max: " << *max_element(nums.begin(), nums.end()) << endl;
-    cout << "Min: " << *min_element(nums.begin(), nums.end()) << endl;
-    cout << "Sum: " << accumulate(nums.begin(), nums.end(), 0) << endl;
+    cout << "max=" << *max_element(nums.begin(), nums.end())
+         << " min=" << *min_element(nums.begin(), nums.end())
+         << " sum=" << accumulate(nums.begin(), nums.end(), 0) << endl;
 
     auto it = find(nums.begin(), nums.end(), 5);
     if (it != nums.end())
-        cout << "find(5): found at index " << (it - nums.begin()) << endl;
+        cout << "5 found at index " << (it - nums.begin()) << endl;
 
-    // ── string as STL container ────────────────────────────────
-    cout << "--- string as container ---" << endl;
-    string hello = "Hello";
-    cout << "Chars: ";
-    for (char c : hello) cout << c << " ";
+    return 0;
+}`;
+
+const FILTER_CODE = `#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <numeric>
+using namespace std;
+
+// __OUTPUT__: odds: 1 3 5 7 9\\nsquared: 1 9 25 49 81\\nproduct: 945
+
+int main() {
+    vector<int> v = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+    // Erase-remove idiom: remove all even numbers
+    v.erase(remove_if(v.begin(), v.end(),
+                      [](int x){ return x % 2 == 0; }),
+            v.end());
+    cout << "odds: ";
+    for (int x : v) cout << x << " ";
     cout << endl;
 
-    string sorted_s = hello;
-    sort(sorted_s.begin(), sorted_s.end());
-    // Remove duplicate chars by using unique
-    sorted_s.erase(unique(sorted_s.begin(), sorted_s.end()), sorted_s.end());
-    cout << "Sorted string: " << sorted_s << endl;
+    // transform: square each element in-place
+    transform(v.begin(), v.end(), v.begin(),
+              [](int x){ return x * x; });
+    cout << "squared: ";
+    for (int x : v) cout << x << " ";
+    cout << endl;
 
-    // ── 2D vector ──────────────────────────────────────────────
-    cout << "--- 2D vector (matrix) ---" << endl;
-    vector<vector<int>> matrix = {{1,2,3},{4,5,6},{7,8,9}};
-    for (auto& row : matrix) {
-        for (int val : row) cout << val << " ";
+    int product = accumulate(v.begin(), v.end(), 1,
+                             [](int a, int b){ return a * b; });
+    cout << "product: " << product << endl;
+
+    return 0;
+}`;
+
+const MATRIX_CODE = `#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+// __OUTPUT__: 1 2 3\\n4 5 6\\n7 8 9\\nsorted chars: Helo
+
+int main() {
+    // 2D vector: vector of vectors
+    vector<vector<int>> grid = {{1,2,3},{4,5,6},{7,8,9}};
+    for (auto& row : grid) {
+        for (int v : row) cout << v << " ";
         cout << endl;
     }
+
+    // string works with all <algorithm> functions
+    string s = "Hello";
+    sort(s.begin(), s.end());
+    s.erase(unique(s.begin(), s.end()), s.end());
+    cout << "sorted chars: " << s << endl;
 
     return 0;
 }`;
@@ -74,7 +115,7 @@ const lesson = {
   chapter: "cpp-0",
   order: 10,
   title: "STL Basics",
-  subtitle: "Use std::vector, std::string, and the standard algorithms from <algorithm>",
+  subtitle: "std::vector, sort, find, accumulate — the standard toolkit every C++ developer uses daily",
   tags: ["c++", "cpp", "stl", "vector", "algorithm", "sort", "find", "accumulate", "iterator"],
   aliases: [
     "c++ vector",
@@ -84,31 +125,33 @@ const lesson = {
     "c++ iterators",
   ],
 
-  hook: `The Standard Template Library (STL) is C++'s built-in toolkit for data structures and algorithms. Before you write any loop to find a max, sort an array, or count elements — the STL already has it, tested, optimized, and portable. Learning the STL is what separates a C programmer who uses C++ from a real C++ developer. The vector alone replaces 80% of use cases for arrays.`,
+  hook: `Before you write any loop to find a max, sort a list, or count elements — the STL already has it, tested and optimized. `\`std::vector\`` alone replaces 80% of array use cases. Learning the STL is what separates C programmers using C++ syntax from real C++ developers.`,
 
   mentalModel: [
-    "**`std::vector<T>` is a dynamically-sized array.** It stores elements contiguously in memory (like C-arrays) but can grow and shrink. Push elements with `push_back()`, access with `[]` or `.at()`, iterate with range-based for. The STL `vector` is the default choice for any ordered collection — use it unless you have a specific reason to choose another container.",
-    "**Iterators are the STL's universal pointer-like interface.** `v.begin()` returns an iterator to the first element; `v.end()` is one past the last. STL algorithms take `(begin, end)` ranges, making them work with any STL container. `*it` dereferences the iterator; `it++` advances it. For `vector`, iterators are essentially pointers — `v.begin() + 3` works like pointer arithmetic.",
-    "**`<algorithm>` gives you generic operations that work on any container range.** `sort(v.begin(), v.end())` sorts a vector. `find(v.begin(), v.end(), x)` searches for x. `accumulate(v.begin(), v.end(), 0)` sums. `max_element`, `min_element`, `count`, `reverse`, `copy` — these all follow the same (begin, end) pattern. Learn the pattern once, apply it to any container.",
+    "**`std::vector<T>` is a dynamically-sized array.** Elements are contiguous in memory (same layout as C arrays), so access is O(1). `push_back` grows the vector, `pop_back` shrinks it. It knows its own size: `v.size()`. This is your default container for ordered data.",
+    "**Iterators are the STL's universal interface.** `v.begin()` points to the first element; `v.end()` is one past the last. All STL algorithms take `(begin, end)` ranges — `sort(v.begin(), v.end())` — making them work with any container. The [begin, end) convention means `end` is never dereferenced.",
+    "**`<algorithm>` gives you generic operations: sort, find, transform, remove_if, accumulate.** They all work on any container range. Learn the pattern once, apply everywhere.",
   ],
 
   intuition: {
     prose: [
-      "**Why `vector` over raw arrays?** Raw arrays are fixed-size, can't be returned from functions easily, lose their size when passed to functions, and can't be assigned with `=`. `std::vector` solves all of these: `vector<int> v2 = v1;` copies correctly; `v.size()` is always accurate; you can `push_back` to grow; you can `return v;` from functions. The performance difference is minimal — `vector` stores elements in the same contiguous layout as arrays, and modern implementations are highly optimized.",
-      "**Vector memory and capacity.** `v.size()` is how many elements are currently in the vector. `v.capacity()` is how many it can hold before needing to reallocate. When `size == capacity` and you `push_back`, the vector allocates a new, larger buffer (typically 2×), copies elements, and frees the old. This amortizes the allocation cost — `push_back` is O(1) amortized. Use `v.reserve(n)` to pre-allocate space if you know the size upfront — avoids repeated reallocations.",
-      "**The `<algorithm>` header is massive and powerful.** Beyond `sort` and `find`: `count(begin, end, val)` counts occurrences, `reverse(begin, end)` reverses in-place, `transform(begin, end, out_begin, func)` applies a function element-wise, `remove_if(begin, end, pred)` moves unwanted elements to the end (use with `erase`), `unique(begin, end)` removes consecutive duplicates. Mastering the standard algorithms is one of the most valuable skills in C++.",
-      "**Iterators as a design pattern.** Every STL container — `vector`, `list`, `map`, `set`, `deque` — exposes iterators. This means ALL standard algorithms work with ALL standard containers without modification. `sort(list.begin(), list.end())` won't compile (sort needs random-access iterators), but `find`, `count`, `accumulate`, and others work on every iterable container. This iterator abstraction is what makes the STL 'generic'.",
+      "**`vector` is your go-to.** Fixed-size C arrays are useful but don't know their size, don't support copy assignment, and can't grow. `vector` solves all of this while maintaining the same cache-friendly contiguous memory layout.",
     ],
     visualizations: [
       {
         id: "CppLab",
-        mathBridge:
-          "**Explore the STL:**\n\n1. Compile and run — trace the vector and algorithm operations\n2. Add `sort(v.rbegin(), v.rend())` — sort in descending order using reverse iterators\n3. Use `count(nums.begin(), nums.end(), 3)` to count occurrences of 3\n4. Use `reverse(hello.begin(), hello.end())` to reverse a string in-place\n5. Try `v.erase(v.begin() + 2)` to remove element at index 2\n6. Combine: `v.erase(remove_if(v.begin(), v.end(), [](int x){return x%2==0;}), v.end())` — remove all even numbers",
+        mathBridge: "**Run it — then explore vector operations:**\n\n- Try `v[10]` — out-of-bounds, no check. Try `v.at(10)` — throws an exception.\n- `v.insert(v.begin() + 2, 99)` — insert at index 2. What's the new size?\n- `v.erase(v.begin())` — remove the first element.\n- `v.clear()` — empties the vector. Then `v.push_back(1)` — it's back.\n- Check `v.empty()` after clearing.",
         props: {
           mainFile: "main.cpp",
-          initialFiles: {
-            "/home/user/main.cpp": STL_CODE,
-          },
+          initialFiles: { "/home/user/main.cpp": VECTOR_CODE },
+        },
+      },
+      {
+        id: "CppLab",
+        mathBridge: "**Sort, search, accumulate — run it then explore:**\n\n- Try `sort(nums.rbegin(), nums.rend())` for descending sort.\n- Use `count(nums.begin(), nums.end(), 3)` — how many 3s are there?\n- Use `binary_search(nums.begin(), nums.end(), 5)` after sorting — O(log n).\n- Change the `find` target to a value not in the vector. What does `it != nums.end()` tell you?",
+        props: {
+          mainFile: "main.cpp",
+          initialFiles: { "/home/user/main.cpp": SORT_SEARCH_CODE },
         },
       },
     ],
@@ -116,57 +159,50 @@ const lesson = {
 
   rigor: {
     prose: [
-      "**Iterator invalidation.** After certain `vector` operations, existing iterators become invalid: if `push_back` causes a reallocation, ALL iterators are invalidated (the vector moved its buffer). `erase` invalidates iterators at or after the erased position. This is why the erase-remove idiom uses the pattern `v.erase(remove_if(...), v.end())` rather than erasing in a loop — erasing in a loop while iterating is a classic bug. Never use a `vector` iterator after any modifying operation that might cause reallocation.",
-      "**Algorithm complexity guarantees.** `std::sort` is O(n log n) — introsort (quicksort + heapsort hybrid). `std::find` is O(n) linear search (no assumption of order). `std::binary_search` is O(log n) but requires a sorted range. `std::lower_bound` / `std::upper_bound` return iterators to the first/last position where a value would be inserted in a sorted range — the foundation for binary search in the STL. Knowing complexities matters for choosing the right algorithm.",
-      "**Custom comparators.** `sort(v.begin(), v.end(), comp)` where `comp(a, b)` returns true if `a` should come before `b`. Sort descending: `sort(v.begin(), v.end(), greater<int>())`. Sort structs by field: `sort(people.begin(), people.end(), [](const Person& a, const Person& b){ return a.age < b.age; })`. Lambdas (covered in cpp-1) make comparators concise. The comparator must satisfy strict weak ordering: irreflexive, asymmetric, transitive.",
+      "**The erase-remove idiom.** `remove_if` doesn't actually remove — it moves unwanted elements to the end and returns an iterator to the new logical end. The vector size is unchanged. You must call `.erase(it, v.end())` to actually shrink it. This two-step idiom is idiomatic C++.",
+      "**`transform` applies a function element-wise.** `transform(begin, end, out, func)` applies `func` to each element in [begin, end) and writes results to `out`. For in-place transformation: pass `v.begin()` as both input and output. Combine with `accumulate(begin, end, init, func)` for fold operations — the two-argument form sums, the four-argument form lets you customize with any binary operation.",
+    ],
+    visualizations: [
+      {
+        id: "CppLab",
+        mathBridge: "**Filter and transform — run it then explore:**\n\n- Change the filter to remove numbers > 5 instead of even numbers.\n- Change transform to cube each element: `x * x * x`.\n- Use `count_if(v.begin(), v.end(), [](int x){ return x > 10; })` after squaring — how many squared values exceed 10?\n- Use `accumulate` with `+` (the default) to sum the squared odds.",
+        props: {
+          mainFile: "main.cpp",
+          initialFiles: { "/home/user/main.cpp": FILTER_CODE },
+        },
+      },
+      {
+        id: "CppLab",
+        mathBridge: "**2D vector and string as container — run it then explore:**\n\n- Add a row to the grid: `grid.push_back({10, 11, 12})` — then print all rows.\n- Access `grid[1][2]` — what's the value?\n- Try `sort(s.begin(), s.end())` on `\"banana\"` — what comes out?\n- Use `count(s.begin(), s.end(), 'a')` on `\"banana\"` — how many 'a's?",
+        props: {
+          mainFile: "main.cpp",
+          initialFiles: { "/home/user/main.cpp": MATRIX_CODE },
+        },
+      },
     ],
     callouts: [
       {
         type: "warning",
-        title: "vector::operator[] does NOT bounds-check",
-        body: "`v[i]` for out-of-range `i` is undefined behavior — just like C arrays. Use `v.at(i)` during development: it throws `std::out_of_range` if `i >= v.size()`. For performance-critical production code, `[]` is fine once the logic is verified correct.",
+        title: "vector[] does NOT bounds-check",
+        body: "`v[i]` for out-of-range `i` is undefined behavior. Use `v.at(i)` during development — it throws `std::out_of_range`. Switch to `[]` in verified production code for performance.",
       },
       {
-        type: "info",
-        title: "String is a sequence container too",
-        body: "`std::string` works with all `<algorithm>` functions: `sort(s.begin(), s.end())` sorts characters, `find(s.begin(), s.end(), 'x')` finds a character, `count(s.begin(), s.end(), 'a')` counts occurrences. You get all STL algorithms on strings for free because string exposes standard iterators.",
+        type: "warning",
+        title: "Iterator invalidation after push_back",
+        body: "If `push_back` causes reallocation (size reaches capacity), ALL iterators become invalid — they point to the old buffer. Never use an iterator across a potentially-reallocating operation. Use `reserve(n)` upfront to prevent this.",
       },
       {
         type: "tip",
-        title: "reserve() before push_back() in a loop",
-        body: "If you know you'll add 1000 elements: `v.reserve(1000)` allocates the space upfront, avoiding ~10 reallocations. `reserve` changes capacity but not size. Always `reserve` for known-size builds: performance difference can be 2-5× for large vectors.",
+        title: "reserve() before building a vector in a loop",
+        body: "If you know you'll add 1000 elements: `v.reserve(1000)` pre-allocates space, avoiding ~10 reallocations. `reserve` changes capacity but not size. Performance improvement can be 2-5× for large builds.",
       },
     ],
   },
 
   examples: [
     {
-      title: "vector idioms: build, filter, transform",
-      body: `vector<int> numbers = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-
-// Erase-remove idiom: remove all even numbers
-numbers.erase(
-    remove_if(numbers.begin(), numbers.end(),
-              [](int x){ return x % 2 == 0; }),
-    numbers.end()
-);
-// {1, 3, 5, 7, 9}
-
-// Transform: square each element (in-place)
-transform(numbers.begin(), numbers.end(), numbers.begin(),
-          [](int x){ return x * x; });
-// {1, 9, 25, 49, 81}
-
-// Accumulate with custom operation (product)
-int product = accumulate(numbers.begin(), numbers.end(), 1,
-                         [](int acc, int x){ return acc * x; });`,
-    },
-    {
-      title: "Sorting with custom comparator",
-      body: `struct Student {
-    string name;
-    double gpa;
-};
+      title: "Sort structs with a custom comparator",
+      body: `struct Student { string name; double gpa; };
 
 vector<Student> students = {
     {"Alice", 3.8}, {"Bob", 3.5}, {"Charlie", 3.9}
@@ -175,34 +211,28 @@ vector<Student> students = {
 // Sort by GPA descending
 sort(students.begin(), students.end(),
      [](const Student& a, const Student& b){
-         return a.gpa > b.gpa;   // > for descending
+         return a.gpa > b.gpa;
      });
 
 for (const auto& s : students)
     cout << s.name << ": " << s.gpa << endl;
-// Charlie: 3.9
-// Alice: 3.8
-// Bob: 3.5`,
+// Charlie: 3.9 / Alice: 3.8 / Bob: 3.5`,
     },
     {
       title: "Binary search on sorted vector",
-      body: `vector<int> sorted = {1, 3, 5, 7, 9, 11, 13, 15};
+      body: `vector<int> sorted = {1, 3, 5, 7, 9, 11};
 
-// Check if value exists (O(log n))
+// Check existence O(log n) — requires sorted range
 bool found = binary_search(sorted.begin(), sorted.end(), 7);
 
-// Find insertion point
-auto it = lower_bound(sorted.begin(), sorted.end(), 8);
-// *it == 9, it points to where 8 would go
-
 // Insert and keep sorted
-sorted.insert(it, 8);
-// {1, 3, 5, 7, 8, 9, 11, 13, 15}
+auto it = lower_bound(sorted.begin(), sorted.end(), 6);
+sorted.insert(it, 6);   // {1,3,5,6,7,9,11}
 
 // Count elements in range [5, 10]
 auto lo = lower_bound(sorted.begin(), sorted.end(), 5);
 auto hi = upper_bound(sorted.begin(), sorted.end(), 10);
-cout << "Count in [5,10]: " << (hi - lo) << endl;  // 4`,
+cout << (hi - lo) << endl;  // 4  (5,6,7,9)`,
     },
   ],
 
@@ -210,26 +240,25 @@ cout << "Count in [5,10]: " << (hi - lo) << endl;  // 4`,
     {
       difficulty: "easy",
       problem:
-        "Read n integers into a vector, then print: (1) the sorted vector, (2) the median value (middle element after sorting — for odd n), (3) how many elements are above the average. Use STL algorithms where possible: `sort`, `accumulate`.",
-      hint: "Median = sorted_v[n/2] for odd n. Average = total / n. Count above-average with a manual loop or `count_if`.",
+        "Read n integers into a vector, then print: (1) the sorted vector, (2) the median (middle element after sorting for odd n), (3) how many elements are above the average. Use `sort` and `accumulate`.",
+      hint: "Median: `v[v.size()/2]` after sorting. Average: `accumulate(v.begin(), v.end(), 0.0) / v.size()`.",
       walkthrough: [
-        "Read n, then push_back n values into a vector",
+        "Read n, push_back n values",
         "sort(v.begin(), v.end())",
         "Median: v[v.size()/2]",
-        "Average: accumulate(v.begin(), v.end(), 0.0) / v.size()",
-        "Count above average: manual loop or count_if",
+        "Average: accumulate / size",
+        "Count above average with loop or count_if",
       ],
     },
     {
       difficulty: "medium",
       problem:
-        "Word frequency counter. Read a paragraph (multiple words on multiple lines — read until EOF using `while(cin >> word)`). Store word counts in a `map<string, int>`. Print each unique word and its count, sorted alphabetically. Hint: `map` automatically sorts by key.",
-      hint: "Include `<map>`. `map<string,int> freq; freq[word]++;` increments the count (starts at 0 if first time). Iterate: `for (auto& [word, count] : freq)`.",
+        "Word frequency counter. Read words from stdin with `while (cin >> word)`. Count with a `map<string, int>` — `freq[word]++` auto-initializes to 0. Print each word and count in alphabetical order (map iterates in sorted key order). Then find and print the most-frequent word.",
+      hint: "`#include <map>`. Iterate: `for (auto& [word, count] : freq)`. For most-frequent: track the max while iterating.",
       walkthrough: [
-        "#include <map>",
-        "string word; while (cin >> word) freq[word]++;",
-        "for (auto& [w, c] : freq) cout << w << \": \" << c << endl;",
-        "map automatically iterates in alphabetical order",
+        "map<string,int> freq; string word; while (cin >> word) freq[word]++;",
+        "for (auto& [w, c] : freq) cout << w << \": \" << c;",
+        "Track max: auto maxIt = max_element(freq.begin(), freq.end(), [](auto& a, auto& b){ return a.second < b.second; });",
       ],
     },
   ],
@@ -248,7 +277,7 @@ cout << "Count in [5,10]: " << (hi - lo) << endl;  // 4`,
         ],
         answer: 1,
         explanation:
-          "`v.end()` returns an iterator to one-past-the-last element — it doesn't point to valid data. All STL ranges use [begin, end) convention: begin is inclusive, end is exclusive. `*v.end()` is undefined behavior.",
+          "`v.end()` is one past the last element — it marks the end of the range but doesn't point to valid data. All STL ranges use [begin, end) where end is exclusive. `*v.end()` is undefined behavior.",
       },
       {
         id: "cpp0-010-q2",
@@ -257,35 +286,35 @@ cout << "Count in [5,10]: " << (hi - lo) << endl;  // 4`,
         options: ["O(n)", "O(n²)", "O(n log n)", "O(log n)"],
         answer: 2,
         explanation:
-          "`std::sort` uses introsort (a hybrid of quicksort, heapsort, and insertion sort), guaranteeing O(n log n) worst case. This is optimal for comparison-based sorting.",
+          "`std::sort` uses introsort (quicksort + heapsort hybrid), guaranteeing O(n log n) worst case.",
       },
       {
         id: "cpp0-010-q3",
         type: "choice",
-        text: "After `vector<int> v = {1,2,3}; v.push_back(4); auto it = v.begin();`, what might happen to `it` if you `push_back` many more elements?",
+        text: "After `v.push_back(x)` causes a reallocation, what happens to iterators obtained before the push?",
         options: [
-          "it always remains valid and points to 1",
-          "it becomes invalid if push_back causes a reallocation",
-          "it advances to the newly added element",
-          "it becomes nullptr",
+          "They remain valid and point to the same elements",
+          "They become invalid — the vector moved its buffer",
+          "They advance to point to the new element",
+          "They become nullptr",
         ],
         answer: 1,
         explanation:
-          "When `push_back` causes reallocation (when size reaches capacity), the vector moves its internal buffer to a larger allocation. All existing iterators, pointers, and references become invalid because they point to the old buffer. Always re-obtain iterators after potential reallocation.",
+          "Reallocation copies all elements to a new buffer. Old iterators point to the old buffer and become dangling. Always re-obtain iterators after potentially-reallocating operations. Use `reserve()` to prevent reallocation.",
       },
       {
         id: "cpp0-010-q4",
         type: "choice",
-        text: "What does `remove_if(v.begin(), v.end(), pred)` do to the vector?",
+        text: "What does `remove_if(v.begin(), v.end(), pred)` return?",
         options: [
-          "Erases all elements satisfying pred from v",
-          "Moves elements satisfying pred to the end and returns an iterator to the new logical end — but does not change v.size()",
-          "Creates a new vector with matching elements removed",
-          "Throws an exception for each element satisfying pred",
+          "The vector with matching elements deleted",
+          "An iterator to the new logical end — elements satisfying pred moved to the back",
+          "The count of removed elements",
+          "A new vector without the matching elements",
         ],
         answer: 1,
         explanation:
-          "`remove_if` rearranges elements: elements NOT satisfying pred are moved to the front, elements satisfying pred are moved to the back (in unspecified order). It returns an iterator to the new 'logical end'. The vector's size doesn't change — you must call `v.erase(it, v.end())` to actually shrink it. This is the erase-remove idiom.",
+          "`remove_if` rearranges elements but doesn't change size — it returns an iterator marking the new logical end. Call `v.erase(it, v.end())` to actually shrink the vector. This is the erase-remove idiom.",
       },
     ],
   },

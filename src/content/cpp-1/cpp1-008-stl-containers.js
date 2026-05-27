@@ -1,69 +1,105 @@
-const STL_CODE = `#include <iostream>
+const MAP_CODE = `#include <iostream>
 #include <map>
-#include <set>
-#include <unordered_map>
-#include <queue>
-#include <deque>
 #include <string>
-#include <vector>
 using namespace std;
 
-// __OUTPUT__: --- map (sorted by key) ---\\napple: 3\\nbanana: 5\\ncherry: 2\\nFound apple: 3\\n--- set (unique sorted values) ---\\n1 2 3 5 8 \\nIn set? yes\\n--- unordered_map (O(1) average) ---\\nalice: 95\\nbob: 87\\n--- queue (FIFO) ---\\nProcessing: task1\\nProcessing: task2\\nProcessing: task3\\n--- priority_queue (max-heap) ---\\nNext: 42\\nNext: 17\\nNext: 5\\n--- deque (double-ended) ---\\n0 1 2 3 4
+// __OUTPUT__: apple: 3\\nbanana: 5\\ncherry: 2\\nfound apple: 3\\napple missing? no
 
 int main() {
-    // ── map: sorted key-value, O(log n) ───────────────────────
-    cout << "--- map (sorted by key) ---" << endl;
-    map<string, int> inventory;
-    inventory["banana"] = 5;
-    inventory["apple"]  = 3;
-    inventory["cherry"] = 2;
+    map<string, int> inv;
+    inv["banana"] = 5;
+    inv["apple"]  = 3;
+    inv["cherry"] = 2;
 
-    for (const auto& [key, val] : inventory)   // iterates in key-sorted order
-        cout << key << ": " << val << endl;
+    // map iterates in sorted key order
+    for (const auto& [k, v] : inv) cout << k << ": " << v << "\\n";
 
-    if (auto it = inventory.find("apple"); it != inventory.end())
-        cout << "Found apple: " << it->second << endl;
+    // find: safe lookup — no insertion side effect
+    auto it = inv.find("apple");
+    if (it != inv.end()) cout << "found apple: " << it->second << "\\n";
 
-    // ── set: sorted unique values, O(log n) ───────────────────
-    cout << "--- set (unique sorted values) ---" << endl;
-    set<int> primes = {2, 3, 5, 2, 3, 8, 1};  // duplicates silently dropped
-    for (int p : primes) cout << p << " ";
-    cout << endl;
-    cout << "In set? " << (primes.count(3) ? "yes" : "no") << endl;
+    // operator[] creates the key if missing — use find to check
+    cout << "apple missing? " << (inv.count("xyz") ? "yes" : "no") << "\\n";
 
-    // ── unordered_map: hash table, O(1) average ───────────────
-    cout << "--- unordered_map (O(1) average) ---" << endl;
+    return 0;
+}`;
+
+const SET_CODE = `#include <iostream>
+#include <set>
+#include <unordered_map>
+#include <string>
+using namespace std;
+
+// __OUTPUT__: set: 1 2 3 5 8\\nin set? yes\\nunordered: alice=95 bob=87
+
+int main() {
+    // set: unique sorted values — duplicates silently dropped
+    set<int> s = {2, 3, 5, 2, 3, 8, 1};
+    cout << "set: ";
+    for (int x : s) cout << x << " ";
+    cout << "\\nin set? " << (s.count(3) ? "yes" : "no") << "\\n";
+
+    // unordered_map: hash table — O(1) average lookup vs O(log n) for map
     unordered_map<string, int> scores;
     scores["alice"] = 95;
     scores["bob"]   = 87;
-    for (const auto& [name, score] : scores)
-        cout << name << ": " << score << endl;
+    cout << "unordered: ";
+    for (const auto& [n, sc] : scores) cout << n << "=" << sc << " ";
+    cout << "\\n";
 
-    // ── queue: FIFO ───────────────────────────────────────────
-    cout << "--- queue (FIFO) ---" << endl;
+    return 0;
+}`;
+
+const QUEUE_CODE = `#include <iostream>
+#include <queue>
+#include <deque>
+using namespace std;
+
+// __OUTPUT__: FIFO: task1 task2 task3\\ndeque: 0 1 2 3 4
+
+int main() {
+    // queue: FIFO — front exits first
     queue<string> tasks;
     tasks.push("task1"); tasks.push("task2"); tasks.push("task3");
+    cout << "FIFO: ";
     while (!tasks.empty()) {
-        cout << "Processing: " << tasks.front() << endl;
+        cout << tasks.front() << " ";
         tasks.pop();
     }
+    cout << "\\n";
 
-    // ── priority_queue: max-heap ──────────────────────────────
-    cout << "--- priority_queue (max-heap) ---" << endl;
-    priority_queue<int> pq;
-    pq.push(5); pq.push(42); pq.push(17);
-    while (!pq.empty()) {
-        cout << "Next: " << pq.top() << endl;
-        pq.pop();
-    }
-
-    // ── deque: O(1) push/pop at both ends ────────────────────
-    cout << "--- deque (double-ended) ---" << endl;
+    // deque: O(1) push/pop at BOTH ends
     deque<int> dq;
     dq.push_back(2);  dq.push_back(3);  dq.push_back(4);
-    dq.push_front(1); dq.push_front(0);
+    dq.push_front(1); dq.push_front(0); // prepend
+    cout << "deque: ";
     for (int x : dq) cout << x << " ";
-    cout << endl;
+    cout << "\\n";
+
+    return 0;
+}`;
+
+const HEAP_CODE = `#include <iostream>
+#include <queue>
+#include <vector>
+using namespace std;
+
+// __OUTPUT__: max-heap: 42 17 5\\nmin-heap: 5 17 42
+
+int main() {
+    // priority_queue: max-heap by default
+    priority_queue<int> maxHeap;
+    maxHeap.push(5); maxHeap.push(42); maxHeap.push(17);
+    cout << "max-heap: ";
+    while (!maxHeap.empty()) { cout << maxHeap.top() << " "; maxHeap.pop(); }
+    cout << "\\n";
+
+    // min-heap: use greater<int> comparator
+    priority_queue<int, vector<int>, greater<int>> minHeap;
+    minHeap.push(5); minHeap.push(42); minHeap.push(17);
+    cout << "min-heap: ";
+    while (!minHeap.empty()) { cout << minHeap.top() << " "; minHeap.pop(); }
+    cout << "\\n";
 
     return 0;
 }`;
@@ -74,20 +110,8 @@ const lesson = {
   chapter: "cpp-1",
   order: 8,
   title: "STL Containers",
-  subtitle:
-    "Choose the right data structure: map, set, unordered_map, queue, deque, priority_queue",
-  tags: [
-    "c++",
-    "cpp",
-    "STL",
-    "map",
-    "set",
-    "unordered_map",
-    "queue",
-    "priority_queue",
-    "deque",
-    "data-structures",
-  ],
+  subtitle: "map, set, unordered_map, queue, deque, priority_queue — choose the right structure",
+  tags: ["c++", "cpp", "STL", "map", "set", "unordered_map", "queue", "priority_queue", "deque"],
   aliases: [
     "c++ map",
     "c++ set",
@@ -98,31 +122,33 @@ const lesson = {
     "c++ STL containers",
   ],
 
-  hook: `The C++ Standard Library ships with battle-tested data structures covering every common access pattern. Sorted key-value lookup? \`map\`. Fast average-case lookup by key? \`unordered_map\`. Unique sorted elements? \`set\`. Task queues? \`queue\` or \`priority_queue\`. Efficient insertion at both ends? \`deque\`. Knowing which container to reach for — and why — is the difference between O(1) and O(n) in the hot path.`,
+  hook: ``\`vector\`` covers most cases, but sometimes you need ordered lookup, uniqueness enforcement, FIFO processing, or priority-based scheduling. Each STL container has a specific performance contract. Knowing which to reach for — and why — is what separates developers who fight their data structures from ones who work with them.`,
 
   mentalModel: [
-    "**Ordered vs unordered.** `map`, `set`, `multimap`, `multiset` are backed by red-black trees — all operations are O(log n), and iteration is in sorted order. `unordered_map`, `unordered_set` are backed by hash tables — average O(1) lookup but O(n) worst case (hash collisions), and iteration order is arbitrary. Choose ordered when you need sorted traversal or range queries; choose unordered for raw lookup speed.",
-    "**Adaptors wrap sequences.** `queue`, `stack`, and `priority_queue` are *container adaptors* — they wrap an underlying container (`deque` by default) and restrict the interface. `queue` exposes only FIFO operations (front, push, pop). `stack` exposes LIFO (top, push, pop). `priority_queue` exposes heap operations (top is always the max). They enforce access discipline, not new data layouts.",
-    "**`deque` vs `vector`.** `vector` is a contiguous array — O(1) random access, O(n) `push_front`. `deque` (double-ended queue) is a sequence of fixed-size chunks — O(1) `push_front` and `push_back`, O(1) random access (slightly slower than vector due to chunk indirection). Use `deque` when you need efficient insertion at both ends. `queue` and `stack` default to `deque` as their backing container.",
+    "**`map<K,V>`: sorted key-value, O(log n).** Internally a red-black tree. Keys are always sorted — iteration gives alphabetical/numerical order. Use when you need sorted iteration or range queries. Warning: `map[key]` inserts a default-constructed value if the key is missing — use `.find()` to check without inserting.",
+    "**`unordered_map<K,V>`: hash table, O(1) average.** No ordering guarantee, but 3-10× faster than `map` for large datasets. Use when you don't need sorted order and just want fast lookup by key.",
+    "**`set<T>`: sorted unique values. `queue<T>`: FIFO. `priority_queue<T>`: max-heap.** Each enforces a specific access pattern — set for membership testing, queue for task processing, priority_queue for 'always give me the highest priority next'.",
   ],
 
   intuition: {
     prose: [
-      '**`map::operator[]` creates entries.** `m["key"]` does not just look up "key" — if "key" doesn\'t exist, it inserts a default-constructed value (0 for int, "" for string) and returns a reference to it. This is convenient for counting (`wordCount[word]++`) but dangerous for read-only access: `m["typo"]` silently creates an entry. For read-only lookup, use `m.find(key)` (returns iterator) or `m.at(key)` (throws `out_of_range`).',
-      "**`count` vs `find` for membership.** `set.count(x)` returns 0 or 1 (it's a set — at most one occurrence). `set.find(x) != set.end()` does the same thing. For `multiset`/`multimap`, `count` returns the actual count; `find` returns the first match. In modern C++ (C++20), `set.contains(x)` is cleaner and reads like English. For unordered containers, `count` is O(1) average; for ordered, O(log n).",
-      "**Priority queue ordering.** `priority_queue<int>` is a max-heap: `top()` gives the largest element. For a min-heap: `priority_queue<int, vector<int>, greater<int>>`. For custom types, provide a comparator. Common pattern: Dijkstra's algorithm uses `priority_queue<pair<int,int>, vector<...>, greater<...>>` where `pair.first` is the distance — the unvisited node with the smallest distance is always at the top.",
-      "**Structured bindings and range-for.** `for (const auto& [key, val] : myMap)` uses C++17 structured bindings to unpack each `pair<const Key, Value>`. Without it: `for (const auto& p : myMap) { p.first; p.second; }`. Always use `const auto&` in range-for to avoid copying heavy objects. If you need to modify values: `for (auto& [key, val] : myMap) val *= 2;` — note: keys in map are always `const`, only values are modifiable.",
+      "**`map` vs `unordered_map` — sorted vs fast.** Both map keys to values. `map` gives you sorted iteration but costs O(log n) per lookup. `unordered_map` gives O(1) average but iterates in an unpredictable hash order. Default: `unordered_map`. Use `map` when you need sorted keys.",
     ],
     visualizations: [
       {
         id: "CppLab",
-        mathBridge:
-          '**Explore container operations:**\n\n1. Compile and run — observe sorted order in `map`, dropped duplicates in `set`\n2. Add `inventory["apple"] += 10` then print — map updates in place\n3. Try `inventory["newFruit"]` without assigning — notice it creates an entry with value 0\n4. Change `priority_queue<int>` to `priority_queue<int, vector<int>, greater<int>>` — now it\'s a min-heap\n5. Add a `multiset<int>` with duplicate values — count() returns actual count\n6. Benchmark: add 1M elements to `map` vs `unordered_map` and compare insert speed',
+        mathBridge: "**map — run it then explore:**\n\n- Try `inv[\"xyz\"]` — it inserts a 0-count entry! Check `inv.size()` before and after.\n- Use `inv.find(\"xyz\")` instead — does it insert? (No)\n- Add 10 more fruits and iterate — do they come out sorted?\n- `inv.erase(\"apple\")` — verify it's gone with `inv.count(\"apple\")`.",
         props: {
           mainFile: "main.cpp",
-          initialFiles: {
-            "/home/user/main.cpp": STL_CODE,
-          },
+          initialFiles: { "/home/user/main.cpp": MAP_CODE },
+        },
+      },
+      {
+        id: "CppLab",
+        mathBridge: "**set and unordered_map — run it then explore:**\n\n- Insert a duplicate into the set: `s.insert(3)`. Does the size change? (No)\n- Try `s.insert({4,6,7})` — bulk insert. Does order hold?\n- `unordered_map` has no guaranteed order — run multiple times. Does alice always come before bob?\n- Use `scores.count(\"alice\")` to check membership. What's the difference from `find`?",
+        props: {
+          mainFile: "main.cpp",
+          initialFiles: { "/home/user/main.cpp": SET_CODE },
         },
       },
     ],
@@ -130,148 +156,95 @@ const lesson = {
 
   rigor: {
     prose: [
-      "**Iterator invalidation rules by container.** `map`/`set`/`unordered_map`: insertion never invalidates existing iterators (tree/hash table). `unordered_map` rehashing invalidates ALL iterators. `deque`: inserting at front/back invalidates all iterators (but not references to existing elements for back-only insertions). Rule of thumb: after any mutating operation, assume iterators are invalid unless you know the specific container's guarantee.",
-      "**Custom hash functions for `unordered_map`.** Built-in types (int, string, pointer) have standard hashes. For custom types as keys, provide a hash specialization: `template<> struct std::hash<MyType> { size_t operator()(const MyType& x) const { return hash<string>()(x.id); } };` and an `operator==`. Without these, `unordered_map<MyType, ...>` won't compile.",
-      '**`emplace` vs `insert`.** `m.insert({"key", value})` constructs a `pair` then copies/moves it into the map. `m.emplace("key", value)` constructs the pair *in-place* inside the map — no intermediate object. For containers of complex objects, `emplace_back` / `emplace` can be significantly faster than `push_back` / `insert`. In modern C++, prefer `emplace` for containers of non-trivial types.',
+      "**Queue and deque access patterns.** `queue` is a strict FIFO adapter — you can only access `front()` and `back()`. `deque` (double-ended queue) supports O(1) push/pop at both ends AND O(1) random access by index. Use `deque` when you need sliding-window access or BFS-style breadth-first processing.",
+      "**Priority queue is a heap.** `priority_queue` pops elements in max-first order (largest first). For min-first order: `priority_queue<int, vector<int>, greater<int>>`. Use for scheduling (highest priority task first), Dijkstra's algorithm (shortest path), or any 'always next best' access pattern. Push and pop are O(log n).",
+    ],
+    visualizations: [
+      {
+        id: "CppLab",
+        mathBridge: "**queue and deque — run it then explore:**\n\n- `queue` doesn't support random access — try `tasks[0]`. What error?\n- Change `deque` to `push_front` only — acts like a stack.\n- Use `deque` as a sliding window: push to back, pop from front to maintain size 3.\n- `deque` supports `dq[2]` — try it. `queue` doesn't.",
+        props: {
+          mainFile: "main.cpp",
+          initialFiles: { "/home/user/main.cpp": QUEUE_CODE },
+        },
+      },
+      {
+        id: "CppLab",
+        mathBridge: "**priority_queue — run it then explore:**\n\n- Push the same value twice — does it appear twice when popping?\n- Change to a min-heap: `priority_queue<int, vector<int>, greater<int>>`.\n- Use a priority_queue to sort: push all elements, pop all — is it sorted?\n- Push `pair<int,string>` — which element has priority? (first field of pair)",
+        props: {
+          mainFile: "main.cpp",
+          initialFiles: { "/home/user/main.cpp": HEAP_CODE },
+        },
+      },
     ],
     callouts: [
       {
         type: "warning",
-        title:
-          "map::operator[] creates entries — use find() for read-only access",
-        body: '`if (m["key"] == 0)` is not a safe way to check if a key is absent. It inserts a zero-valued entry if the key doesn\'t exist. Always use `m.find("key") != m.end()` or `m.count("key")` to check membership, and `m.at("key")` (throws on missing) or `find` for safe read access.',
+        title: "map::operator[] inserts on missing key",
+        body: "`inventory[\"missing\"]` creates a new entry with a default value (0 for int) and returns a reference to it. This silently modifies the map. Use `inventory.find(\"missing\") != inventory.end()` or `inventory.count(\"missing\")` to check without inserting.",
       },
       {
         type: "info",
-        title: "Container complexity summary",
-        body: "vector: O(1) back push/pop, O(n) front; deque: O(1) both ends; map/set: O(log n) all; unordered_map/set: O(1) avg, O(n) worst; priority_queue: O(log n) push/pop, O(1) top; queue/stack: O(1) all (amortized). When in doubt: vector for sequences, unordered_map for lookup tables, priority_queue for scheduling.",
-      },
-      {
-        type: "tip",
-        title: "Use reserve() to avoid rehashing in unordered_map",
-        body: "If you know the approximate number of elements upfront, call `m.reserve(N)` before inserting. This pre-allocates bucket capacity and avoids rehashing — which invalidates all iterators and takes O(n) time. For frequently-looked-up tables built once and read many times, `reserve` is a free win.",
+        title: "Container selection cheat sheet",
+        body: "**vector**: default ordered collection. **unordered_map**: fast key→value lookup. **map**: sorted key→value or range queries. **set**: unique membership, sorted. **unordered_set**: unique membership, fast. **queue**: FIFO task processing. **priority_queue**: always-next-best (heap). **deque**: O(1) push/pop at both ends.",
       },
     ],
   },
 
   examples: [
     {
-      title: "Word frequency counter with map",
-      body: `#include <map>
-#include <sstream>
-#include <string>
-#include <algorithm>
+      title: "Word frequency with unordered_map",
+      body: `string text = "the cat sat on the mat the cat";
+unordered_map<string, int> freq;
+stringstream ss(text);
+string word;
+while (ss >> word) freq[word]++;
 
-std::map<std::string, int> wordFrequency(const std::string& text) {
-    std::map<std::string, int> freq;
-    std::istringstream ss(text);
-    std::string word;
-    while (ss >> word) {
-        // Normalize: lowercase, strip punctuation
-        std::transform(word.begin(), word.end(), word.begin(), ::tolower);
-        word.erase(std::remove_if(word.begin(), word.end(), ::ispunct), word.end());
-        if (!word.empty()) freq[word]++;
-    }
-    return freq;
+for (const auto& [w, c] : freq)
+    cout << w << ": " << c << "\\n";
+// cat: 2, the: 3, sat: 1, ...`,
+    },
+    {
+      title: "Top-K elements with priority_queue",
+      body: `vector<int> data = {5, 3, 8, 1, 9, 2, 7, 4, 6};
+int k = 3;
+
+// Min-heap of size k: keeps k largest
+priority_queue<int, vector<int>, greater<int>> pq;
+for (int x : data) {
+    pq.push(x);
+    if ((int)pq.size() > k) pq.pop();   // evict smallest
 }
 
-// Usage:
-// auto freq = wordFrequency("the cat sat on the mat the cat");
-// for (auto& [w, c] : freq) cout << w << ": " << c << endl;
-// Outputs in sorted order: cat:2, mat:1, on:1, sat:1, the:3`,
-    },
-    {
-      title: "Graph BFS with queue",
-      body: `#include <queue>
-#include <unordered_map>
-#include <unordered_set>
-#include <vector>
-
-std::vector<int> bfs(int start,
-                     const std::unordered_map<int, std::vector<int>>& graph) {
-    std::vector<int> order;
-    std::unordered_set<int> visited;
-    std::queue<int> q;
-
-    q.push(start);
-    visited.insert(start);
-
-    while (!q.empty()) {
-        int node = q.front(); q.pop();
-        order.push_back(node);
-
-        for (int neighbor : graph.at(node)) {
-            if (!visited.count(neighbor)) {
-                visited.insert(neighbor);
-                q.push(neighbor);
-            }
-        }
-    }
-    return order;
-}`,
-    },
-    {
-      title: "LRU cache with map + list",
-      body: `#include <list>
-#include <unordered_map>
-
-class LRUCache {
-    int capacity;
-    std::list<std::pair<int,int>> order;  // front = most recent
-    std::unordered_map<int, std::list<std::pair<int,int>>::iterator> cache;
-
-public:
-    LRUCache(int cap) : capacity(cap) {}
-
-    int get(int key) {
-        auto it = cache.find(key);
-        if (it == cache.end()) return -1;
-        order.splice(order.begin(), order, it->second); // move to front
-        return it->second->second;
-    }
-
-    void put(int key, int value) {
-        if (cache.count(key)) {
-            cache[key]->second = value;
-            order.splice(order.begin(), order, cache[key]);
-        } else {
-            if ((int)order.size() == capacity) {
-                cache.erase(order.back().first);
-                order.pop_back();
-            }
-            order.push_front({key, value});
-            cache[key] = order.begin();
-        }
-    }
-};`,
+cout << "Top " << k << ": ";
+while (!pq.empty()) { cout << pq.top() << " "; pq.pop(); }
+// 7 8 9 (in min-heap order — reverse of arrival)`,
     },
   ],
 
   challenges: [
     {
-      difficulty: "medium",
+      difficulty: "easy",
       problem:
-        'Implement a phone book using `map<string, string>` (name → number). Support: `add(name, number)`, `lookup(name)` (returns number or "Not found"), `remove(name)`, `listAll()` (prints all contacts in alphabetical order). Test with 5+ contacts, look up existing and nonexistent names, remove one, list remaining.',
-      hint: "Use `find()` for safe lookup. `erase(name)` removes a key. Range-for over `map` already gives alphabetical order.",
+        "Word frequency counter using `map<string,int>`. Read a string of words, count each, then print in alphabetical order. Also print the most frequent word. Bonus: use `unordered_map` instead — is the output still alphabetical?",
+      hint: "`map` iterates in sorted key order. For most frequent: iterate and track the max count.",
       walkthrough: [
-        "map<string,string> book;",
-        "add: book[name] = number;",
-        "lookup: auto it = book.find(name); return (it != book.end()) ? it->second : 'Not found'",
-        "remove: book.erase(name);",
-        "listAll: for (const auto& [n, num] : book) cout << n << ': ' << num",
+        "map<string,int> freq; stringstream ss(text); string w; while(ss>>w) freq[w]++;",
+        "for (auto& [w,c] : freq) cout << w << \": \" << c;",
+        "Max: iterate and track pair with highest value",
+        "With unordered_map: same logic, but output order is undefined",
       ],
     },
     {
-      difficulty: "hard",
+      difficulty: "medium",
       problem:
-        "Build a task scheduler with priorities. Use `priority_queue<pair<int,string>, vector<pair<int,string>>, greater<>>` as a min-heap (lower number = higher priority). Implement `addTask(priority, description)` and `processAll()` that prints tasks in priority order. Add 6 tasks with mixed priorities. Then extend: support 'delayed tasks' — tasks that become available only after a tick count. Use a second `priority_queue<pair<int,string>>` for pending tasks where first = available-tick.",
-      hint: "For the delayed extension, `runTick(int tick)` moves tasks from the pending queue to the ready queue if their available-tick <= current tick.",
+        "Implement a priority task queue. Each task has a `string name` and `int priority`. Use `priority_queue<pair<int,string>>` where higher int = higher priority. Write `addTask(priority, name)` and `processNext()` which prints and removes the highest-priority task. Test with 5 tasks of mixed priorities.",
+      hint: "`pair<int,string>` compares by first element (priority) first. Max-heap gives highest priority first. `pq.top().second` is the task name.",
       walkthrough: [
-        "using Task = pair<int,string>; priority_queue<Task, vector<Task>, greater<Task>> ready;",
-        "addTask: ready.push({priority, desc});",
-        "processAll: while (!ready.empty()) { auto [p,d] = ready.top(); ready.pop(); cout << p << ': ' << d; }",
-        "Delayed: struct DelayedTask { int tick; int priority; string desc; };",
-        "runTick: while (!pending.empty() && pending.top().tick <= tick) { move to ready }",
+        "priority_queue<pair<int,string>> pq;",
+        "addTask: pq.push({priority, name});",
+        "processNext: if empty return; cout << pq.top().second; pq.pop();",
+        "Test: add 5 tasks with priorities 1,5,3,2,4; process all",
       ],
     },
   ],
@@ -281,58 +254,58 @@ public:
       {
         id: "cpp1-008-q1",
         type: "choice",
-        text: 'What does `myMap["key"]` do if "key" does not exist in the map?',
+        text: "What does `inventory[\"missing_key\"]` do on a `map<string,int>`?",
         options: [
-          "Returns a default-constructed value without modifying the map",
-          'Inserts a default-constructed entry for "key" and returns a reference to it',
-          "Throws `std::out_of_range`",
-          "Returns `end()` iterator",
+          "Returns 0 without modifying the map",
+          "Throws an exception",
+          "Inserts a new entry with value 0 and returns a reference to it",
+          "Returns end() iterator",
         ],
-        answer: 1,
+        answer: 2,
         explanation:
-          "`operator[]` on a `map` performs insert-if-absent: if the key doesn't exist, it inserts a default-constructed value (0 for int) and returns a reference to that new entry. This is why `map[key]++` works as a counter but `if (map[key] == 0)` is not a safe absence check — it creates the entry.",
+          "`map::operator[]` inserts a default-constructed value if the key doesn't exist. For `int`, that's 0. The map is modified. Use `.find()` or `.count()` to check without inserting.",
       },
       {
         id: "cpp1-008-q2",
         type: "choice",
-        text: "What is the average-case time complexity of lookup in `unordered_map` vs `map`?",
+        text: "What is the time complexity difference between `map` and `unordered_map` for lookup?",
         options: [
-          "Both O(log n)",
-          "unordered_map: O(1) average; map: O(log n)",
-          "unordered_map: O(n) average; map: O(1)",
-          "Both O(1)",
+          "Both are O(1)",
+          "map is O(log n); unordered_map is O(1) average",
+          "Both are O(log n)",
+          "map is O(1); unordered_map is O(n) worst case",
         ],
         answer: 1,
         explanation:
-          "`unordered_map` uses a hash table — average O(1) for find/insert/erase but O(n) worst case on hash collisions. `map` uses a red-black tree — always O(log n) for all operations, iteration in sorted key order. Choose `unordered_map` for raw speed, `map` when sorted order or range queries matter.",
+          "`map` is a red-black tree: O(log n) for insert, find, erase. `unordered_map` is a hash table: O(1) average, O(n) worst case (hash collisions). For most use cases, `unordered_map` is 3-10x faster.",
       },
       {
         id: "cpp1-008-q3",
         type: "choice",
-        text: "What is the output order of `priority_queue<int> pq` after pushing 3, 1, 4, 1, 5, 9 and popping all?",
+        text: "What does `priority_queue<int>` pop first?",
         options: [
-          "3 1 4 1 5 9 (insertion order)",
-          "1 1 3 4 5 9 (ascending)",
-          "9 5 4 3 1 1 (descending — max first)",
-          "9 1 5 1 4 3 (heap internal order)",
+          "The smallest element (min-heap)",
+          "The first element inserted (FIFO)",
+          "The largest element (max-heap by default)",
+          "A random element",
         ],
         answer: 2,
         explanation:
-          "`priority_queue<int>` is a max-heap: `top()` always returns the largest element. Popping all elements produces descending order: 9, 5, 4, 3, 1, 1. For ascending order (min first), use `priority_queue<int, vector<int>, greater<int>>`.",
+          "`priority_queue` is a max-heap by default — `.top()` and `.pop()` give the largest element. For a min-heap: `priority_queue<int, vector<int>, greater<int>>`.",
       },
       {
         id: "cpp1-008-q4",
         type: "choice",
-        text: "Which container would you choose to implement a sliding window minimum over a stream of integers?",
+        text: "What makes `set<T>` different from `vector<T>` with duplicates removed?",
         options: [
-          "std::set — to maintain sorted order and get minimum with begin()",
-          "std::queue — because it's a queue",
-          "std::map — for key-value mapping",
-          "std::priority_queue — for O(1) minimum",
+          "set is faster for all operations",
+          "set automatically maintains sorted order and enforces uniqueness with O(log n) insert/find",
+          "set supports random access by index",
+          "set uses less memory",
         ],
-        answer: 0,
+        answer: 1,
         explanation:
-          "`std::set` (or `std::multiset` if duplicates can occur) maintains sorted order — the minimum is always at `*begin()`. When the window slides, remove the outgoing element with `erase()` and insert the incoming one. All operations are O(log n). A `priority_queue` can't efficiently remove arbitrary elements (only top).",
+          "`set` maintains sorted order (red-black tree) and enforces uniqueness at insertion time — duplicates are silently ignored. O(log n) insert and find. `vector` requires manual deduplication and sorting. Use `unordered_set` for O(1) membership without ordering.",
       },
     ],
   },

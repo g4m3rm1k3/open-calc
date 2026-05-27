@@ -203,17 +203,10 @@ export const COURSES = [
     color: "slate",
   },
   {
-    key: "cpp-0",
+    key: "cpp",
     label: "C++ Programming",
-    path: "/course/cpp-0",
-    desc: "Write, Compile & Run — C++ from First Principles",
-    color: "blue",
-  },
-  {
-    key: "cpp-1",
-    label: "C++ Intermediate",
-    path: "/course/cpp-1",
-    desc: "Classes, RAII, Templates, Smart Pointers & Modern C++",
+    path: "/course/cpp",
+    desc: "Zero to Software Engineer — Complete C++ Mastery",
     color: "blue",
   },
 ];

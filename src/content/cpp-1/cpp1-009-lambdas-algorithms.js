@@ -1,79 +1,110 @@
-const LAMBDA_CODE = `#include <iostream>
+const LAMBDA_BASIC_CODE = `#include <iostream>
+using namespace std;
+
+// __OUTPUT__: square(5)=25\\naddOffset(7)=17\\nfactor=3 multiply(5)=15
+
+int main() {
+    // Lambda: [capture](params) -> rettype { body }
+    auto square = [](int x) { return x * x; };
+    cout << "square(5)=" << square(5) << "\\n";
+
+    // Capture by value: copy at lambda creation time
+    int offset = 10;
+    auto addOffset = [offset](int x) { return x + offset; };
+    cout << "addOffset(7)=" << addOffset(7) << "\\n";
+
+    // Capture by reference: reads current value of factor
+    int factor = 3;
+    auto multiply = [&factor](int x) { return x * factor; };
+    cout << "factor=3 multiply(5)=" << multiply(5) << "\\n";
+
+    return 0;
+}`;
+
+const CAPTURE_CODE = `#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+// __OUTPUT__: after [&] total: 55\\nby value: counter=0 (copy)\\nmutable: counter=5
+
+int main() {
+    vector<int> nums = {1,2,3,4,5,6,7,8,9,10};
+
+    // [&] captures all locals by reference
+    int total = 0;
+    for_each(nums.begin(), nums.end(), [&](int x){ total += x; });
+    cout << "after [&] total: " << total << "\\n";
+
+    // [=] captures by value — lambda has its own copy
+    int counter = 0;
+    auto fn = [counter]() mutable { counter++; return counter; };
+    fn(); fn(); fn(); fn(); fn();
+    cout << "by value: counter=" << counter << " (copy)\\n";
+
+    // mutable: allows modifying the lambda's captured copy
+    auto counter2 = [c=0]() mutable { return ++c; };
+    for (int i=0; i<5; i++) counter2();
+    cout << "mutable: counter=" << counter2() << "\\n";
+
+    return 0;
+}`;
+
+const ALGO_CODE = `#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <numeric>
+using namespace std;
+
+// __OUTPUT__: evens: 2 4 6 8 10\\nsquares: 1 4 9 16 25\\nsum=55  max=10
+
+int main() {
+    vector<int> nums = {1,2,3,4,5,6,7,8,9,10};
+
+    // copy_if: filter into new vector
+    vector<int> evens;
+    copy_if(nums.begin(), nums.end(), back_inserter(evens),
+            [](int x){ return x % 2 == 0; });
+    cout << "evens: ";
+    for (int e : evens) cout << e << " ";
+    cout << "\\n";
+
+    // transform: map each element to its square
+    vector<int> squares(5);
+    transform(nums.begin(), nums.begin()+5, squares.begin(),
+              [](int x){ return x * x; });
+    cout << "squares: ";
+    for (int s : squares) cout << s << " ";
+    cout << "\\n";
+
+    int sum = accumulate(nums.begin(), nums.end(), 0);
+    int mx  = *max_element(nums.begin(), nums.end());
+    cout << "sum=" << sum << "  max=" << mx << "\\n";
+
+    return 0;
+}`;
+
+const STDFUNC_CODE = `#include <iostream>
 #include <vector>
 #include <algorithm>
 #include <functional>
-#include <numeric>
-#include <string>
 using namespace std;
 
-// __OUTPUT__: --- Lambda basics ---\\nSquare of 5: 25\\nAdd 10 to 7: 17\\n--- Capture modes ---\\nMultiplier x3: 15\\nRunning total: 55\\n--- STL algorithms with lambdas ---\\nEvens: 2 4 6 8 10 \\nSquares: 1 4 9 16 25 \\nSum: 55\\nMax: 10\\n--- Sorting with custom comparator ---\\nalice (92)\\nbob (88)\\ncharlie (75)\\n--- std::function ---\\nApply double: 10\\nApply square: 25
+// __OUTPUT__: charlie(75)\\nalice(92)\\nbob(88)  — wait, sorted desc\\nalice(92) bob(88) charlie(75)\\ndouble: 10\\nsquare: 25
 
 int main() {
-    // ── Lambda syntax: [capture](params) -> return { body } ───
-    cout << "--- Lambda basics ---" << endl;
-    auto square = [](int x) { return x * x; };
-    cout << "Square of 5: " << square(5) << endl;
-
-    int offset = 10;
-    auto addOffset = [offset](int x) { return x + offset; };  // capture by value
-    cout << "Add 10 to 7: " << addOffset(7) << endl;
-
-    // ── Capture modes ─────────────────────────────────────────
-    cout << "--- Capture modes ---" << endl;
-    int factor = 3;
-    auto multiply = [&factor](int x) { return x * factor; };  // capture by ref
-    cout << "Multiplier x3: " << multiply(5) << endl;
-
-    int total = 0;
-    vector<int> nums = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    for_each(nums.begin(), nums.end(), [&total](int x) { total += x; });
-    cout << "Running total: " << total << endl;
-
-    // ── STL algorithms with lambdas ───────────────────────────
-    cout << "--- STL algorithms with lambdas ---" << endl;
-
-    // copy_if: filter evens into new vector
-    vector<int> evens;
-    copy_if(nums.begin(), nums.end(), back_inserter(evens),
-            [](int x) { return x % 2 == 0; });
-    cout << "Evens: ";
-    for (int e : evens) cout << e << " ";
-    cout << endl;
-
-    // transform: squares in-place
-    vector<int> squares(nums.size());
-    transform(nums.begin(), nums.end(), squares.begin(),
-              [](int x) { return x * x; });
-    cout << "Squares: ";
-    for (int s : squares) cout << s << " ";
-    cout << endl;
-
-    // accumulate: sum
-    int sum = accumulate(nums.begin(), nums.end(), 0,
-                         [](int acc, int x) { return acc + x; });
-    cout << "Sum: " << sum << endl;
-
-    // max_element
-    auto maxIt = max_element(nums.begin(), nums.end());
-    cout << "Max: " << *maxIt << endl;
-
-    // ── Sorting with custom comparator ────────────────────────
-    cout << "--- Sorting with custom comparator ---" << endl;
-    vector<pair<string, int>> students = {
-        {"charlie", 75}, {"alice", 92}, {"bob", 88}
-    };
+    // Sort with custom comparator lambda
+    vector<pair<string,int>> students = {{"charlie",75},{"alice",92},{"bob",88}};
     sort(students.begin(), students.end(),
-         [](const auto& a, const auto& b) { return a.second > b.second; }); // desc score
-    for (const auto& [name, score] : students)
-        cout << name << " (" << score << ")" << endl;
+         [](const auto& a, const auto& b){ return a.second > b.second; });
+    for (const auto& [n,s] : students) cout << n << "(" << s << ") ";
+    cout << "\\n";
 
-    // ── std::function: type-erased callable ───────────────────
-    cout << "--- std::function ---" << endl;
-    function<int(int)> fn;
-    fn = [](int x) { return x * 2; };
-    cout << "Apply double: " << fn(5) << endl;
-    fn = [](int x) { return x * x; };   // reassign to different lambda
-    cout << "Apply square: " << fn(5) << endl;
+    // std::function: type-erased callable — store any callable
+    function<int(int)> fn = [](int x){ return x * 2; };
+    cout << "double: " << fn(5) << "\\n";
+    fn = [](int x){ return x * x; };   // reassign to different lambda
+    cout << "square: " << fn(5) << "\\n";
 
     return 0;
 }`;
@@ -84,55 +115,44 @@ const lesson = {
   chapter: "cpp-1",
   order: 9,
   title: "Lambdas and STL Algorithms",
-  subtitle:
-    "Write expressive, functional-style code with lambda expressions and the STL algorithm library",
-  tags: [
-    "c++",
-    "cpp",
-    "lambda",
-    "algorithm",
-    "std::function",
-    "capture",
-    "transform",
-    "sort",
-    "accumulate",
-    "functional",
-  ],
+  subtitle: "Inline functions, capture modes, and expressive algorithm composition",
+  tags: ["c++", "cpp", "lambda", "algorithm", "std::function", "capture", "transform", "accumulate"],
   aliases: [
     "c++ lambda",
-    "c++ lambda expression",
+    "c++ lambdas",
+    "c++ algorithm",
     "c++ std::function",
-    "c++ transform algorithm",
-    "c++ sort with comparator",
-    "c++ accumulate",
+    "c++ capture modes",
     "c++ functional programming",
   ],
 
-  hook: `Before C++11, passing behavior to algorithms meant writing named function objects (functors) or free functions. Lambdas changed everything: define behavior exactly where you need it, capture local variables, and pass the result directly to \`sort\`, \`transform\`, \`filter\`. Combined with the STL algorithm library, lambdas let you express data transformation pipelines in a few lines that would otherwise take loops, temporaries, and bookkeeping.`,
+  hook: `Lambdas let you write a function exactly where you need it — no name, no declaration, just logic. Combined with STL algorithms, they turn verbose loops into one-liner expressions that say what they mean: 'filter these', 'transform those', 'accumulate this'. This is expressive, efficient code.`,
 
   mentalModel: [
-    "**A lambda is an anonymous function object.** `[capture](params) { body }` creates an unnamed object whose `operator()` is the body. The compiler generates a unique class for each lambda. Because it's an object, it can capture local state — this is what differentiates lambdas from plain function pointers. `auto f = [x](int y) { return x + y; }` is sugar for a generated class with an `x` member and `operator()(int y)`.",
-    "**Capture by value vs reference.** `[x]` captures `x` by value at the time of the lambda's creation — later changes to `x` don't affect the lambda. `[&x]` captures by reference — the lambda sees changes to `x` and can modify it. `[=]` captures everything in scope by value; `[&]` captures everything by reference; `[=, &x]` mixes (everything by value except `x` by reference). Prefer explicit captures over `[=]`/`[&]` to make dependencies visible.",
-    "**`std::function<R(Args...)>` is a type-erased callable.** A lambda's actual type is compiler-generated and unnamed — you can't spell it. `std::function<int(int)>` accepts any callable (lambda, free function, functor) that takes `int` and returns `int`. Use `std::function` for storing callables in containers, callback fields, or function parameters that must accept different callables. But: `std::function` has overhead (heap allocation, virtual dispatch) — prefer `auto` or template parameters when the callable type is known at compile time.",
+    "**Lambda syntax: `[capture](params) { body }`.** The capture list specifies which outer variables the lambda can use: `[]` captures nothing, `[x]` copies `x`, `[&x]` references `x`, `[=]` copies all, `[&]` references all. Captured variables are baked into the lambda at its creation point.",
+    "**Capture by value copies at lambda creation; capture by reference reads current value.** `int x = 5; auto f = [x]{ return x; }; x = 10; f()` returns `5` (captured old value). `auto g = [&x]{ return x; }; x = 10; g()` returns `10` (references current x).",
+    "**`std::function<R(Args)>` stores any callable.** Unlike a concrete lambda type (which is unique and anonymous), `std::function` can hold a lambda, function pointer, or functor. Use it when you need to store or pass callables of a specific signature. It has overhead vs raw lambdas — only use it when you need the flexibility.",
   ],
 
   intuition: {
     prose: [
-      "**STL algorithms vs hand-rolled loops.** `std::sort(v.begin(), v.end(), cmp)` — the standard library sort is introsort: O(n log n) worst case, in-place, highly optimized. The hand-rolled bubble sort you'd write is O(n²). More importantly, algorithms *communicate intent*: `copy_if` tells the reader 'filter this range'; `transform` tells the reader 'map this range'; a raw loop says 'do something'. Algorithm names are documentation.",
-      "**`back_inserter` and output iterators.** Many algorithms take an output range. `copy_if(src.begin(), src.end(), back_inserter(dest), pred)` uses `back_inserter(dest)` — an iterator adaptor that calls `dest.push_back()` each time the algorithm writes to it. Without `back_inserter`, you'd need to pre-size `dest`. Other output adaptors: `front_inserter` (calls `push_front`), `inserter(c, pos)` (inserts at position).",
-      "**Mutable lambdas.** By default, value-captured variables are `const` inside the lambda — you can't modify the captured copy. `[x]() mutable { x++; return x; }` adds `mutable`, removing the `const` on the generated `operator()`. The capture is still a copy — changes don't affect the original `x`. Mutable lambdas are useful for stateful generators.",
-      "**Generic lambdas (C++14+).** `[](auto x, auto y) { return x + y; }` uses `auto` parameters — the compiler generates a templated `operator()`. This works with any types that support `+`. Combined with `std::transform`, you get behavior that adapts to the element type. C++20 adds explicit template parameters in lambdas: `[]<typename T>(T x) { ... }`.",
+      "**Lambdas are anonymous functions.** `auto square = [](int x){ return x*x; }` creates a closure and stores it in `square`. You call it like a function: `square(5)`. Lambdas passed to `sort`, `find_if`, `copy_if` replace the verbose functor pattern from pre-C++11.",
     ],
     visualizations: [
       {
         id: "CppLab",
-        mathBridge:
-          "**Build algorithm pipelines:**\n\n1. Compile and run — trace lambda captures and algorithm outputs\n2. Write a lambda that returns true if a string length > 4, use `copy_if` to filter a string vector\n3. Use `sort` with a lambda to sort strings by length (shortest first)\n4. Chain: filter evens, transform to squares, accumulate — three-step pipeline\n5. Write a `makeAdder(int n)` function that returns a lambda capturing `n`\n6. Store lambdas in a `vector<function<int(int)>>` and apply each to 5",
+        mathBridge: "**Lambda basics — run it then explore:**\n\n- Change `offset = 10` to `offset = 100` after the lambda is created. What does `addOffset(7)` return? (Still 17 — captured by value)\n- Change `[offset]` to `[&offset]` — now what happens?\n- Add a lambda that takes two ints and returns the larger one.\n- Try `auto fn = [](auto x){ return x*x; }` — generic lambda (C++14). Call with int and double.",
         props: {
           mainFile: "main.cpp",
-          initialFiles: {
-            "/home/user/main.cpp": LAMBDA_CODE,
-          },
+          initialFiles: { "/home/user/main.cpp": LAMBDA_BASIC_CODE },
+        },
+      },
+      {
+        id: "CppLab",
+        mathBridge: "**Capture modes — run it then explore:**\n\n- Change `[&]` to `[=]` in the for_each. Does total get updated? (No — captured by value)\n- Demonstrate dangling reference: create a lambda capturing `[&x]` where `x` is a local, then call the lambda after `x`'s scope ends.\n- `[c=0]` is an init-capture — initializes a new variable in the lambda. Try `[sum=0, &nums]() mutable { for (int x:nums) sum+=x; return sum; }`.",
+        props: {
+          mainFile: "main.cpp",
+          initialFiles: { "/home/user/main.cpp": CAPTURE_CODE },
         },
       },
     ],
@@ -140,132 +160,105 @@ const lesson = {
 
   rigor: {
     prose: [
-      "**Dangling reference captures.** `[&]` capturing a local variable by reference creates a dangling reference if the lambda outlives the variable's scope. The classic bug: returning a lambda that captured a local by reference. `auto f = [&x]() { return x; }; return f;` — when `f` is called, `x` is gone. Rule: only capture by reference if the lambda's lifetime is strictly shorter than the captured variable's. For lambdas returned from functions or stored in data structures, capture by value.",
-      "**`std::function` overhead vs templates.** A template parameter `template<typename F> void apply(F f, int x)` is zero overhead — the compiler sees the concrete type and can inline. `std::function<int(int)>` uses type erasure (typically a `void*` + function pointer, or small-buffer optimization) — it may heap-allocate and can't be inlined. For hot paths, prefer template parameters. Use `std::function` when you need to store the callable in a data structure, pass across translation unit boundaries, or the template parameter would infect a class.",
-      "**Parallel algorithms (C++17).** `std::sort(std::execution::par, v.begin(), v.end())` runs in parallel on multiple threads. Add `#include <execution>` and link with TBB on some platforms. Available policies: `seq` (sequential), `par` (parallel), `par_unseq` (parallel + SIMD). The lambda/comparator must be thread-safe (no shared mutable state). This is the closest C++ gets to data parallelism without explicit threading.",
+      "**Algorithm + lambda = expressive pipeline.** `copy_if(begin, end, out, pred)` copies elements satisfying pred. `transform(begin, end, out, func)` applies func to each element. `accumulate(begin, end, init, func)` folds left. Combined: `accumulate(evens.begin(), evens.end(), 0, [](int a, int x){ return a + x*x; })` — sum of squares of even numbers in one expression.",
+      "**`std::function` has overhead.** It uses type erasure — virtual dispatch under the hood. A concrete lambda is inlined by the compiler (zero overhead). `std::function` prevents inlining and adds a heap allocation for large closures. Only use `std::function` when you need to store callables of different types with the same signature (callbacks, plugin systems).",
+    ],
+    visualizations: [
+      {
+        id: "CppLab",
+        mathBridge: "**Algorithms with lambdas — run it then explore:**\n\n- Chain: filter evens, then transform squares, then accumulate sum — what's the sum of squares of evens from 1-10?\n- Use `count_if(nums.begin(), nums.end(), [](int x){ return x>5; })` — how many are > 5?\n- `any_of(nums.begin(), nums.end(), [](int x){ return x>9; })` — is any element > 9?\n- `remove_if` + `erase` to remove all odd numbers in-place.",
+        props: {
+          mainFile: "main.cpp",
+          initialFiles: { "/home/user/main.cpp": ALGO_CODE },
+        },
+      },
+      {
+        id: "CppLab",
+        mathBridge: "**std::function and sort comparator — run it then explore:**\n\n- Sort alphabetically: `[](const auto& a, const auto& b){ return a.first < b.first; }`.\n- Store a function in a `map<string, function<int(int)>>`: `ops[\"double\"] = [](int x){ return x*2; };`\n- Use `std::function` as a callback: `void doWork(function<void(int)> callback)` — call it with a lambda.\n- What happens if you assign `nullptr` to a `std::function` and call it? (throws bad_function_call)",
+        props: {
+          mainFile: "main.cpp",
+          initialFiles: { "/home/user/main.cpp": STDFUNC_CODE },
+        },
+      },
     ],
     callouts: [
       {
         type: "warning",
-        title:
-          "Never capture local variables by reference in a lambda that outlives them",
-        body: "Returning a `[&]` lambda, storing it in a class field, or passing it to an async operation while the captured variables are on the stack creates a dangling reference. The lambda appears to work locally but crashes or corrupts memory when called later. Capture by value (`[=]` or explicit `[x, y]`) for any lambda that might outlive the current scope.",
-      },
-      {
-        type: "info",
-        title: "Algorithm complexity cheat sheet",
-        body: "`sort`: O(n log n); `stable_sort`: O(n log² n); `find`/`find_if`: O(n); `binary_search`/`lower_bound` (sorted range): O(log n); `copy_if`/`transform`/`for_each`: O(n); `accumulate`: O(n); `min_element`/`max_element`: O(n); `nth_element` (partial sort): O(n) average.",
+        title: "Capturing local variables by reference in long-lived lambdas",
+        body: "If a lambda captures a local by reference `[&x]` and outlives the scope where `x` was defined, the reference dangles. Symptom: accessing a freed stack address — undefined behavior. If the lambda might outlive the scope, capture by value `[x]` instead.",
       },
       {
         type: "tip",
-        title: "Use ranges (C++20) for composable pipelines",
-        body: "C++20 ranges allow composing algorithms without intermediate vectors: `auto result = v | views::filter([](int x){ return x%2==0; }) | views::transform([](int x){ return x*x; });`. This is lazy — elements are processed one at a time, no temporary containers. If you're on C++20, prefer ranges over chained algorithm calls for readability and efficiency.",
+        title: "Use [&] carefully — prefer explicit captures",
+        body: "`[&]` captures everything by reference — convenient but makes it easy to accidentally create dangling references or unexpected side effects. In long-lived lambdas or callbacks, list captures explicitly: `[&total, &count]` makes the dependencies visible.",
       },
     ],
   },
 
   examples: [
     {
-      title: "Function factory: closures returning lambdas",
-      body: `// Functions that return lambdas — closures
-auto makeMultiplier(int factor) {
-    return [factor](int x) { return x * factor; };  // captures factor by value
-}
+      title: "Pipeline: filter → transform → accumulate",
+      body: `vector<int> nums = {1,2,3,4,5,6,7,8,9,10};
 
-auto makeRangePredicate(int lo, int hi) {
-    return [lo, hi](int x) { return x >= lo && x <= hi; };
-}
+// Filter: keep only evens
+vector<int> evens;
+copy_if(nums.begin(), nums.end(), back_inserter(evens),
+        [](int x){ return x%2==0; });
 
-// Usage:
-auto triple = makeMultiplier(3);
-auto inRange = makeRangePredicate(10, 20);
+// Transform: square each even
+transform(evens.begin(), evens.end(), evens.begin(),
+          [](int x){ return x*x; });
 
-std::vector<int> data = {5, 12, 18, 25, 3, 15};
-std::vector<int> result;
-std::copy_if(data.begin(), data.end(), std::back_inserter(result), inRange);
-// result = {12, 18, 15}
-
-std::transform(result.begin(), result.end(), result.begin(), triple);
-// result = {36, 54, 45}`,
+// Accumulate: sum of squares of evens
+int result = accumulate(evens.begin(), evens.end(), 0);
+// evens: {4,16,36,64,100} → sum = 220`,
     },
     {
-      title: "Pipeline: filter → transform → reduce",
-      body: `#include <vector>
-#include <algorithm>
-#include <numeric>
-
-// Process pipeline: keep positives, square them, sum
-int sumSquaredPositives(const std::vector<int>& data) {
-    std::vector<int> positives;
-    std::copy_if(data.begin(), data.end(), std::back_inserter(positives),
-                 [](int x) { return x > 0; });
-
-    std::vector<int> squared(positives.size());
-    std::transform(positives.begin(), positives.end(), squared.begin(),
-                   [](int x) { return x * x; });
-
-    return std::accumulate(squared.begin(), squared.end(), 0);
+      title: "Generic higher-order functions",
+      body: `template<typename T, typename Pred>
+vector<T> filter(const vector<T>& v, Pred pred) {
+    vector<T> result;
+    copy_if(v.begin(), v.end(), back_inserter(result), pred);
+    return result;
 }
 
-// C++20 ranges version (lazy, no intermediate containers):
-// auto result = data | views::filter([](int x){ return x > 0; })
-//                    | views::transform([](int x){ return x*x; });
-// int sum = ranges::fold_left(result, 0, plus<>{});`,
-    },
-    {
-      title: "Event system with std::function callbacks",
-      body: `#include <functional>
-#include <vector>
-#include <string>
+template<typename T, typename F>
+auto map_each(const vector<T>& v, F f) {
+    vector<decltype(f(v[0]))> result;
+    transform(v.begin(), v.end(), back_inserter(result), f);
+    return result;
+}
 
-class Button {
-    std::vector<std::function<void(const std::string&)>> handlers;
-public:
-    // Register any callable: lambda, function, functor
-    void onClick(std::function<void(const std::string&)> handler) {
-        handlers.push_back(std::move(handler));
-    }
-
-    void click(const std::string& label) {
-        for (auto& h : handlers) h(label);
-    }
-};
-
-// Usage:
-// Button btn;
-// btn.onClick([](const std::string& l){ cout << "Clicked: " << l; });
-// int count = 0;
-// btn.onClick([&count](const std::string&){ count++; });
-// btn.click("OK");   // fires all handlers`,
+auto odds   = filter(nums, [](int x){ return x%2!=0; });
+auto cubed  = map_each(odds, [](int x){ return x*x*x; });`,
     },
   ],
 
   challenges: [
     {
-      difficulty: "medium",
+      difficulty: "easy",
       problem:
-        "Write a generic `pipeline` function: `template<typename T, typename... Transforms>` that takes a `vector<T>` and any number of transform functions (lambdas). Each transform takes and returns a `vector<T>`. Chain them: the output of each becomes the input of the next. Test with: filter evens → square each → keep only values < 50 → sort descending. Start with `{1,2,3,4,5,6,7,8,9,10}`.",
-      hint: "Use a fold: `auto result = data; for each transform: result = transform(result); return result;`. For variadic, use `(result = transforms(result), ...)` fold expression.",
+        "Given a vector of strings, use STL algorithms with lambdas to: (1) filter strings longer than 4 chars into a new vector, (2) transform all filtered strings to uppercase (loop `toupper` per char), (3) sort alphabetically, (4) print the result. Use `copy_if`, `transform`, `sort`.",
+      hint: "`copy_if` with `s.length() > 4`. For uppercase: `transform(s.begin(), s.end(), s.begin(), ::toupper)` on each string.",
       walkthrough: [
-        "template<typename T> auto pipeline(vector<T> v) { return v; }",
-        "template<typename T, typename F, typename... Rest> auto pipeline(vector<T> v, F fn, Rest... rest)",
-        "{ return pipeline(fn(v), rest...); }",
-        "Transform 1: copy_if for evens",
-        "Transform 2: transform for squares",
-        "Transform 3: copy_if for < 50",
-        "Transform 4: sort with greater<T>{}",
+        "copy_if with length > 4 predicate",
+        "for each string in result: transform chars to uppercase",
+        "sort(result.begin(), result.end())",
+        "Print with for loop",
       ],
     },
     {
-      difficulty: "hard",
+      difficulty: "medium",
       problem:
-        "Build a memoization wrapper: `template<typename F> auto memoize(F fn)` that returns a new function with the same signature but caches results by argument. Test with a slow Fibonacci implementation: `auto fib = memoize([&](int n) -> long long { return n <= 1 ? n : fib(n-1) + fib(n-2); })`. Without memoization, `fib(40)` takes seconds. With it, nearly instant. Hint: use `std::unordered_map` for the cache, and `std::function` for the recursive reference.",
-      hint: "The cache map lives in the returned lambda's capture. `std::function<long long(int)> fib` must be declared before the lambda to allow recursive capture by reference.",
+        "Write a `compose` function that takes two `function<int(int)>` callables and returns a new function that applies the second then the first: `compose(f, g)(x) == f(g(x))`. Test with `double_it` and `square`. Then compose three functions.",
+      hint: "`function<int(int)> compose(function<int(int)> f, function<int(int)> g) { return [f,g](int x){ return f(g(x)); }; }`",
       walkthrough: [
-        "template<typename R, typename Arg> auto memoize(function<R(Arg)> fn)",
-        "{ unordered_map<Arg, R> cache; return [fn, cache](Arg x) mutable -> R { if (cache.count(x)) return cache[x]; return cache[x] = fn(x); }; }",
-        "For recursive: declare `function<long long(int)> fib;` first",
-        "Then: `fib = memoize<long long,int>([&fib](int n) -> long long { return n<=1 ? n : fib(n-1)+fib(n-2); });`",
+        "function<int(int)> compose(function<int(int)> f, function<int(int)> g)",
+        "Return [f,g](int x){ return f(g(x)); };",
+        "auto double_it = [](int x){ return x*2; }",
+        "auto square = [](int x){ return x*x; }",
+        "compose(double_it, square)(5) == double_it(square(5)) == 50",
+        "Three-way: compose(double_it, compose(square, double_it))(3) == ?",
       ],
     },
   ],
@@ -275,58 +268,58 @@ public:
       {
         id: "cpp1-009-q1",
         type: "choice",
-        text: "What does `[&x, y]` in a lambda capture list mean?",
+        text: "What does `[x]` in a lambda capture mean?",
         options: [
-          "Capture x and y both by reference",
-          "Capture x by reference and y by value",
-          "Capture x by value and y by reference",
-          "Capture everything by reference except y",
+          "x is captured by reference — changes to x inside the lambda affect x outside",
+          "x is captured by value — the lambda gets a copy of x's value at capture time",
+          "x is passed as a parameter when the lambda is called",
+          "x is a return value of the lambda",
         ],
         answer: 1,
         explanation:
-          "`[&x, y]` captures `x` by reference (changes to `x` are visible in the lambda, and the lambda can modify `x`) and `y` by value (a copy of `y` at the time of lambda creation). `&` before a variable name means capture that variable by reference.",
+          "Capture by value `[x]` copies x's value at the time the lambda is created. Later changes to the outer x don't affect the lambda's copy. Capture by reference `[&x]` accesses the current value of x.",
       },
       {
         id: "cpp1-009-q2",
         type: "choice",
-        text: "What is the risk of `[&]` capture in a lambda returned from a function?",
+        text: "What happens to `total` after `for_each(nums.begin(), nums.end(), [=total](int x){ total += x; })`?",
         options: [
-          "The lambda will be too slow due to reference indirection",
-          "Local variables captured by reference become dangling when the function returns — the lambda holds references to destroyed stack variables",
-          "The lambda cannot be stored in std::function",
-          "The compiler will reject the lambda",
+          "total is updated to the sum of all elements",
+          "total is unchanged — [=] captures by value, the lambda modifies its own copy",
+          "Compile error — cannot capture with =",
+          "total is set to the last element",
         ],
         answer: 1,
         explanation:
-          "If you `return [&]() { return localVar; }`, the returned lambda holds a reference to `localVar` — but `localVar` lives on the function's stack frame, which is gone when the function returns. Calling the lambda later reads a dangling reference — undefined behavior. Capture by value `[=]` or `[localVar]` for lambdas that outlive the current scope.",
+          "`[=total]` (or `[=]`) captures total by value. The lambda modifies its own copy — the outer `total` is unchanged. To update the outer total, use `[&total]` or `[&]`.",
       },
       {
         id: "cpp1-009-q3",
         type: "choice",
-        text: "When should you prefer `std::function<int(int)>` over a template parameter for a callable?",
+        text: "What does `copy_if(begin, end, back_inserter(result), pred)` do?",
         options: [
-          "Always — std::function is the modern, recommended way",
-          "When you need to store callables in a data structure or field, or accept different callable types at runtime",
-          "When performance is critical — std::function has less overhead",
-          "Never — template parameters are always better",
+          "Copies elements that do NOT satisfy pred into result",
+          "Copies elements that satisfy pred into result",
+          "Returns a new container with elements satisfying pred",
+          "Modifies elements in [begin, end) that satisfy pred",
         ],
         answer: 1,
         explanation:
-          "Template parameters (`template<typename F> void apply(F f)`) are zero-overhead (compiler sees concrete type, can inline) but can't be stored in containers or class fields. `std::function` adds type erasure overhead but enables storing and passing heterogeneous callables. Use templates for algorithm parameters; `std::function` for callbacks, event handlers, and stored callables.",
+          "`copy_if` copies elements from [begin, end) for which pred returns true, appending to the output iterator. `back_inserter(result)` is an iterator that calls `result.push_back()` for each copied element.",
       },
       {
         id: "cpp1-009-q4",
         type: "choice",
-        text: "What does `std::transform(v.begin(), v.end(), v.begin(), [](int x){ return x*2; })` do?",
+        text: "When should you prefer `std::function<T>` over a raw lambda?",
         options: [
-          "Creates a new vector with doubled values",
-          "Doubles each element in v in-place (output range = input range)",
-          "Returns the sum of doubled values",
-          "Filters elements where x*2 is true",
+          "Always — std::function is faster",
+          "When you need to store callables of the same signature in a variable, container, or function parameter",
+          "When the lambda captures variables by reference",
+          "std::function is never needed — lambdas cover all cases",
         ],
         answer: 1,
         explanation:
-          "When the output iterator equals the input begin (`v.begin()`), `std::transform` writes results back into the same container, effectively doubling each element in-place. The lambda is applied to each element and the result is written to the corresponding position in the output range.",
+          "`std::function` provides type erasure — it can hold any callable with a matching signature. Use it for callbacks, event handlers, or containers of callables. Avoid for hot paths because of virtual dispatch overhead. Raw lambdas passed directly to algorithms are inlined.",
       },
     ],
   },

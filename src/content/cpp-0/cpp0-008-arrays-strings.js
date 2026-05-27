@@ -1,15 +1,11 @@
-const ARRAYS_CODE = `#include <iostream>
-#include <string>
-#include <array>    // std::array (C++11)
+const ARRAY_CODE = `#include <iostream>
 using namespace std;
 
-// __OUTPUT__: --- C-style array ---\\nscores: 85 92 78 95 88 \\nHighest: 95\\nAverage: 87.6\\n--- std::array (safer) ---\\nfib: 0 1 1 2 3 5 8 13 21 34 \\n--- String operations ---\\nOriginal: Hello, World!\\nLength: 13\\nUpper-case first char: H\\nSubstring: World\\nFound at index: 7\\nReversed: !dlroW ,olleH\\n--- String building ---\\nFull name: Alice Smith\\nGreeting: Hello, Alice Smith!
+// __OUTPUT__: 85 92 78 95 88\\nHighest: 95\\nAverage: 87.6
 
 int main() {
-    // ── C-style array ──────────────────────────────────────────
-    cout << "--- C-style array ---" << endl;
     int scores[5] = {85, 92, 78, 95, 88};
-    cout << "scores: ";
+
     for (int i = 0; i < 5; i++) cout << scores[i] << " ";
     cout << endl;
 
@@ -22,32 +18,75 @@ int main() {
     cout << "Highest: " << highest << endl;
     cout << "Average: " << total / 5 << endl;
 
-    // ── std::array ─────────────────────────────────────────────
-    cout << "--- std::array (safer) ---" << endl;
-    array<int, 10> fib = {0,1,1,2,3,5,8,13,21,34};
+    return 0;
+}`;
+
+const STDARRAY_CODE = `#include <iostream>
+#include <array>
+using namespace std;
+
+// __OUTPUT__: size = 5\\n10 20 30 40 50\\nfib: 0 1 1 2 3 5 8 13 21 34
+
+int main() {
+    // std::array knows its own size and supports range-based for
+    array<int, 5> vals = {10, 20, 30, 40, 50};
+
+    cout << "size = " << vals.size() << endl;
+    for (int v : vals) cout << v << " ";
+    cout << endl;
+
+    array<int, 10> fib = {0, 1, 1, 2, 3, 5, 8, 13, 21, 34};
     cout << "fib: ";
     for (int n : fib) cout << n << " ";
     cout << endl;
 
-    // ── std::string operations ─────────────────────────────────
-    cout << "--- String operations ---" << endl;
+    return 0;
+}`;
+
+const STRING_OPS_CODE = `#include <iostream>
+#include <string>
+using namespace std;
+
+// __OUTPUT__: Hello, World!\\nlength: 13\\nchar at 7: W\\nsubstr: World\\nfound at: 7
+
+int main() {
     string s = "Hello, World!";
-    cout << "Original: "  << s << endl;
-    cout << "Length: "    << s.length() << endl;
-    cout << "Upper-case first char: " << (char)toupper(s[0]) << endl;
-    cout << "Substring: " << s.substr(7, 5) << endl;       // "World"
-    cout << "Found at index: " << s.find("World") << endl; // 7
+    cout << s << endl;
+    cout << "length: " << s.length() << endl;
+    cout << "char at 7: " << s[7] << endl;
 
-    // Reverse
-    string rev = string(s.rbegin(), s.rend());
-    cout << "Reversed: " << rev << endl;
+    // substr(start, length)
+    cout << "substr: " << s.substr(7, 5) << endl;
 
-    // ── String building ────────────────────────────────────────
-    cout << "--- String building ---" << endl;
+    // find returns index, or string::npos if not found
+    size_t pos = s.find("World");
+    cout << "found at: " << pos << endl;
+
+    return 0;
+}`;
+
+const STRING_BUILD_CODE = `#include <iostream>
+#include <string>
+using namespace std;
+
+// __OUTPUT__: Alice Smith\\nHello, Alice Smith!\\nupper: HELLO\\ndigits: 5
+
+int main() {
     string first = "Alice", last = "Smith";
-    string full = first + " " + last;
-    cout << "Full name: "  << full << endl;
-    cout << "Greeting: Hello, " << full << "!" << endl;
+    string full = first + " " + last;   // concatenation
+    cout << full << endl;
+    cout << "Hello, " << full << "!" << endl;
+
+    // Convert to uppercase in place
+    string s = "hello";
+    for (char& c : s) c = toupper(c);
+    cout << "upper: " << s << endl;
+
+    // Count digits in a string
+    string mixed = "a1b2c3d4e5";
+    int digits = 0;
+    for (char c : mixed) if (isdigit(c)) digits++;
+    cout << "digits: " << digits << endl;
 
     return 0;
 }`;
@@ -58,41 +97,43 @@ const lesson = {
   chapter: "cpp-0",
   order: 8,
   title: "Arrays and Strings",
-  subtitle: "Store sequences of data with C-arrays, std::array, and std::string",
+  subtitle: "Fixed-size sequences and text — indexing, iteration, and common operations",
   tags: ["c++", "cpp", "arrays", "strings", "std::string", "std::array", "indexing", "substring"],
   aliases: [
     "c++ arrays",
     "c++ string operations",
     "c++ array iteration",
-    "c++ array vs vector",
     "string manipulation c++",
+    "c++ substr find",
   ],
 
-  hook: `Almost every real program processes collections of data: a list of scores, a sentence to parse, a buffer of network bytes. Arrays and strings are the two most fundamental collection types. Understanding their memory layout — contiguous bytes — explains both their performance characteristics and their pitfalls (buffer overflows, off-by-one errors, null termination).`,
+  hook: `Almost every real program processes collections: a list of scores, a sentence to parse, a buffer of data. Arrays and strings are the two most fundamental collection types. Their key trait — contiguous memory — explains both their O(1) access speed and their pitfalls like out-of-bounds writes.`,
 
   mentalModel: [
-    "**An array is a contiguous block of memory holding elements of the same type.** `int scores[5]` reserves exactly 5 × 4 = 20 bytes. Elements are accessed by index starting at 0: `scores[0]` through `scores[4]`. The index is just an offset: `scores[i]` is the value at memory address `scores + i * sizeof(int)`. This is why array access is O(1) — it's just address arithmetic.",
-    "**Arrays don't know their own size.** C-style arrays decay to a pointer when passed to a function — the size information is lost. You must pass the size separately: `void print(int arr[], int n)`. `std::array<int, 5>` (C++11) wraps a C-array and preserves the size, providing `.size()`. `std::vector` (next lesson) adds dynamic resizing. Prefer `std::array` over C-arrays, `std::vector` over both for most cases.",
-    "**`std::string` is a sequence of characters with a rich interface.** Unlike C strings (`char*`), `std::string` knows its own length, manages its memory, and supports operations like `+` (concatenation), `==` (comparison), `.substr()`, `.find()`, and `.at()` (bounds-checked indexing). The underlying data is still a contiguous char array — `s.data()` gives you a pointer to it.",
+    "**An array is a fixed-size contiguous block of same-type elements.** `int scores[5]` reserves exactly 5 × 4 = 20 bytes. Elements are 0-indexed: `scores[0]` through `scores[4]`. `scores[5]` is undefined behavior — C++ doesn't check bounds at runtime.",
+    "**`std::array<T, N>` is a safer wrapper around a C array.** Same performance, same fixed size — but it knows its own size (`.size()`), supports copy/assignment, and works with range-based for. Prefer it over raw `int arr[]` in new code.",
+    "**`std::string` is a smart sequence of characters.** Unlike C strings (`char*`), it knows its length, handles memory automatically, and supports `+` (concatenation), `==` (content comparison), `.substr()`, and `.find()`. It's mutable — you can change individual characters with `s[i] = 'X'`.",
   ],
 
   intuition: {
     prose: [
-      "**Array bounds are your responsibility.** `int arr[5]; arr[5] = 10;` is undefined behavior — you're writing one element past the end of the array. The compiler doesn't check bounds at runtime (by default). This is a *buffer overflow* — one of the most common security vulnerabilities in C/C++ programs. `std::array::at(i)` and `std::vector::at(i)` perform bounds checking and throw `std::out_of_range` if `i` is invalid. Use `.at()` during development to catch bugs.",
-      "**String indexing with `[]` vs `.at()`.** `s[i]` accesses character i with no bounds check — reading `s[s.length()]` is technically undefined (though it returns `\\0` for `std::string` by convention). `s.at(i)` throws `std::out_of_range` if `i >= s.length()`. In performance-critical loops, use `[]`; in defensive code, use `.at()`.",
-      "**`std::string` is both a sequence and a value type.** Unlike Java/Python strings, C++ strings are mutable — you can modify individual characters with `s[i] = 'A'`. String comparison with `==` compares content (not addresses). Two different `std::string` objects holding `\"hello\"` are `==`. This is different from C strings where `str1 == str2` compares pointers, not content.",
-      "**Multidimensional arrays** are arrays of arrays. `int matrix[3][4]` is a 3×4 grid of integers, laid out in row-major order (row 0 complete, then row 1, etc.). Access: `matrix[row][col]`. Pass to functions: `void f(int m[][4], int rows)` — the inner dimension must be known at compile time. For variable-size 2D data, prefer `vector<vector<int>>`.",
+      "**C-style arrays are the foundation.** Fixed size declared at compile time, 0-based indexing, O(1) access via address arithmetic. The array name decays to a pointer — `scores` is the address of `scores[0]`. Iteration is just walking that pointer forward.",
     ],
     visualizations: [
       {
         id: "CppLab",
-        mathBridge:
-          "**Explore arrays and strings:**\n\n1. Compile and run — study each operation\n2. Try accessing `scores[5]` (out of bounds) — what happens? (undefined behavior, might crash or give garbage)\n3. Sort the scores array manually using a nested loop (bubble sort)\n4. Count how many characters in `\"Hello, World!\"` are uppercase using a range-based for\n5. Try `s.replace(7, 5, \"C++\")` to replace `World` with `C++`\n6. Build a new string using += in a loop: `for (char c : original) if (isupper(c)) result += c;`",
+        mathBridge: "**Run it — then explore:**\n\n- Change the values. What happens to highest and average?\n- Try `scores[5] = 100` — that's out of bounds. Does it crash immediately or silently corrupt memory?\n- Add a loop to find the minimum: initialize `int lowest = scores[0]` and compare.\n- Compute the sum of squares: change `total += scores[i]` to `total += scores[i] * scores[i]`.",
         props: {
           mainFile: "main.cpp",
-          initialFiles: {
-            "/home/user/main.cpp": ARRAYS_CODE,
-          },
+          initialFiles: { "/home/user/main.cpp": ARRAY_CODE },
+        },
+      },
+      {
+        id: "CppLab",
+        mathBridge: "**std::array — run it then explore:**\n\n- Try `vals.at(10)` — unlike `vals[10]`, `.at()` throws an exception. What's the error message?\n- `std::array` supports assignment: `array<int,5> copy = vals;` — does modifying `copy[0]` affect `vals`?\n- Add `cout << vals.front() << \" \" << vals.back();` — first and last elements.\n- Try `vals.fill(0)` to zero all elements — then print.",
+        props: {
+          mainFile: "main.cpp",
+          initialFiles: { "/home/user/main.cpp": STDARRAY_CODE },
         },
       },
     ],
@@ -100,107 +141,65 @@ const lesson = {
 
   rigor: {
     prose: [
-      "**Memory layout matters for performance.** Arrays are cache-friendly — elements are packed contiguously, so iterating linearly loads them into CPU cache one cache line at a time (~64 bytes = 16 ints). Accessing random indices in a large array causes cache misses. For performance-critical code, traversing a 2D array row-by-row (matching C++'s row-major layout) is significantly faster than column-by-column.",
-      "**`std::string` has small-string optimization (SSO).** For short strings (typically ≤ 15 characters), `std::string` stores the characters directly inside the object — no heap allocation. For longer strings, it allocates on the heap. This means short string operations are very fast. It also means comparing string sizes matters: copying a 5-char string is nearly free; copying a 1MB string is expensive. Use `std::move` or `const&` for large strings.",
-      "**String conversions.** `std::to_string(42)` converts integers and doubles to strings. `std::stoi(\"42\")` parses an integer from a string (throws `std::invalid_argument` if it fails). `std::stod` for doubles. These are safer than C's `atoi` (which returns 0 on failure with no error indication) and `sprintf`/`sscanf` (which use format strings and are error-prone). Prefer the C++ standard library functions.",
+      "**`std::string` operations.** `.length()` returns the number of characters. `s[i]` accesses character i (no bounds check). `.substr(start, len)` returns a new string of `len` chars starting at `start`. `.find(sub)` returns the starting index, or `string::npos` if not found — always compare with `!= string::npos`, not `-1`.",
+      "**String building.** `+` concatenates strings. `+=` appends in-place. `to_string(42)` converts a number to string. `stoi(\"42\")` parses a string to int. Characters can be modified in place: `for (char& c : s) c = toupper(c)` uppercases every character.",
+    ],
+    visualizations: [
+      {
+        id: "CppLab",
+        mathBridge: "**String operations — run it then explore:**\n\n- Try `s.substr(0, 5)` — what does that give?\n- Try `s.find(\"xyz\")` — what value does it return? Print it and compare to `string::npos`.\n- Add `s.replace(7, 5, \"C++\")` to replace \"World\" with \"C++\". What does s look like?\n- Try `s[0] = 'h'` — strings are mutable in C++.",
+        props: {
+          mainFile: "main.cpp",
+          initialFiles: { "/home/user/main.cpp": STRING_OPS_CODE },
+        },
+      },
+      {
+        id: "CppLab",
+        mathBridge: "**String building — run it then explore:**\n\n- Add `full += \"!\"` after building the full name. Does it append correctly?\n- Count vowels instead of digits: check `c == 'a' || c == 'e' || ...`\n- Try `string repeated = string(5, '*')` — creates `\"*****\"`. Print it.\n- Use `to_string(42)` and append it to a string: `\"Score: \" + to_string(score)`.",
+        props: {
+          mainFile: "main.cpp",
+          initialFiles: { "/home/user/main.cpp": STRING_BUILD_CODE },
+        },
+      },
     ],
     callouts: [
       {
         type: "warning",
-        title: "Array bounds overflow is silent and dangerous",
-        body: "Reading or writing past array bounds is undefined behavior — C++ doesn't check bounds at runtime. The program might silently corrupt memory, crash later with an unrelated error, or seem to work fine. Use `-fsanitize=address` when compiling for development to catch buffer overflows automatically: `g++ -fsanitize=address -g main.cpp`.",
-      },
-      {
-        type: "info",
-        title: "C-string vs std::string",
-        body: "`\"hello\"` is a C string literal — a `const char*` pointing to 6 bytes ('h','e','l','l','o','\\0'). C strings are null-terminated: the end is marked by a zero byte. `std::string` knows its length and handles null bytes internally. Mixing them: `std::string s = \"hello\"` works (string constructed from C-string). `s.c_str()` gives back a C string for legacy APIs.",
+        title: "Array out-of-bounds is silent undefined behavior",
+        body: "`arr[5]` on a 5-element array doesn't crash immediately — it silently reads/writes past the end and can corrupt memory in ways that cause bugs far from the root cause. Enable `-fsanitize=address` in development: `g++ -fsanitize=address main.cpp`.",
       },
       {
         type: "tip",
-        title: "String find returns string::npos on not-found",
-        body: "`s.find(\"xyz\")` returns `std::string::npos` (a very large value, typically `size_t(-1)`) when the substring is not found. Always compare against `npos`: `if (s.find(\"hello\") != string::npos)`. Don't compare against -1 or check for truthiness — `npos` is unsigned and may not behave as expected.",
+        title: "string::npos is not -1 (it's the max size_t value)",
+        body: "`s.find()` returns `string::npos` when not found. `npos` is `size_t(-1)` — a very large unsigned number, not -1 signed. Always write `if (s.find(x) != string::npos)`. Comparing with `-1` or using it in boolean context gives wrong results.",
       },
     ],
   },
 
   examples: [
     {
-      title: "Array algorithms: sort, search, reverse",
-      body: `int arr[] = {5, 2, 8, 1, 9, 3};
-int n = 6;
+      title: "Reverse an array in-place",
+      body: `int arr[] = {1, 2, 3, 4, 5};
+int n = 5;
 
-// Bubble sort
-for (int i = 0; i < n-1; i++) {
-    for (int j = 0; j < n-i-1; j++) {
-        if (arr[j] > arr[j+1]) {
-            int tmp = arr[j];
-            arr[j] = arr[j+1];
-            arr[j+1] = tmp;
-        }
-    }
-}
-// arr is now {1, 2, 3, 5, 8, 9}
-
-// Linear search
-int target = 8;
-int idx = -1;
-for (int i = 0; i < n; i++) {
-    if (arr[i] == target) { idx = i; break; }
-}
-
-// Reverse in place
 for (int i = 0, j = n-1; i < j; i++, j--) {
-    int tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
-}`,
+    int tmp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = tmp;
+}
+// arr is now {5, 4, 3, 2, 1}`,
     },
     {
-      title: "String manipulation patterns",
-      body: `string s = "  Hello, World!  ";
-
-// Trim leading/trailing spaces (manual)
-size_t start = s.find_first_not_of(" ");
-size_t end   = s.find_last_not_of(" ");
-string trimmed = s.substr(start, end - start + 1);
-// "Hello, World!"
-
-// Split on comma
-string csv = "Alice,Bob,Charlie";
-vector<string> names;
+      title: "String split on delimiter",
+      body: `string csv = "Alice,Bob,Charlie";
+vector<string> parts;
 size_t pos = 0;
 while ((pos = csv.find(',')) != string::npos) {
-    names.push_back(csv.substr(0, pos));
+    parts.push_back(csv.substr(0, pos));
     csv.erase(0, pos + 1);
 }
-names.push_back(csv);  // last element
-
-// Convert to uppercase (in place)
-for (char& c : s) c = toupper(c);
-
-// Count occurrences of a char
-int count = 0;
-for (char c : s) if (c == 'l') count++;`,
-    },
-    {
-      title: "2D array: matrix operations",
-      body: `const int ROWS = 3, COLS = 3;
-int A[ROWS][COLS] = {{1,2,3},{4,5,6},{7,8,9}};
-int B[ROWS][COLS] = {{9,8,7},{6,5,4},{3,2,1}};
-int C[ROWS][COLS] = {};   // zero-initialized
-
-// Matrix addition: C = A + B
-for (int i = 0; i < ROWS; i++)
-    for (int j = 0; j < COLS; j++)
-        C[i][j] = A[i][j] + B[i][j];
-
-// Print matrix
-for (int i = 0; i < ROWS; i++) {
-    for (int j = 0; j < COLS; j++)
-        cout << C[i][j] << " ";
-    cout << endl;
-}
-// 10 10 10
-// 10 10 10
-// 10 10 10`,
+parts.push_back(csv);  // last token
+// parts = {"Alice", "Bob", "Charlie"}`,
     },
   ],
 
@@ -208,24 +207,25 @@ for (int i = 0; i < ROWS; i++) {
     {
       difficulty: "easy",
       problem:
-        "Write a program that reads 5 integers into an array, then prints: (1) the minimum, (2) the maximum, (3) the range (max - min), (4) all elements in reverse order. Don't use std::sort or any library functions — implement the min/max search yourself.",
-      hint: "Initialize min and max to arr[0]. Loop from index 1. For reverse, loop from index 4 down to 0.",
+        "Read 5 integers into an array, then print: (1) the minimum, (2) the maximum, (3) all elements in reverse order. Initialize min/max to `arr[0]` and compare from index 1.",
+      hint: "For reverse: `for (int i = 4; i >= 0; i--) cout << arr[i]`.",
       walkthrough: [
-        "Read 5 ints: `for (int i = 0; i < 5; i++) cin >> arr[i]`",
-        "Initialize minVal = maxVal = arr[0]",
-        "Loop i=1 to 4: compare arr[i] with minVal and maxVal",
-        "Reverse: for (int i = 4; i >= 0; i--) print arr[i]",
+        "Read 5 ints: for i = 0..4: cin >> arr[i]",
+        "min = max = arr[0]",
+        "Loop i=1..4: compare arr[i] with min and max",
+        "Reverse loop: i = 4 down to 0",
       ],
     },
     {
       difficulty: "medium",
       problem:
-        "Write a Caesar cipher: read a string and a shift amount (1-25), then encrypt by shifting each letter by `shift` positions (wrapping: 'z' + 1 = 'a', 'Z' + 1 = 'A'). Print the encrypted string. Then decrypt by shifting backward. Hint: use `(c - 'a' + shift) % 26 + 'a'` for lowercase.",
-      hint: "Check `if (islower(c))` and `if (isupper(c))` to handle case separately. Non-letters pass through unchanged.",
+        "Caesar cipher: read a string and a shift (1-25), encrypt by shifting each letter forward by `shift` positions (wrapping 'z' → 'a'). Use `(c - 'a' + shift) % 26 + 'a'` for lowercase. Handle uppercase separately. Non-letters pass through unchanged. Then decrypt by shifting `(26 - shift) % 26`.",
+      hint: "Check `islower(c)` and `isupper(c)` to handle both cases. Modify characters in place.",
       walkthrough: [
-        "Read string and int shift",
-        "For each char c in the string: if islower, c = (c - 'a' + shift) % 26 + 'a'; if isupper, same with 'A'",
-        "Print encrypted; then shift by (26 - shift) % 26 to decrypt",
+        "For each char c: if islower(c): c = (c - 'a' + shift) % 26 + 'a'",
+        "If isupper(c): c = (c - 'A' + shift) % 26 + 'A'",
+        "Print encrypted string",
+        "Decrypt: shift by (26 - shift) % 26",
       ],
     },
   ],
@@ -236,57 +236,42 @@ for (int i = 0; i < ROWS; i++) {
         id: "cpp0-008-q1",
         type: "choice",
         text: "What is the valid index range for `int arr[10]`?",
-        options: [
-          "1 to 10",
-          "0 to 10",
-          "0 to 9",
-          "1 to 9",
-        ],
+        options: ["1 to 10", "0 to 10", "0 to 9", "1 to 9"],
         answer: 2,
         explanation:
-          "C++ arrays are 0-indexed. `arr[0]` through `arr[9]` are valid. `arr[10]` is one past the end — undefined behavior. A 10-element array has indices 0, 1, ..., n-1 where n=10.",
+          "C++ arrays are 0-indexed. Valid indices are 0 through n-1 where n is the size. `arr[10]` is one past the end — undefined behavior.",
       },
       {
         id: "cpp0-008-q2",
         type: "choice",
-        text: "What value does `s.find(\"xyz\")` return when `\"xyz\"` is not in `s`?",
-        options: [
-          "-1",
-          "0",
-          "`std::string::npos`",
-          "The length of s",
-        ],
+        text: "What does `s.find(\"xyz\")` return when `\"xyz\"` is not in `s`?",
+        options: ["-1", "0", "std::string::npos", "The length of s"],
         answer: 2,
         explanation:
-          "`find()` returns `std::string::npos` (maximum value of `size_t`, effectively -1 as unsigned) when not found. Always compare with `!= string::npos`, not with `-1` or truthiness check.",
+          "`find()` returns `std::string::npos` (max value of `size_t`, not signed -1) when not found. Always compare with `!= string::npos`.",
       },
       {
         id: "cpp0-008-q3",
         type: "choice",
-        text: "What's the advantage of `std::array<int,5>` over `int arr[5]`?",
-        options: [
-          "std::array uses less memory",
-          "std::array is dynamically resizable",
-          "std::array knows its size (.size()), supports copy/assignment, and can be passed to functions without losing size",
-          "std::array performs bounds checking by default with []",
-        ],
-        answer: 2,
+        text: "What does `s.substr(3, 4)` return for `s = \"Hello, World!\"`?",
+        options: ['"lo, "', '"Hello"', '"World"', '"llo,"'],
+        answer: 0,
         explanation:
-          "`std::array` has the same fixed-size performance as C arrays but adds `.size()`, copy/assignment operators, range-based for support, and can be passed to template functions. It does NOT resize. Bounds checking with `[]` is not guaranteed; use `.at()` for that.",
+          "`substr(start, length)` — starting at index 3 for 4 chars: s[3]='l', s[4]='o', s[5]=',', s[6]=' ' → `\"lo, \"`. It's (start, length) not (start, end).",
       },
       {
         id: "cpp0-008-q4",
         type: "choice",
-        text: "What does `s.substr(3, 4)` return for `s = \"Hello, World!\"`?",
+        text: "What advantage does `std::array<int,5>` have over `int arr[5]`?",
         options: [
-          "\"lo, \"",
-          "\"Hello\"",
-          "\"World\"",
-          "\"lo, W\"",
+          "std::array uses less memory",
+          "std::array is dynamically resizable",
+          "std::array knows its size (.size()), supports copy/assignment, and doesn't decay to a pointer",
+          "std::array performs automatic bounds checking with []",
         ],
-        answer: 0,
+        answer: 2,
         explanation:
-          "`substr(start, length)` — starting at index 3 for 4 characters: s[3]='l', s[4]='o', s[5]=',', s[6]=' ' — gives `\"lo, \"`. Note: it's (starting index, length), not (start, end).",
+          "`std::array` has the same fixed-size performance but adds `.size()`, copy/assignment, and avoids array-to-pointer decay. It does NOT resize. Bounds checking requires `.at()`, not `[]`.",
       },
     ],
   },

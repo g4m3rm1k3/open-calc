@@ -1,96 +1,138 @@
 const INHERIT_CODE = `#include <iostream>
 #include <string>
+using namespace std;
+
+// __OUTPUT__: Animal says: ...\\nDog says: Woof!\\nDog runs
+
+class Animal {
+protected:
+    string name;
+public:
+    Animal(string n) : name(n) {}
+    void speak()  const { cout << name << " says: ..." << endl; }
+    void breathe()const { cout << name << " breathes" << endl; }
+};
+
+class Dog : public Animal {
+public:
+    Dog(string n) : Animal(n) {}
+    void speak() const { cout << name << " says: Woof!" << endl; }  // override
+    void run()   const { cout << name << " runs" << endl; }         // new method
+};
+
+int main() {
+    Animal a("Animal");
+    Dog d("Dog");
+    a.speak();
+    d.speak();   // calls Dog::speak, not Animal::speak
+    d.run();
+    return 0;
+}`;
+
+const VIRTUAL_CODE = `#include <iostream>
 #include <vector>
 #include <memory>
 using namespace std;
 
-// ── Base class ─────────────────────────────────────────────────
-class Shape {
-protected:
-    string color;
+// __OUTPUT__: Woof!\\nMeow!\\nWoof!\\nMeow!
 
+class Animal {
 public:
-    Shape(const string& c) : color(c) {}
-    virtual ~Shape() {}   // ALWAYS virtual destructor in base
-
-    virtual double area()      const = 0;   // pure virtual
-    virtual double perimeter() const = 0;   // pure virtual
-    virtual string name()      const = 0;
-
-    void describe() const {
-        cout << name() << " [" << color << "]: "
-             << "area=" << area()
-             << " perimeter=" << perimeter() << endl;
-    }
+    virtual ~Animal() {}
+    virtual void speak() const { cout << "..." << endl; }
 };
 
-// ── Derived: Circle ────────────────────────────────────────────
-class Circle : public Shape {
-    double radius;
+class Dog : public Animal {
 public:
-    Circle(double r, const string& c = "red")
-        : Shape(c), radius(r) {}
-
-    double area()      const override { return 3.14159 * radius * radius; }
-    double perimeter() const override { return 2 * 3.14159 * radius; }
-    string name()      const override { return "Circle"; }
+    void speak() const override { cout << "Woof!" << endl; }
 };
 
-// ── Derived: Rectangle ────────────────────────────────────────
-class Rectangle : public Shape {
-    double w, h;
+class Cat : public Animal {
 public:
-    Rectangle(double w, double h, const string& c = "blue")
-        : Shape(c), w(w), h(h) {}
-
-    double area()      const override { return w * h; }
-    double perimeter() const override { return 2*(w+h); }
-    string name()      const override { return "Rectangle"; }
-
-    bool isSquare() const { return w == h; }
+    void speak() const override { cout << "Meow!" << endl; }
 };
-
-// ── Derived: Triangle ─────────────────────────────────────────
-class Triangle : public Shape {
-    double a, b, c;
-public:
-    Triangle(double a, double b, double c, const string& col = "green")
-        : Shape(col), a(a), b(b), c(c) {}
-
-    double perimeter() const override { return a + b + c; }
-    double area()      const override {
-        double s = perimeter() / 2;
-        return sqrt(s*(s-a)*(s-b)*(s-c));  // Heron's formula
-    }
-    string name()      const override { return "Triangle"; }
-};
-
-// __OUTPUT__: --- Polymorphism via base pointer ---\\nCircle [red]: area=78.5397 perimeter=31.4159\\nRectangle [blue]: area=24 perimeter=20\\nTriangle [green]: area=6 perimeter=12\\n--- Total area of all shapes ---\\nTotal area: 108.54\\n--- Runtime type detection ---\\nRectangle isSquare? 0
 
 int main() {
-    // ── Polymorphism: hold different types via base pointer ────
-    cout << "--- Polymorphism via base pointer ---" << endl;
-    vector<unique_ptr<Shape>> shapes;
-    shapes.push_back(make_unique<Circle>(5.0));
-    shapes.push_back(make_unique<Rectangle>(4.0, 6.0));
-    shapes.push_back(make_unique<Triangle>(3.0, 4.0, 5.0));
+    // Polymorphism: different objects, same call site
+    vector<unique_ptr<Animal>> animals;
+    animals.push_back(make_unique<Dog>());
+    animals.push_back(make_unique<Cat>());
 
-    for (const auto& s : shapes) {
-        s->describe();   // virtual dispatch — calls correct subclass method
+    for (const auto& a : animals) a->speak();  // virtual dispatch
+
+    Animal* p = new Dog();
+    p->speak();    // Woof! — virtual, calls Dog::speak
+    delete p;
+
+    Animal* q = new Cat();
+    q->speak();    // Meow!
+    delete q;
+
+    return 0;
+}`;
+
+const ABSTRACT_CODE = `#include <iostream>
+#include <cmath>
+using namespace std;
+
+// __OUTPUT__: Circle area=78.5398\\nRect area=24
+
+class Shape {
+public:
+    virtual ~Shape() {}
+    virtual double area() const = 0;        // pure virtual — must override
+    virtual string name() const = 0;
+
+    void describe() const {
+        cout << name() << " area=" << area() << endl;
     }
+};
 
-    // ── Process all shapes uniformly ──────────────────────────
-    cout << "--- Total area of all shapes ---" << endl;
-    double total = 0;
-    for (const auto& s : shapes) total += s->area();
-    cout << "Total area: " << total << endl;
+// Shape s;  // ERROR: can't instantiate abstract class
 
-    // ── Dynamic cast for subclass-specific operations ──────────
-    cout << "--- Runtime type detection ---" << endl;
-    for (const auto& s : shapes) {
-        Rectangle* r = dynamic_cast<Rectangle*>(s.get());
-        if (r) cout << "Rectangle isSquare? " << r->isSquare() << endl;
-    }
+class Circle : public Shape {
+    double r;
+public:
+    Circle(double r) : r(r) {}
+    double area() const override { return 3.14159 * r * r; }
+    string name() const override { return "Circle"; }
+};
+
+class Rect : public Shape {
+    double w, h;
+public:
+    Rect(double w, double h) : w(w), h(h) {}
+    double area() const override { return w * h; }
+    string name() const override { return "Rect"; }
+};
+
+int main() {
+    Circle c(5);
+    Rect   r(4, 6);
+    c.describe();
+    r.describe();
+    return 0;
+}`;
+
+const CAST_CODE = `#include <iostream>
+#include <memory>
+using namespace std;
+
+// __OUTPUT__: Dog barks\\nCat is not a Dog
+
+class Animal { public: virtual ~Animal() {} };
+class Dog : public Animal { public: void bark() { cout << "Dog barks\\n"; } };
+class Cat : public Animal { public: void meow() { cout << "Cat meows\\n"; } };
+
+int main() {
+    unique_ptr<Animal> a = make_unique<Dog>();
+
+    // dynamic_cast: safe downcast — returns nullptr if wrong type
+    Dog* d = dynamic_cast<Dog*>(a.get());
+    if (d) d->bark();
+
+    Cat* c = dynamic_cast<Cat*>(a.get());
+    if (!c) cout << "Cat is not a Dog" << endl;
 
     return 0;
 }`;
@@ -101,41 +143,43 @@ const lesson = {
   chapter: "cpp-1",
   order: 3,
   title: "Inheritance and Polymorphism",
-  subtitle: "Build class hierarchies and write code that works with any derived type",
-  tags: ["c++", "cpp", "inheritance", "polymorphism", "virtual", "override", "abstract", "base-class"],
+  subtitle: "Extend existing classes and write code that works on any subtype",
+  tags: ["c++", "cpp", "inheritance", "polymorphism", "virtual", "override", "abstract", "dynamic-cast"],
   aliases: [
     "c++ inheritance",
-    "c++ polymorphism",
     "c++ virtual functions",
-    "c++ override keyword",
-    "c++ base derived class",
+    "c++ polymorphism",
+    "c++ abstract class",
+    "c++ override",
   ],
 
-  hook: `Inheritance lets you define a new type in terms of an existing one — inheriting its interface and optionally overriding its behavior. Polymorphism lets you write code against a base class interface that works automatically with any derived class. Together, they're the foundation of extensible, maintainable software: add a new shape without changing the rendering loop; add a new payment method without changing the checkout code.`,
+  hook: `Inheritance lets you build new types by extending existing ones — reusing code, expressing 'is-a' relationships. Polymorphism lets you write code that works on a base type but automatically calls the right derived type's method at runtime. Together they enable extensible, flexible designs.`,
 
   mentalModel: [
-    "**Inheritance models 'is-a' relationships.** A `Circle` IS-A `Shape`. A `Dog` IS-A `Animal`. Derived classes inherit all public and protected members of the base, and can add new members or override virtual methods. Public inheritance (`class Circle : public Shape`) preserves the interface — a `Circle*` can be used wherever a `Shape*` is expected.",
-    "**`virtual` enables runtime dispatch.** Without `virtual`, `Shape* s = new Circle(); s->area()` calls `Shape::area()`. With `virtual`, it calls `Circle::area()` — the actual runtime type determines which function runs. This is **dynamic dispatch** via the vtable (virtual function table). `virtual` functions have a small overhead but enable the power of polymorphism.",
-    "**Pure virtual functions (`= 0`) create abstract classes.** `virtual double area() const = 0;` says 'every derived class must provide this'. You can't instantiate `Shape` directly — only concrete derived classes. Abstract base classes define interfaces: any class that implements all pure virtual methods can be used anywhere the interface is expected.",
+    "**Inheritance: derived class gets all base class members.** `Dog : public Animal` means Dog has everything Animal has, plus its own additions. The derived class can override methods to change behavior, and add new methods. The base class constructor must be called explicitly in the derived constructor's initializer list.",
+    "**`virtual` enables runtime dispatch.** Without `virtual`, `Animal* p = new Dog(); p->speak()` calls `Animal::speak` — the call is resolved at compile time based on the pointer type. With `virtual`, the call is resolved at runtime based on the actual object type — calling `Dog::speak`. This is the core mechanism of polymorphism.",
+    "**Pure virtual (`= 0`) makes a class abstract.** A class with any pure virtual method can't be instantiated. It defines an interface that all derived classes must implement. Abstract classes enable 'program to an interface, not an implementation'.",
   ],
 
   intuition: {
     prose: [
-      "**The vtable mechanism.** When a class has virtual functions, the compiler adds a hidden pointer to a 'virtual function table' (vtable) in each object. The vtable is an array of function pointers for each virtual method. When you call `s->area()`, the CPU: (1) loads the vtable pointer from `s`, (2) indexes into the table to find `area`, (3) calls through the pointer. This one extra indirection is the entire cost of polymorphism — typically negligible.",
-      "**`override` is your safety net.** Writing `double area() const override` tells the compiler: 'I intend to override a base class virtual'. If you misspell the method name or change the signature, the compiler errors instead of silently creating a new non-virtual method. Always use `override` in derived classes — it catches signature mismatches that would otherwise lead to subtle bugs where the 'override' is actually a new function that the vtable never uses.",
-      "**Why `virtual` destructor in the base class?** If you delete a derived object through a base pointer `Shape* s = new Circle(); delete s;`, without a virtual destructor, only `Shape::~Shape()` runs — `Circle::~Circle()` is never called, leaking Circle's resources. With `virtual ~Shape()`, the correct destructor chain runs. Rule: any class with virtual functions must have a virtual destructor.",
-      "**`dynamic_cast` for safe downcasting.** `static_cast<Circle*>(ptr)` is a forced cast — undefined behavior if `ptr` doesn't actually point to a Circle. `dynamic_cast<Circle*>(ptr)` checks the actual runtime type and returns `nullptr` if it's not a Circle (for pointer) or throws `std::bad_cast` (for reference). Use `dynamic_cast` when you genuinely don't know the runtime type; otherwise, the design might need rethinking to avoid casting down the hierarchy.",
+      "**Inheritance without virtual is just code reuse.** Dog inherits Animal's `breathe()` method without rewriting it. But `speak()` is overridden — Dog defines its own version. Without `virtual`, the version that runs depends on the pointer/reference type at compile time.",
     ],
     visualizations: [
       {
         id: "CppLab",
-        mathBridge:
-          "**Extend the hierarchy:**\n\n1. Compile and run — observe virtual dispatch in the loop\n2. Add a `Square` class inheriting from `Rectangle` — constructor takes one side\n3. Add `virtual void draw() const` to Shape that prints an ASCII shape\n4. Try `Shape s;` — compile error, Shape is abstract (has pure virtuals)\n5. Add a free function `void printAll(const vector<Shape*>& v)` — it works with any mix of shapes\n6. Try `dynamic_cast<Circle*>(&rect)` where rect is a Rectangle — returns nullptr",
+        mathBridge: "**Inheritance — run it then explore:**\n\n- Call `d.breathe()` — Dog inherits it from Animal without declaring it.\n- Try `Animal* ap = &d; ap->speak();` — which speak runs? (Animal's — not virtual yet)\n- Add `virtual void speak()` to Animal — now `ap->speak()` calls Dog's version.\n- Add a `Cat` class that inherits from Animal and overrides speak.",
         props: {
           mainFile: "main.cpp",
-          initialFiles: {
-            "/home/user/main.cpp": INHERIT_CODE,
-          },
+          initialFiles: { "/home/user/main.cpp": INHERIT_CODE },
+        },
+      },
+      {
+        id: "CppLab",
+        mathBridge: "**Virtual dispatch — run it then explore:**\n\n- Remove `virtual ~Animal()` — what happens to derived object cleanup when deleting via base pointer?\n- Remove `override` from Dog::speak — does it still work? (yes, but override catches typos)\n- Add a `Parrot` class that overrides speak differently. Add it to the vector.\n- What does `animals[0]->speak()` resolve to at compile time vs runtime?",
+        props: {
+          mainFile: "main.cpp",
+          initialFiles: { "/home/user/main.cpp": VIRTUAL_CODE },
         },
       },
     ],
@@ -143,112 +187,69 @@ const lesson = {
 
   rigor: {
     prose: [
-      "**Object slicing.** If you store a derived object by value in a base variable — `Shape s = circle` — the derived part is 'sliced off'. Only the `Shape` portion is copied. Any data or vtable from `Circle` is lost. This is why polymorphism requires pointers or references: `Shape* s = &circle` or `Shape& s = circle`. A `vector<Shape>` would slice all elements. Always use `vector<shared_ptr<Shape>>` or `vector<unique_ptr<Shape>>` for heterogeneous collections.",
-      "**Multiple inheritance and the diamond problem.** C++ allows inheriting from multiple base classes: `class FlyingCar : public Car, public Airplane`. If both `Car` and `Airplane` inherit from `Vehicle`, `FlyingCar` gets two copies of `Vehicle`'s data — the diamond problem. Virtual inheritance (`class Car : public virtual Vehicle`) solves this by ensuring only one shared copy of the base. Multiple inheritance is powerful but complex — avoid unless the design clearly calls for it.",
-      "**Liskov Substitution Principle (LSP).** A derived class should be usable wherever its base class is expected without breaking the program's correctness. If `Circle::area()` returns a negative number, it violates LSP. If `Square` overrides `Rectangle::setWidth` and also changes the height, it violates LSP (Rectangle's contract says width and height are independent). LSP violations are subtle design bugs that inheritance doesn't prevent automatically — they require discipline.",
+      "**Abstract classes define interfaces.** A `Shape` with pure virtual `area()` can't be instantiated — it's a contract. Any class that inherits from `Shape` must implement `area()` or it too becomes abstract. This enforces consistency: everything that's a `Shape` must provide `area()`. You can hold `Shape*` pointers to any concrete shape and call `area()` without knowing the concrete type.",
+      "**`dynamic_cast` for safe downcasting.** If you have a `Animal*` and suspect it's a `Dog*`, `dynamic_cast<Dog*>(ptr)` returns the pointer if correct, `nullptr` if not. For references, it throws `bad_cast` on failure. `dynamic_cast` requires at least one virtual function in the hierarchy (for RTTI). Use it sparingly — needing to downcast often signals a design problem.",
+    ],
+    visualizations: [
+      {
+        id: "CppLab",
+        mathBridge: "**Abstract class — run it then explore:**\n\n- Try `Shape s;` — what error do you get?\n- Add `class Triangle : public Shape` that computes area with Heron's formula.\n- What happens if you forget to implement `name()` in a derived class?\n- Add a `totalArea(vector<Shape*>& shapes)` free function that sums all areas using polymorphism.",
+        props: {
+          mainFile: "main.cpp",
+          initialFiles: { "/home/user/main.cpp": ABSTRACT_CODE },
+        },
+      },
+      {
+        id: "CppLab",
+        mathBridge: "**dynamic_cast — run it then explore:**\n\n- Try `dynamic_cast<Dog&>(*a.get())` (reference form) — what happens when it fails?\n- What happens if Animal has no virtual functions and you try dynamic_cast? (compile error)\n- Remove `virtual ~Animal()` — what destructors run when deleting through a base pointer?\n- Add a `makeAnimal(bool isDog)` function that returns `unique_ptr<Animal>` — caller uses dynamic_cast to get the specific type.",
+        props: {
+          mainFile: "main.cpp",
+          initialFiles: { "/home/user/main.cpp": CAST_CODE },
+        },
+      },
     ],
     callouts: [
       {
         type: "warning",
-        title: "Always virtual destructor in polymorphic base classes",
-        body: "If any method is virtual (the class is meant to be used polymorphically), the destructor must also be virtual. Otherwise, `delete basePtr` where `basePtr` points to a derived object only calls the base destructor — the derived destructor is never called, leaking resources. Rule: polymorphic base class = virtual destructor.",
-      },
-      {
-        type: "info",
-        title: "override and final keywords (C++11)",
-        body: "`override` on a derived method verifies it actually overrides a base virtual. `final` prevents further overriding: `class Concrete final : public Base` (class can't be subclassed) or `void f() final` (method can't be overridden). Both improve clarity and catch mistakes. Always use `override`.",
+        title: "Always use virtual destructor in base classes",
+        body: "If you delete a derived object through a base pointer without a virtual destructor, only the base destructor runs — the derived destructor is skipped, leaking resources. Rule: if a class has ANY virtual methods (i.e., it's designed for inheritance), its destructor must be virtual.",
       },
       {
         type: "tip",
-        title: "Prefer composition over inheritance",
-        body: "Inheritance creates tight coupling. Before inheriting, ask: 'Is this truly an is-a relationship?' If you're inheriting to reuse code rather than to model a type relationship, prefer composition (holding a member). E.g., a `Car` HAS-A `Engine` (composition) rather than IS-A `Engine` (inheritance). Composition is more flexible and easier to change.",
+        title: "Use override — catch typos at compile time",
+        body: "`void speak() const override` tells the compiler: 'this must match a virtual method in the base class'. If you typo the signature (wrong const, wrong return type), the compiler catches it. Without `override`, the typo silently creates a new method instead of overriding, and polymorphism breaks invisibly.",
       },
     ],
   },
 
   examples: [
     {
-      title: "Animal hierarchy with virtual dispatch",
-      body: `class Animal {
-public:
-    virtual ~Animal() {}
-    virtual string speak() const = 0;
-    virtual string name()  const = 0;
+      title: "Polymorphic collection processing",
+      body: `// Function works on any Shape — polymorphism
+double totalArea(const vector<unique_ptr<Shape>>& shapes) {
+    double total = 0;
+    for (const auto& s : shapes) total += s->area();
+    return total;
+}
 
-    void introduce() const {
-        cout << "I am a " << name() << " and I say: " << speak() << endl;
-    }
-};
+vector<unique_ptr<Shape>> shapes;
+shapes.push_back(make_unique<Circle>(5));
+shapes.push_back(make_unique<Rect>(4, 6));
 
-class Dog : public Animal {
-public:
-    string speak() const override { return "Woof!"; }
-    string name()  const override { return "Dog"; }
-};
+cout << totalArea(shapes) << endl;   // 78.5 + 24 = 102.5
 
-class Cat : public Animal {
-public:
-    string speak() const override { return "Meow!"; }
-    string name()  const override { return "Cat"; }
-};
-
-// Works with any Animal — no need to know the actual type
-void makeNoise(const vector<unique_ptr<Animal>>& animals) {
-    for (const auto& a : animals) a->introduce();
-}`,
+// Adding a Triangle later requires no changes to totalArea`,
     },
     {
-      title: "Protected members and constructor chaining",
-      body: `class Employee {
-protected:
-    string name;
-    double salary;
-
-public:
-    Employee(string n, double s) : name(n), salary(s) {}
-    virtual ~Employee() {}
-
-    virtual double bonus() const { return 0; }
-    double totalComp() const { return salary + bonus(); }
-
-    virtual void print() const {
-        cout << name << ": $" << salary << " + $" << bonus() << " bonus" << endl;
-    }
-};
-
-class Manager : public Employee {
-    int reports;
-public:
-    Manager(string n, double s, int r)
-        : Employee(n, s), reports(r) {}   // chain to base constructor
-
-    double bonus() const override {
-        return salary * 0.10 * reports;   // 10% per report
-    }
-    void print() const override {
-        Employee::print();                // call base version
-        cout << "  Manages " << reports << " people" << endl;
-    }
-};`,
-    },
-    {
-      title: "Interface via pure abstract class",
-      body: `// Pure interface — no data, all pure virtual
-class Serializable {
+      title: "Interface (abstract class) pattern",
+      body: `class Serializable {
 public:
     virtual ~Serializable() {}
-    virtual string serialize()         const = 0;
-    virtual void   deserialize(string) = 0;
+    virtual string serialize() const = 0;
+    virtual void deserialize(const string& s) = 0;
 };
 
-class Printable {
-public:
-    virtual ~Printable() {}
-    virtual void print() const = 0;
-};
-
-// Multiple interface inheritance
-class Config : public Serializable, public Printable {
+class Config : public Serializable {
     map<string, string> data;
 public:
     string serialize() const override {
@@ -256,38 +257,35 @@ public:
         for (auto& [k, v] : data) result += k + "=" + v + ";";
         return result;
     }
-    void deserialize(string s) override { /* parse s */ }
-    void print() const override {
-        for (auto& [k, v] : data) cout << k << "=" << v << endl;
-    }
+    void deserialize(const string& s) override { /* parse */ }
 };`,
     },
   ],
 
   challenges: [
     {
-      difficulty: "medium",
+      difficulty: "easy",
       problem:
-        "Build a mini calculator using polymorphism. Define abstract class `Operation` with `virtual double apply(double a, double b) const = 0` and `virtual string symbol() const = 0`. Create derived classes `Add`, `Subtract`, `Multiply`, `Divide`. Write `double compute(double a, double b, const Operation& op)` that takes any operation. Test all four operations.",
-      hint: "Store operations as `unique_ptr<Operation>` in a vector. For Divide, check if b == 0 and return 0 or print error.",
+        "Build an `Employee` hierarchy. Base class: `Employee` with `name` and `baseSalary`. Derived: `Manager` (adds `bonus`) and `Developer` (adds `overtimeHours` at $50/hr). Each has a virtual `salary()` method. Print each employee's total salary using a `vector<unique_ptr<Employee>>`.",
+      hint: "Manager::salary = baseSalary + bonus. Developer::salary = baseSalary + overtimeHours * 50.",
       walkthrough: [
-        "Abstract base: virtual double apply(double, double) const = 0;",
-        "Derived Add: return a + b; symbol: return \"+\"",
-        "Free function: compute(a, b, op) { return op.apply(a, b); }",
-        "Test: for each op in ops: cout << a << op.symbol() << b << \" = \" << compute(a,b,op)",
+        "class Employee { protected: string name; double baseSalary; public: virtual double salary() const = 0; }",
+        "class Manager : public Employee { double bonus; double salary() const override { return baseSalary + bonus; } }",
+        "class Developer : public Employee { int overtime; double salary() const override { return baseSalary + overtime * 50; } }",
+        "vector<unique_ptr<Employee>> employees; use push_back to add; loop and call salary()",
       ],
     },
     {
       difficulty: "medium",
       problem:
-        "Design a payment system. Abstract `PaymentMethod` with `virtual bool process(double amount) = 0` and `virtual string name() const = 0`. Derive: `CreditCard` (succeeds if `balance >= amount`), `PayPal` (succeeds if email is not empty and amount > 0), `CryptoWallet` (50% chance of 'network error'). Process a list of payments using base class references.",
-      hint: "Use `rand() % 2 == 0` for the CryptoWallet random failure. Store in `vector<unique_ptr<PaymentMethod>>`.",
+        "Implement a `Logger` abstract class with pure virtual `void log(const string& msg)`. Create three derived classes: `ConsoleLogger` (prints to cout), `FileLogger` (writes to a file), and `MultiLogger` (holds a vector of Loggers and forwards to all of them). Test with MultiLogger containing both Console and File loggers.",
+      hint: "MultiLogger::log calls `for (auto& l : loggers) l->log(msg);`. Use `unique_ptr<Logger>` in the MultiLogger's vector.",
       walkthrough: [
-        "Abstract base with process() and name()",
-        "CreditCard: has double balance; process deducts if enough",
-        "PayPal: has string email; process validates email",
-        "CryptoWallet: random failure; process returns rand()%2==0",
-        "Main: loop through payments, call process(), report success/fail",
+        "class Logger { public: virtual void log(string msg) = 0; virtual ~Logger(){} }",
+        "ConsoleLogger: cout << msg;",
+        "FileLogger: ofstream file; write msg;",
+        "MultiLogger: vector<unique_ptr<Logger>> loggers; log() iterates all",
+        "Test: multi->addLogger(make_unique<ConsoleLogger>()); multi->log('hello');",
       ],
     },
   ],
@@ -297,58 +295,58 @@ public:
       {
         id: "cpp1-003-q1",
         type: "choice",
-        text: "What is object slicing?",
+        text: "Without `virtual`, what does `Animal* p = new Dog(); p->speak();` call?",
         options: [
-          "A technique to slice arrays using iterators",
-          "When a derived object is assigned to a base class value, losing the derived-class members",
-          "When a virtual function is not overridden in a derived class",
-          "When dynamic_cast returns nullptr",
+          "Dog::speak — because the actual object is a Dog",
+          "Animal::speak — because the pointer type is Animal*",
+          "Compilation error",
+          "It depends on which was defined first",
         ],
         answer: 1,
         explanation:
-          "Object slicing occurs when a derived object is stored by value in a base class variable. The base class copy constructor/assignment is called, copying only the base portion — the derived data and vtable pointer are lost. Always use pointers or references for polymorphism.",
+          "Without `virtual`, method calls are resolved at compile time based on the static type of the pointer/reference (`Animal*`), not the runtime type of the object. `Animal::speak` is called. Adding `virtual` to Animal::speak enables runtime dispatch.",
       },
       {
         id: "cpp1-003-q2",
         type: "choice",
-        text: "What does `= 0` after a virtual function declaration mean?",
+        text: "What does a pure virtual method (`= 0`) do to a class?",
         options: [
-          "The function returns 0 by default",
-          "The function is pure virtual — derived classes must implement it, and the class cannot be instantiated",
-          "The function cannot be overridden",
-          "The function is initialized to do nothing",
+          "Makes the method private",
+          "Makes the class abstract — it cannot be instantiated directly",
+          "Removes the method from the vtable",
+          "Makes the method inline",
         ],
         answer: 1,
         explanation:
-          "`virtual double f() = 0;` declares a pure virtual function. The class is now abstract — you cannot create instances of it. Any derived class must override this function to be concrete (instantiable).",
+          "A class with at least one pure virtual method is abstract — you can't create instances of it. Derived classes must implement all pure virtuals (or they too become abstract). Abstract classes define interfaces.",
       },
       {
         id: "cpp1-003-q3",
         type: "choice",
-        text: "Why must a polymorphic base class have a virtual destructor?",
+        text: "Why must base classes with virtual methods have a virtual destructor?",
         options: [
-          "Virtual destructors make the destructor run faster",
-          "Without it, `delete basePtr` only runs the base destructor — the derived destructor is never called, leaking resources",
-          "Virtual destructors are required by the C++ standard for all classes",
-          "Virtual destructors prevent object slicing",
+          "To enable calling delete on derived objects",
+          "Without it, deleting a derived object through a base pointer only calls the base destructor — the derived destructor is skipped",
+          "To prevent memory fragmentation",
+          "C++ requires it for all classes",
         ],
         answer: 1,
         explanation:
-          "When you delete a derived object through a base pointer, the destructor called is determined by dynamic dispatch — but only if the destructor is virtual. Without `virtual ~Base()`, the base destructor runs but the derived destructor doesn't, potentially leaking the derived class's resources.",
+          "When you `delete base_ptr` where base_ptr points to a Derived object, if the destructor is non-virtual, only `Base::~Base` runs. `Derived::~Derived` is skipped — leaking any resources the derived class owns. Virtual destructor ensures the correct derived destructor is called.",
       },
       {
         id: "cpp1-003-q4",
         type: "choice",
-        text: "What does `override` do in C++11?",
+        text: "What does `dynamic_cast<Dog*>(animal_ptr)` return if `animal_ptr` actually points to a Cat?",
         options: [
-          "Forces the method to override the base implementation even if the signature doesn't match",
-          "Tells the compiler to verify that this method actually overrides a base class virtual function — compile error if it doesn't",
-          "Makes the function non-virtual",
-          "Prevents the base class version from being called",
+          "A Dog* pointer to the Cat object",
+          "nullptr",
+          "Throws std::bad_cast",
+          "Undefined behavior",
         ],
         answer: 1,
         explanation:
-          "`override` is a specifier that tells the compiler 'this is intended to override a base class virtual function'. If there's no matching virtual function in the base (misspelled name, wrong signature), the compiler errors. This catches bugs where you think you're overriding but are actually defining a new function.",
+          "`dynamic_cast` for pointers returns `nullptr` if the cast fails (wrong type). For references, it throws `std::bad_cast`. This makes it safe to attempt downcasts and check the result.",
       },
     ],
   },

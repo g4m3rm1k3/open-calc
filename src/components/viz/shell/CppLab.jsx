@@ -35,21 +35,28 @@ export default function CppLab({ params = {} }) {
       (k) => k === mainFile || k.endsWith("/" + mainFile),
     );
     return found ?? `/home/user/${mainFile}`;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [initialFiles, mainFile]);
 
   const defaultCode = useMemo(
     () =>
       initialFiles[mainPath] ??
       initialFiles[mainFile] ??
       `#include <iostream>\nusing namespace std;\n\n// __OUTPUT__: Hello, World!\nint main() {\n    cout << "Hello, World!" << endl;\n    return 0;\n}\n`,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    [initialFiles, mainPath, mainFile],
   );
 
   const [code, setCode] = useState(defaultCode);
   const [savedCode, setSavedCode] = useState(defaultCode);
   const [isDirty, setIsDirty] = useState(false);
+
+  // Reset editor content when the lesson changes (new initialFiles from VizFrame params update)
+  const initialFilesKey = useMemo(() => JSON.stringify(initialFiles), [initialFiles]);
+  useEffect(() => {
+    setCode(defaultCode);
+    setSavedCode(defaultCode);
+    setIsDirty(false);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialFilesKey]);
   const textareaRef = useRef(null);
 
   const handleChange = (e) => {
@@ -94,11 +101,10 @@ export default function CppLab({ params = {} }) {
     }
   };
 
-  // liveFiles reference only changes when savedCode changes → safe useEffect dep in ShellTerminal
+  // liveFiles updates when savedCode or initialFiles changes (lesson navigation resets both)
   const liveFiles = useMemo(
     () => ({ ...initialFiles, [mainPath]: savedCode }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [savedCode],
+    [initialFiles, mainPath, savedCode],
   );
 
   const shellParams = {

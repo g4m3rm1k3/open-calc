@@ -1,51 +1,87 @@
-const FUNC_CODE = `#include <iostream>
-#include <string>
+const BASIC_CODE = `#include <iostream>
 using namespace std;
 
-// ── Function declarations (before main) ──────────────────────
-double circleArea(double radius);
-int    factorial(int n);
-void   printLine(string msg, char c = '-');  // default parameter
+// __OUTPUT__: Area of circle r=5: 78.5398\\n10! = 3628800
 
-// ── Function definitions ───────────────────────────────────
-double circleArea(double radius) {
+double circleArea(double r) {
     const double PI = 3.14159265358979;
-    return PI * radius * radius;
+    return PI * r * r;
 }
 
 int factorial(int n) {
-    if (n <= 1) return 1;            // base case
-    return n * factorial(n - 1);    // recursive case
+    if (n <= 1) return 1;
+    return n * factorial(n - 1);
 }
-
-void printLine(string msg, char c) {
-    cout << msg << " ";
-    for (int i = 0; i < 20; i++) cout << c;
-    cout << endl;
-}
-
-// Pass by value vs by reference
-void doubleValue(int x)   { x *= 2; }         // copies x — original unchanged
-void doubleRef(int& x)    { x *= 2; }         // modifies original via reference
-
-// __OUTPUT__: Circle radius 5: area = 78.5398\\nCircle radius 3: area = 28.2743\\n10! = 3628800\\nHello ────────────────\\n=== ════════════════════\\nBefore: 7 7\\nAfter by-val: 7 (unchanged)\\nAfter by-ref: 14 (modified)
 
 int main() {
-    cout << "Circle radius 5: area = " << circleArea(5)   << endl;
-    cout << "Circle radius 3: area = " << circleArea(3)   << endl;
-
+    cout << "Area of circle r=5: " << circleArea(5) << endl;
     cout << "10! = " << factorial(10) << endl;
+    return 0;
+}`;
 
-    printLine("Hello", '-');          // uses provided char
-    printLine("===");                 // uses default char '='... wait — update annotation
+const PARAMS_CODE = `#include <iostream>
+using namespace std;
 
-    int a = 7, b = 7;
-    cout << "Before: " << a << " " << b << endl;
-    doubleValue(a);
-    cout << "After by-val: " << a << " (unchanged)" << endl;
-    doubleRef(b);
-    cout << "After by-ref: " << b << " (modified)" << endl;
+// __OUTPUT__: after val: a=7 (unchanged)\\nafter ref: b=14 (modified)
 
+void doubleByVal(int x) { x *= 2; }    // copy — caller unchanged
+void doubleByRef(int& x) { x *= 2; }  // reference — caller modified
+
+int main() {
+    int a = 7;
+    doubleByVal(a);
+    cout << "after val: a=" << a << " (unchanged)" << endl;
+
+    int b = 7;
+    doubleByRef(b);
+    cout << "after ref: b=" << b << " (modified)" << endl;
+
+    return 0;
+}`;
+
+const OVERLOAD_CODE = `#include <iostream>
+#include <string>
+using namespace std;
+
+// __OUTPUT__: square(3) = 9\\nsquare(2.5) = 6.25\\ngreet() = Hello!\\ngreet(Bob) = Hello, Bob!
+
+int    square(int x)    { return x * x; }
+double square(double x) { return x * x; }
+
+// Default parameter: caller can omit name
+void greet(string name = "") {
+    if (name.empty()) cout << "Hello!" << endl;
+    else              cout << "Hello, " << name << "!" << endl;
+}
+
+int main() {
+    cout << "square(3) = "   << square(3)   << endl;
+    cout << "square(2.5) = " << square(2.5) << endl;
+    greet();
+    greet("Bob");
+    return 0;
+}`;
+
+const RECURSE_CODE = `#include <iostream>
+using namespace std;
+
+// __OUTPUT__: fib(8) = 21\\ngcd(48, 18) = 6
+
+// Fibonacci: each number is sum of two before it
+int fib(int n) {
+    if (n <= 1) return n;       // base cases: fib(0)=0, fib(1)=1
+    return fib(n-1) + fib(n-2); // recursive case
+}
+
+// Euclid's GCD: gcd(a,b) = gcd(b, a%b), stops at gcd(a,0)=a
+int gcd(int a, int b) {
+    if (b == 0) return a;
+    return gcd(b, a % b);
+}
+
+int main() {
+    cout << "fib(8) = "      << fib(8)     << endl;
+    cout << "gcd(48, 18) = " << gcd(48,18) << endl;
     return 0;
 }`;
 
@@ -55,8 +91,8 @@ const lesson = {
   chapter: "cpp-0",
   order: 7,
   title: "Functions",
-  subtitle: "Define reusable code blocks, pass data in and out, and understand the call stack",
-  tags: ["c++", "cpp", "functions", "parameters", "return", "recursion", "pass-by-reference", "default-parameters"],
+  subtitle: "Define reusable logic, pass data in and out, and understand pass-by-reference",
+  tags: ["c++", "cpp", "functions", "parameters", "return", "recursion", "pass-by-reference", "overloading"],
   aliases: [
     "c++ functions",
     "pass by value vs reference c++",
@@ -65,31 +101,33 @@ const lesson = {
     "default parameters c++",
   ],
 
-  hook: `Functions are the fundamental unit of code organization. They let you name a piece of logic, reuse it, test it independently, and reason about it without holding the entire program in your head at once. Every non-trivial program — from shell scripts to game engines — is decomposed into functions. Learning to design good functions (clear names, single responsibilities, clean interfaces) is what separates code you can maintain from code you have to rewrite.`,
+  hook: `Functions are the fundamental unit of code organization. Name a piece of logic, test it independently, reuse it anywhere. Every serious program is decomposed into functions. Learning to design them well — clear names, single responsibilities, clean interfaces — is what separates code you can maintain from code you have to rewrite.`,
 
   mentalModel: [
-    "**A function is a named block of code with a defined interface: parameters and return type.** The caller provides arguments (values for the parameters) and gets back a return value. Inside the function, parameters are local variables — modifying them doesn't affect the caller's variables *unless* you pass by reference.",
-    "**Pass by value vs pass by reference.** `void f(int x)` — `x` is a copy. `void f(int& x)` — `x` IS the caller's variable. In the value case: changes to `x` inside `f` are invisible to the caller. In the reference case: the function sees and can modify the caller's actual variable. This is the distinction between 'tell a function a number' vs 'give a function access to your variable'.",
-    "**Recursion is when a function calls itself.** Every recursive function needs a base case (condition that stops the recursion) and a recursive case (calls itself with a simpler argument). Each call gets its own stack frame — its own set of local variables. Without a base case, recursion is infinite and causes a stack overflow.",
+    "**A function takes parameters and returns a value.** The return type comes first, then the name, then the parameter list. `double circleArea(double r)` is a contract: give it a `double` radius, get back a `double` area. Inside, `r` is a local variable — changes don't affect the caller.",
+    "**Pass by value copies the argument. Pass by reference gives the function access to the caller's variable.** `void f(int x)` — `x` is a copy, caller unchanged. `void f(int& x)` — `x` IS the caller's variable, changes propagate back. Use `const int& x` for large objects you want to read without copying.",
+    "**Recursion: a function that calls itself.** Every recursive function needs a base case (stops recursion) and a recursive case (calls itself with a simpler input). Each call gets its own local variables on the call stack. Missing base case = infinite recursion = stack overflow.",
   ],
 
   intuition: {
     prose: [
-      "**Declarations vs definitions.** A function *declaration* (forward declaration or prototype) tells the compiler the function's name, return type, and parameter types — but not what it does: `double circleArea(double r);`. A *definition* provides the body. In a single-file program, you can define functions before `main` to avoid declarations. In multi-file projects, declarations go in header files (`.h`) and definitions in source files (`.cpp`).",
-      "**The call stack.** Every function call creates a *stack frame* — a chunk of memory on the call stack holding: the return address (where to resume after the function returns), the function's local variables, and space for the return value. When the function returns, its frame is popped. The stack grows as you call deeper, shrinks as functions return. A stack overflow happens when recursion is too deep (or you have very large local arrays). For most programs, the default stack is 1–8 MB — enough for hundreds of thousands of function calls.",
-      "**Default parameters let callers omit trailing arguments.** `void print(string msg, char c = '-')` — the caller can write `print(\"hello\")` (uses `-`) or `print(\"hello\", '*')` (uses `*`). Default values must be specified at the function declaration, and only for trailing parameters. This is how many library functions offer 'sensible defaults while allowing customization'.",
-      "**Function overloading** lets you define multiple functions with the same name but different parameter types. `int abs(int)` and `double abs(double)` can coexist. The compiler selects the right one based on the argument types. This is called *static dispatch* — resolved at compile time, zero runtime overhead. Don't overload with functions that do different things — overloading should mean 'the same operation on different types'.",
+      "**Functions avoid repetition and make code testable.** If you write `PI * r * r` in three places and later want to change the formula, you change one function instead of hunting down three spots. A function also gives the logic a name — `circleArea(5)` is clearer than `3.14159 * 5 * 5`.",
     ],
     visualizations: [
       {
         id: "CppLab",
-        mathBridge:
-          "**Explore functions deeply:**\n\n1. Compile and run — trace what each function does\n2. Add a `power(double base, int exp)` function using a loop\n3. Add a second `circleArea` that takes circumference instead of radius (overloading)\n4. Try `factorial(0)` and `factorial(-1)` — does the base case handle them?\n5. Add `void swap(int& a, int& b)` to swap two variables using references\n6. Trace the recursion: `factorial(4)` calls `factorial(3)` calls... draw the call stack",
+        mathBridge: "**Run it — then explore:**\n\n- Add a `double sphereVolume(double r)` function using the formula `(4.0/3.0) * PI * r * r * r`.\n- Call `factorial(0)` and `factorial(1)` — does the base case handle them?\n- Trace the recursion: `factorial(4)` calls `factorial(3)` calls... draw the call stack on paper.\n- Try `factorial(20)` — does it overflow `int`? Change to `long long` if so.",
         props: {
           mainFile: "main.cpp",
-          initialFiles: {
-            "/home/user/main.cpp": FUNC_CODE,
-          },
+          initialFiles: { "/home/user/main.cpp": BASIC_CODE },
+        },
+      },
+      {
+        id: "CppLab",
+        mathBridge: "**Pass by value vs reference — run it then explore:**\n\n- Add `void triple(int& x) { x *= 3; }` and test it.\n- Add `void swap(int& a, int& b) { int tmp = a; a = b; b = tmp; }` — does it work?\n- Try passing `7` directly to `doubleByRef`: `doubleByRef(7)` — does it compile? (Hint: can't take a reference to a literal)\n- Change `doubleByRef(int& x)` to `doubleByRef(const int& x)` and try `x *= 2` — compile error?",
+        props: {
+          mainFile: "main.cpp",
+          initialFiles: { "/home/user/main.cpp": PARAMS_CODE },
         },
       },
     ],
@@ -97,86 +135,68 @@ const lesson = {
 
   rigor: {
     prose: [
-      "**Stack frames and activation records.** When `main` calls `factorial(3)`, a frame for `factorial(3)` is pushed: `n=3`, return address points back into `main`. That frame calls `factorial(2)` — new frame with `n=2`. Stack grows: main → factorial(3) → factorial(2) → factorial(1). Base case returns 1, frames unwind: factorial(2) returns 2, factorial(3) returns 6, main resumes. Each recursive call has its own independent copy of `n`. This is why recursion is safe for computing but costly for deep recursion.",
-      "**`const` references: read-only access without copying.** `void print(const string& s)` — the `&` avoids copying the string (potentially expensive for large strings), and `const` prevents modification. This is the idiomatic way to pass large objects you only need to read: `void processData(const vector<int>& data)`. The caller is guaranteed the function won't modify their data. Pass fundamental types (int, double, char) by value — they're cheap to copy.",
-      "**Return value optimization (RVO/NRVO).** When a function returns a local object, modern compilers often construct it directly in the caller's memory space, avoiding a copy entirely. Since C++17, this is guaranteed in many cases ('guaranteed copy elision'). This means returning large objects by value is often just as fast as passing them by reference — the compiler handles it. Write clear, return-by-value code and let the compiler optimize.",
+      "**Overloading: same name, different parameter types.** `square(3)` calls `int square(int)`. `square(2.5)` calls `double square(double)`. The compiler resolves which version at compile time based on argument types — zero runtime overhead. Don't overload for different behaviors — only for the same operation on different types.",
+      "**Recursion depth and the call stack.** Every function call creates a stack frame. Deep recursion (or infinite recursion) exhausts the stack — typically 1-8 MB, enough for ~100,000 frames. `fib(50)` is catastrophically slow — it recomputes the same values billions of times. Iterative or memoized solutions are practical. Recognize when recursion is elegant (GCD, tree traversal) vs when it's a trap (naive Fibonacci).",
+    ],
+    visualizations: [
+      {
+        id: "CppLab",
+        mathBridge: "**Overloading and default params — run it then explore:**\n\n- Add `string square(string s) { return s + s; }` — `square(\"hi\")` should return `\"hihi\"`.\n- Try calling `greet()` with and without an argument — confirm both work.\n- Add `void log(string msg, bool newline = true)` — `log(\"hi\")` adds a newline, `log(\"hi\", false)` doesn't.\n- Try `square(3.0f)` — does it call the `double` version or cause ambiguity?",
+        props: {
+          mainFile: "main.cpp",
+          initialFiles: { "/home/user/main.cpp": OVERLOAD_CODE },
+        },
+      },
+      {
+        id: "CppLab",
+        mathBridge: "**Recursion — run it then explore:**\n\n- Run `fib(10)`, `fib(15)`, `fib(20)` — notice it gets slow. Count the calls by adding a static counter.\n- Trace `gcd(48, 18)` by hand: gcd(48,18)→gcd(18,12)→gcd(12,6)→gcd(6,0)=6.\n- Add `bool isPrime(int n)` using recursion: test divisors from 2 up.\n- Try `fib(0)`, `fib(1)` — base cases return the right values?",
+        props: {
+          mainFile: "main.cpp",
+          initialFiles: { "/home/user/main.cpp": RECURSE_CODE },
+        },
+      },
     ],
     callouts: [
       {
         type: "warning",
         title: "Never return a reference to a local variable",
-        body: "`int& badFunc() { int x = 5; return x; }` — this returns a reference to a local variable that is destroyed when the function returns. The reference is dangling (points to freed memory). The compiler usually warns about this. Always return by value for local data, or ensure the referenced object outlives the reference.",
-      },
-      {
-        type: "info",
-        title: "Function signatures must be unique",
-        body: "Overloaded functions are distinguished by parameter types (number and types), not by return type alone. `int f(int)` and `double f(int)` cannot coexist — the compiler can't choose between them at a call site. Also, `const` differences in value parameters (`f(int)` vs `f(const int)`) don't differentiate overloads.",
+        body: "`int& bad() { int x = 5; return x; }` — `x` is destroyed when `bad()` returns. The reference is dangling (points to freed memory). Always return by value for local data.",
       },
       {
         type: "tip",
-        title: "Single responsibility principle for functions",
-        body: "A function should do ONE thing and do it well. If you can't describe what a function does without using 'and', consider splitting it. Prefer many small functions over one large function. Small functions are easier to test, easier to name clearly, and easier to reuse. A good rule of thumb: if a function doesn't fit on one screen, it's probably too long.",
+        title: "Use const& for large read-only parameters",
+        body: "`void print(const string& s)` avoids copying the string (the `&`) while preventing modification (the `const`). For small types like `int`, `double`, `char` — pass by value. For strings, vectors, or large structs — pass by `const&`.",
       },
     ],
   },
 
   examples: [
     {
-      title: "Pass by value vs reference vs const reference",
-      body: `// By value: caller's variable unchanged
-void addTen_val(int x) { x += 10; }
+      title: "Pass by const reference for large objects",
+      body: `#include <vector>
 
-// By reference: modifies caller's variable
-void addTen_ref(int& x) { x += 10; }
-
-// By const ref: reads large object without copying
-string describe(const string& s) {
-    return "Length " + to_string(s.length()) + ": " + s;
+// Avoids copying — reads without modifying
+double average(const vector<int>& data) {
+    if (data.empty()) return 0.0;
+    int sum = 0;
+    for (int x : data) sum += x;
+    return (double)sum / data.size();
 }
 
-int main() {
-    int a = 5;
-    addTen_val(a);   cout << a << endl;   // 5  (unchanged)
-    addTen_ref(a);   cout << a << endl;   // 15 (modified)
-
-    string msg = "Hello, World!";
-    cout << describe(msg) << endl;        // no copy made
+// Passes by reference to modify — output parameter
+void normalize(vector<double>& v, double scale) {
+    for (double& x : v) x /= scale;
 }`,
     },
     {
-      title: "Function overloading",
-      body: `// Same name, different parameter types
-double square(double x) { return x * x; }
-int    square(int x)    { return x * x; }
+      title: "Overloaded min for different types",
+      body: `int    minOf(int a, int b)       { return (a < b) ? a : b; }
+double minOf(double a, double b)  { return (a < b) ? a : b; }
+string minOf(string a, string b)  { return (a < b) ? a : b; }
 
-// The compiler picks the right version automatically
-cout << square(3)    << endl;  // calls int version → 9
-cout << square(2.5)  << endl;  // calls double version → 6.25
-cout << square(3.0)  << endl;  // calls double version → 9.0
-
-// Overload count and total
-int sum(int a, int b)        { return a + b; }
-int sum(int a, int b, int c) { return a + b + c; }
-cout << sum(2, 3)    << endl;  // 5
-cout << sum(1, 2, 3) << endl;  // 6`,
-    },
-    {
-      title: "Recursive binary search",
-      body: `// Find target in sorted array — returns index or -1
-int binarySearch(int arr[], int lo, int hi, int target) {
-    if (lo > hi) return -1;          // base case: not found
-
-    int mid = lo + (hi - lo) / 2;   // avoids overflow vs (lo+hi)/2
-    if (arr[mid] == target) return mid;
-    if (arr[mid] < target)
-        return binarySearch(arr, mid+1, hi, target);   // search right
-    else
-        return binarySearch(arr, lo, mid-1, target);   // search left
-}
-
-int arr[] = {1, 3, 5, 7, 9, 11, 13};
-cout << binarySearch(arr, 0, 6, 7) << endl;   // 3
-cout << binarySearch(arr, 0, 6, 6) << endl;   // -1`,
+cout << minOf(3, 7)        << endl;  // 3
+cout << minOf(2.5, 1.8)    << endl;  // 1.8
+cout << minOf("cat","ant") << endl;  // ant (lexicographic)`,
     },
   ],
 
@@ -184,23 +204,24 @@ cout << binarySearch(arr, 0, 6, 6) << endl;   // -1`,
     {
       difficulty: "easy",
       problem:
-        "Write these utility functions: (1) `bool isPrime(int n)` — returns true if n is prime (test divisors up to sqrt(n)), (2) `int gcd(int a, int b)` — using Euclid's algorithm recursively: `gcd(a, b) = gcd(b, a % b)` with base case `gcd(a, 0) = a`. Test both in main with several values.",
-      hint: "For isPrime, loop d from 2 while d*d <= n. For gcd, the recursive case is `return gcd(b, a % b);`.",
+        "Write `bool isPrime(int n)` — returns true if n is prime. Test divisors from 2 up to sqrt(n): if any divides evenly, it's not prime. Use it to print all primes from 2 to 50.",
+      hint: "Loop `d = 2` while `d * d <= n`. If `n % d == 0`, return false. Return true at the end.",
       walkthrough: [
-        "isPrime: return false for n < 2; loop d = 2 while d*d <= n; if n%d==0 return false; return true",
-        "gcd: if b == 0 return a; else return gcd(b, a % b)",
-        "Test: isPrime(17) = true, isPrime(18) = false; gcd(48, 18) = 6",
+        "if n < 2 return false",
+        "for d = 2; d*d <= n; d++: if n%d==0 return false",
+        "return true",
+        "In main: for i = 2..50: if isPrime(i) cout << i",
       ],
     },
     {
       difficulty: "medium",
       problem:
-        "Write `int countDigits(int n)` and `int reverseDigits(int n)` — both should work for any integer (handle negative numbers by taking the absolute value). Then write `bool isPalindrome(int n)` using the other two functions. A number is a palindrome if it reads the same backwards (e.g., 121, 1331).",
-      hint: "Use `%` to extract the last digit and `/` to remove it. For reverseDigits: result = result * 10 + n % 10; n /= 10;",
+        "Write `int reverseDigits(int n)` and `bool isPalindrome(int n)` — a number is a palindrome if it equals its digit-reversal (121, 1331). Handle negatives by returning false. Then use recursion to write `int sumDigits(int n)` — sum all digits of n.",
+      hint: "reverseDigits: `while n > 0: rev = rev*10 + n%10; n /= 10`. sumDigits: base case `n == 0`, recursive case `n%10 + sumDigits(n/10)`.",
       walkthrough: [
-        "countDigits: handle n=0 as 1 digit; while n > 0: count++, n /= 10",
-        "reverseDigits: while n > 0: rev = rev*10 + n%10; n /= 10; return rev",
-        "isPalindrome: return n == reverseDigits(n) after taking abs",
+        "reverseDigits: rev=0; while n>0: rev = rev*10 + n%10; n /= 10; return rev",
+        "isPalindrome: if n < 0 return false; return n == reverseDigits(n)",
+        "sumDigits: if n == 0 return 0; return n%10 + sumDigits(n/10)",
       ],
     },
   ],
@@ -215,44 +236,44 @@ cout << binarySearch(arr, 0, 6, 6) << endl;   // -1`,
           "No difference — both modify the caller's variable",
           "f(int x) copies the value; f(int& x) accesses the caller's actual variable",
           "f(int& x) is read-only; f(int x) allows modification",
-          "f(int x) is faster because it uses a reference",
+          "f(int x) is faster because it avoids copying",
         ],
         answer: 1,
         explanation:
-          "`void f(int x)` receives a copy of the argument — changes to `x` inside `f` don't affect the caller. `void f(int& x)` receives a reference to the caller's variable — changes to `x` inside `f` directly modify the caller's variable.",
+          "`void f(int x)` receives a copy. Changes inside `f` don't affect the caller. `void f(int& x)` receives a reference to the caller's variable — changes propagate back.",
       },
       {
         id: "cpp0-007-q2",
         type: "choice",
-        text: "What is a 'stack overflow' in the context of recursion?",
+        text: "What causes a stack overflow in recursion?",
         options: [
-          "The return value is too large to store in the return type",
-          "The recursive function returns without computing a value",
-          "Infinite recursion fills the call stack until it runs out of space",
-          "A compile error caused by calling a function before declaring it",
+          "The return value is too large",
+          "A function returns without a value",
+          "Missing base case causes infinite recursion that fills the call stack",
+          "A compile error from calling a function before declaring it",
         ],
         answer: 2,
         explanation:
-          "Each function call uses stack memory for its frame. Infinite recursion (missing or unreachable base case) keeps pushing frames until the stack is exhausted — the OS terminates the program with a segfault or stack overflow error.",
+          "Each call pushes a stack frame. Without a base case, recursion never terminates — the stack fills up and the OS kills the program with a stack overflow / segfault.",
       },
       {
         id: "cpp0-007-q3",
         type: "choice",
         text: "What is the idiomatic way to pass a large `std::vector` to a function that only reads it?",
         options: [
-          "`void f(vector<int> v)` — pass by value",
-          "`void f(vector<int>& v)` — pass by reference",
-          "`void f(const vector<int>& v)` — pass by const reference",
-          "`void f(vector<int>* v)` — pass by pointer",
+          "`void f(vector<int> v)` — by value",
+          "`void f(vector<int>& v)` — by reference",
+          "`void f(const vector<int>& v)` — by const reference",
+          "`void f(vector<int>* v)` — by pointer",
         ],
         answer: 2,
         explanation:
-          "`const vector<int>&` avoids copying the potentially-large vector (reference), while `const` signals that the function won't modify it. This is the standard C++ idiom for read-only large parameters.",
+          "`const vector<int>&` avoids copying (the `&`) while the `const` signals the function won't modify the data. This is the standard idiom for read-only large parameters.",
       },
       {
         id: "cpp0-007-q4",
         type: "choice",
-        text: "Can two functions with the same name but different return types (but same parameter types) coexist as overloads?",
+        text: "Can two functions with the same name but only different return types coexist as overloads?",
         options: [
           "Yes, the compiler picks based on context",
           "No, overload resolution uses parameter types, not return types",
@@ -261,7 +282,7 @@ cout << binarySearch(arr, 0, 6, 6) << endl;   // -1`,
         ],
         answer: 1,
         explanation:
-          "Overload resolution is based on the number and types of parameters. Return type is not considered. `int f(int)` and `double f(int)` are ambiguous — the compiler can't distinguish a call to `f(5)` between them.",
+          "Overload resolution is based on parameter count and types only — not return type. `int f(int)` and `double f(int)` are ambiguous at the call site `f(5)` and will cause a compile error.",
       },
     ],
   },

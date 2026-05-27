@@ -16,60 +16,90 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const MACHINE_DEFINITIONS = {
-
   fanuc_mill: {
     id: "fanuc_mill",
     label: "FANUC 0i-MF / 31i Mill",
     vendor: "FANUC",
     class: "mill",
     dialect: "fanuc",
-    axes: { linear: ["X","Y","Z"], rotary: [], spindle: "C" },
+    axes: { linear: ["X", "Y", "Z"], rotary: [], spindle: "C" },
     channels: [{ id: 0, label: "Main" }],
     syntax: {
       programStart: ["%", "O\\d+"],
-      programEnd:   ["M30", "M02", "%"],
-      blockSkip:    "/",
-      lineComment:  ";",
+      programEnd: ["M30", "M02", "%"],
+      blockSkip: "/",
+      lineComment: ";",
       blockComment: ["(", ")"],
-      seqNumber:    /^N(\d+)/i,
-      varPrefix:    "#",
-      labelPrefix:  "N",
-      subCall:      { code: "M98", param: "P", lRepeat: "L" },
-      subReturn:    "M99",
-      subEnd:       "M99",
+      seqNumber: /^N(\d+)/i,
+      varPrefix: "#",
+      labelPrefix: "N",
+      subCall: { code: "M98", param: "P", lRepeat: "L" },
+      subReturn: "M99",
+      subEnd: "M99",
     },
     modals: {
-      motion:     { group: 1,  default: "G00", codes: ["G00","G01","G02","G03","G04","G05","G05.1","G07.1"] },
-      plane:      { group: 2,  default: "G17", codes: ["G17","G18","G19"] },
-      absInc:     { group: 3,  default: "G90", codes: ["G90","G91"] },
-      feed:       { group: 5,  default: "G94", codes: ["G94","G95"] },
-      units:      { group: 6,  default: "G21", codes: ["G20","G21"] },
-      cutComp:    { group: 7,  default: "G40", codes: ["G40","G41","G41.1","G42","G42.1"] },
-      tlLen:      { group: 8,  default: "G49", codes: ["G43","G43.1","G43.3","G43.4","G44","G49"] },
-      retPlane:   { group: 10, default: "G98", codes: ["G98","G99"] },
-      workCoord:  { group: 14, default: "G54", codes: ["G54","G55","G56","G57","G58","G59","G54.1"] },
-      cycle:      { group: 9,  default: "G80", codes: ["G80","G81","G82","G83","G84","G85","G86","G87","G88","G89"] },
+      motion: {
+        group: 1,
+        default: "G00",
+        codes: ["G00", "G01", "G02", "G03", "G04", "G05", "G05.1", "G07.1"],
+      },
+      plane: { group: 2, default: "G17", codes: ["G17", "G18", "G19"] },
+      absInc: { group: 3, default: "G90", codes: ["G90", "G91"] },
+      feed: { group: 5, default: "G94", codes: ["G94", "G95"] },
+      units: { group: 6, default: "G21", codes: ["G20", "G21"] },
+      cutComp: {
+        group: 7,
+        default: "G40",
+        codes: ["G40", "G41", "G41.1", "G42", "G42.1"],
+      },
+      tlLen: {
+        group: 8,
+        default: "G49",
+        codes: ["G43", "G43.1", "G43.3", "G43.4", "G44", "G49"],
+      },
+      retPlane: { group: 10, default: "G98", codes: ["G98", "G99"] },
+      workCoord: {
+        group: 14,
+        default: "G54",
+        codes: ["G54", "G55", "G56", "G57", "G58", "G59", "G54.1"],
+      },
+      cycle: {
+        group: 9,
+        default: "G80",
+        codes: [
+          "G80",
+          "G81",
+          "G82",
+          "G83",
+          "G84",
+          "G85",
+          "G86",
+          "G87",
+          "G88",
+          "G89",
+        ],
+      },
     },
     mCodes: {
-      programStop:   ["M00"],
-      optionalStop:  ["M01"],
-      programEnd:    ["M30","M02"],
-      spindleCW:     ["M03"],
-      spindleCCW:    ["M04"],
-      spindleStop:   ["M05"],
-      toolChange:    ["M06"],
-      coolantFlood:  ["M08"],
-      coolantMist:   ["M07"],
-      coolantTap:    ["M50"],
-      coolantOff:    ["M09"],
+      programStop: ["M00"],
+      optionalStop: ["M01"],
+      programEnd: ["M30", "M02"],
+      spindleCW: ["M03"],
+      spindleCCW: ["M04"],
+      spindleStop: ["M05"],
+      toolChange: ["M06"],
+      coolantFlood: ["M08"],
+      coolantMist: ["M07"],
+      coolantTap: ["M50"],
+      coolantOff: ["M09"],
       spindleOrient: ["M19"],
-      subCall:       ["M98"],
-      subReturn:     ["M99"],
-      airBlast:      ["M13","M14"],
-      chuckOpen:     ["M21"],
-      chuckClose:    ["M22"],
-      tailstock:     ["M23","M24"],
-      partCatcher:   ["M76","M77"],
+      subCall: ["M98"],
+      subReturn: ["M99"],
+      airBlast: ["M13", "M14"],
+      chuckOpen: ["M21"],
+      chuckClose: ["M22"],
+      tailstock: ["M23", "M24"],
+      partCatcher: ["M76", "M77"],
     },
     waitCodes: {},
     toolChange: {
@@ -78,36 +108,64 @@ export const MACHINE_DEFINITIONS = {
       cancel: "G49",
     },
     specialG: {
-      "G10": "parameter-setting",
-      "G28": "return-to-reference",
-      "G29": "return-from-reference",
-      "G50": "max-spindle-speed",
-      "G52": "local-coord-shift",
-      "G53": "machine-coord",
-      "G65": "macro-call",
-      "G66": "macro-modal-call",
-      "G67": "macro-modal-cancel",
-      "G92": "spindle-speed-clamp",
-      "G96": "css",
-      "G97": "rpm",
+      G10: "parameter-setting",
+      G28: "return-to-reference",
+      G29: "return-from-reference",
+      G50: "max-spindle-speed",
+      G52: "local-coord-shift",
+      G53: "machine-coord",
+      G65: "macro-call",
+      G66: "macro-modal-call",
+      G67: "macro-modal-cancel",
+      G92: "spindle-speed-clamp",
+      G96: "css",
+      G97: "rpm",
     },
     macroVars: {
       system: {
         "#0": "null",
-        "#1": "A-arg", "#2": "B-arg", "#3": "C-arg",
-        "#4": "I-arg", "#5": "J-arg", "#6": "K-arg",
-        "#7": "D-arg", "#8": "E-arg", "#9": "F-arg", "#10": "H-arg",
-        "#11": "M-arg", "#17": "Q-arg", "#18": "R-arg", "#19": "S-arg",
-        "#20": "T-arg", "#21": "U-arg", "#22": "V-arg", "#23": "W-arg",
-        "#24": "X-arg", "#25": "Y-arg", "#26": "Z-arg",
-        "#4001":"group1-modal", "#4002":"group2-modal",
-        "#5001":"block-end-X", "#5002":"block-end-Y", "#5003":"block-end-Z",
-        "#5021":"mach-coord-X", "#5022":"mach-coord-Y", "#5023":"mach-coord-Z",
-        "#5041":"work-coord-X", "#5042":"work-coord-Y", "#5043":"work-coord-Z",
-        "#5061":"skip-coord-X", "#5062":"skip-coord-Y", "#5063":"skip-coord-Z",
-        "#5081":"tool-len-compensation",
-        "#5201":"G54-X", "#5202":"G54-Y", "#5203":"G54-Z",
-        "#5221":"G55-X", "#5222":"G55-Y", "#5223":"G55-Z",
+        "#1": "A-arg",
+        "#2": "B-arg",
+        "#3": "C-arg",
+        "#4": "I-arg",
+        "#5": "J-arg",
+        "#6": "K-arg",
+        "#7": "D-arg",
+        "#8": "E-arg",
+        "#9": "F-arg",
+        "#10": "H-arg",
+        "#11": "M-arg",
+        "#17": "Q-arg",
+        "#18": "R-arg",
+        "#19": "S-arg",
+        "#20": "T-arg",
+        "#21": "U-arg",
+        "#22": "V-arg",
+        "#23": "W-arg",
+        "#24": "X-arg",
+        "#25": "Y-arg",
+        "#26": "Z-arg",
+        "#4001": "group1-modal",
+        "#4002": "group2-modal",
+        "#5001": "block-end-X",
+        "#5002": "block-end-Y",
+        "#5003": "block-end-Z",
+        "#5021": "mach-coord-X",
+        "#5022": "mach-coord-Y",
+        "#5023": "mach-coord-Z",
+        "#5041": "work-coord-X",
+        "#5042": "work-coord-Y",
+        "#5043": "work-coord-Z",
+        "#5061": "skip-coord-X",
+        "#5062": "skip-coord-Y",
+        "#5063": "skip-coord-Z",
+        "#5081": "tool-len-compensation",
+        "#5201": "G54-X",
+        "#5202": "G54-Y",
+        "#5203": "G54-Z",
+        "#5221": "G55-X",
+        "#5222": "G55-Y",
+        "#5223": "G55-Z",
       },
       systemVarNames: {
         "#_DATE": () => new Date().toLocaleDateString(),
@@ -125,79 +183,122 @@ export const MACHINE_DEFINITIONS = {
     vendor: "FANUC",
     class: "lathe",
     dialect: "fanuc",
-    axes: { linear: ["X","Z"], rotary: ["C"], spindle: "C", subSpindleAxes: ["X2","Z2"] },
+    axes: {
+      linear: ["X", "Z"],
+      rotary: ["C"],
+      spindle: "C",
+      subSpindleAxes: ["X2", "Z2"],
+    },
     channels: [{ id: 0, label: "Turret 1 (Main)" }],
     syntax: {
       programStart: ["%", "O\\d+"],
-      programEnd:   ["M30", "M02", "%"],
-      blockSkip:    "/",
-      lineComment:  ";",
+      programEnd: ["M30", "M02", "%"],
+      blockSkip: "/",
+      lineComment: ";",
       blockComment: ["(", ")"],
-      seqNumber:    /^N(\d+)/i,
-      varPrefix:    "#",
-      subCall:      { code: "M98", param: "P", lRepeat: "L" },
-      subReturn:    "M99",
+      seqNumber: /^N(\d+)/i,
+      varPrefix: "#",
+      subCall: { code: "M98", param: "P", lRepeat: "L" },
+      subReturn: "M99",
     },
     modals: {
-      motion:     { group: 1,  default: "G00", codes: ["G00","G01","G02","G03","G04","G07.1","G32","G33","G34","G35","G36"] },
-      plane:      { group: 2,  default: "G18", codes: ["G17","G18","G19"] },
-      absInc:     { group: 3,  default: "G90", codes: ["G90","G91"] },
-      diamRad:    { group: 11, default: "G22", codes: ["G22","G23"] },
-      feed:       { group: 5,  default: "G98", codes: ["G98","G99"] },
-      units:      { group: 6,  default: "G21", codes: ["G20","G21"] },
-      cutComp:    { group: 7,  default: "G40", codes: ["G40","G41","G42"] },
-      tlLen:      { group: 8,  default: "G49", codes: ["G43","G44","G49"] },
-      workCoord:  { group: 14, default: "G54", codes: ["G54","G55","G56","G57","G58","G59"] },
-      cycle:      { group: 9,  default: "G80", codes: ["G70","G71","G72","G73","G74","G75","G76","G80","G83","G84","G85","G87","G88"] },
-      spindleCtrl:{ group: 15, default: "G97", codes: ["G96","G97"] },
+      motion: {
+        group: 1,
+        default: "G00",
+        codes: [
+          "G00",
+          "G01",
+          "G02",
+          "G03",
+          "G04",
+          "G07.1",
+          "G32",
+          "G33",
+          "G34",
+          "G35",
+          "G36",
+        ],
+      },
+      plane: { group: 2, default: "G18", codes: ["G17", "G18", "G19"] },
+      absInc: { group: 3, default: "G90", codes: ["G90", "G91"] },
+      diamRad: { group: 11, default: "G22", codes: ["G22", "G23"] },
+      feed: { group: 5, default: "G98", codes: ["G98", "G99"] },
+      units: { group: 6, default: "G21", codes: ["G20", "G21"] },
+      cutComp: { group: 7, default: "G40", codes: ["G40", "G41", "G42"] },
+      tlLen: { group: 8, default: "G49", codes: ["G43", "G44", "G49"] },
+      workCoord: {
+        group: 14,
+        default: "G54",
+        codes: ["G54", "G55", "G56", "G57", "G58", "G59"],
+      },
+      cycle: {
+        group: 9,
+        default: "G80",
+        codes: [
+          "G70",
+          "G71",
+          "G72",
+          "G73",
+          "G74",
+          "G75",
+          "G76",
+          "G80",
+          "G83",
+          "G84",
+          "G85",
+          "G87",
+          "G88",
+        ],
+      },
+      spindleCtrl: { group: 15, default: "G97", codes: ["G96", "G97"] },
     },
     mCodes: {
-      programStop:   ["M00"],
-      optionalStop:  ["M01"],
-      programEnd:    ["M30","M02"],
-      spindleCW:     ["M03"],
-      spindleCCW:    ["M04"],
-      spindleStop:   ["M05"],
-      toolChange:    [],           // lathe: T-word selects tool+offset
-      coolantFlood:  ["M08"],
-      coolantOff:    ["M09"],
-      coolantThru:   ["M51"],
+      programStop: ["M00"],
+      optionalStop: ["M01"],
+      programEnd: ["M30", "M02"],
+      spindleCW: ["M03"],
+      spindleCCW: ["M04"],
+      spindleStop: ["M05"],
+      toolChange: [], // lathe: T-word selects tool+offset
+      coolantFlood: ["M08"],
+      coolantOff: ["M09"],
+      coolantThru: ["M51"],
       spindleOrient: ["M19"],
-      liveToolCW:    ["M13"],
-      liveToolCCW:   ["M14"],
-      liveToolStop:  ["M15"],
-      chuckOpen:     ["M10","M21"],
-      chuckClose:    ["M11","M22"],
-      tailstockAdv:  ["M23"],
-      tailstockRet:  ["M24"],
+      liveToolCW: ["M13"],
+      liveToolCCW: ["M14"],
+      liveToolStop: ["M15"],
+      chuckOpen: ["M10", "M21"],
+      chuckClose: ["M11", "M22"],
+      tailstockAdv: ["M23"],
+      tailstockRet: ["M24"],
       subSpindClamp: ["M66"],
-      subSpindRel:   ["M67"],
-      partCatcher:   ["M76"],
-      partCatchRet:  ["M77"],
-      barFeeder:     ["M105"],
-      subCall:       ["M98"],
-      subReturn:     ["M99"],
+      subSpindRel: ["M67"],
+      partCatcher: ["M76"],
+      partCatchRet: ["M77"],
+      barFeeder: ["M105"],
+      subCall: ["M98"],
+      subReturn: ["M99"],
     },
     waitCodes: {
-      "M200": { type: "channel-wait", param: "P", desc: "Wait for channel P" },
-      "M201": { type: "channel-wait", desc: "Wait for all channels" },
+      M200: { type: "channel-wait", param: "P", desc: "Wait for channel P" },
+      M201: { type: "channel-wait", desc: "Wait for all channels" },
     },
     toolChange: {
-      syntax: "T{nn}{oo}",   // T0303 = tool 3, offset 3
-      diameterMode: true,    // X is diameter
+      syntax: "T{nn}{oo}", // T0303 = tool 3, offset 3
+      diameterMode: true, // X is diameter
     },
     specialG: {
-      "G50": "max-spindle-clamp",
-      "G92": "spindle-speed-clamp",
-      "G96": "css",
-      "G97": "rpm",
-      "G71": "rough-od-cycle",
-      "G72": "rough-face-cycle",
-      "G73": "pattern-repeating-cycle",
-      "G74": "peck-drilling-face",
-      "G75": "peck-grooving-od",
-      "G76": "threading-cycle",
-      "G70": "finish-cycle",
+      G50: "max-spindle-clamp",
+      G92: "spindle-speed-clamp",
+      G96: "css",
+      G97: "rpm",
+      G71: "rough-od-cycle",
+      G72: "rough-face-cycle",
+      G73: "pattern-repeating-cycle",
+      G74: "peck-drilling-face",
+      G75: "peck-grooving-od",
+      G76: "threading-cycle",
+      G70: "finish-cycle",
     },
   },
 
@@ -207,7 +308,7 @@ export const MACHINE_DEFINITIONS = {
     vendor: "FANUC",
     class: "lathe",
     dialect: "fanuc",
-    axes: { linear: ["X","Z"], rotary: ["C"], subSpindleAxes: ["X2","Z2"] },
+    axes: { linear: ["X", "Z"], rotary: ["C"], subSpindleAxes: ["X2", "Z2"] },
     channels: [
       { id: 0, label: "Turret 1 (Upper)", tag: "$1" },
       { id: 1, label: "Turret 2 (Lower)", tag: "$2" },
@@ -215,33 +316,43 @@ export const MACHINE_DEFINITIONS = {
     syntax: {
       channelTag: /^\$(\d+)/,
       programStart: ["O\\d+"],
-      programEnd:   ["M30"],
-      blockSkip:    "/",
+      programEnd: ["M30"],
+      blockSkip: "/",
       blockComment: ["(", ")"],
-      seqNumber:    /^N(\d+)/i,
-      varPrefix:    "#",
-      subCall:      { code: "M98", param: "P" },
-      subReturn:    "M99",
+      seqNumber: /^N(\d+)/i,
+      varPrefix: "#",
+      subCall: { code: "M98", param: "P" },
+      subReturn: "M99",
     },
     waitCodes: {
-      "M200": { type: "channel-sync", param: "P", channelScope: "both",  desc: "Sync point — both channels wait" },
-      "M201": { type: "channel-sync", param: "P", channelScope: "local", desc: "Local channel wait for partner" },
-      "WBUF": { type: "buffer-sync",  desc: "Siemens-style buffer sync" },
+      M200: {
+        type: "channel-sync",
+        param: "P",
+        channelScope: "both",
+        desc: "Sync point — both channels wait",
+      },
+      M201: {
+        type: "channel-sync",
+        param: "P",
+        channelScope: "local",
+        desc: "Local channel wait for partner",
+      },
+      WBUF: { type: "buffer-sync", desc: "Siemens-style buffer sync" },
     },
     mCodes: {
-      spindleCW:     ["M03"],
-      spindleCCW:    ["M04"],
-      spindleStop:   ["M05"],
-      coolantFlood:  ["M08"],
-      coolantOff:    ["M09"],
-      liveToolCW:    ["M13"],
-      liveToolCCW:   ["M14"],
-      liveToolStop:  ["M15"],
-      subCall:       ["M98"],
-      subReturn:     ["M99"],
-      programEnd:    ["M30"],
-      partTransfer:  ["M67","M68"],
-      subSpindSync:  ["M66"],
+      spindleCW: ["M03"],
+      spindleCCW: ["M04"],
+      spindleStop: ["M05"],
+      coolantFlood: ["M08"],
+      coolantOff: ["M09"],
+      liveToolCW: ["M13"],
+      liveToolCCW: ["M14"],
+      liveToolStop: ["M15"],
+      subCall: ["M98"],
+      subReturn: ["M99"],
+      programEnd: ["M30"],
+      partTransfer: ["M67", "M68"],
+      subSpindSync: ["M66"],
     },
   },
 
@@ -251,34 +362,38 @@ export const MACHINE_DEFINITIONS = {
     vendor: "FANUC",
     class: "lathe",
     dialect: "fanuc",
-    axes: { linear: ["X","Z"], rotary: ["C"] },
+    axes: { linear: ["X", "Z"], rotary: ["C"] },
     channels: [
-      { id: 0, label: "Turret 1 (Main Upper)",  tag: "$1" },
-      { id: 1, label: "Turret 2 (Main Lower)",  tag: "$2" },
+      { id: 0, label: "Turret 1 (Main Upper)", tag: "$1" },
+      { id: 1, label: "Turret 2 (Main Lower)", tag: "$2" },
       { id: 2, label: "Turret 3 (Sub Spindle)", tag: "$3" },
     ],
     waitCodes: {
       // Generic M-wait:  M300 P<sync-id>  — all channels sharing that P value wait
-      "M300": { type: "global-sync",  param: "P", desc: "Global sync point across all turrets" },
-      "M301": { type: "channel-sync", param: "P", desc: "Turret 1+2 sync" },
-      "M302": { type: "channel-sync", param: "P", desc: "Turret 2+3 sync" },
-      "M303": { type: "channel-sync", param: "P", desc: "Turret 1+3 sync" },
-      "M200": { type: "channel-sync", param: "P", desc: "Two-channel sync" },
+      M300: {
+        type: "global-sync",
+        param: "P",
+        desc: "Global sync point across all turrets",
+      },
+      M301: { type: "channel-sync", param: "P", desc: "Turret 1+2 sync" },
+      M302: { type: "channel-sync", param: "P", desc: "Turret 2+3 sync" },
+      M303: { type: "channel-sync", param: "P", desc: "Turret 1+3 sync" },
+      M200: { type: "channel-sync", param: "P", desc: "Two-channel sync" },
       // Custom per-machine — these can be overridden in machine def editor
     },
     mCodes: {
-      spindleCW:     ["M03"],
-      spindleCCW:    ["M04"],
-      spindleStop:   ["M05"],
-      coolantFlood:  ["M08"],
-      coolantOff:    ["M09"],
-      liveToolCW:    ["M13"],
-      liveToolCCW:   ["M14"],
-      liveToolStop:  ["M15"],
-      subCall:       ["M98"],
-      subReturn:     ["M99"],
-      programEnd:    ["M30"],
-      partTransfer:  ["M67"],
+      spindleCW: ["M03"],
+      spindleCCW: ["M04"],
+      spindleStop: ["M05"],
+      coolantFlood: ["M08"],
+      coolantOff: ["M09"],
+      liveToolCW: ["M13"],
+      liveToolCCW: ["M14"],
+      liveToolStop: ["M15"],
+      subCall: ["M98"],
+      subReturn: ["M99"],
+      programEnd: ["M30"],
+      partTransfer: ["M67"],
     },
   },
 
@@ -288,76 +403,128 @@ export const MACHINE_DEFINITIONS = {
     vendor: "SIEMENS",
     class: "mill",
     dialect: "siemens",
-    axes: { linear: ["X","Y","Z"], rotary: ["A","B","C"] },
+    axes: { linear: ["X", "Y", "Z"], rotary: ["A", "B", "C"] },
     channels: [
       { id: 0, label: "Channel 1 (Main)" },
       { id: 1, label: "Channel 2" },
     ],
     syntax: {
-      programStart:  [],
-      programEnd:    ["M30","M02","RET"],
-      lineComment:   ";",
-      blockComment:  null,
-      seqNumber:     /^N(\d+)/i,
-      varPrefix:     "R",
-      namedVarDef:   /DEF\s+\w+\s+(\w+)/i,
-      subCall:       { keyword: "CALL", orDirectName: true },
-      subReturn:     "RET",
-      labelDef:      /^(\w+):/,
-      gotoFwd:       "GOTOF",
-      gotoBwd:       "GOTOB",
-      ifKeyword:     "IF",
-      whileKeyword:  "WHILE",
-      endWhile:      "ENDWHILE",
-      loopKeyword:   "LOOP",
-      endLoop:       "ENDLOOP",
+      programStart: [],
+      programEnd: ["M30", "M02", "RET"],
+      lineComment: ";",
+      blockComment: null,
+      seqNumber: /^N(\d+)/i,
+      varPrefix: "R",
+      namedVarDef: /DEF\s+\w+\s+(\w+)/i,
+      subCall: { keyword: "CALL", orDirectName: true },
+      subReturn: "RET",
+      labelDef: /^(\w+):/,
+      gotoFwd: "GOTOF",
+      gotoBwd: "GOTOB",
+      ifKeyword: "IF",
+      whileKeyword: "WHILE",
+      endWhile: "ENDWHILE",
+      loopKeyword: "LOOP",
+      endLoop: "ENDLOOP",
       repeatKeyword: "REPEAT",
-      untilKeyword:  "UNTIL",
+      untilKeyword: "UNTIL",
     },
     modals: {
-      motion:    { group: 1,  default: "G0",  codes: ["G0","G1","G2","G3","G33","G331","G332","G63","G64","G641","G642"] },
-      plane:     { group: 2,  default: "G17", codes: ["G17","G18","G19"] },
-      absInc:    { group: 3,  default: "G90", codes: ["G90","G91"] },
-      feed:      { group: 5,  default: "G94", codes: ["G93","G94","G95","G96","G97"] },
-      units:     { group: 6,  default: "G71", codes: ["G70","G71"] }, // Siemens: G70=inch G71=mm
-      cutComp:   { group: 7,  default: "G40", codes: ["G40","G41","G42"] },
-      tlLen:     { group: 8,  default: "G43", codes: ["G43","G44"] },
-      workCoord: { group: 14, default: "G54", codes: ["G54","G55","G56","G57","G58","G59","G505","G506","G507","G508","G509","G510"] },
-      cycle:     { group: 9,  default: "G80", codes: ["G80","CYCLE81","CYCLE83","CYCLE84","CYCLE85","CYCLE840"] },
+      motion: {
+        group: 1,
+        default: "G0",
+        codes: [
+          "G0",
+          "G1",
+          "G2",
+          "G3",
+          "G33",
+          "G331",
+          "G332",
+          "G63",
+          "G64",
+          "G641",
+          "G642",
+        ],
+      },
+      plane: { group: 2, default: "G17", codes: ["G17", "G18", "G19"] },
+      absInc: { group: 3, default: "G90", codes: ["G90", "G91"] },
+      feed: {
+        group: 5,
+        default: "G94",
+        codes: ["G93", "G94", "G95", "G96", "G97"],
+      },
+      units: { group: 6, default: "G71", codes: ["G70", "G71"] }, // Siemens: G70=inch G71=mm
+      cutComp: { group: 7, default: "G40", codes: ["G40", "G41", "G42"] },
+      tlLen: { group: 8, default: "G43", codes: ["G43", "G44"] },
+      workCoord: {
+        group: 14,
+        default: "G54",
+        codes: [
+          "G54",
+          "G55",
+          "G56",
+          "G57",
+          "G58",
+          "G59",
+          "G505",
+          "G506",
+          "G507",
+          "G508",
+          "G509",
+          "G510",
+        ],
+      },
+      cycle: {
+        group: 9,
+        default: "G80",
+        codes: ["G80", "CYCLE81", "CYCLE83", "CYCLE84", "CYCLE85", "CYCLE840"],
+      },
     },
     mCodes: {
-      programStop:  ["M0"],
+      programStop: ["M0"],
       optionalStop: ["M1"],
-      programEnd:   ["M30","M2"],
-      spindleCW:    ["M3"],
-      spindleCCW:   ["M4"],
-      spindleStop:  ["M5"],
-      toolChange:   ["M6"],
+      programEnd: ["M30", "M2"],
+      spindleCW: ["M3"],
+      spindleCCW: ["M4"],
+      spindleStop: ["M5"],
+      toolChange: ["M6"],
       coolantFlood: ["M8"],
-      coolantMist:  ["M7"],
-      coolantOff:   ["M9"],
+      coolantMist: ["M7"],
+      coolantOff: ["M9"],
     },
     waitCodes: {
-      "WAITM":  { type: "channel-sync", params: ["value","chan1","chan2"], desc: "Wait for value match across channels" },
-      "WAITMC": { type: "channel-sync", desc: "Wait mark for channel" },
-      "SETM":   { type: "set-marker",   desc: "Set sync marker" },
-      "CLEARM": { type: "clear-marker", desc: "Clear sync marker" },
+      WAITM: {
+        type: "channel-sync",
+        params: ["value", "chan1", "chan2"],
+        desc: "Wait for value match across channels",
+      },
+      WAITMC: { type: "channel-sync", desc: "Wait mark for channel" },
+      SETM: { type: "set-marker", desc: "Set sync marker" },
+      CLEARM: { type: "clear-marker", desc: "Clear sync marker" },
     },
     toolChange: {
       syntax: "T{n} D{d} M6",
-      cutting: "D",    // D-word selects cutting edge offset
+      cutting: "D", // D-word selects cutting edge offset
     },
     specialG: {
-      "TRANS":  "translation", "ATRANS": "additive-translation",
-      "ROT":    "rotation",    "AROT":   "additive-rotation",
-      "SCALE":  "scale",       "MIRROR": "mirror",
-      "CYCLE81":"drilling",    "CYCLE83":"deep-drilling",
-      "CYCLE84":"tapping",     "CYCLE85":"boring",
-      "POCKET3":"rectangular-pocket", "POCKET4":"circular-pocket",
-      "LONGHOLE":"long-hole",  "SLOT1":"slot-milling",
+      TRANS: "translation",
+      ATRANS: "additive-translation",
+      ROT: "rotation",
+      AROT: "additive-rotation",
+      SCALE: "scale",
+      MIRROR: "mirror",
+      CYCLE81: "drilling",
+      CYCLE83: "deep-drilling",
+      CYCLE84: "tapping",
+      CYCLE85: "boring",
+      POCKET3: "rectangular-pocket",
+      POCKET4: "circular-pocket",
+      LONGHOLE: "long-hole",
+      SLOT1: "slot-milling",
     },
     rVarNames: {
-      "R0": "general-purpose", // R0–R249 user vars, R250–R299 system
+      R0: "general-purpose", // R0–R249 user vars, R250–R299 system
     },
   },
 
@@ -367,32 +534,35 @@ export const MACHINE_DEFINITIONS = {
     vendor: "SIEMENS",
     class: "lathe",
     dialect: "siemens",
-    axes: { linear: ["X","Z"], rotary: ["C"] },
-    channels: [{ id: 0, label: "Channel 1" }, { id: 1, label: "Channel 2" }],
+    axes: { linear: ["X", "Z"], rotary: ["C"] },
+    channels: [
+      { id: 0, label: "Channel 1" },
+      { id: 1, label: "Channel 2" },
+    ],
     syntax: {
-      lineComment:  ";",
-      subCall:      { keyword: "CALL", orDirectName: true },
-      subReturn:    "RET",
+      lineComment: ";",
+      subCall: { keyword: "CALL", orDirectName: true },
+      subReturn: "RET",
     },
     waitCodes: {
-      "WAITM":  { type: "channel-sync", params: ["value","chan1","chan2"] },
-      "SETM":   { type: "set-marker" },
-      "CLEARM": { type: "clear-marker" },
+      WAITM: { type: "channel-sync", params: ["value", "chan1", "chan2"] },
+      SETM: { type: "set-marker" },
+      CLEARM: { type: "clear-marker" },
     },
     mCodes: {
-      spindleCW:    ["M3","M303"],
-      spindleCCW:   ["M4","M304"],
-      spindleStop:  ["M5","M305"],
-      liveToolCW:   ["M103"],
-      liveToolCCW:  ["M104"],
+      spindleCW: ["M3", "M303"],
+      spindleCCW: ["M4", "M304"],
+      spindleStop: ["M5", "M305"],
+      liveToolCW: ["M103"],
+      liveToolCCW: ["M104"],
       coolantFlood: ["M8"],
-      coolantOff:   ["M9"],
-      programEnd:   ["M30","M2"],
+      coolantOff: ["M9"],
+      programEnd: ["M30", "M2"],
     },
     specialG: {
-      "LIMS": "max-spindle-clamp",
-      "G96":  "css",
-      "G97":  "rpm",
+      LIMS: "max-spindle-clamp",
+      G96: "css",
+      G97: "rpm",
     },
   },
 
@@ -402,65 +572,88 @@ export const MACHINE_DEFINITIONS = {
     vendor: "HAAS",
     class: "mill",
     dialect: "haas",
-    axes: { linear: ["X","Y","Z"], rotary: ["A","B","C"] },
+    axes: { linear: ["X", "Y", "Z"], rotary: ["A", "B", "C"] },
     channels: [{ id: 0, label: "Main" }],
     syntax: {
       programStart: ["%", "O\\d+"],
-      programEnd:   ["M30", "M02", "%"],
-      blockSkip:    "/",
-      lineComment:  ";",
+      programEnd: ["M30", "M02", "%"],
+      blockSkip: "/",
+      lineComment: ";",
       blockComment: ["(", ")"],
-      seqNumber:    /^N(\d+)/i,
-      varPrefix:    "#",
-      subCall:      { code: "M97", param: "P", lRepeat: "L" },  // HAAS: M97=local, M98=external
-      subReturn:    "M99",
-      macroCall:    "G65",
+      seqNumber: /^N(\d+)/i,
+      varPrefix: "#",
+      subCall: { code: "M97", param: "P", lRepeat: "L" }, // HAAS: M97=local, M98=external
+      subReturn: "M99",
+      macroCall: "G65",
     },
     modals: {
-      motion:    { group: 1,  default: "G00", codes: ["G00","G01","G02","G03","G04","G05","G05.1"] },
-      plane:     { group: 2,  default: "G17", codes: ["G17","G18","G19"] },
-      absInc:    { group: 3,  default: "G90", codes: ["G90","G91"] },
-      units:     { group: 6,  default: "G21", codes: ["G20","G21"] },
-      cutComp:   { group: 7,  default: "G40", codes: ["G40","G41","G42"] },
-      tlLen:     { group: 8,  default: "G49", codes: ["G43","G44","G49"] },
-      workCoord: { group: 14, default: "G54", codes: ["G54","G55","G56","G57","G58","G59","G54.1"] },
-      cycle:     { group: 9,  default: "G80", codes: ["G80","G81","G82","G83","G84","G85","G86","G87","G88","G89"] },
+      motion: {
+        group: 1,
+        default: "G00",
+        codes: ["G00", "G01", "G02", "G03", "G04", "G05", "G05.1"],
+      },
+      plane: { group: 2, default: "G17", codes: ["G17", "G18", "G19"] },
+      absInc: { group: 3, default: "G90", codes: ["G90", "G91"] },
+      units: { group: 6, default: "G21", codes: ["G20", "G21"] },
+      cutComp: { group: 7, default: "G40", codes: ["G40", "G41", "G42"] },
+      tlLen: { group: 8, default: "G49", codes: ["G43", "G44", "G49"] },
+      workCoord: {
+        group: 14,
+        default: "G54",
+        codes: ["G54", "G55", "G56", "G57", "G58", "G59", "G54.1"],
+      },
+      cycle: {
+        group: 9,
+        default: "G80",
+        codes: [
+          "G80",
+          "G81",
+          "G82",
+          "G83",
+          "G84",
+          "G85",
+          "G86",
+          "G87",
+          "G88",
+          "G89",
+        ],
+      },
     },
     mCodes: {
-      programStop:   ["M00"],
-      optionalStop:  ["M01"],
-      programEnd:    ["M30","M02"],
-      spindleCW:     ["M03"],
-      spindleCCW:    ["M04"],
-      spindleStop:   ["M05"],
-      toolChange:    ["M06"],
-      coolantFlood:  ["M08"],
-      coolantMist:   ["M07"],
-      coolantOff:    ["M09"],
-      coolantThru:   ["M50"],
-      coolantAir:    ["M51"],
+      programStop: ["M00"],
+      optionalStop: ["M01"],
+      programEnd: ["M30", "M02"],
+      spindleCW: ["M03"],
+      spindleCCW: ["M04"],
+      spindleStop: ["M05"],
+      toolChange: ["M06"],
+      coolantFlood: ["M08"],
+      coolantMist: ["M07"],
+      coolantOff: ["M09"],
+      coolantThru: ["M50"],
+      coolantAir: ["M51"],
       spindleOrient: ["M19"],
-      gearHigh:      ["M41"],
-      gearLow:       ["M42"],
-      doorOpen:      ["M80"],
-      doorClose:     ["M81"],
-      probeDeploy:   ["M59"],
-      probeRetract:  ["M58"],
-      subLocalCall:  ["M97"],
-      subExtCall:    ["M98"],
-      subReturn:     ["M99"],
+      gearHigh: ["M41"],
+      gearLow: ["M42"],
+      doorOpen: ["M80"],
+      doorClose: ["M81"],
+      probeDeploy: ["M59"],
+      probeRetract: ["M58"],
+      subLocalCall: ["M97"],
+      subExtCall: ["M98"],
+      subReturn: ["M99"],
     },
     waitCodes: {},
     toolChange: { syntax: "T{n} M06", lengthOffset: "G43 H{h}" },
     specialG: {
-      "G12": "circular-pocket-CW",
-      "G13": "circular-pocket-CCW",
-      "G28": "return-to-zero",
-      "G50": "scale",
-      "G51": "scale-cancel",
-      "G68": "coord-rotate",
-      "G69": "coord-rotate-cancel",
-      "G150": "general-pocket",
+      G12: "circular-pocket-CW",
+      G13: "circular-pocket-CCW",
+      G28: "return-to-zero",
+      G50: "scale",
+      G51: "scale-cancel",
+      G68: "coord-rotate",
+      G69: "coord-rotate-cancel",
+      G150: "general-pocket",
     },
   },
 
@@ -470,53 +663,65 @@ export const MACHINE_DEFINITIONS = {
     vendor: "OKUMA",
     class: "mill",
     dialect: "okuma",
-    axes: { linear: ["X","Y","Z"], rotary: ["B","C"] },
+    axes: { linear: ["X", "Y", "Z"], rotary: ["B", "C"] },
     channels: [{ id: 0, label: "Main" }],
     syntax: {
       programStart: ["O\\d+", "%"],
-      programEnd:   ["M02","M30","M99"],
-      lineComment:  ";",
+      programEnd: ["M02", "M30", "M99"],
+      lineComment: ";",
       blockComment: ["(", ")"],
-      seqNumber:    /^N(\d+)/i,
-      varPrefix:    "V",         // Okuma V-variables
-      localVar:     "VC",        // local variable
-      subCall:      { keyword: "CALL", param: "O", lRepeat: "Q" },
-      subReturn:    "RTS",
-      ifKeyword:    "IF",
-      gotoKeyword:  "GOTO",
+      seqNumber: /^N(\d+)/i,
+      varPrefix: "V", // Okuma V-variables
+      localVar: "VC", // local variable
+      subCall: { keyword: "CALL", param: "O", lRepeat: "Q" },
+      subReturn: "RTS",
+      ifKeyword: "IF",
+      gotoKeyword: "GOTO",
     },
     modals: {
-      motion:    { group: 1,  default: "G00", codes: ["G00","G01","G02","G03","G04"] },
-      plane:     { group: 2,  default: "G17", codes: ["G17","G18","G19"] },
-      absInc:    { group: 3,  default: "G90", codes: ["G90","G91"] },
-      units:     { group: 6,  default: "G15", codes: ["G15","G16"] }, // Okuma: G15=mm G16=inch
-      cutComp:   { group: 7,  default: "G40", codes: ["G40","G41","G42"] },
-      tlLen:     { group: 8,  default: "G43", codes: ["G43","G44","G49"] },
-      workCoord: { group: 14, default: "G54", codes: ["G54","G55","G56","G57","G58","G59"] },
-      cycle:     { group: 9,  default: "G80", codes: ["G80","G81","G82","G83","G84","G85"] },
+      motion: {
+        group: 1,
+        default: "G00",
+        codes: ["G00", "G01", "G02", "G03", "G04"],
+      },
+      plane: { group: 2, default: "G17", codes: ["G17", "G18", "G19"] },
+      absInc: { group: 3, default: "G90", codes: ["G90", "G91"] },
+      units: { group: 6, default: "G15", codes: ["G15", "G16"] }, // Okuma: G15=mm G16=inch
+      cutComp: { group: 7, default: "G40", codes: ["G40", "G41", "G42"] },
+      tlLen: { group: 8, default: "G43", codes: ["G43", "G44", "G49"] },
+      workCoord: {
+        group: 14,
+        default: "G54",
+        codes: ["G54", "G55", "G56", "G57", "G58", "G59"],
+      },
+      cycle: {
+        group: 9,
+        default: "G80",
+        codes: ["G80", "G81", "G82", "G83", "G84", "G85"],
+      },
     },
     mCodes: {
-      programStop:  ["M00"],
+      programStop: ["M00"],
       optionalStop: ["M01"],
-      programEnd:   ["M02","M30"],
-      spindleCW:    ["M03"],
-      spindleCCW:   ["M04"],
-      spindleStop:  ["M05"],
-      toolChange:   ["M06"],
+      programEnd: ["M02", "M30"],
+      spindleCW: ["M03"],
+      spindleCCW: ["M04"],
+      spindleStop: ["M05"],
+      toolChange: ["M06"],
       coolantFlood: ["M08"],
-      coolantMist:  ["M07"],
-      coolantOff:   ["M09"],
-      coolantThru:  ["M51"],
-      subCall:      ["M98"],
-      subReturn:    ["M99","RTS"],
+      coolantMist: ["M07"],
+      coolantOff: ["M09"],
+      coolantThru: ["M51"],
+      subCall: ["M98"],
+      subReturn: ["M99", "RTS"],
     },
     waitCodes: {},
     toolChange: { syntax: "T{n} M06", lengthOffset: "G43 H{h}" },
     specialG: {
       "G8.1": "thread-cutting",
-      "G9":   "exact-stop-check",
-      "G14":  "coordinate-read",
-      "G32":  "thread-cutting",
+      G9: "exact-stop-check",
+      G14: "coordinate-read",
+      G32: "thread-cutting",
     },
   },
 
@@ -526,29 +731,32 @@ export const MACHINE_DEFINITIONS = {
     vendor: "OKUMA",
     class: "lathe",
     dialect: "okuma",
-    axes: { linear: ["X","Z"], rotary: ["C"] },
-    channels: [{ id: 0, label: "Turret 1" }, { id: 1, label: "Turret 2" }],
+    axes: { linear: ["X", "Z"], rotary: ["C"] },
+    channels: [
+      { id: 0, label: "Turret 1" },
+      { id: 1, label: "Turret 2" },
+    ],
     syntax: {
-      lineComment:  ";",
+      lineComment: ";",
       blockComment: ["(", ")"],
-      seqNumber:    /^N(\d+)/i,
-      varPrefix:    "V",
-      subCall:      { keyword: "CALL", param: "O" },
-      subReturn:    "RTS",
+      seqNumber: /^N(\d+)/i,
+      varPrefix: "V",
+      subCall: { keyword: "CALL", param: "O" },
+      subReturn: "RTS",
     },
     waitCodes: {
-      "M330": { type: "channel-sync", param: "P", desc: "Turret sync" },
-      "M331": { type: "channel-sync", param: "P", desc: "Sub-spindle sync" },
+      M330: { type: "channel-sync", param: "P", desc: "Turret sync" },
+      M331: { type: "channel-sync", param: "P", desc: "Sub-spindle sync" },
     },
     mCodes: {
-      spindleCW:    ["M03"],
-      spindleCCW:   ["M04"],
-      spindleStop:  ["M05"],
+      spindleCW: ["M03"],
+      spindleCCW: ["M04"],
+      spindleStop: ["M05"],
       coolantFlood: ["M08"],
-      coolantOff:   ["M09"],
-      liveToolCW:   ["M13"],
+      coolantOff: ["M09"],
+      liveToolCW: ["M13"],
       liveToolStop: ["M15"],
-      programEnd:   ["M02","M30"],
+      programEnd: ["M02", "M30"],
     },
     toolChange: { syntax: "T{nn}{oo}", diameterMode: true },
   },
@@ -559,42 +767,54 @@ export const MACHINE_DEFINITIONS = {
     vendor: "MAZAK",
     class: "mill",
     dialect: "mazak",
-    axes: { linear: ["X","Y","Z"], rotary: ["A","B","C"] },
+    axes: { linear: ["X", "Y", "Z"], rotary: ["A", "B", "C"] },
     channels: [{ id: 0, label: "Main" }],
     syntax: {
       programStart: ["O\\d+", ":"],
-      programEnd:   ["M30","M02"],
-      lineComment:  ";",
+      programEnd: ["M30", "M02"],
+      lineComment: ";",
       blockComment: ["(", ")"],
-      seqNumber:    /^N(\d+)/i,
-      varPrefix:    "#",
-      subCall:      { code: "M98", param: "P" },
-      subReturn:    "M99",
+      seqNumber: /^N(\d+)/i,
+      varPrefix: "#",
+      subCall: { code: "M98", param: "P" },
+      subReturn: "M99",
     },
     modals: {
-      motion:    { group: 1,  default: "G00", codes: ["G00","G01","G02","G03","G04"] },
-      plane:     { group: 2,  default: "G17", codes: ["G17","G18","G19"] },
-      absInc:    { group: 3,  default: "G90", codes: ["G90","G91"] },
-      units:     { group: 6,  default: "G21", codes: ["G20","G21"] },
-      cutComp:   { group: 7,  default: "G40", codes: ["G40","G41","G42"] },
-      tlLen:     { group: 8,  default: "G49", codes: ["G43","G44","G49"] },
-      workCoord: { group: 14, default: "G54", codes: ["G54","G55","G56","G57","G58","G59"] },
-      cycle:     { group: 9,  default: "G80", codes: ["G80","G81","G82","G83","G84","G85"] },
+      motion: {
+        group: 1,
+        default: "G00",
+        codes: ["G00", "G01", "G02", "G03", "G04"],
+      },
+      plane: { group: 2, default: "G17", codes: ["G17", "G18", "G19"] },
+      absInc: { group: 3, default: "G90", codes: ["G90", "G91"] },
+      units: { group: 6, default: "G21", codes: ["G20", "G21"] },
+      cutComp: { group: 7, default: "G40", codes: ["G40", "G41", "G42"] },
+      tlLen: { group: 8, default: "G49", codes: ["G43", "G44", "G49"] },
+      workCoord: {
+        group: 14,
+        default: "G54",
+        codes: ["G54", "G55", "G56", "G57", "G58", "G59"],
+      },
+      cycle: {
+        group: 9,
+        default: "G80",
+        codes: ["G80", "G81", "G82", "G83", "G84", "G85"],
+      },
     },
     mCodes: {
-      programStop:  ["M00"],
+      programStop: ["M00"],
       optionalStop: ["M01"],
-      programEnd:   ["M30","M02"],
-      spindleCW:    ["M03"],
-      spindleCCW:   ["M04"],
-      spindleStop:  ["M05"],
-      toolChange:   ["M06"],
+      programEnd: ["M30", "M02"],
+      spindleCW: ["M03"],
+      spindleCCW: ["M04"],
+      spindleStop: ["M05"],
+      toolChange: ["M06"],
       coolantFlood: ["M08"],
-      coolantOff:   ["M09"],
-      coolantThru:  ["M51"],
-      spindleOrient:["M19"],
-      subCall:      ["M98"],
-      subReturn:    ["M99"],
+      coolantOff: ["M09"],
+      coolantThru: ["M51"],
+      spindleOrient: ["M19"],
+      subCall: ["M98"],
+      subReturn: ["M99"],
       palletChange: ["M60"],
     },
     waitCodes: {},
@@ -607,32 +827,36 @@ export const MACHINE_DEFINITIONS = {
     vendor: "Custom",
     class: "mill",
     dialect: "fanuc",
-    axes: { linear: ["X","Y","Z"], rotary: [] },
+    axes: { linear: ["X", "Y", "Z"], rotary: [] },
     channels: [{ id: 0, label: "Main" }],
     syntax: {
-      programEnd:   ["M30"],
+      programEnd: ["M30"],
       blockComment: ["(", ")"],
-      seqNumber:    /^N(\d+)/i,
-      varPrefix:    "#",
-      subCall:      { code: "M98", param: "P" },
-      subReturn:    "M99",
+      seqNumber: /^N(\d+)/i,
+      varPrefix: "#",
+      subCall: { code: "M98", param: "P" },
+      subReturn: "M99",
     },
     modals: {
-      motion:    { group: 1, default: "G00", codes: ["G00","G01","G02","G03"] },
-      absInc:    { group: 3, default: "G90", codes: ["G90","G91"] },
-      units:     { group: 6, default: "G21", codes: ["G20","G21"] },
-      workCoord: { group: 14, default: "G54", codes: ["G54","G55","G56","G57","G58","G59"] },
+      motion: { group: 1, default: "G00", codes: ["G00", "G01", "G02", "G03"] },
+      absInc: { group: 3, default: "G90", codes: ["G90", "G91"] },
+      units: { group: 6, default: "G21", codes: ["G20", "G21"] },
+      workCoord: {
+        group: 14,
+        default: "G54",
+        codes: ["G54", "G55", "G56", "G57", "G58", "G59"],
+      },
     },
     mCodes: {
-      spindleCW:   ["M03"],
-      spindleCCW:  ["M04"],
+      spindleCW: ["M03"],
+      spindleCCW: ["M04"],
       spindleStop: ["M05"],
-      toolChange:  ["M06"],
-      coolantFlood:["M08"],
-      coolantOff:  ["M09"],
-      programEnd:  ["M30"],
-      subCall:     ["M98"],
-      subReturn:   ["M99"],
+      toolChange: ["M06"],
+      coolantFlood: ["M08"],
+      coolantOff: ["M09"],
+      programEnd: ["M30"],
+      subCall: ["M98"],
+      subReturn: ["M99"],
     },
     waitCodes: {},
     toolChange: { syntax: "T{n} M06" },
@@ -645,14 +869,14 @@ export const MACHINE_DEFINITIONS = {
 
 class ChannelState {
   constructor(channelDef, machDef) {
-    this.id      = channelDef.id;
-    this.label   = channelDef.label;
-    this.tag     = channelDef.tag || null;
+    this.id = channelDef.id;
+    this.label = channelDef.label;
+    this.tag = channelDef.tag || null;
     this.machDef = machDef;
 
     // Position
-    this.pos = { X:0, Y:0, Z:0, A:0, B:0, C:0 };
-    this.machinePos = { X:0, Y:0, Z:0 };
+    this.pos = { X: 0, Y: 0, Z: 0, A: 0, B: 0, C: 0 };
+    this.machinePos = { X: 0, Y: 0, Z: 0 };
 
     // Modal state - initialise from machine definition defaults
     this.modals = {};
@@ -661,68 +885,93 @@ class ChannelState {
         this.modals[key] = grp.default;
       }
     }
+    // Fallback defaults for sparse machine definitions (e.g. multi-channel presets).
+    if (!this.modals.feed)
+      this.modals.feed = machDef.class === "lathe" ? "G99" : "G94";
+    if (!this.modals.motion) this.modals.motion = "G00";
     // Override plane for lathe
     if (machDef.class === "lathe") this.modals.plane = "G18";
     this.motionMode = this.modals.motion || "G00";
 
     // Spindle / feed
-    this.feed       = 0;
-    this.rpm        = 0;
-    this.dir        = "";
-    this.coolant    = { flood:false, mist:false, through:false, air:false };
-    this.cssMode    = false;
-    this.cssSpeed   = 0;
+    this.feed = 0;
+    this.rpm = 0;
+    this.dir = "";
+    this.coolant = { flood: false, mist: false, through: false, air: false };
+    this.cssMode = false;
+    this.cssSpeed = 0;
 
     // Tool
-    this.activeT    = 0;
-    this.activeH    = 0;
-    this.activeD    = 1;   // Siemens cutting edge
+    this.activeT = 0;
+    this.activeH = 0;
+    this.activeD = 1; // Siemens cutting edge
+    this.pendingT = 0;
 
     // WCS
-    this.activeWCS  = "G54";
+    this.activeWCS = "G54";
     this.offsets = {
-      G54:{X:0,Y:0,Z:0,A:0,B:0,C:0},
-      G55:{X:100,Y:0,Z:0,A:0,B:0,C:0},
-      G56:{X:200,Y:0,Z:0,A:0,B:0,C:0},
-      G57:{X:0,Y:100,Z:0,A:0,B:0,C:0},
-      G58:{X:100,Y:100,Z:0,A:0,B:0,C:0},
-      G59:{X:200,Y:100,Z:0,A:0,B:0,C:0},
+      G54: { X: 0, Y: 0, Z: 0, A: 0, B: 0, C: 0 },
+      G55: { X: 100, Y: 0, Z: 0, A: 0, B: 0, C: 0 },
+      G56: { X: 200, Y: 0, Z: 0, A: 0, B: 0, C: 0 },
+      G57: { X: 0, Y: 100, Z: 0, A: 0, B: 0, C: 0 },
+      G58: { X: 100, Y: 100, Z: 0, A: 0, B: 0, C: 0 },
+      G59: { X: 200, Y: 100, Z: 0, A: 0, B: 0, C: 0 },
     };
 
     // Variables
-    this.vars = new Map();       // #100-#999 global-ish macro vars
-    this.localVars = [new Map()];// stack of local var frames (#1-#33)
-    this.rVars = new Map();      // Siemens R-vars / Okuma V-vars
+    this.vars = new Map(); // #100-#999 global-ish macro vars
+    this.localVars = [new Map()]; // stack of local var frames (#1-#33)
+    this.rVars = new Map(); // Siemens R-vars / Okuma V-vars
 
     // Control flow
-    this.callStack  = [];        // [{blocks, pointer, returnPtr, loopCount}]
-    this.pointer    = 0;
-    this.blocks     = [];
-    this.waiting    = null;      // {type, syncId} when channel is at a wait code
-    this.done       = false;
-    this.error      = null;
-    this.message    = "";
+    this.callStack = []; // [{blocks, pointer, returnPtr, loopCount}]
+    this.pointer = 0;
+    this.blocks = [];
+    this.waiting = null; // {type, syncId} when channel is at a wait code
+    this.done = false;
+    this.error = null;
+    this.message = "";
 
     // Misc
-    this.posMode    = "G90";     // G90/G91
-    this.diamMode   = machDef.class === "lathe"; // X is diameter on lathe
-    this.units      = "mm";
-    this.plane      = machDef.class === "lathe" ? "G18" : "G17";
-    this.optSkip    = false;
-    this.blockDelete= false;
-    this.home       = { X:0, Y:0, Z:0, A:0, B:0, C:0 };
+    this.posMode = "G90"; // G90/G91
+    this.diamMode = machDef.class === "lathe"; // X is diameter on lathe
+    this.units = "mm";
+    this.plane = machDef.class === "lathe" ? "G18" : "G17";
+    this.optSkip = false;
+    this.blockDelete = false;
+    this.home = { X: 0, Y: 0, Z: 0, A: 0, B: 0, C: 0 };
   }
 
   clone() {
-    const c = new ChannelState({ id: this.id, label: this.label, tag: this.tag }, this.machDef);
-    Object.assign(c, JSON.parse(JSON.stringify({
-      pos: this.pos, machinePos: this.machinePos, modals: this.modals,
-      feed: this.feed, rpm: this.rpm, dir: this.dir,
-      activeT: this.activeT, activeH: this.activeH, activeD: this.activeD,
-      activeWCS: this.activeWCS, posMode: this.posMode, plane: this.plane,
-      units: this.units, cssMode: this.cssMode, cssSpeed: this.cssSpeed,
-      diamMode: this.diamMode, home: this.home,
-    })));
+    const c = new ChannelState(
+      { id: this.id, label: this.label, tag: this.tag },
+      this.machDef,
+    );
+    Object.assign(
+      c,
+      JSON.parse(
+        JSON.stringify({
+          pos: this.pos,
+          machinePos: this.machinePos,
+          modals: this.modals,
+          feed: this.feed,
+          rpm: this.rpm,
+          dir: this.dir,
+          activeT: this.activeT,
+          activeH: this.activeH,
+          activeD: this.activeD,
+          pendingT: this.pendingT,
+          activeWCS: this.activeWCS,
+          posMode: this.posMode,
+          plane: this.plane,
+          units: this.units,
+          cssMode: this.cssMode,
+          cssSpeed: this.cssSpeed,
+          diamMode: this.diamMode,
+          home: this.home,
+        }),
+      ),
+    );
     c.vars = new Map(this.vars);
     c.rVars = new Map(this.rVars);
     c.waiting = this.waiting;
@@ -731,7 +980,7 @@ class ChannelState {
     c.message = this.message;
     c.pointer = this.pointer;
     c.blocks = this.blocks;
-    c.callStack = this.callStack.map(frame => ({
+    c.callStack = this.callStack.map((frame) => ({
       ...frame,
       blocks: frame.blocks,
     }));
@@ -747,12 +996,12 @@ export class GCodeParser {
   constructor(machDef) {
     this.machDef = machDef;
     this.dialect = machDef.dialect || "fanuc";
-    this.syntax  = machDef.syntax  || {};
+    this.syntax = machDef.syntax || {};
   }
 
   parse(src) {
     const lines = src.split("\n");
-    const programs = new Map();  // O-number -> [blocks]
+    const programs = new Map(); // O-number -> [blocks]
     let currentProg = "MAIN";
     programs.set(currentProg, []);
 
@@ -780,7 +1029,10 @@ export class GCodeParser {
     // Block skip
     let skip = false;
     let rest = t;
-    if (rest.startsWith("/")) { skip = true; rest = rest.slice(1).trim(); }
+    if (rest.startsWith("/")) {
+      skip = true;
+      rest = rest.slice(1).trim();
+    }
 
     // Check for sub-program declaration (Fanuc O-number at start)
     const oMatch = rest.match(/^O(\d+)/i);
@@ -801,11 +1053,16 @@ export class GCodeParser {
       const [o, c] = this.syntax.blockComment;
       const cm = rest.match(new RegExp(`\\${o}([^\\${c}]*)\\${c}`));
       if (cm) cmt = cm[1].trim();
-      clean = rest.replace(new RegExp(`\\${o}[^\\${c}]*\\${c}`, "g"), "").trim();
+      clean = rest
+        .replace(new RegExp(`\\${o}[^\\${c}]*\\${c}`, "g"), "")
+        .trim();
     }
     if (this.syntax.lineComment) {
       const idx = clean.indexOf(this.syntax.lineComment);
-      if (idx >= 0) { cmt = cmt || clean.slice(idx + 1).trim(); clean = clean.slice(0, idx).trim(); }
+      if (idx >= 0) {
+        cmt = cmt || clean.slice(idx + 1).trim();
+        clean = clean.slice(0, idx).trim();
+      }
     }
     if (!clean && cmt) return { type: "cmt", cmt, raw, skip, lineIndex };
     if (!clean) return null;
@@ -821,7 +1078,10 @@ export class GCodeParser {
     let noTag = noSeq;
     if (this.syntax.channelTag) {
       const ctm = noSeq.match(this.syntax.channelTag);
-      if (ctm) { channelId = parseInt(ctm[1]) - 1; noTag = noSeq.replace(ctm[0], "").trim(); }
+      if (ctm) {
+        channelId = parseInt(ctm[1]) - 1;
+        noTag = noSeq.replace(ctm[0], "").trim();
+      }
     }
 
     // Word parsing
@@ -830,7 +1090,9 @@ export class GCodeParser {
     // Detect flow-control keywords (Fanuc/HAAS WHILE/DO/END/IF/GOTO + Siemens/Okuma)
     let keyword = null;
     {
-      const kw = noTag.match(/^(WHILE|ENDWHILE|DO\d*|END\d+|IF|ELSE|ENDIF|GOTOF|GOTOB|GOTO|LOOP|ENDLOOP|REPEAT|UNTIL|CALL|RET|RTS|WAITM|SETM|CLEARM|WBUF|DEF|LIMS)/i);
+      const kw = noTag.match(
+        /^(WHILE|ENDWHILE|DO\d*|END\d+|IF|ELSE|ENDIF|GOTOF|GOTOB|GOTO|LOOP|ENDLOOP|REPEAT|UNTIL|CALL|RET|RTS|WAITM|SETM|CLEARM|WBUF|DEF|LIMS)/i,
+      );
       if (kw) keyword = kw[1].toUpperCase();
     }
 
@@ -839,9 +1101,16 @@ export class GCodeParser {
 
     return {
       type: "block",
-      raw, clean: noTag, cmt, skip,
-      seqN, lineIndex, channelId,
-      words, keyword, waitCode,
+      raw,
+      clean: noTag,
+      cmt,
+      skip,
+      seqN,
+      lineIndex,
+      channelId,
+      words,
+      keyword,
+      waitCode,
     };
   }
 
@@ -857,7 +1126,8 @@ export class GCodeParser {
     }
     // Match word-address + macro variable reference: X#104, Y#105, Z#[expr], etc.
     // Store as expression string so evaluator can resolve at runtime
-    const macroWordRe = /([A-Za-z])\s*(#(?:\[.*?\]|\d+)(?:\s*[+\-*\/]\s*[#\d.]+)*)/g;
+    const macroWordRe =
+      /([A-Za-z])\s*(#(?:\[.*?\]|\d+)(?:\s*[+\-*\/]\s*[#\d.]+)*)/g;
     let mm;
     while ((mm = macroWordRe.exec(str)) !== null) {
       const k = mm[1].toUpperCase();
@@ -868,9 +1138,11 @@ export class GCodeParser {
     const re = /([A-Za-z])\s*([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)/g;
     let m;
     while ((m = re.exec(str)) !== null) {
-      const k = m[1].toUpperCase(), v = parseFloat(m[2]);
+      const k = m[1].toUpperCase(),
+        v = parseFloat(m[2]);
       if (k === "N" || k === "O") continue;
-      if (words[k] == null) words[k] = v; // only set if not already set as macro expr
+      if (words[k] == null)
+        words[k] = v; // only set if not already set as macro expr
       else if (typeof words[k] === "number") {
         if (!Array.isArray(words[k])) words[k] = [words[k], v];
         else words[k].push(v);
@@ -878,7 +1150,9 @@ export class GCodeParser {
     }
     // T-word lathe format: T0303 → T:3, H:3
     if (words.T != null && this.machDef.class === "lathe") {
-      const ts = String(typeof words.T === "number" ? (words.T | 0) : parseInt(words.T)).padStart(4, "0");
+      const ts = String(
+        typeof words.T === "number" ? words.T | 0 : parseInt(words.T),
+      ).padStart(4, "0");
       words._toolNum = parseInt(ts.slice(0, 2)) || parseInt(ts.slice(0, 1));
       words._toolOffset = parseInt(ts.slice(2)) || parseInt(ts.slice(1));
     }
@@ -891,7 +1165,8 @@ export class GCodeParser {
       // M-code wait
       if (code.startsWith("M")) {
         const mVal = parseFloat(code.slice(1));
-        const mWords = words.M != null ? (Array.isArray(words.M) ? words.M : [words.M]) : [];
+        const mWords =
+          words.M != null ? (Array.isArray(words.M) ? words.M : [words.M]) : [];
         if (mWords.includes(mVal)) {
           return { code, def, syncId: words.P ?? words.Q ?? null };
         }
@@ -918,8 +1193,11 @@ class ExpressionEvaluator {
   resolve(val) {
     if (typeof val === "number") return val;
     if (typeof val !== "string") return null;
-    try { return this._evalExpr(val); }
-    catch { return null; }
+    try {
+      return this._evalExpr(val);
+    } catch {
+      return null;
+    }
   }
 
   _evalExpr(expr) {
@@ -952,26 +1230,46 @@ class ExpressionEvaluator {
     });
 
     // Step 4: Fanuc trig (degrees) — now safe since vars are substituted
-    e = e.replace(/SIN\[([^\]]+)\]/gi, (_, x) => Math.sin(this._evalExpr(x) * Math.PI / 180));
-    e = e.replace(/COS\[([^\]]+)\]/gi, (_, x) => Math.cos(this._evalExpr(x) * Math.PI / 180));
-    e = e.replace(/TAN\[([^\]]+)\]/gi, (_, x) => Math.tan(this._evalExpr(x) * Math.PI / 180));
-    e = e.replace(/ATAN\[([^\]]+)\]/gi, (_, x) => Math.atan(this._evalExpr(x)) * 180 / Math.PI);
+    e = e.replace(/SIN\[([^\]]+)\]/gi, (_, x) =>
+      Math.sin((this._evalExpr(x) * Math.PI) / 180),
+    );
+    e = e.replace(/COS\[([^\]]+)\]/gi, (_, x) =>
+      Math.cos((this._evalExpr(x) * Math.PI) / 180),
+    );
+    e = e.replace(/TAN\[([^\]]+)\]/gi, (_, x) =>
+      Math.tan((this._evalExpr(x) * Math.PI) / 180),
+    );
+    e = e.replace(
+      /ATAN\[([^\]]+)\]/gi,
+      (_, x) => (Math.atan(this._evalExpr(x)) * 180) / Math.PI,
+    );
     e = e.replace(/SQRT\[([^\]]+)\]/gi, (_, x) => Math.sqrt(this._evalExpr(x)));
     e = e.replace(/ABS\[([^\]]+)\]/gi, (_, x) => Math.abs(this._evalExpr(x)));
-    e = e.replace(/ROUND\[([^\]]+)\]/gi, (_, x) => Math.round(this._evalExpr(x)));
+    e = e.replace(/ROUND\[([^\]]+)\]/gi, (_, x) =>
+      Math.round(this._evalExpr(x)),
+    );
     e = e.replace(/FIX\[([^\]]+)\]/gi, (_, x) => Math.trunc(this._evalExpr(x)));
     e = e.replace(/FUP\[([^\]]+)\]/gi, (_, x) => Math.ceil(this._evalExpr(x)));
 
     // Step 5: Siemens trig (degrees)
-    e = e.replace(/SIN\(([^)]+)\)/gi, (_, x) => Math.sin(this._evalExpr(x) * Math.PI / 180));
-    e = e.replace(/COS\(([^)]+)\)/gi, (_, x) => Math.cos(this._evalExpr(x) * Math.PI / 180));
+    e = e.replace(/SIN\(([^)]+)\)/gi, (_, x) =>
+      Math.sin((this._evalExpr(x) * Math.PI) / 180),
+    );
+    e = e.replace(/COS\(([^)]+)\)/gi, (_, x) =>
+      Math.cos((this._evalExpr(x) * Math.PI) / 180),
+    );
     e = e.replace(/SQRT\(([^)]+)\)/gi, (_, x) => Math.sqrt(this._evalExpr(x)));
     e = e.replace(/ABS\(([^)]+)\)/gi, (_, x) => Math.abs(this._evalExpr(x)));
 
     // Step 6: Boolean comparison operators (Fanuc macro)
-    e = e.replace(/\bEQ\b/g, "===").replace(/\bNE\b/g, "!==")
-         .replace(/\bGT\b/g, ">").replace(/\bLT\b/g, "<")
-         .replace(/\bGE\b/g, ">=").replace(/\bLE\b/g, "<=");
+    // Support compact expressions like #1EQ#2 (no spaces).
+    e = e
+      .replace(/(?<![A-Z])EQ(?![A-Z])/gi, "===")
+      .replace(/(?<![A-Z])NE(?![A-Z])/gi, "!==")
+      .replace(/(?<![A-Z])GT(?![A-Z])/gi, ">")
+      .replace(/(?<![A-Z])LT(?![A-Z])/gi, "<")
+      .replace(/(?<![A-Z])GE(?![A-Z])/gi, ">=")
+      .replace(/(?<![A-Z])LE(?![A-Z])/gi, "<=");
 
     // Evaluate
     try {
@@ -998,44 +1296,78 @@ class ExpressionEvaluator {
 
 export class CNCEngine {
   constructor(machDef) {
-    this.machDef  = machDef;
-    this.channels = machDef.channels.map(cd => new ChannelState(cd, machDef));
-    this.parser   = new GCodeParser(machDef);
-    this.programs = new Map();    // all programs/subs parsed
-    this.syncPoints = new Map();  // syncId -> Set of channelIds waiting
-    this.pathPoints = [];         // [{x,y,z,m,feed,channelId,bi}]
-    this.stats    = { rapid:0, cut:0, arc:0, tc:0, dist:0, time:0, blocks:0 };
+    this.machDef = machDef;
+    this.channels = machDef.channels.map((cd) => new ChannelState(cd, machDef));
+    this.parser = new GCodeParser(machDef);
+    this.programs = new Map(); // all programs/subs parsed
+    this.syncPoints = new Map(); // syncId -> Set of channelIds waiting
+    this.pathPoints = []; // [{x,y,z,m,feed,channelId,bi}]
+    this.stats = {
+      rapid: 0,
+      cut: 0,
+      arc: 0,
+      tc: 0,
+      dist: 0,
+      time: 0,
+      blocks: 0,
+    };
     this.backplotPathPoints = [];
-    this.backplotStats = { rapid:0, cut:0, arc:0, tc:0, dist:0, time:0, blocks:0 };
-    this.evalors  = this.channels.map(ch => new ExpressionEvaluator(ch));
-    this._maxSteps = 100000;      // infinite-loop guard
+    this.backplotStats = {
+      rapid: 0,
+      cut: 0,
+      arc: 0,
+      tc: 0,
+      dist: 0,
+      time: 0,
+      blocks: 0,
+    };
+    this.evalors = this.channels.map((ch) => new ExpressionEvaluator(ch));
+    this.toolTable = {};
+    this.toolUnits = "mm";
+    this._maxSteps = 100000; // infinite-loop guard
+  }
+
+  setToolTable(toolTable = {}, units = "mm") {
+    this.toolTable =
+      toolTable && typeof toolTable === "object" ? toolTable : {};
+    this.toolUnits = units === "inch" ? "inch" : "mm";
   }
 
   _selectParsedEntryBlocks(parsed, sourceName = "MAIN") {
     const mainBlocks = parsed.get("MAIN");
     const namedBlocks = parsed.get(sourceName.toUpperCase());
-    return (Array.isArray(mainBlocks) && mainBlocks.length ? mainBlocks : null)
-      || (Array.isArray(namedBlocks) && namedBlocks.length ? namedBlocks : null)
-      || [...parsed.values()].find(blocks => Array.isArray(blocks) && blocks.length > 0)
-      || [];
+    return (
+      (Array.isArray(mainBlocks) && mainBlocks.length ? mainBlocks : null) ||
+      (Array.isArray(namedBlocks) && namedBlocks.length ? namedBlocks : null) ||
+      [...parsed.values()].find(
+        (blocks) => Array.isArray(blocks) && blocks.length > 0,
+      ) ||
+      []
+    );
   }
 
   // ── Load one or multiple program texts ──────────────────────────────────
   loadPrograms(sources) {
     // sources: { main: "...", O9001: "...", ... }  OR  single string
-    const srcMap = typeof sources === "string"
-      ? { MAIN: sources }
-      : sources;
+    const srcMap = typeof sources === "string" ? { MAIN: sources } : sources;
     const explicitChannelBlocks = new Map();
 
     for (const [name, src] of Object.entries(srcMap)) {
       const parsed = this.parser.parse(src);
-      const chMatch = String(name).toUpperCase().match(/^CH(?:ANNEL)?[_-]?(\d+)$/);
+      const chMatch = String(name)
+        .toUpperCase()
+        .match(/^CH(?:ANNEL)?[_-]?(\d+)$/);
       if (chMatch) {
-        explicitChannelBlocks.set(parseInt(chMatch[1], 10) - 1, this._selectParsedEntryBlocks(parsed, name));
+        explicitChannelBlocks.set(
+          parseInt(chMatch[1], 10) - 1,
+          this._selectParsedEntryBlocks(parsed, name),
+        );
       }
       for (const [progId, blocks] of parsed.entries()) {
-        this.programs.set(progId === "MAIN" ? name.toUpperCase() : progId, blocks);
+        this.programs.set(
+          progId === "MAIN" ? name.toUpperCase() : progId,
+          blocks,
+        );
       }
     }
 
@@ -1043,7 +1375,8 @@ export class CNCEngine {
     const mainBlocks = this._getMainBlocks();
 
     if (this.machDef.channels.length === 1) {
-      this.channels[0].blocks  = mainBlocks.get("ALL") || mainBlocks.values().next().value || [];
+      this.channels[0].blocks =
+        mainBlocks.get("ALL") || mainBlocks.values().next().value || [];
       this.channels[0].pointer = 0;
     } else {
       // Multi-channel: split by $1/$2/$3 tags
@@ -1062,7 +1395,13 @@ export class CNCEngine {
 
   // ── Split blocks into channels by tag ────────────────────────────────────
   _getMainBlocks() {
-    const mainKey = [...this.programs.keys()].find(k => (k === "MAIN" && this.programs.get(k).length > 0) || k.startsWith("O0000") || k.match(/^O\d{1,4}$/)) || this.programs.keys().next().value;
+    const mainKey =
+      [...this.programs.keys()].find(
+        (k) =>
+          (k === "MAIN" && this.programs.get(k).length > 0) ||
+          k.startsWith("O0000") ||
+          k.match(/^O\d{1,4}$/),
+      ) || this.programs.keys().next().value;
     const blocks = this.programs.get(mainKey) || [];
     const byChannel = new Map([["ALL", []]]);
     let currentCh = "ALL";
@@ -1079,16 +1418,19 @@ export class CNCEngine {
 
   _splitChannelBlocks(mainBlocks) {
     // If there are tagged blocks, assign per channel
-    const hasTagged = [...mainBlocks.keys()].some(k => k.startsWith("CH"));
+    const hasTagged = [...mainBlocks.keys()].some((k) => k.startsWith("CH"));
     if (hasTagged) {
       this.channels.forEach((ch, i) => {
-        ch.blocks  = mainBlocks.get(`CH${i}`) || [];
+        ch.blocks = mainBlocks.get(`CH${i}`) || [];
         ch.pointer = 0;
       });
     } else {
       // No tags: give all channels the same program (parallel mode)
       const all = mainBlocks.get("ALL") || [];
-      this.channels.forEach(ch => { ch.blocks = all; ch.pointer = 0; });
+      this.channels.forEach((ch) => {
+        ch.blocks = all;
+        ch.pointer = 0;
+      });
     }
   }
 
@@ -1096,10 +1438,10 @@ export class CNCEngine {
   _buildFullPath() {
     const recorder = {
       pathPoints: [],
-      stats: { rapid:0, cut:0, arc:0, tc:0, dist:0, time:0, blocks:0 },
+      stats: { rapid: 0, cut: 0, arc: 0, tc: 0, dist: 0, time: 0, blocks: 0 },
     };
-    const tempChannels = this.channels.map(ch => ch.clone());
-    const tempEvalors  = tempChannels.map(ch => new ExpressionEvaluator(ch));
+    const tempChannels = this.channels.map((ch) => ch.clone());
+    const tempEvalors = tempChannels.map((ch) => new ExpressionEvaluator(ch));
     let totalSteps = 0;
 
     // Run all channels to completion in round-robin with sync handling
@@ -1116,10 +1458,16 @@ export class CNCEngine {
         if (ch.waiting) this._trySyncResolve(tempChannels);
       }
       // Check if all are done or all are waiting (deadlock)
-      const waiting = tempChannels.filter(ch => ch.waiting && !ch.done).length;
-      const done    = tempChannels.filter(ch => ch.done).length;
+      const waiting = tempChannels.filter(
+        (ch) => ch.waiting && !ch.done,
+      ).length;
+      const done = tempChannels.filter((ch) => ch.done).length;
       if (done === tempChannels.length) allDone = true;
-      if (waiting === tempChannels.filter(ch => !ch.done).length && waiting > 0) break; // deadlock
+      if (
+        waiting === tempChannels.filter((ch) => !ch.done).length &&
+        waiting > 0
+      )
+        break; // deadlock
     }
     recorder.stats.blocks = recorder.pathPoints.length;
     this.backplotPathPoints = recorder.pathPoints;
@@ -1134,8 +1482,10 @@ export class CNCEngine {
     this._executeBlock(ch, ev, false, null);
     this._trySyncResolve(this.channels);
     return {
-      done: ch.done, error: ch.error,
-      waiting: ch.waiting, state: this._getChannelSnapshot(ch)
+      done: ch.done,
+      error: ch.error,
+      waiting: ch.waiting,
+      state: this._getChannelSnapshot(ch),
     };
   }
 
@@ -1148,15 +1498,25 @@ export class CNCEngine {
       }
     }
     this._trySyncResolve(this.channels);
-    return this.channels.map(ch => this._getChannelSnapshot(ch));
+    return this.channels.map((ch) => this._getChannelSnapshot(ch));
   }
 
   reset() {
-    this.channels = this.machDef.channels.map(cd => new ChannelState(cd, this.machDef));
-    this.evalors  = this.channels.map(ch => new ExpressionEvaluator(ch));
+    this.channels = this.machDef.channels.map(
+      (cd) => new ChannelState(cd, this.machDef),
+    );
+    this.evalors = this.channels.map((ch) => new ExpressionEvaluator(ch));
     this.syncPoints.clear();
     this.pathPoints = [];
-    this.stats = { rapid:0, cut:0, arc:0, tc:0, dist:0, time:0, blocks:0 };
+    this.stats = {
+      rapid: 0,
+      cut: 0,
+      arc: 0,
+      tc: 0,
+      dist: 0,
+      time: 0,
+      blocks: 0,
+    };
     // Reload blocks
     const mainBlocks = this._getMainBlocks();
     this._splitChannelBlocks(mainBlocks);
@@ -1200,7 +1560,10 @@ export class CNCEngine {
     if (b.skip && ch.optSkip) return;
 
     // Comment-only
-    if (!b.words && !b.keyword) { if (b.cmt) ch.message = b.cmt; return; }
+    if (!b.words && !b.keyword) {
+      if (b.cmt) ch.message = b.cmt;
+      return;
+    }
 
     const w = b.words || {};
 
@@ -1217,19 +1580,19 @@ export class CNCEngine {
     }
 
     // ── Variable assignment (#100 = ...) ──────────────────────────────────
-    const assignMatch = (b.clean||"").match(/^#(\d+)\s*=\s*(.+)$/);
+    const assignMatch = (b.clean || "").match(/^#(\d+)\s*=\s*(.+)$/);
     if (assignMatch) {
       ch.vars.set(parseInt(assignMatch[1]), ev._evalExpr(assignMatch[2]));
       return;
     }
-    const namedAssign = (b.clean||"").match(/^#\[([^\]]+)\]\s*=\s*(.+)$/i);
+    const namedAssign = (b.clean || "").match(/^#\[([^\]]+)\]\s*=\s*(.+)$/i);
     if (namedAssign) {
       ev.setVar(namedAssign[1], ev._evalExpr(namedAssign[2]));
       return;
     }
     // Siemens R-var: R10=3.14
     if (ch.machDef.dialect === "siemens") {
-      const rAssign = (b.clean||"").match(/^R(\d+)\s*=\s*(.+)$/i);
+      const rAssign = (b.clean || "").match(/^R(\d+)\s*=\s*(.+)$/i);
       if (rAssign) {
         ch.rVars.set(parseInt(rAssign[1]), ev._evalExpr(rAssign[2]));
         return;
@@ -1255,8 +1618,13 @@ export class CNCEngine {
       if (ch.machDef.class === "lathe" && w._toolNum != null) {
         ch.activeT = w._toolNum;
         ch.activeH = w._toolOffset;
+        ch.pendingT = w._toolNum;
       } else if (!ms2.includes(6)) {
         ch.activeT = w.T;
+        ch.activeH = w.T;
+        ch.pendingT = w.T;
+      } else {
+        ch.pendingT = w.T;
       }
     }
 
@@ -1275,52 +1643,151 @@ export class CNCEngine {
 
   _applyGCode(ch, ev, g, w, b) {
     const g2 = Math.round(g * 10) / 10; // handle G43.1, G54.1 etc
-    switch(Math.floor(g2)) {
-      case 0:  ch.motionMode = "G00"; break;
-      case 1:  ch.motionMode = "G01"; break;
-      case 2:  ch.motionMode = "G02"; break;
-      case 3:  ch.motionMode = "G03"; break;
-      case 17: ch.plane = "G17"; break;
-      case 18: ch.plane = "G18"; break;
-      case 19: ch.plane = "G19"; break;
-      case 20: ch.units = "inch"; break;
-      case 21: ch.units = "mm"; break;
-      case 40: ch.modals.cutComp = "G40"; break;
-      case 41: ch.modals.cutComp = "G41"; break;
-      case 42: ch.modals.cutComp = "G42"; break;
-      case 43: ch.modals.tlLen   = "G43"; if (w.H != null) ch.activeH = w.H; break;
-      case 44: ch.modals.tlLen   = "G44"; break;
-      case 49: ch.modals.tlLen   = "G49"; break;
-      case 50: if (w.S != null) ch.cssSpeedMax = w.S; break; // G50 spindle clamp (lathe) or scale (HAAS)
-      case 52: /* G52 local coord shift - no-op for now */ break;
-      case 53: /* G53 machine coord */ break;
-      case 54: ch.activeWCS = "G54"; break;
-      case 55: ch.activeWCS = "G55"; break;
-      case 56: ch.activeWCS = "G56"; break;
-      case 57: ch.activeWCS = "G57"; break;
-      case 58: ch.activeWCS = "G58"; break;
-      case 59: ch.activeWCS = "G59"; break;
-      case 70: if (ch.machDef.class === "lathe") ch.motionMode = "G70"; break; // finish cycle
-      case 71: ch.motionMode = "G71"; break; // rough OD
-      case 72: ch.motionMode = "G72"; break; // rough face
-      case 73: ch.motionMode = "G73"; break; // pattern repeat
-      case 74: ch.motionMode = "G74"; break; // peck face drill
-      case 75: ch.motionMode = "G75"; break; // peck groove
-      case 76: ch.motionMode = "G76"; break; // threading
-      case 80: ch.motionMode = "G80"; ch.modals.cycle = "G80"; break;
-      case 81: case 82: case 83: case 84: case 85: case 86: case 87: case 88: case 89:
-        ch.motionMode = `G${Math.floor(g2)}`; ch.modals.cycle = ch.motionMode; break;
-      case 90: ch.posMode = "G90"; break;
-      case 91: ch.posMode = "G91"; break;
-      case 92: if (w.S != null) ch.cssSpeedMax = w.S; break; // spindle clamp
-      case 94: ch.modals.feed = "G94"; break;
-      case 95: ch.modals.feed = "G95"; break;
-      case 96: ch.cssMode = true;  if (w.S != null) ch.cssSpeed = w.S; break;
-      case 97: ch.cssMode = false; if (w.S != null) ch.rpm = w.S; break;
-      case 98: ch.modals.retPlane = "G98"; break;
-      case 99: ch.modals.retPlane = "G99"; break;
+    switch (Math.floor(g2)) {
+      case 0:
+        ch.motionMode = "G00";
+        break;
+      case 1:
+        ch.motionMode = "G01";
+        break;
+      case 2:
+        ch.motionMode = "G02";
+        break;
+      case 3:
+        ch.motionMode = "G03";
+        break;
+      case 17:
+        ch.plane = "G17";
+        break;
+      case 18:
+        ch.plane = "G18";
+        break;
+      case 19:
+        ch.plane = "G19";
+        break;
+      case 20:
+        ch.units = "inch";
+        break;
+      case 21:
+        ch.units = "mm";
+        break;
+      case 40:
+        ch.modals.cutComp = "G40";
+        break;
+      case 41:
+        ch.modals.cutComp = "G41";
+        break;
+      case 42:
+        ch.modals.cutComp = "G42";
+        break;
+      case 43:
+        ch.modals.tlLen = "G43";
+        if (w.H != null) ch.activeH = w.H;
+        break;
+      case 44:
+        ch.modals.tlLen = "G44";
+        break;
+      case 49:
+        ch.modals.tlLen = "G49";
+        break;
+      case 50:
+        if (w.S != null) ch.cssSpeedMax = w.S;
+        break; // G50 spindle clamp (lathe) or scale (HAAS)
+      case 52:
+        /* G52 local coord shift - no-op for now */ break;
+      case 53:
+        /* G53 machine coord */ break;
+      case 54:
+        ch.activeWCS = "G54";
+        break;
+      case 55:
+        ch.activeWCS = "G55";
+        break;
+      case 56:
+        ch.activeWCS = "G56";
+        break;
+      case 57:
+        ch.activeWCS = "G57";
+        break;
+      case 58:
+        ch.activeWCS = "G58";
+        break;
+      case 59:
+        ch.activeWCS = "G59";
+        break;
+      case 70:
+        if (ch.machDef.class === "lathe") ch.motionMode = "G70";
+        break; // finish cycle
+      case 71:
+        ch.motionMode = "G71";
+        break; // rough OD
+      case 72:
+        ch.motionMode = "G72";
+        break; // rough face
+      case 73:
+        ch.motionMode = "G73";
+        break; // pattern repeat
+      case 74:
+        ch.motionMode = "G74";
+        break; // peck face drill
+      case 75:
+        ch.motionMode = "G75";
+        break; // peck groove
+      case 76:
+        ch.motionMode = "G76";
+        break; // threading
+      case 80:
+        ch.motionMode = "G80";
+        ch.modals.cycle = "G80";
+        break;
+      case 81:
+      case 82:
+      case 83:
+      case 84:
+      case 85:
+      case 86:
+      case 87:
+      case 88:
+      case 89:
+        ch.motionMode = `G${Math.floor(g2)}`;
+        ch.modals.cycle = ch.motionMode;
+        break;
+      case 90:
+        ch.posMode = "G90";
+        break;
+      case 91:
+        ch.posMode = "G91";
+        break;
+      case 92:
+        if (w.S != null) ch.cssSpeedMax = w.S;
+        break; // spindle clamp
+      case 94:
+        ch.modals.feed = "G94";
+        break;
+      case 95:
+        ch.modals.feed = "G95";
+        break;
+      case 96:
+        ch.cssMode = true;
+        if (w.S != null) ch.cssSpeed = w.S;
+        break;
+      case 97:
+        ch.cssMode = false;
+        if (w.S != null) ch.rpm = w.S;
+        break;
+      case 98:
+        if (ch.machDef.class === "lathe") ch.modals.feed = "G98";
+        else ch.modals.retPlane = "G98";
+        break;
+      case 99:
+        if (ch.machDef.class === "lathe") ch.modals.feed = "G99";
+        else ch.modals.retPlane = "G99";
+        break;
       case 28: // G28 return to reference
-        ch.pos.X = ch.home.X; ch.pos.Y = ch.home.Y; ch.pos.Z = ch.home.Z; break;
+        ch.pos.X = ch.home.X;
+        ch.pos.Y = ch.home.Y;
+        ch.pos.Z = ch.home.Z;
+        break;
     }
     // Siemens units
     if (ch.machDef.dialect === "siemens") {
@@ -1331,25 +1798,76 @@ export class CNCEngine {
 
   _applyMCode(ch, ev, m, w, pathOnly, recorder = null) {
     const def = ch.machDef.mCodes || {};
-    const match = (arr) => arr?.includes(`M${m}`);
+    const match = (arr) => {
+      if (!Array.isArray(arr)) return false;
+      return arr.some((code) => {
+        const n = Number(String(code).replace(/[^0-9.+-]/g, ""));
+        return Number.isFinite(n) && n === Number(m);
+      });
+    };
 
-    if (match(def.spindleCW))    { ch.dir = "CW";  if (w.S != null) ch.rpm = w.S; }
-    if (match(def.spindleCCW))   { ch.dir = "CCW"; if (w.S != null) ch.rpm = w.S; }
-    if (match(def.spindleStop))  { ch.dir = ""; }
-    if (match(def.liveToolCW))   { ch.liveDir = "CW";  if (w.S != null) ch.liveRPM = w.S; }
-    if (match(def.liveToolCCW))  { ch.liveDir = "CCW"; if (w.S != null) ch.liveRPM = w.S; }
-    if (match(def.liveToolStop)) { ch.liveDir = ""; }
-    if (match(def.coolantFlood)) { ch.coolant.flood = true; }
-    if (match(def.coolantMist))  { ch.coolant.mist  = true; }
-    if (match(def.coolantThru))  { ch.coolant.through = true; }
-    if (match(def.coolantAir))   { ch.coolant.air   = true; }
-    if (match(def.coolantOff))   { ch.coolant = { flood:false, mist:false, through:false, air:false }; }
-    if (match(def.toolChange))   { if (w.T != null) { ch.activeT = w.T; ch.activeH = w.T; } ch.stats && ch.stats.tc++; }
-    if (match(def.spindleOrient)){ /* no-op */ }
+    if (match(def.spindleCW)) {
+      ch.dir = "CW";
+      if (w.S != null) ch.rpm = w.S;
+    }
+    if (match(def.spindleCCW)) {
+      ch.dir = "CCW";
+      if (w.S != null) ch.rpm = w.S;
+    }
+    if (match(def.spindleStop)) {
+      ch.dir = "";
+    }
+    if (match(def.liveToolCW)) {
+      ch.liveDir = "CW";
+      if (w.S != null) ch.liveRPM = w.S;
+    }
+    if (match(def.liveToolCCW)) {
+      ch.liveDir = "CCW";
+      if (w.S != null) ch.liveRPM = w.S;
+    }
+    if (match(def.liveToolStop)) {
+      ch.liveDir = "";
+    }
+    if (match(def.coolantFlood)) {
+      ch.coolant.flood = true;
+    }
+    if (match(def.coolantMist)) {
+      ch.coolant.mist = true;
+    }
+    if (match(def.coolantThru)) {
+      ch.coolant.through = true;
+    }
+    if (match(def.coolantAir)) {
+      ch.coolant.air = true;
+    }
+    if (match(def.coolantOff)) {
+      ch.coolant = { flood: false, mist: false, through: false, air: false };
+    }
+    if (match(def.toolChange)) {
+      if (w.T != null) {
+        ch.activeT = w.T;
+        ch.activeH = w.T;
+        ch.pendingT = w.T;
+      } else if (ch.pendingT != null) {
+        ch.activeT = ch.pendingT;
+        ch.activeH = ch.pendingT;
+      }
+      ch.stats && ch.stats.tc++;
+    }
+    if (match(def.spindleOrient)) {
+      /* no-op */
+    }
 
-    if (match(def.programStop))  { ch.waiting = { type: "M00" }; }
-    if (match(def.optionalStop) && ch.optSkip) { /* skip */ }
-    if (match(def.programEnd))   { ch.done = true; return true; }
+    if (match(def.programStop)) {
+      ch.waiting = { type: "M00" };
+    }
+    if (match(def.optionalStop) && ch.optSkip) {
+      /* skip */
+    }
+    if (match(def.programEnd)) {
+      ch.done = true;
+      return true;
+    }
 
     // Sub call (M98/M97/CALL)
     if (match(def.subCall)) {
@@ -1380,9 +1898,26 @@ export class CNCEngine {
     };
 
     const hasXYZ = w.X != null || w.Y != null || w.Z != null;
-    const hasCyc = ["G81","G82","G83","G84","G85","G86","G87","G88","G89","G74","G75","G76"].includes(mode);
+    const isArcMode = mode === "G02" || mode === "G03";
+    const hasArcCenterWords =
+      w.I != null || w.J != null || w.K != null || w.R != null;
+    const hasArcMotion = isArcMode && (hasXYZ || hasArcCenterWords);
+    const hasCyc = [
+      "G81",
+      "G82",
+      "G83",
+      "G84",
+      "G85",
+      "G86",
+      "G87",
+      "G88",
+      "G89",
+      "G74",
+      "G75",
+      "G76",
+    ].includes(mode);
 
-    if (!hasXYZ && !hasCyc) return;
+    if (!hasXYZ && !hasCyc && !hasArcMotion) return;
 
     const nx = w.X != null ? av(ch.pos.X, w.X) : ch.pos.X;
     const ny = w.Y != null ? av(ch.pos.Y, w.Y) : ch.pos.Y;
@@ -1392,15 +1927,21 @@ export class CNCEngine {
 
     if (shouldRecordPath && (mode === "G00" || mode === "G01")) {
       this._addPathPoint(ch, nx, ny, nz, mode, b, recorder);
-    } else if (shouldRecordPath && (mode === "G02" || mode === "G03")) {
+    } else if (shouldRecordPath && isArcMode) {
       this._addArcPath(ch, ev, w, nx, ny, nz, mode, b, recorder);
     } else if (shouldRecordPath && hasCyc) {
       this._addCyclePoints(ch, ev, w, nx, ny, nz, mode, b, recorder);
     }
 
-    ch.pos.X = nx; ch.pos.Y = ny; ch.pos.Z = nz;
-    const off = ch.offsets[ch.activeWCS] || {X:0,Y:0,Z:0};
-    ch.machinePos = { X: nx+(off.X||0), Y: ny+(off.Y||0), Z: nz+(off.Z||0) };
+    ch.pos.X = nx;
+    ch.pos.Y = ny;
+    ch.pos.Z = nz;
+    const off = ch.offsets[ch.activeWCS] || { X: 0, Y: 0, Z: 0 };
+    ch.machinePos = {
+      X: nx + (off.X || 0),
+      Y: ny + (off.Y || 0),
+      Z: nz + (off.Z || 0),
+    };
 
     // Update system vars
     ch.vars.set(5041, ch.pos.X);
@@ -1409,62 +1950,259 @@ export class CNCEngine {
   }
 
   _addPathPoint(ch, x, y, z, mode, b, recorder) {
-    const d = Math.sqrt((x-ch.pos.X)**2+(y-ch.pos.Y)**2+(z-ch.pos.Z)**2);
-    const spd = mode === "G00" ? 8000 : (ch.feed || 200);
+    const d = Math.sqrt(
+      (x - ch.pos.X) ** 2 + (y - ch.pos.Y) ** 2 + (z - ch.pos.Z) ** 2,
+    );
+    const spd = this._effectiveFeedRate(ch, mode);
+    const comp = this._applyCutterComp(
+      ch,
+      { x, y, z },
+      { x: ch.pos.X, y: ch.pos.Y, z: ch.pos.Z },
+    );
     recorder.stats.dist += d;
-    if (spd > 0) recorder.stats.time += d / spd * 60;
+    if (spd > 0) recorder.stats.time += (d / spd) * 60;
     if (mode === "G00") recorder.stats.rapid++;
     else recorder.stats.cut++;
-    recorder.pathPoints.push({ x, y, z, m: mode, channelId: ch.id, feed: ch.feed, tool: ch.activeT, bi: b?._ptr });
+    recorder.pathPoints.push({
+      x: comp.x,
+      y: comp.y,
+      z: comp.z,
+      m: mode,
+      channelId: ch.id,
+      feed: ch.feed,
+      tool: ch.activeT,
+      bi: b?._ptr,
+      cutComp: ch.modals?.cutComp || "G40",
+    });
+  }
+
+  _effectiveFeedRate(ch, mode = "G01") {
+    if (mode === "G00") return 8000;
+    const programmedFeed = Number(ch.feed || 0);
+    if (programmedFeed <= 0) return 0;
+    const feedMode = ch.modals?.feed;
+    // G95/G99 are feed-per-revolution modes and must be converted using RPM.
+    if (feedMode === "G95" || feedMode === "G99") {
+      const rpm = Math.abs(Number(ch.rpm || 0));
+      return rpm > 0 ? programmedFeed * rpm : programmedFeed;
+    }
+    return programmedFeed;
+  }
+
+  _toolRadiusInProgramUnits(ch) {
+    const t = this.toolTable?.[ch.activeT] || null;
+    let radius = 0;
+    if (ch.machDef.class === "lathe") {
+      radius = Number(t?.cr ?? 0);
+    } else {
+      const dia = Number(t?.dia ?? 0);
+      radius = dia > 0 ? dia / 2 : Number(t?.cr ?? 0);
+    }
+
+    if (!(radius > 0)) {
+      const fallback = Number(ch.activeD || 0);
+      if (fallback > 0 && fallback < 50) radius = fallback;
+    }
+    const wearR = Number(t?.wearR ?? 0);
+    if (Number.isFinite(wearR)) radius += wearR;
+    if (!(radius > 0)) return 0;
+    if (this.toolUnits === ch.units) return radius;
+    return this.toolUnits === "inch" ? radius * 25.4 : radius / 25.4;
+  }
+
+  _applyCutterComp(ch, target, start = null) {
+    const compMode = ch.modals?.cutComp || "G40";
+    if (compMode !== "G41" && compMode !== "G42") return target;
+    const radius = this._toolRadiusInProgramUnits(ch);
+    if (!(radius > 0)) {
+      ch.message = `Cutter comp ${compMode} active with zero radius on T${ch.activeT || 0}`;
+      return target;
+    }
+    const side = compMode === "G41" ? 1 : -1;
+    const plane = ch.plane || "G17";
+    const s = start || target;
+    const dx = (target.x ?? 0) - (s.x ?? 0);
+    const dy = (target.y ?? 0) - (s.y ?? 0);
+    const dz = (target.z ?? 0) - (s.z ?? 0);
+
+    if (plane === "G18") {
+      const len = Math.hypot(dx, dz);
+      if (len < 1e-9) return target;
+      const ux = dx / len;
+      const uz = dz / len;
+      return {
+        x: (target.x ?? 0) + -uz * side * radius,
+        y: target.y ?? 0,
+        z: (target.z ?? 0) + ux * side * radius,
+      };
+    }
+
+    if (plane === "G19") {
+      const len = Math.hypot(dy, dz);
+      if (len < 1e-9) return target;
+      const uy = dy / len;
+      const uz = dz / len;
+      return {
+        x: target.x ?? 0,
+        y: (target.y ?? 0) + -uz * side * radius,
+        z: (target.z ?? 0) + uy * side * radius,
+      };
+    }
+
+    const len = Math.hypot(dx, dy);
+    if (len < 1e-9) return target;
+    const ux = dx / len;
+    const uy = dy / len;
+    return {
+      x: (target.x ?? 0) + -uy * side * radius,
+      y: (target.y ?? 0) + ux * side * radius,
+      z: target.z ?? 0,
+    };
   }
 
   _addArcPath(ch, ev, w, nx, ny, nz, mode, b, recorder) {
     const I = ev.resolve(w.I) ?? 0;
     const J = ev.resolve(w.J) ?? 0;
     const K = ev.resolve(w.K) ?? 0;
-    let ocx = ch.pos.X + I, ocy = ch.pos.Y + J;
+    let ocx = ch.pos.X + I,
+      ocy = ch.pos.Y + J;
     if (w.R != null) {
-      const R = ev.resolve(w.R), dx = nx-ch.pos.X, dy = ny-ch.pos.Y, len = Math.sqrt(dx*dx+dy*dy);
+      const R = ev.resolve(w.R),
+        dx = nx - ch.pos.X,
+        dy = ny - ch.pos.Y,
+        len = Math.sqrt(dx * dx + dy * dy);
+      if (Math.abs(R) + 1e-6 < len / 2) {
+        ch.message = `Invalid R arc: |R| (${Number(R).toFixed(3)}) < half-chord (${(len / 2).toFixed(3)})`;
+        this._addPathPoint(ch, nx, ny, nz, "G01", b, recorder);
+        return;
+      }
       if (len > 0.001) {
-        const h = Math.sqrt(Math.max(0, R*R-(len/2)**2));
-        const mx=(ch.pos.X+nx)/2, my=(ch.pos.Y+ny)/2;
-        const nx2=-dy/len, ny2=dx/len, sign=mode==="G02"?1:-1;
-        ocx=mx+sign*h*nx2; ocy=my+sign*h*ny2;
+        const h = Math.sqrt(Math.max(0, R * R - (len / 2) ** 2));
+        const mx = (ch.pos.X + nx) / 2,
+          my = (ch.pos.Y + ny) / 2;
+        const nx2 = -dy / len,
+          ny2 = dx / len,
+          sign = mode === "G02" ? 1 : -1;
+        ocx = mx + sign * h * nx2;
+        ocy = my + sign * h * ny2;
       }
     }
-    const r = Math.sqrt((ch.pos.X-ocx)**2+(ch.pos.Y-ocy)**2)||1;
-    let a0=Math.atan2(ch.pos.Y-ocy,ch.pos.X-ocx), a1=Math.atan2(ny-ocy,nx-ocx);
-    let da = a1-a0;
-    if (mode==="G02"){ if(da>0) da-=2*Math.PI; } else { if(da<0) da+=2*Math.PI; }
-    const steps = Math.max(8, Math.round(Math.abs(da)*r/2));
-    for (let s=1;s<=steps;s++) {
-      const a = a0+da*s/steps;
-      const px=ocx+r*Math.cos(a), py=ocy+r*Math.sin(a);
-      const d=Math.sqrt((px-ch.pos.X)**2+(py-ch.pos.Y)**2+(nz-ch.pos.Z)**2);
+    const r = Math.sqrt((ch.pos.X - ocx) ** 2 + (ch.pos.Y - ocy) ** 2) || 1;
+    const hasArcEndXY = w.X != null || w.Y != null;
+    let a0 = Math.atan2(ch.pos.Y - ocy, ch.pos.X - ocx),
+      a1 = Math.atan2(ny - ocy, nx - ocx);
+    let da = a1 - a0;
+    // Fanuc: if endpoint is omitted on G02/G03 with I/J/K center format,
+    // treat as a full-circle move ending at the current XY.
+    if (
+      !hasArcEndXY &&
+      w.R == null &&
+      (w.I != null || w.J != null || w.K != null)
+    ) {
+      da = mode === "G02" ? -2 * Math.PI : 2 * Math.PI;
+    }
+    if (mode === "G02") {
+      if (da > 0) da -= 2 * Math.PI;
+    } else {
+      if (da < 0) da += 2 * Math.PI;
+    }
+    const steps = Math.max(8, Math.round((Math.abs(da) * r) / 2));
+    let prevRaw = { x: ch.pos.X, y: ch.pos.Y, z: ch.pos.Z };
+    for (let s = 1; s <= steps; s++) {
+      const a = a0 + (da * s) / steps;
+      const px = ocx + r * Math.cos(a),
+        py = ocy + r * Math.sin(a);
+      const d = Math.sqrt(
+        (px - ch.pos.X) ** 2 + (py - ch.pos.Y) ** 2 + (nz - ch.pos.Z) ** 2,
+      );
       recorder.stats.dist += d;
       recorder.stats.arc++;
-      if (ch.feed > 0) recorder.stats.time += d / ch.feed * 60;
-      recorder.pathPoints.push({x:px,y:py,z:nz,m:mode,channelId:ch.id,feed:ch.feed,tool:ch.activeT, bi: b?._ptr});
+      const spd = this._effectiveFeedRate(ch, mode);
+      if (spd > 0) recorder.stats.time += (d / spd) * 60;
+      const comp = this._applyCutterComp(ch, { x: px, y: py, z: nz }, prevRaw);
+      recorder.pathPoints.push({
+        x: comp.x,
+        y: comp.y,
+        z: comp.z,
+        m: mode,
+        channelId: ch.id,
+        feed: ch.feed,
+        tool: ch.activeT,
+        bi: b?._ptr,
+        cutComp: ch.modals?.cutComp || "G40",
+      });
+      prevRaw = { x: px, y: py, z: nz };
     }
   }
 
   _addCyclePoints(ch, ev, w, nx, ny, nz, mode, b, recorder) {
-    const rz = w.R != null ? (ch.posMode==="G90"?w.R:ch.pos.Z+w.R) : ch.pos.Z+3;
+    const rz =
+      w.R != null
+        ? ch.posMode === "G90"
+          ? w.R
+          : ch.pos.Z + w.R
+        : ch.pos.Z + 3;
     const dz = nz;
     const bi = b?._ptr;
-    recorder.pathPoints.push({x:nx,y:ny,z:rz,m:"G00",channelId:ch.id,feed:0,tool:ch.activeT,bi});
-    recorder.pathPoints.push({x:nx,y:ny,z:dz,m:"G01",channelId:ch.id,feed:ch.feed,tool:ch.activeT,bi});
-    recorder.pathPoints.push({x:nx,y:ny,z:rz,m:"G00",channelId:ch.id,feed:0,tool:ch.activeT,bi});
+    recorder.pathPoints.push({
+      x: nx,
+      y: ny,
+      z: rz,
+      m: "G00",
+      channelId: ch.id,
+      feed: 0,
+      tool: ch.activeT,
+      bi,
+    });
+    recorder.pathPoints.push({
+      x: nx,
+      y: ny,
+      z: dz,
+      m: "G01",
+      channelId: ch.id,
+      feed: ch.feed,
+      tool: ch.activeT,
+      bi,
+    });
+    recorder.pathPoints.push({
+      x: nx,
+      y: ny,
+      z: rz,
+      m: "G00",
+      channelId: ch.id,
+      feed: 0,
+      tool: ch.activeT,
+      bi,
+    });
     recorder.stats.cut += 2;
     recorder.stats.rapid += 2;
     if (mode === "G83" && w.Q != null) {
       // Peck — add multiple pecks
-      const q = Math.abs(w.Q), totalDepth = Math.abs(dz - rz);
+      const q = Math.abs(w.Q),
+        totalDepth = Math.abs(dz - rz);
       let currentZ = rz;
       while (currentZ > dz) {
         const peckZ = Math.max(dz, currentZ - q);
-        recorder.pathPoints.push({x:nx,y:ny,z:peckZ,m:"G01",channelId:ch.id,feed:ch.feed,tool:ch.activeT,bi});
-        recorder.pathPoints.push({x:nx,y:ny,z:rz,m:"G00",channelId:ch.id,feed:0,tool:ch.activeT,bi});
+        recorder.pathPoints.push({
+          x: nx,
+          y: ny,
+          z: peckZ,
+          m: "G01",
+          channelId: ch.id,
+          feed: ch.feed,
+          tool: ch.activeT,
+          bi,
+        });
+        recorder.pathPoints.push({
+          x: nx,
+          y: ny,
+          z: rz,
+          m: "G00",
+          channelId: ch.id,
+          feed: 0,
+          tool: ch.activeT,
+          bi,
+        });
         currentZ = peckZ;
         recorder.stats.cut++;
         recorder.stats.rapid++;
@@ -1472,9 +2210,27 @@ export class CNCEngine {
     }
     if (mode === "G76") {
       // Threading: add a few spring passes
-      for (let p=0;p<3;p++) {
-        recorder.pathPoints.push({x:nx,y:ny,z:dz,m:"G32",channelId:ch.id,feed:ch.feed,tool:ch.activeT,bi});
-        recorder.pathPoints.push({x:nx,y:ny,z:rz,m:"G00",channelId:ch.id,feed:0,tool:ch.activeT,bi});
+      for (let p = 0; p < 3; p++) {
+        recorder.pathPoints.push({
+          x: nx,
+          y: ny,
+          z: dz,
+          m: "G32",
+          channelId: ch.id,
+          feed: ch.feed,
+          tool: ch.activeT,
+          bi,
+        });
+        recorder.pathPoints.push({
+          x: nx,
+          y: ny,
+          z: rz,
+          m: "G00",
+          channelId: ch.id,
+          feed: 0,
+          tool: ch.activeT,
+          bi,
+        });
       }
     }
   }
@@ -1489,7 +2245,7 @@ export class CNCEngine {
       const mainBlocks = ch.callStack.length
         ? ch.callStack[ch.callStack.length - 1].blocks
         : ch.blocks;
-      const labelIdx = mainBlocks.findIndex(b => b?.seqN === progNum);
+      const labelIdx = mainBlocks.findIndex((b) => b?.seqN === progNum);
       if (labelIdx >= 0) {
         // Slice from the N-label up to (but not including) the next M99
         const subSlice = [];
@@ -1506,15 +2262,27 @@ export class CNCEngine {
       }
     }
 
-    if (!subBlocks) { ch.error = `Sub O${progNum} not found`; return; }
+    if (!subBlocks) {
+      ch.error = `Sub O${progNum} not found`;
+      return;
+    }
     const returnPtr = ch.callStack.length
       ? ch.callStack[ch.callStack.length - 1].pointer
       : ch.pointer;
-    ch.callStack.push({ blocks: subBlocks, pointer: 0, returnPtr, repeat, loopCount: 0 });
+    ch.callStack.push({
+      blocks: subBlocks,
+      pointer: 0,
+      returnPtr,
+      repeat,
+      loopCount: 0,
+    });
   }
 
   _returnFromSub(ch) {
-    if (!ch.callStack.length) { ch.done = true; return; }
+    if (!ch.callStack.length) {
+      ch.done = true;
+      return;
+    }
     const frame = ch.callStack[ch.callStack.length - 1];
     frame.loopCount++;
     if (frame.loopCount < frame.repeat) {
@@ -1533,7 +2301,7 @@ export class CNCEngine {
       const mainBlocks = ch.callStack.length
         ? ch.callStack[ch.callStack.length - 1].blocks
         : ch.blocks;
-      const labelIdx = mainBlocks.findIndex(b => b?.seqN === progNum);
+      const labelIdx = mainBlocks.findIndex((b) => b?.seqN === progNum);
       if (labelIdx >= 0) {
         subBlocks = [];
         for (let i = labelIdx; i < mainBlocks.length; i++) {
@@ -1568,66 +2336,101 @@ export class CNCEngine {
     const line = b.clean || "";
 
     if (kw === "WHILE") {
-      // Fanuc: WHILE [cond] DON  /  Siemens: WHILE cond
-      const condMatch = line.match(/WHILE\s*\[?(.+?)\]?(?:\s+DO\d*)?$/i);
+      // Fanuc: WHILE [cond] DO1  / Siemens: WHILE cond
+      const condMatch = line.match(
+        /^WHILE\s*(?:\[(.+?)\]|(.+?))(?:\s*DO\d*)?$/i,
+      );
       if (condMatch) {
         try {
-          const cond = ev._evalExpr(condMatch[1].replace(/\[|\]/g, ''));
+          const condExpr = (condMatch[1] ?? condMatch[2] ?? "").trim();
+          const cond = ev._evalExpr(condExpr.replace(/\[|\]/g, ""));
           if (!cond) {
-            // Skip to matching ENDn or ENDWHILE
-            const doMatch = line.match(/DO(\d+)/i);
-            const doN = doMatch ? doMatch[1] : null;
-            const ptr = ch.callStack.length ? ch.callStack[ch.callStack.length-1].pointer : ch.pointer;
-            this._skipToMatchingEnd(ch, blks, ptr, doN);
+            const ptr = ch.callStack.length
+              ? ch.callStack[ch.callStack.length - 1].pointer
+              : ch.pointer;
+            this._skipToMatchingLoopEnd(ch, blks, Math.max(0, ptr - 1));
           }
-        } catch { /* expr error, skip */ }
+        } catch {
+          /* expr error, skip */
+        }
       }
     }
 
     // Fanuc DO1 / END1 — loop markers (the actual loop-back on END)
-    if (kw && kw.startsWith("END") && /^END\d+$/.test(kw)) {
-      const doN = kw.replace("END", "");
-      // Walk back to find the matching WHILE [...] DON
-      const ptr = ch.callStack.length ? ch.callStack[ch.callStack.length-1].pointer : ch.pointer;
-      this._jumpBackToWhile(ch, blks, ptr - 1, doN);
+    if (
+      kw &&
+      kw.startsWith("END") &&
+      (/^END\d+$/.test(kw) || kw === "ENDWHILE" || kw === "ENDLOOP")
+    ) {
+      const ptr = ch.callStack.length
+        ? ch.callStack[ch.callStack.length - 1].pointer
+        : ch.pointer;
+      this._jumpBackToLoopStart(ch, blks, Math.max(0, ptr - 2));
       return;
     }
 
     // Fanuc DO1 alone acts as loop-start marker only (no logic needed)
     if (kw && /^DO\d*$/.test(kw)) return;
+    if (kw === "LOOP" || kw === "REPEAT") return;
 
     if (kw === "IF") {
-      const condMatch = line.match(/IF\s+(.+?)\s+GOTO[BF]\s+(\w+)/i);
+      const condMatch = line.match(
+        /^IF\s*(?:\[(.+?)\]|(.+?))\s*GOTO(?:[BF])?\s*(\w+)$/i,
+      );
       if (condMatch) {
         try {
-          const cond = ev._evalExpr(condMatch[1]);
-          if (cond) this._gotoLabel(ch, blks, condMatch[2]);
+          const condExpr = (condMatch[1] ?? condMatch[2] ?? "").trim();
+          const cond = ev._evalExpr(condExpr);
+          if (cond) this._gotoLabel(ch, blks, condMatch[3]);
         } catch {}
         return;
       }
       // IF ... THEN block
-      const thenMatch = line.match(/IF\s+(.+)/i);
+      const thenMatch = line.match(/^IF\s*(?:\[(.+)\]|(.+))$/i);
       if (thenMatch) {
         try {
-          const cond = ev._evalExpr(thenMatch[1]);
-          if (!cond) this._skipToKeyword(ch, blks, ch.pointer, "ENDIF");
+          const condExpr = (thenMatch[1] ?? thenMatch[2] ?? "")
+            .replace(/THEN\s*$/i, "")
+            .trim();
+          const cond = ev._evalExpr(condExpr);
+          if (!cond)
+            this._skipToMatchingElseOrEndif(
+              ch,
+              blks,
+              Math.max(0, ch.pointer - 1),
+            );
         } catch {}
       }
     }
 
-    if (kw === "GOTOF" || kw === "GOTOB") {
-      const lbl = line.replace(/GOTO[FB]\s*/i, "").trim();
+    if (kw === "ELSE") {
+      this._skipToMatchingEndif(ch, blks, Math.max(0, ch.pointer - 1));
+      return;
+    }
+
+    if (kw === "GOTOF" || kw === "GOTOB" || kw === "GOTO") {
+      const lbl = line.replace(/GOTO(?:[FB])?\s*/i, "").trim();
       this._gotoLabel(ch, blks, lbl);
+      return;
     }
 
     if (kw === "CALL") {
-      const callMatch = line.match(/CALL\s+(\w+)/i);
+      const callMatch = line.match(/CALL\s*(\w+)/i);
       if (callMatch && !pathOnly) {
         const subName = callMatch[1];
-        const subBlocks = this.programs.get(subName) || this.programs.get(`O${subName}`);
+        const subBlocks =
+          this.programs.get(subName) || this.programs.get(`O${subName}`);
         if (subBlocks) {
-          const rptr = ch.callStack.length ? ch.callStack[ch.callStack.length-1].pointer : ch.pointer;
-          ch.callStack.push({ blocks: subBlocks, pointer: 0, returnPtr: rptr, repeat: 1, loopCount: 0 });
+          const rptr = ch.callStack.length
+            ? ch.callStack[ch.callStack.length - 1].pointer
+            : ch.pointer;
+          ch.callStack.push({
+            blocks: subBlocks,
+            pointer: 0,
+            returnPtr: rptr,
+            repeat: 1,
+            loopCount: 0,
+          });
         }
       }
     }
@@ -1641,35 +2444,117 @@ export class CNCEngine {
     }
   }
 
-  _skipToKeyword(ch, blks, fromPtr, targetKw) {
-    for (let i = fromPtr; i < blks.length; i++) {
-      if (blks[i]?.keyword === targetKw) {
-        if (ch.callStack.length) ch.callStack[ch.callStack.length-1].pointer = i + 1;
-        else ch.pointer = i + 1;
-        return;
-      }
-    }
+  _isLoopStartKeyword(kw) {
+    return (
+      kw === "WHILE" ||
+      kw === "LOOP" ||
+      kw === "REPEAT" ||
+      /^DO\d*$/.test(kw || "")
+    );
   }
 
-  _skipToMatchingEnd(ch, blks, fromPtr, doN) {
-    // Skip forward to END<N> or ENDWHILE (Fanuc loop exit)
-    for (let i = fromPtr; i < blks.length; i++) {
+  _isLoopEndKeyword(kw) {
+    return (
+      kw === "ENDWHILE" ||
+      kw === "ENDLOOP" ||
+      kw === "UNTIL" ||
+      /^END\d+$/.test(kw || "")
+    );
+  }
+
+  _findForwardMatch(blks, fromPtr, isStart, isEnd) {
+    let depth = 0;
+    for (let i = fromPtr + 1; i < blks.length; i++) {
       const kw = blks[i]?.keyword;
       if (!kw) continue;
-      if (kw === "ENDWHILE") { if (ch.callStack.length) ch.callStack[ch.callStack.length-1].pointer = i + 1; else ch.pointer = i + 1; return; }
-      if (doN && kw === `END${doN}`)  { if (ch.callStack.length) ch.callStack[ch.callStack.length-1].pointer = i + 1; else ch.pointer = i + 1; return; }
+      if (isStart(kw)) depth++;
+      else if (isEnd(kw)) {
+        if (depth === 0) return i;
+        depth--;
+      }
     }
+    return -1;
   }
 
-  _jumpBackToWhile(ch, blks, fromPtr, doN) {
-    // Jump backwards to matching WHILE [...] DON for loop iteration
+  _findBackwardMatch(blks, fromPtr, isStart, isEnd) {
+    let depth = 0;
     for (let i = fromPtr; i >= 0; i--) {
       const kw = blks[i]?.keyword;
       if (!kw) continue;
-      if (kw === "WHILE") {
-        // Set pointer back to the WHILE block so it gets re-evaluated
-        if (ch.callStack.length) ch.callStack[ch.callStack.length-1].pointer = i;
-        else ch.pointer = i;
+      if (isEnd(kw)) depth++;
+      else if (isStart(kw)) {
+        if (depth === 0) return i;
+        depth--;
+      }
+    }
+    return -1;
+  }
+
+  _skipToMatchingLoopEnd(ch, blks, fromPtr) {
+    const idx = this._findForwardMatch(
+      blks,
+      fromPtr,
+      (kw) => this._isLoopStartKeyword(kw),
+      (kw) => this._isLoopEndKeyword(kw),
+    );
+    if (idx >= 0) {
+      if (ch.callStack.length)
+        ch.callStack[ch.callStack.length - 1].pointer = idx + 1;
+      else ch.pointer = idx + 1;
+    }
+  }
+
+  _jumpBackToLoopStart(ch, blks, fromPtr) {
+    const idx = this._findBackwardMatch(
+      blks,
+      fromPtr,
+      (kw) => this._isLoopStartKeyword(kw),
+      (kw) => this._isLoopEndKeyword(kw),
+    );
+    if (idx >= 0) {
+      if (ch.callStack.length)
+        ch.callStack[ch.callStack.length - 1].pointer = idx;
+      else ch.pointer = idx;
+    }
+  }
+
+  _skipToMatchingEndif(ch, blks, fromPtr) {
+    const idx = this._findForwardMatch(
+      blks,
+      fromPtr,
+      (kw) => kw === "IF",
+      (kw) => kw === "ENDIF",
+    );
+    if (idx >= 0) {
+      if (ch.callStack.length)
+        ch.callStack[ch.callStack.length - 1].pointer = idx + 1;
+      else ch.pointer = idx + 1;
+    }
+  }
+
+  _skipToMatchingElseOrEndif(ch, blks, fromPtr) {
+    let depth = 0;
+    for (let i = fromPtr + 1; i < blks.length; i++) {
+      const kw = blks[i]?.keyword;
+      if (!kw) continue;
+      if (kw === "IF") {
+        depth++;
+        continue;
+      }
+      if (kw === "ENDIF") {
+        if (depth === 0) {
+          if (ch.callStack.length)
+            ch.callStack[ch.callStack.length - 1].pointer = i + 1;
+          else ch.pointer = i + 1;
+          return;
+        }
+        depth--;
+        continue;
+      }
+      if (kw === "ELSE" && depth === 0) {
+        if (ch.callStack.length)
+          ch.callStack[ch.callStack.length - 1].pointer = i + 1;
+        else ch.pointer = i + 1;
         return;
       }
     }
@@ -1678,7 +2563,8 @@ export class CNCEngine {
   _gotoLabel(ch, blks, label) {
     for (let i = 0; i < blks.length; i++) {
       if (blks[i]?.label === label || blks[i]?.seqN === parseInt(label)) {
-        if (ch.callStack.length) ch.callStack[ch.callStack.length-1].pointer = i;
+        if (ch.callStack.length)
+          ch.callStack[ch.callStack.length - 1].pointer = i;
         else ch.pointer = i;
         return;
       }
@@ -1687,7 +2573,7 @@ export class CNCEngine {
 
   // ── Sync resolution ───────────────────────────────────────────────────────
   _trySyncResolve(channels) {
-    const waiting = channels.filter(ch => ch.waiting && !ch.done);
+    const waiting = channels.filter((ch) => ch.waiting && !ch.done);
     if (!waiting.length) return;
 
     // M300 Pnnn — all channels with same P must be waiting
@@ -1701,9 +2587,14 @@ export class CNCEngine {
     }
     for (const [sid, group] of bySyncId.entries()) {
       // All channels that should be part of this sync — check machine def
-      const expectedCount = this._expectedSyncChannels(group[0].waiting, channels);
+      const expectedCount = this._expectedSyncChannels(
+        group[0].waiting,
+        channels,
+      );
       if (group.length >= expectedCount) {
-        group.forEach(ch => { ch.waiting = null; });
+        group.forEach((ch) => {
+          ch.waiting = null;
+        });
       }
     }
 
@@ -1715,37 +2606,69 @@ export class CNCEngine {
 
   _expectedSyncChannels(waitDef, channels) {
     if (!waitDef?.def) return 1;
-    if (waitDef.def.type === "global-sync") return channels.filter(c=>!c.done).length;
+    if (waitDef.def.type === "global-sync")
+      return channels.filter((c) => !c.done).length;
     if (waitDef.def.type === "channel-sync") return 2;
     return 1;
   }
 
   // ── Utilities ─────────────────────────────────────────────────────────────
-  _gList(w) { return w?.G == null ? [] : Array.isArray(w.G) ? w.G : [w.G]; }
-  _mList(w) { return w?.M == null ? [] : Array.isArray(w.M) ? w.M : [w.M]; }
+  _gList(w) {
+    return w?.G == null ? [] : Array.isArray(w.G) ? w.G : [w.G];
+  }
+  _mList(w) {
+    return w?.M == null ? [] : Array.isArray(w.M) ? w.M : [w.M];
+  }
 
   _getChannelSnapshot(ch) {
     return {
-      id: ch.id, label: ch.label,
-      pos: {...ch.pos}, machinePos: {...ch.machinePos},
-      feed: ch.feed, rpm: ch.rpm, dir: ch.dir, liveDir: ch.liveDir, liveRPM: ch.liveRPM,
-      coolant: {...ch.coolant},
-      activeT: ch.activeT, activeH: ch.activeH,
-      motionMode: ch.motionMode, posMode: ch.posMode, plane: ch.plane,
-      units: ch.units, cssMode: ch.cssMode, cssSpeed: ch.cssSpeed,
-      activeWCS: ch.activeWCS, offsets: ch.offsets, home: {...ch.home},
-      waiting: ch.waiting, done: ch.done, error: ch.error, message: ch.message,
-      vars: Object.fromEntries(ch.vars), rVars: Object.fromEntries(ch.rVars),
+      id: ch.id,
+      label: ch.label,
+      pos: { ...ch.pos },
+      machinePos: { ...ch.machinePos },
+      feed: ch.feed,
+      rpm: ch.rpm,
+      dir: ch.dir,
+      liveDir: ch.liveDir,
+      liveRPM: ch.liveRPM,
+      coolant: { ...ch.coolant },
+      activeT: ch.activeT,
+      activeH: ch.activeH,
+      motionMode: ch.motionMode,
+      posMode: ch.posMode,
+      plane: ch.plane,
+      units: ch.units,
+      cssMode: ch.cssMode,
+      cssSpeed: ch.cssSpeed,
+      activeWCS: ch.activeWCS,
+      offsets: ch.offsets,
+      home: { ...ch.home },
+      waiting: ch.waiting,
+      done: ch.done,
+      error: ch.error,
+      message: ch.message,
+      vars: Object.fromEntries(ch.vars),
+      rVars: Object.fromEntries(ch.rVars),
       callStackDepth: ch.callStack.length,
       pointer: ch.pointer,
     };
   }
 
-  getState()     { return this.channels.map(ch => this._getChannelSnapshot(ch)); }
-  getPathPoints(){ return this.backplotPathPoints; }
-  getStats()     { return { ...this.backplotStats, blocks: this.backplotPathPoints.length }; }
-  isDone()       { return this.channels.every(ch => ch.done); }
-  hasWaiting()   { return this.channels.some(ch => ch.waiting && !ch.done); }
+  getState() {
+    return this.channels.map((ch) => this._getChannelSnapshot(ch));
+  }
+  getPathPoints() {
+    return this.backplotPathPoints;
+  }
+  getStats() {
+    return { ...this.backplotStats, blocks: this.backplotPathPoints.length };
+  }
+  isDone() {
+    return this.channels.every((ch) => ch.done);
+  }
+  hasWaiting() {
+    return this.channels.some((ch) => ch.waiting && !ch.done);
+  }
 
   // ── Convenience: run full pre-sim and return path ─────────────────────────
   static prerun(src, machDefId = "fanuc_mill") {
@@ -1763,205 +2686,472 @@ export class CNCEngine {
 export const TOOL_TEMPLATES = {
   // ── Mill cutting tools ────────────────────────────────────────────────────
   mill: {
-    "end_mill_4fl": {
-      cls: "mill", type: "End Mill", subtype: "square",
-      dia: 10, cr: 0, lc: 22, lt: 75, shank: 10, fl: 4, mat: "Carbide",
-      profile: "endmill", desc: "4-flute square end mill"
+    end_mill_4fl: {
+      cls: "mill",
+      type: "End Mill",
+      subtype: "square",
+      dia: 10,
+      cr: 0,
+      lc: 22,
+      lt: 75,
+      shank: 10,
+      fl: 4,
+      mat: "Carbide",
+      profile: "endmill",
+      desc: "4-flute square end mill",
     },
-    "end_mill_2fl": {
-      cls: "mill", type: "End Mill", subtype: "square",
-      dia: 8, cr: 0, lc: 19, lt: 65, shank: 8, fl: 2, mat: "Carbide",
-      profile: "endmill", desc: "2-flute (aluminium)"
+    end_mill_2fl: {
+      cls: "mill",
+      type: "End Mill",
+      subtype: "square",
+      dia: 8,
+      cr: 0,
+      lc: 19,
+      lt: 65,
+      shank: 8,
+      fl: 2,
+      mat: "Carbide",
+      profile: "endmill",
+      desc: "2-flute (aluminium)",
     },
-    "ball_mill_4fl": {
-      cls: "mill", type: "Ball Mill",
-      dia: 10, cr: 5, lc: 22, lt: 75, shank: 10, fl: 4, mat: "Carbide",
-      profile: "ballmill", desc: "4-flute ball nose"
+    ball_mill_4fl: {
+      cls: "mill",
+      type: "Ball Mill",
+      dia: 10,
+      cr: 5,
+      lc: 22,
+      lt: 75,
+      shank: 10,
+      fl: 4,
+      mat: "Carbide",
+      profile: "ballmill",
+      desc: "4-flute ball nose",
     },
-    "bull_nose": {
-      cls: "mill", type: "Bull Nose",
-      dia: 12, cr: 1, lc: 26, lt: 80, shank: 12, fl: 4, mat: "Carbide",
-      profile: "endmill", desc: "Bull nose r1"
+    bull_nose: {
+      cls: "mill",
+      type: "Bull Nose",
+      dia: 12,
+      cr: 1,
+      lc: 26,
+      lt: 80,
+      shank: 12,
+      fl: 4,
+      mat: "Carbide",
+      profile: "endmill",
+      desc: "Bull nose r1",
     },
-    "drill_hss": {
-      cls: "mill", type: "Drill",
-      dia: 6, cr: 0, lc: 52, lt: 90, shank: 6, fl: 2, mat: "HSS",
-      profile: "drill", desc: "HSS jobber drill", pointAngle: 118
+    drill_hss: {
+      cls: "mill",
+      type: "Drill",
+      dia: 6,
+      cr: 0,
+      lc: 52,
+      lt: 90,
+      shank: 6,
+      fl: 2,
+      mat: "HSS",
+      profile: "drill",
+      desc: "HSS jobber drill",
+      pointAngle: 118,
     },
-    "drill_carbide": {
-      cls: "mill", type: "Drill",
-      dia: 8, cr: 0, lc: 60, lt: 95, shank: 8, fl: 2, mat: "Carbide",
-      profile: "drill", desc: "Carbide stub drill", pointAngle: 140
+    drill_carbide: {
+      cls: "mill",
+      type: "Drill",
+      dia: 8,
+      cr: 0,
+      lc: 60,
+      lt: 95,
+      shank: 8,
+      fl: 2,
+      mat: "Carbide",
+      profile: "drill",
+      desc: "Carbide stub drill",
+      pointAngle: 140,
     },
-    "center_drill": {
-      cls: "mill", type: "Center Drill",
-      dia: 3, cr: 0, lc: 8, lt: 45, shank: 6, fl: 2, mat: "HSS",
-      profile: "centerdrill", desc: "60° centre drill", pointAngle: 60
+    center_drill: {
+      cls: "mill",
+      type: "Center Drill",
+      dia: 3,
+      cr: 0,
+      lc: 8,
+      lt: 45,
+      shank: 6,
+      fl: 2,
+      mat: "HSS",
+      profile: "centerdrill",
+      desc: "60° centre drill",
+      pointAngle: 60,
     },
-    "spot_drill": {
-      cls: "mill", type: "Spot Drill",
-      dia: 10, cr: 0, lc: 10, lt: 55, shank: 10, fl: 2, mat: "Carbide",
-      profile: "drill", desc: "90° spot drill", pointAngle: 90
+    spot_drill: {
+      cls: "mill",
+      type: "Spot Drill",
+      dia: 10,
+      cr: 0,
+      lc: 10,
+      lt: 55,
+      shank: 10,
+      fl: 2,
+      mat: "Carbide",
+      profile: "drill",
+      desc: "90° spot drill",
+      pointAngle: 90,
     },
-    "reamer": {
-      cls: "mill", type: "Reamer",
-      dia: 10, cr: 0, lc: 30, lt: 80, shank: 10, fl: 6, mat: "HSS",
-      profile: "endmill", desc: "6-flute machine reamer"
+    reamer: {
+      cls: "mill",
+      type: "Reamer",
+      dia: 10,
+      cr: 0,
+      lc: 30,
+      lt: 80,
+      shank: 10,
+      fl: 6,
+      mat: "HSS",
+      profile: "endmill",
+      desc: "6-flute machine reamer",
     },
-    "tap_m10": {
-      cls: "mill", type: "Tap",
-      dia: 10, cr: 0, lc: 25, lt: 80, shank: 10, fl: 4, mat: "HSS",
-      profile: "tap", desc: "M10×1.5 spiral flute tap", pitch: 1.5
+    tap_m10: {
+      cls: "mill",
+      type: "Tap",
+      dia: 10,
+      cr: 0,
+      lc: 25,
+      lt: 80,
+      shank: 10,
+      fl: 4,
+      mat: "HSS",
+      profile: "tap",
+      desc: "M10×1.5 spiral flute tap",
+      pitch: 1.5,
     },
-    "chamfer_90": {
-      cls: "mill", type: "Chamfer",
-      dia: 12, cr: 0, lc: 8, lt: 60, shank: 12, fl: 4, mat: "Carbide",
-      profile: "chamfer", desc: "90° chamfer mill", pointAngle: 90
+    chamfer_90: {
+      cls: "mill",
+      type: "Chamfer",
+      dia: 12,
+      cr: 0,
+      lc: 8,
+      lt: 60,
+      shank: 12,
+      fl: 4,
+      mat: "Carbide",
+      profile: "chamfer",
+      desc: "90° chamfer mill",
+      pointAngle: 90,
     },
-    "t_slot": {
-      cls: "mill", type: "T-Slot",
-      dia: 16, cr: 0, lc: 4, lt: 70, shank: 10, fl: 6, mat: "HSS",
-      profile: "tslot", desc: "T-slot cutter 16mm"
+    t_slot: {
+      cls: "mill",
+      type: "T-Slot",
+      dia: 16,
+      cr: 0,
+      lc: 4,
+      lt: 70,
+      shank: 10,
+      fl: 6,
+      mat: "HSS",
+      profile: "tslot",
+      desc: "T-slot cutter 16mm",
     },
-    "face_mill_50": {
-      cls: "mill", type: "Face Mill",
-      dia: 50, cr: 0.8, lc: 6, lt: 45, shank: 32, fl: 5, mat: "Carbide (insert)",
-      profile: "facemill", desc: "50mm 5-insert face mill"
+    face_mill_50: {
+      cls: "mill",
+      type: "Face Mill",
+      dia: 50,
+      cr: 0.8,
+      lc: 6,
+      lt: 45,
+      shank: 32,
+      fl: 5,
+      mat: "Carbide (insert)",
+      profile: "facemill",
+      desc: "50mm 5-insert face mill",
     },
-    "probe": {
-      cls: "mill", type: "Probe",
-      dia: 6, cr: 3, lc: 50, lt: 120, shank: 10, fl: 1, mat: "Ruby",
-      profile: "probe", desc: "Touch-trigger probe Ø6 ruby stylus"
+    probe: {
+      cls: "mill",
+      type: "Probe",
+      dia: 6,
+      cr: 3,
+      lc: 50,
+      lt: 120,
+      shank: 10,
+      fl: 1,
+      mat: "Ruby",
+      profile: "probe",
+      desc: "Touch-trigger probe Ø6 ruby stylus",
     },
   },
 
   // ── Lathe cutting tools ───────────────────────────────────────────────────
   lathe: {
-    "od_cnmg_80": {
-      cls: "lathe", type: "OD Turning", insertStd: "CNMG",
-      iAngle: 80, relief: 5, cr: 0.8, shank: 16, tlo: 30, lt: 30,
-      profile: "od_turning", desc: "CNMG 80° diamond OD rough/finish"
+    od_cnmg_80: {
+      cls: "lathe",
+      type: "OD Turning",
+      insertStd: "CNMG",
+      iAngle: 80,
+      relief: 5,
+      cr: 0.8,
+      shank: 16,
+      tlo: 30,
+      lt: 30,
+      profile: "od_turning",
+      desc: "CNMG 80° diamond OD rough/finish",
     },
-    "od_wnmg_35": {
-      cls: "lathe", type: "OD Turning", insertStd: "WNMG",
-      iAngle: 35, relief: 7, cr: 0.8, shank: 16, tlo: 30, lt: 30,
-      profile: "od_turning", desc: "WNMG 35° diamond OD finish"
+    od_wnmg_35: {
+      cls: "lathe",
+      type: "OD Turning",
+      insertStd: "WNMG",
+      iAngle: 35,
+      relief: 7,
+      cr: 0.8,
+      shank: 16,
+      tlo: 30,
+      lt: 30,
+      profile: "od_turning",
+      desc: "WNMG 35° diamond OD finish",
     },
-    "od_vnmg_35": {
-      cls: "lathe", type: "OD Profiling", insertStd: "VNMG",
-      iAngle: 35, relief: 7, cr: 0.4, shank: 16, tlo: 30, lt: 30,
-      profile: "od_turning", desc: "VNMG 35° profiling"
+    od_vnmg_35: {
+      cls: "lathe",
+      type: "OD Profiling",
+      insertStd: "VNMG",
+      iAngle: 35,
+      relief: 7,
+      cr: 0.4,
+      shank: 16,
+      tlo: 30,
+      lt: 30,
+      profile: "od_turning",
+      desc: "VNMG 35° profiling",
     },
-    "facing_wnmg": {
-      cls: "lathe", type: "Facing", insertStd: "WNMG",
-      iAngle: 80, relief: 5, cr: 0.8, shank: 16, tlo: 25, lt: 25,
-      profile: "facing", desc: "WNMG facing insert"
+    facing_wnmg: {
+      cls: "lathe",
+      type: "Facing",
+      insertStd: "WNMG",
+      iAngle: 80,
+      relief: 5,
+      cr: 0.8,
+      shank: 16,
+      tlo: 25,
+      lt: 25,
+      profile: "facing",
+      desc: "WNMG facing insert",
     },
-    "id_boring_bar": {
-      cls: "lathe", type: "ID Boring",
-      iAngle: 55, relief: 7, cr: 0.4, shank: 20, tlo: 120, lt: 120, minBore: 25,
-      profile: "boring_bar", desc: "20mm boring bar DCMT insert"
+    id_boring_bar: {
+      cls: "lathe",
+      type: "ID Boring",
+      iAngle: 55,
+      relief: 7,
+      cr: 0.4,
+      shank: 20,
+      tlo: 120,
+      lt: 120,
+      minBore: 25,
+      profile: "boring_bar",
+      desc: "20mm boring bar DCMT insert",
     },
-    "groove_3mm": {
-      cls: "lathe", type: "Grooving",
-      dia: 3, cr: 0.2, shank: 16, tlo: 20, lt: 20, depth: 6,
-      profile: "grooving", desc: "3mm parting/grooving blade"
+    groove_3mm: {
+      cls: "lathe",
+      type: "Grooving",
+      dia: 3,
+      cr: 0.2,
+      shank: 16,
+      tlo: 20,
+      lt: 20,
+      depth: 6,
+      profile: "grooving",
+      desc: "3mm parting/grooving blade",
     },
-    "groove_4mm": {
-      cls: "lathe", type: "Grooving",
-      dia: 4, cr: 0.2, shank: 16, tlo: 20, lt: 20, depth: 6,
-      profile: "grooving", desc: "4mm grooving blade"
+    groove_4mm: {
+      cls: "lathe",
+      type: "Grooving",
+      dia: 4,
+      cr: 0.2,
+      shank: 16,
+      tlo: 20,
+      lt: 20,
+      depth: 6,
+      profile: "grooving",
+      desc: "4mm grooving blade",
     },
-    "parting_3mm": {
-      cls: "lathe", type: "Parting",
-      dia: 3, cr: 0, shank: 16, tlo: 20, lt: 20, depth: 30,
-      profile: "parting", desc: "3mm parting blade (deep)"
+    parting_3mm: {
+      cls: "lathe",
+      type: "Parting",
+      dia: 3,
+      cr: 0,
+      shank: 16,
+      tlo: 20,
+      lt: 20,
+      depth: 30,
+      profile: "parting",
+      desc: "3mm parting blade (deep)",
     },
-    "thread_od_60": {
-      cls: "lathe", type: "Threading",
-      iAngle: 60, cr: 0, shank: 16, tlo: 22, lt: 22,
-      profile: "threading", desc: "60° OD threading insert (metric)"
+    thread_od_60: {
+      cls: "lathe",
+      type: "Threading",
+      iAngle: 60,
+      cr: 0,
+      shank: 16,
+      tlo: 22,
+      lt: 22,
+      profile: "threading",
+      desc: "60° OD threading insert (metric)",
     },
-    "thread_od_55": {
-      cls: "lathe", type: "Threading",
-      iAngle: 55, cr: 0, shank: 16, tlo: 22, lt: 22,
-      profile: "threading", desc: "55° OD threading insert (Whitworth/BSP)"
+    thread_od_55: {
+      cls: "lathe",
+      type: "Threading",
+      iAngle: 55,
+      cr: 0,
+      shank: 16,
+      tlo: 22,
+      lt: 22,
+      profile: "threading",
+      desc: "55° OD threading insert (Whitworth/BSP)",
     },
-    "knurl": {
-      cls: "lathe", type: "Knurling",
-      dia: 20, shank: 16, tlo: 20, lt: 20,
-      profile: "knurl", desc: "Diamond knurl wheel"
+    knurl: {
+      cls: "lathe",
+      type: "Knurling",
+      dia: 20,
+      shank: 16,
+      tlo: 20,
+      lt: 20,
+      profile: "knurl",
+      desc: "Diamond knurl wheel",
     },
   },
 
   // ── Live tools (turret-mounted, rotary) ───────────────────────────────────
   live: {
-    "live_em_8": {
-      cls: "live", type: "Live End Mill",
-      dia: 8, cr: 0, lc: 18, lt: 60, shank: 8, fl: 4, mat: "Carbide",
-      profile: "endmill", desc: "8mm 4-fl live end mill"
+    live_em_8: {
+      cls: "live",
+      type: "Live End Mill",
+      dia: 8,
+      cr: 0,
+      lc: 18,
+      lt: 60,
+      shank: 8,
+      fl: 4,
+      mat: "Carbide",
+      profile: "endmill",
+      desc: "8mm 4-fl live end mill",
     },
-    "live_drill_5": {
-      cls: "live", type: "Live Drill",
-      dia: 5, cr: 0, lc: 40, lt: 75, shank: 5, fl: 2, mat: "Carbide",
-      profile: "drill", desc: "5mm carbide live drill"
+    live_drill_5: {
+      cls: "live",
+      type: "Live Drill",
+      dia: 5,
+      cr: 0,
+      lc: 40,
+      lt: 75,
+      shank: 5,
+      fl: 2,
+      mat: "Carbide",
+      profile: "drill",
+      desc: "5mm carbide live drill",
     },
-    "live_tap_m6": {
-      cls: "live", type: "Live Tap",
-      dia: 6, cr: 0, lc: 18, lt: 65, shank: 6, fl: 4, mat: "HSS",
-      profile: "tap", desc: "M6×1.0 live tap", pitch: 1.0
+    live_tap_m6: {
+      cls: "live",
+      type: "Live Tap",
+      dia: 6,
+      cr: 0,
+      lc: 18,
+      lt: 65,
+      shank: 6,
+      fl: 4,
+      mat: "HSS",
+      profile: "tap",
+      desc: "M6×1.0 live tap",
+      pitch: 1.0,
     },
   },
 
   // ── Tool holders ──────────────────────────────────────────────────────────
   holders: {
     // Mill holders
-    "er32_collet_chuck": {
-      type: "Collet Chuck", standard: "ER32", interface: "BT40",
-      hdia: 63, hlen: 65, gdia: 42, glen: 30, gripRange: [2,20],
-      desc: "BT40 ER32 collet chuck"
+    er32_collet_chuck: {
+      type: "Collet Chuck",
+      standard: "ER32",
+      interface: "BT40",
+      hdia: 63,
+      hlen: 65,
+      gdia: 42,
+      glen: 30,
+      gripRange: [2, 20],
+      desc: "BT40 ER32 collet chuck",
     },
-    "er25_collet_chuck": {
-      type: "Collet Chuck", standard: "ER25", interface: "BT40",
-      hdia: 55, hlen: 60, gdia: 35, glen: 25, gripRange: [2,16],
-      desc: "BT40 ER25 collet chuck"
+    er25_collet_chuck: {
+      type: "Collet Chuck",
+      standard: "ER25",
+      interface: "BT40",
+      hdia: 55,
+      hlen: 60,
+      gdia: 35,
+      glen: 25,
+      gripRange: [2, 16],
+      desc: "BT40 ER25 collet chuck",
     },
-    "weldon_shank_20": {
-      type: "Weldon / Shell Mill", interface: "BT40",
-      hdia: 60, hlen: 55, gdia: 32, glen: 22, gripRange: [20,20],
-      desc: "20mm Weldon arbor BT40"
+    weldon_shank_20: {
+      type: "Weldon / Shell Mill",
+      interface: "BT40",
+      hdia: 60,
+      hlen: 55,
+      gdia: 32,
+      glen: 22,
+      gripRange: [20, 20],
+      desc: "20mm Weldon arbor BT40",
     },
-    "hydraulic_16": {
-      type: "Hydraulic Chuck", interface: "BT40",
-      hdia: 60, hlen: 70, gdia: 35, glen: 30, gripRange: [16,16],
-      desc: "Hydraulic shrink-fit 16mm"
+    hydraulic_16: {
+      type: "Hydraulic Chuck",
+      interface: "BT40",
+      hdia: 60,
+      hlen: 70,
+      gdia: 35,
+      glen: 30,
+      gripRange: [16, 16],
+      desc: "Hydraulic shrink-fit 16mm",
     },
-    "shrinkfit_12": {
-      type: "Shrink-Fit", interface: "HSK63A",
-      hdia: 32, hlen: 85, gdia: 12, glen: 45, gripRange: [12,12],
-      desc: "HSK63A shrink-fit 12mm"
+    shrinkfit_12: {
+      type: "Shrink-Fit",
+      interface: "HSK63A",
+      hdia: 32,
+      hlen: 85,
+      gdia: 12,
+      glen: 45,
+      gripRange: [12, 12],
+      desc: "HSK63A shrink-fit 12mm",
     },
-    "right_angle_head": {
-      type: "Right-Angle Head", interface: "BT40",
-      hdia: 50, hlen: 120, gdia: 20, glen: 30,
-      desc: "Right-angle spindle head 90°"
+    right_angle_head: {
+      type: "Right-Angle Head",
+      interface: "BT40",
+      hdia: 50,
+      hlen: 120,
+      gdia: 20,
+      glen: 30,
+      desc: "Right-angle spindle head 90°",
     },
     // Lathe holders
-    "vdi_25_od": {
-      type: "VDI Turning", standard: "VDI25", interface: "VDI25",
-      hdia: 25, hlen: 80, shankType: "OD",
-      desc: "VDI25 OD turning holder"
+    vdi_25_od: {
+      type: "VDI Turning",
+      standard: "VDI25",
+      interface: "VDI25",
+      hdia: 25,
+      hlen: 80,
+      shankType: "OD",
+      desc: "VDI25 OD turning holder",
     },
-    "vdi_40_boring": {
-      type: "VDI Boring Bar", standard: "VDI40", interface: "VDI40",
-      hdia: 40, hlen: 120, shankType: "boring",
-      desc: "VDI40 boring bar holder"
+    vdi_40_boring: {
+      type: "VDI Boring Bar",
+      standard: "VDI40",
+      interface: "VDI40",
+      hdia: 40,
+      hlen: 120,
+      shankType: "boring",
+      desc: "VDI40 boring bar holder",
     },
-    "bmt_55_live": {
-      type: "BMT Live Tool", standard: "BMT55", interface: "BMT55",
-      hdia: 55, hlen: 70, shankType: "live",
-      liveRPM: 6000, liveKW: 2,
-      desc: "BMT55 driven live tool"
+    bmt_55_live: {
+      type: "BMT Live Tool",
+      standard: "BMT55",
+      interface: "BMT55",
+      hdia: 55,
+      hlen: 70,
+      shankType: "live",
+      liveRPM: 6000,
+      liveKW: 2,
+      desc: "BMT55 driven live tool",
     },
   },
 };
@@ -1977,14 +3167,19 @@ export function getHolderProfile(holderKey) {
 export function buildFullToolProfile(tool, holder) {
   // Returns array of {r, z} points describing the tool+holder cross-section
   const pts = [];
-  const h = holder || { hdia: tool.hdia||32, hlen: tool.hlen||50, gdia: tool.shank||10, glen: 30 };
+  const h = holder || {
+    hdia: tool.hdia || 32,
+    hlen: tool.hlen || 50,
+    gdia: tool.shank || 10,
+    glen: 30,
+  };
   const t = tool;
   let z = 0;
 
   if (t.cls === "lathe") {
     // Lathe: holder is rectangular shank + insert
-    pts.push({ z:0, r: t.shank/2 || 8 });
-    pts.push({ z: t.tlo || 30, r: t.shank/2 || 8 });
+    pts.push({ z: 0, r: t.shank / 2 || 8 });
+    pts.push({ z: t.tlo || 30, r: t.shank / 2 || 8 });
     return { pts, insertType: t.type, iAngle: t.iAngle, cr: t.cr };
   }
 
@@ -1992,15 +3187,19 @@ export function buildFullToolProfile(tool, holder) {
   const r = t.dia / 2;
   const shankR = t.shank / 2;
   const holderR = h.hdia / 2;
-  const gaugeR  = h.gdia / 2;
+  const gaugeR = h.gdia / 2;
 
-  pts.push({ z: 0,       r: r,       seg: "tip"     });
-  pts.push({ z: t.lc||22, r: shankR, seg: "flute"   });
-  pts.push({ z: t.lt||75, r: shankR, seg: "shank"   });
-  pts.push({ z: t.lt||75, r: holderR, seg: "holder-base" });
-  pts.push({ z: (t.lt||75)+(h.hlen||50), r: holderR, seg: "holder" });
-  pts.push({ z: (t.lt||75)+(h.hlen||50), r: gaugeR,  seg: "gauge-base" });
-  pts.push({ z: (t.lt||75)+(h.hlen||50)+(h.glen||30), r: gaugeR, seg: "gauge" });
+  pts.push({ z: 0, r: r, seg: "tip" });
+  pts.push({ z: t.lc || 22, r: shankR, seg: "flute" });
+  pts.push({ z: t.lt || 75, r: shankR, seg: "shank" });
+  pts.push({ z: t.lt || 75, r: holderR, seg: "holder-base" });
+  pts.push({ z: (t.lt || 75) + (h.hlen || 50), r: holderR, seg: "holder" });
+  pts.push({ z: (t.lt || 75) + (h.hlen || 50), r: gaugeR, seg: "gauge-base" });
+  pts.push({
+    z: (t.lt || 75) + (h.hlen || 50) + (h.glen || 30),
+    r: gaugeR,
+    seg: "gauge",
+  });
 
   return { pts, type: t.type, cr: t.cr, profile: t.profile };
 }

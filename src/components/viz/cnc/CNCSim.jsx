@@ -69,7 +69,8 @@ function formatControlLabel(def) {
 
 function getControlBehavior(def) {
   const toolSyntax = def?.toolChange?.syntax || "T";
-  const feedMode = def?.modals?.feed?.default || "G94";
+  const feedMode =
+    def?.modals?.feed?.default || (def?.class === "lathe" ? "G99" : "G94");
   const absMode = def?.modals?.absInc?.default || "G90";
   const plane =
     def?.modals?.plane?.default || (def?.class === "lathe" ? "G18" : "G17");
@@ -125,7 +126,47 @@ function createProjectFile({
   };
 }
 
-function exampleToProject(example, bucket = "main", channel = null) {
+function splitTaggedChannelProgram(code = "", channelCount = 1) {
+  const lines = String(code || "").split("\n");
+  const byChannel = new Map();
+  let sawTagged = false;
+  for (const raw of lines) {
+    const m = raw.match(/^\s*\$(\d+)\s*(.*)$/);
+    if (!m) continue;
+    const ci = Math.max(0, parseInt(m[1], 10) - 1);
+    if (ci >= channelCount) continue;
+    sawTagged = true;
+    if (!byChannel.has(ci)) byChannel.set(ci, []);
+    byChannel.get(ci).push(m[2] || "");
+  }
+  if (!sawTagged) return null;
+  return byChannel;
+}
+
+function exampleToProject(
+  example,
+  bucket = "main",
+  channel = null,
+  machDef = null,
+) {
+  if (bucket === "main" && (machDef?.channels?.length || 1) > 1) {
+    const split = splitTaggedChannelProgram(
+      example?.code || "",
+      machDef.channels.length,
+    );
+    if (split && split.size > 0) {
+      const idStem = example?.id || "PROGRAM";
+      return [...split.entries()].map(([ci, chLines]) =>
+        createProjectFile({
+          name: `${idStem}_CH${ci + 1}.nc`,
+          content: chLines.join("\n").trim(),
+          bucket: "channel",
+          channel: ci,
+          locked: false,
+        }),
+      );
+    }
+  }
   return [
     createProjectFile({
       name: `${example.id || "PROGRAM"}.nc`,
@@ -564,6 +605,7 @@ const MACHINE_PRESETS = {
 // Tool classes
 const MILL_TOOLS = [
   "End Mill",
+  "Relief Neck End Mill",
   "Ball Mill",
   "Bull Nose",
   "Face Mill",
@@ -587,6 +629,227 @@ const LATHE_TOOLS = [
   "Knurling",
 ];
 const LIVE_TOOLS = ["Live End Mill", "Live Drill", "Live Tap", "Live Reamer"];
+
+const TOOL_SCHEMA_VERSION = 2;
+
+const inferUnits = (value, fallback = "mm") => {
+  const s = String(value || "")
+    .trim()
+    .toLowerCase();
+  if (!s) return fallback;
+  if (s.includes("in") || s.includes("inch") || s === "imperial") return "inch";
+  return "mm";
+};
+
+const toMm = (value, units = "mm") => {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return 0;
+  return units === "inch" ? n * 25.4 : n;
+};
+
+const pickNumber = (...values) => {
+  for (const v of values) {
+    if (v == null) continue;
+    const n = Number(v);
+    if (Number.isFinite(n)) return n;
+  }
+  return null;
+};
+
+const inferToolClass = (raw = {}, fallback = "mill") => {
+  const txt =
+    `${raw.cls || ""} ${raw.class || ""} ${raw.type || ""} ${raw.toolType || ""} ${raw.category || ""}`.toLowerCase();
+  if (txt.includes("live")) return "live";
+  if (
+    txt.includes("lathe") ||
+    txt.includes("turn") ||
+    txt.includes("boring") ||
+    txt.includes("groov") ||
+    txt.includes("part")
+  )
+    return "lathe";
+  if (
+    txt.includes("mill") ||
+    txt.includes("drill") ||
+    txt.includes("ream") ||
+    txt.includes("tap")
+  )
+    return "mill";
+  return fallback;
+};
+
+const normalizeToolDefinition = (
+  raw = {},
+  toolNo = null,
+  fallbackClass = "mill",
+) => {
+  const units = inferUnits(raw.units ?? raw.unit ?? raw.uom, "mm");
+  const geom = raw.geometry || {};
+  const holder = raw.holder || {};
+  const offsets = raw.offsets || {};
+  const cls = inferToolClass(raw, fallbackClass);
+
+  const dia = toMm(
+    pickNumber(
+      raw.dia,
+      raw.diameter,
+      geom.dia,
+      geom.diameter,
+      raw.toolDiameter,
+      raw.cuttingDiameter,
+      raw.cutterDiameter,
+    ),
+    units,
+  );
+  const cr = toMm(
+    pickNumber(
+      raw.cr,
+      raw.cornerRadius,
+      geom.cr,
+      geom.cornerRadius,
+      raw.noseRadius,
+      raw.tipRadius,
+    ),
+    units,
+  );
+  const tlo = toMm(
+    pickNumber(
+      raw.tlo,
+      raw.lengthOffset,
+      offsets.length,
+      offsets.h,
+      raw.hOffset,
+      raw.gaugeLength,
+      raw.gaugeLen,
+    ),
+    units,
+  );
+  const lc = toMm(
+    pickNumber(
+      raw.lc,
+      raw.fluteLength,
+      geom.lc,
+      geom.fluteLength,
+      raw.cutLength,
+    ),
+    units,
+  );
+  const lt = toMm(
+    pickNumber(
+      raw.lt,
+      raw.overallLength,
+      geom.lt,
+      geom.overallLength,
+      raw.totalLength,
+    ),
+    units,
+  );
+  const shank = toMm(
+    pickNumber(raw.shank, raw.shankDiameter, geom.shank, geom.shankDiameter),
+    units,
+  );
+  const hdia = toMm(
+    pickNumber(raw.hdia, holder.dia, holder.diameter, raw.holderDiameter),
+    units,
+  );
+  const hlen = toMm(
+    pickNumber(raw.hlen, holder.length, holder.len, raw.holderLength),
+    units,
+  );
+  const wearR = toMm(
+    pickNumber(
+      raw.wearR,
+      raw.radiusWear,
+      offsets.radiusWear,
+      offsets.d,
+      raw.dWear,
+    ),
+    units,
+  );
+  const wearL = toMm(
+    pickNumber(raw.wearL, raw.lengthWear, offsets.lengthWear, offsets.hWear),
+    units,
+  );
+
+  return {
+    schema: TOOL_SCHEMA_VERSION,
+    n:
+      Number(toolNo) ||
+      Number(raw.n) ||
+      Number(raw.number) ||
+      Number(raw.toolNumber) ||
+      0,
+    cls,
+    type:
+      raw.type ||
+      raw.toolType ||
+      (cls === "lathe"
+        ? "OD Turning"
+        : cls === "live"
+          ? "Live End Mill"
+          : "End Mill"),
+    desc:
+      raw.desc || raw.description || raw.name || `Tool ${toolNo || ""}`.trim(),
+    units,
+    dia,
+    cr,
+    tlo: tlo || lt,
+    lc,
+    lt,
+    shank,
+    fl: Number(raw.fl ?? raw.flutes ?? 1) || 1,
+    mat: raw.mat || raw.material || "Carbide",
+    hdia,
+    hlen,
+    neckDia: toMm(pickNumber(raw.neckDia, geom.neckDia), units),
+    neckLen: toMm(pickNumber(raw.neckLen, geom.neckLen), units),
+    wearR,
+    wearL,
+    iAngle: Number(raw.iAngle ?? raw.insertAngle ?? 80) || 80,
+    relief: Number(raw.relief ?? raw.reliefAngle ?? 5) || 5,
+    source: raw.source || raw.vendor || "manual",
+    sourceId: raw.sourceId || raw.id || raw.guid || null,
+  };
+};
+
+const normalizeToolTable = (table = {}, fallbackClass = "mill") => {
+  const out = {};
+  if (!table || typeof table !== "object") return out;
+  for (const [k, raw] of Object.entries(table)) {
+    if (!raw || typeof raw !== "object") continue;
+    const n =
+      Number(k) ||
+      Number(raw.n) ||
+      Number(raw.number) ||
+      Number(raw.toolNumber);
+    if (!Number.isFinite(n) || n <= 0) continue;
+    out[n] = normalizeToolDefinition(raw, n, fallbackClass);
+  }
+  return out;
+};
+
+const normalizeImportedToolPayload = (payload, fallbackClass = "mill") => {
+  if (!payload || typeof payload !== "object") return {};
+  const toolsPayload =
+    payload.tools ?? payload.items ?? payload.data ?? payload;
+  const out = {};
+  if (Array.isArray(toolsPayload)) {
+    toolsPayload.forEach((raw, idx) => {
+      if (!raw || typeof raw !== "object") return;
+      const n =
+        Number(raw.n) ||
+        Number(raw.number) ||
+        Number(raw.toolNumber) ||
+        idx + 1;
+      out[n] = normalizeToolDefinition(raw, n, fallbackClass);
+    });
+    return out;
+  }
+  if (toolsPayload && typeof toolsPayload === "object") {
+    return normalizeToolTable(toolsPayload, fallbackClass);
+  }
+  return {};
+};
 
 // ─── INITIAL STATE ─────────────────────────────────────────────────────────
 const initMS = () => ({
@@ -619,20 +882,24 @@ const initMS = () => ({
 });
 
 // Build default tool table from TOOL_TEMPLATES
-const initTools = () => {
+const initTools = (machineClass = "mill") => {
   const t = {};
   let n = 1;
-  // Mill tools: pick representative set
-  const millKeys = ["end_mill_4fl", "drill_8"];
-  for (const k of millKeys) {
-    const tmpl = TOOL_TEMPLATES.mill[k];
-    if (tmpl) t[n++] = { ...tmpl, tlo: tmpl.lt || 75, hdia: 32, hlen: 50 };
+  if (machineClass !== "lathe") {
+    // Mill tools: pick representative set
+    const millKeys = ["end_mill_4fl", "drill_8"];
+    for (const k of millKeys) {
+      const tmpl = TOOL_TEMPLATES.mill[k];
+      if (tmpl) t[n++] = { ...tmpl, tlo: tmpl.lt || 75, hdia: 32, hlen: 50 };
+    }
   }
-  // Lathe tools
-  const latheKeys = ["od_cnmg_80", "facing_wnmg", "grooving_3mm"];
-  for (const k of latheKeys) {
-    const tmpl = TOOL_TEMPLATES.lathe[k];
-    if (tmpl) t[n++] = { ...tmpl, hdia: 16, hlen: 80 };
+  if (machineClass === "lathe") {
+    // Lathe tools
+    const latheKeys = ["od_cnmg_80", "facing_wnmg", "grooving_3mm"];
+    for (const k of latheKeys) {
+      const tmpl = TOOL_TEMPLATES.lathe[k];
+      if (tmpl) t[n++] = { ...tmpl, hdia: 16, hlen: 80 };
+    }
   }
   // Live tool
   const liveKeys = ["live_end_mill_8"];
@@ -741,7 +1008,7 @@ const initTools = () => {
       },
     };
   }
-  return t;
+  return normalizeToolTable(t, machineClass);
 };
 
 // ─── GEOM → G-CODE ─────────────────────────────────────────────────────────
@@ -1537,8 +1804,59 @@ export default function CNCSimPro() {
   );
   const [showMachBuilder, setShowMachBuilder] = useState(false);
 
+  const activeToolClass = mach.isLathe ? "lathe" : "mill";
+
   const [ms, setMs] = useState(initMS);
-  const [tools, setTools] = useState(initTools);
+  const [toolLibraries, setToolLibraries] = useState(() => {
+    try {
+      const saved = JSON.parse(
+        localStorage.getItem("cnc_tool_libraries_v1") || "null",
+      );
+      if (saved && typeof saved === "object" && saved.mill && saved.lathe) {
+        return {
+          mill: normalizeToolTable(saved.mill, "mill"),
+          lathe: normalizeToolTable(saved.lathe, "lathe"),
+        };
+      }
+    } catch {
+      // ignore corrupt local storage payloads
+    }
+    return { mill: initTools("mill"), lathe: initTools("lathe") };
+  });
+  const [tools, setTools] = useState(
+    () => toolLibraries[activeToolClass] || initTools(activeToolClass),
+  );
+
+  useEffect(() => {
+    setTools(
+      normalizeToolTable(
+        toolLibraries[activeToolClass] || initTools(activeToolClass),
+        activeToolClass,
+      ),
+    );
+  }, [activeToolClass, toolLibraries]);
+
+  useEffect(() => {
+    setToolLibraries((prev) =>
+      prev?.[activeToolClass] === tools
+        ? prev
+        : {
+            ...prev,
+            [activeToolClass]: normalizeToolTable(tools, activeToolClass),
+          },
+    );
+  }, [tools, activeToolClass]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        "cnc_tool_libraries_v1",
+        JSON.stringify(toolLibraries),
+      );
+    } catch {
+      // ignore storage failures
+    }
+  }, [toolLibraries]);
   const [stock, setStock] = useState({
     shape: "rect",
     width: 100,
@@ -1607,6 +1925,9 @@ export default function CNCSimPro() {
   const [matRemoval, setMatRemoval] = useState([]); // array of {z, xRadius} profiles
   const [leftTab, setLeftTab] = useState("dro");
   const [rightTab, setRightTab] = useState("tools");
+  const [toolUnits, setToolUnits] = useState("mm");
+  const [stockUnits, setStockUnits] = useState("mm");
+  const [toolPathStep, setToolPathStep] = useState(0);
   const [alarms, setAlarms] = useState([]);
   const [opMsgs, setOpMsgs] = useState([]);
   const [savedProgs, setSavedProgs] = useState(() => {
@@ -1621,6 +1942,7 @@ export default function CNCSimPro() {
     cls: "lathe",
     type: "OD Turning",
     desc: "",
+    units: "mm",
     dia: 0,
     cr: 0.8,
     tlo: 30,
@@ -1631,6 +1953,10 @@ export default function CNCSimPro() {
     mat: "Carbide",
     hdia: 16,
     hlen: 80,
+    neckDia: 8,
+    neckLen: 12,
+    wearR: 0,
+    wearL: 0,
     iAngle: 80,
     relief: 5,
   });
@@ -1657,6 +1983,7 @@ export default function CNCSimPro() {
   const msRef = useRef(ms);
   const activeChannelRef = useRef(activeChannel);
   const playRef = useRef(null);
+  const toolPathAnimRef = useRef(null);
   const engineRef = useRef(null);
   const doneRef = useRef(false);
   const playingRef = useRef(false);
@@ -1757,6 +2084,7 @@ export default function CNCSimPro() {
       setAlarms([]);
       setValidationIssues(validateProjectFiles(projectFilesRef.current, def));
       const engine = new CNCEngine(def);
+      engine.setToolTable(tools, "mm");
       try {
         engine.loadPrograms(s);
       } catch (err) {
@@ -1780,6 +2108,7 @@ export default function CNCSimPro() {
       setChannelBlocks(engine.channels.map((ch) => ch.blocks || []));
       setBlocks(engine.channels[nextActive]?.blocks || []);
       setCurPt(0);
+      setToolPathStep(0);
       setPointer(0);
       ptrRef.current = 0;
       setActiveChannel(nextActive);
@@ -1793,7 +2122,7 @@ export default function CNCSimPro() {
       remRef.current = [];
       setMatRemoval([]);
     },
-    [machDefId, compileProjectSources],
+    [machDefId, compileProjectSources, tools],
   );
 
   // Trigger initial parse on mount
@@ -1801,6 +2130,10 @@ export default function CNCSimPro() {
     reload(compileProjectSources(projectFiles));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    reload(compileProjectSources(projectFilesRef.current));
+  }, [tools, reload, compileProjectSources]);
 
   // ─── When preset changes, apply machine config + reset stock ───
   useEffect(() => {
@@ -1826,7 +2159,7 @@ export default function CNCSimPro() {
     setMs(initMS());
     const lib = getProgLib(def);
     if (lib?.length) {
-      const nextFiles = exampleToProject(lib[0]);
+      const nextFiles = exampleToProject(lib[0], "main", null, def);
       loadProjectFiles(nextFiles);
       setTimeout(() => reload(buildProjectSources(nextFiles)), 0);
     }
@@ -2787,6 +3120,7 @@ export default function CNCSimPro() {
 
   // ─── Resize observer ───────────────────────────────────────────
   useEffect(() => {
+    if (vpView === "iso") return;
     const cvs = cvsRef.current,
       vp = vpRef.current;
     if (!cvs || !vp) return;
@@ -2798,12 +3132,25 @@ export default function CNCSimPro() {
     ro.observe(vp);
     cvs.width = vp.clientWidth;
     cvs.height = vp.clientHeight;
+    draw();
     return () => ro.disconnect();
-  }, [draw]);
+  }, [draw, vpView]);
 
   useEffect(() => {
+    if (vpView === "iso") return;
     draw();
-  }, [draw, ms, curPt, geoms, drawPts, drawActive, layers, stock, matRemoval]);
+  }, [
+    draw,
+    ms,
+    curPt,
+    geoms,
+    drawPts,
+    drawActive,
+    layers,
+    stock,
+    matRemoval,
+    vpView,
+  ]);
 
   // ─── Screen → World coord conversion ──────────────────────────
   const s2w = useCallback(
@@ -3220,6 +3567,16 @@ export default function CNCSimPro() {
     } else {
       // Mill profile
       const totalLen = (t.lt || 75) + (t.hlen || 50);
+      const isReliefNeck = String(t.type || "").includes("Relief Neck");
+      const neckLen = isReliefNeck
+        ? Math.max(
+            0,
+            Math.min(t.neckLen || 0, Math.max(0, (t.lt || 75) - (t.lc || 22))),
+          )
+        : 0;
+      const neckR = isReliefNeck
+        ? Math.max(0.2, (t.neckDia || t.dia * 0.7 || 1) / 2)
+        : null;
       const sc = Math.min(
         (H - 16) / totalLen,
         (W / 2 - 8) / ((t.hdia || 32) / 2),
@@ -3234,6 +3591,9 @@ export default function CNCSimPro() {
         ctx.arc(px(-(r - t.cr)), py(t.cr), t.cr * sc, Math.PI / 2, Math.PI);
       }
       ctx.lineTo(px(-r), py(t.lc || 22));
+      if (isReliefNeck && neckLen > 0 && neckR != null) {
+        ctx.lineTo(px(-neckR), py((t.lc || 22) + neckLen));
+      }
       ctx.lineTo(px(-(t.shank / 2 || 5)), py(t.lt || 75));
       const hr = (t.hdia || 32) / 2;
       ctx.lineTo(px(-hr), py(t.lt || 75));
@@ -3241,6 +3601,9 @@ export default function CNCSimPro() {
       ctx.lineTo(px(hr), py((t.lt || 75) + (t.hlen || 50)));
       ctx.lineTo(px(hr), py(t.lt || 75));
       ctx.lineTo(px(t.shank / 2 || 5), py(t.lt || 75));
+      if (isReliefNeck && neckLen > 0 && neckR != null) {
+        ctx.lineTo(px(neckR), py((t.lc || 22) + neckLen));
+      }
       ctx.lineTo(px(r), py(t.lc || 22));
       if (t.cr > 0) {
         ctx.arc(px(r - t.cr), py(t.cr), t.cr * sc, 0, -Math.PI / 2, true);
@@ -3412,6 +3775,44 @@ export default function CNCSimPro() {
   );
 
   // ─── Setup export/import ──────────────────────────────────────
+  const exportToolLibrary = () => {
+    const payload = {
+      version: TOOL_SCHEMA_VERSION,
+      ts: new Date().toISOString(),
+      class: activeToolClass,
+      units: "mixed",
+      schema: "cncsim-tool-library",
+      tools: normalizeToolTable(tools, activeToolClass),
+    };
+    const b = new Blob([JSON.stringify(payload, null, 2)], {
+      type: "application/json",
+    });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(b);
+    a.download = `cnc-tools-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+  };
+
+  const importToolLibrary = (f) => {
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = (e) => {
+      try {
+        const d = JSON.parse(String(e.target?.result || "{}"));
+        const tbl = normalizeImportedToolPayload(d, activeToolClass);
+        if (!Object.keys(tbl).length) {
+          throw new Error("Invalid tool library payload");
+        }
+        setTools((prev) =>
+          normalizeToolTable({ ...prev, ...tbl }, activeToolClass),
+        );
+      } catch (err) {
+        alert("Tool library import error: " + err.message);
+      }
+    };
+    r.readAsText(f);
+  };
+
   const exportSetup = () => {
     const d = {
       version: 5,
@@ -3421,7 +3822,7 @@ export default function CNCSimPro() {
       code,
       projectFiles,
       activeFileId,
-      tools,
+      toolLibraries,
       stock,
       fixtures,
       geoms,
@@ -3461,7 +3862,13 @@ export default function CNCSimPro() {
           ];
           loadProjectFiles(nextFiles);
         }
-        if (d.tools) setTools(d.tools);
+        if (d.toolLibraries) {
+          setToolLibraries({
+            mill: normalizeToolTable(d.toolLibraries.mill || {}, "mill"),
+            lathe: normalizeToolTable(d.toolLibraries.lathe || {}, "lathe"),
+          });
+        }
+        if (d.tools) setTools(normalizeToolTable(d.tools, activeToolClass));
         if (d.stock) setStock(d.stock);
         if (d.fixtures) setFixtures(d.fixtures);
         if (d.geoms) setGeoms(d.geoms);
@@ -3537,6 +3944,15 @@ export default function CNCSimPro() {
           : ax === "B"
             ? C.purple
             : C.amber;
+  const stockUnitScale = stockUnits === "inch" ? 25.4 : 1;
+  const toolDisplayDim = (v, units = toolUnits) =>
+    Number((Number(v || 0) / (units === "inch" ? 25.4 : 1)).toFixed(4));
+  const toolInputToMm = (v, units = toolUnits) =>
+    (Number(v || 0) || 0) * (units === "inch" ? 25.4 : 1);
+  const stockDisplayDim = (v) =>
+    Number((Number(v || 0) / stockUnitScale).toFixed(4));
+  const stockInputToMm = (v) => (Number(v || 0) || 0) * stockUnitScale;
+  const stockUnitLabel = stockUnits === "inch" ? "in" : "mm";
   const activeT = tools[ms.activeT];
   const activeTool = activeT || tools[1] || null;
   const currentChannel = channelStates[activeChannel];
@@ -3561,10 +3977,61 @@ export default function CNCSimPro() {
     }
     return idx;
   }, [pathPts, curPt]);
+  useEffect(() => {
+    cancelAnimationFrame(toolPathAnimRef.current);
+    if (!pathPts.length) {
+      setToolPathStep(0);
+      return;
+    }
+    const target = Math.max(
+      0,
+      Math.min(backplotCurrentStep, pathPts.length - 1),
+    );
+    if (!isPlaying) {
+      setToolPathStep(target);
+      return;
+    }
+    const tick = () => {
+      let shouldContinue = false;
+      setToolPathStep((prev) => {
+        if (prev === target) return prev;
+        shouldContinue = true;
+        const delta = target - prev;
+        const stride = Math.max(1, Math.ceil(Math.abs(delta) / 8));
+        return delta > 0
+          ? Math.min(target, prev + stride)
+          : Math.max(target, prev - stride);
+      });
+      if (shouldContinue) {
+        toolPathAnimRef.current = requestAnimationFrame(tick);
+      }
+    };
+    toolPathAnimRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(toolPathAnimRef.current);
+  }, [backplotCurrentStep, pathPts.length, isPlaying]);
+  const backplotToolPosition = useMemo(
+    () =>
+      backplotPathPoints[toolPathStep] || {
+        machineX: mach.isLathe ? (ms.pos.Z ?? 0) : (ms.pos.X ?? 0),
+        machineY: mach.isLathe ? 0 : (ms.pos.Y ?? 0),
+        machineZ: mach.isLathe ? (ms.pos.X ?? 0) / 2 : (ms.pos.Z ?? 0),
+      },
+    [
+      backplotPathPoints,
+      toolPathStep,
+      mach.isLathe,
+      ms.pos.X,
+      ms.pos.Y,
+      ms.pos.Z,
+    ],
+  );
   const unitScale = ms.units === "inch" ? 25.4 : 1;
-  const backplotToolDiameter = (activeTool?.dia ?? 10) / unitScale;
+  const backplotToolDiameter =
+    ((activeTool?.dia ?? 10) + (activeTool?.wearR ?? 0) * 2) / unitScale;
   const backplotToolLength =
-    (activeTool?.lt ?? activeTool?.hlen ?? 75) / unitScale;
+    ((activeTool?.tlo ?? activeTool?.lt ?? activeTool?.hlen ?? 75) +
+      (activeTool?.wearL ?? 0)) /
+    unitScale;
   const backplotToolLenCut =
     activeTool && (activeTool?.lc ?? activeTool?.lt) != null
       ? ((activeTool?.lc ?? activeTool?.lt) || null) / unitScale
@@ -3676,14 +4143,14 @@ export default function CNCSimPro() {
 
   const loadExampleProject = useCallback(
     (example, bucket = "main", channel = null) => {
-      const nextFiles = exampleToProject(example, bucket, channel);
+      const nextFiles = exampleToProject(example, bucket, channel, machDef);
       loadProjectFiles(nextFiles, {
         activeId: nextFiles[0]?.id,
         switchTo: "code",
       });
       setTimeout(() => reload(buildProjectSources(nextFiles)), 0);
     },
-    [loadProjectFiles, reload],
+    [loadProjectFiles, reload, machDef],
   );
 
   return (
@@ -4332,6 +4799,18 @@ export default function CNCSimPro() {
                   </div>
                   <div className="div" />
                   <div className="sec">Stock</div>
+                  <div className="frow" style={{ marginBottom: 5 }}>
+                    <div className="field">
+                      <div className="lbl">Stock Units</div>
+                      <select
+                        value={stockUnits}
+                        onChange={(e) => setStockUnits(e.target.value)}
+                      >
+                        <option value="mm">Metric (mm)</option>
+                        <option value="inch">Inch (in)</option>
+                      </select>
+                    </div>
+                  </div>
                   <div className="btnrow">
                     <button
                       className={`btn${stock.shape === "rect" ? " btn-bl" : ""}`}
@@ -4351,32 +4830,41 @@ export default function CNCSimPro() {
                   {stock.shape === "rect" ? (
                     <div className="frow" style={{ marginTop: 5 }}>
                       <div className="field">
-                        <div className="lbl">W</div>
+                        <div className="lbl">W ({stockUnitLabel})</div>
                         <input
                           type="number"
-                          value={stock.width || 100}
+                          value={stockDisplayDim(stock.width || 100)}
                           onChange={(e) =>
-                            setStock((s) => ({ ...s, width: +e.target.value }))
+                            setStock((s) => ({
+                              ...s,
+                              width: stockInputToMm(e.target.value),
+                            }))
                           }
                         />
                       </div>
                       <div className="field">
-                        <div className="lbl">H</div>
+                        <div className="lbl">H ({stockUnitLabel})</div>
                         <input
                           type="number"
-                          value={stock.height || 80}
+                          value={stockDisplayDim(stock.height || 80)}
                           onChange={(e) =>
-                            setStock((s) => ({ ...s, height: +e.target.value }))
+                            setStock((s) => ({
+                              ...s,
+                              height: stockInputToMm(e.target.value),
+                            }))
                           }
                         />
                       </div>
                       <div className="field">
-                        <div className="lbl">D</div>
+                        <div className="lbl">D ({stockUnitLabel})</div>
                         <input
                           type="number"
-                          value={stock.depth || 40}
+                          value={stockDisplayDim(stock.depth || 40)}
                           onChange={(e) =>
-                            setStock((s) => ({ ...s, depth: +e.target.value }))
+                            setStock((s) => ({
+                              ...s,
+                              depth: stockInputToMm(e.target.value),
+                            }))
                           }
                         />
                       </div>
@@ -4384,25 +4872,28 @@ export default function CNCSimPro() {
                   ) : (
                     <div className="frow" style={{ marginTop: 5 }}>
                       <div className="field">
-                        <div className="lbl">Ø dia</div>
+                        <div className="lbl">Ø dia ({stockUnitLabel})</div>
                         <input
                           type="number"
-                          value={stock.diameter || 80}
+                          value={stockDisplayDim(stock.diameter || 80)}
                           onChange={(e) =>
                             setStock((s) => ({
                               ...s,
-                              diameter: +e.target.value,
+                              diameter: stockInputToMm(e.target.value),
                             }))
                           }
                         />
                       </div>
                       <div className="field">
-                        <div className="lbl">Length</div>
+                        <div className="lbl">Length ({stockUnitLabel})</div>
                         <input
                           type="number"
-                          value={stock.length || 150}
+                          value={stockDisplayDim(stock.length || 150)}
                           onChange={(e) =>
-                            setStock((s) => ({ ...s, length: +e.target.value }))
+                            setStock((s) => ({
+                              ...s,
+                              length: stockInputToMm(e.target.value),
+                            }))
                           }
                         />
                       </div>
@@ -4410,35 +4901,44 @@ export default function CNCSimPro() {
                   )}
                   <div className="frow" style={{ marginTop: 4 }}>
                     <div className="field">
-                      <div className="lbl">Table X</div>
+                      <div className="lbl">Table X ({stockUnitLabel})</div>
                       <input
                         type="number"
-                        value={stock.x || 0}
+                        value={stockDisplayDim(stock.x || 0)}
                         step={0.001}
                         onChange={(e) =>
-                          setStock((s) => ({ ...s, x: +e.target.value }))
+                          setStock((s) => ({
+                            ...s,
+                            x: stockInputToMm(e.target.value),
+                          }))
                         }
                       />
                     </div>
                     <div className="field">
-                      <div className="lbl">Table Y</div>
+                      <div className="lbl">Table Y ({stockUnitLabel})</div>
                       <input
                         type="number"
-                        value={stock.y || 0}
+                        value={stockDisplayDim(stock.y || 0)}
                         step={0.001}
                         onChange={(e) =>
-                          setStock((s) => ({ ...s, y: +e.target.value }))
+                          setStock((s) => ({
+                            ...s,
+                            y: stockInputToMm(e.target.value),
+                          }))
                         }
                       />
                     </div>
                     <div className="field">
-                      <div className="lbl">Table Z</div>
+                      <div className="lbl">Table Z ({stockUnitLabel})</div>
                       <input
                         type="number"
-                        value={stock.z || 0}
+                        value={stockDisplayDim(stock.z || 0)}
                         step={0.001}
                         onChange={(e) =>
-                          setStock((s) => ({ ...s, z: +e.target.value }))
+                          setStock((s) => ({
+                            ...s,
+                            z: stockInputToMm(e.target.value),
+                          }))
                         }
                       />
                     </div>
@@ -4978,7 +5478,7 @@ export default function CNCSimPro() {
               {backplotIs3D ? (
                 <CNCBackplot
                   pathPoints={backplotPathPoints}
-                  currentStep={backplotCurrentStep}
+                  currentStep={toolPathStep}
                   activeChannel={activeChannel}
                   width="100%"
                   height="100%"
@@ -4986,6 +5486,7 @@ export default function CNCSimPro() {
                   toolDiameter={backplotToolDiameter}
                   toolLength={backplotToolLength}
                   toolLenCut={backplotToolLenCut}
+                  toolPosition={backplotToolPosition}
                   showGrid={layers.grid}
                   showTool={layers.tool}
                   stockShape={stock.shape === "cyl" ? "cylinder" : "box"}
@@ -5352,13 +5853,32 @@ export default function CNCSimPro() {
                   Tool Table ({mach.isLathe && !mach.isMill ? "Lathe" : "Mill"}
                   {mach.liveTools ? " + Live" : ""})
                 </div>
+                <div className="btnrow" style={{ marginBottom: 6 }}>
+                  <button className="btn" onClick={exportToolLibrary}>
+                    Export Tool JSON
+                  </button>
+                  <label className="btn" style={{ cursor: "pointer" }}>
+                    Import Tool JSON
+                    <input
+                      type="file"
+                      accept=".json"
+                      style={{ display: "none" }}
+                      onChange={(e) => importToolLibrary(e.target.files?.[0])}
+                    />
+                  </label>
+                </div>
                 {visibleTools.map(([n, t]) => (
                   <div
                     key={n}
                     className={`tcard${ms.activeT == n ? " on" : ""}`}
-                    onClick={() =>
-                      setMs((m) => ({ ...m, activeT: +n, activeH: +n }))
-                    }
+                    onClick={() => {
+                      setMs((m) => ({ ...m, activeT: +n, activeH: +n }));
+                      setEditTool({
+                        ...normalizeToolDefinition(t, +n, activeToolClass),
+                        n: +n,
+                      });
+                      setToolUnits(inferUnits(t.units, "mm"));
+                    }}
                   >
                     <div className="tcard-h">
                       <span className="tcard-name">
@@ -5414,7 +5934,13 @@ export default function CNCSimPro() {
                       </button>
                     </div>
                     <div className="tcard-meta">
-                      {t.desc} {t.dia ? `Ø${t.dia}` : ""} TLO:{t.tlo} {t.mat}
+                      {t.desc}{" "}
+                      {t.dia
+                        ? `Ø${toolDisplayDim(t.dia, t.units || "mm")} ${t.units === "inch" ? "in" : "mm"}`
+                        : ""}{" "}
+                      TLO:{toolDisplayDim(t.tlo, t.units || "mm")}{" "}
+                      {t.units === "inch" ? "in" : "mm"} {t.mat}
+                      {t.source ? ` · ${t.source}` : ""}
                     </div>
                   </div>
                 ))}
@@ -5426,6 +5952,22 @@ export default function CNCSimPro() {
                 )}
                 <div className="div" />
                 <div className="sec">Add / Edit Tool</div>
+                <div className="frow">
+                  <div className="field">
+                    <div className="lbl">Tool Units</div>
+                    <select
+                      value={editTool.units || toolUnits}
+                      onChange={(e) => {
+                        const nextUnits = e.target.value;
+                        setToolUnits(nextUnits);
+                        setEditTool((t) => ({ ...t, units: nextUnits }));
+                      }}
+                    >
+                      <option value="mm">Metric (mm)</option>
+                      <option value="inch">Inch (in)</option>
+                    </select>
+                  </div>
+                </div>
                 <div className="frow">
                   <div className="field">
                     <div className="lbl">T#</div>
@@ -5445,6 +5987,7 @@ export default function CNCSimPro() {
                       onChange={(e) =>
                         setEditTool((t) => ({
                           ...t,
+                          units: t.units || toolUnits,
                           cls: e.target.value,
                           type:
                             e.target.value === "mill"
@@ -5493,74 +6036,45 @@ export default function CNCSimPro() {
                   <>
                     <div className="frow">
                       <div className="field">
-                        <div className="lbl">Ø dia</div>
+                        <div className="lbl">
+                          Ø dia ({editTool.units === "inch" ? "in" : "mm"})
+                        </div>
                         <input
                           type="number"
-                          value={editTool.dia}
-                          step={0.001}
-                          onChange={(e) =>
-                            setEditTool((t) => ({ ...t, dia: +e.target.value }))
-                          }
-                        />
-                      </div>
-                      <div className="field">
-                        <div className="lbl">Corner R</div>
-                        <input
-                          type="number"
-                          value={editTool.cr}
-                          step={0.001}
-                          onChange={(e) =>
-                            setEditTool((t) => ({ ...t, cr: +e.target.value }))
-                          }
-                        />
-                      </div>
-                    </div>
-                    <div className="frow">
-                      <div className="field">
-                        <div className="lbl">TLO (H)</div>
-                        <input
-                          type="number"
-                          value={editTool.tlo}
-                          step={0.001}
-                          onChange={(e) =>
-                            setEditTool((t) => ({ ...t, tlo: +e.target.value }))
-                          }
-                        />
-                      </div>
-                      <div className="field">
-                        <div className="lbl">Flute Len</div>
-                        <input
-                          type="number"
-                          value={editTool.lc}
-                          step={0.001}
-                          onChange={(e) =>
-                            setEditTool((t) => ({ ...t, lc: +e.target.value }))
-                          }
-                        />
-                      </div>
-                    </div>
-                    <div className="frow">
-                      <div className="field">
-                        <div className="lbl">Total Len</div>
-                        <input
-                          type="number"
-                          value={editTool.lt}
-                          step={0.001}
-                          onChange={(e) =>
-                            setEditTool((t) => ({ ...t, lt: +e.target.value }))
-                          }
-                        />
-                      </div>
-                      <div className="field">
-                        <div className="lbl">Shank Ø</div>
-                        <input
-                          type="number"
-                          value={editTool.shank}
+                          value={toolDisplayDim(
+                            editTool.dia,
+                            editTool.units || toolUnits,
+                          )}
                           step={0.001}
                           onChange={(e) =>
                             setEditTool((t) => ({
                               ...t,
-                              shank: +e.target.value,
+                              dia: toolInputToMm(
+                                e.target.value,
+                                t.units || toolUnits,
+                              ),
+                            }))
+                          }
+                        />
+                      </div>
+                      <div className="field">
+                        <div className="lbl">
+                          Corner R ({editTool.units === "inch" ? "in" : "mm"})
+                        </div>
+                        <input
+                          type="number"
+                          value={toolDisplayDim(
+                            editTool.cr,
+                            editTool.units || toolUnits,
+                          )}
+                          step={0.001}
+                          onChange={(e) =>
+                            setEditTool((t) => ({
+                              ...t,
+                              cr: toolInputToMm(
+                                e.target.value,
+                                t.units || toolUnits,
+                              ),
                             }))
                           }
                         />
@@ -5568,29 +6082,231 @@ export default function CNCSimPro() {
                     </div>
                     <div className="frow">
                       <div className="field">
-                        <div className="lbl">Holder Ø</div>
+                        <div className="lbl">
+                          TLO (H) ({editTool.units === "inch" ? "in" : "mm"})
+                        </div>
                         <input
                           type="number"
-                          value={editTool.hdia}
+                          value={toolDisplayDim(
+                            editTool.tlo,
+                            editTool.units || toolUnits,
+                          )}
                           step={0.001}
                           onChange={(e) =>
                             setEditTool((t) => ({
                               ...t,
-                              hdia: +e.target.value,
+                              tlo: toolInputToMm(
+                                e.target.value,
+                                t.units || toolUnits,
+                              ),
                             }))
                           }
                         />
                       </div>
                       <div className="field">
-                        <div className="lbl">Holder Len</div>
+                        <div className="lbl">
+                          Flute Len ({editTool.units === "inch" ? "in" : "mm"})
+                        </div>
                         <input
                           type="number"
-                          value={editTool.hlen}
+                          value={toolDisplayDim(
+                            editTool.lc,
+                            editTool.units || toolUnits,
+                          )}
                           step={0.001}
                           onChange={(e) =>
                             setEditTool((t) => ({
                               ...t,
-                              hlen: +e.target.value,
+                              lc: toolInputToMm(
+                                e.target.value,
+                                t.units || toolUnits,
+                              ),
+                            }))
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div className="frow">
+                      <div className="field">
+                        <div className="lbl">
+                          Total Len ({editTool.units === "inch" ? "in" : "mm"})
+                        </div>
+                        <input
+                          type="number"
+                          value={toolDisplayDim(
+                            editTool.lt,
+                            editTool.units || toolUnits,
+                          )}
+                          step={0.001}
+                          onChange={(e) =>
+                            setEditTool((t) => ({
+                              ...t,
+                              lt: toolInputToMm(
+                                e.target.value,
+                                t.units || toolUnits,
+                              ),
+                            }))
+                          }
+                        />
+                      </div>
+                      <div className="field">
+                        <div className="lbl">
+                          Shank Ø ({editTool.units === "inch" ? "in" : "mm"})
+                        </div>
+                        <input
+                          type="number"
+                          value={toolDisplayDim(
+                            editTool.shank,
+                            editTool.units || toolUnits,
+                          )}
+                          step={0.001}
+                          onChange={(e) =>
+                            setEditTool((t) => ({
+                              ...t,
+                              shank: toolInputToMm(
+                                e.target.value,
+                                t.units || toolUnits,
+                              ),
+                            }))
+                          }
+                        />
+                      </div>
+                    </div>
+                    {String(editTool.type || "").includes("Relief Neck") && (
+                      <div className="frow">
+                        <div className="field">
+                          <div className="lbl">
+                            Neck Ø ({editTool.units === "inch" ? "in" : "mm"})
+                          </div>
+                          <input
+                            type="number"
+                            value={toolDisplayDim(
+                              editTool.neckDia || 0,
+                              editTool.units || toolUnits,
+                            )}
+                            step={0.001}
+                            onChange={(e) =>
+                              setEditTool((t) => ({
+                                ...t,
+                                neckDia: toolInputToMm(
+                                  e.target.value,
+                                  t.units || toolUnits,
+                                ),
+                              }))
+                            }
+                          />
+                        </div>
+                        <div className="field">
+                          <div className="lbl">
+                            Neck Len ({editTool.units === "inch" ? "in" : "mm"})
+                          </div>
+                          <input
+                            type="number"
+                            value={toolDisplayDim(
+                              editTool.neckLen || 0,
+                              editTool.units || toolUnits,
+                            )}
+                            step={0.001}
+                            onChange={(e) =>
+                              setEditTool((t) => ({
+                                ...t,
+                                neckLen: toolInputToMm(
+                                  e.target.value,
+                                  t.units || toolUnits,
+                                ),
+                              }))
+                            }
+                          />
+                        </div>
+                      </div>
+                    )}
+                    <div className="frow">
+                      <div className="field">
+                        <div className="lbl">
+                          Wear R ({editTool.units === "inch" ? "in" : "mm"})
+                        </div>
+                        <input
+                          type="number"
+                          value={toolDisplayDim(
+                            editTool.wearR || 0,
+                            editTool.units || toolUnits,
+                          )}
+                          step={0.001}
+                          onChange={(e) =>
+                            setEditTool((t) => ({
+                              ...t,
+                              wearR: toolInputToMm(
+                                e.target.value,
+                                t.units || toolUnits,
+                              ),
+                            }))
+                          }
+                        />
+                      </div>
+                      <div className="field">
+                        <div className="lbl">
+                          Wear L ({editTool.units === "inch" ? "in" : "mm"})
+                        </div>
+                        <input
+                          type="number"
+                          value={toolDisplayDim(
+                            editTool.wearL || 0,
+                            editTool.units || toolUnits,
+                          )}
+                          step={0.001}
+                          onChange={(e) =>
+                            setEditTool((t) => ({
+                              ...t,
+                              wearL: toolInputToMm(
+                                e.target.value,
+                                t.units || toolUnits,
+                              ),
+                            }))
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div className="frow">
+                      <div className="field">
+                        <div className="lbl">
+                          Holder Ø ({editTool.units === "inch" ? "in" : "mm"})
+                        </div>
+                        <input
+                          type="number"
+                          value={toolDisplayDim(
+                            editTool.hdia,
+                            editTool.units || toolUnits,
+                          )}
+                          step={0.001}
+                          onChange={(e) =>
+                            setEditTool((t) => ({
+                              ...t,
+                              hdia: toolInputToMm(
+                                e.target.value,
+                                t.units || toolUnits,
+                              ),
+                            }))
+                          }
+                        />
+                      </div>
+                      <div className="field">
+                        <div className="lbl">
+                          Holder Len ({editTool.units === "inch" ? "in" : "mm"})
+                        </div>
+                        <input
+                          type="number"
+                          value={toolDisplayDim(
+                            editTool.hlen,
+                            editTool.units || toolUnits,
+                          )}
+                          step={0.001}
+                          onChange={(e) =>
+                            setEditTool((t) => ({
+                              ...t,
+                              hlen: toolInputToMm(
+                                e.target.value,
+                                t.units || toolUnits,
+                              ),
                             }))
                           }
                         />
@@ -5614,39 +6330,115 @@ export default function CNCSimPro() {
                         />
                       </div>
                       <div className="field">
-                        <div className="lbl">Corner R</div>
+                        <div className="lbl">
+                          Corner R ({editTool.units === "inch" ? "in" : "mm"})
+                        </div>
                         <input
                           type="number"
-                          value={editTool.cr}
+                          value={toolDisplayDim(
+                            editTool.cr,
+                            editTool.units || toolUnits,
+                          )}
                           step={0.001}
                           onChange={(e) =>
-                            setEditTool((t) => ({ ...t, cr: +e.target.value }))
+                            setEditTool((t) => ({
+                              ...t,
+                              cr: toolInputToMm(
+                                e.target.value,
+                                t.units || toolUnits,
+                              ),
+                            }))
                           }
                         />
                       </div>
                     </div>
                     <div className="frow">
                       <div className="field">
-                        <div className="lbl">TLO</div>
+                        <div className="lbl">
+                          Wear R ({editTool.units === "inch" ? "in" : "mm"})
+                        </div>
                         <input
                           type="number"
-                          value={editTool.tlo}
-                          step={0.001}
-                          onChange={(e) =>
-                            setEditTool((t) => ({ ...t, tlo: +e.target.value }))
-                          }
-                        />
-                      </div>
-                      <div className="field">
-                        <div className="lbl">Shank W</div>
-                        <input
-                          type="number"
-                          value={editTool.shank}
+                          value={toolDisplayDim(
+                            editTool.wearR || 0,
+                            editTool.units || toolUnits,
+                          )}
                           step={0.001}
                           onChange={(e) =>
                             setEditTool((t) => ({
                               ...t,
-                              shank: +e.target.value,
+                              wearR: toolInputToMm(
+                                e.target.value,
+                                t.units || toolUnits,
+                              ),
+                            }))
+                          }
+                        />
+                      </div>
+                      <div className="field">
+                        <div className="lbl">
+                          Wear L ({editTool.units === "inch" ? "in" : "mm"})
+                        </div>
+                        <input
+                          type="number"
+                          value={toolDisplayDim(
+                            editTool.wearL || 0,
+                            editTool.units || toolUnits,
+                          )}
+                          step={0.001}
+                          onChange={(e) =>
+                            setEditTool((t) => ({
+                              ...t,
+                              wearL: toolInputToMm(
+                                e.target.value,
+                                t.units || toolUnits,
+                              ),
+                            }))
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div className="frow">
+                      <div className="field">
+                        <div className="lbl">
+                          TLO ({editTool.units === "inch" ? "in" : "mm"})
+                        </div>
+                        <input
+                          type="number"
+                          value={toolDisplayDim(
+                            editTool.tlo,
+                            editTool.units || toolUnits,
+                          )}
+                          step={0.001}
+                          onChange={(e) =>
+                            setEditTool((t) => ({
+                              ...t,
+                              tlo: toolInputToMm(
+                                e.target.value,
+                                t.units || toolUnits,
+                              ),
+                            }))
+                          }
+                        />
+                      </div>
+                      <div className="field">
+                        <div className="lbl">
+                          Shank W ({editTool.units === "inch" ? "in" : "mm"})
+                        </div>
+                        <input
+                          type="number"
+                          value={toolDisplayDim(
+                            editTool.shank,
+                            editTool.units || toolUnits,
+                          )}
+                          step={0.001}
+                          onChange={(e) =>
+                            setEditTool((t) => ({
+                              ...t,
+                              shank: toolInputToMm(
+                                e.target.value,
+                                t.units || toolUnits,
+                              ),
                             }))
                           }
                         />
@@ -5655,13 +6447,25 @@ export default function CNCSimPro() {
                     {(editTool.type === "Grooving" ||
                       editTool.type === "Parting") && (
                       <div className="field">
-                        <div className="lbl">Groove Width</div>
+                        <div className="lbl">
+                          Groove Width (
+                          {editTool.units === "inch" ? "in" : "mm"})
+                        </div>
                         <input
                           type="number"
-                          value={editTool.dia}
+                          value={toolDisplayDim(
+                            editTool.dia,
+                            editTool.units || toolUnits,
+                          )}
                           step={0.001}
                           onChange={(e) =>
-                            setEditTool((t) => ({ ...t, dia: +e.target.value }))
+                            setEditTool((t) => ({
+                              ...t,
+                              dia: toolInputToMm(
+                                e.target.value,
+                                t.units || toolUnits,
+                              ),
+                            }))
                           }
                         />
                       </div>
@@ -5674,7 +6478,11 @@ export default function CNCSimPro() {
                   onClick={() =>
                     setTools((prev) => ({
                       ...prev,
-                      [editTool.n]: { ...editTool },
+                      [editTool.n]: normalizeToolDefinition(
+                        editTool,
+                        editTool.n,
+                        activeToolClass,
+                      ),
                     }))
                   }
                 >

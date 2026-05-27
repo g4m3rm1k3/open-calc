@@ -1,83 +1,121 @@
 const STRUCT_CODE = `#include <iostream>
-#include <string>
 #include <cmath>
 using namespace std;
 
-// ── Struct: public by default ────────────────────────────────
+// __OUTPUT__: A=(1, 2)  B=(4, 6)\\ndistance: 5
+
 struct Point {
     double x, y;
 
     double distanceTo(const Point& other) const {
-        double dx = x - other.x;
-        double dy = y - other.y;
+        double dx = x - other.x, dy = y - other.y;
         return sqrt(dx*dx + dy*dy);
     }
 
-    void print() const {
-        cout << "(" << x << ", " << y << ")";
-    }
+    void print() const { cout << "(" << x << ", " << y << ")"; }
 };
-
-// ── Class: private by default ─────────────────────────────────
-class Circle {
-private:
-    Point center;
-    double radius;
-
-public:
-    // Constructor
-    Circle(double cx, double cy, double r)
-        : center{cx, cy}, radius{r} {}
-
-    // Getters (const — don't modify the object)
-    double getRadius() const { return radius; }
-    Point  getCenter() const { return center; }
-    double area()      const { return 3.14159265 * radius * radius; }
-    double perimeter() const { return 2 * 3.14159265 * radius; }
-
-    // Setter with validation
-    void setRadius(double r) {
-        if (r > 0) radius = r;
-        else cout << "Error: radius must be positive" << endl;
-    }
-
-    bool contains(const Point& p) const {
-        return center.distanceTo(p) <= radius;
-    }
-
-    void print() const {
-        cout << "Circle at ";
-        center.print();
-        cout << " with radius " << radius << endl;
-    }
-};
-
-// __OUTPUT__: --- Struct: Point ---\\nA = (1, 2)  B = (4, 6)\\nDistance A→B: 5\\n--- Class: Circle ---\\nCircle at (0, 0) with radius 5\\nArea: 78.5398  Perimeter: 31.4159\\nPoint (3, 4): inside? 1\\nPoint (6, 0): inside? 0\\nAfter setRadius(-1): Error: radius must be positive\\nAfter setRadius(10): radius = 10
 
 int main() {
-    // ── struct usage ───────────────────────────────────────────
-    cout << "--- Struct: Point ---" << endl;
-    Point A{1, 2};
-    Point B{4, 6};
-    cout << "A = "; A.print();
-    cout << "  B = "; B.print(); cout << endl;
-    cout << "Distance A→B: " << A.distanceTo(B) << endl;
+    Point A{1, 2}, B{4, 6};
+    cout << "A="; A.print();
+    cout << "  B="; B.print(); cout << endl;
+    cout << "distance: " << A.distanceTo(B) << endl;
+    return 0;
+}`;
 
-    // ── class usage ────────────────────────────────────────────
-    cout << "--- Class: Circle ---" << endl;
+const CLASS_CODE = `#include <iostream>
+#include <cmath>
+using namespace std;
+
+// __OUTPUT__: area=78.5398\\ncontains (3,4)? 1\\ncontains (6,0)? 0
+
+class Circle {
+private:
+    double cx, cy, radius;   // private: only accessible inside the class
+
+public:
+    // Constructor: initializer list initializes before the body runs
+    Circle(double x, double y, double r) : cx(x), cy(y), radius(r) {}
+
+    double area() const { return 3.14159265 * radius * radius; }
+
+    bool contains(double px, double py) const {
+        double dx = px - cx, dy = py - cy;
+        return sqrt(dx*dx + dy*dy) <= radius;
+    }
+};
+
+int main() {
     Circle c(0, 0, 5);
-    c.print();
-    cout << "Area: " << c.area()
-         << "  Perimeter: " << c.perimeter() << endl;
+    cout << "area=" << c.area() << endl;
+    cout << "contains (3,4)? " << c.contains(3, 4) << endl;
+    cout << "contains (6,0)? " << c.contains(6, 0) << endl;
+    return 0;
+}`;
 
-    Point p1{3, 4}, p2{6, 0};
-    cout << "Point (3, 4): inside? " << c.contains(p1) << endl;
-    cout << "Point (6, 0): inside? " << c.contains(p2) << endl;
+const CONST_CODE = `#include <iostream>
+using namespace std;
 
-    c.setRadius(-1);   // triggers validation
-    c.setRadius(10);
-    cout << "After setRadius(10): radius = " << c.getRadius() << endl;
+// __OUTPUT__: Counter: 0\\nafter increment: 1\\nvalue (const ref): 1
 
+class Counter {
+    int value;
+public:
+    Counter() : value(0) {}   // initializer list
+
+    void increment() { value++; }         // non-const: modifies state
+    int  get() const { return value; }    // const: safe on const objects
+    void reset()     { value = 0; }
+};
+
+void printCounter(const Counter& c) {
+    // c.increment();  // ERROR: can't call non-const on const ref
+    cout << "value (const ref): " << c.get() << endl;
+}
+
+int main() {
+    Counter c;
+    cout << "Counter: " << c.get() << endl;
+    c.increment();
+    cout << "after increment: " << c.get() << endl;
+    printCounter(c);
+    return 0;
+}`;
+
+const ENCAP_CODE = `#include <iostream>
+#include <string>
+using namespace std;
+
+// __OUTPUT__: Alice: $100\\ndeposit $50: ok\\nwithdraw $200: denied\\nAlice: $150
+
+class BankAccount {
+    string owner;
+    double balance;
+public:
+    BankAccount(string name, double initial)
+        : owner(name), balance(initial > 0 ? initial : 0) {}
+
+    bool deposit(double amount) {
+        if (amount <= 0) return false;
+        balance += amount; return true;
+    }
+
+    bool withdraw(double amount) {
+        if (amount <= 0 || amount > balance) return false;
+        balance -= amount; return true;
+    }
+
+    void print() const {
+        cout << owner << ": $" << balance << endl;
+    }
+};
+
+int main() {
+    BankAccount acc("Alice", 100);
+    acc.print();
+    cout << "deposit $50: " << (acc.deposit(50) ? "ok" : "denied") << endl;
+    cout << "withdraw $200: " << (acc.withdraw(200) ? "ok" : "denied") << endl;
+    acc.print();
     return 0;
 }`;
 
@@ -87,7 +125,7 @@ const lesson = {
   chapter: "cpp-1",
   order: 1,
   title: "Structs and Classes",
-  subtitle: "Bundle data and behavior together with structs and classes — the foundation of OOP",
+  subtitle: "Bundle data and behavior into user-defined types — the foundation of OOP",
   tags: ["c++", "cpp", "struct", "class", "oop", "encapsulation", "methods", "access-control"],
   aliases: [
     "c++ struct",
@@ -97,31 +135,33 @@ const lesson = {
     "c++ encapsulation",
   ],
 
-  hook: `Procedural programming (functions + data separately) works for small programs but doesn't scale. Object-oriented programming bundles related data and the functions that operate on it into a single unit — a class. This makes code more organized, safer (controlled access), and reusable. Every major C++ codebase uses classes. Understanding them deeply is the first step to being a professional C++ developer.`,
+  hook: `Procedural programming (functions acting on separate data) breaks down as programs grow. Classes bundle related data and the functions that operate on it — and control who can access what. They're how C++ enforces invariants, organizes large codebases, and enables reuse.`,
 
   mentalModel: [
-    "**A struct/class is a user-defined type.** Just as `int` bundles a 32-bit integer and the operations `+`, `-`, `*`, `/`, a class bundles related data (members) and operations (methods). `Circle c(0,0,5)` creates an instance of the `Circle` type. The instance holds the data; the methods operate on it. The type system then guarantees you can only call valid operations on a circle.",
-    "**The only difference between `struct` and `class` in C++ is default access.** `struct` members are `public` by default; `class` members are `private`. Conventionally: use `struct` for plain data aggregates (no invariants to maintain), `class` for types with behavior and encapsulation. The language doesn't enforce this — it's convention.",
-    "**`const` member functions** promise not to modify the object. `double area() const` — the `const` at the end means `this` pointer is `const Circle*`. You can call `const` methods on `const` objects. Non-const methods cannot be called on const objects. Mark every method that doesn't modify state as `const` — it improves correctness, enables const objects, and signals intent.",
+    "**A class is a user-defined type.** Just as `int` bundles 32 bits and operations `+`, `-`, `*`, `/`, a class bundles data (members) and operations (methods). `Circle c(0,0,5)` creates an instance. The type system ensures you can only call valid operations on a circle.",
+    "**`struct` vs `class` — only the default access differs.** `struct` members are `public` by default; `class` members are `private`. Use `struct` for plain data bundles (no invariants), `class` for types with encapsulation. This is convention — the language doesn't enforce it.",
+    "**`const` methods promise not to modify the object.** Mark every method that doesn't change state as `const`. This lets them be called on `const` objects and `const` references — critical for passing objects to read-only functions.",
   ],
 
   intuition: {
     prose: [
-      "**Encapsulation: hide implementation, expose interface.** By making `Circle`'s `radius` private, external code can't set it to -5 or NaN. Only the `setRadius` method can modify it — and it validates the input. This is the core benefit of encapsulation: the class maintains its *invariants* (rules that keep the data valid) regardless of how it's used. If `radius` were public, any caller could break the invariant by writing `c.radius = -3`.",
-      "**The `this` pointer.** Inside every non-static method, `this` is a pointer to the current object. `this->radius` and just `radius` are equivalent inside a method. The implicit `this` parameter is why `area()` knows which circle's radius to use. In const methods, `this` is `const Circle*`, which is why you can't assign to members in const methods.",
-      "**Member initializer lists** `Circle(double cx, double cy, double r) : center{cx, cy}, radius{r} {}` — the `: members` syntax initializes members before the constructor body runs. This is more efficient than assignment inside the body (which would default-construct the member first, then assign). For `const` members and references, initializer lists are required — they cannot be assigned in the body.",
-      "**Getters and setters aren't always necessary.** If a class has no invariants to maintain (it's just a data bundle), use a `struct` with public members. Only add getters/setters when you need validation, caching, or to decouple the interface from the implementation. Over-engineering with trivial `getX()`/`setX()` for every field adds noise without value.",
+      "**Struct: group related data.** A `Point` with `x` and `y` is more expressive than two separate `double` variables. Adding a `distanceTo` method keeps the logic next to the data it operates on.",
     ],
     visualizations: [
       {
         id: "CppLab",
-        mathBridge:
-          "**Build on the class system:**\n\n1. Compile and run — trace struct vs class behavior\n2. Add a `Rectangle` class with `width`, `height`, `area()`, `perimeter()`, `isSquare()`\n3. Add a `static` method to `Circle`: `static Circle unit()` returning a circle at (0,0) with radius 1\n4. Try accessing `c.radius` directly — compiler error (private)\n5. Add `bool operator==(const Circle& other) const` to compare circles\n6. Create a `vector<Circle>` and add multiple circles — class instances work naturally in STL containers",
+        mathBridge: "**Run it — then build on Point:**\n\n- Add a `midpoint(const Point& other) const` method that returns the midpoint.\n- Add a `bool operator==(const Point& other) const` to compare two points.\n- Create a `vector<Point>` and sort by distance from the origin: `sqrt(x*x + y*y)`.\n- What happens if you try `Point p; p.x = 3;` — is that valid for a struct?",
         props: {
           mainFile: "main.cpp",
-          initialFiles: {
-            "/home/user/main.cpp": STRUCT_CODE,
-          },
+          initialFiles: { "/home/user/main.cpp": STRUCT_CODE },
+        },
+      },
+      {
+        id: "CppLab",
+        mathBridge: "**Class with private members — run it then explore:**\n\n- Try `c.radius = 10;` — compile error (private). Why is this good?\n- Add a `setRadius(double r)` method that validates `r > 0` before setting.\n- Add `double perimeter() const { return 2 * 3.14159 * radius; }`.\n- Add a `static Circle unit()` factory method that returns a circle at (0,0) radius 1.",
+        props: {
+          mainFile: "main.cpp",
+          initialFiles: { "/home/user/main.cpp": CLASS_CODE },
         },
       },
     ],
@@ -129,114 +169,80 @@ const lesson = {
 
   rigor: {
     prose: [
-      "**Access specifiers: `public`, `private`, `protected`.** `public` members are accessible from anywhere. `private` members are only accessible within the class itself (and `friend` declarations). `protected` members are accessible in the class and its derived classes (relevant for inheritance). Access specifiers protect invariants by restricting what external code can touch. The default for `class` is `private`; for `struct` it's `public`.",
-      "**`static` members belong to the class, not instances.** `static int count = 0` inside a class is shared by all instances — one copy exists regardless of how many objects are created. `static` methods can be called without an instance: `Circle::unit()`. They cannot access non-static members (no `this`). Use statics for factory methods, shared counters, or class-level constants.",
-      "**Operator overloading** lets you define what `+`, `==`, `<<`, etc. mean for your types. `bool operator==(const Circle& other) const { return center.x == other.center.x && ... }`. The stream operator `friend ostream& operator<<(ostream& os, const Circle& c)` enables `cout << c`. Overload operators when the meaning is natural and unsurprising — don't make `+` do something that doesn't feel like addition.",
+      "**const methods and the `this` pointer.** Inside every method, `this` is a pointer to the current object. In a `const` method, `this` is `const Circle*` — assignments to members become compile errors. The compiler enforces the `const` promise at compile time, not runtime. Any function taking a `const Circle&` can only call `const` methods on it.",
+      "**Encapsulation enforces invariants.** `BankAccount` keeps `balance` private — external code can never set it to -$1000. Every modification goes through `deposit` or `withdraw`, which enforce the rules. This is the core benefit: the class owns its data and controls the rules. Public members bypass all of this.",
+    ],
+    visualizations: [
+      {
+        id: "CppLab",
+        mathBridge: "**const methods — run it then explore:**\n\n- Try calling `c.increment()` from inside `printCounter` — what error do you get?\n- Add `void resetToValue(int v) const { value = v; }` — compile error because the method is const but modifies state.\n- Declare `const Counter cc; cc.get();` — works. `cc.increment();` — error.\n- Add `mutable int callCount;` to Counter and increment it inside `get()` — mutable bypasses const.",
+        props: {
+          mainFile: "main.cpp",
+          initialFiles: { "/home/user/main.cpp": CONST_CODE },
+        },
+      },
+      {
+        id: "CppLab",
+        mathBridge: "**Encapsulation with invariants — run it then explore:**\n\n- Try `acc.balance = 1000000;` — compile error (private). This is the point.\n- Add a `transfer(BankAccount& other, double amount)` method — withdraw from this, deposit to other.\n- Change the constructor to reject negative initial balances by setting them to 0. Does the current code do that?\n- Add a `string getOwner() const` getter — why make this const?",
+        props: {
+          mainFile: "main.cpp",
+          initialFiles: { "/home/user/main.cpp": ENCAP_CODE },
+        },
+      },
     ],
     callouts: [
       {
         type: "info",
-        title: "struct vs class — only access default differs",
-        body: "In C++, `struct S { int x; };` and `class C { public: int x; };` are identical. The sole difference is `struct` defaults to `public`, `class` defaults to `private`. Convention: use `struct` for data aggregates (no invariants), `class` for types with encapsulated state and methods.",
-      },
-      {
-        type: "warning",
-        title: "const correctness: mark methods const",
-        body: "If a method doesn't modify the object, mark it `const`. This allows the method to be called on const objects and const references. Without `const`, `void print(const Circle& c) { c.area(); }` fails to compile if `area()` is not const. Rule: every method that doesn't modify state should be `const`.",
+        title: "struct vs class — only default access differs",
+        body: "`struct S { int x; };` and `class C { public: int x; };` are identical in C++. The sole difference: `struct` defaults to `public`, `class` to `private`. Convention: `struct` for data aggregates, `class` for encapsulated types.",
       },
       {
         type: "tip",
         title: "Use member initializer lists",
-        body: "In constructors, initialize members in the initializer list rather than the body: `: m_x(x), m_y(y)` instead of `{ m_x = x; m_y = y; }`. The list initializes; the body assigns. For non-trivial types, the list avoids double-construction. `const` members and references MUST be in the initializer list — they can't be assigned.",
+        body: "`:  m_x(x), m_y(y)` in the constructor initializes members directly. The body `{ m_x = x; }` constructs-then-assigns — one extra operation. `const` members and references must use initializer lists — they can't be assigned in the body.",
       },
     ],
   },
 
   examples: [
     {
-      title: "BankAccount class with invariant enforcement",
-      body: `class BankAccount {
-private:
-    string owner;
-    double balance;
-
+      title: "Rectangle class with area and comparison",
+      body: `class Rectangle {
+    double width, height;
 public:
-    BankAccount(string name, double initial)
-        : owner(name), balance(initial > 0 ? initial : 0) {}
+    Rectangle(double w, double h) : width(w), height(h) {}
 
-    bool deposit(double amount) {
-        if (amount <= 0) return false;
-        balance += amount;
-        return true;
+    double area()      const { return width * height; }
+    double perimeter() const { return 2 * (width + height); }
+    bool   isSquare()  const { return width == height; }
+
+    bool operator<(const Rectangle& other) const {
+        return area() < other.area();
     }
-
-    bool withdraw(double amount) {
-        if (amount <= 0 || amount > balance) return false;
-        balance -= amount;
-        return true;
-    }
-
-    double getBalance() const { return balance; }
-    string getOwner()   const { return owner;   }
-
-    void print() const {
-        cout << owner << ": $" << balance << endl;
-    }
-};`,
-    },
-    {
-      title: "Struct for plain data, class for behavior",
-      body: `// Struct: just data, no invariants
-struct RGB {
-    int r, g, b;
 };
 
-// Class: behavior + invariants
-class Color {
-    RGB components;
-public:
-    Color(int r, int g, int b)
-        : components{clamp(r), clamp(g), clamp(b)} {}
-
-    RGB get() const { return components; }
-
-    Color mix(const Color& other) const {
-        return Color(
-            (components.r + other.components.r) / 2,
-            (components.g + other.components.g) / 2,
-            (components.b + other.components.b) / 2
-        );
-    }
-
-private:
-    static int clamp(int v) { return max(0, min(255, v)); }
-};`,
+Rectangle r1(3, 4), r2(5, 5);
+cout << r1.area()    << endl;   // 12
+cout << r2.isSquare() << endl;  // 1
+cout << (r1 < r2)    << endl;   // 1`,
     },
     {
-      title: "Static members and factory methods",
-      body: `class Temperature {
-private:
-    double celsius;
-    static int instanceCount;   // class-level counter
-
+      title: "Static members: shared counter",
+      body: `class Widget {
+    static int instanceCount;  // shared by all instances
+    int id;
 public:
-    Temperature(double c) : celsius(c) { instanceCount++; }
-    ~Temperature() { instanceCount--; }
-
-    // Factory methods (static constructors)
-    static Temperature fromFahrenheit(double f) {
-        return Temperature((f - 32) * 5.0 / 9.0);
-    }
-    static Temperature fromKelvin(double k) {
-        return Temperature(k - 273.15);
-    }
-
-    double toCelsius()    const { return celsius; }
-    double toFahrenheit() const { return celsius * 9.0/5.0 + 32; }
+    Widget() : id(++instanceCount) {}
+    ~Widget() { --instanceCount; }
 
     static int count() { return instanceCount; }
+    int getId() const { return id; }
 };
-int Temperature::instanceCount = 0;   // define outside class`,
+
+int Widget::instanceCount = 0;   // definition outside class
+
+{ Widget a, b, c; cout << Widget::count(); }  // 3
+cout << Widget::count();  // 0 — destructors ran`,
     },
   ],
 
@@ -244,27 +250,26 @@ int Temperature::instanceCount = 0;   // define outside class`,
     {
       difficulty: "easy",
       problem:
-        "Design a `Vector2D` class representing a 2D mathematical vector (not `std::vector`). Include: `double x, y` (private), constructor, `length()`, `normalize()` (returns a unit vector), `dot(const Vector2D&)`, and `operator+`. Test all operations in main.",
-      hint: "Length = sqrt(x*x + y*y). Normalize: return Vector2D(x/length(), y/length()). Dot: return x*other.x + y*other.y.",
+        "Write a `Temperature` class that stores a value in Celsius. Add: `double toCelsius() const`, `double toFahrenheit() const` (F = C * 9/5 + 32), `double toKelvin() const` (K = C + 273.15). Add a constructor and a `void print() const` method that shows all three. Make sure the internal value can't be set negative (below absolute zero: -273.15 C).",
+      hint: "Private member `double celsius`. In constructor: `if (c < -273.15) celsius = -273.15; else celsius = c;`",
       walkthrough: [
-        "Private members: double x, y. Constructor: Vector2D(double x, double y) : x(x), y(y) {}",
-        "length(): return sqrt(x*x + y*y)",
-        "normalize(): double l = length(); return Vector2D(x/l, y/l)",
-        "dot(): return x*o.x + y*o.y",
-        "operator+: return Vector2D(x+o.x, y+o.y)",
+        "class Temperature { double celsius; public: ... }",
+        "Constructor validates: celsius = max(c, -273.15)",
+        "toCelsius returns celsius; toFahrenheit returns celsius * 9.0/5.0 + 32; toKelvin returns celsius + 273.15",
+        "print() calls all three",
       ],
     },
     {
       difficulty: "medium",
       problem:
-        "Build a `Stack<int>` class (not using std::stack) backed by a `vector<int>`. Implement: `push(int)`, `pop()` (returns and removes top), `peek()` (returns top without removing), `isEmpty()`, `size()`. Make `pop()` and `peek()` throw `std::runtime_error` if the stack is empty. Test with a sequence of pushes and pops.",
-      hint: "Use a private `vector<int> data`. push: `data.push_back(val)`. pop: check empty, then `int top = data.back(); data.pop_back(); return top;`",
+        "Build a `Stack<int>` class using a `vector<int>` as the underlying storage. Implement: `void push(int)`, `int pop()` (error-handle empty), `int top() const` (peek without removing), `bool empty() const`, `int size() const`. Test with a sequence of pushes and pops.",
+      hint: "Private `vector<int> data;`. push = push_back, pop = back + pop_back, top = back. Guard `pop` and `top` with empty checks.",
       walkthrough: [
-        "Private: vector<int> data",
+        "private: vector<int> data;",
         "push: data.push_back(val)",
-        "peek: if (isEmpty()) throw; return data.back()",
-        "pop: if (isEmpty()) throw; int top = data.back(); data.pop_back(); return top",
-        "isEmpty: return data.empty(). size: return data.size()",
+        "pop: if empty throw or return; val = data.back(); data.pop_back(); return val",
+        "top: if empty throw or return; return data.back()",
+        "empty: return data.empty(); size: return data.size()",
       ],
     },
   ],
@@ -276,56 +281,56 @@ int Temperature::instanceCount = 0;   // define outside class`,
         type: "choice",
         text: "What is the only difference between `struct` and `class` in C++?",
         options: [
-          "struct cannot have methods; class can",
-          "struct members are public by default; class members are private by default",
-          "struct is stack-allocated; class is heap-allocated",
-          "struct cannot use inheritance; class can",
+          "struct can't have methods; class can",
+          "struct defaults to public access; class defaults to private",
+          "struct is on the stack; class is on the heap",
+          "struct can't inherit; class can",
         ],
         answer: 1,
         explanation:
-          "In C++, `struct` and `class` are identical except for default access: `struct` defaults to `public`, `class` defaults to `private`. Both can have methods, constructors, inheritance, and all OOP features.",
+          "In C++, the only technical difference is default access: `struct` members are `public` by default, `class` members are `private`. Both can have methods, inheritance, and constructors.",
       },
       {
         id: "cpp1-001-q2",
         type: "choice",
-        text: "What does marking a method `const` (e.g., `double area() const`) guarantee?",
+        text: "Why mark a method `const` (e.g., `double area() const`)?",
         options: [
-          "The method runs at compile time",
-          "The method cannot modify any member variables of the object",
-          "The method's return value cannot be modified by the caller",
-          "The method can only be called on const pointers",
+          "To make it faster",
+          "So it can be called on const objects/references and signals it doesn't modify state",
+          "To prevent it from being overridden",
+          "To allow it to access private members",
         ],
         answer: 1,
         explanation:
-          "A `const` method promises not to modify the object's state — `this` is treated as `const T*`. This allows calling the method on const objects and const references. Any attempt to modify a member inside a const method is a compile error.",
+          "`const` methods can be called on `const` objects and `const` references. Without `const`, you can't call the method through a const reference — even if it doesn't actually modify anything. It also signals intent to readers.",
       },
       {
         id: "cpp1-001-q3",
         type: "choice",
-        text: "Why is encapsulation (making members private) valuable?",
+        text: "What advantage does making `balance` private in BankAccount give?",
         options: [
-          "It makes programs run faster",
-          "It prevents external code from putting the object in an invalid state",
-          "It allows the object to be copied more efficiently",
-          "It is required to use templates",
+          "It makes the balance inaccessible from everywhere",
+          "External code must go through deposit/withdraw, which enforce validation rules",
+          "It prevents the balance from being read",
+          "It makes the class faster",
         ],
         answer: 1,
         explanation:
-          "Private members can only be modified through the class's own methods. Those methods can validate inputs and enforce invariants (rules that keep the object in a valid state). External code can't bypass these checks. This is the fundamental value of encapsulation.",
+          "Private members can only be modified by the class's own methods. This forces all modifications through `deposit` and `withdraw`, which enforce the 'balance can't go negative' invariant. Public access would let any code bypass these rules.",
       },
       {
         id: "cpp1-001-q4",
         type: "choice",
-        text: "What is the purpose of a member initializer list `Circle(double r) : radius(r) {}`?",
+        text: "What does the member initializer list `Counter() : value(0) {}` do differently from `Counter() { value = 0; }`?",
         options: [
-          "It's just alternative syntax for `{ radius = r; }` with no difference",
-          "It initializes members before the constructor body runs, which is required for const members and references, and more efficient for complex types",
-          "It allows initializing private members from outside the class",
-          "It makes the constructor run at compile time",
+          "No functional difference for int members",
+          "Initializer list constructs directly; body-assignment constructs then assigns — matters for complex types",
+          "Initializer list is slower",
+          "Body-assignment works for const members; initializer list doesn't",
         ],
         answer: 1,
         explanation:
-          "Initializer lists initialize members directly — they don't default-construct then assign. For `const` members and reference members, initializer lists are required (you can't assign to them in the body). For complex types, it avoids double-construction.",
+          "For `int`, both are functionally identical. For complex types, the initializer list constructs the member directly from arguments (one step), while the body first default-constructs then assigns (two steps). `const` members and references MUST use the initializer list — they cannot be assigned in the body.",
       },
     ],
   },

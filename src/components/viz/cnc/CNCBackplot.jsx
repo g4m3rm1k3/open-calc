@@ -12,6 +12,7 @@ export default function CNCBackplot({
   toolDiameter = 10,
   toolLength = 75,
   toolLenCut = null,
+  toolPosition = null,
   stockShape = "box",
   stockDimensions = { width: 100, height: 80, depth: 40 },
   stockOrigin = { x: 0, y: 0, z: 0 },
@@ -354,6 +355,19 @@ export default function CNCBackplot({
   // Move tool
   useEffect(() => {
     if (!toolRef.current || pathPoints.length === 0) return;
+    if (
+      toolPosition &&
+      Number.isFinite(toolPosition.machineX) &&
+      Number.isFinite(toolPosition.machineY) &&
+      Number.isFinite(toolPosition.machineZ)
+    ) {
+      toolRef.current.position.set(
+        toolPosition.machineX,
+        toolPosition.machineY,
+        toolPosition.machineZ,
+      );
+      return;
+    }
     const targetIndex = Math.min(currentStep, pathPoints.length - 1);
     let pt = pathPoints[targetIndex];
     const channelAtStep = pathPoints
@@ -369,7 +383,7 @@ export default function CNCBackplot({
       pt = fallback;
     }
     if (pt) toolRef.current.position.set(pt.machineX, pt.machineY, pt.machineZ);
-  }, [currentStep, pathPoints, activeChannel]);
+  }, [currentStep, pathPoints, activeChannel, toolPosition]);
 
   return (
     <div

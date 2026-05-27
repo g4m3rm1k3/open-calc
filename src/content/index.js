@@ -37,6 +37,7 @@ import git0 from "./git-0/index.js";
 import cli0 from "./cli-0/index.js";
 import cpp0 from "./cpp-0/index.js";
 import cpp1 from "./cpp-1/index.js";
+import cpp2 from "./cpp-2/index.js";
 import git1 from "./git-1/index.js";
 import dsa1 from "./dsa-1/index.js";
 import dp1 from "./dp-1/index.js";
@@ -104,8 +105,9 @@ const DIGITAL_FUNDAMENTALS_CURRICULUM = digitalFundamentals.map((ch) => ({
 const CNC_CURRICULUM = [cnc1].map((ch) => ({ ...ch, course: "cnc-logic" }));
 const GIT0_CURRICULUM = [git0].map((ch) => ({ ...ch, course: "git-0" }));
 const CLI0_CURRICULUM = [cli0].map((ch) => ({ ...ch, course: "cli-0" }));
-const CPP0_CURRICULUM = [cpp0].map((ch) => ({ ...ch, course: "cpp-0" }));
-const CPP1_CURRICULUM = [cpp1].map((ch) => ({ ...ch, course: "cpp-1" }));
+const CPP0_CURRICULUM = [cpp0].map((ch) => ({ ...ch, course: "cpp" }));
+const CPP1_CURRICULUM = [cpp1].map((ch) => ({ ...ch, course: "cpp" }));
+const CPP2_CURRICULUM = [cpp2].map((ch) => ({ ...ch, course: "cpp" }));
 const GIT_CURRICULUM = [git1].map((ch) => ({ ...ch, course: "git-logic" }));
 const DSA_CURRICULUM = dsa1.map((ch) => ({ ...ch, course: "dsa-1" }));
 const DP_CURRICULUM = dp1.map((ch) => ({ ...ch, course: "dp-1" }));
@@ -164,6 +166,7 @@ export const CURRICULUM = [
   ...CLI0_CURRICULUM,
   ...CPP0_CURRICULUM,
   ...CPP1_CURRICULUM,
+  ...CPP2_CURRICULUM,
 ];
 
 // Flat map for O(1) lookup by slug within chapter

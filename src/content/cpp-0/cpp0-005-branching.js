@@ -1,16 +1,14 @@
-const BRANCH_CODE = `#include <iostream>
-#include <string>
+const IF_CODE = `#include <iostream>
 using namespace std;
 
-// __OUTPUT__: Score: 85\\nGrade: B\\nPassed: yes\\n\\nDay 3 = Wednesday\\n\\nSign: positive\\nAbsolute value: 42
+// __OUTPUT__: Score: 85\\nGrade: B\\nPassed: yes
 
 int main() {
-    // ── if / else if / else ────────────────────────────────────
     int score = 85;
     cout << "Score: " << score << endl;
 
     string grade;
-    if (score >= 90)      grade = "A";
+    if      (score >= 90) grade = "A";
     else if (score >= 80) grade = "B";
     else if (score >= 70) grade = "C";
     else if (score >= 60) grade = "D";
@@ -18,35 +16,78 @@ int main() {
 
     cout << "Grade: " << grade << endl;
 
-    // Ternary: condition ? value_if_true : value_if_false
     string result = (score >= 60) ? "yes" : "no";
-    cout << "Passed: " << result << endl << endl;
+    cout << "Passed: " << result << endl;
 
-    // ── switch / case ──────────────────────────────────────────
+    return 0;
+}`;
+
+const SWITCH_CODE = `#include <iostream>
+#include <string>
+using namespace std;
+
+// __OUTPUT__: Day 3 = Wednesday
+
+int main() {
     int day = 3;
-    string dayName;
+    string name;
+
     switch (day) {
-        case 1:  dayName = "Monday";    break;
-        case 2:  dayName = "Tuesday";   break;
-        case 3:  dayName = "Wednesday"; break;
-        case 4:  dayName = "Thursday";  break;
-        case 5:  dayName = "Friday";    break;
-        default: dayName = "Weekend";   break;
+        case 1:  name = "Monday";    break;
+        case 2:  name = "Tuesday";   break;
+        case 3:  name = "Wednesday"; break;
+        case 4:  name = "Thursday";  break;
+        case 5:  name = "Friday";    break;
+        default: name = "Weekend";   break;
     }
-    cout << "Day " << day << " = " << dayName << endl << endl;
 
-    // ── Nested conditions and short-circuit ────────────────────
+    cout << "Day " << day << " = " << name << endl;
+    return 0;
+}`;
+
+const TERNARY_CODE = `#include <iostream>
+using namespace std;
+
+// __OUTPUT__: abs(-7) = 7\\nsign of 42 = positive\\nmax(3, 9) = 9
+
+int main() {
+    int x = -7;
+    int abs_x = (x >= 0) ? x : -x;
+    cout << "abs(" << x << ") = " << abs_x << endl;
+
     int n = 42;
-    string sign;
-    if (n > 0)      sign = "positive";
-    else if (n < 0) sign = "negative";
-    else            sign = "zero";
-    cout << "Sign: " << sign << endl;
+    string sign = (n > 0) ? "positive" : (n < 0) ? "negative" : "zero";
+    cout << "sign of " << n << " = " << sign << endl;
 
-    // Ternary for absolute value
-    int abs_n = (n >= 0) ? n : -n;
-    cout << "Absolute value: " << abs_n << endl;
+    int a = 3, b = 9;
+    int bigger = (a > b) ? a : b;
+    cout << "max(" << a << ", " << b << ") = " << bigger << endl;
 
+    return 0;
+}`;
+
+const GUARD_CODE = `#include <iostream>
+#include <string>
+using namespace std;
+
+// __OUTPUT__: Score 110 rejected: out of range\\nScore 85 -> Grade B
+
+string getGrade(int score) {
+    // Guard clauses: reject invalid input first, at low indent
+    if (score < 0 || score > 100) {
+        return "rejected: out of range";
+    }
+    // Main logic is flat — no nesting needed
+    if (score >= 90) return "A";
+    if (score >= 80) return "B";
+    if (score >= 70) return "C";
+    if (score >= 60) return "D";
+    return "F";
+}
+
+int main() {
+    cout << "Score 110 " << getGrade(110) << endl;
+    cout << "Score 85 -> Grade " << getGrade(85) << endl;
     return 0;
 }`;
 
@@ -56,7 +97,7 @@ const lesson = {
   chapter: "cpp-0",
   order: 5,
   title: "Branching",
-  subtitle: "Control which code runs with if/else, switch, and the ternary operator",
+  subtitle: "if/else, switch, ternary, and guard clauses — make decisions in code",
   tags: ["c++", "cpp", "if", "else", "switch", "ternary", "conditional", "branching"],
   aliases: [
     "c++ if else",
@@ -66,31 +107,33 @@ const lesson = {
     "c++ control flow",
   ],
 
-  hook: `Programs that always do the same thing regardless of input aren't useful. Branching lets your code make decisions — respond differently to different inputs, handle errors, follow different code paths. Every non-trivial program is a tree of branches, and understanding how to structure them cleanly separates maintainable code from spaghetti.`,
+  hook: `Programs that always do the same thing regardless of input aren't useful. Branching makes code respond to data. Every non-trivial program is a tree of decisions — learning to structure those decisions cleanly is what separates readable code from spaghetti.`,
 
   mentalModel: [
-    "**`if` evaluates a boolean expression and executes the block if true.** The expression in `if (expr)` can be any expression that's convertible to bool: comparisons (`x > 0`), logical combinations (`x > 0 && x < 10`), even plain integers (0 is false, everything else is true). The block is `{ }` — single statements don't technically need braces, but always use them: it prevents bugs when you add lines later.",
-    "**`else if` chains test conditions in order, stopping at the first true one.** Only one branch executes. The conditions are tested sequentially: once `score >= 90` is true, the `else if (score >= 80)` block is not entered — even though 95 ≥ 80 as well. Structure your chains from most specific (or most restrictive) to least specific.",
-    "**`switch` compares one value against integer constants.** It compiles to a jump table — O(1) regardless of how many cases — making it faster than a chain of `if/else` for large case sets. Always include `break` to prevent **fallthrough** (execution continuing into the next case). Use fallthrough intentionally by omitting `break` when multiple cases share behavior.",
+    "**`if/else if/else` tests conditions in order and runs the first matching branch.** Once a true condition is found, all remaining branches are skipped. Structure chains from most restrictive to least restrictive — `score >= 90` before `score >= 80` — or every high score will match the first condition.",
+    "**`switch` matches one integer value against constants.** It compiles to a jump table — O(1) lookup. Always add `break` after each case or execution falls through into the next. Use `default` to handle unexpected values. `switch` only works on integral types: `int`, `char`, `enum` — not `string` or `double`.",
+    "**The ternary `cond ? a : b` is an expression that produces a value.** Unlike `if`, it can appear inside other expressions: `cout << (x > 0 ? \"pos\" : \"neg\")`. Use it for simple value selection. Use `if/else` when you have multiple statements or complex logic.",
   ],
 
   intuition: {
     prose: [
-      "An `if-else if-else` chain is a decision tree. When grading, you don't ask 'is it A?', 'is it B?', 'is it C?' independently — you ask them in sequence and commit to the first true answer. The compiler generates this as a series of conditional jumps. The CPU evaluates the condition, and if true, jumps over the `else` branch to the code after. Branch prediction hardware in modern CPUs tries to guess which branch will be taken, often achieving near-zero penalty for predictable branches.",
-      "The **ternary operator** `condition ? true_value : false_value` is a compact expression that evaluates to one of two values. It's an *expression* (produces a value) unlike `if` (a *statement*). This means you can use it inside a larger expression: `cout << (x > 0 ? \"positive\" : \"negative\")`. Use it for simple value selection; use `if/else` for complex logic with multiple statements.",
-      "**`switch` is specifically for integer-typed values.** The expression in `switch (expr)` must be integral (int, char, enum, bool, long). Each `case` label must be an integer *constant expression* (no variables, no ranges). If you forget `break`, execution falls through to the next case — this is a common bug but also an intentional pattern: `case 'a': case 'A':` to handle both uppercase and lowercase.",
-      "**Nested conditions become hard to read quickly.** When you have `if` inside `if` inside `if`, the cyclomatic complexity explodes. A useful technique: **early return** (or 'guard clauses') — check error conditions or edge cases first and return/break immediately, leaving the main logic at a low indentation level. This flattens the code tree and makes the happy path obvious.",
+      "**if/else if/else is a decision chain.** Conditions are tested in order — only the first true one executes. Changing a score from 85 to 95 should change the grade from B to A. Run the code and verify it does.",
     ],
     visualizations: [
       {
         id: "CppLab",
-        mathBridge:
-          "**Experiment with branching:**\n\n1. Change `score = 85` to `score = 95`, `70`, `59` — does the grade update correctly?\n2. Change `day = 3` to `day = 7` — do you see `Weekend`?\n3. Remove a `break` from the switch — observe fallthrough behavior\n4. Try the ternary for a 3-way comparison: `(x > 0) ? 1 : (x < 0) ? -1 : 0`\n5. What happens if you `switch` on a `double`? (Hint: compile error — switch requires integral type)",
+        mathBridge: "**Run it — then experiment:**\n\n- Change `score = 85` to `95`, `79`, `65`, `55` — does the grade update correctly?\n- What happens if you change the order of else-if branches (put `>= 80` before `>= 90`)? Try it.\n- Change the ternary `score >= 60` to test against a different threshold.\n- Add a check at the top: `if (score < 0 || score > 100)` — print an error and return early.",
         props: {
           mainFile: "main.cpp",
-          initialFiles: {
-            "/home/user/main.cpp": BRANCH_CODE,
-          },
+          initialFiles: { "/home/user/main.cpp": IF_CODE },
+        },
+      },
+      {
+        id: "CppLab",
+        mathBridge: "**switch — run it then explore:**\n\n- Change `day = 3` to `7` — do you see `Weekend`?\n- Remove the `break` after `case 3` — what happens? This is fallthrough.\n- Try grouping cases: `case 6: case 7: name = \"Weekend\"; break;` — both match.\n- Try switching on a `char`: `char c = 'A'; switch(c)` — does it compile? switch works on any integral type.",
+        props: {
+          mainFile: "main.cpp",
+          initialFiles: { "/home/user/main.cpp": SWITCH_CODE },
         },
       },
     ],
@@ -98,87 +141,60 @@ const lesson = {
 
   rigor: {
     prose: [
-      "**Dangling else.** In `if (a) if (b) stmt1; else stmt2;`, the `else` binds to the nearest `if` — so it pairs with `if (b)`, not `if (a)`. This is called the dangling else problem and is a historic source of bugs. The C++ grammar resolves it unambiguously, but it's confusing. Always use braces: `if (a) { if (b) { stmt1; } else { stmt2; } }`. Your intent is unambiguous.",
-      "**Switch fallthrough is an intentional feature with accidental-use traps.** When you omit `break`, execution continues into the next case's code. This is useful for grouping cases with identical behavior. Since C++17, you can annotate intentional fallthrough with `[[fallthrough]];` — the compiler will then warn about unintentional fallthrough but stay silent for annotated ones. Always add `default:` to `switch` to handle unexpected values.",
-      "**Constexpr `if` (C++17) evaluates at compile time.** `if constexpr (condition)` is evaluated by the compiler: the false branch is not compiled at all (only checked for syntax). This is powerful in templates where different types need different code paths. The ordinary `if` evaluates at runtime — `if constexpr` is a compile-time switch. This removes template specialization boilerplate in many cases.",
+      "**Ternary as an expression.** The key difference: `if` is a statement, ternary is an expression. That means you can use it anywhere a value is expected — in `cout <<`, in initialization, in function arguments. `int abs = (x >= 0) ? x : -x;` is idiomatic. Chain them for 3-way comparisons: `(n > 0) ? \"pos\" : (n < 0) ? \"neg\" : \"zero\"`.",
+      "**Guard clauses flatten nested code.** When you check error conditions at the top and return early, the main logic stays at low indentation. Compare deep nesting vs guard clauses — the guard version is easier to read because the happy path is always at the lowest indent level. Every extra level of nesting adds cognitive load.",
+    ],
+    visualizations: [
+      {
+        id: "CppLab",
+        mathBridge: "**Ternary — run it then explore:**\n\n- What does `(a > b) ? a : b` compute for other values? Try `a=10, b=5` and `a=5, b=10`.\n- Write a `clamp` using nested ternaries: `int clamped = (x < 0) ? 0 : (x > 100) ? 100 : x;`\n- Try `cout << ((x > 0) ? \"pos\" : \"non-pos\") << endl;` — ternary directly in cout.\n- What type does `(true) ? 1 : 2.5` produce? (Hint: the compiler finds a common type)",
+        props: {
+          mainFile: "main.cpp",
+          initialFiles: { "/home/user/main.cpp": TERNARY_CODE },
+        },
+      },
+      {
+        id: "CppLab",
+        mathBridge: "**Guard clauses — run it then explore:**\n\n- Try `getGrade(-5)` and `getGrade(101)` — does the guard reject them?\n- Remove the guard clause and see how the function would need to be restructured with nested ifs.\n- Add another guard: reject scores exactly 0 with a specific message `\"zero score\"`.\n- Add a function `string classify(int n)` that returns \"negative\", \"zero\", or \"positive\" using guard clauses.",
+        props: {
+          mainFile: "main.cpp",
+          initialFiles: { "/home/user/main.cpp": GUARD_CODE },
+        },
+      },
     ],
     callouts: [
       {
         type: "warning",
-        title: "Forgetting break in switch causes fallthrough",
-        body: "If you omit `break` in a `case`, execution falls through to the next case's code — even if the next case label doesn't match. This silently executes extra code. Use `break` after every case unless fallthrough is intentional, and annotate intentional fallthrough with `[[fallthrough]];` (C++17).",
-      },
-      {
-        type: "info",
-        title: "switch vs if-else performance",
-        body: "For small case counts (2-4), `if-else` and `switch` generate similar code. For larger counts, `switch` compiles to a jump table — O(1) lookup regardless of case count. This makes `switch` much faster for things like parsing event types, state machines, or command dispatching with many cases.",
+        title: "Forgetting break causes switch fallthrough",
+        body: "Without `break`, execution continues into the next case's statements. This is a common silent bug. Mark intentional fallthrough with `[[fallthrough]];` (C++17) so the compiler warns about accidental cases.",
       },
       {
         type: "tip",
-        title: "Guard clauses flatten nested code",
-        body: "Instead of deeply nested `if`s, check error cases early and return:\n```cpp\n// Nested (hard to read)\nif (ptr != nullptr) {\n  if (ptr->value > 0) {\n    // ... main logic\n  }\n}\n// Guard clause (easy to read)\nif (ptr == nullptr) return;\nif (ptr->value <= 0) return;\n// ... main logic\n```",
+        title: "Guard clauses keep nesting shallow",
+        body: "Check invalid/edge cases first and return early. The main logic then runs flat, without deep nesting. A function with 3+ levels of `if` nesting is usually a sign you should add guard clauses or split into smaller functions.",
       },
     ],
   },
 
   examples: [
     {
-      title: "Grading system with all branches covered",
-      body: `int score;
-cin >> score;
-
-if (score < 0 || score > 100) {
-    cout << "Invalid score" << endl;
-} else if (score >= 90) {
-    cout << "A — Excellent" << endl;
-} else if (score >= 80) {
-    cout << "B — Good" << endl;
-} else if (score >= 70) {
-    cout << "C — Satisfactory" << endl;
-} else if (score >= 60) {
-    cout << "D — Passing" << endl;
-} else {
-    cout << "F — Failing" << endl;
+      title: "FizzBuzz — classic branching exercise",
+      body: `for (int i = 1; i <= 20; i++) {
+    if      (i % 15 == 0) cout << "FizzBuzz\\n";
+    else if (i % 3 == 0)  cout << "Fizz\\n";
+    else if (i % 5 == 0)  cout << "Buzz\\n";
+    else                  cout << i << "\\n";
 }`,
     },
     {
-      title: "Switch with intentional fallthrough",
-      body: `char c;
-cin >> c;
-
+      title: "Vowel/consonant with switch fallthrough",
+      body: `char c = 'e';
 switch (c) {
     case 'a': case 'e': case 'i': case 'o': case 'u':
-    case 'A': case 'E': case 'I': case 'O': case 'U':
-        cout << c << " is a vowel" << endl;
-        break;
-    case ' ': case '\\t': case '\\n':
-        cout << c << " is whitespace" << endl;
+        cout << c << " is a vowel\\n";
         break;
     default:
-        if (isalpha(c))
-            cout << c << " is a consonant" << endl;
-        else
-            cout << c << " is a punctuation/digit" << endl;
-}`,
-    },
-    {
-      title: "Ternary chains and complex conditions",
-      body: `int x = 15;
-
-// Ternary for sign function (-1, 0, 1)
-int sign = (x > 0) ? 1 : (x < 0) ? -1 : 0;
-
-// Compound boolean conditions
-int a = 5, b = 10, c = 3;
-bool inRange = (a >= 0 && a <= 10);      // range check
-bool anyNeg  = (a < 0 || b < 0 || c < 0); // any negative
-
-// FizzBuzz (classic interview example)
-for (int i = 1; i <= 20; i++) {
-    if (i % 15 == 0)      cout << "FizzBuzz" << endl;
-    else if (i % 3 == 0)  cout << "Fizz" << endl;
-    else if (i % 5 == 0)  cout << "Buzz" << endl;
-    else                  cout << i << endl;
+        cout << c << " is not a vowel\\n";
 }`,
     },
   ],
@@ -187,26 +203,25 @@ for (int i = 1; i <= 20; i++) {
     {
       difficulty: "easy",
       problem:
-        "Write a BMI calculator. Read weight (kg) and height (m), compute BMI = weight / (height * height), then classify: < 18.5 = Underweight, 18.5–25 = Normal, 25–30 = Overweight, ≥ 30 = Obese. Print the BMI value and category.",
-      hint: "Use `if / else if / else`. Remember to use `double` for the inputs to avoid integer division.",
+        "Write a BMI calculator. Read weight (kg) and height (m), compute `BMI = weight / (height * height)`, then classify: < 18.5 = Underweight, 18.5–25 = Normal, 25–30 = Overweight, >= 30 = Obese. Print the BMI value and category.",
+      hint: "Use `if/else if/else`. Use `double` for inputs to avoid integer division.",
       walkthrough: [
-        "Read `double weight, height` from cin",
-        "Compute `double bmi = weight / (height * height)`",
+        "Read double weight, height from cin",
+        "Compute double bmi = weight / (height * height)",
         "Chain if/else if/else to classify",
-        "Print bmi and the category string",
+        "Print bmi and category",
       ],
     },
     {
       difficulty: "medium",
       problem:
-        "Build a simple text-based menu using switch. Print: `1. Add  2. Subtract  3. Multiply  4. Quit`. Read choice, then read two numbers for options 1-3 and perform the operation. For 4, print `Goodbye!`. For invalid input, print `Invalid choice`. Use the `default` case.",
-      hint: "Read an `int choice` first, then switch on it. Read the numbers inside cases 1-3.",
+        "Build a simple calculator using switch. Read two numbers and an operator character (`+`, `-`, `*`, `/`). Use switch on the operator to compute and print the result. Handle division by zero as a special case. Use a `default` case for unknown operators.",
+      hint: "Read `char op; double a, b; cin >> a >> op >> b;` then `switch(op)`.",
       walkthrough: [
-        "Print the menu using cout",
-        "Read int choice with cin",
-        "switch(choice) with cases 1-4 and default",
-        "For cases 1-3, read two doubles inside the case and compute",
-        "Don't forget `break` after each case",
+        "cin >> a >> op >> b",
+        "switch(op) with cases '+', '-', '*', '/'",
+        "For '/': check if b == 0 first",
+        "Default case: print unknown operator",
       ],
     },
   ],
@@ -216,30 +231,30 @@ for (int i = 1; i <= 20; i++) {
       {
         id: "cpp0-005-q1",
         type: "choice",
-        text: "In an if-else if chain, how many branches execute when the first condition is true?",
+        text: "In an if-else if-else chain, how many branches execute when the first condition is true?",
         options: [
-          "All conditions are still checked",
-          "Only the first matching branch executes, then control jumps past the chain",
-          "The matching branch and all subsequent else-if branches",
-          "It depends on whether the conditions overlap",
+          "All conditions are checked",
+          "Only the first matching branch, then control jumps past the chain",
+          "The matching branch and all subsequent ones",
+          "It depends on whether conditions overlap",
         ],
         answer: 1,
         explanation:
-          "Only one branch in an if-else if-else chain executes. Once a true condition is found, its block runs and all remaining else-if and else blocks are skipped. Conditions after the first true one are never evaluated.",
+          "Only one branch executes. Once a true condition is found, its block runs and all remaining else-if and else blocks are skipped.",
       },
       {
         id: "cpp0-005-q2",
         type: "choice",
         text: "What happens in a switch when you omit `break` from a case?",
         options: [
-          "The program exits the switch and continues after it",
+          "Control exits the switch",
           "A compile error",
           "Execution falls through and runs the next case's code",
           "The switch restarts from case 1",
         ],
         answer: 2,
         explanation:
-          "Without `break`, execution falls through to the next case's statements — the case label is ignored. This continues until a `break` or the end of the switch. It's a common bug; use `[[fallthrough]]` to mark intentional fallthrough.",
+          "Without `break`, execution falls through — the next case's statements run even if that case label didn't match. Mark intentional fallthrough with `[[fallthrough]]`.",
       },
       {
         id: "cpp0-005-q3",
@@ -253,7 +268,7 @@ for (int i = 1; i <= 20; i++) {
         ],
         answer: 2,
         explanation:
-          "`switch` requires an integral (integer-valued) expression: `int`, `char`, `enum`, `bool`, `long`, and similar. You cannot switch on `double`, `string`, or other non-integral types — those require if-else chains.",
+          "`switch` requires an integral expression. You cannot switch on `double`, `float`, or `string` — use if-else for those.",
       },
       {
         id: "cpp0-005-q4",
@@ -267,7 +282,7 @@ for (int i = 1; i <= 20; i++) {
         ],
         answer: 1,
         explanation:
-          "The ternary `(a > b) ? a : b` evaluates to `a` if `a > b`, otherwise `b`. So it returns the larger of the two — the maximum. This is a common idiom.",
+          "The ternary evaluates to `a` when `a > b`, otherwise `b`. This returns the larger of the two — the maximum.",
       },
     ],
   },
