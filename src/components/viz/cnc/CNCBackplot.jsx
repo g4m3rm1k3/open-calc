@@ -5,12 +5,14 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 export default function CNCBackplot({
   pathPoints = [],
   currentStep = 0,
+  activeChannel = 0,
   isDark = true,
   width = "100%",
   height = "400px",
   toolDiameter = 10,
   toolLength = 75,
   toolLenCut = null,
+  stockShape = "box",
   stockDimensions = { width: 100, height: 80, depth: 40 },
   stockOrigin = { x: 0, y: 0, z: 0 },
   showStock = true,
@@ -36,6 +38,7 @@ export default function CNCBackplot({
     feed: isDark ? 0x38bdf8 : 0x2563eb, // G01/02/03
     stockFill: isDark ? 0x3b82f6 : 0x2563eb,
     stockEdge: isDark ? 0x93c5fd : 0x1d4ed8,
+    channels: [0x63b8ff, 0x46d89f, 0xf0b44c, 0xb89cff],
   };
 
   // ── Bootstrap Three.js (once) ─────────────────────────────────────────────
@@ -161,35 +164,62 @@ export default function CNCBackplot({
     clearGroup(group);
     if (!showStock) return;
 
-    const w = Math.max(stockDimensions?.width ?? 100, 0.1);
-    const h = Math.max(stockDimensions?.height ?? 80, 0.1);
-    const d = Math.max(stockDimensions?.depth ?? 40, 0.1);
     const ox = stockOrigin?.x ?? 0;
     const oy = stockOrigin?.y ?? 0;
     const oz = stockOrigin?.z ?? 0;
+    const stockMat = new THREE.MeshPhongMaterial({
+      color: colors.stockFill,
+      transparent: true,
+      opacity: isDark ? 0.22 : 0.18,
+      shininess: 40,
+    });
 
-    const mesh = new THREE.Mesh(
-      new THREE.BoxGeometry(w, h, d),
-      new THREE.MeshPhongMaterial({
-        color: colors.stockFill,
-        transparent: true,
-        opacity: isDark ? 0.22 : 0.18,
-        shininess: 40,
-      }),
-    );
-    mesh.position.set(ox + w / 2, oy + h / 2, oz + d / 2);
-    group.add(mesh);
+    let center = new THREE.Vector3(ox, oy, oz);
+    let maxDim = 20;
 
-    const edges = new THREE.LineSegments(
-      new THREE.EdgesGeometry(new THREE.BoxGeometry(w, h, d)),
-      new THREE.LineBasicMaterial({ color: colors.stockEdge }),
-    );
-    edges.position.copy(mesh.position);
-    group.add(edges);
+    if (stockShape === "cylinder") {
+      const len = Math.max(stockDimensions?.length ?? 150, 0.1);
+      const dia = Math.max(stockDimensions?.diameter ?? 80, 0.1);
+      const radius = dia / 2;
+      const mesh = new THREE.Mesh(
+        new THREE.CylinderGeometry(radius, radius, len, 64, 1, false),
+        stockMat,
+      );
+      // Three.js cylinder is Y-axis by default; rotate so axis aligns with X (lathe Z)
+      mesh.rotation.z = Math.PI / 2;
+      mesh.position.set(ox + len / 2, oy, oz + radius);
+      group.add(mesh);
+
+      const edges = new THREE.LineSegments(
+        new THREE.EdgesGeometry(new THREE.CylinderGeometry(radius, radius, len, 32)),
+        new THREE.LineBasicMaterial({ color: colors.stockEdge }),
+      );
+      edges.rotation.copy(mesh.rotation);
+      edges.position.copy(mesh.position);
+      group.add(edges);
+
+      center = mesh.position.clone();
+      maxDim = Math.max(len, dia, 20);
+    } else {
+      const w = Math.max(stockDimensions?.width ?? 100, 0.1);
+      const h = Math.max(stockDimensions?.height ?? 80, 0.1);
+      const d = Math.max(stockDimensions?.depth ?? 40, 0.1);
+      const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), stockMat);
+      mesh.position.set(ox + w / 2, oy + h / 2, oz + d / 2);
+      group.add(mesh);
+
+      const edges = new THREE.LineSegments(
+        new THREE.EdgesGeometry(new THREE.BoxGeometry(w, h, d)),
+        new THREE.LineBasicMaterial({ color: colors.stockEdge }),
+      );
+      edges.position.copy(mesh.position);
+      group.add(edges);
+
+      center = mesh.position.clone();
+      maxDim = Math.max(w, h, d, 20);
+    }
 
     if (!pathPoints.length && cameraRef.current && controlsRef.current) {
-      const center = new THREE.Vector3(ox + w / 2, oy + h / 2, oz + d / 2);
-      const maxDim = Math.max(w, h, d, 20);
       const dist = maxDim * 2.2;
       cameraRef.current.position.set(
         center.x + dist * 0.7,
@@ -199,7 +229,14 @@ export default function CNCBackplot({
       controlsRef.current.target.copy(center);
       controlsRef.current.update();
     }
-  }, [stockDimensions, stockOrigin, showStock, isDark, pathPoints.length]);
+  }, [
+    stockShape,
+    stockDimensions,
+    stockOrigin,
+    showStock,
+    isDark,
+    pathPoints.length,
+  ]);
 
   // ── Rebuild path ──────────────────────────────────────────────────────────
   useEffect(() => {
@@ -214,7 +251,7 @@ export default function CNCBackplot({
       return;
     }
 
-    // Group segments by motion mode to draw with different colors
+    // Group segments by motion mode + channel so multichannel traces stay distinct
     const segments = [];
     let currentSegment = {
       points: [
@@ -225,18 +262,21 @@ export default function CNCBackplot({
         ),
       ],
       mode: pathPoints[0].motionMode || "G00",
+      channelId: pathPoints[0].channelId ?? 0,
     };
 
     for (let i = 1; i < pathPoints.length; i++) {
       const pt = pathPoints[i];
       const v = new THREE.Vector3(pt.machineX, pt.machineY, pt.machineZ);
       const mode = pt.motionMode || "G00";
+      const channelId = pt.channelId ?? 0;
 
-      if (mode !== currentSegment.mode) {
+      if (mode !== currentSegment.mode || channelId !== currentSegment.channelId) {
         segments.push(currentSegment);
         currentSegment = {
           points: [currentSegment.points[currentSegment.points.length - 1], v],
           mode,
+          channelId,
         };
       } else {
         currentSegment.points.push(v);
@@ -246,7 +286,9 @@ export default function CNCBackplot({
 
     segments.forEach((seg) => {
       const geo = new THREE.BufferGeometry().setFromPoints(seg.points);
-      const color = seg.mode === "G00" ? colors.rapid : colors.feed;
+      const channelColor =
+        colors.channels[seg.channelId % colors.channels.length] || colors.feed;
+      const color = seg.mode === "G00" ? colors.rapid : channelColor;
       const mat = new THREE.LineBasicMaterial({ color, linewidth: 2 });
       const line = new THREE.Line(geo, mat);
       group.add(line);
@@ -297,9 +339,14 @@ export default function CNCBackplot({
   // Move tool
   useEffect(() => {
     if (!toolRef.current || pathPoints.length === 0) return;
-    const pt = pathPoints[Math.min(currentStep, pathPoints.length - 1)];
+    const targetIndex = Math.min(currentStep, pathPoints.length - 1);
+    let pt = pathPoints[targetIndex];
+    const fallback = [...pathPoints].reverse().find((p) => p.channelId === activeChannel);
+    if ((pt?.channelId ?? activeChannel) !== activeChannel && fallback) {
+      pt = fallback;
+    }
     if (pt) toolRef.current.position.set(pt.machineX, pt.machineY, pt.machineZ);
-  }, [currentStep, pathPoints]);
+  }, [currentStep, pathPoints, activeChannel]);
 
   return (
     <div

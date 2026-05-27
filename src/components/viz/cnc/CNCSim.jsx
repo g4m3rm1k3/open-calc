@@ -3540,15 +3540,17 @@ export default function CNCSimPro() {
   const activeT = tools[ms.activeT];
   const activeTool = activeT || tools[1] || null;
   const currentChannel = channelStates[activeChannel];
+  const backplotIs3D = vpView === "iso";
   const backplotPathPoints = useMemo(
     () =>
       pathPts.map((p) => ({
-        machineX: p.x ?? 0,
-        machineY: p.y ?? 0,
-        machineZ: p.z ?? 0,
+        machineX: mach.isLathe ? p.z ?? 0 : p.x ?? 0,
+        machineY: mach.isLathe ? 0 : p.y ?? 0,
+        machineZ: mach.isLathe ? (p.x ?? 0) / 2 : p.z ?? 0,
         motionMode: p.m ?? p.motionMode ?? "G00",
+        channelId: p.channelId ?? 0,
       })),
-    [pathPts],
+    [pathPts, mach.isLathe],
   );
   const backplotCurrentStep = useMemo(() => {
     if (!pathPts.length) return 0;
@@ -3568,20 +3570,41 @@ export default function CNCSimPro() {
       ? ((activeTool?.lc ?? activeTool?.lt) || null) / unitScale
       : null;
   const backplotStockDimensions = useMemo(
-    () => ({
-      width: (stock.width ?? 100) / unitScale,
-      height: (stock.height ?? 80) / unitScale,
-      depth: (stock.depth ?? 40) / unitScale,
-    }),
-    [stock.width, stock.height, stock.depth, unitScale],
+    () =>
+      stock.shape === "cyl"
+        ? {
+            length: (stock.length ?? 150) / unitScale,
+            diameter: (stock.diameter ?? 80) / unitScale,
+          }
+        : {
+            width: (stock.width ?? 100) / unitScale,
+            height: (stock.height ?? 80) / unitScale,
+            depth: (stock.depth ?? 40) / unitScale,
+          },
+    [
+      stock.shape,
+      stock.length,
+      stock.diameter,
+      stock.width,
+      stock.height,
+      stock.depth,
+      unitScale,
+    ],
   );
   const backplotStockOrigin = useMemo(
-    () => ({
-      x: (stock.x ?? 0) / unitScale,
-      y: (stock.y ?? 0) / unitScale,
-      z: (stock.z ?? 0) / unitScale,
-    }),
-    [stock.x, stock.y, stock.z, unitScale],
+    () =>
+      stock.shape === "cyl"
+        ? {
+            x: (stock.z ?? 0) / unitScale,
+            y: 0,
+            z: (stock.x ?? 0) / unitScale,
+          }
+        : {
+            x: (stock.x ?? 0) / unitScale,
+            y: (stock.y ?? 0) / unitScale,
+            z: (stock.z ?? 0) / unitScale,
+          },
+    [stock.shape, stock.x, stock.y, stock.z, unitScale],
   );
 
   const moveProjectFile = useCallback(
@@ -4919,11 +4942,11 @@ export default function CNCSimPro() {
               <div style={{ flex: 1 }} />
               {mach.isLathe ? (
                 <>
+                  <button className="vp-btn" onClick={() => setVPView("iso")}>
+                    ISO
+                  </button>
                   <button className="vp-btn" onClick={() => setVPView("lathe")}>
                     ZX
-                  </button>
-                  <button className="vp-btn" onClick={() => setVPView("top")}>
-                    Top-ZX
                   </button>
                 </>
               ) : (
@@ -4952,16 +4975,18 @@ export default function CNCSimPro() {
             </div>
 
             <div id="vpWrap" ref={vpRef}>
-              {!mach.isLathe && vpView === "iso" ? (
+              {backplotIs3D ? (
                 <CNCBackplot
                   pathPoints={backplotPathPoints}
                   currentStep={backplotCurrentStep}
+                  activeChannel={activeChannel}
                   width="100%"
                   height="100%"
                   isDark={dark}
                   toolDiameter={backplotToolDiameter}
                   toolLength={backplotToolLength}
                   toolLenCut={backplotToolLenCut}
+                  stockShape={stock.shape === "cyl" ? "cylinder" : "box"}
                   stockDimensions={backplotStockDimensions}
                   stockOrigin={backplotStockOrigin}
                   showStock={layers.stock}
@@ -5015,14 +5040,14 @@ export default function CNCSimPro() {
                 )}
                 <br />
                 Feed: <span>{ms.feed}</span> &nbsp; RPM: <span>{ms.rpm}</span>
-                {mach.isLathe && (
+                {!backplotIs3D && mach.isLathe && (
                   <>
                     <br />
                     Left-drag: pan · Scroll: zoom · Right-click to finish
                     contour
                   </>
                 )}
-                {!mach.isLathe && (
+                {backplotIs3D && (
                   <>
                     <br />
                     Left-drag: rotate · Right-drag: pan · Scroll: zoom
