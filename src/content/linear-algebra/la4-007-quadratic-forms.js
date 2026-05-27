@@ -1,28 +1,34 @@
-export default {
+﻿export default {
   id: 'la4-007',
   slug: 'quadratic-forms',
   chapter: 'la4',
   order: 7,
   title: 'Quadratic Forms and the Principal Axes Theorem',
-  subtitle: 'Every expression $\\mathbf{x}^\\top A \\mathbf{x}$ with symmetric $A$ is a quadratic form — a generalization of $ax^2 + bxy + cy^2$. The Principal Axes Theorem rotates the coordinate system to eliminate the cross terms.',
+  subtitle: 'Every expression $\\mathbf{x}^\\top A \\mathbf{x}$ with symmetric $A$ is a quadratic form â€” a generalization of $ax^2 + bxy + cy^2$. The Principal Axes Theorem rotates the coordinate system to eliminate the cross terms.',
   tags: ['quadratic form', 'positive definite', 'positive semidefinite', 'indefinite', 'principal axes', 'conics', 'classification', 'definiteness'],
   aliases: 'quadratic form positive definite negative definite indefinite principal axes theorem conics ellipse hyperbola classification',
 
   hook: {
-    question: "The equation $3x^2 + 4xy + 3y^2 = 1$ is a conic section — but which one? An ellipse, a hyperbola, or something else? How do you tell without graphing it?",
+    question: "The equation $3x^2 + 4xy + 3y^2 = 1$ is a conic section â€” but which one? An ellipse, a hyperbola, or something else? How do you tell without graphing it?",
     realWorldContext: "Quadratic forms are everywhere in optimization: the second-order Taylor approximation of any smooth function is a quadratic form, and whether that function has a local minimum, maximum, or saddle point depends entirely on whether the Hessian (a symmetric matrix) is positive definite, negative definite, or indefinite. In physics, quadratic forms represent energy: kinetic energy $\\frac{1}{2}\\mathbf{v}^\\top M \\mathbf{v}$ and potential energy $\\frac{1}{2}\\mathbf{x}^\\top K \\mathbf{x}$ where $M$ and $K$ are the mass and stiffness matrices. The structure of these quadratic forms determines whether a system oscillates, decays, or blows up.",
-    previewVisualizationId: 'OpenMatNotebook',
   },
 
   intuition: {
     prose: [
-      'Take $Q(x,y) = 3x^2 + 4xy + 3y^2$. Evaluate at a few points: $Q(1,0) = 3$, $Q(0,1) = 3$, $Q(1,1) = 10$, $Q(1,-1) = 2$ — always positive. Write it as $Q(\\mathbf{x}) = \\mathbf{x}^\\top A\\mathbf{x}$ with $A = \\begin{bmatrix}3&2\\\\2&3\\end{bmatrix}$ (off-diagonal entry = half the $xy$ coefficient: $4/2 = 2$). Eigenvalues of $A$: $(3-\\lambda)^2 - 4 = 0 \\Rightarrow \\lambda = 1, 5$ — both positive. Now try $Q(x,y) = 2x^2 + 6xy + 2y^2$ with $A = \\begin{bmatrix}2&3\\\\3&2\\end{bmatrix}$: eigenvalues $\\lambda = -1$ and $5$ (mixed signs). Check: $Q(1,1) = 10 > 0$ but $Q(1,-1) = -2 < 0$ — the form takes both signs. The eigenvalue signs completely encode the geometry of the level set $Q(\\mathbf{x}) = c$.',
-      '**Definiteness classifies the form.** A quadratic form (and its matrix $A$) is:\n- **Positive definite (PD):** $Q(\\mathbf{x}) > 0$ for all $\\mathbf{x} \\neq 0$ — all eigenvalues positive\n- **Positive semidefinite (PSD):** $Q(\\mathbf{x}) \\geq 0$ for all $\\mathbf{x}$ — all eigenvalues $\\geq 0$\n- **Negative definite (ND):** $Q(\\mathbf{x}) < 0$ for all $\\mathbf{x} \\neq 0$ — all eigenvalues negative\n- **Indefinite:** $Q$ takes both positive and negative values — mixed eigenvalue signs',
-      '**The Principal Axes Theorem.** By the Spectral Theorem, $A = Q\\Lambda Q^\\top$. Change variables: $\\mathbf{x} = Q\\mathbf{y}$ (rotate to the eigenvector coordinate system). Then:\n\n$Q(\\mathbf{x}) = \\mathbf{x}^\\top A \\mathbf{x} = (Q\\mathbf{y})^\\top A (Q\\mathbf{y}) = \\mathbf{y}^\\top Q^\\top A Q \\mathbf{y} = \\mathbf{y}^\\top \\Lambda \\mathbf{y} = \\lambda_1 y_1^2 + \\cdots + \\lambda_n y_n^2$\n\nIn the rotated coordinates, the cross terms vanish. The form is purely diagonal — just a sum of scaled squares.',
+      'Take $Q(x,y) = 3x^2 + 4xy + 3y^2$. Evaluate at a few points: $Q(1,0) = 3$, $Q(0,1) = 3$, $Q(1,1) = 10$, $Q(1,-1) = 2$ â€” always positive. Write it as $Q(\\mathbf{x}) = \\mathbf{x}^\\top A\\mathbf{x}$ with $A = \\begin{bmatrix}3&2\\\\2&3\\end{bmatrix}$ (off-diagonal entry = half the $xy$ coefficient: $4/2 = 2$). Eigenvalues of $A$: $(3-\\lambda)^2 - 4 = 0 \\Rightarrow \\lambda = 1, 5$ â€” both positive. Now try $Q(x,y) = 2x^2 + 6xy + 2y^2$ with $A = \\begin{bmatrix}2&3\\\\3&2\\end{bmatrix}$: eigenvalues $\\lambda = -1$ and $5$ (mixed signs). Check: $Q(1,1) = 10 > 0$ but $Q(1,-1) = -2 < 0$ â€” the form takes both signs. The eigenvalue signs completely encode the geometry of the level set $Q(\\mathbf{x}) = c$.',
+      '**Definiteness classifies the form.** A quadratic form (and its matrix $A$) is:\n- **Positive definite (PD):** $Q(\\mathbf{x}) > 0$ for all $\\mathbf{x} \\neq 0$ â€” all eigenvalues positive\n- **Positive semidefinite (PSD):** $Q(\\mathbf{x}) \\geq 0$ for all $\\mathbf{x}$ â€” all eigenvalues $\\geq 0$\n- **Negative definite (ND):** $Q(\\mathbf{x}) < 0$ for all $\\mathbf{x} \\neq 0$ â€” all eigenvalues negative\n- **Indefinite:** $Q$ takes both positive and negative values â€” mixed eigenvalue signs',
+      '**The Principal Axes Theorem.** By the Spectral Theorem, $A = Q\\Lambda Q^\\top$. Change variables: $\\mathbf{x} = Q\\mathbf{y}$ (rotate to the eigenvector coordinate system). Then:\n\n$Q(\\mathbf{x}) = \\mathbf{x}^\\top A \\mathbf{x} = (Q\\mathbf{y})^\\top A (Q\\mathbf{y}) = \\mathbf{y}^\\top Q^\\top A Q \\mathbf{y} = \\mathbf{y}^\\top \\Lambda \\mathbf{y} = \\lambda_1 y_1^2 + \\cdots + \\lambda_n y_n^2$\n\nIn the rotated coordinates, the cross terms vanish. The form is purely diagonal â€” just a sum of scaled squares.',
       '**Classifying conics.** The equation $Q(\\mathbf{x}) = 1$ defines a level set of the quadratic form. In the principal axis coordinates ($y_1, y_2$), it becomes $\\lambda_1 y_1^2 + \\lambda_2 y_2^2 = 1$. If both $\\lambda_i > 0$: ellipse (ratio of semi-axes = $1/\\sqrt{\\lambda_i}$). If $\\lambda_1 > 0 > \\lambda_2$: hyperbola. If any $\\lambda_i = 0$: degenerate.',
-      '**CNC applications of quadratic forms.** (1) **Cutting energy and tool wear:** the energy delivered to the workpiece per unit volume is $U = \\frac{1}{2}\\boldsymbol{\\epsilon}^\\top C \\boldsymbol{\\epsilon}$ where $\\boldsymbol{\\epsilon}$ is the strain vector and $C$ is the symmetric stiffness tensor — a quadratic form. Positive definiteness of $C$ guarantees $U > 0$ (energy stored, not extracted). (2) **Optimization of surface finish:** the surface roughness objective function $f(\\mathbf{p})$ near the optimal parameter vector $\\mathbf{p}^*$ behaves like $f \\approx f^* + (\\mathbf{p}-\\mathbf{p}^*)^\\top H (\\mathbf{p}-\\mathbf{p}^*)$ where $H$ is the Hessian (symmetric). Positive definiteness of $H$ confirms the parameter is a minimum of roughness, not a saddle. (3) **Tolerance ellipsoids:** the set of positions $\\mathbf{x}$ within tolerance of a nominal point satisfies $\\mathbf{x}^\\top \\Sigma^{-1} \\mathbf{x} \\leq \\chi^2_{\\alpha,n}$ — a quadratic form with matrix $\\Sigma^{-1}$. The tolerance ellipsoid semi-axes are $\\sqrt{\\lambda_i \\cdot \\chi^2_\\alpha}$ in the principal directions, showing which axes have tighter tolerances.',
+      '**Completing the square reveals the eigenvectors.** You can diagonalize a $2 \\times 2$ quadratic form by hand without computing eigenvalues: just complete the square. For $Q(x,y) = ax^2 + 2bxy + cy^2$: group by $x$ and complete the square, then read off the structure. For example, $Q = 3x^2 + 4xy + 3y^2 = 3(x + \\frac{2}{3}y)^2 + \\frac{5}{3}y^2$. This shows $Q > 0$ for all nonzero $(x,y)$, confirming positive definiteness. The rotation that eliminates the cross term points in the eigenvector directions. The standard test to check positive definiteness without eigenvalues is **Sylvester\'s criterion**: $A$ is positive definite iff all leading principal minors (determinants of the upper-left $k \\times k$ submatrices) are positive.',
+      '**Where this is heading.** Quadratic forms are the second-order lens on functions â€” any twice-differentiable function $f(\\mathbf{x})$ near a critical point $\\mathbf{x}^*$ behaves like $f(\\mathbf{x}^*) + \\frac{1}{2}(\\mathbf{x}-\\mathbf{x}^*)^T H(\\mathbf{x}-\\mathbf{x}^*)$ where $H$ is the Hessian matrix (symmetric). Positive definite Hessian means local minimum, negative definite means local maximum, indefinite means saddle. This is multivariable calculus from a linear algebra perspective. In the next lesson, the pseudoinverse extends all of this to matrices that are not invertible â€” which happens exactly when the quadratic form $\\mathbf{x}^T A^T A \\mathbf{x}$ has a zero eigenvalue, meaning multiple inputs map to the same output.',
+      '**CNC applications of quadratic forms.** (1) **Cutting energy and tool wear:** the energy delivered to the workpiece per unit volume is $U = \\frac{1}{2}\\boldsymbol{\\epsilon}^\\top C \\boldsymbol{\\epsilon}$ where $\\boldsymbol{\\epsilon}$ is the strain vector and $C$ is the symmetric stiffness tensor â€” a quadratic form. Positive definiteness of $C$ guarantees $U > 0$ (energy stored, not extracted). (2) **Optimization of surface finish:** the surface roughness objective function $f(\\mathbf{p})$ near the optimal parameter vector $\\mathbf{p}^*$ behaves like $f \\approx f^* + (\\mathbf{p}-\\mathbf{p}^*)^\\top H (\\mathbf{p}-\\mathbf{p}^*)$ where $H$ is the Hessian (symmetric). Positive definiteness of $H$ confirms the parameter is a minimum of roughness, not a saddle. (3) **Tolerance ellipsoids:** the set of positions $\\mathbf{x}$ within tolerance of a nominal point satisfies $\\mathbf{x}^\\top \\Sigma^{-1} \\mathbf{x} \\leq \\chi^2_{\\alpha,n}$ â€” a quadratic form with matrix $\\Sigma^{-1}$. The tolerance ellipsoid semi-axes are $\\sqrt{\\lambda_i \\cdot \\chi^2_\\alpha}$ in the principal directions, showing which axes have tighter tolerances.',
     ],
     callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 7 of 9 â€” Orthogonality & SVD',
+        body: '**Previous (Lesson 6):** Spectral Theorem â€” symmetric matrices are orthogonally diagonalizable with real eigenvalues.\n**This lesson:** Quadratic Forms â€” how symmetric matrices define a scalar-valued function $Q(\\mathbf{x}) = \\mathbf{x}^T A\\mathbf{x}$, and what the eigenvalue signs tell you about its geometry.\n**Next (Lesson 8):** Pseudoinverse â€” the generalization of matrix inverse to non-square and rank-deficient matrices.',
+      },
       {
         type: 'insight',
         title: 'Sylvester\'s Criterion: Testing Positive Definiteness',
@@ -31,7 +37,7 @@ export default {
       {
         type: 'insight',
         title: 'Connecting to Optimization',
-        body: 'At a critical point where $\\nabla f = 0$:\n• Hessian $H$ positive definite → local minimum\n• Hessian $H$ negative definite → local maximum\n• Hessian $H$ indefinite → saddle point\nQuadratic forms are exactly the second-order behavior of smooth functions near critical points.',
+        body: 'At a critical point where $\\nabla f = 0$:\nâ€¢ Hessian $H$ positive definite â†’ local minimum\nâ€¢ Hessian $H$ negative definite â†’ local maximum\nâ€¢ Hessian $H$ indefinite â†’ saddle point\nQuadratic forms are exactly the second-order behavior of smooth functions near critical points.',
       },
       {
         type: 'theorem',
@@ -39,7 +45,7 @@ export default {
         body: 'Every quadratic form $Q(\\mathbf{x}) = \\mathbf{x}^\\top A \\mathbf{x}$ can be diagonalized by an orthogonal change of variables $\\mathbf{x} = Q\\mathbf{y}$:\n$Q(\\mathbf{x}) = \\lambda_1 y_1^2 + \\lambda_2 y_2^2 + \\cdots + \\lambda_n y_n^2$\nThe axes of the resulting ellipsoid/hyperboloid are the eigenvectors (principal axes) of $A$.',
       },
       {
-        type: 'sequencing',
+        type: 'insight',
         title: 'Prediction',
         body: 'Before computing: the quadratic form $Q(x,y) = x^2 - 4xy + 4y^2$ has matrix $A = \\begin{bmatrix}1&-2\\\\-2&4\\end{bmatrix}$. Notice $\\det(A) = 4 - 4 = 0$. What does that tell you about one of the eigenvalues? What kind of conic (or degenerate shape) should $Q(x,y) = 1$ trace out? What happens to the level set $Q(x,y) = c$ for different $c$?',
       },
@@ -133,13 +139,13 @@ Q'*Q
         title: 'Quadratic Forms, Conics, and Optimization',
         mathBridge: 'Classify quadratic forms by eigenvalue signs, visualize level sets as conics, and apply to optimization via Hessian analysis.',
         caption: 'The shape of every conic and the behavior at every critical point is encoded in the eigenvalue signs of the symmetric matrix.',
-        props: {
-          disableRunAll: true,
+        initialProps: {
           initialCells: [
             {
               id: 1,
-              cell_type: 'code',
-              source: `import numpy as np
+              cellTitle: 'Classify quadratic forms â€” eigenvalue signs determine the shape',
+              prose: 'The level set $Q(\\mathbf{x}) = 1$ is an ellipse when both eigenvalues are positive (PD), a hyperbola when eigenvalues have mixed signs (indefinite), and degenerate when an eigenvalue is zero (PSD). Principal axes are the eigenvectors â€” the directions that orient the shape. Plot three cases and compare their eigenvalue signs to the conic type.',
+              code: `import numpy as np
 import matplotlib.pyplot as plt
 
 # Visualize level sets Q(x,y) = 1 for various quadratic forms
@@ -155,7 +161,7 @@ def plot_quadratic(ax, A, title, xrange=(-3, 3), yrange=(-3, 3)):
     Z = A[0,0]*X**2 + (A[0,1]+A[1,0])*X*Y + A[1,1]*Y**2
 
     eigenvalues, eigvecs = np.linalg.eigh(A)
-    sign_info = f"λ = {eigenvalues[0]:.1f}, {eigenvalues[1]:.1f}"
+    sign_info = f"Î» = {eigenvalues[0]:.1f}, {eigenvalues[1]:.1f}"
 
     cs = ax.contour(X, Y, Z, levels=[1], colors='blue', linewidths=2)
     ax.contourf(X, Y, Z, levels=20, cmap='RdBu_r', alpha=0.4)
@@ -174,15 +180,15 @@ def plot_quadratic(ax, A, title, xrange=(-3, 3), yrange=(-3, 3)):
 
 # (a) Positive definite: ellipse
 A_pd = np.array([[3., 2.], [2., 3.]])
-plot_quadratic(axes[0], A_pd, "PD: 3x²+4xy+3y² (ellipse)")
+plot_quadratic(axes[0], A_pd, "PD: 3xÂ²+4xy+3yÂ² (ellipse)")
 
 # (b) Indefinite: hyperbola
 A_indef = np.array([[2., 3.], [3., 2.]])
-plot_quadratic(axes[1], A_indef, "Indefinite: 2x²+6xy+2y² (hyperbola)")
+plot_quadratic(axes[1], A_indef, "Indefinite: 2xÂ²+6xy+2yÂ² (hyperbola)")
 
 # (c) Positive definite, elongated
 A_elon = np.array([[5., 4.], [4., 5.]])
-plot_quadratic(axes[2], A_elon, "PD: 5x²+8xy+5y² (thin ellipse)")
+plot_quadratic(axes[2], A_elon, "PD: 5xÂ²+8xy+5yÂ² (thin ellipse)")
 
 plt.tight_layout()
 plt.savefig('quadratic_forms.png', dpi=80, bbox_inches='tight')
@@ -193,8 +199,9 @@ print("Blue contour = Q(x,y) = 1")
             },
             {
               id: 2,
-              cell_type: 'code',
-              source: `import numpy as np
+              cellTitle: 'Sylvester\'s criterion â€” testing positive definiteness without eigenvalues',
+              prose: 'Sylvester\'s criterion: $A$ is positive definite iff all **leading principal minors** are positive. The $k$-th leading principal minor is $\\det(A_{k \\times k})$ â€” the determinant of the upper-left $k \\times k$ submatrix. This avoids eigenvalue computation. Compare results to the direct eigenvalue test.',
+              code: `import numpy as np
 
 # Sylvester's criterion: test positive definiteness without eigenvalues
 # A PD iff all leading principal minors > 0
@@ -227,13 +234,14 @@ for name, A in matrices.items():
             },
             {
               id: 3,
-              cell_type: 'code',
-              source: `import numpy as np
+              cellTitle: 'CNC surface finish optimization â€” Hessian tells you if you found a minimum',
+              prose: 'At a critical point of $f(\\mathbf{x})$ (where $\\nabla f = 0$), the Hessian $H$ is symmetric. If $H$ is positive definite, you have a local minimum. If indefinite, a saddle. Here we model surface roughness $R_a$ as a quadratic function of feed rate $f$ and cutting speed $v$, then check that the Hessian at the nominal point confirms it\'s a minimum.',
+              code: `import numpy as np
 from scipy.optimize import minimize
 
 # CNC surface finish optimization via Hessian analysis
 # Objective: minimize surface roughness Ra as function of (feed f, speed v)
-# Near optimal point, Ra(f,v) ≈ Ra* + [df dv] H [df;dv]
+# Near optimal point, Ra(f,v) â‰ˆ Ra* + [df dv] H [df;dv]
 # If H is PD at optimum => confirmed local minimum
 
 # Simulated Ra landscape (quadratic approximation near f=0.1, v=200)
@@ -247,8 +255,8 @@ def Ra(params):
 
 # Hessian of Ra (analytical, then verified numerically)
 H_analytical = np.array([
-    [2*5,    0.3],    # d²Ra/df², d²Ra/dfdv
-    [0.3,  2*0.01],  # d²Ra/dvdf, d²Ra/dv²
+    [2*5,    0.3],    # dÂ²Ra/dfÂ², dÂ²Ra/dfdv
+    [0.3,  2*0.01],  # dÂ²Ra/dvdf, dÂ²Ra/dvÂ²
 ])
 print("Hessian at nominal point:")
 print(H_analytical)
@@ -267,13 +275,13 @@ print(f"Eigenvalues of H: {eigenvalues.round(4)}")
 print(f"H is positive definite: {is_pd}")
 print()
 print("=> H PD => operating point is a LOCAL MINIMUM of Ra")
-print(f"=> Nominal Ra = {Ra([f0, v0]):.4f} μm")
+print(f"=> Nominal Ra = {Ra([f0, v0]):.4f} Î¼m")
 print()
 
 # Find true minimum numerically to confirm
 result = minimize(Ra, [f0 + 0.02, v0 + 10])
 print(f"Numerical minimum at f={result.x[0]:.4f}, v={result.x[1]:.2f}")
-print(f"Min Ra = {result.fun:.4f} μm")
+print(f"Min Ra = {result.fun:.4f} Î¼m")
 `,
             },
           ],
@@ -286,13 +294,13 @@ print(f"Min Ra = {result.fun:.4f} μm")
     prose: [
       '**Sylvester\'s Law of Inertia (formal).** If $A$ and $B$ are real symmetric matrices, they are congruent ($A = P^\\top B P$ for some invertible $P$) iff they have the same signature $(n_+, n_-, n_0)$ where $n_+, n_-, n_0$ are the numbers of positive, negative, and zero eigenvalues. The classification of real quadratic forms over $\\mathbb{R}$ is completely determined by the signature. This is the algebraic content of the Principal Axes Theorem: no matter how you diagonalize the form (via eigenvalues or Gaussian elimination), the same count of positive and negative coefficients appears.',
       '**Connection to topology.** The level set $\\{\\mathbf{x} : \\mathbf{x}^\\top A \\mathbf{x} = 1\\}$ is: a real ellipsoid if $A$ is PD (compact, simply connected); a hyperboloid of one sheet if $A$ has signature $(n-1, 1, 0)$; a hyperboloid of two sheets if $A$ has signature $(1, n-1, 0)$; degenerate (cylinder, cone, empty) if $A$ is singular. The topology (compactness, connectivity, number of components) is determined solely by the signature.',
-      '**Completing the square and LDL decomposition.** The classical method for diagonalizing a quadratic form without eigenvalues is **completing the square**, equivalent to $LDL^\\top$ decomposition of $A$ (where $L$ is unit lower-triangular and $D$ is diagonal). The diagonal entries of $D$ are the pivots of Gaussian elimination and their signs determine definiteness. When all pivots are positive, $A$ is positive definite — this is the LDL-based proof of Sylvester\'s criterion.',
+      '**Completing the square and LDL decomposition.** The classical method for diagonalizing a quadratic form without eigenvalues is **completing the square**, equivalent to $LDL^\\top$ decomposition of $A$ (where $L$ is unit lower-triangular and $D$ is diagonal). The diagonal entries of $D$ are the pivots of Gaussian elimination and their signs determine definiteness. When all pivots are positive, $A$ is positive definite â€” this is the LDL-based proof of Sylvester\'s criterion.',
     ],
     callouts: [
       {
         type: 'insight',
         title: 'Completing the Square',
-        body: 'The process of eliminating cross terms from a quadratic form is the matrix version of completing the square. For $3x^2 + 4xy + 3y^2$: let $u = x + \\frac{2}{3}y$, then $3(x + \\frac{2}{3}y)^2 + \\frac{5}{3}y^2$ — all cross terms gone. This is Gaussian elimination applied to the Gram matrix.',
+        body: 'The process of eliminating cross terms from a quadratic form is the matrix version of completing the square. For $3x^2 + 4xy + 3y^2$: let $u = x + \\frac{2}{3}y$, then $3(x + \\frac{2}{3}y)^2 + \\frac{5}{3}y^2$ â€” all cross terms gone. This is Gaussian elimination applied to the Gram matrix.',
       },
       {
         type: 'theorem',
@@ -302,7 +310,7 @@ print(f"Min Ra = {result.fun:.4f} μm")
       {
         type: 'insight',
         title: 'Second Derivative Test in $n$ Dimensions',
-        body: 'At a critical point $\\nabla f = 0$:\n\n$f(\\mathbf{x} + \\mathbf{h}) \\approx f(\\mathbf{x}) + \\frac{1}{2}\\mathbf{h}^\\top H \\mathbf{h}$\n\nwhere $H = [\\partial^2 f / \\partial x_i \\partial x_j]$ is the Hessian (symmetric by Clairaut\'s theorem).\n- $H$ PD → local minimum\n- $H$ ND → local maximum\n- $H$ indefinite → saddle point\n- $H$ PSD or NSD → inconclusive (need higher-order terms)',
+        body: 'At a critical point $\\nabla f = 0$:\n\n$f(\\mathbf{x} + \\mathbf{h}) \\approx f(\\mathbf{x}) + \\frac{1}{2}\\mathbf{h}^\\top H \\mathbf{h}$\n\nwhere $H = [\\partial^2 f / \\partial x_i \\partial x_j]$ is the Hessian (symmetric by Clairaut\'s theorem).\n- $H$ PD â†’ local minimum\n- $H$ ND â†’ local maximum\n- $H$ indefinite â†’ saddle point\n- $H$ PSD or NSD â†’ inconclusive (need higher-order terms)',
       },
     ],
     visualizations: [],
@@ -326,8 +334,8 @@ print(f"Min Ra = {result.fun:.4f} μm")
         },
         {
           expression: '\\text{Both } \\lambda_1 = 3 > 0, \\; \\lambda_2 = 7 > 0 \\implies A \\text{ is positive definite} \\implies \\text{ellipse}',
-          annotation: 'A PD quadratic form has a compact (closed, bounded) level set — an ellipse in 2D.',
-          strategyTitle: 'Classify: all positive eigenvalues → ellipse',
+          annotation: 'A PD quadratic form has a compact (closed, bounded) level set â€” an ellipse in 2D.',
+          strategyTitle: 'Classify: all positive eigenvalues â†’ ellipse',
         },
         {
           expression: '\\text{In principal axis coordinates: } 3y_1^2 + 7y_2^2 = 36 \\iff \\frac{y_1^2}{36/3} + \\frac{y_2^2}{36/7} = 1',
@@ -336,7 +344,7 @@ print(f"Min Ra = {result.fun:.4f} μm")
         },
         {
           expression: 'a_1 = \\sqrt{\\frac{36}{3}} = \\sqrt{12} = 2\\sqrt{3} \\approx 3.46, \\quad a_2 = \\sqrt{\\frac{36}{7}} \\approx 2.27',
-          annotation: 'Semi-axis along the $\\lambda_1 = 3$ eigenvector direction has length $2\\sqrt{3}$; along the $\\lambda_2 = 7$ direction it is shorter ($\\approx 2.27$). Smaller eigenvalue → longer axis.',
+          annotation: 'Semi-axis along the $\\lambda_1 = 3$ eigenvector direction has length $2\\sqrt{3}$; along the $\\lambda_2 = 7$ direction it is shorter ($\\approx 2.27$). Smaller eigenvalue â†’ longer axis.',
           strategyTitle: 'Semi-axes lengths',
           hints: ['The smaller eigenvalue gives the longer semi-axis: large $\\lambda$ means the form grows fast in that direction, so the level set is close to the origin (short semi-axis).'],
         },
@@ -364,9 +372,9 @@ print(f"Min Ra = {result.fun:.4f} μm")
         },
         {
           expression: 'M_1, M_2, M_3 > 0 \\implies A \\text{ is positive definite}',
-          annotation: 'All three leading principal minors are positive — Sylvester\'s criterion is satisfied. No need to compute eigenvalues.',
+          annotation: 'All three leading principal minors are positive â€” Sylvester\'s criterion is satisfied. No need to compute eigenvalues.',
           strategyTitle: 'Conclude: A is PD',
-          checkpoint: 'Verify: eigenvalues of this $A$ are approximately $2.87, 4.44, 8.69$ — all positive, confirming the criterion.',
+          checkpoint: 'Verify: eigenvalues of this $A$ are approximately $2.87, 4.44, 8.69$ â€” all positive, confirming the criterion.',
         },
       ],
     },
@@ -397,12 +405,12 @@ print(f"Min Ra = {result.fun:.4f} μm")
         },
         {
           expression: 'H \\text{ is positive definite} \\implies f \\text{ has a local minimum at } (0,1).',
-          annotation: 'Positive definite Hessian means the quadratic form $\\mathbf{h}^\\top H \\mathbf{h} > 0$ for all directions $\\mathbf{h}$ — the function curves upward in every direction. This is a minimum.',
+          annotation: 'Positive definite Hessian means the quadratic form $\\mathbf{h}^\\top H \\mathbf{h} > 0$ for all directions $\\mathbf{h}$ â€” the function curves upward in every direction. This is a minimum.',
           strategyTitle: 'Classify via definiteness',
         },
         {
           expression: 'f(0,1) = 0 + 0 + 5 - 0 - 10 = -5',
-          annotation: 'Minimum value is $-5$ at $(0,1)$. Verify: $f(1,0) = 2 - 4 = -2 > -5$ ✓, $f(-1, 1) = 2 - 4 + 5 + 4 - 10 = -3 > -5$ ✓. The Hessian is constant (quadratic $f$), so this is also a global minimum.',
+          annotation: 'Minimum value is $-5$ at $(0,1)$. Verify: $f(1,0) = 2 - 4 = -2 > -5$ âœ“, $f(-1, 1) = 2 - 4 + 5 + 4 - 10 = -3 > -5$ âœ“. The Hessian is constant (quadratic $f$), so this is also a global minimum.',
           strategyTitle: 'Compute minimum value',
           checkpoint: 'The Hessian of a quadratic $f$ is the same as the matrix of the quadratic form in the leading terms. Definiteness of the Hessian = definiteness of the quadratic part.',
         },
@@ -421,22 +429,22 @@ print(f"Min Ra = {result.fun:.4f} μm")
         '**Matrix of $Q$:** Off-diagonal entry = half of the $xy$ coefficient: $4/2 = 2$. So $A = \\begin{bmatrix}1&2\\\\2&k\\end{bmatrix}$.',
         '**Leading principal minors:** $M_1 = 1 > 0$ always. $M_2 = \\det(A) = k - 4$.',
         '**Positive definite:** $M_1 > 0$ AND $M_2 > 0 \\Rightarrow k - 4 > 0 \\Rightarrow k > 4$.',
-        '**Positive semidefinite:** $M_1 \\geq 0$ AND $M_2 \\geq 0 \\Rightarrow k \\geq 4$. At $k = 4$: $\\det(A) = 0$, so one eigenvalue is 0 — PSD but not PD.',
-        '**Indefinite:** $M_2 < 0 \\Rightarrow k < 4$. Mixed eigenvalue signs → $Q$ takes both positive and negative values.',
-        '**Verification at $k = 3$:** Eigenvalues of $\\begin{bmatrix}1&2\\\\2&3\\end{bmatrix}$: trace $= 4$, det $= -1$. By quadratic formula: $\\lambda = 2 \\pm \\sqrt{5}$, so $\\lambda_1 \\approx -0.24$ and $\\lambda_2 \\approx 4.24$ — confirmed indefinite.',
+        '**Positive semidefinite:** $M_1 \\geq 0$ AND $M_2 \\geq 0 \\Rightarrow k \\geq 4$. At $k = 4$: $\\det(A) = 0$, so one eigenvalue is 0 â€” PSD but not PD.',
+        '**Indefinite:** $M_2 < 0 \\Rightarrow k < 4$. Mixed eigenvalue signs â†’ $Q$ takes both positive and negative values.',
+        '**Verification at $k = 3$:** Eigenvalues of $\\begin{bmatrix}1&2\\\\2&3\\end{bmatrix}$: trace $= 4$, det $= -1$. By quadratic formula: $\\lambda = 2 \\pm \\sqrt{5}$, so $\\lambda_1 \\approx -0.24$ and $\\lambda_2 \\approx 4.24$ â€” confirmed indefinite.',
       ],
     },
     {
       id: 'ch-la4-007-2',
       title: 'Principal axes of a tolerance ellipse',
       difficulty: 'hard',
-      problem: 'A CNC machining process has dimensional errors with covariance $\\Sigma = \\begin{bmatrix}4&3\\\\3&9\\end{bmatrix}$ (mm²). The $95\\%$ tolerance zone satisfies $\\mathbf{e}^\\top \\Sigma^{-1} \\mathbf{e} \\leq 5.99$ (the $\\chi^2_{0.05, 2}$ critical value). Find the principal axes of the tolerance ellipse and the lengths of its semi-axes.',
+      problem: 'A CNC machining process has dimensional errors with covariance $\\Sigma = \\begin{bmatrix}4&3\\\\3&9\\end{bmatrix}$ (mmÂ²). The $95\\%$ tolerance zone satisfies $\\mathbf{e}^\\top \\Sigma^{-1} \\mathbf{e} \\leq 5.99$ (the $\\chi^2_{0.05, 2}$ critical value). Find the principal axes of the tolerance ellipse and the lengths of its semi-axes.',
       hint: 'The tolerance ellipse $\\mathbf{e}^\\top \\Sigma^{-1} \\mathbf{e} = c$ has semi-axes $\\sqrt{c \\lambda_i}$ in the eigenvector directions of $\\Sigma$ (NOT $\\Sigma^{-1}$).',
       walkthrough: [
         '**Eigenvalues of $\\Sigma$:** $\\text{tr}(\\Sigma) = 13$, $\\det(\\Sigma) = 36 - 9 = 27$. $\\lambda^2 - 13\\lambda + 27 = 0$. $\\lambda = \\frac{13 \\pm \\sqrt{169 - 108}}{2} = \\frac{13 \\pm \\sqrt{61}}{2}$. So $\\lambda_1 \\approx 2.61$, $\\lambda_2 \\approx 10.39$.',
         '**Principal directions:** For $\\lambda_1 \\approx 2.61$: $(\\Sigma - \\lambda_1 I)\\mathbf{v} = 0$, giving $\\mathbf{q}_1 \\propto (-3, \\lambda_1 - 4)^\\top \\approx (-3, -1.39)^\\top$. For $\\lambda_2 \\approx 10.39$: $\\mathbf{q}_2 \\propto (3, \\lambda_2 - 4)^\\top \\approx (3, 6.39)^\\top$.',
         '**Semi-axes:** The tolerance ellipse $\\mathbf{e}^\\top \\Sigma^{-1} \\mathbf{e} = c$ in the eigenvector coordinates of $\\Sigma$ becomes $\\frac{y_1^2}{c\\lambda_1} + \\frac{y_2^2}{c\\lambda_2} = 1$. Semi-axes: $a_1 = \\sqrt{c\\lambda_1} = \\sqrt{5.99 \\times 2.61} \\approx 3.95$ mm, $a_2 = \\sqrt{c\\lambda_2} = \\sqrt{5.99 \\times 10.39} \\approx 7.89$ mm.',
-        '**Interpretation:** The larger semi-axis ($\\approx 7.89$ mm) points in the $\\mathbf{q}_2$ direction — the direction of maximum error spread. If the $y$-axis dimension has larger variance ($\\Sigma_{22} = 9 > \\Sigma_{11} = 4$), the principal axis tilts toward $y$.',
+        '**Interpretation:** The larger semi-axis ($\\approx 7.89$ mm) points in the $\\mathbf{q}_2$ direction â€” the direction of maximum error spread. If the $y$-axis dimension has larger variance ($\\Sigma_{22} = 9 > \\Sigma_{11} = 4$), the principal axis tilts toward $y$.',
       ],
     },
   ],
@@ -455,7 +463,7 @@ print(f"Min Ra = {result.fun:.4f} μm")
     { id: 'cp-la4-007-4', label: 'Run quadratic form level sets lab', type: 'lab' },
     { id: 'cp-la4-007-5', label: 'Run Sylvester criterion and optimization lab', type: 'lab' },
     { id: 'cp-la4-007-6', label: 'Work example 1: classify conic, find semi-axes', type: 'example' },
-    { id: 'cp-la4-007-7', label: 'Work example 2: Sylvester on 3×3 matrix', type: 'example' },
+    { id: 'cp-la4-007-7', label: 'Work example 2: Sylvester on 3Ã—3 matrix', type: 'example' },
     { id: 'cp-la4-007-8', label: 'Solve challenge: classify by parameter $k$', type: 'challenge' },
   ],
 
@@ -465,7 +473,7 @@ print(f"Min Ra = {result.fun:.4f} μm")
         id: 'assess-la4-007-1',
         type: 'computation',
         text: 'Classify and analyze the conic $Q(x,y) = 4x^2 - 4xy + 4y^2 = 6$. (a) Write the matrix $A$. (b) Find the eigenvalues and classify the conic. (c) Find the semi-axes lengths. (d) Find the principal axis directions.',
-        answer: '(a) $A = \\begin{bmatrix}4&-2\\\\-2&4\\end{bmatrix}$. (b) $\\lambda = 2, 6$ (both positive → ellipse). (c) Semi-axes: $\\sqrt{6/2} = \\sqrt{3}$ and $\\sqrt{6/6} = 1$. (d) For $\\lambda=2$: $\\mathbf{q}_1 = (1,1)^\\top/\\sqrt{2}$ (at $45°$); for $\\lambda=6$: $\\mathbf{q}_2 = (1,-1)^\\top/\\sqrt{2}$ (at $-45°$).',
+        answer: '(a) $A = \\begin{bmatrix}4&-2\\\\-2&4\\end{bmatrix}$. (b) $\\lambda = 2, 6$ (both positive â†’ ellipse). (c) Semi-axes: $\\sqrt{6/2} = \\sqrt{3}$ and $\\sqrt{6/6} = 1$. (d) For $\\lambda=2$: $\\mathbf{q}_1 = (1,1)^\\top/\\sqrt{2}$ (at $45Â°$); for $\\lambda=6$: $\\mathbf{q}_2 = (1,-1)^\\top/\\sqrt{2}$ (at $-45Â°$).',
         hint: 'Off-diagonal entry of $A$ is half the $xy$ coefficient: $-4/2 = -2$.',
       },
       {
@@ -499,7 +507,7 @@ print(f"Min Ra = {result.fun:.4f} μm")
         '$\\begin{bmatrix}2&6\\\\6&1\\end{bmatrix}$',
       ],
       answer: '$\\begin{bmatrix}1&3\\\\3&2\\end{bmatrix}$',
-      hints: ['The rule: diagonal entries are the pure-square coefficients; off-diagonal entries are half the cross-term coefficient ($6/2 = 3$). Verify: $[x, y]\\begin{bmatrix}1&3\\\\3&2\\end{bmatrix}\\begin{bmatrix}x\\\\y\\end{bmatrix} = x^2 + 3xy + 3xy + 2y^2 = x^2 + 6xy + 2y^2$ ✓'],
+      hints: ['The rule: diagonal entries are the pure-square coefficients; off-diagonal entries are half the cross-term coefficient ($6/2 = 3$). Verify: $[x, y]\\begin{bmatrix}1&3\\\\3&2\\end{bmatrix}\\begin{bmatrix}x\\\\y\\end{bmatrix} = x^2 + 3xy + 3xy + 2y^2 = x^2 + 6xy + 2y^2$ âœ“'],
       reviewSection: 'intuition',
     },
     {
@@ -517,7 +525,7 @@ print(f"Min Ra = {result.fun:.4f} μm")
       text: 'The conic defined by $\\mathbf{x}^\\top A \\mathbf{x} = 1$ where $A$ has eigenvalues $-3$ and $5$ is:',
       options: ['An ellipse', 'A circle', 'A hyperbola', 'A parabola'],
       answer: 'A hyperbola',
-      hints: ['In the principal axis coordinates: $-3y_1^2 + 5y_2^2 = 1$, or $\\frac{y_2^2}{1/5} - \\frac{y_1^2}{1/3} = 1$ — standard hyperbola form. Mixed eigenvalue signs (indefinite matrix) always give a hyperbola.'],
+      hints: ['In the principal axis coordinates: $-3y_1^2 + 5y_2^2 = 1$, or $\\frac{y_2^2}{1/5} - \\frac{y_1^2}{1/3} = 1$ â€” standard hyperbola form. Mixed eigenvalue signs (indefinite matrix) always give a hyperbola.'],
       reviewSection: 'intuition',
     },
     {
@@ -531,7 +539,7 @@ print(f"Min Ra = {result.fun:.4f} μm")
         '$\\det(A) = 0$, negative semidefinite',
       ],
       answer: '$\\det(A) = 0$, positive semidefinite (not definite)',
-      hints: ['$\\det(A) = 9 - 9 = 0$. One eigenvalue is 0 (rank-1 matrix). The other eigenvalue is $\\text{tr}(A) = 10 > 0$. So eigenvalues are $0$ and $10$ — PSD but not PD. Note: $Q(x,y) = (x+3y)^2 \\geq 0$, with $Q = 0$ along the line $x = -3y$.'],
+      hints: ['$\\det(A) = 9 - 9 = 0$. One eigenvalue is 0 (rank-1 matrix). The other eigenvalue is $\\text{tr}(A) = 10 > 0$. So eigenvalues are $0$ and $10$ â€” PSD but not PD. Note: $Q(x,y) = (x+3y)^2 \\geq 0$, with $Q = 0$ along the line $x = -3y$.'],
       reviewSection: 'intuition',
     },
     {
@@ -539,13 +547,13 @@ print(f"Min Ra = {result.fun:.4f} μm")
       type: 'choice',
       text: 'At a critical point of $f(x,y)$, the Hessian is $H = \\begin{bmatrix}3&2\\\\2&2\\end{bmatrix}$. What is the nature of the critical point?',
       options: [
-        'Local maximum — $H$ is negative definite',
-        'Saddle point — $H$ is indefinite',
-        'Local minimum — $H$ is positive definite',
-        'Inconclusive — $H$ is positive semidefinite',
+        'Local maximum â€” $H$ is negative definite',
+        'Saddle point â€” $H$ is indefinite',
+        'Local minimum â€” $H$ is positive definite',
+        'Inconclusive â€” $H$ is positive semidefinite',
       ],
-      answer: 'Local minimum — $H$ is positive definite',
-      hints: ['Sylvester: $M_1 = 3 > 0$, $M_2 = \\det(H) = 6 - 4 = 2 > 0$. All leading minors positive → $H$ is PD → local minimum. Eigenvalues of $H$: trace $= 5$, det $= 2$, so $\\lambda = (5 \\pm \\sqrt{17})/2$, both positive.'],
+      answer: 'Local minimum â€” $H$ is positive definite',
+      hints: ['Sylvester: $M_1 = 3 > 0$, $M_2 = \\det(H) = 6 - 4 = 2 > 0$. All leading minors positive â†’ $H$ is PD â†’ local minimum. Eigenvalues of $H$: trace $= 5$, det $= 2$, so $\\lambda = (5 \\pm \\sqrt{17})/2$, both positive.'],
       reviewSection: 'intuition',
     },
     {
@@ -553,12 +561,12 @@ print(f"Min Ra = {result.fun:.4f} μm")
       type: 'choice',
       text: 'The Principal Axes Theorem says that for $Q(\\mathbf{x}) = \\mathbf{x}^\\top A \\mathbf{x}$, the change $\\mathbf{x} = Q_0 \\mathbf{y}$ (where $Q_0$ has orthonormal eigenvectors as columns) gives:',
       options: [
-        '$Q(\\mathbf{x}) = \\mathbf{y}^\\top \\mathbf{y}$ — eliminates the matrix entirely',
-        '$Q(\\mathbf{x}) = \\lambda_1 y_1^2 + \\cdots + \\lambda_n y_n^2$ — purely diagonal, no cross terms',
-        '$Q(\\mathbf{x}) = \\mathbf{y}^\\top Q_0^\\top A Q_0 \\mathbf{y}$ — same form, just renamed variables',
-        '$Q(\\mathbf{x}) = \\sum_{i \\neq j} \\lambda_i y_i y_j$ — cross terms only',
+        '$Q(\\mathbf{x}) = \\mathbf{y}^\\top \\mathbf{y}$ â€” eliminates the matrix entirely',
+        '$Q(\\mathbf{x}) = \\lambda_1 y_1^2 + \\cdots + \\lambda_n y_n^2$ â€” purely diagonal, no cross terms',
+        '$Q(\\mathbf{x}) = \\mathbf{y}^\\top Q_0^\\top A Q_0 \\mathbf{y}$ â€” same form, just renamed variables',
+        '$Q(\\mathbf{x}) = \\sum_{i \\neq j} \\lambda_i y_i y_j$ â€” cross terms only',
       ],
-      answer: '$Q(\\mathbf{x}) = \\lambda_1 y_1^2 + \\cdots + \\lambda_n y_n^2$ — purely diagonal, no cross terms',
+      answer: '$Q(\\mathbf{x}) = \\lambda_1 y_1^2 + \\cdots + \\lambda_n y_n^2$ â€” purely diagonal, no cross terms',
       hints: ['$(Q_0 \\mathbf{y})^\\top A (Q_0 \\mathbf{y}) = \\mathbf{y}^\\top (Q_0^\\top A Q_0) \\mathbf{y} = \\mathbf{y}^\\top \\Lambda \\mathbf{y} = \\sum \\lambda_i y_i^2$. Since $Q_0^\\top A Q_0 = \\Lambda$ (diagonal), all cross terms vanish. The rotation aligns the coordinate axes with the principal axes of the quadratic form.'],
       reviewSection: 'math',
     },
@@ -573,7 +581,7 @@ print(f"Min Ra = {result.fun:.4f} μm")
         '$\\Sigma$ is a diagonal matrix if the features are uncorrelated',
       ],
       answer: '$\\Sigma$ is symmetric and positive semidefinite for any $X$',
-      hints: ['$\\Sigma = \\frac{1}{N}X^\\top X$ is a Gram matrix (scaled). For any $\\mathbf{v}$: $\\mathbf{v}^\\top \\Sigma \\mathbf{v} = \\frac{1}{N}\\|X\\mathbf{v}\\|^2 \\geq 0$ — always PSD. Not always PD: if $p > N$ (more features than samples), $X$ cannot have full column rank, so some $X\\mathbf{v} = 0$. Not always diagonal (that\'s only when features are uncorrelated).'],
+      hints: ['$\\Sigma = \\frac{1}{N}X^\\top X$ is a Gram matrix (scaled). For any $\\mathbf{v}$: $\\mathbf{v}^\\top \\Sigma \\mathbf{v} = \\frac{1}{N}\\|X\\mathbf{v}\\|^2 \\geq 0$ â€” always PSD. Not always PD: if $p > N$ (more features than samples), $X$ cannot have full column rank, so some $X\\mathbf{v} = 0$. Not always diagonal (that\'s only when features are uncorrelated).'],
       reviewSection: 'math',
     },
     {
@@ -587,7 +595,7 @@ print(f"Min Ra = {result.fun:.4f} μm")
         'The trace of $A$',
       ],
       answer: 'The signature $(n_+, n_-, n_0)$: counts of positive, negative, and zero eigenvalues',
-      hints: ['Congruence ($P^\\top A P$) does NOT preserve eigenvalues or trace in general (those are similarity invariants from $P^{-1}AP$). What it preserves is the signature — the count of positive, negative, and zero eigenvalues. This means no matter how you diagonalize a quadratic form (by eigenvalues or completing the square), you get the same number of positive and negative squares.'],
+      hints: ['Congruence ($P^\\top A P$) does NOT preserve eigenvalues or trace in general (those are similarity invariants from $P^{-1}AP$). What it preserves is the signature â€” the count of positive, negative, and zero eigenvalues. This means no matter how you diagonalize a quadratic form (by eigenvalues or completing the square), you get the same number of positive and negative squares.'],
       reviewSection: 'rigor',
     },
     {
@@ -595,13 +603,13 @@ print(f"Min Ra = {result.fun:.4f} μm")
       type: 'choice',
       text: 'A CNC stiffness matrix $K$ satisfies $\\mathbf{x}^\\top K \\mathbf{x} > 0$ for all $\\mathbf{x} \\neq 0$. This means the stored elastic energy $U = \\frac{1}{2}\\mathbf{x}^\\top K \\mathbf{x}$ is:',
       options: [
-        'Always zero — no energy is stored in a rigid structure',
-        'Could be negative — springs can release energy',
-        'Always positive for any nonzero deformation — guaranteed by positive definiteness of $K$',
-        'Bounded above — $K$ positive definite limits maximum energy',
+        'Always zero â€” no energy is stored in a rigid structure',
+        'Could be negative â€” springs can release energy',
+        'Always positive for any nonzero deformation â€” guaranteed by positive definiteness of $K$',
+        'Bounded above â€” $K$ positive definite limits maximum energy',
       ],
-      answer: 'Always positive for any nonzero deformation — guaranteed by positive definiteness of $K$',
-      hints: ['Positive definiteness of $K$ means $\\mathbf{x}^\\top K \\mathbf{x} > 0$ for all $\\mathbf{x} \\neq 0$, so $U = \\frac{1}{2}\\mathbf{x}^\\top K \\mathbf{x} > 0$ whenever the structure deforms ($\\mathbf{x} \\neq 0$). This is physically required: elastic energy must be positive (deformation stores energy, which is released when the load is removed). If $K$ were indefinite, some deformation modes would have negative energy — physically impossible for a stable structure.'],
+      answer: 'Always positive for any nonzero deformation â€” guaranteed by positive definiteness of $K$',
+      hints: ['Positive definiteness of $K$ means $\\mathbf{x}^\\top K \\mathbf{x} > 0$ for all $\\mathbf{x} \\neq 0$, so $U = \\frac{1}{2}\\mathbf{x}^\\top K \\mathbf{x} > 0$ whenever the structure deforms ($\\mathbf{x} \\neq 0$). This is physically required: elastic energy must be positive (deformation stores energy, which is released when the load is removed). If $K$ were indefinite, some deformation modes would have negative energy â€” physically impossible for a stable structure.'],
       reviewSection: 'intuition',
     },
   ],
@@ -618,13 +626,13 @@ print(f"Min Ra = {result.fun:.4f} μm")
     {
       falseBelief: 'The matrix of $ax^2 + bxy + cy^2$ has $b$ on the off-diagonal entries.',
       whyStudentsThinkIt: 'Students read off the coefficient $b$ directly without halving it, ignoring that $\\mathbf{x}^\\top A\\mathbf{x}$ generates the cross term as $2A_{12}xy$.',
-      correctionExample: 'For $Q = x^2 + 6xy + 2y^2$: $\\mathbf{x}^\\top \\begin{bmatrix}1&3\\\\3&2\\end{bmatrix}\\mathbf{x} = x^2 + 3xy + 3yx + 2y^2 = x^2 + 6xy + 2y^2$ ✓. The two off-diagonal terms each contribute $3xy$, together giving $6xy$. So off-diagonal entry $= 6/2 = 3$.',
-      contrastCase: 'Using $b = 6$ on the off-diagonal gives $\\begin{bmatrix}1&6\\\\6&2\\end{bmatrix}$, which computes $x^2 + 12xy + 2y^2$ — double the cross term.',
+      correctionExample: 'For $Q = x^2 + 6xy + 2y^2$: $\\mathbf{x}^\\top \\begin{bmatrix}1&3\\\\3&2\\end{bmatrix}\\mathbf{x} = x^2 + 3xy + 3yx + 2y^2 = x^2 + 6xy + 2y^2$ âœ“. The two off-diagonal terms each contribute $3xy$, together giving $6xy$. So off-diagonal entry $= 6/2 = 3$.',
+      contrastCase: 'Using $b = 6$ on the off-diagonal gives $\\begin{bmatrix}1&6\\\\6&2\\end{bmatrix}$, which computes $x^2 + 12xy + 2y^2$ â€” double the cross term.',
     },
     {
       falseBelief: 'If $\\text{tr}(A) > 0$, then $A$ is positive definite.',
       whyStudentsThinkIt: 'Trace = sum of eigenvalues; if the sum is positive, students assume all must be positive.',
-      correctionExample: '$A = \\begin{bmatrix}2&3\\\\3&2\\end{bmatrix}$ has $\\text{tr}(A) = 4 > 0$ but eigenvalues $-1$ and $5$ — indefinite! $Q(1,-1) = 2 - 6 + 2 = -2 < 0$.',
+      correctionExample: '$A = \\begin{bmatrix}2&3\\\\3&2\\end{bmatrix}$ has $\\text{tr}(A) = 4 > 0$ but eigenvalues $-1$ and $5$ â€” indefinite! $Q(1,-1) = 2 - 6 + 2 = -2 < 0$.',
       contrastCase: 'Positive definiteness requires ALL eigenvalues to be positive (or equivalently all Sylvester minors positive). Positive trace only ensures the sum is positive, not each individually.',
     },
   ],
@@ -633,7 +641,7 @@ print(f"Min Ra = {result.fun:.4f} μm")
     {
       situation: 'You have a function $f(\\mathbf{x})$ with a critical point and want to determine if it is a minimum, maximum, or saddle.',
       competingTechniques: 'Plot the function, evaluate on a grid, use first-order conditions only.',
-      whyThisTechniqueWins: 'Compute the Hessian $H$ at the critical point and test it for definiteness. PD → minimum, ND → maximum, indefinite → saddle. This is exact (no grid resolution) and extends to any dimension — plotting fails in $n > 3$ dimensions.',
+      whyThisTechniqueWins: 'Compute the Hessian $H$ at the critical point and test it for definiteness. PD â†’ minimum, ND â†’ maximum, indefinite â†’ saddle. This is exact (no grid resolution) and extends to any dimension â€” plotting fails in $n > 3$ dimensions.',
     },
     {
       situation: 'You need to classify a conic section $ax^2 + bxy + cy^2 = 1$ without graphing.',
@@ -645,14 +653,14 @@ print(f"Min Ra = {result.fun:.4f} μm")
   debugging: [
     {
       commonError: 'Setting the off-diagonal entry of $A$ equal to the full $xy$ coefficient instead of half.',
-      symptom: 'The quadratic form $\\mathbf{x}^\\top A \\mathbf{x}$ does not match the original expression — the cross term appears doubled.',
+      symptom: 'The quadratic form $\\mathbf{x}^\\top A \\mathbf{x}$ does not match the original expression â€” the cross term appears doubled.',
       whyItHappened: 'The matrix product $\\mathbf{x}^\\top A \\mathbf{x}$ generates $2A_{12}$ as the coefficient of $x_1 x_2$ (because there are two off-diagonal paths: $A_{12}x_1 x_2$ and $A_{21}x_2 x_1 = A_{12}x_1 x_2$). So $A_{12} = $ (coefficient of $x_1 x_2$)$/2$.',
       repairStrategy: 'Always verify: expand $\\mathbf{x}^\\top A \\mathbf{x}$ symbolically and check the cross term equals the original. Alternatively, build $A$ by the formula: diagonal $= $ pure square coefficients; off-diagonal $= $ half the cross-term coefficient.',
     },
     {
       commonError: 'Concluding PD from positive eigenvalue sum (trace) or positive diagonal entries alone.',
       symptom: 'Incorrectly classify an indefinite or PSD matrix as positive definite, leading to wrong optimization conclusions (false minimum).',
-      whyItHappened: 'These are necessary but not sufficient conditions. Positive trace means the sum of eigenvalues is positive; positive diagonal entries mean $Q(\\mathbf{e}_i) > 0$ on coordinate axes — but neither rules out a negative eigenvalue in an off-axis direction.',
+      whyItHappened: 'These are necessary but not sufficient conditions. Positive trace means the sum of eigenvalues is positive; positive diagonal entries mean $Q(\\mathbf{e}_i) > 0$ on coordinate axes â€” but neither rules out a negative eigenvalue in an off-axis direction.',
       repairStrategy: 'Use the full Sylvester criterion (all leading principal minors positive) or compute eigenvalues directly with `np.linalg.eigvalsh`. The condition `min(eigenvalues) > 0` is the definitive PD test.',
     },
   ],

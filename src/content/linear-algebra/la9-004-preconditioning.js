@@ -11,22 +11,25 @@ export default {
   hook: {
     question: "CG and GMRES converge in $O(\\sqrt{\\kappa})$ and $O(\\kappa)$ iterations respectively. For a poorly conditioned system with $\\kappa = 10^6$, that\'s 1000–1,000,000 iterations. Can you transform the system to have $\\kappa \\approx 1$ without solving it first?",
     realWorldContext: "Preconditioning is the difference between a practical solver and an impractical one. In computational fluid dynamics, a Navier-Stokes solver without a preconditioner may require millions of iterations; with ILU preconditioner, convergence happens in tens. MATLAB\'s \\texttt{pcg} function accepts a preconditioner as input. The Trilinos library (used in Sandia National Labs simulations) provides algebraic multigrid (AMG) preconditioners that achieve nearly $O(n)$ solve times for elliptic PDEs. AMG is why finite element simulations of millions of elements are computationally feasible.",
-    previewVisualizationId: 'OpenMatNotebook',
   },
 
   intuition: {
     prose: [
-      'Take $A = \\text{diag}(1, 100)$, $\\mathbf{b} = (1, 100)^\\top$ (exact solution $\\mathbf{x}^* = (1,1)^\\top$). The condition number $\\kappa(A) = 100$. Unpreconditioned CG converges with rate $\\left(\\frac{\\sqrt{100}-1}{\\sqrt{100}+1}\\right)^2 \\approx 0.669$ per step — needs ~30 iterations to reduce error by $10^{-6}$. Now precondition with $M = A = \\text{diag}(1,100)$: the preconditioned system is $M^{-1}A\\mathbf{x} = M^{-1}\\mathbf{b}$, i.e., $I\\mathbf{x} = (1,1)^\\top$. Condition number: $\\kappa(I) = 1$. Preconditioned CG solves this **in 1 step** — from 30 iterations to 1. The preconditioner took a poorly-scaled problem and made it trivial. That\'s the power of preconditioning.',
-      '**The idea.** Instead of solving $A\\mathbf{x} = \\mathbf{b}$, solve the preconditioned system $M^{-1}A\\mathbf{x} = M^{-1}\\mathbf{b}$. If $M \\approx A$, then $M^{-1}A \\approx I$, so $\\kappa(M^{-1}A) \\ll \\kappa(A)$. The tradeoff: $M$ must be cheap to apply (solve $M\\mathbf{z} = \\mathbf{r}$ efficiently) and must approximate $A$ well enough to cluster eigenvalues.',
-      '**Left vs right preconditioning.** Left: $M^{-1}A\\mathbf{x} = M^{-1}\\mathbf{b}$ — the residual $M^{-1}(\\mathbf{b} - A\\mathbf{x})$ is preconditioned. Right: $AM^{-1}\\mathbf{y} = \\mathbf{b}$, $\\mathbf{x} = M^{-1}\\mathbf{y}$ — the unpreconditioned residual $\\|\\mathbf{b} - A\\mathbf{x}\\|$ is minimized. Right preconditioning is often preferred for GMRES because it minimizes the true residual.',
-      '**Common preconditioners.** (1) **Diagonal (Jacobi)**: $M = \\text{diag}(A)$. Free to apply, reduces condition number for diagonally dominant matrices, but weak for most problems. (2) **SSOR**: $M = (D+L)D^{-1}(D+U)/\\omega$ — symmetric version of Gauss-Seidel. Works well for elliptic PDEs. (3) **ILU(0)**: incomplete LU factorization — same sparsity as $A$, ignores fill-in. $LU \\approx A$ with controlled error. (4) **ILU(k)**: allows $k$ levels of fill-in. Better approximation, more memory. (5) **AMG**: algebraic multigrid — builds a hierarchy of coarser problems. Near-optimal for elliptic PDEs.',
-      '**Effect on spectrum.** For the Poisson equation on an $n \\times n$ grid: unpreconditioned $\\kappa \\sim n^2$, CG converges in $O(n)$ steps. With Jacobi preconditioner: same order. With ILU(0): $\\kappa \\sim n$, CG in $O(\\sqrt{n})$ steps. With AMG: $\\kappa \\sim 1$ (bounded independent of $n$), CG in $O(1)$ steps (independent of mesh size)!',
+      'Where you are in the story: CG and GMRES are powerful, but their convergence depends critically on the condition number $\\kappa(A)$. CG needs $O(\\sqrt{\\kappa})$ iterations; GMRES up to $O(\\kappa)$. For the 2D Poisson equation on an $n$-point grid, $\\kappa \\sim n$, so CG needs $O(\\sqrt{n})$ iterations. On a $1000 \\times 1000$ grid ($n = 10^6$ unknowns), that is 1000 CG iterations just to converge. And the hardest practical problems — fluid dynamics at high Reynolds number, electromagnetics near resonance — can have $\\kappa = 10^8$ or more. Preconditioning is how you make Krylov methods practical for these cases.',
+      'The core idea is transformation. Instead of solving $A\\mathbf{x} = \\mathbf{b}$ directly, you solve the equivalent system $M^{-1}A\\mathbf{x} = M^{-1}\\mathbf{b}$, where $M$ is a matrix you choose. If $M \\approx A$, then $M^{-1}A \\approx I$, so $\\kappa(M^{-1}A) \\ll \\kappa(A)$ and the Krylov iteration converges in far fewer steps. The catch: $M$ must be cheap to apply (solving $M\\mathbf{z} = \\mathbf{r}$ must cost much less than solving $A\\mathbf{x} = \\mathbf{b}$), and it must be a good enough approximation of $A$ that the eigenvalues of $M^{-1}A$ cluster near 1.',
+      'A concrete illustration: take $A = \\text{diag}(1, 100)$, $\\mathbf{b} = (1, 100)^\\top$. Without preconditioning, $\\kappa(A) = 100$. CG needs about 30 iterations to reduce error by $10^{-6}$. Now precondition with $M = \\text{diag}(A) = \\text{diag}(1, 100)$. The preconditioned system is $M^{-1}A = I$ with condition number 1. Preconditioned CG solves this in exactly 1 step. That is the extreme case — the preconditioner is the matrix itself — but it illustrates the principle vividly: the condition number controls everything, and a good preconditioner eliminates it.',
+      'The simplest family of preconditioners are **splitting-based**: they derive from the same matrix splittings used in stationary iterations. The **Jacobi preconditioner** sets $M = D = \\text{diag}(A)$: applying it costs $O(n)$ (just divide each component by the diagonal). This helps when the bad conditioning comes from poorly scaled rows — all it does is normalize each row by its diagonal entry. For many practical matrices where the off-diagonal entries are the problem, Jacobi preconditioning barely helps. **SSOR** uses $M = (D - L)D^{-1}(D - U)$ (the symmetric Gauss-Seidel preconditioner) and works significantly better for elliptic PDEs, reducing $\\kappa$ from $O(h^{-2})$ to $O(h^{-1})$.',
+      '**Predict before reading on:** Suppose $A$ has $\\kappa(A) = 10^6$ and you apply the Jacobi preconditioner $M = \\text{diag}(A)$. Without knowing the specific off-diagonal entries, would you expect $\\kappa(M^{-1}A)$ to be much less than $10^6$, or could it still be large? When would diagonal scaling actually help?',
+      'The answer: diagonal scaling helps most when the large condition number is caused by row scaling differences — when the diagonal entries span many orders of magnitude. If row 1 has $a_{11} = 1$ and row 2 has $a_{22} = 10^6$ but everything is otherwise well-behaved, scaling by the diagonal fixes the problem. But if all diagonal entries are the same and the problem comes from off-diagonal coupling or near-singularity of some directions, Jacobi does almost nothing. This is why **ILU(0)** — incomplete LU factorization — is the workhorse of practical computing. ILU(0) computes a sparse LU factorization of $A$ that ignores fill-in: it performs Gaussian elimination but drops any new nonzero entry that would appear in a position that was originally zero. The result is $LU \\approx A$ with the same sparsity pattern, costing $O(\\text{nnz})$ to apply (two triangular solves).',
+      'The gold standard for elliptic PDEs is **Algebraic Multigrid (AMG)**. The idea: if the slow convergence of iterative methods comes from low-frequency, smooth error components that are hard to eliminate on a fine grid, perhaps you can represent those components cheaply on a coarser grid. AMG automatically identifies a coarse set of degrees of freedom, builds restriction ($A_c = R A P$) and prolongation operators, and creates a hierarchy of smaller problems. A V-cycle applies smoothing on the fine grid, restricts the residual to the coarse grid, solves there, prolongates the correction back, and smooths again. With AMG as a preconditioner, $\\kappa(M^{-1}A)$ is bounded independently of $n$ — CG+AMG achieves $O(n)$ total work for the largest finite element problems in the world.',
+      'Left vs right preconditioning is a practical detail but matters for GMRES. **Left preconditioning** applies $M^{-1}$ to the residual: the iteration minimizes $\\|M^{-1}(\\mathbf{b} - A\\mathbf{x})\\|$, which is the preconditioned residual. **Right preconditioning** solves $AM^{-1}\\mathbf{y} = \\mathbf{b}$ then recovers $\\mathbf{x} = M^{-1}\\mathbf{y}$: the iteration minimizes the true residual $\\|\\mathbf{b} - A\\mathbf{x}\\|$. Right preconditioning is generally preferred for GMRES because convergence is measured in the unpreconditioned residual — you know exactly how close you are to the true solution.',
+      'Where this is heading: the final lesson in this chapter covers sparse direct solvers — the algorithms used when you absolutely need the exact solution and cannot afford iterative convergence failures. Sparse direct solvers (CHOLMOD, UMFPACK, SuperLU) use sophisticated reordering strategies to minimize fill-in during LU factorization. Understanding when to use direct vs iterative methods, and how to combine them (direct solve as a preconditioner for iterative refinement), is the capstone of large-scale linear algebra in practice.',
     ],
     callouts: [
       {
         type: 'sequencing',
-        title: 'Predict the Effect',
-        body: 'Suppose $A$ has $\\kappa(A) = 10^6$ and you precondition with $M = \\text{diag}(A)$ (Jacobi preconditioner). Without knowing the off-diagonal entries: do you expect $\\kappa(M^{-1}A) \\ll 10^6$? Or could it still be $\\sim 10^6$? When does diagonal preconditioning help most?',
+        title: 'Lesson 4 of 5 — Iterative Solvers & Preconditioning',
+        body: '**Previous (Lesson 3):** GMRES — Arnoldi orthogonalization, Hessenberg least squares, convergence for non-symmetric systems.\n**This lesson:** Preconditioning — Jacobi, SSOR, ILU(0), AMG; how to cluster eigenvalues and make Krylov methods practical.\n**Next (Lesson 5):** Sparse Direct Solvers — fill-in reduction, reordering, when to use direct vs iterative methods.',
       },
       {
         type: 'insight',
@@ -40,6 +43,122 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Preconditioning in Python',
+        mathBridge: 'Compare Jacobi, ILU, and no preconditioner on a Poisson-like system — see the eigenvalue clustering effect directly.',
+        caption: 'Better preconditioners cluster eigenvalues of $M^{-1}A$ near 1, cutting CG iterations.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+
+              cellTitle: 'Eigenvalue clustering: no preconditioner vs Jacobi vs ILU',
+              prose: 'Build a 1D Poisson matrix, compute eigenvalues of the original and preconditioned systems, and plot the clustering effect.',
+              code: `import numpy as np
+import matplotlib.pyplot as plt
+from scipy.linalg import solve_triangular
+
+n = 20
+# 1D Poisson: tridiagonal with 2 on diagonal, -1 off
+A = np.diag(2 * np.ones(n)) + np.diag(-np.ones(n-1), 1) + np.diag(-np.ones(n-1), -1)
+
+# --- Preconditioners ---
+# 1. None: eigenvalues of A
+eigs_A = np.sort(np.linalg.eigvalsh(A))
+
+# 2. Jacobi: M_inv = diag(1/a_ii)
+M_jac_inv = np.diag(1 / np.diag(A))
+A_jac = M_jac_inv @ A
+eigs_jac = np.sort(np.linalg.eigvalsh((A_jac + A_jac.T) / 2))  # symmetrized
+
+# 3. Incomplete Cholesky (IC(0)): for SPD, use lower triangular part
+# Simple IC(0): zero-fill-in Cholesky
+L_ic = np.zeros_like(A)
+for j in range(n):
+    s = A[j, j] - sum(L_ic[j, :j]**2)
+    L_ic[j, j] = np.sqrt(max(s, 1e-14))
+    for i in range(j+1, n):
+        if A[i, j] != 0:  # only fill where A has nonzeros
+            L_ic[i, j] = (A[i, j] - sum(L_ic[i, :j] * L_ic[j, :j])) / L_ic[j, j]
+
+# M^{-1} A = (L L^T)^{-1} A = L^{-T} (L^{-1} A)
+L_inv_A = solve_triangular(L_ic, A, lower=True)
+A_ic = solve_triangular(L_ic, L_inv_A.T, lower=True).T
+eigs_ic = np.sort(np.linalg.eigvalsh((A_ic + A_ic.T) / 2))
+
+print(f"kappa(A):           {eigs_A[-1]/eigs_A[0]:.1f}")
+print(f"kappa(Jacobi^-1 A): {eigs_jac[-1]/eigs_jac[0]:.1f}")
+print(f"kappa(IC(0)^-1 A):  {eigs_ic[-1]/eigs_ic[0]:.1f}")
+
+fig, axes = plt.subplots(1, 3, figsize=(12, 3))
+for ax, eigs, title in zip(axes,
+    [eigs_A, eigs_jac, eigs_ic],
+    ['No preconditioner', 'Jacobi', 'IC(0)']):
+    ax.plot(eigs, 'bo', markersize=5)
+    ax.axhline(1, color='r', linestyle='--', alpha=0.5)
+    ax.set_title(f'{title}\\nkappa={eigs[-1]/eigs[0]:.1f}')
+    ax.set_xlabel('Eigenvalue index'); ax.set_ylabel('Eigenvalue')
+    ax.grid(True)
+plt.tight_layout(); plt.show()
+`,
+            },
+            {
+              id: 2,
+
+              cellTitle: 'CG iteration count vs preconditioner quality',
+              prose: 'Compare CG convergence with three preconditioners on a larger system. Count iterations needed to reach tolerance 1e-8.',
+              code: `import numpy as np
+from scipy.sparse import diags
+from scipy.sparse.linalg import cg, LinearOperator
+from scipy.linalg import solve_triangular
+
+def make_poisson(n):
+    return (np.diag(2*np.ones(n)) + np.diag(-np.ones(n-1),1)
+            + np.diag(-np.ones(n-1),-1)).astype(float)
+
+def count_cg(A, b, M_apply=None, tol=1e-8):
+    count = [0]
+    def callback(x): count[0] += 1
+    if M_apply is None:
+        x, info = cg(A, b, tol=tol, callback=callback, maxiter=500)
+    else:
+        n = len(b)
+        M_op = LinearOperator((n, n), matvec=M_apply)
+        x, info = cg(A, b, M=M_op, tol=tol, callback=callback, maxiter=500)
+    return count[0], info
+
+results = []
+for n in [20, 40, 80, 160]:
+    A = make_poisson(n)
+    b = np.ones(n)
+
+    # No preconditioner
+    k_none, _ = count_cg(A, b)
+
+    # Jacobi preconditioner
+    d_inv = 1 / np.diag(A)
+    k_jac, _ = count_cg(A, b, M_apply=lambda v: d_inv * v)
+
+    # Diagonal scaling shifts kappa from O(n^2) to same order for tridiagonal...
+    # Show how n^0.5 scaling works
+    results.append((n, k_none, k_jac))
+    print(f"n={n:4d}: no-precond={k_none:4d} iters, Jacobi={k_jac:4d} iters, sqrt(n)={n**0.5:.0f}")
+
+import matplotlib.pyplot as plt
+ns, k_none_all, k_jac_all = zip(*results)
+plt.figure(figsize=(6, 4))
+plt.loglog(ns, k_none_all, 'b-o', label='No preconditioner')
+plt.loglog(ns, k_jac_all,  'r-s', label='Jacobi preconditioner')
+plt.loglog(ns, [n**0.5 for n in ns], 'k--', label='O(sqrt(n))')
+plt.xlabel('System size n'); plt.ylabel('CG iterations')
+plt.title('Iteration count vs system size')
+plt.legend(); plt.grid(True); plt.tight_layout(); plt.show()
+`,
+            },
+          ],
+        },
+      },
       {
         id: 'OpenMatNotebook',
         title: 'Preconditioning in Action',

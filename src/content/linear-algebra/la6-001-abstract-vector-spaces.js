@@ -11,7 +11,6 @@ export default {
   hook: {
     question: "You already know how to add vectors in $\\mathbb{R}^n$ and multiply by scalars. But can you add polynomials? Functions? What is it that makes $\\mathbb{R}^n$ a 'vector space' — and do those other things qualify too?",
     realWorldContext: "Abstract vector spaces let you apply all of linear algebra — independence, span, basis, dimension, linear transformations — to any mathematical objects, not just $\\mathbb{R}^n$ arrows. In signal processing, the space of bandlimited functions is a vector space; filters are linear maps. In machine learning, function spaces are vector spaces; regularization is a norm constraint. In differential equations, the set of solutions to a linear ODE is a vector space; its dimension equals the order of the equation. Abstracting away from coordinates reveals structure that would be invisible if you stayed glued to $\\mathbb{R}^n$.",
-    previewVisualizationId: 'OpenMatNotebook',
   },
 
   intuition: {
@@ -20,9 +19,16 @@ export default {
       '**Why the axioms matter.** The axioms say nothing about what vectors "look like." They only specify how vectors behave under the two operations. Anything that satisfies all ten axioms is a vector space, and every theorem proved from those axioms applies automatically. This is the power of abstraction: prove once, apply everywhere.',
       '**Key examples.** $\\mathbb{R}^n$ (columns of $n$ real numbers) — the prototype. $P_n$ (polynomials of degree $\\leq n$) — with $(p+q)(x) = p(x) + q(x)$ and $(cp)(x) = c \\cdot p(x)$. $M_{m \\times n}$ (all $m \\times n$ matrices) — with entry-wise addition and scalar multiplication. $C[a,b]$ (continuous functions on $[a,b]$) — with pointwise operations. All are vector spaces.',
       '**Subspaces.** A subset $W \\subseteq V$ is a subspace if (1) $\\mathbf{0} \\in W$, (2) closed under addition, and (3) closed under scalar multiplication. The three-condition check is all you need — the other axioms are inherited from $V$. Examples: any line through the origin in $\\mathbb{R}^2$; the set of polynomials with zero constant term; the set of all solutions to a homogeneous linear ODE.',
+      '**The zero vector is unique.** The axioms guarantee that every vector space has exactly one zero vector. Proof: suppose $\\mathbf{0}$ and $\\mathbf{0}\'$ are both zero vectors. Then $\\mathbf{0} = \\mathbf{0} + \\mathbf{0}\' = \\mathbf{0}\'$ (using axioms 4 on each). Similarly, every vector has a unique additive inverse. This means you cannot have "multiple zeros" — if you find yourself computing with a set that has two different zero-like objects, it is not a vector space. This uniqueness property is why the zero polynomial $0(x)=0$, the zero matrix $\\mathbf{0}$, and the zero function $f(x)=0$ are each the unique zero of their respective spaces.',
+      '**Why not every set with addition and scaling is a vector space.** Consider the positive reals $\\mathbb{R}_{>0}$ with "addition" $a \\oplus b = ab$ (multiplication) and "scalar multiplication" $c \\otimes a = a^c$. Check: associativity $(a \\oplus b) \\oplus c = (ab)c = a(bc) = a \\oplus (b \\oplus c)$ ✓. Zero element: $1$ (since $a \\oplus 1 = a \\cdot 1 = a$) ✓. Inverse: $a \\oplus a^{-1} = a \\cdot a^{-1} = 1$ ✓. Scalar mult: $c \\otimes a = a^c$ with $(c+d) \\otimes a = a^{c+d} = a^c \\cdot a^d = (c \\otimes a) \\oplus (d \\otimes a)$ ✓. This actually IS a vector space — just with unusual-looking operations. The point: what matters is the algebraic structure (the axioms), not the visual appearance of the objects.',
       '**Abstract vector spaces in engineering.** The solution set of any homogeneous linear ODE $y\'\' + p(t)y\' + q(t)y = 0$ is a vector space (of functions!) — you can add solutions and scale them. In CNC motion control, the set of all possible velocity profiles satisfying $v(0) = v(T) = 0$ (zero start/end speed) forms a function space; finding the "smoothest" profile is a minimization in that space. The set of all $3\\times 3$ rotation matrices is NOT a vector space (you can\'t add two rotations and get a rotation), but the space of antisymmetric matrices $\\mathfrak{so}(3)$ (the Lie algebra) is — it is the tangent space to rotations at the identity, directly relevant to CNC axis interpolation and robot kinematics.',
     ],
     callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 1 of 6 — Abstract Vector Spaces',
+        body: '**Previous:** This is the start of Chapter 6.\n**This lesson:** Abstract Vector Spaces — defining vector spaces by ten axioms, recognizing when a set qualifies, and testing subspaces.\n**Next:** Basis and Dimension — how to measure the "size" of any vector space with a single number.',
+      },
       {
         type: 'insight',
         title: 'The Ten Axioms (Compressed)',
@@ -39,7 +45,7 @@ export default {
         body: 'The set $\\{(x,y) : x \\geq 0, y \\geq 0\\}$ (first quadrant) is NOT a vector space — it fails closure under scalar multiplication (multiplying by $-1$ leaves the quadrant). A vector space must contain $\\mathbf{0}$ and be closed under all linear combinations, including those with negative and non-integer scalars.',
       },
       {
-        type: 'sequencing',
+        type: 'insight',
         title: 'Prediction',
         body: 'Before working through the subspace examples: which of these is a subspace of $\\mathbb{R}^3$? (a) $\\{(x,y,z) : x + y + z = 0\\}$; (b) $\\{(x,y,z) : x + y + z = 1\\}$; (c) $\\{(x,y,z) : x \\geq 0\\}$; (d) $\\{(x,y,z) : x = 0\\}$. For each, ask: does it contain $\\mathbf{0}$? Is it closed under addition and scalar multiplication?',
       },
@@ -129,108 +135,120 @@ disp('It is isomorphic to R^3')
         title: 'Subspace Tests and Polynomial Spaces',
         mathBridge: 'Verify subspace conditions computationally, explore polynomial vector spaces, and see solutions to homogeneous ODEs as a vector space.',
         caption: 'Any structure satisfying the 10 axioms is a vector space — the axioms are everything.',
-        props: {
-          disableRunAll: true,
+        initialProps: {
           initialCells: [
             {
               id: 1,
-              cell_type: 'code',
-              source: `import numpy as np
-
-# Subspace test: W = {(x,y,z) : x + 2y - z = 0} in R^3
-# This is the null space of [1, 2, -1], so it IS a subspace
+              cellTitle: 'Subspace test: two examples',
+              prose: 'Verify that W = {(x,y,z) : x+2y-z=0} is a subspace of R^3 by checking closure under addition and scalar multiplication. Then show a non-example.',
+              code: `import numpy as np
 
 def in_W(v):
     return abs(v[0] + 2*v[1] - v[2]) < 1e-10
 
-# Check 1: zero vector
-print("Check 1 - zero in W:", in_W([0, 0, 0]))
-
-# Check 2: closure under addition
+# Subspace checks
 u = np.array([1., 0., 1.])   # 1+0-1=0 ✓
 v = np.array([2., 1., 4.])   # 2+2-4=0 ✓
-print("u in W:", in_W(u))
-print("v in W:", in_W(v))
-print("u+v in W:", in_W(u + v))
-
-# Check 3: closure under scalar multiplication
-print("7*u in W:", in_W(7*u))
-
-print()
-print("All checks passed: W is a subspace (the null space of [1, 2, -1])")
+print("W = {x+2y-z=0} subspace checks:")
+print("  zero in W:", in_W([0, 0, 0]))
+print("  u in W:", in_W(u), " v in W:", in_W(v))
+print("  u+v in W:", in_W(u + v), "  7*u in W:", in_W(7*u))
+print("=> W is a subspace (null space of [1,2,-1]) ✓")
 print()
 
-# Non-example: W2 = {(x,y,z) : x + y = 1} — NOT a subspace
+# Non-example: W2 = {x+y=1}
 def in_W2(v):
     return abs(v[0] + v[1] - 1) < 1e-10
 
 p = np.array([0.5, 0.5, 3.])
 q = np.array([0.3, 0.7, 1.])
-print("Non-example: W2 = {x+y=1}")
-print("p in W2:", in_W2(p))
-print("p+q in W2:", in_W2(p + q), " <- FAILS (sum has x+y=1.6, not 1)")
-print("Not a subspace: doesn't contain zero vector and not closed under addition")
+print("Non-example W2 = {x+y=1}:")
+print("  p in W2:", in_W2(p), " q in W2:", in_W2(q))
+print("  p+q in W2:", in_W2(p + q), " <- FAILS (x+y=1.6 ≠ 1)")
+print("=> Not a subspace: doesn't contain zero and not closed under addition")
 `,
             },
             {
               id: 2,
-              cell_type: 'code',
-              source: `import numpy as np
-from numpy.polynomial import polynomial as P
+              cellTitle: 'Polynomial vector space P_2 ≅ R^3',
+              prose: 'Treat polynomials as coefficient vectors. Verify vector space operations and test whether {1+x, 1-x} spans P_1.',
+              code: `import numpy as np
 
-# Polynomials as vectors: P_2 is isomorphic to R^3
-# Represent p(x) = a0 + a1*x + a2*x^2 as coefficient array [a0, a1, a2]
+# p(x) = a0 + a1*x + a2*x^2 stored as [a0, a1, a2]
+p = np.array([1., 2., 3.])   # 1 + 2x + 3x^2
+q = np.array([4., 0., -1.])  # 4 - x^2
 
-p = np.array([1., 2., 3.])   # p(x) = 1 + 2x + 3x^2
-q = np.array([4., 0., -1.])  # q(x) = 4 - x^2
-
-# Vector space operations on polynomials
-print("p + q =", p + q, "  means: (1+4) + (2+0)x + (3-1)x^2 =", P.Polynomial(p+q))
-print("3*p =",   3*p,    "  means: 3 + 6x + 9x^2")
-print("zero polynomial:", np.zeros(3))
-
-# Verify span: do {1+x, 1-x} span P_1?
-# We need to solve [1,1; 1,-1] @ [c1;c2] = [a0;a1] for any a0,a1
-A = np.array([[1., 1.], [1., -1.]])
+print("Polynomial arithmetic as vector arithmetic:")
+print("  p + q =", p + q, "  (coefficients add pointwise)")
+print("  3*p   =", 3*p)
+print("  zero  =", np.zeros(3))
 print()
+
+# Spanning test: do {1+x, 1-x} span P_1?
+A = np.array([[1., 1.], [1., -1.]])
 print("Spanning test for {1+x, 1-x} in P_1:")
 for target in [[2., 4.], [3., -1.], [0., 5.]]:
-    coeffs = np.linalg.solve(A, target)
-    print(f"  {target[0]} + {target[1]}x = {coeffs[0]:.2f}(1+x) + {coeffs[1]:.2f}(1-x)")
-
-print("=> {1+x, 1-x} spans P_1 ✓")
+    c = np.linalg.solve(A, target)
+    print(f"  {target[0]}+{target[1]}x = {c[0]:.2f}(1+x) + {c[1]:.2f}(1-x) ✓")
+print("=> {1+x, 1-x} spans P_1")
 `,
             },
             {
               id: 3,
-              cell_type: 'code',
-              source: `import numpy as np
+              cellTitle: "ODE solution space — a 2D vector space",
+              prose: "Solutions to y'' + y = 0 form a 2D vector space spanned by {sin(t), cos(t)}. Verify that any solution is a linear combination of these basis elements.",
+              code: `import numpy as np
 from scipy.integrate import odeint
-
-# ODE solution space: y'' + y = 0 has solutions {sin(t), cos(t)} as basis
-# The solution space is a 2-dimensional vector space
 
 t = np.linspace(0, 2*np.pi, 200)
 
 def ode(y, t):
-    return [y[1], -y[0]]   # y'' = -y
+    return [y[1], -y[0]]
 
-# Three solutions with different initial conditions
-y1 = odeint(ode, [0., 1.], t)[:, 0]   # sin(t): y(0)=0, y'(0)=1
-y2 = odeint(ode, [1., 0.], t)[:, 0]   # cos(t): y(0)=1, y'(0)=0
-y3 = odeint(ode, [2., 3.], t)[:, 0]   # 2cos+3sin: y(0)=2, y'(0)=3
+y1 = odeint(ode, [0., 1.], t)[:, 0]   # sin(t)
+y2 = odeint(ode, [1., 0.], t)[:, 0]   # cos(t)
+y3 = odeint(ode, [2., 3.], t)[:, 0]   # 2cos+3sin
 
-# Verify y3 = 2*y2 + 3*y1 (linear combination of basis solutions)
-combo = 2*y2 + 3*y1
-print("Solution space of y'' + y = 0:")
-print(f"Max error |y3 - (2*cos + 3*sin)|: {np.max(np.abs(y3 - combo)):.2e}")
-print()
-print("=> y3 is exactly a linear combination of y1 and y2")
-print("=> The solution space is a 2D vector space spanned by {sin, cos}")
-print()
-print("General solution: y(t) = c1*cos(t) + c2*sin(t)")
-print("  c1 = y(0), c2 = y'(0)")
-print("  (Each choice of c1,c2 gives a DIFFERENT solution — 2D space)")
+print("Solution space of y'' + y = 0 (dimension 2):")
+print(f"  Max |y3 - (2*y2 + 3*y1)|: {np.max(np.abs(y3 - (2*y2+3*y1))):.2e}")
+print("=> y3 is exactly 2*cos(t) + 3*sin(t)")
+print("=> Any solution = c1*cos(t) + c2*sin(t) — a 2D vector space")
+`,
+            },
+          ],
+        },
+      },
+      {
+        id: 'OpenMatNotebook',
+        title: 'Abstract Vector Spaces — OpenMAT',
+        mathBridge: 'Test subspace conditions and explore polynomial spaces using MATLAB-style syntax.',
+        caption: 'Subspace = subset closed under addition and scalar multiplication, containing zero.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Subspace check and spanning',
+              prose: ['Test whether W = {(x,y,z): x+2y-z=0} is a subspace, then check whether {1+x, 1-x} spans P_1.'],
+              code: `% Subspace check: W = {(x,y,z): x+2y-z=0}
+u = [1; 0; 1]   % 1+0-1=0 ✓
+v = [2; 1; 4]   % 2+2-4=0 ✓
+
+disp('Closure under addition:')
+w = u + v
+x_sum = w(1) + 2*w(2) - w(3)
+disp(['x+2y-z for u+v = ', num2str(x_sum), ' (should be 0)'])
+
+disp('Closure under scalar multiplication:')
+w2 = 7 * u
+x_scal = w2(1) + 2*w2(2) - w2(3)
+disp(['x+2y-z for 7u = ', num2str(x_scal), ' (should be 0)'])
+
+% Spanning test: {1+x, 1-x} in P_1 — coefficients [1;1] and [1;-1]
+A = [1 1; 1 -1]
+b = [2; 4]
+c = A \\ b
+disp('2+4x = c1*(1+x) + c2*(1-x): c =')
+c
 `,
             },
           ],

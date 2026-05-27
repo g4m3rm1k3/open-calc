@@ -11,42 +11,140 @@ export default {
   hook: {
     question: "You need to solve $Ax = b$ where $A$ is the covariance matrix of your data — symmetric and positive definite. LU decomposition works but ignores the symmetry. Is there a smarter factorization?",
     realWorldContext: "Cholesky decomposition is the backbone of statistical computing. In Bayesian statistics, every covariance matrix is SPD, and Cholesky is used to sample multivariate normal distributions, compute log-determinants, and solve linear systems efficiently. In finite element analysis, the stiffness matrix is SPD — Cholesky solvers are used for every structural mechanics simulation. Monte Carlo methods in finance use Cholesky to generate correlated random variables. In machine learning, Gaussian processes require Cholesky to compute kernel matrix inverses.",
-    previewVisualizationId: 'OpenMatNotebook',
   },
 
   intuition: {
     prose: [
-      `**Numbers first.** Take $A = \\begin{bmatrix}4&2\\\\2&3\\end{bmatrix}$. Step through the Cholesky algorithm: $l_{11} = \\sqrt{4} = 2$. Then $l_{21} = 2/l_{11} = 2/2 = 1$. Finally $l_{22} = \\sqrt{3 - l_{21}^2} = \\sqrt{3-1} = \\sqrt{2}$. So $L = \\begin{bmatrix}2&0\\\\1&\\sqrt{2}\\end{bmatrix}$. Verify: $LL^\\top = \\begin{bmatrix}2&0\\\\1&\\sqrt{2}\\end{bmatrix}\\begin{bmatrix}2&1\\\\0&\\sqrt{2}\\end{bmatrix} = \\begin{bmatrix}4&2\\\\2&3\\end{bmatrix} = A$ ✓. No eigenvalue computation needed — just arithmetic on the entries.`,
-      '**Why SPD matrices are special.** For any non-zero $\\mathbf{x}$, $\\mathbf{x}^\\top A \\mathbf{x} > 0$. This means $A$ has all positive eigenvalues, $\\det A > 0$, and all principal submatrices are also positive definite. These properties guarantee that the Cholesky algorithm never divides by zero or takes the square root of a negative number — the algorithm succeeds iff $A$ is SPD.',
-      '**Computing L.** The entries of $L$ are computed by matching entries of $LL^\\top$ to $A$: $l_{jj} = \\sqrt{a_{jj} - \\sum_{k=1}^{j-1} l_{jk}^2}$ and $l_{ij} = \\frac{1}{l_{jj}}\\left(a_{ij} - \\sum_{k=1}^{j-1} l_{ik} l_{jk}\\right)$ for $i > j$. This proceeds column by column.',
-      '**Efficiency.** Cholesky does approximately $n^3/3$ flops — half the $2n^3/3$ of LU (since you only compute the lower triangle). Storage is halved too. For $n = 10000$, this is a factor-of-2 speedup over LU, which matters in production.',
+      '**Where you are in the story.** The last lesson showed that QR decomposition turns least squares into a well-conditioned triangular solve. But QR works for any matrix. When your matrix is symmetric and positive definite — a covariance matrix, a stiffness matrix, a kernel matrix — you can do far better. Cholesky decomposition is the purpose-built algorithm for this case: twice as fast as LU, half the storage, and it tells you whether your matrix is actually positive definite as a free bonus.',
+
+      '**What positive definite actually means, concretely.** Say $A = \\begin{bmatrix}4&2\\\\2&3\\end{bmatrix}$. For any vector $\\mathbf{x} = (x_1, x_2)^\\top$, the quadratic form $\\mathbf{x}^\\top A \\mathbf{x} = 4x_1^2 + 4x_1x_2 + 3x_2^2$. Pick any nonzero $\\mathbf{x}$ you like — this expression is always positive. That is positive definiteness: the matrix "curves upward" in every direction, like a bowl. Negative eigenvalues would create directions where the bowl curves downward. Zero eigenvalues would create flat directions. Positive definiteness rules both out, and that is why Cholesky works: it never encounters a negative number under a square root.',
+
+      '**The idea: A is a perfect square.** The Cholesky factorization $A = LL^\\top$ says the matrix $A$ is a perfect square of a lower triangular matrix. Think of it as a matrix analogue of $a = (\\sqrt{a})^2$ for positive real numbers. The positivity of $A$ (all eigenvalues positive) is exactly the condition that makes this square root exist. The triangular structure of $L$ makes the factorization unique (given positive diagonal) and efficient to compute.',
+
+      '**Walk through the algorithm on a 2×2 example.** $A = \\begin{bmatrix}4&2\\\\2&3\\end{bmatrix}$. You want $L = \\begin{bmatrix}l_{11}&0\\\\l_{21}&l_{22}\\end{bmatrix}$ with $LL^\\top = A$. Matching the $(1,1)$ entry: $l_{11}^2 = 4$, so $l_{11} = 2$. Matching the $(2,1)$ entry: $l_{21} \\cdot l_{11} = 2$, so $l_{21} = 2/2 = 1$. Matching the $(2,2)$ entry: $l_{21}^2 + l_{22}^2 = 3$, so $l_{22} = \\sqrt{3-1} = \\sqrt{2}$. Check: $LL^\\top = \\begin{bmatrix}2&0\\\\1&\\sqrt{2}\\end{bmatrix}\\begin{bmatrix}2&1\\\\0&\\sqrt{2}\\end{bmatrix} = \\begin{bmatrix}4&2\\\\2&3\\end{bmatrix}$ ✓. The algorithm is just arithmetic — no eigenvalues needed.',
+
+      '**Predict before reading on.** For $A = \\begin{bmatrix}9&3\\\\3&2\\end{bmatrix}$, what is $l_{11}$, the first diagonal entry of the Cholesky factor? Write your answer before looking at Example 2.',
+
+      '**Solving systems with Cholesky.** Once you have $A = LL^\\top$, solving $A\\mathbf{x} = \\mathbf{b}$ costs $O(n^2)$ — you do two triangular solves. First forward substitution: $L\\mathbf{y} = \\mathbf{b}$. Then back substitution: $L^\\top\\mathbf{x} = \\mathbf{y}$. This is faster than the general LU approach, and numerically at least as stable (SPD matrices are well-behaved — pivoting is never needed).',
+
+      '**The covariance matrix application.** In statistics and machine learning, covariance matrices are the most common SPD matrices you encounter. Fitting a Gaussian process, sampling from a multivariate normal, computing a Mahalanobis distance — all require factoring the covariance matrix $\\Sigma$. The Cholesky factor $L$ (where $\\Sigma = LL^\\top$) is used to generate correlated random samples: if $\\mathbf{w} \\sim \\mathcal{N}(\\mathbf{0}, I)$, then $L\\mathbf{w} \\sim \\mathcal{N}(\\mathbf{0}, \\Sigma)$. This is how NumPy\'s `np.random.multivariate_normal` works internally.',
+
+      '**Where this is heading.** Cholesky is numerically ideal when you know $A$ is SPD. But what if you only suspect it might be, or what if near-zero eigenvalues make the factorization marginal? That is the topic of the next two lessons: matrix norms and condition numbers tell you how sensitive a factorization is to perturbations, and numerical stability analysis tells you when to trust your computed answers.',
     ],
     callouts: [
       {
+        type: 'sequencing',
+        title: 'Lesson 2 of 7 — Numerical Linear Algebra',
+        body: '**Previous (Lesson 1):** QR decomposition — orthonormal basis, least squares, condition number $\\kappa(A)$ vs $\\kappa(A)^2$.\n**This lesson:** Cholesky — the fast, stable factorization for symmetric positive definite matrices. Connection: $A^\\top A = R^\\top R$ links QR and Cholesky.\n**Next (Lesson 3):** Matrix norms and condition numbers — quantifying sensitivity of factorizations.',
+      },
+      {
         type: 'theorem',
         title: 'Cholesky Existence and Uniqueness',
-        body: '$A$ has a Cholesky factorization $A = LL^\\top$ (with $L$ lower triangular, positive diagonal) iff $A$ is symmetric positive definite (SPD).\n\nConsequence: you can test if $A$ is SPD by attempting Cholesky — if it succeeds, $A$ is SPD; if the algorithm encounters a non-positive pivot, it is not.',
+        body: '$A$ has a Cholesky factorization $A = LL^\\top$ (with $L$ lower triangular, positive diagonal) iff $A$ is symmetric positive definite (SPD).\n\n**Consequence:** you can test if $A$ is SPD by attempting Cholesky — if it succeeds, $A$ is SPD; if the algorithm encounters a non-positive pivot, it is not.',
       },
       {
         type: 'insight',
         title: 'Cholesky for Sampling Normals',
-        body: 'To sample $\\mathbf{z} \\sim \\mathcal{N}(\\boldsymbol{\\mu}, \\Sigma)$:\n1. Compute Cholesky $\\Sigma = LL^\\top$\n2. Sample $\\mathbf{w} \\sim \\mathcal{N}(\\mathbf{0}, I)$ (standard normal)\n3. Return $\\mathbf{z} = \\boldsymbol{\\mu} + L\\mathbf{w}$\n\nCovariance of $L\\mathbf{w}$ = $L \\cdot I \\cdot L^\\top = LL^\\top = \\Sigma$. ✓',
+        body: 'To sample $\\mathbf{z} \\sim \\mathcal{N}(\\boldsymbol{\\mu}, \\Sigma)$:\n1. Compute Cholesky $\\Sigma = LL^\\top$\n2. Sample $\\mathbf{w} \\sim \\mathcal{N}(\\mathbf{0}, I)$ (independent standard normals)\n3. Return $\\mathbf{z} = \\boldsymbol{\\mu} + L\\mathbf{w}$\n\nCovariance of $L\\mathbf{w}$ = $L \\cdot I \\cdot L^\\top = LL^\\top = \\Sigma$ ✓',
       },
       {
         type: 'insight',
-        title: 'Cholesky vs LU',
-        body: 'LU: general $n \\times n$ matrix → $\\frac{2}{3}n^3$ flops\nCholesky (SPD): → $\\frac{1}{3}n^3$ flops (half as much)\nLU needs $n^2$ extra storage for the factored form\nCholesky only stores the lower triangle: $\\frac{n(n+1)}{2}$ entries',
-      },
-      {
-        type: 'sequencing',
-        title: 'Prediction',
-        body: 'Before working Example 2: given $A = \\begin{bmatrix}9&3\\\\3&2\\end{bmatrix}$, predict $l_{11}$ (the first diagonal entry of the Cholesky factor $L$). Write your answer, then work through the algorithm to check.',
+        title: 'Cholesky vs LU: Flop Count',
+        body: 'LU (general): $\\frac{2}{3}n^3$ flops\nCholesky (SPD): $\\frac{1}{3}n^3$ flops — exactly half\n\nStorage: LU fills $n^2$ entries; Cholesky only stores the lower triangle — $\\frac{n(n+1)}{2}$ entries. For $n = 10000$, this saves 50 million doubles.',
       },
     ],
     visualizations: [
       {
+        id: 'PythonNotebook',
+        title: 'Cholesky Decomposition with NumPy/SciPy',
+        mathBridge: 'Factor an SPD matrix with numpy, solve a system using two triangular solves, and use Cholesky to sample correlated random variables.',
+        caption: 'scipy.linalg.cholesky uses LAPACK\'s dpotrf — the same routine run in every scientific computing pipeline.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Compute Cholesky and verify',
+              prose: 'Build an SPD matrix, factor it with Cholesky, and verify A = L @ L.T.',
+              code: `import numpy as np
+from scipy.linalg import cholesky, solve_triangular
+
+# Build an SPD matrix: B.T @ B is always SPD for full-rank B
+B = np.array([[2, 1, 0], [1, 3, 1], [0, 1, 4]], dtype=float)
+A = B.T @ B
+
+print("A (SPD):")
+print(A)
+print("Eigenvalues (all positive):", np.linalg.eigvalsh(A))
+print()
+
+# Cholesky: scipy returns lower triangular by default with lower=True
+L = cholesky(A, lower=True)
+print("L (lower triangular):")
+print(np.round(L, 4))
+print()
+print("||L @ L.T - A||:", np.linalg.norm(L @ L.T - A))
+`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Solve Ax = b using two triangular solves',
+              prose: 'With A = L @ L.T, solve Ax = b as two triangular systems: L y = b, then L.T x = y.',
+              code: `import numpy as np
+from scipy.linalg import cholesky, solve_triangular
+
+B = np.array([[2, 1, 0], [1, 3, 1], [0, 1, 4]], dtype=float)
+A = B.T @ B
+b = np.array([1.0, 2.0, 3.0])
+
+L = cholesky(A, lower=True)
+
+# Forward solve: L y = b
+y = solve_triangular(L, b, lower=True)
+# Back solve: L.T x = y
+x = solve_triangular(L.T, y, lower=False)
+
+print("Solution x:", np.round(x, 6))
+print("Residual ||Ax - b||:", np.linalg.norm(A @ x - b))
+print()
+
+# Compare with direct solve
+x_ref = np.linalg.solve(A, b)
+print("Direct solve x:    ", np.round(x_ref, 6))
+print("Difference:        ", np.linalg.norm(x - x_ref))
+`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Sampling correlated Gaussians',
+              prose: 'Use the Cholesky factor to generate samples from a 2D Gaussian with a given covariance. The key identity: if w ~ N(0,I) then L @ w ~ N(0, Sigma).',
+              code: `import numpy as np
+import matplotlib.pyplot as plt
+
+rng = np.random.default_rng(42)
+
+# Covariance matrix
+Sigma = np.array([[4.0, 2.0], [2.0, 3.0]])
+L = np.linalg.cholesky(Sigma)
+
+# Generate 2000 correlated samples
+n = 2000
+W = rng.standard_normal((2, n))    # iid standard normals
+Z = L @ W                           # correlated: cov ~ Sigma
+
+print("Target Sigma:")
+print(Sigma)
+print()
+print("Empirical covariance of samples:")
+print(np.round(np.cov(Z), 2))
+print("(should be close to Sigma for large n)")
+`,
+            },
+          ],
+        },
+      },
+      {
         id: 'OpenMatNotebook',
-        title: 'Cholesky Factorization',
+        title: 'Cholesky Factorization — OpenMAT',
         mathBridge: 'Factor an SPD matrix and use it to solve systems efficiently.',
         caption: 'A = L * L^T — the square root of a matrix.',
         initialProps: {
@@ -55,58 +153,44 @@ export default {
               id: 1,
               cellTitle: 'Compute Cholesky and verify',
               prose: ['Factor an SPD matrix A = L*L^T, verify, and solve Ax = b.'],
-              code: `% Build an SPD matrix (B'*B is always SPD if B has full column rank)
-B = [2 1 0; 1 3 1; 0 1 4]
+              code: `B = [2 1 0; 1 3 1; 0 1 4]
 A = B' * B
-disp('A = B^T B (SPD):')
-A
 disp('Eigenvalues (all positive for SPD):')
 eig(A)
 
-% Cholesky factorization (chol returns upper triangular R where A = R'*R)
 R = chol(A)
-L = R'   % lower triangular factor
+L = R'
 disp('L (lower triangular):')
 L
-disp('Verify L*L^T = A:')
+disp('Verify ||L*L^T - A||:')
 norm(A - L*L')
 
-% Solve Ax = b using Cholesky
 b = [1; 2; 3]
-% Forward substitution: L*y = b
 y = L \\ b
-% Back substitution: L'*x = y
 x = L' \\ y
 disp('Solution x:')
 x
-disp('Verify Ax = b:')
+disp('Residual ||Ax - b||:')
 norm(A*x - b)
 `,
             },
             {
               id: 2,
               cellTitle: 'Cholesky for sampling correlated normals',
-              prose: ['Use Cholesky to sample from a 2D Gaussian with covariance Sigma.'],
-              code: `% Covariance matrix
-Sigma = [4 2; 2 3]
+              prose: ['Use Cholesky to generate correlated samples from a 2D Gaussian.'],
+              code: `Sigma = [4 2; 2 3]
 L = chol(Sigma, 'lower')
-disp('L:')
-L
 disp('Verify L*L^T = Sigma:')
 norm(Sigma - L*L')
 
-% Sample correlated normals
 rng(42)
 n_samples = 1000
-W = randn(2, n_samples)  % iid standard normals
-Z = L * W  % correlated samples: cov ~ Sigma
+W = randn(2, n_samples)
+Z = L * W
 
-% Empirical covariance
 empirical_cov = (Z * Z') / (n_samples - 1)
-disp('Empirical covariance (should be close to Sigma):')
+disp('Empirical covariance (should match Sigma):')
 round(empirical_cov, 2)
-disp('Target Sigma:')
-Sigma
 `,
             },
           ],

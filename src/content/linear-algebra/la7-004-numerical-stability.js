@@ -11,40 +11,120 @@ export default {
   hook: {
     question: "You run Gaussian elimination on paper and get the exact answer. You run the same algorithm on a computer and get a wrong answer. How can a perfectly correct algorithm give a wrong answer — and how do you fix it?",
     realWorldContext: "Numerical stability is the difference between working scientific software and software that crashes or gives nonsense. The Apollo Guidance Computer used carefully designed algorithms to avoid catastrophic cancellation during lunar orbit insertion. Climate models accumulate rounding errors over millions of time steps — numerical stability determines whether forecasts are reliable. The Intel Pentium FDIV bug (1994) — a flaw in floating-point division — cost Intel \\$475M in recalls. Understanding floating-point arithmetic is not optional for serious numerical computing.",
-    previewVisualizationId: 'OpenMatNotebook',
   },
 
   intuition: {
     prose: [
-      'Compute $f(x) = (1 - \\cos x)/x^2$ at $x = 10^{-8}$. The true limit is $1/2$ (Taylor: $\\cos x \\approx 1 - x^2/2$). Direct computation: $\\cos(10^{-8}) = 1.0000000000000000\\ldots$ in double precision — all 16 significant digits are ones, so $1 - \\cos(10^{-8}) = 0$ in floating-point (the tiny difference $5 \\times 10^{-17}$ is below machine epsilon $\\varepsilon_{\\text{mach}} \\approx 2.2 \\times 10^{-16}$). Division by $10^{-16}$ gives $0/10^{-16} = 0$ — completely wrong instead of $0.5$. This is **catastrophic cancellation**: subtracting nearly equal numbers wipes out all significant digits. The stable rewrite: $f(x) = 2\\sin^2(x/2)/x^2$. At $x = 10^{-8}$: $\\sin(5 \\times 10^{-9}) \\approx 5 \\times 10^{-9}$, giving $2(5 \\times 10^{-9})^2/(10^{-8})^2 = 0.5000\\ldots$ ✓.',
-      '**Floating-point numbers.** A double-precision float has 53 bits of mantissa, giving about 15-17 significant decimal digits. The **machine epsilon** $\\varepsilon_\\text{mach} \\approx 2.2 \\times 10^{-16}$ is the smallest number such that $1 + \\varepsilon_\\text{mach} > 1$ in floating-point. Every arithmetic operation introduces a relative error of at most $\\varepsilon_\\text{mach}$.',
-      '**Catastrophic cancellation.** When you subtract two nearly equal numbers, you can lose all significant digits. Example: $\\sqrt{x+1} - \\sqrt{x}$ for large $x$. Both terms are nearly equal, and the subtraction leaves only noise. The fix: algebraic rewriting to avoid cancellation — $\\sqrt{x+1} - \\sqrt{x} = 1/(\\sqrt{x+1} + \\sqrt{x})$.',
-      '**Gaussian elimination without pivoting can be unstable.** Consider $\\begin{bmatrix}\\varepsilon & 1 \\\\ 1 & 1\\end{bmatrix}$ with tiny $\\varepsilon$. Eliminating using the (1,1) pivot introduces a multiplier $1/\\varepsilon \\gg 1$, which amplifies rounding errors in subsequent steps. The computed solution can be completely wrong.',
-      '**Partial pivoting fixes it.** Before eliminating column $k$, swap row $k$ with the row below it that has the largest absolute value in column $k$. This keeps all multipliers $|l_{ij}| \\leq 1$, controlling error growth. **Partial pivoting makes LU backward stable**: the computed $L, U$ satisfy $PA = LU + E$ where $\\|E\\| = O(\\varepsilon_\\text{mach} \\|A\\|)$.',
+      '**Where you are in the story.** You now know that condition numbers measure how much a problem amplifies input errors. But there is a second source of error in numerical computation: the algorithm itself. Even a perfectly conditioned problem can produce a wrong answer if implemented carelessly. This lesson is about the other half of the error story — what happens inside the computer when you subtract two nearly equal numbers, and how pivoting keeps Gaussian elimination from catastrophically amplifying floating-point noise.',
+
+      '**Floating-point is not exact arithmetic.** A double-precision float stores about 15-17 significant decimal digits. Machine epsilon $\\varepsilon_\\text{mach} \\approx 2.2 \\times 10^{-16}$ is the gap between 1.0 and the next representable number. Every floating-point operation introduces a relative error of at most $\\varepsilon_\\text{mach}$: computing $x + y$ gives $fl(x+y) = (x+y)(1+\\delta)$ where $|\\delta| \\leq \\varepsilon_\\text{mach}$. This is usually harmless — one operation, one tiny error. The danger is when many operations chain together and errors accumulate, or when one operation wipes out all significant digits at once.',
+
+      '**Catastrophic cancellation: the worst single-operation failure.** Compute $f(x) = (1 - \\cos x)/x^2$ at $x = 10^{-8}$. The true answer is $1/2$. On a computer: $\\cos(10^{-8})$ rounds to exactly $1.0000000000000000$ in double precision — all 16 significant digits are used for the integer part. So $1 - \\cos(10^{-8}) = 0$ exactly in floating-point, not $5 \\times 10^{-17}$. Division gives $0$, not $0.5$. The subtraction of two nearly equal numbers destroyed all 16 significant digits in a single operation. This is catastrophic cancellation.',
+
+      '**The fix: algebraic rewriting.** Often you can rearrange the formula to avoid cancellation. For $\\sqrt{x+1} - \\sqrt{x}$ with large $x$: multiply top and bottom by $\\sqrt{x+1}+\\sqrt{x}$ to get $1/(\\sqrt{x+1}+\\sqrt{x})$. No subtraction of nearly equal quantities. For the cosine example: use the identity $1 - \\cos x = 2\\sin^2(x/2)$, giving $f(x) = 2\\sin^2(x/2)/x^2$. Near $x=0$, $\\sin(x/2) \\approx x/2$, so $f \\approx 2(x/2)^2/x^2 = 1/2$ ✓. The key insight: find a mathematically equivalent form that avoids subtracting nearly equal quantities.',
+
+      '**Predict before reading on.** For $A = \\begin{bmatrix}0.001&1\\\\1&1\\end{bmatrix}$, standard Gaussian elimination uses the $(1,1)$ entry as pivot, giving multiplier $1/0.001 = 1000$. Without pivoting, do you expect the solution to be accurate? Write your prediction, then trace Example 2 to see what happens.',
+
+      '**Gaussian elimination without pivoting amplifies errors.** When the pivot is tiny, the elimination multiplier is huge. If that pivot has floating-point errors of relative size $\\varepsilon_\\text{mach}$, multiplying by $1/\\varepsilon_\\text{mach}$ blows those errors up to order 1 — losing all accuracy. The matrix $\\begin{bmatrix}0.001&1\\\\1&1\\end{bmatrix}$ has a perfectly good solution, but naive LU without pivoting can compute it completely wrong when the first pivot is tiny.',
+
+      '**Partial pivoting: the fix that is always used.** Before eliminating column $k$, scan all entries in that column below row $k$ and swap row $k$ with the row having the largest absolute value. This forces the pivot to be at least as large as any entry it will multiply, keeping all multipliers $|l_{ij}| \\leq 1$. With bounded multipliers, floating-point errors in the elimination do not get magnified. Partial pivoting makes LU backward stable: the computed $L, U$ satisfy $PA = LU + E$ where $\\|E\\| \\approx \\varepsilon_\\text{mach}\\|A\\|$. LAPACK\'s `dgetrf` (which NumPy calls internally) always uses partial pivoting.',
+
+      '**Where this is heading.** The sparse matrix lesson applies all these ideas at massive scale. When you solve finite-element systems with millions of unknowns, every floating-point decision — pivoting strategy, storage format, stopping criteria for iterative solvers — determines whether you get an answer at all. The stability concepts here are the foundation for understanding when any large-scale computation can be trusted.',
     ],
     callouts: [
       {
+        type: 'sequencing',
+        title: 'Lesson 4 of 7 — Numerical Linear Algebra',
+        body: '**Previous (Lesson 3):** Matrix norms and condition numbers — problem sensitivity to input perturbations.\n**This lesson:** Numerical stability — algorithm-introduced errors: catastrophic cancellation, floating-point, pivoting.\n**Next (Lesson 5):** Sparse matrices — exploiting near-zero structure at massive scale.',
+      },
+      {
         type: 'insight',
-        title: 'Machine Epsilon and Floating-Point',
-        body: 'Double precision: $\\varepsilon_\\text{mach} \\approx 2.22 \\times 10^{-16}$\nSingle precision: $\\varepsilon_\\text{mach} \\approx 1.19 \\times 10^{-7}$\nHalf precision:  $\\varepsilon_\\text{mach} \\approx 9.77 \\times 10^{-4}$\n\nFor $x, y$ floating-point: $fl(x \\circ y) = (x \\circ y)(1 + \\delta)$ where $|\\delta| \\leq \\varepsilon_\\text{mach}$.',
+        title: 'Machine Epsilon by Precision',
+        body: 'Double precision: $\\varepsilon_\\text{mach} \\approx 2.22 \\times 10^{-16}$ (~16 significant digits)\nSingle precision: $\\varepsilon_\\text{mach} \\approx 1.19 \\times 10^{-7}$ (~7 digits)\nHalf precision: $\\varepsilon_\\text{mach} \\approx 9.77 \\times 10^{-4}$ (~3 digits)\n\nEvery arithmetic operation: $fl(x \\circ y) = (x \\circ y)(1+\\delta)$, $|\\delta| \\leq \\varepsilon_\\text{mach}$',
       },
       {
         type: 'insight',
         title: 'Backward Stability',
-        body: 'Algorithm $\\tilde{f}$ is **backward stable** for problem $f$ if for any input $x$, the computed output $\\tilde{f}(x)$ satisfies $\\tilde{f}(x) = f(x + \\delta x)$ for some small $\\|\\delta x\\| / \\|x\\| = O(\\varepsilon_\\text{mach})$.\n\nInterpretation: the computed answer is the exact answer to a slightly perturbed problem. Backward stable + well-conditioned problem → accurate answer.',
-      },
-      {
-        type: 'sequencing',
-        title: 'Predict the Error',
-        body: 'Before working Example 2 (LU without pivoting): for $A = \\begin{bmatrix}0.001&1\\\\1&1\\end{bmatrix}$, the first pivot is $0.001$. The multiplier will be $1/0.001 = 1000$. Without pivoting, do you expect the solution to be accurate? Write your prediction, then trace through the example to see what happens.',
+        body: 'Algorithm $\\tilde{f}$ is **backward stable** if for any input $x$:\n$\\tilde{f}(x) = f(x + \\delta x)$ for some $\\|\\delta x\\|/\\|x\\| = O(\\varepsilon_\\text{mach})$\n\nMeaning: the computed answer is the *exact* answer to a *slightly perturbed* problem.\n**Backward stable + well-conditioned → accurate answer.**',
       },
       {
         type: 'warning',
         title: 'Growth Factor',
-        body: 'Partial pivoting limits multipliers $|l_{ij}| \\leq 1$, but the **growth factor** $\\rho_n = \\max_{ijk} |u_{ij}| / \\max_{ij} |a_{ij}|$ can still be large (up to $2^{n-1}$ in theory). In practice, catastrophic growth is extremely rare and complete pivoting (which bounds $\\rho_n$ tightly) is almost never needed. Partial pivoting is safe for virtually all practical matrices.',
+        body: 'Partial pivoting bounds multipliers $|l_{ij}| \\leq 1$, but the growth factor $\\rho_n = \\|U\\|_\\infty / \\|A\\|_\\infty$ can still be $2^{n-1}$ in theory. In practice, catastrophic growth essentially never occurs for real-world matrices. Partial pivoting is safe for virtually all applications.',
       },
     ],
     visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Numerical Stability with NumPy',
+        mathBridge: 'Observe catastrophic cancellation, measure machine epsilon, and compare LU with and without pivoting.',
+        caption: 'Python floats are IEEE 754 double precision — same arithmetic as MATLAB and C.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Machine epsilon and catastrophic cancellation',
+              prose: 'Measure machine epsilon and observe how subtracting nearly equal numbers destroys all significant digits.',
+              code: `import numpy as np
+
+eps = np.finfo(float).eps
+print(f"Machine epsilon (float64): {eps:.2e}")
+print(f"1 + eps = {1 + eps}")
+print(f"1 + eps/2 = {1 + eps/2}  (rounds back to 1.0!)")
+print()
+
+# Catastrophic cancellation
+x = 1e15
+bad  = np.sqrt(x+1) - np.sqrt(x)
+good = 1 / (np.sqrt(x+1) + np.sqrt(x))
+print(f"sqrt(x+1) - sqrt(x) [naive]: {bad}")
+print(f"1/(sqrt(x+1)+sqrt(x)) [stable]: {good}")
+print(f"Error: {abs(bad-good):.2e}")
+print()
+
+# Classic example: (1 - cos x) / x^2 near x = 0
+x = 1e-8
+bad_f  = (1 - np.cos(x)) / x**2
+good_f = 2 * np.sin(x/2)**2 / x**2   # stable form
+print(f"(1 - cos x)/x^2 [naive]:  {bad_f}")
+print(f"2*sin^2(x/2)/x^2 [stable]: {good_f}")
+print(f"True value: 0.5")
+`,
+            },
+            {
+              id: 2,
+              cellTitle: 'LU with and without pivoting',
+              prose: 'Compare naive LU (no pivoting) vs scipy LU with partial pivoting on a nearly singular matrix.',
+              code: `import numpy as np
+from scipy.linalg import lu, solve
+
+# Matrix where no-pivot LU fails: small top-left entry
+eps = 1e-15
+A = np.array([[eps, 1.0], [1.0, 1.0]])
+b = np.array([1.0 + eps, 2.0])
+true_x = np.linalg.solve(A, b)
+print("True solution:", np.round(true_x, 6))
+
+# Naive LU without pivoting
+m = A[1, 0] / A[0, 0]       # multiplier = 1/eps — huge!
+A2 = A.copy()
+A2[1, :] -= m * A2[0, :]
+b2 = b.copy()
+b2[1] -= m * b2[0]
+x_naive = np.array([b2[0]/A2[0,0], b2[1]/A2[1,1]])
+print("Naive (no pivot):      ", np.round(x_naive, 6))
+
+# scipy LU with partial pivoting
+P, L, U = lu(A)
+x_pivot = np.linalg.solve(A, b)   # scipy always pivots internally
+print("With partial pivoting: ", np.round(x_pivot, 6))
+print()
+print("The multiplier without pivoting was:", round(m, 2))
+`,
+            },
+          ],
+        },
+      },
       {
         id: 'OpenMatNotebook',
         title: 'Floating-Point Pitfalls and Pivoting',

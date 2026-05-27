@@ -11,21 +11,25 @@ export default {
   hook: {
     question: "Iterative methods can stagnate or converge slowly. For one-off solves or multiple solves with the same $A$, a direct factorization of a sparse matrix can be faster. But naive LU fills in the matrix. How do you control fill-in?",
     realWorldContext: "Sparse direct solvers are the backbone of commercial FEA codes (ANSYS, Abaqus, NASTRAN), electronic design automation (SPICE circuit simulation), and structural mechanics. CHOLMOD (for SPD) and SuperLU/PARDISO (for general) are the dominant libraries. They routinely solve systems with $10^6$–$10^7$ unknowns by exploiting sparsity. The reordering step (AMD, nested dissection) can reduce factorization time by 100× compared to no reordering. After factorization, multiple right-hand sides are solved cheaply via triangular solves.",
-    previewVisualizationId: 'OpenMatNotebook',
   },
 
   intuition: {
     prose: [
-      'Take the $4 \\times 4$ arrow matrix $A$ with nonzeros on the diagonal and in the first row/column. Eliminating in order $1,2,3,4$: after eliminating variable 1, every pair of remaining variables that connect through 1 becomes directly connected — filling in the entire $(2:4)\\times(2:4)$ block. Result: 9 new nonzeros from 3 originals. Now reverse the order ($4,3,2,1$): variables 4, 3, 2 are leaves that connect only to variable 1. Eliminating 4, then 3, then 2 creates NO new connections (no two leaves connect to each other). Finally eliminating 1 — no fill since it\'s the last variable. Total new nonzeros: **0**. The same matrix, the same algorithm, but a different elimination order changes fill-in from $O(n^2)$ to $O(n)$. This is why reordering is the first step of every sparse direct solver.',
-      '**Fill-in.** When Gaussian elimination is applied to a sparse matrix, the LU factors may have many more nonzeros than $A$ ("fill-in"). Example: an arrow matrix (one dense row/column) has $O(n)$ nonzeros but its LU factors are dense ($O(n^2)$ nonzeros). For a 2D Poisson grid with $n$ unknowns: no reordering → $O(n^{3/2})$ fill-in; nested dissection → $O(n\\log n)$ fill-in.',
-      '**Reordering strategies.** The fill-in pattern depends on the order of elimination. A permutation matrix $P$ changes $A$ to $PAP^\\top$ before factorization, without changing the solution: $PAP^\\top (P\\mathbf{x}) = P\\mathbf{b}$. The goal: choose $P$ to minimize fill-in.\n\n**AMD (Approximate Minimum Degree)**: greedily eliminate the variable whose elimination causes fewest new fill-in entries. Works well in practice.\n\n**RCM (Reverse Cuthill-McKee)**: reorders to minimize bandwidth (nonzero width around diagonal). Good for banded matrices.\n\n**Nested dissection (ND)**: optimal for planar graphs. Find a separator of size $O(\\sqrt{n})$ that splits the graph in half; recurse. Results in $O(n\\log n)$ fill-in and $O(n^{3/2})$ flops for 2D problems.',
-      '**Elimination tree.** The elimination tree encodes the dependencies in the factorization: node $j$ is the parent of $i$ if $j > i$ and $j$ is the first entry in column $i$ of $L$ after $i$. Subtrees can be computed in parallel — modern parallel sparse direct solvers (PARDISO, MUMPS) exploit this.',
+      'Where you are in the story: you have now seen the full spectrum of iterative solvers — stationary methods (Jacobi, Gauss-Seidel), Krylov methods (CG, GMRES), and preconditioning strategies that make them practical. But iterative methods are not always the answer. They can stagnate on hard problems, they require tuning the preconditioner, and they produce approximate solutions that need careful monitoring. Sometimes you need the exact answer, robustly, without worrying about convergence. That is when you reach for sparse direct solvers.',
+      'The challenge with sparse direct solvers is **fill-in**: when you perform Gaussian elimination on a sparse matrix, the factors $L$ and $U$ typically contain many more nonzero entries than the original $A$. This is because the elimination process creates new connections between variables that were not directly connected in $A$. In the worst case, a sparse matrix with $O(n)$ nonzeros can produce dense $L$ and $U$ factors with $O(n^2)$ nonzeros — eliminating all the sparsity benefit.',
+      'A concrete 4-variable example reveals the key insight. Consider the arrow matrix: nonzeros on the diagonal and in the first row and column, all other entries zero. If you eliminate variables in natural order $(1,2,3,4)$: after eliminating variable 1, every pair of remaining variables $(2,3,4)$ that were both connected to variable 1 now needs a direct connection in $L$ or $U$. Variables 2, 3, and 4 all connect through variable 1, so the $\\{2,3,4\\} \\times \\{2,3,4\\}$ block fills in completely — 9 new nonzeros. Now reverse the order to $(4,3,2,1)$: variables 4, 3, 2 are "leaves" — they only connect to variable 1. Eliminating leaf 4 creates no new connections because 4 is not connected to any other remaining variable. Same for leaves 3 and 2. When you finally eliminate variable 1, all others are already gone. Total fill-in: **zero**.',
+      'This example is not a special trick — it reveals a general principle. Fill-in occurs when two variables that both connect to the variable being eliminated are not themselves directly connected. A permutation matrix $P$ reorders the variables: instead of factoring $A$, you factor $PAP^\\top$ (same matrix, reordered), solve $PAP^\\top(P\\mathbf{x}) = P\\mathbf{b}$, then unpermute. The fill-in depends entirely on the order chosen by $P$. The graph interpretation is clean: fill-in equals new edges added to the adjacency graph of $A$ during elimination.',
+      '**Predict before reading on:** For a tridiagonal (path graph) matrix eliminated in natural order, does fill-in occur? For an arrow matrix (star graph) in natural order, how much fill-in? For the 2D Poisson matrix — a grid graph — how does fill-in scale with problem size $n$?',
+      'The answers: a tridiagonal matrix produces zero fill-in in natural order because when you eliminate variable $i$, variables $i-1$ and $i+1$ are already directly connected (the tridiagonal entry $a_{i-1,i+1}$ … wait, it is not! But $i-1$ has already been eliminated by the time you reach $i$, so no new connections are created). Actually, the tridiagonal stays tridiagonal throughout — no fill-in. For the 2D Poisson grid, natural order produces $O(n^{3/2})$ fill-in. Nested dissection — finding a small separator that splits the graph, reordering it last, recursing on the two halves — achieves $O(n \\log n)$ fill-in and $O(n^{3/2})$ flops. The **AMD (Approximate Minimum Degree)** algorithm provides a practical greedy heuristic: at each step, eliminate the variable whose elimination creates the fewest new connections. AMD is used by MATLAB\'s backslash operator, CHOLMOD, and most industrial sparse direct solvers.',
+      'The major sparse direct solver libraries — CHOLMOD (for SPD), SuperLU and PARDISO (for general), MUMPS (for distributed memory) — implement these ideas at industrial scale. Their workflow is: (1) analyze sparsity and compute reordering, (2) symbolic factorization (determine the fill-in pattern without computing values), (3) numerical factorization (fill in the values), (4) triangular solves. Steps 1-3 are expensive and done once; step 4 is cheap and done for each right-hand side. This is why direct solvers are preferred when you need to solve many linear systems with the same $A$ but different $\\mathbf{b}$: factorize once, solve hundreds of times at $O(\\text{nnz}(L))$ each.',
+      'For 3D problems, even nested dissection gives $O(n^{4/3})$ fill-in and $O(n^2)$ flops. For a million-variable 3D problem, that is $10^{12}$ operations — not feasible. This is the fundamental reason why iterative methods dominate in 3D: for large 3D systems, CG+AMG at $O(n)$ total work will always beat any direct factorization. The practical rule of thumb: use sparse direct for 2D problems and small 3D problems (up to $10^4$–$10^5$ unknowns), and preconditioned iterative methods for large 3D problems. Many production codes combine both: iterative outer loop, direct solver as a subdomain preconditioner.',
+      'Where this is heading: this lesson completes the Iterative Solvers & Preconditioning chapter. You have now seen the entire landscape of linear system solvers — from the $O(n^3)$ dense LU of Chapter 7, through sparse iterative methods (Jacobi, GS, CG, GMRES), to the $O(n)$ dream of AMG-preconditioned Krylov methods. Chapter 10 will step back to the mathematical foundations: dual spaces, tensors, and operator theory — the abstract framework that unifies everything you have seen in Chapters 1-9.',
     ],
     callouts: [
       {
         type: 'sequencing',
-        title: 'Predict Fill-In',
-        body: 'For a path graph (tridiagonal matrix), predict: when you eliminate variables in order $1, 2, 3, \\ldots, n$, does fill-in occur? What about for a star graph (arrow matrix) eliminated in natural order? Write your predictions — the answers reveal why reordering matters more for some structures than others.',
+        title: 'Lesson 5 of 5 — Iterative Solvers & Preconditioning',
+        body: '**Previous (Lesson 4):** Preconditioning — Jacobi, ILU, AMG; eigenvalue clustering for Krylov efficiency.\n**This lesson:** Sparse Direct Solvers — fill-in, reordering (AMD, nested dissection), CHOLMOD/SuperLU/PARDISO, direct vs iterative tradeoffs.\n**Next (Chapter 10):** Dual Spaces and Advanced Theory — the abstract framework that unifies everything in Chapters 1–9.',
       },
       {
         type: 'insight',
@@ -39,6 +43,110 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Sparse Direct Solvers in Python',
+        mathBridge: 'Measure fill-in with and without reordering, then benchmark direct vs iterative on multiple right-hand sides.',
+        caption: 'AMD reordering reduces fill-in dramatically; factorize once, solve many times at low cost.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+
+              cellTitle: 'Fill-in: arrow matrix natural order vs reversed',
+              prose: 'Demonstrate the arrow matrix example from the lesson: natural elimination order causes complete fill-in; reversed order causes zero fill-in.',
+              code: `import numpy as np
+import matplotlib.pyplot as plt
+from scipy.sparse import lil_matrix, csc_matrix
+from scipy.linalg import lu
+
+n = 6
+
+# Arrow matrix: dense first row/column, diagonal elsewhere
+A = np.zeros((n, n))
+for i in range(n):
+    A[i, i] = 2.0
+A[0, :] = 1.0
+A[:, 0] = 1.0
+A[0, 0] = n
+
+print("Original arrow matrix:")
+print(A.astype(int))
+print(f"Nonzeros in A: {np.count_nonzero(A)}")
+
+# LU with natural order
+P_nat, L_nat, U_nat = lu(A)
+LU_nat = L_nat + U_nat - np.eye(n)
+nnz_natural = np.count_nonzero(np.abs(LU_nat) > 1e-10)
+print(f"\\nNatural order: nnz(L+U) = {nnz_natural}  (dense!)")
+
+# LU with reversed order: last variable first
+perm = list(range(n-1, -1, -1))
+A_rev = A[np.ix_(perm, perm)]
+P_rev, L_rev, U_rev = lu(A_rev)
+LU_rev = L_rev + U_rev - np.eye(n)
+nnz_reversed = np.count_nonzero(np.abs(LU_rev) > 1e-10)
+print(f"Reversed order: nnz(L+U) = {nnz_reversed}  (sparse!)")
+
+# Visualize sparsity patterns
+fig, axes = plt.subplots(1, 3, figsize=(12, 4))
+for ax, M, title in zip(axes,
+    [A, LU_nat, LU_rev],
+    ['Original A', 'LU (natural order)', 'LU (reversed order)']):
+    ax.spy(np.abs(M) > 1e-10, markersize=8)
+    ax.set_title(f'{title}\\nnnz = {np.count_nonzero(np.abs(M) > 1e-10)}')
+plt.tight_layout(); plt.show()
+`,
+            },
+            {
+              id: 2,
+
+              cellTitle: 'Factorize once, solve many times',
+              prose: 'Show the main advantage of direct solvers: pay the factorization cost once, then solve for many right-hand sides cheaply.',
+              code: `import numpy as np
+import time
+from scipy.sparse import diags
+from scipy.sparse.linalg import spsolve, factorized
+
+# Tridiagonal 1D Poisson
+n = 2000
+A = (diags([2]*n, 0) + diags([-1]*(n-1), 1) + diags([-1]*(n-1), -1)).toarray()
+from scipy.sparse import csc_matrix
+A_sparse = csc_matrix(A)
+
+n_rhs = 50
+B = np.random.randn(n, n_rhs)
+
+# Method 1: solve each RHS independently (n_rhs separate solves)
+t0 = time.time()
+X1 = np.zeros((n, n_rhs))
+for j in range(n_rhs):
+    X1[:, j] = np.linalg.solve(A, B[:, j])
+t_separate = time.time() - t0
+
+# Method 2: factorize once with scipy, solve all RHS
+t0 = time.time()
+solve = factorized(A_sparse)   # LU factorization (once)
+X2 = np.zeros((n, n_rhs))
+for j in range(n_rhs):
+    X2[:, j] = solve(B[:, j])   # triangular solves (cheap)
+t_factorized = time.time() - t0
+
+# Method 3: solve all at once with dense numpy
+t0 = time.time()
+X3 = np.linalg.solve(A, B)
+t_dense = time.time() - t0
+
+print(f"Separate solves ({n_rhs} x dense solve): {t_separate:.3f}s")
+print(f"Factorize-once + {n_rhs} triangular solves: {t_factorized:.3f}s")
+print(f"Dense numpy (solve all at once):          {t_dense:.3f}s")
+print(f"\\nFactorize-once speedup: {t_separate/t_factorized:.1f}x over separate")
+print(f"\\nSolution agreement: {np.max(np.abs(X1 - X2)):.2e} (should be ~0)")
+`,
+            },
+          ],
+        },
+      },
       {
         id: 'OpenMatNotebook',
         title: 'Sparse Factorization and Fill-in',

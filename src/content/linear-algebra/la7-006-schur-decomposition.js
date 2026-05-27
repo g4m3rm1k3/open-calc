@@ -11,33 +11,126 @@ export default {
   hook: {
     question: "Diagonalization ($A = PDP^{-1}$) requires $n$ independent eigenvectors and can be numerically unstable. Is there a triangular form that always exists, uses orthogonal transformations (numerically stable), and still reveals eigenvalues on the diagonal?",
     realWorldContext: "The Schur decomposition is what MATLAB's `eig`, NumPy's `eig`, and LAPACK's `dsyev` actually compute. The QR algorithm — the standard method for computing eigenvalues of dense matrices — converges to the Schur form. The real Schur form (with $1\\times 1$ and $2\\times 2$ diagonal blocks for complex conjugate pairs) is computed by modern software in $O(n^3)$ time. Control engineers use the Schur form to solve the algebraic Riccati equation (used in LQR optimal control). Numerical stability engineers prefer Schur over diagonalization because the $Q$ matrix is orthogonal (condition number 1) rather than a potentially ill-conditioned eigenvector matrix $P$.",
-    previewVisualizationId: 'OpenMatNotebook',
   },
 
   intuition: {
     prose: [
-      '**Schur decomposition by example.** Take $A = \\begin{pmatrix}3&1\\\\0&2\\end{pmatrix}$ (already upper triangular). Its eigenvalues are on the diagonal: $\\lambda_1=3$, $\\lambda_2=2$. The Schur form is $Q=I$, $T=A$ — trivial. Now take $A = \\begin{pmatrix}1&2\\\\0&3\\end{pmatrix}$: same eigenvalues, already Schur. For $A=\\begin{pmatrix}0&1\\\\-1&0\\end{pmatrix}$ (rotation): eigenvalues $\\pm i$. Over $\\mathbb{C}$, Schur form is $T=\\begin{pmatrix}i&*\\\\0&-i\\end{pmatrix}$ with unitary $Q$. Over $\\mathbb{R}$, the real Schur form keeps $A$ as a $2\\times2$ block (can\'t diagonalize with real matrices). The key: Schur ALWAYS exists over $\\mathbb{C}$, using only unitary $Q$ (never ill-conditioned), and eigenvalues appear on the diagonal of $T$.',
-      '**How Schur relates to other decompositions.** Diagonalization: $A = PDP^{-1}$ (requires $n$ independent eigenvectors; $P$ may be ill-conditioned). Schur: $A = QTQ^*$ (always exists; $Q$ is orthogonal/unitary, always well-conditioned; $T$ is upper triangular). For symmetric $A = A^*$: Schur gives $T$ diagonal ← that\'s the spectral theorem! For normal $A$ ($A^*A=AA^*$): $T$ is diagonal. For all other $A$: $T$ is upper triangular with eigenvalues on diagonal.',
-      '**The QR algorithm converges to Schur.** The basic QR iteration: (1) Compute $QR = A_k$ (QR factorization), (2) Set $A_{k+1} = RQ$. This orthogonal similarity transformation preserves eigenvalues and converges (under generic conditions) to upper triangular form. The convergence rate depends on ratios of eigenvalues — for well-separated eigenvalues, convergence is fast. Practical algorithms use shifts (e.g., Wilkinson shift) to accelerate convergence and handle defective matrices.',
+      '**Where you are in the story.** In Chapter 5 you learned about eigenvalues and diagonalization: $A = PDP^{-1}$ where $D$ is diagonal and the columns of $P$ are eigenvectors. This decomposition is elegant but has a fatal numerical flaw — $P$ can be arbitrarily ill-conditioned. If two eigenvectors are nearly parallel, $P$ has condition number in the billions, and computed eigenvalues are garbage. The Schur decomposition is the numerically safe version of the same idea: $A = QTQ^*$ where $Q$ is unitary (condition number exactly 1) and $T$ is upper triangular with eigenvalues on the diagonal. It always exists, even for defective matrices.',
+
+      '**What the Schur form looks like.** For $A = \\begin{pmatrix}3&1\\\\0&2\\end{pmatrix}$ (already upper triangular), the Schur form is trivially $Q = I$, $T = A$. For a symmetric matrix $A = \\begin{pmatrix}3&1\\\\1&3\\end{pmatrix}$: the Schur form $T$ must be diagonal (see below why), with the eigenvalues 2 and 4 on the diagonal. For the rotation matrix $A = \\begin{pmatrix}0&1\\\\-1&0\\end{pmatrix}$: eigenvalues are $\\pm i$ (complex), so over $\\mathbb{R}$ the Schur form keeps the whole matrix as a $2 \\times 2$ block — there is no real upper triangular form. The real Schur form has $1 \\times 1$ blocks for real eigenvalues and $2 \\times 2$ blocks for complex conjugate pairs.',
+
+      '**Predict before reading on.** For $A = \\begin{pmatrix}3&1\\\\1&3\\end{pmatrix}$ (symmetric), what are the eigenvalues? You know that symmetric matrices have real eigenvalues and orthogonal eigenvectors. Use the trace (sum of eigenvalues = 6) and determinant (product = $9-1=8$) to find them. Write the two eigenvalues, then check against the Schur form you would compute.',
+
+      '**Why symmetric matrices have diagonal Schur form.** When $A$ is symmetric ($A = A^\\top$), the Schur form $T$ satisfies $T = Q^\\top A Q$, so $T^\\top = Q^\\top A^\\top Q = Q^\\top A Q = T$. An upper triangular matrix that equals its own transpose must be diagonal. So for symmetric matrices, Schur = spectral decomposition: the columns of $Q$ are orthonormal eigenvectors and the diagonal of $T$ contains the eigenvalues. This is the spectral theorem, seen through the lens of Schur.',
+
+      '**Schur vs diagonalization: the stability comparison.** Diagonalization $A = PDP^{-1}$ requires $n$ linearly independent eigenvectors. When eigenvectors are nearly parallel (repeated or near-repeated eigenvalues), $P$ is nearly singular, $\\kappa(P)$ is huge, and computed eigenvalues can be completely wrong. Schur uses unitary $Q$ with $\\kappa(Q) = 1$ — the best possible condition number. Even if $A$ is defective (fewer than $n$ independent eigenvectors), the Schur decomposition exists. This is why every serious numerical software uses Schur, not diagonalization.',
+
+      '**The QR algorithm computes Schur.** Start with $A_0 = A$. Decompose $A_k = Q_k R_k$ (QR factorization), then set $A_{k+1} = R_k Q_k$. This is a similarity transformation: $A_{k+1} = Q_k^\\top A_k Q_k$, so eigenvalues are preserved at every step. The sequence $A_k$ converges to upper triangular form (the Schur form $T$) under generic conditions. Convergence speed depends on how separated the eigenvalues are. Practical versions add shifts to accelerate convergence and run in $O(n^3)$ total.',
+
+      '**The real Schur form and complex eigenvalues.** For real matrices with complex eigenvalues, the complex Schur form has complex entries. The real Schur form avoids this: complex conjugate eigenvalue pairs $\\alpha \\pm i\\beta$ appear together as $2 \\times 2$ blocks $\\begin{pmatrix}\\alpha & \\beta \\\\ -\\beta & \\alpha\\end{pmatrix}$ on the diagonal. The result is block upper triangular — orthogonally similar to $A$ using only real arithmetic. MATLAB\'s `schur(A)` returns the real Schur form by default; `schur(A, \'complex\')` returns the complex form.',
+
+      '**Where this is heading.** The next lesson on Householder reflections explains how QR factorization is implemented stably in practice — which in turn explains how the QR algorithm (this lesson) runs. After that, you will apply these ideas in Chapter 8 to iterative methods, which use QR and Schur concepts to build algorithms that scale to millions of unknowns.',
     ],
     callouts: [
       {
         type: 'sequencing',
-        title: 'Prediction: Schur form for a symmetric matrix',
-        body: 'Let $A = \\begin{pmatrix}3&1\\\\1&3\\end{pmatrix}$ (symmetric). **Before computing:** predict — what will the Schur form $T$ look like? Since $A$ is symmetric, $T$ must be diagonal. What are the diagonal entries? After predicting: eigenvalues are $\\lambda_1=4$, $\\lambda_2=2$ (trace=6, det=8). So $T = \\begin{pmatrix}4&0\\\\0&2\\end{pmatrix}$ and $Q$ is the orthogonal matrix of eigenvectors. Schur = spectral decomposition for symmetric matrices.',
+        title: 'Lesson 6 of 7 — Numerical Linear Algebra',
+        body: '**Previous (Lesson 5):** Sparse matrices — CSR storage, fill-in, sparse matvec.\n**This lesson:** Schur decomposition — the always-existing, numerically safe triangular eigenvalue form.\n**Next (Lesson 7):** Householder reflections and Givens rotations — the elementary building blocks that implement QR stably.',
       },
       {
         type: 'theorem',
         title: 'Schur Decomposition Theorem',
-        body: 'For every $A \\in \\mathbb{C}^{n\\times n}$, there exists a unitary matrix $Q$ and upper triangular $T$ such that:\n\n$A = QTQ^*$\n\nThe diagonal entries of $T$ are the eigenvalues of $A$ (in any order).\n\n**Real Schur form**: for $A \\in \\mathbb{R}^{n\\times n}$, there exists orthogonal $Q$ such that $Q^\\top AQ = T$ is block upper triangular with $1\\times 1$ blocks (real eigenvalues) and $2\\times 2$ blocks (complex conjugate pairs).\n\n**Normal matrices**: $A$ is normal ($A^*A=AA^*$) iff its Schur form $T$ is diagonal.',
+        body: 'For every $A \\in \\mathbb{C}^{n\\times n}$, there exists a unitary matrix $Q$ and upper triangular $T$ such that:\n$A = QTQ^*$\n\nThe diagonal entries of $T$ are the eigenvalues of $A$ (in any order).\n\n**Symmetric $A$**: $T$ is diagonal — the spectral theorem.\n**Normal $A$** ($A^*A=AA^*$): $T$ is diagonal.\n**Real Schur form**: block upper triangular, $2\\times2$ blocks for conjugate pairs.',
       },
       {
         type: 'insight',
         title: 'Schur vs Diagonalization',
-        body: 'Diagonalization $A=PDP^{-1}$:\n- Fails when $A$ has repeated eigenvalues and fewer than $n$ independent eigenvectors (defective matrix)\n- $P$ can be arbitrarily ill-conditioned\n- Computationally dangerous\n\nSchur decomposition $A=QTQ^*$:\n- Always exists (over $\\mathbb{C}$)\n- $Q$ is unitary: $Q^{-1} = Q^*$, so $\\text{cond}(Q) = 1$ (best possible)\n- Numerically stable: unitary transformations preserve norms\n- Used by all modern numerical eigenvalue software',
+        body: 'Diagonalization $A=PDP^{-1}$: fails for defective matrices; $P$ can be ill-conditioned; numerically dangerous.\n\nSchur $A=QTQ^*$: always exists over $\\mathbb{C}$; $Q$ is unitary with $\\kappa(Q) = 1$; numerically stable.\n\n**Rule**: use Schur (or SVD) for numerical eigenvalue computation; only use diagonalization for theoretical analysis.',
       },
     ],
     visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Schur Decomposition with SciPy',
+        mathBridge: 'Compute Schur forms, verify decomposition, compare with diagonalization stability, and run the basic QR iteration to see convergence.',
+        caption: 'scipy.linalg.schur is backed by LAPACK dsyev/dgeev — the same routine in every serious computational software.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Compute and verify the Schur decomposition',
+              prose: 'Factor A = Q T Q.T using scipy, verify T is upper triangular with eigenvalues on the diagonal.',
+              code: `import numpy as np
+from scipy.linalg import schur
+
+# General matrix
+A = np.array([[4.0, 1.0, 2.0],
+              [3.0, 2.0, 1.0],
+              [1.0, 1.0, 3.0]])
+
+T, Q = schur(A)   # real Schur form by default
+
+print("Schur form T (upper triangular):")
+print(np.round(T, 4))
+print()
+print("Eigenvalues (diagonal of T):", np.round(np.diag(T), 4))
+print("Direct eigenvalues:          ", np.round(np.sort(np.linalg.eigvals(A)).real, 4))
+print()
+print("||Q T Q.T - A||:", np.linalg.norm(Q @ T @ Q.T - A))
+print("Q orthogonal? ||Q.T Q - I||:", np.linalg.norm(Q.T @ Q - np.eye(3)))
+`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Symmetric matrix: Schur = spectral theorem',
+              prose: 'For a symmetric matrix, the Schur form T is diagonal. Verify that the eigenvectors (columns of Q) are orthonormal.',
+              code: `import numpy as np
+from scipy.linalg import schur
+
+A = np.array([[3.0, 1.0], [1.0, 3.0]])   # symmetric
+
+T, Q = schur(A)
+print("A (symmetric):")
+print(A)
+print()
+print("Schur form T (should be diagonal for symmetric A):")
+print(np.round(T, 6))
+print()
+print("Q (orthonormal eigenvectors):")
+print(np.round(Q, 4))
+print()
+print("Eigenvalues on diagonal:", np.diag(T))
+print("Expected (trace=6, det=8): eigenvalues are 2 and 4")
+`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Basic QR iteration converges to Schur form',
+              prose: 'Run the basic QR algorithm on a matrix and watch it converge to upper triangular form (the Schur form).',
+              code: `import numpy as np
+
+A = np.array([[4.0, 3.0, 2.0],
+              [1.0, 3.0, 1.0],
+              [0.5, 0.5, 2.0]])
+
+Ak = A.copy()
+print(f"{'Step':>5}  {'below-diag norm':>16}")
+for k in range(30):
+    Q, R = np.linalg.qr(Ak)
+    Ak = R @ Q
+    below = np.linalg.norm(np.tril(Ak, -1))
+    if k < 5 or k % 5 == 4:
+        print(f"{k+1:>5}  {below:>16.2e}")
+
+print()
+print("Converged Schur form (diagonal = eigenvalues):")
+print(np.round(Ak, 4))
+print("True eigenvalues:", np.round(np.sort(np.linalg.eigvals(A)).real, 4))
+`,
+            },
+          ],
+        },
+      },
       {
         id: 'OpenMatNotebook',
         title: 'Schur Decomposition',

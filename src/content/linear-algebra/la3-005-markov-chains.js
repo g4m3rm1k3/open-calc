@@ -1,39 +1,43 @@
-export default {
+﻿export default {
   id: 'la3-005',
   slug: 'markov-chains',
   chapter: 'la3',
   order: 5,
   title: 'Markov Chains and Steady States',
-  subtitle: 'Stochastic matrices model probabilistic transitions — and after enough steps, every starting distribution converges to the same steady state. That state is an eigenvector with eigenvalue 1.',
+  subtitle: 'Stochastic matrices model probabilistic transitions â€” and after enough steps, every starting distribution converges to the same steady state. That state is an eigenvector with eigenvalue 1.',
   tags: ['Markov chain', 'stochastic matrix', 'steady state', 'transition matrix', 'PageRank', 'power method', 'stationary distribution', 'eigenvalue 1'],
   aliases: 'Markov chain stochastic matrix steady state transition matrix PageRank power method stationary distribution probability eigenvalue',
 
   hook: {
     question: "If you start a random process (weather, web surfing, genetics) and let it run forever, where does it end up? And does it matter where it started?",
-    realWorldContext: "Markov chains are everywhere. Google\'s PageRank algorithm models a random web surfer who clicks links at random — the steady-state distribution of which pages they visit determines each page\'s rank. Speech recognition uses Hidden Markov Models to decode audio into words. Population geneticists use Markov chains to model allele frequencies drifting across generations. Financial models use them to predict credit ratings. In all cases, the key insight is the same: there is a long-run equilibrium that is determined entirely by the transition structure — not the starting point.",
-    previewVisualizationId: 'OpenMatNotebook',
+    realWorldContext: "Markov chains are everywhere. Google\'s PageRank algorithm models a random web surfer who clicks links at random â€” the steady-state distribution of which pages they visit determines each page\'s rank. Speech recognition uses Hidden Markov Models to decode audio into words. Population geneticists use Markov chains to model allele frequencies drifting across generations. Financial models use them to predict credit ratings. In all cases, the key insight is the same: there is a long-run equilibrium that is determined entirely by the transition structure â€” not the starting point.",
   },
 
   intuition: {
     prose: [
-      'A simple weather model has two states: Sunny and Rainy. Transition matrix $P = \\begin{bmatrix}0.8&0.4\\\\0.2&0.6\\end{bmatrix}$ (columns sum to 1). Start with $\\mathbf{x}_0 = [1,0]^\\top$ (all Sunny). After one step: $P\\mathbf{x}_0 = [0.8, 0.2]^\\top$. After many steps, $P^k\\mathbf{x}_0 \\to \\mathbf{q}$. Solve $(P-I)\\mathbf{q} = \\mathbf{0}$ with $q_1+q_2=1$: $\\mathbf{q} = [2/3, 1/3]^\\top$. Long run: 67% sunny, 33% rainy — regardless of where you started.',
+      'A simple weather model has two states: Sunny and Rainy. Transition matrix $P = \\begin{bmatrix}0.8&0.4\\\\0.2&0.6\\end{bmatrix}$ (columns sum to 1). Start with $\\mathbf{x}_0 = [1,0]^\\top$ (all Sunny). After one step: $P\\mathbf{x}_0 = [0.8, 0.2]^\\top$. After many steps, $P^k\\mathbf{x}_0 \\to \\mathbf{q}$. Solve $(P-I)\\mathbf{q} = \\mathbf{0}$ with $q_1+q_2=1$: $\\mathbf{q} = [2/3, 1/3]^\\top$. Long run: 67% sunny, 33% rainy â€” regardless of where you started.',
       '**What is a Markov chain?** A Markov chain describes a system that jumps between states over time, where the probability of jumping from state $i$ to state $j$ depends only on the current state (not the history). This "memoryless" property is the Markov property. The transition probabilities are encoded in a matrix.',
       '**Transition matrix.** For a system with $n$ states, the transition matrix $P$ has $P_{ij} = $ probability of moving from state $j$ to state $i$ (column-stochastic convention). Each column sums to 1 (all probability from state $j$ must go somewhere). A column vector $\\mathbf{x}$ where $x_i \\geq 0$ and $\\sum x_i = 1$ represents a probability distribution over states.',
-      '**Matrix-vector product = one time step.** If $\\mathbf{x}_t$ is the distribution at time $t$, then $\\mathbf{x}_{t+1} = P\\mathbf{x}_t$. After $k$ steps: $\\mathbf{x}_k = P^k \\mathbf{x}_0$. As $k \\to \\infty$, the distribution often converges to a **steady state** $\\mathbf{q}$ satisfying $P\\mathbf{q} = \\mathbf{q}$ — an eigenvector of $P$ with eigenvalue 1.',
+      '**Matrix-vector product = one time step.** If $\\mathbf{x}_t$ is the distribution at time $t$, then $\\mathbf{x}_{t+1} = P\\mathbf{x}_t$. After $k$ steps: $\\mathbf{x}_k = P^k \\mathbf{x}_0$. As $k \\to \\infty$, the distribution often converges to a **steady state** $\\mathbf{q}$ satisfying $P\\mathbf{q} = \\mathbf{q}$ â€” an eigenvector of $P$ with eigenvalue 1.',
       '**Why eigenvalue 1 always exists.** For any column-stochastic matrix, the vector of all ones $\\mathbf{1}$ satisfies $P^\\top \\mathbf{1} = \\mathbf{1}$ (each row of $P^\\top$ sums to 1). Therefore $P^\\top - I$ has $\\mathbf{1}$ in its null space, so $\\det(P^\\top - I) = \\det(P - I) = 0$, which means $\\lambda = 1$ is an eigenvalue of $P$. The steady-state distribution is the normalized eigenvector corresponding to $\\lambda = 1$.',
       '**Predict before reading on.** The weather matrix $P = \\begin{bmatrix}0.9&0.3\\\\0.1&0.7\\end{bmatrix}$ has larger diagonal entries (the system tends to stay in its current state). Will the steady state be closer to $[1,0]^\\top$ (all Sunny) or $[0.5, 0.5]^\\top$ (equal)? Which eigenvalue equals 1? Predict, then verify.',
-      '**CNC machine availability — Markov analysis.** A CNC machine cycles through states: Cutting, Setup/Tool-change, Idle (waiting for parts), and Fault. From shift data, you can estimate transition probabilities between these states. The steady-state distribution tells you the long-run fraction of time in each state — and therefore machine **availability** (fraction of time Cutting). Availability = $q_{\\text{Cutting}}$ where $\\mathbf{q}$ is the steady-state distribution. If the fault-recovery probability is low, availability can be optimized by improving it — eigenvalue analysis shows exactly how much the steady state shifts per unit improvement.',
+      '**CNC machine availability â€” Markov analysis.** A CNC machine cycles through states: Cutting, Setup/Tool-change, Idle (waiting for parts), and Fault. From shift data, you can estimate transition probabilities between these states. The steady-state distribution tells you the long-run fraction of time in each state â€” and therefore machine **availability** (fraction of time Cutting). Availability = $q_{\\text{Cutting}}$ where $\\mathbf{q}$ is the steady-state distribution. If the fault-recovery probability is low, availability can be optimized by improving it â€” eigenvalue analysis shows exactly how much the steady state shifts per unit improvement.',
     ],
     callouts: [
       {
+        type: 'sequencing',
+        title: 'Lesson 5 of 7 â€” Eigenvalues & Eigenvectors',
+        body: '**Previous (Lesson 4):** Jordan Normal Form â€” handling non-diagonalizable matrices.\n**This lesson:** Markov Chains â€” stochastic matrices, eigenvalue 1, steady-state distributions, and the Perron-Frobenius theorem.\n**Next (Lesson 6):** Cayley-Hamilton Theorem â€” every matrix satisfies its own characteristic equation.',
+      },
+      {
         type: 'insight',
         title: 'The Perron-Frobenius Theorem (Informal)',
-        body: 'For a regular stochastic matrix (all entries positive, or some power has all positive entries), there is exactly one steady-state distribution, and it is the unique normalized eigenvector for $\\lambda = 1$. Starting from ANY initial distribution, $P^k \\mathbf{x}_0 \\to \\mathbf{q}$ as $k \\to \\infty$. The starting point does not matter — you always end up at $\\mathbf{q}$.',
+        body: 'For a regular stochastic matrix (all entries positive, or some power has all positive entries), there is exactly one steady-state distribution, and it is the unique normalized eigenvector for $\\lambda = 1$. Starting from ANY initial distribution, $P^k \\mathbf{x}_0 \\to \\mathbf{q}$ as $k \\to \\infty$. The starting point does not matter â€” you always end up at $\\mathbf{q}$.',
       },
       {
         type: 'insight',
         title: 'All Other Eigenvalues Satisfy $|\\lambda| \\leq 1$',
-        body: 'For a column-stochastic matrix, all eigenvalues satisfy $|\\lambda| \\leq 1$. If $|\\lambda_2| < 1$ (the second-largest eigenvalue in magnitude), then the contribution of $\\lambda_2^k \\mathbf{v}_2$ to $P^k \\mathbf{x}_0$ shrinks exponentially. The gap $1 - |\\lambda_2|$ is the **spectral gap** — larger gap means faster convergence to steady state.',
+        body: 'For a column-stochastic matrix, all eigenvalues satisfy $|\\lambda| \\leq 1$. If $|\\lambda_2| < 1$ (the second-largest eigenvalue in magnitude), then the contribution of $\\lambda_2^k \\mathbf{v}_2$ to $P^k \\mathbf{x}_0$ shrinks exponentially. The gap $1 - |\\lambda_2|$ is the **spectral gap** â€” larger gap means faster convergence to steady state.',
       },
       {
         type: 'insight',
@@ -133,25 +137,21 @@ spectral_gap
       {
         type: 'definition',
         title: 'Finding the Steady State',
-        body: 'The steady state $\\mathbf{q}$ satisfies $P\\mathbf{q} = \\mathbf{q}$, i.e., $(P - I)\\mathbf{q} = \\mathbf{0}$ with $\\sum_i q_i = 1$.\n\n**Algorithm:**\n1. Form $A = P - I$\n2. Solve $A\\mathbf{q} = \\mathbf{0}$ (find null space)\n3. Normalize: divide by $\\sum_i q_i$\n\nIn MATLAB: `[V,D] = eig(P)` → column of $V$ corresponding to eigenvalue 1.',
+        body: 'The steady state $\\mathbf{q}$ satisfies $P\\mathbf{q} = \\mathbf{q}$, i.e., $(P - I)\\mathbf{q} = \\mathbf{0}$ with $\\sum_i q_i = 1$.\n\n**Algorithm:**\n1. Form $A = P - I$\n2. Solve $A\\mathbf{q} = \\mathbf{0}$ (find null space)\n3. Normalize: divide by $\\sum_i q_i$\n\nIn MATLAB: `[V,D] = eig(P)` â†’ column of $V$ corresponding to eigenvalue 1.',
       },
     ],
     visualizations: [
       {
         id: 'PythonNotebook',
         title: 'Code: Markov Chains, Steady State, and CNC Machine Availability',
-        mathBridge: 'np.linalg.eig(P) finds all eigenvalues. The eigenvector for λ=1 is the steady state — normalize it. P^k @ x0 converges to the same vector from any start. The spectral gap controls convergence speed.',
+        mathBridge: 'np.linalg.eig(P) finds all eigenvalues. The eigenvector for Î»=1 is the steady state â€” normalize it. P^k @ x0 converges to the same vector from any start. The spectral gap controls convergence speed.',
         caption: 'Three cells: finding steady state, simulating convergence, and CNC machine availability analysis.',
-        props: {
-          disableRunAll: true,
+        initialProps: {
           initialCells: [
             {
               id: 1,
               cellTitle: 'Finding the steady-state distribution',
-              prose: [
-                'Solve (P-I)q = 0 with sum(q) = 1. The steady state is the eigenvector for λ=1.',
-                'NumPy returns eigenvectors normalized to unit Euclidean length, not unit L1 norm. Normalize by dividing by the sum.',
-              ],
+              prose: 'Solve (P-I)q = 0 with sum(q) = 1. The steady state is the eigenvector for Î»=1. NumPy returns eigenvectors normalized to unit Euclidean length, not unit L1 norm. Normalize by dividing by the sum.',
               code: `import numpy as np
 
 # 3-state weather: Sunny / Rainy / Cloudy
@@ -167,7 +167,7 @@ print("Column sums:", P.sum(axis=0))
 evals, evecs = np.linalg.eig(P)
 print("\\nEigenvalues:", evals.real.round(4))
 
-# Eigenvector for λ=1
+# Eigenvector for Î»=1
 idx = np.argmin(np.abs(evals - 1.0))
 q = evecs[:, idx].real
 q = q / q.sum()   # normalize to probability vector
@@ -180,10 +180,7 @@ print(f"  Cloudy: {q[2]:.4f}")`,
             {
               id: 2,
               cellTitle: 'Power iteration: watching convergence',
-              prose: [
-                'Start from any probability vector and multiply by P repeatedly. Watch it converge to the steady state regardless of starting point.',
-                'The spectral gap = 1 - |λ₂| determines how fast convergence happens.',
-              ],
+              prose: 'Start from any probability vector and multiply by P repeatedly. Watch it converge to the steady state regardless of starting point. The spectral gap = 1 - |Î»â‚‚| determines how fast convergence happens.',
               code: `import numpy as np
 
 P = np.array([[0.7, 0.3, 0.4],
@@ -210,25 +207,22 @@ for k in [1, 2, 5, 10, 20]:
     print(f"{k:>4}  {str(x1.round(4)):>14}  {str(x2.round(4)):>14}")
 
 evals_sorted = np.sort(np.abs(evals))[::-1]
-print(f"\\nSpectral gap: 1 - |λ₂| = 1 - {evals_sorted[1]:.4f} = {1 - evals_sorted[1]:.4f}")`,
+print(f"\\nSpectral gap: 1 - |Î»â‚‚| = 1 - {evals_sorted[1]:.4f} = {1 - evals_sorted[1]:.4f}")`,
             },
             {
               id: 3,
-              cellTitle: 'CNC machine availability — steady-state analysis',
-              prose: [
-                'Model a CNC machine as a 4-state Markov chain: Cutting, Setup, Idle, Fault.',
-                'The steady-state distribution gives the long-run fraction of time in each state. Machine availability = q[Cutting].',
-              ],
+              cellTitle: 'CNC machine availability â€” steady-state analysis',
+              prose: 'Model a CNC machine as a 4-state Markov chain: Cutting, Setup, Idle, Fault. The steady-state distribution gives the long-run fraction of time in each state. Machine availability = q[Cutting].',
               code: `import numpy as np
 
 # CNC machine state transitions (from shift data)
 # States: 0=Cutting, 1=Setup, 2=Idle, 3=Fault
 # Entry P[i,j] = prob of going to state i from state j (column-stochastic)
 P = np.array([
-    [0.80, 0.60, 0.50, 0.00],  # → Cutting
-    [0.10, 0.25, 0.30, 0.00],  # → Setup
-    [0.05, 0.10, 0.15, 0.20],  # → Idle
-    [0.05, 0.05, 0.05, 0.80],  # → Fault
+    [0.80, 0.60, 0.50, 0.00],  # â†’ Cutting
+    [0.10, 0.25, 0.30, 0.00],  # â†’ Setup
+    [0.05, 0.10, 0.15, 0.20],  # â†’ Idle
+    [0.05, 0.05, 0.05, 0.80],  # â†’ Fault
 ])
 
 states = ['Cutting', 'Setup', 'Idle', 'Fault']
@@ -262,7 +256,7 @@ print(f"(Long-run fraction of time actually cutting)")`,
       {
         type: 'insight',
         title: 'Left vs Right Eigenvectors',
-        body: 'Column-stochastic: $P\\mathbf{q} = \\mathbf{q}$ — the steady state is a **right eigenvector**.\nRow-stochastic ($P^\\top$ convention): steady state satisfies $\\mathbf{q}^\\top P = \\mathbf{q}^\\top$ — it is a **left eigenvector**.\n\nBoth conventions appear in the literature. The left-eigenvector convention arises when the state vector is a row vector. This course uses column-stochastic (state vector = column, matrix acts on the left).',
+        body: 'Column-stochastic: $P\\mathbf{q} = \\mathbf{q}$ â€” the steady state is a **right eigenvector**.\nRow-stochastic ($P^\\top$ convention): steady state satisfies $\\mathbf{q}^\\top P = \\mathbf{q}^\\top$ â€” it is a **left eigenvector**.\n\nBoth conventions appear in the literature. The left-eigenvector convention arises when the state vector is a row vector. This course uses column-stochastic (state vector = column, matrix acts on the left).',
       },
       {
         type: 'theorem',
@@ -272,7 +266,7 @@ print(f"(Long-run fraction of time actually cutting)")`,
       {
         type: 'insight',
         title: 'Reducible vs Irreducible Chains',
-        body: 'A chain is **reducible** if states can be partitioned into two groups with no transitions from one to the other. Reducible chains can have multiple steady-state distributions — the result depends on which subset of states you start in.\n\nIrreducible chains (all states communicate) + aperiodic → unique steady state. Aperiodic means: no state is visited with a fixed period $> 1$. Adding self-loops guarantees aperiodicity.',
+        body: 'A chain is **reducible** if states can be partitioned into two groups with no transitions from one to the other. Reducible chains can have multiple steady-state distributions â€” the result depends on which subset of states you start in.\n\nIrreducible chains (all states communicate) + aperiodic â†’ unique steady state. Aperiodic means: no state is visited with a fixed period $> 1$. Adding self-loops guarantees aperiodicity.',
       },
     ],
     visualizations: [],
@@ -281,15 +275,15 @@ print(f"(Long-run fraction of time actually cutting)")`,
   examples: [
     {
       id: 'ex-la3-005-1',
-      title: 'Two-state weather chain — finding the steady state',
+      title: 'Two-state weather chain â€” finding the steady state',
       problem: 'The transition matrix $P = \\begin{bmatrix}0.9 & 0.4\\\\ 0.1 & 0.6\\end{bmatrix}$ models Sunny (col/row 1) and Rainy (col/row 2). Column convention: column $j$ = probabilities of leaving state $j$. Find the long-run fraction of sunny days.',
       steps: [
         {
           expression: 'P - I = \\begin{bmatrix}0.9-1 & 0.4\\\\0.1 & 0.6-1\\end{bmatrix} = \\begin{bmatrix}-0.1 & 0.4\\\\0.1 & -0.4\\end{bmatrix}',
-          annotation: 'Form $P - I$. Since $\\lambda = 1$ is an eigenvalue, this matrix is singular (both rows are multiples of each other — check: row 2 = $-$row 1).',
+          annotation: 'Form $P - I$. Since $\\lambda = 1$ is an eigenvalue, this matrix is singular (both rows are multiples of each other â€” check: row 2 = $-$row 1).',
           strategyTitle: 'Form P - I',
           checkpoint: 'Why must P - I be singular?',
-          hints: ['Because λ=1 is an eigenvalue of P, P - I has λ=0 as an eigenvalue — so P - I is singular.'],
+          hints: ['Because Î»=1 is an eigenvalue of P, P - I has Î»=0 as an eigenvalue â€” so P - I is singular.'],
         },
         {
           expression: '\\text{Row 1: } -0.1 q_1 + 0.4 q_2 = 0 \\quad \\Rightarrow \\quad q_1 = 4 q_2',
@@ -303,7 +297,7 @@ print(f"(Long-run fraction of time actually cutting)")`,
           annotation: 'Apply the normalization constraint.',
           strategyTitle: 'Normalize',
           checkpoint: 'Sanity check: does Pq = q?',
-          hints: ['$P\\begin{bmatrix}0.8\\\\0.2\\end{bmatrix} = \\begin{bmatrix}0.9(0.8)+0.4(0.2)\\\\0.1(0.8)+0.6(0.2)\\end{bmatrix} = \\begin{bmatrix}0.72+0.08\\\\0.08+0.12\\end{bmatrix} = \\begin{bmatrix}0.8\\\\0.2\\end{bmatrix}$ ✓'],
+          hints: ['$P\\begin{bmatrix}0.8\\\\0.2\\end{bmatrix} = \\begin{bmatrix}0.9(0.8)+0.4(0.2)\\\\0.1(0.8)+0.6(0.2)\\end{bmatrix} = \\begin{bmatrix}0.72+0.08\\\\0.08+0.12\\end{bmatrix} = \\begin{bmatrix}0.8\\\\0.2\\end{bmatrix}$ âœ“'],
         },
       ],
       conclusion: 'Steady state: 80% sunny, 20% rainy. This is the long-run distribution regardless of whether today is sunny or rainy.',
@@ -318,7 +312,7 @@ print(f"(Long-run fraction of time actually cutting)")`,
           annotation: 'Column $j$ = outlink distribution from page $j$. Page A has 2 outlinks so $P_{BA} = P_{CA} = 1/2$. Page B has 1 outlink so $P_{CB} = 1$. Page C has 1 outlink so $P_{AC} = 1$.',
           strategyTitle: 'Build transition matrix',
           checkpoint: 'Why must each column sum to 1?',
-          hints: ['Each column represents all the probability leaving one page — it must go somewhere, so it sums to 1.'],
+          hints: ['Each column represents all the probability leaving one page â€” it must go somewhere, so it sums to 1.'],
         },
         {
           expression: '(P - I)\\mathbf{q} = \\mathbf{0}: \\quad -q_A + q_C = 0, \\quad \\frac{1}{2}q_A - q_B = 0, \\quad \\frac{1}{2}q_A + q_B - q_C = 0',
@@ -360,18 +354,18 @@ print(f"(Long-run fraction of time actually cutting)")`,
           expression: '\\lambda = \\frac{1.4 \\pm \\sqrt{1.96 - 1.6}}{2} = \\frac{1.4 \\pm 0.6}{2} \\implies \\lambda_1 = 1, \\; \\lambda_2 = 0.4',
           annotation: 'Two eigenvalues: 1 (steady state) and 0.4 (convergence rate).',
           strategyTitle: 'Solve for eigenvalues',
-          checkpoint: 'Verify: trace = 1.4 = 1 + 0.4 ✓; det = 0.40 = 1 × 0.4 ✓',
+          checkpoint: 'Verify: trace = 1.4 = 1 + 0.4 âœ“; det = 0.40 = 1 Ã— 0.4 âœ“',
           hints: [],
         },
         {
           expression: '|\\lambda_2^k| < 0.01 \\implies |0.4|^k < 0.01 \\implies k > \\ln(0.01)/\\ln(0.4) \\approx 4.6/0.916 \\approx 5.0',
           annotation: 'After $k$ steps, the error is proportional to $|\\lambda_2|^k = 0.4^k$. For error $< 1\\%$: $k > 5$.',
           strategyTitle: 'Compute convergence steps',
-          checkpoint: 'What would happen if λ₂ = 0.99 instead of 0.4?',
-          hints: ['$0.99^k < 0.01$ requires $k > \\ln(0.01)/\\ln(0.99) \\approx 458$ steps. Eigenvalue close to 1 → slow convergence; eigenvalue close to 0 → fast convergence.'],
+          checkpoint: 'What would happen if Î»â‚‚ = 0.99 instead of 0.4?',
+          hints: ['$0.99^k < 0.01$ requires $k > \\ln(0.01)/\\ln(0.99) \\approx 458$ steps. Eigenvalue close to 1 â†’ slow convergence; eigenvalue close to 0 â†’ fast convergence.'],
         },
       ],
-      conclusion: 'With $\\lambda_2 = 0.4$ (spectral gap $= 0.6$), this chain converges quickly: within 6 steps. The spectral gap $1 - |\\lambda_2|$ directly controls convergence rate. Large gap → fast convergence to steady state.',
+      conclusion: 'With $\\lambda_2 = 0.4$ (spectral gap $= 0.6$), this chain converges quickly: within 6 steps. The spectral gap $1 - |\\lambda_2|$ directly controls convergence rate. Large gap â†’ fast convergence to steady state.',
     },
   ],
 
@@ -395,7 +389,7 @@ print(f"(Long-run fraction of time actually cutting)")`,
           annotation: 'Machine is working 85.7% of the time in the long run.',
         },
       ],
-      answer: 'P = [[0.95, 0.3],[0.05, 0.7]]. Steady state: W = 6/7 ≈ 85.7%, B = 1/7 ≈ 14.3%.',
+      answer: 'P = [[0.95, 0.3],[0.05, 0.7]]. Steady state: W = 6/7 â‰ˆ 85.7%, B = 1/7 â‰ˆ 14.3%.',
     },
     {
       id: 'ch-la3-005-2',
@@ -416,7 +410,7 @@ print(f"(Long-run fraction of time actually cutting)")`,
           annotation: 'After 7 steps, the error is below 0.01. Spectral gap = 1 - 0.5 = 0.5 (relatively fast mixing).',
         },
       ],
-      answer: 'λ₂ = 0.5. About 7 steps to reach within 0.01 of steady state. Spectral gap = 0.5.',
+      answer: 'Î»â‚‚ = 0.5. About 7 steps to reach within 0.01 of steady state. Spectral gap = 0.5.',
     },
   ],
 
@@ -428,12 +422,12 @@ print(f"(Long-run fraction of time actually cutting)")`,
   ],
 
   checkpoints: [
-    { id: 'cp-la3-005-1', label: 'Read: understand stochastic matrices, steady states, and why λ=1 always exists', type: 'read' },
+    { id: 'cp-la3-005-1', label: 'Read: understand stochastic matrices, steady states, and why Î»=1 always exists', type: 'read' },
     { id: 'cp-la3-005-2', label: 'Read: follow the proof that column sums = 1 implies eigenvalue 1', type: 'read' },
     { id: 'cp-la3-005-3', label: 'Read: understand Perron-Frobenius and the spectral gap convergence analysis', type: 'read' },
-    { id: 'cp-la3-005-4', label: 'Run code cell — compute steady state via eig and verify P*q = q', type: 'lab' },
-    { id: 'cp-la3-005-5', label: 'Run power iteration code — watch convergence to steady state from any start', type: 'lab' },
-    { id: 'cp-la3-005-6', label: 'Complete example 1: find steady state of a 2×2 stochastic matrix', type: 'example' },
+    { id: 'cp-la3-005-4', label: 'Run code cell â€” compute steady state via eig and verify P*q = q', type: 'lab' },
+    { id: 'cp-la3-005-5', label: 'Run power iteration code â€” watch convergence to steady state from any start', type: 'lab' },
+    { id: 'cp-la3-005-6', label: 'Complete example 1: find steady state of a 2Ã—2 stochastic matrix', type: 'example' },
     { id: 'cp-la3-005-7', label: 'Complete example 2: compute PageRank for a 3-page web graph', type: 'example' },
     { id: 'cp-la3-005-8', label: 'Attempt challenge 2: design a stochastic matrix with a target steady state', type: 'challenge' },
   ],
@@ -463,7 +457,7 @@ print(f"(Long-run fraction of time actually cutting)")`,
       ],
       answer: '$P\\mathbf{q} = \\mathbf{q}$ with $\\sum_i q_i = 1$',
       hints: ['$P\\mathbf{q} = \\mathbf{q}$ means $\\mathbf{q}$ is an eigenvector for eigenvalue 1. The normalization $\\sum q_i = 1$ makes it a probability distribution.'],
-      reviewSection: 'Math tab — Finding the Steady State',
+      reviewSection: 'Math tab â€” Finding the Steady State',
     },
     {
       id: 'q-la3-005-2',
@@ -476,8 +470,8 @@ print(f"(Long-run fraction of time actually cutting)")`,
         'The chain only converges if it starts at the steady state',
       ],
       answer: 'The chain converges to a unique steady state regardless of starting point',
-      hints: ['Perron-Frobenius: regular stochastic matrices have a unique steady state, and P^k x₀ → q for any probability vector x₀.'],
-      reviewSection: 'Intuition — Perron-Frobenius',
+      hints: ['Perron-Frobenius: regular stochastic matrices have a unique steady state, and P^k xâ‚€ â†’ q for any probability vector xâ‚€.'],
+      reviewSection: 'Intuition â€” Perron-Frobenius',
     },
     {
       id: 'q-la3-005-3',
@@ -490,8 +484,8 @@ print(f"(Long-run fraction of time actually cutting)")`,
         'The magnitude of the largest eigenvalue',
       ],
       answer: 'How fast the chain converges to its steady state',
-      hints: ['After k steps, the distance from steady state is proportional to |λ₂|^k. Larger spectral gap (smaller |λ₂|) → faster convergence.'],
-      reviewSection: 'Math tab — Convergence Proof Sketch',
+      hints: ['After k steps, the distance from steady state is proportional to |Î»â‚‚|^k. Larger spectral gap (smaller |Î»â‚‚|) â†’ faster convergence.'],
+      reviewSection: 'Math tab â€” Convergence Proof Sketch',
     },
     {
       id: 'q-la3-005-4',
@@ -504,8 +498,8 @@ print(f"(Long-run fraction of time actually cutting)")`,
         'The trace equals $n$',
       ],
       answer: 'Each column sums to 1, so $\\mathbf{1}^\\top P = \\mathbf{1}^\\top$',
-      hints: ['$\\mathbf{1}^\\top P = \\mathbf{1}^\\top$ means $\\mathbf{1}$ is a left eigenvector of P for λ=1. Since P and P^T have the same eigenvalues, λ=1 is also a right eigenvalue.'],
-      reviewSection: 'Math tab — Existence of eigenvalue 1',
+      hints: ['$\\mathbf{1}^\\top P = \\mathbf{1}^\\top$ means $\\mathbf{1}$ is a left eigenvector of P for Î»=1. Since P and P^T have the same eigenvalues, Î»=1 is also a right eigenvalue.'],
+      reviewSection: 'Math tab â€” Existence of eigenvalue 1',
     },
     {
       id: 'q-la3-005-5',
@@ -519,12 +513,12 @@ print(f"(Long-run fraction of time actually cutting)")`,
       ],
       answer: 'About 20 steps ($0.7^{20} \\approx 0.0008$)',
       hints: ['Error $\\propto |\\lambda_2|^k = 0.7^k$. Need $0.7^k < 0.001$: $k > \\ln(0.001)/\\ln(0.7) \\approx 19.4$. Round up to 20.'],
-      reviewSection: 'Examples tab — Example 3',
+      reviewSection: 'Examples tab â€” Example 3',
     },
     {
       id: 'q-la3-005-6',
       type: 'choice',
-      text: 'A Markov chain has a "dangling node" — a page with no outgoing links. In PageRank, this is handled by:',
+      text: 'A Markov chain has a "dangling node" â€” a page with no outgoing links. In PageRank, this is handled by:',
       options: [
         'Removing the page from the model.',
         'Setting all transition probabilities to 0 from that page.',
@@ -532,8 +526,8 @@ print(f"(Long-run fraction of time actually cutting)")`,
         'Assigning the page a rank of 0.',
       ],
       answer: 'Adding a "teleportation" step: with probability $d$, teleport to any page uniformly.',
-      hints: ['Google\'s PageRank uses $G = dP + (1-d)/n \\cdot \\mathbf{1}\\mathbf{1}^\\top$ where $d \\approx 0.85$ is the damping factor. This ensures the matrix is regular (all entries positive) and has a unique steady state — Perron-Frobenius applies.'],
-      reviewSection: 'Examples tab — Example 2 (PageRank)',
+      hints: ['Google\'s PageRank uses $G = dP + (1-d)/n \\cdot \\mathbf{1}\\mathbf{1}^\\top$ where $d \\approx 0.85$ is the damping factor. This ensures the matrix is regular (all entries positive) and has a unique steady state â€” Perron-Frobenius applies.'],
+      reviewSection: 'Examples tab â€” Example 2 (PageRank)',
     },
     {
       id: 'q-la3-005-7',
@@ -547,7 +541,7 @@ print(f"(Long-run fraction of time actually cutting)")`,
       ],
       answer: 'Because $\\lambda = 1$ is the largest eigenvalue, and all other eigenvalues satisfy $|\\lambda_i| \\leq 1$.',
       hints: ['Stochastic matrices satisfy $|\\lambda_i| \\leq 1$ for all $i$, with $\\lambda_1 = 1$ being the largest. Power iteration converges to the dominant eigenvector (largest magnitude eigenvalue). For regular stochastic matrices, this is unique and equals the steady state.'],
-      reviewSection: 'Math tab — Power Iteration',
+      reviewSection: 'Math tab â€” Power Iteration',
     },
     {
       id: 'q-la3-005-8',
@@ -556,7 +550,7 @@ print(f"(Long-run fraction of time actually cutting)")`,
       options: ['1 (stays in state 1)', '0.6 (converges to steady state)', '0 (moves away from state 1)', 'Cannot determine without the transition matrix.'],
       answer: '0.6 (converges to steady state)',
       hints: ['For a regular Markov chain, $P^k\\mathbf{x}_0 \\to \\mathbf{q}$ as $k \\to \\infty$ regardless of starting point. Starting at state 1 just determines how quickly you converge, not where you end up.'],
-      reviewSection: 'Intuition — Perron-Frobenius',
+      reviewSection: 'Intuition â€” Perron-Frobenius',
     },
     {
       id: 'q-la3-005-9',
@@ -565,7 +559,7 @@ print(f"(Long-run fraction of time actually cutting)")`,
       options: ['$0.9$', '$0.7$', '$0.1$', '$0.2$'],
       answer: '$0.7$',
       hints: ['Machine availability = fraction of time in the productive state (Cutting) = $q_1 = 0.7$. The steady-state distribution directly gives long-run time fractions.'],
-      reviewSection: 'Intuition — CNC machine availability',
+      reviewSection: 'Intuition â€” CNC machine availability',
     },
     {
       id: 'q-la3-005-10',
@@ -578,23 +572,23 @@ print(f"(Long-run fraction of time actually cutting)")`,
         'Cannot determine from the spectral gap.',
       ],
       answer: '$P_1$ because larger gap means $|\\lambda_2|$ is smaller, so $|\\lambda_2|^k$ decays faster.',
-      hints: ['Spectral gap $= 1 - |\\lambda_2|$. Gap 0.9 → $|\\lambda_2| = 0.1$ → $0.1^k$ decays very fast. Gap 0.01 → $|\\lambda_2| = 0.99$ → $0.99^k$ decays very slowly. $P_1$ mixes much faster.'],
-      reviewSection: 'Math tab — Convergence Proof Sketch',
+      hints: ['Spectral gap $= 1 - |\\lambda_2|$. Gap 0.9 â†’ $|\\lambda_2| = 0.1$ â†’ $0.1^k$ decays very fast. Gap 0.01 â†’ $|\\lambda_2| = 0.99$ â†’ $0.99^k$ decays very slowly. $P_1$ mixes much faster.'],
+      reviewSection: 'Math tab â€” Convergence Proof Sketch',
     },
   ],
 
   misconceptions: [
     {
-      falseBelief: 'The steady state depends on the starting distribution — different starting points give different steady states.',
+      falseBelief: 'The steady state depends on the starting distribution â€” different starting points give different steady states.',
       whyStudentsThinkIt: 'In deterministic systems, different initial conditions lead to different final states. Students apply the same intuition to Markov chains.',
       correctionExample: 'For the regular stochastic matrix $P = \\begin{bmatrix}0.8&0.4\\\\0.2&0.6\\end{bmatrix}$, try $\\mathbf{x}_0 = [1,0]^\\top$ or $\\mathbf{x}_0 = [0,1]^\\top$. After 20 steps, both converge to $\\mathbf{q} = [2/3, 1/3]^\\top$. The Perron-Frobenius theorem guarantees this for regular matrices.',
-      contrastCase: 'An absorbing Markov chain (with absorbing states that you cannot leave) does depend on the starting distribution — different starting states may lead to absorption in different absorbing states.',
+      contrastCase: 'An absorbing Markov chain (with absorbing states that you cannot leave) does depend on the starting distribution â€” different starting states may lead to absorption in different absorbing states.',
     },
     {
       falseBelief: 'The steady-state distribution is the same as the uniform distribution.',
       whyStudentsThinkIt: 'Since all probabilities must sum to 1, students think the "equilibrium" means equal probabilities.',
       correctionExample: 'For $P = \\begin{bmatrix}0.9&0.3\\\\0.1&0.7\\end{bmatrix}$, the steady state is $[0.75, 0.25]^\\top$. Not uniform. The high diagonal entry 0.9 for state 1 (tends to stay in state 1) makes state 1 more probable in the long run.',
-      contrastCase: 'A doubly stochastic matrix (rows AND columns sum to 1) does have the uniform distribution as its steady state. Doubly stochastic → uniform steady state.',
+      contrastCase: 'A doubly stochastic matrix (rows AND columns sum to 1) does have the uniform distribution as its steady state. Doubly stochastic â†’ uniform steady state.',
     },
   ],
 
@@ -607,21 +601,21 @@ print(f"(Long-run fraction of time actually cutting)")`,
     {
       situation: 'A factory manager wants to know the long-run fraction of time each machine spends in Cutting, Setup, Idle, and Fault states. Transition probabilities were estimated from sensor data.',
       competingTechniques: 'Record data for months (slow), simulate from multiple starting conditions, compute Markov steady state.',
-      whyThisTechniqueWins: 'Build the $4 \\times 4$ transition matrix $P$ from the sensor data and find the steady-state eigenvector. This gives the long-run time fractions in one computation. Availability = component for Cutting state. Optimization: change one transition probability and recompute — eigenvalue sensitivity analysis tells you which improvement gives the biggest availability gain.',
+      whyThisTechniqueWins: 'Build the $4 \\times 4$ transition matrix $P$ from the sensor data and find the steady-state eigenvector. This gives the long-run time fractions in one computation. Availability = component for Cutting state. Optimization: change one transition probability and recompute â€” eigenvalue sensitivity analysis tells you which improvement gives the biggest availability gain.',
     },
   ],
 
   debugging: [
     {
       commonError: 'Building a row-stochastic matrix (rows sum to 1) and then applying it as $P\\mathbf{x}$ to update a column vector probability distribution.',
-      symptom: 'The update $P\\mathbf{x}$ does not produce a valid probability vector — the entries do not sum to 1, and the probabilities make no sense.',
+      symptom: 'The update $P\\mathbf{x}$ does not produce a valid probability vector â€” the entries do not sum to 1, and the probabilities make no sense.',
       whyItHappened: 'Row-stochastic convention: $\\mathbf{x}_{t+1}^\\top = \\mathbf{x}_t^\\top P$ (row vector times matrix). Column-stochastic convention: $\\mathbf{x}_{t+1} = P\\mathbf{x}_t$ (matrix times column vector). Mixing conventions breaks the model.',
       repairStrategy: 'Choose one convention consistently. Column-stochastic: each COLUMN sums to 1, use $\\mathbf{x}_{t+1} = P\\mathbf{x}_t$ with column vectors. Row-stochastic: each ROW sums to 1, use $\\mathbf{x}_{t+1}^\\top = \\mathbf{x}_t^\\top P$ with row vectors. Most textbooks use column-stochastic.',
     },
     {
       commonError: 'Finding the null space of $P$ to get the steady state, instead of the null space of $P - I$.',
-      symptom: 'The "steady state" found does not satisfy $P\\mathbf{q} = \\mathbf{q}$ — it satisfies $P\\mathbf{q} = \\mathbf{0}$ instead.',
-      whyItHappened: 'Confusing two different null space problems: the null space of $P$ gives vectors mapped to zero (not useful here). The steady state satisfies $P\\mathbf{q} = \\mathbf{q}$, which rearranges to $(P-I)\\mathbf{q} = \\mathbf{0}$ — the null space of $P - I$.',
+      symptom: 'The "steady state" found does not satisfy $P\\mathbf{q} = \\mathbf{q}$ â€” it satisfies $P\\mathbf{q} = \\mathbf{0}$ instead.',
+      whyItHappened: 'Confusing two different null space problems: the null space of $P$ gives vectors mapped to zero (not useful here). The steady state satisfies $P\\mathbf{q} = \\mathbf{q}$, which rearranges to $(P-I)\\mathbf{q} = \\mathbf{0}$ â€” the null space of $P - I$.',
       repairStrategy: 'Always set up the equation $(P - I)\\mathbf{q} = \\mathbf{0}$ to find the steady state. Then normalize: divide $\\mathbf{q}$ by the sum of its entries to make it a probability vector.',
     },
   ],
@@ -629,7 +623,7 @@ print(f"(Long-run fraction of time actually cutting)")`,
   mastery: {
     targetLevel: 2,
     solveIndependently: 'Set up the steady-state equation $(P-I)\\mathbf{q} = \\mathbf{0}$ with normalization constraint, solve for $\\mathbf{q}$, and compute how quickly the chain converges using $|\\lambda_2|$.',
-    explainVerbally: 'Explain why every column-stochastic matrix has eigenvalue 1 (columns sum to 1), why the steady state is an eigenvector for λ=1, and why larger spectral gap means faster convergence.',
+    explainVerbally: 'Explain why every column-stochastic matrix has eigenvalue 1 (columns sum to 1), why the steady state is an eigenvector for Î»=1, and why larger spectral gap means faster convergence.',
     detectIncorrectApplication: 'Spot when someone uses a row-stochastic matrix with column-vector updates, or when someone solves $P\\mathbf{q} = \\mathbf{0}$ instead of $(P-I)\\mathbf{q} = \\mathbf{0}$.',
     transferToUnfamiliar: 'Given a new Markov model (genetics, queuing, web graph), build the transition matrix, find the steady state, and interpret the result in the application domain.',
   },

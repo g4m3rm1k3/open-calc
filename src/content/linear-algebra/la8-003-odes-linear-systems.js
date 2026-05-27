@@ -11,35 +11,128 @@ export default {
   hook: {
     question: "A spring-mass system, an electrical circuit, and a population model all lead to equations of the form $\\ddot{x} + a\\dot{x} + bx = 0$. Can linear algebra give a unified approach to all of them?",
     realWorldContext: "Linear ODEs are the foundation of control engineering, circuit analysis, structural dynamics, and chemical kinetics. Aircraft autopilots stabilize a system $\\dot{\\mathbf{x}} = A\\mathbf{x} + B\\mathbf{u}$ in real time. Drug pharmacokinetics follows a linear compartment model. Electrical power grids are governed by linear differential equations near equilibrium. The eigenvalues of the system matrix $A$ tell you everything about stability without solving the ODE explicitly.",
-    previewVisualizationId: 'OpenMatNotebook',
   },
 
   intuition: {
     prose: [
-      '**A concrete rotation ODE — numbers first.** Take $A = \\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$. The system $\\dot{\\mathbf{x}} = A\\mathbf{x}$ has eigenvalues $\\lambda = \\pm i$ (purely imaginary — found from $\\det(A - \\lambda I) = \\lambda^2 + 1 = 0$). Since $e^{At} = \\begin{bmatrix}\\cos t & -\\sin t\\\\ \\sin t & \\cos t\\end{bmatrix}$ (the rotation matrix!), a point starting at $\\mathbf{x}(0) = (1,0)^\\top$ traces a circle. At $t = \\pi/2$: $\\mathbf{x}(\\pi/2) = \\begin{bmatrix}\\cos(\\pi/2)&-\\sin(\\pi/2)\\\\\\sin(\\pi/2)&\\cos(\\pi/2)\\end{bmatrix}\\begin{pmatrix}1\\\\0\\end{pmatrix} = \\begin{pmatrix}0\\\\1\\end{pmatrix}$. The system rotated the point 90° counterclockwise — pure imaginary eigenvalues mean perpetual rotation.',
-      '**First-order linear system.** The system $\\dot{\\mathbf{x}} = A\\mathbf{x}$, $\\mathbf{x}(0) = \\mathbf{x}_0$ has the unique solution $\\mathbf{x}(t) = e^{At}\\mathbf{x}_0$. This is the matrix generalization of the scalar ODE $\\dot{x} = ax$ with solution $x(t) = e^{at}x_0$.',
-      '**Computing $e^{At}$ via diagonalization.** If $A = PDP^{-1}$ with $D = \\text{diag}(\\lambda_1, \\ldots, \\lambda_n)$: $e^{At} = Pe^{Dt}P^{-1}$ where $e^{Dt} = \\text{diag}(e^{\\lambda_1 t}, \\ldots, e^{\\lambda_n t})$. The solution decomposes into independent modes: $\\mathbf{x}(t) = \\sum_i c_i e^{\\lambda_i t} \\mathbf{v}_i$ where $\\mathbf{v}_i$ are eigenvectors and $c_i$ determined by initial conditions.',
-      '**Stability from eigenvalues.** A system $\\dot{\\mathbf{x}} = A\\mathbf{x}$ is:\n• **Asymptotically stable** (all solutions $\\to \\mathbf{0}$) iff all eigenvalues have negative real part: $\\text{Re}(\\lambda_i) < 0$ for all $i$.\n• **Unstable** if any eigenvalue has positive real part.\n• **Marginally stable** if all eigenvalues have non-positive real part and those with zero real part have trivial Jordan blocks (no $e^{\\lambda t} \\cdot t$ growing terms).',
-      '**Reducing higher-order ODEs.** The second-order $\\ddot{x} + a\\dot{x} + bx = 0$ becomes first-order by introducing state $\\mathbf{z} = (x, \\dot{x})^\\top$: $\\dot{\\mathbf{z}} = \\begin{bmatrix}0&1\\\\-b&-a\\end{bmatrix}\\mathbf{z}$. The eigenvalues of this matrix (the roots of the characteristic polynomial $\\lambda^2 + a\\lambda + b = 0$) determine the behavior.',
+      '**Where you are in the story.** PCA turned a data problem into an eigenvector computation. Markov chains turned a network problem into the same. This lesson shows the same eigenvalue machinery applied to continuous time: differential equations. The systems $\\dot{\\mathbf{x}} = A\\mathbf{x}$ appear everywhere in physics and engineering — spring-mass systems, RLC circuits, population dynamics, aircraft autopilots. Eigenvalues determine whether solutions grow, decay, or oscillate, without ever solving the ODE explicitly.',
+
+      '**The single equation first.** Before coupling: $\\dot{x} = ax$ has solution $x(t) = e^{at} x_0$. If $a < 0$: decay to zero. If $a > 0$: grow to infinity. If $a = 0$: constant. Everything in the matrix case is the same pattern, applied to each eigenmode independently.',
+
+      '**Concrete first: the rotation system.** Take $A = \\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$. The characteristic polynomial is $\\lambda^2 + 1 = 0$, so $\\lambda = \\pm i$ (purely imaginary). The matrix exponential is $e^{At} = \\begin{bmatrix}\\cos t&-\\sin t\\\\\\sin t&\\cos t\\end{bmatrix}$ — a rotation matrix! Starting from $(1,0)^\\top$, the solution traces a perfect circle. Pure imaginary eigenvalues = perpetual oscillation, no growth or decay.',
+
+      '**Predict before reading on.** For $A = \\begin{bmatrix}-1&2\\\\0&-3\\end{bmatrix}$, the eigenvalues are $-1$ and $-3$ (both negative real). What does the solution $\\mathbf{x}(t)$ do as $t \\to \\infty$? Is the system stable, asymptotically stable, or unstable? Write your answer before reading further.',
+
+      '**The matrix exponential and eigendecomposition.** For diagonalizable $A = PDP^{-1}$: $e^{At} = Pe^{Dt}P^{-1}$ where $e^{Dt} = \\text{diag}(e^{\\lambda_1 t}, \\ldots, e^{\\lambda_n t})$. The general solution decomposes into modes: $\\mathbf{x}(t) = \\sum_i c_i e^{\\lambda_i t}\\mathbf{v}_i$ where $\\mathbf{v}_i$ are eigenvectors and $c_i = (P^{-1}\\mathbf{x}_0)_i$. Each mode evolves independently. If $\\text{Re}(\\lambda_i) < 0$: mode $i$ decays. If $\\text{Re}(\\lambda_i) > 0$: it explodes. The long-term behavior is controlled by the eigenvalue with the largest real part.',
+
+      '**Stability is purely about eigenvalue real parts.** A system $\\dot{\\mathbf{x}} = A\\mathbf{x}$ is asymptotically stable (all solutions $\\to \\mathbf{0}$ as $t \\to \\infty$) if and only if all eigenvalues of $A$ have negative real parts. One eigenvalue with positive real part makes the system unstable. This is a complete characterization — no other information about $A$ is needed. Engineers check the eigenvalue real parts (or use the Routh-Hurwitz criterion) before building control systems.',
+
+      '**Reducing second-order systems to first-order.** The ODE $\\ddot{x} + a\\dot{x} + bx = 0$ becomes a first-order system by setting state $\\mathbf{z} = (x, \\dot{x})^\\top$: $\\dot{\\mathbf{z}} = \\begin{bmatrix}0&1\\\\-b&-a\\end{bmatrix}\\mathbf{z}$. The eigenvalues of this companion matrix are the roots of $\\lambda^2 + a\\lambda + b = 0$ — the characteristic polynomial of the second-order equation. This reduction is how every higher-order ODE is analyzed numerically and theoretically.',
+
+      '**Where this is heading.** The final lesson in this chapter applies these ideas to 3D computer graphics — transformations, rotations, projections. The connection: rotation matrices are exactly the matrix exponential of skew-symmetric $A$, which have purely imaginary eigenvalues. The algebra of rotations in 3D is the spectral theory of skew-symmetric matrices.',
     ],
     callouts: [
       {
+        type: 'sequencing',
+        title: 'Lesson 3 of 4 — Applications of Linear Algebra',
+        body: '**Previous (Lesson 2):** Markov chains and PageRank — stationary distributions as dominant eigenvectors.\n**This lesson:** ODEs and linear systems — eigenvalues determine stability; $\\dot{\\mathbf{x}} = A\\mathbf{x}$ solved by $e^{At}$.\n**Next (Lesson 4):** Computer graphics — rotations, projections, homogeneous coordinates.',
+      },
+      {
         type: 'insight',
         title: 'Stability Classification',
-        body: 'For $\\dot{\\mathbf{x}} = A\\mathbf{x}$, eigenvalues $\\lambda = \\sigma + i\\omega$:\n\n$\\sigma < 0$: decaying oscillation (stable spiral)\n$\\sigma = 0, \\omega \\neq 0$: pure oscillation (center)\n$\\sigma > 0$: growing oscillation (unstable spiral)\n$\\lambda$ real, $< 0$: exponential decay (stable node)\n$\\lambda$ real, $> 0$: exponential growth (unstable node)\nReal eigenvalues of opposite sign: saddle point (unstable)',
+        body: 'For $\\dot{\\mathbf{x}} = A\\mathbf{x}$ with eigenvalue $\\lambda = \\sigma + i\\omega$:\n\n$\\sigma < 0$: decaying oscillation (stable spiral)\n$\\sigma = 0, \\omega \\neq 0$: pure oscillation (center)\n$\\sigma > 0$: growing oscillation (unstable spiral)\nAll real $\\lambda < 0$: exponential decay (stable node)\nAny real $\\lambda > 0$: exponential growth (unstable node)\nReal eigenvalues of opposite signs: saddle (unstable)',
       },
       {
         type: 'insight',
-        title: 'General Solution Structure',
-        body: 'For $A = PDP^{-1}$ (diagonalizable), initial condition $\\mathbf{x}_0$:\n\n$\\mathbf{x}(t) = \\sum_{i=1}^n c_i e^{\\lambda_i t} \\mathbf{v}_i$\n\nwhere $c_i = (P^{-1}\\mathbf{x}_0)_i$.\n\nStable modes ($\\text{Re}(\\lambda_i) < 0$) die out.\nUnstable modes ($\\text{Re}(\\lambda_i) > 0$) grow.\nLong-term behavior dominated by eigenvalue with largest real part.',
-      },
-      {
-        type: 'sequencing',
-        title: 'Prediction',
-        body: 'For the rotation system $\\dot{\\mathbf{x}} = \\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}\\mathbf{x}$ starting at $(1,0)^\\top$, the eigenvalues are $\\pm i$ with zero real part. What trajectory does the solution trace in the $(x_1, x_2)$ plane? Is this system stable, asymptotically stable, or unstable? Think about what $e^{i\\omega t}$ does geometrically before reading the answer.',
+        title: 'Solution via Eigendecomposition',
+        body: 'For diagonalizable $A = PDP^{-1}$:\n$\\mathbf{x}(t) = \\sum_{i=1}^n c_i e^{\\lambda_i t} \\mathbf{v}_i$\nwhere $c_i = (P^{-1}\\mathbf{x}_0)_i$.\n\nStable modes ($\\text{Re}(\\lambda_i) < 0$) die out.\nUnstable modes ($\\text{Re}(\\lambda_i) > 0$) dominate.\nLong-term: controlled by eigenvalue with largest real part.',
       },
     ],
     visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Linear ODEs with NumPy and SciPy',
+        mathBridge: 'Compute the matrix exponential, simulate ODE trajectories, and classify stability from eigenvalues.',
+        caption: 'scipy.linalg.expm computes the matrix exponential exactly; scipy.integrate.odeint solves ODE systems numerically.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Matrix exponential and stability classification',
+              prose: 'Check eigenvalue real parts to classify stability, then compute the matrix exponential using scipy.',
+              code: `import numpy as np
+from scipy.linalg import expm
+
+# Three systems with different stability
+systems = {
+    "Stable spiral": np.array([[-1.0, 2.0], [-2.0, -1.0]]),
+    "Unstable node":  np.array([[2.0, 1.0], [0.0, 3.0]]),
+    "Center (pure oscillation)": np.array([[0.0, -1.0], [1.0, 0.0]]),
+}
+
+for name, A in systems.items():
+    eigs = np.linalg.eigvals(A)
+    max_real = max(e.real for e in eigs)
+    stable = "asymptotically stable" if max_real < 0 else ("marginally stable" if max_real == 0 else "UNSTABLE")
+    print(f"{name}")
+    print(f"  Eigenvalues: {np.round(eigs, 3)}")
+    print(f"  Status: {stable}")
+    print()
+`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Simulate ODE trajectory using matrix exponential',
+              prose: 'Solve x_dot = A x analytically via matrix exponential and plot the trajectory.',
+              code: `import numpy as np
+from scipy.linalg import expm
+
+# Stable spiral: A with eigenvalues -1 +/- 2i
+A = np.array([[-1.0, 2.0], [-2.0, -1.0]])
+x0 = np.array([1.0, 0.0])
+
+t_vals = np.linspace(0, 4, 100)
+x_traj = np.array([expm(A * t) @ x0 for t in t_vals])
+
+print("Trajectory x(t) = e^{At} x0:")
+print(f"  x(0) = {np.round(x0, 3)}")
+print(f"  x(1) = {np.round(expm(A*1) @ x0, 3)}")
+print(f"  x(2) = {np.round(expm(A*2) @ x0, 3)}")
+print(f"  x(4) = {np.round(expm(A*4) @ x0, 3)}")
+print()
+print("||x(t)|| decays (stable):", np.linalg.norm(x_traj[-1]) < np.linalg.norm(x_traj[0]))
+print("Final distance from origin:", np.round(np.linalg.norm(x_traj[-1]), 6))
+`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Second-order ODE as first-order system',
+              prose: 'Convert x_ddot + a*x_dot + b*x = 0 to state space and analyze stability by eigenvalues.',
+              code: `import numpy as np
+
+# Spring-mass-damper: x'' + 2*zeta*wn*x' + wn^2*x = 0
+# State: z = (x, x')
+# z' = [[0, 1], [-wn^2, -2*zeta*wn]] z
+
+configs = [
+    ("Underdamped (osc, decay)", 1.0, 0.3),
+    ("Overdamped (slow decay)",  1.0, 2.0),
+    ("Undamped (pure osc)",      1.0, 0.0),
+    ("Critically damped",        1.0, 1.0),
+]
+
+for name, wn, zeta in configs:
+    A = np.array([[0.0, 1.0], [-wn**2, -2*zeta*wn]])
+    eigs = np.linalg.eigvals(A)
+    print(f"{name}  (wn={wn}, zeta={zeta})")
+    print(f"  Eigenvalues: {np.round(eigs, 3)}")
+    print(f"  Stable: {all(e.real < 0 for e in eigs)}")
+    print()
+`,
+            },
+          ],
+        },
+      },
       {
         id: 'OpenMatNotebook',
         title: 'ODE Stability Analysis',

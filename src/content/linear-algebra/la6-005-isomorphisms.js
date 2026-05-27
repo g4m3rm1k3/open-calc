@@ -1,27 +1,34 @@
-export default {
+﻿export default {
   id: 'la6-005',
   slug: 'isomorphisms',
   chapter: 'la6',
   order: 5,
   title: 'Isomorphisms of Vector Spaces',
-  subtitle: 'Two vector spaces are isomorphic if there is a bijective linear map between them. Isomorphic spaces are structurally identical — you can transport every linear algebra fact between them.',
+  subtitle: 'Two vector spaces are isomorphic if there is a bijective linear map between them. Isomorphic spaces are structurally identical â€” you can transport every linear algebra fact between them.',
   tags: ['isomorphism', 'bijective', 'invertible linear map', 'coordinate isomorphism', 'natural isomorphism', 'same dimension', 'structure-preserving'],
   aliases: 'isomorphism bijective invertible linear map coordinate isomorphism natural isomorphism dimension structure preserving',
 
   hook: {
-    question: "We said $P_2 \\cong \\mathbb{R}^3$ and $M_{2\\times 2} \\cong \\mathbb{R}^4$. But what does $\\cong$ actually mean — and why does having the same dimension guarantee it?",
-    realWorldContext: "Isomorphisms are the mathematical notion of 'same structure, different labels.' In quantum mechanics, different representations of a quantum system (position space vs momentum space — related by the Fourier transform) are isomorphic Hilbert spaces. In data science, any feature vector space you work with is isomorphic to $\\mathbb{R}^n$ — which is why you can always do linear algebra on it. In cryptography, the isomorphism between the integers mod $p$ and $\\mathbb{F}_p$ is the foundation of almost all public-key systems. Understanding when two spaces are 'the same' prevents duplication of effort.",
-    previewVisualizationId: 'OpenMatNotebook',
+    question: "We said $P_2 \\cong \\mathbb{R}^3$ and $M_{2\\times 2} \\cong \\mathbb{R}^4$. But what does $\\cong$ actually mean â€” and why does having the same dimension guarantee it?",
+    realWorldContext: "Isomorphisms are the mathematical notion of 'same structure, different labels.' In quantum mechanics, different representations of a quantum system (position space vs momentum space â€” related by the Fourier transform) are isomorphic Hilbert spaces. In data science, any feature vector space you work with is isomorphic to $\\mathbb{R}^n$ â€” which is why you can always do linear algebra on it. In cryptography, the isomorphism between the integers mod $p$ and $\\mathbb{F}_p$ is the foundation of almost all public-key systems. Understanding when two spaces are 'the same' prevents duplication of effort.",
   },
 
   intuition: {
     prose: [
-      'Consider the polynomial $p = 3 + 5x \\in P_1$ and the vector $(3, 5) \\in \\mathbb{R}^2$. Define $T: P_1 \\to \\mathbb{R}^2$ by $T(a + bx) = (a, b)$. Is this a bijective linear map? Linearity: $T((a+bx)+(c+dx)) = T((a+c)+(b+d)x) = (a+c, b+d) = (a,b)+(c,d) = T(a+bx)+T(c+dx)$ ✓. Injective: $T(a+bx) = (0,0)$ forces $a=0, b=0$, so only the zero polynomial maps to zero ✓. Surjective: any $(a,b) \\in \\mathbb{R}^2$ is hit by $a+bx$ ✓. Inverse: $T^{-1}(a,b) = a+bx$. So $P_1 \\cong \\mathbb{R}^2$ — same structure, different notation.',
-      '**The grand theorem.** For finite-dimensional vector spaces over the same field: $V \\cong W$ if and only if $\\dim V = \\dim W$. Dimension is the ONLY invariant — if two spaces have the same dimension, they are isomorphic. Every $n$-dimensional vector space over $\\mathbb{R}$ is isomorphic to $\\mathbb{R}^n$.',
+      'Consider the polynomial $p = 3 + 5x \\in P_1$ and the vector $(3, 5) \\in \\mathbb{R}^2$. Define $T: P_1 \\to \\mathbb{R}^2$ by $T(a + bx) = (a, b)$. Is this a bijective linear map? Linearity: $T((a+bx)+(c+dx)) = T((a+c)+(b+d)x) = (a+c, b+d) = (a,b)+(c,d) = T(a+bx)+T(c+dx)$ âœ“. Injective: $T(a+bx) = (0,0)$ forces $a=0, b=0$, so only the zero polynomial maps to zero âœ“. Surjective: any $(a,b) \\in \\mathbb{R}^2$ is hit by $a+bx$ âœ“. Inverse: $T^{-1}(a,b) = a+bx$. So $P_1 \\cong \\mathbb{R}^2$ â€” same structure, different notation.',
+      '**The grand theorem.** For finite-dimensional vector spaces over the same field: $V \\cong W$ if and only if $\\dim V = \\dim W$. Dimension is the ONLY invariant â€” if two spaces have the same dimension, they are isomorphic. Every $n$-dimensional vector space over $\\mathbb{R}$ is isomorphic to $\\mathbb{R}^n$.',
       '**How to construct an isomorphism.** Given $V$ with basis $(\\mathbf{b}_1, \\ldots, \\mathbf{b}_n)$: define $T: V \\to \\mathbb{R}^n$ by $T(c_1\\mathbf{b}_1 + \\cdots + c_n\\mathbf{b}_n) = (c_1, \\ldots, c_n)^\\top$. This "coordinate map" is always an isomorphism. It is well-defined (because the basis representation is unique), linear (by direct verification), injective (only $\\mathbf{0}$ maps to $\\mathbf{0}$), and surjective (every coordinate vector is achieved).',
-      '**Natural vs basis-dependent.** The coordinate isomorphism $V \\cong \\mathbb{R}^n$ requires a choice of basis. Change the basis, change the isomorphism. A **natural isomorphism** would work the same way regardless of basis. For example, $V \\cong V^{**}$ (double dual) is natural — no basis needed.',
+      '**Natural vs basis-dependent.** The coordinate isomorphism $V \\cong \\mathbb{R}^n$ requires a choice of basis. Change the basis, change the isomorphism. A **natural isomorphism** would work the same way regardless of basis. For example, $V \\cong V^{**}$ (double dual) is natural â€” no basis needed.',
+      '**Isomorphism is an equivalence relation.** Every space is isomorphic to itself (identity map is an isomorphism). If $V \\cong W$ then $W \\cong V$ (the inverse of an isomorphism is an isomorphism). If $V \\cong W$ and $W \\cong X$ then $V \\cong X$ (composition of isomorphisms is an isomorphism). So "is isomorphic to" partitions the class of all vector spaces over $\\mathbb{F}$ into equivalence classes â€” and the classification theorem says exactly one invariant (dimension) determines which class a finite-dimensional space belongs to.',
+      '**What isomorphisms let you do.** If you have a hard problem in an abstract space $V$, find an isomorphism $T: V \\to \\mathbb{R}^n$, translate the problem to $\\mathbb{R}^n$ using $T$, solve it there using matrices and Gaussian elimination, then translate the answer back using $T^{-1}$. This is the entire strategy of coordinate-based linear algebra: turn abstract problems into concrete matrix problems by choosing a basis, and understand that any two choices of basis give equivalent problems (just with different matrices representing the same map). The solution you compute is independent of which basis you used â€” only its coordinates change.',
+      '**Where this is heading.** The last lesson in this chapter is change of basis â€” the practical mechanics of converting between coordinate systems. Once you can fluently change bases, you can always find the basis that makes a computation easiest: the eigenvector basis for a diagonalizable map, the SVD basis for any matrix, or the Gram-Schmidt basis for projection problems. Every important algorithm in numerical linear algebra is, at its core, a change of basis.',
     ],
     callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 5 of 6 â€” Abstract Vector Spaces',
+        body: '**Previous:** Matrix Representations â€” encoding linear maps as matrices in a chosen basis.\n**This lesson:** Isomorphisms â€” bijective linear maps that identify two vector spaces as structurally identical, with dimension as the complete invariant.\n**Next:** Coordinates and Change of Basis â€” the mechanics of converting between different coordinate systems.',
+      },
       {
         type: 'theorem',
         title: 'Classification of Finite-Dimensional Spaces',
@@ -30,7 +37,7 @@ export default {
       {
         type: 'insight',
         title: 'Isomorphisms Preserve All Linear Algebra',
-        body: 'If $T: V \\to W$ is an isomorphism:\n• Linearly independent sets in $V$ map to linearly independent sets in $W$\n• Bases in $V$ map to bases in $W$\n• $\\dim V = \\dim W$\n• Subspaces correspond bijectively\n• Dimension of subspaces is preserved\n\nAn isomorphism is a "dictionary" that translates all linear algebra between the two spaces.',
+        body: 'If $T: V \\to W$ is an isomorphism:\nâ€¢ Linearly independent sets in $V$ map to linearly independent sets in $W$\nâ€¢ Bases in $V$ map to bases in $W$\nâ€¢ $\\dim V = \\dim W$\nâ€¢ Subspaces correspond bijectively\nâ€¢ Dimension of subspaces is preserved\n\nAn isomorphism is a "dictionary" that translates all linear algebra between the two spaces.',
       },
       {
         type: 'insight',
@@ -38,7 +45,7 @@ export default {
         body: 'If $T: V \\to W$ is an isomorphism, then $T^{-1}: W \\to V$ is also a linear map (and an isomorphism). This is not obvious! Proof: for $T^{-1}(\\mathbf{u}+\\mathbf{v})$, write $\\mathbf{u} = T(\\mathbf{a})$, $\\mathbf{v} = T(\\mathbf{b})$. Then $T^{-1}(\\mathbf{u}+\\mathbf{v}) = T^{-1}(T(\\mathbf{a}+\\mathbf{b})) = \\mathbf{a}+\\mathbf{b} = T^{-1}(\\mathbf{u}) + T^{-1}(\\mathbf{v})$.',
       },
       {
-        type: 'sequencing',
+        type: 'insight',
         title: 'Prediction',
         body: 'Before reading the math section: $P_2$ has dimension 3 and $\\mathbb{R}^3$ has dimension 3. Can you write down an explicit bijective linear map $T: P_2 \\to \\mathbb{R}^3$ right now? What would $T(1 + 2x - x^2)$ equal under your map? Write down your candidate map and check it satisfies linearity before reading on.',
       },
@@ -105,7 +112,7 @@ end
 
   math: {
     prose: [
-      '**Proof of the classification theorem.** ($\\Rightarrow$) Isomorphisms preserve linear independence and spanning — so they map bases to bases, preserving dimension. ($\\Leftarrow$) If $\\dim V = \\dim W = n$, pick bases $\\mathcal{B}$ for $V$ and $\\mathcal{C}$ for $W$. Define $T: V \\to W$ by $T(\\mathbf{b}_j) = \\mathbf{c}_j$ and extend linearly. This $T$ maps a basis to a basis, so it is bijective. $\\square$',
+      '**Proof of the classification theorem.** ($\\Rightarrow$) Isomorphisms preserve linear independence and spanning â€” so they map bases to bases, preserving dimension. ($\\Leftarrow$) If $\\dim V = \\dim W = n$, pick bases $\\mathcal{B}$ for $V$ and $\\mathcal{C}$ for $W$. Define $T: V \\to W$ by $T(\\mathbf{b}_j) = \\mathbf{c}_j$ and extend linearly. This $T$ maps a basis to a basis, so it is bijective. $\\square$',
     ],
     callouts: [
       {
@@ -114,7 +121,71 @@ end
         body: 'For $T: V \\to W$ with $\\dim V = \\dim W < \\infty$, these are equivalent:\n1. $T$ is an isomorphism\n2. $T$ is injective ($\\ker T = \\{\\mathbf{0}\\}$)\n3. $T$ is surjective ($\\text{im } T = W$)\n4. $T$ maps a basis to a basis\n5. The matrix of $T$ (in any bases) is invertible',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Code: Isomorphisms and Coordinate Maps',
+        mathBridge: 'Use the coordinate map to translate abstract linear independence problems into matrix rank problems. Verify isomorphism by checking injectivity and surjectivity via the matrix.',
+        caption: 'Same dimension means isomorphic. Use the coordinate map to reduce abstract problems to linear systems.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Coordinate isomorphism: translate P_2 problems to R^3',
+              prose: 'The coordinate map $\\phi: P_2 \\to \\mathbb{R}^3$, $\\phi(a + bx + cx^2) = (a,b,c)^T$, is an isomorphism. To check if polynomials in $P_2$ are linearly independent, just check if their coordinate vectors in $\\mathbb{R}^3$ are linearly independent (using rank).',
+              code: `import numpy as np
+
+# Translate a P_2 independence question to R^3
+# Are p1 = 1 + x, p2 = 1 + x^2, p3 = x + x^2 linearly independent?
+v1 = np.array([1., 1., 0.])   # 1 + x
+v2 = np.array([1., 0., 1.])   # 1 + x^2
+v3 = np.array([0., 1., 1.])   # x + x^2
+
+M = np.column_stack([v1, v2, v3])
+rank = np.linalg.matrix_rank(M)
+
+print("Coordinate matrix M = [v1|v2|v3]:")
+print(M)
+print(f"rank(M) = {rank}")
+print(f"Linearly independent: {rank == 3}")
+print()
+
+# If they span P_2 (rank 3), we can find coordinates of any polynomial
+p_target = np.array([2., 5., -3.])   # 2 + 5x - 3x^2
+coords = np.linalg.solve(M, p_target)
+print(f"2 + 5x - 3x^2 = {coords[0]:.4f}*(1+x) + {coords[1]:.4f}*(1+x^2) + {coords[2]:.4f}*(x+x^2)")`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Build an explicit isomorphism and verify it',
+              prose: 'An isomorphism $T: V \\to W$ must be linear (matrix), injective (full column rank), and surjective (full row rank). When $\\dim V = \\dim W$, checking either injectivity or surjectivity alone suffices. Verify $T^{-1}$ is also linear.',
+              code: `import numpy as np
+
+# Isomorphism T: R^3 -> Sym(2x2) (2x2 symmetric matrices)
+# Sym(2x2) has basis B1=[1,0;0,0], B2=[0,1;1,0], B3=[0,0;0,1]
+# T(a,b,c) = a*B1 + b*B2 + c*B3 (as a 4-vector [a,b,b,c])
+
+# Matrix of T (as flat 4-vector representation of Sym)
+T_matrix = np.array([[1., 0., 0.],   # B1 flattened
+                     [0., 1., 0.],   # B2_upper
+                     [0., 1., 0.],   # B2_lower (symmetric)
+                     [0., 0., 1.]])  # B3 flattened
+
+print("T maps R^3 to flattened Sym(2x2) via matrix T:")
+print(T_matrix)
+print(f"rank(T) = {np.linalg.matrix_rank(T_matrix)}  (should be 3 = dim R^3)")
+print()
+
+# Apply T to vector (2, -1, 3)
+v = np.array([2., -1., 3.])
+T_v = T_matrix @ v
+print(f"T({v}) = {T_v}  -> matrix [[{T_v[0]},{T_v[1]}],[{T_v[2]},{T_v[3]}]]")
+print("This is: 2*B1 + (-1)*B2 + 3*B3 = [[2,-1],[-1,3]] âœ“")`,
+            },
+          ],
+        },
+      },
+    ],
   },
 
   rigor: {
@@ -126,7 +197,7 @@ end
       {
         type: 'insight',
         title: 'Every finite-dim space IS R^n, up to isomorphism',
-        body: 'When you "pick a basis," you are literally constructing the coordinate isomorphism $V \\xrightarrow{\\sim} \\mathbb{R}^n$. The entire theory of $\\mathbb{R}^n$ — rank, null space, determinants, eigenvalues — applies to $V$ once you pick a basis. The choice of basis is a "gauge choice" that does not affect the underlying geometry.',
+        body: 'When you "pick a basis," you are literally constructing the coordinate isomorphism $V \\xrightarrow{\\sim} \\mathbb{R}^n$. The entire theory of $\\mathbb{R}^n$ â€” rank, null space, determinants, eigenvalues â€” applies to $V$ once you pick a basis. The choice of basis is a "gauge choice" that does not affect the underlying geometry.',
       },
     ],
     visualizations: [],
@@ -160,7 +231,7 @@ end
         },
         {
           expression: '\\text{Injective} + \\dim(\\text{domain}) = \\dim(\\text{codomain}) \\implies \\text{bijective} \\implies T \\text{ is an isomorphism}',
-          annotation: 'By rank-nullity: injective + same-dimension domain/codomain → surjective → isomorphism.',
+          annotation: 'By rank-nullity: injective + same-dimension domain/codomain â†’ surjective â†’ isomorphism.',
           strategyTitle: 'Conclude isomorphism',
         },
       ],
@@ -199,12 +270,12 @@ end
     },
     {
       id: 'ex-la6-005-3',
-      title: 'Isomorphism $M_{2\\times 1} \\cong \\mathbb{R}^2$ — the trivial case made explicit',
+      title: 'Isomorphism $M_{2\\times 1} \\cong \\mathbb{R}^2$ â€” the trivial case made explicit',
       problem: 'The space $M_{2\\times 1}$ of $2\\times 1$ column matrices looks different from $\\mathbb{R}^2$, but they are isomorphic. Write down the isomorphism, verify it is linear and bijective, and find its inverse.',
       steps: [
         {
           expression: '\\dim(M_{2\\times 1}) = 2, \\quad \\dim(\\mathbb{R}^2) = 2',
-          annotation: '$M_{2\\times 1}$ has basis $\\left\\{\\begin{bmatrix}1\\\\0\\end{bmatrix}, \\begin{bmatrix}0\\\\1\\end{bmatrix}\\right\\}$. Same dimension as $\\mathbb{R}^2$ — isomorphism guaranteed.',
+          annotation: '$M_{2\\times 1}$ has basis $\\left\\{\\begin{bmatrix}1\\\\0\\end{bmatrix}, \\begin{bmatrix}0\\\\1\\end{bmatrix}\\right\\}$. Same dimension as $\\mathbb{R}^2$ â€” isomorphism guaranteed.',
           strategyTitle: 'Check dimensions',
         },
         {
@@ -219,7 +290,7 @@ end
         },
         {
           expression: '\\ker(T) = \\left\\{\\begin{bmatrix}a\\\\b\\end{bmatrix} : (a,b) = (0,0)\\right\\} = \\left\\{\\begin{bmatrix}0\\\\0\\end{bmatrix}\\right\\}',
-          annotation: 'Trivial kernel → injective. Same dimensions → also surjective. $T$ is an isomorphism.',
+          annotation: 'Trivial kernel â†’ injective. Same dimensions â†’ also surjective. $T$ is an isomorphism.',
           strategyTitle: 'Injectivity and surjectivity',
         },
         {
@@ -240,7 +311,7 @@ end
       hint: 'Compute the dimension of each space.',
       walkthrough: [
         '**$P_2$ vs $P_3$:** $\\dim(P_2) = 3$ (basis $\\{1,x,x^2\\}$) and $\\dim(P_3) = 4$ (basis $\\{1,x,x^2,x^3\\}$). Since $3 \\neq 4$, there is no bijective linear map. Any isomorphism must map bases to bases, which would require equal-size bases.',
-        '**$M_{2\\times 3}$ vs $P_5$:** $\\dim(M_{2\\times 3}) = 6$ and $\\dim(P_5) = 6$. Same dimension → isomorphic. Explicit isomorphism: map each matrix entry to a polynomial coefficient: $T\\begin{bmatrix}a_{11}&a_{12}&a_{13}\\\\a_{21}&a_{22}&a_{23}\\end{bmatrix} = a_{11} + a_{12}x + a_{13}x^2 + a_{21}x^3 + a_{22}x^4 + a_{23}x^5$.',
+        '**$M_{2\\times 3}$ vs $P_5$:** $\\dim(M_{2\\times 3}) = 6$ and $\\dim(P_5) = 6$. Same dimension â†’ isomorphic. Explicit isomorphism: map each matrix entry to a polynomial coefficient: $T\\begin{bmatrix}a_{11}&a_{12}&a_{13}\\\\a_{21}&a_{22}&a_{23}\\end{bmatrix} = a_{11} + a_{12}x + a_{13}x^2 + a_{21}x^3 + a_{22}x^4 + a_{23}x^5$.',
         '**Key theorem:** Two finite-dimensional vector spaces over the same field are isomorphic if and only if they have the same dimension. Dimension is the complete invariant.',
       ],
     },
@@ -253,7 +324,7 @@ end
       walkthrough: [
         '**Matrix of $T$:** Apply to basis $\\{1, x, x^2\\}$: $T(1) = (1,1,1)^\\top$, $T(x) = (0,1,-1)^\\top$, $T(x^2) = (0,1,1)^\\top$. Matrix: $A = \\begin{bmatrix}1&0&0\\\\1&1&1\\\\1&-1&1\\end{bmatrix}$.',
         '**Determinant:** $\\det(A) = 1(1-(-1)) = 2 \\neq 0$.',
-        '**Conclusion:** $A$ is invertible → $T$ is bijective → $T$ is an isomorphism. Its inverse gives polynomial interpolation: given values at $0, 1, -1$, find the unique quadratic through those points.',
+        '**Conclusion:** $A$ is invertible â†’ $T$ is bijective â†’ $T$ is an isomorphism. Its inverse gives polynomial interpolation: given values at $0, 1, -1$, find the unique quadratic through those points.',
       ],
     },
   ],
@@ -261,8 +332,8 @@ end
   mentalModel: [
     'Isomorphism = bijective linear map. Same structure, different packaging.',
     'Two finite-dim spaces over the same field are isomorphic iff they have the same dimension.',
-    'Coordinate map = canonical isomorphism: pick basis → get $V \\cong \\mathbb{R}^n$.',
-    'Isomorphisms preserve independence, bases, dimension, subspace structure — everything linear.',
+    'Coordinate map = canonical isomorphism: pick basis â†’ get $V \\cong \\mathbb{R}^n$.',
+    'Isomorphisms preserve independence, bases, dimension, subspace structure â€” everything linear.',
   ],
 
   checkpoints: [
@@ -282,7 +353,7 @@ end
         id: 'assess-la6-005-1',
         type: 'proof',
         text: 'Prove that any bijective linear map $T: V \\to W$ has a linear inverse. That is, if $T$ is an isomorphism, then $T^{-1}: W \\to V$ is also linear.',
-        answer: 'Let $T^{-1}: W \\to V$ be the set-theoretic inverse. For any $\\mathbf{w}_1, \\mathbf{w}_2 \\in W$ and scalar $c$: Let $\\mathbf{v}_i = T^{-1}(\\mathbf{w}_i)$, so $T(\\mathbf{v}_i) = \\mathbf{w}_i$. Then $T(c\\mathbf{v}_1 + \\mathbf{v}_2) = cT(\\mathbf{v}_1) + T(\\mathbf{v}_2) = c\\mathbf{w}_1 + \\mathbf{w}_2$ (by linearity of $T$). Applying $T^{-1}$: $c\\mathbf{v}_1 + \\mathbf{v}_2 = T^{-1}(c\\mathbf{w}_1 + \\mathbf{w}_2) = cT^{-1}(\\mathbf{w}_1) + T^{-1}(\\mathbf{w}_2)$. ✓',
+        answer: 'Let $T^{-1}: W \\to V$ be the set-theoretic inverse. For any $\\mathbf{w}_1, \\mathbf{w}_2 \\in W$ and scalar $c$: Let $\\mathbf{v}_i = T^{-1}(\\mathbf{w}_i)$, so $T(\\mathbf{v}_i) = \\mathbf{w}_i$. Then $T(c\\mathbf{v}_1 + \\mathbf{v}_2) = cT(\\mathbf{v}_1) + T(\\mathbf{v}_2) = c\\mathbf{w}_1 + \\mathbf{w}_2$ (by linearity of $T$). Applying $T^{-1}$: $c\\mathbf{v}_1 + \\mathbf{v}_2 = T^{-1}(c\\mathbf{w}_1 + \\mathbf{w}_2) = cT^{-1}(\\mathbf{w}_1) + T^{-1}(\\mathbf{w}_2)$. âœ“',
         hint: 'Let $\\mathbf{v}_i = T^{-1}(\\mathbf{w}_i)$ and use linearity of $T$ to show $T(c\\mathbf{v}_1 + \\mathbf{v}_2) = c\\mathbf{w}_1 + \\mathbf{w}_2$, then apply $T^{-1}$.',
       },
     ],
@@ -295,7 +366,7 @@ end
       text: 'Two finite-dimensional real vector spaces are isomorphic if and only if:',
       options: ['They contain the same vectors', 'They have the same dimension', 'They have the same basis', 'One is a subspace of the other'],
       answer: 'They have the same dimension',
-      hints: ['Dimension is the complete invariant: $\\dim V = \\dim W \\Leftrightarrow V \\cong W$ (over the same field). $P_3 \\cong M_{2\\times 2} \\cong \\mathbb{R}^4$ — all have dimension 4, all are isomorphic to each other.'],
+      hints: ['Dimension is the complete invariant: $\\dim V = \\dim W \\Leftrightarrow V \\cong W$ (over the same field). $P_3 \\cong M_{2\\times 2} \\cong \\mathbb{R}^4$ â€” all have dimension 4, all are isomorphic to each other.'],
       reviewSection: 'intuition',
     },
     {
@@ -304,16 +375,16 @@ end
       text: 'The coordinate map $\\phi_{\\mathcal{B}}: V \\to \\mathbb{R}^n$ (sending $\\mathbf{v}$ to its $\\mathcal{B}$-coordinates) is:',
       options: ['Always injective but not surjective', 'Always surjective but not injective', 'An isomorphism', 'Linear but not bijective'],
       answer: 'An isomorphism',
-      hints: ['The coordinate map is injective (different vectors have different coordinate representations) and surjective (every tuple in $\\mathbb{R}^n$ corresponds to some vector). So it is bijective and linear — an isomorphism.'],
+      hints: ['The coordinate map is injective (different vectors have different coordinate representations) and surjective (every tuple in $\\mathbb{R}^n$ corresponds to some vector). So it is bijective and linear â€” an isomorphism.'],
       reviewSection: 'intuition',
     },
     {
       id: 'q-la6-005-3',
       type: 'choice',
       text: 'Is $M_{2\\times 3} \\cong P_5$?',
-      options: ['Yes — both have dimension 6', 'No — $M_{2\\times 3}$ is not a vector space', 'Yes — any two matrix spaces are isomorphic', 'No — their dimensions differ'],
-      answer: 'Yes — both have dimension 6',
-      hints: ['$\\dim(M_{2\\times 3}) = 2 \\times 3 = 6$. $\\dim(P_5) = 6$ (basis: $1,x,x^2,x^3,x^4,x^5$). Same dimension → isomorphic. An explicit isomorphism maps the 6 matrix entries to the 6 polynomial coefficients.'],
+      options: ['Yes â€” both have dimension 6', 'No â€” $M_{2\\times 3}$ is not a vector space', 'Yes â€” any two matrix spaces are isomorphic', 'No â€” their dimensions differ'],
+      answer: 'Yes â€” both have dimension 6',
+      hints: ['$\\dim(M_{2\\times 3}) = 2 \\times 3 = 6$. $\\dim(P_5) = 6$ (basis: $1,x,x^2,x^3,x^4,x^5$). Same dimension â†’ isomorphic. An explicit isomorphism maps the 6 matrix entries to the 6 polynomial coefficients.'],
       reviewSection: 'intuition',
     },
     {
@@ -358,7 +429,7 @@ end
       text: 'Is $P_2 \\cong \\mathbb{R}^2$?',
       options: ['Yes, because both contain polynomials and vectors', 'No, because $\\dim P_2 = 3$ while $\\dim \\mathbb{R}^2 = 2$', 'Yes, because we can always find a linear map between any two spaces', 'No, because $P_2$ is not a subspace of $\\mathbb{R}^2$'],
       answer: 'No, because $\\dim P_2 = 3$ while $\\dim \\mathbb{R}^2 = 2$',
-      hints: ['$P_2$ has basis $\\{1, x, x^2\\}$ so $\\dim P_2 = 3$. $\\mathbb{R}^2$ has dimension 2. Different dimensions → not isomorphic. There is no bijective linear map between spaces of different dimensions.'],
+      hints: ['$P_2$ has basis $\\{1, x, x^2\\}$ so $\\dim P_2 = 3$. $\\mathbb{R}^2$ has dimension 2. Different dimensions â†’ not isomorphic. There is no bijective linear map between spaces of different dimensions.'],
       reviewSection: 'intuition',
     },
     {
@@ -376,7 +447,7 @@ end
       text: 'The "natural" isomorphism $V \\cong V^{**}$ (double dual) is distinguished from the coordinate isomorphism $V \\cong \\mathbb{R}^n$ because:',
       options: ['It does not require choosing a basis', 'It only works for $\\mathbb{R}^n$', 'It is not actually an isomorphism', 'It requires $V$ to be infinite-dimensional'],
       answer: 'It does not require choosing a basis',
-      hints: ['The coordinate isomorphism $V \\to \\mathbb{R}^n$ requires picking an ordered basis — change the basis, change the map. The double-dual isomorphism $\\mathbf{v} \\mapsto (\\phi \\mapsto \\phi(\\mathbf{v}))$ is defined the same way for all $V$, with no basis choice. This is what "natural" means in category theory.'],
+      hints: ['The coordinate isomorphism $V \\to \\mathbb{R}^n$ requires picking an ordered basis â€” change the basis, change the map. The double-dual isomorphism $\\mathbf{v} \\mapsto (\\phi \\mapsto \\phi(\\mathbf{v}))$ is defined the same way for all $V$, with no basis choice. This is what "natural" means in category theory.'],
       reviewSection: 'rigor',
     },
   ],
@@ -385,7 +456,7 @@ end
     targetLevel: 2,
     solveIndependently: 'Given two finite-dimensional vector spaces, determine whether they are isomorphic by comparing dimensions, and if so, write down an explicit isomorphism and verify it satisfies linearity and bijectivity.',
     explainVerbally: 'Explain why dimension is the "complete invariant" of finite-dimensional vector spaces, and what it means for two spaces to be "structurally the same."',
-    detectIncorrectApplication: 'Identify when a proposed map fails to be an isomorphism — whether it is not linear, not injective, or not surjective — and pinpoint which condition fails.',
+    detectIncorrectApplication: 'Identify when a proposed map fails to be an isomorphism â€” whether it is not linear, not injective, or not surjective â€” and pinpoint which condition fails.',
     transferToUnfamiliar: 'Construct an isomorphism between two unfamiliar vector spaces (e.g., the space of $2\\times 2$ symmetric matrices and $\\mathbb{R}^3$) without being prompted on the definition.',
   },
 
@@ -394,7 +465,7 @@ end
       falseBelief: 'Two spaces are isomorphic only if they contain the same kinds of objects (e.g., both are spaces of vectors).',
       whyStudentsThinkIt: 'Students focus on the surface appearance of the elements rather than the algebraic structure. $P_2$ looks nothing like $\\mathbb{R}^3$, so it seems like they should not be "the same."',
       correctionExample: '$P_2 = \\{a+bx+cx^2\\}$ and $\\mathbb{R}^3 = \\{(a,b,c)\\}$ are isomorphic via $T(a+bx+cx^2) = (a,b,c)$. Their elements look different but the algebraic rules are identical.',
-      contrastCase: '$P_2$ and $P_3$ are NOT isomorphic even though both are polynomial spaces — because their dimensions differ ($3 \\neq 4$).',
+      contrastCase: '$P_2$ and $P_3$ are NOT isomorphic even though both are polynomial spaces â€” because their dimensions differ ($3 \\neq 4$).',
     },
     {
       falseBelief: 'Any linear map between equal-dimensional spaces is an isomorphism.',
@@ -413,7 +484,7 @@ end
     {
       situation: 'Two matrix spaces are given and you want to know if they are "the same" for linear algebra purposes.',
       competingTechniques: 'Could try to find an explicit isomorphism directly, which can be complicated.',
-      whyThisTechniqueWins: 'Just compute the dimensions. If dimensions match, an isomorphism exists (you can always construct one via bases). If dimensions differ, no isomorphism is possible — no need to search.',
+      whyThisTechniqueWins: 'Just compute the dimensions. If dimensions match, an isomorphism exists (you can always construct one via bases). If dimensions differ, no isomorphism is possible â€” no need to search.',
     },
   ],
 
@@ -422,7 +493,7 @@ end
       commonError: 'Defining a map that is linear but not injective, then claiming it is an isomorphism.',
       symptom: 'The proposed $T$ passes the "linearity check" but $T(\\mathbf{v}) = T(\\mathbf{w})$ for $\\mathbf{v} \\neq \\mathbf{w}$, so $T^{-1}$ cannot be defined.',
       whyItHappened: 'Students focus on verifying linearity and forget to check injectivity (trivial kernel).',
-      repairStrategy: 'After verifying linearity, always compute $\\ker T$. Set $T(\\mathbf{v}) = \\mathbf{0}$ and solve — if the only solution is $\\mathbf{v} = \\mathbf{0}$, $T$ is injective. With equal finite dimensions, this is sufficient for isomorphism.',
+      repairStrategy: 'After verifying linearity, always compute $\\ker T$. Set $T(\\mathbf{v}) = \\mathbf{0}$ and solve â€” if the only solution is $\\mathbf{v} = \\mathbf{0}$, $T$ is injective. With equal finite dimensions, this is sufficient for isomorphism.',
     },
     {
       commonError: 'Confusing "an isomorphism exists" with "every map is an isomorphism."',

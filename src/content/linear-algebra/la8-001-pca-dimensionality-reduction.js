@@ -11,34 +11,153 @@ export default {
   hook: {
     question: "Your dataset has 10,000 features per sample but only 1,000 samples. The data matrix is 1000 × 10000. Can you reduce to the 50 most informative directions without losing much information?",
     realWorldContext: "PCA is one of the most widely used techniques in data science. In genomics, gene expression datasets have 20,000+ genes — PCA reveals the dominant biological variation axes. In finance, returns on 500 stocks are reduced to a few 'risk factors' via PCA. In computer vision, eigenfaces (PCA of face images) was the dominant face recognition method for a decade. In climate science, PCA identifies the El Niño pattern, the North Atlantic Oscillation, and other dominant climate modes. In machine learning, PCA preprocessing often improves classification accuracy by removing noise dimensions.",
-    previewVisualizationId: 'OpenMatNotebook',
   },
 
   intuition: {
     prose: [
-      '**PCA in action — concrete numbers first.** Start with three data points: $(0,0)$, $(2,1)$, $(4,2)$. Mean: $(2,1)$. Centered: $(-2,-1)$, $(0,0)$, $(2,1)$. The centered data matrix is $X = \\begin{bmatrix}-2&-1\\\\0&0\\\\2&1\\end{bmatrix}$. The covariance matrix $C = \\frac{1}{n-1}X^\\top X = \\frac{1}{2}\\begin{bmatrix}8&4\\\\4&2\\end{bmatrix} = \\begin{bmatrix}4&2\\\\2&1\\end{bmatrix}$. Eigenvalues: $\\lambda_1 = 5$, $\\lambda_2 = 0$. Eigenvector for $\\lambda_1 = 5$: $\\mathbf{v}_1 = (2/\\sqrt{5},\\, 1/\\sqrt{5})$. Project first point onto PC1: $(-2,-1)\\cdot(2/\\sqrt{5},1/\\sqrt{5}) = -5/\\sqrt{5} = -\\sqrt{5}$. The entire dataset lies on one line — PCA finds it exactly.',
-      '**What PCA does in general.** Given a data matrix $X$ ($n$ samples × $p$ features, mean-centered), PCA finds an orthonormal basis $\\{\\mathbf{v}_1, \\ldots, \\mathbf{v}_k\\}$ for a $k$-dimensional subspace that captures as much variance in $X$ as possible. The $i$-th principal component $\\mathbf{v}_i$ is the direction of maximum remaining variance after removing all previous components.',
-      '**Connection to SVD and covariance.** The $p \\times p$ sample covariance matrix is $C = \\frac{1}{n-1}X^\\top X$. Its eigenvectors are the principal components; its eigenvalues are the variances along each component. Equivalently: compute the SVD $X = U\\Sigma V^\\top$. The columns of $V$ are the principal components; $\\sigma_i^2/(n-1)$ are the variances. The $k$-rank approximation $X_k = U_k \\Sigma_k V_k^\\top$ is the best rank-$k$ approximation to $X$ in the Frobenius norm (Eckart-Young theorem).',
-      '**How much to keep.** The "explained variance ratio" of component $i$ is $\\lambda_i / \\sum_j \\lambda_j$ (eigenvalue fraction). Plot the cumulative explained variance vs number of components ("scree plot"). Keep enough components to explain 90-99% of variance, or use the "elbow" heuristic.',
+      '**Where you are in the story.** Chapters 1–7 built the mathematical machinery: vectors, matrices, eigenvalues, SVD, orthogonality, numerical methods. Chapter 8 shows where all of that machinery goes — the real problems it was built to solve. Principal Component Analysis is perhaps the single most-applied technique in quantitative science. It is the eigenvalue problem applied to data. You have been building toward this for several chapters; now you see it in action.',
+
+      '**The problem: too many dimensions.** Your dataset has 500 stock returns measured daily for 10 years — a $2500 \\times 500$ matrix. You could work with all 500 dimensions, but most of the variation in stock prices is driven by a handful of underlying factors: market risk, sector effects, interest rate sensitivity. PCA finds those few directions that explain most of the variance. You reduce 500 dimensions to maybe 10, losing almost no information. The 10 directions it finds are not arbitrary — they are the directions of maximum variance, computed via the eigenvalue decomposition of the covariance matrix.',
+
+      '**Concrete first: three points in 2D.** Data: $(0,0)$, $(2,1)$, $(4,2)$. Step 1 — center: subtract mean $(2,1)$, giving $(-2,-1)$, $(0,0)$, $(2,1)$. Covariance matrix: $C = \\frac{1}{2}X^\\top X = \\begin{bmatrix}4&2\\\\2&1\\end{bmatrix}$. Eigenvalues: trace $= 5$, determinant $= 0$, so $\\lambda_1 = 5$, $\\lambda_2 = 0$. Eigenvector for $\\lambda_1 = 5$: $(2/\\sqrt{5}, 1/\\sqrt{5})^\\top$. The data has zero variance in the perpendicular direction and all variance in the $(2,1)$ direction — PCA found that the three points are perfectly collinear, lying on a single line.',
+
+      '**The geometric idea: find the axis of maximum stretch.** Think of the data as a cloud of points. PCA finds the direction through the cloud that is "longest" (maximum variance), then the perpendicular direction that is "next longest," and so on. These are the principal components. They are orthogonal to each other (the eigenvectors of a symmetric matrix are always orthogonal) and ordered by how much variance they capture.',
+
+      '**Predict before reading on.** If all your data points satisfy exactly $y = 2x$, what is the rank of the covariance matrix? How many principal components are needed to capture 100% of the variance? Write your answer before continuing.',
+
+      '**SVD and PCA are the same computation.** The SVD $X = U\\Sigma V^\\top$ gives the principal components directly: columns of $V$ are the directions (principal axes), $\\sigma_i^2/(n-1)$ are the variances along each axis. The covariance matrix approach ($C = X^\\top X/(n-1) = V\\Lambda V^\\top$) and the SVD approach give exactly the same directions — but SVD is numerically preferred because it does not square the matrix (recall: squaring squares the condition number).',
+
+      '**How many components to keep: the scree plot.** The explained variance ratio of component $i$ is $\\lambda_i/\\sum_j \\lambda_j$ — the fraction of total variance captured by that direction. A "scree plot" shows these fractions in decreasing order. Look for the "elbow" where the curve bends — adding more components after that gives diminishing returns. In practice, keeping enough components to explain 95% of variance is a common threshold.',
+
+      '**Where this is heading.** The next lesson applies eigenvalue ideas to a completely different setting: Markov chains and PageRank. The stationary distribution of a random walk is an eigenvector problem. The tools are the same (eigendecomposition, power method) but the interpretation is completely different. After that, you will see eigenvalues drive coupled ODE systems and 3D computer graphics.',
     ],
     callouts: [
       {
+        type: 'sequencing',
+        title: 'Lesson 1 of 4 — Applications of Linear Algebra',
+        body: '**Chapter 7 (Numerical Methods):** QR, Cholesky, conditioning, stability, sparse matrices.\n**Chapter 8 (Applications), this chapter:** Where the math meets real problems.\n**This lesson:** PCA — eigenvalue decomposition of data covariance; dimensionality reduction.\n**Next:** Markov chains and PageRank — stationary distributions as eigenvectors.',
+      },
+      {
         type: 'insight',
         title: 'PCA Recipe',
-        body: '1. Mean-center each feature: $X \\leftarrow X - \\bar{X}$\n2. Compute SVD: $X = U\\Sigma V^\\top$ (or eigendecompose $C = X^\\top X/(n-1)$)\n3. Choose $k$ by explained variance threshold\n4. Project: $Z = X V_k$ ($n \\times k$ score matrix)\n5. Reconstruct: $\\hat{X} = Z V_k^\\top$ ($n \\times p$, rank-$k$ approximation)\n\nVariance captured by first $k$ components: $\\sum_{i=1}^k \\sigma_i^2 / \\sum_i \\sigma_i^2$',
+        body: '1. Mean-center: $X \\leftarrow X - \\bar{X}$\n2. SVD: $X = U\\Sigma V^\\top$ (columns of $V$ are principal components)\n3. Choose $k$ by explained variance: keep $\\sigma_1,\\ldots,\\sigma_k$\n4. Project: $Z = X V_k$ ($n \\times k$ score matrix)\n5. Reconstruct: $\\hat{X} = Z V_k^\\top$ (rank-$k$ approximation)\n\nVariance captured: $\\sum_{i=1}^k \\sigma_i^2 / \\sum_i \\sigma_i^2$',
       },
       {
         type: 'insight',
-        title: 'Eckart-Young Theorem',
-        body: 'The best rank-$k$ approximation of $X$ (in 2-norm or Frobenius norm) is $X_k = \\sum_{i=1}^k \\sigma_i \\mathbf{u}_i \\mathbf{v}_i^\\top$.\n\nApproximation error: $\\|X - X_k\\|_F = \\sqrt{\\sum_{i>k} \\sigma_i^2}$\n\nThis is why SVD-based PCA is optimal — no other rank-$k$ subspace captures more variance.',
-      },
-      {
-        type: 'sequencing',
-        title: 'Prediction',
-        body: 'If the data is perfectly correlated — every point satisfies $y = x$ — what is the rank of the covariance matrix $C$? What does that imply about the number of nonzero eigenvalues and how many principal components are needed to capture 100% of the variance?',
+        title: 'Eckart-Young: SVD gives the best approximation',
+        body: 'The rank-$k$ approximation $X_k = \\sum_{i=1}^k \\sigma_i \\mathbf{u}_i \\mathbf{v}_i^\\top$ is the best rank-$k$ approximation of $X$ in both the 2-norm and Frobenius norm.\n\nError: $\\|X - X_k\\|_F = \\sqrt{\\sigma_{k+1}^2 + \\cdots + \\sigma_r^2}$\n\nNo other $k$-dimensional subspace captures more variance.',
       },
     ],
     visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'PCA with NumPy',
+        mathBridge: 'Perform PCA from scratch using SVD, compute explained variance, project to 2D, and verify the Eckart-Young approximation.',
+        caption: 'sklearn.decomposition.PCA uses the same SVD under the hood — but implementing it yourself makes the linear algebra visible.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'PCA step by step on synthetic data',
+              prose: 'Perform PCA on a correlated 2D dataset: center, SVD, find principal components, compute explained variance.',
+              code: `import numpy as np
+
+rng = np.random.default_rng(42)
+
+# Correlated 2D data: x1 and x2 are correlated
+n = 200
+x1 = rng.standard_normal(n)
+x2 = 0.8 * x1 + 0.2 * rng.standard_normal(n)
+X = np.column_stack([x1, x2])
+
+# Step 1: Mean-center
+X_centered = X - X.mean(axis=0)
+
+# Step 2: SVD
+U, s, Vt = np.linalg.svd(X_centered, full_matrices=False)
+
+# Principal components and explained variance
+total_var = (s**2).sum()
+explained = s**2 / total_var
+
+print("Principal directions (rows of Vt):")
+print(np.round(Vt, 4))
+print()
+print("Singular values:", np.round(s, 3))
+print("Explained variance:     PC1 = {:.1f}%  PC2 = {:.1f}%".format(
+    100*explained[0], 100*explained[1]))
+print("Cumulative:             PC1 = {:.1f}%  both = 100%".format(
+    100*explained[0]))
+`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Project to k=1 component and reconstruct',
+              prose: 'Reduce the 2D data to 1 principal component (the direction of max variance) and reconstruct the approximation.',
+              code: `import numpy as np
+
+rng = np.random.default_rng(42)
+x1 = rng.standard_normal(200)
+x2 = 0.8 * x1 + 0.2 * rng.standard_normal(200)
+X = np.column_stack([x1, x2])
+X_c = X - X.mean(axis=0)
+
+U, s, Vt = np.linalg.svd(X_c, full_matrices=False)
+k = 1
+
+# Project onto first k components
+Z = X_c @ Vt[:k].T       # (n, k) scores
+X_hat = Z @ Vt[:k]       # (n, p) reconstruction
+
+# Approximation error
+error_fro = np.linalg.norm(X_c - X_hat, 'fro')
+total_fro = np.linalg.norm(X_c, 'fro')
+
+print(f"Reconstruction error ||X - X_hat||_F = {error_fro:.4f}")
+print(f"Total ||X||_F = {total_fro:.4f}")
+print(f"Relative error = {error_fro/total_fro:.4f}")
+print()
+print("Eckart-Young: error should equal sqrt(sigma_2^2):")
+print(f"  sigma_2 = {s[1]:.4f}")
+print(f"  Match: {abs(s[1] - error_fro) < 1e-10}")
+`,
+            },
+            {
+              id: 3,
+              cellTitle: 'PCA on iris dataset',
+              prose: 'Apply PCA to the classic 4-feature iris dataset and reduce to 2 principal components.',
+              code: `import numpy as np
+
+# Iris dataset (4 features: sepal length, sepal width, petal length, petal width)
+# Using first 50 samples from each class (150 total)
+rng = np.random.default_rng(0)
+# Synthetic iris-like data
+means = [[5.0, 3.4, 1.5, 0.2],
+         [5.9, 2.8, 4.3, 1.3],
+         [6.5, 3.0, 5.6, 2.0]]
+X = np.vstack([rng.multivariate_normal(m, 0.3*np.eye(4), 50) for m in means])
+y = np.repeat([0, 1, 2], 50)
+
+# PCA
+X_c = X - X.mean(axis=0)
+U, s, Vt = np.linalg.svd(X_c, full_matrices=False)
+Z = X_c @ Vt[:2].T  # project to 2D
+
+explained = s**2 / (s**2).sum()
+print("Explained variance per PC:")
+for i, e in enumerate(explained):
+    print(f"  PC{i+1}: {100*e:.1f}%")
+print(f"First 2 PCs capture {100*explained[:2].sum():.1f}% of variance")
+print()
+print("2D projections (first 5 rows of each class):")
+for cls, label in enumerate(["setosa", "versicolor", "virginica"]):
+    idx = np.where(y == cls)[0][:3]
+    print(f"  {label}:", np.round(Z[idx], 2))
+`,
+            },
+          ],
+        },
+      },
       {
         id: 'OpenMatNotebook',
         title: 'PCA via SVD',

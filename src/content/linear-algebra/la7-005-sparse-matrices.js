@@ -11,40 +11,142 @@ export default {
   hook: {
     question: "The finite-element mesh of a bridge has 100,000 nodes. The stiffness matrix is $100000 \\times 100000$ — storing it densely requires 80 GB of RAM and $10^{15}$ flops to factor. But each node only connects to a few neighbors. How do you exploit that?",
     realWorldContext: "Sparse matrices are everywhere in scientific computing. Finite element analysis (structural mechanics, fluid dynamics, electromagnetics) produces sparse stiffness/mass matrices from mesh connectivity. Power grid analysis: the admittance matrix has only a few non-zeros per row. Google PageRank: the web graph has billions of nodes but each page links to only ~40 others — the matrix is $10^{-8}$% dense. Graph algorithms, recommendation systems, and network analysis all rely on sparse matrix operations. MATLAB\'s sparse support, SciPy\'s scipy.sparse, and PETSc are purpose-built for this.",
-    previewVisualizationId: 'OpenMatNotebook',
   },
 
   intuition: {
     prose: [
-      'A $1000 \\times 1000$ grid of points produces a stiffness matrix of size $10^6 \\times 10^6$. Dense storage: $10^{12}$ entries $\\times$ 8 bytes = **8 terabytes** — impossible. But each interior point connects only to its 4 grid neighbors (up, down, left, right), so the matrix has only $\\approx 5 \\times 10^6$ non-zero entries. CSR sparse storage: $5 \\times 10^6 \\times 8$ bytes = **40 MB** — fits in a laptop. As a concrete mini-example, the $3 \\times 3$ matrix $A = \\begin{bmatrix}1&0&2\\\\0&3&0\\\\4&0&5\\end{bmatrix}$ has only 5 non-zeros out of 9 entries. CSR encodes it as: `values = [1,2,3,4,5]`, `col_idx = [0,2,1,0,2]`, `row_ptr = [0,2,3,5]`. To compute $A\\mathbf{x}$, you loop only over those 5 non-zeros — $O(nnz)$ flops instead of $O(n^2)$.',
-      '**Sparsity.** A matrix is **sparse** if most of its entries are zero. The sparsity pattern (which entries are non-zero) often has geometric or graph-theoretic meaning. A matrix with $nnz$ non-zeros in an $n \\times n$ matrix has **density** $nnz/n^2$. Typical sparse matrices have $nnz = O(n)$ or $O(n \\log n)$, while dense matrices have $nnz = n^2$.',
-      '**Storage formats.** Dense: store all $n^2$ entries. Compressed Sparse Row (CSR): store `values[]` (non-zeros), `col_idx[]` (column index of each non-zero), `row_ptr[]` ($n+1$ pointers — where each row starts). Memory: $O(nnz)$ instead of $O(n^2)$. Compressed Sparse Column (CSC) is the column-oriented variant. COO (coordinate) format just stores $(i, j, v)$ triples — easy to build, but slow to use.',
-      '**Sparse matrix-vector product.** The core operation for iterative solvers: $\\mathbf{y} = A\\mathbf{x}$. With CSR, each non-zero contributes one multiply-add: $O(nnz)$ flops instead of $O(n^2)$. For $nnz = O(n)$, this is $O(n)$ — linear in problem size. This is the basis for all large-scale sparse solvers.',
-      '**Fill-in.** During Gaussian elimination on a sparse matrix, new non-zeros appear in positions that were originally zero — this is **fill-in**. A 1D mesh gives a tridiagonal matrix (no fill). A 2D mesh gives a banded matrix (fill within bandwidth). Poor ordering on a 3D mesh gives $O(n^{4/3})$ fill. **Reordering** (AMD, RCM, METIS) permutes rows and columns to minimize fill.',
+      '**Where you are in the story.** Everything covered so far — QR, Cholesky, condition numbers, pivoting — assumes dense matrices. Dense means you store every entry. Dense means every operation touches every element. This works fine when $n$ is a few thousand. But the problems that matter most to engineers and scientists have $n$ in the millions or billions. A finite-element mesh with a million nodes produces a $10^6 \\times 10^6$ matrix — dense storage would require 8 terabytes and dense LU would take $10^{18}$ floating-point operations. Sparse matrices are how you solve these problems at all.',
+
+      '**The key observation: most entries are zero.** In a finite-element mesh, each node only connects to a few physical neighbors. In the web graph, each page links to maybe 40 others out of a billion. In a power grid, each bus connects to a few transmission lines. When you represent these systems as matrices, the vast majority of entries are zero — often more than $99.99\\%$. A matrix is "sparse" when its non-zero count $nnz$ is $O(n)$ rather than $O(n^2)$.',
+
+      '**Storage: only keep the non-zeros.** The most common sparse format is Compressed Sparse Row (CSR). For $A = \\begin{bmatrix}1&0&2\\\\0&3&0\\\\4&0&5\\end{bmatrix}$: CSR stores `values = [1, 2, 3, 4, 5]` (just the non-zeros), `col_idx = [0, 2, 1, 0, 2]` (column of each non-zero), `row_ptr = [0, 2, 3, 5]` (where each row starts in the arrays). Memory: $O(nnz)$ instead of $O(n^2)$. For the million-node mesh with 5 neighbors each: 5 million entries instead of $10^{12}$ — 200,000 times smaller.',
+
+      '**Matrix-vector products are the foundation.** Every iterative solver — conjugate gradient, GMRES, multigrid — reduces to repeating the operation $\\mathbf{y} = A\\mathbf{x}$. With CSR, this costs $O(nnz)$ flops: iterate over non-zeros, multiply by $\\mathbf{x}$ at the matching column, accumulate. For $nnz = O(n)$, this is linear time. The entire iterative solver becomes $O(k \\cdot n)$ where $k$ is the number of iterations — feasible even for $n = 10^6$.',
+
+      '**Predict before reading on.** Consider a $5 \\times 5$ tridiagonal matrix (2 on the diagonal, $-1$ on the super- and sub-diagonals). When you run Gaussian elimination on it, do you expect any fill-in — new non-zeros appearing where there were zeros? Think about what happens when row 1 eliminates from row 2. Write your prediction.',
+
+      '**Fill-in: the complication for direct solvers.** When you run Gaussian elimination on a sparse matrix, the $L$ and $U$ factors are generally denser than $A$ — new non-zeros appear in positions that were zero in $A$. A tridiagonal 1D problem has no fill. A 2D mesh problem fills within its bandwidth. A poorly ordered 3D problem can fill so densely that the direct solve is infeasible. This is why sparse direct solvers always reorder first.',
+
+      '**Reordering minimizes fill-in.** Permuting the rows and columns of $A$ (which does not change its solution) can dramatically reduce fill. The Cuthill-McKee ordering reduces bandwidth for banded matrices. AMD (Approximate Minimum Degree) works well for unstructured meshes. METIS partitions the graph to create a nested dissection ordering that gives optimal fill for 2D and 3D problems. NumPy and scipy.sparse support sparse operations natively; MATLAB has built-in sparse support since the 1980s.',
+
+      '**Where this is heading.** Sparse matrices are not a dead end — they connect to the next lesson on the Schur decomposition and to iterative methods like conjugate gradient. For very large systems, iterative methods (which only need matrix-vector products, not the full factorization) are the only feasible approach. Understanding sparse structure tells you which method to pick.',
     ],
     callouts: [
       {
+        type: 'sequencing',
+        title: 'Lesson 5 of 7 — Numerical Linear Algebra',
+        body: '**Previous (Lesson 4):** Numerical stability — catastrophic cancellation, machine epsilon, partial pivoting.\n**This lesson:** Sparse matrices — CSR storage, sparse matvec, fill-in, and reordering for direct solvers.\n**Next (Lesson 6):** Schur decomposition — the block upper triangular form for eigenvalue computation.',
+      },
+      {
         type: 'insight',
         title: 'Sparse Storage: CSR Format',
-        body: 'For $n \\times n$ matrix with $nnz$ non-zeros:\n```\nvalues:  [v_{r0,c0}, v_{r0,c1}, ..., v_{r1,c0}, ...]\ncol_idx: [c0 of row 0, c1 of row 0, ..., c0 of row 1, ...]\nrow_ptr: [0, nnz_row0, nnz_row0+nnz_row1, ..., nnz]\n```\nMemory: $O(nnz + n)$ instead of $O(n^2)$.\nMatrix-vector: iterate `for each row, for each non-zero in row, y[row] += val * x[col]`.',
+        body: 'For $n \\times n$ matrix with $nnz$ non-zeros:\n- `values[nnz]` — the non-zero values in row-major order\n- `col_idx[nnz]` — column index of each value\n- `row_ptr[n+1]` — row_ptr[i] is the start of row $i$ in values/col_idx\n\nMemory: $O(nnz + n)$ instead of $O(n^2)$.',
       },
       {
         type: 'insight',
         title: 'Sparse vs Dense Complexity',
-        body: 'For $n \\times n$ sparse matrices with $nnz = O(n)$:\n\n| Operation | Dense | Sparse |\n|-----------|-------|--------|\n| Storage | $O(n^2)$ | $O(n)$ |\n| Matvec $Ax$ | $O(n^2)$ | $O(n)$ |\n| LU factor | $O(n^3)$ | $O(n^{1.5})$ (2D) |\n| Iterative solve | — | $O(n)$/iteration |\n\n For $n = 10^6$: dense LU is impossible; sparse iterative is routine.',
-      },
-      {
-        type: 'sequencing',
-        title: 'Predict the Fill-In',
-        body: 'Consider the $5 \\times 5$ tridiagonal matrix from Example 1 (2 on diagonal, -1 off-diagonal). Before looking: when you run LU factorization on this matrix, do you expect fill-in? (Hint: think about what the first elimination step does to row 2 — does it create non-zeros in column 1 outside the tridiagonal band?)',
+        body: 'For $n \\times n$ sparse ($nnz = O(n)$) vs dense:\n\nStorage: $O(n)$ vs $O(n^2)$\nMatvec $Ax$: $O(n)$ vs $O(n^2)$\nDirect LU: $O(n^{1.5})$ (2D mesh) vs $O(n^3)$\nIterative solve: $O(k \\cdot n)$ vs not applicable\n\nFor $n = 10^6$: dense LU is $10^{18}$ flops (impossible); sparse iterative is $10^8$ (seconds).',
       },
       {
         type: 'insight',
         title: 'Sparsity and Graphs',
-        body: 'Every sparse matrix $A$ corresponds to a graph $G = (V, E)$: vertex $i$ connects to $j$ iff $A_{ij} \\neq 0$. Fill-in during LU corresponds to edges added to the graph (chordal completion). Reordering to minimize fill is equivalent to minimizing the fill of a chordal supergraph. AMD (Approximate Minimum Degree) greedily reduces graph degree to limit fill.',
+        body: 'Every sparse matrix $A$ corresponds to a graph: node $i$ connects to $j$ iff $A_{ij} \\neq 0$. Fill-in during LU = edges added in the elimination graph. Reordering to minimize fill = finding the ordering that minimizes the chordal completion of the graph. This is why sparse solver packages (METIS, CHOLMOD) have graph partitioning algorithms.',
       },
     ],
     visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Sparse Matrices with scipy.sparse',
+        mathBridge: 'Build sparse matrices using CSR format, perform sparse matvec, compare memory use and timing vs dense, and observe fill-in.',
+        caption: 'scipy.sparse is the Python standard for sparse matrix operations — used in scikit-learn, NetworkX, and FEniCS.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Build a sparse tridiagonal matrix',
+              prose: 'Create the 1D Laplacian (tridiagonal: 2 on diagonal, -1 off-diagonal) as both dense and CSR sparse. Compare memory usage.',
+              code: `import numpy as np
+import scipy.sparse as sp
+
+n = 1000
+
+# Dense construction
+A_dense = np.zeros((n, n))
+for i in range(n):
+    A_dense[i, i] = 2.0
+    if i > 0:     A_dense[i, i-1] = -1.0
+    if i < n-1:   A_dense[i, i+1] = -1.0
+
+# Sparse CSR construction
+diags = [np.full(n, 2.0), np.full(n-1, -1.0), np.full(n-1, -1.0)]
+A_sparse = sp.diags(diags, [0, -1, 1], format='csr')
+
+print(f"Dense memory:  {A_dense.nbytes / 1e6:.1f} MB")
+print(f"Sparse memory: {(A_sparse.data.nbytes + A_sparse.indices.nbytes + A_sparse.indptr.nbytes) / 1e3:.1f} KB")
+print(f"Density: {A_sparse.nnz / n**2 * 100:.4f}%")
+print(f"Non-zeros: {A_sparse.nnz} out of {n*n}")
+`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Sparse vs dense matrix-vector product timing',
+              prose: 'Compare the time to compute A @ x for sparse vs dense. For n = 10000, the difference should be dramatic.',
+              code: `import numpy as np
+import scipy.sparse as sp
+import time
+
+n = 10000
+A_sparse = sp.diags([np.full(n, 2.0), np.full(n-1, -1.0), np.full(n-1, -1.0)],
+                     [0, -1, 1], format='csr')
+A_dense  = A_sparse.toarray()
+x = np.random.randn(n)
+
+# Time sparse matvec
+t0 = time.perf_counter()
+for _ in range(100): y_sp = A_sparse @ x
+t_sparse = (time.perf_counter() - t0) / 100 * 1000
+
+# Time dense matvec
+t0 = time.perf_counter()
+for _ in range(100): y_dn = A_dense @ x
+t_dense = (time.perf_counter() - t0) / 100 * 1000
+
+print(f"Sparse matvec: {t_sparse:.3f} ms")
+print(f"Dense matvec:  {t_dense:.3f} ms")
+print(f"Speedup: {t_dense/t_sparse:.1f}x")
+print(f"Max error: {np.max(np.abs(y_sp - y_dn)):.2e}")
+`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Observe fill-in during sparse LU',
+              prose: 'Factor a sparse matrix with scipy and measure how much fill-in is generated. Compare orderings.',
+              code: `import numpy as np
+import scipy.sparse as sp
+from scipy.sparse.linalg import splu
+
+n = 50
+A = sp.diags([np.full(n, 4.0), np.full(n-1, -1.0), np.full(n-1, -1.0)],
+              [0, -1, 1], format='csc')
+
+# LU factorization (SuperLU under the hood)
+lu = splu(A)
+
+nnz_A  = A.nnz
+nnz_LU = lu.L.nnz + lu.U.nnz
+
+print(f"Original matrix non-zeros: {nnz_A}")
+print(f"L + U non-zeros after LU:  {nnz_LU}")
+print(f"Fill factor: {nnz_LU / nnz_A:.2f}x")
+print()
+print("For tridiagonal 1D: almost no fill-in")
+print("For 2D mesh: significant fill-in")
+print("For 3D mesh: use iterative solvers instead")
+`,
+            },
+          ],
+        },
+      },
       {
         id: 'OpenMatNotebook',
         title: 'Sparse Matrix Operations',

@@ -1,5 +1,5 @@
-export default {
-  // ── Identity ───────────────────────────────────────────────────
+﻿export default {
+  // â”€â”€ Identity â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   id: 'la1-001',
   slug: 'what-is-a-vector',
   chapter: 'la1',
@@ -13,35 +13,35 @@ export default {
   prerequisites: [],
   nextLesson: 'linear-combinations',
 
-  // ── Hook ──────────────────────────────────────────────────────
+  // â”€â”€ Hook â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   hook: {
     question: "How do we mathematically describe both the speed and direction of a moving object at the same time?",
     realWorldContext: "When a pilot calculates the flight path of an airplane, they must account for the plane's velocity (speed and direction) and the wind's velocity (speed and direction). A single number (like '500 mph') is not enough to predict where the plane will end up. We need a mathematical object that can stretch across space and point specifically toward a target. In modern AI, vectors represent meaning: the word 'king' and the word 'queen' are represented as lists of numbers in a high-dimensional space, and the distance between them mathematically captures their linguistic relationship. Vectors are the universal language for things that have multiple dimensions.",
     previewVisualizationId: 'LALesson11_OrthogonalProjections',
   },
 
-  // ── Intuition ──────────────────────────────────────────────────
+  // â”€â”€ Intuition â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   intuition: {
     prose: [
-      '**Start with a movement.** A delivery drone must move 3 meters east and 4 meters north to reach the next package. We record that as $[3,\\; 4]$ — two numbers, one per axis. The first says "go this far east"; the second says "go this far north." That list, encoding both a direction and a distance, is a **vector**. The total distance traveled is the straight-line diagonal: $\\sqrt{3^2 + 4^2} = \\sqrt{25} = 5$ meters (the Pythagorean theorem).',
-      '**Before reading on, predict:** if you doubled the movement — same direction, twice as far — what would the new vector be, and how far would the drone travel? Work it out before continuing.',
-      '**The doubled movement is $[6,\\; 8]$**, and the total distance is $\\sqrt{6^2 + 8^2} = \\sqrt{100} = 10$ meters — exactly twice the original 5. This is **scalar multiplication**: multiplying a vector by 2 stretches it by 2 while keeping the same direction. The distance (magnitude) scales by the same factor.',
-      '**Three perspectives on the same object.** The vector $[3, 4]$ can be read three ways:\n\n**Physics:** an arrow pointing 3 right and 4 up — length 5, angle about 53°. Sliding the arrow to a new position does not change it.\n**Computer science:** an ordered list `[3, 4]`. A house might be `[1200, 3, 2, 450000]` (sqft, bedrooms, bathrooms, price). Every dataset is a collection of vectors.\n**Mathematics:** anything you can add to another and scale by a number — polynomials and functions qualify too.',
-      '**Scalars change size, not shape.** A **scalar** is a single real number from $\\mathbb{R}$. Multiplying vector $\\mathbf{v}$ by scalar $c$ produces these four behaviors:\n\n• $c > 1$: stretches $\\mathbf{v}$ (longer, same direction)\n• $0 < c < 1$: shrinks it\n• $c = -1$: reverses direction exactly\n• $c = 0$: collapses to $\\mathbf{0}$ (the zero vector — length 0, no direction)',
-      '**The magnitude formula.** The length of a vector is called its **magnitude**, written $\\|\\mathbf{v}\\|$. For $\\mathbf{v} = [x, y]^\\top$, the formula comes directly from the Pythagorean theorem — the components form the two legs of a right triangle, and the vector is the hypotenuse:\n$$\\|\\mathbf{v}\\| = \\sqrt{x^2 + y^2}$$\nFor our drone: $\\|[3,4]^\\top\\| = \\sqrt{9+16} = 5$.',
+      '**Start with a movement.** A delivery drone must move 3 meters east and 4 meters north to reach the next package. We record that as $[3,\\; 4]$ â€” two numbers, one per axis. The first says "go this far east"; the second says "go this far north." That list, encoding both a direction and a distance, is a **vector**. The total distance traveled is the straight-line diagonal: $\\sqrt{3^2 + 4^2} = \\sqrt{25} = 5$ meters (the Pythagorean theorem).',
+      '**Before reading on, predict:** if you doubled the movement â€” same direction, twice as far â€” what would the new vector be, and how far would the drone travel? Work it out before continuing.',
+      '**The doubled movement is $[6,\\; 8]$**, and the total distance is $\\sqrt{6^2 + 8^2} = \\sqrt{100} = 10$ meters â€” exactly twice the original 5. This is **scalar multiplication**: multiplying a vector by 2 stretches it by 2 while keeping the same direction. The distance (magnitude) scales by the same factor.',
+      '**Three perspectives on the same object.** The vector $[3, 4]$ can be read three ways:\n\n**Physics:** an arrow pointing 3 right and 4 up â€” length 5, angle about 53Â°. Sliding the arrow to a new position does not change it.\n**Computer science:** an ordered list `[3, 4]`. A house might be `[1200, 3, 2, 450000]` (sqft, bedrooms, bathrooms, price). Every dataset is a collection of vectors.\n**Mathematics:** anything you can add to another and scale by a number â€” polynomials and functions qualify too.',
+      '**Scalars change size, not shape.** A **scalar** is a single real number from $\\mathbb{R}$. Multiplying vector $\\mathbf{v}$ by scalar $c$ produces these four behaviors:\n\nâ€¢ $c > 1$: stretches $\\mathbf{v}$ (longer, same direction)\nâ€¢ $0 < c < 1$: shrinks it\nâ€¢ $c = -1$: reverses direction exactly\nâ€¢ $c = 0$: collapses to $\\mathbf{0}$ (the zero vector â€” length 0, no direction)',
+      '**The magnitude formula.** The length of a vector is called its **magnitude**, written $\\|\\mathbf{v}\\|$. For $\\mathbf{v} = [x, y]^\\top$, the formula comes directly from the Pythagorean theorem â€” the components form the two legs of a right triangle, and the vector is the hypotenuse:\n$$\\|\\mathbf{v}\\| = \\sqrt{x^2 + y^2}$$\nFor our drone: $\\|[3,4]^\\top\\| = \\sqrt{9+16} = 5$.',
       '**Unit vectors: pure direction.** Divide any nonzero vector by its own magnitude. The result has length exactly 1. It is called the **unit vector** $\\hat{u} = \\mathbf{v}/\\|\\mathbf{v}\\|$. For $\\mathbf{v} = [3,4]^\\top$: $\\hat{u} = [3/5,\\; 4/5]^\\top = [0.6,\\; 0.8]^\\top$. Same direction as $\\mathbf{v}$, length exactly 1.',
       '**CNC connection.** The command $G00\\; X3.0\\; Y2.0\\; Z{-1.5}$ moves a cutting tool to position $[3.0, 2.0, -1.5]^\\top$. Distance traveled: $\\sqrt{3^2+2^2+1.5^2} \\approx 3.9$ mm. Every displacement between waypoints is vector subtraction; every feed distance is a magnitude.',
     ],
     callouts: [
       {
+        type: 'sequencing',
+        title: 'Lesson 1 of 6 â€” Vectors & Spaces',
+        body: '**Previous:** (start of chapter)\n**This lesson:** What vectors are â€” direction, magnitude, scalar multiplication, unit vectors.\n**Next:** Linear Combinations â€” how to build any vector by scaling and adding basis vectors.',
+      },
+      {
         type: 'procedure',
         title: 'Procedure: Magnitude and Unit Vector',
         body: 'Given $\\mathbf{v} = [x, y]^\\top$ (extends to 3D by adding $z^2$):\n\nStep 1. Square each component: $x^2$ and $y^2$.\nStep 2. Add the squares: $x^2 + y^2$.\nStep 3. Take the square root: $\\|\\mathbf{v}\\| = \\sqrt{x^2 + y^2}$.\nStep 4. To normalize: divide every component by $\\|\\mathbf{v}\\|$. Result $\\hat{v} = \\mathbf{v}/\\|\\mathbf{v}\\|$ has magnitude exactly 1.',
-      },
-      {
-        type: 'sequencing',
-        title: 'Lesson 1 of 3 — Vectors & Spaces',
-        body: '**This lesson:** What vectors are and how we represent them geometrically and algebraically.\n**Next:** How to add them together and scale them (Linear Combinations).',
       },
       {
         type: 'insight',
@@ -50,8 +50,8 @@ export default {
       },
       {
         type: 'insight',
-        title: 'Scalar Multiplication — Four Behaviors to Know',
-        body: 'Given a vector $\\mathbf{v}$ and a scalar $c$:\n\n• $c > 1$: stretches (makes longer)\n• $0 < c < 1$: shrinks (makes shorter)\n• $c = -1$: flips direction exactly\n• $c < 0$: flips AND scales\n• $c = 0$: collapses to $\\mathbf{0}$ (the zero vector)\n\nDirection only changes sign when $c < 0$. Magnitude always becomes $|c| \\cdot \\|\\mathbf{v}\\|$.',
+        title: 'Scalar Multiplication â€” Four Behaviors to Know',
+        body: 'Given a vector $\\mathbf{v}$ and a scalar $c$:\n\nâ€¢ $c > 1$: stretches (makes longer)\nâ€¢ $0 < c < 1$: shrinks (makes shorter)\nâ€¢ $c = -1$: flips direction exactly\nâ€¢ $c < 0$: flips AND scales\nâ€¢ $c = 0$: collapses to $\\mathbf{0}$ (the zero vector)\n\nDirection only changes sign when $c < 0$. Magnitude always becomes $|c| \\cdot \\|\\mathbf{v}\\|$.',
       },
       {
         type: 'strategy',
@@ -61,37 +61,37 @@ export default {
       {
         type: 'warning',
         title: 'Common Mistake: Adding Components Instead of Using the Pythagorean Theorem',
-        body: 'Students sometimes write $\\|\\mathbf{v}\\| = v_1 + v_2$ (just adding components). This is WRONG. The correct formula is $\\|\\mathbf{v}\\| = \\sqrt{v_1^2 + v_2^2}$ — square each component, sum, then take the square root. For $\\mathbf{v} = [3, 4]^T$: wrong answer is $3 + 4 = 7$; correct answer is $\\sqrt{9+16} = 5$. Always square first.',
+        body: 'Students sometimes write $\\|\\mathbf{v}\\| = v_1 + v_2$ (just adding components). This is WRONG. The correct formula is $\\|\\mathbf{v}\\| = \\sqrt{v_1^2 + v_2^2}$ â€” square each component, sum, then take the square root. For $\\mathbf{v} = [3, 4]^T$: wrong answer is $3 + 4 = 7$; correct answer is $\\sqrt{9+16} = 5$. Always square first.',
       },
       {
         type: 'insight',
         title: 'When to Use This',
-        body: 'Use vector **magnitude** when you need the length of a displacement, force, or velocity. Use a **unit vector** when you need direction alone — stripped of scale. Use **component form** when working algebraically with coordinates (solving systems, computing projections, matrix multiplication).',
+        body: 'Use vector **magnitude** when you need the length of a displacement, force, or velocity. Use a **unit vector** when you need direction alone â€” stripped of scale. Use **component form** when working algebraically with coordinates (solving systems, computing projections, matrix multiplication).',
       },
       {
         type: 'insight',
         title: 'Stop and Think: Can Two Vectors Have the Same Magnitude but Point Different Ways?',
-        body: 'Yes — infinitely many. The vector $[3, 4]$ and the vector $[-3, 4]$ both have magnitude 5, yet they point in entirely different directions. **Magnitude alone does not determine a vector.** This is why we need both magnitude AND direction.',
+        body: 'Yes â€” infinitely many. The vector $[3, 4]$ and the vector $[-3, 4]$ both have magnitude 5, yet they point in entirely different directions. **Magnitude alone does not determine a vector.** This is why we need both magnitude AND direction.',
       },
     ],
     visualizations: [
       {
         id: 'LALesson01_Vectors',
-        title: 'Vector Components — Geometry meets Algebra',
+        title: 'Vector Components â€” Geometry meets Algebra',
         mathBridge: 'Drag the vector tip to change its direction and length. Watch how the coordinate list $[x, y]^T$ updates in real-time. This is the core connection: every geometric arrow has exactly one algebraic representation, and every list of numbers has exactly one geometric arrow.',
         caption: 'Moving the tip horizontally changes only the $x$ component. Moving vertically changes only $y$. They are independent.',
       },
       {
         id: 'VectorComponentDecomposer',
         title: 'Decomposing a Vector into Components',
-        mathBridge: 'Any vector $\\mathbf{v} = [x, y]$ can be written as $x \\cdot \\hat{\\mathbf{i}} + y \\cdot \\hat{\\mathbf{j}}$ — the $x$-component along the horizontal axis, plus the $y$-component along the vertical. The dashed lines show the "shadow" of the vector onto each axis.',
+        mathBridge: 'Any vector $\\mathbf{v} = [x, y]$ can be written as $x \\cdot \\hat{\\mathbf{i}} + y \\cdot \\hat{\\mathbf{j}}$ â€” the $x$-component along the horizontal axis, plus the $y$-component along the vertical. The dashed lines show the "shadow" of the vector onto each axis.',
         caption: 'Every 2D vector is a sum of a horizontal piece and a vertical piece.',
       },
       {
         id: 'ForceVectorIntuition',
         title: 'Application: Force Vectors in Physics',
-        mathBridge: 'A force has both a magnitude (how strong) and a direction (which way). That makes it a vector. Drag the sliders to change the magnitude and direction of each force. The green arrow shows the resultant — the single vector that represents the combined effect of all forces.',
-        caption: 'Force, velocity, acceleration, magnetic field, electric field — all vectors in physics.',
+        mathBridge: 'A force has both a magnitude (how strong) and a direction (which way). That makes it a vector. Drag the sliders to change the magnitude and direction of each force. The green arrow shows the resultant â€” the single vector that represents the combined effect of all forces.',
+        caption: 'Force, velocity, acceleration, magnetic field, electric field â€” all vectors in physics.',
       },
       {
         id: 'LALesson11_OrthogonalProjections',
@@ -102,7 +102,7 @@ export default {
     ],
   },
 
-  // ── Math ───────────────────────────────────────────────────────
+  // â”€â”€ Math â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   math: {
     prose: [
       'Standard notation for vectors is a lowercase letter with an arrow on top ($\\vec{v}$) or simply boldface ($\\mathbf{v}$). The length of a vector is called its magnitude, denoted as $\\|\\vec{v}\\|$.',
@@ -132,23 +132,22 @@ export default {
       },
       {
         id: 'UnitVectorBuilder',
-        title: 'Unit Vectors — Pure Direction, Length 1',
-        mathBridge: 'Drag the blue vector to any direction. The amber arrow is its unit vector — same direction, magnitude exactly 1. The unit vector $\\hat{v} = \\mathbf{v}/\\|\\mathbf{v}\\|$ strips away the "how long" and keeps only the "which way."',
-        caption: 'The unit vector is the direction ambassador — it carries direction information with no length bias.',
+        title: 'Unit Vectors â€” Pure Direction, Length 1',
+        mathBridge: 'Drag the blue vector to any direction. The amber arrow is its unit vector â€” same direction, magnitude exactly 1. The unit vector $\\hat{v} = \\mathbf{v}/\\|\\mathbf{v}\\|$ strips away the "how long" and keeps only the "which way."',
+        caption: 'The unit vector is the direction ambassador â€” it carries direction information with no length bias.',
       },
       {
         id: 'PythonNotebook',
         title: 'Code: Vectors in NumPy',
-        mathBridge: 'A numpy array IS a vector. np.array([3, 4]) creates the column vector [3, 4]^T. np.linalg.norm(v) computes ‖v‖ = √(3²+4²) = 5. Dividing by the norm gives the unit vector.',
+        mathBridge: 'A numpy array IS a vector. np.array([3, 4]) creates the column vector [3, 4]^T. np.linalg.norm(v) computes â€–vâ€– = âˆš(3Â²+4Â²) = 5. Dividing by the norm gives the unit vector.',
         caption: 'Run each cell to see the math formulas become one-liners in code.',
-        props: {
-          disableRunAll: true,
+        initialProps: {
           initialCells: [
             {
               id: 1,
               cellTitle: 'Vectors: creation, addition, scalar multiplication',
               prose: [
-                'A `numpy` array is a vector. The two fundamental operations — addition and scalar multiplication — are `+` and `*`.',
+                'A `numpy` array is a vector. The two fundamental operations â€” addition and scalar multiplication â€” are `+` and `*`.',
                 'Notice that `2 * a` stretches the vector, `-1 * a` flips it, and `a + b` follows the tip-to-tail rule.',
               ],
               code: `import numpy as np
@@ -167,8 +166,8 @@ print("a - b =", a - b)       # a + (-b)`,
               id: 2,
               cellTitle: 'Magnitude and unit vectors',
               prose: [
-                '`np.linalg.norm(v)` computes ‖v‖ = √(v₁² + v₂² + …). Dividing by the norm normalizes to a unit vector.',
-                'The vector [3, 4] is the classic 3-4-5 right triangle. Its unit vector is [0.6, 0.8] — verify: 0.6² + 0.8² = 1.',
+                '`np.linalg.norm(v)` computes â€–vâ€– = âˆš(vâ‚Â² + vâ‚‚Â² + â€¦). Dividing by the norm normalizes to a unit vector.',
+                'The vector [3, 4] is the classic 3-4-5 right triangle. Its unit vector is [0.6, 0.8] â€” verify: 0.6Â² + 0.8Â² = 1.',
               ],
               code: `import numpy as np
 
@@ -178,16 +177,16 @@ magnitude = np.linalg.norm(v)
 unit = v / magnitude
 
 print(f"v = {v}")
-print(f"‖v‖ = {magnitude}")       # should be 5.0
+print(f"â€–vâ€– = {magnitude}")       # should be 5.0
 print(f"unit vector = {unit}")    # [0.6, 0.8]
-print(f"‖unit‖ = {np.linalg.norm(unit):.6f}")  # should be 1.0`,
+print(f"â€–unitâ€– = {np.linalg.norm(unit):.6f}")  # should be 1.0`,
             },
             {
               id: 3,
               cellTitle: 'Visualize: vector and its unit vector',
               prose: [
-                'The blue arrow is **v = [3, 4]**. The amber arrow is its unit vector — same direction, length 1.',
-                'Scaling the unit vector by the magnitude reconstructs the original: 5 × [0.6, 0.8] = [3, 4].',
+                'The blue arrow is **v = [3, 4]**. The amber arrow is its unit vector â€” same direction, length 1.',
+                'Scaling the unit vector by the magnitude reconstructs the original: 5 Ã— [0.6, 0.8] = [3, 4].',
               ],
               code: `import numpy as np
 from opencalc import Figure, BLUE, AMBER
@@ -206,7 +205,7 @@ fig.show()`,
               id: 4,
               cellTitle: 'Application: CNC tool path as vectors',
               prose: [
-                'A CNC machine moves a cutting tool between waypoints. Each waypoint is a position vector. The move from one point to the next is a displacement vector — vector subtraction.',
+                'A CNC machine moves a cutting tool between waypoints. Each waypoint is a position vector. The move from one point to the next is a displacement vector â€” vector subtraction.',
                 'The total distance a tool travels is the sum of the magnitudes of all displacement vectors along the path.',
               ],
               code: `import numpy as np
@@ -229,7 +228,7 @@ for i in range(len(waypoints) - 1):
     dist = np.linalg.norm(displacement)
     direction = displacement / dist
     total_distance += dist
-    print(f"Move {i+1}: {waypoints[i]} → {waypoints[i+1]}")
+    print(f"Move {i+1}: {waypoints[i]} â†’ {waypoints[i+1]}")
     print(f"  Displacement: {displacement}, Distance: {dist:.2f} mm")
 
 print(f"\\nTotal tool travel: {total_distance:.2f} mm")
@@ -254,7 +253,7 @@ w = np.array([-6.0, 8.0])
 
 # 1. magnitude
 # 2. unit vector
-# 3. verify ‖unit‖ = 1
+# 3. verify â€–unitâ€– = 1
 # 4. angle with x-axis
 `,
               hint: 'np.linalg.norm(w) for magnitude. w / np.linalg.norm(w) for unit. np.arctan2 gives the angle directly.',
@@ -265,15 +264,15 @@ w = np.array([-6.0, 8.0])
       {
         id: 'OpenMatNotebook',
         title: 'Vectors in OpenMAT / MATLAB',
-        mathBridge: 'MATLAB was designed for matrix math. Key syntax: a semicolon inside brackets starts a new row, so [3; 4] is a 2×1 column vector. Use sqrt(dot(v,v)) to compute ‖v‖. Dividing by the magnitude gives the unit vector.',
+        mathBridge: 'MATLAB was designed for matrix math. Key syntax: a semicolon inside brackets starts a new row, so [3; 4] is a 2Ã—1 column vector. Use sqrt(dot(v,v)) to compute â€–vâ€–. Dividing by the magnitude gives the unit vector.',
         caption: 'OpenMAT mirrors real MATLAB syntax. Master it here, use it in class.',
         initialProps: {
           initialCells: [
             {
               id: 1,
-              cellTitle: 'Column vectors — the MATLAB syntax rule',
+              cellTitle: 'Column vectors â€” the MATLAB syntax rule',
               prose: [
-                'The key syntax: a **semicolon** inside `[]` starts a new row. So `[3; 4]` is a 2×1 column vector. A **comma** separates columns: `[3, 4]` is a 1×2 row vector.',
+                'The key syntax: a **semicolon** inside `[]` starts a new row. So `[3; 4]` is a 2Ã—1 column vector. A **comma** separates columns: `[3, 4]` is a 1Ã—2 row vector.',
                 'Linear algebra almost always uses column vectors.',
               ],
               code: `v = [3; 4]
@@ -294,7 +293,7 @@ disp('3 * a =')
               id: 2,
               cellTitle: 'Magnitude and unit vectors',
               prose: [
-                'OpenMAT computes magnitude as `sqrt(dot(v, v))` — the dot product of a vector with itself equals the sum of squared components, so its square root is the Euclidean length.',
+                'OpenMAT computes magnitude as `sqrt(dot(v, v))` â€” the dot product of a vector with itself equals the sum of squared components, so its square root is the Euclidean length.',
                 'To normalize (get a unit vector): divide every component by the magnitude.',
               ],
               code: `v = [3; 4];
@@ -307,7 +306,7 @@ sqrt(dot(w, w))   % should be 3: sqrt(1+4+4)=3`,
             },
             {
               id: 3,
-              cellTitle: 'Scalar multiplication — four behaviors',
+              cellTitle: 'Scalar multiplication â€” four behaviors',
               prose: [
                 'c > 1 stretches. 0 < c < 1 shrinks. c = -1 flips. c = 0 collapses to zero.',
               ],
@@ -317,7 +316,7 @@ sqrt(dot(w, w))   % should be 3: sqrt(1+4+4)=3`,
 -1 * v
 0 * v
 
-% Key rule: ‖c·v‖ = |c| · ‖v‖
+% Key rule: â€–cÂ·vâ€– = |c| Â· â€–vâ€–
 c = -3;
 abs(c)*sqrt(dot(v, v))
 sqrt(dot(c*v, c*v))`,
@@ -348,12 +347,12 @@ check = 3.5*X_axis + 2.0*Y_axis + (-1.5)*Z_axis`,
     ],
   },
 
-  // ── Rigor ──────────────────────────────────────────────────────
+  // â”€â”€ Rigor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   rigor: {
     prose: [
-      '**Formal Definition of a Vector Space.** A vector space $V$ over a field $\\mathbb{F}$ is a set equipped with two operations — vector addition and scalar multiplication — satisfying ten axioms. We can group them into four families: closure, addition structure, behavior of zero and negatives, and scalar rules.',
+      '**Formal Definition of a Vector Space.** A vector space $V$ over a field $\\mathbb{F}$ is a set equipped with two operations â€” vector addition and scalar multiplication â€” satisfying ten axioms. We can group them into four families: closure, addition structure, behavior of zero and negatives, and scalar rules.',
       '**The ten axioms:**\n\n1. Closure under addition: $\\mathbf{u} + \\mathbf{v} \\in V$\n2. Closure under scalar multiplication: $c\\mathbf{v} \\in V$\n3. Commutativity: $\\mathbf{u} + \\mathbf{v} = \\mathbf{v} + \\mathbf{u}$\n4. Associativity: $(\\mathbf{u} + \\mathbf{v}) + \\mathbf{w} = \\mathbf{u} + (\\mathbf{v} + \\mathbf{w})$\n5. Zero vector: $\\exists\\, \\mathbf{0}$ with $\\mathbf{v} + \\mathbf{0} = \\mathbf{v}$\n6. Additive inverse: $\\exists\\, -\\mathbf{v}$ with $\\mathbf{v} + (-\\mathbf{v}) = \\mathbf{0}$\n7. Scalar identity: $1 \\cdot \\mathbf{v} = \\mathbf{v}$\n8. Scalar compatibility: $c(d\\mathbf{v}) = (cd)\\mathbf{v}$\n9. Distributivity over vector addition: $c(\\mathbf{u}+\\mathbf{v}) = c\\mathbf{u} + c\\mathbf{v}$\n10. Distributivity over scalar addition: $(c+d)\\mathbf{v} = c\\mathbf{v} + d\\mathbf{v}$',
-      '**Why these axioms?** They guarantee that the familiar algebra you learned in school still works in any vector space. Every theorem in linear algebra is proved from exactly these ten rules — no pictures, no coordinates, just logic. Because the axioms say nothing about what vectors "look like," every proof applies universally: to arrows, polynomials, functions, matrices, and anything else satisfying the list.',
+      '**Why these axioms?** They guarantee that the familiar algebra you learned in school still works in any vector space. Every theorem in linear algebra is proved from exactly these ten rules â€” no pictures, no coordinates, just logic. Because the axioms say nothing about what vectors "look like," every proof applies universally: to arrows, polynomials, functions, matrices, and anything else satisfying the list.',
       '**Counter-example.** The first quadrant $\\{(x,y) : x \\geq 0, y \\geq 0\\}$ fails Axiom 6: $(-1)(1, 1) = (-1, -1)$ is outside the first quadrant. Not a vector space. Finding even one failing axiom is sufficient to disqualify.',
     ],
     callouts: [
@@ -365,7 +364,7 @@ check = 3.5*X_axis + 2.0*Y_axis + (-1.5)*Z_axis`,
       {
         type: 'insight',
         title: 'The Power of Abstraction',
-        body: 'The set of all polynomials of degree $\\leq 2$ is a vector space. This means every theorem we prove about $\\mathbb{R}^n$ automatically applies to polynomial spaces — without any new proof. Abstraction is a machine that multiplies your theorems.',
+        body: 'The set of all polynomials of degree $\\leq 2$ is a vector space. This means every theorem we prove about $\\mathbb{R}^n$ automatically applies to polynomial spaces â€” without any new proof. Abstraction is a machine that multiplies your theorems.',
       },
       {
         type: 'warning',
@@ -377,13 +376,13 @@ check = 3.5*X_axis + 2.0*Y_axis + (-1.5)*Z_axis`,
       {
         id: 'VectorEqualityProof',
         title: 'Vector Equality: Algebraic Proof vs. Geometric Proof',
-        mathBridge: 'Two vectors are equal if and only if all corresponding components are equal: $[a, b] = [c, d]$ iff $a = c$ and $b = d$. This visualization shows what it means for two arrows to be "equal" — same length, same direction, regardless of where they are drawn.',
-        caption: 'Equal vectors have the same components — even when drawn at different positions.',
+        mathBridge: 'Two vectors are equal if and only if all corresponding components are equal: $[a, b] = [c, d]$ iff $a = c$ and $b = d$. This visualization shows what it means for two arrows to be "equal" â€” same length, same direction, regardless of where they are drawn.',
+        caption: 'Equal vectors have the same components â€” even when drawn at different positions.',
       },
     ],
   },
 
-  // ── Examples ───────────────────────────────────────────────────
+  // â”€â”€ Examples â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   examples: [
     {
       id: 'la1-001-ex1',
@@ -394,7 +393,7 @@ check = 3.5*X_axis + 2.0*Y_axis + (-1.5)*Z_axis`,
           expression: '\\|\\mathbf{v}\\| = \\sqrt{(-6)^2 + 8^2}',
           annotation: 'Apply the magnitude formula where $\\mathbf{v} = [-6, 8]^T$, $v_1 = -6$ = horizontal component, $v_2 = 8$ = vertical component. Each component is squared (removing any negative sign) and summed under the radical.',
           strategyTitle: 'Step 1: Set up the magnitude formula',
-          hints: ['Square the $x$-component: $(-6)^2 = 36$. Square the $y$-component: $8^2 = 64$. Squaring a negative always gives a positive — magnitude is never negative.'],
+          hints: ['Square the $x$-component: $(-6)^2 = 36$. Square the $y$-component: $8^2 = 64$. Squaring a negative always gives a positive â€” magnitude is never negative.'],
         },
         {
           expression: '\\|\\mathbf{v}\\| = \\sqrt{36 + 64} = \\sqrt{100}',
@@ -432,14 +431,14 @@ check = 3.5*X_axis + 2.0*Y_axis + (-1.5)*Z_axis`,
           expression: '\\hat{u} = \\begin{bmatrix} 3/5 \\\\ -4/5 \\end{bmatrix} = \\begin{bmatrix} 0.6 \\\\ -0.8 \\end{bmatrix}',
           annotation: 'Distribute the scalar $1/5$ to each component. The result points in the exact same direction as $\\mathbf{v}$, but has length exactly 1.',
           strategyTitle: 'Step 3: Distribute to each component',
-          hints: ['Verify: $\\|\\hat{u}\\| = \\sqrt{(3/5)^2 + (-4/5)^2} = \\sqrt{9/25 + 16/25} = \\sqrt{25/25} = 1$ ✓'],
+          hints: ['Verify: $\\|\\hat{u}\\| = \\sqrt{(3/5)^2 + (-4/5)^2} = \\sqrt{9/25 + 16/25} = \\sqrt{25/25} = 1$ âœ“'],
         },
       ],
       conclusion: 'The unit vector $[3/5, -4/5]$ points in the exact same direction as $[3, -4]$, but its length is exactly 1.',
     },
     {
       id: 'la1-001-ex3',
-      title: 'Adding Two Vectors — the Tip-to-Tail Rule',
+      title: 'Adding Two Vectors â€” the Tip-to-Tail Rule',
       problem: 'Compute $\\mathbf{a} + \\mathbf{b}$ where $\\mathbf{a} = \\begin{bmatrix} 3 \\\\ 1 \\end{bmatrix}$ and $\\mathbf{b} = \\begin{bmatrix} -1 \\\\ 4 \\end{bmatrix}$. Then find $\\|\\mathbf{a} + \\mathbf{b}\\|$.',
       steps: [
         {
@@ -456,7 +455,7 @@ check = 3.5*X_axis + 2.0*Y_axis + (-1.5)*Z_axis`,
         },
         {
           expression: '\\|\\mathbf{a} + \\mathbf{b}\\| = \\sqrt{2^2 + 5^2} = \\sqrt{4 + 25} = \\sqrt{29} \\approx 5.39',
-          annotation: 'Apply the magnitude formula to the result vector $[2, 5]^T$. Note: $\\|\\mathbf{a}\\| = \\sqrt{10} \\approx 3.16$ and $\\|\\mathbf{b}\\| = \\sqrt{17} \\approx 4.12$. So $\\sqrt{29} < \\sqrt{10} + \\sqrt{17}$ — the Triangle Inequality.',
+          annotation: 'Apply the magnitude formula to the result vector $[2, 5]^T$. Note: $\\|\\mathbf{a}\\| = \\sqrt{10} \\approx 3.16$ and $\\|\\mathbf{b}\\| = \\sqrt{17} \\approx 4.12$. So $\\sqrt{29} < \\sqrt{10} + \\sqrt{17}$ â€” the Triangle Inequality.',
           strategyTitle: 'Step 3: Magnitude of the sum',
           hints: ['The Triangle Inequality states $\\|\\mathbf{a} + \\mathbf{b}\\| \\leq \\|\\mathbf{a}\\| + \\|\\mathbf{b}\\|$. Equality holds only when both vectors point in exactly the same direction. The sum is always shorter than or equal to the sum of individual lengths.'],
         },
@@ -478,14 +477,14 @@ check = 3.5*X_axis + 2.0*Y_axis + (-1.5)*Z_axis`,
           expression: '\\hat{v} = \\frac{1}{3} \\begin{bmatrix} 2 \\\\ -1 \\\\ 2 \\end{bmatrix} = \\begin{bmatrix} 2/3 \\\\ -1/3 \\\\ 2/3 \\end{bmatrix}',
           annotation: 'Divide every component by the magnitude $\\|\\mathbf{v}\\| = 3$. The normalization formula $\\hat{v} = \\mathbf{v}/\\|\\mathbf{v}\\|$ is identical in any dimension.',
           strategyTitle: 'Step 2: Divide by magnitude',
-          hints: ['Verify: $(2/3)^2 + (-1/3)^2 + (2/3)^2 = 4/9 + 1/9 + 4/9 = 9/9 = 1$ ✓'],
+          hints: ['Verify: $(2/3)^2 + (-1/3)^2 + (2/3)^2 = 4/9 + 1/9 + 4/9 = 9/9 = 1$ âœ“'],
         },
       ],
-      conclusion: 'Unit vector: $[2/3, -1/3, 2/3]$. The formulas — magnitude, unit vector, and beyond — extend to any number of dimensions by simply adding more squared terms.',
+      conclusion: 'Unit vector: $[2/3, -1/3, 2/3]$. The formulas â€” magnitude, unit vector, and beyond â€” extend to any number of dimensions by simply adding more squared terms.',
     },
   ],
 
-  // ── Challenges ─────────────────────────────────────────────────
+  // â”€â”€ Challenges â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   challenges: [
     {
       id: 'la1-001-ch1',
@@ -493,11 +492,11 @@ check = 3.5*X_axis + 2.0*Y_axis + (-1.5)*Z_axis`,
       problem: 'What is the magnitude of the vector $\\begin{bmatrix} 5 \\\\ 12 \\end{bmatrix}$?',
       hint: 'Apply the Pythagorean theorem: $\\sqrt{5^2 + 12^2}$. Does 5-12-? form a Pythagorean triple?',
       walkthrough: [
-        { expression: '\\|\\mathbf{v}\\| = \\sqrt{5^2 + 12^2}', annotation: 'Apply the magnitude formula (Step 1–3 of the procedure): square each component, add, take the square root.' },
+        { expression: '\\|\\mathbf{v}\\| = \\sqrt{5^2 + 12^2}', annotation: 'Apply the magnitude formula (Step 1â€“3 of the procedure): square each component, add, take the square root.' },
         { expression: '= \\sqrt{25 + 144} = \\sqrt{169}', annotation: '$5^2 = 25$, $12^2 = 144$. Sum: 169.' },
-        { expression: '= 13', annotation: '$\\sqrt{169} = 13$. The 5-12-13 Pythagorean triple — like 3-4-5 scaled up.' },
+        { expression: '= 13', annotation: '$\\sqrt{169} = 13$. The 5-12-13 Pythagorean triple â€” like 3-4-5 scaled up.' },
       ],
-      answer: 'The magnitude of $[5, 12]^\\top$ is 13 — it forms the Pythagorean triple 5-12-13, a scaled version of 3-4-5.',
+      answer: 'The magnitude of $[5, 12]^\\top$ is 13 â€” it forms the Pythagorean triple 5-12-13, a scaled version of 3-4-5.',
     },
     {
       id: 'la1-001-ch2',
@@ -510,16 +509,16 @@ check = 3.5*X_axis + 2.0*Y_axis + (-1.5)*Z_axis`,
         { expression: 'y = -8 \\;\\text{(negative root chosen)}', annotation: '$y = \\pm 8$; the problem specifies $y < 0$, so $y = -8$.' },
         { expression: '\\mathbf{v} = \\begin{bmatrix}6 \\\\ -8\\end{bmatrix}, \\quad \\|\\mathbf{v}\\| = \\sqrt{36+64} = 10 \\checkmark', annotation: 'Verify: magnitude is indeed 10. This is the 3-4-5 triple scaled by 2.' },
       ],
-      answer: 'The vector is $[6, -8]^\\top$ — found by solving the magnitude equation in reverse for the unknown component.',
+      answer: 'The vector is $[6, -8]^\\top$ â€” found by solving the magnitude equation in reverse for the unknown component.',
     },
     {
       id: 'la1-001-ch3',
       difficulty: 'hard',
-      problem: 'A vector $\\mathbf{v}$ makes an angle of $120°$ with the positive $x$-axis and has magnitude $4$. Write $\\mathbf{v}$ as a column vector using $\\cos(120°) = -\\tfrac{1}{2}$ and $\\sin(120°) = \\tfrac{\\sqrt{3}}{2}$.',
-      hint: 'For magnitude $r$ and angle $\\theta$: components are $(r\\cos\\theta,\\, r\\sin\\theta)$. At $120°$, the vector is in the second quadrant — $x$ is negative, $y$ is positive.',
+      problem: 'A vector $\\mathbf{v}$ makes an angle of $120Â°$ with the positive $x$-axis and has magnitude $4$. Write $\\mathbf{v}$ as a column vector using $\\cos(120Â°) = -\\tfrac{1}{2}$ and $\\sin(120Â°) = \\tfrac{\\sqrt{3}}{2}$.',
+      hint: 'For magnitude $r$ and angle $\\theta$: components are $(r\\cos\\theta,\\, r\\sin\\theta)$. At $120Â°$, the vector is in the second quadrant â€” $x$ is negative, $y$ is positive.',
       walkthrough: [
-        { expression: 'v_x = 4\\cos(120°) = 4 \\cdot (-1/2) = -2', annotation: 'Horizontal component: magnitude times cosine of the angle. Negative because $120°$ puts the vector in the second quadrant (pointing left).' },
-        { expression: 'v_y = 4\\sin(120°) = 4 \\cdot (\\sqrt{3}/2) = 2\\sqrt{3}', annotation: 'Vertical component: magnitude times sine of the angle. Positive because $0° < 120° < 180°$ (vector points upward).' },
+        { expression: 'v_x = 4\\cos(120Â°) = 4 \\cdot (-1/2) = -2', annotation: 'Horizontal component: magnitude times cosine of the angle. Negative because $120Â°$ puts the vector in the second quadrant (pointing left).' },
+        { expression: 'v_y = 4\\sin(120Â°) = 4 \\cdot (\\sqrt{3}/2) = 2\\sqrt{3}', annotation: 'Vertical component: magnitude times sine of the angle. Positive because $0Â° < 120Â° < 180Â°$ (vector points upward).' },
         { expression: '\\mathbf{v} = \\begin{bmatrix}-2 \\\\ 2\\sqrt{3}\\end{bmatrix}', annotation: 'Assemble the column vector.' },
         { expression: '\\|\\mathbf{v}\\| = \\sqrt{4 + 12} = \\sqrt{16} = 4 \\checkmark', annotation: 'Verify: $(-2)^2 + (2\\sqrt{3})^2 = 4 + 12 = 16$. Magnitude is 4 as required.' },
       ],
@@ -527,25 +526,25 @@ check = 3.5*X_axis + 2.0*Y_axis + (-1.5)*Z_axis`,
     },
   ],
 
-  // ── Semantic Layer ───────────────────────────────────────────────
+  // â”€â”€ Semantic Layer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   semantics: {
     core: [
-      { symbol: '\\mathbf{v} = \\begin{bmatrix} x \\\\ y \\end{bmatrix}', meaning: 'A 2D column vector — an ordered list of numbers encoding a displacement of $x$ units horizontally and $y$ units vertically' },
-      { symbol: '\\|\\mathbf{v}\\|', meaning: 'The magnitude (Euclidean length) of vector $\\mathbf{v}$ — computed as $\\sqrt{x^2+y^2}$, always non-negative' },
-      { symbol: '\\hat{u}', meaning: 'A unit vector — has magnitude exactly 1, representing pure direction with no scale information' },
-      { symbol: 'c\\mathbf{v}', meaning: 'Scalar multiplication — stretches $\\mathbf{v}$ by $|c|$; flips direction if $c < 0$; collapses to $\\mathbf{0}$ if $c = 0$' },
-      { symbol: '\\mathbf{0}', meaning: 'The zero vector — all components are 0, magnitude is 0, direction is undefined; it is the additive identity $\\mathbf{v} + \\mathbf{0} = \\mathbf{v}$' },
+      { symbol: '\\mathbf{v} = \\begin{bmatrix} x \\\\ y \\end{bmatrix}', meaning: 'A 2D column vector â€” an ordered list of numbers encoding a displacement of $x$ units horizontally and $y$ units vertically' },
+      { symbol: '\\|\\mathbf{v}\\|', meaning: 'The magnitude (Euclidean length) of vector $\\mathbf{v}$ â€” computed as $\\sqrt{x^2+y^2}$, always non-negative' },
+      { symbol: '\\hat{u}', meaning: 'A unit vector â€” has magnitude exactly 1, representing pure direction with no scale information' },
+      { symbol: 'c\\mathbf{v}', meaning: 'Scalar multiplication â€” stretches $\\mathbf{v}$ by $|c|$; flips direction if $c < 0$; collapses to $\\mathbf{0}$ if $c = 0$' },
+      { symbol: '\\mathbf{0}', meaning: 'The zero vector â€” all components are 0, magnitude is 0, direction is undefined; it is the additive identity $\\mathbf{v} + \\mathbf{0} = \\mathbf{v}$' },
     ],
     rulesOfThumb: [
       'A vector is defined by length and direction; its starting position does not matter.',
       'Always write linear algebra vectors as vertical columns to prepare for matrix multiplication.',
       'To find a unit vector: compute the magnitude, then divide every component by that magnitude.',
-      'Magnitude is always non-negative — squaring removes the sign of each component before summing.',
+      'Magnitude is always non-negative â€” squaring removes the sign of each component before summing.',
       'When a scalar is negative, it flips direction; magnitude scales by the absolute value of the scalar.',
     ],
   },
 
-  // ── Spiral Learning ──────────────────────────────────────────────
+  // â”€â”€ Spiral Learning â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   spiral: {
     recoveryPoints: [
       { lessonId: 'algebra-pythagoras', label: 'The Pythagorean Theorem', note: 'Vector magnitude is just the Pythagorean theorem applied to the components. The hypotenuse of the triangle IS the length of the vector.' },
@@ -555,7 +554,7 @@ check = 3.5*X_axis + 2.0*Y_axis + (-1.5)*Z_axis`,
     ],
   },
 
-  // ── Assessment ───────────────────────────────────────────────────
+  // â”€â”€ Assessment â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   assessment: {
     questions: [
       {
@@ -569,11 +568,11 @@ check = 3.5*X_axis + 2.0*Y_axis + (-1.5)*Z_axis`,
     ],
   },
 
-  // ── Mental Model ─────────────────────────────────────────────────
+  // â”€â”€ Mental Model â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   mentalModel: [
-    'Physics: Vectors are arrows — length and direction, not position.',
+    'Physics: Vectors are arrows â€” length and direction, not position.',
     'CS: Vectors are ordered lists of numbers.',
-    'Math: Vectors are elements of a vector space — things you can add and scale.',
+    'Math: Vectors are elements of a vector space â€” things you can add and scale.',
     'Magnitude = hypotenuse of the right triangle formed by components: $\\sqrt{v_1^2 + v_2^2}$.',
     'Unit vector = same direction, length 1. Formula: $\\hat{v} = \\mathbf{v}/\\|\\mathbf{v}\\|$.',
   ],
@@ -582,7 +581,7 @@ check = 3.5*X_axis + 2.0*Y_axis + (-1.5)*Z_axis`,
     {
       falseBelief: 'The magnitude of $[-3, 4]$ is $-3 + 4 = 1$ because you just add the components.',
       whyStudentsThinkIt: 'Students transfer "distance = sum of parts" thinking from everyday contexts (driving 3 miles then 4 miles = 7 miles total) to vectors, forgetting that vector components are perpendicular.',
-      correctionExample: '$\\|[-3, 4]^\\top\\| = \\sqrt{(-3)^2 + 4^2} = \\sqrt{9+16} = 5$, not 1. You must square, sum, then root — never add directly.',
+      correctionExample: '$\\|[-3, 4]^\\top\\| = \\sqrt{(-3)^2 + 4^2} = \\sqrt{9+16} = 5$, not 1. You must square, sum, then root â€” never add directly.',
       contrastCase: 'If the two vectors were parallel (same direction), THEN you could add magnitudes. For perpendicular components, you always need the Pythagorean theorem.',
     },
     {
@@ -597,11 +596,11 @@ check = 3.5*X_axis + 2.0*Y_axis + (-1.5)*Z_axis`,
     {
       situation: 'You are given the magnitude and direction angle of a vector and need to write it as a column.',
       competingTechniques: ['Guess the components from context', 'Use $v_x = r\\cos\\theta$, $v_y = r\\sin\\theta$'],
-      whyThisTechniqueWins: 'The component formula is exact and works for any angle. Guessing only works for 0°, 90°, 180°, 270°.',
+      whyThisTechniqueWins: 'The component formula is exact and works for any angle. Guessing only works for 0Â°, 90Â°, 180Â°, 270Â°.',
     },
     {
       situation: 'You need a vector pointing north-east with length exactly 1.',
-      competingTechniques: ['Write $[1, 1]$ (wrong — length is $\\sqrt{2}$)', 'Write $[1/\\sqrt{2},\\; 1/\\sqrt{2}]$ (unit vector at 45°)'],
+      competingTechniques: ['Write $[1, 1]$ (wrong â€” length is $\\sqrt{2}$)', 'Write $[1/\\sqrt{2},\\; 1/\\sqrt{2}]$ (unit vector at 45Â°)'],
       whyThisTechniqueWins: 'Always normalize: compute $[1,1]$, find its magnitude $\\sqrt{2}$, divide each component. The result $[0.707, 0.707]$ has length exactly 1.',
     },
   ],
@@ -626,22 +625,22 @@ check = 3.5*X_axis + 2.0*Y_axis + (-1.5)*Z_axis`,
     solveIndependently: 'Compute the magnitude and unit vector of any 2D or 3D vector without referring to a formula sheet.',
     explainVerbally: 'Explain why magnitude uses the Pythagorean theorem and why you cannot just add components.',
     detectIncorrectApplication: 'Identify when a student has added components instead of using the Pythagorean theorem, and describe the correction.',
-    transferToUnfamiliar: 'Given a force of magnitude 10 N at 135°, write the force vector in component form and verify its magnitude.',
+    transferToUnfamiliar: 'Given a force of magnitude 10 N at 135Â°, write the force vector in component form and verify its magnitude.',
   },
 
-  // ── Checkpoints ──────────────────────────────────────────────────
+  // â”€â”€ Checkpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   checkpoints: [
     { id: 'cp-la1-001-1', label: 'Read the magnitude formula derivation in the Math tab', type: 'read' },
     { id: 'cp-la1-001-2', label: 'Read the Procedure: Magnitude and Unit Vector callout', type: 'read' },
     { id: 'cp-la1-001-3', label: 'Read the scalar multiplication behaviors callout', type: 'read' },
     { id: 'cp-la1-001-4', label: 'Run the NumPy magnitude and unit vector notebook cells', type: 'lab' },
     { id: 'cp-la1-001-5', label: 'Run the CNC tool path notebook cells', type: 'lab' },
-    { id: 'cp-la1-001-6', label: 'Complete Example 1 — compute magnitude of [-6, 8]', type: 'example' },
-    { id: 'cp-la1-001-7', label: 'Complete Example 2 — find unit vector of [3, -4]', type: 'example' },
-    { id: 'cp-la1-001-8', label: 'Attempt Challenge 3 — construct a vector from angle and magnitude', type: 'challenge' },
+    { id: 'cp-la1-001-6', label: 'Complete Example 1 â€” compute magnitude of [-6, 8]', type: 'example' },
+    { id: 'cp-la1-001-7', label: 'Complete Example 2 â€” find unit vector of [3, -4]', type: 'example' },
+    { id: 'cp-la1-001-8', label: 'Attempt Challenge 3 â€” construct a vector from angle and magnitude', type: 'challenge' },
   ],
 
-  // ── Final Quiz ─────────────────────────────────────────────────
+  // â”€â”€ Final Quiz â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   quiz: [
     {
       id: 'la1-001-quiz-1',
@@ -655,7 +654,7 @@ check = 3.5*X_axis + 2.0*Y_axis + (-1.5)*Z_axis`,
       ],
       answer: 'A single unchangeable coordinate point',
       hints: ['Vectors are displacements (movements), not fixed destinations. A point is a location; a vector is an instruction for how to move.'],
-      reviewSection: 'Intuition tab — Vectors vs. Points',
+      reviewSection: 'Intuition tab â€” Vectors vs. Points',
     },
     {
       id: 'la1-001-quiz-2',
@@ -664,7 +663,7 @@ check = 3.5*X_axis + 2.0*Y_axis + (-1.5)*Z_axis`,
       options: ['1', '5', '7', '25'],
       answer: '5',
       hints: ['$\\|[-3, 4]^T\\| = \\sqrt{(-3)^2 + 4^2} = \\sqrt{9 + 16} = \\sqrt{25} = 5$. Squaring the negative component gives a positive value.'],
-      reviewSection: 'Math tab — Vector Magnitude',
+      reviewSection: 'Math tab â€” Vector Magnitude',
     },
     {
       id: 'la1-001-quiz-3',
@@ -678,7 +677,7 @@ check = 3.5*X_axis + 2.0*Y_axis + (-1.5)*Z_axis`,
       ],
       answer: 'The vector triples in length and reverses direction',
       hints: ['Magnitude becomes $|-3| \\times \\|\\mathbf{v}\\| = 3\\|\\mathbf{v}\\|$ (triples). The negative sign flips direction. Rule: $\\|c\\mathbf{v}\\| = |c|\\|\\mathbf{v}\\|$.'],
-      reviewSection: 'Intuition tab — Scalar Multiplication',
+      reviewSection: 'Intuition tab â€” Scalar Multiplication',
     },
     {
       id: 'la1-001-quiz-4',
@@ -691,8 +690,8 @@ check = 3.5*X_axis + 2.0*Y_axis + (-1.5)*Z_axis`,
         'The zero vector has magnitude 1',
       ],
       answer: 'The zero vector has magnitude 0 and undefined direction',
-      hints: ['The zero vector results from scaling any vector by 0. It has zero length and no meaningful direction. It IS a valid vector — it is the additive identity $\\mathbf{v} + \\mathbf{0} = \\mathbf{v}$.'],
-      reviewSection: 'Intuition tab — Scalar Multiplication',
+      hints: ['The zero vector results from scaling any vector by 0. It has zero length and no meaningful direction. It IS a valid vector â€” it is the additive identity $\\mathbf{v} + \\mathbf{0} = \\mathbf{v}$.'],
+      reviewSection: 'Intuition tab â€” Scalar Multiplication',
     },
     {
       id: 'la1-001-quiz-5',
@@ -701,7 +700,7 @@ check = 3.5*X_axis + 2.0*Y_axis + (-1.5)*Z_axis`,
       options: ['$[0, -5]^T$', '$[0, -1]^T$', '$[0, 1]^T$', '$[-1, 0]^T$'],
       answer: '$[0, -1]^T$',
       hints: ['$\\|[0,-5]^T\\| = 5$. Unit vector: $[0,-5]^T / 5 = [0, -1]^T$. Direction (straight down) is preserved.'],
-      reviewSection: 'Math tab — Unit Vectors',
+      reviewSection: 'Math tab â€” Unit Vectors',
     },
     {
       id: 'la1-001-quiz-6',
@@ -715,7 +714,7 @@ check = 3.5*X_axis + 2.0*Y_axis + (-1.5)*Z_axis`,
       ],
       answer: 'They are NOT equal because they point in opposite directions',
       hints: ['Vectors are equal only if ALL corresponding components are equal. $[3, 0] \\neq [-3, 0]$ because $3 \\neq -3$. Having the same magnitude is NOT sufficient for equality.'],
-      reviewSection: 'Rigor tab — Vector Equality',
+      reviewSection: 'Rigor tab â€” Vector Equality',
     },
   ],
 };

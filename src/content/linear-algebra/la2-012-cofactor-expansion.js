@@ -198,6 +198,80 @@ disp('That is 4 x 3 = 12 two-by-two determinants. Use row reduction for n>=4.')`
           ],
         },
       },
+      {
+        id: 'PythonNotebook',
+        title: 'Cofactor Expansion and Adjugate in NumPy',
+        mathBridge: 'Build a cofactor expansion function from scratch using numpy slicing, then verify it matches np.linalg.det. Compute the adjugate and recover A⁻¹ via the formula — confirm it equals np.linalg.inv(A).',
+        caption: 'The adjugate formula: A⁻¹ = adj(A) / det(A). Identical to the 2×2 swap-and-negate rule, just generalized.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Cofactor function and expansion from scratch',
+              prose: 'Build cofactor(A, i, j) by deleting row i and column j using numpy index tricks, then compute the full determinant by expanding along row 0. Verify it matches np.linalg.det.',
+              code: `import numpy as np
+
+def minor(A, i, j):
+    """Return det of A with row i and column j deleted."""
+    rows = np.delete(np.arange(A.shape[0]), i)
+    cols = np.delete(np.arange(A.shape[1]), j)
+    return np.linalg.det(A[np.ix_(rows, cols)])
+
+def cofactor(A, i, j):
+    """Cofactor C_ij = (-1)^(i+j) * minor(A,i,j)."""
+    return ((-1) ** (i + j)) * minor(A, i, j)
+
+def cofactor_expansion(A, row=0):
+    """Compute det(A) by expanding along the given row."""
+    return sum(A[row, j] * cofactor(A, row, j) for j in range(A.shape[1]))
+
+A = np.array([[2., 1., 3.],
+              [0., 4., 1.],
+              [5., 2., 6.]])
+
+det_manual = cofactor_expansion(A, row=0)
+det_numpy  = np.linalg.det(A)
+
+print(f"det via cofactor expansion: {det_manual:.6f}")
+print(f"det via np.linalg.det:      {det_numpy:.6f}")
+print(f"Match: {np.isclose(det_manual, det_numpy)}")`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Adjugate and the inverse formula',
+              prose: 'Build the full cofactor matrix, transpose to get the adjugate, then recover A⁻¹ = adj(A) / det(A). Confirm it matches np.linalg.inv(A) and that A @ adj(A) = det(A) * I.',
+              code: `import numpy as np
+
+def cofactor_matrix(A):
+    n = A.shape[0]
+    C = np.zeros((n, n))
+    for i in range(n):
+        for j in range(n):
+            rows = np.delete(np.arange(n), i)
+            cols = np.delete(np.arange(n), j)
+            C[i, j] = ((-1)**(i+j)) * np.linalg.det(A[np.ix_(rows, cols)])
+    return C
+
+A = np.array([[2., 1., 3.],
+              [0., 4., 1.],
+              [5., 2., 6.]])
+
+C = cofactor_matrix(A)
+adj_A = C.T          # adjugate = transpose of cofactor matrix
+d     = np.linalg.det(A)
+A_inv = adj_A / d
+
+print("Inverse via adjugate formula:")
+print(np.round(A_inv, 6))
+print("\\nnp.linalg.inv(A):")
+print(np.round(np.linalg.inv(A), 6))
+print("\\nA @ adj(A) should equal det(A)*I:")
+print(np.round(A @ adj_A, 6))
+print(f"det(A) = {d:.4f}, det(A)*I diagonal = {d:.4f}")`,
+            },
+          ],
+        },
+      },
     ],
   },
 

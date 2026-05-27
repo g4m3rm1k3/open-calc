@@ -11,35 +11,125 @@ export default {
   hook: {
     question: "How does Google decide which web pages are most important? The answer is linear algebra: the importance of a page is the eigenvector component corresponding to eigenvalue 1 of the web\'s link matrix.",
     realWorldContext: "PageRank (1998, Brin and Page) turned web search into an eigenvalue problem. The web graph has ~5 billion pages — the 'importance' of each page is the stationary distribution of a random walk on this graph. Power iteration (repeatedly multiply by the matrix) converges to the dominant eigenvector. Beyond search: Markov chains model protein folding, financial market transitions, disease spread, recommendation systems (Markov collaborative filtering), natural language models (n-gram transition matrices), and queuing systems in operations research.",
-    previewVisualizationId: 'OpenMatNotebook',
   },
 
   intuition: {
     prose: [
-      '**Power iteration on a 3-page web — numbers first.** Consider three web pages: page 1 links to pages 2 and 3; page 2 links only to page 3; page 3 links only back to page 1. The column-stochastic link matrix is $M = \\begin{bmatrix}0&0&1\\\\1/2&0&0\\\\1/2&1&0\\end{bmatrix}$ (column $j$ = where page $j$ sends its rank). Start with equal rank $\\mathbf{r}^{(0)} = (1/3, 1/3, 1/3)^\\top$. After step 1: $\\mathbf{r}^{(1)} = M\\mathbf{r}^{(0)} = (1/3,\\, 1/6,\\, 1/2)^\\top$. After step 2: $\\mathbf{r}^{(2)} = M\\mathbf{r}^{(1)} = (1/2,\\, 1/6,\\, 1/3)^\\top$. Page 3 starts highest (receives from two pages), but page 1 gains rank over iterations because page 3 — which receives the most links — sends all its rank back to page 1.',
-      '**Markov chains.** A finite Markov chain has $n$ states and a **transition matrix** $P$ (row-stochastic: all entries $\\geq 0$, each row sums to 1). $P_{ij}$ = probability of going from state $i$ to state $j$. The distribution after $k$ steps: $\\boldsymbol{\\pi}_k = \\boldsymbol{\\pi}_0 P^k$ (if distributions are row vectors). A **stationary distribution** satisfies $\\boldsymbol{\\pi} P = \\boldsymbol{\\pi}$ (or equivalently $P^\\top \\boldsymbol{\\pi}^\\top = \\boldsymbol{\\pi}^\\top$) — it is an eigenvector of $P^\\top$ for eigenvalue 1.',
-      '**Perron-Frobenius theorem.** For an irreducible (every state reachable from every other) and aperiodic Markov chain: (1) eigenvalue 1 exists and has multiplicity 1; (2) all other eigenvalues satisfy $|\\lambda| < 1$; (3) the unique stationary distribution $\\boldsymbol{\\pi}$ has all positive entries; (4) $\\boldsymbol{\\pi}_0 P^k \\to \\boldsymbol{\\pi}$ for any starting distribution.',
-      '**PageRank.** The original PageRank treats the web as a directed graph. For a page $i$ with out-links to pages $j_1, \\ldots, j_k$: column $i$ of the column-stochastic link matrix has $1/k$ in rows $j_1, \\ldots, j_k$. To ensure irreducibility and aperiodicity, add a "teleportation" probability $\\alpha$ (typically 0.85): $G = \\alpha M + (1-\\alpha) \\mathbf{e}\\mathbf{e}^\\top/n$ (the "Google matrix"). The PageRank vector is the dominant eigenvector of $G$.',
-      '**Power iteration.** The algorithm: start with uniform $\\mathbf{r} = \\mathbf{e}/n$, iterate $\\mathbf{r} \\leftarrow G\\mathbf{r}$, stop when $\\|\\mathbf{r}_{k+1} - \\mathbf{r}_k\\|_1 < \\varepsilon$. Convergence rate is $|\\lambda_2|^k$ per iteration. With $\\alpha = 0.85$, $|\\lambda_2| \\leq 0.85$ so convergence is fast.',
+      '**Where you are in the story.** The previous lesson showed PCA turning a data science problem into an eigenvector computation. This lesson shows the same idea applied to a network: the web graph. In 1998, Larry Page and Sergey Brin noticed that the "importance" of a web page could be defined recursively — a page is important if important pages link to it. That self-referential definition is exactly an eigenvector equation. Their solution (PageRank) made Google the dominant search engine and earned them billions of dollars. The math is eigenvalues and Markov chains.',
+
+      '**The Markov chain model.** Imagine a random web surfer: at each step they click a random link on the current page, or occasionally (with probability $1-\\alpha$) jump to a completely random page. This is a Markov chain on $n$ states (web pages). The transition matrix $P$ (column-stochastic: column $j$ contains $1/k$ in the rows linked from page $j$, where $k$ is the out-degree) encodes the probabilities. The key question: after infinitely many random steps, how often does the surfer visit each page? That fraction is the PageRank — the stationary distribution.',
+
+      '**Concrete first: 3-page web.** Pages: 1 links to {2,3}, 2 links to {3}, 3 links to {1}. Link matrix $M = \\begin{bmatrix}0&0&1\\\\1/2&0&0\\\\1/2&1&0\\end{bmatrix}$. Start uniform: $\\mathbf{r}^{(0)} = (1/3, 1/3, 1/3)^\\top$. After one step: $\\mathbf{r}^{(1)} = M\\mathbf{r}^{(0)} = (1/3, 1/6, 1/2)^\\top$. Page 3 jumps to the top because two pages link to it. After more steps, page 1 climbs because it receives all of page 3\'s rank — which is high because page 3 received from both pages 1 and 2.',
+
+      '**Predict before reading on.** In the 3-page example, which page ends up with the highest stationary PageRank? Think about the flow of rank before computing: page 3 receives from two pages (1 and 2), then sends everything to page 1. Does that make page 1 ultimately the most important? Write your prediction.',
+
+      '**The eigenvector equation.** The stationary distribution $\\boldsymbol{\\pi}$ satisfies $M\\boldsymbol{\\pi} = \\boldsymbol{\\pi}$ — it is an eigenvector of $M$ with eigenvalue 1. By the Perron-Frobenius theorem, for any irreducible aperiodic stochastic matrix this eigenvalue-1 eigenvector is unique, positive, and all other eigenvalues satisfy $|\\lambda| < 1$. So the stationary distribution is the dominant eigenvector, and power iteration (repeatedly multiplying $\\mathbf{r} \\leftarrow M\\mathbf{r}$) converges to it.',
+
+      '**The Google matrix: handling dangling nodes and disconnected graphs.** The raw link matrix has problems: "dangling nodes" (pages with no out-links) create rows of zeros; disconnected components prevent the surfer from reaching all pages. The fix: add a "teleportation" term. The Google matrix is $G = \\alpha M + (1-\\alpha)\\mathbf{1}\\mathbf{1}^\\top/n$ with $\\alpha \\approx 0.85$. With probability $\\alpha$ the surfer follows a link; with probability $1-\\alpha$ they jump to a uniformly random page. This makes $G$ irreducible and aperiodic, guaranteeing a unique stationary distribution.',
+
+      '**Power iteration is cheap and scales.** The algorithm: start with $\\mathbf{r} = \\mathbf{1}/n$, repeatedly compute $\\mathbf{r} \\leftarrow G\\mathbf{r}$, stop when $\\|\\mathbf{r}_{k+1} - \\mathbf{r}_k\\|_1 < 10^{-8}$. Convergence rate is $\\alpha^k = 0.85^k$ per step — converges in about 50-100 iterations regardless of $n$. The key: you never form $G$ explicitly. You compute $G\\mathbf{r} = \\alpha M\\mathbf{r} + (1-\\alpha)\\mathbf{1}/n$ using only the sparse link matrix $M$ (about 40 non-zeros per column for the web). This runs on a billion-page web graph in minutes.',
+
+      '**Where this is heading.** The next lesson applies eigenvalue ideas to differential equations. The connection: just as $P^k \\mathbf{r}_0$ converges to the stationary distribution as $k \\to \\infty$, the solution $e^{At} \\mathbf{x}_0$ of a linear ODE converges to zero as $t \\to \\infty$ — if the eigenvalues of $A$ have negative real parts. Stability is the ODE analogue of mixing.',
     ],
     callouts: [
       {
+        type: 'sequencing',
+        title: 'Lesson 2 of 4 — Applications of Linear Algebra',
+        body: '**Previous (Lesson 1):** PCA — eigenvectors of the covariance matrix reveal the directions of maximum variance.\n**This lesson:** Markov chains and PageRank — stationary distributions as dominant eigenvectors; power iteration at web scale.\n**Next (Lesson 3):** ODEs and linear systems — eigenvalues determine stability; matrix exponential gives exact solutions.',
+      },
+      {
         type: 'theorem',
         title: 'Perron-Frobenius Theorem (Markov Version)',
-        body: 'For an irreducible aperiodic stochastic matrix $P$:\n1. $\\lambda_1 = 1$ is a simple eigenvalue\n2. All other eigenvalues satisfy $|\\lambda_i| < 1$\n3. Unique stationary distribution $\\boldsymbol{\\pi} > 0$ with $\\boldsymbol{\\pi}^\\top \\mathbf{1} = 1$\n4. $P^k \\to \\mathbf{1}\\boldsymbol{\\pi}^\\top$ as $k \\to \\infty$ (every row of $P^k$ converges to $\\boldsymbol{\\pi}$)',
+        body: 'For an irreducible aperiodic stochastic matrix $P$:\n1. $\\lambda_1 = 1$ is a simple eigenvalue\n2. All other eigenvalues: $|\\lambda_i| < 1$\n3. Unique stationary distribution $\\boldsymbol{\\pi} > 0$ with $\\sum_i \\pi_i = 1$\n4. $\\boldsymbol{\\pi}_0 P^k \\to \\boldsymbol{\\pi}$ for any starting distribution',
       },
       {
         type: 'insight',
         title: 'Spectral Gap Controls Mixing Time',
-        body: 'The **spectral gap** $1 - |\\lambda_2|$ controls how fast the chain mixes.\n\nLarge spectral gap $\\Rightarrow$ fast convergence to stationary distribution.\nSmall spectral gap $\\Rightarrow$ slow mixing ("torpid mixing").\n\nFor PageRank with teleportation $\\alpha = 0.85$: spectral gap $\\geq 0.15$, so convergence in $\\sim 50$ iterations.',
-      },
-      {
-        type: 'sequencing',
-        title: 'Prediction',
-        body: 'In the 3-page web example above (page 1 → {2,3}, page 2 → {3}, page 3 → {1}), which page do you predict will have the highest final PageRank after power iteration converges? Think about who receives rank from whom before computing.',
+        body: 'The spectral gap $1 - |\\lambda_2|$ controls convergence speed.\n\nLarge gap → fast mixing → few power iterations needed.\nSmall gap → slow mixing → many iterations.\n\nPageRank with $\\alpha = 0.85$: gap $\\geq 0.15$, so about 50 iterations suffice.',
       },
     ],
     visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Markov Chains and PageRank with NumPy',
+        mathBridge: 'Simulate a Markov chain, find the stationary distribution by power iteration, and implement a small PageRank.',
+        caption: 'Power iteration converges to the dominant eigenvector at rate |lambda_2|^k per step.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Weather Markov chain — power iteration',
+              prose: 'Model sunny/cloudy/rainy weather with a transition matrix and find the stationary distribution by repeatedly multiplying the transition matrix.',
+              code: `import numpy as np
+
+# Row-stochastic transition matrix (P[i,j] = prob of going from state i to state j)
+# States: 0=Sunny, 1=Cloudy, 2=Rainy
+P = np.array([
+    [0.7, 0.2, 0.1],   # from Sunny
+    [0.3, 0.4, 0.3],   # from Cloudy
+    [0.2, 0.4, 0.4],   # from Rainy
+])
+
+# Power iteration: start from uniform, multiply P.T repeatedly
+pi = np.array([1/3, 1/3, 1/3])
+for k in range(100):
+    pi_new = P.T @ pi
+    if np.linalg.norm(pi_new - pi) < 1e-12:
+        print(f"Converged at step {k}")
+        break
+    pi = pi_new
+
+print("Stationary distribution:")
+print(f"  Sunny:  {pi[0]:.4f}")
+print(f"  Cloudy: {pi[1]:.4f}")
+print(f"  Rainy:  {pi[2]:.4f}")
+print()
+print("Verify pi P = pi:", np.allclose(pi @ P, pi))
+print("Eigenvalue check: P.T has eigenvalue 1?", np.round(sorted(np.linalg.eigvals(P.T), reverse=True), 4))
+`,
+            },
+            {
+              id: 2,
+              cellTitle: 'PageRank on a small web graph',
+              prose: 'Build a small 5-page web graph and compute PageRank using the Google matrix with teleportation.',
+              code: `import numpy as np
+
+# 5-page directed web graph (link matrix M, column-stochastic)
+# Page 0 -> {1, 2}
+# Page 1 -> {3}
+# Page 2 -> {1, 3}
+# Page 3 -> {0}
+# Page 4 -> {0, 3}
+n = 5
+M = np.zeros((n, n))
+links = {0: [1,2], 1: [3], 2: [1,3], 3: [0], 4: [0,3]}
+for src, dsts in links.items():
+    for dst in dsts:
+        M[dst, src] = 1.0 / len(dsts)
+
+# Google matrix with teleportation alpha=0.85
+alpha = 0.85
+G = alpha * M + (1 - alpha) / n * np.ones((n, n))
+
+# Power iteration
+r = np.ones(n) / n
+for _ in range(200):
+    r_new = G @ r
+    if np.linalg.norm(r_new - r) < 1e-12:
+        break
+    r = r_new
+
+print("PageRank scores:")
+for i, score in enumerate(r):
+    print(f"  Page {i}: {score:.4f}")
+print()
+ranking = np.argsort(r)[::-1]
+print("Ranking (most to least important):", ranking)
+`,
+            },
+          ],
+        },
+      },
       {
         id: 'OpenMatNotebook',
         title: 'Markov Chains and Power Iteration',

@@ -885,6 +885,84 @@ export function detectMatlabCompatibilityWarnings(source) {
   return checks.filter((check) => check.pattern.test(text)).map((check) => check.message);
 }
 
+// ── String-aware MATLAB comment stripper ──────────────────────────────────────
+// Must be defined before parseBlocks so the block parser can use it.
+// A % inside 'a string' must NOT be treated as a comment.
+function stripMatlabComment(line) {
+  let inStr = false;
+  let i = 0;
+  while (i < line.length) {
+    const c = line[i];
+    if (inStr) {
+      if (c === "'") {
+        // '' is an escaped single-quote inside the string — skip both chars
+        if (line[i + 1] === "'") { i += 2; continue; }
+        inStr = false;
+      }
+      i++;
+      continue;
+    }
+    // Outside a string: % starts a comment
+    if (c === "%") return line.slice(0, i);
+    if (c === "'") {
+      // Transpose when immediately preceded by ), ], or a word char; otherwise string.
+      const prev = line.slice(0, i).trimEnd();
+      const lastCh = prev.slice(-1);
+      if (/[)\]\w]/.test(lastCh)) { i++; continue; } // transpose — not a string opener
+      inStr = true;
+    }
+    i++;
+  }
+  return line;
+}
+
+// ── Block parser helpers ──────────────────────────────────────────────────────
+
+// Find the index of the first top-level comma in str (outside parens, brackets,
+// braces, and strings). Returns -1 if not found.
+// Used to detect MATLAB one-liner syntax:  if cond, stmt; end
+function findTopLevelComma(str) {
+  let depth = 0, inStr = false, strCh = null;
+  for (let i = 0; i < str.length; i++) {
+    const c = str[i];
+    if (inStr) {
+      if (c === strCh) {
+        if (c === "'" && str[i + 1] === "'") { i++; continue; } // '' escape
+        inStr = false;
+      }
+      continue;
+    }
+    if (c === "'") {
+      const prev = str.slice(0, i).trimEnd().slice(-1);
+      if (/[)\]\w]/.test(prev)) continue; // transpose — not a string
+      inStr = true; strCh = c; continue;
+    }
+    if (c === '"') { inStr = true; strCh = c; continue; }
+    if ("([{".includes(c)) depth++;
+    else if (")]}".includes(c)) depth = Math.max(0, depth - 1);
+    else if (c === "," && depth === 0) return i;
+  }
+  return -1;
+}
+
+// Split str by top-level semicolons (outside strings/brackets).
+// Used to break apart inline bodies in one-liners.
+function splitTopLevelSemicolons(str) {
+  const parts = [];
+  let cur = "", depth = 0, inStr = false, strCh = null;
+  for (let i = 0; i < str.length; i++) {
+    const c = str[i];
+    if (inStr) { cur += c; if (c === strCh) inStr = false; continue; }
+    if (c === "'" || c === '"') { inStr = true; strCh = c; cur += c; continue; }
+    if ("([{".includes(c)) depth++;
+    else if (")]}".includes(c)) depth = Math.max(0, depth - 1);
+    if (c === ";" && depth === 0) { parts.push(cur.trim()); cur = ""; }
+    else cur += c;
+  }
+  if (cur.trim()) parts.push(cur.trim());
+  return parts.filter(Boolean);
+}
+
 // ── Block parser ──────────────────────────────────────────────────────────────
 
 export function parseBlocks(lines) {
@@ -905,7 +983,7 @@ export function parseBlocks(lines) {
   for (let i = 0; i < lines.length; i++) {
     const raw = lines[i];
     const lineNo = i + 1;
-    const stripped = raw.replace(/%.*$/, "").trim();
+    const stripped = stripMatlabComment(raw).trim();
     if (!stripped) continue;
     const lower = stripped.toLowerCase();
 
@@ -922,32 +1000,92 @@ export function parseBlocks(lines) {
 
     const forMatch = stripped.match(/^for\s+([A-Za-z_]\w*)\s*=\s*(.+)$/i);
     if (forMatch) {
-      const node = { type: "for", varName: forMatch[1], iterExpr: forMatch[2], body: [], lineNo };
+      // Handle one-liner: for i = expr, stmt; end
+      let iterExpr = forMatch[2].replace(/;\s*$/, "").trim();
+      const commaIdx = findTopLevelComma(iterExpr);
+      let inlineStmts = null;
+      if (commaIdx !== -1) {
+        inlineStmts = iterExpr.slice(commaIdx + 1).trim();
+        iterExpr = iterExpr.slice(0, commaIdx).trim();
+      }
+      const node = { type: "for", varName: forMatch[1], iterExpr, body: [], lineNo };
       top().body.push(node);
       stack.push(node);
+      if (inlineStmts) {
+        splitTopLevelSemicolons(inlineStmts).forEach(s => {
+          const sl = s.toLowerCase();
+          if (sl === "end") { if (stack.length > 1) stack.pop(); }
+          else if (s) getTargetBody(top()).push({ type: "line", raw: s, lineNo });
+        });
+      }
       continue;
     }
 
     const whileMatch = stripped.match(/^while\s+(.+)$/i);
     if (whileMatch) {
-      const node = { type: "while", condExpr: whileMatch[1], body: [], lineNo };
+      // Handle one-liner: while cond, stmt; end
+      let condExpr = whileMatch[1].replace(/;\s*$/, "").trim();
+      const commaIdx = findTopLevelComma(condExpr);
+      let inlineStmts = null;
+      if (commaIdx !== -1) {
+        inlineStmts = condExpr.slice(commaIdx + 1).trim();
+        condExpr = condExpr.slice(0, commaIdx).trim();
+      }
+      const node = { type: "while", condExpr, body: [], lineNo };
       top().body.push(node);
       stack.push(node);
+      if (inlineStmts) {
+        splitTopLevelSemicolons(inlineStmts).forEach(s => {
+          const sl = s.toLowerCase();
+          if (sl === "end") { if (stack.length > 1) stack.pop(); }
+          else if (s) getTargetBody(top()).push({ type: "line", raw: s, lineNo });
+        });
+      }
       continue;
     }
 
     const ifMatch = stripped.match(/^if\s+(.+)$/i);
     if (ifMatch) {
-      const node = { type: "if", branches: [{ cond: ifMatch[1], body: [], lineNo }], elseBody: null, lineNo };
+      // Handle one-liner: if cond, stmt1; stmt2; end
+      let cond = ifMatch[1].replace(/;\s*$/, "").trim();
+      const commaIdx = findTopLevelComma(cond);
+      let inlineStmts = null;
+      if (commaIdx !== -1) {
+        inlineStmts = cond.slice(commaIdx + 1).trim();
+        cond = cond.slice(0, commaIdx).trim();
+      }
+      const node = { type: "if", branches: [{ cond, body: [], lineNo }], elseBody: null, lineNo };
       top().body.push(node);
       stack.push(node);
+      if (inlineStmts) {
+        splitTopLevelSemicolons(inlineStmts).forEach(s => {
+          const sl = s.toLowerCase();
+          if (sl === "end") { if (stack.length > 1) stack.pop(); }
+          else if (sl === "else") { if (top().type === "if") top().elseBody = []; }
+          else if (s) getTargetBody(top()).push({ type: "line", raw: s, lineNo });
+        });
+      }
       continue;
     }
 
     const elseifMatch = stripped.match(/^elseif\s+(.+)$/i);
     if (elseifMatch) {
+      let cond = elseifMatch[1].replace(/;\s*$/, "").trim();
+      const commaIdx = findTopLevelComma(cond);
+      let inlineStmts = null;
+      if (commaIdx !== -1) {
+        inlineStmts = cond.slice(commaIdx + 1).trim();
+        cond = cond.slice(0, commaIdx).trim();
+      }
       const ifNode = top();
-      if (ifNode.type === "if") ifNode.branches.push({ cond: elseifMatch[1], body: [], lineNo });
+      if (ifNode.type === "if") {
+        ifNode.branches.push({ cond, body: [], lineNo });
+        if (inlineStmts) {
+          splitTopLevelSemicolons(inlineStmts).forEach(s => {
+            if (s && s.toLowerCase() !== "end") getTargetBody(top()).push({ type: "line", raw: s, lineNo });
+          });
+        }
+      }
       continue;
     }
 
@@ -1212,7 +1350,7 @@ function replaceBackslash(expr) {
 }
 
 export function preprocessLine(line, variables, functionNames = new Set()) {
-  let output = line.replace(/%.*$/, "").trim();
+  let output = stripMatlabComment(line).trim();
   if (!output) return "";
   output = output.replace(/\bnull\s*\(/g, "nullspace(");
   output = output.replace(/^hold\s+on$/i, "hold('on')");
@@ -1679,6 +1817,8 @@ export function createExecutionEngine(options = {}) {
     return Math.pow(vec.reduce((s, x) => s + Math.abs(x) ** pn, 0), 1 / pn);
   });
   parser.set("trace", (A) => { const m = toNumericMatrix(A); return m ? m.reduce((s, r, i) => s + (r[i] ?? 0), 0) : 0; });
+  // transpose(A): non-conjugate transpose — equivalent to A.' in MATLAB
+  parser.set("transpose", (A) => toPlain(math.transpose(toPlain(A))));
   parser.set("diag", (v, k = 0) => {
     const plain = toPlain(v); const kn = Number(k) || 0;
     if (isMatrix(plain)) return plain.flatMap((row, i) => { const j = i + kn; return j >= 0 && j < row.length ? [row[j]] : []; });
@@ -2014,7 +2154,7 @@ export function executeScript(source, options = {}) {
   }
 
   function executeLine(rawLine, lineNo = null) {
-    const trimmedRaw = rawLine.replace(/%.*$/, "").trim();
+    const trimmedRaw = stripMatlabComment(rawLine).trim();
     if (!trimmedRaw) return null;
     const hasSemicolon = /;\s*$/.test(trimmedRaw);
     const withoutSemicolon = trimmedRaw.replace(/;\s*$/, "");
@@ -2206,7 +2346,7 @@ export function executeScript(source, options = {}) {
   function expandMidLineSemicolons(src) {
     const result = [];
     for (const rawLine of src.split(/\r?\n/)) {
-      const code = rawLine.replace(/%.*$/, "");
+      const code = stripMatlabComment(rawLine);
       if (!code.includes(";")) { result.push(rawLine); continue; }
       const parts = [];
       let cur = "", depth = 0, inStr = false, strCh = null;
@@ -2359,6 +2499,79 @@ export function executeScript(source, options = {}) {
         if (line[i] === "&" && line[i + 1] === "&") { result += " and "; i += 2; continue; }
         // || → or
         if (line[i] === "|" && line[i + 1] === "|") { result += " or "; i += 2; continue; }
+        // MATLAB ~= (not-equal) → !=
+        if (c === "~" && line[i + 1] === "=") { result += "!="; i += 2; continue; }
+        // MATLAB .'' (non-conjugate transpose): A.' → transpose(A)
+        // Detect the pattern: a word/closing-bracket followed by .'
+        if (c === "." && line[i + 1] === "'") {
+          // Check if the character before . is an operand end (word char or closing bracket)
+          const prevTrimmed = result.trimEnd();
+          const lastCh = prevTrimmed.slice(-1);
+          if (/[\w)\]]/.test(lastCh)) {
+            // Scan back to find the full left operand
+            let objEnd = prevTrimmed.length;
+            let objStart = objEnd - 1;
+            if (lastCh === ")" || lastCh === "]") {
+              const close = lastCh, open = close === ")" ? "(" : "[";
+              let d = 1; objStart--;
+              while (objStart >= 0 && d > 0) {
+                if (prevTrimmed[objStart] === close) d++;
+                else if (prevTrimmed[objStart] === open) d--;
+                if (d > 0) objStart--;
+              }
+              // include any identifier before the bracket
+              while (objStart > 0 && /[\w]/.test(prevTrimmed[objStart - 1])) objStart--;
+            } else {
+              while (objStart > 0 && /[\w]/.test(prevTrimmed[objStart - 1])) objStart--;
+            }
+            const prefix = prevTrimmed.slice(0, objStart);
+            const obj = prevTrimmed.slice(objStart, objEnd);
+            result = prefix + `transpose(${obj})`;
+            i += 2; // skip .' 
+            continue;
+          }
+        }
+        // MATLAB ~ (logical NOT prefix) → not(...)
+        // Only treat as NOT when ~ appears at a position where a value is expected
+        // (i.e. after an operator, open bracket, or at start-of-expression).
+        if (c === "~" && line[i + 1] !== "=") {
+          const prevTrimmedNot = result.trimEnd();
+          const lastChNot = prevTrimmedNot.slice(-1);
+          const afterOperator = !lastChNot || /[=+\-*/<>!&|,(\[{]/.test(lastChNot);
+          if (afterOperator) {
+            // Scan forward to grab the next token/expression to negate
+            let j = i + 1;
+            while (j < line.length && line[j] === " ") j++;
+            const startToken = j;
+            if (line[j] === "(") {
+              // find matching )
+              let depth = 1; j++;
+              while (j < line.length && depth > 0) {
+                if (line[j] === "(") depth++;
+                else if (line[j] === ")") depth--;
+                j++;
+              }
+            } else {
+              // scan a simple identifier or number
+              while (j < line.length && /[\w.]/.test(line[j])) j++;
+              // if followed by (, grab that too (function call)
+              if (line[j] === "(") {
+                let depth = 1; j++;
+                while (j < line.length && depth > 0) {
+                  if (line[j] === "(") depth++;
+                  else if (line[j] === ")") depth--;
+                  j++;
+                }
+              }
+            }
+            if (j > startToken) {
+              const token = line.slice(startToken, j);
+              result += `not(${token})`;
+              i = j;
+              continue;
+            }
+          }
+        }
         // dynamic field: identifier.(expr) — find the opening ( and matching )
         // handled as getfield(identifier, expr) by detecting .(
         if (c === "." && line[i + 1] === "(") {

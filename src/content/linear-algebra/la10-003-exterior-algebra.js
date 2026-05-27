@@ -11,21 +11,25 @@ export default {
   hook: {
     question: "Why does the determinant satisfy $\\det(AB) = \\det(A)\\det(B)$ and $\\det$ changes sign when two rows are swapped? These properties aren\'t coincidences — they follow from a single algebraic structure: the exterior algebra.",
     realWorldContext: "The exterior algebra is the algebraic foundation of differential geometry and modern physics. Maxwell\'s equations in their natural form are written using differential forms (wedge products on spacetime). The integral theorems (Green\'s, Stokes\', Gauss\') become a single formula $\\int_M d\\omega = \\int_{\\partial M} \\omega$. In robotics and computer vision, the wedge product computes cross products and oriented areas. In algebraic topology, homology groups are computed using the exterior algebra.",
-    previewVisualizationId: 'OpenMatNotebook',
   },
 
   intuition: {
     prose: [
-      '**Signed area from the start.** Take $\\mathbf{u}=(3,1)$ and $\\mathbf{v}=(1,2)$ in $\\mathbb{R}^2$. The unsigned area of their parallelogram is $|3\\cdot2 - 1\\cdot1| = 5$. But orientation matters: $\\mathbf{u} \\wedge \\mathbf{v}$ gives signed area $+5$ (counterclockwise from $\\mathbf{u}$ to $\\mathbf{v}$), while $\\mathbf{v} \\wedge \\mathbf{u} = -5$ (clockwise). Switching order flips sign — that is the defining property of the wedge product: $\\mathbf{v} \\wedge \\mathbf{u} = -(\\mathbf{u} \\wedge \\mathbf{v})$, and in particular $\\mathbf{u} \\wedge \\mathbf{u} = 0$ (degenerate: zero area). This alternating property is exactly why swapping rows of a determinant changes its sign.',
-      '**The wedge product.** The wedge product is **alternating**: $\\mathbf{v} \\wedge \\mathbf{u} = -(\\mathbf{u} \\wedge \\mathbf{v})$. In particular, $\\mathbf{v} \\wedge \\mathbf{v} = 0$ (zero area for degenerate parallelogram). The wedge product of $k$ vectors lives in $\\Lambda^k V$ (the $k$-th exterior power). For $n$-dimensional $V$: $\\dim \\Lambda^k V = \\binom{n}{k}$. The top space $\\Lambda^n V$ has dimension 1 (the determinant lives here).',
-      '**Determinant as volume.** For $n$ vectors $\\mathbf{v}_1, \\ldots, \\mathbf{v}_n$ in $\\mathbb{R}^n$: $\\mathbf{v}_1 \\wedge \\cdots \\wedge \\mathbf{v}_n = \\det[\\mathbf{v}_1 | \\cdots | \\mathbf{v}_n] \\cdot (\\mathbf{e}_1 \\wedge \\cdots \\wedge \\mathbf{e}_n)$. The signed volume of the parallelepiped is $\\det[\\mathbf{v}_1 | \\cdots | \\mathbf{v}_n]$. Sign = orientation (positive if the frame is right-handed, negative if left-handed).',
-      '**Differential forms.** A $k$-form on $\\mathbb{R}^n$ is a smooth assignment of an element of $\\Lambda^k(\\mathbb{R}^n)^*$ to each point. Example: the 1-form $dx$ satisfies $dx(\\partial/\\partial x) = 1$, $dx(\\partial/\\partial y) = 0$. A 2-form like $dx \\wedge dy$ measures oriented area in the $xy$-plane. Integration of $k$-forms over $k$-dimensional surfaces gives the integral theorems.',
+      'Where you are in the story: tensor products gave you a way to combine two vectors into an element of a higher-dimensional space, preserving all bilinear information. But most interesting geometric quantities — area, volume, orientation — are not just bilinear; they are **antisymmetric**. Swapping two vectors should negate the result because swapping two edges of a parallelogram reverses its orientation. Exterior algebra is the tensor product algebra with antisymmetry built in, and it turns out that the determinant, the cross product, and the integral theorems of calculus are all special cases.',
+      'The concrete starting point: take $\\mathbf{u} = (3,1)$ and $\\mathbf{v} = (1,2)$ in $\\mathbb{R}^2$. The unsigned area of the parallelogram they span is $|3 \\cdot 2 - 1 \\cdot 1| = 5$. But orientation matters. Walking along $\\mathbf{u}$ then $\\mathbf{v}$ goes counterclockwise — positive orientation. The **wedge product** $\\mathbf{u} \\wedge \\mathbf{v}$ encodes this as $+5$. Walking $\\mathbf{v}$ then $\\mathbf{u}$ goes clockwise: $\\mathbf{v} \\wedge \\mathbf{u} = -5$. The fundamental rule is $\\mathbf{v} \\wedge \\mathbf{u} = -(\\mathbf{u} \\wedge \\mathbf{v})$, which implies $\\mathbf{u} \\wedge \\mathbf{u} = 0$ (a parallelogram with two equal edges has zero area). This antisymmetry is the algebraic DNA of the exterior algebra.',
+      'The $k$-th exterior power $\\Lambda^k V$ is the space of all formal antisymmetric $k$-fold tensor products. It is spanned by $\\mathbf{e}_{i_1} \\wedge \\mathbf{e}_{i_2} \\wedge \\cdots \\wedge \\mathbf{e}_{i_k}$ for all ordered index tuples $i_1 < i_2 < \\cdots < i_k$ (antisymmetry makes the ordering canonical). Dimension: $\\dim \\Lambda^k V = \\binom{n}{k}$. For $V = \\mathbb{R}^3$: $\\dim \\Lambda^1 = 3$, $\\dim \\Lambda^2 = 3$, $\\dim \\Lambda^3 = 1$. The top exterior power $\\Lambda^n V$ always has dimension 1 — there is only one oriented $n$-volume up to scaling.',
+      'The determinant is the element of $\\Lambda^n V$ produced by wedging all $n$ columns of a matrix. Precisely: for $A = [\\mathbf{v}_1 | \\cdots | \\mathbf{v}_n]$, the wedge product $\\mathbf{v}_1 \\wedge \\cdots \\wedge \\mathbf{v}_n = \\det(A) \\cdot (\\mathbf{e}_1 \\wedge \\cdots \\wedge \\mathbf{e}_n)$. Since $\\Lambda^n \\mathbb{R}^n$ is 1-dimensional, everything is a scalar multiple of the "standard volume element" $\\mathbf{e}_1 \\wedge \\cdots \\wedge \\mathbf{e}_n$, and that scalar is the determinant. All three familiar determinant properties fall out of the wedge product rules: antisymmetry of $\\wedge$ gives the row-swap sign change; distributivity gives multilinearity; and $\\mathbf{e}_1 \\wedge \\cdots \\wedge \\mathbf{e}_n = \\det(I) \\cdot \\mathbf{e}_1 \\wedge \\cdots \\wedge \\mathbf{e}_n$ forces $\\det(I)=1$.',
+      '**Predict before reading on:** Let $\\mathbf{u} = (2,0)$ and $\\mathbf{v} = (0,3)$. Predict the signed area $\\mathbf{u} \\wedge \\mathbf{v}$. Is it positive or negative? What is $\\mathbf{v} \\wedge \\mathbf{u}$? And what is $\\mathbf{u} \\wedge (\\mathbf{u} + \\mathbf{v})$ — does adding $\\mathbf{u}$ to the second vector change the area?',
+      'Answers: $\\mathbf{u} \\wedge \\mathbf{v} = \\det\\begin{pmatrix}2&0\\\\0&3\\end{pmatrix} = +6$ (counterclockwise). $\\mathbf{v} \\wedge \\mathbf{u} = -6$ (clockwise). $\\mathbf{u} \\wedge (\\mathbf{u}+\\mathbf{v}) = \\mathbf{u} \\wedge \\mathbf{u} + \\mathbf{u} \\wedge \\mathbf{v} = 0 + 6 = 6$ — same area, because shifting $\\mathbf{v}$ by $\\mathbf{u}$ slides the parallelogram without changing its area (a shear). This is exactly why row operations of type "add multiple of one row to another" leave the determinant unchanged.',
+      'The $k$-dimensional volume of the parallelepiped spanned by $k$ vectors in $\\mathbb{R}^n$ (where $k < n$) is $\\|\\mathbf{v}_1 \\wedge \\cdots \\wedge \\mathbf{v}_k\\| = \\sqrt{\\det(V^\\top V)}$ where $V$ is the $n \\times k$ matrix with those vectors as columns. The matrix $G = V^\\top V$ is the **Gram matrix**, and $\\sqrt{\\det G}$ is the **Gram determinant**. This formula appears whenever you change variables in a multi-dimensional integral: the Jacobian determinant is the signed volume of the image of the unit cube under the transformation.',
+      'Differential forms are the dual side of exterior algebra. A $k$-form on $\\mathbb{R}^n$ is an element of $\\Lambda^k(\\mathbb{R}^n)^*$ — an antisymmetric $k$-linear functional on tangent vectors. The 1-form $dx$ measures how much a curve moves in the $x$-direction; the 2-form $dx \\wedge dy$ measures oriented area in the $xy$-plane. The exterior derivative $d$ maps $k$-forms to $(k+1)$-forms, and the fundamental theorem of calculus, Green\'s theorem, Stokes\' theorem, and the divergence theorem all become a single equation: $\\int_M d\\omega = \\int_{\\partial M} \\omega$.',
+      'Where this is heading: the next lesson extends the analysis from finite-dimensional vector spaces to infinite-dimensional **Hilbert spaces** and the operators on them. In finite dimensions, every symmetric matrix has real eigenvalues and an orthonormal eigenbasis. In infinite dimensions, this becomes the spectral theorem for compact self-adjoint operators — the mathematical foundation of quantum mechanics, Fourier analysis, and the study of differential equations.',
     ],
     callouts: [
       {
         type: 'sequencing',
-        title: 'Prediction: signed area and orientation',
-        body: 'Let $\\mathbf{u}=(2,0)$ and $\\mathbf{v}=(0,3)$. **Before computing:** predict the signed area $\\mathbf{u} \\wedge \\mathbf{v}$. Is it positive or negative? What about $\\mathbf{v} \\wedge \\mathbf{u}$? And what would $\\mathbf{u} \\wedge (\\mathbf{u}+\\mathbf{v})$ give? After predicting: $\\mathbf{u} \\wedge \\mathbf{v} = \\det\\begin{pmatrix}2&0\\\\0&3\\end{pmatrix} = +6$ (counterclockwise ✓). $\\mathbf{v} \\wedge \\mathbf{u} = -6$ (clockwise ✓). $\\mathbf{u} \\wedge (\\mathbf{u}+\\mathbf{v}) = \\mathbf{u}\\wedge\\mathbf{u}+\\mathbf{u}\\wedge\\mathbf{v} = 0+6 = 6$ — same area, adding $\\mathbf{u}$ to $\\mathbf{v}$ doesn\'t change the span.',
+        title: 'Lesson 3 of 5 — Advanced Theory',
+        body: '**Previous (Lesson 2):** Tensor Products — bilinear maps, universal property, Kronecker product, vectorization identity.\n**This lesson:** Exterior Algebra — antisymmetric tensors, wedge product, determinants as volume, differential forms.\n**Next (Lesson 4):** Operator Theory — bounded operators, spectrum, spectral theorem for compact self-adjoint operators.',
       },
       {
         type: 'theorem',
@@ -39,6 +43,97 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Exterior Algebra in Python',
+        mathBridge: 'Compute signed areas and volumes as determinants, verify the Gram determinant formula, and see how shear operations preserve area.',
+        caption: 'Determinant = signed volume of parallelepiped; antisymmetry explains every determinant rule.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+
+              cellTitle: 'Signed area, orientation, and antisymmetry',
+              prose: 'Verify the three wedge product rules computationally: antisymmetry (swap = negate), nilpotency (v∧v = 0), and that shears preserve area.',
+              code: `import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+from matplotlib.patches import Polygon
+
+# In 2D, u∧v = det([u|v]) = u[0]*v[1] - u[1]*v[0]
+def wedge_2d(u, v):
+    return u[0]*v[1] - u[1]*v[0]
+
+u = np.array([3., 1.])
+v = np.array([1., 2.])
+
+print(f"u = {u}, v = {v}")
+print(f"u ∧ v = {wedge_2d(u, v):.3f}  (signed area, counterclockwise)")
+print(f"v ∧ u = {wedge_2d(v, u):.3f}  (same area, flipped sign)")
+print(f"u ∧ u = {wedge_2d(u, u):.3f}  (zero: degenerate)")
+
+# Shear preserves area: u ∧ (v + c*u) = u ∧ v
+c = 3.7
+print(f"\\nShear test: u ∧ (v + {c}*u) = {wedge_2d(u, v + c*u):.3f}")
+print(f"u ∧ v = {wedge_2d(u, v):.3f}  (shear preserves area ✓)")
+
+# Visualize parallelograms
+fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+for ax, (A, B, title) in zip(axes, [
+    (u, v, f"u ∧ v = +{wedge_2d(u,v):.1f}"),
+    (v, u, f"v ∧ u = {wedge_2d(v,u):.1f}")]):
+    O = np.array([0.,0.])
+    pts = np.array([O, A, A+B, B, O])
+    ax.fill(pts[:,0], pts[:,1], alpha=0.3,
+            color='green' if wedge_2d(A,B)>0 else 'red')
+    ax.annotate('', xy=A, xytext=O, arrowprops=dict(arrowstyle='->', lw=2, color='blue'))
+    ax.annotate('', xy=B, xytext=O, arrowprops=dict(arrowstyle='->', lw=2, color='orange'))
+    ax.set_aspect('equal'); ax.grid(True)
+    ax.set_title(title + ' (green=+, red=-)')
+plt.tight_layout(); plt.show()
+`,
+            },
+            {
+              id: 2,
+
+              cellTitle: 'Gram determinant: k-dimensional volume',
+              prose: 'Compute the volume of a k-dimensional parallelepiped in R^n using the Gram determinant formula sqrt(det(V^T V)).',
+              code: `import numpy as np
+
+# Three vectors in R^4 — compute the 3D volume of the parallelepiped they span
+V = np.array([[1, 0, 1, 0],
+              [0, 2, 0, 1],
+              [1, 1, 2, 0]], dtype=float).T  # 4x3 matrix: columns are vectors
+
+# Gram determinant: Vol = sqrt(det(V^T V))
+G = V.T @ V
+print("Gram matrix G = V^T V:")
+print(G.round(4))
+vol_gram = np.sqrt(np.linalg.det(G))
+print(f"\\n3D volume via Gram determinant: sqrt(det G) = {vol_gram:.4f}")
+
+# For n=k (square matrix), should equal |det A|
+A = np.array([[2, 1, 0],
+              [0, 3, 1],
+              [1, 0, 4]], dtype=float)
+vol_direct = abs(np.linalg.det(A))
+G_sq = A.T @ A
+vol_gram_sq = np.sqrt(np.linalg.det(G_sq))
+print(f"\\nFor square 3x3 matrix:")
+print(f"|det A| = {vol_direct:.4f}")
+print(f"sqrt(det(A^T A)) = {vol_gram_sq:.4f}")
+print(f"Equal? {np.isclose(vol_direct, vol_gram_sq)}")
+
+# Geometric meaning: volume scales under linear maps
+# det(A): signed volume of image of unit cube
+scale = 2.0
+print(f"\\nIf we scale A by {scale}: new volume = {scale**3 * vol_direct:.4f}")
+print(f"det({scale}*A) = {np.linalg.det(scale * A):.4f}  = {scale}^3 * det(A)")
+`,
+            },
+          ],
+        },
+      },
       {
         id: 'OpenMatNotebook',
         title: 'Wedge Products and Determinants',

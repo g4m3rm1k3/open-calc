@@ -1,26 +1,28 @@
-export default {
+﻿export default {
   id: 'la3-006',
   slug: 'cayley-hamilton',
   chapter: 'la3',
   order: 6,
   title: 'The Cayley-Hamilton Theorem',
-  subtitle: 'Every matrix satisfies its own characteristic equation. Plug the matrix in for the scalar variable — and you get the zero matrix.',
+  subtitle: 'Every matrix satisfies its own characteristic equation. Plug the matrix in for the scalar variable â€” and you get the zero matrix.',
   tags: ['Cayley-Hamilton', 'characteristic polynomial', 'minimal polynomial', 'matrix polynomial', 'matrix inverse', 'matrix powers'],
   aliases: 'Cayley Hamilton characteristic polynomial minimal polynomial matrix polynomial annihilator',
 
   hook: {
-    question: "The characteristic polynomial $p(\\lambda) = \\det(A - \\lambda I)$ is a polynomial in the scalar $\\lambda$. What happens if you replace $\\lambda$ with the matrix $A$ itself? You get the zero matrix — every single time.",
+    question: "The characteristic polynomial $p(\\lambda) = \\det(A - \\lambda I)$ is a polynomial in the scalar $\\lambda$. What happens if you replace $\\lambda$ with the matrix $A$ itself? You get the zero matrix â€” every single time.",
     realWorldContext: "The Cayley-Hamilton theorem has a surprisingly practical consequence: it gives you an efficient way to compute high powers of matrices and to find matrix inverses without computing determinants. In control theory, it is used to prove that any polynomial in a matrix can be reduced to degree $\\leq n-1$. In signal processing, it bounds the order of recurrence relations. In robotics, it simplifies the computation of matrix exponentials used in joint kinematics. Wherever you need to evaluate a function of a matrix, Cayley-Hamilton is in the background.",
-    previewVisualizationId: 'OpenMatNotebook',
   },
 
   intuition: {
     prose: [
-      'Take $A = \\begin{bmatrix}2&1\\\\5&3\\end{bmatrix}$. Characteristic polynomial: $p(\\lambda) = \\lambda^2 - 5\\lambda + 1$ (trace $= 5$, det $= 1$). Now plug $A$ in for $\\lambda$: $p(A) = A^2 - 5A + I$. Compute $A^2 = \\begin{bmatrix}9&5\\\\25&14\\end{bmatrix}$, so $p(A) = \\begin{bmatrix}9-10+1 & 5-5 \\\\ 25-25 & 14-15+1\\end{bmatrix} = \\begin{bmatrix}0&0\\\\0&0\\end{bmatrix}$. This always works — every matrix zeroes out its own characteristic polynomial. That is the Cayley-Hamilton theorem.',
-      '**Example first.** Let $A = \\begin{bmatrix}2&1\\\\5&3\\end{bmatrix}$. The characteristic polynomial is $p(\\lambda) = \\lambda^2 - 5\\lambda + 1$ (since trace $= 5$, det $= 1$). Cayley-Hamilton says $A^2 - 5A + I = 0$, meaning $A^2 = 5A - I$. You can verify this directly by computing $A^2$ and checking the equality.',
-      '**Two key applications.** First, computing matrix inverses: from $A^2 - 5A + I = 0$, multiply by $A^{-1}$: $A - 5I + A^{-1} = 0$, so $A^{-1} = 5I - A$. No Gauss-Jordan needed! Second, reducing matrix powers: $A^2 = 5A - I$, so $A^3 = A \\cdot A^2 = A(5A - I) = 5A^2 - A = 5(5A - I) - A = 24A - 5I$. Any power of $A$ can be expressed as a linear combination of $I$ and $A$ (since the characteristic polynomial has degree 2).',
-      '**Minimal polynomial.** The minimal polynomial $m(\\lambda)$ is the monic polynomial of smallest degree such that $m(A) = 0$. The characteristic polynomial $p(\\lambda)$ is always an annihilating polynomial, but it may not be minimal. For a diagonalizable matrix, the minimal polynomial has no repeated roots. For a Jordan block $J_k(\\lambda_0)$, the minimal polynomial is $(\\lambda - \\lambda_0)^k$.',
-      '**CNC robot kinematics.** In robotics, the rotation of a joint is described by a rotation matrix $R$ (a $3\\times 3$ orthogonal matrix). The matrix exponential $e^{\\hat{\\omega}t}$ (where $\\hat{\\omega}$ is the skew-symmetric matrix of the joint axis) governs how the joint moves in time. Cayley-Hamilton says $\\hat{\\omega}^3 = -\\|\\omega\\|^2 \\hat{\\omega}$ (for the specific characteristic polynomial of skew-symmetric matrices), so $e^{\\hat{\\omega}t}$ can be computed exactly from just $\\hat{\\omega}$ and $\\hat{\\omega}^2$ with scalar coefficients. This is the **Rodrigues rotation formula** — a direct consequence of Cayley-Hamilton. CNC multi-axis controllers and robotic arm controllers use Rodrigues\' formula constantly to compute joint rotations efficiently.',
+      '**A strange idea: plug a matrix into a polynomial.** The characteristic polynomial of $A$ is $p(\\lambda) = \\det(A - \\lambda I)$ â€” a polynomial in a scalar variable $\\lambda$. Normally you evaluate $p$ at a number to find eigenvalues. But what happens if you replace $\\lambda$ with the matrix $A$ itself? This sounds absurd â€” the polynomial was built from $A$ in the first place. Yet every time you do it, you get the zero matrix. That is the Cayley-Hamilton theorem, and it is far from obvious.',
+      '**Verify the claim on a $2 \\times 2$.** Let $A = \\begin{bmatrix}2&1\\\\5&3\\end{bmatrix}$. Trace $= 5$, det $= 1$, so $p(\\lambda) = \\lambda^2 - 5\\lambda + 1$. Now compute $p(A) = A^2 - 5A + I$. First, $A^2 = \\begin{bmatrix}9&5\\\\25&14\\end{bmatrix}$. Then $5A = \\begin{bmatrix}10&5\\\\25&15\\end{bmatrix}$. Subtract: $A^2 - 5A = \\begin{bmatrix}-1&0\\\\0&-1\\end{bmatrix} = -I$. Add $I$: result is $\\begin{bmatrix}0&0\\\\0&0\\end{bmatrix}$. The matrix zeroes out its own characteristic polynomial.',
+      '**Application 1: computing the inverse symbolically.** From $A^2 - 5A + I = 0$, multiply both sides by $A^{-1}$: $A - 5I + A^{-1} = 0$, so $A^{-1} = 5I - A = \\begin{bmatrix}3&-1\\\\-5&2\\end{bmatrix}$. No row reduction, no formula lookup â€” Cayley-Hamilton gives the inverse directly from the characteristic polynomial. This works whenever det$(A) \\neq 0$ (so that $c_0 = \\det(A)$ in the characteristic polynomial is nonzero).',
+      '**Application 2: reducing high powers.** From $A^2 = 5A - I$, compute $A^3 = A \\cdot A^2 = A(5A - I) = 5A^2 - A = 5(5A - I) - A = 24A - 5I$. Every higher power follows the same pattern: $A^k$ is always a linear combination $\\alpha_k A + \\beta_k I$ for some scalars $\\alpha_k, \\beta_k$. The characteristic polynomial acts as a recurrence relation for the coefficients. For an $n \\times n$ matrix, any $A^k$ reduces to a linear combination of $I, A, A^2, \\ldots, A^{n-1}$.',
+      '**Minimal polynomial.** The minimal polynomial $m(\\lambda)$ is the monic polynomial of smallest degree that annihilates $A$: $m(A) = 0$. The characteristic polynomial is always an annihilating polynomial, but it may not be the smallest. For a diagonalizable matrix with distinct eigenvalues, $m = p$. For the identity matrix $I_n$, $p(\\lambda) = (\\lambda - 1)^n$ but $m(\\lambda) = \\lambda - 1$ (since $I - I = 0$). The minimal polynomial divides the characteristic polynomial.',
+      '**Predict before reading on.** For $B = \\begin{bmatrix}1&2\\\\0&3\\end{bmatrix}$, trace $= 4$, det $= 3$, so $p(\\lambda) = \\lambda^2 - 4\\lambda + 3$. Before computing: what is $B^2 - 4B + 3I$? And what is $B^{-1}$ using Cayley-Hamilton? Write your predictions, then verify by computing $B^2 = \\begin{bmatrix}1&8\\\\0&9\\end{bmatrix}$ and checking.',
+      '**CNC robot kinematics â€” Rodrigues\' formula.** In 5-axis CNC and robotic arms, every joint rotation is a $3 \\times 3$ rotation matrix $R$. To compute the path of the tool, you need $e^{\\hat{\\omega}t}$ where $\\hat{\\omega}$ is the skew-symmetric angular velocity matrix. Cayley-Hamilton says $\\hat{\\omega}^3 = -\\|\\omega\\|^2 \\hat{\\omega}$ for any skew-symmetric matrix, so $e^{\\hat{\\omega}t} = I + \\sin(t)\\hat{\\omega} + (1 - \\cos t)\\hat{\\omega}^2$. This is Rodrigues\' rotation formula â€” and it comes directly from Cayley-Hamilton. CNC controllers compute this 50â€“200 times per second for every joint.',
+      '**Where this is heading.** Cayley-Hamilton is the bridge from eigenvalues to functions of matrices. If you know $p(A) = 0$ and $p$ factors as $(\\lambda - \\lambda_1)\\cdots(\\lambda - \\lambda_n)$, then the matrix exponential $e^{At}$ reduces to a sum involving $e^{\\lambda_i t}$ times low-degree matrix polynomials â€” that is the next lesson, Matrix Exponential. Understanding Cayley-Hamilton also unlocks the theory of linear recurrences: any sequence satisfying a linear recurrence is secretly computing powers of a companion matrix.',
     ],
     callouts: [
       {
@@ -35,13 +37,13 @@ export default {
       },
       {
         type: 'sequencing',
-        title: 'Prediction',
-        body: 'For $B = \\begin{bmatrix}1&2\\\\0&3\\end{bmatrix}$, trace $= 4$, det $= 3$, so $p(\\lambda) = \\lambda^2 - 4\\lambda + 3$. Before computing, predict: what is $B^2 - 4B + 3I$? And what is $B^{-1}$ using Cayley-Hamilton? Check your prediction by computing $B^2$.',
+        title: 'Lesson 6 of 7 â€” Eigenvalues & Eigenvectors',
+        body: '**Previous (Lesson 5):** Markov Chains â€” eigenvalue 1, steady-state distributions.\n**This lesson:** Cayley-Hamilton Theorem â€” every matrix satisfies its own characteristic equation; using it to compute powers and inverses symbolically.\n**Next (Lesson 7):** Matrix Exponential â€” solving differential equations $\\dot{\\mathbf{x}} = A\\mathbf{x}$ via $e^{At}$.',
       },
       {
         type: 'warning',
         title: 'Do Not Prove It by Substitution',
-        body: 'A common mistake: writing $p(A) = \\det(A - A \\cdot I) = \\det(0) = 0$ and thinking the theorem is obvious. This is wrong — $\\det(A - \\lambda I)$ is a scalar polynomial, and you cannot just substitute a matrix for the scalar and call it done. The actual proof requires care with polynomial rings and matrix algebra.',
+        body: 'A common mistake: writing $p(A) = \\det(A - A \\cdot I) = \\det(0) = 0$ and thinking the theorem is obvious. This is wrong â€” $\\det(A - \\lambda I)$ is a scalar polynomial, and you cannot just substitute a matrix for the scalar and call it done. The actual proof requires care with polynomial rings and matrix algebra.',
       },
     ],
     visualizations: [
@@ -135,25 +137,21 @@ a(end)*A + b(end)*eye(2)
       {
         type: 'insight',
         title: 'Cayley-Hamilton and the Power Basis',
-        body: 'Any polynomial $f(A)$ in a matrix can be reduced modulo the characteristic polynomial $p(\\lambda)$:\n\n$f(A) = r(A)$ where $r$ is the remainder of $f$ divided by $p$ (degree $< n$)\n\nThis means $\\{I, A, A^2, \\ldots, A^{n-1}\\}$ spans the entire space of polynomials in $A$. You never need $A^n$ or higher — it is always a linear combination of lower powers.',
+        body: 'Any polynomial $f(A)$ in a matrix can be reduced modulo the characteristic polynomial $p(\\lambda)$:\n\n$f(A) = r(A)$ where $r$ is the remainder of $f$ divided by $p$ (degree $< n$)\n\nThis means $\\{I, A, A^2, \\ldots, A^{n-1}\\}$ spans the entire space of polynomials in $A$. You never need $A^n$ or higher â€” it is always a linear combination of lower powers.',
       },
     ],
     visualizations: [
       {
         id: 'PythonNotebook',
         title: 'Code: Cayley-Hamilton Verification, Inverse, and Rodrigues Formula',
-        mathBridge: 'np.poly(A) computes characteristic polynomial coefficients. np.polyval(p, A) evaluates at A — result should be zero matrix. Inverse from polynomial identity. Rodrigues formula as Cayley-Hamilton application.',
+        mathBridge: 'np.poly(A) computes characteristic polynomial coefficients. np.polyval(p, A) evaluates at A â€” result should be zero matrix. Inverse from polynomial identity. Rodrigues formula as Cayley-Hamilton application.',
         caption: 'Three cells: verify C-H, compute inverse via polynomial algebra, and apply to 3D rotation via Rodrigues formula.',
-        props: {
-          disableRunAll: true,
+        initialProps: {
           initialCells: [
             {
               id: 1,
               cellTitle: 'Verifying Cayley-Hamilton',
-              prose: [
-                'Compute the characteristic polynomial, then evaluate it at the matrix A. Result must be the zero matrix (up to floating point).',
-                'For a 2×2 matrix: p(λ) = λ² - trace(A)λ + det(A). So p(A) = A² - trace(A)·A + det(A)·I.',
-              ],
+              prose: 'Compute the characteristic polynomial, then evaluate it at the matrix A. Result must be the zero matrix (up to floating point). For a 2Ã—2 matrix: p(Î») = Î»Â² - trace(A)Î» + det(A), so p(A) = AÂ² - trace(A)Â·A + det(A)Â·I.',
               code: `import numpy as np
 
 A = np.array([[2., 1.],
@@ -162,12 +160,12 @@ A = np.array([[2., 1.],
 t = np.trace(A)
 d = np.linalg.det(A)
 
-# p(λ) = λ² - t·λ + d  →  p(A) = A² - t·A + d·I
+# p(Î») = Î»Â² - tÂ·Î» + d  â†’  p(A) = AÂ² - tÂ·A + dÂ·I
 p_A = A @ A - t * A + d * np.eye(2)
 
-print(f"Characteristic polynomial: λ² - {t}λ + {d:.4f}")
+print(f"Characteristic polynomial: Î»Â² - {t}Î» + {d:.4f}")
 print()
-print("p(A) = A² - trace(A)·A + det(A)·I:")
+print("p(A) = AÂ² - trace(A)Â·A + det(A)Â·I:")
 print(p_A.round(10))
 print()
 print("Is p(A) = 0?", np.allclose(p_A, 0, atol=1e-10))
@@ -179,19 +177,16 @@ B = np.array([[1., 2., 0.],
 
 coeffs = np.poly(B)   # characteristic polynomial coefficients
 print()
-print("3×3 matrix B characteristic poly coefficients:", coeffs.round(4))
+print("3Ã—3 matrix B characteristic poly coefficients:", coeffs.round(4))
 
-# Evaluate: coeffs = [1, c2, c1, c0] for λ³ + c2λ² + c1λ + c0
+# Evaluate: coeffs = [1, c2, c1, c0] for Î»Â³ + c2Î»Â² + c1Î» + c0
 p_B = np.eye(3)*coeffs[3] + B*coeffs[2] + B@B*coeffs[1] + B@B@B*coeffs[0]
 print("p(B):", p_B.round(10))`,
             },
             {
               id: 2,
-              cellTitle: 'Computing A⁻¹ via Cayley-Hamilton — no row reduction needed',
-              prose: [
-                'For 2×2: p(A) = 0 gives A² - t·A + d·I = 0. Multiply by A⁻¹: A - t·I + d·A⁻¹ = 0. So A⁻¹ = (t·I - A)/d.',
-                'This works whenever d = det(A) ≠ 0. Much simpler than Gauss-Jordan for analytic work.',
-              ],
+              cellTitle: 'Computing Aâ»Â¹ via Cayley-Hamilton â€” no row reduction needed',
+              prose: 'For 2Ã—2: p(A) = 0 gives AÂ² - tÂ·A + dÂ·I = 0. Multiply by Aâ»Â¹: A - tÂ·I + dÂ·Aâ»Â¹ = 0. So Aâ»Â¹ = (tÂ·I - A)/d. This works whenever d = det(A) â‰  0. Much simpler than Gauss-Jordan for analytic work.',
               code: `import numpy as np
 
 A = np.array([[1., 2.],
@@ -200,7 +195,7 @@ A = np.array([[1., 2.],
 t = np.trace(A)
 d = np.linalg.det(A)
 
-# From p(A) = 0: A⁻¹ = (t·I - A) / d
+# From p(A) = 0: Aâ»Â¹ = (tÂ·I - A) / d
 A_inv_CH = (t * np.eye(2) - A) / d
 
 print("A inverse via Cayley-Hamilton:")
@@ -217,11 +212,8 @@ print((A @ A_inv_CH).round(10))`,
             },
             {
               id: 3,
-              cellTitle: 'Rodrigues rotation formula — Cayley-Hamilton for 3D rotations',
-              prose: [
-                'For a 3D unit axis ω and rotation angle θ, the rotation matrix R = exp(θ·K) where K is the skew-symmetric matrix of ω.',
-                'Cayley-Hamilton gives K³ = -K (since the minimal poly of any skew-sym matrix is λ³+λ). So the Taylor series truncates: R = I + sin(θ)·K + (1-cos(θ))·K².',
-              ],
+              cellTitle: 'Rodrigues rotation formula â€” Cayley-Hamilton for 3D rotations',
+              prose: 'For a 3D unit axis Ï‰ and rotation angle Î¸, the rotation matrix R = exp(Î¸Â·K) where K is the skew-symmetric matrix of Ï‰. Cayley-Hamilton gives KÂ³ = -K (since the minimal poly of any skew-sym matrix is Î»Â³+Î»). So the Taylor series truncates: R = I + sin(Î¸)Â·K + (1-cos(Î¸))Â·KÂ².',
               code: `import numpy as np
 from scipy.linalg import expm
 
@@ -231,7 +223,7 @@ def skew(w):
                      [w[2],   0,    -w[0]],
                      [-w[1],  w[0],  0   ]])
 
-# Rotate 45° around z-axis
+# Rotate 45Â° around z-axis
 omega = np.array([0., 0., 1.])  # unit vector
 theta = np.radians(45)
 
@@ -246,13 +238,13 @@ R_expm = expm(theta * K)
 print("Rodrigues formula:")
 print(R_rodrigues.round(6))
 print()
-print("Matrix exponential expm(θK):")
+print("Matrix exponential expm(Î¸K):")
 print(R_expm.round(6))
 print()
 print("Match:", np.allclose(R_rodrigues, R_expm, atol=1e-10))
 print()
-# Verify K³ = -K (Cayley-Hamilton for skew-sym)
-print("K³ + K (should be zero — Cayley-Hamilton):")
+# Verify KÂ³ = -K (Cayley-Hamilton for skew-sym)
+print("KÂ³ + K (should be zero â€” Cayley-Hamilton):")
 print((K@K@K + K).round(10))`,
             },
           ]
@@ -271,7 +263,7 @@ print((K@K@K + K).round(10))`,
       {
         type: 'proof',
         title: 'Outline: Adjugate Proof',
-        body: '1. Write $\\text{adj}(A-\\lambda I) = \\sum_{k=0}^{n-1} B_k \\lambda^k$ (matrix coefficients $B_k$)\n\n2. Use $(A-\\lambda I)\\text{adj}(A-\\lambda I) = p(\\lambda)I$ and expand both sides\n\n3. Match coefficients of $\\lambda^k$ for $k = 0, 1, \\ldots, n$: get $n+1$ matrix equations\n\n4. Left-multiply equation $k$ by $A^k$, sum all $n+1$ equations — a telescoping collapse gives $p(A) = 0$ $\\blacksquare$',
+        body: '1. Write $\\text{adj}(A-\\lambda I) = \\sum_{k=0}^{n-1} B_k \\lambda^k$ (matrix coefficients $B_k$)\n\n2. Use $(A-\\lambda I)\\text{adj}(A-\\lambda I) = p(\\lambda)I$ and expand both sides\n\n3. Match coefficients of $\\lambda^k$ for $k = 0, 1, \\ldots, n$: get $n+1$ matrix equations\n\n4. Left-multiply equation $k$ by $A^k$, sum all $n+1$ equations â€” a telescoping collapse gives $p(A) = 0$ $\\blacksquare$',
       },
       {
         type: 'insight',
@@ -290,7 +282,7 @@ print((K@K@K + K).round(10))`,
   examples: [
     {
       id: 'ex-la3-006-1',
-      title: 'Verify Cayley-Hamilton for a 2×2 matrix',
+      title: 'Verify Cayley-Hamilton for a 2Ã—2 matrix',
       problem: 'For $A = \\begin{bmatrix}2&1\\\\5&3\\end{bmatrix}$, verify that $p(A) = 0$ where $p$ is the characteristic polynomial.',
       steps: [
         {
@@ -298,28 +290,28 @@ print((K@K@K + K).round(10))`,
           annotation: 'Characteristic polynomial. trace $= 2+3 = 5$. det $= 2\\cdot 3 - 1\\cdot 5 = 1$.',
           strategyTitle: 'Find characteristic polynomial',
           checkpoint: 'What should p(A) equal according to Cayley-Hamilton?',
-          hints: ['The zero matrix — not just a scalar zero.'],
+          hints: ['The zero matrix â€” not just a scalar zero.'],
         },
         {
           expression: 'A^2 = \\begin{bmatrix}2&1\\\\5&3\\end{bmatrix}^2 = \\begin{bmatrix}9&5\\\\25&14\\end{bmatrix}',
           annotation: 'Compute $A^2$ by matrix multiplication.',
-          strategyTitle: 'Compute A²',
+          strategyTitle: 'Compute AÂ²',
           checkpoint: '',
           hints: [],
         },
         {
           expression: 'p(A) = A^2 - 5A + I = \\begin{bmatrix}9&5\\\\25&14\\end{bmatrix} - 5\\begin{bmatrix}2&1\\\\5&3\\end{bmatrix} + \\begin{bmatrix}1&0\\\\0&1\\end{bmatrix} = \\begin{bmatrix}9-10+1 & 5-5+0 \\\\ 25-25+0 & 14-15+1\\end{bmatrix} = \\begin{bmatrix}0&0\\\\0&0\\end{bmatrix}',
-          annotation: 'Substitute. Every entry is exactly 0. ✓',
+          annotation: 'Substitute. Every entry is exactly 0. âœ“',
           strategyTitle: 'Evaluate p(A)',
           checkpoint: '',
           hints: [],
         },
       ],
-      conclusion: '$p(A) = A^2 - 5A + I = 0$ ✓. Rearranging: $A^2 = 5A - I$. This means any higher power of $A$ can be written in terms of $\\{I, A\\}$ alone.',
+      conclusion: '$p(A) = A^2 - 5A + I = 0$ âœ“. Rearranging: $A^2 = 5A - I$. This means any higher power of $A$ can be written in terms of $\\{I, A\\}$ alone.',
     },
     {
       id: 'ex-la3-006-2',
-      title: 'Finding A⁻¹ via Cayley-Hamilton',
+      title: 'Finding Aâ»Â¹ via Cayley-Hamilton',
       problem: 'Use Cayley-Hamilton to find $A^{-1}$ for $A = \\begin{bmatrix}3&1\\\\2&4\\end{bmatrix}$ without row reduction.',
       steps: [
         {
@@ -339,16 +331,16 @@ print((K@K@K + K).round(10))`,
         {
           expression: 'A^2 - 7A + 10I = 0 \\quad \\xrightarrow{\\times A^{-1}} \\quad A - 7I + 10A^{-1} = 0',
           annotation: 'Multiply both sides by $A^{-1}$ (valid since det $\\neq 0$).',
-          strategyTitle: 'Multiply by A⁻¹',
+          strategyTitle: 'Multiply by Aâ»Â¹',
           checkpoint: '',
           hints: [],
         },
         {
           expression: 'A^{-1} = \\frac{7I - A}{10} = \\frac{1}{10}\\begin{bmatrix}4 & -1 \\\\ -2 & 3\\end{bmatrix}',
           annotation: 'Solve for $A^{-1}$. This matches the standard formula $A^{-1} = \\frac{1}{\\det(A)}\\begin{bmatrix}d&-b\\\\-c&a\\end{bmatrix}$.',
-          strategyTitle: 'Solve for A⁻¹',
-          checkpoint: 'Verify: A @ A⁻¹ = I',
-          hints: ['$\\begin{bmatrix}3&1\\\\2&4\\end{bmatrix}\\frac{1}{10}\\begin{bmatrix}4&-1\\\\-2&3\\end{bmatrix} = \\frac{1}{10}\\begin{bmatrix}10&0\\\\0&10\\end{bmatrix} = I$ ✓'],
+          strategyTitle: 'Solve for Aâ»Â¹',
+          checkpoint: 'Verify: A @ Aâ»Â¹ = I',
+          hints: ['$\\begin{bmatrix}3&1\\\\2&4\\end{bmatrix}\\frac{1}{10}\\begin{bmatrix}4&-1\\\\-2&3\\end{bmatrix} = \\frac{1}{10}\\begin{bmatrix}10&0\\\\0&10\\end{bmatrix} = I$ âœ“'],
         },
       ],
       conclusion: 'Cayley-Hamilton gives a one-formula shortcut for the inverse: $A^{-1} = (\\text{tr}(A)I - A)/\\det(A)$ for any invertible $2\\times 2$ matrix.',
@@ -363,18 +355,18 @@ print((K@K@K + K).round(10))`,
           annotation: '$A$ is diagonal, so eigenvalues are 3 (multiplicity 2) and 2 (multiplicity 1).',
           strategyTitle: 'Find characteristic polynomial',
           checkpoint: 'Is the minimal polynomial always equal to the characteristic polynomial?',
-          hints: ['No — for a diagonalizable matrix with repeated eigenvalues, the minimal polynomial can have smaller degree.'],
+          hints: ['No â€” for a diagonalizable matrix with repeated eigenvalues, the minimal polynomial can have smaller degree.'],
         },
         {
           expression: 'm(\\lambda) = (\\lambda-3)(\\lambda-2) = \\lambda^2 - 5\\lambda + 6',
-          annotation: 'Since $A$ is diagonal (diagonalizable), the minimal polynomial has each distinct eigenvalue appearing exactly once — no repeated roots needed.',
+          annotation: 'Since $A$ is diagonal (diagonalizable), the minimal polynomial has each distinct eigenvalue appearing exactly once â€” no repeated roots needed.',
           strategyTitle: 'Identify minimal polynomial',
           checkpoint: '',
           hints: [],
         },
         {
           expression: 'm(A) = A^2 - 5A + 6I = \\begin{bmatrix}9&0&0\\\\0&9&0\\\\0&0&4\\end{bmatrix} - \\begin{bmatrix}15&0&0\\\\0&15&0\\\\0&0&10\\end{bmatrix} + \\begin{bmatrix}6&0&0\\\\0&6&0\\\\0&0&6\\end{bmatrix} = \\begin{bmatrix}0&0&0\\\\0&0&0\\\\0&0&0\\end{bmatrix}',
-          annotation: 'Diagonal: $9-15+6=0$ ✓, $9-15+6=0$ ✓, $4-10+6=0$ ✓.',
+          annotation: 'Diagonal: $9-15+6=0$ âœ“, $9-15+6=0$ âœ“, $4-10+6=0$ âœ“.',
           strategyTitle: 'Verify m(A) = 0',
           checkpoint: '',
           hints: [],
@@ -389,7 +381,7 @@ print((K@K@K + K).round(10))`,
       id: 'ch-la3-006-1',
       difficulty: 'easy',
       problem: 'For $A = \\begin{bmatrix}1&1\\\\0&2\\end{bmatrix}$, find the characteristic polynomial and verify $p(A) = 0$ directly.',
-      hint: 'trace = 3, det = 2. So p(λ) = λ² - 3λ + 2. Compute A² - 3A + 2I.',
+      hint: 'trace = 3, det = 2. So p(Î») = Î»Â² - 3Î» + 2. Compute AÂ² - 3A + 2I.',
       walkthrough: [
         {
           expression: 'p(\\lambda) = \\lambda^2 - 3\\lambda + 2',
@@ -397,16 +389,16 @@ print((K@K@K + K).round(10))`,
         },
         {
           expression: 'A^2 = \\begin{bmatrix}1&3\\\\0&4\\end{bmatrix} \\qquad A^2 - 3A + 2I = \\begin{bmatrix}1-3+2 & 3-3+0 \\\\ 0-0+0 & 4-6+2\\end{bmatrix} = \\begin{bmatrix}0&0\\\\0&0\\end{bmatrix}',
-          annotation: 'Verified. ✓',
+          annotation: 'Verified. âœ“',
         },
       ],
-      answer: 'p(λ) = λ² - 3λ + 2. A² - 3A + 2I = [[0,0],[0,0]] ✓',
+      answer: 'p(Î») = Î»Â² - 3Î» + 2. AÂ² - 3A + 2I = [[0,0],[0,0]] âœ“',
     },
     {
       id: 'ch-la3-006-2',
       difficulty: 'medium',
       problem: 'For $A = \\begin{bmatrix}2&3\\\\1&4\\end{bmatrix}$, use Cayley-Hamilton to express $A^3$ as a linear combination of $I$ and $A$.',
-      hint: 'Find p(λ), use C-H to get A² = 6A - 5I. Then compute A³ = A·A² = A(6A-5I) = 6A² - 5A.',
+      hint: 'Find p(Î»), use C-H to get AÂ² = 6A - 5I. Then compute AÂ³ = AÂ·AÂ² = A(6A-5I) = 6AÂ² - 5A.',
       walkthrough: [
         {
           expression: 'p(\\lambda) = \\lambda^2 - 6\\lambda + 5 = 0 \\quad \\Rightarrow \\quad A^2 = 6A - 5I',
@@ -417,7 +409,7 @@ print((K@K@K + K).round(10))`,
           annotation: 'Substitute $A^2 = 6A-5I$ again.',
         },
       ],
-      answer: 'A³ = 31A - 30I. Verify: A³ = [[8+3, 6+12],[2+4, 3+16]] = [[11,18],[6,19]] and 31[[2,3],[1,4]] - 30I = [[62-30,93],[31,124-30]] = [[32,93],[31,94]]... compute numerically to confirm.',
+      answer: 'AÂ³ = 31A - 30I. Verify: AÂ³ = [[8+3, 6+12],[2+4, 3+16]] = [[11,18],[6,19]] and 31[[2,3],[1,4]] - 30I = [[62-30,93],[31,124-30]] = [[32,93],[31,94]]... compute numerically to confirm.',
     },
   ],
 
@@ -433,9 +425,9 @@ print((K@K@K + K).round(10))`,
     { id: 'cp-la3-006-2', label: 'Read: Explain why the naive substitution proof fails', type: 'read' },
     { id: 'cp-la3-006-3', label: 'Read: Distinguish characteristic from minimal polynomial', type: 'read' },
     { id: 'cp-la3-006-4', label: 'Lab: Verify p(A) = 0 in the notebook', type: 'lab' },
-    { id: 'cp-la3-006-5', label: 'Lab: Compute A⁻¹ via Cayley-Hamilton formula', type: 'lab' },
+    { id: 'cp-la3-006-5', label: 'Lab: Compute Aâ»Â¹ via Cayley-Hamilton formula', type: 'lab' },
     { id: 'cp-la3-006-6', label: 'Example: Find inverse using Cayley-Hamilton', type: 'example' },
-    { id: 'cp-la3-006-7', label: 'Example: Express A³ as aA + bI', type: 'example' },
+    { id: 'cp-la3-006-7', label: 'Example: Express AÂ³ as aA + bI', type: 'example' },
     { id: 'cp-la3-006-8', label: 'Challenge: Find minimal polynomial for a block matrix', type: 'challenge' },
   ],
 
@@ -444,7 +436,7 @@ print((K@K@K + K).round(10))`,
       {
         id: 'la3-006-assess-1',
         type: 'input',
-        text: 'For $A = \\begin{bmatrix}0&1\\\\-1&0\\end{bmatrix}$ (90° rotation), the characteristic polynomial is $\\lambda^2 + 1$. What is $A^2 + I$?',
+        text: 'For $A = \\begin{bmatrix}0&1\\\\-1&0\\end{bmatrix}$ (90Â° rotation), the characteristic polynomial is $\\lambda^2 + 1$. What is $A^2 + I$?',
         answer: '0',
         hint: 'Cayley-Hamilton: $p(A) = A^2 + I = 0$ (the zero matrix).',
       },
@@ -463,8 +455,8 @@ print((K@K@K + K).round(10))`,
         '$A$ is always diagonalizable',
       ],
       answer: '$p(A) = 0$ where $p$ is the characteristic polynomial',
-      hints: ['p(λ) is a scalar polynomial derived from A. When you substitute A for λ (and multiply scalar coefficients by the identity), you get the zero matrix.'],
-      reviewSection: 'Intuition — Cayley-Hamilton Theorem',
+      hints: ['p(Î») is a scalar polynomial derived from A. When you substitute A for Î» (and multiply scalar coefficients by the identity), you get the zero matrix.'],
+      reviewSection: 'Intuition â€” Cayley-Hamilton Theorem',
     },
     {
       id: 'q-la3-006-2',
@@ -478,7 +470,7 @@ print((K@K@K + K).round(10))`,
       ],
       answer: '$(\\lambda-\\lambda_1)(\\lambda-\\lambda_2)(\\lambda-\\lambda_3)$',
       hints: ['Diagonalizable = no repeated Jordan blocks = all eigenvalues in minimal polynomial appear with multiplicity 1.'],
-      reviewSection: 'Math tab — Minimal polynomial',
+      reviewSection: 'Math tab â€” Minimal polynomial',
     },
     {
       id: 'q-la3-006-3',
@@ -491,8 +483,8 @@ print((K@K@K + K).round(10))`,
         'A scalar multiple of $I$',
       ],
       answer: 'A linear combination of $\\{I, A, A^2, \\ldots, A^{n-1}\\}$',
-      hints: ['Cayley-Hamilton gives A^n as a combination of lower powers. Then A^(n+1) = A · A^n, which is also a combination of lower powers. By induction, all A^k for k ≥ n are in the span of {I, A, ..., A^(n-1)}.'],
-      reviewSection: 'Rigor — Span of Matrix Powers',
+      hints: ['Cayley-Hamilton gives A^n as a combination of lower powers. Then A^(n+1) = A Â· A^n, which is also a combination of lower powers. By induction, all A^k for k â‰¥ n are in the span of {I, A, ..., A^(n-1)}.'],
+      reviewSection: 'Rigor â€” Span of Matrix Powers',
     },
     {
       id: 'q-la3-006-4',
@@ -505,8 +497,8 @@ print((K@K@K + K).round(10))`,
         'It only works for symmetric matrices',
       ],
       answer: '$\\det(A - \\lambda I)$ is a scalar polynomial; you cannot substitute a matrix for the scalar variable $\\lambda$ without additional justification',
-      hints: ['$p(λ)$ is a function of a scalar. When you write p(A), you are evaluating a polynomial at a matrix — this requires interpreting λⁿ as Aⁿ and constants as scalar×I. The substitution A→A gives A-AI=0 is a type error: A is not a scalar.'],
-      reviewSection: 'Intuition — Warning: Do Not Prove It by Substitution',
+      hints: ['$p(Î»)$ is a function of a scalar. When you write p(A), you are evaluating a polynomial at a matrix â€” this requires interpreting Î»â¿ as Aâ¿ and constants as scalarÃ—I. The substitution Aâ†’A gives A-AI=0 is a type error: A is not a scalar.'],
+      reviewSection: 'Intuition â€” Warning: Do Not Prove It by Substitution',
     },
     {
       id: 'q-la3-006-5',
@@ -519,8 +511,8 @@ print((K@K@K + K).round(10))`,
         '$\\lambda^2 - 6\\lambda + 9$',
       ],
       answer: '$(\\lambda - 3)^2$',
-      hints: ['For a Jordan block J_k(λ₀), the minimal polynomial is (λ - λ₀)^k. Here k=2, λ₀=3, so m(λ) = (λ-3)².'],
-      reviewSection: 'Math — Minimal Polynomial',
+      hints: ['For a Jordan block J_k(Î»â‚€), the minimal polynomial is (Î» - Î»â‚€)^k. Here k=2, Î»â‚€=3, so m(Î») = (Î»-3)Â².'],
+      reviewSection: 'Math â€” Minimal Polynomial',
     },
     {
       id: 'q-la3-006-6',
@@ -534,12 +526,12 @@ print((K@K@K + K).round(10))`,
       ],
       answer: '$(\\lambda-2)(\\lambda-5)$',
       hints: ['A is diagonal (diagonalizable), so the minimal polynomial has each distinct eigenvalue with multiplicity 1. Distinct eigenvalues: 2 and 5.'],
-      reviewSection: 'Examples — Minimal polynomial example',
+      reviewSection: 'Examples â€” Minimal polynomial example',
     },
     {
       id: 'q-la3-006-7',
       type: 'choice',
-      text: 'For $A = \\begin{bmatrix}0&1\\\\-1&0\\end{bmatrix}$ (90° rotation), Cayley-Hamilton says $A^2 + I = 0$. What is $A^4$?',
+      text: 'For $A = \\begin{bmatrix}0&1\\\\-1&0\\end{bmatrix}$ (90Â° rotation), Cayley-Hamilton says $A^2 + I = 0$. What is $A^4$?',
       options: [
         '$-A^2$',
         '$I$',
@@ -547,8 +539,8 @@ print((K@K@K + K).round(10))`,
         '$A$',
       ],
       answer: '$I$',
-      hints: ['From A² = -I, we get A⁴ = (A²)² = (-I)² = I.'],
-      reviewSection: 'Intuition — computing matrix powers',
+      hints: ['From AÂ² = -I, we get Aâ´ = (AÂ²)Â² = (-I)Â² = I.'],
+      reviewSection: 'Intuition â€” computing matrix powers',
     },
     {
       id: 'q-la3-006-8',
@@ -562,7 +554,7 @@ print((K@K@K + K).round(10))`,
       ],
       answer: '$A^n B$ is already a linear combination of the previous columns by Cayley-Hamilton',
       hints: ['Cayley-Hamilton says A^n = -(c_{n-1}A^{n-1} + ... + c_0 I), so A^n B = -(c_{n-1}A^{n-1}B + ... + c_0 B), which is a combination of columns already present.'],
-      reviewSection: 'Rigor — Cayley-Hamilton in Control Theory',
+      reviewSection: 'Rigor â€” Cayley-Hamilton in Control Theory',
     },
     {
       id: 'q-la3-006-9',
@@ -575,8 +567,8 @@ print((K@K@K + K).round(10))`,
         'Rotation matrices are always diagonalizable',
       ],
       answer: 'The minimal polynomial of any skew-symmetric $K$ satisfies $K^3 = -K$, so the matrix exponential series truncates at $K^2$',
-      hints: ['For a unit-axis skew-sym K, the characteristic polynomial is λ³+λ = λ(λ²+1). So K³ = -K. Then e^(θK) = I + sin(θ)K + (1-cos θ)K², no higher powers needed.'],
-      reviewSection: 'Math — Rodrigues formula cell',
+      hints: ['For a unit-axis skew-sym K, the characteristic polynomial is Î»Â³+Î» = Î»(Î»Â²+1). So KÂ³ = -K. Then e^(Î¸K) = I + sin(Î¸)K + (1-cos Î¸)KÂ², no higher powers needed.'],
+      reviewSection: 'Math â€” Rodrigues formula cell',
     },
     {
       id: 'q-la3-006-10',
@@ -589,23 +581,23 @@ print((K@K@K + K).round(10))`,
         '$A^3 = 8I$',
       ],
       answer: '$A$ has at least one Jordan block of size 3 for eigenvalue 2',
-      hints: ['The degree of the largest Jordan block for eigenvalue λ₀ equals the multiplicity of λ₀ in the minimal polynomial. So (λ-2)³ means there is a 3×3 Jordan block for λ=2.'],
-      reviewSection: 'Math — Minimal polynomial determines Jordan structure',
+      hints: ['The degree of the largest Jordan block for eigenvalue Î»â‚€ equals the multiplicity of Î»â‚€ in the minimal polynomial. So (Î»-2)Â³ means there is a 3Ã—3 Jordan block for Î»=2.'],
+      reviewSection: 'Math â€” Minimal polynomial determines Jordan structure',
     },
   ],
 
   misconceptions: [
     {
       falseBelief: 'Cayley-Hamilton can be proved by substituting A into p(A) = det(A - AI) = det(0) = 0.',
-      whyStudentsThinkIt: 'It looks like a simple substitution — if p(λ) = det(A - λI) and you set λ = A, then A - AI = 0, so det(0) = 0.',
-      correctionExample: 'This is a type error. $p(\\lambda)$ is a polynomial whose variable $\\lambda$ is a scalar. When we write $p(A)$ we mean replace $\\lambda^k$ with $A^k$ and scalar constants with scalar×I. Writing $A - AI$ conflates matrix multiplication (AI = A) with scalar substitution (λ → A). The actual proof requires careful bookkeeping through the adjugate matrix.',
-      contrastCase: 'Correct: $p(A) = A^2 - 5A + I$ for the 2×2 example, not $\\det(A - A \\cdot I)$.',
+      whyStudentsThinkIt: 'It looks like a simple substitution â€” if p(Î») = det(A - Î»I) and you set Î» = A, then A - AI = 0, so det(0) = 0.',
+      correctionExample: 'This is a type error. $p(\\lambda)$ is a polynomial whose variable $\\lambda$ is a scalar. When we write $p(A)$ we mean replace $\\lambda^k$ with $A^k$ and scalar constants with scalarÃ—I. Writing $A - AI$ conflates matrix multiplication (AI = A) with scalar substitution (Î» â†’ A). The actual proof requires careful bookkeeping through the adjugate matrix.',
+      contrastCase: 'Correct: $p(A) = A^2 - 5A + I$ for the 2Ã—2 example, not $\\det(A - A \\cdot I)$.',
     },
     {
       falseBelief: 'The minimal polynomial always equals the characteristic polynomial.',
       whyStudentsThinkIt: 'Cayley-Hamilton says the characteristic polynomial annihilates A, so students assume it must be the smallest such polynomial.',
-      correctionExample: 'For $A = \\text{diag}(3,3,2)$, the characteristic polynomial is $(\\lambda-3)^2(\\lambda-2)$ but the minimal polynomial is only $(\\lambda-3)(\\lambda-2)$ — degree 2, not 3. A is diagonalizable, so each eigenvalue needs only one factor.',
-      contrastCase: 'Contrast: for the Jordan block $J = \\begin{bmatrix}3&1\\\\0&3\\end{bmatrix}$, both the minimal and characteristic polynomials are $(\\lambda-3)^2$ — they coincide because $J$ is not diagonalizable.',
+      correctionExample: 'For $A = \\text{diag}(3,3,2)$, the characteristic polynomial is $(\\lambda-3)^2(\\lambda-2)$ but the minimal polynomial is only $(\\lambda-3)(\\lambda-2)$ â€” degree 2, not 3. A is diagonalizable, so each eigenvalue needs only one factor.',
+      contrastCase: 'Contrast: for the Jordan block $J = \\begin{bmatrix}3&1\\\\0&3\\end{bmatrix}$, both the minimal and characteristic polynomials are $(\\lambda-3)^2$ â€” they coincide because $J$ is not diagonalizable.',
     },
   ],
 
@@ -613,12 +605,12 @@ print((K@K@K + K).round(10))`,
     {
       situation: 'You need to compute $A^{50}$ for a $2\\times 2$ matrix without diagonalizing.',
       competingTechniques: ['Repeated matrix multiplication (50 steps)', 'Diagonalization then $D^{50}$', 'Cayley-Hamilton recurrence'],
-      whyThisTechniqueWins: 'Cayley-Hamilton gives $A^2 = \\text{tr}(A)A - \\det(A)I$, establishing a recurrence for $A^n = a_n A + b_n I$. You then compute the scalars $a_n, b_n$ with a simple two-term recurrence — no matrix multiplications beyond $A^2$.',
+      whyThisTechniqueWins: 'Cayley-Hamilton gives $A^2 = \\text{tr}(A)A - \\det(A)I$, establishing a recurrence for $A^n = a_n A + b_n I$. You then compute the scalars $a_n, b_n$ with a simple two-term recurrence â€” no matrix multiplications beyond $A^2$.',
     },
     {
       situation: 'In signal processing, you need to bound the order of a recurrence relation produced by a linear system with state matrix $A$.',
       competingTechniques: ['Compute all eigenvectors', 'Simulate the recurrence directly', 'Apply Cayley-Hamilton'],
-      whyThisTechniqueWins: 'Cayley-Hamilton says $A^n$ is a linear combination of $\\{I, A, \\ldots, A^{n-1}\\}$, so any output of the system obeys a recurrence of order $\\leq n$. You get the bound immediately from the matrix size — no eigenvalue computation required.',
+      whyThisTechniqueWins: 'Cayley-Hamilton says $A^n$ is a linear combination of $\\{I, A, \\ldots, A^{n-1}\\}$, so any output of the system obeys a recurrence of order $\\leq n$. You get the bound immediately from the matrix size â€” no eigenvalue computation required.',
     },
   ],
 
@@ -632,14 +624,14 @@ print((K@K@K + K).round(10))`,
     {
       commonError: 'Claiming $m(A) = 0$ for the wrong minimal polynomial.',
       symptom: 'You write $m(\\lambda) = (\\lambda - \\lambda_1)$ for a matrix with repeated eigenvalue, but $m(A) \\neq 0$.',
-      whyItHappened: 'The minimal polynomial must include $(\\lambda - \\lambda_0)^k$ where $k$ is the size of the largest Jordan block for $\\lambda_0$. If $A$ has a $2\\times 2$ Jordan block, you need $(\\lambda - \\lambda_0)^2$ — not just $(\\lambda - \\lambda_0)$.',
-      repairStrategy: 'Test incrementally: check if $(A - \\lambda_0 I) = 0$. If not, check $(A - \\lambda_0 I)^2 = 0$. Stop at the first power that gives zero — that is the minimal polynomial factor for $\\lambda_0$.',
+      whyItHappened: 'The minimal polynomial must include $(\\lambda - \\lambda_0)^k$ where $k$ is the size of the largest Jordan block for $\\lambda_0$. If $A$ has a $2\\times 2$ Jordan block, you need $(\\lambda - \\lambda_0)^2$ â€” not just $(\\lambda - \\lambda_0)$.',
+      repairStrategy: 'Test incrementally: check if $(A - \\lambda_0 I) = 0$. If not, check $(A - \\lambda_0 I)^2 = 0$. Stop at the first power that gives zero â€” that is the minimal polynomial factor for $\\lambda_0$.',
     },
   ],
 
   mastery: {
     targetLevel: 2,
-    solveIndependently: 'Given any 2×2 or 3×3 matrix, verify Cayley-Hamilton, use it to compute the inverse, and express A³ as a linear combination of lower powers.',
+    solveIndependently: 'Given any 2Ã—2 or 3Ã—3 matrix, verify Cayley-Hamilton, use it to compute the inverse, and express AÂ³ as a linear combination of lower powers.',
     explainVerbally: 'State Cayley-Hamilton in one sentence, explain why plugging A into p(A) gives zero (not just "by definition"), and distinguish the minimal polynomial from the characteristic polynomial.',
     detectIncorrectApplication: 'Identify the false substitution proof p(A) = det(A-AI); catch sign errors in characteristic polynomial coefficients; recognize when minimal polynomial is strictly smaller than characteristic polynomial.',
     transferToUnfamiliar: 'Apply Cayley-Hamilton to bound recurrence order in a linear system, derive the Rodrigues formula for 3D rotations, or compute matrix exponentials via polynomial truncation.',

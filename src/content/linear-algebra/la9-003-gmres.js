@@ -11,22 +11,25 @@ export default {
   hook: {
     question: "CG is ideal for symmetric positive definite systems, but what about non-symmetric systems arising in fluid dynamics, Helmholtz equations, or graph algorithms? Can you still exploit the Krylov structure?",
     realWorldContext: "Non-symmetric linear systems arise everywhere: Navier-Stokes equations (fluid dynamics), convection-dominated transport, time-dependent PDEs, optimization. GMRES is the algorithm of choice for these systems — used in computational fluid dynamics (ANSYS Fluent, OpenFOAM), electromagnetics (COMSOL), semiconductor device simulation, and scientific machine learning. PETSc (the Portable, Extensible Toolkit for Scientific computation) ships GMRES as a first-class solver.",
-    previewVisualizationId: 'OpenMatNotebook',
   },
 
   intuition: {
     prose: [
-      'Take the non-symmetric system $A = \\begin{bmatrix}3&1\\\\0&2\\end{bmatrix}$, $\\mathbf{b} = (7,4)^\\top$ (exact solution $\\mathbf{x}^* = (2,2)^\\top$). You cannot apply CG — $A \\neq A^\\top$. GMRES step 1: start with $\\mathbf{x}_0 = \\mathbf{0}$, residual $\\mathbf{r}_0 = \\mathbf{b} = (7,4)^\\top$. Search over all $\\mathbf{x} = \\alpha \\mathbf{r}_0$: minimize $\\|\\mathbf{b} - A\\alpha \\mathbf{r}_0\\|_2$. We have $A\\mathbf{r}_0 = (25,8)^\\top$, so we solve $\\min_\\alpha \\|(7-25\\alpha, 4-8\\alpha)\\|$. Differentiating: $\\alpha^* = 414/1378 = 3/10$. Result: $\\mathbf{x}_1 = (2.1, 1.2)^\\top$, residual $\\mathbf{r}_1 = (-0.5, 1.6)^\\top$, $\\|\\mathbf{r}_1\\| \\approx 1.68$ vs $\\|\\mathbf{r}_0\\| \\approx 8.06$. Residual dropped 80% in one step! Step 2 gives the exact solution. **Key**: GMRES minimizes the residual over the Krylov subspace at each step — no symmetry required.',
-      '**The idea: minimize residual over Krylov subspace.** GMRES finds $\\mathbf{x}_k \\in \\mathbf{x}_0 + \\mathcal{K}_k(A, \\mathbf{r}_0)$ that minimizes $\\|\\mathbf{b} - A\\mathbf{x}_k\\|_2$ (the residual norm). Unlike CG, this is a least-squares problem — no symmetry required.',
-      '**Arnoldi process.** GMRES builds an orthonormal basis $\\{\\mathbf{q}_1, \\ldots, \\mathbf{q}_k\\}$ for $\\mathcal{K}_k$ via modified Gram-Schmidt applied to $\\{\\mathbf{r}_0, A\\mathbf{r}_0, A^2\\mathbf{r}_0, \\ldots\\}$. The Arnoldi relation: $AQ_k = Q_{k+1}\\tilde{H}_k$ where $\\tilde{H}_k$ is a $(k+1) \\times k$ upper Hessenberg matrix. The minimization $\\min\\|\\mathbf{b} - A\\mathbf{x}\\|$ reduces to a small least-squares problem $\\min\\|\\|\\mathbf{r}_0\\|\\mathbf{e}_1 - \\tilde{H}_k\\mathbf{y}\\|$ solved by QR factorization of $\\tilde{H}_k$.',
-      '**Storage growth and restarting.** Full GMRES stores all $k$ basis vectors: $O(kn)$ memory. After $k = n$ steps, the exact solution is found. In practice, GMRES(m) restarts every $m$ steps: discard the Krylov basis, restart from current residual. Restarting sacrifices optimality but controls memory. Typical: $m = 20$–$100$. Without restarting, GMRES stagnates less but memory grows.',
-      '**Convergence.** GMRES is guaranteed to converge: $\\|\\mathbf{r}_k\\| \\leq \\|\\mathbf{r}_0\\|$ (residual is monotonically non-increasing) and $\\|\\mathbf{r}_n\\| = 0$ (exact after $n$ steps). Practical convergence depends on the spectrum of $A$ — if eigenvalues are clustered away from 0, GMRES converges fast. Theoretical bounds use pseudospectrum or field of values.',
+      'Where you are in the story: Conjugate Gradient is a beautiful algorithm, but it comes with a hard requirement — the matrix must be symmetric positive definite. In computational fluid dynamics, you are solving the Navier-Stokes equations, which produce non-symmetric matrices because fluid flowing in one direction couples unknowns asymmetrically. In electromagnetics, in convection-dominated transport, in any time-dependent PDE with explicit time stepping, the system matrix is non-symmetric. CG will simply give wrong answers on these problems. You need a Krylov method that does not require symmetry.',
+      'GMRES — Generalized Minimal Residual — takes the core Krylov idea and generalizes it. Instead of minimizing the energy norm error (which requires $A$ to define a valid inner product via symmetry), GMRES minimizes the standard 2-norm of the residual: $\\|\\mathbf{b} - A\\mathbf{x}_k\\|_2$. Minimizing the residual norm is always meaningful regardless of the symmetry of $A$. The residual norm is also directly observable — you can check it at each step — whereas the energy norm requires knowing $A$\'s eigendecomposition.',
+      'The algorithmic engine behind GMRES is the **Arnoldi process**: a way to build an orthonormal basis for the Krylov subspace $\\mathcal{K}_k(A, \\mathbf{r}_0) = \\text{span}\\{\\mathbf{r}_0, A\\mathbf{r}_0, A^2\\mathbf{r}_0, \\ldots, A^{k-1}\\mathbf{r}_0\\}$ without ever storing the raw vectors $A^j \\mathbf{r}_0$ (which become catastrophically ill-conditioned). Arnoldi is just modified Gram-Schmidt applied to the sequence produced by repeatedly multiplying by $A$: start with $\\mathbf{q}_1 = \\mathbf{r}_0 / \\|\\mathbf{r}_0\\|$, compute $A\\mathbf{q}_1$, orthogonalize against $\\mathbf{q}_1$ to get $\\mathbf{q}_2$, compute $A\\mathbf{q}_2$, orthogonalize against both $\\mathbf{q}_1$ and $\\mathbf{q}_2$ to get $\\mathbf{q}_3$, and so on.',
+      'The Arnoldi process encodes a beautiful structure. After $k$ steps, the relation $AQ_k = Q_{k+1}\\tilde{H}_k$ holds exactly, where $Q_k$ has the orthonormal Krylov basis as columns and $\\tilde{H}_k$ is a $(k+1) \\times k$ upper Hessenberg matrix — all the inner products from the Gram-Schmidt orthogonalization. Now the minimization problem $\\min_\\mathbf{x} \\|\\mathbf{b} - A\\mathbf{x}\\|_2$ over the Krylov subspace becomes a small least-squares problem: $\\min_\\mathbf{y} \\| \\|\\mathbf{r}_0\\| \\mathbf{e}_1 - \\tilde{H}_k \\mathbf{y}\\|_2$. That is a $(k+1) \\times k$ system, easily solved with a QR factorization of $\\tilde{H}_k$ using $k$ Givens rotations.',
+      'A concrete first step: take $A = \\begin{bmatrix}3&1\\\\0&2\\end{bmatrix}$, $\\mathbf{b} = (7,4)^\\top$, exact solution $\\mathbf{x}^* = (2,2)^\\top$. Start at $\\mathbf{x}_0 = \\mathbf{0}$, $\\mathbf{r}_0 = (7,4)^\\top$. GMRES step 1: search over $\\mathbf{x} = \\alpha \\mathbf{r}_0$ and minimize $\\|\\mathbf{b} - A\\alpha\\mathbf{r}_0\\|_2$. We get $A\\mathbf{r}_0 = (25, 8)^\\top$, so $\\alpha^* = \\mathbf{r}_0^\\top A\\mathbf{r}_0 / \\|A\\mathbf{r}_0\\|^2 \\approx 0.298$. New iterate: $\\mathbf{x}_1 \\approx (2.09, 1.19)^\\top$, residual $\\|\\mathbf{r}_1\\| \\approx 1.68$ vs $\\|\\mathbf{r}_0\\| \\approx 8.06$ — an 80% reduction in one step. Step 2 finds the exact solution by spanning all of $\\mathbb{R}^2$.',
+      '**Predict before reading on:** For a $2 \\times 2$ system, GMRES is guaranteed to find the exact solution in at most how many steps? And for an $n \\times n$ system with $m$ distinct eigenvalues ($m < n$), how many steps are needed? Think about what it means for the Krylov subspace to span the full space.',
+      'For an $n \\times n$ system, GMRES finds the exact solution in at most $n$ steps because after $n$ Arnoldi iterations, $Q_n$ spans all of $\\mathbb{R}^n$ and the minimization over the Krylov subspace is unconstrained. More practically, if $A$ has only $m$ distinct eigenvalues, the Krylov subspace already spans the relevant space after $m$ steps — just as in CG. This is why preconditioning matters just as much for GMRES: a good preconditioner clusters eigenvalues and reduces the effective $m$.',
+      'The key practical limitation of GMRES is memory. Full GMRES stores all $k$ Arnoldi vectors: $O(kn)$ memory. After 1000 steps on a million-variable system, that is 8 gigabytes of Krylov vectors alone. GMRES($m$) — restarted GMRES — addresses this by discarding the Krylov basis every $m$ steps and restarting from the current residual. Restarting loses the global minimization property, which can cause stagnation. The tradeoff between convergence speed and memory is the central engineering decision when deploying GMRES in practice.',
+      'Where this is heading: GMRES is powerful but naked — without preconditioning it can converge slowly for hard problems. The next lesson dives into preconditioning: how to build a matrix $M \\approx A^{-1}$ that is cheap to apply and transforms the system so eigenvalues cluster near 1. Incomplete LU (ILU) factorizations and algebraic multigrid (AMG) are the workhorse preconditioners that make GMRES practical for the world\'s hardest linear systems.',
     ],
     callouts: [
       {
         type: 'sequencing',
-        title: 'Predict Convergence',
-        body: 'For a $2 \\times 2$ system, GMRES is guaranteed to find the exact solution in at most how many steps? Write your answer before reading on. (Hint: think about what happens when the Krylov subspace spans all of $\\mathbb{R}^2$.)',
+        title: 'Lesson 3 of 5 — Iterative Solvers & Preconditioning',
+        body: '**Previous (Lesson 2):** Conjugate Gradient — Krylov subspace optimization for SPD systems, eigenvalue clustering, $\\sqrt{\\kappa}$ convergence.\n**This lesson:** GMRES — Arnoldi orthogonalization, Hessenberg least squares, restarting, convergence for non-symmetric systems.\n**Next (Lesson 4):** Preconditioning — ILU, SSOR, AMG; how to cluster eigenvalues and make iterative methods practical.',
       },
       {
         type: 'insight',
@@ -40,6 +43,116 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'GMRES in Python',
+        mathBridge: 'Build the Arnoldi process from scratch and solve a non-symmetric system — compare against CG to see why symmetry matters.',
+        caption: 'GMRES monotonically reduces the residual norm; CG on a non-symmetric matrix diverges.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Arnoldi process and GMRES solve',
+              prose: 'Implement the Arnoldi process and use it to solve a non-symmetric system. Verify that the Hessenberg relation AQ = Q_ext * H holds.',
+              code: `import numpy as np
+from scipy.linalg import solve_triangular
+
+# Non-symmetric convection-diffusion matrix (1D, small)
+n = 10
+h = 1 / (n + 1)
+eps = 0.05   # diffusion coefficient (small -> more non-symmetric)
+diag_main = 2 * eps / h**2 * np.ones(n)
+diag_up   = (-eps / h**2 + 1 / (2 * h)) * np.ones(n - 1)
+diag_dn   = (-eps / h**2 - 1 / (2 * h)) * np.ones(n - 1)
+A = np.diag(diag_main) + np.diag(diag_up, 1) + np.diag(diag_dn, -1)
+b = np.ones(n)
+x_star = np.linalg.solve(A, b)
+
+print(f"Is A symmetric? {np.allclose(A, A.T)}")
+print(f"Condition number: {np.linalg.cond(A):.1f}")
+
+# Arnoldi process: build Q, H such that A Q_k = Q_{k+1} H_{k+1,k}
+def arnoldi(A, b, k):
+    n = len(b)
+    Q = np.zeros((n, k + 1))
+    H = np.zeros((k + 1, k))
+    Q[:, 0] = b / np.linalg.norm(b)
+    for j in range(k):
+        v = A @ Q[:, j]
+        for i in range(j + 1):
+            H[i, j] = Q[:, i] @ v
+            v = v - H[i, j] * Q[:, i]
+        H[j + 1, j] = np.linalg.norm(v)
+        if H[j + 1, j] < 1e-14:
+            break
+        Q[:, j + 1] = v / H[j + 1, j]
+    return Q, H
+
+k = n - 1
+Q, H = arnoldi(A, b, k)
+
+# Verify: A Q_k = Q_{k+1} H  (Hessenberg relation)
+residual = np.linalg.norm(A @ Q[:, :k] - Q @ H)
+print(f"Arnoldi relation ||AQ_k - Q_ext H||: {residual:.2e}  (should be ~0)")
+
+# Solve the least-squares problem: min ||beta*e1 - H y||
+beta = np.linalg.norm(b)
+e1 = np.zeros(k + 1); e1[0] = beta
+y, res, _, _ = np.linalg.lstsq(H, e1, rcond=None)
+x_gmres = Q[:, :k] @ y
+
+print(f"GMRES error: {np.linalg.norm(x_gmres - x_star):.2e}")
+print(f"Direct solve error: {np.linalg.norm(np.linalg.solve(A, b) - x_star):.2e}")
+`,
+            },
+            {
+              id: 2,
+              cellTitle: 'GMRES residual convergence vs CG failure',
+              prose: 'Show that scipy GMRES converges on a non-symmetric system while CG fails. Track residual norm each iteration.',
+              code: `import numpy as np
+import matplotlib.pyplot as plt
+from scipy.sparse.linalg import gmres, cg
+from scipy.linalg import norm
+
+# Build larger non-symmetric system
+n = 50
+h = 1 / (n + 1)
+eps = 0.01
+diag_main = 2 * eps / h**2 * np.ones(n)
+diag_up   = (-eps / h**2 + 1 / (2*h)) * np.ones(n - 1)
+diag_dn   = (-eps / h**2 - 1 / (2*h)) * np.ones(n - 1)
+A = np.diag(diag_main) + np.diag(diag_up, 1) + np.diag(diag_dn, -1)
+b = np.ones(n)
+
+gmres_residuals = []
+def gmres_callback(r):
+    gmres_residuals.append(np.linalg.norm(r) if hasattr(r, '__len__') else r)
+
+cg_residuals = []
+def cg_callback(x):
+    cg_residuals.append(np.linalg.norm(b - A @ x))
+
+x_exact = np.linalg.solve(A, b)
+
+x_gm, info_gm = gmres(A, b, restart=30, maxiter=200, tol=1e-10, callback=gmres_callback)
+x_cg, info_cg = cg(A, b, maxiter=200, tol=1e-10, callback=cg_callback)
+
+print(f"GMRES: converged={info_gm==0}, error={norm(x_gm - x_exact):.2e}")
+print(f"CG:    converged={info_cg==0}, error={norm(x_cg - x_exact):.2e}  (CG may fail on non-symmetric!)")
+
+plt.figure(figsize=(7, 4))
+if gmres_residuals:
+    plt.semilogy(gmres_residuals, 'b-o', markersize=3, label='GMRES residual')
+if cg_residuals:
+    plt.semilogy(cg_residuals, 'r-s', markersize=3, label='CG residual (unreliable!)')
+plt.xlabel('Iteration'); plt.ylabel('||residual||')
+plt.title('GMRES vs CG on non-symmetric convection-diffusion')
+plt.legend(); plt.grid(True); plt.tight_layout(); plt.show()
+`,
+            },
+          ],
+        },
+      },
       {
         id: 'OpenMatNotebook',
         title: 'GMRES Arnoldi Process',

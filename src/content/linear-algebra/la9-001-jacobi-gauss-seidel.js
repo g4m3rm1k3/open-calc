@@ -11,18 +11,26 @@ export default {
   hook: {
     question: "You need to solve a $10000 \\times 10000$ sparse linear system. Gaussian elimination requires $O(n^3)$ operations. Can you solve it in $O(kn)$ operations for small $k$ — iteratively updating your guess until it converges?",
     realWorldContext: "Direct solvers (LU factorization) require $O(n^3)$ work and $O(n^2)$ memory — impractical for the $10^6$-scale systems arising in finite element analysis (structural engineering), computational fluid dynamics, and reservoir simulation. Iterative methods only need $O(n)$ memory (store the matrix once) and each iteration costs $O(\\text{nnz})$ (sparse matrix-vector multiply). Jacobi and Gauss-Seidel are simple but often slow; they are building blocks for understanding more powerful methods (CG, GMRES, multigrid).",
-    previewVisualizationId: 'OpenMatNotebook',
   },
 
   intuition: {
     prose: [
-      '**Concrete first: Jacobi on a 2×2 system.** Take $\\begin{bmatrix}4&1\\\\1&3\\end{bmatrix}\\begin{bmatrix}x\\\\y\\end{bmatrix} = \\begin{bmatrix}9\\\\7\\end{bmatrix}$ (exact solution: $x=2, y=\\frac{5}{3}$). Start with $x^{(0)}=0, y^{(0)}=0$. Jacobi says: isolate each variable using the old values. From row 1: $x^{(1)} = (9 - 1\\cdot y^{(0)})/4 = 9/4 = 2.25$. From row 2: $y^{(1)} = (7 - 1\\cdot x^{(0)})/3 = 7/3 \\approx 2.333$. Then $x^{(2)} = (9 - 2.333)/4 = 1.667$, $y^{(2)} = (7 - 2.25)/3 = 1.583$. After ~15 iterations: $x \\approx 2.000, y \\approx 1.667$. The method converges — each sweep improves the estimate.',
-      '**Matrix splitting.** Write $A = M - N$ where $M$ is easy to invert. The linear system $A\\mathbf{x} = \\mathbf{b}$ becomes $M\\mathbf{x} = N\\mathbf{x} + \\mathbf{b}$, giving iteration: $M\\mathbf{x}^{(k+1)} = N\\mathbf{x}^{(k)} + \\mathbf{b}$, i.e., $\\mathbf{x}^{(k+1)} = M^{-1}N\\mathbf{x}^{(k)} + M^{-1}\\mathbf{b}$. The **iteration matrix** is $G = M^{-1}N = M^{-1}(M-A) = I - M^{-1}A$.',
-      '**Jacobi method.** Split $A = D - (L + U)$ where $D$ is the diagonal, $L$ and $U$ are strictly lower and upper triangular. Jacobi: $M = D$. Each iteration: $x_i^{(k+1)} = \\frac{1}{a_{ii}}\\left(b_i - \\sum_{j \\neq i} a_{ij} x_j^{(k)}\\right)$. All components of $\\mathbf{x}^{(k)}$ (old) are used — can be parallelized trivially.',
-      '**Gauss-Seidel method.** Same split but use updated values as soon as available: $x_i^{(k+1)} = \\frac{1}{a_{ii}}\\left(b_i - \\sum_{j < i} a_{ij} x_j^{(k+1)} - \\sum_{j > i} a_{ij} x_j^{(k)}\\right)$. Splitting: $M = D - L$ (lower triangular). Gauss-Seidel typically converges about twice as fast as Jacobi (same work per iteration).',
-      '**Convergence criterion.** The iteration converges (for any initial guess) iff the spectral radius $\\rho(G) = \\max_i |\\lambda_i(G)| < 1$. The asymptotic convergence rate is $-\\log_{10}\\rho(G)$ decimal digits per iteration. If $A$ is **strictly diagonally dominant** ($|a_{ii}| > \\sum_{j \\neq i} |a_{ij}|$ for all $i$), both Jacobi and Gauss-Seidel converge.',
+      'Where you are in the story: Chapter 7 gave you powerful direct solvers — LU factorization, Cholesky, QR — that find the exact answer in a finite number of steps. Chapter 8 showed why you need to solve linear systems in the first place: PageRank on billions of web links, differential equations modeling physical phenomena, 3D graphics pipelines. Now those two threads collide. The systems arising from real applications are enormous — a finite element mesh for an aircraft wing can have ten million unknowns — and direct solvers simply cannot handle them. $O(n^3)$ flops for $n = 10^6$ is $10^{18}$ operations. Even at a billion operations per second, that is thirty years of compute time. Something fundamentally different is needed.',
+      'The escape hatch is iteration. Instead of computing the exact answer in one pass, you start with a guess — any guess, even all zeros — and repeatedly improve it until it is close enough. Each improvement is cheap: just a sparse matrix-vector multiply plus some arithmetic, costing $O(\\text{nnz})$ where nnz is the number of nonzero entries. For a sparse system, nnz is $O(n)$, so each iteration costs $O(n)$. If you need $k$ iterations to converge, the total work is $O(kn)$. When $k$ is modest (say, a few hundred), this beats $O(n^3)$ by orders of magnitude.',
+      'The key insight behind stationary iterative methods is matrix splitting: write $A = M - N$ where $M$ is easy to invert. The system $A\\mathbf{x} = \\mathbf{b}$ becomes $M\\mathbf{x} = N\\mathbf{x} + \\mathbf{b}$, which suggests the iteration $M\\mathbf{x}^{(k+1)} = N\\mathbf{x}^{(k)} + \\mathbf{b}$. Solving for the update: $\\mathbf{x}^{(k+1)} = M^{-1}N\\mathbf{x}^{(k)} + M^{-1}\\mathbf{b}$. The matrix $G = M^{-1}N$ is called the iteration matrix. Applying $G$ once costs $O(n)$ if $M$ is triangular or diagonal. The question is: does the sequence $\\mathbf{x}^{(0)}, \\mathbf{x}^{(1)}, \\mathbf{x}^{(2)}, \\ldots$ actually converge to the true solution $\\mathbf{x}^*$?',
+      'The **Jacobi method** uses the simplest possible splitting: $M = D$, the diagonal of $A$. To update component $i$, take equation $i$, move all the off-diagonal terms to the right using old values, and divide by the diagonal: $x_i^{(k+1)} = \\frac{1}{a_{ii}}\\left(b_i - \\sum_{j \\neq i} a_{ij} x_j^{(k)}\\right)$. Every component is updated using the same snapshot of $\\mathbf{x}^{(k)}$. This is beautifully parallelizable — all $n$ updates are independent — which is why Jacobi still appears in GPU solvers today.',
+      'A concrete walk-through makes this tangible. Take $\\begin{bmatrix}4&1\\\\1&3\\end{bmatrix}\\begin{bmatrix}x\\\\y\\end{bmatrix} = \\begin{bmatrix}9\\\\7\\end{bmatrix}$, exact solution $(x,y) = (2, 5/3)$. Start at $(0,0)$. Step 1: $x^{(1)} = (9 - 1\\cdot 0)/4 = 2.25$, $y^{(1)} = (7 - 1\\cdot 0)/3 \\approx 2.333$. Step 2: $x^{(2)} = (9 - 2.333)/4 = 1.667$, $y^{(2)} = (7 - 2.25)/3 = 1.583$. The iterates are spiraling inward toward $(2, 1.667)$, overshooting on each side. By step 15 the error is below $10^{-4}$.',
+      '**Predict before reading on:** In that 2×2 example, the iterates oscillated — $x$ went 0 → 2.25 → 1.667 → 2.083 → … — crossing the true value repeatedly. Will this always happen, or can the iterates approach from one side without oscillating? What feature of the matrix determines which behavior you get?',
+      'The answer lies in the eigenvalues of the iteration matrix $G_J = -D^{-1}(L+U)$. For the 2×2 example, $G_J = -\\begin{bmatrix}0&1/4\\\\1/3&0\\end{bmatrix}$ has eigenvalues $\\pm 1/\\sqrt{12} \\approx \\pm 0.289$. The negative eigenvalue causes the oscillation — each step flips sign. If all eigenvalues were positive real, the iterates would approach monotonically. The convergence condition is simply $\\rho(G) = \\max_i |\\lambda_i(G)| < 1$: the spectral radius must be less than 1. Every iteration multiplies the error by roughly $\\rho(G)$, so you lose $-\\log_{10}\\rho(G)$ decimal digits of accuracy per step. For Jacobi on this example: $\\rho = 0.289$, so each step gains $\\log_{10}(1/0.289) \\approx 0.54$ decimal digits — you need about 11 steps per digit.',
+      '**Gauss-Seidel** makes one improvement: instead of waiting until the end of the sweep to use fresh values, it uses each $x_i^{(k+1)}$ as soon as it is computed. When updating component $i$, the components $j < i$ already have their new values: $x_i^{(k+1)} = \\frac{1}{a_{ii}}\\left(b_i - \\sum_{j < i} a_{ij} x_j^{(k+1)} - \\sum_{j > i} a_{ij} x_j^{(k)}\\right)$. The splitting becomes $M = D - L$ (lower triangular). For many important matrices — particularly those from elliptic PDEs — the spectral radius satisfies $\\rho_{GS} \\approx \\rho_J^2$, meaning Gauss-Seidel converges roughly twice as fast as Jacobi with the same work per iteration.',
+      'Where this is heading: Jacobi and Gauss-Seidel converge, but often slowly — especially near the solution, where only low-frequency error components remain. The next lesson introduces **Conjugate Gradient**, which does not use a fixed splitting at all; it adaptively constructs a search direction from the residual and the matrix\'s geometry, achieving convergence in at most $n$ steps for any SPD system. After that, GMRES generalizes CG to non-symmetric systems. These Krylov methods will reduce the iteration count from hundreds to tens, making iterative methods truly competitive for the largest linear systems in science and engineering.',
     ],
     callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 1 of 5 — Iterative Solvers & Preconditioning',
+        body: '**Previous (Chapter 8):** Applications — PCA, PageRank, ODEs, computer graphics.\n**This lesson:** Jacobi and Gauss-Seidel — stationary iterative methods, matrix splitting $A = M - N$, spectral radius convergence criterion, SOR acceleration.\n**Next (Lesson 2):** Conjugate Gradient — Krylov subspace methods that converge in far fewer steps than stationary iterations.',
+      },
       {
         type: 'theorem',
         title: 'Convergence Theorem',
@@ -33,13 +41,125 @@ export default {
         title: 'SOR: Successive Over-Relaxation',
         body: 'SOR interpolates between old and Gauss-Seidel update:\n$x_i^{(k+1)} = (1-\\omega)x_i^{(k)} + \\omega x_i^{GS}$\n\n$\\omega = 1$: Gauss-Seidel\n$1 < \\omega < 2$: over-relaxation (usually faster)\n$0 < \\omega < 1$: under-relaxation (can stabilize non-convergent GS)\n\nOptimal $\\omega$ for Poisson equation: $\\omega^* = \\frac{2}{1+\\sqrt{1-\\rho_{Jac}^2}}$, giving $\\rho_{SOR} = \\omega^* - 1$.',
       },
-      {
-        type: 'sequencing',
-        title: 'Prediction',
-        body: 'Before running more iterations of the 2×2 Jacobi example above, predict: will the iterates overshoot the solution (oscillate) or approach it smoothly from one side? What determines which behavior occurs? (Hint: look at the sign of the off-diagonal entries relative to the diagonal.)',
-      },
     ],
     visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Jacobi and Gauss-Seidel in Python',
+        mathBridge: 'Implement both methods from scratch and track convergence — spectral radius predicts exact iteration count.',
+        caption: 'Watch how $\\rho(G)$ governs the convergence rate: halving $\\rho$ doubles the decimal digits gained per step.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Jacobi iteration with convergence tracking',
+              prose: 'Implement Jacobi from scratch on a diagonally dominant system, track the error each iteration, and verify that the convergence rate matches the theoretical spectral radius.',
+              code: `import numpy as np
+import matplotlib.pyplot as plt
+
+# Diagonally dominant system (from 1D Poisson discretization)
+A = np.array([[4, -1,  0,  0],
+              [-1,  4, -1,  0],
+              [ 0, -1,  4, -1],
+              [ 0,  0, -1,  4]], dtype=float)
+b = np.array([3., 4., 4., 3.])
+x_exact = np.linalg.solve(A, b)
+
+# Jacobi iteration matrix G = -D^{-1}(L+U)
+D = np.diag(np.diag(A))
+LU = A - D
+G_jac = -np.linalg.inv(D) @ LU
+rho = np.max(np.abs(np.linalg.eigvals(G_jac)))
+print(f"Spectral radius rho(G_Jacobi) = {rho:.4f}")
+print(f"Predicted digits per iteration: {-np.log10(rho):.3f}")
+
+# Run Jacobi
+x = np.zeros(4)
+errors = []
+for k in range(60):
+    x_new = np.linalg.solve(D, b - LU @ x)
+    err = np.linalg.norm(x_new - x_exact)
+    errors.append(err)
+    if err < 1e-10:
+        print(f"Converged at iteration {k+1}")
+        break
+    x = x_new
+
+# Plot convergence
+plt.figure(figsize=(7, 4))
+plt.semilogy(errors, 'b-o', markersize=3, label='Jacobi error')
+# Overlay theoretical rate
+k_vals = np.arange(len(errors))
+plt.semilogy(k_vals, errors[0] * rho**k_vals, 'r--', label=f'Theoretical: rho^k * e0 (rho={rho:.3f})')
+plt.xlabel('Iteration'); plt.ylabel('||error||')
+plt.title('Jacobi convergence vs. spectral radius prediction')
+plt.legend(); plt.grid(True); plt.tight_layout(); plt.show()
+`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Gauss-Seidel vs Jacobi comparison',
+              prose: 'Implement Gauss-Seidel and compare convergence rates. For this matrix class, verify the theoretical prediction that rho_GS ≈ rho_Jacobi².',
+              code: `import numpy as np
+import matplotlib.pyplot as plt
+
+A = np.array([[4, -1,  0,  0],
+              [-1,  4, -1,  0],
+              [ 0, -1,  4, -1],
+              [ 0,  0, -1,  4]], dtype=float)
+b = np.array([3., 4., 4., 3.])
+x_exact = np.linalg.solve(A, b)
+
+D = np.diag(np.diag(A))
+L = np.tril(A, -1)
+U = np.triu(A,  1)
+
+# Iteration matrices
+G_jac = -np.linalg.inv(D) @ (L + U)
+G_gs  = -np.linalg.solve(D + L, U)
+rho_j = np.max(np.abs(np.linalg.eigvals(G_jac)))
+rho_gs = np.max(np.abs(np.linalg.eigvals(G_gs)))
+print(f"rho_Jacobi      = {rho_j:.4f}")
+print(f"rho_GS          = {rho_gs:.4f}")
+print(f"rho_Jacobi^2    = {rho_j**2:.4f}  (should match rho_GS)")
+
+def jacobi(A, b, x0, tol=1e-12, maxiter=200):
+    D = np.diag(np.diag(A)); LU = A - D
+    x = x0.copy(); errs = []
+    for _ in range(maxiter):
+        x_new = np.linalg.solve(D, b - LU @ x)
+        errs.append(np.linalg.norm(x_new - np.linalg.solve(A, b)))
+        if errs[-1] < tol: break
+        x = x_new
+    return errs
+
+def gauss_seidel(A, b, x0, tol=1e-12, maxiter=200):
+    n = len(b); x = x0.copy(); errs = []
+    x_star = np.linalg.solve(A, b)
+    for _ in range(maxiter):
+        for i in range(n):
+            x[i] = (b[i] - A[i, :i] @ x[:i] - A[i, i+1:] @ x[i+1:]) / A[i, i]
+        errs.append(np.linalg.norm(x - x_star))
+        if errs[-1] < tol: break
+    return errs
+
+x0 = np.zeros(4)
+errs_j  = jacobi(A, b, x0)
+errs_gs = gauss_seidel(A, b, x0)
+
+plt.figure(figsize=(7, 4))
+plt.semilogy(errs_j,  'b-o', markersize=3, label=f'Jacobi (rho={rho_j:.3f})')
+plt.semilogy(errs_gs, 'r-s', markersize=3, label=f'Gauss-Seidel (rho={rho_gs:.3f})')
+plt.xlabel('Iteration'); plt.ylabel('||error||')
+plt.title('Jacobi vs Gauss-Seidel: GS needs ~half the iterations')
+plt.legend(); plt.grid(True); plt.tight_layout(); plt.show()
+print(f"Jacobi iterations:       {len(errs_j)}")
+print(f"Gauss-Seidel iterations: {len(errs_gs)}")
+`,
+            },
+          ],
+        },
+      },
       {
         id: 'OpenMatNotebook',
         title: 'Jacobi and Gauss-Seidel Iteration',

@@ -11,21 +11,25 @@ export default {
   hook: {
     question: "The rationals $\\mathbb{Q}$ have a distance but aren\'t complete: the sequence $3, 3.1, 3.14, 3.141, \\ldots$ converges to $\\pi \\notin \\mathbb{Q}$. What happens when you need calculus in infinite dimensions? You need completeness.",
     realWorldContext: "Hilbert spaces are the mathematical language of quantum mechanics, signal processing, and machine learning. The $L^2$ space of square-integrable functions on $[0,1]$ is the Hilbert space where Fourier series live. Every signal can be decomposed into an orthonormal basis (Fourier modes, wavelets, eigenfunctions of the Laplacian). Reproducing kernel Hilbert spaces (RKHS) are the foundation of kernel methods (SVMs, Gaussian processes). Banach spaces (like $L^p$ for $p \\neq 2$) appear in optimization (sparsity-promoting $L^1$ norms) and PDE theory.",
-    previewVisualizationId: 'OpenMatNotebook',
   },
 
   intuition: {
     prose: [
-      '**Hilbert space ideas in $\\mathbb{R}^2$.** Start small: $H = \\mathbb{R}^2$ with the dot product $\\langle(x_1,x_2),(y_1,y_2)\\rangle = x_1 y_1 + x_2 y_2$. The subspace $M = \\{(x,0)\\}$ (x-axis) is closed. Take $\\mathbf{x} = (3,4)$. Its orthogonal projection onto $M$ is $P_M\\mathbf{x} = (3,0)$, and the remainder $(0,4)$ is perpendicular to $M$. Pythagorean: $\\|(3,4)\\|^2 = \\|(3,0)\\|^2 + \\|(0,4)\\|^2 = 9+16 = 25$ ✓. The functional $f(x_1,x_2) = 3x_1 + 4x_2$ is bounded: by Riesz, $f(\\mathbf{x}) = \\langle \\mathbf{x}, (3,4)\\rangle$, so the representing vector is exactly $(3,4)$. These ideas — projection, Pythagorean theorem, Riesz representation — all extend to infinite-dimensional Hilbert spaces like $L^2[0,1]$.',
-      '**Hilbert spaces.** A **Hilbert space** is a Banach space whose norm comes from an inner product: $\\|\\mathbf{x}\\|^2 = \\langle\\mathbf{x},\\mathbf{x}\\rangle$. The inner product adds geometric structure (angles, orthogonality). Examples: $\\mathbb{R}^n$ with dot product; $\\ell^2 = \\{(a_n) : \\sum|a_n|^2 < \\infty\\}$ with $\\langle \\mathbf{a}, \\mathbf{b}\\rangle = \\sum a_n b_n$; $L^2[a,b] = \\{f : \\int_a^b |f|^2 < \\infty\\}$ with $\\langle f, g\\rangle = \\int_a^b f(x)g(x)\\,dx$.',
-      '**Orthonormal bases.** In a separable Hilbert space, an **orthonormal basis** (ONB) $\\{\\mathbf{e}_n\\}$ satisfies $\\langle \\mathbf{e}_m, \\mathbf{e}_n\\rangle = \\delta_{mn}$ and $\\overline{\\text{span}\\{\\mathbf{e}_n\\}} = H$ (closed span is all of $H$). For any $\\mathbf{x} \\in H$: **Parseval\'s identity** $\\|\\mathbf{x}\\|^2 = \\sum_n |\\langle\\mathbf{x},\\mathbf{e}_n\\rangle|^2$ and **Fourier expansion** $\\mathbf{x} = \\sum_n \\langle\\mathbf{x},\\mathbf{e}_n\\rangle \\mathbf{e}_n$ (converges in $H$). This generalizes the finite-dimensional case exactly.',
-      '**Riesz representation theorem.** For any bounded linear functional $f: H \\to \\mathbb{F}$, there exists a unique $\\mathbf{y} \\in H$ such that $f(\\mathbf{x}) = \\langle\\mathbf{x},\\mathbf{y}\\rangle$ for all $\\mathbf{x}$. This gives the natural isomorphism $H^* \\cong H$ (Hilbert spaces are reflexive). In machine learning, this justifies the "kernel trick": a linear functional in a feature space is a kernel evaluation.',
+      'Where you are in the story: operator theory described what bounded linear operators look like on abstract spaces. But we have been sloppy about one crucial question: what exactly are these spaces? You cannot do analysis — limits, sequences, projections — without a completeness guarantee. The rational numbers $\\mathbb{Q}$ have an addition and a distance, but the sequence $3, 3.1, 3.14, 3.141, \\ldots$ converges to $\\pi$, which is not rational. If you are doing calculus on $\\mathbb{Q}$, your limits can escape the space. Banach spaces fix this by requiring completeness: every Cauchy sequence must converge to something inside the space.',
+      'A **Banach space** is a normed vector space that is complete: every Cauchy sequence (a sequence where $\\|\\mathbf{x}_m - \\mathbf{x}_n\\| \\to 0$ as $m, n \\to \\infty$) converges to a limit in the space. The integers $\\mathbb{Z}$ are not a Banach space (not a vector space). The rationals $\\mathbb{Q}$ are not complete. The reals $\\mathbb{R}$, the $n$-dimensional spaces $\\mathbb{R}^n$, and the function spaces $L^p[a,b]$ (p-integrable functions with $\\|f\\|_p = (\\int |f|^p)^{1/p}$) are all Banach spaces. Completeness is what makes the intermediate value theorem, the Picard-Lindelöf existence theorem for ODEs, and the open mapping theorem for linear operators all work.',
+      'A **Hilbert space** is a Banach space whose norm comes from an inner product: $\\|\\mathbf{x}\\|^2 = \\langle \\mathbf{x}, \\mathbf{x}\\rangle$. The inner product adds angles and orthogonality — the geometry of Euclidean space — to the abstract setting. The key examples: $\\mathbb{R}^n$ with the dot product; the space $\\ell^2$ of square-summable sequences with $\\langle \\mathbf{a}, \\mathbf{b}\\rangle = \\sum_n a_n b_n$; and the function space $L^2[a,b]$ with $\\langle f, g \\rangle = \\int_a^b f(x)g(x)\\,dx$. Note that $L^p$ for $p \\neq 2$ is a Banach space but NOT a Hilbert space: you cannot define an inner product from the $p$-norm for $p \\neq 2$.',
+      'Start with $H = \\mathbb{R}^2$ to build intuition. The subspace $M = \\{(x,0) : x \\in \\mathbb{R}\\}$ (the $x$-axis) is closed. Take $\\mathbf{v} = (3,4)$. The orthogonal projection onto $M$ is $P_M \\mathbf{v} = (3,0)$, and the remainder $(0,4)$ is perpendicular to $M$: $(0,4) \\cdot (x,0) = 0$ for all $(x,0) \\in M$. Pythagorean theorem: $\\|(3,4)\\|^2 = \\|(3,0)\\|^2 + \\|(0,4)\\|^2 = 9+16 = 25$. The functional $f(x_1,x_2) = 3x_1+4x_2$ can be written $f(\\mathbf{v}) = \\langle \\mathbf{v}, (3,4)\\rangle$: the representing vector for $f$ is the vector $(3,4)$ whose components are the coefficients of $f$. All three observations — projection theorem, Pythagorean theorem, Riesz representation — extend to any Hilbert space.',
+      '**Predict before reading on:** In $L^2[0,1]$, the functions $e_1(x) = 1$ and $e_2(x) = \\sqrt{3}(2x-1)$ form an orthonormal set. What are the Fourier coefficients (inner products $\\langle f, e_1 \\rangle$ and $\\langle f, e_2 \\rangle$) of $f(x) = x^2$ in this basis? What polynomial does the truncated Fourier expansion give?',
+      'Computing: $c_1 = \\langle x^2, 1\\rangle = \\int_0^1 x^2\\,dx = 1/3$. And $c_2 = \\langle x^2, \\sqrt{3}(2x-1)\\rangle = \\sqrt{3}\\int_0^1 x^2(2x-1)\\,dx = \\sqrt{3}(2/4 - 1/3) = \\sqrt{3}/12$. The two-term approximation is $c_1 e_1 + c_2 e_2 = \\frac{1}{3} + \\frac{\\sqrt{3}}{12}\\cdot\\sqrt{3}(2x-1) = \\frac{1}{3} + \\frac{3}{12}(2x-1) = x - \\frac{1}{12}$. This is the best linear approximation to $x^2$ in the $L^2$ sense — the least-squares polynomial fit. Parseval\'s identity says $\\|f\\|^2 = \\sum_n |c_n|^2$: if you sum all Fourier coefficients, you reconstruct the full $L^2$ norm.',
+      'The **Riesz representation theorem** is the Hilbert space version of the dual space result from la10-001. For any bounded linear functional $f: H \\to \\mathbb{R}$, there is a unique $\\mathbf{y} \\in H$ such that $f(\\mathbf{x}) = \\langle \\mathbf{x}, \\mathbf{y}\\rangle$ for all $\\mathbf{x}$. This gives a canonical isomorphism $H^* \\cong H$: Hilbert spaces are self-dual. In la10-001, we saw that the natural isomorphism $V \\cong V^*$ requires choosing an inner product (not canonical). Here, the Hilbert space comes equipped with its own inner product, so the isomorphism $H \\cong H^*$ is part of the structure. In machine learning, reproducing kernel Hilbert spaces use this: every evaluation functional $f \mapsto f(x_0)$ is a bounded linear functional, so it is represented by a "kernel" function $k(\\cdot, x_0) \\in H$.',
+      'The **projection theorem** is the geometric heart of Hilbert space theory: for any closed subspace $M \\subseteq H$ and any $\\mathbf{x} \\in H$, the nearest point in $M$ to $\\mathbf{x}$ exists and is unique. This nearest point $P_M \\mathbf{x}$ is the orthogonal projection, and the error $\\mathbf{x} - P_M \\mathbf{x}$ is perpendicular to all of $M$. In $\\mathbb{R}^n$ this is obvious; in an infinite-dimensional Hilbert space it requires the completeness of $H$ and the closedness of $M$ — without these, the infimum might not be achieved. Least-squares regression, the Gram-Schmidt process, Fourier series truncation, and principal component analysis are all special cases of orthogonal projection in a Hilbert space.',
+      'Where this is heading: this lesson concludes the linear algebra course. You started with systems of equations and row reduction (Chapter 1), built up to the spectral theorem for symmetric matrices (Chapter 3), learned the numerical algorithms that make the theory computable (Chapters 7-9), saw the applications that motivate the whole subject (Chapter 8), and finally arrived at the abstract framework — dual spaces, tensors, exterior algebra, operator theory, Hilbert spaces — that unifies everything. The structures you studied are not just tools for solving equations: they are the mathematical language in which physics, signal processing, machine learning, and differential geometry are written.',
     ],
     callouts: [
       {
         type: 'sequencing',
-        title: 'Prediction: Fourier coefficients via inner product',
-        body: 'In $L^2[0,1]$, the functions $e_1(x) = 1$ and $e_2(x) = \\sqrt{3}(2x-1)$ form an orthonormal set (verify: $\\langle e_1,e_1\\rangle = \\int_0^1 1\\,dx = 1$ ✓; $\\langle e_2,e_2\\rangle = 3\\int_0^1(2x-1)^2dx = 1$ ✓; $\\langle e_1,e_2\\rangle = \\sqrt{3}\\int_0^1(2x-1)dx = 0$ ✓). **Before computing:** predict the Fourier coefficients of $f(x)=x^2$ in this basis. After predicting: $c_1 = \\langle x^2, 1\\rangle = \\int_0^1 x^2 dx = 1/3$; $c_2 = \\langle x^2, \\sqrt{3}(2x-1)\\rangle = \\sqrt{3}(2/4-1/3) = \\sqrt{3}/6$. Projection: $x^2 \\approx \\frac{1}{3}\\cdot 1 + \\frac{\\sqrt{3}}{6}\\cdot\\sqrt{3}(2x-1) = x - \\frac{1}{6}$.',
+        title: 'Lesson 5 of 5 — Advanced Theory',
+        body: '**Previous (Lesson 4):** Operator Theory — bounded operators, spectrum, compact operators, spectral theorem.\n**This lesson:** Banach and Hilbert Spaces — completeness, projection theorem, Parseval\'s identity, Riesz representation, $L^2$ space.\n**This is the final lesson of the linear algebra course.**',
       },
       {
         type: 'theorem',
@@ -39,6 +43,110 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Hilbert Spaces in Python',
+        mathBridge: 'Compute Fourier coefficients as inner products, verify Parseval\'s identity, and demonstrate orthogonal projection as best approximation.',
+        caption: 'Fourier expansion = orthogonal projection in L²; Parseval\'s identity verifies completeness.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+
+              cellTitle: 'Fourier coefficients as inner products',
+              prose: 'Compute Fourier coefficients of f(x)=x² in an orthonormal polynomial basis on [0,1], verify Parseval\'s identity, and compare the projection against the true function.',
+              code: `import numpy as np
+import matplotlib.pyplot as plt
+from numpy.polynomial import legendre
+
+# Build an orthonormal polynomial basis on [0,1] via Gram-Schmidt
+# (shifted Legendre polynomials, normalized)
+x_pts = np.linspace(0, 1, 1000)
+dx = x_pts[1] - x_pts[0]
+
+def inner_product(f, g):
+    """L² inner product on [0,1] via numerical integration"""
+    return np.trapz(f * g, x_pts)
+
+# Build orthonormal basis up to degree 4
+polys_raw = [x_pts**k for k in range(5)]
+ONB = []
+for p in polys_raw:
+    q = p.copy()
+    for e in ONB:
+        q = q - inner_product(q, e) * e
+    norm = np.sqrt(inner_product(q, q))
+    if norm > 1e-10:
+        ONB.append(q / norm)
+
+# Target function
+f = x_pts**2
+
+# Fourier coefficients
+coeffs = [inner_product(f, e) for e in ONB]
+print("Fourier coefficients c_k = <x², e_k>:")
+for k, c in enumerate(coeffs):
+    print(f"  k={k}: c_{k} = {c:.6f}")
+
+# Parseval's identity: ||f||² = sum |c_k|²
+norm_f_sq = inner_product(f, f)
+parseval_sum = sum(c**2 for c in coeffs)
+print(f"\\n||f||² = {norm_f_sq:.6f}")
+print(f"∑|c_k|² = {parseval_sum:.6f}  (Parseval: should match)")
+
+# Plot projections onto growing subspaces
+fig, axes = plt.subplots(1, len(ONB), figsize=(15, 3))
+approx = np.zeros_like(x_pts)
+for k, (c, e) in enumerate(zip(coeffs, ONB)):
+    approx = approx + c * e
+    axes[k].plot(x_pts, f, 'b-', lw=2, label='x²')
+    axes[k].plot(x_pts, approx, 'r--', lw=2, label=f'{k+1}-term approx')
+    err = np.sqrt(inner_product((f - approx)**2 / inner_product(f,f), np.ones_like(x_pts)))
+    axes[k].set_title(f'{k+1} terms\\nL² error={err:.3f}')
+    axes[k].legend(fontsize=7)
+plt.tight_layout(); plt.show()
+`,
+            },
+            {
+              id: 2,
+
+              cellTitle: 'Riesz representation: functionals ↔ vectors',
+              prose: 'Verify the Riesz representation theorem in R^n: every bounded linear functional is an inner product with some fixed vector, and that vector has norm equal to the operator norm of the functional.',
+              code: `import numpy as np
+
+# In R^n, every linear functional f: R^n -> R has the form f(x) = <x, y>
+# The representing vector y is just the coefficients of f
+
+# Define a functional f(x) = 2x1 - x2 + 3x3 in R^3
+coeffs = np.array([2., -1., 3.])
+def f(x):
+    return coeffs @ x
+
+# The representing vector y is just coeffs
+y_riesz = coeffs.copy()
+print("Linear functional f(x) = 2x₁ - x₂ + 3x₃")
+print(f"Representing vector y = {y_riesz}")
+
+# Verify: f(x) = <x, y> for several test vectors
+test_vecs = [np.array([1.,0.,0.]), np.array([1.,2.,3.]), np.random.randn(3)]
+for x in test_vecs:
+    fval = f(x)
+    inner = np.dot(x, y_riesz)
+    print(f"  f({x.round(2)}) = {fval:.4f},  <x,y> = {inner:.4f},  match: {np.isclose(fval, inner)}")
+
+# Norm of functional = operator norm = ||y||
+norm_f = np.max([abs(f(x)) for x in [np.random.randn(3) for _ in range(10000)]
+                 if np.linalg.norm(x) < 1.001 and np.linalg.norm(x) > 0.999])
+norm_y = np.linalg.norm(y_riesz)
+print(f"\\nOperator norm ||f|| ≈ {norm_f:.4f}")
+print(f"||y_Riesz|| = {norm_y:.4f}")
+print(f"||f|| = ||y|| : {np.isclose(norm_f, norm_y, atol=0.02)}")
+print("\\nThis is the Riesz representation theorem: every functional is an inner product with a vector of the same norm.")
+`,
+            },
+          ],
+        },
+      },
       {
         id: 'OpenMatNotebook',
         title: 'Hilbert Space Concepts',

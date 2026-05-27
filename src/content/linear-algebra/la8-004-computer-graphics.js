@@ -11,34 +11,155 @@ export default {
   hook: {
     question: "A 3D game renders 60 frames per second with millions of triangles. Every vertex must be rotated, translated, and projected onto a 2D screen. How can a GPU do this efficiently for every vertex?",
     realWorldContext: "Modern real-time graphics — from video games to surgical simulations to AR/VR — are built on matrix transformations. The GPU pipeline applies the model matrix (place object in world), view matrix (position camera), and projection matrix (perspective). These three 4×4 matrices are multiplied together into the MVP matrix once per draw call, then multiplied with each vertex. OpenGL, DirectX, Vulkan, and WebGL all use this linear algebra foundation. CAD software (SolidWorks, AutoCAD), visual effects (Maya, Blender), and robotics (forward kinematics) all use the same framework.",
-    previewVisualizationId: 'OpenMatNotebook',
   },
 
   intuition: {
     prose: [
-      'Rotate the point $(1, 0, 0)$ by $90°$ around the $z$-axis, then translate it by $(3, 2, 0)$. Without homogeneous coordinates, you need two separate operations. With them, you write $(1,0,0)$ as $(1,0,0,1)^\\top$ and encode the whole pipeline as one $4 \\times 4$ product:\n\n$\\underbrace{\\begin{bmatrix}1&0&0&3\\\\0&1&0&2\\\\0&0&1&0\\\\0&0&0&1\\end{bmatrix}}_{\\text{translate}} \\cdot \\underbrace{\\begin{bmatrix}0&-1&0&0\\\\1&0&0&0\\\\0&0&1&0\\\\0&0&0&1\\end{bmatrix}}_{R_z(90°)} \\cdot \\begin{bmatrix}1\\\\0\\\\0\\\\1\\end{bmatrix} = \\begin{bmatrix}1&0&0&3\\\\0&1&0&2\\\\0&0&1&0\\\\0&0&0&1\\end{bmatrix}\\begin{bmatrix}0\\\\1\\\\0\\\\1\\end{bmatrix} = \\begin{bmatrix}3\\\\3\\\\0\\\\1\\end{bmatrix}$\n\nResult: the world point $(3, 3, 0)$. One matrix product handles both operations — the GPU does this for every vertex at 60fps.',
-      '**Why homogeneous coordinates?** Translation is not a linear operation in standard coordinates ($T(\\mathbf{x} + \\mathbf{y}) \\neq T(\\mathbf{x}) + T(\\mathbf{y})$). Homogeneous coordinates fix this by working in $\\mathbb{R}^{n+1}$: a 3D point $(x, y, z)$ becomes $(x, y, z, 1)$. Now translation by $(t_x, t_y, t_z)$ is the matrix $\\begin{bmatrix}I & \\mathbf{t}\\\\ \\mathbf{0}^\\top & 1\\end{bmatrix}$. Composing transformations = multiplying matrices.',
-      '**The 4×4 transformation matrices.** In homogeneous coordinates (point = $(x,y,z,1)^\\top$, direction = $(x,y,z,0)^\\top$):\n\n**Translation**: $T(t_x,t_y,t_z) = I_{4\\times4}$ with last column $(t_x,t_y,t_z,1)^\\top$.\n\n**Scaling**: $S(s_x,s_y,s_z) = \\text{diag}(s_x,s_y,s_z,1)$.\n\n**Rotation** about $z$-axis by $\\theta$: $R_z(\\theta) = \\begin{bmatrix}\\cos\\theta&-\\sin\\theta&0&0\\\\\\sin\\theta&\\cos\\theta&0&0\\\\0&0&1&0\\\\0&0&0&1\\end{bmatrix}$.\n\nComposition: apply rotation first, then translate: $T \\cdot R$ (right-to-left: rightmost applied first).',
-      '**Projection.** A perspective projection maps a 3D point to the image plane. The projection matrix $P$ in homogeneous coordinates produces $(x/z, y/z)$ (perspective division) — a nonlinear operation made linear by working in homogeneous coordinates and dividing by the $w$ component at the end. The full pipeline: $\\mathbf{v}_{clip} = P \\cdot V \\cdot M \\cdot \\mathbf{v}_{model}$. Divide by $w$ for NDC (Normalized Device Coordinates).',
+      '**Where you are in the story.** Chapter 8 has shown you linear algebra applied to data (PCA), networks (PageRank), and differential equations (ODEs). This final lesson brings it home to something you interact with every day: 3D graphics. Every frame of every video game, every rendered 3D model, every AR effect on your phone is computed using the same $4 \\times 4$ matrix multiplication you have been practicing for months. The abstract machinery becomes concrete here in a way you can see and feel.',
+
+      '**The problem with translation.** Rotation and scaling are linear maps: $R(\\mathbf{x} + \\mathbf{y}) = R\\mathbf{x} + R\\mathbf{y}$. But translation is not — adding a displacement vector is not a matrix multiplication in 3D. This is inconvenient: if you want to compose "scale, then rotate, then translate," you need two different types of operations mixed together. The GPU cannot efficiently handle that. The fix: work in one higher dimension.',
+
+      '**Homogeneous coordinates: embed 3D in 4D.** Represent a 3D point $(x, y, z)$ as the 4D vector $(x, y, z, 1)^\\top$. Represent a direction as $(x, y, z, 0)^\\top$. Now translation by $(t_x, t_y, t_z)$ becomes a $4 \\times 4$ matrix with the translation in the last column. The key: now translation, rotation, and scaling are ALL $4 \\times 4$ matrix multiplications. Composing them is just matrix multiplication. The GPU does one matrix multiply per vertex — extremely fast.',
+
+      '**Concrete: rotate then translate.** Rotate $(1,0,0)$ by $90°$ around the $z$-axis, then translate by $(3,2,0)$. Encode as one matrix product: $T \\cdot R_z(90°) \\cdot (1,0,0,1)^\\top$. The rotation gives $(0,1,0,1)^\\top$, then the translation adds $(3,2,0)$ to get $(3,3,0,1)^\\top$ — world position $(3,3,0)$. Order matters: matrix multiplication is not commutative, and the matrices are applied right-to-left (rightmost first).',
+
+      '**Predict before reading on.** You want to scale a point by 2, then rotate $90°$ around the $z$-axis. Is the combined matrix $R_z \\cdot S$ or $S \\cdot R_z$? Which applies the scale first? Write your answer before continuing.',
+
+      '**The MVP pipeline.** In a 3D game engine, every vertex goes through three transforms: the Model matrix $M$ (places the object in world space), the View matrix $V$ (positions the camera — inverse of camera\'s own transform), and the Projection matrix $P$ (creates perspective by dividing by depth). The combined MVP matrix $M_{mvp} = P \\cdot V \\cdot M$ is computed once per draw call on the CPU, then every vertex just multiplies: $\\mathbf{v}_{clip} = M_{mvp}\\mathbf{v}_{model}$. After that, dividing each coordinate by the $w$ component gives the 2D screen position.',
+
+      '**Rotation matrices are orthogonal — and that has consequences.** Every rotation matrix $R$ satisfies $R^\\top R = I$, which means $R^{-1} = R^\\top$. To undo a rotation (go back to camera space from world space), you just take the transpose — no matrix inversion needed. Since all rotations preserve vector lengths ($\\|R\\mathbf{v}\\| = \\|\\mathbf{v}\\|$), the GPU can apply millions of rotations per frame without any accumulating distortion. This orthogonality is why the Schur decomposition (unitary matrices) is so powerful numerically — the same reason rotation matrices are so elegant in graphics.',
+
+      '**Where this is heading.** Chapter 8 showed applications across data science, networks, dynamical systems, and graphics. Chapter 9 returns to numerical methods: iterative solvers for large sparse systems. The conjugate gradient method, GMRES, and preconditioning let you solve million-variable linear systems that would be impossible with direct methods. The tools are different but the core ideas — eigenvalues, condition numbers, orthogonality — are everything you have built so far.',
     ],
     callouts: [
       {
         type: 'sequencing',
-        title: 'Predict the Order',
-        body: 'You want to scale a point by 2, then rotate it $90°$ around the $z$-axis. Before computing: is the combined matrix $R_z \\cdot S$ or $S \\cdot R_z$? Which one applies the scale first? Write your answer, then verify by applying each to the point $(1,0,0,1)^\\top$.',
+        title: 'Lesson 4 of 4 — Applications of Linear Algebra',
+        body: '**Previous (Lesson 3):** ODEs and linear systems — eigenvalues determine stability; matrix exponential.\n**This lesson:** Computer graphics — homogeneous coordinates, 4×4 MVP pipeline, rotation matrices are orthogonal.\n**Next (Chapter 9):** Iterative solvers — conjugate gradient, GMRES, preconditioning for large sparse systems.',
       },
       {
         type: 'insight',
         title: 'Transformation Composition Order',
-        body: 'Transformations are applied right-to-left in the matrix product:\n\n$M_{total} = M_n \\cdots M_2 M_1$\n\nApplied as: $M_{total}\\mathbf{v} = M_n(\\cdots(M_2(M_1 \\mathbf{v})))$\n\nIn graphics: $M_{mvp} = P \\cdot V \\cdot M$\n- $M$: model → world (object\'s own transform)\n- $V$: world → camera (inverse camera transform)\n- $P$: camera → clip (perspective or orthographic)\n\nMatrix multiplication is NOT commutative: order matters critically!',
+        body: 'Transformations applied right-to-left: $M_{total}\\mathbf{v} = M_n \\cdots M_2 M_1 \\mathbf{v}$\n\nIn graphics: $M_{mvp} = P \\cdot V \\cdot M$\n- $M$: model → world (object placement)\n- $V$: world → camera (inverse camera transform)\n- $P$: camera → clip (perspective)\n\n**Matrix multiplication is NOT commutative. Order is critical.**',
       },
       {
         type: 'insight',
         title: 'Rotation Matrices Are Orthogonal',
-        body: 'All rotation matrices $R$ satisfy $R^\\top R = I$ (orthogonal). This has powerful consequences:\n\n$R^{-1} = R^\\top$ (fast inversion)\n$\\det(R) = 1$ (preserves orientation)\n$\\|R\\mathbf{v}\\| = \\|\\mathbf{v}\\|$ (preserves lengths)\nAngles between vectors preserved\n\nThe inverse view matrix (camera transform) is easy: $(V)^{-1} = V^\\top$ for pure rotation cameras.',
+        body: 'All $3 \\times 3$ (or $4 \\times 4$) rotation matrices $R$ satisfy $R^\\top R = I$:\n\n$R^{-1} = R^\\top$ (fast inversion: just transpose)\n$\\det(R) = 1$ (preserves orientation)\n$\\|R\\mathbf{v}\\| = \\|\\mathbf{v}\\|$ (preserves lengths)\nAngles and dot products preserved',
       },
     ],
     visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Graphics Transformations with NumPy',
+        mathBridge: 'Build 4x4 homogeneous transformation matrices, compose them with matrix multiplication, and implement a simple MVP pipeline.',
+        caption: 'Every vertex in a 3D game executes exactly this matrix multiply — just at GPU speed, a billion times per second.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Build 4x4 transformation matrices',
+              prose: 'Construct translation, rotation, and scaling matrices in homogeneous coordinates.',
+              code: `import numpy as np
+
+def translation(tx, ty, tz):
+    T = np.eye(4)
+    T[:3, 3] = [tx, ty, tz]
+    return T
+
+def rotation_z(theta):
+    c, s = np.cos(theta), np.sin(theta)
+    R = np.eye(4)
+    R[:2, :2] = [[c, -s], [s, c]]
+    return R
+
+def scaling(sx, sy, sz):
+    return np.diag([sx, sy, sz, 1.0])
+
+# Compose: scale by 2, rotate 45 deg, translate (3, 1, 0)
+M = translation(3, 1, 0) @ rotation_z(np.pi/4) @ scaling(2, 2, 2)
+print("Composed transform (Scale -> Rotate -> Translate):")
+print(np.round(M, 4))
+
+# Apply to point (1, 0, 0)
+p = np.array([1, 0, 0, 1.0])
+p_transformed = M @ p
+print("\\nTransformed point (1,0,0):", np.round(p_transformed[:3], 4))
+`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Order matters: commutativity test',
+              prose: 'Verify that matrix multiplication is NOT commutative for transformations.',
+              code: `import numpy as np
+
+def rotation_z(theta):
+    c, s = np.cos(theta), np.sin(theta)
+    R = np.eye(4)
+    R[:2, :2] = [[c, -s], [s, c]]
+    return R
+
+def translation(tx, ty, tz):
+    T = np.eye(4)
+    T[:3, 3] = [tx, ty, tz]
+    return T
+
+p = np.array([1, 0, 0, 1.0])
+R = rotation_z(np.pi/2)   # 90 degrees
+T = translation(2, 0, 0)
+
+# Rotate then translate: T @ R
+result1 = (T @ R) @ p
+# Translate then rotate: R @ T
+result2 = (R @ T) @ p
+
+print("Rotate then translate (T @ R @ p):", np.round(result1[:3], 4))
+print("Translate then rotate (R @ T @ p):", np.round(result2[:3], 4))
+print()
+print("Same? ", np.allclose(result1, result2))
+print("Order matters! (T @ R) != (R @ T)")
+`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Simple perspective projection',
+              prose: 'Apply a perspective projection matrix to see how 3D points become 2D screen coordinates.',
+              code: `import numpy as np
+
+def perspective(fov_y, aspect, near, far):
+    """Perspective projection matrix (OpenGL convention)."""
+    f = 1.0 / np.tan(fov_y / 2)
+    nf = 1.0 / (near - far)
+    P = np.zeros((4, 4))
+    P[0, 0] = f / aspect
+    P[1, 1] = f
+    P[2, 2] = (far + near) * nf
+    P[2, 3] = 2 * far * near * nf
+    P[3, 2] = -1.0
+    return P
+
+P = perspective(np.radians(60), 16/9, 0.1, 100)
+
+# Some 3D points at different depths (homogeneous)
+points = np.array([
+    [0, 0, -5, 1],    # on z-axis, depth 5
+    [1, 0, -5, 1],    # to the right, depth 5
+    [0, 0, -2, 1],    # closer (depth 2)
+])
+
+print("3D -> clip space -> NDC (normalized device coordinates):")
+for p in points:
+    clip = P @ p
+    ndc = clip[:3] / clip[3]   # perspective divide
+    print(f"  World {p[:3]} -> NDC {np.round(ndc, 3)}")
+
+print()
+print("Objects at z=-2 appear larger than z=-5 (perspective effect)")
+`,
+            },
+          ],
+        },
+      },
       {
         id: 'OpenMatNotebook',
         title: 'Graphics Transformation Matrices',

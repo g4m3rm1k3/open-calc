@@ -11,33 +11,146 @@ export default {
   hook: {
     question: "The Gram-Schmidt process for QR factorization is elegant but numerically unstable — rounding errors accumulate and the computed columns lose orthogonality. Is there a numerically stable way to compute QR using orthogonal matrices?",
     realWorldContext: "Householder reflections and Givens rotations are the workhorses of modern numerical linear algebra. LAPACK's `dgeqrf` (QR factorization), `dgehrd` (Hessenberg reduction), and `dgees` (Schur decomposition) all use Householder reflections internally. Givens rotations are preferred for sparse matrices (they zero out one entry at a time without disturbing zeros), for parallel computing (independent rotations can be applied simultaneously), and in streaming algorithms (update a factorization when one row changes). The stability of these methods — because they use orthogonal matrices — is why modern scientific computing relies on them.",
-    previewVisualizationId: 'OpenMatNotebook',
   },
 
   intuition: {
     prose: [
-      '**Householder reflection: zero out a vector.** Goal: find an orthogonal matrix $H$ such that $H\\mathbf{x} = \\|\\mathbf{x}\\|\\mathbf{e}_1$. Take $\\mathbf{x} = (3,4)^\\top$, $\\|\\mathbf{x}\\| = 5$. We want $H(3,4)^\\top = (5,0)^\\top$ (or $(-5,0)^\\top$ for numerical stability). The Householder reflector is $H = I - 2\\mathbf{v}\\mathbf{v}^\\top/\\|\\mathbf{v}\\|^2$ where $\\mathbf{v} = \\mathbf{x} - \\|\\mathbf{x}\\|\\mathbf{e}_1$. Here $\\mathbf{v} = (3,4)^\\top - (-5,0)^\\top = (8,4)^\\top$ (using the negative sign for stability). $\\|\\mathbf{v}\\|^2 = 80$. $H = I - 2(8,4)^\\top(8,4)/80 = I - \\frac{1}{40}\\begin{pmatrix}64&32\\\\32&16\\end{pmatrix} = \\begin{pmatrix}-3/5&-4/5\\\\-4/5&3/5\\end{pmatrix}$. Check: $H(3,4)^\\top = (-9/5-16/5, -12/5+12/5)^\\top = (-5,0)^\\top$ ✓ (negative of target — adjust sign).',
-      '**Givens rotation: zero out one entry.** A Givens rotation $G(i,j,\\theta)$ rotates the $(i,j)$ plane by angle $\\theta$ to zero the $j$-th entry of a vector. For $(a,b)^\\top$: choose $c=a/r$, $s=b/r$ where $r=\\sqrt{a^2+b^2}$. Then $\\begin{pmatrix}c&s\\\\-s&c\\end{pmatrix}\\begin{pmatrix}a\\\\b\\end{pmatrix} = \\begin{pmatrix}r\\\\0\\end{pmatrix}$. Example: $a=3$, $b=4$, $r=5$, $c=3/5$, $s=4/5$. $G^\\top(3,4)^\\top = (5,0)^\\top$ ✓. Cost: 4 multiplications and 2 additions per rotation vs $O(n)$ for a Householder step.',
-      '**Householder for QR.** Apply Householder reflections column by column: $H_1$ zeros out entries below the diagonal in column 1, $H_2$ zeros entries below diagonal in column 2, etc. After $n-1$ steps (for $m\\times n$ with $m\\geq n$): $H_{n-1}\\cdots H_1 A = R$ (upper triangular), so $A = QR$ with $Q = H_1 \\cdots H_{n-1}$ (orthogonal, product of reflectors). Each reflector is stored as just the vector $\\mathbf{v}$ — the full $Q$ is never explicitly formed unless needed.',
+      '**Where you are in the story.** Every algorithm in this chapter has used QR factorization as a subroutine — QR for least squares, the QR algorithm for eigenvalues, the Schur decomposition. You learned that Gram-Schmidt computes QR but is numerically unstable. This lesson explains what is used instead: two elementary orthogonal transformations that together are the foundation of all stable numerical linear algebra. Householder reflections and Givens rotations are not abstract — they are the literal operations that LAPACK runs inside your computer.',
+
+      '**The Householder idea: reflect to zero everything below one entry.** You have a vector $\\mathbf{x} = (3,4)^\\top$ and you want to find an orthogonal matrix $H$ such that $H\\mathbf{x} = (5,0)^\\top$ — all entries except the first become zero. The key geometric insight: $H$ is a reflection across a hyperplane. If you reflect $\\mathbf{x}$ across the hyperplane perpendicular to $\\mathbf{v} = \\mathbf{x} - \\|\\mathbf{x}\\|\\mathbf{e}_1$, the reflection lands on the $\\mathbf{e}_1$ axis. The formula is $H = I - 2\\mathbf{v}\\mathbf{v}^\\top / \\|\\mathbf{v}\\|^2$. One matrix, one multiplication: the entire sub-column becomes zero.',
+
+      '**The sign convention matters.** For numerical stability, you choose the sign of $\\|\\mathbf{x}\\|\\mathbf{e}_1$ to be opposite to $x_1$: $\\mathbf{v} = \\mathbf{x} + \\text{sign}(x_1)\\|\\mathbf{x}\\|\\mathbf{e}_1$. This makes $\\mathbf{v}$ as large as possible, avoiding catastrophic cancellation when $x_1 \\approx \\|\\mathbf{x}\\|$. It is the same pattern you saw in the numerical stability lesson: algebraically equivalent formulas can have very different floating-point behavior.',
+
+      '**Householder QR: apply one reflector per column.** To triangularize $A$: apply $H_1$ to zero out everything below the (1,1) entry of column 1. Then apply $H_2$ (acting on rows $2,\\ldots,m$) to zero out everything below the (2,2) entry of column 2. Continue until the matrix is upper triangular. Each reflector is orthogonal, so the product $Q = H_1 H_2 \\cdots H_{n-1}$ is orthogonal. The beautiful efficiency: you never form $H_k$ as an $m \\times m$ matrix — you store just the vector $\\mathbf{v}_k$ and apply the operation $x \\mapsto x - 2\\mathbf{v}(\\mathbf{v}^\\top x)/\\|\\mathbf{v}\\|^2$ in $O(m)$ flops.',
+
+      '**Predict before reading on.** For the dense matrix $A = \\begin{pmatrix}3&1\\\\4&0\\\\0&1\\end{pmatrix}$, the first Householder reflector $H_1$ acts on the first column $(3,4,0)^\\top$. What is $\\|\\mathbf{a}_1\\|$? What will the $(1,1)$ entry of $R = H_1 A$ be? Write your answer before Example 1.',
+
+      '**Givens rotations: zero out one entry at a time.** A Givens rotation $G$ acts in a $2 \\times 2$ subspace: given a pair $(a,b)$, it rotates so $(a,b)^\\top \\mapsto (r, 0)^\\top$ with $r = \\sqrt{a^2 + b^2}$. The angle is $\\cos\\theta = a/r$, $\\sin\\theta = b/r$. Cost: 6 arithmetic operations per rotation (vs $O(m)$ for a Householder step). The tradeoff: Householder is far more efficient for dense matrices (one step per column), but Givens is perfect for sparse matrices where you only need to zero out a few specific entries without disturbing the existing zero structure.',
+
+      '**When to use Givens vs Householder.** Dense matrix QR: use Householder — it zeros an entire sub-column in $O(m)$ work, giving total cost $O(mn^2)$. Sparse matrix QR or incremental updates (one row changes): use Givens — each rotation touches only two entries, so existing zeros are preserved. Parallel computation: Givens rotations on independent row pairs can run simultaneously. The "streaming least squares" problem (update the QR as new data arrives) uses one Givens rotation per new data point.',
+
+      '**Where this is heading.** Chapter 8 applies these building blocks to iterative methods for large systems: conjugate gradient, GMRES, and Lanczos all reduce ultimately to sequences of orthogonalization steps — Gram-Schmidt, Householder, or Givens variants. The stability concepts you learned here (and the numerical pitfalls you now recognize) are prerequisites for understanding when those iterative methods converge and when they fail.',
     ],
     callouts: [
       {
         type: 'sequencing',
-        title: 'Prediction: Householder or Givens?',
-        body: 'You need to compute the QR factorization of (a) a dense $500\\times 400$ matrix, and (b) a sparse tridiagonal $1000\\times 1000$ matrix. **Before deciding:** which method (Householder vs Givens) is better for each? After predicting: (a) Dense: Householder — each reflector zeros an entire column below the diagonal in one operation, $O(n^2)$ per column. Givens would need $m-1$ rotations per column. (b) Sparse tridiagonal: Givens — each rotation zeros one entry without disturbing the existing zeros, preserving sparsity. Householder would introduce fill-in.',
+        title: 'Lesson 7 of 7 — Numerical Linear Algebra',
+        body: '**Previous (Lesson 6):** Schur decomposition — always-existing upper triangular eigenvalue form, the QR algorithm.\n**This lesson:** Householder reflections and Givens rotations — the elementary orthogonal operations that implement QR stably in all production software.\n**Next (Chapter 8):** Iterative methods — conjugate gradient, GMRES — which use these building blocks at massive scale.',
       },
       {
         type: 'theorem',
         title: 'Householder Reflector',
-        body: 'For any nonzero $\\mathbf{x} \\in \\mathbb{R}^n$, the matrix $H = I - 2\\mathbf{v}\\mathbf{v}^\\top/\\|\\mathbf{v}\\|^2$\nwhere $\\mathbf{v} = \\mathbf{x} + \\text{sign}(x_1)\\|\\mathbf{x}\\|\\mathbf{e}_1$\n\nsatisfies: $H\\mathbf{x} = -\\text{sign}(x_1)\\|\\mathbf{x}\\|\\mathbf{e}_1$\n\nProperties: $H = H^\\top$ (symmetric), $H^2 = I$ (involutory), $H^{-1} = H$ (its own inverse), $\\det H = -1$.\n\nThe sign choice ensures $\\mathbf{v} \\neq 0$ and avoids cancellation: if $x_1 > 0$, use $+\\|\\mathbf{x}\\|$.',
+        body: 'For any nonzero $\\mathbf{x} \\in \\mathbb{R}^n$, with $\\mathbf{v} = \\mathbf{x} + \\text{sign}(x_1)\\|\\mathbf{x}\\|\\mathbf{e}_1$:\n\n$H = I - 2\\mathbf{v}\\mathbf{v}^\\top/\\|\\mathbf{v}\\|^2$\n\n$H\\mathbf{x} = -\\text{sign}(x_1)\\|\\mathbf{x}\\|\\mathbf{e}_1$\n\nProperties: $H = H^\\top$, $H^2 = I$, $\\det H = -1$, $\\kappa(H) = 1$.',
       },
       {
         type: 'insight',
         title: 'Givens vs Householder: when to use each',
-        body: '**Householder**: zeros an entire sub-column in one step. Best for dense matrices. Cost: $O(2mn)$ per reflector (vs $O(4mn)$ flops for Gram-Schmidt). Produces QR for $m\\times n$ matrix in $O(mn^2 - n^3/3)$ flops.\n\n**Givens**: zeros one entry per rotation. Best for sparse matrices, streaming updates, and parallel computation. Introduced in parallel as pairs of rows can rotate simultaneously.\n\n**Never use**: classical Gram-Schmidt (unstable). Use modified Gram-Schmidt only when building ONLY $Q$ incrementally.',
+        body: '**Householder**: zeros an entire sub-column in $O(m)$ work. Best for dense matrices. Total QR cost: $O(mn^2 - n^3/3)$ flops.\n\n**Givens**: zeros one entry per rotation at fixed cost of 6 operations. Best for sparse matrices (preserves zeros), streaming updates, and parallel algorithms.\n\n**Never use**: classical Gram-Schmidt. Modified Gram-Schmidt is acceptable only for building $Q$ incrementally.',
       },
     ],
     visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Householder and Givens with NumPy',
+        mathBridge: 'Implement a Householder reflector, apply it to zero a sub-column, build QR column-by-column, and compare stability to Gram-Schmidt.',
+        caption: 'numpy.linalg.qr calls LAPACK dgeqrf internally — Householder reflections, exactly as implemented here.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Build a Householder reflector',
+              prose: 'Construct H for a given vector x so that Hx = ||x|| e_1. Verify it is orthogonal and symmetric.',
+              code: `import numpy as np
+
+def householder(x):
+    """Returns v s.t. H = I - 2vv^T/||v||^2 maps x -> -sign(x[0])||x||e_1"""
+    v = x.copy().astype(float)
+    sign = 1.0 if x[0] >= 0 else -1.0
+    v[0] += sign * np.linalg.norm(x)
+    return v
+
+x = np.array([3.0, 4.0, 0.0])
+v = householder(x)
+H = np.eye(3) - 2 * np.outer(v, v) / (v @ v)
+
+print("x =", x)
+print("Hx =", np.round(H @ x, 10))
+print("Expected: [-5, 0, 0]")
+print()
+print("H symmetric? ||H - H.T|| =", np.linalg.norm(H - H.T))
+print("H orthogonal? ||H.T H - I|| =", np.linalg.norm(H.T @ H - np.eye(3)))
+print("H involutory? ||H^2 - I|| =", np.linalg.norm(H @ H - np.eye(3)))
+`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Householder QR factorization',
+              prose: 'Apply Householder reflectors column by column to triangularize A. Compare the result to numpy.linalg.qr.',
+              code: `import numpy as np
+
+def householder_qr(A):
+    m, n = A.shape
+    R = A.copy().astype(float)
+    Q = np.eye(m)
+    for k in range(n):
+        x = R[k:, k]
+        sign = 1.0 if x[0] >= 0 else -1.0
+        v = x.copy()
+        v[0] += sign * np.linalg.norm(x)
+        if np.linalg.norm(v) < 1e-14:
+            continue
+        v = v / np.linalg.norm(v)
+        # Apply H_k to R and Q
+        R[k:, :] -= 2 * np.outer(v, v @ R[k:, :])
+        Q[:, k:] -= 2 * np.outer(Q[:, k:] @ v, v)
+    return Q, R
+
+A = np.array([[1,2,3],[4,5,6],[7,8,10],[1,0,1]], dtype=float)
+Q, R = householder_qr(A)
+
+print("R (should be upper triangular):")
+print(np.round(R, 4))
+print()
+print("||QR - A||:", np.linalg.norm(Q @ R - A))
+print("||Q.T Q - I||:", np.linalg.norm(Q.T @ Q - np.eye(4)))
+`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Stability: Householder vs classical Gram-Schmidt',
+              prose: 'For an ill-conditioned matrix, compare how far Q deviates from orthogonality between Gram-Schmidt and Householder.',
+              code: `import numpy as np
+
+# Nearly rank-deficient matrix (ill-conditioned)
+n = 20
+t = np.linspace(0, 1, n)
+A = np.column_stack([t**k for k in range(10)])  # Vandermonde, kappa ~ 10^12
+
+# Classical Gram-Schmidt
+def cgs(A):
+    m, n = A.shape
+    Q = np.zeros((m, n))
+    for j in range(n):
+        q = A[:, j].copy()
+        for i in range(j):
+            q -= (Q[:, i] @ A[:, j]) * Q[:, i]
+        Q[:, j] = q / np.linalg.norm(q)
+    return Q
+
+Q_gs = cgs(A)
+Q_hh, _ = np.linalg.qr(A, mode='reduced')   # Householder internally
+
+print(f"Condition number of A: {np.linalg.cond(A):.2e}")
+print()
+print("||Q.T Q - I|| (Gram-Schmidt): ", np.linalg.norm(Q_gs.T @ Q_gs - np.eye(10)))
+print("||Q.T Q - I|| (Householder):  ", np.linalg.norm(Q_hh.T @ Q_hh - np.eye(10)))
+print()
+print("Gram-Schmidt Q loses orthogonality; Householder keeps it machine-precise")
+`,
+            },
+          ],
+        },
+      },
       {
         id: 'OpenMatNotebook',
         title: 'Householder and Givens in Action',

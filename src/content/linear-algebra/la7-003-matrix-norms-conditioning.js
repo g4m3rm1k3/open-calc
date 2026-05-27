@@ -11,40 +11,123 @@ export default {
   hook: {
     question: "You solve $Ax = b$ on a computer and get some answer. But if there are tiny rounding errors in $b$, how wrong might your solution be? The condition number tells you exactly.",
     realWorldContext: "Condition numbers are critical in scientific computing. A condition number of $10^{12}$ means that 12 digits of precision are lost in the solution — a disaster on 16-digit double-precision hardware. In ill-conditioned structural mechanics problems (nearly singular stiffness matrices), computed stresses can be completely wrong. In machine learning, ill-conditioned Gram matrices (when features are nearly collinear) cause numerical instability in solving normal equations. In statistics, near-multicollinearity in regression leads to high condition numbers — the signal that your fit is unreliable.",
-    previewVisualizationId: 'OpenMatNotebook',
   },
 
   intuition: {
     prose: [
-      'Take $A = \\begin{bmatrix}3&0\\\\0&0.001\\end{bmatrix}$ and $\\mathbf{b} = (3, 0.001)^\\top$ — exact solution $\\mathbf{x} = (1,1)^\\top$. Now perturb $\\mathbf{b}$ by $\\delta\\mathbf{b} = (0, 0.001)^\\top$: relative input error $\\|\\delta\\mathbf{b}\\|/\\|\\mathbf{b}\\| \\approx 0.03\\%$. The new solution is $\\mathbf{x}\' = (1, 2)^\\top$, so $\\|\\delta\\mathbf{x}\\|/\\|\\mathbf{x}\\| = 1/\\sqrt{2} \\approx 71\\%$. A tiny perturbation in $\\mathbf{b}$ caused a massive change in $\\mathbf{x}$. Why? Because $\\kappa_2(A) = \\sigma_{\\max}/\\sigma_{\\min} = 3/0.001 = 3000$ — the condition number predicted this: error amplification $\\leq \\kappa(A)$. The matrix has one direction (the $y$-axis) that is nearly invisible — tiny components there get magnified enormously.',
-      '**Vector norms first.** The most common vector norms: $\\|\\mathbf{x}\\|_1 = \\sum |x_i|$ (taxicab), $\\|\\mathbf{x}\\|_2 = \\sqrt{\\sum x_i^2}$ (Euclidean), $\\|\\mathbf{x}\\|_\\infty = \\max |x_i|$ (Chebyshev). All equivalent (bounded by constant multiples), but different numerics.',
-      '**Induced (operator) norms.** For a matrix $A$, the induced $p$-norm is $\\|A\\|_p = \\max_{\\mathbf{x} \\neq 0} \\frac{\\|A\\mathbf{x}\\|_p}{\\|\\mathbf{x}\\|_p}$ — the maximum amplification factor. Key results: $\\|A\\|_1 = \\max_j \\sum_i |a_{ij}|$ (max column sum), $\\|A\\|_\\infty = \\max_i \\sum_j |a_{ij}|$ (max row sum), $\\|A\\|_2 = \\sigma_1$ (largest singular value). The Frobenius norm $\\|A\\|_F = \\sqrt{\\sum_{ij} a_{ij}^2} = \\sqrt{\\sum_i \\sigma_i^2}$ is not an induced norm.',
-      '**The condition number.** $\\kappa(A) = \\|A\\| \\cdot \\|A^{-1}\\|$. For the 2-norm: $\\kappa_2(A) = \\sigma_1/\\sigma_n$ (ratio of largest to smallest singular value). Interpretation: a relative perturbation of size $\\varepsilon$ in $\\mathbf{b}$ (or $A$) can cause a relative error as large as $\\kappa(A) \\cdot \\varepsilon$ in the solution $\\mathbf{x}$. The condition number is the amplification factor for errors.',
-      '**Singular $A$ has $\\kappa = \\infty$.** If $A$ is singular, $\\sigma_n = 0$, so $\\kappa_2(A) = \\infty$. Near-singular matrices have large $\\kappa$ and the solution is numerically unreliable. Rule of thumb: if $\\kappa(A) \\approx 10^k$, you lose about $k$ digits of accuracy in double precision (which has ~16 digits).',
+      '**Where you are in the story.** QR and Cholesky give you numerically stable ways to factorize matrices. But "stable" is not a binary property — it comes in degrees. A matrix with condition number 2 is practically indestructible. A matrix with condition number $10^{15}$ will give you garbage even with the best algorithm. This lesson gives you the tools to measure where any given matrix falls on that spectrum, and to understand exactly how much error your computed answer might contain.',
+
+      '**A concrete disaster.** Take $A = \\begin{bmatrix}3&0\\\\0&0.001\\end{bmatrix}$ and solve $A\\mathbf{x} = \\mathbf{b}$ for $\\mathbf{b} = (3, 0.001)^\\top$. Exact solution: $\\mathbf{x} = (1,1)^\\top$. Now add a tiny perturbation $\\delta\\mathbf{b} = (0, 0.001)^\\top$. The relative input error is $\\|\\delta\\mathbf{b}\\|/\\|\\mathbf{b}\\| \\approx 0.03\\%$. The new solution is $(1, 2)^\\top$. Relative error in the answer: $71\\%$. A three-hundredths-of-a-percent perturbation caused a seventy-percent error. The matrix amplified the error by a factor of about 2300. That amplification factor has a name: the condition number.',
+
+      '**What the condition number measures geometrically.** The matrix $A = \\begin{bmatrix}3&0\\\\0&0.001\\end{bmatrix}$ stretches the $x$-axis by 3 and the $y$-axis by 0.001. The ratio of largest to smallest stretch is $3/0.001 = 3000$. That is $\\kappa_2(A)$. A unit sphere under $A$ becomes an ellipse with axes 3 and 0.001. The tiny-axis direction is the source of the problem — points spread out along the fat direction collapse together when $A$ acts on them, so the inverse map fans them back out enormously.',
+
+      '**Norms measure "size" for vectors and matrices.** The Euclidean norm $\\|\\mathbf{x}\\|_2$ is what you already know. The 1-norm $\\|\\mathbf{x}\\|_1 = \\sum |x_i|$ and $\\infty$-norm $\\|\\mathbf{x}\\|_\\infty = \\max |x_i|$ measure size differently. For matrices, the induced 2-norm $\\|A\\|_2 = \\max_{\\mathbf{x}\\neq 0} \\|A\\mathbf{x}\\|_2/\\|\\mathbf{x}\\|_2$ measures the maximum stretching factor — which equals $\\sigma_1$, the largest singular value. The Frobenius norm $\\|A\\|_F = \\sqrt{\\sum a_{ij}^2}$ counts all entries equally and is not an induced norm.',
+
+      '**Predict before reading on.** A $5 \\times 5$ Hilbert matrix has condition number around $5 \\times 10^5$. If you solve $H\\mathbf{x} = \\mathbf{b}$ in double precision (about 16 significant digits), how many reliable digits will the answer have? Write your estimate before looking at Example 1.',
+
+      '**The rule of thumb: digits lost = $\\log_{10}(\\kappa)$.** Double precision has ~16 significant decimal digits. If $\\kappa(A) \\approx 10^k$, solving $A\\mathbf{x} = \\mathbf{b}$ loses about $k$ digits. With $\\kappa = 10^5$, you retain ~11 digits. With $\\kappa = 10^{12}$, only ~4 digits survive. With $\\kappa > 10^{16}$, the answer is meaningless. The Hilbert matrix of size 12 already hits that wall. This is not exotic — it appears in polynomial fitting, integral equations, and machine learning with bad feature scaling.',
+
+      '**The condition number is norm-dependent but qualitatively universal.** $\\kappa_1$, $\\kappa_2$, $\\kappa_\\infty$ can differ by up to $\\sqrt{n}$, but they all agree on whether a matrix is well- or ill-conditioned. In practice, use $\\kappa_2(A) = \\sigma_1/\\sigma_n$: ratio of largest to smallest singular value. An orthogonal matrix (like $Q$ from QR) has $\\kappa_2 = 1$ — perfectly conditioned. A singular matrix has $\\kappa_2 = \\infty$. Everything else is in between.',
+
+      '**Where this is heading.** The next lesson on numerical stability goes deeper: it asks whether the algorithm itself introduces extra errors on top of what conditioning predicts. An algorithm is backward stable if it solves a slightly perturbed problem exactly. Combining perturbation bounds (this lesson) with backward stability (next) gives you a complete picture of how much to trust any numerical result.',
     ],
     callouts: [
       {
+        type: 'sequencing',
+        title: 'Lesson 3 of 7 — Numerical Linear Algebra',
+        body: '**Previous (Lesson 2):** Cholesky decomposition — fast SPD factorization, $\\frac{1}{3}n^3$ flops.\n**This lesson:** Matrix norms and condition numbers — how much can input errors corrupt the output?\n**Next (Lesson 4):** Numerical stability — does the algorithm introduce extra error beyond what conditioning predicts?',
+      },
+      {
         type: 'theorem',
         title: 'Perturbation Bound',
-        body: 'If $A\\mathbf{x} = \\mathbf{b}$ and $A(\\mathbf{x}+\\delta\\mathbf{x}) = \\mathbf{b}+\\delta\\mathbf{b}$, then:\n$\\frac{\\|\\delta\\mathbf{x}\\|}{\\|\\mathbf{x}\\|} \\leq \\kappa(A) \\cdot \\frac{\\|\\delta\\mathbf{b}\\|}{\\|\\mathbf{b}\\|}$\n\nThe condition number $\\kappa(A)$ is the worst-case relative error amplification.',
+        body: 'If $A\\mathbf{x} = \\mathbf{b}$ and $A(\\mathbf{x}+\\delta\\mathbf{x}) = \\mathbf{b}+\\delta\\mathbf{b}$, then:\n$\\frac{\\|\\delta\\mathbf{x}\\|}{\\|\\mathbf{x}\\|} \\leq \\kappa(A) \\cdot \\frac{\\|\\delta\\mathbf{b}\\|}{\\|\\mathbf{b}\\|}$\n\nThe condition number $\\kappa(A) = \\|A\\| \\cdot \\|A^{-1}\\|$ is the worst-case relative error amplification.',
       },
       {
         type: 'insight',
         title: 'Matrix Norm Summary',
-        body: '$\\|A\\|_1 = \\max_j \\sum_i |a_{ij}|$ (max column abs-sum)\n$\\|A\\|_\\infty = \\max_i \\sum_j |a_{ij}|$ (max row abs-sum)\n$\\|A\\|_2 = \\sigma_1$ (largest singular value)\n$\\|A\\|_F = \\sqrt{\\sum_{ij} a_{ij}^2} = \\sqrt{\\sum_i \\sigma_i^2}$\n\nAll satisfy: $\\|AB\\| \\leq \\|A\\| \\cdot \\|B\\|$ (submultiplicativity)',
-      },
-      {
-        type: 'sequencing',
-        title: 'Predict Before Computing',
-        body: 'Before looking at Example 1 (Hilbert matrix): if a $5 \\times 5$ matrix has $\\kappa_2 \\approx 5 \\times 10^5$ and you solve $A\\mathbf{x} = \\mathbf{b}$ in double precision (16-digit accuracy), how many reliable digits will your answer have? Write your guess, then check the rule of thumb.',
+        body: '$\\|A\\|_1 = \\max_j \\sum_i |a_{ij}|$ (max column abs-sum)\n$\\|A\\|_\\infty = \\max_i \\sum_j |a_{ij}|$ (max row abs-sum)\n$\\|A\\|_2 = \\sigma_1$ (largest singular value)\n$\\|A\\|_F = \\sqrt{\\sum_{ij} a_{ij}^2} = \\sqrt{\\sum_i \\sigma_i^2}$ (not induced)\n\nAll induced norms satisfy submultiplicativity: $\\|AB\\| \\leq \\|A\\| \\cdot \\|B\\|$',
       },
       {
         type: 'warning',
         title: 'Condition Number Is Norm-Dependent',
-        body: '$\\kappa_1(A) = \\|A\\|_1 \\|A^{-1}\\|_1$ and $\\kappa_2(A) = \\sigma_1/\\sigma_n$ can differ by a factor of $\\sqrt{n}$ in the worst case. In practice, all condition numbers agree within constant factors, so the qualitative conclusion (well-conditioned vs ill-conditioned) is norm-independent.',
+        body: '$\\kappa_1$ and $\\kappa_2$ can differ by a factor of $\\sqrt{n}$, but they agree qualitatively. Use $\\kappa_2 = \\sigma_{\\max}/\\sigma_{\\min}$ for the cleanest interpretation.\n\n**Rule of thumb:** $\\kappa \\approx 10^k$ → lose $k$ digits of accuracy in double precision.',
       },
     ],
     visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Matrix Norms and Condition Numbers with NumPy',
+        mathBridge: 'Compute norms and condition numbers, observe error amplification, and see the Hilbert matrix as the classic ill-conditioned example.',
+        caption: 'np.linalg.cond uses the ratio of largest to smallest singular value — the most interpretable condition number.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Compare norms and condition numbers',
+              prose: 'Compute 1-norm, 2-norm, inf-norm, Frobenius norm, and condition number for well- and ill-conditioned matrices.',
+              code: `import numpy as np
+
+A_good = np.array([[2.0, 1.0], [1.0, 3.0]])
+print("A_good — well-conditioned:")
+print("  1-norm:     ", np.linalg.norm(A_good, 1))
+print("  2-norm:     ", np.linalg.norm(A_good, 2))
+print("  inf-norm:   ", np.linalg.norm(A_good, np.inf))
+print("  Frobenius:  ", np.linalg.norm(A_good, 'fro'))
+print("  Condition:  ", np.linalg.cond(A_good))
+print()
+
+A_bad = np.array([[1.0, 1.0], [1.0, 1.001]])
+print("A_bad — nearly singular:")
+print("  Condition:  ", np.linalg.cond(A_bad))
+print("  Singular values:", np.linalg.svd(A_bad, compute_uv=False))
+`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Observe error amplification directly',
+              prose: 'Perturb b by a tiny relative amount and measure how much the solution changes. Compare to what the condition number predicted.',
+              code: `import numpy as np
+
+A = np.array([[1.0, 1.0], [1.0, 1.0001]])
+b = np.array([2.0, 2.0001])
+
+x_exact = np.linalg.solve(A, b)
+delta_b  = np.array([0.0001, 0.0])
+x_perturbed = np.linalg.solve(A, b + delta_b)
+
+rel_err_b = np.linalg.norm(delta_b) / np.linalg.norm(b)
+rel_err_x = np.linalg.norm(x_perturbed - x_exact) / np.linalg.norm(x_exact)
+
+print(f"Relative error in b: {rel_err_b:.2e}")
+print(f"Relative error in x: {rel_err_x:.2e}")
+print(f"Amplification:       {rel_err_x / rel_err_b:.1f}")
+print(f"Condition number:    {np.linalg.cond(A):.1f}")
+print()
+print("Amplification <= cond(A)?", rel_err_x / rel_err_b <= np.linalg.cond(A) * 1.01)
+`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Hilbert matrix — condition number grows exponentially',
+              prose: 'The Hilbert matrix H[i,j] = 1/(i+j+1) looks harmless but becomes numerically singular around n = 12.',
+              code: `import numpy as np
+
+print(f"{'n':>4}  {'kappa':>12}  {'digits lost':>12}")
+print("-" * 36)
+for n in range(2, 13):
+    H = np.array([[1.0/(i+j+1) for j in range(n)] for i in range(n)])
+    kappa = np.linalg.cond(H)
+    digits_lost = np.log10(kappa) if kappa > 1 else 0
+    print(f"{n:>4}  {kappa:>12.2e}  {digits_lost:>11.1f}")
+
+print()
+print("Double precision: ~16 significant digits")
+print("H_12 is numerically singular in float64")
+`,
+            },
+          ],
+        },
+      },
       {
         id: 'OpenMatNotebook',
         title: 'Computing Norms and Condition Numbers',

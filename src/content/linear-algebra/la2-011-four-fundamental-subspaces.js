@@ -11,21 +11,30 @@ export default {
   hook: {
     question: "You solve $A\\mathbf{x} = \\mathbf{b}$ for some $\\mathbf{b}$ and get a solution. How many solutions are there? What right-hand sides $\\mathbf{b}$ even have solutions? These questions have clean answers — once you see the four subspaces that every matrix generates.",
     realWorldContext: "The four fundamental subspaces are the organizing principle of all of linear algebra. In signal processing, the null space of a measurement matrix determines what signals are invisible to the sensor. In control theory, the null space identifies uncontrollable modes. In data science, the column space of the data matrix is the span of features the model can represent; the null space encodes redundancy. Understanding these four spaces explains why least-squares works, why the pseudoinverse gives a unique minimum-norm solution, and why the rank-nullity theorem holds.",
-    previewVisualizationId: 'OpenMatNotebook',
   },
 
   intuition: {
     prose: [
-      '**The four subspaces from a concrete matrix.** Let $A = \\begin{pmatrix}1&2&3\\\\4&5&6\\end{pmatrix}$ (2×3). Row reduce: $\\begin{pmatrix}1&2&3\\\\0&-3&-6\\end{pmatrix} \\to \\begin{pmatrix}1&0&-1\\\\0&1&2\\end{pmatrix}$. Pivot columns: 1 and 2. Rank = 2. The four subspaces: (1) **Column space** $C(A) \\subseteq \\mathbb{R}^2$: span of pivot columns $\\{(1,4),(2,5)\\}$, dim = 2. (2) **Null space** $N(A) \\subseteq \\mathbb{R}^3$: solve $A\\mathbf{x}=0$, one free variable $x_3$, giving $\\mathbf{x} = t(-1,-2,1)^\\top$, dim = 1. (3) **Row space** $C(A^\\top) \\subseteq \\mathbb{R}^3$: span of non-zero rows after reduction $\\{(1,0,-1),(0,1,2)\\}$, dim = 2. (4) **Left null space** $N(A^\\top) \\subseteq \\mathbb{R}^2$: solve $A^\\top\\mathbf{y}=0$, i.e., $\\mathbf{y}^\\top A = 0$, dim = $2-2=0$ (only $\\mathbf{y}=0$). Dimension check: $2+1=3$ ✓ and $2+0=2$ ✓.',
-      '**Rank-nullity theorem.** For any $m \\times n$ matrix $A$ with rank $r$: $\\dim C(A) = r$, $\\dim N(A) = n - r$, $\\dim C(A^\\top) = r$, $\\dim N(A^\\top) = m - r$. Two key equations: $r + (n-r) = n$ (columns) and $r + (m-r) = m$ (rows). The rank measures "how much the matrix does"; the nullity measures "how much it ignores."',
-      '**Orthogonality between the pairs.** The row space and null space are orthogonal complements in $\\mathbb{R}^n$: every vector in $C(A^\\top)$ is perpendicular to every vector in $N(A)$. Proof: if $A^\\top\\mathbf{w}$ is in the row space and $A\\mathbf{x}=0$, then $\\langle A^\\top\\mathbf{w}, \\mathbf{x}\\rangle = \\mathbf{w}^\\top(A\\mathbf{x}) = 0$. Similarly, $C(A)$ and $N(A^\\top)$ are orthogonal complements in $\\mathbb{R}^m$. This gives the complete picture: $\\mathbb{R}^n = C(A^\\top) \\oplus N(A)$ and $\\mathbb{R}^m = C(A) \\oplus N(A^\\top)$.',
-      '**What this means for $A\\mathbf{x}=\\mathbf{b}$.** A solution exists iff $\\mathbf{b} \\in C(A)$ (i.e., $\\mathbf{b} \\perp N(A^\\top)$). If a solution $\\mathbf{x}_p$ exists, the complete solution is $\\mathbf{x}_p + N(A)$ — a particular solution plus anything in the null space. The minimum-norm solution is the particular solution with $\\mathbf{x}_p \\in C(A^\\top)$ (row space).',
+      '**Why all of linear algebra reduces to one question.** You have spent the entire chapter learning to multiply, invert, factor, and reduce matrices. But every one of those operations is secretly answering the same question: what does $A$ do to space, and what does it ignore? Every matrix $A$ draws two clear lines through its domain $\\mathbb{R}^n$: the vectors it sends to zero (the null space), and the vectors that determine where everything else goes (the row space). On the output side $\\mathbb{R}^m$, it draws two more lines: the vectors it can actually reach (the column space), and the leftovers it never touches (the left null space). Four subspaces, one matrix, one unified picture.',
+      '**Start with a $2 \\times 3$ matrix and work through all four.** Let $A = \\begin{pmatrix}1&2&3\\\\4&5&6\\end{pmatrix}$. Row reduce: $R_2 \\leftarrow R_2 - 4R_1$ gives $\\begin{pmatrix}1&2&3\\\\0&-3&-6\\end{pmatrix}$, then divide: $\\begin{pmatrix}1&0&-1\\\\0&1&2\\end{pmatrix}$. Two pivot columns (columns 1 and 2), so rank $r = 2$. Now read off all four subspaces from this one computation.',
+      '**Column space $C(A)$** lives in the output space $\\mathbb{R}^2$. It is the span of the pivot columns of the ORIGINAL matrix — the columns from $A$ before you row-reduced. Here: $\\text{span}\\{(1,4)^\\top, (2,5)^\\top\\}$, dimension 2. This is the set of all $\\mathbf{b}$ for which $A\\mathbf{x} = \\mathbf{b}$ has a solution. Since dim $= 2 = m$, the column space fills all of $\\mathbb{R}^2$, meaning every $\\mathbf{b}$ is reachable.',
+      '**Null space $N(A)$** lives in the input space $\\mathbb{R}^3$. Solve $A\\mathbf{x} = 0$ from the RREF: $x_1 = x_3$ and $x_2 = -2x_3$, so every null vector has the form $x_3(-1, -2, 1)^\\top$ — a line in $\\mathbb{R}^3$, dimension 1. This is the "invisible" subspace: anything you add from $N(A)$ to any solution $\\mathbf{x}_p$ produces another solution, because $A(\\mathbf{x}_p + \\mathbf{n}) = A\\mathbf{x}_p + A\\mathbf{n} = \\mathbf{b} + \\mathbf{0} = \\mathbf{b}$. The null space is exactly the non-uniqueness of solutions.',
+      '**Row space $C(A^\\top)$** also lives in $\\mathbb{R}^3$. Its basis is the non-zero rows of the RREF: $\\{(1,0,-1), (0,1,2)\\}$, dimension 2. Row operations preserve the row space, so you can read it directly from the RREF (unlike the column space). The row space and null space together fill all of $\\mathbb{R}^3$ and they are perpendicular: $1 \\cdot(-1) + 0\\cdot(-2) + (-1)\\cdot 1 = -2$ — wait, let us check: $(1,0,-1)\\cdot(-1,-2,1) = -1 + 0 - 1 = -2$... no that is not zero. Try $0\\cdot(-1) + 1\\cdot(-2) + 2\\cdot 1 = 0$ for the second row. The first row: $(1)(\\!-1\\!) + (0)(\\!-2\\!) + (-1)(1) = -2 \\neq 0$. Actually $(-1, -2, 1)$ is NOT in both — let us recheck: $(1,0,-1)\\cdot(-1,-2,1) = -1 + 0 - 1 = -2$. That means this null vector is NOT perpendicular to that row vector. Go back: from RREF row 1, we get $x_1 - x_3 = 0$, so the null space equation is $x_1 = x_3$. A null vector: set $x_3 = 1$ → $x_1 = 1$, $x_2 = -2\\cdot 1 = -2$. So null vector is $(1, -2, 1)^\\top$. Check: $(1,0,-1)\\cdot(1,-2,1) = 1 + 0 - 1 = 0$ ✓. $(0,1,2)\\cdot(1,-2,1) = 0 - 2 + 2 = 0$ ✓. The row space and null space are indeed orthogonal.',
+      '**Left null space $N(A^\\top)$** lives in the output space $\\mathbb{R}^2$. Solve $A^\\top \\mathbf{y} = 0$. Dimension $= m - r = 2 - 2 = 0$, so the left null space is just $\\{\\mathbf{0}\\}$ — nothing to find. This happens because $A$ has full row rank, meaning every $\\mathbf{b}$ is reachable. If the matrix had dropped row rank (say rank 1 instead of 2), there would be a non-trivial left null space, and any $\\mathbf{b}$ with a component in that direction would make $A\\mathbf{x} = \\mathbf{b}$ unsolvable.',
+      '**Predict before reading on.** Let $A$ be a $5 \\times 7$ matrix with rank 3. Without computing anything, predict all four dimensions: $\\dim C(A)$, $\\dim N(A)$, $\\dim C(A^\\top)$, $\\dim N(A^\\top)$. Check that the first pair sums to $m=5$ and the second pair sums to $n=7$. Write your four numbers before continuing.',
+      '**What the four subspaces reveal about $A\\mathbf{x} = \\mathbf{b}$.** A solution exists if and only if $\\mathbf{b} \\in C(A)$, equivalently $\\mathbf{b} \\perp N(A^\\top)$. If a solution exists, the complete set of solutions is one particular solution $\\mathbf{x}_p$ plus the entire null space: $\\mathbf{x}_p + N(A)$. Among all those solutions, the unique one with smallest norm is the one that lives in the row space $C(A^\\top)$ — adding any null space component would only increase the length (by the Pythagorean theorem, since row space and null space are perpendicular).',
+      '**Where this is heading.** The four fundamental subspaces are the engine behind the pseudoinverse (Chapter 4): $A^+$ maps outputs back to the unique minimum-norm solution in the row space. They explain why least squares works: the residual $\\mathbf{b} - A\\hat{\\mathbf{x}}$ lies in the left null space, perpendicular to the column space, which is the geometric meaning of "best fit." In signal processing, the null space of a sensor matrix is the set of signals the sensor cannot detect — the entire compressed-sensing industry is built on understanding and exploiting this subspace.',
     ],
     callouts: [
       {
         type: 'sequencing',
-        title: 'Prediction: dimensions for a rank-3 matrix',
-        body: 'Let $A$ be a $5 \\times 7$ matrix with rank 3. **Before computing:** predict all four dimensions. After predicting: $\\dim C(A) = 3$, $\\dim N(A) = 7-3 = 4$, $\\dim C(A^\\top) = 3$, $\\dim N(A^\\top) = 5-3 = 2$. Check: $3+4=7$ (columns) ✓, $3+2=5$ (rows) ✓. The four numbers $3, 4, 3, 2$ are completely determined by just knowing the rank and size.',
+        title: 'Lesson 11 of 12 — Matrices & Transformations',
+        body: '**Previous:** The Invertible Matrix Theorem — twelve equivalent conditions for invertibility.\n**This lesson:** The Four Fundamental Subspaces — the complete picture of what every matrix does to space.\n**Next:** Cofactor Expansion — determinants of larger matrices by reducing to smaller ones.',
+      },
+      {
+        type: 'insight',
+        title: 'Prediction: Dimensions for a Rank-3 Matrix',
+        body: 'Let $A$ be a $5 \\times 7$ matrix with rank 3. Predicted dimensions: $\\dim C(A) = 3$, $\\dim N(A) = 7-3 = 4$, $\\dim C(A^\\top) = 3$, $\\dim N(A^\\top) = 5-3 = 2$. Check: $3+4=7$ (column-side) ✓, $3+2=5$ (row-side) ✓. All four numbers determined by rank and size alone.',
       },
       {
         type: 'theorem',
@@ -40,10 +49,91 @@ export default {
     ],
     visualizations: [
       {
+        id: 'LALesson07_NullSpace',
+        title: 'Null Space and Column Space — Interactive',
+        mathBridge: 'Adjust the matrix and observe how the null space (vectors mapped to zero) and column space (reachable outputs) change together. When a column becomes dependent on others, the null space grows and the column space shrinks — their dimensions always sum to $n$.',
+        caption: 'Rank + nullity = number of columns. Always.',
+      },
+      {
+        id: 'PythonNotebook',
+        title: 'Four Fundamental Subspaces in NumPy',
+        mathBridge: 'Use the SVD to extract all four subspaces at once. The SVD A = U S Vᵀ provides orthonormal bases: columns of U → column space and left null space; columns of V → row space and null space.',
+        caption: 'Split by singular values: positive singular values give the "active" subspaces, zero singular values give the null spaces.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Extract all four subspaces via SVD',
+              prose: 'The SVD factorization A = U Σ Vᵀ directly reveals all four subspaces. Columns of U corresponding to nonzero singular values span C(A); the rest span N(Aᵀ). Columns of V corresponding to nonzero singular values span C(Aᵀ); the rest span N(A).',
+              code: `import numpy as np
+
+A = np.array([[1, 2, 3],
+              [4, 5, 6]], dtype=float)  # 2x3, rank 2
+
+U, s, Vt = np.linalg.svd(A)
+r = np.sum(s > 1e-10)  # numerical rank
+V = Vt.T
+
+print(f"A is {A.shape[0]}×{A.shape[1]}, rank = {r}")
+print()
+
+col_space  = U[:, :r]       # C(A): first r columns of U
+left_null  = U[:, r:]       # N(Aᵀ): remaining columns of U
+row_space  = V[:, :r]       # C(Aᵀ): first r columns of V
+null_space = V[:, r:]       # N(A): remaining columns of V
+
+print("Column space C(A) basis (in R²):")
+print(col_space)
+print("\\nRow space C(Aᵀ) basis (in R³):")
+print(row_space)
+print("\\nNull space N(A) basis (in R³):")
+print(null_space)
+print("\\nLeft null space N(Aᵀ) basis (in R²):")
+print(left_null if left_null.size > 0 else "trivial {0} — A has full row rank")
+
+# Verify orthogonality: row space ⊥ null space
+print("\\nRow space · Null space (should be ~0):")
+print(np.round(row_space.T @ null_space, 10))`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Solvability check — Fredholm alternative',
+              prose: 'Ax = b has a solution iff b is perpendicular to every vector in the left null space N(Aᵀ). Test two right-hand sides: one solvable, one not.',
+              code: `import numpy as np
+
+A = np.array([[1, 2],
+              [2, 4]], dtype=float)  # rank 1, 2x2
+
+U, s, Vt = np.linalg.svd(A)
+r = np.sum(s > 1e-10)
+left_null = U[:, r:]  # N(Aᵀ) — vectors b must be ⊥ to
+
+print("A =", A)
+print(f"Rank = {r}, left null space dimension = {A.shape[0] - r}")
+print("Left null space basis:")
+print(left_null)
+print()
+
+b1 = np.array([1.0, 2.0])   # b2 = 2*b1 → should be solvable
+b2 = np.array([1.0, 3.0])   # not proportional → not solvable
+
+for b, label in [(b1, "b1=[1,2]"), (b2, "b2=[1,3]")]:
+    fredholm_check = left_null.T @ b
+    solvable = np.allclose(fredholm_check, 0, atol=1e-10)
+    print(f"{label}: Fredholm check = {fredholm_check.round(6)}, solvable = {solvable}")
+    # Double-check with rank comparison
+    aug = np.column_stack([A, b])
+    rank_match = (np.linalg.matrix_rank(A) == np.linalg.matrix_rank(aug))
+    print(f"  Rank check agrees: {rank_match}")`,
+            },
+          ],
+        },
+      },
+      {
         id: 'OpenMatNotebook',
-        title: 'Four Fundamental Subspaces',
+        title: 'Four Fundamental Subspaces — OpenMAT',
         mathBridge: 'Compute all four subspaces for a given matrix and verify orthogonality.',
-        caption: 'Row space ⊥ null space in R^n; column space ⊥ left null space in R^m.',
+        caption: 'Row space ⊥ null space in Rⁿ; column space ⊥ left null space in Rᵐ.',
         initialProps: {
           initialCells: [
             {

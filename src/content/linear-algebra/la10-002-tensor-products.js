@@ -11,21 +11,25 @@ export default {
   hook: {
     question: "A $2 \\times 3$ matrix has 6 entries. Can you think of it as a vector in a 6-dimensional space? And what is the right algebraic structure that makes this work for maps from $\\mathbb{R}^2 \\times \\mathbb{R}^3$ to $\\mathbb{R}$?",
     realWorldContext: "Tensor products are the mathematical foundation of modern machine learning. Neural network weight matrices are tensors; the attention mechanism in Transformers is a tensor operation. In quantum computing, a system of $n$ qubits lives in $\\mathbb{C}^2 \\otimes \\mathbb{C}^2 \\otimes \\cdots \\otimes \\mathbb{C}^2$ ($2^n$ dimensions). Tensor decompositions (Tucker, CP/PARAFAC) are used in signal processing, chemometrics, and recommender systems. The Kronecker product appears in solving Lyapunov equations, vectorization tricks, and GPU-efficient matrix computations.",
-    previewVisualizationId: 'OpenMatNotebook',
   },
 
   intuition: {
     prose: [
-      '**Tensor products from first numbers.** Take $\\mathbf{u} = (2,1) \\in \\mathbb{R}^2$ and $\\mathbf{v} = (3,4) \\in \\mathbb{R}^2$. Their outer product is $\\mathbf{u}\\mathbf{v}^\\top = \\begin{pmatrix}6&8\\\\3&4\\end{pmatrix}$ — a 2×2 matrix. In tensor language, this IS $\\mathbf{u} \\otimes \\mathbf{v}$: a single "elementary tensor." Now consider a bilinear map like $B(\\mathbf{u},\\mathbf{v}) = u_1 v_1 + 2u_2 v_2$ — it is linear in each argument separately: $B((2,1),(3,4)) = 2\\cdot3+2\\cdot1\\cdot4 = 14$. The tensor product $V \\otimes W$ is the universal domain that converts bilinear maps into ordinary linear maps: every such $B$ factors as a linear map $\\tilde{B}$ applied to $\\mathbf{u}\\otimes\\mathbf{v}$. Dimension: $\\dim(\\mathbb{R}^2 \\otimes \\mathbb{R}^3) = 6$, matching a $2 \\times 3$ matrix\'s 6 entries.',
-      '**Construction.** $V \\otimes W$ is the vector space spanned by formal symbols $\\mathbf{v} \\otimes \\mathbf{w}$ (for $\\mathbf{v} \\in V$, $\\mathbf{w} \\in W$) subject to bilinearity relations: $(\\alpha\\mathbf{v}) \\otimes \\mathbf{w} = \\alpha(\\mathbf{v} \\otimes \\mathbf{w}) = \\mathbf{v} \\otimes (\\alpha\\mathbf{w})$ and $(\\mathbf{v}_1 + \\mathbf{v}_2) \\otimes \\mathbf{w} = \\mathbf{v}_1 \\otimes \\mathbf{w} + \\mathbf{v}_2 \\otimes \\mathbf{w}$. Dimension: $\\dim(V \\otimes W) = (\\dim V)(\\dim W)$. Basis: $\\{\\mathbf{e}_i \\otimes \\mathbf{f}_j\\}$ for bases $\\{\\mathbf{e}_i\\}$ of $V$ and $\\{\\mathbf{f}_j\\}$ of $W$.',
-      '**Matrices as tensors.** $\\mathbb{R}^m \\otimes \\mathbb{R}^n \\cong \\mathbb{R}^{m \\times n}$ (space of $m \\times n$ matrices). An elementary tensor (rank-1 tensor) $\\mathbf{u} \\otimes \\mathbf{v}$ corresponds to the outer product matrix $\\mathbf{u}\\mathbf{v}^\\top$. Not every matrix is rank-1, but every matrix is a sum of rank-1 matrices — this is the matrix rank decomposition / SVD.',
-      '**Kronecker product.** For matrices $A \\in \\mathbb{R}^{m \\times n}$ and $B \\in \\mathbb{R}^{p \\times q}$: $A \\otimes B \\in \\mathbb{R}^{mp \\times nq}$ with block structure $(A \\otimes B)_{(i-1)p+k, (j-1)q+l} = a_{ij}b_{kl}$. Key properties: $(A \\otimes B)(C \\otimes D) = AC \\otimes BD$, $(A \\otimes B)^{-1} = A^{-1} \\otimes B^{-1}$, $\\text{vec}(AXB) = (B^\\top \\otimes A)\\text{vec}(X)$.',
+      'Where you are in the story: the dual space gave you a new perspective on row vectors — they are linear functionals, not just transposes of column vectors. Now push further: what if you want a function that takes two vectors and produces a scalar, and is linear in each argument separately? This is a **bilinear map**, and it appears everywhere: the inner product is bilinear, the determinant of a 2×2 matrix is bilinear in its rows, the stress tensor in mechanics maps two vectors (a surface normal and a force direction) to a scalar. Tensor products are the algebraic structure that tames bilinear maps.',
+      'Start with the simplest example. Take $\\mathbf{u} = (2,1) \\in \\mathbb{R}^2$ and $\\mathbf{v} = (3,4) \\in \\mathbb{R}^2$. Their **outer product** is $\\mathbf{u}\\mathbf{v}^\\top = \\begin{pmatrix}6&8\\\\3&4\\end{pmatrix}$ — a $2 \\times 2$ matrix. This matrix is the tensor $\\mathbf{u} \\otimes \\mathbf{v}$: an "elementary tensor" or "rank-1 tensor." Given any bilinear function $B: \\mathbb{R}^2 \\times \\mathbb{R}^2 \\to \\mathbb{R}$, we can evaluate it as a linear function of the outer product matrix: $B(\\mathbf{u},\\mathbf{v}) = \\sum_{i,j} w_{ij} u_i v_j = \\text{tr}(W^\\top (\\mathbf{u}\\mathbf{v}^\\top))$ for some weight matrix $W$. The outer product is the "universal" way to store the information from a pair of vectors that a bilinear map needs.',
+      'The tensor product space $V \\otimes W$ is the vector space spanned by all elementary tensors $\\mathbf{v} \\otimes \\mathbf{w}$ (for $\\mathbf{v} \\in V$, $\\mathbf{w} \\in W$), subject to the bilinearity rules: $(\\alpha \\mathbf{v}) \\otimes \\mathbf{w} = \\alpha(\\mathbf{v} \\otimes \\mathbf{w}) = \\mathbf{v} \\otimes (\\alpha \\mathbf{w})$ and $(\\mathbf{v}_1 + \\mathbf{v}_2) \\otimes \\mathbf{w} = \\mathbf{v}_1 \\otimes \\mathbf{w} + \\mathbf{v}_2 \\otimes \\mathbf{w}$. A basis for $V \\otimes W$ is $\\{\\mathbf{e}_i \\otimes \\mathbf{f}_j\\}$ where $\\{\\mathbf{e}_i\\}$ and $\\{\\mathbf{f}_j\\}$ are bases of $V$ and $W$. Counting: $\\dim(V \\otimes W) = (\\dim V)(\\dim W)$. For $\\mathbb{R}^2 \\otimes \\mathbb{R}^3$: dimension 6, exactly matching the 6 entries of a $2 \\times 3$ matrix.',
+      'The key theorem: the tensor product has the **universal property** for bilinear maps. For any bilinear map $B: V \\times W \\to U$, there is a unique linear map $\\tilde{B}: V \\otimes W \\to U$ such that $B(\\mathbf{v}, \\mathbf{w}) = \\tilde{B}(\\mathbf{v} \\otimes \\mathbf{w})$. In pictures: $V \\times W \\xrightarrow{\\otimes} V \\otimes W \\xrightarrow{\\tilde{B}} U$. This is profound: any bilinear problem can be converted into a linear problem on a (higher-dimensional) space. Bilinearity is "compiled away" by the tensor product.',
+      '**Predict before reading on:** Let $A = \\begin{pmatrix}1&2\\\\3&4\\end{pmatrix}$ and $B = \\begin{pmatrix}0&1\\\\1&0\\end{pmatrix}$. The Kronecker product $A \\otimes B$ is the matrix representation of the tensor product. What is its size? What does the $(1,1)$ block look like? Is $A \\otimes B$ itself a rank-1 matrix (an elementary tensor)? Make all three predictions before continuing.',
+      'The Kronecker product $A \\otimes B$ is a $4 \\times 4$ matrix (since $2 \\cdot 2 \\times 2 \\cdot 2$): it replaces each entry $a_{ij}$ of $A$ with the block $a_{ij}B$. So the $(1,1)$ block is $a_{11}B = 1 \\cdot B = B = \\begin{pmatrix}0&1\\\\1&0\\end{pmatrix}$. Is $A \\otimes B$ rank-1? No: $A \\otimes B$ has rank $= \\text{rank}(A) \\cdot \\text{rank}(B) = 2 \\cdot 1 = 2$ (using the Kronecker product rank identity). Only elementary tensors $\\mathbf{u} \\otimes \\mathbf{v}$ — i.e., outer products — are rank-1.',
+      'The most useful computational identity involving the Kronecker product is the **vectorization trick**: $\\text{vec}(AXB) = (B^\\top \\otimes A)\\,\\text{vec}(X)$, where $\\text{vec}(X)$ stacks the columns of $X$ into a single vector. This converts a matrix equation into a standard linear system. For example, the Sylvester equation $AX + XB = C$ (which appears in control theory, eigenvalue problems, and covariance propagation) becomes $(I \\otimes A + B^\\top \\otimes I)\\,\\text{vec}(X) = \\text{vec}(C)$ — a single linear system of size $mn \\times mn$ where $X \\in \\mathbb{R}^{m \\times n}$.',
+      'In modern machine learning, tensors are everywhere. The weight tensor of a convolutional layer maps an input feature map tensor to an output feature map tensor; the attention matrix in a Transformer is a bilinear form evaluated on query and key tensors; a system of $n$ qubits in quantum computing lives in $\\mathbb{C}^2 \\otimes \\mathbb{C}^2 \\otimes \\cdots \\otimes \\mathbb{C}^2$ ($2^n$ dimensions). When you call `torch.einsum` or `np.tensordot`, you are performing tensor contractions — compositions of tensor products and traces — on structured multilinear objects.',
+      'Where this is heading: tensor products extend to higher order by taking more copies — $V \\otimes V \\otimes V^*$ is a (2,1)-tensor, which is exactly what a connection coefficient in differential geometry is. The next lesson introduces exterior algebra, which takes tensor products and imposes antisymmetry: $\mathbf{v} \\wedge \\mathbf{w} = -\\mathbf{w} \\wedge \\mathbf{v}$. This antisymmetry is what makes determinants, volumes, and differential forms work.',
     ],
     callouts: [
       {
         type: 'sequencing',
-        title: 'Prediction: Kronecker product size and rank',
-        body: 'Let $A = \\begin{pmatrix}1&2\\\\3&4\\end{pmatrix}$ (2×2) and $B = \\begin{pmatrix}0&1\\\\1&0\\end{pmatrix}$ (2×2). **Before computing:** predict — what is the size of $A \\otimes B$? Is $A \\otimes B$ an elementary tensor (rank-1)? What would the (1,1) block of $A \\otimes B$ look like? After predicting: $A \\otimes B$ is 4×4 (2·2 × 2·2), the (1,1) block is $a_{11} B = 1 \\cdot B = B$. And $A \\otimes B$ is NOT an elementary tensor since $A$ itself has rank 2.',
+        title: 'Lesson 2 of 5 — Advanced Theory',
+        body: '**Previous (Lesson 1):** Dual Spaces — linear functionals, dual basis, row vectors as covectors, transpose as dual map.\n**This lesson:** Tensor Products — bilinear maps, universal property, matrices as rank-1 tensors, Kronecker product, vectorization identity.\n**Next (Lesson 3):** Exterior Algebra — antisymmetric tensors, wedge product, determinants as volume forms, differential forms.',
       },
       {
         type: 'theorem',
@@ -39,6 +43,97 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Tensor Products in Python',
+        mathBridge: 'Build Kronecker products, verify the vec identity, and solve a Sylvester equation via vectorization.',
+        caption: 'vec(AXB) = (B^T ⊗ A) vec(X) converts any matrix equation into a standard linear system.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+
+              cellTitle: 'Kronecker product and rank identity',
+              prose: 'Build Kronecker products, verify that rank(A⊗B) = rank(A)*rank(B), and confirm the block structure by inspection.',
+              code: `import numpy as np
+
+A = np.array([[1, 2], [3, 4]], dtype=float)
+B = np.array([[0, 1], [1, 0]], dtype=float)
+
+K = np.kron(A, B)
+print("A:")
+print(A)
+print("\\nB:")
+print(B)
+print("\\nA ⊗ B (Kronecker product):")
+print(K)
+print(f"\\nSize: {K.shape}  (expected {A.shape[0]*B.shape[0]} x {A.shape[1]*B.shape[1]})")
+
+# Verify rank identity: rank(A⊗B) = rank(A) * rank(B)
+print(f"\\nrank(A) = {np.linalg.matrix_rank(A)}")
+print(f"rank(B) = {np.linalg.matrix_rank(B)}")
+print(f"rank(A⊗B) = {np.linalg.matrix_rank(K)}")
+print(f"rank(A)*rank(B) = {np.linalg.matrix_rank(A)*np.linalg.matrix_rank(B)}")
+
+# Verify eigenvalue identity: eigs(A⊗B) = all products eig_A[i] * eig_B[j]
+eA = np.linalg.eigvals(A)
+eB = np.linalg.eigvals(B)
+eK_expected = np.array([a*b for a in eA for b in eB])
+eK_actual = np.linalg.eigvals(K)
+print(f"\\nEigenvalues of A⊗B (actual, sorted):  {np.sort(np.real(eK_actual)).round(3)}")
+print(f"All products eig(A)*eig(B) (sorted):   {np.sort(np.real(eK_expected)).round(3)}")
+`,
+            },
+            {
+              id: 2,
+
+              cellTitle: 'Vectorization identity and Sylvester equation',
+              prose: 'Verify vec(AXB) = (B^T ⊗ A) vec(X), then use it to solve a Sylvester equation AX + XB = C by converting to a standard linear system.',
+              code: `import numpy as np
+
+# Verify vec identity: vec(AXB) = (B^T ⊗ A) vec(X)
+A = np.array([[1, 2], [0, 3]], dtype=float)
+X = np.array([[1, -1, 0], [2, 1, -1]], dtype=float)
+B = np.array([[1, 0, 1], [0, 2, 0], [1, 0, 1]], dtype=float)
+
+AXB = A @ X @ B
+vec_AXB_direct = AXB.flatten('F')  # column-major (Fortran order) = stack columns
+
+# Via Kronecker product: (B^T ⊗ A) vec(X)
+vec_X = X.flatten('F')
+K = np.kron(B.T, A)
+vec_AXB_kron = K @ vec_X
+
+print("vec(AXB) direct:")
+print(vec_AXB_direct.round(4))
+print("\\n(B^T ⊗ A) vec(X):")
+print(vec_AXB_kron.round(4))
+print(f"\\nIdentity verified: {np.allclose(vec_AXB_direct, vec_AXB_kron)}")
+
+# Solve Sylvester equation AX + XB = C using vectorization
+# Convert to: (I⊗A + B^T⊗I) vec(X) = vec(C)
+print("\\n--- Sylvester equation AX + XB = C ---")
+A_s = np.array([[4, 1], [0, 3]], dtype=float)
+B_s = np.array([[2, 0], [1, 5]], dtype=float)
+C_s = np.array([[1, 2], [3, 4]], dtype=float)
+
+m, n = A_s.shape[0], B_s.shape[0]
+M = np.kron(np.eye(n), A_s) + np.kron(B_s.T, np.eye(m))
+vec_C = C_s.flatten('F')
+vec_X = np.linalg.solve(M, vec_C)
+X_sol = vec_X.reshape((m, n), order='F')
+
+print("Solution X:")
+print(X_sol.round(4))
+print("\\nVerification: AX + XB =")
+print((A_s @ X_sol + X_sol @ B_s).round(4))
+print("C =")
+print(C_s)
+`,
+            },
+          ],
+        },
+      },
       {
         id: 'OpenMatNotebook',
         title: 'Kronecker Products',

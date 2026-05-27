@@ -11,7 +11,6 @@ export default {
   hook: {
     question: "You can now solve 3×3 systems by hand. But a real power grid has 100,000 unknowns. How do engineers solve it?",
     realWorldContext: "NumPy (Numerical Python) and SciPy (Scientific Python) are the engines behind TensorFlow, PyTorch, scikit-learn, and virtually every modern scientific computation. They compile down to BLAS/LAPACK — the same Fortran libraries NASA used in the 1970s, now running at near-hardware speed. This lesson bridges your theoretical understanding to the professional tooling you will use every day.",
-    previewVisualizationId: 'PythonNotebook',
   },
 
   intuition: {

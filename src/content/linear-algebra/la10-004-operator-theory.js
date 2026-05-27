@@ -11,21 +11,25 @@ export default {
   hook: {
     question: "Matrices have eigenvalues. What do infinite-dimensional linear operators have? A matrix might have 3 eigenvalues; a differential operator on $L^2[0,1]$ has a continuous spectrum. What replaces the eigenvalue decomposition?",
     realWorldContext: "Quantum mechanics is governed by self-adjoint operators on Hilbert spaces: the Hamiltonian $H$ (energy), momentum $p = -i\\hbar d/dx$, position $x$. Observable quantities are eigenvalues of these operators. The hydrogen atom\'s energy levels are the eigenvalues of the Schrödinger operator. Signal processing uses the Fourier transform as a unitary operator on $L^2(\\mathbb{R})$ — its spectrum is continuous. PDE theory uses the spectral theory of differential operators to solve heat, wave, and Schrödinger equations.",
-    previewVisualizationId: 'OpenMatNotebook',
   },
 
   intuition: {
     prose: [
-      '**Operator norm: two concrete examples.** Consider $A = \\begin{pmatrix}3&0\\\\0&-5\\end{pmatrix}$ (diagonal, hence normal). The operator norm $\\|A\\| = \\sup_{\\|x\\|=1}\\|Ax\\|$ is the maximum stretching: $\\|A\\| = 5$ (the largest $|$eigenvalue$|$). Spectral radius $r(A) = \\max(3,5) = 5 = \\|A\\|$. For normal operators, these are always equal. Now contrast with $N = \\begin{pmatrix}0&1\\\\0&0\\end{pmatrix}$ (nilpotent): eigenvalues are both 0, so spectral radius $r(N)=0$. But $\\|N\\| = 1$ (it sends $e_2$ to $e_1$ with $\\|Ne_2\\|=1$, $\\|e_2\\|=1$). For non-normal operators, spectral radius $< $ operator norm is possible.',
-      '**The spectrum.** For $T \\in \\mathcal{B}(H)$, the **resolvent set** is $\\rho(T) = \\{\\lambda \\in \\mathbb{C} : (T - \\lambda I)^{-1} \\text{ exists and is bounded}\\}$. The **spectrum** is $\\sigma(T) = \\mathbb{C} \\setminus \\rho(T)$. In finite dimensions, $\\sigma(T) = $ eigenvalues. In infinite dimensions, three types of spectrum: (1) **Point spectrum** $\\sigma_p$: $\\lambda$ is an eigenvalue (kernel non-trivial). (2) **Continuous spectrum** $\\sigma_c$: $(T-\\lambda I)$ is injective with dense but non-closed range. (3) **Residual spectrum** $\\sigma_r$: $(T-\\lambda I)$ injective but range not dense.',
-      '**The operator norm.** $\\|T\\| = \\sup_{\\|\\mathbf{x}\\| \\leq 1}\\|T\\mathbf{x}\\|$. For matrices: this is the largest singular value (2-norm). Key: $\\|TS\\| \\leq \\|T\\|\\|S\\|$ (submultiplicativity). The **spectral radius** $r(T) = \\lim_{n\\to\\infty}\\|T^n\\|^{1/n} = \\sup_{\\lambda \\in \\sigma(T)}|\\lambda|$. For normal operators ($T^*T = TT^*$): $r(T) = \\|T\\|$ (spectral radius equals operator norm).',
-      '**Compact operators.** $T$ is **compact** if it maps bounded sets to precompact sets (closure is compact). Compact operators are the "limit" of finite-rank operators. Key: $\\sigma(T) \\setminus \\{0\\}$ consists entirely of eigenvalues, each with finite multiplicity, accumulating only at 0. This gives a discrete (but possibly infinite) spectrum.',
+      'Where you are in the story: everything in this course has been finite-dimensional. You worked with matrices — linear maps on $\\mathbb{R}^n$ — and the whole theory of eigenvalues, SVD, and spectral decomposition was built on the fact that an $n \\times n$ matrix has at most $n$ eigenvalues. But the world is not finite-dimensional. A signal is a function, not a finite vector. The Schrödinger equation describes a wavefunction in an infinite-dimensional function space. Operator theory is what happens when you ask: what do eigenvalues become for linear maps on infinite-dimensional spaces?',
+      'The first thing to get right is **boundedness**. For a linear map $T: V \to W$ between finite-dimensional spaces, boundedness is automatic — all linear maps between finite-dimensional normed spaces are bounded. In infinite dimensions, this fails. Consider the derivative $d/dx$ acting on smooth functions on $[0,1]$: the sequence of functions $f_n(x) = \\sin(n\\pi x)/n$ has $\\|f_n\\|_{L^2} \\to 0$ but $\\|f_n\'\\|_{L^2} = \\pi$ — the derivative blows up the norm ratio. A bounded operator is one where $\\|T\\mathbf{x}\\| \\leq C \\|\\mathbf{x}\\|$ for some constant $C$ and all $\\mathbf{x}$. The **operator norm** is the smallest such $C$: $\\|T\\| = \\sup_{\\|\\mathbf{x}\\|=1} \\|T\\mathbf{x}\\|$. For matrices, this is just the largest singular value.',
+      'The **spectrum** generalizes eigenvalues. For a bounded operator $T$, the spectrum $\\sigma(T)$ is the set of $\\lambda \\in \\mathbb{C}$ for which $(T - \\lambda I)$ is not invertible as a bounded operator. In finite dimensions, this is just the eigenvalues. In infinite dimensions, three things can go wrong: (1) **Point spectrum**: $(T-\\lambda I)$ has a nontrivial kernel — $\lambda$ is an eigenvalue. (2) **Continuous spectrum**: $(T-\\lambda I)$ is injective but its range is only dense, not all of $H$ — $\lambda$ is not an eigenvalue but the resolvent is unbounded. (3) **Residual spectrum**: $(T-\\lambda I)$ is injective but its range is not dense.',
+      'Concrete contrast: take $A = \\text{diag}(3,-5)$ (normal matrix). The operator norm $\\|A\\| = 5$ (largest singular value = largest $|$eigenvalue$|$ for normal matrices). Spectral radius $r(A) = 5 = \\|A\\|$. Now take the nilpotent $N = \\begin{pmatrix}0&1\\\\0&0\\end{pmatrix}$: both eigenvalues are 0, so spectral radius $r(N) = 0$. But $\\|N\\| = 1$ — it sends $\\mathbf{e}_2$ to $\\mathbf{e}_1$ with no shrinkage. This shows that for non-normal operators, spectral radius can be strictly less than operator norm. The spectral radius formula $r(T) = \\lim_{n\\to\\infty}\\|T^n\\|^{1/n}$ recovers the right answer in general.',
+      '**Predict before reading on:** Let $T: \\ell^2 \\to \\ell^2$ be defined by $(Tx)_n = \\frac{1}{n} x_n$ — it multiplies the $n$-th component by $1/n$. Is $T$ bounded? What is $\\|T\\|$? Does $T$ have eigenvectors? What is the spectrum $\\sigma(T)$? Think through each question before continuing.',
+      'The multiplication operator is bounded: $\\|Tx\\|^2 = \\sum_{n=1}^\\infty \\frac{1}{n^2}|x_n|^2 \\leq \\sum |x_n|^2 = \\|x\\|^2$, so $\\|T\\| \\leq 1$. Actually $\\|T\\| = 1$ since the unit vector $e_1$ satisfies $\\|Te_1\\| = 1$. Each standard basis vector $e_n$ is an eigenvector: $Te_n = \\frac{1}{n} e_n$. The eigenvalues $\\{1/n : n \\geq 1\\}$ accumulate at 0. Is 0 itself an eigenvalue? No: $Tx = 0$ forces all components to be zero. But 0 is in the spectrum because $(T - 0)$ is injective but not surjective (the sequence $(1, 1/2, 1/3, \\ldots) \\in \\ell^2$ is not in the range of $T$). So $\\sigma(T) = \\{1/n : n \\geq 1\\} \\cup \\{0\\}$ — discrete eigenvalues with 0 in the continuous/residual spectrum.',
+      '**Compact operators** are the infinite-dimensional analogue of matrices: they are limits of finite-rank operators and have the most matrix-like behavior. For a compact self-adjoint operator, the spectral theorem says: the spectrum (excluding 0) consists entirely of real eigenvalues with finite-dimensional eigenspaces, and the eigenvalues accumulate only at 0. There is an orthonormal basis of eigenvectors, and $T\\mathbf{x} = \\sum_i \\lambda_i \\langle \\mathbf{x}, \\mathbf{e}_i \\rangle \\mathbf{e}_i$. This is the exact infinite-dimensional generalization of the spectral theorem for symmetric matrices from Chapter 3.',
+      'The **adjoint** of a bounded operator $T: H \\to H$ is the unique operator $T^*$ satisfying $\\langle T\\mathbf{x}, \\mathbf{y}\\rangle = \\langle \\mathbf{x}, T^*\\mathbf{y}\\rangle$ for all $\\mathbf{x}, \\mathbf{y} \\in H$. For matrices, $T^* = A^*$ (conjugate transpose). A **self-adjoint** operator satisfies $T = T^*$. All eigenvalues of a self-adjoint operator are real; eigenvectors for different eigenvalues are orthogonal — exactly as for symmetric matrices, and for exactly the same reason.',
+      'Where this is heading: the final lesson introduces Banach and Hilbert spaces — the complete normed spaces where all this analysis lives. Completeness is what separates infinite-dimensional analysis from the algebraic setting: Cauchy sequences must converge, projections onto closed subspaces must exist, and the Riesz representation theorem must hold. These structural results are what make Fourier series, quantum mechanics, and kernel methods rigorous.',
     ],
     callouts: [
       {
         type: 'sequencing',
-        title: 'Prediction: spectrum of a simple operator',
-        body: 'Let $T: \\ell^2 \\to \\ell^2$ be the multiplication operator $(Tx)_n = \\frac{1}{n} x_n$ (multiplies the $n$-th component by $1/n$). **Before reading on:** predict — is $T$ bounded? What is $\\|T\\|$? Does $T$ have eigenvectors? What is the spectrum? After predicting: $\\|Tx\\|^2 = \\sum \\frac{1}{n^2}|x_n|^2 \\leq \\sum|x_n|^2 = \\|x\\|^2$, so $\\|T\\|\\leq 1$; in fact $\\|T\\|=1$ (approached but not achieved). Each $e_n$ IS an eigenvector with eigenvalue $1/n$. The spectrum $\\sigma(T) = \\{1/n : n\\geq 1\\}\\cup\\{0\\}$ — discrete eigenvalues accumulating at 0. This is a compact, self-adjoint operator.',
+        title: 'Lesson 4 of 5 — Advanced Theory',
+        body: '**Previous (Lesson 3):** Exterior Algebra — antisymmetric tensors, wedge product, determinants as volume, differential forms.\n**This lesson:** Operator Theory — bounded operators, operator norm, spectrum (point/continuous/residual), compact operators, spectral theorem.\n**Next (Lesson 5):** Banach and Hilbert Spaces — completeness, projections, Riesz representation, $L^2$ space, Fourier series.',
       },
       {
         type: 'theorem',
@@ -39,6 +43,91 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Operator Theory in Python',
+        mathBridge: 'Compute operator norms and spectral radii, verify the spectral radius formula, and simulate an infinite-dimensional compact operator via truncation.',
+        caption: 'For normal matrices: operator norm = spectral radius. For nilpotent: they differ dramatically.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+
+              cellTitle: 'Operator norm vs spectral radius: normal vs non-normal',
+              prose: 'Compare operator norms and spectral radii for a normal matrix (diagonal) and a non-normal matrix (nilpotent/Jordan block). Verify the spectral radius formula r(T) = lim ||T^n||^(1/n).',
+              code: `import numpy as np
+
+def operator_norm(A):
+    """Largest singular value = 2-norm = operator norm"""
+    return np.linalg.norm(A, ord=2)
+
+def spectral_radius(A):
+    """Max modulus of eigenvalues"""
+    return np.max(np.abs(np.linalg.eigvals(A)))
+
+# Normal matrix (symmetric): op_norm = spectral_radius
+A_normal = np.diag([3., -5., 2., -1.])
+print("Normal (diagonal) matrix:")
+print(f"  Operator norm  ||A|| = {operator_norm(A_normal):.3f}")
+print(f"  Spectral radius r(A) = {spectral_radius(A_normal):.3f}")
+print(f"  Equal? {np.isclose(operator_norm(A_normal), spectral_radius(A_normal))}")
+
+# Non-normal matrix: r(A) < ||A|| is possible
+n = 5
+A_jordan = np.diag(np.zeros(n)) + np.diag(np.ones(n-1), 1)  # nilpotent Jordan block
+print(f"\\nNilpotent Jordan block (n={n}):")
+print(f"  Operator norm  ||A|| = {operator_norm(A_jordan):.3f}")
+print(f"  Spectral radius r(A) = {spectral_radius(A_jordan):.3f}  (all eigenvalues = 0)")
+
+# Verify spectral radius formula: r(A) = lim ||A^n||^(1/n)
+print("\\nSpectral radius via power formula ||A^n||^(1/n):")
+A_test = np.array([[0.5, 1.0], [0.0, 0.8]])
+r_true = spectral_radius(A_test)
+Apow = np.eye(2)
+for n in [1, 5, 10, 20, 50]:
+    Apow = np.linalg.matrix_power(A_test, n)
+    approx = operator_norm(Apow) ** (1/n)
+    print(f"  n={n:3d}: ||A^n||^(1/n) = {approx:.5f}")
+print(f"  True spectral radius   = {r_true:.5f}")
+`,
+            },
+            {
+              id: 2,
+
+              cellTitle: 'Compact operator approximation via truncation',
+              prose: 'Approximate the infinite-dimensional multiplication operator T(x)_n = (1/n)*x_n by its N×N truncation, and verify that the eigenvalues converge to the infinite-dimensional spectrum.',
+              code: `import numpy as np
+import matplotlib.pyplot as plt
+
+# Multiplication operator T: x_n -> (1/n)*x_n on ℓ²
+# N-dimensional approximation: diagonal matrix with 1/n on diagonal
+def trunc_spectrum(N):
+    return np.array([1/n for n in range(1, N+1)])
+
+# Show eigenvalues of truncations converging to full spectrum
+Ns = [5, 10, 20, 50]
+fig, axes = plt.subplots(1, len(Ns), figsize=(14, 3))
+for ax, N in zip(axes, Ns):
+    eigs = trunc_spectrum(N)
+    ax.scatter(eigs, np.zeros(N), s=30, c='blue', zorder=5)
+    ax.axhline(0, color='gray', lw=0.5)
+    ax.axvline(0, color='red', lw=1, linestyle='--', label='Spectrum accumulates at 0')
+    ax.set_xlim(-0.1, 1.1); ax.set_ylim(-0.5, 0.5)
+    ax.set_title(f'N={N} truncation\\neigs = 1/1,...,1/N')
+    ax.set_xlabel('Eigenvalue')
+plt.suptitle('Eigenvalues of compact operator T(x)_n = (1/n)x_n', y=1.02)
+plt.tight_layout(); plt.show()
+
+# As N→∞, spectrum fills {1/n : n≥1} ∪ {0}
+print("Operator norm ||T_N||:", 1.0)  # always 1 (largest eigenvalue is 1/1)
+print("Spectral radius r(T_N):", 1.0)  # also 1 (T_N is normal = diagonal)
+print("As N→∞: 0 enters the spectrum but is NOT an eigenvalue")
+print("  (0 is in the continuous/residual spectrum)")
+`,
+            },
+          ],
+        },
+      },
       {
         id: 'OpenMatNotebook',
         title: 'Operator Norm and Spectral Radius',

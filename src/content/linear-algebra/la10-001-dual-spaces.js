@@ -11,21 +11,25 @@ export default {
   hook: {
     question: "Why do physicists write row vectors differently from column vectors? Why does the transpose arise naturally in so many formulas? The answer is duality: row vectors and column vectors live in different (but related) spaces.",
     realWorldContext: "Duality is ubiquitous in mathematics and physics. In quantum mechanics, bra vectors $\\langle\\phi|$ (dual) and ket vectors $|\\psi\\rangle$ (original) are the foundation of the bra-ket formalism. In optimization (duality theory), the dual of a linear program gives a lower bound; strong duality means primal and dual optimal values coincide. In differential geometry, 1-forms (dual vectors) are the natural integrands in integration. In machine learning, support vectors in SVMs are dual variables.",
-    previewVisualizationId: 'OpenMatNotebook',
   },
 
   intuition: {
     prose: [
-      '**Linear functionals — a concrete start.** Let $V = \\mathbb{R}^2$ with standard basis $\\mathbf{e}_1=(1,0)$, $\\mathbf{e}_2=(0,1)$. The function $f(x,y) = 3x - 2y$ is a **linear functional**: $f(1,0)=3$, $f(0,1)=-2$, $f(2,5)=3(2)-2(5)=-4$. The **dual basis** consists of $e^1(x,y)=x$ and $e^2(x,y)=y$, satisfying $e^1(\\mathbf{e}_1)=1$, $e^1(\\mathbf{e}_2)=0$, $e^2(\\mathbf{e}_1)=0$, $e^2(\\mathbf{e}_2)=1$ (Kronecker delta). Then $f = 3e^1 + (-2)e^2$: check, $3e^1(2,5)+(-2)e^2(2,5)=3(2)+(-2)(5)=-4$ ✓. The **dual space** $V^* = $ all such linear functionals — a new vector space, same dimension as $V$.',
-      '**The dual space $V^*$.** The **dual space** of $V$ is $V^* = \\mathcal{L}(V, \\mathbb{F})$ — the set of all linear functionals on $V$. It is itself a vector space (pointwise addition and scalar multiplication). Key fact: $\\dim V^* = \\dim V$ for finite-dimensional spaces. The **dual basis** of a basis $\\{\\mathbf{e}_1, \\ldots, \\mathbf{e}_n\\}$ is $\\{\\mathbf{e}^1, \\ldots, \\mathbf{e}^n\\} \\subset V^*$ defined by $\\mathbf{e}^i(\\mathbf{e}_j) = \\delta^i_j$ (Kronecker delta). In coordinates: if $\\mathbf{v} = \\sum v_j \\mathbf{e}_j$ then $\\mathbf{e}^i(\\mathbf{v}) = v_i$ (picks out the $i$-th coordinate).',
-      '**Row vectors as covectors.** In $\\mathbb{R}^n$, a column vector $\\mathbf{x}$ is a point in $\\mathbb{R}^n$. A row vector $\\mathbf{a}^\\top$ is a covector — an element of $(\\mathbb{R}^n)^*$. The action is $\\mathbf{a}^\\top(\\mathbf{x}) = \\mathbf{a}^\\top \\mathbf{x}$ (dot product). This is why $\\mathbf{a}^\\top\\mathbf{x}$ is well-typed: covector applied to vector.',
-      '**The double dual V\\*\\*.** The dual of the dual: $V^{**} = (V^*)^*$. There is a natural (basis-independent) isomorphism $\\iota: V \\to V^{**}$ given by $\\iota(\\mathbf{v})(f) = f(\\mathbf{v})$ for $f \\in V^*$. This is an isomorphism for finite-dimensional $V$ (not for infinite-dimensional spaces in general).',
+      'Where you are in the story: for nine chapters you have worked with vectors as columns of numbers, matrices as grids of numbers, and linear maps as matrix multiplications. This has been powerful, but it has obscured something subtle. When you write $\\mathbf{a}^\\top \\mathbf{x}$ — a row vector times a column vector — you are doing something conceptually different from $\\mathbf{a}^\\top$ times $\\mathbf{x}$: you are applying a function to a vector. The row vector is not a vector; it is a **linear functional** — a machine that eats a vector and produces a scalar. Chapter 10 lifts the entire subject into the abstract setting where this distinction becomes precise and powerful.',
+      'Start with a concrete linear functional. Let $V = \\mathbb{R}^2$ and define $f(x,y) = 3x - 2y$. Check that $f$ is linear: $f(u+v) = f(u)+f(v)$ and $f(cv) = cf(v)$ both hold. The function $f$ takes a 2D vector and produces a single number. There are infinitely many such functions — one for each choice of coefficients $(a,b)$ in $f(x,y) = ax+by$. The collection of all linear functionals $V \\to \\mathbb{R}$ is itself a vector space, called the **dual space** $V^*$, with addition $(f+g)(v) = f(v)+g(v)$ and scalar multiplication $(cf)(v) = c f(v)$. A fundamental theorem: $\\dim V^* = \\dim V$.',
+      'Every basis $\\{\\mathbf{e}_1, \\ldots, \\mathbf{e}_n\\}$ of $V$ has a corresponding **dual basis** $\\{e^1, \\ldots, e^n\\}$ of $V^*$ defined by $e^i(\\mathbf{e}_j) = \\delta^i_j$ (1 if $i=j$, 0 otherwise). For the standard basis of $\\mathbb{R}^2$: $e^1(x,y) = x$ (picks out the first component) and $e^2(x,y) = y$ (picks out the second). Any functional decomposes as $f = f(\\mathbf{e}_1)\\, e^1 + f(\\mathbf{e}_2)\\, e^2 + \\cdots$. So $f(x,y) = 3x-2y$ becomes $f = 3\\cdot e^1 + (-2)\\cdot e^2$ — the coefficients of $f$ in the dual basis are exactly the values of $f$ on the primal basis vectors.',
+      'Now the reason for row vs column vectors becomes precise. A column vector $\\mathbf{x} \\in \\mathbb{R}^n$ represents a point in the original space $V$. A row vector $\\mathbf{a}^\\top$ represents an element of $V^*$ — a linear functional. The product $\\mathbf{a}^\\top \\mathbf{x}$ is the application of the functional $\\mathbf{a}^\\top$ to the vector $\\mathbf{x}$, producing a scalar. This is not just a notational distinction — it explains why the transpose arises so naturally. In physics, "bra" vectors $\\langle \\phi |$ live in the dual space; "ket" vectors $|\\psi\\rangle$ live in the original space; and the inner product $\\langle \\phi | \\psi \\rangle$ is a functional applied to a vector.',
+      '**Predict before reading on:** Let $B = \\{\\mathbf{b}_1 = (1,1), \\mathbf{b}_2 = (1,-1)\\}$ be a basis of $\\mathbb{R}^2$. The dual basis vector $e^1_B$ must satisfy $e^1_B(\\mathbf{b}_1) = 1$ and $e^1_B(\\mathbf{b}_2) = 0$. If $e^1_B(x,y) = ax + by$, what are $a$ and $b$? Set up the equations and solve before reading on.',
+      'The system $a + b = 1$, $a - b = 0$ gives $a = b = 1/2$, so $e^1_B(x,y) = \\frac{x+y}{2}$. In matrix language: if $B$ is the matrix with $\\mathbf{b}_1, \\mathbf{b}_2$ as columns, then the dual basis vectors are the rows of $B^{-1}$. This is the computational way to find dual bases: $\\text{dual\\_basis} = (B^{-1})^\\top$, whose rows are the dual basis vectors. Verification: $(B^{-1})^\\top B$ should be the identity — the Kronecker delta condition in matrix form.',
+      'The **dual map** (or transpose) has a beautiful coordinate-free definition. If $T: V \\to W$ is linear, its dual map $T^*: W^* \\to V^*$ is defined by $(T^* g)(\\mathbf{v}) = g(T\\mathbf{v})$ — pre-compose with $T$. In matrix coordinates, if $T$ has matrix $A$, then $T^*$ has matrix $A^\\top$. This is the abstract definition of the transpose: not "flip along the diagonal" but "precompose the output functionals with $T$". The fundamental identity $\\langle T\\mathbf{v}, g \\rangle = \\langle \\mathbf{v}, T^*g \\rangle$ (where $\\langle \\cdot, \\cdot \\rangle$ is the dual pairing $g(\\mathbf{v})$) is the abstract adjoint relation that unifies the transpose, the Hermitian conjugate, and the adjoint operator in functional analysis.',
+      'The **double dual** $V^{**} = (V^*)^*$ is the space of linear functionals on $V^*$. There is a natural map $\\iota: V \\to V^{**}$ defined by $\\iota(\\mathbf{v})(f) = f(\\mathbf{v})$ — a vector $\\mathbf{v}$ defines a functional on $V^*$ by evaluating each $f$ at $\\mathbf{v}$. For finite-dimensional $V$, this map is an isomorphism: $V \\cong V^{**}$. The word "natural" here is technical and important — the isomorphism $V \\cong V^*$ requires choosing an inner product (not natural), but $V \\cong V^{**}$ requires no extra structure at all. This is the first hint of category theory: isomorphisms that are "natural" in a precise sense.',
+      'Where this is heading: the next lesson extends scalar-valued linear functionals to multilinear maps on multiple copies of $V$ and $V^*$ — that is, tensors. Tensors are how the dual space perspective on vectors naturally generalizes: stress tensors in mechanics, metric tensors in relativity, and the curvature tensor in differential geometry are all multilinear maps built from copies of $V$ and $V^*$. The abstract formalism you are building now is the foundation for all of it.',
     ],
     callouts: [
       {
         type: 'sequencing',
-        title: 'Prediction: dual basis for a non-standard basis',
-        body: 'Let $B = \\{\\mathbf{b}_1=(1,1),\\, \\mathbf{b}_2=(1,-1)\\}$ be a basis of $\\mathbb{R}^2$. **Before computing:** predict — should the dual basis vector $e^1_B$ give $e^1_B(1,1)=1$ and $e^1_B(1,-1)=0$? What formula $e^1_B(x,y) = ax+by$ satisfies both? After predicting, solve the 2×2 system: $a+b=1$ and $a-b=0$, giving $a=b=\\tfrac{1}{2}$, so $e^1_B(x,y)=\\tfrac{x+y}{2}$. Check: $e^1_B(1,1)=1$ ✓, $e^1_B(1,-1)=0$ ✓.',
+        title: 'Lesson 1 of 5 — Advanced Theory',
+        body: '**Previous (Chapter 9):** Iterative Solvers — Jacobi, CG, GMRES, preconditioning, sparse direct solvers.\n**This lesson:** Dual Spaces — linear functionals, dual basis, row vectors as covectors, dual map = transpose, double dual.\n**Next (Lesson 2):** Tensor Products — multilinear maps, tensor algebra, Kronecker product in computation.',
       },
       {
         type: 'theorem',
@@ -39,6 +43,99 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Dual Spaces in Python',
+        mathBridge: 'Compute dual bases, verify the Kronecker delta property, and confirm that the matrix transpose is the dual map.',
+        caption: 'Dual basis = rows of $B^{-1}$; the transpose is not a coincidence — it is the coordinate expression of the dual map.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+
+              cellTitle: 'Dual basis construction and verification',
+              prose: 'Compute the dual basis for a non-standard basis of R^3 and verify the Kronecker delta property. Then express a linear functional in the dual basis.',
+              code: `import numpy as np
+
+# Basis for R^3: columns of B are basis vectors
+B = np.array([[1, 1, 0],
+              [0, 1, 1],
+              [1, 0, 1]], dtype=float)
+
+print("Basis B (columns are basis vectors):")
+print(B)
+
+# Dual basis: rows of B^{-T} = (B^{-1})^T
+# Property: dual_basis[i] @ B[:, j] = delta_{ij}
+B_inv = np.linalg.inv(B)
+dual_basis = B_inv.T  # rows are dual basis vectors
+
+print("\\nDual basis (rows are dual basis vectors):")
+print(np.round(dual_basis, 4))
+
+# Verify Kronecker delta: dual_basis @ B should be identity
+check = dual_basis @ B
+print("\\nVerification: dual_basis @ B =")
+print(np.round(check, 10))
+print(f"Is identity? {np.allclose(check, np.eye(3))}")
+
+# Express a linear functional f(x,y,z) = 2x - y + 3z in dual basis
+f_on_primal = np.array([2., -1., 3.])  # f(e1), f(e2), f(e3)... wait, these are coords
+# f in coordinates: f(x,y,z) = 2x - y + 3z, so [2, -1, 3] is the covector
+f_row = np.array([2., -1., 3.])
+
+# To express in dual basis: coefficients are f applied to each primal basis vector
+# f_coeff[i] = f(b_i) = f_row @ B[:, i]
+f_coeffs = f_row @ B
+print(f"\\nFunctional f = [2, -1, 3] in standard basis")
+print(f"f(b1), f(b2), f(b3) = {f_coeffs}  (coordinates in dual basis)")
+
+# Verify: reconstruct f from dual basis
+f_reconstructed = sum(f_coeffs[i] * dual_basis[i] for i in range(3))
+print(f"Reconstructed: {f_reconstructed}  (should match [2, -1, 3])")
+`,
+            },
+            {
+              id: 2,
+
+              cellTitle: 'Transpose as the dual map',
+              prose: 'Verify the abstract definition of the dual map: T*(g) = g ∘ T. Show that this forces T* to have matrix A^T.',
+              code: `import numpy as np
+
+# Linear map T: R^3 -> R^2, represented by matrix A
+A = np.array([[1, 2, 3],
+              [4, 5, 6]], dtype=float)
+
+# The dual map T*: (R^2)* -> (R^3)* is T*(g) = g ∘ T
+# In coordinates: if g is represented by row vector w^T,
+# then T*(g) is represented by w^T A = (A^T w)^T
+# So the matrix of T* is A^T (acting on column vectors of R^3*)
+
+print("Matrix of T:", A.shape)
+print(A)
+print("\\nMatrix of dual map T* = A^T:", A.T.shape)
+print(A.T)
+
+# Verify adjoint identity: <Tv, g> = <v, T*g>
+# i.e., g(Tv) = (T*g)(v) for all v ∈ R^3, g ∈ (R^2)*
+v = np.array([1., 2., 3.])
+g = np.array([1., -1.])   # linear functional on R^2: g(x,y) = x - y
+
+Tv = A @ v
+lhs = g @ Tv             # g applied to T(v) = <Tv, g>
+
+T_star_g = A.T @ g       # T*(g) is the functional A^T g on R^3
+rhs = T_star_g @ v       # (T*g) applied to v = <v, T*g>
+
+print(f"\\n<T(v), g> = g(Av)  = {lhs}")
+print(f"<v, T*(g)> = (A^T g)·v = {rhs}")
+print(f"Equal? {np.isclose(lhs, rhs)}")
+print("\\nConclusion: transpose is not an accident — it IS the dual map in coordinates.")
+`,
+            },
+          ],
+        },
+      },
       {
         id: 'OpenMatNotebook',
         title: 'Dual Basis and Linear Functionals',
