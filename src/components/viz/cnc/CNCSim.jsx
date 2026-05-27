@@ -1623,6 +1623,72 @@ G80
 G0 Z50.
 M9 M5 M30`,
     },
+    {
+      id: "O9000",
+      name: "4-Part Tombstone (B-Axis)",
+      desc: "G54-G57 corners, B0 top + B-90 side, macro sub",
+      code: `O9000 (4-PART TOMBSTONE - B-AXIS 2-FACE DRILL)
+(---------------------------------------------------)
+( HAAS UMC / FANUC 5-AXIS                          )
+( 4 PARTS AT CORNERS OF TABLE - G54 THRU G57       )
+( FACE 1 : B0.   C0.  TOP FACE   - DRILL X0 Y0     )
+( FACE 2 : B-90. C0.  SIDE FACE  - DRILL X0 Y0     )
+(---------------------------------------------------)
+( PART LAYOUT (set WCS offsets to match):           )
+(   G54  X+80  Y+80  Z0   front-right corner        )
+(   G55  X-80  Y+80  Z0   front-left  corner        )
+(   G56  X-80  Y-80  Z0   rear-left   corner        )
+(   G57  X+80  Y-80  Z0   rear-right  corner        )
+(---------------------------------------------------)
+( SUBROUTINE O9100 : drills one hole per WCS        )
+(   A-argument = WCS number  54/55/56/57            )
+(---------------------------------------------------)
+G21 G90 G40 G49 G80
+(--- TOOL 1: 12mm CARBIDE DRILL ---)
+T1 M6
+G43 H1
+S2200 M3
+M8
+(=== SET WORK OFFSETS VIA G10 (edit as needed) ===)
+G10 L2 P1 X80. Y80. Z0.
+G10 L2 P2 X-80. Y80. Z0.
+G10 L2 P3 X-80. Y-80. Z0.
+G10 L2 P4 X80. Y-80. Z0.
+(=== FACE 1 : B0 TOP FACE ===)
+G00 B0. C0.
+G91 G28 Z0.
+G90
+G65 P9100 A54.
+G65 P9100 A55.
+G65 P9100 A56.
+G65 P9100 A57.
+(=== FACE 2 : B-90 SIDE FACE ===)
+G00 B-90. C0.
+G91 G28 Z0.
+G90
+G65 P9100 A54.
+G65 P9100 A55.
+G65 P9100 A56.
+G65 P9100 A57.
+(=== RETURN HOME ===)
+G00 B0. C0.
+G91 G28 Z0.
+G90
+M9 M5
+M30
+O9100 (DRILL SUB - #1 = WCS CODE 54/55/56/57)
+(Select work offset from A-argument)
+IF [#1 EQ 54] G54
+IF [#1 EQ 55] G55
+IF [#1 EQ 56] G56
+IF [#1 EQ 57] G57
+G00 X0. Y0.
+G00 Z5.
+G81 X0. Y0. Z-20. R3. F120.
+G80
+G00 Z50.
+M99`,
+    },
   ],
 };
 
@@ -1828,23 +1894,29 @@ export default function CNCSimPro() {
   );
 
   useEffect(() => {
-    setTools(
-      normalizeToolTable(
+    setTools((prevTools) => {
+      const nextTools = normalizeToolTable(
         toolLibraries[activeToolClass] || initTools(activeToolClass),
         activeToolClass,
-      ),
-    );
+      );
+      if (JSON.stringify(prevTools) === JSON.stringify(nextTools)) {
+        return prevTools;
+      }
+      return nextTools;
+    });
   }, [activeToolClass, toolLibraries]);
 
   useEffect(() => {
-    setToolLibraries((prev) =>
-      prev?.[activeToolClass] === tools
-        ? prev
-        : {
-            ...prev,
-            [activeToolClass]: normalizeToolTable(tools, activeToolClass),
-          },
-    );
+    setToolLibraries((prev) => {
+      const nextTools = normalizeToolTable(tools, activeToolClass);
+      if (prev?.[activeToolClass] === tools || JSON.stringify(prev?.[activeToolClass]) === JSON.stringify(nextTools)) {
+        return prev;
+      }
+      return {
+        ...prev,
+        [activeToolClass]: nextTools,
+      };
+    });
   }, [tools, activeToolClass]);
 
   useEffect(() => {

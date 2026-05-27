@@ -209,7 +209,7 @@ fprintf('RMS surface deviation: %.6f mm\\n', rms(residuals))`,
             {
               id: 1,
               cellTitle: 'Solving an overdetermined system',
-              prose: ‘An overdetermined system (more equations than unknowns) usually has no exact solution. Least squares finds the x̂ that minimizes ‖b − Ax‖². `np.linalg.lstsq(A, b, rcond=None)` solves this directly. Compare to directly applying the normal equations.’,
+              prose: 'An overdetermined system (more equations than unknowns) usually has no exact solution. Least squares finds the x̂ that minimizes ‖b − Ax‖². `np.linalg.lstsq(A, b, rcond=None)` solves this directly. Compare to directly applying the normal equations.',
               code: `import numpy as np
 
 # 3 equations, 2 unknowns â€” no exact solution

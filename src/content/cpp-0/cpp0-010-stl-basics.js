@@ -115,8 +115,19 @@ const lesson = {
   chapter: "cpp-0",
   order: 10,
   title: "STL Basics",
-  subtitle: "std::vector, sort, find, accumulate — the standard toolkit every C++ developer uses daily",
-  tags: ["c++", "cpp", "stl", "vector", "algorithm", "sort", "find", "accumulate", "iterator"],
+  subtitle:
+    "std::vector, sort, find, accumulate — the standard toolkit every C++ developer uses daily",
+  tags: [
+    "c++",
+    "cpp",
+    "stl",
+    "vector",
+    "algorithm",
+    "sort",
+    "find",
+    "accumulate",
+    "iterator",
+  ],
   aliases: [
     "c++ vector",
     "c++ stl",
@@ -125,7 +136,7 @@ const lesson = {
     "c++ iterators",
   ],
 
-  hook: `Before you write any loop to find a max, sort a list, or count elements — the STL already has it, tested and optimized. `\`std::vector\`` alone replaces 80% of array use cases. Learning the STL is what separates C programmers using C++ syntax from real C++ developers.`,
+  hook: `Before you write any loop to find a max, sort a list, or count elements — the STL already has it, tested and optimized. \`std::vector\` alone replaces 80% of array use cases. Learning the STL is what separates C programmers using C++ syntax from real C++ developers.`,
 
   mentalModel: [
     "**`std::vector<T>` is a dynamically-sized array.** Elements are contiguous in memory (same layout as C arrays), so access is O(1). `push_back` grows the vector, `pop_back` shrinks it. It knows its own size: `v.size()`. This is your default container for ordered data.",
@@ -140,7 +151,8 @@ const lesson = {
     visualizations: [
       {
         id: "CppLab",
-        mathBridge: "**Run it — then explore vector operations:**\n\n- Try `v[10]` — out-of-bounds, no check. Try `v.at(10)` — throws an exception.\n- `v.insert(v.begin() + 2, 99)` — insert at index 2. What's the new size?\n- `v.erase(v.begin())` — remove the first element.\n- `v.clear()` — empties the vector. Then `v.push_back(1)` — it's back.\n- Check `v.empty()` after clearing.",
+        mathBridge:
+          "**Run it — then explore vector operations:**\n\n- Try `v[10]` — out-of-bounds, no check. Try `v.at(10)` — throws an exception.\n- `v.insert(v.begin() + 2, 99)` — insert at index 2. What's the new size?\n- `v.erase(v.begin())` — remove the first element.\n- `v.clear()` — empties the vector. Then `v.push_back(1)` — it's back.\n- Check `v.empty()` after clearing.",
         props: {
           mainFile: "main.cpp",
           initialFiles: { "/home/user/main.cpp": VECTOR_CODE },
@@ -148,7 +160,8 @@ const lesson = {
       },
       {
         id: "CppLab",
-        mathBridge: "**Sort, search, accumulate — run it then explore:**\n\n- Try `sort(nums.rbegin(), nums.rend())` for descending sort.\n- Use `count(nums.begin(), nums.end(), 3)` — how many 3s are there?\n- Use `binary_search(nums.begin(), nums.end(), 5)` after sorting — O(log n).\n- Change the `find` target to a value not in the vector. What does `it != nums.end()` tell you?",
+        mathBridge:
+          "**Sort, search, accumulate — run it then explore:**\n\n- Try `sort(nums.rbegin(), nums.rend())` for descending sort.\n- Use `count(nums.begin(), nums.end(), 3)` — how many 3s are there?\n- Use `binary_search(nums.begin(), nums.end(), 5)` after sorting — O(log n).\n- Change the `find` target to a value not in the vector. What does `it != nums.end()` tell you?",
         props: {
           mainFile: "main.cpp",
           initialFiles: { "/home/user/main.cpp": SORT_SEARCH_CODE },
@@ -165,7 +178,8 @@ const lesson = {
     visualizations: [
       {
         id: "CppLab",
-        mathBridge: "**Filter and transform — run it then explore:**\n\n- Change the filter to remove numbers > 5 instead of even numbers.\n- Change transform to cube each element: `x * x * x`.\n- Use `count_if(v.begin(), v.end(), [](int x){ return x > 10; })` after squaring — how many squared values exceed 10?\n- Use `accumulate` with `+` (the default) to sum the squared odds.",
+        mathBridge:
+          "**Filter and transform — run it then explore:**\n\n- Change the filter to remove numbers > 5 instead of even numbers.\n- Change transform to cube each element: `x * x * x`.\n- Use `count_if(v.begin(), v.end(), [](int x){ return x > 10; })` after squaring — how many squared values exceed 10?\n- Use `accumulate` with `+` (the default) to sum the squared odds.",
         props: {
           mainFile: "main.cpp",
           initialFiles: { "/home/user/main.cpp": FILTER_CODE },
@@ -173,7 +187,8 @@ const lesson = {
       },
       {
         id: "CppLab",
-        mathBridge: "**2D vector and string as container — run it then explore:**\n\n- Add a row to the grid: `grid.push_back({10, 11, 12})` — then print all rows.\n- Access `grid[1][2]` — what's the value?\n- Try `sort(s.begin(), s.end())` on `\"banana\"` — what comes out?\n- Use `count(s.begin(), s.end(), 'a')` on `\"banana\"` — how many 'a's?",
+        mathBridge:
+          "**2D vector and string as container — run it then explore:**\n\n- Add a row to the grid: `grid.push_back({10, 11, 12})` — then print all rows.\n- Access `grid[1][2]` — what's the value?\n- Try `sort(s.begin(), s.end())` on `\"banana\"` — what comes out?\n- Use `count(s.begin(), s.end(), 'a')` on `\"banana\"` — how many 'a's?",
         props: {
           mainFile: "main.cpp",
           initialFiles: { "/home/user/main.cpp": MATRIX_CODE },
@@ -257,7 +272,7 @@ cout << (hi - lo) << endl;  // 4  (5,6,7,9)`,
       hint: "`#include <map>`. Iterate: `for (auto& [word, count] : freq)`. For most-frequent: track the max while iterating.",
       walkthrough: [
         "map<string,int> freq; string word; while (cin >> word) freq[word]++;",
-        "for (auto& [w, c] : freq) cout << w << \": \" << c;",
+        'for (auto& [w, c] : freq) cout << w << ": " << c;',
         "Track max: auto maxIt = max_element(freq.begin(), freq.end(), [](auto& a, auto& b){ return a.second < b.second; });",
       ],
     },

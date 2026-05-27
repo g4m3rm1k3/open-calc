@@ -31,6 +31,7 @@ export default function CNCBackplot({
   const gridRef = useRef(null);
   const rafRef = useRef(null);
   const pathFittedRef = useRef(false);
+  const mountedRef = useRef(false);
 
   // Colors based on theme
   const colors = {
@@ -48,6 +49,7 @@ export default function CNCBackplot({
   useEffect(() => {
     const el = mountRef.current;
     if (!el) return;
+    mountedRef.current = true;
 
     const w = el.clientWidth || 700;
     const h = height.endsWith("%")
@@ -100,8 +102,16 @@ export default function CNCBackplot({
 
     const animate = () => {
       rafRef.current = requestAnimationFrame(animate);
-      controls.update();
-      renderer.render(scene, camera);
+      try {
+        controls.update();
+        renderer.render(scene, camera);
+      } catch (err) {
+        // Stop the loop if rendering fails to avoid console/error floods.
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+        mountedRef.current = false;
+        console.error("CNCBackplot render loop stopped", err);
+      }
     };
     animate();
 
@@ -119,10 +129,28 @@ export default function CNCBackplot({
     ro.observe(el);
 
     return () => {
+      mountedRef.current = false;
       cancelAnimationFrame(rafRef.current);
       ro.disconnect();
+      controls.dispose();
+      clearGroup(pathLayerRef.current);
+      clearGroup(stockLayerRef.current);
+      clearGroup(toolRef.current);
+      if (gridRef.current) {
+        gridRef.current.geometry?.dispose?.();
+        gridRef.current.material?.dispose?.();
+      }
       renderer.dispose();
       if (el.contains(renderer.domElement)) el.removeChild(renderer.domElement);
+      rendererRef.current = null;
+      sceneRef.current = null;
+      cameraRef.current = null;
+      controlsRef.current = null;
+      pathLayerRef.current = null;
+      stockLayerRef.current = null;
+      toolRef.current = null;
+      gridRef.current = null;
+      rafRef.current = null;
     };
   }, []);
 
@@ -130,6 +158,16 @@ export default function CNCBackplot({
     if (!group) return;
     while (group.children.length) {
       const child = group.children.pop();
+      child?.traverse?.((node) => {
+        if (node.geometry) node.geometry.dispose?.();
+        if (node.material) {
+          if (Array.isArray(node.material)) {
+            node.material.forEach((m) => m?.dispose?.());
+          } else {
+            node.material.dispose?.();
+          }
+        }
+      });
       if (child.geometry) child.geometry.dispose();
       if (child.material) {
         if (Array.isArray(child.material)) {
@@ -144,10 +182,15 @@ export default function CNCBackplot({
 
   // Update background/fog when theme changes
   useEffect(() => {
-    if (rendererRef.current) rendererRef.current.setClearColor(colors.bg);
-    if (sceneRef.current) sceneRef.current.fog.color.setHex(colors.bg);
-    if (gridRef.current) {
-      sceneRef.current.remove(gridRef.current);
+    const renderer = rendererRef.current;
+    const scene = sceneRef.current;
+    const currentGrid = gridRef.current;
+    if (renderer) renderer.setClearColor(colors.bg);
+    if (scene?.fog) scene.fog.color.setHex(colors.bg);
+    if (scene && currentGrid) {
+      scene.remove(currentGrid);
+      currentGrid.geometry?.dispose?.();
+      currentGrid.material?.dispose?.();
       const newGrid = new THREE.GridHelper(
         500,
         50,
@@ -155,16 +198,19 @@ export default function CNCBackplot({
         colors.gridAlt,
       );
       newGrid.rotation.x = Math.PI / 2;
-      sceneRef.current.add(newGrid);
+      newGrid.visible = !!showGrid;
+      scene.add(newGrid);
       gridRef.current = newGrid;
     }
-  }, [isDark]);
+  }, [isDark, showGrid]);
 
   useEffect(() => {
+    if (!mountedRef.current) return;
     if (gridRef.current) gridRef.current.visible = !!showGrid;
   }, [showGrid]);
 
   useEffect(() => {
+    if (!mountedRef.current) return;
     if (toolRef.current) toolRef.current.visible = !!showTool;
   }, [showTool]);
 

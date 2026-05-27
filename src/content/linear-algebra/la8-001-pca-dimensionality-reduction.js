@@ -1,7 +1,7 @@
 export default {
   id: 'la8-001',
   slug: 'pca-dimensionality-reduction',
-  chapter: 'la8',
+  chapter: 'la5',
   order: 1,
   title: 'PCA and Dimensionality Reduction',
   subtitle: 'Principal Component Analysis finds the directions of maximum variance in data. These are the eigenvectors of the covariance matrix — or equivalently, the left singular vectors of the centered data matrix.',

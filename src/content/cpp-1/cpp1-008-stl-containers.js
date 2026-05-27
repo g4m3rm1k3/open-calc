@@ -110,8 +110,19 @@ const lesson = {
   chapter: "cpp-1",
   order: 8,
   title: "STL Containers",
-  subtitle: "map, set, unordered_map, queue, deque, priority_queue — choose the right structure",
-  tags: ["c++", "cpp", "STL", "map", "set", "unordered_map", "queue", "priority_queue", "deque"],
+  subtitle:
+    "map, set, unordered_map, queue, deque, priority_queue — choose the right structure",
+  tags: [
+    "c++",
+    "cpp",
+    "STL",
+    "map",
+    "set",
+    "unordered_map",
+    "queue",
+    "priority_queue",
+    "deque",
+  ],
   aliases: [
     "c++ map",
     "c++ set",
@@ -122,7 +133,7 @@ const lesson = {
     "c++ STL containers",
   ],
 
-  hook: ``\`vector\`` covers most cases, but sometimes you need ordered lookup, uniqueness enforcement, FIFO processing, or priority-based scheduling. Each STL container has a specific performance contract. Knowing which to reach for — and why — is what separates developers who fight their data structures from ones who work with them.`,
+  hook: `\`vector\` covers most cases, but sometimes you need ordered lookup, uniqueness enforcement, FIFO processing, or priority-based scheduling. Each STL container has a specific performance contract. Knowing which to reach for — and why — is what separates developers who fight their data structures from ones who work with them.`,
 
   mentalModel: [
     "**`map<K,V>`: sorted key-value, O(log n).** Internally a red-black tree. Keys are always sorted — iteration gives alphabetical/numerical order. Use when you need sorted iteration or range queries. Warning: `map[key]` inserts a default-constructed value if the key is missing — use `.find()` to check without inserting.",
@@ -137,7 +148,8 @@ const lesson = {
     visualizations: [
       {
         id: "CppLab",
-        mathBridge: "**map — run it then explore:**\n\n- Try `inv[\"xyz\"]` — it inserts a 0-count entry! Check `inv.size()` before and after.\n- Use `inv.find(\"xyz\")` instead — does it insert? (No)\n- Add 10 more fruits and iterate — do they come out sorted?\n- `inv.erase(\"apple\")` — verify it's gone with `inv.count(\"apple\")`.",
+        mathBridge:
+          '**map — run it then explore:**\n\n- Try `inv["xyz"]` — it inserts a 0-count entry! Check `inv.size()` before and after.\n- Use `inv.find("xyz")` instead — does it insert? (No)\n- Add 10 more fruits and iterate — do they come out sorted?\n- `inv.erase("apple")` — verify it\'s gone with `inv.count("apple")`.',
         props: {
           mainFile: "main.cpp",
           initialFiles: { "/home/user/main.cpp": MAP_CODE },
@@ -145,7 +157,8 @@ const lesson = {
       },
       {
         id: "CppLab",
-        mathBridge: "**set and unordered_map — run it then explore:**\n\n- Insert a duplicate into the set: `s.insert(3)`. Does the size change? (No)\n- Try `s.insert({4,6,7})` — bulk insert. Does order hold?\n- `unordered_map` has no guaranteed order — run multiple times. Does alice always come before bob?\n- Use `scores.count(\"alice\")` to check membership. What's the difference from `find`?",
+        mathBridge:
+          '**set and unordered_map — run it then explore:**\n\n- Insert a duplicate into the set: `s.insert(3)`. Does the size change? (No)\n- Try `s.insert({4,6,7})` — bulk insert. Does order hold?\n- `unordered_map` has no guaranteed order — run multiple times. Does alice always come before bob?\n- Use `scores.count("alice")` to check membership. What\'s the difference from `find`?',
         props: {
           mainFile: "main.cpp",
           initialFiles: { "/home/user/main.cpp": SET_CODE },
@@ -162,7 +175,8 @@ const lesson = {
     visualizations: [
       {
         id: "CppLab",
-        mathBridge: "**queue and deque — run it then explore:**\n\n- `queue` doesn't support random access — try `tasks[0]`. What error?\n- Change `deque` to `push_front` only — acts like a stack.\n- Use `deque` as a sliding window: push to back, pop from front to maintain size 3.\n- `deque` supports `dq[2]` — try it. `queue` doesn't.",
+        mathBridge:
+          "**queue and deque — run it then explore:**\n\n- `queue` doesn't support random access — try `tasks[0]`. What error?\n- Change `deque` to `push_front` only — acts like a stack.\n- Use `deque` as a sliding window: push to back, pop from front to maintain size 3.\n- `deque` supports `dq[2]` — try it. `queue` doesn't.",
         props: {
           mainFile: "main.cpp",
           initialFiles: { "/home/user/main.cpp": QUEUE_CODE },
@@ -170,7 +184,8 @@ const lesson = {
       },
       {
         id: "CppLab",
-        mathBridge: "**priority_queue — run it then explore:**\n\n- Push the same value twice — does it appear twice when popping?\n- Change to a min-heap: `priority_queue<int, vector<int>, greater<int>>`.\n- Use a priority_queue to sort: push all elements, pop all — is it sorted?\n- Push `pair<int,string>` — which element has priority? (first field of pair)",
+        mathBridge:
+          "**priority_queue — run it then explore:**\n\n- Push the same value twice — does it appear twice when popping?\n- Change to a min-heap: `priority_queue<int, vector<int>, greater<int>>`.\n- Use a priority_queue to sort: push all elements, pop all — is it sorted?\n- Push `pair<int,string>` — which element has priority? (first field of pair)",
         props: {
           mainFile: "main.cpp",
           initialFiles: { "/home/user/main.cpp": HEAP_CODE },
@@ -181,7 +196,7 @@ const lesson = {
       {
         type: "warning",
         title: "map::operator[] inserts on missing key",
-        body: "`inventory[\"missing\"]` creates a new entry with a default value (0 for int) and returns a reference to it. This silently modifies the map. Use `inventory.find(\"missing\") != inventory.end()` or `inventory.count(\"missing\")` to check without inserting.",
+        body: '`inventory["missing"]` creates a new entry with a default value (0 for int) and returns a reference to it. This silently modifies the map. Use `inventory.find("missing") != inventory.end()` or `inventory.count("missing")` to check without inserting.',
       },
       {
         type: "info",
@@ -230,7 +245,7 @@ while (!pq.empty()) { cout << pq.top() << " "; pq.pop(); }
       hint: "`map` iterates in sorted key order. For most frequent: iterate and track the max count.",
       walkthrough: [
         "map<string,int> freq; stringstream ss(text); string w; while(ss>>w) freq[w]++;",
-        "for (auto& [w,c] : freq) cout << w << \": \" << c;",
+        'for (auto& [w,c] : freq) cout << w << ": " << c;',
         "Max: iterate and track pair with highest value",
         "With unordered_map: same logic, but output order is undefined",
       ],
@@ -254,7 +269,7 @@ while (!pq.empty()) { cout << pq.top() << " "; pq.pop(); }
       {
         id: "cpp1-008-q1",
         type: "choice",
-        text: "What does `inventory[\"missing_key\"]` do on a `map<string,int>`?",
+        text: 'What does `inventory["missing_key"]` do on a `map<string,int>`?',
         options: [
           "Returns 0 without modifying the map",
           "Throws an exception",

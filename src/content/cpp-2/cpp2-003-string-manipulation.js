@@ -146,8 +146,19 @@ const lesson = {
   chapter: "cpp-2",
   order: 3,
   title: "String Manipulation",
-  subtitle: "find, replace, split, build, convert — plus string_view for zero-copy",
-  tags: ["c++", "cpp", "string", "string_view", "ostringstream", "split", "substr", "stoi", "stod"],
+  subtitle:
+    "find, replace, split, build, convert — plus string_view for zero-copy",
+  tags: [
+    "c++",
+    "cpp",
+    "string",
+    "string_view",
+    "ostringstream",
+    "split",
+    "substr",
+    "stoi",
+    "stod",
+  ],
   aliases: [
     "c++ string manipulation",
     "c++ string split",
@@ -157,7 +168,7 @@ const lesson = {
     "c++ string find replace",
   ],
 
-  hook: `Strings are in every program — parsing input, formatting output, searching, transforming. C++ strings have a rich API but several sharp edges: `\`find\`` returning `\`npos\``, `\`substr\`` allocating copies, `\`+\`` building temporaries. Knowing when to use `\`string_view\`` (zero-copy), `\`ostringstream\`` (efficient building), and `\`getline\`` with delimiter (clean splitting) separates readable string code from subtle bugs.`,
+  hook: `Strings are in every program — parsing input, formatting output, searching, transforming. C++ strings have a rich API but several sharp edges: \`find\` returning \`npos\`, \`substr\` allocating copies, \`+\` building temporaries. Knowing when to use \`string_view\` (zero-copy), \`ostringstream\` (efficient building), and \`getline\` with delimiter (clean splitting) separates readable string code from subtle bugs.`,
 
   mentalModel: [
     "**`string::find` returns `string::npos` when not found.** `npos` is `size_t(-1)` — the largest possible `size_t`. Always check: `if (pos != string::npos)`. Using `npos` as an index (`s.substr(npos)`) is undefined behavior.",
@@ -167,12 +178,13 @@ const lesson = {
 
   intuition: {
     prose: [
-      "**`stoi`/`stod` throw on bad input.** `stoi(\"abc\")` throws `std::invalid_argument`. `stoi(\"99999999999\")` throws `std::out_of_range`. Always wrap in try/catch when parsing user-provided strings. C++17 `std::from_chars` is the non-throwing alternative.",
+      '**`stoi`/`stod` throw on bad input.** `stoi("abc")` throws `std::invalid_argument`. `stoi("99999999999")` throws `std::out_of_range`. Always wrap in try/catch when parsing user-provided strings. C++17 `std::from_chars` is the non-throwing alternative.',
     ],
     visualizations: [
       {
         id: "CppLab",
-        mathBridge: "**String operations — run it then explore:**\n\n- `s.find(\"xyz\")` — what does it return? (string::npos = 18446744073709551615)\n- `s.substr(pos + 2, 5)` — limit the length of the substring.\n- `s.rfind(',')` — find last occurrence from the right.\n- `s.erase(0, 7)` — remove the first 7 characters in-place.",
+        mathBridge:
+          "**String operations — run it then explore:**\n\n- `s.find(\"xyz\")` — what does it return? (string::npos = 18446744073709551615)\n- `s.substr(pos + 2, 5)` — limit the length of the substring.\n- `s.rfind(',')` — find last occurrence from the right.\n- `s.erase(0, 7)` — remove the first 7 characters in-place.",
         props: {
           mainFile: "main.cpp",
           initialFiles: { "/home/user/main.cpp": STR_OPS_CODE },
@@ -180,7 +192,8 @@ const lesson = {
       },
       {
         id: "CppLab",
-        mathBridge: "**String building — run it then explore:**\n\n- Build the join in a loop with `+` instead of `ostringstream` — does it work? (yes, but slower)\n- `stoi(\"42abc\")` — what happens? (parses '42', stops at 'a' — succeeds)\n- `stoi(\"abc\")` — throws invalid_argument; wrap in try/catch.\n- `to_string(3.14)` — how many decimal places? Try `to_string(1.0/3.0)`.",
+        mathBridge:
+          "**String building — run it then explore:**\n\n- Build the join in a loop with `+` instead of `ostringstream` — does it work? (yes, but slower)\n- `stoi(\"42abc\")` — what happens? (parses '42', stops at 'a' — succeeds)\n- `stoi(\"abc\")` — throws invalid_argument; wrap in try/catch.\n- `to_string(3.14)` — how many decimal places? Try `to_string(1.0/3.0)`.",
         props: {
           mainFile: "main.cpp",
           initialFiles: { "/home/user/main.cpp": STR_BUILD_CODE },
@@ -191,13 +204,14 @@ const lesson = {
 
   rigor: {
     prose: [
-      "**`getline(ss, token, delim)` is the idiomatic split.** Wrapping `getline` with an `istringstream` and a delimiter gives clean splitting without manual index arithmetic. Edge cases: `\"a,,b\"` produces an empty token between the commas — decide if that's correct for your use case.",
+      '**`getline(ss, token, delim)` is the idiomatic split.** Wrapping `getline` with an `istringstream` and a delimiter gives clean splitting without manual index arithmetic. Edge cases: `"a,,b"` produces an empty token between the commas — decide if that\'s correct for your use case.',
       "**`string_view` lifetime hazard.** A `string_view` doesn't own its data. If the underlying `string` is destroyed or reallocated, the view becomes dangling. Never return a `string_view` pointing into a local string. Never store a `string_view` beyond the lifetime of its source. Safe use: function parameters that only read, loop variables referencing an outer string.",
     ],
     visualizations: [
       {
         id: "CppLab",
-        mathBridge: "**Splitting — run it then explore:**\n\n- Split `\"a,,b\"` on `,` — does the empty token appear? (yes — `getline` emits empty strings for consecutive delimiters)\n- Split `\"hello world\"` with `>>` — does whitespace collapsing happen? (yes — multiple spaces treated as one)\n- Try splitting on `'\\n'` to process multi-line input.\n- What does `split(\"\", ',')` return? (one empty string — getline reads up to first delimiter)",
+        mathBridge:
+          '**Splitting — run it then explore:**\n\n- Split `"a,,b"` on `,` — does the empty token appear? (yes — `getline` emits empty strings for consecutive delimiters)\n- Split `"hello world"` with `>>` — does whitespace collapsing happen? (yes — multiple spaces treated as one)\n- Try splitting on `\'\\n\'` to process multi-line input.\n- What does `split("", \',\')` return? (one empty string — getline reads up to first delimiter)',
         props: {
           mainFile: "main.cpp",
           initialFiles: { "/home/user/main.cpp": STR_SPLIT_CODE },
@@ -205,7 +219,8 @@ const lesson = {
       },
       {
         id: "CppLab",
-        mathBridge: "**string_view — run it then explore:**\n\n- Create a dangling string_view: `string_view sv = string(\"temp\");` — the temporary is destroyed immediately.\n- `string_view` doesn't have `.c_str()` — if you need a null-terminated C string, use `string(sv).c_str()`.\n- Pass `string_view` to a function that takes `const string&` — implicit conversion works.\n- Time `find` on a large string_view vs string — are they the same? (yes, same underlying algorithm)",
+        mathBridge:
+          '**string_view — run it then explore:**\n\n- Create a dangling string_view: `string_view sv = string("temp");` — the temporary is destroyed immediately.\n- `string_view` doesn\'t have `.c_str()` — if you need a null-terminated C string, use `string(sv).c_str()`.\n- Pass `string_view` to a function that takes `const string&` — implicit conversion works.\n- Time `find` on a large string_view vs string — are they the same? (yes, same underlying algorithm)',
         props: {
           mainFile: "main.cpp",
           initialFiles: { "/home/user/main.cpp": STRVIEW_CODE },
@@ -273,11 +288,11 @@ const lesson = {
     {
       difficulty: "medium",
       problem:
-        "Implement a simple template engine: given a template string like `\"Hello, {{name}}! You have {{count}} messages.\"` and a `map<string,string>` of replacements, return the string with all `{{key}}` patterns replaced. Handle missing keys by leaving the placeholder unchanged.",
-      hint: "Loop: `find(\"{{\")`  → find `\"}}\"` → extract key → lookup in map → `replace(pos, len, value)`. After replacing, update the search position to skip past the replacement.",
+        'Implement a simple template engine: given a template string like `"Hello, {{name}}! You have {{count}} messages."` and a `map<string,string>` of replacements, return the string with all `{{key}}` patterns replaced. Handle missing keys by leaving the placeholder unchanged.',
+      hint: 'Loop: `find("{{")`  → find `"}}"` → extract key → lookup in map → `replace(pos, len, value)`. After replacing, update the search position to skip past the replacement.',
       walkthrough: [
-        "size_t pos = 0; while ((pos = s.find(\"{{\", pos)) != npos) {",
-        "  size_t end = s.find(\"}}\", pos); string key = s.substr(pos+2, end-pos-2);",
+        'size_t pos = 0; while ((pos = s.find("{{", pos)) != npos) {',
+        '  size_t end = s.find("}}", pos); string key = s.substr(pos+2, end-pos-2);',
         "  if (replacements.count(key)) s.replace(pos, end-pos+2, replacements[key]);",
         "  else pos = end + 2;",
         "}",

@@ -145,8 +145,18 @@ const lesson = {
   chapter: "cpp-2",
   order: 10,
   title: "Regular Expressions",
-  subtitle: "Pattern matching, capture groups, replace, and iteration with std::regex",
-  tags: ["c++", "cpp", "regex", "regex_match", "regex_search", "regex_replace", "smatch", "sregex_iterator"],
+  subtitle:
+    "Pattern matching, capture groups, replace, and iteration with std::regex",
+  tags: [
+    "c++",
+    "cpp",
+    "regex",
+    "regex_match",
+    "regex_search",
+    "regex_replace",
+    "smatch",
+    "sregex_iterator",
+  ],
   aliases: [
     "c++ regex",
     "c++ regular expression",
@@ -156,22 +166,23 @@ const lesson = {
     "c++ smatch",
   ],
 
-  hook: `Parsing structured text — dates, emails, phone numbers, log entries — with `\`find\`` and `\`substr\`` becomes unmaintainable fast. Regular expressions express the pattern once and the engine handles the search, extraction, and replacement. C++11 added `\`<regex>\`` to the standard library: compile the pattern once, use it many times.`,
+  hook: `Parsing structured text — dates, emails, phone numbers, log entries — with \`find\` and \`substr\` becomes unmaintainable fast. Regular expressions express the pattern once and the engine handles the search, extraction, and replacement. C++11 added \`<regex>\` to the standard library: compile the pattern once, use it many times.`,
 
   mentalModel: [
-    "**`regex_match` checks the whole string; `regex_search` finds a match anywhere.** `regex_match(\"hello123\", rx)` returns true only if the entire string matches. `regex_search(\"prefix hello123 suffix\", m, rx)` returns true if the pattern appears anywhere. For validation use `match`; for extraction use `search`.",
+    '**`regex_match` checks the whole string; `regex_search` finds a match anywhere.** `regex_match("hello123", rx)` returns true only if the entire string matches. `regex_search("prefix hello123 suffix", m, rx)` returns true if the pattern appears anywhere. For validation use `match`; for extraction use `search`.',
     "**Capture groups `(...)` extract substrings.** `smatch m; regex_search(s, m, rx)` — `m[0]` is the full match, `m[1]` is the first group, `m[2]` is the second, etc. Use groups to extract structured data: `(year)-(month)-(day)` gives you three captures.",
     "**`sregex_iterator` iterates all matches in a string.** Construct with `(begin, end, regex)`, iterate until the end sentinel. Use it to collect all occurrences of a pattern — email addresses, URLs, numbers. `sregex_token_iterator` with `-1` splits on the pattern instead.",
   ],
 
   intuition: {
     prose: [
-      "**Raw string literals `R\"(...)\"` avoid double-escaping.** Regex patterns use `\\d` for digits, but in a regular string you'd write `\"\\\\d\"`. With raw strings: `R\"(\\d+)\"` — no escaping needed. Always use raw strings for regex patterns.",
+      '**Raw string literals `R"(...)"` avoid double-escaping.** Regex patterns use `\\d` for digits, but in a regular string you\'d write `"\\\\d"`. With raw strings: `R"(\\d+)"` — no escaping needed. Always use raw strings for regex patterns.',
     ],
     visualizations: [
       {
         id: "CppLab",
-        mathBridge: "**match vs search — run it then explore:**\n\n- `regex_match` requires the WHOLE string to match — add prefix/suffix and it fails.\n- `regex_search` finds the pattern anywhere — 'Contact at user@example.com' still finds the email.\n- Change pattern to `R\"(\\d+)\"` — does `regex_match(\"42abc\", rx)` succeed? (no — not all chars are digits)\n- `regex_search(\"hello\", m, regex(R\"(\\d+)\"))` — `m` is empty, returns false.",
+        mathBridge:
+          '**match vs search — run it then explore:**\n\n- `regex_match` requires the WHOLE string to match — add prefix/suffix and it fails.\n- `regex_search` finds the pattern anywhere — \'Contact at user@example.com\' still finds the email.\n- Change pattern to `R"(\\d+)"` — does `regex_match("42abc", rx)` succeed? (no — not all chars are digits)\n- `regex_search("hello", m, regex(R"(\\d+)"))` — `m` is empty, returns false.',
         props: {
           mainFile: "main.cpp",
           initialFiles: { "/home/user/main.cpp": MATCH_SEARCH_CODE },
@@ -179,7 +190,8 @@ const lesson = {
       },
       {
         id: "CppLab",
-        mathBridge: "**Capture groups — run it then explore:**\n\n- `m.size()` — how many groups are in the match? (total captures + 1 for m[0])\n- `m[0]` is always the full match — `m[1]` is the first parenthesized group.\n- Try nested groups: `((\\d{4})-(\\d{2}))` — `m[1]` is the outer group, `m[2]` and `m[3]` are inner.\n- What if a group doesn't participate in the match (e.g., optional group `(x)?`)? `m[1].matched` is false.",
+        mathBridge:
+          "**Capture groups — run it then explore:**\n\n- `m.size()` — how many groups are in the match? (total captures + 1 for m[0])\n- `m[0]` is always the full match — `m[1]` is the first parenthesized group.\n- Try nested groups: `((\\d{4})-(\\d{2}))` — `m[1]` is the outer group, `m[2]` and `m[3]` are inner.\n- What if a group doesn't participate in the match (e.g., optional group `(x)?`)? `m[1].matched` is false.",
         props: {
           mainFile: "main.cpp",
           initialFiles: { "/home/user/main.cpp": CAPTURE_CODE },
@@ -196,7 +208,8 @@ const lesson = {
     visualizations: [
       {
         id: "CppLab",
-        mathBridge: "**regex_replace — run it then explore:**\n\n- `$0` in the replacement refers to the entire match — use to surround matches: `regex_replace(s, rx, \"[\" + \"$0\" + \"]\")`\n- `$1`, `$2` back-references in the replacement string.\n- Add `regex_constants::format_first_only` flag to replace only the first match.\n- Replace all whitespace with underscores: `regex_replace(s, regex(R\"(\\s+)\"), \"_\")`",
+        mathBridge:
+          '**regex_replace — run it then explore:**\n\n- `$0` in the replacement refers to the entire match — use to surround matches: `regex_replace(s, rx, "[" + "$0" + "]")`\n- `$1`, `$2` back-references in the replacement string.\n- Add `regex_constants::format_first_only` flag to replace only the first match.\n- Replace all whitespace with underscores: `regex_replace(s, regex(R"(\\s+)"), "_")`',
         props: {
           mainFile: "main.cpp",
           initialFiles: { "/home/user/main.cpp": REPLACE_ALL_CODE },
@@ -204,7 +217,8 @@ const lesson = {
       },
       {
         id: "CppLab",
-        mathBridge: "**sregex_iterator — run it then explore:**\n\n- Collect all numbers from 'score: 95, max: 100' using `R\"(\\d+)\"`.\n- `sregex_token_iterator` with `-1` splits; with `0` yields matches. Try both on a CSV string.\n- Count matches: `distance(sregex_iterator(s.begin(),s.end(),rx), sregex_iterator{})` — O(n).\n- Collect capture group 1 from each match: `(*it)[1].str()`",
+        mathBridge:
+          "**sregex_iterator — run it then explore:**\n\n- Collect all numbers from 'score: 95, max: 100' using `R\"(\\d+)\"`.\n- `sregex_token_iterator` with `-1` splits; with `0` yields matches. Try both on a CSV string.\n- Count matches: `distance(sregex_iterator(s.begin(),s.end(),rx), sregex_iterator{})` — O(n).\n- Collect capture group 1 from each match: `(*it)[1].str()`",
         props: {
           mainFile: "main.cpp",
           initialFiles: { "/home/user/main.cpp": ITER_CODE },
@@ -215,12 +229,12 @@ const lesson = {
       {
         type: "warning",
         title: "Compile regex outside loops",
-        body: "`std::regex` compilation is expensive. Declaring `regex rx(pattern)` inside a loop recompiles on every iteration. Declare it once outside and reuse it. For static patterns, use a static local: `static regex rx(\"pattern\");`",
+        body: '`std::regex` compilation is expensive. Declaring `regex rx(pattern)` inside a loop recompiles on every iteration. Declare it once outside and reuse it. For static patterns, use a static local: `static regex rx("pattern");`',
       },
       {
         type: "tip",
         title: "Use raw string literals for regex patterns",
-        body: "In a regular string, `\\d` must be written as `\"\\\\d\"`. In a raw string `R\"(\\d)\"`, no escaping needed. Regex patterns are significantly more readable with raw strings — compare `R\"(\\d{4}-\\d{2}-\\d{2})\"` vs `\"\\\\d{4}-\\\\d{2}-\\\\d{2}\"`.",
+        body: 'In a regular string, `\\d` must be written as `"\\\\d"`. In a raw string `R"(\\d)"`, no escaping needed. Regex patterns are significantly more readable with raw strings — compare `R"(\\d{4}-\\d{2}-\\d{2})"` vs `"\\\\d{4}-\\\\d{2}-\\\\d{2}"`.',
       },
     ],
   },
@@ -268,10 +282,10 @@ std::map<std::string, std::string> parseConfig(const std::string& text) {
     {
       difficulty: "easy",
       problem:
-        "Write a `extractNumbers(string s)` that returns a `vector<int>` of all integers found in the string. Use `sregex_iterator` with pattern `R\"(\\d+)\"`. Test with `\"score: 95, max: 100, min: 42\"` — should return `{95, 100, 42}`.",
-      hint: "`static regex numRx(R\"(\\d+)\");`. Loop `sregex_iterator`, push `stoi((*it)[0].str())`.",
+        'Write a `extractNumbers(string s)` that returns a `vector<int>` of all integers found in the string. Use `sregex_iterator` with pattern `R"(\\d+)"`. Test with `"score: 95, max: 100, min: 42"` — should return `{95, 100, 42}`.',
+      hint: '`static regex numRx(R"(\\d+)");`. Loop `sregex_iterator`, push `stoi((*it)[0].str())`.',
       walkthrough: [
-        "static regex numRx(R\"(\\d+)\");",
+        'static regex numRx(R"(\\d+)");',
         "vector<int> result;",
         "for (sregex_iterator it(s.begin(), s.end(), numRx), end; it != end; ++it)",
         "  result.push_back(stoi((*it)[0].str()));",
@@ -282,9 +296,9 @@ std::map<std::string, std::string> parseConfig(const std::string& text) {
       difficulty: "medium",
       problem:
         "Write a log parser: given lines like `[2024-03-15 14:23:01] ERROR user.service: connection timeout`, extract timestamp, level, service, and message using capture groups. Return a struct `LogEntry{string timestamp, level, service, message}`. Test with 5 sample lines.",
-      hint: `Pattern: \\[(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})\\] (\\w+) ([\\w.]+): (.+)`. Groups 1-4 are timestamp, level, service, message.`,
+      hint: `Pattern: \`\\[(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})\\] (\\w+) ([\\w.]+): (.+)\`. Groups 1-4 are timestamp, level, service, message.`,
       walkthrough: [
-        "regex logRx(R\"(\\[(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})\\] (\\w+) ([\\w.]+): (.+))\");",
+        'regex logRx(R"(\\[(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})\\] (\\w+) ([\\w.]+): (.+))");',
         "smatch m; if (regex_search(line, m, logRx))",
         "return {m[1], m[2], m[3], m[4]};",
         "Test with ERROR, INFO, WARN lines",

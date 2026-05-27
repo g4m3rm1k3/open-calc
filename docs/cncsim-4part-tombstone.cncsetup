@@ -1,0 +1,104 @@
+{
+  "_comment": "CNCSim example setup — 4-part tombstone on B-axis machine (HAAS UMC 750 style). Load with File → Import Setup.",
+  "version": 5,
+  "ts": "2026-05-27T00:00:00Z",
+  "machDefId": "haas_mill",
+
+  "stock": {
+    "_comment": "Tombstone base plate — 320×320×20 mm, centred at origin, sitting on table",
+    "shape": "box",
+    "width": 320,
+    "depth": 320,
+    "height": 20,
+    "x": -160,
+    "y": -160,
+    "z": -20
+  },
+
+  "fixtures": [
+    {
+      "_comment": "Part 1 — G54 corner (+X +Y). Origin of G54 is at the top face centre of this block.",
+      "id": 1,
+      "name": "Part 1 (G54)",
+      "x": 30,
+      "y": 30,
+      "z": 0,
+      "w": 100,
+      "h": 50,
+      "d": 100
+    },
+    {
+      "_comment": "Part 2 — G55 corner (-X +Y).",
+      "id": 2,
+      "name": "Part 2 (G55)",
+      "x": -130,
+      "y": 30,
+      "z": 0,
+      "w": 100,
+      "h": 50,
+      "d": 100
+    },
+    {
+      "_comment": "Part 3 — G56 corner (-X -Y).",
+      "id": 3,
+      "name": "Part 3 (G56)",
+      "x": -130,
+      "y": -130,
+      "z": 0,
+      "w": 100,
+      "h": 50,
+      "d": 100
+    },
+    {
+      "_comment": "Part 4 — G57 corner (+X -Y).",
+      "id": 4,
+      "name": "Part 4 (G57)",
+      "x": 30,
+      "y": -130,
+      "z": 0,
+      "w": 100,
+      "h": 50,
+      "d": 100
+    }
+  ],
+
+  "offsets": {
+    "_comment": "G54–G57 origins are at the top-face centre of each block. Adjust Z if parts sit at a different height.",
+    "G54": { "x":  80, "y":  80, "z": 0, "a": 0, "b": 0, "c": 0 },
+    "G55": { "x": -80, "y":  80, "z": 0, "a": 0, "b": 0, "c": 0 },
+    "G56": { "x": -80, "y": -80, "z": 0, "a": 0, "b": 0, "c": 0 },
+    "G57": { "x":  80, "y": -80, "z": 0, "a": 0, "b": 0, "c": 0 }
+  },
+  "wcs": "G54",
+
+  "toolLibraries": {
+    "mill": {
+      "1": {
+        "schema": 2,
+        "n": 1,
+        "cls": "mill",
+        "type": "Drill",
+        "desc": "12mm carbide drill — tombstone example",
+        "units": "mm",
+        "dia": 12,
+        "cr": 0,
+        "tlo": 90,
+        "lc": 40,
+        "lt": 100,
+        "shank": 12,
+        "fl": 2,
+        "mat": "Carbide",
+        "iAngle": 118,
+        "wearR": 0,
+        "wearL": 0,
+        "source": "Example",
+        "sourceId": "drill-12mm"
+      }
+    },
+    "lathe": {}
+  },
+
+  "geomDepth": -5,
+  "geomFeed": 200,
+  "home": { "x": 0, "y": 0, "z": 0 }
+}

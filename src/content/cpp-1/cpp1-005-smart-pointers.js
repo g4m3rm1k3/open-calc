@@ -109,8 +109,18 @@ const lesson = {
   chapter: "cpp-1",
   order: 5,
   title: "Smart Pointers",
-  subtitle: "unique_ptr, shared_ptr, weak_ptr — automatic, safe memory management",
-  tags: ["c++", "cpp", "smart-pointers", "unique_ptr", "shared_ptr", "weak_ptr", "RAII", "memory"],
+  subtitle:
+    "unique_ptr, shared_ptr, weak_ptr — automatic, safe memory management",
+  tags: [
+    "c++",
+    "cpp",
+    "smart-pointers",
+    "unique_ptr",
+    "shared_ptr",
+    "weak_ptr",
+    "RAII",
+    "memory",
+  ],
   aliases: [
     "c++ smart pointers",
     "c++ unique_ptr",
@@ -119,7 +129,7 @@ const lesson = {
     "c++ new delete",
   ],
 
-  hook: `Raw `\`new\`` and `\`delete\`` are the biggest source of C++ bugs: leaks (forgot delete), double-frees, dangling pointers. Smart pointers apply RAII to heap memory — they delete automatically when they go out of scope. In modern C++, you almost never write `\`new\`` and `\`delete\`` directly.`,
+  hook: `Raw \`new\` and \`delete\` are the biggest source of C++ bugs: leaks (forgot delete), double-frees, dangling pointers. Smart pointers apply RAII to heap memory — they delete automatically when they go out of scope. In modern C++, you almost never write \`new\` and \`delete\` directly.`,
 
   mentalModel: [
     "**`unique_ptr`: one owner, automatic cleanup.** Cannot be copied — only moved. When it goes out of scope, it deletes the object. Zero overhead vs a raw pointer. Default choice for heap allocation.",
@@ -134,7 +144,8 @@ const lesson = {
     visualizations: [
       {
         id: "CppLab",
-        mathBridge: "**unique_ptr — run it then explore:**\n\n- Try `auto file3 = file;` after the move — compile error (unique_ptr can't be copied).\n- `file.get()` returns the raw pointer after the move — what is it? (nullptr)\n- Add `if (file) cout << \"file valid\";` — implicit bool conversion checks for nullptr.\n- Return a unique_ptr from a function: `auto make_db() { return make_unique<Resource>(\"DB\"); }`",
+        mathBridge:
+          '**unique_ptr — run it then explore:**\n\n- Try `auto file3 = file;` after the move — compile error (unique_ptr can\'t be copied).\n- `file.get()` returns the raw pointer after the move — what is it? (nullptr)\n- Add `if (file) cout << "file valid";` — implicit bool conversion checks for nullptr.\n- Return a unique_ptr from a function: `auto make_db() { return make_unique<Resource>("DB"); }`',
         props: {
           mainFile: "main.cpp",
           initialFiles: { "/home/user/main.cpp": UNIQUE_CODE },
@@ -142,7 +153,8 @@ const lesson = {
       },
       {
         id: "CppLab",
-        mathBridge: "**shared_ptr and ref counting — run it then explore:**\n\n- Add a third `shared_ptr<Config> cfg3 = cfg` inside a nested scope. When does the count drop?\n- Pass `cfg` to a function `void f(shared_ptr<Config> c)` — what does the count become inside f?\n- Try `shared_ptr<Config> cfg4 = move(cfg)` — does cfg's count drop?\n- What's the count just before the Config is released?",
+        mathBridge:
+          "**shared_ptr and ref counting — run it then explore:**\n\n- Add a third `shared_ptr<Config> cfg3 = cfg` inside a nested scope. When does the count drop?\n- Pass `cfg` to a function `void f(shared_ptr<Config> c)` — what does the count become inside f?\n- Try `shared_ptr<Config> cfg4 = move(cfg)` — does cfg's count drop?\n- What's the count just before the Config is released?",
         props: {
           mainFile: "main.cpp",
           initialFiles: { "/home/user/main.cpp": SHARED_CODE },
@@ -159,7 +171,8 @@ const lesson = {
     visualizations: [
       {
         id: "CppLab",
-        mathBridge: "**weak_ptr — run it then explore:**\n\n- Assign `weak = nullptr` before the scope ends — does that release the Cache early? (No — weak doesn't own it)\n- Try `weak.lock()` after the cache is destroyed — returns nullptr.\n- Add a second `shared_ptr<Cache> cache2 = cache` — does the weak still expire when cache goes out of scope? (No — cache2 still owns it)\n- What's the use_count of a weak_ptr? (weak.use_count() counts strong owners only)",
+        mathBridge:
+          "**weak_ptr — run it then explore:**\n\n- Assign `weak = nullptr` before the scope ends — does that release the Cache early? (No — weak doesn't own it)\n- Try `weak.lock()` after the cache is destroyed — returns nullptr.\n- Add a second `shared_ptr<Cache> cache2 = cache` — does the weak still expire when cache goes out of scope? (No — cache2 still owns it)\n- What's the use_count of a weak_ptr? (weak.use_count() counts strong owners only)",
         props: {
           mainFile: "main.cpp",
           initialFiles: { "/home/user/main.cpp": WEAK_CODE },
@@ -167,7 +180,8 @@ const lesson = {
       },
       {
         id: "CppLab",
-        mathBridge: "**Ownership patterns — run it then explore:**\n\n- Change `borrow(const Widget* w)` to take `Widget&` — often cleaner for non-null borrowing.\n- Try `unique_ptr<Widget> w2 = move(w)` before borrow — does borrow crash? (no, but w is null after)\n- Add `share(shared_ptr<Widget>)` and call it with `make_shared<Widget>()` — count inside?\n- Demonstrate ownership transfer: `return make_unique<Widget>()` from a factory function.",
+        mathBridge:
+          "**Ownership patterns — run it then explore:**\n\n- Change `borrow(const Widget* w)` to take `Widget&` — often cleaner for non-null borrowing.\n- Try `unique_ptr<Widget> w2 = move(w)` before borrow — does borrow crash? (no, but w is null after)\n- Add `share(shared_ptr<Widget>)` and call it with `make_shared<Widget>()` — count inside?\n- Demonstrate ownership transfer: `return make_unique<Widget>()` from a factory function.",
         props: {
           mainFile: "main.cpp",
           initialFiles: { "/home/user/main.cpp": OWNER_CODE },
@@ -233,7 +247,7 @@ conn->query();
       difficulty: "easy",
       problem:
         "Demonstrate the memory leak that raw `new` can cause, then fix it with `unique_ptr`. Create a `Resource` class that prints on construction and destruction. Allocate with `new` in a function, then throw an exception before `delete`. The destructor never runs. Rewrite using `make_unique` — the destructor runs even with the exception.",
-      hint: "Without smart pointer: `Resource* r = new Resource(); throw runtime_error(\"oops\");` — r is leaked. With unique_ptr: `auto r = make_unique<Resource>();` — destructor runs during stack unwinding.",
+      hint: 'Without smart pointer: `Resource* r = new Resource(); throw runtime_error("oops");` — r is leaked. With unique_ptr: `auto r = make_unique<Resource>();` — destructor runs during stack unwinding.',
       walkthrough: [
         "Raw version: new Resource, throw — destructor never called, memory leaked",
         "Smart version: make_unique<Resource>, throw — ~Resource called during stack unwind",

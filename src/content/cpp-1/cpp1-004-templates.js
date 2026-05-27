@@ -116,7 +116,14 @@ const lesson = {
   order: 4,
   title: "Templates",
   subtitle: "Write code once that works with any type — generic programming",
-  tags: ["c++", "cpp", "templates", "generic-programming", "type-parameters", "specialization"],
+  tags: [
+    "c++",
+    "cpp",
+    "templates",
+    "generic-programming",
+    "type-parameters",
+    "specialization",
+  ],
   aliases: [
     "c++ templates",
     "c++ generic programming",
@@ -125,7 +132,7 @@ const lesson = {
     "c++ template specialization",
   ],
 
-  hook: `Why write `\`max(int, int)\`` and `\`max(double, double)\`` and `\`max(string, string)\`` separately when the logic is identical? Templates let you write code once and have the compiler generate type-specific versions for you. Every STL container — `\`vector<T>\``, `\`map<K,V>\``, `\`pair<T,U>\`` — is a template. Once you understand templates, the entire standard library opens up.`,
+  hook: `Why write \`max(int, int)\` and \`max(double, double)\` and \`max(string, string)\` separately when the logic is identical? Templates let you write code once and have the compiler generate type-specific versions for you. Every STL container — \`vector<T>\`, \`map<K,V>\`, \`pair<T,U>\` — is a template. Once you understand templates, the entire standard library opens up.`,
 
   mentalModel: [
     "**`template<typename T>` creates a blueprint.** The compiler generates a concrete function or class for each type you use it with. `maxOf(3, 7)` generates an `int` version; `maxOf(3.14, 2.71)` generates a `double` version. The generated code is identical to writing them by hand — zero runtime overhead.",
@@ -140,7 +147,8 @@ const lesson = {
     visualizations: [
       {
         id: "CppLab",
-        mathBridge: "**Function templates — run it then explore:**\n\n- Try `maxOf(3, 3.14)` — compile error. Why? (T must be the same for both arguments)\n- Fix it: `maxOf<double>(3, 3.14)` — explicit type argument forces promotion.\n- Add `template<typename T> T minOf(T a, T b)` — same pattern, different operation.\n- Try `maxOf(true, false)` — bool is comparable, returns true.",
+        mathBridge:
+          "**Function templates — run it then explore:**\n\n- Try `maxOf(3, 3.14)` — compile error. Why? (T must be the same for both arguments)\n- Fix it: `maxOf<double>(3, 3.14)` — explicit type argument forces promotion.\n- Add `template<typename T> T minOf(T a, T b)` — same pattern, different operation.\n- Try `maxOf(true, false)` — bool is comparable, returns true.",
         props: {
           mainFile: "main.cpp",
           initialFiles: { "/home/user/main.cpp": FUNC_TPL_CODE },
@@ -148,7 +156,8 @@ const lesson = {
       },
       {
         id: "CppLab",
-        mathBridge: "**Class template Stack — run it then explore:**\n\n- Try `Stack<string> ss; ss.push(\"hello\"); ss.push(\"world\");` — strings work identically.\n- Try `Stack<double>` — same template, different type.\n- What happens when you `pop()` an empty stack? (throws runtime_error)\n- Add a `void print() const` method that prints all elements without modifying the stack.",
+        mathBridge:
+          '**Class template Stack — run it then explore:**\n\n- Try `Stack<string> ss; ss.push("hello"); ss.push("world");` — strings work identically.\n- Try `Stack<double>` — same template, different type.\n- What happens when you `pop()` an empty stack? (throws runtime_error)\n- Add a `void print() const` method that prints all elements without modifying the stack.',
         props: {
           mainFile: "main.cpp",
           initialFiles: { "/home/user/main.cpp": CLASS_TPL_CODE },
@@ -165,7 +174,8 @@ const lesson = {
     visualizations: [
       {
         id: "CppLab",
-        mathBridge: "**Multiple type parameters — run it then explore:**\n\n- Add `Pair<int, vector<string>>` — templates can have complex type parameters.\n- Change `add` to return the sum of a vector of mixed-type values using a fold.\n- Try `Pair<Pair<int,int>, string>` — nested templates.\n- Add a `swap(Pair<K,V>&)` method that swaps key and value.",
+        mathBridge:
+          "**Multiple type parameters — run it then explore:**\n\n- Add `Pair<int, vector<string>>` — templates can have complex type parameters.\n- Change `add` to return the sum of a vector of mixed-type values using a fold.\n- Try `Pair<Pair<int,int>, string>` — nested templates.\n- Add a `swap(Pair<K,V>&)` method that swaps key and value.",
         props: {
           mainFile: "main.cpp",
           initialFiles: { "/home/user/main.cpp": MULTI_TPL_CODE },
@@ -173,7 +183,8 @@ const lesson = {
       },
       {
         id: "CppLab",
-        mathBridge: "**Template specialization — run it then explore:**\n\n- Add a specialization for `double` that formats to 2 decimal places.\n- Try `print(42)` and `print(42.0)` — which specialization is called for each?\n- What does `typeid(val).name()` print for different types? (compiler-specific names)\n- Add `print(vector<int>{1,2,3})` — does the generic template handle it?",
+        mathBridge:
+          "**Template specialization — run it then explore:**\n\n- Add a specialization for `double` that formats to 2 decimal places.\n- Try `print(42)` and `print(42.0)` — which specialization is called for each?\n- What does `typeid(val).name()` print for different types? (compiler-specific names)\n- Add `print(vector<int>{1,2,3})` — does the generic template handle it?",
         props: {
           mainFile: "main.cpp",
           initialFiles: { "/home/user/main.cpp": SPEC_TPL_CODE },
