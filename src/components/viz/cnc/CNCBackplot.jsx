@@ -1,6 +1,13 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { TransformControls } from "three/examples/jsm/controls/TransformControls.js";
+import { STLLoader } from "three/examples/jsm/loaders/STLLoader.js";
+import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
+import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { ColladaLoader } from "three/examples/jsm/loaders/ColladaLoader.js";
+import { PLYLoader } from "three/examples/jsm/loaders/PLYLoader.js";
 
 export default function CNCBackplot({
   pathPoints = [],
@@ -19,6 +26,16 @@ export default function CNCBackplot({
   showGrid = true,
   showTool = true,
   showStock = true,
+  showCuts = true,
+  stockSTLBuffer = null,
+  // Fixture models: [{id, name, format, buffer, position:[x,y,z], rotation:[rx,ry,rz], scale:[sx,sy,sz], w, h, d}]
+  fixtures = [],
+  selectedFixtureId = null,
+  onSelectFixture = null,     // (id|null) => void
+  onFixtureTransform = null,  // (id, {pos, rot, scl}) => void
+  transformMode = "translate", // 'translate' | 'rotate' | 'scale'
+  snapGrid = 0,               // 0 = off, otherwise mm increment
+  facePickMode = false,
 }) {
   const mountRef = useRef(null);
   const rendererRef = useRef(null);
@@ -27,11 +44,27 @@ export default function CNCBackplot({
   const controlsRef = useRef(null);
   const pathLayerRef = useRef(null);
   const stockLayerRef = useRef(null);
+  const cutsLayerRef = useRef(null);
+  const cutsGeoRef = useRef(null);
   const toolRef = useRef(null);
   const gridRef = useRef(null);
   const rafRef = useRef(null);
+  // Fixture / transform refs
+  const fixtureLayerRef = useRef(null);
+  const transformControlsRef = useRef(null);
+  const fixtureObjectsRef = useRef(new Map()); // id → THREE.Object3D
+  const facePickModeRef = useRef(false);
+  const onSelectFixtureRef = useRef(null);
+  const onFixtureTransformRef = useRef(null);
   const pathFittedRef = useRef(false);
   const mountedRef = useRef(false);
+  // Face-alignment overlay state (managed inside this component)
+  const [pendingFace, setPendingFace] = useState(null);
+
+  // Keep callback refs fresh so the bootstrap closure always has the latest values
+  useEffect(() => { onSelectFixtureRef.current = onSelectFixture; }, [onSelectFixture]);
+  useEffect(() => { onFixtureTransformRef.current = onFixtureTransform; }, [onFixtureTransform]);
+  useEffect(() => { facePickModeRef.current = facePickMode; }, [facePickMode]);
 
   // Colors based on theme
   const colors = {
@@ -96,9 +129,89 @@ export default function CNCBackplot({
     scene.add(stockLayer);
     stockLayerRef.current = stockLayer;
 
+    const cutsLayer = new THREE.Group();
+    scene.add(cutsLayer);
+    cutsLayerRef.current = cutsLayer;
+
     const toolGroup = new THREE.Group();
     scene.add(toolGroup);
     toolRef.current = toolGroup;
+
+    const fixtureLayer = new THREE.Group();
+    scene.add(fixtureLayer);
+    fixtureLayerRef.current = fixtureLayer;
+
+    // ── TransformControls ─────────────────────────────────────────────────
+    const tc = new TransformControls(camera, renderer.domElement);
+    tc.setMode("translate");
+    // Disable orbit while dragging a gizmo handle
+    tc.addEventListener("dragging-changed", (e) => {
+      controls.enabled = !e.value;
+    });
+    tc.addEventListener("objectChange", () => {
+      const obj = tc.object;
+      if (!obj) return;
+      let o = obj;
+      while (o && !o.userData?.fixtureId) o = o.parent;
+      const fxId = o?.userData?.fixtureId;
+      if (fxId && onFixtureTransformRef.current) {
+        onFixtureTransformRef.current(fxId, {
+          pos: obj.position.toArray(),
+          rot: [obj.rotation.x, obj.rotation.y, obj.rotation.z],
+          scl: obj.scale.toArray(),
+        });
+      }
+    });
+    scene.add(tc);
+    transformControlsRef.current = tc;
+
+    // ── Fixture click-to-select + face-pick ───────────────────────────────
+    let _tcPointerDownThisClick = false;
+    tc.addEventListener("mouseDown", () => { _tcPointerDownThisClick = true; });
+    tc.addEventListener("mouseUp",   () => {
+      requestAnimationFrame(() => { _tcPointerDownThisClick = false; });
+    });
+
+    const handleClick = (event) => {
+      if (!mountedRef.current || _tcPointerDownThisClick) return;
+      const rect = el.getBoundingClientRect();
+      const mouse = new THREE.Vector2(
+        ((event.clientX - rect.left) / rect.width) * 2 - 1,
+        -((event.clientY - rect.top) / rect.height) * 2 + 1,
+      );
+      const raycaster = new THREE.Raycaster();
+      raycaster.setFromCamera(mouse, cameraRef.current);
+      const meshes = [];
+      fixtureLayerRef.current?.traverse((o) => { if (o.isMesh) meshes.push(o); });
+      const hits = raycaster.intersectObjects(meshes, false);
+
+      const getFxId = (obj) => {
+        let o = obj;
+        while (o && !o.userData?.fixtureId) o = o.parent;
+        return o?.userData?.fixtureId ?? null;
+      };
+
+      if (facePickModeRef.current) {
+        if (hits.length && hits[0].face) {
+          const hit = hits[0];
+          const wn = hit.face.normal.clone()
+            .transformDirection(hit.object.matrixWorld).normalize();
+          const fxId = getFxId(hit.object);
+          if (fxId) {
+            const obj3d = fixtureObjectsRef.current.get(fxId);
+            setPendingFace({ fixtureId: fxId, worldNormal: wn, object3d: obj3d });
+          }
+        }
+        return;
+      }
+
+      if (hits.length) {
+        onSelectFixtureRef.current?.(getFxId(hits[0].object));
+      } else {
+        onSelectFixtureRef.current?.(null);
+      }
+    };
+    el.addEventListener("click", handleClick);
 
     const animate = () => {
       rafRef.current = requestAnimationFrame(animate);
@@ -132,10 +245,14 @@ export default function CNCBackplot({
       mountedRef.current = false;
       cancelAnimationFrame(rafRef.current);
       ro.disconnect();
+      el.removeEventListener("click", handleClick);
       controls.dispose();
+      if (transformControlsRef.current) transformControlsRef.current.dispose();
       clearGroup(pathLayerRef.current);
       clearGroup(stockLayerRef.current);
+      clearGroup(cutsLayerRef.current);
       clearGroup(toolRef.current);
+      clearGroup(fixtureLayerRef.current);
       if (gridRef.current) {
         gridRef.current.geometry?.dispose?.();
         gridRef.current.material?.dispose?.();
@@ -148,7 +265,10 @@ export default function CNCBackplot({
       controlsRef.current = null;
       pathLayerRef.current = null;
       stockLayerRef.current = null;
+      cutsLayerRef.current = null;
       toolRef.current = null;
+      fixtureLayerRef.current = null;
+      transformControlsRef.current = null;
       gridRef.current = null;
       rafRef.current = null;
     };
@@ -227,14 +347,34 @@ export default function CNCBackplot({
     const stockMat = new THREE.MeshPhongMaterial({
       color: colors.stockFill,
       transparent: true,
-      opacity: isDark ? 0.22 : 0.18,
+      // Ghost the stock when cut surface is active so the solid surface shows through
+      opacity: showCuts ? 0.06 : (isDark ? 0.22 : 0.18),
       shininess: 40,
     });
 
     let center = new THREE.Vector3(ox, oy, oz);
     let maxDim = 20;
 
-    if (stockShape === "cylinder") {
+    if (stockSTLBuffer) {
+      // Custom STL stock shape — renders at bbox.min = stock origin
+      try {
+        const _ldr = new STLLoader();
+        const stlGeo = _ldr.parse(stockSTLBuffer);
+        stlGeo.computeBoundingBox();
+        const { min, max } = stlGeo.boundingBox;
+        stlGeo.translate(-min.x + ox, -min.y + oy, -min.z + oz);
+        stlGeo.computeVertexNormals();
+        group.add(new THREE.Mesh(stlGeo, stockMat));
+        center = new THREE.Vector3(
+          ox + (max.x - min.x) / 2,
+          oy + (max.y - min.y) / 2,
+          oz + (max.z - min.z) / 2,
+        );
+        maxDim = Math.max(max.x - min.x, max.y - min.y, max.z - min.z, 20);
+      } catch (e) {
+        console.warn("CNCBackplot: failed to parse stock STL", e);
+      }
+    } else if (stockShape === "cylinder") {
       const len = Math.max(stockDimensions?.length ?? 150, 0.1);
       const dia = Math.max(stockDimensions?.diameter ?? 80, 0.1);
       const radius = dia / 2;
@@ -293,10 +433,298 @@ export default function CNCBackplot({
     stockDimensions,
     stockOrigin,
     showStock,
+    showCuts,
+    stockSTLBuffer,
     isDark,
     pathPoints.length,
   ]);
 
+  // ── Cut surface heightmap ─────────────────────────────────────────────────
+  // Effect 1: Allocate the heightmap geometry whenever stock layout changes.
+  // The vertex Z values start at stockTop and get lowered by Effect 2.
+  const HMAP_N = 80;
+  useEffect(() => {
+    const group = cutsLayerRef.current;
+    if (!group) return;
+    clearGroup(group);
+    cutsGeoRef.current = null; // clearGroup disposed the old geometry
+    if (!showCuts || stockShape === "cylinder") return;
+
+    const ox = stockOrigin?.x ?? 0;
+    const oy = stockOrigin?.y ?? 0;
+    const oz = stockOrigin?.z ?? 0;
+    const sw = Math.max(stockDimensions?.width ?? 100, 1);
+    const sh = Math.max(stockDimensions?.height ?? 80, 1);
+    const sd = Math.max(stockDimensions?.depth ?? 40, 0.1);
+    const stockTopZ = oz + sd;
+    const NX = HMAP_N, NY = HMAP_N;
+
+    const positions = new Float32Array(NX * NY * 3);
+    const idxArr = [];
+    for (let j = 0; j < NY; j++) {
+      for (let i = 0; i < NX; i++) {
+        const vi = j * NX + i;
+        positions[vi * 3]     = ox + i * (sw / (NX - 1));
+        positions[vi * 3 + 1] = oy + j * (sh / (NY - 1));
+        positions[vi * 3 + 2] = stockTopZ;
+        if (i < NX - 1 && j < NY - 1) {
+          const a = vi, b = vi + 1, c = vi + NX, d = vi + NX + 1;
+          idxArr.push(a, b, d, a, d, c);
+        }
+      }
+    }
+
+    const posAttr = new THREE.BufferAttribute(positions, 3);
+    posAttr.setUsage(THREE.DynamicDrawUsage);
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", posAttr);
+    geo.setIndex(idxArr);
+    geo.computeVertexNormals();
+
+    const mat = new THREE.MeshPhongMaterial({
+      color: isDark ? 0xa8b8c4 : 0xd0c4a8,  // machined aluminum / warm steel
+      shininess: 140,
+      specular: isDark ? 0x4a7a9b : 0x887860,
+      side: THREE.FrontSide,
+      polygonOffset: true,
+      polygonOffsetFactor: -1,
+      polygonOffsetUnits: -1,
+    });
+    const cutsMesh = new THREE.Mesh(geo, mat);
+    cutsMesh.visible = true; // always shown — represents the current stock top surface
+    group.add(cutsMesh);
+    cutsGeoRef.current = {
+      geo, mesh: cutsMesh,
+      NX, NY, ox, oy, sw, sh, stockTopZ,
+      hmap: null, hmapStep: -1, hmapPathLen: -1,
+    };
+  }, [stockShape, stockDimensions, stockOrigin, showCuts, isDark]);
+
+  // Effect 2: Update vertex Z heights for every feed point up to currentStep.
+  // Interpolates along each segment so long G01 moves are fully carved, not just
+  // their endpoints. Uses an incremental cache so forward playback only processes
+  // new steps; backward scrub resets and recomputes from the start.
+  useEffect(() => {
+    const info = cutsGeoRef.current;
+    if (!info || !showCuts) return;
+    const { geo, mesh, NX, NY, ox, oy, sw, sh, stockTopZ } = info;
+    const posAttr = geo.attributes.position;
+    const toolR = Math.max(toolDiameter / 2, 0.5);
+    const r2 = toolR * toolR;
+    const cellW = sw / (NX - 1);
+    const cellH = sh / (NY - 1);
+
+    // Reset the cache when going backward or when a new path is loaded.
+    if (!info.hmap || pathPoints.length !== info.hmapPathLen || currentStep < info.hmapStep) {
+      info.hmap = new Float32Array(NX * NY).fill(stockTopZ);
+      info.hmapStep = -1;
+      info.hmapPathLen = pathPoints.length;
+    }
+    const hmap = info.hmap;
+
+    // Incrementally carve only the new segments since the last update.
+    const startPi = Math.max(1, info.hmapStep + 1);
+    const endPi   = Math.min(currentStep + 1, pathPoints.length);
+    for (let pi = startPi; pi < endPi; pi++) {
+      const pt = pathPoints[pi];
+      if (!pt || pt.motionMode === "G00") continue;
+
+      // Interpolate from the previous path point to this one so every point
+      // along the segment is carved, not just the endpoint.
+      const prev = pathPoints[pi - 1] ?? pt;
+      const ddx = pt.machineX - prev.machineX;
+      const ddy = pt.machineY - prev.machineY;
+      const ddz = pt.machineZ - prev.machineZ;
+      const xyLen = Math.sqrt(ddx * ddx + ddy * ddy);
+      const stepSize = Math.max(cellW * 0.8, toolR * 0.5);
+      const nSteps = Math.max(1, Math.ceil(xyLen / stepSize));
+
+      for (let s = 0; s <= nSteps; s++) {
+        const t = s / nSteps;
+        const px = prev.machineX + t * ddx - ox;
+        const py = prev.machineY + t * ddy - oy;
+        const tipZ = prev.machineZ + t * ddz;
+
+        if (tipZ >= stockTopZ) continue;
+        if (px + toolR < 0 || px - toolR > sw || py + toolR < 0 || py - toolR > sh) continue;
+
+        const xiMin = Math.max(0, Math.floor((px - toolR) / cellW));
+        const xiMax = Math.min(NX - 1, Math.ceil((px + toolR) / cellW));
+        const yiMin = Math.max(0, Math.floor((py - toolR) / cellH));
+        const yiMax = Math.min(NY - 1, Math.ceil((py + toolR) / cellH));
+
+        for (let xi = xiMin; xi <= xiMax; xi++) {
+          for (let yi = yiMin; yi <= yiMax; yi++) {
+            const dx = xi * cellW - px;
+            const dy = yi * cellH - py;
+            if (dx * dx + dy * dy <= r2) {
+              const vi = yi * NX + xi;
+              if (tipZ < hmap[vi]) hmap[vi] = tipZ;
+            }
+          }
+        }
+      }
+    }
+    info.hmapStep = currentStep;
+
+    // Push updated Z values to the GPU buffer
+    for (let vi = 0; vi < NX * NY; vi++) posAttr.setZ(vi, hmap[vi]);
+    posAttr.needsUpdate = true;
+    geo.computeVertexNormals();
+
+    // Always show the surface — uncut areas sit at stockTopZ (flush with stock top),
+    // cut areas drop below to reveal the machined surface.
+    if (mesh) mesh.visible = true;
+  }, [currentStep, pathPoints, toolDiameter, showCuts]);
+  // ── Render fixture models (STL / OBJ / FBX / GLTF / DAE / PLY) ──────────────
+  useEffect(() => {
+    const group = fixtureLayerRef.current;
+    if (!group) return;
+    clearGroup(group);
+    fixtureObjectsRef.current.clear();
+    // Also detach TC — the attached object is being disposed
+    transformControlsRef.current?.detach();
+    if (!fixtures?.length) return;
+
+    let cancelled = false;
+    const stlLdr  = new STLLoader();
+    const objLdr  = new OBJLoader();
+    const fbxLdr  = new FBXLoader();
+    const gltfLdr = new GLTFLoader();
+    const daeLdr  = new ColladaLoader();
+    const plyLdr  = new PLYLoader();
+
+    const mkMat = () => new THREE.MeshPhongMaterial({
+      color: isDark ? 0x4a5568 : 0x718096,
+      transparent: true,
+      opacity: 0.88,
+      shininess: 80,
+      side: THREE.DoubleSide,
+    });
+    const mkEdgeMat = () => new THREE.LineBasicMaterial({
+      color: isDark ? 0x94a3b8 : 0x475569,
+    });
+
+    const finalize = (obj3d, fx) => {
+      if (cancelled) return;
+      const pos = fx.position ?? [fx.x ?? 0, fx.y ?? 0, fx.z ?? 0];
+      const rot = fx.rotation ?? [0, 0, 0];
+      const scl = fx.scale    ?? [1, 1, 1];
+      obj3d.position.set(pos[0], pos[1], pos[2]);
+      obj3d.rotation.set(rot[0], rot[1], rot[2]);
+      obj3d.scale.set(scl[0], scl[1], scl[2]);
+      obj3d.userData.fixtureId = fx.id;
+      obj3d.traverse((o) => { o.userData.fixtureId = fx.id; });
+      group.add(obj3d);
+      fixtureObjectsRef.current.set(fx.id, obj3d);
+    };
+
+    fixtures.forEach((fx) => {
+      if (!fx.buffer) {
+        // Placeholder box
+        const [w, h, d] = [fx.w ?? 60, fx.h ?? 50, fx.d ?? 25];
+        const g = new THREE.Group();
+        const boxGeo = new THREE.BoxGeometry(w, h, d);
+        const mesh = new THREE.Mesh(boxGeo, mkMat());
+        mesh.position.set(w / 2, h / 2, d / 2);
+        const edges = new THREE.LineSegments(
+          new THREE.EdgesGeometry(boxGeo), mkEdgeMat());
+        edges.position.copy(mesh.position);
+        g.add(mesh, edges);
+        finalize(g, fx);
+        return;
+      }
+      try {
+        switch (fx.format) {
+          case "stl": {
+            const geo = stlLdr.parse(fx.buffer);
+            geo.computeVertexNormals();
+            const g = new THREE.Group();
+            g.add(new THREE.Mesh(geo, mkMat()));
+            finalize(g, fx);
+            break;
+          }
+          case "ply": {
+            const geo = plyLdr.parse(fx.buffer);
+            geo.computeVertexNormals();
+            const g = new THREE.Group();
+            g.add(new THREE.Mesh(geo, mkMat()));
+            finalize(g, fx);
+            break;
+          }
+          case "obj": {
+            const obj = objLdr.parse(new TextDecoder().decode(fx.buffer));
+            obj.traverse((o) => { if (o.isMesh) o.material = mkMat(); });
+            finalize(obj, fx);
+            break;
+          }
+          case "fbx": {
+            const obj = fbxLdr.parse(fx.buffer, "");
+            obj.traverse((o) => { if (o.isMesh) o.material = mkMat(); });
+            finalize(obj, fx);
+            break;
+          }
+          case "gltf":
+          case "glb": {
+            gltfLdr.parse(fx.buffer, "",
+              (gltf) => {
+                if (cancelled) return;
+                gltf.scene.traverse((o) => { if (o.isMesh) o.material = mkMat(); });
+                finalize(gltf.scene, fx);
+                // Re-attach TC if this was the selected fixture and it loaded async
+                const tc = transformControlsRef.current;
+                if (tc && fx.id === selectedFixtureId) {
+                  const obj3d = fixtureObjectsRef.current.get(fx.id);
+                  if (obj3d) tc.attach(obj3d);
+                }
+              },
+              (err) => console.warn("CNCBackplot: GLTF load error", err),
+            );
+            break;
+          }
+          case "dae": {
+            const result = daeLdr.parse(new TextDecoder().decode(fx.buffer));
+            result.scene.traverse((o) => { if (o.isMesh) o.material = mkMat(); });
+            finalize(result.scene, fx);
+            break;
+          }
+          default:
+            console.warn("CNCBackplot: unknown fixture format", fx.format);
+        }
+      } catch (e) {
+        console.warn("CNCBackplot: fixture load failed", fx.format, e);
+        // Fallback box
+        const g = new THREE.Group();
+        g.add(new THREE.Mesh(
+          new THREE.BoxGeometry(fx.w ?? 60, fx.h ?? 50, fx.d ?? 25), mkMat()));
+        finalize(g, fx);
+      }
+    });
+    return () => { cancelled = true; };
+  }, [fixtures, isDark]); // selectedFixtureId attachment handled in next effect
+
+  // ── Attach / detach TransformControls when selection changes ───────────────
+  useEffect(() => {
+    const tc = transformControlsRef.current;
+    if (!tc) return;
+    if (!selectedFixtureId) { tc.detach(); return; }
+    const obj = fixtureObjectsRef.current.get(selectedFixtureId);
+    if (obj) tc.attach(obj); else tc.detach();
+  }, [selectedFixtureId]);
+
+  // ── TransformControls mode: translate / rotate / scale ─────────────────────
+  useEffect(() => {
+    const tc = transformControlsRef.current;
+    if (tc) tc.setMode(transformMode);
+  }, [transformMode]);
+
+  // ── Grid snap ───────────────────────────────────────────────────────────
+  useEffect(() => {
+    const tc = transformControlsRef.current;
+    if (!tc) return;
+    tc.setTranslationSnap(snapGrid || null);
+    tc.setRotationSnap(snapGrid ? Math.PI / 12 : null); // 15° increments
+  }, [snapGrid]);
   // ── Rebuild path ──────────────────────────────────────────────────────────
   useEffect(() => {
     const group = pathLayerRef.current;
@@ -443,6 +871,67 @@ export default function CNCBackplot({
       }}
     >
       <div ref={mountRef} className="w-full h-full" />
+
+      {/* Face-alignment overlay — appears after user clicks a surface in face-pick mode */}
+      {pendingFace && (
+        <div
+          style={{
+            position: "absolute", top: 8, left: 8,
+            background: "rgba(15,23,42,0.92)",
+            border: "1px solid #334155",
+            borderRadius: 8, padding: "10px 12px",
+            zIndex: 20, minWidth: 180,
+          }}
+        >
+          <div style={{ fontSize: 10, color: "#94a3b8", marginBottom: 6, fontWeight: 600 }}>
+            Align picked face to…
+          </div>
+          {[
+            { label: "Lay flat on table ↓",  target: new THREE.Vector3(0, 0, -1) },
+            { label: "Face up ↑",             target: new THREE.Vector3(0, 0,  1) },
+            { label: "+X right",              target: new THREE.Vector3(1, 0,  0) },
+            { label: "+Y front",              target: new THREE.Vector3(0, 1,  0) },
+          ].map(({ label, target }) => (
+            <button
+              key={label}
+              style={{
+                display: "block", width: "100%", marginBottom: 4,
+                background: "#1e293b", border: "1px solid #334155",
+                color: "#e2e8f0", borderRadius: 4, padding: "4px 8px",
+                fontSize: 10, cursor: "pointer", textAlign: "left",
+              }}
+              onClick={() => {
+                const { fixtureId, worldNormal, object3d } = pendingFace;
+                if (!object3d) { setPendingFace(null); return; }
+                // Rotate the object so worldNormal aligns with target
+                const q = new THREE.Quaternion().setFromUnitVectors(
+                  worldNormal.clone().normalize(), target.clone().normalize());
+                object3d.quaternion.premultiply(q);
+                onFixtureTransformRef.current?.(fixtureId, {
+                  pos: object3d.position.toArray(),
+                  rot: [object3d.rotation.x, object3d.rotation.y, object3d.rotation.z],
+                  scl: object3d.scale.toArray(),
+                });
+                setPendingFace(null);
+              }}
+            >
+              {label}
+            </button>
+          ))}
+          <button
+            style={{
+              display: "block", width: "100%",
+              background: "#7f1d1d", border: "1px solid #991b1b",
+              color: "#fca5a5", borderRadius: 4, padding: "4px 8px",
+              fontSize: 10, cursor: "pointer",
+            }}
+            onClick={() => setPendingFace(null)}
+          >
+            Cancel
+          </button>
+        </div>
+      )}
+
       {pathPoints.length === 0 && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <span className="text-[10px] uppercase tracking-widest font-bold text-slate-500 bg-slate-800/80 px-4 py-2 rounded-lg backdrop-blur-sm">

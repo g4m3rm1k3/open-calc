@@ -1974,7 +1974,6 @@ export default function CNCSimPro() {
   const [rpmOvr, setRpmOvr] = useState(100);
   const [jogAxis, setJogAxis] = useState("X");
   const [jogStep, setJogStep] = useState(0.001);
-  const [jogPos, setJogPos] = useState({ X: 0, Y: 0, Z: 0 });
   const [layers, setLayers] = useState({
     stock: true,
     grid: true,
@@ -3816,6 +3815,19 @@ export default function CNCSimPro() {
     return () => cvs.removeEventListener("wheel", h);
   }, [draw]);
 
+  // ─── Jog ───────────────────────────────────────────────────────
+  const jog = useCallback(
+    (dir) => {
+      const d = dir * jogStep;
+      setMs((m) => ({
+        ...m,
+        pos: { ...m.pos, [jogAxis]: (m.pos[jogAxis] || 0) + d },
+      }));
+      draw();
+    },
+    [jogAxis, jogStep, draw],
+  );
+
   // ─── Keyboard shortcuts ────────────────────────────────────────
   useEffect(() => {
     const h = (e) => {
@@ -3835,25 +3847,7 @@ export default function CNCSimPro() {
     };
     window.addEventListener("keydown", h);
     return () => window.removeEventListener("keydown", h);
-  }, [toggleCycle, step, resetProg]);
-
-  // ─── Jog ───────────────────────────────────────────────────────
-  const jog = useCallback(
-    (dir) => {
-      const d = dir * jogStep;
-      setJogPos((prev) => {
-        const n = { ...prev };
-        n[jogAxis] = +(n[jogAxis] + d).toFixed(4);
-        return n;
-      });
-      setMs((m) => ({
-        ...m,
-        pos: { ...m.pos, [jogAxis]: (m.pos[jogAxis] || 0) + d },
-      }));
-      draw();
-    },
-    [jogAxis, jogStep, draw],
-  );
+  }, [toggleCycle, step, resetProg, jog]);
 
   // ─── Setup export/import ──────────────────────────────────────
   const exportToolLibrary = () => {
@@ -4040,9 +4034,10 @@ export default function CNCSimPro() {
   const backplotIs3D = vpView === "iso";
   // Z offset to lift path and tool so stock sits on the grid.
   // G-code Z=0 (part top) → scene Z = stockDepth; Z=-5 (cut) → scene Z = stockDepth-5.
+  // Use ms.units (G-code execution units) to match path-point coordinate space.
   const backplotZOffset = mach.isLathe
     ? 0
-    : (stock.depth ?? 40) / stockUnitScale;
+    : (stock.depth ?? 40) / (ms.units === "inch" ? 25.4 : 1);
   const backplotPathPoints = useMemo(
     () =>
       pathPts.map((p) => ({
@@ -5385,7 +5380,7 @@ export default function CNCSimPro() {
                         <div key={ax} className="mini">
                           <span className="mini-l">{ax}</span>
                           <span className="mini-v">
-                            {(jogPos[ax] || 0).toFixed(3)}
+                            {(ms.pos[ax] || 0).toFixed(3)}
                           </span>
                         </div>
                       ))}
@@ -5576,6 +5571,7 @@ export default function CNCSimPro() {
                   stockDimensions={backplotStockDimensions}
                   stockOrigin={backplotStockOrigin}
                   showStock={layers.stock}
+                  showCuts={layers.removal}
                 />
               ) : (
                 <canvas
