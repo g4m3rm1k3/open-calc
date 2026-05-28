@@ -214,12 +214,14 @@ const STARTER_CELLS = [
     output: "",
     status: "idle",
     figureJson: null,
+    matplotlibImages: [],
   },
 ];
 
 // ── CellOutput ────────────────────────────────────────────────────────────────
 function CellOutput({ cell, C }) {
-  if (!cell.output && !cell.figureJson) return null;
+  const hasMatplotlib = cell.matplotlibImages && cell.matplotlibImages.length > 0;
+  if (!cell.output && !cell.figureJson && !hasMatplotlib) return null;
 
   return (
     <div style={{ borderTop: `0.5px solid ${C.border}` }}>
@@ -235,10 +237,24 @@ function CellOutput({ cell, C }) {
         Out [{cell.id}]
       </div>
 
-      {/* Figure canvas */}
+      {/* opencalc Figure canvas */}
       {cell.figureJson && (
         <div style={{ padding: "0 14px 10px" }}>
           <FigureRenderer figureJson={cell.figureJson} C={C} />
+        </div>
+      )}
+
+      {/* matplotlib figures — captured as PNG via Agg backend */}
+      {hasMatplotlib && (
+        <div style={{ padding: "6px 14px 10px", display: "flex", flexDirection: "column", gap: 8 }}>
+          {cell.matplotlibImages.map((src, i) => (
+            <img
+              key={i}
+              src={src}
+              alt={`Figure ${i + 1}`}
+              style={{ maxWidth: "100%", borderRadius: 8, display: "block", border: `1px solid ${C.border}` }}
+            />
+          ))}
         </div>
       )}
 
@@ -349,6 +365,27 @@ async function getPyodide() {
       "sympy",
     ]);
 
+    // Force Agg backend so matplotlib never injects HTML into the DOM
+    await py.runPythonAsync(`
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import io as _io, base64 as _base64
+
+def _capture_matplotlib_figs():
+    nums = plt.get_fignums()
+    if not nums:
+        return []
+    result = []
+    for n in nums:
+        fig = plt.figure(n)
+        buf = _io.BytesIO()
+        fig.savefig(buf, format='png', bbox_inches='tight', dpi=120)
+        buf.seek(0)
+        result.append('data:image/png;base64,' + _base64.b64encode(buf.read()).decode())
+    plt.close('all')
+    return result
+`);
     await py.runPythonAsync(
       'from opencalc import Figure; print("Python stack ready")',
     );
@@ -997,7 +1034,7 @@ export default function PythonNotebook({ params, onParamChange }) {
       setCells((prev) =>
         prev.map((c) =>
           c.id === cellId
-            ? { ...c, status: "running", output: "", figureJson: null }
+            ? { ...c, status: "running", output: "", figureJson: null, matplotlibImages: [] }
             : c,
         ),
       );
@@ -1056,6 +1093,16 @@ export default function PythonNotebook({ params, onParamChange }) {
           result !== undefined && result !== null ? String(result) : "";
         const isFigure = isFigureOutput(resultStr);
 
+        // Capture any matplotlib figures rendered during the cell run
+        let matplotlibImages = [];
+        try {
+          const proxy = await pyodide.runPythonAsync('_capture_matplotlib_figs()');
+          if (proxy && proxy.toJs) {
+            matplotlibImages = proxy.toJs({ create_proxies: false }) ?? [];
+            proxy.destroy?.();
+          }
+        } catch { /* ignore if helper not available */ }
+
         execCounterRef.current += 1;
         setCells((prev) =>
           prev.map((c) =>
@@ -1067,6 +1114,7 @@ export default function PythonNotebook({ params, onParamChange }) {
                   output:
                     textOutput || (!isFigure && resultStr ? resultStr : ""),
                   figureJson: isFigure ? resultStr : null,
+                  matplotlibImages,
                   testResult: testFeedback,
                 }
               : c,
@@ -1084,6 +1132,7 @@ export default function PythonNotebook({ params, onParamChange }) {
                     "Error: " +
                     err.message,
                   figureJson: null,
+                  matplotlibImages: [],
                 }
               : c,
           ),
@@ -1117,6 +1166,7 @@ export default function PythonNotebook({ params, onParamChange }) {
         output: "",
         status: "idle",
         figureJson: null,
+        matplotlibImages: [],
       },
     ]);
   };
@@ -1131,7 +1181,7 @@ export default function PythonNotebook({ params, onParamChange }) {
   const clearOutput = (id) =>
     setCells((prev) =>
       prev.map((c) =>
-        c.id === id ? { ...c, output: "", figureJson: null } : c,
+        c.id === id ? { ...c, output: "", figureJson: null, matplotlibImages: [] } : c,
       ),
     );
 

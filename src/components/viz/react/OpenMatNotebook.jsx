@@ -278,6 +278,26 @@ function sprintfFormat(fmt, ...args) {
   });
 }
 
+// ── Figure renderer (handles single + subplot figures) ───────────────────────
+function NotebookFigure({ figureJson, C }) {
+  if (!figureJson) return null;
+  let parsed;
+  try { parsed = typeof figureJson === "string" ? JSON.parse(figureJson) : figureJson; } catch { return null; }
+  if (parsed?.type === "opencalc_subplots") {
+    const { cols = 1, panels = [] } = parsed;
+    return (
+      <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 8 }}>
+        {panels.map((panel, i) => (
+          <div key={i} style={{ minWidth: 0 }}>
+            {panel ? <FigureRenderer figureJson={panel} C={C} /> : <div style={{ height: 200, borderRadius: 8, background: C.surface2, border: `1px solid ${C.border}` }} />}
+          </div>
+        ))}
+      </div>
+    );
+  }
+  return <FigureRenderer figureJson={figureJson} C={C} />;
+}
+
 // ── Plot accumulator → opencalc_figure JSON ───────────────────────────────────
 function makeFigure(plotState) {
   const elements = [];
@@ -563,8 +583,13 @@ const CellComponent = React.memo(function CellComponent({ cell, C, onRun, onClea
       {(cell.output || cell.figureJson) && (
         <div style={{ borderTop: `0.5px solid ${C.border}` }}>
           <div style={{ padding: "4px 14px 2px", fontSize: 11, color: C.hint, fontFamily: "monospace" }}>Out [{cell.execCount ?? " "}]</div>
-          {cell.figureJson && <div style={{ padding: "0 14px 10px" }}><FigureRenderer figureJson={cell.figureJson} C={C} /></div>}
-          {cell.output && (
+          {cell.figureJson && (
+            <div style={{ padding: "8px 14px 10px", borderBottom: cell.output ? `0.5px solid ${C.border}` : undefined }}>
+              <div style={{ fontSize: 10, fontWeight: 600, color: C.hint, textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 6 }}>Figure</div>
+              <NotebookFigure figureJson={cell.figureJson} C={C} />
+            </div>
+          )}
+          {cell.output && cell.output !== "Plot rendered." && (
             <pre style={{ margin: 0, padding: "4px 14px 12px", fontFamily: "monospace", fontSize: 13, lineHeight: 1.6, color: cell.status === "error" ? C.red : C.text, background: "transparent", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{cell.output}</pre>
           )}
         </div>

@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: 'la6-001',
   slug: 'abstract-vector-spaces',
   chapter: 'la6',
@@ -269,7 +269,14 @@ c
         body: 'Two vector spaces are isomorphic iff they have the same dimension. $P_n \\cong \\mathbb{R}^{n+1}$, $M_{m \\times n} \\cong \\mathbb{R}^{mn}$. Isomorphic spaces are "the same" for purposes of linear algebra — any basis identification gives an isomorphism.',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'VectorSpacesViz',
+        title: 'Vector Spaces — Subspaces, Null Space & Column Space',
+        mathBridge: 'A five-tab module: Concept explains the 8 axioms, span, subspaces, and examples (polynomials, functions, matrices); Canonical steps through an RREF computation highlighting pivot vs free columns and identifying the column space and null space; Real World shows null space as the set of all CNC tool positions that produce no output displacement; Interactive lets you enter any 2×3 matrix and visualize its column space and null space; Practice has four problems.',
+        caption: 'Pivot columns span the column space; null space is everything the matrix squishes to zero — both revealed by RREF.',
+      },
+    ],
   },
 
   examples: [

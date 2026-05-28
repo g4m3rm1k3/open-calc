@@ -298,6 +298,15 @@ const VIZ_REGISTRY = {
   LALinearAlgebraRealWorld: lazy(
     () => import("./react/LALinearAlgebraRealWorld.jsx"),
   ),
+  // Linear Algebra interactive modules (from drafts)
+  LinearSystemsStepperViz: lazy(() => import("./react/LinearSystemsStepperViz.jsx")),
+  MatrixAlgebraViz: lazy(() => import("./react/MatrixAlgebraViz.jsx")),
+  VectorsModuleViz: lazy(() => import("./react/VectorsModuleViz.jsx")),
+  DeterminantsModuleViz: lazy(() => import("./react/DeterminantsModuleViz.jsx")),
+  VectorSpacesViz: lazy(() => import("./react/VectorSpacesViz.jsx")),
+  LinearTransformationsViz: lazy(() => import("./react/LinearTransformationsViz.jsx")),
+  EigenvaluesModuleViz: lazy(() => import("./react/EigenvaluesModuleViz.jsx")),
+  OrthogonalityModuleViz: lazy(() => import("./react/OrthogonalityModuleViz.jsx")),
   PythonNotebook: lazy(() => import("./react/PythonNotebook.jsx")),
   OpenMatNotebook: lazy(() => import("./react/OpenMatNotebook.jsx")),
   JSNotebook: lazy(() => import("./react/JSNotebook.jsx")),

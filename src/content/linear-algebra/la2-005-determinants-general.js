@@ -372,6 +372,12 @@ A = np.array([[2., 0., 1.],
     ],
     visualizations: [
       {
+        id: 'DeterminantsModuleViz',
+        title: 'Determinants — Cofactor Expansion & Area/Volume',
+        mathBridge: 'A five-tab module: Concept covers 2×2 and 3×3 determinants, cofactor signs, and geometry; Canonical steps through a 3×3 cofactor expansion along row 1 showing each minor; Real World shows how det gives signed area of a parallelogram and signed volume of a parallelepiped; Interactive lets you enter any 2×2 or 3×3 matrix and see the determinant computed with all cofactors highlighted; Practice has four problems including real CNC applications.',
+        caption: 'The determinant is the signed scaling factor of a transformation — zero means collapse, nonzero means invertible.',
+      },
+      {
         id: 'LALinearAlgebraRealWorld',
         title: 'Linear Algebra in the Real World â€” Applied Module',
         mathBridge: 'A six-tab applied module spanning chapters 1 and 2: Systemsâ†’CNC shows two sensor equations as intersecting lines and computes the tool position via RREF; Matricesâ†’Graphics applies rotation/scale/shear to a 2D shape and displays the combined matrix T with det(T); Vectorsâ†’Forces decomposes two cable tensions into a linear system and solves for Tâ‚ and Tâ‚‚; Dotâ†’Normals shows how the dot product controls surface brightness and cutting-tool contact angle; Detâ†’Area/Vol draws the parallelogram spanned by two vectors and shows area = |det|; Practice has five hand-calculation problems with real manufacturing context.',

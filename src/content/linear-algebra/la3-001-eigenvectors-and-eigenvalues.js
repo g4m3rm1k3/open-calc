@@ -1,4 +1,4 @@
-﻿export default {
+﻿﻿export default {
   // â”€â”€ Identity â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   id: 'la3-001',
   slug: 'eigenvectors-and-eigenvalues',
@@ -334,7 +334,14 @@ A = np.array([[5., 2.],
         body: 'If $B = P^{-1}AP$, then:\n\n$\\det(B - \\lambda I) = \\det(P^{-1}AP - \\lambda I) = \\det(P^{-1}(A-\\lambda I)P) = \\det(A - \\lambda I)$\n\nSo $A$ and $B$ have identical characteristic polynomials and identical eigenvalues. **Change of basis does not change eigenvalues.** This is why eigenvalues are called "intrinsic" properties of a linear map.',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'EigenvaluesModuleViz',
+        title: 'Eigenvalues & Eigenvectors — Characteristic Equation Stepper',
+        mathBridge: 'A five-tab module: Concept explains eigenvectors as special directions, eigenvalues as scaling factors, and the characteristic equation; Canonical steps through the full 2x2 eigenvalue computation, expanding to a quadratic, solving for eigenvalues, then solving (A-lI)v=0 for eigenvectors; Real World shows eigenvalues in PCA, vibration modes, and PageRank; Interactive lets you enter any 2x2 matrix and see eigenvalues and eigenvectors computed live; Practice has four problems.',
+        caption: 'Eigenvalues are the roots of det(A-lI) = 0 — each gives a direction the matrix stretches without rotating.',
+      },
+    ],
   },
 
   // â”€â”€ Examples â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€

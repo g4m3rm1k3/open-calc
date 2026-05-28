@@ -307,7 +307,14 @@ A = np.array([
         body: 'Suppose $R$ and $S$ are both RREF matrices row-equivalent to $A$. Then $S = M R$ for some invertible $M$. Consider the pivot columns of $R$: they are the standard basis vectors $\\mathbf{e}_{i_1}, \\ldots, \\mathbf{e}_{i_r}$. The corresponding columns of $S = MR$ would be $M\\mathbf{e}_{i_1}, \\ldots, M\\mathbf{e}_{i_r}$. For $S$ to also be in RREF, these must be standard basis vectors. Proceeding column by column (left to right), one shows by induction that every leading 1 in $R$ corresponds to the same column position in $S$, and that all entries of $R$ and $S$ agree.',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'LinearSystemsStepperViz',
+        title: 'Linear Systems & Row Reduction — Interactive Module',
+        mathBridge: 'A four-tab module: Concept explains augmented matrices, EROs, REF vs RREF, and all three solution types; Stepper walks through Gaussian elimination step by step with preset systems (unique, ∞, no solution, CNC positioning) — pivot row highlighted in blue, elimination row in red; Real World shows a CNC controller solving encoder equations; Practice has four hand-worked problems with full answers.',
+        caption: 'Step through every elementary row operation to reach RREF — see exactly which rows are active at each stage.',
+      },
+    ],
   },
 
   examples: [

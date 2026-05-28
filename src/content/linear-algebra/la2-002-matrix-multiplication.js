@@ -1,4 +1,4 @@
-﻿export default {
+export default {
   // â”€â”€ Identity â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   id: 'la2-002',
   slug: 'matrix-multiplication',
@@ -182,7 +182,7 @@ fprintf('Composite transformation matrix:\\n')
 disp(composite)
 
 % A programmed tool path (3 points, as columns)
-path_in = [20 20 0; 0 10 0]';  % [x; y] for each point
+path_in = [20 20 0; 0 10 0];  % 2x3: each column = [x; y] for one tool point
 path_out = composite * path_in;
 
 fprintf('\\nProgrammed points vs Machine coordinates:\\n')
@@ -339,6 +339,12 @@ v = np.array([1.0, 0.0])
         mathBridge: 'A five-tab module: Concept covers addition, multiplication, identity, inverse, and LU; Canonical walks through a 2Ã—3 Ã— 3Ã—2 product entry by entry, a 2Ã—2 inverse by row reduction, and an LU factorisation; Real World shows the 3D graphics pipeline and FEA usage; Interactive lets you enter any 2Ã—2 matrices A and B and instantly computes AB, BA, det(A), Aâ»Â¹, and Aâ»Â¹b, plus a live graphics canvas with rotation/scale/shear sliders; Practice has five hand-calculation problems.',
         caption: 'The same math that renders every polygon in a 3D game â€” rotation, scale, and shear combined into a single matrix multiply.',
       },
+      {
+        id: 'MatrixAlgebraViz',
+        title: 'Matrix Algebra — Interactive Calculator & Stepper',
+        mathBridge: 'A five-tab module: Concept covers addition, scalar multiplication, transpose, and the distributive/associative laws; Canonical steps through a 2×3 × 3×2 multiplication entry-by-entry showing the row-dot-column pattern; Real World applies matrix products to a CNC rotation-then-translation pipeline; Interactive lets you input any 2×2 matrices A and B and instantly shows AB, BA, det, inverse, and a live 2D transformation canvas; Practice has four hand-calculation problems.',
+        caption: 'Matrix multiplication entry by entry — see why order matters and what each product encodes geometrically.',
+      }
     ],
   },
 

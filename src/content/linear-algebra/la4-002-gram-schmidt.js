@@ -1,4 +1,4 @@
-﻿export default {
+﻿﻿export default {
   // â”€â”€ Identity â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   id: 'la4-002',
   slug: 'gram-schmidt',
@@ -289,7 +289,14 @@ v2 = np.array([2.0, 2.0])
         body: 'Classical: subtract all projections from the original $\\mathbf{v}_j$.\nModified: subtract projections from the running $\\mathbf{u}_j$ after each one.\nAlgebraically identical. Numerically, Modified is preferred â€” error does not accumulate.',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'OrthogonalityModuleViz',
+        title: 'Gram-Schmidt & Orthogonality — Step-by-Step',
+        mathBridge: 'A five-tab module: Concept explains orthogonality, orthonormal bases, QR decomposition, and why they matter; Canonical steps through Gram-Schmidt for 2 or 3 vectors — subtract each projection, normalize, show all dot-products confirming orthogonality; Real World shows QR in CNC least-squares fitting and numerical stability; Interactive lets you enter 2 or 3 vectors and animate the full orthogonalization; Practice has four problems.',
+        caption: 'Gram-Schmidt builds a perpendicular basis one vector at a time — subtract all previous projections, then normalize.',
+      },
+    ],
   },
 
   // â”€â”€ Examples â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€

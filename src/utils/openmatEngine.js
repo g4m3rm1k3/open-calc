@@ -31,7 +31,14 @@ export function toPlain(value) {
     const p = value.valueOf();
     if (p !== value) return toPlain(p);
   }
-  if (Array.isArray(value)) return value.map(toPlain);
+  if (Array.isArray(value)) {
+    const mapped = value.map(toPlain);
+    // Normalize Nx1 column vectors → 1D flat arrays so r(i) indexing works correctly
+    if (mapped.length > 0 && mapped.every(v => Array.isArray(v) && v.length === 1)) {
+      return mapped.map(v => v[0]);
+    }
+    return mapped;
+  }
   if (value && typeof value === "object") {
     if ("re" in value && "im" in value && Object.keys(value).length <= 3) return value;
     return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, toPlain(v)]));
@@ -1323,12 +1330,19 @@ function joinContinuationLines(source) {
 
 function replaceIndexing(line, variables, functionNames = new Set()) {
   if (variables.size === 0) return line;
-  return line.replace(/\b([A-Za-z_]\w*)\s*\(([^()]+)\)/g, (match, name, inner) => {
+  // MATLAB () indexing for known variables: var(i) → var[i]
+  let result = line.replace(/\b([A-Za-z_]\w*)\s*\(([^()]+)\)/g, (match, name, inner) => {
     if (!variables.has(name) || functionNames.has(name)) return match;
-    // Replace MATLAB 'end' keyword with length(name) for last-element access
     const expandedInner = inner.replace(/\bend\b/g, `length(${name})`);
     return `${name}[${expandedInner}]`;
   });
+  // MATLAB {} cell-array indexing: fields{i} → fields[i]
+  // {} is never valid mathjs syntax, so convert for any identifier
+  result = result.replace(/\b([A-Za-z_]\w*)\s*\{([^{}]+)\}/g, (match, name, inner) => {
+    const expandedInner = inner.replace(/\bend\b/g, `length(${name})`);
+    return `${name}[${expandedInner}]`;
+  });
+  return result;
 }
 
 function replaceBackslash(expr) {
@@ -1863,6 +1877,29 @@ export function createExecutionEngine(options = {}) {
   parser.set("xor",     (a, b)    => (Boolean(a) !== Boolean(b)) ? 1 : 0);
   parser.set("not",     (v)       => isCollection(v) ? mapDeep(v, (x) => x ? 0 : 1) : (v ? 0 : 1));
 
+  // ── Comparison / equality helpers ───────────────────────────────────────────
+  // Deep structural equality — returns 1 if both args are identical, 0 otherwise.
+  // Handles scalars, vectors, and matrices.  NaN !== NaN (use isequaln for NaN-safe).
+  const _deepEq = (a, b, nanEqual) => {
+    const pa = toPlain(a), pb = toPlain(b);
+    if (Array.isArray(pa) && Array.isArray(pb)) {
+      if (pa.length !== pb.length) return false;
+      return pa.every((row, i) => _deepEq(row, pb[i], nanEqual));
+    }
+    const na = Number(pa), nb = Number(pb);
+    if (nanEqual && isNaN(na) && isNaN(nb)) return true;
+    return na === nb;
+  };
+  parser.set("isequal",    (a, b) => _deepEq(a, b, false) ? 1 : 0);
+  parser.set("isequaln",   (a, b) => _deepEq(a, b, true)  ? 1 : 0);
+  parser.set("isequaltol", (a, b, tol = 1e-9) => {
+    const pa = toPlain(a), pb = toPlain(b);
+    const flat = (v) => Array.isArray(v) ? v.flatMap(flat) : [Number(v)];
+    const fa = flat(pa), fb = flat(pb);
+    if (fa.length !== fb.length) return 0;
+    return fa.every((x, i) => Math.abs(x - fb[i]) <= Number(tol)) ? 1 : 0;
+  });
+
   // ── String utilities ────────────────────────────────────────────────────────
   parser.set("strcmp",    (a, b)       => String(a) === String(b) ? 1 : 0);
   parser.set("strcmpi",   (a, b)       => String(a).toLowerCase() === String(b).toLowerCase() ? 1 : 0);
@@ -2201,15 +2238,78 @@ export function executeScript(source, options = {}) {
       const indexedAssign = line.match(/^([A-Za-z_]\w*)\[([^\]]+)\]\s*=\s*(.+)$/);
       if (indexedAssign) {
         const [, name, idxExpr, valExpr] = indexedAssign;
-        const arr = parser.get(name);
-        const idx = Number(toPlain(parser.evaluate(idxExpr)));
+        let arr = parser.get(name);
         const val = toPlain(parser.evaluate(valExpr));
-        const updated = Array.isArray(arr) ? [...arr] : arr;
-        if (Array.isArray(updated)) updated[idx - 1] = val;
-        parser.set(name, updated);
+
+        // Helper: evaluate an index expression with 'end' expanded
+        const evalIdx = (expr, len) => {
+          const expanded = String(expr).replace(/\bend\b/g, String(len));
+          const result = toPlain(parser.evaluate(expanded));
+          return isCollection(result) ? normalizeVector(result).map(Number) : [Number(result)];
+        };
+
+        // Split top-level comma to detect 1D vs 2D indexing
+        const topCommas = [];
+        let depth = 0;
+        for (let ci = 0; ci < idxExpr.length; ci++) {
+          const ch = idxExpr[ci];
+          if (ch === '(' || ch === '[' || ch === '{') depth++;
+          else if (ch === ')' || ch === ']' || ch === '}') depth--;
+          else if (ch === ',' && depth === 0) topCommas.push(ci);
+        }
+
+        if (topCommas.length === 0) {
+          // ── 1D indexing: A[i] = val ──────────────────────────────────────
+          const updated = Array.isArray(arr) ? [...arr] : arr;
+          const indices = evalIdx(idxExpr, Array.isArray(updated) ? updated.length : 1);
+          if (indices.length === 1) {
+            if (Array.isArray(updated)) updated[indices[0] - 1] = val;
+          } else {
+            // Range assignment: A(2:5) = [...]
+            const vals = isCollection(val) ? normalizeVector(val) : indices.map(() => val);
+            indices.forEach((idx, k) => { if (Array.isArray(updated)) updated[idx - 1] = vals[k] ?? val; });
+          }
+          parser.set(name, updated);
+        } else if (topCommas.length === 1) {
+          // ── 2D indexing: A[i,j] = val ────────────────────────────────────
+          const rowExpr = idxExpr.slice(0, topCommas[0]).trim();
+          const colExpr = idxExpr.slice(topCommas[0] + 1).trim();
+
+          // Ensure arr is a 2D matrix
+          let mat = toNumericMatrix(arr);
+          if (!mat) {
+            // Not yet a matrix — initialise as a 1×1 or grow as needed
+            mat = [[Number(arr) || 0]];
+          }
+          mat = mat.map(r => [...r]); // deep copy
+
+          const nRows = mat.length;
+          const nCols = mat[0]?.length ?? 0;
+
+          const rowIdxs = evalIdx(rowExpr, nRows);
+          const colIdxs = evalIdx(colExpr, nCols);
+
+          // Grow matrix if needed
+          const maxRow = Math.max(...rowIdxs);
+          const maxCol = Math.max(...colIdxs);
+          while (mat.length < maxRow) mat.push(Array(mat[0]?.length ?? maxCol).fill(0));
+          mat.forEach(r => { while (r.length < maxCol) r.push(0); });
+
+          // Assign value(s)
+          const valFlat = isCollection(val) ? normalizeVector(val) : null;
+          let vi = 0;
+          rowIdxs.forEach(ri => {
+            colIdxs.forEach(ci => {
+              const v = valFlat ? (valFlat[vi++] ?? 0) : Number(val);
+              mat[ri - 1][ci - 1] = v;
+            });
+          });
+          parser.set(name, mat);
+        }
         variables.add(name);
-        return hasSemicolon ? null : updated;
+        return hasSemicolon ? null : parser.get(name);
       }
+
       const assign = line.match(/^([A-Za-z_]\w*)\s*=\s*(.+)$/);
       if (assign) {
         const [, name, expr] = assign;

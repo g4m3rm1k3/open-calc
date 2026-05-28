@@ -1,4 +1,4 @@
-﻿export default {
+﻿﻿export default {
   // â”€â”€ Identity â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   id: 'la2-001',
   slug: 'matrices-as-transformations',
@@ -362,6 +362,12 @@ v = np.array([4.0, 2.0])
         title: 'Projection â€” A Linear Map That Loses Information',
         mathBridge: 'Projection onto a line is a linear transformation whose matrix has rank 1. Drag the input vector and see it collapse onto the projection axis. The kernel (null space) consists of all vectors perpendicular to the projection direction â€” they map to zero. This visualizes both kernel and image for a concrete linear map.',
         caption: 'A rank-1 matrix collapses the plane onto a line. Many inputs share the same output â€” the kernel is all vectors perpendicular to the projection axis.',
+      },
+      {
+        id: 'LinearTransformationsViz',
+        title: 'Linear Transformations — Step-by-Step T(x) = Ax',
+        mathBridge: 'A five-tab module: Concept explains linearity (additivity + homogeneity), the standard matrix, kernel, image, rank-nullity; Canonical walks step-by-step through T(x) = Ax for preset transformations (rotation, projection, shear) showing each entry computed as a dot product; Real World shows a CNC coordinate transformation pipeline; Interactive lets you set any 2×2 matrix and input vector and animate the transformation; Practice has four problems.',
+        caption: 'Every linear transformation is multiplication by its standard matrix — the columns are where the basis vectors land.',
       },
     ],
   },

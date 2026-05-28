@@ -271,7 +271,14 @@ b = np.array([3.0, 3.0])
         body: 'The dot product uses $\\cos\\theta$, measuring alignment. The cross product uses $\\sin\\theta$, measuring divergence. When $\\theta = 90Â°$, $\\sin = 1$ â€” perpendicular vectors form the largest parallelogram. When $\\theta = 0Â°$ or $180Â°$, $\\sin = 0$ â€” parallel vectors form a flat parallelogram with zero area. Dot and cross are complementary.',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'VectorsModuleViz',
+        title: 'Vectors — Dot Product, Cross Product & Applications',
+        mathBridge: 'A five-tab module: Concept explains vector notation, magnitude, direction, dot and cross products; Canonical steps through a dot product calculation showing each term, the angle formula, and projection; Real World shows cable tension decomposition and CNC toolpath normal vectors; Interactive lets you enter two 3D vectors and instantly computes dot, cross, angle, projections, and parallelogram area; Practice has four hand-calculation problems.',
+        caption: 'Dot product measures alignment; cross product measures perpendicularity — both essential for force decomposition and surface normals.',
+      },
+    ],
   },
 
   examples: [
