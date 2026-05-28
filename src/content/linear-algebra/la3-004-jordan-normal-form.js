@@ -149,95 +149,80 @@ J^4
               cellTitle: 'Detecting a defective matrix â€” algebraic vs geometric multiplicity',
               prose: 'A matrix is defective when eigenvalues are repeated but the eigenspace is too small. Check: are all eigenvectors independent? If eig() returns near-duplicate columns, the matrix is defective. The rank of (A - Î»I) determines the eigenspace dimension: geometric multiplicity = n - rank(A - Î»I).',
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
-# Defective 2x2 matrix: Î»=3, algebraic mult 2, geo mult 1
-J2 = np.array([[3., 1.],
-               [0., 3.]])
+J = np.array([[3., 1.], [0., 3.]])
+evals, evecs = np.linalg.eig(J)
+print("J eigenvalues:", evals)
+print("Eigenvector rank:", np.linalg.matrix_rank(evecs), "(= 1, not diagonalizable)")
 
-evals, evecs = np.linalg.eig(J2)
-print("Eigenvalues:", evals)
-print()
-print("Eigenvectors (columns):")
-print(evecs.real.round(6))
-print()
-
-# Check geometric multiplicity via rank deficiency
-A_minus_lI = J2 - 3*np.eye(2)
-rank = np.linalg.matrix_rank(A_minus_lI)
-geo_mult = 2 - rank
-alg_mult = 2  # both eigenvalues are 3
-
-print(f"Algebraic multiplicity: {alg_mult}")
-print(f"Geometric multiplicity: {geo_mult}")
-print(f"Defective? {geo_mult < alg_mult}")`,
+fig, axes = plt.subplots(1, 3, figsize=(11, 3.5))
+for ax, (M, title) in zip(axes, [(J,'J'), (J@J,'J^2'), (J@J@J,'J^3')]):
+    ax.imshow(M, cmap='RdBu_r', aspect='equal', vmin=0, vmax=30)
+    ax.set_title(title, fontsize=13)
+    for i in range(2):
+        for j in range(2):
+            ax.text(j, i, f'{M[i,j]:.0f}', ha='center', va='center', fontsize=14,
+                    color='white' if M[i,j] > 15 else 'black')
+    ax.set_xticks([]); ax.set_yticks([])
+plt.suptitle("Jordan block powers: J^n has n on superdiagonal", fontsize=11)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 2,
               cellTitle: 'Jordan chain: finding the generalized eigenvector',
               prose: 'For a 2Ã—2 Jordan block with eigenvalue Î»: vâ‚ is the true eigenvector, vâ‚‚ satisfies (A-Î»I)vâ‚‚ = vâ‚. Solve (A-Î»I)vâ‚‚ = vâ‚ as a linear system. The solution vâ‚‚ is not unique â€” any particular solution works.',
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
-A = np.array([[3., 1.],
-              [0., 3.]])
-lam = 3.0
+A_diag = np.array([[3., 0.], [0., 3.]])  # 3I: diagonalizable
+J = np.array([[3., 1.], [0., 3.]])        # Jordan block: defective
+v = np.array([1.0, 0.0])
+ns = range(8)
+norms_diag = [np.linalg.norm(np.linalg.matrix_power(A_diag, n) @ v) for n in ns]
+norms_J    = [np.linalg.norm(np.linalg.matrix_power(J, n) @ v) for n in ns]
+norms_pred = [3.**n for n in ns]
 
-N = A - lam * np.eye(2)  # nilpotent part
+print("n=6: 3I gives", norms_diag[6], ", J gives", norms_J[6])
+print("Jordan block grows faster due to defect term n*lam^(n-1)")
 
-# True eigenvector: solve Nv1 = 0
-_, _, Vh = np.linalg.svd(N)
-v1 = Vh[-1].real  # right singular vector for near-zero singular value
-v1 = v1 / v1[0]   # normalize so first component = 1
-
-# Generalized eigenvector: solve Nv2 = v1
-# Use lstsq for the least-squares solution
-v2, _, _, _ = np.linalg.lstsq(N, v1, rcond=None)
-
-print("Nilpotent N = A - 3I:")
-print(N)
-print()
-print(f"True eigenvector v1: {v1}")
-print(f"Generalized eigenvector v2: {v2.real}")
-print()
-print("Verify (A-3I)v2 = v1:")
-print(f"  N @ v2 = {(N @ v2.real).round(6)}")
-print(f"  v1 =     {v1}")
-print(f"  Match: {np.allclose(N @ v2.real, v1, atol=1e-6)}")`,
+fig, ax = plt.subplots(figsize=(7, 4))
+ax.semilogy(ns, norms_diag, 'o-', color='steelblue', lw=2, label='3I (pure scaling)')
+ax.semilogy(ns, norms_J,    's-', color='crimson',   lw=2, label='Jordan block (defective)')
+ax.semilogy(ns, norms_pred, '--', color='gray', lw=1.5, label='3^n (eigenvalue only)')
+ax.set_xlabel("n"); ax.set_ylabel("||M^n v|| (log)")
+ax.set_title("Jordan defect causes faster-than-eigenvalue growth", fontsize=11)
+ax.legend(fontsize=9); ax.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 3,
               cellTitle: 'CNC critically damped axis â€” Jordan block in action',
               prose: 'A critically damped second-order system (Î¶=1) has a repeated pole at s=-Ï‰â‚™. Its state matrix is a Jordan block. The solution x(t) = (câ‚ + câ‚‚t)e^{-Ï‰â‚™t} has the polynomialÃ—exponential signature of a Jordan block. Critical damping gives the fastest settling without overshoot â€” engineers deliberately target this. The Jordan block is the mathematical model behind it.',
               code: `import numpy as np
-from scipy.linalg import expm
+import matplotlib.pyplot as plt
 
-# CNC axis: critically damped 2nd-order system
-# x'' + 2*omega_n*x' + omega_n^2*x = 0 at Î¶=1
-omega_n = 100.0  # 100 rad/s natural frequency
+matrices = [
+    ('Diagonalizable\n[[4,1],[2,3]]', np.array([[4.,1.],[2.,3.]])),
+    ('Jordan 2x2\n[[2,1],[0,2]]',      np.array([[2.,1.],[0.,2.]])),
+    ('Jordan 3x3\n[[1,1,0],[0,1,1],[0,0,1]]', np.array([[1.,1.,0.],[0.,1.,1.],[0.,0.,1.]])),
+]
 
-# State space: [x, x'] â€” Jordan block structure
-A = np.array([[-omega_n, 1.],
-              [0.,       -omega_n]])
-
-print("State matrix A (Jordan block):")
-print(A)
-evals = np.linalg.eigvals(A)
-print(f"\\nEigenvalues: {evals}  (repeated root at Î» = -Ï‰â‚™)")
-print()
-
-# Response: expm(A*t) gives the transition matrix
-# Initial condition: 1mm displacement, zero velocity
-x0 = np.array([1e-3, 0.0])
-
-print("Position response at selected times:")
-print(f"{'t (ms)':>8}  {'x (mm)':>10}  {'v (mm/s)':>12}")
-for t_ms in [0, 5, 10, 20, 50]:
-    t = t_ms * 1e-3
-    xt = expm(A * t) @ x0
-    print(f"{t_ms:>8}  {xt[0]*1e3:>10.4f}  {xt[1]*1e3:>12.4f}")
-
-print()
-print("Note: solution form x(t) = (c1 + c2*t)*exp(-Ï‰â‚™t)")
-print("The linear term 'c2*t' is the Jordan block's signature.")`,
+fig, axes = plt.subplots(1, 3, figsize=(12, 4))
+for ax, (name, M) in zip(axes, matrices):
+    evals = np.linalg.eig(M)[0]
+    ax.imshow(M, cmap='RdBu_r', aspect='equal', vmin=-2, vmax=2)
+    ax.set_title(f"{name}\nevals={evals.round(1)}", fontsize=9)
+    for i in range(M.shape[0]):
+        for j in range(M.shape[1]):
+            ax.text(j, i, f'{M[i,j]:.0f}', ha='center', va='center', fontsize=12,
+                    color='white' if abs(M[i,j]) > 1 else 'black')
+    ax.set_xticks([]); ax.set_yticks([])
+plt.suptitle("Diagonalizable vs Jordan form", fontsize=11)
+plt.tight_layout()
+plt.show()`,
             },
           ]
         }

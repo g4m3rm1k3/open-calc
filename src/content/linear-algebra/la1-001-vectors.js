@@ -151,6 +151,7 @@
                 'Notice that `2 * a` stretches the vector, `-1 * a` flips it, and `a + b` follows the tip-to-tail rule.',
               ],
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
 a = np.array([3.0, 1.0])
 b = np.array([1.0, 2.0])
@@ -160,7 +161,37 @@ print("b =", b)
 print("a + b =", a + b)       # tip-to-tail
 print("2 * a =", 2 * a)       # stretch
 print("-1 * a =", -1 * a)     # flip direction
-print("a - b =", a - b)       # a + (-b)`,
+print("a - b =", a - b)       # a + (-b)
+
+fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+
+# Left: show a, b, and their sum
+ax = axes[0]
+ax.set_title("Vector Addition: a + b")
+origin = np.zeros(2)
+vectors = {'a': (a, 'steelblue'), 'b': (b, 'darkorange'), 'a+b': (a+b, 'green')}
+for label, (v, color) in vectors.items():
+    ax.annotate('', xy=v, xytext=origin,
+                arrowprops=dict(arrowstyle='->', color=color, lw=2))
+    ax.text(v[0]*0.55, v[1]*0.55, label, fontsize=11, color=color, fontweight='bold')
+ax.set_xlim(-1, 5); ax.set_ylim(-1, 4)
+ax.axhline(0, color='k', lw=0.5); ax.axvline(0, color='k', lw=0.5)
+ax.set_aspect('equal'); ax.grid(True, alpha=0.3)
+
+# Right: scalar multiplication effects
+ax2 = axes[1]
+ax2.set_title("Scalar Multiplication of a")
+for scalar, color, label in [(2, 'steelblue', '2a'), (1, 'green', 'a'), (-1, 'red', '-a')]:
+    v = scalar * a
+    ax2.annotate('', xy=v, xytext=origin,
+                 arrowprops=dict(arrowstyle='->', color=color, lw=2))
+    ax2.text(v[0]*0.6+0.1, v[1]*0.6+0.1, label, fontsize=11, color=color, fontweight='bold')
+ax2.set_xlim(-4, 7); ax2.set_ylim(-2, 3)
+ax2.axhline(0, color='k', lw=0.5); ax2.axvline(0, color='k', lw=0.5)
+ax2.set_aspect('equal'); ax2.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 2,
@@ -170,6 +201,7 @@ print("a - b =", a - b)       # a + (-b)`,
                 'The vector [3, 4] is the classic 3-4-5 right triangle. Its unit vector is [0.6, 0.8] â€” verify: 0.6Â² + 0.8Â² = 1.',
               ],
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
 v = np.array([3.0, 4.0])
 
@@ -177,9 +209,39 @@ magnitude = np.linalg.norm(v)
 unit = v / magnitude
 
 print(f"v = {v}")
-print(f"â€–vâ€– = {magnitude}")       # should be 5.0
+print(f"||v|| = {magnitude}")       # should be 5.0
 print(f"unit vector = {unit}")    # [0.6, 0.8]
-print(f"â€–unitâ€– = {np.linalg.norm(unit):.6f}")  # should be 1.0`,
+print(f"||unit|| = {np.linalg.norm(unit):.6f}")  # should be 1.0
+
+fig, ax = plt.subplots(figsize=(6, 5))
+ax.set_title("Vector v and its Unit Vector", fontsize=13)
+origin = np.zeros(2)
+
+# Draw the original vector v
+ax.annotate('', xy=v, xytext=origin,
+            arrowprops=dict(arrowstyle='->', color='steelblue', lw=2.5))
+ax.text(v[0]*0.5 + 0.15, v[1]*0.5, f'v = {v}\\n||v|| = {magnitude}',
+        color='steelblue', fontsize=10)
+
+# Draw the unit vector
+ax.annotate('', xy=unit, xytext=origin,
+            arrowprops=dict(arrowstyle='->', color='darkorange', lw=2.5))
+ax.text(unit[0]*0.5 - 0.6, unit[1]*0.5 + 0.1, f'unit = {unit}\\n||unit|| = 1',
+        color='darkorange', fontsize=10)
+
+# Draw right-triangle components
+ax.plot([0, v[0]], [0, 0], 'k--', lw=1, alpha=0.5)
+ax.plot([v[0], v[0]], [0, v[1]], 'k--', lw=1, alpha=0.5)
+ax.text(v[0]/2, -0.3, f'x={v[0]}', ha='center', fontsize=9, color='gray')
+ax.text(v[0]+0.1, v[1]/2, f'y={v[1]}', fontsize=9, color='gray')
+
+ax.set_xlim(-0.5, 4); ax.set_ylim(-0.5, 5)
+ax.set_aspect('equal')
+ax.axhline(0, color='k', lw=0.5); ax.axvline(0, color='k', lw=0.5)
+ax.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 3,

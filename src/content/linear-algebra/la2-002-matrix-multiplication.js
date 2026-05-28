@@ -214,6 +214,7 @@ fprintf('\\nSame result via two steps? %d\\n', norm(step2 - path_out) < 1e-10)`,
                 'The result is a new matrix representing the composition of the two transformations.',
               ],
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
 A = np.array([[1., 2.],
               [3., 4.]])
@@ -223,12 +224,23 @@ B = np.array([[5., 6.],
 AB = A @ B
 print("A @ B =")
 print(AB)
-print()
 
-# Verify entry (0,0): row 0 of A Â· col 0 of B
-r0 = A[0]      # [1, 2]
-c0 = B[:, 0]   # [5, 7]
-print(f"Entry (0,0) = {r0} Â· {c0} = {np.dot(r0, c0)}")`,
+r0 = A[0]; c0 = B[:, 0]
+print(f"Entry (0,0) = dot({r0}, {c0}) = {np.dot(r0, c0)}")
+
+fig, axes = plt.subplots(1, 3, figsize=(11, 3))
+for ax, M, title in zip(axes, [A, B, AB], ['A', 'B', 'A @ B']):
+    im = ax.imshow(M, cmap='RdBu_r', aspect='equal', vmin=-60, vmax=60)
+    ax.set_title(title, fontsize=13, fontweight='bold')
+    for i in range(M.shape[0]):
+        for j in range(M.shape[1]):
+            ax.text(j, i, f'{M[i,j]:.0f}', ha='center', va='center', fontsize=14,
+                    color='white' if abs(M[i,j]) > 30 else 'black')
+    ax.set_xticks([]); ax.set_yticks([])
+
+plt.suptitle("Matrix Multiplication: A @ B", fontsize=12)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 2,
@@ -238,21 +250,41 @@ print(f"Entry (0,0) = {r0} Â· {c0} = {np.dot(r0, c0)}")`,
                 'The order in which you compose transformations changes the final result.',
               ],
               code: `import numpy as np
-from opencalc import quick_transform
+import matplotlib.pyplot as plt
 
-rotate = np.array([[0., -1.], [1., 0.]])   # 90Â° CCW
+rotate = np.array([[0., -1.], [1., 0.]])   # 90 deg CCW
 shear  = np.array([[1.,  1.], [0., 1.]])   # horizontal shear
 
-rotate_then_shear = shear @ rotate   # apply rotate first, shear second
+rotate_then_shear = shear @ rotate
 shear_then_rotate = rotate @ shear
 
-print("Rotate then shear:")
-print(rotate_then_shear)
-print()
-print("Shear then rotate:")
-print(shear_then_rotate)
-print()
-print("Equal?", np.allclose(rotate_then_shear, shear_then_rotate))`,
+print("Rotate then shear:"); print(rotate_then_shear)
+print("Shear then rotate:"); print(shear_then_rotate)
+print("Equal?", np.allclose(rotate_then_shear, shear_then_rotate))
+
+# Draw a unit square transformed by each composition
+def transform_square(T):
+    pts = np.array([[0,0],[1,0],[1,1],[0,1],[0,0]], dtype=float).T
+    return T @ pts
+
+fig, axes = plt.subplots(1, 2, figsize=(9, 4))
+for ax, M, title in [(axes[0], rotate_then_shear, "Rotate THEN Shear"),
+                     (axes[1], shear_then_rotate, "Shear THEN Rotate")]:
+    orig = transform_square(np.eye(2))
+    trans = transform_square(M)
+    ax.fill(orig[0], orig[1], alpha=0.2, color='steelblue', label='original')
+    ax.plot(orig[0], orig[1], 'steelblue', lw=1.5, linestyle='--')
+    ax.fill(trans[0], trans[1], alpha=0.35, color='crimson', label='transformed')
+    ax.plot(trans[0], trans[1], 'crimson', lw=2)
+    ax.set_title(title, fontsize=12)
+    ax.set_xlim(-2, 3); ax.set_ylim(-2, 3)
+    ax.set_aspect('equal'); ax.grid(True, alpha=0.3)
+    ax.axhline(0, color='k', lw=0.5); ax.axvline(0, color='k', lw=0.5)
+    ax.legend(fontsize=9)
+
+plt.suptitle("AB != BA: Order changes the shape", fontsize=12)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 3,
@@ -262,23 +294,34 @@ print("Equal?", np.allclose(rotate_then_shear, shear_then_rotate))`,
                 'This is the associativity property â€” you can group however you like, but you cannot change the order.',
               ],
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
 A = np.array([[2., 0.], [0., 0.5]])  # scale x2, shrink y
-B = np.array([[0., -1.], [1., 0.]])  # 90Â° rotation
+B = np.array([[0., -1.], [1., 0.]])  # 90 deg rotation
 v = np.array([3.0, 1.0])
 
-# Method 1: apply B then A separately
-step1 = B @ v
-step2 = A @ step1
-
-# Method 2: compose first, then apply
+step1 = B @ v          # apply B first
+step2 = A @ step1      # then apply A
 AB = A @ B
-result = AB @ v
+result = AB @ v        # apply composed matrix
 
 print(f"B @ v = {step1}")
 print(f"A @ (B @ v) = {step2}")
 print(f"(A @ B) @ v = {result}")
-print(f"Same result: {np.allclose(step2, result)}")`,
+print(f"Same result: {np.allclose(step2, result)}")
+
+fig, ax = plt.subplots(figsize=(6, 5))
+ax.set_title("Composition: B first, then A", fontsize=12)
+origin = np.zeros(2)
+for vec, color, lbl in [(v,'steelblue','v (original)'), (step1,'darkorange','B*v (after rotation)'),
+                        (step2,'crimson','A*(B*v) (final)')]:
+    ax.annotate('', xy=vec, xytext=origin, arrowprops=dict(arrowstyle='->', color=color, lw=2.5))
+    ax.text(vec[0]+0.1, vec[1]+0.1, lbl, color=color, fontsize=9, fontweight='bold')
+ax.set_xlim(-2, 4); ax.set_ylim(-2, 4)
+ax.set_aspect('equal'); ax.grid(True, alpha=0.3)
+ax.axhline(0, color='k', lw=0.5); ax.axvline(0, color='k', lw=0.5)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 'c1',

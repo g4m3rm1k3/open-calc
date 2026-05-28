@@ -186,54 +186,64 @@ fprintf('Peak displacement at node 2: %.4f mm\\n', max(abs(x(2,:)))*1e3)`,
               cellTitle: 'Building P and D from eigenvalues',
               prose: '`np.linalg.eig(A)` gives the eigenvector matrix P and eigenvalue array. Put eigenvalues on the diagonal of D. Verify: `P @ D @ P_inv â‰ˆ A`. If it does not match, something went wrong.',
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
-A = np.array([[4., 1.],
-              [2., 3.]])
-
+A = np.array([[4., 1.], [2., 3.]])
 evals, P = np.linalg.eig(A)
-
-# D = diagonal matrix of eigenvalues
 D = np.diag(evals)
-P_inv = np.linalg.inv(P)
+A_check = P @ D @ np.linalg.inv(P)
 
-print("Eigenvalues:", evals)
-print()
-print("P (eigenvectors as columns):")
-print(P.round(4))
-print()
-print("Reconstructed A = P @ D @ P_inv:")
-print((P @ D @ P_inv).real.round(6))
-print()
-print("Matches original A?", np.allclose((P @ D @ P_inv).real, A))`,
+print("P (eigenvectors as columns):");  print(P.round(4))
+print("D (eigenvalues on diagonal):");  print(D.round(4))
+print("P @ D @ P_inv = A?", np.allclose(A_check, A))
+
+fig, axes = plt.subplots(1, 3, figsize=(11, 3))
+for ax, M, title in zip(axes, [A, D, A_check], ['A', 'D (diagonal)', 'P D P_inv (= A)']):
+    ax.imshow(M, cmap='RdBu_r', aspect='equal', vmin=-5, vmax=5)
+    ax.set_title(title, fontsize=11)
+    for i in range(2):
+        for j in range(2):
+            ax.text(j, i, f'{M[i,j]:.2f}', ha='center', va='center', fontsize=13,
+                    color='white' if abs(M[i,j]) > 2.5 else 'black')
+    ax.set_xticks([]); ax.set_yticks([])
+plt.suptitle("Diagonalization: A = P D P_inv", fontsize=12)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 2,
               cellTitle: 'Matrix powers via diagonalization',
               prose: 'A^k = P D^k Pâ»Â¹. Raising D to the k-th power just raises each diagonal entry (eigenvalue) to the k-th power. This makes computing A^100 as easy as A^2 â€” no repeated matrix multiplication.',
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
-A = np.array([[3., 1.],
-              [0., 2.]])
-
+A = np.array([[4., 1.], [2., 3.]])
 evals, P = np.linalg.eig(A)
+D = np.diag(evals)
 P_inv = np.linalg.inv(P)
 
-def matrix_power_diag(A, P, evals, P_inv, k):
-    Dk = np.diag(evals ** k)
-    return (P @ Dk @ P_inv).real.round(6)
+# Powers via diagonalization: A^n = P @ D^n @ P_inv
+def power_via_diag(A, n):
+    evals, P = np.linalg.eig(A)
+    Dn = np.diag(evals**n)
+    return P @ Dn @ np.linalg.inv(P)
 
-# Verify with numpy's built-in matrix power
-k = 5
-A_power_diag = matrix_power_diag(A, P, evals, P_inv, k)
-A_power_numpy = np.linalg.matrix_power(A, k).astype(float)
+print("A^3 via diagonalization:"); print(power_via_diag(A, 3).round(4))
+print("A@A@A directly:");           print((A@A@A).round(4))
+print("Match:", np.allclose(power_via_diag(A, 3), A@A@A))
 
-print(f"A^{k} via diagonalization:")
-print(A_power_diag)
-print()
-print(f"A^{k} via numpy:")
-print(A_power_numpy)
-print()
-print("Match:", np.allclose(A_power_diag, A_power_numpy))`,
+# Show det(A) = product of eigenvalues and sign relationship
+fig, ax = plt.subplots(figsize=(7, 4))
+ns = np.arange(1, 8)
+dets = [np.linalg.det(np.linalg.matrix_power(A, n)) for n in ns]
+pred = [np.linalg.det(A)**n for n in ns]
+ax.plot(ns, dets, 'o-', color='steelblue', lw=2, label='det(A^n)')
+ax.plot(ns, pred, 's--', color='darkorange', lw=2, label='det(A)^n')
+ax.set_xlabel('n'); ax.set_ylabel('Determinant')
+ax.set_title("det(A^n) = det(A)^n (verified)", fontsize=12)
+ax.legend(); ax.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 'c1',
@@ -243,15 +253,40 @@ print("Match:", np.allclose(A_power_diag, A_power_numpy))`,
               difficulty: 'hard',
               prompt: 'Diagonalize A = [[2, 1],[1, 2]]. Then compute A^10 using P D^10 Pâ»Â¹. Verify against np.linalg.matrix_power(A, 10). Finally, print the eigenvalues â€” what symmetry do you notice about a symmetric matrix\'s eigenvalues?',
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
-A = np.array([[2., 1.],
-              [1., 2.]])
+# Non-diagonalizable: Jordan block (repeated eigenvalue, only 1 eigenvector)
+B = np.array([[2., 1.], [0., 2.]])
+evals_B, evecs_B = np.linalg.eig(B)
+print("B eigenvalues:", evals_B)
+print("B eigenvectors:"); print(evecs_B.round(4))
+print("Rank of eigenvector matrix:", np.linalg.matrix_rank(evecs_B))
+print("Not diagonalizable: eigenvectors are linearly dependent")
 
-# 1. compute evals and P via np.linalg.eig(A)
-# 2. compute A^10 using P @ diag(evals**10) @ P_inv
-# 3. verify against np.linalg.matrix_power(A, 10)
-# 4. comment on the eigenvalues (are they real? symmetric?)
-`,
+# Compare: diagonalizable vs not diagonalizable under iteration
+A = np.array([[4., 1.], [2., 3.]])  # diagonalizable
+v0 = np.array([1., 1.])
+
+fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+for ax, M, title in [(axes[0], A, "Diagonalizable A"), (axes[1], B, "Non-diagonalizable B")]:
+    trajectories = [v0]
+    v = v0.copy()
+    for _ in range(6):
+        v = M @ v / np.linalg.norm(M @ v)
+        trajectories.append(v)
+    traj = np.array(trajectories)
+    ax.plot(traj[:,0], traj[:,1], 'o-', color='steelblue', lw=2)
+    ax.scatter([traj[0,0]], [traj[0,1]], color='green', s=80, zorder=5, label='start')
+    ax.scatter([traj[-1,0]], [traj[-1,1]], color='crimson', s=80, zorder=5, label='end')
+    ax.set_title(f"{title}
+evals={np.linalg.eig(M)[0].round(2)}", fontsize=11)
+    ax.set_xlim(-1.5, 1.5); ax.set_ylim(-1.5, 1.5)
+    ax.set_aspect('equal'); ax.grid(True, alpha=0.3)
+    ax.axhline(0, color='k', lw=0.5); ax.axvline(0, color='k', lw=0.5)
+    ax.legend(fontsize=9)
+plt.suptitle("Normalized power iteration: convergence to dominant eigenvector", fontsize=11)
+plt.tight_layout()
+plt.show()`,
               hint: 'evals, P = np.linalg.eig(A). Dk = np.diag(evals**10). A10 = (P @ Dk @ np.linalg.inv(P)).real. Symmetric matrices always have real eigenvalues.',
             },
           ]

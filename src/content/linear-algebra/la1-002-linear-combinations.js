@@ -129,6 +129,7 @@
                 'The set of ALL such combinations (for every possible câ‚, câ‚‚) is the **span**.',
               ],
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
 v1 = np.array([2.0, 0.0])
 v2 = np.array([0.0, 1.0])
@@ -136,7 +137,34 @@ v2 = np.array([0.0, 1.0])
 combos = [(1, 0), (0, 1), (2, 3), (-1, 2)]
 for c1, c2 in combos:
     result = c1 * v1 + c2 * v2
-    print(f"{c1}Â·{v1} + {c2}Â·{v2} = {result}")`,
+    print(f"{c1}*v1 + {c2}*v2 = {result}")
+
+fig, ax = plt.subplots(figsize=(7, 5))
+ax.set_title("Linear Combinations of v1 and v2", fontsize=13)
+origin = np.zeros(2)
+
+colors = ['steelblue', 'darkorange', 'green', 'crimson']
+for (c1, c2), color in zip(combos, colors):
+    result = c1 * v1 + c2 * v2
+    ax.annotate('', xy=result, xytext=origin,
+                arrowprops=dict(arrowstyle='->', color=color, lw=2))
+    ax.text(result[0]+0.05, result[1]+0.05,
+            f'({c1},{c2})', fontsize=9, color=color, fontweight='bold')
+
+# Draw basis vectors
+ax.annotate('', xy=v1, xytext=origin,
+            arrowprops=dict(arrowstyle='->', color='gray', lw=1.5, linestyle='dashed'))
+ax.annotate('', xy=v2, xytext=origin,
+            arrowprops=dict(arrowstyle='->', color='gray', lw=1.5, linestyle='dashed'))
+ax.text(v1[0]+0.05, v1[1]+0.05, 'v1', fontsize=9, color='gray')
+ax.text(v2[0]+0.05, v2[1]+0.05, 'v2', fontsize=9, color='gray')
+
+ax.set_xlim(-3, 5); ax.set_ylim(-1, 4)
+ax.axhline(0, color='k', lw=0.5); ax.axvline(0, color='k', lw=0.5)
+ax.set_aspect('equal'); ax.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 2,
@@ -146,15 +174,49 @@ for c1, c2 in combos:
                 'rank == n means independent; rank < n means at least one is redundant.',
               ],
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
 # Independent: different directions
 indep = np.array([[1.0, 0.0], [0.0, 1.0]])
 
-# Dependent: second = 2 Ã— first
+# Dependent: second = 2 x first
 dep = np.array([[2.0, 1.0], [4.0, 2.0]])
 
-print(f"Independent rank = {np.linalg.matrix_rank(indep)}  (= 2 â†’ independent)")
-print(f"Dependent rank = {np.linalg.matrix_rank(dep)}  (= 1 â†’ second is redundant)")`,
+print(f"Independent rank = {np.linalg.matrix_rank(indep)}  (= 2 -> independent)")
+print(f"Dependent rank = {np.linalg.matrix_rank(dep)}  (= 1 -> second is redundant)")
+
+fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+origin = np.zeros(2)
+
+# Left: independent vectors
+ax = axes[0]
+ax.set_title(f"Independent (rank={np.linalg.matrix_rank(indep)}): span = full plane", fontsize=11)
+for i, (v, color, label) in enumerate(zip(indep, [‘steelblue’, ‘darkorange’], [‘v1’, ‘v2’])):
+    ax.annotate(‘’, xy=v, xytext=origin,
+                arrowprops=dict(arrowstyle=’->’, color=color, lw=2.5))
+    ax.text(v[0]+0.05, v[1]+0.05, label, fontsize=11, color=color, fontweight=’bold’)
+ax.set_xlim(-0.5, 1.5); ax.set_ylim(-0.5, 1.5)
+ax.set_aspect(‘equal’); ax.grid(True, alpha=0.3)
+ax.axhline(0, color=’k’, lw=0.5); ax.axvline(0, color=’k’, lw=0.5)
+
+# Right: dependent vectors
+ax2 = axes[1]
+ax2.set_title(f"Dependent (rank={np.linalg.matrix_rank(dep)}): span = 1D line", fontsize=11)
+# Draw the 1D line they span
+t = np.linspace(-1, 2.5, 100)
+direction = dep[0] / np.linalg.norm(dep[0])
+ax2.plot(t * dep[0][0], t * dep[0][1], ‘gray’, lw=1, linestyle=’--’, alpha=0.5, label=’span (1D line)’)
+for v, color, label in zip(dep, [‘steelblue’, ‘darkorange’], [‘v1’, ‘v2’]):
+    ax2.annotate(‘’, xy=v, xytext=origin,
+                 arrowprops=dict(arrowstyle=’->’, color=color, lw=2.5))
+    ax2.text(v[0]+0.05, v[1]+0.05, label, fontsize=11, color=color, fontweight=’bold’)
+ax2.set_xlim(-1, 5); ax2.set_ylim(-1, 3)
+ax2.set_aspect(‘equal’); ax2.grid(True, alpha=0.3)
+ax2.axhline(0, color=’k’, lw=0.5); ax2.axvline(0, color=’k’, lw=0.5)
+ax2.legend(fontsize=9)
+
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 3,

@@ -232,8 +232,27 @@ A = np.array([[3., 1.],
 S = np.array([[2., 4.],
               [1., 2.]])
 
-print(f"det(A) = {np.linalg.det(A):.1f}  (non-zero â†’ invertible)")
-print(f"det(S) = {np.linalg.det(S):.1f}  (zero â†’ singular, no inverse)")`,
+print(f"det(A) = {np.linalg.det(A):.1f}  (non-zero -> invertible)")
+print(f"det(S) = {np.linalg.det(S):.1f}  (zero -> singular, no inverse)")
+
+fig, axes = plt.subplots(1, 2, figsize=(9, 4))
+origin = np.zeros(2)
+for ax, M, title in [(axes[0], A, f"A: det={np.linalg.det(A):.1f} (invertible)"),
+                     (axes[1], S, f"S: det={np.linalg.det(S):.1f} (singular)")]:
+    c1, c2 = M[:, 0], M[:, 1]
+    para = plt.Polygon([origin, c1, c1+c2, c2], alpha=0.2, color=’steelblue’)
+    ax.add_patch(para)
+    ax.annotate(‘’, xy=c1, xytext=origin, arrowprops=dict(arrowstyle=’->’, color=’steelblue’, lw=2.5))
+    ax.annotate(‘’, xy=c2, xytext=origin, arrowprops=dict(arrowstyle=’->’, color=’darkorange’, lw=2.5))
+    ax.text(c1[0]*0.5+0.1, c1[1]*0.5+0.1, ‘col1’, color=’steelblue’, fontsize=11)
+    ax.text(c2[0]*0.5+0.1, c2[1]*0.5+0.1, ‘col2’, color=’darkorange’, fontsize=11)
+    ax.set_title(title, fontsize=11)
+    ax.set_xlim(-1, 5); ax.set_ylim(-1, 5)
+    ax.set_aspect(‘equal’); ax.grid(True, alpha=0.3)
+    ax.axhline(0, color=’k’, lw=0.5); ax.axvline(0, color=’k’, lw=0.5)
+plt.suptitle("|det| = area of parallelogram spanned by columns", fontsize=11)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 2,
@@ -243,21 +262,27 @@ print(f"det(S) = {np.linalg.det(S):.1f}  (zero â†’ singular, no inverse)")`
                 'In practice, use `np.linalg.solve(A, b)` to solve systems â€” never compute the inverse just to multiply it.',
               ],
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
-A = np.array([[3., 1.],
-              [2., 4.]])
-
+A = np.array([[3., 1.], [2., 4.]])
 A_inv = np.linalg.inv(A)
-print("Aâ»Â¹ =")
-print(A_inv.round(4))
-print()
+I_check = A @ A_inv
 
-# Verify: A @ Aâ»Â¹ should be the identity
-I = A @ A_inv
-print("A @ Aâ»Â¹ =")
-print(I.round(10))
-print()
-print("Is it the identity?", np.allclose(I, np.eye(2)))`,
+print("A_inv ="); print(A_inv.round(4))
+print("A @ A_inv ="); print(I_check.round(10))
+print("Is it the identity?", np.allclose(I_check, np.eye(2)))
+
+fig, axes = plt.subplots(1, 3, figsize=(10, 3))
+for ax, M, title in zip(axes, [A, A_inv, I_check], ["A", "A_inv", "A @ A_inv (= I)"]):
+    ax.imshow(M, cmap="RdBu_r", aspect="equal", vmin=-1.5, vmax=3.5)
+    ax.set_title(title, fontsize=12)
+    for i in range(M.shape[0]):
+        for j in range(M.shape[1]):
+            ax.text(j, i, f"{M[i,j]:.3f}", ha="center", va="center", fontsize=12,
+                    color="white" if abs(M[i,j]) > 1.5 else "black")
+    ax.set_xticks([]); ax.set_yticks([])
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 'c1',

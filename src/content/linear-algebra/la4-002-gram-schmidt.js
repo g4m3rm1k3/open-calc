@@ -197,52 +197,71 @@ fprintf('Max residual: %.2e\\n', max(max(abs(Q'*Q - eye(3)))))`,
               cellTitle: 'Gram-Schmidt step by step',
               prose: 'Each step: subtract all projections onto previous basis vectors, then normalize. After the process, every pair of output vectors is orthogonal (dot product = 0), and each has magnitude 1.',
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
-def gram_schmidt(vectors):
-    """Orthonormalize a list of vectors using Gram-Schmidt."""
-    basis = []
-    for v in vectors:
-        u = v.copy().astype(float)
-        for e in basis:
-            u -= np.dot(v, e) * e   # subtract projection onto each prior basis vector
-        norm = np.linalg.norm(u)
-        if norm > 1e-10:            # skip near-zero vectors (dependent)
-            basis.append(u / norm)
-    return basis
+# Gram-Schmidt on 2 vectors in R^2
+v1 = np.array([3., 1.])
+v2 = np.array([2., 2.])
 
-v1 = np.array([1.0, 1.0, 0.0])
-v2 = np.array([1.0, 0.0, 1.0])
-v3 = np.array([0.0, 1.0, 1.0])
+# Step 1: normalize v1
+e1 = v1 / np.linalg.norm(v1)
+# Step 2: remove e1 component from v2, then normalize
+v2_perp = v2 - np.dot(v2, e1) * e1
+e2 = v2_perp / np.linalg.norm(v2_perp)
 
-Q_cols = gram_schmidt([v1, v2, v3])
-Q = np.column_stack(Q_cols)
+print(f"e1 = {e1.round(4)}  (||e1|| = {np.linalg.norm(e1):.4f})")
+print(f"e2 = {e2.round(4)}  (||e2|| = {np.linalg.norm(e2):.4f})")
+print(f"e1 . e2 = {np.dot(e1, e2):.10f}  (orthogonal?)")
 
-print("Orthonormal basis (columns of Q):")
-print(Q.round(4))
-print()
-print("Qáµ€Q (should be identity):")
-print((Q.T @ Q).round(10))`,
+fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+origin = np.zeros(2)
+for ax, (u1,u2,t1,t2), title in [
+    (axes[0], (v1,v2,'v1','v2'), "Original: v1, v2"),
+    (axes[1], (e1,e2,'e1','e2'), "After Gram-Schmidt: e1, e2 (orthonormal)")
+]:
+    for v, color, lbl in [(u1,'steelblue',t1),(u2,'darkorange',t2)]:
+        ax.annotate('', xy=v, xytext=origin, arrowprops=dict(arrowstyle='->', color=color, lw=2.5))
+        ax.text(v[0]+0.05, v[1]+0.05, lbl, color=color, fontsize=12, fontweight='bold')
+    ax.set_title(title, fontsize=11)
+    ax.set_xlim(-0.5, 4); ax.set_ylim(-0.5, 2.5)
+    ax.set_aspect('equal'); ax.grid(True, alpha=0.3)
+    ax.axhline(0, color='k', lw=0.5); ax.axvline(0, color='k', lw=0.5)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 2,
               cellTitle: 'QR decomposition â€” Gram-Schmidt as a matrix equation',
               prose: '`np.linalg.qr(A)` computes the QR decomposition. Q has orthonormal columns; R is upper triangular. Verify: Q @ R â‰ˆ A (reconstruction). Qáµ€ Q â‰ˆ I (orthonormality).',
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
-A = np.array([[1., 1., 0.],
+# QR decomposition via scipy (numerically stable Gram-Schmidt)
+from scipy.linalg import qr
+
+A = np.array([[1., 2., 0.],
               [1., 0., 1.],
               [0., 1., 1.]])
 
-Q, R = np.linalg.qr(A)
-
-print("Q (orthonormal columns):")
-print(Q.round(4))
-print()
-print("R (upper triangular):")
-print(R.round(4))
-print()
+Q, R = qr(A)
+print("Q (orthonormal columns):"); print(Q.round(4))
+print("R (upper triangular):"); print(R.round(4))
+print("Q^T @ Q = I?", np.allclose(Q.T @ Q, np.eye(3)))
 print("Q @ R = A?", np.allclose(Q @ R, A))
-print("Qáµ€Q = I?", np.allclose(Q.T @ Q, np.eye(3)))`,
+
+fig, axes = plt.subplots(1, 3, figsize=(11, 3.5))
+for ax, M, title in zip(axes, [A, Q, R], ['A', 'Q (orthonormal)', 'R (upper tri)']):
+    lim = max(abs(M).max(), 0.1)
+    ax.imshow(M, cmap='RdBu_r', aspect='equal', vmin=-lim, vmax=lim)
+    ax.set_title(title, fontsize=12)
+    for i in range(3):
+        for j in range(3):
+            ax.text(j, i, f'{M[i,j]:.2f}', ha='center', va='center', fontsize=10,
+                    color='white' if abs(M[i,j]) > lim*0.6 else 'black')
+    ax.set_xticks([]); ax.set_yticks([])
+plt.suptitle("QR Decomposition: A = Q @ R", fontsize=11)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 'c1',

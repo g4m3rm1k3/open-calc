@@ -139,28 +139,44 @@ J_numerical = J_num
                 'Compare numerical gradient with the analytic result âˆ‡f = 2Ax for f(x) = x^T A x.',
               ],
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
-def numerical_gradient(f, x, eps=1e-6):
-    """Compute gradient of f at x via central finite differences."""
-    grad = np.zeros_like(x, dtype=float)
-    for i in range(len(x)):
-        e = np.zeros_like(x, dtype=float)
-        e[i] = eps
-        grad[i] = (f(x + e) - f(x - e)) / (2 * eps)
-    return grad
+# Gradient of f(x) = x^T A x + b^T x
+A = np.array([[3., 1.], [1., 2.]])  # symmetric positive definite
+b = np.array([1., 2.])
 
-# Quadratic form f(x) = x^T A x
-A = np.array([[3., 1.], [1., 2.]])   # symmetric
-f = lambda x: x @ A @ x
+# Gradient: nabla f = (A + A^T)x + b = 2Ax + b (since A symmetric)
+def f(x): return x @ A @ x + b @ x
+def grad_f(x): return 2 * A @ x + b
 
-x0 = np.array([1.0, 2.0])
-grad_numerical = numerical_gradient(f, x0)
-grad_analytic  = 2 * A @ x0          # formula: âˆ‡(x^T A x) = 2Ax for symmetric A
+x0 = np.array([1.0, 0.5])
+print(f"f(x0) = {f(x0):.4f}")
+print(f"grad_f(x0) = {grad_f(x0)}")
+print(f"grad_f at minimum (should be ~0): {grad_f(np.linalg.solve(2*A, -b))}")
 
-print(f"x0 = {x0}")
-print(f"Numerical gradient:  {grad_numerical.round(8)}")
-print(f"Analytic  gradient:  {grad_analytic.round(8)}")
-print(f"Max error: {np.max(np.abs(grad_numerical - grad_analytic)):.2e}")`,
+# Plot contours and gradient field
+fig, ax = plt.subplots(figsize=(6, 5))
+xx, yy = np.meshgrid(np.linspace(-2, 2, 80), np.linspace(-2, 2, 80))
+Z = np.array([f(np.array([x, y])) for x, y in zip(xx.ravel(), yy.ravel())]).reshape(xx.shape)
+ax.contourf(xx, yy, Z, levels=20, cmap='RdYlGn_r', alpha=0.6)
+ax.contour(xx, yy, Z, levels=10, colors='k', linewidths=0.5, alpha=0.5)
+
+# Gradient arrows (downsampled grid)
+xs = np.linspace(-1.5, 1.5, 8); ys = np.linspace(-1.5, 1.5, 8)
+for xi in xs:
+    for yi in ys:
+        g = grad_f(np.array([xi, yi]))
+        g = g / (np.linalg.norm(g) + 1e-6) * 0.25
+        ax.annotate('', xy=[xi+g[0], yi+g[1]], xytext=[xi, yi],
+                    arrowprops=dict(arrowstyle='->', color='steelblue', lw=0.8, alpha=0.7))
+
+xmin = np.linalg.solve(2*A, -b)
+ax.scatter(*xmin, color='red', s=80, zorder=5, label=f'minimum {xmin.round(2)}')
+ax.set_title("f(x) = x^T A x + b^T x with gradient field", fontsize=11)
+ax.set_xlabel('x1'); ax.set_ylabel('x2')
+ax.legend(fontsize=9); ax.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 2,

@@ -215,38 +215,27 @@ fprintf('Max deflection (rapid):     %.4f mm\\n', max(abs(disp_rapid)))`,
                 'Step 2: eliminate column 2. Multiplier: m32 = 3/1 = 3. This goes into L[2,1].',
               ],
               code: `import numpy as np
+import matplotlib.pyplot as plt
+from scipy import linalg
 
-A = np.array([[2., 1., 1.],
-              [4., 3., 3.],
-              [8., 7., 9.]])
+A = np.array([[2., 1., 1.], [4., 3., 3.], [8., 7., 9.]])
+P, L, U = linalg.lu(A)
+print("L ="); print(L.round(4))
+print("U ="); print(U.round(4))
+print("P@A = L@U?", np.allclose(P @ A, L @ U))
 
-# --- Step 1: eliminate column 1 ---
-m21 = A[1,0] / A[0,0]   # = 4/2 = 2
-m31 = A[2,0] / A[0,0]   # = 8/2 = 4
-
-A[1] = A[1] - m21 * A[0]  # R2 = R2 - 2*R1
-A[2] = A[2] - m31 * A[0]  # R3 = R3 - 4*R1
-print("After step 1:")
-print(A)
-
-# --- Step 2: eliminate column 2 ---
-m32 = A[2,1] / A[1,1]   # = 3/1 = 3
-
-A[2] = A[2] - m32 * A[1]  # R3 = R3 - 3*R2
-print("After step 2 (this is U):")
-print(A)
-
-print()
-# Assemble L from multipliers
-L = np.array([[1.,   0., 0.],
-              [m21,  1., 0.],
-              [m31, m32, 1.]])
-U = A  # the result of elimination
-
-print("L =")
-print(L)
-print("U =")
-print(U)`,
+fig, axes = plt.subplots(1, 3, figsize=(11, 3.5))
+for ax, M, title in zip(axes, [L, U, L@U], ['L (lower tri)', 'U (upper tri)', 'L @ U = P@A']):
+    ax.imshow(M, cmap='RdBu_r', aspect='equal', vmin=-10, vmax=10)
+    ax.set_title(title, fontsize=12)
+    for i in range(M.shape[0]):
+        for j in range(M.shape[1]):
+            ax.text(j, i, f'{M[i,j]:.2f}', ha='center', va='center', fontsize=10,
+                    color='white' if abs(M[i,j]) > 5 else 'black')
+    ax.set_xticks([]); ax.set_yticks([])
+plt.suptitle("LU Decomposition: A = L @ U (with partial pivoting)", fontsize=11)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 2,
@@ -256,32 +245,34 @@ print(U)`,
                 'We also use scipy.linalg.lu to verify â€” it returns (P, L, U) where A = P @ L @ U.',
               ],
               code: `import numpy as np
-from scipy.linalg import lu
+import matplotlib.pyplot as plt
+from scipy import linalg
 
-A_original = np.array([[2., 1., 1.],
-                        [4., 3., 3.],
-                        [8., 7., 9.]])
+A = np.array([[2., 1., 1.], [4., 3., 3.], [8., 7., 9.]])
+b = np.array([4., 10., 24.])
+P, L, U = linalg.lu(A)
 
-# Our manual LU
-L_manual = np.array([[1.,  0., 0.],
-                      [2.,  1., 0.],
-                      [4.,  3., 1.]])
-U_manual = np.array([[2., 1., 1.],
-                      [0., 1., 1.],
-                      [0., 0., 2.]])
+# Forward substitution: solve Ly = Pb
+Pb = P.T @ b
+y = linalg.solve_triangular(L, Pb, lower=True)
+x = linalg.solve_triangular(U, y)
 
-print("Manual L @ U:")
-print((L_manual @ U_manual).round(10))
-print()
-print("Original A:")
-print(A_original)
-print()
-print("Match:", np.allclose(L_manual @ U_manual, A_original))
+print(f"y (forward sub) = {y.round(4)}")
+print(f"x (back sub)    = {x.round(4)}")
+print(f"Verify A@x = {(A@x).round(4)}  (should be {b})")
 
-# scipy verification
-P, L_sci, U_sci = lu(A_original)
-print()
-print("scipy: P @ L @ U matches A:", np.allclose(P @ L_sci @ U_sci, A_original))`,
+fig, ax = plt.subplots(figsize=(6, 4))
+stages = ['b', 'Pb', 'y (Ly=Pb)', 'x (Ux=y)']
+vals = [b, Pb, y, x]
+colors = ['steelblue', 'darkorange', 'green', 'crimson']
+for k, (stage, v, color) in enumerate(zip(stages, vals, colors)):
+    for i, vi in enumerate(v):
+        ax.bar(k + i*0.25 - 0.25, vi, 0.2, color=color, alpha=0.85)
+ax.set_xticks(range(4)); ax.set_xticklabels(stages, fontsize=10)
+ax.set_title("LU Solve: b -> Pb -> y -> x", fontsize=12)
+ax.axhline(0, color='k', lw=0.5); ax.grid(True, alpha=0.3, axis='y')
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 3,

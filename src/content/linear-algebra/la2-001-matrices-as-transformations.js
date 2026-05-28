@@ -244,23 +244,39 @@ fprintf('\\nMax positional error without G68: %.4f mm\\n', error)`,
                 'The columns of A tell you where Ã® = [1,0] and Äµ = [0,1] land. Any other vector\'s destination is a linear combination of those columns.',
               ],
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
-# A rotation 90Â° counterclockwise: Ã®â†’[0,1], Äµâ†’[-1,0]
+# A rotation 90 deg counterclockwise: i -> [0,1], j -> [-1,0]
 A = np.array([[0.0, -1.0],
               [1.0,  0.0]])
 
-# Where does each basis vector land?
 i_hat = np.array([1.0, 0.0])
 j_hat = np.array([0.0, 1.0])
 
-print("Ã® lands at:", A @ i_hat, " (first column of A)")
-print("Äµ lands at:", A @ j_hat, " (second column of A)")
-print()
+print("i lands at:", A @ i_hat, " (first column of A)")
+print("j lands at:", A @ j_hat, " (second column of A)")
 
-# Where does v = [3, 1] land?
 v = np.array([3.0, 1.0])
 print(f"v = {v} lands at: {A @ v}")
-print(f"Verify: 3 Ã— (A@Ã®) + 1 Ã— (A@Äµ) = {3*(A@i_hat) + 1*(A@j_hat)}")`,
+print(f"Verify: 3*(A@i) + 1*(A@j) = {3*(A@i_hat) + 1*(A@j_hat)}")
+
+fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+origin = np.zeros(2)
+
+for ax, title, vecs in [
+    (axes[0], "Before (original)", [(i_hat,’steelblue’,’i’), (j_hat,’darkorange’,’j’), (v,’green’,’v’)]),
+    (axes[1], "After 90 deg rotation", [(A@i_hat,’steelblue’,"A*i"), (A@j_hat,’darkorange’,"A*j"), (A@v,’green’,"A*v")]),
+]:
+    ax.set_title(title, fontsize=12)
+    for vec, color, lbl in vecs:
+        ax.annotate(‘’, xy=vec, xytext=origin, arrowprops=dict(arrowstyle=’->’, color=color, lw=2.5))
+        ax.text(vec[0]+0.08, vec[1]+0.08, lbl, color=color, fontsize=11, fontweight=’bold’)
+    ax.set_xlim(-2, 4); ax.set_ylim(-2, 4)
+    ax.set_aspect(‘equal’); ax.grid(True, alpha=0.3)
+    ax.axhline(0, color=’k’, lw=0.5); ax.axvline(0, color=’k’, lw=0.5)
+
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 2,
@@ -283,20 +299,38 @@ quick_transform(rotation, vector=[2, 1])`,
                 'Every 2Ã—2 matrix is a transformation. Here are the most common ones â€” each described by where Ã® and Äµ land.',
               ],
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
 transformations = {
-    "90Â° rotation":  np.array([[0., -1.], [1., 0.]]),
+    "90 deg rotation":  np.array([[0., -1.], [1., 0.]]),
     "Reflect x-axis": np.array([[1., 0.], [0., -1.]]),
-    "Horizontal shear": np.array([[1., 1.], [0., 1.]]),
-    "Scale 2x, 0.5y": np.array([[2., 0.], [0., 0.5]]),
-    "Project to x-axis": np.array([[1., 0.], [0., 0.]]),
+    "Horiz. shear": np.array([[1., 1.], [0., 1.]]),
+    "Scale 2x,0.5y": np.array([[2., 0.], [0., 0.5]]),
+    "Project x-axis": np.array([[1., 0.], [0., 0.]]),
 }
 
 v = np.array([2.0, 1.0])
 print(f"Input vector: {v}")
-print()
 for name, T in transformations.items():
-    print(f"{name}: {T @ v}")`,
+    print(f"  {name}: {T @ v}")
+
+# Visualize all transformations in subplots
+fig, axes = plt.subplots(1, 5, figsize=(14, 3))
+origin = np.zeros(2)
+for ax, (name, T) in zip(axes, transformations.items()):
+    ax.set_title(name, fontsize=9)
+    ax.annotate('', xy=v, xytext=origin, arrowprops=dict(arrowstyle='->', color='steelblue', lw=2, alpha=0.4))
+    Tv = T @ v
+    ax.annotate('', xy=Tv, xytext=origin, arrowprops=dict(arrowstyle='->', color='crimson', lw=2.5))
+    ax.text(v[0]*0.5+0.05, v[1]*0.5+0.1, 'v', color='steelblue', fontsize=10, alpha=0.5)
+    ax.text(Tv[0]*0.5+0.1, Tv[1]*0.5+0.1, 'Tv', color='crimson', fontsize=10, fontweight='bold')
+    ax.set_xlim(-2.5, 3); ax.set_ylim(-2, 3)
+    ax.set_aspect('equal'); ax.grid(True, alpha=0.3)
+    ax.axhline(0, color='k', lw=0.5); ax.axvline(0, color='k', lw=0.5)
+
+plt.suptitle("Common 2x2 Transformations applied to v=[2,1]", fontsize=11, y=1.02)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 'c1',

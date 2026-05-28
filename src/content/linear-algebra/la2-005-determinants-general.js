@@ -230,26 +230,40 @@ fprintf('\\nConclusion: det tests whether 3 motion axes span full 3D.\\n')`,
                 '= 1Â·(45âˆ’12) âˆ’ 2Â·(36âˆ’42) + 3Â·(8âˆ’35) = 33 + 12 âˆ’ 81 = âˆ’36',
               ],
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
-A = np.array([[1., 2., 3.],
-              [4., 5., 6.],
-              [7., 2., 9.]])
+A = np.array([[1., 2., 3.], [4., 5., 6.], [7., 2., 9.]])
 
-# NumPy (internally uses LU decomposition â€” same result)
 print(f"np.linalg.det(A) = {np.linalg.det(A):.1f}")  # should be -36.0
 
 # Manual cofactor expansion along row 1
-# M11: delete row 0, col 0 â†’ remaining = [[5,6],[2,9]]
 M11 = 5*9 - 6*2    # = 33
-# M12: delete row 0, col 1 â†’ remaining = [[4,6],[7,9]]
-M12 = 4*9 - 6*7    # = -6  (note: cofactor sign = -1)
-# M13: delete row 0, col 2 â†’ remaining = [[4,5],[7,2]]
+M12 = 4*9 - 6*7    # = -6
 M13 = 4*2 - 5*7    # = -27
-
-det_manual = 1*M11 + (-1)*(-1)*M12 + 1*M13  # signs: +1, -1, +1
-# Equivalently: a11*M11 - a12*M12 + a13*M13
 det_manual = 1*M11 - 2*M12 + 3*M13
-print(f"Manual cofactor expansion = {det_manual}")  # -36`,
+print(f"Manual cofactor expansion = {det_manual}")
+
+fig, axes = plt.subplots(1, 2, figsize=(9, 3.5))
+ax = axes[0]
+ax.imshow(A, cmap='Blues', aspect='equal', vmin=0, vmax=10)
+ax.set_title(f"Matrix A  (det = {np.linalg.det(A):.1f})", fontsize=12)
+for i in range(3):
+    for j in range(3):
+        ax.text(j, i, f'{A[i,j]:.0f}', ha='center', va='center', fontsize=14, fontweight='bold')
+ax.set_xticks([]); ax.set_yticks([])
+
+ax2 = axes[1]
+cofactors = np.array([[M11, -(-1)*M12, M13], [0,0,0],[0,0,0]], dtype=float)
+ax2.imshow([[M11, M12, M13]], cmap='RdBu_r', aspect='auto', vmin=-30, vmax=35)
+ax2.set_title(f"Row 1 cofactors
+det = 1*{M11} - 2*{M12} + 3*{M13} = {det_manual}", fontsize=11)
+for j, (c, lbl) in enumerate(zip([M11, M12, M13], ['C11', 'C12', 'C13'])):
+    ax2.text(j, 0, f'{lbl}
+{c}', ha='center', va='center', fontsize=12,
+             color='white' if abs(c) > 20 else 'black')
+ax2.set_xticks([]); ax2.set_yticks([])
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 2,
@@ -259,19 +273,55 @@ print(f"Manual cofactor expansion = {det_manual}")  # -36`,
                 'The six terms correspond exactly to the six permutations in the Leibniz formula for n=3.',
               ],
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
-A = np.array([[1., 2., 3.],
-              [4., 5., 6.],
-              [7., 2., 9.]])
+A = np.array([[1., 2., 3.], [4., 5., 6.], [7., 2., 9.]])
+a,b,c = A[0]; d,e,f = A[1]; g,h,i = A[2]
 
-a,b,c = A[0];  d,e,f = A[1];  g,h,i = A[2]
-
-# Forward diagonals: aei, bfg, cdh
-# Backward diagonals: ceg, afh, bdi
 sarrus = (a*e*i + b*f*g + c*d*h) - (c*e*g + a*f*h + b*d*i)
-print(f"Sarrus rule:    {sarrus}")
-print(f"NumPy det:      {np.linalg.det(A):.1f}")
-print(f"Match: {np.isclose(sarrus, np.linalg.det(A))}")`,
+print(f"Sarrus rule:  {sarrus}")
+print(f"NumPy det:    {np.linalg.det(A):.1f}")
+print(f"Match: {np.isclose(sarrus, np.linalg.det(A))}")
+
+# Visualize Sarrus: show 3x3 grid + extended columns, highlight diagonals
+fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+grid = np.hstack([A, A[:, :2]])  # augment with first 2 cols
+
+ax = axes[0]
+ax.imshow(grid, cmap='Greys', aspect='equal', alpha=0.15, vmin=0, vmax=12)
+ax.set_title("Forward diagonals (add)", fontsize=11)
+colors = ['steelblue', 'darkorange', 'green']
+for k, color in enumerate(colors):
+    xs = [k, k+1, k+2]
+    ys = [0, 1, 2]
+    vals = [grid[r, c] for r, c in zip(ys, xs)]
+    for r, c in zip(ys, xs):
+        ax.text(c, r, f'{grid[r,c]:.0f}', ha='center', va='center', fontsize=13,
+                color=color, fontweight='bold')
+    product = vals[0]*vals[1]*vals[2]
+    ax.plot(xs, ys, color=color, lw=2, marker='o', markersize=6)
+    ax.text(k+1, 2.7, f'+{product:.0f}', ha='center', fontsize=10, color=color)
+ax.set_xlim(-0.5, 4.5); ax.set_ylim(3.2, -0.5)
+ax.set_xticks([]); ax.set_yticks([])
+
+ax2 = axes[1]
+ax2.imshow(grid, cmap='Greys', aspect='equal', alpha=0.15, vmin=0, vmax=12)
+ax2.set_title("Backward diagonals (subtract)", fontsize=11)
+for k, color in enumerate(colors):
+    xs = [k+2, k+1, k]
+    ys = [0, 1, 2]
+    vals = [grid[r, c] for r, c in zip(ys, xs)]
+    for r, c in zip(ys, xs):
+        ax2.text(c, r, f'{grid[r,c]:.0f}', ha='center', va='center', fontsize=13,
+                color=color, fontweight='bold')
+    product = vals[0]*vals[1]*vals[2]
+    ax2.plot(xs, ys, color=color, lw=2, marker='o', markersize=6)
+    ax2.text(k+1, 2.7, f'-{product:.0f}', ha='center', fontsize=10, color=color)
+ax2.set_xlim(-0.5, 4.5); ax2.set_ylim(3.2, -0.5)
+ax2.set_xticks([]); ax2.set_yticks([])
+plt.suptitle(f"Sarrus: ({a*e*i:.0f}+{b*f*g:.0f}+{c*d*h:.0f}) - ({c*e*g:.0f}+{a*f*h:.0f}+{b*d*i:.0f}) = {sarrus:.0f}", fontsize=11)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 3,
@@ -281,36 +331,42 @@ print(f"Match: {np.isclose(sarrus, np.linalg.det(A))}")`,
                 'We also verify: row swap flips sign; triangular matrix â†’ product of diagonal.',
               ],
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
 A = np.array([[2., 1.], [5., 3.]])
 B = np.array([[1., 0.], [2., 4.]])
 
-dA, dB, dAB = np.linalg.det(A), np.linalg.det(B), np.linalg.det(A @ B)
-print("--- Property 6: det(AB) = det(A) * det(B) ---")
-print(f"det(A)  = {dA:.4f}")
-print(f"det(B)  = {dB:.4f}")
-print(f"det(AB) = {dAB:.4f}")
-print(f"det(A)*det(B) = {dA*dB:.4f}")
-print(f"Equal? {np.isclose(dAB, dA*dB)}")
+dA = np.linalg.det(A)
+dB = np.linalg.det(B)
+dAB = np.linalg.det(A @ B)
+A_swapped = A[[1,0], :]
+T = np.array([[3., 1., 5.], [0., 2., 4.], [0., 0., 7.]])
 
-print()
-print("--- Property 7: det(A^T) = det(A) ---")
-print(f"det(A)   = {dA:.4f}")
-print(f"det(A^T) = {np.linalg.det(A.T):.4f}")
+print(f"det(A)={dA:.4f}  det(B)={dB:.4f}  det(AB)={dAB:.4f}  det(A)*det(B)={dA*dB:.4f}")
+print(f"det(A)={dA:.4f}  det(A^T)={np.linalg.det(A.T):.4f}")
+print(f"det(A)={dA:.4f}  det(A row-swapped)={np.linalg.det(A_swapped):.4f}")
+print(f"det(T)={np.linalg.det(T):.1f}  3x2x7={3*2*7}")
 
-print()
-print("--- Property 2: row swap flips sign ---")
-A_swapped = A[[1,0], :]           # swap rows 0 and 1
-print(f"det(A)           = {dA:.4f}")
-print(f"det(A row-swapped) = {np.linalg.det(A_swapped):.4f}")
+# Bar chart visualizing each property
+properties = ['det(AB)
+=det(A)*det(B)', 'det(A^T)
+=det(A)', 'Row swap
+flips sign', 'Triangular
+=prod(diag)']
+lhs = [dAB, np.linalg.det(A.T), np.linalg.det(A_swapped), np.linalg.det(T)]
+rhs = [dA*dB, dA, -dA, 3*2*7]
 
-print()
-print("--- Triangular matrix: det = product of diagonal ---")
-T = np.array([[3., 1., 5.],
-              [0., 2., 4.],
-              [0., 0., 7.]])
-print(f"det(T) = {np.linalg.det(T):.1f}")
-print(f"3Ã—2Ã—7  = {3*2*7}")`,
+fig, ax = plt.subplots(figsize=(10, 4))
+x = np.arange(len(properties))
+w = 0.35
+ax.bar(x - w/2, lhs, w, label='LHS', color='steelblue', alpha=0.85)
+ax.bar(x + w/2, rhs, w, label='RHS', color='darkorange', alpha=0.85)
+ax.set_xticks(x); ax.set_xticklabels(properties, fontsize=10)
+ax.set_ylabel('Determinant value')
+ax.set_title('Determinant Properties: LHS vs RHS (should match)', fontsize=12)
+ax.legend(); ax.axhline(0, color='k', lw=0.5); ax.grid(True, alpha=0.3, axis='y')
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 'c1',

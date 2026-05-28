@@ -240,7 +240,7 @@ inWorkspace([520;50;-5], limits)`,
                 'Evaluate at many t values to get a dense set of points for visualization.',
               ],
               code: `import numpy as np
-from opencalc import Figure, BLUE, AMBER, GREEN
+import matplotlib.pyplot as plt
 
 # Define the line
 P0 = np.array([1.0, 2.0])   # base point (2D for visualization)
@@ -251,14 +251,37 @@ t_vals = np.linspace(-1, 2, 100)
 # r(t) = P0 + t*d  (NumPy broadcasts over all t values at once)
 points = P0 + np.outer(t_vals, d)   # shape: (100, 2)
 
-print("r(0) = P0:", points[t_vals==0.0].flatten() if any(t_vals==0.0) else P0)
+print("r(0) = P0:", P0)
 print("r(1) =", P0 + d)
 print("r(-1) =", P0 - d)
 
 # Sample specific points
 for t in [-1, 0, 1, 2]:
     r = P0 + t*d
-    print(f"t={t}: r = {r}")`,
+    print(f"t={t}: r = {r}")
+
+fig, ax = plt.subplots(figsize=(7, 4))
+ax.set_title("Parametric Line r(t) = P0 + t*d", fontsize=13)
+ax.plot(points[:, 0], points[:, 1], 'steelblue', lw=2, label='r(t) = P0 + t*d')
+
+# Mark specific t values
+for t_val, color in [(-1, 'red'), (0, 'green'), (1, 'darkorange'), (2, 'purple')]:
+    r = P0 + t_val * d
+    ax.scatter(*r, color=color, s=80, zorder=5)
+    ax.text(r[0]+0.1, r[1]+0.1, f't={t_val}', fontsize=9, color=color)
+
+# Mark direction vector from P0
+ax.annotate('', xy=P0+d, xytext=P0,
+            arrowprops=dict(arrowstyle='->', color='black', lw=2))
+ax.text(P0[0]+d[0]*0.5+0.1, P0[1]+d[1]*0.5+0.1, 'd', fontsize=11, fontweight='bold')
+ax.scatter(*P0, color='green', s=100, zorder=6)
+ax.text(P0[0]+0.1, P0[1]+0.15, 'P0', fontsize=10, color='green', fontweight='bold')
+
+ax.grid(True, alpha=0.3)
+ax.axhline(0, color='k', lw=0.5); ax.axvline(0, color='k', lw=0.5)
+ax.legend(fontsize=10)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 2,
@@ -268,21 +291,54 @@ for t in [-1, 0, 1, 2]:
                 'The distance formula from point Q to the plane is the most important geometric formula in 3D: |nÂ·Q - d| / â€–nâ€–.',
               ],
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
 n = np.array([1.0, 2.0, -1.0])   # normal vector
-d_val = 4.0                        # plane: nÂ·x = 4
+d_val = 4.0                        # plane: n.x = 4
 
 # Test if P = [2, 1, 0] is on the plane
 P = np.array([2.0, 1.0, 0.0])
-print(f"n Â· P = {np.dot(n, P):.4f}  (plane value = {d_val})")
+print(f"n . P = {np.dot(n, P):.4f}  (plane value = {d_val})")
 print(f"P is on plane: {np.isclose(np.dot(n, P), d_val)}")
 
 # Distance from Q = [1, 2, 3] to the plane
 Q = np.array([1.0, 2.0, 3.0])
 dist = abs(np.dot(n, Q) - d_val) / np.linalg.norm(n)
-print(f"\\nDistance from Q to plane = {dist:.4f}")
-print(f"  |nÂ·Q - d| = |{np.dot(n,Q):.1f} - {d_val}| = {abs(np.dot(n,Q)-d_val):.1f}")
-print(f"  â€–nâ€– = {np.linalg.norm(n):.4f}")`,
+print(f"
+Distance from Q to plane = {dist:.4f}")
+print(f"  |n.Q - d| = |{np.dot(n,Q):.1f} - {d_val}| = {abs(np.dot(n,Q)-d_val):.1f}")
+print(f"  ||n|| = {np.linalg.norm(n):.4f}")
+
+# Visualize in 2D (x-y plane, z=0 slice)
+fig, ax = plt.subplots(figsize=(7, 5))
+ax.set_title("Plane n.x = d: Point Test and Distance", fontsize=12)
+
+# Plot the plane as a line in x-y (set z=0: n[0]*x + n[1]*y = d_val)
+x_range = np.linspace(-1, 4, 100)
+if abs(n[1]) > 1e-10:
+    y_plane = (d_val - n[0]*x_range) / n[1]
+    ax.plot(x_range, y_plane, 'gray', lw=2, linestyle='--', label=f'Plane: n.x = {d_val} (z=0 slice)')
+
+# Plot P (on plane) and Q (off plane)
+P2d, Q2d = P[:2], Q[:2]
+ax.scatter(*P2d, color='green', s=120, zorder=5)
+ax.text(P2d[0]+0.05, P2d[1]+0.05, f'P={P[:2]} (ON plane)', fontsize=9, color='green')
+
+ax.scatter(*Q2d, color='red', s=120, zorder=5)
+ax.text(Q2d[0]+0.05, Q2d[1]+0.05, f'Q={Q[:2]} (OFF, dist={dist:.2f})', fontsize=9, color='red')
+
+# Draw perpendicular from Q to plane (approximate in 2D)
+n2d = n[:2] / np.linalg.norm(n[:2])
+proj = Q2d - (np.dot(n[:2], Q2d) - d_val/np.linalg.norm(n[2:])) * n2d
+ax.annotate('', xy=P2d, xytext=Q2d,
+            arrowprops=dict(arrowstyle='->', color='crimson', lw=1.5, linestyle='dashed'))
+
+ax.set_xlim(-1, 4); ax.set_ylim(-1, 4)
+ax.set_xlabel('x'); ax.set_ylabel('y')
+ax.axhline(0, color='k', lw=0.5); ax.axvline(0, color='k', lw=0.5)
+ax.grid(True, alpha=0.3); ax.legend(fontsize=9)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 3,
@@ -292,6 +348,7 @@ print(f"  â€–nâ€– = {np.linalg.norm(n):.4f}")`,
                 'Substitute r(t) = P0 + t*d into nÂ·x = d, solve for t, then compute the intersection point.',
               ],
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
 P0  = np.array([2.0, 0.0, 1.0])    # line base point
 direction = np.array([1.0, -1.0, 3.0])  # direction
@@ -300,16 +357,48 @@ n       = np.array([1.0, 2.0, -1.0])
 d_plane = 4.0
 
 n_dot_d = np.dot(n, direction)
-print(f"n Â· direction = {n_dot_d}")
+print(f"n . direction = {n_dot_d}")
 
 if abs(n_dot_d) < 1e-10:
-    print("Line is parallel to the plane â€” no intersection")
+    print("Line is parallel to the plane -- no intersection")
 else:
     t = (d_plane - np.dot(n, P0)) / n_dot_d
     intersection = P0 + t * direction
     print(f"t = {t:.4f}")
     print(f"Intersection point = {intersection}")
-    print(f"Verify: n Â· intersection = {np.dot(n, intersection):.4f}  (should be {d_plane})")`,
+    print(f"Verify: n . intersection = {np.dot(n, intersection):.4f}  (should be {d_plane})")
+
+# Visualize in 2D (x-z plane projection)
+t_vals = np.linspace(-0.5, 0.8, 100)
+line_pts = P0 + np.outer(t_vals, direction)
+
+fig, ax = plt.subplots(figsize=(7, 5))
+ax.set_title("Line-Plane Intersection (x-z projection)", fontsize=12)
+
+# Plot projected line (x-z coords)
+ax.plot(line_pts[:, 0], line_pts[:, 2], 'steelblue', lw=2, label='Line r(t)')
+ax.scatter(P0[0], P0[2], color='steelblue', s=80, zorder=5)
+ax.text(P0[0]+0.05, P0[2]+0.05, 'P0', fontsize=9, color='steelblue')
+
+# Show the plane as a line in this projection (n . x = d_plane with y=0)
+# n[0]*x + n[2]*z = d_plane when projected
+x_range = np.linspace(2, 4.5, 50)
+if abs(n[2]) > 1e-10:
+    z_plane = (d_plane - n[0]*x_range) / n[2]
+    ax.plot(x_range, z_plane, 'darkorange', lw=2, label='Plane (projected)')
+
+if abs(n_dot_d) >= 1e-10:
+    t_val = (d_plane - np.dot(n, P0)) / n_dot_d
+    inter = P0 + t_val * direction
+    ax.scatter(inter[0], inter[2], color='red', s=120, zorder=6,
+               label=f'Intersection t={t_val:.2f}')
+    ax.text(inter[0]+0.05, inter[2]+0.05, 'Intersection', fontsize=9, color='red')
+
+ax.set_xlabel('x'); ax.set_ylabel('z')
+ax.grid(True, alpha=0.3); ax.legend(fontsize=9)
+ax.axhline(0, color='k', lw=0.5); ax.axvline(0, color='k', lw=0.5)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 4,
@@ -319,6 +408,7 @@ else:
                 'Each "ray" is a parametric line. Each "surface" is a plane (or a collection of triangles approximated by planes). The core algorithm is what you just learned.',
               ],
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
 def ray_plane_intersection(ray_origin, ray_dir, plane_normal, plane_d):
     """Find where a ray hits a plane. Returns (t, point) or None if parallel."""
@@ -346,7 +436,36 @@ if result:
     print(f"Hit point: {hit_point.round(3)}")
     print(f"That's {t:.1f} units from the camera")
 else:
-    print("Ray misses the floor (parallel or going up)")`,
+    print("Ray misses the floor (parallel or going up)")
+
+# Visualize in 2D (side view: x-z plane, ignoring y)
+fig, ax = plt.subplots(figsize=(7, 5))
+ax.set_title("Ray Tracing: Camera Ray Hitting Floor Plane", fontsize=12)
+
+# Floor line (y = -3 shown as z = -3 in side view)
+ax.axhline(-3, color='saddlebrown', lw=2, label='Floor plane (y=-3)')
+ax.fill_between([-5, 5], -3, -5, alpha=0.2, color='saddlebrown')
+
+# Camera position
+cam2d = np.array([camera_pos[0], camera_pos[2]])  # (x, z)
+ax.scatter(*cam2d, color='purple', s=120, zorder=5, label='Camera')
+ax.text(cam2d[0]+0.1, cam2d[1]+0.1, 'Camera', fontsize=9, color='purple')
+
+# Ray direction (x, z components)
+ray2d_dir = np.array([ray_direction[0], ray_direction[2]])
+if result:
+    hit2d = np.array([hit_point[0], hit_point[2]])
+    ax.annotate('', xy=hit2d, xytext=cam2d,
+                arrowprops=dict(arrowstyle='->', color='steelblue', lw=2))
+    ax.scatter(*hit2d, color='red', s=120, zorder=5, label=f'Hit point {hit_point.round(2)}')
+    ax.text(hit2d[0]+0.1, hit2d[1]+0.1, 'Hit!', fontsize=10, color='red', fontweight='bold')
+
+ax.set_xlim(-2, 5); ax.set_ylim(-5, 12)
+ax.set_xlabel('x'); ax.set_ylabel('z (depth)')
+ax.axhline(0, color='k', lw=0.5); ax.axvline(0, color='k', lw=0.5)
+ax.grid(True, alpha=0.3); ax.legend(fontsize=9)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 'c1',

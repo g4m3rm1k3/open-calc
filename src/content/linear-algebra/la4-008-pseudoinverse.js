@@ -145,31 +145,37 @@ null_A'' * x_min
               cellTitle: 'Computing the pseudoinverse via SVD',
               prose: 'The pseudoinverse $A^+ = V\\Sigma^+U^T$ inverts the non-zero singular values. `np.linalg.pinv` does this automatically. Verify the four Moore-Penrose conditions: $AA^+A = A$, $A^+AA^+ = A^+$, $(AA^+)^T = AA^+$, $(A^+A)^T = A^+A$.',
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
-A = np.array([[1., 0.],
-              [0., 1.],
-              [1., 1.]])   # 3Ã—2, rank 2 â€” overdetermined
+# Underdetermined system: more unknowns than equations
+# A is 2x3: minimum norm solution
+A = np.array([[1., 2., 3.], [4., 5., 6.]])
+b = np.array([1., 2.])
 
-A_plus = np.linalg.pinv(A)
-print("A shape:", A.shape, "  A+ shape:", A_plus.shape)
-print()
+# Pseudoinverse (Moore-Penrose)
+A_pinv = np.linalg.pinv(A)
+x_min_norm = A_pinv @ b
+print(f"A shape: {A.shape}")
+print(f"Pseudoinverse solution: {x_min_norm.round(4)}")
+print(f"Verify Ax = b: {A @ x_min_norm}")
+print(f"||x||^2 = {np.linalg.norm(x_min_norm)**2:.4f}  (minimum norm)")
 
-# Moore-Penrose conditions
-cond1 = np.allclose(A @ A_plus @ A, A)
-cond2 = np.allclose(A_plus @ A @ A_plus, A_plus)
-cond3 = np.allclose((A @ A_plus).T, A @ A_plus)
-cond4 = np.allclose((A_plus @ A).T, A_plus @ A)
+U, s, Vt = np.linalg.svd(A, full_matrices=False)
+print(f"Singular values: {s.round(4)}")
 
-print(f"Condition 1  AA+A = A:       {cond1}")
-print(f"Condition 2  A+AA+ = A+:     {cond2}")
-print(f"Condition 3  (AA+)^T = AA+:  {cond3}")
-print(f"Condition 4  (A+A)^T = A+A:  {cond4}")
-
-print()
-print("AA+ (projection onto col(A)):")
-print((A @ A_plus).round(6))
-print("A+A (projection onto row(A)):")
-print((A_plus @ A).round(6))`,
+fig, axes = plt.subplots(1, 2, figsize=(10, 3.5))
+axes[0].bar(['s1', 's2'], s, color=['steelblue','darkorange'], alpha=0.85, edgecolor='k')
+axes[0].set_title(f"Singular values of A\ncondition number = {s[0]/s[-1]:.2f}", fontsize=11)
+axes[0].grid(True, alpha=0.3, axis='y')
+lim = max(abs(A_pinv).max(), 0.1)
+axes[1].imshow(A_pinv, cmap='RdBu_r', aspect='auto', vmin=-lim, vmax=lim)
+axes[1].set_title(f"Pseudoinverse A+ ({A_pinv.shape[0]}x{A_pinv.shape[1]})", fontsize=11)
+for i in range(A_pinv.shape[0]):
+    for j in range(A_pinv.shape[1]):
+        axes[1].text(j, i, f'{A_pinv[i,j]:.3f}', ha='center', va='center', fontsize=9)
+axes[1].set_xticks([]); axes[1].set_yticks([])
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 2,

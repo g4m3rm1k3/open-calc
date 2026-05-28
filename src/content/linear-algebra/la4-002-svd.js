@@ -187,47 +187,73 @@ fprintf('Storage: %d numbers vs original %d (%.0f%% compression)\\n', ...
               cellTitle: 'Computing the SVD',
               prose: '`np.linalg.svd(A)` returns U, S, Vt where A = U @ diag(S) @ Vt. U has orthonormal columns, S contains singular values in descending order, Vt has orthonormal rows. The rank of A equals the number of non-zero singular values.',
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
-A = np.array([[3., 1., 1.],
-              [1., 3., 1.]])   # 2Ã—3 matrix
+A = np.array([[3., 1.], [2., 2.], [0., 1.]])
+U, s, Vt = np.linalg.svd(A, full_matrices=False)
 
-U, S, Vt = np.linalg.svd(A)
+print("U (left singular vectors):"); print(U.round(4))
+print("s (singular values):", s.round(4))
+print("Vt (right singular vectors^T):"); print(Vt.round(4))
+print("Reconstruct A?", np.allclose(U @ np.diag(s) @ Vt, A))
 
-print(f"Shape of A: {A.shape}")
-print(f"U shape: {U.shape}  (orthonormal columns)")
-print(f"S = {S.round(4)}  (singular values, descending)")
-print(f"Vt shape: {Vt.shape}  (orthonormal rows)")
-print()
-
-# Reconstruct A from full SVD
-S_mat = np.zeros_like(A, dtype=float)
-np.fill_diagonal(S_mat, S)
-A_reconstructed = U @ S_mat @ Vt
-print("A reconstructed:", np.allclose(A_reconstructed, A))
-print()
-print(f"rank(A) â‰ˆ {np.sum(S > 1e-10)}  (non-zero singular values)")`,
+fig, axes = plt.subplots(1, 4, figsize=(13, 3.5))
+Sigma = np.diag(s)
+for ax, M, title in zip(axes, [A, U, Sigma, Vt],
+                         ['A', 'U (orthonormal)', 'S (singular vals)', 'V^T (orthonormal)']):
+    lim = max(abs(M).max(), 0.1)
+    ax.imshow(M, cmap='RdBu_r', aspect='auto', vmin=-lim, vmax=lim)
+    ax.set_title(title, fontsize=10)
+    for i in range(M.shape[0]):
+        for j in range(M.shape[1]):
+            ax.text(j, i, f'{M[i,j]:.2f}', ha='center', va='center', fontsize=9,
+                    color='white' if abs(M[i,j]) > lim*0.6 else 'black')
+    ax.set_xticks([]); ax.set_yticks([])
+plt.suptitle("SVD: A = U S V^T", fontsize=11)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 2,
               cellTitle: 'Low-rank approximation â€” Eckart-Young theorem',
               prose: 'The rank-k approximation keeps only the k largest singular values. It is the best possible rank-k approximation (Eckart-Young theorem). Watch how quickly the approximation improves as k increases.',
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
-# A 5Ã—5 matrix
-np.random.seed(42)
-A = np.random.randint(1, 10, (5, 5)).astype(float)
-U, S, Vt = np.linalg.svd(A)
+A = np.array([[3., 1.], [2., 2.], [0., 1.]])
+U, s, Vt = np.linalg.svd(A, full_matrices=False)
+V = Vt.T
 
-print("Original matrix A:")
-print(A)
-print(f"Singular values: {S.round(2)}")
-print()
+# Geometric view: SVD maps unit circle to ellipse
+# Unit circle in input space -> scale by s -> rotate by U
+theta = np.linspace(0, 2*np.pi, 200)
+circle = np.array([np.cos(theta), np.sin(theta)])  # 2D input space
+ellipse = U * s[:, np.newaxis]  # columns scaled by singular values
 
-for k in [1, 2, 3, 5]:
-    # Rank-k approximation
-    A_k = U[:, :k] @ np.diag(S[:k]) @ Vt[:k, :]
-    error = np.linalg.norm(A - A_k, 'fro')
-    print(f"k={k}: Frobenius error = {error:.4f}")`,
+print("Singular values:", s.round(4))
+print("Condition number:", s[0]/s[-1], "(ratio of largest to smallest)")
+
+fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+# Input space: unit circle + V columns
+Vcircle = V @ circle
+axes[0].plot(Vcircle[0], Vcircle[1], color='gray', lw=1, alpha=0.5, linestyle='--')
+for i, (v_col, color) in enumerate(zip(V.T, ['steelblue','darkorange'])):
+    axes[0].annotate('', xy=v_col, xytext=[0,0], arrowprops=dict(arrowstyle='->', color=color, lw=2.5))
+    axes[0].text(v_col[0]+0.05, v_col[1]+0.05, f'v{i+1}', color=color, fontsize=11)
+axes[0].set_title("Input: V columns (right singular vecs)", fontsize=11)
+axes[0].set_aspect('equal'); axes[0].grid(True, alpha=0.3)
+axes[0].axhline(0, color='k', lw=0.5); axes[0].axvline(0, color='k', lw=0.5)
+# Output space: A maps unit circle to ellipse
+output = A @ circle
+axes[1].plot(output[0], output[1], color='steelblue', lw=2, alpha=0.7)
+for i, (u_col, sv, color) in enumerate(zip(U.T, s, ['steelblue','darkorange'])):
+    axes[1].annotate('', xy=sv*u_col, xytext=[0,0], arrowprops=dict(arrowstyle='->', color=color, lw=2.5))
+    axes[1].text(sv*u_col[0]+0.05, sv*u_col[1]+0.05, f'sigma{i+1}*u{i+1}', color=color, fontsize=9)
+axes[1].set_title("Output: A stretches unit circle to ellipse", fontsize=11)
+axes[1].set_aspect('equal'); axes[1].grid(True, alpha=0.3)
+axes[1].axhline(0, color='k', lw=0.5); axes[1].axvline(0, color='k', lw=0.5)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 3,

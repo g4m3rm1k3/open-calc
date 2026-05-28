@@ -202,21 +202,35 @@ fprintf('  Unknown direction: [%.3f; %.3f]\\n', null_dir(1), null_dir(2))`,
                 'nullity = number of free variables = dimension of the null space.',
               ],
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
-# Full rank: det â‰  0
-A = np.array([[1., 2.], [3., 4.]])
+A = np.array([[1., 2.], [3., 4.]])   # full rank
+B = np.array([[1., 2.], [3., 6.]])   # rank 1
 
-# Rank-deficient: row 2 = 3 Ã— row 1
-B = np.array([[1., 2.], [3., 6.]])
-
-print(f"rank(A) = {np.linalg.matrix_rank(A)}  (full rank, 2Ã—2 â†’ only the zero vector in null space)")
-print(f"rank(B) = {np.linalg.matrix_rank(B)}  (rank 1, nullity = 2-1 = 1 â†’ 1D null space)")
-print()
-
-# Rank-nullity theorem for B (2 columns)
+rank_A = np.linalg.matrix_rank(A)
 rank_B = np.linalg.matrix_rank(B)
-nullity_B = B.shape[1] - rank_B
-print(f"rank(B) + nullity(B) = {rank_B} + {nullity_B} = {rank_B + nullity_B} = n âœ“")`,
+print(f"rank(A) = {rank_A}  (full rank)")
+print(f"rank(B) = {rank_B}  (rank 1, nullity = {B.shape[1] - rank_B})")
+print(f"rank-nullity: {rank_B} + {B.shape[1]-rank_B} = {B.shape[1]}")
+
+fig, axes = plt.subplots(1, 2, figsize=(9, 4))
+origin = np.zeros(2)
+for ax, M, title in [
+    (axes[0], A, f"A: rank={rank_A} (spans plane)"),
+    (axes[1], B, f"B: rank={rank_B} (spans 1D line)")]:
+    c1, c2 = M[:, 0], M[:, 1]
+    para = plt.Polygon([origin, c1, c1+c2, c2], alpha=0.2, color='steelblue')
+    ax.add_patch(para)
+    ax.annotate('', xy=c1, xytext=origin, arrowprops=dict(arrowstyle='->', color='steelblue', lw=2.5))
+    ax.annotate('', xy=c2, xytext=origin, arrowprops=dict(arrowstyle='->', color='darkorange', lw=2.5))
+    ax.text(c1[0]*0.5+0.1, c1[1]*0.5+0.1, 'c1', color='steelblue', fontsize=11)
+    ax.text(c2[0]*0.5+0.1, c2[1]*0.5+0.1, 'c2', color='darkorange', fontsize=11)
+    ax.set_title(title, fontsize=11)
+    ax.set_xlim(-1, 5); ax.set_ylim(-1, 7)
+    ax.set_aspect('equal'); ax.grid(True, alpha=0.3)
+    ax.axhline(0, color='k', lw=0.5); ax.axvline(0, color='k', lw=0.5)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 2,
@@ -226,20 +240,35 @@ print(f"rank(B) + nullity(B) = {rank_B} + {nullity_B} = {rank_B + nullity_B} = n
                 '`scipy.linalg.null_space(A)` returns an orthonormal basis for N(A). Verify by checking A @ null_vec â‰ˆ 0.',
               ],
               code: `import numpy as np
+import matplotlib.pyplot as plt
 from scipy import linalg
 
-# B has a 1D null space (row 2 = 3 Ã— row 1)
-B = np.array([[1., 2.],
-              [3., 6.]])
-
+B = np.array([[1., 2.], [3., 6.]])
 null_B = linalg.null_space(B)
 print("Null space basis vector:")
 print(null_B)
-print()
-
-# Verify: B @ null_vec = 0
 print("B @ null_vec =", (B @ null_B).round(10))
-print("(all zeros â†’ null space confirmed)")`,
+
+fig, ax = plt.subplots(figsize=(6, 5))
+ax.set_title("Null space of B: all vectors mapped to 0", fontsize=12)
+origin = np.zeros(2)
+# Draw the column span (1D line through col 1)
+t = np.linspace(-2, 4, 100)
+col1 = B[:, 0] / np.linalg.norm(B[:, 0])
+ax.plot(t*B[0,0]/np.linalg.norm(B[:,0]), t*B[1,0]/np.linalg.norm(B[:,0]),
+        color='steelblue', lw=2, alpha=0.5, label='column space (1D line)')
+# Draw the null vector
+nv = null_B[:, 0]
+ax.annotate('', xy=nv, xytext=origin, arrowprops=dict(arrowstyle='->', color='crimson', lw=2.5))
+ax.text(nv[0]+0.05, nv[1]+0.05, f'null vec
+{nv.round(3)}', color='crimson', fontsize=10)
+ax.annotate('', xy=-nv, xytext=origin, arrowprops=dict(arrowstyle='->', color='crimson', lw=2.5, linestyle='dashed'))
+ax.set_xlim(-1.5, 1.5); ax.set_ylim(-1.5, 1.5)
+ax.set_aspect('equal'); ax.grid(True, alpha=0.3)
+ax.axhline(0, color='k', lw=0.5); ax.axvline(0, color='k', lw=0.5)
+ax.legend(fontsize=9)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 'c1',

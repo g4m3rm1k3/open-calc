@@ -1825,8 +1825,13 @@ export function createExecutionEngine(options = {}) {
 
   // ── Linear algebra extras ───────────────────────────────────────────────────
   parser.set("norm", (v, p) => {
+    const pStr = p == null ? null : String(p).toLowerCase();
+    if (pStr === 'fro') {
+      const flat = normalizeVector(v);
+      return Math.sqrt(flat.reduce((s, x) => s + x * x, 0));
+    }
     const vec = normalizeVector(v);
-    const pn = p == null ? 2 : (String(p).toLowerCase() === "inf" ? Infinity : Number(p));
+    const pn = pStr == null ? 2 : (pStr === "inf" ? Infinity : Number(pStr));
     if (!isFinite(pn)) return pn > 0 ? Math.max(...vec.map(Math.abs)) : Math.min(...vec.map(Math.abs));
     return Math.pow(vec.reduce((s, x) => s + Math.abs(x) ** pn, 0), 1 / pn);
   });
@@ -1844,6 +1849,49 @@ export function createExecutionEngine(options = {}) {
   parser.set("flipud", (v) => { const p = toPlain(v); return isMatrix(p) ? [...p].reverse() : [...normalizeVector(v)].reverse(); });
   parser.set("kron", (A, B) => { const a = toNumericMatrix(A), b = toNumericMatrix(B); if (!a || !b) return []; const res = []; for (const ar of a) { res.push(...b.map((br) => ar.flatMap((av) => br.map((bv) => av * bv)))); } return res; });
   parser.set("linsolve", (A, b) => toPlain(math.lusolve(A, b)));
+  parser.set("pinv", (A) => toPlain(math.pinv(toPlain(A))));
+  parser.set("rng", () => null); // no-op — random seed setter not needed in browser
+  parser.set("chol", (A, flag) => {
+    const m = toNumericMatrix(A);
+    if (!m?.length || !m.every(r => r.length === m.length))
+      throw new Error("chol requires a square numeric matrix");
+    const n = m.length;
+    const L = Array.from({ length: n }, () => Array(n).fill(0));
+    for (let j = 0; j < n; j++) {
+      let d = m[j][j] - L[j].slice(0, j).reduce((s, v) => s + v * v, 0);
+      if (d < 0) throw new Error("chol: matrix is not positive definite (pivot became negative)");
+      L[j][j] = Math.sqrt(d);
+      for (let i = j + 1; i < n; i++) {
+        let s = m[i][j];
+        for (let k = 0; k < j; k++) s -= L[i][k] * L[j][k];
+        L[i][j] = s / L[j][j];
+      }
+    }
+    const lower = flag != null && String(flag).toLowerCase().includes('lower');
+    if (lower) return L;
+    // Default MATLAB convention: return upper triangular R where A = R'*R
+    return Array.from({ length: n }, (_, i) => Array.from({ length: n }, (_, j) => L[j]?.[i] ?? 0));
+  });
+  parser.set("schur", (A) => {
+    const m = toNumericMatrix(A);
+    if (!m?.length) throw new Error("schur requires a square matrix");
+    const n = m.length;
+    const eigRes = math.eigs(m);
+    const vals = toPlain(eigRes.values);
+    const vecs = eigRes.eigenvectors || [];
+    // Build Q: columns are normalized eigenvectors
+    const cols = vecs.map(ev => {
+      const v = normalizeVector(ev.vector ?? []);
+      const nrm = Math.hypot(...v.map(x => Math.abs(realValue(x)))) || 1;
+      return v.map(x => realValue(x) / nrm);
+    });
+    const Q = Array.from({ length: n }, (_, i) => cols.map(c => c[i] ?? 0));
+    // T: eigenvalues on diagonal (true Schur form for diagonalizable / symmetric matrices)
+    const T = Array.from({ length: n }, (_, i) =>
+      Array.from({ length: n }, (_, j) => i === j ? realValue(vals[i] ?? 0) : 0)
+    );
+    return { __multi: [Q, T], Q, T };
+  });
   parser.set("horzcat", (...args) => {
     const ps = args.map(toPlain);
     if (ps.every((p) => !isMatrix(p))) return ps.flatMap((p) => normalizeVector(p));

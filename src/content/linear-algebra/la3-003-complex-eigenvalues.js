@@ -178,55 +178,63 @@ fprintf('\\nController is %s\\n', ternary(stable, 'STABLE', 'UNSTABLE'))`,
               cellTitle: 'Computing complex eigenvalues',
               prose: 'NumPy handles complex eigenvalues automatically. The rotation matrix R_Î¸ has eigenvalues e^{Â±iÎ¸} â€” both on the unit circle. `np.abs(Î»)` gives the magnitude (|Î»|). `np.angle(Î»)` gives the angle Î¸ in radians.',
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
-# 90Â° rotation matrix
-theta = np.pi / 2
-R = np.array([[np.cos(theta), -np.sin(theta)],
+theta = np.pi / 4  # 45 degrees rotation
+A = np.array([[np.cos(theta), -np.sin(theta)],
               [np.sin(theta),  np.cos(theta)]])
+evals, evecs = np.linalg.eig(A)
+print("Eigenvalues:", evals.round(4))
+print("|lambda|:", [abs(e) for e in evals])
 
-evals, _ = np.linalg.eig(R)
-print("Rotation matrix (90Â°):")
-print(f"  Eigenvalues: {evals}")
-print(f"  |Î»â‚| = {abs(evals[0]):.4f}  (on the unit circle)")
-print(f"  angle(Î»â‚) = {np.degrees(np.angle(evals[0])):.1f}Â°")
-print()
-
-# Spiral-in: |Î»| < 1
-S = 0.9 * R    # rotate 90Â° AND shrink by 0.9
-evals_s, _ = np.linalg.eig(S)
-print("Shrinking spiral matrix (0.9 Ã— rotation):")
-print(f"  |Î»| = {abs(evals_s[0]):.4f}  (< 1 â†’ spiral in)")`,
+fig, ax = plt.subplots(figsize=(5, 5))
+circle = plt.Circle((0,0), 1, fill=False, color='gray', lw=1.5, linestyle='--', alpha=0.6)
+ax.add_patch(circle)
+for e, color, lbl in zip(evals, ['steelblue','darkorange'], ['lam1','lam2']):
+    ax.plot([0, e.real], [0, e.imag], 'o-', color=color, lw=2.5, markersize=8)
+    ax.text(e.real+0.05, e.imag+0.05, f'{lbl}={e:.3f}', color=color, fontsize=9)
+ax.set_title(f"Complex eigenvalues on unit circle (rotation {np.degrees(theta):.0f} deg)", fontsize=11)
+ax.set_xlabel("Real"); ax.set_ylabel("Imaginary")
+ax.set_xlim(-1.5, 1.5); ax.set_ylim(-1.5, 1.5)
+ax.set_aspect('equal'); ax.grid(True, alpha=0.3)
+ax.axhline(0, color='k', lw=0.5); ax.axvline(0, color='k', lw=0.5)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 2,
               cellTitle: 'Tracing the spiral trajectory',
               prose: 'Apply the matrix repeatedly to a starting vector and plot each step. If |Î»| < 1, points spiral toward the origin. If |Î»| > 1, they spiral outward.',
               code: `import numpy as np
-from opencalc import Figure, BLUE, AMBER
+import matplotlib.pyplot as plt
 
-# Spiral-in matrix: rotate 30Â° and scale by 0.85
-theta = np.radians(30)
-r = 0.85
-A = r * np.array([[np.cos(theta), -np.sin(theta)],
-                  [np.sin(theta),  np.cos(theta)]])
+# Spiral inward: |lambda| < 1
+A = np.array([[0.9, -0.4], [0.4, 0.9]])
+evals, _ = np.linalg.eig(A)
+print("Eigenvalues:", evals.round(4))
+print("|lambda|:", [round(abs(e), 4) for e in evals])
 
-# Apply A repeatedly to v0
-v = np.array([3.0, 0.0])
-xs, ys = [float(v[0])], [float(v[1])]
-for _ in range(20):
+v = np.array([1.0, 0.0])
+traj = [v.copy()]
+for _ in range(40):
     v = A @ v
-    xs.append(float(v[0]))
-    ys.append(float(v[1]))
+    traj.append(v.copy())
+traj = np.array(traj)
 
-fig = Figure(square=True, xmin=-4, xmax=4, ymin=-4, ymax=4,
-             title=f"Spiral: |Î»|={r}, Î¸=30Â°")
-fig.grid().axes()
-fig.scatter(xs, ys, color=BLUE, radius=4)
-
-# Connect points with line segments
-for i in range(len(xs)-1):
-    fig.line([xs[i], ys[i]], [xs[i+1], ys[i+1]], color=AMBER, width=1)
-fig.show()`,
+fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+axes[0].plot(traj[:,0], traj[:,1], 'o-', markersize=3, color='steelblue')
+axes[0].scatter(*traj[0], color='green', s=80, zorder=5, label='start')
+axes[0].scatter(*traj[-1], color='crimson', s=80, zorder=5, label='end')
+axes[0].set_title(f"|lambda|={abs(evals[0]):.4f} < 1: spiral inward", fontsize=11)
+axes[0].set_aspect('equal'); axes[0].grid(True, alpha=0.3); axes[0].legend(fontsize=9)
+axes[0].axhline(0, color='k', lw=0.5); axes[0].axvline(0, color='k', lw=0.5)
+norms = np.linalg.norm(traj, axis=1)
+axes[1].plot(norms, 'o-', color='darkorange', markersize=3)
+axes[1].set_xlabel("Iteration"); axes[1].set_ylabel("||v||")
+axes[1].set_title("Norm decays exponentially", fontsize=11)
+axes[1].grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 'c1',

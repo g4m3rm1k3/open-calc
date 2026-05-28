@@ -149,6 +149,8 @@ R = rref(A)
                 'Use SymPy when you want to see exactly what the RREF looks like on paper. Use NumPy when you need fast numerical computation.',
               ],
               code: `from sympy import Matrix, Rational
+import numpy as np
+import matplotlib.pyplot as plt
 
 # System: 2x + y - z = 8, -3x - y + 2z = -11, -2x + y + 2z = -3
 A_aug = Matrix([
@@ -161,12 +163,37 @@ rref_matrix, pivot_cols = A_aug.rref()
 
 print("Augmented matrix:")
 print(A_aug)
-print("\\nRREF:")
+print("
+RREF:")
 print(rref_matrix)
-print("\\nPivot columns:", pivot_cols)
-print("\\nSolution: xâ‚ =", rref_matrix[0,3],
-      "  xâ‚‚ =", rref_matrix[1,3],
-      "  xâ‚ƒ =", rref_matrix[2,3])`,
+print("
+Pivot columns:", pivot_cols)
+print("
+Solution: x1 =", rref_matrix[0,3],
+      "  x2 =", rref_matrix[1,3],
+      "  x3 =", rref_matrix[2,3])
+
+# Visualize original vs RREF as heatmaps
+A_np = np.array(A_aug.tolist(), dtype=float)
+R_np = np.array(rref_matrix.tolist(), dtype=float)
+
+fig, axes = plt.subplots(1, 2, figsize=(10, 3))
+for ax, mat, title in [(axes[0], A_np, 'Original [A | b]'),
+                        (axes[1], R_np, 'RREF [I | solution]')]:
+    vmax = max(abs(mat).max(), 1)
+    im = ax.imshow(mat, cmap='RdBu_r', aspect='auto', vmin=-vmax, vmax=vmax)
+    ax.set_title(title, fontsize=11)
+    ax.set_xticks(range(mat.shape[1]))
+    ax.set_xticklabels(['x1','x2','x3','b'])
+    ax.set_yticks(range(3))
+    ax.set_yticklabels(['R1','R2','R3'])
+    for r in range(mat.shape[0]):
+        for c in range(mat.shape[1]):
+            ax.text(c, r, f'{mat[r,c]:.1f}', ha='center', va='center',
+                    fontsize=10, color='black', fontweight='bold')
+    plt.colorbar(im, ax=ax, shrink=0.8)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 2,
@@ -177,6 +204,7 @@ print("\\nSolution: xâ‚ =", rref_matrix[0,3],
               ],
               code: `from sympy import Matrix
 import numpy as np
+import matplotlib.pyplot as plt
 
 def classify_system(A_arr, b_arr):
     """Classify a linear system and return the result."""
@@ -191,13 +219,13 @@ def classify_system(A_arr, b_arr):
     print(f"rank(A) = {r_A}, rank([A|b]) = {r_Ab}, unknowns = {n}")
 
     if r_Ab > r_A:
-        print("â†’ INCONSISTENT: no solution (pivot in augmented column)")
+        print("-> INCONSISTENT: no solution (pivot in augmented column)")
     elif r_A == n:
         rref, _ = Ab.rref()
         sol = list(rref.col(-1))
-        print(f"â†’ UNIQUE SOLUTION: {sol}")
+        print(f"-> UNIQUE SOLUTION: {sol}")
     else:
-        print(f"â†’ INFINITELY MANY: {n - r_A} free variable(s)")
+        print(f"-> INFINITELY MANY: {n - r_A} free variable(s)")
         rref, pivots = Ab.rref()
         print("RREF:", rref)
     return None
@@ -206,11 +234,34 @@ print("=== Case 1: Unique solution ===")
 classify_system(np.array([[2,1,-1],[-3,-1,2],[-2,1,2]]),
                 np.array([[8],[-11],[-3]]))
 
-print("\\n=== Case 2: Inconsistent ===")
+print("
+=== Case 2: Inconsistent ===")
 classify_system(np.array([[1,2],[2,4]]), np.array([[3],[7]]))
 
-print("\\n=== Case 3: Infinite solutions ===")
-classify_system(np.array([[1,2,-1],[0,0,1]]), np.array([[4],[2]]))`,
+print("
+=== Case 3: Infinite solutions ===")
+classify_system(np.array([[1,2,-1],[0,0,1]]), np.array([[4],[2]]))
+
+# Summary bar chart: rank values for each case
+fig, ax = plt.subplots(figsize=(7, 4))
+cases = ['Case 1
+Unique', 'Case 2
+Inconsistent', 'Case 3
+Infinite']
+rank_A   = [3, 1, 1]
+rank_Ab  = [3, 2, 1]
+unknowns = [3, 2, 3]
+x = np.arange(len(cases))
+w = 0.25
+ax.bar(x - w, rank_A,   width=w, label='rank(A)',   color='steelblue',   alpha=0.8)
+ax.bar(x,     rank_Ab,  width=w, label='rank([A|b])',color='darkorange',  alpha=0.8)
+ax.bar(x + w, unknowns, width=w, label='n (unknowns)',color='green',      alpha=0.8)
+ax.set_xticks(x); ax.set_xticklabels(cases, fontsize=10)
+ax.set_ylabel('Count'); ax.set_title('Rank Analysis: Three Solution Cases', fontsize=12)
+ax.legend(fontsize=9); ax.grid(True, axis='y', alpha=0.3)
+ax.set_ylim(0, 5)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 3,
@@ -220,51 +271,76 @@ classify_system(np.array([[1,2,-1],[0,0,1]]), np.array([[4],[2]]))`,
                 'This is the best way to build intuition about WHY RREF works.',
               ],
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
 def manual_rref(M):
     """Step-by-step RREF with printed intermediate states."""
     A = M.astype(float).copy()
     rows, cols = A.shape
     pivot_row = 0
+    states = [A.copy()]
 
     for col in range(cols - 1):  # skip augmented column
-        # Find a nonzero entry in this column
         nonzero = None
         for r in range(pivot_row, rows):
             if abs(A[r, col]) > 1e-10:
                 nonzero = r
                 break
         if nonzero is None:
-            continue  # free variable column, skip
+            continue
 
-        # Swap to bring pivot to current row
         if nonzero != pivot_row:
             A[[pivot_row, nonzero]] = A[[nonzero, pivot_row]]
-            print(f"Swap R{pivot_row+1} â†” R{nonzero+1}:")
-            print(A.round(4), "\\n")
+            print(f"Swap R{pivot_row+1} <-> R{nonzero+1}:")
+            print(A.round(4), "
+")
+            states.append(A.copy())
 
-        # Scale pivot row
         A[pivot_row] /= A[pivot_row, col]
         print(f"Scale R{pivot_row+1} (pivot = 1):")
-        print(A.round(4), "\\n")
+        print(A.round(4), "
+")
+        states.append(A.copy())
 
-        # Eliminate all other rows
         for r in range(rows):
             if r != pivot_row and abs(A[r, col]) > 1e-10:
                 A[r] -= A[r, col] * A[pivot_row]
-                print(f"R{r+1} â† R{r+1} âˆ’ {A[r,col]:.4g}Â·R{pivot_row+1}:")
-                print(A.round(4), "\\n")
+                print(f"R{r+1} <- R{r+1} - factor * R{pivot_row+1}:")
+                print(A.round(4), "
+")
+                states.append(A.copy())
 
         pivot_row += 1
-    return A
+    return A, states
 
 M = np.array([[2, 1, -1, 8],
               [-3, -1, 2, -11],
               [-2, 1, 2, -3]])
 print("Starting matrix:")
-print(M, "\\n")
-result = manual_rref(M)
-print("Final RREF:", result.round(4))`,
+print(M, "
+")
+result, states = manual_rref(M)
+print("Final RREF:", result.round(4))
+
+# Visualize: show initial and final RREF as heatmaps
+fig, axes = plt.subplots(1, 2, figsize=(10, 3))
+for ax, mat, title in [(axes[0], M.astype(float), 'Original Augmented Matrix'),
+                        (axes[1], result, 'After RREF')]:
+    im = ax.imshow(mat, cmap='RdBu_r', aspect='auto',
+                   vmin=-max(abs(mat.max()), abs(mat.min())),
+                   vmax=max(abs(mat.max()), abs(mat.min())))
+    ax.set_title(title, fontsize=11)
+    ax.set_xticks(range(mat.shape[1]))
+    ax.set_xticklabels([f'col {i+1}' if i < mat.shape[1]-1 else 'b' for i in range(mat.shape[1])])
+    ax.set_yticks(range(mat.shape[0]))
+    ax.set_yticklabels([f'R{i+1}' for i in range(mat.shape[0])])
+    for r in range(mat.shape[0]):
+        for c in range(mat.shape[1]):
+            ax.text(c, r, f'{mat[r,c]:.1f}', ha='center', va='center',
+                    fontsize=10, color='black', fontweight='bold')
+    plt.colorbar(im, ax=ax)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 'c1',

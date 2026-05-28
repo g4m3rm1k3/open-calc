@@ -211,27 +211,31 @@ fprintf('RMS surface deviation: %.6f mm\\n', rms(residuals))`,
               cellTitle: 'Solving an overdetermined system',
               prose: 'An overdetermined system (more equations than unknowns) usually has no exact solution. Least squares finds the x̂ that minimizes ‖b − Ax‖². `np.linalg.lstsq(A, b, rcond=None)` solves this directly. Compare to directly applying the normal equations.',
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
-# 3 equations, 2 unknowns â€” no exact solution
-A = np.array([[1., 1.],
-              [1., 2.],
-              [1., 3.]])
-b = np.array([2., 3., 4.5])
+# Overdetermined: 3 equations, 2 unknowns -> no exact solution
+A = np.array([[1., 1.], [2., 1.], [3., 1.]])
+b = np.array([2., 3., 5.])
 
-# Method 1: lstsq
-x_hat, residuals, _, _ = np.linalg.lstsq(A, b, rcond=None)
-print("Least squares solution:", x_hat)
+# Least squares: minimize ||Ax - b||^2
+x_ls, res, rank, sv = np.linalg.lstsq(A, b, rcond=None)
+print(f"Least squares solution: x = {x_ls.round(4)}")
+print(f"Residual ||Ax - b||^2 = {np.linalg.norm(A@x_ls - b)**2:.4f}")
+print(f"Ax_ls = {A@x_ls.round(4)}  vs  b = {b}")
 
-# Method 2: normal equations (A^T A x = A^T b)
-x_normal = np.linalg.solve(A.T @ A, A.T @ b)
-print("Normal equations solution:", x_normal)
-print("Same?", np.allclose(x_hat, x_normal))
-print()
-
-# Residual
-e = b - A @ x_hat
-print(f"Residual vector: {e.round(4)}")
-print(f"â€–residualâ€– = {np.linalg.norm(e):.4f}")`,
+fig, ax = plt.subplots(figsize=(6, 5))
+t = np.linspace(0, 4, 100)
+ax.scatter([1,2,3], b, color='crimson', s=80, zorder=5, label='data points')
+ax.plot(t, x_ls[0]*t + x_ls[1], color='steelblue', lw=2,
+        label=f'best fit: y = {x_ls[0]:.2f}x + {x_ls[1]:.2f}')
+for xi, bi in zip([1,2,3], b):
+    yi_fit = x_ls[0]*xi + x_ls[1]
+    ax.plot([xi,xi], [bi, yi_fit], 'k--', lw=1.5, alpha=0.6)
+ax.set_title("Least Squares: best-fit line minimizes sum of squared residuals", fontsize=11)
+ax.set_xlabel("x"); ax.set_ylabel("y")
+ax.legend(fontsize=10); ax.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 2,

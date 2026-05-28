@@ -193,14 +193,15 @@ normal = cross(edge1, edge2)`,
                 '`np.dot(a, b)` computes the dot product: positive when vectors align, zero when perpendicular, negative when opposing.',
               ],
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
 a = np.array([1.0, 0.0])
 b = np.array([0.0, 1.0])
 c = np.array([1.0, 1.0])
 
-print(f"a Â· b = {np.dot(a, b)}  (orthogonal â†’ 0)")
-print(f"a Â· c = {np.dot(a, c)}  (partially aligned â†’ positive)")
-print(f"a Â· (-a) = {np.dot(a, -a)}  (opposing â†’ negative)")
+print(f"a . b = {np.dot(a, b)}  (orthogonal -> 0)")
+print(f"a . c = {np.dot(a, c)}  (partially aligned -> positive)")
+print(f"a . (-a) = {np.dot(a, -a)}  (opposing -> negative)")
 
 def angle_deg(u, v):
     cos_t = np.dot(u, v) / (np.linalg.norm(u) * np.linalg.norm(v))
@@ -208,8 +209,51 @@ def angle_deg(u, v):
 
 p = np.array([3.0, 1.0])
 q = np.array([1.0, 3.0])
-print(f"angle(p, q) = {angle_deg(p, q):.2f}Â°")
-print(f"angle(a, b) = {angle_deg(a, b):.1f}Â°  (right angle confirmed)")`,
+print(f"angle(p, q) = {angle_deg(p, q):.2f} deg")
+print(f"angle(a, b) = {angle_deg(a, b):.1f} deg  (right angle confirmed)")
+
+fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+origin = np.zeros(2)
+
+# Left: dot product alignment cases
+ax = axes[0]
+ax.set_title("Dot Product: Alignment Measure", fontsize=12)
+pairs = [
+    (a, b, ‘steelblue’, ‘darkorange’, f’a.b = {np.dot(a,b):.0f} (orthog.)’),
+    (a, c/np.linalg.norm(c), ‘steelblue’, ‘green’, f’a.c/||c|| = {np.dot(a,c/np.linalg.norm(c)):.2f} (partial)’),
+]
+for u, v, c1, c2, lbl in pairs:
+    ax.annotate(‘’, xy=u, xytext=origin, arrowprops=dict(arrowstyle=’->’, color=c1, lw=2))
+    ax.annotate(‘’, xy=v, xytext=origin, arrowprops=dict(arrowstyle=’->’, color=c2, lw=2))
+ax.annotate(‘’, xy=a, xytext=origin, arrowprops=dict(arrowstyle=’->’, color=’steelblue’, lw=2.5))
+ax.annotate(‘’, xy=b, xytext=origin, arrowprops=dict(arrowstyle=’->’, color=’darkorange’, lw=2.5))
+ax.annotate(‘’, xy=c/np.linalg.norm(c), xytext=origin, arrowprops=dict(arrowstyle=’->’, color=’green’, lw=2.5))
+ax.text(a[0]+0.05, a[1]+0.05, ‘a’, fontsize=11, color=’steelblue’, fontweight=’bold’)
+ax.text(b[0]+0.05, b[1]+0.05, ‘b (perp)’, fontsize=11, color=’darkorange’, fontweight=’bold’)
+ax.text(c[0]/np.linalg.norm(c)+0.05, c[1]/np.linalg.norm(c)+0.05, ‘c (45 deg)’, fontsize=10, color=’green’)
+ax.set_xlim(-0.3, 1.5); ax.set_ylim(-0.3, 1.5)
+ax.set_aspect(‘equal’); ax.grid(True, alpha=0.3)
+ax.axhline(0, color=’k’, lw=0.5); ax.axvline(0, color=’k’, lw=0.5)
+
+# Right: angle between p and q
+ax2 = axes[1]
+ax2.set_title(f"Angle between p and q: {angle_deg(p, q):.1f} deg", fontsize=12)
+ax2.annotate(‘’, xy=p, xytext=origin, arrowprops=dict(arrowstyle=’->’, color=’steelblue’, lw=2.5))
+ax2.annotate(‘’, xy=q, xytext=origin, arrowprops=dict(arrowstyle=’->’, color=’darkorange’, lw=2.5))
+ax2.text(p[0]*0.5+0.1, p[1]*0.5-0.2, f’p={p}’, fontsize=10, color=’steelblue’)
+ax2.text(q[0]*0.5-0.8, q[1]*0.5+0.1, f’q={q}’, fontsize=10, color=’darkorange’)
+# Arc for angle
+theta1 = np.degrees(np.arctan2(p[1], p[0]))
+theta2 = np.degrees(np.arctan2(q[1], q[0]))
+from matplotlib.patches import Arc
+arc = Arc((0,0), 0.8, 0.8, theta1=min(theta1,theta2), theta2=max(theta1,theta2), color=’gray’, lw=1.5)
+ax2.add_patch(arc)
+ax2.set_xlim(-0.5, 4); ax2.set_ylim(-0.5, 4)
+ax2.set_aspect(‘equal’); ax2.grid(True, alpha=0.3)
+ax2.axhline(0, color=’k’, lw=0.5); ax2.axvline(0, color=’k’, lw=0.5)
+
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 2,
@@ -218,16 +262,54 @@ print(f"angle(a, b) = {angle_deg(a, b):.1f}Â°  (right angle confirmed)")`,
                 '`np.cross(a, b)` produces a vector perpendicular to both a and b. Its magnitude = area of the parallelogram.',
               ],
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
 a = np.array([3.0, 0.0, 0.0])
 b = np.array([0.0, 4.0, 0.0])
 
 axb = np.cross(a, b)
-print(f"a Ã— b = {axb}  (should point in z direction)")
-print(f"â€–a Ã— bâ€– = {np.linalg.norm(axb)}  (area = 3Ã—4 = 12)")
-print(f"(aÃ—b)Â·a = {np.dot(axb, a):.1f}  (should be 0)")
-print(f"(aÃ—b)Â·b = {np.dot(axb, b):.1f}  (should be 0)")
-print(f"b Ã— a = {np.cross(b, a)}  (sign flipped)")`,
+print(f"a x b = {axb}  (should point in z direction)")
+print(f"||a x b|| = {np.linalg.norm(axb)}  (area = 3x4 = 12)")
+print(f"(axb).a = {np.dot(axb, a):.1f}  (should be 0)")
+print(f"(axb).b = {np.dot(axb, b):.1f}  (should be 0)")
+print(f"b x a = {np.cross(b, a)}  (sign flipped)")
+
+fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+
+# Left: parallelogram formed by a and b (shown in 2D: x-y plane)
+ax = axes[0]
+ax.set_title("Parallelogram: area = ||a x b||", fontsize=12)
+a2d = a[:2]; b2d = b[:2]
+para = plt.Polygon([a2d*0, a2d, a2d+b2d, b2d], alpha=0.25, color='steelblue')
+ax.add_patch(para)
+origin = np.zeros(2)
+ax.annotate('', xy=a2d, xytext=origin, arrowprops=dict(arrowstyle='->', color='steelblue', lw=2.5))
+ax.annotate('', xy=b2d, xytext=origin, arrowprops=dict(arrowstyle='->', color='darkorange', lw=2.5))
+ax.text(a2d[0]*0.5+0.1, a2d[1]+0.1, f'a={a[:2]}', fontsize=10, color='steelblue')
+ax.text(b2d[0]+0.1, b2d[1]*0.5, f'b={b[:2]}', fontsize=10, color='darkorange')
+area = np.linalg.norm(axb)
+ax.text(1.2, 1.5, f'Area = {area:.0f}', fontsize=11, color='green', fontweight='bold')
+ax.set_xlim(-0.5, 4.5); ax.set_ylim(-0.5, 5)
+ax.set_aspect('equal'); ax.grid(True, alpha=0.3)
+ax.axhline(0, color='k', lw=0.5); ax.axvline(0, color='k', lw=0.5)
+
+# Right: cross product direction bar (z-component magnitudes)
+ax2 = axes[1]
+ax2.set_title("Cross Product Magnitudes", fontsize=12)
+labels = ['||a x b||', '||b x a||', 'a . (a x b)', 'b . (a x b)']
+values = [np.linalg.norm(axb), np.linalg.norm(np.cross(b,a)),
+          abs(np.dot(a, axb)), abs(np.dot(b, axb))]
+colors = ['steelblue', 'darkorange', 'green', 'crimson']
+bars = ax2.bar(labels, values, color=colors, alpha=0.7, edgecolor='black')
+ax2.set_ylabel("Value")
+for bar, val in zip(bars, values):
+    ax2.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.2,
+             f'{val:.1f}', ha='center', fontsize=10, fontweight='bold')
+ax2.set_ylim(0, 16)
+ax2.grid(True, axis='y', alpha=0.3)
+
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 'c1',

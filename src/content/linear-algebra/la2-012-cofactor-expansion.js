@@ -210,31 +210,42 @@ disp('That is 4 x 3 = 12 two-by-two determinants. Use row reduction for n>=4.')`
               cellTitle: 'Cofactor function and expansion from scratch',
               prose: 'Build cofactor(A, i, j) by deleting row i and column j using numpy index tricks, then compute the full determinant by expanding along row 0. Verify it matches np.linalg.det.',
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
-def minor(A, i, j):
-    """Return det of A with row i and column j deleted."""
-    rows = np.delete(np.arange(A.shape[0]), i)
-    cols = np.delete(np.arange(A.shape[1]), j)
-    return np.linalg.det(A[np.ix_(rows, cols)])
+A = np.array([[1., 2., 3.], [0., 4., 5.], [1., 0., 6.]])
 
-def cofactor(A, i, j):
-    """Cofactor C_ij = (-1)^(i+j) * minor(A,i,j)."""
-    return ((-1) ** (i + j)) * minor(A, i, j)
+# Cofactor expansion along row 1
+def minor(M, row, col):
+    return np.delete(np.delete(M, row, 0), col, 1)
 
-def cofactor_expansion(A, row=0):
-    """Compute det(A) by expanding along the given row."""
-    return sum(A[row, j] * cofactor(A, row, j) for j in range(A.shape[1]))
+def cofactor(M, i, j):
+    return ((-1)**(i+j)) * np.linalg.det(minor(M, i, j))
 
-A = np.array([[2., 1., 3.],
-              [0., 4., 1.],
-              [5., 2., 6.]])
+C = np.array([[cofactor(A, i, j) for j in range(3)] for i in range(3)])
+det_expansion = sum(A[0,j] * C[0,j] for j in range(3))
 
-det_manual = cofactor_expansion(A, row=0)
-det_numpy  = np.linalg.det(A)
+print(f"det(A) by cofactor expansion = {det_expansion:.4f}")
+print(f"np.linalg.det(A) = {np.linalg.det(A):.4f}")
+print(f"Match: {np.isclose(det_expansion, np.linalg.det(A))}")
+print("
+Cofactor matrix C:")
+print(C.round(4))
 
-print(f"det via cofactor expansion: {det_manual:.6f}")
-print(f"det via np.linalg.det:      {det_numpy:.6f}")
-print(f"Match: {np.isclose(det_manual, det_numpy)}")`,
+fig, axes = plt.subplots(1, 3, figsize=(11, 3.5))
+for ax, (M, title) in zip(axes, [(A, f'A (det={np.linalg.det(A):.1f})'), 
+                                   (C, 'Cofactor matrix C'),
+                                   (C.T, 'adj(A) = C^T
+A_inv = adj(A)/det')]):
+    lim = max(abs(M).max(), 1)
+    ax.imshow(M, cmap='RdBu_r', aspect='equal', vmin=-lim, vmax=lim)
+    ax.set_title(title, fontsize=11)
+    for i in range(3):
+        for j in range(3):
+            ax.text(j, i, f'{M[i,j]:.1f}', ha='center', va='center', fontsize=12,
+                    color='white' if abs(M[i,j]) > lim*0.6 else 'black')
+    ax.set_xticks([]); ax.set_yticks([])
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 2,

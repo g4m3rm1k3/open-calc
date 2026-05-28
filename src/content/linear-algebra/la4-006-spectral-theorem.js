@@ -144,55 +144,68 @@ imag(eigenvalues_B)
               cellTitle: 'Orthogonal diagonalization of a symmetric matrix',
               prose: '`np.linalg.eigh` is specifically for symmetric matrices â€” it returns real eigenvalues and orthonormal eigenvectors. The spectral decomposition $A = Q\\Lambda Q^T$ writes $A$ as a sum of rank-1 outer products $\\lambda_i \\mathbf{q}_i \\mathbf{q}_i^T$. Verify that $Q^T Q = I$ (eigenvectors are orthonormal) and that the reconstruction is exact.',
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
-A = np.array([[4., 2., 0.],
-              [2., 3., 1.],
-              [0., 1., 2.]])
+# Symmetric matrix: real eigenvalues, orthogonal eigenvectors
+A = np.array([[4., 2.], [2., 1.]])  # symmetric
+evals, evecs = np.linalg.eig(A)
+print("Eigenvalues (all real):", evals.round(4))
+print("Eigenvectors (columns):\n", evecs.round(4))
+print("Orthogonal?", np.allclose(evecs.T @ evecs, np.eye(2)))
 
-print("A symmetric?", np.allclose(A, A.T))
-eigenvalues, Q = np.linalg.eigh(A)
-print(f"Eigenvalues: {eigenvalues.round(4)}")
-print("Q^T Q (should be I):")
-print((Q.T @ Q).round(10))
+# Spectral decomposition: A = sum of lambda_i * v_i * v_i^T
+A_reconstructed = sum(evals[i] * np.outer(evecs[:,i], evecs[:,i]) for i in range(2))
+print("Spectral decomp matches A:", np.allclose(A_reconstructed, A))
 
-A_reconstructed = sum(eigenvalues[i] * np.outer(Q[:, i], Q[:, i]) for i in range(3))
-print("Reconstruction error:", np.linalg.norm(A - A_reconstructed))`,
+fig, axes = plt.subplots(1, 3, figsize=(12, 3.5))
+for ax, M, title in zip(axes, [A, evals[0]*np.outer(evecs[:,0],evecs[:,0]),
+                                   evals[1]*np.outer(evecs[:,1],evecs[:,1])],
+                         ['A (original)', f'lam1={evals[0]:.2f} * v1*v1^T', f'lam2={evals[1]:.2f} * v2*v2^T']):
+    lim = max(abs(M).max(), 0.1)
+    ax.imshow(M, cmap='RdBu_r', aspect='equal', vmin=-lim, vmax=lim)
+    ax.set_title(title, fontsize=10)
+    for i in range(2):
+        for j in range(2):
+            ax.text(j, i, f'{M[i,j]:.3f}', ha='center', va='center', fontsize=12,
+                    color='white' if abs(M[i,j]) > lim*0.6 else 'black')
+    ax.set_xticks([]); ax.set_yticks([])
+plt.suptitle("Spectral decomposition: A = lam1*v1v1^T + lam2*v2v2^T", fontsize=11)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 2,
               cellTitle: 'Functions of symmetric matrices via spectral decomposition',
               prose: 'For a symmetric matrix $A = Q\\Lambda Q^T$, any function $f(A) = Q f(\\Lambda) Q^T$ â€” just apply $f$ to each eigenvalue. This works for $A^{1/2}$ (matrix square root), $A^{-1}$, and $e^A$. These would be impossible or expensive to compute directly but become trivial once you have the spectral decomposition.',
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
-A = np.array([[5., 4.],
-              [4., 5.]])
+# Symmetric matrix: eigenvectors are orthogonal basis
+A = np.array([[3., 1.], [1., 3.]])
+evals, Q = np.linalg.eig(A)
+# Sort by eigenvalue
+idx = np.argsort(evals)[::-1]
+evals, Q = evals[idx], Q[:, idx]
 
-eigenvalues, Q = np.linalg.eigh(A)
-print(f"Eigenvalues of A: {eigenvalues}")
+# A = Q D Q^T (orthogonal diagonalization)
+D = np.diag(evals)
+A_check = Q @ D @ Q.T
+print("Q^T @ Q = I?", np.allclose(Q.T @ Q, np.eye(2)))
+print("Q @ D @ Q^T = A?", np.allclose(A_check, A))
+print("Eigenvalues:", evals.round(4))
 
-# Matrix square root: apply sqrt to eigenvalues
-sqrt_lambdas = np.sqrt(eigenvalues)
-A_sqrt = Q @ np.diag(sqrt_lambdas) @ Q.T
-print()
-print("sqrt(A) =")
-print(A_sqrt.round(6))
-print()
-print("Verification: sqrt(A) @ sqrt(A) should equal A:")
-print((A_sqrt @ A_sqrt).round(10))
-
-# Matrix inverse: apply 1/lambda to eigenvalues
-A_inv = Q @ np.diag(1.0 / eigenvalues) @ Q.T
-print()
-print("Verification: A @ A_inv should equal I:")
-print((A @ A_inv).round(10))
-
-# Matrix exponential: apply exp to eigenvalues
-from scipy.linalg import expm
-A_exp_spec = Q @ np.diag(np.exp(eigenvalues)) @ Q.T
-A_exp_scipy = expm(A)
-print()
-print("exp(A) via spectral vs scipy â€” max diff:", np.max(np.abs(A_exp_spec - A_exp_scipy)))
-`,
+# Visualize eigenvectors as principal axes
+fig, ax = plt.subplots(figsize=(5, 5))
+origin = np.zeros(2)
+for i, (ev, eval_, color) in enumerate(zip(Q.T, evals, ['steelblue','darkorange'])):
+    ax.annotate('', xy=ev*eval_, xytext=origin, arrowprops=dict(arrowstyle='->', color=color, lw=3))
+    ax.text(ev[0]*eval_+0.1, ev[1]*eval_+0.1, f'lam={eval_:.1f}\nv{i+1}', color=color, fontsize=10)
+ax.set_title("Eigenvectors are orthogonal principal axes", fontsize=11)
+ax.set_xlim(-4, 4); ax.set_ylim(-4, 4)
+ax.set_aspect('equal'); ax.grid(True, alpha=0.3)
+ax.axhline(0, color='k', lw=0.5); ax.axvline(0, color='k', lw=0.5)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 3,

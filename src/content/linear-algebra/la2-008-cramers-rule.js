@@ -134,33 +134,47 @@ inv(A)`,
                 "This is exact for small systems. For large n, it is exponentially slower than np.linalg.solve.",
               ],
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
-def cramers_rule(A, b):
-    """Solve Ax = b using Cramer's Rule. Only practical for small n."""
-    n = len(b)
-    det_A = np.linalg.det(A)
-    if abs(det_A) < 1e-12:
-        raise ValueError("Matrix is singular â€” no unique solution")
+A = np.array([[3., 2.], [1., 4.]])
+b = np.array([7., 5.])
+detA = np.linalg.det(A)
 
-    x = np.zeros(n)
-    for i in range(n):
-        Ai = A.copy()
-        Ai[:, i] = b        # replace column i with b
-        x[i] = np.linalg.det(Ai) / det_A
-    return x
+A1 = A.copy(); A1[:, 0] = b
+A2 = A.copy(); A2[:, 1] = b
+x1 = np.linalg.det(A1) / detA
+x2 = np.linalg.det(A2) / detA
 
-# 3Ã—3 system: 2xâ‚ + xâ‚‚ - xâ‚ƒ = 8,  -3xâ‚ - xâ‚‚ + 2xâ‚ƒ = -11,  -2xâ‚ + xâ‚‚ + 2xâ‚ƒ = -3
-A = np.array([[2., 1., -1.],
-              [-3., -1., 2.],
-              [-2., 1., 2.]])
-b = np.array([8., -11., -3.])
+print(f"det(A) = {detA:.2f}")
+print(f"x1 = det(A1)/det(A) = {np.linalg.det(A1):.2f}/{detA:.2f} = {x1:.4f}")
+print(f"x2 = det(A2)/det(A) = {np.linalg.det(A2):.2f}/{detA:.2f} = {x2:.4f}")
+print(f"Verify: A@[x1,x2] = {A @ np.array([x1,x2])}")
 
-x_cramer = cramers_rule(A, b)
-x_solve  = np.linalg.solve(A, b)
-
-print("Cramer's Rule:", x_cramer.round(6))
-print("np.linalg.solve:", x_solve.round(6))
-print("Match:", np.allclose(x_cramer, x_solve))`,
+fig, axes = plt.subplots(1, 3, figsize=(11, 3))
+t = np.linspace(-1, 5, 200)
+y1 = (7 - 3*t) / 2    # 3x + 2y = 7
+y2 = (5 - t) / 4      # x + 4y = 5
+for ax, title in zip(axes, ["System: both equations", "A1 (col 1 replaced)", "A2 (col 2 replaced)"]):
+    if axes.tolist().index(ax) == 0:
+        ax.plot(t, y1, color='steelblue', lw=2, label='3x+2y=7')
+        ax.plot(t, y2, color='darkorange', lw=2, label='x+4y=5')
+        ax.scatter([x1],[x2], color='green', s=100, zorder=5, label=f'({x1:.2f},{x2:.2f})')
+        ax.legend(fontsize=8)
+    else:
+        M = A1 if 'A1' in title else A2
+        ax.imshow(M, cmap='RdBu_r', aspect='equal', vmin=-5, vmax=8)
+        for i in range(2):
+            for j in range(2):
+                ax.text(j, i, f'{M[i,j]:.0f}', ha='center', va='center', fontsize=14)
+        det_val = np.linalg.det(M)
+        ax.set_xlabel(f'det={det_val:.2f}', fontsize=10)
+        ax.set_xticks([]); ax.set_yticks([])
+    ax.set_title(title, fontsize=10)
+    if axes.tolist().index(ax) == 0:
+        ax.set_xlim(-0.5, 4); ax.set_ylim(-0.5, 4)
+        ax.grid(True, alpha=0.3); ax.axhline(0, color='k', lw=0.5); ax.axvline(0, color='k', lw=0.5)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 2,

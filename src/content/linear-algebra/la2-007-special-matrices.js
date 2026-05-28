@@ -144,23 +144,36 @@ eig(A)              % both positive iff SPD`,
                 'The eigenvectors form an orthonormal set â€” their matrix Q satisfies Q.T @ Q = I.',
               ],
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
-A = np.array([[4., 2., 1.],
-              [2., 3., 1.],
-              [1., 1., 5.]])
+# Symmetric: A^T = A
+A_sym = np.array([[4., 2., 1.], [2., 3., 0.], [1., 0., 5.]])
+# Orthogonal: Q^T = Q^-1 (rotation)
+theta = np.pi/4
+Q = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
+# Diagonal
+D = np.diag([3., 1., 4.])
 
-# eigh is specialized for symmetric matrices (faster, more accurate)
-eigenvalues, Q = np.linalg.eigh(A)
+print("Symmetric? A^T == A:", np.allclose(A_sym.T, A_sym))
+print("Orthogonal? Q^T @ Q = I:", np.allclose(Q.T @ Q, np.eye(2)))
+print("Q^T == Q_inv:", np.allclose(Q.T, np.linalg.inv(Q)))
 
-print("Eigenvalues (all real):", eigenvalues.round(6))
-print("All positive?", np.all(eigenvalues > 0), "â†’ SPD!")
-print()
-print("Eigenvectors (columns of Q):")
-print(Q.round(6))
-print()
-# Orthonormality: Q^T Q should = I
-print("Q^T @ Q (should = I):")
-print((Q.T @ Q).round(10))`,
+fig, axes = plt.subplots(1, 3, figsize=(11, 3.5))
+for ax, M, title in zip(axes, [A_sym, np.pad(Q, ((0,1),(0,1))), D], 
+                         ['Symmetric
+A^T = A', 'Orthogonal
+Q^T = Q_inv', 'Diagonal
+D = diag(3,1,4)']):
+    if M.shape[0] == 3:
+        im = ax.imshow(M, cmap='RdBu_r', aspect='equal', vmin=-5, vmax=5)
+        for i in range(M.shape[0]):
+            for j in range(M.shape[1]):
+                ax.text(j, i, f'{M[i,j]:.2f}', ha='center', va='center', fontsize=11,
+                        color='white' if abs(M[i,j]) > 2.5 else 'black')
+    ax.set_title(title, fontsize=11)
+    ax.set_xticks([]); ax.set_yticks([])
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 2,
@@ -170,24 +183,34 @@ print((Q.T @ Q).round(10))`,
                 'Condition number = 1 means the transformation introduces zero amplification of errors â€” numerically ideal.',
               ],
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
-# Rotation by 45Â° around z-axis
-theta = np.radians(45)
-Q = np.array([
-    [np.cos(theta), -np.sin(theta), 0.],
-    [np.sin(theta),  np.cos(theta), 0.],
-    [0.,             0.,            1.]
-])
+# Orthogonal matrix: rotation preserves lengths and angles
+theta = np.pi / 3  # 60 degrees
+Q = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
 
-print("Q^T @ Q (should = I):")
-print((Q.T @ Q).round(10))
-print()
-print(f"det(Q) = {np.linalg.det(Q):.6f}  (should be +1 for rotation)")
-print(f"Condition number = {np.linalg.cond(Q):.6f}  (should be 1.0)")
-print()
-# Inverse = transpose (free!)
-print("Q^{-1} - Q^T (should be zero):")
-print((np.linalg.inv(Q) - Q.T).round(10))`,
+v1 = np.array([2.0, 1.0])
+v2 = np.array([0.5, 2.0])
+Qv1 = Q @ v1; Qv2 = Q @ v2
+
+print(f"||v1|| = {np.linalg.norm(v1):.4f}   ||Qv1|| = {np.linalg.norm(Qv1):.4f}  (preserved)")
+print(f"dot(v1,v2) = {np.dot(v1,v2):.4f}  dot(Qv1,Qv2) = {np.dot(Qv1,Qv2):.4f}  (preserved)")
+
+fig, axes = plt.subplots(1, 2, figsize=(9, 4))
+origin = np.zeros(2)
+for ax, (u1, u2), title in [
+    (axes[0], (v1, v2), "Original v1, v2"),
+    (axes[1], (Qv1, Qv2), "After 60 deg rotation")]:
+    for v, color, lbl in [(u1,'steelblue','v1'),(u2,'darkorange','v2')]:
+        ax.annotate('', xy=v, xytext=origin, arrowprops=dict(arrowstyle='->', color=color, lw=2.5))
+        ax.text(v[0]+0.05, v[1]+0.05, lbl, color=color, fontsize=11, fontweight='bold')
+    ax.set_title(title, fontsize=11)
+    ax.set_xlim(-2.5, 2.5); ax.set_ylim(-0.5, 2.5)
+    ax.set_aspect('equal'); ax.grid(True, alpha=0.3)
+    ax.axhline(0, color='k', lw=0.5); ax.axvline(0, color='k', lw=0.5)
+plt.suptitle("Orthogonal Q: rotates without changing lengths or angles", fontsize=11)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 3,

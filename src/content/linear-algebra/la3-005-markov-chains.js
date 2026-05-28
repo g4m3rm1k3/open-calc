@@ -153,92 +153,99 @@ spectral_gap
               cellTitle: 'Finding the steady-state distribution',
               prose: 'Solve (P-I)q = 0 with sum(q) = 1. The steady state is the eigenvector for Î»=1. NumPy returns eigenvectors normalized to unit Euclidean length, not unit L1 norm. Normalize by dividing by the sum.',
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
-# 3-state weather: Sunny / Rainy / Cloudy
-# Column j = probability dist of "where you go from state j"
-P = np.array([[0.7, 0.3, 0.4],
-              [0.2, 0.5, 0.3],
-              [0.1, 0.2, 0.3]])
+P = np.array([[0.9, 0.1], [0.3, 0.7]])  # sunny/rainy transition
+v = np.array([0.5, 0.5])
+history = [v.copy()]
+for _ in range(30):
+    v = P.T @ v
+    history.append(v.copy())
+history = np.array(history)
 
-# Verify column-stochastic
-print("Column sums:", P.sum(axis=0))
+evals, evecs = np.linalg.eig(P.T)
+stat_idx = np.argmin(abs(evals - 1))
+stationary = np.abs(evecs[:, stat_idx]) / np.abs(evecs[:, stat_idx]).sum()
+print("Stationary distribution:", stationary.round(4))
 
-# Find eigenvalue 1's eigenvector
-evals, evecs = np.linalg.eig(P)
-print("\\nEigenvalues:", evals.real.round(4))
-
-# Eigenvector for Î»=1
-idx = np.argmin(np.abs(evals - 1.0))
-q = evecs[:, idx].real
-q = q / q.sum()   # normalize to probability vector
-
-print("\\nSteady-state distribution:")
-print(f"  Sunny:  {q[0]:.4f}")
-print(f"  Rainy:  {q[1]:.4f}")
-print(f"  Cloudy: {q[2]:.4f}")`,
+fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+axes[0].plot(history[:,0], 'o-', color='gold', markersize=4, label='P(sunny)')
+axes[0].plot(history[:,1], 's-', color='steelblue', markersize=4, label='P(rainy)')
+axes[0].axhline(stationary[0], color='gold', lw=1.5, linestyle='--', alpha=0.7)
+axes[0].axhline(stationary[1], color='steelblue', lw=1.5, linestyle='--', alpha=0.7)
+axes[0].set_xlabel("Steps"); axes[0].set_ylabel("Probability")
+axes[0].set_title("Convergence to stationary distribution", fontsize=11)
+axes[0].legend(fontsize=9); axes[0].grid(True, alpha=0.3)
+im = axes[1].imshow(P, cmap='Blues', aspect='equal', vmin=0, vmax=1)
+axes[1].set_title("Transition matrix P", fontsize=11)
+axes[1].set_xticks([0,1]); axes[1].set_xticklabels(['sunny','rainy'])
+axes[1].set_yticks([0,1]); axes[1].set_yticklabels(['from sunny','from rainy'])
+for i in range(2):
+    for j in range(2):
+        axes[1].text(j, i, f'{P[i,j]:.1f}', ha='center', va='center', fontsize=14)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 2,
               cellTitle: 'Power iteration: watching convergence',
               prose: 'Start from any probability vector and multiply by P repeatedly. Watch it converge to the steady state regardless of starting point. The spectral gap = 1 - |Î»â‚‚| determines how fast convergence happens.',
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
-P = np.array([[0.7, 0.3, 0.4],
-              [0.2, 0.5, 0.3],
-              [0.1, 0.2, 0.3]])
+P = np.array([[0.9, 0.1], [0.3, 0.7]])
+evals, evecs = np.linalg.eig(P.T)
+stat_idx = np.argmin(abs(evals - 1))
+stationary = np.abs(evecs[:, stat_idx]) / np.abs(evecs[:, stat_idx]).sum()
+print("Eigenvalues:", evals.round(4))
+print("Stationary:", stationary.round(4))
+print("P^T @ stat = stat?", np.allclose(P.T @ stationary, stationary))
 
-# Two different starting distributions
-x_sunny = np.array([1.0, 0.0, 0.0])   # start all-sunny
-x_rainy = np.array([0.0, 1.0, 0.0])   # start all-rainy
-
-# Compute steady state for comparison
-evals, evecs = np.linalg.eig(P)
-idx = np.argmin(np.abs(evals - 1.0))
-q = evecs[:, idx].real
-q = q / q.sum()
-
-print(f"Steady state:  {q.round(4)}")
-print()
-print(f"{'Step':>4}  {'From Sunny':>14}  {'From Rainy':>14}")
-x1, x2 = x_sunny.copy(), x_rainy.copy()
-for k in [1, 2, 5, 10, 20]:
-    x1 = np.linalg.matrix_power(P, k) @ x_sunny
-    x2 = np.linalg.matrix_power(P, k) @ x_rainy
-    print(f"{k:>4}  {str(x1.round(4)):>14}  {str(x2.round(4)):>14}")
-
-evals_sorted = np.sort(np.abs(evals))[::-1]
-print(f"\\nSpectral gap: 1 - |Î»â‚‚| = 1 - {evals_sorted[1]:.4f} = {1 - evals_sorted[1]:.4f}")`,
+fig, axes = plt.subplots(1, 2, figsize=(9, 4))
+for e, color, lbl in zip(evals, ['steelblue','darkorange'], ['lam=1 (stationary)','lam (mixing)']):
+    axes[0].plot([0, e.real], [0, 0], 'o-', color=color, lw=3, markersize=10, label=f'{lbl}: {e:.3f}')
+axes[0].set_xlim(-0.2, 1.2); axes[0].set_ylim(-0.5, 0.5)
+axes[0].set_xlabel("Eigenvalue"); axes[0].set_title("Eigenvalues", fontsize=11)
+axes[0].axvline(1, color='gray', lw=1, linestyle='--'); axes[0].legend(fontsize=8)
+axes[0].grid(True, alpha=0.3)
+axes[1].bar(['P(sunny)', 'P(rainy)'], stationary, color=['gold','steelblue'], alpha=0.85, edgecolor='k')
+axes[1].set_title(f"Stationary distribution", fontsize=11)
+axes[1].set_ylabel("Probability"); axes[1].set_ylim(0, 1)
+axes[1].grid(True, alpha=0.3, axis='y')
+for i, v in enumerate(stationary):
+    axes[1].text(i, v+0.01, f'{v:.3f}', ha='center', fontsize=12, fontweight='bold')
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 3,
               cellTitle: 'CNC machine availability â€” steady-state analysis',
               prose: 'Model a CNC machine as a 4-state Markov chain: Cutting, Setup, Idle, Fault. The steady-state distribution gives the long-run fraction of time in each state. Machine availability = q[Cutting].',
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
-# CNC machine state transitions (from shift data)
-# States: 0=Cutting, 1=Setup, 2=Idle, 3=Fault
-# Entry P[i,j] = prob of going to state i from state j (column-stochastic)
-P = np.array([
-    [0.80, 0.60, 0.50, 0.00],  # â†’ Cutting
-    [0.10, 0.25, 0.30, 0.00],  # â†’ Setup
-    [0.05, 0.10, 0.15, 0.20],  # â†’ Idle
-    [0.05, 0.05, 0.05, 0.80],  # â†’ Fault
-])
+# 4-page web (PageRank)
+P = np.array([[0.0,0.5,0.5,0.0],[0.5,0.0,0.0,0.5],[0.5,0.0,0.0,0.5],[0.0,0.5,0.5,0.0]])
+evals, evecs = np.linalg.eig(P.T)
+stat_idx = np.argmin(abs(evals - 1))
+pagerank = np.abs(evecs[:, stat_idx]) / np.abs(evecs[:, stat_idx]).sum()
+print("PageRank scores:", pagerank.round(4))
 
-states = ['Cutting', 'Setup', 'Idle', 'Fault']
-print("Column sums:", P.sum(axis=0))  # should all be 1
-
-evals, evecs = np.linalg.eig(P)
-idx = np.argmin(np.abs(evals - 1.0))
-q = evecs[:, idx].real
-q = q / q.sum()
-
-print("\\nSteady-state distribution:")
-for i, (s, qi) in enumerate(zip(states, q)):
-    print(f"  {s:<12}: {qi:.3f} ({qi*100:.1f}%)")
-
-print(f"\\nMachine availability: {q[0]:.3f} ({q[0]*100:.1f}%)")
-print(f"(Long-run fraction of time actually cutting)")`,
+fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+axes[0].imshow(P, cmap='Blues', aspect='equal', vmin=0, vmax=0.6)
+axes[0].set_title("4-page transition matrix P", fontsize=11)
+for i in range(4):
+    for j in range(4):
+        axes[0].text(j, i, f'{P[i,j]:.1f}', ha='center', va='center', fontsize=11)
+axes[0].set_xticks(range(4)); axes[0].set_xticklabels(['p1','p2','p3','p4'])
+axes[0].set_yticks(range(4)); axes[0].set_yticklabels(['p1','p2','p3','p4'])
+axes[1].bar([f'Page {i+1}' for i in range(4)], pagerank,
+            color=['steelblue','darkorange','green','crimson'], alpha=0.85, edgecolor='k')
+axes[1].set_title("PageRank (stationary distribution)", fontsize=11)
+axes[1].set_ylabel("Score"); axes[1].set_ylim(0, 0.4)
+axes[1].grid(True, alpha=0.3, axis='y')
+plt.tight_layout()
+plt.show()`,
             },
           ]
         }

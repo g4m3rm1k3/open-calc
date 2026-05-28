@@ -153,62 +153,67 @@ a(end)*A + b(end)*eye(2)
               cellTitle: 'Verifying Cayley-Hamilton',
               prose: 'Compute the characteristic polynomial, then evaluate it at the matrix A. Result must be the zero matrix (up to floating point). For a 2Ã—2 matrix: p(Î») = Î»Â² - trace(A)Î» + det(A), so p(A) = AÂ² - trace(A)Â·A + det(A)Â·I.',
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
-A = np.array([[2., 1.],
-              [5., 3.]])
+A = np.array([[3., 1.], [2., 4.]])
+evals = np.linalg.eigvals(A)
 
-t = np.trace(A)
-d = np.linalg.det(A)
+# Characteristic polynomial: p(lam) = lam^2 - trace*lam + det
+tr = np.trace(A); det = np.linalg.det(A)
+print(f"p(lam) = lam^2 - {tr:.0f}*lam + {det:.0f}")
+print(f"Eigenvalues: {evals}")
 
-# p(Î») = Î»Â² - tÂ·Î» + d  â†’  p(A) = AÂ² - tÂ·A + dÂ·I
-p_A = A @ A - t * A + d * np.eye(2)
+# Cayley-Hamilton: p(A) = A^2 - trace*A + det*I = 0
+pA = A@A - tr*A + det*np.eye(2)
+print("p(A) ="); print(pA.round(10))
+print("p(A) = 0?", np.allclose(pA, 0))
 
-print(f"Characteristic polynomial: Î»Â² - {t}Î» + {d:.4f}")
-print()
-print("p(A) = AÂ² - trace(A)Â·A + det(A)Â·I:")
-print(p_A.round(10))
-print()
-print("Is p(A) = 0?", np.allclose(p_A, 0, atol=1e-10))
+# Visualize: eval the characteristic polynomial at a range of values
+lam = np.linspace(-1, 8, 300)
+p_lam = lam**2 - tr*lam + det
 
-# Also test a 3x3 matrix
-B = np.array([[1., 2., 0.],
-              [0., 3., 1.],
-              [2., 0., 1.]])
-
-coeffs = np.poly(B)   # characteristic polynomial coefficients
-print()
-print("3Ã—3 matrix B characteristic poly coefficients:", coeffs.round(4))
-
-# Evaluate: coeffs = [1, c2, c1, c0] for Î»Â³ + c2Î»Â² + c1Î» + c0
-p_B = np.eye(3)*coeffs[3] + B*coeffs[2] + B@B*coeffs[1] + B@B@B*coeffs[0]
-print("p(B):", p_B.round(10))`,
+fig, ax = plt.subplots(figsize=(7, 4))
+ax.plot(lam, p_lam, color='steelblue', lw=2, label=f'p(lam) = lam^2 - {tr:.0f}*lam + {det:.0f}')
+ax.axhline(0, color='k', lw=1)
+ax.scatter(evals, [0,0], color='crimson', s=80, zorder=5, label=f'eigenvalues {evals.round(2)}')
+ax.set_xlabel("lambda"); ax.set_ylabel("p(lambda)")
+ax.set_title("Characteristic polynomial: roots = eigenvalues", fontsize=12)
+ax.legend(fontsize=9); ax.grid(True, alpha=0.3)
+ax.set_ylim(-5, 15)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 2,
               cellTitle: 'Computing Aâ»Â¹ via Cayley-Hamilton â€” no row reduction needed',
               prose: 'For 2Ã—2: p(A) = 0 gives AÂ² - tÂ·A + dÂ·I = 0. Multiply by Aâ»Â¹: A - tÂ·I + dÂ·Aâ»Â¹ = 0. So Aâ»Â¹ = (tÂ·I - A)/d. This works whenever d = det(A) â‰  0. Much simpler than Gauss-Jordan for analytic work.',
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
-A = np.array([[1., 2.],
-              [3., 4.]])
+A = np.array([[3., 1.], [2., 4.]])
+tr = np.trace(A); det = np.linalg.det(A)
 
-t = np.trace(A)
-d = np.linalg.det(A)
+# Use Cayley-Hamilton to compute A_inv without inv():
+# A^2 = tr*A - det*I  =>  A * (1/det)(tr*I - A) = I  =>  A_inv = (tr*I - A)/det
+A_inv_CH = (tr * np.eye(2) - A) / det
+A_inv_np = np.linalg.inv(A)
 
-# From p(A) = 0: Aâ»Â¹ = (tÂ·I - A) / d
-A_inv_CH = (t * np.eye(2) - A) / d
+print("A_inv via Cayley-Hamilton:"); print(A_inv_CH.round(4))
+print("A_inv via np.linalg.inv:"); print(A_inv_np.round(4))
+print("Match:", np.allclose(A_inv_CH, A_inv_np))
 
-print("A inverse via Cayley-Hamilton:")
-print(A_inv_CH.round(6))
-print()
-print("A inverse via numpy:")
-print(np.linalg.inv(A).round(6))
-print()
-print("Match:", np.allclose(A_inv_CH, np.linalg.inv(A)))
-print()
-# Verify: A @ A_inv = I
-print("A @ A_inv (should be I):")
-print((A @ A_inv_CH).round(10))`,
+fig, axes = plt.subplots(1, 3, figsize=(11, 3))
+for ax, M, title in zip(axes, [A, A_inv_CH, A@A_inv_CH],
+                         ['A', 'A_inv (Cayley-Hamilton)', 'A @ A_inv (= I?)']):
+    ax.imshow(M, cmap='RdBu_r', aspect='equal', vmin=-2, vmax=3)
+    ax.set_title(title, fontsize=10)
+    for i in range(2):
+        for j in range(2):
+            ax.text(j, i, f'{M[i,j]:.3f}', ha='center', va='center', fontsize=11,
+                    color='white' if abs(M[i,j]) > 1.5 else 'black')
+    ax.set_xticks([]); ax.set_yticks([])
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 3,

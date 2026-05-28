@@ -66,34 +66,48 @@ export default {
               cellTitle: 'Extract all four subspaces via SVD',
               prose: 'The SVD factorization A = U Σ Vᵀ directly reveals all four subspaces. Columns of U corresponding to nonzero singular values span C(A); the rest span N(Aᵀ). Columns of V corresponding to nonzero singular values span C(Aᵀ); the rest span N(A).',
               code: `import numpy as np
+import matplotlib.pyplot as plt
+from scipy import linalg
 
-A = np.array([[1, 2, 3],
-              [4, 5, 6]], dtype=float)  # 2x3, rank 2
+A = np.array([[1., 2., 0., 3.],
+              [2., 4., 1., 5.],
+              [0., 0., 1., -1.]])
 
-U, s, Vt = np.linalg.svd(A)
-r = np.sum(s > 1e-10)  # numerical rank
-V = Vt.T
+r = np.linalg.matrix_rank(A)
+m, n = A.shape
+print(f"Shape: {m}x{n}, rank={r}")
+print(f"C(A):  dim={r}  (column space, subset of R^{m})")
+print(f"N(A):  dim={n-r}  (null space, subset of R^{n})")
+print(f"C(A^T):dim={r}  (row space, subset of R^{n})")
+print(f"N(A^T):dim={m-r}  (left null space, subset of R^{m})")
 
-print(f"A is {A.shape[0]}×{A.shape[1]}, rank = {r}")
-print()
+# Verify orthogonality: row space perp null space
+null_A = linalg.null_space(A)
+row_space_A = linalg.null_space(A.T).T  # left null space orthocomp
+print("
+Row space and null space dimensions sum to n:", r + null_A.shape[1], "=", n)
+print("Dot products (row space basis) * (null space):", np.round(A[:r].T @ null_A, 8))
 
-col_space  = U[:, :r]       # C(A): first r columns of U
-left_null  = U[:, r:]       # N(Aᵀ): remaining columns of U
-row_space  = V[:, :r]       # C(Aᵀ): first r columns of V
-null_space = V[:, r:]       # N(A): remaining columns of V
-
-print("Column space C(A) basis (in R²):")
-print(col_space)
-print("\\nRow space C(Aᵀ) basis (in R³):")
-print(row_space)
-print("\\nNull space N(A) basis (in R³):")
-print(null_space)
-print("\\nLeft null space N(Aᵀ) basis (in R²):")
-print(left_null if left_null.size > 0 else "trivial {0} — A has full row rank")
-
-# Verify orthogonality: row space ⊥ null space
-print("\\nRow space · Null space (should be ~0):")
-print(np.round(row_space.T @ null_space, 10))`,
+fig, ax = plt.subplots(figsize=(7, 4))
+dims = [r, n-r, r, m-r]
+spaces = [f'C(A)
+dim={r}
+subset R^{m}', f'N(A)
+dim={n-r}
+subset R^{n}',
+          f'C(A^T)
+dim={r}
+subset R^{n}', f'N(A^T)
+dim={m-r}
+subset R^{m}']
+colors = ['steelblue', 'crimson', 'darkorange', 'green']
+bars = ax.bar(spaces, dims, color=colors, alpha=0.8, edgecolor='k', linewidth=0.5)
+ax.set_ylabel('Dimension'); ax.set_title(f"Four Fundamental Subspaces of A ({m}x{n}, rank={r})", fontsize=12)
+ax.set_ylim(0, max(dims)+1); ax.grid(True, alpha=0.3, axis='y')
+for bar, d in zip(bars, dims):
+    ax.text(bar.get_x()+bar.get_width()/2, d+0.05, str(d), ha='center', fontsize=13, fontweight='bold')
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 2,

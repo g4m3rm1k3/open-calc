@@ -195,27 +195,35 @@ fprintf('Direction of error:  [%.4f, %.4f, %.4f]\\n', cross_track(1)/error_mag, 
                 'Formula: proj = (aÂ·b / aÂ·a) Ã— a. The error e = b âˆ’ proj is always perpendicular to a.',
               ],
               code: `import numpy as np
-from opencalc import Figure, BLUE, AMBER, GREEN
+import matplotlib.pyplot as plt
 
-a = np.array([4.0, 0.0])   # the line direction
-b = np.array([3.0, 3.0])   # the vector to project
+a = np.array([3., 1.])   # direction to project onto
+b = np.array([2., 3.])   # vector to project
 
-proj = (np.dot(a, b) / np.dot(a, a)) * a
-error = b - proj
+# Projection of b onto a
+proj_b = (np.dot(a, b) / np.dot(a, a)) * a
+error  = b - proj_b  # component of b perpendicular to a
 
-print(f"a = {a},  b = {b}")
-print(f"proj_a(b) = {proj}")
-print(f"error = b - proj = {error}")
-print(f"perpendicular check: a Â· error = {np.dot(a, error):.10f}  (should be 0)")
+print(f"proj_a(b) = {proj_b}")
+print(f"error     = {error}")
+print(f"Orthogonal? dot(proj, error) = {np.dot(proj_b, error):.10f}")
 
-fig = Figure(square=True, xmin=-1, xmax=5, ymin=-1, ymax=5,
-             title="Projection of b onto a")
-fig.grid().axes()
-fig.vector(a.tolist(), color=BLUE, label="a")
-fig.vector(b.tolist(), color=AMBER, label="b")
-fig.vector(proj.tolist(), color=GREEN, label="proj")
-fig.arrow(proj.tolist(), b.tolist(), color=AMBER, dashed=True, label="error")
-fig.show()`,
+fig, ax = plt.subplots(figsize=(6, 5))
+origin = np.zeros(2)
+ax.annotate('', xy=a, xytext=origin, arrowprops=dict(arrowstyle='->', color='steelblue', lw=2.5))
+ax.annotate('', xy=b, xytext=origin, arrowprops=dict(arrowstyle='->', color='darkorange', lw=2.5))
+ax.annotate('', xy=proj_b, xytext=origin, arrowprops=dict(arrowstyle='->', color='green', lw=2.5))
+ax.annotate('', xy=b, xytext=proj_b, arrowprops=dict(arrowstyle='->', color='crimson', lw=2, linestyle='dashed'))
+ax.text(a[0]*0.5+0.1, a[1]*0.5+0.1, 'a', color='steelblue', fontsize=12, fontweight='bold')
+ax.text(b[0]*0.5+0.1, b[1]*0.5-0.2, 'b', color='darkorange', fontsize=12, fontweight='bold')
+ax.text(proj_b[0]*0.5+0.1, proj_b[1]*0.5-0.2, 'proj', color='green', fontsize=12, fontweight='bold')
+ax.text((b[0]+proj_b[0])/2+0.1, (b[1]+proj_b[1])/2, 'error', color='crimson', fontsize=10)
+ax.set_xlim(-0.5, 4); ax.set_ylim(-0.5, 4)
+ax.set_aspect('equal'); ax.grid(True, alpha=0.3)
+ax.axhline(0, color='k', lw=0.5); ax.axvline(0, color='k', lw=0.5)
+ax.set_title("Orthogonal projection of b onto a", fontsize=12)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 2,
@@ -225,24 +233,30 @@ fig.show()`,
                 'Key property: PÂ² = P (idempotent). Projecting twice gives the same result â€” the projected vector is already on the line.',
               ],
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
-a = np.array([[4.0], [0.0]])   # column vector (2Ã—1)
+# Projection matrix P onto the line spanned by a
+a = np.array([[3.], [1.]])  # column vector
+P = (a @ a.T) / (a.T @ a)   # projection matrix: rank 1
+I_minus_P = np.eye(2) - P   # complementary projection
 
-# Projection matrix: P = aaáµ€ / (aáµ€a)
-P = (a @ a.T) / float(a.T @ a)
-print("Projection matrix P:")
-print(P)
-print()
+b = np.array([2., 3.])
+print("P (projection matrix):"); print(P.round(4))
+print("P^2 = P?", np.allclose(P @ P, P))  # idempotent
+print("P = P^T?", np.allclose(P, P.T))    # symmetric
 
-# Verify idempotency: PÂ² = P
-P2 = P @ P
-print("PÂ² =")
-print(P2)
-print()
-print("PÂ² = P?", np.allclose(P2, P))
-
-# Verify symmetry: Páµ€ = P
-print("P symmetric?", np.allclose(P.T, P))`,
+fig, axes = plt.subplots(1, 3, figsize=(11, 3.5))
+for ax, M, title in zip(axes, [P, I_minus_P, P+I_minus_P],
+                         ['P (onto a)', 'I-P (complement)', 'P + (I-P) = I']):
+    ax.imshow(M, cmap='RdBu_r', aspect='equal', vmin=-0.5, vmax=1.2)
+    ax.set_title(title, fontsize=11)
+    for i in range(2):
+        for j in range(2):
+            ax.text(j, i, f'{M[i,j]:.3f}', ha='center', va='center', fontsize=12,
+                    color='white' if abs(M[i,j]) > 0.6 else 'black')
+    ax.set_xticks([]); ax.set_yticks([])
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 'c1',

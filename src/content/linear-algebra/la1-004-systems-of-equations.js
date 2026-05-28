@@ -215,6 +215,7 @@ end`,
                 'Geometrically: each row of Ax = b defines a line. The solution is their intersection.',
               ],
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
 # System: 2x + y = 8,  x + 3y = 9
 A = np.array([[2.0, 1.0],
@@ -223,7 +224,24 @@ b = np.array([8.0, 9.0])
 
 x = np.linalg.solve(A, b)
 print(f"Solution: x = {x[0]:.4f},  y = {x[1]:.4f}")
-print(f"Verify A @ x = {A @ x}  (should equal b = {b})")`,
+print(f"Verify A @ x = {A @ x}  (should equal b = {b})")
+
+# Visualize: each equation is a line; solution is their intersection
+t = np.linspace(-1, 6, 200)
+y_line1 = 8 - 2*t          # 2x + y = 8 -> y = 8 - 2x
+y_line2 = (9 - t) / 3      # x + 3y = 9 -> y = (9-x)/3
+
+fig, ax = plt.subplots(figsize=(6, 5))
+ax.set_title("System Ax=b: Each Equation is a Line", fontsize=13)
+ax.plot(t, y_line1, color='steelblue', lw=2, label='2x + y = 8')
+ax.plot(t, y_line2, color='darkorange', lw=2, label='x + 3y = 9')
+ax.scatter([x[0]], [x[1]], color='green', s=100, zorder=5, label=f'Solution ({x[0]:.2f}, {x[1]:.2f})')
+ax.axhline(0, color='k', lw=0.5); ax.axvline(0, color='k', lw=0.5)
+ax.set_xlim(-1, 6); ax.set_ylim(-1, 6)
+ax.grid(True, alpha=0.3)
+ax.legend(fontsize=10)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 2,
@@ -256,24 +274,53 @@ fig.show()`,
                 '- rank(A) = n and system consistent â†’ **unique solution**\n- rank([A|b]) > rank(A) â†’ **no solution** (inconsistent)\n- rank(A) < n and consistent â†’ **infinitely many solutions** (free variables)',
               ],
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
 # Inconsistent: parallel lines (no solution)
-A1 = np.array([[1.0, 2.0], [2.0, 4.0]])   # row 2 = 2 Ã— row 1
-b1 = np.array([3.0, 7.0])                  # but 7 â‰  2Ã—3
+A1 = np.array([[1.0, 2.0], [2.0, 4.0]])   # row 2 = 2 x row 1
+b1 = np.array([3.0, 7.0])                  # but 7 != 2*3
 
 # Infinitely many: same line
-b2 = np.array([3.0, 6.0])                  # 6 = 2Ã—3 â†’ consistent
+b2 = np.array([3.0, 6.0])                  # 6 = 2*3 -> consistent
 
 print("=== Inconsistent system ===")
 print(f"rank(A1) = {np.linalg.matrix_rank(A1)}")
 Ab1 = np.column_stack([A1, b1])
 print(f"rank([A1|b1]) = {np.linalg.matrix_rank(Ab1)}")
-print("rank increased â†’ NO solution")
+print("rank increased -> NO solution")
 print()
 print("=== Infinitely many ===")
 Ab2 = np.column_stack([A1, b2])
 print(f"rank([A1|b2]) = {np.linalg.matrix_rank(Ab2)}")
-print("rank unchanged, but rank < n â†’ INFINITE solutions")`,
+print("rank unchanged, but rank < n -> INFINITE solutions")
+
+t = np.linspace(-2, 5, 200)
+y1_inc = (3 - t) / 2
+y2_inc = (7 - 2*t) / 4
+y1_inf = (3 - t) / 2
+
+fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+
+ax = axes[0]
+ax.set_title("Inconsistent: Parallel Lines (No Solution)", fontsize=11)
+ax.plot(t, y1_inc, color='steelblue', lw=2, label='x + 2y = 3')
+ax.plot(t, y2_inc, color='darkorange', lw=2, linestyle='--', label='2x + 4y = 7 (parallel)')
+ax.set_xlim(-1, 4); ax.set_ylim(-1, 3)
+ax.axhline(0, color='k', lw=0.5); ax.axvline(0, color='k', lw=0.5)
+ax.grid(True, alpha=0.3); ax.legend(fontsize=9)
+
+ax2 = axes[1]
+ax2.set_title("Infinite Solutions: Same Line (Overlap)", fontsize=11)
+ax2.plot(t, y1_inf, color='steelblue', lw=3, label='x + 2y = 3')
+ax2.plot(t + 0.05, y1_inf, color='darkorange', lw=1.5, linestyle='--', label='2x + 4y = 6 (same line)')
+ax2.text(1, 0.8, 'Infinite points lie on both', fontsize=9, color='green',
+         ha='center', bbox=dict(boxstyle='round', facecolor='lightyellow'))
+ax2.set_xlim(-1, 4); ax2.set_ylim(-1, 3)
+ax2.axhline(0, color='k', lw=0.5); ax2.axvline(0, color='k', lw=0.5)
+ax2.grid(True, alpha=0.3); ax2.legend(fontsize=9)
+
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 'c1',

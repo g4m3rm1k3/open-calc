@@ -124,43 +124,45 @@ null(B)
                 'Try both an invertible matrix and a singular one â€” notice how all conditions agree.',
               ],
               code: `import numpy as np
-from scipy.linalg import null_space
+import matplotlib.pyplot as plt
 
-def imt_check(A, label="A"):
-    """Check all major Invertible Matrix Theorem conditions for square A."""
+# Show all IMT conditions on one invertible and one singular matrix
+A_inv = np.array([[2., 1.], [1., 3.]])    # invertible
+A_sing = np.array([[2., 4.], [1., 2.]])   # singular (row2 = 0.5*row1)
+
+def imt_report(A, label):
+    rank = np.linalg.matrix_rank(A)
     n = A.shape[0]
-    assert A.shape == (n, n), "IMT requires square matrix"
+    det = np.linalg.det(A)
+    null_dim = n - rank
+    print(f"--- {label} ---")
+    print(f"  rank = {rank}  (need {n} for invertible)")
+    print(f"  det  = {det:.4f}  (need != 0)")
+    print(f"  nullity = {null_dim}  (need 0)")
+    print(f"  invertible: {rank == n}")
 
-    d = np.linalg.det(A)
-    r = np.linalg.matrix_rank(A)
-    eigs = np.linalg.eigvals(A)
-    null_dim = n - r
-    null_b = null_space(A)
+imt_report(A_inv, "Invertible A")
+imt_report(A_sing, "Singular A")
 
-    print(f"=== IMT check for {label} (n={n}) ===")
-    print(f"  1. det(A) = {d:.4f}  â†’ {'INVERTIBLE' if abs(d) > 1e-10 else 'SINGULAR'}")
-    print(f"  2. rank(A) = {r}  â†’ {'= n âœ“' if r == n else f'< n âœ— (rank deficient)'}")
-    print(f"  3. nullity = {null_dim}  â†’ {'= 0 (trivial null space) âœ“' if null_dim == 0 else f'= {null_dim} (non-trivial null space) âœ—'}")
-    print(f"  4. min |eigenvalue| = {np.min(np.abs(eigs)):.4f}  â†’ {'all nonzero âœ“' if np.min(np.abs(eigs)) > 1e-10 else 'zero eigenvalue âœ—'}")
-    # Try to compute inverse
-    try:
-        A_inv = np.linalg.inv(A)
-        print(f"  5. Aâ»Â¹ exists âœ“")
-    except np.linalg.LinAlgError:
-        print(f"  5. Aâ»Â¹ does NOT exist âœ—")
-    print()
-
-# Invertible matrix
-A = np.array([[2., 1., 0.],
-              [1., 3., 1.],
-              [0., 1., 4.]])
-imt_check(A, "A (invertible)")
-
-# Singular matrix
-S = np.array([[1., 2., 3.],
-              [4., 5., 6.],
-              [7., 8., 9.]])  # row 3 = row1 + row2 + extra
-imt_check(S, "S (singular)")`,
+# Visualize: column vectors of each matrix
+fig, axes = plt.subplots(1, 2, figsize=(9, 4))
+origin = np.zeros(2)
+for ax, M, label in [(axes[0], A_inv, "Invertible"), (axes[1], A_sing, "Singular")]:
+    c1, c2 = M[:,0], M[:,1]
+    para = plt.Polygon([origin, c1, c1+c2, c2], alpha=0.2, color='steelblue')
+    ax.add_patch(para)
+    ax.annotate('', xy=c1, xytext=origin, arrowprops=dict(arrowstyle='->', color='steelblue', lw=2.5))
+    ax.annotate('', xy=c2, xytext=origin, arrowprops=dict(arrowstyle='->', color='darkorange', lw=2.5))
+    ax.text(c1[0]*0.5+0.1, c1[1]*0.5+0.1, 'c1', color='steelblue', fontsize=11)
+    ax.text(c2[0]*0.5+0.1, c2[1]*0.5+0.1, 'c2', color='darkorange', fontsize=11)
+    det = np.linalg.det(M)
+    ax.set_title(f"{label}: det={det:.2f}, rank={np.linalg.matrix_rank(M)}", fontsize=11)
+    ax.set_xlim(-1, 6); ax.set_ylim(-1, 4)
+    ax.set_aspect('equal'); ax.grid(True, alpha=0.3)
+    ax.axhline(0, color='k', lw=0.5); ax.axvline(0, color='k', lw=0.5)
+plt.suptitle("IMT: all conditions true/false simultaneously", fontsize=11)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 2,

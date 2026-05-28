@@ -177,28 +177,36 @@ end
               prose:
                 "scipy.linalg.expm(A) uses PadÃ© approximation + scaling-and-squaring â€” more accurate than summing the power series directly. Verify: det(e^A) = e^trace(A). Also: e^A @ e^(-A) = I.",
               code: `import numpy as np
+import matplotlib.pyplot as plt
 from scipy.linalg import expm
 
-A = np.array([[-1., 2.],
-              [-2., -1.]])
-
+A = np.array([[-1., 0.], [0., -2.]])  # diagonal: easy exponential
 eA = expm(A)
-print("e^A:")
-print(eA.round(6))
-print()
+eA_exact = np.diag([np.exp(-1), np.exp(-2)])
 
-# Verify det(e^A) = e^trace(A)
-det_eA = np.linalg.det(eA)
-expected = np.exp(np.trace(A))
-print(f"det(e^A) = {det_eA:.6f}")
-print(f"e^tr(A) = {expected:.6f}")
-print(f"Match: {np.isclose(det_eA, expected)}")
-print()
+print("expm(A) ="); print(eA.round(6))
+print("exact (diagonal):", eA_exact.round(6))
+print("Match:", np.allclose(eA, eA_exact))
+print("det(expm(A)) = exp(trace(A)):", np.linalg.det(eA), "vs", np.exp(np.trace(A)))
 
-# Verify inverse: e^A @ e^(-A) = I
-eA_inv = expm(-A)
-print("e^A @ e^(-A) (should be I):")
-print((eA @ eA_inv).round(10))`,
+# Show e^(tA) for varying t
+ts = np.linspace(0, 3, 50)
+norms = [np.linalg.norm(expm(t*A)) for t in ts]
+
+fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+axes[0].plot(ts, norms, color='steelblue', lw=2)
+axes[0].set_xlabel("t"); axes[0].set_ylabel("||e^(tA)||")
+axes[0].set_title("Matrix norm of e^(tA) decays (eigenvalues < 0)", fontsize=11)
+axes[0].grid(True, alpha=0.3)
+
+axes[1].imshow(eA, cmap='RdBu_r', aspect='equal', vmin=0, vmax=1)
+axes[1].set_title("expm(A) for A=diag(-1,-2)", fontsize=11)
+for i in range(2):
+    for j in range(2):
+        axes[1].text(j, i, f'{eA[i,j]:.4f}', ha='center', va='center', fontsize=12)
+axes[1].set_xticks([]); axes[1].set_yticks([])
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 2,
@@ -206,34 +214,35 @@ print((eA @ eA_inv).round(10))`,
               prose:
                 "The exact solution to dx/dt = Ax with x(0) = xâ‚€ is x(t) = e^(At) xâ‚€. Compare with numerical ODE solver (scipy.integrate.odeint) to verify.",
               code: `import numpy as np
+import matplotlib.pyplot as plt
 from scipy.linalg import expm
-from scipy.integrate import odeint
 
-# Stable system: complex eigenvalues with negative real part â†’ decaying spiral
-A = np.array([[-0.5, 2.0],
-              [-2.0, -0.5]])
+# ODE: dx/dt = Ax, x(0) = x0; solution: x(t) = expm(tA) @ x0
+# Example: rotation A = [[0,-1],[1,0]] gives circular motion
+A = np.array([[0., -1.], [1., 0.]])
+x0 = np.array([1., 0.])
 
-evals = np.linalg.eigvals(A)
-print(f"Eigenvalues: {evals}")
-print(f"Real parts: {evals.real} (all negative â†’ stable)")
-print()
+ts = np.linspace(0, 2*np.pi, 100)
+traj = np.array([expm(t*A) @ x0 for t in ts])
 
-x0 = np.array([2.0, 0.0])
-t = np.linspace(0, 5, 6)
+print("A = rotation generator [[0,-1],[1,0]]")
+print("x(t) = expm(tA) @ x0 traces a circle")
+print("x(pi/2) =", (expm(np.pi/2 * A) @ x0).round(4))
+print("x(pi)   =", (expm(np.pi   * A) @ x0).round(4))
 
-# Exact solution via matrix exponential
-print(f"{'t':>5}  {'x1(exact)':>12}  {'x2(exact)':>12}")
-for ti in t:
-    xt = expm(A * ti) @ x0
-    print(f"{ti:>5.1f}  {xt[0]:>12.6f}  {xt[1]:>12.6f}")
-
-# ODE solver for comparison
-def sys(x, t):
-    return A @ x
-t_fine = np.linspace(0, 5, 1000)
-x_ode = odeint(sys, x0, t_fine)
-print(f"\\nODE solver x(5): {x_ode[-1].round(6)}")
-print(f"Matrix exp x(5): {(expm(A*5) @ x0).round(6)}")`,
+fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+axes[0].plot(traj[:,0], traj[:,1], color='steelblue', lw=2)
+axes[0].scatter(*x0, color='green', s=80, zorder=5, label='x0=(1,0)')
+axes[0].set_title("e^(tA) @ x0: circular ODE solution", fontsize=11)
+axes[0].set_aspect('equal'); axes[0].grid(True, alpha=0.3); axes[0].legend()
+axes[0].axhline(0, color='k', lw=0.5); axes[0].axvline(0, color='k', lw=0.5)
+axes[1].plot(ts, traj[:,0], color='steelblue', lw=2, label='x1(t) = cos(t)')
+axes[1].plot(ts, traj[:,1], color='darkorange', lw=2, label='x2(t) = sin(t)')
+axes[1].set_xlabel("t"); axes[1].set_ylabel("x(t)")
+axes[1].set_title("Components of the solution", fontsize=11)
+axes[1].legend(fontsize=9); axes[1].grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 3,

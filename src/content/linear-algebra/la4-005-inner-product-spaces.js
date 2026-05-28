@@ -153,25 +153,35 @@ abs(lhs - rhs) < 1e-9
               cellTitle: 'Trig function orthogonality â€” the integral inner product',
               prose: 'The inner product $\\langle f, g \\rangle = \\int_{-\\pi}^{\\pi} f(x)g(x)\\,dx$ on functions works exactly like the dot product. Two trig functions $\\sin(mx)$ and $\\sin(nx)$ are orthogonal when $m \\neq n$ â€” their inner product is zero. We verify this numerically using np.trapz (the trapezoidal rule for numerical integration).',
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
-x = np.linspace(-np.pi, np.pi, 10000)
+# Standard inner product and alternatives
+u = np.array([1., 2., 3.])
+v = np.array([4., -1., 2.])
 
-def inner_product(f, g):
-    return np.trapz(f * g, x)
+# Standard: <u,v> = u^T v
+ip_std = np.dot(u, v)
+# Weighted: <u,v>_W = u^T W v with W = diag(2,1,3)
+W = np.diag([2., 1., 3.])
+ip_weighted = u @ W @ v
 
-def norm_f(f):
-    return np.sqrt(inner_product(f, f))
+print(f"Standard  <u,v> = {ip_std}")
+print(f"Weighted  <u,v>_W = {ip_weighted}")
+print(f"||u|| = {np.linalg.norm(u):.4f}")
+print(f"||u||_W = {np.sqrt(u @ W @ u):.4f}")
+print(f"Cauchy-Schwarz: |<u,v>| = {abs(ip_std):.4f} <= ||u||*||v|| = {np.linalg.norm(u)*np.linalg.norm(v):.4f}")
 
-print("Trig function orthogonality on [-pi, pi]:")
-print(f"<sin(x),  sin(2x)> = {inner_product(np.sin(x), np.sin(2*x)):.6f}  (expect 0)")
-print(f"<sin(x),  cos(x)>  = {inner_product(np.sin(x), np.cos(x)):.6f}   (expect 0)")
-print(f"<sin(x),  sin(x)>  = {inner_product(np.sin(x), np.sin(x)):.6f}  (expect pi)")
-print(f"<cos(2x), cos(2x)> = {inner_product(np.cos(2*x), np.cos(2*x)):.6f}  (expect pi)")
-
-e1 = np.sin(x) / norm_f(np.sin(x))
-e2 = np.cos(x) / norm_f(np.cos(x))
-print()
-print(f"Normalized basis: ||e1|| = {norm_f(e1):.6f}, <e1,e2> = {inner_product(e1, e2):.6f}")`,
+# Visualize: angle between vectors via inner product
+theta = np.arccos(ip_std / (np.linalg.norm(u) * np.linalg.norm(v)))
+fig, ax = plt.subplots(figsize=(6, 4))
+ax.bar(['<u,v>', '||u||*||v||', '|<u,v>_W|', '||u||_W*||v||_W'],
+       [abs(ip_std), np.linalg.norm(u)*np.linalg.norm(v),
+        abs(ip_weighted), np.sqrt(u@W@u)*np.sqrt(v@W@v)],
+       color=['steelblue','darkorange','green','crimson'], alpha=0.85, edgecolor='k')
+ax.set_title(f"Cauchy-Schwarz: |<u,v>| <= ||u||*||v||\nAngle = {np.degrees(theta):.1f} deg", fontsize=11)
+ax.grid(True, alpha=0.3, axis='y')
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 2,

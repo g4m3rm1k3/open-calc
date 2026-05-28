@@ -372,6 +372,9 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import io as _io, base64 as _base64
 
+# Override plt.show() so figures are never closed before we can capture them
+plt.show = lambda *_a, **_k: None
+
 def _capture_matplotlib_figs():
     nums = plt.get_fignums()
     if not nums:

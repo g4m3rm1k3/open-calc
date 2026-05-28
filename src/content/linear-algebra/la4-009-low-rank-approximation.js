@@ -141,57 +141,68 @@ end
               cellTitle: 'Eckart-Young theorem â€” verify best rank-k approximation',
               prose: 'The rank-$k$ truncated SVD is the best rank-$k$ approximation. $\\|A - A_k\\|_2 = \\sigma_{k+1}$ and $\\|A - A_k\\|_F = \\sqrt{\\sigma_{k+1}^2 + \\cdots}$. No other rank-$k$ matrix does better. We verify: for each $k$, compute the error and confirm it equals the $(k+1)$-th singular value.',
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
+# Image-like matrix: rank-k approximation
 np.random.seed(42)
-A = np.random.randn(8, 6).astype(float)
-U, S, Vt = np.linalg.svd(A)
+# Construct a rank-3 matrix (3 signal components) + noise
+true_signal = np.outer(np.sin(np.linspace(0,np.pi,20)), np.cos(np.linspace(0,np.pi,20)))
+true_signal += 0.5 * np.outer(np.linspace(-1,1,20), np.linspace(-1,1,20))
+A = true_signal + 0.3 * np.random.randn(20, 20)
 
-print(f"Singular values: {S.round(3)}")
-print(f"Total energy ||A||_F^2 = {np.sum(S**2):.3f}")
-print()
+U, s, Vt = np.linalg.svd(A, full_matrices=False)
 
-r = len(S)
-for k in range(1, r):
-    Ak = U[:, :k] @ np.diag(S[:k]) @ Vt[:k, :]
-    err_2 = np.linalg.norm(A - Ak, 2)
-    err_F = np.linalg.norm(A - Ak, 'fro')
-    energy_pct = np.sum(S[:k]**2) / np.sum(S**2) * 100
-    print(f"k={k}: ||A-Ak||_2={err_2:.4f} (Ïƒ_{k+1}={S[k]:.4f}), "
-          f"energy={energy_pct:.1f}%")`,
+# Rank-k approximations
+def rank_k(U, s, Vt, k):
+    return U[:, :k] @ np.diag(s[:k]) @ Vt[:k, :]
+
+print("Singular values (first 8):", s[:8].round(3))
+print("Cumulative energy at k=1:", (s[0]**2 / (s**2).sum() * 100).round(1), "%")
+print("Cumulative energy at k=3:", ((s[:3]**2).sum() / (s**2).sum() * 100).round(1), "%")
+
+fig, axes = plt.subplots(1, 4, figsize=(13, 3.5))
+for ax, (M, title) in zip(axes, [(A,'Original'), (rank_k(U,s,Vt,1),'Rank-1'),
+                                   (rank_k(U,s,Vt,3),'Rank-3'), (rank_k(U,s,Vt,10),'Rank-10')]):
+    ax.imshow(M, cmap='RdBu_r', aspect='equal', vmin=-1.5, vmax=1.5)
+    err = np.linalg.norm(A - M, 'fro') / np.linalg.norm(A, 'fro')
+    ax.set_title(f"{title}\nerror={err:.3f}", fontsize=10)
+    ax.set_xticks([]); ax.set_yticks([])
+plt.suptitle("Low-rank approximation via SVD truncation", fontsize=11)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 2,
               cellTitle: 'PCA as low-rank approximation of the covariance matrix',
               prose: 'PCA finds the $k$ directions of maximum variance in data. The covariance matrix $C = X^TX/m$ is symmetric â€” its eigenvectors are the principal components. Projecting data onto the top $k$ eigenvectors is equivalent to the rank-$k$ approximation $X \\approx X_k$ (Eckart-Young applied to the data matrix).',
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
-np.random.seed(0)
-n_samples, n_features = 200, 5
+np.random.seed(42)
+true_signal = np.outer(np.sin(np.linspace(0,np.pi,20)), np.cos(np.linspace(0,np.pi,20)))
+A = true_signal + 0.3 * np.random.randn(20, 20)
+U, s, Vt = np.linalg.svd(A, full_matrices=False)
 
-# Data with strong structure in 2 directions
-signal = np.random.randn(n_samples, 2)
-mixing = np.array([[3.0, 1.0, 0.5, 0.2, 0.1],
-                   [0.5, 2.0, 1.5, 0.3, 0.1]])
-X = signal @ mixing + 0.1 * np.random.randn(n_samples, n_features)
-X -= X.mean(axis=0)
+# Scree plot: singular values and cumulative energy
+cumulative_energy = np.cumsum(s**2) / (s**2).sum() * 100
+k90 = np.searchsorted(cumulative_energy, 90) + 1
+print(f"Rank needed for 90% energy: k = {k90}")
+print(f"First 5 singular values: {s[:5].round(3)}")
 
-# Covariance matrix
-C = X.T @ X / n_samples
-eigenvalues, Q = np.linalg.eigh(C)
-idx = np.argsort(eigenvalues)[::-1]
-eigenvalues, Q = eigenvalues[idx], Q[:, idx]
+fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+axes[0].bar(range(1, len(s)+1), s, color='steelblue', alpha=0.8)
+axes[0].set_xlim(0, 15); axes[0].set_xlabel("k"); axes[0].set_ylabel("Singular value")
+axes[0].set_title("Singular values (scree plot)", fontsize=11)
+axes[0].grid(True, alpha=0.3, axis='y')
 
-print("Eigenvalues (variance explained):", eigenvalues.round(4))
-explained = eigenvalues / eigenvalues.sum()
-print("Explained variance ratio:", explained.round(4))
-print(f"Top 2 components explain {explained[:2].sum()*100:.1f}% of variance")
-
-# PCA projection
-k = 2
-X_projected = X @ Q[:, :k]   # n_samples x k
-X_reconstructed = X_projected @ Q[:, :k].T
-recon_err = np.linalg.norm(X - X_reconstructed, 'fro') / np.linalg.norm(X, 'fro')
-print(f"Reconstruction error with k={k}: {recon_err:.4f}")`,
+axes[1].plot(range(1, len(s)+1), cumulative_energy, 'o-', color='darkorange', lw=2)
+axes[1].axhline(90, color='crimson', lw=1.5, linestyle='--', label='90% threshold')
+axes[1].axvline(k90, color='crimson', lw=1.5, linestyle='--', label=f'k={k90}')
+axes[1].set_xlim(0, 15); axes[1].set_xlabel("k"); axes[1].set_ylabel("Cumulative energy (%)")
+axes[1].set_title("Cumulative energy explained", fontsize=11)
+axes[1].legend(fontsize=9); axes[1].grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 3,

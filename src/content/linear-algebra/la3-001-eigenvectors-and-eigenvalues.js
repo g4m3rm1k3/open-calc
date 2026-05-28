@@ -216,40 +216,64 @@ fprintf('\\nChatter avoidance: choose spindle speed NOT in [%.0f, %.0f] RPM\\n',
               cellTitle: 'Computing eigenvalues and eigenvectors',
               prose: '`np.linalg.eig(A)` returns `(eigenvalues, eigenvectors)`. The eigenvectors are columns of the second output. Verify the defining equation: `A @ v` should equal `Î» * v` for each eigenpair.',
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
-A = np.array([[3., 1.],
-              [0., 2.]])   # upper triangular: eigenvalues are diagonal entries
-
+A = np.array([[3., 1.], [0., 2.]])
 eigenvalues, eigenvectors = np.linalg.eig(A)
 print("Eigenvalues:", eigenvalues)
-print()
-print("Eigenvectors (each column):")
+print("Eigenvectors (columns):")
 print(eigenvectors)
-print()
-
-# Verify Av = Î»v for each pair
 for i in range(len(eigenvalues)):
-    lam = eigenvalues[i]
-    v   = eigenvectors[:, i]
-    Av  = A @ v
-    lv  = lam * v
-    ok  = np.allclose(Av, lv)
-    print(f"Î»={lam:.1f}: A@v={Av.round(4)}, Î»v={lv.round(4)}, âœ“={ok}")`,
+    lam = eigenvalues[i]; v = eigenvectors[:, i]
+    ok = np.allclose(A @ v, lam * v)
+    print(f"  lam={lam:.1f}: Av={( A@v).round(3)}, lam*v={(lam*v).round(3)}, ok={ok}")
+
+fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+origin = np.zeros(2)
+for ax, title, vecs in [
+    (axes[0], "Eigenvectors (invariant directions)",
+     [(eigenvectors[:,0].real,'steelblue',f'v1 (lam={eigenvalues[0]:.0f})'),
+      (eigenvectors[:,1].real,'darkorange',f'v2 (lam={eigenvalues[1]:.0f})')]),
+    (axes[1], "Av vs lambda*v for v1",
+     [(eigenvectors[:,0].real,'steelblue','v1'),
+      ((A@eigenvectors[:,0]).real,'green','A*v1'),
+      ((eigenvalues[0]*eigenvectors[:,0]).real,'crimson','lam*v1 (same!)')])
+]:
+    for vec, color, lbl in vecs:
+        ax.annotate('', xy=vec, xytext=origin, arrowprops=dict(arrowstyle='->', color=color, lw=2.5))
+        ax.text(vec[0]+0.05, vec[1]+0.05, lbl, color=color, fontsize=9, fontweight='bold')
+    ax.set_title(title, fontsize=11)
+    ax.set_xlim(-0.5, 3.5); ax.set_ylim(-0.5, 2.5)
+    ax.set_aspect('equal'); ax.grid(True, alpha=0.3)
+    ax.axhline(0, color='k', lw=0.5); ax.axvline(0, color='k', lw=0.5)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 2,
               cellTitle: 'Sanity checks â€” trace and determinant',
               prose: 'For any matrix: sum of eigenvalues = trace(A), product of eigenvalues = det(A). These are fast sanity checks after computing eigenvalues.',
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
-A = np.array([[4., 2.],
-              [1., 3.]])
-
+A = np.array([[4., 2.], [1., 3.]])
 evals, _ = np.linalg.eig(A)
 print(f"Eigenvalues: {evals}")
-print()
-print(f"trace(A) = {np.trace(A):.1f}  |  sum of eigenvalues = {evals.sum():.1f}")
-print(f"det(A)   = {np.linalg.det(A):.1f}  |  product of eigenvalues = {evals.prod():.1f}")`,
+print(f"trace(A) = {np.trace(A):.1f}  | sum(evals) = {evals.sum():.1f}")
+print(f"det(A)   = {np.linalg.det(A):.1f}  | prod(evals) = {evals.prod():.1f}")
+
+fig, axes = plt.subplots(1, 2, figsize=(9, 3.5))
+axes[0].bar(['eig1', 'eig2', 'trace(A)', 'sum(evals)'],
+            [evals[0], evals[1], np.trace(A), evals.sum()],
+            color=['steelblue','darkorange','green','green'], alpha=0.8)
+axes[0].set_title("trace = sum of eigenvalues", fontsize=11)
+axes[0].grid(True, alpha=0.3, axis='y')
+axes[1].bar(['det(A)', 'prod(evals)'], [np.linalg.det(A), evals.prod()],
+            color=['steelblue','darkorange'], alpha=0.8)
+axes[1].set_title("det = product of eigenvalues", fontsize=11)
+axes[1].grid(True, alpha=0.3, axis='y')
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 3,
