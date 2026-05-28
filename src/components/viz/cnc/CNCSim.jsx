@@ -1909,7 +1909,10 @@ export default function CNCSimPro() {
   useEffect(() => {
     setToolLibraries((prev) => {
       const nextTools = normalizeToolTable(tools, activeToolClass);
-      if (prev?.[activeToolClass] === tools || JSON.stringify(prev?.[activeToolClass]) === JSON.stringify(nextTools)) {
+      if (
+        prev?.[activeToolClass] === tools ||
+        JSON.stringify(prev?.[activeToolClass]) === JSON.stringify(nextTools)
+      ) {
         return prev;
       }
       return {
@@ -2146,6 +2149,11 @@ export default function CNCSimPro() {
   }, []);
 
   // ─── Reload code / project ────────────────────────────────────
+  // Keep tools in a ref so `reload` doesn't list `tools` as a dep.
+  // If it did, every tool edit would recreate `reload`, re-fire the
+  // machDefId effect (which also depends on `reload`), and reset stock.
+  const toolsRef = useRef(tools);
+  toolsRef.current = tools;
   const reload = useCallback(
     (src) => {
       const s = src ?? compileProjectSources();
@@ -2156,7 +2164,7 @@ export default function CNCSimPro() {
       setAlarms([]);
       setValidationIssues(validateProjectFiles(projectFilesRef.current, def));
       const engine = new CNCEngine(def);
-      engine.setToolTable(tools, "mm");
+      engine.setToolTable(toolsRef.current, "mm");
       try {
         engine.loadPrograms(s);
       } catch (err) {
@@ -2194,7 +2202,8 @@ export default function CNCSimPro() {
       remRef.current = [];
       setMatRemoval([]);
     },
-    [machDefId, compileProjectSources, tools],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [machDefId, compileProjectSources],
   );
 
   // Trigger initial parse on mount
@@ -4029,16 +4038,21 @@ export default function CNCSimPro() {
   const activeTool = activeT || tools[1] || null;
   const currentChannel = channelStates[activeChannel];
   const backplotIs3D = vpView === "iso";
+  // Z offset to lift path and tool so stock sits on the grid.
+  // G-code Z=0 (part top) → scene Z = stockDepth; Z=-5 (cut) → scene Z = stockDepth-5.
+  const backplotZOffset = mach.isLathe
+    ? 0
+    : (stock.depth ?? 40) / stockUnitScale;
   const backplotPathPoints = useMemo(
     () =>
       pathPts.map((p) => ({
         machineX: mach.isLathe ? (p.z ?? 0) : (p.x ?? 0),
         machineY: mach.isLathe ? 0 : (p.y ?? 0),
-        machineZ: mach.isLathe ? (p.x ?? 0) / 2 : (p.z ?? 0),
+        machineZ: mach.isLathe ? (p.x ?? 0) / 2 : (p.z ?? 0) + backplotZOffset,
         motionMode: p.m ?? p.motionMode ?? "G00",
         channelId: p.channelId ?? 0,
       })),
-    [pathPts, mach.isLathe],
+    [pathPts, mach.isLathe, backplotZOffset],
   );
   const backplotCurrentStep = useMemo(() => {
     if (!pathPts.length) return 0;
@@ -4081,21 +4095,18 @@ export default function CNCSimPro() {
     toolPathAnimRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(toolPathAnimRef.current);
   }, [backplotCurrentStep, pathPts.length, isPlaying]);
+  // ms.pos is the single source of truth — updated by both step() and jog().
+  // The path polylines (backplotPathPoints) are the trace lines; the tool
+  // indicator always tracks live machine position so jogging moves it.
   const backplotToolPosition = useMemo(
-    () =>
-      backplotPathPoints[toolPathStep] || {
-        machineX: mach.isLathe ? (ms.pos.Z ?? 0) : (ms.pos.X ?? 0),
-        machineY: mach.isLathe ? 0 : (ms.pos.Y ?? 0),
-        machineZ: mach.isLathe ? (ms.pos.X ?? 0) / 2 : (ms.pos.Z ?? 0),
-      },
-    [
-      backplotPathPoints,
-      toolPathStep,
-      mach.isLathe,
-      ms.pos.X,
-      ms.pos.Y,
-      ms.pos.Z,
-    ],
+    () => ({
+      machineX: mach.isLathe ? (ms.pos.Z ?? 0) : (ms.pos.X ?? 0),
+      machineY: mach.isLathe ? 0 : (ms.pos.Y ?? 0),
+      machineZ: mach.isLathe
+        ? (ms.pos.X ?? 0) / 2
+        : (ms.pos.Z ?? 0) + backplotZOffset,
+    }),
+    [mach.isLathe, ms.pos.X, ms.pos.Y, ms.pos.Z, backplotZOffset],
   );
   const unitScale = ms.units === "inch" ? 25.4 : 1;
   const backplotToolDiameter =
@@ -4112,13 +4123,13 @@ export default function CNCSimPro() {
     () =>
       stock.shape === "cyl"
         ? {
-            length: (stock.length ?? 150) / unitScale,
-            diameter: (stock.diameter ?? 80) / unitScale,
+            length: (stock.length ?? 150) / stockUnitScale,
+            diameter: (stock.diameter ?? 80) / stockUnitScale,
           }
         : {
-            width: (stock.width ?? 100) / unitScale,
-            height: (stock.height ?? 80) / unitScale,
-            depth: (stock.depth ?? 40) / unitScale,
+            width: (stock.width ?? 100) / stockUnitScale,
+            height: (stock.height ?? 80) / stockUnitScale,
+            depth: (stock.depth ?? 40) / stockUnitScale,
           },
     [
       stock.shape,
@@ -4127,23 +4138,23 @@ export default function CNCSimPro() {
       stock.width,
       stock.height,
       stock.depth,
-      unitScale,
+      stockUnitScale,
     ],
   );
   const backplotStockOrigin = useMemo(
     () =>
       stock.shape === "cyl"
         ? {
-            x: (stock.z ?? 0) / unitScale,
+            x: (stock.z ?? 0) / stockUnitScale,
             y: 0,
-            z: (stock.x ?? 0) / unitScale,
+            z: (stock.x ?? 0) / stockUnitScale,
           }
         : {
-            x: (stock.x ?? 0) / unitScale,
-            y: (stock.y ?? 0) / unitScale,
-            z: (stock.z ?? 0) / unitScale,
+            x: (stock.x ?? 0) / stockUnitScale,
+            y: (stock.y ?? 0) / stockUnitScale,
+            z: (stock.z ?? 0) / stockUnitScale,
           },
-    [stock.shape, stock.x, stock.y, stock.z, unitScale],
+    [stock.shape, stock.x, stock.y, stock.z, stock.depth, stockUnitScale],
   );
 
   const moveProjectFile = useCallback(

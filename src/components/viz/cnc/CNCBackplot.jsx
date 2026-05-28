@@ -400,7 +400,7 @@ export default function CNCBackplot({
 
   // Move tool
   useEffect(() => {
-    if (!toolRef.current || pathPoints.length === 0) return;
+    if (!toolRef.current) return;
     if (
       toolPosition &&
       Number.isFinite(toolPosition.machineX) &&
@@ -414,6 +414,7 @@ export default function CNCBackplot({
       );
       return;
     }
+    if (pathPoints.length === 0) return;
     const targetIndex = Math.min(currentStep, pathPoints.length - 1);
     let pt = pathPoints[targetIndex];
     const channelAtStep = pathPoints

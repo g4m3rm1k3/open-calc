@@ -889,6 +889,10 @@ class ChannelState {
     if (!this.modals.feed)
       this.modals.feed = machDef.class === "lathe" ? "G99" : "G94";
     if (!this.modals.motion) this.modals.motion = "G00";
+    if (!this.modals.cutComp) this.modals.cutComp = "G40";
+    if (!this.modals.tlLen) this.modals.tlLen = "G49";
+    if (!this.modals.absInc) this.modals.absInc = "G90";
+    if (!this.modals.workCoord) this.modals.workCoord = "G54";
     // Override plane for lathe
     if (machDef.class === "lathe") this.modals.plane = "G18";
     this.motionMode = this.modals.motion || "G00";
