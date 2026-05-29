@@ -392,8 +392,8 @@ function isSolved(state) {
 }
 
 // ─── Cubie building ──────────────────────────────────────────────────────────
-const CELL = 56
-const GAP = 3
+const CELL = 64
+const GAP = 4
 
 // Get sticker index for a given cubie face
 function getStickerIndex(x, y, z, face) {
@@ -466,7 +466,7 @@ function buildCubies() {
 }
 
 const CUBIES = buildCubies()
-const TOTAL = CELL + GAP // 59px per unit
+const TOTAL = CELL + GAP // 68px per unit
 const HALF = TOTAL // offset to center: positions are -1,0,+1 so center at 0
 
 // ─── Cubie 3D renderer ───────────────────────────────────────────────────────
@@ -727,16 +727,38 @@ export default function RubiksCube() {
         color: '#e0f0ff',
         fontFamily: 'system-ui, sans-serif',
       }}>
-        <div style={{ maxWidth: 720, width: '100%' }}>
+        <div style={{ maxWidth: 780, width: '100%' }}>
+          {/* Step progress */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 32 }}>
+            {['① Story', '② Learn', '③ Play'].map((label, i) => (
+              <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{
+                  padding: '4px 14px', borderRadius: 20, fontSize: 12, fontWeight: 700,
+                  background: i === 0 ? 'rgba(77,208,255,0.2)' : 'rgba(255,255,255,0.05)',
+                  border: i === 0 ? '1px solid rgba(77,208,255,0.5)' : '1px solid rgba(255,255,255,0.1)',
+                  color: i === 0 ? '#4dd0ff' : '#445566',
+                }}>{label}</div>
+                {i < 2 && <span style={{ color: '#334455' }}>→</span>}
+              </div>
+            ))}
+          </div>
+
           {/* Title */}
-          <div style={{ textAlign: 'center', marginBottom: 40 }}>
-            <div style={{ fontSize: 72, marginBottom: 8 }}>🎲</div>
+          <div style={{ textAlign: 'center', marginBottom: 32 }}>
+            <div style={{ fontSize: 64, marginBottom: 8 }}>🎲</div>
             <h1 style={{ fontSize: 36, fontWeight: 900, color: '#fff', margin: '0 0 8px' }}>
               Rubik's Cube
             </h1>
-            <p style={{ color: '#4dd0ff', fontSize: 14, letterSpacing: '0.15em', textTransform: 'uppercase', margin: 0 }}>
+            <p style={{ color: '#4dd0ff', fontSize: 14, letterSpacing: '0.15em', textTransform: 'uppercase', margin: '0 0 16px' }}>
               Group Theory Through Play
             </p>
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+              {['What is a mathematical group?', 'Why order matters in math', 'God\'s Number = 20 moves', 'The "sexy move" commutator'].map(item => (
+                <div key={item} style={{ fontSize: 12, color: '#4dd0ff', background: 'rgba(77,208,255,0.08)', border: '1px solid rgba(77,208,255,0.2)', borderRadius: 20, padding: '3px 12px' }}>
+                  ✓ {item}
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Fact cards */}
@@ -830,11 +852,54 @@ export default function RubiksCube() {
         fontFamily: 'system-ui, sans-serif',
       }}>
         <div style={{ maxWidth: 800, width: '100%' }}>
+          {/* Step progress */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 20 }}>
+            {['① Story', '② Learn', '③ Play'].map((label, i) => (
+              <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{
+                  padding: '4px 14px', borderRadius: 20, fontSize: 12, fontWeight: 700,
+                  background: i === 1 ? 'rgba(77,208,255,0.2)' : 'rgba(255,255,255,0.05)',
+                  border: i === 1 ? '1px solid rgba(77,208,255,0.5)' : '1px solid rgba(255,255,255,0.1)',
+                  color: i === 1 ? '#4dd0ff' : i === 0 ? '#334455' : '#445566',
+                }}>{label}</div>
+                {i < 2 && <span style={{ color: '#334455' }}>→</span>}
+              </div>
+            ))}
+          </div>
           <h2 style={{ textAlign: 'center', fontSize: 28, fontWeight: 900, color: '#fff', marginBottom: 32 }}>
             The Math Behind the Cube
           </h2>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: 20, marginBottom: 40 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 20, marginBottom: 40 }}>
+            {/* Panel 0 — Face Notation (NEW) */}
+            <div style={{ background: 'rgba(255,200,50,0.06)', border: '1px solid rgba(255,200,50,0.2)', borderRadius: 12, padding: 24 }}>
+              <div style={{ color: '#ffd700', fontWeight: 800, fontSize: 13, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 12 }}>
+                Face Notation — Start Here
+              </div>
+              <p style={{ color: '#c0d8e8', fontSize: 13, lineHeight: 1.6, margin: '0 0 12px' }}>
+                Every face of the cube has a single letter. A move rotates that face <strong style={{ color: '#fff' }}>90° clockwise</strong> (viewed from outside). A prime <strong style={{ color: '#ffd700' }}>'</strong> means counter-clockwise. A <strong style={{ color: '#ffd700' }}>2</strong> means 180°.
+              </p>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 12px', marginBottom: 10 }}>
+                {[
+                  { letter: 'U', name: 'Up face', color: '#f0f0f0' },
+                  { letter: 'D', name: 'Down face', color: '#ffcc00' },
+                  { letter: 'R', name: 'Right face', color: '#0066cc' },
+                  { letter: 'L', name: 'Left face', color: '#ff6600' },
+                  { letter: 'F', name: 'Front face', color: '#cc2200' },
+                  { letter: 'B', name: 'Back face', color: '#009933' },
+                ].map(({ letter, name, color }) => (
+                  <div key={letter} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ width: 16, height: 16, background: color, borderRadius: 3, border: '1px solid rgba(0,0,0,0.25)', flexShrink: 0 }} />
+                    <span style={{ fontFamily: 'monospace', color, fontWeight: 800, fontSize: 14 }}>{letter}</span>
+                    <span style={{ color: '#8899aa', fontSize: 12 }}>{name}</span>
+                  </div>
+                ))}
+              </div>
+              <div style={{ borderTop: '1px solid rgba(255,200,50,0.15)', paddingTop: 10, fontFamily: 'monospace', fontSize: 12, color: '#8899aa', lineHeight: 1.8 }}>
+                <span style={{ color: '#ffd700' }}>R</span> = Right CW · <span style={{ color: '#ffd700' }}>R'</span> = Right CCW · <span style={{ color: '#ffd700' }}>R2</span> = Right 180°
+              </div>
+            </div>
+
             {/* Panel 1 */}
             <div style={{ background: 'rgba(77,208,255,0.06)', border: '1px solid rgba(77,208,255,0.2)', borderRadius: 12, padding: 24 }}>
               <div style={{ color: '#4dd0ff', fontWeight: 800, fontSize: 13, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 12 }}>
@@ -931,15 +996,16 @@ export default function RubiksCube() {
     <div style={{
       display: 'flex',
       flexDirection: 'row',
-      minHeight: '100vh',
+      height: '100vh',
+      overflow: 'hidden',
       fontFamily: 'system-ui, sans-serif',
       color: '#e0f0ff',
       gap: 0,
     }}>
       {/* ── LEFT COLUMN (65%) ── */}
-      <div style={{ flex: '0 0 65%', display: 'flex', flexDirection: 'column', padding: '20px 20px 20px 24px', gap: 20 }}>
+      <div style={{ flex: '0 0 65%', display: 'flex', flexDirection: 'column', padding: '20px 20px 20px 24px', gap: 20, overflowY: 'auto', height: '100vh' }}>
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
           <button
             onClick={() => setPhase('intro')}
             style={{ background: 'none', border: '1px solid rgba(77,208,255,0.3)', color: '#4dd0ff', borderRadius: 6, padding: '4px 10px', fontSize: 12, cursor: 'pointer' }}
@@ -952,7 +1018,40 @@ export default function RubiksCube() {
               SOLVED ✓
             </span>
           )}
+          <span style={{ color: '#334455', fontSize: 11, marginLeft: 'auto' }}>Drag cube to rotate view</span>
         </div>
+
+        {/* Face color legend */}
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+          <span style={{ color: '#445566', fontSize: 11, marginRight: 4 }}>Faces:</span>
+          {[
+            { letter: 'U', name: 'Up', color: '#f0f0f0' },
+            { letter: 'R', name: 'Right', color: '#0066cc' },
+            { letter: 'F', name: 'Front', color: '#cc2200' },
+            { letter: 'D', name: 'Down', color: '#ffcc00' },
+            { letter: 'L', name: 'Left', color: '#ff6600' },
+            { letter: 'B', name: 'Back', color: '#009933' },
+          ].map(({ letter, name, color }) => (
+            <div key={letter} style={{ display: 'flex', alignItems: 'center', gap: 4, background: `${color}15`, border: `1px solid ${color}44`, borderRadius: 5, padding: '2px 7px' }}>
+              <div style={{ width: 9, height: 9, background: color, borderRadius: 2, border: '1px solid rgba(0,0,0,0.2)' }} />
+              <span style={{ fontFamily: 'monospace', color, fontWeight: 800, fontSize: 11 }}>{letter}</span>
+              <span style={{ color: '#667788', fontSize: 10 }}>{name}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* First-timer hint */}
+        {history.length === 0 && (
+          <div style={{ background: 'rgba(77,208,255,0.06)', border: '1px solid rgba(77,208,255,0.2)', borderRadius: 8, padding: '10px 16px' }}>
+            <div style={{ color: '#4dd0ff', fontWeight: 700, fontSize: 12, marginBottom: 6 }}>New here? Here's how to start:</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 4, fontSize: 12, color: '#8899aa' }}>
+              <div><span style={{ color: '#fff', fontFamily: 'monospace', fontWeight: 700 }}>R</span> — rotate the Right face 90° clockwise</div>
+              <div><span style={{ color: '#fff', fontFamily: 'monospace', fontWeight: 700 }}>R'</span> — rotate it back (counter-clockwise)</div>
+              <div><span style={{ color: '#ffd700', fontFamily: 'monospace', fontWeight: 700 }}>R U R' U'</span> — the "sexy move" (try it 6×)</div>
+              <div>Hit <strong style={{ color: '#fff' }}>Scramble</strong> to mix it up, then try to solve it!</div>
+            </div>
+          </div>
+        )}
 
         {/* 3D Cube */}
         <div
@@ -962,9 +1061,9 @@ export default function RubiksCube() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            perspective: '800px',
+            perspective: '900px',
             cursor: dragging.current ? 'grabbing' : 'grab',
-            height: 340,
+            height: 420,
             userSelect: 'none',
           }}
         >
@@ -986,7 +1085,10 @@ export default function RubiksCube() {
 
         {/* Move buttons */}
         <div>
-          <div style={{ color: '#4dd0ff', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Moves</div>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 8 }}>
+            <div style={{ color: '#4dd0ff', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Moves</div>
+            <div style={{ color: '#445566', fontSize: 11 }}>Letter = face · no suffix = clockwise · ' = CCW · 2 = 180°</div>
+          </div>
           <MoveButtons onMove={doMove} disabled={scrambling} />
         </div>
 
@@ -1080,10 +1182,57 @@ export default function RubiksCube() {
         flexDirection: 'column',
         gap: 20,
         overflowY: 'auto',
-        minHeight: '100vh',
+        height: '100vh',
       }}>
         <div style={{ color: '#4dd0ff', fontSize: 13, fontWeight: 900, letterSpacing: '0.12em', textTransform: 'uppercase', borderBottom: '1px solid rgba(77,208,255,0.15)', paddingBottom: 8 }}>
           Math Panel
+        </div>
+
+        {/* NOTATION GUIDE */}
+        <div>
+          <div style={{ color: '#ffd700', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>
+            Move Notation
+          </div>
+          <div style={{ background: 'rgba(255,200,50,0.04)', border: '1px solid rgba(255,200,50,0.15)', borderRadius: 8, padding: '10px 12px' }}>
+            {[
+              { mv: 'R / R\'', color: '#0066cc', desc: 'Right face — CW / CCW' },
+              { mv: 'U / U\'', color: '#f0f0f0', desc: 'Up face — CW / CCW' },
+              { mv: 'F / F\'', color: '#cc2200', desc: 'Front face — CW / CCW' },
+              { mv: 'D / D\'', color: '#ffcc00', desc: 'Down face — CW / CCW' },
+              { mv: 'L / L\'', color: '#ff6600', desc: 'Left face — CW / CCW' },
+              { mv: 'B / B\'', color: '#009933', desc: 'Back face — CW / CCW' },
+            ].map(({ mv, color, desc }) => (
+              <div key={mv} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                <div style={{ width: 8, height: 8, background: color, borderRadius: 2, flexShrink: 0 }} />
+                <span style={{ fontFamily: 'monospace', color, fontWeight: 700, fontSize: 11, minWidth: 44 }}>{mv}</span>
+                <span style={{ color: '#8899aa', fontSize: 11 }}>{desc}</span>
+              </div>
+            ))}
+            <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', marginTop: 6, paddingTop: 6, color: '#556677', fontSize: 10 }}>
+              Clockwise = as seen looking straight at that face from outside the cube
+            </div>
+          </div>
+        </div>
+
+        {/* GUIDED EXPERIMENTS */}
+        <div>
+          <div style={{ color: '#c084fc', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>
+            Try These Experiments
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {[
+              { label: 'Order of R', steps: 'Press R exactly 4 times', insight: 'Back to solved! R has order 4 in the group.', color: '#0066cc' },
+              { label: 'The Sexy Move', steps: 'Press R, U, R\', U\' — repeat 6 times', insight: '[R,U] is a commutator with order 6.', color: '#c084fc' },
+              { label: 'Non-commutativity', steps: 'Try R then U. Reset. Try U then R.', insight: 'Different results — order matters, just like matrix multiplication.', color: '#ff8844' },
+              { label: 'Identity element', steps: 'Press R then R\'', insight: 'You\'re back to start. R\' is the inverse of R.', color: '#4dd0ff' },
+            ].map(({ label, steps, insight, color }) => (
+              <div key={label} style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid ${color}33`, borderRadius: 6, padding: '7px 10px' }}>
+                <div style={{ color, fontSize: 11, fontWeight: 700, marginBottom: 2 }}>{label}</div>
+                <div style={{ color: '#c0d8e8', fontSize: 11 }}>{steps}</div>
+                <div style={{ color: '#556677', fontSize: 10, fontStyle: 'italic', marginTop: 2 }}>{insight}</div>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* LAST MOVE */}
@@ -1093,20 +1242,25 @@ export default function RubiksCube() {
           </div>
           {lastMove ? (
             <div style={{ background: 'rgba(77,208,255,0.05)', border: '1px solid rgba(77,208,255,0.15)', borderRadius: 8, padding: 12 }}>
-              <div style={{ fontFamily: 'monospace', fontSize: 24, fontWeight: 900, color: '#fff', marginBottom: 8 }}>
-                {lastMove}
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 8 }}>
+                <div style={{ fontFamily: 'monospace', fontSize: 24, fontWeight: 900, color: '#fff' }}>{lastMove}</div>
+                <div style={{ color: '#6688aa', fontSize: 12 }}>
+                  {lastMove.endsWith("'") ? 'counter-clockwise' : lastMove.endsWith('2') ? '180°' : 'clockwise'}
+                  {' · '}{lastMove[0] === 'U' ? 'top' : lastMove[0] === 'D' ? 'bottom' : lastMove[0] === 'R' ? 'right' : lastMove[0] === 'L' ? 'left' : lastMove[0] === 'F' ? 'front' : 'back'} face
+                </div>
               </div>
-              <div style={{ color: '#6688aa', fontSize: 11, marginBottom: 6 }}>
-                Permutation cycles (affects {lastMoveCycles.length * 4} stickers):
+              <div style={{ color: '#6688aa', fontSize: 11, marginBottom: 4 }}>
+                Permutation cycles — moves {lastMoveCycles.length * 4} stickers in {lastMoveCycles.length} independent 4-cycles:
               </div>
               {lastMoveCycles.slice(0, 5).map((c, i) => (
                 <div key={i} style={{ fontFamily: 'monospace', fontSize: 11, color: '#4dd0ff', lineHeight: 1.7 }}>
-                  [{c.join(' → ')}]
+                  ({c.join(' → ')})
                 </div>
               ))}
+              <div style={{ color: '#445566', fontSize: 10, marginTop: 4 }}>Numbers are sticker indices (0–53) in the internal state array</div>
             </div>
           ) : (
-            <div style={{ color: '#445566', fontSize: 12 }}>Apply a move to see its permutation</div>
+            <div style={{ color: '#445566', fontSize: 12 }}>Apply a move to see its permutation cycles in the group</div>
           )}
         </div>
 
@@ -1187,20 +1341,29 @@ export default function RubiksCube() {
           {rxuResult && (rxuResult.ru || rxuResult.ur) && (
             <div style={{ background: 'rgba(255,136,68,0.06)', border: '1px solid rgba(255,136,68,0.2)', borderRadius: 8, padding: 10 }}>
               {rxuResult.ru && rxuResult.ur && (
-                <>
-                  <div style={{ color: '#ff8844', fontWeight: 700, fontSize: 12, marginBottom: 4 }}>
-                    R∘U ≠ U∘R
+                <div>
+                  <div style={{ color: '#ff8844', fontWeight: 700, fontSize: 13, marginBottom: 6 }}>
+                    R∘U ≠ U∘R ✓ Confirmed!
                   </div>
-                  <div style={{ color: '#8899aa', fontSize: 11 }}>
-                    The two operations produce different cube states — just like AB ≠ BA for matrices.
+                  <div style={{ color: '#c0d8e8', fontSize: 12, marginBottom: 8, lineHeight: 1.5 }}>
+                    The two operations produce <strong style={{ color: '#fff' }}>different cube states</strong> — just like matrix multiplication where AB ≠ BA in general.
                   </div>
-                  <div style={{ fontFamily: 'monospace', fontSize: 10, color: '#556677', marginTop: 6 }}>
-                    First 9 stickers R∘U: {rxuResult.ru.slice(0,9).join(',')}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                    <div style={{ background: 'rgba(77,208,255,0.08)', borderRadius: 6, padding: '6px 8px', textAlign: 'center' }}>
+                      <div style={{ color: '#4dd0ff', fontSize: 11, fontWeight: 700, marginBottom: 3 }}>R then U</div>
+                      <div style={{ fontFamily: 'monospace', fontSize: 10, color: '#667788' }}>
+                        U-face: {rxuResult.ru.slice(0,9).join(' ')}
+                      </div>
+                    </div>
+                    <div style={{ background: 'rgba(255,136,68,0.08)', borderRadius: 6, padding: '6px 8px', textAlign: 'center' }}>
+                      <div style={{ color: '#ff8844', fontSize: 11, fontWeight: 700, marginBottom: 3 }}>U then R</div>
+                      <div style={{ fontFamily: 'monospace', fontSize: 10, color: '#667788' }}>
+                        U-face: {rxuResult.ur.slice(0,9).join(' ')}
+                      </div>
+                    </div>
                   </div>
-                  <div style={{ fontFamily: 'monospace', fontSize: 10, color: '#556677' }}>
-                    First 9 stickers U∘R: {rxuResult.ur.slice(0,9).join(',')}
-                  </div>
-                </>
+                  <div style={{ color: '#445566', fontSize: 10, marginTop: 6 }}>U-face stickers differ between the two — they are not equal</div>
+                </div>
               )}
               {!(rxuResult.ru && rxuResult.ur) && (
                 <div style={{ color: '#8899aa', fontSize: 11 }}>Try both buttons to compare results</div>
