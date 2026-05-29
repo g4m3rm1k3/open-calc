@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useEffect } from 'react'
+import { FlaskConical, Play, Sparkles } from 'lucide-react'
+import LabWorkbenchBackground from '../components/labs/LabWorkbenchBackground.jsx'
 
 const LABS = [
   {
@@ -68,33 +70,33 @@ const LABS = [
 ]
 
 const BG = {
-  indigo:  'bg-indigo-50 dark:bg-indigo-950/30 border-indigo-200 dark:border-indigo-800 hover:border-indigo-400 dark:hover:border-indigo-600',
-  amber:   'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800 hover:border-amber-400 dark:hover:border-amber-600',
-  violet:  'bg-violet-50 dark:bg-violet-950/30 border-violet-200 dark:border-violet-800 hover:border-violet-400 dark:hover:border-violet-600',
-  cyan:    'bg-cyan-50 dark:bg-cyan-950/30 border-cyan-200 dark:border-cyan-800 hover:border-cyan-400 dark:hover:border-cyan-600',
-  fuchsia: 'bg-fuchsia-50 dark:bg-fuchsia-950/30 border-fuchsia-200 dark:border-fuchsia-800 hover:border-fuchsia-400 dark:hover:border-fuchsia-600',
-  slate:   'bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500',
-  emerald: 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800 hover:border-emerald-400 dark:hover:border-emerald-600',
+  indigo:  'bg-indigo-950/50 border-indigo-300/25 hover:border-indigo-200/70 hover:shadow-indigo-500/20',
+  amber:   'bg-amber-950/40 border-amber-300/25 hover:border-amber-200/70 hover:shadow-amber-500/20',
+  violet:  'bg-violet-950/45 border-violet-300/25 hover:border-violet-200/70 hover:shadow-violet-500/20',
+  cyan:    'bg-cyan-950/45 border-cyan-300/25 hover:border-cyan-200/70 hover:shadow-cyan-500/20',
+  fuchsia: 'bg-fuchsia-950/45 border-fuchsia-300/25 hover:border-fuchsia-200/70 hover:shadow-fuchsia-500/20',
+  slate:   'bg-slate-950/55 border-slate-300/20 hover:border-slate-200/60 hover:shadow-slate-500/20',
+  emerald: 'bg-emerald-950/45 border-emerald-300/25 hover:border-emerald-200/70 hover:shadow-emerald-500/20',
 }
 
 const LABEL = {
-  indigo:  'text-indigo-700 dark:text-indigo-300',
-  amber:   'text-amber-700 dark:text-amber-300',
-  violet:  'text-violet-700 dark:text-violet-300',
-  cyan:    'text-cyan-700 dark:text-cyan-300',
-  fuchsia: 'text-fuchsia-700 dark:text-fuchsia-300',
-  slate:   'text-slate-700 dark:text-slate-300',
-  emerald: 'text-emerald-700 dark:text-emerald-300',
+  indigo:  'text-indigo-100',
+  amber:   'text-amber-100',
+  violet:  'text-violet-100',
+  cyan:    'text-cyan-100',
+  fuchsia: 'text-fuchsia-100',
+  slate:   'text-slate-100',
+  emerald: 'text-emerald-100',
 }
 
 const TAG = {
-  indigo:  'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400',
-  amber:   'bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400',
-  violet:  'bg-violet-100 dark:bg-violet-900/40 text-violet-600 dark:text-violet-400',
-  cyan:    'bg-cyan-100 dark:bg-cyan-900/40 text-cyan-600 dark:text-cyan-400',
-  fuchsia: 'bg-fuchsia-100 dark:bg-fuchsia-900/40 text-fuchsia-600 dark:text-fuchsia-400',
-  slate:   'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400',
-  emerald: 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400',
+  indigo:  'bg-indigo-300/15 text-indigo-100 ring-1 ring-indigo-100/20',
+  amber:   'bg-amber-300/15 text-amber-100 ring-1 ring-amber-100/20',
+  violet:  'bg-violet-300/15 text-violet-100 ring-1 ring-violet-100/20',
+  cyan:    'bg-cyan-300/15 text-cyan-100 ring-1 ring-cyan-100/20',
+  fuchsia: 'bg-fuchsia-300/15 text-fuchsia-100 ring-1 ring-fuchsia-100/20',
+  slate:   'bg-slate-300/15 text-slate-100 ring-1 ring-slate-100/20',
+  emerald: 'bg-emerald-300/15 text-emerald-100 ring-1 ring-emerald-100/20',
 }
 
 function LabCard({ item, action }) {
@@ -103,7 +105,7 @@ function LabCard({ item, action }) {
   const tag = TAG[item.color]   ?? TAG.slate
 
   const inner = (
-    <div className={`group flex flex-col rounded-2xl border p-5 h-full transition-all hover:shadow-md ${bg}`}>
+    <div className={`group flex h-full flex-col rounded-[8px] border p-5 text-white shadow-2xl shadow-black/20 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl ${bg}`}>
       <div className="flex items-start justify-between mb-3">
         <span className="text-3xl leading-none">{item.emoji}</span>
         <div className="flex flex-wrap gap-1 justify-end">
@@ -116,12 +118,13 @@ function LabCard({ item, action }) {
       </div>
 
       <span className={`text-sm font-bold mb-1 ${lbl}`}>{item.label}</span>
-      <p className="text-sm text-slate-600 dark:text-slate-400 leading-snug flex-1 mb-4">
+      <p className="text-sm text-slate-200/78 leading-snug flex-1 mb-4">
         {item.desc}
       </p>
 
-      <span className={`text-xs font-semibold group-hover:opacity-100 opacity-60 transition-opacity ${lbl}`}>
-        Launch →
+      <span className={`inline-flex items-center gap-1.5 text-xs font-semibold opacity-70 transition-opacity group-hover:opacity-100 ${lbl}`}>
+        <Play className="h-3.5 w-3.5" />
+        Launch
       </span>
     </div>
   )
@@ -148,18 +151,33 @@ export default function LabsPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto">
-      <div className="mb-10">
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">Labs</h1>
-        <p className="text-slate-500 dark:text-slate-400">
-          Hands-on simulations and interactive tools — experiment, model, and build.
-        </p>
-      </div>
+    <div className="relative min-h-[calc(100vh-9rem)] text-white">
+      <LabWorkbenchBackground />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {LABS.map(lab => (
-          <LabCard key={lab.key} item={lab} action={() => launch(lab.event)} />
-        ))}
+      <div className="relative z-10 mx-auto max-w-5xl pt-6 sm:pt-10">
+        <div className="mb-10 max-w-3xl">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-[8px] border border-emerald-200/20 bg-emerald-300/10 px-3 py-2 text-xs font-black uppercase tracking-[0.22em] text-emerald-100 backdrop-blur-md">
+            <FlaskConical className="h-4 w-4" />
+            Labs
+          </div>
+          <h1 className="mb-4 text-4xl font-black leading-tight text-white sm:text-6xl">
+            Live simulations with the engine humming underneath.
+          </h1>
+          <p className="max-w-2xl text-base leading-7 text-slate-100/76 sm:text-lg">
+            Hands-on simulations and interactive tools for experimenting, modeling, and building.
+          </p>
+        </div>
+
+        <div className="mb-5 flex items-center gap-2 text-sm font-semibold text-emerald-100/80">
+          <Sparkles className="h-4 w-4" />
+          <span>Interactive 3D lab backdrop active</span>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 pb-16 sm:grid-cols-2 lg:grid-cols-3">
+          {LABS.map(lab => (
+            <LabCard key={lab.key} item={lab} action={() => launch(lab.event)} />
+          ))}
+        </div>
       </div>
     </div>
   )
