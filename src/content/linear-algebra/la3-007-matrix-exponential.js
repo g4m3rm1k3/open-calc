@@ -54,6 +54,11 @@ export default {
         body: "**Previous (Lesson 6):** Cayley-Hamilton Theorem — matrices satisfy their own characteristic polynomial.\n**This lesson:** Matrix Exponential — $e^{At}$ solves $\\dot{\\mathbf{x}} = A\\mathbf{x}$; connection to eigenvalues via diagonalization.\n**Next (Chapter 4):** Orthogonal Projections — projecting vectors onto subspaces; the foundation of least squares.",
       },
       {
+        type: "procedure",
+        title: "Procedure: Compute e^(At) and Solve the ODE",
+        body: "Step 1. **Find eigenvalues and eigenvectors.** Compute $\\det(A - \\lambda I) = 0$ for eigenvalues, then find eigenvectors $\\mathbf{v}_i$ for each $\\lambda_i$.\n\nStep 2. **Diagonalize.** Form $P = [\\mathbf{v}_1 \\mid \\cdots \\mid \\mathbf{v}_n]$ and $D = \\text{diag}(\\lambda_1, \\ldots, \\lambda_n)$. Verify $A = PDP^{-1}$.\n\nStep 3. **Exponentiate the diagonal.** $e^{Dt} = \\text{diag}(e^{\\lambda_1 t}, \\ldots, e^{\\lambda_n t})$.\n\nStep 4. **Transform back.** $e^{At} = P e^{Dt} P^{-1}$.\n\nStep 5. **Apply initial condition.** $\\mathbf{x}(t) = e^{At} \\mathbf{x}_0$. Expand as $c_1 e^{\\lambda_1 t} \\mathbf{v}_1 + \\cdots$ where $c_i$ match $\\mathbf{x}_0 = P\\mathbf{c}$.\n\nStep 6. **Check stability.** All $\\text{Re}(\\lambda_i) < 0$ → asymptotically stable (all solutions → 0). Any $\\text{Re}(\\lambda_i) > 0$ → unstable.",
+      },
+      {
         type: "warning",
         title: "Commutativity Is Required for $e^{A+B} = e^A e^B$",
         body: "In general, $e^{A+B} \\neq e^A e^B$ unless $AB = BA$. This fails for most pairs of matrices. The Baker-Campbell-Hausdorff formula gives the correction terms involving commutators $[A,B] = AB - BA$.",
@@ -74,7 +79,8 @@ export default {
               cellTitle:
                 "Stable system: all eigenvalues have negative real part",
               prose: [
-                "A = [-1 2; -2 -1]: complex eigenvalues -1 +/- 2i => decaying spiral.",
+                "Call `eig(A)` to get eigenvalues. The diagonal of $D$ will be complex: $-1 \\pm 2i$. Extract real and imaginary parts with `real(eigenvalues)` and `imag(eigenvalues)`. Verify with `exp(trace(A))` — this equals `det(e^A)` by Liouville's formula.",
+                "Negative real parts ($-1$) confirm stability; nonzero imaginary parts ($\\pm 2$) confirm oscillation. The `det(e^A) = e^{\\text{tr}(A)} = e^{-2}$ check is a quick sanity test — if your computed `det(expm(A))` doesn't match `exp(trace(A))`, something is wrong with your exponential computation.",
               ],
               code: `A = [-1 2; -2 -1]
 [V, D] = eig(A)
@@ -91,7 +97,8 @@ exp(trace(A))
               id: 2,
               cellTitle: "Computing e^(At) via diagonalization",
               prose: [
-                "If A = PDP^{-1}, then e^(At) = P * diag(e^{d1*t}, e^{d2*t}) * P^{-1}.",
+                "Call `[P, D] = eig(A)` to diagonalize. Form `eDt = diag(exp(diag(D) * t))` — this exponentiates each diagonal entry of $D$ independently. Then `eAt_diag = P * eDt * inv(P)` applies the similarity transform to get $e^{At}$. Verify at $t=0$: the result should be the identity matrix.",
+                "Why does `diag(exp(diag(D)*t))` work? Because $e^{Dt} = \\text{diag}(e^{\\lambda_1 t}, e^{\\lambda_2 t})$ — the power series for a diagonal matrix collapses to independent scalar exponentials for each entry. This is exact, not an approximation. Take the real part of the result since the imaginary parts cancel (the original matrix $A$ is real).",
               ],
               code: `A = [-1 2; -2 -1]
 [P, D] = eig(A)
@@ -115,7 +122,8 @@ eAt0 = real(P * eDt0 * inv(P))
               id: 3,
               cellTitle: "ODE trajectory: x(t) = e^(At) * x0",
               prose: [
-                "Solve dx/dt = Ax, x(0) = [2; 0] and sample the trajectory at t = 0, 0.5, 1, 2.",
+                "For each time step in `times = [0, 0.5, 1.0, 2.0]`, compute `eAt = real(P * diag(exp(diag(D)*t)) * inv(P))` and then `xt = eAt * x0`. The loop prints the state vector at each time, showing how both components change.",
+                "Watch the numbers: at $t=0$, $\\mathbf{x} = [2; 0] = \\mathbf{x}_0$. By $t=2$, both components are near zero — the decaying spiral has brought the trajectory to the origin. The complex eigenvalues $-1 \\pm 2i$ predict decay with time constant $1/|{-1}| = 1$ second and oscillation period $2\\pi/2 \\approx 3.14$ seconds.",
               ],
               code: `A = [-1 2; -2 -1]
 x0 = [2; 0]
@@ -174,8 +182,10 @@ end
             {
               id: 1,
               cellTitle: "Computing e^A — power series vs scipy",
-              prose:
-                "scipy.linalg.expm(A) uses PadÃ© approximation + scaling-and-squaring — more accurate than summing the power series directly. Verify: det(e^A) = e^trace(A). Also: e^A @ e^(-A) = I.",
+              prose: [
+                "Use `expm(A)` from `scipy.linalg` to compute the matrix exponential. Compare against the exact result for a diagonal matrix: `eA_exact = np.diag([np.exp(-1), np.exp(-2)])`. Verify Liouville: `np.linalg.det(eA)` should equal `np.exp(np.trace(A))`. The left plot shows $\\|e^{tA}\\|$ decreasing as $t$ grows.",
+                "The norm of $e^{tA}$ decays because both eigenvalues of $A$ are negative. When the eigenvalues are $\\lambda_1, \\lambda_2$, the dominant norm behavior is $\\sim e^{\\max(\\lambda_i) t}$. The heat map (right plot) shows the entries of $e^A$ at $t=1$ — note the off-diagonal entries are zero since $A$ is diagonal, making $e^A$ diagonal too.",
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 from scipy.linalg import expm
@@ -211,8 +221,10 @@ plt.show()`,
             {
               id: 2,
               cellTitle: "ODE trajectory: x(t) = e^(At) x₀",
-              prose:
-                "The exact solution to dx/dt = Ax with x(0) = x₀ is x(t) = e^(At) x₀. Compare with numerical ODE solver (scipy.integrate.odeint) to verify.",
+              prose: [
+                "Set $A = [[0,-1],[1,0]]$ (the rotation generator) and $\\mathbf{x}_0 = [1,0]$. Compute `traj = [expm(t*A) @ x0 for t in ts]` over one full period $t \\in [0, 2\\pi]$. The left panel plots the phase-space trajectory $x_2$ vs $x_1$; the right panel shows both components as functions of $t$.",
+                "The rotation generator $A = [[0,-1],[1,0]]$ has eigenvalues $\\pm i$, so $e^{At}$ is a rotation by angle $t$. The trajectory is a perfect circle: $x_1(t) = \\cos(t)$, $x_2(t) = \\sin(t)$. Check: `expm(np.pi/2 * A) @ x0` rotates $[1,0]$ by 90° to $[0,1]$, and `expm(np.pi * A) @ x0` gives $[-1,0]$ ✓.",
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 from scipy.linalg import expm
@@ -247,8 +259,10 @@ plt.show()`,
             {
               id: 3,
               cellTitle: "CNC servo drive stability analysis",
-              prose:
-                "A CNC axis servo: state = [position, velocity], A encodes the physics. Eigenvalues with negative real part → stable (position tracks command). Positive real part → runaway axis. Servo tuning adjusts damping coefficient to find the stability boundary.",
+              prose: [
+                "Loop over damping ratios $\\zeta \\in \\{0, 0.3, 0.5, 0.7, 1.0, 1.5, 2.0\\}$. For each, build the second-order state matrix $A = [[0,1],[-\\omega^2, -2\\zeta\\omega]]$ and compute `np.linalg.eigvals(A)`. Print the real and imaginary parts of the eigenvalue and whether all real parts are negative.",
+                "Reading the table column by column: at $\\zeta = 0$ the real part is 0 — marginally stable (pure oscillation, `stable=False`). For any $\\zeta > 0$, the real part is $-\\zeta\\omega < 0$ — asymptotically stable. The settling time $\\approx 2/|\\text{Re}(\\lambda)|$ is longest near critical damping ($\\zeta = 1$) but without oscillation; for $\\zeta > 1$ (overdamped), settling is pure exponential decay.",
+              ],
               code: `import numpy as np
 from scipy.linalg import expm
 
@@ -282,6 +296,7 @@ print("Settling time ~ 2/|Re(lam)| seconds")`,
       "**Spectral mapping theorem.** If $A = PDP^{-1}$ (diagonalizable), then $e^A = Pe^D P^{-1}$, and the eigenvalues of $e^A$ are exactly $\\{e^\\lambda : \\lambda \\in \\text{spec}(A)\\}$. More generally, for any analytic function $f$, $f(A)$ has eigenvalues $\\{f(\\lambda) : \\lambda \\in \\text{spec}(A)\\}$. This is the spectral mapping theorem.",
       "**Matrix logarithm.** The inverse of the matrix exponential (when it exists) is the matrix logarithm. $\\log(e^A) = A$ for matrices near 0. The logarithm exists for all invertible matrices near $I$, but may not be unique (the complex logarithm is multi-valued). Applications: computing rotations in robotics (Lie algebras), interpolating between rotations in animation and computer vision.",
       "**Fundamental matrix solutions.** For a system $\\dot{\\mathbf{x}} = A\\mathbf{x}$, the **fundamental matrix** $\\Phi(t) = e^{At}$ satisfies $\\dot{\\Phi} = A\\Phi$ and $\\Phi(0) = I$. The general solution is $\\mathbf{x}(t) = \\Phi(t)\\mathbf{x}_0$. For non-autonomous systems $\\dot{\\mathbf{x}} = A(t)\\mathbf{x}$, a fundamental matrix still exists but is not simply $e^{\\int A\\,dt}$ unless $A(t)$ commutes with itself at different times.",
+      "**Sylvester's formula and functions of matrices.** For a diagonalizable matrix $A$ with distinct eigenvalues $\\lambda_1, \\ldots, \\lambda_n$, any analytic function $f(A)$ can be written as $f(A) = \\sum_{i=1}^n f(\\lambda_i) Z_i$ where $Z_i = \\prod_{j \\neq i} \\frac{A - \\lambda_j I}{\\lambda_i - \\lambda_j}$ are the **spectral projectors** satisfying $Z_i Z_j = 0$ for $i \\neq j$ and $\\sum Z_i = I$. For the matrix exponential: $e^{At} = \\sum_i e^{\\lambda_i t} Z_i$. This is Sylvester's formula — it makes the dependence of $e^{At}$ on both the eigenvalues and the initial condition completely explicit, and generalizes to any analytic function: $\\sin(A)$, $\\log(A)$, $A^{1/2}$, etc.",
     ],
     callouts: [
       {
@@ -481,6 +496,31 @@ print("Settling time ~ 2/|Re(lam)| seconds")`,
       ],
       answer:
         "Asymptotically stable for all ζ > 0, ω > 0. Underdamped (ζ < 1): decaying oscillation. Critically/overdamped (ζ ≥ 1): pure decay without oscillation.",
+    },
+    {
+      id: "ch-la3-007-3",
+      difficulty: "hard",
+      problem: "For the Jordan block $A = \\begin{bmatrix}-1&1\\\\0&-1\\end{bmatrix}$, compute $e^{At}$ using the decomposition $A = -I + N$ where $N = [[0,1],[0,0]]$. Then write the ODE solution from $\\mathbf{x}_0 = [0,1]^\\top$ and identify the $t e^{\\lambda t}$ term.",
+      hint: "Decompose A into scalar and nilpotent parts. Since $-I$ and $N$ commute, $e^{At} = e^{-It} e^{Nt}$. Use $N^2 = 0$ to truncate the series.",
+      walkthrough: [
+        {
+          expression: "A = -I + N, \\quad N = \\begin{bmatrix}0&1\\\\0&0\\end{bmatrix}, \\quad N^2 = 0",
+          annotation: "Decompose: the scalar part $-I$ commutes with everything, enabling $e^{At} = e^{-It} e^{Nt}$.",
+        },
+        {
+          expression: "e^{Nt} = I + Nt = \\begin{bmatrix}1&t\\\\0&1\\end{bmatrix}",
+          annotation: "Since $N^2 = 0$, the series terminates: $e^{Nt} = I + Nt + N^2t^2/2! + \\cdots = I + Nt$.",
+        },
+        {
+          expression: "e^{At} = e^{-t} \\begin{bmatrix}1&t\\\\0&1\\end{bmatrix}",
+          annotation: "$e^{-It} = e^{-t}I$ (scalar). Combined: $e^{At} = e^{-t}(I + Nt)$.",
+        },
+        {
+          expression: "\\mathbf{x}(t) = e^{At}\\mathbf{x}_0 = e^{-t}\\begin{bmatrix}1&t\\\\0&1\\end{bmatrix}\\begin{bmatrix}0\\\\1\\end{bmatrix} = e^{-t}\\begin{bmatrix}t\\\\1\\end{bmatrix}",
+          annotation: "$x_1(t) = te^{-t}$ — the classical $te^{\\lambda t}$ Jordan term. The system is stable ($\\lambda = -1 < 0$) so this decays to 0 despite the polynomial factor.",
+        },
+      ],
+      answer: "$e^{At} = e^{-t}\\begin{bmatrix}1&t\\\\0&1\\end{bmatrix}$. From $\\mathbf{x}_0 = [0,1]^T$: $\\mathbf{x}(t) = e^{-t}[t, 1]^T$. The $te^{-t}$ term peaks at $t=1$ then decays — stable Jordan mode.",
     },
   ],
 
@@ -775,22 +815,14 @@ print("Settling time ~ 2/|Re(lam)| seconds")`,
     {
       situation:
         "You need to simulate a CNC servo axis responding to a step command — modeling position and velocity over time.",
-      competingTechniques: [
-        "Numerical ODE solver (Euler, Runge-Kutta)",
-        "Laplace transforms",
-        "Matrix exponential solution",
-      ],
+      competingTechniques: "Numerical ODE solver (Euler, Runge-Kutta), Laplace transforms, or matrix exponential solution.",
       whyThisTechniqueWins:
         "The matrix exponential gives the exact closed-form solution $\\mathbf{x}(t) = e^{At}\\mathbf{x}_0$ at any time $t$, no discretization error. You can directly read off the settling time ($\\approx 2/|\\text{Re}(\\lambda)|$) and oscillation frequency ($\\text{Im}(\\lambda)/2\\pi$) from the eigenvalues without running the simulation.",
     },
     {
       situation:
         "In quantum mechanics, you need to compute the state of a two-level system at time $t$ given initial state $|\\psi_0\\rangle$ and Hamiltonian $H$.",
-      competingTechniques: [
-        "Numerical integration of SchrÃ¶dinger equation",
-        "Perturbation theory",
-        "Exact matrix exponential",
-      ],
+      competingTechniques: "Numerical integration of the Schrödinger equation, perturbation theory, or exact matrix exponential.",
       whyThisTechniqueWins:
         "The time-evolution operator is exactly $U(t) = e^{-iHt/\\hbar}$ — a matrix exponential. For small matrices (qubits), this is exact and efficient. The eigenvalues of $H$ give the energy levels; their differences give the oscillation frequencies in the solution.",
     },
@@ -829,5 +861,33 @@ print("Settling time ~ 2/|Re(lam)| seconds")`,
       "Catch entry-wise exponentiation vs. matrix exponentiation; catch confusing discrete (|λ|<1) and continuous (Re λ<0) stability criteria; catch incorrect commutator claims.",
     transferToUnfamiliar:
       "Analyze stability of a physical system from its state matrix; compute $e^{At}$ for a Jordan block system; apply the spectral mapping theorem to a new matrix function.",
+  },
+
+  semantics: {
+    core: [
+      { symbol: "e^{At}", meaning: "Matrix exponential: the $n\\times n$ matrix $\\sum_{k=0}^\\infty \\frac{(At)^k}{k!} = I + At + A^2t^2/2! + \\cdots$; the unique solution operator satisfying $\\frac{d}{dt}e^{At} = Ae^{At}$ and $e^{A\\cdot 0} = I$." },
+      { symbol: "\\mathbf{x}(t) = e^{At}\\mathbf{x}_0", meaning: "Exact solution to the ODE $\\dot{\\mathbf{x}} = A\\mathbf{x}$ with initial condition $\\mathbf{x}(0) = \\mathbf{x}_0$." },
+      { symbol: "\\text{Re}(\\lambda) < 0", meaning: "Continuous-time stability criterion: all solutions decay to zero iff the real parts of all eigenvalues of $A$ are negative." },
+      { symbol: "\\det(e^A) = e^{\\text{tr}(A)}", meaning: "Liouville's formula: the determinant of $e^A$ equals $e^{\\text{tr}(A)}$; implies $e^A$ is always invertible." },
+      { symbol: "e^{At} = Pe^{Dt}P^{-1}", meaning: "Diagonalization formula: if $A = PDP^{-1}$, compute $e^{At}$ by exponentiating the diagonal entries of $D$ and conjugating back with $P$." },
+    ],
+    rulesOfThumb: [
+      "Stability test: compute all eigenvalues; if any $\\text{Re}(\\lambda) > 0$, the system is unstable; if all $\\text{Re}(\\lambda) < 0$, every solution decays to zero.",
+      "$e^{A+B} = e^A e^B$ only when $AB = BA$ — never assume this rule holds without checking commutativity.",
+      "For Jordan blocks: $e^{J_k(\\lambda)t} = e^{\\lambda t}(I + Nt + N^2t^2/2! + \\cdots)$ terminates at $N^{k-1}$ since $N^k = 0$.",
+      "Use `scipy.linalg.expm(A)` or `expm(A)` (MATLAB) — never entry-wise `np.exp(A)` or `exp(A)`, which compute something completely different.",
+      "Settling time of a stable mode is roughly $2/|\\text{Re}(\\lambda)|$ — larger magnitude real part means faster settling.",
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: [
+      { id: "la3-001", reason: "Review eigenvalues and eigenvectors — the ODE solution $c_1 e^{\\lambda_1 t}\\mathbf{v}_1 + \\cdots$ is built directly from eigenpairs." },
+      { id: "la3-002", reason: "Review diagonalization $A = PDP^{-1}$ — the formula $e^{At} = Pe^{Dt}P^{-1}$ is diagonalization applied to the exponential." },
+    ],
+    futureLinks: [
+      { id: "la4-001", preview: "Orthogonal projections: the singular values of $e^{At}$ are $e^{\\sigma_i t}$ where $\\sigma_i$ are the singular values of $At$ — connecting the matrix exponential to the SVD of Chapter 4." },
+      { id: "la3-004", preview: "Jordan normal form: non-diagonalizable matrices produce $t^k e^{\\lambda t}$ solution modes, computed through Jordan blocks as $e^{J_k(\\lambda)t} = e^{\\lambda t}(I + Nt + \\cdots)$." },
+    ],
   },
 };

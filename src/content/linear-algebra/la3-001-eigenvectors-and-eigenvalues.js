@@ -36,6 +36,11 @@
         body: '**Previous (Chapter 2):** Null Space and Column Space — what a matrix destroys and what it can reach.\n**This lesson:** Eigenvectors and eigenvalues — the invariant directions and scaling factors of a transformation.\n**Next (Lesson 2):** Diagonalization — rebuilding coordinates around eigenvectors so the matrix becomes trivially simple.',
       },
       {
+        type: 'procedure',
+        title: 'Procedure: Find All Eigenvalues and Eigenvectors',
+        body: 'Step 1. Form $(A - \\lambda I)$ by subtracting $\\lambda$ from each diagonal entry of $A$.\nStep 2. Compute $\\det(A - \\lambda I)$ to get the characteristic polynomial (degree $n$).\nStep 3. Solve $\\det(A - \\lambda I) = 0$ — the roots are the eigenvalues $\\lambda_1, \\lambda_2, \\ldots$\nStep 4. For each eigenvalue $\\lambda_k$: row-reduce $(A - \\lambda_k I)$ and find the null space. Every non-zero vector in that null space is an eigenvector for $\\lambda_k$.\nStep 5. Sanity-check: $\\sum \\lambda_i = \\text{tr}(A)$ and $\\prod \\lambda_i = \\det(A)$.',
+      },
+      {
         type: 'insight',
         title: 'The Defining Equation',
         body: 'A\\mathbf{v} = \\lambda\\mathbf{v}\n\n$\\mathbf{v}$ is the eigenvector (a non-zero vector). $\\lambda$ is the eigenvalue (a scalar — positive means stretching in that direction, negative means flipping, zero means the vector gets squished to the origin).',
@@ -97,7 +102,10 @@
             {
               id: 1,
               cellTitle: 'eig() — computing and verifying eigenpairs',
-              prose: '`[V, D] = eig(A)` returns eigenvectors as columns of V, eigenvalues on the diagonal of D. Verify the defining equation Av = λv for each pair. Also check: trace = sum of eigenvalues, det = product.',
+              prose: [
+                '`[V, D] = eig(A)` returns two outputs: V is the matrix of eigenvectors (each column is one eigenvector), and D is a diagonal matrix with the eigenvalues on the diagonal. `lambda = diag(D)` extracts them as a vector. The loop checks the defining equation $Av = \\lambda v$ for each pair: `A*v` should equal `lam*v` to within floating-point precision.',
+                'The sanity checks `trace(A) == sum(lambda)` and `det(A) == prod(lambda)` follow from the characteristic polynomial: $\\det(A - \\lambda I) = (\\lambda_1 - \\lambda)(\\lambda_2 - \\lambda)\\cdots$, which at $\\lambda = 0$ gives $\\det(A) = \\lambda_1\\lambda_2\\cdots$, and the coefficient of $\\lambda^{n-1}$ gives the trace identity.',
+              ],
               code: `A = [4 2; 1 3];  % 2×2 asymmetric matrix
 
 [V, D] = eig(A);
@@ -123,7 +131,10 @@ fprintf('det(A)   = %g = product of eigenvalues = %g\\n', det(A), prod(lambda))`
             {
               id: 2,
               cellTitle: 'Characteristic polynomial — finding roots manually',
-              prose: 'The characteristic polynomial is det(A - λI). For a 2×2 matrix: p(λ) = λ² - trace(A)·λ + det(A). MATLAB\'s `poly(A)` returns the coefficients of the characteristic polynomial [1, -trace, det].',
+              prose: [
+                'The characteristic polynomial of a 2×2 matrix is $p(\\lambda) = \\lambda^2 - \\text{tr}(A)\\lambda + \\det(A)$. `poly(A)` returns the coefficients in descending order: `[1, -trace(A), det(A)]`. The coefficient of $\\lambda$ is $-\\text{tr}(A)$ (negative of the sum of eigenvalues) and the constant term is $\\det(A)$ (product of eigenvalues).',
+                '`roots(coeffs)` finds the polynomial roots numerically — these are the eigenvalues. Comparing `eigenvalues_from_poly` with `eig(A)` confirms both approaches agree. For 3×3 and larger, `poly(A)` produces higher-degree coefficients, and the roots become the characteristic equation solutions: use this to see the full characteristic polynomial symbolically before MATLAB solves it.',
+              ],
               code: `A = [4 2; 1 3];
 
 % MATLAB poly() gives characteristic polynomial coefficients
@@ -142,7 +153,10 @@ fprintf('Eigenvalues from eig():           [%g, %g]\\n', eigs_direct(1), eigs_di
             {
               id: 3,
               cellTitle: 'Power iteration — finding the dominant eigenvector',
-              prose: 'The simplest eigenvector algorithm: start with a random vector and repeatedly multiply by A, normalizing each time. It converges to the eigenvector with the largest eigenvalue (the "dominant" eigenvector). Google\'s PageRank was originally a power iteration on a web graph matrix.',
+              prose: [
+                'Power iteration works because multiplying by $A$ stretches the dominant eigenvector direction by $|\\lambda_{\\max}|$ and stretches every other direction by smaller factors. After many steps, the dominant direction grows relative to all others, and normalizing at each step keeps the vector unit-length so it converges to $v_{\\max}$ without blowing up.',
+                'The eigenvalue estimate `lambda_est = norm(x_new)` uses the fact that after the dominant direction dominates, `A*x ≈ lambda_max * x`, so `norm(A*x) ≈ |lambda_max| * norm(x) = |lambda_max|`. Convergence is geometric with ratio $|\\lambda_2/\\lambda_1|$: if the two largest eigenvalues are close in magnitude, convergence is slow. PageRank uses a damping factor to ensure this ratio stays bounded.',
+              ],
               code: `A = [4 2; 1 3];
 [V_true, D] = eig(A);
 
@@ -169,7 +183,10 @@ end`,
             {
               id: 4,
               cellTitle: 'Application: CNC frame resonance — eigenvalues as natural frequencies',
-              prose: 'The natural vibration frequencies of a CNC machine frame are ω_i = sqrt(λ_i), where λ_i are eigenvalues of the mass-normalized stiffness matrix M⁻¹K. Spindle speeds that match these frequencies cause resonance (chatter). Engineers plot these as "danger zones" and choose spindle RPM to stay between them.',
+              prose: [
+                'The CNC frame equations of motion are $M\\ddot{\\mathbf{u}} + K\\mathbf{u} = \\mathbf{0}$. Substituting $\\mathbf{u}(t) = \\mathbf{v}e^{i\\omega t}$ gives the generalized eigenvalue problem $K\\mathbf{v} = \\omega^2 M\\mathbf{v}$. Multiplying both sides by $M^{-1}$ converts it to the standard form $M^{-1}K\\mathbf{v} = \\omega^2\\mathbf{v}$. Each eigenvalue $\\lambda_k = \\omega_k^2$ is a squared natural frequency; `sqrt(lambda)` recovers $\\omega_k$ in rad/s.',
+                'The eigenvectors (mode shapes) tell you which parts of the machine move and in which direction at each natural frequency. `freq_Hz(k) * 60` converts a frequency in Hz to spindle speed in RPM. If the spindle rotates at a frequency matching a natural frequency, the frame resonates — this produces chatter: violent vibration that ruins surface finish and can break cutting tools. Staying away from these RPM values avoids resonance.',
+              ],
               code: `% Simplified 2-DOF CNC frame model
 % M = mass matrix (kg), K = stiffness matrix (N/m)
 M = [5 0; 0 3];       % diagonal mass (simplified: decoupled masses)
@@ -214,7 +231,10 @@ fprintf('\\nChatter avoidance: choose spindle speed NOT in [%.0f, %.0f] RPM\\n',
             {
               id: 1,
               cellTitle: 'Computing eigenvalues and eigenvectors',
-              prose: '`np.linalg.eig(A)` returns `(eigenvalues, eigenvectors)`. The eigenvectors are columns of the second output. Verify the defining equation: `A @ v` should equal `λ * v` for each eigenpair.',
+              prose: [
+                '`np.linalg.eig(A)` returns a tuple: `(eigenvalues, eigenvectors)`. `eigenvectors[:,i]` is the $i$-th eigenvector (a column). The loop checks `np.allclose(A @ v, lam * v)` — this verifies the defining equation $Av = \\lambda v$ for each pair. `allclose` uses a default tolerance of $10^{-8}$, which handles floating-point rounding.',
+                'The arrow plots show the geometric meaning: the left panel displays both eigenvectors as directions in 2D space. The right panel overlays $v_1$, $Av_1$, and $\\lambda v_1$ — all three arrows point the same direction, confirming $Av_1 = \\lambda_1 v_1$. For a non-eigenvector like $[1,1]^T$, $Av$ would point in a completely different direction.',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -252,7 +272,10 @@ plt.show()`,
             {
               id: 2,
               cellTitle: 'Sanity checks — trace and determinant',
-              prose: 'For any matrix: sum of eigenvalues = trace(A), product of eigenvalues = det(A). These are fast sanity checks after computing eigenvalues.',
+              prose: [
+                'These two identities follow from the characteristic polynomial structure. Writing $\\det(A - \\lambda I) = (\\lambda_1 - \\lambda)(\\lambda_2 - \\lambda) = \\lambda^2 - (\\lambda_1+\\lambda_2)\\lambda + \\lambda_1\\lambda_2$, the coefficient of $\\lambda^{n-1}$ is $-\\text{tr}(A)$ and the constant term (at $\\lambda=0$) is $\\det(A) = \\lambda_1\\lambda_2$. Both must match.',
+                'The bar charts make the comparison visual: trace equals the sum of the two eigenvalue bars, and det equals their product. Run this cell on any matrix you are working with as a quick sanity check — if the bars do not match, you computed an eigenvalue incorrectly.',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -278,7 +301,10 @@ plt.show()`,
             {
               id: 3,
               cellTitle: 'Visualize: eigenvectors are the invariant directions',
-              prose: 'Eigenvectors are the arrows a transformation never rotates — only stretches or shrinks. The blue and amber arrows are the two eigenvectors. The dashed arrows show where A sends a general vector [1,1].',
+              prose: [
+                'The visualization plots the two eigenvectors (blue and amber) as arrows from the origin. Each one is labeled with its eigenvalue $\\lambda$ — the stretch factor. The green arrow shows a general vector $[1,1]^T$; the dashed arrow shows $A[1,1]^T$, which points in a different direction. Try to see how $[1,1]^T$ is a linear combination of the eigenvectors, and how $A$ stretches each component independently.',
+                'Eigenvectors define the "natural axes" of the transformation: along each eigenvector direction, the matrix acts like simple scalar multiplication. In any other direction, the matrix mixes the components. The next lesson (Diagonalization) rebuilds the coordinate system along these natural axes so $A$ becomes a diagonal matrix.',
+              ],
               code: `import numpy as np
 from opencalc import Figure, BLUE, AMBER, GREEN
 

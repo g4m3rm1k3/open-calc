@@ -30,6 +30,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'Procedure: Solve a Least Squares Problem',
+        body: 'Step 1. **Identify the overdetermined system.** You have $A\\mathbf{x} = \\mathbf{b}$ with more rows than unknowns ($m > n$) and no exact solution.\n\nStep 2. **Form the normal equations.** Compute $A^TA$ ($n\\times n$) and $A^T\\mathbf{b}$ ($n\\times 1$).\n\nStep 3. **Solve $A^TA\\hat{\\mathbf{x}} = A^T\\mathbf{b}$.** Use Gaussian elimination (or `np.linalg.lstsq` in Python). The solution $\\hat{\\mathbf{x}}$ minimizes $\\|A\\mathbf{x} - \\mathbf{b}\\|^2$.\n\nStep 4. **Compute the residual.** $\\mathbf{r} = \\mathbf{b} - A\\hat{\\mathbf{x}}$. This is the "error" — the component of $\\mathbf{b}$ perpendicular to the column space of $A$.\n\nStep 5. **Verify perpendicularity.** Check $A^T\\mathbf{r} = \\mathbf{0}$ — the residual is orthogonal to every column of $A$.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 3 of 9 — Orthogonality & SVD',
         body: '**Previous (Lesson 2):** Gram-Schmidt — building an orthonormal basis from any basis.\n**This lesson:** Least Squares — finding the best approximate solution to an overdetermined system, using projection onto the column space.\n**Next (Lesson 4):** SVD — the ultimate factorization that gives the deepest view of least squares and much more.',
@@ -753,12 +758,12 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2x² + x + 1
   transferPrompts: [
     {
       situation: 'You have sensor data from an accelerometer on a CNC axis. You want to estimate velocity and position from noisy acceleration readings using a Kalman filter.',
-      competingTechniques: ['Numerical integration (trapezoid)', 'Low-pass filter', 'Least squares batch estimation'],
+      competingTechniques: 'Numerical integration (trapezoid); Low-pass filter; Least squares batch estimation',
       whyThisTechniqueWins: 'Least squares (or its recursive variant, the Kalman filter) fits the physical model $\\mathbf{x}_{k+1} = A\\mathbf{x}_k + B\\mathbf{u}_k + \\mathbf{w}_k$ to all measurements simultaneously, minimizing squared prediction errors. It combines all readings optimally — much better than integrating forward from noisy individual readings.',
     },
     {
       situation: 'In machine learning, you want to find the weights $\\mathbf{w}$ of a linear model that best fit training data $(\\mathbf{x}_1, y_1), \\ldots, (\\mathbf{x}_n, y_n)$.',
-      competingTechniques: ['Gradient descent', 'Direct formula', 'Normal equations'],
+      competingTechniques: 'Gradient descent; Direct formula; Normal equations',
       whyThisTechniqueWins: 'For small to medium datasets, the normal equations $X^TX\\mathbf{w} = X^T\\mathbf{y}$ give the exact least squares solution in one shot — no iteration, no learning rate. Gradient descent is preferred for large $n$ (millions of samples) where forming $X^TX$ is prohibitively expensive.',
     },
   ],

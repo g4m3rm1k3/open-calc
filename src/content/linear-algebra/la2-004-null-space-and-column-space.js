@@ -36,6 +36,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'Procedure: Find a Basis for the Null Space',
+        body: 'Step 1. Set up the equation $A\\mathbf{x} = \\mathbf{0}$ and form the augmented matrix $[A \\mid \\mathbf{0}]$.\nStep 2. Row-reduce to RREF. Identify the pivot columns and the free variable columns (non-pivot columns).\nStep 3. nullity = (number of free columns) = $n - \\text{rank}$.\nStep 4. For each free variable, set that free variable to 1 and all other free variables to 0.\nStep 5. Back-substitute to find the pivot variables — this gives one null space basis vector.\nStep 6. Repeat Step 4–5 for every free variable. The resulting vectors form a basis for $N(A)$.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 4 of 12 — Matrices & Transformations',
         body: '**Previous:** Determinants and inverses — when is a transformation reversible?\n**This lesson:** Column space (what the transformation can reach) and null space (what it annihilates).\n**Next (LA3):** Eigenvectors — vectors immune to rotation, only scaled.',
@@ -186,6 +191,32 @@ fprintf('  nullity = %d  (one surface direction is UNKNOWN)\\n', 2 - rank(M_bad)
 null_dir = null(M_bad);
 fprintf('  Unknown direction: [%.3f; %.3f]\\n', null_dir(1), null_dir(2))`,
             },
+            {
+              id: 4,
+              cellTitle: 'Challenge: consistency check using rank',
+              prose: [
+                '`rank(A)` and `rank([A b])` compare the rank of $A$ alone vs the augmented matrix $[A|\\mathbf{b}]$. If $\\text{rank}([A|\\mathbf{b}]) > \\text{rank}(A)$, appending $\\mathbf{b}$ added an independent row — $\\mathbf{b}$ is outside $C(A)$, so the system is inconsistent. If the ranks are equal, $\\mathbf{b} \\in C(A)$ and the system is consistent.',
+                'For `b_good`: $A\\mathbf{x} = \\mathbf{b}$ has a solution because $\\mathbf{b}$ lies in the column space. For `b_bad`: the rank jumps, revealing the contradiction. `A \\ b_good` solves the consistent system via backslash — attempting `A \\ b_bad` would return a least-squares approximation (not an exact solution), another clue that $\\mathbf{b}_{\\text{bad}} \\notin C(A)$.',
+              ],
+              code: `% Column space consistency check
+A = [1 2; 3 6];  % rank 1
+
+b_good = [2; 6];   % b = 2 * col1 => in C(A)
+b_bad  = [1; 4];   % not a multiple of [1;3] => not in C(A)
+
+r_A     = rank(A);
+r_good  = rank([A b_good]);
+r_bad   = rank([A b_bad]);
+
+fprintf('rank(A) = %d\\n', r_A)
+fprintf('rank([A | b_good]) = %d  ', r_good)
+if r_good == r_A, disp('-> CONSISTENT  (b in C(A))');
+else,             disp('-> INCONSISTENT'); end
+
+fprintf('rank([A | b_bad]) = %d  ', r_bad)
+if r_bad == r_A, disp('-> CONSISTENT');
+else,            disp('-> INCONSISTENT  (b NOT in C(A))'); end`,
+            },
           ]
         }
       },
@@ -268,6 +299,50 @@ ax.set_xlim(-1.5, 1.5); ax.set_ylim(-1.5, 1.5)
 ax.set_aspect('equal'); ax.grid(True, alpha=0.3)
 ax.axhline(0, color='k', lw=0.5); ax.axvline(0, color='k', lw=0.5)
 ax.legend(fontsize=9)
+plt.tight_layout()
+plt.show()`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Application: consistency test and Rank-Nullity on a 3×4 matrix',
+              prose: [
+                '`np.linalg.matrix_rank(A)` counts the pivot columns — the rank. `n = A.shape[1]` is the number of columns. `nullity = n - rank` is the Rank-Nullity theorem applied directly: the gap between input dimension ($n=4$) and output dimension (rank) is exactly the number of crushed directions (null space dimension). For this matrix with 2 pivot columns, 2 directions survive and 2 are annihilated.',
+                '`rank_Ab = np.linalg.matrix_rank(np.column_stack([A, b]))` augments $A$ with $\\mathbf{b}$ and recomputes the rank. If it increases, $\\mathbf{b}$ added a new independent direction that $A$\'s columns can\'t span — inconsistent. The bar chart shows both rank tests side by side: equal bars (blue = orange) mean consistent, a taller orange bar means $\\mathbf{b} \\notin C(A)$. The gap between the orange rank($[A|b]$) and blue rank($A$) bars visually encodes the consistency test.',
+              ],
+              code: `import numpy as np
+import matplotlib.pyplot as plt
+
+# 3x4 matrix: maps R^4 -> R^3
+A = np.array([[1., 2., 0., 3.],
+              [2., 4., 1., 5.],
+              [0., 0., 1., -1.]])
+
+r = np.linalg.matrix_rank(A)
+n = A.shape[1]
+print(f"rank(A) = {r},  nullity = {n - r},  rank + nullity = {n} = n (confirmed)")
+
+# Consistency test for two right-hand sides
+b_good = A @ np.array([1., 0., 2., 0.])   # in C(A) by construction
+b_bad  = np.array([1., 0., 0.])            # likely not in C(A)
+
+for b, label in [(b_good, 'b_good'), (b_bad, 'b_bad')]:
+    r_Ab = np.linalg.matrix_rank(np.column_stack([A, b.reshape(-1,1)]))
+    status = 'CONSISTENT' if r_Ab == r else f'INCONSISTENT (rank jumped to {r_Ab})'
+    print(f"rank([A|{label}]) = {r_Ab}  -> {status}")
+
+# Bar chart comparing rank tests
+fig, ax = plt.subplots(figsize=(7, 4))
+x = np.arange(2)
+bars_A  = [r, r]
+bars_Ab = [np.linalg.matrix_rank(np.column_stack([A, b_good.reshape(-1,1)])),
+           np.linalg.matrix_rank(np.column_stack([A, b_bad.reshape(-1,1)]))]
+w = 0.35
+ax.bar(x - w/2, bars_A,  width=w, label='rank(A)',    color='steelblue', alpha=0.8)
+ax.bar(x + w/2, bars_Ab, width=w, label='rank([A|b])',color='darkorange', alpha=0.8)
+ax.set_xticks(x); ax.set_xticklabels(['b_good\\n(consistent)', 'b_bad\\n(inconsistent)'])
+ax.set_ylabel('rank value'); ax.set_ylim(0, 4)
+ax.set_title('Consistency test: equal bars = b in C(A)', fontsize=12)
+ax.legend(); ax.grid(True, axis='y', alpha=0.3)
 plt.tight_layout()
 plt.show()`,
             },

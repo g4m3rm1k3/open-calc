@@ -42,6 +42,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'Procedure: Compute a 3×3 Determinant by Cofactor Expansion',
+        body: 'Step 1. Choose the row or column with the most zero entries — each zero eliminates one 2×2 computation.\nStep 2. For each nonzero entry $a_{ij}$ in that row/column: delete row $i$ and column $j$ to form the 2×2 submatrix. Compute its determinant — this is the minor $M_{ij}$.\nStep 3. Apply the checkerboard sign: cofactor $C_{ij} = (-1)^{i+j} M_{ij}$. Corners are positive ($+$), neighbors negative ($-$), alternating like a chess board.\nStep 4. Multiply each entry by its cofactor: $a_{ij} \\cdot C_{ij}$.\nStep 5. Sum all products for the chosen row or column: $\\det(A) = \\sum_j a_{ij} C_{ij}$.\nStep 6. Verify with a second expansion along a different row — you must get the same answer.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 5 of 12 — Matrices & Transformations',
         body: '**Previous:** Null Space and Column Space — what a matrix destroys and what it can reach.\n**This lesson:** Computing determinants for 3×3 and larger; algebraic properties that make computation tractable.\n**Next:** LU Decomposition — Gaussian elimination formalized as a matrix factorization.',
@@ -213,6 +218,35 @@ fprintf('  det = %.4f  (zero → cannot reach off-plane points)\\n', det(M_bad))
 % The 5-axis capability matrix would be 5x5
 % But checking the 3D translation axes is the critical constraint
 fprintf('\\nConclusion: det tests whether 3 motion axes span full 3D.\\n')`,
+            },
+            {
+              id: 4,
+              cellTitle: 'Challenge: det(AB) = det(A)·det(B) and the c^n scaling rule',
+              prose: [
+                '`det(A*B)` computes the determinant of the product directly. `det(A)*det(B)` computes them separately and multiplies. Property 6 guarantees they are equal — this verifies that the volume-scaling factors compose multiplicatively: if $A$ scales volume by $\\det(A)$ and $B$ by $\\det(B)$, then $AB$ scales by their product.',
+                '`det(k*A)` scales every entry of $A$ by $k$, which scales every row by $k$. Since there are $n$ rows and each row-scale multiplies the determinant by $k$, the result is $\\det(kA) = k^n \\det(A)$. The code checks this for $k=3$ and $n=3$: `det(3*A)` should equal $3^3 \\cdot \\det(A) = 27 \\det(A)$. This is the most common misconception — students expect $k \\cdot \\det(A)$ but get $k^n \\cdot \\det(A)$.',
+              ],
+              code: `A = [2 -1 0; 3 2 1; 0 1 4];
+B = [1 0 2; -1 3 0; 2 1 1];
+
+dA = det(A);
+dB = det(B);
+dAB = det(A*B);
+
+fprintf('--- Property 6: det(AB) = det(A)·det(B) ---\\n')
+fprintf('det(A)        = %g\\n', dA)
+fprintf('det(B)        = %g\\n', dB)
+fprintf('det(A*B)      = %g\\n', dAB)
+fprintf('det(A)*det(B) = %g\\n', dA*dB)
+fprintf('Equal: %d\\n', abs(dAB - dA*dB) < 1e-10)
+
+fprintf('\\n--- Scaling: det(k*A) = k^n * det(A) for n=3 ---\\n')
+k = 3;
+n = 3;
+fprintf('det(3*A)          = %g\\n', det(k*A))
+fprintf('3^3 * det(A)      = %g\\n', k^n * dA)
+fprintf('Common mistake: 3*det(A) = %g  (WRONG for n>1)\\n', k * dA)
+fprintf('Scaling matches k^n rule: %d\\n', abs(det(k*A) - k^n*dA) < 1e-10)`,
             },
           ]
         }
@@ -511,6 +545,42 @@ A = np.array([[2., 0., 1.],
         }
       ],
       conclusion: "det(A) = 1. The row-reduction strategy involves only O(n²) work to reach triangular form versus O(n!) for cofactor expansion. For this 3×3, three row replacements sufficed — no sign tracking needed. For most problems, row reduction is faster.",
+    },
+    {
+      id: "la2-005-ex3",
+      title: "Strategic Row Choice — Two Zeros Reduce Work to One Cofactor",
+      problem: "Compute $\\det(A)$ for $A = \\begin{bmatrix} 2 & -3 & 1 \\\\ 0 & 0 & 5 \\\\ 4 & 1 & 3 \\end{bmatrix}$ by choosing the most efficient row.",
+      steps: [
+        {
+          expression: "\\text{Scan each row: Row 1 has 0 zeros, Row 2 has 2 zeros, Row 3 has 0 zeros. Choose Row 2.}",
+          annotation: "Row 2 is $[0, 0, 5]$ — two zeros. Expanding along it means only one nonzero term survives: the entry 5 at position $(2,3)$. The other two cofactors are multiplied by zero and contribute nothing.",
+          strategyTitle: "Identify the most efficient row",
+          checkpoint: "How many 2×2 computations does row 2 save compared to row 1?",
+          hints: ["Row 1 has no zeros — all three cofactors require a 2×2 determinant. Row 2 has two zeros — only one cofactor is needed. Saving 2 of 3 computations."],
+        },
+        {
+          expression: "M_{23} = \\det\\begin{bmatrix} 2 & -3 \\\\ 4 & 1 \\end{bmatrix} = (2)(1) - (-3)(4) = 2 + 12 = 14",
+          annotation: "Delete row 2 and column 3. The remaining 2×2 submatrix uses rows 1 and 3, columns 1 and 2. Minor $M_{23} = 2 \\cdot 1 - (-3) \\cdot 4 = 14$.",
+          strategyTitle: "Compute the one surviving minor",
+          checkpoint: "Which entries go into the submatrix after deleting row 2 and column 3?",
+          hints: ["Rows 1 and 3, columns 1 and 2: $\\begin{bmatrix}2&-3\\\\4&1\\end{bmatrix}$. Determinant = $2(1) - (-3)(4) = 14$."],
+        },
+        {
+          expression: "C_{23} = (-1)^{2+3} M_{23} = (-1)^5 \\cdot 14 = -14",
+          annotation: "Position $(2,3)$: exponent $2+3 = 5$ is odd, so sign is $-1$. The cofactor is $C_{23} = (-1)(-14)$... wait — $C_{23} = (-1)^5 \\cdot M_{23} = (-1) \\cdot 14 = -14$.",
+          strategyTitle: "Apply the checkerboard sign",
+          checkpoint: "What is the sign at position $(2,3)$ on the checkerboard?",
+          hints: ["Checkerboard: $(1,1)$ is $+$, $(1,2)$ is $-$, $(2,1)$ is $-$, $(2,2)$ is $+$, $(2,3)$ is $-$. Exponent $2+3=5$ is odd, so sign is $-1$."],
+        },
+        {
+          expression: "\\det(A) = 0 \\cdot C_{21} + 0 \\cdot C_{22} + 5 \\cdot C_{23} = 5(-14) = -70",
+          annotation: "Row 2 expansion: $a_{21}C_{21} + a_{22}C_{22} + a_{23}C_{23} = 0 + 0 + 5(-14) = -70$. The two zero entries eliminated two cofactor computations entirely — this is the strategic advantage of choosing row 2.",
+          strategyTitle: "Sum along row 2",
+          checkpoint: "Verify: expand along row 1 and confirm you get the same −70.",
+          hints: ["Row 1 expansion: $C_{11} = +\\det\\begin{bmatrix}0&5\\\\1&3\\end{bmatrix} = -5$, $C_{12} = -\\det\\begin{bmatrix}0&5\\\\4&3\\end{bmatrix} = 20$, $C_{13} = +\\det\\begin{bmatrix}0&0\\\\4&1\\end{bmatrix} = 0$. $\\det = 2(-5) + (-3)(20) + 1(0) = -10 - 60 = -70$ ✓."],
+        }
+      ],
+      conclusion: "det(A) = −70. Row 2 had two zeros, reducing three 2×2 computations to one. This is the key strategic principle: the row or column with the most zeros is always the best choice for cofactor expansion. The determinant is the same regardless of which row you choose — only the amount of work differs.",
     }
   ],
 

@@ -35,6 +35,11 @@ export default {
         body: '**Previous:** Phase 3 — Eigenvalues, Diagonalization, Complex Eigenvalues.\n**This lesson:** Orthogonal Projections — finding the closest point in a subspace; the perpendicularity condition.\n**Next:** Gram-Schmidt — using projection repeatedly to build a clean orthonormal basis.',
       },
       {
+        type: 'procedure',
+        title: 'Procedure: Compute an Orthogonal Projection',
+        body: 'Step 1. **Identify the subspace.** Determine the direction vector $\\mathbf{a}$ (for a line) or the basis matrix $A$ (for a higher-dimensional subspace, with columns as basis vectors).\n\nStep 2. **Compute the scalar coefficient.** For a line: $c = \\mathbf{a}^\\top \\mathbf{b} / \\mathbf{a}^\\top \\mathbf{a}$.\n\nStep 3. **Compute the projection.** For a line: $\\mathbf{p} = c\\mathbf{a}$. For a subspace (column space of $A$): $\\mathbf{p} = A(A^\\top A)^{-1}A^\\top \\mathbf{b} = P\\mathbf{b}$.\n\nStep 4. **Compute the error.** $\\mathbf{e} = \\mathbf{b} - \\mathbf{p}$.\n\nStep 5. **Verify perpendicularity.** Check $\\mathbf{a}^\\top \\mathbf{e} = 0$ (line) or $A^\\top \\mathbf{e} = \\mathbf{0}$ (subspace). Also verify $P^2 = P$ and $P^\\top = P$.',
+      },
+      {
         type: 'insight',
         title: 'Why "Orthogonal" Means "Closest"',
         body: 'The Pythagorean theorem guarantees it. If $\\mathbf{p}$ is the projection and $\\mathbf{q}$ is any other point in the subspace, then $\\|\\mathbf{b} - \\mathbf{q}\\|^2 = \\|\\mathbf{b} - \\mathbf{p}\\|^2 + \\|\\mathbf{p} - \\mathbf{q}\\|^2 > \\|\\mathbf{b}-\\mathbf{p}\\|^2$.\n\nThe error at the orthogonal projection is the shortest possible error. No other point in the subspace is closer.',
@@ -723,12 +728,12 @@ b = np.array([1., 2., 3.])
   transferPrompts: [
     {
       situation: 'In data science, you want to project a high-dimensional dataset onto its first principal component — the direction of greatest variance.',
-      competingTechniques: ['Computing the full covariance matrix eigendecomposition', 'Random projection', 'Orthogonal projection formula'],
+      competingTechniques: 'Computing the full covariance matrix eigendecomposition, random projection, or orthogonal projection formula.',
       whyThisTechniqueWins: 'The first principal component is the unit vector $\\mathbf{u}$ that maximizes variance. Projecting each data point onto $\\mathbf{u}$ is exactly $\\text{proj}_{\\mathbf{u}}\\mathbf{x}_i = (\\mathbf{u}^T\\mathbf{x}_i)\\mathbf{u}$. The scalar $\\mathbf{u}^T\\mathbf{x}_i$ is the new 1D coordinate. Orthogonal projection is the mathematical core of PCA.',
     },
     {
       situation: 'In signal processing, you want to extract the component of a signal at a specific frequency from a noisy measurement.',
-      competingTechniques: ['Fourier transform', 'Low-pass filter', 'Orthogonal projection onto frequency basis'],
+      competingTechniques: 'Fourier transform, low-pass filter, or orthogonal projection onto frequency basis.',
       whyThisTechniqueWins: 'Each frequency basis function is a vector; the signal is projected onto it. The projection coefficient is the Fourier coefficient. Orthogonality of the Fourier basis makes each coefficient independent — projecting onto one frequency does not affect others.',
     },
   ],

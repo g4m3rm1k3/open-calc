@@ -36,6 +36,11 @@
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'Procedure: Apply a Matrix to a Vector (Column Method)',
+        body: 'Step 1. Write the input vector $\\mathbf{v} = [x, y]^T$ and identify its two components $x$ and $y$.\nStep 2. Read column 1 of $A$ — this is where $\\hat{i} = [1,0]^T$ lands after the transformation.\nStep 3. Read column 2 of $A$ — this is where $\\hat{j} = [0,1]^T$ lands.\nStep 4. Scale and add: $A\\mathbf{v} = x \\cdot (\\text{column 1}) + y \\cdot (\\text{column 2})$.\nStep 5. Verify with the row formula: row 1 of $A$ dotted with $\\mathbf{v}$ gives the first output component; row 2 dotted with $\\mathbf{v}$ gives the second.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 1 of 12 — Matrices & Transformations',
         body: '**Previous (Chapter 1):** Static vectors, dot products, systems of equations, RREF.\n**This lesson:** Matrices as active functions that warp space — the “verb” to LA1\'s “nouns.”\n**Next (Lesson 2):** Matrix Multiplication — chaining two transformations into one.',

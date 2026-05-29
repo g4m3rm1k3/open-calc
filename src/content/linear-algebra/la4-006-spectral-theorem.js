@@ -25,6 +25,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'Procedure: Orthogonally Diagonalize a Symmetric Matrix',
+        body: 'Step 1. **Verify symmetry.** Check $A = A^\\top$. The spectral theorem only applies to symmetric matrices.\n\nStep 2. **Find all eigenvalues.** Solve $\\det(A - \\lambda I) = 0$. The spectral theorem guarantees all roots are real.\n\nStep 3. **Find orthonormal eigenvectors for each eigenvalue.** For each eigenvalue $\\lambda_k$, solve $(A - \\lambda_k I)\\mathbf{v} = \\mathbf{0}$. If the eigenvalue has multiplicity $> 1$, apply Gram-Schmidt within the eigenspace.\n\nStep 4. **Assemble $Q$.** Arrange the orthonormal eigenvectors as columns. Verify $Q^\\top Q = I$ — if not, something went wrong.\n\nStep 5. **Write $A = Q\\Lambda Q^\\top$.** Confirm numerically: $Q \\Lambda Q^\\top$ should equal $A$ to machine precision.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 6 of 9 — Orthogonality & SVD',
         body: '**Previous (Lesson 5):** Inner Product Spaces — abstract geometry via inner products and orthogonality.\n**This lesson:** Spectral Theorem — symmetric matrices always have real eigenvalues and orthogonal eigenvectors, making them diagonalizable in the best possible way.\n**Next (Lesson 7):** Quadratic Forms — how symmetric matrices define curvature, energy, and the shape of level curves.',
@@ -264,6 +269,7 @@ print(f"  Worn:  {ev_worn[1]/ev_worn[0]:.3f}  (higher = more chatter energy in s
       '**Hermitian matrices.** Over $\\mathbb{C}$, the analogue of a real symmetric matrix is a **Hermitian matrix**: $A = A^* = \\bar{A}^\\top$. The spectral theorem extends: every Hermitian matrix is unitarily diagonalizable ($A = U\\Lambda U^*$ with $UU^* = I$) and has real eigenvalues. This is the form used in quantum mechanics, where observables are Hermitian operators and measured values are eigenvalues.',
       '**Courant-Fischer min-max theorem.** The eigenvalues of a symmetric matrix $A$ have a variational characterization: $\\lambda_k(A) = \\min_{\\dim(V)=k} \\max_{\\mathbf{x} \\in V, \\|\\mathbf{x}\\|=1} \\mathbf{x}^\\top A \\mathbf{x}$. In particular, the largest eigenvalue is $\\lambda_n = \\max_{\\|\\mathbf{x}\\|=1} \\mathbf{x}^\\top A \\mathbf{x}$ — the direction that maximizes the quadratic form. This is why the first principal component of PCA is the direction of maximum variance.',
       '**Spectral theorem for compact operators.** In infinite-dimensional Hilbert spaces, compact self-adjoint operators have a countable orthonormal basis of eigenvectors with eigenvalues $\\lambda_1 \\geq \\lambda_2 \\geq \\cdots \\to 0$. This is the foundation for integral equations (Fredholm theory) and Fourier analysis. The finite-dimensional spectral theorem is the matrix analogue of this infinite-dimensional result.',
+      '**Sylvester\'s law of inertia.** Two real symmetric matrices are congruent (related by $B = P^\\top A P$ for invertible $P$) if and only if they have the same number of positive, negative, and zero eigenvalues. This triple $(n_+, n_-, n_0)$ is the **signature** of the matrix, and it is invariant under congruence. The signature fully classifies symmetric matrices up to congruence — for example, all symmetric positive definite $n \\times n$ matrices are congruent to $I_n$. This invariant also explains why the second-derivative test in multivariable calculus (Hessian at a critical point) depends only on the signs of the eigenvalues: a positive definite Hessian means a local minimum regardless of the actual values.',
     ],
     callouts: [
       {
@@ -412,6 +418,32 @@ print(f"  Worn:  {ev_worn[1]/ev_worn[0]:.3f}  (higher = more chatter energy in s
         '**Conclude:** $(\\lambda - \\mu)(\\mathbf{u}^\\top \\mathbf{v}) = 0$. Since $\\lambda \\neq \\mu$, we must have $\\mathbf{u}^\\top \\mathbf{v} = 0$. QED.',
         '**Why this proof breaks for repeated eigenvalues:** If $\\lambda = \\mu$, the factor $(\\lambda - \\mu) = 0$ and we cannot conclude anything about $\\mathbf{u}^\\top\\mathbf{v}$. For repeated eigenvalues, eigenvectors in the same eigenspace are not automatically orthogonal — we must use Gram-Schmidt to orthogonalize within each eigenspace.',
       ],
+    },
+    {
+      id: 'ch-la4-006-3',
+      title: 'PSD test and spectral decomposition of a 3×3 matrix',
+      difficulty: 'hard',
+      problem: 'For $A = \\begin{bmatrix}2&1&0\\\\1&2&1\\\\0&1&2\\end{bmatrix}$: (a) Is $A$ symmetric? (b) Find its three eigenvalues and verify they are all positive (so $A$ is positive definite). (c) Write the spectral decomposition $A = \\sum_{i=1}^3 \\lambda_i \\mathbf{q}_i\\mathbf{q}_i^\\top$ using normalized eigenvectors. (d) Compute $A^{-1}$ using the spectral decomposition.',
+      hint: 'The characteristic polynomial of this tridiagonal matrix is $(2-\\lambda)^3 - 2(2-\\lambda) = (2-\\lambda)[(2-\\lambda)^2 - 2]$. Let $\\mu = 2-\\lambda$ to factor. For the inverse: $A^{-1} = Q\\Lambda^{-1}Q^\\top$ — just invert each eigenvalue.',
+      walkthrough: [
+        {
+          expression: 'A = A^\\top \\checkmark',
+          annotation: '$a_{12}=a_{21}=1$, $a_{23}=a_{32}=1$, off-diagonals match. Symmetric confirmed.',
+        },
+        {
+          expression: '\\det(A - \\lambda I) = (2-\\lambda)[(2-\\lambda)^2 - 2] = 0',
+          annotation: 'Let $\\mu = 2-\\lambda$: $\\mu(\\mu^2 - 2) = 0$, so $\\mu = 0$ or $\\mu = \\pm\\sqrt{2}$. Eigenvalues: $\\lambda_1 = 2-\\sqrt{2}$, $\\lambda_2 = 2$, $\\lambda_3 = 2+\\sqrt{2}$.',
+        },
+        {
+          expression: '\\lambda_1 = 2 - \\sqrt{2} \\approx 0.586 > 0, \\quad \\lambda_2 = 2, \\quad \\lambda_3 = 2 + \\sqrt{2} \\approx 3.414',
+          annotation: 'All three eigenvalues are strictly positive — $A$ is positive definite. The spectral theorem guarantees they are real since $A$ is symmetric.',
+        },
+        {
+          expression: 'A^{-1} = Q \\Lambda^{-1} Q^\\top = \\frac{1}{\\lambda_1}\\mathbf{q}_1\\mathbf{q}_1^\\top + \\frac{1}{2}\\mathbf{q}_2\\mathbf{q}_2^\\top + \\frac{1}{\\lambda_3}\\mathbf{q}_3\\mathbf{q}_3^\\top',
+          annotation: 'Spectral decomposition makes the inverse trivial: just replace each eigenvalue $\\lambda_i$ with $1/\\lambda_i$. The eigenvectors are unchanged.',
+        },
+      ],
+      answer: 'λ = 2−√2, 2, 2+√2 (all positive → A is positive definite). A⁻¹ = QΛ⁻¹Qᵀ with eigenvalues 1/λᵢ.',
     },
   ],
 
@@ -630,6 +662,45 @@ print(f"  Worn:  {ev_worn[1]/ev_worn[0]:.3f}  (higher = more chatter energy in s
       whyThisTechniqueWins: 'The spectral theorem guarantees the covariance matrix $C = Q\\Lambda Q^\\top$ where eigenvalues are the explained variances. The cumulative eigenvalue fraction $\\sum_{i=1}^k \\lambda_i / \\text{tr}(C)$ gives an exact, interpretable criterion. This is only possible because $C$ is symmetric — its eigenvalues are real and sum to the total variance.',
     },
   ],
+
+  semantics: {
+    core: [
+      { symbol: 'A = Q\\Lambda Q^\\top', meaning: 'Orthogonal diagonalization of a symmetric matrix — Q is orthogonal (Qᵀ=Q⁻¹), Λ has real eigenvalues' },
+      { symbol: 'A = \\sum_{i=1}^n \\lambda_i \\mathbf{q}_i\\mathbf{q}_i^\\top', meaning: 'Spectral decomposition — A as a sum of rank-1 projections onto each eigenvector, scaled by eigenvalue' },
+      { symbol: '\\mathbf{q}_i\\mathbf{q}_i^\\top', meaning: 'Rank-1 projection matrix onto the ith eigenvector direction; these sum to I' },
+      { symbol: 'f(A) = Qf(\\Lambda)Q^\\top', meaning: 'Matrix function via spectral decomposition — apply f to each eigenvalue; works for √, exp, inverse, etc.' },
+      { symbol: 'A \\succ 0', meaning: 'Positive definite: all eigenvalues > 0; equivalently xᵀAx > 0 for all x ≠ 0' },
+    ],
+    rulesOfThumb: [
+      'A = Aᵀ guarantees: real eigenvalues AND orthogonal eigenvectors. Both come from symmetry — neither alone is sufficient.',
+      'For repeated eigenvalues, run Gram-Schmidt within each eigenspace to get orthonormal eigenvectors.',
+      'Use np.linalg.eigh (not eig) for symmetric matrices — it exploits symmetry for real output and orthonormal eigenvectors.',
+      'A is positive definite ↔ all eigenvalues positive ↔ Cholesky decomposition exists.',
+      'The spectral decomposition makes matrix functions trivial: just apply f to each eigenvalue, keep eigenvectors the same.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: [
+      {
+        lessonId: 'la3-001',
+        label: 'Eigenvalues and Eigenvectors',
+        note: 'The spectral theorem is a refinement of eigendecomposition: for symmetric matrices, the eigenvectors are not just independent — they are orthonormal, so P⁻¹ = Pᵀ.',
+      },
+      {
+        lessonId: 'la4-002',
+        label: 'Gram-Schmidt',
+        note: 'When a symmetric matrix has repeated eigenvalues, Gram-Schmidt is applied within each eigenspace to orthonormalize. Without Gram-Schmidt, eigenvectors within the same eigenspace may not be orthogonal.',
+      },
+    ],
+    futureLinks: [
+      {
+        lessonId: 'la4-007',
+        label: 'Quadratic Forms',
+        note: 'Quadratic forms $\\mathbf{x}^\\top A \\mathbf{x}$ are analyzed entirely through the spectral decomposition of the symmetric matrix $A$. Positive/negative definiteness is determined by eigenvalue signs.',
+      },
+    ],
+  },
 
   debugging: [
     {

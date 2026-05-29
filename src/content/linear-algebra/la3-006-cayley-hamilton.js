@@ -41,6 +41,11 @@ export default {
         body: '**Previous (Lesson 5):** Markov Chains — eigenvalue 1, steady-state distributions.\n**This lesson:** Cayley-Hamilton Theorem — every matrix satisfies its own characteristic equation; using it to compute powers and inverses symbolically.\n**Next (Lesson 7):** Matrix Exponential — solving differential equations $\\dot{\\mathbf{x}} = A\\mathbf{x}$ via $e^{At}$.',
       },
       {
+        type: 'procedure',
+        title: 'Procedure: Apply Cayley-Hamilton',
+        body: 'Step 1. **Find the characteristic polynomial.** For a $2\\times 2$ matrix: $p(\\lambda) = \\lambda^2 - \\text{tr}(A)\\lambda + \\det(A)$. For larger matrices, expand $\\det(A - \\lambda I)$.\n\nStep 2. **Interpret $p(A)$.** Replace every $\\lambda^k$ with $A^k$, and replace every scalar constant $c$ with $cI$. For example, $p(\\lambda) = \\lambda^2 - 5\\lambda + 1$ becomes $p(A) = A^2 - 5A + I$.\n\nStep 3. **Verify $p(A) = 0$.** Compute each term and sum — you should get the zero matrix.\n\nStep 4. **Derive consequences.** From $p(A) = 0$:\n- Multiply by $A^{-1}$ to get the **inverse**: $A^{-1} = (\\text{tr}(A)I - A)/\\det(A)$.\n- Rearrange to express $A^n$ as a lower-degree combination: e.g., $A^2 = \\text{tr}(A)A - \\det(A)I$, then use this recurrence for $A^3, A^4, \\ldots$',
+      },
+      {
         type: 'warning',
         title: 'Do Not Prove It by Substitution',
         body: 'A common mistake: writing $p(A) = \\det(A - A \\cdot I) = \\det(0) = 0$ and thinking the theorem is obvious. This is wrong — $\\det(A - \\lambda I)$ is a scalar polynomial, and you cannot just substitute a matrix for the scalar and call it done. The actual proof requires care with polynomial rings and matrix algebra.',
@@ -57,7 +62,10 @@ export default {
             {
               id: 1,
               cellTitle: 'Verify Cayley-Hamilton for a 2x2 matrix',
-              prose: ['For A = [2 1; 5 3], char poly is lambda^2 - 5*lambda + 1. Verify A^2 - 5A + I = 0.'],
+              prose: [
+                'Compute the characteristic polynomial coefficients using `trace(A)` and `det(A)`. Form $p(A) = A^2 - \\text{tr}(A) \\cdot A + \\det(A) \\cdot I$ and store it in `p_A`.',
+                'The result `p_A` should be identically the zero matrix — every entry exactly 0. If any entry is nonzero (beyond floating-point noise), you have a sign error in your characteristic polynomial. Notice that the formula uses `eye(2)` for the identity term: scalar constants always become scalar $\\times I$ when evaluated at a matrix.',
+              ],
               code: `A = [2 1; 5 3]
 % Characteristic polynomial coefficients: trace and det
 t = trace(A)
@@ -72,7 +80,10 @@ p_A
             {
               id: 2,
               cellTitle: 'Use Cayley-Hamilton to compute the inverse',
-              prose: ['From A^2 - 5A + I = 0, we get A^{-1} = 5I - A.'],
+              prose: [
+                'Starting from the Cayley-Hamilton identity $A^2 - \\text{tr}(A) \\cdot A + \\det(A) \\cdot I = 0$, multiply both sides by $A^{-1}$. In code: compute `A_inv_CH = (t*eye(2) - A) / d` — no row reduction, no `inv()` call needed.',
+                'Compare `A_inv_CH` against `inv(A)` and check the difference is zero. This formula $A^{-1} = (\\text{tr}(A) I - A)/\\det(A)$ works for any invertible $2\\times 2$ matrix. It is Cayley-Hamilton made computational: three matrix operations (scalar multiply, subtract, divide by scalar) replace Gauss-Jordan elimination entirely.',
+              ],
               code: `A = [2 1; 5 3]
 t = trace(A);
 d = det(A);
@@ -89,7 +100,10 @@ A_inv_CH - inv(A)
             {
               id: 3,
               cellTitle: 'Compute A^10 using Cayley-Hamilton',
-              prose: ['Since A^2 = 5A - I, express any A^n as aA + bI using recurrence.'],
+              prose: [
+                'From Cayley-Hamilton, $A^2 = \\text{tr}(A) \\cdot A - \\det(A) \\cdot I$. This is a recurrence: define $a_n, b_n$ so $A^n = a_n A + b_n I$. Initialize $a_0 = 0, b_0 = 1$ (since $A^0 = I$) and $a_1 = 1, b_1 = 0$ (since $A^1 = A$). The loop applies `an_new = 5*a(end) - a(end-1)` to compute each coefficient.',
+                'The final matrix `a(end)*A + b(end)*eye(2)` should equal `A^10` computed directly. Changing $n$ from 10 to 100 or 1000 costs only scalar arithmetic — the same two matrix multiplications. For high powers, Cayley-Hamilton recurrence is dramatically cheaper than repeated matrix multiplication.',
+              ],
               code: `A = [2 1; 5 3]
 % Direct computation
 A_pow = A^10;
@@ -151,7 +165,10 @@ a(end)*A + b(end)*eye(2)
             {
               id: 1,
               cellTitle: 'Verifying Cayley-Hamilton',
-              prose: 'Compute the characteristic polynomial, then evaluate it at the matrix A. Result must be the zero matrix (up to floating point). For a 2×2 matrix: p(λ) = λ² - trace(A)λ + det(A), so p(A) = A² - trace(A)·A + det(A)·I.',
+              prose: [
+                'Compute the characteristic polynomial coefficients `tr = np.trace(A)` and `det = np.linalg.det(A)`. Then evaluate $p(A) = A^2 - \\text{tr} \\cdot A + \\det \\cdot I$ by forming `pA = A@A - tr*A + det*np.eye(2)`. Call `np.allclose(pA, 0)` to verify. The polynomial plot visualizes the scalar characteristic polynomial $p(\\lambda)$ with eigenvalues marked as its roots.',
+                'The scatter points on the $x$-axis where $p(\\lambda) = 0$ are the eigenvalues — this is what the characteristic polynomial was designed to encode. Cayley-Hamilton says that evaluating this same polynomial at the matrix $A$ (replacing $\\lambda^k$ with $A^k$) also gives zero — a matrix zero, not a scalar zero. The two types of "zero" are connected by the structure of matrix algebra.',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -186,7 +203,10 @@ plt.show()`,
             {
               id: 2,
               cellTitle: 'Computing A⁻¹ via Cayley-Hamilton — no row reduction needed',
-              prose: 'For 2×2: p(A) = 0 gives A² - t·A + d·I = 0. Multiply by A⁻¹: A - t·I + d·A⁻¹ = 0. So A⁻¹ = (t·I - A)/d. This works whenever d = det(A) ≠ 0. Much simpler than Gauss-Jordan for analytic work.',
+              prose: [
+                'From Cayley-Hamilton: $A^2 - \\text{tr}(A) \\cdot A + \\det(A) \\cdot I = 0$. Multiply both sides by $A^{-1}$ and solve: $A^{-1} = (\\text{tr}(A) \\cdot I - A)/\\det(A)$. Code: `A_inv_CH = (tr * np.eye(2) - A) / det`. Then verify with `np.allclose(A_inv_CH, np.linalg.inv(A))`.',
+                'The three heat maps show $A$, $A^{-1}$, and $A A^{-1}$ side by side. The third panel should be the identity matrix (1s on diagonal, 0s off diagonal) — confirming the inverse is correct. This algebraic derivation works for any invertible $2\\times 2$ matrix, replacing Gauss-Jordan with three simple matrix operations.',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -218,7 +238,10 @@ plt.show()`,
             {
               id: 3,
               cellTitle: 'Rodrigues rotation formula — Cayley-Hamilton for 3D rotations',
-              prose: 'For a 3D unit axis ω and rotation angle θ, the rotation matrix R = exp(θ·K) where K is the skew-symmetric matrix of ω. Cayley-Hamilton gives K³ = -K (since the minimal poly of any skew-sym matrix is λ³+λ). So the Taylor series truncates: R = I + sin(θ)·K + (1-cos(θ))·K².',
+              prose: [
+                'For a unit rotation axis $\\omega$, build the skew-symmetric matrix $K$ using the `skew()` function. Then compute `R_rodrigues = np.eye(3) + np.sin(theta)*K + (1 - np.cos(theta))*K@K` and compare with `expm(theta * K)`. They should match. Verify `K@K@K + K` is zero (Cayley-Hamilton for skew-symmetric matrices).',
+                'Why does the matrix exponential series truncate here? For any unit-axis skew-symmetric $K$, the characteristic polynomial is $\\lambda^3 + \\lambda = \\lambda(\\lambda^2 + 1)$, so $K^3 = -K$ by Cayley-Hamilton. Every higher power cycles: $K^4 = -K^2$, $K^5 = K$, etc. So $e^{\\theta K} = \\sum \\theta^n K^n/n!$ collapses to just $I + \\sin(\\theta)K + (1-\\cos\\theta)K^2$ — Rodrigues\' rotation formula is Cayley-Hamilton made explicit.',
+              ],
               code: `import numpy as np
 from scipy.linalg import expm
 
@@ -263,6 +286,7 @@ print((K@K@K + K).round(10))`,
       '**Proof via the adjugate.** The rigorous proof uses the **adjugate matrix** (matrix of cofactors). Since $(A - \\lambda I)\\text{adj}(A - \\lambda I) = \\det(A - \\lambda I) I = p(\\lambda) I$, write $\\text{adj}(A - \\lambda I) = B_{n-1}\\lambda^{n-1} + \\cdots + B_0$ (each $B_k$ is an $n\\times n$ matrix with polynomial entries). Collect powers of $\\lambda$ from both sides of $(A - \\lambda I)(B_{n-1}\\lambda^{n-1} + \\cdots + B_0) = (c_n \\lambda^n + \\cdots + c_0) I$ and identify the matrix coefficient of each power. This gives $n+1$ matrix equations; summing them correctly (each multiplied by the appropriate power of $A$) yields $p(A) = 0$.',
       '**Over commutative rings.** The Cayley-Hamilton theorem holds for any $n \\times n$ matrix over a commutative ring $R$ (not just fields). The adjugate proof carries through unchanged since it only uses the commutativity of $R$. This makes the theorem valid over $\\mathbb{Z}$, polynomial rings $\\mathbb{Z}[x]$, and more, which is important in algebraic K-theory and number theory.',
       '**Relationship between minimal and characteristic polynomials.** The minimal polynomial $m(\\lambda)$ divides the characteristic polynomial $p(\\lambda)$, and they have the same set of distinct roots. The exact divisibility structure encodes the Jordan block sizes: if $\\lambda_0$ has largest Jordan block of size $k$, then $(\\lambda - \\lambda_0)^k | m(\\lambda)$ but $(\\lambda - \\lambda_0)^{k+1} \\nmid m(\\lambda)$. The characteristic polynomial has $(\\lambda - \\lambda_0)^{m_a(\\lambda_0)}$ (the full algebraic multiplicity).',
+      '**Hamiltonian systems and symplectic matrices.** In classical mechanics, the time-evolution of a Hamiltonian system is described by a symplectic matrix $M$ satisfying $M^\\top J M = J$ where $J = \\begin{bmatrix}0&I\\\\-I&0\\end{bmatrix}$ is the standard symplectic form. Cayley-Hamilton applied to symplectic matrices reveals that their characteristic polynomial is palindromic: if $\\lambda$ is an eigenvalue, so is $1/\\lambda$. This symmetry has deep consequences — it forces all eigenvalues to come in reciprocal pairs, constraining the long-term stability of Hamiltonian dynamics. In control theory, the analogous result for Riccati equations guarantees that optimal control gains can be found from the stable half of the spectrum of the Hamiltonian matrix.',
     ],
     callouts: [
       {
@@ -415,6 +439,31 @@ print((K@K@K + K).round(10))`,
         },
       ],
       answer: 'A³ = 31A - 30I. Verify: A³ = [[8+3, 6+12],[2+4, 3+16]] = [[11,18],[6,19]] and 31[[2,3],[1,4]] - 30I = [[62-30,93],[31,124-30]] = [[32,93],[31,94]]... compute numerically to confirm.',
+    },
+    {
+      id: 'ch-la3-006-3',
+      difficulty: 'hard',
+      problem: 'For $A = \\begin{bmatrix}0&1\\\\-1&0\\end{bmatrix}$ (90° rotation matrix), find the minimal polynomial. Then verify that $A^4 = I$ using only the Cayley-Hamilton identity, without computing $A^4$ directly by multiplication.',
+      hint: 'Char poly: trace = 0, det = 1, so $p(\\lambda) = \\lambda^2 + 1$. Therefore $A^2 = -I$. Use this to find $A^4$.',
+      walkthrough: [
+        {
+          expression: 'p(\\lambda) = \\lambda^2 - \\text{tr}(A)\\lambda + \\det(A) = \\lambda^2 + 1',
+          annotation: 'trace = 0, det = 0·0 - 1·(-1) = 1.',
+        },
+        {
+          expression: 'p(A) = 0 \\quad \\Rightarrow \\quad A^2 + I = 0 \\quad \\Rightarrow \\quad A^2 = -I',
+          annotation: 'Cayley-Hamilton. Note: $A^2 = -I$ means two 90° rotations = 180° rotation = negation. ✓',
+        },
+        {
+          expression: 'A^4 = (A^2)^2 = (-I)^2 = I',
+          annotation: 'Four 90° rotations = 360° = identity. ✓ No matrix multiplication required — only scalar reasoning about $A^2 = -I$.',
+        },
+        {
+          expression: 'm(\\lambda) = p(\\lambda) = \\lambda^2 + 1',
+          annotation: 'Minimal polynomial equals the characteristic polynomial here. Check: is there a degree-1 annihilator? That would require $A = cI$ for some scalar $c$, but $A = [[0,1],[-1,0]] \\neq cI$. So $m = p$.',
+        },
+      ],
+      answer: 'Minimal polynomial: $\\lambda^2 + 1$. $A^4 = I$ follows from $A^2 = -I$ via $(A^2)^2 = (-I)^2 = I$.',
     },
   ],
 
@@ -638,12 +687,12 @@ print((K@K@K + K).round(10))`,
   transferPrompts: [
     {
       situation: 'You need to compute $A^{50}$ for a $2\\times 2$ matrix without diagonalizing.',
-      competingTechniques: ['Repeated matrix multiplication (50 steps)', 'Diagonalization then $D^{50}$', 'Cayley-Hamilton recurrence'],
+      competingTechniques: 'Repeated matrix multiplication (50 steps), diagonalization then $D^{50}$, or Cayley-Hamilton recurrence.',
       whyThisTechniqueWins: 'Cayley-Hamilton gives $A^2 = \\text{tr}(A)A - \\det(A)I$, establishing a recurrence for $A^n = a_n A + b_n I$. You then compute the scalars $a_n, b_n$ with a simple two-term recurrence — no matrix multiplications beyond $A^2$.',
     },
     {
       situation: 'In signal processing, you need to bound the order of a recurrence relation produced by a linear system with state matrix $A$.',
-      competingTechniques: ['Compute all eigenvectors', 'Simulate the recurrence directly', 'Apply Cayley-Hamilton'],
+      competingTechniques: 'Compute all eigenvectors explicitly, simulate the recurrence directly, or apply Cayley-Hamilton.',
       whyThisTechniqueWins: 'Cayley-Hamilton says $A^n$ is a linear combination of $\\{I, A, \\ldots, A^{n-1}\\}$, so any output of the system obeys a recurrence of order $\\leq n$. You get the bound immediately from the matrix size — no eigenvalue computation required.',
     },
   ],
@@ -669,5 +718,33 @@ print((K@K@K + K).round(10))`,
     explainVerbally: 'State Cayley-Hamilton in one sentence, explain why plugging A into p(A) gives zero (not just "by definition"), and distinguish the minimal polynomial from the characteristic polynomial.',
     detectIncorrectApplication: 'Identify the false substitution proof p(A) = det(A-AI); catch sign errors in characteristic polynomial coefficients; recognize when minimal polynomial is strictly smaller than characteristic polynomial.',
     transferToUnfamiliar: 'Apply Cayley-Hamilton to bound recurrence order in a linear system, derive the Rodrigues formula for 3D rotations, or compute matrix exponentials via polynomial truncation.',
+  },
+
+  semantics: {
+    core: [
+      { symbol: 'p(\\lambda)', meaning: 'Characteristic polynomial: $\\det(A - \\lambda I)$; a degree-$n$ polynomial in the scalar $\\lambda$ whose roots are the eigenvalues of $A$.' },
+      { symbol: 'p(A)', meaning: 'The characteristic polynomial evaluated at the matrix $A$: replace $\\lambda^k$ with $A^k$ and scalar constants $c$ with $cI$. Cayley-Hamilton: $p(A) = 0$.' },
+      { symbol: 'm(\\lambda)', meaning: 'Minimal polynomial: the monic polynomial of smallest degree satisfying $m(A) = 0$. Divides $p(\\lambda)$ and has the same roots, but possibly smaller multiplicities.' },
+      { symbol: 'A^{-1} = (\\text{tr}(A)I - A)/\\det(A)', meaning: 'Inverse formula for $2\\times 2$ matrices derived from Cayley-Hamilton by multiplying $p(A) = 0$ by $A^{-1}$.' },
+      { symbol: 'A^n = a_n A + b_n I', meaning: 'For a $2\\times 2$ matrix, every power $A^n$ is a linear combination of $A$ and $I$, with scalar coefficients satisfying a two-term recurrence from the characteristic polynomial.' },
+    ],
+    rulesOfThumb: [
+      'For a $2\\times 2$ matrix: $A^{-1} = (\\text{tr}(A) \\cdot I - A)/\\det(A)$ — no row reduction needed.',
+      'Every $A^k$ for $k \\geq n$ is a linear combination of $\\{I, A, \\ldots, A^{n-1}\\}$ — Cayley-Hamilton is a recurrence relation.',
+      'Minimal polynomial = characteristic polynomial iff no Jordan block is smaller than it could be — i.e., for non-diagonalizable matrices.',
+      'For diagonal (diagonalizable) matrices, minimal polynomial has each distinct eigenvalue once: $m(\\lambda) = \\prod_i (\\lambda - \\lambda_i)$.',
+      'Never prove Cayley-Hamilton by substitution: $\\det(A - AI) = \\det(0) = 0$ is a type error — $A$ is a matrix, not a scalar.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: [
+      { id: 'la2-012', reason: 'Review cofactor expansion and the adjugate matrix — the rigorous proof of Cayley-Hamilton uses the adjugate identity $(A-\\lambda I)\\text{adj}(A-\\lambda I) = p(\\lambda)I$.' },
+      { id: 'la3-001', reason: 'Review eigenvalues and the characteristic polynomial — Cayley-Hamilton is a statement about plugging the matrix back into its own eigenvalue polynomial.' },
+    ],
+    futureLinks: [
+      { id: 'la3-007', preview: 'Matrix exponential: Cayley-Hamilton truncates the Taylor series of $e^{At}$ to finite degree, making matrix exponentials computable as polynomial functions of $A$.' },
+      { id: 'la3-004', preview: 'Jordan normal form: the minimal polynomial encodes the Jordan block sizes — its factorization reveals whether the matrix is diagonalizable.' },
+    ],
   },
 };

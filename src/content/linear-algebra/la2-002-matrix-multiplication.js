@@ -36,6 +36,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'Procedure: Multiply Two Matrices by Hand',
+        body: 'Step 1. Check dimensions: $A$ is $m \\times k$, $B$ is $k \\times n$. The inner dimensions must match. The product $AB$ will be $m \\times n$.\nStep 2. For each entry $(i, j)$ of $AB$: take row $i$ of $A$ and column $j$ of $B$.\nStep 3. Multiply corresponding elements and sum: $(AB)_{ij} = \\sum_{k} A_{ik} B_{kj}$ (a dot product).\nStep 4. Repeat for all $(i,j)$ combinations — there are $m \\times n$ entries total.\nStep 5. Verify: column $j$ of $AB$ should equal $A$ applied to column $j$ of $B$.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 2 of 12 — Matrices & Transformations',
         body: '**Previous (Lesson 1):** A matrix is a linear transformation — its columns are where $\\hat{i}$ and $\\hat{j}$ land.\n**This lesson:** Multiplying matrices = composing transformations. The product $BA$ applies $A$ first, then $B$.\n**Next (Lesson 3):** Determinants — how much does the transformation scale area?',
@@ -195,6 +200,34 @@ end
 step1 = R_G68 * path_in;
 step2 = M_mirror * step1;
 fprintf('\\nSame result via two steps? %d\\n', norm(step2 - path_out) < 1e-10)`,
+            },
+            {
+              id: 4,
+              cellTitle: 'Challenge: verify associativity and a 3-matrix chain',
+              prose: [
+                '`(A*B)*C` and `A*(B*C)` produce the same composite matrix — associativity holds. Each grouping is two matrix-matrix products (order of grouping does not change the left-to-right sequence of the three transforms). The `norm((A*B)*C - A*(B*C)) < 1e-12` check confirms this numerically.',
+                'Applying three matrices to a vector $\\mathbf{v}$ costs 3 matrix-vector multiplications if done one at a time: $A(B(C\\mathbf{v}))$. Pre-computing $M = ABC$ costs one matrix-matrix product (done once), then every vector only needs $M\\mathbf{v}$ — one multiplication instead of three. `M * v` vs `A * (B * (C * v))` proves this gives the same result for any $\\mathbf{v}$.',
+              ],
+              code: `% Verify associativity: (A*B)*C = A*(B*C)
+A = [2 1; 0 3];
+B = [1 2; 3 1];
+C = [0 1; 1 0];
+
+v = [4; 2];
+
+% Two groupings — should give identical composite matrices
+left_assoc  = (A*B)*C;
+right_assoc = A*(B*C);
+fprintf('Associativity: norm diff = %.2e  (should be ~0)\\n', ...
+    norm(left_assoc - right_assoc))
+
+% Pre-compute the chain, then apply once vs three sequential steps
+M = A * B * C;
+result_pre  = M * v;
+result_seq  = A * (B * (C * v));
+fprintf('Pre-composed: [%.4g; %.4g]\\n', result_pre(1), result_pre(2))
+fprintf('Sequential:   [%.4g; %.4g]\\n', result_seq(1), result_seq(2))
+fprintf('Equal: %d\\n', norm(result_pre - result_seq) < 1e-12)`,
             },
           ]
         }

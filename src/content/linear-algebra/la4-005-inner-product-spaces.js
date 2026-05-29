@@ -25,6 +25,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'Procedure: Verify an Inner Product and Compute Geometry',
+        body: 'Step 1. **Check the three axioms.** For $\\langle \\mathbf{u}, \\mathbf{v} \\rangle$ to be a valid inner product, verify: (1) Symmetry: $\\langle \\mathbf{u}, \\mathbf{v} \\rangle = \\langle \\mathbf{v}, \\mathbf{u} \\rangle$; (2) Linearity: $\\langle c\\mathbf{u}+\\mathbf{w}, \\mathbf{v} \\rangle = c\\langle \\mathbf{u}, \\mathbf{v} \\rangle + \\langle \\mathbf{w}, \\mathbf{v} \\rangle$; (3) Positive definiteness: $\\langle \\mathbf{v}, \\mathbf{v} \\rangle > 0$ for $\\mathbf{v} \\neq \\mathbf{0}$.\n\nStep 2. **Compute norms.** $\\|\\mathbf{v}\\| = \\sqrt{\\langle \\mathbf{v}, \\mathbf{v} \\rangle}$. For functions: $\\|f\\| = \\sqrt{\\int_a^b f(x)^2\\,dx}$.\n\nStep 3. **Check Cauchy-Schwarz.** $|\\langle \\mathbf{u}, \\mathbf{v} \\rangle| \\leq \\|\\mathbf{u}\\|\\|\\mathbf{v}\\|$. Equality holds iff one is a scalar multiple of the other.\n\nStep 4. **Find angle.** $\\cos\\theta = \\langle \\mathbf{u}, \\mathbf{v} \\rangle / (\\|\\mathbf{u}\\|\\|\\mathbf{v}\\|)$. Two vectors are orthogonal iff $\\langle \\mathbf{u}, \\mathbf{v} \\rangle = 0$.\n\nStep 5. **Project.** $\\text{proj}_{\\mathbf{v}} \\mathbf{u} = \\frac{\\langle \\mathbf{u}, \\mathbf{v} \\rangle}{\\langle \\mathbf{v}, \\mathbf{v} \\rangle}\\mathbf{v}$. Same formula in any inner product space — just swap the dot product for $\\langle \\cdot, \\cdot \\rangle$.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 5 of 9 — Orthogonality & SVD',
         body: '**Previous (Lesson 4):** SVD — the universal factorization $A = U\\Sigma V^T$.\n**This lesson:** Inner Product Spaces — abstracting the dot product to define geometry in any vector space.\n**Next (Lesson 6):** Spectral Theorem — why symmetric matrices are always diagonalizable with orthogonal eigenvectors.',
@@ -246,6 +251,7 @@ for freq in [120, 300, 500, 650, 800]:
       '**Hilbert spaces.** An inner product space that is complete (every Cauchy sequence converges) is a Hilbert space. $\\mathbb{R}^n$ and $\\mathbb{C}^n$ are finite-dimensional Hilbert spaces. The space $L^2[a,b]$ of square-integrable functions (with $\\langle f, g \\rangle = \\int_a^b f\\bar{g}$) is an infinite-dimensional Hilbert space — every square-integrable function has a convergent Fourier series. Finite-dimensional inner product spaces are always complete (no distinction from Hilbert space in finite dimensions).',
       '**Riesz representation theorem.** Every continuous linear functional $\\phi: H \\to \\mathbb{F}$ on a Hilbert space $H$ is of the form $\\phi(\\mathbf{v}) = \\langle \\mathbf{v}, \\mathbf{w} \\rangle$ for a unique $\\mathbf{w} \\in H$. This profound result means that "measuring by integration against a function" and "taking an inner product" are the same thing. In finite dimensions: any linear functional on $\\mathbb{R}^n$ is a dot product with some vector — the gradient $\\nabla f(\\mathbf{x})$ is exactly this representing vector for the derivative functional.',
       '**Gram-Schmidt and ONB existence.** In any finite-dimensional inner product space, an orthonormal basis (ONB) always exists via Gram-Schmidt. The expansion $\\mathbf{v} = \\sum_{k=1}^n \\langle \\mathbf{v}, \\mathbf{e}_k \\rangle \\mathbf{e}_k$ expresses $\\mathbf{v}$ in the orthonormal basis, and the coefficient $\\langle \\mathbf{v}, \\mathbf{e}_k \\rangle$ is the orthogonal projection of $\\mathbf{v}$ onto the $k$-th basis direction. This is why Fourier coefficients are computed as integrals: $a_n = \\frac{1}{\\pi}\\int_{-\\pi}^{\\pi} f(x)\\cos(nx)\\,dx = \\frac{\\langle f, \\cos(nx)\\rangle}{\\|\\cos(nx)\\|^2}$.',
+      '**Adjoint operators and self-adjointness.** In an inner product space, the adjoint $T^*$ of a linear operator $T: V \\to V$ is defined by $\\langle T\\mathbf{u}, \\mathbf{v} \\rangle = \\langle \\mathbf{u}, T^*\\mathbf{v} \\rangle$ for all $\\mathbf{u}, \\mathbf{v}$. For matrices, the adjoint under the standard inner product is the transpose: $(A^*)_{ij} = A_{ji}$. An operator is **self-adjoint** if $T = T^*$, meaning $\\langle T\\mathbf{u}, \\mathbf{v} \\rangle = \\langle \\mathbf{u}, T\\mathbf{v} \\rangle$. Self-adjoint operators have real eigenvalues and orthogonal eigenvectors — which is precisely the Spectral Theorem. This abstract formulation extends to infinite-dimensional Hilbert spaces, where it underlies quantum mechanics: every observable is a self-adjoint operator on a Hilbert space of wave functions, and its real eigenvalues are the measurable values of that observable.',
     ],
     callouts: [
       {
@@ -403,6 +409,32 @@ for freq in [120, 300, 500, 650, 800]:
         '**First 3 terms:** $\\pi(b_1^2 + b_2^2 + b_3^2) = \\pi(4 + 1 + 4/9) = \\pi \\cdot \\frac{49}{9} \\approx 17.10$. Captured fraction: $\\frac{17.10}{65.80} \\approx 26\\%$ — only 3 terms.',
         '**Convergence:** The full series requires $\\sum_{n=1}^\\infty \\frac{4}{n^2} = \\frac{2\\pi^2}{3}$ (Basel problem), and $\\pi \\cdot \\frac{2\\pi^2}{3} = \\frac{2\\pi^3}{3} = \\|f\\|^2$ ✓. Parseval is confirmed by the Basel problem identity.',
       ],
+    },
+    {
+      id: 'ch-la4-005-3',
+      title: 'Weighted inner product: find all W-orthogonal pairs',
+      difficulty: 'medium',
+      problem: 'On $\\mathbb{R}^2$, define $\\langle \\mathbf{u}, \\mathbf{v} \\rangle_W = 3u_1v_1 + 7u_2v_2$. (a) Verify this satisfies all three inner product axioms. (b) Find the set of all vectors $\\mathbf{v}$ that are $W$-orthogonal to $\\mathbf{a} = [7, -3]^\\top$. (c) Show that $\\mathbf{a}$ and $\\mathbf{b} = [1,1]^\\top$ are $W$-orthogonal but NOT dot-product orthogonal. (d) Compute the $W$-norm of $\\mathbf{a}$.',
+      hint: 'For part (b), solve $\\langle \\mathbf{a}, \\mathbf{v} \\rangle_W = 3(7)v_1 + 7(-3)v_2 = 21v_1 - 21v_2 = 0$, giving $v_1 = v_2$. For $W$-norm: $\\|\\mathbf{a}\\|_W = \\sqrt{\\langle \\mathbf{a}, \\mathbf{a} \\rangle_W} = \\sqrt{3(49) + 7(9)}$.',
+      walkthrough: [
+        {
+          expression: '\\langle \\mathbf{u}, \\mathbf{v} \\rangle_W = \\mathbf{u}^\\top W \\mathbf{v}, \\quad W = \\begin{pmatrix}3 & 0 \\\\ 0 & 7\\end{pmatrix}',
+          annotation: 'Positive definite (eigenvalues 3 and 7, both positive) ✓. Symmetry: $w_i u_i v_i = w_i v_i u_i$ ✓. Linearity follows from distributivity ✓. All three axioms hold.',
+        },
+        {
+          expression: '\\langle [7,-3], \\mathbf{v} \\rangle_W = 3(7)v_1 + 7(-3)v_2 = 21v_1 - 21v_2 = 0',
+          annotation: 'The set of $W$-orthogonal vectors solves $v_1 = v_2$: this is the line $\\text{span}\\{[1,1]^\\top\\}$.',
+        },
+        {
+          expression: '\\langle [7,-3], [1,1] \\rangle_W = 21 - 21 = 0 \\qquad [7,-3]^\\top \\cdot [1,1]^\\top = 7 - 3 = 4 \\neq 0',
+          annotation: '$W$-orthogonal but not dot-product orthogonal. Different inner products, different geometry on the same space.',
+        },
+        {
+          expression: '\\|[7,-3]\\|_W = \\sqrt{3(49) + 7(9)} = \\sqrt{147 + 63} = \\sqrt{210}',
+          annotation: 'Compare to the Euclidean norm $\\|[7,-3]\\| = \\sqrt{49+9} = \\sqrt{58}$. The $W$-norm weights the first component more heavily (factor 3 vs. 7), but the specific numbers still give $\\sqrt{210} \\approx 14.49$.',
+        },
+      ],
+      answer: '(a) Axioms verified: W is SPD. (b) {v : v₁=v₂} = span{[1,1]ᵀ}. (c) W-inner product = 0 ≠ 4 = dot product. (d) ‖a‖_W = √210.',
     },
   ],
 
@@ -574,12 +606,12 @@ for freq in [120, 300, 500, 650, 800]:
   transferPrompts: [
     {
       situation: 'You want to find the best polynomial approximation to a function $f$ on $[-1,1]$ in the $L^2$ sense.',
-      competingTechniques: ['Taylor expansion', 'Interpolation at chosen nodes', 'Projection via function inner product'],
+      competingTechniques: 'Taylor expansion; Interpolation at chosen nodes; Projection via function inner product',
       whyThisTechniqueWins: 'The $L^2$ projection onto the polynomial subspace (using Legendre polynomials as ONB) minimizes $\\|f - p\\|_{L^2}^2$ — the average squared error. Taylor minimizes pointwise error near a single point; interpolation forces exact agreement at discrete points. The inner product projection gives the globally best fit.',
     },
     {
       situation: 'In signal processing, you want to extract the amplitude of a specific frequency $\\omega_0$ from a noisy signal $f(t)$.',
-      competingTechniques: ['Bandpass filter', 'Fourier transform at $\\omega_0$', 'Inner product with the basis function'],
+      competingTechniques: 'Bandpass filter; Fourier transform at ω₀; Inner product with the basis function',
       whyThisTechniqueWins: 'The Fourier coefficient is $c_n = \\langle f, e^{i\\omega_0 t} \\rangle / \\|e^{i\\omega_0 t}\\|^2$ — an inner product. Because the Fourier basis is orthogonal, this extracts exactly the $\\omega_0$ component without contamination from other frequencies.',
     },
   ],
@@ -605,5 +637,44 @@ for freq in [120, 300, 500, 650, 800]:
     explainVerbally: 'Explain what an inner product generalizes beyond the dot product, why orthogonality depends on the inner product choice, and what completeness (Hilbert space) means.',
     detectIncorrectApplication: 'Catch negative-weight inner products (fails positive definiteness); catch pointwise vs. integral confusion; catch assuming orthogonality is absolute.',
     transferToUnfamiliar: 'Apply function inner products to Fourier series, quantum mechanics, or polynomial approximation — any context where geometry extends to infinite-dimensional function spaces.',
+  },
+
+  semantics: {
+    core: [
+      { symbol: '\\langle \\mathbf{u}, \\mathbf{v} \\rangle', meaning: 'Inner product of u and v — generalizes the dot product to any vector space' },
+      { symbol: '\\|\\mathbf{v}\\| = \\sqrt{\\langle \\mathbf{v}, \\mathbf{v} \\rangle}', meaning: 'Norm induced by the inner product — the "length" in this geometry' },
+      { symbol: '\\langle \\mathbf{u}, \\mathbf{v} \\rangle_W = \\mathbf{u}^T W \\mathbf{v}', meaning: 'Weighted inner product — W symmetric positive definite; arises in weighted least squares' },
+      { symbol: '\\langle f, g \\rangle = \\int_a^b f(x)g(x)\\,dx', meaning: 'Function inner product on C[a,b] — the foundation of Fourier series and signal analysis' },
+      { symbol: '|\\langle \\mathbf{u}, \\mathbf{v} \\rangle| \\leq \\|\\mathbf{u}\\|\\|\\mathbf{v}\\|', meaning: 'Cauchy-Schwarz inequality — guarantees that the "cosine" formula gives values in [-1,1]' },
+    ],
+    rulesOfThumb: [
+      'Orthogonality is inner-product-relative: u⊥v under one inner product does not mean u⊥v under another.',
+      'The three axioms to check: symmetry, linearity, positive definiteness. A negative coefficient anywhere fails positive definiteness.',
+      'Gram-Schmidt, projection, and orthogonal decomposition work identically in any inner product space — just replace the dot product.',
+      'Function inner products are integrals: the inner product of two functions is one scalar, not a function of x.',
+      'A Hilbert space is a complete inner product space: ℝⁿ always is; C[a,b] under L² norm is not (limits can be discontinuous).',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: [
+      {
+        lessonId: 'la4-001',
+        label: 'Orthogonal Projections',
+        note: 'The projection formula $\\text{proj}_{\\mathbf{v}} \\mathbf{u} = \\frac{\\mathbf{u}\\cdot\\mathbf{v}}{\\mathbf{v}\\cdot\\mathbf{v}}\\mathbf{v}$ is a special case of the abstract formula $\\frac{\\langle \\mathbf{u}, \\mathbf{v} \\rangle}{\\langle \\mathbf{v}, \\mathbf{v} \\rangle}\\mathbf{v}$ in any inner product space.',
+      },
+      {
+        lessonId: 'la4-002',
+        label: 'Gram-Schmidt',
+        note: 'Gram-Schmidt works in any inner product space: the projection subtraction step uses $\\langle \\cdot, \\cdot \\rangle$ in place of the dot product throughout.',
+      },
+    ],
+    futureLinks: [
+      {
+        lessonId: 'la4-006',
+        label: 'Spectral Theorem',
+        note: 'The Spectral Theorem says symmetric matrices are self-adjoint under the dot product inner product — their eigenvectors are orthogonal in the sense of that inner product.',
+      },
+    ],
   },
 };

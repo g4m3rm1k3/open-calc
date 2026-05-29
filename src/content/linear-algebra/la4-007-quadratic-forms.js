@@ -25,6 +25,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'Procedure: Analyze a Quadratic Form',
+        body: 'Step 1. **Write the symmetric matrix.** For $Q = ax_1^2 + bx_1x_2 + cx_2^2$: set $A_{11}=a$, $A_{22}=c$, $A_{12}=A_{21}=b/2$ (half the cross-term coefficient).\n\nStep 2. **Classify the form.** Find eigenvalues of $A$ (or use Sylvester: check all leading principal minors). All positive → PD. Mixed signs → indefinite. All non-negative with some zero → PSD.\n\nStep 3. **Apply the Principal Axes Theorem.** Change variables $\\mathbf{x} = Q\\mathbf{y}$ (orthogonal), where $Q$ has eigenvectors as columns. In the new coordinates: $Q(\\mathbf{x}) = \\lambda_1 y_1^2 + \\cdots + \\lambda_n y_n^2$ — no cross terms.\n\nStep 4. **Identify the level set.** For $Q(\\mathbf{x}) = c$ with $c > 0$: if all $\\lambda_i > 0$, this is an ellipse/ellipsoid with semi-axes $a_i = \\sqrt{c/\\lambda_i}$ along the eigenvector directions. Mixed signs give a hyperbola/hyperboloid.\n\nStep 5. **Interpret definiteness geometrically.** Positive definite → bowl shape (local min possible). Indefinite → saddle shape.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 7 of 9 — Orthogonality & SVD',
         body: '**Previous (Lesson 6):** Spectral Theorem — symmetric matrices are orthogonally diagonalizable with real eigenvalues.\n**This lesson:** Quadratic Forms — how symmetric matrices define a scalar-valued function $Q(\\mathbf{x}) = \\mathbf{x}^T A\\mathbf{x}$, and what the eigenvalue signs tell you about its geometry.\n**Next (Lesson 8):** Pseudoinverse — the generalization of matrix inverse to non-square and rank-deficient matrices.',
@@ -295,6 +300,7 @@ print(f"Min Ra = {result.fun:.4f} μm")
       '**Sylvester\'s Law of Inertia (formal).** If $A$ and $B$ are real symmetric matrices, they are congruent ($A = P^\\top B P$ for some invertible $P$) iff they have the same signature $(n_+, n_-, n_0)$ where $n_+, n_-, n_0$ are the numbers of positive, negative, and zero eigenvalues. The classification of real quadratic forms over $\\mathbb{R}$ is completely determined by the signature. This is the algebraic content of the Principal Axes Theorem: no matter how you diagonalize the form (via eigenvalues or Gaussian elimination), the same count of positive and negative coefficients appears.',
       '**Connection to topology.** The level set $\\{\\mathbf{x} : \\mathbf{x}^\\top A \\mathbf{x} = 1\\}$ is: a real ellipsoid if $A$ is PD (compact, simply connected); a hyperboloid of one sheet if $A$ has signature $(n-1, 1, 0)$; a hyperboloid of two sheets if $A$ has signature $(1, n-1, 0)$; degenerate (cylinder, cone, empty) if $A$ is singular. The topology (compactness, connectivity, number of components) is determined solely by the signature.',
       '**Completing the square and LDL decomposition.** The classical method for diagonalizing a quadratic form without eigenvalues is **completing the square**, equivalent to $LDL^\\top$ decomposition of $A$ (where $L$ is unit lower-triangular and $D$ is diagonal). The diagonal entries of $D$ are the pivots of Gaussian elimination and their signs determine definiteness. When all pivots are positive, $A$ is positive definite — this is the LDL-based proof of Sylvester\'s criterion.',
+      '**Simultaneous diagonalization of two quadratic forms.** Given two symmetric matrices $A$ and $B$ with $B$ positive definite, there exists an invertible matrix $P$ such that $P^\\top A P = \\Lambda$ (diagonal) and $P^\\top B P = I$ simultaneously. This is the **generalized eigenvalue problem** $A\\mathbf{v} = \\lambda B\\mathbf{v}$. In CNC vibration analysis, the kinetic energy is $T = \\frac{1}{2}\\dot{\\mathbf{x}}^\\top M \\dot{\\mathbf{x}}$ and potential energy is $U = \\frac{1}{2}\\mathbf{x}^\\top K \\mathbf{x}$, both positive definite quadratic forms. Simultaneously diagonalizing $K$ and $M$ gives the natural frequencies $\\omega_i = \\sqrt{\\lambda_i}$ (generalized eigenvalues) — the resonant frequencies of the structure. The principal directions that simultaneously diagonalize both forms are the **normal modes** of vibration.',
     ],
     callouts: [
       {
@@ -446,6 +452,32 @@ print(f"Min Ra = {result.fun:.4f} μm")
         '**Semi-axes:** The tolerance ellipse $\\mathbf{e}^\\top \\Sigma^{-1} \\mathbf{e} = c$ in the eigenvector coordinates of $\\Sigma$ becomes $\\frac{y_1^2}{c\\lambda_1} + \\frac{y_2^2}{c\\lambda_2} = 1$. Semi-axes: $a_1 = \\sqrt{c\\lambda_1} = \\sqrt{5.99 \\times 2.61} \\approx 3.95$ mm, $a_2 = \\sqrt{c\\lambda_2} = \\sqrt{5.99 \\times 10.39} \\approx 7.89$ mm.',
         '**Interpretation:** The larger semi-axis ($\\approx 7.89$ mm) points in the $\\mathbf{q}_2$ direction — the direction of maximum error spread. If the $y$-axis dimension has larger variance ($\\Sigma_{22} = 9 > \\Sigma_{11} = 4$), the principal axis tilts toward $y$.',
       ],
+    },
+    {
+      id: 'ch-la4-007-3',
+      title: 'Hessian analysis and saddle point classification',
+      difficulty: 'medium',
+      problem: 'The function $f(x,y) = x^3 + y^3 - 3xy$ has a critical point at $(1,1)$ (verify: $\\nabla f = (3x^2 - 3y, 3y^2 - 3x) = (0,0)$ at $(1,1)$). (a) Compute the Hessian matrix $H$ at $(1,1)$. (b) Classify the critical point using the definiteness of $H$. (c) What is the sign of the function near $(1,1)$?',
+      hint: '$H_{ij} = \\partial^2 f / \\partial x_i \\partial x_j$. At $(1,1)$: $H_{11} = 6x|_{(1,1)} = 6$, $H_{22} = 6y|_{(1,1)} = 6$, $H_{12} = H_{21} = -3$. Use Sylvester: $M_1 = H_{11} > 0$ and $\\det(H) = ?$.',
+      walkthrough: [
+        {
+          expression: 'H = \\begin{bmatrix}6x & -3 \\\\ -3 & 6y\\end{bmatrix}\\bigg|_{(1,1)} = \\begin{bmatrix}6 & -3 \\\\ -3 & 6\\end{bmatrix}',
+          annotation: '$\\partial^2 f/\\partial x^2 = 6x$, $\\partial^2 f/\\partial y^2 = 6y$, $\\partial^2 f/\\partial x\\partial y = -3$. Evaluate at $(1,1)$.',
+        },
+        {
+          expression: 'M_1 = 6 > 0 \\quad \\det(H) = 36 - 9 = 27 > 0',
+          annotation: 'Sylvester criterion: both leading principal minors positive → $H$ is positive definite. Eigenvalues are both positive (trace $= 12 > 0$, det $= 27 > 0$ confirms this).',
+        },
+        {
+          expression: 'H \\succ 0 \\implies f \\text{ has a LOCAL MINIMUM at } (1,1)',
+          annotation: 'The quadratic form $\\mathbf{h}^\\top H \\mathbf{h} > 0$ for all directions $\\mathbf{h}$, so the function curves upward in all directions from $(1,1)$. It is indeed the global minimum of $f$ on the region where $x,y > 0$.',
+        },
+        {
+          expression: 'f(1,1) = 1 + 1 - 3 = -1',
+          annotation: 'The local minimum value is $-1$. Near $(1,1)$, $f(1+h_1, 1+h_2) \\approx -1 + \\frac{1}{2}(h_1,h_2)H(h_1,h_2)^\\top > -1$ for small $(h_1,h_2) \\neq 0$.',
+        },
+      ],
+      answer: 'H = [[6,-3],[-3,6]] at (1,1). H is positive definite (det=27>0, trace=12>0). Critical point at (1,1) is a local minimum with f(1,1) = -1.',
     },
   ],
 
@@ -649,6 +681,40 @@ print(f"Min Ra = {result.fun:.4f} μm")
       whyThisTechniqueWins: 'All three methods are equivalent, but the matrix/eigenvalue approach extends to $n$ dimensions (ellipsoids, hyperboloids), handles the rotation automatically (eigenvectors give the principal axes), and connects directly to PD classification. The discriminant trick $b^2 - 4ac$ is 2D only.',
     },
   ],
+
+  semantics: {
+    core: [
+      { symbol: 'Q(\\mathbf{x}) = \\mathbf{x}^\\top A \\mathbf{x}', meaning: 'Quadratic form — A must be symmetric; off-diagonal entries = half the cross-term coefficient' },
+      { symbol: 'A \\succ 0', meaning: 'Positive definite: Q(x) > 0 for all x ≠ 0; all eigenvalues positive' },
+      { symbol: '(n_+, n_-, n_0)', meaning: 'Signature of A — count of positive, negative, and zero eigenvalues; invariant under congruence' },
+      { symbol: 'a_i = \\sqrt{c/\\lambda_i}', meaning: 'Semi-axis length of the ellipse Q(x)=c in the ith principal direction' },
+      { symbol: 'H = [\\partial^2 f/\\partial x_i \\partial x_j]', meaning: 'Hessian matrix at a critical point — its definiteness determines whether the point is a min, max, or saddle' },
+    ],
+    rulesOfThumb: [
+      'Off-diagonal entry of A = half the cross-term coefficient (the factor of 2 in xᵀAx doubles it back).',
+      'Positive definite ↔ all eigenvalues positive ↔ all Sylvester leading principal minors positive.',
+      'Mixed eigenvalue signs = indefinite = saddle in optimization.',
+      'The principal axes of the level set Q=c are the eigenvectors; the semi-axes have length √(c/λᵢ).',
+      'Trace > 0 is NOT sufficient for positive definiteness; it only checks that eigenvalue sum is positive.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: [
+      {
+        lessonId: 'la4-006',
+        label: 'Spectral Theorem',
+        note: 'Quadratic form analysis is a direct application of the Spectral Theorem: orthogonal diagonalization $A = Q\\Lambda Q^\\top$ eliminates cross terms under the change of variables $\\mathbf{x} = Q\\mathbf{y}$.',
+      },
+    ],
+    futureLinks: [
+      {
+        lessonId: 'la4-008',
+        label: 'Pseudoinverse',
+        note: 'The pseudoinverse solves the least squares problem, which minimizes the quadratic form $\\|A\\mathbf{x} - \\mathbf{b}\\|^2 = (A\\mathbf{x}-\\mathbf{b})^\\top(A\\mathbf{x}-\\mathbf{b})$. When $A$ does not have full column rank, the quadratic form $\\mathbf{x}^\\top A^\\top A \\mathbf{x}$ is positive semidefinite (zero eigenvalue), and the pseudoinverse finds the minimum-norm minimizer.',
+      },
+    ],
+  },
 
   debugging: [
     {

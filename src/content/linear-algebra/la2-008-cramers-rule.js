@@ -30,6 +30,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: "Procedure: Apply Cramer's Rule to Solve Ax = b",
+        body: 'Step 1. Compute $\\det(A)$. If it is zero, the system has no unique solution — stop.\nStep 2. For each variable $x_i$ ($i = 1, \\ldots, n$): form the matrix $A_i$ by replacing column $i$ of $A$ with the vector $\\mathbf{b}$. All other columns stay unchanged.\nStep 3. Compute $\\det(A_i)$ using cofactor expansion (or row reduction).\nStep 4. Apply the formula: $x_i = \\det(A_i) / \\det(A)$.\nStep 5. Repeat steps 2–4 for every variable. You will compute $n+1$ determinants total.\nStep 6. Verify: substitute $\\mathbf{x}$ back into $A\\mathbf{x}$ and confirm it equals $\\mathbf{b}$.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 8 of 12 — Matrices & Transformations',
         body: '**Previous:** Special Matrices — symmetric, orthogonal, and positive definite.\n**This lesson:** Cramer\'s Rule — explicit determinant-based formulas for each solution variable; the adjugate inverse formula.\n**Next:** Matrix Calculus — how to differentiate functions of matrices and vectors.',
@@ -66,34 +71,109 @@ export default {
           initialCells: [
             {
               id: 1,
-              cellTitle: "Cramer's Rule step by step",
-              prose: ["Solve a 3×3 system using Cramer's Rule. Compare with A\\b."],
+              cellTitle: "Cramer's Rule step by step — 3×3 system",
+              prose: [
+                '`det(A)` computes the denominator shared by all variables. `[b A(:,2) A(:,3)]` builds the matrix $A_1(\\mathbf{b})$ — column 1 of $A$ replaced by $\\mathbf{b}$, columns 2 and 3 unchanged. `det([b A(:,2) A(:,3)]) / d` applies Cramer\'s formula: $x_1 = \\det(A_1)/\\det(A)$.',
+                '`A \\\\ b` is MATLAB\'s backslash operator which uses LU decomposition internally — this is the numerically correct approach for any real code. Comparing the two confirms Cramer\'s Rule gives the same answer but required computing 4 separate determinants vs one LU factorization.',
+              ],
               code: `A = [2 1 -1; -3 -1 2; -2 1 2];
 b = [8; -11; -3];
 
 d = det(A);
-x1 = det([b A(:,2) A(:,3)]) / d;
-x2 = det([A(:,1) b A(:,3)]) / d;
-x3 = det([A(:,1) A(:,2) b]) / d;
+fprintf('det(A) = %g\\n', d)
 
-disp('Cramer solution:')
-disp([x1; x2; x3])
-disp('Backslash solution:')
-disp(A \\ b)`,
+% Cramer: each x_i = det(A_i(b)) / det(A)
+x1 = det([b    A(:,2) A(:,3)]) / d;   % replace col 1
+x2 = det([A(:,1)   b  A(:,3)]) / d;   % replace col 2
+x3 = det([A(:,1) A(:,2)   b ]) / d;   % replace col 3
+
+fprintf('Cramer solution:     [%g; %g; %g]\\n', x1, x2, x3)
+fprintf('Backslash (LU) soln: ')
+disp((A \\ b)')
+fprintf('Match: %d\\n', norm([x1;x2;x3] - (A\\b)) < 1e-10)`,
             },
             {
               id: 2,
-              cellTitle: 'Adjugate and inverse formula',
-              prose: ['The adjugate matrix gives an explicit formula for the inverse.'],
-              code: `A = [1 2; 3 4];
+              cellTitle: 'Adjugate and inverse formula — A^{-1} = adj(A) / det(A)',
+              prose: [
+                '`[A(2,2) -A(1,2); -A(2,1) A(1,1)]` builds the adjugate of a 2×2 matrix by the rule: swap the diagonal entries ($a \\leftrightarrow d$) and negate the off-diagonal entries ($b \\to -b$, $c \\to -c$). This is a special case of the general formula $\\text{adj}(A)_{ij} = C_{ji}$.',
+                '`adj_A / d` divides every entry of $\\text{adj}(A)$ by $\\det(A)$, giving $A^{-1}$. `norm(inv_formula - inv(A)) < 1e-12` checks agreement to machine precision. `A * inv_formula` should equal $I$ — this verifies $A \\cdot \\text{adj}(A) = \\det(A) \\cdot I$ (the fundamental adjugate identity).',
+              ],
+              code: `A = [3 1; 2 4];
 d = det(A);
+fprintf('det(A) = %g\\n', d)
+
 % Adjugate of 2x2: swap diagonal, negate off-diagonal
 adj_A = [A(2,2) -A(1,2); -A(2,1) A(1,1)];
 inv_formula = adj_A / d;
-disp('1/det * adj(A):')
-inv_formula
-disp('inv(A):')
-inv(A)`,
+
+fprintf('adj(A) / det(A):\\n'); disp(inv_formula)
+fprintf('inv(A):\\n');           disp(inv(A))
+fprintf('Match: %d\\n', norm(inv_formula - inv(A)) < 1e-12)
+
+% Verify A * adj(A) = det(A) * I
+product = A * adj_A;
+fprintf('A * adj(A) (should be %g*I):\\n', d); disp(product)`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Build the adjugate of a 3×3 matrix from cofactors',
+              prose: [
+                'The nested loops compute every cofactor $C_{ij} = (-1)^{i+j} M_{ij}$: `minor = A` with row `i` and column `j` deleted, `det(minor)` gives $M_{ij}$, and the sign $(-1)^{i+j}$ is `(-1)^(i+j)`. The adjugate is the TRANSPOSE of the cofactor matrix — note `adj(j,i) = cofactor` (not `adj(i,j)`).',
+                '`A * adj_A` should equal `det(A) * eye(3)` — the fundamental adjugate identity. The off-diagonal entries should be exactly zero (the Alien Cofactor Theorem: using row $i$\'s entries with row $j$\'s cofactors gives determinant of a matrix with two identical rows = 0). `norm(A * adj_A - d * eye(3)) < 1e-10` confirms this numerically.',
+              ],
+              code: `A = [2 -1 0; 3 2 1; 0 1 4];
+d = det(A);
+n = 3;
+
+% Build adjugate: adj(j,i) = (-1)^(i+j) * M_ij
+adj_A = zeros(n);
+for i = 1:n
+    for j = 1:n
+        minor = A;
+        minor(i,:) = [];  % delete row i
+        minor(:,j) = [];  % delete col j
+        adj_A(j,i) = (-1)^(i+j) * det(minor);
+    end
+end
+
+fprintf('adj(A):\\n'); disp(adj_A)
+product = A * adj_A;
+fprintf('A * adj(A) (should be %g * I):\\n', d); disp(product)
+fprintf('Identity check: norm = %g (should be ~0)\\n', norm(product - d*eye(n)))`,
+            },
+            {
+              id: 4,
+              cellTitle: 'Challenge: verify Alien Cofactor Theorem numerically',
+              prose: [
+                'The Alien Cofactor Theorem states: $\\sum_k a_{jk} C_{ik} = 0$ when $i \\neq j$. This is the off-diagonal entry of $A \\cdot \\text{adj}(A)$. The loop below computes this sum directly for all pairs $(i,j)$ and prints the value — it should be 0 for $i \\neq j$ and $\\det(A)$ for $i = j$.',
+                'These are exactly the entries of $A \\cdot \\text{adj}(A)$. The diagonal entries are $\\det(A)$ (correct cofactor expansion); the off-diagonal entries are 0 (Alien Cofactor Theorem). Together they prove $A \\cdot \\text{adj}(A) = \\det(A) I$, which is the theoretical basis of the adjugate inverse formula.',
+              ],
+              code: `A = [2 -1 0; 3 2 1; 0 1 4];
+d = det(A);
+n = 3;
+
+% Rebuild cofactors C_ik (cofactor of entry (i,k))
+C = zeros(n);
+for i = 1:n
+    for k = 1:n
+        minor = A; minor(i,:) = []; minor(:,k) = [];
+        C(i,k) = (-1)^(i+k) * det(minor);
+    end
+end
+
+% Alien Cofactor: sum_k a_{jk} * C_{ik}  for all (i,j) pairs
+fprintf('Sum a_{jk}*C_{ik} for each (i,j) [diagonal = det(A) = %g; off-diagonal = 0]:\\n', d)
+for i = 1:n
+    for j = 1:n
+        alien_sum = A(j,:) * C(i,:)';  % row j of A dotted with row i of cofactors
+        if i == j
+            fprintf('  (i=%d, j=%d): %8.2e  (diagonal  = det(A))\\n', i, j, alien_sum)
+        else
+            fprintf('  (i=%d, j=%d): %8.2e  (off-diag = 0)\\n', i, j, alien_sum)
+        end
+    end
+end`,
             },
           ]
         }
@@ -213,6 +293,80 @@ print("np.linalg.inv(A):")
 print(np.linalg.inv(A).round(6))
 print("Match:", np.allclose(inv_formula, np.linalg.inv(A)))`,
             },
+            {
+              id: 3,
+              cellTitle: "Cramer's Rule for 3×3 — all three replacements visualized",
+              prose: [
+                '`A_i = A.copy(); A_i[:, i] = b` forms the matrix $A_i(\\mathbf{b})$ by replacing column $i$ with $\\mathbf{b}$. This is a one-line operation in NumPy: copy the matrix, then overwrite one column. `np.linalg.det(A_i) / det_A` applies the Cramer formula. All three variables are computed in the loop.',
+                'The heatmap grid shows the original matrix $A$ and the three replacement matrices $A_1, A_2, A_3$ side by side. The highlighted column in each $A_i$ is where $\\mathbf{b}$ was substituted. Comparing the determinant of each replacement matrix to $\\det(A)$ gives each variable as a simple ratio.',
+              ],
+              code: `import numpy as np
+import matplotlib.pyplot as plt
+
+A = np.array([[2., 1., -1.], [-3., -1., 2.], [-2., 1., 2.]])
+b = np.array([8., -11., -3.])
+det_A = np.linalg.det(A)
+
+x = np.zeros(3)
+for i in range(3):
+    A_i = A.copy()
+    A_i[:, i] = b             # replace column i with b
+    x[i] = np.linalg.det(A_i) / det_A
+
+print(f"det(A) = {det_A:.4f}")
+print(f"Cramer: x = {x.round(6)}")
+print(f"Verify A@x = b: {np.allclose(A @ x, b)}")
+
+fig, axes = plt.subplots(1, 4, figsize=(14, 3))
+matrices = [A] + [np.column_stack([A[:,:i], b, A[:,i+1:]]) for i in range(3)]
+titles   = ['A', 'A₁(b)', 'A₂(b)', 'A₃(b)']
+highlight = [None, 0, 1, 2]
+
+for ax, M, title, hcol in zip(axes, matrices, titles, highlight):
+    ax.imshow(M, cmap='Blues', aspect='equal', vmin=-12, vmax=8, alpha=0.5)
+    for i in range(3):
+        for j in range(3):
+            fc = 'darkorange' if j == hcol else 'black'
+            ax.text(j, i, f'{M[i,j]:.0f}', ha='center', va='center', fontsize=12,
+                    fontweight='bold' if j == hcol else 'normal', color=fc)
+    det_val = np.linalg.det(M)
+    ax.set_title(f'{title}\\ndet = {det_val:.1f}', fontsize=10)
+    ax.set_xticks([]); ax.set_yticks([])
+plt.suptitle(f"Cramer: x = [{x[0]:.2f}, {x[1]:.2f}, {x[2]:.2f}]", fontsize=11)
+plt.tight_layout()
+plt.show()`,
+            },
+            {
+              id: 'c1',
+              challengeType: 'write',
+              challengeNumber: 1,
+              challengeTitle: "Cramer's Rule for a parametric system",
+              difficulty: 'hard',
+              prompt: 'For the system with A(t) = [[t, 1], [1, t]] and b(t) = [t+1, 2]: (1) compute det(A(t)) as a polynomial in t, (2) use Cramer\'s Rule symbolically to get x1(t) and x2(t), (3) verify numerically at t=3 using np.linalg.solve, (4) plot x1(t) and x2(t) for t in [0, 5] (exclude t = ±1 where det = 0).',
+              code: `import numpy as np
+import matplotlib.pyplot as plt
+
+# 1. Symbolic: det(A(t)) = t^2 - 1 = (t-1)(t+1)
+# Cramer: x1(t) = det([[t+1,1],[2,t]]) / (t^2-1) = (t^2+t-2)/(t^2-1) = (t+2)/(t+1)
+# Cramer: x2(t) = det([[t,t+1],[1,2]]) / (t^2-1) = (2t-t-1)/(t^2-1) = (t-1)/((t-1)(t+1)) = 1/(t+1)
+
+# 2. Numerical verification at t=3
+t_val = 3
+A = np.array([[t_val, 1.], [1., t_val]])
+b = np.array([t_val+1., 2.])
+x_np = np.linalg.solve(A, b)
+x_cramer = np.array([(t_val+2)/(t_val+1), 1/(t_val+1)])
+print(f"t=3: Cramer=[{x_cramer[0]:.4f}, {x_cramer[1]:.4f}]  NumPy=[{x_np[0]:.4f}, {x_np[1]:.4f}]")
+
+# 3. Plot x1(t) and x2(t) — avoid t = -1 (singularity)
+t = np.linspace(0.1, 5, 300)
+x1_t = (t + 2) / (t + 1)
+x2_t = 1 / (t + 1)
+
+# Your plot here
+`,
+              hint: 'After factoring: x1(t) = (t+2)/(t+1), x2(t) = 1/(t+1). The singularity at t=−1 is where det(A) = 0 — the system loses its unique solution there.',
+            },
           ]
         }
       },
@@ -221,7 +375,10 @@ print("Match:", np.allclose(inv_formula, np.linalg.inv(A)))`,
 
   rigor: {
     prose: [
-      "**Cramer's Rule and the implicit function theorem.** One deep application of Cramer's Rule is in proving the implicit function theorem. If $F(\\mathbf{x}, \\mathbf{y}) = \\mathbf{0}$ near a point and the Jacobian $\\partial F / \\partial \\mathbf{y}$ is invertible, then $\\mathbf{y}$ can be expressed as a smooth function of $\\mathbf{x}$. The explicit formula for the partial derivatives of this implicit function is exactly Cramer's rule applied to the linear system $J \\partial \\mathbf{y}/\\partial x_i = -\\partial F/\\partial x_i$.",
+      "**Formal proof of Cramer's Rule using multilinearity.** Let $A = [\\mathbf{a}_1 | \\cdots | \\mathbf{a}_n]$ with $\\det(A) \\neq 0$, and let $\\mathbf{x}$ be the unique solution of $A\\mathbf{x} = \\mathbf{b}$. Form $A_i(\\mathbf{b})$ by replacing column $i$ with $\\mathbf{b} = x_1\\mathbf{a}_1 + \\cdots + x_n\\mathbf{a}_n$. By multilinearity of det in column $i$: $\\det(A_i(\\mathbf{b})) = \\sum_j x_j \\det(\\cdots | \\mathbf{a}_j | \\cdots)$ where $\\mathbf{a}_j$ is placed in column $i$. For $j \\neq i$ the matrix has two copies of column $j$, so its determinant is zero. The $j = i$ term gives $x_i \\det(A)$. Therefore $x_i = \\det(A_i(\\mathbf{b})) / \\det(A)$.",
+      "**Algebraic structure of the adjugate.** The entry $\\text{adj}(A)_{ij} = C_{ji}$ is a polynomial of degree $n-1$ in the entries of $A$ (it is an $(n-1) \\times (n-1)$ minor with a sign). This makes $A^{-1} = \\text{adj}(A)/\\det(A)$ a matrix of rational functions of $A$'s entries. This algebraic structure is why CAS systems (Mathematica, SymPy, Maple) use the adjugate formula internally for symbolic matrix inversion — the result is always an exact rational expression, not a floating-point approximation.",
+      "**Cramer's Rule and the implicit function theorem.** One deep application of Cramer's Rule is in proving the implicit function theorem. If $F(\\mathbf{x}, \\mathbf{y}) = \\mathbf{0}$ near a point and the Jacobian $\\partial F / \\partial \\mathbf{y}$ is invertible at that point, then $\\mathbf{y}$ can be expressed as a smooth function of $\\mathbf{x}$ near that point. The explicit formula for the partial derivatives $\\partial y_i / \\partial x_k$ is exactly Cramer's rule applied to the linear system $(\\partial F/\\partial \\mathbf{y}) \\cdot \\partial\\mathbf{y}/\\partial x_k = -\\partial F/\\partial x_k$, giving each partial derivative as a ratio of Jacobian subdeterminants.",
+      "**Computational complexity revisited.** Using LU decomposition (not cofactor expansion) to compute each of the $n+1$ determinants in Cramer's Rule costs $O(n^3)$ per determinant — total $O(n^4)$. For comparison, solving via LU is $O(n^3)$ once plus $O(n^2)$ per back-substitution. At $n = 100$: Cramer's Rule is $101 \\times O(100^3) \\approx 10^8$ operations vs $O(100^3) + O(100^2) \\approx 10^6$ for LU — a $100\\times$ factor in favor of LU. The gap widens quadratically with $n$.",
     ],
     callouts: [
       {

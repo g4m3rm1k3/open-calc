@@ -36,6 +36,11 @@
         body: '**Previous (Lesson 1):** Orthogonal Projections — how to find the shadow of a vector onto a subspace.\n**This lesson:** Gram-Schmidt — how to build a clean, perpendicular basis from any basis, using projection as the cleaning tool.\n**Next (Lesson 3):** Least Squares — how to find the best approximate solution when a system has no exact answer.',
       },
       {
+        type: 'procedure',
+        title: 'Procedure: Gram-Schmidt Orthogonalization',
+        body: 'Step 1. **Take the first vector.** Set $\\mathbf{u}_1 = \\mathbf{v}_1$. Normalize: $\\mathbf{e}_1 = \\mathbf{u}_1 / \\|\\mathbf{u}_1\\|$.\n\nStep 2. **For each subsequent vector $\\mathbf{v}_k$:** Subtract its projections onto all previous basis vectors:\n$\\mathbf{u}_k = \\mathbf{v}_k - \\sum_{j=1}^{k-1} (\\mathbf{v}_k \\cdot \\mathbf{e}_j)\\mathbf{e}_j$\n\nStep 3. **Normalize.** $\\mathbf{e}_k = \\mathbf{u}_k / \\|\\mathbf{u}_k\\|$. (If $\\mathbf{u}_k = \\mathbf{0}$, the original vectors were linearly dependent — stop.)\n\nStep 4. **Verify orthonormality.** For all $i \\neq j$: $\\mathbf{e}_i \\cdot \\mathbf{e}_j = 0$ and $\\|\\mathbf{e}_k\\| = 1$.\n\nStep 5. **Build QR.** Assemble $Q = [\\mathbf{e}_1 \\mid \\cdots \\mid \\mathbf{e}_k]$. The upper triangular matrix $R$ has entries $R_{ij} = \\mathbf{e}_i \\cdot \\mathbf{v}_j$ for $i \\leq j$.',
+      },
+      {
         type: 'insight',
         title: 'The Subtraction IS the Orthogonalization',
         body: 'When you subtract the projection of $\\mathbf{v}_2$ onto $\\mathbf{e}_1$, the remainder is perpendicular to $\\mathbf{e}_1$ — always, automatically, by the definition of projection. You are not checking for orthogonality; you are manufacturing it.',
@@ -195,7 +200,10 @@ fprintf('Max residual: %.2e\\n', max(max(abs(Q'*Q - eye(3)))))`,
             {
               id: 1,
               cellTitle: 'Gram-Schmidt step by step',
-              prose: 'Each step: subtract all projections onto previous basis vectors, then normalize. After the process, every pair of output vectors is orthogonal (dot product = 0), and each has magnitude 1.',
+              prose: [
+                'This cell implements Gram-Schmidt line by line. `e1 = v1 / np.linalg.norm(v1)` normalizes the first vector — this is the base case with nothing to subtract. For `v2`, the scalar projection `np.dot(v2, e1)` computes how much of `v2` points in the `e1` direction (the "contamination"). Multiplying by `e1` turns it into a vector, and subtracting removes that contamination entirely.',
+                'After normalization, `np.dot(e1, e2)` should be 0 (orthogonality) and `np.linalg.norm(e1)` should be 1 (unit length). The matplotlib plot confirms this geometrically: the two output arrows are exactly at 90°, regardless of how tilted the input vectors were.',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -232,7 +240,10 @@ plt.show()`,
             {
               id: 2,
               cellTitle: 'QR decomposition — Gram-Schmidt as a matrix equation',
-              prose: '`np.linalg.qr(A)` computes the QR decomposition. Q has orthonormal columns; R is upper triangular. Verify: Q @ R ≈ A (reconstruction). Qᵀ Q ≈ I (orthonormality).',
+              prose: [
+                '`np.linalg.qr(A)` runs Gram-Schmidt (in a numerically stabilized form) on the columns of `A` and returns `Q` (orthonormal columns) and `R` (upper triangular). `Q @ R` reconstructs `A` exactly — this is the matrix form of the Gram-Schmidt identity. The entries of `R` encode the scalar projections: `R[i,j]` = (projection of v_j onto e_i).',
+                '`Q.T @ Q` should equal the identity matrix — this is the algebraic statement that columns of `Q` are orthonormal. The heatmap makes this vivid: only the diagonal entries are 1, all off-diagonal entries are 0 (up to floating-point noise ~1e-16). If any off-diagonal entry is large, Gram-Schmidt has failed to orthogonalize.',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -480,6 +491,43 @@ v2 = np.array([2.0, 2.0])
         },
       ],
       answer: 'When inputs are already orthogonal, Gram-Schmidt reduces to pure normalization.',
+    },
+    {
+      id: 'la4-002-ch3',
+      difficulty: 'hard',
+      problem: 'Apply Gram-Schmidt to the three vectors $\\mathbf{v}_1 = [1,1,0]^\\top$, $\\mathbf{v}_2 = [1,0,1]^\\top$, $\\mathbf{v}_3 = [0,1,1]^\\top$ in $\\mathbb{R}^3$. Produce an orthonormal set $\\{\\mathbf{e}_1, \\mathbf{e}_2, \\mathbf{e}_3\\}$ spanning the same subspace. Then write down the matrix $Q = [\\mathbf{e}_1 \\mid \\mathbf{e}_2 \\mid \\mathbf{e}_3]$ and verify $Q^T Q = I$.',
+      hint: 'For $\\mathbf{e}_3$: subtract projections onto both $\\mathbf{e}_1$ and $\\mathbf{e}_2$, then normalize. If the result is the zero vector, the inputs are linearly dependent (they are not here).',
+      walkthrough: [
+        {
+          expression: '\\mathbf{e}_1 = \\frac{[1,1,0]^\\top}{\\sqrt{2}} = \\left[\\tfrac{1}{\\sqrt{2}},\\tfrac{1}{\\sqrt{2}},0\\right]^\\top',
+          annotation: 'Normalize $\\mathbf{v}_1$: $\\|\\mathbf{v}_1\\| = \\sqrt{1+1+0} = \\sqrt{2}$.',
+        },
+        {
+          expression: '\\mathbf{v}_2 \\cdot \\mathbf{e}_1 = \\tfrac{1}{\\sqrt{2}}+0+0 = \\tfrac{1}{\\sqrt{2}}',
+          annotation: 'Scalar projection of $\\mathbf{v}_2$ onto $\\mathbf{e}_1$.',
+        },
+        {
+          expression: '\\mathbf{u}_2 = [1,0,1]^\\top - \\tfrac{1}{\\sqrt{2}}\\left[\\tfrac{1}{\\sqrt{2}},\\tfrac{1}{\\sqrt{2}},0\\right]^\\top = \\left[\\tfrac{1}{2},-\\tfrac{1}{2},1\\right]^\\top',
+          annotation: 'Subtract $\\tfrac{1}{\\sqrt{2}}\\mathbf{e}_1$ from $\\mathbf{v}_2$. Magnitude: $\\|\\mathbf{u}_2\\| = \\sqrt{1/4+1/4+1} = \\sqrt{3/2}$.',
+        },
+        {
+          expression: '\\mathbf{e}_2 = \\left[\\tfrac{1}{\\sqrt{6}}, -\\tfrac{1}{\\sqrt{6}}, \\sqrt{\\tfrac{2}{3}}\\right]^\\top',
+          annotation: 'Normalize $\\mathbf{u}_2$ by $\\sqrt{3/2}$. Verify $\\mathbf{e}_1 \\cdot \\mathbf{e}_2 = 0$ ✓.',
+        },
+        {
+          expression: '\\mathbf{v}_3 \\cdot \\mathbf{e}_1 = \\tfrac{1}{\\sqrt{2}}, \\quad \\mathbf{v}_3 \\cdot \\mathbf{e}_2 = -\\tfrac{1}{\\sqrt{6}}+\\sqrt{\\tfrac{2}{3}}= \\tfrac{1}{\\sqrt{6}}',
+          annotation: 'Compute both scalar projections needed to clean $\\mathbf{v}_3$.',
+        },
+        {
+          expression: '\\mathbf{u}_3 = [0,1,1]^\\top - \\tfrac{1}{\\sqrt{2}}\\mathbf{e}_1 - \\tfrac{1}{\\sqrt{6}}\\mathbf{e}_2 = \\left[-\\tfrac{2}{3}, \\tfrac{2}{3}, \\tfrac{2}{3}\\right]^\\top',
+          annotation: 'After subtracting both projections, $\\|\\mathbf{u}_3\\| = \\tfrac{2\\sqrt{3}}{3}$. Normalize to get $\\mathbf{e}_3 = [-1,1,1]^\\top/\\sqrt{3}$.',
+        },
+        {
+          expression: 'Q^T Q = I_{3\\times 3}',
+          annotation: 'All 9 dot products: $\\mathbf{e}_i \\cdot \\mathbf{e}_j = \\delta_{ij}$. The three-vector Gram-Schmidt in $\\mathbb{R}^3$ produces a full orthonormal basis.',
+        },
+      ],
+      answer: 'e₁ = [1,1,0]ᵀ/√2, e₂ = [1,−1,2]ᵀ/√6, e₃ = [−1,1,1]ᵀ/√3',
     },
   ],
 
@@ -742,12 +790,12 @@ v2 = np.array([2.0, 2.0])
   transferPrompts: [
     {
       situation: 'You are fitting a polynomial $p(x) = a_0 + a_1 x + a_2 x^2$ to data, but the monomials $\\{1, x, x^2\\}$ are nearly collinear on $[-1,1]$, causing numerical instability.',
-      competingTechniques: ['Use monomials directly', 'Least squares with normal equations', 'Gram-Schmidt to build orthogonal polynomials'],
+      competingTechniques: 'Use monomials directly; Least squares with normal equations; Gram-Schmidt to build orthogonal polynomials',
       whyThisTechniqueWins: 'Applying Gram-Schmidt to $\\{1, x, x^2\\}$ under an appropriate inner product produces Legendre polynomials — an orthogonal basis for polynomials. Fitting in this basis is numerically stable and the coefficients are independent.',
     },
     {
       situation: 'In computer graphics, you need to orient a camera at a point of interest using forward, up, and right vectors — but the user-specified "up" may not be exactly perpendicular to the forward direction.',
-      competingTechniques: ['Use the vectors as-is (rendering artifacts)', 'Manually adjust one vector', 'Gram-Schmidt orthogonalization'],
+      competingTechniques: 'Use the vectors as-is (rendering artifacts); Manually adjust one vector; Gram-Schmidt orthogonalization',
       whyThisTechniqueWins: 'Gram-Schmidt on {forward, user_up} gives a guaranteed orthonormal frame. One step: subtract the projection of user_up onto forward, normalize. This is standard in every 3D engine\'s "look-at" calculation.',
     },
   ],

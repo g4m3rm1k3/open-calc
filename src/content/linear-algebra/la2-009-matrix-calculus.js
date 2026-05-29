@@ -29,6 +29,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'Procedure: Compute the Gradient of a Scalar Function of a Vector',
+        body: 'Step 1. Identify the function type: linear ($\\mathbf{a}^\\top\\mathbf{x}$), quadratic ($\\mathbf{x}^\\top A\\mathbf{x}$), or composite (chain rule needed).\nStep 2. Apply the matching formula: $\\nabla(\\mathbf{a}^\\top\\mathbf{x}) = \\mathbf{a}$; $\\nabla(\\mathbf{x}^\\top A\\mathbf{x}) = 2A\\mathbf{x}$ (symmetric $A$); $\\nabla\\|A\\mathbf{x}-\\mathbf{b}\\|^2 = 2A^\\top(A\\mathbf{x}-\\mathbf{b})$.\nStep 3. Verify the shape: $\\nabla f$ must be a column vector of the same dimension as $\\mathbf{x}$.\nStep 4. Verify numerically: compute $[f(\\mathbf{x}+\\epsilon\\mathbf{e}_i) - f(\\mathbf{x}-\\epsilon\\mathbf{e}_i)]/(2\\epsilon)$ for each $i$ and compare to the analytic formula.\nStep 5. To find the minimizer: set $\\nabla f = \\mathbf{0}$ and solve the resulting linear system. Check the Hessian is positive definite to confirm a minimum.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 9 of 12 — Matrices & Transformations',
         body: '**Previous:** Cramer\'s Rule — determinant-based formulas for solutions and inverses.\n**This lesson:** Matrix Calculus — gradients, Jacobians, and Hessians; how to differentiate functions of vectors and matrices.\n**Next:** The Invertible Matrix Theorem — twelve equivalent conditions that unify all of Chapters 1 and 2.',
@@ -60,7 +65,10 @@ export default {
             {
               id: 1,
               cellTitle: 'Gradient of a quadratic form',
-              prose: ['For f(x) = x\'*A*x with symmetric A, the gradient is 2*A*x. Verify numerically.'],
+              prose: [
+                'The formula ∇(x^T Ax) = 2Ax is applied directly: grad_analytic = 2*A*x multiplies the symmetric matrix A by x and scales by 2. The anonymous function f = @(v) v\'*A*v evaluates the scalar at any vector v, enabling the central-difference verification [f(x+h*eᵢ) − f(x−h*eᵢ)]/(2h) for each coordinate direction eᵢ — the standard numerical approximation to ∂f/∂xᵢ.',
+                'The Hessian H = 2*A is constant for any quadratic. Calling [V,D] = eig(H) reveals the principal curvature directions (columns of V) and their magnitudes (diagonal of D). Both eigenvalues positive confirms A is positive definite — the quadratic form curves upward in every direction, so setting ∇f = 0 finds the unique global minimum.',
+              ],
               code: `A = [3 1; 1 2]
 x = [1; 2]
 % Analytic gradient: 2*A*x
@@ -81,7 +89,10 @@ disp('Eigenvalues of Hessian (all positive = minimum):')
             {
               id: 2,
               cellTitle: 'Jacobian of a vector function',
-              prose: ['The Jacobian J is the matrix of all partial derivatives. Compute it numerically.'],
+              prose: [
+                'The analytic Jacobian J_analytic = [2*x(1), 1; x(2), x(1)] is built by differentiating each output. Row 1 comes from f₁ = x₁² + x₂: ∂f₁/∂x₁ = 2x₁, ∂f₁/∂x₂ = 1. Row 2 comes from f₂ = x₁x₂: ∂f₂/∂x₁ = x₂, ∂f₂/∂x₂ = x₁. Each row is the gradient (transposed) of one output function — the Jacobian stacks all of them into a single matrix.',
+                'The numerical loop builds J column by column: column j is [f(x+h*eⱼ) − f(x−h*eⱼ)]/(2h), measuring how every output fᵢ responds to a small step in input xⱼ. Compare J_numerical to J_analytic — they match to machine precision, confirming the analytic formula and the Jacobian-as-linear-approximation interpretation.',
+              ],
               code: `% f(x) = [x1^2 + x2; x1*x2] — Jacobian is 2x2
 x = [2; 3];
 h = 1e-6;
@@ -97,6 +108,68 @@ for i = 1:2
   J_num(:,i) = (f(x + h*e) - f(x - h*e)) / (2*h);
 end
 J_numerical = J_num
+`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Newton\'s method converges in one step on a quadratic',
+              prose: [
+                'For f(x) = x^T Ax − b^T x, the gradient is ∇f = 2Ax − b and the Hessian is H = 2A (constant — it does not depend on x). Newton\'s method solves H·Δx = −∇f for the step, computed as x_star = x0 - H \\ grad_f(x0) (MATLAB backslash solves the linear system). For a quadratic, this single step lands exactly at the minimum because minimizing the quadratic Taylor approximation IS minimizing f itself.',
+                'Try changing x0 to [100; -50] or [-3; 7]: the result is always the same x*. The printed gradient at x_star shows ~1e-14 (machine zero), and the analytic check confirms: setting ∇f = 0 gives 2Ax = b, so x* = A \\ b / 2.',
+              ],
+              code: `A = [4 1; 1 3];
+b = [2; 1];
+f = @(x) x'*A*x - b'*x;
+grad_f = @(x) 2*A*x - b;
+H = 2*A;          % Hessian is constant for a quadratic
+
+x0 = [5; 5];
+x_star = x0 - H \\ grad_f(x0);  % one Newton step solves quadratic exactly
+
+disp('f at start:'); disp(f(x0))
+disp('x* after 1 Newton step:'); disp(x_star)
+g = grad_f(x_star);
+disp('Gradient at x* (should be zero vector):'); disp(g)
+disp('f(x*):'); disp(f(x_star))
+
+% Confirm: setting 2Ax = b gives x* = A\\b/2
+x_analytic = A \\ b / 2;
+disp('Analytic x*:'); disp(x_analytic)
+disp('Difference (should be ~0):'); disp(norm(x_star - x_analytic))
+`,
+            },
+            {
+              id: 4,
+              cellTitle: 'Challenge: gradient descent on the least-squares objective',
+              prose: [
+                'This challenge implements gradient descent on f(x) = ||Ax − b||^2 for a 3×2 overdetermined system. The step size alpha = 0.9/λ_max(A^T A) is the largest safe value — use max(eig(AtA)) to find λ_max. Any larger and the iterations diverge. Each update applies x = x − alpha * ∇f where ∇f = 2A^T(Ax − b).',
+                'After 150 steps, compare the GD result to the exact normal-equations solution. The difference f(GD) − f(x*) should be near zero. Try halving alpha and doubling the iterations — you\'ll see convergence is exponentially slower when the step size drops, confirming that rate ∝ (1 − 2α·λ_min) per iteration.',
+              ],
+              code: `A = [4 1; 2 3; 1 2];   % overdetermined 3x2 system
+b = [1; 2; 3];
+f = @(x) norm(A*x - b)^2;
+grad_f = @(x) 2 * (A' * (A*x - b));
+
+% Safe step size: alpha < 1 / lambda_max(A'*A)
+AtA = A' * A;
+lambda_max = max(eig(AtA));
+alpha = 0.9 / lambda_max;
+
+x = [0; 0];   % start at origin
+n_iter = 150;
+losses = zeros(1, n_iter + 1);
+losses(1) = f(x);
+
+for k = 1:n_iter
+    x = x - alpha * grad_f(x);
+    losses(k+1) = f(x);
+end
+
+x_ls = AtA \\ (A' * b);   % exact solution via normal equations
+disp('GD solution:'); disp(x)
+disp('Exact least-squares x*:'); disp(x_ls)
+disp('f(GD) - f(x*):'); disp(f(x) - f(x_ls))
+disp('Step size alpha used:'); disp(alpha)
 `,
             },
           ],
@@ -237,6 +310,51 @@ print(f"Starting point: {x0}")
 print(f"After 1 Newton step: {x_star.round(6)}")
 print(f"Gradient at x*: {grad_f(x_star).round(10)}  (should be ≈ 0)")
 print(f"f(x*) = {f(x_star):.6f}  (minimum value)")`,
+            },
+            {
+              id: 4,
+              cellTitle: 'Challenge: gradient descent on the least-squares objective',
+              prose: [
+                'Implement gradient descent on f(x) = ||Ax - b||^2 from scratch. The step size must satisfy alpha < 1/lambda_max(A^T A) for convergence — use np.linalg.eigvalsh to compute lambda_max and set alpha = 0.9/lambda_max. Each step is x = x - alpha * grad_f(x) where grad_f(x) = 2 * A.T @ (A @ x - b).',
+                'Plot the loss on a semilog scale: the straight line confirms exponential convergence — a characteristic signature of gradient descent on a quadratic objective. Compare the final x to the exact least-squares solution from numpy\'s normal equations.',
+              ],
+              code: `import numpy as np
+import matplotlib.pyplot as plt
+
+A = np.array([[4., 1.], [2., 3.], [1., 2.]])  # overdetermined 3x2
+b = np.array([1., 2., 3.])
+
+def f(x): return np.linalg.norm(A @ x - b) ** 2
+def grad_f(x): return 2 * A.T @ (A @ x - b)
+
+# Step size: must be < 1 / lambda_max(A^T A) for convergence
+AtA = A.T @ A
+lam_max = np.linalg.eigvalsh(AtA).max()
+alpha = 0.9 / lam_max
+
+x = np.zeros(2)
+x_star = np.linalg.solve(AtA, A.T @ b)  # exact: normal equations
+
+losses = [f(x)]
+for _ in range(200):
+    x = x - alpha * grad_f(x)
+    losses.append(f(x))
+
+print(f"GD solution:  {x.round(4)}")
+print(f"Exact x*:     {x_star.round(4)}")
+print(f"f(GD) = {f(x):.6f},  f(x*) = {f(x_star):.6f}")
+print(f"alpha = {alpha:.4f}  (lambda_max = {lam_max:.2f})")
+
+fig, ax = plt.subplots(figsize=(7, 4))
+ax.semilogy(losses, color='steelblue', linewidth=2, label='GD loss')
+ax.axhline(f(x_star), color='red', linestyle='--',
+           label=f'optimal f(x*) = {f(x_star):.4f}')
+ax.set_xlabel('Iteration')
+ax.set_ylabel('||Ax - b||²  (log scale)')
+ax.set_title('Gradient Descent on Least-Squares: Exponential Convergence')
+ax.legend(); ax.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()`,
             },
           ]
         }

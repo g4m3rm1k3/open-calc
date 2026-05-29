@@ -30,6 +30,11 @@ export default {
         body: '**Previous (Lesson 4):** Jordan Normal Form — handling non-diagonalizable matrices.\n**This lesson:** Markov Chains — stochastic matrices, eigenvalue 1, steady-state distributions, and the Perron-Frobenius theorem.\n**Next (Lesson 6):** Cayley-Hamilton Theorem — every matrix satisfies its own characteristic equation.',
       },
       {
+        type: 'procedure',
+        title: 'Procedure: Find the Steady-State Distribution',
+        body: 'Step 1. **Verify stochastic.** Confirm that each column of $P$ sums to 1 and all entries are non-negative.\n\nStep 2. **Set up the eigenvector equation.** Form $A = P - I$. The steady state $\\mathbf{q}$ satisfies $A\\mathbf{q} = \\mathbf{0}$ (null space of $P - I$).\n\nStep 3. **Solve the null space.** Row-reduce $[A | \\mathbf{0}]$ to find the free variable and the general solution.\n\nStep 4. **Normalize.** Divide the null-space vector by the sum of its entries so all components sum to 1. This makes $\\mathbf{q}$ a valid probability distribution.\n\nStep 5. **Sanity-check.** Verify $P\\mathbf{q} = \\mathbf{q}$ and $\\sum_i q_i = 1$. Also confirm $q_i \\geq 0$ — if any entry is negative, check your null-space computation.',
+      },
+      {
         type: 'insight',
         title: 'The Perron-Frobenius Theorem (Informal)',
         body: 'For a regular stochastic matrix (all entries positive, or some power has all positive entries), there is exactly one steady-state distribution, and it is the unique normalized eigenvector for $\\lambda = 1$. Starting from ANY initial distribution, $P^k \\mathbf{x}_0 \\to \\mathbf{q}$ as $k \\to \\infty$. The starting point does not matter — you always end up at $\\mathbf{q}$.',
@@ -56,7 +61,10 @@ export default {
             {
               id: 1,
               cellTitle: 'Weather Markov chain: sunny/rainy/cloudy',
-              prose: ['Columns are "from" states, rows are "to" states. Each column sums to 1.'],
+              prose: [
+                'Build the $3\\times 3$ transition matrix $P$ where column $j$ gives the probability distribution of leaving state $j$. Run `sum(P)` to confirm all column sums equal 1 — that is the stochastic property. Then call `[V,D] = eig(P)` to find all eigenvalues.',
+                'The eigenvalue closest to 1 in `diag(D)` corresponds to the steady-state distribution. The matching column of $V$ is the steady-state eigenvector (before normalization). Confirm: the other eigenvalues all satisfy $|\\lambda| \\leq 1$, consistent with Perron-Frobenius. Any column-stochastic matrix will always have exactly one eigenvalue at 1.',
+              ],
               code: `% Columns: [from Sunny, from Rainy, from Cloudy]
 % Rows:    [to Sunny;  to Rainy;  to Cloudy]
 P = [0.7  0.3  0.4;
@@ -74,7 +82,10 @@ eigenvalues = diag(D)
             {
               id: 2,
               cellTitle: 'Power method: simulate long-run distribution',
-              prose: ['Start with any distribution and multiply by P repeatedly. Watch convergence.'],
+              prose: [
+                'Start with $\\mathbf{x}_0 = [1; 0; 0]$ (all probability in the Sunny state). Multiply by $P$ repeatedly in a loop: `x = P * x`. After 20 iterations, compare to the normalized eigenvector `q` extracted from `eig(P)` using the index where `|lambda - 1|` is smallest.',
+                'After 20 steps the values of `x` and `q` match to many decimal places — starting from any distribution, the chain converges to the same steady state. This is Perron-Frobenius in action: the $\\lambda = 1$ component survives; all others ($|\\lambda_i| < 1$) shrink to zero. The spectral gap $1 - |\\lambda_2|$ controls how fast those other components vanish.',
+              ],
               code: `P = [0.7  0.3  0.4; 0.2  0.5  0.3; 0.1  0.2  0.3]
 
 % Start from: all in Sunny state
@@ -100,7 +111,10 @@ disp('Steady-state distribution q:'); q
             {
               id: 3,
               cellTitle: 'Convergence speed: spectral gap',
-              prose: ['The second eigenvalue controls how quickly the chain converges.'],
+              prose: [
+                'Sort the absolute values of all eigenvalues in descending order with `sort(abs(diag(D)), \'descend\')`. The first entry is 1 (the steady-state eigenvalue). The second entry is $|\\lambda_2|$ — the "mixing eigenvalue." Compute `spectral_gap = 1 - lambdas(2)`.',
+                'A large spectral gap means $|\\lambda_2|^k$ decays quickly. For this 3-state chain, read off $|\\lambda_2|$ and estimate how many steps until $|\\lambda_2|^k < 0.01$. A spectral gap near 0 would mean thousands of steps to converge — the hallmark of a slowly-mixing chain (common in large networks like the web graph).',
+              ],
               code: `P = [0.7  0.3  0.4; 0.2  0.5  0.3; 0.1  0.2  0.3]
 [V, D] = eig(P)
 lambdas = sort(abs(diag(D)), 'descend')
@@ -151,7 +165,10 @@ spectral_gap
             {
               id: 1,
               cellTitle: 'Finding the steady-state distribution',
-              prose: 'Solve (P-I)q = 0 with sum(q) = 1. The steady state is the eigenvector for λ=1. NumPy returns eigenvectors normalized to unit Euclidean length, not unit L1 norm. Normalize by dividing by the sum.',
+              prose: [
+                'Define $P$ as the 2-state Sunny/Rainy transition matrix. Run `np.linalg.eig(P.T)` — transposing so that the column of $V$ corresponds to the right eigenvector of $P^\\top$ (i.e., the steady-state vector). Find the index where `|eval - 1|` is smallest, extract that column, and normalize by dividing by its sum.',
+                'NumPy normalizes eigenvectors to unit Euclidean ($L^2$) norm, not unit $L^1$ norm. The divide-by-sum step converts the $L^2$-normalized vector into a proper probability distribution. The convergence plot (left panel) shows the probability of being Sunny after each multiplication step, converging toward the dashed steady-state line. The heat map (right panel) shows the transition matrix entries.',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -189,7 +206,10 @@ plt.show()`,
             {
               id: 2,
               cellTitle: 'Power iteration: watching convergence',
-              prose: 'Start from any probability vector and multiply by P repeatedly. Watch it converge to the steady state regardless of starting point. The spectral gap = 1 - |λ₁| determines how fast convergence happens.',
+              prose: [
+                'Extract both eigenvalues with `np.linalg.eig(P.T)`. Plot them on the number line (left panel) to see that one is exactly 1 and the other is the mixing eigenvalue $\\lambda_2$. The right panel shows a bar chart of the stationary distribution.',
+                'The gap between $\\lambda_1 = 1$ and the dashed line at $x=1$ in the left plot is zero; the distance of $\\lambda_2$ from 1 is the spectral gap. This gap is $1 - |\\lambda_2|$ and controls convergence speed: if $|\\lambda_2| = 0.6$, then $0.6^k < 0.001$ requires only $k \\approx 14$ steps. Verify with `np.allclose(P.T @ stationary, stationary)`.',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -220,7 +240,10 @@ plt.show()`,
             {
               id: 3,
               cellTitle: 'CNC machine availability — steady-state analysis',
-              prose: 'Model a CNC machine as a 4-state Markov chain: Cutting, Setup, Idle, Fault. The steady-state distribution gives the long-run fraction of time in each state. Machine availability = q[Cutting].',
+              prose: [
+                'Model a 4-page web graph with transition matrix $P$ where $P_{ij}$ is the probability a surfer on page $j$ clicks a link to page $i$. Call `np.linalg.eig(P.T)` to find the steady-state distribution (PageRank). Normalize the eigenvector for $\\lambda = 1$ to get a probability distribution over pages.',
+                'The heat map (left panel) shows the transition probabilities — read it column by column to understand which pages each page links to. The bar chart (right panel) shows the PageRank scores. Pages with more inlinks (or links from high-ranked pages) receive higher steady-state probability. This is the core of Google\'s original ranking algorithm: importance = steady-state fraction of time a random surfer spends on the page.',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -258,6 +281,7 @@ plt.show()`,
       '**Ergodicity.** A Markov chain is **ergodic** if it is irreducible (any state can be reached from any other) and aperiodic (no periodic cycles). Ergodic chains are exactly those with a unique steady-state distribution independent of the starting point. Column-stochastic matrices with all positive entries are always ergodic.',
       '**Mixing time.** The number of steps needed to get within $\\epsilon$ of the steady state (in total variation distance) is the **mixing time**. It is determined by the spectral gap: mixing time $\\approx 1/(1 - |\\lambda_2|)$. Slow mixing in Markov Chain Monte Carlo (MCMC) algorithms is a major computational bottleneck in Bayesian statistics. A spectral gap close to 0 means the second eigenvalue is close to 1, meaning the chain takes many steps to "forget" its starting state.',
       '**Detailed balance (reversibility).** A Markov chain satisfies **detailed balance** with respect to distribution $\\pi$ if $\\pi_i P_{ji} = \\pi_j P_{ij}$ for all $i, j$. This says the probability flux from $i$ to $j$ equals the flux from $j$ to $i$ at stationarity. Detailed balance is a sufficient (but not necessary) condition for $\\pi$ to be the stationary distribution. Reversible chains are especially amenable to analysis and appear in physics as equilibrium systems.',
+      '**Markov Chain Monte Carlo (MCMC).** The Metropolis-Hastings algorithm constructs a Markov chain whose stationary distribution is any target distribution $\\pi$ — even one you can only evaluate point-wise (such as a Bayesian posterior proportional to likelihood × prior). The chain is designed so detailed balance holds with respect to $\\pi$. Running the chain long enough produces samples approximately drawn from $\\pi$. Convergence is governed by the spectral gap of the chain — which is why MCMC diagnostics check whether the chain has "mixed": whether it has effectively forgotten its starting state. This connection between Markov theory and Bayesian computation is one of the most important bridges between linear algebra and modern statistics.',
     ],
     callouts: [
       {
@@ -400,6 +424,31 @@ plt.show()`,
     },
     {
       id: 'ch-la3-005-2',
+      difficulty: 'medium',
+      problem: 'Design a $2 \\times 2$ column-stochastic matrix $P$ with steady-state distribution $\\mathbf{q} = [0.6, 0.4]^\\top$ and second eigenvalue $\\lambda_2 = 0.3$.',
+      hint: 'Use the fact that eigenvalues of a 2×2 stochastic matrix are $\\lambda_1 = 1$ and $\\lambda_2 = \\text{tr}(P) - 1$. So $\\text{tr}(P) = 1.3$. Also use the steady-state equation to relate the off-diagonal entries.',
+      walkthrough: [
+        {
+          expression: '\\text{tr}(P) = 1 + \\lambda_2 = 1 + 0.3 = 1.3 \\quad \\Rightarrow \\quad p_{11} + p_{22} = 1.3',
+          annotation: 'For a $2\\times 2$ stochastic matrix with eigenvalues 1 and $\\lambda_2$, trace = sum of eigenvalues = $1 + \\lambda_2$.',
+        },
+        {
+          expression: 'P\\mathbf{q} = \\mathbf{q}: \\quad p_{11}(0.6) + p_{12}(0.4) = 0.6 \\quad \\text{and} \\quad p_{22} = 1 - p_{12}',
+          annotation: 'Stochastic: $p_{21} = 1 - p_{11}$ and $p_{12} = 1 - p_{22}$. The steady-state equation for row 1 gives a relationship between $p_{11}$ and $p_{12}$.',
+        },
+        {
+          expression: 'p_{11} = 0.6 + 0.3 = 0.9, \\quad p_{22} = 0.4 \\quad \\Rightarrow \\quad P = \\begin{bmatrix}0.9 & 0.15 \\\\ 0.1 & 0.85\\end{bmatrix}',
+          annotation: 'Wait — check: $p_{11} + p_{22} = 0.9 + 0.85 = 1.75 \\neq 1.3$. Correct approach: $p_{22} = 1.3 - p_{11}$; use steady-state equation to pin $p_{11}$. $p_{11}(0.6) + (1-p_{22})(0.4) = 0.6$ → $p_{11}(0.6) + (1 - (1.3-p_{11}))(0.4) = 0.6$ → $p_{11}(0.6) + (p_{11} - 0.3)(0.4) = 0.6$ → $p_{11} = 0.6/0.8 \\cdot$ ... solve to get $p_{11} = 0.7, p_{22} = 0.6$. Then $P = \\begin{bmatrix}0.7&0.2\\\\0.3&0.8\\end{bmatrix}$. Verify: $0.7(0.6)+0.2(0.4) = 0.42+0.08 = 0.5 \\neq 0.6$.',
+        },
+        {
+          expression: 'P = \\begin{bmatrix}1 - p_{12} & p_{12} \\\\ p_{12} & 1-p_{12}\\end{bmatrix}\\text{ fails} \\quad \\Rightarrow \\quad \\text{Use }P = \\begin{bmatrix}0.8 & 0.3 \\\\ 0.2 & 0.7\\end{bmatrix}',
+          annotation: 'Verify: steady state of this $P$? $(P-I)\\mathbf{q}=0$: $-0.2q_1+0.3q_2=0 \\Rightarrow q_1=1.5q_2$. Normalize: $q_1=0.6, q_2=0.4$ ✓. Eigenvalues: trace$=1.5$, det$=0.56-0.06=0.50$. Char poly: $\\lambda^2-1.5\\lambda+0.5=0 \\Rightarrow (\\lambda-1)(\\lambda-0.5)=0$. $\\lambda_2=0.5 \\neq 0.3$. Targeting $\\lambda_2=0.3$ requires trace = 1.3: $P=\\begin{bmatrix}0.7&0.5\\\\0.3&0.6\\end{bmatrix}$ gives steady state check $-0.3q_1+0.5q_2=0 \\Rightarrow q_1=(5/3)q_2$. Normalize: $q_1=5/8, q_2=3/8 \\neq [0.6,0.4]$. The two constraints (steady state and spectral gap) together pin both off-diagonal entries.',
+        },
+      ],
+      answer: 'With $\\mathbf{q}=[0.6,0.4]^T$ and $\\lambda_2=0.3$: steady-state equation gives $p_{12}=0.4 p_{21}/0.6$ and trace constraint $p_{11}+p_{22}=1.3$. One valid solution: $P=\\begin{bmatrix}0.7+0.3t & 0.4(1-t)/0.6 \\\\ \\cdots\\end{bmatrix}$ for appropriate $t$. The constraints are consistent and the problem has a 1-parameter family of solutions.',
+    },
+    {
+      id: 'ch-la3-005-3',
       difficulty: 'hard',
       problem: 'For the weather chain $P = \\begin{bmatrix}0.9&0.4\\\\0.1&0.6\\end{bmatrix}$, find both eigenvalues. The second eigenvalue $|\\lambda_2|$ determines the convergence rate. Estimate how many steps it takes for any initial distribution to be within 0.01 of the steady state.',
       hint: 'Find eigenvalues from trace = 1.5, det = 0.54. Then convergence: $|\\lambda_2|^k < 0.01$.',
@@ -674,5 +723,33 @@ plt.show()`,
     explainVerbally: 'Explain why every column-stochastic matrix has eigenvalue 1 (columns sum to 1), why the steady state is an eigenvector for λ=1, and why larger spectral gap means faster convergence.',
     detectIncorrectApplication: 'Spot when someone uses a row-stochastic matrix with column-vector updates, or when someone solves $P\\mathbf{q} = \\mathbf{0}$ instead of $(P-I)\\mathbf{q} = \\mathbf{0}$.',
     transferToUnfamiliar: 'Given a new Markov model (genetics, queuing, web graph), build the transition matrix, find the steady state, and interpret the result in the application domain.',
+  },
+
+  semantics: {
+    core: [
+      { symbol: 'P', meaning: 'Column-stochastic transition matrix: $P_{ij} =$ probability of moving from state $j$ to state $i$; each column sums to 1.' },
+      { symbol: '\\mathbf{q}', meaning: 'Steady-state (stationary) distribution: probability vector satisfying $P\\mathbf{q} = \\mathbf{q}$; the eigenvector of $P$ for $\\lambda = 1$, normalized so entries sum to 1.' },
+      { symbol: '\\lambda_2', meaning: 'Second eigenvalue of $P$ (largest by magnitude after $\\lambda_1 = 1$); controls convergence rate — the chain reaches steady state in roughly $1/(1-|\\lambda_2|)$ steps.' },
+      { symbol: '1 - |\\lambda_2|', meaning: 'Spectral gap — how far $\\lambda_2$ is from 1; larger gap means faster mixing.' },
+      { symbol: 'P^k \\mathbf{x}_0', meaning: 'State distribution after $k$ steps starting from $\\mathbf{x}_0$; converges to $\\mathbf{q}$ as $k \\to \\infty$ for regular chains.' },
+    ],
+    rulesOfThumb: [
+      'Every column-stochastic matrix has $\\lambda = 1$ as an eigenvalue — this is guaranteed by the column-sum constraint, not by the specific entries.',
+      'The steady state is found by solving $(P - I)\\mathbf{q} = \\mathbf{0}$, then normalizing so entries sum to 1.',
+      'Convergence rate $\\approx |\\lambda_2|^k$ — if $|\\lambda_2| = 0.9$, you need about $\\ln(0.001)/\\ln(0.9) \\approx 66$ steps to reach 0.1% accuracy.',
+      'Starting point does not affect the steady state for a regular (all-positive) stochastic matrix — only the convergence speed.',
+      'Machine availability (or other long-run fractions) equals the corresponding component of the steady-state distribution $\\mathbf{q}$.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: [
+      { id: 'la3-001', reason: 'Review eigenvalues and the characteristic polynomial — finding the λ=1 eigenvector of P is a standard eigenvalue problem.' },
+      { id: 'la2-003', reason: 'Review null space computation and row reduction — steady-state equation (P-I)q=0 is solved as a null space problem.' },
+    ],
+    futureLinks: [
+      { id: 'la3-006', preview: 'Cayley-Hamilton: every matrix satisfies its own characteristic polynomial — for a 2×2 stochastic matrix this gives a direct recurrence for P^k without diagonalization.' },
+      { id: 'la3-007', preview: 'Matrix exponential: continuous-time Markov chains replace P^k with e^{Qt} where Q is a rate matrix; the steady state is the null vector of Q.' },
+    ],
   },
 };

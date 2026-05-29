@@ -29,6 +29,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'Procedure: Compute the SVD of a Matrix',
+        body: 'Step 1. **Form $A^TA$.** Compute the $n\\times n$ symmetric matrix $A^TA$.\n\nStep 2. **Find eigenvalues of $A^TA$.** These are $\\lambda_1 \\geq \\lambda_2 \\geq \\cdots \\geq 0$ (always non-negative). The singular values are $\\sigma_i = \\sqrt{\\lambda_i}$.\n\nStep 3. **Find eigenvectors of $A^TA$.** These orthonormal eigenvectors become the columns of $V$ (the right singular vectors).\n\nStep 4. **Compute left singular vectors.** For each $\\sigma_i > 0$: $\\mathbf{u}_i = \\frac{1}{\\sigma_i}A\\mathbf{v}_i$. Complete $U$ to an orthonormal basis if needed.\n\nStep 5. **Assemble $A = U\\Sigma V^T$.** Verify by multiplying back: $U\\Sigma V^T$ should equal $A$.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 4 of 9 — Orthogonality & SVD',
         body: '**Previous (Lesson 3):** Least Squares — finding the best approximate solution using projection.\n**This lesson:** SVD — the universal factorization $A = U\\Sigma V^T$ that reveals the core structure of any matrix.\n**Next (Lesson 5):** Inner Product Spaces — generalizing length and angle to abstract spaces.',
@@ -774,12 +779,12 @@ A = np.array([[1., 2.],
   transferPrompts: [
     {
       situation: 'You need to compress a high-resolution image stored as a matrix of pixel values (1000×1000 = 1M numbers) for efficient transmission.',
-      competingTechniques: ['JPEG compression (DCT-based)', 'Random sampling', 'SVD truncation'],
+      competingTechniques: 'JPEG compression (DCT-based); Random sampling; SVD truncation',
       whyThisTechniqueWins: 'SVD rank-$k$ truncation is the provably optimal linear compression: for a given storage budget ($k(m+n+1)$ numbers vs $mn$ original), it minimizes Frobenius error. In practice, JPEG is faster to compute, but SVD gives the theoretical baseline for quality.',
     },
     {
       situation: 'In recommendation systems, users × items ratings matrix has many missing entries and is approximately low-rank. You want to predict missing ratings.',
-      competingTechniques: ['Fill missing values with average', 'Nearest neighbor', 'SVD / matrix factorization'],
+      competingTechniques: 'Fill missing values with average; Nearest neighbor; SVD / matrix factorization',
       whyThisTechniqueWins: 'The observed entries approximately follow a low-rank structure (users can be described by a few "taste factors"). SVD (or its variant, truncated matrix factorization) recovers this structure and generalizes to predict unseen ratings — the basis of Netflix Prize-winning algorithms.',
     },
   ],

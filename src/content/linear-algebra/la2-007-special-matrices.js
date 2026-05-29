@@ -30,6 +30,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'Procedure: Classify a Matrix by Its Structure',
+        body: 'Step 1. Check symmetry: compute $A - A^\\top$. If it is the zero matrix, $A$ is symmetric.\nStep 2. Check orthogonality: compute $A^\\top A$. If it equals $I$, $A$ is orthogonal (inverse = transpose, $\\det = \\pm 1$).\nStep 3. If symmetric, check positive definiteness: (a) all leading principal minors positive? (Sylvester), or (b) compute eigenvalues — all positive → SPD.\nStep 4. If SPD: use Cholesky ($A = LL^\\top$) instead of LU. Faster ($n^3/6$ vs $n^3/3$) and more stable.\nStep 5. If orthogonal: never invert — just transpose. $A^{-1} = A^\\top$ costs $O(n^2)$ vs $O(n^3)$ for LU.\nStep 6. If triangular: solve by substitution directly — no factorization needed.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 7 of 12 — Matrices & Transformations',
         body: '**Previous:** LU Decomposition — Gaussian elimination as a factorization $A = LU$.\n**This lesson:** Special matrix types — symmetric, orthogonal, positive definite, diagonal, triangular — and why each type unlocks faster algorithms.\n**Next:** Cramer\'s Rule — using determinants to solve small systems explicitly.',
@@ -71,38 +76,89 @@ export default {
           initialCells: [
             {
               id: 1,
-              cellTitle: 'Symmetric: eigenvalues are real',
-              prose: ['For any real symmetric matrix, all eigenvalues are real. Verify this.'],
+              cellTitle: 'Symmetric: eigenvalues are real and eigenvectors are orthogonal',
+              prose: [
+                '`norm(A - A\')` computes $\\|A - A^\\top\\|_F$. For a symmetric matrix this is exactly zero — every off-diagonal pair satisfies $a_{ij} = a_{ji}$. If this norm is nonzero, the matrix is NOT symmetric and no further steps apply.',
+                '`[V, D] = eig(A)` returns the eigendecomposition: columns of `V` are eigenvectors, diagonal of `D` contains eigenvalues. For any real symmetric matrix, MATLAB guarantees `diag(D)` contains only real numbers — a consequence of the Spectral Theorem. `V\' * V` should equal `I` (orthonormal eigenvectors) and `V * D * V\'` should reconstruct `A`.',
+              ],
               code: `A = [4 2 1; 2 3 1; 1 1 5];
-disp('Is symmetric:')
-norm(A - A')        % should be 0
+fprintf('Symmetry check: norm(A - A\\') = %g (should be 0)\\n', norm(A - A'))
+
 [V, D] = eig(A);
-disp('Eigenvalues (all real):')
-diag(D)`,
+fprintf('Eigenvalues (all real for symmetric A):\\n')
+disp(diag(D)')
+
+fprintf('Eigenvectors orthonormal: norm(V\\' * V - I) = %g\\n', norm(V'*V - eye(3)))
+fprintf('Reconstruct: norm(V*D*V\\' - A) = %g\\n', norm(V*D*V' - A))`,
             },
             {
               id: 2,
-              cellTitle: 'Orthogonal: Q^T Q = I',
-              prose: ['The 2D rotation matrix is orthogonal. Verify that Q^T Q = I exactly.'],
-              code: `theta = pi/4;
-Q = [cos(theta) -sin(theta); sin(theta) cos(theta)];
-disp('Q^T Q:')
-Q' * Q
-disp('det(Q):')
-det(Q)      % must be Â±1`,
+              cellTitle: 'Orthogonal: Q^T Q = I, inverse = transpose, det = ±1',
+              prose: [
+                '`Q = [cos(t) -sin(t); sin(t) cos(t)]` builds a 2D rotation by angle `t`. Each column has unit length and the two columns are perpendicular — the definition of orthonormal columns.',
+                '`Q.\'*Q` (using real transpose `Q.\'` to avoid parsing issues) computes $Q^\\top Q$: entry $(i,j)$ is the dot product of column $i$ with column $j$ of $Q$. Orthonormal columns give 1 on the diagonal and 0 elsewhere — exactly $I$. `det(Q)` confirms $+1$ (proper rotation, no reflection). `norm(Q.\' - inv(Q))` verifies $Q^{-1} = Q^\\top$ to machine precision — inversion for free.',
+              ],
+              code: `t = pi/3;   % 60 degree rotation
+Q = [cos(t) -sin(t); sin(t) cos(t)];
+
+fprintf('Q^T * Q (should be I):\\n'); disp(Q' * Q)
+fprintf('det(Q) = %g (should be +1 for rotation)\\n', det(Q))
+fprintf('norm(Q^T - inv(Q)) = %g (should be ~0)\\n', norm(Q' - inv(Q)))
+
+% Orthogonal matrix preserves vector lengths
+v = [3; 4];
+Qv = Q * v;
+fprintf('||v|| = %g,  ||Qv|| = %g  (preserved)\\n', norm(v), norm(Qv))`,
             },
             {
               id: 3,
-              cellTitle: 'Positive Definite: x^T A x > 0',
-              prose: ['Test the quadratic form for several random vectors.'],
+              cellTitle: 'Positive Definite: x^T A x > 0 and Sylvester criterion',
+              prose: [
+                '`x\' * A * x` computes the quadratic form $\\mathbf{x}^\\top A \\mathbf{x}$: a scalar that gives the "energy" of $\\mathbf{x}$ with respect to $A$. For a positive definite matrix, this value is always strictly positive regardless of which nonzero $\\mathbf{x}$ is used. The loop tests 5 random vectors — all outputs should be positive.',
+                '`eig(A)` confirms SPD via the eigenvalue test: all eigenvalues positive. `det(A(1,1)) > 0` and `det(A) > 0` are the two Sylvester leading principal minors — all positive → SPD. This is the fastest manual check for $2\\times 2$.',
+              ],
               code: `A = [5 2; 2 3];   % symmetric
+fprintf('Leading principal minors (Sylvester criterion):\\n')
+fprintf('  M1 = %g > 0: %d\\n', A(1,1), A(1,1) > 0)
+fprintf('  M2 = det(A) = %g > 0: %d\\n', det(A), det(A) > 0)
+
+fprintf('\\nAll eigenvalues positive?\\n')
+disp(eig(A)')
+
+fprintf('\\nQuadratic form x^T A x for 5 random vectors (all > 0 if SPD):\\n')
 for k = 1:5
-  x = randn(2,1);
-  quad = x' * A * x;
-  disp(quad)        % should always be positive
-end
-disp('Eigenvalues:')
-eig(A)              % both positive iff SPD`,
+    x = randn(2,1);
+    fprintf('  x^T A x = %.4f\\n', x' * A * x)
+end`,
+            },
+            {
+              id: 4,
+              cellTitle: 'Challenge: Cholesky factorization — A = L L^T for SPD',
+              prose: [
+                '`chol(A)` returns the upper Cholesky factor $R$ such that $A = R^\\top R$ (MATLAB convention: upper triangular). `R\' * R - A` should be near-zero. `chol` will throw an error if $A$ is not positive definite — this is a built-in SPD check.',
+                'The manual computation below follows the Cholesky algorithm: `L(1,1) = sqrt(A(1,1))`, then `L(2,1) = A(2,1)/L(1,1)`, then `L(2,2) = sqrt(A(2,2) - L(2,1)^2)`. The diagonal entries are square roots of "remaining variance" — they fail (imaginary) when $A$ is not SPD. `norm(L * L\' - A) < 1e-12` confirms $LL^\\top = A$.',
+              ],
+              code: `A = [9 3; 3 5];   % SPD matrix
+
+% MATLAB built-in Cholesky (returns upper triangular R s.t. A = R'*R)
+R = chol(A);
+fprintf('Cholesky factor R (upper triangular):\\n'); disp(R)
+fprintf('R\\' * R = A? norm diff = %g\\n', norm(R'*R - A))
+
+% Manual lower-triangular Cholesky
+L = zeros(2,2);
+L(1,1) = sqrt(A(1,1));          % = sqrt(9) = 3
+L(2,1) = A(2,1) / L(1,1);      % = 3/3 = 1
+L(2,2) = sqrt(A(2,2) - L(2,1)^2);  % = sqrt(5-1) = 2
+fprintf('\\nManual L =\\n'); disp(L)
+fprintf('L * L\\' = A? norm diff = %g\\n', norm(L*L' - A))
+
+% Solve Ax = b using Cholesky: Ly = b, then L'x = y
+b = [12; 8];
+y = L \\ b;         % forward substitution
+x = L' \\ y;        % back substitution
+fprintf('\\nSolution x = [%g; %g]\\n', x(1), x(2))
+fprintf('Verify A*x = b: [%g; %g]\\n', A*x)`,
             },
           ]
         }

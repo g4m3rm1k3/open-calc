@@ -31,6 +31,11 @@ export default {
         body: '**Previous (Lesson 3):** Complex Eigenvalues — rotation and oscillation encoded as $a \\pm bi$.\n**This lesson:** Jordan Normal Form — what to do when a matrix cannot be diagonalized; the structure of defective matrices.\n**Next (Lesson 5):** Markov Chains — applying eigenvalues to probability transitions and steady states.',
       },
       {
+        type: 'procedure',
+        title: 'Procedure: Find the Jordan Normal Form',
+        body: 'Step 1. **Find all eigenvalues.** Compute the characteristic polynomial $\\det(A - \\lambda I) = 0$ and factor it. Record the algebraic multiplicity $m_a(\\lambda)$ of each root.\n\nStep 2. **Check geometric multiplicity.** For each $\\lambda$, compute $m_g(\\lambda) = n - \\text{rank}(A - \\lambda I)$. If $m_g(\\lambda) < m_a(\\lambda)$ for any $\\lambda$, the matrix is defective.\n\nStep 3. **Determine block structure.** For each eigenvalue $\\lambda$: number of Jordan blocks = $m_g(\\lambda)$; sizes of those blocks must sum to $m_a(\\lambda)$. Use rank$(A - \\lambda I)^k$ for $k = 1, 2, \\ldots$ to pin down the exact sizes.\n\nStep 4. **Build each Jordan chain.** Find the true eigenvector $\\mathbf{v}_1$ (null vector of $A - \\lambda I$). Solve $(A - \\lambda I)\\mathbf{v}_2 = \\mathbf{v}_1$ for the generalized eigenvector $\\mathbf{v}_2$. Continue until the chain length equals the block size.\n\nStep 5. **Assemble $S$ and verify.** Form $S$ with Jordan chain columns in order. Verify $S^{-1}AS = J$ — the Jordan blocks should appear on the diagonal.',
+      },
+      {
         type: 'definition',
         title: 'Defective Matrix',
         body: 'A matrix is **defective** if for some eigenvalue $\\lambda$:\n\n$m_g(\\lambda) < m_a(\\lambda)$\n\nwhere $m_g(\\lambda) = \\dim \\ker(A - \\lambda I)$ is the **geometric multiplicity** (number of independent eigenvectors) and $m_a(\\lambda)$ is the **algebraic multiplicity** (root multiplicity in char. poly.).\n\nA defective matrix cannot be diagonalized.',
@@ -62,7 +67,10 @@ export default {
             {
               id: 1,
               cellTitle: 'A defective matrix: eigenvalues without enough eigenvectors',
-              prose: ['J = [3 1; 0 3] has eigenvalue 3 with algebraic multiplicity 2 but only 1 eigenvector.'],
+              prose: [
+                'Build the Jordan block $J = \\begin{bmatrix}3&1\\\\0&3\\end{bmatrix}$. Call `eig(J)` to get the eigenvalue matrix $D$ and eigenvector matrix $V$. Then check `det(V)` — if it is zero (or near-zero), the eigenvectors are linearly dependent and the matrix is defective.',
+                'Both eigenvalues equal 3 (algebraic multiplicity 2), but `det(V) ≈ 0` confirms there is only one independent eigenvector. The eigenvector matrix is singular — diagonalization is impossible. This is the defining test for a defective matrix.',
+              ],
               code: `J = [3 1; 0 3]
 [V, D] = eig(J)
 disp('Eigenvalues (diagonal of D):')
@@ -76,7 +84,10 @@ det(V)
             {
               id: 2,
               cellTitle: 'Jordan chain: generalized eigenvectors',
-              prose: ['Find the true eigenvector v1 and generalized eigenvector v2 such that (J-3I)v2 = v1.'],
+              prose: [
+                'Form $B = J - 3I$ and use `rref(B)` to find the null space — that gives the true eigenvector $\\mathbf{v}_1 = [1; 0]$. Then solve $(J - 3I)\\mathbf{v}_2 = \\mathbf{v}_1$ by forming the augmented matrix `[B v1]` and applying `rref`. The solution $\\mathbf{v}_2 = [0; 1]$ is the generalized eigenvector.',
+                'The Jordan chain condition $(J-3I)\\mathbf{v}_2 = \\mathbf{v}_1$ is what makes $\\mathbf{v}_2$ a generalized (not true) eigenvector. Verify with `B * v2` — the result must equal $\\mathbf{v}_1$, not $\\mathbf{0}$. Together $\\{\\mathbf{v}_1, \\mathbf{v}_2\\}$ span $\\mathbb{R}^2$ and form the columns of the change-of-basis matrix $S$.',
+              ],
               code: `J = [3 1; 0 3]
 lam = 3;
 B = J - lam*eye(2)
@@ -95,7 +106,10 @@ B * v2
             {
               id: 3,
               cellTitle: 'Matrix powers of a Jordan block',
-              prose: ['For a Jordan block J_k(lambda), J^n has lambda^n on diagonal and n*lambda^(n-1) on superdiagonal.'],
+              prose: [
+                'Compute `J^2`, `J^3`, `J^4` directly in OpenMAT. Then build the predicted value `J_pred = [3^n, n*3^(n-1); 0, 3^n]` for $n=4$ and compare with `J^4`. Both should match exactly.',
+                'The off-diagonal entry $n \\cdot 3^{n-1}$ grows polynomially in $n$ — for $n=4$ it is $4 \\cdot 27 = 108$, which is larger than the diagonal $3^4 = 81$. This polynomial growth is the signature of a Jordan block: powers of a defective matrix grow faster than the eigenvalue alone would suggest.',
+              ],
               code: `J = [3 1; 0 3]
 disp('J^2:')
 J^2
@@ -147,7 +161,10 @@ J^4
             {
               id: 1,
               cellTitle: 'Detecting a defective matrix — algebraic vs geometric multiplicity',
-              prose: 'A matrix is defective when eigenvalues are repeated but the eigenspace is too small. Check: are all eigenvectors independent? If eig() returns near-duplicate columns, the matrix is defective. The rank of (A - λI) determines the eigenspace dimension: geometric multiplicity = n - rank(A - λI).',
+              prose: [
+                'Build $J = [[3,1],[0,3]]$ and call `np.linalg.eig(J)` — both eigenvalues equal 3. Then check `np.linalg.matrix_rank(evecs)`: rank 1 means the two returned eigenvectors are not independent. The heat-map grid shows $J$, $J^2$, and $J^3$ with values annotated, so you can read the off-diagonal growth directly.',
+                'The rank test is the key diagnostic: a non-defective matrix with distinct eigenvalues always returns rank $= n$. Here rank = 1 < 2 confirms only one independent eigenvector exists. Watch the off-diagonal entries in the heat maps — they are 1, 6, 27, following $n \\cdot 3^{n-1}$, which grows faster than the diagonal $3^n$.',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -172,7 +189,10 @@ plt.show()`,
             {
               id: 2,
               cellTitle: 'Jordan chain: finding the generalized eigenvector',
-              prose: 'For a 2×2 Jordan block with eigenvalue λ: v₁ is the true eigenvector, v₁ satisfies (A-λI)v₁ = v₁. Solve (A-λI)v₁ = v₁ as a linear system. The solution v₁ is not unique — any particular solution works.',
+              prose: [
+                'Compare two matrices with eigenvalue 3: the scalar multiple $3I$ (diagonalizable) and the Jordan block $J$ (defective). Compute `np.linalg.matrix_power(M, n) @ v` for $n = 0, \\ldots, 7$ to get the norm growth of each. The semi-log plot (`ax.semilogy`) lets you see whether the growth is purely exponential (straight line) or faster.',
+                'For $3I$, the norm grows exactly as $3^n$ — a straight line on the log scale, matching the gray dashed reference. For the Jordan block, the norm grows as $\\|J^n v\\| \\approx 3^n \\sqrt{1 + n^2/9}$ — bending above the straight line. This polynomial correction from the $n\\lambda^{n-1}$ term is the observable signature of the Jordan defect.',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -200,7 +220,10 @@ plt.show()`,
             {
               id: 3,
               cellTitle: 'CNC critically damped axis — Jordan block in action',
-              prose: 'A critically damped second-order system (Î¶=1) has a repeated pole at s=-ω₁™. Its state matrix is a Jordan block. The solution x(t) = (c₁ + c₁t)e^{-ω₁™t} has the polynomial×exponential signature of a Jordan block. Critical damping gives the fastest settling without overshoot — engineers deliberately target this. The Jordan block is the mathematical model behind it.',
+              prose: [
+                'Build three matrices — a diagonalizable $2\\times 2$, a $2\\times 2$ Jordan block, and a $3\\times 3$ Jordan block — and display each as a heat map with entry values annotated. Call `np.linalg.eig(M)[0]` to show the eigenvalues of each matrix in the subplot title.',
+                'Scan the heat maps from left to right: the diagonalizable matrix has no superdiagonal 1s; the $2\\times 2$ Jordan block has one; the $3\\times 3$ block has two. The number of superdiagonal 1s = block size $- 1$ = number of generalized eigenvectors needed. The 1s are the visual signature of defectiveness — each one represents an eigenvector the eigenspace is missing.',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -659,5 +682,33 @@ plt.show()`,
     explainVerbally: 'Explain why defective matrices cannot be diagonalized (eigenspace too small), what a Jordan block encodes (eigenvalue + the "missing" generalized eigenvectors), and what the 1s on the superdiagonal mean geometrically.',
     detectIncorrectApplication: 'Spot when someone uses the diagonal power formula $A^n = PD^nP^{-1}$ for a defective matrix, or conflates Jordan block size with algebraic multiplicity, or assumes all repeated-eigenvalue matrices are defective.',
     transferToUnfamiliar: 'Apply Jordan form to analyze a new system (critically damped oscillator, marginally stable control system) by recognizing the Jordan block structure in the state matrix and predicting the $t^k e^{\\lambda t}$ solution form.',
+  },
+
+  semantics: {
+    core: [
+      { symbol: 'm_a(\\lambda)', meaning: 'Algebraic multiplicity — the multiplicity of $\\lambda$ as a root of $\\det(A-\\lambda I) = 0$; equals the total size across all Jordan blocks for this eigenvalue.' },
+      { symbol: 'm_g(\\lambda)', meaning: 'Geometric multiplicity — $\\dim \\ker(A - \\lambda I)$; the number of independent eigenvectors; equals the number of Jordan blocks for this eigenvalue.' },
+      { symbol: 'J_k(\\lambda)', meaning: 'Jordan block of size $k$ at eigenvalue $\\lambda$: a $k \\times k$ matrix with $\\lambda$ on the main diagonal and 1s on the superdiagonal, zeros elsewhere.' },
+      { symbol: 'N', meaning: 'Nilpotent part of a Jordan block: $N = J_k(\\lambda) - \\lambda I$, with 1s on the superdiagonal only; satisfies $N^k = 0$ so powers terminate.' },
+      { symbol: 'S', meaning: 'Change-of-basis matrix formed from Jordan chain columns; satisfies $S^{-1}AS = J$; each column is either a true eigenvector or a generalized eigenvector.' },
+    ],
+    rulesOfThumb: [
+      'Number of Jordan blocks for $\\lambda$ = geometric multiplicity; sum of all their sizes = algebraic multiplicity.',
+      'A matrix is diagonalizable iff every Jordan block is $1 \\times 1$, i.e., $m_g(\\lambda) = m_a(\\lambda)$ for every eigenvalue.',
+      'The off-diagonal entry $n\\lambda^{n-1}$ in $J_2(\\lambda)^n$ grows polynomially — Jordan blocks cause faster-than-eigenvalue growth in iterated powers.',
+      'Never compute Jordan form numerically — it is sensitive to tiny perturbations. Use Schur decomposition for numerical work instead.',
+      'Jordan form is a complete similarity invariant: two matrices are similar if and only if they have the same Jordan form.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: [
+      { id: 'la3-001', reason: 'Review eigenvalue and eigenvector computation and the characteristic polynomial — generalized eigenvectors build on top of that foundation.' },
+      { id: 'la3-002', reason: 'Review diagonalization and the requirement of $n$ independent eigenvectors — Jordan form explains precisely when and why that requirement fails.' },
+    ],
+    futureLinks: [
+      { id: 'la3-007', preview: 'Matrix exponential uses Jordan decomposition directly: $e^{J_k(\\lambda)t} = e^{\\lambda t}(I + Nt + N^2t^2/2! + \\cdots)$ terminates because $N^k = 0$.' },
+      { id: 'la3-006', preview: 'Cayley-Hamilton theorem states every matrix satisfies its own characteristic polynomial — the reason generalized eigenspaces have dimension exactly equal to algebraic multiplicity.' },
+    ],
   },
 };

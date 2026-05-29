@@ -27,6 +27,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'Procedure: Find All Four Fundamental Subspaces',
+        body: 'Step 1. Row reduce A to RREF. The number of pivots = rank r.\nStep 2. Column space C(A): identify pivot column indices in the RREF, then take those columns from the ORIGINAL matrix A (row reduction changes column vectors — always go back to A).\nStep 3. Null space N(A): from RREF, express each pivot variable in terms of the free variables. One basis vector per free variable — set that free variable = 1 and all others = 0, then solve for the pivot variables.\nStep 4. Row space C(Aᵀ): take the nonzero rows of the RREF (row operations preserve the row space).\nStep 5. Left null space N(Aᵀ): row-reduce the augmented matrix [A | Iₘ]. The rows of the right Iₘ-block that correspond to zero rows on the left give the left null space basis.\nStep 6. Verify dimensions: dim C(A) + dim N(Aᵀ) = m and dim C(Aᵀ) + dim N(A) = n.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 11 of 12 — Matrices & Transformations',
         body: '**Previous:** The Invertible Matrix Theorem — twelve equivalent conditions for invertibility.\n**This lesson:** The Four Fundamental Subspaces — the complete picture of what every matrix does to space.\n**Next:** Cofactor Expansion — determinants of larger matrices by reducing to smaller ones.',
@@ -64,7 +69,10 @@ export default {
             {
               id: 1,
               cellTitle: 'Extract all four subspaces via SVD',
-              prose: 'The SVD factorization A = U Σ Vᵀ directly reveals all four subspaces. Columns of U corresponding to nonzero singular values span C(A); the rest span N(Aᵀ). Columns of V corresponding to nonzero singular values span C(Aᵀ); the rest span N(A).',
+              prose: [
+                'The SVD A = U Σ Vᵀ directly reveals all four subspaces. The first r columns of U (corresponding to nonzero singular values) span C(A); the remaining m-r columns span N(Aᵀ). The first r columns of V span C(Aᵀ); the remaining n-r columns span N(A). One decomposition, four subspaces.',
+                'The bar chart shows the four dimensions side by side. For this 3×4 rank-2 matrix: C(A) and C(Aᵀ) both have dim 2; N(A) has dim 2; N(Aᵀ) has dim 1. Verify rank-nullity: 2+2=4=n for the n-side, and 2+1=3=m for the m-side. The dot product check confirms orthogonality to machine precision.',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 from scipy import linalg
@@ -112,7 +120,10 @@ plt.show()`,
             {
               id: 2,
               cellTitle: 'Solvability check — Fredholm alternative',
-              prose: 'Ax = b has a solution iff b is perpendicular to every vector in the left null space N(Aᵀ). Test two right-hand sides: one solvable, one not.',
+              prose: [
+                'Ax = b is solvable iff b ⊥ N(Aᵀ) (Fredholm alternative). The code extracts the left null space via SVD: U[:, r:] gives the columns of U that correspond to zero singular values. These are the vectors b must be orthogonal to. Here A = [1 2; 2 4] has rank 1, so N(Aᵀ) is 1-dimensional.',
+                'The variable b1 = [1, 2] is proportional to the first row of A, so it is in C(A) — Fredholm check prints ~0. The variable b2 = [1, 3] is not proportional, so it is outside C(A) — Fredholm check is nonzero. The rank augmentation test confirms both results independently.',
+              ],
               code: `import numpy as np
 
 A = np.array([[1, 2],
@@ -140,6 +151,69 @@ for b, label in [(b1, "b1=[1,2]"), (b2, "b2=[1,3]")]:
     rank_match = (np.linalg.matrix_rank(A) == np.linalg.matrix_rank(aug))
     print(f"  Rank check agrees: {rank_match}")`,
             },
+            {
+              id: 3,
+              cellTitle: 'Visualize how a singular matrix collapses the plane',
+              prose: [
+                'For a 2×2 rank-1 matrix A = [1 2; 2 4], the column space C(A) is just a line through the origin. Every input vector x maps to a point on this line — the entire plane collapses onto a 1D subspace. Vectors in N(A) = span{[-2,1]^T} all land on zero.',
+                'The left subplot shows the input plane colored by distance from origin. The right subplot shows where every grid point maps after multiplication by A. The collapse from 2D to 1D is the geometric meaning of det(A) = 0. Compare to the invertible case A_inv = [1 1; 0 1] where the plane stretches but stays 2D.',
+              ],
+              code: `import numpy as np
+import matplotlib.pyplot as plt
+
+# Singular A collapses the plane onto a line
+A_sing = np.array([[1., 2.], [2., 4.]])  # rank 1
+A_inv  = np.array([[1., 1.], [0., 1.]])  # rank 2
+
+fig, axes = plt.subplots(1, 2, figsize=(10, 4.5))
+grid = np.linspace(-2, 2, 15)
+xx, yy = np.meshgrid(grid, grid)
+pts = np.stack([xx.ravel(), yy.ravel()])  # 2 × N
+
+for ax, A, title in [(axes[0], A_sing, 'Singular: rank=1'), (axes[1], A_inv, 'Invertible: rank=2')]:
+    mapped = A @ pts
+    colors = np.linalg.norm(pts, axis=0)
+    ax.scatter(mapped[0], mapped[1], c=colors, cmap='RdYlBu', s=15, alpha=0.7)
+    ax.axhline(0, color='k', lw=0.5); ax.axvline(0, color='k', lw=0.5)
+    ax.set_xlim(-6, 6); ax.set_ylim(-6, 6); ax.set_aspect('equal')
+    ax.set_title(f'{title}, det={np.linalg.det(A):.1f}', fontsize=11)
+    ax.grid(True, alpha=0.3)
+plt.suptitle('Column space: singular A maps ℝ² onto a line; invertible A maps onto ℝ²', fontsize=10)
+plt.tight_layout()
+plt.show()`,
+            },
+            {
+              id: 4,
+              cellTitle: 'Challenge: minimum-norm solution via pseudoinverse',
+              prose: [
+                'For an underdetermined system Ax=b (more unknowns than equations), there are infinitely many solutions. The pseudoinverse A^+ = np.linalg.pinv(A) gives the minimum-norm solution — the unique solution in the row space C(Aᵀ). Any other solution adds a null space component, increasing the norm.',
+                'Verify: x_min = A^+ b should satisfy A @ x_min ≈ b, and np.linalg.lstsq returns the same answer. Also verify that x_min is in the row space by checking that null(A)^T @ x_min ≈ 0. Compute a second solution x2 = x_min + null_vec and confirm ||x2|| > ||x_min||.',
+              ],
+              code: `import numpy as np
+from scipy import linalg
+
+A = np.array([[1., 2., 3.], [0., 1., 2.]])  # 2x3, rank 2
+b = np.array([1., 1.])
+
+# Minimum-norm solution via pseudoinverse (row space component)
+x_min = np.linalg.pinv(A) @ b
+print(f"Minimum-norm solution: {x_min.round(4)}")
+print(f"||x_min|| = {np.linalg.norm(x_min):.4f}")
+print(f"A @ x_min = {(A @ x_min).round(6)}  (should equal b = {b})")
+
+# Null space basis
+null_A = linalg.null_space(A)
+print(f"\\nNull space basis:\\n{null_A.round(4)}")
+
+# Add null vector to get another solution with larger norm
+x2 = x_min + null_A[:, 0] * 0.5
+print(f"\\nAnother solution x2 = x_min + 0.5*null_vec:")
+print(f"||x2|| = {np.linalg.norm(x2):.4f}  (should be > ||x_min||)")
+print(f"A @ x2 = {(A @ x2).round(6)}  (still satisfies Ax=b)")
+
+# Verify x_min is in row space: null_A^T @ x_min ≈ 0
+print(f"\\nnull_A^T @ x_min = {(null_A.T @ x_min).round(10)}  (should be ~0 — x_min in row space)")`,
+            },
           ],
         },
       },
@@ -153,7 +227,10 @@ for b, label in [(b1, "b1=[1,2]"), (b2, "b2=[1,3]")]:
             {
               id: 1,
               cellTitle: 'Four subspaces via SVD',
-              prose: ['Extract bases for all four fundamental subspaces using the SVD.'],
+              prose: [
+                'The SVD [U, S, V] = svd(A, \'econ\') factorizes A = U*S*V\'. The first r columns of U span C(A), the first r columns of V span C(A^T), the last n-r columns of V span N(A), and the last m-r columns of U span N(A^T). Here A is 2×3 with rank r=2, so the single last column of V is the null space basis and the left null space is empty (m-r = 0).',
+                'The final check row_space\' * null_space computes all inner products between the row-space and null-space basis vectors. The result should be a matrix of near-zero values — confirming C(A^T) ⊥ N(A). A single matrix multiply verifies the fundamental orthogonality property.',
+              ],
               code: `% Matrix A (2x3, rank 2)
 A = [1 2 3; 4 5 6]
 [m, n] = size(A)
@@ -187,7 +264,10 @@ row_space' * null_space
             {
               id: 2,
               cellTitle: 'Solvability check via left null space',
-              prose: ['Check whether Ax=b has a solution using the Fredholm alternative.'],
+              prose: [
+                'The Fredholm check left_null\' * b1 computes the inner product of every left-null-space basis vector with b1. A result of ~0 confirms b1 ∈ C(A), so Ax=b1 is solvable. A non-zero result for b2 confirms b2 ∉ C(A). Here A = [1 2; 2 4] has rank 1, so the left null space has dimension m-r = 2-1 = 1.',
+                'The rank augmentation test [rank(A), rank([A b])] is the Rouché-Capelli theorem: if rank does not increase when b is appended, b is in the column space. Both methods — Fredholm and rank augmentation — are equivalent and should always agree. Run both and compare their answers for b1 and b2.',
+              ],
               code: `A = [1 2 3; 4 5 6; 7 8 9]  % rank 2, 3x3
 b1 = [1; 2; 3]   % test: is b1 in C(A)?
 b2 = [1; 2; 4]   % test: is b2 in C(A)?
@@ -213,6 +293,61 @@ disp('Rank of [A b2] vs rank(A):')
 [rank(A), rank([A b2])]
 `,
             },
+            {
+              id: 3,
+              cellTitle: 'Find all four subspaces by row reduction (no SVD)',
+              prose: [
+                'This cell computes all four subspaces using only row reduction — the method taught in the lesson. rref(A) gives the RREF; non-zero rows are the row space basis. The pivot positions identify which columns to take from original A for the column space. null(A) and null(A\') compute the null spaces numerically.',
+                'The final check row_space * null_A should print ~0: a 2×1 matrix of near-zeros confirming C(A^T) ⊥ N(A). Notice that the column space basis uses the original A columns, not the RREF columns — row operations preserve row space and null space but NOT column space.',
+              ],
+              code: `A = [1 2 3; 4 5 6; 7 8 9];   % rank 2, 3x3
+[m, n] = size(A);
+r = rank(A);
+fprintf('rank=%d  nullity=%d  left-null dim=%d\\n', r, n-r, m-r)
+
+R = rref(A);
+disp('RREF:'); disp(R)
+disp('Row space basis (non-zero rows of RREF):')
+row_space = R(1:r, :)
+
+null_A = null(A);
+disp('Null space basis N(A):'); disp(null_A)
+
+disp('Column space basis (pivot cols of original A):')
+col_space = A(:, 1:r)
+
+null_AT = null(A');
+disp('Left null space N(A^T):'); disp(null_AT)
+
+disp('Row space · Null space (should be ~0):')
+row_space * null_A
+`,
+            },
+            {
+              id: 4,
+              cellTitle: 'Challenge: orthogonal decomposition of a vector',
+              prose: [
+                'Any vector x ∈ ℝⁿ splits uniquely as x = x_row + x_null where x_row ∈ C(A^T) and x_null ∈ N(A). The projection onto N(A) is P_null = V*V\' where V is the null space basis matrix. The row space projection is P_row = I - P_null.',
+                'After running: verify that A*x_null ≈ 0 (the null component maps to zero), that x_row and x_null are orthogonal (dot product ≈ 0), and that x_row + x_null = x exactly. This is the core geometric meaning of the four fundamental subspaces — they explain the exact structure of every vector in the domain.',
+              ],
+              code: `A = [1 0 2; 0 1 -1];   % 2x3, rank 2
+x = [3; -1; 2];          % arbitrary vector in R^3
+
+V = null(A);             % null space basis (1 column for this A)
+P_null = V * V';         % projection onto N(A)
+P_row = eye(3) - P_null; % projection onto C(A^T) (row space)
+
+x_null = P_null * x;
+x_row  = P_row  * x;
+
+fprintf('x      = [%.3f, %.3f, %.3f]\\n', x(1), x(2), x(3))
+fprintf('x_row  = [%.3f, %.3f, %.3f]\\n', x_row(1), x_row(2), x_row(3))
+fprintf('x_null = [%.3f, %.3f, %.3f]\\n', x_null(1), x_null(2), x_null(3))
+fprintf('A*x_null (should be ~0): [%.2e, %.2e]\\n', A*x_null)
+fprintf('dot(x_row, x_null) (should be ~0): %.2e\\n', dot(x_row, x_null))
+fprintf('norm(x_row + x_null - x) (should be ~0): %.2e\\n', norm(x_row+x_null-x))
+`,
+            },
           ],
         },
       },
@@ -235,7 +370,10 @@ disp('Rank of [A b2] vs rank(A):')
 
   rigor: {
     prose: [
-      '**Generalization beyond finite dimensions.** For a bounded linear operator $T: V \\to W$ between Banach spaces, the four fundamental subspaces generalize to: $\\ker T$, $\\text{im}\\, T$, $\\ker T^*$, $\\text{im}\\, T^*$. The Fredholm alternative still holds for Fredholm operators: $\\dim \\ker T = \\dim \\ker T^*$ (Fredholm index 0 for self-adjoint operators). For compact operators, this gives the Fredholm integral equation theory. In PDE, the solvability of $Lu = f$ (for a differential operator $L$) requires $f \\perp \\ker L^*$ — a direct generalization of the matrix Fredholm alternative.',
+      '**Formal definitions via linear algebra.** For a linear map $T_A: \\mathbb{R}^n \\to \\mathbb{R}^m$ (i.e., multiplication by $A$), the four subspaces are: $C(A) = \\{A\\mathbf{x} : \\mathbf{x} \\in \\mathbb{R}^n\\}$ (image of $T_A$); $N(A) = \\{\\mathbf{x} : A\\mathbf{x} = \\mathbf{0}\\}$ (kernel of $T_A$); $C(A^\\top) = \\{A^\\top\\mathbf{y} : \\mathbf{y} \\in \\mathbb{R}^m\\}$ (image of $T_{A^\\top}$); $N(A^\\top) = \\{\\mathbf{y} : A^\\top\\mathbf{y} = \\mathbf{0}\\}$ (kernel of $T_{A^\\top}$). The Rank-Nullity Theorem applied to $T_A$ gives $\\dim N(A) + \\dim C(A) = n$; applied to $T_{A^\\top}$ gives $\\dim N(A^\\top) + \\dim C(A^\\top) = m$. Both column spaces share the same dimension $r = \\text{rank}(A) = \\text{rank}(A^\\top)$.',
+      '**Proof of orthogonality: $C(A^\\top) \\perp N(A)$.** Take any vector $\\mathbf{r} \\in C(A^\\top)$ — it has the form $\\mathbf{r} = A^\\top \\mathbf{w}$ for some $\\mathbf{w}$. Take any $\\mathbf{x} \\in N(A)$, so $A\\mathbf{x} = \\mathbf{0}$. Compute their inner product: $\\langle \\mathbf{r}, \\mathbf{x} \\rangle = \\mathbf{r}^\\top \\mathbf{x} = (A^\\top \\mathbf{w})^\\top \\mathbf{x} = \\mathbf{w}^\\top (A\\mathbf{x}) = \\mathbf{w}^\\top \\mathbf{0} = 0$. This holds for every $\\mathbf{r} \\in C(A^\\top)$ and every $\\mathbf{x} \\in N(A)$ — orthogonality is exact, not approximate. The same calculation with $A$ replaced by $A^\\top$ proves $C(A) \\perp N(A^\\top)$.',
+      '**The big picture: $A$ as bijection from row space to column space.** Every $\\mathbf{x} \\in \\mathbb{R}^n$ splits uniquely as $\\mathbf{x} = \\mathbf{x}_r + \\mathbf{x}_n$ (row space + null space components, by orthogonal projection). Then $A\\mathbf{x} = A\\mathbf{x}_r + A\\mathbf{x}_n = A\\mathbf{x}_r$ (since $\\mathbf{x}_n \\in N(A)$). The restriction of $A$ to the row space $C(A^\\top)$ is injective (if $A\\mathbf{x}_r = \\mathbf{0}$ and $\\mathbf{x}_r \\in C(A^\\top)$, then $\\mathbf{x}_r \\in N(A) \\cap C(A^\\top) = \\{\\mathbf{0}\\}$) and surjective onto $C(A)$ (by definition). So $A$ restricts to a bijection $C(A^\\top) \\xrightarrow{\\sim} C(A)$ — both $r$-dimensional. The null space is precisely the "wasted" part of the domain that $A$ ignores.',
+      '**Fredholm alternative and infinite-dimensional generalizations.** For a Fredholm operator $T: V \\to W$ on Banach spaces, the four subspaces generalize to $\\ker T$, $\\text{im}\\, T$, $\\ker T^*$, $\\text{im}\\, T^*$. The Fredholm alternative states: either $T\\mathbf{x} = \\mathbf{f}$ has a solution, or there exists $\\mathbf{y} \\in \\ker T^*$ with $\\langle \\mathbf{y}, \\mathbf{f} \\rangle \\neq 0$ — never both. This governs the solvability of PDE: $Lu = f$ is solvable iff $f \\perp \\ker L^*$. In finite dimensions this is exactly the matrix condition $\\mathbf{b} \\perp N(A^\\top)$. The pseudoinverse $A^+$ then provides the minimum-norm solution from the row space — the unique solution that has no null space component.',
     ],
     callouts: [
       {
@@ -295,7 +433,51 @@ disp('Rank of [A b2] vs rank(A):')
       hint: 'Write any solution as $\\mathbf{x} = \\mathbf{x}_r + \\mathbf{x}_n$ where $\\mathbf{x}_r \\in C(A^\\top)$ and $\\mathbf{x}_n \\in N(A)$, then use the Pythagorean theorem.',
       solution: 'Any solution to $A\\mathbf{x}=\\mathbf{b}$ is $\\mathbf{x} = \\mathbf{x}_r + \\mathbf{x}_n$ where $\\mathbf{x}_r \\in C(A^\\top)$ (the row space component) and $\\mathbf{x}_n \\in N(A)$ (null space component). Since $C(A^\\top) \\perp N(A)$, by Pythagoras: $\\|\\mathbf{x}\\|^2 = \\|\\mathbf{x}_r\\|^2 + \\|\\mathbf{x}_n\\|^2 \\geq \\|\\mathbf{x}_r\\|^2$. The minimum is achieved when $\\mathbf{x}_n = 0$, i.e., $\\mathbf{x} = \\mathbf{x}_r \\in C(A^\\top)$. This minimum-norm solution is unique (the row space component is unique).',
     },
+    {
+      id: 'ch-la2-011-2',
+      title: 'All four subspaces for a rank-1 matrix',
+      difficulty: 'medium',
+      prompt: 'For $A = \\begin{pmatrix}1&1&1\\\\1&1&1\\\\1&1&1\\end{pmatrix}$, find all four subspaces. Then determine whether $A\\mathbf{x} = (3,3,3)^\\top$ is solvable and write the complete solution.',
+      hint: 'All rows are identical — rank 1. The null space has dimension 2 (two free variables). Check solvability via the Fredholm condition $\\mathbf{b} \\perp N(A^\\top)$.',
+      solution: '$C(A) = \\text{span}\\{(1,1,1)^\\top\\}$; $N(A) = \\text{span}\\{(-1,1,0)^\\top, (-1,0,1)^\\top\\}$; $C(A^\\top) = \\text{span}\\{(1,1,1)^\\top\\}$; $N(A^\\top) = \\text{span}\\{(1,-1,0)^\\top, (1,0,-1)^\\top\\}$. Solvability check: $(1,-1,0)\\cdot(3,3,3)=0$ ✓ and $(1,0,-1)\\cdot(3,3,3)=0$ ✓ — $\\mathbf{b}$ is in $C(A)$. Particular solution: $\\mathbf{x}_p = (1,1,1)^\\top$. Complete solution: $\\mathbf{x} = (1,1,1)^\\top + s(-1,1,0)^\\top + t(-1,0,1)^\\top$ for any $s,t \\in \\mathbb{R}$.',
+    },
+    {
+      id: 'ch-la2-011-3',
+      title: 'Projection matrix from the column space',
+      difficulty: 'hard',
+      prompt: 'Let $A = \\begin{pmatrix}1&0\\\\0&1\\\\1&1\\end{pmatrix}$ (3×2, full column rank). (a) Find the left null space $N(A^\\top)$. (b) Compute the projection matrix $P = A(A^\\top A)^{-1}A^\\top$ onto $C(A)$. (c) For $\\mathbf{b} = (1,1,1)^\\top$, verify $P\\mathbf{b} \\in C(A)$ and $\\mathbf{b} - P\\mathbf{b} \\in N(A^\\top)$.',
+      hint: 'For the projection formula, compute $A^\\top A$ first (a 2×2 invertible matrix), then form $P = A(A^\\top A)^{-1}A^\\top$. Verify $P^2 = P$ (idempotent) and $P^\\top = P$ (symmetric).',
+      solution: 'Left null space: solve $A^\\top\\mathbf{y}=\\mathbf{0}$; basis $(-1,-1,1)^\\top$. $A^\\top A = \\begin{pmatrix}2&1\\\\1&2\\end{pmatrix}$, $(A^\\top A)^{-1} = \\frac{1}{3}\\begin{pmatrix}2&-1\\\\-1&2\\end{pmatrix}$. $P = \\frac{1}{3}\\begin{pmatrix}2&-1&1\\\\-1&2&1\\\\1&1&2\\end{pmatrix}$. For $\\mathbf{b}=(1,1,1)^\\top$: $P\\mathbf{b} = (2/3, 2/3, 4/3)^\\top \\in C(A)$ ✓; $\\mathbf{b}-P\\mathbf{b} = (1/3, 1/3, -1/3)^\\top = \\frac{1}{3}(-1,-1,1)^\\top \\in N(A^\\top)$ ✓.',
+    },
   ],
+
+  semantics: {
+    core: [
+      { symbol: 'C(A) \\subseteq \\mathbb{R}^m', meaning: 'Column space: all vectors $A\\mathbf{x}$ as $\\mathbf{x}$ ranges over $\\mathbb{R}^n$. Dimension $= r$. This is the set of right-hand sides $\\mathbf{b}$ for which $A\\mathbf{x}=\\mathbf{b}$ is solvable.' },
+      { symbol: 'N(A) \\subseteq \\mathbb{R}^n', meaning: 'Null space: all $\\mathbf{x}$ with $A\\mathbf{x}=\\mathbf{0}$. Dimension $= n-r$. Encodes non-uniqueness: $\\mathbf{x}_p + \\mathbf{n}$ is also a solution for any $\\mathbf{n} \\in N(A)$.' },
+      { symbol: 'C(A^\\top) \\subseteq \\mathbb{R}^n', meaning: 'Row space: span of the rows of $A$. Dimension $= r$. Orthogonal complement of $N(A)$ in $\\mathbb{R}^n$. The minimum-norm solution lives here.' },
+      { symbol: 'N(A^\\top) \\subseteq \\mathbb{R}^m', meaning: 'Left null space: all $\\mathbf{y}$ with $A^\\top\\mathbf{y}=\\mathbf{0}$. Dimension $= m-r$. Solvability condition: $\\mathbf{b} \\perp N(A^\\top)$.' },
+      { symbol: '\\dim C(A^\\top) + \\dim N(A) = n', meaning: 'Rank-nullity in $\\mathbb{R}^n$: row space and null space are orthogonal complements. Similarly $\\dim C(A) + \\dim N(A^\\top) = m$ in $\\mathbb{R}^m$.' },
+    ],
+    rulesOfThumb: [
+      'Column space and left null space both live in $\\mathbb{R}^m$; row space and null space both live in $\\mathbb{R}^n$.',
+      'All four dimensions are determined by just two numbers: rank $r$ and matrix shape $m \\times n$.',
+      'Column space basis: pivot columns of the ORIGINAL $A$. Row space basis: nonzero rows of RREF.',
+      'Solvability check: $A\\mathbf{x}=\\mathbf{b}$ is solvable iff $\\mathbf{b} \\perp N(A^\\top)$ — test against every left-null-space basis vector.',
+      'Minimum-norm solution: the unique solution in $C(A^\\top)$. Adding any null vector increases $\\|\\mathbf{x}\\|$ by the Pythagorean theorem.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: [
+      { lessonId: 'la2-003', label: 'Null Space and Column Space', note: 'The null space $N(A)$ and column space $C(A)$ were introduced in la2-003. This lesson adds the row space and left null space, completing the full four-subspace picture and the orthogonality relationships.' },
+      { lessonId: 'la2-010', label: 'Invertible Matrix Theorem', note: 'The IMT says $A$ is invertible iff all four subspaces degenerate: $N(A)=N(A^\\top)=\\{\\mathbf{0}\\}$ and $C(A)=\\mathbb{R}^m$, $C(A^\\top)=\\mathbb{R}^n$. The four subspaces unify and generalize the IMT to non-square matrices.' },
+    ],
+    futureLinks: [
+      { lessonId: 'la4-003', label: 'Least Squares and Projections', note: 'Least squares replaces $A\\mathbf{x}=\\mathbf{b}$ (unsolvable) with the projection $P\\mathbf{b}$ of $\\mathbf{b}$ onto $C(A)$. The residual $\\mathbf{b}-P\\mathbf{b}$ lies in $N(A^\\top)$. This is the orthogonality $C(A) \\perp N(A^\\top)$ applied to optimization.' },
+      { lessonId: 'la9-001', label: 'Singular Value Decomposition', note: 'The SVD $A = U\\Sigma V^\\top$ provides orthonormal bases for all four subspaces simultaneously: first $r$ columns of $U$ span $C(A)$; last $m-r$ span $N(A^\\top)$; first $r$ columns of $V$ span $C(A^\\top)$; last $n-r$ span $N(A)$.' },
+    ],
+  },
 
   mentalModel: [
     'Four subspaces: $C(A)$ in $\\mathbb{R}^m$, $N(A)$ in $\\mathbb{R}^n$, $C(A^\\top)$ in $\\mathbb{R}^n$, $N(A^\\top)$ in $\\mathbb{R}^m$.',

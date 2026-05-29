@@ -36,6 +36,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'Procedure: Find the Inverse of a 2×2 Matrix',
+        body: 'Step 1. Compute $\\det(A) = ad - bc$.\nStep 2. If $\\det(A) = 0$: STOP — the matrix is singular and no inverse exists.\nStep 3. Swap the main diagonal entries: $a$ moves to bottom-right, $d$ moves to top-left.\nStep 4. Negate the off-diagonal entries: $b$ becomes $-b$, $c$ becomes $-c$.\nStep 5. Scale the entire rearranged matrix by $\\frac{1}{\\det(A)}$.\nStep 6. Verify: compute $A^{-1}A$ — it must equal $I$.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 3 of 12 — Matrices & Transformations',
         body: '**Previous:** Matrix multiplication = composing transformations.\n**This lesson:** Determinant = area scaling factor. If det ≠ 0, the inverse exists and undoes the transformation.\n**Next:** Null space and column space — what happens to vectors when det = 0.',
@@ -224,6 +229,7 @@ fprintf('Condition number (bad):  %.2e  (huge = near-singular)\\n', cond(M_bad))
                 '`np.linalg.det(S)` with `S = [[2,4],[1,2]]` returns exactly 0: $2 \\cdot 2 - 4 \\cdot 1 = 0$. Row 2 of S is half of row 1 — they are linearly dependent. The rank of S is 1, not 2, so S maps the entire plane onto a single line (a 1D subspace). Any area becomes zero. No inverse exists.',
               ],
               code: `import numpy as np
+import matplotlib.pyplot as plt
 
 # Invertible: det ≠ 0
 A = np.array([[3., 1.],
@@ -282,6 +288,42 @@ for ax, M, title in zip(axes, [A, A_inv, I_check], ["A", "A_inv", "A @ A_inv (= 
             ax.text(j, i, f"{M[i,j]:.3f}", ha="center", va="center", fontsize=12,
                     color="white" if abs(M[i,j]) > 1.5 else "black")
     ax.set_xticks([]); ax.set_yticks([])
+plt.tight_layout()
+plt.show()`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Solving Ax=b — solve vs inv, and visualizing the singular boundary',
+              prose: [
+                '`np.linalg.solve(A, b)` uses LU factorization internally: it factors $A = LU$ once ($O(n^3)$), then performs two triangular solves for $\\mathbf{b}$ ($O(n^2)$). `np.linalg.inv(A) @ b` computes the full inverse (all $n^2$ entries, more floating-point operations), then multiplies. Both give the same answer numerically but `solve` is the correct professional approach — lower error accumulation.',
+                'The line plot shows $\\det\\begin{bmatrix}2&3\\\\1&d\\end{bmatrix} = 2d - 3$ as a function of the entry $d$. The red dashed line marks $\\det = 0$ — the singular boundary. Left of $d=1.5$ the matrix has a negative determinant (orientation-flipping but still invertible). Right of $d=1.5$ it is positive-det invertible. Exactly at $d=1.5$ it is singular. The shaded regions make it visual: blue is invertible-positive, red is invertible-negative, and the boundary itself is the non-invertible point.',
+              ],
+              code: `import numpy as np
+import matplotlib.pyplot as plt
+
+A = np.array([[3., 1.], [2., 4.]])
+b = np.array([10., 8.])
+
+x_solve = np.linalg.solve(A, b)
+x_inv   = np.linalg.inv(A) @ b
+print(f"linalg.solve:  x = {x_solve}")
+print(f"inv(A) @ b:    x = {x_inv}")
+print(f"Residual |Ax - b| = {np.linalg.norm(A @ x_solve - b):.2e}")
+
+# Visualize det as function of one entry
+d_vals = np.linspace(1.0, 2.5, 200)
+dets = 2*d_vals - 3          # det of [[2,3],[1,d]] = 2d - 3
+
+fig, ax = plt.subplots(figsize=(7, 4))
+ax.plot(d_vals, dets, 'steelblue', lw=2.5, label='det = 2d - 3')
+ax.axhline(0, color='crimson', lw=1.5, linestyle='--', label='singular boundary (det=0)')
+ax.axvline(1.5, color='darkorange', lw=1.5, linestyle=':', label='d=1.5 (singular point)')
+ax.fill_between(d_vals, dets, 0, where=(dets > 0), alpha=0.15, color='steelblue', label='det > 0 (invertible)')
+ax.fill_between(d_vals, dets, 0, where=(dets < 0), alpha=0.15, color='crimson', label='det < 0 (invertible, flipped)')
+ax.set_xlabel('Entry d in [[2,3],[1,d]]', fontsize=11)
+ax.set_ylabel('det(A)', fontsize=11)
+ax.set_title('Singular boundary: det = 0 at d = 1.5', fontsize=12)
+ax.legend(fontsize=9); ax.grid(True, alpha=0.3)
 plt.tight_layout()
 plt.show()`,
             },

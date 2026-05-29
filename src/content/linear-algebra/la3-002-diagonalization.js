@@ -35,6 +35,11 @@ export default {
         body: '**Previous (Lesson 1):** Eigenvectors and Eigenvalues — the invariant directions and their scaling factors.\n**This lesson:** Diagonalization — rebuilding coordinates around eigenvectors so the matrix becomes diagonal scaling.\n**Next (Lesson 3):** Complex Eigenvalues — what happens when the matrix rotates and there are no real eigenvectors.',
       },
       {
+        type: 'procedure',
+        title: 'Procedure: Diagonalize a Matrix and Compute A^k',
+        body: 'Step 1. Find all eigenvalues by solving $\\det(A - \\lambda I) = 0$.\nStep 2. For each eigenvalue $\\lambda_i$, find the eigenvector(s) by solving $(A - \\lambda_i I)\\mathbf{v} = \\mathbf{0}$.\nStep 3. Check: do you have $n$ linearly independent eigenvectors total? If not, $A$ is defective and cannot be diagonalized.\nStep 4. Build $P$ with eigenvectors as columns and $D = \\text{diag}(\\lambda_1, \\ldots, \\lambda_n)$ — column order must match eigenvalue order.\nStep 5. Verify: compute $AP - PD$ and confirm it is the zero matrix.\nStep 6. For $A^k$: compute $D^k$ (raise each diagonal entry to the $k$th power) and assemble $A^k = PD^kP^{-1}$.',
+      },
+      {
         type: 'insight',
         title: 'The PDP⁻¹ Sandwich',
         body: 'A = PDP^{-1}\n\n$P$ = matrix of eigenvectors (columns)\n$D$ = diagonal matrix of eigenvalues\n\nPowers: $A^k = PD^kP^{-1}$, where $D^k$ just raises each diagonal entry to the $k$th power.',
@@ -97,7 +102,10 @@ export default {
             {
               id: 1,
               cellTitle: 'Diagonalization: A = P D P⁻¹',
-              prose: '`[P, D] = eig(A)` returns eigenvectors as columns of P, eigenvalues on diagonal of D. Verify A = P * D * inv(P). The columns of P must be linearly independent for this to work.',
+              prose: [
+                '`[P, D] = eig(A)` returns two matrices: P whose columns are eigenvectors, and D whose diagonal entries are the corresponding eigenvalues. `diag(D)` extracts the diagonal as a column vector. The eigenvectors in P are automatically ordered to match the eigenvalues in D — column $i$ of P corresponds to entry $(i,i)$ of D.',
+                'The verification `norm(A - A_reconstructed) < 1e-10` checks $\\|A - PDP^{-1}\\| < \\epsilon$. If this fails, P is singular (columns not independent), which means A is defective. The block `AP - PD` checks the defining relation directly: $A \\cdot P = P \\cdot D$ expands to $n$ simultaneous eigenvector equations $A\\mathbf{v}_i = \\lambda_i\\mathbf{v}_i$ at once.',
+              ],
               code: `A = [4 1; 2 3];
 [P, D] = eig(A);
 
@@ -118,7 +126,10 @@ disp(A*P - P*D)`,
             {
               id: 2,
               cellTitle: 'Matrix powers via diagonalization — A^k in O(n²) instead of O(n³·k)',
-              prose: 'A^k = P * D^k * inv(P). For diagonal D, D^k just raises each diagonal entry to the k-th power — no matrix multiplication needed for that step. Compare: directly computing A^100 requires 99 matrix multiplications. Via diagonalization: 3 multiplications regardless of k.',
+              prose: [
+                '`diag(diag(D).^k)` is the key line: `diag(D)` extracts the eigenvalues as a vector, `.^k` raises each element to the $k$th power (element-wise), and `diag(...)` puts them back on a diagonal matrix. This replaces what would otherwise be 99 matrix-matrix multiplications for $k=100$ with two scalar exponentiations.',
+                'Direct `A^100` in MATLAB internally uses matrix exponentiation by squaring ($O(n^3 \\log k)$), not naive repeated multiplication. Via diagonalization it is $O(n^3)$ for one eigendecomposition plus $O(n)$ for $D^k$ plus $O(n^2)$ for assembly — essentially the same asymptotic cost but the diagonalization approach gives an exact closed-form formula, not just a number.',
+              ],
               code: `A = [4 1; 2 3];
 [P, D] = eig(A);
 P_inv = inv(P);
@@ -138,7 +149,10 @@ fprintf('Max difference: %.2e\\n', max(max(abs(A_direct - A_k))))`,
             {
               id: 3,
               cellTitle: 'Application: CNC vibration — modal superposition',
-              prose: 'A CNC machine\'s vibration is a sum of its natural modes (eigenvectors). Each mode oscillates at its natural frequency (sqrt of eigenvalue). The total vibration at any time is a superposition of all modes. Diagonalization separates these modes: in eigenvector coordinates, each mode is independent (decoupled). This is the foundation of modal analysis in structural dynamics.',
+              prose: [
+                'The physical idea: a CNC frame with 2 degrees of freedom has two natural vibration modes (eigenvectors of $M^{-1}K$). Any initial displacement $\\mathbf{x}_0$ can be written as $\\mathbf{x}_0 = q_1\\mathbf{v}_1 + q_2\\mathbf{v}_2$ where $q_i$ are modal coordinates. `P \\ x0` solves $P\\mathbf{q} = \\mathbf{x}_0$ for the modal coordinate vector $\\mathbf{q}$.',
+                'In modal (eigenvector) coordinates, the modes are completely decoupled — mode 1 oscillates at $\\omega_1$ with no coupling to mode 2. `q0 .* cos(omega * t(i))` computes both modes simultaneously (element-wise). `P * modal_response` maps back to physical coordinates. This is diagonalization in action: the stiffness matrix is diagonal in the eigenvector basis, so each mode integrates independently.',
+              ],
               code: `% 2-DOF CNC frame: mass-normalized stiffness matrix
 A = [2 -1; -1 3] * 1e4;  % stiffness in N/m
 
@@ -184,7 +198,10 @@ fprintf('Peak displacement at node 2: %.4f mm\\n', max(abs(x(2,:)))*1e3)`,
             {
               id: 1,
               cellTitle: 'Building P and D from eigenvalues',
-              prose: '`np.linalg.eig(A)` gives the eigenvector matrix P and eigenvalue array. Put eigenvalues on the diagonal of D. Verify: `P @ D @ P_inv â‰ˆ A`. If it does not match, something went wrong.',
+              prose: [
+                '`np.linalg.eig(A)` returns `(eigenvalues, eigenvectors)` — the eigenvalues as a 1D array and eigenvectors as columns. `np.diag(evals)` builds the diagonal matrix $D$ from the eigenvalue array. The heatmap comparison shows $A$, $D$, and $PDP^{-1}$ side by side: $D$ has off-diagonal zeros (pure scaling), while $PDP^{-1}$ matches $A$ exactly.',
+                'The `np.allclose(A_check, A)` check passes when reconstruction error is below $10^{-8}$. If it fails, the eigenvectors in P are nearly linearly dependent — A is near-defective and numerical errors blow up when forming $P^{-1}$. For such cases, use a more stable algorithm like `scipy.linalg.schur` instead.',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -213,7 +230,10 @@ plt.show()`,
             {
               id: 2,
               cellTitle: 'Matrix powers via diagonalization',
-              prose: 'A^k = P D^k P⁻¹. Raising D to the k-th power just raises each diagonal entry (eigenvalue) to the k-th power. This makes computing A^100 as easy as A^2 — no repeated matrix multiplication.',
+              prose: [
+                '`evals**n` raises each eigenvalue to the $n$th power element-wise — this is the entire cost of computing $D^n$. The function `power_via_diag` packages the full formula $A^n = PD^nP^{-1}$ in three lines: one eigendecomposition, one diagonal exponentiation, two matrix multiplications.',
+                'The det verification `det(A^n) = det(A)^n` is a consequence of the product rule $\\det(PD^nP^{-1}) = \\det(P)\\det(D^n)\\det(P^{-1}) = \\det(D^n) = \\prod_i \\lambda_i^n = (\\prod_i \\lambda_i)^n = \\det(A)^n$. The plot shows both series matching exactly, confirming the diagonalization formula is correct.',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 

@@ -37,6 +37,11 @@ export default {
         body: '**Previous (Lesson 2):** Diagonalization — rebuilding coordinates in the eigenvector basis.\n**This lesson:** Complex eigenvalues — what rotation looks like algebraically, and how $a + bi$ encodes spinning and scaling.\n**Next (Lesson 4):** Jordan Normal Form — what to do when a matrix cannot be diagonalized.',
       },
       {
+        type: 'procedure',
+        title: 'Procedure: Analyze a Matrix with Complex Eigenvalues',
+        body: 'Step 1. Set up $\\det(A - \\lambda I) = 0$. If the discriminant is negative, the eigenvalues are complex.\nStep 2. Solve the quadratic (or use the quadratic formula) to get $\\lambda = a \\pm bi$.\nStep 3. Compute the magnitude $r = |\\lambda| = \\sqrt{a^2 + b^2}$.\nStep 4. Classify: $r < 1$ → stable (spirals in); $r = 1$ → neutral (orbits); $r > 1$ → unstable (spirals out).\nStep 5. Compute the rotation angle $\\theta = \\arctan(b/a)$ to determine the rotation per application.\nStep 6. Verify: trace $= 2a$ and det $= a^2 + b^2 = r^2$.',
+      },
+      {
         type: 'insight',
         title: 'Complex Eigenvalue Geometry',
         body: 'For $\\lambda = a + bi$:\n\n• $r = |\\lambda| = \\sqrt{a^2 + b^2}$ → stretch factor\n• $\\theta = \\arctan(b/a)$ → rotation angle per step\n\n$r > 1$: spirals outward\n$r = 1$: pure rotation (circle)\n$r < 1$: spirals inward (decays)',
@@ -98,7 +103,10 @@ export default {
             {
               id: 1,
               cellTitle: 'Complex eigenvalues with eig() — magnitude and angle',
-              prose: '`[V, D] = eig(A)` works for any matrix, even with complex eigenvalues. Extract real/imaginary parts with `real()` and `imag()`. `abs(lambda)` gives magnitude r. `angle(lambda)` gives angle θ in radians. If |λ| < 1 → stable; > 1 → unstable; = 1 → neutral.',
+              prose: [
+                'For a rotation-scaling matrix $A = \\begin{bmatrix}a&-b\\\\b&a\\end{bmatrix}$, the eigenvalues are $\\lambda = a \\pm bi$. `eig(A)` returns these automatically as complex numbers. `real(lk)` and `imag(lk)` extract the real and imaginary parts, `abs(lk)` computes $|\\lambda| = \\sqrt{a^2+b^2}$, and `rad2deg(angle(lk))` converts the argument to degrees.',
+                'The stability test `all(abs(lambda) < 1)` checks whether every eigenvalue is strictly inside the unit circle — the discrete-time stability criterion. For the matrix with $a=0.8$, $b=0.6$: $|\\lambda| = \\sqrt{0.64+0.36} = 1.0$, so this is a pure rotation with no scaling (neutral stability). Changing $a$ and $b$ while watching $|\\lambda|$ shows how slight growth or decay is introduced.',
+              ],
               code: `% Matrix with complex eigenvalues (rotation + scaling)
 a = 0.8; b = 0.6;
 A = [a -b; b a];   % rotation by arctan(b/a) and scale by sqrt(a^2+b^2)
@@ -118,7 +126,10 @@ fprintf('\\n|λ| < 1 → stable? %d\\n', all(abs(lambda) < 1))`,
             {
               id: 2,
               cellTitle: 'Rotation matrix: eigenvalues trace the unit circle',
-              prose: 'For a pure rotation by θ, the eigenvalues are e^(Â±iθ) — points on the unit circle. |λ| = 1 always, so pure rotations are neither stable nor unstable. Varying θ sweeps the eigenvalues around the unit circle. The trace = 2cosθ tracks the real part.',
+              prose: [
+                'The rotation matrix $R_\\theta = \\begin{bmatrix}\\cos\\theta&-\\sin\\theta\\\\\\sin\\theta&\\cos\\theta\\end{bmatrix}$ has eigenvalues $e^{\\pm i\\theta} = \\cos\\theta \\pm i\\sin\\theta$. Since $|e^{\\pm i\\theta}| = 1$ always, pure rotations are neutral — neither growing nor decaying. `real(lambda(1))` reads $\\cos\\theta$ and `abs(imag(lambda(1)))` reads $|\\sin\\theta|$.',
+                'The table shows how trace $= 2\\cos\\theta$ changes as $\\theta$ varies: trace $= 2$ at $\\theta=0°$ (identity), trace $= 0$ at $\\theta=90°$ (pure quarter-turn), trace $= -2$ at $\\theta=180°$ (negation). This gives a fast check: if trace is between $-2$ and $2$, the $2\\times 2$ matrix has complex eigenvalues on the unit circle; if outside, eigenvalues are real.',
+              ],
               code: `% Sweep rotation angle and watch eigenvalues
 angles_deg = 0:30:330;
 
@@ -135,7 +146,10 @@ end`,
             {
               id: 3,
               cellTitle: 'CNC spindle control: stability via eigenvalue analysis',
-              prose: 'A discrete-time spindle speed controller has a state matrix whose eigenvalues determine stability. Complex eigenvalues near the unit circle produce lightly-damped oscillation — this is chatter. The frequency of chatter oscillation is ω = angle(λ) radians per sample. For a 1 kHz control loop and angle θ, the chatter frequency is θ/(2π) × 1000 Hz.',
+              prose: [
+                'The state matrix `A_ctrl` is derived from a discrete 2nd-order PID model at 1 kHz sampling. Its eigenvalues determine stability: if any $|\\lambda| \\geq 1$, the controller is on or beyond the stability boundary. `abs(lk)` computes each eigenvalue\'s magnitude; the code flags the controller as stable only if all magnitudes are strictly below 1.',
+                'When eigenvalues are complex, `abs(angle(lk)) / (2*pi) * 1000` converts the argument to chatter frequency in Hz: an eigenvalue with argument $\\theta$ radians/sample at 1000 samples/s oscillates at $\\theta/(2\\pi) \\times 1000$ Hz. This is the predicted chatter tone if the controller becomes marginally unstable. Engineers detune $K_p$ and $K_d$ to push all eigenvalues away from the unit circle boundary while keeping the chatter frequency above the audible range.',
+              ],
               code: `% CNC spindle controller state matrix (2nd-order discrete model)
 % Gains tuned for 1 kHz sampling
 Kp = 0.9; Kd = 0.1;
@@ -176,7 +190,10 @@ fprintf('\\nController is %s\\n', ternary(stable, 'STABLE', 'UNSTABLE'))`,
             {
               id: 1,
               cellTitle: 'Computing complex eigenvalues',
-              prose: 'NumPy handles complex eigenvalues automatically. The rotation matrix R_θ has eigenvalues e^{Â±iθ} — both on the unit circle. `np.abs(λ)` gives the magnitude (|λ|). `np.angle(λ)` gives the angle θ in radians.',
+              prose: [
+                'NumPy returns complex eigenvalues as Python complex numbers. `np.abs(evals)` computes $|\\lambda|$ for each eigenvalue (element-wise), and `np.angle(evals)` returns the argument $\\theta = \\arctan(b/a)$ in radians. For the 45° rotation matrix, both eigenvalues have $|\\lambda| = 1$ and arguments $\\pm\\pi/4$.',
+                'The heatmap plots both eigenvalues as points in the complex plane with the unit circle for reference. Points on the unit circle → neutral stability. The dashed unit circle is the boundary separating convergence (inside) from divergence (outside). For the rotation matrix, both points lie exactly on the circle at angle $\\pm 45°$.',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -204,7 +221,10 @@ plt.show()`,
             {
               id: 2,
               cellTitle: 'Tracing the spiral trajectory',
-              prose: 'Apply the matrix repeatedly to a starting vector and plot each step. If |λ| < 1, points spiral toward the origin. If |λ| > 1, they spiral outward.',
+              prose: [
+                'The matrix `A = [[0.9, -0.4],[0.4, 0.9]]` has $a=0.9$, $b=0.4$, so $|\\lambda| = \\sqrt{0.81+0.16} = \\sqrt{0.97} \\approx 0.985 < 1$. Each multiplication by $A$ rotates by $\\arctan(0.4/0.9) \\approx 24°$ and shrinks by $0.985$. After 40 steps the vector is much closer to the origin — the left plot shows the inward spiral.',
+                'The right plot shows $\\|v_n\\|$ vs step $n$ on a linear scale: the norm decays geometrically as $|\\lambda|^n \\approx 0.985^n$. For the spiral to be visible, the magnitude change per step is subtle; the angular sweep is about $24°$/step, taking roughly $360°/24° = 15$ steps per "lap." Understanding both plots together shows why $|\\lambda|$ is the key quantity: it controls the radial decay rate.',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -270,6 +290,7 @@ C = np.array([[0.5, 0.2],
       '**Why conjugate pairs?** Let $A$ be a real matrix with $A\\mathbf{v} = \\lambda\\mathbf{v}$ where $\\lambda = a + bi \\in \\mathbb{C}$. Take the complex conjugate of both sides: $\\overline{A\\mathbf{v}} = \\overline{\\lambda\\mathbf{v}}$. Since $A$ has real entries, $\\overline{A\\mathbf{v}} = A\\bar{\\mathbf{v}}$. So $A\\bar{\\mathbf{v}} = \\bar{\\lambda}\\bar{\\mathbf{v}}$. Thus $\\bar{\\lambda} = a - bi$ is also an eigenvalue with eigenvector $\\bar{\\mathbf{v}}$.',
       '**The real canonical form.** Even though we cannot diagonalize a real matrix with complex eigenvalues over $\\mathbb{R}$, we can put it in a **real block diagonal form**: each conjugate pair $a \\pm bi$ contributes a $2 \\times 2$ rotation-scaling block:\n\n$\\begin{bmatrix}a & -b \\\\ b & a\\end{bmatrix}$\n\nThis block rotates by $\\arctan(b/a)$ and scales by $\\sqrt{a^2+b^2}$. The full matrix in this basis becomes block diagonal with these $2\\times 2$ blocks for complex pairs and scalar entries for real eigenvalues.',
       '**Over $\\mathbb{C}$, every matrix is diagonalizable... almost.** The Fundamental Theorem of Algebra guarantees the characteristic polynomial has $n$ roots in $\\mathbb{C}$. If those roots are all distinct, the matrix is diagonalizable over $\\mathbb{C}$. If there are repeated roots, the Jordan form (over $\\mathbb{C}$) captures the structure, with 1s on the superdiagonal for non-diagonalizable cases.',
+      '**Future connections: spectral radius and the Leslie matrix.** The largest eigenvalue magnitude $\\rho(A) = \\max_i |\\lambda_i|$ is called the **spectral radius**. It governs the long-run growth rate of any iterated system $\\mathbf{x}_n = A^n\\mathbf{x}_0$: if $\\rho(A) > 1$ the system grows, if $\\rho(A) < 1$ it decays, regardless of whether eigenvalues are real or complex. In population biology, the Leslie matrix models age-structured populations; its dominant eigenvalue (which may be complex for oscillating populations) determines extinction vs. growth. In numerical analysis, iterative solvers like Jacobi and Gauss-Seidel converge when the spectral radius of the iteration matrix is less than 1 — complex eigenvalues contribute to oscillatory convergence, visible as a spiral path in the residual plot.',
     ],
     callouts: [
       {

@@ -43,6 +43,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'Procedure: Compute the LU Decomposition by Gaussian Elimination',
+        body: 'Step 1. Initialize $L = I_n$ and let $U$ be a working copy of $A$.\nStep 2. For column $k = 1, \\ldots, n-1$: the pivot is $U_{kk}$. If it is zero, swap with a lower row (record the swap in permutation $P$).\nStep 3. For each row $i > k$: compute the multiplier $m_{ik} = U_{ik} / U_{kk}$ and store it in $L$ at position $(i,k)$.\nStep 4. Row replace: $U_i \\leftarrow U_i - m_{ik} \\cdot U_k$. This creates a zero at position $(i,k)$ in $U$.\nStep 5. Repeat steps 2–4 for all rows $i > k$, then move to the next column $k+1$.\nStep 6. Verify: $LU = A$ (or $PA = LU$ if pivoting). Use the diagonal of $U$ to read off $\\det(A) = (\\pm 1) \\cdot \\prod_i U_{ii}$.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 6 of 12 — Matrices & Transformations',
         body: '**Previous:** Determinants — general computation and properties.\n**This lesson:** LU decomposition — Gaussian elimination packaged as a product of two triangular matrices.\n**Next (Chapter 3):** Eigenvalues and Eigenvectors — the invariant directions of a transformation.',
@@ -161,6 +166,44 @@ fprintf('Verify A*x1 = b1: %d\\n', norm(A*x1 - b1) < 1e-10)
 
 fprintf('x2 (for b2): [%g; %g; %g]\\n', x2(1), x2(2), x2(3))
 fprintf('Verify A*x2 = b2: %d\\n', norm(A*x2 - b2) < 1e-10)`,
+            },
+            {
+              id: 4,
+              cellTitle: 'Challenge: implement forward and back substitution from scratch',
+              prose: [
+                'Rather than calling `A \\ b` (which calls LAPACK), this cell implements the two substitution phases as explicit loops — exactly what is happening inside the built-in solver. `for i = 1:n` iterates top to bottom through $L$; the inner `for j = 1:i-1` subtracts the contributions of already-known $y_j$ values. Since $L_{ii} = 1$ always, no division is needed in forward substitution.',
+                '`for i = n:-1:1` iterates bottom to top through $U$; the inner `for j = i+1:n` subtracts contributions of already-known $x_j$. Division by `U(i,i)` is required because $U$\'s diagonal entries are the pivots (not necessarily 1). `norm(x_manual - x_builtin) < 1e-10` confirms the manual implementation matches MATLAB\'s built-in solver — same algorithm, just written out.',
+              ],
+              code: `L = [1 0 0; 2 1 0; 4 3 1];
+U = [2 1 1; 0 1 1; 0 0 2];
+b = [4; 10; 20];
+n = length(b);
+
+% --- Phase 1: Forward substitution (Ly = b) ---
+y = zeros(n,1);
+for i = 1:n
+    y(i) = b(i);
+    for j = 1:i-1
+        y(i) = y(i) - L(i,j)*y(j);
+    end
+    % L(i,i) = 1, no division needed
+end
+fprintf('y (forward sub) = [%g; %g; %g]\\n', y(1), y(2), y(3))
+
+% --- Phase 2: Back substitution (Ux = y) ---
+x_manual = zeros(n,1);
+for i = n:-1:1
+    x_manual(i) = y(i);
+    for j = i+1:n
+        x_manual(i) = x_manual(i) - U(i,j)*x_manual(j);
+    end
+    x_manual(i) = x_manual(i) / U(i,i);
+end
+fprintf('x (back sub)    = [%g; %g; %g]\\n', x_manual(1), x_manual(2), x_manual(3))
+
+A = L*U;
+x_builtin = A \\ b;
+fprintf('Match with A\\\\b: %d\\n', norm(x_manual - x_builtin) < 1e-10)`,
             },
             {
               id: 3,
@@ -481,6 +524,42 @@ b = np.array([6., 14., 10.])
         }
       ],
       conclusion: "x = [1, 3, −1]. The two-phase approach (forward then back substitution) each takes O(n²) operations. Critically, the LU factorization from Example 1 can now be reused for any different b vector without redoing the elimination.",
+    },
+    {
+      id: "la2-006-ex3",
+      title: "Reusing the Same LU for a Second Right-Hand Side",
+      problem: "Using the LU factorization from Example 1 ($L = \\begin{bmatrix}1&0&0\\\\2&1&0\\\\4&3&1\\end{bmatrix}$, $U = \\begin{bmatrix}2&1&1\\\\0&1&1\\\\0&0&2\\end{bmatrix}$), now solve $A\\mathbf{x} = \\mathbf{b}_2$ for $\\mathbf{b}_2 = \\begin{bmatrix}1\\\\1\\\\5\\end{bmatrix}$. No re-factorization needed.",
+      steps: [
+        {
+          expression: "L\\mathbf{y} = \\mathbf{b}_2: \\quad y_1 = 1",
+          annotation: "Forward substitution, row 1: $y_1 = b_{21} = 1$ (L has a 1 on the diagonal, so no division needed).",
+          strategyTitle: "Phase 1: forward substitution starts",
+          checkpoint: "Why is this new b₂ instantly solvable without touching A again?",
+          hints: ["The factorization A = LU is already complete. We only need L, U, and the new b — Gaussian elimination never runs again."],
+        },
+        {
+          expression: "y_2 = 1 - 2(1) = -1, \\quad y_3 = 5 - 4(1) - 3(-1) = 5 - 4 + 3 = 4",
+          annotation: "Row 2: $y_2 = b_{22} - L_{21}y_1 = 1 - 2(1) = -1$. Row 3: $y_3 = b_{23} - L_{31}y_1 - L_{32}y_2 = 5 - 4(1) - 3(-1) = 4$. Intermediate vector $\\mathbf{y} = [1, -1, 4]^T$.",
+          strategyTitle: "Forward substitution completes",
+          checkpoint: "",
+          hints: [],
+        },
+        {
+          expression: "U\\mathbf{x} = \\mathbf{y}: \\quad x_3 = 4/2 = 2",
+          annotation: "Phase 2: back substitution from the bottom. Row 3 of $U$: $2x_3 = y_3 = 4 \\Rightarrow x_3 = 2$.",
+          strategyTitle: "Phase 2: back substitution starts",
+          checkpoint: "",
+          hints: [],
+        },
+        {
+          expression: "x_2 = (-1) - 1(2) = -3, \\quad x_1 = (1 - 1(-3) - 1(2))/2 = (1+3-2)/2 = 1",
+          annotation: "Row 2: $x_2 + x_3 = -1 \\Rightarrow x_2 = -1 - 2 = -3$. Row 1: $2x_1 + x_2 + x_3 = 1 \\Rightarrow 2x_1 = 1 + 3 - 2 = 2 \\Rightarrow x_1 = 1$. Solution: $\\mathbf{x} = [1, -3, 2]^T$. Verify: $A\\mathbf{x} = [2-3+2, 4-9+6, 8-21+18]^T = [1, 1, 5]^T$ ✓.",
+          strategyTitle: "Back substitution completes",
+          checkpoint: "How many row operations were required to solve this second system after the LU was available?",
+          hints: ["Zero row operations. Only two triangular solves (forward + back), each O(n²). The O(n³) Gaussian elimination was already done in Example 1."],
+        }
+      ],
+      conclusion: "x = [1, −3, 2]. This second solve required NO Gaussian elimination — only the two O(n²) substitution passes. This is the LU advantage: amortize the O(n³) factorization over as many right-hand sides as needed.",
     }
   ],
 

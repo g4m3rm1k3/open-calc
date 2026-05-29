@@ -25,6 +25,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'Procedure: Compute the Pseudoinverse and Solve $A\\mathbf{x}=\\mathbf{b}$',
+        body: 'Step 1. **Compute the SVD.** Find $A = U\\Sigma V^\\top$ with singular values $\\sigma_1 \\geq \\cdots \\geq \\sigma_r > 0$.\n\nStep 2. **Build $\\Sigma^+$.** Transpose $\\Sigma$ (so $\\Sigma^+$ is $n \\times m$), then replace each nonzero $\\sigma_i$ with $1/\\sigma_i$ and leave zeros as zeros.\n\nStep 3. **Compute $A^+ = V\\Sigma^+ U^\\top$.**\n\nStep 4. **Solve: $\\hat{\\mathbf{x}} = A^+\\mathbf{b}$.** This is simultaneously: the least-squares minimizer of $\\|A\\mathbf{x}-\\mathbf{b}\\|$, and the minimum-norm solution among all such minimizers.\n\nStep 5. **Verify using Moore-Penrose conditions.** Check $AA^+A = A$, $A^+AA^+ = A^+$, $(AA^+)^\\top = AA^+$, $(A^+A)^\\top = A^+A$. Any of these failing means $A^+$ was computed incorrectly.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 8 of 9 — Orthogonality & SVD',
         body: '**Previous (Lesson 7):** Quadratic Forms — how symmetric matrices define curvature and classify critical points.\n**This lesson:** Pseudoinverse — the Moore-Penrose generalization of the matrix inverse to any matrix, giving the minimum-norm least-squares solution.\n**Next (Lesson 9):** Low-Rank Approximation — using SVD to compress matrices and find the most important structure in data.',
@@ -247,6 +252,9 @@ print(f"\\nAlternative solution ||q_other||: {np.linalg.norm(q_other):.4f} (larg
   rigor: {
     prose: [
       '**Existence and uniqueness.** The Moore-Penrose pseudoinverse exists and is unique for every matrix $A$ (including rectangular and rank-deficient). Proof of uniqueness: suppose $B_1$ and $B_2$ both satisfy all four Moore-Penrose conditions. Then $B_1 = B_1 A B_2 = B_2$ (using conditions 1, 3, 4). The SVD formula $A^+ = V\\Sigma^+U^\\top$ gives the explicit construction. For operators on Hilbert spaces, the pseudoinverse generalizes to closed-range operators, where it is the bounded inverse of $A$ restricted to $C(A)^\\perp \\to \\overline{C(A)}$.',
+      '**Projectors and the four fundamental subspaces.** The two products $AA^+$ and $A^+A$ are orthogonal projectors: $AA^+$ projects onto the column space $C(A)$, and $A^+A$ projects onto the row space $C(A^\\top)$. Their complements $I - AA^+$ and $I - A^+A$ project onto the left null space $N(A^\\top)$ and null space $N(A)$ respectively. This provides a unified decomposition $\\mathbf{b} = AA^+\\mathbf{b} + (I-AA^+)\\mathbf{b}$ into column space and left null space components — the error $\\mathbf{b} - A\\hat{\\mathbf{x}} = (I-AA^+)\\mathbf{b}$ is exactly the left null space component.',
+      '**Tikhonov regularization.** The pseudoinverse is sensitive to near-zero singular values: if $\\sigma_k \\approx 0$ then $1/\\sigma_k$ is huge, and the pseudoinverse amplifies noise. In practice, Tikhonov regularization (ridge regression) uses $(A^\\top A + \\lambda I)^{-1}A^\\top$ instead of $(A^\\top A)^{-1}A^\\top$. This has SVD representation $V\\text{diag}(\\sigma_i/(\\sigma_i^2 + \\lambda))U^\\top$, which shrinks each coefficient by $\\sigma_i^2/\\sigma_i^2+\\lambda)$ — small singular values are heavily shrunk. As $\\lambda \\to 0$, this converges to the pseudoinverse; as $\\lambda \\to \\infty$, it converges to zero. The optimal $\\lambda$ balances fit quality against solution norm.',
+      '**Pseudoinverse for symmetric positive semidefinite matrices.** For $A = Q\\Lambda Q^\\top$ (SPD spectral decomposition), $A^+ = Q\\Lambda^+ Q^\\top$ where $\\Lambda^+$ inverts the positive diagonal entries and leaves zeros as zeros. Geometrically, $A^+$ is the "partial inverse" that acts as the true inverse on $C(A) = C(A^\\top)$ and gives zero on $N(A) = N(A^\\top)$. In PCA, the SPD covariance matrix $\\Sigma$ has a pseudoinverse that defines the Mahalanobis distance: $d^2(\\mathbf{x}) = \\mathbf{x}^\\top \\Sigma^+ \\mathbf{x}$ — measuring distance in units of standard deviations along each principal component, zero along directions with no variance.',
     ],
     callouts: [
       {

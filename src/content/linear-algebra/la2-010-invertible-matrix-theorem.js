@@ -39,6 +39,11 @@ export default {
         body: 'The Invertible Matrix Theorem requires $A$ to be $n \\times n$. For non-square matrices, you can still have full column rank or full row rank, but you cannot have a two-sided inverse.',
       },
       {
+        type: 'procedure',
+        title: 'Procedure: Apply the IMT to Determine Invertibility',
+        body: 'Step 1. Choose the cheapest condition: det(A) for 2×2 or 3×3 matrices; rank via row reduction for larger ones.\nStep 2. Compute it. If det(A) ≠ 0, rank(A) = n, or RREF(A) = I — stop: A is invertible.\nStep 3. If the condition fails, A is singular — all 12 IMT conditions fail simultaneously.\nStep 4. For an invertible A, immediately state all equivalents: trivial null space, columns linearly independent, columns span ℝⁿ, unique solution for every b, no zero eigenvalue.\nStep 5. For a singular A, immediately state all failures: nullity = n − rank, det = 0, 0 is an eigenvalue, A·x = b has no unique solution for every b.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 10 of 12 — Matrices & Transformations',
         body: '**Previous:** Cramer\'s Rule — using determinants to solve systems one variable at a time.\n**This lesson:** The Invertible Matrix Theorem — twelve equivalent conditions that all say the same thing: this matrix is invertible.\n**Next:** Four Fundamental Subspaces — column space, null space, row space, and left null space.',
@@ -55,7 +60,10 @@ export default {
             {
               id: 1,
               cellTitle: 'Invertible matrix: all conditions pass',
-              prose: ['Test A = [2 1; 5 3] against every IMT condition.'],
+              prose: [
+                'Each line is a different IMT condition: det_A ≠ 0 is Condition 2, rank_A = 2 is Condition 3, rref(A) = I is Condition 4, null_dim = 0 is Condition 7, and eigenvalues all nonzero is Condition 12. For A = [2 1; 5 3] the determinant is 6 − 5 = 1 ≠ 0, so all conditions must hold — the IMT guarantees it.',
+                'The block [V,D] = eig(A) returns eigenvectors (columns of V) and eigenvalues (diagonal of D). Both eigenvalues nonzero confirms Condition 12. Verify: null_dim should print 0, and rref(A) should print the 2×2 identity. All five conditions pass at once.',
+              ],
               code: `A = [2 1; 5 3]
 det_A = det(A)
 rank_A = rank(A)
@@ -70,7 +78,10 @@ null_dim
             {
               id: 2,
               cellTitle: 'Singular matrix: all conditions fail',
-              prose: ['Now test B = [1 2; 2 4] — its second row is double the first.'],
+              prose: [
+                'Every single IMT condition fails for B = [1 2; 2 4]. det_B = 4 − 4 = 0 (Condition 2 fails), rank_B = 1 < 2 (Condition 3 fails), RREF ≠ I (Condition 4 fails), one eigenvalue is 0 (Condition 12 fails), and null_dim = 1 (Condition 7 fails). This is the IMT: one condition failing drags all the others down.',
+                'The call null(B) returns a unit vector in the null space of B. Verify: B * null(B) should give [0; 0]. Row 2 of B is exactly 2 × row 1 — the matrix collapses the plane onto a single line, destroying all information in the perpendicular direction.',
+              ],
               code: `B = [1 2; 2 4]
 det_B = det(B)
 rank_B = rank(B)
@@ -82,6 +93,47 @@ disp('null(B) dimension (should be 1 — one whole direction destroyed):')
 null_dim
 disp('A vector in the null space:')
 null(B)
+`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Near-singular: how condition number explodes as det → 0',
+              prose: [
+                'The IMT is binary — invertible or singular — but numerically, a matrix can be "almost singular" with a tiny but non-zero determinant. The condition number κ = σ_max / σ_min (ratio of largest to smallest singular value) measures how close to singular a matrix really is.',
+                'This cell fixes row 1 of A as [1, 2] and slides row 2 from [2, 4+k] toward [2, 4] (singular at k = 0). Watch det shrink to zero while κ explodes toward infinity. At k = 0 the IMT says singular; for any k > 0 the IMT says invertible — but with κ = 10^6 any numerical solve would be catastrophically inaccurate.',
+              ],
+              code: `disp('k          det(A)      rank    cond(A)')
+for k = [1.0, 0.1, 0.01, 0.001, 0.0001]
+    A = [1 2; 2 4+k];
+    fprintf('k=%6.4f   det=%10.4e   rank=%d   cond=%10.2e\\n', ...
+            k, det(A), rank(A), cond(A))
+end
+A_sing = [1 2; 2 4];
+fprintf('k=0.0000   det=%10.4e   rank=%d   (singular by IMT)\\n', ...
+        det(A_sing), rank(A_sing))
+`,
+            },
+            {
+              id: 4,
+              cellTitle: 'Challenge: minimum perturbation to make a matrix singular',
+              prose: [
+                'The closest singular matrix to A (in Frobenius norm) is obtained by zeroing the smallest singular value. The distance equals σ_min(A) — the smallest singular value. This connects the IMT to the SVD: A is invertible iff all singular values are nonzero.',
+                'The code decomposes A = U*S*V\' via svd, zeroes the smallest diagonal of S to get S2, then forms A_perturbed = U*S2*V\'. Verify det(A_perturbed) ≈ 0 and rank(A_perturbed) = 1. The perturbation norm is σ_min — the exact IMT boundary.',
+              ],
+              code: `A = [4 2; 1 3];
+[U, S, V] = svd(A);
+sigma_min = S(end, end);
+fprintf('sigma_min(A) = %.4f  — minimum norm perturbation to reach singularity\\n', sigma_min)
+
+% Zero the smallest singular value to get the nearest singular matrix
+S2 = S;
+S2(end, end) = 0;
+A_perturbed = U * S2 * V';
+
+fprintf('det(A)           = %.4f\\n', det(A))
+fprintf('det(A_perturbed) = %.2e  (should be ~0)\\n', det(A_perturbed))
+fprintf('rank(A_perturbed) = %d  (should be 1)\\n', rank(A_perturbed))
+fprintf('norm of perturbation: %.4f  (equals sigma_min)\\n', norm(A - A_perturbed, 'fro'))
 `,
             },
           ],
@@ -184,6 +236,70 @@ for k in [10.0, 1.0, 0.1, 0.01, 0.001]:
     c = np.linalg.cond(A)
     r = np.linalg.matrix_rank(A)
     print(f"{k:>6.3f}   {d:>12.4e}   {c:>12.2e}   {r:>6d}")`,
+            },
+            {
+              id: 3,
+              cellTitle: 'How singularity collapses space: transforming the unit circle',
+              prose: [
+                'An invertible matrix maps the unit circle to an ellipse — every direction survives, just stretched and rotated. A singular matrix collapses the circle onto a line segment, destroying an entire dimension. This is why det = 0: the 2D area of the ellipse is |det(A)| times the area of the circle, so det = 0 means the ellipse has zero area.',
+                'Run this cell and compare the two plots. The invertible case (det = 5) produces a proper ellipse. The singular case (det = 0) collapses to a line — every point on the circle maps to a point on that single line, confirming the null space is non-trivial (infinitely many inputs land on the same output).',
+              ],
+              code: `import numpy as np
+import matplotlib.pyplot as plt
+
+theta = np.linspace(0, 2*np.pi, 300)
+circle = np.stack([np.cos(theta), np.sin(theta)])  # 2×300 input
+
+A_inv  = np.array([[2., 1.], [1., 3.]])   # invertible: det = 5
+A_sing = np.array([[2., 4.], [1., 2.]])   # singular:   det = 0
+
+fig, axes = plt.subplots(1, 2, figsize=(10, 4.5))
+for ax, A, label in [(axes[0], A_inv, 'Invertible'), (axes[1], A_sing, 'Singular')]:
+    mapped = A @ circle
+    ax.plot(circle[0], circle[1], 'b--', lw=1.2, alpha=0.5, label='unit circle')
+    ax.plot(mapped[0], mapped[1], 'r-', lw=2.5, label='A · circle')
+    ax.axhline(0, color='k', lw=0.5); ax.axvline(0, color='k', lw=0.5)
+    ax.set_aspect('equal')
+    ax.set_title(f'{label}: det={np.linalg.det(A):.1f}, rank={np.linalg.matrix_rank(A)}',
+                 fontsize=11)
+    ax.legend(fontsize=9); ax.grid(True, alpha=0.3)
+plt.suptitle("IMT: invertible → ellipse (full 2D output); singular → line (collapsed)", fontsize=10)
+plt.tight_layout()
+plt.show()`,
+            },
+            {
+              id: 4,
+              cellTitle: 'Challenge: condition number and solution sensitivity',
+              prose: [
+                'The IMT is binary (invertible or not), but condition number κ = σ_max/σ_min measures how "barely invertible" a matrix is. The sensitivity bound guarantees: relative error in x ≤ κ × (relative error in b). For κ = 10^10, a 1-digit error in b produces a 10-digit error in x.',
+                'This challenge constructs a well-conditioned and a near-singular matrix, adds small noise to b, and measures how much the solution changes. Compare the actual error amplification to the theoretical bound κ × noise_level. The near-singular matrix should wildly amplify errors while the well-conditioned one barely changes.',
+              ],
+              code: `import numpy as np
+
+def solution_sensitivity(A, b, noise=1e-4, n_trials=500):
+    x_exact = np.linalg.solve(A, b)
+    kappa = np.linalg.cond(A)
+    errors = []
+    for _ in range(n_trials):
+        db = np.random.randn(len(b)) * noise * np.linalg.norm(b)
+        x_perturbed = np.linalg.solve(A, b + db)
+        rel = np.linalg.norm(x_perturbed - x_exact) / np.linalg.norm(x_exact)
+        errors.append(rel)
+    return kappa, max(errors)
+
+A_good = np.array([[2., 1.], [1., 3.]])       # well-conditioned
+A_bad  = np.array([[1., 2.], [2., 4.0001]])   # near-singular
+
+b = np.array([1., 2.])
+noise = 1e-4
+
+for A, name in [(A_good, 'Well-conditioned'), (A_bad, 'Near-singular')]:
+    kappa, max_err = solution_sensitivity(A, b, noise)
+    print(f"{name}:")
+    print(f"  kappa = {kappa:.2e}")
+    print(f"  theoretical bound = {kappa * noise:.2e}")
+    print(f"  observed max error = {max_err:.2e}")
+    print()`,
             },
           ]
         }

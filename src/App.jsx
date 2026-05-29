@@ -34,7 +34,7 @@ const LabsPage = lazy(() => import("./pages/LabsPage.jsx"));
 const AsteroidsLAPage = lazy(() => import("./pages/AsteroidsLAPage.jsx"));
 const CardAcademyPage = lazy(() => import("./pages/CardAcademyPage.jsx"));
 const StemTetrisPage = lazy(() => import("./pages/StemTetrisPage.jsx"));
-
+const HealthTrackerPage = lazy(() => import('./pages/HealthTrackerPage.jsx'));
 const Fallback = () => (
   <div className="flex items-center justify-center h-64">
     <LoadingSpinner size="lg" />
@@ -93,6 +93,7 @@ export default function App() {
                     <Route path="asteroids-la" element={<AsteroidsLAPage />} />
                     <Route path="card-academy" element={<CardAcademyPage />} />
                     <Route path="stem-tetris" element={<StemTetrisPage />} />
+                    <Route path="health" element={<HealthTrackerPage />} />
                   </Routes>
                 </Suspense>
               </AppShell>
