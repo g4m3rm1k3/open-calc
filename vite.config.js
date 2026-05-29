@@ -1,8 +1,19 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import { createHash } from "crypto";
+
+function emitVersionJson() {
+  return {
+    name: "emit-version-json",
+    generateBundle() {
+      const v = createHash("sha1").update(Date.now().toString()).digest("hex").slice(0, 10);
+      this.emitFile({ type: "asset", fileName: "version.json", source: JSON.stringify({ v }) });
+    },
+  };
+}
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), emitVersionJson()],
   base: process.env.VITE_BASE_URL ?? (process.env.ELECTRON_BUILD ? "./" : "/"),
   build: {
     outDir: "dist",
