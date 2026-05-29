@@ -5,6 +5,15 @@ import ArcadeMazeBackground from '../components/games/ArcadeMazeBackground.jsx'
 
 const GAMES = [
   {
+    key: 'card-academy',
+    label: 'STEM Card Academy',
+    emoji: '🃏',
+    color: 'indigo',
+    desc: 'Five card games — Blackjack, War, Go Fish, Snap, and Higher/Lower — each teaching probability, statistics, and neuroscience through play.',
+    path: '/card-academy',
+    tags: ['Probability', 'Statistics'],
+  },
+  {
     key: 'asteroids-la',
     label: 'Vector Asteroids',
     emoji: '🌀',

@@ -32,6 +32,7 @@ const DocsPage = lazy(() => import("./pages/DocsPage.jsx"));
 const GamesPage = lazy(() => import("./pages/GamesPage.jsx"));
 const LabsPage = lazy(() => import("./pages/LabsPage.jsx"));
 const AsteroidsLAPage = lazy(() => import("./pages/AsteroidsLAPage.jsx"));
+const CardAcademyPage = lazy(() => import("./pages/CardAcademyPage.jsx"));
 
 const Fallback = () => (
   <div className="flex items-center justify-center h-64">
@@ -89,6 +90,7 @@ export default function App() {
                     <Route path="games" element={<GamesPage />} />
                     <Route path="labs" element={<LabsPage />} />
                     <Route path="asteroids-la" element={<AsteroidsLAPage />} />
+                    <Route path="card-academy" element={<CardAcademyPage />} />
                   </Routes>
                 </Suspense>
               </AppShell>
