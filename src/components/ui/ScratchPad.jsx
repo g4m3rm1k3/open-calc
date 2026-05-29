@@ -20,6 +20,7 @@ const SIZE_KEY   = 'oc-pad-size'
 const GRID_KEY   = 'oc-pad-grid'
 const MIN_W = 300, MIN_H = 220, DEFAULT_W = 680, DEFAULT_H = 520
 const SNAP_DIST = 14
+const SNAP_MARGIN = 80
 
 const GEO_TOOLS = [
   { id:'select',   label:'Select',   Icon:MousePointer2 },
@@ -515,7 +516,7 @@ function ResizeHandle({direction,onResize,darkCanvas}) {
   const onPM=e=>{if(!drag.current)return;const dx=e.clientX-start.current.x,dy=e.clientY-start.current.y;start.current={x:e.clientX,y:e.clientY};onResize(direction,dx,dy)}
   const onPU=()=>{drag.current=false}
   const base={position:'absolute',zIndex:10,background:'transparent'}
-  const styles={top:{...base,top:0,left:8,right:8,height:8,cursor:'ns-resize'},left:{...base,left:0,top:8,bottom:8,width:8,cursor:'ew-resize'},corner:{...base,top:0,left:0,width:16,height:16,cursor:'nwse-resize'}}
+  const styles={top:{...base,top:0,left:8,right:8,height:8,cursor:'ns-resize'},left:{...base,left:0,top:8,bottom:8,width:8,cursor:'ew-resize'},right:{...base,right:0,top:8,bottom:8,width:8,cursor:'ew-resize'},corner:{...base,top:0,left:0,width:16,height:16,cursor:'nwse-resize'}}
   return (
     <div style={styles[direction]} onPointerDown={onPD} onPointerMove={onPM} onPointerUp={onPU}>
       {direction==='top'&&<div style={{position:'absolute',top:2,left:'50%',transform:'translateX(-50%)',width:36,height:3,borderRadius:2,background:darkCanvas?'#475569':'#cbd5e1'}}/>}
@@ -577,7 +578,7 @@ function ShapePanel({type, form, setForm, onCreate, onUpdate, selectedId, darkCa
 
 // ─── Main ScratchPad ────────────────────────────────────────────────────────
 
-export default function ScratchPad({isOpen,onClose}) {
+export default function ScratchPad({isOpen,onClose,onSnap}) {
   // ── draw state
   const [lines,    setLines]    = useState(()=>load(LINES_KEY,[]))
   const [tool,     setTool]     = useState('brush')
@@ -610,8 +611,11 @@ export default function ScratchPad({isOpen,onClose}) {
   const saved=load(SIZE_KEY,null)
   const [panelW,setPanelW]=useState(saved?.w??DEFAULT_W)
   const [panelH,setPanelH]=useState(saved?.h??DEFAULT_H)
+  const [panelPos,setPanelPos]=useState(null)
+  const [snapSide,setSnapSide]=useState(null)
 
   const isDrawing   = useRef(false)
+  const dragState   = useRef({active:false,moved:false,startX:0,startY:0,origX:0,origY:0})
   const stageRef    = useRef(null)
   const containerRef= useRef(null)
   const [canvasSize,setCanvasSize]=useState({w:0,h:0})
@@ -679,9 +683,49 @@ export default function ScratchPad({isOpen,onClose}) {
   },[isOpen,selectedId])
 
   const handleResize=useCallback((dir,dx,dy)=>{
+    const maxW=snapSide?Math.floor(window.innerWidth*0.45):window.innerWidth-24
     if(dir==='top'||dir==='corner') setPanelH(h=>Math.max(MIN_H,Math.min(h-dy,window.innerHeight-80)))
-    if(dir==='left'||dir==='corner') setPanelW(w=>Math.max(MIN_W,Math.min(w-dx,window.innerWidth-24)))
-  },[])
+    if(dir==='left'||dir==='corner') setPanelW(w=>{const n=Math.max(MIN_W,Math.min(w-dx,maxW));if(snapSide) onSnap?.(snapSide,n);return n})
+    if(dir==='right') setPanelW(w=>{const n=Math.max(MIN_W,Math.min(w+dx,maxW));if(snapSide) onSnap?.(snapSide,n);return n})
+  },[snapSide,onSnap])
+
+  const startPanelDrag=useCallback(e=>{
+    if(isMobile) return
+    if(e.target.closest('button,input,select,textarea,a')) return
+    e.stopPropagation()
+    let origX,origY
+    if(snapSide==='left'){origX=0;origY=56}
+    else if(snapSide==='right'){origX=window.innerWidth-panelW;origY=56}
+    else if(panelPos){origX=panelPos.x;origY=panelPos.y}
+    else{origX=window.innerWidth-panelW-16;origY=window.innerHeight-panelH-16}
+    dragState.current={active:true,moved:false,startX:e.clientX,startY:e.clientY,origX,origY}
+    if(snapSide){setSnapSide(null);onSnap?.(null,0);setPanelPos({x:origX,y:origY})}
+    e.currentTarget.setPointerCapture(e.pointerId)
+  },[isMobile,snapSide,panelPos,panelW,panelH,onSnap])
+
+  const onPanelDragMove=useCallback(e=>{
+    if(!dragState.current.active) return
+    const dx=e.clientX-dragState.current.startX,dy=e.clientY-dragState.current.startY
+    if(!dragState.current.moved&&Math.abs(dx)<5&&Math.abs(dy)<5) return
+    dragState.current.moved=true
+    setPanelPos({x:Math.max(0,Math.min(dragState.current.origX+dx,window.innerWidth-panelW)),y:Math.max(0,Math.min(dragState.current.origY+dy,window.innerHeight-40))})
+  },[panelW])
+
+  const onPanelDragEnd=useCallback(e=>{
+    if(!dragState.current.active) return
+    dragState.current.active=false
+    if(!dragState.current.moved) return
+    const x=dragState.current.origX+(e.clientX-dragState.current.startX)
+    const maxSnapW=Math.floor(window.innerWidth*0.45)
+    const snapW=Math.min(panelW,maxSnapW)
+    if(x<SNAP_MARGIN){
+      if(snapW!==panelW) setPanelW(snapW)
+      setSnapSide('left');setPanelPos(null);onSnap?.('left',snapW)
+    } else if(window.innerWidth-x-panelW<SNAP_MARGIN){
+      if(snapW!==panelW) setPanelW(snapW)
+      setSnapSide('right');setPanelPos(null);onSnap?.('right',snapW)
+    }
+  },[panelW,onSnap])
 
   // ── Freehand
   const getPos=e=>e.target.getStage().getPointerPosition()
@@ -888,7 +932,10 @@ export default function ScratchPad({isOpen,onClose}) {
   if(!isOpen) return null
 
   const mobileStyle={position:'fixed',bottom:0,left:0,right:0,height:Math.max(MIN_H,Math.min(panelH,window.innerHeight-60)),zIndex:120,display:'flex',flexDirection:'column',borderRadius:'16px 16px 0 0',overflow:'hidden',boxShadow:'0 -8px 40px rgba(0,0,0,0.3)',borderTop:`1px solid ${bdr}`,background:darkCanvas?'#1e293b':'#fff'}
-  const desktopStyle={position:'fixed',bottom:'1rem',right:'1rem',width:panelW,height:panelH,zIndex:120,display:'flex',flexDirection:'column',borderRadius:16,overflow:'hidden',boxShadow:'0 8px 40px rgba(0,0,0,0.22)',border:`1px solid ${bdr}`,background:darkCanvas?'#1e293b':'#fff'}
+  const _shared={zIndex:120,display:'flex',flexDirection:'column',overflow:'hidden',boxShadow:'0 8px 40px rgba(0,0,0,0.22)',border:`1px solid ${bdr}`,background:darkCanvas?'#1e293b':'#fff'}
+  const desktopStyle=snapSide
+    ?{..._shared,position:'fixed',top:56,[snapSide]:0,bottom:0,width:panelW,borderRadius:snapSide==='left'?'0 16px 16px 0':'16px 0 0 16px'}
+    :{..._shared,position:'fixed',...(panelPos?{left:panelPos.x,top:panelPos.y}:{bottom:'1rem',right:'1rem'}),width:panelW,height:panelH,borderRadius:16}
   const rowStyle={display:'flex',alignItems:'center',gap:4,padding:'5px 10px',background:tbBg,flexShrink:0,overflowX:'auto',overflowY:'hidden',scrollbarWidth:'none',msOverflowStyle:'none',WebkitOverflowScrolling:'touch',userSelect:'none'}
 
   return (
@@ -902,7 +949,12 @@ export default function ScratchPad({isOpen,onClose}) {
     <div style={isMobile?mobileStyle:desktopStyle}>
 
       {/* Resize handles */}
-      {!isMobile&&<><ResizeHandle direction="top" onResize={handleResize} darkCanvas={darkCanvas}/><ResizeHandle direction="left" onResize={handleResize} darkCanvas={darkCanvas}/><ResizeHandle direction="corner" onResize={handleResize} darkCanvas={darkCanvas}/></>}
+      {!isMobile&&<>
+        <ResizeHandle direction="top" onResize={handleResize} darkCanvas={darkCanvas}/>
+        {(!snapSide||snapSide==='right')&&<ResizeHandle direction="left" onResize={handleResize} darkCanvas={darkCanvas}/>}
+        {snapSide==='left'&&<ResizeHandle direction="right" onResize={handleResize} darkCanvas={darkCanvas}/>}
+        {!snapSide&&<ResizeHandle direction="corner" onResize={handleResize} darkCanvas={darkCanvas}/>}
+      </>}
       {isMobile&&<ResizeHandle direction="top" onResize={handleResize} darkCanvas={darkCanvas}/>}
 
       {/* ══ MOBILE TOOLBAR ══ */}
@@ -947,7 +999,10 @@ export default function ScratchPad({isOpen,onClose}) {
       </>
 
       /* ══ DESKTOP TOOLBAR ══ */
-      :<div style={{...rowStyle,borderBottom:`1px solid ${bdr}`,paddingTop:10}}>
+      :<div
+        onPointerDown={startPanelDrag} onPointerMove={onPanelDragMove} onPointerUp={onPanelDragEnd}
+        style={{display:'flex',alignItems:'center',flexWrap:'wrap',gap:4,padding:'6px 10px',background:tbBg,flexShrink:0,borderBottom:`1px solid ${bdr}`,cursor:'grab',userSelect:'none',touchAction:'none'}}
+      >
         <span style={{fontSize:11,fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase',color:ic,flexShrink:0,marginRight:2}}>Scratch</span>
         <Div c={bdr}/>
         <TBtn active={mode==='draw'} onClick={()=>setMode('draw')} dark={darkCanvas}><Pencil size={13}/> Draw</TBtn>
@@ -965,10 +1020,8 @@ export default function ScratchPad({isOpen,onClose}) {
           {showFinish&&<TBtn active={false} onClick={finishPolygon} dark={darkCanvas}><Check size={13}/> <span style={{fontSize:10}}>Finish</span></TBtn>}
         </>}
         <Div c={bdr}/>
-        <div style={{display:'flex',alignItems:'center',gap:4,flexShrink:0}}>
-          {PALETTE.map(c=><Swatch key={c} c={c} active={brushActive&&color===c} onClick={()=>pickColor(c)}/>)}
-        </div>
-        <div style={{flex:1}}/>
+        {PALETTE.map(c=><Swatch key={c} c={c} active={brushActive&&color===c} onClick={()=>pickColor(c)}/>)}
+        <Div c={bdr}/>
         {gridControls}
         <Div c={bdr}/>
         <IBtn onClick={()=>setDarkCanvas(d=>!d)} color={ic}>{darkCanvas?<Sun size={15}/>:<Moon size={15}/>}</IBtn>

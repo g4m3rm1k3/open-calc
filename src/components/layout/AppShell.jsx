@@ -309,7 +309,7 @@ function TopBar({
   }, [gamesMenuOpen]);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[100] bg-white/70 dark:bg-slate-950/60 backdrop-blur-3xl border-b border-white/10 flex items-center px-2 sm:px-6 shadow-[0_20px_50px_rgba(0,0,0,0.05)] h-14 overflow-x-auto overflow-y-hidden">
+    <header className="fixed top-0 left-0 right-0 z-[100] bg-white/95 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-200/60 dark:border-white/10 flex items-center px-2 sm:px-6 shadow-[0_20px_50px_rgba(0,0,0,0.05)] h-14 overflow-x-auto overflow-y-hidden">
       {/* 1. BRANDING & SEARCH - Crystalline Module */}
       <div className="flex items-center gap-2 border-r border-white/10 pr-4 h-10">
         <Link to="/" className="relative group">
@@ -511,6 +511,15 @@ export default function AppShell({ children }) {
   const [polyOpen, setPolyOpen] = useState(false);
   const [laOpen, setLAOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
+  const [scratchSnap, setScratchSnap] = useState(null)
+  const [scratchSnapW, setScratchSnapW] = useState(680)
+  const handleScratchSnap = useCallback((side, w) => {
+    setScratchSnap(side)
+    if (w) setScratchSnapW(w)
+  }, [])
+  useEffect(() => {
+    if (!scratchOpen) setScratchSnap(null)
+  }, [scratchOpen])
   const closeAllTools = useCallback(() => {
     setGraphOpen(false);
     setGraph3DOpen(false);
@@ -662,6 +671,7 @@ export default function AppShell({ children }) {
           <ScratchPad
             isOpen={scratchOpen}
             onClose={() => setScratchOpen(false)}
+            onSnap={handleScratchSnap}
           />
           {calcOpen && <TICalc onClose={() => setCalcOpen(false)} />}
           {sigmaOpen && <SigmaCalc onClose={() => setSigmaOpen(false)} />}
@@ -772,6 +782,10 @@ onMenuToggle={() => setSidebarOpen((o) => !o)}
         {/* Main content */}
         <main
           className={`transition-[padding] duration-500 ease-in-out pb-20 lg:pb-0 ${(isChemistryRoute || isOpenMatRoute) ? "h-screen overflow-hidden" : "min-h-screen"} ${sidebarPinned ? "lg:pl-[280px]" : "lg:pl-3"} ${chatOpen ? "lg:pr-[400px]" : "lg:pr-0"} pt-14`}
+          style={{
+            ...(scratchSnap === 'left'  ? { paddingLeft:  `${(sidebarPinned ? 280 : 12) + scratchSnapW}px` } : {}),
+            ...(scratchSnap === 'right' ? { paddingRight: `${scratchSnapW}px` } : {}),
+          }}
         >
           <div
             className={
@@ -1021,7 +1035,8 @@ onMenuToggle={() => setSidebarOpen((o) => !o)}
         />
         <ScratchPad
           isOpen={scratchOpen}
-          onClose={() => setScratchOpen(false)}
+          onClose={() => { setScratchOpen(false); setScratchSnap(null) }}
+          onSnap={handleScratchSnap}
         />
         <GlobalPythonNotebook
           isOpen={pythonOpen}
