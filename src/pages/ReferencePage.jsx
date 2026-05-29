@@ -4,6 +4,7 @@ import katex from 'katex'
 import { REFERENCE_CATEGORIES, ALL_ENTRIES } from '../content/reference-data.js'
 import { PROOFS } from '../content/proofs/index.js'
 import ProofModal from '../components/ui/ProofModal.jsx'
+import MathReferenceBackground from '../components/reference/MathReferenceBackground.jsx'
 
 const COLOR_CLASSES = {
   blue:    { badge: 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300',    tab: 'bg-blue-600 text-white',    tabInactive: 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30' },
@@ -41,7 +42,7 @@ function FormulaCard({ entry, onOpenProof }) {
   return (
     <button
       onClick={hasProof ? () => onOpenProof(entry) : undefined}
-      className={`relative w-full text-left bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-slate-200/50 dark:border-slate-800/50 rounded-2xl overflow-hidden transition-all duration-300 group shadow-sm ${
+      className={`relative w-full text-left bg-white/76 dark:bg-slate-950/54 backdrop-blur-xl border border-white/55 dark:border-white/10 rounded-[8px] overflow-hidden transition-all duration-300 group shadow-2xl shadow-slate-950/10 ${
         hasProof
           ? 'hover:shadow-2xl hover:shadow-brand-500/10 hover:border-amber-400 dark:hover:border-amber-600 hover:-translate-y-1.5 cursor-pointer'
           : 'hover:shadow-xl cursor-default hover:-translate-y-0.5'
@@ -51,7 +52,7 @@ function FormulaCard({ entry, onOpenProof }) {
       <div className={`absolute inset-0 bg-gradient-to-tr ${sheenClass} opacity-100 pointer-events-none`} />
 
       <div className="relative z-10 px-5 pt-5 pb-2 flex items-start justify-between gap-2">
-        <div className="font-bold text-[15px] text-slate-800 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-tight">
+        <div className="font-bold text-[15px] text-slate-800 dark:text-slate-50 group-hover:text-blue-600 dark:group-hover:text-blue-300 transition-colors leading-tight">
           {entry.name}
         </div>
         <div className="flex items-center gap-1.5 flex-shrink-0">
@@ -66,7 +67,7 @@ function FormulaCard({ entry, onOpenProof }) {
         </div>
       </div>
       <div
-        className="relative z-10 px-5 py-5 overflow-x-auto text-center text-slate-900 dark:text-slate-100 bg-white/40 dark:bg-white/5 my-1 mx-3 rounded-xl border border-white/20 dark:border-white/5 shadow-inner"
+        className="relative z-10 px-5 py-5 overflow-x-auto text-center text-slate-900 dark:text-slate-50 bg-white/66 dark:bg-white/8 my-1 mx-3 rounded-[8px] border border-white/45 dark:border-white/10 shadow-inner"
         dangerouslySetInnerHTML={{ __html: html }}
       />
       <div className="relative z-10 px-5 pb-4 min-h-[46px] flex flex-col justify-end">
@@ -110,21 +111,27 @@ export default function ReferencePage() {
   const proofCount = ALL_ENTRIES.filter(e => PROOFS[e.id]).length
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 text-slate-900 dark:text-slate-100">
+    <div className="relative min-h-[calc(100vh-9rem)] text-slate-900 dark:text-slate-100">
+      <MathReferenceBackground />
+
+      <div className="relative z-10 max-w-6xl mx-auto px-4 py-8">
       {/* Cleaner Header */}
       <div className="mb-10 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight mb-2">Reference</h1>
-          <p className="text-slate-500 dark:text-slate-400 max-w-2xl leading-relaxed">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-[8px] border border-sky-200/30 bg-sky-200/12 px-3 py-2 text-xs font-black uppercase tracking-[0.22em] text-sky-100 backdrop-blur-md">
+            Formula Atlas
+          </div>
+          <h1 className="text-4xl sm:text-6xl font-black tracking-tight mb-4 text-white">Reference</h1>
+          <p className="text-slate-100/76 max-w-2xl leading-relaxed">
             Every formula, law, and identity in one place.{' '}
-            <span className="text-amber-600 dark:text-amber-400 font-semibold">
+            <span className="text-amber-200 font-semibold">
               {proofCount} verified with step-by-step proofs.
             </span>
           </p>
         </div>
         <Link
           to="/chemistry"
-          className="shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 text-sm font-semibold hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
+          className="shrink-0 hidden sm:flex items-center gap-2 px-4 py-2 rounded-[8px] border border-sky-200/20 bg-sky-300/10 text-sky-100 text-sm font-semibold backdrop-blur-xl hover:bg-sky-300/16 transition-colors"
         >
           ⚛ Periodic Table
         </Link>
@@ -140,7 +147,7 @@ export default function ReferencePage() {
           placeholder="Search formulas, identities, rules…"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-shadow shadow-sm"
+          className="w-full pl-11 pr-4 py-3 rounded-[8px] border border-white/40 dark:border-white/12 bg-white/82 dark:bg-slate-950/58 text-slate-900 dark:text-slate-100 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-sky-300/30 transition-shadow shadow-2xl shadow-slate-950/15 backdrop-blur-xl"
         />
       </div>
 
@@ -148,7 +155,7 @@ export default function ReferencePage() {
       <div className="flex flex-wrap gap-2 mb-10">
         <button
           onClick={() => setActiveCategory('all')}
-          className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${activeCategory === 'all' ? 'bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-900' : 'text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
+          className={`px-4 py-1.5 rounded-[8px] text-xs font-bold uppercase tracking-wider transition-all backdrop-blur-xl ${activeCategory === 'all' ? 'bg-white text-slate-950 shadow-xl shadow-slate-950/20' : 'text-slate-100/76 hover:bg-white/10'}`}
         >
           All
         </button>
@@ -169,7 +176,7 @@ export default function ReferencePage() {
 
       {/* Formula grid */}
       {filtered.length === 0 ? (
-        <div className="text-center py-16 text-slate-400 dark:text-slate-500">
+        <div className="text-center py-16 text-slate-200/70">
           No formulas match "{search}"
         </div>
       ) : (
@@ -180,7 +187,7 @@ export default function ReferencePage() {
         </div>
       )}
 
-      <div className="mt-10 text-center text-xs text-slate-300 dark:text-slate-600">
+      <div className="mt-10 text-center text-xs text-slate-200/58">
         {ALL_ENTRIES.length} formulas across {REFERENCE_CATEGORIES.length} categories · {proofCount} with proofs
       </div>
 
@@ -192,6 +199,7 @@ export default function ReferencePage() {
           onClose={() => setProofEntry(null)}
         />
       )}
+      </div>
     </div>
   )
 }
