@@ -5,6 +5,15 @@ import ArcadeMazeBackground from '../components/games/ArcadeMazeBackground.jsx'
 
 const GAMES = [
   {
+    key: 'asteroids-la',
+    label: 'Vector Asteroids',
+    emoji: '🌀',
+    color: 'violet',
+    desc: 'Blast rocks through 10 waves — velocity vectors, dot products, matrix transforms, and eigenvectors all felt through gameplay.',
+    path: '/asteroids-la',
+    tags: ['Linear Algebra', 'Arcade'],
+  },
+  {
     key: 'arkanoid',
     label: 'Arkanoid Learn',
     emoji: '🎮',
@@ -87,7 +96,7 @@ const BG = {
   orange:  'bg-orange-950/45 border-orange-300/25 hover:border-orange-200/70 hover:shadow-orange-500/20',
   purple:  'bg-fuchsia-950/45 border-fuchsia-300/25 hover:border-fuchsia-200/70 hover:shadow-fuchsia-500/20',
   emerald: 'bg-emerald-950/45 border-emerald-300/25 hover:border-emerald-200/70 hover:shadow-emerald-500/20',
-  violet:  'bg-violet-950/45 border-violet-300/25 hover:border-violet-200/70 hover:shadow-violet-500/20',
+  violet:  'bg-violet-950/50 border-violet-300/25 hover:border-violet-200/70 hover:shadow-violet-500/20',
   fuchsia: 'bg-fuchsia-950/45 border-fuchsia-300/25 hover:border-fuchsia-200/70 hover:shadow-fuchsia-500/20',
   slate:   'bg-slate-950/55 border-slate-300/20 hover:border-slate-200/60 hover:shadow-slate-500/20',
 }
