@@ -18,8 +18,12 @@ import {
   Eye,
   Upload,
   RefreshCcw,
+  Code2,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from 'lucide-react'
 import { buildOptionalBackendUrl } from '../../utils/optionalBackend.js'
+import DocsCodeWorkspace from './DocsCodeWorkspace.jsx'
 
 const DOCS_MODULES = import.meta.glob('/src/docs/**/*.md', {
   query: '?raw',
@@ -227,6 +231,8 @@ export default function MarkdownHub() {
   const [previewMode, setPreviewMode] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [tutorialOverrideActive, setTutorialOverrideActive] = useState(false)
+  const [codeAlongOpen, setCodeAlongOpen] = useState(false)
+  const [docsNavOpen, setDocsNavOpen] = useState(true)
 
   const overriddenPaths = useMemo(() => new Set(overrideDocs.map((doc) => doc.path)), [overrideDocs])
   const activeUserDoc = userDocs.find((doc) => doc.id === activeUserId) || null
@@ -538,6 +544,10 @@ export default function MarkdownHub() {
     event.target.value = ''
   }, [backendReady, refreshDocsIndex, selectUserDoc, userDocs])
 
+  const activeTitle = tab === 'tutorials'
+    ? activeFile?.replace('/src/docs/', '') || 'Bundled docs'
+    : editorName || 'Markdown document'
+
   return (
     <>
       <style>{MD_CSS}</style>
@@ -584,6 +594,27 @@ export default function MarkdownHub() {
           </div>
 
           <div className="flex-1" />
+
+          <button
+            onClick={() => setDocsNavOpen((value) => !value)}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+            title={docsNavOpen ? 'Hide docs navigation' : 'Show docs navigation'}
+          >
+            {docsNavOpen ? <PanelLeftClose className="w-3.5 h-3.5" /> : <PanelLeftOpen className="w-3.5 h-3.5" />}
+            Nav
+          </button>
+
+          <button
+            onClick={() => setCodeAlongOpen((value) => !value)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold border rounded-lg transition-colors ${
+              codeAlongOpen
+                ? 'text-cyan-700 dark:text-cyan-300 bg-cyan-50 dark:bg-cyan-900/30 border-cyan-200 dark:border-cyan-800/50'
+                : 'text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
+            }`}
+            title="Open code-along workspace"
+          >
+            <Code2 className="w-3.5 h-3.5" /> Code Along
+          </button>
 
           <button
             onClick={refreshDocsIndex}
@@ -654,8 +685,8 @@ export default function MarkdownHub() {
           )}
         </div>
 
-        <div className="flex flex-1 overflow-hidden w-full relative">
-          <div className="w-[300px] bg-slate-50 dark:bg-slate-900/50 border-r border-slate-200 dark:border-slate-800 flex flex-col shrink-0 overflow-hidden hidden sm:flex">
+        <div className={`flex flex-1 overflow-hidden w-full relative ${codeAlongOpen ? 'min-w-0' : ''}`}>
+          <div className={`${docsNavOpen ? 'hidden sm:flex' : 'hidden'} ${codeAlongOpen ? 'w-[240px]' : 'w-[300px]'} bg-slate-50 dark:bg-slate-900/50 border-r border-slate-200 dark:border-slate-800 flex-col shrink-0 overflow-hidden`}>
             <div className="flex-1 overflow-y-auto py-3 custom-scrollbar">
               {tab === 'tutorials' && (
                 tree.length === 0
@@ -732,7 +763,7 @@ export default function MarkdownHub() {
             )}
           </div>
 
-          <div className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-[#0b1322]">
+          <div className={`${codeAlongOpen ? (docsNavOpen ? 'basis-[42%]' : 'basis-[46%]') + ' min-w-0' : 'flex-1'} flex flex-col overflow-hidden bg-white dark:bg-[#0b1322]`}>
             {tab === 'tutorials' && (
               <div className="flex-1 overflow-y-auto px-6 sm:px-10 lg:px-16 py-8 custom-scrollbar">
                 {loading ? (
@@ -810,6 +841,12 @@ export default function MarkdownHub() {
               </div>
             )}
           </div>
+
+          {codeAlongOpen && (
+            <div className={`${docsNavOpen ? 'basis-[58%]' : 'basis-[54%]'} hidden md:block min-w-[420px]`}>
+              <DocsCodeWorkspace activeTitle={activeTitle} />
+            </div>
+          )}
         </div>
       </div>
     </>

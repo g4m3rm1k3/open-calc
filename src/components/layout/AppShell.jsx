@@ -573,6 +573,24 @@ export default function AppShell({ children }) {
 
   useEffect(() => {
     const handler = (e) => {
+      const { tool } = e.detail ?? {};
+      if (tool === "calculator") setCalcOpen(true);
+      else if (tool === "sigma") setSigmaOpen(true);
+      else if (tool === "polynomial") setPolyOpen(true);
+      else if (tool === "linear-algebra") setLAOpen(true);
+      else if (tool === "python") setPythonOpen(true);
+      else if (tool === "javascript") setJsOpen(true);
+      else if (tool === "scratchpad") setScratchOpen(true);
+      else if (tool === "grapher") setGraphOpen(true);
+      else if (tool === "grapher-3d") setGraph3DOpen(true);
+      else if (tool === "jsxgraph") setGraphJSXOpen(true);
+    };
+    window.addEventListener("oc-open-tool", handler);
+    return () => window.removeEventListener("oc-open-tool", handler);
+  }, []);
+
+  useEffect(() => {
+    const handler = (e) => {
       const { game } = e.detail ?? {};
       if (game === "basketball") setBasketOpen(true);
       else if (game === "pool") setPoolOpen(true);
@@ -645,6 +663,15 @@ export default function AppShell({ children }) {
             isOpen={scratchOpen}
             onClose={() => setScratchOpen(false)}
           />
+          {calcOpen && <TICalc onClose={() => setCalcOpen(false)} />}
+          {sigmaOpen && <SigmaCalc onClose={() => setSigmaOpen(false)} />}
+          {polyOpen && <PolyCalc onClose={() => setPolyOpen(false)} />}
+          {laOpen && <LinearAlgebraCalc onClose={() => setLAOpen(false)} />}
+          <GlobalPythonNotebook
+            isOpen={pythonOpen}
+            onClose={() => setPythonOpen(false)}
+          />
+          <GlobalJSPlayground isOpen={jsOpen} onClose={() => setJsOpen(false)} />
         </div>
       </GrapherContext.Provider>
     );
