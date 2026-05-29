@@ -1703,6 +1703,1031 @@ const SnapGame = () => {
 }
 
 // ═══════════════════════════════════════════════
+//  GAME: CRIBBAGE
+// ═══════════════════════════════════════════════
+
+// Card value for cribbage (A=1, 2-9=face, 10/J/Q/K=10)
+const cribbageValue = (rank) => {
+  if (rank === 'A') return 1
+  if (['J','Q','K'].includes(rank)) return 10
+  return parseInt(rank, 10) || 10
+}
+
+// Rank order for run detection (A=1 low only)
+const cribbageRankOrder = (rank) => RANK_VALUES[rank] // A=1..K=13
+
+// Get all combinations of size k from array
+const getCombinations = (arr, k) => {
+  if (k === 0) return [[]]
+  if (arr.length < k) return []
+  const [first, ...rest] = arr
+  const withFirst = getCombinations(rest, k - 1).map(combo => [first, ...combo])
+  const withoutFirst = getCombinations(rest, k)
+  return [...withFirst, ...withoutFirst]
+}
+
+// Score a cribbage hand (4 cards + starter). isCrib affects flush rules.
+const scoreCribbageHand = (hand, starter, isCrib = false) => {
+  const allCards = starter ? [...hand, starter] : [...hand]
+  const breakdown = []
+  let total = 0
+
+  // --- 15s ---
+  for (let size = 2; size <= allCards.length; size++) {
+    for (const combo of getCombinations(allCards, size)) {
+      const sum = combo.reduce((s, c) => s + cribbageValue(c.rank), 0)
+      if (sum === 15) {
+        breakdown.push({ name: '15', points: 2, cards: combo.map(c => c.id) })
+        total += 2
+      }
+    }
+  }
+
+  // --- Pairs ---
+  for (const combo of getCombinations(allCards, 2)) {
+    if (combo[0].rank === combo[1].rank) {
+      breakdown.push({ name: `Pair (${combo[0].rank}s)`, points: 2, cards: combo.map(c => c.id) })
+      total += 2
+    }
+  }
+
+  // --- Runs: find maximum non-overlapping runs ---
+  // Check for runs of length 5 down to 3
+  const foundRunCards = new Set()
+  for (let runLen = allCards.length; runLen >= 3; runLen--) {
+    for (const combo of getCombinations(allCards, runLen)) {
+      const sorted = [...combo].sort((a, b) => cribbageRankOrder(a.rank) - cribbageRankOrder(b.rank))
+      const vals = sorted.map(c => cribbageRankOrder(c.rank))
+      // Check all unique
+      const unique = new Set(vals)
+      if (unique.size !== vals.length) continue
+      // Check consecutive
+      let isRun = true
+      for (let i = 1; i < vals.length; i++) {
+        if (vals[i] !== vals[i - 1] + 1) { isRun = false; break }
+      }
+      if (isRun) {
+        // Only count if no card in this combo was already part of a longer run
+        const ids = combo.map(c => c.id)
+        const alreadyCounted = ids.some(id => foundRunCards.has(id))
+        if (!alreadyCounted) {
+          for (const id of ids) foundRunCards.add(id)
+          breakdown.push({ name: `Run of ${runLen}`, points: runLen, cards: ids })
+          total += runLen
+        }
+      }
+    }
+  }
+
+  // --- Flush ---
+  if (starter) {
+    const handSuits = hand.map(c => c.suit)
+    const allSameSuit = handSuits.every(s => s === handSuits[0])
+    if (allSameSuit) {
+      if (!isCrib) {
+        // 4-card flush (hand only) or 5-card flush
+        if (starter.suit === handSuits[0]) {
+          breakdown.push({ name: 'Flush (5)', points: 5, cards: allCards.map(c => c.id) })
+          total += 5
+        } else {
+          breakdown.push({ name: 'Flush (4)', points: 4, cards: hand.map(c => c.id) })
+          total += 4
+        }
+      } else {
+        // Crib: only 5-card flush counts
+        if (starter.suit === handSuits[0]) {
+          breakdown.push({ name: 'Flush (5)', points: 5, cards: allCards.map(c => c.id) })
+          total += 5
+        }
+      }
+    }
+  } else {
+    // No starter (discard preview): just check 4-card flush
+    if (!isCrib) {
+      const handSuits = hand.map(c => c.suit)
+      if (hand.length >= 4 && handSuits.every(s => s === handSuits[0])) {
+        breakdown.push({ name: 'Flush (4)', points: 4, cards: hand.map(c => c.id) })
+        total += 4
+      }
+    }
+  }
+
+  // --- Nobs (Jack matching starter suit) ---
+  if (starter) {
+    const nobs = hand.find(c => c.rank === 'J' && c.suit === starter.suit)
+    if (nobs) {
+      breakdown.push({ name: 'Nobs (J matches starter)', points: 1, cards: [nobs.id] })
+      total += 1
+    }
+  }
+
+  return { total, breakdown }
+}
+
+// CribbageBoard SVG
+const CribbageBoard = ({ humanScore, aiScore }) => {
+  const HOLES = 121
+  const TRACK_W = 480
+  const TRACK_H = 20
+  const HOLE_R = 3.5
+  const GROUP_GAP = 6
+  const HOLES_PER_GROUP = 5
+  const GROUPS = Math.ceil(HOLES / HOLES_PER_GROUP) // 25 groups (holes 0..120)
+
+  // Calculate x position for hole index 0..120
+  const holeX = (idx) => {
+    const group = Math.floor(idx / HOLES_PER_GROUP)
+    const pos = idx % HOLES_PER_GROUP
+    const usableW = TRACK_W - (GROUPS - 1) * GROUP_GAP
+    const holeSpacing = usableW / (HOLES - 1 + (GROUPS - 1) * (GROUP_GAP / ((TRACK_W - GROUP_GAP * (GROUPS - 1)) / (HOLES - 1))))
+    // Simpler: distribute evenly with slight gap every 5
+    const totalSlots = HOLES + (GROUPS - 1) * 0.8
+    const slotW = TRACK_W / totalSlots
+    return group * (HOLES_PER_GROUP * slotW + GROUP_GAP * 0.3) + pos * slotW + slotW / 2
+  }
+
+  // Simpler uniform distribution
+  const hx = (idx) => {
+    if (idx <= 0) return 10
+    if (idx >= 120) return TRACK_W - 10
+    const group = Math.floor(idx / HOLES_PER_GROUP)
+    const pos = idx % HOLES_PER_GROUP
+    const cellW = (TRACK_W - 20) / (HOLES - 1)
+    return 10 + idx * cellW + group * 1.5
+  }
+
+  const SVG_W = TRACK_W + 20
+  const SVG_H = 110
+
+  const PEG_Y_FRONT = 30
+  const PEG_Y_BACK = 50
+  const AI_Y_FRONT = 75
+  const AI_Y_BACK = 93
+
+  return (
+    <div style={{ margin: '12px 0', overflowX: 'auto' }}>
+      <svg width={SVG_W} height={SVG_H} style={{ display: 'block' }}>
+        {/* Track labels */}
+        <text x={10} y={20} fill="#4dff91" fontSize={10} fontFamily="monospace">YOU</text>
+        <text x={10} y={68} fill="#ff4455" fontSize={10} fontFamily="monospace">AI</text>
+
+        {/* Holes - human track */}
+        {Array.from({ length: HOLES }).map((_, i) => (
+          <circle
+            key={`h${i}`}
+            cx={hx(i) + 10}
+            cy={PEG_Y_FRONT}
+            r={HOLE_R}
+            fill={i <= humanScore ? '#1a3d1a' : '#1a2a1a'}
+            stroke={i % 5 === 0 ? '#2a5a2a' : '#1a3a1a'}
+            strokeWidth={0.8}
+          />
+        ))}
+        {/* Holes - AI track */}
+        {Array.from({ length: HOLES }).map((_, i) => (
+          <circle
+            key={`a${i}`}
+            cx={hx(i) + 10}
+            cy={AI_Y_FRONT}
+            r={HOLE_R}
+            fill={i <= aiScore ? '#3d1a1a' : '#2a1a1a'}
+            stroke={i % 5 === 0 ? '#5a2a2a' : '#3a1a1a'}
+            strokeWidth={0.8}
+          />
+        ))}
+
+        {/* Milestone markers every 10 */}
+        {[10,20,30,40,50,60,70,80,90,100,110,120].map(m => (
+          <g key={m}>
+            <line x1={hx(m)+10} y1={22} x2={hx(m)+10} y2={62} stroke="#333" strokeWidth={0.5} />
+            <text x={hx(m)+10} y={61} fill="#555" fontSize={8} fontFamily="monospace" textAnchor="middle">{m}</text>
+          </g>
+        ))}
+
+        {/* Human front peg */}
+        {humanScore > 0 && (
+          <circle cx={hx(Math.min(humanScore, 120))+10} cy={PEG_Y_FRONT} r={5.5} fill="#4dff91" stroke="#fff" strokeWidth={1.5} />
+        )}
+        {/* Human back peg (previous position) */}
+        {humanScore > 0 && (
+          <circle cx={hx(Math.max(0, humanScore - 1))+10} cy={PEG_Y_BACK - 8} r={3.5} fill="#26a050" stroke="#4dff91" strokeWidth={1} opacity={0.7} />
+        )}
+
+        {/* AI front peg */}
+        {aiScore > 0 && (
+          <circle cx={hx(Math.min(aiScore, 120))+10} cy={AI_Y_FRONT} r={5.5} fill="#ff4455" stroke="#fff" strokeWidth={1.5} />
+        )}
+        {/* AI back peg */}
+        {aiScore > 0 && (
+          <circle cx={hx(Math.max(0, aiScore - 1))+10} cy={AI_Y_FRONT + 12} r={3.5} fill="#a02626" stroke="#ff4455" strokeWidth={1} opacity={0.7} />
+        )}
+
+        {/* Score labels */}
+        <text x={SVG_W - 6} y={PEG_Y_FRONT + 4} fill="#4dff91" fontSize={11} fontFamily="monospace" fontWeight="bold" textAnchor="end">{humanScore}</text>
+        <text x={SVG_W - 6} y={AI_Y_FRONT + 4} fill="#ff4455" fontSize={11} fontFamily="monospace" fontWeight="bold" textAnchor="end">{aiScore}</text>
+      </svg>
+    </div>
+  )
+}
+
+// Tutorial tips per phase
+const CRIB_TIPS = {
+  intro: null,
+  deal: "Each player gets 6 cards. You'll keep 4 and send 2 to the 'crib' — the bonus hand.",
+  discard: "Pick exactly 2 cards to discard to the crib. The crib belongs to the dealer — it scores for them at the end. Keep cards that make 15s and pairs.",
+  cut: "The starter card applies to everyone's hand. A Jack starter scores 2 pts for the dealer ('His Heels').",
+  peg: "Take turns playing cards. The running total resets after 31. Score 2 pts for hitting 15 or 31 exactly, 1 pt for 'Go' (opponent can't play).",
+  count: "Count your hand + the starter card. Every combo summing to 15 = 2 pts. Pairs = 2 pts. Runs = 1 pt per card.",
+  gameover: null,
+}
+
+const CribbageGame = () => {
+  const [phase, setPhase] = useState('intro')
+  const [tutorialOn, setTutorialOn] = useState(true)
+  const [humanScore, setHumanScore] = useState(0)
+  const [aiScore, setAiScore] = useState(0)
+  const [humanHand, setHumanHand] = useState([])
+  const [aiHand, setAiHand] = useState([])
+  const [humanCrib, setHumanCrib] = useState([]) // cards human discarded
+  const [aiCrib, setAiCrib] = useState([])       // cards AI discarded
+  const [crib, setCrib] = useState([])            // combined crib
+  const [starter, setStarter] = useState(null)
+  const [dealer, setDealer] = useState('ai') // 'ai' | 'human'
+  const [humanDiscards, setHumanDiscards] = useState([]) // selected indices
+  const [pegState, setPegState] = useState({
+    humanPlayed: [], aiPlayed: [], runningTotal: 0,
+    turn: 'human', goCount: 0, lastPlayer: null,
+  })
+  const [scorePopup, setScorePopup] = useState(null)
+  const [countPhase, setCountPhase] = useState(null) // 'human_hand' | 'ai_hand' | 'crib'
+  const [countResult, setCountResult] = useState(null)
+  const [log, setLog] = useState([])
+  const [handNum, setHandNum] = useState(1)
+
+  const addLog = (msg) => setLog(l => [msg, ...l].slice(0, 10))
+
+  // ── SCORING HELPER ──
+  const addPoints = (who, pts, reason) => {
+    if (pts <= 0) return
+    if (who === 'human') setHumanScore(s => Math.min(121, s + pts))
+    else setAiScore(s => Math.min(121, s + pts))
+    addLog(`${who === 'human' ? 'You' : 'AI'} score ${pts} for ${reason}`)
+  }
+
+  // ── DEAL ──
+  const dealCards = () => {
+    const d = shuffle(makeDeck())
+    setHumanHand(d.slice(0, 6))
+    setAiHand(d.slice(6, 12))
+    setStarter(null)
+    setCrib([])
+    setHumanDiscards([])
+    setHumanCrib([])
+    setAiCrib([])
+    setPegState({ humanPlayed: [], aiPlayed: [], runningTotal: 0, turn: dealer === 'human' ? 'human' : 'human', goCount: 0, lastPlayer: null })
+    setScorePopup(null)
+    setCountResult(null)
+    setCountPhase(null)
+    setLog([])
+    setPhase('discard')
+  }
+
+  // ── AI DISCARD STRATEGY: keep the 4-card combo with highest score ──
+  const aiChooseDiscards = (hand) => {
+    let best = -1, bestKeep = null
+    for (const keep of getCombinations(hand, 4)) {
+      const { total } = scoreCribbageHand(keep, null, false)
+      if (total > best) { best = total; bestKeep = keep }
+    }
+    const keepIds = new Set(bestKeep.map(c => c.id))
+    const discarded = hand.filter(c => !keepIds.has(c.id))
+    return { kept: bestKeep, discarded }
+  }
+
+  // ── HANDLE HUMAN DISCARD TOGGLE ──
+  const toggleDiscard = (idx) => {
+    if (humanDiscards.includes(idx)) {
+      setHumanDiscards(humanDiscards.filter(i => i !== idx))
+    } else if (humanDiscards.length < 2) {
+      setHumanDiscards([...humanDiscards, idx])
+    }
+  }
+
+  // ── CONFIRM DISCARD ──
+  const confirmDiscard = () => {
+    if (humanDiscards.length !== 2) return
+    const discardedCards = humanDiscards.map(i => humanHand[i])
+    const keptCards = humanHand.filter((_, i) => !humanDiscards.includes(i))
+    const { kept: aiKept, discarded: aiDiscarded } = aiChooseDiscards(aiHand)
+    setHumanCrib(discardedCards)
+    setAiCrib(aiDiscarded)
+    setCrib([...discardedCards, ...aiDiscarded])
+    setHumanHand(keptCards)
+    setAiHand(aiKept)
+    setPhase('cut')
+  }
+
+  // ── CUT STARTER ──
+  const cutStarter = () => {
+    const usedIds = new Set([
+      ...humanHand.map(c => c.id),
+      ...aiHand.map(c => c.id),
+      ...crib.map(c => c.id),
+    ])
+    const remaining = makeDeck().filter(c => !usedIds.has(c.id))
+    const s = remaining[Math.floor(Math.random() * remaining.length)]
+    setStarter(s)
+    addLog(`Starter: ${s.rank}${s.suit}`)
+    // His Heels
+    if (s.rank === 'J') {
+      addPoints(dealer, 2, "His Heels (Jack starter)")
+      setScorePopup({ msg: "His Heels! 2 pts for dealer", color: '#ffe040' })
+      setTimeout(() => setScorePopup(null), 2000)
+    }
+    // Pegging turn: non-dealer goes first
+    setPegState(ps => ({ ...ps, turn: dealer === 'human' ? 'ai' : 'human' }))
+    setPhase('peg')
+  }
+
+  // ── PEGGING HELPERS ──
+  const pegCardValue = (card) => cribbageValue(card.rank)
+
+  const scorePegPlay = (played, newCard, runningTotal, playerId) => {
+    const points = []
+    const newTotal = runningTotal + pegCardValue(newCard)
+
+    if (newTotal === 15) points.push({ pts: 2, label: '15 for 2!' })
+    if (newTotal === 31) points.push({ pts: 2, label: '31 for 2!' })
+
+    // Pairs / triples / quads on last N cards of same rank
+    const lastSameRank = []
+    for (let i = played.length - 1; i >= 0; i--) {
+      if (played[i].card.rank === newCard.rank) lastSameRank.push(played[i])
+      else break
+    }
+    if (lastSameRank.length === 1) points.push({ pts: 2, label: 'Pair!' })
+    else if (lastSameRank.length === 2) points.push({ pts: 6, label: 'Three of a kind!' })
+    else if (lastSameRank.length === 3) points.push({ pts: 12, label: 'Four of a kind!' })
+
+    // Runs: check if last N cards form a run (any order)
+    const sequence = [...played.map(p => p.card), newCard]
+    for (let len = Math.min(sequence.length, 7); len >= 3; len--) {
+      const seg = sequence.slice(-len)
+      const vals = seg.map(c => cribbageRankOrder(c.rank)).sort((a, b) => a - b)
+      const unique = new Set(vals)
+      if (unique.size === vals.length) {
+        let isRun = true
+        for (let i = 1; i < vals.length; i++) {
+          if (vals[i] !== vals[i - 1] + 1) { isRun = false; break }
+        }
+        if (isRun) {
+          points.push({ pts: len, label: `Run of ${len}!` })
+          break
+        }
+      }
+    }
+
+    return points
+  }
+
+  // ── PLAY PEG CARD ──
+  const playPegCard = (card) => {
+    if (pegState.turn !== 'human' || phase !== 'peg') return
+    if (pegState.runningTotal + pegCardValue(card) > 31) return
+
+    const newTotal = pegState.runningTotal + pegCardValue(card)
+    const newPlayed = [...pegState.humanPlayed, card]
+    const newFullPlayed = [
+      ...pegState.humanPlayed.map(c => ({ card: c, player: 'human' })),
+      ...pegState.aiPlayed.map(c => ({ card: c, player: 'ai' })),
+      { card, player: 'human' }
+    ].sort((a, b) => 0) // keep insertion order — use a sequence array instead
+
+    // Use a shared play sequence
+    const playSeq = (pegState.playSequence || [])
+    const newSeq = [...playSeq, { card, player: 'human' }]
+
+    const scorePts = scorePegPlay(playSeq, card, pegState.runningTotal, 'human')
+    let gained = 0
+    scorePts.forEach(({ pts, label }) => {
+      addPoints('human', pts, label)
+      gained += pts
+    })
+    if (gained > 0) {
+      setScorePopup({ msg: scorePts.map(s => s.label).join(' + '), color: '#4dff91' })
+      setTimeout(() => setScorePopup(null), 1500)
+    }
+
+    const newHumanHand = humanHand.filter(c => c.id !== card.id)
+    setHumanHand(newHumanHand)
+
+    const reset = newTotal === 31
+    setPegState(ps => ({
+      ...ps,
+      humanPlayed: newPlayed,
+      playSequence: reset ? [] : newSeq,
+      runningTotal: reset ? 0 : newTotal,
+      turn: 'ai',
+      lastPlayer: 'human',
+      goCount: reset ? 0 : ps.goCount,
+    }))
+    addLog(`You played ${card.rank}${card.suit} — total: ${reset ? 31 : newTotal}${reset ? ' (reset)' : ''}`)
+
+    if (reset) {
+      addPoints('human', 2, '31!')
+      // slight pause then AI turn
+      setTimeout(() => setPegState(ps => ({ ...ps, turn: 'ai' })), 600)
+    }
+  }
+
+  // ── AI PEG TURN ──
+  useEffect(() => {
+    if (phase !== 'peg' || pegState.turn !== 'ai') return
+    const timeout = setTimeout(() => {
+      const playable = aiHand.filter(c => pegState.runningTotal + pegCardValue(c) <= 31)
+      if (playable.length === 0) {
+        // AI says Go
+        addLog('AI says Go!')
+        const newGoCount = pegState.goCount + 1
+        // If both have said Go, score and reset
+        if (newGoCount >= 2 || humanHand.every(c => pegState.runningTotal + pegCardValue(c) > 31)) {
+          addPoints('human', 1, 'Go!')
+          setScorePopup({ msg: 'Go! +1', color: '#4dff91' })
+          setTimeout(() => setScorePopup(null), 1500)
+          setPegState(ps => ({
+            ...ps, runningTotal: 0, goCount: 0, turn: 'human',
+            playSequence: [],
+          }))
+        } else {
+          setPegState(ps => ({ ...ps, goCount: newGoCount, turn: 'human' }))
+        }
+        return
+      }
+
+      // AI picks best scoring card
+      let best = null, bestPts = -1
+      const seqSoFar = pegState.playSequence || []
+      for (const c of playable) {
+        const pts = scorePegPlay(seqSoFar, c, pegState.runningTotal, 'ai')
+          .reduce((s, p) => s + p.pts, 0)
+        if (pts > bestPts) { bestPts = pts; best = c }
+      }
+      // If no scoring play, prefer mid-range cards
+      if (bestPts === 0) {
+        const midCards = playable.filter(c => {
+          const v = pegCardValue(c)
+          return v >= 4 && v <= 7
+        })
+        best = midCards.length > 0
+          ? midCards[Math.floor(Math.random() * midCards.length)]
+          : playable.sort((a, b) => pegCardValue(a) - pegCardValue(b))[0]
+      }
+
+      const newTotal = pegState.runningTotal + pegCardValue(best)
+      const newSeq = [...seqSoFar, { card: best, player: 'ai' }]
+      const scorePts = scorePegPlay(seqSoFar, best, pegState.runningTotal, 'ai')
+      let gained = 0
+      scorePts.forEach(({ pts, label }) => {
+        addPoints('ai', pts, label)
+        gained += pts
+      })
+      if (gained > 0) {
+        setScorePopup({ msg: `AI: ${scorePts.map(s => s.label).join(' + ')}`, color: '#ff4455' })
+        setTimeout(() => setScorePopup(null), 1500)
+      }
+
+      const reset = newTotal === 31
+      const newAiHand = aiHand.filter(c => c.id !== best.id)
+      setAiHand(newAiHand)
+      setPegState(ps => ({
+        ...ps,
+        aiPlayed: [...ps.aiPlayed, best],
+        playSequence: reset ? [] : newSeq,
+        runningTotal: reset ? 0 : newTotal,
+        turn: 'human',
+        lastPlayer: 'ai',
+        goCount: reset ? 0 : ps.goCount,
+      }))
+      addLog(`AI played ${best.rank}${best.suit} — total: ${reset ? 31 : newTotal}${reset ? ' (reset)' : ''}`)
+      if (reset) addPoints('ai', 2, '31!')
+    }, 900)
+    return () => clearTimeout(timeout)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, pegState.turn, pegState.runningTotal])
+
+  // ── CHECK IF PEGGING IS DONE ──
+  useEffect(() => {
+    if (phase !== 'peg') return
+    if (humanHand.length === 0 && aiHand.length === 0) {
+      // Last card gets 1 pt
+      if (pegState.lastPlayer) {
+        addPoints(pegState.lastPlayer, 1, 'Last card')
+      }
+      setTimeout(() => {
+        setCountPhase('human_hand')
+        setPhase('count')
+      }, 800)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [humanHand.length, aiHand.length, phase])
+
+  // ── CHECK WIN ──
+  useEffect(() => {
+    if (humanScore >= 121) { setPhase('gameover') }
+    else if (aiScore >= 121) { setPhase('gameover') }
+  }, [humanScore, aiScore])
+
+  // ── HUMAN CAN'T PLAY ──
+  const humanCanPlay = humanHand.some(c => pegState.runningTotal + pegCardValue(c) <= 31)
+
+  const humanSayGo = () => {
+    if (phase !== 'peg' || pegState.turn !== 'human') return
+    addLog('You say Go!')
+    const newGoCount = pegState.goCount + 1
+    const aiCanPlay = aiHand.some(c => pegState.runningTotal + pegCardValue(c) <= 31)
+    if (!aiCanPlay) {
+      addPoints('ai', 1, 'Go!')
+      setScorePopup({ msg: 'AI gets Go! +1', color: '#ff4455' })
+      setTimeout(() => setScorePopup(null), 1500)
+      setPegState(ps => ({ ...ps, runningTotal: 0, goCount: 0, turn: 'human', playSequence: [] }))
+    } else {
+      setPegState(ps => ({ ...ps, goCount: newGoCount, turn: 'ai' }))
+    }
+  }
+
+  // ── COUNTING PHASE ──
+  const countNext = () => {
+    if (countPhase === 'human_hand') {
+      const result = scoreCribbageHand(humanHand.length > 0 ? humanHand : pegState.humanPlayed, starter, false)
+      setCountResult({ who: 'Your hand', result, cards: humanHand.length > 0 ? humanHand : pegState.humanPlayed })
+      addPoints('human', result.total, 'hand count')
+    } else if (countPhase === 'ai_hand') {
+      const result = scoreCribbageHand(aiHand.length > 0 ? aiHand : pegState.aiPlayed, starter, false)
+      setCountResult({ who: "AI's hand", result, cards: aiHand.length > 0 ? aiHand : pegState.aiPlayed })
+      addPoints('ai', result.total, 'hand count')
+    } else if (countPhase === 'crib') {
+      const result = scoreCribbageHand(crib, starter, true)
+      setCountResult({ who: `${dealer === 'human' ? 'Your' : "AI's"} crib`, result, cards: crib })
+      addPoints(dealer, result.total, 'crib count')
+    }
+  }
+
+  const advanceCount = () => {
+    if (countPhase === 'human_hand') setCountPhase('ai_hand')
+    else if (countPhase === 'ai_hand') setCountPhase('crib')
+    else {
+      // End of hand — next deal
+      setDealer(d => d === 'ai' ? 'human' : 'ai')
+      setHandNum(n => n + 1)
+      setCountPhase(null)
+      setCountResult(null)
+      setPhase('deal')
+    }
+    setCountResult(null)
+  }
+
+  // ── LIVE HAND SCORE (for discard phase math panel) ──
+  const keptCards = humanHand.filter((_, i) => !humanDiscards.includes(i))
+  const liveHandScore = phase === 'discard' && keptCards.length === 4
+    ? scoreCribbageHand(keptCards, null, false)
+    : null
+
+  // ── MATH PANEL ──
+  const mathPanel = (
+    <>
+      <MPSection title="Scores">
+        <div style={{ display: 'flex', gap: 8 }}>
+          <div style={{ flex: 1, textAlign: 'center', background: '#4dff9122', borderRadius: 8, padding: 8, border: '1px solid #4dff9144' }}>
+            <div style={{ fontSize: 26, fontWeight: 900, color: '#4dff91', fontFamily: 'monospace' }}>{humanScore}</div>
+            <div style={{ fontSize: 10, color: '#aaa' }}>You</div>
+          </div>
+          <div style={{ flex: 1, textAlign: 'center', background: '#ff445522', borderRadius: 8, padding: 8, border: '1px solid #ff455544' }}>
+            <div style={{ fontSize: 26, fontWeight: 900, color: '#ff4455', fontFamily: 'monospace' }}>{aiScore}</div>
+            <div style={{ fontSize: 10, color: '#aaa' }}>AI</div>
+          </div>
+        </div>
+        <HBar label="You" value={humanScore} max={121} color="#4dff91" subtitle={`${humanScore}/121`} />
+        <HBar label="AI" value={aiScore} max={121} color="#ff4455" subtitle={`${aiScore}/121`} />
+        <div style={{ fontSize: 10, color: '#555', marginTop: 2 }}>First to 121 wins</div>
+      </MPSection>
+
+      {phase === 'discard' && (
+        <MPSection title="Your Hand Value">
+          {liveHandScore ? (
+            <>
+              <BigNum value={liveHandScore.total} label="pts (no starter)" color="#ffe040" />
+              {liveHandScore.breakdown.map((b, i) => (
+                <div key={i} style={{ fontSize: 11, color: '#a0c0ff', display: 'flex', justifyContent: 'space-between' }}>
+                  <span>{b.name}</span><span style={{ color: '#4dff91', fontWeight: 700 }}>+{b.points}</span>
+                </div>
+              ))}
+              {liveHandScore.breakdown.length === 0 && <div style={{ fontSize: 11, color: '#555' }}>No score yet</div>}
+            </>
+          ) : (
+            <div style={{ fontSize: 11, color: '#555' }}>
+              {2 - humanDiscards.length > 0
+                ? `Select ${2 - humanDiscards.length} more card${2 - humanDiscards.length > 1 ? 's' : ''} to discard`
+                : 'Select 2 to discard'}
+            </div>
+          )}
+          <Formula text="Keep cards that pair + sum to 15" />
+        </MPSection>
+      )}
+
+      {phase === 'peg' && (
+        <MPSection title="Pegging">
+          <BigNum value={pegState.runningTotal} label="Running total" color={pegState.runningTotal === 15 || pegState.runningTotal === 31 ? '#ffe040' : '#fff'} />
+          <Formula text="15 = 2 pts | 31 = 2 pts | Go = 1 pt\nPair = 2 | 3-kind = 6 | Run of N = N pts" />
+        </MPSection>
+      )}
+
+      {phase === 'count' && countResult && (
+        <MPSection title={countResult.who}>
+          <BigNum value={countResult.result.total} label="points" color="#ffe040" />
+          {countResult.result.breakdown.map((b, i) => (
+            <div key={i} style={{ fontSize: 11, color: '#a0c0ff', display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
+              <span>{b.name}</span><span style={{ color: '#4dff91', fontWeight: 700 }}>+{b.points}</span>
+            </div>
+          ))}
+        </MPSection>
+      )}
+
+      <MPSection title="Crib Math">
+        <div style={{ fontSize: 11, color: '#aaa', lineHeight: 1.6 }}>
+          <div style={{ color: '#4dd0ff', fontWeight: 700, marginBottom: 4 }}>Dealer: <span style={{ color: '#fff' }}>{dealer === 'human' ? 'You' : 'AI'}</span></div>
+          The crib scores extra points for the dealer. Average crib value ~4-5 pts.
+        </div>
+        <Formula text="Good discard to own crib: 5s, pairs\nBad discard to opponent crib: 5s" />
+      </MPSection>
+
+      <MPSection title="Scoring Formula">
+        <Formula text={
+          "15s: every combo = 2 pts\nPairs: 2 pts / pair\nRuns: 1 pt per card\nFlush: 4 (hand) or 5\nNobs: J matching starter = 1"
+        } />
+      </MPSection>
+    </>
+  )
+
+  // ── INTRO ──
+  if (phase === 'intro') return (
+    <GameLayout
+      left={
+        <div style={{ maxWidth: 560 }}>
+          <div style={{ background: 'rgba(15,153,96,0.08)', border: '1px solid rgba(15,153,96,0.25)', borderRadius: 12, padding: '18px 20px', marginBottom: 20 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#0f9960', letterSpacing: 2, marginBottom: 10 }}>WHAT IS CRIBBAGE?</div>
+            <div style={{ fontSize: 14, color: '#c0d8f0', lineHeight: 1.8 }}>
+              Cribbage is one of the oldest card games still widely played — invented in the 17th century by poet Sir John Suckling.
+              It combines <strong style={{ color: '#ffe040' }}>combinatorics</strong>, <strong style={{ color: '#4dff91' }}>probability</strong>, and
+              strategic card play. Two players race to <strong style={{ color: '#fff' }}>121 points</strong> scored by pegging (playing cards) and
+              counting combinations of 15, pairs, and runs.
+            </div>
+          </div>
+
+          <div style={{ fontSize: 14, fontWeight: 700, color: '#fff', marginBottom: 10 }}>Key scoring rules:</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 20 }}>
+            {[
+              ['15s', '2 pts each — any combo of cards summing to 15'],
+              ['Pairs', '2 pts — two cards of the same rank'],
+              ['Runs', '1 pt per card — three or more in sequence'],
+              ['Flush', '4 pts (hand) or 5 pts (with starter)'],
+              ['Nobs', '1 pt — Jack matching the starter suit'],
+              ['His Heels', '2 pts — starter is a Jack (for dealer)'],
+              ['15 / 31 in pegging', '2 pts when running total hits exactly'],
+              ['Go', '1 pt — opponent cannot play without exceeding 31'],
+            ].map(([rule, desc]) => (
+              <div key={rule} style={{ display: 'flex', gap: 12, background: 'rgba(255,255,255,0.03)', borderRadius: 8, padding: '8px 12px' }}>
+                <div style={{ fontSize: 12, fontWeight: 800, color: '#0f9960', width: 100, flexShrink: 0 }}>{rule}</div>
+                <div style={{ fontSize: 12, color: '#a0b8d0' }}>{desc}</div>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button onClick={() => { setTutorialOn(true); setPhase('deal') }} style={btnStyle('#1d6fa4')}>
+              Start with Tutorial
+            </button>
+            <button onClick={() => { setTutorialOn(false); setPhase('deal') }} style={btnStyle('#0f9960')}>
+              Play (skip tutorial)
+            </button>
+          </div>
+        </div>
+      }
+      right={mathPanel}
+    />
+  )
+
+  // ── DEAL ──
+  if (phase === 'deal') return (
+    <GameLayout
+      left={
+        <div style={{ maxWidth: 560 }}>
+          {tutorialOn && (
+            <div style={{ background: 'rgba(29,111,164,0.15)', border: '1px solid rgba(29,111,164,0.4)', borderRadius: 10, padding: '12px 16px', marginBottom: 16, fontSize: 13, color: '#a0d0ff', lineHeight: 1.6 }}>
+              <strong style={{ color: '#4dd0ff' }}>Tutorial:</strong> {CRIB_TIPS.deal}
+            </div>
+          )}
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ fontSize: 16, fontWeight: 700, color: '#fff', marginBottom: 8 }}>Hand {handNum}</div>
+            <div style={{ color: '#a0c0ff', fontSize: 13, lineHeight: 1.7 }}>
+              Dealer this hand: <strong style={{ color: dealer === 'human' ? '#4dff91' : '#ff8080' }}>{dealer === 'human' ? 'You' : 'AI'}</strong>
+              <br />The dealer also owns the crib — extra hand scored at the end.
+            </div>
+          </div>
+          <button onClick={dealCards} style={btnStyle('#0f9960')}>Deal Cards</button>
+        </div>
+      }
+      right={mathPanel}
+    />
+  )
+
+  // ── DISCARD ──
+  if (phase === 'discard') return (
+    <GameLayout
+      left={
+        <div>
+          {tutorialOn && (
+            <div style={{ background: 'rgba(29,111,164,0.15)', border: '1px solid rgba(29,111,164,0.4)', borderRadius: 10, padding: '12px 16px', marginBottom: 16, fontSize: 13, color: '#a0d0ff', lineHeight: 1.6 }}>
+              <strong style={{ color: '#4dd0ff' }}>Tutorial:</strong> {CRIB_TIPS.discard}
+            </div>
+          )}
+          <div style={{ color: '#a0c0ff', fontSize: 12, marginBottom: 8, letterSpacing: 1 }}>
+            YOUR HAND — click 2 cards to discard to crib
+            <span style={{ marginLeft: 10, background: humanDiscards.length === 2 ? '#0f996044' : '#33333388', borderRadius: 6, padding: '2px 8px', fontSize: 11, color: humanDiscards.length === 2 ? '#4dff91' : '#666', border: `1px solid ${humanDiscards.length === 2 ? '#4dff9166' : '#333'}` }}>
+              {humanDiscards.length}/2 selected
+            </span>
+          </div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
+            {humanHand.map((c, i) => (
+              <Card
+                key={c.id} card={c} small
+                selected={humanDiscards.includes(i)}
+                onClick={() => toggleDiscard(i)}
+              />
+            ))}
+          </div>
+          <div style={{ color: '#666', fontSize: 12, marginBottom: 6 }}>
+            Crib belongs to: <span style={{ color: dealer === 'human' ? '#4dff91' : '#ff8080' }}>{dealer === 'human' ? 'You' : 'AI'}</span>
+          </div>
+          <button
+            onClick={confirmDiscard}
+            disabled={humanDiscards.length !== 2}
+            style={btnStyle('#0f9960', humanDiscards.length !== 2)}
+          >
+            Discard to Crib
+          </button>
+        </div>
+      }
+      right={mathPanel}
+    />
+  )
+
+  // ── CUT ──
+  if (phase === 'cut') return (
+    <GameLayout
+      left={
+        <div style={{ maxWidth: 560 }}>
+          {tutorialOn && (
+            <div style={{ background: 'rgba(29,111,164,0.15)', border: '1px solid rgba(29,111,164,0.4)', borderRadius: 10, padding: '12px 16px', marginBottom: 16, fontSize: 13, color: '#a0d0ff', lineHeight: 1.6 }}>
+              <strong style={{ color: '#4dd0ff' }}>Tutorial:</strong> {CRIB_TIPS.cut}
+            </div>
+          )}
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ color: '#a0c0ff', fontSize: 12, marginBottom: 8, letterSpacing: 1 }}>YOUR KEPT HAND</div>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              {humanHand.map(c => <Card key={c.id} card={c} small />)}
+            </div>
+          </div>
+          {scorePopup && (
+            <div style={{ background: 'rgba(255,224,64,0.15)', border: '1px solid rgba(255,224,64,0.4)', borderRadius: 10, padding: '10px 16px', marginBottom: 12, color: '#ffe040', fontWeight: 700, textAlign: 'center' }}>
+              {scorePopup.msg}
+            </div>
+          )}
+          <button onClick={cutStarter} style={btnStyle('#0f9960')}>Cut Starter Card</button>
+        </div>
+      }
+      right={mathPanel}
+    />
+  )
+
+  // ── PEG ──
+  if (phase === 'peg') {
+    const playSeq = pegState.playSequence || []
+    return (
+      <GameLayout
+        left={
+          <div>
+            {tutorialOn && (
+              <div style={{ background: 'rgba(29,111,164,0.15)', border: '1px solid rgba(29,111,164,0.4)', borderRadius: 10, padding: '12px 16px', marginBottom: 12, fontSize: 13, color: '#a0d0ff', lineHeight: 1.6 }}>
+                <strong style={{ color: '#4dd0ff' }}>Tutorial:</strong> {CRIB_TIPS.peg}
+              </div>
+            )}
+
+            {/* Score banner */}
+            {scorePopup && (
+              <div style={{ background: 'rgba(255,255,255,0.08)', borderRadius: 8, padding: '6px 14px', marginBottom: 8, color: scorePopup.color, fontWeight: 700, fontSize: 14, textAlign: 'center' }}>
+                {scorePopup.msg}
+              </div>
+            )}
+
+            {/* Running total + turn + Go button — always visible together */}
+            <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 10, flexWrap: 'wrap' }}>
+              <div style={{ background: 'rgba(255,255,255,0.06)', borderRadius: 8, padding: '6px 16px', textAlign: 'center', minWidth: 80 }}>
+                <div style={{ fontSize: 10, color: '#aaa', marginBottom: 1 }}>Running Total</div>
+                <div style={{ fontSize: 28, fontWeight: 900, fontFamily: 'monospace', color: pegState.runningTotal >= 15 ? '#ffe040' : '#fff', lineHeight: 1 }}>
+                  {pegState.runningTotal}
+                </div>
+              </div>
+              {starter && (
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: 10, color: '#aaa', marginBottom: 2 }}>STARTER</div>
+                  <Card card={starter} small />
+                </div>
+              )}
+              <div style={{ flex: 1, fontSize: 12, color: pegState.turn === 'human' ? '#4dff91' : '#ff8080' }}>
+                {pegState.turn === 'human' ? '▶ Your turn' : '⏳ AI thinking...'}
+              </div>
+              {/* Say Go — shown whenever it's human's turn, disabled if they can still play */}
+              {pegState.turn === 'human' && humanHand.length > 0 && (
+                <button
+                  onClick={humanSayGo}
+                  disabled={humanCanPlay}
+                  title={humanCanPlay ? 'You still have playable cards' : "None of your cards can play without exceeding 31 — say Go!"}
+                  style={{
+                    ...btnStyle(humanCanPlay ? '#1a1a3e' : '#7c3aed', humanCanPlay),
+                    border: humanCanPlay ? '1px solid #333' : 'none',
+                    fontSize: 13, padding: '8px 16px',
+                  }}
+                >
+                  Say Go {!humanCanPlay && '⚠️'}
+                </button>
+              )}
+            </div>
+
+            {/* Play sequence */}
+            <div style={{ marginBottom: 8 }}>
+              <div style={{ fontSize: 10, color: '#555', marginBottom: 4, letterSpacing: 1 }}>PLAY SEQUENCE</div>
+              <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', minHeight: 36 }}>
+                {playSeq.map((p, i) => (
+                  <div key={i} style={{ position: 'relative' }}>
+                    <Card card={p.card} small />
+                    <div style={{ position: 'absolute', top: -5, right: -3, fontSize: 9, fontWeight: 700, color: p.player === 'human' ? '#4dff91' : '#ff4455', background: '#0d1525', borderRadius: 3, padding: '1px 3px' }}>
+                      {p.player === 'human' ? 'Y' : 'A'}
+                    </div>
+                  </div>
+                ))}
+                {playSeq.length === 0 && <span style={{ color: '#444', fontSize: 11, alignSelf: 'center' }}>No cards played yet</span>}
+              </div>
+            </div>
+
+            {/* Human hand */}
+            <div style={{ marginBottom: 8 }}>
+              <div style={{ color: '#a0c0ff', fontSize: 11, marginBottom: 6, letterSpacing: 1 }}>
+                YOUR HAND — click a card to play
+                {pegState.turn === 'human' && !humanCanPlay && humanHand.length > 0 && (
+                  <span style={{ color: '#ff8080', marginLeft: 8 }}>↑ None playable — use "Say Go"</span>
+                )}
+              </div>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', minHeight: 60 }}>
+                {humanHand.map(c => {
+                  const canPlay = pegState.runningTotal + pegCardValue(c) <= 31
+                  return (
+                    <Card
+                      key={c.id} card={c} small
+                      onClick={() => canPlay && pegState.turn === 'human' && playPegCard(c)}
+                      style={{ opacity: canPlay ? 1 : 0.3, cursor: canPlay && pegState.turn === 'human' ? 'pointer' : 'not-allowed' }}
+                    />
+                  )
+                })}
+                {humanHand.length === 0 && <div style={{ color: '#555', fontSize: 12, alignSelf: 'center' }}>All cards played</div>}
+              </div>
+            </div>
+
+            {/* AI hand (face down) */}
+            <div style={{ background: 'rgba(0,0,0,0.2)', borderRadius: 6, padding: '6px 10px', marginBottom: 8 }}>
+              <div style={{ fontSize: 10, color: '#555', marginBottom: 4, letterSpacing: 1 }}>AI HAND ({aiHand.length} remaining)</div>
+              <div style={{ display: 'flex', gap: 4 }}>
+                {aiHand.map((_, i) => <Card key={i} card={{ suit: '♠', rank: 'A' }} faceDown small />)}
+              </div>
+            </div>
+
+            {/* Log */}
+            <div style={{ background: 'rgba(0,0,0,0.25)', borderRadius: 6, padding: 8, maxHeight: 80, overflowY: 'auto' }}>
+              {log.slice(0, 5).map((l, i) => (
+                <div key={i} style={{ color: i === 0 ? '#ffd700' : '#555', fontSize: 11, marginBottom: 2 }}>{l}</div>
+              ))}
+            </div>
+          </div>
+        }
+        right={mathPanel}
+      />
+    )
+  }
+
+  // ── COUNT ──
+  if (phase === 'count') return (
+    <GameLayout
+      left={
+        <div style={{ maxWidth: 560 }}>
+          {tutorialOn && (
+            <div style={{ background: 'rgba(29,111,164,0.15)', border: '1px solid rgba(29,111,164,0.4)', borderRadius: 10, padding: '12px 16px', marginBottom: 16, fontSize: 13, color: '#a0d0ff', lineHeight: 1.6 }}>
+              <strong style={{ color: '#4dd0ff' }}>Tutorial:</strong> {CRIB_TIPS.count}
+            </div>
+          )}
+
+          <div style={{ marginBottom: 14 }}>
+            <div style={{ fontSize: 14, color: '#fff', fontWeight: 700, marginBottom: 6 }}>
+              Counting: <span style={{ color: '#0f9960' }}>
+                {countPhase === 'human_hand' ? 'Your hand' : countPhase === 'ai_hand' ? "AI's hand" : `${dealer === 'human' ? 'Your' : "AI's"} crib`}
+              </span>
+            </div>
+            {starter && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                <div style={{ fontSize: 11, color: '#aaa' }}>STARTER:</div>
+                <Card card={starter} small />
+              </div>
+            )}
+          </div>
+
+          {/* Show the hand being counted */}
+          <div style={{ marginBottom: 14 }}>
+            <div style={{ fontSize: 11, color: '#555', marginBottom: 6, letterSpacing: 1 }}>
+              {countPhase === 'human_hand' ? 'YOUR' : countPhase === 'ai_hand' ? "AI'S" : 'CRIB'} CARDS
+            </div>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              {(countPhase === 'human_hand'
+                ? (humanHand.length > 0 ? humanHand : pegState.humanPlayed)
+                : countPhase === 'ai_hand'
+                ? (aiHand.length > 0 ? aiHand : pegState.aiPlayed)
+                : crib
+              ).map(c => <Card key={c.id} card={c} small />)}
+            </div>
+          </div>
+
+          {!countResult ? (
+            <button onClick={countNext} style={btnStyle('#0f9960')}>Count This Hand</button>
+          ) : (
+            <div>
+              <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: 10, padding: 14, marginBottom: 14 }}>
+                <div style={{ fontSize: 15, fontWeight: 700, color: '#ffe040', marginBottom: 10 }}>
+                  {countResult.who}: {countResult.result.total} pts
+                </div>
+                {countResult.result.breakdown.map((b, i) => (
+                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#a0c0ff', marginBottom: 4 }}>
+                    <span>{b.name}</span>
+                    <span style={{ color: '#4dff91', fontWeight: 700 }}>+{b.points}</span>
+                  </div>
+                ))}
+                {countResult.result.breakdown.length === 0 && (
+                  <div style={{ color: '#555', fontSize: 12 }}>No score</div>
+                )}
+              </div>
+              <button onClick={advanceCount} style={btnStyle('#1d6fa4')}>
+                {countPhase === 'crib' ? 'Next Hand' : 'Next Count'}
+              </button>
+            </div>
+          )}
+
+          <div style={{ marginTop: 14, background: 'rgba(0,0,0,0.3)', borderRadius: 8, padding: 8, maxHeight: 100, overflowY: 'auto' }}>
+            {log.map((l, i) => (
+              <div key={i} style={{ color: i === 0 ? '#ffd700' : '#555', fontSize: 11, marginBottom: 2 }}>{l}</div>
+            ))}
+          </div>
+        </div>
+      }
+      right={mathPanel}
+    />
+  )
+
+  // ── GAME OVER ──
+  if (phase === 'gameover') {
+    const winner = humanScore >= 121 ? 'human' : 'ai'
+    return (
+      <GameLayout
+        left={
+          <div style={{ maxWidth: 480, textAlign: 'center' }}>
+            <div style={{ fontSize: 36, fontWeight: 900, color: winner === 'human' ? '#4dff91' : '#ff4455', marginBottom: 12 }}>
+              {winner === 'human' ? 'You Win!' : 'AI Wins!'}
+            </div>
+            <div style={{ fontSize: 15, color: '#a0c0ff', marginBottom: 24 }}>
+              Final score — You: <strong style={{ color: '#4dff91' }}>{humanScore}</strong> &nbsp; AI: <strong style={{ color: '#ff4455' }}>{aiScore}</strong>
+            </div>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
+              <button onClick={() => {
+                setHumanScore(0); setAiScore(0); setHandNum(1); setDealer('ai'); setPhase('deal')
+              }} style={btnStyle('#0f9960')}>Play Again</button>
+              <button onClick={() => { setHumanScore(0); setAiScore(0); setHandNum(1); setDealer('ai'); setPhase('intro') }} style={btnStyle('#1d6fa4')}>Back to Intro</button>
+            </div>
+          </div>
+        }
+        right={mathPanel}
+      />
+    )
+  }
+
+  return null
+}
+
+// ═══════════════════════════════════════════════
 //  GAME MENU CONFIG
 // ═══════════════════════════════════════════════
 const CARD_GAMES = [
@@ -1759,6 +2784,15 @@ const CARD_GAMES = [
     desc: 'Match cards before the AI. Reaction time chart updates live. See how you compare to human benchmarks.',
     color: '#f39c12',
     component: SnapGame,
+  },
+  {
+    id: 'cribbage',
+    name: 'Cribbage',
+    emoji: '📊',
+    stem: 'Combinatorics & Scoring',
+    desc: 'The classic 2-player card game built on combinatorics — count 15s, pairs, runs, and race to 121 on the board.',
+    color: '#0f9960',
+    component: CribbageGame,
   },
 ]
 
