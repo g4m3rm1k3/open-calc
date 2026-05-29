@@ -56,6 +56,7 @@ import {
 import TICalc from "../calculator/TICalc.jsx";
 import SigmaCalc from "../calculator/SigmaCalc.jsx";
 import PolyCalc from "../calculator/PolyCalc.jsx";
+import LinearAlgebraCalc from "../calculator/LinearAlgebraCalc.jsx";
 import HelpModal from "../ui/HelpModal.jsx";
 import MobileBottomNav from "./MobileBottomNav.jsx";
 import GlobalPythonNotebook from "../ui/GlobalPythonNotebook.jsx";
@@ -279,6 +280,8 @@ function TopBar({
   sigmaOpen,
   onPolyToggle,
   polyOpen,
+  onLAToggle,
+  laOpen,
   onPythonToggle,
   pythonOpen,
   onJsToggle,
@@ -433,6 +436,9 @@ function TopBar({
           </button>
           <button onClick={onPolyToggle} className="p-2 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/30 transition-all font-black text-[10px]" title="Polynomial Solver">
             P(x)
+          </button>
+          <button onClick={onLAToggle} className="p-2 rounded-lg text-sky-500 hover:bg-sky-50 dark:hover:bg-sky-900/30 transition-all font-black text-[10px]" title="Linear Algebra Calculator">
+            [A]
           </button>
         </RibbonGroup>
 
@@ -596,6 +602,7 @@ export default function AppShell({ children }) {
   const [golfOpen, setGolfOpen] = useState(false);
   const [footballOpen, setFootballOpen] = useState(false);
   const [polyOpen, setPolyOpen] = useState(false);
+  const [laOpen, setLAOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const closeAllTools = useCallback(() => {
     setGraphOpen(false);
@@ -605,6 +612,7 @@ export default function AppShell({ children }) {
     setCalcOpen(false);
     setSigmaOpen(false);
     setPolyOpen(false);
+    setLAOpen(false);
     setPythonOpen(false);
     setJsOpen(false);
     setPoolOpen(false);
@@ -742,6 +750,8 @@ export default function AppShell({ children }) {
           sigmaOpen={sigmaOpen}
           onPolyToggle={() => setPolyOpen((prev) => !prev)}
           polyOpen={polyOpen}
+          onLAToggle={() => setLAOpen((prev) => !prev)}
+          laOpen={laOpen}
           onPythonToggle={() => setPythonOpen((prev) => !prev)}
           pythonOpen={pythonOpen}
           onJsToggle={() => setJsOpen((prev) => !prev)}
@@ -1011,6 +1021,7 @@ export default function AppShell({ children }) {
         {calcOpen && <TICalc onClose={() => setCalcOpen(false)} />}
         {sigmaOpen && <SigmaCalc onClose={() => setSigmaOpen(false)} />}
         {polyOpen && <PolyCalc onClose={() => setPolyOpen(false)} />}
+        {laOpen && <LinearAlgebraCalc onClose={() => setLAOpen(false)} />}
         <UtilityPanel />
         <WelcomeModal />
         <SearchModal />
