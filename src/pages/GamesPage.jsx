@@ -5,6 +5,15 @@ import ArcadeMazeBackground from '../components/games/ArcadeMazeBackground.jsx'
 
 const GAMES = [
   {
+    key: 'stem-tetris',
+    label: 'STEM Tetris',
+    emoji: '🟦',
+    color: 'fuchsia',
+    desc: 'Classic Tetris with six STEM lenses — see the board as a matrix, rotations as 2×2 transforms, piece drops as acceleration, and distribution as probability.',
+    path: '/stem-tetris',
+    tags: ['Math', 'CS'],
+  },
+  {
     key: 'card-academy',
     label: 'STEM Card Academy',
     emoji: '🃏',
