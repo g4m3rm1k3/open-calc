@@ -5,6 +5,15 @@ import ArcadeMazeBackground from '../components/games/ArcadeMazeBackground.jsx'
 
 const GAMES = [
   {
+    key: 'rubiks-cube',
+    label: "Rubik's Cube",
+    emoji: '🎲',
+    color: 'emerald',
+    desc: "Explore group theory, permutations, and non-commutativity through the world's most famous puzzle.",
+    path: '/rubiks-cube',
+    tags: ['Group Theory', 'Linear Algebra'],
+  },
+  {
     key: 'stem-tetris',
     label: 'STEM Tetris',
     emoji: '🟦',
