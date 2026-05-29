@@ -718,7 +718,7 @@ export default function ArkanoidLearn() {
             <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4 lg:self-start">
               <button
                 type="button"
-                onClick={() => navigate("/")}
+                onClick={() => navigate("/games")}
                 className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-900/70 px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:border-slate-500 hover:bg-slate-900"
               >
                 <X className="h-4 w-4" />

@@ -1115,7 +1115,7 @@ export default function RealityRunner() {
     <div style={{ display: "flex", height: "100vh", background: C.bg, color: C.text, fontFamily: "monospace" }}>
       {/* Sidebar */}
       <div style={{ width: 220, background: C.panel, borderRight: `1px solid ${C.border}`, padding: "14px 12px", display: "flex", flexDirection: "column", gap: 10, overflowY: "auto", flexShrink: 0 }}>
-        <button onClick={() => navigate(-1)} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "none", color: C.sub, cursor: "pointer", fontSize: 13, padding: 0, marginBottom: 4 }}>
+        <button onClick={() => navigate("/games")} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "none", color: C.sub, cursor: "pointer", fontSize: 13, padding: 0, marginBottom: 4 }}>
           <ArrowLeft size={14} /> Back
         </button>
 

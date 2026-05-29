@@ -7101,7 +7101,7 @@ export default function OpenMatStudio() {
           </OpenMatTooltip>
           <button
             type="button"
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/labs")}
             className="inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-xs font-semibold"
             style={{ borderColor: C.border, background: C.surface, color: C.text }}
             title="Close OpenMAT"

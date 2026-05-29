@@ -217,39 +217,29 @@ function ChatToggleButton({ onClick, isOpen }) {
   )
 }
 
-function CoursesDropdown({ isExpanded = true }) {
+function CoursesDropdown() {
   return (
-    <NavLink 
+    <NavLink
       to="/courses"
-      className={({ isActive }) => 
-        `p-2.5 rounded-xl transition-all duration-300 flex items-center gap-2 ${
-          isActive 
-            ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' 
-            : 'text-slate-500 hover:bg-white/50 dark:hover:bg-white/5'
+      className={({ isActive }) =>
+        `p-2 rounded-lg transition-all flex items-center ${
+          isActive
+            ? 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700 shadow'
+            : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
         }`
       }
-      title="Course Catalog"
+      title="Courses"
+      aria-label="Courses"
     >
       <BookOpen className="w-5 h-5" />
-      {isExpanded && (
-        <span className="text-sm font-bold tracking-tight animate-in fade-in slide-in-from-left-2 duration-500">
-          Courses
-        </span>
-      )}
     </NavLink>
   );
 }
 
-function RibbonGroup({ title, children }) {
-  // Horizontal group of icons, perfectly vertically centered in navbar
+function RibbonGroup({ children }) {
   return (
-    <div className="group/ribbon flex flex-col items-center justify-center h-full px-2 sm:px-3 border-r border-white/5 last:border-none mb-1 transition-all duration-500">
-      <div className="flex flex-row items-center justify-center h-full gap-1.5">
-        {children}
-      </div>
-      <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 opacity-0 group-hover/nav:opacity-100 group-focus-within/nav:opacity-100 transition-opacity pt-1 animate-in fade-in slide-in-from-top-1 duration-500">
-        {title}
-      </span>
+    <div className="flex items-center gap-1.5 px-2 sm:px-3 border-r border-white/5 last:border-none h-full">
+      {children}
     </div>
   );
 }
@@ -293,8 +283,7 @@ function TopBar({
   onBgPickerToggle,
   dark,
   toggleDark,
-  isExpanded,
-  onToggleExpanded
+
 }) {
   const { openSearch } = useSearchContext();
   const {
@@ -319,9 +308,8 @@ function TopBar({
     return () => document.removeEventListener("mousedown", handler);
   }, [gamesMenuOpen]);
 
-  // Compact nav: icon-only by default, expands on hover/focus
   return (
-    <header className="fixed top-0 left-0 right-0 z-[100] bg-white/70 dark:bg-slate-950/60 backdrop-blur-3xl border-b border-white/10 flex items-center px-2 sm:px-6 shadow-[0_20px_50px_rgba(0,0,0,0.05)] transition-all duration-500 ease-in-out h-14 hover:h-24 focus-within:h-24 group/nav overflow-x-auto overflow-y-hidden">
+    <header className="fixed top-0 left-0 right-0 z-[100] bg-white/70 dark:bg-slate-950/60 backdrop-blur-3xl border-b border-white/10 flex items-center px-2 sm:px-6 shadow-[0_20px_50px_rgba(0,0,0,0.05)] h-14 overflow-x-auto overflow-y-hidden">
       {/* 1. BRANDING & SEARCH - Crystalline Module */}
       <div className="flex items-center gap-2 border-r border-white/10 pr-4 h-10">
         <Link to="/" className="relative group">
@@ -330,56 +318,39 @@ function TopBar({
           </span>
           <div className="absolute inset-0 bg-indigo-500/20 blur-md rounded-full -z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
         </Link>
-        <button 
-          onClick={openSearch} 
-          className="flex items-center gap-2 p-2 rounded-lg bg-indigo-500/10 text-indigo-500 hover:bg-indigo-500 hover:text-white shadow-sm transition-all duration-300"
-          title="Search Archive"
+        <button
+          onClick={openSearch}
+          className="p-2 rounded-lg bg-indigo-500/10 text-indigo-500 hover:bg-indigo-500 hover:text-white shadow-sm transition-all duration-300"
+          title="Search"
         >
           <Search className="w-4 h-4" />
-          <span className="hidden group-hover/nav:inline text-xs font-bold tracking-tight ml-1 transition-all duration-300">ARCHIVE</span>
         </button>
       </div>
 
       {/* 2. THE EXPANDED GRID RIBBON */}
-      <nav className="flex-1 flex flex-row gap-2 px-2 h-full items-center justify-start overflow-x-auto overflow-y-hidden whitespace-nowrap group/nav transition-all duration-500">
+      <nav className="flex-1 flex flex-row h-full items-center justify-start overflow-x-auto overflow-y-hidden whitespace-nowrap">
         {/* NAV BAY — mode switchers */}
-        <RibbonGroup title="Navigate">
+        <RibbonGroup>
           <CoursesDropdown />
-          <div className="flex flex-col items-center justify-center h-full">
-            <NavLink to="/games" className={({ isActive }) => `flex flex-col items-center justify-center h-full p-2 rounded-lg transition-all ${isActive ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`} style={{height: '100%'}} aria-label="Games">
-              <Gamepad2 className="w-5 h-5" />
-              <span className="text-xs font-semibold mt-1 transition-all duration-300 opacity-0 group-hover/nav:opacity-100 group-focus-within/nav:opacity-100 max-h-0 group-hover/nav:max-h-6 group-focus-within/nav:max-h-6 overflow-hidden">Games</span>
-            </NavLink>
-          </div>
-          <div className="flex flex-col items-center justify-center h-full">
-            <NavLink to="/labs" className={({ isActive }) => `flex flex-col items-center justify-center h-full p-2 rounded-lg transition-all ${isActive ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`} style={{height: '100%'}} aria-label="Labs">
-              <FlaskConical className="w-5 h-5" />
-              <span className="text-xs font-semibold mt-1 transition-all duration-300 opacity-0 group-hover/nav:opacity-100 group-focus-within/nav:opacity-100 max-h-0 group-hover/nav:max-h-6 group-focus-within/nav:max-h-6 overflow-hidden">Labs</span>
-            </NavLink>
-          </div>
-          <div className="flex flex-col items-center justify-center h-full">
-            <NavLink to="/reference" className={({ isActive }) => `flex flex-col items-center justify-center h-full p-2 rounded-lg transition-all ${isActive ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`} style={{height: '100%'}} aria-label="Reference Library">
-              <Library className="w-5 h-5" />
-              <span className="text-xs font-semibold mt-1 transition-all duration-300 opacity-0 group-hover/nav:opacity-100 group-focus-within/nav:opacity-100 max-h-0 group-hover/nav:max-h-6 group-focus-within/nav:max-h-6 overflow-hidden">Reference</span>
-            </NavLink>
-          </div>
-          <div className="flex flex-col items-center justify-center h-full">
-            <NavLink to="/docs" className={({ isActive }) => `flex flex-col items-center justify-center h-full p-2 rounded-lg transition-all ${isActive ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`} style={{height: '100%'}} aria-label="Technical Docs">
-              <FileText className="w-5 h-5" />
-              <span className="text-xs font-semibold mt-1 transition-all duration-300 opacity-0 group-hover/nav:opacity-100 group-focus-within/nav:opacity-100 max-h-0 group-hover/nav:max-h-6 group-focus-within/nav:max-h-6 overflow-hidden">Docs</span>
-            </NavLink>
-          </div>
-          <button
-            onClick={onHelpToggle}
-            className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
-            title="Help"
-          >
+          <NavLink to="/games" title="Games" aria-label="Games" className={({ isActive }) => `p-2 rounded-lg transition-all ${isActive ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`}>
+            <Gamepad2 className="w-5 h-5" />
+          </NavLink>
+          <NavLink to="/labs" title="Labs" aria-label="Labs" className={({ isActive }) => `p-2 rounded-lg transition-all ${isActive ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`}>
+            <FlaskConical className="w-5 h-5" />
+          </NavLink>
+          <NavLink to="/reference" title="Reference" aria-label="Reference Library" className={({ isActive }) => `p-2 rounded-lg transition-all ${isActive ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`}>
+            <Library className="w-5 h-5" />
+          </NavLink>
+          <NavLink to="/docs" title="Docs" aria-label="Technical Docs" className={({ isActive }) => `p-2 rounded-lg transition-all ${isActive ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`}>
+            <FileText className="w-5 h-5" />
+          </NavLink>
+          <button onClick={onHelpToggle} className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" title="Help">
             <HelpCircle className="w-5 h-5" />
           </button>
         </RibbonGroup>
 
         {/* MATH BAY */}
-        <RibbonGroup title="Analysis">
+        <RibbonGroup>
           <button onClick={onGraphToggle} className="p-2 rounded-lg text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all" title="2D Grapher">
             <Activity className="w-5 h-5" />
           </button>
@@ -405,7 +376,7 @@ function TopBar({
         </RibbonGroup>
 
         {/* ENGINES BAY */}
-        <RibbonGroup title="Development">
+        <RibbonGroup>
           <button onClick={onScratchToggle} className="p-2 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/30 transition-all" title="Scratchpad">
             <PenLine className="w-5 h-5" />
           </button>
@@ -502,7 +473,6 @@ export default function AppShell({ children }) {
   const isStemQuestRoute = location.pathname.startsWith("/stem-quest");
   const isDocsRoute = location.pathname.startsWith("/docs");
   
-  const [ribbonExpanded, setRibbonExpanded] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarPinned, setSidebarPinned] = useState(() => {
     const saved = localStorage.getItem("oc-sidebar-pinned");
@@ -686,9 +656,7 @@ export default function AppShell({ children }) {
       <div className="min-h-screen transition-colors duration-500 relative overflow-hidden">
         <DynamicBackground mode={dark ? "dark" : "light"} config={bgConfig} />
         <TopBar
-          isExpanded={ribbonExpanded}
-          onToggleExpanded={() => setRibbonExpanded(!ribbonExpanded)}
-          onMenuToggle={() => setSidebarOpen((o) => !o)}
+onMenuToggle={() => setSidebarOpen((o) => !o)}
           sidebarOpen={sidebarOpen}
           onGraphToggle={() => setGraphOpen((prev) => !prev)}
           onGraph3DToggle={() => setGraph3DOpen((prev) => !prev)}
@@ -754,7 +722,7 @@ export default function AppShell({ children }) {
           onMouseEnter={() => !sidebarPinned && setSidebarHovered(true)}
           onMouseLeave={() => setSidebarHovered(false)}
           className={`fixed left-0 bottom-0 z-50 bg-[var(--color-surface)] backdrop-blur-xl border-r border-[var(--color-border)] transition-all duration-500 ease-in-out w-[280px]
-          ${ribbonExpanded ? "top-14" : "top-[50px]"}
+          top-14
           ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
           ${isSidebarExpanded ? "lg:translate-x-0" : "lg:-translate-x-[276px]"}
           ${!sidebarPinned && isSidebarExpanded ? "shadow-2xl ring-1 ring-black/5 dark:ring-white/5" : ""}
@@ -776,7 +744,7 @@ export default function AppShell({ children }) {
 
         {/* Main content */}
         <main
-          className={`transition-[padding] duration-500 ease-in-out pb-20 lg:pb-0 ${(isChemistryRoute || isOpenMatRoute) ? "h-screen overflow-hidden" : "min-h-screen"} ${sidebarPinned ? "lg:pl-[280px]" : "lg:pl-3"} ${chatOpen ? "lg:pr-[400px]" : "lg:pr-0"} ${ribbonExpanded ? "pt-14" : "pt-[50px]"}`}
+          className={`transition-[padding] duration-500 ease-in-out pb-20 lg:pb-0 ${(isChemistryRoute || isOpenMatRoute) ? "h-screen overflow-hidden" : "min-h-screen"} ${sidebarPinned ? "lg:pl-[280px]" : "lg:pl-3"} ${chatOpen ? "lg:pr-[400px]" : "lg:pr-0"} pt-14`}
         >
           <div
             className={

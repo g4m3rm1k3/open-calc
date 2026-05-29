@@ -1404,7 +1404,7 @@ export default function StemQuest() {
   }, []);
 
   const handleCloseGame = useCallback(() => {
-    navigate("/");
+    navigate("/games");
   }, [navigate]);
 
   const handleReturnHome = useCallback(() => {

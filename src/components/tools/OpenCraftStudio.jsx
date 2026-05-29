@@ -939,7 +939,7 @@ export default function OpenCraftStudio() {
     if (document.pointerLockElement) {
       document.exitPointerLock?.();
     }
-    navigate("/");
+    navigate("/games");
   }, [navigate]);
 
   useEffect(() => {
