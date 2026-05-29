@@ -7,9 +7,9 @@ const ROWS = 20
 // Compute cell size from viewport once at module load
 const CELL = (() => {
   if (typeof window === 'undefined') return 36
-  const byH = Math.floor((window.innerHeight - 170) / ROWS)  // leave room for header + padding
+  const byH = Math.floor((window.innerHeight - 90) / ROWS)   // full-screen: only header ~70px
   const byW = Math.floor((window.innerWidth  - 420) / COLS)  // left panel(120) + right panel(240) + gaps
-  return Math.max(28, Math.min(byH, byW, 48))
+  return Math.max(28, Math.min(byH, byW, 66))
 })()
 
 const W = COLS * CELL
@@ -385,7 +385,8 @@ function StemPanel({ mode, piece, board, pieceCount, level, lines, combo, rotati
   const bump = heights.reduce((acc, h, i) => acc + (i > 0 ? Math.abs(h - heights[i-1]) : 0), 0)
   const avgH = Math.round(heights.reduce((a, b) => a + b, 0) / COLS)
 
-  const panelStyle = { width: 240, minWidth: 240, background: '#060c14', border: '1px solid #1a3040', padding: 14, display: 'flex', flexDirection: 'column', gap: 10, fontFamily: 'monospace', fontSize: 12, overflowY: 'auto' }
+  const panelW = Math.max(240, Math.min(320, Math.round(CELL * 5.5)))
+  const panelStyle = { width: panelW, minWidth: panelW, background: '#060c14', border: '1px solid #1a3040', padding: 14, display: 'flex', flexDirection: 'column', gap: 10, fontFamily: 'monospace', fontSize: 12, overflowY: 'auto' }
   const hdStyle = { fontSize: 8, letterSpacing: 3, color: '#2a5570', marginBottom: 3, textTransform: 'uppercase' }
   const codeBox = (c) => ({ margin: '6px 0', padding: '6px 8px', background: '#0a1520', border: '1px solid #1a3a40', fontSize: 10, color: c || '#44ff88', lineHeight: 1.7 })
 
@@ -754,7 +755,7 @@ export default function StemTetris({ defaultMode = 'NORMAL', autoStart = false }
   const modeObj = STEM_MODES.find(m => m.id === mode)
 
   return (
-    <div style={{ display: 'inline-flex', flexDirection: 'column', gap: 10, fontFamily: 'monospace', color: '#c8e0f0' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontFamily: 'monospace', color: '#c8e0f0', width: '100%', padding: '0 24px', boxSizing: 'border-box' }}>
       <style>{`
         @keyframes flashIn { from { opacity:0; transform:scale(0.95) } to { opacity:1; transform:scale(1) } }
       `}</style>
@@ -782,7 +783,7 @@ export default function StemTetris({ defaultMode = 'NORMAL', autoStart = false }
       </div>
 
       {/* ── Main layout ── */}
-      <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+      <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', justifyContent: 'space-around' }}>
 
         {/* Left stats */}
         <div style={{ width: 115, display: 'flex', flexDirection: 'column', gap: 7 }}>

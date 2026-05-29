@@ -472,6 +472,9 @@ export default function AppShell({ children }) {
   const isRealityRunnerRoute = location.pathname.startsWith("/reality-runner");
   const isStemQuestRoute = location.pathname.startsWith("/stem-quest");
   const isDocsRoute = location.pathname.startsWith("/docs");
+  const isAsteroidsRoute = location.pathname.startsWith("/asteroids-la");
+  const isStemTetrisRoute = location.pathname.startsWith("/stem-tetris");
+  const isCardAcademyRoute = location.pathname.startsWith("/card-academy");
   
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarPinned, setSidebarPinned] = useState(() => {
@@ -612,10 +615,10 @@ export default function AppShell({ children }) {
     return () => window.removeEventListener("oc-open-game", handler);
   }, []);
 
-  if (isOpenMatRoute || isArkanoidLearnRoute || isRealityRunnerRoute || isCNCSimRoute || isCadProRoute || isOpenCraftRoute || isStemQuestRoute || isDocsRoute) {
+  if (isOpenMatRoute || isArkanoidLearnRoute || isRealityRunnerRoute || isCNCSimRoute || isCadProRoute || isOpenCraftRoute || isStemQuestRoute || isDocsRoute || isAsteroidsRoute || isStemTetrisRoute || isCardAcademyRoute) {
     return (
       <GrapherContext.Provider value={{ openGrapher }}>
-        <div className={`h-screen overflow-hidden ${(isArkanoidLearnRoute || isRealityRunnerRoute || isCadProRoute || isOpenCraftRoute || isStemQuestRoute) ? "bg-[#08111f]" : "bg-white dark:bg-slate-950"}`}>
+        <div className={`h-screen overflow-hidden ${(isArkanoidLearnRoute || isRealityRunnerRoute || isCadProRoute || isOpenCraftRoute || isStemQuestRoute || isAsteroidsRoute || isStemTetrisRoute || isCardAcademyRoute) ? "bg-[#08111f]" : "bg-white dark:bg-slate-950"}`}>
           <div className="h-full w-full overflow-hidden">
             {children ?? <Outlet />}
           </div>

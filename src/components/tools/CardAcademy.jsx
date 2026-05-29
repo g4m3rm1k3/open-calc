@@ -782,7 +782,7 @@ export default function CardAcademy() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(160deg, #0a0a1e 0%, #0f1635 50%, #0a0a1e 100%)',
+      background: 'transparent',
       fontFamily: "'Segoe UI', system-ui, sans-serif",
       color: '#e0e0ff',
     }}>
