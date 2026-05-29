@@ -1,43 +1,43 @@
-﻿export default {
-  // â”€â”€ Identity â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+export default {
+  // ── Identity ───────────────────────────────────────────────────
   id: 'la4-003',
   slug: 'least-squares',
   chapter: 'la4',
   order: 3,
   title: 'Least Squares',
-  subtitle: 'When the exact answer does not exist, find the best approximate answer â€” the foundation of data fitting and linear regression.',
+  subtitle: 'When the exact answer does not exist, find the best approximate answer — the foundation of data fitting and linear regression.',
   tags: ['least squares', 'normal equations', 'overdetermined system', 'linear regression', 'projection', 'best approximation', 'curve fitting'],
   aliases: 'least squares regression best fit line normal equations overdetermined inconsistent approximate solution data fitting',
 
-  // â”€â”€ Hook â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Hook ──────────────────────────────────────────────────────
   hook: {
-    question: "You have 100 data points and want to fit a line through them â€” but no line passes through all 100 exactly. What does 'the best line' even mean, and how do you find it?",
-    realWorldContext: "Least squares is one of the most widely used ideas in all of applied mathematics. It is the engine behind linear regression in statistics, GPS position estimation, computer vision, signal processing, and machine learning. Any time you have more constraints than unknowns â€” more data than parameters â€” and want the 'best fit,' you are solving a least squares problem. Carl Friedrich Gauss used it in 1801 to predict the orbit of the asteroid Ceres from just a handful of observations. Scientists still use the same idea today.",
+    question: "You have 100 data points and want to fit a line through them — but no line passes through all 100 exactly. What does 'the best line' even mean, and how do you find it?",
+    realWorldContext: "Least squares is one of the most widely used ideas in all of applied mathematics. It is the engine behind linear regression in statistics, GPS position estimation, computer vision, signal processing, and machine learning. Any time you have more constraints than unknowns — more data than parameters — and want the 'best fit,' you are solving a least squares problem. Carl Friedrich Gauss used it in 1801 to predict the orbit of the asteroid Ceres from just a handful of observations. Scientists still use the same idea today.",
     previewVisualizationId: 'LeastSquaresFit',
   },
 
-  // â”€â”€ Intuition â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Intuition ──────────────────────────────────────────────────
   intuition: {
     prose: [
-      'Three data points $(0,1),(1,2),(2,4)$. Set up $A\\mathbf{x} \\approx \\mathbf{b}$: $A = \\begin{bmatrix}0&1\\\\1&1\\\\2&1\\end{bmatrix}$, $\\mathbf{b} = [1,2,4]^\\top$ (columns are $x$-values and 1s). No line passes through all three points exactly â€” the system is overdetermined. Normal equations: $A^TA\\hat{\\mathbf{x}} = A^T\\mathbf{b}$ gives $\\begin{bmatrix}5&3\\\\3&3\\end{bmatrix}\\hat{\\mathbf{x}} = \\begin{bmatrix}10\\\\7\\end{bmatrix}$, solution $\\hat{\\mathbf{x}} = [3/2,\\, 5/6]^\\top$ â€” slope $3/2$, intercept $5/6$. This minimizes the sum of squared vertical distances from the line to the points.',
+      'Three data points $(0,1),(1,2),(2,4)$. Set up $A\\mathbf{x} \\approx \\mathbf{b}$: $A = \\begin{bmatrix}0&1\\\\1&1\\\\2&1\\end{bmatrix}$, $\\mathbf{b} = [1,2,4]^\\top$ (columns are $x$-values and 1s). No line passes through all three points exactly — the system is overdetermined. Normal equations: $A^TA\\hat{\\mathbf{x}} = A^T\\mathbf{b}$ gives $\\begin{bmatrix}5&3\\\\3&3\\end{bmatrix}\\hat{\\mathbf{x}} = \\begin{bmatrix}10\\\\7\\end{bmatrix}$, solution $\\hat{\\mathbf{x}} = [3/2,\\, 5/6]^\\top$ — slope $3/2$, intercept $5/6$. This minimizes the sum of squared vertical distances from the line to the points.',
       'When you have more equations than unknowns, the system is called **overdetermined**. Think of fitting a line to 100 data points: you have 100 equations ($y_i = ax_i + b$) but only 2 unknowns ($a$ and $b$). Almost certainly, no single line passes through all 100 points. The system has no solution.',
-      '**The geometric picture.** The target vector $\\mathbf{b}$ (your data) does not lie in the column space of $A$. No matter what $\\mathbf{x}$ you pick, $A\\mathbf{x}$ can only reach points in the column space. The best you can do is get as close as possible â€” meaning: find the point $A\\hat{\\mathbf{x}}$ in the column space that is closest to $\\mathbf{b}$. That closest point is the orthogonal projection of $\\mathbf{b}$ onto the column space.',
-      'The error vector $\\mathbf{e} = \\mathbf{b} - A\\hat{\\mathbf{x}}$ is the residual â€” the gap between your best approximation and the actual target. The least squares solution minimizes $\\|\\mathbf{e}\\|^2$ (the sum of squared errors), which is where the name comes from.',
-      '**The key insight.** The residual $\\mathbf{e}$ is perpendicular to every column of $A$. This is not a coincidence â€” it is the defining property of orthogonal projection. The residual points in the direction you cannot reach, which is exactly perpendicular to the column space.',
+      '**The geometric picture.** The target vector $\\mathbf{b}$ (your data) does not lie in the column space of $A$. No matter what $\\mathbf{x}$ you pick, $A\\mathbf{x}$ can only reach points in the column space. The best you can do is get as close as possible — meaning: find the point $A\\hat{\\mathbf{x}}$ in the column space that is closest to $\\mathbf{b}$. That closest point is the orthogonal projection of $\\mathbf{b}$ onto the column space.',
+      'The error vector $\\mathbf{e} = \\mathbf{b} - A\\hat{\\mathbf{x}}$ is the residual — the gap between your best approximation and the actual target. The least squares solution minimizes $\\|\\mathbf{e}\\|^2$ (the sum of squared errors), which is where the name comes from.',
+      '**The key insight.** The residual $\\mathbf{e}$ is perpendicular to every column of $A$. This is not a coincidence — it is the defining property of orthogonal projection. The residual points in the direction you cannot reach, which is exactly perpendicular to the column space.',
       'Saying "$\\mathbf{e}$ is perpendicular to every column of $A$" is the same as saying $A^T\\mathbf{e} = \\mathbf{0}$. Substituting $\\mathbf{e} = \\mathbf{b} - A\\hat{\\mathbf{x}}$ gives the famous **normal equations**: $A^TA\\hat{\\mathbf{x}} = A^T\\mathbf{b}$.',
-      '**CNC workpiece probing â€” fitting a plane to touch-probe data.** A touch probe on a CNC machine measures the surface of a raw workpiece at multiple points before machining. Each probe touch gives one point $(x_i, y_i, z_i)$ on the surface. To establish the workpiece datum, the controller needs the equation of the best-fit plane: $z = ax + by + c$. With 5 or more probe touches, you have 5 equations in 3 unknowns ($a$, $b$, $c$) â€” an overdetermined system. Least squares finds the best-fit plane that minimizes the sum of squared deviations of probe points from the plane. This is exactly the normal equations with $A = [x_i, y_i, 1]$ rows and $\\mathbf{b} = [z_i]$. The result: a datum that best represents the actual workpiece surface despite measurement noise.',
-      '**Where this is heading:** The least squares solution is the workhorse of data science. When you learn about the SVD in the next lesson, you will see an even deeper way to compute it â€” using the pseudoinverse â€” that works even when $A^TA$ is not invertible.',
+      '**CNC workpiece probing — fitting a plane to touch-probe data.** A touch probe on a CNC machine measures the surface of a raw workpiece at multiple points before machining. Each probe touch gives one point $(x_i, y_i, z_i)$ on the surface. To establish the workpiece datum, the controller needs the equation of the best-fit plane: $z = ax + by + c$. With 5 or more probe touches, you have 5 equations in 3 unknowns ($a$, $b$, $c$) — an overdetermined system. Least squares finds the best-fit plane that minimizes the sum of squared deviations of probe points from the plane. This is exactly the normal equations with $A = [x_i, y_i, 1]$ rows and $\\mathbf{b} = [z_i]$. The result: a datum that best represents the actual workpiece surface despite measurement noise.',
+      '**Where this is heading:** The least squares solution is the workhorse of data science. When you learn about the SVD in the next lesson, you will see an even deeper way to compute it — using the pseudoinverse — that works even when $A^TA$ is not invertible.',
     ],
     callouts: [
       {
         type: 'sequencing',
-        title: 'Lesson 3 of 9 â€” Orthogonality & SVD',
-        body: '**Previous (Lesson 2):** Gram-Schmidt â€” building an orthonormal basis from any basis.\n**This lesson:** Least Squares â€” finding the best approximate solution to an overdetermined system, using projection onto the column space.\n**Next (Lesson 4):** SVD â€” the ultimate factorization that gives the deepest view of least squares and much more.',
+        title: 'Lesson 3 of 9 — Orthogonality & SVD',
+        body: '**Previous (Lesson 2):** Gram-Schmidt — building an orthonormal basis from any basis.\n**This lesson:** Least Squares — finding the best approximate solution to an overdetermined system, using projection onto the column space.\n**Next (Lesson 4):** SVD — the ultimate factorization that gives the deepest view of least squares and much more.',
       },
       {
         type: 'insight',
         title: 'Why "Least Squares"?',
-        body: 'We minimize $\\|\\mathbf{b} - A\\mathbf{x}\\|^2 = \\sum_i (b_i - \\text{row}_i(A) \\cdot \\mathbf{x})^2$ â€” the sum of the squared residuals. Squaring makes all errors positive and penalizes large errors more heavily. The solution that minimizes this sum is the least squares solution.',
+        body: 'We minimize $\\|\\mathbf{b} - A\\mathbf{x}\\|^2 = \\sum_i (b_i - \\text{row}_i(A) \\cdot \\mathbf{x})^2$ — the sum of the squared residuals. Squaring makes all errors positive and penalizes large errors more heavily. The solution that minimizes this sum is the least squares solution.',
       },
       {
         type: 'insight',
@@ -52,7 +52,7 @@
       {
         type: 'insight',
         title: 'Prediction',
-        body: 'You have 4 data points $(1,2),(2,3),(3,5),(4,6)$ and want the best-fit line $y = ax + b$. Before computing: will the residual be zero or non-zero? Is $\\mathbf{b}$ in $\\text{col}(A)$? Predict the slope â€” is it closer to 1 or to 2? Then set up $A$ and $A^T A$ and solve.',
+        body: 'You have 4 data points $(1,2),(2,3),(3,5),(4,6)$ and want the best-fit line $y = ax + b$. Before computing: will the residual be zero or non-zero? Is $\\mathbf{b}$ in $\\text{col}(A)$? Predict the slope — is it closer to 1 or to 2? Then set up $A$ and $A^T A$ and solve.',
       },
       {
         type: 'warning',
@@ -64,13 +64,13 @@
       {
         id: 'LeastSquaresFit',
         title: 'Best-Fit Line: Minimizing Squared Residuals',
-        mathBridge: 'The visualization shows scattered data points and a adjustable line. Drag the line\'s slope and intercept. Watch the vertical red segments (residuals) update in real time. The squared residuals are shown as red squares on the right. The least squares solution (the best fit line) minimizes the total area of those red squares. Notice that no line eliminates the residuals â€” the best fit line makes them as small as possible.',
+        mathBridge: 'The visualization shows scattered data points and a adjustable line. Drag the line\'s slope and intercept. Watch the vertical red segments (residuals) update in real time. The squared residuals are shown as red squares on the right. The least squares solution (the best fit line) minimizes the total area of those red squares. Notice that no line eliminates the residuals — the best fit line makes them as small as possible.',
         caption: 'Least squares = minimize the total area of the squared residuals.',
       },
     ],
   },
 
-  // â”€â”€ Math â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Math ───────────────────────────────────────────────────────
   math: {
     prose: [
       'Given an overdetermined system $A\\mathbf{x} \\approx \\mathbf{b}$ (where $A$ is $m \\times n$ with $m > n$), the **least squares solution** $\\hat{\\mathbf{x}}$ minimizes:\n\n$\\|\\mathbf{b} - A\\mathbf{x}\\|^2 = \\sum_{i=1}^m (b_i - [A\\mathbf{x}]_i)^2$',
@@ -88,25 +88,25 @@
       {
         type: 'definition',
         title: 'Projection Matrix',
-        body: 'P = A(A^T A)^{-1}A^T\n\nâ€¢ $P\\mathbf{b}$ = orthogonal projection of $\\mathbf{b}$ onto $\\text{col}(A)$\nâ€¢ $P^2 = P$ (projecting twice = projecting once)\nâ€¢ $P^T = P$ (projection is symmetric)',
+        body: 'P = A(A^T A)^{-1}A^T\n\n• $P\\mathbf{b}$ = orthogonal projection of $\\mathbf{b}$ onto $\\text{col}(A)$\n• $P^2 = P$ (projecting twice = projecting once)\n• $P^T = P$ (projection is symmetric)',
       },
       {
         type: 'insight',
         title: 'QR Makes It Faster',
-        body: 'With $A = QR$: $\\hat{\\mathbf{x}} = (A^TA)^{-1}A^T\\mathbf{b} = (R^TQ^TQR)^{-1}R^TQ^T\\mathbf{b} = R^{-1}Q^T\\mathbf{b}$.\n\nThis is a simple triangular system â€” much faster and more stable than forming $A^TA$.',
+        body: 'With $A = QR$: $\\hat{\\mathbf{x}} = (A^TA)^{-1}A^T\\mathbf{b} = (R^TQ^TQR)^{-1}R^TQ^T\\mathbf{b} = R^{-1}Q^T\\mathbf{b}$.\n\nThis is a simple triangular system — much faster and more stable than forming $A^TA$.',
       },
     ],
     visualizations: [
       {
         id: 'OpenMatNotebook',
-        title: 'OpenMAT: Least Squares â€” Normal Equations and CNC Plane Fitting',
-        mathBridge: 'MATLAB: `A \\ b` solves the least squares problem directly (backslash). Or: `(A\'*A) \\ (A\'*b)` via normal equations. `\\` is the recommended tool â€” it uses QR decomposition internally.',
+        title: 'OpenMAT: Least Squares — Normal Equations and CNC Plane Fitting',
+        mathBridge: 'MATLAB: `A \\ b` solves the least squares problem directly (backslash). Or: `(A\'*A) \\ (A\'*b)` via normal equations. `\\` is the recommended tool — it uses QR decomposition internally.',
         caption: 'Three cells: overdetermined system, linear regression, and CNC probe plane fitting.',
         initialProps: {
           initialCells: [
             {
               id: 1,
-              cellTitle: 'Solving overdetermined systems â€” normal equations vs backslash',
+              cellTitle: 'Solving overdetermined systems — normal equations vs backslash',
               prose: [
                 'For A*x = b with more rows than columns (overdetermined), `x = A \\ b` gives the least squares solution automatically.',
                 'Manually: solve (A\'*A)*x_hat = A\'*b. Verify by checking A\'*(b - A*x_hat) â‰ˆ 0 (residual perpendicular to col(A)).',
@@ -131,10 +131,10 @@ fprintf('A''*e (should be 0): [%.2e; %.2e]\\n', A'*e)`,
             },
             {
               id: 2,
-              cellTitle: 'Linear regression â€” best-fit line via least squares',
+              cellTitle: 'Linear regression — best-fit line via least squares',
               prose: [
                 'Fitting y = ax + b to data: build A = [x, 1] and solve A \\ y.',
-                'The residual norm â€–eâ€– measures fit quality. Smaller = better fit.',
+                'The residual norm –e– measures fit quality. Smaller = better fit.',
               ],
               code: `% Study hours vs exam score
 x_data = [2; 4; 5; 7; 9; 10; 12];
@@ -154,7 +154,7 @@ fprintf('R^2: %.6f\\n', 1 - var(residuals)/var(y_data))`,
             },
             {
               id: 3,
-              cellTitle: 'CNC workpiece plane fitting â€” least squares from probe data',
+              cellTitle: 'CNC workpiece plane fitting — least squares from probe data',
               prose: [
                 'A touch probe measures surface points (x_i, y_i, z_i). Fit z = ax + by + c using least squares with A = [x, y, 1].',
                 'The residuals represent surface deviation from a perfect plane (waviness, tilt, etc.).',
@@ -196,13 +196,13 @@ fprintf('RMS surface deviation: %.6f mm\\n', rms(residuals))`,
       {
         id: 'LeastSquaresProjectionViz',
         title: 'Projection onto the Column Space',
-        mathBridge: 'The visualization shows $\\mathbf{b}$ as a vector NOT in the column space of $A$ (a 2D plane in 3D). The blue vector is the projection $A\\hat{\\mathbf{x}}$ â€” the closest point in the column space. The red vector is the residual $\\mathbf{e} = \\mathbf{b} - A\\hat{\\mathbf{x}}$. Confirm that the red vector is perpendicular to the blue plane. Drag $\\mathbf{b}$ â€” watch the projection update.',
+        mathBridge: 'The visualization shows $\\mathbf{b}$ as a vector NOT in the column space of $A$ (a 2D plane in 3D). The blue vector is the projection $A\\hat{\\mathbf{x}}$ — the closest point in the column space. The red vector is the residual $\\mathbf{e} = \\mathbf{b} - A\\hat{\\mathbf{x}}$. Confirm that the red vector is perpendicular to the blue plane. Drag $\\mathbf{b}$ — watch the projection update.',
         caption: 'Least squares = project b onto the column space of A.',
       },
       {
         id: 'PythonNotebook',
         title: 'Code: Least Squares and Linear Regression',
-        mathBridge: 'np.linalg.lstsq(A, b) solves the normal equations. xÌ‚ = (Aáµ€A)â»Â¹Aáµ€b. Residual = b âˆ’ AxÌ‚. Linear regression: A = [x | 1], b = y-values, solution gives slope and intercept.',
+        mathBridge: 'np.linalg.lstsq(A, b) solves the normal equations. xÌ‚ = (Aáµ€A)â»¹Aáµ€b. Residual = b − AxÌ‚. Linear regression: A = [x | 1], b = y-values, solution gives slope and intercept.',
         caption: 'Solve overdetermined systems and fit a best-fit line through data using the normal equations.',
         initialProps: {
           initialCells: [
@@ -275,14 +275,14 @@ fig.show()`,
               challengeNumber: 1,
               challengeTitle: 'Fit a quadratic',
               difficulty: 'hard',
-              prompt: 'The data below follows a quadratic pattern y â‰ˆ axÂ² + bx + c. Build the matrix A with columns [xÂ², x, 1] and use np.linalg.lstsq to find the best-fit quadratic. Then plot the data (scatter) and the fitted curve (fig.plot(lambda t: ...)) on the same figure.',
+              prompt: 'The data below follows a quadratic pattern y â‰ˆ ax² + bx + c. Build the matrix A with columns [x², x, 1] and use np.linalg.lstsq to find the best-fit quadratic. Then plot the data (scatter) and the fitted curve (fig.plot(lambda t: ...)) on the same figure.',
               code: `import numpy as np
 from opencalc import Figure, BLUE, AMBER
 
 x = np.array([0., 1., 2., 3., 4., 5., 6.])
-y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2xÂ² + x + 1
+y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2x² + x + 1
 
-# Build A with columns [xÂ², x, 1]
+# Build A with columns [x², x, 1]
 # Solve with lstsq
 # Plot scatter + fitted curve
 `,
@@ -294,7 +294,7 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2xÂ² + x + 1
     ],
   },
 
-  // â”€â”€ Rigor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Rigor ──────────────────────────────────────────────────────
   rigor: {
     prose: [
       '**Theorem (Least Squares):** Let $A$ be an $m \\times n$ matrix and $\\mathbf{b} \\in \\mathbb{R}^m$. The set of least squares solutions (minimizers of $\\|A\\mathbf{x} - \\mathbf{b}\\|^2$) is exactly the solution set of the normal equations $A^TA\\mathbf{x} = A^T\\mathbf{b}$.',
@@ -306,7 +306,7 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2xÂ² + x + 1
       {
         type: 'theorem',
         title: 'Existence and Uniqueness',
-        body: 'â€¢ Least squares solutions always exist (for any $A$, $\\mathbf{b}$).\nâ€¢ The solution is unique iff $\\text{rank}(A) = n$ (independent columns).\nâ€¢ When not unique, the minimum-norm solution is $\\hat{\\mathbf{x}} = A^+\\mathbf{b}$.',
+        body: '• Least squares solutions always exist (for any $A$, $\\mathbf{b}$).\n• The solution is unique iff $\\text{rank}(A) = n$ (independent columns).\n• When not unique, the minimum-norm solution is $\\hat{\\mathbf{x}} = A^+\\mathbf{b}$.',
       },
       {
         type: 'insight',
@@ -317,37 +317,37 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2xÂ² + x + 1
     visualizations: [],
   },
 
-  // â”€â”€ Examples â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Examples ───────────────────────────────────────────────────
   examples: [
     {
       id: 'la4-003-ex1',
-      title: 'Least Squares Solution to an Overdetermined 3Ã—2 System',
+      title: 'Least Squares Solution to an Overdetermined 3×2 System',
       problem: 'Find the least squares solution to $A\\mathbf{x} = \\mathbf{b}$ where $A = \\begin{bmatrix}1 & 1 \\\\ 1 & 2 \\\\ 1 & 3\\end{bmatrix}$ and $\\mathbf{b} = \\begin{bmatrix}1 \\\\ 2 \\\\ 2\\end{bmatrix}$.',
       steps: [
         {
           expression: 'A^TA = \\begin{bmatrix}1&1&1\\\\1&2&3\\end{bmatrix}\\begin{bmatrix}1&1\\\\1&2\\\\1&3\\end{bmatrix} = \\begin{bmatrix}3&6\\\\6&14\\end{bmatrix}',
-          annotation: 'Compute $A^TA$ â€” a 2Ã—2 matrix. This is the "information matrix."',
+          annotation: 'Compute $A^TA$ — a 2×2 matrix. This is the "information matrix."',
           strategyTitle: 'Compute Aáµ€A',
           checkpoint: 'Verify entry $(1,1)$: $1^2 + 1^2 + 1^2 = 3$. Entry $(1,2)$: $1\\cdot1 + 1\\cdot2 + 1\\cdot3 = 6$.',
-          hints: ['$A^TA$ is always symmetric â€” both off-diagonal entries equal 6.'],
+          hints: ['$A^TA$ is always symmetric — both off-diagonal entries equal 6.'],
         },
         {
           expression: 'A^T\\mathbf{b} = \\begin{bmatrix}1&1&1\\\\1&2&3\\end{bmatrix}\\begin{bmatrix}1\\\\2\\\\2\\end{bmatrix} = \\begin{bmatrix}5\\\\11\\end{bmatrix}',
-          annotation: 'Compute $A^T\\mathbf{b}$ â€” a 2-vector.',
+          annotation: 'Compute $A^T\\mathbf{b}$ — a 2-vector.',
           strategyTitle: 'Compute Aáµ€b',
           checkpoint: '',
           hints: ['Row 1: $1+2+2=5$. Row 2: $1+4+6=11$.'],
         },
         {
           expression: '\\begin{bmatrix}3&6\\\\6&14\\end{bmatrix}\\hat{\\mathbf{x}} = \\begin{bmatrix}5\\\\11\\end{bmatrix}',
-          annotation: 'The normal equations. We now solve this 2Ã—2 system â€” which HAS an exact solution.',
+          annotation: 'The normal equations. We now solve this 2×2 system — which HAS an exact solution.',
           strategyTitle: 'Set up normal equations',
-          checkpoint: 'Why does this 2Ã—2 system have an exact solution when the original 3Ã—2 did not?',
+          checkpoint: 'Why does this 2×2 system have an exact solution when the original 3×2 did not?',
           hints: ['$A^TA$ is square and (assuming $A$ has independent columns) invertible. We traded an overdetermined system for a square one.'],
         },
         {
           expression: '\\det(A^TA) = 3 \\cdot 14 - 6 \\cdot 6 = 42 - 36 = 6 \\quad (A^TA)^{-1} = \\frac{1}{6}\\begin{bmatrix}14&-6\\\\-6&3\\end{bmatrix}',
-          annotation: 'Invert the 2Ã—2 matrix using the formula $(A^TA)^{-1} = \\frac{1}{\\det}\\begin{bmatrix}d&-b\\\\-c&a\\end{bmatrix}$.',
+          annotation: 'Invert the 2×2 matrix using the formula $(A^TA)^{-1} = \\frac{1}{\\det}\\begin{bmatrix}d&-b\\\\-c&a\\end{bmatrix}$.',
           strategyTitle: 'Invert Aáµ€A',
           checkpoint: '',
           hints: [],
@@ -360,7 +360,7 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2xÂ² + x + 1
           hints: [],
         },
       ],
-      conclusion: 'The least squares solution is $\\hat{\\mathbf{x}} = [2/3,\\; 1/2]^T$. This minimizes $\\|A\\mathbf{x}-\\mathbf{b}\\|^2$ â€” no other $\\mathbf{x}$ gets $A\\mathbf{x}$ closer to $\\mathbf{b}$. The residual is $\\mathbf{e} = \\mathbf{b} - A\\hat{\\mathbf{x}} = [1,2,2]^T - [7/6, 4/3, 3/2]^T$, which is perpendicular to both columns of $A$.',
+      conclusion: 'The least squares solution is $\\hat{\\mathbf{x}} = [2/3,\\; 1/2]^T$. This minimizes $\\|A\\mathbf{x}-\\mathbf{b}\\|^2$ — no other $\\mathbf{x}$ gets $A\\mathbf{x}$ closer to $\\mathbf{b}$. The residual is $\\mathbf{e} = \\mathbf{b} - A\\hat{\\mathbf{x}} = [1,2,2]^T - [7/6, 4/3, 3/2]^T$, which is perpendicular to both columns of $A$.',
     },
     {
       id: 'la4-003-ex2',
@@ -372,7 +372,7 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2xÂ² + x + 1
           annotation: 'Rewrite the system. Each data point gives one equation: $y_i = ax_i + b$. The first column of $A$ is the $x$-values, the second is all 1\'s (for the intercept).',
           strategyTitle: 'Set up the system',
           checkpoint: 'Write out the three equations from the data.',
-          hints: ['$a(1)+b=1$, $a(2)+b=2$, $a(3)+b=4$. Three equations, two unknowns â€” overdetermined.'],
+          hints: ['$a(1)+b=1$, $a(2)+b=2$, $a(3)+b=4$. Three equations, two unknowns — overdetermined.'],
         },
         {
           expression: 'A^TA = \\begin{bmatrix}14&6\\\\6&3\\end{bmatrix}, \\quad A^T\\mathbf{b}_{\\text{data}} = \\begin{bmatrix}17\\\\7\\end{bmatrix}',
@@ -393,7 +393,7 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2xÂ² + x + 1
           annotation: 'The best-fit line is $y = \\frac{3}{2}x - \\frac{2}{3}$.',
           strategyTitle: 'Read off slope and intercept',
           checkpoint: 'Check: does this line pass through all three points exactly?',
-          hints: ['At $x=1$: $3/2 - 2/3 = 9/6 - 4/6 = 5/6 \\neq 1$. It does not pass through exactly â€” that is expected. It is the best fit, not an exact fit.'],
+          hints: ['At $x=1$: $3/2 - 2/3 = 9/6 - 4/6 = 5/6 \\neq 1$. It does not pass through exactly — that is expected. It is the best fit, not an exact fit.'],
         },
       ],
       conclusion: 'The best-fit line is $y = \\frac{3}{2}x - \\frac{2}{3}$. None of the three points lie exactly on the line, but this line minimizes the sum of squared vertical distances from the points to the line.',
@@ -405,10 +405,10 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2xÂ² + x + 1
       steps: [
         {
           expression: '\\mathbf{b} = \\begin{bmatrix}2\\\\3\\\\5\\end{bmatrix} = 2\\begin{bmatrix}1\\\\0\\\\1\\end{bmatrix} + 3\\begin{bmatrix}0\\\\1\\\\1\\end{bmatrix} = A\\begin{bmatrix}2\\\\3\\end{bmatrix}',
-          annotation: '$\\mathbf{b}$ is exactly $A[2,3]^T$ â€” it lies in the column space of $A$. An exact solution exists.',
+          annotation: '$\\mathbf{b}$ is exactly $A[2,3]^T$ — it lies in the column space of $A$. An exact solution exists.',
           strategyTitle: 'Recognize b is in col(A)',
           checkpoint: 'If an exact solution exists, what should the least squares solution be?',
-          hints: ['If Ax=b has an exact solution x*, then x* also minimizes â€–Ax-bâ€–Â² = 0. The least squares solution must equal the exact solution.'],
+          hints: ['If Ax=b has an exact solution x*, then x* also minimizes –Ax-b–² = 0. The least squares solution must equal the exact solution.'],
         },
         {
           expression: 'A^TA = \\begin{bmatrix}2&1\\\\1&2\\end{bmatrix}, \\quad A^T\\mathbf{b} = \\begin{bmatrix}1&0&1\\\\0&1&1\\end{bmatrix}\\begin{bmatrix}2\\\\3\\\\5\\end{bmatrix} = \\begin{bmatrix}7\\\\8\\end{bmatrix}',
@@ -419,14 +419,14 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2xÂ² + x + 1
         },
         {
           expression: '\\hat{\\mathbf{x}} = (A^TA)^{-1}A^T\\mathbf{b} = \\frac{1}{3}\\begin{bmatrix}2&-1\\\\-1&2\\end{bmatrix}\\begin{bmatrix}7\\\\8\\end{bmatrix} = \\frac{1}{3}\\begin{bmatrix}6\\\\9\\end{bmatrix} = \\begin{bmatrix}2\\\\3\\end{bmatrix}',
-          annotation: '$\\det(A^TA) = 4-1=3$. Normal equations give $\\hat{\\mathbf{x}} = [2,3]^T$ â€” exactly the exact solution.',
+          annotation: '$\\det(A^TA) = 4-1=3$. Normal equations give $\\hat{\\mathbf{x}} = [2,3]^T$ — exactly the exact solution.',
           strategyTitle: 'Solve normal equations',
           checkpoint: '',
           hints: [],
         },
         {
           expression: '\\mathbf{e} = \\mathbf{b} - A\\hat{\\mathbf{x}} = \\begin{bmatrix}2\\\\3\\\\5\\end{bmatrix} - \\begin{bmatrix}1&0\\\\0&1\\\\1&1\\end{bmatrix}\\begin{bmatrix}2\\\\3\\end{bmatrix} = \\begin{bmatrix}2\\\\3\\\\5\\end{bmatrix} - \\begin{bmatrix}2\\\\3\\\\5\\end{bmatrix} = \\begin{bmatrix}0\\\\0\\\\0\\end{bmatrix}',
-          annotation: 'Zero residual â€” $\\mathbf{b}$ is exactly in the column space, so the projection equals $\\mathbf{b}$ itself.',
+          annotation: 'Zero residual — $\\mathbf{b}$ is exactly in the column space, so the projection equals $\\mathbf{b}$ itself.',
           strategyTitle: 'Verify residual is zero',
           checkpoint: '',
           hints: [],
@@ -436,7 +436,7 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2xÂ² + x + 1
     },
   ],
 
-  // â”€â”€ Challenges â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Challenges ─────────────────────────────────────────────────
   challenges: [
     {
       id: 'la4-003-ch1',
@@ -446,11 +446,11 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2xÂ² + x + 1
       walkthrough: [
         {
           expression: 'A^TA = \\begin{bmatrix}1&0&1\\\\0&1&1\\end{bmatrix}\\begin{bmatrix}1&0\\\\0&1\\\\1&1\\end{bmatrix} = \\begin{bmatrix}2&1\\\\1&2\\end{bmatrix}',
-          annotation: 'Multiply $A^T$ (2Ã—3) by $A$ (3Ã—2) to get a 2Ã—2 matrix.',
+          annotation: 'Multiply $A^T$ (2×3) by $A$ (3×2) to get a 2×2 matrix.',
         },
         {
           expression: 'A^T\\mathbf{b} = \\begin{bmatrix}1&0&1\\\\0&1&1\\end{bmatrix}\\begin{bmatrix}1\\\\1\\\\3\\end{bmatrix} = \\begin{bmatrix}4\\\\4\\end{bmatrix}',
-          annotation: 'Multiply $A^T$ (2Ã—3) by $\\mathbf{b}$ (3Ã—1).',
+          annotation: 'Multiply $A^T$ (2×3) by $\\mathbf{b}$ (3×1).',
         },
         {
           expression: '\\begin{bmatrix}2&1\\\\1&2\\end{bmatrix}\\hat{\\mathbf{x}} = \\begin{bmatrix}4\\\\4\\end{bmatrix}',
@@ -499,28 +499,28 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2xÂ² + x + 1
           annotation: '$(A^TA)^{-1}(A^TA) = I$. The middle cancels, leaving $P$ again.',
         },
       ],
-      answer: 'PÂ² = P. Geometrically: projecting twice is the same as projecting once. Once you are on the subspace, re-projecting leaves you unchanged.',
+      answer: 'P² = P. Geometrically: projecting twice is the same as projecting once. Once you are on the subspace, re-projecting leaves you unchanged.',
     },
   ],
 
-  // â”€â”€ Semantics â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Semantics ────────────────────────────────────────────────────
   semantics: {
     core: [
-      { symbol: '\\hat{\\mathbf{x}}', meaning: 'The least squares solution â€” minimizes ||Ax - b||Â²' },
-      { symbol: 'A^TA\\hat{\\mathbf{x}} = A^T\\mathbf{b}', meaning: 'The normal equations â€” the 2Ã—2 (or nÃ—n) system whose solution is the least squares answer' },
-      { symbol: 'P = A(A^TA)^{-1}A^T', meaning: 'Projection matrix onto col(A) â€” maps any b to its closest point in the column space' },
-      { symbol: '\\mathbf{e} = \\mathbf{b} - A\\hat{\\mathbf{x}}', meaning: 'Residual vector â€” perpendicular to col(A), represents the irreducible error' },
-      { symbol: 'A^+', meaning: 'Pseudoinverse of A â€” generalizes (Aáµ€A)â»Â¹Aáµ€ to rank-deficient cases' },
+      { symbol: '\\hat{\\mathbf{x}}', meaning: 'The least squares solution — minimizes ||Ax - b||²' },
+      { symbol: 'A^TA\\hat{\\mathbf{x}} = A^T\\mathbf{b}', meaning: 'The normal equations — the 2×2 (or n×n) system whose solution is the least squares answer' },
+      { symbol: 'P = A(A^TA)^{-1}A^T', meaning: 'Projection matrix onto col(A) — maps any b to its closest point in the column space' },
+      { symbol: '\\mathbf{e} = \\mathbf{b} - A\\hat{\\mathbf{x}}', meaning: 'Residual vector — perpendicular to col(A), represents the irreducible error' },
+      { symbol: 'A^+', meaning: 'Pseudoinverse of A — generalizes (Aáµ€A)â»¹Aáµ€ to rank-deficient cases' },
     ],
     rulesOfThumb: [
       'Least squares = project b onto col(A) and find the corresponding x.',
       'Normal equations are always solvable, even when the original system is not.',
-      'Residual is perpendicular to col(A) â€” that is the definition of "best approximation."',
+      'Residual is perpendicular to col(A) — that is the definition of "best approximation."',
       'In practice, use QR (not Aáµ€A) for numerical stability.',
     ],
   },
 
-  // â”€â”€ Spiral â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Spiral ────────────────────────────────────────────────────────
   spiral: {
     recoveryPoints: [
       {
@@ -531,7 +531,7 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2xÂ² + x + 1
       {
         lessonId: 'la1-004',
         label: 'Systems of Linear Equations',
-        note: 'The normal equations $A^TA\\hat{\\mathbf{x}} = A^T\\mathbf{b}$ ARE a square linear system â€” exactly the kind you learned to solve with Gaussian elimination. Least squares converts an unsolvable overdetermined system into a solvable square one.',
+        note: 'The normal equations $A^TA\\hat{\\mathbf{x}} = A^T\\mathbf{b}$ ARE a square linear system — exactly the kind you learned to solve with Gaussian elimination. Least squares converts an unsolvable overdetermined system into a solvable square one.',
       },
     ],
     futureLinks: [
@@ -543,28 +543,28 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2xÂ² + x + 1
     ],
   },
 
-  // â”€â”€ Mental Model â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Mental Model ─────────────────────────────────────────────────
   mentalModel: [
-    'b not in col(A) â†’ no exact solution â†’ find the closest point in col(A).',
+    'b not in col(A) → no exact solution → find the closest point in col(A).',
     'Closest point = orthogonal projection of b onto col(A).',
-    'Normal equations: A^T A x-hat = A^T b â€” always solvable.',
+    'Normal equations: A^T A x-hat = A^T b — always solvable.',
     'Residual e = b - A x-hat is perpendicular to every column of A.',
     'Linear regression is least squares with a design matrix of x-values.',
   ],
 
-  // â”€â”€ Checkpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Checkpoints ──────────────────────────────────────────────────
   checkpoints: [
     { id: 'cp-la4-003-1', label: 'Read: State the normal equations and where they come from', type: 'read' },
     { id: 'cp-la4-003-2', label: 'Read: Explain the geometric picture of least squares', type: 'read' },
     { id: 'cp-la4-003-3', label: 'Read: Describe when the residual is zero vs. non-zero', type: 'read' },
     { id: 'cp-la4-003-4', label: 'Lab: Fit a line and visualize the squared residuals', type: 'lab' },
     { id: 'cp-la4-003-5', label: 'Lab: Verify Aáµ€e = 0 after solving normal equations', type: 'lab' },
-    { id: 'cp-la4-003-6', label: 'Example: Solve an overdetermined 3Ã—2 system', type: 'example' },
+    { id: 'cp-la4-003-6', label: 'Example: Solve an overdetermined 3×2 system', type: 'example' },
     { id: 'cp-la4-003-7', label: 'Example: Fit a line to data using normal equations', type: 'example' },
     { id: 'cp-la4-003-8', label: 'Challenge: Show least squares recovers exact solution when b âˆˆ col(A)', type: 'challenge' },
   ],
 
-  // â”€â”€ Assessment â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Assessment ───────────────────────────────────────────────────
   assessment: {
     questions: [
       {
@@ -577,7 +577,7 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2xÂ² + x + 1
     ],
   },
 
-  // â”€â”€ Quiz â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Quiz ─────────────────────────────────────────────────────────
   quiz: [
     {
       id: 'least-squares-q1',
@@ -591,7 +591,7 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2xÂ² + x + 1
       ],
       answer: 'It makes $A\\hat{\\mathbf{x}}$ the orthogonal projection of $\\mathbf{b}$ onto the column space of $A$',
       hints: ['The minimum distance from $\\mathbf{b}$ to the column space is achieved at the orthogonal projection.'],
-      reviewSection: 'Intuition tab â€” The Geometric Core',
+      reviewSection: 'Intuition tab — The Geometric Core',
     },
     {
       id: 'least-squares-q2',
@@ -605,16 +605,16 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2xÂ² + x + 1
       ],
       answer: '$A^T\\mathbf{e} = \\mathbf{0}$ (residual is perpendicular to column space)',
       hints: ['This is the normal equations condition. The residual is orthogonal to every column of $A$.'],
-      reviewSection: 'Math tab â€” Deriving the Normal Equations',
+      reviewSection: 'Math tab — Deriving the Normal Equations',
     },
     {
       id: 'least-squares-q3',
       type: 'choice',
       text: 'You want to fit a line $y = ax + b$ to 50 data points. What is the size of the matrix $A$ you set up?',
-      options: ['2 Ã— 50', '50 Ã— 2', '2 Ã— 2', '50 Ã— 50'],
-      answer: '50 Ã— 2',
+      options: ['2 × 50', '50 × 2', '2 × 2', '50 × 50'],
+      answer: '50 × 2',
       hints: ['One row per data point (50 equations), one column per parameter: slope $a$ and intercept $b$ (2 unknowns).'],
-      reviewSection: 'Math tab â€” Linear Regression',
+      reviewSection: 'Math tab — Linear Regression',
     },
     {
       id: 'q-la4-003-4',
@@ -628,16 +628,16 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2xÂ² + x + 1
       ],
       answer: 'The residual $\\mathbf{e} = \\mathbf{b} - A\\hat{\\mathbf{x}}$ is perpendicular to every column of $A$',
       hints: ['The perpendicularity condition Aáµ€(b - AxÌ‚) = 0 is what makes the projection optimal. Rearranging gives Aáµ€AxÌ‚ = Aáµ€b.'],
-      reviewSection: 'Math â€” Deriving the normal equations',
+      reviewSection: 'Math — Deriving the normal equations',
     },
     {
       id: 'q-la4-003-5',
       type: 'choice',
       text: 'When fitting a quadratic $y = ax^2 + bx + c$ to 10 data points, the matrix $A$ has how many rows and columns?',
-      options: ['3 Ã— 10', '10 Ã— 3', '10 Ã— 10', '3 Ã— 3'],
-      answer: '10 Ã— 3',
-      hints: ['One row per data point (10 rows). Three columns: one for xÂ², one for x, one for the constant term (3 unknowns: a, b, c).'],
-      reviewSection: 'Math â€” linear regression setup',
+      options: ['3 × 10', '10 × 3', '10 × 10', '3 × 3'],
+      answer: '10 × 3',
+      hints: ['One row per data point (10 rows). Three columns: one for x², one for x, one for the constant term (3 unknowns: a, b, c).'],
+      reviewSection: 'Math — linear regression setup',
     },
     {
       id: 'q-la4-003-6',
@@ -646,7 +646,7 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2xÂ² + x + 1
       options: ['1', 'Some positive number', '0', '$\\|\\mathbf{b}\\|$'],
       answer: '0',
       hints: ['If b âˆˆ col(A), the projection of b onto col(A) is b itself. The residual e = b - Pb = b - b = 0.'],
-      reviewSection: 'Examples â€” exact solution case',
+      reviewSection: 'Examples — exact solution case',
     },
     {
       id: 'q-la4-003-7',
@@ -659,8 +659,8 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2xÂ² + x + 1
         '$A^TA$ is not always invertible when $A$ is not square',
       ],
       answer: 'Forming $A^TA$ squares the condition number, making numerical errors worse; QR preserves the conditioning of $A$',
-      hints: ['If Îº(A) = 100, then Îº(Aáµ€A) = Îº(A)Â² = 10,000. Tiny rounding errors get amplified 10,000Ã— instead of 100Ã—. QR factorization avoids forming Aáµ€A.'],
-      reviewSection: 'Intuition â€” Normal Equations Can Be Ill-Conditioned',
+      hints: ['If Îº(A) = 100, then Îº(Aáµ€A) = Îº(A)² = 10,000. Tiny rounding errors get amplified 10,000× instead of 100×. QR factorization avoids forming Aáµ€A.'],
+      reviewSection: 'Intuition — Normal Equations Can Be Ill-Conditioned',
     },
     {
       id: 'q-la4-003-8',
@@ -673,8 +673,8 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2xÂ² + x + 1
         'The columns of $A$ are always orthonormal',
       ],
       answer: 'Projecting a vector that is already in the column space of $A$ leaves it unchanged',
-      hints: ['If w = Pb is already in col(A), then Pw = P(Pb) = PÂ²b = Pb = w (unchanged). That idempotency is what PÂ² = P captures.'],
-      reviewSection: 'Math â€” Projection onto the column space',
+      hints: ['If w = Pb is already in col(A), then Pw = P(Pb) = P²b = Pb = w (unchanged). That idempotency is what P² = P captures.'],
+      reviewSection: 'Math — Projection onto the column space',
     },
     {
       id: 'q-la4-003-9',
@@ -682,13 +682,13 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2xÂ² + x + 1
       text: 'In GPS, position is solved as a least squares problem because:',
       options: [
         'GPS uses exactly 3 satellites for 3 unknowns',
-        'More than 4 satellites give more equations than unknowns (overdetermined) â€” the least squares solution minimizes combined distance errors',
+        'More than 4 satellites give more equations than unknowns (overdetermined) — the least squares solution minimizes combined distance errors',
         'GPS signals are orthogonal by construction',
         'The exact system has no solution due to Earth\'s curvature',
       ],
-      answer: 'More than 4 satellites give more equations than unknowns (overdetermined) â€” the least squares solution minimizes combined distance errors',
-      hints: ['Modern GPS uses 8â€“12 satellites. Each gives one distance equation for 4 unknowns (x,y,z,clock offset). The overdetermined system is solved via least squares.'],
-      reviewSection: 'Hook â€” real-world context',
+      answer: 'More than 4 satellites give more equations than unknowns (overdetermined) — the least squares solution minimizes combined distance errors',
+      hints: ['Modern GPS uses 8—12 satellites. Each gives one distance equation for 4 unknowns (x,y,z,clock offset). The overdetermined system is solved via least squares.'],
+      reviewSection: 'Hook — real-world context',
     },
     {
       id: 'q-la4-003-10',
@@ -701,8 +701,8 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2xÂ² + x + 1
         'The covariance matrix',
       ],
       answer: 'The pseudoinverse of $A$',
-      hints: ['The pseudoinverse Aâº = (Aáµ€A)â»Â¹Aáµ€ generalizes the inverse to rectangular matrices. For square invertible A, Aâº = Aâ»Â¹. More generally, Aâº = VÎ£âºUáµ€ via SVD.'],
-      reviewSection: 'Math â€” pseudoinverse',
+      hints: ['The pseudoinverse Aâº = (Aáµ€A)â»¹Aáµ€ generalizes the inverse to rectangular matrices. For square invertible A, Aâº = Aâ»¹. More generally, Aâº = VΣâºUáµ€ via SVD.'],
+      reviewSection: 'Math — pseudoinverse',
     },
   ],
 
@@ -710,13 +710,13 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2xÂ² + x + 1
     {
       falseBelief: 'The least squares solution makes $A\\hat{\\mathbf{x}} = \\mathbf{b}$ exactly.',
       whyStudentsThinkIt: 'Students confuse "solve" with "approximate." The term "solution" implies exactness.',
-      correctionExample: 'For $A = \\begin{bmatrix}1\\\\1\\\\1\\end{bmatrix}$, $\\mathbf{b} = [1,2,4]^T$: no single scalar $\\hat{x}$ satisfies all three equations $\\hat{x}=1$, $\\hat{x}=2$, $\\hat{x}=4$. The least squares solution $\\hat{x} = 7/3$ minimizes the sum of squared errors â€” it does NOT satisfy any of the three equations exactly.',
+      correctionExample: 'For $A = \\begin{bmatrix}1\\\\1\\\\1\\end{bmatrix}$, $\\mathbf{b} = [1,2,4]^T$: no single scalar $\\hat{x}$ satisfies all three equations $\\hat{x}=1$, $\\hat{x}=2$, $\\hat{x}=4$. The least squares solution $\\hat{x} = 7/3$ minimizes the sum of squared errors — it does NOT satisfy any of the three equations exactly.',
       contrastCase: 'The residual $\\mathbf{e} = \\mathbf{b} - A\\hat{\\mathbf{x}}$ is only zero when $\\mathbf{b}$ is exactly in the column space of $A$.',
     },
     {
       falseBelief: 'Least squares minimizes the maximum error (the largest residual).',
       whyStudentsThinkIt: 'Students confuse least squares ($\\ell^2$ norm) with minimax / Chebyshev ($\\ell^\\infty$ norm) optimization.',
-      correctionExample: 'Least squares minimizes $\\sum e_i^2$ â€” the sum of squared residuals. Minimizing the maximum error ($\\max |e_i|$) is a different problem called Chebyshev approximation. Least squares is generally easier to compute (linear system), while minimax requires linear programming.',
+      correctionExample: 'Least squares minimizes $\\sum e_i^2$ — the sum of squared residuals. Minimizing the maximum error ($\\max |e_i|$) is a different problem called Chebyshev approximation. Least squares is generally easier to compute (linear system), while minimax requires linear programming.',
       contrastCase: 'For three residuals $[-2, 1, 1]$ (sum of squares = 6) vs $[-1, -1, 2]$ (sum of squares = 6), both have the same least squares cost but different maximum errors (2 vs 2).',
     },
   ],
@@ -725,12 +725,12 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2xÂ² + x + 1
     {
       situation: 'You have sensor data from an accelerometer on a CNC axis. You want to estimate velocity and position from noisy acceleration readings using a Kalman filter.',
       competingTechniques: ['Numerical integration (trapezoid)', 'Low-pass filter', 'Least squares batch estimation'],
-      whyThisTechniqueWins: 'Least squares (or its recursive variant, the Kalman filter) fits the physical model $\\mathbf{x}_{k+1} = A\\mathbf{x}_k + B\\mathbf{u}_k + \\mathbf{w}_k$ to all measurements simultaneously, minimizing squared prediction errors. It combines all readings optimally â€” much better than integrating forward from noisy individual readings.',
+      whyThisTechniqueWins: 'Least squares (or its recursive variant, the Kalman filter) fits the physical model $\\mathbf{x}_{k+1} = A\\mathbf{x}_k + B\\mathbf{u}_k + \\mathbf{w}_k$ to all measurements simultaneously, minimizing squared prediction errors. It combines all readings optimally — much better than integrating forward from noisy individual readings.',
     },
     {
       situation: 'In machine learning, you want to find the weights $\\mathbf{w}$ of a linear model that best fit training data $(\\mathbf{x}_1, y_1), \\ldots, (\\mathbf{x}_n, y_n)$.',
       competingTechniques: ['Gradient descent', 'Direct formula', 'Normal equations'],
-      whyThisTechniqueWins: 'For small to medium datasets, the normal equations $X^TX\\mathbf{w} = X^T\\mathbf{y}$ give the exact least squares solution in one shot â€” no iteration, no learning rate. Gradient descent is preferred for large $n$ (millions of samples) where forming $X^TX$ is prohibitively expensive.',
+      whyThisTechniqueWins: 'For small to medium datasets, the normal equations $X^TX\\mathbf{w} = X^T\\mathbf{y}$ give the exact least squares solution in one shot — no iteration, no learning rate. Gradient descent is preferred for large $n$ (millions of samples) where forming $X^TX$ is prohibitively expensive.',
     },
   ],
 
@@ -739,11 +739,11 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2xÂ² + x + 1
       commonError: 'Setting up $A$ with columns for data values but forgetting the column of ones for the intercept.',
       symptom: 'The fitted line passes through the origin (intercept forced to zero) even when the data clearly has a non-zero y-intercept.',
       whyItHappened: 'For $y = ax + b$, the model has two parameters: slope $a$ and intercept $b$. The column of ones in $A$ corresponds to $b$ (the coefficient of the constant term 1). Without it, you are forcing $b = 0$.',
-      repairStrategy: 'For fitting $y = a_1 f_1(x) + a_2 f_2(x) + \\cdots$, column $j$ of $A$ is $[f_j(x_1), f_j(x_2), \\ldots, f_j(x_m)]^T$. For a constant term, $f_j(x) = 1$ for all $x$ â€” a column of all ones.',
+      repairStrategy: 'For fitting $y = a_1 f_1(x) + a_2 f_2(x) + \\cdots$, column $j$ of $A$ is $[f_j(x_1), f_j(x_2), \\ldots, f_j(x_m)]^T$. For a constant term, $f_j(x) = 1$ for all $x$ — a column of all ones.',
     },
     {
       commonError: 'Using $A^T(A^T)^{-1}\\mathbf{b}$ instead of $(A^TA)^{-1}A^T\\mathbf{b}$.',
-      symptom: 'Shape mismatch â€” $A^T$ is $n\\times m$ and cannot be inverted when $m \\neq n$.',
+      symptom: 'Shape mismatch — $A^T$ is $n\\times m$ and cannot be inverted when $m \\neq n$.',
       whyItHappened: 'Confusing the order: the pseudoinverse is $(A^TA)^{-1}A^T$, not $A^T(A^T)^{-1}$. The matrix $A^TA$ (an $n\\times n$ square matrix) is what gets inverted.',
       repairStrategy: 'Memorize the shape: $A$ is $m\\times n$, $A^TA$ is $n\\times n$ (invertible if columns are independent), $(A^TA)^{-1}A^T$ is $n\\times m$. The pseudoinverse maps from $\\mathbb{R}^m$ (right-hand side) back to $\\mathbb{R}^n$ (solution space).',
     },
@@ -754,6 +754,6 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2xÂ² + x + 1
     solveIndependently: 'Set up the normal equations for any overdetermined linear system, solve for $\\hat{\\mathbf{x}}$, and verify the residual is perpendicular to the column space.',
     explainVerbally: 'Explain why the normal equations arise from the perpendicularity condition, what the geometric picture is, and when the residual is zero.',
     detectIncorrectApplication: 'Catch missing intercept column; catch wrong pseudoinverse formula order; catch using least squares when an exact solution exists (redundant).',
-    transferToUnfamiliar: 'Apply least squares to polynomial fitting, GPS position estimation, machine learning linear regression, or sensor fusion â€” any scenario with more equations than unknowns.',
+    transferToUnfamiliar: 'Apply least squares to polynomial fitting, GPS position estimation, machine learning linear regression, or sensor fusion — any scenario with more equations than unknowns.',
   },
 };

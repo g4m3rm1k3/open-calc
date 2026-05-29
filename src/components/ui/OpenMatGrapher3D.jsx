@@ -250,7 +250,12 @@ function buildMeshLines(surfaceData, color) {
 // ── 3D function renderer ──────────────────────────────────────────────────────
 const OpenMatFunction3D = ({ fn, settings }) => {
   const flatShading = settings.flatShading !== false;
-  const colorMap    = fn.colorMap || settings.colormap || "parula";
+  // settings.colormapOverride means the user explicitly picked a colormap in the
+  // Render Settings panel — that takes priority over the per-function default.
+  const colorMap = (settings.colormapOverride ? settings.colormap : null)
+    || fn.colorMap
+    || settings.colormap
+    || "parula";
   const size = settings.range || 10;
   const segs = settings.resolution || 64;
 
@@ -580,7 +585,12 @@ const OpenMatGrapher3D = ({ isOpen, onClose, onSwitchTo2D, onSwitchToJSX, launch
     const next = functions.filter((f) => f.id !== id);
     setFunctions(next.length ? next : [{ id: Date.now(), latex: "surface", color: "#6366f1", visible: true, wireframe: false, opacity: 0.9 }]);
   };
-  const setSetting = (k, v) => setSettings((p) => ({ ...p, [k]: v }));
+  const setSetting = (k, v) => setSettings((p) => ({
+    ...p,
+    [k]: v,
+    // Track that the user has explicitly chosen a colormap so it overrides per-function defaults
+    ...(k === "colormap" ? { colormapOverride: true } : {}),
+  }));
 
   // Colorbar info: use the first function that has a colorRange
   const colorbarFn = functions.find((fn) =>
@@ -761,7 +771,7 @@ const OpenMatGrapher3D = ({ isOpen, onClose, onSwitchTo2D, onSwitchToJSX, launch
           {showColorbar && (
             <div className="pointer-events-none absolute bottom-5 right-5 flex items-end">
               <Colorbar
-                colorMap={colorbarFn.colorMap || settings.colormap || "parula"}
+                colorMap={(settings.colormapOverride ? settings.colormap : null) || colorbarFn.colorMap || settings.colormap || "parula"}
                 range={colorbarFn.colorRange}
               />
             </div>

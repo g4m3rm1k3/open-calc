@@ -1,34 +1,34 @@
-﻿export default {
+export default {
   id: 'la6-006',
   slug: 'coordinates-change-of-basis',
   chapter: 'la6',
   order: 6,
   title: 'Coordinates and Change of Basis',
-  subtitle: 'The same vector has different coordinates in different bases. The change-of-basis matrix translates between them â€” and the same transformation produces matrix similarity for linear maps.',
+  subtitle: 'The same vector has different coordinates in different bases. The change-of-basis matrix translates between them — and the same transformation produces matrix similarity for linear maps.',
   tags: ['coordinates', 'change of basis', 'transition matrix', 'basis transformation', 'similarity', 'diagonalization', 'coordinate vector'],
   aliases: 'coordinates change of basis transition matrix basis transformation similarity diagonalization coordinate vector',
 
   hook: {
-    question: "You have two bases for $\\mathbb{R}^2$: the standard basis and one rotated 45Â°. The same vector $(1, 0)$ has coordinates $(1, 0)$ in the first basis but different numbers in the second. How do you convert?",
+    question: "You have two bases for $\\mathbb{R}^2$: the standard basis and one rotated 45°. The same vector $(1, 0)$ has coordinates $(1, 0)$ in the first basis but different numbers in the second. How do you convert?",
     realWorldContext: "Coordinate changes are everywhere in applied mathematics. In computer graphics, transforming between local and world coordinate frames is a change of basis. In robotics, converting between joint angles and Cartesian coordinates uses Jacobian matrices (which are related to basis changes). In general relativity, the metric tensor describes how coordinate systems relate in curved spacetime. In numerical methods, preconditioning a linear system is a change of basis to make the problem better-conditioned. The change-of-basis matrix is the key tool.",
   },
 
   intuition: {
     prose: [
-      'Take $\\mathbf{v} = (5, 3)$ and two bases for $\\mathbb{R}^2$: standard $\\mathcal{E} = \\{(1,0),(0,1)\\}$ and $\\mathcal{B} = \\{(1,1),(1,-1)\\}$. In $\\mathcal{E}$, the coordinates are just $(5,3)$ â€” no work needed. In $\\mathcal{B}$, you need $c_1(1,1) + c_2(1,-1) = (5,3)$. That gives $c_1+c_2=5$ and $c_1-c_2=3$, so $c_1=4, c_2=1$. Check: $4(1,1)+1(1,-1)=(5,3)$ âœ“. The **same vector**, two completely different lists of numbers â€” $(5,3)$ vs $(4,1)$. Coordinates depend on the basis.',
+      'Take $\\mathbf{v} = (5, 3)$ and two bases for $\\mathbb{R}^2$: standard $\\mathcal{E} = \\{(1,0),(0,1)\\}$ and $\\mathcal{B} = \\{(1,1),(1,-1)\\}$. In $\\mathcal{E}$, the coordinates are just $(5,3)$ — no work needed. In $\\mathcal{B}$, you need $c_1(1,1) + c_2(1,-1) = (5,3)$. That gives $c_1+c_2=5$ and $c_1-c_2=3$, so $c_1=4, c_2=1$. Check: $4(1,1)+1(1,-1)=(5,3)$ âœ“. The **same vector**, two completely different lists of numbers — $(5,3)$ vs $(4,1)$. Coordinates depend on the basis.',
       '**The change-of-basis matrix.** Given two ordered bases $\\mathcal{B}$ and $\\mathcal{B}\'$ for $V$, the **change-of-basis matrix from $\\mathcal{B}$ to $\\mathcal{B}\'$** is the matrix $P_{\\mathcal{B} \\to \\mathcal{B}\'} = [P]$ whose $j$-th column is $[\\mathbf{b}_j]_{\\mathcal{B}\'} =$ coordinates of the old basis vector $\\mathbf{b}_j$ in the new basis $\\mathcal{B}\'$. Then: $[\\mathbf{v}]_{\\mathcal{B}\'} = P_{\\mathcal{B} \\to \\mathcal{B}\'} \\cdot [\\mathbf{v}]_{\\mathcal{B}}$.',
-      '**The inverse goes the other way.** If $P$ converts from $\\mathcal{B}$-coordinates to $\\mathcal{B}\'$-coordinates, then $P^{-1}$ converts from $\\mathcal{B}\'$-coordinates back to $\\mathcal{B}$-coordinates. Since $P$ is always invertible (it converts between two bases â€” its columns are linearly independent), $P^{-1}$ always exists. When converting in $\\mathbb{R}^n$ with the standard basis as one of the bases: if $P = [\\mathbf{b}_1 | \\cdots | \\mathbf{b}_n]$ converts from $\\mathcal{B}$-coordinates to standard coordinates, then $P^{-1}$ converts from standard coordinates to $\\mathcal{B}$-coordinates. Concretely: $[\\mathbf{v}]_{\\mathcal{B}} = P^{-1}\\mathbf{v}$ where $\\mathbf{v}$ is the standard-coordinate vector.',
+      '**The inverse goes the other way.** If $P$ converts from $\\mathcal{B}$-coordinates to $\\mathcal{B}\'$-coordinates, then $P^{-1}$ converts from $\\mathcal{B}\'$-coordinates back to $\\mathcal{B}$-coordinates. Since $P$ is always invertible (it converts between two bases — its columns are linearly independent), $P^{-1}$ always exists. When converting in $\\mathbb{R}^n$ with the standard basis as one of the bases: if $P = [\\mathbf{b}_1 | \\cdots | \\mathbf{b}_n]$ converts from $\\mathcal{B}$-coordinates to standard coordinates, then $P^{-1}$ converts from standard coordinates to $\\mathcal{B}$-coordinates. Concretely: $[\\mathbf{v}]_{\\mathcal{B}} = P^{-1}\\mathbf{v}$ where $\\mathbf{v}$ is the standard-coordinate vector.',
       '**In $\\mathbb{R}^n$.** When $\\mathcal{C}$ is the standard basis and $\\mathcal{B}$ is a non-standard basis with basis vectors $\\mathbf{b}_1, \\ldots, \\mathbf{b}_n$, the matrix $P = [\\mathbf{b}_1 | \\cdots | \\mathbf{b}_n]$ converts from $\\mathcal{B}$-coordinates to standard coordinates: $\\mathbf{v} = P[\\mathbf{v}]_{\\mathcal{B}}$. To go the other way: $[\\mathbf{v}]_{\\mathcal{B}} = P^{-1}\\mathbf{v}$.',
-      '**Effect on matrices.** If $T: V \\to V$ has matrix $A$ in basis $\\mathcal{B}$ and matrix $A\'$ in basis $\\mathcal{B}\'$, then $A\' = P^{-1}AP$ where $P = P_{\\mathcal{B}\' \\to \\mathcal{B}}$ (columns = $\\mathcal{B}\'$ vectors in $\\mathcal{B}$-coordinates). This is the similarity transformation from earlier â€” now you know where it comes from.',
-      '**Diagonalization is change of basis to eigenvectors.** When $A$ is diagonalizable with eigenvector matrix $P$ and diagonal matrix $D$: $D = P^{-1}AP$. This says: in the eigenvector basis, the map $T$ simply scales each coordinate independently by the corresponding eigenvalue â€” the simplest possible matrix. The eigenvalues $\\lambda_1, \\ldots, \\lambda_n$ do not change when you change basis (they are similarity invariants). Only the matrix entries change. The eigenvector basis is the "optimal" basis for understanding a diagonalizable linear map.',
-      '**CNC coordinate frames.** In multi-axis CNC machining, every component of the machine has its own coordinate frame: the machine frame (absolute), the workpiece frame (offset by fixture), the tool frame (tip of cutting tool). Moving between these is a change of basis. The transformation matrices are rigid body motions: rotation $R$ (change of orientation basis) combined with translation $\\mathbf{t}$ (origin shift), represented as $4 \\times 4$ homogeneous matrices $\\begin{bmatrix}R & \\mathbf{t} \\\\ \\mathbf{0} & 1\\end{bmatrix}$. Composing two frame changes multiplies the matrices â€” the matrix algebra of change of basis, applied to machining geometry.',
-      '**Where this is heading.** This completes the chapter on Abstract Vector Spaces. Looking forward, all the key algorithms of linear algebra â€” eigendecomposition, SVD, QR factorization, LU factorization, Gram-Schmidt â€” can now be understood as: finding the right basis for the problem, computing in that basis, and converting back. The question "what is the best basis?" drives the entire field of applied linear algebra.',
+      '**Effect on matrices.** If $T: V \\to V$ has matrix $A$ in basis $\\mathcal{B}$ and matrix $A\'$ in basis $\\mathcal{B}\'$, then $A\' = P^{-1}AP$ where $P = P_{\\mathcal{B}\' \\to \\mathcal{B}}$ (columns = $\\mathcal{B}\'$ vectors in $\\mathcal{B}$-coordinates). This is the similarity transformation from earlier — now you know where it comes from.',
+      '**Diagonalization is change of basis to eigenvectors.** When $A$ is diagonalizable with eigenvector matrix $P$ and diagonal matrix $D$: $D = P^{-1}AP$. This says: in the eigenvector basis, the map $T$ simply scales each coordinate independently by the corresponding eigenvalue — the simplest possible matrix. The eigenvalues $\\lambda_1, \\ldots, \\lambda_n$ do not change when you change basis (they are similarity invariants). Only the matrix entries change. The eigenvector basis is the "optimal" basis for understanding a diagonalizable linear map.',
+      '**CNC coordinate frames.** In multi-axis CNC machining, every component of the machine has its own coordinate frame: the machine frame (absolute), the workpiece frame (offset by fixture), the tool frame (tip of cutting tool). Moving between these is a change of basis. The transformation matrices are rigid body motions: rotation $R$ (change of orientation basis) combined with translation $\\mathbf{t}$ (origin shift), represented as $4 \\times 4$ homogeneous matrices $\\begin{bmatrix}R & \\mathbf{t} \\\\ \\mathbf{0} & 1\\end{bmatrix}$. Composing two frame changes multiplies the matrices — the matrix algebra of change of basis, applied to machining geometry.',
+      '**Where this is heading.** This completes the chapter on Abstract Vector Spaces. Looking forward, all the key algorithms of linear algebra — eigendecomposition, SVD, QR factorization, LU factorization, Gram-Schmidt — can now be understood as: finding the right basis for the problem, computing in that basis, and converting back. The question "what is the best basis?" drives the entire field of applied linear algebra.',
     ],
     callouts: [
       {
         type: 'sequencing',
-        title: 'Lesson 6 of 6 â€” Abstract Vector Spaces',
-        body: '**Previous:** Isomorphisms â€” bijective linear maps and the classification of finite-dimensional spaces.\n**This lesson:** Coordinates and Change of Basis â€” the mechanics of converting vectors and matrices between different bases, and why $P^{-1}AP$ is the right formula.\n**Next:** End of Chapter 6.',
+        title: 'Lesson 6 of 6 — Abstract Vector Spaces',
+        body: '**Previous:** Isomorphisms — bijective linear maps and the classification of finite-dimensional spaces.\n**This lesson:** Coordinates and Change of Basis — the mechanics of converting vectors and matrices between different bases, and why $P^{-1}AP$ is the right formula.\n**Next:** End of Chapter 6.',
       },
       {
         type: 'insight',
@@ -48,7 +48,7 @@
       {
         type: 'warning',
         title: 'Direction Convention',
-        body: 'There are two conventions for change-of-basis matrices. Always track: does column $j$ of $P$ contain the new basis vectors written in old coordinates, or vice versa? And do you multiply vectors by $P$ or $P^{-1}$ to convert them? Be consistent â€” the formulas work out oppositely depending on the convention.',
+        body: 'There are two conventions for change-of-basis matrices. Always track: does column $j$ of $P$ contain the new basis vectors written in old coordinates, or vice versa? And do you multiply vectors by $P$ or $P^{-1}$ to convert them? Be consistent — the formulas work out oppositely depending on the convention.',
       },
     ],
     visualizations: [
@@ -125,7 +125,7 @@ diag(D_new)
       {
         type: 'insight',
         title: 'Invariants Under Similarity',
-        body: 'Quantities unchanged under $A \\mapsto P^{-1}AP$:\nâ€¢ Eigenvalues (and characteristic polynomial)\nâ€¢ Determinant: $\\det(P^{-1}AP) = \\det(A)$\nâ€¢ Trace: $\\text{tr}(P^{-1}AP) = \\text{tr}(A)$\nâ€¢ Rank\nâ€¢ Minimal polynomial\nâ€¢ Jordan structure\n\nThese are intrinsic properties of the linear map $T$, independent of basis.',
+        body: 'Quantities unchanged under $A \\mapsto P^{-1}AP$:\n• Eigenvalues (and characteristic polynomial)\n• Determinant: $\\det(P^{-1}AP) = \\det(A)$\n• Trace: $\\text{tr}(P^{-1}AP) = \\text{tr}(A)$\n• Rank\n• Minimal polynomial\n• Jordan structure\n\nThese are intrinsic properties of the linear map $T$, independent of basis.',
       },
     ],
     visualizations: [
@@ -138,11 +138,11 @@ diag(D_new)
           initialCells: [
             {
               id: 1,
-              cellTitle: 'Change-of-basis matrix â€” coordinate conversion in R^2',
+              cellTitle: 'Change-of-basis matrix — coordinate conversion in R^2',
               prose: 'Given basis $\\mathcal{B} = \\{\\mathbf{b}_1, \\mathbf{b}_2\\}$, build $P = [\\mathbf{b}_1 | \\mathbf{b}_2]$. Then $[\\mathbf{v}]_{\\mathcal{B}} = P^{-1}\\mathbf{v}$ (from standard to $\\mathcal{B}$) and $\\mathbf{v} = P[\\mathbf{v}]_{\\mathcal{B}}$ (from $\\mathcal{B}$ to standard). Verify by round-tripping: convert to $\\mathcal{B}$ and back.',
               code: `import numpy as np
 
-b1 = np.array([1., 1.]) / np.sqrt(2)   # 45Â° rotation basis
+b1 = np.array([1., 1.]) / np.sqrt(2)   # 45° rotation basis
 b2 = np.array([-1., 1.]) / np.sqrt(2)
 
 P = np.column_stack([b1, b2])          # change-of-basis matrix
@@ -161,17 +161,17 @@ print(f"Recovered: {v_recovered.round(10)}")
 print("Round-trip exact:", np.allclose(v, v_recovered))
 print()
 
-# Geometric check: B is rotated 45Â°, so B-coordinates should be rotated
+# Geometric check: B is rotated 45°, so B-coordinates should be rotated
 import numpy as np
 angle = np.degrees(np.arctan2(v[1], v[0]))
-print(f"Standard angle: {angle:.2f}Â°")
+print(f"Standard angle: {angle:.2f}°")
 angle_B = np.degrees(np.arctan2(v_B[1], v_B[0]))
-print(f"B-basis angle:  {angle_B:.2f}Â°  (should be ~{angle - 45:.2f}Â°)")`,
+print(f"B-basis angle:  {angle_B:.2f}°  (should be ~{angle - 45:.2f}°)")`,
             },
             {
               id: 2,
-              cellTitle: 'P^{-1}AP â€” matrix in a new basis, similarity invariants',
-              prose: 'Changing to a new basis transforms the matrix $A$ to $A\' = P^{-1}AP$ (similar matrices). Similarity invariants â€” determinant, trace, eigenvalues â€” are preserved because they describe the map itself, not its coordinate representation.',
+              cellTitle: 'P^{-1}AP — matrix in a new basis, similarity invariants',
+              prose: 'Changing to a new basis transforms the matrix $A$ to $A\' = P^{-1}AP$ (similar matrices). Similarity invariants — determinant, trace, eigenvalues — are preserved because they describe the map itself, not its coordinate representation.',
               code: `import numpy as np
 
 A = np.array([[2., 1.],
@@ -202,13 +202,13 @@ print("Same tr:", np.isclose(np.trace(A), np.trace(A_new)))`,
 
   rigor: {
     prose: [
-      '**Congruence vs similarity.** Under change of orthonormal basis (unitary transformation $U$), the transformation $A \\mapsto U^{-1}AU = U^\\top AU$ is called **orthogonal similarity** (or unitary similarity over $\\mathbb{C}$). Eigenvalues are preserved. For symmetric matrices, the Spectral Theorem says you can always find an orthonormal basis of eigenvectors â€” achieving real diagonal $D = Q^\\top AQ$. Congruence ($A \\mapsto P^\\top AP$) is different â€” it classifies quadratic forms and is relevant for Sylvester\'s law of inertia.',
+      '**Congruence vs similarity.** Under change of orthonormal basis (unitary transformation $U$), the transformation $A \\mapsto U^{-1}AU = U^\\top AU$ is called **orthogonal similarity** (or unitary similarity over $\\mathbb{C}$). Eigenvalues are preserved. For symmetric matrices, the Spectral Theorem says you can always find an orthonormal basis of eigenvectors — achieving real diagonal $D = Q^\\top AQ$. Congruence ($A \\mapsto P^\\top AP$) is different — it classifies quadratic forms and is relevant for Sylvester\'s law of inertia.',
     ],
     callouts: [
       {
         type: 'sequencing',
         title: 'Connections to Prior Lessons',
-        body: 'Change of basis $\\Rightarrow$ unifies:\nâ€¢ Diagonalization: $P^{-1}AP = D$ (eigenvector basis)\nâ€¢ Spectral Theorem: $Q^\\top A Q = \\Lambda$ (orthonormal eigenbasis)\nâ€¢ Jordan Normal Form: $P^{-1}AP = J$ (generalized eigenvector basis)\nâ€¢ QR decomposition: basis orthogonalization\nâ€¢ Coordinate geometry: conics, quadric surfaces\nAll are instances of choosing a "better" basis to simplify a matrix.',
+        body: 'Change of basis $\\Rightarrow$ unifies:\n• Diagonalization: $P^{-1}AP = D$ (eigenvector basis)\n• Spectral Theorem: $Q^\\top A Q = \\Lambda$ (orthonormal eigenbasis)\n• Jordan Normal Form: $P^{-1}AP = J$ (generalized eigenvector basis)\n• QR decomposition: basis orthogonalization\n• Coordinate geometry: conics, quadric surfaces\nAll are instances of choosing a "better" basis to simplify a matrix.',
       },
     ],
     visualizations: [],
@@ -296,8 +296,8 @@ print("Same tr:", np.isclose(np.trace(A), np.trace(A_new)))`,
         },
         {
           expression: '\\text{Eigenvalues of } [T]_{\\mathcal{B}}: \\det\\begin{bmatrix}2-\\lambda&0\\\\2&3-\\lambda\\end{bmatrix} = (2-\\lambda)(3-\\lambda) = 0 \\Rightarrow \\lambda = 2, 3 \\checkmark',
-          annotation: 'Same eigenvalues! Similar matrices ($A$ and $P^{-1}AP$) always share eigenvalues â€” they represent the same linear map in different coordinates.',
-          strategyTitle: 'Eigenvalues of $[T]_{\\mathcal{B}}$ â€” same as $A$',
+          annotation: 'Same eigenvalues! Similar matrices ($A$ and $P^{-1}AP$) always share eigenvalues — they represent the same linear map in different coordinates.',
+          strategyTitle: 'Eigenvalues of $[T]_{\\mathcal{B}}$ — same as $A$',
         },
       ],
     },
@@ -325,7 +325,7 @@ print("Same tr:", np.isclose(np.trace(A), np.trace(A_new)))`,
     'Change-of-basis matrix $P$: columns are new basis vectors in old coordinates.',
     'Vector conversion: $[\\mathbf{v}]_{\\text{new}} = P^{-1}[\\mathbf{v}]_{\\text{old}}$.',
     'Matrix conversion (similarity): $[T]_{\\text{new}} = P^{-1}[T]_{\\text{old}}P$.',
-    'Eigenvalues, determinant, trace, rank are invariant under similarity â€” they describe the map, not the basis.',
+    'Eigenvalues, determinant, trace, rank are invariant under similarity — they describe the map, not the basis.',
   ],
 
   checkpoints: [
@@ -345,7 +345,7 @@ print("Same tr:", np.isclose(np.trace(A), np.trace(A_new)))`,
         id: 'assess-la6-006-1',
         type: 'computation',
         text: 'Let $A = \\begin{bmatrix}4&2\\\\1&3\\end{bmatrix}$. (a) Find the eigenvalues and eigenvectors. (b) Form the change-of-basis matrix $P$. (c) Verify $P^{-1}AP = D$. (d) What does $A$ look like in the eigenvector basis?',
-        answer: '(a) Char poly: $(4-\\lambda)(3-\\lambda)-2 = \\lambda^2-7\\lambda+10 = (\\lambda-2)(\\lambda-5)$. $\\lambda_1=2$: $\\mathbf{v}_1=(-2,1)^\\top$ (or $(2,-1)^\\top$). $\\lambda_2=5$: $\\mathbf{v}_2=(1,1)^\\top$. (b) $P=\\begin{bmatrix}-2&1\\\\1&1\\end{bmatrix}$. (c) $P^{-1}AP = \\begin{bmatrix}2&0\\\\0&5\\end{bmatrix}$ âœ“. (d) In the eigenvector basis, $A$ scales the $\\mathbf{v}_1$ direction by 2 and the $\\mathbf{v}_2$ direction by 5 â€” pure stretching, no mixing.',
+        answer: '(a) Char poly: $(4-\\lambda)(3-\\lambda)-2 = \\lambda^2-7\\lambda+10 = (\\lambda-2)(\\lambda-5)$. $\\lambda_1=2$: $\\mathbf{v}_1=(-2,1)^\\top$ (or $(2,-1)^\\top$). $\\lambda_2=5$: $\\mathbf{v}_2=(1,1)^\\top$. (b) $P=\\begin{bmatrix}-2&1\\\\1&1\\end{bmatrix}$. (c) $P^{-1}AP = \\begin{bmatrix}2&0\\\\0&5\\end{bmatrix}$ âœ“. (d) In the eigenvector basis, $A$ scales the $\\mathbf{v}_1$ direction by 2 and the $\\mathbf{v}_2$ direction by 5 — pure stretching, no mixing.',
         hint: 'Form $P = [\\mathbf{v}_1 | \\mathbf{v}_2]$ and compute $P^{-1} = \\frac{1}{\\det P}\\begin{bmatrix}d&-b\\\\-c&a\\end{bmatrix}$.',
       },
     ],
@@ -367,7 +367,7 @@ print("Same tr:", np.isclose(np.trace(A), np.trace(A_new)))`,
       text: 'Under matrix similarity $B = P^{-1}AP$, which quantity is NOT preserved?',
       options: ['Eigenvalues', 'Determinant', 'Individual matrix entries', 'Rank'],
       answer: 'Individual matrix entries',
-      hints: ['Similarity invariants include: eigenvalues, characteristic polynomial, trace, determinant, rank. The individual entries $A_{ij}$ are NOT invariants â€” they depend on the choice of basis. This is precisely the point: same map, different matrix representations.'],
+      hints: ['Similarity invariants include: eigenvalues, characteristic polynomial, trace, determinant, rank. The individual entries $A_{ij}$ are NOT invariants — they depend on the choice of basis. This is precisely the point: same map, different matrix representations.'],
       reviewSection: 'rigor',
     },
     {
@@ -376,7 +376,7 @@ print("Same tr:", np.isclose(np.trace(A), np.trace(A_new)))`,
       text: 'In the eigenvector basis, a diagonalizable matrix $A$ looks like:',
       options: ['A triangular matrix', 'A permutation matrix', 'A diagonal matrix $D$ with eigenvalues on the diagonal', 'An identity matrix'],
       answer: 'A diagonal matrix $D$ with eigenvalues on the diagonal',
-      hints: ['$P^{-1}AP = D$ where $D = \\text{diag}(\\lambda_1, \\ldots, \\lambda_n)$. In the eigenvector basis, the map $T$ has the simplest possible matrix â€” a diagonal scaling.'],
+      hints: ['$P^{-1}AP = D$ where $D = \\text{diag}(\\lambda_1, \\ldots, \\lambda_n)$. In the eigenvector basis, the map $T$ has the simplest possible matrix — a diagonal scaling.'],
       reviewSection: 'math',
     },
     {
@@ -385,7 +385,7 @@ print("Same tr:", np.isclose(np.trace(A), np.trace(A_new)))`,
       text: 'The change-of-basis matrices satisfy which composition rule when going from basis $A$ to $B$ to $C$?',
       options: ['$P_{A \\to C} = P_{A \\to B} + P_{B \\to C}$', '$P_{A \\to C} = P_{B \\to C} \\cdot P_{A \\to B}$', '$P_{A \\to C} = P_{A \\to B} \\cdot P_{B \\to C}$', '$P_{A \\to C} = P_{A \\to B}^{-1} + P_{B \\to C}^{-1}$'],
       answer: '$P_{A \\to C} = P_{B \\to C} \\cdot P_{A \\to B}$',
-      hints: ['Apply in sequence: $[\\mathbf{v}]_B = P_{A\\to B}[\\mathbf{v}]_A$, then $[\\mathbf{v}]_C = P_{B\\to C}[\\mathbf{v}]_B = P_{B\\to C} P_{A\\to B} [\\mathbf{v}]_A$. Matrix multiplication is not commutative â€” order matters.'],
+      hints: ['Apply in sequence: $[\\mathbf{v}]_B = P_{A\\to B}[\\mathbf{v}]_A$, then $[\\mathbf{v}]_C = P_{B\\to C}[\\mathbf{v}]_B = P_{B\\to C} P_{A\\to B} [\\mathbf{v}]_A$. Matrix multiplication is not commutative — order matters.'],
       reviewSection: 'math',
     },
     {
@@ -427,7 +427,7 @@ print("Same tr:", np.isclose(np.trace(A), np.trace(A_new)))`,
     {
       id: 'q-la6-006-9',
       type: 'choice',
-      text: 'The vector $\\mathbf{v} = (1,0)$ in the standard basis. In the basis $\\mathcal{B} = \\{(1/\\sqrt{2},1/\\sqrt{2}),(-1/\\sqrt{2},1/\\sqrt{2})\\}$ (45Â° rotation), what are its coordinates?',
+      text: 'The vector $\\mathbf{v} = (1,0)$ in the standard basis. In the basis $\\mathcal{B} = \\{(1/\\sqrt{2},1/\\sqrt{2}),(-1/\\sqrt{2},1/\\sqrt{2})\\}$ (45° rotation), what are its coordinates?',
       options: ['$(1/\\sqrt{2}, -1/\\sqrt{2})$', '$(\\sqrt{2}, 0)$', '$(1, 0)$', '$(0, 1/\\sqrt{2})$'],
       answer: '$(1/\\sqrt{2}, -1/\\sqrt{2})$',
       hints: ['$P = [\\mathbf{b}_1 | \\mathbf{b}_2]$ is an orthogonal matrix, so $P^{-1} = P^T$. Thus $[\\mathbf{v}]_{\\mathcal{B}} = P^T(1,0)^T = (1/\\sqrt{2}, -1/\\sqrt{2})^T$. Check: $(1/\\sqrt{2})(1/\\sqrt{2}, 1/\\sqrt{2}) + (-1/\\sqrt{2})(-1/\\sqrt{2}, 1/\\sqrt{2}) = (1/2+1/2, 1/2-1/2) = (1,0)$ âœ“.'],
@@ -437,8 +437,8 @@ print("Same tr:", np.isclose(np.trace(A), np.trace(A_new)))`,
       id: 'q-la6-006-10',
       type: 'choice',
       text: 'If $A$ is already diagonal, $A = \\text{diag}(2, 5)$, what is $P^{-1}AP$ for an invertible $P$?',
-      options: ['Always $A$ itself', 'Always diagonal, but possibly with different diagonal entries', 'Similar to $A$ â€” same eigenvalues 2 and 5, but generally not diagonal', 'Always the identity'],
-      answer: 'Similar to $A$ â€” same eigenvalues 2 and 5, but generally not diagonal',
+      options: ['Always $A$ itself', 'Always diagonal, but possibly with different diagonal entries', 'Similar to $A$ — same eigenvalues 2 and 5, but generally not diagonal', 'Always the identity'],
+      answer: 'Similar to $A$ — same eigenvalues 2 and 5, but generally not diagonal',
       hints: ['$P^{-1}AP$ is similar to $A$ regardless of what $P$ is, so it always has eigenvalues 2 and 5. But unless $P$ is itself diagonal (or built from eigenvectors of $A$), $P^{-1}AP$ will not be diagonal. Diagonality is a basis-dependent property; eigenvalues are not.'],
       reviewSection: 'rigor',
     },
@@ -456,14 +456,14 @@ print("Same tr:", np.isclose(np.trace(A), np.trace(A_new)))`,
     {
       falseBelief: 'The matrix $P$ converts vectors to new-basis coordinates.',
       whyStudentsThinkIt: 'Students see "$P$ is the change-of-basis matrix" and assume multiplying by $P$ gives new coordinates.',
-      correctionExample: '$P$ converts FROM new-basis coordinates TO standard: $\\mathbf{v} = P[\\mathbf{v}]_{\\mathcal{B}}$. To get new coordinates, you need $P^{-1}$: $[\\mathbf{v}]_{\\mathcal{B}} = P^{-1}\\mathbf{v}$. Think of $P$ as "decoding" (new â†’ standard) and $P^{-1}$ as "encoding" (standard â†’ new).',
+      correctionExample: '$P$ converts FROM new-basis coordinates TO standard: $\\mathbf{v} = P[\\mathbf{v}]_{\\mathcal{B}}$. To get new coordinates, you need $P^{-1}$: $[\\mathbf{v}]_{\\mathcal{B}} = P^{-1}\\mathbf{v}$. Think of $P$ as "decoding" (new → standard) and $P^{-1}$ as "encoding" (standard → new).',
       contrastCase: 'If $\\mathcal{B} = \\{(2,0),(0,3)\\}$ and $\\mathbf{v} = (4,6)$, then $[\\mathbf{v}]_{\\mathcal{B}} = P^{-1}(4,6)^T = (1/2, 0; 0, 1/3)(4,6)^T = (2,2)^T$. Multiplying by $P$ gives $(2\\cdot4, 3\\cdot6) = (8,18)$ which is wrong.',
     },
     {
-      falseBelief: 'Similar matrices are the same matrix written differently â€” so all their entries are equal.',
+      falseBelief: 'Similar matrices are the same matrix written differently — so all their entries are equal.',
       whyStudentsThinkIt: 'Students hear "same linear transformation, different basis" and confuse "same transformation" with "same matrix entries."',
       correctionExample: 'The matrices $A = [[3,1],[0,2]]$ and $P^{-1}AP = [[2,2],[0,3]]$ (from Example 3) represent the same transformation in different bases. Their entries differ completely, but eigenvalues (2 and 3), trace (5), and determinant (6) are identical.',
-      contrastCase: 'Two matrices with the same entries are equal, not just similar. Two matrices are similar if there exists an invertible $P$ with $B = P^{-1}AP$ â€” the standard and new-basis representations of one map.',
+      contrastCase: 'Two matrices with the same entries are equal, not just similar. Two matrices are similar if there exists an invertible $P$ with $B = P^{-1}AP$ — the standard and new-basis representations of one map.',
     },
   ],
 
@@ -471,7 +471,7 @@ print("Same tr:", np.isclose(np.trace(A), np.trace(A_new)))`,
     {
       situation: 'In signal processing, the Discrete Fourier Transform converts a signal from the time domain to the frequency domain.',
       competingTechniques: 'You could analyze the signal in the time domain directly, or transform to frequency domain first.',
-      whyThisTechniqueWins: 'The DFT is a change of basis â€” from the standard time-domain basis to the Fourier (frequency) basis. In the Fourier basis, convolution (hard) becomes pointwise multiplication (easy), just as a linear map becomes diagonal in its eigenvector basis.',
+      whyThisTechniqueWins: 'The DFT is a change of basis — from the standard time-domain basis to the Fourier (frequency) basis. In the Fourier basis, convolution (hard) becomes pointwise multiplication (easy), just as a linear map becomes diagonal in its eigenvector basis.',
     },
     {
       situation: 'A physics problem involves a symmetric mass-spring system with coupled oscillators. The equations of motion are coupled (each mass affects the others).',

@@ -1,33 +1,33 @@
-﻿export default {
+export default {
   id: 'la4-005',
   slug: 'inner-product-spaces',
   chapter: 'la4',
   order: 5,
   title: 'Inner Product Spaces',
-  subtitle: 'The dot product is just one example of an inner product. Any function that measures angle and length in a way that satisfies three properties generates a complete geometry â€” distance, angle, projection, and orthogonality.',
+  subtitle: 'The dot product is just one example of an inner product. Any function that measures angle and length in a way that satisfies three properties generates a complete geometry — distance, angle, projection, and orthogonality.',
   tags: ['inner product', 'inner product space', 'norm', 'Cauchy-Schwarz', 'orthogonality', 'Gram-Schmidt', 'function space', 'Hilbert space'],
   aliases: 'inner product space norm Cauchy-Schwarz inequality orthogonality Gram-Schmidt Hilbert space function space bilinear',
 
   hook: {
-    question: "The dot product measures angles and lengths in $\\mathbb{R}^n$. But what about polynomials, functions, or matrices â€” can we define angles and orthogonality there too?",
+    question: "The dot product measures angles and lengths in $\\mathbb{R}^n$. But what about polynomials, functions, or matrices — can we define angles and orthogonality there too?",
     realWorldContext: "Inner product spaces unify geometry across wildly different settings. Quantum mechanics is formulated in a complex inner product space (Hilbert space): the inner product gives the probability amplitude between quantum states. Signal processing uses the inner product on function spaces: $\\langle f, g \\rangle = \\int f(t)g(t)\\,dt$ measures how much two signals share. Statistics uses weighted inner products to account for unequal variances. Fourier series work because trig functions form an orthonormal basis in a function inner product space. Understanding the abstract inner product means understanding all of these at once.",
   },
 
   intuition: {
     prose: [
-      'Two polynomials: $f(x) = x$ and $g(x) = x^2$ on $[0,1]$. Their "similarity": $\\langle f,g \\rangle = \\int_0^1 x \\cdot x^2\\,dx = \\int_0^1 x^3\\,dx = 1/4$. Their "lengths": $\\|f\\| = \\sqrt{1/3}$, $\\|g\\| = \\sqrt{1/5}$. Angle: $\\cos\\theta = (1/4)/(\\sqrt{1/3}\\sqrt{1/5}) = (\\sqrt{15}/4) \\approx 0.968$ â€” these polynomials are nearly aligned ($\\theta \\approx 15Â°$). There are no components here, just an integral â€” yet we get length, angle, and orthogonality exactly like in $\\mathbb{R}^n$. An inner product is any function that extends this geometry to any vector space.',
-      '**The standard dot product.** On $\\mathbb{R}^n$: $\\langle \\mathbf{u}, \\mathbf{v} \\rangle = \\mathbf{u}^\\top \\mathbf{v} = \\sum_{i=1}^n u_i v_i$. This is the canonical example. The norm it induces is $\\|\\mathbf{v}\\| = \\sqrt{\\langle \\mathbf{v}, \\mathbf{v} \\rangle} = \\sqrt{\\sum v_i^2}$ â€” Euclidean length.',
+      'Two polynomials: $f(x) = x$ and $g(x) = x^2$ on $[0,1]$. Their "similarity": $\\langle f,g \\rangle = \\int_0^1 x \\cdot x^2\\,dx = \\int_0^1 x^3\\,dx = 1/4$. Their "lengths": $\\|f\\| = \\sqrt{1/3}$, $\\|g\\| = \\sqrt{1/5}$. Angle: $\\cos\\theta = (1/4)/(\\sqrt{1/3}\\sqrt{1/5}) = (\\sqrt{15}/4) \\approx 0.968$ — these polynomials are nearly aligned ($\\theta \\approx 15°$). There are no components here, just an integral — yet we get length, angle, and orthogonality exactly like in $\\mathbb{R}^n$. An inner product is any function that extends this geometry to any vector space.',
+      '**The standard dot product.** On $\\mathbb{R}^n$: $\\langle \\mathbf{u}, \\mathbf{v} \\rangle = \\mathbf{u}^\\top \\mathbf{v} = \\sum_{i=1}^n u_i v_i$. This is the canonical example. The norm it induces is $\\|\\mathbf{v}\\| = \\sqrt{\\langle \\mathbf{v}, \\mathbf{v} \\rangle} = \\sqrt{\\sum v_i^2}$ — Euclidean length.',
       '**A weighted inner product.** On $\\mathbb{R}^n$ with positive weights $w_1, \\ldots, w_n$: $\\langle \\mathbf{u}, \\mathbf{v} \\rangle_W = \\sum w_i u_i v_i = \\mathbf{u}^\\top W \\mathbf{v}$ where $W = \\text{diag}(w_1, \\ldots, w_n)$. This inner product arises in statistics (weighted least squares) and finite elements (energy-based norms).',
-      '**Inner products on function spaces.** On the space of continuous functions $C[a,b]$: $\\langle f, g \\rangle = \\int_a^b f(x)g(x)\\,dx$. Two functions are orthogonal if this integral is zero. This makes the sine and cosine functions of different frequencies orthogonal â€” the basis for Fourier series.',
-      '**CNC and signal processing applications.** In CNC machining, vibration sensors record acceleration signals $f(t)$ during cutting. To detect **chatter**, engineers compute the inner product $\\langle f, \\sin(\\omega_{\\text{chatter}} t) \\rangle = \\int_0^T f(t)\\sin(\\omega t)\\,dt$ â€” if this is large, the cutting force contains that frequency. This is exactly the Fourier coefficient: how much of the chatter basis function lives in the measured signal. In **finite element analysis** for CNC frame design, the stiffness matrix entries are $K_{ij} = \\int_{\\Omega} \\nabla\\phi_i \\cdot \\nabla\\phi_j\\,d\\Omega$ â€” an inner product of basis function gradients over the material domain. The weighted inner product appears in **weighted least squares**, where measurement noise with unequal variance $\\sigma_i^2$ gets inner product weights $w_i = 1/\\sigma_i^2$ so that precise measurements count more.',
-      '**What makes an inner product valid â€” the three axioms.** Not every formula that takes two vectors and returns a number qualifies. A valid inner product must satisfy: (1) **Positive definiteness** â€” $\\langle \\mathbf{v}, \\mathbf{v} \\rangle > 0$ for $\\mathbf{v} \\neq \\mathbf{0}$ and $\\langle \\mathbf{0}, \\mathbf{0} \\rangle = 0$ (you cannot have zero length unless you are the zero vector); (2) **Symmetry** â€” $\\langle \\mathbf{u}, \\mathbf{v} \\rangle = \\langle \\mathbf{v}, \\mathbf{u} \\rangle$ (distance from $A$ to $B$ equals distance from $B$ to $A$); (3) **Linearity** â€” $\\langle c\\mathbf{u} + \\mathbf{w}, \\mathbf{v} \\rangle = c\\langle \\mathbf{u}, \\mathbf{v} \\rangle + \\langle \\mathbf{w}, \\mathbf{v} \\rangle$ (scaling and adding vectors commutes with the inner product). The weighted inner product $\\langle \\mathbf{u}, \\mathbf{v} \\rangle_W = \\mathbf{u}^T W \\mathbf{v}$ satisfies all three whenever $W$ is symmetric positive definite.',
-      '**Where this is heading.** The abstract inner product is the gateway to infinite-dimensional analysis. The Spectral Theorem in the next lesson says that every symmetric matrix can be diagonalized with orthonormal eigenvectors â€” and orthonormality here means exactly the dot-product inner product. After that, the same ideas extend to infinite dimensions: $L^2$ function spaces, Fourier series, and quantum mechanics all live in Hilbert spaces (complete inner product spaces). The abstract framework you are building here is the same one used to prove that Fourier series converge, that quantum observables have real eigenvalues, and that finite element approximations improve as the mesh is refined.',
+      '**Inner products on function spaces.** On the space of continuous functions $C[a,b]$: $\\langle f, g \\rangle = \\int_a^b f(x)g(x)\\,dx$. Two functions are orthogonal if this integral is zero. This makes the sine and cosine functions of different frequencies orthogonal — the basis for Fourier series.',
+      '**CNC and signal processing applications.** In CNC machining, vibration sensors record acceleration signals $f(t)$ during cutting. To detect **chatter**, engineers compute the inner product $\\langle f, \\sin(\\omega_{\\text{chatter}} t) \\rangle = \\int_0^T f(t)\\sin(\\omega t)\\,dt$ — if this is large, the cutting force contains that frequency. This is exactly the Fourier coefficient: how much of the chatter basis function lives in the measured signal. In **finite element analysis** for CNC frame design, the stiffness matrix entries are $K_{ij} = \\int_{\\Omega} \\nabla\\phi_i \\cdot \\nabla\\phi_j\\,d\\Omega$ — an inner product of basis function gradients over the material domain. The weighted inner product appears in **weighted least squares**, where measurement noise with unequal variance $\\sigma_i^2$ gets inner product weights $w_i = 1/\\sigma_i^2$ so that precise measurements count more.',
+      '**What makes an inner product valid — the three axioms.** Not every formula that takes two vectors and returns a number qualifies. A valid inner product must satisfy: (1) **Positive definiteness** — $\\langle \\mathbf{v}, \\mathbf{v} \\rangle > 0$ for $\\mathbf{v} \\neq \\mathbf{0}$ and $\\langle \\mathbf{0}, \\mathbf{0} \\rangle = 0$ (you cannot have zero length unless you are the zero vector); (2) **Symmetry** — $\\langle \\mathbf{u}, \\mathbf{v} \\rangle = \\langle \\mathbf{v}, \\mathbf{u} \\rangle$ (distance from $A$ to $B$ equals distance from $B$ to $A$); (3) **Linearity** — $\\langle c\\mathbf{u} + \\mathbf{w}, \\mathbf{v} \\rangle = c\\langle \\mathbf{u}, \\mathbf{v} \\rangle + \\langle \\mathbf{w}, \\mathbf{v} \\rangle$ (scaling and adding vectors commutes with the inner product). The weighted inner product $\\langle \\mathbf{u}, \\mathbf{v} \\rangle_W = \\mathbf{u}^T W \\mathbf{v}$ satisfies all three whenever $W$ is symmetric positive definite.',
+      '**Where this is heading.** The abstract inner product is the gateway to infinite-dimensional analysis. The Spectral Theorem in the next lesson says that every symmetric matrix can be diagonalized with orthonormal eigenvectors — and orthonormality here means exactly the dot-product inner product. After that, the same ideas extend to infinite dimensions: $L^2$ function spaces, Fourier series, and quantum mechanics all live in Hilbert spaces (complete inner product spaces). The abstract framework you are building here is the same one used to prove that Fourier series converge, that quantum observables have real eigenvalues, and that finite element approximations improve as the mesh is refined.',
     ],
     callouts: [
       {
         type: 'sequencing',
-        title: 'Lesson 5 of 9 â€” Orthogonality & SVD',
-        body: '**Previous (Lesson 4):** SVD â€” the universal factorization $A = U\\Sigma V^T$.\n**This lesson:** Inner Product Spaces â€” abstracting the dot product to define geometry in any vector space.\n**Next (Lesson 6):** Spectral Theorem â€” why symmetric matrices are always diagonalizable with orthogonal eigenvectors.',
+        title: 'Lesson 5 of 9 — Orthogonality & SVD',
+        body: '**Previous (Lesson 4):** SVD — the universal factorization $A = U\\Sigma V^T$.\n**This lesson:** Inner Product Spaces — abstracting the dot product to define geometry in any vector space.\n**Next (Lesson 6):** Spectral Theorem — why symmetric matrices are always diagonalizable with orthogonal eigenvectors.',
       },
       {
         type: 'theorem',
@@ -42,7 +42,7 @@
       {
         type: 'insight',
         title: 'Gram-Schmidt in an Inner Product Space',
-        body: 'Gram-Schmidt works in any inner product space. Given linearly independent $\\{\\mathbf{v}_1, \\ldots, \\mathbf{v}_k\\}$, produce orthonormal $\\{\\mathbf{q}_1, \\ldots, \\mathbf{q}_k\\}$ using the same algorithm â€” just replace the dot product with $\\langle \\cdot, \\cdot \\rangle$ throughout.',
+        body: 'Gram-Schmidt works in any inner product space. Given linearly independent $\\{\\mathbf{v}_1, \\ldots, \\mathbf{v}_k\\}$, produce orthonormal $\\{\\mathbf{q}_1, \\ldots, \\mathbf{q}_k\\}$ using the same algorithm — just replace the dot product with $\\langle \\cdot, \\cdot \\rangle$ throughout.',
       },
       {
         type: 'insight',
@@ -127,7 +127,7 @@ abs(lhs - rhs) < 1e-9
       {
         type: 'insight',
         title: 'The Parallelogram Law',
-        body: 'A norm $\\|\\cdot\\|$ comes from an inner product iff it satisfies the parallelogram law:\n$\\|\\mathbf{u} + \\mathbf{v}\\|^2 + \\|\\mathbf{u} - \\mathbf{v}\\|^2 = 2(\\|\\mathbf{u}\\|^2 + \\|\\mathbf{v}\\|^2)$\nThe $L^1$ and $L^\\infty$ norms do NOT satisfy this â€” they cannot come from any inner product.',
+        body: 'A norm $\\|\\cdot\\|$ comes from an inner product iff it satisfies the parallelogram law:\n$\\|\\mathbf{u} + \\mathbf{v}\\|^2 + \\|\\mathbf{u} - \\mathbf{v}\\|^2 = 2(\\|\\mathbf{u}\\|^2 + \\|\\mathbf{v}\\|^2)$\nThe $L^1$ and $L^\\infty$ norms do NOT satisfy this — they cannot come from any inner product.',
       },
       {
         type: 'definition',
@@ -150,8 +150,8 @@ abs(lhs - rhs) < 1e-9
           initialCells: [
             {
               id: 1,
-              cellTitle: 'Trig function orthogonality â€” the integral inner product',
-              prose: 'The inner product $\\langle f, g \\rangle = \\int_{-\\pi}^{\\pi} f(x)g(x)\\,dx$ on functions works exactly like the dot product. Two trig functions $\\sin(mx)$ and $\\sin(nx)$ are orthogonal when $m \\neq n$ â€” their inner product is zero. We verify this numerically using np.trapz (the trapezoidal rule for numerical integration).',
+              cellTitle: 'Trig function orthogonality — the integral inner product',
+              prose: 'The inner product $\\langle f, g \\rangle = \\int_{-\\pi}^{\\pi} f(x)g(x)\\,dx$ on functions works exactly like the dot product. Two trig functions $\\sin(mx)$ and $\\sin(nx)$ are orthogonal when $m \\neq n$ — their inner product is zero. We verify this numerically using np.trapz (the trapezoidal rule for numerical integration).',
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -185,7 +185,7 @@ plt.show()`,
             },
             {
               id: 2,
-              cellTitle: 'Weighted inner product â€” geometry changes with weights',
+              cellTitle: 'Weighted inner product — geometry changes with weights',
               prose: 'The weighted inner product $\\langle \\mathbf{u}, \\mathbf{v} \\rangle_W = \\mathbf{u}^T W \\mathbf{v}$ with $W = \\text{diag}(w_1,\\ldots,w_n)$ arises in weighted least squares. When sensors have unequal noise variance $\\sigma_i^2$, set $w_i = 1/\\sigma_i^2$ so precise measurements count more. The same vectors $\\mathbf{u},\\mathbf{v}$ can have completely different angles under the standard vs. weighted inner product.',
               code: `import numpy as np
 
@@ -213,7 +213,7 @@ print("Different inner products give different geometries on the same space.")`,
             {
               id: 3,
               cellTitle: 'CNC chatter detection as a function inner product',
-              prose: 'To detect chatter at frequency $\\omega_c$, compute $\\langle f, \\sin(\\omega_c t) \\rangle = \\int_0^T f(t)\\sin(\\omega_c t)\\,dt$. If this Fourier coefficient is large, the cutting force contains that frequency. This is the inner product on the function space $L^2[0,T]$ â€” orthogonality of trig functions means each frequency is tested independently.',
+              prose: 'To detect chatter at frequency $\\omega_c$, compute $\\langle f, \\sin(\\omega_c t) \\rangle = \\int_0^T f(t)\\sin(\\omega_c t)\\,dt$. If this Fourier coefficient is large, the cutting force contains that frequency. This is the inner product on the function space $L^2[0,T]$ — orthogonality of trig functions means each frequency is tested independently.',
               code: `import numpy as np
 
 T = 1.0; fs = 4096
@@ -243,25 +243,25 @@ for freq in [120, 300, 500, 650, 800]:
 
   rigor: {
     prose: [
-      '**Hilbert spaces.** An inner product space that is complete (every Cauchy sequence converges) is a Hilbert space. $\\mathbb{R}^n$ and $\\mathbb{C}^n$ are finite-dimensional Hilbert spaces. The space $L^2[a,b]$ of square-integrable functions (with $\\langle f, g \\rangle = \\int_a^b f\\bar{g}$) is an infinite-dimensional Hilbert space â€” every square-integrable function has a convergent Fourier series. Finite-dimensional inner product spaces are always complete (no distinction from Hilbert space in finite dimensions).',
-      '**Riesz representation theorem.** Every continuous linear functional $\\phi: H \\to \\mathbb{F}$ on a Hilbert space $H$ is of the form $\\phi(\\mathbf{v}) = \\langle \\mathbf{v}, \\mathbf{w} \\rangle$ for a unique $\\mathbf{w} \\in H$. This profound result means that "measuring by integration against a function" and "taking an inner product" are the same thing. In finite dimensions: any linear functional on $\\mathbb{R}^n$ is a dot product with some vector â€” the gradient $\\nabla f(\\mathbf{x})$ is exactly this representing vector for the derivative functional.',
+      '**Hilbert spaces.** An inner product space that is complete (every Cauchy sequence converges) is a Hilbert space. $\\mathbb{R}^n$ and $\\mathbb{C}^n$ are finite-dimensional Hilbert spaces. The space $L^2[a,b]$ of square-integrable functions (with $\\langle f, g \\rangle = \\int_a^b f\\bar{g}$) is an infinite-dimensional Hilbert space — every square-integrable function has a convergent Fourier series. Finite-dimensional inner product spaces are always complete (no distinction from Hilbert space in finite dimensions).',
+      '**Riesz representation theorem.** Every continuous linear functional $\\phi: H \\to \\mathbb{F}$ on a Hilbert space $H$ is of the form $\\phi(\\mathbf{v}) = \\langle \\mathbf{v}, \\mathbf{w} \\rangle$ for a unique $\\mathbf{w} \\in H$. This profound result means that "measuring by integration against a function" and "taking an inner product" are the same thing. In finite dimensions: any linear functional on $\\mathbb{R}^n$ is a dot product with some vector — the gradient $\\nabla f(\\mathbf{x})$ is exactly this representing vector for the derivative functional.',
       '**Gram-Schmidt and ONB existence.** In any finite-dimensional inner product space, an orthonormal basis (ONB) always exists via Gram-Schmidt. The expansion $\\mathbf{v} = \\sum_{k=1}^n \\langle \\mathbf{v}, \\mathbf{e}_k \\rangle \\mathbf{e}_k$ expresses $\\mathbf{v}$ in the orthonormal basis, and the coefficient $\\langle \\mathbf{v}, \\mathbf{e}_k \\rangle$ is the orthogonal projection of $\\mathbf{v}$ onto the $k$-th basis direction. This is why Fourier coefficients are computed as integrals: $a_n = \\frac{1}{\\pi}\\int_{-\\pi}^{\\pi} f(x)\\cos(nx)\\,dx = \\frac{\\langle f, \\cos(nx)\\rangle}{\\|\\cos(nx)\\|^2}$.',
     ],
     callouts: [
       {
         type: 'insight',
         title: 'Orthonormal Bases in Hilbert Spaces',
-        body: 'In a Hilbert space with orthonormal basis $\\{\\mathbf{e}_k\\}$: every vector $\\mathbf{v} = \\sum_k \\langle \\mathbf{v}, \\mathbf{e}_k \\rangle \\mathbf{e}_k$ (Fourier expansion). The coefficients $\\langle \\mathbf{v}, \\mathbf{e}_k \\rangle$ are the Fourier coefficients. **Parseval\'s identity:** $\\|\\mathbf{v}\\|^2 = \\sum_k |\\langle \\mathbf{v}, \\mathbf{e}_k \\rangle|^2$\nThis says energy in the signal equals the sum of squared Fourier coefficients â€” no energy is lost in the transform.',
+        body: 'In a Hilbert space with orthonormal basis $\\{\\mathbf{e}_k\\}$: every vector $\\mathbf{v} = \\sum_k \\langle \\mathbf{v}, \\mathbf{e}_k \\rangle \\mathbf{e}_k$ (Fourier expansion). The coefficients $\\langle \\mathbf{v}, \\mathbf{e}_k \\rangle$ are the Fourier coefficients. **Parseval\'s identity:** $\\|\\mathbf{v}\\|^2 = \\sum_k |\\langle \\mathbf{v}, \\mathbf{e}_k \\rangle|^2$\nThis says energy in the signal equals the sum of squared Fourier coefficients — no energy is lost in the transform.',
       },
       {
         type: 'theorem',
         title: 'Riesz Representation Theorem',
-        body: 'Let $H$ be a Hilbert space. For every bounded linear functional $\\phi: H \\to \\mathbb{F}$, there exists a unique $\\mathbf{w} \\in H$ such that:\n$\\phi(\\mathbf{v}) = \\langle \\mathbf{v}, \\mathbf{w} \\rangle \\quad \\text{for all } \\mathbf{v} \\in H$\nMoreover $\\|\\phi\\| = \\|\\mathbf{w}\\|$. Consequence: $H$ and its dual $H^*$ are isometrically isomorphic â€” the inner product identifies them.',
+        body: 'Let $H$ be a Hilbert space. For every bounded linear functional $\\phi: H \\to \\mathbb{F}$, there exists a unique $\\mathbf{w} \\in H$ such that:\n$\\phi(\\mathbf{v}) = \\langle \\mathbf{v}, \\mathbf{w} \\rangle \\quad \\text{for all } \\mathbf{v} \\in H$\nMoreover $\\|\\phi\\| = \\|\\mathbf{w}\\|$. Consequence: $H$ and its dual $H^*$ are isometrically isomorphic — the inner product identifies them.',
       },
       {
         type: 'insight',
         title: 'Completeness and $L^2$',
-        body: 'The space $L^2[a,b]$ of square-integrable functions (technically: equivalence classes where $f = g$ if $\\int |f-g|^2 = 0$) is a Hilbert space. Continuous functions $C[a,b]$ are NOT complete under the $L^2$ norm â€” a limit of continuous functions may be discontinuous. But $L^2[a,b]$ is the completion of $C[a,b]$, just as $\\mathbb{R}$ is the completion of $\\mathbb{Q}$.',
+        body: 'The space $L^2[a,b]$ of square-integrable functions (technically: equivalence classes where $f = g$ if $\\int |f-g|^2 = 0$) is a Hilbert space. Continuous functions $C[a,b]$ are NOT complete under the $L^2$ norm — a limit of continuous functions may be discontinuous. But $L^2[a,b]$ is the completion of $C[a,b]$, just as $\\mathbb{R}$ is the completion of $\\mathbb{Q}$.',
       },
     ],
     visualizations: [],
@@ -294,7 +294,7 @@ for freq in [120, 300, 500, 650, 800]:
         },
         {
           expression: '\\langle \\sin, \\cos \\rangle = 0 \\implies \\sin \\perp \\cos \\text{ in } C[-\\pi, \\pi]',
-          annotation: 'The zero inner product confirms orthogonality. This works for all distinct frequencies: $\\langle \\sin(mx), \\sin(nx) \\rangle = 0$ when $m \\neq n$ â€” the foundation of Fourier series.',
+          annotation: 'The zero inner product confirms orthogonality. This works for all distinct frequencies: $\\langle \\sin(mx), \\sin(nx) \\rangle = 0$ when $m \\neq n$ — the foundation of Fourier series.',
           strategyTitle: 'Conclusion',
         },
       ],
@@ -347,11 +347,11 @@ for freq in [120, 300, 500, 650, 800]:
           annotation: 'Use the identity $\\sin(x)\\cos(x) = \\frac{1}{2}\\sin(2x)$.',
           strategyTitle: 'Apply product-to-sum identity',
           checkpoint: 'Why do we expect this to be zero before computing?',
-          hints: ['sin(x)cos(x) is an odd function (f(-x) = -f(x)). The integral of any odd function over a symmetric interval [-Ï€,Ï€] is zero.'],
+          hints: ['sin(x)cos(x) is an odd function (f(-x) = -f(x)). The integral of any odd function over a symmetric interval [-π,π] is zero.'],
         },
         {
           expression: '= \\frac{1}{2}\\left[-\\frac{\\cos(2x)}{2}\\right]_{-\\pi}^{\\pi} = \\frac{1}{2}\\left(-\\frac{\\cos(2\\pi)}{2} + \\frac{\\cos(-2\\pi)}{2}\\right) = 0',
-          annotation: '$\\cos(2\\pi) = \\cos(-2\\pi) = 1$, so the antiderivative evaluates to the same value at both endpoints â€” difference is zero. âœ“',
+          annotation: '$\\cos(2\\pi) = \\cos(-2\\pi) = 1$, so the antiderivative evaluates to the same value at both endpoints — difference is zero. âœ“',
           strategyTitle: 'Evaluate integral',
           checkpoint: '',
           hints: [],
@@ -368,7 +368,7 @@ for freq in [120, 300, 500, 650, 800]:
           annotation: '$\\cos^2(x) = (1+\\cos(2x))/2$, same argument. So $\\|\\sin(x)\\| = \\|\\cos(x)\\| = \\sqrt{\\pi}$.',
           strategyTitle: 'Compute norm of cos(x)',
           checkpoint: 'What is the orthonormal pair (unit-length vectors)?',
-          hints: ['Divide by the norm: eâ‚ = sin(x)/âˆšÏ€ and eâ‚‚ = cos(x)/âˆšÏ€. These form an orthonormal pair in function space â€” the same role as standard basis vectors in â„â¿.'],
+          hints: ['Divide by the norm: e₁ = sin(x)/âˆšπ and e₁ = cos(x)/âˆšπ. These form an orthonormal pair in function space — the same role as standard basis vectors in ℝⁿ.'],
         },
       ],
       conclusion: '$\\sin(x) \\perp \\cos(x)$ in function space, with $\\|\\sin(x)\\| = \\|\\cos(x)\\| = \\sqrt{\\pi}$. Normalized: $\\{\\sin(x)/\\sqrt{\\pi}, \\cos(x)/\\sqrt{\\pi}\\}$ is an orthonormal pair. This orthogonality is the reason Fourier series work: each frequency is independent (contributes independently to the total signal).',
@@ -383,11 +383,11 @@ for freq in [120, 300, 500, 650, 800]:
       problem: 'Apply Gram-Schmidt to $\\{1, x, x^2\\}$ with inner product $\\langle p, q \\rangle = \\int_{-1}^{1} p(x)q(x)\\,dx$ to produce an orthonormal basis of polynomials up to degree 2.',
       hint: 'Compute $\\langle 1, 1 \\rangle = \\int_{-1}^1 1\\,dx = 2$, so $e_1 = 1/\\sqrt{2}$. For $q_2$: subtract the projection of $x$ onto $e_1$. Note $\\langle x, 1 \\rangle = \\int_{-1}^1 x\\,dx = 0$ (odd function on symmetric interval).',
       walkthrough: [
-        '**Step 1 â€” Normalize $v_1 = 1$:** $\\|v_1\\|^2 = \\int_{-1}^1 1\\,dx = 2$, so $e_1 = \\frac{1}{\\sqrt{2}}$.',
-        '**Step 2 â€” Orthogonalize $v_2 = x$:** $\\langle x, e_1 \\rangle = \\int_{-1}^1 x \\cdot \\frac{1}{\\sqrt{2}}\\,dx = 0$ (odd integrand on $[-1,1]$). So $u_2 = x - 0 = x$. Normalize: $\\|x\\|^2 = \\int_{-1}^1 x^2\\,dx = \\frac{2}{3}$, giving $e_2 = x\\sqrt{\\frac{3}{2}}$.',
-        '**Step 3 â€” Orthogonalize $v_3 = x^2$:** Need to subtract projections onto $e_1$ and $e_2$. $\\langle x^2, e_1 \\rangle = \\frac{1}{\\sqrt{2}}\\int_{-1}^1 x^2\\,dx = \\frac{1}{\\sqrt{2}} \\cdot \\frac{2}{3} = \\frac{\\sqrt{2}}{3}$. $\\langle x^2, e_2 \\rangle = \\sqrt{\\frac{3}{2}}\\int_{-1}^1 x^3\\,dx = 0$ (odd). So $u_3 = x^2 - \\frac{\\sqrt{2}}{3} \\cdot e_1 = x^2 - \\frac{1}{3}$.',
-        '**Step 4 â€” Normalize $u_3$:** $\\|x^2 - \\frac{1}{3}\\|^2 = \\int_{-1}^1 (x^2 - \\frac{1}{3})^2\\,dx = \\frac{8}{45}$. So $e_3 = \\frac{x^2 - 1/3}{\\sqrt{8/45}} = \\frac{3x^2 - 1}{2}\\sqrt{\\frac{5}{2}}$.',
-        '**Result â€” Legendre polynomials:** $e_1 = \\frac{1}{\\sqrt{2}}$, $e_2 = \\sqrt{\\frac{3}{2}}x$, $e_3 = \\sqrt{\\frac{5}{2}}\\cdot\\frac{3x^2-1}{2}$. These are the normalized Legendre polynomials $P_0, P_1, P_2$ â€” the natural orthonormal basis for polynomial approximation on $[-1,1]$.',
+        '**Step 1 — Normalize $v_1 = 1$:** $\\|v_1\\|^2 = \\int_{-1}^1 1\\,dx = 2$, so $e_1 = \\frac{1}{\\sqrt{2}}$.',
+        '**Step 2 — Orthogonalize $v_2 = x$:** $\\langle x, e_1 \\rangle = \\int_{-1}^1 x \\cdot \\frac{1}{\\sqrt{2}}\\,dx = 0$ (odd integrand on $[-1,1]$). So $u_2 = x - 0 = x$. Normalize: $\\|x\\|^2 = \\int_{-1}^1 x^2\\,dx = \\frac{2}{3}$, giving $e_2 = x\\sqrt{\\frac{3}{2}}$.',
+        '**Step 3 — Orthogonalize $v_3 = x^2$:** Need to subtract projections onto $e_1$ and $e_2$. $\\langle x^2, e_1 \\rangle = \\frac{1}{\\sqrt{2}}\\int_{-1}^1 x^2\\,dx = \\frac{1}{\\sqrt{2}} \\cdot \\frac{2}{3} = \\frac{\\sqrt{2}}{3}$. $\\langle x^2, e_2 \\rangle = \\sqrt{\\frac{3}{2}}\\int_{-1}^1 x^3\\,dx = 0$ (odd). So $u_3 = x^2 - \\frac{\\sqrt{2}}{3} \\cdot e_1 = x^2 - \\frac{1}{3}$.',
+        '**Step 4 — Normalize $u_3$:** $\\|x^2 - \\frac{1}{3}\\|^2 = \\int_{-1}^1 (x^2 - \\frac{1}{3})^2\\,dx = \\frac{8}{45}$. So $e_3 = \\frac{x^2 - 1/3}{\\sqrt{8/45}} = \\frac{3x^2 - 1}{2}\\sqrt{\\frac{5}{2}}$.',
+        '**Result — Legendre polynomials:** $e_1 = \\frac{1}{\\sqrt{2}}$, $e_2 = \\sqrt{\\frac{3}{2}}x$, $e_3 = \\sqrt{\\frac{5}{2}}\\cdot\\frac{3x^2-1}{2}$. These are the normalized Legendre polynomials $P_0, P_1, P_2$ — the natural orthonormal basis for polynomial approximation on $[-1,1]$.',
       ],
     },
     {
@@ -400,16 +400,16 @@ for freq in [120, 300, 500, 650, 800]:
         '**Signal energy:** $\\|f\\|^2 = \\int_{-\\pi}^\\pi x^2\\,dx = \\frac{x^3}{3}\\big|_{-\\pi}^\\pi = \\frac{2\\pi^3}{3} \\approx 65.80$.',
         '**Fourier coefficients:** $b_n = \\frac{2(-1)^{n+1}}{n}$. So $b_1 = 2, b_2 = -1, b_3 = 2/3$.',
         '**Energy per mode:** With ONB $e_n(x) = \\frac{1}{\\sqrt{\\pi}}\\sin(nx)$ (since $\\|\\sin(nx)\\|^2 = \\pi$), the ONB coefficient is $c_n = b_n\\sqrt{\\pi}$. By Parseval: $\\|f\\|^2 = \\sum |c_n|^2 = \\pi \\sum b_n^2$.',
-        '**First 3 terms:** $\\pi(b_1^2 + b_2^2 + b_3^2) = \\pi(4 + 1 + 4/9) = \\pi \\cdot \\frac{49}{9} \\approx 17.10$. Captured fraction: $\\frac{17.10}{65.80} \\approx 26\\%$ â€” only 3 terms.',
+        '**First 3 terms:** $\\pi(b_1^2 + b_2^2 + b_3^2) = \\pi(4 + 1 + 4/9) = \\pi \\cdot \\frac{49}{9} \\approx 17.10$. Captured fraction: $\\frac{17.10}{65.80} \\approx 26\\%$ — only 3 terms.',
         '**Convergence:** The full series requires $\\sum_{n=1}^\\infty \\frac{4}{n^2} = \\frac{2\\pi^2}{3}$ (Basel problem), and $\\pi \\cdot \\frac{2\\pi^2}{3} = \\frac{2\\pi^3}{3} = \\|f\\|^2$ âœ“. Parseval is confirmed by the Basel problem identity.',
       ],
     },
   ],
 
   mentalModel: [
-    'An inner product is any function that measures "how aligned" two vectors are â€” with the dot product as the standard case.',
+    'An inner product is any function that measures "how aligned" two vectors are — with the dot product as the standard case.',
     'Any inner product induces a norm, distance, angle, and orthogonality.',
-    'Cauchy-Schwarz: $|\\langle u,v \\rangle| \\leq \\|u\\|\\|v\\|$ â€” the cosine of angle is always between -1 and 1.',
+    'Cauchy-Schwarz: $|\\langle u,v \\rangle| \\leq \\|u\\|\\|v\\|$ — the cosine of angle is always between -1 and 1.',
     'Gram-Schmidt, projection, and orthogonal complements all work the same way in any inner product space.',
   ],
 
@@ -437,7 +437,7 @@ for freq in [120, 300, 500, 650, 800]:
         id: 'assess-la4-005-2',
         type: 'computation',
         text: 'Use the function inner product $\\langle f, g \\rangle = \\int_0^1 f(x)g(x)\\,dx$ to: (a) compute $\\langle x, x^2 \\rangle$; (b) find $\\|x\\|$ and $\\|x^2\\|$; (c) compute the angle between $f(x) = x$ and $g(x) = x^2$.',
-        answer: '(a) $\\int_0^1 x^3\\,dx = 1/4$. (b) $\\|x\\|^2 = \\int_0^1 x^2\\,dx = 1/3$, so $\\|x\\| = 1/\\sqrt{3}$; $\\|x^2\\|^2 = 1/5$, $\\|x^2\\| = 1/\\sqrt{5}$. (c) $\\cos\\theta = \\frac{1/4}{(1/\\sqrt{3})(1/\\sqrt{5})} = \\frac{\\sqrt{15}}{4} \\approx 0.968$; $\\theta \\approx 14.5Â°$.',
+        answer: '(a) $\\int_0^1 x^3\\,dx = 1/4$. (b) $\\|x\\|^2 = \\int_0^1 x^2\\,dx = 1/3$, so $\\|x\\| = 1/\\sqrt{3}$; $\\|x^2\\|^2 = 1/5$, $\\|x^2\\| = 1/\\sqrt{5}$. (c) $\\cos\\theta = \\frac{1/4}{(1/\\sqrt{3})(1/\\sqrt{5})} = \\frac{\\sqrt{15}}{4} \\approx 0.968$; $\\theta \\approx 14.5°$.',
         hint: 'Use $\\cos\\theta = \\langle f, g \\rangle / (\\|f\\|\\|g\\|)$ exactly as in $\\mathbb{R}^n$.',
       },
     ],
@@ -464,7 +464,7 @@ for freq in [120, 300, 500, 650, 800]:
         '$\\|\\mathbf{u}\\| = \\|\\mathbf{v}\\|$',
       ],
       answer: '$|\\langle\\mathbf{u},\\mathbf{v}\\rangle| \\leq \\|\\mathbf{u}\\|\\|\\mathbf{v}\\|$',
-      hints: ['The first option is the triangle inequality. The third is symmetry. Cauchy-Schwarz bounds the magnitude of the inner product by the product of the norms â€” it guarantees $\\cos\\theta \\in [-1,1]$.'],
+      hints: ['The first option is the triangle inequality. The third is symmetry. Cauchy-Schwarz bounds the magnitude of the inner product by the product of the norms — it guarantees $\\cos\\theta \\in [-1,1]$.'],
       reviewSection: 'math',
     },
     {
@@ -473,7 +473,7 @@ for freq in [120, 300, 500, 650, 800]:
       text: 'A complete inner product space (every Cauchy sequence converges) is called:',
       options: ['Banach space', 'Hilbert space', 'Normed space', 'Metric space'],
       answer: 'Hilbert space',
-      hints: ['A Banach space is a complete normed space (no inner product required). A Hilbert space adds the inner product structure â€” it is a special Banach space where the norm comes from an inner product.'],
+      hints: ['A Banach space is a complete normed space (no inner product required). A Hilbert space adds the inner product structure — it is a special Banach space where the norm comes from an inner product.'],
       reviewSection: 'rigor',
     },
     {
@@ -489,10 +489,10 @@ for freq in [120, 300, 500, 650, 800]:
       id: 'q-la4-005-5',
       type: 'choice',
       text: 'Under the weighted inner product $\\langle \\mathbf{u}, \\mathbf{v} \\rangle_W = 2u_1v_1 + 5u_2v_2$, are $\\mathbf{u} = [5,-2]^T$ and $\\mathbf{v} = [1,1]^T$ orthogonal?',
-      options: ['Yes â€” $\\langle \\mathbf{u}, \\mathbf{v} \\rangle_W = 0$', 'No â€” $\\langle \\mathbf{u}, \\mathbf{v} \\rangle_W = 3$', 'No â€” $\\mathbf{u}^T\\mathbf{v} = 3 \\neq 0$', 'Yes â€” both are unit vectors'],
-      answer: 'Yes â€” $\\langle \\mathbf{u}, \\mathbf{v} \\rangle_W = 0$',
-      hints: ['âŸ¨u,vâŸ©_W = 2Â·5Â·1 + 5Â·(-2)Â·1 = 10 - 10 = 0. They are W-orthogonal even though uÂ·v = 3 â‰  0 under the standard dot product.'],
-      reviewSection: 'Examples â€” weighted inner product',
+      options: ['Yes — $\\langle \\mathbf{u}, \\mathbf{v} \\rangle_W = 0$', 'No — $\\langle \\mathbf{u}, \\mathbf{v} \\rangle_W = 3$', 'No — $\\mathbf{u}^T\\mathbf{v} = 3 \\neq 0$', 'Yes — both are unit vectors'],
+      answer: 'Yes — $\\langle \\mathbf{u}, \\mathbf{v} \\rangle_W = 0$',
+      hints: ['âŸ¨u,vâŸ©_W = 2·5·1 + 5·(-2)·1 = 10 - 10 = 0. They are W-orthogonal even though u·v = 3 ≠ 0 under the standard dot product.'],
+      reviewSection: 'Examples — weighted inner product',
     },
     {
       id: 'q-la4-005-6',
@@ -505,8 +505,8 @@ for freq in [120, 300, 500, 650, 800]:
         '$\\langle \\mathbf{u}, \\mathbf{v} \\rangle = u_1v_1 + 2u_2v_2$',
       ],
       answer: '$\\langle \\mathbf{u}, \\mathbf{v} \\rangle = u_1v_1 - u_2v_2$',
-      hints: ['Take v=[0,1]áµ€: âŸ¨v,vâŸ© = 0 - 1 = -1 < 0. Positive definiteness fails â€” inner products require âŸ¨v,vâŸ© > 0 for all non-zero v.'],
-      reviewSection: 'Intuition â€” positive definiteness axiom',
+      hints: ['Take v=[0,1]áµ€: âŸ¨v,vâŸ© = 0 - 1 = -1 < 0. Positive definiteness fails — inner products require âŸ¨v,vâŸ© > 0 for all non-zero v.'],
+      reviewSection: 'Intuition — positive definiteness axiom',
     },
     {
       id: 'q-la4-005-7',
@@ -514,8 +514,8 @@ for freq in [120, 300, 500, 650, 800]:
       text: 'Parseval\'s identity $\\|f\\|^2 = \\sum_n |\\langle f, e_n \\rangle|^2$ (for an orthonormal basis $\\{e_n\\}$) is the infinite-dimensional version of:',
       options: ['Cauchy-Schwarz inequality', 'The Pythagorean theorem', 'The triangle inequality', 'Gram-Schmidt'],
       answer: 'The Pythagorean theorem',
-      hints: ['In â„â¿: â€–vâ€–Â² = Î£áµ¢|âŸ¨v,eáµ¢âŸ©|Â² (sum of squared components along an ONB). Parseval says the same thing holds in infinite dimensions: total energy = sum of squared Fourier coefficients.'],
-      reviewSection: 'Rigor â€” Parseval and completeness',
+      hints: ['In ℝⁿ: –v–² = Σᵢ|âŸ¨v,eᵢâŸ©|² (sum of squared components along an ONB). Parseval says the same thing holds in infinite dimensions: total energy = sum of squared Fourier coefficients.'],
+      reviewSection: 'Rigor — Parseval and completeness',
     },
     {
       id: 'q-la4-005-8',
@@ -528,8 +528,8 @@ for freq in [120, 300, 500, 650, 800]:
         'Cauchy-Schwarz does not hold there',
       ],
       answer: 'A Cauchy sequence of continuous functions can converge to a discontinuous limit (not in the space)',
-      hints: ['Completeness requires every Cauchy sequence to converge within the space. Example: a sequence of continuous functions approximating the step function â€” the limit is discontinuous, hence not in C[0,1]. The completion is LÂ²[0,1].'],
-      reviewSection: 'Rigor â€” Hilbert vs. inner product spaces',
+      hints: ['Completeness requires every Cauchy sequence to converge within the space. Example: a sequence of continuous functions approximating the step function — the limit is discontinuous, hence not in C[0,1]. The completion is L²[0,1].'],
+      reviewSection: 'Rigor — Hilbert vs. inner product spaces',
     },
     {
       id: 'q-la4-005-9',
@@ -537,8 +537,8 @@ for freq in [120, 300, 500, 650, 800]:
       text: 'Gram-Schmidt applied to polynomials $\\{1, x, x^2\\}$ on $[-1,1]$ with the $L^2$ inner product produces:',
       options: ['The monomials $\\{1, x, x^2\\}$ unchanged', 'The Legendre polynomials $\\{P_0, P_1, P_2\\}$', 'The Taylor basis', 'The Fourier basis'],
       answer: 'The Legendre polynomials $\\{P_0, P_1, P_2\\}$',
-      hints: ['Gram-Schmidt orthogonalizes the monomial basis using the LÂ² inner product on [-1,1]. The output is the Legendre polynomial basis â€” the natural orthogonal basis for polynomial approximation on [-1,1].'],
-      reviewSection: 'Challenges â€” Gram-Schmidt on polynomial space',
+      hints: ['Gram-Schmidt orthogonalizes the monomial basis using the L² inner product on [-1,1]. The output is the Legendre polynomial basis — the natural orthogonal basis for polynomial approximation on [-1,1].'],
+      reviewSection: 'Challenges — Gram-Schmidt on polynomial space',
     },
     {
       id: 'q-la4-005-10',
@@ -546,13 +546,13 @@ for freq in [120, 300, 500, 650, 800]:
       text: 'In quantum mechanics, $|\\langle \\psi_n, \\psi \\rangle|^2$ gives the probability of measuring eigenvalue $n$. This is meaningful because:',
       options: [
         'Wave functions are always real-valued',
-        'The eigenstates $\\{\\psi_n\\}$ form an orthonormal basis â€” Parseval guarantees the probabilities sum to 1',
+        'The eigenstates $\\{\\psi_n\\}$ form an orthonormal basis — Parseval guarantees the probabilities sum to 1',
         'The SchrÃ¶dinger equation is linear',
         'Energy levels are always integers',
       ],
-      answer: 'The eigenstates $\\{\\psi_n\\}$ form an orthonormal basis â€” Parseval guarantees the probabilities sum to 1',
-      hints: ['Parseval: â€–Ïˆâ€–Â² = Î£â‚™|âŸ¨Ïˆâ‚™,ÏˆâŸ©|Â². If â€–Ïˆâ€–=1 (normalized state), then Î£â‚™|âŸ¨Ïˆâ‚™,ÏˆâŸ©|Â² = 1. The probabilities |âŸ¨Ïˆâ‚™,ÏˆâŸ©|Â² automatically sum to 1 by the inner product structure.'],
-      reviewSection: 'Transfer â€” quantum mechanics',
+      answer: 'The eigenstates $\\{\\psi_n\\}$ form an orthonormal basis — Parseval guarantees the probabilities sum to 1',
+      hints: ['Parseval: –Ïˆ–² = Σ₁™|âŸ¨Ïˆ₁™,ÏˆâŸ©|². If –Ïˆ–=1 (normalized state), then Σ₁™|âŸ¨Ïˆ₁™,ÏˆâŸ©|² = 1. The probabilities |âŸ¨Ïˆ₁™,ÏˆâŸ©|² automatically sum to 1 by the inner product structure.'],
+      reviewSection: 'Transfer — quantum mechanics',
     },
   ],
 
@@ -561,12 +561,12 @@ for freq in [120, 300, 500, 650, 800]:
       falseBelief: 'An inner product is the same as the dot product.',
       whyStudentsThinkIt: 'The dot product is the first inner product students encounter, so they generalize it incorrectly as the only option.',
       correctionExample: 'The function inner product $\\langle f, g \\rangle = \\int_a^b f(x)g(x)\\,dx$ satisfies all three axioms but involves no components at all. The weighted dot product $\\sum w_i u_i v_i$ is also a valid inner product when all weights $w_i > 0$, giving a different geometry.',
-      contrastCase: 'Under the weighted inner product with $w_1=2, w_2=5$, the vectors $[5,-2]^T$ and $[1,1]^T$ are orthogonal â€” but under the standard dot product they are not. Same vectors, different "angle" depending on the inner product.',
+      contrastCase: 'Under the weighted inner product with $w_1=2, w_2=5$, the vectors $[5,-2]^T$ and $[1,1]^T$ are orthogonal — but under the standard dot product they are not. Same vectors, different "angle" depending on the inner product.',
     },
     {
       falseBelief: 'Orthogonality is an intrinsic property of two vectors, independent of the inner product.',
       whyStudentsThinkIt: 'Students learn orthogonality as a geometric property (perpendicularity) and think it is absolute.',
-      correctionExample: 'The same pair of vectors can be orthogonal under one inner product and not orthogonal under another. "Orthogonal" means $\\langle \\mathbf{u}, \\mathbf{v} \\rangle = 0$ â€” which depends on the specific inner product being used.',
+      correctionExample: 'The same pair of vectors can be orthogonal under one inner product and not orthogonal under another. "Orthogonal" means $\\langle \\mathbf{u}, \\mathbf{v} \\rangle = 0$ — which depends on the specific inner product being used.',
       contrastCase: 'In weighted least squares, the "normal equations" use the weighted inner product, not the standard dot product. The residual is orthogonal to the column space under the correct (weighted) inner product.',
     },
   ],
@@ -575,26 +575,26 @@ for freq in [120, 300, 500, 650, 800]:
     {
       situation: 'You want to find the best polynomial approximation to a function $f$ on $[-1,1]$ in the $L^2$ sense.',
       competingTechniques: ['Taylor expansion', 'Interpolation at chosen nodes', 'Projection via function inner product'],
-      whyThisTechniqueWins: 'The $L^2$ projection onto the polynomial subspace (using Legendre polynomials as ONB) minimizes $\\|f - p\\|_{L^2}^2$ â€” the average squared error. Taylor minimizes pointwise error near a single point; interpolation forces exact agreement at discrete points. The inner product projection gives the globally best fit.',
+      whyThisTechniqueWins: 'The $L^2$ projection onto the polynomial subspace (using Legendre polynomials as ONB) minimizes $\\|f - p\\|_{L^2}^2$ — the average squared error. Taylor minimizes pointwise error near a single point; interpolation forces exact agreement at discrete points. The inner product projection gives the globally best fit.',
     },
     {
       situation: 'In signal processing, you want to extract the amplitude of a specific frequency $\\omega_0$ from a noisy signal $f(t)$.',
       competingTechniques: ['Bandpass filter', 'Fourier transform at $\\omega_0$', 'Inner product with the basis function'],
-      whyThisTechniqueWins: 'The Fourier coefficient is $c_n = \\langle f, e^{i\\omega_0 t} \\rangle / \\|e^{i\\omega_0 t}\\|^2$ â€” an inner product. Because the Fourier basis is orthogonal, this extracts exactly the $\\omega_0$ component without contamination from other frequencies.',
+      whyThisTechniqueWins: 'The Fourier coefficient is $c_n = \\langle f, e^{i\\omega_0 t} \\rangle / \\|e^{i\\omega_0 t}\\|^2$ — an inner product. Because the Fourier basis is orthogonal, this extracts exactly the $\\omega_0$ component without contamination from other frequencies.',
     },
   ],
 
   debugging: [
     {
       commonError: 'Trying to define an inner product with a negative weight, like $\\langle u,v \\rangle = u_1v_1 - u_2v_2$.',
-      symptom: '$\\langle \\mathbf{v}, \\mathbf{v} \\rangle < 0$ for $\\mathbf{v} = [0,1]^T$ â€” violates positive definiteness.',
+      symptom: '$\\langle \\mathbf{v}, \\mathbf{v} \\rangle < 0$ for $\\mathbf{v} = [0,1]^T$ — violates positive definiteness.',
       whyItHappened: 'For a weighted inner product $\\sum w_i u_i v_i$ to satisfy positive definiteness, all weights must be positive. The minus sign makes $w_2 = -1 < 0$.',
-      repairStrategy: 'Check: for every non-zero $\\mathbf{v}$, compute $\\langle \\mathbf{v}, \\mathbf{v} \\rangle$ â€” must be $> 0$. For the matrix form $\\mathbf{u}^T A \\mathbf{v}$: $A$ must be symmetric positive definite (all eigenvalues positive).',
+      repairStrategy: 'Check: for every non-zero $\\mathbf{v}$, compute $\\langle \\mathbf{v}, \\mathbf{v} \\rangle$ — must be $> 0$. For the matrix form $\\mathbf{u}^T A \\mathbf{v}$: $A$ must be symmetric positive definite (all eigenvalues positive).',
     },
     {
       commonError: 'Computing the inner product of two functions by evaluating $f(x) \\cdot g(x)$ at a single point instead of integrating.',
-      symptom: 'Gets a number that varies with $x$ â€” an inner product is a single fixed scalar, not a function of $x$.',
-      whyItHappened: 'Confusing pointwise multiplication with integration. The function inner product is $\\int_a^b f(x)g(x)\\,dx$ â€” a definite integral that outputs one number.',
+      symptom: 'Gets a number that varies with $x$ — an inner product is a single fixed scalar, not a function of $x$.',
+      whyItHappened: 'Confusing pointwise multiplication with integration. The function inner product is $\\int_a^b f(x)g(x)\\,dx$ — a definite integral that outputs one number.',
       repairStrategy: 'Always check: inner product inputs are two vectors/functions, output is one scalar. If you have $x$ in your answer, you have not finished the computation.',
     },
   ],
@@ -604,6 +604,6 @@ for freq in [120, 300, 500, 650, 800]:
     solveIndependently: 'Verify inner product axioms, compute norms and angles in function space, identify orthogonal pairs, and state Cauchy-Schwarz.',
     explainVerbally: 'Explain what an inner product generalizes beyond the dot product, why orthogonality depends on the inner product choice, and what completeness (Hilbert space) means.',
     detectIncorrectApplication: 'Catch negative-weight inner products (fails positive definiteness); catch pointwise vs. integral confusion; catch assuming orthogonality is absolute.',
-    transferToUnfamiliar: 'Apply function inner products to Fourier series, quantum mechanics, or polynomial approximation â€” any context where geometry extends to infinite-dimensional function spaces.',
+    transferToUnfamiliar: 'Apply function inner products to Fourier series, quantum mechanics, or polynomial approximation — any context where geometry extends to infinite-dimensional function spaces.',
   },
 };

@@ -1,33 +1,33 @@
-﻿export default {
+export default {
   id: 'la6-004',
   slug: 'matrix-representations',
   chapter: 'la6',
   order: 4,
   title: 'Matrix Representations',
-  subtitle: 'Every linear map between finite-dimensional vector spaces can be encoded as a matrix â€” but the matrix depends on the choice of bases. Change the bases, change the matrix.',
+  subtitle: 'Every linear map between finite-dimensional vector spaces can be encoded as a matrix — but the matrix depends on the choice of bases. Change the bases, change the matrix.',
   tags: ['matrix representation', 'coordinate vector', 'change of basis', 'basis matrix', 'similar matrices', 'diagonalization', 'canonical form'],
   aliases: 'matrix representation coordinate vector change of basis basis matrix similar matrices diagonalization canonical form',
 
   hook: {
-    question: "If differentiation is a linear map and every linear map has a matrix, what does the 'differentiation matrix' look like â€” and why does it depend on which basis you use for polynomials?",
+    question: "If differentiation is a linear map and every linear map has a matrix, what does the 'differentiation matrix' look like — and why does it depend on which basis you use for polynomials?",
     realWorldContext: "The same linear transformation can look very different depending on your basis. A rotation in $\\mathbb{R}^2$ is represented by a rotation matrix in the standard basis, but by a diagonal matrix (just scaling by $e^{i\\theta}$ and $e^{-i\\theta}$) in the basis of complex eigenvectors. This is exactly diagonalization! In signal processing, the DFT changes basis to the Fourier modes, turning convolution (complicated) into pointwise multiplication (simple). In numerical methods, preconditioners change the basis to make the system better conditioned.",
   },
 
   intuition: {
     prose: [
-      'Let $T: \\mathbb{R}^2 \\to \\mathbb{R}^2$ be rotation by $90Â°$ counterclockwise. Where do the standard basis vectors go? $T(\\mathbf{e}_1) = T(1,0) = (0,1)$ and $T(\\mathbf{e}_2) = T(0,1) = (-1,0)$. Write these as columns: the matrix is $\\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$. To verify: $T(3,2) = \\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}\\begin{bmatrix}3\\\\2\\end{bmatrix} = \\begin{bmatrix}-2\\\\3\\end{bmatrix}$ âœ“. That\'s the whole algorithm â€” apply $T$ to each basis vector, use the outputs as columns.',
+      'Let $T: \\mathbb{R}^2 \\to \\mathbb{R}^2$ be rotation by $90°$ counterclockwise. Where do the standard basis vectors go? $T(\\mathbf{e}_1) = T(1,0) = (0,1)$ and $T(\\mathbf{e}_2) = T(0,1) = (-1,0)$. Write these as columns: the matrix is $\\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$. To verify: $T(3,2) = \\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}\\begin{bmatrix}3\\\\2\\end{bmatrix} = \\begin{bmatrix}-2\\\\3\\end{bmatrix}$ âœ“. That\'s the whole algorithm — apply $T$ to each basis vector, use the outputs as columns.',
       '**Coordinates.** For a vector $\\mathbf{v} \\in V$, write $\\mathbf{v} = x_1 \\mathbf{b}_1 + \\cdots + x_n \\mathbf{b}_n$. The coordinate vector is $[\\mathbf{v}]_{\\mathcal{B}} = (x_1, \\ldots, x_n)^\\top \\in \\mathbb{R}^n$. Then matrix multiplication gives: $[T(\\mathbf{v})]_{\\mathcal{C}} = [T]_{\\mathcal{B}}^{\\mathcal{C}} \\cdot [\\mathbf{v}]_{\\mathcal{B}}$. This is the fundamental formula: matrices multiply coordinate vectors.',
-      '**Change of basis.** If $T: V \\to V$ (same space) and you switch from basis $\\mathcal{B}$ to basis $\\mathcal{B}\'$, the matrix changes by conjugation: $[T]_{\\mathcal{B}\'} = P^{-1}[T]_{\\mathcal{B}}P$, where $P$ is the **change-of-basis matrix** â€” its $j$-th column is $[\\mathbf{b}_j]_{\\mathcal{B}\'} =$ coordinates of the old basis vectors in the new basis. Two matrices $A$ and $B$ represent the same linear map in different bases iff $B = P^{-1}AP$ for some invertible $P$.',
-      '**The matrix is always constructed the same way.** To build $[T]_{\\mathcal{B}}^{\\mathcal{C}}$ step by step: (1) Apply $T$ to the first basis vector $\\mathbf{b}_1$ to get $T(\\mathbf{b}_1) \\in W$. (2) Express $T(\\mathbf{b}_1)$ as a linear combination of the $\\mathcal{C}$ basis vectors. (3) Write the coefficients as the first column of the matrix. Repeat for each basis vector $\\mathbf{b}_2, \\ldots, \\mathbf{b}_n$. The columns go left to right, one per input basis vector. This construction works for any two vector spaces and any two bases â€” including polynomial spaces, function spaces, and matrix spaces.',
+      '**Change of basis.** If $T: V \\to V$ (same space) and you switch from basis $\\mathcal{B}$ to basis $\\mathcal{B}\'$, the matrix changes by conjugation: $[T]_{\\mathcal{B}\'} = P^{-1}[T]_{\\mathcal{B}}P$, where $P$ is the **change-of-basis matrix** — its $j$-th column is $[\\mathbf{b}_j]_{\\mathcal{B}\'} =$ coordinates of the old basis vectors in the new basis. Two matrices $A$ and $B$ represent the same linear map in different bases iff $B = P^{-1}AP$ for some invertible $P$.',
+      '**The matrix is always constructed the same way.** To build $[T]_{\\mathcal{B}}^{\\mathcal{C}}$ step by step: (1) Apply $T$ to the first basis vector $\\mathbf{b}_1$ to get $T(\\mathbf{b}_1) \\in W$. (2) Express $T(\\mathbf{b}_1)$ as a linear combination of the $\\mathcal{C}$ basis vectors. (3) Write the coefficients as the first column of the matrix. Repeat for each basis vector $\\mathbf{b}_2, \\ldots, \\mathbf{b}_n$. The columns go left to right, one per input basis vector. This construction works for any two vector spaces and any two bases — including polynomial spaces, function spaces, and matrix spaces.',
       '**Similar matrices share invariants.** Since $B = P^{-1}AP$ represents the same linear map in a different basis, any property of the map that does not depend on the choice of basis is preserved. These are called **similarity invariants**: $\\det(A) = \\det(B)$ (determinant is basis-free), $\\text{tr}(A) = \\text{tr}(B)$ (trace is basis-free), and the characteristic polynomial $\\det(\\lambda I - A) = \\det(\\lambda I - B)$ (eigenvalues are basis-free). This is why eigenvalues are intrinsic to the linear map, not to its matrix representation.',
-      '**The DFT is a change of basis.** The Discrete Fourier Transform (DFT) is a change of basis in $\\mathbb{C}^n$ â€” from the standard basis (sample values in time) to the Fourier basis (complex exponentials $e^{2\\pi i k/n}$). In the Fourier basis, convolution (which is a complicated sum in the time basis) becomes pointwise multiplication (trivial). The DFT matrix $F$ is the change-of-basis matrix: $F_{jk} = e^{2\\pi i jk/n}/\\sqrt{n}$. This is why FFT-based convolution is so much faster than direct convolution â€” the right basis makes the computation trivial.',
-      '**Where this is heading.** Once you understand that every linear map is represented by a matrix, and that changing the basis changes the matrix by $P^{-1}AP$, diagonalization becomes simple to interpret: finding a basis in which $A$ is diagonal is exactly finding a basis in which the map just scales each direction independently. The next lesson (isomorphisms) formalizes when two spaces are "the same" â€” meaning there is a bijective linear map between them â€” which connects directly to when two matrix representations are interchangeable.',
+      '**The DFT is a change of basis.** The Discrete Fourier Transform (DFT) is a change of basis in $\\mathbb{C}^n$ — from the standard basis (sample values in time) to the Fourier basis (complex exponentials $e^{2\\pi i k/n}$). In the Fourier basis, convolution (which is a complicated sum in the time basis) becomes pointwise multiplication (trivial). The DFT matrix $F$ is the change-of-basis matrix: $F_{jk} = e^{2\\pi i jk/n}/\\sqrt{n}$. This is why FFT-based convolution is so much faster than direct convolution — the right basis makes the computation trivial.',
+      '**Where this is heading.** Once you understand that every linear map is represented by a matrix, and that changing the basis changes the matrix by $P^{-1}AP$, diagonalization becomes simple to interpret: finding a basis in which $A$ is diagonal is exactly finding a basis in which the map just scales each direction independently. The next lesson (isomorphisms) formalizes when two spaces are "the same" — meaning there is a bijective linear map between them — which connects directly to when two matrix representations are interchangeable.',
     ],
     callouts: [
       {
         type: 'sequencing',
-        title: 'Lesson 4 of 6 â€” Abstract Vector Spaces',
-        body: '**Previous:** Linear Transformations â€” maps between vector spaces that preserve linear structure.\n**This lesson:** Matrix Representations â€” how to encode any linear transformation as a matrix once you choose bases, and how the matrix changes when you change the bases.\n**Next:** Isomorphisms â€” when two vector spaces are "structurally identical" and the precise meaning of that statement.',
+        title: 'Lesson 4 of 6 — Abstract Vector Spaces',
+        body: '**Previous:** Linear Transformations — maps between vector spaces that preserve linear structure.\n**This lesson:** Matrix Representations — how to encode any linear transformation as a matrix once you choose bases, and how the matrix changes when you change the bases.\n**Next:** Isomorphisms — when two vector spaces are "structurally identical" and the precise meaning of that statement.',
       },
       {
         type: 'insight',
@@ -42,7 +42,7 @@
       {
         type: 'warning',
         title: 'Order of Bases Matters',
-        body: 'The matrix $[T]_{\\mathcal{B}}^{\\mathcal{C}}$ is not just "the matrix of $T$" â€” it depends on the ordered pair of bases $(\\mathcal{B}, \\mathcal{C})$. Reordering either basis permutes rows or columns. Swapping to a different basis entirely changes the matrix significantly. Always track which bases you\'re using.',
+        body: 'The matrix $[T]_{\\mathcal{B}}^{\\mathcal{C}}$ is not just "the matrix of $T$" — it depends on the ordered pair of bases $(\\mathcal{B}, \\mathcal{C})$. Reordering either basis permutes rows or columns. Swapping to a different basis entirely changes the matrix significantly. Always track which bases you\'re using.',
       },
       {
         type: 'insight',
@@ -120,12 +120,12 @@ norm(A - A_check)
         id: 'PythonNotebook',
         title: 'Code: Matrix Representations and Change of Basis',
         mathBridge: 'Build matrix representations of linear maps, change basis via P^{-1}AP, verify similarity invariants.',
-        caption: 'The same linear map looks different in different bases â€” but its eigenvalues, determinant, and trace never change.',
+        caption: 'The same linear map looks different in different bases — but its eigenvalues, determinant, and trace never change.',
         initialProps: {
           initialCells: [
             {
               id: 1,
-              cellTitle: 'Build the matrix of differentiation D: P_3 â†’ P_3',
+              cellTitle: 'Build the matrix of differentiation D: P_3 → P_3',
               prose: 'To build $[D]$ for differentiation in the basis $\\{1, x, x^2, x^3\\}$: compute $D(\\mathbf{b}_j) = \\mathbf{b}_j\'$ for each basis vector, express the result as a coordinate vector, and use it as the $j$-th column. Apply the matrix to verify it correctly differentiates a polynomial.',
               code: `import numpy as np
 
@@ -157,8 +157,8 @@ print("Match:", np.allclose(dp_coords, [-1., 0., 9., 0.]))`,
             },
             {
               id: 2,
-              cellTitle: 'Change of basis: P^{-1}AP â€” same map, different coordinates',
-              prose: 'If $A$ represents map $T$ in the standard basis, then $P^{-1}AP$ represents the same map in the basis formed by the columns of $P$. When $P$ is the eigenvector matrix, $P^{-1}AP = D$ is diagonal â€” the simplest possible representation. Similarity invariants (det, trace, eigenvalues) are preserved.',
+              cellTitle: 'Change of basis: P^{-1}AP — same map, different coordinates',
+              prose: 'If $A$ represents map $T$ in the standard basis, then $P^{-1}AP$ represents the same map in the basis formed by the columns of $P$. When $P$ is the eigenvector matrix, $P^{-1}AP = D$ is diagonal — the simplest possible representation. Similarity invariants (det, trace, eigenvalues) are preserved.',
               code: `import numpy as np
 
 A = np.array([[3., 1.],
@@ -176,7 +176,7 @@ print("A in eigenbasis (P^-1 A P):")
 print(A_in_eigenbasis.round(10))
 print(f"det = {np.linalg.det(A_in_eigenbasis):.4f}, tr = {np.trace(A_in_eigenbasis):.4f}")
 print()
-print("Same map, different basis â€” det and tr preserved:",
+print("Same map, different basis — det and tr preserved:",
       np.isclose(np.linalg.det(A), np.linalg.det(A_in_eigenbasis)))`,
             },
           ],
@@ -193,7 +193,7 @@ print("Same map, different basis â€” det and tr preserved:",
       {
         type: 'insight',
         title: 'When Are Two Matrices "The Same Map"?',
-        body: '$A$ and $B$ represent the same linear map in different bases iff $B = P^{-1}AP$ (similar matrices).\n\nInvariants preserved under similarity: determinant, trace, rank, characteristic polynomial, eigenvalues, minimal polynomial, Jordan structure.\n\nUse these invariants to tell similar matrices apart â€” or to verify they might be similar.',
+        body: '$A$ and $B$ represent the same linear map in different bases iff $B = P^{-1}AP$ (similar matrices).\n\nInvariants preserved under similarity: determinant, trace, rank, characteristic polynomial, eigenvalues, minimal polynomial, Jordan structure.\n\nUse these invariants to tell similar matrices apart — or to verify they might be similar.',
       },
     ],
     visualizations: [],
@@ -230,7 +230,7 @@ print("Same map, different basis â€” det and tr preserved:",
     },
     {
       id: 'ex-la6-004-2',
-      title: 'Differentiation map $D: P_2 \\to P_2$ â€” build matrix column by column',
+      title: 'Differentiation map $D: P_2 \\to P_2$ — build matrix column by column',
       problem: 'Let $D: P_2 \\to P_2$ be the differentiation map $D(p) = p\'$. Use the basis $\\mathcal{B} = \\{1, x, x^2\\}$ for both domain and codomain. Find $[D]_{\\mathcal{B}}^{\\mathcal{B}}$.',
       steps: [
         {
@@ -250,7 +250,7 @@ print("Same map, different basis â€” det and tr preserved:",
         },
         {
           expression: '[D]_{\\mathcal{B}}^{\\mathcal{B}} = \\begin{bmatrix}0&1&0\\\\0&0&2\\\\0&0&0\\end{bmatrix}',
-          annotation: 'Assemble the three column vectors. The matrix is strictly upper triangular â€” differentiation lowers the degree by one, so it maps each basis vector to an earlier one.',
+          annotation: 'Assemble the three column vectors. The matrix is strictly upper triangular — differentiation lowers the degree by one, so it maps each basis vector to an earlier one.',
           strategyTitle: 'Assemble and interpret',
         },
         {
@@ -282,7 +282,7 @@ print("Same map, different basis â€” det and tr preserved:",
         },
         {
           expression: '[T]_{\\mathcal{B}} = P^{-1}AP = \\begin{bmatrix}0&1\\\\1&-1\\end{bmatrix}\\begin{bmatrix}4&3\\\\2&2\\end{bmatrix} = \\begin{bmatrix}2&2\\\\2&1\\end{bmatrix}',
-          annotation: 'The matrix of $T$ in the $\\mathcal{B}$ basis. Note: $\\det([T]_{\\mathcal{B}}) = 2\\cdot 1 - 2\\cdot 2 = -2 = \\det(A)$ â€” the determinant is a similarity invariant âœ“.',
+          annotation: 'The matrix of $T$ in the $\\mathcal{B}$ basis. Note: $\\det([T]_{\\mathcal{B}}) = 2\\cdot 1 - 2\\cdot 2 = -2 = \\det(A)$ — the determinant is a similarity invariant âœ“.',
           strategyTitle: 'Final answer: $P^{-1}AP$',
         },
       ],
@@ -294,14 +294,14 @@ print("Same map, different basis â€” det and tr preserved:",
       id: 'ch-la6-004-1',
       title: 'Change of basis for a rotation',
       difficulty: 'medium',
-      problem: 'Let $T: \\mathbb{R}^2 \\to \\mathbb{R}^2$ have standard matrix $A = \\begin{bmatrix}0&1\\\\-1&0\\end{bmatrix}$ ($90Â°$ counterclockwise rotation). Find the matrix of $T$ in $\\mathcal{B} = \\left\\{\\begin{bmatrix}1\\\\1\\end{bmatrix}, \\begin{bmatrix}1\\\\-1\\end{bmatrix}\\right\\}$.',
+      problem: 'Let $T: \\mathbb{R}^2 \\to \\mathbb{R}^2$ have standard matrix $A = \\begin{bmatrix}0&1\\\\-1&0\\end{bmatrix}$ ($90°$ counterclockwise rotation). Find the matrix of $T$ in $\\mathcal{B} = \\left\\{\\begin{bmatrix}1\\\\1\\end{bmatrix}, \\begin{bmatrix}1\\\\-1\\end{bmatrix}\\right\\}$.',
       hint: 'Form $P = [\\mathbf{b}_1 | \\mathbf{b}_2]$ (columns = new basis vectors) and compute $P^{-1}AP$.',
       walkthrough: [
         '**Change-of-basis matrix:** $P = \\begin{bmatrix}1&1\\\\1&-1\\end{bmatrix}$ (columns are the new basis vectors).',
         '**Inverse of $P$:** $\\det(P) = -1 - 1 = -2$. $P^{-1} = \\frac{1}{-2}\\begin{bmatrix}-1&-1\\\\-1&1\\end{bmatrix} = \\begin{bmatrix}1/2&1/2\\\\1/2&-1/2\\end{bmatrix}$.',
         '**Compute $AP$:** $A\\begin{bmatrix}1&1\\\\1&-1\\end{bmatrix} = \\begin{bmatrix}1&-1\\\\-1&-1\\end{bmatrix}$.',
         '**Compute $P^{-1}(AP)$:** $\\begin{bmatrix}1/2&1/2\\\\1/2&-1/2\\end{bmatrix}\\begin{bmatrix}1&-1\\\\-1&-1\\end{bmatrix} = \\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$.',
-        '**Result:** $P^{-1}AP = \\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$ â€” the same $90Â°$ rotation matrix! This makes sense: a rotation looks the same in any orthonormal-like basis. The representation changed, but the geometric content did not.',
+        '**Result:** $P^{-1}AP = \\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$ — the same $90°$ rotation matrix! This makes sense: a rotation looks the same in any orthonormal-like basis. The representation changed, but the geometric content did not.',
       ],
     },
   ],
@@ -386,7 +386,7 @@ print("Same map, different basis â€” det and tr preserved:",
     {
       id: 'q-la6-004-6',
       type: 'choice',
-      text: 'The matrix of the $90Â°$ counterclockwise rotation $T: \\mathbb{R}^2 \\to \\mathbb{R}^2$ in the standard basis is:',
+      text: 'The matrix of the $90°$ counterclockwise rotation $T: \\mathbb{R}^2 \\to \\mathbb{R}^2$ in the standard basis is:',
       options: ['$\\begin{bmatrix}0&1\\\\-1&0\\end{bmatrix}$', '$\\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$', '$\\begin{bmatrix}1&0\\\\0&-1\\end{bmatrix}$', '$\\begin{bmatrix}-1&0\\\\0&1\\end{bmatrix}$'],
       answer: '$\\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$',
       hints: ['Compute where $T$ sends the basis vectors: $T(1,0) = (0,1)$ (column 1) and $T(0,1) = (-1,0)$ (column 2). Assemble into a matrix.'],
@@ -398,7 +398,7 @@ print("Same map, different basis â€” det and tr preserved:",
       text: 'If $T: \\mathbb{R}^3 \\to \\mathbb{R}^2$ is linear and represented by a $2\\times 3$ matrix in standard bases, what is the size of $[T]_{\\mathcal{B}}^{\\mathcal{C}}$ for any bases $\\mathcal{B}$ of $\\mathbb{R}^3$ and $\\mathcal{C}$ of $\\mathbb{R}^2$?',
       options: ['$3 \\times 2$', '$2 \\times 3$', '$3 \\times 3$', 'Depends on the bases chosen'],
       answer: '$2 \\times 3$',
-      hints: ['The shape of the matrix is $\\dim(W) \\times \\dim(V)$ for $T: V \\to W$. Here $\\dim(\\mathbb{R}^2) = 2$ (rows) and $\\dim(\\mathbb{R}^3) = 3$ (columns). Changing bases does not change the shape of the matrix â€” only its entries.'],
+      hints: ['The shape of the matrix is $\\dim(W) \\times \\dim(V)$ for $T: V \\to W$. Here $\\dim(\\mathbb{R}^2) = 2$ (rows) and $\\dim(\\mathbb{R}^3) = 3$ (columns). Changing bases does not change the shape of the matrix — only its entries.'],
       reviewSection: 'math',
     },
     {
@@ -442,8 +442,8 @@ print("Same map, different basis â€” det and tr preserved:",
     {
       falseBelief: 'The matrix of a linear map is a fixed, intrinsic object.',
       whyStudentsThinkIt: 'In early linear algebra, every matrix problem uses the standard basis implicitly, so students never see the basis dependence.',
-      correctionExample: 'The $90Â°$ rotation $T$ has matrix $\\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$ in the standard basis but a different matrix in the eigenvector basis over $\\mathbb{C}$.',
-      contrastCase: 'The eigenvalues of $T$ ARE intrinsic â€” they do not change when you change bases.',
+      correctionExample: 'The $90°$ rotation $T$ has matrix $\\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$ in the standard basis but a different matrix in the eigenvector basis over $\\mathbb{C}$.',
+      contrastCase: 'The eigenvalues of $T$ ARE intrinsic — they do not change when you change bases.',
     },
     {
       falseBelief: 'To find the matrix column, just write $T(\\mathbf{b}_j)$ as a vector directly.',
@@ -457,11 +457,11 @@ print("Same map, different basis â€” det and tr preserved:",
     {
       situation: 'You have a linear map on polynomials (like integration or multiplication by $x$) and need to work with it computationally.',
       competingTechniques: 'Could try to work with the polynomials abstractly, or guess the matrix pattern.',
-      whyThisTechniqueWins: 'The column-by-column construction gives the exact matrix in $O(n)$ steps for $n$-dimensional spaces â€” no guessing needed. Once you have the matrix, all of numerical linear algebra applies.',
+      whyThisTechniqueWins: 'The column-by-column construction gives the exact matrix in $O(n)$ steps for $n$-dimensional spaces — no guessing needed. Once you have the matrix, all of numerical linear algebra applies.',
     },
     {
       situation: 'Two matrices $A$ and $B$ are given and you want to know if they represent the same linear map.',
-      competingTechniques: 'Could compare all entries (fails â€” different bases give different entries) or compute $P^{-1}AP = B$ directly (hard to find $P$).',
+      competingTechniques: 'Could compare all entries (fails — different bases give different entries) or compute $P^{-1}AP = B$ directly (hard to find $P$).',
       whyThisTechniqueWins: 'Compute similarity invariants: if $\\det(A) \\neq \\det(B)$ or $\\text{tr}(A) \\neq \\text{tr}(B)$ or characteristic polynomials differ, they are NOT similar. If all invariants agree, they might be similar.',
     },
   ],

@@ -1,34 +1,34 @@
-﻿export default {
+export default {
   id: 'la4-009',
   slug: 'low-rank-approximation',
   chapter: 'la4',
   order: 9,
   title: 'Low-Rank Approximation',
-  subtitle: 'The best rank-$k$ approximation to any matrix $A$ is obtained by keeping the top $k$ singular values and discarding the rest. This theorem â€” proved by Eckart-Young â€” is the mathematical foundation of data compression, PCA, and dimensionality reduction.',
+  subtitle: 'The best rank-$k$ approximation to any matrix $A$ is obtained by keeping the top $k$ singular values and discarding the rest. This theorem — proved by Eckart-Young — is the mathematical foundation of data compression, PCA, and dimensionality reduction.',
   tags: ['low-rank approximation', 'Eckart-Young theorem', 'truncated SVD', 'data compression', 'best approximation', 'singular values', 'rank-k', 'image compression'],
   aliases: 'low-rank approximation Eckart-Young truncated SVD best rank-k approximation data compression image compression PCA dimensionality reduction',
 
   hook: {
-    question: "A $1000 \\times 1000$ image has $10^6$ pixel values. Can you store the essential information in just $1000 \\times 20 = 20000$ numbers â€” 50x compression â€” while keeping the image recognizable? The answer is yes, using low-rank approximation.",
+    question: "A $1000 \\times 1000$ image has $10^6$ pixel values. Can you store the essential information in just $1000 \\times 20 = 20000$ numbers — 50x compression — while keeping the image recognizable? The answer is yes, using low-rank approximation.",
     realWorldContext: "Low-rank approximation is the engine behind Netflix's recommendation system (collaborative filtering), image and video compression (JPEG-2000 uses wavelets, which are low-rank), face recognition (eigenfaces = top PCA components), NLP word embeddings (GloVe, word2vec use low-rank matrix factorizations of co-occurrence matrices), and physics simulations (reduced-order models approximate high-dimensional PDEs with low-rank dynamics). The Eckart-Young theorem guarantees these are the BEST possible approximations in both the 2-norm and Frobenius norm.",
   },
 
   intuition: {
     prose: [
-      'Imagine a $256 \\times 256$ grayscale image â€” a matrix of 65,536 pixel values. Computing its SVD reveals something striking: most of the visual information sits in the first 10â€“20 singular values, while the remaining 236+ are near zero. If you keep only the top $k$ singular values and discard the rest, you get a matrix that looks almost identical to the original image â€” but stores only $k(256 + 256 + 1)$ numbers instead of 65,536. For $k=20$, that is 10,260 numbers versus 65,536 â€” an 84% reduction with barely visible quality loss. The mathematics that makes this exact and optimal is the Eckart-Young theorem.',
-      '**Best rank-1 approximation with numbers.** Take $A = \\begin{pmatrix}4&3\\\\2&1\\end{pmatrix}$. SVD: singular values $\\sigma_1 \\approx 5.46$, $\\sigma_2 \\approx 0.37$. Top singular vectors: $u_1 \\approx (0.86, 0.51)^\\top$, $v_1 \\approx (0.90, 0.44)^\\top$. Best rank-1 approximation: $A_1 = \\sigma_1 u_1 v_1^\\top \\approx 5.46 \\cdot \\begin{pmatrix}0.77&0.38\\\\0.46&0.22\\end{pmatrix} \\approx \\begin{pmatrix}4.2&2.1\\\\2.5&1.2\\end{pmatrix}$. Error $\\|A - A_1\\|_2 = \\sigma_2 \\approx 0.37$ â€” the best possible for any rank-1 matrix. The singular value $\\sigma_2$ is the "cost" of discarding the second component.',
+      'Imagine a $256 \\times 256$ grayscale image — a matrix of 65,536 pixel values. Computing its SVD reveals something striking: most of the visual information sits in the first 10—20 singular values, while the remaining 236+ are near zero. If you keep only the top $k$ singular values and discard the rest, you get a matrix that looks almost identical to the original image — but stores only $k(256 + 256 + 1)$ numbers instead of 65,536. For $k=20$, that is 10,260 numbers versus 65,536 — an 84% reduction with barely visible quality loss. The mathematics that makes this exact and optimal is the Eckart-Young theorem.',
+      '**Best rank-1 approximation with numbers.** Take $A = \\begin{pmatrix}4&3\\\\2&1\\end{pmatrix}$. SVD: singular values $\\sigma_1 \\approx 5.46$, $\\sigma_2 \\approx 0.37$. Top singular vectors: $u_1 \\approx (0.86, 0.51)^\\top$, $v_1 \\approx (0.90, 0.44)^\\top$. Best rank-1 approximation: $A_1 = \\sigma_1 u_1 v_1^\\top \\approx 5.46 \\cdot \\begin{pmatrix}0.77&0.38\\\\0.46&0.22\\end{pmatrix} \\approx \\begin{pmatrix}4.2&2.1\\\\2.5&1.2\\end{pmatrix}$. Error $\\|A - A_1\\|_2 = \\sigma_2 \\approx 0.37$ — the best possible for any rank-1 matrix. The singular value $\\sigma_2$ is the "cost" of discarding the second component.',
       '**The Eckart-Young theorem.** For $A = \\sum_{i=1}^r \\sigma_i u_i v_i^\\top$, the rank-$k$ truncation $A_k = \\sum_{i=1}^k \\sigma_i u_i v_i^\\top$ satisfies: (1) $\\|A - A_k\\|_2 = \\sigma_{k+1}$ (the $(k+1)$-th singular value). (2) $\\|A - A_k\\|_F^2 = \\sigma_{k+1}^2 + \\cdots + \\sigma_r^2$ (sum of discarded singular values squared). (3) For any rank-$k$ matrix $B$: $\\|A - B\\|_2 \\geq \\sigma_{k+1}$ and $\\|A - B\\|_F \\geq \\|A - A_k\\|_F$. $A_k$ is the BEST rank-$k$ approximation in BOTH norms simultaneously.',
       '**Compression ratio and energy.** The Frobenius norm $\\|A\\|_F^2 = \\sum_i \\sigma_i^2$ is the total "energy." Keeping the top $k$ singular values captures energy fraction $\\sum_{i=1}^k \\sigma_i^2 / \\sum_{i=1}^r \\sigma_i^2$. For images, often 90% of the energy is in the top 1-5% of singular values. Storage: $A$ needs $mn$ numbers; $A_k = U_k \\Sigma_k V_k^\\top$ needs $mk + k + nk = k(m+n+1)$ numbers. Compression ratio: $mn / (k(m+n+1))$.',
-      '**Why the singular values decay fast for natural data.** Real-world data matrices â€” images, user ratings, genomic data â€” tend to have rapidly decaying singular values because the data has structure. A natural image is not random noise: nearby pixels are correlated, and the image can be described as a sum of a few dominant patterns (edges, gradients, textures) plus small corrections. Random noise has singular values of roughly equal size (all $\\approx \\sqrt{n}$ by random matrix theory). The faster the singular values decay, the more compressible the matrix â€” and the better low-rank approximation works.',
-      '**PCA is low-rank approximation applied to a covariance matrix.** Given data matrix $X$ ($m$ samples, $n$ features, zero-centered), the covariance is $C = X^TX / m$ (symmetric). By the spectral theorem, $C = Q\\Lambda Q^T$. The top eigenvector $\\mathbf{q}_1$ is the direction of maximum variance â€” the first principal component. Projecting each sample onto $\\mathbf{q}_1,\\ldots,\\mathbf{q}_k$ reduces the data from $n$-dimensional to $k$-dimensional while preserving the maximum variance. This is exactly the rank-$k$ approximation: project data onto the top $k$ principal directions, discard the rest. Eckart-Young guarantees this is the best possible $k$-dimensional linear projection.',
-      '**CNC toolpath compression with SVD.** A 3D CNC toolpath with $m$ waypoints is stored as a $3 \\times m$ matrix $T$ (each column is a 3D point). For smooth paths â€” circles, spirals, polynomial splines â€” the matrix $T$ has low rank: all the geometry lives in 2 or 3 directions. The rank-$k$ approximation $T_k = U_k \\Sigma_k V_k^T$ keeps only the dominant shape components. For a helical toolpath, $k=2$ captures $>99\\%$ of the path geometry. In CAM software, this is essentially what happens when the system converts waypoints to NURBS splines: it finds a low-dimensional representation of the toolpath. The approximation error in the SVD sense gives a bound on how far the compressed path deviates from the original.',
-      '**Where this is heading.** Low-rank approximation is the final major idea of the linear algebra curriculum. Looking forward: in data science, it connects to **matrix completion** (fill in missing entries from a partially-observed matrix â€” the Netflix problem), **robust PCA** (separate a low-rank signal from sparse noise), and **tensor decompositions** (generalizing SVD to 3D+ arrays). Every one of these builds on the same core idea: real data has low-dimensional structure, and SVD is the optimal tool for finding it.',
+      '**Why the singular values decay fast for natural data.** Real-world data matrices — images, user ratings, genomic data — tend to have rapidly decaying singular values because the data has structure. A natural image is not random noise: nearby pixels are correlated, and the image can be described as a sum of a few dominant patterns (edges, gradients, textures) plus small corrections. Random noise has singular values of roughly equal size (all $\\approx \\sqrt{n}$ by random matrix theory). The faster the singular values decay, the more compressible the matrix — and the better low-rank approximation works.',
+      '**PCA is low-rank approximation applied to a covariance matrix.** Given data matrix $X$ ($m$ samples, $n$ features, zero-centered), the covariance is $C = X^TX / m$ (symmetric). By the spectral theorem, $C = Q\\Lambda Q^T$. The top eigenvector $\\mathbf{q}_1$ is the direction of maximum variance — the first principal component. Projecting each sample onto $\\mathbf{q}_1,\\ldots,\\mathbf{q}_k$ reduces the data from $n$-dimensional to $k$-dimensional while preserving the maximum variance. This is exactly the rank-$k$ approximation: project data onto the top $k$ principal directions, discard the rest. Eckart-Young guarantees this is the best possible $k$-dimensional linear projection.',
+      '**CNC toolpath compression with SVD.** A 3D CNC toolpath with $m$ waypoints is stored as a $3 \\times m$ matrix $T$ (each column is a 3D point). For smooth paths — circles, spirals, polynomial splines — the matrix $T$ has low rank: all the geometry lives in 2 or 3 directions. The rank-$k$ approximation $T_k = U_k \\Sigma_k V_k^T$ keeps only the dominant shape components. For a helical toolpath, $k=2$ captures $>99\\%$ of the path geometry. In CAM software, this is essentially what happens when the system converts waypoints to NURBS splines: it finds a low-dimensional representation of the toolpath. The approximation error in the SVD sense gives a bound on how far the compressed path deviates from the original.',
+      '**Where this is heading.** Low-rank approximation is the final major idea of the linear algebra curriculum. Looking forward: in data science, it connects to **matrix completion** (fill in missing entries from a partially-observed matrix — the Netflix problem), **robust PCA** (separate a low-rank signal from sparse noise), and **tensor decompositions** (generalizing SVD to 3D+ arrays). Every one of these builds on the same core idea: real data has low-dimensional structure, and SVD is the optimal tool for finding it.',
     ],
     callouts: [
       {
         type: 'sequencing',
-        title: 'Lesson 9 of 9 â€” Orthogonality & SVD',
-        body: '**Previous (Lesson 8):** Pseudoinverse â€” the minimum-norm least-squares solution via $A^+ = V\\Sigma^+U^T$.\n**This lesson:** Low-Rank Approximation â€” the Eckart-Young theorem and why keeping the top $k$ singular values is the best possible rank-$k$ approximation in both the 2-norm and Frobenius norm.\n**Next (Chapter 6):** Abstract Vector Spaces â€” extending the ideas of bases, dimension, and linear transformations beyond $\\mathbb{R}^n$.',
+        title: 'Lesson 9 of 9 — Orthogonality & SVD',
+        body: '**Previous (Lesson 8):** Pseudoinverse — the minimum-norm least-squares solution via $A^+ = V\\Sigma^+U^T$.\n**This lesson:** Low-Rank Approximation — the Eckart-Young theorem and why keeping the top $k$ singular values is the best possible rank-$k$ approximation in both the 2-norm and Frobenius norm.\n**Next (Chapter 6):** Abstract Vector Spaces — extending the ideas of bases, dimension, and linear transformations beyond $\\mathbb{R}^n$.',
       },
       {
         type: 'insight',
@@ -46,7 +46,7 @@
         id: 'OpenMatNotebook',
         title: 'Low-Rank Approximation',
         mathBridge: 'Compute truncated SVD approximations and measure approximation quality.',
-        caption: 'Rank-k approximation = sum of top k singular value Ã— outer product terms.',
+        caption: 'Rank-k approximation = sum of top k singular value × outer product terms.',
         initialProps: {
           initialCells: [
             {
@@ -138,7 +138,7 @@ end
           initialCells: [
             {
               id: 1,
-              cellTitle: 'Eckart-Young theorem â€” verify best rank-k approximation',
+              cellTitle: 'Eckart-Young theorem — verify best rank-k approximation',
               prose: 'The rank-$k$ truncated SVD is the best rank-$k$ approximation. $\\|A - A_k\\|_2 = \\sigma_{k+1}$ and $\\|A - A_k\\|_F = \\sqrt{\\sigma_{k+1}^2 + \\cdots}$. No other rank-$k$ matrix does better. We verify: for each $k$, compute the error and confirm it equals the $(k+1)$-th singular value.',
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -174,7 +174,7 @@ plt.show()`,
             {
               id: 2,
               cellTitle: 'PCA as low-rank approximation of the covariance matrix',
-              prose: 'PCA finds the $k$ directions of maximum variance in data. The covariance matrix $C = X^TX/m$ is symmetric â€” its eigenvectors are the principal components. Projecting data onto the top $k$ eigenvectors is equivalent to the rank-$k$ approximation $X \\approx X_k$ (Eckart-Young applied to the data matrix).',
+              prose: 'PCA finds the $k$ directions of maximum variance in data. The covariance matrix $C = X^TX/m$ is symmetric — its eigenvectors are the principal components. Projecting data onto the top $k$ eigenvectors is equivalent to the rank-$k$ approximation $X \\approx X_k$ (Eckart-Young applied to the data matrix).',
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -207,13 +207,13 @@ plt.show()`,
             {
               id: 3,
               cellTitle: 'CNC toolpath compression via low-rank SVD',
-              prose: 'A smooth 3D CNC toolpath has low-dimensional structure â€” it lives near a 2D surface. Store the path as a $3 \\times m$ matrix and compute the SVD. The rank-$k$ approximation captures the dominant shape with far fewer numbers. Measure how much of the path geometry (Frobenius energy) the rank-2 approximation preserves.',
+              prose: 'A smooth 3D CNC toolpath has low-dimensional structure — it lives near a 2D surface. Store the path as a $3 \\times m$ matrix and compute the SVD. The rank-$k$ approximation captures the dominant shape with far fewer numbers. Measure how much of the path geometry (Frobenius energy) the rank-2 approximation preserves.',
               code: `import numpy as np
 
 # Helical CNC toolpath: x=cos(t), y=sin(t), z=t/(2pi)
 m = 300
 t = np.linspace(0, 4*np.pi, m)
-path = np.array([np.cos(t), np.sin(t), t / (4*np.pi)])   # 3 Ã— m
+path = np.array([np.cos(t), np.sin(t), t / (4*np.pi)])   # 3 × m
 
 U, S, Vt = np.linalg.svd(path)
 print(f"Path shape: {path.shape}")
@@ -236,7 +236,7 @@ for k in [1, 2, 3]:
 
   rigor: {
     prose: [
-      '**Matrix completion and the Netflix problem.** Given a partially observed matrix $M$ (most entries missing), find the lowest-rank matrix consistent with the observations. Under incoherence conditions (the singular vectors are "spread out"), $M$ can be exactly recovered from $O(rn\\log n)$ random entries by nuclear norm minimization â€” far fewer than the $mn$ total entries. This is the mathematical foundation of collaborative filtering: if user preferences form a low-rank matrix (users cluster into groups, items cluster into genres), then a few ratings suffice to predict all ratings.',
+      '**Matrix completion and the Netflix problem.** Given a partially observed matrix $M$ (most entries missing), find the lowest-rank matrix consistent with the observations. Under incoherence conditions (the singular vectors are "spread out"), $M$ can be exactly recovered from $O(rn\\log n)$ random entries by nuclear norm minimization — far fewer than the $mn$ total entries. This is the mathematical foundation of collaborative filtering: if user preferences form a low-rank matrix (users cluster into groups, items cluster into genres), then a few ratings suffice to predict all ratings.',
     ],
     callouts: [
       {
@@ -269,8 +269,8 @@ for k in [1, 2, 3]:
         { explanation: 'Original storage: $200 \\times 300 = 60000$ numbers.' },
         { explanation: 'Rank-20 SVD storage: $U_{200\\times 20}$ + $\\Sigma_{20\\times 20}$ (20 values) + $V_{300\\times 20}$. Total: $200\\cdot20 + 20 + 300\\cdot20 = 4000 + 20 + 6000 = 10020$ numbers.' },
         { explanation: 'Compression ratio: $60000 / 10020 \\approx 6:1$ (store 6x fewer numbers).' },
-        { explanation: 'Relative error: if top 20 singular values capture 95% of energy, then $\\sum_{i=1}^{20}\\sigma_i^2/\\sum_{i=1}^{200}\\sigma_i^2 = 0.95$. By Eckart-Young: $\\|A-A_{20}\\|_F^2/\\|A\\|_F^2 = 1-0.95 = 0.05$. Relative error $= \\sqrt{0.05} \\approx 22\\%$ â€” the image looks slightly blurry but recognizable.' },
-        { explanation: 'If you want 1% relative error: need $\\sum_{i>k}\\sigma_i^2/\\|A\\|_F^2 \\leq 0.0001$, i.e., capture 99.99% of energy. The required $k$ depends on how fast singular values decay â€” natural images typically need $k\\approx 50$-$100$ for near-lossless quality.' },
+        { explanation: 'Relative error: if top 20 singular values capture 95% of energy, then $\\sum_{i=1}^{20}\\sigma_i^2/\\sum_{i=1}^{200}\\sigma_i^2 = 0.95$. By Eckart-Young: $\\|A-A_{20}\\|_F^2/\\|A\\|_F^2 = 1-0.95 = 0.05$. Relative error $= \\sqrt{0.05} \\approx 22\\%$ — the image looks slightly blurry but recognizable.' },
+        { explanation: 'If you want 1% relative error: need $\\sum_{i>k}\\sigma_i^2/\\|A\\|_F^2 \\leq 0.0001$, i.e., capture 99.99% of energy. The required $k$ depends on how fast singular values decay — natural images typically need $k\\approx 50$-$100$ for near-lossless quality.' },
       ],
     },
     {
@@ -281,8 +281,8 @@ for k in [1, 2, 3]:
         { explanation: 'SVD of $A$: already diagonal, $\\sigma_1=3$, $\\sigma_2=1$, $U=V=I$.' },
         { explanation: 'Soft-threshold with $\\lambda=2$: $\\max(\\sigma_i-\\lambda, 0)$. $\\sigma_1-2=1>0$ âœ“; $\\sigma_2-1=0$ (wait: $1-2=-1<0$, so $\\max(-1,0)=0$).' },
         { explanation: 'Soft-thresholded approximation: $B = \\begin{pmatrix}1&0\\\\0&0\\end{pmatrix}$ (rank 1). Nuclear norm of $B$: $\\|B\\|_* = 1$.' },
-        { explanation: 'Compare to Eckart-Young rank-1 (hard threshold): keep $\\sigma_1=3$, set $\\sigma_2=0$. Hard threshold gives $A_1 = \\begin{pmatrix}3&0\\\\0&0\\end{pmatrix}$. Eckart-Young minimizes $\\|A-B\\|_F$ over rank-1 matrices â€” the answer is $A_1$ with $\\|A-A_1\\|_F=1$. Soft threshold minimizes $\\|A-B\\|_F^2+2\\|B\\|_*$ â€” a different (convex) objective, giving a shrunken approximation.' },
-        { explanation: 'Takeaway: hard threshold (Eckart-Young) gives the best rank-$k$ approximation for a fixed rank budget. Soft threshold (nuclear norm) is the convex relaxation â€” it automatically chooses the rank based on $\\lambda$, allowing $\\lambda$ to be tuned by cross-validation.' },
+        { explanation: 'Compare to Eckart-Young rank-1 (hard threshold): keep $\\sigma_1=3$, set $\\sigma_2=0$. Hard threshold gives $A_1 = \\begin{pmatrix}3&0\\\\0&0\\end{pmatrix}$. Eckart-Young minimizes $\\|A-B\\|_F$ over rank-1 matrices — the answer is $A_1$ with $\\|A-A_1\\|_F=1$. Soft threshold minimizes $\\|A-B\\|_F^2+2\\|B\\|_*$ — a different (convex) objective, giving a shrunken approximation.' },
+        { explanation: 'Takeaway: hard threshold (Eckart-Young) gives the best rank-$k$ approximation for a fixed rank budget. Soft threshold (nuclear norm) is the convex relaxation — it automatically chooses the rank based on $\\lambda$, allowing $\\lambda$ to be tuned by cross-validation.' },
       ],
     },
   ],
@@ -353,7 +353,7 @@ for k in [1, 2, 3]:
       text: 'For a $200\\times 300$ matrix approximated by rank-20, how many numbers are stored (approximately)?',
       options: ['$60000$', '$6000$', '$10000$', '$1000$'],
       answer: '$10000$',
-      hints: ['$U$ (200Ã—20) + 20 singular values + $V$ (300Ã—20).', '$4000 + 20 + 6000 = 10020 \\approx 10000$.'],
+      hints: ['$U$ (200×20) + 20 singular values + $V$ (300×20).', '$4000 + 20 + 6000 = 10020 \\approx 10000$.'],
       reviewSection: 'examples',
     },
     {
@@ -399,7 +399,7 @@ for k in [1, 2, 3]:
         'The singular values are all equal',
       ],
       answer: 'The rating matrix is approximately low-rank (users and items cluster)',
-      hints: ['Users group into types (action fans, rom-com fans...) and items into genres.', 'A few "user types" Ã— "item types" interactions explain most ratings â€” low rank.'],
+      hints: ['Users group into types (action fans, rom-com fans...) and items into genres.', 'A few "user types" × "item types" interactions explain most ratings — low rank.'],
       reviewSection: 'rigor',
     },
     {
@@ -431,7 +431,7 @@ for k in [1, 2, 3]:
     targetLevel: 2,
     solveIndependently: 'Given a matrix with known singular values, compute the rank-$k$ approximation error in both 2-norm and Frobenius norm; determine the compression ratio; and find the minimum $k$ needed to capture a given fraction of total energy.',
     explainVerbally: 'Explain why the Eckart-Young theorem works: why keeping the top $k$ singular values simultaneously minimizes both norms, and why the error equals $\\sigma_{k+1}$.',
-    detectIncorrectApplication: 'Catch the error of thinking rank-$k$ approximation always gives small relative error â€” if singular values decay slowly, even high-rank approximations may be poor.',
+    detectIncorrectApplication: 'Catch the error of thinking rank-$k$ approximation always gives small relative error — if singular values decay slowly, even high-rank approximations may be poor.',
     transferToUnfamiliar: 'Given a new data matrix, identify whether its singular values decay quickly (low-rank structure present) or slowly (no compressible structure), and explain what this means for data compression and model complexity.',
   },
 
@@ -440,20 +440,20 @@ for k in [1, 2, 3]:
       falseBelief: 'The best rank-$k$ approximation in the Frobenius norm is different from the best in the 2-norm.',
       whyStudentsThinkIt: 'Different norms usually lead to different optima. For vector problems, $\\ell^1$ and $\\ell^2$ minimizers are different. Students expect the same for matrices.',
       correctionExample: 'For $A = \\begin{pmatrix}3&0\\\\0&1\\end{pmatrix}$, the best rank-1 in 2-norm: $A_1 = \\begin{pmatrix}3&0\\\\0&0\\end{pmatrix}$, error $= 1$. The best rank-1 in Frobenius: also $A_1 = \\begin{pmatrix}3&0\\\\0&0\\end{pmatrix}$, error $= 1$. Same answer.',
-      contrastCase: 'This is unique to the SVD truncation. The Eckart-Young theorem says the SAME $A_k$ minimizes both simultaneously â€” a remarkable property with no analog in vector optimization.',
+      contrastCase: 'This is unique to the SVD truncation. The Eckart-Young theorem says the SAME $A_k$ minimizes both simultaneously — a remarkable property with no analog in vector optimization.',
     },
     {
       falseBelief: 'You can always recover the original matrix from a low-rank approximation with enough computation.',
-      whyStudentsThinkIt: 'Compression seems reversible â€” like a zip file. Students think "approximation" means the original is still there somewhere.',
+      whyStudentsThinkIt: 'Compression seems reversible — like a zip file. Students think "approximation" means the original is still there somewhere.',
       correctionExample: 'The discarded singular values ($\\sigma_{k+1},\\ldots,\\sigma_r$) and their corresponding singular vectors are THROWN AWAY. The information in those components is lost. Even with infinite computation, you cannot recover $A$ from $A_k$ when rank$(A) > k$.',
-      contrastCase: 'Lossless compression (like zip/gzip) stores the exact original. SVD truncation is LOSSY â€” the $\\sigma_{k+1}$ error is unavoidable. The Eckart-Young theorem guarantees you cannot do better than $A_k$ within the rank-$k$ constraint.',
+      contrastCase: 'Lossless compression (like zip/gzip) stores the exact original. SVD truncation is LOSSY — the $\\sigma_{k+1}$ error is unavoidable. The Eckart-Young theorem guarantees you cannot do better than $A_k$ within the rank-$k$ constraint.',
     },
   ],
 
   transferPrompts: [
     {
-      situation: 'A recommender system has a 500,000 user Ã— 100,000 movie rating matrix, but only 1% of entries are observed. How does low-rank structure make this tractable?',
-      competingTechniques: ['Try to fill in the matrix by interpolation', 'Model the matrix as low-rank (say rank 50): 50 "user taste" vectors Ã— 50 "movie profile" vectors'],
+      situation: 'A recommender system has a 500,000 user × 100,000 movie rating matrix, but only 1% of entries are observed. How does low-rank structure make this tractable?',
+      competingTechniques: ['Try to fill in the matrix by interpolation', 'Model the matrix as low-rank (say rank 50): 50 "user taste" vectors × 50 "movie profile" vectors'],
       whyThisTechniqueWins: 'A rank-50 matrix has only $50\\times(500000+100000) = 30$ million parameters vs $50$ billion entries. The low-rank assumption converts a hopelessly under-determined problem into an over-determined one. Nuclear norm minimization or alternating least squares can recover the rank-50 matrix from the 1% observations under incoherence conditions.',
     },
     {
@@ -472,7 +472,7 @@ for k in [1, 2, 3]:
     },
     {
       commonError: 'Computing storage for rank-$k$ as $k$ numbers instead of $k(m+n+1)$.',
-      symptom: 'Student says "rank-5 approximation stores 5 numbers" â€” forgetting that each rank-1 term $\\sigma_i u_i v_i^\\top$ requires $m + 1 + n$ numbers.',
+      symptom: 'Student says "rank-5 approximation stores 5 numbers" — forgetting that each rank-1 term $\\sigma_i u_i v_i^\\top$ requires $m + 1 + n$ numbers.',
       whyItHappened: 'Rank is just a number $k$, and students conflate the rank with the number of parameters needed to specify the approximation.',
       repairStrategy: 'Each rank-1 term needs: $m$ numbers for $u_i$, $1$ for $\\sigma_i$, $n$ for $v_i$. Total for rank-$k$: $k(m+1+n)$ numbers. Compression only helps when $k(m+n+1) < mn$, i.e., $k < mn/(m+n+1) \\approx \\min(m,n)/2$ (roughly).',
     },

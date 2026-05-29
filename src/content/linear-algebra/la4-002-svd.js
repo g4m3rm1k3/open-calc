@@ -1,47 +1,47 @@
-﻿export default {
-  // â”€â”€ Identity â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+export default {
+  // ── Identity ───────────────────────────────────────────────────
   id: 'la4-004',
   slug: 'svd',
   chapter: 'la4',
   order: 4,
   title: 'Singular Value Decomposition (SVD)',
-  subtitle: 'Every matrix â€” square or not, invertible or not â€” can be broken into three clean pieces: two rotations and a diagonal stretch. This is the most powerful factorization in all of linear algebra.',
+  subtitle: 'Every matrix — square or not, invertible or not — can be broken into three clean pieces: two rotations and a diagonal stretch. This is the most powerful factorization in all of linear algebra.',
   tags: ['SVD', 'singular value decomposition', 'singular values', 'left singular vectors', 'right singular vectors', 'low-rank approximation', 'image compression', 'PCA', 'pseudoinverse'],
   aliases: 'singular value decomposition SVD left right singular vectors sigma U V compression PCA pseudoinverse rank approximation',
 
-  // â”€â”€ Hook â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Hook ──────────────────────────────────────────────────────
   hook: {
     question: "A photograph is stored as a matrix of pixel values. How can you throw away 90% of the mathematical information in that matrix and still have a recognizable image?",
-    realWorldContext: "SVD is one of the most widely used algorithms in all of applied mathematics and computer science. Image compression uses it to keep only the most important components of a picture. Netflix and Spotify recommendation systems use it to find hidden patterns in user-rating matrices. Genomics researchers use it to find the most meaningful variation across thousands of genes. Search engines use it (as Latent Semantic Analysis) to match documents to queries based on meaning rather than exact words. In machine learning, Principal Component Analysis (PCA) â€” the standard tool for dimensionality reduction â€” is SVD applied to a data matrix. Any time you need to find the most important structure in a large, possibly noisy dataset, SVD is the answer.",
+    realWorldContext: "SVD is one of the most widely used algorithms in all of applied mathematics and computer science. Image compression uses it to keep only the most important components of a picture. Netflix and Spotify recommendation systems use it to find hidden patterns in user-rating matrices. Genomics researchers use it to find the most meaningful variation across thousands of genes. Search engines use it (as Latent Semantic Analysis) to match documents to queries based on meaning rather than exact words. In machine learning, Principal Component Analysis (PCA) — the standard tool for dimensionality reduction — is SVD applied to a data matrix. Any time you need to find the most important structure in a large, possibly noisy dataset, SVD is the answer.",
     previewVisualizationId: 'LALesson12_SVD',
   },
 
-  // â”€â”€ Intuition â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Intuition ──────────────────────────────────────────────────
   intuition: {
     prose: [
-      'Take $A = \\begin{bmatrix}4&3\\\\0&0\\end{bmatrix}$. Compute $A^TA = \\begin{bmatrix}16&12\\\\12&9\\end{bmatrix}$ â€” eigenvalues 25 and 0, eigenvectors $\\mathbf{v}_1 = [4/5,3/5]^\\top$, $\\mathbf{v}_2 = [-3/5,4/5]^\\top$. Singular values: $\\sigma_1 = 5$, $\\sigma_2 = 0$. Left singular vector: $\\mathbf{u}_1 = (1/5)A\\mathbf{v}_1 = [1,0]^\\top$. SVD: $A = 5\\cdot[1,0]^\\top[4/5,3/5] = \\begin{bmatrix}4&3\\\\0&0\\end{bmatrix}$ âœ“. Any matrix â€” any shape, any rank â€” factors this way as $A = U\\Sigma V^T$. The singular values tell you how much stretching happens in each direction.',
+      'Take $A = \\begin{bmatrix}4&3\\\\0&0\\end{bmatrix}$. Compute $A^TA = \\begin{bmatrix}16&12\\\\12&9\\end{bmatrix}$ — eigenvalues 25 and 0, eigenvectors $\\mathbf{v}_1 = [4/5,3/5]^\\top$, $\\mathbf{v}_2 = [-3/5,4/5]^\\top$. Singular values: $\\sigma_1 = 5$, $\\sigma_2 = 0$. Left singular vector: $\\mathbf{u}_1 = (1/5)A\\mathbf{v}_1 = [1,0]^\\top$. SVD: $A = 5\\cdot[1,0]^\\top[4/5,3/5] = \\begin{bmatrix}4&3\\\\0&0\\end{bmatrix}$ âœ“. Any matrix — any shape, any rank — factors this way as $A = U\\Sigma V^T$. The singular values tell you how much stretching happens in each direction.',
       'We need SVD because diagonalization has a limitation: it only works for square matrices with enough independent eigenvectors. SVD has no such restriction. It works for any matrix, any shape, any rank.',
-      '**The geometric picture.** Any linear transformation â€” any matrix $A$ â€” takes a sphere in $\\mathbb{R}^n$ and maps it to an ellipse (possibly flattened) in $\\mathbb{R}^m$. SVD breaks this down into three clean steps:\n\n1. **Rotate** the input sphere to align it with the "right" coordinate axes ($V^T$)\n2. **Stretch** each axis independently â€” no mixing, no rotating â€” by the singular values ($\\Sigma$)\n3. **Rotate** again to place the ellipse in the output space ($U$)\n\nEvery matrix does exactly this, no matter how complicated it looks.',
+      '**The geometric picture.** Any linear transformation — any matrix $A$ — takes a sphere in $\\mathbb{R}^n$ and maps it to an ellipse (possibly flattened) in $\\mathbb{R}^m$. SVD breaks this down into three clean steps:\n\n1. **Rotate** the input sphere to align it with the "right" coordinate axes ($V^T$)\n2. **Stretch** each axis independently — no mixing, no rotating — by the singular values ($\\Sigma$)\n3. **Rotate** again to place the ellipse in the output space ($U$)\n\nEvery matrix does exactly this, no matter how complicated it looks.',
       'The stretching amounts $\\sigma_1 \\geq \\sigma_2 \\geq \\cdots \\geq 0$ are the **singular values**. They are always non-negative real numbers, even if the original matrix has complex entries. The largest singular value tells you the maximum amount any unit vector gets stretched by $A$. The smallest tells you the minimum.',
-      '**The low-rank approximation idea.** SVD can be written as a sum of rank-1 "slices": $A = \\sigma_1 \\mathbf{u}_1 \\mathbf{v}_1^T + \\sigma_2 \\mathbf{u}_2 \\mathbf{v}_2^T + \\cdots$. Each term $\\sigma_i \\mathbf{u}_i \\mathbf{v}_i^T$ is a rank-1 matrix â€” the simplest possible building block. The singular values measure how important each piece is. If $\\sigma_{50} = 0.001$ and $\\sigma_1 = 1000$, then the 50th piece contributes almost nothing to the full matrix, and you can discard it. Keep only the first $k$ terms and you get the best possible rank-$k$ approximation to $A$ (in a precise mathematical sense).',
-      '**Where this is heading:** This is the end of the linear algebra curriculum. But SVD is really a beginning â€” it is the entry point to data science, machine learning, signal processing, and numerical analysis. Every major field of applied mathematics uses it.',
-      '**CNC machine intelligence via SVD.** (1) **Tool wear detection:** Record the $n$-dimensional cutting force vector over $m$ time steps. Stack these into an $m \\times n$ data matrix $X$. SVD $X = U\\Sigma V^T$ reveals the dominant cutting force pattern: $\\mathbf{v}_1$ is the direction of maximum force variance, $\\sigma_1$ its magnitude. As the tool wears, $\\sigma_1$ grows and the ratio $\\sigma_1/\\sigma_2$ increases â€” the cutting becomes more "one-dimensional" as chatter dominates. (2) **G-code path compression:** A 3D CNC toolpath with $m$ waypoints is a $3 \\times m$ matrix. Its SVD rank-$k$ approximation keeps the $k$ dominant shape components. For smooth paths, $k = 2$ or $3$ captures 99\\%+ of the path geometry while reducing data by 90\\% â€” the core idea behind spline fitting in CAM software. (3) **Probe calibration:** When calibrating a touch probe, you collect $m$ probe contact points as an $m \\times 3$ matrix. The singular values reveal probe eccentricity: if $\\sigma_3 \\ll \\sigma_1$, the contacts are nearly coplanar â€” a surface is being probed. The condition number $\\sigma_1/\\sigma_3$ measures how nearly parallel the probe axes are.',
+      '**The low-rank approximation idea.** SVD can be written as a sum of rank-1 "slices": $A = \\sigma_1 \\mathbf{u}_1 \\mathbf{v}_1^T + \\sigma_2 \\mathbf{u}_2 \\mathbf{v}_2^T + \\cdots$. Each term $\\sigma_i \\mathbf{u}_i \\mathbf{v}_i^T$ is a rank-1 matrix — the simplest possible building block. The singular values measure how important each piece is. If $\\sigma_{50} = 0.001$ and $\\sigma_1 = 1000$, then the 50th piece contributes almost nothing to the full matrix, and you can discard it. Keep only the first $k$ terms and you get the best possible rank-$k$ approximation to $A$ (in a precise mathematical sense).',
+      '**Where this is heading:** This is the end of the linear algebra curriculum. But SVD is really a beginning — it is the entry point to data science, machine learning, signal processing, and numerical analysis. Every major field of applied mathematics uses it.',
+      '**CNC machine intelligence via SVD.** (1) **Tool wear detection:** Record the $n$-dimensional cutting force vector over $m$ time steps. Stack these into an $m \\times n$ data matrix $X$. SVD $X = U\\Sigma V^T$ reveals the dominant cutting force pattern: $\\mathbf{v}_1$ is the direction of maximum force variance, $\\sigma_1$ its magnitude. As the tool wears, $\\sigma_1$ grows and the ratio $\\sigma_1/\\sigma_2$ increases — the cutting becomes more "one-dimensional" as chatter dominates. (2) **G-code path compression:** A 3D CNC toolpath with $m$ waypoints is a $3 \\times m$ matrix. Its SVD rank-$k$ approximation keeps the $k$ dominant shape components. For smooth paths, $k = 2$ or $3$ captures 99\\%+ of the path geometry while reducing data by 90\\% — the core idea behind spline fitting in CAM software. (3) **Probe calibration:** When calibrating a touch probe, you collect $m$ probe contact points as an $m \\times 3$ matrix. The singular values reveal probe eccentricity: if $\\sigma_3 \\ll \\sigma_1$, the contacts are nearly coplanar — a surface is being probed. The condition number $\\sigma_1/\\sigma_3$ measures how nearly parallel the probe axes are.',
     ],
     callouts: [
       {
         type: 'sequencing',
-        title: 'Lesson 4 of 9 â€” Orthogonality & SVD',
-        body: '**Previous (Lesson 3):** Least Squares â€” finding the best approximate solution using projection.\n**This lesson:** SVD â€” the universal factorization $A = U\\Sigma V^T$ that reveals the core structure of any matrix.\n**Next (Lesson 5):** Inner Product Spaces â€” generalizing length and angle to abstract spaces.',
+        title: 'Lesson 4 of 9 — Orthogonality & SVD',
+        body: '**Previous (Lesson 3):** Least Squares — finding the best approximate solution using projection.\n**This lesson:** SVD — the universal factorization $A = U\\Sigma V^T$ that reveals the core structure of any matrix.\n**Next (Lesson 5):** Inner Product Spaces — generalizing length and angle to abstract spaces.',
       },
       {
         type: 'definition',
         title: 'The SVD Decomposition',
-        body: 'A = U \\Sigma V^T\n\nâ€¢ $U$ is $m \\times m$, orthogonal (left singular vectors)\nâ€¢ $\\Sigma$ is $m \\times n$, diagonal (singular values $\\sigma_1 \\geq \\sigma_2 \\geq \\cdots \\geq 0$)\nâ€¢ $V^T$ is $n \\times n$, orthogonal (right singular vectors)',
+        body: 'A = U \\Sigma V^T\n\n• $U$ is $m \\times m$, orthogonal (left singular vectors)\n• $\\Sigma$ is $m \\times n$, diagonal (singular values $\\sigma_1 \\geq \\sigma_2 \\geq \\cdots \\geq 0$)\n• $V^T$ is $n \\times n$, orthogonal (right singular vectors)',
       },
       {
         type: 'insight',
         title: 'SVD vs. Diagonalization',
-        body: '**Diagonalization** $A = PDP^{-1}$:\nâ€¢ Square matrices only\nâ€¢ May not exist (defective matrices)\nâ€¢ $P$ not necessarily orthogonal\n\n**SVD** $A = U\\Sigma V^T$:\nâ€¢ Any matrix, any shape\nâ€¢ Always exists\nâ€¢ $U$ and $V$ are always orthogonal',
+        body: '**Diagonalization** $A = PDP^{-1}$:\n• Square matrices only\n• May not exist (defective matrices)\n• $P$ not necessarily orthogonal\n\n**SVD** $A = U\\Sigma V^T$:\n• Any matrix, any shape\n• Always exists\n• $U$ and $V$ are always orthogonal',
       },
       {
         type: 'insight',
@@ -50,27 +50,27 @@
       },
       {
         type: 'insight',
-        title: 'Singular Values â‰  Eigenvalues',
-        body: 'Singular values are always non-negative real numbers â€” even for matrices whose eigenvalues are complex or negative.\n\nFor symmetric positive definite matrices, singular values = eigenvalues. Otherwise, they are different objects.',
+        title: 'Singular Values ≠ Eigenvalues',
+        body: 'Singular values are always non-negative real numbers — even for matrices whose eigenvalues are complex or negative.\n\nFor symmetric positive definite matrices, singular values = eigenvalues. Otherwise, they are different objects.',
       },
     ],
     visualizations: [
       {
         id: 'LALesson12_SVD',
-        title: 'SVD: Rotate â†’ Stretch â†’ Rotate',
-        mathBridge: 'The visualization shows the unit circle (all unit vectors in $\\mathbb{R}^2$) being transformed by $A$. Use the step slider: Step 0 = unit circle. Step 1 = apply $V^T$ (first rotation â€” the circle rotates but stays circular). Step 2 = apply $\\Sigma$ (axis-aligned stretch â€” the circle becomes an ellipse). Step 3 = apply $U$ (final rotation â€” the ellipse rotates to its final position). The lengths of the ellipse axes are the singular values $\\sigma_1$ and $\\sigma_2$.',
+        title: 'SVD: Rotate → Stretch → Rotate',
+        mathBridge: 'The visualization shows the unit circle (all unit vectors in $\\mathbb{R}^2$) being transformed by $A$. Use the step slider: Step 0 = unit circle. Step 1 = apply $V^T$ (first rotation — the circle rotates but stays circular). Step 2 = apply $\\Sigma$ (axis-aligned stretch — the circle becomes an ellipse). Step 3 = apply $U$ (final rotation — the ellipse rotates to its final position). The lengths of the ellipse axes are the singular values $\\sigma_1$ and $\\sigma_2$.',
         caption: 'Any transformation = two rotations and a diagonal stretch.',
       },
     ],
   },
 
-  // â”€â”€ Math â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Math ───────────────────────────────────────────────────────
   math: {
     prose: [
-      '**How to compute SVD.** The key connection to eigenvalues:\n\n- The **right singular vectors** (columns of $V$) are the eigenvectors of $A^TA$.\n- The **singular values** are $\\sigma_i = \\sqrt{\\lambda_i(A^TA)}$ (square roots of eigenvalues of $A^TA$).\n- The **left singular vectors** (columns of $U$) are $\\mathbf{u}_i = \\frac{1}{\\sigma_i}A\\mathbf{v}_i$.\n\nNote: $A^TA$ is always symmetric and positive semidefinite â€” it always has real, non-negative eigenvalues, so the square roots are always real.',
+      '**How to compute SVD.** The key connection to eigenvalues:\n\n- The **right singular vectors** (columns of $V$) are the eigenvectors of $A^TA$.\n- The **singular values** are $\\sigma_i = \\sqrt{\\lambda_i(A^TA)}$ (square roots of eigenvalues of $A^TA$).\n- The **left singular vectors** (columns of $U$) are $\\mathbf{u}_i = \\frac{1}{\\sigma_i}A\\mathbf{v}_i$.\n\nNote: $A^TA$ is always symmetric and positive semidefinite — it always has real, non-negative eigenvalues, so the square roots are always real.',
       '**The compact (thin) SVD.** If $A$ is $m\\times n$ with $\\text{rank}(A) = r$, only the first $r$ singular values are non-zero. The full SVD has many columns of $U$ and $V$ that multiply zero singular values and contribute nothing. The **compact SVD** keeps only the $r$ non-zero terms:\n\n$A = U_r \\Sigma_r V_r^T \\qquad (m\\times r)(r\\times r)(r\\times n)$',
       '**Low-rank approximation (Eckart-Young Theorem).** The rank-$k$ matrix closest to $A$ (in Frobenius norm) is obtained by keeping only the first $k$ singular value terms:\n\n$A_k = \\sum_{i=1}^k \\sigma_i \\mathbf{u}_i\\mathbf{v}_i^T$\n\nThe approximation error is $\\|A - A_k\\|_F = \\sqrt{\\sigma_{k+1}^2 + \\cdots + \\sigma_r^2}$. No other rank-$k$ matrix is closer to $A$.',
-      '**The pseudoinverse via SVD.** Recall from Least Squares: the pseudoinverse $A^+$ gives the minimum-norm least squares solution. Via SVD: $A^+ = V\\Sigma^+U^T$, where $\\Sigma^+$ replaces each non-zero diagonal entry $\\sigma_i$ with $1/\\sigma_i$ and keeps zeros as zeros. This handles rank-deficient matrices gracefully â€” no division by zero.',
+      '**The pseudoinverse via SVD.** Recall from Least Squares: the pseudoinverse $A^+$ gives the minimum-norm least squares solution. Via SVD: $A^+ = V\\Sigma^+U^T$, where $\\Sigma^+$ replaces each non-zero diagonal entry $\\sigma_i$ with $1/\\sigma_i$ and keeps zeros as zeros. This handles rank-deficient matrices gracefully — no division by zero.',
       '**The condition number.** The ratio $\\sigma_1 / \\sigma_r$ (largest singular value over smallest non-zero) is the **condition number** of $A$. It measures how sensitive the solution to $A\\mathbf{x} = \\mathbf{b}$ is to small changes in $\\mathbf{b}$. Large condition number = ill-conditioned = numerically fragile.',
     ],
     callouts: [
@@ -100,7 +100,7 @@
         id: 'OpenMatNotebook',
         title: 'SVD in OpenMat',
         mathBridge: 'Compute SVD with the built-in svd() function, build low-rank approximations, and analyze CNC toolpath compression.',
-        caption: 'MATLAB/OpenMat uses [U,S,V] = svd(A) â€” note S is a full matrix, not a vector.',
+        caption: 'MATLAB/OpenMat uses [U,S,V] = svd(A) — note S is a full matrix, not a vector.',
         initialProps: {
           initialCells: [
             {
@@ -172,7 +172,7 @@ fprintf('Storage: %d numbers vs original %d (%.0f%% compression)\\n', ...
       {
         id: 'LowRankApproximationViz',
         title: 'Image Compression via Low-Rank Approximation',
-        mathBridge: 'The slider controls $k$ â€” the number of singular values kept. At $k=1$, only the single most important "direction" of the image is kept â€” a blurry shadow. As $k$ increases, more detail returns. Observe how quickly the image becomes recognizable (often around $k = 20$ for a $256\\times256$ image, while full quality requires $k = 256$). The compression ratio is $(m + n + 1)k / mn$. Watch it in the corner.',
+        mathBridge: 'The slider controls $k$ — the number of singular values kept. At $k=1$, only the single most important "direction" of the image is kept — a blurry shadow. As $k$ increases, more detail returns. Observe how quickly the image becomes recognizable (often around $k = 20$ for a $256\\times256$ image, while full quality requires $k = 256$). The compression ratio is $(m + n + 1)k / mn$. Watch it in the corner.',
         caption: 'Singular values ranked by importance. Truncate to compress.',
       },
       {
@@ -215,7 +215,7 @@ plt.show()`,
             },
             {
               id: 2,
-              cellTitle: 'Low-rank approximation â€” Eckart-Young theorem',
+              cellTitle: 'Low-rank approximation — Eckart-Young theorem',
               prose: 'The rank-k approximation keeps only the k largest singular values. It is the best possible rank-k approximation (Eckart-Young theorem). Watch how quickly the approximation improves as k increases.',
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -257,7 +257,7 @@ plt.show()`,
             },
             {
               id: 3,
-              cellTitle: 'Condition number â€” numerical stability',
+              cellTitle: 'Condition number — numerical stability',
               prose: 'The condition number = σ₁ / σₙ (largest / smallest singular value). It measures how much a small change in b amplifies the error in the solution to Ax = b. A large condition number means the matrix is nearly singular — small input errors cause large output errors.',
               code: `import numpy as np
 
@@ -272,7 +272,7 @@ print()
 # Ill-conditioned: nearly singular (rows almost proportional)
 B = np.array([[1., 2.], [1.001, 2.001]])
 print(f"Ill-conditioned: condition number = {np.linalg.cond(B):.1f}")
-print("  (large â†’ tiny input error causes huge solution error)")`,
+print("  (large → tiny input error causes huge solution error)")`,
             },
             {
               id: 'c1',
@@ -280,7 +280,7 @@ print("  (large â†’ tiny input error causes huge solution error)")`,
               challengeNumber: 1,
               challengeTitle: 'SVD-based pseudoinverse',
               difficulty: 'hard',
-              prompt: 'Compute the pseudoinverse of A = [[1,2],[3,4],[5,6]] using SVD: Aâº = V Î£âº Uáµ€, where Î£âº replaces each Ïƒáµ¢ with 1/Ïƒáµ¢. Verify by checking that Aâº @ A â‰ˆ I (nÃ—n identity). Compare with np.linalg.pinv(A).',
+              prompt: 'Compute the pseudoinverse of A = [[1,2],[3,4],[5,6]] using SVD: Aâº = V Σâº Uáµ€, where Σâº replaces each σᵢ with 1/σᵢ. Verify by checking that Aâº @ A â‰ˆ I (n×n identity). Compare with np.linalg.pinv(A).',
               code: `import numpy as np
 
 A = np.array([[1., 2.],
@@ -290,7 +290,7 @@ A = np.array([[1., 2.],
 # U, S, Vt = np.linalg.svd(A, full_matrices=False)
 # S_plus = 1/S for non-zero entries
 # A_plus = Vt.T @ np.diag(S_plus) @ U.T
-# verify: A_plus @ A â‰ˆ I (2Ã—2)
+# verify: A_plus @ A â‰ˆ I (2×2)
 # compare: np.linalg.pinv(A)
 `,
               hint: 'Use full_matrices=False for the compact SVD. S_plus = 1.0/S (all entries are non-zero here). A_plus = Vt.T @ np.diag(S_plus) @ U.T. Check np.allclose(A_plus @ A, np.eye(2)).',
@@ -301,11 +301,11 @@ A = np.array([[1., 2.],
     ],
   },
 
-  // â”€â”€ Rigor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Rigor ──────────────────────────────────────────────────────
   rigor: {
     prose: [
       '**Existence of SVD (sketch).** For any real $m\\times n$ matrix $A$, the matrix $A^TA$ is real, symmetric, and positive semidefinite. By the Spectral Theorem, it has a complete orthonormal eigenbasis $\\{\\mathbf{v}_1, \\ldots, \\mathbf{v}_n\\}$ with non-negative eigenvalues $\\lambda_1 \\geq \\cdots \\geq \\lambda_n \\geq 0$. Setting $\\sigma_i = \\sqrt{\\lambda_i}$ and $\\mathbf{u}_i = A\\mathbf{v}_i/\\sigma_i$ for $\\sigma_i > 0$, and extending $\\{\\mathbf{u}_1,\\ldots,\\mathbf{u}_r\\}$ to an orthonormal basis of $\\mathbb{R}^m$, gives the SVD $A = U\\Sigma V^T$.',
-      '**Uniqueness.** The singular values $\\sigma_1 \\geq \\cdots \\geq \\sigma_r > 0$ are uniquely determined by $A$ (they are the square roots of the eigenvalues of $A^TA$). However, $U$ and $V$ are not unique â€” there is freedom in choosing the singular vectors when singular values are repeated.',
+      '**Uniqueness.** The singular values $\\sigma_1 \\geq \\cdots \\geq \\sigma_r > 0$ are uniquely determined by $A$ (they are the square roots of the eigenvalues of $A^TA$). However, $U$ and $V$ are not unique — there is freedom in choosing the singular vectors when singular values are repeated.',
       '**The four fundamental subspaces via SVD.** The SVD cleanly reveals all four subspaces:\n- $\\text{col}(A)$: spanned by $\\{\\mathbf{u}_1, \\ldots, \\mathbf{u}_r\\}$ (left singular vectors for non-zero $\\sigma_i$)\n- $\\text{null}(A^T)$: spanned by $\\{\\mathbf{u}_{r+1}, \\ldots, \\mathbf{u}_m\\}$\n- $\\text{row}(A)$: spanned by $\\{\\mathbf{v}_1, \\ldots, \\mathbf{v}_r\\}$\n- $\\text{null}(A)$: spanned by $\\{\\mathbf{v}_{r+1}, \\ldots, \\mathbf{v}_n\\}$',
       '**The Eckart-Young Theorem (formal statement).** For the Frobenius norm $\\|M\\|_F = \\sqrt{\\sum_{ij} M_{ij}^2}$:\n\n$\\min_{\\text{rank}(B)\\leq k} \\|A - B\\|_F = \\|A - A_k\\|_F = \\sqrt{\\sigma_{k+1}^2 + \\cdots + \\sigma_r^2}$\n\nThe truncated SVD $A_k$ is the best rank-$k$ approximation. This holds also for the spectral norm $\\|M\\|_2 = \\sigma_1(M)$.',
     ],
@@ -318,17 +318,17 @@ A = np.array([[1., 2.],
       {
         type: 'insight',
         title: 'SVD Generalizes Everything',
-        body: 'â€¢ $A^+ = V\\Sigma^+U^T$ (pseudoinverse for least squares)\nâ€¢ $A_k = \\sum_{i=1}^k \\sigma_i\\mathbf{u}_i\\mathbf{v}_i^T$ (best rank-$k$ approx)\nâ€¢ PCA = SVD of the centered data matrix\nâ€¢ $\\text{rank}(A) = $ number of non-zero $\\sigma_i$\nâ€¢ $\\|A\\|_2 = \\sigma_1$, $\\|A\\|_F = \\sqrt{\\sum_i \\sigma_i^2}$',
+        body: '• $A^+ = V\\Sigma^+U^T$ (pseudoinverse for least squares)\n• $A_k = \\sum_{i=1}^k \\sigma_i\\mathbf{u}_i\\mathbf{v}_i^T$ (best rank-$k$ approx)\n• PCA = SVD of the centered data matrix\n• $\\text{rank}(A) = $ number of non-zero $\\sigma_i$\n• $\\|A\\|_2 = \\sigma_1$, $\\|A\\|_F = \\sqrt{\\sum_i \\sigma_i^2}$',
       },
     ],
     visualizations: [],
   },
 
-  // â”€â”€ Examples â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Examples ───────────────────────────────────────────────────
   examples: [
     {
       id: 'la4-004-ex1',
-      title: 'Computing the SVD of a 2Ã—2 Matrix',
+      title: 'Computing the SVD of a 2×2 Matrix',
       problem: 'Find the SVD of $A = \\begin{bmatrix}3&0\\\\0&2\\end{bmatrix}$.',
       steps: [
         {
@@ -336,7 +336,7 @@ A = np.array([[1., 2.],
           annotation: 'Since $A$ is diagonal and symmetric, $A^TA = A^2$ here.',
           strategyTitle: 'Compute Aáµ€A',
           checkpoint: 'What are the eigenvalues of this diagonal matrix?',
-          hints: ['Diagonal matrix â€” eigenvalues are the diagonal entries: $\\lambda_1 = 9$, $\\lambda_2 = 4$.'],
+          hints: ['Diagonal matrix — eigenvalues are the diagonal entries: $\\lambda_1 = 9$, $\\lambda_2 = 4$.'],
         },
         {
           expression: '\\sigma_1 = \\sqrt{9} = 3, \\quad \\sigma_2 = \\sqrt{4} = 2',
@@ -361,13 +361,13 @@ A = np.array([[1., 2.],
         },
         {
           expression: 'A = U\\Sigma V^T = \\begin{bmatrix}1&0\\\\0&1\\end{bmatrix}\\begin{bmatrix}3&0\\\\0&2\\end{bmatrix}\\begin{bmatrix}1&0\\\\0&1\\end{bmatrix} = A \\quad âœ“',
-          annotation: 'For a diagonal matrix with positive entries, SVD is trivial â€” $U = V = I$ and $\\Sigma = A$ itself.',
+          annotation: 'For a diagonal matrix with positive entries, SVD is trivial — $U = V = I$ and $\\Sigma = A$ itself.',
           strategyTitle: 'Assemble SVD',
           checkpoint: '',
           hints: [],
         },
       ],
-      conclusion: 'For a diagonal positive matrix, SVD is just the matrix itself. The singular values are the diagonal entries, and both $U$ and $V$ are the identity. This is the simplest possible SVD â€” the baseline.',
+      conclusion: 'For a diagonal positive matrix, SVD is just the matrix itself. The singular values are the diagonal entries, and both $U$ and $V$ are the identity. This is the simplest possible SVD — the baseline.',
     },
     {
       id: 'la4-004-ex2',
@@ -383,7 +383,7 @@ A = np.array([[1., 2.],
         },
         {
           expression: 'A - A_1 = \\begin{bmatrix}3&2\\\\2&3\\end{bmatrix} - \\begin{bmatrix}2.5&2.5\\\\2.5&2.5\\end{bmatrix} = \\begin{bmatrix}0.5&-0.5\\\\-0.5&0.5\\end{bmatrix}',
-          annotation: 'The discarded portion â€” what rank-1 truncation throws away.',
+          annotation: 'The discarded portion — what rank-1 truncation throws away.',
           strategyTitle: 'Compute discarded part',
           checkpoint: 'Can you verify this equals $\\sigma_2\\mathbf{u}_2\\mathbf{v}_2^T$?',
           hints: ['$\\sigma_2\\mathbf{u}_2\\mathbf{v}_2^T = 1 \\cdot \\frac{1}{2}[1,-1]^T[1,-1] = \\frac{1}{2}\\begin{bmatrix}1&-1\\\\-1&1\\end{bmatrix} = \\begin{bmatrix}0.5&-0.5\\\\-0.5&0.5\\end{bmatrix}$ âœ“'],
@@ -412,7 +412,7 @@ A = np.array([[1., 2.],
         },
         {
           expression: '\\mathbf{v}_1 = \\frac{1}{\\sqrt{2}}\\begin{bmatrix}1\\\\1\\end{bmatrix}, \\quad \\mathbf{v}_2 = \\frac{1}{\\sqrt{2}}\\begin{bmatrix}-1\\\\1\\end{bmatrix}',
-          annotation: 'Eigenvectors of $A$. For $\\lambda=5$: $(A-5I)\\mathbf{v}=0$ â†’ $[-1,1;1,-1]\\mathbf{v}=0$ â†’ $v_1=v_2$. Normalize. For $\\lambda=3$: $v_1=-v_2$.',
+          annotation: 'Eigenvectors of $A$. For $\\lambda=5$: $(A-5I)\\mathbf{v}=0$ → $[-1,1;1,-1]\\mathbf{v}=0$ → $v_1=v_2$. Normalize. For $\\lambda=3$: $v_1=-v_2$.',
           strategyTitle: 'Find singular vectors',
           checkpoint: '',
           hints: [],
@@ -429,20 +429,20 @@ A = np.array([[1., 2.],
           annotation: 'By Eckart-Young, $\\|A - A_1\\|_F = \\sigma_2 = 3$. Direct check: $A - A_1 = \\begin{bmatrix}4-5/2 & 1-5/2\\\\1-5/2 & 4-5/2\\end{bmatrix} = \\frac{3}{2}\\begin{bmatrix}1&-1\\\\-1&1\\end{bmatrix}$, and $\\|\\cdot\\|_F = \\sqrt{4\\cdot(3/2)^2} = 3$ âœ“.',
           strategyTitle: 'Verify Eckart-Young error',
           checkpoint: 'Could any other rank-1 matrix achieve error < 3?',
-          hints: ['No â€” Eckart-Young theorem proves the rank-1 truncated SVD is the best rank-1 approximation in Frobenius norm. Any other rank-1 matrix has error â‰¥ Ïƒâ‚‚.'],
+          hints: ['No — Eckart-Young theorem proves the rank-1 truncated SVD is the best rank-1 approximation in Frobenius norm. Any other rank-1 matrix has error ≥ σ₁.'],
         },
       ],
       conclusion: '$A_1 = (5/2)\\begin{bmatrix}1&1\\\\1&1\\end{bmatrix}$ is the best rank-1 approximation to $A = \\begin{bmatrix}4&1\\\\1&4\\end{bmatrix}$. The Frobenius error equals $\\sigma_2 = 3$. The information retained: $\\sigma_1^2/(\\sigma_1^2+\\sigma_2^2) = 25/34 \\approx 74\\%$.',
     },
   ],
 
-  // â”€â”€ Challenges â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Challenges ─────────────────────────────────────────────────
   challenges: [
     {
       id: 'la4-004-ch1',
       difficulty: 'easy',
       problem: 'A matrix has singular values $\\sigma_1 = 10$, $\\sigma_2 = 3$, $\\sigma_3 = 0.1$. (a) What is the rank of the matrix? (b) What percentage of the Frobenius norm is captured by the rank-1 approximation?',
-      hint: 'Rank = number of non-zero singular values. Frobenius normÂ² = sum of Ïƒáµ¢Â².',
+      hint: 'Rank = number of non-zero singular values. Frobenius norm² = sum of σᵢ².',
       walkthrough: [
         {
           expression: '\\text{rank}(A) = 3 \\quad (\\text{all three singular values are non-zero})',
@@ -478,13 +478,13 @@ A = np.array([[1., 2.],
           annotation: 'For symmetric positive definite matrices, SVD and eigendecomposition coincide: $A = Q\\Lambda Q^T = U\\Sigma V^T$.',
         },
       ],
-      answer: 'For symmetric positive definite A: Ïƒáµ¢ = Î»áµ¢. SVD = eigendecomposition.',
+      answer: 'For symmetric positive definite A: σᵢ = λᵢ. SVD = eigendecomposition.',
     },
     {
       id: 'la4-004-ch3',
       difficulty: 'hard',
       problem: 'A rank-2 matrix has SVD with $\\sigma_1 = 4, \\sigma_2 = 3$, and appropriate $\\mathbf{u}_i, \\mathbf{v}_i$. (a) What is $\\|A\\|_F$? (b) What is the minimum error if you approximate $A$ with a rank-1 matrix? (c) What fraction of the information does rank-1 capture?',
-      hint: 'Eckart-Young: error = Ïƒâ‚‚. Frobenius normÂ² = Ïƒâ‚Â² + Ïƒâ‚‚Â². Information fraction = Ïƒâ‚Â²/(Ïƒâ‚Â²+Ïƒâ‚‚Â²).',
+      hint: 'Eckart-Young: error = σ₁. Frobenius norm² = σ₁² + σ₁². Information fraction = σ₁²/(σ₁²+σ₁²).',
       walkthrough: [
         {
           expression: '\\|A\\|_F = \\sqrt{\\sigma_1^2 + \\sigma_2^2} = \\sqrt{16+9} = \\sqrt{25} = 5',
@@ -503,25 +503,25 @@ A = np.array([[1., 2.],
     },
   ],
 
-  // â”€â”€ Semantics â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Semantics ────────────────────────────────────────────────────
   semantics: {
     core: [
-      { symbol: 'A = U\\Sigma V^T', meaning: 'SVD: U and V are orthogonal, Î£ is diagonal with singular values Ïƒáµ¢ â‰¥ 0' },
+      { symbol: 'A = U\\Sigma V^T', meaning: 'SVD: U and V are orthogonal, Σ is diagonal with singular values σᵢ ≥ 0' },
       { symbol: '\\sigma_i = \\sqrt{\\lambda_i(A^TA)}', meaning: 'Singular values are square roots of eigenvalues of Aáµ€A' },
       { symbol: 'A_k = \\sum_{i=1}^k \\sigma_i\\mathbf{u}_i\\mathbf{v}_i^T', meaning: 'Best rank-k approximation to A (Eckart-Young)' },
-      { symbol: 'A^+ = V\\Sigma^+U^T', meaning: 'Pseudoinverse via SVD â€” used for minimum-norm least squares' },
-      { symbol: '\\sigma_1/\\sigma_r', meaning: 'Condition number â€” measures numerical stability of the linear system' },
+      { symbol: 'A^+ = V\\Sigma^+U^T', meaning: 'Pseudoinverse via SVD — used for minimum-norm least squares' },
+      { symbol: '\\sigma_1/\\sigma_r', meaning: 'Condition number — measures numerical stability of the linear system' },
     ],
     rulesOfThumb: [
-      'SVD always exists â€” any matrix, any size, any rank.',
+      'SVD always exists — any matrix, any size, any rank.',
       'Singular values are always non-negative real numbers.',
       'Large singular values = important directions. Small â‰ˆ noise.',
       'Rank = number of non-zero singular values.',
-      '||A||_F = sqrt(Ïƒâ‚Â² + Ïƒâ‚‚Â² + ...). ||A||â‚‚ = Ïƒâ‚.',
+      '||A||_F = sqrt(σ₁² + σ₁² + ...). ||A||₁ = σ₁.',
     ],
   },
 
-  // â”€â”€ Spiral â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Spiral ────────────────────────────────────────────────────────
   spiral: {
     recoveryPoints: [
       {
@@ -532,7 +532,7 @@ A = np.array([[1., 2.],
       {
         lessonId: 'la4-003',
         label: 'Least Squares',
-        note: 'The pseudoinverse $A^+ = V\\Sigma^+U^T$ is the deepest way to understand least squares. It gives the minimum-norm solution even when $A^TA$ is singular â€” something the normal equations cannot handle.',
+        note: 'The pseudoinverse $A^+ = V\\Sigma^+U^T$ is the deepest way to understand least squares. It gives the minimum-norm solution even when $A^TA$ is singular — something the normal equations cannot handle.',
       },
     ],
     futureLinks: [
@@ -544,28 +544,28 @@ A = np.array([[1., 2.],
     ],
   },
 
-  // â”€â”€ Mental Model â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Mental Model ─────────────────────────────────────────────────
   mentalModel: [
-    'Any matrix = rotate (Váµ€) â†’ stretch (Î£) â†’ rotate (U). Three clean steps.',
+    'Any matrix = rotate (Váµ€) → stretch (Σ) → rotate (U). Three clean steps.',
     'Singular values rank the directions by importance. Large = signal. Small = noise.',
     'SVD always exists. Diagonalization sometimes fails. SVD never does.',
-    'Truncate to rank k: keep the k biggest Ïƒáµ¢ terms. Best possible compression.',
-    'Pseudoinverse Aâº = VÎ£âºUáµ€ handles everything least squares cannot.',
+    'Truncate to rank k: keep the k biggest σᵢ terms. Best possible compression.',
+    'Pseudoinverse Aâº = VΣâºUáµ€ handles everything least squares cannot.',
   ],
 
-  // â”€â”€ Checkpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Checkpoints ──────────────────────────────────────────────────
   checkpoints: [
-    { id: 'cp-la4-svd-1', label: 'Read: State the three matrices in A = UÎ£Váµ€', type: 'read' },
+    { id: 'cp-la4-svd-1', label: 'Read: State the three matrices in A = UΣVáµ€', type: 'read' },
     { id: 'cp-la4-svd-2', label: 'Read: Explain how singular values differ from eigenvalues', type: 'read' },
     { id: 'cp-la4-svd-3', label: 'Read: State the Eckart-Young theorem', type: 'read' },
-    { id: 'cp-la4-svd-4', label: 'Lab: Visualize Váµ€ â†’ Î£ â†’ U acting on the unit circle', type: 'lab' },
+    { id: 'cp-la4-svd-4', label: 'Lab: Visualize Váµ€ → Σ → U acting on the unit circle', type: 'lab' },
     { id: 'cp-la4-svd-5', label: 'Lab: Compute rank-k approximation and measure compression ratio', type: 'lab' },
     { id: 'cp-la4-svd-6', label: 'Example: SVD of a diagonal matrix', type: 'example' },
     { id: 'cp-la4-svd-7', label: 'Example: Best rank-1 approximation', type: 'example' },
     { id: 'cp-la4-svd-8', label: 'Challenge: Verify Eckart-Young error bound numerically', type: 'challenge' },
   ],
 
-  // â”€â”€ Assessment â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Assessment ───────────────────────────────────────────────────
   assessment: {
     questions: [
       {
@@ -578,7 +578,7 @@ A = np.array([[1., 2.],
     ],
   },
 
-  // â”€â”€ Quiz â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Quiz ─────────────────────────────────────────────────────────
   quiz: [
     {
       id: 'svd-q1',
@@ -586,13 +586,13 @@ A = np.array([[1., 2.],
       text: 'What is guaranteed to be true about the matrices $U$ and $V$ in every SVD $A = U\\Sigma V^T$?',
       options: [
         'They are diagonal',
-        'They are square and orthogonal â€” their columns are orthonormal',
+        'They are square and orthogonal — their columns are orthonormal',
         'They are equal ($U = V$)',
         'They are the same as the eigenvectors of $A$',
       ],
-      answer: 'They are square and orthogonal â€” their columns are orthonormal',
-      hints: ['$U$ and $V$ are orthogonal matrices â€” their columns form orthonormal sets. This is what makes SVD so numerically stable.'],
-      reviewSection: 'Intuition tab â€” SVD Decomposition',
+      answer: 'They are square and orthogonal — their columns are orthonormal',
+      hints: ['$U$ and $V$ are orthogonal matrices — their columns form orthonormal sets. This is what makes SVD so numerically stable.'],
+      reviewSection: 'Intuition tab — SVD Decomposition',
     },
     {
       id: 'svd-q2',
@@ -605,8 +605,8 @@ A = np.array([[1., 2.],
         'They are the eigenvalues of $A + A^T$',
       ],
       answer: 'They are the square roots of the eigenvalues of $A^TA$',
-      hints: ['$A^TA$ is always symmetric positive semidefinite â€” it always has non-negative real eigenvalues, so square roots are always defined.'],
-      reviewSection: 'Math tab â€” Computing SVD from Eigenvalues',
+      hints: ['$A^TA$ is always symmetric positive semidefinite — it always has non-negative real eigenvalues, so square roots are always defined.'],
+      reviewSection: 'Math tab — Computing SVD from Eigenvalues',
     },
     {
       id: 'svd-q3',
@@ -614,7 +614,7 @@ A = np.array([[1., 2.],
       text: 'A matrix has singular values 5 and 12. What is its Frobenius norm?',
       answer: '13',
       hints: ['$\\|A\\|_F = \\sqrt{\\sigma_1^2 + \\sigma_2^2} = \\sqrt{25 + 144} = \\sqrt{169} = 13$.'],
-      reviewSection: 'Rigor tab â€” SVD Generalizes Everything',
+      reviewSection: 'Rigor tab — SVD Generalizes Everything',
     },
     {
       id: 'svd-q4',
@@ -628,7 +628,7 @@ A = np.array([[1., 2.],
       ],
       answer: 'The Eckart-Young theorem proves no other rank-$k$ matrix is closer in Frobenius (or spectral) norm',
       hints: ['Eckart-Young: $\\min_{\\text{rank}(B)\\leq k}\\|A-B\\|_F = \\|A-A_k\\|_F = \\sqrt{\\sigma_{k+1}^2+\\cdots}$. Proved, not just claimed.'],
-      reviewSection: 'Math tab â€” Low-Rank Approximation',
+      reviewSection: 'Math tab — Low-Rank Approximation',
     },
     {
       id: 'q-la4-svd-5',
@@ -641,8 +641,8 @@ A = np.array([[1., 2.],
         '$(AA^T)^{-1}A$',
       ],
       answer: '$V\\Sigma^+ U^T$, where $\\Sigma^+$ inverts each non-zero singular value',
-      hints: ['Î£âº replaces each non-zero Ïƒáµ¢ with 1/Ïƒáµ¢ and keeps zeros as zeros. Aâº = VÎ£âºUáµ€ is valid for any rank matrix â€” it handles rank-deficient cases gracefully.'],
-      reviewSection: 'Math â€” pseudoinverse via SVD',
+      hints: ['Σâº replaces each non-zero σᵢ with 1/σᵢ and keeps zeros as zeros. Aâº = VΣâºUáµ€ is valid for any rank matrix — it handles rank-deficient cases gracefully.'],
+      reviewSection: 'Math — pseudoinverse via SVD',
     },
     {
       id: 'q-la4-svd-6',
@@ -655,8 +655,8 @@ A = np.array([[1., 2.],
         'The determinant of $A$',
       ],
       answer: 'How much small changes in $\\mathbf{b}$ can amplify errors in the solution $\\hat{\\mathbf{x}}$ to $A\\mathbf{x} = \\mathbf{b}$',
-      hints: ['A perturbation Î´b in b causes a change Î´x with â€–Î´xâ€–/â€–xâ€– â‰¤ Îº(A)Â·â€–Î´bâ€–/â€–bâ€–, where Îº(A)=Ïƒâ‚/Ïƒâ‚™. Large Îº means tiny changes in b cause large changes in x.'],
-      reviewSection: 'Math â€” condition number',
+      hints: ['A perturbation Î´b in b causes a change Î´x with –Î´x–/–x– ≤ Îº(A)·–Î´b–/–b–, where Îº(A)=σ₁/σ₁™. Large Îº means tiny changes in b cause large changes in x.'],
+      reviewSection: 'Math — condition number',
     },
     {
       id: 'q-la4-svd-7',
@@ -669,8 +669,8 @@ A = np.array([[1., 2.],
         'The trace of $A$',
       ],
       answer: 'The rank of $A$',
-      hints: ['Ïƒáµ¢ = 0 iff the ith right singular vector is in the null space of A. The number of non-zero Ïƒáµ¢ equals the dimension of the row space = rank(A).'],
-      reviewSection: 'Math â€” SVD and rank',
+      hints: ['σᵢ = 0 iff the ith right singular vector is in the null space of A. The number of non-zero σᵢ equals the dimension of the row space = rank(A).'],
+      reviewSection: 'Math — SVD and rank',
     },
     {
       id: 'q-la4-svd-8',
@@ -683,8 +683,8 @@ A = np.array([[1., 2.],
         '$100\\%$',
       ],
       answer: '$96\\%$',
-      hints: ['Ïƒâ‚Â²/(Ïƒâ‚Â² + Ïƒâ‚‚Â²) = 100/(100+4) = 100/104 â‰ˆ 96.15%.'],
-      reviewSection: 'Math â€” low-rank approximation',
+      hints: ['σ₁²/(σ₁² + σ₁²) = 100/(100+4) = 100/104 â‰ˆ 96.15%.'],
+      reviewSection: 'Math — low-rank approximation',
     },
     {
       id: 'q-la4-svd-9',
@@ -697,8 +697,8 @@ A = np.array([[1., 2.],
         'They are unrelated',
       ],
       answer: 'Singular values = eigenvalues exactly',
-      hints: ['For SPD A: A = QÎ›Qáµ€ (spectral theorem), and A^TA = QÎ›Â²Qáµ€. So Ïƒáµ¢ = âˆšÎ»áµ¢(Aáµ€A) = âˆšÎ»áµ¢Â² = Î»áµ¢ (since Î»áµ¢ > 0).'],
-      reviewSection: 'Intuition â€” Singular Values â‰  Eigenvalues callout',
+      hints: ['For SPD A: A = QÎ›Qáµ€ (spectral theorem), and A^TA = QÎ›²Qáµ€. So σᵢ = âˆšλᵢ(Aáµ€A) = âˆšλᵢ² = λᵢ (since λᵢ > 0).'],
+      reviewSection: 'Intuition — Singular Values ≠ Eigenvalues callout',
     },
     {
       id: 'q-la4-svd-10',
@@ -706,13 +706,13 @@ A = np.array([[1., 2.],
       text: 'In the SVD $A = U\\Sigma V^T$, the columns of $V$ are:',
       options: [
         'Left singular vectors (in the output space)',
-        'Right singular vectors (in the input space) â€” eigenvectors of $A^TA$',
+        'Right singular vectors (in the input space) — eigenvectors of $A^TA$',
         'The eigenvectors of $AA^T$',
         'The columns of $A$ normalized',
       ],
-      answer: 'Right singular vectors (in the input space) â€” eigenvectors of $A^TA$',
-      hints: ['V comes from the eigendecomposition of Aáµ€A. The transformation A = UÎ£Váµ€ first applies Váµ€ (rotate input), then Î£ (scale), then U (rotate output). V acts in the input space (domain of A).'],
-      reviewSection: 'Math â€” computing SVD from eigenvalues',
+      answer: 'Right singular vectors (in the input space) — eigenvectors of $A^TA$',
+      hints: ['V comes from the eigendecomposition of Aáµ€A. The transformation A = UΣVáµ€ first applies Váµ€ (rotate input), then Σ (scale), then U (rotate output). V acts in the input space (domain of A).'],
+      reviewSection: 'Math — computing SVD from eigenvalues',
     },
   ],
 
@@ -726,44 +726,44 @@ A = np.array([[1., 2.],
     {
       falseBelief: 'The rank-$k$ truncated SVD is an approximation but not necessarily the best rank-$k$ approximation.',
       whyStudentsThinkIt: 'It seems like an intuitive choice rather than a provably optimal one.',
-      correctionExample: 'The Eckart-Young theorem proves it: for any rank-$k$ matrix $B$, $\\|A - B\\|_F \\geq \\sqrt{\\sigma_{k+1}^2 + \\cdots + \\sigma_r^2}$. The truncated SVD achieves this bound â€” no other rank-$k$ matrix can do better.',
+      correctionExample: 'The Eckart-Young theorem proves it: for any rank-$k$ matrix $B$, $\\|A - B\\|_F \\geq \\sqrt{\\sigma_{k+1}^2 + \\cdots + \\sigma_r^2}$. The truncated SVD achieves this bound — no other rank-$k$ matrix can do better.',
       contrastCase: 'For compression: if you truncate to rank 1 and lose $\\sigma_2 = 3$ in the example, no other rank-1 matrix has a smaller Frobenius error than 3.',
     },
   ],
 
   transferPrompts: [
     {
-      situation: 'You need to compress a high-resolution image stored as a matrix of pixel values (1000Ã—1000 = 1M numbers) for efficient transmission.',
+      situation: 'You need to compress a high-resolution image stored as a matrix of pixel values (1000×1000 = 1M numbers) for efficient transmission.',
       competingTechniques: ['JPEG compression (DCT-based)', 'Random sampling', 'SVD truncation'],
       whyThisTechniqueWins: 'SVD rank-$k$ truncation is the provably optimal linear compression: for a given storage budget ($k(m+n+1)$ numbers vs $mn$ original), it minimizes Frobenius error. In practice, JPEG is faster to compute, but SVD gives the theoretical baseline for quality.',
     },
     {
-      situation: 'In recommendation systems, users Ã— items ratings matrix has many missing entries and is approximately low-rank. You want to predict missing ratings.',
+      situation: 'In recommendation systems, users × items ratings matrix has many missing entries and is approximately low-rank. You want to predict missing ratings.',
       competingTechniques: ['Fill missing values with average', 'Nearest neighbor', 'SVD / matrix factorization'],
-      whyThisTechniqueWins: 'The observed entries approximately follow a low-rank structure (users can be described by a few "taste factors"). SVD (or its variant, truncated matrix factorization) recovers this structure and generalizes to predict unseen ratings â€” the basis of Netflix Prize-winning algorithms.',
+      whyThisTechniqueWins: 'The observed entries approximately follow a low-rank structure (users can be described by a few "taste factors"). SVD (or its variant, truncated matrix factorization) recovers this structure and generalizes to predict unseen ratings — the basis of Netflix Prize-winning algorithms.',
     },
   ],
 
   debugging: [
     {
       commonError: 'Confusing $U$ (left singular vectors, $m\\times m$) with $V$ (right singular vectors, $n\\times n$) in $A = U\\Sigma V^T$.',
-      symptom: 'Shape mismatch when trying to reconstruct $A$ from the SVD â€” the matrix product dimensions do not work out.',
+      symptom: 'Shape mismatch when trying to reconstruct $A$ from the SVD — the matrix product dimensions do not work out.',
       whyItHappened: 'For a rectangular $m\\times n$ matrix, $U$ is $m\\times m$ and $V$ is $n\\times n$. The left singular vectors live in the output space, right singular vectors in the input space.',
       repairStrategy: 'Always check: $U$ is $m\\times m$, $\\Sigma$ is $m\\times n$, $V^T$ is $n\\times n$. The product $(m\\times m)(m\\times n)(n\\times n) = m\\times n$, matching $A$. Also: $\\mathbf{u}_i = (1/\\sigma_i)A\\mathbf{v}_i$ (not the other way).',
     },
     {
       commonError: 'Using eigenvalues of $A$ as singular values for a non-symmetric matrix.',
-      symptom: 'Negative "singular values" or complex "singular values" â€” which are impossible.',
+      symptom: 'Negative "singular values" or complex "singular values" — which are impossible.',
       whyItHappened: 'Singular values are eigenvalues of $A^TA$ (not $A$), and $A^TA$ is always positive semidefinite, so its eigenvalues are always non-negative.',
-      repairStrategy: 'For singular values: form $A^TA$, find its eigenvalues $\\lambda_i \\geq 0$, then $\\sigma_i = \\sqrt{\\lambda_i}$. If you get any negative eigenvalues of $A^TA$, re-check the computation â€” $A^TA$ can never have negative eigenvalues.',
+      repairStrategy: 'For singular values: form $A^TA$, find its eigenvalues $\\lambda_i \\geq 0$, then $\\sigma_i = \\sqrt{\\lambda_i}$. If you get any negative eigenvalues of $A^TA$, re-check the computation — $A^TA$ can never have negative eigenvalues.',
     },
   ],
 
   mastery: {
     targetLevel: 3,
-    solveIndependently: 'Compute the SVD of a 2Ã—2 matrix via $A^TA$ eigendecomposition, perform rank-$k$ approximation, and state the Frobenius error.',
+    solveIndependently: 'Compute the SVD of a 2×2 matrix via $A^TA$ eigendecomposition, perform rank-$k$ approximation, and state the Frobenius error.',
     explainVerbally: 'Explain the geometric meaning of each matrix in $A = U\\Sigma V^T$, why singular values differ from eigenvalues, and what Eckart-Young guarantees.',
     detectIncorrectApplication: 'Catch eigenvalue-singular value confusion; catch $U$/$V$ shape mismatches; recognize when a condition number signals numerical trouble.',
-    transferToUnfamiliar: 'Apply SVD to image compression, recommendation systems, PCA, or pseudoinverse computation â€” any context requiring a stable matrix factorization.',
+    transferToUnfamiliar: 'Apply SVD to image compression, recommendation systems, PCA, or pseudoinverse computation — any context requiring a stable matrix factorization.',
   },
 };

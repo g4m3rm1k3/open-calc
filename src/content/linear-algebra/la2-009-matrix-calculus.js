@@ -1,10 +1,10 @@
-﻿export default {
+export default {
   id: 'la2-009',
   slug: 'matrix-calculus',
   chapter: 'la2',
   order: 9,
   title: 'Matrix Calculus: Gradients, Jacobians, and Hessians',
-  subtitle: 'When calculus meets linear algebra â€” every gradient is a row vector, every Jacobian is a matrix, and every Hessian is symmetric.',
+  subtitle: 'When calculus meets linear algebra — every gradient is a row vector, every Jacobian is a matrix, and every Hessian is symmetric.',
   tags: ['gradient', 'Jacobian', 'Hessian', 'matrix calculus', 'chain rule', 'partial derivatives', 'optimization'],
   aliases: 'gradient Jacobian Hessian matrix calculus partial derivatives chain rule optimization vector calculus',
   timeToComplete: 30,
@@ -14,24 +14,24 @@
 
   hook: {
     question: "Neural networks adjust millions of weights using calculus on vectors. How do you take the derivative of a function whose input is an entire matrix?",
-    realWorldContext: "Every machine learning algorithm ultimately does calculus on vectors and matrices. The gradient of a loss function tells you which direction to step to reduce error. The Jacobian tells you how a transformation stretches space locally â€” GPS systems use it to map sensor noise through nonlinear coordinate transforms. The Hessian tells you the curvature of a surface â€” Newton\'s method for optimization uses it to jump straight to a minimum instead of crawling with gradient descent. Understanding matrix calculus is the difference between being able to derive these algorithms from scratch and just copying formulas from a textbook.",
+    realWorldContext: "Every machine learning algorithm ultimately does calculus on vectors and matrices. The gradient of a loss function tells you which direction to step to reduce error. The Jacobian tells you how a transformation stretches space locally — GPS systems use it to map sensor noise through nonlinear coordinate transforms. The Hessian tells you the curvature of a surface — Newton\'s method for optimization uses it to jump straight to a minimum instead of crawling with gradient descent. Understanding matrix calculus is the difference between being able to derive these algorithms from scratch and just copying formulas from a textbook.",
   },
 
   intuition: {
     prose: [
-      'Take $\\mathbf{x}_0 = [1, 2]^\\top$ and $A = \\begin{bmatrix}3&1\\\\1&2\\end{bmatrix}$. The function $f(\\mathbf{x}) = \\mathbf{x}^\\top A \\mathbf{x}$ evaluates to $15$ at $\\mathbf{x}_0$. One formula gives the gradient instantly: $\\nabla f = 2A\\mathbf{x}_0 = 2\\begin{bmatrix}3&1\\\\1&2\\end{bmatrix}\\begin{bmatrix}1\\\\2\\end{bmatrix} = \\begin{bmatrix}10\\\\10\\end{bmatrix}$. This tells you: from $\\mathbf{x}_0$, moving in direction $[10,10]^\\top$ increases $f$ fastest; gradient descent steps the opposite way. That single formula â€” $\\nabla(\\mathbf{x}^\\top A\\mathbf{x}) = 2A\\mathbf{x}$ â€” drives least squares, ridge regression, and neural network training.',
-      '**Derivatives of scalars with respect to vectors â€” the gradient.** If $f(\\mathbf{x})$ maps a vector $\\mathbf{x} \\in \\mathbb{R}^n$ to a scalar, the gradient $\\nabla f$ is a column vector of partial derivatives: $\\nabla f = \\bigl[\\partial f/\\partial x_1, \\ldots, \\partial f/\\partial x_n\\bigr]^\\top$. The gradient points in the direction of steepest ascent. Gradient descent moves opposite to it.',
-      '**Derivatives of vectors with respect to vectors â€” the Jacobian.** If $\\mathbf{f}(\\mathbf{x})$ maps $\\mathbf{x} \\in \\mathbb{R}^n$ to $\\mathbf{f} \\in \\mathbb{R}^m$, the Jacobian $J$ is an $m \\times n$ matrix where $J_{ij} = \\partial f_i / \\partial x_j$. The Jacobian is the best linear approximation to $\\mathbf{f}$ at a point â€” the multivariable analogue of the single-variable derivative.',
-      '**The Hessian â€” second-order information.** For a scalar function $f: \\mathbb{R}^n \\to \\mathbb{R}$, the Hessian $H$ is the $n \\times n$ matrix of second partial derivatives: $H_{ij} = \\partial^2 f / \\partial x_i \\partial x_j$. By Schwarz\'s theorem, the Hessian is always symmetric ($H = H^\\top$). Its eigenvalues tell you the curvature in each principal direction. Positive definite Hessian â†’ local minimum. Indefinite Hessian â†’ saddle point.',
+      'Take $\\mathbf{x}_0 = [1, 2]^\\top$ and $A = \\begin{bmatrix}3&1\\\\1&2\\end{bmatrix}$. The function $f(\\mathbf{x}) = \\mathbf{x}^\\top A \\mathbf{x}$ evaluates to $15$ at $\\mathbf{x}_0$. One formula gives the gradient instantly: $\\nabla f = 2A\\mathbf{x}_0 = 2\\begin{bmatrix}3&1\\\\1&2\\end{bmatrix}\\begin{bmatrix}1\\\\2\\end{bmatrix} = \\begin{bmatrix}10\\\\10\\end{bmatrix}$. This tells you: from $\\mathbf{x}_0$, moving in direction $[10,10]^\\top$ increases $f$ fastest; gradient descent steps the opposite way. That single formula — $\\nabla(\\mathbf{x}^\\top A\\mathbf{x}) = 2A\\mathbf{x}$ — drives least squares, ridge regression, and neural network training.',
+      '**Derivatives of scalars with respect to vectors — the gradient.** If $f(\\mathbf{x})$ maps a vector $\\mathbf{x} \\in \\mathbb{R}^n$ to a scalar, the gradient $\\nabla f$ is a column vector of partial derivatives: $\\nabla f = \\bigl[\\partial f/\\partial x_1, \\ldots, \\partial f/\\partial x_n\\bigr]^\\top$. The gradient points in the direction of steepest ascent. Gradient descent moves opposite to it.',
+      '**Derivatives of vectors with respect to vectors — the Jacobian.** If $\\mathbf{f}(\\mathbf{x})$ maps $\\mathbf{x} \\in \\mathbb{R}^n$ to $\\mathbf{f} \\in \\mathbb{R}^m$, the Jacobian $J$ is an $m \\times n$ matrix where $J_{ij} = \\partial f_i / \\partial x_j$. The Jacobian is the best linear approximation to $\\mathbf{f}$ at a point — the multivariable analogue of the single-variable derivative.',
+      '**The Hessian — second-order information.** For a scalar function $f: \\mathbb{R}^n \\to \\mathbb{R}$, the Hessian $H$ is the $n \\times n$ matrix of second partial derivatives: $H_{ij} = \\partial^2 f / \\partial x_i \\partial x_j$. By Schwarz\'s theorem, the Hessian is always symmetric ($H = H^\\top$). Its eigenvalues tell you the curvature in each principal direction. Positive definite Hessian → local minimum. Indefinite Hessian → saddle point.',
       '**Two critical formulas to memorize.** For $f(\\mathbf{x}) = \\mathbf{a}^\\top \\mathbf{x}$ (linear), the gradient is $\\nabla f = \\mathbf{a}$. For $f(\\mathbf{x}) = \\mathbf{x}^\\top A \\mathbf{x}$ (quadratic form with symmetric $A$), the gradient is $\\nabla f = 2A\\mathbf{x}$, and the Hessian is $H = 2A$. These two formulas appear everywhere in statistics (least squares), physics (energy), and ML (loss functions).',
       '**Predict before reading on.** A neural network has two layers: $\\mathbf{z} = W_1\\mathbf{x}$ then $\\mathbf{y} = W_2\\mathbf{z}$, so $\\mathbf{y} = W_2 W_1 \\mathbf{x}$. If the loss is $L = \\frac{1}{2}\\|\\mathbf{y} - \\mathbf{t}\\|^2$, what is $\\partial L/\\partial \\mathbf{x}$? Write your answer in terms of $W_1$, $W_2$, $\\mathbf{y}$, and $\\mathbf{t}$ before continuing.',
-      '**Where this is heading.** The formula $\\nabla(\\|A\\mathbf{x} - \\mathbf{b}\\|^2) = 2A^\\top(A\\mathbf{x} - \\mathbf{b})$ is why we study least squares (Chapter 4) â€” setting the gradient to zero gives the normal equations $A^\\top A \\mathbf{x} = A^\\top \\mathbf{b}$. The Hessian $H = 2A$ being positive definite is precisely the condition (from Chapter 4\'s spectral theorem) that guarantees the normal equations have a unique solution. And backpropagation in neural networks â€” the algorithm that trains every language model and image classifier â€” is pure Jacobian chain rule, layer by layer. Every formula in this lesson is used daily in production ML systems.',
+      '**Where this is heading.** The formula $\\nabla(\\|A\\mathbf{x} - \\mathbf{b}\\|^2) = 2A^\\top(A\\mathbf{x} - \\mathbf{b})$ is why we study least squares (Chapter 4) — setting the gradient to zero gives the normal equations $A^\\top A \\mathbf{x} = A^\\top \\mathbf{b}$. The Hessian $H = 2A$ being positive definite is precisely the condition (from Chapter 4\'s spectral theorem) that guarantees the normal equations have a unique solution. And backpropagation in neural networks — the algorithm that trains every language model and image classifier — is pure Jacobian chain rule, layer by layer. Every formula in this lesson is used daily in production ML systems.',
     ],
     callouts: [
       {
         type: 'sequencing',
-        title: 'Lesson 9 of 12 â€” Matrices & Transformations',
-        body: '**Previous:** Cramer\'s Rule â€” determinant-based formulas for solutions and inverses.\n**This lesson:** Matrix Calculus â€” gradients, Jacobians, and Hessians; how to differentiate functions of vectors and matrices.\n**Next:** The Invertible Matrix Theorem â€” twelve equivalent conditions that unify all of Chapters 1 and 2.',
+        title: 'Lesson 9 of 12 — Matrices & Transformations',
+        body: '**Previous:** Cramer\'s Rule — determinant-based formulas for solutions and inverses.\n**This lesson:** Matrix Calculus — gradients, Jacobians, and Hessians; how to differentiate functions of vectors and matrices.\n**Next:** The Invertible Matrix Theorem — twelve equivalent conditions that unify all of Chapters 1 and 2.',
       },
       {
         type: 'insight',
@@ -41,12 +41,12 @@
       {
         type: 'insight',
         title: 'The Chain Rule in Matrix Form',
-        body: 'If $\\mathbf{h}(\\mathbf{x}) = \\mathbf{f}(\\mathbf{g}(\\mathbf{x}))$, the Jacobian of the composition is the product of Jacobians:\n$J_h = J_f \\cdot J_g$\nThis is why backpropagation in neural networks is just repeated matrix multiplication of Jacobians â€” the chain rule applied layer by layer.',
+        body: 'If $\\mathbf{h}(\\mathbf{x}) = \\mathbf{f}(\\mathbf{g}(\\mathbf{x}))$, the Jacobian of the composition is the product of Jacobians:\n$J_h = J_f \\cdot J_g$\nThis is why backpropagation in neural networks is just repeated matrix multiplication of Jacobians — the chain rule applied layer by layer.',
       },
       {
         type: 'warning',
         title: 'Numerator vs Denominator Layout',
-        body: 'There are two conventions: numerator layout (gradient is a row vector) and denominator layout (gradient is a column vector). This course uses denominator layout â€” the gradient $\\nabla f$ is a column vector of the same shape as the input $\\mathbf{x}$. Be careful when reading ML papers which often switch conventions.',
+        body: 'There are two conventions: numerator layout (gradient is a row vector) and denominator layout (gradient is a column vector). This course uses denominator layout — the gradient $\\nabla f$ is a column vector of the same shape as the input $\\mathbf{x}$. Be careful when reading ML papers which often switch conventions.',
       },
     ],
     visualizations: [
@@ -82,7 +82,7 @@ disp('Eigenvalues of Hessian (all positive = minimum):')
               id: 2,
               cellTitle: 'Jacobian of a vector function',
               prose: ['The Jacobian J is the matrix of all partial derivatives. Compute it numerically.'],
-              code: `% f(x) = [x1^2 + x2; x1*x2] â€” Jacobian is 2x2
+              code: `% f(x) = [x1^2 + x2; x1*x2] — Jacobian is 2x2
 x = [2; 3];
 h = 1e-6;
 
@@ -108,8 +108,8 @@ J_numerical = J_num
   math: {
     prose: [
       '**Deriving the gradient of the quadratic form.** Let $f(\\mathbf{x}) = \\mathbf{x}^\\top A \\mathbf{x}$ where $A$ is $n \\times n$ symmetric. Writing $f = \\sum_{i,j} a_{ij} x_i x_j$, the partial derivative with respect to $x_k$ is $\\partial f / \\partial x_k = \\sum_j a_{kj} x_j + \\sum_i a_{ik} x_i = 2\\sum_j a_{kj} x_j$ (using $a_{kj} = a_{jk}$ for symmetry). In vector form: $\\nabla f = 2A\\mathbf{x}$.',
-      '**The least squares normal equation from calculus.** The sum of squared residuals is $\\|A\\mathbf{x} - \\mathbf{b}\\|^2 = (A\\mathbf{x} - \\mathbf{b})^\\top(A\\mathbf{x} - \\mathbf{b})$. Expanding and differentiating: $\\nabla = 2A^\\top(A\\mathbf{x} - \\mathbf{b})$. Setting this to zero gives $A^\\top A \\mathbf{x} = A^\\top \\mathbf{b}$ â€” the normal equations you derived geometrically in Chapter 4.',
-      '**The Jacobian as best linear approximation.** For $\\mathbf{f}: \\mathbb{R}^n \\to \\mathbb{R}^m$, the Jacobian $J$ satisfies $\\mathbf{f}(\\mathbf{x} + \\mathbf{h}) \\approx \\mathbf{f}(\\mathbf{x}) + J\\mathbf{h}$ for small $\\mathbf{h}$. The "derivative" of a vector function at a point is a matrix â€” the linear map that best approximates the local behavior of $\\mathbf{f}$.',
+      '**The least squares normal equation from calculus.** The sum of squared residuals is $\\|A\\mathbf{x} - \\mathbf{b}\\|^2 = (A\\mathbf{x} - \\mathbf{b})^\\top(A\\mathbf{x} - \\mathbf{b})$. Expanding and differentiating: $\\nabla = 2A^\\top(A\\mathbf{x} - \\mathbf{b})$. Setting this to zero gives $A^\\top A \\mathbf{x} = A^\\top \\mathbf{b}$ — the normal equations you derived geometrically in Chapter 4.',
+      '**The Jacobian as best linear approximation.** For $\\mathbf{f}: \\mathbb{R}^n \\to \\mathbb{R}^m$, the Jacobian $J$ satisfies $\\mathbf{f}(\\mathbf{x} + \\mathbf{h}) \\approx \\mathbf{f}(\\mathbf{x}) + J\\mathbf{h}$ for small $\\mathbf{h}$. The "derivative" of a vector function at a point is a matrix — the linear map that best approximates the local behavior of $\\mathbf{f}$.',
     ],
     callouts: [
       {
@@ -120,22 +120,22 @@ J_numerical = J_num
       {
         type: 'insight',
         title: 'Gradient Descent in One Line',
-        body: 'Update rule: $\\mathbf{x}_{k+1} = \\mathbf{x}_k - \\alpha \\nabla f(\\mathbf{x}_k)$\nFor $f = \\|A\\mathbf{x} - \\mathbf{b}\\|^2$: $\\mathbf{x}_{k+1} = \\mathbf{x}_k - 2\\alpha A^\\top(A\\mathbf{x}_k - \\mathbf{b})$\nThis is exactly what neural networks do â€” backprop computes $\\nabla f$, then the optimizer steps against it.',
+        body: 'Update rule: $\\mathbf{x}_{k+1} = \\mathbf{x}_k - \\alpha \\nabla f(\\mathbf{x}_k)$\nFor $f = \\|A\\mathbf{x} - \\mathbf{b}\\|^2$: $\\mathbf{x}_{k+1} = \\mathbf{x}_k - 2\\alpha A^\\top(A\\mathbf{x}_k - \\mathbf{b})$\nThis is exactly what neural networks do — backprop computes $\\nabla f$, then the optimizer steps against it.',
       },
     ],
     visualizations: [
       {
         id: 'PythonNotebook',
         title: 'Code: Gradients, Jacobians, and Hessians',
-        mathBridge: 'Compute gradients via finite differences and verify against analytic formulas. For f(x) = x^T A x, the gradient is 2Ax. The Jacobian of a vector-valued function is a matrix of partial derivatives. NumPy does not have a built-in automatic differentiation â€” use finite differences or JAX/PyTorch for production.',
+        mathBridge: 'Compute gradients via finite differences and verify against analytic formulas. For f(x) = x^T A x, the gradient is 2Ax. The Jacobian of a vector-valued function is a matrix of partial derivatives. NumPy does not have a built-in automatic differentiation — use finite differences or JAX/PyTorch for production.',
         caption: 'Numerical gradient verification and the quadratic form gradient formula.',
         initialProps: {
           initialCells: [
             {
               id: 1,
-              cellTitle: 'Gradient via finite differences â€” verify analytic formula',
+              cellTitle: 'Gradient via finite differences — verify analytic formula',
               prose: [
-                'The finite difference approximation: âˆ‚f/âˆ‚xáµ¢ â‰ˆ [f(x + Îµeáµ¢) - f(x)] / Îµ for small Îµ.',
+                'The finite difference approximation: âˆ‚f/âˆ‚xᵢ â‰ˆ [f(x + εeᵢ) - f(x)] / ε for small ε.',
                 'Compare numerical gradient with the analytic result âˆ‡f = 2Ax for f(x) = x^T A x.',
               ],
               code: `import numpy as np
@@ -182,8 +182,8 @@ plt.show()`,
               id: 2,
               cellTitle: 'Jacobian of a vector-valued function',
               prose: [
-                'The Jacobian J is an mÃ—n matrix where J[i,j] = âˆ‚f_i/âˆ‚x_j.',
-                'For f(x) = Ax (linear), the Jacobian is just A itself â€” the "derivative" of a linear map is the map.',
+                'The Jacobian J is an m×n matrix where J[i,j] = âˆ‚f_i/âˆ‚x_j.',
+                'For f(x) = Ax (linear), the Jacobian is just A itself — the "derivative" of a linear map is the map.',
               ],
               code: `import numpy as np
 
@@ -222,7 +222,7 @@ print("Match:", np.allclose(J_num, A))`,
 
 # Minimize f(x) = x^T A x - b^T x (quadratic)
 # Analytic minimum: x* = (2A)^{-1} b = A^{-1} b / 2... wait
-# Actually grad f = 2Ax - b = 0 â†’ x* = A^{-1} b / 2
+# Actually grad f = 2Ax - b = 0 → x* = A^{-1} b / 2
 A = np.array([[4., 1.], [1., 3.]])
 b = np.array([2., 1.])
 f = lambda x: x @ A @ x - b @ x
@@ -246,26 +246,26 @@ print(f"f(x*) = {f(x_star):.6f}  (minimum value)")`,
 
   rigor: {
     prose: [
-      '**FrÃ©chet derivative â€” the general framework.** The gradient is a special case of the FrÃ©chet derivative. A function $f: V \\to W$ between normed spaces is FrÃ©chet differentiable at $\\mathbf{x}_0$ if there exists a bounded linear map $Df_{\\mathbf{x}_0}: V \\to W$ such that $\\lim_{\\|\\mathbf{h}\\| \\to 0} \\frac{\\|f(\\mathbf{x}_0 + \\mathbf{h}) - f(\\mathbf{x}_0) - Df_{\\mathbf{x}_0}(\\mathbf{h})\\|}{\\|\\mathbf{h}\\|} = 0$. For $f: \\mathbb{R}^n \\to \\mathbb{R}$, $Df_{\\mathbf{x}_0}$ is represented by $\\nabla f(\\mathbf{x}_0)^\\top$ â€” a row vector acting on the displacement $\\mathbf{h}$.',
-      '**Symmetry of the Hessian â€” Schwarz\'s theorem.** If the second partial derivatives of $f$ are continuous in a neighborhood of $\\mathbf{x}_0$, then $\\partial^2 f / \\partial x_i \\partial x_j = \\partial^2 f / \\partial x_j \\partial x_i$ for all $i, j$. This makes $H$ symmetric. By the Spectral Theorem, symmetric matrices have real eigenvalues and orthogonal eigenvectors â€” so the principal curvatures of a smooth function are always real, and the directions of maximum/minimum curvature are orthogonal.',
+      '**FrÃ©chet derivative — the general framework.** The gradient is a special case of the FrÃ©chet derivative. A function $f: V \\to W$ between normed spaces is FrÃ©chet differentiable at $\\mathbf{x}_0$ if there exists a bounded linear map $Df_{\\mathbf{x}_0}: V \\to W$ such that $\\lim_{\\|\\mathbf{h}\\| \\to 0} \\frac{\\|f(\\mathbf{x}_0 + \\mathbf{h}) - f(\\mathbf{x}_0) - Df_{\\mathbf{x}_0}(\\mathbf{h})\\|}{\\|\\mathbf{h}\\|} = 0$. For $f: \\mathbb{R}^n \\to \\mathbb{R}$, $Df_{\\mathbf{x}_0}$ is represented by $\\nabla f(\\mathbf{x}_0)^\\top$ — a row vector acting on the displacement $\\mathbf{h}$.',
+      '**Symmetry of the Hessian — Schwarz\'s theorem.** If the second partial derivatives of $f$ are continuous in a neighborhood of $\\mathbf{x}_0$, then $\\partial^2 f / \\partial x_i \\partial x_j = \\partial^2 f / \\partial x_j \\partial x_i$ for all $i, j$. This makes $H$ symmetric. By the Spectral Theorem, symmetric matrices have real eigenvalues and orthogonal eigenvectors — so the principal curvatures of a smooth function are always real, and the directions of maximum/minimum curvature are orthogonal.',
       '**Taylor expansion and Newton\'s method.** The second-order Taylor expansion of $f: \\mathbb{R}^n \\to \\mathbb{R}$ at $\\mathbf{x}_0$ is $f(\\mathbf{x}_0 + \\mathbf{h}) \\approx f(\\mathbf{x}_0) + \\nabla f(\\mathbf{x}_0)^\\top \\mathbf{h} + \\frac{1}{2}\\mathbf{h}^\\top H(\\mathbf{x}_0) \\mathbf{h}$. Newton\'s method minimizes this quadratic approximation exactly at each step: differentiating and setting to zero gives $H(\\mathbf{x}_0)\\mathbf{h} = -\\nabla f(\\mathbf{x}_0)$, so the Newton step is $\\mathbf{x}_1 = \\mathbf{x}_0 - H^{-1}\\nabla f$. For exactly quadratic $f$, Newton\'s method converges in one step.',
-      '**The chain rule as matrix multiplication.** If $\\mathbf{h}(\\mathbf{x}) = \\mathbf{f}(\\mathbf{g}(\\mathbf{x}))$ where $\\mathbf{g}: \\mathbb{R}^p \\to \\mathbb{R}^n$ and $\\mathbf{f}: \\mathbb{R}^n \\to \\mathbb{R}^m$, then the Jacobian of the composition is $J_h = J_f \\cdot J_g$ â€” a product of matrices. The dimensions work out: $J_f$ is $m \\times n$, $J_g$ is $n \\times p$, and $J_h$ is $m \\times p$. Neural network backpropagation is literally this: the loss gradient propagates backwards through layers via repeated Jacobian matrix multiplication.',
+      '**The chain rule as matrix multiplication.** If $\\mathbf{h}(\\mathbf{x}) = \\mathbf{f}(\\mathbf{g}(\\mathbf{x}))$ where $\\mathbf{g}: \\mathbb{R}^p \\to \\mathbb{R}^n$ and $\\mathbf{f}: \\mathbb{R}^n \\to \\mathbb{R}^m$, then the Jacobian of the composition is $J_h = J_f \\cdot J_g$ — a product of matrices. The dimensions work out: $J_f$ is $m \\times n$, $J_g$ is $n \\times p$, and $J_h$ is $m \\times p$. Neural network backpropagation is literally this: the loss gradient propagates backwards through layers via repeated Jacobian matrix multiplication.',
     ],
     callouts: [
       {
         type: 'theorem',
         title: 'Second Derivative Test (Multivariable)',
-        body: 'At a critical point $\\nabla f(\\mathbf{x}_0) = \\mathbf{0}$, examine eigenvalues of $H(\\mathbf{x}_0)$:\nâ€¢ All eigenvalues $> 0$ ($H$ positive definite) â†’ strict local **minimum**\nâ€¢ All eigenvalues $< 0$ ($H$ negative definite) â†’ strict local **maximum**\nâ€¢ Mixed signs ($H$ indefinite) â†’ **saddle point**\nâ€¢ Any eigenvalue $= 0$ ($H$ singular) â†’ test **inconclusive**',
+        body: 'At a critical point $\\nabla f(\\mathbf{x}_0) = \\mathbf{0}$, examine eigenvalues of $H(\\mathbf{x}_0)$:\n• All eigenvalues $> 0$ ($H$ positive definite) → strict local **minimum**\n• All eigenvalues $< 0$ ($H$ negative definite) → strict local **maximum**\n• Mixed signs ($H$ indefinite) → **saddle point**\n• Any eigenvalue $= 0$ ($H$ singular) → test **inconclusive**',
       },
       {
         type: 'theorem',
-        title: 'Gradient of a Quadratic Form â€” Proof',
+        title: 'Gradient of a Quadratic Form — Proof',
         body: 'Let $f(\\mathbf{x}) = \\mathbf{x}^\\top A \\mathbf{x}$ with $A$ symmetric. Writing $f = \\sum_{i,j} a_{ij}x_ix_j$ and differentiating with respect to $x_k$:\n\n$\\frac{\\partial f}{\\partial x_k} = \\sum_j a_{kj}x_j + \\sum_i a_{ik}x_i = 2\\sum_j a_{kj}x_j$ (since $a_{kj} = a_{jk}$)\n\nIn vector form: $\\nabla f = 2A\\mathbf{x}$. Therefore the Hessian is $H = 2A$ (constant).',
       },
       {
         type: 'insight',
         title: 'Convergence Rate of Gradient Descent',
-        body: 'For $f(\\mathbf{x}) = \\mathbf{x}^\\top A \\mathbf{x} - \\mathbf{b}^\\top\\mathbf{x}$ with $A$ symmetric positive definite:\nâ€¢ Gradient descent step size $\\alpha < 1/\\lambda_{\\max}(A)$ guarantees convergence\nâ€¢ Optimal step: $\\alpha^* = 2/(\\lambda_{\\min} + \\lambda_{\\max})$\nâ€¢ Convergence rate: $r = (\\kappa - 1)/(\\kappa + 1)$ where $\\kappa = \\lambda_{\\max}/\\lambda_{\\min}$ is the **condition number**\nâ€¢ Ill-conditioned matrices ($\\kappa \\gg 1$) make gradient descent crawl; Newton\'s method is immune to conditioning.',
+        body: 'For $f(\\mathbf{x}) = \\mathbf{x}^\\top A \\mathbf{x} - \\mathbf{b}^\\top\\mathbf{x}$ with $A$ symmetric positive definite:\n• Gradient descent step size $\\alpha < 1/\\lambda_{\\max}(A)$ guarantees convergence\n• Optimal step: $\\alpha^* = 2/(\\lambda_{\\min} + \\lambda_{\\max})$\n• Convergence rate: $r = (\\kappa - 1)/(\\kappa + 1)$ where $\\kappa = \\lambda_{\\max}/\\lambda_{\\min}$ is the **condition number**\n• Ill-conditioned matrices ($\\kappa \\gg 1$) make gradient descent crawl; Newton\'s method is immune to conditioning.',
       },
     ],
     visualizations: [],
@@ -281,7 +281,7 @@ print(f"f(x*) = {f(x_star):.6f}  (minimum value)")`,
           expression: 'f(\\mathbf{x}) = 2x_1^2 + 2x_1x_2 + 3x_2^2',
           annotation: 'Expand $\\mathbf{x}^\\top A \\mathbf{x} = a_{11}x_1^2 + (a_{12}+a_{21})x_1x_2 + a_{22}x_2^2$. Since $a_{12} = a_{21} = 1$, the cross term is $2x_1x_2$.',
           strategyTitle: 'Expand the quadratic form as a polynomial',
-          checkpoint: 'Can you expand x^T A x by hand for this 2Ã—2 case?',
+          checkpoint: 'Can you expand x^T A x by hand for this 2×2 case?',
           hints: ['$\\mathbf{x}^\\top A \\mathbf{x} = [x_1,x_2]\\begin{bmatrix}2&1\\\\1&3\\end{bmatrix}\\begin{bmatrix}x_1\\\\x_2\\end{bmatrix} = [x_1,x_2]\\begin{bmatrix}2x_1+x_2\\\\x_1+3x_2\\end{bmatrix} = 2x_1^2 + x_1x_2 + x_1x_2 + 3x_2^2$.'],
         },
         {
@@ -306,7 +306,7 @@ print(f"f(x*) = {f(x_star):.6f}  (minimum value)")`,
           hints: ['Yes. For $f = \\mathbf{x}^\\top A \\mathbf{x}$ with symmetric $A$, the Hessian is always $2A$ (a constant matrix, independent of $\\mathbf{x}$).'],
         },
       ],
-      conclusion: 'The formula $\\nabla(\\mathbf{x}^\\top A \\mathbf{x}) = 2A\\mathbf{x}$ is confirmed by direct calculation. The Hessian $H = 2A$ is constant â€” the quadratic form curves the same way everywhere. This appears in least squares, ridge regression, and PCA.',
+      conclusion: 'The formula $\\nabla(\\mathbf{x}^\\top A \\mathbf{x}) = 2A\\mathbf{x}$ is confirmed by direct calculation. The Hessian $H = 2A$ is constant — the quadratic form curves the same way everywhere. This appears in least squares, ridge regression, and PCA.',
     },
     {
       id: 'la2-009-ex2',
@@ -324,8 +324,8 @@ print(f"f(x*) = {f(x_star):.6f}  (minimum value)")`,
           expression: '= \\mathbf{x}^\\top A^\\top A\\mathbf{x} - 2\\mathbf{b}^\\top A\\mathbf{x} + \\mathbf{b}^\\top\\mathbf{b}',
           annotation: 'Expand: $(A\\mathbf{x})^\\top(A\\mathbf{x}) - 2\\mathbf{b}^\\top(A\\mathbf{x}) + \\mathbf{b}^\\top\\mathbf{b}$. Note $(A\\mathbf{x})^\\top = \\mathbf{x}^\\top A^\\top$ and $\\mathbf{b}^\\top\\mathbf{b}$ is constant.',
           strategyTitle: 'Expand the product',
-          checkpoint: 'Why is the cross term âˆ’2b^T Ax (not âˆ’b^T Ax âˆ’ (Ax)^T b)?',
-          hints: ['$(\\mathbf{b}^\\top A\\mathbf{x})$ is a scalar, so $(\\mathbf{b}^\\top A\\mathbf{x})^\\top = \\mathbf{b}^\\top A\\mathbf{x}$ â€” the two cross terms are equal, giving factor 2.'],
+          checkpoint: 'Why is the cross term −2b^T Ax (not −b^T Ax − (Ax)^T b)?',
+          hints: ['$(\\mathbf{b}^\\top A\\mathbf{x})$ is a scalar, so $(\\mathbf{b}^\\top A\\mathbf{x})^\\top = \\mathbf{b}^\\top A\\mathbf{x}$ — the two cross terms are equal, giving factor 2.'],
         },
         {
           expression: '\\nabla_\\mathbf{x}[\\mathbf{x}^\\top A^\\top A\\mathbf{x}] = 2A^\\top A\\mathbf{x}, \\quad \\nabla_\\mathbf{x}[-2\\mathbf{b}^\\top A\\mathbf{x}] = -2A^\\top\\mathbf{b}',
@@ -344,9 +344,9 @@ print(f"f(x*) = {f(x_star):.6f}  (minimum value)")`,
         {
           expression: '\\nabla f = \\mathbf{0} \\implies A^\\top A\\mathbf{x} = A^\\top\\mathbf{b} \\quad \\text{(Normal equations)}',
           annotation: 'Setting the gradient to zero gives the normal equations. Any minimizer of the least-squares objective satisfies this linear system. If $A$ has full column rank, $A^\\top A$ is invertible and the unique solution is $\\hat{\\mathbf{x}} = (A^\\top A)^{-1}A^\\top\\mathbf{b}$.',
-          strategyTitle: 'Set gradient to zero â†’ normal equations',
+          strategyTitle: 'Set gradient to zero → normal equations',
           checkpoint: 'Why is A^T A always symmetric? (Hint: transpose rules)',
-          hints: ['$(A^\\top A)^\\top = A^\\top(A^\\top)^\\top = A^\\top A$. It equals its own transpose â€” always symmetric, always positive semidefinite.'],
+          hints: ['$(A^\\top A)^\\top = A^\\top(A^\\top)^\\top = A^\\top A$. It equals its own transpose — always symmetric, always positive semidefinite.'],
         },
       ],
       conclusion: 'The gradient of $\\|A\\mathbf{x} - \\mathbf{b}\\|^2$ is $2A^\\top(A\\mathbf{x} - \\mathbf{b})$. Setting this to zero is the calculus condition for a minimum, and it recovers the same normal equations you derive geometrically (orthogonality of the residual). Calculus and geometry agree.',
@@ -360,32 +360,32 @@ print(f"f(x*) = {f(x_star):.6f}  (minimum value)")`,
           expression: 'J = \\begin{bmatrix}\\partial f_1/\\partial x_1 & \\partial f_1/\\partial x_2 \\\\ \\partial f_2/\\partial x_1 & \\partial f_2/\\partial x_2\\end{bmatrix} = \\begin{bmatrix}2x_1 & 1 \\\\ x_2 & x_1\\end{bmatrix}',
           annotation: 'Row $i$ of the Jacobian contains the partial derivatives of output $f_i$ with respect to each input. $J_{ij} = \\partial f_i / \\partial x_j$.',
           strategyTitle: 'Compute all four partial derivatives',
-          checkpoint: 'What is âˆ‚fâ‚‚/âˆ‚xâ‚? (fâ‚‚ = xâ‚xâ‚‚)',
+          checkpoint: 'What is âˆ‚f₁/âˆ‚x₁? (f₁ = x₁x₁)',
           hints: ['$\\partial(x_1 x_2)/\\partial x_1 = x_2$ (treat $x_2$ as a constant).'],
         },
         {
           expression: 'J(\\mathbf{x}_0) = \\begin{bmatrix}2(2) & 1 \\\\ 3 & 2\\end{bmatrix} = \\begin{bmatrix}4 & 1 \\\\ 3 & 2\\end{bmatrix}',
           annotation: 'Substitute $\\mathbf{x}_0 = [2,3]^\\top$. The Jacobian is the matrix of the best linear approximation to $\\mathbf{f}$ at this specific point.',
-          strategyTitle: 'Evaluate the Jacobian at xâ‚€',
+          strategyTitle: 'Evaluate the Jacobian at x₀',
           checkpoint: '',
           hints: [],
         },
         {
           expression: '\\mathbf{f}(\\mathbf{x}_0) = \\begin{bmatrix}2^2+3\\\\2 \\cdot 3\\end{bmatrix} = \\begin{bmatrix}7\\\\6\\end{bmatrix}',
           annotation: 'Compute the exact function value at the base point.',
-          strategyTitle: 'Evaluate f at xâ‚€',
+          strategyTitle: 'Evaluate f at x₀',
           checkpoint: '',
           hints: [],
         },
         {
           expression: '\\mathbf{f}(2.1, 3) \\approx \\mathbf{f}(\\mathbf{x}_0) + J(\\mathbf{x}_0)\\Delta\\mathbf{x} = \\begin{bmatrix}7\\\\6\\end{bmatrix} + \\begin{bmatrix}4&1\\\\3&2\\end{bmatrix}\\begin{bmatrix}0.1\\\\0\\end{bmatrix} = \\begin{bmatrix}7.4\\\\6.3\\end{bmatrix}',
           annotation: '$\\Delta\\mathbf{x} = [0.1, 0]^\\top$. The linear approximation predicts $f_1 \\approx 7.4$ and $f_2 \\approx 6.3$.',
-          strategyTitle: 'Apply linear approximation f(xâ‚€ + Î”x) â‰ˆ f(xâ‚€) + JÂ·Î”x',
-          checkpoint: 'Verify: exact value of f(2.1, 3) is [(2.1)Â²+3, 2.1Â·3] = [7.41, 6.3]. How accurate is the approximation?',
-          hints: ['Exact: $[7.41, 6.3]$. Predicted: $[7.4, 6.3]$. Error in $f_1$: $0.01$ â€” the $0.1^2$ quadratic term we dropped. The Jacobian captures the first-order (linear) change perfectly.'],
+          strategyTitle: 'Apply linear approximation f(x₀ + Î”x) â‰ˆ f(x₀) + J·Î”x',
+          checkpoint: 'Verify: exact value of f(2.1, 3) is [(2.1)²+3, 2.1·3] = [7.41, 6.3]. How accurate is the approximation?',
+          hints: ['Exact: $[7.41, 6.3]$. Predicted: $[7.4, 6.3]$. Error in $f_1$: $0.01$ — the $0.1^2$ quadratic term we dropped. The Jacobian captures the first-order (linear) change perfectly.'],
         },
       ],
-      conclusion: 'The Jacobian is the matrix of the best local linear approximation to a vector function. It is evaluated at a point â€” different points give different Jacobians (unlike for linear maps, where $J = A$ everywhere). In robot kinematics, the Jacobian maps joint velocities to end-effector velocities and is re-evaluated at every time step.',
+      conclusion: 'The Jacobian is the matrix of the best local linear approximation to a vector function. It is evaluated at a point — different points give different Jacobians (unlike for linear maps, where $J = A$ everywhere). In robot kinematics, the Jacobian maps joint velocities to end-effector velocities and is re-evaluated at every time step.',
     },
   ],
 
@@ -398,7 +398,7 @@ print(f"f(x*) = {f(x_star):.6f}  (minimum value)")`,
       walkthrough: [
         { expression: 'f(\\mathbf{x}) = c_1x_1 + c_2x_2 + c_3x_3 + 5', annotation: 'Write the linear function component-wise.' },
         { expression: '\\nabla f = \\begin{bmatrix}\\partial f/\\partial x_1\\\\\\partial f/\\partial x_2\\\\\\partial f/\\partial x_3\\end{bmatrix} = \\begin{bmatrix}c_1\\\\c_2\\\\c_3\\end{bmatrix} = \\mathbf{c}', annotation: 'Each partial derivative picks out one component of $\\mathbf{c}$. The constant disappears.' },
-        { expression: '\\nabla f\\big|_{\\mathbf{x}=\\mathbf{0}} = \\mathbf{c} = [1,-2,4]^\\top', annotation: 'The gradient of a linear function is constant everywhere â€” it does not depend on $\\mathbf{x}$.' },
+        { expression: '\\nabla f\\big|_{\\mathbf{x}=\\mathbf{0}} = \\mathbf{c} = [1,-2,4]^\\top', annotation: 'The gradient of a linear function is constant everywhere — it does not depend on $\\mathbf{x}$.' },
       ],
       answer: '$\\nabla f = \\mathbf{c} = [1,-2,4]^\\top$ everywhere, including at the origin.',
     },
@@ -439,9 +439,9 @@ print(f"f(x*) = {f(x_star):.6f}  (minimum value)")`,
       { symbol: '\\nabla\\|A\\mathbf{x}-\\mathbf{b}\\|^2 = 2A^\\top(A\\mathbf{x}-\\mathbf{b})', meaning: 'Gradient of the least-squares objective. Setting this to zero gives the normal equations $A^\\top A\\mathbf{x} = A^\\top\\mathbf{b}$.' },
     ],
     rulesOfThumb: [
-      'Gradient shape = input shape. Jacobian shape = (output dim) Ã— (input dim).',
+      'Gradient shape = input shape. Jacobian shape = (output dim) × (input dim).',
       'The gradient of a constant is zero; of a linear function $\\mathbf{a}^\\top\\mathbf{x}$ is $\\mathbf{a}$; of $\\mathbf{x}^\\top A\\mathbf{x}$ is $2A\\mathbf{x}$.',
-      'Hessian = 2A for quadratic forms. If $H$ is positive definite at a critical point â†’ minimum.',
+      'Hessian = 2A for quadratic forms. If $H$ is positive definite at a critical point → minimum.',
       'Chain rule for vector functions: $J_{h} = J_f \\cdot J_g$. This is backpropagation.',
       'To find a minimum, set $\\nabla f = \\mathbf{0}$ and check $H$ is positive definite.',
     ],
@@ -449,7 +449,7 @@ print(f"f(x*) = {f(x_star):.6f}  (minimum value)")`,
 
   spiral: {
     recoveryPoints: [
-      { lessonId: 'la2-007', label: 'Special Matrices', note: 'The Hessian is always symmetric. Review why symmetric matrices have real eigenvalues and an orthonormal eigenbasis (Spectral Theorem) â€” this underlies the second derivative test.' },
+      { lessonId: 'la2-007', label: 'Special Matrices', note: 'The Hessian is always symmetric. Review why symmetric matrices have real eigenvalues and an orthonormal eigenbasis (Spectral Theorem) — this underlies the second derivative test.' },
       { lessonId: 'la2-005', label: 'Determinants', note: 'The Jacobian determinant (det of the Jacobian) measures local volume scaling. It appears in change-of-variables for multivariable integrals and in the Inverse Function Theorem.' },
     ],
     futureLinks: [
@@ -461,19 +461,19 @@ print(f"f(x*) = {f(x_star):.6f}  (minimum value)")`,
 
   mentalModel: [
     'Gradient = the derivative of a scalar function; it is a column vector the same size as the input.',
-    'Jacobian = the derivative of a vector function; it is a matrix (output rows Ã— input columns).',
+    'Jacobian = the derivative of a vector function; it is a matrix (output rows × input columns).',
     'Hessian = the second derivative of a scalar function; it is always symmetric.',
-    '$\\nabla(\\mathbf{x}^\\top A\\mathbf{x}) = 2A\\mathbf{x}$, $H = 2A$ â€” memorize this for quadratic forms.',
+    '$\\nabla(\\mathbf{x}^\\top A\\mathbf{x}) = 2A\\mathbf{x}$, $H = 2A$ — memorize this for quadratic forms.',
     'Chain rule for matrices = matrix product of Jacobians. Backpropagation is exactly this.',
     'To minimize $f$: set $\\nabla f = 0$, then check $H$ is positive definite at the solution.',
   ],
 
   checkpoints: [
-    { id: 'cp-la2-009-1', label: 'Read intuition â€” understand gradient vs Jacobian vs Hessian and their shapes', type: 'read' },
-    { id: 'cp-la2-009-2', label: 'Read math â€” derive $\\nabla(\\mathbf{x}^\\top A\\mathbf{x}) = 2A\\mathbf{x}$ and the normal equations step by step', type: 'read' },
-    { id: 'cp-la2-009-3', label: 'Read rigor â€” understand FrÃ©chet derivative, Schwarz theorem, and Newton\'s method', type: 'read' },
-    { id: 'cp-la2-009-4', label: 'Run OpenMAT cell 1 â€” verify gradient numerically via finite differences', type: 'lab' },
-    { id: 'cp-la2-009-5', label: 'Run Python cell 2 â€” verify Jacobian of a linear map numerically', type: 'lab' },
+    { id: 'cp-la2-009-1', label: 'Read intuition — understand gradient vs Jacobian vs Hessian and their shapes', type: 'read' },
+    { id: 'cp-la2-009-2', label: 'Read math — derive $\\nabla(\\mathbf{x}^\\top A\\mathbf{x}) = 2A\\mathbf{x}$ and the normal equations step by step', type: 'read' },
+    { id: 'cp-la2-009-3', label: 'Read rigor — understand FrÃ©chet derivative, Schwarz theorem, and Newton\'s method', type: 'read' },
+    { id: 'cp-la2-009-4', label: 'Run OpenMAT cell 1 — verify gradient numerically via finite differences', type: 'lab' },
+    { id: 'cp-la2-009-5', label: 'Run Python cell 2 — verify Jacobian of a linear map numerically', type: 'lab' },
     { id: 'cp-la2-009-6', label: 'Complete example 1: compute gradient of a quadratic form step by step', type: 'example' },
     { id: 'cp-la2-009-7', label: 'Complete example 2: derive the normal equations via the gradient condition', type: 'example' },
     { id: 'cp-la2-009-8', label: 'Attempt challenge 2: ridge regression gradient and minimizer', type: 'challenge' },
@@ -509,8 +509,8 @@ print(f"f(x*) = {f(x_star):.6f}  (minimum value)")`,
         'A row vector of shape $1 \\times n$.',
       ],
       answer: 'An $n$-dimensional column vector.',
-      hints: ['The gradient has the same shape as the input $\\mathbf{x}$. For $f: \\mathbb{R}^n \\to \\mathbb{R}$, input is $n$-dimensional, so gradient is an $n \\times 1$ column vector. (Some sources write it as a row vector â€” numerator layout â€” but we use denominator layout.)'],
-      reviewSection: 'Intuition tab â€” gradient definition',
+      hints: ['The gradient has the same shape as the input $\\mathbf{x}$. For $f: \\mathbb{R}^n \\to \\mathbb{R}$, input is $n$-dimensional, so gradient is an $n \\times 1$ column vector. (Some sources write it as a row vector — numerator layout — but we use denominator layout.)'],
+      reviewSection: 'Intuition tab — gradient definition',
     },
     {
       id: 'la2-009-quiz-2',
@@ -518,8 +518,8 @@ print(f"f(x*) = {f(x_star):.6f}  (minimum value)")`,
       text: 'The Jacobian of $\\mathbf{f}: \\mathbb{R}^5 \\to \\mathbb{R}^3$ is a matrix of shape:',
       options: ['$5 \\times 3$', '$3 \\times 5$', '$5 \\times 5$', '$3 \\times 3$'],
       answer: '$3 \\times 5$',
-      hints: ['Row $i$ of the Jacobian is $\\nabla f_i^\\top$ â€” one row per output. Column $j$ corresponds to derivative w.r.t. input $x_j$ â€” one column per input. So shape = (# outputs) Ã— (# inputs) = $m \\times n = 3 \\times 5$.'],
-      reviewSection: 'Intuition tab â€” Jacobian definition',
+      hints: ['Row $i$ of the Jacobian is $\\nabla f_i^\\top$ — one row per output. Column $j$ corresponds to derivative w.r.t. input $x_j$ — one column per input. So shape = (# outputs) × (# inputs) = $m \\times n = 3 \\times 5$.'],
+      reviewSection: 'Intuition tab — Jacobian definition',
     },
     {
       id: 'la2-009-quiz-3',
@@ -528,7 +528,7 @@ print(f"f(x*) = {f(x_star):.6f}  (minimum value)")`,
       options: ['$A\\mathbf{x}$', '$2A\\mathbf{x}$', '$A^\\top\\mathbf{x} + A\\mathbf{x}$', '$\\mathbf{x}^\\top A$'],
       answer: '$2A\\mathbf{x}$',
       hints: ['For symmetric $A$ (so $a_{ij} = a_{ji}$), differentiating $\\sum_{i,j} a_{ij}x_ix_j$ with respect to $x_k$ gives $2\\sum_j a_{kj}x_j = 2(A\\mathbf{x})_k$. The formula $(A+A^\\top)\\mathbf{x} = 2A\\mathbf{x}$ also works for the non-symmetric case.'],
-      reviewSection: 'Rigor tab â€” Gradient of a Quadratic Form theorem',
+      reviewSection: 'Rigor tab — Gradient of a Quadratic Form theorem',
     },
     {
       id: 'la2-009-quiz-4',
@@ -542,7 +542,7 @@ print(f"f(x*) = {f(x_star):.6f}  (minimum value)")`,
       ],
       answer: 'By Schwarz\'s theorem: mixed partial derivatives commute ($\\partial^2 f/\\partial x_i \\partial x_j = \\partial^2 f/\\partial x_j \\partial x_i$) when they are continuous.',
       hints: ['$H_{ij} = \\partial^2 f/\\partial x_i \\partial x_j$ and $H_{ji} = \\partial^2 f/\\partial x_j \\partial x_i$. Schwarz\'s theorem says these are equal when second partials are continuous. So $H_{ij} = H_{ji}$, meaning $H = H^\\top$.'],
-      reviewSection: 'Rigor tab â€” Symmetry of the Hessian',
+      reviewSection: 'Rigor tab — Symmetry of the Hessian',
     },
     {
       id: 'la2-009-quiz-5',
@@ -550,8 +550,8 @@ print(f"f(x*) = {f(x_star):.6f}  (minimum value)")`,
       text: 'At a critical point $\\nabla f = \\mathbf{0}$, the Hessian has eigenvalues $[5, -2, 3]$. What type of critical point is this?',
       options: ['Local minimum', 'Local maximum', 'Saddle point', 'Cannot determine without more information'],
       answer: 'Saddle point',
-      hints: ['Eigenvalues $[5, -2, 3]$ have mixed signs (positive 5, negative -2, positive 3). The Hessian is indefinite. An indefinite Hessian at a critical point means the function increases in some directions and decreases in others â€” a saddle point.'],
-      reviewSection: 'Rigor tab â€” Second Derivative Test theorem',
+      hints: ['Eigenvalues $[5, -2, 3]$ have mixed signs (positive 5, negative -2, positive 3). The Hessian is indefinite. An indefinite Hessian at a critical point means the function increases in some directions and decreases in others — a saddle point.'],
+      reviewSection: 'Rigor tab — Second Derivative Test theorem',
     },
     {
       id: 'la2-009-quiz-6',
@@ -560,12 +560,12 @@ print(f"f(x*) = {f(x_star):.6f}  (minimum value)")`,
       options: [
         'Solving a linear system $A\\mathbf{x} = \\mathbf{b}$ for each layer.',
         'Computing the matrix inverse of each weight matrix.',
-        'Applying the chain rule â€” multiplying Jacobians in reverse order through the network layers.',
+        'Applying the chain rule — multiplying Jacobians in reverse order through the network layers.',
         'Running LU decomposition on the weight matrices.',
       ],
-      answer: 'Applying the chain rule â€” multiplying Jacobians in reverse order through the network layers.',
-      hints: ['Each layer is a function. The loss gradient w.r.t. the first layer\'s input is $J_1^\\top J_2^\\top \\cdots J_L^\\top \\nabla_{\\text{output}} L$ â€” the chain rule applied in reverse (backpropagation). Each $J_k^\\top$ is a transposed weight matrix times a diagonal activation derivative matrix.'],
-      reviewSection: 'Rigor tab â€” Chain Rule as Matrix Multiplication',
+      answer: 'Applying the chain rule — multiplying Jacobians in reverse order through the network layers.',
+      hints: ['Each layer is a function. The loss gradient w.r.t. the first layer\'s input is $J_1^\\top J_2^\\top \\cdots J_L^\\top \\nabla_{\\text{output}} L$ — the chain rule applied in reverse (backpropagation). Each $J_k^\\top$ is a transposed weight matrix times a diagonal activation derivative matrix.'],
+      reviewSection: 'Rigor tab — Chain Rule as Matrix Multiplication',
     },
     {
       id: 'la2-009-quiz-7',
@@ -579,7 +579,7 @@ print(f"f(x*) = {f(x_star):.6f}  (minimum value)")`,
       ],
       answer: '$\\nabla f = \\mathbf{a}$, $H = 0$ (zero matrix)',
       hints: ['$\\mathbf{a}^\\top\\mathbf{x} = a_1x_1 + \\cdots + a_nx_n$. Each partial $\\partial f/\\partial x_k = a_k$, so $\\nabla f = \\mathbf{a}$. The gradient is constant, so all second partials are zero: $H = 0$.'],
-      reviewSection: 'Intuition tab â€” critical formulas',
+      reviewSection: 'Intuition tab — critical formulas',
     },
     {
       id: 'la2-009-quiz-8',
@@ -592,8 +592,8 @@ print(f"f(x*) = {f(x_star):.6f}  (minimum value)")`,
         'The matrix $A^\\top A$',
       ],
       answer: 'The matrix $A$ itself',
-      hints: ['$f_i(\\mathbf{x}) = \\sum_j a_{ij} x_j$, so $\\partial f_i/\\partial x_j = a_{ij}$. The Jacobian entry $(i,j)$ is exactly $a_{ij}$. The Jacobian of a linear map is the map itself â€” $J = A$.'],
-      reviewSection: 'Examples tab â€” Example 3 (Jacobian of a vector function)',
+      hints: ['$f_i(\\mathbf{x}) = \\sum_j a_{ij} x_j$, so $\\partial f_i/\\partial x_j = a_{ij}$. The Jacobian entry $(i,j)$ is exactly $a_{ij}$. The Jacobian of a linear map is the map itself — $J = A$.'],
+      reviewSection: 'Examples tab — Example 3 (Jacobian of a vector function)',
     },
     {
       id: 'la2-009-quiz-9',
@@ -607,7 +607,7 @@ print(f"f(x*) = {f(x_star):.6f}  (minimum value)")`,
       ],
       answer: '$A^\\top A\\mathbf{x} = A^\\top\\mathbf{b}$',
       hints: ['$\\nabla f = 2A^\\top(A\\mathbf{x} - \\mathbf{b}) = \\mathbf{0}$ gives $A^\\top A\\mathbf{x} = A^\\top\\mathbf{b}$. These are the normal equations of least squares. The factor of 2 cancels when you divide both sides.'],
-      reviewSection: 'Math tab â€” least squares normal equation',
+      reviewSection: 'Math tab — least squares normal equation',
     },
     {
       id: 'la2-009-quiz-10',
@@ -621,7 +621,7 @@ print(f"f(x*) = {f(x_star):.6f}  (minimum value)")`,
       ],
       answer: 'The condition number $\\kappa = \\lambda_{\\max}/\\lambda_{\\min}$ is much larger than 1.',
       hints: ['Convergence rate per step is $(\\kappa-1)/(\\kappa+1)$. When $\\kappa \\gg 1$ (ill-conditioned), this is close to 1, meaning each step barely reduces the error. The function is elongated like an ellipse: gradient descent zigzags along the long axis instead of heading straight to the minimum.'],
-      reviewSection: 'Rigor tab â€” Convergence Rate callout',
+      reviewSection: 'Rigor tab — Convergence Rate callout',
     },
   ],
 
@@ -629,14 +629,14 @@ print(f"f(x*) = {f(x_star):.6f}  (minimum value)")`,
     {
       falseBelief: 'The gradient of $f(\\mathbf{x})$ is a row vector (same as $\\mathbf{x}^\\top$).',
       whyStudentsThinkIt: 'Many ML papers and textbooks use numerator layout, where $\\nabla f$ is written as a row vector so that $df = \\nabla f \\, d\\mathbf{x}$ is a scalar product of two row/column vectors. This convention switch causes confusion when switching resources.',
-      correctionExample: 'In denominator layout (used here), $\\nabla f \\in \\mathbb{R}^n$ is a column vector â€” same shape as $\\mathbf{x}$. At $\\mathbf{x} = [1,2]^\\top$ with $f(\\mathbf{x}) = 3x_1 + x_2$, $\\nabla f = [3, 1]^\\top$ (column). The gradient update $\\mathbf{x} \\leftarrow \\mathbf{x} - \\alpha\\nabla f$ must be column minus column.',
+      correctionExample: 'In denominator layout (used here), $\\nabla f \\in \\mathbb{R}^n$ is a column vector — same shape as $\\mathbf{x}$. At $\\mathbf{x} = [1,2]^\\top$ with $f(\\mathbf{x}) = 3x_1 + x_2$, $\\nabla f = [3, 1]^\\top$ (column). The gradient update $\\mathbf{x} \\leftarrow \\mathbf{x} - \\alpha\\nabla f$ must be column minus column.',
       contrastCase: 'The FrÃ©chet derivative $Df_{\\mathbf{x}_0}$ acts as a linear functional on displacement vectors $\\mathbf{h}$, so it is naturally a row vector $\\nabla f^\\top$. The gradient itself is the column vector obtained by transposing this row.',
     },
     {
-      falseBelief: 'The Hessian $H = \\nabla^2 f$ is the derivative of the gradient vector â€” so it should be a vector, not a matrix.',
+      falseBelief: 'The Hessian $H = \\nabla^2 f$ is the derivative of the gradient vector — so it should be a vector, not a matrix.',
       whyStudentsThinkIt: 'Students apply 1D intuition: the second derivative of $f(x)$ is a scalar. In multiple dimensions the "derivative of the gradient" is the Jacobian of the gradient map $\\nabla f: \\mathbb{R}^n \\to \\mathbb{R}^n$, which is an $n \\times n$ matrix.',
-      correctionExample: 'For $f(\\mathbf{x}) = x_1^2 + 3x_1x_2 + x_2^2$, $\\nabla f = [2x_1 + 3x_2, 3x_1 + 2x_2]^\\top$. The Hessian is $H = \\begin{bmatrix}2&3\\\\3&2\\end{bmatrix}$ â€” the Jacobian of $\\nabla f$. Entry $H_{ij} = \\partial^2 f/\\partial x_i\\partial x_j$.',
-      contrastCase: 'For a truly linear function $f(\\mathbf{x}) = \\mathbf{c}^\\top\\mathbf{x}$, the gradient is constant $\\nabla f = \\mathbf{c}$, so its Jacobian (the Hessian) is the zero matrix â€” analogous to how the second derivative of a linear 1D function is zero.',
+      correctionExample: 'For $f(\\mathbf{x}) = x_1^2 + 3x_1x_2 + x_2^2$, $\\nabla f = [2x_1 + 3x_2, 3x_1 + 2x_2]^\\top$. The Hessian is $H = \\begin{bmatrix}2&3\\\\3&2\\end{bmatrix}$ — the Jacobian of $\\nabla f$. Entry $H_{ij} = \\partial^2 f/\\partial x_i\\partial x_j$.',
+      contrastCase: 'For a truly linear function $f(\\mathbf{x}) = \\mathbf{c}^\\top\\mathbf{x}$, the gradient is constant $\\nabla f = \\mathbf{c}$, so its Jacobian (the Hessian) is the zero matrix — analogous to how the second derivative of a linear 1D function is zero.',
     },
   ],
 
@@ -644,19 +644,19 @@ print(f"f(x*) = {f(x_star):.6f}  (minimum value)")`,
     {
       situation: 'You are calibrating a camera. The reprojection error $E(\\boldsymbol{\\theta}) = \\sum_i \\|\\mathbf{p}_i - \\hat{\\mathbf{p}}_i(\\boldsymbol{\\theta})\\|^2$ is a nonlinear function of camera parameters $\\boldsymbol{\\theta}$. You want to minimize $E$ using Gauss-Newton.',
       competingTechniques: 'Gradient descent (first-order, slow near minimum), Gauss-Newton (approximate Hessian using Jacobian $J^\\top J$), full Newton\'s method (exact Hessian, expensive to compute).',
-      whyThisTechniqueWins: 'Gauss-Newton approximates the Hessian as $J^\\top J$ where $J = \\partial\\hat{\\mathbf{p}}/\\partial\\boldsymbol{\\theta}$ is the Jacobian of the prediction function. This avoids second-derivative computation while achieving near-quadratic convergence near the optimum â€” exploiting matrix calculus knowledge about Jacobians and normal equations.',
+      whyThisTechniqueWins: 'Gauss-Newton approximates the Hessian as $J^\\top J$ where $J = \\partial\\hat{\\mathbf{p}}/\\partial\\boldsymbol{\\theta}$ is the Jacobian of the prediction function. This avoids second-derivative computation while achieving near-quadratic convergence near the optimum — exploiting matrix calculus knowledge about Jacobians and normal equations.',
     },
     {
       situation: 'A physical simulation tracks how a particle\'s position $\\mathbf{p}(t)$ evolves. You need to propagate uncertainty: if initial position has covariance $\\Sigma_0$, what is the covariance $\\Sigma_t$ at time $t$?',
       competingTechniques: 'Monte Carlo sampling (simulate many particles, expensive), linearization via Jacobian (first-order approximation, cheap), unscented transform (sigma-point approximation, moderate cost).',
-      whyThisTechniqueWins: 'The extended Kalman filter uses the Jacobian $J = \\partial\\mathbf{p}_t/\\partial\\mathbf{p}_0$ to propagate uncertainty: $\\Sigma_t \\approx J\\Sigma_0 J^\\top$. This covariance propagation formula is exactly the Jacobian-as-linear-approximation idea â€” the local linearization of the dynamics maps the uncertainty ellipsoid forward in time.',
+      whyThisTechniqueWins: 'The extended Kalman filter uses the Jacobian $J = \\partial\\mathbf{p}_t/\\partial\\mathbf{p}_0$ to propagate uncertainty: $\\Sigma_t \\approx J\\Sigma_0 J^\\top$. This covariance propagation formula is exactly the Jacobian-as-linear-approximation idea — the local linearization of the dynamics maps the uncertainty ellipsoid forward in time.',
     },
   ],
 
   debugging: [
     {
       commonError: 'Forgetting the transpose in the least-squares gradient: writing $\\nabla\\|A\\mathbf{x}-\\mathbf{b}\\|^2 = 2A(A\\mathbf{x}-\\mathbf{b})$ instead of $2A^\\top(A\\mathbf{x}-\\mathbf{b})$.',
-      symptom: 'The resulting normal equations $AA\\mathbf{x} = A\\mathbf{b}$ have dimension mismatch if $A$ is not square: $A$ is $m\\times n$, $A(A\\mathbf{x}-\\mathbf{b})$ would require multiplying an $m\\times n$ matrix by an $m$-vector â€” dimension error.',
+      symptom: 'The resulting normal equations $AA\\mathbf{x} = A\\mathbf{b}$ have dimension mismatch if $A$ is not square: $A$ is $m\\times n$, $A(A\\mathbf{x}-\\mathbf{b})$ would require multiplying an $m\\times n$ matrix by an $m$-vector — dimension error.',
       whyItHappened: 'The chain rule for $\\|\\mathbf{v}\\|^2 = \\mathbf{v}^\\top\\mathbf{v}$ gives gradient $2\\mathbf{v}$ with respect to $\\mathbf{v}$, but then the chain rule through $\\mathbf{v} = A\\mathbf{x}$ introduces $A^\\top$ (the Jacobian of $A\\mathbf{x}$ w.r.t. $\\mathbf{x}$ transposed): $\\partial/\\partial\\mathbf{x}[\\mathbf{v}(\\mathbf{x})^\\top\\mathbf{v}(\\mathbf{x})] = 2(\\partial\\mathbf{v}/\\partial\\mathbf{x})^\\top\\mathbf{v} = 2A^\\top\\mathbf{v}$.',
       repairStrategy: 'Always check dimension consistency. The gradient must be in $\\mathbb{R}^n$ (same as $\\mathbf{x}$). $A^\\top(A\\mathbf{x}-\\mathbf{b})$: $A^\\top$ is $n\\times m$, $(A\\mathbf{x}-\\mathbf{b})$ is $m\\times 1$, product is $n\\times 1$. Dimensions match.',
     },
@@ -671,7 +671,7 @@ print(f"f(x*) = {f(x_star):.6f}  (minimum value)")`,
   mastery: {
     targetLevel: 2,
     solveIndependently: 'Compute the gradient and Hessian of a quadratic form $\\mathbf{x}^\\top A\\mathbf{x} + \\mathbf{b}^\\top\\mathbf{x} + c$ using the memorized formulas, and minimize it by setting $\\nabla f = 0$.',
-    explainVerbally: 'Explain the difference between gradient (scalarâ†’vector derivative), Jacobian (vectorâ†’vector derivative), and Hessian (second-order scalar derivative), including their shapes and what they represent geometrically.',
+    explainVerbally: 'Explain the difference between gradient (scalar→vector derivative), Jacobian (vector→vector derivative), and Hessian (second-order scalar derivative), including their shapes and what they represent geometrically.',
     detectIncorrectApplication: 'Spot when someone writes the gradient as a row vector instead of a column vector, or forgets the transpose $A^\\top$ in the least-squares gradient, or applies the symmetric formula to a non-symmetric $A$.',
     transferToUnfamiliar: 'Derive the gradient of a new loss function (e.g., logistic loss, Frobenius norm) by expanding it into known forms and applying the chain rule and standard identities.',
   },

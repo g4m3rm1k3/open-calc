@@ -1,5 +1,5 @@
-﻿﻿export default {
-  // â”€â”€ Identity â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+﻿export default {
+  // ── Identity ───────────────────────────────────────────────────
   id: 'la4-002',
   slug: 'gram-schmidt',
   chapter: 'la4',
@@ -9,46 +9,46 @@
   tags: ['gram-schmidt', 'orthogonalization', 'orthonormal basis', 'QR decomposition', 'projection', 'normalization'],
   aliases: 'orthogonal basis orthonormal set QR factorization perpendicular basis construct orthogonal',
 
-  // â”€â”€ Hook â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Hook ──────────────────────────────────────────────────────
   hook: {
     question: "Your GPS calculates position using satellite signals that arrive from messy, non-perpendicular directions. How does it clean up the geometry to make the math tractable?",
-    realWorldContext: "Gram-Schmidt is the algorithm behind QR decomposition, which is used everywhere: solving least squares problems in statistics, finding eigenvalues numerically (the QR algorithm), compressing images, and training neural networks. Every time you want to work in coordinates that are clean and perpendicular â€” even if your original data is tilted and messy â€” Gram-Schmidt does the cleaning. It is one of the most-used algorithms in scientific computing.",
+    realWorldContext: "Gram-Schmidt is the algorithm behind QR decomposition, which is used everywhere: solving least squares problems in statistics, finding eigenvalues numerically (the QR algorithm), compressing images, and training neural networks. Every time you want to work in coordinates that are clean and perpendicular — even if your original data is tilted and messy — Gram-Schmidt does the cleaning. It is one of the most-used algorithms in scientific computing.",
     previewVisualizationId: 'GramSchmidtProcess',
   },
 
-  // â”€â”€ Intuition â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Intuition ──────────────────────────────────────────────────
   intuition: {
     prose: [
-      'Take $\\mathbf{v}_1 = [3,4]^\\top$ and $\\mathbf{v}_2 = [2,0]^\\top$ â€” two vectors at an awkward angle. After one Gram-Schmidt step: $\\mathbf{e}_1 = [3/5,4/5]^\\top$ (normalize $\\mathbf{v}_1$). Subtract the shadow: $\\mathbf{v}_2 - (\\mathbf{v}_2 \\cdot \\mathbf{e}_1)\\mathbf{e}_1 = [32/25, -24/25]^\\top$, then normalize to $\\mathbf{e}_2 = [4/5, -3/5]^\\top$. Check: $\\mathbf{e}_1 \\cdot \\mathbf{e}_2 = 12/25 - 12/25 = 0$ âœ“. Same 2D span, now perfectly perpendicular. That subtraction step â€” removing the shadow â€” is the entire algorithm.',
-      'Here is the core idea in plain language: imagine you have two vectors in 2D that are *not* perpendicular â€” they are tilted at some weird angle to each other. You want to replace them with two perpendicular vectors that span the exact same space. Gram-Schmidt tells you how.',
+      'Take $\\mathbf{v}_1 = [3,4]^\\top$ and $\\mathbf{v}_2 = [2,0]^\\top$ — two vectors at an awkward angle. After one Gram-Schmidt step: $\\mathbf{e}_1 = [3/5,4/5]^\\top$ (normalize $\\mathbf{v}_1$). Subtract the shadow: $\\mathbf{v}_2 - (\\mathbf{v}_2 \\cdot \\mathbf{e}_1)\\mathbf{e}_1 = [32/25, -24/25]^\\top$, then normalize to $\\mathbf{e}_2 = [4/5, -3/5]^\\top$. Check: $\\mathbf{e}_1 \\cdot \\mathbf{e}_2 = 12/25 - 12/25 = 0$ âœ“. Same 2D span, now perfectly perpendicular. That subtraction step — removing the shadow — is the entire algorithm.',
+      'Here is the core idea in plain language: imagine you have two vectors in 2D that are *not* perpendicular — they are tilted at some weird angle to each other. You want to replace them with two perpendicular vectors that span the exact same space. Gram-Schmidt tells you how.',
       '**Step 1: Keep the first vector as-is.** There is nothing to clean yet. Just normalize it to length 1: $\\mathbf{e}_1 = \\mathbf{v}_1 / \\|\\mathbf{v}_1\\|$.',
       '**Step 2: Subtract off the "contamination."** Take your second vector $\\mathbf{v}_2$. It has some component that points in the direction of $\\mathbf{e}_1$ (the part that overlaps). Subtract that component away, leaving only the part that is perpendicular to $\\mathbf{e}_1$. That remainder is already orthogonal to $\\mathbf{e}_1$ by construction. Normalize it to get $\\mathbf{e}_2$.',
       '**Step 3: Repeat for every remaining vector.** For $\\mathbf{v}_3$: subtract its projection onto $\\mathbf{e}_1$ AND its projection onto $\\mathbf{e}_2$. What is left is perpendicular to both. Normalize. Repeat until done.',
       'The beautiful guarantee: at every step, what remains after subtracting all prior projections is perpendicular to every previously computed basis vector. You are peeling off contamination one direction at a time.',
       '**Why orthonormal bases are worth the effort.** When your basis is orthonormal, nearly everything becomes simpler. Coordinates are just dot products. The inverse of the basis matrix $Q$ is just its transpose $Q^T$ (no computation needed!). Projections are $QQ^T\\mathbf{b}$. The entire least squares algorithm simplifies. Orthonormal bases are the "clean room" of linear algebra.',
-      '**CNC machine axis calibration.** A CNC machine\'s $X$, $Y$, $Z$ axis directions are ideally perfectly orthogonal. In practice, a precision ball-bar probe measures the actual axis directions as unit vectors $\\mathbf{v}_X, \\mathbf{v}_Y, \\mathbf{v}_Z$ â€” and they are slightly non-orthogonal due to mechanical tolerances. Gram-Schmidt converts these measured directions into a perfectly orthonormal frame $\\{\\mathbf{e}_X, \\mathbf{e}_Y, \\mathbf{e}_Z\\}$ that the CNC controller uses as its reference. The "squareness" error of the machine is precisely the deviation of the original vectors from orthogonality â€” and Gram-Schmidt quantifies and removes it.',
+      '**CNC machine axis calibration.** A CNC machine\'s $X$, $Y$, $Z$ axis directions are ideally perfectly orthogonal. In practice, a precision ball-bar probe measures the actual axis directions as unit vectors $\\mathbf{v}_X, \\mathbf{v}_Y, \\mathbf{v}_Z$ — and they are slightly non-orthogonal due to mechanical tolerances. Gram-Schmidt converts these measured directions into a perfectly orthonormal frame $\\{\\mathbf{e}_X, \\mathbf{e}_Y, \\mathbf{e}_Z\\}$ that the CNC controller uses as its reference. The "squareness" error of the machine is precisely the deviation of the original vectors from orthogonality — and Gram-Schmidt quantifies and removes it.',
       '**Where this is heading:** Gram-Schmidt is the constructive proof that every subspace has an orthonormal basis. It directly produces the QR decomposition ($A = QR$, where $Q$ has orthonormal columns and $R$ is upper triangular). The next lesson on Least Squares uses this heavily, and SVD generalizes it further.',
     ],
     callouts: [
       {
         type: 'sequencing',
-        title: 'Lesson 2 of 9 â€” Orthogonality & SVD',
-        body: '**Previous (Lesson 1):** Orthogonal Projections â€” how to find the shadow of a vector onto a subspace.\n**This lesson:** Gram-Schmidt â€” how to build a clean, perpendicular basis from any basis, using projection as the cleaning tool.\n**Next (Lesson 3):** Least Squares â€” how to find the best approximate solution when a system has no exact answer.',
+        title: 'Lesson 2 of 9 — Orthogonality & SVD',
+        body: '**Previous (Lesson 1):** Orthogonal Projections — how to find the shadow of a vector onto a subspace.\n**This lesson:** Gram-Schmidt — how to build a clean, perpendicular basis from any basis, using projection as the cleaning tool.\n**Next (Lesson 3):** Least Squares — how to find the best approximate solution when a system has no exact answer.',
       },
       {
         type: 'insight',
         title: 'The Subtraction IS the Orthogonalization',
-        body: 'When you subtract the projection of $\\mathbf{v}_2$ onto $\\mathbf{e}_1$, the remainder is perpendicular to $\\mathbf{e}_1$ â€” always, automatically, by the definition of projection. You are not checking for orthogonality; you are manufacturing it.',
+        body: 'When you subtract the projection of $\\mathbf{v}_2$ onto $\\mathbf{e}_1$, the remainder is perpendicular to $\\mathbf{e}_1$ — always, automatically, by the definition of projection. You are not checking for orthogonality; you are manufacturing it.',
       },
       {
         type: 'definition',
         title: 'Orthonormal Set',
-        body: 'A set of vectors $\\{\\mathbf{e}_1, \\ldots, \\mathbf{e}_k\\}$ is orthonormal if:\nâ€¢ $\\mathbf{e}_i \\cdot \\mathbf{e}_j = 0$ for all $i \\neq j$ (orthogonal â€” pairwise perpendicular)\nâ€¢ $\\|\\mathbf{e}_i\\| = 1$ for all $i$ (normal â€” all unit length)',
+        body: 'A set of vectors $\\{\\mathbf{e}_1, \\ldots, \\mathbf{e}_k\\}$ is orthonormal if:\n• $\\mathbf{e}_i \\cdot \\mathbf{e}_j = 0$ for all $i \\neq j$ (orthogonal — pairwise perpendicular)\n• $\\|\\mathbf{e}_i\\| = 1$ for all $i$ (normal — all unit length)',
       },
       {
         type: 'strategy',
         title: 'Orthonormal Superpower: Inverse = Transpose',
-        body: 'If $Q$ is a matrix with orthonormal columns, then $Q^{-1} = Q^T$. This is called an orthogonal matrix. Inverting it costs nothing â€” just transpose. This is why numerical algorithms love orthonormal bases.',
+        body: 'If $Q$ is a matrix with orthonormal columns, then $Q^{-1} = Q^T$. This is called an orthogonal matrix. Inverting it costs nothing — just transpose. This is why numerical algorithms love orthonormal bases.',
       },
       {
         type: 'insight',
@@ -60,20 +60,20 @@
       {
         id: 'GramSchmidtProcess',
         title: 'Gram-Schmidt in 2D',
-        mathBridge: 'Start with two non-perpendicular vectors (the default, shown in red and blue). Press "Step 1" to see $\\mathbf{v}_1$ normalized to $\\mathbf{e}_1$. Press "Step 2" to see the projection of $\\mathbf{v}_2$ onto $\\mathbf{e}_1$ subtracted away â€” watch the remainder (green) snap to exactly 90Â° from $\\mathbf{e}_1$. Drag the original vectors to different angles and run the process again. Confirm that no matter how tilted the input, the output is always perpendicular.',
+        mathBridge: 'Start with two non-perpendicular vectors (the default, shown in red and blue). Press "Step 1" to see $\\mathbf{v}_1$ normalized to $\\mathbf{e}_1$. Press "Step 2" to see the projection of $\\mathbf{v}_2$ onto $\\mathbf{e}_1$ subtracted away — watch the remainder (green) snap to exactly 90° from $\\mathbf{e}_1$. Drag the original vectors to different angles and run the process again. Confirm that no matter how tilted the input, the output is always perpendicular.',
         caption: 'Projection peels off contamination, leaving perpendicularity behind.',
       },
     ],
   },
 
-  // â”€â”€ Math â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Math ───────────────────────────────────────────────────────
   math: {
     prose: [
       'Given a set of linearly independent vectors $\\{\\mathbf{v}_1, \\mathbf{v}_2, \\ldots, \\mathbf{v}_k\\}$, the Gram-Schmidt process produces an orthonormal set $\\{\\mathbf{e}_1, \\mathbf{e}_2, \\ldots, \\mathbf{e}_k\\}$ that spans the exact same subspace.',
       'The recipe has two clean phases: (1) subtract off all prior-direction contamination, then (2) normalize to unit length.',
       'For the first vector: there is nothing to subtract yet. Just normalize:\n\n$\\mathbf{e}_1 = \\frac{\\mathbf{v}_1}{\\|\\mathbf{v}_1\\|}$',
       'For each subsequent vector $\\mathbf{v}_j$, subtract its projection onto every previously computed basis vector, then normalize:\n\n$\\mathbf{u}_j = \\mathbf{v}_j - \\sum_{i=1}^{j-1} (\\mathbf{v}_j \\cdot \\mathbf{e}_i)\\,\\mathbf{e}_i \\qquad \\mathbf{e}_j = \\frac{\\mathbf{u}_j}{\\|\\mathbf{u}_j\\|}$',
-      'The term $(\\mathbf{v}_j \\cdot \\mathbf{e}_i)$ is just the scalar projection of $\\mathbf{v}_j$ onto $\\mathbf{e}_i$ â€” the amount of $\\mathbf{v}_j$ that points in the $\\mathbf{e}_i$ direction. Subtracting that amount removes all overlap with $\\mathbf{e}_i$.',
+      'The term $(\\mathbf{v}_j \\cdot \\mathbf{e}_i)$ is just the scalar projection of $\\mathbf{v}_j$ onto $\\mathbf{e}_i$ — the amount of $\\mathbf{v}_j$ that points in the $\\mathbf{e}_i$ direction. Subtracting that amount removes all overlap with $\\mathbf{e}_i$.',
       '**Connection to QR decomposition.** If we assemble the original vectors as columns of a matrix $A$, then Gram-Schmidt produces a factorization $A = QR$, where $Q$ has orthonormal columns (the $\\mathbf{e}_j$\'s) and $R$ is upper triangular with entries $r_{ij} = \\mathbf{v}_j \\cdot \\mathbf{e}_i$. QR is the matrix restatement of Gram-Schmidt.',
     ],
     callouts: [
@@ -95,7 +95,7 @@
       {
         type: 'warning',
         title: 'Gram-Schmidt Requires Linear Independence',
-        body: 'If $\\mathbf{v}_j$ is already in the span of $\\{\\mathbf{v}_1, \\ldots, \\mathbf{v}_{j-1}\\}$, then $\\mathbf{u}_j = \\mathbf{0}$ and cannot be normalized. Gram-Schmidt breaks down â€” by design â€” on linearly dependent sets.',
+        body: 'If $\\mathbf{v}_j$ is already in the span of $\\{\\mathbf{v}_1, \\ldots, \\mathbf{v}_{j-1}\\}$, then $\\mathbf{u}_j = \\mathbf{0}$ and cannot be normalized. Gram-Schmidt breaks down — by design — on linearly dependent sets.',
       },
     ],
     visualizations: [
@@ -111,7 +111,7 @@
               cellTitle: 'Gram-Schmidt step by step in MATLAB',
               prose: [
                 '`orth(A)` computes an orthonormal basis for the column space of A. `[Q,R] = qr(A)` gives the full QR decomposition.',
-                'Manual Gram-Schmidt: normalize v1, subtract projection from v2, normalize. Verify e1Â·e2 = 0.',
+                'Manual Gram-Schmidt: normalize v1, subtract projection from v2, normalize. Verify e1·e2 = 0.',
               ],
               code: `v1 = [3; 4];
 v2 = [2; 0];
@@ -125,12 +125,12 @@ e2 = u2 / norm(u2);
 
 fprintf('e1 = [%.4f; %.4f]\\n', e1(1), e1(2))
 fprintf('e2 = [%.4f; %.4f]\\n', e2(1), e2(2))
-fprintf('e1 Â· e2 = %.2e (should be 0)\\n', dot(e1, e2))
+fprintf('e1 · e2 = %.2e (should be 0)\\n', dot(e1, e2))
 fprintf('||e1|| = %.6f  ||e2|| = %.6f  (should be 1)\\n', norm(e1), norm(e2))`,
             },
             {
               id: 2,
-              cellTitle: 'QR decomposition â€” Gram-Schmidt as a matrix equation',
+              cellTitle: 'QR decomposition — Gram-Schmidt as a matrix equation',
               prose: [
                 '`[Q, R] = qr(A)` factorizes A into orthogonal Q and upper-triangular R. Q*R = A exactly.',
                 'Q*Q\' = I confirms the columns are orthonormal. R encodes the projection coefficients.',
@@ -149,7 +149,7 @@ fprintf('Max off-diagonal error: %.2e\\n', max(max(abs(Q'*Q - eye(3)))))`,
             },
             {
               id: 3,
-              cellTitle: 'CNC axis calibration â€” orthogonalizing measured axis directions',
+              cellTitle: 'CNC axis calibration — orthogonalizing measured axis directions',
               prose: [
                 'A probe measures slightly non-orthogonal axis directions due to machine geometry tolerances. Gram-Schmidt creates a perfect orthonormal reference frame.',
                 'The off-diagonal entries of V\'*V (before Gram-Schmidt) quantify the squareness error in radians.',
@@ -162,7 +162,7 @@ v_Z = [-0.0007; -0.0014; 1.000];  % Z-axis direction (measured)
 V = [v_X, v_Y, v_Z];
 
 % Squareness errors before calibration
-fprintf('Before Gram-Schmidt â€” V''*V (should be identity):\\n')
+fprintf('Before Gram-Schmidt — V''*V (should be identity):\\n')
 VtV = V' * V;
 disp(VtV)
 fprintf('Off-diagonal elements (squareness errors in rad):\\n')
@@ -172,7 +172,7 @@ fprintf('  Y-Z: %.6f rad (%.4f arcsec)\\n', VtV(2,3), VtV(2,3)*206265)
 
 % Gram-Schmidt orthogonalization
 [Q, ~] = qr(V);
-fprintf('\\nAfter Gram-Schmidt â€” Q''*Q (perfect identity):\\n')
+fprintf('\\nAfter Gram-Schmidt — Q''*Q (perfect identity):\\n')
 disp(Q'*Q)
 fprintf('Max residual: %.2e\\n', max(max(abs(Q'*Q - eye(3)))))`,
             },
@@ -182,7 +182,7 @@ fprintf('Max residual: %.2e\\n', max(max(abs(Q'*Q - eye(3)))))`,
       {
         id: 'QRDecompositionViz',
         title: 'From Gram-Schmidt to QR',
-        mathBridge: 'The visualization shows a 2Ã—2 matrix $A$ with its columns as vectors. Run Gram-Schmidt to see $Q$ (the orthonormal columns) and $R$ (the upper triangular matrix) appear. Verify that $QR = A$ by multiplying them back together. Change $A$ and confirm the decomposition always works.',
+        mathBridge: 'The visualization shows a 2×2 matrix $A$ with its columns as vectors. Run Gram-Schmidt to see $Q$ (the orthonormal columns) and $R$ (the upper triangular matrix) appear. Verify that $QR = A$ by multiplying them back together. Change $A$ and confirm the decomposition always works.',
         caption: 'QR decomposition is Gram-Schmidt, written as a matrix equation.',
       },
       {
@@ -231,7 +231,7 @@ plt.show()`,
             },
             {
               id: 2,
-              cellTitle: 'QR decomposition â€” Gram-Schmidt as a matrix equation',
+              cellTitle: 'QR decomposition — Gram-Schmidt as a matrix equation',
               prose: '`np.linalg.qr(A)` computes the QR decomposition. Q has orthonormal columns; R is upper triangular. Verify: Q @ R â‰ˆ A (reconstruction). Qáµ€ Q â‰ˆ I (orthonormality).',
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -269,7 +269,7 @@ plt.show()`,
               challengeNumber: 1,
               challengeTitle: 'Gram-Schmidt by hand, verified by QR',
               difficulty: 'hard',
-              prompt: 'Given v1 = [3, 1] and v2 = [2, 2], apply Gram-Schmidt manually: (1) e1 = v1 / â€–v1â€–, (2) u2 = v2 âˆ’ (v2Â·e1)e1, e2 = u2 / â€–u2â€–. Verify e1Â·e2 = 0 and â€–e1â€– = â€–e2â€– = 1. Then confirm using np.linalg.qr.',
+              prompt: 'Given v1 = [3, 1] and v2 = [2, 2], apply Gram-Schmidt manually: (1) e1 = v1 / –v1–, (2) u2 = v2 − (v2·e1)e1, e2 = u2 / –u2–. Verify e1·e2 = 0 and –e1– = –e2– = 1. Then confirm using np.linalg.qr.',
               code: `import numpy as np
 
 v1 = np.array([3.0, 1.0])
@@ -288,10 +288,10 @@ v2 = np.array([2.0, 2.0])
     ],
   },
 
-  // â”€â”€ Rigor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Rigor ──────────────────────────────────────────────────────
   rigor: {
     prose: [
-      '**Theorem:** Every finite-dimensional inner product space has an orthonormal basis. The Gram-Schmidt process is the constructive proof â€” it does not just assert existence, it builds the basis explicitly.',
+      '**Theorem:** Every finite-dimensional inner product space has an orthonormal basis. The Gram-Schmidt process is the constructive proof — it does not just assert existence, it builds the basis explicitly.',
       'The process preserves span at every step: $\\text{span}\\{\\mathbf{e}_1, \\ldots, \\mathbf{e}_j\\} = \\text{span}\\{\\mathbf{v}_1, \\ldots, \\mathbf{v}_j\\}$ for each $j$. This is proved by induction: $\\mathbf{e}_j$ is a linear combination of $\\mathbf{v}_1, \\ldots, \\mathbf{v}_j$, and conversely $\\mathbf{v}_j$ can be recovered from $\\mathbf{e}_1, \\ldots, \\mathbf{e}_j$.',
       '**Numerical stability.** The "classical" Gram-Schmidt formula above is mathematically correct but numerically fragile: small rounding errors in floating-point arithmetic accumulate and the resulting vectors drift from true orthogonality. In practice, **Modified Gram-Schmidt** (which subtracts projections one at a time onto the current $\\mathbf{u}_j$ rather than the original $\\mathbf{v}_j$) is used instead. The results are algebraically identical but numerically far more stable.',
       'For large-scale computations, even Modified Gram-Schmidt can be insufficient. The **Householder** and **Givens** methods produce QR decompositions that are more numerically stable and are used in production linear algebra libraries (LAPACK, NumPy, MATLAB).',
@@ -305,7 +305,7 @@ v2 = np.array([2.0, 2.0])
       {
         type: 'insight',
         title: 'Modified vs. Classical Gram-Schmidt',
-        body: 'Classical: subtract all projections from the original $\\mathbf{v}_j$.\nModified: subtract projections from the running $\\mathbf{u}_j$ after each one.\nAlgebraically identical. Numerically, Modified is preferred â€” error does not accumulate.',
+        body: 'Classical: subtract all projections from the original $\\mathbf{v}_j$.\nModified: subtract projections from the running $\\mathbf{u}_j$ after each one.\nAlgebraically identical. Numerically, Modified is preferred — error does not accumulate.',
       },
     ],
     visualizations: [
@@ -318,17 +318,17 @@ v2 = np.array([2.0, 2.0])
     ],
   },
 
-  // â”€â”€ Examples â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Examples ───────────────────────────────────────────────────
   examples: [
     {
       id: 'la4-002-ex1',
-      title: 'Gram-Schmidt in â„Â²',
+      title: 'Gram-Schmidt in ℝ²',
       problem: 'Apply Gram-Schmidt to $\\mathbf{v}_1 = \\begin{bmatrix}3\\\\4\\end{bmatrix}$ and $\\mathbf{v}_2 = \\begin{bmatrix}2\\\\0\\end{bmatrix}$.',
       steps: [
         {
           expression: '\\mathbf{e}_1 = \\frac{\\mathbf{v}_1}{\\|\\mathbf{v}_1\\|} = \\frac{1}{5}\\begin{bmatrix}3\\\\4\\end{bmatrix} = \\begin{bmatrix}3/5\\\\4/5\\end{bmatrix}',
           annotation: 'Normalize the first vector. Its magnitude is $\\sqrt{9+16}=5$.',
-          strategyTitle: 'Normalize vâ‚',
+          strategyTitle: 'Normalize v₁',
           checkpoint: 'Verify $\\|\\mathbf{e}_1\\| = 1$.',
           hints: ['$(3/5)^2 + (4/5)^2 = 9/25 + 16/25 = 25/25 = 1$. âœ“'],
         },
@@ -356,7 +356,7 @@ v2 = np.array([2.0, 2.0])
         {
           expression: '\\mathbf{e}_2 = \\frac{\\mathbf{u}_2}{\\|\\mathbf{u}_2\\|} = \\frac{5}{8}\\begin{bmatrix}32/25\\\\-24/25\\end{bmatrix} = \\begin{bmatrix}4/5\\\\-3/5\\end{bmatrix}',
           annotation: 'Normalize $\\mathbf{u}_2$. The final orthonormal pair is $\\{\\mathbf{e}_1, \\mathbf{e}_2\\}$.',
-          strategyTitle: 'Normalize to get eâ‚‚',
+          strategyTitle: 'Normalize to get e₁',
           checkpoint: 'Verify: $\\mathbf{e}_1 \\cdot \\mathbf{e}_2 = 0$ and $\\|\\mathbf{e}_2\\| = 1$.',
           hints: ['$(3/5)(4/5) + (4/5)(-3/5) = 12/25 - 12/25 = 0$. âœ“  $(4/5)^2 + (-3/5)^2 = 16/25 + 9/25 = 1$. âœ“'],
         },
@@ -365,13 +365,13 @@ v2 = np.array([2.0, 2.0])
     },
     {
       id: 'la4-002-ex2',
-      title: 'Gram-Schmidt in â„Â³',
+      title: 'Gram-Schmidt in ℝ³',
       problem: 'Find an orthonormal basis for the span of $\\mathbf{v}_1 = \\begin{bmatrix}1\\\\1\\\\0\\end{bmatrix}$, $\\mathbf{v}_2 = \\begin{bmatrix}1\\\\0\\\\1\\end{bmatrix}$.',
       steps: [
         {
           expression: '\\mathbf{e}_1 = \\frac{1}{\\sqrt{2}}\\begin{bmatrix}1\\\\1\\\\0\\end{bmatrix}',
           annotation: '$\\|\\mathbf{v}_1\\| = \\sqrt{2}$. Normalize directly.',
-          strategyTitle: 'Normalize vâ‚',
+          strategyTitle: 'Normalize v₁',
           checkpoint: '',
           hints: [],
         },
@@ -392,7 +392,7 @@ v2 = np.array([2.0, 2.0])
         {
           expression: '\\|\\mathbf{u}_2\\| = \\sqrt{1/4 + 1/4 + 1} = \\sqrt{3/2} = \\frac{\\sqrt{6}}{2} \\qquad \\mathbf{e}_2 = \\frac{1}{\\sqrt{6}}\\begin{bmatrix}1\\\\-1\\\\2\\end{bmatrix}',
           annotation: 'Normalize. (Multiply numerator and denominator by 2 to simplify: $\\mathbf{u}_2 = \\frac{1}{2}[1,-1,2]^T$, so $\\mathbf{e}_2 = [1,-1,2]^T/\\sqrt{6}$.)',
-          strategyTitle: 'Normalize to get eâ‚‚',
+          strategyTitle: 'Normalize to get e₁',
           checkpoint: 'Verify $\\mathbf{e}_1 \\cdot \\mathbf{e}_2 = 0$.',
           hints: ['$(1/\\sqrt{2})(1/\\sqrt{6}) + (1/\\sqrt{2})(-1/\\sqrt{6}) + 0 = 1/\\sqrt{12} - 1/\\sqrt{12} = 0$. âœ“'],
         },
@@ -407,7 +407,7 @@ v2 = np.array([2.0, 2.0])
         {
           expression: '\\mathbf{e}_1 = \\frac{\\mathbf{v}_1}{\\|\\mathbf{v}_1\\|} = \\frac{1}{\\sqrt{2}}\\begin{bmatrix}1\\\\1\\\\0\\end{bmatrix}',
           annotation: '$\\|\\mathbf{v}_1\\| = \\sqrt{1+1+0} = \\sqrt{2}$. Normalize.',
-          strategyTitle: 'Normalize vâ‚',
+          strategyTitle: 'Normalize v₁',
           checkpoint: '',
           hints: [],
         },
@@ -415,13 +415,13 @@ v2 = np.array([2.0, 2.0])
           expression: '\\mathbf{u}_2 = \\mathbf{v}_2 - (\\mathbf{v}_2 \\cdot \\mathbf{e}_1)\\mathbf{e}_1 = \\begin{bmatrix}1\\\\0\\\\1\\end{bmatrix} - \\frac{1}{\\sqrt{2}} \\cdot \\frac{1}{\\sqrt{2}}\\begin{bmatrix}1\\\\1\\\\0\\end{bmatrix} = \\begin{bmatrix}1/2\\\\-1/2\\\\1\\end{bmatrix}',
           annotation: '$\\mathbf{v}_2 \\cdot \\mathbf{e}_1 = (1+0+0)/\\sqrt{2} = 1/\\sqrt{2}$. Subtract $(1/\\sqrt{2})\\mathbf{e}_1$.',
           strategyTitle: 'Subtract projection',
-          checkpoint: 'Check: uâ‚‚ Â· eâ‚ = 0?',
-          hints: ['uâ‚‚ Â· eâ‚ = (1/2)(1/âˆš2) + (-1/2)(1/âˆš2) + 1Â·0 = 0 âœ“'],
+          checkpoint: 'Check: u₁ · e₁ = 0?',
+          hints: ['u₁ · e₁ = (1/2)(1/âˆš2) + (-1/2)(1/âˆš2) + 1·0 = 0 âœ“'],
         },
         {
           expression: '\\mathbf{e}_2 = \\frac{\\mathbf{u}_2}{\\|\\mathbf{u}_2\\|} = \\frac{1}{\\sqrt{3/2}}\\begin{bmatrix}1/2\\\\-1/2\\\\1\\end{bmatrix} = \\frac{1}{\\sqrt{6}}\\begin{bmatrix}1\\\\-1\\\\2\\end{bmatrix}',
           annotation: '$\\|\\mathbf{u}_2\\|^2 = 1/4 + 1/4 + 1 = 3/2$, so $\\|\\mathbf{u}_2\\| = \\sqrt{6}/2$.',
-          strategyTitle: 'Normalize uâ‚‚',
+          strategyTitle: 'Normalize u₁',
           checkpoint: '',
           hints: [],
         },
@@ -430,14 +430,14 @@ v2 = np.array([2.0, 2.0])
           annotation: '$R_{11} = \\mathbf{e}_1^T\\mathbf{v}_1 = \\sqrt{2}$, $R_{12} = \\mathbf{e}_1^T\\mathbf{v}_2 = 1/\\sqrt{2}$, $R_{21} = 0$ (by G-S construction), $R_{22} = \\mathbf{e}_2^T\\mathbf{v}_2 = \\sqrt{6}/2$. $R$ is upper triangular.',
           strategyTitle: 'Compute R = Qáµ€A',
           checkpoint: 'Verify: A = QR (recover original columns from Q and R)',
-          hints: ['Column 1 of QR: eâ‚Â·Râ‚â‚ = vâ‚/âˆš2 Â· âˆš2 = vâ‚ âœ“. Column 2: eâ‚Â·(1/âˆš2) + eâ‚‚Â·(âˆš6/2) = (1/2)[1,1,0]áµ€ + (1/2)[1,-1,2]áµ€ = [1,0,1]áµ€ = vâ‚‚ âœ“.'],
+          hints: ['Column 1 of QR: e₁·R₁₁ = v₁/âˆš2 · âˆš2 = v₁ âœ“. Column 2: e₁·(1/âˆš2) + e₁·(âˆš6/2) = (1/2)[1,1,0]áµ€ + (1/2)[1,-1,2]áµ€ = [1,0,1]áµ€ = v₁ âœ“.'],
         },
       ],
       conclusion: '$A = QR$ where $Q = [\\mathbf{e}_1 \\; \\mathbf{e}_2]$ has orthonormal columns and $R$ is upper triangular. This is the QR decomposition. Gram-Schmidt is the algorithm; QR is the matrix factorization it produces. Numerical solvers use QR because $Q^{-1} = Q^T$ makes subsequent computations cheap.',
     },
   ],
 
-  // â”€â”€ Challenges â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Challenges ─────────────────────────────────────────────────
   challenges: [
     {
       id: 'la4-002-ch1',
@@ -458,12 +458,12 @@ v2 = np.array([2.0, 2.0])
           annotation: 'Normalize: magnitude is 4, so $\\mathbf{e}_2 = [0,4]/4 = [0,1]$. The standard basis!',
         },
       ],
-      answer: 'eâ‚ = [1,0]áµ€, eâ‚‚ = [0,1]áµ€',
+      answer: 'e₁ = [1,0]áµ€, e₁ = [0,1]áµ€',
     },
     {
       id: 'la4-002-ch2',
       difficulty: 'medium',
-      problem: 'Show that if $\\mathbf{v}_1$ and $\\mathbf{v}_2$ are already orthogonal (but not necessarily unit length), Gram-Schmidt just normalizes each one â€” no subtraction needed. Explain why this makes sense.',
+      problem: 'Show that if $\\mathbf{v}_1$ and $\\mathbf{v}_2$ are already orthogonal (but not necessarily unit length), Gram-Schmidt just normalizes each one — no subtraction needed. Explain why this makes sense.',
       hint: 'Compute $\\mathbf{v}_2 \\cdot \\mathbf{e}_1$. What is it when the vectors are already orthogonal?',
       walkthrough: [
         {
@@ -483,23 +483,23 @@ v2 = np.array([2.0, 2.0])
     },
   ],
 
-  // â”€â”€ Semantics â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Semantics ────────────────────────────────────────────────────
   semantics: {
     core: [
       { symbol: '\\mathbf{e}_j', meaning: 'The jth orthonormal basis vector produced by Gram-Schmidt' },
-      { symbol: '\\mathbf{v}_j \\cdot \\mathbf{e}_i', meaning: 'Scalar projection of v_j onto e_i â€” the amount of contamination to remove' },
+      { symbol: '\\mathbf{v}_j \\cdot \\mathbf{e}_i', meaning: 'Scalar projection of v_j onto e_i — the amount of contamination to remove' },
       { symbol: 'A = QR', meaning: 'QR decomposition: Q has orthonormal columns, R is upper triangular' },
-      { symbol: 'Q^{-1} = Q^T', meaning: 'For orthogonal matrices, the inverse is free â€” just transpose' },
+      { symbol: 'Q^{-1} = Q^T', meaning: 'For orthogonal matrices, the inverse is free — just transpose' },
     ],
     rulesOfThumb: [
       'Each new vector = original vector minus its projections onto all prior orthonormal vectors.',
-      'The subtraction manufactures orthogonality â€” it does not check for it.',
+      'The subtraction manufactures orthogonality — it does not check for it.',
       'Gram-Schmidt fails on linearly dependent sets (subtraction gives the zero vector).',
       'In code, use Modified Gram-Schmidt or Householder for numerical stability.',
     ],
   },
 
-  // â”€â”€ Spiral â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Spiral ────────────────────────────────────────────────────────
   spiral: {
     recoveryPoints: [
       {
@@ -512,7 +512,7 @@ v2 = np.array([2.0, 2.0])
       {
         lessonId: 'la4-003',
         label: 'Least Squares',
-        note: 'Gram-Schmidt produces QR, and QR makes least squares computationally efficient. The normal equations $A^TA\\mathbf{x}=A^T\\mathbf{b}$ become $R\\mathbf{x}=Q^T\\mathbf{b}$ â€” a simple triangular system.',
+        note: 'Gram-Schmidt produces QR, and QR makes least squares computationally efficient. The normal equations $A^TA\\mathbf{x}=A^T\\mathbf{b}$ become $R\\mathbf{x}=Q^T\\mathbf{b}$ — a simple triangular system.',
       },
       {
         lessonId: 'la4-004',
@@ -522,28 +522,28 @@ v2 = np.array([2.0, 2.0])
     ],
   },
 
-  // â”€â”€ Mental Model â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Mental Model ─────────────────────────────────────────────────
   mentalModel: [
     'Gram-Schmidt = project, subtract contamination, normalize. Repeat.',
-    'The subtraction manufactures orthogonality â€” guaranteed by algebra.',
+    'The subtraction manufactures orthogonality — guaranteed by algebra.',
     'Output spans the same space as the input, but with clean right angles.',
     'QR decomposition is Gram-Schmidt written as a matrix equation.',
     'Orthonormal basis: inverse = transpose. All coordinates = dot products.',
   ],
 
-  // â”€â”€ Checkpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Checkpoints ──────────────────────────────────────────────────
   checkpoints: [
     { id: 'cp-la4-002-1', label: 'Read: Explain why subtraction creates orthogonality', type: 'read' },
     { id: 'cp-la4-002-2', label: 'Read: State when Gram-Schmidt breaks down', type: 'read' },
-    { id: 'cp-la4-002-3', label: 'Read: Explain why Qâ»Â¹ = Qáµ€ for orthonormal columns', type: 'read' },
+    { id: 'cp-la4-002-3', label: 'Read: Explain why Qâ»¹ = Qáµ€ for orthonormal columns', type: 'read' },
     { id: 'cp-la4-002-4', label: 'Lab: Step through Gram-Schmidt on two non-perpendicular vectors', type: 'lab' },
-    { id: 'cp-la4-002-5', label: 'Lab: Verify eâ‚Â·eâ‚‚ = 0 and â€–eâ‚â€– = â€–eâ‚‚â€– = 1 after output', type: 'lab' },
-    { id: 'cp-la4-002-6', label: 'Example: Run Gram-Schmidt in â„Â²', type: 'example' },
-    { id: 'cp-la4-002-7', label: 'Example: Run Gram-Schmidt in â„Â³ to get orthonormal basis', type: 'example' },
-    { id: 'cp-la4-002-8', label: 'Challenge: Derive QR from Gram-Schmidt for a 3Ã—2 matrix', type: 'challenge' },
+    { id: 'cp-la4-002-5', label: 'Lab: Verify e₁·e₁ = 0 and –e₁– = –e₁– = 1 after output', type: 'lab' },
+    { id: 'cp-la4-002-6', label: 'Example: Run Gram-Schmidt in ℝ²', type: 'example' },
+    { id: 'cp-la4-002-7', label: 'Example: Run Gram-Schmidt in ℝ³ to get orthonormal basis', type: 'example' },
+    { id: 'cp-la4-002-8', label: 'Challenge: Derive QR from Gram-Schmidt for a 3×2 matrix', type: 'challenge' },
   ],
 
-  // â”€â”€ Assessment â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Assessment ───────────────────────────────────────────────────
   assessment: {
     questions: [
       {
@@ -556,7 +556,7 @@ v2 = np.array([2.0, 2.0])
     ],
   },
 
-  // â”€â”€ Quiz â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Quiz ─────────────────────────────────────────────────────────
   quiz: [
     {
       id: 'gram-schmidt-q1',
@@ -570,7 +570,7 @@ v2 = np.array([2.0, 2.0])
       ],
       answer: 'To remove the component of $\\mathbf{v}_2$ that overlaps with $\\mathbf{e}_1$, guaranteeing the remainder is perpendicular',
       hints: ['Think of projection as the "shadow" of $\\mathbf{v}_2$ on $\\mathbf{e}_1$. Subtracting the shadow removes the overlap.'],
-      reviewSection: 'Intuition tab â€” The Subtraction IS the Orthogonalization',
+      reviewSection: 'Intuition tab — The Subtraction IS the Orthogonalization',
     },
     {
       id: 'gram-schmidt-q2',
@@ -578,13 +578,13 @@ v2 = np.array([2.0, 2.0])
       text: 'What happens when you apply Gram-Schmidt to a linearly dependent set of vectors?',
       options: [
         'You get an orthonormal basis for the full space',
-        'The process produces a zero vector, which cannot be normalized â€” it breaks down',
+        'The process produces a zero vector, which cannot be normalized — it breaks down',
         'You get the standard basis automatically',
         'The process runs but gives incorrect results',
       ],
-      answer: 'The process produces a zero vector, which cannot be normalized â€” it breaks down',
+      answer: 'The process produces a zero vector, which cannot be normalized — it breaks down',
       hints: ['If $\\mathbf{v}_j$ is in the span of the previous vectors, subtracting all projections leaves exactly $\\mathbf{0}$.'],
-      reviewSection: 'Math tab â€” Gram-Schmidt Requires Linear Independence',
+      reviewSection: 'Math tab — Gram-Schmidt Requires Linear Independence',
     },
     {
       id: 'gram-schmidt-q3',
@@ -593,7 +593,7 @@ v2 = np.array([2.0, 2.0])
       options: ['$Q^2$', '$-Q$', '$Q^T$', '$\\det(Q) \\cdot Q$'],
       answer: '$Q^T$',
       hints: ['This is the defining property of an orthogonal matrix. It follows from $Q^TQ = I$ (which holds because $Q$\'s columns are orthonormal).'],
-      reviewSection: 'Intuition tab â€” Orthonormal Superpower',
+      reviewSection: 'Intuition tab — Orthonormal Superpower',
     },
     {
       id: 'q-la4-002-4',
@@ -601,13 +601,13 @@ v2 = np.array([2.0, 2.0])
       text: 'In Gram-Schmidt, why must the vectors being processed be linearly independent?',
       options: [
         'So each vector can be made longer',
-        'If any vector is in the span of the previous ones, its residual after projection is $\\mathbf{0}$ â€” which cannot be normalized',
+        'If any vector is in the span of the previous ones, its residual after projection is $\\mathbf{0}$ — which cannot be normalized',
         'So the output has unit length',
         'To ensure the output spans a different space than the input',
       ],
-      answer: 'If any vector is in the span of the previous ones, its residual after projection is $\\mathbf{0}$ â€” which cannot be normalized',
-      hints: ['If vâ‚ƒ = Î±vâ‚ + Î²vâ‚‚, then after subtracting all projections onto eâ‚ and eâ‚‚, the residual is exactly 0. You cannot normalize the zero vector.'],
-      reviewSection: 'Math â€” Gram-Schmidt requires linear independence',
+      answer: 'If any vector is in the span of the previous ones, its residual after projection is $\\mathbf{0}$ — which cannot be normalized',
+      hints: ['If v₁ƒ = αv₁ + βv₁, then after subtracting all projections onto e₁ and e₁, the residual is exactly 0. You cannot normalize the zero vector.'],
+      reviewSection: 'Math — Gram-Schmidt requires linear independence',
     },
     {
       id: 'q-la4-002-5',
@@ -620,8 +620,8 @@ v2 = np.array([2.0, 2.0])
         'Their components along the standard basis',
       ],
       answer: 'The subspace they span',
-      hints: ['Gram-Schmidt replaces vectors with linear combinations of themselves â€” it never leaves the span. The subspace is identical; only the basis changes to an orthonormal one.'],
-      reviewSection: 'Intuition â€” Gram-Schmidt preserves span',
+      hints: ['Gram-Schmidt replaces vectors with linear combinations of themselves — it never leaves the span. The subspace is identical; only the basis changes to an orthonormal one.'],
+      reviewSection: 'Intuition — Gram-Schmidt preserves span',
     },
     {
       id: 'q-la4-002-6',
@@ -629,8 +629,8 @@ v2 = np.array([2.0, 2.0])
       text: 'If $Q$ has orthonormal columns, what is $Q^TQ$?',
       options: ['$QQ^T$', '$I$', '$Q^2$', '$\\det(Q) \\cdot I$'],
       answer: '$I$',
-      hints: ['$(Q^TQ)_{ij} = $ column i of Q dotted with column j of Q = Î´áµ¢â±¼ (1 if i=j, 0 otherwise) by orthonormality. So Q^TQ = I.'],
-      reviewSection: 'Intuition â€” Orthonormal Superpower',
+      hints: ['$(Q^TQ)_{ij} = $ column i of Q dotted with column j of Q = Î´ᵢâ±¼ (1 if i=j, 0 otherwise) by orthonormality. So Q^TQ = I.'],
+      reviewSection: 'Intuition — Orthonormal Superpower',
     },
     {
       id: 'q-la4-002-7',
@@ -644,7 +644,7 @@ v2 = np.array([2.0, 2.0])
       ],
       answer: 'Upper triangular',
       hints: ['R = Qáµ€A. By the Gram-Schmidt construction, each e_j is orthogonal to all v_i for i < j. This makes the lower triangle of R zero. R_{ij} = 0 when i > j.'],
-      reviewSection: 'Examples â€” QR decomposition example',
+      reviewSection: 'Examples — QR decomposition example',
     },
     {
       id: 'q-la4-002-8',
@@ -658,7 +658,7 @@ v2 = np.array([2.0, 2.0])
       ],
       answer: 'In floating point arithmetic, classical Gram-Schmidt accumulates errors that destroy orthogonality; Modified Gram-Schmidt corrects this step by step',
       hints: ['In exact arithmetic both are equivalent. In floating point, subtracting projections in one batch (classical) causes round-off accumulation. Modified G-S updates the remaining vectors after each projection, keeping errors small.'],
-      reviewSection: 'Rigor â€” numerical stability',
+      reviewSection: 'Rigor — numerical stability',
     },
     {
       id: 'q-la4-002-9',
@@ -671,8 +671,8 @@ v2 = np.array([2.0, 2.0])
         'Removing the largest component of $\\mathbf{v}_k$',
       ],
       answer: 'Projecting $\\mathbf{v}_k$ onto the orthogonal complement of $\\text{span}(\\mathbf{e}_1, \\ldots, \\mathbf{e}_{k-1})$',
-      hints: ['The sum Î£(v_kÂ·e_j)e_j is the projection of v_k onto span{eâ‚,...,e_{k-1}}. Subtracting it gives the component of v_k perpendicular to that span â€” which is the projection onto the orthogonal complement.'],
-      reviewSection: 'Math â€” Gram-Schmidt algorithm',
+      hints: ['The sum Σ(v_k·e_j)e_j is the projection of v_k onto span{e₁,...,e_{k-1}}. Subtracting it gives the component of v_k perpendicular to that span — which is the projection onto the orthogonal complement.'],
+      reviewSection: 'Math — Gram-Schmidt algorithm',
     },
     {
       id: 'q-la4-002-10',
@@ -685,8 +685,8 @@ v2 = np.array([2.0, 2.0])
         'QR only works for square matrices',
       ],
       answer: 'QR avoids squaring the condition number: solving $R\\hat{\\mathbf{x}} = Q^T\\mathbf{b}$ is more numerically stable than computing $(A^TA)^{-1}A^T\\mathbf{b}$',
-      hints: ['Forming Aáµ€A squares the condition number of A. If Îº(A) = 100, then Îº(Aáµ€A) = 10000 â€” tiny perturbations in b get amplified 10000Ã— instead of 100Ã—. QR preserves the original conditioning.'],
-      reviewSection: 'Rigor â€” numerical stability',
+      hints: ['Forming Aáµ€A squares the condition number of A. If Îº(A) = 100, then Îº(Aáµ€A) = 10000 — tiny perturbations in b get amplified 10000× instead of 100×. QR preserves the original conditioning.'],
+      reviewSection: 'Rigor — numerical stability',
     },
   ],
 
@@ -694,14 +694,14 @@ v2 = np.array([2.0, 2.0])
     {
       falseBelief: 'Gram-Schmidt changes the subspace spanned by the vectors.',
       whyStudentsThinkIt: 'The output vectors look completely different from the input (different directions, different lengths), so students assume the span changed.',
-      correctionExample: 'For $\\mathbf{v}_1 = [3,4]^T$ and $\\mathbf{v}_2 = [2,0]^T$ spanning $\\mathbb{R}^2$: the Gram-Schmidt output $\\mathbf{e}_1, \\mathbf{e}_2$ also spans all of $\\mathbb{R}^2$ â€” same subspace, different (cleaner) basis.',
-      contrastCase: 'What does change: the individual vectors, their directions and lengths. What does not change: the set of all linear combinations â€” the span.',
+      correctionExample: 'For $\\mathbf{v}_1 = [3,4]^T$ and $\\mathbf{v}_2 = [2,0]^T$ spanning $\\mathbb{R}^2$: the Gram-Schmidt output $\\mathbf{e}_1, \\mathbf{e}_2$ also spans all of $\\mathbb{R}^2$ — same subspace, different (cleaner) basis.',
+      contrastCase: 'What does change: the individual vectors, their directions and lengths. What does not change: the set of all linear combinations — the span.',
     },
     {
       falseBelief: 'Gram-Schmidt only works on two vectors.',
       whyStudentsThinkIt: 'Most examples show the two-vector case. Students do not see how to extend the subtraction step.',
       correctionExample: 'For three vectors: $\\mathbf{u}_3 = \\mathbf{v}_3 - (\\mathbf{v}_3 \\cdot \\mathbf{e}_1)\\mathbf{e}_1 - (\\mathbf{v}_3 \\cdot \\mathbf{e}_2)\\mathbf{e}_2$. Subtract projections onto ALL previous orthonormal vectors. The pattern extends to any number of input vectors.',
-      contrastCase: 'The formula is identical for $k$ vectors â€” just sum over all $j < k$ in the projection subtraction.',
+      contrastCase: 'The formula is identical for $k$ vectors — just sum over all $j < k$ in the projection subtraction.',
     },
   ],
 
@@ -709,10 +709,10 @@ v2 = np.array([2.0, 2.0])
     {
       situation: 'You are fitting a polynomial $p(x) = a_0 + a_1 x + a_2 x^2$ to data, but the monomials $\\{1, x, x^2\\}$ are nearly collinear on $[-1,1]$, causing numerical instability.',
       competingTechniques: ['Use monomials directly', 'Least squares with normal equations', 'Gram-Schmidt to build orthogonal polynomials'],
-      whyThisTechniqueWins: 'Applying Gram-Schmidt to $\\{1, x, x^2\\}$ under an appropriate inner product produces Legendre polynomials â€” an orthogonal basis for polynomials. Fitting in this basis is numerically stable and the coefficients are independent.',
+      whyThisTechniqueWins: 'Applying Gram-Schmidt to $\\{1, x, x^2\\}$ under an appropriate inner product produces Legendre polynomials — an orthogonal basis for polynomials. Fitting in this basis is numerically stable and the coefficients are independent.',
     },
     {
-      situation: 'In computer graphics, you need to orient a camera at a point of interest using forward, up, and right vectors â€” but the user-specified "up" may not be exactly perpendicular to the forward direction.',
+      situation: 'In computer graphics, you need to orient a camera at a point of interest using forward, up, and right vectors — but the user-specified "up" may not be exactly perpendicular to the forward direction.',
       competingTechniques: ['Use the vectors as-is (rendering artifacts)', 'Manually adjust one vector', 'Gram-Schmidt orthogonalization'],
       whyThisTechniqueWins: 'Gram-Schmidt on {forward, user_up} gives a guaranteed orthonormal frame. One step: subtract the projection of user_up onto forward, normalize. This is standard in every 3D engine\'s "look-at" calculation.',
     },
@@ -720,8 +720,8 @@ v2 = np.array([2.0, 2.0])
 
   debugging: [
     {
-      commonError: 'Subtracting the projection in the wrong order â€” projecting $\\mathbf{e}_1$ onto $\\mathbf{v}_2$ instead of $\\mathbf{v}_2$ onto $\\mathbf{e}_1$.',
-      symptom: 'The residual $\\mathbf{u}_2$ is not perpendicular to $\\mathbf{e}_1$ â€” the dot product check fails.',
+      commonError: 'Subtracting the projection in the wrong order — projecting $\\mathbf{e}_1$ onto $\\mathbf{v}_2$ instead of $\\mathbf{v}_2$ onto $\\mathbf{e}_1$.',
+      symptom: 'The residual $\\mathbf{u}_2$ is not perpendicular to $\\mathbf{e}_1$ — the dot product check fails.',
       whyItHappened: 'Projection is not symmetric: $\\text{proj}_{\\mathbf{e}_1}\\mathbf{v}_2 \\neq \\text{proj}_{\\mathbf{v}_2}\\mathbf{e}_1$. The formula $\\mathbf{v}_2 \\cdot \\mathbf{e}_1$ is the projection of $\\mathbf{v}_2$ onto $\\mathbf{e}_1$ (not the other way around).',
       repairStrategy: 'Always verify with the dot product check: compute $\\mathbf{u}_2 \\cdot \\mathbf{e}_1$ after subtraction. It must be zero. If not, re-check which vector you projected onto which.',
     },
@@ -738,6 +738,6 @@ v2 = np.array([2.0, 2.0])
     solveIndependently: 'Apply Gram-Schmidt to orthogonalize 2 or 3 vectors, verify orthogonality of output, and extract QR from the computation.',
     explainVerbally: 'Explain why the subtraction step creates orthogonality, what breaks when vectors are dependent, and why $Q^{-1} = Q^T$ saves computation.',
     detectIncorrectApplication: 'Catch wrong projection direction; catch missing projections in the multi-vector step; catch failure to verify $\\mathbf{e}_i \\cdot \\mathbf{e}_j = 0$.',
-    transferToUnfamiliar: 'Apply Gram-Schmidt to functions (orthogonal polynomials), 3D camera orientation, or QR-based least squares â€” any context requiring a clean orthonormal basis from a messy one.',
+    transferToUnfamiliar: 'Apply Gram-Schmidt to functions (orthogonal polynomials), 3D camera orientation, or QR-based least squares — any context requiring a clean orthonormal basis from a messy one.',
   },
 };

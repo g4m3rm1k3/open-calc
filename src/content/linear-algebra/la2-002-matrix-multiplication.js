@@ -1,5 +1,5 @@
 export default {
-  // â”€â”€ Identity â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Identity ───────────────────────────────────────────────────
   id: 'la2-002',
   slug: 'matrix-multiplication',
   chapter: 'la2',
@@ -9,46 +9,46 @@ export default {
   tags: ['matrix multiplication', 'composition', 'non-commutative', 'chaining transformations', 'dot product'],
   aliases: 'multiplying matrices composing functions right-to-left AB BA transformation chain',
 
-  // â”€â”€ Pedagogical Meta â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Pedagogical Meta ───────────────────────────────────────────
   timeToComplete: 20,
   coreConcept: 'Multiplying two matrices is mathematically identical to applying one linear transformation, and then applying a second linear transformation immediately after it.',
   prerequisites: ['la2-001'],
   nextLesson: 'inverse-matrices',
 
-  // â”€â”€ Hook â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Hook ───────────────────────────────────────────────────────
   hook: {
     question: "If I rotate a photo by 90 degrees, and then shear it horizontally, how do I write that mathematically?",
     realWorldContext: "When an animator at Pixar makes an animated character wave, they aren't just applying one transformation. They rotate the shoulder, then they rotate the elbow relative to the shoulder, then the wrist relative to the elbow. If the computer literally transformed all the millions of polygons in the arm 3 separate times, the movie would take millennia to render. Instead, the computer multiplies the three matrices together *first* to create one single 'master' matrix. It then applies this master matrix to the millions of polygons just once. Matrix multiplication is the ultimate shortcut: squishing a sequence of complex instructions into a single math operation.",
     previewVisualizationId: 'LALesson05_MatrixMult',
   },
 
-  // â”€â”€ Intuition â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Intuition ──────────────────────────────────────────────────
   intuition: {
     prose: [
-      'Apply $R = \\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$ (90Â° CCW rotation) to $[3,1]^T$: result is $[-1,3]^T$. Now apply shear $S = \\begin{bmatrix}1&1\\\\0&1\\end{bmatrix}$ to $[-1,3]^T$: result is $[2,3]^T$. Two steps: rotate then shear, and $[3,1]^T$ lands at $[2,3]^T$. The matrix that does BOTH steps at once is the product $SR = \\begin{bmatrix}0&-1\\\\1&1\\end{bmatrix}$ â€” a single matrix capturing both transformations. **Matrix multiplication IS transformation composition.** This lesson shows you how to compute that product and why the order of multiplication matches the order of applying transformations.',
+      'Apply $R = \\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$ (90° CCW rotation) to $[3,1]^T$: result is $[-1,3]^T$. Now apply shear $S = \\begin{bmatrix}1&1\\\\0&1\\end{bmatrix}$ to $[-1,3]^T$: result is $[2,3]^T$. Two steps: rotate then shear, and $[3,1]^T$ lands at $[2,3]^T$. The matrix that does BOTH steps at once is the product $SR = \\begin{bmatrix}0&-1\\\\1&1\\end{bmatrix}$ — a single matrix capturing both transformations. **Matrix multiplication IS transformation composition.** This lesson shows you how to compute that product and why the order of multiplication matches the order of applying transformations.',
       '**The shortcut insight.** Imagine applying matrix $A$ to every point in the plane. The plane warps into a new shape. Now apply matrix $B$ to the already-warped plane. The plane warps again. You have performed two transformations. But since both warps are linear, the *combined* effect is itself a linear transformation. That means a single matrix could have done both steps at once. That single matrix is the **product** $BA$ (B after A).',
       '**Why right-to-left?** We write $B(A(\\mathbf{x}))$ because functions compose from inside to outside. The matrix closest to the vector $\\mathbf{x}$ acts first, like nested function calls in code: `B(A(x))`. Reading $BA\\mathbf{x}$ correctly means: A acts on $\\mathbf{x}$ first, then B acts on the result.',
       '**The Pixar connection.** When animating a character\'s arm wave, the studio must account for: shoulder rotation, elbow rotation relative to shoulder, wrist rotation relative to elbow. Every frame, every polygon on the arm needs all three transformations applied. If you applied them one at a time to millions of polygons, the movie would take decades to render. Instead: multiply the three matrices together *first* to get one master matrix. Apply that single matrix to every polygon. One matrix product replaces three passes.',
-      '**CNC parallel.** A CNC machining center moving a 5-axis part from fixtured position to cutting position does the same thing. The post-processor (the software that converts CAD moves to G-code) computes a chain of transformation matrices: work coordinate offset â†’ coordinate rotation (G68) â†’ tool length compensation â†’ machine kinematics. Each step is a matrix. The post-processor multiplies them together before outputting a single G-code block. The machine\'s controller never sees the individual steps â€” only the composite result.',
-      '**Order is everything.** "First rotate 90Â°, then shear horizontally" warps space to a completely different shape than "first shear horizontally, then rotate 90Â°." In matrix language: $BA \\neq AB$ in general. This is called **non-commutativity**, and it is not an accident â€” it reflects the physical reality that the order of physical operations matters.',
+      '**CNC parallel.** A CNC machining center moving a 5-axis part from fixtured position to cutting position does the same thing. The post-processor (the software that converts CAD moves to G-code) computes a chain of transformation matrices: work coordinate offset → coordinate rotation (G68) → tool length compensation → machine kinematics. Each step is a matrix. The post-processor multiplies them together before outputting a single G-code block. The machine\'s controller never sees the individual steps — only the composite result.',
+      '**Order is everything.** "First rotate 90°, then shear horizontally" warps space to a completely different shape than "first shear horizontally, then rotate 90°." In matrix language: $BA \\neq AB$ in general. This is called **non-commutativity**, and it is not an accident — it reflects the physical reality that the order of physical operations matters.',
       '**Predict before reading on.** You want to apply $A = \\begin{bmatrix}2&0\\\\0&3\\end{bmatrix}$ (scale $x$ by 2, $y$ by 3) and then $B = \\begin{bmatrix}1&1\\\\0&1\\end{bmatrix}$ (horizontal shear). What is the product $BA$? Without computing the full matrix, predict: where does $[1,0]^T$ end up after both transformations? Check your answer in Example 1.',
       '**How to compute the product.** The $(i,j)$ entry of $AB$ is the dot product of row $i$ of $A$ with column $j$ of $B$. Geometrically: you are asking where the $j$-th basis vector goes under $B$, and then where *that* resulting vector goes under $A$. That landing coordinate is row $i$ of the result.',
     ],
     callouts: [
       {
         type: 'sequencing',
-        title: 'Lesson 2 of 12 â€” Matrices & Transformations',
-        body: '**Previous (Lesson 1):** A matrix is a linear transformation â€” its columns are where $\\hat{i}$ and $\\hat{j}$ land.\n**This lesson:** Multiplying matrices = composing transformations. The product $BA$ applies $A$ first, then $B$.\n**Next (Lesson 3):** Determinants â€” how much does the transformation scale area?',
+        title: 'Lesson 2 of 12 — Matrices & Transformations',
+        body: '**Previous (Lesson 1):** A matrix is a linear transformation — its columns are where $\\hat{i}$ and $\\hat{j}$ land.\n**This lesson:** Multiplying matrices = composing transformations. The product $BA$ applies $A$ first, then $B$.\n**Next (Lesson 3):** Determinants — how much does the transformation scale area?',
       },
       {
         type: 'warning',
-        title: 'Read Right-to-Left â€” Always',
-        body: 'The expression $CBA\\mathbf{v}$ applies transformations chronologically as $A$ first, then $B$, then $C$. The matrix physically closest to the vector acts first. This trips up students consistently â€” write it on a sticky note until it\'s automatic:\n\n$$CBA\\mathbf{v} = C\\bigl(B\\bigl(A(\\mathbf{v})\\bigr)\\bigr)$$',
+        title: 'Read Right-to-Left — Always',
+        body: 'The expression $CBA\\mathbf{v}$ applies transformations chronologically as $A$ first, then $B$, then $C$. The matrix physically closest to the vector acts first. This trips up students consistently — write it on a sticky note until it\'s automatic:\n\n$$CBA\\mathbf{v} = C\\bigl(B\\bigl(A(\\mathbf{v})\\bigr)\\bigr)$$',
       },
       {
         type: 'strategy',
         title: 'When to Multiply Matrices',
-        body: '**Multiply matrices when** you need one matrix that does what two (or more) matrices would do in sequence â€” e.g., a CNC post-processor pre-computing a compound transformation, or a graphics pipeline combining rotation + scale + shear into one draw call.\n\n**Do NOT multiply** if you only need to transform a single vector â€” just apply each matrix in sequence: `B @ (A @ v)` is the same work as `(B @ A) @ v` for one vector, but pre-computing `B @ A` pays off when you need to transform thousands of vectors.\n\n**Dimension check first:** $(m \\times k)(k \\times n) = (m \\times n)$. If inner dimensions do not match, the product is undefined.',
+        body: '**Multiply matrices when** you need one matrix that does what two (or more) matrices would do in sequence — e.g., a CNC post-processor pre-computing a compound transformation, or a graphics pipeline combining rotation + scale + shear into one draw call.\n\n**Do NOT multiply** if you only need to transform a single vector — just apply each matrix in sequence: `B @ (A @ v)` is the same work as `(B @ A) @ v` for one vector, but pre-computing `B @ A` pays off when you need to transform thousands of vectors.\n\n**Dimension check first:** $(m \\times k)(k \\times n) = (m \\times n)$. If inner dimensions do not match, the product is undefined.',
       },
       {
         type: 'insight',
@@ -58,26 +58,26 @@ export default {
       {
         type: 'definition',
         title: 'Dimension Compatibility',
-        body: 'You can only multiply $A \\times B$ if the number of **columns** in $A$ equals the number of **rows** in $B$.\n\n$$(m \\times k)(k \\times n) = (m \\times n)$$\n\nThe inner dimension $k$ must match. The result has the outer dimensions. Violating this is one of the most common errors in scientific computing â€” NumPy will throw a shape mismatch error.',
+        body: 'You can only multiply $A \\times B$ if the number of **columns** in $A$ equals the number of **rows** in $B$.\n\n$$(m \\times k)(k \\times n) = (m \\times n)$$\n\nThe inner dimension $k$ must match. The result has the outer dimensions. Violating this is one of the most common errors in scientific computing — NumPy will throw a shape mismatch error.',
       },
     ],
     visualizations: [
       {
         id: 'LALesson05_MatrixMult',
-        title: 'Composing Two Warps â€” Interactive',
+        title: 'Composing Two Warps — Interactive',
         mathBridge: 'Two transformation buttons (Shear A, Rotate B) apply in sequence. Use the playback slider to watch the plane undergo shear first, then rotation. Notice that the final positions of $\\hat{i}$ and $\\hat{j}$ match the columns of the algebraically computed product $BA$. Also try applying them in reverse order ($AB$) to see non-commutativity.',
         caption: 'Applying A then B is the same as applying the single matrix BA. The product captures both transformations simultaneously.',
       },
       {
         id: 'LAMatrixAlgebraModule',
-        title: 'Matrix Algebra â€” Concept to Graphics Pipeline',
-        mathBridge: 'A five-tab module: Concept covers addition, multiplication, identity, inverse, and LU; Canonical walks through a 2Ã—3 Ã— 3Ã—2 product entry by entry, a 2Ã—2 inverse by row reduction, and an LU factorisation; Real World shows the 3D graphics pipeline and FEA usage; Interactive lets you enter any 2Ã—2 matrices A and B and instantly computes AB, BA, det(A), Aâ»Â¹, and Aâ»Â¹b, plus a live graphics canvas with rotation/scale/shear sliders; Practice has five hand-calculation problems.',
-        caption: 'The same math that renders every polygon in a 3D game â€” rotation, scale, and shear combined into a single matrix multiply.',
+        title: 'Matrix Algebra — Concept to Graphics Pipeline',
+        mathBridge: 'A five-tab module: Concept covers addition, multiplication, identity, inverse, and LU; Canonical walks through a 2×3 × 3×2 product entry by entry, a 2×2 inverse by row reduction, and an LU factorisation; Real World shows the 3D graphics pipeline and FEA usage; Interactive lets you enter any 2×2 matrices A and B and instantly computes AB, BA, det(A), Aâ»¹, and Aâ»¹b, plus a live graphics canvas with rotation/scale/shear sliders; Practice has five hand-calculation problems.',
+        caption: 'The same math that renders every polygon in a 3D game — rotation, scale, and shear combined into a single matrix multiply.',
       },
     ],
   },
 
-  // â”€â”€ Math â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Math ───────────────────────────────────────────────────────
   math: {
     prose: [
       'There is a mechanical algorithm for multiplying two matrices $A$ and $B$ by hand. Note that to multiply two matrices, their inner dimensions must match: an $(m \\times n)$ matrix times an $(n \\times p)$ matrix creates an $(m \\times p)$ matrix.',
@@ -102,16 +102,16 @@ export default {
       {
         id: 'OpenMatNotebook',
         title: 'OpenMAT: Matrix Multiplication as Composition',
-        mathBridge: 'In MATLAB, `A * B` is matrix multiplication (not element-wise â€” that would be `A .* B`). Composition: apply B first by writing `A * B` (right-to-left). Test commutativity directly.',
+        mathBridge: 'In MATLAB, `A * B` is matrix multiplication (not element-wise — that would be `A .* B`). Composition: apply B first by writing `A * B` (right-to-left). Test commutativity directly.',
         caption: 'Three cells: mechanics, non-commutativity proof, and CNC multi-step transformation chain.',
         initialProps: {
           initialCells: [
             {
               id: 1,
-              cellTitle: 'Matrix multiplication mechanics â€” dot product view',
+              cellTitle: 'Matrix multiplication mechanics — dot product view',
               prose: [
                 'In MATLAB, `A * B` is matrix multiplication. Each entry (i,j) of the result is the dot product of row i of A with column j of B.',
-                'CRITICAL: `A .* B` is element-wise multiplication â€” completely different! Always use `*` for matrix products.',
+                'CRITICAL: `A .* B` is element-wise multiplication — completely different! Always use `*` for matrix products.',
               ],
               code: `A = [1 2; 3 4];
 B = [5 6; 7 8];
@@ -121,7 +121,7 @@ disp('A * B ='); disp(AB)
 
 % Verify (1,1) entry manually: row 1 of A dot col 1 of B
 entry_11 = dot(A(1,:), B(:,1));
-fprintf('Entry (1,1) = row1(A) Â· col1(B) = %g\\n', entry_11)
+fprintf('Entry (1,1) = row1(A) · col1(B) = %g\\n', entry_11)
 
 % Column view: col j of AB = A * col j of B
 col1_of_AB = A * B(:,1);
@@ -129,12 +129,12 @@ fprintf('Col 1 of AB via column view: [%g; %g]\\n', col1_of_AB(1), col1_of_AB(2)
             },
             {
               id: 2,
-              cellTitle: 'Non-commutativity â€” order changes the result',
+              cellTitle: 'Non-commutativity — order changes the result',
               prose: [
                 '"Rotate then shear" is a physically different transformation than "shear then rotate." Verify this: compute both products and apply to the same vector.',
-                'The two results will differ â€” different final positions for the same starting point.',
+                'The two results will differ — different final positions for the same starting point.',
               ],
-              code: `% Rotation 90Â° CCW
+              code: `% Rotation 90° CCW
 R = [0 -1; 1 0];
 % Horizontal shear (shears along x-axis)
 S = [1 1; 0 1];
@@ -156,19 +156,19 @@ fprintf('AB == BA? %d  (0 = NO = non-commutative)\\n', isequal(rotate_then_shear
             },
             {
               id: 3,
-              cellTitle: 'Application: CNC post-processor â€” chaining transformation matrices',
+              cellTitle: 'Application: CNC post-processor — chaining transformation matrices',
               prose: [
-                'A 3-axis CNC program applies several coordinate transformations in sequence: work coordinate offset (G54), then coordinate rotation (G68), then cutting. The post-processor multiplies these matrices before outputting G-code â€” one product replaces three sequential operations.',
+                'A 3-axis CNC program applies several coordinate transformations in sequence: work coordinate offset (G54), then coordinate rotation (G68), then cutting. The post-processor multiplies these matrices before outputting G-code — one product replaces three sequential operations.',
                 'This is exactly why machining companies invest in expensive post-processor software. Getting the matrix multiplication wrong produces crashes and scrapped parts.',
               ],
               code: `% Simulate CNC post-processor matrix chain
-% Each step: a 2Ã—2 matrix acting on [X; Y] tool positions
+% Each step: a 2×2 matrix acting on [X; Y] tool positions
 
 % Step 1: G54 work coordinate system is offset by [100; 50] mm
 % But offsets are NOT linear maps (they translate the origin).
-% We handle them separately â€” here we focus on the rotation chain.
+% We handle them separately — here we focus on the rotation chain.
 
-% Step 2: G68 coordinate rotation â€” part clamped 7Â° off-axis
+% Step 2: G68 coordinate rotation — part clamped 7° off-axis
 theta = 7 * pi / 180;
 R_G68 = [cos(theta) -sin(theta); sin(theta) cos(theta)];
 
@@ -202,13 +202,13 @@ fprintf('\\nSame result via two steps? %d\\n', norm(step2 - path_out) < 1e-10)`,
       {
         id: 'PythonNotebook',
         title: 'Code: Matrix Multiplication as Composition',
-        mathBridge: 'A @ B computes the product. (A @ B) @ v = A @ (B @ v): apply B first, then A. Matrix multiplication is NOT commutative: A @ B â‰  B @ A in general.',
+        mathBridge: 'A @ B computes the product. (A @ B) @ v = A @ (B @ v): apply B first, then A. Matrix multiplication is NOT commutative: A @ B ≠ B @ A in general.',
         caption: 'Verify the composition property: chaining two transformations equals multiplying their matrices.',
         initialProps: {
           initialCells: [
             {
               id: 1,
-              cellTitle: 'Matrix multiplication â€” the mechanics',
+              cellTitle: 'Matrix multiplication — the mechanics',
               prose: [
                 '`A @ B` in NumPy computes the matrix product. Each entry (i,j) of the result is the dot product of row i of A with column j of B.',
                 'The result is a new matrix representing the composition of the two transformations.',
@@ -244,9 +244,9 @@ plt.show()`,
             },
             {
               id: 2,
-              cellTitle: 'Not commutative â€” order matters geometrically',
+              cellTitle: 'Not commutative — order matters geometrically',
               prose: [
-                'AB â‰  BA in general. "Rotate then shear" is a different transformation than "shear then rotate".',
+                'AB ≠ BA in general. "Rotate then shear" is a different transformation than "shear then rotate".',
                 'The order in which you compose transformations changes the final result.',
               ],
               code: `import numpy as np
@@ -291,7 +291,7 @@ plt.show()`,
               cellTitle: 'Composition: applying B then A',
               prose: [
                 '(A @ B) @ v = A @ (B @ v). Applying the product matrix to v gives the same result as applying B first, then A.',
-                'This is the associativity property â€” you can group however you like, but you cannot change the order.',
+                'This is the associativity property — you can group however you like, but you cannot change the order.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -329,12 +329,12 @@ plt.show()`,
               challengeNumber: 1,
               challengeTitle: 'Verify non-commutativity',
               difficulty: 'easy',
-              prompt: 'Let A be a 45Â° rotation matrix [[cos45, -sin45],[sin45, cos45]] and B be a reflection across the x-axis [[1,0],[0,-1]]. Compute AB and BA. Show they are different and describe geometrically what each composition does to the vector [1, 0].',
+              prompt: 'Let A be a 45° rotation matrix [[cos45, -sin45],[sin45, cos45]] and B be a reflection across the x-axis [[1,0],[0,-1]]. Compute AB and BA. Show they are different and describe geometrically what each composition does to the vector [1, 0].',
               code: `import numpy as np
 
 angle = np.radians(45)
 A = np.array([[np.cos(angle), -np.sin(angle)],
-              [np.sin(angle),  np.cos(angle)]])  # 45Â° rotation
+              [np.sin(angle),  np.cos(angle)]])  # 45° rotation
 B = np.array([[1., 0.], [0., -1.]])              # reflect x-axis
 
 # Compute AB and BA
@@ -349,13 +349,13 @@ v = np.array([1.0, 0.0])
     ],
   },
 
-  // â”€â”€ Rigor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Rigor ──────────────────────────────────────────────────────
   rigor: {
     prose: [
       '**Composition of linear maps.** Let $T_1: U \\to V$ and $T_2: V \\to W$ be linear maps with matrix representations $B$ and $A$ respectively (so $T_1(\\mathbf{x}) = B\\mathbf{x}$, $T_2(\\mathbf{y}) = A\\mathbf{y}$). The composition $T_2 \\circ T_1: U \\to W$ defined by $(T_2 \\circ T_1)(\\mathbf{x}) = T_2(T_1(\\mathbf{x})) = A(B\\mathbf{x})$ is itself a linear map. Its matrix is $AB$.',
       '**Why the formula is row-dot-column.** For any input $\\mathbf{x}$, $(AB)\\mathbf{x} = A(B\\mathbf{x})$. Writing out $B\\mathbf{x} = \\sum_k x_k \\mathbf{b}_k$ where $\\mathbf{b}_k$ are columns of $B$, then $A(B\\mathbf{x}) = \\sum_k x_k A\\mathbf{b}_k$. The $(i,j)$ entry of $AB$ is $(AB)_{ij} = (A(B\\mathbf{e}_j))_i = (A \\mathbf{b}_j)_i = \\sum_k A_{ik} B_{kj}$. This is the dot product of row $i$ of $A$ with column $j$ of $B$. The formula is derived, not defined.',
-      '**Associativity from function composition.** Function composition is always associative: $(h \\circ g) \\circ f = h \\circ (g \\circ f)$. Since matrix multiplication represents composition, matrix multiplication is also associative: $(AB)C = A(BC)$. This is not a coincidence â€” it is the algebraic shadow of associativity of function composition.',
-      '**Non-commutativity.** Function composition is not commutative in general. $f \\circ g \\neq g \\circ f$ even for linear functions. The classic counterexample: let $A$ rotate $90Â°$ CCW and $B$ reflect across the $x$-axis. Rotating then reflecting lands the point $(1,0)$ at $(0,-1)$. Reflecting then rotating lands it at $(0,1)$. Different results â€” non-commutative.',
+      '**Associativity from function composition.** Function composition is always associative: $(h \\circ g) \\circ f = h \\circ (g \\circ f)$. Since matrix multiplication represents composition, matrix multiplication is also associative: $(AB)C = A(BC)$. This is not a coincidence — it is the algebraic shadow of associativity of function composition.',
+      '**Non-commutativity.** Function composition is not commutative in general. $f \\circ g \\neq g \\circ f$ even for linear functions. The classic counterexample: let $A$ rotate $90°$ CCW and $B$ reflect across the $x$-axis. Rotating then reflecting lands the point $(1,0)$ at $(0,-1)$. Reflecting then rotating lands it at $(0,1)$. Different results — non-commutative.',
       '**When does $AB = BA$?** Scalar multiples of the identity ($cI$) commute with everything. Matrices $A$ and $B$ commute if they share the same eigenvectors (have the same eigenspaces). Powers of the same matrix commute: $A^m A^n = A^{m+n}$. Commutativity is the exception, not the rule.',
     ],
     callouts: [
@@ -378,9 +378,9 @@ v = np.array([1.0, 0.0])
     visualizations: [
       {
         id: 'LAMatrixAlgebraModule',
-        title: 'Matrix Algebra â€” Concept to Graphics Pipeline',
-        mathBridge: 'A five-tab module: Concept covers addition, multiplication, identity, inverse, and LU; Canonical walks through a 2Ã—3 Ã— 3Ã—2 product entry by entry, a 2Ã—2 inverse by row reduction, and an LU factorisation; Real World shows the 3D graphics pipeline and FEA usage; Interactive lets you enter any 2Ã—2 matrices A and B and instantly computes AB, BA, det(A), Aâ»Â¹, and Aâ»Â¹b, plus a live graphics canvas with rotation/scale/shear sliders; Practice has five hand-calculation problems.',
-        caption: 'The same math that renders every polygon in a 3D game â€” rotation, scale, and shear combined into a single matrix multiply.',
+        title: 'Matrix Algebra — Concept to Graphics Pipeline',
+        mathBridge: 'A five-tab module: Concept covers addition, multiplication, identity, inverse, and LU; Canonical walks through a 2×3 × 3×2 product entry by entry, a 2×2 inverse by row reduction, and an LU factorisation; Real World shows the 3D graphics pipeline and FEA usage; Interactive lets you enter any 2×2 matrices A and B and instantly computes AB, BA, det(A), Aâ»¹, and Aâ»¹b, plus a live graphics canvas with rotation/scale/shear sliders; Practice has five hand-calculation problems.',
+        caption: 'The same math that renders every polygon in a 3D game — rotation, scale, and shear combined into a single matrix multiply.',
       },
       {
         id: 'MatrixAlgebraViz',
@@ -394,12 +394,12 @@ v = np.array([1.0, 0.0])
   examples: [
     {
       id: 'la2-002-ex1',
-      title: 'Compute $AB$ â€” Row-Dot-Column Method',
+      title: 'Compute $AB$ — Row-Dot-Column Method',
       problem: `Let $A = \\begin{bmatrix} 1 & 2 \\\\ 3 & 4 \\end{bmatrix}$ and $B = \\begin{bmatrix} 5 & 6 \\\\ 7 & 8 \\end{bmatrix}$. Compute $AB$ and interpret which transformation acts first.`,
       steps: [
         {
           expression: 'AB = \\begin{bmatrix} 1 & 2 \\\\ 3 & 4 \\end{bmatrix} \\begin{bmatrix} 5 & 6 \\\\ 7 & 8 \\end{bmatrix}',
-          annotation: 'Set up $AB$. The product $AB$ means $B$ acts on a vector first, then $A$ acts on the result. Dimension check: $A$ is $2 \\times 2$, $B$ is $2 \\times 2$ â€” inner dimensions match (2 = 2), so the product is defined and $2 \\times 2$.',
+          annotation: 'Set up $AB$. The product $AB$ means $B$ acts on a vector first, then $A$ acts on the result. Dimension check: $A$ is $2 \\times 2$, $B$ is $2 \\times 2$ — inner dimensions match (2 = 2), so the product is defined and $2 \\times 2$.',
           strategyTitle: 'Step 1: Set up and dimension check',
         },
         {
@@ -416,7 +416,7 @@ v = np.array([1.0, 0.0])
         },
         {
           expression: 'AB = \\begin{bmatrix} 19 & 22 \\\\ 43 & 50 \\end{bmatrix}',
-          annotation: 'Assemble. This single matrix is equivalent to first applying transformation $B$, then transformation $A$. One matrix â€” two sequential operations captured in one object.',
+          annotation: 'Assemble. This single matrix is equivalent to first applying transformation $B$, then transformation $A$. One matrix — two sequential operations captured in one object.',
           strategyTitle: 'Step 4: Assemble result',
           hints: ['Verify column 1 = $A$ applied to column 1 of $B$: $A \\cdot [5,7]^T = [1 \\cdot 5 + 2 \\cdot 7, \\; 3 \\cdot 5 + 4 \\cdot 7]^T = [19, 43]^T$ âœ“'],
         },
@@ -424,13 +424,13 @@ v = np.array([1.0, 0.0])
     },
     {
       id: 'la2-002-ex2',
-      title: 'Non-Commutativity â€” Rotation Then Shear vs. Shear Then Rotation',
-      problem: `Let $R = \\begin{bmatrix} 0 & -1 \\\\ 1 & 0 \\end{bmatrix}$ (90Â° CCW rotation) and $S = \\begin{bmatrix} 1 & 1 \\\\ 0 & 1 \\end{bmatrix}$ (horizontal shear). Compute $SR$ (shear after rotation) and $RS$ (rotation after shear). Show they are different.`,
+      title: 'Non-Commutativity — Rotation Then Shear vs. Shear Then Rotation',
+      problem: `Let $R = \\begin{bmatrix} 0 & -1 \\\\ 1 & 0 \\end{bmatrix}$ (90° CCW rotation) and $S = \\begin{bmatrix} 1 & 1 \\\\ 0 & 1 \\end{bmatrix}$ (horizontal shear). Compute $SR$ (shear after rotation) and $RS$ (rotation after shear). Show they are different.`,
       steps: [
         {
           expression: 'SR = \\begin{bmatrix} 1 & 1 \\\\ 0 & 1 \\end{bmatrix}\\begin{bmatrix} 0 & -1 \\\\ 1 & 0 \\end{bmatrix}',
-          annotation: '$SR$ means $R$ (rotation) acts first, then $S$ (shear). To apply two transformations: first rotate the plane 90Â° CCW, then shear it horizontally.',
-          strategyTitle: 'Step 1: Set up SR â€” rotation first, shear second',
+          annotation: '$SR$ means $R$ (rotation) acts first, then $S$ (shear). To apply two transformations: first rotate the plane 90° CCW, then shear it horizontally.',
+          strategyTitle: 'Step 1: Set up SR — rotation first, shear second',
         },
         {
           expression: 'SR = \\begin{bmatrix} (1)(0)+(1)(1) & (1)(-1)+(1)(0) \\\\ (0)(0)+(1)(1) & (0)(-1)+(1)(0) \\end{bmatrix} = \\begin{bmatrix} 1 & -1 \\\\ 1 & 0 \\end{bmatrix}',
@@ -441,25 +441,25 @@ v = np.array([1.0, 0.0])
         {
           expression: 'RS = \\begin{bmatrix} 0 & -1 \\\\ 1 & 0 \\end{bmatrix}\\begin{bmatrix} 1 & 1 \\\\ 0 & 1 \\end{bmatrix} = \\begin{bmatrix} 0 & -1 \\\\ 1 & 1 \\end{bmatrix}',
           annotation: '$RS$ means $S$ (shear) acts first, then $R$ (rotation). Entry $(1,1)$: $0 \\cdot 1 + (-1) \\cdot 0 = 0$. Entry $(1,2)$: $0 \\cdot 1 + (-1) \\cdot 1 = -1$. Etc.',
-          strategyTitle: 'Step 3: Compute RS â€” shear first, rotation second',
+          strategyTitle: 'Step 3: Compute RS — shear first, rotation second',
         },
         {
           expression: 'SR = \\begin{bmatrix} 1 & -1 \\\\ 1 & 0 \\end{bmatrix} \\neq \\begin{bmatrix} 0 & -1 \\\\ 1 & 1 \\end{bmatrix} = RS',
-          annotation: 'The two products are different matrices â€” different transformations entirely. "Rotate the plane then shear it" leaves a different final configuration than "shear it then rotate." Order is not interchangeable.',
-          strategyTitle: 'Step 4: Compare â€” $SR \\neq RS$',
-          hints: ['Apply each to $\\hat{i} = [1,0]^T$: $SR \\cdot \\hat{i} = [1,1]^T$ (it moved to (1,1)). $RS \\cdot \\hat{i} = [0,1]^T$ (it moved to (0,1)). Different destinations â€” non-commutative.'],
+          annotation: 'The two products are different matrices — different transformations entirely. "Rotate the plane then shear it" leaves a different final configuration than "shear it then rotate." Order is not interchangeable.',
+          strategyTitle: 'Step 4: Compare — $SR \\neq RS$',
+          hints: ['Apply each to $\\hat{i} = [1,0]^T$: $SR \\cdot \\hat{i} = [1,1]^T$ (it moved to (1,1)). $RS \\cdot \\hat{i} = [0,1]^T$ (it moved to (0,1)). Different destinations — non-commutative.'],
         },
       ],
     },
     {
       id: 'la2-002-ex3',
-      title: 'Dimension Compatibility â€” Multiplying Non-Square Matrices',
+      title: 'Dimension Compatibility — Multiplying Non-Square Matrices',
       problem: `Can you compute $AB$? Let $A = \\begin{bmatrix} 1 & 0 & -1 \\\\ 2 & 1 & 3 \\end{bmatrix}$ ($2 \\times 3$) and $B = \\begin{bmatrix} 4 & 1 \\\\ -1 & 2 \\\\ 0 & 3 \\end{bmatrix}$ ($3 \\times 2$). If yes, compute it and state the output size.`,
       steps: [
         {
           expression: 'A \\text{ is } 2 \\times 3, \\quad B \\text{ is } 3 \\times 2 \\quad \\Rightarrow \\quad (2 \\times \\underbrace{3)(3}_\\text{match} \\times 2) = 2 \\times 2',
-          annotation: 'Dimension check: the inner dimensions are both 3 â€” they match. The product $AB$ is defined and will be $2 \\times 2$. (Rule: $(m \\times k)(k \\times n) = (m \\times n)$. Outer dimensions give the output size.)',
-          strategyTitle: 'Step 1: Dimension check â€” inner dimensions must match',
+          annotation: 'Dimension check: the inner dimensions are both 3 — they match. The product $AB$ is defined and will be $2 \\times 2$. (Rule: $(m \\times k)(k \\times n) = (m \\times n)$. Outer dimensions give the output size.)',
+          strategyTitle: 'Step 1: Dimension check — inner dimensions must match',
           hints: ['What about $BA$? $B$ is $3 \\times 2$ and $A$ is $2 \\times 3$: inner dimensions are both 2, so $BA$ is also defined and is $3 \\times 3$. $AB \\neq BA$ in size even!'],
         },
         {
@@ -482,7 +482,7 @@ v = np.array([1.0, 0.0])
     },
   ],
 
-  // â”€â”€ Challenges â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Challenges ─────────────────────────────────────────────────
   challenges: [
     {
       id: 'la2-002-ch1',
@@ -521,19 +521,19 @@ v = np.array([1.0, 0.0])
     {
       id: 'la2-002-ch3',
       difficulty: 'hard',
-      problem: 'Let $R = \\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$ (90Â° CCW) and $S = \\begin{bmatrix}1&1\\\\0&1\\end{bmatrix}$ (shear). (a) Compute $SR$ and $RS$. (b) Show $SR \\neq RS$ by applying each to $[1,0]^T$. (c) Interpret geometrically: which vector does $SR$ map $\\hat{i}$ to, and what does that tell you about the shear being applied to an already-rotated space?',
+      problem: 'Let $R = \\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$ (90° CCW) and $S = \\begin{bmatrix}1&1\\\\0&1\\end{bmatrix}$ (shear). (a) Compute $SR$ and $RS$. (b) Show $SR \\neq RS$ by applying each to $[1,0]^T$. (c) Interpret geometrically: which vector does $SR$ map $\\hat{i}$ to, and what does that tell you about the shear being applied to an already-rotated space?',
       hint: 'For (a): compute row-by-column for each product. For (b): substitute $[1,0]^T$ into each. For (c): the first column of $SR$ is where $\\hat{i}$ lands after rotation then shear.',
       walkthrough: [
         { expression: 'SR = \\begin{bmatrix}1&1\\\\0&1\\end{bmatrix}\\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix} = \\begin{bmatrix}0+1&-1+0\\\\0+1&0+0\\end{bmatrix} = \\begin{bmatrix}1&-1\\\\1&0\\end{bmatrix}', annotation: 'Entry (1,1): row 1 of $S$ = $[1,1]$ dot col 1 of $R$ = $[0,1]^T$ = 0+1=1. Entry (1,2): $[1,1]\\cdot[-1,0]^T = -1$. Row 2 similarly.' },
         { expression: 'RS = \\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}\\begin{bmatrix}1&1\\\\0&1\\end{bmatrix} = \\begin{bmatrix}0&-1\\\\1&1\\end{bmatrix}', annotation: 'Entry (1,1): $[0,-1]\\cdot[1,0]^T = 0$. Entry (1,2): $[0,-1]\\cdot[1,1]^T = -1$. Entry (2,1): $[1,0]\\cdot[1,0]^T = 1$. Entry (2,2): $[1,0]\\cdot[1,1]^T = 1$.' },
         { expression: 'SR\\begin{bmatrix}1\\\\0\\end{bmatrix} = \\begin{bmatrix}1\\\\1\\end{bmatrix}, \\quad RS\\begin{bmatrix}1\\\\0\\end{bmatrix} = \\begin{bmatrix}0\\\\1\\end{bmatrix}', annotation: '$\\hat{i}$ lands at different points under $SR$ vs $RS$. Non-commutativity confirmed: the two products are different transformations.' },
-        { expression: '\\text{Geometric: column 1 of } SR = [1,1]^T', annotation: '$\\hat{i}$ under $SR$ goes to $[1,1]^T$: rotation first takes $\\hat{i}$ to $[0,1]^T$ (pointing up), then shear slides it one unit right to $[1,1]^T$. The shear acts on the already-rotated space â€” the same shear gives a different result than if applied first.' },
+        { expression: '\\text{Geometric: column 1 of } SR = [1,1]^T', annotation: '$\\hat{i}$ under $SR$ goes to $[1,1]^T$: rotation first takes $\\hat{i}$ to $[0,1]^T$ (pointing up), then shear slides it one unit right to $[1,1]^T$. The shear acts on the already-rotated space — the same shear gives a different result than if applied first.' },
       ],
       answer: '$SR = \\begin{bmatrix}1&-1\\\\1&0\\end{bmatrix}$, $RS = \\begin{bmatrix}0&-1\\\\1&1\\end{bmatrix}$, $SR \\neq RS$. The geometric difference: $SR$ shears the rotated grid; $RS$ rotates the sheared grid.',
     },
   ],
 
-  // â”€â”€ Semantic Layer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Semantic Layer ───────────────────────────────────────────────
   semantics: {
     core: [
       {
@@ -552,7 +552,7 @@ v = np.array([1.0, 0.0])
     ]
   },
 
-  // â”€â”€ Spiral Learning â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Spiral Learning ──────────────────────────────────────────────
   spiral: {
     recoveryPoints: [
       {
@@ -570,7 +570,7 @@ v = np.array([1.0, 0.0])
     ]
   },
 
-  // â”€â”€ Assessment â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Assessment ───────────────────────────────────────────────────
   assessment: {
     questions: [
       {
@@ -583,23 +583,23 @@ v = np.array([1.0, 0.0])
     ],
   },
 
-  // â”€â”€ Mental Model â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Mental Model ─────────────────────────────────────────────────
   mentalModel: [
     "Matrices are verbs. Matrix multiplication is chaining verbs together.",
     "Read right to left.",
     "Non-commutative: Putting on socks then shoes is NOT putting on shoes then socks."
   ],
 
-  // â”€â”€ Checkpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Checkpoints ──────────────────────────────────────────────────
   checkpoints: [
     { id: 'cp-la2-002-1', label: 'Read: Explain why matrix multiplication is read right-to-left', type: 'read' },
-    { id: 'cp-la2-002-2', label: 'Read: State the dimension rule â€” when is AB defined and what size is the result?', type: 'read' },
+    { id: 'cp-la2-002-2', label: 'Read: State the dimension rule — when is AB defined and what size is the result?', type: 'read' },
     { id: 'cp-la2-002-3', label: 'Read: Explain why matrix multiplication is non-commutative with a geometric example', type: 'read' },
-    { id: 'cp-la2-002-4', label: 'Run: OpenMAT cell 2 â€” verify rotate-then-shear â‰  shear-then-rotate numerically', type: 'lab' },
-    { id: 'cp-la2-002-5', label: 'Run: Python cell 1 â€” compute a matrix product and verify the (0,0) entry by hand', type: 'lab' },
-    { id: 'cp-la2-002-6', label: 'Complete: Example 1 â€” trace each entry via row-dot-column', type: 'example' },
-    { id: 'cp-la2-002-7', label: 'Complete: Example 2 â€” prove non-commutativity by computing both SR and RS', type: 'example' },
-    { id: 'cp-la2-002-8', label: 'Attempt: Challenge 3 â€” compute SR and RS, explain the geometric difference', type: 'challenge' },
+    { id: 'cp-la2-002-4', label: 'Run: OpenMAT cell 2 — verify rotate-then-shear ≠ shear-then-rotate numerically', type: 'lab' },
+    { id: 'cp-la2-002-5', label: 'Run: Python cell 1 — compute a matrix product and verify the (0,0) entry by hand', type: 'lab' },
+    { id: 'cp-la2-002-6', label: 'Complete: Example 1 — trace each entry via row-dot-column', type: 'example' },
+    { id: 'cp-la2-002-7', label: 'Complete: Example 2 — prove non-commutativity by computing both SR and RS', type: 'example' },
+    { id: 'cp-la2-002-8', label: 'Attempt: Challenge 3 — compute SR and RS, explain the geometric difference', type: 'challenge' },
   ],
 
   quiz: [
@@ -608,42 +608,42 @@ v = np.array([1.0, 0.0])
       type: 'choice',
       text: 'Geometrically, what does it mean that matrix multiplication is non-commutative ($AB \\neq BA$)?',
       options: [
-        'The order matters â€” "rotate then shear" leaves the plane in a different final shape than "shear then rotate"',
+        'The order matters — "rotate then shear" leaves the plane in a different final shape than "shear then rotate"',
         'The area of transformed space scales unpredictably depending on order',
         'It is impossible to multiply rectangular matrices in reverse order',
         'The origin moves to different places depending on order',
       ],
-      answer: 'The order matters â€” "rotate then shear" leaves the plane in a different final shape than "shear then rotate"',
+      answer: 'The order matters — "rotate then shear" leaves the plane in a different final shape than "shear then rotate"',
       hints: ['Matrices represent transformations. Applying warps in a different order warp an already-warped space. The final configuration depends on which warp went first.'],
-      reviewSection: 'Example 2 â€” non-commutativity',
+      reviewSection: 'Example 2 — non-commutativity',
     },
     {
       id: 'la2-002-quiz-2',
       type: 'choice',
       text: 'In the expression $ABC\\mathbf{v}$, which transformation acts on $\\mathbf{v}$ first?',
       options: [
-        '$C$ acts first â€” the matrix closest to the vector acts first (right-to-left)',
-        '$A$ acts first â€” read left to right like text',
-        '$B$ acts first â€” it is in the middle',
+        '$C$ acts first — the matrix closest to the vector acts first (right-to-left)',
+        '$A$ acts first — read left to right like text',
+        '$B$ acts first — it is in the middle',
         'All three act simultaneously',
       ],
-      answer: '$C$ acts first â€” the matrix closest to the vector acts first (right-to-left)',
+      answer: '$C$ acts first — the matrix closest to the vector acts first (right-to-left)',
       hints: ['$ABC\\mathbf{v} = A(B(C(\\mathbf{v})))$: functions evaluate inside-out. $C$ first, then $B$ on the result, then $A$.'],
-      reviewSection: 'Intuition tab â€” why right-to-left',
+      reviewSection: 'Intuition tab — why right-to-left',
     },
     {
       id: 'la2-002-quiz-3',
       type: 'choice',
       text: 'Can you multiply a $3 \\times 4$ matrix by a $4 \\times 2$ matrix? If yes, what size is the result?',
       options: [
-        'Yes â€” the result is $3 \\times 2$',
-        'No â€” the matrices must be square to multiply',
-        'Yes â€” the result is $4 \\times 4$',
-        'No â€” the number of rows must match',
+        'Yes — the result is $3 \\times 2$',
+        'No — the matrices must be square to multiply',
+        'Yes — the result is $4 \\times 4$',
+        'No — the number of rows must match',
       ],
-      answer: 'Yes â€” the result is $3 \\times 2$',
+      answer: 'Yes — the result is $3 \\times 2$',
       hints: ['Rule: $(m \\times k)(k \\times n) = (m \\times n)$. Inner dimensions $k=4$ must match; they do. Result has outer dimensions $3 \\times 2$.'],
-      reviewSection: 'Example 3 â€” dimension compatibility',
+      reviewSection: 'Example 3 — dimension compatibility',
     },
     {
       id: 'la2-002-quiz-4',
@@ -651,8 +651,8 @@ v = np.array([1.0, 0.0])
       text: 'You want to apply transformation $R$ first, then transformation $S$. Which product do you compute?',
       options: ['$SR$', '$RS$', '$R + S$', '$R^T S$'],
       answer: '$SR$',
-      hints: ['$SR\\mathbf{v} = S(R(\\mathbf{v}))$: $R$ acts first (closest to $\\mathbf{v}$), then $S$. Writing $RS$ would apply $S$ first â€” the wrong order.'],
-      reviewSection: 'Intuition tab â€” why right-to-left',
+      hints: ['$SR\\mathbf{v} = S(R(\\mathbf{v}))$: $R$ acts first (closest to $\\mathbf{v}$), then $S$. Writing $RS$ would apply $S$ first — the wrong order.'],
+      reviewSection: 'Intuition tab — why right-to-left',
     },
     {
       id: 'la2-002-quiz-5',
@@ -660,22 +660,22 @@ v = np.array([1.0, 0.0])
       text: 'Compute the top-left entry of $\\begin{bmatrix}2&3\\\\1&0\\end{bmatrix}\\begin{bmatrix}1&4\\\\2&-1\\end{bmatrix}$.',
       options: ['$8$', '$5$', '$2$', '$6$'],
       answer: '$8$',
-      hints: ['Entry $(1,1)$ = row 1 Â· col 1 = $[2,3] \\cdot [1,2]^T = 2 + 6 = 8$.'],
-      reviewSection: 'Example 1 â€” row-dot-column computation',
+      hints: ['Entry $(1,1)$ = row 1 · col 1 = $[2,3] \\cdot [1,2]^T = 2 + 6 = 8$.'],
+      reviewSection: 'Example 1 — row-dot-column computation',
     },
     {
       id: 'la2-002-quiz-6',
       type: 'choice',
       text: 'What property does matrix multiplication share with function composition that addition does NOT have?',
       options: [
-        'Non-commutativity â€” $AB \\neq BA$ just as $f \\circ g \\neq g \\circ f$ in general',
-        'Distributivity â€” $A(B+C) = AB + AC$',
-        'Associativity â€” $(AB)C = A(BC)$',
-        'Closure â€” the product of two $n \\times n$ matrices is always $n \\times n$',
+        'Non-commutativity — $AB \\neq BA$ just as $f \\circ g \\neq g \\circ f$ in general',
+        'Distributivity — $A(B+C) = AB + AC$',
+        'Associativity — $(AB)C = A(BC)$',
+        'Closure — the product of two $n \\times n$ matrices is always $n \\times n$',
       ],
-      answer: 'Non-commutativity â€” $AB \\neq BA$ just as $f \\circ g \\neq g \\circ f$ in general',
-      hints: ['Function composition is not commutative (socks then shoes â‰  shoes then socks), and neither is matrix multiplication. Addition IS commutative: $A + B = B + A$.'],
-      reviewSection: 'Intuition tab â€” non-commutativity',
+      answer: 'Non-commutativity — $AB \\neq BA$ just as $f \\circ g \\neq g \\circ f$ in general',
+      hints: ['Function composition is not commutative (socks then shoes ≠ shoes then socks), and neither is matrix multiplication. Addition IS commutative: $A + B = B + A$.'],
+      reviewSection: 'Intuition tab — non-commutativity',
     },
     {
       id: 'la2-002-quiz-7',
@@ -683,8 +683,8 @@ v = np.array([1.0, 0.0])
       text: 'The identity matrix $I$ satisfies $IA = AI = A$ for any compatible $A$. This makes $I$ the matrix equivalent of which number in regular arithmetic?',
       options: ['$1$ (the multiplicative identity)', '$0$ (the additive identity)', '$-1$ (the additive inverse)', '$\\infty$'],
       answer: '$1$ (the multiplicative identity)',
-      hints: ['Just as $1 \\times x = x$, $IA = A$. The identity matrix is the transformation that does nothing â€” every vector stays exactly where it is.'],
-      reviewSection: 'Challenge 2 â€” the identity matrix',
+      hints: ['Just as $1 \\times x = x$, $IA = A$. The identity matrix is the transformation that does nothing — every vector stays exactly where it is.'],
+      reviewSection: 'Challenge 2 — the identity matrix',
     },
     {
       id: 'la2-002-quiz-8',
@@ -693,49 +693,49 @@ v = np.array([1.0, 0.0])
       options: ['$4 \\times 5$', '$3 \\times 3$', '$4 \\times 3$', '$5 \\times 4$'],
       answer: '$4 \\times 5$',
       hints: ['$(4 \\times 3)(3 \\times 5) = (4 \\times 5)$. Inner dimensions are both 3 (they match). Outer dimensions 4 and 5 give the result size.'],
-      reviewSection: 'Example 3 â€” dimension compatibility',
+      reviewSection: 'Example 3 — dimension compatibility',
     },
     {
       id: 'la2-002-quiz-9',
       type: 'choice',
       text: 'Is $(AB)C = A(BC)$ always true for matrices?',
       options: [
-        'Yes â€” matrix multiplication is associative',
-        'No â€” like commutativity, associativity also fails for matrices',
+        'Yes — matrix multiplication is associative',
+        'No — like commutativity, associativity also fails for matrices',
         'Only if all three matrices are square',
         'Only if $AB = BA$',
       ],
-      answer: 'Yes â€” matrix multiplication is associative',
-      hints: ['Matrix multiplication is NOT commutative but IS associative. $(AB)C = A(BC)$ always holds. You can group matrix products however you like â€” just maintain the left-to-right order.'],
-      reviewSection: 'Math tab â€” Associativity vs Commutativity',
+      answer: 'Yes — matrix multiplication is associative',
+      hints: ['Matrix multiplication is NOT commutative but IS associative. $(AB)C = A(BC)$ always holds. You can group matrix products however you like — just maintain the left-to-right order.'],
+      reviewSection: 'Math tab — Associativity vs Commutativity',
     },
     {
       id: 'la2-002-quiz-10',
       type: 'choice',
       text: 'A Pixar animator chains three transformations: shoulder rotation $A$, elbow rotation $B$, wrist rotation $C$. Applied in that order to a vertex $\\mathbf{v}$, the expression is $CBA\\mathbf{v}$. If the animator pre-multiplies to get one matrix $M = CBA$, how many matrix-vector multiplications are needed per vertex?',
       options: [
-        '1 â€” one multiplication of $M$ times $\\mathbf{v}$',
-        '3 â€” one multiplication per transformation',
-        '6 â€” each matrix has 4 entries, divided by 2',
+        '1 — one multiplication of $M$ times $\\mathbf{v}$',
+        '3 — one multiplication per transformation',
+        '6 — each matrix has 4 entries, divided by 2',
         'It depends on the number of vertices',
       ],
-      answer: '1 â€” one multiplication of $M$ times $\\mathbf{v}$',
+      answer: '1 — one multiplication of $M$ times $\\mathbf{v}$',
       hints: ['Pre-computing $M = CBA$ costs one matrix-matrix multiplication (done once). Then each vertex only needs one matrix-vector product $M\\mathbf{v}$. At millions of polygons per frame, this is the key performance optimization.'],
-      reviewSection: 'Intuition tab â€” The Pixar connection',
+      reviewSection: 'Intuition tab — The Pixar connection',
     },
   ],
 
   misconceptions: [
     {
-      falseBelief: 'Matrix multiplication is commutative â€” $AB = BA$ always.',
+      falseBelief: 'Matrix multiplication is commutative — $AB = BA$ always.',
       whyStudentsThinkIt: 'Number multiplication is commutative ($3 \\times 5 = 5 \\times 3$). Students assume matrices follow the same rule.',
-      correctionExample: 'Let $A = \\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$ (rotate 90Â°) and $B = \\begin{bmatrix}1&1\\\\0&1\\end{bmatrix}$ (shear). Then $AB = \\begin{bmatrix}0&-1\\\\1&1\\end{bmatrix}$ but $BA = \\begin{bmatrix}1&0\\\\1&0\\end{bmatrix}$ â€” different matrices entirely.',
+      correctionExample: 'Let $A = \\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$ (rotate 90°) and $B = \\begin{bmatrix}1&1\\\\0&1\\end{bmatrix}$ (shear). Then $AB = \\begin{bmatrix}0&-1\\\\1&1\\end{bmatrix}$ but $BA = \\begin{bmatrix}1&0\\\\1&0\\end{bmatrix}$ — different matrices entirely.',
       contrastCase: 'Addition IS commutative: $A + B = B + A$. And multiplication by a scalar is commutative: $2A = A \\cdot 2$. It is specifically matrix-matrix multiplication that breaks commutativity.',
     },
     {
       falseBelief: 'In $AB\\mathbf{v}$, $A$ acts on $\\mathbf{v}$ first because $A$ is written first (left to right).',
       whyStudentsThinkIt: 'English reads left-to-right. Students naturally read $AB\\mathbf{v}$ as "first $A$, then $B$."',
-      correctionExample: '$AB\\mathbf{v} = A(B\\mathbf{v})$: first compute $B\\mathbf{v}$, then apply $A$ to the result. The matrix physically closest to $\\mathbf{v}$ (here $B$) acts first. Think of nested function calls: `A(B(v))` â€” the innermost function executes first.',
+      correctionExample: '$AB\\mathbf{v} = A(B\\mathbf{v})$: first compute $B\\mathbf{v}$, then apply $A$ to the result. The matrix physically closest to $\\mathbf{v}$ (here $B$) acts first. Think of nested function calls: `A(B(v))` — the innermost function executes first.',
       contrastCase: 'Code analogy: `result = A.transform(B.transform(v))`. The innermost call `B.transform(v)` runs first. The outer call runs on the result.',
     },
   ],
@@ -744,27 +744,27 @@ v = np.array([1.0, 0.0])
     {
       situation: 'A robotics arm has three joints. Each joint applies a rotation matrix $R_1$, $R_2$, $R_3$ to transform from the base frame to the end-effector frame. The controller must compute the end-effector position for 1000 different joint angle configurations per second. How does it minimize computation?',
       competingTechniques: ['Apply three matrix-vector products per configuration', 'Pre-multiply the three matrices into one, then apply once per configuration'],
-      whyThisTechniqueWins: 'Pre-compute $M = R_3 R_2 R_1$ once per joint configuration update. Then apply $M \\mathbf{v}$ to each point. Three matrix-vector products per point â†’ one. For complex models with thousands of points, this is a 3Ã— speedup at the cost of one matrix-matrix multiplication.',
+      whyThisTechniqueWins: 'Pre-compute $M = R_3 R_2 R_1$ once per joint configuration update. Then apply $M \\mathbf{v}$ to each point. Three matrix-vector products per point → one. For complex models with thousands of points, this is a 3× speedup at the cost of one matrix-matrix multiplication.',
     },
     {
-      situation: 'A student claims: "To undo a rotation by 90Â° followed by a shear, I just undo the shear and then undo the rotation â€” in any order." Is this correct?',
+      situation: 'A student claims: "To undo a rotation by 90° followed by a shear, I just undo the shear and then undo the rotation — in any order." Is this correct?',
       competingTechniques: ['Undo in the same order (undo rotation first, then undo shear)', 'Undo in reverse order (undo shear first, then undo rotation)'],
-      whyThisTechniqueWins: 'To undo $SR\\mathbf{v}$, you reverse: first undo $S$ (apply $S^{-1}$), then undo $R$ (apply $R^{-1}$). The inverse of $SR$ is $R^{-1} S^{-1}$ â€” reversed order. Undoing in the same order would be $(SR)^{-1} \\neq S^{-1} R^{-1}$.',
+      whyThisTechniqueWins: 'To undo $SR\\mathbf{v}$, you reverse: first undo $S$ (apply $S^{-1}$), then undo $R$ (apply $R^{-1}$). The inverse of $SR$ is $R^{-1} S^{-1}$ — reversed order. Undoing in the same order would be $(SR)^{-1} \\neq S^{-1} R^{-1}$.',
     },
   ],
 
   debugging: [
     {
       commonError: 'Multiplying matrices in the wrong order when composing transformations.',
-      symptom: 'Student writes $AB$ when they want to "apply $A$ first, then $B$" â€” getting the transformation backwards.',
+      symptom: 'Student writes $AB$ when they want to "apply $A$ first, then $B$" — getting the transformation backwards.',
       whyItHappened: 'The natural reading order suggests $A$ goes first. But the right-to-left convention means $B$ must be closest to the vector.',
       repairStrategy: 'Draw an arrow: transformation $1 \\to$ transformation $2 \\to$ vector. Write them right-to-left. To apply $A$ first then $B$: write $BA\\mathbf{v}$. Always verify by testing a specific vector: $BA[1,0]^T$ should give the same result as first computing $A[1,0]^T$, then applying $B$ to the result.',
     },
     {
       commonError: 'Forgetting to check dimension compatibility before multiplying.',
-      symptom: 'Student writes $AB$ where $A$ is $2 \\times 3$ and $B$ is $2 \\times 2$ â€” inner dimensions mismatch (3 â‰  2), so $AB$ is undefined.',
+      symptom: 'Student writes $AB$ where $A$ is $2 \\times 3$ and $B$ is $2 \\times 2$ — inner dimensions mismatch (3 ≠ 2), so $AB$ is undefined.',
       whyItHappened: 'Students focus on whether both matrices have numbers and forget the inner-dimension rule.',
-      repairStrategy: 'Write the sizes explicitly: $(m \\times k)(k \\times n)$. The middle two numbers must match. Circle them. If $A$ is $2 \\times 3$ and $B$ is $2 \\times 2$: $(2 \\times \\underline{3})(\\underline{2} \\times 2)$ â€” 3 â‰  2, undefined. Try $B^T$ (size $2 \\times 2$) â€” no, still wrong. You need $B$ to have 3 rows.',
+      repairStrategy: 'Write the sizes explicitly: $(m \\times k)(k \\times n)$. The middle two numbers must match. Circle them. If $A$ is $2 \\times 3$ and $B$ is $2 \\times 2$: $(2 \\times \\underline{3})(\\underline{2} \\times 2)$ — 3 ≠ 2, undefined. Try $B^T$ (size $2 \\times 2$) — no, still wrong. You need $B$ to have 3 rows.',
     },
   ],
 

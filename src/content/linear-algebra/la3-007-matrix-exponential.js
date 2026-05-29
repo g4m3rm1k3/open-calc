@@ -1,11 +1,11 @@
-﻿export default {
+export default {
   id: "la3-007",
   slug: "matrix-exponential",
   chapter: "la3",
   order: 7,
   title: "The Matrix Exponential and Systems of ODEs",
   subtitle:
-    "Define $e^A$ as a matrix power series. It solves every constant-coefficient linear differential equation $\\dot{\\mathbf{x}} = A\\mathbf{x}$ â€” giving the complete trajectory of the system in one formula.",
+    "Define $e^A$ as a matrix power series. It solves every constant-coefficient linear differential equation $\\dot{\\mathbf{x}} = A\\mathbf{x}$ — giving the complete trajectory of the system in one formula.",
   tags: [
     "matrix exponential",
     "e^A",
@@ -23,35 +23,35 @@
     question:
       "The scalar equation $\\dot{x} = ax$ has solution $x(t) = e^{at} x(0)$. What is the solution to the system $\\dot{\\mathbf{x}} = A\\mathbf{x}$ where $A$ is a matrix?",
     realWorldContext:
-      "Every constant-coefficient linear ODE system â€” mechanical vibrations, electrical circuits, population dynamics, heat flow â€” has the solution $\\mathbf{x}(t) = e^{At}\\mathbf{x}(0)$, where $e^{At}$ is the matrix exponential. In quantum mechanics, the time-evolution operator $e^{-iHt/\\hbar}$ (where $H$ is the Hamiltonian matrix) governs all dynamics. In robotics, matrix exponentials compute the position of a robot arm as it sweeps through a rotation. In control theory, $e^{At}$ is the state transition matrix. Understanding this formula unifies ODEs and linear algebra into a single framework.",
+      "Every constant-coefficient linear ODE system — mechanical vibrations, electrical circuits, population dynamics, heat flow — has the solution $\\mathbf{x}(t) = e^{At}\\mathbf{x}(0)$, where $e^{At}$ is the matrix exponential. In quantum mechanics, the time-evolution operator $e^{-iHt/\\hbar}$ (where $H$ is the Hamiltonian matrix) governs all dynamics. In robotics, matrix exponentials compute the position of a robot arm as it sweeps through a rotation. In control theory, $e^{At}$ is the state transition matrix. Understanding this formula unifies ODEs and linear algebra into a single framework.",
   },
 
   intuition: {
     prose: [
-      "**You already know the scalar case.** If $\\dot{x} = ax$, the unique solution satisfying $x(0) = x_0$ is $x(t) = e^{at}x_0$. When $a < 0$ the solution decays; when $a > 0$ it blows up. Now suppose you have a system: $\\dot{x}_1 = -2x_1$, $\\dot{x}_2 = -3x_2$. In matrix form, $\\dot{\\mathbf{x}} = A\\mathbf{x}$ with $A = \\begin{bmatrix}-2&0\\\\0&-3\\end{bmatrix}$. By analogy, the solution should be $\\mathbf{x}(t) = e^{At}\\mathbf{x}_0$ â€” and it is. The object $e^{At}$ is the **matrix exponential**, defined by the same power series as its scalar cousin: $e^{At} = I + At + \\frac{(At)^2}{2!} + \\frac{(At)^3}{3!} + \\cdots$",
-      "**Verify it works on the diagonal case.** For $A = \\begin{bmatrix}-2&0\\\\0&-3\\end{bmatrix}$, each power $A^k = \\begin{bmatrix}(-2)^k&0\\\\0&(-3)^k\\end{bmatrix}$, so the power series sums to $e^{At} = \\begin{bmatrix}e^{-2t}&0\\\\0&e^{-3t}\\end{bmatrix}$. With $\\mathbf{x}_0 = [1,1]^\\top$, the solution at $t=1$ is $\\mathbf{x}(1) = [e^{-2}, e^{-3}]^\\top \\approx [0.135, 0.050]^\\top$. Both components decay because both eigenvalues are negative. Change $-2$ to $+2$ and $x_1$ explodes â€” the sign of the eigenvalue controls stability directly.",
-      "**Why it solves the ODE.** Differentiate $\\mathbf{x}(t) = e^{At}\\mathbf{x}_0$ term by term: $\\frac{d}{dt}(I + At + \\frac{A^2t^2}{2} + \\cdots) = A + A^2 t + \\cdots = A(I + At + \\cdots) = Ae^{At}$. So $\\dot{\\mathbf{x}} = Ae^{At}\\mathbf{x}_0 = A\\mathbf{x}(t)$ âœ“. And $\\mathbf{x}(0) = e^0 \\mathbf{x}_0 = I\\mathbf{x}_0 = \\mathbf{x}_0$ âœ“. No numerical integration needed â€” the entire solution from $t = 0$ to $\\infty$ is captured in one matrix formula.",
+      "**You already know the scalar case.** If $\\dot{x} = ax$, the unique solution satisfying $x(0) = x_0$ is $x(t) = e^{at}x_0$. When $a < 0$ the solution decays; when $a > 0$ it blows up. Now suppose you have a system: $\\dot{x}_1 = -2x_1$, $\\dot{x}_2 = -3x_2$. In matrix form, $\\dot{\\mathbf{x}} = A\\mathbf{x}$ with $A = \\begin{bmatrix}-2&0\\\\0&-3\\end{bmatrix}$. By analogy, the solution should be $\\mathbf{x}(t) = e^{At}\\mathbf{x}_0$ — and it is. The object $e^{At}$ is the **matrix exponential**, defined by the same power series as its scalar cousin: $e^{At} = I + At + \\frac{(At)^2}{2!} + \\frac{(At)^3}{3!} + \\cdots$",
+      "**Verify it works on the diagonal case.** For $A = \\begin{bmatrix}-2&0\\\\0&-3\\end{bmatrix}$, each power $A^k = \\begin{bmatrix}(-2)^k&0\\\\0&(-3)^k\\end{bmatrix}$, so the power series sums to $e^{At} = \\begin{bmatrix}e^{-2t}&0\\\\0&e^{-3t}\\end{bmatrix}$. With $\\mathbf{x}_0 = [1,1]^\\top$, the solution at $t=1$ is $\\mathbf{x}(1) = [e^{-2}, e^{-3}]^\\top \\approx [0.135, 0.050]^\\top$. Both components decay because both eigenvalues are negative. Change $-2$ to $+2$ and $x_1$ explodes — the sign of the eigenvalue controls stability directly.",
+      "**Why it solves the ODE.** Differentiate $\\mathbf{x}(t) = e^{At}\\mathbf{x}_0$ term by term: $\\frac{d}{dt}(I + At + \\frac{A^2t^2}{2} + \\cdots) = A + A^2 t + \\cdots = A(I + At + \\cdots) = Ae^{At}$. So $\\dot{\\mathbf{x}} = Ae^{At}\\mathbf{x}_0 = A\\mathbf{x}(t)$ âœ“. And $\\mathbf{x}(0) = e^0 \\mathbf{x}_0 = I\\mathbf{x}_0 = \\mathbf{x}_0$ âœ“. No numerical integration needed — the entire solution from $t = 0$ to $\\infty$ is captured in one matrix formula.",
       "**Computing $e^{At}$ for non-diagonal matrices via diagonalization.** If $A = PDP^{-1}$ where $D = \\text{diag}(\\lambda_1, \\ldots, \\lambda_n)$, then $(A)^k = PD^kP^{-1}$, so the power series sums to $e^{At} = Pe^{Dt}P^{-1}$ where $e^{Dt} = \\text{diag}(e^{\\lambda_1 t}, \\ldots, e^{\\lambda_n t})$. This reduces the computation to: (1) find eigenvalues and eigenvectors, (2) form $P$ and $D$, (3) exponentiate the diagonal, (4) transform back. For non-diagonalizable matrices, use the Jordan form from the previous lesson.",
       "**Predict before reading on.** For $A = \\begin{bmatrix}0&-\\omega\\\\\\omega&0\\end{bmatrix}$ with eigenvalues $\\pm i\\omega$, the exponential $e^{At}$ must involve $e^{\\pm i\\omega t}$. Use Euler's formula $e^{i\\theta} = \\cos\\theta + i\\sin\\theta$ to predict the form of $e^{At}$. Should solutions grow, decay, or oscillate? Write your prediction before continuing.",
       "**The eigenvalue tells you everything about long-time behavior.** Real $\\lambda < 0$: exponential decay. Real $\\lambda > 0$: exponential growth. Purely imaginary $\\pm i\\omega$: perpetual oscillation at frequency $\\omega/(2\\pi)$. Complex $a \\pm bi$ with $a < 0$: decaying spiral (stable oscillation). Complex $a \\pm bi$ with $a > 0$: growing spiral (unstable). The system $\\dot{\\mathbf{x}} = A\\mathbf{x}$ is globally stable if and only if ALL eigenvalues of $A$ have negative real part.",
-      "**CNC servo drives â€” why eigenvalues matter in manufacturing.** A CNC axis servo is modeled by $\\dot{\\mathbf{x}} = A\\mathbf{x} + B u$ where $\\mathbf{x} = [\\text{position}, \\text{velocity}]^\\top$. With no input ($u = 0$), the axis coasts according to $\\mathbf{x}(t) = e^{At}\\mathbf{x}_0$. Complex eigenvalues $a \\pm bi$ mean the axis rings (oscillates) at frequency $b/(2\\pi)$ Hz as it settles. In machining, this ringing is the source of chatter marks on the workpiece surface â€” a distinctive corrugated pattern. Servo tuning shifts eigenvalues deep into the left half-plane to kill the ringing. Machine tool designers use the eigenvalues of the servo loop matrix as a direct design criterion.",
-      "**Where this is heading.** The matrix exponential closes the loop on eigenvalues: we found eigenvalues (la3-001), diagonalized with them (la3-002), handled complex cases (la3-003), and now use them to propagate dynamical systems through time. Chapter 4 shifts focus from dynamics to geometry â€” orthogonal projections, least squares, and the SVD. The eigenvalues of $A^\\top A$ are the squared singular values of $A$, connecting the eigenvalue theory of this chapter to the geometric theory of the next.",
+      "**CNC servo drives — why eigenvalues matter in manufacturing.** A CNC axis servo is modeled by $\\dot{\\mathbf{x}} = A\\mathbf{x} + B u$ where $\\mathbf{x} = [\\text{position}, \\text{velocity}]^\\top$. With no input ($u = 0$), the axis coasts according to $\\mathbf{x}(t) = e^{At}\\mathbf{x}_0$. Complex eigenvalues $a \\pm bi$ mean the axis rings (oscillates) at frequency $b/(2\\pi)$ Hz as it settles. In machining, this ringing is the source of chatter marks on the workpiece surface — a distinctive corrugated pattern. Servo tuning shifts eigenvalues deep into the left half-plane to kill the ringing. Machine tool designers use the eigenvalues of the servo loop matrix as a direct design criterion.",
+      "**Where this is heading.** The matrix exponential closes the loop on eigenvalues: we found eigenvalues (la3-001), diagonalized with them (la3-002), handled complex cases (la3-003), and now use them to propagate dynamical systems through time. Chapter 4 shifts focus from dynamics to geometry — orthogonal projections, least squares, and the SVD. The eigenvalues of $A^\\top A$ are the squared singular values of $A$, connecting the eigenvalue theory of this chapter to the geometric theory of the next.",
     ],
     callouts: [
       {
         type: "insight",
-        title: "Eigenvalue â†’ Solution Behavior",
+        title: "Eigenvalue → Solution Behavior",
         body: "| Eigenvalue type | Solution behavior |\n|---|---|\n| Real $\\lambda < 0$ | Exponential decay: $e^{\\lambda t} \\to 0$ |\n| Real $\\lambda > 0$ | Exponential growth: $e^{\\lambda t} \\to \\infty$ |\n| Pure imaginary $\\pm i\\omega$ | Oscillation: $\\cos(\\omega t) \\pm i\\sin(\\omega t)$ |\n| Complex $a \\pm bi$, $a < 0$ | Decaying oscillation |\n| Repeated eigenvalue (Jordan) | $t^k e^{\\lambda t}$ terms |",
       },
       {
         type: "theorem",
         title: "Properties of the Matrix Exponential",
-        body: "â€¢ $e^{A \\cdot 0} = I$\nâ€¢ $\\frac{d}{dt} e^{At} = A e^{At} = e^{At} A$\nâ€¢ $\\det(e^A) = e^{\\text{tr}(A)}$\nâ€¢ If $AB = BA$: $e^{A+B} = e^A e^B$ (commutativity required!)\nâ€¢ $(e^A)^{-1} = e^{-A}$",
+        body: "• $e^{A \\cdot 0} = I$\n• $\\frac{d}{dt} e^{At} = A e^{At} = e^{At} A$\n• $\\det(e^A) = e^{\\text{tr}(A)}$\n• If $AB = BA$: $e^{A+B} = e^A e^B$ (commutativity required!)\n• $(e^A)^{-1} = e^{-A}$",
       },
       {
         type: "sequencing",
-        title: "Lesson 7 of 7 â€” Eigenvalues & Eigenvectors",
-        body: "**Previous (Lesson 6):** Cayley-Hamilton Theorem â€” matrices satisfy their own characteristic polynomial.\n**This lesson:** Matrix Exponential â€” $e^{At}$ solves $\\dot{\\mathbf{x}} = A\\mathbf{x}$; connection to eigenvalues via diagonalization.\n**Next (Chapter 4):** Orthogonal Projections â€” projecting vectors onto subspaces; the foundation of least squares.",
+        title: "Lesson 7 of 7 — Eigenvalues & Eigenvectors",
+        body: "**Previous (Lesson 6):** Cayley-Hamilton Theorem — matrices satisfy their own characteristic polynomial.\n**This lesson:** Matrix Exponential — $e^{At}$ solves $\\dot{\\mathbf{x}} = A\\mathbf{x}$; connection to eigenvalues via diagonalization.\n**Next (Chapter 4):** Orthogonal Projections — projecting vectors onto subspaces; the foundation of least squares.",
       },
       {
         type: "warning",
@@ -166,16 +166,16 @@ end
         title:
           "Code: Matrix Exponential, ODE Trajectories, and CNC Servo Stability",
         mathBridge:
-          "scipy.linalg.expm(A) computes e^A. For e^(At): expm(A*t). ODE trajectory: x(t) = expm(A*t) @ x0. Eigenvalues via np.linalg.eig(A) â€” all Re(Î») < 0 means stable.",
+          "scipy.linalg.expm(A) computes e^A. For e^(At): expm(A*t). ODE trajectory: x(t) = expm(A*t) @ x0. Eigenvalues via np.linalg.eig(A) — all Re(λ) < 0 means stable.",
         caption:
           "Three cells: compute e^A, trace ODE trajectories, and analyze CNC servo drive stability.",
         initialProps: {
           initialCells: [
             {
               id: 1,
-              cellTitle: "Computing e^A â€” power series vs scipy",
+              cellTitle: "Computing e^A — power series vs scipy",
               prose:
-                "scipy.linalg.expm(A) uses PadÃ© approximation + scaling-and-squaring â€” more accurate than summing the power series directly. Verify: det(e^A) = e^trace(A). Also: e^A @ e^(-A) = I.",
+                "scipy.linalg.expm(A) uses PadÃ© approximation + scaling-and-squaring — more accurate than summing the power series directly. Verify: det(e^A) = e^trace(A). Also: e^A @ e^(-A) = I.",
               code: `import numpy as np
 import matplotlib.pyplot as plt
 from scipy.linalg import expm
@@ -210,9 +210,9 @@ plt.show()`,
             },
             {
               id: 2,
-              cellTitle: "ODE trajectory: x(t) = e^(At) xâ‚€",
+              cellTitle: "ODE trajectory: x(t) = e^(At) x₀",
               prose:
-                "The exact solution to dx/dt = Ax with x(0) = xâ‚€ is x(t) = e^(At) xâ‚€. Compare with numerical ODE solver (scipy.integrate.odeint) to verify.",
+                "The exact solution to dx/dt = Ax with x(0) = x₀ is x(t) = e^(At) x₀. Compare with numerical ODE solver (scipy.integrate.odeint) to verify.",
               code: `import numpy as np
 import matplotlib.pyplot as plt
 from scipy.linalg import expm
@@ -248,7 +248,7 @@ plt.show()`,
               id: 3,
               cellTitle: "CNC servo drive stability analysis",
               prose:
-                "A CNC axis servo: state = [position, velocity], A encodes the physics. Eigenvalues with negative real part â†’ stable (position tracks command). Positive real part â†’ runaway axis. Servo tuning adjusts damping coefficient to find the stability boundary.",
+                "A CNC axis servo: state = [position, velocity], A encodes the physics. Eigenvalues with negative real part → stable (position tracks command). Positive real part → runaway axis. Servo tuning adjusts damping coefficient to find the stability boundary.",
               code: `import numpy as np
 from scipy.linalg import expm
 
@@ -257,7 +257,7 @@ from scipy.linalg import expm
 omega = 100.0  # natural frequency (rad/s)
 
 print("Stability vs damping ratio Î¶:")
-print(f"{'Î¶':>6}  {'Re(Î»)':>10}  {'Im(Î»)':>10}  {'Stable':>8}  {'Settling ~2/|Re|':>18}")
+print(f"{'Î¶':>6}  {'Re(λ)':>10}  {'Im(λ)':>10}  {'Stable':>8}  {'Settling ~2/|Re|':>18}")
 for zeta in [0.0, 0.3, 0.5, 0.7, 1.0, 1.5, 2.0]:
     A = np.array([[0., 1.],
                   [-omega**2, -2*zeta*omega]])
@@ -269,7 +269,7 @@ for zeta in [0.0, 0.3, 0.5, 0.7, 1.0, 1.5, 2.0]:
 
 print("\\nÎ¶=0: marginally stable (pure oscillation)")
 print("Î¶>0: stable (decays to equilibrium)")
-print("Settling time â‰ˆ 2/|Re(Î»)| seconds")`,
+print("Settling time â‰ˆ 2/|Re(λ)| seconds")`,
             },
           ],
         },
@@ -292,7 +292,7 @@ print("Settling time â‰ˆ 2/|Re(Î»)| seconds")`,
       {
         type: "insight",
         title: "Lie Groups and Lie Algebras",
-        body: "The matrix exponential maps the **Lie algebra** (a vector space of matrices, closed under commutator $[A,B] = AB-BA$) to the **Lie group** (a manifold of invertible matrices):\n\n$\\mathfrak{so}(3) \\xrightarrow{\\exp} SO(3)$ (skew-symmetric â†’ rotation matrices)\n\n$\\mathfrak{se}(3) \\xrightarrow{\\exp} SE(3)$ (rigid body motions â†’ transformation matrices)\n\nThis is the mathematical foundation of modern robotics and computer graphics.",
+        body: "The matrix exponential maps the **Lie algebra** (a vector space of matrices, closed under commutator $[A,B] = AB-BA$) to the **Lie group** (a manifold of invertible matrices):\n\n$\\mathfrak{so}(3) \\xrightarrow{\\exp} SO(3)$ (skew-symmetric → rotation matrices)\n\n$\\mathfrak{se}(3) \\xrightarrow{\\exp} SE(3)$ (rigid body motions → transformation matrices)\n\nThis is the mathematical foundation of modern robotics and computer graphics.",
       },
       {
         type: "insight",
@@ -318,7 +318,7 @@ print("Settling time â‰ˆ 2/|Re(Î»)| seconds")`,
           strategyTitle: "Exponentiate diagonal entries",
           checkpoint: "Why is e^(Dt) so simple for diagonal D?",
           hints: [
-            "Powers: D^k = diag(Î»â‚^k, Î»â‚‚^k). The power series becomes diag(Î£Î»â‚^k/k!, Î£Î»â‚‚^k/k!) = diag(e^(Î»â‚t), e^(Î»â‚‚t)).",
+            "Powers: D^k = diag(λ₁^k, λ₁^k). The power series becomes diag(Σλ₁^k/k!, Σλ₁^k/k!) = diag(e^(λ₁t), e^(λ₁t)).",
           ],
         },
         {
@@ -340,7 +340,7 @@ print("Settling time â‰ˆ 2/|Re(Î»)| seconds")`,
         },
       ],
       conclusion:
-        "$e^{At} = \\text{diag}(e^{-2t}, e^{-3t})$. The system is asymptotically stable â€” every initial condition decays to zero exponentially.",
+        "$e^{At} = \\text{diag}(e^{-2t}, e^{-3t})$. The system is asymptotically stable — every initial condition decays to zero exponentially.",
     },
     {
       id: "ex-la3-007-2",
@@ -380,7 +380,7 @@ print("Settling time â‰ˆ 2/|Re(Î»)| seconds")`,
             "Explicit solution. Both components decay. As $t\\to\\infty$: $x_1 \\to 0$, $x_2 \\to 0$.",
           strategyTitle: "Final answer",
           checkpoint: "Verify x(0).",
-          hints: ["xâ‚(0) = 2-1 = 1 âœ“. xâ‚‚(0) = 1 âœ“."],
+          hints: ["x₁(0) = 2-1 = 1 âœ“. x₁(0) = 1 âœ“."],
         },
       ],
       conclusion:
@@ -419,14 +419,14 @@ print("Settling time â‰ˆ 2/|Re(Î»)| seconds")`,
             "For $\\mathbf{x}_0 = [1,0]^\\top$, the solution is $e^{2t}[1,0]^\\top$. The $t \\cdot e^{2t}$ term does not appear for this initial condition.",
           strategyTitle: "Apply to initial condition",
           checkpoint:
-            "What initial condition would make the tÂ·e^(2t) term appear?",
+            "What initial condition would make the t·e^(2t) term appear?",
           hints: [
-            "Try xâ‚€ = [0,1]áµ€: then x(t) = e^(2t)[t, 1]áµ€ â€” the t factor appears in xâ‚.",
+            "Try x₀ = [0,1]áµ€: then x(t) = e^(2t)[t, 1]áµ€ — the t factor appears in x₁.",
           ],
         },
       ],
       conclusion:
-        "$e^{At} = e^{2t}\\begin{bmatrix}1&t\\\\0&1\\end{bmatrix}$. Jordan blocks produce $t^k e^{\\lambda t}$ terms in solutions â€” the off-diagonal $t$ factor is the hallmark of defective (non-diagonalizable) matrices. The system is unstable since $\\lambda = 2 > 0$.",
+        "$e^{At} = e^{2t}\\begin{bmatrix}1&t\\\\0&1\\end{bmatrix}$. Jordan blocks produce $t^k e^{\\lambda t}$ terms in solutions — the off-diagonal $t$ factor is the hallmark of defective (non-diagonalizable) matrices. The system is unstable since $\\lambda = 2 > 0$.",
     },
   ],
 
@@ -441,7 +441,7 @@ print("Settling time â‰ˆ 2/|Re(Î»)| seconds")`,
         {
           expression:
             "\\det(A - \\lambda I) = \\lambda^2 + \\omega^2 = 0 \\quad \\Rightarrow \\quad \\lambda = \\pm i\\omega",
-          annotation: "Pure imaginary eigenvalues â€” neutral stability.",
+          annotation: "Pure imaginary eigenvalues — neutral stability.",
         },
         {
           expression:
@@ -457,7 +457,7 @@ print("Settling time â‰ˆ 2/|Re(Î»)| seconds")`,
         },
       ],
       answer:
-        "e^(At) = rotation matrix by angle Ï‰t. All solutions are circles in phase space â€” neutrally stable (oscillates forever).",
+        "e^(At) = rotation matrix by angle ωt. All solutions are circles in phase space — neutrally stable (oscillates forever).",
     },
     {
       id: "ch-la3-007-2",
@@ -476,25 +476,25 @@ print("Settling time â‰ˆ 2/|Re(Î»)| seconds")`,
           expression:
             "\\text{Re}(\\lambda) = -\\zeta\\omega < 0 \\text{ for all } \\zeta > 0",
           annotation:
-            "If $\\zeta < 1$ (underdamped): complex eigenvalues $-\\zeta\\omega \\pm i\\omega\\sqrt{1-\\zeta^2}$ â€” decaying oscillation. If $\\zeta \\geq 1$: real negative eigenvalues â€” pure exponential decay.",
+            "If $\\zeta < 1$ (underdamped): complex eigenvalues $-\\zeta\\omega \\pm i\\omega\\sqrt{1-\\zeta^2}$ — decaying oscillation. If $\\zeta \\geq 1$: real negative eigenvalues — pure exponential decay.",
         },
       ],
       answer:
-        "Asymptotically stable for all Î¶ > 0, Ï‰ > 0. Underdamped (Î¶<1): decaying oscillation. Critically/overdamped (Î¶â‰¥1): pure decay without oscillation.",
+        "Asymptotically stable for all Î¶ > 0, ω > 0. Underdamped (Î¶<1): decaying oscillation. Critically/overdamped (Î¶≥1): pure decay without oscillation.",
     },
   ],
 
   mentalModel: [
     "$\\dot{\\mathbf{x}} = A\\mathbf{x}$, $\\mathbf{x}(0) = \\mathbf{x}_0$ has exact solution $\\mathbf{x}(t) = e^{At}\\mathbf{x}_0$.",
-    "Eigenvalues of $A$ govern stability: all Re$(\\lambda) < 0$ â†’ stable; any Re$(\\lambda) > 0$ â†’ unstable.",
+    "Eigenvalues of $A$ govern stability: all Re$(\\lambda) < 0$ → stable; any Re$(\\lambda) > 0$ → unstable.",
     "Compute $e^{At}$ via diagonalization: $e^{At} = Pe^{Dt}P^{-1}$ where $e^{Dt}$ just exponentiates diagonal entries.",
-    "$\\det(e^A) = e^{\\text{tr}(A)}$ â€” the determinant is never zero, so $e^{At}$ is always invertible.",
+    "$\\det(e^A) = e^{\\text{tr}(A)}$ — the determinant is never zero, so $e^{At}$ is always invertible.",
   ],
 
   checkpoints: [
     {
       id: "cp-la3-007-1",
-      label: "Read: State the ODE that e^(At)xâ‚€ solves",
+      label: "Read: State the ODE that e^(At)x₀ solves",
       type: "read",
     },
     {
@@ -541,7 +541,7 @@ print("Settling time â‰ˆ 2/|Re(Î»)| seconds")`,
         type: "input",
         text: 'For $A = \\begin{bmatrix}-2&0\\\\0&5\\end{bmatrix}$, is the system $\\dot{\\mathbf{x}} = A\\mathbf{x}$ stable? Answer "stable" or "unstable".',
         answer: "unstable",
-        hint: "One eigenvalue is $\\lambda = 5 > 0$ â€” that component grows without bound. Any positive real eigenvalue makes the system unstable.",
+        hint: "One eigenvalue is $\\lambda = 5 > 0$ — that component grows without bound. Any positive real eigenvalue makes the system unstable.",
       },
     ],
   },
@@ -559,14 +559,14 @@ print("Settling time â‰ˆ 2/|Re(Î»)| seconds")`,
       ],
       answer: "$e^{At}\\mathbf{x}_0$",
       hints: [
-        "This is the matrix analogue of x(t) = e^(at)xâ‚€ for the scalar equation áº‹ = ax. The matrix exponential e^(At) is the transition matrix.",
+        "This is the matrix analogue of x(t) = e^(at)x₀ for the scalar equation áº‹ = ax. The matrix exponential e^(At) is the transition matrix.",
       ],
-      reviewSection: "Intuition â€” It solves the matrix ODE",
+      reviewSection: "Intuition — It solves the matrix ODE",
     },
     {
       id: "q-la3-007-2",
       type: "choice",
-      text: "For asymptotic stability of $\\dot{\\mathbf{x}} = A\\mathbf{x}$ (all solutions â†’ 0 as t â†’ âˆž), the eigenvalues of $A$ must all satisfy:",
+      text: "For asymptotic stability of $\\dot{\\mathbf{x}} = A\\mathbf{x}$ (all solutions → 0 as t → âˆž), the eigenvalues of $A$ must all satisfy:",
       options: [
         "$\\text{Re}(\\lambda) > 0$",
         "$\\text{Im}(\\lambda) \\neq 0$",
@@ -575,9 +575,9 @@ print("Settling time â‰ˆ 2/|Re(Î»)| seconds")`,
       ],
       answer: "$\\text{Re}(\\lambda) < 0$",
       hints: [
-        "e^(Î»t) â†’ 0 iff Re(Î») < 0. For complex Î»=a+bi: |e^(Î»t)| = e^(at). Decays iff a < 0. Note: |Î»| < 1 is the discrete-time criterion, not continuous-time.",
+        "e^(λt) → 0 iff Re(λ) < 0. For complex λ=a+bi: |e^(λt)| = e^(at). Decays iff a < 0. Note: |λ| < 1 is the discrete-time criterion, not continuous-time.",
       ],
-      reviewSection: "Math tab â€” Stability criterion",
+      reviewSection: "Math tab — Stability criterion",
     },
     {
       id: "q-la3-007-3",
@@ -591,9 +591,9 @@ print("Settling time â‰ˆ 2/|Re(Î»)| seconds")`,
       ],
       answer: "$Pe^{Dt}P^{-1}$",
       hints: [
-        "Same pattern as A^k = PD^kP^{-1}. The series e^(At) = Î£ (At)^k/k! = P Î£ D^kt^k/k! P^{-1} = Pe^(Dt)P^{-1}.",
+        "Same pattern as A^k = PD^kP^{-1}. The series e^(At) = Σ (At)^k/k! = P Σ D^kt^k/k! P^{-1} = Pe^(Dt)P^{-1}.",
       ],
-      reviewSection: "Intuition â€” Computing via diagonalization",
+      reviewSection: "Intuition — Computing via diagonalization",
     },
     {
       id: "q-la3-007-4",
@@ -607,9 +607,9 @@ print("Settling time â‰ˆ 2/|Re(Î»)| seconds")`,
       ],
       answer: "They spiral inward toward the origin",
       hints: [
-        "Re(Î») = -1 < 0 â†’ e^(Re(Î»)t) = e^(-t) â†’ 0. Im(Î») = Â±3 â†’ oscillation at frequency 3/(2Ï€). Combined: decaying oscillation = inward spiral.",
+        "Re(λ) = -1 < 0 → e^(Re(λ)t) = e^(-t) → 0. Im(λ) = Â±3 → oscillation at frequency 3/(2π). Combined: decaying oscillation = inward spiral.",
       ],
-      reviewSection: "Intuition â€” Eigenvalue â†’ Solution Behavior",
+      reviewSection: "Intuition — Eigenvalue → Solution Behavior",
     },
     {
       id: "q-la3-007-5",
@@ -623,9 +623,9 @@ print("Settling time â‰ˆ 2/|Re(Î»)| seconds")`,
       ],
       answer: "$t\\,e^{3t}$ terms alongside $e^{3t}$",
       hints: [
-        "Jordan block of size 2: e^(Jt) = e^(Î»t)(I + Nt) where N is the superdiagonal of ones. This gives e^(3t) on diagonal and tÂ·e^(3t) in the upper-right entry.",
+        "Jordan block of size 2: e^(Jt) = e^(λt)(I + Nt) where N is the superdiagonal of ones. This gives e^(3t) on diagonal and t·e^(3t) in the upper-right entry.",
       ],
-      reviewSection: "Math â€” Jordan case",
+      reviewSection: "Math — Jordan case",
     },
     {
       id: "q-la3-007-6",
@@ -641,7 +641,7 @@ print("Settling time â‰ˆ 2/|Re(Î»)| seconds")`,
       hints: [
         "The scalar rule e^(a+b) = e^a e^b relied on commutativity of numbers. Matrices do not commute in general, so the rule fails unless AB = BA.",
       ],
-      reviewSection: "Intuition â€” Warning: Commutativity",
+      reviewSection: "Intuition — Warning: Commutativity",
     },
     {
       id: "q-la3-007-7",
@@ -655,9 +655,9 @@ print("Settling time â‰ˆ 2/|Re(Î»)| seconds")`,
       ],
       answer: "$e^{\\text{tr}(A)}$",
       hints: [
-        "For diagonal D, det(e^D) = product of e^(Î»áµ¢) = e^(Î£Î»áµ¢) = e^(tr(D)). Similarity invariance extends this to all matrices. Also: e^(tr(A)) is always positive, so e^A is always invertible.",
+        "For diagonal D, det(e^D) = product of e^(λᵢ) = e^(Σλᵢ) = e^(tr(D)). Similarity invariance extends this to all matrices. Also: e^(tr(A)) is always positive, so e^A is always invertible.",
       ],
-      reviewSection: "Intuition â€” Properties of the Matrix Exponential",
+      reviewSection: "Intuition — Properties of the Matrix Exponential",
     },
     {
       id: "q-la3-007-8",
@@ -671,9 +671,9 @@ print("Settling time â‰ˆ 2/|Re(Î»)| seconds")`,
       ],
       answer: "All eigenvalues have $|\\lambda| < 1$",
       hints: [
-        "Discrete-time: x_k = A^k xâ‚€. This decays iff |Î»|^k â†’ 0 for all eigenvalues, i.e. |Î»| < 1. Continuous-time uses Re(Î») < 0 â€” different criterion.",
+        "Discrete-time: x_k = A^k x₀. This decays iff |λ|^k → 0 for all eigenvalues, i.e. |λ| < 1. Continuous-time uses Re(λ) < 0 — different criterion.",
       ],
-      reviewSection: "Math â€” Stability criterion (discrete vs continuous)",
+      reviewSection: "Math — Stability criterion (discrete vs continuous)",
     },
     {
       id: "q-la3-007-9",
@@ -687,9 +687,9 @@ print("Settling time â‰ˆ 2/|Re(Î»)| seconds")`,
       ],
       answer: "Decaying oscillation that rings then settles",
       hints: [
-        'Complex eigenvalues aÂ±bi give e^(at)(cos(bt) + iÂ·sin(bt)). Since a<0, the amplitude e^(at)â†’0 while the oscillation at frequency b/(2Ï€) persists temporarily â€” classically called "ringing."',
+        'Complex eigenvalues aÂ±bi give e^(at)(cos(bt) + i·sin(bt)). Since a<0, the amplitude e^(at)→0 while the oscillation at frequency b/(2π) persists temporarily — classically called "ringing."',
       ],
-      reviewSection: "Intuition â€” CNC servo drives",
+      reviewSection: "Intuition — CNC servo drives",
     },
     {
       id: "q-la3-007-10",
@@ -704,9 +704,9 @@ print("Settling time â‰ˆ 2/|Re(Î»)| seconds")`,
       answer:
         "The power series converges but is numerically unstable for large $\\|A\\|$",
       hints: [
-        "For large â€–Aâ€–, early terms of the series grow huge and then cancel â€” catastrophic cancellation causes large floating-point errors. Scaling A down to â€–Aâ€–â‰ˆ1, applying PadÃ©, then squaring up avoids this.",
+        "For large –A–, early terms of the series grow huge and then cancel — catastrophic cancellation causes large floating-point errors. Scaling A down to –A–â‰ˆ1, applying PadÃ©, then squaring up avoids this.",
       ],
-      reviewSection: "Rigor â€” Numerical Computation of e^A",
+      reviewSection: "Rigor — Numerical Computation of e^A",
     },
   ],
 
@@ -735,7 +735,7 @@ print("Settling time â‰ˆ 2/|Re(Î»)| seconds")`,
   transferPrompts: [
     {
       situation:
-        "You need to simulate a CNC servo axis responding to a step command â€” modeling position and velocity over time.",
+        "You need to simulate a CNC servo axis responding to a step command — modeling position and velocity over time.",
       competingTechniques: [
         "Numerical ODE solver (Euler, Runge-Kutta)",
         "Laplace transforms",
@@ -753,7 +753,7 @@ print("Settling time â‰ˆ 2/|Re(Î»)| seconds")`,
         "Exact matrix exponential",
       ],
       whyThisTechniqueWins:
-        "The time-evolution operator is exactly $U(t) = e^{-iHt/\\hbar}$ â€” a matrix exponential. For small matrices (qubits), this is exact and efficient. The eigenvalues of $H$ give the energy levels; their differences give the oscillation frequencies in the solution.",
+        "The time-evolution operator is exactly $U(t) = e^{-iHt/\\hbar}$ — a matrix exponential. For small matrices (qubits), this is exact and efficient. The eigenvalues of $H$ give the energy levels; their differences give the oscillation frequencies in the solution.",
     },
   ],
 
@@ -764,7 +764,7 @@ print("Settling time â‰ˆ 2/|Re(Î»)| seconds")`,
       symptom:
         "Result fails verification: $e^A \\cdot e^{-A} \\neq I$, or $\\det(e^A) \\neq e^{\\text{tr}(A)}$.",
       whyItHappened:
-        "The matrix exponential is NOT entry-wise exponentiation â€” it is defined by the power series $I + A + A^2/2! + \\cdots$. Entry-wise exponentiation ($\\exp(A)$ in numpy notation) is a different operation entirely.",
+        "The matrix exponential is NOT entry-wise exponentiation — it is defined by the power series $I + A + A^2/2! + \\cdots$. Entry-wise exponentiation ($\\exp(A)$ in numpy notation) is a different operation entirely.",
       repairStrategy:
         "Use `scipy.linalg.expm(A)` (not `np.exp(A)`). In MATLAB, use `expm(A)` (not `exp(A)`). Always verify with `expm(A) @ expm(-A) â‰ˆ I`.",
     },
@@ -774,7 +774,7 @@ print("Settling time â‰ˆ 2/|Re(Î»)| seconds")`,
       symptom:
         "A matrix with $\\det(A) > 0$ is claimed stable, but simulations diverge.",
       whyItHappened:
-        "$\\det(A)$ is the product of all eigenvalues â€” it tells you nothing about their signs or real parts individually. You could have $\\det(A) = (-2)(3) = -6 < 0$ (one negative, one positive â€” unstable) or $(âˆ’1)(âˆ’2) = 2 > 0$ (both negative â€” stable).",
+        "$\\det(A)$ is the product of all eigenvalues — it tells you nothing about their signs or real parts individually. You could have $\\det(A) = (-2)(3) = -6 < 0$ (one negative, one positive — unstable) or $(−1)(−2) = 2 > 0$ (both negative — stable).",
       repairStrategy:
         "Always check eigenvalues directly: `np.linalg.eigvals(A)`. For stability: verify all `np.real(evals) < 0`. Determinant and trace together give partial information but not the full picture.",
     },
@@ -783,11 +783,11 @@ print("Settling time â‰ˆ 2/|Re(Î»)| seconds")`,
   mastery: {
     targetLevel: 2,
     solveIndependently:
-      "Compute $e^{At}$ for diagonal matrices and 2Ã—2 systems via eigendecomposition; write the ODE solution; classify stability from eigenvalues.",
+      "Compute $e^{At}$ for diagonal matrices and 2×2 systems via eigendecomposition; write the ODE solution; classify stability from eigenvalues.",
     explainVerbally:
       "Explain why $e^{At}$ solves $\\dot{\\mathbf{x}} = A\\mathbf{x}$, what eigenvalues determine about long-term behavior, and why $e^{A+B} \\neq e^A e^B$ in general.",
     detectIncorrectApplication:
-      "Catch entry-wise exponentiation vs. matrix exponentiation; catch confusing discrete (|Î»|<1) and continuous (Re Î»<0) stability criteria; catch incorrect commutator claims.",
+      "Catch entry-wise exponentiation vs. matrix exponentiation; catch confusing discrete (|λ|<1) and continuous (Re λ<0) stability criteria; catch incorrect commutator claims.",
     transferToUnfamiliar:
       "Analyze stability of a physical system from its state matrix; compute $e^{At}$ for a Jordan block system; apply the spectral mapping theorem to a new matrix function.",
   },

@@ -1,33 +1,33 @@
-﻿export default {
+export default {
   id: 'la4-006',
   slug: 'spectral-theorem',
   chapter: 'la4',
   order: 6,
   title: 'The Spectral Theorem',
-  subtitle: 'Every real symmetric matrix can be orthogonally diagonalized. Its eigenvectors are not just independent â€” they are perpendicular. Its eigenvalues are not just complex numbers â€” they are real.',
+  subtitle: 'Every real symmetric matrix can be orthogonally diagonalized. Its eigenvectors are not just independent — they are perpendicular. Its eigenvalues are not just complex numbers — they are real.',
   tags: ['spectral theorem', 'symmetric matrix', 'orthogonal diagonalization', 'real eigenvalues', 'orthonormal eigenvectors', 'principal axes', 'self-adjoint'],
   aliases: 'spectral theorem symmetric matrix orthogonal diagonalization real eigenvalues principal axes self-adjoint Hermitian',
 
   hook: {
     question: "Regular diagonalization $A = PDP^{-1}$ works when you have enough independent eigenvectors. But if $A$ is symmetric, something magical happens: the eigenvectors are automatically perpendicular to each other, and the eigenvalues are guaranteed to be real. Why?",
-    realWorldContext: "The spectral theorem is the workhorse of modern data analysis. PCA (Principal Component Analysis) works because the covariance matrix is symmetric â€” its eigenvectors are the principal components, automatically orthogonal, and its eigenvalues are the variances (automatically real and non-negative). Quantum mechanics is built on self-adjoint (Hermitian) operators, whose spectral theorem guarantees that measured values (eigenvalues) are always real numbers. Finite element methods for structural analysis assemble symmetric stiffness matrices, and their eigenvalues are the resonant frequencies of the structure.",
+    realWorldContext: "The spectral theorem is the workhorse of modern data analysis. PCA (Principal Component Analysis) works because the covariance matrix is symmetric — its eigenvectors are the principal components, automatically orthogonal, and its eigenvalues are the variances (automatically real and non-negative). Quantum mechanics is built on self-adjoint (Hermitian) operators, whose spectral theorem guarantees that measured values (eigenvalues) are always real numbers. Finite element methods for structural analysis assemble symmetric stiffness matrices, and their eigenvalues are the resonant frequencies of the structure.",
   },
 
   intuition: {
     prose: [
-      'Take $A = \\begin{bmatrix}3&1\\\\1&3\\end{bmatrix}$ â€” a real symmetric matrix ($A = A^\\top$). Characteristic polynomial: $(3-\\lambda)^2 - 1 = \\lambda^2 - 6\\lambda + 8 = (\\lambda-2)(\\lambda-4) = 0$, giving $\\lambda_1 = 2$, $\\lambda_2 = 4$ â€” both real. Eigenvectors: $\\mathbf{v}_1 = (1,-1)^\\top$ and $\\mathbf{v}_2 = (1,1)^\\top$. Check: $\\mathbf{v}_1 \\cdot \\mathbf{v}_2 = 1 \\cdot 1 + (-1) \\cdot 1 = 0$ âœ“. Two facts emerge: eigenvalues are real, and eigenvectors are perpendicular â€” nobody forced them to be, the symmetry made it happen. Contrast with $B = \\begin{bmatrix}1&2\\\\0&3\\end{bmatrix}$ (not symmetric): eigenvalues $1$ and $3$ are also real, but eigenvectors $(1,0)^\\top$ and $(1,1)^\\top$ give dot product $1 \\neq 0$ â€” not orthogonal. Symmetry is what forces the eigenvectors to be perpendicular.',
+      'Take $A = \\begin{bmatrix}3&1\\\\1&3\\end{bmatrix}$ — a real symmetric matrix ($A = A^\\top$). Characteristic polynomial: $(3-\\lambda)^2 - 1 = \\lambda^2 - 6\\lambda + 8 = (\\lambda-2)(\\lambda-4) = 0$, giving $\\lambda_1 = 2$, $\\lambda_2 = 4$ — both real. Eigenvectors: $\\mathbf{v}_1 = (1,-1)^\\top$ and $\\mathbf{v}_2 = (1,1)^\\top$. Check: $\\mathbf{v}_1 \\cdot \\mathbf{v}_2 = 1 \\cdot 1 + (-1) \\cdot 1 = 0$ âœ“. Two facts emerge: eigenvalues are real, and eigenvectors are perpendicular — nobody forced them to be, the symmetry made it happen. Contrast with $B = \\begin{bmatrix}1&2\\\\0&3\\end{bmatrix}$ (not symmetric): eigenvalues $1$ and $3$ are also real, but eigenvectors $(1,0)^\\top$ and $(1,1)^\\top$ give dot product $1 \\neq 0$ — not orthogonal. Symmetry is what forces the eigenvectors to be perpendicular.',
       '**Why eigenvalues are real.** Suppose $\\lambda$ is an eigenvalue with eigenvector $\\mathbf{v}$ (potentially complex): $A\\mathbf{v} = \\lambda \\mathbf{v}$. Take the conjugate transpose: $\\bar{\\mathbf{v}}^\\top A^\\top = \\bar{\\lambda} \\bar{\\mathbf{v}}^\\top$. Since $A = A^\\top$ (real, symmetric): $\\bar{\\mathbf{v}}^\\top A = \\bar{\\lambda} \\bar{\\mathbf{v}}^\\top$. Multiply the original equation on the left by $\\bar{\\mathbf{v}}^\\top$: $\\bar{\\mathbf{v}}^\\top A \\mathbf{v} = \\lambda \\bar{\\mathbf{v}}^\\top \\mathbf{v}$. Also $\\bar{\\mathbf{v}}^\\top A \\mathbf{v} = \\bar{\\lambda} \\bar{\\mathbf{v}}^\\top \\mathbf{v}$. So $\\lambda = \\bar{\\lambda}$, meaning $\\lambda$ is real.',
       '**Why eigenvectors for distinct eigenvalues are orthogonal.** Let $A\\mathbf{u} = \\lambda\\mathbf{u}$ and $A\\mathbf{v} = \\mu\\mathbf{v}$ with $\\lambda \\neq \\mu$. Then $\\lambda \\mathbf{u}^\\top \\mathbf{v} = (A\\mathbf{u})^\\top \\mathbf{v} = \\mathbf{u}^\\top A^\\top \\mathbf{v} = \\mathbf{u}^\\top A \\mathbf{v} = \\mu \\mathbf{u}^\\top \\mathbf{v}$. So $(\\lambda - \\mu) \\mathbf{u}^\\top \\mathbf{v} = 0$. Since $\\lambda \\neq \\mu$: $\\mathbf{u}^\\top \\mathbf{v} = 0$.',
-      '**The spectral theorem.** Every real symmetric $n \\times n$ matrix $A$ can be written as $A = Q\\Lambda Q^\\top$ where $Q$ is orthogonal ($Q^\\top = Q^{-1}$, columns are orthonormal eigenvectors) and $\\Lambda = \\text{diag}(\\lambda_1, \\ldots, \\lambda_n)$ has real eigenvalues. This is **orthogonal diagonalization** â€” special because $P^{-1} = P^\\top$.',
-      '**The spectral decomposition writes $A$ as a sum of rank-1 projections.** Since the columns $\\mathbf{q}_i$ of $Q$ are orthonormal, we can write $A = Q\\Lambda Q^T = \\sum_{i=1}^n \\lambda_i \\mathbf{q}_i \\mathbf{q}_i^T$. Each term $\\mathbf{q}_i \\mathbf{q}_i^T$ is the projection matrix onto the $i$-th eigenvector direction, scaled by the eigenvalue $\\lambda_i$. This is the same rank-1 sum structure as the SVD â€” in fact, for symmetric matrices, the left and right singular vectors coincide, and the singular values are $|\\lambda_i|$. Functions of $A$ become easy: $A^k = Q\\Lambda^k Q^T$ (raise each eigenvalue to the $k$th power), $A^{-1} = Q\\Lambda^{-1}Q^T$ (invert each eigenvalue), $e^A = Q e^\\Lambda Q^T$ (exponentiate each eigenvalue).',
-      '**Positive definite matrices are symmetric matrices with all positive eigenvalues.** A symmetric matrix $A$ is **positive definite** when $\\mathbf{x}^T A \\mathbf{x} > 0$ for all $\\mathbf{x} \\neq \\mathbf{0}$. By the spectral theorem, this is equivalent to all eigenvalues being strictly positive. Positive definite matrices arise as: Gram matrices $B^T B$ (when $B$ has full column rank), covariance matrices in statistics, stiffness matrices in finite elements, and the Hessian of a strictly convex function at a minimum. A positive semidefinite matrix allows zero eigenvalues â€” the covariance matrix of data that lies exactly on a lower-dimensional subspace will have zero eigenvalues, revealing the dimension of the actual data.',
-      '**CNC structural analysis and PCA.** The spectral theorem is everywhere in CNC engineering. (1) **Modal analysis:** the equation of motion for a vibrating CNC frame is $M\\ddot{\\mathbf{x}} + K\\mathbf{x} = \\mathbf{0}$ where $M$ and $K$ are symmetric (mass and stiffness matrices). The natural frequencies are $\\omega_i = \\sqrt{\\lambda_i(M^{-1/2}KM^{-1/2})}$ â€” eigenvalues of a symmetric matrix, all real and non-negative. (2) **Tool wear monitoring by PCA:** attach $n$ vibration sensors to the spindle; form the covariance matrix $C = \\frac{1}{N}X^\\top X$ (symmetric, PSD). The spectral decomposition $C = Q\\Lambda Q^\\top$ gives principal axes $\\mathbf{q}_i$ and explained variances $\\lambda_i$. As the tool wears, the dominant principal direction rotates and the leading eigenvalue grows â€” a real-time wear indicator. (3) **Elliptical tolerance zones:** the error ellipsoid for a machined feature is $\\mathbf{e}^\\top C^{-1} \\mathbf{e} \\leq 1$ where $C = Q\\Lambda Q^\\top$; the principal axes of the ellipsoid are the eigenvectors, and the semi-axes are $\\sqrt{\\lambda_i}$.',
+      '**The spectral theorem.** Every real symmetric $n \\times n$ matrix $A$ can be written as $A = Q\\Lambda Q^\\top$ where $Q$ is orthogonal ($Q^\\top = Q^{-1}$, columns are orthonormal eigenvectors) and $\\Lambda = \\text{diag}(\\lambda_1, \\ldots, \\lambda_n)$ has real eigenvalues. This is **orthogonal diagonalization** — special because $P^{-1} = P^\\top$.',
+      '**The spectral decomposition writes $A$ as a sum of rank-1 projections.** Since the columns $\\mathbf{q}_i$ of $Q$ are orthonormal, we can write $A = Q\\Lambda Q^T = \\sum_{i=1}^n \\lambda_i \\mathbf{q}_i \\mathbf{q}_i^T$. Each term $\\mathbf{q}_i \\mathbf{q}_i^T$ is the projection matrix onto the $i$-th eigenvector direction, scaled by the eigenvalue $\\lambda_i$. This is the same rank-1 sum structure as the SVD — in fact, for symmetric matrices, the left and right singular vectors coincide, and the singular values are $|\\lambda_i|$. Functions of $A$ become easy: $A^k = Q\\Lambda^k Q^T$ (raise each eigenvalue to the $k$th power), $A^{-1} = Q\\Lambda^{-1}Q^T$ (invert each eigenvalue), $e^A = Q e^\\Lambda Q^T$ (exponentiate each eigenvalue).',
+      '**Positive definite matrices are symmetric matrices with all positive eigenvalues.** A symmetric matrix $A$ is **positive definite** when $\\mathbf{x}^T A \\mathbf{x} > 0$ for all $\\mathbf{x} \\neq \\mathbf{0}$. By the spectral theorem, this is equivalent to all eigenvalues being strictly positive. Positive definite matrices arise as: Gram matrices $B^T B$ (when $B$ has full column rank), covariance matrices in statistics, stiffness matrices in finite elements, and the Hessian of a strictly convex function at a minimum. A positive semidefinite matrix allows zero eigenvalues — the covariance matrix of data that lies exactly on a lower-dimensional subspace will have zero eigenvalues, revealing the dimension of the actual data.',
+      '**CNC structural analysis and PCA.** The spectral theorem is everywhere in CNC engineering. (1) **Modal analysis:** the equation of motion for a vibrating CNC frame is $M\\ddot{\\mathbf{x}} + K\\mathbf{x} = \\mathbf{0}$ where $M$ and $K$ are symmetric (mass and stiffness matrices). The natural frequencies are $\\omega_i = \\sqrt{\\lambda_i(M^{-1/2}KM^{-1/2})}$ — eigenvalues of a symmetric matrix, all real and non-negative. (2) **Tool wear monitoring by PCA:** attach $n$ vibration sensors to the spindle; form the covariance matrix $C = \\frac{1}{N}X^\\top X$ (symmetric, PSD). The spectral decomposition $C = Q\\Lambda Q^\\top$ gives principal axes $\\mathbf{q}_i$ and explained variances $\\lambda_i$. As the tool wears, the dominant principal direction rotates and the leading eigenvalue grows — a real-time wear indicator. (3) **Elliptical tolerance zones:** the error ellipsoid for a machined feature is $\\mathbf{e}^\\top C^{-1} \\mathbf{e} \\leq 1$ where $C = Q\\Lambda Q^\\top$; the principal axes of the ellipsoid are the eigenvectors, and the semi-axes are $\\sqrt{\\lambda_i}$.',
     ],
     callouts: [
       {
         type: 'sequencing',
-        title: 'Lesson 6 of 9 â€” Orthogonality & SVD',
-        body: '**Previous (Lesson 5):** Inner Product Spaces â€” abstract geometry via inner products and orthogonality.\n**This lesson:** Spectral Theorem â€” symmetric matrices always have real eigenvalues and orthogonal eigenvectors, making them diagonalizable in the best possible way.\n**Next (Lesson 7):** Quadratic Forms â€” how symmetric matrices define curvature, energy, and the shape of level curves.',
+        title: 'Lesson 6 of 9 — Orthogonality & SVD',
+        body: '**Previous (Lesson 5):** Inner Product Spaces — abstract geometry via inner products and orthogonality.\n**This lesson:** Spectral Theorem — symmetric matrices always have real eigenvalues and orthogonal eigenvectors, making them diagonalizable in the best possible way.\n**Next (Lesson 7):** Quadratic Forms — how symmetric matrices define curvature, energy, and the shape of level curves.',
       },
       {
         type: 'theorem',
@@ -37,7 +37,7 @@
       {
         type: 'insight',
         title: 'Spectral Decomposition',
-        body: '$A = Q\\Lambda Q^\\top = \\lambda_1 \\mathbf{q}_1 \\mathbf{q}_1^\\top + \\lambda_2 \\mathbf{q}_2 \\mathbf{q}_2^\\top + \\cdots + \\lambda_n \\mathbf{q}_n \\mathbf{q}_n^\\top$\n\nThis writes $A$ as a sum of rank-1 projection matrices $\\mathbf{q}_i \\mathbf{q}_i^\\top$, each scaled by the corresponding eigenvalue. This is the spectral decomposition â€” the deepest way to understand what a symmetric matrix does.',
+        body: '$A = Q\\Lambda Q^\\top = \\lambda_1 \\mathbf{q}_1 \\mathbf{q}_1^\\top + \\lambda_2 \\mathbf{q}_2 \\mathbf{q}_2^\\top + \\cdots + \\lambda_n \\mathbf{q}_n \\mathbf{q}_n^\\top$\n\nThis writes $A$ as a sum of rank-1 projection matrices $\\mathbf{q}_i \\mathbf{q}_i^\\top$, each scaled by the corresponding eigenvalue. This is the spectral decomposition — the deepest way to understand what a symmetric matrix does.',
       },
       {
         type: 'insight',
@@ -142,7 +142,7 @@ imag(eigenvalues_B)
             {
               id: 1,
               cellTitle: 'Orthogonal diagonalization of a symmetric matrix',
-              prose: '`np.linalg.eigh` is specifically for symmetric matrices â€” it returns real eigenvalues and orthonormal eigenvectors. The spectral decomposition $A = Q\\Lambda Q^T$ writes $A$ as a sum of rank-1 outer products $\\lambda_i \\mathbf{q}_i \\mathbf{q}_i^T$. Verify that $Q^T Q = I$ (eigenvectors are orthonormal) and that the reconstruction is exact.',
+              prose: '`np.linalg.eigh` is specifically for symmetric matrices — it returns real eigenvalues and orthonormal eigenvectors. The spectral decomposition $A = Q\\Lambda Q^T$ writes $A$ as a sum of rank-1 outer products $\\lambda_i \\mathbf{q}_i \\mathbf{q}_i^T$. Verify that $Q^T Q = I$ (eigenvectors are orthonormal) and that the reconstruction is exact.',
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -176,7 +176,7 @@ plt.show()`,
             {
               id: 2,
               cellTitle: 'Functions of symmetric matrices via spectral decomposition',
-              prose: 'For a symmetric matrix $A = Q\\Lambda Q^T$, any function $f(A) = Q f(\\Lambda) Q^T$ â€” just apply $f$ to each eigenvalue. This works for $A^{1/2}$ (matrix square root), $A^{-1}$, and $e^A$. These would be impossible or expensive to compute directly but become trivial once you have the spectral decomposition.',
+              prose: 'For a symmetric matrix $A = Q\\Lambda Q^T$, any function $f(A) = Q f(\\Lambda) Q^T$ — just apply $f$ to each eigenvalue. This works for $A^{1/2}$ (matrix square root), $A^{-1}$, and $e^A$. These would be impossible or expensive to compute directly but become trivial once you have the spectral decomposition.',
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -210,7 +210,7 @@ plt.show()`,
             {
               id: 3,
               cellTitle: 'PCA for CNC tool wear monitoring',
-              prose: 'The covariance matrix $C = \\frac{1}{N}X^T X$ is symmetric positive semidefinite. Its eigenvectors (principal components) are the directions of maximum variance in the sensor data. As a tool wears, a second dominant direction (chatter) appears â€” the ratio of the second to first eigenvalue grows, giving a real-time wear indicator.',
+              prose: 'The covariance matrix $C = \\frac{1}{N}X^T X$ is symmetric positive semidefinite. Its eigenvectors (principal components) are the directions of maximum variance in the sensor data. As a tool wears, a second dominant direction (chatter) appears — the ratio of the second to first eigenvalue grows, giving a real-time wear indicator.',
               code: `import numpy as np
 
 # PCA for CNC tool wear monitoring
@@ -248,7 +248,7 @@ ev_clean = pca_analysis(clean_data, "Clean tool")
 ev_worn  = pca_analysis(worn_data,  "Worn tool")
 
 print()
-print("Wear indicator â€” ratio of 2nd to 1st eigenvalue:")
+print("Wear indicator — ratio of 2nd to 1st eigenvalue:")
 print(f"  Clean: {ev_clean[1]/ev_clean[0]:.3f}")
 print(f"  Worn:  {ev_worn[1]/ev_worn[0]:.3f}  (higher = more chatter energy in secondary axis)")
 `,
@@ -262,7 +262,7 @@ print(f"  Worn:  {ev_worn[1]/ev_worn[0]:.3f}  (higher = more chatter energy in s
   rigor: {
     prose: [
       '**Hermitian matrices.** Over $\\mathbb{C}$, the analogue of a real symmetric matrix is a **Hermitian matrix**: $A = A^* = \\bar{A}^\\top$. The spectral theorem extends: every Hermitian matrix is unitarily diagonalizable ($A = U\\Lambda U^*$ with $UU^* = I$) and has real eigenvalues. This is the form used in quantum mechanics, where observables are Hermitian operators and measured values are eigenvalues.',
-      '**Courant-Fischer min-max theorem.** The eigenvalues of a symmetric matrix $A$ have a variational characterization: $\\lambda_k(A) = \\min_{\\dim(V)=k} \\max_{\\mathbf{x} \\in V, \\|\\mathbf{x}\\|=1} \\mathbf{x}^\\top A \\mathbf{x}$. In particular, the largest eigenvalue is $\\lambda_n = \\max_{\\|\\mathbf{x}\\|=1} \\mathbf{x}^\\top A \\mathbf{x}$ â€” the direction that maximizes the quadratic form. This is why the first principal component of PCA is the direction of maximum variance.',
+      '**Courant-Fischer min-max theorem.** The eigenvalues of a symmetric matrix $A$ have a variational characterization: $\\lambda_k(A) = \\min_{\\dim(V)=k} \\max_{\\mathbf{x} \\in V, \\|\\mathbf{x}\\|=1} \\mathbf{x}^\\top A \\mathbf{x}$. In particular, the largest eigenvalue is $\\lambda_n = \\max_{\\|\\mathbf{x}\\|=1} \\mathbf{x}^\\top A \\mathbf{x}$ — the direction that maximizes the quadratic form. This is why the first principal component of PCA is the direction of maximum variance.',
       '**Spectral theorem for compact operators.** In infinite-dimensional Hilbert spaces, compact self-adjoint operators have a countable orthonormal basis of eigenvectors with eigenvalues $\\lambda_1 \\geq \\lambda_2 \\geq \\cdots \\to 0$. This is the foundation for integral equations (Fredholm theory) and Fourier analysis. The finite-dimensional spectral theorem is the matrix analogue of this infinite-dimensional result.',
     ],
     callouts: [
@@ -293,7 +293,7 @@ print(f"  Worn:  {ev_worn[1]/ev_worn[0]:.3f}  (higher = more chatter energy in s
       steps: [
         {
           expression: '\\det(A - \\lambda I) = (3-\\lambda)^2 - 1 = \\lambda^2 - 6\\lambda + 8 = (\\lambda-2)(\\lambda-4) = 0',
-          annotation: 'Characteristic polynomial. Two distinct real eigenvalues â€” guaranteed since $A$ is symmetric.',
+          annotation: 'Characteristic polynomial. Two distinct real eigenvalues — guaranteed since $A$ is symmetric.',
           strategyTitle: 'Find eigenvalues',
         },
         {
@@ -303,7 +303,7 @@ print(f"  Worn:  {ev_worn[1]/ev_worn[0]:.3f}  (higher = more chatter energy in s
         },
         {
           expression: '\\lambda_2 = 4: \\quad (A - 4I)\\mathbf{v} = \\begin{bmatrix}-1&1\\\\1&-1\\end{bmatrix}\\mathbf{v} = \\mathbf{0} \\implies \\mathbf{v} = \\begin{bmatrix}1\\\\1\\end{bmatrix}',
-          annotation: 'Note: $(1,-1) \\cdot (1,1) = 1-1 = 0$ â€” automatically orthogonal, as the theorem guarantees.',
+          annotation: 'Note: $(1,-1) \\cdot (1,1) = 1-1 = 0$ — automatically orthogonal, as the theorem guarantees.',
           strategyTitle: 'Eigenvector for $\\lambda_2 = 4$',
         },
         {
@@ -313,7 +313,7 @@ print(f"  Worn:  {ev_worn[1]/ev_worn[0]:.3f}  (higher = more chatter energy in s
         },
         {
           expression: 'Q = \\frac{1}{\\sqrt{2}}\\begin{bmatrix}1&1\\\\-1&1\\end{bmatrix}, \\quad \\Lambda = \\begin{bmatrix}2&0\\\\0&4\\end{bmatrix}, \\quad A = Q\\Lambda Q^\\top',
-          annotation: 'Verify: $Q^\\top Q = I$ (columns are orthonormal). This is a $45Â°$ rotation matrix â€” $A$ stretches by 2 along the $(-45Â°)$ diagonal and by 4 along the $(+45Â°)$ diagonal.',
+          annotation: 'Verify: $Q^\\top Q = I$ (columns are orthonormal). This is a $45°$ rotation matrix — $A$ stretches by 2 along the $(-45°)$ diagonal and by 4 along the $(+45°)$ diagonal.',
           strategyTitle: 'Assemble $Q$ and $\\Lambda$',
           checkpoint: 'Always verify $Q^\\top Q = I$ and $Q\\Lambda Q^\\top = A$ before concluding.',
         },
@@ -340,15 +340,15 @@ print(f"  Worn:  {ev_worn[1]/ev_worn[0]:.3f}  (higher = more chatter energy in s
           strategyTitle: 'Find eigenvalues (variances)',
         },
         {
-          expression: '\\lambda_1 = 8: \\mathbf{q}_1 = \\frac{1}{\\sqrt{2}}(1,1)^\\top \\quad (45Â° \\text{ direction})',
-          annotation: 'Largest eigenvalue â†’ first principal component = direction of maximum variance.',
+          expression: '\\lambda_1 = 8: \\mathbf{q}_1 = \\frac{1}{\\sqrt{2}}(1,1)^\\top \\quad (45° \\text{ direction})',
+          annotation: 'Largest eigenvalue → first principal component = direction of maximum variance.',
           strategyTitle: 'First principal component',
         },
         {
           expression: '\\text{Fraction explained: } \\frac{\\lambda_1}{\\text{tr}(C)} = \\frac{8}{10} = 80\\%, \\quad \\frac{\\lambda_2}{\\text{tr}(C)} = \\frac{2}{10} = 20\\%',
-          annotation: 'The $45Â°$ direction $(1,1)/\\sqrt{2}$ captures $80\\%$ of total variance. The data is elongated along this axis â€” both variables increase together.',
+          annotation: 'The $45°$ direction $(1,1)/\\sqrt{2}$ captures $80\\%$ of total variance. The data is elongated along this axis — both variables increase together.',
           strategyTitle: 'Explained variance fractions',
-          hints: ['The $45Â°$ principal axis makes sense: if $C_{12} = 3 > 0$, the two variables are positively correlated, meaning the data cloud is elongated in the $(1,1)$ direction.'],
+          hints: ['The $45°$ principal axis makes sense: if $C_{12} = 3 > 0$, the two variables are positively correlated, meaning the data cloud is elongated in the $(1,1)$ direction.'],
         },
       ],
     },
@@ -359,7 +359,7 @@ print(f"  Worn:  {ev_worn[1]/ev_worn[0]:.3f}  (higher = more chatter energy in s
       steps: [
         {
           expression: 'A = Q\\Lambda Q^\\top, \\quad Q = \\tfrac{1}{\\sqrt{2}}\\begin{bmatrix}1&1\\\\-1&1\\end{bmatrix}, \\quad \\Lambda = \\begin{bmatrix}2&0\\\\0&4\\end{bmatrix}',
-          annotation: 'From Example 1. The spectral decomposition is already done â€” we just apply $f$ to the eigenvalues.',
+          annotation: 'From Example 1. The spectral decomposition is already done — we just apply $f$ to the eigenvalues.',
           strategyTitle: 'Recall the spectral decomposition',
         },
         {
@@ -369,12 +369,12 @@ print(f"  Worn:  {ev_worn[1]/ev_worn[0]:.3f}  (higher = more chatter energy in s
         },
         {
           expression: 'e^A = \\frac{e^2}{2}\\begin{bmatrix}1&-1\\\\-1&1\\end{bmatrix} + \\frac{e^4}{2}\\begin{bmatrix}1&1\\\\1&1\\end{bmatrix} = \\frac{1}{2}\\begin{bmatrix}e^2+e^4 & -e^2+e^4 \\\\ -e^2+e^4 & e^2+e^4\\end{bmatrix}',
-          annotation: 'Expand: $Q\\begin{bmatrix}e^2&0\\\\0&e^4\\end{bmatrix}Q^\\top = e^2 \\mathbf{q}_1\\mathbf{q}_1^\\top + e^4 \\mathbf{q}_2\\mathbf{q}_2^\\top$. This is the spectral decomposition of $e^A$ â€” same eigenvectors, eigenvalues transformed.',
+          annotation: 'Expand: $Q\\begin{bmatrix}e^2&0\\\\0&e^4\\end{bmatrix}Q^\\top = e^2 \\mathbf{q}_1\\mathbf{q}_1^\\top + e^4 \\mathbf{q}_2\\mathbf{q}_2^\\top$. This is the spectral decomposition of $e^A$ — same eigenvectors, eigenvalues transformed.',
           strategyTitle: 'Expand using outer products',
         },
         {
           expression: 'e^A = e^3\\begin{bmatrix}\\cosh 1 & \\sinh 1 \\\\ \\sinh 1 & \\cosh 1\\end{bmatrix} \\approx \\begin{bmatrix}30.09 & 23.93 \\\\ 23.93 & 30.09\\end{bmatrix}',
-          annotation: 'Factor $e^{(2+4)/2} = e^3$: entries $(e^2+e^4)/2 = e^3\\cosh 1$ and $(e^4-e^2)/2 = e^3\\sinh 1$. The result is symmetric (as expected â€” $e^A$ inherits the symmetry of $A$) and positive definite (all eigenvalues $e^2, e^4 > 0$).',
+          annotation: 'Factor $e^{(2+4)/2} = e^3$: entries $(e^2+e^4)/2 = e^3\\cosh 1$ and $(e^4-e^2)/2 = e^3\\sinh 1$. The result is symmetric (as expected — $e^A$ inherits the symmetry of $A$) and positive definite (all eigenvalues $e^2, e^4 > 0$).',
           strategyTitle: 'Compact form and verification',
           checkpoint: 'For symmetric $A$, $e^A$ is symmetric and positive definite (all eigenvalues positive). The spectral theorem makes matrix functions a one-line computation.',
         },
@@ -406,20 +406,20 @@ print(f"  Worn:  {ev_worn[1]/ev_worn[0]:.3f}  (higher = more chatter energy in s
       hint: 'Compute $\\mathbf{u}^\\top A \\mathbf{v}$ in two ways: using $A\\mathbf{v} = \\mu\\mathbf{v}$ and using $A = A^\\top$ with $A^\\top \\mathbf{u} = \\lambda\\mathbf{u}$.',
       walkthrough: [
         '**Set up:** Compute the scalar $\\mathbf{u}^\\top A \\mathbf{v}$ two ways.',
-        '**Way 1 â€” use the right eigenvector equation:** $\\mathbf{u}^\\top (A\\mathbf{v}) = \\mathbf{u}^\\top (\\mu\\mathbf{v}) = \\mu(\\mathbf{u}^\\top \\mathbf{v})$.',
-        '**Way 2 â€” transpose trick:** $\\mathbf{u}^\\top A \\mathbf{v} = (\\mathbf{u}^\\top A) \\mathbf{v} = (A^\\top \\mathbf{u})^\\top \\mathbf{v}$. Since $A = A^\\top$: $(A^\\top \\mathbf{u})^\\top = (A\\mathbf{u})^\\top = (\\lambda\\mathbf{u})^\\top = \\lambda\\mathbf{u}^\\top$. So: $\\mathbf{u}^\\top A \\mathbf{v} = \\lambda(\\mathbf{u}^\\top \\mathbf{v})$.',
+        '**Way 1 — use the right eigenvector equation:** $\\mathbf{u}^\\top (A\\mathbf{v}) = \\mathbf{u}^\\top (\\mu\\mathbf{v}) = \\mu(\\mathbf{u}^\\top \\mathbf{v})$.',
+        '**Way 2 — transpose trick:** $\\mathbf{u}^\\top A \\mathbf{v} = (\\mathbf{u}^\\top A) \\mathbf{v} = (A^\\top \\mathbf{u})^\\top \\mathbf{v}$. Since $A = A^\\top$: $(A^\\top \\mathbf{u})^\\top = (A\\mathbf{u})^\\top = (\\lambda\\mathbf{u})^\\top = \\lambda\\mathbf{u}^\\top$. So: $\\mathbf{u}^\\top A \\mathbf{v} = \\lambda(\\mathbf{u}^\\top \\mathbf{v})$.',
         '**Equate:** Both expressions equal $\\mathbf{u}^\\top A\\mathbf{v}$, so $\\mu(\\mathbf{u}^\\top \\mathbf{v}) = \\lambda(\\mathbf{u}^\\top \\mathbf{v})$.',
         '**Conclude:** $(\\lambda - \\mu)(\\mathbf{u}^\\top \\mathbf{v}) = 0$. Since $\\lambda \\neq \\mu$, we must have $\\mathbf{u}^\\top \\mathbf{v} = 0$. QED.',
-        '**Why this proof breaks for repeated eigenvalues:** If $\\lambda = \\mu$, the factor $(\\lambda - \\mu) = 0$ and we cannot conclude anything about $\\mathbf{u}^\\top\\mathbf{v}$. For repeated eigenvalues, eigenvectors in the same eigenspace are not automatically orthogonal â€” we must use Gram-Schmidt to orthogonalize within each eigenspace.',
+        '**Why this proof breaks for repeated eigenvalues:** If $\\lambda = \\mu$, the factor $(\\lambda - \\mu) = 0$ and we cannot conclude anything about $\\mathbf{u}^\\top\\mathbf{v}$. For repeated eigenvalues, eigenvectors in the same eigenspace are not automatically orthogonal — we must use Gram-Schmidt to orthogonalize within each eigenspace.',
       ],
     },
   ],
 
   mentalModel: [
-    'Symmetric = $A = A^\\top$ â†’ all eigenvalues real, eigenvectors perpendicular.',
+    'Symmetric = $A = A^\\top$ → all eigenvalues real, eigenvectors perpendicular.',
     'Orthogonal diagonalization: $A = Q\\Lambda Q^\\top$ with $Q^{-1} = Q^\\top$.',
     'Spectral decomposition: $A = \\sum \\lambda_i \\mathbf{q}_i\\mathbf{q}_i^\\top$ (sum of rank-1 projections).',
-    'Function of A: $f(A) = Qf(\\Lambda)Q^\\top$ â€” just apply $f$ to each eigenvalue.',
+    'Function of A: $f(A) = Qf(\\Lambda)Q^\\top$ — just apply $f$ to each eigenvalue.',
   ],
 
   checkpoints: [
@@ -428,7 +428,7 @@ print(f"  Worn:  {ev_worn[1]/ev_worn[0]:.3f}  (higher = more chatter energy in s
     { id: 'cp-la4-006-3', label: 'Read rigor: Hermitian and Courant-Fischer', type: 'read' },
     { id: 'cp-la4-006-4', label: 'Run orthogonal diagonalization lab', type: 'lab' },
     { id: 'cp-la4-006-5', label: 'Run spectral decomposition and PCA lab', type: 'lab' },
-    { id: 'cp-la4-006-6', label: 'Work example 1: diagonalize symmetric 2Ã—2', type: 'example' },
+    { id: 'cp-la4-006-6', label: 'Work example 1: diagonalize symmetric 2×2', type: 'example' },
     { id: 'cp-la4-006-7', label: 'Work example 2: PCA covariance matrix', type: 'example' },
     { id: 'cp-la4-006-8', label: 'Solve matrix square root challenge', type: 'challenge' },
   ],
@@ -506,7 +506,7 @@ print(f"  Worn:  {ev_worn[1]/ev_worn[0]:.3f}  (higher = more chatter energy in s
         'The number of data points along $\\mathbf{q}_i$',
       ],
       answer: 'The variance of the data projected onto $\\mathbf{q}_i$',
-      hints: ['If the covariance is $C = \\frac{1}{N}X^\\top X$ and $C\\mathbf{q}_i = \\lambda_i \\mathbf{q}_i$, then the projected data $X\\mathbf{q}_i$ has variance $\\mathbf{q}_i^\\top C \\mathbf{q}_i = \\lambda_i$. The Courant-Fischer theorem says $\\lambda_1 = \\max_{\\|\\mathbf{q}\\|=1} \\mathbf{q}^\\top C \\mathbf{q}$ â€” the first PC maximizes explained variance.'],
+      hints: ['If the covariance is $C = \\frac{1}{N}X^\\top X$ and $C\\mathbf{q}_i = \\lambda_i \\mathbf{q}_i$, then the projected data $X\\mathbf{q}_i$ has variance $\\mathbf{q}_i^\\top C \\mathbf{q}_i = \\lambda_i$. The Courant-Fischer theorem says $\\lambda_1 = \\max_{\\|\\mathbf{q}\\|=1} \\mathbf{q}^\\top C \\mathbf{q}$ — the first PC maximizes explained variance.'],
       reviewSection: 'rigor',
     },
     {
@@ -514,12 +514,12 @@ print(f"  Worn:  {ev_worn[1]/ev_worn[0]:.3f}  (higher = more chatter energy in s
       type: 'choice',
       text: 'A symmetric matrix has a repeated eigenvalue $\\lambda = 3$ with multiplicity 2. What does the spectral theorem guarantee about the eigenvectors for this eigenspace?',
       options: [
-        'They are automatically orthogonal â€” the spectral theorem forces it',
+        'They are automatically orthogonal — the spectral theorem forces it',
         'There is only one eigenvector, so we cannot orthogonally diagonalize',
-        'We can choose an orthonormal basis for the eigenspace using Gram-Schmidt â€” the theorem guarantees this is possible',
+        'We can choose an orthonormal basis for the eigenspace using Gram-Schmidt — the theorem guarantees this is possible',
         'The matrix is not diagonalizable when eigenvalues repeat',
       ],
-      answer: 'We can choose an orthonormal basis for the eigenspace using Gram-Schmidt â€” the theorem guarantees this is possible',
+      answer: 'We can choose an orthonormal basis for the eigenspace using Gram-Schmidt — the theorem guarantees this is possible',
       hints: ['For distinct eigenvalues, orthogonality of eigenvectors is automatic. For repeated eigenvalues, the eigenspace has dimension $\\geq 1$. The spectral theorem guarantees we can always find an orthonormal basis for each eigenspace (using Gram-Schmidt within the space), giving the full $Q$ with $Q^\\top Q = I$.'],
       reviewSection: 'intuition',
     },
@@ -534,7 +534,7 @@ print(f"  Worn:  {ev_worn[1]/ev_worn[0]:.3f}  (higher = more chatter energy in s
         '$Q\\Lambda Q^{-1}$',
       ],
       answer: '$Q\\Lambda^{-1}Q^\\top$ where $\\Lambda^{-1} = \\text{diag}(1/4, 1/9)$',
-      hints: ['From $A = Q\\Lambda Q^\\top$: $A^{-1} = (Q^\\top)^{-1}\\Lambda^{-1}Q^{-1} = Q\\Lambda^{-1}Q^\\top$ since $Q^{-1} = Q^\\top$ (and $(Q^\\top)^{-1} = Q$). The eigenvalues of $A^{-1}$ are $1/\\lambda_i$ â€” just invert the diagonal.'],
+      hints: ['From $A = Q\\Lambda Q^\\top$: $A^{-1} = (Q^\\top)^{-1}\\Lambda^{-1}Q^{-1} = Q\\Lambda^{-1}Q^\\top$ since $Q^{-1} = Q^\\top$ (and $(Q^\\top)^{-1} = Q$). The eigenvalues of $A^{-1}$ are $1/\\lambda_i$ — just invert the diagonal.'],
       reviewSection: 'math',
     },
     {
@@ -558,7 +558,7 @@ print(f"  Worn:  {ev_worn[1]/ev_worn[0]:.3f}  (higher = more chatter energy in s
       options: [
         'Because $K$ and $M$ happen to commute',
         'The generalized eigenvalues of two symmetric positive definite matrices are always real and non-negative',
-        'The eigenvalues are complex â€” the real part gives frequency, imaginary part gives damping',
+        'The eigenvalues are complex — the real part gives frequency, imaginary part gives damping',
         'Only if the structure is undamped',
       ],
       answer: 'The generalized eigenvalues of two symmetric positive definite matrices are always real and non-negative',
@@ -584,13 +584,13 @@ print(f"  Worn:  {ev_worn[1]/ev_worn[0]:.3f}  (higher = more chatter energy in s
       type: 'choice',
       text: 'Non-symmetric $B = \\begin{bmatrix}1&2\\\\0&3\\end{bmatrix}$ has real eigenvalues $1$ and $3$ with eigenvectors $(1,0)^\\top$ and $(1,1)^\\top$. Does $B$ satisfy the spectral theorem?',
       options: [
-        'Yes â€” it has real eigenvalues, which is all the theorem requires',
-        'No â€” the eigenvectors are not orthogonal: $(1,0)\\cdot(1,1) = 1 \\neq 0$',
-        'Yes â€” any diagonalizable matrix satisfies the spectral theorem',
-        'No â€” non-symmetric matrices always have complex eigenvalues',
+        'Yes — it has real eigenvalues, which is all the theorem requires',
+        'No — the eigenvectors are not orthogonal: $(1,0)\\cdot(1,1) = 1 \\neq 0$',
+        'Yes — any diagonalizable matrix satisfies the spectral theorem',
+        'No — non-symmetric matrices always have complex eigenvalues',
       ],
-      answer: 'No â€” the eigenvectors are not orthogonal: $(1,0)\\cdot(1,1) = 1 \\neq 0$',
-      hints: ['The spectral theorem requires orthogonal diagonalization: $A = Q\\Lambda Q^\\top$ with $Q^\\top Q = I$. This needs orthonormal eigenvectors. $B$ can be diagonalized ($B = PDP^{-1}$) but $P^{-1} \\neq P^\\top$. Real eigenvalues alone are not enough â€” symmetry forces the eigenvectors to be orthogonal.'],
+      answer: 'No — the eigenvectors are not orthogonal: $(1,0)\\cdot(1,1) = 1 \\neq 0$',
+      hints: ['The spectral theorem requires orthogonal diagonalization: $A = Q\\Lambda Q^\\top$ with $Q^\\top Q = I$. This needs orthonormal eigenvectors. $B$ can be diagonalized ($B = PDP^{-1}$) but $P^{-1} \\neq P^\\top$. Real eigenvalues alone are not enough — symmetry forces the eigenvectors to be orthogonal.'],
       reviewSection: 'intuition',
     },
   ],
@@ -599,7 +599,7 @@ print(f"  Worn:  {ev_worn[1]/ev_worn[0]:.3f}  (higher = more chatter energy in s
     targetLevel: 3,
     solveIndependently: 'Orthogonally diagonalize a symmetric matrix, write its spectral decomposition as a sum of rank-1 projections, and compute a matrix function (square root, inverse, exponential) via the decomposition.',
     explainVerbally: 'Explain why symmetry forces eigenvalues to be real and eigenvectors to be orthogonal, using the two-way computation of $\\mathbf{u}^\\top A \\mathbf{v}$.',
-    detectIncorrectApplication: 'Catch claims that any diagonalizable matrix has orthogonal eigenvectors, or that real eigenvalues imply orthogonal eigenvectors â€” both require symmetry.',
+    detectIncorrectApplication: 'Catch claims that any diagonalizable matrix has orthogonal eigenvectors, or that real eigenvalues imply orthogonal eigenvectors — both require symmetry.',
     transferToUnfamiliar: 'Apply the spectral theorem to compute matrix functions, recognize PCA as spectral decomposition of a covariance matrix, and interpret the Courant-Fischer characterization.',
   },
 
@@ -627,7 +627,7 @@ print(f"  Worn:  {ev_worn[1]/ev_worn[0]:.3f}  (higher = more chatter energy in s
     {
       situation: 'You are doing PCA on a dataset and want to choose how many components to keep.',
       competingTechniques: 'Keep a fixed number, keep until cumulative variance exceeds 90%, use cross-validation.',
-      whyThisTechniqueWins: 'The spectral theorem guarantees the covariance matrix $C = Q\\Lambda Q^\\top$ where eigenvalues are the explained variances. The cumulative eigenvalue fraction $\\sum_{i=1}^k \\lambda_i / \\text{tr}(C)$ gives an exact, interpretable criterion. This is only possible because $C$ is symmetric â€” its eigenvalues are real and sum to the total variance.',
+      whyThisTechniqueWins: 'The spectral theorem guarantees the covariance matrix $C = Q\\Lambda Q^\\top$ where eigenvalues are the explained variances. The cumulative eigenvalue fraction $\\sum_{i=1}^k \\lambda_i / \\text{tr}(C)$ gives an exact, interpretable criterion. This is only possible because $C$ is symmetric — its eigenvalues are real and sum to the total variance.',
     },
   ],
 
@@ -636,12 +636,12 @@ print(f"  Worn:  {ev_worn[1]/ev_worn[0]:.3f}  (higher = more chatter energy in s
       commonError: 'Using `numpy.linalg.eig` instead of `numpy.linalg.eigh` for symmetric matrices.',
       symptom: '`eig` returns complex eigenvectors and eigenvalues with small imaginary parts (e.g., $10^{-16}i$) even for a perfectly symmetric matrix, and $Q^\\top Q \\neq I$.',
       whyItHappened: '`eig` is for general matrices and uses non-symmetric algorithms (like QR iteration without symmetry exploitation). `eigh` knows the matrix is symmetric/Hermitian and uses a symmetric algorithm that guarantees real output and orthonormal eigenvectors.',
-      repairStrategy: 'Replace `np.linalg.eig(A)` with `np.linalg.eigh(A)`. Also verify `np.allclose(A, A.T)` before calling â€” if not symmetric, the result of `eigh` is undefined.',
+      repairStrategy: 'Replace `np.linalg.eig(A)` with `np.linalg.eigh(A)`. Also verify `np.allclose(A, A.T)` before calling — if not symmetric, the result of `eigh` is undefined.',
     },
     {
       commonError: 'Applying the matrix function formula $f(A) = Qf(\\Lambda)Q^\\top$ to a non-symmetric or non-diagonalizable matrix.',
       symptom: 'The result is wrong: e.g., $\\sqrt{A}^2 \\neq A$, or the reconstructed matrix differs from the original.',
-      whyItHappened: 'The formula $f(A) = Qf(\\Lambda)Q^\\top$ requires $A$ to be orthogonally diagonalizable â€” i.e., symmetric. For a general diagonalizable matrix $A = PDP^{-1}$, the correct formula is $f(A) = Pf(D)P^{-1}$, not $Pf(D)P^\\top$.',
+      whyItHappened: 'The formula $f(A) = Qf(\\Lambda)Q^\\top$ requires $A$ to be orthogonally diagonalizable — i.e., symmetric. For a general diagonalizable matrix $A = PDP^{-1}$, the correct formula is $f(A) = Pf(D)P^{-1}$, not $Pf(D)P^\\top$.',
       repairStrategy: 'Check $A = A^\\top$ before applying the spectral formula. For general matrices, compute $P^{-1}$ explicitly and use $f(A) = Pf(D)P^{-1}$. For non-diagonalizable matrices, use `scipy.linalg.funm` (Schur decomposition).',
     },
   ],

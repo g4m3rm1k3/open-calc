@@ -1,4 +1,4 @@
-﻿export default {
+export default {
   id: 'la4-008',
   slug: 'pseudoinverse',
   chapter: 'la4',
@@ -9,30 +9,30 @@
   aliases: 'pseudoinverse Moore-Penrose generalized inverse minimum-norm solution least squares SVD overdetermined underdetermined',
 
   hook: {
-    question: "The inverse $A^{-1}$ requires $A$ to be square and invertible. What if your system has more equations than unknowns (overdetermined)? Or more unknowns than equations (underdetermined)? The pseudoinverse handles both â€” and reduces to the true inverse when it exists.",
-    realWorldContext: "The pseudoinverse is one of the most useful computations in data science and engineering. In machine learning, the normal equations for linear regression are $A^+\\mathbf{b}$ â€” the minimum-norm least-squares solution. In robotics, the pseudoinverse of the Jacobian matrix maps desired end-effector velocities to joint velocities, even when the manipulator is kinematically redundant (more joints than needed). In image reconstruction (MRI, CT), the pseudoinverse reconstructs images from measurements, with regularization added to handle ill-conditioning.",
+    question: "The inverse $A^{-1}$ requires $A$ to be square and invertible. What if your system has more equations than unknowns (overdetermined)? Or more unknowns than equations (underdetermined)? The pseudoinverse handles both — and reduces to the true inverse when it exists.",
+    realWorldContext: "The pseudoinverse is one of the most useful computations in data science and engineering. In machine learning, the normal equations for linear regression are $A^+\\mathbf{b}$ — the minimum-norm least-squares solution. In robotics, the pseudoinverse of the Jacobian matrix maps desired end-effector velocities to joint velocities, even when the manipulator is kinematically redundant (more joints than needed). In image reconstruction (MRI, CT), the pseudoinverse reconstructs images from measurements, with regularization added to handle ill-conditioning.",
   },
 
   intuition: {
     prose: [
-      'When a matrix is not invertible â€” because it is rectangular, or because it is square but rank-deficient â€” the equation $A\\mathbf{x} = \\mathbf{b}$ may have no solution, infinitely many solutions, or both problems at once. The **pseudoinverse** $A^+$ resolves all three cases with one formula. For any $\\mathbf{b}$, $\\hat{\\mathbf{x}} = A^+\\mathbf{b}$ gives the unique vector that minimizes $\\|A\\mathbf{x} - \\mathbf{b}\\|$ (least squares fit) and, among all such minimizers, has the smallest norm $\\|\\mathbf{x}\\|$. This is the best possible answer to any linear system.',
-      '**A concrete example.** Take $A = \\begin{pmatrix}3&0\\\\0&2\\\\0&0\\end{pmatrix}$ (3Ã—2, rank 2). The SVD is $A = U\\Sigma V^T$ with $\\Sigma = \\begin{pmatrix}3&0\\\\0&2\\\\0&0\\end{pmatrix}$ and $U,V$ as identity matrices in this case. To build $A^+$: flip $\\Sigma$ to get a 2Ã—3 matrix, and replace each nonzero entry by its reciprocal: $\\Sigma^+ = \\begin{pmatrix}1/3&0&0\\\\0&1/2&0\\end{pmatrix}$. Then $A^+ = V\\Sigma^+U^T = \\begin{pmatrix}1/3&0&0\\\\0&1/2&0\\end{pmatrix}$. Check: $A^+A = I_2$ (left inverse â€” A has full column rank). But $AA^+ = \\begin{pmatrix}1&0&0\\\\0&1&0\\\\0&0&0\\end{pmatrix}$ â€” not the identity, but the projection onto the column space of $A$.',
-      '**The three cases the pseudoinverse handles.** (1) **Overdetermined ($m > n$, full column rank):** no exact solution, $A^+\\mathbf{b}$ is the unique least-squares minimizer. This is $\\hat{\\mathbf{x}} = (A^TA)^{-1}A^T\\mathbf{b}$ from the normal equations. (2) **Underdetermined ($m < n$, full row rank):** infinitely many exact solutions, $A^+\\mathbf{b}$ picks the minimum-norm one. This is $\\hat{\\mathbf{x}} = A^T(AA^T)^{-1}\\mathbf{b}$. (3) **Square invertible:** exactly one exact solution, and $A^+ = A^{-1}$ exactly â€” the pseudoinverse reduces to the regular inverse. In all three cases, the same SVD formula $A^+ = V\\Sigma^+U^T$ works.',
-      '**Why minimum norm?** In the underdetermined case ($m < n$), there are infinitely many vectors $\\mathbf{x}$ with $A\\mathbf{x} = \\mathbf{b}$ exactly. They form the set $\\hat{\\mathbf{x}} + N(A)$ â€” the particular solution plus any null space vector. Among these, $A^+\\mathbf{b}$ is the unique solution in the **row space** $C(A^T)$ â€” perpendicular to the null space. This is the minimum-norm solution. Geometrically, you are projecting the origin onto the solution set and taking the closest point.',
-      '**The four Moore-Penrose conditions.** $A^+$ is the unique matrix satisfying: (1) $AA^+A = A$, (2) $A^+AA^+ = A^+$, (3) $(AA^+)^T = AA^+$, (4) $(A^+A)^T = A^+A$. Conditions (3) and (4) are the orthogonality conditions: they require $AA^+$ and $A^+A$ to be symmetric, which forces them to be orthogonal projections. Any matrix that satisfies all four is the pseudoinverse â€” uniquely.',
-      '**CNC robot kinematics â€” the Jacobian pseudoinverse.** A robotic CNC machine with $n$ joints and $m$ degrees of freedom at the end effector has a Jacobian $J(\\mathbf{q})$ relating joint velocities to end-effector velocities: $\\dot{\\mathbf{p}} = J\\dot{\\mathbf{q}}$. To move the end effector at velocity $\\dot{\\mathbf{p}}$, compute $\\dot{\\mathbf{q}} = J^+\\dot{\\mathbf{p}}$. If $n > m$ (more joints than DOF â€” kinematically redundant), there are infinitely many joint velocity solutions. The pseudoinverse gives the minimum-norm joint velocities â€” the smoothest motion. If the robot passes through a **singularity** (where $J$ drops rank), some singular values of $J$ go to zero, and $J^+$ would amplify small errors catastrophically. In practice, a regularized pseudoinverse $(J^TJ + \\lambda I)^{-1}J^T$ is used near singularities.',
-      '**Where this is heading.** The pseudoinverse is the last major tool in this chapter â€” it unifies least squares, projection, and the four fundamental subspaces into one formula. The final lesson applies these ideas to data: low-rank approximation and dimensionality reduction using the SVD, where the pseudoinverse determines how to reconstruct compressed data.',
+      'When a matrix is not invertible — because it is rectangular, or because it is square but rank-deficient — the equation $A\\mathbf{x} = \\mathbf{b}$ may have no solution, infinitely many solutions, or both problems at once. The **pseudoinverse** $A^+$ resolves all three cases with one formula. For any $\\mathbf{b}$, $\\hat{\\mathbf{x}} = A^+\\mathbf{b}$ gives the unique vector that minimizes $\\|A\\mathbf{x} - \\mathbf{b}\\|$ (least squares fit) and, among all such minimizers, has the smallest norm $\\|\\mathbf{x}\\|$. This is the best possible answer to any linear system.',
+      '**A concrete example.** Take $A = \\begin{pmatrix}3&0\\\\0&2\\\\0&0\\end{pmatrix}$ (3×2, rank 2). The SVD is $A = U\\Sigma V^T$ with $\\Sigma = \\begin{pmatrix}3&0\\\\0&2\\\\0&0\\end{pmatrix}$ and $U,V$ as identity matrices in this case. To build $A^+$: flip $\\Sigma$ to get a 2×3 matrix, and replace each nonzero entry by its reciprocal: $\\Sigma^+ = \\begin{pmatrix}1/3&0&0\\\\0&1/2&0\\end{pmatrix}$. Then $A^+ = V\\Sigma^+U^T = \\begin{pmatrix}1/3&0&0\\\\0&1/2&0\\end{pmatrix}$. Check: $A^+A = I_2$ (left inverse — A has full column rank). But $AA^+ = \\begin{pmatrix}1&0&0\\\\0&1&0\\\\0&0&0\\end{pmatrix}$ — not the identity, but the projection onto the column space of $A$.',
+      '**The three cases the pseudoinverse handles.** (1) **Overdetermined ($m > n$, full column rank):** no exact solution, $A^+\\mathbf{b}$ is the unique least-squares minimizer. This is $\\hat{\\mathbf{x}} = (A^TA)^{-1}A^T\\mathbf{b}$ from the normal equations. (2) **Underdetermined ($m < n$, full row rank):** infinitely many exact solutions, $A^+\\mathbf{b}$ picks the minimum-norm one. This is $\\hat{\\mathbf{x}} = A^T(AA^T)^{-1}\\mathbf{b}$. (3) **Square invertible:** exactly one exact solution, and $A^+ = A^{-1}$ exactly — the pseudoinverse reduces to the regular inverse. In all three cases, the same SVD formula $A^+ = V\\Sigma^+U^T$ works.',
+      '**Why minimum norm?** In the underdetermined case ($m < n$), there are infinitely many vectors $\\mathbf{x}$ with $A\\mathbf{x} = \\mathbf{b}$ exactly. They form the set $\\hat{\\mathbf{x}} + N(A)$ — the particular solution plus any null space vector. Among these, $A^+\\mathbf{b}$ is the unique solution in the **row space** $C(A^T)$ — perpendicular to the null space. This is the minimum-norm solution. Geometrically, you are projecting the origin onto the solution set and taking the closest point.',
+      '**The four Moore-Penrose conditions.** $A^+$ is the unique matrix satisfying: (1) $AA^+A = A$, (2) $A^+AA^+ = A^+$, (3) $(AA^+)^T = AA^+$, (4) $(A^+A)^T = A^+A$. Conditions (3) and (4) are the orthogonality conditions: they require $AA^+$ and $A^+A$ to be symmetric, which forces them to be orthogonal projections. Any matrix that satisfies all four is the pseudoinverse — uniquely.',
+      '**CNC robot kinematics — the Jacobian pseudoinverse.** A robotic CNC machine with $n$ joints and $m$ degrees of freedom at the end effector has a Jacobian $J(\\mathbf{q})$ relating joint velocities to end-effector velocities: $\\dot{\\mathbf{p}} = J\\dot{\\mathbf{q}}$. To move the end effector at velocity $\\dot{\\mathbf{p}}$, compute $\\dot{\\mathbf{q}} = J^+\\dot{\\mathbf{p}}$. If $n > m$ (more joints than DOF — kinematically redundant), there are infinitely many joint velocity solutions. The pseudoinverse gives the minimum-norm joint velocities — the smoothest motion. If the robot passes through a **singularity** (where $J$ drops rank), some singular values of $J$ go to zero, and $J^+$ would amplify small errors catastrophically. In practice, a regularized pseudoinverse $(J^TJ + \\lambda I)^{-1}J^T$ is used near singularities.',
+      '**Where this is heading.** The pseudoinverse is the last major tool in this chapter — it unifies least squares, projection, and the four fundamental subspaces into one formula. The final lesson applies these ideas to data: low-rank approximation and dimensionality reduction using the SVD, where the pseudoinverse determines how to reconstruct compressed data.',
     ],
     callouts: [
       {
         type: 'sequencing',
-        title: 'Lesson 8 of 9 â€” Orthogonality & SVD',
-        body: '**Previous (Lesson 7):** Quadratic Forms â€” how symmetric matrices define curvature and classify critical points.\n**This lesson:** Pseudoinverse â€” the Moore-Penrose generalization of the matrix inverse to any matrix, giving the minimum-norm least-squares solution.\n**Next (Lesson 9):** Low-Rank Approximation â€” using SVD to compress matrices and find the most important structure in data.',
+        title: 'Lesson 8 of 9 — Orthogonality & SVD',
+        body: '**Previous (Lesson 7):** Quadratic Forms — how symmetric matrices define curvature and classify critical points.\n**This lesson:** Pseudoinverse — the Moore-Penrose generalization of the matrix inverse to any matrix, giving the minimum-norm least-squares solution.\n**Next (Lesson 9):** Low-Rank Approximation — using SVD to compress matrices and find the most important structure in data.',
       },
       {
         type: 'insight',
         title: 'Prediction: pseudoinverse of a rank-1 matrix',
-        body: 'Let $A = \\begin{pmatrix}2\\\\1\\end{pmatrix}$ (2Ã—1 column vector). **Before computing:** what should $A^+$ be? It must map $\\mathbb{R}^2 \\to \\mathbb{R}^1$ (a row vector). For $\\mathbf{b} = (2,1)^\\top$ (in $C(A)$), the exact solution is $x=1$. For $\\mathbf{b} = (1,0)^\\top$, the least-squares solution minimizes $(2x-1)^2+x^2$. After predicting: $A^+ = \\frac{A^\\top}{\\|A\\|^2} = \\frac{1}{5}(2,1)$. Check: $A^+A = (4+1)/5 = 1$ âœ“. $A^+(2,1)^\\top = (4+1)/5 = 1$ (exact solution âœ“).',
+        body: 'Let $A = \\begin{pmatrix}2\\\\1\\end{pmatrix}$ (2×1 column vector). **Before computing:** what should $A^+$ be? It must map $\\mathbb{R}^2 \\to \\mathbb{R}^1$ (a row vector). For $\\mathbf{b} = (2,1)^\\top$ (in $C(A)$), the exact solution is $x=1$. For $\\mathbf{b} = (1,0)^\\top$, the least-squares solution minimizes $(2x-1)^2+x^2$. After predicting: $A^+ = \\frac{A^\\top}{\\|A\\|^2} = \\frac{1}{5}(2,1)$. Check: $A^+A = (4+1)/5 = 1$ âœ“. $A^+(2,1)^\\top = (4+1)/5 = 1$ (exact solution âœ“).',
       },
       {
         type: 'theorem',
@@ -123,13 +123,13 @@ null_A'' * x_min
 
   math: {
     prose: [
-      '**Regularized pseudoinverse.** When $A$ is ill-conditioned (some singular values near zero), $A^+$ amplifies noise â€” dividing by near-zero $\\sigma_i$ is unstable. The **Tikhonov regularization** replaces $A^+$ with $(A^\\top A + \\lambda I)^{-1}A^\\top$ for small $\\lambda > 0$. In SVD terms: replace $1/\\sigma_i$ by $\\sigma_i/(\\sigma_i^2 + \\lambda)$. This shrinks the contribution of small singular values instead of amplifying them. As $\\lambda \\to 0$, this converges to $A^+$. The choice of $\\lambda$ is the bias-variance tradeoff in ridge regression.',
+      '**Regularized pseudoinverse.** When $A$ is ill-conditioned (some singular values near zero), $A^+$ amplifies noise — dividing by near-zero $\\sigma_i$ is unstable. The **Tikhonov regularization** replaces $A^+$ with $(A^\\top A + \\lambda I)^{-1}A^\\top$ for small $\\lambda > 0$. In SVD terms: replace $1/\\sigma_i$ by $\\sigma_i/(\\sigma_i^2 + \\lambda)$. This shrinks the contribution of small singular values instead of amplifying them. As $\\lambda \\to 0$, this converges to $A^+$. The choice of $\\lambda$ is the bias-variance tradeoff in ridge regression.',
     ],
     callouts: [
       {
         type: 'insight',
         title: 'Pseudoinverse and Projections',
-        body: '$AA^+$ projects onto the column space $C(A)$: for $\\mathbf{b} \\in C(A)$, $AA^+\\mathbf{b} = \\mathbf{b}$; for $\\mathbf{b} \\perp C(A)$, $AA^+\\mathbf{b} = 0$.\n\n$A^+A$ projects onto the row space $C(A^\\top)$: for $\\mathbf{x} \\in C(A^\\top)$, $A^+A\\mathbf{x} = \\mathbf{x}$; for $\\mathbf{x} \\in N(A)$, $A^+A\\mathbf{x} = 0$.\n\nThese are the orthogonal projectors onto the two "usable" subspaces â€” exactly what the four fundamental subspaces tell us.',
+        body: '$AA^+$ projects onto the column space $C(A)$: for $\\mathbf{b} \\in C(A)$, $AA^+\\mathbf{b} = \\mathbf{b}$; for $\\mathbf{b} \\perp C(A)$, $AA^+\\mathbf{b} = 0$.\n\n$A^+A$ projects onto the row space $C(A^\\top)$: for $\\mathbf{x} \\in C(A^\\top)$, $A^+A\\mathbf{x} = \\mathbf{x}$; for $\\mathbf{x} \\in N(A)$, $A^+A\\mathbf{x} = 0$.\n\nThese are the orthogonal projectors onto the two "usable" subspaces — exactly what the four fundamental subspaces tell us.',
       },
     ],
     visualizations: [
@@ -179,7 +179,7 @@ plt.show()`,
             },
             {
               id: 2,
-              cellTitle: 'Overdetermined vs underdetermined â€” one formula handles both',
+              cellTitle: 'Overdetermined vs underdetermined — one formula handles both',
               prose: 'For an overdetermined system ($m > n$), $A^+\\mathbf{b}$ is the least-squares solution. For an underdetermined system ($m < n$), it is the minimum-norm exact solution. The same `np.linalg.pinv` works for both.',
               code: `import numpy as np
 
@@ -206,8 +206,8 @@ print(f"Another solution norm: {np.linalg.norm(x_other):.4f} (larger than min-no
             },
             {
               id: 3,
-              cellTitle: 'Robot Jacobian pseudoinverse â€” minimum-norm joint velocities',
-              prose: 'A 3-joint planar robot with end-effector position in 2D has a 2Ã—3 Jacobian. Since 3 joints > 2 DOF (underdetermined), there are infinitely many joint velocity solutions for any desired end-effector motion. The pseudoinverse picks the minimum-norm joint velocities â€” minimizing energy and avoiding sudden joint accelerations.',
+              cellTitle: 'Robot Jacobian pseudoinverse — minimum-norm joint velocities',
+              prose: 'A 3-joint planar robot with end-effector position in 2D has a 2×3 Jacobian. Since 3 joints > 2 DOF (underdetermined), there are infinitely many joint velocity solutions for any desired end-effector motion. The pseudoinverse picks the minimum-norm joint velocities — minimizing energy and avoiding sudden joint accelerations.',
               code: `import numpy as np
 
 # Simplified 3-joint planar robot Jacobian at a given configuration
@@ -261,7 +261,7 @@ print(f"\\nAlternative solution ||q_other||: {np.linalg.norm(q_other):.4f} (larg
   examples: [
     {
       id: 'ex-la4-008-1',
-      title: 'Pseudoinverse via SVD for a 3Ã—2 matrix',
+      title: 'Pseudoinverse via SVD for a 3×2 matrix',
       problem: 'Compute $A^+$ for $A = \\begin{pmatrix}1&0\\\\0&1\\\\1&1\\end{pmatrix}$ using the SVD formula, then find the minimum-norm least-squares solution to $A\\mathbf{x} = (2, 1, 4)^\\top$.',
       steps: [
         { explanation: 'Compute $A^\\top A = \\begin{pmatrix}2&1\\\\1&2\\end{pmatrix}$. Eigenvalues: $\\lambda = 3, 1$. So singular values $\\sigma_1=\\sqrt{3}$, $\\sigma_2=1$. This gives $\\Sigma = \\begin{pmatrix}\\sqrt{3}&0\\\\0&1\\\\0&0\\end{pmatrix}$.' },
@@ -276,7 +276,7 @@ print(f"\\nAlternative solution ||q_other||: {np.linalg.norm(q_other):.4f} (larg
       title: 'Minimum-norm solution for underdetermined system',
       problem: 'Solve the underdetermined system $\\mathbf{x}_1 + 2\\mathbf{x}_2 + 3\\mathbf{x}_3 = 6$ for the minimum-norm solution using the pseudoinverse.',
       steps: [
-        { explanation: 'Matrix: $A = (1, 2, 3)$ (1Ã—3). Many solutions exist: any $(x_1,x_2,x_3)$ with $x_1+2x_2+3x_3=6$.' },
+        { explanation: 'Matrix: $A = (1, 2, 3)$ (1×3). Many solutions exist: any $(x_1,x_2,x_3)$ with $x_1+2x_2+3x_3=6$.' },
         { explanation: 'Pseudoinverse of a row vector: $A^+ = A^\\top/\\|A\\|^2 = (1,2,3)^\\top/(1+4+9) = (1,2,3)^\\top/14$.' },
         { explanation: 'Minimum-norm solution: $\\hat{x} = A^+ \\cdot 6 = 6(1,2,3)^\\top/14 = (3/7, 6/7, 9/7)^\\top$.' },
         { explanation: 'Verify: $1\\cdot(3/7)+2\\cdot(6/7)+3\\cdot(9/7) = (3+12+27)/7 = 42/7 = 6$ âœ“.' },
@@ -321,7 +321,7 @@ print(f"\\nAlternative solution ||q_other||: {np.linalg.norm(q_other):.4f} (larg
     { id: 'cp-la4-008-3', label: 'Read what A+b computes (min-norm LS solution)', type: 'read' },
     { id: 'cp-la4-008-4', label: 'Compute pseudoinverse and verify conditions in notebook', type: 'lab' },
     { id: 'cp-la4-008-5', label: 'Find min-norm solution for underdetermined system in notebook', type: 'lab' },
-    { id: 'cp-la4-008-6', label: 'Trace the 3Ã—2 full column rank pseudoinverse example', type: 'example' },
+    { id: 'cp-la4-008-6', label: 'Trace the 3×2 full column rank pseudoinverse example', type: 'example' },
     { id: 'cp-la4-008-7', label: 'Trace the minimum-norm underdetermined example', type: 'example' },
     { id: 'cp-la4-008-8', label: 'Derive the pseudoinverse formula for a rank-1 outer product', type: 'challenge' },
   ],
@@ -373,7 +373,7 @@ print(f"\\nAlternative solution ||q_other||: {np.linalg.norm(q_other):.4f} (larg
     {
       id: 'q-la4-008-5',
       type: 'choice',
-      text: 'For $A = (2, 1)$ (a 1Ã—2 row vector), $A^+$ is:',
+      text: 'For $A = (2, 1)$ (a 1×2 row vector), $A^+$ is:',
       options: ['$(2, 1)^\\top$', '$(2,1)^\\top/5$', '$(1/2, 1)^\\top$', '$(2,1)^\\top/\\sqrt{5}$'],
       answer: '$(2,1)^\\top/5$',
       hints: ['$A^+ = A^\\top/\\|A\\|^2$ for a row vector.', '$\\|A\\|^2 = 4+1=5$.'],
@@ -394,7 +394,7 @@ print(f"\\nAlternative solution ||q_other||: {np.linalg.norm(q_other):.4f} (larg
       text: 'For an invertible square matrix $A$, the pseudoinverse $A^+$ equals:',
       options: ['$A$', '$A^\\top$', '$A^{-1}$', '$A^{-\\top}$'],
       answer: '$A^{-1}$',
-      hints: ['When $A$ is invertible, the pseudoinverse reduces to the true inverse.', '$A^+ = V\\Sigma^+U^\\top$ and $(A^{-1}) = V\\Sigma^{-1}U^\\top$ â€” same formula with $\\Sigma^+ = \\Sigma^{-1}$ since all singular values are nonzero.'],
+      hints: ['When $A$ is invertible, the pseudoinverse reduces to the true inverse.', '$A^+ = V\\Sigma^+U^\\top$ and $(A^{-1}) = V\\Sigma^{-1}U^\\top$ — same formula with $\\Sigma^+ = \\Sigma^{-1}$ since all singular values are nonzero.'],
       reviewSection: 'intuition',
     },
     {
@@ -412,7 +412,7 @@ print(f"\\nAlternative solution ||q_other||: {np.linalg.norm(q_other):.4f} (larg
       text: 'Tikhonov regularization $(A^\\top A + \\lambda I)^{-1}A^\\top\\mathbf{b}$ is preferred over $A^+\\mathbf{b}$ when:',
       options: ['$A$ is full rank', '$A$ has small singular values (ill-conditioned)', '$\\mathbf{b}$ is large', '$A$ is square'],
       answer: '$A$ has small singular values (ill-conditioned)',
-      hints: ['$A^+$ divides by singular values â€” tiny $\\sigma_i$ cause huge amplification of noise.', 'Tikhonov adds $\\lambda$ to avoid dividing by near-zero values.'],
+      hints: ['$A^+$ divides by singular values — tiny $\\sigma_i$ cause huge amplification of noise.', 'Tikhonov adds $\\lambda$ to avoid dividing by near-zero values.'],
       reviewSection: 'math',
     },
     {
@@ -430,14 +430,14 @@ print(f"\\nAlternative solution ||q_other||: {np.linalg.norm(q_other):.4f} (larg
     targetLevel: 2,
     solveIndependently: 'Compute the pseudoinverse using $A^+ = (A^\\top A)^{-1}A^\\top$ (full column rank) or $A^+= A^\\top(AA^\\top)^{-1}$ (full row rank); find the minimum-norm least-squares solution $\\hat{x} = A^+b$.',
     explainVerbally: 'Explain why $A^+b$ gives the unique minimum-norm least-squares solution, connecting it to the row space (minimum norm) and column space projection (least squares).',
-    detectIncorrectApplication: 'Catch the mistake of using $A^+ = (A^\\top A)^{-1}A^\\top$ when $A$ is not full column rank â€” $A^\\top A$ is not invertible in that case and you must use the SVD formula.',
+    detectIncorrectApplication: 'Catch the mistake of using $A^+ = (A^\\top A)^{-1}A^\\top$ when $A$ is not full column rank — $A^\\top A$ is not invertible in that case and you must use the SVD formula.',
     transferToUnfamiliar: 'Given a new linear system, classify it as overdetermined, underdetermined, or exactly determined, then apply the correct pseudoinverse formula and interpret the solution geometrically.',
   },
 
   misconceptions: [
     {
       falseBelief: 'The pseudoinverse is just the regular inverse when the matrix is square.',
-      whyStudentsThinkIt: 'For invertible square matrices, $A^+ = A^{-1}$ â€” this is true. But for singular square matrices, $A^+ \\neq A^{-1}$ (which doesn\'t exist). Students think "square" implies "pseudoinverse = inverse."',
+      whyStudentsThinkIt: 'For invertible square matrices, $A^+ = A^{-1}$ — this is true. But for singular square matrices, $A^+ \\neq A^{-1}$ (which doesn\'t exist). Students think "square" implies "pseudoinverse = inverse."',
       correctionExample: 'For $A = \\begin{pmatrix}1&1\\\\1&1\\end{pmatrix}$ (square but singular, rank 1): $A^+ = A/(\\|A\\|_F^2) = A/4$ (one-quarter of $A$), NOT the inverse (which doesn\'t exist).',
       contrastCase: 'Only for invertible square matrices is $A^+ = A^{-1}$. For all other matrices (non-square or singular square), $A^+$ is genuinely different from any classical inverse.',
     },
@@ -445,7 +445,7 @@ print(f"\\nAlternative solution ||q_other||: {np.linalg.norm(q_other):.4f} (larg
       falseBelief: '$A^+\\mathbf{b}$ always gives an exact solution to $A\\mathbf{x}=\\mathbf{b}$.',
       whyStudentsThinkIt: 'The pseudoinverse "solves" the equation, so students assume it gives an exact solution. But for overdetermined inconsistent systems, there is no exact solution.',
       correctionExample: 'For $A = \\begin{pmatrix}1\\\\2\\end{pmatrix}$, $\\mathbf{b} = (1,0)^\\top$: $A^+ = (1,2)/5$, $\\hat{x} = A^+\\mathbf{b} = 1/5$. Then $A\\hat{x} = (1/5, 2/5)^\\top \\neq (1,0)^\\top$. The residual is $(4/5, -2/5)^\\top$, which is nonzero but is perpendicular to $C(A) = \\text{span}\\{(1,2)^\\top\\}$ âœ“.',
-      contrastCase: '$A^+\\mathbf{b}$ gives an exact solution when $\\mathbf{b} \\in C(A)$. For inconsistent systems, it gives the nearest point in $C(A)$ â€” the least-squares solution, NOT an exact solution.',
+      contrastCase: '$A^+\\mathbf{b}$ gives an exact solution when $\\mathbf{b} \\in C(A)$. For inconsistent systems, it gives the nearest point in $C(A)$ — the least-squares solution, NOT an exact solution.',
     },
   ],
 
@@ -453,12 +453,12 @@ print(f"\\nAlternative solution ||q_other||: {np.linalg.norm(q_other):.4f} (larg
     {
       situation: 'In a robotics arm with 7 joints controlling a 6D end-effector pose, the Jacobian $J$ is $6\\times 7$ (underdetermined). You want to move the end-effector with velocity $\\mathbf{v}$. How do you find joint velocities $\\dot{q}$?',
       competingTechniques: ['Use any particular solution to $J\\dot{q}=v$ (ignore redundancy)', 'Use $\\dot{q}^* = J^+\\mathbf{v}$ (minimum-norm joint velocities)'],
-      whyThisTechniqueWins: 'The pseudoinverse solution $J^+\\mathbf{v}$ gives the minimum-energy joint motion â€” the redundant DOF is used to minimize joint effort. Alternative: $\\dot{q}^* + (I-J^+J)\\mathbf{z}$ for any $\\mathbf{z}$ (null space term) can further optimize secondary objectives like avoiding joint limits.',
+      whyThisTechniqueWins: 'The pseudoinverse solution $J^+\\mathbf{v}$ gives the minimum-energy joint motion — the redundant DOF is used to minimize joint effort. Alternative: $\\dot{q}^* + (I-J^+J)\\mathbf{z}$ for any $\\mathbf{z}$ (null space term) can further optimize secondary objectives like avoiding joint limits.',
     },
     {
       situation: 'A linear regression model has more features than training samples (overparameterized, $n > m$). The normal equations $X^\\top X\\hat{\\beta} = X^\\top\\mathbf{y}$ are underdetermined. Which solution does gradient descent on squared loss converge to?',
-      competingTechniques: ['Add regularization (ridge, LASSO) to ensure uniqueness', 'Use gradient descent initialized at zero â€” converges to $X^+\\mathbf{y}$ (minimum norm)'],
-      whyThisTechniqueWins: 'When initialized at zero, gradient descent converges exactly to the minimum-norm solution $\\hat{\\beta} = X^+\\mathbf{y}$ â€” this is an implicit regularization effect. Understanding the pseudoinverse explains WHY overparameterized networks trained with SGD generalize: they find the minimum-norm solution, which tends to be simpler.',
+      competingTechniques: ['Add regularization (ridge, LASSO) to ensure uniqueness', 'Use gradient descent initialized at zero — converges to $X^+\\mathbf{y}$ (minimum norm)'],
+      whyThisTechniqueWins: 'When initialized at zero, gradient descent converges exactly to the minimum-norm solution $\\hat{\\beta} = X^+\\mathbf{y}$ — this is an implicit regularization effect. Understanding the pseudoinverse explains WHY overparameterized networks trained with SGD generalize: they find the minimum-norm solution, which tends to be simpler.',
     },
   ],
 
@@ -473,7 +473,7 @@ print(f"\\nAlternative solution ||q_other||: {np.linalg.norm(q_other):.4f} (larg
       commonError: 'Confusing $\\Sigma^+$ with $\\Sigma^{-1}$ (transposing $\\Sigma$ but not inverting the entries).',
       symptom: 'Student computes $\\Sigma^+ = \\Sigma^\\top$ (just the transpose of $\\Sigma$) without inverting the diagonal entries.',
       whyItHappened: 'The formula $A^+ = V\\Sigma^+U^\\top$ uses $^\\top$ notation for both the SVD factors AND the pseudoinverse, causing confusion about what "flipping" $\\Sigma$ means.',
-      repairStrategy: '$\\Sigma^+$ = TRANSPOSE $\\Sigma$ (swap $m\\times n$ to $n\\times m$) AND replace each nonzero diagonal entry $\\sigma_i$ by $1/\\sigma_i$. Leave zero entries as zero. For $\\Sigma = \\text{diag}(3,2,0)$ (3Ã—3): $\\Sigma^+ = \\text{diag}(1/3, 1/2, 0)$ (3Ã—3 same shape since square here).',
+      repairStrategy: '$\\Sigma^+$ = TRANSPOSE $\\Sigma$ (swap $m\\times n$ to $n\\times m$) AND replace each nonzero diagonal entry $\\sigma_i$ by $1/\\sigma_i$. Leave zero entries as zero. For $\\Sigma = \\text{diag}(3,2,0)$ (3×3): $\\Sigma^+ = \\text{diag}(1/3, 1/2, 0)$ (3×3 same shape since square here).',
     },
   ],
 };

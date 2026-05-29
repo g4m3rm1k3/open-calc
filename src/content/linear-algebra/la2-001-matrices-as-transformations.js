@@ -1,44 +1,44 @@
-﻿﻿export default {
-  // â”€â”€ Identity â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+﻿export default {
+  // ── Identity ───────────────────────────────────────────────────
   id: 'la2-001',
   slug: 'matrices-as-transformations',
   chapter: 'la2',
   order: 1,
   title: 'Matrices as Linear Transformations',
-  subtitle: 'A matrix is not just a block of numbersâ€”it is a machine that stretches, squishes, and rotates space.',
+  subtitle: 'A matrix is not just a block of numbers—it is a machine that stretches, squishes, and rotates space.',
   tags: ['matrices', 'linear transformation', 'basis vectors', 'mapping', 'function'],
   aliases: 'matrix transformation linear mapping linear function warping space grid transformation',
 
-  // â”€â”€ Pedagogical Meta â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Pedagogical Meta ───────────────────────────────────────────
   timeToComplete: 25,
   coreConcept: 'A matrix is a function that maps an input vector to an output vector. Geometrically, it transforms the entire coordinate space while keeping grid lines parallel and evenly spaced.',
   prerequisites: ['la1-002', 'la1-003'],
   nextLesson: 'matrix-multiplication',
 
-  // â”€â”€ Hook â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Hook ───────────────────────────────────────────────────────
   hook: {
     question: "If you take a photo on your phone and want to skew it horizontally, how does the computer know where to move every single one of the 12 million pixels?",
-    realWorldContext: "When an engineer designs a video game or an iPhone app, they don't write a loop that calculates the new position of every single pixel one by one. That would be far too slow. Instead, they define a 'Linear Transformation'â€”a single rule that universally twists and stretches the entire fabric of space. Because space is locked to a grid, the computer only needs to calculate where the two fundamental basis vectors move. Everything else just gets dragged along for the ride. The mathematical 'recipe' that holds the instructions for where those two basis vectors go is called a Matrix.",
+    realWorldContext: "When an engineer designs a video game or an iPhone app, they don't write a loop that calculates the new position of every single pixel one by one. That would be far too slow. Instead, they define a 'Linear Transformation'—a single rule that universally twists and stretches the entire fabric of space. Because space is locked to a grid, the computer only needs to calculate where the two fundamental basis vectors move. Everything else just gets dragged along for the ride. The mathematical 'recipe' that holds the instructions for where those two basis vectors go is called a Matrix.",
     previewVisualizationId: 'LALesson04_Matrices',
   },
 
-  // â”€â”€ Intuition â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Intuition ──────────────────────────────────────────────────
   intuition: {
     prose: [
-      'Take $[3, 1]^T$ and apply $A = \\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$. Output: $[-1, 3]^T$. Apply $A$ to $[5, 2]^T$: output is $[-2, 5]^T$. Apply $A$ to $[0, -4]^T$: output is $[4, 0]^T$. Every vector rotates 90Â° counter-clockwise. The matrix $A$ is not storing data â€” it is a **function** that warps the entire plane simultaneously. This lesson is about that shift: from matrix as spreadsheet to matrix as **verb** that transforms space.',
-      'You may have seen matrices before as grids of data â€” like a spreadsheet. That is the database view. The **geometric view** is far more powerful: a matrix is a *function* that transforms every point in space simultaneously.',
-      'Picture a rubber sheet covered in a grid. A matrix transformation grabs that sheet and stretches it, rotates it, or shears it into a new shape. Every point on the sheet moves with it. The key constraint of a **linear** transformation: the rubber sheet cannot crinkle, tear, or move the origin. Grid lines stay parallel and evenly spaced â€” just scaled, rotated, or skewed.',
-      '**The basis vector shortcut.** Because the grid stays uniform, you do not need to track where every point goes. Track only two points: where $\\hat{i} = [1,0]$ and $\\hat{j} = [0,1]$ land. Once you know those, every other point is forced â€” because every vector is a linear combination of $\\hat{i}$ and $\\hat{j}$, and the combination rules do not change under a linear transformation.',
+      'Take $[3, 1]^T$ and apply $A = \\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$. Output: $[-1, 3]^T$. Apply $A$ to $[5, 2]^T$: output is $[-2, 5]^T$. Apply $A$ to $[0, -4]^T$: output is $[4, 0]^T$. Every vector rotates 90° counter-clockwise. The matrix $A$ is not storing data — it is a **function** that warps the entire plane simultaneously. This lesson is about that shift: from matrix as spreadsheet to matrix as **verb** that transforms space.',
+      'You may have seen matrices before as grids of data — like a spreadsheet. That is the database view. The **geometric view** is far more powerful: a matrix is a *function* that transforms every point in space simultaneously.',
+      'Picture a rubber sheet covered in a grid. A matrix transformation grabs that sheet and stretches it, rotates it, or shears it into a new shape. Every point on the sheet moves with it. The key constraint of a **linear** transformation: the rubber sheet cannot crinkle, tear, or move the origin. Grid lines stay parallel and evenly spaced — just scaled, rotated, or skewed.',
+      '**The basis vector shortcut.** Because the grid stays uniform, you do not need to track where every point goes. Track only two points: where $\\hat{i} = [1,0]$ and $\\hat{j} = [0,1]$ land. Once you know those, every other point is forced — because every vector is a linear combination of $\\hat{i}$ and $\\hat{j}$, and the combination rules do not change under a linear transformation.',
       '**The matrix is the cheat sheet.** A $2 \\times 2$ matrix stores exactly two pieces of information: the new coordinates of $\\hat{i}$ (first column) and the new coordinates of $\\hat{j}$ (second column). That is the whole secret.',
       '**Predict before reading on.** You have the shear matrix $S = \\begin{bmatrix}1&3\\\\0&1\\end{bmatrix}$. Without computing: what does $S$ send $\\hat{i} = [1,0]^T$ to? What does it send $\\hat{j} = [0,1]^T$ to? Where does the corner $(0,1)$ of the unit square end up? Write your prediction, then check it against Example 3.',
-      '**CNC machine connection â€” G68 coordinate rotation.** On a CNC milling machine, parts are sometimes clamped at an angle. Rather than rewriting every coordinate in the G-code program, the operator uses `G68` (Coordinate Rotation). The CNC controller secretly multiplies every tool position by a rotation matrix:\n\n$$\\begin{bmatrix}X\' \\\\ Y\'\\end{bmatrix} = \\begin{bmatrix}\\cos\\theta & -\\sin\\theta \\\\ \\sin\\theta & \\cos\\theta\\end{bmatrix}\\begin{bmatrix}X \\\\ Y\\end{bmatrix}$$\n\nIf the part is clamped 5Â° off â€” the controller applies this matrix to every single move, invisibly rotating the entire work coordinate system. You write the G-code as if the part were perfectly aligned; the transformation matrix handles the rest.',
+      '**CNC machine connection — G68 coordinate rotation.** On a CNC milling machine, parts are sometimes clamped at an angle. Rather than rewriting every coordinate in the G-code program, the operator uses `G68` (Coordinate Rotation). The CNC controller secretly multiplies every tool position by a rotation matrix:\n\n$$\\begin{bmatrix}X\' \\\\ Y\'\\end{bmatrix} = \\begin{bmatrix}\\cos\\theta & -\\sin\\theta \\\\ \\sin\\theta & \\cos\\theta\\end{bmatrix}\\begin{bmatrix}X \\\\ Y\\end{bmatrix}$$\n\nIf the part is clamped 5° off — the controller applies this matrix to every single move, invisibly rotating the entire work coordinate system. You write the G-code as if the part were perfectly aligned; the transformation matrix handles the rest.',
       '**Where this is heading:** Once we understand what ONE matrix does to space, we chain matrices together (Matrix Multiplication) and ask whether transformations can be undone (Matrix Inverses).',
     ],
     callouts: [
       {
         type: 'sequencing',
-        title: 'Lesson 1 of 12 â€” Matrices & Transformations',
-        body: '**Previous (Chapter 1):** Static vectors, dot products, systems of equations, RREF.\n**This lesson:** Matrices as active functions that warp space â€” the “verb” to LA1\'s “nouns.”\n**Next (Lesson 2):** Matrix Multiplication â€” chaining two transformations into one.',
+        title: 'Lesson 1 of 12 — Matrices & Transformations',
+        body: '**Previous (Chapter 1):** Static vectors, dot products, systems of equations, RREF.\n**This lesson:** Matrices as active functions that warp space — the “verb” to LA1\'s “nouns.”\n**Next (Lesson 2):** Matrix Multiplication — chaining two transformations into one.',
       },
       {
         type: 'insight',
@@ -48,12 +48,12 @@
       {
         type: 'definition',
         title: 'What Makes a Transformation "Linear"?',
-        body: 'Exactly two rules must hold for all vectors $\\mathbf{u}, \\mathbf{v}$ and scalars $c$:\n\n1. **Additivity:** $T(\\mathbf{u} + \\mathbf{v}) = T(\\mathbf{u}) + T(\\mathbf{v})$\n2. **Homogeneity:** $T(c\\mathbf{v}) = cT(\\mathbf{v})$\n\nTogether these imply $T(\\mathbf{0}) = \\mathbf{0}$ â€” the origin stays fixed. Any transformation that moves the origin (like "add 2 to every x-coordinate") is **not** linear (it is called affine).',
+        body: 'Exactly two rules must hold for all vectors $\\mathbf{u}, \\mathbf{v}$ and scalars $c$:\n\n1. **Additivity:** $T(\\mathbf{u} + \\mathbf{v}) = T(\\mathbf{u}) + T(\\mathbf{v})$\n2. **Homogeneity:** $T(c\\mathbf{v}) = cT(\\mathbf{v})$\n\nTogether these imply $T(\\mathbf{0}) = \\mathbf{0}$ — the origin stays fixed. Any transformation that moves the origin (like "add 2 to every x-coordinate") is **not** linear (it is called affine).',
       },
       {
         type: 'warning',
-        title: 'Affine vs. Linear â€” A Critical Distinction',
-        body: 'CNC work offsets (G54, G55) **translate** the origin â€” they shift every coordinate by a constant amount. That is an **affine** transformation, not a linear one. G68 coordinate rotation **is** linear â€” it preserves the origin. In robotics and computer graphics, the standard workaround is homogeneous coordinates: embed the 2D plane in 3D and represent translations as matrix multiplications.',
+        title: 'Affine vs. Linear — A Critical Distinction',
+        body: 'CNC work offsets (G54, G55) **translate** the origin — they shift every coordinate by a constant amount. That is an **affine** transformation, not a linear one. G68 coordinate rotation **is** linear — it preserves the origin. In robotics and computer graphics, the standard workaround is homogeneous coordinates: embed the 2D plane in 3D and represent translations as matrix multiplications.',
       },
       {
         type: 'strategy',
@@ -64,8 +64,8 @@
     visualizations: [
       {
         id: 'LALesson04_Matrices',
-        title: 'Warping the Grid â€” Interactive',
-        mathBridge: 'The red arrow is $\\hat{i}$ and the green arrow is $\\hat{j}$. Click the transformation buttons (Shear, Rotate, Scale, Reflect) and watch the entire grid morph. At all times, the final coordinates of the red and green arrows equal the first and second columns of the matrix that was applied. The grid stays a uniform grid â€” no crinkles, no tears.',
+        title: 'Warping the Grid — Interactive',
+        mathBridge: 'The red arrow is $\\hat{i}$ and the green arrow is $\\hat{j}$. Click the transformation buttons (Shear, Rotate, Scale, Reflect) and watch the entire grid morph. At all times, the final coordinates of the red and green arrows equal the first and second columns of the matrix that was applied. The grid stays a uniform grid — no crinkles, no tears.',
         caption: 'A linear transformation is completely determined by where it sends the two basis vectors.',
       },
       {
@@ -77,7 +77,7 @@
     ],
   },
 
-  // â”€â”€ Math â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Math ───────────────────────────────────────────────────────
   math: {
     prose: [
       'A 2D linear transformation relies on $2 \\times 2$ matrices. When applying a matrix $A$ to an input vector $\\vec{v}$, the output vector is written as $A\\vec{v}$.',
@@ -104,18 +104,18 @@
       {
         id: 'OpenMatNotebook',
         title: 'OpenMAT: Matrices as Transformations',
-        mathBridge: 'MATLAB uses `*` for matrix multiplication and `[a b; c d]` syntax for 2Ã—2 matrices. The columns of A tell you where Ã® and Äµ go â€” verify this directly by multiplying A by [1;0] and [0;1].',
+        mathBridge: 'MATLAB uses `*` for matrix multiplication and `[a b; c d]` syntax for 2×2 matrices. The columns of A tell you where Ã® and Äµ go — verify this directly by multiplying A by [1;0] and [0;1].',
         caption: 'Four cells: matrix-vector multiply, common transforms, rotation derivation, and CNC G68.',
         initialProps: {
           initialCells: [
             {
               id: 1,
-              cellTitle: 'Matrix-vector multiply â€” columns are destination of basis vectors',
+              cellTitle: 'Matrix-vector multiply — columns are destination of basis vectors',
               prose: [
                 'In MATLAB/Octave, `*` multiplies matrices and vectors. A column vector is `[x; y]` (semicolons separate rows).',
-                'The first column of A is where Ã® = [1;0] goes. The second column is where Äµ = [0;1] goes. Verify this directly â€” multiply A by each basis vector.',
+                'The first column of A is where Ã® = [1;0] goes. The second column is where Äµ = [0;1] goes. Verify this directly — multiply A by each basis vector.',
               ],
-              code: `% 90Â° counter-clockwise rotation matrix
+              code: `% 90° counter-clockwise rotation matrix
 A = [0 -1; 1 0];
 
 % Where does i-hat land?
@@ -137,9 +137,9 @@ disp('Linear combination check:'); disp(verify)`,
             },
             {
               id: 2,
-              cellTitle: 'Common 2D transformations â€” all defined by their columns',
+              cellTitle: 'Common 2D transformations — all defined by their columns',
               prose: [
-                'Every possible 2Ã—2 matrix is some transformation. These are the geometric classics. For each one, figure out where Ã® and Äµ go â€” that tells you the columns.',
+                'Every possible 2×2 matrix is some transformation. These are the geometric classics. For each one, figure out where Ã® and Äµ go — that tells you the columns.',
               ],
               code: `% The four famous 2D transformation types
 v = [2; 1];
@@ -166,9 +166,9 @@ fprintf('Squish [2;1] --> [%g;%g]\\n', squish*v)`,
             },
             {
               id: 3,
-              cellTitle: 'Rotation matrix â€” derived from tracking basis vectors',
+              cellTitle: 'Rotation matrix — derived from tracking basis vectors',
               prose: [
-                'Where does Ã® = [1,0] go after rotating by angle Î¸? To [cos Î¸, sin Î¸]. Where does Äµ = [0,1] go? To [âˆ’sin Î¸, cos Î¸]. Paste those into the columns and you have the rotation matrix.',
+                'Where does Ã® = [1,0] go after rotating by angle θ? To [cos θ, sin θ]. Where does Äµ = [0,1] go? To [−sin θ, cos θ]. Paste those into the columns and you have the rotation matrix.',
                 'The unit circle property: rotation is length-preserving. Every column has magnitude 1. The two columns are perpendicular.',
               ],
               code: `theta_deg = 45;
@@ -196,8 +196,8 @@ fprintf('Dot product of columns: %.6f  (should be 0)\\n', dot(R(:,1), R(:,2)))`,
               id: 4,
               cellTitle: 'Application: CNC G68 coordinate rotation',
               prose: [
-                'A machinist clamps a part at 5Â° off-axis. Rather than rewriting hundreds of G-code coordinates, they use G68 (Coordinate Rotation). The CNC controller silently pre-multiplies every tool position by a rotation matrix.',
-                'Here we simulate that: original G-code coordinates â†’ rotation matrix â†’ corrected machine positions.',
+                'A machinist clamps a part at 5° off-axis. Rather than rewriting hundreds of G-code coordinates, they use G68 (Coordinate Rotation). The CNC controller silently pre-multiplies every tool position by a rotation matrix.',
+                'Here we simulate that: original G-code coordinates → rotation matrix → corrected machine positions.',
               ],
               code: `% CNC part is clamped 5 degrees off-axis
 theta = 5 * pi / 180;
@@ -238,7 +238,7 @@ fprintf('\\nMax positional error without G68: %.4f mm\\n', error)`,
           initialCells: [
             {
               id: 1,
-              cellTitle: 'Matrix-vector multiplication â€” where does a vector land?',
+              cellTitle: 'Matrix-vector multiplication — where does a vector land?',
               prose: [
                 'The `@` operator is matrix multiplication in NumPy. `A @ v` applies transformation A to vector v.',
                 'The columns of A tell you where Ã® = [1,0] and Äµ = [0,1] land. Any other vector\'s destination is a linear combination of those columns.',
@@ -288,7 +288,7 @@ plt.show()`,
               ],
               code: `from opencalc import quick_transform
 
-# 90Â° rotation
+# 90° rotation
 rotation = [[0, -1], [1, 0]]
 quick_transform(rotation, vector=[2, 1])`,
             },
@@ -296,7 +296,7 @@ quick_transform(rotation, vector=[2, 1])`,
               id: 3,
               cellTitle: 'Common transformations',
               prose: [
-                'Every 2Ã—2 matrix is a transformation. Here are the most common ones â€” each described by where Ã® and Äµ land.',
+                'Every 2×2 matrix is a transformation. Here are the most common ones — each described by where Ã® and Äµ land.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -359,14 +359,14 @@ v = np.array([4.0, 2.0])
     ],
   },
 
-  // â”€â”€ Rigor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Rigor ──────────────────────────────────────────────────────
   rigor: {
     prose: [
       '**Formal definition of a linear map.** A function $T: V \\to W$ between vector spaces is called a **linear transformation** (or linear map) if and only if for all $\\mathbf{u}, \\mathbf{v} \\in V$ and all scalars $c$:\n\n1. **Additivity:** $T(\\mathbf{u} + \\mathbf{v}) = T(\\mathbf{u}) + T(\\mathbf{v})$\n2. **Homogeneity:** $T(c\\mathbf{v}) = cT(\\mathbf{v})$\n\nCombining these: $T(c\\mathbf{u} + d\\mathbf{v}) = cT(\\mathbf{u}) + dT(\\mathbf{v})$ for all scalars $c, d$. By induction, $T$ preserves arbitrary linear combinations: $T\\bigl(\\sum_i c_i \\mathbf{v}_i\\bigr) = \\sum_i c_i T(\\mathbf{v}_i)$.',
       '**Matrix representation theorem.** The critical fact: every linear transformation $T: \\mathbb{R}^n \\to \\mathbb{R}^m$ is uniquely represented by an $m \\times n$ matrix $A$ such that $T(\\mathbf{x}) = A\\mathbf{x}$ for all $\\mathbf{x}$. How do we find $A$? Apply $T$ to each standard basis vector $\\mathbf{e}_j$ and make the results the columns of $A$:\n\n$$A = \\begin{bmatrix} T(\\mathbf{e}_1) & T(\\mathbf{e}_2) & \\cdots & T(\\mathbf{e}_n) \\end{bmatrix}$$\n\nThis is the deepest reason the columns of a matrix are the destinations of the basis vectors.',
       '**Proof sketch.** For any $\\mathbf{x} = x_1 \\mathbf{e}_1 + \\cdots + x_n \\mathbf{e}_n$:\n\n$$T(\\mathbf{x}) = T(x_1 \\mathbf{e}_1 + \\cdots + x_n \\mathbf{e}_n) = x_1 T(\\mathbf{e}_1) + \\cdots + x_n T(\\mathbf{e}_n) = A\\mathbf{x}$$\n\nThe first equality uses the representation in the standard basis. The second uses linearity. The third uses the definition $A = [T(\\mathbf{e}_1) \\cdots T(\\mathbf{e}_n)]$.',
       '**The space of linear maps.** The set of all linear maps $T: \\mathbb{R}^n \\to \\mathbb{R}^m$ forms a vector space (called $\\mathcal{L}(\\mathbb{R}^n, \\mathbb{R}^m)$ or $\\text{Hom}(\\mathbb{R}^n, \\mathbb{R}^m)$), isomorphic to $\\mathbb{R}^{m \\times n}$. The identification $T \\leftrightarrow A$ is a linear isomorphism. This is the formal statement that matrices and linear maps are the same thing.',
-      '**Kernel and image.** For $T: V \\to W$, the **kernel** (null space) is $\\ker(T) = \\{\\mathbf{v} \\in V : T(\\mathbf{v}) = \\mathbf{0}\\}$. The **image** (column space) is $\\text{im}(T) = \\{T(\\mathbf{v}) : \\mathbf{v} \\in V\\}$. Both are subspaces. The Rank-Nullity theorem (LA1-006 preview) states $\\dim(\\ker T) + \\dim(\\text{im}\\, T) = \\dim(V) = n$. The image of $A$ is exactly the span of $A$\'s columns â€” this is why column space matters.',
+      '**Kernel and image.** For $T: V \\to W$, the **kernel** (null space) is $\\ker(T) = \\{\\mathbf{v} \\in V : T(\\mathbf{v}) = \\mathbf{0}\\}$. The **image** (column space) is $\\text{im}(T) = \\{T(\\mathbf{v}) : \\mathbf{v} \\in V\\}$. Both are subspaces. The Rank-Nullity theorem (LA1-006 preview) states $\\dim(\\ker T) + \\dim(\\text{im}\\, T) = \\dim(V) = n$. The image of $A$ is exactly the span of $A$\'s columns — this is why column space matters.',
     ],
     callouts: [
       {
@@ -377,25 +377,25 @@ v = np.array([4.0, 2.0])
       {
         type: 'proof',
         title: 'The Origin Must Be Fixed',
-        body: 'For any linear map $T$, $T(\\mathbf{0}) = T(0 \\cdot \\mathbf{0}) = 0 \\cdot T(\\mathbf{0}) = \\mathbf{0}$ by homogeneity. So $T(\\mathbf{0}) = \\mathbf{0}$ â€” the origin is always a fixed point of any linear transformation. A transformation that moves the origin (e.g., $f(\\mathbf{x}) = A\\mathbf{x} + \\mathbf{b}$ with $\\mathbf{b} \\neq \\mathbf{0}$) is called affine, not linear.',
+        body: 'For any linear map $T$, $T(\\mathbf{0}) = T(0 \\cdot \\mathbf{0}) = 0 \\cdot T(\\mathbf{0}) = \\mathbf{0}$ by homogeneity. So $T(\\mathbf{0}) = \\mathbf{0}$ — the origin is always a fixed point of any linear transformation. A transformation that moves the origin (e.g., $f(\\mathbf{x}) = A\\mathbf{x} + \\mathbf{b}$ with $\\mathbf{b} \\neq \\mathbf{0}$) is called affine, not linear.',
       },
       {
         type: 'insight',
         title: 'Image = Column Space',
-        body: 'The image of $T(\\mathbf{x}) = A\\mathbf{x}$ is the set of all possible outputs: $\\{A\\mathbf{x} : \\mathbf{x} \\in \\mathbb{R}^n\\}$. Expanding: $A\\mathbf{x} = x_1\\mathbf{a}_1 + \\cdots + x_n\\mathbf{a}_n$ where $\\mathbf{a}_j$ are the columns of $A$. So the image is exactly $\\text{span}(\\mathbf{a}_1, \\ldots, \\mathbf{a}_n)$ â€” the **column space** of $A$.\n\nIn other words: the columns of the matrix span the entire set of possible outputs.',
+        body: 'The image of $T(\\mathbf{x}) = A\\mathbf{x}$ is the set of all possible outputs: $\\{A\\mathbf{x} : \\mathbf{x} \\in \\mathbb{R}^n\\}$. Expanding: $A\\mathbf{x} = x_1\\mathbf{a}_1 + \\cdots + x_n\\mathbf{a}_n$ where $\\mathbf{a}_j$ are the columns of $A$. So the image is exactly $\\text{span}(\\mathbf{a}_1, \\ldots, \\mathbf{a}_n)$ — the **column space** of $A$.\n\nIn other words: the columns of the matrix span the entire set of possible outputs.',
       },
       {
         type: 'warning',
-        title: 'Composition Order Matters â€” Matrices Do Not Commute',
-        body: 'Composing two linear maps corresponds to multiplying their matrices. But $AB \\neq BA$ in general â€” matrix multiplication is **not** commutative.\n\nGeometrically: "first rotate, then shear" gives a different result than "first shear, then rotate." Order matters because you are applying transformations to an already-warped space.',
+        title: 'Composition Order Matters — Matrices Do Not Commute',
+        body: 'Composing two linear maps corresponds to multiplying their matrices. But $AB \\neq BA$ in general — matrix multiplication is **not** commutative.\n\nGeometrically: "first rotate, then shear" gives a different result than "first shear, then rotate." Order matters because you are applying transformations to an already-warped space.',
       },
     ],
     visualizations: [
       {
         id: 'ProjectionMatrixViz',
-        title: 'Projection â€” A Linear Map That Loses Information',
-        mathBridge: 'Projection onto a line is a linear transformation whose matrix has rank 1. Drag the input vector and see it collapse onto the projection axis. The kernel (null space) consists of all vectors perpendicular to the projection direction â€” they map to zero. This visualizes both kernel and image for a concrete linear map.',
-        caption: 'A rank-1 matrix collapses the plane onto a line. Many inputs share the same output â€” the kernel is all vectors perpendicular to the projection axis.',
+        title: 'Projection — A Linear Map That Loses Information',
+        mathBridge: 'Projection onto a line is a linear transformation whose matrix has rank 1. Drag the input vector and see it collapse onto the projection axis. The kernel (null space) consists of all vectors perpendicular to the projection direction — they map to zero. This visualizes both kernel and image for a concrete linear map.',
+        caption: 'A rank-1 matrix collapses the plane onto a line. Many inputs share the same output — the kernel is all vectors perpendicular to the projection axis.',
       },
       {
         id: 'LinearTransformationsViz',
@@ -406,11 +406,11 @@ v = np.array([4.0, 2.0])
     ],
   },
 
-  // â”€â”€ Examples â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Examples ───────────────────────────────────────────────────
   examples: [
     {
       id: 'la2-001-ex1',
-      title: 'Apply a Matrix â€” Read the Output as a Linear Combination',
+      title: 'Apply a Matrix — Read the Output as a Linear Combination',
       problem: `Let $A = \\begin{bmatrix} 2 & -1 \\\\ 0 & 3 \\end{bmatrix}$. Where does the vector $\\mathbf{v} = \\begin{bmatrix} 4 \\\\ 1 \\end{bmatrix}$ land after the transformation?`,
       steps: [
         {
@@ -420,7 +420,7 @@ v = np.array([4.0, 2.0])
         },
         {
           expression: '= 4 \\begin{bmatrix} 2 \\\\ 0 \\end{bmatrix} + 1 \\begin{bmatrix} -1 \\\\ 3 \\end{bmatrix}',
-          annotation: `Rewrite as a **linear combination of the columns** of $A$: the first component of $\\mathbf{v}$ (which is 4) scales column 1 $= [2,0]^T$, and the second component (which is 1) scales column 2 $= [-1,3]^T$. This is the geometric interpretation â€” $\\mathbf{v}$ says "go 4 steps along new $\\hat{i}$ and 1 step along new $\\hat{j}$."`,
+          annotation: `Rewrite as a **linear combination of the columns** of $A$: the first component of $\\mathbf{v}$ (which is 4) scales column 1 $= [2,0]^T$, and the second component (which is 1) scales column 2 $= [-1,3]^T$. This is the geometric interpretation — $\\mathbf{v}$ says "go 4 steps along new $\\hat{i}$ and 1 step along new $\\hat{j}$."`,
           strategyTitle: 'Step 2: Decompose as linear combination of columns',
           hints: ['Column 1 of $A$ = $[2,0]^T$ = where $\\hat{i}=[1,0]$ lands. Column 2 = $[-1,3]^T$ = where $\\hat{j}=[0,1]$ lands.'],
         },
@@ -432,51 +432,51 @@ v = np.array([4.0, 2.0])
         {
           expression: '= \\begin{bmatrix} 7 \\\\ 3 \\end{bmatrix}',
           annotation: 'Add the scaled columns: $[8,0]^T + [-1,3]^T = [7,3]^T$. The vector $\\mathbf{v} = [4,1]^T$ lands at $[7,3]^T$ after transformation $A$.',
-          strategyTitle: 'Step 4: Add â†’ output vector',
+          strategyTitle: 'Step 4: Add → output vector',
           hints: ['Verify via row formula: row 1 dot $\\mathbf{v}$ = $2(4)+(-1)(1)=7$. Row 2 dot $\\mathbf{v}$ = $0(4)+3(1)=3$. âœ“'],
         },
       ],
     },
     {
       id: 'la2-001-ex2',
-      title: 'Build a Matrix from Geometry â€” 90Â° Rotation',
+      title: 'Build a Matrix from Geometry — 90° Rotation',
       problem: 'Construct the $2 \\times 2$ matrix that rotates every vector in the 2D plane $90^\\circ$ counter-clockwise.',
       steps: [
         {
-          expression: '\\hat{i} = \\begin{bmatrix} 1 \\\\ 0 \\end{bmatrix} \\xrightarrow{\\text{90Â° CCW}} \\begin{bmatrix} 0 \\\\ 1 \\end{bmatrix}',
-          annotation: 'Strategy: track only the two basis vectors. $\\hat{i} = [1,0]^T$ points right. After rotating 90Â° counter-clockwise it points straight up: $[0,1]^T$. This will become column 1 of the matrix.',
-          strategyTitle: 'Step 1: Track $\\hat{i}$ under 90Â° CCW rotation',
-          hints: ['Picture a clock hand pointing 3 o\'clock (positive x). Rotate it 90Â° CCW â€” it now points 12 o\'clock (positive y).'],
+          expression: '\\hat{i} = \\begin{bmatrix} 1 \\\\ 0 \\end{bmatrix} \\xrightarrow{\\text{90° CCW}} \\begin{bmatrix} 0 \\\\ 1 \\end{bmatrix}',
+          annotation: 'Strategy: track only the two basis vectors. $\\hat{i} = [1,0]^T$ points right. After rotating 90° counter-clockwise it points straight up: $[0,1]^T$. This will become column 1 of the matrix.',
+          strategyTitle: 'Step 1: Track $\\hat{i}$ under 90° CCW rotation',
+          hints: ['Picture a clock hand pointing 3 o\'clock (positive x). Rotate it 90° CCW — it now points 12 o\'clock (positive y).'],
         },
         {
-          expression: '\\hat{j} = \\begin{bmatrix} 0 \\\\ 1 \\end{bmatrix} \\xrightarrow{\\text{90Â° CCW}} \\begin{bmatrix} -1 \\\\ 0 \\end{bmatrix}',
-          annotation: '$\\hat{j} = [0,1]^T$ points up. After 90Â° CCW it points left: $[-1,0]^T$. This becomes column 2 of the matrix.',
-          strategyTitle: 'Step 2: Track $\\hat{j}$ under 90Â° CCW rotation',
-          hints: ['A hand at 12 o\'clock, rotated 90Â° CCW, now points 9 o\'clock (negative x).'],
+          expression: '\\hat{j} = \\begin{bmatrix} 0 \\\\ 1 \\end{bmatrix} \\xrightarrow{\\text{90° CCW}} \\begin{bmatrix} -1 \\\\ 0 \\end{bmatrix}',
+          annotation: '$\\hat{j} = [0,1]^T$ points up. After 90° CCW it points left: $[-1,0]^T$. This becomes column 2 of the matrix.',
+          strategyTitle: 'Step 2: Track $\\hat{j}$ under 90° CCW rotation',
+          hints: ['A hand at 12 o\'clock, rotated 90° CCW, now points 9 o\'clock (negative x).'],
         },
         {
           expression: 'R_{90} = \\begin{bmatrix} 0 & -1 \\\\ 1 & 0 \\end{bmatrix}',
-          annotation: 'Paste the two landing vectors in as columns: column 1 = destination of $\\hat{i}$ = $[0,1]^T$, column 2 = destination of $\\hat{j}$ = $[-1,0]^T$. Every vector in the plane is rotated 90Â° CCW by this matrix.',
-          strategyTitle: 'Step 3: Paste destinations â†’ columns of the matrix',
+          annotation: 'Paste the two landing vectors in as columns: column 1 = destination of $\\hat{i}$ = $[0,1]^T$, column 2 = destination of $\\hat{j}$ = $[-1,0]^T$. Every vector in the plane is rotated 90° CCW by this matrix.',
+          strategyTitle: 'Step 3: Paste destinations → columns of the matrix',
         },
         {
           expression: 'R_{90} \\begin{bmatrix} 3 \\\\ 1 \\end{bmatrix} = 3\\begin{bmatrix} 0 \\\\ 1 \\end{bmatrix} + 1\\begin{bmatrix} -1 \\\\ 0 \\end{bmatrix} = \\begin{bmatrix} -1 \\\\ 3 \\end{bmatrix}',
-          annotation: 'Verify: apply $R_{90}$ to a test vector $[3,1]^T$. The result $[-1,3]^T$ should be $[3,1]^T$ rotated 90Â° CCW. Length preserved: $\\sqrt{9+1} = \\sqrt{1+9}$ âœ“. Direction rotated 90Â° âœ“.',
+          annotation: 'Verify: apply $R_{90}$ to a test vector $[3,1]^T$. The result $[-1,3]^T$ should be $[3,1]^T$ rotated 90° CCW. Length preserved: $\\sqrt{9+1} = \\sqrt{1+9}$ âœ“. Direction rotated 90° âœ“.',
           strategyTitle: 'Step 4: Verify on a test vector',
-          hints: ['General rotation matrix by angle $\\theta$: $R_\\theta = \\begin{bmatrix}\\cos\\theta & -\\sin\\theta \\\\ \\sin\\theta & \\cos\\theta\\end{bmatrix}$. At $\\theta = 90Â°$: $\\cos 90Â° = 0$, $\\sin 90Â° = 1$. Matches our matrix.'],
+          hints: ['General rotation matrix by angle $\\theta$: $R_\\theta = \\begin{bmatrix}\\cos\\theta & -\\sin\\theta \\\\ \\sin\\theta & \\cos\\theta\\end{bmatrix}$. At $\\theta = 90°$: $\\cos 90° = 0$, $\\sin 90° = 1$. Matches our matrix.'],
         },
       ],
     },
     {
       id: 'la2-001-ex3',
-      title: 'Read a Matrix â€” Identify the Transformation Geometrically',
+      title: 'Read a Matrix — Identify the Transformation Geometrically',
       problem: `Given $A = \\begin{bmatrix} 1 & 3 \\\\ 0 & 1 \\end{bmatrix}$, describe geometrically what this transformation does to the plane. Then apply it to the square with corners at $(0,0)$, $(1,0)$, $(1,1)$, $(0,1)$.`,
       steps: [
         {
           expression: '\\text{Column 1} = \\begin{bmatrix} 1 \\\\ 0 \\end{bmatrix}, \\quad \\text{Column 2} = \\begin{bmatrix} 3 \\\\ 1 \\end{bmatrix}',
-          annotation: 'Read the columns: $\\hat{i} = [1,0]^T$ stays at $[1,0]^T$ (unchanged). $\\hat{j} = [0,1]^T$ moves to $[3,1]^T$ â€” it slides 3 units to the right while staying at height 1. This is a **horizontal shear**.',
-          strategyTitle: 'Step 1: Read column destinations â€” identify the transformation type',
-          hints: ['When $\\hat{i}$ stays fixed but $\\hat{j}$ slides horizontally, it is a horizontal shear. The grid lines stay parallel and evenly spaced â€” just tilted.'],
+          annotation: 'Read the columns: $\\hat{i} = [1,0]^T$ stays at $[1,0]^T$ (unchanged). $\\hat{j} = [0,1]^T$ moves to $[3,1]^T$ — it slides 3 units to the right while staying at height 1. This is a **horizontal shear**.',
+          strategyTitle: 'Step 1: Read column destinations — identify the transformation type',
+          hints: ['When $\\hat{i}$ stays fixed but $\\hat{j}$ slides horizontally, it is a horizontal shear. The grid lines stay parallel and evenly spaced — just tilted.'],
         },
         {
           expression: 'A\\begin{bmatrix}1\\\\0\\end{bmatrix} = \\begin{bmatrix}1\\\\0\\end{bmatrix}, \\quad A\\begin{bmatrix}1\\\\1\\end{bmatrix} = \\begin{bmatrix}4\\\\1\\end{bmatrix}, \\quad A\\begin{bmatrix}0\\\\1\\end{bmatrix} = \\begin{bmatrix}3\\\\1\\end{bmatrix}',
@@ -485,15 +485,15 @@ v = np.array([4.0, 2.0])
         },
         {
           expression: '\\text{Square} \\to \\text{Parallelogram with corners } (0,0),(1,0),(4,1),(3,1)',
-          annotation: 'The unit square shears into a parallelogram. The bottom edge stays on the x-axis (unaffected). The top edge slides 3 units right. **Key insight:** area is preserved in this shear â€” the parallelogram has the same area as the original square ($= |\\det(A)| = |1\\cdot1 - 3\\cdot0| = 1$).',
-          strategyTitle: 'Step 3: Describe the image â€” square becomes parallelogram',
-          hints: ['Area of output = $|\\det(A)|$ Ã— area of input. For this shear, $\\det = 1$, so area is unchanged. This is NOT always true â€” a scale matrix $[2,0;0,2]$ doubles lengths and quadruples area.'],
+          annotation: 'The unit square shears into a parallelogram. The bottom edge stays on the x-axis (unaffected). The top edge slides 3 units right. **Key insight:** area is preserved in this shear — the parallelogram has the same area as the original square ($= |\\det(A)| = |1\\cdot1 - 3\\cdot0| = 1$).',
+          strategyTitle: 'Step 3: Describe the image — square becomes parallelogram',
+          hints: ['Area of output = $|\\det(A)|$ × area of input. For this shear, $\\det = 1$, so area is unchanged. This is NOT always true — a scale matrix $[2,0;0,2]$ doubles lengths and quadruples area.'],
         },
       ],
     },
   ],
 
-  // â”€â”€ Challenges â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Challenges ─────────────────────────────────────────────────
   challenges: [
     {
       id: 'la2-001-ch1',
@@ -545,13 +545,13 @@ v = np.array([4.0, 2.0])
       walkthrough: [
         { expression: 'A = \\begin{bmatrix} 2 & -1 \\\\ 3 & 4 \\end{bmatrix}', annotation: 'Paste destinations as columns: column 1 = $[2,3]^T$ (where $\\hat{i}$ lands), column 2 = $[-1,4]^T$ (where $\\hat{j}$ lands).' },
         { expression: 'A\\begin{bmatrix}5\\\\-2\\end{bmatrix} = 5\\begin{bmatrix}2\\\\3\\end{bmatrix} + (-2)\\begin{bmatrix}-1\\\\4\\end{bmatrix} = \\begin{bmatrix}10\\\\15\\end{bmatrix}+\\begin{bmatrix}2\\\\-8\\end{bmatrix} = \\begin{bmatrix}12\\\\7\\end{bmatrix}', annotation: 'Linear combination of columns: $5 \\times$ col 1 plus $-2 \\times$ col 2.' },
-        { expression: '\\det(A) = (2)(4) - (-1)(3) = 8 + 3 = 11', annotation: 'The determinant equals 11, so $|\\det| = 11 \\neq 1$. The transformation scales area by a factor of 11 â€” it is NOT area-preserving. Regions expand to 11 times their original area.' },
+        { expression: '\\det(A) = (2)(4) - (-1)(3) = 8 + 3 = 11', annotation: 'The determinant equals 11, so $|\\det| = 11 \\neq 1$. The transformation scales area by a factor of 11 — it is NOT area-preserving. Regions expand to 11 times their original area.' },
       ],
-      answer: '$A = \\begin{bmatrix} 2 & -1 \\\\ 3 & 4 \\end{bmatrix}$, $A[5,-2]^T = [12,7]^T$, and $|\\det(A)| = 11$ â€” the transformation scales area by 11.',
+      answer: '$A = \\begin{bmatrix} 2 & -1 \\\\ 3 & 4 \\end{bmatrix}$, $A[5,-2]^T = [12,7]^T$, and $|\\det(A)| = 11$ — the transformation scales area by 11.',
     },
   ],
 
-  // â”€â”€ Semantic Layer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Semantic Layer ───────────────────────────────────────────────
   semantics: {
     core: [
       {
@@ -570,7 +570,7 @@ v = np.array([4.0, 2.0])
     ]
   },
 
-  // â”€â”€ Spiral Learning â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Spiral Learning ──────────────────────────────────────────────
   spiral: {
     recoveryPoints: [
       {
@@ -588,7 +588,7 @@ v = np.array([4.0, 2.0])
     ]
   },
 
-  // â”€â”€ Assessment â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Assessment ───────────────────────────────────────────────────
   assessment: {
     questions: [
       {
@@ -601,7 +601,7 @@ v = np.array([4.0, 2.0])
     ],
   },
 
-  // â”€â”€ Mental Model â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Mental Model ─────────────────────────────────────────────────
   mentalModel: [
     "A matrix is a VERB. It is an action you perform on a space.",
     "First column = new home for horizontal unit vector.",
@@ -609,23 +609,23 @@ v = np.array([4.0, 2.0])
     "Matrix multiplication = Linear combination of columns."
   ],
 
-  // â”€â”€ Checkpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Checkpoints ──────────────────────────────────────────────────
   checkpoints: [
-    { id: 'cp-la2-001-1', label: 'Read: State the column secret â€” what do the columns of a matrix represent', type: 'read' },
-    { id: 'cp-la2-001-2', label: 'Read: Define a linear transformation â€” the two rules it must satisfy', type: 'read' },
+    { id: 'cp-la2-001-1', label: 'Read: State the column secret — what do the columns of a matrix represent', type: 'read' },
+    { id: 'cp-la2-001-2', label: 'Read: Define a linear transformation — the two rules it must satisfy', type: 'read' },
     { id: 'cp-la2-001-3', label: 'Read: Explain why every linear map has a unique matrix representation', type: 'read' },
-    { id: 'cp-la2-001-4', label: 'Run: OpenMAT cell 1 â€” verify where Ã® and Äµ land under a rotation matrix', type: 'lab' },
-    { id: 'cp-la2-001-5', label: 'Run: Python cell 1 â€” apply a matrix to vectors and confirm via linear combination', type: 'lab' },
-    { id: 'cp-la2-001-6', label: 'Complete: Example 1 â€” apply a matrix using the column linear combination method', type: 'example' },
-    { id: 'cp-la2-001-7', label: 'Complete: Example 2 â€” build the 90Â° rotation matrix from geometry', type: 'example' },
-    { id: 'cp-la2-001-8', label: 'Attempt: Challenge 2 â€” construct a matrix purely from a geometric description', type: 'challenge' },
+    { id: 'cp-la2-001-4', label: 'Run: OpenMAT cell 1 — verify where Ã® and Äµ land under a rotation matrix', type: 'lab' },
+    { id: 'cp-la2-001-5', label: 'Run: Python cell 1 — apply a matrix to vectors and confirm via linear combination', type: 'lab' },
+    { id: 'cp-la2-001-6', label: 'Complete: Example 1 — apply a matrix using the column linear combination method', type: 'example' },
+    { id: 'cp-la2-001-7', label: 'Complete: Example 2 — build the 90° rotation matrix from geometry', type: 'example' },
+    { id: 'cp-la2-001-8', label: 'Attempt: Challenge 2 — construct a matrix purely from a geometric description', type: 'challenge' },
   ],
 
   quiz: [
     {
       id: 'la2-001-quiz-1',
       type: 'choice',
-      text: 'Geometrically, what do the columns of a 2Ã—2 transformation matrix represent?',
+      text: 'Geometrically, what do the columns of a 2×2 transformation matrix represent?',
       options: [
         'The coordinate destinations where the basis vectors Ã® and Äµ land after the transformation',
         'The x and y components of the output vector for a specific input',
@@ -634,7 +634,7 @@ v = np.array([4.0, 2.0])
       ],
       answer: 'The coordinate destinations where the basis vectors Ã® and Äµ land after the transformation',
       hints: ['Every vector is a linear combination of Ã® and Äµ. If you know where those two land, you know where every other vector lands.'],
-      reviewSection: 'Intuition tab â€” The column secret',
+      reviewSection: 'Intuition tab — The column secret',
     },
     {
       id: 'la2-001-quiz-2',
@@ -647,8 +647,8 @@ v = np.array([4.0, 2.0])
         'Scaling the input by c scales the output by c',
       ],
       answer: 'The area of the space must remain unchanged',
-      hints: ['Area can change â€” a scale matrix doubles lengths and quadruples area, yet is still linear. What cannot change: the origin must be fixed, grid lines must stay parallel, and scaling must carry through.'],
-      reviewSection: 'Intuition tab â€” What makes a transformation linear?',
+      hints: ['Area can change — a scale matrix doubles lengths and quadruples area, yet is still linear. What cannot change: the origin must be fixed, grid lines must stay parallel, and scaling must carry through.'],
+      reviewSection: 'Intuition tab — What makes a transformation linear?',
     },
     {
       id: 'la2-001-quiz-3',
@@ -656,36 +656,36 @@ v = np.array([4.0, 2.0])
       text: 'Compute $\\begin{bmatrix}3&1\\\\2&-1\\end{bmatrix}\\begin{bmatrix}2\\\\4\\end{bmatrix}$.',
       options: ['$[10, 0]^T$', '$[6, -4]^T$', '$[7, 3]^T$', '$[10, 4]^T$'],
       answer: '$[10, 0]^T$',
-      hints: ['Linear combination: $2[3,2]^T + 4[1,-1]^T = [6,4]^T + [4,-4]^T = [10,0]^T$. Or row formula: row 1 Â· [2,4] = 6+4=10; row 2 Â· [2,4] = 4âˆ’4=0.'],
-      reviewSection: 'Example 1 â€” apply a matrix using linear combination of columns',
+      hints: ['Linear combination: $2[3,2]^T + 4[1,-1]^T = [6,4]^T + [4,-4]^T = [10,0]^T$. Or row formula: row 1 · [2,4] = 6+4=10; row 2 · [2,4] = 4−4=0.'],
+      reviewSection: 'Example 1 — apply a matrix using linear combination of columns',
     },
     {
       id: 'la2-001-quiz-4',
       type: 'choice',
       text: 'The matrix $\\begin{bmatrix}1&0\\\\0&-1\\end{bmatrix}$ sends Ã® to $[1,0]^T$ and Äµ to $[0,-1]^T$. What geometric transformation does this represent?',
       options: [
-        'Reflection over the x-axis â€” the y-coordinate flips sign',
-        'Rotation 90Â° clockwise',
+        'Reflection over the x-axis — the y-coordinate flips sign',
+        'Rotation 90° clockwise',
         'Horizontal shear',
         'Projection onto the x-axis',
       ],
-      answer: 'Reflection over the x-axis â€” the y-coordinate flips sign',
-      hints: ['Ã® stays on the x-axis (unchanged). Äµ flips from pointing up to pointing down â€” y-coordinates flip sign. Compare with projection $[1,0;0,0]$ which sends Äµ to zero.'],
-      reviewSection: 'Example 3 â€” read what a transformation does from its columns',
+      answer: 'Reflection over the x-axis — the y-coordinate flips sign',
+      hints: ['Ã® stays on the x-axis (unchanged). Äµ flips from pointing up to pointing down — y-coordinates flip sign. Compare with projection $[1,0;0,0]$ which sends Äµ to zero.'],
+      reviewSection: 'Example 3 — read what a transformation does from its columns',
     },
     {
       id: 'la2-001-quiz-5',
       type: 'choice',
       text: 'Can a linear transformation ever move the origin (0,0) to a different point?',
       options: [
-        'No â€” by homogeneity, T(0) = T(0Â·v) = 0Â·T(v) = 0 for any v',
-        'Yes â€” if the matrix has a nonzero entry on its diagonal',
-        'Yes â€” if the transformation is a translation',
+        'No — by homogeneity, T(0) = T(0·v) = 0·T(v) = 0 for any v',
+        'Yes — if the matrix has a nonzero entry on its diagonal',
+        'Yes — if the transformation is a translation',
         'Only if the matrix is not square',
       ],
-      answer: 'No â€” by homogeneity, T(0) = T(0Â·v) = 0Â·T(v) = 0 for any v',
+      answer: 'No — by homogeneity, T(0) = T(0·v) = 0·T(v) = 0 for any v',
       hints: ['The origin is always fixed by any linear map. A transformation that moves the origin (like a translation) is called affine, not linear.'],
-      reviewSection: 'Rigor tab â€” The origin must be fixed',
+      reviewSection: 'Rigor tab — The origin must be fixed',
     },
     {
       id: 'la2-001-quiz-6',
@@ -694,7 +694,7 @@ v = np.array([4.0, 2.0])
       options: ['$3\\mathbf{w}$', '$\\mathbf{w}^3$', '$\\mathbf{w} + 3$', '$3\\mathbf{v}$'],
       answer: '$3\\mathbf{w}$',
       hints: ['By homogeneity: $T(3\\mathbf{v}) = 3T(\\mathbf{v}) = 3\\mathbf{w}$. Scaling the input by 3 scales the output by 3.'],
-      reviewSection: 'Intuition tab â€” What makes a transformation linear?',
+      reviewSection: 'Intuition tab — What makes a transformation linear?',
     },
     {
       id: 'la2-001-quiz-7',
@@ -708,7 +708,7 @@ v = np.array([4.0, 2.0])
       ],
       answer: '$\\begin{bmatrix}1&2\\\\0&1\\end{bmatrix}$',
       hints: ['Column 1 = destination of Ã® = $[1,0]^T$ (unchanged). Column 2 = destination of Äµ = $[2,1]^T$. Paste destinations into columns.'],
-      reviewSection: 'Example 2 â€” build a matrix from geometry',
+      reviewSection: 'Example 2 — build a matrix from geometry',
     },
     {
       id: 'la2-001-quiz-8',
@@ -722,7 +722,7 @@ v = np.array([4.0, 2.0])
       ],
       answer: '$[2,-3]^T$',
       hints: ['$A = \\begin{bmatrix}0&1\\\\-1&0\\end{bmatrix}$ (column 1 = $[0,-1]$, column 2 = $[1,0]$). Then $A[3,2]^T = 3[0,-1]^T + 2[1,0]^T = [0,-3]^T + [2,0]^T = [2,-3]^T$.'],
-      reviewSection: 'Example 1 â€” apply a matrix using linear combination of columns',
+      reviewSection: 'Example 1 — apply a matrix using linear combination of columns',
     },
     {
       id: 'la2-001-quiz-9',
@@ -735,36 +735,36 @@ v = np.array([4.0, 2.0])
         'It projects onto the y-axis: $[x,y]^T \\to [0,y]^T$',
       ],
       answer: 'It collapses the vector onto the x-axis: $[x,y]^T \\to [x,0]^T$',
-      hints: ['Column 1 = $[1,0]^T$ (Ã® unchanged). Column 2 = $[0,0]^T$ (Äµ sent to the origin). So $y$ information is destroyed â€” every vector is flattened onto the x-axis.'],
-      reviewSection: 'Math tab â€” common 2D transformations',
+      hints: ['Column 1 = $[1,0]^T$ (Ã® unchanged). Column 2 = $[0,0]^T$ (Äµ sent to the origin). So $y$ information is destroyed — every vector is flattened onto the x-axis.'],
+      reviewSection: 'Math tab — common 2D transformations',
     },
     {
       id: 'la2-001-quiz-10',
       type: 'choice',
       text: 'Why is a translation (shifting every point by $[3,2]^T$) NOT a linear transformation?',
       options: [
-        'It moves the origin â€” $T(\\mathbf{0}) = [3,2]^T \\neq \\mathbf{0}$',
+        'It moves the origin — $T(\\mathbf{0}) = [3,2]^T \\neq \\mathbf{0}$',
         'It does not preserve vector lengths',
         'It changes the number of dimensions',
         'It is not invertible',
       ],
-      answer: 'It moves the origin â€” $T(\\mathbf{0}) = [3,2]^T \\neq \\mathbf{0}$',
-      hints: ['Every linear map must satisfy $T(\\mathbf{0}) = \\mathbf{0}$. Translation sends the origin to $[3,2]^T$ â€” immediately disqualified. Translations are called affine transformations.'],
-      reviewSection: 'Intuition tab â€” Affine vs. Linear',
+      answer: 'It moves the origin — $T(\\mathbf{0}) = [3,2]^T \\neq \\mathbf{0}$',
+      hints: ['Every linear map must satisfy $T(\\mathbf{0}) = \\mathbf{0}$. Translation sends the origin to $[3,2]^T$ — immediately disqualified. Translations are called affine transformations.'],
+      reviewSection: 'Intuition tab — Affine vs. Linear',
     },
   ],
 
   misconceptions: [
     {
-      falseBelief: 'A matrix is just a grid of numbers â€” like a spreadsheet or a table of data.',
+      falseBelief: 'A matrix is just a grid of numbers — like a spreadsheet or a table of data.',
       whyStudentsThinkIt: 'Students first encounter matrices in contexts like storing grades or pixel colors. The geometric interpretation is never shown explicitly.',
-      correctionExample: 'Every $2 \\times 2$ matrix is a function $f: \\mathbb{R}^2 \\to \\mathbb{R}^2$. The entry $a_{ij}$ is not data â€” it is the $i$-th component of where the $j$-th basis vector lands. $\\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$ rotates every point 90Â° CCW.',
-      contrastCase: 'A spreadsheet stores independent rows of data with no relationship between them. A matrix has deeply coupled entries â€” changing one entry changes where an entire basis vector goes.',
+      correctionExample: 'Every $2 \\times 2$ matrix is a function $f: \\mathbb{R}^2 \\to \\mathbb{R}^2$. The entry $a_{ij}$ is not data — it is the $i$-th component of where the $j$-th basis vector lands. $\\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$ rotates every point 90° CCW.',
+      contrastCase: 'A spreadsheet stores independent rows of data with no relationship between them. A matrix has deeply coupled entries — changing one entry changes where an entire basis vector goes.',
     },
     {
       falseBelief: 'You need to compute $A\\mathbf{v}$ for every vector $\\mathbf{v}$ separately to understand what the matrix does.',
       whyStudentsThinkIt: 'Students treat each multiplication as an isolated computation, not realizing the matrix defines one rule that applies everywhere.',
-      correctionExample: 'Read the columns once: $A = \\begin{bmatrix}2&0\\\\0&3\\end{bmatrix}$ stretches the $x$-direction by 2 and the $y$-direction by 3. You immediately know $A[5,4]^T = [10,12]^T$, $A[-1,2]^T = [-2,6]^T$, and any other input â€” without new computation.',
+      correctionExample: 'Read the columns once: $A = \\begin{bmatrix}2&0\\\\0&3\\end{bmatrix}$ stretches the $x$-direction by 2 and the $y$-direction by 3. You immediately know $A[5,4]^T = [10,12]^T$, $A[-1,2]^T = [-2,6]^T$, and any other input — without new computation.',
       contrastCase: 'Once you read the column destinations, you can reconstruct the output for ANY input vector as a linear combination of those columns.',
     },
   ],
@@ -773,12 +773,12 @@ v = np.array([4.0, 2.0])
     {
       situation: 'A video game engine applies 60 rotations per second to every object in the scene. Each object has 100 vertices. How does the engine avoid computing a fresh rotation for each vertex?',
       competingTechniques: ['Rotate each vertex independently using trigonometry', 'Build the rotation matrix once and multiply'],
-      whyThisTechniqueWins: 'Build the rotation matrix $R_\\theta$ once (2 trig calls). Then multiply every vertex position by $R_\\theta$ â€” pure matrix-vector products, no trig per vertex. At 60 fps with 1000 objects Ã— 100 vertices, this is the difference between 6 million trig calls vs 6 million simple multiplications.',
+      whyThisTechniqueWins: 'Build the rotation matrix $R_\\theta$ once (2 trig calls). Then multiply every vertex position by $R_\\theta$ — pure matrix-vector products, no trig per vertex. At 60 fps with 1000 objects × 100 vertices, this is the difference between 6 million trig calls vs 6 million simple multiplications.',
     },
     {
       situation: 'A neural network applies a learned "weight matrix" $W$ to an input vector of pixel values. How is this a linear transformation, and what does the column interpretation tell you about what $W$ "learns"?',
       competingTechniques: ['Think of W as a table of weights to be added', 'Think of W as a linear transformation between feature spaces'],
-      whyThisTechniqueWins: 'Column $j$ of $W$ tells you: "this is the direction in output space that input feature $j$ contributes to." Reading $W$ geometrically reveals what the layer has learned to detect â€” rather than just opaque multiplications.',
+      whyThisTechniqueWins: 'Column $j$ of $W$ tells you: "this is the direction in output space that input feature $j$ contributes to." Reading $W$ geometrically reveals what the layer has learned to detect — rather than just opaque multiplications.',
     },
   ],
 
@@ -787,7 +787,7 @@ v = np.array([4.0, 2.0])
       commonError: 'Interpreting a matrix as storing output values instead of destinations of basis vectors.',
       symptom: 'Student computes $A[3,1]^T$ and says "the matrix already told me the answer was $[a,c]$" (confusing column values with the output).',
       whyItHappened: 'Conflating "the first column is $[2,0]^T$" with "any input gives output $[2,0]^T$." The column is only the destination of $\\hat{i}$, not a universal output.',
-      repairStrategy: 'Always multiply: "column 1 Ã— (first component of input) + column 2 Ã— (second component)." For $A = [2,-1;0,3]$ and $\\mathbf{v} = [4,1]^T$: $4[2,0]^T + 1[-1,3]^T = [7,3]^T$ â€” not $[2,0]^T$.',
+      repairStrategy: 'Always multiply: "column 1 × (first component of input) + column 2 × (second component)." For $A = [2,-1;0,3]$ and $\\mathbf{v} = [4,1]^T$: $4[2,0]^T + 1[-1,3]^T = [7,3]^T$ — not $[2,0]^T$.',
     },
     {
       commonError: 'Building the matrix with destinations as rows instead of columns.',
@@ -802,6 +802,6 @@ v = np.array([4.0, 2.0])
     solveIndependently: 'Apply any $2 \\times 2$ matrix to any vector using the linear combination of columns method, and construct a matrix from a geometric description (rotation, reflection, shear, scale) by tracking where Ã® and Äµ land.',
     explainVerbally: 'Explain why a linear transformation is completely determined by where it sends the basis vectors, and why a translation cannot be represented as a matrix multiplication.',
     detectIncorrectApplication: 'Identify when a student builds a matrix with destinations as rows (not columns), or mistakes the column entries for the output of an arbitrary input.',
-    transferToUnfamiliar: 'Given a 3D transformation described geometrically (e.g., "rotate 90Â° around the z-axis"), construct the $3 \\times 3$ matrix by tracking where $\\hat{i}, \\hat{j}, \\hat{k}$ land.',
+    transferToUnfamiliar: 'Given a 3D transformation described geometrically (e.g., "rotate 90° around the z-axis"), construct the $3 \\times 3$ matrix by tracking where $\\hat{i}, \\hat{j}, \\hat{k}$ land.',
   },
 };
