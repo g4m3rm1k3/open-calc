@@ -116,7 +116,7 @@ Each visualization entry must serve an explicit purpose. Attach a comment or com
 - [ ] States which **misconception** the visual directly contradicts
 - [ ] States which **invariant** stays constant while something else changes (e.g., *direction is preserved, length changes*)
 - [ ] A visual without a stated purpose is worse than no visual — it adds cognitive load without payoff
-- [ ] IDs must come from the registry at the end of this document; no unlisted IDs
+- [ ] Every lesson must have at least one visualization, and each visualistaion it like a lesson in itself. 
 
 ### `math.prose[]`
 - [ ] Proof uses only symbols introduced in intuition
@@ -272,13 +272,4 @@ Run through all **14 questions** before committing a lesson as done. Do not skip
 
 ---
 
-## Valid Visualization IDs (only these may be used)
 
-### Main LA series
-`LALesson01_Vectors`, `LALesson02_Combinations`, `LALesson03_DotCross`, `LALesson04_Matrices`, `LALesson05_MatrixMult`, `LALesson06_Inverses`, `LALesson07_NullSpace`, `LALesson08_Eigen`, `LALesson09_Diagonalization`, `LALesson10_ComplexEigen`, `LALesson11_OrthogonalProjections`, `LALesson12_SVD`
-
-### Secondary components
-`MagnitudeAndDirectionViz`, `LinearDependenceViz`, `CrossProductViz`, `GaussianEliminationStepper`, `CharacteristicPolynomialViz`, `DiagonalizationStepperViz`, `ComplexPlaneEigenvalueViz`, `ProjectionMatrixViz`, `QRDecompositionViz`, `LeastSquaresProjectionViz`, `LowRankApproximationViz`
-
-### Notebooks
-`OpenMatNotebook`, `PythonNotebook`

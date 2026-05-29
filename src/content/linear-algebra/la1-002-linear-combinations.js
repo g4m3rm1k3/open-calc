@@ -1,4 +1,4 @@
-﻿export default {
+export default {
   id: 'la1-002',
   slug: 'linear-combinations',
   chapter: 'la1',
@@ -21,19 +21,19 @@
 
   intuition: {
     prose: [
-      'Take $\\mathbf{v}_1 = [2, 0]^T$ and $\\mathbf{v}_2 = [0, 1]^T$. Scale $\\mathbf{v}_1$ by $3$ to get $[6, 0]^T$. Scale $\\mathbf{v}_2$ by $-2$ to get $[0, -2]^T$. Add them: $[6, -2]^T$. Change the scalars to $c_1 = 5$, $c_2 = 4$: you get $[10, 4]^T$. Every choice of scalars $(c_1, c_2)$ lands you at a different output vector. This operation â€” scaling vectors and adding the results â€” is called a **linear combination**, and it is the engine that drives all of linear algebra.',
-      'There are exactly two operations in linear algebra: **scalar multiplication** (stretching or shrinking a vector) and **vector addition** (placing the tail of one vector at the tip of another). When you do both at once â€” scaling a bunch of vectors and adding them â€” you have created a **Linear Combination**.',
+      'Take $\\mathbf{v}_1 = [2, 0]^T$ and $\\mathbf{v}_2 = [0, 1]^T$. Scale $\\mathbf{v}_1$ by $3$ to get $[6, 0]^T$. Scale $\\mathbf{v}_2$ by $-2$ to get $[0, -2]^T$. Add them: $[6, -2]^T$. Change the scalars to $c_1 = 5$, $c_2 = 4$: you get $[10, 4]^T$. Every choice of scalars $(c_1, c_2)$ lands you at a different output vector. This operation — scaling vectors and adding the results — is called a **linear combination**, and it is the engine that drives all of linear algebra.',
+      'There are exactly two operations in linear algebra: **scalar multiplication** (stretching or shrinking a vector) and **vector addition** (placing the tail of one vector at the tip of another). When you do both at once — scaling a bunch of vectors and adding them — you have created a **Linear Combination**.',
       'If you have two vectors $\\mathbf{v}$ and $\\mathbf{w}$, ask: "If I scale and add these two vectors in every possible way, what set of points can I reach?" The answer is called the **Span**.',
-      '**Predict before reading on:** Take $\\mathbf{v} = [1, 0]^T$ and $\\mathbf{w} = [2, 0]^T$. Can you reach the point $[0, 1]^T$ using some linear combination $c_1\\mathbf{v} + c_2\\mathbf{w}$? Try to find $c_1, c_2$ that work â€” hold your answer until the next paragraph.',
-      'If $\\mathbf{v}$ and $\\mathbf{w}$ point in totally different directions, you can reach every single point on the 2D plane â€” their span is the entire 2D universe. But if they point in the exact same direction, you are trapped on a single 1D line. The second vector is redundant. That is **Linearly Dependent**.',
-      'If the vectors point in different directions, they are **Linearly Independent**. When a set of vectors spans the entire space AND has zero redundancies, we call it a **Basis** â€” the absolute minimum number of building blocks needed to construct a universe.',
+      '**Predict before reading on:** Take $\\mathbf{v} = [1, 0]^T$ and $\\mathbf{w} = [2, 0]^T$. Can you reach the point $[0, 1]^T$ using some linear combination $c_1\\mathbf{v} + c_2\\mathbf{w}$? Try to find $c_1, c_2$ that work — hold your answer until the next paragraph.',
+      'If $\\mathbf{v}$ and $\\mathbf{w}$ point in totally different directions, you can reach every single point on the 2D plane — their span is the entire 2D universe. But if they point in the exact same direction, you are trapped on a single 1D line. The second vector is redundant. That is **Linearly Dependent**.',
+      'If the vectors point in different directions, they are **Linearly Independent**. When a set of vectors spans the entire space AND has zero redundancies, we call it a **Basis** — the absolute minimum number of building blocks needed to construct a universe.',
       '**Where this is heading:** The coordinates $[3, -2]$ are a secret linear combination of the standard basis (3 steps right, 2 steps down). Later, when we get to matrices, a matrix is a machine that moves the basis vectors to new locations, dragging all of space with them.',
     ],
     callouts: [
       {
         type: 'sequencing',
-        title: 'Lesson 2 of 6 â€” Vectors & Spaces',
-        body: '**Previous:** What is a Vector â€” direction, magnitude, unit vectors.\n**This lesson:** Linear combinations, span, linear independence, and basis.\n**Next:** Dot and Cross Products â€” measuring angles and area between vectors.',
+        title: 'Lesson 2 of 6 — Vectors & Spaces',
+        body: '**Previous:** What is a Vector — direction, magnitude, unit vectors.\n**This lesson:** Linear combinations, span, linear independence, and basis.\n**Next:** Dot and Cross Products — measuring angles and area between vectors.',
       },
       {
         type: 'insight',
@@ -43,12 +43,12 @@
       {
         type: 'procedure',
         title: 'Procedure: Testing Linear Independence',
-        body: 'Step 1. Write $c_1\\mathbf{v}_1 + c_2\\mathbf{v}_2 + \\cdots + c_k\\mathbf{v}_k = \\mathbf{0}$.\nStep 2. Match each component row to get one scalar equation per row.\nStep 3. Solve the resulting system for $c_1, c_2, \\ldots, c_k$.\nStep 4. If the only solution is all $c_i = 0$ â†’ **linearly independent**.\nStep 5. If any non-zero solution exists â†’ **linearly dependent**; write the explicit relationship.',
+        body: 'Step 1. Write $c_1\\mathbf{v}_1 + c_2\\mathbf{v}_2 + \\cdots + c_k\\mathbf{v}_k = \\mathbf{0}$.\nStep 2. Match each component row to get one scalar equation per row.\nStep 3. Solve the resulting system for $c_1, c_2, \\ldots, c_k$.\nStep 4. If the only solution is all $c_i = 0$ → **linearly independent**.\nStep 5. If any non-zero solution exists → **linearly dependent**; write the explicit relationship.',
       },
       {
         type: 'warning',
         title: 'Common Mistake: Confusing Span with the Vectors Themselves',
-        body: 'The **span** of $\\{\\mathbf{v}_1, \\mathbf{v}_2\\}$ is NOT just those two vectors â€” it is the INFINITE collection of ALL linear combinations $c_1\\mathbf{v}_1 + c_2\\mathbf{v}_2$ for every possible $c_1, c_2 \\in \\mathbb{R}$. If the two vectors are independent in $\\mathbb{R}^2$, their span is the entire plane â€” infinitely many points.',
+        body: 'The **span** of $\\{\\mathbf{v}_1, \\mathbf{v}_2\\}$ is NOT just those two vectors — it is the INFINITE collection of ALL linear combinations $c_1\\mathbf{v}_1 + c_2\\mathbf{v}_2$ for every possible $c_1, c_2 \\in \\mathbb{R}$. If the two vectors are independent in $\\mathbb{R}^2$, their span is the entire plane — infinitely many points.',
       },
       {
         type: 'insight',
@@ -60,7 +60,7 @@
       {
         id: 'LALesson02_Combinations',
         title: 'Linear Combinations Sweeping the Plane',
-        mathBridge: 'Adjust the scalar multipliers $c_1$ and $c_2$ using the sliders. Watch the result vector sweep across the plane. When both vectors are independent, you can reach every point on the 2D plane â€” the span IS the full plane.',
+        mathBridge: 'Adjust the scalar multipliers $c_1$ and $c_2$ using the sliders. Watch the result vector sweep across the plane. When both vectors are independent, you can reach every point on the 2D plane — the span IS the full plane.',
         caption: 'Every point you can reach with any $c_1, c_2$ is in the span of those two vectors.',
       },
       {
@@ -104,7 +104,7 @@
       {
         type: 'insight',
         title: 'Real-World Analogy: Paint Mixing',
-        body: 'Red, Green, Blue are linearly independent â€” no combination of two produces the third in the additive light model. They span the color space. Now add Yellow = Red + Green: it is dependent on Red and Green â€” redundant. Dependent vectors are like redundant paint colors: they take up space without expanding your range.',
+        body: 'Red, Green, Blue are linearly independent — no combination of two produces the third in the additive light model. They span the color space. Now add Yellow = Red + Green: it is dependent on Red and Green — redundant. Dependent vectors are like redundant paint colors: they take up space without expanding your range.',
       },
     ],
     visualizations: [
@@ -125,8 +125,8 @@
               id: 1,
               cellTitle: 'Building linear combinations',
               prose: [
-                'A **linear combination** of vectors vâ‚, vâ‚‚ with scalars câ‚, câ‚‚ is: câ‚Â·vâ‚ + câ‚‚Â·vâ‚‚.',
-                'The set of ALL such combinations (for every possible câ‚, câ‚‚) is the **span**.',
+                'A **linear combination** of vectors v₁, v₂ with scalars c₁, c₂ is: c₁·v₁ + c₂·v₂.',
+                'The set of ALL such combinations (for every possible c₁, c₂) is the **span**.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -168,7 +168,7 @@ plt.show()`,
             },
             {
               id: 2,
-              cellTitle: 'Testing linear independence â€” rank',
+              cellTitle: 'Testing linear independence — rank',
               prose: [
                 'Stack vectors as rows of a matrix. `np.linalg.matrix_rank()` counts the independent directions.',
                 'rank == n means independent; rank < n means at least one is redundant.',
@@ -222,7 +222,7 @@ plt.show()`,
               id: 3,
               cellTitle: 'Visualize: span of two vectors',
               prose: [
-                'Two independent vectors span the entire plane â€” you can reach any point by scaling and adding.',
+                'Two independent vectors span the entire plane — you can reach any point by scaling and adding.',
               ],
               code: `import numpy as np
 from opencalc import Figure, BLUE, AMBER, GREEN
@@ -233,7 +233,7 @@ c1, c2 = 1.5, 1.0
 combo = c1 * v1 + c2 * v2
 
 fig = Figure(square=True, xmin=-1, xmax=5, ymin=-1, ymax=5,
-             title=f"Linear Combination: {c1}Â·v1 + {c2}Â·v2")
+             title=f"Linear Combination: {c1}·v1 + {c2}·v2")
 fig.grid().axes()
 fig.vector(v1.tolist(), color=BLUE, label="v1")
 fig.vector(v2.tolist(), color=AMBER, label="v2")
@@ -264,7 +264,7 @@ target = np.array([5.0, 5.0])
       {
         id: 'OpenMatNotebook',
         title: 'Linear Combinations in OpenMAT / MATLAB',
-        mathBridge: 'Stacking your vectors as columns of a matrix A, then computing A*c, gives the same result as câ‚*vâ‚ + câ‚‚*vâ‚‚. This equivalence â€” "matrix-vector product IS a linear combination of columns" â€” is the single most important idea connecting this lesson to matrix algebra.',
+        mathBridge: 'Stacking your vectors as columns of a matrix A, then computing A*c, gives the same result as c₁*v₁ + c₂*v₂. This equivalence — "matrix-vector product IS a linear combination of columns" — is the single most important idea connecting this lesson to matrix algebra.',
         caption: 'The column picture of matrix multiplication starts here.',
         initialProps: {
           initialCells: [
@@ -318,7 +318,7 @@ rank(A_three)   % = 2, third is redundant`,
               id: 4,
               cellTitle: 'Application: CNC tool offsets as linear combinations',
               prose: [
-                'In CNC machining, a Work Coordinate System (WCS) offset shifts the origin. All positions are relative to the new origin â€” vector addition with coefficient 1.',
+                'In CNC machining, a Work Coordinate System (WCS) offset shifts the origin. All positions are relative to the new origin — vector addition with coefficient 1.',
               ],
               code: `G54_offset = [150; 80; 0];
 P1_part = [10; 5; -3];
@@ -339,7 +339,7 @@ sqrt(dot(diff_vec, diff_vec))   % distance unchanged by offset`,
   rigor: {
     prose: [
       '**Span is always a subspace.** The span of any collection $\\{\\mathbf{v}_1, \\ldots, \\mathbf{v}_k\\}$ is automatically a subspace: any linear combination of linear combinations is still a linear combination.',
-      '**Basis for abstract spaces.** The standard basis for $P_2$ (polynomials of degree $\\leq 2$) is $\\{1, t, t^2\\}$. Every polynomial $a + bt + ct^2 = a \\cdot 1 + b \\cdot t + c \\cdot t^2$ â€” the weights $(a, b, c)$ are the coordinates. Converting polynomial problems to matrix problems using this coordinate assignment is the entire mechanism of linear algebra applied to functions.',
+      '**Basis for abstract spaces.** The standard basis for $P_2$ (polynomials of degree $\\leq 2$) is $\\{1, t, t^2\\}$. Every polynomial $a + bt + ct^2 = a \\cdot 1 + b \\cdot t + c \\cdot t^2$ — the weights $(a, b, c)$ are the coordinates. Converting polynomial problems to matrix problems using this coordinate assignment is the entire mechanism of linear algebra applied to functions.',
       '**Dimension: a theorem, not a definition.** The dimension of a vector space is the number of vectors in any basis. This requires a theorem: all bases have the same size. The proof uses the Steinitz Exchange Lemma. Therefore "dimension" is well-defined.',
       '**Dimension Inequality:** (1) Any set of more than $n$ vectors in $\\mathbb{R}^n$ is automatically dependent. (2) Any $n$ independent vectors in $\\mathbb{R}^n$ span it. (3) No spanning set can have fewer than $n$ vectors.',
     ],
@@ -357,7 +357,7 @@ sqrt(dot(diff_vec, diff_vec))   % distance unchanged by offset`,
       {
         type: 'warning',
         title: 'Any $n+1$ Vectors in $\\mathbb{R}^n$ Are Dependent',
-        body: 'You cannot have 3 independent vectors in $\\mathbb{R}^2$. If someone hands you three 2D vectors and claims independence, one is a linear combination of the others â€” no exceptions. Dimension is a hard ceiling.',
+        body: 'You cannot have 3 independent vectors in $\\mathbb{R}^2$. If someone hands you three 2D vectors and claims independence, one is a linear combination of the others — no exceptions. Dimension is a hard ceiling.',
       },
     ],
     visualizations: [
@@ -406,19 +406,19 @@ sqrt(dot(diff_vec, diff_vec))   % distance unchanged by offset`,
           expression: 'c_1 \\begin{bmatrix} 4 \\\\ 6 \\end{bmatrix} + c_2 \\begin{bmatrix} -2 \\\\ -3 \\end{bmatrix} = \\begin{bmatrix} 0 \\\\ 0 \\end{bmatrix}',
           annotation: 'Set up the zero-sum test where $c_1, c_2 \\in \\mathbb{R}$ are unknown scalars and $\\mathbf{0} = [0,0]^T$ is the zero vector. Ask: can we find non-zero scalars satisfying this?',
           strategyTitle: 'Step 1: Set up the independence test',
-          hints: ['Before computing, check: is $\\mathbf{v}_2 = k\\mathbf{v}_1$? Try $k = -1/2$: $(-1/2)[4,6]^T = [-2,-3]^T = \\mathbf{v}_2$. They are proportional â€” strong sign of dependence.'],
+          hints: ['Before computing, check: is $\\mathbf{v}_2 = k\\mathbf{v}_1$? Try $k = -1/2$: $(-1/2)[4,6]^T = [-2,-3]^T = \\mathbf{v}_2$. They are proportional — strong sign of dependence.'],
         },
         {
           expression: '1 \\cdot [4,6]^T + 2 \\cdot [-2,-3]^T = [4-4, 6-6]^T = [0,0]^T',
-          annotation: 'We found $c_1 = 1$ and $c_2 = 2$ â€” both non-zero â€” that make the combination zero. This is a non-trivial solution, which is exactly what we need to prove dependence.',
+          annotation: 'We found $c_1 = 1$ and $c_2 = 2$ — both non-zero — that make the combination zero. This is a non-trivial solution, which is exactly what we need to prove dependence.',
           strategyTitle: 'Step 2: Exhibit the non-trivial combination',
           hints: ['$c_1 = 1$ and $c_2 = 2$ are not both zero. By definition of linear independence, the vectors are DEPENDENT.'],
         },
         {
           expression: '\\mathbf{v}_1 \\text{ and } \\mathbf{v}_2 \\text{ are Linearly Dependent since } \\mathbf{v}_2 = -\\tfrac{1}{2}\\mathbf{v}_1',
-          annotation: 'The vectors lie on the same line through the origin. Their span is 1D â€” a single line â€” not the full 2D plane.',
+          annotation: 'The vectors lie on the same line through the origin. Their span is 1D — a single line — not the full 2D plane.',
           strategyTitle: 'Step 3: Conclude and give the explicit relationship',
-          hints: ['Geometric meaning: $\\mathbf{v}_2 = (-1/2)\\mathbf{v}_1$ â€” they point in exactly opposite directions along the same line.'],
+          hints: ['Geometric meaning: $\\mathbf{v}_2 = (-1/2)\\mathbf{v}_1$ — they point in exactly opposite directions along the same line.'],
         },
       ],
       conclusion: 'The vectors are linearly dependent because $\\mathbf{v}_2 = (-1/2)\\mathbf{v}_1$. Their span is a 1D line, not the full 2D plane.',
@@ -438,7 +438,7 @@ sqrt(dot(diff_vec, diff_vec))   % distance unchanged by offset`,
           expression: '(2c_1 + c_2) + (c_1 - c_2) = 7 + (-3) \\Rightarrow 3c_1 = 4 \\Rightarrow c_1 = \\tfrac{4}{3}',
           annotation: 'Add both equations to eliminate $c_2$ (the $+c_2$ and $-c_2$ terms cancel). This reveals $c_1 = 4/3$ directly.',
           strategyTitle: 'Step 2: Eliminate $c_2$ by adding',
-          hints: ['Adding works because the $c_2$ coefficients are $+1$ and $-1$ â€” they cancel. Choosing the right operation to eliminate a variable is the core skill of solving linear systems.'],
+          hints: ['Adding works because the $c_2$ coefficients are $+1$ and $-1$ — they cancel. Choosing the right operation to eliminate a variable is the core skill of solving linear systems.'],
         },
         {
           expression: 'c_2 = 7 - 2c_1 = 7 - \\tfrac{8}{3} = \\tfrac{13}{3}',
@@ -450,8 +450,8 @@ sqrt(dot(diff_vec, diff_vec))   % distance unchanged by offset`,
       conclusion: '$\\mathbf{b} = \\frac{4}{3}\\mathbf{v}_1 + \\frac{13}{3}\\mathbf{v}_2$. The key insight: "is $\\mathbf{b}$ in the span?" and "does this linear system have a solution?" are exactly the same question.',
     },
     {
-      id: 'ex-la1-002-4',
-      title: 'Independence in 3D â€” Three Vectors',
+      id: 'la1-002-ex4',
+      title: 'Independence in 3D — Three Vectors',
       problem: 'Are $\\mathbf{a} = [1,0,0]^T$, $\\mathbf{b} = [1,1,0]^T$, $\\mathbf{c} = [1,1,1]^T$ linearly independent?',
       steps: [
         {
@@ -464,11 +464,11 @@ sqrt(dot(diff_vec, diff_vec))   % distance unchanged by offset`,
           expression: 'c_3 = 0 \\Rightarrow c_2 = 0 \\Rightarrow c_1 = 0',
           annotation: 'Back-substitute from the bottom equation upward. Row 3 immediately gives $c_3 = 0$. Substituting into Row 2 gives $c_2 = 0$. Substituting into Row 1 gives $c_1 = 0$. Only the trivial solution exists.',
           strategyTitle: 'Step 2: Solve by back-substitution',
-          hints: ['The triangular structure means we solve from bottom to top â€” this is how upper triangular systems always work.'],
+          hints: ['The triangular structure means we solve from bottom to top — this is how upper triangular systems always work.'],
         },
         {
           expression: 'c_1 = c_2 = c_3 = 0 \\Rightarrow \\text{Linearly INDEPENDENT}',
-          annotation: 'Only the trivial solution exists, so the vectors are linearly independent. They also span $\\mathbb{R}^3$ â€” forming a valid basis.',
+          annotation: 'Only the trivial solution exists, so the vectors are linearly independent. They also span $\\mathbb{R}^3$ — forming a valid basis.',
           strategyTitle: 'Step 3: Conclude independence',
           hints: ['These three vectors form a triangular basis for $\\mathbb{R}^3$. Each adds one new non-zero component the others lack.'],
         },
@@ -561,7 +561,7 @@ sqrt(dot(diff_vec, diff_vec))   % distance unchanged by offset`,
     'Span = "Everything I can possibly reach with these building blocks."',
     'Independent = "Every arrow adds a totally new direction."',
     'Dependent = "At least one arrow is redundant."',
-    'Basis = "Independent AND spans everything â€” the perfect minimal toolkit."',
+    'Basis = "Independent AND spans everything — the perfect minimal toolkit."',
   ],
 
   checkpoints: [
@@ -588,7 +588,7 @@ sqrt(dot(diff_vec, diff_vec))   % distance unchanged by offset`,
       ],
       answer: 'A set of linearly independent vectors that span the entire space',
       hints: ['A basis is the minimal toolkit: no redundancies (independent) and reaches everywhere (spanning).'],
-      reviewSection: 'Math tab â€” Basis definition',
+      reviewSection: 'Math tab — Basis definition',
     },
     {
       id: 'la1-002-quiz-2',
@@ -602,7 +602,7 @@ sqrt(dot(diff_vec, diff_vec))   % distance unchanged by offset`,
       ],
       answer: 'Linearly dependent, because $\\dim(\\mathbb{R}^2) = 2 < 3$',
       hints: ['Any $n+1$ vectors in $\\mathbb{R}^n$ must be dependent. With 3 vectors in a 2D space, the third is always in the span of the first two.'],
-      reviewSection: 'Rigor tab â€” Dimension inequality',
+      reviewSection: 'Rigor tab — Dimension inequality',
     },
     {
       id: 'la1-002-quiz-3',
@@ -616,7 +616,7 @@ sqrt(dot(diff_vec, diff_vec))   % distance unchanged by offset`,
       ],
       answer: 'The entire 2D plane $\\mathbb{R}^2$',
       hints: ['Two independent vectors in 2D provide two degrees of freedom. With $c_1$ and $c_2$ ranging over all reals, $c_1\\mathbf{v}_1 + c_2\\mathbf{v}_2$ traces every point in the plane.'],
-      reviewSection: 'Intuition tab â€” Span',
+      reviewSection: 'Intuition tab — Span',
     },
     {
       id: 'la1-002-quiz-4',
@@ -625,7 +625,7 @@ sqrt(dot(diff_vec, diff_vec))   % distance unchanged by offset`,
       options: ['1', '2', '3', '4 or more'],
       answer: '3',
       hints: ['A basis for $\\mathbb{R}^n$ has exactly $n$ vectors. Three dimensions need exactly 3 independent directions.'],
-      reviewSection: 'Math tab â€” Basis',
+      reviewSection: 'Math tab — Basis',
     },
     {
       id: 'la1-002-quiz-5',
@@ -638,22 +638,22 @@ sqrt(dot(diff_vec, diff_vec))   % distance unchanged by offset`,
         'Dependent, because they have the same number of components',
       ],
       answer: 'Dependent, because one is a scalar multiple of the other and both lie on the $x$-axis',
-      hints: ['$[-3,0]^T = -3 \\cdot [1,0]^T$. They both lie along the $x$-axis â€” their span is only a 1D line.'],
-      reviewSection: 'Intuition tab â€” Linear Dependence',
+      hints: ['$[-3,0]^T = -3 \\cdot [1,0]^T$. They both lie along the $x$-axis — their span is only a 1D line.'],
+      reviewSection: 'Intuition tab — Linear Dependence',
     },
     {
       id: 'la1-002-quiz-6',
       type: 'choice',
       text: 'The coordinates $[5, 7]^T$ relative to the standard basis mean:',
       options: [
-        '$5 \\cdot \\hat{\\mathbf{i}} + 7 \\cdot \\hat{\\mathbf{j}}$ â€” coordinates ARE the scalar weights',
+        '$5 \\cdot \\hat{\\mathbf{i}} + 7 \\cdot \\hat{\\mathbf{j}}$ — coordinates ARE the scalar weights',
         '5 and 7 are the magnitudes of two separate vectors',
         'The vector has magnitude $5 + 7 = 12$',
         'The vector makes an angle of $5/7$ radians with the $x$-axis',
       ],
-      answer: '$5 \\cdot \\hat{\\mathbf{i}} + 7 \\cdot \\hat{\\mathbf{j}}$ â€” coordinates ARE the scalar weights',
+      answer: '$5 \\cdot \\hat{\\mathbf{i}} + 7 \\cdot \\hat{\\mathbf{j}}$ — coordinates ARE the scalar weights',
       hints: ['$[5,7]^T = 5[1,0]^T + 7[0,1]^T = 5\\hat{\\mathbf{i}} + 7\\hat{\\mathbf{j}}$. The $x$-coordinate IS the $\\hat{\\mathbf{i}}$ weight; the $y$-coordinate IS the $\\hat{\\mathbf{j}}$ weight.'],
-      reviewSection: 'Intuition tab â€” Coordinate Illusion',
+      reviewSection: 'Intuition tab — Coordinate Illusion',
     },
     {
       id: 'la1-002-quiz-7',
@@ -667,7 +667,7 @@ sqrt(dot(diff_vec, diff_vec))   % distance unchanged by offset`,
       ],
       answer: '$\\begin{bmatrix}3\\\\-8\\end{bmatrix}$',
       hints: ['Scale first: $2[3,-1]^T = [6,-2]^T$ and $3[1,2]^T = [3,6]^T$. Then subtract: $[6-3,\\ -2-6]^T = [3,-8]^T$.'],
-      reviewSection: 'Example 1 â€” compute a linear combination',
+      reviewSection: 'Example 1 — compute a linear combination',
     },
     {
       id: 'la1-002-quiz-8',
@@ -681,35 +681,35 @@ sqrt(dot(diff_vec, diff_vec))   % distance unchanged by offset`,
       ],
       answer: 'Yes: $c_1 = 2$, $c_2 = 1$',
       hints: ['Set up the system: $c_1 + c_2 = 3$ (top component) and $2c_1 + 3c_2 = 7$ (bottom). From the first equation $c_1 = 3 - c_2$. Sub into the second: $2(3-c_2) + 3c_2 = 7 \\Rightarrow c_2 = 1$, $c_1 = 2$.'],
-      reviewSection: 'Example 3 â€” express as a linear combination',
+      reviewSection: 'Example 3 — express as a linear combination',
     },
     {
       id: 'la1-002-quiz-9',
       type: 'choice',
       text: 'Which of the following sets is a basis for $\\mathbb{R}^2$?',
       options: [
-        '$\\{[1,0]^T,\\; [0,1]^T\\}$ â€” independent and spans $\\mathbb{R}^2$',
-        '$\\{[1,2]^T,\\; [2,4]^T\\}$ â€” two nonzero vectors',
-        '$\\{[1,0]^T,\\; [0,1]^T,\\; [1,1]^T\\}$ â€” three vectors cover more directions',
-        '$\\{[3,3]^T\\}$ â€” one vector in $\\mathbb{R}^2$',
+        '$\\{[1,0]^T,\\; [0,1]^T\\}$ — independent and spans $\\mathbb{R}^2$',
+        '$\\{[1,2]^T,\\; [2,4]^T\\}$ — two nonzero vectors',
+        '$\\{[1,0]^T,\\; [0,1]^T,\\; [1,1]^T\\}$ — three vectors cover more directions',
+        '$\\{[3,3]^T\\}$ — one vector in $\\mathbb{R}^2$',
       ],
-      answer: '$\\{[1,0]^T,\\; [0,1]^T\\}$ â€” independent and spans $\\mathbb{R}^2$',
+      answer: '$\\{[1,0]^T,\\; [0,1]^T\\}$ — independent and spans $\\mathbb{R}^2$',
       hints: ['A basis needs (1) independence and (2) spanning. $[1,2]^T$ and $[2,4]^T$ are dependent ($[2,4] = 2[1,2]$). Three vectors in $\\mathbb{R}^2$ are always dependent. One vector can only span a line. Only two independent vectors in $\\mathbb{R}^2$ form a basis.'],
-      reviewSection: 'Math tab â€” Basis definition',
+      reviewSection: 'Math tab — Basis definition',
     },
     {
       id: 'la1-002-quiz-10',
       type: 'choice',
       text: 'You add vector $\\mathbf{v} = [0, 0]^T$ (the zero vector) to a spanning set $S = \\{[1,0]^T, [0,1]^T\\}$. What happens to the span?',
       options: [
-        'Nothing changes â€” the zero vector is always dependent on any set and contributes no new direction',
+        'Nothing changes — the zero vector is always dependent on any set and contributes no new direction',
         'The span grows to include the origin',
         'The zero vector makes the set inconsistent',
         'The span shrinks because the zero vector is not in $\\mathbb{R}^2$',
       ],
-      answer: 'Nothing changes â€” the zero vector is always dependent on any set and contributes no new direction',
-      hints: ['$\\mathbf{0} = 0 \\cdot [1,0]^T + 0 \\cdot [0,1]^T$ â€” the zero vector is already in every span (take all scalars = 0). Adding it never expands the span and makes the set dependent.'],
-      reviewSection: 'Intuition tab â€” Span',
+      answer: 'Nothing changes — the zero vector is always dependent on any set and contributes no new direction',
+      hints: ['$\\mathbf{0} = 0 \\cdot [1,0]^T + 0 \\cdot [0,1]^T$ — the zero vector is already in every span (take all scalars = 0). Adding it never expands the span and makes the set dependent.'],
+      reviewSection: 'Intuition tab — Span',
     },
   ],
 

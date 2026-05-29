@@ -1226,11 +1226,34 @@ function splitTopLevelCells(row) {
 }
 
 function normalizeMatrixSyntax(line) {
-  return line.replace(/\[([^[\]]+)\]/g, (_, inner) => {
-    const rows = splitTopLevel(inner, ";").map((row) => splitTopLevelCells(row).join(", "));
-    return `[${rows.join("; ")}]`;
+  return line.replace(/\[([^\[\]]+)\]/g, (match, inner) => {
+    const rows = splitTopLevel(inner, ";").map(r => splitTopLevelCells(r));
+
+    // Detect whether any cell looks like a variable/matrix reference (not just a number)
+    const hasNonScalar = rows.some(row =>
+      row.some(cell => {
+        const t = cell.trim();
+        // A pure number (possibly with sign/decimal/exp) is scalar; anything else may be a matrix/vector
+        return t !== "" && !/^[+-]?\d+(\.\d+)?([eE][+-]?\d+)?$/.test(t);
+      })
+    );
+
+    if (!hasNonScalar) {
+      // All-scalar literal: keep as standard mathjs matrix syntax
+      return `[${rows.map(r => r.join(", ")).join("; ")}]`;
+    }
+
+    // Mixed/variable content — use horzcat/vertcat to handle matrix concatenation properly.
+    // Each semicolon-separated row becomes a horzcat of its cells;
+    // multiple such rows are vertcat-ed together.
+    const rowExprs = rows.map(row => {
+      const cells = row.map(c => c.trim()).filter(Boolean);
+      return cells.length === 1 ? cells[0] : `horzcat(${cells.join(", ")})`;
+    });
+    return rowExprs.length === 1 ? rowExprs[0] : `vertcat(${rowExprs.join(", ")})`;
   });
 }
+
 
 function normalizeElementwiseOperators(line) {
   return line
@@ -1895,8 +1918,18 @@ export function createExecutionEngine(options = {}) {
   parser.set("horzcat", (...args) => {
     const ps = args.map(toPlain);
     if (ps.every((p) => !isMatrix(p))) return ps.flatMap((p) => normalizeVector(p));
-    const mats = ps.map((p) => isMatrix(p) ? p : [normalizeVector(p)]);
-    return mats[0].map((_, i) => mats.flatMap((m) => m[i] || []));
+    // Determine number of rows from the 2D matrix arguments
+    const nRows = Math.max(...ps.map(p => isMatrix(p) ? p.length : 0));
+    // Normalise each argument to a 2D form (array of rows)
+    const mats = ps.map((p) => {
+      if (isMatrix(p)) return p;
+      const vec = normalizeVector(p);
+      // If the vector length matches the row-count, treat as a column vector (Nx1)
+      if (vec.length === nRows && nRows > 1) return vec.map(v => [v]);
+      // Otherwise treat as a single row
+      return [vec];
+    });
+    return Array.from({ length: nRows }, (_, i) => mats.flatMap((m) => m[i] ?? []));
   });
   parser.set("vertcat", (...args) => args.flatMap((a) => { const p = toPlain(a); return isMatrix(p) ? p : [normalizeVector(p)]; }));
   parser.set("cat", (dim, ...args) => {
@@ -2289,9 +2322,13 @@ export function executeScript(source, options = {}) {
         let arr = parser.get(name);
         const val = toPlain(parser.evaluate(valExpr));
 
-        // Helper: evaluate an index expression with 'end' expanded
+        // Helper: evaluate an index expression with 'end' expanded.
+        // A bare ':' means "all indices" — handle it before calling the parser
+        // so we never pass ':' to mathjs (which would fail with "Undefined symbol end").
         const evalIdx = (expr, len) => {
-          const expanded = String(expr).replace(/\bend\b/g, String(len));
+          const trimmed = String(expr).trim();
+          if (trimmed === ":") return Array.from({ length: len }, (_, k) => k + 1);
+          const expanded = trimmed.replace(/\bend\b/g, String(len));
           const result = toPlain(parser.evaluate(expanded));
           return isCollection(result) ? normalizeVector(result).map(Number) : [Number(result)];
         };
@@ -2334,6 +2371,24 @@ export function executeScript(source, options = {}) {
           const nRows = mat.length;
           const nCols = mat[0]?.length ?? 0;
 
+          // ── Deletion: M(i,:)=[] removes row; M(:,j)=[] removes column ──────
+          const isEmpty = Array.isArray(val) && val.flat(Infinity).length === 0;
+          const rowIsColon = rowExpr.trim() === ":";
+          const colIsColon = colExpr.trim() === ":";
+          if (isEmpty) {
+            if (colIsColon && !rowIsColon) {
+              // M(i,:) = [] → delete row(s)
+              const toDelete = new Set(evalIdx(rowExpr, nRows).map(r => r - 1));
+              parser.set(name, mat.filter((_, r) => !toDelete.has(r)));
+            } else if (rowIsColon && !colIsColon) {
+              // M(:,j) = [] → delete column(s)
+              const toDelete = new Set(evalIdx(colExpr, nCols).map(c => c - 1));
+              parser.set(name, mat.map(row => row.filter((_, c) => !toDelete.has(c))));
+            }
+            variables.add(name);
+            return hasSemicolon ? null : parser.get(name);
+          }
+
           const rowIdxs = evalIdx(rowExpr, nRows);
           const colIdxs = evalIdx(colExpr, nCols);
 
@@ -2354,6 +2409,7 @@ export function executeScript(source, options = {}) {
           });
           parser.set(name, mat);
         }
+
         variables.add(name);
         return hasSemicolon ? null : parser.get(name);
       }
