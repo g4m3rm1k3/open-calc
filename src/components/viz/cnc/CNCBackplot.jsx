@@ -31,10 +31,10 @@ export default function CNCBackplot({
   // Fixture models: [{id, name, format, buffer, position:[x,y,z], rotation:[rx,ry,rz], scale:[sx,sy,sz], w, h, d}]
   fixtures = [],
   selectedFixtureId = null,
-  onSelectFixture = null,     // (id|null) => void
-  onFixtureTransform = null,  // (id, {pos, rot, scl}) => void
+  onSelectFixture = null, // (id|null) => void
+  onFixtureTransform = null, // (id, {pos, rot, scl}) => void
   transformMode = "translate", // 'translate' | 'rotate' | 'scale'
-  snapGrid = 0,               // 0 = off, otherwise mm increment
+  snapGrid = 0, // 0 = off, otherwise mm increment
   facePickMode = false,
 }) {
   const mountRef = useRef(null);
@@ -62,9 +62,15 @@ export default function CNCBackplot({
   const [pendingFace, setPendingFace] = useState(null);
 
   // Keep callback refs fresh so the bootstrap closure always has the latest values
-  useEffect(() => { onSelectFixtureRef.current = onSelectFixture; }, [onSelectFixture]);
-  useEffect(() => { onFixtureTransformRef.current = onFixtureTransform; }, [onFixtureTransform]);
-  useEffect(() => { facePickModeRef.current = facePickMode; }, [facePickMode]);
+  useEffect(() => {
+    onSelectFixtureRef.current = onSelectFixture;
+  }, [onSelectFixture]);
+  useEffect(() => {
+    onFixtureTransformRef.current = onFixtureTransform;
+  }, [onFixtureTransform]);
+  useEffect(() => {
+    facePickModeRef.current = facePickMode;
+  }, [facePickMode]);
 
   // Colors based on theme
   const colors = {
@@ -167,9 +173,13 @@ export default function CNCBackplot({
 
     // ── Fixture click-to-select + face-pick ───────────────────────────────
     let _tcPointerDownThisClick = false;
-    tc.addEventListener("mouseDown", () => { _tcPointerDownThisClick = true; });
-    tc.addEventListener("mouseUp",   () => {
-      requestAnimationFrame(() => { _tcPointerDownThisClick = false; });
+    tc.addEventListener("mouseDown", () => {
+      _tcPointerDownThisClick = true;
+    });
+    tc.addEventListener("mouseUp", () => {
+      requestAnimationFrame(() => {
+        _tcPointerDownThisClick = false;
+      });
     });
 
     const handleClick = (event) => {
@@ -182,7 +192,9 @@ export default function CNCBackplot({
       const raycaster = new THREE.Raycaster();
       raycaster.setFromCamera(mouse, cameraRef.current);
       const meshes = [];
-      fixtureLayerRef.current?.traverse((o) => { if (o.isMesh) meshes.push(o); });
+      fixtureLayerRef.current?.traverse((o) => {
+        if (o.isMesh) meshes.push(o);
+      });
       const hits = raycaster.intersectObjects(meshes, false);
 
       const getFxId = (obj) => {
@@ -194,12 +206,18 @@ export default function CNCBackplot({
       if (facePickModeRef.current) {
         if (hits.length && hits[0].face) {
           const hit = hits[0];
-          const wn = hit.face.normal.clone()
-            .transformDirection(hit.object.matrixWorld).normalize();
+          const wn = hit.face.normal
+            .clone()
+            .transformDirection(hit.object.matrixWorld)
+            .normalize();
           const fxId = getFxId(hit.object);
           if (fxId) {
             const obj3d = fixtureObjectsRef.current.get(fxId);
-            setPendingFace({ fixtureId: fxId, worldNormal: wn, object3d: obj3d });
+            setPendingFace({
+              fixtureId: fxId,
+              worldNormal: wn,
+              object3d: obj3d,
+            });
           }
         }
         return;
@@ -348,7 +366,7 @@ export default function CNCBackplot({
       color: colors.stockFill,
       transparent: true,
       // Ghost the stock when cut surface is active so the solid surface shows through
-      opacity: showCuts ? 0.06 : (isDark ? 0.22 : 0.18),
+      opacity: showCuts ? 0.06 : isDark ? 0.22 : 0.18,
       shininess: 40,
     });
 
@@ -457,18 +475,22 @@ export default function CNCBackplot({
     const sh = Math.max(stockDimensions?.height ?? 80, 1);
     const sd = Math.max(stockDimensions?.depth ?? 40, 0.1);
     const stockTopZ = oz + sd;
-    const NX = HMAP_N, NY = HMAP_N;
+    const NX = HMAP_N,
+      NY = HMAP_N;
 
     const positions = new Float32Array(NX * NY * 3);
     const idxArr = [];
     for (let j = 0; j < NY; j++) {
       for (let i = 0; i < NX; i++) {
         const vi = j * NX + i;
-        positions[vi * 3]     = ox + i * (sw / (NX - 1));
+        positions[vi * 3] = ox + i * (sw / (NX - 1));
         positions[vi * 3 + 1] = oy + j * (sh / (NY - 1));
         positions[vi * 3 + 2] = stockTopZ;
         if (i < NX - 1 && j < NY - 1) {
-          const a = vi, b = vi + 1, c = vi + NX, d = vi + NX + 1;
+          const a = vi,
+            b = vi + 1,
+            c = vi + NX,
+            d = vi + NX + 1;
           idxArr.push(a, b, d, a, d, c);
         }
       }
@@ -482,7 +504,7 @@ export default function CNCBackplot({
     geo.computeVertexNormals();
 
     const mat = new THREE.MeshPhongMaterial({
-      color: isDark ? 0xa8b8c4 : 0xd0c4a8,  // machined aluminum / warm steel
+      color: isDark ? 0xa8b8c4 : 0xd0c4a8, // machined aluminum / warm steel
       shininess: 140,
       specular: isDark ? 0x4a7a9b : 0x887860,
       side: THREE.FrontSide,
@@ -494,9 +516,18 @@ export default function CNCBackplot({
     cutsMesh.visible = true; // always shown — represents the current stock top surface
     group.add(cutsMesh);
     cutsGeoRef.current = {
-      geo, mesh: cutsMesh,
-      NX, NY, ox, oy, sw, sh, stockTopZ,
-      hmap: null, hmapStep: -1, hmapPathLen: -1,
+      geo,
+      mesh: cutsMesh,
+      NX,
+      NY,
+      ox,
+      oy,
+      sw,
+      sh,
+      stockTopZ,
+      hmap: null,
+      hmapStep: -1,
+      hmapPathLen: -1,
     };
   }, [stockShape, stockDimensions, stockOrigin, showCuts, isDark]);
 
@@ -515,7 +546,11 @@ export default function CNCBackplot({
     const cellH = sh / (NY - 1);
 
     // Reset the cache when going backward or when a new path is loaded.
-    if (!info.hmap || pathPoints.length !== info.hmapPathLen || currentStep < info.hmapStep) {
+    if (
+      !info.hmap ||
+      pathPoints.length !== info.hmapPathLen ||
+      currentStep < info.hmapStep
+    ) {
       info.hmap = new Float32Array(NX * NY).fill(stockTopZ);
       info.hmapStep = -1;
       info.hmapPathLen = pathPoints.length;
@@ -524,7 +559,7 @@ export default function CNCBackplot({
 
     // Incrementally carve only the new segments since the last update.
     const startPi = Math.max(1, info.hmapStep + 1);
-    const endPi   = Math.min(currentStep + 1, pathPoints.length);
+    const endPi = Math.min(currentStep + 1, pathPoints.length);
     for (let pi = startPi; pi < endPi; pi++) {
       const pt = pathPoints[pi];
       if (!pt || pt.motionMode === "G00") continue;
@@ -546,7 +581,13 @@ export default function CNCBackplot({
         const tipZ = prev.machineZ + t * ddz;
 
         if (tipZ >= stockTopZ) continue;
-        if (px + toolR < 0 || px - toolR > sw || py + toolR < 0 || py - toolR > sh) continue;
+        if (
+          px + toolR < 0 ||
+          px - toolR > sw ||
+          py + toolR < 0 ||
+          py - toolR > sh
+        )
+          continue;
 
         const xiMin = Math.max(0, Math.floor((px - toolR) / cellW));
         const xiMax = Math.min(NX - 1, Math.ceil((px + toolR) / cellW));
@@ -587,34 +628,38 @@ export default function CNCBackplot({
     if (!fixtures?.length) return;
 
     let cancelled = false;
-    const stlLdr  = new STLLoader();
-    const objLdr  = new OBJLoader();
-    const fbxLdr  = new FBXLoader();
+    const stlLdr = new STLLoader();
+    const objLdr = new OBJLoader();
+    const fbxLdr = new FBXLoader();
     const gltfLdr = new GLTFLoader();
-    const daeLdr  = new ColladaLoader();
-    const plyLdr  = new PLYLoader();
+    const daeLdr = new ColladaLoader();
+    const plyLdr = new PLYLoader();
 
-    const mkMat = () => new THREE.MeshPhongMaterial({
-      color: isDark ? 0x4a5568 : 0x718096,
-      transparent: true,
-      opacity: 0.88,
-      shininess: 80,
-      side: THREE.DoubleSide,
-    });
-    const mkEdgeMat = () => new THREE.LineBasicMaterial({
-      color: isDark ? 0x94a3b8 : 0x475569,
-    });
+    const mkMat = () =>
+      new THREE.MeshPhongMaterial({
+        color: isDark ? 0x4a5568 : 0x718096,
+        transparent: true,
+        opacity: 0.88,
+        shininess: 80,
+        side: THREE.DoubleSide,
+      });
+    const mkEdgeMat = () =>
+      new THREE.LineBasicMaterial({
+        color: isDark ? 0x94a3b8 : 0x475569,
+      });
 
     const finalize = (obj3d, fx) => {
       if (cancelled) return;
       const pos = fx.position ?? [fx.x ?? 0, fx.y ?? 0, fx.z ?? 0];
       const rot = fx.rotation ?? [0, 0, 0];
-      const scl = fx.scale    ?? [1, 1, 1];
+      const scl = fx.scale ?? [1, 1, 1];
       obj3d.position.set(pos[0], pos[1], pos[2]);
       obj3d.rotation.set(rot[0], rot[1], rot[2]);
       obj3d.scale.set(scl[0], scl[1], scl[2]);
       obj3d.userData.fixtureId = fx.id;
-      obj3d.traverse((o) => { o.userData.fixtureId = fx.id; });
+      obj3d.traverse((o) => {
+        o.userData.fixtureId = fx.id;
+      });
       group.add(obj3d);
       fixtureObjectsRef.current.set(fx.id, obj3d);
     };
@@ -628,7 +673,9 @@ export default function CNCBackplot({
         const mesh = new THREE.Mesh(boxGeo, mkMat());
         mesh.position.set(w / 2, h / 2, d / 2);
         const edges = new THREE.LineSegments(
-          new THREE.EdgesGeometry(boxGeo), mkEdgeMat());
+          new THREE.EdgesGeometry(boxGeo),
+          mkEdgeMat(),
+        );
         edges.position.copy(mesh.position);
         g.add(mesh, edges);
         finalize(g, fx);
@@ -654,22 +701,30 @@ export default function CNCBackplot({
           }
           case "obj": {
             const obj = objLdr.parse(new TextDecoder().decode(fx.buffer));
-            obj.traverse((o) => { if (o.isMesh) o.material = mkMat(); });
+            obj.traverse((o) => {
+              if (o.isMesh) o.material = mkMat();
+            });
             finalize(obj, fx);
             break;
           }
           case "fbx": {
             const obj = fbxLdr.parse(fx.buffer, "");
-            obj.traverse((o) => { if (o.isMesh) o.material = mkMat(); });
+            obj.traverse((o) => {
+              if (o.isMesh) o.material = mkMat();
+            });
             finalize(obj, fx);
             break;
           }
           case "gltf":
           case "glb": {
-            gltfLdr.parse(fx.buffer, "",
+            gltfLdr.parse(
+              fx.buffer,
+              "",
               (gltf) => {
                 if (cancelled) return;
-                gltf.scene.traverse((o) => { if (o.isMesh) o.material = mkMat(); });
+                gltf.scene.traverse((o) => {
+                  if (o.isMesh) o.material = mkMat();
+                });
                 finalize(gltf.scene, fx);
                 // Re-attach TC if this was the selected fixture and it loaded async
                 const tc = transformControlsRef.current;
@@ -684,7 +739,9 @@ export default function CNCBackplot({
           }
           case "dae": {
             const result = daeLdr.parse(new TextDecoder().decode(fx.buffer));
-            result.scene.traverse((o) => { if (o.isMesh) o.material = mkMat(); });
+            result.scene.traverse((o) => {
+              if (o.isMesh) o.material = mkMat();
+            });
             finalize(result.scene, fx);
             break;
           }
@@ -695,21 +752,31 @@ export default function CNCBackplot({
         console.warn("CNCBackplot: fixture load failed", fx.format, e);
         // Fallback box
         const g = new THREE.Group();
-        g.add(new THREE.Mesh(
-          new THREE.BoxGeometry(fx.w ?? 60, fx.h ?? 50, fx.d ?? 25), mkMat()));
+        g.add(
+          new THREE.Mesh(
+            new THREE.BoxGeometry(fx.w ?? 60, fx.h ?? 50, fx.d ?? 25),
+            mkMat(),
+          ),
+        );
         finalize(g, fx);
       }
     });
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [fixtures, isDark]); // selectedFixtureId attachment handled in next effect
 
   // ── Attach / detach TransformControls when selection changes ───────────────
   useEffect(() => {
     const tc = transformControlsRef.current;
     if (!tc) return;
-    if (!selectedFixtureId) { tc.detach(); return; }
+    if (!selectedFixtureId) {
+      tc.detach();
+      return;
+    }
     const obj = fixtureObjectsRef.current.get(selectedFixtureId);
-    if (obj) tc.attach(obj); else tc.detach();
+    if (obj) tc.attach(obj);
+    else tc.detach();
   }, [selectedFixtureId]);
 
   // ── TransformControls mode: translate / rotate / scale ─────────────────────
@@ -876,40 +943,70 @@ export default function CNCBackplot({
       {pendingFace && (
         <div
           style={{
-            position: "absolute", top: 8, left: 8,
+            position: "absolute",
+            top: 8,
+            left: 8,
             background: "rgba(15,23,42,0.92)",
             border: "1px solid #334155",
-            borderRadius: 8, padding: "10px 12px",
-            zIndex: 20, minWidth: 180,
+            borderRadius: 8,
+            padding: "10px 12px",
+            zIndex: 20,
+            minWidth: 180,
           }}
         >
-          <div style={{ fontSize: 10, color: "#94a3b8", marginBottom: 6, fontWeight: 600 }}>
+          <div
+            style={{
+              fontSize: 10,
+              color: "#94a3b8",
+              marginBottom: 6,
+              fontWeight: 600,
+            }}
+          >
             Align picked face to…
           </div>
           {[
-            { label: "Lay flat on table ↓",  target: new THREE.Vector3(0, 0, -1) },
-            { label: "Face up ↑",             target: new THREE.Vector3(0, 0,  1) },
-            { label: "+X right",              target: new THREE.Vector3(1, 0,  0) },
-            { label: "+Y front",              target: new THREE.Vector3(0, 1,  0) },
+            {
+              label: "Lay flat on table ↓",
+              target: new THREE.Vector3(0, 0, -1),
+            },
+            { label: "Face up ↑", target: new THREE.Vector3(0, 0, 1) },
+            { label: "+X right", target: new THREE.Vector3(1, 0, 0) },
+            { label: "+Y front", target: new THREE.Vector3(0, 1, 0) },
           ].map(({ label, target }) => (
             <button
               key={label}
               style={{
-                display: "block", width: "100%", marginBottom: 4,
-                background: "#1e293b", border: "1px solid #334155",
-                color: "#e2e8f0", borderRadius: 4, padding: "4px 8px",
-                fontSize: 10, cursor: "pointer", textAlign: "left",
+                display: "block",
+                width: "100%",
+                marginBottom: 4,
+                background: "#1e293b",
+                border: "1px solid #334155",
+                color: "#e2e8f0",
+                borderRadius: 4,
+                padding: "4px 8px",
+                fontSize: 10,
+                cursor: "pointer",
+                textAlign: "left",
               }}
               onClick={() => {
                 const { fixtureId, worldNormal, object3d } = pendingFace;
-                if (!object3d) { setPendingFace(null); return; }
+                if (!object3d) {
+                  setPendingFace(null);
+                  return;
+                }
                 // Rotate the object so worldNormal aligns with target
                 const q = new THREE.Quaternion().setFromUnitVectors(
-                  worldNormal.clone().normalize(), target.clone().normalize());
+                  worldNormal.clone().normalize(),
+                  target.clone().normalize(),
+                );
                 object3d.quaternion.premultiply(q);
                 onFixtureTransformRef.current?.(fixtureId, {
                   pos: object3d.position.toArray(),
-                  rot: [object3d.rotation.x, object3d.rotation.y, object3d.rotation.z],
+                  rot: [
+                    object3d.rotation.x,
+                    object3d.rotation.y,
+                    object3d.rotation.z,
+                  ],
                   scl: object3d.scale.toArray(),
                 });
                 setPendingFace(null);
@@ -920,10 +1017,15 @@ export default function CNCBackplot({
           ))}
           <button
             style={{
-              display: "block", width: "100%",
-              background: "#7f1d1d", border: "1px solid #991b1b",
-              color: "#fca5a5", borderRadius: 4, padding: "4px 8px",
-              fontSize: 10, cursor: "pointer",
+              display: "block",
+              width: "100%",
+              background: "#7f1d1d",
+              border: "1px solid #991b1b",
+              color: "#fca5a5",
+              borderRadius: 4,
+              padding: "4px 8px",
+              fontSize: 10,
+              cursor: "pointer",
             }}
             onClick={() => setPendingFace(null)}
           >

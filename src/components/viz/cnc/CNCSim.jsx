@@ -1942,6 +1942,11 @@ export default function CNCSimPro() {
     z: 0,
   });
   const [fixtures, setFixtures] = useState([]);
+  const [stockSTLBuffer, setStockSTLBuffer] = useState(null);
+  const [selectedFixtureId, setSelectedFixtureId] = useState(null);
+  const [transformMode, setTransformMode] = useState("translate");
+  const [snapGrid, setSnapGrid] = useState(0);
+  const [facePickMode, setFacePickMode] = useState(false);
   const [code, setCode] = useState(
     () => getProgLib(MACHINE_DEFINITIONS["fanuc_mill"])[0].code,
   );
@@ -2348,6 +2353,14 @@ export default function CNCSimPro() {
     setIsPlaying(false);
     reload();
   }, [reload]);
+
+  const handleFixtureTransform = useCallback((id, { pos, rot, scl }) => {
+    setFixtures((p) =>
+      p.map((f) =>
+        f.id === id ? { ...f, position: pos, rotation: rot, scale: scl } : f,
+      ),
+    );
+  }, []);
 
   useEffect(() => {
     const next = channelStates[activeChannel];
@@ -2876,15 +2889,21 @@ export default function CNCSimPro() {
           ctx.stroke();
         });
         fixtures.forEach((fx) => {
+          // Support both new position array and legacy x/y/z fields
+          const [fx_x, fx_y, fx_z] = fx.position ?? [
+            fx.x ?? 0,
+            fx.y ?? 0,
+            fx.z ?? 0,
+          ];
           const fc = [
-            [fx.x, fx.y, fx.z],
-            [fx.x + fx.w, fx.y, fx.z],
-            [fx.x + fx.w, fx.y + fx.h, fx.z],
-            [fx.x, fx.y + fx.h, fx.z],
-            [fx.x, fx.y, fx.z + fx.d],
-            [fx.x + fx.w, fx.y, fx.z + fx.d],
-            [fx.x + fx.w, fx.y + fx.h, fx.z + fx.d],
-            [fx.x, fx.y + fx.h, fx.z + fx.d],
+            [fx_x, fx_y, fx_z],
+            [fx_x + fx.w, fx_y, fx_z],
+            [fx_x + fx.w, fx_y + fx.h, fx_z],
+            [fx_x, fx_y + fx.h, fx_z],
+            [fx_x, fx_y, fx_z + fx.d],
+            [fx_x + fx.w, fx_y, fx_z + fx.d],
+            [fx_x + fx.w, fx_y + fx.h, fx_z + fx.d],
+            [fx_x, fx_y + fx.h, fx_z + fx.d],
           ];
           [
             [0, 1, 5, 4, C.fixTop],
@@ -5032,6 +5051,12 @@ export default function CNCSimPro() {
                         {
                           id: Date.now(),
                           name: `Fix ${p.length + 1}`,
+                          format: null,
+                          buffer: null,
+                          position: [120, 0, 0],
+                          rotation: [0, 0, 0],
+                          scale: [1, 1, 1],
+                          // legacy box dims kept for placeholder rendering
                           x: 120,
                           y: 0,
                           z: 0,
@@ -5044,80 +5069,197 @@ export default function CNCSimPro() {
                   >
                     + Add Fixture
                   </button>
-                  {fixtures.map((f, fi) => (
-                    <div
-                      key={f.id}
-                      style={{
-                        background: C.bg,
-                        border: `1px solid ${C.bd}`,
-                        borderRadius: 4,
-                        padding: "6px 8px",
-                        marginTop: 4,
-                      }}
-                    >
+                  {fixtures.map((f, fi) => {
+                    const pos = f.position ?? [f.x ?? 0, f.y ?? 0, f.z ?? 0];
+                    const rot = f.rotation ?? [0, 0, 0];
+                    const isSelected = selectedFixtureId === f.id;
+                    return (
                       <div
+                        key={f.id}
                         style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          marginBottom: 4,
+                          background: isSelected ? C.greenBg : C.bg,
+                          border: `1px solid ${isSelected ? C.green : C.bd}`,
+                          borderRadius: 4,
+                          padding: "6px 8px",
+                          marginTop: 4,
                         }}
                       >
-                        <span style={{ fontWeight: 600, fontSize: 10 }}>
-                          {f.name}
-                        </span>
-                        <button
-                          className="btn btn-rd"
-                          style={{ fontSize: 8, padding: "1px 5px" }}
-                          onClick={() =>
-                            setFixtures((p) => p.filter((_, i) => i !== fi))
-                          }
+                        {/* Header row */}
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            marginBottom: 4,
+                          }}
                         >
-                          ✕
+                          <span style={{ fontWeight: 600, fontSize: 10 }}>
+                            {f.name}
+                          </span>
+                          <div style={{ display: "flex", gap: 4 }}>
+                            <button
+                              className={`btn${isSelected ? " btn-gr" : ""}`}
+                              style={{ fontSize: 8, padding: "1px 6px" }}
+                              onClick={() =>
+                                setSelectedFixtureId((id) =>
+                                  id === f.id ? null : f.id,
+                                )
+                              }
+                            >
+                              {isSelected ? "✓ Sel" : "Select"}
+                            </button>
+                            <button
+                              className="btn btn-rd"
+                              style={{ fontSize: 8, padding: "1px 5px" }}
+                              onClick={() => {
+                                if (selectedFixtureId === f.id)
+                                  setSelectedFixtureId(null);
+                                setFixtures((p) =>
+                                  p.filter((_, i) => i !== fi),
+                                );
+                              }}
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Model upload */}
+                        <label
+                          className="btn btn-gr full"
+                          style={{
+                            cursor: "pointer",
+                            marginBottom: 4,
+                            fontSize: 9,
+                          }}
+                        >
+                          {f.buffer
+                            ? `✓ ${f.format?.toUpperCase()} loaded`
+                            : "Upload model (.stl .obj .fbx .glb .gltf .dae .ply)"}
+                          <input
+                            type="file"
+                            accept=".stl,.obj,.fbx,.glb,.gltf,.dae,.ply"
+                            style={{ display: "none" }}
+                            onChange={(e) => {
+                              const file = e.target.files[0];
+                              if (!file) return;
+                              const ext = file.name
+                                .split(".")
+                                .pop()
+                                .toLowerCase();
+                              file
+                                .arrayBuffer()
+                                .then((buf) =>
+                                  setFixtures((p) =>
+                                    p.map((x) =>
+                                      x.id === f.id
+                                        ? { ...x, format: ext, buffer: buf }
+                                        : x,
+                                    ),
+                                  ),
+                                );
+                            }}
+                          />
+                        </label>
+
+                        {/* Position */}
+                        <div className="frow">
+                          {["X", "Y", "Z"].map((k, ki) => (
+                            <div key={k} className="field">
+                              <div className="lbl">{k}</div>
+                              <input
+                                type="number"
+                                value={+(pos[ki] ?? 0).toFixed(3)}
+                                step={0.1}
+                                onChange={(e) =>
+                                  setFixtures((p) =>
+                                    p.map((x) => {
+                                      if (x.id !== f.id) return x;
+                                      const newPos = [
+                                        ...(x.position ?? [
+                                          x.x ?? 0,
+                                          x.y ?? 0,
+                                          x.z ?? 0,
+                                        ]),
+                                      ];
+                                      newPos[ki] = +e.target.value;
+                                      return { ...x, position: newPos };
+                                    }),
+                                  )
+                                }
+                              />
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Rotation (degrees) */}
+                        <div className="frow">
+                          {["Rx", "Ry", "Rz"].map((k, ki) => (
+                            <div key={k} className="field">
+                              <div className="lbl">{k}</div>
+                              <input
+                                type="number"
+                                value={
+                                  +(((rot[ki] ?? 0) * 180) / Math.PI).toFixed(1)
+                                }
+                                step={1}
+                                onChange={(e) =>
+                                  setFixtures((p) =>
+                                    p.map((x) => {
+                                      if (x.id !== f.id) return x;
+                                      const newRot = [
+                                        ...(x.rotation ?? [0, 0, 0]),
+                                      ];
+                                      newRot[ki] =
+                                        (+e.target.value * Math.PI) / 180;
+                                      return { ...x, rotation: newRot };
+                                    }),
+                                  )
+                                }
+                              />
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Box dims (shown when no model loaded) */}
+                        {!f.buffer && (
+                          <div className="frow">
+                            {["w", "h", "d"].map((k) => (
+                              <div key={k} className="field">
+                                <div className="lbl">{k.toUpperCase()}</div>
+                                <input
+                                  type="number"
+                                  value={f[k]}
+                                  onChange={(e) =>
+                                    setFixtures((p) =>
+                                      p.map((x) =>
+                                        x.id === f.id
+                                          ? { ...x, [k]: +e.target.value }
+                                          : x,
+                                      ),
+                                    )
+                                  }
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Snap stock on top of fixture */}
+                        <button
+                          className="btn btn-gr full"
+                          style={{ marginTop: 4, fontSize: 9 }}
+                          onClick={() => {
+                            const fzTop =
+                              (f.position?.[2] ?? f.z ?? 0) + (f.d ?? 25);
+                            setStock((s) => ({ ...s, z: fzTop }));
+                          }}
+                        >
+                          Snap Stock on Top
                         </button>
                       </div>
-                      <div className="frow">
-                        {["x", "y", "z"].map((k) => (
-                          <div key={k} className="field">
-                            <div className="lbl">{k.toUpperCase()}</div>
-                            <input
-                              type="number"
-                              value={f[k]}
-                              step={0.001}
-                              onChange={(e) =>
-                                setFixtures((p) =>
-                                  p.map((x, i) =>
-                                    i === fi
-                                      ? { ...x, [k]: +e.target.value }
-                                      : x,
-                                  ),
-                                )
-                              }
-                            />
-                          </div>
-                        ))}
-                      </div>
-                      <div className="frow">
-                        {["w", "h", "d"].map((k) => (
-                          <div key={k} className="field">
-                            <div className="lbl">{k.toUpperCase()}</div>
-                            <input
-                              type="number"
-                              value={f[k]}
-                              onChange={(e) =>
-                                setFixtures((p) =>
-                                  p.map((x, i) =>
-                                    i === fi
-                                      ? { ...x, [k]: +e.target.value }
-                                      : x,
-                                  ),
-                                )
-                              }
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </>
               )}
 
@@ -5550,6 +5692,49 @@ export default function CNCSimPro() {
                     : l.charAt(0).toUpperCase() + l.slice(1)}
                 </button>
               ))}
+              {selectedFixtureId && (
+                <>
+                  <div className="ctrl-div" />
+                  {[
+                    ["translate", "↔"],
+                    ["rotate", "↻"],
+                    ["scale", "⊞"],
+                  ].map(([m, icon]) => (
+                    <button
+                      key={m}
+                      className={`vp-btn${transformMode === m ? " on" : ""}`}
+                      onClick={() => setTransformMode(m)}
+                    >
+                      {icon} {m[0].toUpperCase() + m.slice(1)}
+                    </button>
+                  ))}
+                  <button
+                    className={`vp-btn${facePickMode ? " on" : ""}`}
+                    title="Click a face on the model to align it to an axis"
+                    onClick={() => setFacePickMode((f) => !f)}
+                  >
+                    Face↔Z
+                  </button>
+                  <button
+                    className="vp-btn"
+                    style={{ color: "#f87171" }}
+                    onClick={() => {
+                      setSelectedFixtureId(null);
+                      setFacePickMode(false);
+                    }}
+                  >
+                    ✕ Deselect
+                  </button>
+                </>
+              )}
+              <div className="ctrl-div" />
+              <button
+                className={`vp-btn${snapGrid ? " on" : ""}`}
+                title="Toggle 1 mm grid snap for transform gizmo"
+                onClick={() => setSnapGrid((v) => (v ? 0 : 1))}
+              >
+                Snap{snapGrid ? ` ${snapGrid}mm` : ""}
+              </button>
             </div>
 
             <div id="vpWrap" ref={vpRef}>
@@ -5572,6 +5757,14 @@ export default function CNCSimPro() {
                   stockOrigin={backplotStockOrigin}
                   showStock={layers.stock}
                   showCuts={layers.removal}
+                  stockSTLBuffer={stockSTLBuffer}
+                  fixtures={fixtures}
+                  selectedFixtureId={selectedFixtureId}
+                  onSelectFixture={setSelectedFixtureId}
+                  onFixtureTransform={handleFixtureTransform}
+                  transformMode={transformMode}
+                  snapGrid={snapGrid}
+                  facePickMode={facePickMode}
                 />
               ) : (
                 <canvas

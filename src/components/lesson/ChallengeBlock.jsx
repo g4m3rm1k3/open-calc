@@ -106,9 +106,9 @@ export default function ChallengeBlock({ challenge, number }) {
   const icon = DIFFICULTY_ICONS[difficulty] || '⭐'
 
   return (
-    <div className="relative mb-12 rounded-3xl shadow-2xl border border-slate-200/40 dark:border-slate-800/40 bg-white/30 dark:bg-slate-900/30 backdrop-blur-3xl overflow-hidden transition-all">
+    <div className="relative mx-4 lg:mx-0 mb-6 rounded-3xl shadow-2xl border border-slate-200/40 dark:border-slate-800/40 bg-white/30 dark:bg-slate-900/30 backdrop-blur-3xl overflow-hidden transition-all">
       {/* Softer glassy header with subtle gradient */}
-      <div className="px-8 py-6 flex items-center justify-between bg-gradient-to-r from-brand-400/20 via-white/10 to-emerald-300/10 dark:from-brand-900/20 dark:via-slate-900/10 dark:to-emerald-900/10 border-b border-brand-200/20 dark:border-brand-800/20 shadow-md backdrop-blur-2xl">
+      <div className="px-4 py-4 sm:px-8 sm:py-6 flex items-center justify-between gap-2 bg-gradient-to-r from-brand-400/20 via-white/10 to-emerald-300/10 dark:from-brand-900/20 dark:via-slate-900/10 dark:to-emerald-900/10 border-b border-brand-200/20 dark:border-brand-800/20 shadow-md backdrop-blur-2xl">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-2xl bg-white/70 dark:bg-slate-900/70 flex items-center justify-center text-2xl shadow-lg border-2 border-brand-200/40 dark:border-brand-800/40 backdrop-blur-md">
             {icon}
@@ -124,7 +124,7 @@ export default function ChallengeBlock({ challenge, number }) {
         </div>
       </div>
 
-      <div className="p-10 bg-white/70 dark:bg-slate-950/70 backdrop-blur-xl">
+      <div className="p-4 sm:p-6 lg:p-8 bg-white/70 dark:bg-slate-950/70 backdrop-blur-xl">
         {/* Problem */}
         <div className="bg-white/80 dark:bg-slate-900/80 rounded-xl p-5 mb-6 border border-slate-100/40 dark:border-slate-800/40 shadow-sm backdrop-blur-md">
           <MarkdownProse text={challenge.problem} className="text-base leading-relaxed text-slate-700 dark:text-slate-300" />
