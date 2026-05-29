@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
 import Editor from '@monaco-editor/react'
-import { FileCode2, Play, RotateCcw } from 'lucide-react'
+import { Columns2, FileCode2, Maximize2, Minimize2, Play, RotateCcw } from 'lucide-react'
 import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
 import { executeScript } from '../../utils/openmatEngine.js'
 
@@ -10,20 +10,32 @@ async function getPyodide() {
   if (!pyodidePromise) {
     pyodidePromise = (async () => {
       if (!window.loadPyodide) {
-        await new Promise((resolve, reject) => {
+        await withTimeout(new Promise((resolve, reject) => {
           const script = document.createElement('script')
-          script.src = 'https://cdn.jsdelivr.net/pyodide/v0.29.3/full/pyodide.js'
+          script.src = 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js'
           script.onload = resolve
-          script.onerror = reject
+          script.onerror = () => reject(new Error('Failed to load Pyodide. Check network access or try again.'))
           document.head.appendChild(script)
-        })
+        }), 30000, 'Timed out loading Pyodide. The first Python run downloads the runtime; check network access and try again.')
       }
-      return window.loadPyodide({
-        indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.29.3/full/',
+      return withTimeout(window.loadPyodide({
+        indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/',
+        fullStdLib: false,
+      }), 45000, 'Timed out initializing Pyodide.')
+    })().catch((error) => {
+      pyodidePromise = null
+      throw error
       })
-    })()
   }
   return pyodidePromise
+}
+
+function withTimeout(promise, ms, message) {
+  let timeoutId
+  const timeout = new Promise((_, reject) => {
+    timeoutId = window.setTimeout(() => reject(new Error(message)), ms)
+  })
+  return Promise.race([promise, timeout]).finally(() => window.clearTimeout(timeoutId))
 }
 
 const STARTERS = {
@@ -95,12 +107,18 @@ int main() {
 }`,
   },
   matlab: {
-    label: 'MATLAB / OpenMAT',
-    monaco: 'matlab',
+    label: 'OpenMAT',
+    monaco: 'openmat',
     output: 'console',
-    code: `x = linspace(0, 2*pi, 8)
-y = sin(x)
-mean(y)`,
+    code: `% OpenMAT uses MATLAB-style syntax and runs through the in-app engine.
+t = linspace(0, 2*pi, 12);
+y = sin(t);
+
+disp("sampled sine values")
+y
+
+A = [1 2; 3 4]
+det(A)`,
   },
 }
 
@@ -186,6 +204,7 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs' }) {
   const [output, setOutput] = useState('Choose a language and press Run.')
   const [previewDoc, setPreviewDoc] = useState('')
   const [running, setRunning] = useState(false)
+  const [outputMode, setOutputMode] = useState('split')
   const editorRef = useRef(null)
 
   const current = STARTERS[language]
@@ -207,11 +226,17 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs' }) {
         setPreviewDoc(buildReactDoc(code))
         setOutput('React preview refreshed.')
       } else if (language === 'python') {
+        setOutput('Loading Python runtime...')
         const pyodide = await getPyodide()
         const logs = []
         pyodide.setStdout({ batched: (text) => logs.push(text) })
         pyodide.setStderr({ batched: (text) => logs.push(text) })
-        const result = await pyodide.runPythonAsync(code)
+        setOutput('Executing Python...')
+        const result = await withTimeout(
+          pyodide.runPythonAsync(code),
+          20000,
+          'Python execution timed out.',
+        )
         if (result !== undefined) logs.push(String(result))
         setPreviewDoc('')
         setOutput(logs.join('\n') || 'No output.')
@@ -242,6 +267,8 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs' }) {
     setOutput('Starter restored.')
     setPreviewDoc('')
   }, [language])
+
+  const outputIsFull = outputMode === 'full'
 
   return (
     <section className="h-full min-h-0 flex flex-col bg-slate-950 text-slate-100 border-l border-slate-800">
@@ -280,32 +307,48 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs' }) {
         >
           <RotateCcw className="w-3.5 h-3.5" />
         </button>
+        <button
+          onClick={() => setOutputMode((mode) => (mode === 'split' ? 'full' : 'split'))}
+          className="h-8 w-8 inline-flex items-center justify-center rounded-md border border-slate-700 text-slate-300 hover:bg-slate-800 transition-colors"
+          title={outputIsFull ? 'Restore editor and output split' : 'Pop output out'}
+        >
+          {outputIsFull ? <Columns2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+        </button>
       </header>
 
-      <div className="flex-1 min-h-0 grid grid-rows-[minmax(0,1fr)_minmax(150px,34%)]">
-        <Editor
-          value={code}
-          language={current.monaco}
-          theme="vs-dark"
-          beforeMount={setupOpenCalcMonaco}
-          onMount={(editor) => {
-            editorRef.current = editor
-          }}
-          onChange={(value) => setCodeByLanguage((previous) => ({ ...previous, [language]: value ?? '' }))}
-          options={{
-            minimap: { enabled: false },
-            fontSize: 13,
-            fontFamily: 'JetBrains Mono, Consolas, monospace',
-            wordWrap: 'on',
-            automaticLayout: true,
-            scrollBeyondLastLine: false,
-            tabSize: 2,
-          }}
-        />
+      <div className={`flex-1 min-h-0 grid ${outputIsFull ? 'grid-rows-[0_minmax(0,1fr)]' : 'grid-rows-[minmax(0,1fr)_minmax(150px,34%)]'}`}>
+        <div className={outputIsFull ? 'hidden' : 'min-h-0'}>
+          <Editor
+            value={code}
+            language={current.monaco}
+            theme="vs-dark"
+            beforeMount={setupOpenCalcMonaco}
+            onMount={(editor) => {
+              editorRef.current = editor
+            }}
+            onChange={(value) => setCodeByLanguage((previous) => ({ ...previous, [language]: value ?? '' }))}
+            options={{
+              minimap: { enabled: false },
+              fontSize: 13,
+              fontFamily: 'JetBrains Mono, Consolas, monospace',
+              wordWrap: 'on',
+              automaticLayout: true,
+              scrollBeyondLastLine: false,
+              tabSize: 2,
+            }}
+          />
+        </div>
 
         <div className="min-h-0 border-t border-slate-800 bg-slate-950 flex flex-col">
           <div className="h-8 shrink-0 flex items-center gap-2 px-3 border-b border-slate-800 text-[10px] font-bold uppercase tracking-widest text-slate-400">
-            {current.output === 'preview' ? 'Preview' : 'Console Output'}
+            <span>{current.output === 'preview' ? 'Preview' : 'Console Output'}</span>
+            <button
+              onClick={() => setOutputMode((mode) => (mode === 'split' ? 'full' : 'split'))}
+              className="ml-auto inline-flex items-center justify-center w-6 h-6 rounded text-slate-400 hover:text-slate-100 hover:bg-slate-800"
+              title={outputIsFull ? 'Restore split view' : 'Expand output'}
+            >
+              {outputIsFull ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+            </button>
           </div>
           {previewDoc ? (
             <iframe
