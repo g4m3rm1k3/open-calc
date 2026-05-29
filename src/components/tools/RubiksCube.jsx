@@ -469,8 +469,159 @@ const CUBIES = buildCubies()
 const TOTAL = CELL + GAP // 68px per unit
 const HALF = TOTAL // offset to center: positions are -1,0,+1 so center at 0
 
+// Face center cubies — used to render labels on the cube
+const FACE_CENTERS = {
+  U: { x: 0, y: 1, z: 0 },
+  D: { x: 0, y: -1, z: 0 },
+  R: { x: 1, y: 0, z: 0 },
+  L: { x: -1, y: 0, z: 0 },
+  F: { x: 0, y: 0, z: 1 },
+  B: { x: 0, y: 0, z: -1 },
+}
+
+const FACE_LABEL_NAMES = { U: 'Up', D: 'Down', R: 'Right', L: 'Left', F: 'Front', B: 'Back' }
+
+// Light faces need dark text, dark faces need light text
+const LABEL_TEXT_COLOR = { U: 'rgba(0,0,0,0.62)', D: 'rgba(0,0,0,0.62)', L: 'rgba(0,0,0,0.65)', R: 'rgba(255,255,255,0.88)', F: 'rgba(255,255,255,0.88)', B: 'rgba(255,255,255,0.88)' }
+
+// Which cubies belong to each face layer (for animation)
+const FACE_LAYER = {
+  U: c => c.y === 1,
+  D: c => c.y === -1,
+  R: c => c.x === 1,
+  L: c => c.x === -1,
+  F: c => c.z === 1,
+  B: c => c.z === -1,
+}
+
+// CSS rotation axis + CW degrees for each face
+// U CW from above (front→right = +Z→+X): rotateY(+90)
+// D CW from below (front→left): rotateY(-90)
+// R CW from right (top→front, my+Y→+Z, CSS -Y→+Z): rotateX(-90)
+// L CW from left (opposite of R): rotateX(+90)
+// F CW from front (right→down, +X→CSS+Y): rotateZ(+90)
+// B CW from back: rotateZ(-90)
+const FACE_ANIM = {
+  U: { axis: 'Y', cw: 90 },
+  D: { axis: 'Y', cw: -90 },
+  R: { axis: 'X', cw: -90 },
+  L: { axis: 'X', cw: 90 },
+  F: { axis: 'Z', cw: 90 },
+  B: { axis: 'Z', cw: -90 },
+}
+
+const ANIM_MS = 300 // slow enough to see the rotation clearly
+
+// ─── Cube net diagram ─────────────────────────────────────────────────────────
+function CubeNet() {
+  const cells = [
+    { l: 'U', c: '#f0f0f0', n: 'Up',    col: 2, row: 1 },
+    { l: 'L', c: '#ff6600', n: 'Left',  col: 1, row: 2 },
+    { l: 'F', c: '#cc2200', n: 'Front', col: 2, row: 2 },
+    { l: 'R', c: '#0066cc', n: 'Right', col: 3, row: 2 },
+    { l: 'B', c: '#009933', n: 'Back',  col: 4, row: 2 },
+    { l: 'D', c: '#ffcc00', n: 'Down',  col: 2, row: 3 },
+  ]
+  return (
+    <div>
+      <div style={{ color: '#667788', fontSize: 10, marginBottom: 6 }}>Unfolded cube — each square is one face:</div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 48px)', gridTemplateRows: 'repeat(3, 48px)', gap: 3, width: 'fit-content' }}>
+        {cells.map(({ l, c, n, col, row }) => (
+          <div key={l} style={{ gridColumn: col, gridRow: row, background: c, borderRadius: 5, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', border: '2px solid rgba(0,0,0,0.18)' }}>
+            <span style={{ fontWeight: 900, fontSize: 18, fontFamily: 'monospace', color: LABEL_TEXT_COLOR[l], lineHeight: 1 }}>{l}</span>
+            <span style={{ fontSize: 9, fontWeight: 600, color: LABEL_TEXT_COLOR[l], opacity: 0.75 }}>{n}</span>
+          </div>
+        ))}
+      </div>
+      <div style={{ color: '#445566', fontSize: 10, marginTop: 8, lineHeight: 1.7 }}>
+        <div><strong style={{ color: '#c0d0e0' }}>F</strong> = face toward you · <strong style={{ color: '#c0d0e0' }}>U</strong> = top · <strong style={{ color: '#c0d0e0' }}>R</strong> = your right</div>
+        <div>Moves rotate that face CW (viewed from outside)</div>
+      </div>
+    </div>
+  )
+}
+
+// ─── Live flat cube net ───────────────────────────────────────────────────────
+// Shows all 54 stickers in the standard cross layout, updating live with state
+function CubeNetLive({ state }) {
+  const S = 18 // sticker pixel size
+  const G = 2  // gap
+
+  // Build a 3×3 grid for one face
+  const FaceGrid = ({ faceIdx, gridCol, gridRow }) => (
+    <div style={{
+      gridColumn: gridCol,
+      gridRow: gridRow,
+      display: 'grid',
+      gridTemplateColumns: `repeat(3, ${S}px)`,
+      gridTemplateRows: `repeat(3, ${S}px)`,
+      gap: 1,
+      border: '1px solid rgba(255,255,255,0.12)',
+      borderRadius: 3,
+      overflow: 'hidden',
+    }}>
+      {Array.from({ length: 9 }, (_, i) => {
+        const sticker = state[faceIdx * 9 + i]
+        const color = FACE_COLORS[sticker] || '#333'
+        return (
+          <div key={i} style={{
+            width: S, height: S,
+            background: color,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <span style={{ fontSize: 7, fontWeight: 700, color: ['U','D','L'].includes(sticker) ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.6)', fontFamily: 'monospace', lineHeight: 1 }}>
+              {i + 1}
+            </span>
+          </div>
+        )
+      })}
+    </div>
+  )
+
+  const faceNames = ['U', 'R', 'F', 'D', 'L', 'B']
+  const faceColors = ['#f0f0f0', '#0066cc', '#cc2200', '#ffcc00', '#ff6600', '#009933']
+  const netLayout = [
+    { faceIdx: 0, col: 2, row: 1 }, // U
+    { faceIdx: 4, col: 1, row: 2 }, // L
+    { faceIdx: 2, col: 2, row: 2 }, // F
+    { faceIdx: 1, col: 3, row: 2 }, // R
+    { faceIdx: 5, col: 4, row: 2 }, // B
+    { faceIdx: 3, col: 2, row: 3 }, // D
+  ]
+
+  return (
+    <div style={{ padding: '12px 16px', borderTop: '1px solid rgba(77,208,255,0.1)' }}>
+      <div style={{ color: '#4dd0ff', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>
+        Live Unfolded Net — all 54 stickers
+      </div>
+      <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: `repeat(4, ${S * 3 + G * 4}px)`,
+          gridTemplateRows: `repeat(3, ${S * 3 + G * 4}px)`,
+          gap: G * 3,
+        }}>
+          {netLayout.map(({ faceIdx, col, row }) => (
+            <FaceGrid key={faceIdx} faceIdx={faceIdx} gridCol={col} gridRow={row} />
+          ))}
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          {faceNames.map((name, i) => (
+            <div key={name} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div style={{ width: 10, height: 10, background: faceColors[i], borderRadius: 2, border: '1px solid rgba(0,0,0,0.2)', flexShrink: 0 }} />
+              <span style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: 11, color: faceColors[i] }}>{name}</span>
+              <span style={{ fontSize: 10, color: '#667788' }}>{FACE_LABEL_NAMES[name]}</span>
+            </div>
+          ))}
+          <div style={{ color: '#445566', fontSize: 10, marginTop: 4 }}>Numbers = sticker position (1–9)</div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ─── Cubie 3D renderer ───────────────────────────────────────────────────────
-function Cubie({ cubie, state }) {
+function Cubie({ cubie, state, faceLabel, hidden, showNumbers }) {
   const { x, y, z, faces } = cubie
   const tx = x * TOTAL
   const ty = -y * TOTAL // y=+1 is up visually
@@ -497,6 +648,7 @@ function Cubie({ cubie, state }) {
         top: HALF,
         marginLeft: -CELL / 2,
         marginTop: -CELL / 2,
+        visibility: hidden ? 'hidden' : 'visible',
       }}
     >
       {faceDefs.map(({ face, transform }) => {
@@ -527,7 +679,34 @@ function Cubie({ cubie, state }) {
                 background: color,
                 borderRadius: 2,
                 boxShadow: 'inset 0 0 6px rgba(255,255,255,0.15)',
-              }} />
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+                {faceLabel === face && !showNumbers && (
+                  <span style={{
+                    fontFamily: 'system-ui, sans-serif',
+                    fontWeight: 900,
+                    fontSize: Math.round(CELL * 0.30),
+                    color: LABEL_TEXT_COLOR[face] || 'rgba(0,0,0,0.6)',
+                    userSelect: 'none',
+                    pointerEvents: 'none',
+                    lineHeight: 1,
+                  }}>{face}</span>
+                )}
+                {showNumbers && stickerIdx !== undefined && (
+                  <span style={{
+                    fontFamily: 'monospace',
+                    fontWeight: 900,
+                    fontSize: Math.round(CELL * 0.22),
+                    color: LABEL_TEXT_COLOR[state[stickerIdx]] || 'rgba(0,0,0,0.6)',
+                    userSelect: 'none',
+                    pointerEvents: 'none',
+                    lineHeight: 1,
+                    textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+                  }}>{(stickerIdx % 9) + 1}</span>
+                )}
+              </div>
             )}
           </div>
         )
@@ -600,6 +779,29 @@ export default function RubiksCube() {
   const [scrambling, setScrambling] = useState(false)
   const [orderResult, setOrderResult] = useState(null) // { move, order }
   const [rxuResult, setRxuResult] = useState(null) // { ru: state, ur: state }
+  const [showLabels, setShowLabels] = useState(true)
+  const [showNumbers, setShowNumbers] = useState(false)
+  const [showNet, setShowNet] = useState(true)
+
+  // Animation state: { face, transform } | null
+  const [animMove, setAnimMove] = useState(null)
+  const animating = useRef(false)
+  const animLayerRef = useRef(null)
+  const animTimerRef = useRef(null)
+
+  // Trigger the CSS transition after the animation wrapper mounts
+  useEffect(() => {
+    if (!animMove || !animLayerRef.current) return
+    const el = animLayerRef.current
+    el.style.transition = 'none'
+    el.style.transform = 'none'
+    el.getBoundingClientRect() // force reflow so transition starts from identity
+    el.style.transition = `transform ${ANIM_MS}ms cubic-bezier(0.4, 0, 0.2, 1)`
+    el.style.transform = animMove.transform
+  }, [animMove])
+
+  // Cleanup timer on unmount
+  useEffect(() => () => { if (animTimerRef.current) clearTimeout(animTimerRef.current) }, [])
 
   // Viewing angle
   const [rotX, setRotX] = useState(-25)
@@ -634,13 +836,42 @@ export default function RubiksCube() {
     }
   }, [handleMouseMove, handleMouseUp])
 
-  const doMove = useCallback((moveName) => {
+  const doMoveInstant = useCallback((moveName) => {
     setState(prev => applyMove(prev, moveName))
     setHistory(prev => [...prev.slice(-19), moveName])
     setLastMove(moveName)
     setSessionMoves(n => n + 1)
     setOrderResult(null)
   }, [])
+
+  const doMove = useCallback((moveName) => {
+    // If already animating, apply instantly so we don't stack up
+    if (animating.current) {
+      doMoveInstant(moveName)
+      return
+    }
+    const fa = FACE_ANIM[moveName[0]]
+    if (!fa) { doMoveInstant(moveName); return }
+
+    const isInverse = moveName.endsWith("'")
+    const isDouble = moveName.endsWith('2')
+    const base = isDouble ? 180 : fa.cw
+    const deg = isInverse ? -base : base
+
+    animating.current = true
+    setAnimMove({ face: moveName[0], transform: `rotate${fa.axis}(${deg}deg)` })
+
+    if (animTimerRef.current) clearTimeout(animTimerRef.current)
+    animTimerRef.current = setTimeout(() => {
+      setState(prev => applyMove(prev, moveName))
+      setHistory(prev => [...prev.slice(-19), moveName])
+      setLastMove(moveName)
+      setSessionMoves(n => n + 1)
+      setOrderResult(null)
+      setAnimMove(null)
+      animating.current = false
+    }, ANIM_MS + 40)
+  }, [doMoveInstant])
 
   const doScramble = useCallback(async () => {
     const moves = Object.keys(MOVE_DEFS).filter(m => !m.endsWith('2'))
@@ -696,10 +927,8 @@ export default function RubiksCube() {
   }, [lastMove, state])
 
   const doCommutator = useCallback(() => {
-    doMove('R')
-    setTimeout(() => doMove('U'), 100)
-    setTimeout(() => doMove("R'"), 200)
-    setTimeout(() => doMove("U'"), 300)
+    const step = ANIM_MS + 80
+    ;['R', 'U', "R'", "U'"].forEach((m, i) => setTimeout(() => doMove(m), i * step))
   }, [doMove])
 
   const doRthenU = useCallback(() => {
@@ -1054,32 +1283,88 @@ export default function RubiksCube() {
         )}
 
         {/* 3D Cube */}
-        <div
-          ref={cubeRef}
-          onMouseDown={handleMouseDown}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            perspective: '900px',
-            cursor: dragging.current ? 'grabbing' : 'grab',
-            height: 420,
-            userSelect: 'none',
-          }}
-        >
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
+            <div style={{ color: '#6688aa', fontSize: 11 }}>Drag to rotate view</div>
+            {[
+              { key: 'labels', label: showLabels ? '🏷 Labels ON' : '🏷 Labels OFF', active: showLabels, toggle: () => setShowLabels(v => !v) },
+              { key: 'nums', label: showNumbers ? '#  Numbers ON' : '#  Numbers OFF', active: showNumbers, toggle: () => setShowNumbers(v => !v) },
+              { key: 'net', label: showNet ? '⊞ Net ON' : '⊞ Net OFF', active: showNet, toggle: () => setShowNet(v => !v) },
+            ].map(({ key, label, active, toggle }) => (
+              <button key={key} onClick={toggle} style={{
+                marginLeft: key === 'labels' ? 'auto' : 0,
+                padding: '3px 10px', borderRadius: 5,
+                border: `1px solid rgba(77,208,255,${active ? '0.4' : '0.15'})`,
+                background: active ? 'rgba(77,208,255,0.15)' : 'rgba(255,255,255,0.04)',
+                color: active ? '#4dd0ff' : '#445566',
+                fontSize: 11, fontWeight: 700, cursor: 'pointer',
+              }}>{label}</button>
+            ))}
+          </div>
           <div
+            ref={cubeRef}
+            onMouseDown={handleMouseDown}
             style={{
-              position: 'relative',
-              width: cubeSize,
-              height: cubeSize,
-              transformStyle: 'preserve-3d',
-              transform: `rotateX(${rotX}deg) rotateY(${rotY}deg)`,
-              transition: scrambling ? 'transform 0.08s ease' : 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              perspective: '900px',
+              cursor: dragging.current ? 'grabbing' : 'grab',
+              height: 420,
+              userSelect: 'none',
             }}
           >
-            {CUBIES.map((cubie, i) => (
-              <Cubie key={i} cubie={cubie} state={state} />
-            ))}
+            <div
+              style={{
+                position: 'relative',
+                width: cubeSize,
+                height: cubeSize,
+                transformStyle: 'preserve-3d',
+                transform: `rotateX(${rotX}deg) rotateY(${rotY}deg)`,
+                transition: scrambling ? 'transform 0.08s ease' : 'none',
+              }}
+            >
+              {(() => {
+                const layerFn = animMove ? FACE_LAYER[animMove.face] : null
+                const getFaceLabel = (cubie) => {
+                  if (!showLabels || showNumbers) return null
+                  const e = Object.entries(FACE_CENTERS).find(([, c]) => c.x === cubie.x && c.y === cubie.y && c.z === cubie.z)
+                  return e ? e[0] : null
+                }
+                return (
+                  <>
+                    {CUBIES.map(cubie => (
+                      <Cubie
+                        key={`${cubie.x},${cubie.y},${cubie.z}`}
+                        cubie={cubie}
+                        state={state}
+                        faceLabel={getFaceLabel(cubie)}
+                        showNumbers={showNumbers}
+                        hidden={layerFn ? layerFn(cubie) : false}
+                      />
+                    ))}
+                    {animMove && (
+                      <div ref={animLayerRef} style={{
+                        position: 'absolute',
+                        left: 0, top: 0, right: 0, bottom: 0,
+                        transformStyle: 'preserve-3d',
+                        pointerEvents: 'none',
+                      }}>
+                        {CUBIES.filter(c => FACE_LAYER[animMove.face](c)).map(cubie => (
+                          <Cubie
+                            key={`g-${cubie.x},${cubie.y},${cubie.z}`}
+                            cubie={cubie}
+                            state={state}
+                            faceLabel={getFaceLabel(cubie)}
+                            showNumbers={showNumbers}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )
+              })()}
+            </div>
           </div>
         </div>
 
@@ -1089,7 +1374,7 @@ export default function RubiksCube() {
             <div style={{ color: '#4dd0ff', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Moves</div>
             <div style={{ color: '#445566', fontSize: 11 }}>Letter = face · no suffix = clockwise · ' = CCW · 2 = 180°</div>
           </div>
-          <MoveButtons onMove={doMove} disabled={scrambling} />
+          <MoveButtons onMove={doMove} disabled={scrambling || !!animMove} />
         </div>
 
         {/* Action buttons */}
@@ -1170,6 +1455,9 @@ export default function RubiksCube() {
             )}
           </div>
         </div>
+
+        {/* Live unfolded net */}
+        {showNet && <CubeNetLive state={state} />}
       </div>
 
       {/* ── RIGHT COLUMN — Math Panel (35%) ── */}
@@ -1211,6 +1499,16 @@ export default function RubiksCube() {
             <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', marginTop: 6, paddingTop: 6, color: '#556677', fontSize: 10 }}>
               Clockwise = as seen looking straight at that face from outside the cube
             </div>
+          </div>
+        </div>
+
+        {/* CUBE NET DIAGRAM */}
+        <div>
+          <div style={{ color: '#4dd0ff', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>
+            Face Map
+          </div>
+          <div style={{ background: 'rgba(77,208,255,0.04)', border: '1px solid rgba(77,208,255,0.12)', borderRadius: 8, padding: '12px 14px' }}>
+            <CubeNet />
           </div>
         </div>
 
