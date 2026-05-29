@@ -19,7 +19,7 @@
   // ── Intuition ──────────────────────────────────────────────────
   intuition: {
     prose: [
-      'Take $\\mathbf{v}_1 = [3,4]^\\top$ and $\\mathbf{v}_2 = [2,0]^\\top$ — two vectors at an awkward angle. After one Gram-Schmidt step: $\\mathbf{e}_1 = [3/5,4/5]^\\top$ (normalize $\\mathbf{v}_1$). Subtract the shadow: $\\mathbf{v}_2 - (\\mathbf{v}_2 \\cdot \\mathbf{e}_1)\\mathbf{e}_1 = [32/25, -24/25]^\\top$, then normalize to $\\mathbf{e}_2 = [4/5, -3/5]^\\top$. Check: $\\mathbf{e}_1 \\cdot \\mathbf{e}_2 = 12/25 - 12/25 = 0$ âœ“. Same 2D span, now perfectly perpendicular. That subtraction step — removing the shadow — is the entire algorithm.',
+      'Take $\\mathbf{v}_1 = [3,4]^\\top$ and $\\mathbf{v}_2 = [2,0]^\\top$ — two vectors at an awkward angle. After one Gram-Schmidt step: $\\mathbf{e}_1 = [3/5,4/5]^\\top$ (normalize $\\mathbf{v}_1$). Subtract the shadow: $\\mathbf{v}_2 - (\\mathbf{v}_2 \\cdot \\mathbf{e}_1)\\mathbf{e}_1 = [32/25, -24/25]^\\top$, then normalize to $\\mathbf{e}_2 = [4/5, -3/5]^\\top$. Check: $\\mathbf{e}_1 \\cdot \\mathbf{e}_2 = 12/25 - 12/25 = 0$ ✓. Same 2D span, now perfectly perpendicular. That subtraction step — removing the shadow — is the entire algorithm.',
       'Here is the core idea in plain language: imagine you have two vectors in 2D that are *not* perpendicular — they are tilted at some weird angle to each other. You want to replace them with two perpendicular vectors that span the exact same space. Gram-Schmidt tells you how.',
       '**Step 1: Keep the first vector as-is.** There is nothing to clean yet. Just normalize it to length 1: $\\mathbf{e}_1 = \\mathbf{v}_1 / \\|\\mathbf{v}_1\\|$.',
       '**Step 2: Subtract off the "contamination."** Take your second vector $\\mathbf{v}_2$. It has some component that points in the direction of $\\mathbf{e}_1$ (the part that overlaps). Subtract that component away, leaving only the part that is perpendicular to $\\mathbf{e}_1$. That remainder is already orthogonal to $\\mathbf{e}_1$ by construction. Normalize it to get $\\mathbf{e}_2$.',
@@ -188,7 +188,7 @@ fprintf('Max residual: %.2e\\n', max(max(abs(Q'*Q - eye(3)))))`,
       {
         id: 'PythonNotebook',
         title: 'Code: Gram-Schmidt and QR Decomposition',
-        mathBridge: 'numpy.linalg.qr(A) returns the QR factorization directly. Q has orthonormal columns (Qᵀ Q = I), R is upper triangular. Verify: Q @ R â‰ˆ A and Q.T @ Q â‰ˆ I.',
+        mathBridge: 'numpy.linalg.qr(A) returns the QR factorization directly. Q has orthonormal columns (Qᵀ Q = I), R is upper triangular. Verify: Q @ R ≈ A and Q.T @ Q ≈ I.',
         caption: 'Implement Gram-Schmidt step by step, then verify it matches NumPy\'s QR decomposition.',
         initialProps: {
           initialCells: [
@@ -232,7 +232,7 @@ plt.show()`,
             {
               id: 2,
               cellTitle: 'QR decomposition — Gram-Schmidt as a matrix equation',
-              prose: '`np.linalg.qr(A)` computes the QR decomposition. Q has orthonormal columns; R is upper triangular. Verify: Q @ R â‰ˆ A (reconstruction). Qᵀ Q â‰ˆ I (orthonormality).',
+              prose: '`np.linalg.qr(A)` computes the QR decomposition. Q has orthonormal columns; R is upper triangular. Verify: Q @ R ≈ A (reconstruction). Qᵀ Q ≈ I (orthonormality).',
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -280,7 +280,7 @@ v2 = np.array([2.0, 2.0])
 # Step 3: verify orthogonality and unit length
 # Step 4: confirm with np.linalg.qr(np.column_stack([v1, v2]))
 `,
-              hint: 'e1 = v1/np.linalg.norm(v1). u2 = v2 - np.dot(v2,e1)*e1. e2 = u2/np.linalg.norm(u2). Then check np.dot(e1,e2) â‰ˆ 0.',
+              hint: 'e1 = v1/np.linalg.norm(v1). u2 = v2 - np.dot(v2,e1)*e1. e2 = u2/np.linalg.norm(u2). Then check np.dot(e1,e2) ≈ 0.',
             },
           ]
         }
@@ -330,7 +330,7 @@ v2 = np.array([2.0, 2.0])
           annotation: 'Normalize the first vector. Its magnitude is $\\sqrt{9+16}=5$.',
           strategyTitle: 'Normalize v₁',
           checkpoint: 'Verify $\\|\\mathbf{e}_1\\| = 1$.',
-          hints: ['$(3/5)^2 + (4/5)^2 = 9/25 + 16/25 = 25/25 = 1$. âœ“'],
+          hints: ['$(3/5)^2 + (4/5)^2 = 9/25 + 16/25 = 25/25 = 1$. ✓'],
         },
         {
           expression: '\\mathbf{v}_2 \\cdot \\mathbf{e}_1 = \\begin{bmatrix}2\\\\0\\end{bmatrix} \\cdot \\begin{bmatrix}3/5\\\\4/5\\end{bmatrix} = \\frac{6}{5}',
@@ -344,7 +344,7 @@ v2 = np.array([2.0, 2.0])
           annotation: 'Subtract off the contamination. The result $\\mathbf{u}_2$ is perpendicular to $\\mathbf{e}_1$.',
           strategyTitle: 'Subtract projection',
           checkpoint: 'Verify: $\\mathbf{u}_2 \\cdot \\mathbf{e}_1 = 0$?',
-          hints: ['$(32/25)(3/5) + (-24/25)(4/5) = 96/125 - 96/125 = 0$. âœ“'],
+          hints: ['$(32/25)(3/5) + (-24/25)(4/5) = 96/125 - 96/125 = 0$. ✓'],
         },
         {
           expression: '\\|\\mathbf{u}_2\\| = \\sqrt{(32/25)^2 + (24/25)^2} = \\frac{1}{25}\\sqrt{1024+576} = \\frac{40}{25} = \\frac{8}{5}',
@@ -358,7 +358,7 @@ v2 = np.array([2.0, 2.0])
           annotation: 'Normalize $\\mathbf{u}_2$. The final orthonormal pair is $\\{\\mathbf{e}_1, \\mathbf{e}_2\\}$.',
           strategyTitle: 'Normalize to get e₁',
           checkpoint: 'Verify: $\\mathbf{e}_1 \\cdot \\mathbf{e}_2 = 0$ and $\\|\\mathbf{e}_2\\| = 1$.',
-          hints: ['$(3/5)(4/5) + (4/5)(-3/5) = 12/25 - 12/25 = 0$. âœ“  $(4/5)^2 + (-3/5)^2 = 16/25 + 9/25 = 1$. âœ“'],
+          hints: ['$(3/5)(4/5) + (4/5)(-3/5) = 12/25 - 12/25 = 0$. ✓  $(4/5)^2 + (-3/5)^2 = 16/25 + 9/25 = 1$. ✓'],
         },
       ],
       conclusion: 'The orthonormal basis is $\\mathbf{e}_1 = [3/5,\\; 4/5]^T$ and $\\mathbf{e}_2 = [4/5,\\; -3/5]^T$. These span the same 2D space as the originals, but now they are perfectly perpendicular and both have unit length.',
@@ -394,7 +394,7 @@ v2 = np.array([2.0, 2.0])
           annotation: 'Normalize. (Multiply numerator and denominator by 2 to simplify: $\\mathbf{u}_2 = \\frac{1}{2}[1,-1,2]^T$, so $\\mathbf{e}_2 = [1,-1,2]^T/\\sqrt{6}$.)',
           strategyTitle: 'Normalize to get e₁',
           checkpoint: 'Verify $\\mathbf{e}_1 \\cdot \\mathbf{e}_2 = 0$.',
-          hints: ['$(1/\\sqrt{2})(1/\\sqrt{6}) + (1/\\sqrt{2})(-1/\\sqrt{6}) + 0 = 1/\\sqrt{12} - 1/\\sqrt{12} = 0$. âœ“'],
+          hints: ['$(1/\\sqrt{2})(1/\\sqrt{6}) + (1/\\sqrt{2})(-1/\\sqrt{6}) + 0 = 1/\\sqrt{12} - 1/\\sqrt{12} = 0$. ✓'],
         },
       ],
       conclusion: 'The two-dimensional subspace spanned by $\\mathbf{v}_1$ and $\\mathbf{v}_2$ now has the clean orthonormal basis $\\{\\mathbf{e}_1, \\mathbf{e}_2\\}$. Any computation within this subspace is now far simpler.',
@@ -416,7 +416,7 @@ v2 = np.array([2.0, 2.0])
           annotation: '$\\mathbf{v}_2 \\cdot \\mathbf{e}_1 = (1+0+0)/\\sqrt{2} = 1/\\sqrt{2}$. Subtract $(1/\\sqrt{2})\\mathbf{e}_1$.',
           strategyTitle: 'Subtract projection',
           checkpoint: 'Check: u₁ · e₁ = 0?',
-          hints: ['u₁ · e₁ = (1/2)(1/âˆš2) + (-1/2)(1/âˆš2) + 1·0 = 0 âœ“'],
+          hints: ['u₁ · e₁ = (1/2)(1/√2) + (-1/2)(1/√2) + 1·0 = 0 ✓'],
         },
         {
           expression: '\\mathbf{e}_2 = \\frac{\\mathbf{u}_2}{\\|\\mathbf{u}_2\\|} = \\frac{1}{\\sqrt{3/2}}\\begin{bmatrix}1/2\\\\-1/2\\\\1\\end{bmatrix} = \\frac{1}{\\sqrt{6}}\\begin{bmatrix}1\\\\-1\\\\2\\end{bmatrix}',
@@ -430,7 +430,7 @@ v2 = np.array([2.0, 2.0])
           annotation: '$R_{11} = \\mathbf{e}_1^T\\mathbf{v}_1 = \\sqrt{2}$, $R_{12} = \\mathbf{e}_1^T\\mathbf{v}_2 = 1/\\sqrt{2}$, $R_{21} = 0$ (by G-S construction), $R_{22} = \\mathbf{e}_2^T\\mathbf{v}_2 = \\sqrt{6}/2$. $R$ is upper triangular.',
           strategyTitle: 'Compute R = QᵀA',
           checkpoint: 'Verify: A = QR (recover original columns from Q and R)',
-          hints: ['Column 1 of QR: e₁·R₁₁ = v₁/âˆš2 · âˆš2 = v₁ âœ“. Column 2: e₁·(1/âˆš2) + e₁·(âˆš6/2) = (1/2)[1,1,0]ᵀ + (1/2)[1,-1,2]ᵀ = [1,0,1]ᵀ = v₁ âœ“.'],
+          hints: ['Column 1 of QR: e₁·R₁₁ = v₁/√2 · √2 = v₁ ✓. Column 2: e₁·(1/√2) + e₂·(√6/2) = (1/2)[1,1,0]ᵀ + (1/2)[1,-1,2]ᵀ = [1,0,1]ᵀ = v₂ ✓.'],
         },
       ],
       conclusion: '$A = QR$ where $Q = [\\mathbf{e}_1 \\; \\mathbf{e}_2]$ has orthonormal columns and $R$ is upper triangular. This is the QR decomposition. Gram-Schmidt is the algorithm; QR is the matrix factorization it produces. Numerical solvers use QR because $Q^{-1} = Q^T$ makes subsequent computations cheap.',
@@ -555,6 +555,38 @@ v2 = np.array([2.0, 2.0])
         hints: ['Gram-Schmidt produces orthogonal (perpendicular) vectors — their dot product is always 0 by construction.'],
         reviewSection: 'Intuition tab — Gram-Schmidt process',
       },
+      {
+        id: 'la4-002-assess-2',
+        type: 'choice',
+        text: 'For $\\mathbf{v}_1 = [3,4]^T$ and $\\mathbf{v}_2 = [2,0]^T$, the first Gram-Schmidt basis vector $\\mathbf{e}_1$ is:',
+        options: ['$[3,4]^T$', '$[3/5,\\; 4/5]^T$', '$[1,0]^T$', '$[4/5,\\; -3/5]^T$'],
+        answer: '$[3/5,\\; 4/5]^T$',
+        hints: ['$\\mathbf{e}_1 = \\mathbf{v}_1 / \\|\\mathbf{v}_1\\| = [3,4]^T / 5 = [3/5, 4/5]^T$.'],
+        reviewSection: 'Examples tab — Gram-Schmidt in ℝ²',
+      },
+      {
+        id: 'la4-002-assess-3',
+        type: 'choice',
+        text: 'If $Q$ is a matrix with orthonormal columns, then $Q^TQ$ equals:',
+        options: ['$QQ^T$', 'The identity matrix $I$', '$Q^2$', '$\\det(Q) \\cdot I$'],
+        answer: 'The identity matrix $I$',
+        hints: ['$(Q^TQ)_{ij}$ = (column $i$ of $Q$) · (column $j$ of $Q$) = $\\delta_{ij}$ by orthonormality. So $Q^TQ = I$.'],
+        reviewSection: 'Math tab — QR Decomposition / orthonormal columns',
+      },
+      {
+        id: 'la4-002-assess-4',
+        type: 'choice',
+        text: 'In the QR decomposition, $R = Q^TA$ is upper triangular because:',
+        options: [
+          '$A$ is always symmetric',
+          '$R_{ij} = \\mathbf{e}_i^T \\mathbf{v}_j = 0$ for $i > j$, since each $\\mathbf{e}_i$ is orthogonal to all $\\mathbf{v}_j$ with $j < i$',
+          '$Q$ is always diagonal',
+          'Upper triangular matrices are always produced by matrix multiplication',
+        ],
+        answer: '$R_{ij} = \\mathbf{e}_i^T \\mathbf{v}_j = 0$ for $i > j$, since each $\\mathbf{e}_i$ is orthogonal to all $\\mathbf{v}_j$ with $j < i$',
+        hints: ['Gram-Schmidt builds $\\mathbf{e}_i$ to be orthogonal to $\\text{span}(\\mathbf{e}_1,\\ldots,\\mathbf{e}_{i-1}) = \\text{span}(\\mathbf{v}_1,\\ldots,\\mathbf{v}_{i-1})$. So $\\mathbf{e}_i \\cdot \\mathbf{v}_j = 0$ for $j < i$.'],
+        reviewSection: 'Examples tab — QR decomposition example',
+      },
     ],
   },
 
@@ -631,7 +663,7 @@ v2 = np.array([2.0, 2.0])
       text: 'If $Q$ has orthonormal columns, what is $Q^TQ$?',
       options: ['$QQ^T$', '$I$', '$Q^2$', '$\\det(Q) \\cdot I$'],
       answer: '$I$',
-      hints: ['$(Q^TQ)_{ij} = $ column i of Q dotted with column j of Q = Î´ᵢâ±¼ (1 if i=j, 0 otherwise) by orthonormality. So Q^TQ = I.'],
+      hints: ['$(Q^TQ)_{ij}$ = (column $i$) · (column $j$) = $\\delta_{ij}$ (1 if i=j, 0 otherwise) by orthonormality. So $Q^TQ = I$.'],
       reviewSection: 'Intuition — Orthonormal Superpower',
     },
     {
@@ -687,7 +719,7 @@ v2 = np.array([2.0, 2.0])
         'QR only works for square matrices',
       ],
       answer: 'QR avoids squaring the condition number: solving $R\\hat{\\mathbf{x}} = Q^T\\mathbf{b}$ is more numerically stable than computing $(A^TA)^{-1}A^T\\mathbf{b}$',
-      hints: ['Forming AᵀA squares the condition number of A. If Îº(A) = 100, then Îº(AᵀA) = 10000 — tiny perturbations in b get amplified 10000× instead of 100×. QR preserves the original conditioning.'],
+      hints: ['Forming AᵀA squares the condition number of A. If κ(A) = 100, then κ(AᵀA) = 10000 — tiny perturbations in b get amplified 10000× instead of 100×. QR preserves the original conditioning.'],
       reviewSection: 'Rigor — numerical stability',
     },
   ],

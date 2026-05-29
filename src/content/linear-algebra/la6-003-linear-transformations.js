@@ -15,7 +15,7 @@ export default {
 
   intuition: {
     prose: [
-      'Take differentiation $D: P_3 \\to P_3$, $D(p) = p\'$. Test linearity: $D(p+q) = (p+q)\' = p\'+q\' = D(p)+D(q)$ âœ“; $D(cp) = (cp)\' = cp\' = cD(p)$ âœ“. Now find the kernel: $D(p) = 0$ iff $p\' = 0$ iff $p$ is constant — $\\ker(D) = P_0$ (constants), dimension 1. Image: $D(a_0 + a_1x + a_2x^2 + a_3x^3) = a_1 + 2a_2x + 3a_3x^2$ — any polynomial of degree $\\leq 2$ appears, so $\\text{im}(D) = P_2$, dimension 3. Rank-Nullity: $1 + 3 = 4 = \\dim P_3$ âœ“. Contrast: $T(p) = p^2$ is NOT linear — $T(p+q) = (p+q)^2 = p^2 + 2pq + q^2 \\neq p^2 + q^2$. Linearity is preserved-combinations, not any function.',
+      'Take differentiation $D: P_3 \\to P_3$, $D(p) = p\'$. Test linearity: $D(p+q) = (p+q)\' = p\'+q\' = D(p)+D(q)$ ✓; $D(cp) = (cp)\' = cp\' = cD(p)$ ✓. Now find the kernel: $D(p) = 0$ iff $p\' = 0$ iff $p$ is constant — $\\ker(D) = P_0$ (constants), dimension 1. Image: $D(a_0 + a_1x + a_2x^2 + a_3x^3) = a_1 + 2a_2x + 3a_3x^2$ — any polynomial of degree $\\leq 2$ appears, so $\\text{im}(D) = P_2$, dimension 3. Rank-Nullity: $1 + 3 = 4 = \\dim P_3$ ✓. Contrast: $T(p) = p^2$ is NOT linear — $T(p+q) = (p+q)^2 = p^2 + 2pq + q^2 \\neq p^2 + q^2$. Linearity is preserved-combinations, not any function.',
       '**Key structural maps.** The **kernel** (or null space) of $T$ is $\\ker(T) = \\{\\mathbf{v} \\in V : T(\\mathbf{v}) = \\mathbf{0}_W\\}$ — the set of vectors that get mapped to zero. The **image** (or range) is $\\text{im}(T) = \\{T(\\mathbf{v}) : \\mathbf{v} \\in V\\} \\subseteq W$ — the set of all possible outputs. Both the kernel and image are subspaces (of $V$ and $W$ respectively).',
       '**Rank-nullity for linear transformations.** $\\dim(\\ker T) + \\dim(\\text{im } T) = \\dim V$. This is the abstract version of the rank-nullity theorem. The "rank" of $T$ is $\\dim(\\text{im } T)$ and the "nullity" is $\\dim(\\ker T)$.',
       '**From abstract to matrix.** Given a linear transformation $T: V \\to W$ and bases $\\mathcal{B}$ for $V$ and $\\mathcal{C}$ for $W$, there is a unique matrix $[T]_{\\mathcal{B}}^{\\mathcal{C}}$ that represents $T$ in those coordinates: $[T(\\mathbf{v})]_{\\mathcal{C}} = [T]_{\\mathcal{B}}^{\\mathcal{C}} [\\mathbf{v}]_{\\mathcal{B}}$. Every linear transformation between finite-dimensional spaces is represented by a matrix — once you pick bases.',
@@ -37,7 +37,7 @@ export default {
       {
         type: 'insight',
         title: 'Differentiation as a Linear Map',
-        body: '$D: P_n \\to P_{n-1}$, $D(p) = p\'$\n$\\ker(D) = P_0 = \\{$constants$\\}$ (dim 1 — constant polynomials have zero derivative)\n$\\text{im}(D) = P_{n-1}$ (dim $n$ — every polynomial of degree ≤ $n-1$ is a derivative)\nRank-Nullity: $1 + n = n+1 = \\dim P_n$ âœ“',
+        body: '$D: P_n \\to P_{n-1}$, $D(p) = p\'$\n$\\ker(D) = P_0 = \\{$constants$\\}$ (dim 1 — constant polynomials have zero derivative)\n$\\text{im}(D) = P_{n-1}$ (dim $n$ — every polynomial of degree ≤ $n-1$ is a derivative)\nRank-Nullity: $1 + n = n+1 = \\dim P_n$ ✓',
       },
       {
         type: 'insight',
@@ -188,7 +188,7 @@ nullity_D = D.shape[1] - rank_D  # n - rank
 
 print(f"rank(D) = dim(im D) = {rank_D}  (= dim(P_3), D is surjective)")
 print(f"nullity(D) = dim(ker D) = {nullity_D}  (= 1, only constants have zero derivative)")
-print(f"rank + nullity = {rank_D + nullity_D} = {D.shape[1]} = dim(P_4) âœ“")
+print(f"rank + nullity = {rank_D + nullity_D} = {D.shape[1]} = dim(P_4) ✓")
 print()
 
 # Find kernel basis (null space)
@@ -244,7 +244,7 @@ print(kernel_basis.round(10))
           expression: '[T] = \\begin{bmatrix}0&0&0\\\\1&0&0\\\\0&1/2&0\\\\0&0&1/3\\end{bmatrix}',
           annotation: 'Columns are the coordinate vectors of $T(1), T(x), T(x^2)$. This $4\\times 3$ matrix represents integration from $P_2$ to $P_3$.',
           strategyTitle: 'Assemble matrix',
-          hints: ['Verify: $[T] \\cdot [2+3x-x^2] = [T] \\cdot [2,3,-1]^\\top = [0, 2, 3/2, -1/3]^\\top$, meaning $T(2+3x-x^2) = 2x + \\frac{3}{2}x^2 - \\frac{1}{3}x^3$. Check: $\\int_0^x (2+3t-t^2)dt = 2x + \\frac{3}{2}x^2 - \\frac{1}{3}x^3$ âœ“'],
+          hints: ['Verify: $[T] \\cdot [2+3x-x^2] = [T] \\cdot [2,3,-1]^\\top = [0, 2, 3/2, -1/3]^\\top$, meaning $T(2+3x-x^2) = 2x + \\frac{3}{2}x^2 - \\frac{1}{3}x^3$. Check: $\\int_0^x (2+3t-t^2)dt = 2x + \\frac{3}{2}x^2 - \\frac{1}{3}x^3$ ✓'],
         },
       ],
     },
@@ -275,7 +275,7 @@ print(kernel_basis.round(10))
         },
         {
           expression: '\\text{im}(T) = \\text{Span}\\{T(1), T(x), T(x^2)\\} = \\text{Span}\\{0, x, 2x^2\\} = \\text{Span}\\{x, x^2\\}, \\quad \\dim = 2',
-          annotation: 'Rank-Nullity: $1 + 2 = 3 = \\dim P_2$ âœ“. $T$ is neither injective (kernel nontrivial) nor surjective (image misses constants).',
+          annotation: 'Rank-Nullity: $1 + 2 = 3 = \\dim P_2$ ✓. $T$ is neither injective (kernel nontrivial) nor surjective (image misses constants).',
           strategyTitle: 'Find image and verify rank-nullity',
           checkpoint: 'The diagonal matrix $\\text{diag}(0,1,2)$ shows $T$ kills the constant term (eigenvalue 0) and scales $x$ by 1 and $x^2$ by 2.',
         },
@@ -317,7 +317,7 @@ print(kernel_basis.round(10))
         '**Matrix:** Columns = $[T(b_j)]$ in basis $\\{1,x,x^2,x^3\\}$: $[T] = \\begin{bmatrix}1&1&0&0\\\\0&1&2&0\\\\0&0&1&3\\\\0&0&0&1\\end{bmatrix}$.',
         '**Kernel:** Solve $[T]\\mathbf{c} = \\mathbf{0}$. Since $[T]$ is upper triangular with all diagonal entries $= 1$, its determinant is 1, so $[T]$ is invertible. The kernel is $\\{\\mathbf{0}\\}$.',
         '**Image:** Since $[T]$ is invertible ($\\det = 1$), the image is all of $\\mathbb{R}^4$ in coordinates, meaning $\\text{im}(T) = P_3$. $T$ is an isomorphism.',
-        '**Rank-Nullity:** $\\dim(\\ker T) + \\dim(\\text{im } T) = 0 + 4 = 4 = \\dim P_3$ âœ“.',
+        '**Rank-Nullity:** $\\dim(\\ker T) + \\dim(\\text{im } T) = 0 + 4 = 4 = \\dim P_3$ ✓.',
         '**Interpretation:** Adding the derivative of a polynomial never destroys information — you can always recover $p$ from $p + p\'$ (by inverting the operator $I + D$).',
       ],
     },
@@ -348,7 +348,7 @@ print(kernel_basis.round(10))
         id: 'assess-la6-003-1',
         type: 'computation',
         text: 'For $T: P_2 \\to P_2$ defined by $T(p) = xp\'(x)$ (multiply derivative by $x$): (a) Show $T$ is linear. (b) Find the matrix in basis $\\{1,x,x^2\\}$. (c) Find $\\ker(T)$ and $\\text{im}(T)$.',
-        answer: '(a) $T(ap+bq) = x(ap+bq)\' = x(ap\'+bq\') = axp\' + bxq\' = aT(p)+bT(q)$ âœ“. (b) $T(1) = x \\cdot 0 = 0$, $T(x) = x \\cdot 1 = x$, $T(x^2) = x \\cdot 2x = 2x^2$. Matrix: $\\begin{bmatrix}0&0&0\\\\0&1&0\\\\0&0&2\\end{bmatrix}$. (c) $\\ker T = \\{$constants$\\}$ (constants have zero derivative), $\\dim(\\ker T) = 1$. $\\text{im}(T) = \\text{Span}\\{x, x^2\\}$, $\\dim = 2$. Rank-Nullity: $1 + 2 = 3 = \\dim P_2$ âœ“.',
+        answer: '(a) $T(ap+bq) = x(ap+bq)\' = x(ap\'+bq\') = axp\' + bxq\' = aT(p)+bT(q)$ ✓. (b) $T(1) = x \\cdot 0 = 0$, $T(x) = x \\cdot 1 = x$, $T(x^2) = x \\cdot 2x = 2x^2$. Matrix: $\\begin{bmatrix}0&0&0\\\\0&1&0\\\\0&0&2\\end{bmatrix}$. (c) $\\ker T = \\{$constants$\\}$ (constants have zero derivative), $\\dim(\\ker T) = 1$. $\\text{im}(T) = \\text{Span}\\{x, x^2\\}$, $\\dim = 2$. Rank-Nullity: $1 + 2 = 3 = \\dim P_2$ ✓.',
         hint: 'For part (b): $T$ maps 1 to 0, $x$ to $x$, $x^2$ to $2x^2$.',
       },
     ],
@@ -407,7 +407,7 @@ print(kernel_basis.round(10))
         'No — its range is not a vector space',
       ],
       answer: 'No — $T(\\mathbf{0}) = (0,0)$ so the zero test passes, but $xy$ is not linear',
-      hints: ['The zero test: $T(0,0) = (0,0)$ âœ“ — passes. But the second component $xy$ is bilinear (quadratic), not linear. Check: $T((1,0)+(0,1)) = T(1,1) = (2,1)$, but $T(1,0)+T(0,1) = (1,0)+(1,0) = (2,0) \\neq (2,1)$. The zero test is necessary but not sufficient.'],
+      hints: ['The zero test: $T(0,0) = (0,0)$ ✓ — passes. But the second component $xy$ is bilinear (quadratic), not linear. Check: $T((1,0)+(0,1)) = T(1,1) = (2,1)$, but $T(1,0)+T(0,1) = (1,0)+(1,0) = (2,0) \\neq (2,1)$. The zero test is necessary but not sufficient.'],
       reviewSection: 'intuition',
     },
     {

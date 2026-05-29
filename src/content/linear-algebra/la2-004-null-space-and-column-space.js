@@ -105,9 +105,9 @@ export default {
               id: 1,
               cellTitle: 'rank(), null(), orth() — the three essential commands',
               prose: [
-                '`rank(A)` = number of pivot columns = dim(column space).',
-                '`null(A)` = orthonormal basis for the null space (columns of the result are basis vectors).',
-                '`orth(A)` = orthonormal basis for the column space.',
+                '`rank(A_full)` counts how many columns are linearly independent — computed internally via LU factorization. For `A_full = [1 2; 3 4]`: neither column is a multiple of the other, so rank = 2 = n. Full rank means invertible and the null space is trivial.',
+                '`size(null(A_full), 2)` counts how many basis vectors span $N(A) = \\{\\mathbf{x}: A\\mathbf{x}=\\mathbf{0}\\}$. For `A_full` (full rank), `null(A_full)` returns an empty matrix — no non-trivial vector maps to zero. For `B = [1 2; 3 6]` (row 2 = 3×row 1, rank = 1): `null(B)` returns one column — the single direction that $B$ collapses to zero.',
+                '`B * null_B` should print near-zero (around $10^{-16}$, machine epsilon) — this verifies $B\\mathbf{v} = \\mathbf{0}$ computationally. `orth(B)` returns a unit-length column spanning the column space. For rank-1 $B$, both `null(B)` and `orth(B)` return a single column — one direction survives (column space), one is annihilated (null space).',
               ],
               code: `% Full rank matrix (invertible)
 A_full = [1 2; 3 4];
@@ -132,7 +132,10 @@ disp('Column space basis of B:'); disp(orth(B))`,
               id: 2,
               cellTitle: 'Rank-Nullity theorem — dimensions must balance',
               prose: [
-                'For an m×n matrix: rank + nullity = n. You can verify this for any matrix — the dimensions always sum to the number of columns.',
+                '`[m, n] = size(A)` reads shape: $m = 3$ rows, $n = 4$ columns. Rank-Nullity divides $n = 4$ into pivot columns (rank) + free columns (nullity).',
+                '`r = rank(A)` counts pivot columns via LU. `nullity = n - r` is the theorem directly: $\\text{rank} + \\text{nullity} = n$. For this matrix: 2 pivot columns + 2 free columns = 4 = n.',
+                '`null_basis = null(A)` returns a $4 \\times 2$ matrix — two orthonormal columns, each a basis vector for $N(A) \\subseteq \\mathbb{R}^4$. The matrix maps $\\mathbb{R}^4 \\to \\mathbb{R}^3$; the null space lives in the input space $\\mathbb{R}^4$, dimension = nullity = 2.',
+                '`norm(A * null_basis)` computes $\\|A[\\mathbf{v}_1, \\mathbf{v}_2]\\|_F$ (Frobenius norm). If both columns of `null_basis` truly satisfy $A\\mathbf{v} = \\mathbf{0}$, the product is a zero matrix and this norm prints $\\approx 10^{-15}$ — confirming the basis is correct.',
               ],
               code: `% 3×4 matrix: maps R^4 → R^3
 A = [1 2 0 3;
@@ -160,8 +163,8 @@ fprintf('||A * null_basis|| = %.2e  (should be ≈ 0)\\n', residual)`,
               id: 3,
               cellTitle: 'Application: CNC probe calibration — catching collinear probe points',
               prose: [
-                'A CNC machine probes reference points to establish its work coordinate frame. If the probed points are collinear (all on a line), the measurement matrix has rank 1 — not enough to define a plane. The null space is 1D, meaning one surface direction is completely unknown.',
-                'This checks whether a set of probe points is geometrically adequate for surface calibration.',
+                '`P2 - P1` and `P3 - P1` compute edge vectors from the first probe point. `M_good = [P2-P1, P3-P1]` assembles a 2×2 matrix whose columns are those two direction vectors. `rank(M_good) = 2` means the vectors point in independent directions — together they span the full 2D plane of the workpiece surface.',
+                'For the bad layout: `P3_bad = [50; 0]` is collinear with P1 and P2 (all on the x-axis). `M_bad` has columns `[100; 0]` and `[50; 0]` — proportional, so rank = 1. `null(M_bad)` returns the y-direction: the y-component of the surface is entirely undetermined. The CNC controller cannot reconstruct the part plane from this data alone.',
               ],
               code: `% Good probe layout: 3 non-collinear points define a plane
 P1 = [0;   0  ];
@@ -197,9 +200,8 @@ fprintf('  Unknown direction: [%.3f; %.3f]\\n', null_dir(1), null_dir(2))`,
               id: 1,
               cellTitle: 'Rank — counting the independent directions',
               prose: [
-                'The **rank** of A is the number of pivot columns — the dimension of the column space.',
-                'The **rank-nullity theorem**: rank(A) + nullity(A) = n (number of columns).',
-                'nullity = number of free variables = dimension of the null space.',
+                '`np.linalg.matrix_rank(A)` counts linearly independent columns by computing the SVD and counting singular values above a numerical threshold. For `A = [[1,2],[3,4]]`: columns `[1,3]` and `[2,4]` point in different directions — rank = 2 = n. For `B = [[1,2],[3,6]]`: column 2 = 2×column 1 — only one independent direction, rank = 1.',
+                'The rank-nullity theorem $\\text{rank} + \\text{nullity} = n$ printed for `B`: $1 + 1 = 2$. The parallelogram plot shows this geometrically — `A` produces a non-degenerate parallelogram (columns span the plane), `B` produces a degenerate one: both arrows collapse to the same line (zero-area parallelogram = rank 1 = zero determinant).',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -236,8 +238,8 @@ plt.show()`,
               id: 2,
               cellTitle: 'Computing the null space',
               prose: [
-                'The null space is all vectors x such that Ax = 0.',
-                '`scipy.linalg.null_space(A)` returns an orthonormal basis for N(A). Verify by checking A @ null_vec ≈ 0.',
+                '`scipy.linalg.null_space(B)` computes $N(B) = \\{\\mathbf{x}: B\\mathbf{x}=\\mathbf{0}\\}$ via SVD: the right singular vectors corresponding to near-zero singular values span the null space. For `B = [[1,2],[3,6]]` (rank 1): one singular value $\\approx 0$, so `null_B` is a single normalized column.',
+                '`B @ null_B` prints near-zero (around $10^{-16}$) — the verification that `null_B` satisfies $B\\mathbf{x}=\\mathbf{0}$. The plot shows the null vector (red) and its negative — the null space is this entire 1D line through the origin. By the Fundamental Theorem, the null space is perpendicular to the row space. Notice the blue column-space line and the red null-space line are orthogonal: they are the two complementary subspaces of $\\mathbb{R}^2$ for this rank-1 matrix.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -260,8 +262,7 @@ ax.plot(t*B[0,0]/np.linalg.norm(B[:,0]), t*B[1,0]/np.linalg.norm(B[:,0]),
 # Draw the null vector
 nv = null_B[:, 0]
 ax.annotate('', xy=nv, xytext=origin, arrowprops=dict(arrowstyle='->', color='crimson', lw=2.5))
-ax.text(nv[0]+0.05, nv[1]+0.05, f'null vec
-{nv.round(3)}', color='crimson', fontsize=10)
+ax.text(nv[0]+0.05, nv[1]+0.05, f'null vec\\n{nv.round(3)}', color='crimson', fontsize=10)
 ax.annotate('', xy=-nv, xytext=origin, arrowprops=dict(arrowstyle='->', color='crimson', lw=2.5, linestyle='dashed'))
 ax.set_xlim(-1.5, 1.5); ax.set_ylim(-1.5, 1.5)
 ax.set_aspect('equal'); ax.grid(True, alpha=0.3)
@@ -373,7 +374,7 @@ A = np.array([[1., 2., 3.],
           annotation: "Row-reduce to RREF. Pivots appear in columns 1 and 3. Columns 2 and 4 have no pivots — they are the free variable columns. Therefore rank = 2, nullity = 4 − 2 = 2.",
           strategyTitle: "Row-reduce to find pivot and free columns",
           checkpoint: "How many pivot columns? How many free variables?",
-          hints: ["Pivots in columns 1 and 3. Free variables: $x_2$ and $x_4$. Rank-Nullity: 2 + 2 = 4 âœ“"],
+          hints: ["Pivots in columns 1 and 3. Free variables: $x_2$ and $x_4$. Rank-Nullity: 2 + 2 = 4 ✓"],
         },
         {
           expression: "x_1 + 2x_2 + 3x_4 = 0 \\implies x_1 = -2x_2 - 3x_4 \\qquad x_3 - x_4 = 0 \\implies x_3 = x_4",
@@ -389,7 +390,7 @@ A = np.array([[1., 2., 3.],
         },
         {
           expression: "N(A) = \\text{Span}\\left\\{\\begin{bmatrix}-2\\\\1\\\\0\\\\0\\end{bmatrix},\\begin{bmatrix}-3\\\\0\\\\1\\\\1\\end{bmatrix}\\right\\}",
-          annotation: "The null space is a 2D subspace of $\\mathbb{R}^4$. Verify: rank 2 + nullity 2 = 4 = number of columns âœ“. Check: $A\\mathbf{v}_1 = \\mathbf{0}$ and $A\\mathbf{v}_2 = \\mathbf{0}$.",
+          annotation: "The null space is a 2D subspace of $\\mathbb{R}^4$. Verify: rank 2 + nullity 2 = 4 = number of columns ✓. Check: $A\\mathbf{v}_1 = \\mathbf{0}$ and $A\\mathbf{v}_2 = \\mathbf{0}$.",
           strategyTitle: "Assemble and verify",
         }
       ],
@@ -407,7 +408,7 @@ A = np.array([[1., 2., 3.],
         },
         {
           expression: "(a)\\; \\mathbf{b}_1 = \\begin{bmatrix}2\\\\6\\end{bmatrix} = 2\\begin{bmatrix}1\\\\3\\end{bmatrix} \\in C(A) \\implies \\textbf{CONSISTENT}",
-          annotation: "$\\mathbf{b}_1 = 2 \\cdot [1,3]^T$ — it lies exactly on the column space line. A particular solution: $\\mathbf{x}_p = [2,0]^T$ (check: $A[2,0]^T = 2[1,3]^T = [2,6]^T$ âœ“). The general solution is $\\mathbf{x} = [2,0]^T + t[-2,1]^T$ (adding any null space vector).",
+          annotation: "$\\mathbf{b}_1 = 2 \\cdot [1,3]^T$ — it lies exactly on the column space line. A particular solution: $\\mathbf{x}_p = [2,0]^T$ (check: $A[2,0]^T = 2[1,3]^T = [2,6]^T$ ✓). The general solution is $\\mathbf{x} = [2,0]^T + t[-2,1]^T$ (adding any null space vector).",
           strategyTitle: "Check b₁: is it a scalar multiple of [1,3]ᵀ?",
         },
         {
@@ -484,7 +485,7 @@ A = np.array([[1., 2., 3.],
           annotation: "No contradiction row $[0,0,0|\\neq 0]$. $\\mathbf{b}$ is reachable. Particular solution: $x_p = [3/2, 0, 1/2]^T$. General solution: $\\mathbf{x} = [3/2, 0, 1/2]^T + t[-2,1,0]^T$."
         }
       ],
-      answer: "$N(A) = \\text{Span}\\{[-2,1,0]^T\\}$; rank 2, nullity 1; $2+1=3=n$ âœ“; $\\mathbf{b} \\in C(A)$, general solution $\\mathbf{x} = [3/2,\\,0,\\,1/2]^T + t[-2,1,0]^T$"
+      answer: "$N(A) = \\text{Span}\\{[-2,1,0]^T\\}$; rank 2, nullity 1; $2+1=3=n$ ✓; $\\mathbf{b} \\in C(A)$, general solution $\\mathbf{x} = [3/2,\\,0,\\,1/2]^T + t[-2,1,0]^T$"
     }
   ],
 
@@ -533,8 +534,42 @@ A = np.array([[1., 2., 3.],
         text: 'A $4 \\times 4$ matrix has rank 2. What is the dimension of its null space?',
         options: ['2', '1', '4', '0'],
         answer: '2',
-        hint: 'Rank-Nullity: rank + nullity = n (columns). $2 + \\text{nullity} = 4 \\Rightarrow \\text{nullity} = 2$.',
-      }
+        hints: ['Rank-Nullity: rank + nullity = n (columns). $2 + \\text{nullity} = 4 \\Rightarrow \\text{nullity} = 2$.'],
+      },
+      {
+        id: 'la2-004-assess-2',
+        type: 'choice',
+        text: 'For $A = \\begin{bmatrix}1&2\\\\2&4\\end{bmatrix}$, which vector is in the null space?',
+        options: [
+          '$[2, -1]^T$ — because $A[2,-1]^T = [1\\cdot2+2\\cdot(-1),\\;2\\cdot2+4\\cdot(-1)]^T = [0,0]^T$',
+          '$[1, 2]^T$ — the first column of $A$',
+          '$[1, 0]^T$ — the standard basis vector',
+          '$[2, 4]^T$ — the second column of $A$',
+        ],
+        answer: '$[2, -1]^T$ — because $A[2,-1]^T = [1\\cdot2+2\\cdot(-1),\\;2\\cdot2+4\\cdot(-1)]^T = [0,0]^T$',
+        hints: ['Multiply $A$ by each candidate and check which gives $[0,0]^T$.', 'Row 2 = 2×row 1, so only rank 1. The null space vector satisfies $x_1 + 2x_2 = 0$, giving $x_1 = -2x_2$.'],
+      },
+      {
+        id: 'la2-004-assess-3',
+        type: 'choice',
+        text: 'The system $A\\mathbf{x} = \\mathbf{b}$ has no solution. What does this tell you about $\\mathbf{b}$?',
+        options: [
+          '$\\mathbf{b}$ is not in the column space of $A$ — no input maps to that output',
+          '$\\mathbf{b}$ is in the null space of $A$',
+          'The rank of $A$ must be zero',
+          '$A$ must be non-square',
+        ],
+        answer: '$\\mathbf{b}$ is not in the column space of $A$ — no input maps to that output',
+        hints: ['$A\\mathbf{x} = \\mathbf{b}$ is consistent if and only if $\\mathbf{b} \\in C(A)$. No solution means $\\mathbf{b}$ lies outside the column space.'],
+      },
+      {
+        id: 'la2-004-assess-4',
+        type: 'choice',
+        text: 'A $3 \\times 5$ matrix has nullity 3. What is its rank?',
+        options: ['2', '3', '5', '1'],
+        answer: '2',
+        hints: ['Rank-Nullity: rank + nullity = n (columns). $n = 5$, nullity = 3, so rank = $5 - 3 = 2$.'],
+      },
     ]
   },
 

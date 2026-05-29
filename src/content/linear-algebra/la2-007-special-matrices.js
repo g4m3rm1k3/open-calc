@@ -227,7 +227,7 @@ A = B.T @ B   # always SPD when B has full column rank
 
 print("A = B^T @ B:")
 print(A)
-print(f"Eigenvalues: {np.linalg.eigh(A)[0].round(4)}  (all positive âœ“)")
+print(f"Eigenvalues: {np.linalg.eigh(A)[0].round(4)}  (all positive ✓)")
 print()
 
 # Cholesky factorization: A = L @ L.T
@@ -369,7 +369,7 @@ for i, M in enumerate([M1, M2, M3], 1):
       steps: [
         {
           expression: 'A = B^\\top B = \\begin{bmatrix}1&2&0\\\\0&1&3\\end{bmatrix}\\begin{bmatrix}1&0\\\\2&1\\\\0&3\\end{bmatrix} = \\begin{bmatrix}5&2\\\\2&10\\end{bmatrix}',
-          annotation: 'Any Gram matrix $B^\\top B$ is symmetric PSD. It is SPD when $B$ has full column rank (here rank 2 âœ“).',
+          annotation: 'Any Gram matrix $B^\\top B$ is symmetric PSD. It is SPD when $B$ has full column rank (here rank 2 ✓).',
           strategyTitle: 'Step 1: Form the Gram matrix $A = B^\\top B$',
         },
         {
@@ -391,7 +391,7 @@ for i, M in enumerate([M1, M2, M3], 1):
           expression: '\\text{Solve } L\\mathbf{y} = \\mathbf{b}: \\quad y_1 = \\frac{5}{\\sqrt{5}} = \\sqrt{5}, \\quad y_2 = \\frac{11 - \\frac{2}{\\sqrt{5}}\\sqrt{5}}{\\sqrt{46/5}} = \\frac{9}{\\sqrt{46/5}}',
           annotation: 'Forward substitution on $L\\mathbf{y} = \\mathbf{b}$. Then back-substitute on $L^\\top\\mathbf{x} = \\mathbf{y}$.',
           strategyTitle: 'Step 5: Forward then back substitution',
-          hints: ['Final answer: $\\mathbf{x} \\approx [0.652, 0.978]^\\top$. Verify: $A\\mathbf{x} = [5(0.652)+2(0.978),\\; 2(0.652)+10(0.978)] \\approx [5, 11]$ âœ“'],
+          hints: ['Final answer: $\\mathbf{x} \\approx [0.652, 0.978]^\\top$. Verify: $A\\mathbf{x} = [5(0.652)+2(0.978),\\; 2(0.652)+10(0.978)] \\approx [5, 11]$ ✓'],
         },
       ],
     },
@@ -439,7 +439,7 @@ for i, M in enumerate([M1, M2, M3], 1):
         { expression: 'l_{11} = \\sqrt{9} = 3, \\quad l_{21} = 3/3 = 1, \\quad l_{22} = \\sqrt{5 - 1} = 2', annotation: 'Cholesky: compute column by column.' },
         { expression: 'L = \\begin{bmatrix}3&0\\\\1&2\\end{bmatrix}, \\quad LL^\\top = \\begin{bmatrix}3&0\\\\1&2\\end{bmatrix}\\begin{bmatrix}3&1\\\\0&2\\end{bmatrix} = \\begin{bmatrix}9&3\\\\3&5\\end{bmatrix} \\checkmark', annotation: 'Verify $LL^\\top = A$.' },
         { expression: 'L\\mathbf{y} = \\mathbf{b}: \\quad y_1 = 12/3 = 4, \\quad y_2 = (8 - 1 \\cdot 4)/2 = 2', annotation: 'Forward substitution.' },
-        { expression: 'L^\\top\\mathbf{x} = \\mathbf{y}: \\quad x_2 = 2/2 = 1, \\quad x_1 = (4 - 1 \\cdot 1)/3 = 1', annotation: 'Back substitution. $\\mathbf{x} = [1, 1]^\\top$. Verify: $A[1,1]^\\top = [9+3, 3+5]^\\top = [12,8]^\\top$ âœ“' },
+        { expression: 'L^\\top\\mathbf{x} = \\mathbf{y}: \\quad x_2 = 2/2 = 1, \\quad x_1 = (4 - 1 \\cdot 1)/3 = 1', annotation: 'Back substitution. $\\mathbf{x} = [1, 1]^\\top$. Verify: $A[1,1]^\\top = [9+3, 3+5]^\\top = [12,8]^\\top$ ✓' },
       ],
       answer: '$L = [[3,0],[1,2]]$; $\\mathbf{x} = [1,1]^\\top$',
     },
@@ -499,7 +499,46 @@ for i, M in enumerate([M1, M2, M3], 1):
           'A scaling transformation',
         ],
         answer: 'An improper rotation (includes a reflection) — orthogonal with det = −1',
-        hint: 'Orthogonal matrices with det = +1 are rotations; those with det = −1 are improper rotations (rotations combined with a reflection).',
+        hints: ['Orthogonal matrices with $\\det = +1$ are rotations; those with $\\det = -1$ are improper rotations (includes a reflection component).'],
+      },
+      {
+        id: 'la2-007-assess-2',
+        type: 'choice',
+        text: 'For an orthogonal matrix $Q$, what is $Q^{-1}$?',
+        options: [
+          '$Q^\\top$ — because $Q^\\top Q = I$ means $Q^\\top = Q^{-1}$',
+          '$-Q$ — the negative of $Q$',
+          '$\\det(Q) \\cdot Q$ — scaled by the determinant',
+          '$Q$ itself — orthogonal matrices are self-inverse',
+        ],
+        answer: '$Q^\\top$ — because $Q^\\top Q = I$ means $Q^\\top = Q^{-1}$',
+        hints: ['The defining property $Q^\\top Q = I$ directly says $Q^\\top$ acts as a left inverse. Since $Q$ is square, $Q^\\top = Q^{-1}$.'],
+      },
+      {
+        id: 'la2-007-assess-3',
+        type: 'choice',
+        text: 'A matrix $A$ is symmetric positive definite (SPD). What can you say about its eigenvalues?',
+        options: [
+          'All eigenvalues are positive',
+          'All eigenvalues are zero',
+          'All eigenvalues are real but can be negative',
+          'Eigenvalues are complex conjugate pairs',
+        ],
+        answer: 'All eigenvalues are positive',
+        hints: ['For SPD $A$: $\\mathbf{x}^\\top A \\mathbf{x} > 0$ for all $\\mathbf{x} \\neq \\mathbf{0}$. If $A\\mathbf{v} = \\lambda\\mathbf{v}$, then $\\mathbf{v}^\\top A \\mathbf{v} = \\lambda\\|\\mathbf{v}\\|^2 > 0$, so $\\lambda > 0$.'],
+      },
+      {
+        id: 'la2-007-assess-4',
+        type: 'choice',
+        text: 'For a symmetric matrix $A$, what does $A^\\top$ equal?',
+        options: [
+          '$A$ — a matrix is symmetric iff $A^\\top = A$',
+          '$-A$ — antisymmetric condition',
+          '$A^{-1}$ — symmetric matrices are orthogonal',
+          '$I$ — the identity',
+        ],
+        answer: '$A$ — a matrix is symmetric iff $A^\\top = A$',
+        hints: ['Symmetric means every entry satisfies $a_{ij} = a_{ji}$, which is exactly the definition $A^\\top = A$.'],
       },
     ],
   },
@@ -612,7 +651,7 @@ for i, M in enumerate([M1, M2, M3], 1):
         'Positive semidefinite: $\\det(A) = 0$',
       ],
       answer: 'Positive definite: top-left $= 3 > 0$, $\\det(A) = 6-1 = 5 > 0$',
-      hints: ['Sylvester criterion: all leading principal minors positive. Minor 1: $a_{11} = 3 > 0$ âœ“. Minor 2: $\\det(A) = 3(2)-1(1) = 5 > 0$ âœ“. Both positive → $A$ is SPD.'],
+      hints: ['Sylvester criterion: all leading principal minors positive. Minor 1: $a_{11} = 3 > 0$ ✓. Minor 2: $\\det(A) = 3(2)-1(1) = 5 > 0$ ✓. Both positive → $A$ is SPD.'],
       reviewSection: 'Math tab — Positive definite: three equivalent definitions',
     },
     {

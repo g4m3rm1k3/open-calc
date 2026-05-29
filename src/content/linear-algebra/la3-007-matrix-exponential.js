@@ -12,7 +12,7 @@ export default {
     "ODE",
     "differential equations",
     "eigendecomposition",
-    "PadÃ© approximation",
+    "Padé approximation",
     "scaling and squaring",
     "stability",
   ],
@@ -30,7 +30,7 @@ export default {
     prose: [
       "**You already know the scalar case.** If $\\dot{x} = ax$, the unique solution satisfying $x(0) = x_0$ is $x(t) = e^{at}x_0$. When $a < 0$ the solution decays; when $a > 0$ it blows up. Now suppose you have a system: $\\dot{x}_1 = -2x_1$, $\\dot{x}_2 = -3x_2$. In matrix form, $\\dot{\\mathbf{x}} = A\\mathbf{x}$ with $A = \\begin{bmatrix}-2&0\\\\0&-3\\end{bmatrix}$. By analogy, the solution should be $\\mathbf{x}(t) = e^{At}\\mathbf{x}_0$ — and it is. The object $e^{At}$ is the **matrix exponential**, defined by the same power series as its scalar cousin: $e^{At} = I + At + \\frac{(At)^2}{2!} + \\frac{(At)^3}{3!} + \\cdots$",
       "**Verify it works on the diagonal case.** For $A = \\begin{bmatrix}-2&0\\\\0&-3\\end{bmatrix}$, each power $A^k = \\begin{bmatrix}(-2)^k&0\\\\0&(-3)^k\\end{bmatrix}$, so the power series sums to $e^{At} = \\begin{bmatrix}e^{-2t}&0\\\\0&e^{-3t}\\end{bmatrix}$. With $\\mathbf{x}_0 = [1,1]^\\top$, the solution at $t=1$ is $\\mathbf{x}(1) = [e^{-2}, e^{-3}]^\\top \\approx [0.135, 0.050]^\\top$. Both components decay because both eigenvalues are negative. Change $-2$ to $+2$ and $x_1$ explodes — the sign of the eigenvalue controls stability directly.",
-      "**Why it solves the ODE.** Differentiate $\\mathbf{x}(t) = e^{At}\\mathbf{x}_0$ term by term: $\\frac{d}{dt}(I + At + \\frac{A^2t^2}{2} + \\cdots) = A + A^2 t + \\cdots = A(I + At + \\cdots) = Ae^{At}$. So $\\dot{\\mathbf{x}} = Ae^{At}\\mathbf{x}_0 = A\\mathbf{x}(t)$ âœ“. And $\\mathbf{x}(0) = e^0 \\mathbf{x}_0 = I\\mathbf{x}_0 = \\mathbf{x}_0$ âœ“. No numerical integration needed — the entire solution from $t = 0$ to $\\infty$ is captured in one matrix formula.",
+      "**Why it solves the ODE.** Differentiate $\\mathbf{x}(t) = e^{At}\\mathbf{x}_0$ term by term: $\\frac{d}{dt}(I + At + \\frac{A^2t^2}{2} + \\cdots) = A + A^2 t + \\cdots = A(I + At + \\cdots) = Ae^{At}$. So $\\dot{\\mathbf{x}} = Ae^{At}\\mathbf{x}_0 = A\\mathbf{x}(t)$ ✓. And $\\mathbf{x}(0) = e^0 \\mathbf{x}_0 = I\\mathbf{x}_0 = \\mathbf{x}_0$ ✓. No numerical integration needed — the entire solution from $t = 0$ to $\\infty$ is captured in one matrix formula.",
       "**Computing $e^{At}$ for non-diagonal matrices via diagonalization.** If $A = PDP^{-1}$ where $D = \\text{diag}(\\lambda_1, \\ldots, \\lambda_n)$, then $(A)^k = PD^kP^{-1}$, so the power series sums to $e^{At} = Pe^{Dt}P^{-1}$ where $e^{Dt} = \\text{diag}(e^{\\lambda_1 t}, \\ldots, e^{\\lambda_n t})$. This reduces the computation to: (1) find eigenvalues and eigenvectors, (2) form $P$ and $D$, (3) exponentiate the diagonal, (4) transform back. For non-diagonalizable matrices, use the Jordan form from the previous lesson.",
       "**Predict before reading on.** For $A = \\begin{bmatrix}0&-\\omega\\\\\\omega&0\\end{bmatrix}$ with eigenvalues $\\pm i\\omega$, the exponential $e^{At}$ must involve $e^{\\pm i\\omega t}$. Use Euler's formula $e^{i\\theta} = \\cos\\theta + i\\sin\\theta$ to predict the form of $e^{At}$. Should solutions grow, decay, or oscillate? Write your prediction before continuing.",
       "**The eigenvalue tells you everything about long-time behavior.** Real $\\lambda < 0$: exponential decay. Real $\\lambda > 0$: exponential growth. Purely imaginary $\\pm i\\omega$: perpetual oscillation at frequency $\\omega/(2\\pi)$. Complex $a \\pm bi$ with $a < 0$: decaying spiral (stable oscillation). Complex $a \\pm bi$ with $a > 0$: growing spiral (unstable). The system $\\dot{\\mathbf{x}} = A\\mathbf{x}$ is globally stable if and only if ALL eigenvalues of $A$ have negative real part.",
@@ -156,8 +156,8 @@ end
       },
       {
         type: "insight",
-        title: "PadÃ© Approximation in Practice",
-        body: "MATLAB's `expm` and SciPy's `expm` use the PadÃ© approximant + scaling and squaring, not the power series. The power series is unstable for large $\\|A\\|$. The scaling trick: $e^A = (e^{A/2^s})^{2^s}$. Scale down until $A/2^s$ is small, apply PadÃ©, then square $s$ times.",
+        title: "Padé Approximation in Practice",
+        body: "MATLAB's `expm` and SciPy's `expm` use the Padé approximant + scaling and squaring, not the power series. The power series is unstable for large $\\|A\\|$. The scaling trick: $e^A = (e^{A/2^s})^{2^s}$. Scale down until $A/2^s$ is small, apply Padé, then square $s$ times.",
       },
     ],
     visualizations: [
@@ -256,8 +256,8 @@ from scipy.linalg import expm
 # State: [e, e_dot] where e = position error
 omega = 100.0  # natural frequency (rad/s)
 
-print("Stability vs damping ratio Î¶:")
-print(f"{'Î¶':>6}  {'Re(λ)':>10}  {'Im(λ)':>10}  {'Stable':>8}  {'Settling ~2/|Re|':>18}")
+print("Stability vs damping ratio zeta:")
+print(f"{'zeta':>6}  {'Re(lam)':>10}  {'Im(lam)':>10}  {'Stable':>8}  {'Settling ~2/|Re|':>18}")
 for zeta in [0.0, 0.3, 0.5, 0.7, 1.0, 1.5, 2.0]:
     A = np.array([[0., 1.],
                   [-omega**2, -2*zeta*omega]])
@@ -267,9 +267,9 @@ for zeta in [0.0, 0.3, 0.5, 0.7, 1.0, 1.5, 2.0]:
     settling = 2.0/abs(re) if abs(re) > 1e-6 else float('inf')
     print(f"{zeta:>6.1f}  {re:>10.2f}  {im:>10.2f}  {str(stable):>8}  {settling:>18.4f}s")
 
-print("\\nÎ¶=0: marginally stable (pure oscillation)")
-print("Î¶>0: stable (decays to equilibrium)")
-print("Settling time â‰ˆ 2/|Re(λ)| seconds")`,
+print("\\nzeta=0: marginally stable (pure oscillation)")
+print("zeta>0: stable (decays to equilibrium)")
+print("Settling time ~ 2/|Re(lam)| seconds")`,
             },
           ],
         },
@@ -297,7 +297,7 @@ print("Settling time â‰ˆ 2/|Re(λ)| seconds")`,
       {
         type: "insight",
         title: "Numerical Computation of e^A",
-        body: "The power series $\\sum A^k/k!$ is accurate only for small $\\|A\\|$. MATLAB's `expm` and SciPy's `scipy.linalg.expm` use the **PadÃ© approximant** + **scaling and squaring**:\n\n1. Scale: compute $B = A/2^s$ so $\\|B\\| \\approx 1$\n2. Compute $e^B \\approx$ PadÃ© approximant (rational function approximation)\n3. Square: $e^A = (e^B)^{2^s}$\n\nThis is $O(n^3)$ and numerically stable. Never use the raw power series.",
+        body: "The power series $\\sum A^k/k!$ is accurate only for small $\\|A\\|$. MATLAB's `expm` and SciPy's `scipy.linalg.expm` use the **Padé approximant** + **scaling and squaring**:\n\n1. Scale: compute $B = A/2^s$ so $\\|B\\| \\approx 1$\n2. Compute $e^B \\approx$ Padé approximant (rational function approximation)\n3. Square: $e^A = (e^B)^{2^s}$\n\nThis is $O(n^3)$ and numerically stable. Never use the raw power series.",
       },
     ],
     visualizations: [],
@@ -380,7 +380,7 @@ print("Settling time â‰ˆ 2/|Re(λ)| seconds")`,
             "Explicit solution. Both components decay. As $t\\to\\infty$: $x_1 \\to 0$, $x_2 \\to 0$.",
           strategyTitle: "Final answer",
           checkpoint: "Verify x(0).",
-          hints: ["x₁(0) = 2-1 = 1 âœ“. x₁(0) = 1 âœ“."],
+          hints: ["x₁(0) = 2-1 = 1 ✓. x₁(0) = 1 ✓."],
         },
       ],
       conclusion:
@@ -480,7 +480,7 @@ print("Settling time â‰ˆ 2/|Re(λ)| seconds")`,
         },
       ],
       answer:
-        "Asymptotically stable for all Î¶ > 0, ω > 0. Underdamped (Î¶<1): decaying oscillation. Critically/overdamped (Î¶≥1): pure decay without oscillation.",
+        "Asymptotically stable for all ζ > 0, ω > 0. Underdamped (ζ < 1): decaying oscillation. Critically/overdamped (ζ ≥ 1): pure decay without oscillation.",
     },
   ],
 
@@ -545,6 +545,43 @@ print("Settling time â‰ˆ 2/|Re(λ)| seconds")`,
         hints: ["$\\lambda_1 = -2 < 0$ (stable component) but $\\lambda_2 = 5 > 0$ — that component grows without bound. Any positive real eigenvalue makes the system unstable."],
         reviewSection: 'Intuition tab — stability condition',
       },
+      {
+        id: "la3-007-assess-2",
+        type: "choice",
+        text: "For $A = \\begin{bmatrix}-3&0\\\\0&-1\\end{bmatrix}$, what is $e^{At}$?",
+        options: [
+          "$\\begin{bmatrix}-3t&0\\\\0&-t\\end{bmatrix}$",
+          "$\\begin{bmatrix}e^{-3t}&0\\\\0&e^{-t}\\end{bmatrix}$",
+          "$e^{-4t}I$",
+          "$\\begin{bmatrix}e^{-3}&0\\\\0&e^{-1}\\end{bmatrix}$",
+        ],
+        answer: "$\\begin{bmatrix}e^{-3t}&0\\\\0&e^{-t}\\end{bmatrix}$",
+        hints: ["For a diagonal matrix $D$, each diagonal entry $d_{ii}$ becomes $e^{d_{ii}t}$ in $e^{Dt}$. The power series $\\sum D^k t^k/k!$ sums independently for each diagonal entry."],
+        reviewSection: "Examples tab — Matrix exponential of a diagonal matrix",
+      },
+      {
+        id: "la3-007-assess-3",
+        type: "choice",
+        text: "When is the identity $e^{A+B} = e^A e^B$ guaranteed to hold?",
+        options: [
+          "Always, just like the scalar rule",
+          "When both $A$ and $B$ are symmetric",
+          "When $AB = BA$ (A and B commute)",
+          "When $\\det(A) = \\det(B)$",
+        ],
+        answer: "When $AB = BA$ (A and B commute)",
+        hints: ["The scalar rule $e^{a+b} = e^a e^b$ relies on numbers commuting. For matrices, the Baker-Campbell-Hausdorff formula shows $e^A e^B = e^{A+B+[A,B]/2+\\cdots}$, which collapses to $e^{A+B}$ only when the commutator $[A,B] = AB - BA = 0$."],
+        reviewSection: "Intuition tab — Warning: Commutativity",
+      },
+      {
+        id: "la3-007-assess-4",
+        type: "choice",
+        text: "Liouville's formula states that $\\det(e^A)$ equals:",
+        options: ["$e^{\\det(A)}$", "$1$ always", "$e^{\\text{tr}(A)}$", "$\\text{tr}(e^A)$"],
+        answer: "$e^{\\text{tr}(A)}$",
+        hints: ["For diagonal $D$: $\\det(e^D) = \\prod_i e^{\\lambda_i} = e^{\\sum_i \\lambda_i} = e^{\\text{tr}(D)}$. Since trace is invariant under similarity, this extends to all matrices. Consequence: $e^A$ is always invertible."],
+        reviewSection: "Math tab — Liouville's Formula",
+      },
     ],
   },
 
@@ -568,7 +605,7 @@ print("Settling time â‰ˆ 2/|Re(λ)| seconds")`,
     {
       id: "q-la3-007-2",
       type: "choice",
-      text: "For asymptotic stability of $\\dot{\\mathbf{x}} = A\\mathbf{x}$ (all solutions → 0 as t → âˆž), the eigenvalues of $A$ must all satisfy:",
+      text: "For asymptotic stability of $\\dot{\\mathbf{x}} = A\\mathbf{x}$ (all solutions → 0 as $t \\to \\infty$), the eigenvalues of $A$ must all satisfy:",
       options: [
         "$\\text{Re}(\\lambda) > 0$",
         "$\\text{Im}(\\lambda) \\neq 0$",
@@ -577,7 +614,7 @@ print("Settling time â‰ˆ 2/|Re(λ)| seconds")`,
       ],
       answer: "$\\text{Re}(\\lambda) < 0$",
       hints: [
-        "e^(λt) → 0 iff Re(λ) < 0. For complex λ=a+bi: |e^(λt)| = e^(at). Decays iff a < 0. Note: |λ| < 1 is the discrete-time criterion, not continuous-time.",
+        "e^(λt) → 0 iff Re(λ) < 0. For complex λ = a+bi: |e^(λt)| = e^(at). Decays iff a < 0. Note: |λ| < 1 is the discrete-time criterion, not continuous-time.",
       ],
       reviewSection: "Math tab — Stability criterion",
     },
@@ -689,7 +726,7 @@ print("Settling time â‰ˆ 2/|Re(λ)| seconds")`,
       ],
       answer: "Decaying oscillation that rings then settles",
       hints: [
-        'Complex eigenvalues aÂ±bi give e^(at)(cos(bt) + i·sin(bt)). Since a<0, the amplitude e^(at)→0 while the oscillation at frequency b/(2π) persists temporarily — classically called "ringing."',
+        'Complex eigenvalues a±bi give e^(at)(cos(bt) + i·sin(bt)). Since a < 0, the amplitude e^(at) → 0 while the oscillation at frequency b/(2π) persists temporarily — classically called "ringing."',
       ],
       reviewSection: "Intuition — CNC servo drives",
     },
@@ -706,7 +743,7 @@ print("Settling time â‰ˆ 2/|Re(λ)| seconds")`,
       answer:
         "The power series converges but is numerically unstable for large $\\|A\\|$",
       hints: [
-        "For large –A–, early terms of the series grow huge and then cancel — catastrophic cancellation causes large floating-point errors. Scaling A down to –A–â‰ˆ1, applying PadÃ©, then squaring up avoids this.",
+        "For large ‖A‖, early terms of the series grow huge then cancel — catastrophic cancellation causes large floating-point errors. Scaling A down so ‖A/2^s‖ ≈ 1, applying Padé, then squaring up avoids this.",
       ],
       reviewSection: "Rigor — Numerical Computation of e^A",
     },
@@ -744,7 +781,7 @@ print("Settling time â‰ˆ 2/|Re(λ)| seconds")`,
         "Matrix exponential solution",
       ],
       whyThisTechniqueWins:
-        "The matrix exponential gives the exact closed-form solution $\\mathbf{x}(t) = e^{At}\\mathbf{x}_0$ at any time $t$, no discretization error. You can directly read off the settling time (â‰ˆ$2/|\\text{Re}(\\lambda)|$) and oscillation frequency ($\\text{Im}(\\lambda)/2\\pi$) from the eigenvalues without running the simulation.",
+        "The matrix exponential gives the exact closed-form solution $\\mathbf{x}(t) = e^{At}\\mathbf{x}_0$ at any time $t$, no discretization error. You can directly read off the settling time ($\\approx 2/|\\text{Re}(\\lambda)|$) and oscillation frequency ($\\text{Im}(\\lambda)/2\\pi$) from the eigenvalues without running the simulation.",
     },
     {
       situation:

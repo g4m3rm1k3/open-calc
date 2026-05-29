@@ -106,7 +106,8 @@ export default {
               id: 1,
               cellTitle: 'Determinant — area scaling, manual formula, and MATLAB',
               prose: [
-                'The determinant tells you how much the transformation scales area. MATLAB computes it with `det(A)`. For 2×2, the formula is ad − bc.',
+                '`det(A)` computes the determinant. For $A = \\begin{bmatrix}a & b \\\\ c & d\\end{bmatrix}$, the formula is $ad - bc$. For `A = [3 1; 2 4]`: $3 \\cdot 4 - 1 \\cdot 2 = 10 \\neq 0$ — invertible. The `fprintf` line prints each part of the formula explicitly so you can trace the arithmetic.',
+                'For `S = [2 4; 1 2]`: $\\det = 2 \\cdot 2 - 4 \\cdot 1 = 0$ — column 2 is $2 \\times$ column 1 (proportional). A zero determinant means the transformation squishes the entire plane onto a single line, destroying information. No inverse can recover what was annihilated.',
               ],
               code: `% Invertible matrix
 A = [3 1; 2 4];
@@ -129,8 +130,8 @@ disp('A * inv(A):'); disp(A * A_inv)`,
               id: 2,
               cellTitle: 'Watching det → 0 as a matrix becomes singular',
               prose: [
-                'Slide the value of a single entry and watch the determinant approach zero. When det = 0, inv(A) explodes (the matrix is singular).',
-                'In practice, matrices with very small (but nonzero) determinants are near-singular — numerically unstable even if technically invertible.',
+                'For `A_base = [2 3; 1 2]` with `A(2,2)` varying: the determinant is $2 \\cdot (2,2) - 3 \\cdot 1 = 2(A_{22}) - 3$. When $A_{22} = 1.5$, the determinant hits zero exactly. The loop approaches that critical value and prints `det(A)` at each step — you can watch the number approach 0.',
+                'Mathematically, the $2 \\times 2$ inverse formula is $A^{-1} = \\frac{1}{\\det(A)}\\begin{bmatrix}d & -b \\\\ -c & a\\end{bmatrix}$. As $\\det(A) \\to 0$, the $1/\\det$ factor blows up, sending all entries of $A^{-1}$ to $\\pm\\infty$. MATLAB\'s `inv(A)` will return a matrix with enormous entries (or `Inf`) — not a signal that the problem is interesting, but that the problem is ill-conditioned.',
               ],
               code: `% Start with an invertible matrix and make it singular
 A_base = [2 3; 1 2];
@@ -153,8 +154,8 @@ fprintf('\\nAt (2,2)=1.5: det = %g  (singular!)\\n', det(A_sing))`,
               id: 3,
               cellTitle: 'Solving Ax=b — backslash beats inv()',
               prose: [
-                'To solve Ax = b, use the backslash operator `A \\ b`. It is faster and numerically stabler than `inv(A) * b` because it uses LU factorization internally.',
-                'Only use `inv(A)` when you genuinely need the matrix entries themselves.',
+                '`A \\ b` solves $A\\mathbf{x} = \\mathbf{b}$ via LU factorization — two triangular solves, $O(n^2)$ work given the factorization. `inv(A) * b` first computes all $n^2$ entries of $A^{-1}$ ($O(n^3)$ extra work) then multiplies, accumulating more floating-point error. Backslash is not just faster — it is numerically more stable because it avoids amplifying rounding errors through the full inverse.',
+                '`norm(A*x_solve - b)` computes the residual $\\|A\\mathbf{x} - \\mathbf{b}\\|_2$ to verify accuracy — should be near `1e-15`. Use `inv(A)` only when you genuinely need the matrix entries (for analysis or symbolic work), never just to multiply by a single right-hand side vector.',
               ],
               code: `A = [3 1; 2 4];
 b = [10; 8];
@@ -219,8 +220,8 @@ fprintf('Condition number (bad):  %.2e  (huge = near-singular)\\n', cond(M_bad))
               id: 1,
               cellTitle: 'Determinant — the scaling factor',
               prose: [
-                'The determinant measures how much a transformation scales area. det = 2 means areas double; det = 0 means space collapses to a line.',
-                '`np.linalg.det(A)` computes it numerically.',
+                '`np.linalg.det(A)` computes the determinant using LU decomposition (more numerically stable than the $ad-bc$ formula for large matrices). For $2 \\times 2$: $\\det(A) = a \\cdot d - b \\cdot c = 3 \\cdot 4 - 1 \\cdot 2 = 10$. Geometrically, this means $A$ scales all areas by a factor of 10 — a unit square maps to a parallelogram of area 10.',
+                '`np.linalg.det(S)` with `S = [[2,4],[1,2]]` returns exactly 0: $2 \\cdot 2 - 4 \\cdot 1 = 0$. Row 2 of S is half of row 1 — they are linearly dependent. The rank of S is 1, not 2, so S maps the entire plane onto a single line (a 1D subspace). Any area becomes zero. No inverse exists.',
               ],
               code: `import numpy as np
 
@@ -258,8 +259,8 @@ plt.show()`,
               id: 2,
               cellTitle: 'Computing the inverse and verifying A·A⁻¹ = I',
               prose: [
-                '`np.linalg.inv(A)` computes A⁻¹. Multiplying A by its inverse should give the identity matrix I.',
-                'In practice, use `np.linalg.solve(A, b)` to solve systems — never compute the inverse just to multiply it.',
+                '`np.linalg.inv(A)` computes $A^{-1}$ — the unique matrix satisfying $AA^{-1} = I_n$. For $2 \\times 2$: $A^{-1} = \\frac{1}{\\det(A)}\\begin{bmatrix}d & -b \\\\ -c & a\\end{bmatrix}$. For `A = [[3,1],[2,4]]` with $\\det = 10$: $A^{-1} = \\frac{1}{10}\\begin{bmatrix}4 & -1 \\\\ -2 & 3\\end{bmatrix}$.',
+                '`np.allclose(A @ A_inv, np.eye(2))` verifies $AA^{-1} \\approx I$ to floating-point precision — `allclose` is needed because matrix multiplication accumulates rounding errors that prevent exact equality. The bar chart compares entries of $AA^{-1}$ against the identity: the diagonals should be 1 and the off-diagonals 0.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -558,8 +559,47 @@ C = np.array([[2., -1.], [4., 3.]])
           '$\\det = 6$; invertible',
         ],
         answer: '$\\det = 0$; not invertible — columns are proportional',
-        hint: '$ad - bc = (1)(4) - (2)(2) = 4 - 4 = 0$. Column 2 = $2 \\times$ column 1 — proportional columns always give $\\det = 0$.',
-      }
+        hints: ['$ad - bc = (1)(4) - (2)(2) = 4 - 4 = 0$. Column 2 = $2 \\times$ column 1 — proportional columns always give $\\det = 0$ because the transformation squishes area to zero.'],
+      },
+      {
+        id: 'la2-003-assess-2',
+        type: 'choice',
+        text: 'A transformation matrix $A$ has $\\det(A) = 5$. What does this tell you about how $A$ affects areas?',
+        options: [
+          'Every region is scaled to 5 times its original area',
+          'Every region shrinks to 1/5 of its original area',
+          'The matrix is not invertible',
+          'Every length is multiplied by 5',
+        ],
+        answer: 'Every region is scaled to 5 times its original area',
+        hints: ['The determinant IS the area scaling factor. $\\det = 5$ means a unit square maps to a parallelogram of area 5. Note: lengths scale by $\\sqrt{5}$ on average (not by 5 — that would be $\\det = 25$).'],
+      },
+      {
+        id: 'la2-003-assess-3',
+        type: 'choice',
+        text: 'What is the $2 \\times 2$ inverse of $A = \\begin{bmatrix}4&1\\\\2&3\\end{bmatrix}$?',
+        options: [
+          '$\\frac{1}{10}\\begin{bmatrix}3&-1\\\\-2&4\\end{bmatrix}$',
+          '$\\frac{1}{10}\\begin{bmatrix}3&1\\\\2&4\\end{bmatrix}$',
+          '$\\begin{bmatrix}3&-1\\\\-2&4\\end{bmatrix}$',
+          'The matrix is not invertible',
+        ],
+        answer: '$\\frac{1}{10}\\begin{bmatrix}3&-1\\\\-2&4\\end{bmatrix}$',
+        hints: ['$\\det(A) = 4 \\cdot 3 - 1 \\cdot 2 = 10$. The $2 \\times 2$ inverse formula: swap $a$ and $d$, negate $b$ and $c$, divide by $\\det$: $A^{-1} = \\frac{1}{10}\\begin{bmatrix}3 & -1 \\\\ -2 & 4\\end{bmatrix}$.'],
+      },
+      {
+        id: 'la2-003-assess-4',
+        type: 'choice',
+        text: 'You need to solve $A\\mathbf{x} = \\mathbf{b}$ for 500 different right-hand sides $\\mathbf{b}$. Which approach is most efficient?',
+        options: [
+          'Compute the LU factorization of $A$ once, then solve each $\\mathbf{b}$ with two triangular solves',
+          'Compute $A^{-1}$ once and multiply each $\\mathbf{b}$ by $A^{-1}$',
+          'Use RREF on $[A|\\mathbf{b}]$ for each right-hand side separately',
+          'Both LU and $A^{-1}$ have identical cost for 500 right-hand sides',
+        ],
+        answer: 'Compute the LU factorization of $A$ once, then solve each $\\mathbf{b}$ with two triangular solves',
+        hints: ['LU factorization costs $O(n^3)$ once. Each solve costs $O(n^2)$. Computing $A^{-1}$ also costs $O(n^3)$, but then each multiply $A^{-1}\\mathbf{b}$ costs $O(n^2)$ with more accumulated floating-point error. LU wins on accuracy.'],
+      },
     ]
   },
 

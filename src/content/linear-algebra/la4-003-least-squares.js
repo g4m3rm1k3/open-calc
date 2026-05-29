@@ -109,7 +109,7 @@ export default {
               cellTitle: 'Solving overdetermined systems — normal equations vs backslash',
               prose: [
                 'For A*x = b with more rows than columns (overdetermined), `x = A \\ b` gives the least squares solution automatically.',
-                'Manually: solve (A\'*A)*x_hat = A\'*b. Verify by checking A\'*(b - A*x_hat) â‰ˆ 0 (residual perpendicular to col(A)).',
+                'Manually: solve (A\'*A)*x_hat = A\'*b. Verify by checking A\'*(b - A*x_hat) ≈ 0 (residual perpendicular to col(A)).',
               ],
               code: `A = [1 1; 1 2; 1 3];
 b = [1; 2; 2];
@@ -202,7 +202,7 @@ fprintf('RMS surface deviation: %.6f mm\\n', rms(residuals))`,
       {
         id: 'PythonNotebook',
         title: 'Code: Least Squares and Linear Regression',
-        mathBridge: 'np.linalg.lstsq(A, b) solves the normal equations. xÌ‚ = (AᵀA)⁻¹Aᵀb. Residual = b − AxÌ‚. Linear regression: A = [x | 1], b = y-values, solution gives slope and intercept.',
+        mathBridge: 'np.linalg.lstsq(A, b) solves the normal equations. x̂ = (AᵀA)⁻¹Aᵀb. Residual = b − Ax̂. Linear regression: A = [x | 1], b = y-values, solution gives slope and intercept.',
         caption: 'Solve overdetermined systems and fit a best-fit line through data using the normal equations.',
         initialProps: {
           initialCells: [
@@ -576,6 +576,33 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2x² + x + 1
         hints: ['They are called normal equations because the residual $\\mathbf{b} - A\\hat{\\mathbf{x}}$ is normal (perpendicular) to the column space of $A$.'],
         reviewSection: 'Math tab — Normal equations',
       },
+      {
+        id: 'la4-003-assess-2',
+        type: 'choice',
+        text: 'The matrix $A^TA$ in the normal equations is guaranteed to be invertible when:',
+        options: ['$A$ is always square', '$A$ has linearly independent columns ($\\text{rank}(A) = n$)', '$A$ is symmetric', 'The residual vector is zero'],
+        answer: '$A$ has linearly independent columns ($\\text{rank}(A) = n$)',
+        hints: ['If the columns of $A$ are independent, $A\\mathbf{x} = \\mathbf{0}$ implies $\\mathbf{x} = \\mathbf{0}$, which makes $A^TA$ positive definite and therefore invertible.'],
+        reviewSection: 'Math tab — Normal Equations (uniqueness condition)',
+      },
+      {
+        id: 'la4-003-assess-3',
+        type: 'choice',
+        text: 'To fit the line $y = ax + b$ to 30 data points $(x_i, y_i)$, the design matrix $A$ has size:',
+        options: ['$2 \\times 30$', '$30 \\times 2$', '$30 \\times 30$', '$2 \\times 2$'],
+        answer: '$30 \\times 2$',
+        hints: ['One row per data point (30 equations). Two columns: one for the $x_i$ values (coefficient of $a$) and one column of 1s (coefficient of $b$). Shape: $30 \\times 2$.'],
+        reviewSection: 'Math tab — Linear Regression',
+      },
+      {
+        id: 'la4-003-assess-4',
+        type: 'choice',
+        text: 'The least squares residual $\\mathbf{e} = \\mathbf{b} - A\\hat{\\mathbf{x}}$ must satisfy which condition?',
+        options: ['$\\mathbf{e} = \\mathbf{0}$', '$A\\mathbf{e} = \\mathbf{b}$', '$A^T\\mathbf{e} = \\mathbf{0}$ (residual is perpendicular to all columns of $A$)', '$\\|\\mathbf{e}\\| = 1$'],
+        answer: '$A^T\\mathbf{e} = \\mathbf{0}$ (residual is perpendicular to all columns of $A$)',
+        hints: ['The residual points in the direction you cannot reach — perpendicular to the column space. This orthogonality condition $A^T(\\mathbf{b} - A\\hat{\\mathbf{x}}) = \\mathbf{0}$ is exactly what the normal equations encode.'],
+        reviewSection: 'Intuition tab — Key Insight: perpendicular residual',
+      },
     ],
   },
 
@@ -629,7 +656,7 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2x² + x + 1
         '$\\det(A^TA) = 0$',
       ],
       answer: 'The residual $\\mathbf{e} = \\mathbf{b} - A\\hat{\\mathbf{x}}$ is perpendicular to every column of $A$',
-      hints: ['The perpendicularity condition Aᵀ(b - AxÌ‚) = 0 is what makes the projection optimal. Rearranging gives AᵀAxÌ‚ = Aᵀb.'],
+      hints: ['The perpendicularity condition Aᵀ(b - Ax̂) = 0 is what makes the projection optimal. Rearranging gives AᵀAx̂ = Aᵀb.'],
       reviewSection: 'Math — Deriving the normal equations',
     },
     {
@@ -661,7 +688,7 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2x² + x + 1
         '$A^TA$ is not always invertible when $A$ is not square',
       ],
       answer: 'Forming $A^TA$ squares the condition number, making numerical errors worse; QR preserves the conditioning of $A$',
-      hints: ['If Îº(A) = 100, then Îº(AᵀA) = Îº(A)² = 10,000. Tiny rounding errors get amplified 10,000× instead of 100×. QR factorization avoids forming AᵀA.'],
+      hints: ['If κ(A) = 100, then κ(AᵀA) = κ(A)² = 10,000. Tiny rounding errors get amplified 10,000× instead of 100×. QR factorization avoids forming AᵀA.'],
       reviewSection: 'Intuition — Normal Equations Can Be Ill-Conditioned',
     },
     {

@@ -410,7 +410,7 @@ print(f"Min Ra = {result.fun:.4f} μm")
         },
         {
           expression: 'f(0,1) = 0 + 0 + 5 - 0 - 10 = -5',
-          annotation: 'Minimum value is $-5$ at $(0,1)$. Verify: $f(1,0) = 2 - 4 = -2 > -5$ âœ“, $f(-1, 1) = 2 - 4 + 5 + 4 - 10 = -3 > -5$ âœ“. The Hessian is constant (quadratic $f$), so this is also a global minimum.',
+          annotation: 'Minimum value is $-5$ at $(0,1)$. Verify: $f(1,0) = 2 - 4 = -2 > -5$ ✓, $f(-1, 1) = 2 - 4 + 5 + 4 - 10 = -3 > -5$ ✓. The Hessian is constant (quadratic $f$), so this is also a global minimum.',
           strategyTitle: 'Compute minimum value',
           checkpoint: 'The Hessian of a quadratic $f$ is the same as the matrix of the quadratic form in the leading terms. Definiteness of the Hessian = definiteness of the quadratic part.',
         },
@@ -507,7 +507,7 @@ print(f"Min Ra = {result.fun:.4f} μm")
         '$\\begin{bmatrix}2&6\\\\6&1\\end{bmatrix}$',
       ],
       answer: '$\\begin{bmatrix}1&3\\\\3&2\\end{bmatrix}$',
-      hints: ['The rule: diagonal entries are the pure-square coefficients; off-diagonal entries are half the cross-term coefficient ($6/2 = 3$). Verify: $[x, y]\\begin{bmatrix}1&3\\\\3&2\\end{bmatrix}\\begin{bmatrix}x\\\\y\\end{bmatrix} = x^2 + 3xy + 3xy + 2y^2 = x^2 + 6xy + 2y^2$ âœ“'],
+      hints: ['The rule: diagonal entries are the pure-square coefficients; off-diagonal entries are half the cross-term coefficient ($6/2 = 3$). Verify: $[x, y]\\begin{bmatrix}1&3\\\\3&2\\end{bmatrix}\\begin{bmatrix}x\\\\y\\end{bmatrix} = x^2 + 3xy + 3xy + 2y^2 = x^2 + 6xy + 2y^2$ ✓'],
       reviewSection: 'intuition',
     },
     {
@@ -626,7 +626,7 @@ print(f"Min Ra = {result.fun:.4f} μm")
     {
       falseBelief: 'The matrix of $ax^2 + bxy + cy^2$ has $b$ on the off-diagonal entries.',
       whyStudentsThinkIt: 'Students read off the coefficient $b$ directly without halving it, ignoring that $\\mathbf{x}^\\top A\\mathbf{x}$ generates the cross term as $2A_{12}xy$.',
-      correctionExample: 'For $Q = x^2 + 6xy + 2y^2$: $\\mathbf{x}^\\top \\begin{bmatrix}1&3\\\\3&2\\end{bmatrix}\\mathbf{x} = x^2 + 3xy + 3yx + 2y^2 = x^2 + 6xy + 2y^2$ âœ“. The two off-diagonal terms each contribute $3xy$, together giving $6xy$. So off-diagonal entry $= 6/2 = 3$.',
+      correctionExample: 'For $Q = x^2 + 6xy + 2y^2$: $\\mathbf{x}^\\top \\begin{bmatrix}1&3\\\\3&2\\end{bmatrix}\\mathbf{x} = x^2 + 3xy + 3yx + 2y^2 = x^2 + 6xy + 2y^2$ ✓. The two off-diagonal terms each contribute $3xy$, together giving $6xy$. So off-diagonal entry $= 6/2 = 3$.',
       contrastCase: 'Using $b = 6$ on the off-diagonal gives $\\begin{bmatrix}1&6\\\\6&2\\end{bmatrix}$, which computes $x^2 + 12xy + 2y^2$ — double the cross term.',
     },
     {

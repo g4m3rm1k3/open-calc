@@ -129,8 +129,9 @@ export default {
               id: 1,
               cellTitle: 'The backslash operator A\\b — MATLAB\'s workhorse',
               prose: [
-                '`A\\b` is how MATLAB solves Ax = b. It does NOT compute A⁻¹ directly — it uses LU factorization internally, which is faster and more numerically stable.',
-                'Think of `\\` as "solve from the left." If A is the transformation and b is the target, A\\b asks "what input x produces output b?"',
+                '`A \\ b` (the backslash operator) solves $A\\mathbf{x} = \\mathbf{b}$ for $\\mathbf{x}$. MATLAB internally uses LU factorization — it decomposes $A = LU$ where $L$ is lower-triangular and $U$ is upper-triangular, then solves $L\\mathbf{y} = \\mathbf{b}$ and $U\\mathbf{x} = \\mathbf{y}$ by back-substitution. This is the same algorithm as row reduction, but optimized for numerical stability.',
+                'The line `inv(A) * b` produces the same numerical answer as `A \\ b`, but it is considered bad practice: computing the full inverse requires $O(n^3)$ additional work just to produce a matrix you immediately multiply by $\\mathbf{b}$. The backslash avoids that wasted work and also handles nearly-singular matrices more stably.',
+                'The verification `A * x` should print `[8; 9]` exactly — or within floating-point tolerance. If it does, $A\\mathbf{x} = \\mathbf{b}$ is confirmed.',
               ],
               code: `% System: 2x + y = 8,  x + 3y = 9
 A = [2 1; 1 3];
@@ -152,8 +153,9 @@ inv(A) * b`,
               id: 2,
               cellTitle: 'rref() — seeing Gauss-Jordan elimination',
               prose: [
-                '`rref(M)` applies Gauss-Jordan elimination to matrix M and returns the reduced row echelon form. Feed it the augmented matrix [A b] to see the full system reduction.',
-                'Reading the RREF: if the last column has a leading 1 in some row → inconsistent (no solution). If a column in A has no pivot → that variable is free → infinitely many solutions.',
+                '`rref([A b])` applies the complete Gauss-Jordan elimination algorithm to the augmented matrix $[A \\mid \\mathbf{b}]$ and returns the RREF. Each column of the result is either a **pivot column** (has a leading 1 with all other entries zero) or a **free column** (no leading 1). The last column of the augmented matrix tells you the right-hand side values after elimination.',
+                'For the **no-solution case** (`b2 = [3; 7]`): row 2 becomes `[0 0 | 1]`, which reads $0x + 0y = 1$, i.e., $0 = 1$ — a contradiction. A leading 1 appearing in the last column (the augmented part) is the definitive signature of inconsistency.',
+                'For the **infinite-solutions case** (`b3 = [3; 6]`): row 2 becomes `[0 0 | 0]`, which reads $0 = 0$ — a true but empty statement. This row gives no constraint, so the system has fewer constraints than unknowns: one free variable, infinitely many solutions.',
               ],
               code: `% Unique solution: full rank
 A1 = [2 1; 1 3];  b1 = [8; 9];
@@ -177,8 +179,9 @@ rref([A2 b3])
               id: 3,
               cellTitle: 'rank() and the three-case detector',
               prose: [
-                'A single check determines which case you are in. Compare rank(A) and rank([A b]):',
-                '- rank([A b]) > rank(A) → inconsistent (no solution)\n- rank(A) = number of unknowns → unique solution\n- rank(A) < number of unknowns AND equal to rank([A b]) → infinitely many solutions',
+                '`rank(A)` counts the number of pivot rows in $A$ — the number of independent constraints. Comparing it against `rank([A b])` (the augmented matrix) and against `n` (the number of unknowns) classifies the system completely.',
+                'The three-way decision: `rank([A b]) > rank(A)` means $\\mathbf{b}$ adds a new independent row that the coefficient columns cannot satisfy — contradiction, no solution. `rank(A) == n` means every unknown has its own pivot — unique solution. `rank(A) < n` with `rank([A b]) == rank(A)` means some columns have no pivot — free variables, infinitely many solutions.',
+                'The code uses `n = size(A, 2)` to get the column count (number of unknowns), since the number of unknowns determines how many pivots are needed for a unique solution. This check is universal: it works for any $m \\times n$ system, not just square ones.',
               ],
               code: `A_unique = [1 2; 3 1];
 b_unique = [5; 7];
@@ -188,7 +191,7 @@ r_A = rank(A_unique)
 r_Ab = rank([A_unique b_unique])
 
 if r_Ab > r_A
-    disp('NO SOLUTION — inconsistent')
+    disp('NO SOLUTION -- inconsistent')
 elseif r_A == n
     disp('UNIQUE SOLUTION')
     A_unique \\ b_unique
@@ -196,6 +199,38 @@ else
     disp('INFINITELY MANY SOLUTIONS')
     fprintf('Number of free variables: %d\\n', n - r_A)
 end`,
+            },
+            {
+              id: 4,
+              cellTitle: 'Application: Kirchhoff\'s circuit equations',
+              prose: [
+                'Each circuit equation becomes one row of the system $A\\mathbf{I} = \\mathbf{b}$, where $\\mathbf{I} = [I_1, I_2, I_3]^\\top$ is the unknown current vector. KCL (node equation) gives $I_1 - I_2 - I_3 = 0$: the current entering equals the sum of currents leaving. KVL (loop equations) give $R \\cdot I = V$ for each loop, where the sign of each term depends on whether the current flows with or against the loop direction.',
+                '`A \\ b` solves the system in one step. The `fprintf` lines convert the solution to readable output with physical units. `A * I` at the end confirms the full solution satisfies every row of the system simultaneously.',
+                'The two verification prints at the bottom test KCL ($I_1 - I_2 - I_3 = 0$) and KVL ($10I_1 + 5I_2 = 12$) directly, showing that the mathematical solution corresponds to the physical laws it encodes.',
+              ],
+              code: `% Three-branch circuit: solve for currents I1, I2, I3 (in amps)
+% Equations from KCL and KVL:
+%   Node 1 (KCL):      I1 - I2 - I3 = 0
+%   Loop 1 (KVL):   10*I1 + 5*I2    = 12   (12V source)
+%   Loop 2 (KVL):      5*I2 - 8*I3  = 0
+A = [1   -1  -1;
+     10   5   0;
+      0   5  -8];
+b = [0; 12; 0];
+
+I = A \\ b
+fprintf('I1 = %.4f A\\n', I(1));
+fprintf('I2 = %.4f A\\n', I(2));
+fprintf('I3 = %.4f A\\n', I(3));
+
+% Verify KCL: I1 = I2 + I3
+fprintf('\\nKCL check: I1 - I2 - I3 = %.6f (should be 0)\\n', I(1)-I(2)-I(3));
+
+% Verify KVL loop 1: 10*I1 + 5*I2 = 12
+fprintf('KVL check: 10*I1 + 5*I2 = %.4f (should be 12)\\n', 10*I(1)+5*I(2));
+
+disp('Full verification A*I:')
+A * I`,
             },
           ],
         },
@@ -211,8 +246,9 @@ end`,
               id: 1,
               cellTitle: 'Solve Ax = b — unique solution',
               prose: [
-                '`np.linalg.solve(A, b)` solves the system in one call. It uses LU factorization — faster and more stable than computing A⁻¹ directly.',
-                'Geometrically: each row of Ax = b defines a line. The solution is their intersection.',
+                '`np.linalg.solve(A, b)` solves the system $A\\mathbf{x} = \\mathbf{b}$ via LU factorization internally. It decomposes $A = PLU$ (with a permutation matrix $P$ for numerical stability), then forward-solves $L\\mathbf{y} = P\\mathbf{b}$ and back-solves $U\\mathbf{x} = \\mathbf{y}$. The result `x` is a NumPy array where `x[0]` is the first unknown and `x[1]` is the second.',
+                '`A @ x` computes the matrix-vector product to verify: if the solution is correct, `A @ x` equals `b` (or matches within floating-point tolerance). This is the standard verification step — never skip it in applied work.',
+                'The plot converts each equation into a line (`y_line1 = 8 - 2*t` rearranges $2x + y = 8$ to $y = 8 - 2x$) and plots both. The green dot at the intersection visually confirms the numerical solution is exactly where the two lines cross.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -247,31 +283,39 @@ plt.show()`,
               id: 2,
               cellTitle: 'Visualize the intersection of two lines',
               prose: [
-                'Each equation in the 2×2 system is a line. The solution is where they cross.',
-                'Line 1: 2x + y = 8 → y = 8 − 2x. Line 2: x + 3y = 9 → y = (9 − x)/3.',
+                'Rearranging each equation to $y = f(x)$ form lets you plot them as functions. $2x + y = 8$ becomes $y = 8 - 2x$ (slope $-2$, intercept $8$); $x + 3y = 9$ becomes $y = (9-x)/3$ (slope $-1/3$, intercept $3$). These two lines have different slopes, so they must cross at exactly one point.',
+                '`np.linalg.solve(A, b)` still finds the solution, and the scatter dot at `(x[0], x[1])` marks the intersection. If you change the coefficient matrix so the two lines become parallel (same slope), `solve` would raise a `LinAlgError` — use that as a signal to check the rank.',
               ],
               code: `import numpy as np
-from opencalc import Figure, BLUE, AMBER, GREEN
+import matplotlib.pyplot as plt
 
 A = np.array([[2.0, 1.0], [1.0, 3.0]])
 b = np.array([8.0, 9.0])
 x = np.linalg.solve(A, b)
 
-fig = Figure(xmin=-1, xmax=7, ymin=-1, ymax=7,
-             title="Intersection of Two Lines")
-fig.grid().axes()
-fig.plot(lambda t: 8 - 2*t,     color=BLUE,  label="2x+y=8")
-fig.plot(lambda t: (9-t)/3,     color=AMBER, label="x+3y=9")
-fig.point([float(x[0]), float(x[1])], color=GREEN,
-          label=f"({x[0]:.1f}, {x[1]:.1f})", radius=7)
-fig.show()`,
+t = np.linspace(-0.5, 5.5, 300)
+y1 = 8 - 2*t          # 2x + y = 8
+y2 = (9 - t) / 3      # x + 3y = 9
+
+fig, ax = plt.subplots(figsize=(6, 5))
+ax.set_title("Intersection of Two Lines", fontsize=13)
+ax.plot(t, y1, color='steelblue',  lw=2.5, label='2x + y = 8')
+ax.plot(t, y2, color='darkorange', lw=2.5, label='x + 3y = 9')
+ax.scatter([x[0]], [x[1]], color='green', s=120, zorder=5,
+           label=f'Solution ({x[0]:.1f}, {x[1]:.1f})')
+ax.axhline(0, color='k', lw=0.5); ax.axvline(0, color='k', lw=0.5)
+ax.set_xlim(-0.5, 5.5); ax.set_ylim(-0.5, 5.5)
+ax.grid(True, alpha=0.3); ax.legend(fontsize=10)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 3,
               cellTitle: 'No solution vs. infinitely many',
               prose: [
-                'The rank of A tells you the structure of the solution:',
-                '- rank(A) = n and system consistent → **unique solution**\n- rank([A|b]) > rank(A) → **no solution** (inconsistent)\n- rank(A) < n and consistent → **infinitely many solutions** (free variables)',
+                '`np.linalg.matrix_rank(M)` counts the number of linearly independent rows (equivalently, columns) in $M$ by performing a rank-revealing decomposition internally. Comparing the rank of $A$ to the rank of the augmented matrix $[A \\mid \\mathbf{b}]$ and to $n$ (the number of unknowns) determines which of the three cases applies.',
+                'For the **inconsistent case** (`b1 = [3, 7]`): `rank(A1) = 1` but `rank([A1|b1]) = 2`. The augmented matrix has more independent rows than $A$ alone — meaning $\\mathbf{b}$ is NOT in the column space of $A$. The system asks for something $A$ cannot produce.',
+                'For the **infinite-solutions case** (`b2 = [3, 6]`): both ranks equal 1, but `rank(A) = 1 < n = 2`. There is one independent constraint on two unknowns — one degree of freedom remains, giving infinitely many solutions parameterized by a free variable.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -401,7 +445,7 @@ b = np.array([9.0, 3.0, 1.0])
           expression: 'R_1 \\to R_1 + R_2 \\quad \\longrightarrow \\quad \\left[\\begin{array}{cc|c} 1 & 0 & 2 \\\\ 0 & 1 & 1 \\end{array}\\right]',
           annotation: 'Back-substitute by adding row 2 to row 1, zeroing out the $-1$ above the second pivot. The matrix is now in RREF — identity on the left, solution on the right. Read: $x = 2$, $y = 1$.',
           strategyTitle: 'Back-eliminate to RREF — read solution',
-          hints: ['Verify in the original equations: $2(2) + 1 = 5$ âœ“ and $2 - 1 = 1$ âœ“'],
+          hints: ['Verify in the original equations: $2(2) + 1 = 5$ ✓ and $2 - 1 = 1$ ✓'],
         },
       ],
       conclusion: 'The system has a unique solution at the point $(2, 1)$. Geometrically, the two lines $2x + y = 5$ and $x - y = 1$ intersect at exactly this point.',
@@ -461,7 +505,7 @@ b = np.array([9.0, 3.0, 1.0])
           expression: 'y = t \\in \\mathbb{R}, \\quad z = 2, \\quad x = 2 - 2t',
           annotation: 'Let the free variable $y = t$ (any real number). Pivot variable $z = 2$ from row 2. Pivot variable $x = 2 - 2t$ from row 1. The solution is a line parameterized by $t$.',
           strategyTitle: 'Assign parameter and write general solution',
-          hints: ['Verify at $t = 0$: $(x,y,z) = (2,0,2)$. Check: $2 + 0 + 2 = 4$ âœ“, $4 + 0 + 4 = 8$ âœ“, $6 + 0 + 8 = 14$ âœ“'],
+          hints: ['Verify at $t = 0$: $(x,y,z) = (2,0,2)$. Check: $2 + 0 + 2 = 4$ ✓, $4 + 0 + 4 = 8$ ✓, $6 + 0 + 8 = 14$ ✓'],
         },
       ],
       conclusion: 'The system has infinitely many solutions, parameterized as $(2-2t,\\, t,\\, 2)$ for $t \\in \\mathbb{R}$. The solution set is a line in 3D space. One of the three original equations was redundant — it carried no new constraint.',
@@ -583,7 +627,41 @@ b = np.array([9.0, 3.0, 1.0])
         text: 'How many solutions does the system $x + y = 3$, $2x + 2y = 6$ have?',
         options: ['Exactly one', 'No solution', 'Infinitely many', 'Exactly two'],
         answer: 'Infinitely many',
-        hint: 'The second equation is 2 times the first \u2014 it is redundant. Row-reduce to get a zero row, revealing a free variable.',
+        hints: ['The second equation is 2 times the first \u2014 it is redundant. Row-reduce to get a zero row, revealing a free variable.'],
+      },
+      {
+        id: 'la1-004-assess-2',
+        type: 'choice',
+        text: 'During row reduction you get the row $[0 \\ 0 \\ 0 \\ | \\ 4]$. What does this mean?',
+        options: [
+          'The system is inconsistent \u2014 no solution exists',
+          'There is a free variable, giving infinitely many solutions',
+          'The system has a unique solution',
+          'The row can be safely removed',
+        ],
+        answer: 'The system is inconsistent \u2014 no solution exists',
+        hints: ['The row reads $0 = 4$ \u2014 a contradiction. A pivot in the augmented column means the system has no solution.'],
+      },
+      {
+        id: 'la1-004-assess-3',
+        type: 'choice',
+        text: 'A $3 \\times 4$ system (3 equations, 4 unknowns) has $\\text{rank}(A) = 3$ and is consistent. How many free variables are there?',
+        options: ['0', '1', '2', '3'],
+        answer: '1',
+        hints: ['Free variables = total unknowns \u2212 number of pivots = $4 - 3 = 1$.'],
+      },
+      {
+        id: 'la1-004-assess-4',
+        type: 'choice',
+        text: 'Which of the following is a legal elementary row operation?',
+        options: [
+          '$R_2 \\to R_2 - 3R_1$ (subtract 3 times row 1 from row 2)',
+          '$R_1 \\to 0 \\cdot R_1$ (multiply row 1 by zero)',
+          '$R_2 \\to R_2 + R_1 - R_2$ (add and remove row 2)',
+          '$R_3 \\to R_1 + R_2$ (replace row 3 with a different combination)',
+        ],
+        answer: '$R_2 \\to R_2 - 3R_1$ (subtract 3 times row 1 from row 2)',
+        hints: ['Row replacement $R_i \\to R_i + c \\cdot R_j$ (with $c \\neq 0$) is valid. Multiplying by zero destroys information and is not allowed.'],
       },
     ],
   },

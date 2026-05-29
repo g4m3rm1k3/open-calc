@@ -65,15 +65,15 @@ export default {
       },
       {
         id: 'BasisVectorProof',
-        title: 'Standard Basis: Every Vector as a Linear Combination',
-        mathBridge: 'The standard basis for $\\mathbb{R}^2$ is $\\hat{\\mathbf{i}} = [1,0]^T$ and $\\hat{\\mathbf{j}} = [0,1]^T$. Any vector $[x,y]^T = x\\hat{\\mathbf{i}} + y\\hat{\\mathbf{j}}$. Your $x$-coordinate is "how many $\\hat{\\mathbf{i}}$ steps," your $y$-coordinate is "how many $\\hat{\\mathbf{j}}$ steps."',
-        caption: 'Coordinates ARE coefficients in a linear combination of the standard basis.',
+        title: 'Coordinates as Linear Combination Weights',
+        mathBridge: 'This visualizer decomposes any vector into its standard-basis components. When you point to $(3, -2)$, it shows $3 \\cdot \\hat{\\mathbf{i}} + (-2) \\cdot \\hat{\\mathbf{j}}$ — not just the numbers, but the full linear combination with labeled arrows. The $x$-coordinate IS the $\\hat{\\mathbf{i}}$ scalar weight; the $y$-coordinate IS the $\\hat{\\mathbf{j}}$ scalar weight. Drag any point and watch the two component arrows resize — this makes the abstract definition of a linear combination concrete.',
+        caption: 'Every coordinate pair = a linear combination of the standard basis vectors.',
       },
       {
         id: 'CartesianGridLab',
-        title: 'The Grid As a Span',
-        mathBridge: 'The entire Cartesian grid is just the span of $\\hat{\\mathbf{i}}$ and $\\hat{\\mathbf{j}}$. Every grid point $(m, n)$ is the linear combination $m\\hat{\\mathbf{i}} + n\\hat{\\mathbf{j}}$. Change the basis vectors and the entire grid changes with them.',
-        caption: 'The standard grid = span of standard basis vectors.',
+        title: 'Build Any Vector by Scaling and Adding Basis Vectors',
+        mathBridge: 'Use the sliders to pick $c_1$ and $c_2$. The lab draws $c_1 \\hat{\\mathbf{i}}$ (horizontal arrow) and $c_2 \\hat{\\mathbf{j}}$ (vertical arrow) separately, then places them tip-to-tail to show the resultant $c_1 \\hat{\\mathbf{i}} + c_2 \\hat{\\mathbf{j}}$. Try $c_1 = 4$, $c_2 = -3$: the result arrow lands exactly at $(4, -3)$ — confirming that the two scalar weights ARE the coordinates. Change $c_1$ and $c_2$ to any real numbers and observe that you can reach every point in the plane with just these two basis vectors.',
+        caption: 'Scaling and adding the two basis vectors can reach every point in the plane.',
       },
     ],
   },
@@ -110,9 +110,9 @@ export default {
     visualizations: [
       {
         id: 'LinearDependenceViz',
-        title: 'Trapped on a Line',
-        mathBridge: 'Observe two vectors pointing along the exact same line. Try to reach the red point hovering in 2D space. You cannot. Dependent vectors collapse the span into a lower dimension regardless of how many you add.',
-        caption: 'Linearly dependent vectors collapse the span into a lower dimension.',
+        title: 'Dependence: Trapped on a Line',
+        mathBridge: 'When two vectors are scalar multiples of each other — say $\\mathbf{v}_2 = -\\frac{1}{2}\\mathbf{v}_1$ — every linear combination $c_1\\mathbf{v}_1 + c_2\\mathbf{v}_2$ lies on the same line through the origin: you are "trapped." Drag the vectors in this visualizer so they become parallel: watch the reachable region collapse from the full plane to a single line. The independence test asks "can we make $\\mathbf{0}$ with scalars not all zero?" — setting $c_1 = 1$ and $c_2 = 2$ for the vectors $[4,6]^\\top$ and $[-2,-3]^\\top$ gives the zero vector with non-zero coefficients, proving they are dependent.',
+        caption: 'Dependent vectors: their span collapses from the full plane to a single line.',
       },
       {
         id: 'PythonNotebook',
@@ -125,8 +125,9 @@ export default {
               id: 1,
               cellTitle: 'Building linear combinations',
               prose: [
-                'A **linear combination** of vectors v₁, v₂ with scalars c₁, c₂ is: c₁·v₁ + c₂·v₂.',
-                'The set of ALL such combinations (for every possible c₁, c₂) is the **span**.',
+                '`c1 * v1 + c2 * v2` is exactly the linear combination formula: multiply each vector by its scalar weight, then add. NumPy applies the scalar multiplication to every component and the addition component-by-component — no loops needed.',
+                'The four `(c1, c2)` pairs in `combos` each produce a different result vector. The key observation: every result is a different point in the plane, reachable by tuning just two numbers. The complete set of ALL reachable points (for every possible real-number choice of c₁ and c₂) is the **span** — an infinite set, not just these four.',
+                'Run this cell and look at the four arrows. They all start at the origin and reach different destinations. Change any `(c1, c2)` pair to see new destinations. Two independent vectors can reach ANY point in the plane by choosing the right pair.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -170,8 +171,9 @@ plt.show()`,
               id: 2,
               cellTitle: 'Testing linear independence — rank',
               prose: [
-                'Stack vectors as rows of a matrix. `np.linalg.matrix_rank()` counts the independent directions.',
-                'rank == n means independent; rank < n means at least one is redundant.',
+                '`np.linalg.matrix_rank(M)` counts the number of **independent directions** in the rows of matrix $M$. Under the hood, NumPy row-reduces $M$ and counts the non-zero pivot rows — the same procedure you do by hand when testing independence.',
+                'Stacking vectors as rows gives you a matrix whose rank reports the verdict: `rank == n` (where $n$ is the number of vectors) means each row adds a genuinely new direction — independent, span is $n$-dimensional. `rank < n` means at least one row is a linear combination of the others — dependent, and the span has strictly lower dimension.',
+                'The right subplot draws the dashed line that IS the span of the dependent pair `[[2,1],[4,2]]`. Both arrows lie on that line. Any combination $c_1[2,1]^\\top + c_2[4,2]^\\top = (c_1 + 2c_2)[2,1]^\\top$ — the result is always a scalar multiple of $[2,1]^\\top$, confirming rank 1 means 1D span.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -222,7 +224,9 @@ plt.show()`,
               id: 3,
               cellTitle: 'Visualize: span of two vectors',
               prose: [
-                'Two independent vectors span the entire plane — you can reach any point by scaling and adding.',
+                '`c1 * v1 + c2 * v2` performs the linear combination directly: `v1` and `v2` are NumPy arrays, so `*` scales every component and `+` adds component-by-component — no loops needed. The result `combo` is another NumPy array representing the endpoint of the combined arrow.',
+                '`Figure` from opencalc draws vector arrows from the origin. The three arrows (blue $\\mathbf{v}_1$, amber $\\mathbf{v}_2$, green combination) make the tip-to-tail geometry explicit: walk $c_1$ steps along $\\mathbf{v}_1$, then $c_2$ steps along $\\mathbf{v}_2$, and the green arrow reaches exactly where you land.',
+                'Try changing `c1` and `c2` to any real numbers. Because $\\mathbf{v}_1 = [2,1]^\\top$ and $\\mathbf{v}_2 = [0,1.5]^\\top$ point in genuinely different directions (independent), every different pair $(c_1, c_2)$ lands at a different point. The complete set of all reachable points as $c_1, c_2$ range over all reals is the **span** — the entire plane.',
               ],
               code: `import numpy as np
 from opencalc import Figure, BLUE, AMBER, GREEN
@@ -239,6 +243,34 @@ fig.vector(v1.tolist(), color=BLUE, label="v1")
 fig.vector(v2.tolist(), color=AMBER, label="v2")
 fig.vector(combo.tolist(), color=GREEN, label=f"{c1}v1+{c2}v2")
 fig.show()`,
+            },
+            {
+              id: 4,
+              cellTitle: 'The column picture: matrix-vector product as linear combination',
+              prose: [
+                '`np.column_stack([v1, v2])` builds a matrix whose **columns** are $\\mathbf{v}_1$ and $\\mathbf{v}_2$. When you compute `A @ c`, NumPy takes each row of $A$ and dots it with $\\mathbf{c}$ — but the result is identical to $c_1\\mathbf{v}_1 + c_2\\mathbf{v}_2$. These two interpretations (row picture vs. column picture) of the same multiplication are a core duality in linear algebra.',
+                '`np.linalg.solve(A, b)` finds the unique vector $\\mathbf{c} = [c_1, c_2]^\\top$ satisfying $A\\mathbf{c} = \\mathbf{b}$. This is the same as finding the scalar weights to write $\\mathbf{b}$ as a linear combination of $\\mathbf{v}_1$ and $\\mathbf{v}_2$. "Is $\\mathbf{b}$ in the span of the columns?" and "does $A\\mathbf{c} = \\mathbf{b}$ have a solution?" are exactly the same question — `solve` answers both at once.',
+                'The final `np.allclose(A @ c_sol, b)` check is how you verify a solution numerically: `==` on floats is unreliable due to rounding, but `allclose` tolerates tiny floating-point errors and reports `True` if every component matches within a small tolerance.',
+              ],
+              code: `import numpy as np
+
+v1 = np.array([2.0, 1.0])
+v2 = np.array([1.0, 3.0])
+b  = np.array([7.0, 5.0])
+
+# Build matrix whose columns ARE the vectors
+A = np.column_stack([v1, v2])
+print("A (columns = v1, v2):\\n", A)
+
+# A @ c  means  c1*v1 + c2*v2  (column picture of matrix multiplication)
+c = np.array([2.0, 1.0])
+print("\\nA @ [2,1] =", A @ c)
+print("2*v1 + 1*v2 =", 2*v1 + 1*v2, "  (same result)")
+
+# Solve A @ c_sol = b  ->  find weights that express b as a combination of v1 and v2
+c_sol = np.linalg.solve(A, b)
+print("\\nWeights to reach b:", c_sol)
+print("Verify:", np.allclose(A @ c_sol, b))`,
             },
             {
               id: 'c1',
@@ -272,7 +304,9 @@ target = np.array([5.0, 5.0])
               id: 1,
               cellTitle: 'Computing linear combinations directly',
               prose: [
-                'A linear combination is just scalar multiplication and addition.',
+                'In MATLAB/Octave, `v1 = [2; 1]` creates a **column vector** — a 2×1 matrix where semicolons separate rows. The semicolon means "new row," so `[2; 1]` reads "row 1 = 2, row 2 = 1." This is different from Python\'s `np.array([2, 1])`, which is a 1D array with no explicit orientation.',
+                '`c1*v1 + c2*v2` computes the linear combination: MATLAB multiplies every element of `v1` by the scalar `c1`, every element of `v2` by `c2`, then adds element-by-element. The result is always a column vector of the same shape — a new vector in the same space.',
+                'The second block reassigns `c1 = -1; c2 = 3` and evaluates `c1*v1 + c2*v2` without assigning to a variable, so MATLAB displays the result automatically. Swapping the scalars while keeping `v1` and `v2` fixed is exactly what it means to vary the linear combination — same building blocks, different amounts.',
               ],
               code: `v1 = [2; 1];
 v2 = [0; 1];
@@ -285,8 +319,9 @@ c1*v1 + c2*v2`,
               id: 2,
               cellTitle: 'The column picture: A*c = linear combination of columns',
               prose: [
-                'Stack v1 and v2 as **columns** of a matrix A. Then A*[c1;c2] computes c1*v1 + c2*v2 automatically.',
-                '**Matrix-vector multiplication is a linear combination of columns, weighted by the vector entries.**',
+                '`A = [v1, v2]` stacks $\\mathbf{v}_1$ and $\\mathbf{v}_2$ as **columns** of a 2×2 matrix. In MATLAB, square brackets with commas concatenate horizontally, so column 1 of $A$ is $\\mathbf{v}_1$ and column 2 is $\\mathbf{v}_2$.',
+                '`A * c` (matrix-vector product) computes exactly $c_1\\mathbf{v}_1 + c_2\\mathbf{v}_2$ — the first column of $A$ scaled by `c(1)` plus the second column scaled by `c(2)`. This is the **column picture of matrix multiplication**: every product $A\\mathbf{c}$ is a linear combination of $A$\'s columns weighted by the entries of $\\mathbf{c}$.',
+                '`A \\ target` (backslash) solves $A\\mathbf{c} = \\mathbf{target}$ for $\\mathbf{c}$ using LU factorization internally. The result `c_solution` gives the unique scalar weights such that $c_1\\mathbf{v}_1 + c_2\\mathbf{v}_2 = \\mathbf{target}$. "Find the weights" and "solve a linear system" are the same problem.',
               ],
               code: `v1 = [2; 1];
 v2 = [0; 1];
@@ -303,7 +338,10 @@ A * c_solution`,
               id: 3,
               cellTitle: 'Checking linear independence with rank()',
               prose: [
-                '`rank(A)` tells you how many independent columns A has.',
+                '`rank(A)` counts the number of **pivot positions** after row-reducing $A$ — equivalently, the number of linearly independent columns in $A$. For a matrix whose rows are your test vectors, `rank == k` (where $k$ is the row count) means all rows are independent; `rank < k` means at least one row is a combination of the others.',
+                '`A_ind = [[2; 1], [0; 1]]` stacks $[2,1]^\\top$ and $[0,1]^\\top$ as columns. `rank(A_ind) = 2` because neither column is a multiple of the other — two independent directions means the span is all of $\\mathbb{R}^2$.',
+                '`A_dep = [[2; 1], [4; 2]]` — note $[4,2]^\\top = 2 \\cdot [2,1]^\\top$. `rank(A_dep) = 1`: both columns point the same direction, so there is only one independent direction. The span is a 1D line, not the plane.',
+                '`A_three` has three 2D column vectors. `rank = 2` because in $\\mathbb{R}^2$ you can never have more than 2 independent vectors — the third is always a combination of the first two, no matter what it is.',
               ],
               code: `A_ind = [[2; 1], [0; 1]]
 rank(A_ind)
@@ -318,7 +356,9 @@ rank(A_three)   % = 2, third is redundant`,
               id: 4,
               cellTitle: 'Application: CNC tool offsets as linear combinations',
               prose: [
-                'In CNC machining, a Work Coordinate System (WCS) offset shifts the origin. All positions are relative to the new origin — vector addition with coefficient 1.',
+                'A CNC **Work Coordinate System (WCS) offset** shifts the machine\'s reference origin. Every tool position $\\mathbf{P}_{\\text{part}}$ is measured relative to the part origin, but the controller needs machine coordinates. The conversion is $\\mathbf{P}_{\\text{machine}} = \\mathbf{G54\\_offset} + 1 \\cdot \\mathbf{P}_{\\text{part}}$ — a linear combination with both coefficients equal to 1.',
+                '`sqrt(dot(diff_vec, diff_vec))` computes the distance between $P_1$ and $P_2$: `diff_vec = P1_part - P2_part`, then `dot(diff_vec, diff_vec)` gives $\\|\\mathbf{diff}\\|^2 = \\Delta x^2 + \\Delta y^2 + \\Delta z^2$, and `sqrt(...)` gives the Euclidean distance. This is the same formula as $\\|\\mathbf{v}\\| = \\sqrt{\\mathbf{v} \\cdot \\mathbf{v}}$ from Lesson 1.',
+                'The distance between $P_1$ and $P_2$ is identical in part coordinates and machine coordinates because adding a constant offset to both points cancels: $(P_1 + \\text{offset}) - (P_2 + \\text{offset}) = P_1 - P_2$. Offsets translate the origin without scaling or rotating — they preserve all inter-point distances.',
               ],
               code: `G54_offset = [150; 80; 0];
 P1_part = [10; 5; -3];
@@ -363,9 +403,9 @@ sqrt(dot(diff_vec, diff_vec))   % distance unchanged by offset`,
     visualizations: [
       {
         id: 'LinearDependenceViz',
-        title: 'Why Three Vectors in $\\mathbb{R}^2$ Must Be Dependent',
-        mathBridge: 'Add a third vector. No matter what direction you choose, it lands inside the span of the first two (the entire plane). The third vector is automatically a linear combination of the first two.',
-        caption: 'Three 2D vectors are always dependent. The third is always redundant.',
+        title: 'Why Three 2D Vectors Must Be Dependent',
+        mathBridge: 'Load the visualizer with $\\mathbf{v}_1 = [1,0]^\\top$ and $\\mathbf{v}_2 = [0,1]^\\top$. Their span fills the entire plane — every point is reachable. Now place any third 2D vector $\\mathbf{v}_3$: wherever you put it, it is already in the span of $\\mathbf{v}_1$ and $\\mathbf{v}_2$, so $\\mathbf{v}_3 = c_1\\mathbf{v}_1 + c_2\\mathbf{v}_2$ for some pair $(c_1, c_2)$. Rearranging: $c_1\\mathbf{v}_1 + c_2\\mathbf{v}_2 - \\mathbf{v}_3 = \\mathbf{0}$ with coefficients not all zero — dependent by definition. No matter how you orient the third arrow, this dependence is unavoidable: dimension is a hard ceiling.',
+        caption: 'Add a third 2D vector: it is always a combination of the first two, without exception.',
       },
     ],
   },
@@ -444,7 +484,7 @@ sqrt(dot(diff_vec, diff_vec))   % distance unchanged by offset`,
           expression: 'c_2 = 7 - 2c_1 = 7 - \\tfrac{8}{3} = \\tfrac{13}{3}',
           annotation: 'Substitute $c_1 = 4/3$ into the first equation: $c_2 = 7 - 2(4/3) = 21/3 - 8/3 = 13/3$.',
           strategyTitle: 'Step 3: Back-substitute to find $c_2$',
-          hints: ['Verify: $\\frac{4}{3}[2,1]^T + \\frac{13}{3}[1,-1]^T = [8/3+13/3,\\; 4/3-13/3]^T = [21/3,\\; -9/3]^T = [7,-3]^T$ âœ“'],
+          hints: ['Verify: $\\frac{4}{3}[2,1]^T + \\frac{13}{3}[1,-1]^T = [8/3+13/3,\\; 4/3-13/3]^T = [21/3,\\; -9/3]^T = [7,-3]^T$ ✓'],
         },
       ],
       conclusion: '$\\mathbf{b} = \\frac{4}{3}\\mathbf{v}_1 + \\frac{13}{3}\\mathbf{v}_2$. The key insight: "is $\\mathbf{b}$ in the span?" and "does this linear system have a solution?" are exactly the same question.',
@@ -551,7 +591,46 @@ sqrt(dot(diff_vec, diff_vec))   % distance unchanged by offset`,
         text: 'Compute $2[1, 5]^T - [3, 2]^T$.',
         options: ['$[-1, 8]^T$', '$[5, 12]^T$', '$[-1, 3]^T$', '$[1, 8]^T$'],
         answer: '$[-1, 8]^T$',
-        hint: 'Scale first: $2[1,5]^T = [2,10]^T$. Then subtract component-by-component: $[2-3,\\; 10-2]^T = [-1, 8]^T$.',
+        hints: ['Scale first: $2[1,5]^T = [2,10]^T$. Then subtract component-by-component: $[2-3,\\; 10-2]^T = [-1, 8]^T$.'],
+      },
+      {
+        id: 'la1-002-assess-2',
+        type: 'choice',
+        text: 'Are $[2, 6]^T$ and $[1, 3]^T$ linearly independent?',
+        options: [
+          'No — $[2,6]^T = 2 \\cdot [1,3]^T$, so they are scalar multiples and therefore dependent',
+          'Yes — they have different entries, so they are independent',
+          'Yes — neither vector is the zero vector',
+          'Cannot determine without computing the rank',
+        ],
+        answer: 'No — $[2,6]^T = 2 \\cdot [1,3]^T$, so they are scalar multiples and therefore dependent',
+        hints: ['Check component ratios: $2/1 = 2$ and $6/3 = 2$. Equal ratios mean proportional — one is a scalar multiple of the other, so they are dependent.'],
+      },
+      {
+        id: 'la1-002-assess-3',
+        type: 'choice',
+        text: 'What is the span of $[1, 0]^T$ and $[0, 1]^T$?',
+        options: [
+          'The entire 2D plane $\\mathbb{R}^2$',
+          'Just the two vectors themselves',
+          'Only the positive quadrant',
+          'A single line through the origin',
+        ],
+        answer: 'The entire 2D plane $\\mathbb{R}^2$',
+        hints: ['Two independent vectors in $\\mathbb{R}^2$ span the full plane. Every point $(a, b)$ equals $a \\cdot [1,0]^T + b \\cdot [0,1]^T$ for any real $a, b$.'],
+      },
+      {
+        id: 'la1-002-assess-4',
+        type: 'choice',
+        text: 'A set $S$ already spans $\\mathbb{R}^2$. You add a new vector $\\mathbf{v} \\in \\mathbb{R}^2$ to $S$. What happens to $\\text{span}(S \\cup \\{\\mathbf{v}\\})$?',
+        options: [
+          'It stays $\\mathbb{R}^2$ — any vector already in the span cannot expand it further',
+          'It always grows larger because $S$ now contains more vectors',
+          'It depends on whether $\\mathbf{v}$ is a unit vector',
+          'The span shrinks because the new vector introduces a dependency',
+        ],
+        answer: 'It stays $\\mathbb{R}^2$ — any vector already in the span cannot expand it further',
+        hints: ['If $S$ spans $\\mathbb{R}^2$, then every 2D vector — including $\\mathbf{v}$ — is already expressible as a combination from $S$. Adding a dependent vector creates redundancy but never expands the span.'],
       },
     ],
   },

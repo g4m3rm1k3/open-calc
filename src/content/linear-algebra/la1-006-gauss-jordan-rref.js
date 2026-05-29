@@ -85,7 +85,10 @@ export default {
             {
               id: 1,
               cellTitle: 'Unique solution — 3×3',
-              prose: ['A square system with a unique solution. The RREF should look like [I|c].'],
+              prose: [
+                '`rref(A)` applies Gauss-Jordan elimination to the augmented matrix and returns the RREF directly. For a $3 \\times 3$ system with a unique solution, the result is $[I | \\mathbf{c}]$ — the $3 \\times 3$ identity on the left and the solution column on the right. You read the answer from the last column: row 1 gives $x_1$, row 2 gives $x_2$, row 3 gives $x_3$. No substitution step is needed.',
+                'A unique solution requires every variable to be a pivot variable, which means `rank(A(:,1:3)) == 3` — all three coefficient columns have a leading 1 with zeros elsewhere. Change one right-hand side entry (e.g., set the last entry of $\\mathbf{b}$ to a value that contradicts the others) and watch the RREF change from $[I|\\mathbf{c}]$ to a contradiction row.',
+              ],
               code: `% Unique solution: 3 equations, 3 unknowns
 A = [2 1 -1 8; -3 -1 2 -11; -2 1 2 -3];
 R = rref(A)
@@ -94,7 +97,10 @@ R = rref(A)
             {
               id: 2,
               cellTitle: 'Inconsistent system',
-              prose: ['Watch for a row [0 0 0 | k≠0] — this signals no solution.'],
+              prose: [
+                '`rref([1 2 3 4; 2 4 6 9; 0 0 0 1])` produces a row of the form `[0 0 0 1]` — which reads $0x_1 + 0x_2 + 0x_3 = 1$, i.e., $0 = 1$. This is the inconsistency signature: a **pivot in the augmented column** (the last column). No combination of $x_1, x_2, x_3$ can satisfy $0 = 1$, so the system has no solution.',
+                'Why does this happen algebraically? The first two equations have coefficient rows $[1\\ 2\\ 3]$ and $[2\\ 4\\ 6] = 2 \\times [1\\ 2\\ 3]$ — they are parallel planes. Equation 1 says $x_1 + 2x_2 + 3x_3 = 4$; equation 2 says the same combination equals $9/2 \\neq 4$. These planes never intersect. The third row `[0 0 0 1]` is the algebraic record of that impossibility — the elimination revealed the contradiction that was hidden in the original system.',
+              ],
               code: `% Inconsistent system
 A = [1 2 3 4; 2 4 6 9; 0 0 0 1];
 R = rref(A)
@@ -103,7 +109,10 @@ R = rref(A)
             {
               id: 3,
               cellTitle: 'Infinitely many solutions',
-              prose: ['Free variables appear when a column has no pivot. Express pivot variables in terms of the free parameter.'],
+              prose: [
+                '`rref([1 2 -1 3 9; 0 0 1 -2 5])` reduces to `[1 2 0 1 14; 0 0 1 -2 5]`. Columns 1 and 3 contain leading 1s with zeros elsewhere — they are **pivot columns** ($x_1$ and $x_3$ are determined). Columns 2 and 4 have no leading 1 anywhere — they are **free variable columns** ($x_2$ and $x_4$ are unconstrained). Free variables = unknowns - rank = 4 - 2 = 2.',
+                'To write the general solution: assign parameters $x_2 = s$ and $x_4 = t$. Row 2 (pivot in column 3) gives $x_3 - 2t = 5$, so $x_3 = 5 + 2t$. Row 1 (pivot in column 1) gives $x_1 + 2s + t = 14$, so $x_1 = 14 - 2s - t$. Every pair $(s, t) \\in \\mathbb{R}^2$ produces a valid solution — this is a 2-parameter family. Verify by substituting back: all four unknowns satisfy both original equations for any $s$ and $t$.',
+              ],
               code: `% Underdetermined: 2 equations, 4 unknowns
 A = [1 2 -1 3 9; 0 0 1 -2 5];
 R = rref(A)
@@ -113,8 +122,8 @@ R = rref(A)
               id: 4,
               cellTitle: 'Challenge: rank, nullity, and solution type',
               prose: [
-                'Use rref() and rank() to determine the solution type for the system below.',
-                'A = [1 2 0 3; 2 4 1 7; 3 6 1 10]. Compute rank(A(:,1:3)), rank(A), and the number of free variables. What is the solution type?',
+                '`rank(coeff)` counts pivot columns in the $3 \\times 3$ coefficient block — how many independent equations constrain the three unknowns. `rank(A)` does the same for the full augmented matrix including $\\mathbf{b}$. The three-way decision: if `r_aug > r_coeff`, appending $\\mathbf{b}$ added an independent row, meaning $\\mathbf{b}$ is outside the column space — **inconsistent**. If both equal `n_unknowns`, every variable is a pivot variable — **unique solution**. Otherwise — **infinitely many**, with `n_unknowns - r_coeff` free variables.',
+                'The `if/elseif/else` block is the same decision tree you draw on paper, now automated. For this specific system, try changing the last column to `[3; 7; 11]` (so $b_3 = b_1 + b_2$): the system becomes consistent with a free variable. Try `[3; 7; 12]` (so $b_3 \\neq b_1 + b_2$): it becomes inconsistent. The single number `r_aug - r_coeff` tells you which case you are in.',
               ],
               code: `% Challenge: classify the system
 A = [1 2 0 3; 2 4 1 7; 3 6 1 10];
@@ -175,8 +184,9 @@ end`,
               id: 1,
               cellTitle: 'SymPy RREF — exact computation, like working on paper',
               prose: [
-                '`sympy.Matrix.rref()` returns the RREF and the pivot column indices. SymPy uses exact arithmetic — you get fractions, not floating-point approximations.',
-                'Use SymPy when you want to see exactly what the RREF looks like on paper. Use NumPy when you need fast numerical computation.',
+                '`Matrix(A_aug.tolist())` converts the NumPy array to a SymPy Matrix, which uses exact rational arithmetic — no floating-point rounding. `A_aug.rref()` returns a tuple: the RREF matrix (with exact fractions) and a tuple of pivot column indices.',
+                'Reading the output: `rref_matrix[0, 3]` is row 0, column 3 (the last column of the 3×4 augmented RREF). If the RREF looks like $[I | \\mathbf{c}]$ with the identity on the left, the solution is the right-hand column directly: `x1 = rref_matrix[0,3]`, `x2 = rref_matrix[1,3]`, `x3 = rref_matrix[2,3]`.',
+                'The heatmap comparison shows the transformation from the original "messy" augmented matrix to the clean RREF. The identity structure on the left (blue 1s, white 0s) versus the mixed values on the right makes the "canonical form" property visual.',
               ],
               code: `from sympy import Matrix, Rational
 import numpy as np
@@ -193,13 +203,10 @@ rref_matrix, pivot_cols = A_aug.rref()
 
 print("Augmented matrix:")
 print(A_aug)
-print("
-RREF:")
+print("\\nRREF:")
 print(rref_matrix)
-print("
-Pivot columns:", pivot_cols)
-print("
-Solution: x1 =", rref_matrix[0,3],
+print("\\nPivot columns:", pivot_cols)
+print("\\nSolution: x1 =", rref_matrix[0,3],
       "  x2 =", rref_matrix[1,3],
       "  x3 =", rref_matrix[2,3])
 
@@ -229,8 +236,8 @@ plt.show()`,
               id: 2,
               cellTitle: 'Three outcome cases — classify and solve',
               prose: [
-                'One function to rule them all: feed it the augmented matrix, get back the case name and solution.',
-                'Understanding: compare rank(A) vs rank([A|b]) vs n. Those three numbers tell you everything.',
+                '`A.rank()` counts pivot columns in the RREF of $A$ alone — the number of independent equations. `Ab.rank()` does the same for the augmented matrix $[A|\\mathbf{b}]$. The three-way comparison `r_Ab > r_A` / `r_A == n` / `else` directly implements the consistency theorem: if appending $\\mathbf{b}$ raised the rank, $\\mathbf{b}$ is outside the column space of $A$ — the system is inconsistent. If ranks match and equal $n$, every column is a pivot column with no free variables — unique solution. If ranks match but are less than $n$, there are `n - r_A` free variables — infinitely many solutions.',
+                'The bar chart makes the theorem visual: for a unique solution, all three bars (rank($A$), rank($[A|b]$), unknowns $n$) reach the same height. For inconsistency, the orange rank($[A|b]$) bar stands taller than the blue rank($A$) bar — the extra rank came from appending $\\mathbf{b}$, meaning $\\mathbf{b}$ is not in the column space. For infinite solutions, both rank bars match but fall short of the green $n$ bar — that vertical gap between blue/orange and green is the number of free variables.',
               ],
               code: `from sympy import Matrix
 import numpy as np
@@ -264,20 +271,15 @@ print("=== Case 1: Unique solution ===")
 classify_system(np.array([[2,1,-1],[-3,-1,2],[-2,1,2]]),
                 np.array([[8],[-11],[-3]]))
 
-print("
-=== Case 2: Inconsistent ===")
+print("\\n=== Case 2: Inconsistent ===")
 classify_system(np.array([[1,2],[2,4]]), np.array([[3],[7]]))
 
-print("
-=== Case 3: Infinite solutions ===")
+print("\\n=== Case 3: Infinite solutions ===")
 classify_system(np.array([[1,2,-1],[0,0,1]]), np.array([[4],[2]]))
 
 # Summary bar chart: rank values for each case
 fig, ax = plt.subplots(figsize=(7, 4))
-cases = ['Case 1
-Unique', 'Case 2
-Inconsistent', 'Case 3
-Infinite']
+cases = ['Case 1\\nUnique', 'Case 2\\nInconsistent', 'Case 3\\nInfinite']
 rank_A   = [3, 1, 1]
 rank_Ab  = [3, 2, 1]
 unknowns = [3, 2, 3]
@@ -297,8 +299,8 @@ plt.show()`,
               id: 3,
               cellTitle: 'Manual RREF — seeing each row operation',
               prose: [
-                'This cell performs Gauss-Jordan elimination step-by-step, printing the matrix after each operation. You can see exactly what the algorithm does.',
-                'This is the best way to build intuition about WHY RREF works.',
+                '`manual_rref` implements the three Gauss-Jordan phases directly. For each column (left to right, skipping the augmented column), it searches for a nonzero entry at or below `pivot_row` using `abs(A[r, col]) > 1e-10` (a small tolerance instead of exact zero to handle floating-point). It then swaps that row up, scales the pivot row by dividing `A[pivot_row] /= A[pivot_row, col]` so the leading entry becomes exactly 1, and finally loops `for r in range(rows)` — ALL rows, not just those below — to zero out every other entry in that column. That all-rows loop is the Gauss-Jordan addition: ordinary Gaussian elimination only loops over rows below the pivot.',
+                'The printed output traces each of the three operations: "Swap R$i$ <-> R$j$" shows a row interchange, "Scale R$i$" shows the division step (pivot → 1), and "R$i$ <- R$i$ - factor * R$j$" shows the elimination step. Count the "Scale" lines — there is exactly one per pivot, so the count equals rank($A$). The before/after heatmap compresses the full operation sequence visually: after RREF, the left block (coefficient columns) shows the identity structure — one distinct "hot" cell per row on the diagonal, surrounded by white (zero) entries.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -322,22 +324,19 @@ def manual_rref(M):
         if nonzero != pivot_row:
             A[[pivot_row, nonzero]] = A[[nonzero, pivot_row]]
             print(f"Swap R{pivot_row+1} <-> R{nonzero+1}:")
-            print(A.round(4), "
-")
+            print(A.round(4), "\\n")
             states.append(A.copy())
 
         A[pivot_row] /= A[pivot_row, col]
         print(f"Scale R{pivot_row+1} (pivot = 1):")
-        print(A.round(4), "
-")
+        print(A.round(4), "\\n")
         states.append(A.copy())
 
         for r in range(rows):
             if r != pivot_row and abs(A[r, col]) > 1e-10:
                 A[r] -= A[r, col] * A[pivot_row]
                 print(f"R{r+1} <- R{r+1} - factor * R{pivot_row+1}:")
-                print(A.round(4), "
-")
+                print(A.round(4), "\\n")
                 states.append(A.copy())
 
         pivot_row += 1
@@ -347,8 +346,7 @@ M = np.array([[2, 1, -1, 8],
               [-3, -1, 2, -11],
               [-2, 1, 2, -3]])
 print("Starting matrix:")
-print(M, "
-")
+print(M, "\\n")
 result, states = manual_rref(M)
 print("Final RREF:", result.round(4))
 
@@ -644,7 +642,46 @@ A = np.array([
         text: 'A consistent system has 5 unknowns and rank(A) = 3. How many free variables are there?',
         options: ['2', '3', '5', '1'],
         answer: '2',
-        hint: 'Free variables = n \u2212 rank(A) = 5 \u2212 3 = 2.',
+        hints: ['Free variables = n \u2212 rank(A) = 5 \u2212 3 = 2.'],
+      },
+      {
+        id: 'la1-006-assess-2',
+        type: 'choice',
+        text: 'After row-reducing an augmented matrix you find the row $[0\\ 0\\ 0\\ |\\ 7]$. What does this tell you?',
+        options: [
+          'The system is inconsistent \u2014 no solution exists',
+          'The variable $x_3 = 7$',
+          'There is a free variable in the system',
+          'The system has infinitely many solutions',
+        ],
+        answer: 'The system is inconsistent \u2014 no solution exists',
+        hints: ['This row reads $0x_1 + 0x_2 + 0x_3 = 7$, i.e., $0 = 7$ \u2014 a contradiction. No values of $x$ can satisfy it. Compare with $[0\\ 0\\ 0\\ |\\ 0]$, which reads $0 = 0$ (harmless redundancy, not a contradiction).'],
+      },
+      {
+        id: 'la1-006-assess-3',
+        type: 'choice',
+        text: 'What is the key difference between Row Echelon Form (REF) and Reduced Row Echelon Form (RREF)?',
+        options: [
+          'RREF has zeros above AND below each pivot; REF only has zeros below',
+          'RREF uses only integer entries; REF allows fractions',
+          'REF is unique for every matrix; RREF is not',
+          'RREF only applies to square matrices',
+        ],
+        answer: 'RREF has zeros above AND below each pivot; REF only has zeros below',
+        hints: ['Forward elimination creates zeros below each pivot \u2014 stopping there gives REF, which still requires back-substitution to read answers. Gauss-Jordan continues with a back-elimination pass to zero entries above each pivot too, giving RREF where the solution can be read directly from the last column.'],
+      },
+      {
+        id: 'la1-006-assess-4',
+        type: 'choice',
+        text: 'A system has rank(A) = rank([A|b]) = 2 and 4 unknowns. How many solutions does it have?',
+        options: [
+          'Infinitely many \u2014 2 free variables',
+          'Exactly one',
+          'None',
+          'Exactly two',
+        ],
+        answer: 'Infinitely many \u2014 2 free variables',
+        hints: ['rank(A) = rank([A|b]) means the system is consistent (no contradiction row). rank(A) = 2 < n = 4, so free variables = 4 \u2212 2 = 2. A consistent system with any free variables always has infinitely many solutions \u2014 one solution per combination of parameter values.'],
       },
     ],
   },

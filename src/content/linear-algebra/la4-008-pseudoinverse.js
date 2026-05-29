@@ -32,7 +32,7 @@ export default {
       {
         type: 'insight',
         title: 'Prediction: pseudoinverse of a rank-1 matrix',
-        body: 'Let $A = \\begin{pmatrix}2\\\\1\\end{pmatrix}$ (2×1 column vector). **Before computing:** what should $A^+$ be? It must map $\\mathbb{R}^2 \\to \\mathbb{R}^1$ (a row vector). For $\\mathbf{b} = (2,1)^\\top$ (in $C(A)$), the exact solution is $x=1$. For $\\mathbf{b} = (1,0)^\\top$, the least-squares solution minimizes $(2x-1)^2+x^2$. After predicting: $A^+ = \\frac{A^\\top}{\\|A\\|^2} = \\frac{1}{5}(2,1)$. Check: $A^+A = (4+1)/5 = 1$ âœ“. $A^+(2,1)^\\top = (4+1)/5 = 1$ (exact solution âœ“).',
+        body: 'Let $A = \\begin{pmatrix}2\\\\1\\end{pmatrix}$ (2×1 column vector). **Before computing:** what should $A^+$ be? It must map $\\mathbb{R}^2 \\to \\mathbb{R}^1$ (a row vector). For $\\mathbf{b} = (2,1)^\\top$ (in $C(A)$), the exact solution is $x=1$. For $\\mathbf{b} = (1,0)^\\top$, the least-squares solution minimizes $(2x-1)^2+x^2$. After predicting: $A^+ = \\frac{A^\\top}{\\|A\\|^2} = \\frac{1}{5}(2,1)$. Check: $A^+A = (4+1)/5 = 1$ ✓. $A^+(2,1)^\\top = (4+1)/5 = 1$ (exact solution ✓).',
       },
       {
         type: 'theorem',
@@ -268,7 +268,7 @@ print(f"\\nAlternative solution ||q_other||: {np.linalg.norm(q_other):.4f} (larg
         { explanation: 'Right singular vectors ($V$): $v_1 = (1,1)^\\top/\\sqrt{2}$, $v_2 = (1,-1)^\\top/\\sqrt{2}$. Left singular vectors ($U$): $u_i = Av_i/\\sigma_i$. $u_1 = A(1,1)^\\top/(\\sqrt{2}\\cdot\\sqrt{3}) = (1,1,2)^\\top/\\sqrt{6}$, $u_2 = A(1,-1)^\\top/\\sqrt{2} = (1,-1,0)^\\top/\\sqrt{2}$. Third left vector: $u_3 \\perp u_1, u_2$ (left null space), e.g., $(-1,-1,1)^\\top/\\sqrt{3}$... but for $A^+$ we only need the first two.' },
         { explanation: '$\\Sigma^+ = \\begin{pmatrix}1/\\sqrt{3}&0&0\\\\0&1&0\\end{pmatrix}$. Then $A^+ = V\\Sigma^+U^\\top$. Since dimensions work out: $A^+ = \\frac{1}{\\sqrt{2}}\\begin{pmatrix}1&1\\\\1&-1\\end{pmatrix}\\begin{pmatrix}1/\\sqrt{3}&0&0\\\\0&1&0\\end{pmatrix}\\frac{1}{\\sqrt{6}}\\begin{pmatrix}1&1&2\\\\1&-1&0\\\\-1&-1&1\\end{pmatrix}^\\top$.' },
         { explanation: 'Shortcut: since $A$ has full column rank, $A^+ = (A^\\top A)^{-1}A^\\top$. $(A^\\top A)^{-1} = \\frac{1}{3}\\begin{pmatrix}2&-1\\\\-1&2\\end{pmatrix}$. Then $A^+ = \\frac{1}{3}\\begin{pmatrix}2&-1\\\\-1&2\\end{pmatrix}\\begin{pmatrix}1&0&1\\\\0&1&1\\end{pmatrix} = \\frac{1}{3}\\begin{pmatrix}2&-1&1\\\\-1&2&1\\end{pmatrix}$.' },
-        { explanation: 'Solution: $\\hat{x} = A^+(2,1,4)^\\top = \\frac{1}{3}(2\\cdot2-1\\cdot1+1\\cdot4, -1\\cdot2+2\\cdot1+1\\cdot4) = \\frac{1}{3}(7, 6) = (7/3, 2)^\\top$. Residual: $A\\hat{x}-(2,1,4)^\\top = (7/3, 2, 7/3+2)-(2,1,4) = (1/3, 1, 1/3)$. This is in the left null space (perpendicular to column space) âœ“.' },
+        { explanation: 'Solution: $\\hat{x} = A^+(2,1,4)^\\top = \\frac{1}{3}(2\\cdot2-1\\cdot1+1\\cdot4, -1\\cdot2+2\\cdot1+1\\cdot4) = \\frac{1}{3}(7, 6) = (7/3, 2)^\\top$. Residual: $A\\hat{x}-(2,1,4)^\\top = (7/3, 2, 7/3+2)-(2,1,4) = (1/3, 1, 1/3)$. This is in the left null space (perpendicular to column space) ✓.' },
       ],
     },
     {
@@ -279,8 +279,8 @@ print(f"\\nAlternative solution ||q_other||: {np.linalg.norm(q_other):.4f} (larg
         { explanation: 'Matrix: $A = (1, 2, 3)$ (1×3). Many solutions exist: any $(x_1,x_2,x_3)$ with $x_1+2x_2+3x_3=6$.' },
         { explanation: 'Pseudoinverse of a row vector: $A^+ = A^\\top/\\|A\\|^2 = (1,2,3)^\\top/(1+4+9) = (1,2,3)^\\top/14$.' },
         { explanation: 'Minimum-norm solution: $\\hat{x} = A^+ \\cdot 6 = 6(1,2,3)^\\top/14 = (3/7, 6/7, 9/7)^\\top$.' },
-        { explanation: 'Verify: $1\\cdot(3/7)+2\\cdot(6/7)+3\\cdot(9/7) = (3+12+27)/7 = 42/7 = 6$ âœ“.' },
-        { explanation: 'Minimum norm: $\\|\\hat{x}\\|^2 = (9+36+81)/49 = 126/49 = 18/7 \\approx 2.57$. Any other solution $\\hat{x}+n$ with $n$ in the null space has $\\|\\hat{x}+n\\|^2 = \\|\\hat{x}\\|^2+\\|n\\|^2 > \\|\\hat{x}\\|^2$ since $\\hat{x} \\perp N(A)$ âœ“.' },
+        { explanation: 'Verify: $1\\cdot(3/7)+2\\cdot(6/7)+3\\cdot(9/7) = (3+12+27)/7 = 42/7 = 6$ ✓.' },
+        { explanation: 'Minimum norm: $\\|\\hat{x}\\|^2 = (9+36+81)/49 = 126/49 = 18/7 \\approx 2.57$. Any other solution $\\hat{x}+n$ with $n$ in the null space has $\\|\\hat{x}+n\\|^2 = \\|\\hat{x}\\|^2+\\|n\\|^2 > \\|\\hat{x}\\|^2$ since $\\hat{x} \\perp N(A)$ ✓.' },
       ],
     },
     {
@@ -303,7 +303,7 @@ print(f"\\nAlternative solution ||q_other||: {np.linalg.norm(q_other):.4f} (larg
       difficulty: 'medium',
       prompt: 'For a rank-1 matrix $A = \\mathbf{u}\\mathbf{v}^\\top$ (outer product), derive a formula for $A^+$ in terms of $\\mathbf{u}$ and $\\mathbf{v}$.',
       hint: 'The SVD of $A = \\mathbf{u}\\mathbf{v}^\\top$ has one nonzero singular value $\\sigma = \\|\\mathbf{u}\\|\\|\\mathbf{v}\\|$.',
-      solution: 'Normalize: $\\hat{u} = \\mathbf{u}/\\|\\mathbf{u}\\|$, $\\hat{v} = \\mathbf{v}/\\|\\mathbf{v}\\|$, $\\sigma = \\|\\mathbf{u}\\|\\|\\mathbf{v}\\|$. SVD: $A = \\hat{u}\\cdot\\sigma\\cdot\\hat{v}^\\top$. Pseudoinverse: $A^+ = \\hat{v}\\cdot(1/\\sigma)\\cdot\\hat{u}^\\top = \\mathbf{v}\\mathbf{u}^\\top/(\\|\\mathbf{u}\\|^2\\|\\mathbf{v}\\|^2)$. Check: $AA^+A = \\mathbf{u}\\mathbf{v}^\\top \\cdot \\frac{\\mathbf{v}\\mathbf{u}^\\top}{\\|\\mathbf{u}\\|^2\\|\\mathbf{v}\\|^2}\\cdot\\mathbf{u}\\mathbf{v}^\\top = \\mathbf{u}\\mathbf{v}^\\top = A$ âœ“.',
+      solution: 'Normalize: $\\hat{u} = \\mathbf{u}/\\|\\mathbf{u}\\|$, $\\hat{v} = \\mathbf{v}/\\|\\mathbf{v}\\|$, $\\sigma = \\|\\mathbf{u}\\|\\|\\mathbf{v}\\|$. SVD: $A = \\hat{u}\\cdot\\sigma\\cdot\\hat{v}^\\top$. Pseudoinverse: $A^+ = \\hat{v}\\cdot(1/\\sigma)\\cdot\\hat{u}^\\top = \\mathbf{v}\\mathbf{u}^\\top/(\\|\\mathbf{u}\\|^2\\|\\mathbf{v}\\|^2)$. Check: $AA^+A = \\mathbf{u}\\mathbf{v}^\\top \\cdot \\frac{\\mathbf{v}\\mathbf{u}^\\top}{\\|\\mathbf{u}\\|^2\\|\\mathbf{v}\\|^2}\\cdot\\mathbf{u}\\mathbf{v}^\\top = \\mathbf{u}\\mathbf{v}^\\top = A$ ✓.',
     },
   ],
 
@@ -444,7 +444,7 @@ print(f"\\nAlternative solution ||q_other||: {np.linalg.norm(q_other):.4f} (larg
     {
       falseBelief: '$A^+\\mathbf{b}$ always gives an exact solution to $A\\mathbf{x}=\\mathbf{b}$.',
       whyStudentsThinkIt: 'The pseudoinverse "solves" the equation, so students assume it gives an exact solution. But for overdetermined inconsistent systems, there is no exact solution.',
-      correctionExample: 'For $A = \\begin{pmatrix}1\\\\2\\end{pmatrix}$, $\\mathbf{b} = (1,0)^\\top$: $A^+ = (1,2)/5$, $\\hat{x} = A^+\\mathbf{b} = 1/5$. Then $A\\hat{x} = (1/5, 2/5)^\\top \\neq (1,0)^\\top$. The residual is $(4/5, -2/5)^\\top$, which is nonzero but is perpendicular to $C(A) = \\text{span}\\{(1,2)^\\top\\}$ âœ“.',
+      correctionExample: 'For $A = \\begin{pmatrix}1\\\\2\\end{pmatrix}$, $\\mathbf{b} = (1,0)^\\top$: $A^+ = (1,2)/5$, $\\hat{x} = A^+\\mathbf{b} = 1/5$. Then $A\\hat{x} = (1/5, 2/5)^\\top \\neq (1,0)^\\top$. The residual is $(4/5, -2/5)^\\top$, which is nonzero but is perpendicular to $C(A) = \\text{span}\\{(1,2)^\\top\\}$ ✓.',
       contrastCase: '$A^+\\mathbf{b}$ gives an exact solution when $\\mathbf{b} \\in C(A)$. For inconsistent systems, it gives the nearest point in $C(A)$ — the least-squares solution, NOT an exact solution.',
     },
   ],

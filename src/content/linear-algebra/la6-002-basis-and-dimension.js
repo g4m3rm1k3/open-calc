@@ -144,7 +144,7 @@ null_basis = Vt[rank:].T   # right singular vectors for zero singular values
 print(f"A is {A.shape[0]}x{A.shape[1]}")
 print(f"rank(A) = {rank}")
 print(f"nullity(A) = {A.shape[1] - rank}")
-print(f"rank + nullity = {rank + A.shape[1] - rank} = {A.shape[1]} (columns) âœ“")
+print(f"rank + nullity = {rank + A.shape[1] - rank} = {A.shape[1]} (columns) ✓")
 print()
 print("Basis for null space:")
 print(null_basis.round(6))
@@ -270,7 +270,7 @@ print("Standard coordinates of v:", coords_std, "(same as v itself)")
         },
         {
           expression: '\\text{Basis: } \\{x^2,\\; x^3\\}, \\quad \\dim(W) = 2',
-          annotation: 'Each constraint eliminates one dimension: $P_3$ starts at dimension 4, two constraints reduce it by 2 (if independent), giving dimension 2. Verify: $x^2 \\in W$ ($x^2|_0 = 0$, $(x^2)\'|_0 = 0$) âœ“; same for $x^3$.',
+          annotation: 'Each constraint eliminates one dimension: $P_3$ starts at dimension 4, two constraints reduce it by 2 (if independent), giving dimension 2. Verify: $x^2 \\in W$ ($x^2|_0 = 0$, $(x^2)\'|_0 = 0$) ✓; same for $x^3$.',
           strategyTitle: 'State basis and dimension',
           checkpoint: 'Each independent linear constraint on an $n$-dimensional space reduces dimension by exactly 1. Two independent constraints on $P_3$ (dim 4) give a subspace of dim 2.',
         },
@@ -298,7 +298,7 @@ print("Standard coordinates of v:", coords_std, "(same as v itself)")
         },
         {
           expression: '\\begin{bmatrix}c_1\\\\c_2\\end{bmatrix} = B^{-1}\\mathbf{v} = \\frac{1}{-5}\\begin{bmatrix}1\\cdot7 - 3\\cdot5\\\\-2\\cdot7 + 1\\cdot5\\end{bmatrix} = \\frac{1}{-5}\\begin{bmatrix}-8\\\\-9\\end{bmatrix} = \\begin{bmatrix}8/5\\\\9/5\\end{bmatrix}',
-          annotation: 'The $\\mathcal{B}$-coordinates are $(8/5, 9/5)$. Verify: $(8/5)(1,2)^\\top + (9/5)(3,1)^\\top = (8/5+27/5,\\;16/5+9/5) = (35/5,25/5) = (7,5)^\\top$ âœ“.',
+          annotation: 'The $\\mathcal{B}$-coordinates are $(8/5, 9/5)$. Verify: $(8/5)(1,2)^\\top + (9/5)(3,1)^\\top = (8/5+27/5,\\;16/5+9/5) = (35/5,25/5) = (7,5)^\\top$ ✓.',
           strategyTitle: 'Compute coordinates',
           checkpoint: 'Coordinates depend on the basis. Same vector, different basis, different numbers — but they represent the same geometric object.',
         },
@@ -400,7 +400,7 @@ print("Standard coordinates of v:", coords_std, "(same as v itself)")
         '$\\{1-x, 1+x, x^2\\}$',
       ],
       answer: '$\\{1-x, 1+x, x^2\\}$',
-      hints: ['$\\{1,x,x^2,x^3\\}$ has 4 vectors in a 3-dimensional space — too many (linearly dependent). $\\{1+x, 2+2x, x^2\\}$ is dependent: $2+2x = 2(1+x)$. $\\{x, x^2\\}$ only has 2 vectors — cannot span the 3-dimensional $P_2$. $\\{1-x, 1+x, x^2\\}$: check independence — the only solution to $a(1-x)+b(1+x)+cx^2=0$ is $a=b=c=0$. âœ“'],
+      hints: ['$\\{1,x,x^2,x^3\\}$ has 4 vectors in a 3-dimensional space — too many (linearly dependent). $\\{1+x, 2+2x, x^2\\}$ is dependent: $2+2x = 2(1+x)$. $\\{x, x^2\\}$ only has 2 vectors — cannot span the 3-dimensional $P_2$. $\\{1-x, 1+x, x^2\\}$: check independence — the only solution to $a(1-x)+b(1+x)+cx^2=0$ is $a=b=c=0$. ✓'],
       reviewSection: 'intuition',
     },
     {

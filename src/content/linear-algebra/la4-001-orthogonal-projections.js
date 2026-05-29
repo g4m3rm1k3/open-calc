@@ -19,7 +19,7 @@ export default {
   // ── Intuition ──────────────────────────────────────────────────
   intuition: {
     prose: [
-      'Take $\\mathbf{b} = [3,4]^\\top$ and the $x$-axis spanned by $\\mathbf{a} = [1,0]^\\top$. The point on the $x$-axis closest to $\\mathbf{b}$: drop a perpendicular and land at $\\mathbf{p} = [3,0]^\\top$. Error: $\\mathbf{e} = \\mathbf{b} - \\mathbf{p} = [0,4]^\\top$. Check perpendicularity: $\\mathbf{a} \\cdot \\mathbf{e} = 1\\cdot 0 + 0\\cdot 4 = 0$ âœ“. The formula: $c = \\mathbf{a}^\\top\\mathbf{b}/\\mathbf{a}^\\top\\mathbf{a} = 3/1 = 3$, so $\\mathbf{p} = 3\\mathbf{a} = [3,0]^\\top$. That perpendicularity condition $\\mathbf{a}\\cdot(\\mathbf{b}-c\\mathbf{a}) = 0$ is what determines $c$ — and why orthogonal projection is the closest point.',
+      'Take $\\mathbf{b} = [3,4]^\\top$ and the $x$-axis spanned by $\\mathbf{a} = [1,0]^\\top$. The point on the $x$-axis closest to $\\mathbf{b}$: drop a perpendicular and land at $\\mathbf{p} = [3,0]^\\top$. Error: $\\mathbf{e} = \\mathbf{b} - \\mathbf{p} = [0,4]^\\top$. Check perpendicularity: $\\mathbf{a} \\cdot \\mathbf{e} = 1\\cdot 0 + 0\\cdot 4 = 0$ ✓. The formula: $c = \\mathbf{a}^\\top\\mathbf{b}/\\mathbf{a}^\\top\\mathbf{a} = 3/1 = 3$, so $\\mathbf{p} = 3\\mathbf{a} = [3,0]^\\top$. That perpendicularity condition $\\mathbf{a}\\cdot(\\mathbf{b}-c\\mathbf{a}) = 0$ is what determines $c$ — and why orthogonal projection is the closest point.',
       'Here is the core picture. Imagine a line drawn through the origin in 2D (or a plane in 3D). You have a target vector $\\mathbf{b}$ that does not lie on that line. The question is: what point ON the line is closest to $\\mathbf{b}$? The answer is the point you reach by dropping a perpendicular from $\\mathbf{b}$ straight down to the line. That foot of the perpendicular is the **orthogonal projection** of $\\mathbf{b}$.',
       'The word "orthogonal" means perpendicular. The projection is orthogonal because the error vector — the gap between $\\mathbf{b}$ and its projection — is perpendicular to the line (or subspace). This is not just aesthetically pleasing; it is the mathematical definition of "closest." Any other point on the line is farther from $\\mathbf{b}$ than the orthogonal projection, because the orthogonal path is the shortest path.',
       '**From a line to a subspace.** When the target line is spanned by a single unit vector $\\hat{u}$, the projection is $(\\mathbf{b} \\cdot \\hat{u})\\hat{u}$ — the dot product picks off how much of $\\mathbf{b}$ points in the $\\hat{u}$ direction, and then we scale $\\hat{u}$ by that amount. For a non-unit vector $\\mathbf{a}$, we need to divide by the length: $\\text{proj} = \\frac{\\mathbf{a}\\cdot\\mathbf{b}}{\\mathbf{a}\\cdot\\mathbf{a}}\\mathbf{a}$.',
@@ -103,7 +103,7 @@ export default {
               cellTitle: 'Scalar and vector projection onto a line',
               prose: [
                 '`dot(a,b)` computes the dot product. Scalar projection c = dot(a,b)/dot(a,a). Vector projection p = c*a.',
-                'The error e = b - p must satisfy dot(a,e) â‰ˆ 0 (perpendicularity).',
+                'The error e = b - p must satisfy dot(a,e) ≈ 0 (perpendicularity).',
               ],
               code: `a = [1; 1; 1];    % line direction
 b = [1; 2; 3];    % vector to project
@@ -278,7 +278,7 @@ b = np.array([1., 2., 3.])
 # verify P² = P, Pᵀ = P
 # verify A.T @ error â‰ˆ 0
 `,
-              hint: 'P = A @ np.linalg.inv(A.T @ A) @ A.T. Check np.allclose(P @ P, P) for idempotency. np.allclose(A.T @ (b - P @ b), 0) for perpendicularity.',
+              hint: 'P = A @ np.linalg.inv(A.T @ A) @ A.T. Check np.allclose(P @ P, P) for idempotency. np.allclose(A.T @ (b - P @ b), 0) checks perpendicularity of error to col(A).',
             },
           ]
         }
@@ -338,7 +338,7 @@ b = np.array([1., 2., 3.])
           hints: [],
         },
         {
-          expression: '\\mathbf{a} \\cdot \\mathbf{e} = (1)(-1) + (1)(0) + (1)(1) = 0 \\quad âœ“',
+          expression: '\\mathbf{a} \\cdot \\mathbf{e} = (1)(-1) + (1)(0) + (1)(1) = 0 \\quad ✓',
           annotation: 'Verify orthogonality: the error is perpendicular to the line. This must always be true for an orthogonal projection.',
           strategyTitle: 'Verify orthogonality',
           checkpoint: 'What would a non-zero dot product here mean?',
@@ -357,17 +357,17 @@ b = np.array([1., 2., 3.])
           annotation: '$\\mathbf{a}^T\\mathbf{a} = 1^2+2^2=5$. The outer product $\\mathbf{a}\\mathbf{a}^T$ is a $2\\times 2$ matrix (not a number!).',
           strategyTitle: 'Build projection matrix',
           checkpoint: 'Check: $P$ is symmetric ($P^T = P$). Verify.',
-          hints: ['The $(1,2)$ entry is $2/5$ and the $(2,1)$ entry is $2/5$. They match — $P$ is symmetric. âœ“'],
+          hints: ['The $(1,2)$ entry is $2/5$ and the $(2,1)$ entry is $2/5$. They match — $P$ is symmetric. ✓'],
         },
         {
           expression: 'P\\mathbf{b} = \\frac{1}{5}\\begin{bmatrix}1&2\\\\2&4\\end{bmatrix}\\begin{bmatrix}3\\\\1\\end{bmatrix} = \\frac{1}{5}\\begin{bmatrix}5\\\\10\\end{bmatrix} = \\begin{bmatrix}1\\\\2\\end{bmatrix}',
           annotation: 'Apply $P$ to $\\mathbf{b}$. The result is the projection.',
           strategyTitle: 'Project using P',
           checkpoint: 'Is $P\\mathbf{b}$ on the line spanned by $\\mathbf{a} = [1,2]^T$?',
-          hints: ['$P\\mathbf{b} = [1,2]^T = 1 \\cdot \\mathbf{a}$. Yes — it is exactly on the line. âœ“'],
+          hints: ['$P\\mathbf{b} = [1,2]^T = 1 \\cdot \\mathbf{a}$. Yes — it is exactly on the line. ✓'],
         },
         {
-          expression: 'P^2 = P \\cdot P = \\frac{1}{5}\\begin{bmatrix}1&2\\\\2&4\\end{bmatrix} \\cdot \\frac{1}{5}\\begin{bmatrix}1&2\\\\2&4\\end{bmatrix} = \\frac{1}{25}\\begin{bmatrix}5&10\\\\10&20\\end{bmatrix} = \\frac{1}{5}\\begin{bmatrix}1&2\\\\2&4\\end{bmatrix} = P \\quad âœ“',
+          expression: 'P^2 = P \\cdot P = \\frac{1}{5}\\begin{bmatrix}1&2\\\\2&4\\end{bmatrix} \\cdot \\frac{1}{5}\\begin{bmatrix}1&2\\\\2&4\\end{bmatrix} = \\frac{1}{25}\\begin{bmatrix}5&10\\\\10&20\\end{bmatrix} = \\frac{1}{5}\\begin{bmatrix}1&2\\\\2&4\\end{bmatrix} = P \\quad ✓',
           annotation: 'Verify idempotency: $P^2 = P$. Once projected onto the line, re-projecting changes nothing.',
           strategyTitle: 'Verify P² = P',
           checkpoint: '',
@@ -398,16 +398,16 @@ b = np.array([1., 2., 3.])
         {
           expression: '\\hat{\\mathbf{x}} = (A^TA)^{-1}A^T\\mathbf{b} = \\frac{1}{3}\\begin{bmatrix}2&-1\\\\-1&2\\end{bmatrix}\\begin{bmatrix}1\\\\1\\end{bmatrix} = \\frac{1}{3}\\begin{bmatrix}1\\\\1\\end{bmatrix}',
           annotation: 'The optimal coefficients: $\\mathbf{p} = \\frac{1}{3}\\mathbf{a}_1 + \\frac{1}{3}\\mathbf{a}_2$.',
-          strategyTitle: 'Solve for xÌ‚',
+          strategyTitle: 'Solve for x-hat',
           checkpoint: '',
           hints: [],
         },
         {
           expression: '\\mathbf{p} = A\\hat{\\mathbf{x}} = \\frac{1}{3}\\begin{bmatrix}1\\\\0\\\\1\\end{bmatrix} + \\frac{1}{3}\\begin{bmatrix}0\\\\1\\\\1\\end{bmatrix} = \\begin{bmatrix}1/3\\\\1/3\\\\2/3\\end{bmatrix}',
-          annotation: 'Verify: $A^T\\mathbf{e} = A^T(\\mathbf{b}-\\mathbf{p}) = A^T[{-1/3},{-1/3},{1/3}]^T = [0,0]^T$ âœ“.',
+          annotation: 'Verify: $A^T\\mathbf{e} = A^T(\\mathbf{b}-\\mathbf{p}) = A^T[{-1/3},{-1/3},{1/3}]^T = [0,0]^T$ ✓.',
           strategyTitle: 'Compute projection',
           checkpoint: 'Verify Aᵀe = 0',
-          hints: ['Row 1 of Aᵀ times e: 1·(-1/3) + 0·(-1/3) + 1·(1/3) = 0 âœ“. Row 2: 0·(-1/3) + 1·(-1/3) + 1·(1/3) = 0 âœ“.'],
+          hints: ['Row 1 of Aᵀ times e: 1·(-1/3) + 0·(-1/3) + 1·(1/3) = 0 ✓. Row 2: 0·(-1/3) + 1·(-1/3) + 1·(1/3) = 0 ✓.'],
         },
       ],
       conclusion: '$\\mathbf{p} = [1/3,\\, 1/3,\\, 2/3]^T$. The error $\\mathbf{e} = [-1/3,-1/3,1/3]^T$ is perpendicular to both columns of $A$. This generalizes the line projection to any dimension: the formula $P = A(A^TA)^{-1}A^T$ always works as long as the columns of $A$ are independent.',
@@ -448,11 +448,11 @@ b = np.array([1., 2., 3.])
           annotation: 'The error component — perpendicular to the line.',
         },
         {
-          expression: 'P\\mathbf{b} \\cdot (I-P)\\mathbf{b} = \\begin{bmatrix}1\\\\2\\end{bmatrix}\\cdot\\begin{bmatrix}2\\\\-1\\end{bmatrix} = 2 - 2 = 0 \\quad âœ“',
+          expression: 'P\\mathbf{b} \\cdot (I-P)\\mathbf{b} = \\begin{bmatrix}1\\\\2\\end{bmatrix}\\cdot\\begin{bmatrix}2\\\\-1\\end{bmatrix} = 2 - 2 = 0 \\quad ✓',
           annotation: 'The two components are perpendicular — the orthogonal decomposition is confirmed.',
         },
       ],
-      answer: '(I-P)b = [2,-1]ᵀ, dot product with Pb = 0 âœ“',
+      answer: '(I-P)b = [2,-1]ᵀ, dot product with Pb = 0 ✓',
     },
     {
       id: 'la4-001-ch3',
@@ -469,7 +469,7 @@ b = np.array([1., 2., 3.])
           annotation: 'Group the middle: $\\mathbf{a}^T\\mathbf{a} = 1$ (scalar). Associativity gives $P^2 = P$.',
         },
       ],
-      answer: 'P = aaᵀ (unit vector case); P² = a(aᵀa)aᵀ = a(1)aᵀ = aaᵀ = P âœ“',
+      answer: 'P = aaᵀ (unit vector case); P² = a(aᵀa)aᵀ = a(1)aᵀ = aaᵀ = P ✓',
     },
   ],
 
@@ -484,7 +484,7 @@ b = np.array([1., 2., 3.])
     ],
     rulesOfThumb: [
       'The error e = b - proj is always perpendicular to the subspace. Always check a·e = 0.',
-      'Unit vector projection: p = (b·Ã»)Ã» — dot product gives the scalar, then scale Ã».',
+      'Unit vector projection: p = (b·û)û where û is the unit vector — dot product gives the scalar, then scale û.',
       'Projection matrix: symmetric (Pᵀ = P) and idempotent (P² = P). Verify both.',
       '(I - P) projects onto the orthogonal complement — the part P misses.',
     ],
@@ -546,6 +546,38 @@ b = np.array([1., 2., 3.])
         hints: ['Orthogonal means perpendicular means dot product = 0. The defining condition is $\\mathbf{a} \\cdot (\\mathbf{b} - \\mathbf{p}) = 0$.'],
         reviewSection: 'Intuition tab — orthogonality condition',
       },
+      {
+        id: 'la4-001-assess-2',
+        type: 'choice',
+        text: 'For $\\mathbf{a} = \\begin{bmatrix}3\\\\4\\end{bmatrix}$ and $\\mathbf{b} = \\begin{bmatrix}2\\\\5\\end{bmatrix}$, the scalar projection $c = \\mathbf{a}\\cdot\\mathbf{b}/\\mathbf{a}\\cdot\\mathbf{a}$ equals:',
+        options: ['$26/25$', '$7/5$', '$2/5$', '$5$'],
+        answer: '$26/25$',
+        hints: ['$\\mathbf{a}\\cdot\\mathbf{b} = 3\\cdot 2 + 4\\cdot 5 = 6 + 20 = 26$. $\\mathbf{a}\\cdot\\mathbf{a} = 9+16 = 25$. So $c = 26/25$.'],
+        reviewSection: 'Math tab — Projection onto a Line',
+      },
+      {
+        id: 'la4-001-assess-3',
+        type: 'choice',
+        text: 'Which property is NOT guaranteed for a projection matrix $P = A(A^TA)^{-1}A^T$?',
+        options: ['$P$ is symmetric ($P^T = P$)', '$P$ is idempotent ($P^2 = P$)', '$P$ is invertible', '$P\\mathbf{b}$ lies in the column space of $A$'],
+        answer: '$P$ is invertible',
+        hints: ['$P$ projects onto a subspace, so all vectors in the orthogonal complement map to $\\mathbf{0}$ — a non-trivial null space. A matrix with a non-trivial null space is never invertible.'],
+        reviewSection: 'Math tab — Properties of Projection Matrices',
+      },
+      {
+        id: 'la4-001-assess-4',
+        type: 'choice',
+        text: 'In the CNC cross-track error calculation, the error magnitude is:',
+        options: [
+          'The dot product of the tool position with the path direction',
+          'The length of the projection of the tool position onto the path',
+          '$\\|\\mathbf{b} - \\text{proj}_{\\mathbf{a}}\\mathbf{b}\\|$ — the distance from the tool to its closest point on the path',
+          'The angle between the tool direction and path direction',
+        ],
+        answer: '$\\|\\mathbf{b} - \\text{proj}_{\\mathbf{a}}\\mathbf{b}\\|$ — the distance from the tool to its closest point on the path',
+        hints: ['The cross-track error is the perpendicular deviation: e = b − proj gives the direction off-path, and its length is the magnitude of the error. This is exactly the norm of the error vector.'],
+        reviewSection: 'Intuition tab — CNC cross-track error',
+      },
     ],
   },
 
@@ -594,7 +626,7 @@ b = np.array([1., 2., 3.])
       text: 'For $\\mathbf{b} = [3,4]^T$ and $\\mathbf{a} = [1,0]^T$, what is the error vector $\\mathbf{e} = \\mathbf{b} - \\mathbf{p}$?',
       options: ['$[3,0]^T$', '$[0,4]^T$', '$[3,4]^T$', '$[0,0]^T$'],
       answer: '$[0,4]^T$',
-      hints: ['Projection onto the $x$-axis: $\\mathbf{p} = [3,0]^T$. Error: $\\mathbf{e} = [3,4]^T - [3,0]^T = [0,4]^T$. It points straight up — perpendicular to the $x$-axis. âœ“'],
+      hints: ['Projection onto the $x$-axis: $\\mathbf{p} = [3,0]^T$. Error: $\\mathbf{e} = [3,4]^T - [3,0]^T = [0,4]^T$. It points straight up — perpendicular to the $x$-axis. ✓'],
       reviewSection: 'Examples tab — Error Vector',
     },
     {
@@ -654,7 +686,7 @@ b = np.array([1., 2., 3.])
         'The projection formula requires $A^T = A$',
       ],
       answer: 'The error $\\mathbf{b} - A\\hat{\\mathbf{x}}$ must be perpendicular to every column of $A$',
-      hints: ['Aᵀ(b - AxÌ‚) = 0 is the perpendicularity condition applied to all columns of A simultaneously. This is exactly the projection condition — AxÌ‚ is the closest point in col(A) to b.'],
+      hints: ['Aᵀ(b - Ax̂) = 0 is the perpendicularity condition applied to all columns of A simultaneously. This is exactly the projection condition — Ax̂ is the closest point in col(A) to b.'],
       reviewSection: 'Math — projection onto a subspace',
     },
     {

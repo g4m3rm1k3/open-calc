@@ -110,8 +110,8 @@ export default {
               id: 1,
               cellTitle: 'Matrix multiplication mechanics — dot product view',
               prose: [
-                'In MATLAB, `A * B` is matrix multiplication. Each entry (i,j) of the result is the dot product of row i of A with column j of B.',
-                'CRITICAL: `A .* B` is element-wise multiplication — completely different! Always use `*` for matrix products.',
+                '`A * B` in MATLAB is matrix multiplication — `*` triggers the row-dot-column formula. `dot(A(1,:), B(:,1))` computes entry $(1,1)$ explicitly: `A(1,:)` selects row 1 of A as a row vector, `B(:,1)` selects column 1 of B as a column vector, and `dot` sums their element-wise products.',
+                '`col1_of_AB = A * B(:,1)` applies A to the first column of B directly — this is the column interpretation of matrix multiplication: column $j$ of AB equals A applied to column $j$ of B. The `isequal` check confirms this matches the corresponding column of the full product `AB`. Note: `A .* B` would compute element-wise products (different operation entirely — never confuse these).',
               ],
               code: `A = [1 2; 3 4];
 B = [5 6; 7 8];
@@ -131,8 +131,8 @@ fprintf('Col 1 of AB via column view: [%g; %g]\\n', col1_of_AB(1), col1_of_AB(2)
               id: 2,
               cellTitle: 'Non-commutativity — order changes the result',
               prose: [
-                '"Rotate then shear" is a physically different transformation than "shear then rotate." Verify this: compute both products and apply to the same vector.',
-                'The two results will differ — different final positions for the same starting point.',
+                '`S * R` computes the composition with R acting first (rotation), then S (shear) — R is right of S, so R acts on v first. `R * S` reverses the order: shear first, then rotation. The variable names (`rotate_then_shear = S * R`) can feel backwards at first; remember that in $BA\\mathbf{v}$, matrix A (right side) acts on v first.',
+                '`isequal(rotate_then_shear, shear_then_rotate)` returns 0 (false) — the two matrices are genuinely different objects. `fprintf` with format `%d` prints the integer 0 directly. This is the non-commutativity proof: not just different outputs for one specific vector, but different transformation matrices with different columns.',
               ],
               code: `% Rotation 90° CCW
 R = [0 -1; 1 0];
@@ -158,8 +158,8 @@ fprintf('AB == BA? %d  (0 = NO = non-commutative)\\n', isequal(rotate_then_shear
               id: 3,
               cellTitle: 'Application: CNC post-processor — chaining transformation matrices',
               prose: [
-                'A 3-axis CNC program applies several coordinate transformations in sequence: work coordinate offset (G54), then coordinate rotation (G68), then cutting. The post-processor multiplies these matrices before outputting G-code — one product replaces three sequential operations.',
-                'This is exactly why machining companies invest in expensive post-processor software. Getting the matrix multiplication wrong produces crashes and scrapped parts.',
+                '`composite = M_mirror * R_G68` pre-multiplies right-to-left: `R_G68` (7° rotation) acts first on any tool position, then `M_mirror` (x-axis flip) acts on the result. `composite * path_in` applies this combined transformation to all three path points simultaneously — `path_in` is $2 \\times 3$, so MATLAB applies the $2 \\times 2$ composite to each column independently.',
+                '`norm(step2 - path_out) < 1e-10` verifies that applying the transformations sequentially (step 1: rotate, step 2: mirror) gives the same result as the single composite matrix. The `1e-10` threshold handles floating-point rounding errors. This is the fundamental property: one matrix product replaces an arbitrary chain of sequential transformations.',
               ],
               code: `% Simulate CNC post-processor matrix chain
 % Each step: a 2×2 matrix acting on [X; Y] tool positions
@@ -210,8 +210,8 @@ fprintf('\\nSame result via two steps? %d\\n', norm(step2 - path_out) < 1e-10)`,
               id: 1,
               cellTitle: 'Matrix multiplication — the mechanics',
               prose: [
-                '`A @ B` in NumPy computes the matrix product. Each entry (i,j) of the result is the dot product of row i of A with column j of B.',
-                'The result is a new matrix representing the composition of the two transformations.',
+                '`A @ B` is NumPy matrix multiplication. `r0 = A[0]` extracts row 0 of A as a 1D array; `B[:, 0]` extracts column 0 of B as a 1D array. `np.dot(r0, c0)` computes their dot product $\\sum_k r0_k \\cdot c0_k$ — this is the formula for entry $(0,0)$ of the product.',
+                'The heatmap shows A, B, and AB as color grids. Notice that AB entries (≈19–50) are much larger than A or B entries (1–8) — each entry accumulates products of multiple elements. `vmin=-60, vmax=60` normalizes all three plots to the same color scale so the magnitudes are visually comparable.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -246,8 +246,8 @@ plt.show()`,
               id: 2,
               cellTitle: 'Not commutative — order matters geometrically',
               prose: [
-                'AB ≠ BA in general. "Rotate then shear" is a different transformation than "shear then rotate".',
-                'The order in which you compose transformations changes the final result.',
+                '`shear @ rotate` computes S after R (shear second, rotate first) — R is on the right so it acts first. `rotate @ shear` reverses the order. `np.allclose(rotate_then_shear, shear_then_rotate)` returns `False` — the matrices are genuinely different.',
+                '`transform_square(T)` builds a $2 \\times 5$ array of the unit square corners and applies `T @ pts` — multiplying the $2 \\times 2$ transform by the $2 \\times 5$ corner matrix, transforming all five points simultaneously. The filled polygon plot shows the unit square (blue) warped into different parallelograms (red) for each composition order — the same square ends up in visibly different positions, making non-commutativity geometric.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -290,8 +290,8 @@ plt.show()`,
               id: 3,
               cellTitle: 'Composition: applying B then A',
               prose: [
-                '(A @ B) @ v = A @ (B @ v). Applying the product matrix to v gives the same result as applying B first, then A.',
-                'This is the associativity property — you can group however you like, but you cannot change the order.',
+                '`step1 = B @ v` applies B (rotation) to v first. `step2 = A @ step1` applies A (scale) to the rotated vector — two sequential matrix-vector products. `result = AB @ v` applies the pre-composed product in one step. `np.allclose(step2, result)` confirms both paths agree to floating-point precision: $(AB)\\mathbf{v} = A(B\\mathbf{v})$ is the associativity property.',
+                'The efficiency argument: `AB = A @ B` is computed once (a matrix-matrix product). Then each vertex only needs `AB @ v` — one product instead of two. For a scene with millions of vertices rendered at 60 fps, pre-multiplying the transformation chain is what makes real-time rendering computationally feasible.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -579,7 +579,41 @@ v = np.array([1.0, 0.0])
         text: 'You apply transformation $A$ first, then $B$, then $C$ to a vector $\\mathbf{v}$. Which expression is correct?',
         options: ['$CBA\\mathbf{v}$', '$ABC\\mathbf{v}$', '$BAC\\mathbf{v}$', '$ACB\\mathbf{v}$'],
         answer: '$CBA\\mathbf{v}$',
-        hint: 'The matrix closest to $\\mathbf{v}$ acts first. $A$ acts first, so $A$ is closest: $\\ldots A\\mathbf{v}$. Then $B$ acts on the result: $\\ldots BA\\mathbf{v}$. Then $C$: $CBA\\mathbf{v}$.',
+        hints: ['The matrix closest to $\\mathbf{v}$ acts first. $A$ acts first → $A$ is rightmost: $\\ldots A\\mathbf{v}$. Then $B$: $\\ldots BA\\mathbf{v}$. Then $C$: $CBA\\mathbf{v}$. Read right-to-left, just like nested function calls $C(B(A(\\mathbf{v})))$.'],
+      },
+      {
+        id: 'la2-002-assess-2',
+        type: 'choice',
+        text: 'Compute the $(1,1)$ entry (top-left) of $\\begin{bmatrix}2&3\\\\1&4\\end{bmatrix}\\begin{bmatrix}1&0\\\\2&1\\end{bmatrix}$.',
+        options: ['$8$', '$5$', '$2$', '$4$'],
+        answer: '$8$',
+        hints: ['Entry $(1,1)$ = row 1 of the left matrix dotted with column 1 of the right matrix: $[2,3] \\cdot [1,2]^T = 2 \\cdot 1 + 3 \\cdot 2 = 2 + 6 = 8$.'],
+      },
+      {
+        id: 'la2-002-assess-3',
+        type: 'choice',
+        text: 'Let $A = \\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$ (90° CCW rotation) and $B = \\begin{bmatrix}1&1\\\\0&1\\end{bmatrix}$ (shear). Is $AB = BA$?',
+        options: [
+          'No — matrix multiplication is generally non-commutative; these produce different transformations',
+          'Yes — rotation and shear always commute',
+          'Yes — for 2×2 matrices, $AB$ always equals $BA$',
+          'Only if $\\det(A) = \\det(B)$',
+        ],
+        answer: 'No — matrix multiplication is generally non-commutative; these produce different transformations',
+        hints: ['Compute $AB$: apply B first (shear), then A (rotation). Compute $BA$: apply A first (rotation), then B (shear). Try applying each to $[1,0]^T$ — the results are different vectors, proving $AB \\neq BA$.'],
+      },
+      {
+        id: 'la2-002-assess-4',
+        type: 'choice',
+        text: 'Can you multiply a $2 \\times 3$ matrix by a $3 \\times 4$ matrix? If yes, what are the dimensions of the result?',
+        options: [
+          'Yes — the result is $2 \\times 4$',
+          'No — the matrices must be square to multiply',
+          'Yes — the result is $3 \\times 3$',
+          'No — the first matrix has more columns than rows',
+        ],
+        answer: 'Yes — the result is $2 \\times 4$',
+        hints: ['Dimension rule: $(m \\times k)(k \\times n) = (m \\times n)$. Here $(2 \\times 3)(3 \\times 4)$: inner dimensions are both 3 (they match), outer dimensions are 2 and 4, giving a $2 \\times 4$ result.'],
       },
     ],
   },

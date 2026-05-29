@@ -15,7 +15,7 @@ export default {
 
   intuition: {
     prose: [
-      'Consider the polynomial $p = 3 + 5x \\in P_1$ and the vector $(3, 5) \\in \\mathbb{R}^2$. Define $T: P_1 \\to \\mathbb{R}^2$ by $T(a + bx) = (a, b)$. Is this a bijective linear map? Linearity: $T((a+bx)+(c+dx)) = T((a+c)+(b+d)x) = (a+c, b+d) = (a,b)+(c,d) = T(a+bx)+T(c+dx)$ âœ“. Injective: $T(a+bx) = (0,0)$ forces $a=0, b=0$, so only the zero polynomial maps to zero âœ“. Surjective: any $(a,b) \\in \\mathbb{R}^2$ is hit by $a+bx$ âœ“. Inverse: $T^{-1}(a,b) = a+bx$. So $P_1 \\cong \\mathbb{R}^2$ — same structure, different notation.',
+      'Consider the polynomial $p = 3 + 5x \\in P_1$ and the vector $(3, 5) \\in \\mathbb{R}^2$. Define $T: P_1 \\to \\mathbb{R}^2$ by $T(a + bx) = (a, b)$. Is this a bijective linear map? Linearity: $T((a+bx)+(c+dx)) = T((a+c)+(b+d)x) = (a+c, b+d) = (a,b)+(c,d) = T(a+bx)+T(c+dx)$ ✓. Injective: $T(a+bx) = (0,0)$ forces $a=0, b=0$, so only the zero polynomial maps to zero ✓. Surjective: any $(a,b) \\in \\mathbb{R}^2$ is hit by $a+bx$ ✓. Inverse: $T^{-1}(a,b) = a+bx$. So $P_1 \\cong \\mathbb{R}^2$ — same structure, different notation.',
       '**The grand theorem.** For finite-dimensional vector spaces over the same field: $V \\cong W$ if and only if $\\dim V = \\dim W$. Dimension is the ONLY invariant — if two spaces have the same dimension, they are isomorphic. Every $n$-dimensional vector space over $\\mathbb{R}$ is isomorphic to $\\mathbb{R}^n$.',
       '**How to construct an isomorphism.** Given $V$ with basis $(\\mathbf{b}_1, \\ldots, \\mathbf{b}_n)$: define $T: V \\to \\mathbb{R}^n$ by $T(c_1\\mathbf{b}_1 + \\cdots + c_n\\mathbf{b}_n) = (c_1, \\ldots, c_n)^\\top$. This "coordinate map" is always an isomorphism. It is well-defined (because the basis representation is unique), linear (by direct verification), injective (only $\\mathbf{0}$ maps to $\\mathbf{0}$), and surjective (every coordinate vector is achieved).',
       '**Natural vs basis-dependent.** The coordinate isomorphism $V \\cong \\mathbb{R}^n$ requires a choice of basis. Change the basis, change the isomorphism. A **natural isomorphism** would work the same way regardless of basis. For example, $V \\cong V^{**}$ (double dual) is natural — no basis needed.',
@@ -180,7 +180,7 @@ print()
 v = np.array([2., -1., 3.])
 T_v = T_matrix @ v
 print(f"T({v}) = {T_v}  -> matrix [[{T_v[0]},{T_v[1]}],[{T_v[2]},{T_v[3]}]]")
-print("This is: 2*B1 + (-1)*B2 + 3*B3 = [[2,-1],[-1,3]] âœ“")`,
+print("This is: 2*B1 + (-1)*B2 + 3*B3 = [[2,-1],[-1,3]] ✓")`,
             },
           ],
         },
@@ -353,7 +353,7 @@ print("This is: 2*B1 + (-1)*B2 + 3*B3 = [[2,-1],[-1,3]] âœ“")`,
         id: 'assess-la6-005-1',
         type: 'proof',
         text: 'Prove that any bijective linear map $T: V \\to W$ has a linear inverse. That is, if $T$ is an isomorphism, then $T^{-1}: W \\to V$ is also linear.',
-        answer: 'Let $T^{-1}: W \\to V$ be the set-theoretic inverse. For any $\\mathbf{w}_1, \\mathbf{w}_2 \\in W$ and scalar $c$: Let $\\mathbf{v}_i = T^{-1}(\\mathbf{w}_i)$, so $T(\\mathbf{v}_i) = \\mathbf{w}_i$. Then $T(c\\mathbf{v}_1 + \\mathbf{v}_2) = cT(\\mathbf{v}_1) + T(\\mathbf{v}_2) = c\\mathbf{w}_1 + \\mathbf{w}_2$ (by linearity of $T$). Applying $T^{-1}$: $c\\mathbf{v}_1 + \\mathbf{v}_2 = T^{-1}(c\\mathbf{w}_1 + \\mathbf{w}_2) = cT^{-1}(\\mathbf{w}_1) + T^{-1}(\\mathbf{w}_2)$. âœ“',
+        answer: 'Let $T^{-1}: W \\to V$ be the set-theoretic inverse. For any $\\mathbf{w}_1, \\mathbf{w}_2 \\in W$ and scalar $c$: Let $\\mathbf{v}_i = T^{-1}(\\mathbf{w}_i)$, so $T(\\mathbf{v}_i) = \\mathbf{w}_i$. Then $T(c\\mathbf{v}_1 + \\mathbf{v}_2) = cT(\\mathbf{v}_1) + T(\\mathbf{v}_2) = c\\mathbf{w}_1 + \\mathbf{w}_2$ (by linearity of $T$). Applying $T^{-1}$: $c\\mathbf{v}_1 + \\mathbf{v}_2 = T^{-1}(c\\mathbf{w}_1 + \\mathbf{w}_2) = cT^{-1}(\\mathbf{w}_1) + T^{-1}(\\mathbf{w}_2)$. ✓',
         hint: 'Let $\\mathbf{v}_i = T^{-1}(\\mathbf{w}_i)$ and use linearity of $T$ to show $T(c\\mathbf{v}_1 + \\mathbf{v}_2) = c\\mathbf{w}_1 + \\mathbf{w}_2$, then apply $T^{-1}$.',
       },
     ],

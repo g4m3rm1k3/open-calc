@@ -176,7 +176,8 @@ disp(['Max difference between methods: ', num2str(max(max(abs(A_inv_adj - inv(A)
               id: 3,
               cellTitle: 'Expansion along a row with zeros — strategic choice',
               prose: [
-                'Expanding along a row with zeros skips entire minor computations. Here det is computed two ways: naive row 1 expansion, and strategic expansion along the sparsest row.',
+                'Expanding along a row with zeros skips entire minor computations — each zero entry contributes nothing to the sum. Here `det` is computed two ways: naive row 1 expansion (all three minors), and strategic expansion along the sparsest row (only non-zero entries need minors). Both give the same determinant but the second uses fewer multiplications.',
+                '`A([2 3], [1 3])` is MATLAB submatrix indexing: select rows 2 and 3, columns 1 and 3, to get the $2\\times 2$ minor for position $(1,2)$. The sign $(-1)^{1+2} = -1$ flips that minor\'s contribution.',
               ],
               code: `B = [0 0 3; 1 2 4; 5 6 7];
 disp('Matrix B:'); disp(B)
@@ -359,6 +360,64 @@ print(f"det(A) = {d:.4f}, det(A)*I diagonal = {d:.4f}")`,
     { id: 'cp-la2-012-7', label: 'Run: OpenMAT cell 1 — compute all 9 cofactors of a 3×3 matrix and verify the adjugate identity', type: 'lab' },
     { id: 'cp-la2-012-8', label: 'Attempt: Compute the adjugate and inverse of $\\begin{bmatrix}1&2&0\\\\3&1&1\\\\0&1&2\\end{bmatrix}$ by hand', type: 'challenge' },
   ],
+
+  // ── Assessment ──────────────────────────────────────────────────
+  assessment: {
+    questions: [
+      {
+        id: 'la2-012-assess-1',
+        type: 'choice',
+        text: 'What is the sign of the cofactor $C_{23}$?',
+        options: [
+          '$(-1)^{2+3} = -1$ — the cofactor is $-M_{23}$',
+          '$(-1)^{2+3} = +1$',
+          'The sign is always positive for row 2',
+          'Sign depends on the matrix entries',
+        ],
+        answer: '$(-1)^{2+3} = -1$ — the cofactor is $-M_{23}$',
+        hints: ['$C_{ij} = (-1)^{i+j} M_{ij}$. At $(2,3)$: exponent $= 2+3 = 5$ (odd), so $(-1)^5 = -1$.'],
+      },
+      {
+        id: 'la2-012-assess-2',
+        type: 'choice',
+        text: 'For a $2\\times 2$ matrix $A = \\begin{bmatrix}a&b\\\\c&d\\end{bmatrix}$, what is $\\text{adj}(A)$?',
+        options: [
+          '$\\begin{bmatrix}d&-b\\\\-c&a\\end{bmatrix}$ — swap diagonal, negate off-diagonal',
+          '$\\begin{bmatrix}a&-b\\\\-c&d\\end{bmatrix}$',
+          '$\\begin{bmatrix}d&c\\\\b&a\\end{bmatrix}$',
+          '$\\begin{bmatrix}-d&b\\\\c&-a\\end{bmatrix}$',
+        ],
+        answer: '$\\begin{bmatrix}d&-b\\\\-c&a\\end{bmatrix}$ — swap diagonal, negate off-diagonal',
+        hints: ['Cofactors: $C_{11} = d$, $C_{12} = -c$, $C_{21} = -b$, $C_{22} = a$. Adjugate = transpose of cofactor matrix: $\\text{adj}(A)_{ij} = C_{ji}$.'],
+      },
+      {
+        id: 'la2-012-assess-3',
+        type: 'choice',
+        text: 'If $A \\cdot \\text{adj}(A) = kI$, what is $k$?',
+        options: [
+          '$k = \\det(A)$',
+          '$k = \\text{tr}(A)$',
+          '$k = 1$ always',
+          '$k = \\text{rank}(A)$',
+        ],
+        answer: '$k = \\det(A)$',
+        hints: ['The adjugate identity: $A \\cdot \\text{adj}(A) = \\det(A) \\cdot I$. This follows from cofactor expansion along each row simultaneously.'],
+      },
+      {
+        id: 'la2-012-assess-4',
+        type: 'choice',
+        text: 'You are computing $\\det(A)$ for a $3\\times 3$ matrix with Row 2 = $[0, 5, 0]$. Which is the most efficient expansion?',
+        options: [
+          'Expand along row 2 — only one non-zero entry, so only one minor needs computing',
+          'Expand along row 1 — always the default',
+          'Expand along column 1 — easier indexing',
+          'Use Sarrus\'s rule — always fastest for $3\\times 3$',
+        ],
+        answer: 'Expand along row 2 — only one non-zero entry, so only one minor needs computing',
+        hints: ['Row 2 has two zeros: $a_{21} = 0$, $a_{23} = 0$. Only the $a_{22} = 5$ term contributes: $\\det = 5 \\cdot C_{22}$. One $2\\times 2$ minor instead of three.'],
+      },
+    ],
+  },
 
   // ── Quiz ───────────────────────────────────────────────────────
   quiz: [

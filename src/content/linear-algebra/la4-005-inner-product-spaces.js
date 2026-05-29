@@ -351,7 +351,7 @@ for freq in [120, 300, 500, 650, 800]:
         },
         {
           expression: '= \\frac{1}{2}\\left[-\\frac{\\cos(2x)}{2}\\right]_{-\\pi}^{\\pi} = \\frac{1}{2}\\left(-\\frac{\\cos(2\\pi)}{2} + \\frac{\\cos(-2\\pi)}{2}\\right) = 0',
-          annotation: '$\\cos(2\\pi) = \\cos(-2\\pi) = 1$, so the antiderivative evaluates to the same value at both endpoints — difference is zero. âœ“',
+          annotation: '$\\cos(2\\pi) = \\cos(-2\\pi) = 1$, so the antiderivative evaluates to the same value at both endpoints — difference is zero. ✓',
           strategyTitle: 'Evaluate integral',
           checkpoint: '',
           hints: [],
@@ -401,7 +401,7 @@ for freq in [120, 300, 500, 650, 800]:
         '**Fourier coefficients:** $b_n = \\frac{2(-1)^{n+1}}{n}$. So $b_1 = 2, b_2 = -1, b_3 = 2/3$.',
         '**Energy per mode:** With ONB $e_n(x) = \\frac{1}{\\sqrt{\\pi}}\\sin(nx)$ (since $\\|\\sin(nx)\\|^2 = \\pi$), the ONB coefficient is $c_n = b_n\\sqrt{\\pi}$. By Parseval: $\\|f\\|^2 = \\sum |c_n|^2 = \\pi \\sum b_n^2$.',
         '**First 3 terms:** $\\pi(b_1^2 + b_2^2 + b_3^2) = \\pi(4 + 1 + 4/9) = \\pi \\cdot \\frac{49}{9} \\approx 17.10$. Captured fraction: $\\frac{17.10}{65.80} \\approx 26\\%$ — only 3 terms.',
-        '**Convergence:** The full series requires $\\sum_{n=1}^\\infty \\frac{4}{n^2} = \\frac{2\\pi^2}{3}$ (Basel problem), and $\\pi \\cdot \\frac{2\\pi^2}{3} = \\frac{2\\pi^3}{3} = \\|f\\|^2$ âœ“. Parseval is confirmed by the Basel problem identity.',
+        '**Convergence:** The full series requires $\\sum_{n=1}^\\infty \\frac{4}{n^2} = \\frac{2\\pi^2}{3}$ (Basel problem), and $\\pi \\cdot \\frac{2\\pi^2}{3} = \\frac{2\\pi^3}{3} = \\|f\\|^2$ ✓. Parseval is confirmed by the Basel problem identity.',
       ],
     },
   ],
@@ -430,7 +430,7 @@ for freq in [120, 300, 500, 650, 800]:
         id: 'assess-la4-005-1',
         type: 'proof',
         text: 'Define a weighted inner product $\\langle \\mathbf{u}, \\mathbf{v} \\rangle_W = 3u_1v_1 + 7u_2v_2$ on $\\mathbb{R}^2$. (a) Verify all three inner product axioms. (b) Find two non-zero vectors orthogonal under $\\langle \\cdot, \\cdot \\rangle_W$ but not under the dot product. (c) Show that the Cauchy-Schwarz inequality $|\\langle \\mathbf{u}, \\mathbf{v} \\rangle_W|^2 \\leq \\langle \\mathbf{u}, \\mathbf{u} \\rangle_W \\cdot \\langle \\mathbf{v}, \\mathbf{v} \\rangle_W$ holds for $\\mathbf{u} = (1, 1)^\\top$, $\\mathbf{v} = (1, -1)^\\top$.',
-        answer: '(a) Symmetry: $w_i u_i v_i = w_i v_i u_i$ âœ“; Linearity: distributes over scalar mult and addition âœ“; Positive def: $\\sum w_i v_i^2 > 0$ for $\\mathbf{v} \\neq 0$ since $w_i > 0$ âœ“. (b) Need $3u_1v_1 + 7u_2v_2 = 0$: take $\\mathbf{u} = (7, -3)^\\top, \\mathbf{v} = (1, 1)^\\top$; $\\langle \\mathbf{u}, \\mathbf{v} \\rangle_W = 21 - 21 = 0$; dot product $= 7 - 3 = 4 \\neq 0$. (c) LHS $= |3 - 7|^2 = 16$; RHS $= (3+7)(3+7) = 100$; $16 \\leq 100$ âœ“.',
+        answer: '(a) Symmetry: $w_i u_i v_i = w_i v_i u_i$ ✓; Linearity: distributes over scalar mult and addition ✓; Positive def: $\\sum w_i v_i^2 > 0$ for $\\mathbf{v} \\neq 0$ since $w_i > 0$ ✓. (b) Need $3u_1v_1 + 7u_2v_2 = 0$: take $\\mathbf{u} = (7, -3)^\\top, \\mathbf{v} = (1, 1)^\\top$; $\\langle \\mathbf{u}, \\mathbf{v} \\rangle_W = 21 - 21 = 0$; dot product $= 7 - 3 = 4 \\neq 0$. (c) LHS $= |3 - 7|^2 = 16$; RHS $= (3+7)(3+7) = 100$; $16 \\leq 100$ ✓.',
         hint: 'For part (b), to get $w_1 u_1 v_1 + w_2 u_2 v_2 = 0$, try $\\mathbf{u} = (w_2, -w_1)^\\top$, $\\mathbf{v} = (1, 1)^\\top$.',
       },
       {

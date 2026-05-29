@@ -316,7 +316,52 @@ disp('Rank of [A b2] vs rank(A):')
     { id: 'cp-la2-011-8', label: 'Prove the minimum-norm solution lives in the row space', type: 'challenge' },
   ],
 
-  assessment: 'For the matrix $A = \\begin{pmatrix}2&1&3\\\\4&2&6\\end{pmatrix}$: (a) find rank and all four dimensions; (b) find a basis for each of the four subspaces; (c) determine which $\\mathbf{b} = (b_1, b_2)^\\top$ make $A\\mathbf{x}=\\mathbf{b}$ solvable.',
+  assessment: {
+    questions: [
+      {
+        id: 'la2-011-assess-1',
+        type: 'choice',
+        text: 'For an $m \\times n$ matrix with rank $r$, what is $\\dim N(A)$?',
+        options: ['$n - r$', '$m - r$', '$r$', '$m + n - r$'],
+        answer: '$n - r$',
+        hints: ['Rank-Nullity: rank + nullity = $n$ (number of columns). Null space lives in input space $\\mathbb{R}^n$, so nullity $= n - r$.'],
+      },
+      {
+        id: 'la2-011-assess-2',
+        type: 'choice',
+        text: 'The row space $C(A^\\top)$ and null space $N(A)$ are related how?',
+        options: [
+          'They are orthogonal complements in $\\mathbb{R}^n$',
+          'They are orthogonal complements in $\\mathbb{R}^m$',
+          'They are equal when $A$ is square',
+          'They have no systematic relationship',
+        ],
+        answer: 'They are orthogonal complements in $\\mathbb{R}^n$',
+        hints: ['Fundamental Theorem: $C(A^\\top) \\perp N(A)$ and together they span $\\mathbb{R}^n$. Any $\\mathbf{x} \\in \\mathbb{R}^n$ splits uniquely as $\\mathbf{x}_{\\text{row}} + \\mathbf{x}_{\\text{null}}$.'],
+      },
+      {
+        id: 'la2-011-assess-3',
+        type: 'choice',
+        text: 'For a $5 \\times 7$ matrix with rank 3, what is $\\dim N(A^\\top)$ (the left null space)?',
+        options: ['$2$', '$4$', '$3$', '$5$'],
+        answer: '$2$',
+        hints: ['Left null space dimension $= m - r = 5 - 3 = 2$. It lives in $\\mathbb{R}^m$ (output space) and is the orthogonal complement of $C(A)$.'],
+      },
+      {
+        id: 'la2-011-assess-4',
+        type: 'choice',
+        text: '$A\\mathbf{x} = \\mathbf{b}$ is consistent. What does the Fundamental Theorem say $\\mathbf{b}$ must satisfy?',
+        options: [
+          '$\\mathbf{b} \\perp N(A^\\top)$ — $\\mathbf{b}$ is orthogonal to the left null space',
+          '$\\mathbf{b} \\perp N(A)$ — $\\mathbf{b}$ is orthogonal to the null space',
+          '$\\mathbf{b}$ must be in $N(A)$',
+          '$\\mathbf{b}$ must be in $\\mathbb{R}^n$',
+        ],
+        answer: '$\\mathbf{b} \\perp N(A^\\top)$ — $\\mathbf{b}$ is orthogonal to the left null space',
+        hints: ['$\\mathbf{b} \\in C(A)$ iff $\\mathbf{b} \\perp N(A^\\top)$ (Fredholm alternative). The column space and left null space are orthogonal complements in $\\mathbb{R}^m$.'],
+      },
+    ],
+  },
 
   quiz: [
     {

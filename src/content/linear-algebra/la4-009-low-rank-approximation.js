@@ -279,7 +279,7 @@ for k in [1, 2, 3]:
       problem: 'Apply soft-thresholding with $\\lambda = 2$ to $A = \\begin{pmatrix}3&0\\\\0&1\\end{pmatrix}$ (already diagonal = SVD). Compute the nuclear-norm-regularized solution and compare to the Eckart-Young rank-1 approximation.',
       steps: [
         { explanation: 'SVD of $A$: already diagonal, $\\sigma_1=3$, $\\sigma_2=1$, $U=V=I$.' },
-        { explanation: 'Soft-threshold with $\\lambda=2$: $\\max(\\sigma_i-\\lambda, 0)$. $\\sigma_1-2=1>0$ âœ“; $\\sigma_2-1=0$ (wait: $1-2=-1<0$, so $\\max(-1,0)=0$).' },
+        { explanation: 'Soft-threshold with $\\lambda=2$: $\\max(\\sigma_i-\\lambda, 0)$. $\\sigma_1-2=1>0$ ✓; $\\sigma_2-1=0$ (wait: $1-2=-1<0$, so $\\max(-1,0)=0$).' },
         { explanation: 'Soft-thresholded approximation: $B = \\begin{pmatrix}1&0\\\\0&0\\end{pmatrix}$ (rank 1). Nuclear norm of $B$: $\\|B\\|_* = 1$.' },
         { explanation: 'Compare to Eckart-Young rank-1 (hard threshold): keep $\\sigma_1=3$, set $\\sigma_2=0$. Hard threshold gives $A_1 = \\begin{pmatrix}3&0\\\\0&0\\end{pmatrix}$. Eckart-Young minimizes $\\|A-B\\|_F$ over rank-1 matrices — the answer is $A_1$ with $\\|A-A_1\\|_F=1$. Soft threshold minimizes $\\|A-B\\|_F^2+2\\|B\\|_*$ — a different (convex) objective, giving a shrunken approximation.' },
         { explanation: 'Takeaway: hard threshold (Eckart-Young) gives the best rank-$k$ approximation for a fixed rank budget. Soft threshold (nuclear norm) is the convex relaxation — it automatically chooses the rank based on $\\lambda$, allowing $\\lambda$ to be tuned by cross-validation.' },

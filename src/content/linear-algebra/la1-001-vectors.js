@@ -54,9 +54,19 @@ export default {
         body: 'Given a vector $\\mathbf{v}$ and a scalar $c$:\n\n• $c > 1$: stretches (makes longer)\n• $0 < c < 1$: shrinks (makes shorter)\n• $c = -1$: flips direction exactly\n• $c < 0$: flips AND scales\n• $c = 0$: collapses to $\\mathbf{0}$ (the zero vector)\n\nDirection only changes sign when $c < 0$. Magnitude always becomes $|c| \\cdot \\|\\mathbf{v}\\|$.',
       },
       {
+        type: 'definition',
+        title: 'What is a Vector? (One-Sentence Definition)',
+        body: 'A **vector** is an ordered list of numbers that encodes both a **magnitude** (size) and a **direction**. Written as a column:\n$$\\mathbf{v} = \\begin{bmatrix} 3 \\\\ 4 \\end{bmatrix}$$\nThe top number is the horizontal component (east/west). The bottom is the vertical component (north/south). Together they tell you exactly where to go.',
+      },
+      {
+        type: 'insight',
+        title: 'What does the ᵀ mean? (Transpose Notation)',
+        body: 'Column vectors take up vertical space on a page. To save space, we often write them sideways with a superscript $^\\top$ (or $^T$):\n$$[3,\\; 4]^\\top \\;\\text{ means }\\; \\begin{bmatrix} 3 \\\\ 4 \\end{bmatrix}$$\nThe $^\\top$ symbol means "transpose" — turn this row into a column. Whenever you see $[a, b]^\\top$, mentally rotate it 90° to stand vertically. The numbers and their order do not change, only the layout on the page. You will see this notation constantly: $[x, y, z]^\\top$ is just a 3D column vector written compactly.',
+      },
+      {
         type: 'strategy',
-        title: 'The Column Matrix',
-        body: 'In calculus, you often write vectors horizontally as $(x, y)$. In linear algebra, we almost exclusively write them vertically as column matrices. This convention makes matrix multiplication work beautifully later on.',
+        title: 'Why We Use Column Vectors',
+        body: 'In calculus, you may have written vectors as $(x, y)$ (row form). In linear algebra, we write them as vertical columns:\n$$\\mathbf{v} = \\begin{bmatrix} x \\\\ y \\end{bmatrix}$$\nThis column convention makes **matrix multiplication** work correctly: multiplying a matrix (rows of numbers) by a column vector produces a new column vector. Rows times columns = the standard rule. Always use columns.',
       },
       {
         type: 'warning',
@@ -129,8 +139,11 @@ export default {
               id: 1,
               cellTitle: 'Vectors: creation, addition, scalar multiplication',
               prose: [
-                'A `numpy` array is a vector. The two fundamental operations — addition and scalar multiplication — are `+` and `*`.',
-                'Notice that `2 * a` stretches the vector, `-1 * a` flips it, and `a + b` follows the tip-to-tail rule.',
+                '`np.array([3.0, 1.0])` creates the column vector $[3, 1]^\\top$ in code. The list inside is read top-to-bottom, matching how you write a column vector on paper. Use floats (3.0, not 3) so NumPy stores the values as decimals, avoiding integer-division surprises later.',
+                '`a + b` adds component-by-component: $[3,1] + [1,2] = [3+1,\\; 1+2] = [4,3]$. NumPy does this automatically for arrays of the same shape — you never write a loop. This is exactly the vector addition definition from the lesson.',
+                '`2 * a` multiplies EVERY component by 2: $2[3,1] = [6,2]$. This is scalar multiplication: the vector stretches by factor 2 but keeps its direction. The scalar goes on the LEFT in both math and code.',
+                '`-1 * a` negates every component: $[3,1] \\to [-3,-1]$. Same magnitude, reversed direction — the flip behavior from the scalar multiplication callout in the lesson.',
+                '`a - b` is shorthand for `a + (-1)*b`: subtract corresponding components. The result is the vector FROM $b$ TO $a$ — geometrically, the arrow that takes you from the tip of $b$ back to the tip of $a$.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -179,8 +192,9 @@ plt.show()`,
               id: 2,
               cellTitle: 'Magnitude and unit vectors',
               prose: [
-                '`np.linalg.norm(v)` computes ‖v‖ = √(v₁² + v₂² + …). Dividing by the norm normalizes to a unit vector.',
-                'The vector [3, 4] is the classic 3-4-5 right triangle. Its unit vector is [0.6, 0.8] — verify: 0.6² + 0.8² = 1.',
+                '`np.linalg.norm(v)` computes $\\|v\\| = \\sqrt{v_1^2 + v_2^2 + \\cdots}$ — the Euclidean magnitude (Pythagorean theorem) from the lesson. For $v = [3, 4]^\\top$ this is $\\sqrt{9+16} = 5$. Works for any number of dimensions: 2D, 3D, or 100D.',
+                '`v / magnitude` divides EVERY component by the scalar magnitude: $[3, 4] / 5 = [3/5,\\; 4/5] = [0.6,\\; 0.8]$. This is the unit vector formula $\\hat{v} = \\mathbf{v}/\\|\\mathbf{v}\\|$ applied directly. NumPy broadcasts the scalar division across every element automatically.',
+                '`np.linalg.norm(unit)` verifies the result is 1. Always check after normalizing — this confirms $(0.6)^2 + (0.8)^2 = 0.36 + 0.64 = 1.0$. If you get something like $1.0000000000000002$, that is floating-point rounding error: correct to 15 decimal places.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -229,8 +243,10 @@ plt.show()`,
               id: 3,
               cellTitle: 'Visualize: vector and its unit vector',
               prose: [
-                'The blue arrow is **v = [3, 4]**. The amber arrow is its unit vector — same direction, length 1.',
-                'Scaling the unit vector by the magnitude reconstructs the original: 5 × [0.6, 0.8] = [3, 4].',
+                '`from opencalc import Figure` loads the course visualization engine. `Figure(square=True, ...)` creates a 2D coordinate grid with equal axis scales — important so arrows do not appear stretched.',
+                '`fig.vector(v.tolist(), color=BLUE, label="v")` draws an arrow from the origin to the tip of $v$. The `.tolist()` call converts the NumPy array to a plain Python list because the opencalc API expects standard Python lists, not NumPy arrays.',
+                'Run this cell and compare the two arrows visually: the BLUE vector reaches $(3, 4)$ with length $5$. The AMBER unit vector points in exactly the same direction but only reaches $(0.6, 0.8)$ — length 1. This confirms what the formula says: dividing by magnitude preserves direction and sets length to 1.',
+                'Key connection: $5 \\times [0.6, 0.8] = [3, 4]$ — you can always reconstruct the original vector as (magnitude) × (unit vector). This decomposition appears constantly in dot products and projections.',
               ],
               code: `import numpy as np
 from opencalc import Figure, BLUE, AMBER
@@ -249,8 +265,10 @@ fig.show()`,
               id: 4,
               cellTitle: 'Application: CNC tool path as vectors',
               prose: [
-                'A CNC machine moves a cutting tool between waypoints. Each waypoint is a position vector. The move from one point to the next is a displacement vector — vector subtraction.',
-                'The total distance a tool travels is the sum of the magnitudes of all displacement vectors along the path.',
+                'Each entry in `waypoints` is a 2D position vector: `np.array([50.0, 0.0])` means the tool is at $x = 50\\text{ mm}$, $y = 0$. The machine\'s workspace is just a 2D (or 3D) vector space, and every tool position is a vector from the origin.',
+                '`waypoints[i+1] - waypoints[i]` is vector subtraction — the **displacement vector** from the current position to the next waypoint. It is the arrow you would draw between the two points. Components are subtracted: $(x_2 - x_1,\\; y_2 - y_1)$.',
+                '`np.linalg.norm(displacement)` gives the straight-line length of that move in mm. Summing all move distances gives `total_distance` — the total tool travel distance, which a CNC programmer uses to estimate machining time at a given feed rate.',
+                '`direction = displacement / dist` normalizes the displacement to a unit vector. This unit vector encodes the pure direction of travel. In 5-axis CNC, the controller uses this to keep the tool tip aligned with the cutting direction — pure direction, no distance information needed.',
               ],
               code: `import numpy as np
 from opencalc import Figure, BLUE, AMBER, GREEN, RED
@@ -316,8 +334,9 @@ w = np.array([-6.0, 8.0])
               id: 1,
               cellTitle: 'Column vectors — the MATLAB syntax rule',
               prose: [
-                'The key syntax: a **semicolon** inside `[]` starts a new row. So `[3; 4]` is a 2×1 column vector. A **comma** separates columns: `[3, 4]` is a 1×2 row vector.',
-                'Linear algebra almost always uses column vectors.',
+                'The one syntax rule you must memorize: a **semicolon** inside `[]` starts a new row, making a column. `v = [3; 4]` creates a $2 \\times 1$ column vector $\\begin{bmatrix}3\\\\4\\end{bmatrix}$. A **comma** separates columns: `vT = [3, 4]` creates a $1 \\times 2$ row vector — the transpose.',
+                '`size(v)` returns `[2  1]` (2 rows, 1 column). `size(vT)` returns `[1  2]`. Always confirm your vector is a column (first dimension larger) before doing matrix operations. Most bugs in MATLAB linear algebra come from accidentally using row vectors where column vectors are expected.',
+                '`a + b` and `3 * a` work exactly as the math defines: component-by-component addition and scalar multiplication. MATLAB applies them element-by-element to every component simultaneously — no loops needed, just as with NumPy.',
               ],
               code: `v = [3; 4]
 vT = [3, 4]
@@ -337,8 +356,10 @@ disp('3 * a =')
               id: 2,
               cellTitle: 'Magnitude and unit vectors',
               prose: [
-                'OpenMAT computes magnitude as `sqrt(dot(v, v))` — the dot product of a vector with itself equals the sum of squared components, so its square root is the Euclidean length.',
-                'To normalize (get a unit vector): divide every component by the magnitude.',
+                '`dot(v, v)` computes the dot product of $v$ with itself: $v_1^2 + v_2^2 + \\cdots$. For `[3; 4]` this is $3^2 + 4^2 = 9 + 16 = 25$. Taking `sqrt` gives $\\sqrt{25} = 5$ — the magnitude formula from the lesson, directly derived from the Pythagorean theorem.',
+                'Why write `sqrt(dot(v, v))` instead of just `norm(v)`? Both work in MATLAB/Octave. But `dot(v, v)` makes the connection to the math formula explicit: magnitude is the square root of the sum of squared components. Using it helps you understand WHY the formula works, not just that it works.',
+                '`unit_v = v / sqrt(dot(v, v))` is the unit vector formula $\\hat{v} = \\mathbf{v}/\\|\\mathbf{v}\\|$ in code. MATLAB divides every component by the scalar: $[3; 4] / 5 = [0.6; 0.8]$.',
+                'The final `sqrt(dot(unit_v, unit_v))` should print `1` (or $1.0000\\ldots$ due to floating-point). This is your verification: a correctly normalized vector always has dot product 1 with itself.',
               ],
               code: `v = [3; 4];
 magnitude = sqrt(dot(v, v))
@@ -352,7 +373,9 @@ sqrt(dot(w, w))   % should be 3: sqrt(1+4+4)=3`,
               id: 3,
               cellTitle: 'Scalar multiplication — four behaviors',
               prose: [
-                'c > 1 stretches. 0 < c < 1 shrinks. c = -1 flips. c = 0 collapses to zero.',
+                'These four lines demonstrate the four distinct behaviors of scalar multiplication from the lesson. Run each line and compare the output to the vector `v = [1; 2; 1]` to see the effect on every component.',
+                '`2.5 * v` stretches: every component multiplied by $2.5$, same direction. `0.4 * v` shrinks: same direction, shorter. `-1 * v` flips: every component negated, opposite direction, same length. `0 * v` collapses: all zeros — the zero vector.',
+                'The formula $\\|c \\cdot v\\| = |c| \\cdot \\|v\\|$ is verified by the last two lines: `abs(c)*sqrt(dot(v,v))` computes $|c|\\|v\\|$ and `sqrt(dot(c*v, c*v))` computes $\\|cv\\|$ — they must match for any scalar $c$. Try changing `c` to confirm.',
               ],
               code: `v = [1; 2; 1];
 2.5 * v
@@ -369,8 +392,10 @@ sqrt(dot(c*v, c*v))`,
               id: 4,
               cellTitle: 'Application: CNC machine coordinates as vectors',
               prose: [
-                'In CNC machining, G00 X3.5 Y2.0 Z-1.5 moves the tool to position [3.5, 2.0, -1.5]. That IS a 3D vector.',
-                'Displacement = vector subtraction. Distance = norm of displacement.',
+                'The G-code command `G00 X3.5 Y2.0 Z-1.5` moves the tool to position $[3.5, 2.0, -1.5]^\\top$ — that coordinate triple IS a 3D vector from the machine origin. `current` and `next` store two such position vectors.',
+                '`displacement = next - current` is vector subtraction: $(3.5 - 1.0,\\; 2.0 - 0.5,\\; -1.5 - 0.0) = (2.5, 1.5, -1.5)$. This displacement vector describes the exact move the machine must execute — direction and distance in one object.',
+                '`distance = sqrt(dot(displacement, displacement))` computes $\\|\\text{displacement}\\|$ in mm — how far the tool physically travels. The controller divides distance by the programmed feed rate to calculate move duration.',
+                '`direction = displacement / distance` gives the unit vector along the tool path — pure direction stripped of distance. Notice the last expression: $3.5 \\cdot \\hat{X} + 2.0 \\cdot \\hat{Y} + (-1.5) \\cdot \\hat{Z}$ reconstructs the destination position. This is a **linear combination** of the axis unit vectors — the central idea of the next lesson.',
               ],
               code: `current = [1.0; 0.5; 0.0];
 next = [3.5; 2.0; -1.5];
@@ -608,6 +633,35 @@ check = 3.5*X_axis + 2.0*Y_axis + (-1.5)*Z_axis`,
         options: ['$\\sqrt{7}$', '$7$', '$14$', '$49$'],
         answer: '$7$',
         hint: '$\\sqrt{0^2 + 7^2} = \\sqrt{49} = 7$. When one component is 0, the formula reduces to the absolute value of the other component.',
+      },
+      {
+        id: 'la1-001-assess-2',
+        type: 'choice',
+        text: 'The notation $[2, -5, 3]^\\top$ represents which of the following?',
+        options: [
+          'A 1×3 row vector (one row, three columns)',
+          'A 3×1 column vector (three rows, one column)',
+          'A scalar equal to $2 - 5 + 3 = 0$',
+          'An invalid expression because of the superscript $T$',
+        ],
+        answer: 'A 3×1 column vector (three rows, one column)',
+        hint: 'The $^\\top$ (transpose) notation means "turn this row into a column." $[2, -5, 3]^\\top$ is just a shorthand for the column $\\begin{bmatrix}2\\\\-5\\\\3\\end{bmatrix}$.',
+      },
+      {
+        id: 'la1-001-assess-3',
+        type: 'choice',
+        text: 'What is the unit vector in the direction of $\\mathbf{v} = [5, 0]^\\top$?',
+        options: ['$[5, 0]^\\top$', '$[1, 0]^\\top$', '$[0, 1]^\\top$', '$[0.5, 0]^\\top$'],
+        answer: '$[1, 0]^\\top$',
+        hint: '$\\|[5,0]^\\top\\| = 5$. Unit vector: $[5,0]^\\top / 5 = [1, 0]^\\top$. This is the standard x-axis unit vector, often written $\\hat{e}_1$.',
+      },
+      {
+        id: 'la1-001-assess-4',
+        type: 'choice',
+        text: 'A vector $\\mathbf{v}$ has $\\|\\mathbf{v}\\| = 6$. After computing $-\\tfrac{1}{2}\\mathbf{v}$, what is the magnitude of the result?',
+        options: ['$-3$', '$3$', '$6$', '$12$'],
+        answer: '$3$',
+        hint: '$\\|c\\mathbf{v}\\| = |c| \\cdot \\|\\mathbf{v}\\| = |-\\tfrac{1}{2}| \\cdot 6 = 3$. Magnitude is always non-negative; the $|c|$ removes any negative sign.',
       },
     ],
   },

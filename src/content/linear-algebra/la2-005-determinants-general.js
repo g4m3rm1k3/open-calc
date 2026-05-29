@@ -134,7 +134,9 @@ export default {
               id: 1,
               cellTitle: 'Cofactor expansion and MATLAB det() — 3×3 verification',
               prose: [
-                '`det(A)` in MATLAB uses LU decomposition internally — never cofactor expansion for large matrices. Use cofactor expansion by hand to understand the formula; use `det()` in practice.',
+                '`det(A)` in MATLAB uses LU decomposition: $A = LU$ (with pivoting), $\\det(A) = (\\pm 1) \\cdot \\prod_i U_{ii}$ — just the product of the diagonal of $U$, corrected for any row swaps. For a $3\\times 3$ matrix LU takes ~27 multiplications; cofactor expansion takes $6$ full-term products (but these grow to $n!$ for larger matrices).',
+                'The manual block computes each cofactor explicitly using the checkerboard sign $(-1)^{i+j}$: `C11 = +(2·4 - 1·1)` (sign $+1$ at position $(1,1)$), `C12 = -(3·4 - 1·0)` (sign $-1$ at $(1,2)$), `C13 = +(3·1 - 2·0)` (sign $+1$ at $(1,3)$). Then $\\det = a_{11}C_{11} + a_{12}C_{12} + a_{13}C_{13}$.',
+                '`abs(det_manual - d) < 1e-10` verifies they match. This is the difference between **understanding** the formula (cofactor expansion) and **computing** it in practice (LU).',
               ],
               code: `A = [2 -1 0; 3 2 1; 0 1 4];
 
@@ -158,7 +160,8 @@ fprintf('Match: %d\\n', abs(det_manual - d) < 1e-10)`,
               id: 2,
               cellTitle: 'Verifying the seven determinant properties',
               prose: [
-                'Each property has a geometric meaning. det(AB) = det(A)·det(B) means "composing two transformations multiplies their area-scaling factors." Row swap flips orientation.',
+                '`det(A*B)` multiplies two $2\\times 2$ matrices and computes the determinant of the product. `det(A)*det(B)` computes them separately and multiplies. Both should give the same number — this is Property 6. Geometrically: $A$ scales areas by $\\det(A)$ and $B$ scales them by $\\det(B)$; composing them scales by $\\det(A) \\cdot \\det(B)$.',
+                '`A_swap = A([2 1], :)` reorders rows using MATLAB index vector `[2 1]`: row 2 goes first, row 1 goes second. `det(A_swap)` should equal $-\\det(A)$ — one row swap flips the sign (Property 2). `T = [3 1 5; 0 2 4; 0 0 7]` is upper triangular: `det(T)` should equal $3 \\times 2 \\times 7 = 42$ — the triangular matrix rule (only the diagonal matters).',
               ],
               code: `A = [2 1; 5 3];
 B = [1 0; 2 4];
@@ -225,9 +228,8 @@ fprintf('\\nConclusion: det tests whether 3 motion axes span full 3D.\\n')`,
               id: 1,
               cellTitle: 'Computing a 3×3 determinant: manual vs NumPy',
               prose: [
-                'We compute det(A) by cofactor expansion along row 1, then verify with NumPy.',
-                'A = [[1,2,3],[4,5,6],[7,2,9]]. Expansion: 1·det([[5,6],[2,9]]) − 2·det([[4,6],[7,9]]) + 3·det([[4,5],[7,2]])',
-                '= 1·(45−12) − 2·(36−42) + 3·(8−35) = 33 + 12 − 81 = −36',
+                '`np.linalg.det(A)` uses LU decomposition internally — not cofactor expansion. The manual block computes each $2 \\times 2$ minor: `M11 = 5*9 - 6*2 = 33`, `M12 = 4*9 - 6*7 = -6`, `M13 = 4*2 - 5*7 = -27`. Signs from $(-1)^{1+j}$: `1*M11 - 2*M12 + 3*M13 = 33 + 12 - 81 = -36`.',
+                'The matrix heatmap (left) shows the entries with color intensity. The right panel shows the three cofactor values as colored cells — their signed weighted sum equals the determinant. A lighter tile means a smaller cofactor contribution to the total.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -255,11 +257,9 @@ ax.set_xticks([]); ax.set_yticks([])
 ax2 = axes[1]
 cofactors = np.array([[M11, -(-1)*M12, M13], [0,0,0],[0,0,0]], dtype=float)
 ax2.imshow([[M11, M12, M13]], cmap='RdBu_r', aspect='auto', vmin=-30, vmax=35)
-ax2.set_title(f"Row 1 cofactors
-det = 1*{M11} - 2*{M12} + 3*{M13} = {det_manual}", fontsize=11)
+ax2.set_title(f"Row 1 cofactors\\ndet = 1*{M11} - 2*{M12} + 3*{M13} = {det_manual}", fontsize=11)
 for j, (c, lbl) in enumerate(zip([M11, M12, M13], ['C11', 'C12', 'C13'])):
-    ax2.text(j, 0, f'{lbl}
-{c}', ha='center', va='center', fontsize=12,
+    ax2.text(j, 0, f'{lbl}\\n{c}', ha='center', va='center', fontsize=12,
              color='white' if abs(c) > 20 else 'black')
 ax2.set_xticks([]); ax2.set_yticks([])
 plt.tight_layout()
@@ -269,8 +269,8 @@ plt.show()`,
               id: 2,
               cellTitle: "Sarrus's rule verification",
               prose: [
-                "Sarrus's rule: sum three forward diagonals, subtract three backward diagonals. Only valid for 3×3.",
-                'The six terms correspond exactly to the six permutations in the Leibniz formula for n=3.',
+                'Sarrus\'s rule sums six products: three from forward diagonals (top-left to bottom-right) minus three from backward diagonals (top-right to bottom-left). These six terms correspond exactly to the $3! = 6$ permutations in the Leibniz formula $\\det(A) = \\sum_{\\sigma \\in S_3} \\text{sgn}(\\sigma) \\prod_i a_{i,\\sigma(i)}$. This is why it only works for $3\\times 3$: a $4\\times 4$ has $4! = 24$ terms, not 6.',
+                '`grid = np.hstack([A, A[:, :2]])` extends to a $3 \\times 5$ grid by copying the first two columns. Each forward diagonal uses column indices $[k, k+1, k+2]$ for $k = 0, 1, 2$ (going right and down). The backward diagonals use $[k+2, k+1, k]$ (going left and down). The plot shows each diagonal in a separate color with its product labeled — forward products are added, backward products are subtracted.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -327,8 +327,8 @@ plt.show()`,
               id: 3,
               cellTitle: 'Verifying the key properties',
               prose: [
-                'Property 6 (det(AB) = det(A)det(B)) and Property 7 (det(A^T) = det(A)) are the most important for theoretical work.',
-                'We also verify: row swap flips sign; triangular matrix → product of diagonal.',
+                '`np.linalg.det(A @ B)` computes $\\det(AB)$ directly; `dA * dB` multiplies two separately computed determinants. They should match to floating-point precision — this is Property 6. The geometric meaning: if $A$ scales areas by $\\det(A)$ and $B$ by $\\det(B)$, composing them scales by the product.',
+                '`A_swapped = A[[1,0], :]` uses NumPy fancy indexing to reorder rows 0↔1. `det(A_swapped)` should equal $-\\det(A)$ — one row swap flips the sign. `T = [[3,1,5],[0,2,4],[0,0,7]]` is upper triangular: `det(T)` should equal $3 \\times 2 \\times 7 = 42$ (the triangular matrix rule). The bar chart plots LHS vs RHS for each property — matching heights confirm each property holds.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -348,11 +348,7 @@ print(f"det(A)={dA:.4f}  det(A row-swapped)={np.linalg.det(A_swapped):.4f}")
 print(f"det(T)={np.linalg.det(T):.1f}  3x2x7={3*2*7}")
 
 # Bar chart visualizing each property
-properties = ['det(AB)
-=det(A)*det(B)', 'det(A^T)
-=det(A)', 'Row swap
-flips sign', 'Triangular
-=prod(diag)']
+properties = ['det(AB)\\n=det(A)*det(B)', 'det(A^T)\\n=det(A)', 'Row swap\\nflips sign', 'Triangular\\n=prod(diag)']
 lhs = [dAB, np.linalg.det(A.T), np.linalg.det(A_swapped), np.linalg.det(T)]
 rhs = [dA*dB, dA, -dA, 3*2*7]
 
@@ -660,6 +656,52 @@ A = np.array([[2., 0., 1.],
         answer: "-30",
         hints: ["This is a lower triangular matrix. det = product of diagonal entries = 2 × (−3) × 5 = −30."],
         reviewSection: "Math tab — Triangular matrix determinant"
+      },
+      {
+        id: "la2-005-assess-2",
+        type: "choice",
+        text: "What is the sign of the cofactor $C_{23}$ (position row 2, column 3)?",
+        options: [
+          "$(-1)^{2+3} = -1$ — the cofactor is $-M_{23}$",
+          "$(-1)^{2+3} = +1$ — the cofactor is $+M_{23}$",
+          "The sign is always positive for row 2",
+          "The sign depends on the matrix entries"
+        ],
+        answer: "$(-1)^{2+3} = -1$ — the cofactor is $-M_{23}$",
+        hints: ["Cofactor sign formula: $(-1)^{i+j}$. For position $(2,3)$: $(-1)^{2+3} = (-1)^5 = -1$."],
+        reviewSection: "Intuition tab — The Checkerboard Sign Pattern callout"
+      },
+      {
+        id: "la2-005-assess-3",
+        type: "choice",
+        text: "$\\det(A) = 6$. What is $\\det(A^{-1})$?",
+        options: [
+          "$\\frac{1}{6}$ — from $\\det(A) \\cdot \\det(A^{-1}) = \\det(I) = 1$",
+          "$-6$ — the inverse flips the sign",
+          "$36$ — squaring the determinant",
+          "$6$ — the determinant is the same"
+        ],
+        answer: "$\\frac{1}{6}$ — from $\\det(A) \\cdot \\det(A^{-1}) = \\det(I) = 1$",
+        hints: ["Property 6: $\\det(AB) = \\det(A)\\det(B)$. Apply with $B = A^{-1}$: $\\det(A)\\det(A^{-1}) = \\det(AA^{-1}) = \\det(I) = 1$. So $\\det(A^{-1}) = 1/\\det(A)$."],
+        reviewSection: "Math tab — Multiplicative Property theorem"
+      },
+      {
+        id: "la2-005-assess-4",
+        type: "choice",
+        text: "A row-reduction of $A$ uses three row replacements and two row swaps, ending with a triangular matrix with diagonal $[2, 3, 1]$. What is $\\det(A)$?",
+        options: [
+          "$-6$ — two swaps each flip the sign; product of diagonal = $2 \\times 3 \\times 1 = 6$; two flips give $(-1)^2 \\times 6 = 6$... wait: $(-1)^2 = 1$ so det = $6$.",
+          "$6$",
+          "$-6$",
+          "$12$"
+        ],
+        answer: "$6$",
+        hints: [
+          "Row replacements never change the determinant.",
+          "Each row swap multiplies det by $-1$. Two swaps: $(-1)^2 = +1$.",
+          "Product of diagonal entries: $2 \\times 3 \\times 1 = 6$. Two sign flips cancel: $\\det(A) = (+1) \\times 6 = 6$."
+        ],
+        reviewSection: "Math tab — Row operations and Properties 2 and 4"
       }
     ]
   },

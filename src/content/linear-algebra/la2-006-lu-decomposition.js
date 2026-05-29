@@ -118,8 +118,8 @@ export default {
               id: 1,
               cellTitle: 'LU decomposition in MATLAB — [L, U, P] = lu(A)',
               prose: [
-                '`[L, U, P] = lu(A)` gives the factorization with pivoting: P*A = L*U.',
-                'L is unit lower triangular (1s on diagonal). U is upper triangular. P is a permutation matrix.',
+                '`[L, U, P] = lu(A)` returns the factorization $PA = LU$ with partial pivoting. `P` is a permutation matrix (records row swaps); `L` is unit lower triangular ($1$s on diagonal, Gaussian elimination multipliers below); `U` is upper triangular (the row-reduced result).',
+                '`P*A - L*U` should be a zero matrix — this verifies $PA = LU$ to machine precision. `prod(diag(U))` computes $U_{11} \\cdot U_{22} \\cdot U_{33}$. `det(P)` returns $\\pm 1$ based on the number of row swaps. Together: $\\det(A) = \\det(P^{-1}) \\cdot \\underbrace{\\det(L)}_{=1} \\cdot \\det(U) = (\\pm 1) \\cdot \\prod_i U_{ii}$ — the determinant costs nothing extra after factorization.',
               ],
               code: `A = [2 1 1; 4 3 3; 8 7 9];
 
@@ -140,8 +140,8 @@ fprintf('det(A) from MATLAB     = %g\\n', det(A))`,
               id: 2,
               cellTitle: 'Solving multiple systems with the same A — one factorization',
               prose: [
-                'Factor A once, then solve Ax = b for multiple right-hand sides using forward/back substitution.',
-                'In MATLAB: L \\ b is forward substitution; U \\ y is back substitution. Each is O(n²).',
+                '`solve_LU = @(b) U \\ (L \\ (P * b))` defines a function encapsulating the two-phase solve: (1) `P * b` reorders $\\mathbf{b}$ to match the pivot permutation; (2) `L \\ (P*b)` solves $L\\mathbf{y} = P\\mathbf{b}$ by forward substitution ($O(n^2)$); (3) `U \\ y` solves $U\\mathbf{x} = \\mathbf{y}$ by back substitution ($O(n^2)$). This function reuses the same `L`, `U`, `P` for any right-hand side without refactoring.',
+                '`norm(A*x1 - b1) < 1e-10` checks the residual $\\|A\\mathbf{x}_1 - \\mathbf{b}_1\\|$ — near-zero confirms $\\mathbf{x}_1$ is correct. The second call `solve_LU(b2)` costs only $O(n^2)$ because the factorization is already done. For $k$ right-hand sides: one $O(n^3)$ factorization + $k \\times O(n^2)$ solves vs $k \\times O(n^3)$ fresh eliminations.',
               ],
               code: `A = [2 1 1; 4 3 3; 8 7 9];
 [L, U, P] = lu(A);
@@ -166,8 +166,8 @@ fprintf('Verify A*x2 = b2: %d\\n', norm(A*x2 - b2) < 1e-10)`,
               id: 3,
               cellTitle: 'Application: CNC structural analysis — one stiffness matrix, many load cases',
               prose: [
-                'A CNC machine\'s structural frame is modeled as a finite element stiffness matrix K. Engineers test many load scenarios (different cutting forces, different tool positions) — all use the same K but different force vectors.',
-                'LU-factoring K once lets you solve all scenarios with O(n²) each. This is the standard in structural FEM.',
+                '`[L, U, P] = lu(K)` factors the $4\\times 4$ stiffness matrix once — this is the $O(n^3)$ investment. `cond(K)` is the condition number: a large condition number means small input errors (measurement noise in the forces) could produce large errors in the computed displacements. For a well-conditioned stiffness matrix, the LU solution is reliable.',
+                '`solve_K = @(F) U \\ (L \\ (P * F))` reuses the same factorization for all three load cases. Each call is $O(n^2)$: permute $F$, forward-substitute through $L$, back-substitute through $U$. `max(abs(disp))` extracts the maximum nodal deflection — the critical engineering output, checked against allowable deformation tolerances.',
               ],
               code: `% Simplified 4×4 FEM stiffness matrix (symmetric positive definite)
 % Represents spring-connected nodes in a CNC gantry frame
@@ -210,9 +210,8 @@ fprintf('Max deflection (rapid):     %.4f mm\\n', max(abs(disp_rapid)))`,
               id: 1,
               cellTitle: 'Manual LU decomposition of a 3×3 matrix',
               prose: [
-                'We trace Gaussian elimination on A = [[2,1,1],[4,3,3],[8,7,9]] step by step, recording the multipliers into L.',
-                'Step 1: eliminate column 1. Multipliers: m21 = 4/2 = 2, m31 = 8/2 = 4. These go into L[1,0] and L[2,0].',
-                'Step 2: eliminate column 2. Multiplier: m32 = 3/1 = 3. This goes into L[2,1].',
+                '`scipy.linalg.lu(A)` returns `(P, L, U)` such that $A = P \\cdot L \\cdot U$ (scipy convention: $A = PLU$, not $PA = LU$). `P` is the permutation matrix; `L` is unit lower triangular ($1$s on diagonal); `U` is upper triangular. `np.allclose(P @ A, L @ U)` verifies this — if `False`, the factorization has a bug.',
+                'The heatmap shows `L`, `U`, and `L@U` side by side. `L` is clearly lower triangular (zeros above the diagonal). `U` is upper triangular (zeros below). `L@U` reconstructs `P@A` — the original matrix with its rows permuted by the partial pivoting. The red/blue color scale shows positive (blue) vs negative (red) entries.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -241,8 +240,8 @@ plt.show()`,
               id: 2,
               cellTitle: 'Verify: L @ U equals the original A',
               prose: [
-                'If our LU is correct, L @ U should exactly reproduce the original matrix A.',
-                'We also use scipy.linalg.lu to verify — it returns (P, L, U) where A = P @ L @ U.',
+                '`scipy.linalg.solve_triangular(L, Pb, lower=True)` performs forward substitution: solves $L\\mathbf{y} = P^T\\mathbf{b}$ in $O(n^2)$. The `lower=True` flag tells scipy to use the triangular structure — without it, scipy would use a general $O(n^3)$ solver unnecessarily. `P.T @ b` is $P^T \\mathbf{b}$ because $P^T = P^{-1}$ for permutation matrices.',
+                '`solve_triangular(U, y)` performs back substitution: solves $U\\mathbf{x} = \\mathbf{y}$ (default `lower=False` = upper triangular). The bar chart shows the vector at each pipeline stage: $\\mathbf{b} \\to P^T\\mathbf{b} \\to \\mathbf{y} \\to \\mathbf{x}$. Each transition applies one triangular solve, transforming the problem through the LU layers until $\\mathbf{x}$ emerges.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -278,8 +277,8 @@ plt.show()`,
               id: 3,
               cellTitle: 'Solving two systems with the same A (one factorization, two solves)',
               prose: [
-                'The power of LU: factor A once, solve Ax = b for multiple b vectors.',
-                'We use scipy.linalg.lu_factor and lu_solve — the standard interface for multiple right-hand sides.',
+                '`lu_factor(A)` returns a compact representation `(lu_array, piv)`: `lu_array` stores both $L$ and $U$ in-place (upper triangle = $U$, strict lower triangle = the multipliers of $L$, with $L$\'s diagonal 1s implied). This saves memory vs storing $L$ and $U$ as two separate full matrices.',
+                '`lu_solve(lu_factored, b)` extracts $L$ and $U$ from the compact form, applies the pivot permutation to $\\mathbf{b}$, then solves in $O(n^2)$. `np.allclose(A @ x1, b1)` verifies the residual. Calling `lu_solve` a second time with `b2` costs only $O(n^2)$ — the $O(n^3)$ factorization is already paid.',
               ],
               code: `import numpy as np
 from scipy.linalg import lu_factor, lu_solve
@@ -311,8 +310,8 @@ print("Verify A @ x2 = b2:", np.allclose(A @ x2, b2))`,
               id: 4,
               cellTitle: 'Determinant from LU decomposition',
               prose: [
-                'det(A) = product of diagonal of U, times (−1)^(number of row swaps).',
-                'scipy.linalg.lu tells us the pivot swaps via matrix P. Each swap flips the sign.',
+                '`np.prod(np.diag(U))` computes $U_{11} \\cdot U_{22} \\cdot U_{33}$ — the determinant of the upper triangular factor (product of diagonal entries of any triangular matrix). `np.linalg.det(P)` returns $+1$ if the number of row swaps is even, $-1$ if odd.',
+                '`det_P * diag_product` assembles $\\det(A) = \\det(P^{-1}) \\cdot \\underbrace{\\det(L)}_{1} \\cdot \\det(U) = (\\pm 1) \\cdot \\prod_i U_{ii}$. `np.isclose` confirms it matches `np.linalg.det(A)` — this is exactly what NumPy does internally: it calls LAPACK LU routines and multiplies the diagonal of $U$ with the swap sign.',
               ],
               code: `import numpy as np
 from scipy.linalg import lu
@@ -634,8 +633,47 @@ b = np.array([6., 14., 10.])
           "Compute the determinant of A to check invertibility, then use Cramer's rule"
         ],
         answer: "Compute the LU decomposition of A once, then apply forward/back substitution 500 times",
-        hint: "LU factors once at O(n³), then each solve is O(n²). Computing A⁻¹ is also O(n³) but less numerically stable. Running full Gaussian elimination 500 times is 500 × O(n³)."
-      }
+        hints: ["LU factors once at $O(n^3)$, then each solve is $O(n^2)$. Running full Gaussian elimination 500 times is $500 \\times O(n^3)$. Computing $A^{-1}$ is also $O(n^3)$ and numerically less stable."],
+      },
+      {
+        id: "la2-006-assess-2",
+        type: "choice",
+        text: "During LU decomposition, Gaussian elimination uses a multiplier $m_{21} = 2$ to eliminate row 2 using row 1. Where does this multiplier go?",
+        options: [
+          "Into $L$ at position $(2,1)$ — below the diagonal",
+          "Into $U$ at position $(2,1)$",
+          "Into $L$ at position $(1,2)$ — above the diagonal",
+          "It is discarded after use"
+        ],
+        answer: "Into $L$ at position $(2,1)$ — below the diagonal",
+        hints: ["$L$ stores the Gaussian elimination multipliers: the entry $L_{ij}$ holds the multiplier used to eliminate row $i$ using row $j$. Since $i = 2 > j = 1$, this is below the diagonal. The diagonal of $L$ is always 1."],
+      },
+      {
+        id: "la2-006-assess-3",
+        type: "choice",
+        text: "The LU factorization gives $U$ with diagonal entries $[3, 2, -1]$, and one row swap was used. What is $\\det(A)$?",
+        options: [
+          "$6$ — product of diagonal is $3 \\times 2 \\times (-1) = -6$; one swap flips sign: $(-1)^1 \\times (-6) = 6$",
+          "$-6$ — product of diagonal: $3 \\times 2 \\times (-1) = -6$",
+          "$-6 / 1 = -6$",
+          "$6 \\times (-1) = -6$"
+        ],
+        answer: "$6$ — product of diagonal is $3 \\times 2 \\times (-1) = -6$; one swap flips sign: $(-1)^1 \\times (-6) = 6$",
+        hints: ["$\\det(A) = (\\pm 1) \\cdot \\prod_i U_{ii}$. One swap means sign factor $= (-1)^1 = -1$. Diagonal product $= 3 \\times 2 \\times (-1) = -6$. So $\\det(A) = (-1) \\times (-6) = 6$."],
+      },
+      {
+        id: "la2-006-assess-4",
+        type: "choice",
+        text: "Why is `np.linalg.solve(A, b)` preferred over `np.linalg.inv(A) @ b`?",
+        options: [
+          "Both cost $O(n^3)$, but `solve` is more numerically stable and does not store the full $n \\times n$ inverse matrix",
+          "`inv(A)` is faster because it only needs to be computed once",
+          "`solve` is slower but more precise for large integers",
+          "They are mathematically equivalent and there is no practical difference"
+        ],
+        answer: "Both cost $O(n^3)$, but `solve` is more numerically stable and does not store the full $n \\times n$ inverse matrix",
+        hints: ["Computing `inv(A)` accumulates rounding errors across $n^2$ entries. `solve` uses LU and applies it directly to $\\mathbf{b}$, confining rounding errors to that single vector. For a single solve, `solve` is identical in cost and more stable."],
+      },
     ]
   },
 

@@ -112,8 +112,8 @@
               id: 1,
               cellTitle: 'Matrix-vector multiply — columns are destination of basis vectors',
               prose: [
-                'In MATLAB/Octave, `*` multiplies matrices and vectors. A column vector is `[x; y]` (semicolons separate rows).',
-                'The first column of A is where î = [1;0] goes. The second column is where ĵ = [0;1] goes. Verify this directly — multiply A by each basis vector.',
+                '`A * i_hat` multiplies the $2 \\times 2$ matrix by the column vector $[1;0]$. This computes $0 \\cdot \\text{col}_1 + 1 \\cdot \\text{col}_2$... no: for `[1;0]` the result is $1 \\cdot \\text{col}_1 + 0 \\cdot \\text{col}_2$ = column 1 exactly. Similarly `A * [0;1]` returns column 2. This directly confirms: **the columns of a matrix are the destinations of the basis vectors**.',
+                '`3*A(:,1) + 1*A(:,2)` computes the linear combination manually — 3 times the first column (destination of î) plus 1 times the second column (destination of ĵ). The `disp(verify)` line confirms this equals `A * v` where `v = [3;1]`. Every matrix-vector product is a weighted sum of the matrix columns, with weights equal to the input vector components.',
               ],
               code: `% 90° counter-clockwise rotation matrix
 A = [0 -1; 1 0];
@@ -139,7 +139,8 @@ disp('Linear combination check:'); disp(verify)`,
               id: 2,
               cellTitle: 'Common 2D transformations — all defined by their columns',
               prose: [
-                'Every possible 2×2 matrix is some transformation. These are the geometric classics. For each one, figure out where î and ĵ go — that tells you the columns.',
+                'Each transform is defined by two columns: shear `[1 1; 0 1]` — left column $[1,0]$ keeps î fixed, right column $[1,1]$ slides ĵ one unit right while keeping it at height 1. Reflection `[1 0; 0 -1]` — î unchanged, ĵ flips sign on its $y$-component (pointing down instead of up). Projection `[1 0; 0 0]` — î unchanged, ĵ maps to zero, so all $y$-information is permanently destroyed.',
+                'Squish `[3 0; 0 0.5]`: left column $[3,0]$ means î triples in length; right column $[0,0.5]$ means ĵ shrinks to half. Before running: predict `squish * [2;1]` by computing $2 \\cdot [3,0] + 1 \\cdot [0,0.5]$ in your head. Then run the cell to check.',
               ],
               code: `% The four famous 2D transformation types
 v = [2; 1];
@@ -168,8 +169,8 @@ fprintf('Squish [2;1] --> [%g;%g]\\n', squish*v)`,
               id: 3,
               cellTitle: 'Rotation matrix — derived from tracking basis vectors',
               prose: [
-                'Where does î = [1,0] go after rotating by angle θ? To [cos θ, sin θ]. Where does ĵ = [0,1] go? To [−sin θ, cos θ]. Paste those into the columns and you have the rotation matrix.',
-                'The unit circle property: rotation is length-preserving. Every column has magnitude 1. The two columns are perpendicular.',
+                'After rotating by $\\theta$, î = $[1,0]$ (at angle $0°$ on the unit circle) moves to $[\\cos\\theta, \\sin\\theta]$ — column 1. ĵ = $[0,1]$ (at $90°$) moves to $[-\\sin\\theta, \\cos\\theta]$ — column 2. `cos(theta)` and `sin(theta)` in MATLAB compute those exact values when `theta` is in radians, which is why `theta_deg * pi / 180` converts degrees first.',
+                '`norm(i_new)` computes $\\sqrt{\\cos^2\\theta + \\sin^2\\theta} = 1$ — the Pythagorean identity proves rotation preserves vector length. `dot(R(:,1), R(:,2))` computes $\\cos\\theta \\cdot (-\\sin\\theta) + \\sin\\theta \\cdot \\cos\\theta = 0$ — the two columns are always perpendicular. A matrix with unit-length, mutually perpendicular columns is called **orthogonal**; every rotation matrix is orthogonal.',
               ],
               code: `theta_deg = 45;
 theta = theta_deg * pi / 180;
@@ -196,8 +197,8 @@ fprintf('Dot product of columns: %.6f  (should be 0)\\n', dot(R(:,1), R(:,2)))`,
               id: 4,
               cellTitle: 'Application: CNC G68 coordinate rotation',
               prose: [
-                'A machinist clamps a part at 5° off-axis. Rather than rewriting hundreds of G-code coordinates, they use G68 (Coordinate Rotation). The CNC controller silently pre-multiplies every tool position by a rotation matrix.',
-                'Here we simulate that: original G-code coordinates → rotation matrix → corrected machine positions.',
+                '`path_program` is a $2 \\times 4$ matrix — each column is one $(X,Y)$ tool position. `R * path_program` multiplies the $2 \\times 2$ rotation matrix by this $2 \\times 4$ matrix. MATLAB applies $R$ to each column independently: column $k$ of the result is $R \\cdot \\text{col}_k(\\text{path\\_program})$. One matrix multiply corrects all four points simultaneously — this is why matrix operations are used instead of looping over each coordinate.',
+                '`norm(raw_pt - corrected_pt)` computes the Euclidean distance $\\sqrt{(x_1-x_2)^2 + (y_1-y_2)^2}$ between the uncorrected and G68-corrected positions for one point. This is the actual positional error you would measure in the machined part if the rotation correction were skipped. Even a 5° offset at 10mm from origin gives a noticeable error on tight-tolerance features.',
               ],
               code: `% CNC part is clamped 5 degrees off-axis
 theta = 5 * pi / 180;
@@ -240,8 +241,8 @@ fprintf('\\nMax positional error without G68: %.4f mm\\n', error)`,
               id: 1,
               cellTitle: 'Matrix-vector multiplication — where does a vector land?',
               prose: [
-                'The `@` operator is matrix multiplication in NumPy. `A @ v` applies transformation A to vector v.',
-                'The columns of A tell you where î = [1,0] and ĵ = [0,1] land. Any other vector\'s destination is a linear combination of those columns.',
+                '`A @ i_hat` is the NumPy matrix-vector product. For `i_hat = [1.0, 0.0]`, the formula gives $1 \\cdot \\text{col}_0(A) + 0 \\cdot \\text{col}_1(A) = $ column 0 of A exactly — confirming the "first column = destination of î" rule. `A @ j_hat` similarly returns column 1.',
+                '`3*(A@i_hat) + 1*(A@j_hat)` computes the linear combination manually, weighted by the components of `v = [3.0, 1.0]`. The result must match `A @ v`, which `print(f"Verify: ...")` confirms. This is not a coincidence — it is the definition of matrix-vector multiplication. The plot makes it visual: the "After" panel shows all three vectors rotated exactly 90° CCW, with lengths unchanged.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -282,9 +283,8 @@ plt.show()`,
               id: 2,
               cellTitle: 'Visualize: the transformed grid',
               prose: [
-                '`fig.transformed_grid(matrix)` draws the coordinate grid after the transformation.',
-                'The red arrow shows where î lands; the green arrow shows where ĵ lands.',
-                'Try changing the matrix below to a shear [[1,1],[0,1]] or a scale [[2,0],[0,0.5]] and re-run.',
+                '`quick_transform(matrix, vector)` is an OpenCalc helper that draws the coordinate grid before and after applying `matrix`. It applies the same $2 \\times 2$ matrix-vector product `A @ v` to a dense grid of sample points and plots both the original (gray) and transformed (colored) grids. The `vector` argument marks one specific input vector and its image as an arrow.',
+                'Try replacing `[[0,-1],[1,0]]` with a shear `[[1,1],[0,1]]` — grid lines stay parallel but tilt. Try `[[1,0],[0,0]]` (projection) — the entire grid collapses onto the x-axis. Every matrix that keeps grid lines straight and evenly spaced is a linear transformation.',
               ],
               code: `from opencalc import quick_transform
 
@@ -296,7 +296,8 @@ quick_transform(rotation, vector=[2, 1])`,
               id: 3,
               cellTitle: 'Common transformations',
               prose: [
-                'Every 2×2 matrix is a transformation. Here are the most common ones — each described by where î and ĵ land.',
+                'Each entry in `transformations` maps a name to a $2 \\times 2$ NumPy array. `T @ v` applies that transformation to `v = [2.0, 1.0]` — a linear combination of `T`\'s columns weighted by 2 and 1. The loop runs the same formula for all five matrices; the output for each is determined entirely by the column structure of `T`.',
+                'The 5-panel subplot shows the input vector (blue, faded) and output vector (red) side by side. For "Project x-axis", the red arrow always lies on the x-axis — the second column is zero, so the $y$-component is always destroyed. For "90 deg rotation", the output is perpendicular to the input at the same length. Read each matrix\'s columns before running — predict the output direction and length before the cell executes.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -602,7 +603,46 @@ v = np.array([4.0, 2.0])
           '$\\begin{bmatrix}0&0\\\\0&0\\end{bmatrix}$',
         ],
         answer: '$\\begin{bmatrix}1&0\\\\0&1\\end{bmatrix}$',
-        hint: 'The identity matrix sends î to $[1,0]^T$ (unchanged) and ĵ to $[0,1]^T$ (unchanged). Every vector multiplied by $I$ comes out the same.',
+        hints: ['The identity matrix sends î to $[1,0]^T$ (unchanged) and ĵ to $[0,1]^T$ (unchanged). Column 1 = destination of î = $[1,0]$; column 2 = destination of ĵ = $[0,1]$.'],
+      },
+      {
+        id: 'la2-001-assess-2',
+        type: 'choice',
+        text: 'Compute $\\begin{bmatrix}3&1\\\\0&2\\end{bmatrix}\\begin{bmatrix}2\\\\4\\end{bmatrix}$ using the linear combination of columns.',
+        options: [
+          '$[10, 8]^T$',
+          '$[6, 8]^T$',
+          '$[7, 8]^T$',
+          '$[10, 4]^T$',
+        ],
+        answer: '$[10, 8]^T$',
+        hints: ['Linear combination: $2 \\cdot [3,0]^T + 4 \\cdot [1,2]^T = [6,0]^T + [4,8]^T = [10,8]^T$. Or row formula: row 1 · [2,4] = 6+4=10; row 2 · [2,4] = 0+8=8.'],
+      },
+      {
+        id: 'la2-001-assess-3',
+        type: 'choice',
+        text: 'A transformation sends $\\hat{i} \\to [0,1]^T$ and $\\hat{j} \\to [-1,0]^T$. Which matrix represents it?',
+        options: [
+          '$\\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$',
+          '$\\begin{bmatrix}0&1\\\\-1&0\\end{bmatrix}$',
+          '$\\begin{bmatrix}1&0\\\\0&-1\\end{bmatrix}$',
+          '$\\begin{bmatrix}-1&0\\\\0&1\\end{bmatrix}$',
+        ],
+        answer: '$\\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$',
+        hints: ['Column 1 = destination of î = $[0,1]^T$. Column 2 = destination of ĵ = $[-1,0]^T$. Paste destinations into columns: $\\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$. This is the 90° CCW rotation matrix.'],
+      },
+      {
+        id: 'la2-001-assess-4',
+        type: 'choice',
+        text: 'Why cannot a translation $T(\\mathbf{x}) = \\mathbf{x} + [3,2]^T$ be represented as a $2 \\times 2$ matrix multiplication?',
+        options: [
+          'It moves the origin — $T(\\mathbf{0}) = [3,2]^T \\neq \\mathbf{0}$, violating linearity',
+          'It changes the dimension of the output',
+          'It is not invertible',
+          'It does not preserve vector lengths',
+        ],
+        answer: 'It moves the origin — $T(\\mathbf{0}) = [3,2]^T \\neq \\mathbf{0}$, violating linearity',
+        hints: ['Every linear map must satisfy $T(\\mathbf{0}) = \\mathbf{0}$, because $T(\\mathbf{0}) = T(0 \\cdot \\mathbf{v}) = 0 \\cdot T(\\mathbf{v}) = \\mathbf{0}$. Translation moves the origin to $[3,2]$, so it fails this test. Such transformations are called affine (not linear).'],
       },
     ],
   },
