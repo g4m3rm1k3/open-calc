@@ -29,6 +29,8 @@ const CadProPage = lazy(() => import("./pages/CadProPage.jsx"));
 const OpenCraftPage = lazy(() => import("./pages/OpenCraftPage.jsx"));
 const StemQuestPage = lazy(() => import("./pages/StemQuestPage.jsx"));
 const DocsPage = lazy(() => import("./pages/DocsPage.jsx"));
+const GamesPage = lazy(() => import("./pages/GamesPage.jsx"));
+const LabsPage = lazy(() => import("./pages/LabsPage.jsx"));
 
 const Fallback = () => (
   <div className="flex items-center justify-center h-64">
@@ -83,6 +85,8 @@ export default function App() {
                     <Route path="open-craft" element={<OpenCraftPage />} />
                     <Route path="stem-quest" element={<StemQuestPage />} />
                     <Route path="docs" element={<DocsPage />} />
+                    <Route path="games" element={<GamesPage />} />
+                    <Route path="labs" element={<LabsPage />} />
                   </Routes>
                 </Suspense>
               </AppShell>

@@ -18,40 +18,28 @@ import ScratchPad from "../ui/ScratchPad.jsx";
 import { useSearchContext } from "../../context/SearchContext.jsx";
 import { useProgress } from "../../hooks/useProgress.js";
 import GrapherContext from "../../context/GrapherContext.jsx";
-import { 
-  Activity, 
-  Box, 
-  Settings2, 
-  PenLine, 
-  Smartphone, 
-  Layers, 
-  Search, 
-  BookOpen, 
-  Home, 
-  Compass, 
-  Menu, 
-  X, 
+import {
+  Activity,
+  Box,
+  Settings2,
+  PenLine,
+  Smartphone,
+  Layers,
+  Search,
+  BookOpen,
+  Menu,
+  X,
   Calculator,
-  Terminal, 
-  Code2, 
-  PlayCircle, 
-  HelpCircle, 
-  MessageSquare, 
+  Terminal,
+  Code2,
+  PlayCircle,
+  HelpCircle,
+  MessageSquare,
   Sparkles,
-  Cpu,
-  Wrench,
-  Binary,
   FileText,
-  Variable,
-  Hash,
   Gamepad2,
   Library,
-  GraduationCap,
-  Atom,
   FlaskConical,
-  ChevronUp,
-  LayoutGrid,
-  Zap
 } from "lucide-react";
 import TICalc from "../calculator/TICalc.jsx";
 import SigmaCalc from "../calculator/SigmaCalc.jsx";
@@ -354,9 +342,21 @@ function TopBar({
 
       {/* 2. THE EXPANDED GRID RIBBON */}
       <nav className="flex-1 flex flex-row gap-2 px-2 h-full items-center justify-start overflow-x-auto overflow-y-hidden whitespace-nowrap group/nav transition-all duration-500">
-        {/* NAV BAY */}
-        <RibbonGroup title="Navigation">
+        {/* NAV BAY — mode switchers */}
+        <RibbonGroup title="Navigate">
           <CoursesDropdown />
+          <div className="flex flex-col items-center justify-center h-full">
+            <NavLink to="/games" className={({ isActive }) => `flex flex-col items-center justify-center h-full p-2 rounded-lg transition-all ${isActive ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`} style={{height: '100%'}} aria-label="Games">
+              <Gamepad2 className="w-5 h-5" />
+              <span className="text-xs font-semibold mt-1 transition-all duration-300 opacity-0 group-hover/nav:opacity-100 group-focus-within/nav:opacity-100 max-h-0 group-hover/nav:max-h-6 group-focus-within/nav:max-h-6 overflow-hidden">Games</span>
+            </NavLink>
+          </div>
+          <div className="flex flex-col items-center justify-center h-full">
+            <NavLink to="/labs" className={({ isActive }) => `flex flex-col items-center justify-center h-full p-2 rounded-lg transition-all ${isActive ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`} style={{height: '100%'}} aria-label="Labs">
+              <FlaskConical className="w-5 h-5" />
+              <span className="text-xs font-semibold mt-1 transition-all duration-300 opacity-0 group-hover/nav:opacity-100 group-focus-within/nav:opacity-100 max-h-0 group-hover/nav:max-h-6 group-focus-within/nav:max-h-6 overflow-hidden">Labs</span>
+            </NavLink>
+          </div>
           <div className="flex flex-col items-center justify-center h-full">
             <NavLink to="/reference" className={({ isActive }) => `flex flex-col items-center justify-center h-full p-2 rounded-lg transition-all ${isActive ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`} style={{height: '100%'}} aria-label="Reference Library">
               <Library className="w-5 h-5" />
@@ -369,51 +369,13 @@ function TopBar({
               <span className="text-xs font-semibold mt-1 transition-all duration-300 opacity-0 group-hover/nav:opacity-100 group-focus-within/nav:opacity-100 max-h-0 group-hover/nav:max-h-6 group-focus-within/nav:max-h-6 overflow-hidden">Docs</span>
             </NavLink>
           </div>
-        </RibbonGroup>
-
-        {/* HELP BAY */}
-        <RibbonGroup title="Help">
           <button
             onClick={onHelpToggle}
-            className="p-2 rounded-lg text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all"
-            title="Help & Docs"
+            className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+            title="Help"
           >
             <HelpCircle className="w-5 h-5" />
           </button>
-        </RibbonGroup>
-
-        {/* ECOSYSTEM BAY */}
-        <RibbonGroup title="Ecosystem">
-          <div className="flex flex-col items-center justify-center h-full">
-            <NavLink to="/universal-calc" className={({ isActive }) => `flex flex-col items-center justify-center h-full p-2 rounded-lg transition-all ${isActive ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`} style={{height: '100%'}} aria-label="Universal Calculus">
-              <Cpu className="w-5 h-5" />
-              <span className="text-xs font-semibold mt-1 transition-all duration-300 opacity-0 group-hover/nav:opacity-100 group-focus-within/nav:opacity-100 max-h-0 group-hover/nav:max-h-6 group-focus-within/nav:max-h-6 overflow-hidden">Universal</span>
-            </NavLink>
-          </div>
-          <div className="flex flex-col items-center justify-center h-full">
-            <NavLink to="/openmat" className={({ isActive }) => `flex flex-col items-center justify-center h-full p-2 rounded-lg transition-all ${isActive ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`} style={{height: '100%'}} aria-label="OpenMAT Platform">
-              <Atom className="w-5 h-5" />
-              <span className="text-xs font-semibold mt-1 transition-all duration-300 opacity-0 group-hover/nav:opacity-100 group-focus-within/nav:opacity-100 max-h-0 group-hover/nav:max-h-6 group-focus-within/nav:max-h-6 overflow-hidden">OpenMAT</span>
-            </NavLink>
-          </div>
-          <div className="flex flex-col items-center justify-center h-full">
-            <NavLink to="/open-craft" className={({ isActive }) => `flex flex-col items-center justify-center h-full p-2 rounded-lg transition-all ${isActive ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700 shadow" : "text-slate-500 hover:bg-lime-50 dark:hover:bg-lime-900/30"}`} style={{height: '100%'}} aria-label="OpenCraft Sandbox">
-              <Gamepad2 className="w-5 h-5" />
-              <span className="text-xs font-semibold mt-1 transition-all duration-300 opacity-0 group-hover/nav:opacity-100 group-focus-within/nav:opacity-100 max-h-0 group-hover/nav:max-h-6 group-focus-within/nav:max-h-6 overflow-hidden">OpenCraft</span>
-            </NavLink>
-          </div>
-          <div className="flex flex-col items-center justify-center h-full">
-            <NavLink to="/cnc-sim" className={({ isActive }) => `flex flex-col items-center justify-center h-full p-2 rounded-lg transition-all ${isActive ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`} style={{height: '100%'}} aria-label="CNC Simulator">
-              <Wrench className="w-5 h-5" />
-              <span className="text-xs font-semibold mt-1 transition-all duration-300 opacity-0 group-hover/nav:opacity-100 group-focus-within/nav:opacity-100 max-h-0 group-hover/nav:max-h-6 group-focus-within/nav:max-h-6 overflow-hidden">CNC Sim</span>
-            </NavLink>
-          </div>
-          <div className="flex flex-col items-center justify-center h-full">
-            <NavLink to="/logic-sim" className={({ isActive }) => `flex flex-col items-center justify-center h-full p-2 rounded-lg transition-all ${isActive ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`} style={{height: '100%'}} aria-label="Logic Suite">
-              <Binary className="w-5 h-5" />
-              <span className="text-xs font-semibold mt-1 transition-all duration-300 opacity-0 group-hover/nav:opacity-100 group-focus-within/nav:opacity-100 max-h-0 group-hover/nav:max-h-6 group-focus-within/nav:max-h-6 overflow-hidden">Logic</span>
-            </NavLink>
-          </div>
         </RibbonGroup>
 
         {/* MATH BAY */}
@@ -455,31 +417,6 @@ function TopBar({
           </button>
         </RibbonGroup>
 
-        {/* SIMS BAY */}
-        <RibbonGroup title="Laboratories">
-          <button onClick={onChemToggle} className="p-2 rounded-lg text-cyan-500 hover:bg-cyan-50 dark:hover:bg-cyan-900/30 transition-all" title="Chemistry Lab">
-            <FlaskConical className="w-5 h-5" />
-          </button>
-          <button onClick={onPhysicsToggle} className="p-2 rounded-lg text-fuchsia-500 hover:bg-fuchsia-50 dark:hover:bg-fuchsia-900/30 transition-all" title="Physics Engine">
-            <Zap className="w-5 h-5" />
-          </button>
-          <div className="w-px h-6 bg-[var(--color-border)] mx-1" />
-          <button onClick={onBasketToggle} className="p-2 rounded-lg text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-900/30 transition-all" title="Basketball Lab">
-            <span className="text-lg">🏀</span>
-          </button>
-          <button onClick={onPoolToggle} className="p-2 rounded-lg text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all" title="Physics Pool">
-            <span className="text-lg">🎱</span>
-          </button>
-          <button onClick={onGolfToggle} className="p-2 rounded-lg text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-all" title="Mini Golf">
-            <span className="text-lg">⛳</span>
-          </button>
-          <button onClick={onFootballToggle} className="p-2 rounded-lg text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/30 transition-all" title="Football Calc">
-            <span className="text-lg">🏈</span>
-          </button>
-          <button onClick={() => navigate("/stem-quest")} className="p-2 rounded-lg text-brand-500 hover:bg-brand-50 dark:hover:bg-brand-900/30 transition-all" title="STEM Quest">
-            <GraduationCap className="w-5 h-5" />
-          </button>
-        </RibbonGroup>
       </nav>
 
       {/* 3. ASSISTANTS & UTILS */}
@@ -662,6 +599,20 @@ export default function AppShell({ children }) {
     const openScratch = () => setScratchOpen(true);
     window.addEventListener("oc-open-scratchpad", openScratch);
     return () => window.removeEventListener("oc-open-scratchpad", openScratch);
+  }, []);
+
+  useEffect(() => {
+    const handler = (e) => {
+      const { game } = e.detail ?? {};
+      if (game === "basketball") setBasketOpen(true);
+      else if (game === "pool") setPoolOpen(true);
+      else if (game === "golf") setGolfOpen(true);
+      else if (game === "football") setFootballOpen(true);
+      else if (game === "chemistry") setChemOpen(true);
+      else if (game === "physics") setPhysicsOpen(true);
+    };
+    window.addEventListener("oc-open-game", handler);
+    return () => window.removeEventListener("oc-open-game", handler);
   }, []);
 
   if (isOpenMatRoute || isArkanoidLearnRoute || isRealityRunnerRoute || isCNCSimRoute || isCadProRoute || isOpenCraftRoute || isStemQuestRoute || isDocsRoute) {
