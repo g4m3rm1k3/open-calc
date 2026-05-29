@@ -3,6 +3,8 @@ import { useEffect, useMemo, useState } from "react";
 import { LESSON_MAP, ALL_LESSONS, CURRICULUM } from "../content/index.js";
 import { useProgress } from "../hooks/useProgress.js";
 import MicroCycleLesson from "../components/lesson/MicroCycleLesson.jsx";
+import MobileLessonContent from "../components/lesson/MobileLessonContent.jsx";
+import { useIsMobile } from "../hooks/useIsMobile.js";
 import CrossRef from "../components/lesson/CrossRef.jsx";
 import VizFrame from "../components/viz/VizFrame.jsx";
 import MarkdownProse from "../components/math/MarkdownProse.jsx";
@@ -31,6 +33,7 @@ export default function LessonPage() {
     getReadingProgress,
   } = useProgress();
   const { setLessonId } = useVideoPlayer();
+  const isMobile = useIsMobile();
   const activeTab = getActiveTab(lesson?.id ?? "");
   const initialReadingProgress = getReadingProgress(lesson?.id ?? "");
 
@@ -92,7 +95,7 @@ export default function LessonPage() {
   const nextLesson = lessonIndex < ALL_LESSONS.length - 1 ? ALL_LESSONS[lessonIndex + 1] : null;
 
   return (
-    <article className="mx-auto max-w-7xl pb-20 px-0 md:px-6">
+    <article className="mx-auto max-w-7xl pb-20 px-0 md:px-6 bg-[var(--color-page-bg)] lg:bg-transparent">
       <TutorPanel lesson={lesson} />
 
       <div className="pointer-events-none fixed left-0 top-0 z-[10001] h-1 w-full bg-slate-200 dark:bg-slate-800">
@@ -105,7 +108,7 @@ export default function LessonPage() {
       {(() => {
         const chapter = CURRICULUM.find((entry) => String(entry.number) === chapterId);
         return (
-          <nav className="mb-6 flex flex-wrap items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+          <nav className="mb-6 px-4 md:px-0 flex flex-wrap items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
             <Link to="/" className="hover:text-brand-600 dark:hover:text-brand-400">
               Home
             </Link>
@@ -219,7 +222,11 @@ export default function LessonPage() {
       )}
 
       <div className="space-y-12">
-        <MicroCycleLesson lesson={lesson} />
+        {isMobile ? (
+          <MobileLessonContent lesson={lesson} />
+        ) : (
+          <MicroCycleLesson lesson={lesson} />
+        )}
       </div>
 
       {lesson.quiz?.length > 0 && <LessonQuizBlock key={key} lessonId={lesson.id} questions={lesson.quiz} />}

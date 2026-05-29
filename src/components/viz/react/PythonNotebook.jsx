@@ -803,9 +803,11 @@ const CellComponent = React.memo(
         <div
           style={{
             display: "flex",
+            flexWrap: "wrap",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "6px 14px",
+            gap: 4,
+            padding: "5px 10px",
             background: C.surface2,
             borderBottom: `0.5px solid ${C.border}`,
           }}
@@ -821,7 +823,7 @@ const CellComponent = React.memo(
               <span>In [{cell.executionCount ?? " "}]</span>
             )}
           </span>
-          <div style={{ display: "flex", gap: 6 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
             <button
               onClick={() => onRun(cell.id)}
               disabled={isExecuting}
@@ -1250,19 +1252,21 @@ export default function PythonNotebook({ params, onParamChange }) {
       style={{
         width: "100%",
         fontFamily: "sans-serif",
+        padding: "12px",
+        boxSizing: "border-box",
       }}
     >
       {/* Header */}
       <div
         style={{
           display: "flex",
+          flexWrap: "wrap",
           justifyContent: "space-between",
           alignItems: "center",
-          background: C.surface,
-          border: `0.5px solid ${C.border}`,
-          borderRadius: 12,
-          padding: "12px 18px",
-          marginBottom: 16,
+          gap: 8,
+          padding: "4px 4px 12px",
+          marginBottom: 8,
+          borderBottom: `0.5px solid ${C.border}`,
         }}
       >
         <div>
@@ -1293,12 +1297,12 @@ export default function PythonNotebook({ params, onParamChange }) {
             Python 3.x · WebAssembly · opencalc visualisation library loaded
           </div>
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
           <button
             onClick={() => setShowHelp(!showHelp)}
             style={{
               fontSize: 12,
-              padding: "6px 14px",
+              padding: "6px 10px",
               borderRadius: 8,
               cursor: "pointer",
               border: `0.5px solid ${showHelp ? C.teal : C.border}`,
@@ -1315,7 +1319,7 @@ export default function PythonNotebook({ params, onParamChange }) {
               disabled={isExecuting}
               style={{
                 fontSize: 12,
-                padding: "6px 14px",
+                padding: "6px 10px",
                 borderRadius: 8,
                 cursor: "pointer",
                 border: "none",
@@ -1331,7 +1335,7 @@ export default function PythonNotebook({ params, onParamChange }) {
             onClick={addCell}
             style={{
               fontSize: 12,
-              padding: "6px 14px",
+              padding: "6px 10px",
               borderRadius: 8,
               cursor: "pointer",
               border: `0.5px solid ${C.border}`,
@@ -1524,8 +1528,9 @@ fig.show()`}
         <div
           style={{
             display: "flex",
+            flexWrap: "wrap",
             justifyContent: "center",
-            gap: 16,
+            gap: 12,
             fontSize: 11,
             color: C.hint,
           }}

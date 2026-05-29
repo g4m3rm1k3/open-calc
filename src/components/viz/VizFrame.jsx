@@ -1247,6 +1247,36 @@ export default function VizFrame({ id, initialProps = {}, title }) {
     }
   }
 
+  // PHONE_OK components own their own visual presentation — VizFrame is just
+  // a transparent overlay that provides pin/expand chrome without adding a card.
+  if (PHONE_OK.has(id)) {
+    return (
+      <div id={`viz-${id}`} className="viz-frame relative group w-full max-w-full overflow-hidden">
+        <div className="dev-viz-label absolute top-0 left-0 z-[9999] items-center gap-1.5 px-2 py-1 rounded-br-lg bg-amber-400 text-slate-900 pointer-events-none select-none">
+          <span className="text-[10px] font-black uppercase tracking-widest">VIZ</span>
+          <span className="text-xs font-mono font-bold">{id}</span>
+        </div>
+        <div className="absolute top-2 right-2 z-20 hidden lg:flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button
+            onClick={togglePin}
+            title={pinned ? "Unpin" : "Pin this visualization"}
+            className={`flex items-center gap-1 px-2 py-1 text-xs font-bold rounded shadow-md border transition-colors ${pinned ? "bg-amber-500 border-amber-400 text-white" : "bg-slate-800 border-slate-600 text-white hover:bg-amber-500 hover:border-amber-400"}`}
+          >
+            📌
+          </button>
+          <button
+            onClick={() => setIsExpanded(true)}
+            title="Expand to Full Width"
+            className="bg-slate-800 text-white px-2 py-1 flex items-center gap-1 text-xs font-bold rounded shadow-md border border-slate-600 hover:bg-brand-500 hover:border-brand-400"
+          >
+            <span>⛶</span> Expand
+          </button>
+        </div>
+        {content}
+      </div>
+    );
+  }
+
   return (
     <div
       id={`viz-${id}`}

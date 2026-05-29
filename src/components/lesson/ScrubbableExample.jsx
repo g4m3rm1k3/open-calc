@@ -223,9 +223,9 @@ export default function ScrubbableExample({ example, number, lessonId }) {
   const cHint = cHintLevels[cHintLevel];
 
   return (
-    <div className="example-block oc-shell-card mb-12 overflow-hidden">
+    <div className="example-block oc-shell-card mx-4 lg:mx-0 mb-6 overflow-hidden">
       {/* Header */}
-      <div className="oc-header-gradient px-8 py-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-4">
+      <div className="oc-header-gradient px-4 py-4 sm:px-8 sm:py-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2 sm:gap-4">
         <div className="flex items-center gap-3 min-w-0">
           <div className="w-10 h-10 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-sm shadow-sm flex-shrink-0">
             📝
@@ -334,18 +334,18 @@ export default function ScrubbableExample({ example, number, lessonId }) {
             </>
           )}
 
-          <div className="flex items-center justify-between pt-6 border-t border-slate-100 dark:border-slate-800">
+          <div className="flex items-center justify-between gap-2 pt-6 border-t border-slate-100 dark:border-slate-800">
             <button
               disabled={currentStep === 0}
               onClick={() => setCurrentStep(s => Math.max(0, s - 1))}
-              className="px-6 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 disabled:opacity-30 transition-all font-bold text-xs uppercase tracking-widest"
+              className="px-4 py-2.5 sm:px-6 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 disabled:opacity-30 transition-all font-bold text-xs uppercase tracking-widest"
             >
-              ← Previous
+              ← Prev
             </button>
             {!isDone && (
               <button
                 onClick={() => setCurrentStep(s => s + 1)}
-                className="oc-btn-premium px-10 py-3 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white font-black text-xs uppercase tracking-widest shadow-xl shadow-brand-500/30 ring-4 ring-brand-500/10 hover:ring-brand-500/20 active:ring-0"
+                className="oc-btn-premium px-5 py-2.5 sm:px-10 sm:py-3 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white font-black text-xs uppercase tracking-widest shadow-xl shadow-brand-500/30 ring-4 ring-brand-500/10 hover:ring-brand-500/20 active:ring-0"
               >
                 Reveal Step →
               </button>

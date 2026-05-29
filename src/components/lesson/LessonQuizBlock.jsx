@@ -238,9 +238,9 @@ export default function LessonQuizBlock({ lessonId, questions }) {
         : { text: 'Needs Review', color: 'text-red-600 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800' }
 
   return (
-    <section className="mt-20 oc-shell-card overflow-hidden">
+    <section className="mt-20 mx-4 lg:mx-0 oc-shell-card overflow-hidden">
       {/* Header row */}
-      <div className="oc-header-gradient px-8 py-10 flex items-center justify-between border-b border-slate-200 dark:border-slate-800">
+      <div className="oc-header-gradient px-4 py-5 sm:px-8 sm:py-10 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800">
         <div>
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 shadow-sm flex items-center justify-center text-xl">
@@ -277,7 +277,7 @@ export default function LessonQuizBlock({ lessonId, questions }) {
         </div>
       </div>
 
-      <div className="p-8 space-y-6 bg-slate-50/30 dark:bg-slate-950/20">
+      <div className="p-4 sm:p-8 space-y-6 bg-slate-50/30 dark:bg-slate-950/20">
         {questions.map((q, i) => (
           <QuizQuestion
             key={`${lessonId}-${q.id ?? i}`}

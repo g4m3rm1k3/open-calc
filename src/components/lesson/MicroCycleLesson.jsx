@@ -258,7 +258,7 @@ function VizCard({
       id={noteId ? noteId.replace(/:/g, "-") : undefined}
       className={`rounded-2xl overflow-hidden border ${borderColor} shadow-sm bg-white dark:bg-slate-900`}
     >
-      <div className="px-0 md:px-4 py-2 bg-slate-50 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+      <div className="px-4 py-2 bg-slate-50 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
         {viz.title ? (
           <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
             {viz.title}
@@ -269,7 +269,7 @@ function VizCard({
         {noteId && <StickyNote noteId={noteId} />}
       </div>
       {viz.mathBridge && (
-        <div className="px-0 md:px-4 py-3 bg-indigo-50 dark:bg-indigo-950/40 border-b border-indigo-100 dark:border-indigo-900/50 [&_p]:text-sm [&_p]:text-indigo-900 [&_p]:dark:text-indigo-200 [&_strong]:text-indigo-800 [&_strong]:dark:text-indigo-100">
+        <div className="px-4 py-3 bg-indigo-50 dark:bg-indigo-950/40 border-b border-indigo-100 dark:border-indigo-900/50 [&_p]:text-sm [&_p]:text-indigo-900 [&_p]:dark:text-indigo-200 [&_strong]:text-indigo-800 [&_strong]:dark:text-indigo-100">
           <MarkdownProse text={viz.mathBridge} />
         </div>
       )}
@@ -279,7 +279,7 @@ function VizCard({
         title={viz.title}
       />
       {viz.caption && (
-        <p className="text-xs text-slate-400 dark:text-slate-500 px-0 md:px-4 py-2.5 italic text-center leading-relaxed border-t border-slate-100 dark:border-slate-800">
+        <p className="text-xs text-slate-400 dark:text-slate-500 px-4 py-2.5 italic text-center leading-relaxed border-t border-slate-100 dark:border-slate-800">
           {parseProse(viz.caption)}
         </p>
       )}
@@ -331,7 +331,7 @@ function VizTabGroup({ vizzes, lessonId }) {
       {vizzes.map((viz, i) => (
         <div key={i} style={{ display: i === activeIdx ? "block" : "none" }}>
           {viz.mathBridge && (
-            <div className="px-0 md:px-4 py-3 bg-indigo-50 dark:bg-indigo-950/40 border-b border-indigo-100 dark:border-indigo-900/50 [&_p]:text-sm [&_p]:text-indigo-900 [&_p]:dark:text-indigo-200 [&_strong]:text-indigo-800 [&_strong]:dark:text-indigo-100">
+            <div className="px-4 py-3 bg-indigo-50 dark:bg-indigo-950/40 border-b border-indigo-100 dark:border-indigo-900/50 [&_p]:text-sm [&_p]:text-indigo-900 [&_p]:dark:text-indigo-200 [&_strong]:text-indigo-800 [&_strong]:dark:text-indigo-100">
               <MarkdownProse text={viz.mathBridge} />
             </div>
           )}
@@ -351,12 +351,12 @@ function SemanticsBlock({ semantics }) {
   if (!semantics) return null;
   return (
     <div className="mb-10 rounded-3xl border border-sky-100 dark:border-sky-900/40 bg-gradient-to-br from-sky-50/80 via-white/90 to-sky-100/80 dark:from-slate-900 dark:via-slate-950 dark:to-sky-900/40 overflow-hidden shadow-2xl shadow-sky-200/40 dark:shadow-sky-900/60">
-      <div className="px-0 md:px-6 py-4 bg-gradient-to-r from-sky-200/80 via-sky-100/80 to-white/80 dark:from-sky-900 dark:via-slate-900 dark:to-slate-800 border-b border-sky-100 dark:border-sky-900/40">
+      <div className="px-4 py-4 bg-gradient-to-r from-sky-200/80 via-sky-100/80 to-white/80 dark:from-sky-900 dark:via-slate-900 dark:to-slate-800 border-b border-sky-100 dark:border-sky-900/40">
         <h3 className="text-[11px] font-black uppercase tracking-[0.22em] text-sky-800 dark:text-sky-200 drop-shadow-md">
           Semantic Layer: Symbols & Meaning
         </h3>
       </div>
-      <div className="px-0 md:px-5 py-5">
+      <div className="px-4 py-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           {semantics.core?.map((item, i) => (
             <div
@@ -408,7 +408,7 @@ function PerspectiveSync({ perspectives, bridge }) {
   if (!perspectives?.length) return null;
   return (
     <div className="mb-10 rounded-3xl border border-indigo-100 dark:border-indigo-900/40 bg-white dark:bg-slate-900 overflow-hidden shadow-premium">
-      <div className="px-0 md:px-6 py-4 oc-header-gradient border-b border-indigo-100 dark:border-indigo-900/40">
+      <div className="px-4 py-4 oc-header-gradient border-b border-indigo-100 dark:border-indigo-900/40">
         <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-800 dark:text-indigo-300">
           Perspective Synchronization
         </h3>
@@ -445,12 +445,12 @@ function FailureModes({ modes }) {
   if (!modes?.length) return null;
   return (
     <div className="mb-10 rounded-3xl border border-rose-100 dark:border-rose-900/40 bg-white dark:bg-slate-900 overflow-hidden shadow-premium">
-      <div className="px-0 md:px-6 py-4 oc-header-gradient border-b border-rose-100 dark:border-rose-900/40">
+      <div className="px-4 py-4 oc-header-gradient border-b border-rose-100 dark:border-rose-900/40">
         <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-rose-800 dark:text-rose-400 flex items-center gap-2">
           <span>🚨</span> Failure Modes: Where Logic Breaks
         </h3>
       </div>
-      <div className="px-0 md:px-4 py-4 overflow-x-auto">
+      <div className="px-4 py-4 overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead>
             <tr className="border-b border-rose-100 dark:border-rose-900/50">
@@ -573,7 +573,7 @@ function IntuitionBlock({ data, lesson }) {
 
   return (
     <div className="oc-shell-card mb-12 overflow-hidden">
-      <div className="oc-header-gradient px-0 md:px-8 py-5 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3">
+      <div className="oc-header-gradient px-4 sm:px-6 py-5 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3">
         <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-xl shadow-sm">
           🧠
         </div>
@@ -589,7 +589,7 @@ function IntuitionBlock({ data, lesson }) {
         {lesson?.id && <StickyNote noteId={`${lesson.id}:intuition`} />}
       </div>
 
-      <div className="px-0 md:px-8 py-8">
+      <div className="px-4 sm:px-6 py-6">
         <SemanticsBlock semantics={data.semantics ?? lesson?.semantics} />
         <SectionContent data={data} />
         {data.perspectives?.length > 0 && (
@@ -660,7 +660,7 @@ function MathBlock({ data, lessonId }) {
         onKeyDown={(e) =>
           (e.key === "Enter" || e.key === " ") && setOpen((o) => !o)
         }
-        className="oc-header-gradient w-full flex items-center gap-3 px-6 py-5 hover:opacity-90 transition-all text-left cursor-pointer border-b border-brand-100 dark:border-brand-900/60"
+        className="oc-header-gradient w-full flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-4 hover:opacity-90 transition-all text-left cursor-pointer border-b border-brand-100 dark:border-brand-900/60"
       >
         <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 border border-brand-200 dark:border-brand-800 flex items-center justify-center text-xl shadow-sm">
           📐
@@ -684,7 +684,7 @@ function MathBlock({ data, lessonId }) {
         </span>
       </div>
       {open && (
-        <div className="px-0 md:px-8 py-8 space-y-6 bg-white dark:bg-slate-900">
+        <div className="px-4 sm:px-6 py-6 space-y-6 bg-white dark:bg-slate-900">
           {data.processDefinition?.length > 0 && (
             <div className="mb-6 p-4 rounded-xl bg-brand-600 text-white shadow-xl shadow-brand-500/20">
               <p className="text-[10px] font-bold uppercase tracking-widest text-brand-200 mb-3">
@@ -757,7 +757,7 @@ function RigorBlock({ data, lessonId }) {
         onKeyDown={(e) =>
           (e.key === "Enter" || e.key === " ") && setOpen((o) => !o)
         }
-        className="oc-header-gradient w-full flex items-center gap-3 px-6 py-5 hover:opacity-90 transition-all text-left cursor-pointer border-b border-purple-100 dark:border-purple-900/60"
+        className="oc-header-gradient w-full flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-4 hover:opacity-90 transition-all text-left cursor-pointer border-b border-purple-100 dark:border-purple-900/60"
       >
         <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 border border-purple-200 dark:border-purple-800 flex items-center justify-center text-xl shadow-sm">
           ∴
@@ -786,7 +786,7 @@ function RigorBlock({ data, lessonId }) {
         </span>
       </div>
       {open && (
-        <div className="px-0 md:px-8 py-8 space-y-6 bg-white dark:bg-slate-900">
+        <div className="px-4 sm:px-6 py-6 space-y-6 bg-white dark:bg-slate-900">
           {hasProse || hasCallouts || isBlocksFormat ? (
             <SectionContent data={data} />
           ) : null}

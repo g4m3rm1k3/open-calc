@@ -978,7 +978,7 @@ export default function TutorPanel({ lesson, context = null, onApplyCode = null 
           whileHover={{ scale: 1.1, rotate: 5 }}
           whileTap={{ scale: 0.9 }}
           onClick={() => setOpen(true)}
-          className="fixed z-[9997] bottom-6 right-6 w-14 h-14 rounded-2xl shadow-[0_10px_30px_rgba(79,70,229,0.3)] bg-indigo-600 text-white flex items-center justify-center border border-white/20 dark:border-white/10 backdrop-blur-xl transition-all"
+          className="fixed z-[9997] bottom-[88px] right-4 lg:bottom-6 lg:right-6 w-14 h-14 rounded-2xl shadow-[0_10px_30px_rgba(79,70,229,0.3)] bg-indigo-600 text-white flex items-center justify-center border border-white/20 dark:border-white/10 backdrop-blur-xl transition-all"
           title="STEM Coach"
         >
           <div className="absolute inset-0 bg-indigo-400/20 blur-xl rounded-full animate-pulse" />
