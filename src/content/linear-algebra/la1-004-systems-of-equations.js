@@ -129,7 +129,7 @@ export default {
               id: 1,
               cellTitle: 'The backslash operator A\\b — MATLAB\'s workhorse',
               prose: [
-                '`A\\b` is how MATLAB solves Ax = b. It does NOT compute Aâ»Â¹ directly — it uses LU factorization internally, which is faster and more numerically stable.',
+                '`A\\b` is how MATLAB solves Ax = b. It does NOT compute A⁻¹ directly — it uses LU factorization internally, which is faster and more numerically stable.',
                 'Think of `\\` as "solve from the left." If A is the transformation and b is the target, A\\b asks "what input x produces output b?"',
               ],
               code: `% System: 2x + y = 8,  x + 3y = 9
@@ -203,7 +203,7 @@ end`,
       {
         id: 'PythonNotebook',
         title: 'Code: Solving Linear Systems',
-        mathBridge: 'np.linalg.solve(A, b) computes Aâ»Â¹b efficiently via LU factorization. np.linalg.matrix_rank() counts pivots. Always verify with np.allclose(A @ x, b).',
+        mathBridge: 'np.linalg.solve(A, b) computes A⁻¹b efficiently via LU factorization. np.linalg.matrix_rank() counts pivots. Always verify with np.allclose(A @ x, b).',
         caption: 'Solve systems of equations in one line — and visualize the geometry of the solution.',
         initialProps: {
           initialCells: [
@@ -211,7 +211,7 @@ end`,
               id: 1,
               cellTitle: 'Solve Ax = b — unique solution',
               prose: [
-                '`np.linalg.solve(A, b)` solves the system in one call. It uses LU factorization — faster and more stable than computing Aâ»Â¹ directly.',
+                '`np.linalg.solve(A, b)` solves the system in one call. It uses LU factorization — faster and more stable than computing A⁻¹ directly.',
                 'Geometrically: each row of Ax = b defines a line. The solution is their intersection.',
               ],
               code: `import numpy as np
@@ -701,7 +701,7 @@ b = np.array([9.0, 3.0, 1.0])
       whyThisTechniqueWins: 'Gaussian elimination finds exact solutions when they exist, but overdetermined systems usually have no exact solution. Least squares minimizes the residual ||Ax−b||² and is the right tool for noisy data. Gaussian elimination remains essential as a subroutine inside the least-squares solver.',
     },
     {
-      situation: 'You need to check whether three vectors in â„Â³ are linearly independent — without computing a determinant.',
+      situation: 'You need to check whether three vectors in ℝ³ are linearly independent — without computing a determinant.',
       competingTechniques: ['Row-reduce the matrix formed by the three column vectors', 'Compute the determinant', 'Check by inspection'],
       whyThisTechniqueWins: 'Form the 3×3 matrix with the vectors as columns and row-reduce. If you get 3 pivot columns (rank 3), they are independent. If rank < 3, they are dependent. This generalizes to any size — determinants only work for square matrices and give less insight into which vectors are redundant.',
     },

@@ -1226,26 +1226,29 @@ function splitTopLevelCells(row) {
 }
 
 function normalizeMatrixSyntax(line) {
-  return line.replace(/\[([^\[\]]+)\]/g, (match, inner) => {
+  return line.replace(/\[([^\[\]]+)\]/g, (match, inner, offset, str) => {
+    // ── Guard: don't transform the LHS of a multi-assignment ─────────────────
+    // "[X, Y] = expr"  →  must stay as "[X, Y]" for the destructuring handler.
+    const after = str.slice(offset + match.length).trimStart();
+    if (after.startsWith("=") && !after.startsWith("==")) return match;
+
     const rows = splitTopLevel(inner, ";").map(r => splitTopLevelCells(r));
 
-    // Detect whether any cell looks like a variable/matrix reference (not just a number)
+    // Detect whether any cell looks like a variable/matrix reference (not a plain number)
     const hasNonScalar = rows.some(row =>
       row.some(cell => {
         const t = cell.trim();
-        // A pure number (possibly with sign/decimal/exp) is scalar; anything else may be a matrix/vector
         return t !== "" && !/^[+-]?\d+(\.\d+)?([eE][+-]?\d+)?$/.test(t);
       })
     );
 
     if (!hasNonScalar) {
-      // All-scalar literal: keep as standard mathjs matrix syntax
+      // All-scalar literal: keep as standard mathjs matrix syntax  [1 2; 3 4]
       return `[${rows.map(r => r.join(", ")).join("; ")}]`;
     }
 
-    // Mixed/variable content — use horzcat/vertcat to handle matrix concatenation properly.
-    // Each semicolon-separated row becomes a horzcat of its cells;
-    // multiple such rows are vertcat-ed together.
+    // Mixed/variable content — use horzcat/vertcat for correct matrix concatenation.
+    // Each semicolon-row becomes horzcat of its cells; multiple rows are vertcat-ed.
     const rowExprs = rows.map(row => {
       const cells = row.map(c => c.trim()).filter(Boolean);
       return cells.length === 1 ? cells[0] : `horzcat(${cells.join(", ")})`;
@@ -1253,6 +1256,7 @@ function normalizeMatrixSyntax(line) {
     return rowExprs.length === 1 ? rowExprs[0] : `vertcat(${rowExprs.join(", ")})`;
   });
 }
+
 
 
 function normalizeElementwiseOperators(line) {
