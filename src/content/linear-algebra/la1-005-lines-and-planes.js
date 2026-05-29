@@ -784,7 +784,7 @@ C = np.array([0.0, 0.0, 3.0])
       text: 'Two planes $ax+by+cz=d_1$ and $ax+by+cz=d_2$ (with $d_1 \\neq d_2$) are:',
       options: ['Identical', 'Intersecting along a line', 'Parallel and distinct', 'Perpendicular'],
       answer: 'Parallel and distinct',
-      hints: ['Same normal vector [a,b,c] means same orientation (parallel). Different right-hand sides d₁≠d₁ means different positions (distinct). Parallel lines never intersect.'],
+      hints: ['Same normal vector [a,b,c] means same orientation (parallel). Different right-hand sides d₁≠d₁ means different positions (distinct). Parallel lines never intersect.'],
       reviewSection: 'Rigor — parallel planes',
     },
     {

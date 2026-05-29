@@ -36,7 +36,7 @@ export default {
       },
       {
         type: 'insight',
-        title: 'The PDPâ»¹ Sandwich',
+        title: 'The PDP⁻¹ Sandwich',
         body: 'A = PDP^{-1}\n\n$P$ = matrix of eigenvectors (columns)\n$D$ = diagonal matrix of eigenvalues\n\nPowers: $A^k = PD^kP^{-1}$, where $D^k$ just raises each diagonal entry to the $k$th power.',
       },
       {
@@ -96,7 +96,7 @@ export default {
           initialCells: [
             {
               id: 1,
-              cellTitle: 'Diagonalization: A = P D Pâ»¹',
+              cellTitle: 'Diagonalization: A = P D P⁻¹',
               prose: '`[P, D] = eig(A)` returns eigenvectors as columns of P, eigenvalues on diagonal of D. Verify A = P * D * inv(P). The columns of P must be linearly independent for this to work.',
               code: `A = [4 1; 2 3];
 [P, D] = eig(A);
@@ -177,7 +177,7 @@ fprintf('Peak displacement at node 2: %.4f mm\\n', max(abs(x(2,:)))*1e3)`,
       {
         id: 'PythonNotebook',
         title: 'Code: Diagonalization and Matrix Powers',
-        mathBridge: 'A = P D Pâ»¹. eig() gives P and D. A^k = P D^k Pâ»¹ — raise diagonal entries to the k-th power, no repeated multiplication. Verify: P @ D @ P_inv â‰ˆ A.',
+        mathBridge: 'A = P D P⁻¹. eig() gives P and D. A^k = P D^k P⁻¹ — raise diagonal entries to the k-th power, no repeated multiplication. Verify: P @ D @ P_inv â‰ˆ A.',
         caption: 'Diagonalize a matrix, then use it to compute high matrix powers instantly.',
         initialProps: {
           initialCells: [
@@ -213,7 +213,7 @@ plt.show()`,
             {
               id: 2,
               cellTitle: 'Matrix powers via diagonalization',
-              prose: 'A^k = P D^k Pâ»¹. Raising D to the k-th power just raises each diagonal entry (eigenvalue) to the k-th power. This makes computing A^100 as easy as A^2 — no repeated matrix multiplication.',
+              prose: 'A^k = P D^k P⁻¹. Raising D to the k-th power just raises each diagonal entry (eigenvalue) to the k-th power. This makes computing A^100 as easy as A^2 — no repeated matrix multiplication.',
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -251,7 +251,7 @@ plt.show()`,
               challengeNumber: 1,
               challengeTitle: 'Diagonalize and compute A^10',
               difficulty: 'hard',
-              prompt: 'Diagonalize A = [[2, 1],[1, 2]]. Then compute A^10 using P D^10 Pâ»¹. Verify against np.linalg.matrix_power(A, 10). Finally, print the eigenvalues — what symmetry do you notice about a symmetric matrix\'s eigenvalues?',
+              prompt: 'Diagonalize A = [[2, 1],[1, 2]]. Then compute A^10 using P D^10 P⁻¹. Verify against np.linalg.matrix_power(A, 10). Finally, print the eigenvalues — what symmetry do you notice about a symmetric matrix\'s eigenvalues?',
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -311,7 +311,7 @@ plt.show()`,
       },
       {
         type: 'proof',
-        title: 'Proof that AP = PD Implies A = PDPâ»¹',
+        title: 'Proof that AP = PD Implies A = PDP⁻¹',
         body: 'Let $\\mathbf{v}_1,\\ldots,\\mathbf{v}_n$ be linearly independent eigenvectors with eigenvalues $\\lambda_1,\\ldots,\\lambda_n$.\n\n**Step 1.** Write all $n$ eigenvalue equations at once as a matrix product:\n$A[\\mathbf{v}_1 \\cdots \\mathbf{v}_n] = [A\\mathbf{v}_1 \\cdots A\\mathbf{v}_n] = [\\lambda_1\\mathbf{v}_1 \\cdots \\lambda_n\\mathbf{v}_n]$\n\n**Step 2.** The right side factors as $PD$ (eigenvectors times their scaling factors):\n$AP = PD$\n\n**Step 3.** Since the columns of $P$ are linearly independent, $P$ is invertible. Right-multiply both sides by $P^{-1}$:\n$A = PDP^{-1}$ $\\blacksquare$',
       },
       {
@@ -337,7 +337,7 @@ plt.show()`,
   examples: [
     {
       id: 'la3-002-ex1',
-      title: 'Constructing P and D, then Verifying A = PDPâ»¹',
+      title: 'Constructing P and D, then Verifying A = PDP⁻¹',
       problem: 'Diagonalize $A = \\begin{bmatrix}4 & 2 \\\\ 1 & 3\\end{bmatrix}$ using the eigenvectors from the previous lesson ($\\lambda_1 = 5, \\mathbf{v}_1=[2,1]^T$; $\\lambda_2=2, \\mathbf{v}_2=[1,-1]^T$).',
       steps: [
         {
@@ -350,14 +350,14 @@ plt.show()`,
         {
           expression: 'P^{-1} = \\frac{1}{\\det(P)}\\begin{bmatrix}-1&-1\\\\-1&2\\end{bmatrix} = \\frac{1}{-3}\\begin{bmatrix}-1&-1\\\\-1&2\\end{bmatrix} = \\begin{bmatrix}1/3&1/3\\\\1/3&-2/3\\end{bmatrix}',
           annotation: '$\\det(P) = (2)(-1)-(1)(1) = -3$. Use the 2×2 inverse formula.',
-          strategyTitle: 'Compute Pâ»¹',
+          strategyTitle: 'Compute P⁻¹',
           checkpoint: 'Verify: $PP^{-1} = I$.',
           hints: ['Check: $\\begin{bmatrix}2&1\\\\1&-1\\end{bmatrix}\\begin{bmatrix}1/3&1/3\\\\1/3&-2/3\\end{bmatrix} = \\begin{bmatrix}1&0\\\\0&1\\end{bmatrix}$ âœ“'],
         },
         {
           expression: 'PDP^{-1} = \\begin{bmatrix}2&1\\\\1&-1\\end{bmatrix}\\begin{bmatrix}5&0\\\\0&2\\end{bmatrix}\\begin{bmatrix}1/3&1/3\\\\1/3&-2/3\\end{bmatrix}',
           annotation: 'Compute $PD$ first (multiply $P$ by $D$), then multiply by $P^{-1}$.',
-          strategyTitle: 'Compute PDPâ»¹',
+          strategyTitle: 'Compute PDP⁻¹',
           checkpoint: '',
           hints: [],
         },
@@ -479,7 +479,7 @@ plt.show()`,
           annotation: 'The complete factorization.',
         },
       ],
-      answer: 'P = [[1,1],[1,-1]], D = [[3,0],[0,1]], Pâ»¹ = [[1/2,1/2],[1/2,-1/2]]',
+      answer: 'P = [[1,1],[1,-1]], D = [[3,0],[0,1]], P⁻¹ = [[1/2,1/2],[1/2,-1/2]]',
     },
     {
       id: 'la3-002-ch3',
@@ -551,8 +551,8 @@ plt.show()`,
   // ── Mental Model ─────────────────────────────────────────────────
   mentalModel: [
     'Diagonalization = finding the coordinates where A does nothing but scale.',
-    'A = PDPâ»¹: change coords (Pâ»¹), scale (D), change back (P).',
-    'A^k = PD^kPâ»¹ — powers become trivial.',
+    'A = PDP⁻¹: change coords (P⁻¹), scale (D), change back (P).',
+    'A^k = PD^kP⁻¹ — powers become trivial.',
     'Diagonal matrix: eigenvalues on diagonal, zeros everywhere else.',
     'Fails when there are not enough independent eigenvectors (defective matrix).',
   ],
@@ -560,12 +560,12 @@ plt.show()`,
   // ── Checkpoints ──────────────────────────────────────────────────
   checkpoints: [
     { id: 'cp-la3-002-1', label: 'Read: understand why eigenvector coordinates make A diagonal', type: 'read' },
-    { id: 'cp-la3-002-2', label: 'Read: follow the derivation A = PDPâ»¹ and the matrix powers formula A^k = PD^kPâ»¹', type: 'read' },
+    { id: 'cp-la3-002-2', label: 'Read: follow the derivation A = PDP⁻¹ and the matrix powers formula A^k = PD^kP⁻¹', type: 'read' },
     { id: 'cp-la3-002-3', label: 'Read: understand the diagonalizability criterion and when defective matrices fail', type: 'read' },
     { id: 'cp-la3-002-4', label: 'Run OpenMAT cell 1 — build P and D, verify A = P*D*inv(P)', type: 'lab' },
     { id: 'cp-la3-002-5', label: 'Run Python cell 2 — compute A^k via diagonalization and verify against numpy', type: 'lab' },
-    { id: 'cp-la3-002-6', label: 'Complete example 1: construct P and D, compute Pâ»¹, verify A = PDPâ»¹', type: 'example' },
-    { id: 'cp-la3-002-7', label: 'Complete example 2: compute A³ using PD³Pâ»¹', type: 'example' },
+    { id: 'cp-la3-002-6', label: 'Complete example 1: construct P and D, compute P⁻¹, verify A = PDP⁻¹', type: 'example' },
+    { id: 'cp-la3-002-7', label: 'Complete example 2: compute A³ using PD³P⁻¹', type: 'example' },
     { id: 'cp-la3-002-8', label: 'Attempt challenge 3: derive A^n as a closed-form formula and analyze long-run behavior', type: 'challenge' },
   ],
 
@@ -574,10 +574,12 @@ plt.show()`,
     questions: [
       {
         id: 'la3-002-assess-1',
-        type: 'input',
+        type: 'choice',
         text: 'If the diagonal matrix $D = \\text{diag}(2, 5)$, what is the $(2,2)$ entry of $D^{10}$?',
+        options: ['9765625', '3125', '1024', '50'],
         answer: '9765625',
-        hint: '$5^{10} = 9{,}765{,}625$.',
+        hints: ['$D^{10}$ is diagonal with entries $2^{10}$ and $5^{10}$. The $(2,2)$ entry is $5^{10} = 9{,}765{,}625$.'],
+        reviewSection: 'Math tab — matrix powers via diagonalization',
       },
     ],
   },

@@ -119,7 +119,7 @@ fprintf('Perpendicularity check: a·e = %.2e  (should be 0)\\n', dot(a, e))`,
             },
             {
               id: 2,
-              cellTitle: 'Projection matrix: build it, verify P² = P and P = Páµ€',
+              cellTitle: 'Projection matrix: build it, verify P² = P and P = Pᵀ',
               prose: [
                 'P = a*a\' / (a\'*a) is the projection matrix onto the line spanned by a.',
                 'For subspace projection (column space of A): P = A*inv(A\'*A)*A\'.',
@@ -183,7 +183,7 @@ fprintf('Direction of error:  [%.4f, %.4f, %.4f]\\n', cross_track(1)/error_mag, 
       {
         id: 'PythonNotebook',
         title: 'Code: Orthogonal Projections',
-        mathBridge: 'proj_a(b) = (a·b / a·a) * a. Projection matrix: P = a @ a.T / (a.T @ a). For subspace: P = A @ inv(A.T @ A) @ A.T. Verify P² = P and P = Páµ€.',
+        mathBridge: 'proj_a(b) = (a·b / a·a) * a. Projection matrix: P = a @ a.T / (a.T @ a). For subspace: P = A @ inv(A.T @ A) @ A.T. Verify P² = P and P = Pᵀ.',
         caption: 'Compute vector projections, build projection matrices, and verify the idempotency property.',
         initialProps: {
           initialCells: [
@@ -229,7 +229,7 @@ plt.show()`,
               id: 2,
               cellTitle: 'Projection matrix P and idempotency P² = P',
               prose: [
-                'The projection matrix P = aaáµ€ / aáµ€a projects any vector onto the line spanned by a in one multiplication.',
+                'The projection matrix P = aaᵀ / aᵀa projects any vector onto the line spanned by a in one multiplication.',
                 'Key property: P² = P (idempotent). Projecting twice gives the same result — the projected vector is already on the line.',
               ],
               code: `import numpy as np
@@ -264,7 +264,7 @@ plt.show()`,
               challengeNumber: 1,
               challengeTitle: 'Projection onto a subspace',
               difficulty: 'hard',
-              prompt: 'Build the projection matrix onto the column space of A = [[1,0],[1,1],[0,1]] (a plane in 3D). Use P = A(Aáµ€A)â»¹Aáµ€. Then project b = [1,2,3] onto that plane. Verify P² = P and Páµ€ = P. Also verify that the error e = b − Pb is perpendicular to both columns of A.',
+              prompt: 'Build the projection matrix onto the column space of A = [[1,0],[1,1],[0,1]] (a plane in 3D). Use P = A(AᵀA)⁻¹Aᵀ. Then project b = [1,2,3] onto that plane. Verify P² = P and Pᵀ = P. Also verify that the error e = b − Pb is perpendicular to both columns of A.',
               code: `import numpy as np
 
 A = np.array([[1., 0.],
@@ -275,7 +275,7 @@ b = np.array([1., 2., 3.])
 # P = A @ inv(A.T @ A) @ A.T
 # proj = P @ b
 # error = b - proj
-# verify P² = P, Páµ€ = P
+# verify P² = P, Pᵀ = P
 # verify A.T @ error â‰ˆ 0
 `,
               hint: 'P = A @ np.linalg.inv(A.T @ A) @ A.T. Check np.allclose(P @ P, P) for idempotency. np.allclose(A.T @ (b - P @ b), 0) for perpendicularity.',
@@ -378,20 +378,20 @@ b = np.array([1., 2., 3.])
     },
     {
       id: 'la4-001-ex3',
-      title: 'Projecting onto a 2D Subspace using P = A(Aáµ€A)â»¹Aáµ€',
+      title: 'Projecting onto a 2D Subspace using P = A(AᵀA)⁻¹Aᵀ',
       problem: 'Project $\\mathbf{b} = \\begin{bmatrix}0\\\\0\\\\1\\end{bmatrix}$ onto the subspace spanned by $\\mathbf{a}_1 = \\begin{bmatrix}1\\\\0\\\\1\\end{bmatrix}$ and $\\mathbf{a}_2 = \\begin{bmatrix}0\\\\1\\\\1\\end{bmatrix}$. Form the matrix $A = [\\mathbf{a}_1 \\; \\mathbf{a}_2]$ and use the formula $\\mathbf{p} = A(A^TA)^{-1}A^T\\mathbf{b}$.',
       steps: [
         {
           expression: 'A^TA = \\begin{bmatrix}1&0&1\\\\0&1&1\\end{bmatrix}\\begin{bmatrix}1&0\\\\0&1\\\\1&1\\end{bmatrix} = \\begin{bmatrix}2&1\\\\1&2\\end{bmatrix}',
           annotation: 'Entry $(i,j)$ = dot product of column $i$ with column $j$ of $A$. Diagonal: $\\|\\mathbf{a}_1\\|^2=2$, $\\|\\mathbf{a}_2\\|^2=2$. Off-diagonal: $\\mathbf{a}_1 \\cdot \\mathbf{a}_2 = 1$.',
-          strategyTitle: 'Compute Aáµ€A',
-          checkpoint: 'Why must Aáµ€A be invertible here?',
-          hints: ['The columns of A are linearly independent (neither is a multiple of the other), which guarantees Aáµ€A is invertible.'],
+          strategyTitle: 'Compute AᵀA',
+          checkpoint: 'Why must AᵀA be invertible here?',
+          hints: ['The columns of A are linearly independent (neither is a multiple of the other), which guarantees AᵀA is invertible.'],
         },
         {
           expression: '(A^TA)^{-1} = \\frac{1}{3}\\begin{bmatrix}2&-1\\\\-1&2\\end{bmatrix}, \\quad A^T\\mathbf{b} = \\begin{bmatrix}0+0+1\\\\0+0+1\\end{bmatrix} = \\begin{bmatrix}1\\\\1\\end{bmatrix}',
           annotation: 'det$(A^TA) = 4-1 = 3$. Standard $2\\times 2$ inverse formula. $A^T\\mathbf{b}$ picks up the third component of $\\mathbf{b}$ since $\\mathbf{a}_1, \\mathbf{a}_2$ both have a $1$ in their third entry.',
-          strategyTitle: 'Invert and compute Aáµ€b',
+          strategyTitle: 'Invert and compute Aᵀb',
           checkpoint: '',
           hints: [],
         },
@@ -406,8 +406,8 @@ b = np.array([1., 2., 3.])
           expression: '\\mathbf{p} = A\\hat{\\mathbf{x}} = \\frac{1}{3}\\begin{bmatrix}1\\\\0\\\\1\\end{bmatrix} + \\frac{1}{3}\\begin{bmatrix}0\\\\1\\\\1\\end{bmatrix} = \\begin{bmatrix}1/3\\\\1/3\\\\2/3\\end{bmatrix}',
           annotation: 'Verify: $A^T\\mathbf{e} = A^T(\\mathbf{b}-\\mathbf{p}) = A^T[{-1/3},{-1/3},{1/3}]^T = [0,0]^T$ âœ“.',
           strategyTitle: 'Compute projection',
-          checkpoint: 'Verify Aáµ€e = 0',
-          hints: ['Row 1 of Aáµ€ times e: 1·(-1/3) + 0·(-1/3) + 1·(1/3) = 0 âœ“. Row 2: 0·(-1/3) + 1·(-1/3) + 1·(1/3) = 0 âœ“.'],
+          checkpoint: 'Verify Aᵀe = 0',
+          hints: ['Row 1 of Aᵀ times e: 1·(-1/3) + 0·(-1/3) + 1·(1/3) = 0 âœ“. Row 2: 0·(-1/3) + 1·(-1/3) + 1·(1/3) = 0 âœ“.'],
         },
       ],
       conclusion: '$\\mathbf{p} = [1/3,\\, 1/3,\\, 2/3]^T$. The error $\\mathbf{e} = [-1/3,-1/3,1/3]^T$ is perpendicular to both columns of $A$. This generalizes the line projection to any dimension: the formula $P = A(A^TA)^{-1}A^T$ always works as long as the columns of $A$ are independent.',
@@ -431,7 +431,7 @@ b = np.array([1., 2., 3.])
           annotation: 'The projection strips out the $y$-component, keeping only the $x$. Exactly what dropping a perpendicular to the $x$-axis does.',
         },
       ],
-      answer: 'p = [4, 0]áµ€',
+      answer: 'p = [4, 0]ᵀ',
     },
     {
       id: 'la4-001-ch2',
@@ -452,7 +452,7 @@ b = np.array([1., 2., 3.])
           annotation: 'The two components are perpendicular — the orthogonal decomposition is confirmed.',
         },
       ],
-      answer: '(I-P)b = [2,-1]áµ€, dot product with Pb = 0 âœ“',
+      answer: '(I-P)b = [2,-1]ᵀ, dot product with Pb = 0 âœ“',
     },
     {
       id: 'la4-001-ch3',
@@ -469,7 +469,7 @@ b = np.array([1., 2., 3.])
           annotation: 'Group the middle: $\\mathbf{a}^T\\mathbf{a} = 1$ (scalar). Associativity gives $P^2 = P$.',
         },
       ],
-      answer: 'P = aaáµ€ (unit vector case); P² = a(aáµ€a)aáµ€ = a(1)aáµ€ = aaáµ€ = P âœ“',
+      answer: 'P = aaᵀ (unit vector case); P² = a(aᵀa)aᵀ = a(1)aᵀ = aaᵀ = P âœ“',
     },
   ],
 
@@ -485,7 +485,7 @@ b = np.array([1., 2., 3.])
     rulesOfThumb: [
       'The error e = b - proj is always perpendicular to the subspace. Always check a·e = 0.',
       'Unit vector projection: p = (b·Ã»)Ã» — dot product gives the scalar, then scale Ã».',
-      'Projection matrix: symmetric (Páµ€ = P) and idempotent (P² = P). Verify both.',
+      'Projection matrix: symmetric (Pᵀ = P) and idempotent (P² = P). Verify both.',
       '(I - P) projects onto the orthogonal complement — the part P misses.',
     ],
   },
@@ -518,7 +518,7 @@ b = np.array([1., 2., 3.])
     'Projection = shadow; drop a perpendicular to the subspace.',
     'The error (b - proj) is always perpendicular to the subspace. Always.',
     'Closer than the projection? Impossible — Pythagorean theorem proves it.',
-    'Projection matrix: P² = P, Páµ€ = P. Two ways to verify correctness.',
+    'Projection matrix: P² = P, Pᵀ = P. Two ways to verify correctness.',
     'I - P gives the complementary projection onto the orthogonal complement.',
   ],
 
@@ -528,10 +528,10 @@ b = np.array([1., 2., 3.])
     { id: 'cp-la4-001-2', label: 'Read: Explain why the projection is the closest point', type: 'read' },
     { id: 'cp-la4-001-3', label: 'Read: Write both projection formulas (line and subspace)', type: 'read' },
     { id: 'cp-la4-001-4', label: 'Lab: Drag the vector and verify error stays perpendicular', type: 'lab' },
-    { id: 'cp-la4-001-5', label: 'Lab: Compute P = aaáµ€/aáµ€a and verify P² = P', type: 'lab' },
+    { id: 'cp-la4-001-5', label: 'Lab: Compute P = aaᵀ/aᵀa and verify P² = P', type: 'lab' },
     { id: 'cp-la4-001-6', label: 'Example: Project onto a line in ℝ³', type: 'example' },
     { id: 'cp-la4-001-7', label: 'Example: Build a projection matrix and apply it', type: 'example' },
-    { id: 'cp-la4-001-8', label: 'Challenge: Project onto a 2D subspace with Aáµ€A formula', type: 'challenge' },
+    { id: 'cp-la4-001-8', label: 'Challenge: Project onto a 2D subspace with AᵀA formula', type: 'challenge' },
   ],
 
   // ── Assessment ───────────────────────────────────────────────────
@@ -539,10 +539,12 @@ b = np.array([1., 2., 3.])
     questions: [
       {
         id: 'la4-001-assess-1',
-        type: 'input',
+        type: 'choice',
         text: 'What is the dot product of the error vector $\\mathbf{e} = \\mathbf{b} - \\mathbf{p}$ and the projection direction $\\mathbf{a}$, for any valid orthogonal projection?',
+        options: ['0', '1', '$\\|\\mathbf{e}\\|^2$', 'It depends on the angle between $\\mathbf{b}$ and $\\mathbf{a}$'],
         answer: '0',
-        hint: 'Orthogonal means perpendicular means dot product = 0.',
+        hints: ['Orthogonal means perpendicular means dot product = 0. The defining condition is $\\mathbf{a} \\cdot (\\mathbf{b} - \\mathbf{p}) = 0$.'],
+        reviewSection: 'Intuition tab — orthogonality condition',
       },
     ],
   },
@@ -579,8 +581,9 @@ b = np.array([1., 2., 3.])
     },
     {
       id: 'orthogonal-projections-q3',
-      type: 'input',
+      type: 'choice',
       text: 'Project $\\mathbf{b} = [6, 0]^T$ onto the line spanned by $\\mathbf{a} = [1, 0]^T$. What is the $x$-component of the projection?',
+      options: ['6', '0', '3', '36'],
       answer: '6',
       hints: ['$c = \\mathbf{a}\\cdot\\mathbf{b}/\\mathbf{a}\\cdot\\mathbf{a} = 6/1 = 6$. Projection $= 6[1,0]^T = [6,0]^T$.'],
       reviewSection: 'Math tab — Projection onto a Line',
@@ -600,7 +603,7 @@ b = np.array([1., 2., 3.])
       text: 'For $\\mathbf{a} = [2,1]^T$ and $\\mathbf{b} = [3,0]^T$, compute the scalar projection $c$.',
       options: ['$6/5$', '$3/5$', '$6/\\sqrt{5}$', '$3$'],
       answer: '$6/5$',
-      hints: ['c = aáµ€b / aáµ€a = (2·3 + 1·0)/(4+1) = 6/5.'],
+      hints: ['c = aᵀb / aᵀa = (2·3 + 1·0)/(4+1) = 6/5.'],
       reviewSection: 'Math — projection onto a line',
     },
     {
@@ -614,7 +617,7 @@ b = np.array([1., 2., 3.])
         '$P\\mathbf{b} = \\mathbf{b}$ for all $\\mathbf{b}$',
       ],
       answer: '$P^T = P$ and $P^2 = P$',
-      hints: ['P is symmetric: P = A(Aáµ€A)â»¹Aáµ€ — taking transpose gives the same matrix. Idempotent: P² = A(Aáµ€A)â»¹Aáµ€A(Aáµ€A)â»¹Aáµ€ = A(Aáµ€A)â»¹Aáµ€ = P.'],
+      hints: ['P is symmetric: P = A(AᵀA)⁻¹Aᵀ — taking transpose gives the same matrix. Idempotent: P² = A(AᵀA)⁻¹AᵀA(AᵀA)⁻¹Aᵀ = A(AᵀA)⁻¹Aᵀ = P.'],
       reviewSection: 'Math — key properties of projection matrices',
     },
     {
@@ -651,7 +654,7 @@ b = np.array([1., 2., 3.])
         'The projection formula requires $A^T = A$',
       ],
       answer: 'The error $\\mathbf{b} - A\\hat{\\mathbf{x}}$ must be perpendicular to every column of $A$',
-      hints: ['Aáµ€(b - AxÌ‚) = 0 is the perpendicularity condition applied to all columns of A simultaneously. This is exactly the projection condition — AxÌ‚ is the closest point in col(A) to b.'],
+      hints: ['Aᵀ(b - AxÌ‚) = 0 is the perpendicularity condition applied to all columns of A simultaneously. This is exactly the projection condition — AxÌ‚ is the closest point in col(A) to b.'],
       reviewSection: 'Math — projection onto a subspace',
     },
     {
@@ -665,7 +668,7 @@ b = np.array([1., 2., 3.])
         'GPS signals are orthogonal by definition',
       ],
       answer: 'There are more satellite equations than unknowns — an overdetermined system — so the least squares projection gives the best-fit position',
-      hints: ['4+ satellites give 4+ distance equations for 3 unknowns (x,y,z). No exact solution exists due to noise; the projection Pb = A(Aáµ€A)â»¹Aáµ€b minimizes total squared error.'],
+      hints: ['4+ satellites give 4+ distance equations for 3 unknowns (x,y,z). No exact solution exists due to noise; the projection Pb = A(AᵀA)⁻¹Aᵀb minimizes total squared error.'],
       reviewSection: 'Hook — real-world context',
     },
   ],

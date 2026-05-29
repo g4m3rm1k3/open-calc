@@ -72,7 +72,7 @@
         id: 'BasisVectorProof',
         title: 'Why Columns Equal Basis Vector Destinations',
         mathBridge: 'This visualization proves the column secret geometrically. Set $\\mathbf{v} = 1 \\cdot \\hat{i} + 0 \\cdot \\hat{j}$, then apply a transformation $A$. By linearity, $A\\hat{i} = 1 \\cdot (\\text{first column})$. Drag the sliders to see how any vector is just a scaled sum of the two column vectors.',
-        caption: 'The linear combination law forces column 1 = destination of Ã®, column 2 = destination of Äµ.',
+        caption: 'The linear combination law forces column 1 = destination of î, column 2 = destination of ĵ.',
       },
     ],
   },
@@ -104,7 +104,7 @@
       {
         id: 'OpenMatNotebook',
         title: 'OpenMAT: Matrices as Transformations',
-        mathBridge: 'MATLAB uses `*` for matrix multiplication and `[a b; c d]` syntax for 2×2 matrices. The columns of A tell you where Ã® and Äµ go — verify this directly by multiplying A by [1;0] and [0;1].',
+        mathBridge: 'MATLAB uses `*` for matrix multiplication and `[a b; c d]` syntax for 2×2 matrices. The columns of A tell you where î and ĵ go — verify this directly by multiplying A by [1;0] and [0;1].',
         caption: 'Four cells: matrix-vector multiply, common transforms, rotation derivation, and CNC G68.',
         initialProps: {
           initialCells: [
@@ -113,7 +113,7 @@
               cellTitle: 'Matrix-vector multiply — columns are destination of basis vectors',
               prose: [
                 'In MATLAB/Octave, `*` multiplies matrices and vectors. A column vector is `[x; y]` (semicolons separate rows).',
-                'The first column of A is where Ã® = [1;0] goes. The second column is where Äµ = [0;1] goes. Verify this directly — multiply A by each basis vector.',
+                'The first column of A is where î = [1;0] goes. The second column is where ĵ = [0;1] goes. Verify this directly — multiply A by each basis vector.',
               ],
               code: `% 90° counter-clockwise rotation matrix
 A = [0 -1; 1 0];
@@ -139,7 +139,7 @@ disp('Linear combination check:'); disp(verify)`,
               id: 2,
               cellTitle: 'Common 2D transformations — all defined by their columns',
               prose: [
-                'Every possible 2×2 matrix is some transformation. These are the geometric classics. For each one, figure out where Ã® and Äµ go — that tells you the columns.',
+                'Every possible 2×2 matrix is some transformation. These are the geometric classics. For each one, figure out where î and ĵ go — that tells you the columns.',
               ],
               code: `% The four famous 2D transformation types
 v = [2; 1];
@@ -168,7 +168,7 @@ fprintf('Squish [2;1] --> [%g;%g]\\n', squish*v)`,
               id: 3,
               cellTitle: 'Rotation matrix — derived from tracking basis vectors',
               prose: [
-                'Where does Ã® = [1,0] go after rotating by angle θ? To [cos θ, sin θ]. Where does Äµ = [0,1] go? To [−sin θ, cos θ]. Paste those into the columns and you have the rotation matrix.',
+                'Where does î = [1,0] go after rotating by angle θ? To [cos θ, sin θ]. Where does ĵ = [0,1] go? To [−sin θ, cos θ]. Paste those into the columns and you have the rotation matrix.',
                 'The unit circle property: rotation is length-preserving. Every column has magnitude 1. The two columns are perpendicular.',
               ],
               code: `theta_deg = 45;
@@ -232,7 +232,7 @@ fprintf('\\nMax positional error without G68: %.4f mm\\n', error)`,
       {
         id: 'PythonNotebook',
         title: 'Code: Matrices as Transformations',
-        mathBridge: 'A @ v is matrix-vector multiplication. The columns of A tell you where Ã® and Äµ land. fig.transformed_grid([[a,b],[c,d]]) draws the warped coordinate system.',
+        mathBridge: 'A @ v is matrix-vector multiplication. The columns of A tell you where î and ĵ land. fig.transformed_grid([[a,b],[c,d]]) draws the warped coordinate system.',
         caption: 'Apply transformations to vectors and visualize how the grid warps.',
         initialProps: {
           initialCells: [
@@ -241,7 +241,7 @@ fprintf('\\nMax positional error without G68: %.4f mm\\n', error)`,
               cellTitle: 'Matrix-vector multiplication — where does a vector land?',
               prose: [
                 'The `@` operator is matrix multiplication in NumPy. `A @ v` applies transformation A to vector v.',
-                'The columns of A tell you where Ã® = [1,0] and Äµ = [0,1] land. Any other vector\'s destination is a linear combination of those columns.',
+                'The columns of A tell you where î = [1,0] and ĵ = [0,1] land. Any other vector\'s destination is a linear combination of those columns.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -283,7 +283,7 @@ plt.show()`,
               cellTitle: 'Visualize: the transformed grid',
               prose: [
                 '`fig.transformed_grid(matrix)` draws the coordinate grid after the transformation.',
-                'The red arrow shows where Ã® lands; the green arrow shows where Äµ lands.',
+                'The red arrow shows where î lands; the green arrow shows where ĵ lands.',
                 'Try changing the matrix below to a shear [[1,1],[0,1]] or a scale [[2,0],[0,0.5]] and re-run.',
               ],
               code: `from opencalc import quick_transform
@@ -296,7 +296,7 @@ quick_transform(rotation, vector=[2, 1])`,
               id: 3,
               cellTitle: 'Common transformations',
               prose: [
-                'Every 2×2 matrix is a transformation. Here are the most common ones — each described by where Ã® and Äµ land.',
+                'Every 2×2 matrix is a transformation. Here are the most common ones — each described by where î and ĵ land.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -338,11 +338,11 @@ plt.show()`,
               challengeNumber: 1,
               challengeTitle: 'Build a transformation matrix',
               difficulty: 'medium',
-              prompt: 'Build a matrix A that sends Ã® = [1,0] to [2, 1] and Äµ = [0,1] to [-1, 3]. Then apply it to the vector [4, 2] and visualize the result using quick_transform.',
+              prompt: 'Build a matrix A that sends î = [1,0] to [2, 1] and ĵ = [0,1] to [-1, 3]. Then apply it to the vector [4, 2] and visualize the result using quick_transform.',
               code: `import numpy as np
 from opencalc import quick_transform
 
-# Columns of A are where Ã® and Äµ land
+# Columns of A are where î and ĵ land
 A = np.array([[2., -1.],
               [1.,  3.]])
 
@@ -351,7 +351,7 @@ v = np.array([4.0, 2.0])
 # Apply A to v
 # Then visualize: quick_transform(A.tolist(), vector=v.tolist())
 `,
-              hint: 'The columns of A are directly the images of Ã® and Äµ. A = [[2,-1],[1,3]] means first column is where Ã® goes, second column is where Äµ goes. A.tolist() converts to plain lists for quick_transform.',
+              hint: 'The columns of A are directly the images of î and ĵ. A = [[2,-1],[1,3]] means first column is where î goes, second column is where ĵ goes. A.tolist() converts to plain lists for quick_transform.',
             },
           ]
         }
@@ -433,7 +433,7 @@ v = np.array([4.0, 2.0])
           expression: '= \\begin{bmatrix} 7 \\\\ 3 \\end{bmatrix}',
           annotation: 'Add the scaled columns: $[8,0]^T + [-1,3]^T = [7,3]^T$. The vector $\\mathbf{v} = [4,1]^T$ lands at $[7,3]^T$ after transformation $A$.',
           strategyTitle: 'Step 4: Add → output vector',
-          hints: ['Verify via row formula: row 1 dot $\\mathbf{v}$ = $2(4)+(-1)(1)=7$. Row 2 dot $\\mathbf{v}$ = $0(4)+3(1)=3$. âœ“'],
+          hints: ['Verify via row formula: row 1 dot $\\mathbf{v}$ = $2(4)+(-1)(1)=7$. Row 2 dot $\\mathbf{v}$ = $0(4)+3(1)=3$. ✓'],
         },
       ],
     },
@@ -461,7 +461,7 @@ v = np.array([4.0, 2.0])
         },
         {
           expression: 'R_{90} \\begin{bmatrix} 3 \\\\ 1 \\end{bmatrix} = 3\\begin{bmatrix} 0 \\\\ 1 \\end{bmatrix} + 1\\begin{bmatrix} -1 \\\\ 0 \\end{bmatrix} = \\begin{bmatrix} -1 \\\\ 3 \\end{bmatrix}',
-          annotation: 'Verify: apply $R_{90}$ to a test vector $[3,1]^T$. The result $[-1,3]^T$ should be $[3,1]^T$ rotated 90° CCW. Length preserved: $\\sqrt{9+1} = \\sqrt{1+9}$ âœ“. Direction rotated 90° âœ“.',
+          annotation: 'Verify: apply $R_{90}$ to a test vector $[3,1]^T$. The result $[-1,3]^T$ should be $[3,1]^T$ rotated 90° CCW. Length preserved: $\\sqrt{9+1} = \\sqrt{1+9}$ ✓. Direction rotated 90° ✓.',
           strategyTitle: 'Step 4: Verify on a test vector',
           hints: ['General rotation matrix by angle $\\theta$: $R_\\theta = \\begin{bmatrix}\\cos\\theta & -\\sin\\theta \\\\ \\sin\\theta & \\cos\\theta\\end{bmatrix}$. At $\\theta = 90°$: $\\cos 90° = 0$, $\\sin 90° = 1$. Matches our matrix.'],
         },
@@ -554,20 +554,20 @@ v = np.array([4.0, 2.0])
   // ── Semantic Layer ───────────────────────────────────────────────
   semantics: {
     core: [
-      {
-        symbol: "A\\vec{v}",
-        meaning: "Applying the transformation matrix A to the input vector v."
-      },
-      {
-        symbol: "T(\\vec{v})",
-        meaning: "A linear transformation function T acting on vector v. Functionally identical to a matrix multiplication."
-      }
+      { symbol: 'A\\mathbf{v}', meaning: 'The image of v under transformation A — equals x times column 1 of A plus y times column 2, where [x,y] are the components of v' },
+      { symbol: 'T(\\mathbf{v})', meaning: 'A linear transformation function T applied to v — identical to matrix multiplication A·v when T has a matrix representation' },
+      { symbol: '\\hat{i},\\;\\hat{j}', meaning: 'Standard basis vectors [1,0] and [0,1] — their destinations are exactly the columns of the transformation matrix' },
+      { symbol: '\\ker(T)', meaning: 'Kernel (null space) of T — all vectors v with T(v) = 0; measures how much information the transformation destroys' },
+      { symbol: '\\text{im}(T)', meaning: 'Image (column space) of T — the set of all possible outputs; equals the span of the columns of the matrix' },
+      { symbol: 'T(c\\mathbf{u}+d\\mathbf{v})=cT(\\mathbf{u})+dT(\\mathbf{v})', meaning: 'The linearity condition — a transformation is linear iff it preserves scaling and addition simultaneously' },
     ],
     rulesOfThumb: [
-      "The columns of a matrix tell you where the standard basis vectors land.",
-      "Matrix-vector multiplication is just a linear combination of the matrix's columns.",
-      "If the grid lines curve after a transformation, it is NOT a linear transformation."
-    ]
+      "Columns of A = destinations of the basis vectors — read them to understand what the transformation does geometrically.",
+      "Matrix-vector multiplication is a linear combination of columns — A·v = v₁·(col 1) + v₂·(col 2).",
+      "A transformation that moves the origin is affine, not linear — matrices alone cannot represent translations.",
+      "If grid lines stay parallel and evenly spaced, the transformation is linear — even if stretched or tilted.",
+      "To build a matrix from geometry, track only where î and ĵ land — those destinations become the two columns.",
+    ],
   },
 
   // ── Spiral Learning ──────────────────────────────────────────────
@@ -592,11 +592,17 @@ v = np.array([4.0, 2.0])
   assessment: {
     questions: [
       {
-        id: 'q-la2-001-assess-1',
-        type: 'input',
-        text: 'What matrix does absolutely nothing to space? (The Identity Matrix). Provide the top row first, then bottom row.',
-        answer: '[[1, 0], [0, 1]]',
-        hint: 'Where must i-hat and j-hat go if nothing changes? i-hat stays at [1, 0] and j-hat stays at [0, 1].',
+        id: 'la2-001-assess-1',
+        type: 'choice',
+        text: 'Which matrix performs NO transformation — leaving every vector exactly where it was?',
+        options: [
+          '$\\begin{bmatrix}1&0\\\\0&1\\end{bmatrix}$',
+          '$\\begin{bmatrix}0&1\\\\1&0\\end{bmatrix}$',
+          '$\\begin{bmatrix}1&1\\\\0&1\\end{bmatrix}$',
+          '$\\begin{bmatrix}0&0\\\\0&0\\end{bmatrix}$',
+        ],
+        answer: '$\\begin{bmatrix}1&0\\\\0&1\\end{bmatrix}$',
+        hint: 'The identity matrix sends î to $[1,0]^T$ (unchanged) and ĵ to $[0,1]^T$ (unchanged). Every vector multiplied by $I$ comes out the same.',
       },
     ],
   },
@@ -614,7 +620,7 @@ v = np.array([4.0, 2.0])
     { id: 'cp-la2-001-1', label: 'Read: State the column secret — what do the columns of a matrix represent', type: 'read' },
     { id: 'cp-la2-001-2', label: 'Read: Define a linear transformation — the two rules it must satisfy', type: 'read' },
     { id: 'cp-la2-001-3', label: 'Read: Explain why every linear map has a unique matrix representation', type: 'read' },
-    { id: 'cp-la2-001-4', label: 'Run: OpenMAT cell 1 — verify where Ã® and Äµ land under a rotation matrix', type: 'lab' },
+    { id: 'cp-la2-001-4', label: 'Run: OpenMAT cell 1 — verify where î and ĵ land under a rotation matrix', type: 'lab' },
     { id: 'cp-la2-001-5', label: 'Run: Python cell 1 — apply a matrix to vectors and confirm via linear combination', type: 'lab' },
     { id: 'cp-la2-001-6', label: 'Complete: Example 1 — apply a matrix using the column linear combination method', type: 'example' },
     { id: 'cp-la2-001-7', label: 'Complete: Example 2 — build the 90° rotation matrix from geometry', type: 'example' },
@@ -627,13 +633,13 @@ v = np.array([4.0, 2.0])
       type: 'choice',
       text: 'Geometrically, what do the columns of a 2×2 transformation matrix represent?',
       options: [
-        'The coordinate destinations where the basis vectors Ã® and Äµ land after the transformation',
+        'The coordinate destinations where the basis vectors î and ĵ land after the transformation',
         'The x and y components of the output vector for a specific input',
         'The angle of rotation applied to the space',
         'The eigenvalues of the matrix',
       ],
-      answer: 'The coordinate destinations where the basis vectors Ã® and Äµ land after the transformation',
-      hints: ['Every vector is a linear combination of Ã® and Äµ. If you know where those two land, you know where every other vector lands.'],
+      answer: 'The coordinate destinations where the basis vectors î and ĵ land after the transformation',
+      hints: ['Every vector is a linear combination of î and ĵ. If you know where those two land, you know where every other vector lands.'],
       reviewSection: 'Intuition tab — The column secret',
     },
     {
@@ -662,7 +668,7 @@ v = np.array([4.0, 2.0])
     {
       id: 'la2-001-quiz-4',
       type: 'choice',
-      text: 'The matrix $\\begin{bmatrix}1&0\\\\0&-1\\end{bmatrix}$ sends Ã® to $[1,0]^T$ and Äµ to $[0,-1]^T$. What geometric transformation does this represent?',
+      text: 'The matrix $\\begin{bmatrix}1&0\\\\0&-1\\end{bmatrix}$ sends î to $[1,0]^T$ and ĵ to $[0,-1]^T$. What geometric transformation does this represent?',
       options: [
         'Reflection over the x-axis — the y-coordinate flips sign',
         'Rotation 90° clockwise',
@@ -670,7 +676,7 @@ v = np.array([4.0, 2.0])
         'Projection onto the x-axis',
       ],
       answer: 'Reflection over the x-axis — the y-coordinate flips sign',
-      hints: ['Ã® stays on the x-axis (unchanged). Äµ flips from pointing up to pointing down — y-coordinates flip sign. Compare with projection $[1,0;0,0]$ which sends Äµ to zero.'],
+      hints: ['î stays on the x-axis (unchanged). ĵ flips from pointing up to pointing down — y-coordinates flip sign. Compare with projection $[1,0;0,0]$ which sends ĵ to zero.'],
       reviewSection: 'Example 3 — read what a transformation does from its columns',
     },
     {
@@ -699,7 +705,7 @@ v = np.array([4.0, 2.0])
     {
       id: 'la2-001-quiz-7',
       type: 'choice',
-      text: 'Which matrix represents a horizontal shear that leaves Ã® fixed but sends Äµ to $[2, 1]^T$?',
+      text: 'Which matrix represents a horizontal shear that leaves î fixed but sends ĵ to $[2, 1]^T$?',
       options: [
         '$\\begin{bmatrix}1&2\\\\0&1\\end{bmatrix}$',
         '$\\begin{bmatrix}2&0\\\\1&0\\end{bmatrix}$',
@@ -707,7 +713,7 @@ v = np.array([4.0, 2.0])
         '$\\begin{bmatrix}0&2\\\\0&1\\end{bmatrix}$',
       ],
       answer: '$\\begin{bmatrix}1&2\\\\0&1\\end{bmatrix}$',
-      hints: ['Column 1 = destination of Ã® = $[1,0]^T$ (unchanged). Column 2 = destination of Äµ = $[2,1]^T$. Paste destinations into columns.'],
+      hints: ['Column 1 = destination of î = $[1,0]^T$ (unchanged). Column 2 = destination of ĵ = $[2,1]^T$. Paste destinations into columns.'],
       reviewSection: 'Example 2 — build a matrix from geometry',
     },
     {
@@ -735,7 +741,7 @@ v = np.array([4.0, 2.0])
         'It projects onto the y-axis: $[x,y]^T \\to [0,y]^T$',
       ],
       answer: 'It collapses the vector onto the x-axis: $[x,y]^T \\to [x,0]^T$',
-      hints: ['Column 1 = $[1,0]^T$ (Ã® unchanged). Column 2 = $[0,0]^T$ (Äµ sent to the origin). So $y$ information is destroyed — every vector is flattened onto the x-axis.'],
+      hints: ['Column 1 = $[1,0]^T$ (î unchanged). Column 2 = $[0,0]^T$ (ĵ sent to the origin). So $y$ information is destroyed — every vector is flattened onto the x-axis.'],
       reviewSection: 'Math tab — common 2D transformations',
     },
     {
@@ -791,15 +797,15 @@ v = np.array([4.0, 2.0])
     },
     {
       commonError: 'Building the matrix with destinations as rows instead of columns.',
-      symptom: 'Student is told "Ã® goes to $[2,3]^T$" and writes $A = \\begin{bmatrix}2&3\\\\\\cdots&\\cdots\\end{bmatrix}$ (row instead of column).',
+      symptom: 'Student is told "î goes to $[2,3]^T$" and writes $A = \\begin{bmatrix}2&3\\\\\\cdots&\\cdots\\end{bmatrix}$ (row instead of column).',
       whyItHappened: 'Writing destination coordinates left-to-right feels natural. But the matrix-vector product formula demands column $j$ = destination of basis vector $j$.',
-      repairStrategy: 'Verify immediately: multiply the matrix you built by $[1,0]^T$ (Ã®). If the result is the destination of Ã®, the column is correct. If not, transpose.',
+      repairStrategy: 'Verify immediately: multiply the matrix you built by $[1,0]^T$ (î). If the result is the destination of î, the column is correct. If not, transpose.',
     },
   ],
 
   mastery: {
     targetLevel: 2,
-    solveIndependently: 'Apply any $2 \\times 2$ matrix to any vector using the linear combination of columns method, and construct a matrix from a geometric description (rotation, reflection, shear, scale) by tracking where Ã® and Äµ land.',
+    solveIndependently: 'Apply any $2 \\times 2$ matrix to any vector using the linear combination of columns method, and construct a matrix from a geometric description (rotation, reflection, shear, scale) by tracking where î and ĵ land.',
     explainVerbally: 'Explain why a linear transformation is completely determined by where it sends the basis vectors, and why a translation cannot be represented as a matrix multiplication.',
     detectIncorrectApplication: 'Identify when a student builds a matrix with destinations as rows (not columns), or mistakes the column entries for the output of an arbitrary input.',
     transferToUnfamiliar: 'Given a 3D transformation described geometrically (e.g., "rotate 90° around the z-axis"), construct the $3 \\times 3$ matrix by tracking where $\\hat{i}, \\hat{j}, \\hat{k}$ land.',

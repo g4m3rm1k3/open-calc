@@ -65,8 +65,8 @@ export default {
       },
       {
         id: 'LALesson05_MatrixMult',
-        title: 'A then Aâ»¹ = Identity',
-        mathBridge: 'Set the first transformation to any invertible matrix A (try a shear or rotation). Then set the second transformation to its inverse Aâ»¹ (use the formula: swap main diagonal, negate off-diagonal, scale by 1/det). Press "compose" and watch the combined transformation snap back to the identity — the grid returns to its original, undistorted state. This is the meaning of $A^{-1}A = I$: the inverse perfectly cancels the original warp.',
+        title: 'A then A⁻¹ = Identity',
+        mathBridge: 'Set the first transformation to any invertible matrix A (try a shear or rotation). Then set the second transformation to its inverse A⁻¹ (use the formula: swap main diagonal, negate off-diagonal, scale by 1/det). Press "compose" and watch the combined transformation snap back to the identity — the grid returns to its original, undistorted state. This is the meaning of $A^{-1}A = I$: the inverse perfectly cancels the original warp.',
         caption: 'Composing A with its inverse returns the grid exactly to where it started — the identity transformation.',
       },
     ],
@@ -211,8 +211,8 @@ fprintf('Condition number (bad):  %.2e  (huge = near-singular)\\n', cond(M_bad))
       {
         id: 'PythonNotebook',
         title: 'Code: Determinant and Inverse',
-        mathBridge: 'np.linalg.det(A) computes det(A) = ad − bc. np.linalg.inv(A) computes Aâ»¹. Verify: A @ A_inv â‰ˆ I. det = 0 means singular — no inverse exists.',
-        caption: 'Verify the invertibility conditions and confirm A·Aâ»¹ = I numerically.',
+        mathBridge: 'np.linalg.det(A) computes det(A) = ad − bc. np.linalg.inv(A) computes A⁻¹. Verify: A @ A_inv ≈ I. det = 0 means singular — no inverse exists.',
+        caption: 'Verify the invertibility conditions and confirm A·A⁻¹ = I numerically.',
         initialProps: {
           initialCells: [
             {
@@ -256,9 +256,9 @@ plt.show()`,
             },
             {
               id: 2,
-              cellTitle: 'Computing the inverse and verifying A·Aâ»¹ = I',
+              cellTitle: 'Computing the inverse and verifying A·A⁻¹ = I',
               prose: [
-                '`np.linalg.inv(A)` computes Aâ»¹. Multiplying A by its inverse should give the identity matrix I.',
+                '`np.linalg.inv(A)` computes A⁻¹. Multiplying A by its inverse should give the identity matrix I.',
                 'In practice, use `np.linalg.solve(A, b)` to solve systems — never compute the inverse just to multiply it.',
               ],
               code: `import numpy as np
@@ -290,7 +290,7 @@ plt.show()`,
               challengeNumber: 1,
               challengeTitle: 'Invertibility check',
               difficulty: 'medium',
-              prompt: 'For each matrix below: (1) compute the determinant, (2) state whether it is invertible, (3) for any invertible matrix, compute Aâ»¹ and verify A @ Aâ»¹ = I. Explain why matrix C is singular.',
+              prompt: 'For each matrix below: (1) compute the determinant, (2) state whether it is invertible, (3) for any invertible matrix, compute A⁻¹ and verify A @ A⁻¹ = I. Explain why matrix C is singular.',
               code: `import numpy as np
 
 A = np.array([[4., 2.], [1., 3.]])
@@ -511,24 +511,19 @@ C = np.array([[2., -1.], [4., 3.]])
   // ── Semantic Layer ───────────────────────────────────────────────
   semantics: {
     core: [
-      {
-        symbol: "A^{-1}",
-        meaning: "The inverse matrix. It perfectly undoes the transformation caused by A."
-      },
-      {
-        symbol: "\\det(A)",
-        meaning: "The determinant of A. The exact factor by which the transformation scales area/volume."
-      },
-      {
-        symbol: "A^{-1}A = I",
-        meaning: "Multiplying a matrix by its inverse yields the Identity matrix (no change)."
-      }
+      { symbol: 'A^{-1}', meaning: 'Inverse matrix — undoes A exactly; applying A then A⁻¹ returns every vector to its original position' },
+      { symbol: '\\det(A)', meaning: 'Determinant — the signed area-scaling factor; positive means orientation preserved, negative means flipped, zero means singular (irreversible)' },
+      { symbol: 'A^{-1}A = I', meaning: 'Inverse cancels original — the two matrices compose to the identity (do nothing)' },
+      { symbol: 'ad - bc', meaning: '2×2 determinant formula — the difference of the two diagonal products; zero when columns are proportional' },
+      { symbol: '\\det(AB) = \\det(A)\\det(B)', meaning: 'Multiplicative property — the area scaling of a composed transformation equals the product of the individual scalings' },
     ],
     rulesOfThumb: [
-      "If columns are linearly dependent (they lie on the same line), the determinant will always be 0.",
-      "A determinant of exactly 0 is the mathematical equivalent of losing data permanently.",
-      "If you see A(vector) = (output), never 'divide' by A. Multiply both sides by A-inverse."
-    ]
+      'If columns are proportional (dependent), the determinant is always 0 and no inverse exists.',
+      'det = 0 means information was permanently destroyed — the transformation is irreversible.',
+      'To solve Ax = b, use solve(A, b) or backslash — never compute inv(A) just to multiply it.',
+      'The sign of det encodes orientation: negative det means the transformation flips space like a mirror.',
+      'The 2×2 inverse is: swap the main diagonal, negate the off-diagonal, divide by det.',
+    ],
   },
 
   // ── Spiral Learning ──────────────────────────────────────────────
@@ -553,11 +548,17 @@ C = np.array([[2., -1.], [4., 3.]])
   assessment: {
     questions: [
       {
-        id: "la2-003-assess-1",
-        type: "input",
-        text: "What is the determinant of the matrix [[1, 2], [2, 4]]?",
-        answer: "0",
-        hint: "(1*4) - (2*2) = 4 - 4."
+        id: 'la2-003-assess-1',
+        type: 'choice',
+        text: 'What is $\\det\\begin{bmatrix}1&2\\\\2&4\\end{bmatrix}$, and is this matrix invertible?',
+        options: [
+          '$\\det = 0$; not invertible — columns are proportional',
+          '$\\det = 4$; invertible',
+          '$\\det = -4$; invertible with negative determinant',
+          '$\\det = 6$; invertible',
+        ],
+        answer: '$\\det = 0$; not invertible — columns are proportional',
+        hint: '$ad - bc = (1)(4) - (2)(2) = 4 - 4 = 0$. Column 2 = $2 \\times$ column 1 — proportional columns always give $\\det = 0$.',
       }
     ]
   },
@@ -579,7 +580,7 @@ C = np.array([[2., -1.], [4., 3.]])
     { id: 'cp-la2-003-4', label: 'Run OpenMAT cell 1 — compute det manually and verify via MATLAB', type: 'lab' },
     { id: 'cp-la2-003-5', label: 'Run OpenMAT cell 3 — use backslash to solve Ax=b (not inv)', type: 'lab' },
     { id: 'cp-la2-003-6', label: 'Complete example 1: trace the 2×2 inverse formula step by step', type: 'example' },
-    { id: 'cp-la2-003-7', label: 'Complete example 2: recover the input vector by applying Aâ»¹', type: 'example' },
+    { id: 'cp-la2-003-7', label: 'Complete example 2: recover the input vector by applying A⁻¹', type: 'example' },
     { id: 'cp-la2-003-8', label: 'Attempt challenge 1: compute det by hand using ad − bc', type: 'challenge' },
     { id: 'cp-la2-003-9', label: 'Attempt challenge 2: find the value of c that makes the matrix singular', type: 'challenge' },
   ],

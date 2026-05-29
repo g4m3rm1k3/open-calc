@@ -71,7 +71,7 @@ export default {
       {
         id: 'LAMatrixAlgebraModule',
         title: 'Matrix Algebra — Concept to Graphics Pipeline',
-        mathBridge: 'A five-tab module: Concept covers addition, multiplication, identity, inverse, and LU; Canonical walks through a 2×3 × 3×2 product entry by entry, a 2×2 inverse by row reduction, and an LU factorisation; Real World shows the 3D graphics pipeline and FEA usage; Interactive lets you enter any 2×2 matrices A and B and instantly computes AB, BA, det(A), Aâ»¹, and Aâ»¹b, plus a live graphics canvas with rotation/scale/shear sliders; Practice has five hand-calculation problems.',
+        mathBridge: 'A five-tab module: Concept covers addition, multiplication, identity, inverse, and LU; Canonical walks through a 2×3 × 3×2 product entry by entry, a 2×2 inverse by row reduction, and an LU factorisation; Real World shows the 3D graphics pipeline and FEA usage; Interactive lets you enter any 2×2 matrices A and B and instantly computes AB, BA, det(A), A⁻¹, and A⁻¹b, plus a live graphics canvas with rotation/scale/shear sliders; Practice has five hand-calculation problems.',
         caption: 'The same math that renders every polygon in a 3D game — rotation, scale, and shear combined into a single matrix multiply.',
       },
     ],
@@ -367,7 +367,7 @@ v = np.array([1.0, 0.0])
       {
         type: 'theorem',
         title: 'Ring Properties of Matrix Algebra',
-        body: 'For matrices of compatible sizes:\n\n- **Associativity:** $(AB)C = A(BC)$ âœ“\n- **Left distributivity:** $A(B+C) = AB + AC$ âœ“\n- **Right distributivity:** $(B+C)A = BA + CA$ âœ“\n- **Scalar:** $(cA)B = c(AB) = A(cB)$ âœ“\n- **Commutativity:** $AB = BA$ âœ— (in general)\n\nThe set of $n \\times n$ matrices forms a **non-commutative ring** under addition and multiplication.',
+        body: 'For matrices of compatible sizes:\n\n- **Associativity:** $(AB)C = A(BC)$ ✓\n- **Left distributivity:** $A(B+C) = AB + AC$ ✓\n- **Right distributivity:** $(B+C)A = BA + CA$ ✓\n- **Scalar:** $(cA)B = c(AB) = A(cB)$ ✓\n- **Commutativity:** $AB = BA$ ✗ (in general)\n\nThe set of $n \\times n$ matrices forms a **non-commutative ring** under addition and multiplication.',
       },
       {
         type: 'proof',
@@ -379,7 +379,7 @@ v = np.array([1.0, 0.0])
       {
         id: 'LAMatrixAlgebraModule',
         title: 'Matrix Algebra — Concept to Graphics Pipeline',
-        mathBridge: 'A five-tab module: Concept covers addition, multiplication, identity, inverse, and LU; Canonical walks through a 2×3 × 3×2 product entry by entry, a 2×2 inverse by row reduction, and an LU factorisation; Real World shows the 3D graphics pipeline and FEA usage; Interactive lets you enter any 2×2 matrices A and B and instantly computes AB, BA, det(A), Aâ»¹, and Aâ»¹b, plus a live graphics canvas with rotation/scale/shear sliders; Practice has five hand-calculation problems.',
+        mathBridge: 'A five-tab module: Concept covers addition, multiplication, identity, inverse, and LU; Canonical walks through a 2×3 × 3×2 product entry by entry, a 2×2 inverse by row reduction, and an LU factorisation; Real World shows the 3D graphics pipeline and FEA usage; Interactive lets you enter any 2×2 matrices A and B and instantly computes AB, BA, det(A), A⁻¹, and A⁻¹b, plus a live graphics canvas with rotation/scale/shear sliders; Practice has five hand-calculation problems.',
         caption: 'The same math that renders every polygon in a 3D game — rotation, scale, and shear combined into a single matrix multiply.',
       },
       {
@@ -418,7 +418,7 @@ v = np.array([1.0, 0.0])
           expression: 'AB = \\begin{bmatrix} 19 & 22 \\\\ 43 & 50 \\end{bmatrix}',
           annotation: 'Assemble. This single matrix is equivalent to first applying transformation $B$, then transformation $A$. One matrix — two sequential operations captured in one object.',
           strategyTitle: 'Step 4: Assemble result',
-          hints: ['Verify column 1 = $A$ applied to column 1 of $B$: $A \\cdot [5,7]^T = [1 \\cdot 5 + 2 \\cdot 7, \\; 3 \\cdot 5 + 4 \\cdot 7]^T = [19, 43]^T$ âœ“'],
+          hints: ['Verify column 1 = $A$ applied to column 1 of $B$: $A \\cdot [5,7]^T = [1 \\cdot 5 + 2 \\cdot 7, \\; 3 \\cdot 5 + 4 \\cdot 7]^T = [19, 43]^T$ ✓'],
         },
       ],
     },
@@ -434,9 +434,9 @@ v = np.array([1.0, 0.0])
         },
         {
           expression: 'SR = \\begin{bmatrix} (1)(0)+(1)(1) & (1)(-1)+(1)(0) \\\\ (0)(0)+(1)(1) & (0)(-1)+(1)(0) \\end{bmatrix} = \\begin{bmatrix} 1 & -1 \\\\ 1 & 0 \\end{bmatrix}',
-          annotation: 'Compute each entry via row-dot-column. Geometric meaning: where does $\\hat{i} = [1,0]^T$ end up? Under $R$: $[0,1]^T$. Under $S$ applied to $[0,1]^T$: $[1,1]^T$. That is column 1 of $SR$ âœ“.',
+          annotation: 'Compute each entry via row-dot-column. Geometric meaning: where does $\\hat{i} = [1,0]^T$ end up? Under $R$: $[0,1]^T$. Under $S$ applied to $[0,1]^T$: $[1,1]^T$. That is column 1 of $SR$ ✓.',
           strategyTitle: 'Step 2: Compute SR',
-          hints: ['Column 1 of $SR$ = $S \\cdot$ (col 1 of $R$) = $S \\cdot [0,1]^T = [0+1, 0+1]^T = [1,1]^T$ âœ“'],
+          hints: ['Column 1 of $SR$ = $S \\cdot$ (col 1 of $R$) = $S \\cdot [0,1]^T = [0+1, 0+1]^T = [1,1]^T$ ✓'],
         },
         {
           expression: 'RS = \\begin{bmatrix} 0 & -1 \\\\ 1 & 0 \\end{bmatrix}\\begin{bmatrix} 1 & 1 \\\\ 0 & 1 \\end{bmatrix} = \\begin{bmatrix} 0 & -1 \\\\ 1 & 1 \\end{bmatrix}',
@@ -476,7 +476,7 @@ v = np.array([1.0, 0.0])
           expression: 'AB = \\begin{bmatrix} 4 & -2 \\\\ 7 & 13 \\end{bmatrix}',
           annotation: 'Complete the bottom row: $(2,1) = 2 \\cdot 4 + 1 \\cdot (-1) + 3 \\cdot 0 = 7$. $(2,2) = 2 \\cdot 1 + 1 \\cdot 2 + 3 \\cdot 3 = 13$. Result: a $2 \\times 2$ matrix. $A$ maps $\\mathbb{R}^3 \\to \\mathbb{R}^2$; $B$ maps $\\mathbb{R}^2 \\to \\mathbb{R}^3$; their composition $AB$ maps $\\mathbb{R}^2 \\to \\mathbb{R}^2$.',
           strategyTitle: 'Step 4: Assemble the $2 \\times 2$ result',
-          hints: ['Verify: $(2,1)$ = row 2 of $A = [2,1,3]$ dot col 1 of $B = [4,-1,0]^T$ = $8-1+0=7$ âœ“. $(2,2)$ = $[2,1,3] \\cdot [1,2,3]^T = 2+2+9=13$ âœ“.'],
+          hints: ['Verify: $(2,1)$ = row 2 of $A = [2,1,3]$ dot col 1 of $B = [4,-1,0]^T$ = $8-1+0=7$ ✓. $(2,2)$ = $[2,1,3] \\cdot [1,2,3]^T = 2+2+9=13$ ✓.'],
         },
       ],
     },
@@ -536,20 +536,20 @@ v = np.array([1.0, 0.0])
   // ── Semantic Layer ───────────────────────────────────────────────
   semantics: {
     core: [
-      {
-        symbol: "AB",
-        meaning: "The composition of two linear transformations. Read right-to-left: evaluate B, then evaluate A on the result."
-      },
-      {
-        symbol: "A^2",
-        meaning: "Applying the transformation A twice in a row. A * A."
-      }
+      { symbol: 'AB', meaning: 'Composition of linear maps — apply B first, then A. Read right-to-left: B acts on the input, A acts on the result' },
+      { symbol: 'A^2', meaning: 'Apply transformation A twice in a row — A composed with itself: A(A(v))' },
+      { symbol: '(AB)_{ij} = \\sum_k A_{ik}B_{kj}', meaning: 'Row-dot-column formula — entry (i,j) of the product is row i of A dotted with column j of B' },
+      { symbol: '(m\\times k)(k\\times n)=(m\\times n)', meaning: 'Dimension rule — inner dimensions must match; outer dimensions give the result size' },
+      { symbol: 'AB \\neq BA', meaning: 'Non-commutativity — matrix multiplication order matters; swapping the order changes the result' },
+      { symbol: '(AB)C = A(BC)', meaning: 'Associativity — matrix products can be grouped in any order as long as the left-to-right sequence is maintained' },
     ],
     rulesOfThumb: [
-      "Matrix multiplication is just chasing where basis vectors land across multiple chronological jumps.",
-      "The dot-product method (row by column) is just the algorithmic way to calculate it.",
-      "Order always matters. Rotating then moving is not moving then rotating."
-    ]
+      'Read matrix products right-to-left: the matrix closest to the vector acts first.',
+      'Check dimensions before multiplying: write sizes side by side — the inner pair must match.',
+      'Pre-multiply a chain of matrices into one master matrix to save computation when transforming many vectors.',
+      'Order always matters: "rotate then shear" warps space differently than "shear then rotate."',
+      'Column j of AB is A applied to column j of B — use this to build geometric intuition for the product.',
+    ],
   },
 
   // ── Spiral Learning ──────────────────────────────────────────────
@@ -574,11 +574,12 @@ v = np.array([1.0, 0.0])
   assessment: {
     questions: [
       {
-        id: 'q-la2-002-assess-1',
-        type: 'input',
-        text: 'If you apply transformation A first, B second, and C third to a vector v, how is this written algebraically? (Type the letters without spaces).',
-        answer: 'CBAv',
-        hint: 'Transformations compose right-to-left: C(B(A(v))). The matrix closest to v acts first.',
+        id: 'la2-002-assess-1',
+        type: 'choice',
+        text: 'You apply transformation $A$ first, then $B$, then $C$ to a vector $\\mathbf{v}$. Which expression is correct?',
+        options: ['$CBA\\mathbf{v}$', '$ABC\\mathbf{v}$', '$BAC\\mathbf{v}$', '$ACB\\mathbf{v}$'],
+        answer: '$CBA\\mathbf{v}$',
+        hint: 'The matrix closest to $\\mathbf{v}$ acts first. $A$ acts first, so $A$ is closest: $\\ldots A\\mathbf{v}$. Then $B$ acts on the result: $\\ldots BA\\mathbf{v}$. Then $C$: $CBA\\mathbf{v}$.',
       },
     ],
   },

@@ -77,7 +77,7 @@ export default {
       {
         id: 'LALinearAlgebraRealWorld',
         title: 'Linear Algebra in the Real World — Applied Module',
-        mathBridge: 'A six-tab applied module spanning chapters 1 and 2: Systems→CNC shows two sensor equations as intersecting lines and computes the tool position via RREF; Matrices→Graphics applies rotation/scale/shear to a 2D shape and displays the combined matrix T with det(T); Vectors→Forces decomposes two cable tensions into a linear system and solves for T₁ and T₁; Dot→Normals shows how the dot product controls surface brightness and cutting-tool contact angle; Det→Area/Vol draws the parallelogram spanned by two vectors and shows area = |det|; Practice has five hand-calculation problems with real manufacturing context.',
+        mathBridge: 'A six-tab applied module spanning chapters 1 and 2: Systems→CNC shows two sensor equations as intersecting lines and computes the tool position via RREF; Matrices→Graphics applies rotation/scale/shear to a 2D shape and displays the combined matrix T with det(T); Vectors→Forces decomposes two cable tensions into a linear system and solves for T₁ and T₁; Dot→Normals shows how the dot product controls surface brightness and cutting-tool contact angle; Det→Area/Vol draws the parallelogram spanned by two vectors and shows area = |det|; Practice has five hand-calculation problems with real manufacturing context.',
         caption: 'The five core tools of linear algebra — systems, matrices, vectors, dot products, determinants — each doing real engineering work.',
       },
     ],
@@ -374,7 +374,7 @@ plt.show()`,
               challengeNumber: 1,
               challengeTitle: 'Full cofactor analysis',
               difficulty: 'medium',
-              prompt: 'For A = [[2,0,1],[3,1,2],[1,4,0]]: (1) compute det(A) by cofactor expansion along row 1 (show each minor and cofactor), (2) verify with NumPy, (3) verify det(A^T) = det(A), (4) compute det(A)·det(Aâ»¹) and confirm it equals 1.',
+              prompt: 'For A = [[2,0,1],[3,1,2],[1,4,0]]: (1) compute det(A) by cofactor expansion along row 1 (show each minor and cofactor), (2) verify with NumPy, (3) verify det(A^T) = det(A), (4) compute det(A)·det(A⁻¹) and confirm it equals 1.',
               code: `import numpy as np
 
 A = np.array([[2., 0., 1.],
@@ -436,7 +436,7 @@ A = np.array([[2., 0., 1.],
       {
         id: 'LALinearAlgebraRealWorld',
         title: 'Linear Algebra in the Real World — Applied Module',
-        mathBridge: 'A six-tab applied module spanning chapters 1 and 2: Systems→CNC shows two sensor equations as intersecting lines and computes the tool position via RREF; Matrices→Graphics applies rotation/scale/shear to a 2D shape and displays the combined matrix T with det(T); Vectors→Forces decomposes two cable tensions into a linear system and solves for T₁ and T₁; Dot→Normals shows how the dot product controls surface brightness and cutting-tool contact angle; Det→Area/Vol draws the parallelogram spanned by two vectors and shows area = |det|; Practice has five hand-calculation problems with real manufacturing context.',
+        mathBridge: 'A six-tab applied module spanning chapters 1 and 2: Systems→CNC shows two sensor equations as intersecting lines and computes the tool position via RREF; Matrices→Graphics applies rotation/scale/shear to a 2D shape and displays the combined matrix T with det(T); Vectors→Forces decomposes two cable tensions into a linear system and solves for T₁ and T₁; Dot→Normals shows how the dot product controls surface brightness and cutting-tool contact angle; Det→Area/Vol draws the parallelogram spanned by two vectors and shows area = |det|; Practice has five hand-calculation problems with real manufacturing context.',
         caption: 'The five core tools of linear algebra — systems, matrices, vectors, dot products, determinants — each doing real engineering work.',
       },
     ],
@@ -603,6 +603,18 @@ A = np.array([[2., 0., 1.],
       {
         symbol: "\\det(AB) = \\det(A)\\det(B)",
         meaning: "The multiplicative property: composing two transformations multiplies their volume-scaling factors."
+      },
+      {
+        symbol: "\\det(A) = 0",
+        meaning: "Singular matrix: columns are linearly dependent, no inverse exists, the transformation collapses space to a lower dimension."
+      },
+      {
+        symbol: "\\det(cA) = c^n\\det(A)",
+        meaning: "Scaling an n×n matrix by c multiplies the determinant by cⁿ — one factor of c per row, n rows total."
+      },
+      {
+        symbol: "\\det(A^T) = \\det(A)",
+        meaning: "Transposing a matrix leaves the determinant unchanged — row expansion and column expansion give the same result."
       }
     ],
     rulesOfThumb: [
@@ -642,10 +654,12 @@ A = np.array([[2., 0., 1.],
     questions: [
       {
         id: "la2-005-assess-1",
-        type: "input",
+        type: "choice",
         text: "What is the determinant of $\\begin{bmatrix} 2 & 0 & 0 \\\\ 1 & -3 & 0 \\\\ 4 & 2 & 5 \\end{bmatrix}$?",
+        options: ["-30", "30", "-6", "0"],
         answer: "-30",
-        hint: "This is a lower triangular matrix. det = product of diagonal entries = 2 × (−3) × 5 = −30."
+        hints: ["This is a lower triangular matrix. det = product of diagonal entries = 2 × (−3) × 5 = −30."],
+        reviewSection: "Math tab — Triangular matrix determinant"
       }
     ]
   },
@@ -655,7 +669,7 @@ A = np.array([[2., 0., 1.],
     "Cofactor expansion: pick any row or column, multiply each entry by its signed minor, sum everything.",
     "Properties make computation tractable: row replacements preserve det; row swaps flip sign; triangular form → read off product of diagonal.",
     "det(AB) = det(A)·det(B) — composing two transformations multiplies their volume-scaling factors.",
-    "Zero determinant â†” coplanar columns (3D) â†” space collapses â†” no inverse.",
+    "Zero determinant ↔ coplanar columns (3D) ↔ space collapses ↔ no inverse.",
     "Cofactor expansion is O(n!) — never use it for matrices larger than 3×3 in practice."
   ],
 

@@ -368,7 +368,7 @@ for freq in [120, 300, 500, 650, 800]:
           annotation: '$\\cos^2(x) = (1+\\cos(2x))/2$, same argument. So $\\|\\sin(x)\\| = \\|\\cos(x)\\| = \\sqrt{\\pi}$.',
           strategyTitle: 'Compute norm of cos(x)',
           checkpoint: 'What is the orthonormal pair (unit-length vectors)?',
-          hints: ['Divide by the norm: e₁ = sin(x)/âˆšπ and e₁ = cos(x)/âˆšπ. These form an orthonormal pair in function space — the same role as standard basis vectors in ℝⁿ.'],
+          hints: ['Divide by the norm: e₁ = sin(x)/âˆšπ and e₁ = cos(x)/âˆšπ. These form an orthonormal pair in function space — the same role as standard basis vectors in ℝⁿ.'],
         },
       ],
       conclusion: '$\\sin(x) \\perp \\cos(x)$ in function space, with $\\|\\sin(x)\\| = \\|\\cos(x)\\| = \\sqrt{\\pi}$. Normalized: $\\{\\sin(x)/\\sqrt{\\pi}, \\cos(x)/\\sqrt{\\pi}\\}$ is an orthonormal pair. This orthogonality is the reason Fourier series work: each frequency is independent (contributes independently to the total signal).',
@@ -505,7 +505,7 @@ for freq in [120, 300, 500, 650, 800]:
         '$\\langle \\mathbf{u}, \\mathbf{v} \\rangle = u_1v_1 + 2u_2v_2$',
       ],
       answer: '$\\langle \\mathbf{u}, \\mathbf{v} \\rangle = u_1v_1 - u_2v_2$',
-      hints: ['Take v=[0,1]áµ€: âŸ¨v,vâŸ© = 0 - 1 = -1 < 0. Positive definiteness fails — inner products require âŸ¨v,vâŸ© > 0 for all non-zero v.'],
+      hints: ['Take v=[0,1]ᵀ: âŸ¨v,vâŸ© = 0 - 1 = -1 < 0. Positive definiteness fails — inner products require âŸ¨v,vâŸ© > 0 for all non-zero v.'],
       reviewSection: 'Intuition — positive definiteness axiom',
     },
     {

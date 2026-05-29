@@ -135,8 +135,8 @@ J_numerical = J_num
               id: 1,
               cellTitle: 'Gradient via finite differences — verify analytic formula',
               prose: [
-                'The finite difference approximation: âˆ‚f/âˆ‚xᵢ â‰ˆ [f(x + εeᵢ) - f(x)] / ε for small ε.',
-                'Compare numerical gradient with the analytic result âˆ‡f = 2Ax for f(x) = x^T A x.',
+                'The finite difference approximation: ∂f/∂xᵢ ≈ [f(x + εeᵢ) - f(x)] / ε for small ε.',
+                'Compare numerical gradient with the analytic result ∇f = 2Ax for f(x) = x^T A x.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -182,7 +182,7 @@ plt.show()`,
               id: 2,
               cellTitle: 'Jacobian of a vector-valued function',
               prose: [
-                'The Jacobian J is an m×n matrix where J[i,j] = âˆ‚f_i/âˆ‚x_j.',
+                'The Jacobian J is an m×n matrix where J[i,j] = ∂f_i/∂x_j.',
                 'For f(x) = Ax (linear), the Jacobian is just A itself — the "derivative" of a linear map is the map.',
               ],
               code: `import numpy as np
@@ -235,7 +235,7 @@ x_star = x0 - np.linalg.solve(H, grad_f(x0))
 
 print(f"Starting point: {x0}")
 print(f"After 1 Newton step: {x_star.round(6)}")
-print(f"Gradient at x*: {grad_f(x_star).round(10)}  (should be â‰ˆ 0)")
+print(f"Gradient at x*: {grad_f(x_star).round(10)}  (should be ≈ 0)")
 print(f"f(x*) = {f(x_star):.6f}  (minimum value)")`,
             },
           ]
@@ -246,7 +246,7 @@ print(f"f(x*) = {f(x_star):.6f}  (minimum value)")`,
 
   rigor: {
     prose: [
-      '**FrÃ©chet derivative — the general framework.** The gradient is a special case of the FrÃ©chet derivative. A function $f: V \\to W$ between normed spaces is FrÃ©chet differentiable at $\\mathbf{x}_0$ if there exists a bounded linear map $Df_{\\mathbf{x}_0}: V \\to W$ such that $\\lim_{\\|\\mathbf{h}\\| \\to 0} \\frac{\\|f(\\mathbf{x}_0 + \\mathbf{h}) - f(\\mathbf{x}_0) - Df_{\\mathbf{x}_0}(\\mathbf{h})\\|}{\\|\\mathbf{h}\\|} = 0$. For $f: \\mathbb{R}^n \\to \\mathbb{R}$, $Df_{\\mathbf{x}_0}$ is represented by $\\nabla f(\\mathbf{x}_0)^\\top$ — a row vector acting on the displacement $\\mathbf{h}$.',
+      '**Fréchet derivative — the general framework.** The gradient is a special case of the Fréchet derivative. A function $f: V \\to W$ between normed spaces is Fréchet differentiable at $\\mathbf{x}_0$ if there exists a bounded linear map $Df_{\\mathbf{x}_0}: V \\to W$ such that $\\lim_{\\|\\mathbf{h}\\| \\to 0} \\frac{\\|f(\\mathbf{x}_0 + \\mathbf{h}) - f(\\mathbf{x}_0) - Df_{\\mathbf{x}_0}(\\mathbf{h})\\|}{\\|\\mathbf{h}\\|} = 0$. For $f: \\mathbb{R}^n \\to \\mathbb{R}$, $Df_{\\mathbf{x}_0}$ is represented by $\\nabla f(\\mathbf{x}_0)^\\top$ — a row vector acting on the displacement $\\mathbf{h}$.',
       '**Symmetry of the Hessian — Schwarz\'s theorem.** If the second partial derivatives of $f$ are continuous in a neighborhood of $\\mathbf{x}_0$, then $\\partial^2 f / \\partial x_i \\partial x_j = \\partial^2 f / \\partial x_j \\partial x_i$ for all $i, j$. This makes $H$ symmetric. By the Spectral Theorem, symmetric matrices have real eigenvalues and orthogonal eigenvectors — so the principal curvatures of a smooth function are always real, and the directions of maximum/minimum curvature are orthogonal.',
       '**Taylor expansion and Newton\'s method.** The second-order Taylor expansion of $f: \\mathbb{R}^n \\to \\mathbb{R}$ at $\\mathbf{x}_0$ is $f(\\mathbf{x}_0 + \\mathbf{h}) \\approx f(\\mathbf{x}_0) + \\nabla f(\\mathbf{x}_0)^\\top \\mathbf{h} + \\frac{1}{2}\\mathbf{h}^\\top H(\\mathbf{x}_0) \\mathbf{h}$. Newton\'s method minimizes this quadratic approximation exactly at each step: differentiating and setting to zero gives $H(\\mathbf{x}_0)\\mathbf{h} = -\\nabla f(\\mathbf{x}_0)$, so the Newton step is $\\mathbf{x}_1 = \\mathbf{x}_0 - H^{-1}\\nabla f$. For exactly quadratic $f$, Newton\'s method converges in one step.',
       '**The chain rule as matrix multiplication.** If $\\mathbf{h}(\\mathbf{x}) = \\mathbf{f}(\\mathbf{g}(\\mathbf{x}))$ where $\\mathbf{g}: \\mathbb{R}^p \\to \\mathbb{R}^n$ and $\\mathbf{f}: \\mathbb{R}^n \\to \\mathbb{R}^m$, then the Jacobian of the composition is $J_h = J_f \\cdot J_g$ — a product of matrices. The dimensions work out: $J_f$ is $m \\times n$, $J_g$ is $n \\times p$, and $J_h$ is $m \\times p$. Neural network backpropagation is literally this: the loss gradient propagates backwards through layers via repeated Jacobian matrix multiplication.',
@@ -360,7 +360,7 @@ print(f"f(x*) = {f(x_star):.6f}  (minimum value)")`,
           expression: 'J = \\begin{bmatrix}\\partial f_1/\\partial x_1 & \\partial f_1/\\partial x_2 \\\\ \\partial f_2/\\partial x_1 & \\partial f_2/\\partial x_2\\end{bmatrix} = \\begin{bmatrix}2x_1 & 1 \\\\ x_2 & x_1\\end{bmatrix}',
           annotation: 'Row $i$ of the Jacobian contains the partial derivatives of output $f_i$ with respect to each input. $J_{ij} = \\partial f_i / \\partial x_j$.',
           strategyTitle: 'Compute all four partial derivatives',
-          checkpoint: 'What is âˆ‚f₁/âˆ‚x₁? (f₁ = x₁x₁)',
+          checkpoint: 'What is ∂f₁/∂x₁? (f₁ = x₁x₁)',
           hints: ['$\\partial(x_1 x_2)/\\partial x_1 = x_2$ (treat $x_2$ as a constant).'],
         },
         {
@@ -380,7 +380,7 @@ print(f"f(x*) = {f(x_star):.6f}  (minimum value)")`,
         {
           expression: '\\mathbf{f}(2.1, 3) \\approx \\mathbf{f}(\\mathbf{x}_0) + J(\\mathbf{x}_0)\\Delta\\mathbf{x} = \\begin{bmatrix}7\\\\6\\end{bmatrix} + \\begin{bmatrix}4&1\\\\3&2\\end{bmatrix}\\begin{bmatrix}0.1\\\\0\\end{bmatrix} = \\begin{bmatrix}7.4\\\\6.3\\end{bmatrix}',
           annotation: '$\\Delta\\mathbf{x} = [0.1, 0]^\\top$. The linear approximation predicts $f_1 \\approx 7.4$ and $f_2 \\approx 6.3$.',
-          strategyTitle: 'Apply linear approximation f(x₀ + Î”x) â‰ˆ f(x₀) + J·Î”x',
+          strategyTitle: 'Apply linear approximation f(x₀ + Δx) ≈ f(x₀) + J·Δx',
           checkpoint: 'Verify: exact value of f(2.1, 3) is [(2.1)²+3, 2.1·3] = [7.41, 6.3]. How accurate is the approximation?',
           hints: ['Exact: $[7.41, 6.3]$. Predicted: $[7.4, 6.3]$. Error in $f_1$: $0.01$ — the $0.1^2$ quadratic term we dropped. The Jacobian captures the first-order (linear) change perfectly.'],
         },
@@ -471,7 +471,7 @@ print(f"f(x*) = {f(x_star):.6f}  (minimum value)")`,
   checkpoints: [
     { id: 'cp-la2-009-1', label: 'Read intuition — understand gradient vs Jacobian vs Hessian and their shapes', type: 'read' },
     { id: 'cp-la2-009-2', label: 'Read math — derive $\\nabla(\\mathbf{x}^\\top A\\mathbf{x}) = 2A\\mathbf{x}$ and the normal equations step by step', type: 'read' },
-    { id: 'cp-la2-009-3', label: 'Read rigor — understand FrÃ©chet derivative, Schwarz theorem, and Newton\'s method', type: 'read' },
+    { id: 'cp-la2-009-3', label: 'Read rigor — understand Fréchet derivative, Schwarz theorem, and Newton\'s method', type: 'read' },
     { id: 'cp-la2-009-4', label: 'Run OpenMAT cell 1 — verify gradient numerically via finite differences', type: 'lab' },
     { id: 'cp-la2-009-5', label: 'Run Python cell 2 — verify Jacobian of a linear map numerically', type: 'lab' },
     { id: 'cp-la2-009-6', label: 'Complete example 1: compute gradient of a quadratic form step by step', type: 'example' },
@@ -630,7 +630,7 @@ print(f"f(x*) = {f(x_star):.6f}  (minimum value)")`,
       falseBelief: 'The gradient of $f(\\mathbf{x})$ is a row vector (same as $\\mathbf{x}^\\top$).',
       whyStudentsThinkIt: 'Many ML papers and textbooks use numerator layout, where $\\nabla f$ is written as a row vector so that $df = \\nabla f \\, d\\mathbf{x}$ is a scalar product of two row/column vectors. This convention switch causes confusion when switching resources.',
       correctionExample: 'In denominator layout (used here), $\\nabla f \\in \\mathbb{R}^n$ is a column vector — same shape as $\\mathbf{x}$. At $\\mathbf{x} = [1,2]^\\top$ with $f(\\mathbf{x}) = 3x_1 + x_2$, $\\nabla f = [3, 1]^\\top$ (column). The gradient update $\\mathbf{x} \\leftarrow \\mathbf{x} - \\alpha\\nabla f$ must be column minus column.',
-      contrastCase: 'The FrÃ©chet derivative $Df_{\\mathbf{x}_0}$ acts as a linear functional on displacement vectors $\\mathbf{h}$, so it is naturally a row vector $\\nabla f^\\top$. The gradient itself is the column vector obtained by transposing this row.',
+      contrastCase: 'The Fréchet derivative $Df_{\\mathbf{x}_0}$ acts as a linear functional on displacement vectors $\\mathbf{h}$, so it is naturally a row vector $\\nabla f^\\top$. The gradient itself is the column vector obtained by transposing this row.',
     },
     {
       falseBelief: 'The Hessian $H = \\nabla^2 f$ is the derivative of the gradient vector — so it should be a vector, not a matrix.',

@@ -59,7 +59,7 @@ export default {
       {
         id: 'LALesson04_Matrices',
         title: 'Special Matrices as Transformations',
-        mathBridge: 'Adjust the matrix entries to explore how structure constrains transformations. An orthogonal matrix (Qáµ€Q=I) rotates or reflects the unit square without changing its area. A symmetric positive definite matrix stretches but never flips. A singular (zero-determinant) matrix flattens space irreversibly. Observe how each structural condition restricts which transformations are possible.',
+        mathBridge: 'Adjust the matrix entries to explore how structure constrains transformations. An orthogonal matrix (QᵀQ=I) rotates or reflects the unit square without changing its area. A symmetric positive definite matrix stretches but never flips. A singular (zero-determinant) matrix flattens space irreversibly. Observe how each structural condition restricts which transformations are possible.',
         caption: 'Visualize how structure constrains the transformation.',
       },
       {

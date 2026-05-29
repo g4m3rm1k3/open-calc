@@ -109,6 +109,36 @@ A = [1 2 -1 3 9; 0 0 1 -2 5];
 R = rref(A)
 % x2 and x4 are free variables`,
             },
+            {
+              id: 4,
+              cellTitle: 'Challenge: rank, nullity, and solution type',
+              prose: [
+                'Use rref() and rank() to determine the solution type for the system below.',
+                'A = [1 2 0 3; 2 4 1 7; 3 6 1 10]. Compute rank(A(:,1:3)), rank(A), and the number of free variables. What is the solution type?',
+              ],
+              code: `% Challenge: classify the system
+A = [1 2 0 3; 2 4 1 7; 3 6 1 10];
+coeff = A(:, 1:3);
+n_unknowns = 3;
+
+r_coeff = rank(coeff);
+r_aug   = rank(A);
+
+fprintf('rank(A) = %d\\n', r_coeff)
+fprintf('rank([A|b]) = %d\\n', r_aug)
+fprintf('unknowns = %d\\n', n_unknowns)
+
+if r_aug > r_coeff
+    disp('INCONSISTENT — no solution')
+elseif r_coeff == n_unknowns
+    disp('UNIQUE SOLUTION')
+    R = rref(A);
+    fprintf('x1=%g  x2=%g  x3=%g\\n', R(1,4), R(2,4), R(3,4))
+else
+    fprintf('INFINITE SOLUTIONS — %d free variable(s)\\n', n_unknowns - r_coeff)
+    disp(rref(A))
+end`,
+            },
           ]
         }
       },

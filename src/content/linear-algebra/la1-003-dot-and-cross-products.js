@@ -112,7 +112,7 @@ export default {
               id: 1,
               cellTitle: 'dot() — the alignment test',
               prose: [
-                '`dot(u, v)` multiplies corresponding components and sums them: u₁v₁ + u₁v₁ + â€¦ It returns a single scalar.',
+                '`dot(u, v)` multiplies corresponding components and sums them: u₁v₁ + u₁v₁ + â€¦ It returns a single scalar.',
                 'The sign tells you the relationship: positive = same half-space (angle < 90°), zero = perpendicular, negative = opposite half-space (angle > 90°).',
               ],
               code: `u = [1; 0];   % points right (x-axis)

@@ -140,7 +140,7 @@ J^4
       {
         id: 'PythonNotebook',
         title: 'Code: Jordan Blocks, Generalized Eigenvectors, and Critical Damping',
-        mathBridge: 'Python: detect defective matrices via rank of (A - λI). Find Jordan chains by solving (A-λI)v₁ = v₁. Scipy `jordan_form()` computes Jordan form. Matrix exponential via scipy.linalg.expm() reveals the polynomial×exponential structure.',
+        mathBridge: 'Python: detect defective matrices via rank of (A - λI). Find Jordan chains by solving (A-λI)v₁ = v₁. Scipy `jordan_form()` computes Jordan form. Matrix exponential via scipy.linalg.expm() reveals the polynomial×exponential structure.',
         caption: 'Three cells: defective matrix analysis, Jordan chain construction, and critically-damped CNC axis response.',
         initialProps: {
           initialCells: [
@@ -172,7 +172,7 @@ plt.show()`,
             {
               id: 2,
               cellTitle: 'Jordan chain: finding the generalized eigenvector',
-              prose: 'For a 2×2 Jordan block with eigenvalue λ: v₁ is the true eigenvector, v₁ satisfies (A-λI)v₁ = v₁. Solve (A-λI)v₁ = v₁ as a linear system. The solution v₁ is not unique — any particular solution works.',
+              prose: 'For a 2×2 Jordan block with eigenvalue λ: v₁ is the true eigenvector, v₁ satisfies (A-λI)v₁ = v₁. Solve (A-λI)v₁ = v₁ as a linear system. The solution v₁ is not unique — any particular solution works.',
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -200,7 +200,7 @@ plt.show()`,
             {
               id: 3,
               cellTitle: 'CNC critically damped axis — Jordan block in action',
-              prose: 'A critically damped second-order system (Î¶=1) has a repeated pole at s=-ω₁™. Its state matrix is a Jordan block. The solution x(t) = (c₁ + c₁t)e^{-ω₁™t} has the polynomial×exponential signature of a Jordan block. Critical damping gives the fastest settling without overshoot — engineers deliberately target this. The Jordan block is the mathematical model behind it.',
+              prose: 'A critically damped second-order system (Î¶=1) has a repeated pole at s=-ω₁™. Its state matrix is a Jordan block. The solution x(t) = (c₁ + c₁t)e^{-ω₁™t} has the polynomial×exponential signature of a Jordan block. Critical damping gives the fastest settling without overshoot — engineers deliberately target this. The Jordan block is the mathematical model behind it.',
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -391,7 +391,7 @@ plt.show()`,
           annotation: 'Cannot determine which without computing rank$(A - 2I)^2$.',
         },
       ],
-      answer: 'Two possibilities: J₁ƒ(2) âŠ• J₁(2) or J₁(2) âŠ• J₁(2). Distinguish by computing rank(A-2I)².',
+      answer: 'Two possibilities: J₁ƒ(2) âŠ• J₁(2) or J₁(2) âŠ• J₁(2). Distinguish by computing rank(A-2I)².',
     },
     {
       id: 'ch-la3-004-3',
@@ -412,7 +412,7 @@ plt.show()`,
           annotation: 'For $\\lambda=2, n=3$: diagonal $2^3 = 8$, off-diagonal $3 \\cdot 2^2 = 12$. Verify by multiplying $J \\cdot J \\cdot J$ directly.',
         },
       ],
-      answer: 'Jⁿ = [[λⁿ, nλⁿâ»¹],[0, λⁿ]]. For λ=2, n=3: [[8,12],[0,8]].',
+      answer: 'Jⁿ = [[λⁿ, nλⁿ⁻¹],[0, λⁿ]]. For λ=2, n=3: [[8,12],[0,8]].',
     },
   ],
 
@@ -427,7 +427,7 @@ plt.show()`,
     { id: 'cp-la3-004-1', label: 'Read: understand why defective matrices cannot be diagonalized and what Jordan blocks encode', type: 'read' },
     { id: 'cp-la3-004-2', label: 'Read: follow the generalized eigenvector construction and Jordan chain algorithm', type: 'read' },
     { id: 'cp-la3-004-3', label: 'Read: understand the Jordan Normal Form theorem and its uniqueness', type: 'read' },
-    { id: 'cp-la3-004-4', label: 'Run code cell — compute Jordan form numerically and verify P J Pâ»¹ = A', type: 'lab' },
+    { id: 'cp-la3-004-4', label: 'Run code cell — compute Jordan form numerically and verify P J P⁻¹ = A', type: 'lab' },
     { id: 'cp-la3-004-5', label: 'Run code cell — simulate critically damped CNC axis using Jordan block matrix exponential', type: 'lab' },
     { id: 'cp-la3-004-6', label: 'Complete example 1: find Jordan form from eigenvalues and multiplicities', type: 'example' },
     { id: 'cp-la3-004-7', label: 'Complete example 2: determine Jordan structure from rank analysis', type: 'example' },
@@ -438,10 +438,12 @@ plt.show()`,
     questions: [
       {
         id: 'la3-004-assess-1',
-        type: 'input',
+        type: 'choice',
         text: 'For $J = \\begin{bmatrix}3&1\\\\0&3\\end{bmatrix}$, what is the $(1,2)$ entry of $J^4$? (Use the formula $J^n = \\begin{bmatrix}\\lambda^n & n\\lambda^{n-1}\\\\0&\\lambda^n\\end{bmatrix}$)',
+        options: ['108', '81', '324', '27'],
         answer: '108',
-        hint: '$n\\lambda^{n-1} = 4 \\cdot 3^3 = 4 \\cdot 27 = 108$.',
+        hints: ['$n\\lambda^{n-1} = 4 \\cdot 3^3 = 4 \\cdot 27 = 108$.'],
+        reviewSection: 'Math tab — powers of a Jordan block',
       },
     ],
   },

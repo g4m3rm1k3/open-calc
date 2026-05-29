@@ -125,8 +125,8 @@ export default {
               id: 1,
               cellTitle: 'Building linear combinations',
               prose: [
-                'A **linear combination** of vectors v₁, v₂ with scalars c₁, c₂ is: c₁·v₁ + c₂·v₂.',
-                'The set of ALL such combinations (for every possible c₁, c₂) is the **span**.',
+                'A **linear combination** of vectors v₁, v₂ with scalars c₁, c₂ is: c₁·v₁ + c₂·v₂.',
+                'The set of ALL such combinations (for every possible c₁, c₂) is the **span**.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -264,7 +264,7 @@ target = np.array([5.0, 5.0])
       {
         id: 'OpenMatNotebook',
         title: 'Linear Combinations in OpenMAT / MATLAB',
-        mathBridge: 'Stacking your vectors as columns of a matrix A, then computing A*c, gives the same result as c₁*v₁ + c₂*v₂. This equivalence — "matrix-vector product IS a linear combination of columns" — is the single most important idea connecting this lesson to matrix algebra.',
+        mathBridge: 'Stacking your vectors as columns of a matrix A, then computing A*c, gives the same result as c₁*v₁ + c₂*v₂. This equivalence — "matrix-vector product IS a linear combination of columns" — is the single most important idea connecting this lesson to matrix algebra.',
         caption: 'The column picture of matrix multiplication starts here.',
         initialProps: {
           initialCells: [

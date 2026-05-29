@@ -202,7 +202,7 @@ fprintf('RMS surface deviation: %.6f mm\\n', rms(residuals))`,
       {
         id: 'PythonNotebook',
         title: 'Code: Least Squares and Linear Regression',
-        mathBridge: 'np.linalg.lstsq(A, b) solves the normal equations. xÌ‚ = (Aáµ€A)â»¹Aáµ€b. Residual = b − AxÌ‚. Linear regression: A = [x | 1], b = y-values, solution gives slope and intercept.',
+        mathBridge: 'np.linalg.lstsq(A, b) solves the normal equations. xÌ‚ = (AᵀA)⁻¹Aᵀb. Residual = b − AxÌ‚. Linear regression: A = [x | 1], b = y-values, solution gives slope and intercept.',
         caption: 'Solve overdetermined systems and fit a best-fit line through data using the normal equations.',
         initialProps: {
           initialCells: [
@@ -327,14 +327,14 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2x² + x + 1
         {
           expression: 'A^TA = \\begin{bmatrix}1&1&1\\\\1&2&3\\end{bmatrix}\\begin{bmatrix}1&1\\\\1&2\\\\1&3\\end{bmatrix} = \\begin{bmatrix}3&6\\\\6&14\\end{bmatrix}',
           annotation: 'Compute $A^TA$ — a 2×2 matrix. This is the "information matrix."',
-          strategyTitle: 'Compute Aáµ€A',
+          strategyTitle: 'Compute AᵀA',
           checkpoint: 'Verify entry $(1,1)$: $1^2 + 1^2 + 1^2 = 3$. Entry $(1,2)$: $1\\cdot1 + 1\\cdot2 + 1\\cdot3 = 6$.',
           hints: ['$A^TA$ is always symmetric — both off-diagonal entries equal 6.'],
         },
         {
           expression: 'A^T\\mathbf{b} = \\begin{bmatrix}1&1&1\\\\1&2&3\\end{bmatrix}\\begin{bmatrix}1\\\\2\\\\2\\end{bmatrix} = \\begin{bmatrix}5\\\\11\\end{bmatrix}',
           annotation: 'Compute $A^T\\mathbf{b}$ — a 2-vector.',
-          strategyTitle: 'Compute Aáµ€b',
+          strategyTitle: 'Compute Aᵀb',
           checkpoint: '',
           hints: ['Row 1: $1+2+2=5$. Row 2: $1+4+6=11$.'],
         },
@@ -348,7 +348,7 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2x² + x + 1
         {
           expression: '\\det(A^TA) = 3 \\cdot 14 - 6 \\cdot 6 = 42 - 36 = 6 \\quad (A^TA)^{-1} = \\frac{1}{6}\\begin{bmatrix}14&-6\\\\-6&3\\end{bmatrix}',
           annotation: 'Invert the 2×2 matrix using the formula $(A^TA)^{-1} = \\frac{1}{\\det}\\begin{bmatrix}d&-b\\\\-c&a\\end{bmatrix}$.',
-          strategyTitle: 'Invert Aáµ€A',
+          strategyTitle: 'Invert AᵀA',
           checkpoint: '',
           hints: [],
         },
@@ -510,13 +510,13 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2x² + x + 1
       { symbol: 'A^TA\\hat{\\mathbf{x}} = A^T\\mathbf{b}', meaning: 'The normal equations — the 2×2 (or n×n) system whose solution is the least squares answer' },
       { symbol: 'P = A(A^TA)^{-1}A^T', meaning: 'Projection matrix onto col(A) — maps any b to its closest point in the column space' },
       { symbol: '\\mathbf{e} = \\mathbf{b} - A\\hat{\\mathbf{x}}', meaning: 'Residual vector — perpendicular to col(A), represents the irreducible error' },
-      { symbol: 'A^+', meaning: 'Pseudoinverse of A — generalizes (Aáµ€A)â»¹Aáµ€ to rank-deficient cases' },
+      { symbol: 'A^+', meaning: 'Pseudoinverse of A — generalizes (AᵀA)⁻¹Aᵀ to rank-deficient cases' },
     ],
     rulesOfThumb: [
       'Least squares = project b onto col(A) and find the corresponding x.',
       'Normal equations are always solvable, even when the original system is not.',
       'Residual is perpendicular to col(A) — that is the definition of "best approximation."',
-      'In practice, use QR (not Aáµ€A) for numerical stability.',
+      'In practice, use QR (not AᵀA) for numerical stability.',
     ],
   },
 
@@ -558,10 +558,10 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2x² + x + 1
     { id: 'cp-la4-003-2', label: 'Read: Explain the geometric picture of least squares', type: 'read' },
     { id: 'cp-la4-003-3', label: 'Read: Describe when the residual is zero vs. non-zero', type: 'read' },
     { id: 'cp-la4-003-4', label: 'Lab: Fit a line and visualize the squared residuals', type: 'lab' },
-    { id: 'cp-la4-003-5', label: 'Lab: Verify Aáµ€e = 0 after solving normal equations', type: 'lab' },
+    { id: 'cp-la4-003-5', label: 'Lab: Verify Aᵀe = 0 after solving normal equations', type: 'lab' },
     { id: 'cp-la4-003-6', label: 'Example: Solve an overdetermined 3×2 system', type: 'example' },
     { id: 'cp-la4-003-7', label: 'Example: Fit a line to data using normal equations', type: 'example' },
-    { id: 'cp-la4-003-8', label: 'Challenge: Show least squares recovers exact solution when b âˆˆ col(A)', type: 'challenge' },
+    { id: 'cp-la4-003-8', label: 'Challenge: Show least squares recovers exact solution when b ∈ col(A)', type: 'challenge' },
   ],
 
   // ── Assessment ───────────────────────────────────────────────────
@@ -569,10 +569,12 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2x² + x + 1
     questions: [
       {
         id: 'la4-003-assess-1',
-        type: 'input',
+        type: 'choice',
         text: 'What is the name of the square system whose solution gives the least squares answer?',
-        answer: 'normal equations',
-        hint: 'They are called this because the residual is normal (perpendicular) to the column space.',
+        options: ['Normal equations', 'Characteristic equations', 'Augmented equations', 'Reduced row echelon form'],
+        answer: 'Normal equations',
+        hints: ['They are called normal equations because the residual $\\mathbf{b} - A\\hat{\\mathbf{x}}$ is normal (perpendicular) to the column space of $A$.'],
+        reviewSection: 'Math tab — Normal equations',
       },
     ],
   },
@@ -627,7 +629,7 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2x² + x + 1
         '$\\det(A^TA) = 0$',
       ],
       answer: 'The residual $\\mathbf{e} = \\mathbf{b} - A\\hat{\\mathbf{x}}$ is perpendicular to every column of $A$',
-      hints: ['The perpendicularity condition Aáµ€(b - AxÌ‚) = 0 is what makes the projection optimal. Rearranging gives Aáµ€AxÌ‚ = Aáµ€b.'],
+      hints: ['The perpendicularity condition Aᵀ(b - AxÌ‚) = 0 is what makes the projection optimal. Rearranging gives AᵀAxÌ‚ = Aᵀb.'],
       reviewSection: 'Math — Deriving the normal equations',
     },
     {
@@ -645,7 +647,7 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2x² + x + 1
       text: 'If $\\mathbf{b}$ lies exactly in the column space of $A$, the least squares residual $\\|\\mathbf{e}\\|$ equals:',
       options: ['1', 'Some positive number', '0', '$\\|\\mathbf{b}\\|$'],
       answer: '0',
-      hints: ['If b âˆˆ col(A), the projection of b onto col(A) is b itself. The residual e = b - Pb = b - b = 0.'],
+      hints: ['If b ∈ col(A), the projection of b onto col(A) is b itself. The residual e = b - Pb = b - b = 0.'],
       reviewSection: 'Examples — exact solution case',
     },
     {
@@ -659,7 +661,7 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2x² + x + 1
         '$A^TA$ is not always invertible when $A$ is not square',
       ],
       answer: 'Forming $A^TA$ squares the condition number, making numerical errors worse; QR preserves the conditioning of $A$',
-      hints: ['If Îº(A) = 100, then Îº(Aáµ€A) = Îº(A)² = 10,000. Tiny rounding errors get amplified 10,000× instead of 100×. QR factorization avoids forming Aáµ€A.'],
+      hints: ['If Îº(A) = 100, then Îº(AᵀA) = Îº(A)² = 10,000. Tiny rounding errors get amplified 10,000× instead of 100×. QR factorization avoids forming AᵀA.'],
       reviewSection: 'Intuition — Normal Equations Can Be Ill-Conditioned',
     },
     {
@@ -701,7 +703,7 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2x² + x + 1
         'The covariance matrix',
       ],
       answer: 'The pseudoinverse of $A$',
-      hints: ['The pseudoinverse Aâº = (Aáµ€A)â»¹Aáµ€ generalizes the inverse to rectangular matrices. For square invertible A, Aâº = Aâ»¹. More generally, Aâº = VΣâºUáµ€ via SVD.'],
+      hints: ['The pseudoinverse Aâº = (AᵀA)⁻¹Aᵀ generalizes the inverse to rectangular matrices. For square invertible A, Aâº = A⁻¹. More generally, Aâº = VΣâºUᵀ via SVD.'],
       reviewSection: 'Math — pseudoinverse',
     },
   ],

@@ -188,7 +188,7 @@ fprintf('Max residual: %.2e\\n', max(max(abs(Q'*Q - eye(3)))))`,
       {
         id: 'PythonNotebook',
         title: 'Code: Gram-Schmidt and QR Decomposition',
-        mathBridge: 'numpy.linalg.qr(A) returns the QR factorization directly. Q has orthonormal columns (Qáµ€ Q = I), R is upper triangular. Verify: Q @ R â‰ˆ A and Q.T @ Q â‰ˆ I.',
+        mathBridge: 'numpy.linalg.qr(A) returns the QR factorization directly. Q has orthonormal columns (Qᵀ Q = I), R is upper triangular. Verify: Q @ R â‰ˆ A and Q.T @ Q â‰ˆ I.',
         caption: 'Implement Gram-Schmidt step by step, then verify it matches NumPy\'s QR decomposition.',
         initialProps: {
           initialCells: [
@@ -232,7 +232,7 @@ plt.show()`,
             {
               id: 2,
               cellTitle: 'QR decomposition — Gram-Schmidt as a matrix equation',
-              prose: '`np.linalg.qr(A)` computes the QR decomposition. Q has orthonormal columns; R is upper triangular. Verify: Q @ R â‰ˆ A (reconstruction). Qáµ€ Q â‰ˆ I (orthonormality).',
+              prose: '`np.linalg.qr(A)` computes the QR decomposition. Q has orthonormal columns; R is upper triangular. Verify: Q @ R â‰ˆ A (reconstruction). Qᵀ Q â‰ˆ I (orthonormality).',
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -328,7 +328,7 @@ v2 = np.array([2.0, 2.0])
         {
           expression: '\\mathbf{e}_1 = \\frac{\\mathbf{v}_1}{\\|\\mathbf{v}_1\\|} = \\frac{1}{5}\\begin{bmatrix}3\\\\4\\end{bmatrix} = \\begin{bmatrix}3/5\\\\4/5\\end{bmatrix}',
           annotation: 'Normalize the first vector. Its magnitude is $\\sqrt{9+16}=5$.',
-          strategyTitle: 'Normalize v₁',
+          strategyTitle: 'Normalize v₁',
           checkpoint: 'Verify $\\|\\mathbf{e}_1\\| = 1$.',
           hints: ['$(3/5)^2 + (4/5)^2 = 9/25 + 16/25 = 25/25 = 1$. âœ“'],
         },
@@ -371,7 +371,7 @@ v2 = np.array([2.0, 2.0])
         {
           expression: '\\mathbf{e}_1 = \\frac{1}{\\sqrt{2}}\\begin{bmatrix}1\\\\1\\\\0\\end{bmatrix}',
           annotation: '$\\|\\mathbf{v}_1\\| = \\sqrt{2}$. Normalize directly.',
-          strategyTitle: 'Normalize v₁',
+          strategyTitle: 'Normalize v₁',
           checkpoint: '',
           hints: [],
         },
@@ -407,7 +407,7 @@ v2 = np.array([2.0, 2.0])
         {
           expression: '\\mathbf{e}_1 = \\frac{\\mathbf{v}_1}{\\|\\mathbf{v}_1\\|} = \\frac{1}{\\sqrt{2}}\\begin{bmatrix}1\\\\1\\\\0\\end{bmatrix}',
           annotation: '$\\|\\mathbf{v}_1\\| = \\sqrt{1+1+0} = \\sqrt{2}$. Normalize.',
-          strategyTitle: 'Normalize v₁',
+          strategyTitle: 'Normalize v₁',
           checkpoint: '',
           hints: [],
         },
@@ -415,8 +415,8 @@ v2 = np.array([2.0, 2.0])
           expression: '\\mathbf{u}_2 = \\mathbf{v}_2 - (\\mathbf{v}_2 \\cdot \\mathbf{e}_1)\\mathbf{e}_1 = \\begin{bmatrix}1\\\\0\\\\1\\end{bmatrix} - \\frac{1}{\\sqrt{2}} \\cdot \\frac{1}{\\sqrt{2}}\\begin{bmatrix}1\\\\1\\\\0\\end{bmatrix} = \\begin{bmatrix}1/2\\\\-1/2\\\\1\\end{bmatrix}',
           annotation: '$\\mathbf{v}_2 \\cdot \\mathbf{e}_1 = (1+0+0)/\\sqrt{2} = 1/\\sqrt{2}$. Subtract $(1/\\sqrt{2})\\mathbf{e}_1$.',
           strategyTitle: 'Subtract projection',
-          checkpoint: 'Check: u₁ · e₁ = 0?',
-          hints: ['u₁ · e₁ = (1/2)(1/âˆš2) + (-1/2)(1/âˆš2) + 1·0 = 0 âœ“'],
+          checkpoint: 'Check: u₁ · e₁ = 0?',
+          hints: ['u₁ · e₁ = (1/2)(1/âˆš2) + (-1/2)(1/âˆš2) + 1·0 = 0 âœ“'],
         },
         {
           expression: '\\mathbf{e}_2 = \\frac{\\mathbf{u}_2}{\\|\\mathbf{u}_2\\|} = \\frac{1}{\\sqrt{3/2}}\\begin{bmatrix}1/2\\\\-1/2\\\\1\\end{bmatrix} = \\frac{1}{\\sqrt{6}}\\begin{bmatrix}1\\\\-1\\\\2\\end{bmatrix}',
@@ -428,9 +428,9 @@ v2 = np.array([2.0, 2.0])
         {
           expression: 'R = Q^T A = \\begin{bmatrix}\\mathbf{e}_1^T\\\\\\mathbf{e}_2^T\\end{bmatrix}\\begin{bmatrix}\\mathbf{v}_1 & \\mathbf{v}_2\\end{bmatrix} = \\begin{bmatrix}\\mathbf{e}_1^T\\mathbf{v}_1 & \\mathbf{e}_1^T\\mathbf{v}_2 \\\\ 0 & \\mathbf{e}_2^T\\mathbf{v}_2\\end{bmatrix} = \\begin{bmatrix}\\sqrt{2} & 1/\\sqrt{2} \\\\ 0 & \\sqrt{6}/2\\end{bmatrix}',
           annotation: '$R_{11} = \\mathbf{e}_1^T\\mathbf{v}_1 = \\sqrt{2}$, $R_{12} = \\mathbf{e}_1^T\\mathbf{v}_2 = 1/\\sqrt{2}$, $R_{21} = 0$ (by G-S construction), $R_{22} = \\mathbf{e}_2^T\\mathbf{v}_2 = \\sqrt{6}/2$. $R$ is upper triangular.',
-          strategyTitle: 'Compute R = Qáµ€A',
+          strategyTitle: 'Compute R = QᵀA',
           checkpoint: 'Verify: A = QR (recover original columns from Q and R)',
-          hints: ['Column 1 of QR: e₁·R₁₁ = v₁/âˆš2 · âˆš2 = v₁ âœ“. Column 2: e₁·(1/âˆš2) + e₁·(âˆš6/2) = (1/2)[1,1,0]áµ€ + (1/2)[1,-1,2]áµ€ = [1,0,1]áµ€ = v₁ âœ“.'],
+          hints: ['Column 1 of QR: e₁·R₁₁ = v₁/âˆš2 · âˆš2 = v₁ âœ“. Column 2: e₁·(1/âˆš2) + e₁·(âˆš6/2) = (1/2)[1,1,0]ᵀ + (1/2)[1,-1,2]ᵀ = [1,0,1]ᵀ = v₁ âœ“.'],
         },
       ],
       conclusion: '$A = QR$ where $Q = [\\mathbf{e}_1 \\; \\mathbf{e}_2]$ has orthonormal columns and $R$ is upper triangular. This is the QR decomposition. Gram-Schmidt is the algorithm; QR is the matrix factorization it produces. Numerical solvers use QR because $Q^{-1} = Q^T$ makes subsequent computations cheap.',
@@ -458,7 +458,7 @@ v2 = np.array([2.0, 2.0])
           annotation: 'Normalize: magnitude is 4, so $\\mathbf{e}_2 = [0,4]/4 = [0,1]$. The standard basis!',
         },
       ],
-      answer: 'e₁ = [1,0]áµ€, e₁ = [0,1]áµ€',
+      answer: 'e₁ = [1,0]ᵀ, e₁ = [0,1]ᵀ',
     },
     {
       id: 'la4-002-ch2',
@@ -535,9 +535,9 @@ v2 = np.array([2.0, 2.0])
   checkpoints: [
     { id: 'cp-la4-002-1', label: 'Read: Explain why subtraction creates orthogonality', type: 'read' },
     { id: 'cp-la4-002-2', label: 'Read: State when Gram-Schmidt breaks down', type: 'read' },
-    { id: 'cp-la4-002-3', label: 'Read: Explain why Qâ»¹ = Qáµ€ for orthonormal columns', type: 'read' },
+    { id: 'cp-la4-002-3', label: 'Read: Explain why Q⁻¹ = Qᵀ for orthonormal columns', type: 'read' },
     { id: 'cp-la4-002-4', label: 'Lab: Step through Gram-Schmidt on two non-perpendicular vectors', type: 'lab' },
-    { id: 'cp-la4-002-5', label: 'Lab: Verify e₁·e₁ = 0 and –e₁– = –e₁– = 1 after output', type: 'lab' },
+    { id: 'cp-la4-002-5', label: 'Lab: Verify e₁·e₁ = 0 and –e₁– = –e₁– = 1 after output', type: 'lab' },
     { id: 'cp-la4-002-6', label: 'Example: Run Gram-Schmidt in ℝ²', type: 'example' },
     { id: 'cp-la4-002-7', label: 'Example: Run Gram-Schmidt in ℝ³ to get orthonormal basis', type: 'example' },
     { id: 'cp-la4-002-8', label: 'Challenge: Derive QR from Gram-Schmidt for a 3×2 matrix', type: 'challenge' },
@@ -548,10 +548,12 @@ v2 = np.array([2.0, 2.0])
     questions: [
       {
         id: 'la4-002-assess-1',
-        type: 'input',
+        type: 'choice',
         text: 'After running Gram-Schmidt on two vectors, what is the dot product of the two output vectors?',
+        options: ['0', '1', 'It depends on the input vectors', 'The magnitude of the first output vector'],
         answer: '0',
-        hint: 'The whole point of Gram-Schmidt is to make the output vectors perpendicular.',
+        hints: ['Gram-Schmidt produces orthogonal (perpendicular) vectors — their dot product is always 0 by construction.'],
+        reviewSection: 'Intuition tab — Gram-Schmidt process',
       },
     ],
   },
@@ -606,7 +608,7 @@ v2 = np.array([2.0, 2.0])
         'To ensure the output spans a different space than the input',
       ],
       answer: 'If any vector is in the span of the previous ones, its residual after projection is $\\mathbf{0}$ — which cannot be normalized',
-      hints: ['If v₁ƒ = αv₁ + βv₁, then after subtracting all projections onto e₁ and e₁, the residual is exactly 0. You cannot normalize the zero vector.'],
+      hints: ['If v₁ƒ = αv₁ + βv₁, then after subtracting all projections onto e₁ and e₁, the residual is exactly 0. You cannot normalize the zero vector.'],
       reviewSection: 'Math — Gram-Schmidt requires linear independence',
     },
     {
@@ -643,7 +645,7 @@ v2 = np.array([2.0, 2.0])
         'Orthogonal',
       ],
       answer: 'Upper triangular',
-      hints: ['R = Qáµ€A. By the Gram-Schmidt construction, each e_j is orthogonal to all v_i for i < j. This makes the lower triangle of R zero. R_{ij} = 0 when i > j.'],
+      hints: ['R = QᵀA. By the Gram-Schmidt construction, each e_j is orthogonal to all v_i for i < j. This makes the lower triangle of R zero. R_{ij} = 0 when i > j.'],
       reviewSection: 'Examples — QR decomposition example',
     },
     {
@@ -671,7 +673,7 @@ v2 = np.array([2.0, 2.0])
         'Removing the largest component of $\\mathbf{v}_k$',
       ],
       answer: 'Projecting $\\mathbf{v}_k$ onto the orthogonal complement of $\\text{span}(\\mathbf{e}_1, \\ldots, \\mathbf{e}_{k-1})$',
-      hints: ['The sum Σ(v_k·e_j)e_j is the projection of v_k onto span{e₁,...,e_{k-1}}. Subtracting it gives the component of v_k perpendicular to that span — which is the projection onto the orthogonal complement.'],
+      hints: ['The sum Σ(v_k·e_j)e_j is the projection of v_k onto span{e₁,...,e_{k-1}}. Subtracting it gives the component of v_k perpendicular to that span — which is the projection onto the orthogonal complement.'],
       reviewSection: 'Math — Gram-Schmidt algorithm',
     },
     {
@@ -685,7 +687,7 @@ v2 = np.array([2.0, 2.0])
         'QR only works for square matrices',
       ],
       answer: 'QR avoids squaring the condition number: solving $R\\hat{\\mathbf{x}} = Q^T\\mathbf{b}$ is more numerically stable than computing $(A^TA)^{-1}A^T\\mathbf{b}$',
-      hints: ['Forming Aáµ€A squares the condition number of A. If Îº(A) = 100, then Îº(Aáµ€A) = 10000 — tiny perturbations in b get amplified 10000× instead of 100×. QR preserves the original conditioning.'],
+      hints: ['Forming AᵀA squares the condition number of A. If Îº(A) = 100, then Îº(AᵀA) = 10000 — tiny perturbations in b get amplified 10000× instead of 100×. QR preserves the original conditioning.'],
       reviewSection: 'Rigor — numerical stability',
     },
   ],

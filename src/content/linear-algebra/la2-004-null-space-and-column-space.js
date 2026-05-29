@@ -97,7 +97,7 @@ export default {
       {
         id: 'OpenMatNotebook',
         title: 'OpenMAT: Null Space and Column Space',
-        mathBridge: 'MATLAB: `rank(A)` counts pivot columns; `null(A)` returns an orthonormal basis for the null space; `orth(A)` returns an orthonormal basis for the column space. Verify: A * null(A) â‰ˆ 0.',
+        mathBridge: 'MATLAB: `rank(A)` counts pivot columns; `null(A)` returns an orthonormal basis for the null space; `orth(A)` returns an orthonormal basis for the column space. Verify: A * null(A) ≈ 0.',
         caption: 'Three cells: computing rank and null space, the four subspaces, and CNC probe geometry check.',
         initialProps: {
           initialCells: [
@@ -154,7 +154,7 @@ disp(null_basis)
 
 % Verify all null space vectors satisfy A*v = 0
 residual = norm(A * null_basis);
-fprintf('||A * null_basis|| = %.2e  (should be â‰ˆ 0)\\n', residual)`,
+fprintf('||A * null_basis|| = %.2e  (should be ≈ 0)\\n', residual)`,
             },
             {
               id: 3,
@@ -237,7 +237,7 @@ plt.show()`,
               cellTitle: 'Computing the null space',
               prose: [
                 'The null space is all vectors x such that Ax = 0.',
-                '`scipy.linalg.null_space(A)` returns an orthonormal basis for N(A). Verify by checking A @ null_vec â‰ˆ 0.',
+                '`scipy.linalg.null_space(A)` returns an orthonormal basis for N(A). Verify by checking A @ null_vec ≈ 0.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -287,7 +287,7 @@ A = np.array([[1., 2., 3.],
 # 1. rank
 # 2. nullity = n - rank (n = 3 columns)
 # 3. null_space basis
-# 4. verify each column of null_basis satisfies A @ col â‰ˆ 0
+# 4. verify each column of null_basis satisfies A @ col ≈ 0
 `,
               hint: 'np.linalg.matrix_rank(A). null_basis = linalg.null_space(A). Each column of null_basis is a basis vector. Check np.allclose(A @ null_basis, 0).',
             },
@@ -303,6 +303,7 @@ A = np.array([[1., 2., 3.],
       '**Subspace verification.** Both the null space and column space are genuine vector subspaces — they are closed under addition and scalar multiplication.\n\n*Null space:* If $A\\mathbf{u} = \\mathbf{0}$ and $A\\mathbf{v} = \\mathbf{0}$, then $A(\\mathbf{u}+\\mathbf{v}) = A\\mathbf{u} + A\\mathbf{v} = \\mathbf{0}+\\mathbf{0} = \\mathbf{0}$. Also $A(c\\mathbf{u}) = cA\\mathbf{u} = \\mathbf{0}$. Both conditions hold.\n\n*Column space:* If $\\mathbf{y}_1, \\mathbf{y}_2 \\in C(A)$ then $\\mathbf{y}_1 = A\\mathbf{x}_1$, $\\mathbf{y}_2 = A\\mathbf{x}_2$, so $\\mathbf{y}_1 + \\mathbf{y}_2 = A(\\mathbf{x}_1 + \\mathbf{x}_2) \\in C(A)$. Similarly $c\\mathbf{y}_1 = A(c\\mathbf{x}_1) \\in C(A)$.',
       '**The Fundamental Theorem of Linear Algebra (Gilbert Strang).** For any $m \\times n$ matrix $A$:\n\n- $C(A) \\perp N(A^T)$ — column space and left null space are orthogonal complements in $\\mathbb{R}^m$\n- $C(A^T) \\perp N(A)$ — row space and null space are orthogonal complements in $\\mathbb{R}^n$\n\nConsequence: every vector $\\mathbf{x} \\in \\mathbb{R}^n$ decomposes uniquely as $\\mathbf{x} = \\mathbf{x}_{\\text{row}} + \\mathbf{x}_{\\text{null}}$ with $\\mathbf{x}_{\\text{row}} \\in C(A^T)$ and $\\mathbf{x}_{\\text{null}} \\in N(A)$. The matrix $A$ maps $\\mathbf{x}_{\\text{row}}$ injectively onto $C(A)$ and annihilates $\\mathbf{x}_{\\text{null}}$.',
       '**Proof of the Rank-Nullity theorem.** Let $r = \\text{rank}(A)$. RREF of $A$ has $r$ pivot columns and $n - r$ free variable columns. The null space has dimension $n - r$ (one free parameter per free column). The column space has dimension $r$ (pivot columns of the original $A$ form a basis). Therefore $r + (n-r) = n$.',
+      '**Connection to Singular Value Decomposition (SVD).** The four fundamental subspaces are the exact framework for understanding the SVD: $A = U \\Sigma V^T$. The right singular vectors $V$ split into two groups: the first $r$ columns span the row space $C(A^T)$, and the last $n-r$ columns span the null space $N(A)$. The left singular vectors $U$ split similarly: first $r$ span $C(A)$, last $m-r$ span $N(A^T)$. The SVD is the "coordinate system" aligned with the four subspaces — it diagonalizes the mapping restricted to $C(A^T) \\to C(A)$ while making the null space behavior explicit. Everything you observed here about rank and nullity becomes quantitatively precise in the SVD, making it the central tool in dimensionality reduction (PCA), pseudoinverse computation, and least-squares.',
     ],
     callouts: [
       {
@@ -396,7 +397,7 @@ A = np.array([[1., 2., 3.],
     },
     {
       id: "la2-004-ex3",
-      title: "Is Ax = b Consistent? Testing b âˆˆ C(A)",
+      title: "Is Ax = b Consistent? Testing b ∈ C(A)",
       problem: "For $A = \\begin{bmatrix} 1 & 2 \\\\ 3 & 6 \\end{bmatrix}$ (from Example 1), determine whether (a) $\\mathbf{b}_1 = \\begin{bmatrix}2\\\\6\\end{bmatrix}$ and (b) $\\mathbf{b}_2 = \\begin{bmatrix}1\\\\2\\end{bmatrix}$ are in the column space.",
       steps: [
         {
@@ -407,7 +408,7 @@ A = np.array([[1., 2., 3.],
         {
           expression: "(a)\\; \\mathbf{b}_1 = \\begin{bmatrix}2\\\\6\\end{bmatrix} = 2\\begin{bmatrix}1\\\\3\\end{bmatrix} \\in C(A) \\implies \\textbf{CONSISTENT}",
           annotation: "$\\mathbf{b}_1 = 2 \\cdot [1,3]^T$ — it lies exactly on the column space line. A particular solution: $\\mathbf{x}_p = [2,0]^T$ (check: $A[2,0]^T = 2[1,3]^T = [2,6]^T$ âœ“). The general solution is $\\mathbf{x} = [2,0]^T + t[-2,1]^T$ (adding any null space vector).",
-          strategyTitle: "Check b₁: is it a scalar multiple of [1,3]áµ€?",
+          strategyTitle: "Check b₁: is it a scalar multiple of [1,3]ᵀ?",
         },
         {
           expression: "(b)\\; \\mathbf{b}_2 = \\begin{bmatrix}1\\\\2\\end{bmatrix}: \\text{ need } c=1 \\text{ (from row 1) but } 3c = 3 \\neq 2 \\text{ (row 2)} \\implies \\mathbf{b}_2 \\notin C(A) \\implies \\textbf{INCONSISTENT}",
@@ -416,7 +417,7 @@ A = np.array([[1., 2., 3.],
           hints: ["The augmented matrix test: row-reduce $[A|\\mathbf{b}]$. If any row looks like $[0,0,\\ldots,0|c]$ with $c \\neq 0$, the system is inconsistent."],
         }
       ],
-      conclusion: "b₁ = [2,6]áµ€ is reachable (2× the column space basis). b₁ = [1,2]áµ€ lies off the column space line — inconsistent. The key rule: Ax = b is solvable if and only if b âˆˆ C(A)."
+      conclusion: "b₁ = [2,6]ᵀ is reachable (2× the column space basis). b₁ = [1,2]ᵀ lies off the column space line — inconsistent. The key rule: Ax = b is solvable if and only if b ∈ C(A)."
     }
   ],
 
@@ -490,24 +491,19 @@ A = np.array([[1., 2., 3.],
   // ── Semantic Layer ───────────────────────────────────────────────
   semantics: {
     core: [
-      {
-        symbol: "C(A)",
-        meaning: "Column Space. The span of the matrix's columns. Geometrically, the space of all possible outputs."
-      },
-      {
-        symbol: "N(A)",
-        meaning: "Null Space. The set of all vectors v where Av = 0."
-      },
-      {
-        symbol: "\\text{Rank}(A)",
-        meaning: "The number of dimensions mathematically surviving in the Column Space."
-      }
+      { symbol: 'C(A)', meaning: 'Column space — the set of all vectors Ax can produce; span of the columns of A; lives in the output space ℝᵐ' },
+      { symbol: 'N(A)', meaning: 'Null space (kernel) — all x with Ax = 0; these inputs are annihilated; lives in the input space ℝⁿ' },
+      { symbol: '\\text{rank}(A)', meaning: 'Rank — number of pivot columns in RREF; equals dim(C(A)); measures how much information the transformation preserves' },
+      { symbol: '\\text{nullity}(A)', meaning: 'Nullity — dim(N(A)); equals n minus rank; counts how many independent directions get crushed to zero' },
+      { symbol: '\\text{rank}(A) + \\text{nullity}(A) = n', meaning: 'Rank-Nullity theorem — dimensions always balance; pivot columns + free columns = total columns' },
     ],
     rulesOfThumb: [
-      "If a matrix is invertible, its Rank is full (equal to n), and its Null Space contains ONLY the zero vector.",
-      "If a matrix has a determinant of exactly 0, its Null Space has a dimension of at least 1.",
-      "Rank + Nullity ALWAYS equals the total number of starting columns."
-    ]
+      'If a matrix is invertible, rank = n and nullity = 0 — nothing gets crushed, every output is reachable.',
+      'If det = 0, nullity ≥ 1 — at least one direction is permanently destroyed by the transformation.',
+      'rank + nullity = n (number of COLUMNS, not rows) — always.',
+      'Use original (pre-RREF) pivot columns for the column space basis — row ops change columns but preserve pivot positions.',
+      'Ax = b is consistent iff b is in C(A); each null space vector gives a free degree of freedom in the solution.',
+    ],
   },
 
   // ── Spiral Learning ──────────────────────────────────────────────
@@ -532,11 +528,12 @@ A = np.array([[1., 2., 3.],
   assessment: {
     questions: [
       {
-        id: "la2-004-assess-1",
-        type: "input",
-        text: "If a 4x4 matrix flattens 4D space into a completely flat 2D plane, what is the dimension of its Null Space? (Enter a number).",
-        answer: "2",
-        hint: "Rank-Nullity theorem: 2 (Rank) + X (Nullity) = 4 (Total Columns)."
+        id: 'la2-004-assess-1',
+        type: 'choice',
+        text: 'A $4 \\times 4$ matrix has rank 2. What is the dimension of its null space?',
+        options: ['2', '1', '4', '0'],
+        answer: '2',
+        hint: 'Rank-Nullity: rank + nullity = n (columns). $2 + \\text{nullity} = 4 \\Rightarrow \\text{nullity} = 2$.',
       }
     ]
   },
@@ -554,7 +551,7 @@ A = np.array([[1., 2., 3.],
     { id: 'cp-la2-004-1', label: 'Read intuition — understand column space vs null space', type: 'read' },
     { id: 'cp-la2-004-2', label: 'Read math — trace the null space algorithm for a 2×2 matrix', type: 'read' },
     { id: 'cp-la2-004-3', label: 'Read rigor — study Rank-Nullity proof and Fundamental Theorem', type: 'read' },
-    { id: 'cp-la2-004-4', label: 'Run OpenMAT cell 1 — verify A * null(A) â‰ˆ 0', type: 'lab' },
+    { id: 'cp-la2-004-4', label: 'Run OpenMAT cell 1 — verify A * null(A) ≈ 0', type: 'lab' },
     { id: 'cp-la2-004-5', label: 'Run OpenMAT cell 2 — verify rank + nullity = n for a 3×4 matrix', type: 'lab' },
     { id: 'cp-la2-004-6', label: 'Complete example 1: find column space and null space of a 2×2 singular matrix', type: 'example' },
     { id: 'cp-la2-004-7', label: 'Complete example 2: find the 2D null space of a 3×4 matrix', type: 'example' },
@@ -645,7 +642,7 @@ A = np.array([[1., 2., 3.],
         "The matrix $A$ must be square."
       ],
       answer: "The null space of $A$ is non-trivial (nullity ≥ 1): adding any null space vector to one particular solution gives another valid solution.",
-      hints: ["If $\\mathbf{x}_p$ solves $A\\mathbf{x}=\\mathbf{b}$ and $\\mathbf{v} \\in N(A)$, then $\\mathbf{x}_p + \\mathbf{v}$ is also a solution. Infinitely many solutions â†” nullity ≥ 1."],
+      hints: ["If $\\mathbf{x}_p$ solves $A\\mathbf{x}=\\mathbf{b}$ and $\\mathbf{v} \\in N(A)$, then $\\mathbf{x}_p + \\mathbf{v}$ is also a solution. Infinitely many solutions ↔ nullity ≥ 1."],
       reviewSection: 'Rigor tab — General solution theorem',
     },
     {

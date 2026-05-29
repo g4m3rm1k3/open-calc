@@ -79,7 +79,7 @@ export default {
       '**LU Decomposition — Formal Definition**',
       'Given an $n \\times n$ matrix $A$, the LU decomposition (without pivoting) finds matrices $L$ and $U$ such that:\n\n$A = LU$\n\nwhere $L$ is **lower triangular** with 1s on the diagonal (called a unit lower triangular matrix) and $U$ is **upper triangular**.',
       '**The Algorithm: Gaussian Elimination with Multiplier Recording**',
-      'For each column $k = 1, \\ldots, n-1$:\n\nFor each row $i = k+1, \\ldots, n$:\n\n$m_{ik} = a_{ik} / a_{kk}$ â† the elimination multiplier for position $(i,k)$\n\n$R_i \\leftarrow R_i - m_{ik} R_k$ â† standard row replacement\n\nAfter all eliminations: $L_{ij} = m_{ij}$ for $i > j$, $L_{ii} = 1$, $U$ = result of elimination.',
+      'For each column $k = 1, \\ldots, n-1$:\n\nFor each row $i = k+1, \\ldots, n$:\n\n$m_{ik} = a_{ik} / a_{kk}$ ← the elimination multiplier for position $(i,k)$\n\n$R_i \\leftarrow R_i - m_{ik} R_k$ ← standard row replacement\n\nAfter all eliminations: $L_{ij} = m_{ij}$ for $i > j$, $L_{ii} = 1$, $U$ = result of elimination.',
       '**Solving $A\\mathbf{x} = \\mathbf{b}$ via LU**',
       'Substitute $A = LU$:\n\n$LU\\mathbf{x} = \\mathbf{b}$\n\nLet $\\mathbf{y} = U\\mathbf{x}$. Solve in two phases:',
       '**Phase 1 — Forward substitution** (solve $L\\mathbf{y} = \\mathbf{b}$):\n\n$y_1 = b_1$\n\n$y_i = b_i - \\sum_{j=1}^{i-1} L_{ij} y_j \\quad (i = 2, \\ldots, n)$',
@@ -98,11 +98,11 @@ export default {
       {
         type: 'theorem',
         title: 'Computational Complexity',
-        body: 'LU factorization: $O(n^3)$ — performed once.\nForward substitution: $O(n^2)$ — per right-hand side.\nBack substitution: $O(n^2)$ — per right-hand side.\n\nFor $k$ different right-hand sides:\n• NaÃ¯ve (re-run elimination each time): $O(kn^3)$\n• LU factorization: $O(n^3 + kn^2)$ — far cheaper when $k$ is large.',
+        body: 'LU factorization: $O(n^3)$ — performed once.\nForward substitution: $O(n^2)$ — per right-hand side.\nBack substitution: $O(n^2)$ — per right-hand side.\n\nFor $k$ different right-hand sides:\n• Naïve (re-run elimination each time): $O(kn^3)$\n• LU factorization: $O(n^3 + kn^2)$ — far cheaper when $k$ is large.',
       },
       {
         type: 'strategy',
-        title: 'Never Compute Aâ»¹ Just to Solve Ax = b',
+        title: 'Never Compute A⁻¹ Just to Solve Ax = b',
         body: 'Computing $A^{-1}$ requires $O(n^3)$ work AND introduces numerical errors. Then multiplying $A^{-1}\\mathbf{b}$ adds another $O(n^2)$. Solving via LU is the same cost but more numerically stable. In NumPy: always use `np.linalg.solve(A, b)`, never `np.linalg.inv(A) @ b`.',
       },
     ],
@@ -457,7 +457,7 @@ b = np.array([6., 14., 10.])
           annotation: "Substitute $A = LU$ into $A\\mathbf{x} = \\mathbf{b}$ to get $LU\\mathbf{x} = \\mathbf{b}$. Let $\\mathbf{y} = U\\mathbf{x}$ and first solve $L\\mathbf{y} = \\mathbf{b}$. This is Phase 1: forward substitution.",
           strategyTitle: "Phase 1 setup — forward substitution",
           checkpoint: "Why can we solve Ly = b without inverting L?",
-          hints: ["L is lower triangular: y₁ is immediately known from the first row, then y₁ uses only y₁, then y₁ƒ uses only y₁ and y₁. No matrix inversion needed."],
+          hints: ["L is lower triangular: y₁ is immediately known from the first row, then y₁ uses only y₁, then y₁ƒ uses only y₁ and y₁. No matrix inversion needed."],
         },
         {
           expression: "y_1 = 4, \\quad y_2 = 10 - 2(4) = 2, \\quad y_3 = 20 - 4(4) - 3(2) = 20 - 16 - 6 = -2",
@@ -478,7 +478,7 @@ b = np.array([6., 14., 10.])
           annotation: "Row 3: $2x_3 = -2 \\Rightarrow x_3 = -1$. Row 2: $x_2 + x_3 = 2 \\Rightarrow x_2 = 3$. Row 1: $2x_1 + x_2 + x_3 = 4 \\Rightarrow 2x_1 = 4 - 3 + 1 = 2 \\Rightarrow x_1 = 1$. Solution: $\\mathbf{x} = [1, 3, -1]^T$.",
           strategyTitle: "Back substitution — compute x",
           checkpoint: "Verify: does A @ [1, 3, -1]^T equal [4, 10, 20]^T?",
-          hints: ["Row 1: 2(1)+1(3)+1(-1) = 2+3-1 = 4 âœ“. Row 2: 4(1)+3(3)+3(-1) = 4+9-3 = 10 âœ“. Row 3: 8(1)+7(3)+9(-1) = 8+21-9 = 20 âœ“."],
+          hints: ["Row 1: 2(1)+1(3)+1(-1) = 2+3-1 = 4 ✓. Row 2: 4(1)+3(3)+3(-1) = 4+9-3 = 10 ✓. Row 3: 8(1)+7(3)+9(-1) = 8+21-9 = 20 ✓."],
         }
       ],
       conclusion: "x = [1, 3, −1]. The two-phase approach (forward then back substitution) each takes O(n²) operations. Critically, the LU factorization from Example 1 can now be reused for any different b vector without redoing the elimination.",
@@ -512,7 +512,7 @@ b = np.array([6., 14., 10.])
       id: "la2-006-ch2",
       difficulty: "medium",
       problem: "Using the LU decomposition $L = \\begin{bmatrix} 1 & 0 & 0 \\\\ 2 & 1 & 0 \\\\ 1 & 3 & 1 \\end{bmatrix}$, $U = \\begin{bmatrix} 2 & 4 & -2 \\\\ 0 & 1 & 5 \\\\ 0 & 0 & 3 \\end{bmatrix}$, solve $A\\mathbf{x} = \\begin{bmatrix} 0 \\\\ 1 \\\\ 8 \\end{bmatrix}$ via forward substitution then back substitution.",
-      hint: "Phase 1: Ly = b. y₁ = b₁ = 0, then y₁ = b₁ − 2y₁, then y₁ƒ = b₁ƒ − 1·y₁ − 3·y₁. Phase 2: Ux = y. x₁ƒ = y₁ƒ/3, then x₁ = (y₁ − 5x₁ƒ)/1, then x₁ = (y₁ − 4x₁ − (−2)x₁ƒ)/2.",
+      hint: "Phase 1: Ly = b. y₁ = 0, then y₂ = b₂ − 2y₁ = 1, then y₃ = b₃ − 1·y₁ − 3·y₂ = 5. Phase 2: Ux = y. x₃ = y₃/3 = 5/3, then x₂ = (y₂ − 5·x₃)/1 = −22/3, then x₁ = (y₁ − 4·x₂ − (−2)·x₃)/2 = 49/3.",
       walkthrough: [
         {
           expression: "y_1 = 0, \\quad y_2 = 1 - 2(0) = 1, \\quad y_3 = 8 - 1(0) - 3(1) = 5",
@@ -570,11 +570,23 @@ b = np.array([6., 14., 10.])
       {
         symbol: "L\\mathbf{y} = \\mathbf{b}, \\quad U\\mathbf{x} = \\mathbf{y}",
         meaning: "The two-phase solve: forward substitution (top-to-bottom through L) produces y, then back substitution (bottom-to-top through U) produces x."
+      },
+      {
+        symbol: "m_{ik} = a_{ik}/a_{kk}",
+        meaning: "The Gaussian elimination multiplier: entry to eliminate divided by the pivot. Placed at position (i,k) in L — no extra work, it is recorded as elimination runs."
+      },
+      {
+        symbol: "\\det(A) = (\\pm 1) \\cdot U_{11} \\cdots U_{nn}",
+        meaning: "Determinant as LU byproduct: product of U's diagonal, negated once per row swap in P. Free after factorization."
+      },
+      {
+        symbol: "O(n^3) + k \\cdot O(n^2)",
+        meaning: "Total cost for k right-hand sides: one factorization (O(n³)) plus k triangular solves (O(n²) each) — far cheaper than k full eliminations (k × O(n³))."
       }
     ],
     rulesOfThumb: [
       "Factor A once (O(n³)), solve multiple right-hand sides in O(n²) each.",
-      "Never compute Aâ»¹ just to multiply it by b — use np.linalg.solve (which uses LU internally).",
+      "Never compute A⁻¹ just to multiply it by b — use np.linalg.solve (which uses LU internally).",
       "If a pivot is zero (or very small), swap to the row with the largest entry in that column (partial pivoting).",
       "det(A) from LU: product of U's diagonal, times (−1)^(number of row swaps)."
     ]
@@ -603,7 +615,7 @@ b = np.array([6., 14., 10.])
       {
         lessonId: 'la4-004',
         label: 'SVD',
-        note: 'The SVD (A = UΣVáµ€) is the ultimate matrix factorization. Like LU, it is computed once and reused for multiple operations: solving, compressing, pseudoinverse, rank approximation.'
+        note: 'The SVD (A = UΣVᵀ) is the ultimate matrix factorization. Like LU, it is computed once and reused for multiple operations: solving, compressing, pseudoinverse, rank approximation.'
       }
     ]
   },
@@ -616,13 +628,13 @@ b = np.array([6., 14., 10.])
         type: "choice",
         text: "You need to solve Ax = b for 500 different vectors b, all with the same matrix A. Which approach is computationally cheapest?",
         options: [
-          "Compute Aâ»¹ once, then multiply Aâ»¹ b for each b",
+          "Compute A⁻¹ once, then multiply A⁻¹ b for each b",
           "Run Gaussian elimination from scratch for each of the 500 systems",
           "Compute the LU decomposition of A once, then apply forward/back substitution 500 times",
           "Compute the determinant of A to check invertibility, then use Cramer's rule"
         ],
         answer: "Compute the LU decomposition of A once, then apply forward/back substitution 500 times",
-        hint: "LU factors once at O(n³), then each solve is O(n²). Computing Aâ»¹ is also O(n³) but less numerically stable. Running full Gaussian elimination 500 times is 500 × O(n³)."
+        hint: "LU factors once at O(n³), then each solve is O(n²). Computing A⁻¹ is also O(n³) but less numerically stable. Running full Gaussian elimination 500 times is 500 × O(n³)."
       }
     ]
   },
@@ -733,7 +745,7 @@ b = np.array([6., 14., 10.])
       ],
       answer: "`x = A \\ b` in MATLAB (or `np.linalg.solve(A, b)` in Python) — use LU decomposition directly.",
       hints: ["Computing `inv(A)` is more expensive AND less numerically stable than solving directly via LU. Professional code always uses `A \\ b` (MATLAB backslash) or `np.linalg.solve(A, b)`, which call LAPACK LU routines internally."],
-      reviewSection: 'Math tab — Never compute Aâ»¹ callout',
+      reviewSection: 'Math tab — Never compute A⁻¹ callout',
     },
     {
       id: 'la2-006-quiz-7',
