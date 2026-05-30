@@ -68,6 +68,7 @@ export default {
               prose: [
                 'The formula ∇(x^T Ax) = 2Ax is applied directly: grad_analytic = 2*A*x multiplies the symmetric matrix A by x and scales by 2. The anonymous function f = @(v) v\'*A*v evaluates the scalar at any vector v, enabling the central-difference verification [f(x+h*eᵢ) − f(x−h*eᵢ)]/(2h) for each coordinate direction eᵢ — the standard numerical approximation to ∂f/∂xᵢ.',
                 'The Hessian H = 2*A is constant for any quadratic. Calling [V,D] = eig(H) reveals the principal curvature directions (columns of V) and their magnitudes (diagonal of D). Both eigenvalues positive confirms A is positive definite — the quadratic form curves upward in every direction, so setting ∇f = 0 finds the unique global minimum.',
+                'The constant Hessian is what makes Newton\'s method exact in one step for a quadratic: Newton solves $H \\cdot \\Delta\\mathbf{x} = -\\nabla f$, and because $H$ is the EXACT curvature (no approximation), the step lands precisely at $\\mathbf{x}^*$. In gradient descent, the step size $\\alpha < 1/\\lambda_{\\max}(H)$ bounds how far each step can go — the condition number $\\kappa(H) = \\lambda_{\\max}/\\lambda_{\\min}$ determines how many iterations converge: high $\\kappa$ → slow. For $H = 2A$, $\\kappa(A)$ controls convergence.',
               ],
               code: `A = [3 1; 1 2]
 x = [1; 2]
@@ -92,6 +93,7 @@ disp('Eigenvalues of Hessian (all positive = minimum):')
               prose: [
                 'The analytic Jacobian J_analytic = [2*x(1), 1; x(2), x(1)] is built by differentiating each output. Row 1 comes from f₁ = x₁² + x₂: ∂f₁/∂x₁ = 2x₁, ∂f₁/∂x₂ = 1. Row 2 comes from f₂ = x₁x₂: ∂f₂/∂x₁ = x₂, ∂f₂/∂x₂ = x₁. Each row is the gradient (transposed) of one output function — the Jacobian stacks all of them into a single matrix.',
                 'The numerical loop builds J column by column: column j is [f(x+h*eⱼ) − f(x−h*eⱼ)]/(2h), measuring how every output fᵢ responds to a small step in input xⱼ. Compare J_numerical to J_analytic — they match to machine precision, confirming the analytic formula and the Jacobian-as-linear-approximation interpretation.',
+                'The Jacobian is a local linear-sensitivity map: column $j$ is how every output responds to nudging input $x_j$. In robotics, a robot arm maps joint angles $\\boldsymbol{\\theta}$ to end-effector position $\\mathbf{p}$; its Jacobian $J(\\boldsymbol{\\theta})$ is the velocity map $\\dot{\\mathbf{p}} = J\\dot{\\boldsymbol{\\theta}}$. Near a singularity where $\\det J = 0$, the arm cannot move in some Cartesian directions. Change x to [1; 1] and verify det(J_analytic) = 2*1*1 - 1*1 = 1 (no singularity here). The closer $\\det J$ is to zero, the more ill-conditioned the velocity inversion $\\dot{\\boldsymbol{\\theta}} = J^{-1}\\dot{\\mathbf{p}}$.',
               ],
               code: `% f(x) = [x1^2 + x2; x1*x2] — Jacobian is 2x2
 x = [2; 3];

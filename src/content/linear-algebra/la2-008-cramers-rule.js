@@ -75,6 +75,7 @@ export default {
               prose: [
                 '`det(A)` computes the denominator shared by all variables. `[b A(:,2) A(:,3)]` builds the matrix $A_1(\\mathbf{b})$ — column 1 of $A$ replaced by $\\mathbf{b}$, columns 2 and 3 unchanged. `det([b A(:,2) A(:,3)]) / d` applies Cramer\'s formula: $x_1 = \\det(A_1)/\\det(A)$.',
                 '`A \\\\ b` is MATLAB\'s backslash operator which uses LU decomposition internally — this is the numerically correct approach for any real code. Comparing the two confirms Cramer\'s Rule gives the same answer but required computing 4 separate determinants vs one LU factorization.',
+                'For this $3\\times 3$ system, Cramer\'s Rule computes 4 determinants (1 for $\\det(A)$ + 1 per variable). Each $3\\times 3$ determinant costs ~14 operations (cofactor expansion); LU factorization costs ~18 operations for $3\\times 3$. At this size the methods are comparable. But at $n = 100$: Cramer\'s needs $101 \\times O(100^3) \\approx 10^8$ operations vs LU\'s $O(100^3) \\approx 10^6$ — a $100\\times$ disadvantage. Cramer\'s Rule is most powerful when $A$ and $\\mathbf{b}$ contain symbolic variables: the formula `x_i = det(A_i) / det(A)` then gives a closed-form expression that can be differentiated, simplified, or analyzed.',
               ],
               code: `A = [2 1 -1; -3 -1 2; -2 1 2];
 b = [8; -11; -3];
@@ -98,6 +99,7 @@ fprintf('Match: %d\\n', norm([x1;x2;x3] - (A\\b)) < 1e-10)`,
               prose: [
                 '`[A(2,2) -A(1,2); -A(2,1) A(1,1)]` builds the adjugate of a 2×2 matrix by the rule: swap the diagonal entries ($a \\leftrightarrow d$) and negate the off-diagonal entries ($b \\to -b$, $c \\to -c$). This is a special case of the general formula $\\text{adj}(A)_{ij} = C_{ji}$.',
                 '`adj_A / d` divides every entry of $\\text{adj}(A)$ by $\\det(A)$, giving $A^{-1}$. `norm(inv_formula - inv(A)) < 1e-12` checks agreement to machine precision. `A * inv_formula` should equal $I$ — this verifies $A \\cdot \\text{adj}(A) = \\det(A) \\cdot I$ (the fundamental adjugate identity).',
+                '`product = A * adj_A` computes $A \\cdot \\text{adj}(A)$ directly. The diagonal entries of `product` equal $\\det(A)$ — each is a standard cofactor expansion along that row. The off-diagonal entries are zero (Alien Cofactor Theorem: row $j$ of $A$ dotted with row $i$\'s cofactors gives $\\det$ of a matrix with two identical rows = 0). The pattern — diagonal $= \\det(A)$, off-diagonal $= 0$ — is exactly $\\det(A) \\cdot I$, proving $A^{-1} = \\text{adj}(A)/\\det(A)$ algebraically.',
               ],
               code: `A = [3 1; 2 4];
 d = det(A);
@@ -121,6 +123,7 @@ fprintf('A * adj(A) (should be %g*I):\\n', d); disp(product)`,
               prose: [
                 'The nested loops compute every cofactor $C_{ij} = (-1)^{i+j} M_{ij}$: `minor = A` with row `i` and column `j` deleted, `det(minor)` gives $M_{ij}$, and the sign $(-1)^{i+j}$ is `(-1)^(i+j)`. The adjugate is the TRANSPOSE of the cofactor matrix — note `adj(j,i) = cofactor` (not `adj(i,j)`).',
                 '`A * adj_A` should equal `det(A) * eye(3)` — the fundamental adjugate identity. The off-diagonal entries should be exactly zero (the Alien Cofactor Theorem: using row $i$\'s entries with row $j$\'s cofactors gives determinant of a matrix with two identical rows = 0). `norm(A * adj_A - d * eye(3)) < 1e-10` confirms this numerically.',
+                'The index reversal `adj_A(j,i) = cofactor` (not `adj_A(i,j)`) builds the TRANSPOSE of the cofactor matrix directly — the definition of the adjugate. The nested loops cover all $n^2$ cofactors by deleting each row-column pair. Reading the pattern: position $(j, i)$ in the adjugate holds the cofactor at position $(i, j)$ in $A$. This reversal is why the 2×2 formula swaps the diagonal entries (not just negates) — swapping corresponds to transposing a $1\\times 1$ cofactor in the off-diagonal position.',
               ],
               code: `A = [2 -1 0; 3 2 1; 0 1 4];
 d = det(A);
@@ -148,6 +151,7 @@ fprintf('Identity check: norm = %g (should be ~0)\\n', norm(product - d*eye(n)))
               prose: [
                 'The Alien Cofactor Theorem states: $\\sum_k a_{jk} C_{ik} = 0$ when $i \\neq j$. This is the off-diagonal entry of $A \\cdot \\text{adj}(A)$. The loop below computes this sum directly for all pairs $(i,j)$ and prints the value — it should be 0 for $i \\neq j$ and $\\det(A)$ for $i = j$.',
                 'These are exactly the entries of $A \\cdot \\text{adj}(A)$. The diagonal entries are $\\det(A)$ (correct cofactor expansion); the off-diagonal entries are 0 (Alien Cofactor Theorem). Together they prove $A \\cdot \\text{adj}(A) = \\det(A) I$, which is the theoretical basis of the adjugate inverse formula.',
+                '`A(j,:) * C(i,:)\'` computes $\\sum_k a_{jk} C_{ik}$ — row $j$ of $A$ dotted with row $i$ of the cofactor matrix. When $i = j$: cofactor expansion of $\\det(A)$ along row $i$. When $i \\neq j$: imagine replacing row $i$ of $A$ with row $j$ — the resulting matrix has two identical rows, so its determinant is zero. The printed pattern (diagonal = $\\det(A)$, off-diagonal $\\approx 0$) is exactly $A \\cdot \\text{adj}(A) = \\det(A) I$ — the small non-zero values for off-diagonal are floating-point rounding, not mathematical error.',
               ],
               code: `A = [2 -1 0; 3 2 1; 0 1 4];
 d = det(A);
@@ -212,6 +216,7 @@ end`,
               prose: [
                 "For a system Ax = b, x_i = det(A_i) / det(A) where A_i is A with column i replaced by b.",
                 "This is exact for small systems. For large n, it is exponentially slower than np.linalg.solve.",
+                'The left panel plots both lines (equations) and marks their intersection — the solution $(x_1, x_2)$. The right two panels show matrices $A_1$ and $A_2$ as heatmaps with their determinants in the axis label. Reading the ratios: $\\det(A_1)/\\det(A)$ gives $x_1$, $\\det(A_2)/\\det(A)$ gives $x_2$. Each determinant encodes a signed area — the ratio is the coordinate in the $\\mathbf{a}_1, \\mathbf{a}_2$ basis defined by $A$\'s columns. This is the geometric meaning: Cramer\'s Rule decomposes $\\mathbf{b}$ as a combination of $A$\'s columns, reading off each coefficient as an area ratio.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -262,6 +267,7 @@ plt.show()`,
               prose: [
                 "The adjugate is the transpose of the cofactor matrix. For 2×2: adj([[a,b],[c,d]]) = [[d,-b],[-c,a]].",
                 "For larger matrices, compute cofactors by omitting each row and column. NumPy's inv() is faster, but adjugate is useful for symbolic computation.",
+                '`adj[j, i] = ((-1)**(i+j)) * np.linalg.det(minor)` — note the index reversal `[j, i]` (not `[i, j]`): this directly builds the TRANSPOSE of the cofactor matrix (the adjugate) without a separate transpose step. Each entry of `adj` is a polynomial of degree $n-1$ in $A$\'s entries (a minor determinant). Therefore $A^{-1} = \\text{adj}(A)/\\det(A)$ has entries that are rational functions of $A$\'s entries — this is why SymPy and Mathematica use the adjugate formula for symbolic matrix inversion, producing exact algebraic expressions rather than floating-point approximations.',
               ],
               code: `import numpy as np
 
@@ -299,6 +305,7 @@ print("Match:", np.allclose(inv_formula, np.linalg.inv(A)))`,
               prose: [
                 '`A_i = A.copy(); A_i[:, i] = b` forms the matrix $A_i(\\mathbf{b})$ by replacing column $i$ with $\\mathbf{b}$. This is a one-line operation in NumPy: copy the matrix, then overwrite one column. `np.linalg.det(A_i) / det_A` applies the Cramer formula. All three variables are computed in the loop.',
                 'The heatmap grid shows the original matrix $A$ and the three replacement matrices $A_1, A_2, A_3$ side by side. The highlighted column in each $A_i$ is where $\\mathbf{b}$ was substituted. Comparing the determinant of each replacement matrix to $\\det(A)$ gives each variable as a simple ratio.',
+                'The orange column in each $A_i$ is exactly $\\mathbf{b} = [8, -11, -3]^T$ — the right-hand side replacing that variable\'s column. Reading the determinant values in the plot titles: $\\det(A) = -1$, so the signs of $\\det(A_i)$ directly give the signs of $x_i$. For $\\mathbf{x} = [2, 3, -1]^T$: each ratio is exact — no floating-point loss because the numerator and denominator are both integer-entry determinants. This is why Cramer\'s Rule is preferred in exact arithmetic (CAS systems, integer linear programming): it produces exact rational results without introducing rounding error.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -333,6 +340,64 @@ for ax, M, title, hcol in zip(axes, matrices, titles, highlight):
     ax.set_title(f'{title}\\ndet = {det_val:.1f}', fontsize=10)
     ax.set_xticks([]); ax.set_yticks([])
 plt.suptitle(f"Cramer: x = [{x[0]:.2f}, {x[1]:.2f}, {x[2]:.2f}]", fontsize=11)
+plt.tight_layout()
+plt.show()`,
+            },
+            {
+              id: 4,
+              cellTitle: "Application: parametric Cramer's Rule — solution as a function of parameter t",
+              prose: [
+                '`x1_t = (t + 2) / (t + 1)` and `x2_t = 1 / (t + 1)` are the Cramer\'s Rule formulas derived symbolically from the parametric system $A(t) = \\begin{bmatrix}t&1\\\\1&t\\end{bmatrix}$, $\\mathbf{b}(t) = \\begin{bmatrix}t+1\\\\2\\end{bmatrix}$. They are rational functions of $t$ — continuous and differentiable except where $\\det(A(t)) = t^2 - 1 = 0$ (at $t = \\pm 1$). `np.linalg.solve` confirms these match at any specific $t$, but cannot produce the symbolic formula.',
+                'The left plot traces $x_1(t)$ and $x_2(t)$ continuously. The dashed lines at $t = \\pm 1$ are singularities — as $t \\to \\pm 1$, one or both solution components blow up. The right plot shows $\\det(A(t)) = t^2 - 1$: the shaded regions distinguish where the matrix is invertible (nonzero determinant). The zeros of $\\det(A(t))$ are exactly the singularities of the solution.',
+                'This is Cramer\'s Rule\'s key advantage over numerical methods: `np.linalg.solve` gives a number for each fixed $t$ but no formula. Cramer\'s Rule gives the solution as a function, enabling symbolic differentiation ($\\partial x_i / \\partial t$), singularity analysis (roots of $\\det(A(t))$), and asymptotic analysis ($x_1 \\to 1$ and $x_2 \\to 0$ as $t \\to \\infty$). Control engineers and physicists reach for Cramer\'s Rule whenever the system depends on parameters.',
+              ],
+              code: `import numpy as np
+import matplotlib.pyplot as plt
+
+# Parametric system: A(t) = [[t,1],[1,t]], b(t) = [t+1, 2]
+# Cramer: x1(t) = det([[t+1,1],[2,t]]) / (t^2-1) = (t+2)/(t+1)
+# Cramer: x2(t) = det([[t,t+1],[1,2]]) / (t^2-1) = 1/(t+1)
+
+t_vals = np.linspace(-3, 6, 600)
+t_vals = t_vals[np.abs(t_vals**2 - 1) > 0.08]   # exclude singularities t = ±1
+
+x1_t = (t_vals + 2) / (t_vals + 1)
+x2_t = 1.0 / (t_vals + 1)
+
+# Numerical verify at t = 3
+t_c = 3.0
+A_c = np.array([[t_c, 1.], [1., t_c]])
+b_c = np.array([t_c + 1., 2.])
+x_np  = np.linalg.solve(A_c, b_c)
+x_cr  = np.array([(t_c + 2) / (t_c + 1), 1.0 / (t_c + 1)])
+print(f"t=3:  Cramer = {x_cr.round(4)},  NumPy = {x_np.round(4)},  match: {np.allclose(x_cr, x_np)}")
+
+fig, axes = plt.subplots(1, 2, figsize=(11, 4.5))
+
+# Left: x1(t) and x2(t)
+ax = axes[0]
+ax.plot(t_vals, x1_t, 'steelblue', lw=2.5, label='x₁(t) = (t+2)/(t+1)')
+ax.plot(t_vals, x2_t, 'darkorange', lw=2.5, label='x₂(t) = 1/(t+1)')
+ax.axvline(1,  color='gray', ls='--', lw=1.5, label='singularity t = 1')
+ax.axvline(-1, color='gray', ls=':', lw=1.5, label='singularity t = -1')
+ax.scatter([t_c], [x_cr[0]], s=80, color='steelblue', zorder=5)
+ax.scatter([t_c], [x_cr[1]], s=80, color='darkorange', zorder=5)
+ax.set_xlabel('t'); ax.set_ylabel('solution components')
+ax.set_title("Cramer's Rule: x(t) as rational functions of t", fontsize=10)
+ax.legend(fontsize=9); ax.grid(True, alpha=0.3); ax.set_ylim(-4, 6)
+
+# Right: det(A(t))
+ax2 = axes[1]
+det_t = t_vals**2 - 1
+ax2.plot(t_vals, det_t, 'crimson', lw=2.5, label='det(A(t)) = t² - 1')
+ax2.axhline(0, color='k', lw=0.8)
+ax2.fill_between(t_vals, 0, det_t, where=(det_t > 0), alpha=0.2, color='green', label='invertible (det > 0)')
+ax2.fill_between(t_vals, 0, det_t, where=(det_t < 0), alpha=0.2, color='red',   label='singular zone (det < 0)')
+ax2.set_xlabel('t'); ax2.set_ylabel('det(A(t))')
+ax2.set_title("det(A(t)) = t² - 1: zeros = singularities", fontsize=10)
+ax2.legend(fontsize=9); ax2.grid(True, alpha=0.3)
+
+plt.suptitle("Cramer's Rule: solution as closed-form functions of a parameter", fontsize=10)
 plt.tight_layout()
 plt.show()`,
             },

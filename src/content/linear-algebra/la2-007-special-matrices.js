@@ -140,6 +140,7 @@ end`,
               prose: [
                 '`chol(A)` returns the upper Cholesky factor $R$ such that $A = R^\\top R$ (MATLAB convention: upper triangular). `R\' * R - A` should be near-zero. `chol` will throw an error if $A$ is not positive definite — this is a built-in SPD check.',
                 'The manual computation below follows the Cholesky algorithm: `L(1,1) = sqrt(A(1,1))`, then `L(2,1) = A(2,1)/L(1,1)`, then `L(2,2) = sqrt(A(2,2) - L(2,1)^2)`. The diagonal entries are square roots of "remaining variance" — they fail (imaginary) when $A$ is not SPD. `norm(L * L\' - A) < 1e-12` confirms $LL^\\top = A$.',
+                'Solving with Cholesky: `y = L \\ b` is forward substitution ($L\\mathbf{y} = \\mathbf{b}$, $O(n^2)$), then `x = L\' \\ y` is back substitution ($L^\\top \\mathbf{x} = \\mathbf{y}$, $O(n^2)$). This is the same two-phase pattern as LU, but here the upper triangular factor is EXACTLY $L^\\top$ — the transpose of $L$ — so no separate matrix $U$ is needed. Cholesky stores only $L$ (the lower triangle of $A$), processes only $n^2/2$ entries instead of $n^2$, and costs $n^3/6$ operations vs $n^3/3$ for LU: a genuine 2× speedup.',
               ],
               code: `A = [9 3; 3 5];   % SPD matrix
 
@@ -199,38 +200,41 @@ fprintf('Verify A*x = b: [%g; %g]\\n', A*x)`,
               id: 1,
               cellTitle: 'Symmetric matrix — verify real eigenvalues and orthogonal eigenvectors',
               prose: [
-                'For real symmetric matrices, NumPy\'s `np.linalg.eigh()` is faster and more accurate than `np.linalg.eig()` because it exploits the symmetry.',
-                'The eigenvectors form an orthonormal set — their matrix Q satisfies Q.T @ Q = I.',
+                '`np.linalg.eigh(A)` is the correct function for symmetric matrices — it uses a specialized real symmetric algorithm (faster and more accurate than the general `np.linalg.eig`). It returns `(vals, vecs)` where `vals` are the eigenvalues (guaranteed real and sorted ascending) and `vecs` has orthonormal eigenvectors as columns.',
+                '`np.allclose(vecs.T @ vecs, np.eye(3))` verifies the eigenvector matrix is orthonormal: columns are unit-length and pairwise perpendicular. `A_reconstructed = vecs @ np.diag(vals) @ vecs.T` assembles $A = V\\Lambda V^T$ (the Spectral Theorem) and the reconstruction error `np.linalg.norm(A - A_reconstructed)` should be near machine epsilon ($\\approx 10^{-14}$).',
+                'The heatmap shows $A$ (symmetric — notice the mirror symmetry across the diagonal), eigenvector matrix $V$ (columns look "random" but are orthonormal), and $\\Lambda = \\text{diag}(\\lambda_1, \\lambda_2, \\lambda_3)$ (diagonal matrix with all real entries). Reading $A = V\\Lambda V^T$ left to right: $V^T$ rotates to the eigenvector basis, $\\Lambda$ scales each axis independently, $V$ rotates back. This is the geometric action of every symmetric matrix.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
-# Symmetric: A^T = A
-A_sym = np.array([[4., 2., 1.], [2., 3., 0.], [1., 0., 5.]])
-# Orthogonal: Q^T = Q^-1 (rotation)
-theta = np.pi/4
-Q = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
-# Diagonal
-D = np.diag([3., 1., 4.])
+A = np.array([[4., 2., 1.],
+              [2., 3., 0.],
+              [1., 0., 5.]])
 
-print("Symmetric? A^T == A:", np.allclose(A_sym.T, A_sym))
-print("Orthogonal? Q^T @ Q = I:", np.allclose(Q.T @ Q, np.eye(2)))
-print("Q^T == Q_inv:", np.allclose(Q.T, np.linalg.inv(Q)))
+print("Symmetric? (A == A^T):", np.allclose(A, A.T))
 
+# eigh exploits symmetry: faster, guaranteed real eigenvalues
+vals, vecs = np.linalg.eigh(A)
+print(f"Eigenvalues (all real, Spectral Theorem): {vals.round(4)}")
+print("V^T @ V (should be I):")
+print((vecs.T @ vecs).round(4))
+
+# Verify A = V Lambda V^T
+A_rec = vecs @ np.diag(vals) @ vecs.T
+print(f"Reconstruction error |A - VLambdaV^T|: {np.linalg.norm(A - A_rec):.2e}")
+
+# Visualize A and its spectral decomposition
 fig, axes = plt.subplots(1, 3, figsize=(11, 3.5))
-for ax, M, title in zip(axes, [A_sym, np.pad(Q, ((0,1),(0,1))), D], 
-                         ['Symmetric
-A^T = A', 'Orthogonal
-Q^T = Q_inv', 'Diagonal
-D = diag(3,1,4)']):
-    if M.shape[0] == 3:
-        im = ax.imshow(M, cmap='RdBu_r', aspect='equal', vmin=-5, vmax=5)
-        for i in range(M.shape[0]):
-            for j in range(M.shape[1]):
-                ax.text(j, i, f'{M[i,j]:.2f}', ha='center', va='center', fontsize=11,
-                        color='white' if abs(M[i,j]) > 2.5 else 'black')
-    ax.set_title(title, fontsize=11)
+labels = ['A (symmetric)', 'V (eigenvectors)', 'Lambda = diag(eigenvalues)']
+for ax, M, lbl in zip(axes, [A, vecs, np.diag(vals)], labels):
+    ax.imshow(M, cmap='RdBu_r', aspect='equal', vmin=-5, vmax=5)
+    ax.set_title(lbl, fontsize=10)
+    for i in range(M.shape[0]):
+        for j in range(M.shape[1]):
+            ax.text(j, i, f'{M[i,j]:.2f}', ha='center', va='center', fontsize=9,
+                    color='white' if abs(M[i,j]) > 2.5 else 'black')
     ax.set_xticks([]); ax.set_yticks([])
+plt.suptitle("Spectral Theorem: A = V @ diag(eigenvalues) @ V^T", fontsize=10)
 plt.tight_layout()
 plt.show()`,
             },
@@ -240,6 +244,7 @@ plt.show()`,
               prose: [
                 'A 3D rotation matrix is orthogonal. Verify Q^T @ Q = I, det = 1, and condition number = 1.',
                 'Condition number = 1 means the transformation introduces zero amplification of errors — numerically ideal.',
+                'The arrows in the side-by-side plot have the same lengths before and after rotation. Length preservation follows from $(Q\\mathbf{v})^\\top(Q\\mathbf{v}) = \\mathbf{v}^\\top Q^\\top Q \\mathbf{v} = \\mathbf{v}^\\top I \\mathbf{v} = \\|\\mathbf{v}\\|^2$. Angle preservation follows similarly: $\\langle Q\\mathbf{u}, Q\\mathbf{v} \\rangle = \\mathbf{u}^\\top Q^\\top Q \\mathbf{v} = \\mathbf{u}^\\top \\mathbf{v}$. These two facts together define an **isometry** — the most numerically stable transformation possible. `np.linalg.cond(Q)` would return exactly 1.0, confirming no direction is amplified or damped.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -277,6 +282,7 @@ plt.show()`,
               prose: [
                 'For symmetric positive definite matrices, Cholesky factorization A = L @ L.T is twice as fast as LU decomposition.',
                 'It only works when A is truly SPD — the algorithm will throw a LinAlgError if A is not positive definite.',
+                'The two solve calls `np.linalg.solve(L, b)` and `np.linalg.solve(L.T, y)` implement the Cholesky two-phase solve: forward substitution through $L$, then back substitution through $L^T$. This is the same pattern as LU ($Ly = b$, $Ux = y$), but here $U = L^T$ — no separate upper-triangular matrix is needed. Cholesky stores only the lower triangle of $A$ (~$n^2/2$ entries vs $n^2$ for LU) and costs $n^3/6$ flops vs $n^3/3$ — exactly twice as fast, exploiting the symmetry $A = A^T$.',
               ],
               code: `import numpy as np
 
@@ -303,6 +309,53 @@ y = np.linalg.solve(L, b)         # forward sub
 x = np.linalg.solve(L.T, y)       # back sub
 print(f"Solution x: {x.round(6)}")
 print(f"Verify A@x = b: {np.allclose(A @ x, b)}")`,
+            },
+            {
+              id: 4,
+              cellTitle: 'Application: multivariate Gaussian sampling — Cholesky shapes a distribution',
+              prose: [
+                '`np.linalg.cholesky(Sigma)` returns the lower Cholesky factor $L$ such that $\\Sigma = L L^T$. The key identity: if $\\mathbf{z} \\sim \\mathcal{N}(\\mathbf{0}, I)$ (standard normal, uncorrelated), then $\\mathbf{x} = L\\mathbf{z}$ has covariance $E[\\mathbf{x}\\mathbf{x}^T] = E[L\\mathbf{z}\\mathbf{z}^T L^T] = L \\cdot I \\cdot L^T = LL^T = \\Sigma$. Multiplying by $L$ "shapes" the distribution from a round ball to an ellipse with the desired correlations.',
+                '`z = np.random.randn(2, n_samples)` draws from $\\mathcal{N}(0, I)$ (2D standard normal, shape 2×500). `x = L @ z` applies the Cholesky factor as a linear map — each column of $z$ gets transformed into a correlated sample. `np.cov(x)` estimates the empirical covariance of the 500 samples; it should converge to `Sigma` as `n_samples → ∞`.',
+                'The scatter plot shows the elliptical shape of the distribution — the tilt corresponds to the off-diagonal entry $\\Sigma_{12} = 1.5$ (positive correlation: $x_1$ and $x_2$ tend to move together). This Cholesky-sampling trick appears in MCMC (Metropolis-Hastings proposals), Bayesian inference (sampling from posterior distributions), Kalman filtering, and any Monte Carlo simulation that needs correlated random variables.',
+              ],
+              code: `import numpy as np
+import matplotlib.pyplot as plt
+
+# Target covariance matrix (SPD) — correlated 2D Gaussian
+Sigma = np.array([[2.0, 1.5],
+                  [1.5, 2.0]])
+
+print("Eigenvalues of Sigma (must all be positive for SPD):", np.linalg.eigvalsh(Sigma).round(4))
+
+# Cholesky: Sigma = L @ L.T
+L = np.linalg.cholesky(Sigma)
+print(f"Cholesky factor L:\\n{L.round(4)}")
+print(f"L @ L.T = Sigma? {np.allclose(L @ L.T, Sigma)}")
+
+# Generate 500 correlated samples: z ~ N(0,I), x = L @ z ~ N(0,Sigma)
+np.random.seed(42)
+n_samples = 500
+z = np.random.randn(2, n_samples)   # standard normal (uncorrelated)
+x = L @ z                           # correlated: covariance = L @ I @ L.T = Sigma
+
+print(f"\\nEmpirical covariance (should approach Sigma):")
+print(np.cov(x).round(2))
+
+# Plot
+fig, axes = plt.subplots(1, 2, figsize=(10, 4.5))
+axes[0].scatter(z[0], z[1], alpha=0.3, s=12, color='steelblue', label='z ~ N(0,I)')
+axes[0].set_title("z ~ N(0, I): uncorrelated, circular", fontsize=10)
+axes[0].set_aspect('equal'); axes[0].set_xlim(-4,4); axes[0].set_ylim(-4,4)
+axes[0].grid(True, alpha=0.3); axes[0].axhline(0,color='k',lw=0.5); axes[0].axvline(0,color='k',lw=0.5)
+
+axes[1].scatter(x[0], x[1], alpha=0.3, s=12, color='crimson', label='x = L@z ~ N(0,Sigma)')
+axes[1].set_title("x = L @ z ~ N(0, Sigma): correlated, elliptical", fontsize=10)
+axes[1].set_aspect('equal'); axes[1].set_xlim(-6,6); axes[1].set_ylim(-6,6)
+axes[1].grid(True, alpha=0.3); axes[1].axhline(0,color='k',lw=0.5); axes[1].axvline(0,color='k',lw=0.5)
+
+plt.suptitle("Cholesky shapes N(0,I) into N(0,Sigma) via x = L @ z", fontsize=11)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 'c1',
