@@ -114,7 +114,7 @@ export default {
               prose: [
                 'MATLAB returns S as a full diagonal matrix. Use diag(S) to extract singular values.',
                 'The three matrices encode the full transformation: $A = U\\Sigma V^T$ means "rotate by $V^T$, scale by $\\Sigma$, then rotate by $U$." Columns of $U$ are output directions, columns of $V$ are input directions, and diagonal entries of $S$ are the stretching factors (singular values). The singular values appear in descending order: $\\sigma_1 \\geq \\sigma_2 \\geq \\cdots \\geq 0$.',
-                'Verify the reconstruction with `norm(A - U*S*V\\'', \\'fro\\') < 1e-10`. The full format gives $S$ as an $m\\times n$ matrix; for a tall matrix ($m > n$), the last $m-n$ columns of $U$ span the left null space and correspond to zero singular values — this is why `svd(A, \\'econ\\')` (economy form) returns a smaller $U$ and drops those columns.',
+                "Verify the reconstruction with `norm(A - U*S*V', 'fro') < 1e-10`. The full format gives $S$ as an $m\\times n$ matrix; for a tall matrix ($m > n$), the last $m-n$ columns of $U$ span the left null space and correspond to zero singular values — this is why `svd(A, 'econ')` (economy form) returns a smaller $U$ and drops those columns.",
               ],
               code: `A = [3 1 1; 1 3 1]   % 2x3 matrix
 [U, S, V] = svd(A)
