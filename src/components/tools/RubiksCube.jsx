@@ -22,362 +22,98 @@ function solvedState() {
   return s
 }
 
-// ─── Permutation cycle application ───────────────────────────────────────────
-// cycle = [a, b, c, d] means: new[b]=old[a], new[c]=old[b], new[d]=old[c], new[a]=old[d]
-function applyCycles(state, cycles) {
+// ─── Rotation-matrix move algorithm ──────────────────────────────────────────
+// Each function gives the new [x,y,z] after a CW rotation of that face (viewed from outside).
+const FACE_ROT = {
+  U: (x, y, z) => [ z, y, -x],  // CW from above: +Z→+X→-Z→-X
+  D: (x, y, z) => [-z, y,  x],  // CW from below: +Z→-X→-Z→+X
+  R: (x, y, z) => [ x,-z,  y],  // CW from right: top→front
+  L: (x, y, z) => [ x, z, -y],  // CW from left:  top→back
+  F: (x, y, z) => [ y,-x,  z],  // CW from front: right→down
+  B: (x, y, z) => [-y, x,  z],  // CW from behind: top→world-right
+}
+
+const FACE_LAYER_FN = {
+  U: (_x, y, _z) => y ===  1,
+  D: (_x, y, _z) => y === -1,
+  R: (x, _y, _z) => x ===  1,
+  L: (x, _y, _z) => x === -1,
+  F: (_x, _y, z) => z ===  1,
+  B: (_x, _y, z) => z === -1,
+}
+
+function normalToFaceName(x, y, z) {
+  if (y ===  1) return 'U'
+  if (y === -1) return 'D'
+  if (x ===  1) return 'R'
+  if (x === -1) return 'L'
+  if (z ===  1) return 'F'
+  return 'B'
+}
+
+function applyFaceMove(state, face) {
+  const rot = FACE_ROT[face]
+  const inLayer = FACE_LAYER_FN[face]
   const next = [...state]
-  for (const [a, b, c, d] of cycles) {
-    next[b] = state[a]
-    next[c] = state[b]
-    next[d] = state[c]
-    next[a] = state[d]
+  for (let x = -1; x <= 1; x++) {
+    for (let y = -1; y <= 1; y++) {
+      for (let z = -1; z <= 1; z++) {
+        if (x === 0 && y === 0 && z === 0) continue
+        if (!inLayer(x, y, z)) continue
+        const [nx, ny, nz] = rot(x, y, z)
+        const normals = []
+        if (y ===  1) normals.push([ 0,  1,  0, 'U'])
+        if (y === -1) normals.push([ 0, -1,  0, 'D'])
+        if (x ===  1) normals.push([ 1,  0,  0, 'R'])
+        if (x === -1) normals.push([-1,  0,  0, 'L'])
+        if (z ===  1) normals.push([ 0,  0,  1, 'F'])
+        if (z === -1) normals.push([ 0,  0, -1, 'B'])
+        for (const [fn_x, fn_y, fn_z, fdir] of normals) {
+          const [rn_x, rn_y, rn_z] = rot(fn_x, fn_y, fn_z)
+          const newFdir = normalToFaceName(rn_x, rn_y, rn_z)
+          const srcIdx = getStickerIndex(x, y, z, fdir)
+          const dstIdx = getStickerIndex(nx, ny, nz, newFdir)
+          if (srcIdx >= 0 && dstIdx >= 0) next[dstIdx] = state[srcIdx]
+        }
+      }
+    }
   }
   return next
 }
 
-// ─── Move tables ─────────────────────────────────────────────────────────────
-// Face layout when looking straight at the face:
-//   U face (y=+1, top): [0..8], row 0 = back (z=-1), row 2 = front (z=+1), col 0 = left (x=-1)
-//   R face (x=+1, right): [9..17], row 0 = top (y=+1), col 0 = front (z=+1)
-//   F face (z=+1, front): [18..26], row 0 = top (y=+1), col 0 = left (x=-1)
-//   D face (y=-1, bottom): [27..35], row 0 = front (z=+1), col 0 = left (x=-1)
-//   L face (x=-1, left): [36..44], row 0 = top (y=+1), col 0 = back (z=-1)  [looking from left: back=left, front=right]
-//   B face (z=-1, back): [45..53], row 0 = top (y=+1), col 0 = right (x=+1) [looking from behind: right=left]
+// ─── Move application ────────────────────────────────────────────────────────
 
-// Sticker index helpers:
-// U[row][col] = row*3+col  (row 0=back z=-1, row 2=front z=+1; col 0=left x=-1, col 2=right x=+1)
-// R[row][col] = 9+row*3+col (row 0=top y=+1; col 0=front z=+1, col 2=back z=-1)
-// F[row][col] = 18+row*3+col (row 0=top y=+1; col 0=left x=-1, col 2=right x=+1)
-// D[row][col] = 27+row*3+col (row 0=front z=+1; col 0=left x=-1, col 2=right x=+1)
-// L[row][col] = 36+row*3+col (row 0=top y=+1; col 0=back z=-1, col 2=front z=+1)
-// B[row][col] = 45+row*3+col (row 0=top y=+1; col 0=right x=+1, col 2=left x=-1)
-
-// Verified move tables:
-// U clockwise (top layer rotates CW when viewed from above):
-//   Face: corners 0,2,8,6 cycle CW; edges 1,5,7,3 cycle CW
-//   Sides: F-top-row → R-top-row → B-top-row(reversed) → L-top-row(reversed)
-//     F top row: F[0][0..2] = 18,19,20
-//     R top row: R[0][0..2] = 9,10,11
-//     B top row (looking from behind, reversed): B[0][2..0] = 47,46,45
-//     L top row (looking from left, reversed):  L[0][2..0] = 38,37,36
-//   Cycle: F→R→B'→L': 18→9→47→38, 19→10→46→37, 20→11→45→36
-
-const MOVES = {
-  U: [
-    [0, 2, 8, 6], [1, 5, 7, 3],
-    [18, 9, 47, 38], [19, 10, 46, 37], [20, 11, 45, 36],
-  ],
-  // R clockwise (right layer rotates CW when viewed from the right):
-  //   Face: R corners 9,11,17,15; edges 10,14,16,12
-  //   Sides: U-right-col → F-right-col → D-right-col → B-left-col(reversed)
-  //     U right col (col=2): U[0..2][2] = 2,5,8
-  //     F right col (col=2): F[0..2][2] = 20,23,26
-  //     D right col (col=2): D[0..2][2] = 29,32,35
-  //     B left col (looking from behind, x=+1 is col 0): B[2..0][0] = 51,48,45 → reversed gives 45,48,51
-  //     Actually: U→F means top goes to front. U→F→D→B'
-  //     B col for x=+1 is col 0: B[row][0] = 45+row*3+0 = 45,48,51 (top to bottom)
-  //     When R turns CW: U-right-col top-to-bottom → F-right-col top-to-bottom,
-  //       F-right-col top-to-bottom → D-right-col top-to-bottom,
-  //       D-right-col top-to-bottom → B-left-col BOTTOM-to-top (reversed)
-  //     U[r][2]→F[r][2]: 2→20, 5→23, 8→26
-  //     F[r][2]→D[r][2]: 20→29, 23→32, 26→35
-  //     D-right-col top-to-bottom = D[0..2][2] = 29,32,35
-  //     B left col (x=+1) = col 0: B[0..2][0] = 45,48,51
-  //     D[r][2]→B[2-r][0]: 29→51, 32→48, 35→45
-  //     B[r][0]→U[2-r][2]: 45→8, 48→5, 51→2
-  //   Cycles: [2,20,29,51], [5,23,32,48], [8,26,35,45]
-  R: [
-    [9, 11, 17, 15], [10, 14, 16, 12],
-    [2, 20, 29, 51], [5, 23, 32, 48], [8, 26, 35, 45],
-  ],
-  // F clockwise (front layer CW viewed from front):
-  //   Face: F corners 18,20,26,24; edges 19,23,25,21
-  //   Sides: U-bottom-row → R-left-col → D-top-row(reversed) → L-right-col(reversed)
-  //     U bottom row (row=2, z=+1): U[2][0..2] = 6,7,8
-  //     R left col (z=+1, col=0): R[0..2][0] = 9,12,15
-  //     D top row (row=0, z=+1): D[0][0..2] = 27,28,29
-  //     L right col (z=+1, col=2): L[0..2][2] = 38,41,44
-  //   F CW: U-bottom-row left-to-right → R-left-col top-to-bottom
-  //         R-left-col top-to-bottom → D-top-row right-to-left (reversed)
-  //         D-top-row right-to-left → L-right-col bottom-to-top (reversed)
-  //         L-right-col bottom-to-top → U-bottom-row left-to-right
-  //   U[2][0..2] = 6,7,8
-  //   R col 0 = 9,12,15
-  //   D[0][2..0] = 29,28,27
-  //   L col 2 reversed = 44,41,38
-  //   Cycles: 6→9→29→44, 7→12→28→41, 8→15→27→38
-  F: [
-    [18, 20, 26, 24], [19, 23, 25, 21],
-    [6, 9, 29, 44], [7, 12, 28, 41], [8, 15, 27, 38],
-  ],
-  // D clockwise (bottom layer CW viewed from below):
-  //   Face: D corners 27,29,35,33; edges 28,32,34,30
-  //   Sides (looking from below, CW): F-bottom → L-bottom → B-bottom → R-bottom
-  //     F bottom row (row=2, y=-1): F[2][0..2] = 24,25,26
-  //     L bottom row (row=2): L[2][0..2] = 42,43,44
-  //     B bottom row (row=2): B[2][0..2] = 51,52,53
-  //     R bottom row (row=2): R[2][0..2] = 15,16,17
-  //   D CW (from below): F→R→B→L or looking from above it's counter-CW
-  //   Standard: D CW (from below) = F-bot → L-bot → B-bot → R-bot
-  //   But when looking from below, CW means: standing below looking up, turning right
-  //   From standard cube notation: D moves the bottom layer so that front-bottom becomes right-bottom
-  //   So: F[2]→R[2]→B[2]→L[2] (CW from below, but B gets reversed since B indices run right-to-left)
-  //   Let's think: D CW from below = same rotation direction as U CW from above but for bottom layer
-  //   U CW: F-top → R-top → B-top(rev) → L-top(rev)
-  //   D CW from below (= U CW direction for bottom): the bottom layer stickers on F,R,B,L
-  //   Bottom row of F (row=2): 24,25,26 (left to right = x: -1,0,+1)
-  //   Bottom row of R (row=2): 15,16,17 (front to back = z: +1,0,-1)
-  //   Bottom row of B (row=2): 51,52,53 (right to left = x: +1,0,-1)
-  //   Bottom row of L (row=2): 42,43,44 (back to front = z: -1,0,+1)
-  //   D CW (from below = CCW from above): F[2]→L[2]→B[2]→R[2]
-  //   But D CW in standard notation = CW when looking at D face (from below)
-  //   D CW from below means the front-bottom edge goes to the LEFT-bottom: F→L→B→R
-  //   Hmm, let me verify with a corner: FDL corner (x=-1,y=-1,z=+1)
-  //   F sticker at F[2][0]=24, D sticker at D[0][0]=27, L sticker at L[2][2]=44
-  //   D CW from below: FDL → BDL → BDR → FDR  (CW from below)
-  //   FDR corner goes to FDL? No:
-  //   Looking from below (z points away from you, x right, y up toward cube):
-  //   CW from below: front-left → back-left → back-right → front-right
-  //   So FDL(24,27,44) → BDL → BDR → FDR
-  //   F sticker 24 → goes where? FDL→BDL: the F face sticker of FDL goes to B face of BDL
-  //   B[2][2]=53 (x=-1, z=-1, y=-1): B[row][col] row=2 means bottom, col=2 means x=-1
-  //   So F[2][0]=24 → B[2][2]=53
-  //   F[2][1]=25 → B[2][1]=52
-  //   F[2][2]=26 → B[2][0]=51
-  //   BDR corner (x=+1,y=-1,z=-1): B[2][0]=51, D[2][2]=35, R[2][2]=17
-  //   BDR→FDR: B[2][0]=51 → F[2][2]=26
-  //   So: 24→53, 25→52, 26→51 and 51→26, 52→25, 53→24
-  //   Cycles: [24,53,??,??]... Let me redo properly
-  //   D CW path for the 3 cycles through sides:
-  //   FDL→BDL: 24→53, D-sticker cycles separately
-  //   FDR→FDL: hmm let me trace full cycle for each position
-  //   Cycle involving position at x=-1,z=+1 (front-left of bottom layer):
-  //     D CW from below: FDL → back-left position (x=-1,z=-1)
-  //     FDL has F sticker F[2][0]=24 and L sticker L[2][2]=44
-  //     BDL has B sticker B[2][2]=53 and L sticker L[2][0]=42
-  //     D CW: 24(FDL F-face)→53(BDL B-face)...
-  //   This is getting complex. Let me use the standard D CW permutation:
-  //   D CW (from standard references):
-  //     face: [27,29,35,33],[28,32,34,30]
-  //     sides: F-bottom→L-bottom, L-bottom→B-bottom(reversed), B-bottom(reversed)→R-bottom, R-bottom→F-bottom
-  //   standard: [26,39,45,17],[25,40,46,16],[24,41,47,15]
-  //   Wait, let me recheck: D move cycles for side stickers with proper indexing
-  //   D CW from below: standing below cube, facing up, turning right
-  //   Positions rotate: FDL→FDR→BDR→BDL and FDR→BDR→BDL→FDL (CW from below)
-  //   Hmm, actually standard cube notation D CW means: looking at D face head on (from below cube, face toward you),
-  //   the layer turns clockwise.
-  //   Front of D face (when looking straight up at D face) = front of cube still = z=+1 direction
-  //   CW from below: front-left → front-right → back-right → back-left
-  //   Wait no: CW = right turn: front-left → back-left → back-right → front-right → front-left
-  //   Ugh, let me just use confirmed standard D move cycles:
-  //   D move: moves stickers on F/R/B/L bottom rows
-  //   Standard notation: F-bottom → R-bottom → B-bottom(flipped) → L-bottom(flipped) is U CW pattern
-  //   For D CW: F-bottom → L-bottom(flipped) → B-bottom → R-bottom(flipped)? No...
-  //
-  //   Actually simplest: D' (counterclockwise from below) = clockwise from above for that layer
-  //   Standard D (CW from below, CCW from above for that layer):
-  //   Side effect: front-bottom → left-bottom
-  //   Using confirmed values from cubing databases:
-  //   D CW: [27,33,35,29],[28,30,34,32], [24,15,51,36],[25,16,52,37],[26,17,53,38]  ← standard
-  //   Let me verify: D CW moves FDR(x=+1,z=+1) → RDB(x=+1,z=-1)?
-  //   No, D CW from below moves FDR → FDL... I need to be careful
-  //
-  //   Using the most common standard:
-  //   D CW (as seen from below): FD edge goes to LD, LD to BD, BD to RD, RD to FD
-  //   i.e. F-bottom-row → L-bottom, L-bottom → B-bottom, B-bottom → R-bottom, R-bottom → F-bottom
-  //   F[2][0..2]=24,25,26; L[2][2..0]=44,43,42; B[2][0..2]=51,52,53; R[2][2..0]=17,16,15
-  //   D CW from below: 24→44,25→43,26→42 (F→L reversed), 44→51,43→52,42→53 (L-rev→B),
-  //                    51→17,52→16,53→15 (B→R reversed), 17→24,16→25,15→26 (R-rev→F)
-  //   Cycles: [24,44,51,17],[25,43,52,16],[26,42,53,15]
-  D: [
-    [27, 29, 35, 33], [28, 32, 34, 30],
-    [24, 44, 51, 17], [25, 43, 52, 16], [26, 42, 53, 15],
-  ],
-  // L clockwise (left layer CW viewed from left):
-  //   Face: L corners 36,38,44,42; edges 37,41,43,39
-  //   Sides: U-left-col → B-right-col(reversed) → D-left-col → F-left-col
-  //   L CW (from left): up-side goes back, back-side goes down, down goes front, front goes up
-  //   U left col (col=0): U[0..2][0] = 0,3,6 (back to front = z: -1,0,+1)
-  //   F left col (col=0): F[0..2][0] = 18,21,24 (top to bottom = y: +1,0,-1)
-  //   D left col (col=0): D[0..2][0] = 27,30,33 (front to back = z: +1,0,-1)
-  //   B right col (looking from behind, x=-1 is col=2): B[0..2][2] = 47,50,53 (top to bottom = y: +1,0,-1)
-  //   L CW: F-left-col top-to-bottom → U-left-col front-to-back (reversed)
-  //     Actually: L CW (from left): front face left col goes up, and up col goes to back face
-  //     F[0][0]=18 is at top-left-front (x=-1,y=+1,z=+1)
-  //     L CW: (x=-1,y=+1,z=+1) → (x=-1,y=+1,z=-1): F[0][0] → U[0][0]
-  //     (x=-1,y=+1,z=-1): U[0][0] → B[0][2] (back face, top, left position = col 2)
-  //     Wait: U[0][0] is at (x=-1,z=-1,y=+1) - top-back-left cubie
-  //     L CW rotation axis is x=-1, rotating around x-axis: z→y, y→-z (y decreases when z was positive)
-  //     So: (x=-1, y=+1, z=+1) → (x=-1, y=+1, z=-1)? No.
-  //     Rotation around x-axis CW when viewed from -x (left): y→z, z→-y
-  //     (y=+1,z=+1) → (y=-1,z=+1)? That's front-bottom.
-  //     Hmm: looking from left (-x direction looking toward +x), CW rotation:
-  //     top(y=+1) → front(z=+1) → bottom(y=-1) → back(z=-1) → top
-  //     So: UL column → FL column → DL column → BL column (with appropriate reversals)
-  //     U-left-col indices (top, looking at U from above): U[row][0], row goes back to front (z: -1..+1)
-  //       U[0][0]=0 (x=-1,z=-1), U[1][0]=3, U[2][0]=6 (x=-1,z=+1)
-  //     F-left-col: F[row][0], row top to bottom: 18,21,24
-  //     D-left-col: D[row][0], row front to back (z: +1..-1): 27,30,33
-  //     B-right-col (x=-1 on B face = col 2): B[row][2] top to bottom: 47,50,53
-  //     L CW: U-left → F-left means (x=-1,y=+1,z=-1)→(x=-1,y=+1,z=+1)? No that's not L CW.
-  //     L CW: U top goes to BACK, front goes to UP, D bottom goes to front, back goes to DOWN
-  //     Wait: looking from left (from -x), CW means:
-  //       y=+1 (up) face at left → z=-1 (back) side
-  //       z=-1 (back) → y=-1 (down)
-  //       y=-1 (down) → z=+1 (front)
-  //       z=+1 (front) → y=+1 (up)
-  //     So L CW: U→B, B→D, D→F, F→U for the left column
-  //     U-left-col top-to-bottom in z (back to front): U[0][0]=0, U[1][0]=3, U[2][0]=6
-  //       0 is at z=-1(back), 6 is at z=+1(front)
-  //     B-right-col (x=-1, top-to-bottom): B[0][2]=47, B[1][2]=50, B[2][2]=53
-  //       47 is at y=+1(top), 53 is at y=-1(bottom)
-  //     U[2][0]=6 (z=+1,y=+1) → B top of that z...
-  //     U going to B: U[r][0] where z=+1-r direction...
-  //     U[0][0]=0 at z=-1 → becomes B[0][2]=47 (top of B's right col)
-  //     U[1][0]=3 at z=0 → B[1][2]=50
-  //     U[2][0]=6 at z=+1 → B[2][2]=53
-  //     So U→B: 0→47, 3→50, 6→53? But wait, z goes back-to-front in U face numbering.
-  //     When L turns CW (U→B): U-back-left goes to B-top-right, U-front-left goes to B-bottom-right
-  //     U[0][0]=0 is back-left (z=-1,x=-1) → B[0][2]=47 is top-right of B face (y=+1,x=-1)
-  //     Yes, 0→47 makes sense because both are on the "top" and "back" intersection cubie face.
-  //     B→D: B[row][2] top-to-bottom → D-left-col.
-  //       B[0][2]=47 is at y=+1 (top-back-left) → D[r][0] where...
-  //       D-left-col: D[0][0]=27 at z=+1 (front), D[2][0]=33 at z=-1 (back)
-  //       B-top-right (y=+1,x=-1) → D-back-left (y=-1,z=-1): D[2][0]=33
-  //       B[0][2]=47→D[2][0]=33, B[1][2]=50→D[1][0]=30, B[2][2]=53→D[0][0]=27
-  //       So B→D reversed: 47→33, 50→30, 53→27
-  //     D→F: D[row][0] → F[row][0]
-  //       D[0][0]=27 (z=+1,y=-1,x=-1) → F[2][0]=24 (z=+1,y=-1,x=-1): 27→24
-  //       D[1][0]=30→F[1][0]=21, D[2][0]=33→F[0][0]=18
-  //       So D→F reversed: 27→24, 30→21, 33→18
-  //     F→U: F[row][0] → U[row][0]
-  //       F[0][0]=18 (y=+1,z=+1,x=-1) → U[2][0]=6 (y=+1,z=+1,x=-1): 18→6
-  //       F[1][0]=21→U[1][0]=3, F[2][0]=24→U[0][0]=0 (wait: F[2][0]=24 is y=-1,z=+1 → U[r][0] where z=+1 is U[2][0]=6)
-  //       F→U: 18→6 (F top-left → U front-left), 21→3, 24→0? No that's wrong direction
-  //       F[2][0]=24 at y=-1,z=+1 → doesn't go to U (U is y=+1)
-  //       Wait: when L turns CW (front→up): F-left-col goes to U-left-col
-  //       The FRONT sticker on cubie (x=-1,y=+1,z=+1) = F[0][0]=18 goes to U[2][0]=6 (same cubie)
-  //       The FRONT sticker on cubie (x=-1,y=-1,z=+1) = F[2][0]=24 stays front?? No, that cubie moves to UP position
-  //       (x=-1,y=-1,z=+1) rotates to (x=-1,y=+1,z=+1) — but that's UFL, so F-sticker(24) goes to U[2][0]=6? No.
-  //       When L turns CW (from left view): (x=-1,y,z) → (x=-1,-z,y)
-  //       (x=-1,y=-1,z=+1) → (x=-1,z=-1, y=-1)? No: CW from -x: new_y=z, new_z=-y
-  //       (x=-1, y, z) → (x=-1, z, -y)
-  //       (x=-1,y=+1,z=+1) → (x=-1, y=+1, z=-1): UFL → UBL
-  //       (x=-1,y=+1,z=-1) → (x=-1, y=-1, z=-1): UBL → DBL
-  //       (x=-1,y=-1,z=-1) → (x=-1, y=-1, z=+1): DBL → DFL
-  //       (x=-1,y=-1,z=+1) → (x=-1, y=+1, z=+1): DFL → UFL ✓ (CW rotation going up on front side)
-  //     So: UFL(x=-1,y=+1,z=+1) → UBL(x=-1,y=+1,z=-1) → DBL → DFL → UFL
-  //     Stickers:
-  //       UFL: U sticker=U[2][0]=6, F sticker=F[0][0]=18, L sticker=L[0][2]=38
-  //       UBL: U sticker=U[0][0]=0, B sticker=B[0][2]=47, L sticker=L[0][0]=36
-  //       DBL: D sticker=D[2][0]=33, B sticker=B[2][2]=53, L sticker=L[2][0]=42
-  //       DFL: D sticker=D[0][0]=27, F sticker=F[2][0]=24, L sticker=L[2][2]=44
-  //     L CW cycles for corners (UFL→UBL→DBL→DFL→UFL):
-  //       U stickers: 6→0→33→27→... wait, 33 is D, not U. Let me trace face stickers:
-  //       UFL U-sticker (6) goes to UBL, where the incoming face is...
-  //       UFL cubie has U face sticker. After L CW, UFL moves to UBL position.
-  //       At UBL, the face that was pointing up still points up (U sticker stays U sticker?). Yes for same-face stickers on the moving layer: U[2][0]=6 at UFL → at new position UBL → U[0][0]=0
-  //       So 6→0 in the U-face sticker array. But wait, after L CW, UFL goes to UBL, so the U-sticker of UFL (=6) goes to where UBL's U-sticker is (=0). So 6 replaces 0, meaning cycle: 6→0.
-  //       Continue: UBL's U-sticker (0) goes to DBL position but DBL has no U sticker (y=-1). So the sticker that was at U[0][0]=0 goes to... DBL's B-sticker position B[2][2]=53.
-  //     I'll use the confirmed standard cycles:
-  //     L CW: U[col=0] top-to-bottom, F[col=0] top-to-bottom, D[col=0] top-to-bottom, B[col=2] top-to-bottom
-  //     With reversals: U→B reversed, F→U reversed, D→F reversed, B→D reversed
-  //     Properly: L CW (front goes up): F[r][0]→U[2-r][0], U[r][0]→B[2-r][2], B[r][2]→D[2-r][0], D[r][0]→F[2-r][0]
-  //     Check: F[0][0]=18→U[2][0]=6, F[1][0]=21→U[1][0]=3, F[2][0]=24→U[0][0]=0
-  //            U[0][0]=0→B[2][2]=53, U[1][0]=3→B[1][2]=50, U[2][0]=6→B[0][2]=47
-  //            B[0][2]=47→D[2][0]=33, B[1][2]=50→D[1][0]=30, B[2][2]=53→D[0][0]=27
-  //            D[0][0]=27→F[2][0]=24, D[1][0]=30→F[1][0]=21, D[2][0]=33→F[0][0]=18
-  //     Cycles: [18,6,47,33],[21,3,50,30],[24,0,53,27]
-  L: [
-    [36, 38, 44, 42], [37, 41, 43, 39],
-    [18, 6, 47, 33], [21, 3, 50, 30], [24, 0, 53, 27],
-  ],
-  // B clockwise (back layer CW viewed from back = CCW from front):
-  //   Face: B corners 45,47,53,51; edges 46,50,52,48
-  //   Sides: U-top-row, R-right-col, D-bottom-row, L-left-col (with reversals)
-  //   B face is back of cube. Looking at it from behind, CW rotation.
-  //   B CW: looking from behind (from +z looking toward -z, or wait - back is z=-1)
-  //   Looking from z=-1 direction outward (from back), CW:
-  //   Rotation: (x=-1,y=+1) → (x=+1,y=+1) → (x=+1,y=-1) → (x=-1,y=-1) [CW from behind]
-  //   U top row (y=+1, z=-1): U[0][0..2]=0,1,2 (x: -1,0,+1, z=-1)
-  //   R right col (x=+1, z=-1 end): R[0..2][2]=11,14,17 (y: +1,0,-1)
-  //   D bottom row (y=-1, z=-1): D[2][0..2]=33,34,35 (x: -1,0,+1)
-  //   L left col (x=-1, z=-1 end): L[0..2][0]=36,39,42 (y: +1,0,-1)
-  //   B CW (from behind): U→R→D→L with appropriate reversals
-  //   Looking from behind at z=-1 face, CW: top→right→bottom→left
-  //   U top-row left-to-right (x: -1→+1): 0,1,2
-  //   Going CW from behind: UBL(x=-1)→UBR(x=+1)→DBR→DBL→UBL
-  //   U[0][0..2]=0,1,2 → R right col:
-  //     UBL(x=-1,y=+1,z=-1) → UBR(x=+1,y=+1,z=-1): B CW rotation (x=-1,y=+1)→(x=+1,y=+1)
-  //     Wait, B CW from behind: (x,y)→(y,-x) [standard CW rotation in xy plane, seen from -z]
-  //     (x=-1,y=+1)→(y=+1,−x=+1)=(x=+1,y=+1): UBL→UBR ✓
-  //     (x=+1,y=+1)→(x=+1,y=-1): UBR→DBR ✓
-  //     (x=+1,y=-1)→(x=-1,y=-1): DBR→DBL ✓
-  //     (x=-1,y=-1)→(x=-1,y=+1): DBL→UBL ✓
-  //   UBL U-sticker(0)→UBR U-sticker(2)? No, after rotation UBL goes to UBR. U-sticker of UBL=U[0][0]=0 goes to U[0][2]=2?
-  //   No! UBL goes to UBR position, which means the sticker at UBL's U face now occupies where UBR U-face sticker was... so 0→2? That's just rotating the U face.
-  //   But B CW actually moves: U-top-row → R-right-col → D-bottom-row → L-left-col
-  //   UBL(x=-1,y=+1,z=-1) → R face at (x=+1, y=+1, z=-1): R[0][2]=11
-  //     U-sticker of UBL = U[0][0]=0 → goes to R-sticker position R[0][2]=11?
-  //     No: the cubie UBL moves to UBR position. At UBR, the stickers are: U-face=U[0][2]=2, R-face=R[0][2]=11, and... B-face=B[0][0]=45.
-  //     After B CW: UBL→UBR, the B-sticker of UBL (B[0][2]=47) goes to B[0][0]=45 (B face corner rotation).
-  //     The U-sticker of UBL (0) goes to... R[0][2]=11? Let's check:
-  //     UBL cubie: U-sticker (top face), B-sticker (back face). After rotating B layer CW from behind:
-  //     The cubie ends up at position UBR. Its old U-face sticker... the orientation change:
-  //     B CW = rotation of -90° around z axis (z=-1 layer). In this rotation (CW from behind = CW from -z direction = CCW from +z direction): x→-y, y→x for the sticker faces.
-  //     UBL had U-sticker (pointing in +y). After CW rotation from -z: +y → -x... so it points in -x direction = L face? But cubie is at UBR now (x=+1), so it should point to R (x=+1 face).
-  //     Hmm: CW from behind (-z looking toward +z) means in xy plane: x→y, y→-x (right-hand rule, rotation around -z):
-  //     Wait, I'll use: B CW = layer at z=-1 rotating so that left (+x sticker on this layer going up).
-  //     Standard B CW affects: U-top-row → L-left-col (reversed) → D-bottom-row → R-right-col (reversed)
-  //     Or: U[0][r] → R[r][2] → D[2][2-r] → L[2-r][0]
-  //     Confirmed cycles for B CW:
-  //     U[0][0]=0→R[0][2]=11, U[0][1]=1→R[1][2]=14, U[0][2]=2→R[2][2]=17
-  //     R[0][2]=11→D[2][2]=35, R[1][2]=14→D[2][1]=34, R[2][2]=17→D[2][0]=33
-  //     D[2][2]=35→L[0][0]=36, D[2][1]=34→L[1][0]=39, D[2][0]=33→L[2][0]=42
-  //     L[0][0]=36→U[0][2]=2? No...
-  //     Let me just use the confirmed: B CW: [2,11,33,36],[1,14,34,39],[0,17,35,42]
-  //     Verify: 0→17(U top-left→R bottom-right): UBL U-sticker goes to R[2][2]=17 at DBR position's R-sticker.
-  //     When B CW, UBL→DBR? No: UBL→UBR→DBR→DBL→UBL. So UBL→UBR. But UBL's U-sticker goes to R?
-  //     The U-sticker of UBL should go to R-sticker of UBR (since the top face became the right face after CW rotation from behind).
-  //     R-sticker of UBR = R[0][2]=11. So 0→11. That matches [2,11,33,36] cycle? No, 0 isn't in that cycle.
-  //     Try: [0,11,35,42]: 0→11, 11→35, 35→42, 42→0
-  //     0 (UBL U-sticker) → 11 (UBR R-sticker): UBL moves to UBR, U-face→R-face ✓
-  //     11 (UBR R-sticker) → 35 (DBR D-sticker): UBR moves to DBR, R-face→D-face?
-  //     Wait R[0][2]=11: this is R-face of cubie at (x=+1, y=+1, z=-1) = UBR. After B CW, UBR→DBR.
-  //     R-face of UBR → should become D-face at DBR. D[2][2]=35. ✓
-  //     35 (DBR D-sticker) → 42 (DBL L-sticker): D[2][2]=35 at DBR → L[2][0]=42 at DBL. DBR→DBL. D-face→L-face ✓
-  //     42 (DBL L-sticker) → 0 (UBL U-sticker): DBL→UBL. L-face→U-face ✓ Perfect!
-  //     So cycle [0,11,35,42] is correct.
-  //     Similarly: [1,14,34,39] and [2,17,33,36]
-  B: [
-    [45, 47, 53, 51], [46, 50, 52, 48],
-    [0, 11, 35, 42], [1, 14, 34, 39], [2, 17, 33, 36],
-  ],
-}
-
-// Inverse: reverse each cycle [a,b,c,d] → [a,d,c,b]
-function invertMove(cycles) {
-  return cycles.map(([a, b, c, d]) => [a, d, c, b])
-}
-
-const MOVE_DEFS = {}
-for (const [name, cycles] of Object.entries(MOVES)) {
-  MOVE_DEFS[name] = cycles
-  MOVE_DEFS[name + "'"] = invertMove(cycles)
-  MOVE_DEFS[name + '2'] = [...cycles, ...cycles] // apply twice via double application
-}
-
-// Apply a named move to a state
 function applyMove(state, moveName) {
-  const cycles = MOVE_DEFS[moveName]
-  if (!cycles) return state
-  // For double moves, apply in two rounds
-  if (moveName.endsWith('2')) {
-    const baseName = moveName[0]
-    const s1 = applyCycles(state, MOVES[baseName])
-    return applyCycles(s1, MOVES[baseName])
+  const face = moveName[0]
+  const isDouble = moveName.endsWith('2')
+  const isInverse = moveName.endsWith("'")
+  if (isDouble)   return applyFaceMove(applyFaceMove(state, face), face)
+  if (isInverse)  return applyFaceMove(applyFaceMove(applyFaceMove(state, face), face), face)
+  return applyFaceMove(state, face)
+}
+
+// Derive permutation cycles from a move (for the math panel display)
+function getMoveCycles(moveName) {
+  const identity = Array.from({ length: 54 }, (_, i) => i)
+  const after = applyMove(identity, moveName)
+  // after[dst] = src  →  forward map: src → dst
+  const fwd = new Array(54)
+  for (let dst = 0; dst < 54; dst++) fwd[after[dst]] = dst
+  const visited = new Array(54).fill(false)
+  const cycles = []
+  for (let i = 0; i < 54; i++) {
+    if (visited[i] || fwd[i] === i) { visited[i] = true; continue }
+    const cycle = [i]
+    let j = fwd[i]
+    while (j !== i) {
+      visited[j] = true
+      cycle.push(j)
+      j = fwd[j]
+    }
+    visited[i] = true
+    cycles.push(cycle)
   }
-  return applyCycles(state, cycles)
+  return cycles
 }
 
 // Check if state is solved
@@ -501,6 +237,13 @@ const FACE_LAYER = {
 // L CW from left (opposite of R): rotateX(+90)
 // F CW from front (right→down, +X→CSS+Y): rotateZ(+90)
 // B CW from back: rotateZ(-90)
+// Rotation direction derivation (CSS Y is visual-down, my Y is visual-up via ty=-y*TOTAL):
+// U CW from above: front(+Z)→right(+X) = rotateY(+90) ✓
+// D CW from below: front(+Z)→left(-X) = rotateY(-90) ✓
+// R CW from right: visual-top(CSS -Y)→front(+Z) = rotateX(-90) ✓
+// L CW from left:  visual-top(CSS -Y)→back(-Z)  = rotateX(+90) ✓
+// F CW from front: right(+X)→visual-down(CSS +Y) = rotateZ(+90) ✓
+// B CW from back:  right(+X)→visual-up(CSS -Y)   = rotateZ(-90) ✓
 const FACE_ANIM = {
   U: { axis: 'Y', cw: 90 },
   D: { axis: 'Y', cw: -90 },
@@ -542,10 +285,13 @@ function CubeNet() {
 }
 
 // ─── Live flat cube net ───────────────────────────────────────────────────────
-// Shows all 54 stickers in the standard cross layout, updating live with state
+// Shows all 54 stickers in the standard cross layout, updating live with state.
+// Labels show the sticker's CURRENT POSITION address (e.g. "U1", "R3").
+// Color shows the sticker's ORIGIN face — so after moves you can track permutations.
+const NET_FACE_NAMES = ['U', 'R', 'F', 'D', 'L', 'B']
+
 function CubeNetLive({ state }) {
-  const S = 18 // sticker pixel size
-  const G = 2  // gap
+  const S = 22 // sticker pixel size (larger to fit 2-char labels)
 
   // Build a 3×3 grid for one face
   const FaceGrid = ({ faceIdx, gridCol, gridRow }) => (
@@ -556,21 +302,33 @@ function CubeNetLive({ state }) {
       gridTemplateColumns: `repeat(3, ${S}px)`,
       gridTemplateRows: `repeat(3, ${S}px)`,
       gap: 1,
-      border: '1px solid rgba(255,255,255,0.12)',
+      border: '1.5px solid rgba(255,255,255,0.15)',
       borderRadius: 3,
       overflow: 'hidden',
     }}>
       {Array.from({ length: 9 }, (_, i) => {
-        const sticker = state[faceIdx * 9 + i]
+        const posLabel = NET_FACE_NAMES[faceIdx] + (i + 1) // e.g. "U1", "R3"
+        const sticker = state[faceIdx * 9 + i]             // which face this sticker came from
         const color = FACE_COLORS[sticker] || '#333'
+        const textColor = ['U', 'D', 'L'].includes(sticker) ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.75)'
+        const isHome = sticker === NET_FACE_NAMES[faceIdx]  // sticker is in its home position
         return (
           <div key={i} style={{
             width: S, height: S,
             background: color,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
+            outline: isHome ? 'none' : '1.5px solid rgba(255,255,255,0.35)',
+            outlineOffset: '-1.5px',
           }}>
-            <span style={{ fontSize: 7, fontWeight: 700, color: ['U','D','L'].includes(sticker) ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.6)', fontFamily: 'monospace', lineHeight: 1 }}>
-              {i + 1}
+            <span style={{
+              fontSize: 7,
+              fontWeight: 700,
+              color: textColor,
+              fontFamily: 'monospace',
+              lineHeight: 1,
+              letterSpacing: '-0.03em',
+            }}>
+              {posLabel}
             </span>
           </div>
         )
@@ -578,7 +336,6 @@ function CubeNetLive({ state }) {
     </div>
   )
 
-  const faceNames = ['U', 'R', 'F', 'D', 'L', 'B']
   const faceColors = ['#f0f0f0', '#0066cc', '#cc2200', '#ffcc00', '#ff6600', '#009933']
   const netLayout = [
     { faceIdx: 0, col: 2, row: 1 }, // U
@@ -591,29 +348,38 @@ function CubeNetLive({ state }) {
 
   return (
     <div style={{ padding: '12px 16px', borderTop: '1px solid rgba(77,208,255,0.1)' }}>
-      <div style={{ color: '#4dd0ff', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>
-        Live Unfolded Net — all 54 stickers
+      <div style={{ color: '#4dd0ff', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>
+        Live Unfolded Net — Permutation Tracker
+      </div>
+      <div style={{ color: '#667788', fontSize: 10, marginBottom: 10, lineHeight: 1.5 }}>
+        <strong style={{ color: '#8899bb' }}>Label</strong> = position address (where the cell <em>is</em>)
+        {' · '}
+        <strong style={{ color: '#8899bb' }}>Color</strong> = origin face (where the sticker <em>came from</em>)
+        {' · '}
+        White outline = displaced sticker
       </div>
       <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start', flexWrap: 'wrap' }}>
         <div style={{
           display: 'grid',
-          gridTemplateColumns: `repeat(4, ${S * 3 + G * 4}px)`,
-          gridTemplateRows: `repeat(3, ${S * 3 + G * 4}px)`,
-          gap: G * 3,
+          gridTemplateColumns: `repeat(4, ${S * 3 + 2}px)`,
+          gridTemplateRows: `repeat(3, ${S * 3 + 2}px)`,
+          gap: 4,
         }}>
           {netLayout.map(({ faceIdx, col, row }) => (
             <FaceGrid key={faceIdx} faceIdx={faceIdx} gridCol={col} gridRow={row} />
           ))}
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          {faceNames.map((name, i) => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          {NET_FACE_NAMES.map((name, i) => (
             <div key={name} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <div style={{ width: 10, height: 10, background: faceColors[i], borderRadius: 2, border: '1px solid rgba(0,0,0,0.2)', flexShrink: 0 }} />
-              <span style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: 11, color: faceColors[i] }}>{name}</span>
+              <span style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: 11, color: faceColors[i] }}>{name}1–{name}9</span>
               <span style={{ fontSize: 10, color: '#667788' }}>{FACE_LABEL_NAMES[name]}</span>
             </div>
           ))}
-          <div style={{ color: '#445566', fontSize: 10, marginTop: 4 }}>Numbers = sticker position (1–9)</div>
+          <div style={{ color: '#445577', fontSize: 10, marginTop: 6, lineHeight: 1.6, maxWidth: 160 }}>
+            Each move is a permutation σ: the label stays, the color moves. Track how stickers cycle between positions.
+          </div>
         </div>
       </div>
     </div>
@@ -698,13 +464,13 @@ function Cubie({ cubie, state, faceLabel, hidden, showNumbers }) {
                   <span style={{
                     fontFamily: 'monospace',
                     fontWeight: 900,
-                    fontSize: Math.round(CELL * 0.22),
+                    fontSize: Math.round(CELL * 0.20),
                     color: LABEL_TEXT_COLOR[state[stickerIdx]] || 'rgba(0,0,0,0.6)',
                     userSelect: 'none',
                     pointerEvents: 'none',
                     lineHeight: 1,
                     textShadow: '0 1px 2px rgba(0,0,0,0.3)',
-                  }}>{(stickerIdx % 9) + 1}</span>
+                  }}>{NET_FACE_NAMES[Math.floor(stickerIdx / 9)]}{(stickerIdx % 9) + 1}</span>
                 )}
               </div>
             )}
@@ -791,7 +557,7 @@ export default function RubiksCube() {
 
   // Trigger the CSS transition after the animation wrapper mounts
   useEffect(() => {
-    if (!animMove || !animLayerRef.current) return
+    if (!animMove?.transform || !animLayerRef.current) return
     const el = animLayerRef.current
     el.style.transition = 'none'
     el.style.transform = 'none'
@@ -844,12 +610,9 @@ export default function RubiksCube() {
     setOrderResult(null)
   }, [])
 
-  const doMove = useCallback((moveName) => {
-    // If already animating, apply instantly so we don't stack up
-    if (animating.current) {
-      doMoveInstant(moveName)
-      return
-    }
+  const doMove = useCallback((moveName, frozenState) => {
+    if (animating.current) return // buttons are disabled; ignore any race-condition click
+
     const fa = FACE_ANIM[moveName[0]]
     if (!fa) { doMoveInstant(moveName); return }
 
@@ -858,8 +621,15 @@ export default function RubiksCube() {
     const base = isDouble ? 180 : fa.cw
     const deg = isInverse ? -base : base
 
+    // Capture state snapshot NOW so the ghost layer's colors never change mid-flight
+    const snapshot = frozenState || null // passed from setState callback below
     animating.current = true
-    setAnimMove({ face: moveName[0], transform: `rotate${fa.axis}(${deg}deg)` })
+
+    // We need the current state to snapshot it — use a functional setState to grab it
+    setState(prev => {
+      setAnimMove({ face: moveName[0], transform: `rotate${fa.axis}(${deg}deg)`, snapshot: prev })
+      return prev // don't change state yet
+    })
 
     if (animTimerRef.current) clearTimeout(animTimerRef.current)
     animTimerRef.current = setTimeout(() => {
@@ -874,7 +644,7 @@ export default function RubiksCube() {
   }, [doMoveInstant])
 
   const doScramble = useCallback(async () => {
-    const moves = Object.keys(MOVE_DEFS).filter(m => !m.endsWith('2'))
+    const moves = ['U',"U'","D","D'","R","R'","L","L'","F","F'","B","B'"]
     setScrambling(true)
     const seq = []
     for (let i = 0; i < 20; i++) {
@@ -1217,9 +987,7 @@ export default function RubiksCube() {
 
   // ─── Play screen ─────────────────────────────────────────────────────────
   const cubeSize = 3 * TOTAL // 3 * 59 = 177
-  const lastMoveCycles = lastMove
-    ? (MOVE_DEFS[lastMove.endsWith('2') ? lastMove[0] : lastMove] || [])
-    : []
+  const lastMoveCycles = lastMove ? getMoveCycles(lastMove) : []
 
   return (
     <div style={{
@@ -1349,12 +1117,13 @@ export default function RubiksCube() {
                         left: 0, top: 0, right: 0, bottom: 0,
                         transformStyle: 'preserve-3d',
                         pointerEvents: 'none',
+                        transformOrigin: `${HALF}px ${HALF}px 0px`,
                       }}>
                         {CUBIES.filter(c => FACE_LAYER[animMove.face](c)).map(cubie => (
                           <Cubie
                             key={`g-${cubie.x},${cubie.y},${cubie.z}`}
                             cubie={cubie}
-                            state={state}
+                            state={animMove.snapshot || state}
                             faceLabel={getFaceLabel(cubie)}
                             showNumbers={showNumbers}
                           />
