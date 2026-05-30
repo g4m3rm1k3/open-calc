@@ -63,6 +63,7 @@ import ChemistryPage from "../../pages/ChemistryPage.jsx";
 import PhysicsPage from "../../pages/PhysicsPage.jsx";
 import DynamicBackground from "../ui/DynamicBackground.jsx";
 import BackgroundPicker from "../ui/BackgroundPicker.jsx";
+import AlphaMascot from "../mascot/AlphaMascot.jsx";
 
 function MobileLocationBadge() {
   const { chapterId, lessonSlug } = useParams();
@@ -1102,6 +1103,8 @@ onMenuToggle={() => setSidebarOpen((o) => !o)}
             <PhysicsPage onClose={() => setPhysicsOpen(false)} />
           </div>
         )}
+
+        <AlphaMascot />
       </div>
     </GrapherContext.Provider>
     </ChatProvider>
