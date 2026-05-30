@@ -7,6 +7,7 @@ import {
   Apple,
 } from 'lucide-react'
 import { useHippocratesAI } from '../hooks/useHippocratesAI.js'
+import MarkdownProse from '../components/math/MarkdownProse.jsx'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const STORE_KEY   = 'oc-health-v1'
@@ -934,7 +935,10 @@ function HippocratesTab({ profile }) {
                   <Heart className="w-3 h-3" /> Hippocrates
                 </div>
               )}
-              {m.text}
+              {m.role === 'assistant'
+                ? <MarkdownProse text={m.text} />
+                : m.text
+              }
             </div>
           </div>
         ))}
