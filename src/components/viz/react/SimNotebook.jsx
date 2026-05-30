@@ -48,6 +48,10 @@ function useColors() {
     red:      dark ? '#f87171' : '#dc2626',
     redBg:    dark ? 'rgba(248,113,113,0.10)' : 'rgba(220,38,38,0.07)',
     redBd:    dark ? '#f87171' : '#dc2626',
+    // violet / html accent
+    violet:   dark ? '#a78bfa' : '#7c3aed',
+    violetBg: dark ? 'rgba(167,139,250,0.10)' : 'rgba(124,58,237,0.07)',
+    violetBd: dark ? '#a78bfa' : '#7c3aed',
   }
 }
 
@@ -68,10 +72,12 @@ function SimCell({ cell, cellNumber, isChallenge, C }) {
   const iframeRef = useRef(null)
   const srcdoc    = useRef(buildSandbox())
 
-  const is3d   = (cell.mode ?? '3d') === '3d'
-  const accent = isChallenge ? C.amber : is3d ? C.sky : C.em
-  const accentBg = isChallenge ? C.amberBg : is3d ? C.skyBg : C.emBg
-  const accentBd = isChallenge ? C.amberBd : is3d ? C.skyBd : C.emBd
+  const mode_   = cell.mode ?? '3d'
+  const is3d    = mode_ === '3d'
+  const isHtml  = mode_ === 'html'
+  const accent   = isChallenge ? C.amber : is3d ? C.sky : isHtml ? C.violet : C.em
+  const accentBg = isChallenge ? C.amberBg : is3d ? C.skyBg : isHtml ? C.violetBg : C.emBg
+  const accentBd = isChallenge ? C.amberBd : is3d ? C.skyBd : isHtml ? C.violetBd : C.emBd
 
   // Forward messages from sandbox
   useEffect(() => {
@@ -148,9 +154,9 @@ function SimCell({ cell, cellNumber, isChallenge, C }) {
             <span style={{
               fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase',
               padding: '2px 7px', borderRadius: 5,
-              background: is3d ? C.skyBg : C.emBg,
-              border: `1px solid ${is3d ? C.skyBd : C.emBd}`,
-              color: is3d ? C.sky : C.em,
+              background: is3d ? C.skyBg : isHtml ? C.violetBg : C.emBg,
+              border: `1px solid ${is3d ? C.skyBd : isHtml ? C.violetBd : C.emBd}`,
+              color: is3d ? C.sky : isHtml ? C.violet : C.em,
             }}>
               {cell.mode ?? '3d'}
             </span>
@@ -361,11 +367,14 @@ export default function SimNotebook({ initialCells: cellsProp, params = {} }) {
     <div style={{ width: '100%', fontFamily: 'sans-serif', padding: '4px 0' }}>
       {initialCells.map((cell) => {
         const isChallenge = !!cell.challengeType
+        // Key includes code so navigating between lessons (same cell IDs, different
+        // code) forces a full remount — otherwise useState keeps stale code.
+        const cellKey = `${cell.id}::${(cell.code ?? '').slice(0, 40)}`
         if (isChallenge) {
           challengeCount++
           return (
             <SimCell
-              key={cell.id}
+              key={cellKey}
               cell={cell}
               cellNumber={challengeCount}
               isChallenge
@@ -376,7 +385,7 @@ export default function SimNotebook({ initialCells: cellsProp, params = {} }) {
           regularCount++
           return (
             <SimCell
-              key={cell.id}
+              key={cellKey}
               cell={cell}
               cellNumber={regularCount}
               isChallenge={false}

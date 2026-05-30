@@ -1,8 +1,9 @@
 // Shared sandbox srcdoc for SimLabPage and SimNotebook
-// Supports mode '3d' (Three.js) and mode '2d' (Canvas2D)
+// Supports mode '3d' (Three.js), mode '2d' (Canvas2D), and mode 'html' (DOM)
 // Globals injected to user code:
 //   3d: scene, camera, renderer, controls, THREE
 //   2d: canvas, ctx, W, H
+//   html: app (root div element)
 export function buildSandbox() {
   return `<!DOCTYPE html>
 <html>
@@ -13,6 +14,7 @@ export function buildSandbox() {
   body { background:#02060f; overflow:hidden; transition:background 0.25s }
   body > canvas { position:absolute; top:0; left:0; display:block }
   #c2d { position:absolute; top:0; left:0; display:none }
+  #app { display:none; width:100%; min-height:100%; font-family:system-ui,sans-serif }
   #err { position:fixed; bottom:0; left:0; right:0; padding:8px 14px;
          background:rgba(20,4,4,0.95); color:#ff6b6b; font:11px/1.6 monospace;
          white-space:pre-wrap; border-top:1px solid #ff4444; display:none;
@@ -22,6 +24,7 @@ export function buildSandbox() {
 <body>
 <div id="err"></div>
 <canvas id="c2d"></canvas>
+<div id="app"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script>
@@ -62,8 +65,18 @@ function clearScene() {
 }
 function switchMode(mode) {
   currentMode = mode
-  if (mode === '3d') { renderer.domElement.style.display='block'; c2d.style.display='none' }
-  else { renderer.domElement.style.display='none'; c2d.style.display='block'; c2d.width=innerWidth; c2d.height=innerHeight }
+  const app = document.getElementById('app')
+  if (mode === '3d') {
+    renderer.domElement.style.display='block'; c2d.style.display='none'; app.style.display='none'
+    document.body.style.overflow='hidden'; document.body.style.background='#02060f'
+  } else if (mode === '2d') {
+    renderer.domElement.style.display='none'; c2d.style.display='block'; c2d.width=innerWidth; c2d.height=innerHeight
+    app.style.display='none'; document.body.style.overflow='hidden'; document.body.style.background='#02060f'
+  } else if (mode === 'html') {
+    renderer.domElement.style.display='none'; c2d.style.display='none'
+    app.style.display='block'; app.innerHTML=''
+    document.body.style.overflow='auto'; document.body.style.background='#f8fafc'
+  }
 }
 
 // ── Error / console ───────────────────────────────────────────────────────────
@@ -94,7 +107,13 @@ window.addEventListener('message', ({ data }) => {
     stopLoop(); hideError()
     const mode = data.mode || '3d'
     switchMode(mode)
-    if (mode === '2d') {
+    if (mode === 'html') {
+      const app = document.getElementById('app')
+      try {
+        const fn=new Function('app', data.code)
+        fn(app)
+      } catch(e) { showError(e.toString()); parent.postMessage({type:'error',message:e.toString()},'*') }
+    } else if (mode === '2d') {
       const ctx=c2d.getContext('2d'), W=c2d.width, H=c2d.height
       try {
         const fn=new Function('canvas','ctx','W','H', data.code+'\\nreturn {init,update}')
@@ -116,9 +135,13 @@ window.addEventListener('message', ({ data }) => {
     else { const ctx=c2d.getContext('2d'); ctx.clearRect(0,0,c2d.width,c2d.height) }
   }
   if (data.type === 'theme') {
-    const bg=data.dark?'#02060f':'#e8f0f8'
-    document.body.style.background=bg
-    scene.background=new THREE.Color(data.dark?0x02060f:0xe8f0f8)
+    if (currentMode === 'html') {
+      document.body.style.background=data.dark?'#0f172a':'#f8fafc'
+    } else {
+      const bg=data.dark?'#02060f':'#e8f0f8'
+      document.body.style.background=bg
+      scene.background=new THREE.Color(data.dark?0x02060f:0xe8f0f8)
+    }
   }
 })
 
