@@ -144,6 +144,7 @@ t_from_z = (Q(3) - P0(3)) / d(3)   % expect 2
               prose: [
                 '`dot(n, P)` computes $\\mathbf{n} \\cdot P = n_1P_1 + n_2P_2 + n_3P_3$. If the result equals `d`, then $P$ satisfies the plane equation $\\mathbf{n} \\cdot \\mathbf{x} = d$ — the point lies on the plane. If `dot(n, Q) - d > 0`, the point is on the side the normal points toward ("positive side"); if negative, it is on the other side.',
                 '`abs(dot(n, Q) - d) / sqrt(dot(n, n))` is the distance formula. `dot(n, Q) - d` measures the "signed distance" in the normal direction — unnormalized. Dividing by `sqrt(dot(n, n))` (which equals $\\|\\mathbf{n}\\|$) rescales from "units of $\\mathbf{n}$" to actual Euclidean distance. The `abs` removes the sign, giving a non-negative distance.',
+                'The plane equation $\\mathbf{n} \\cdot \\mathbf{x} = d$ classifies every point in 3D as on the plane (dot product equals $d$), on the positive side (greater), or on the negative side (less). This is the foundation of half-space tests used in CNC workspace boundary checking, collision detection, and support-vector machine classifiers — all reduce to evaluating $\\mathbf{n} \\cdot \\mathbf{x} - d$ and checking its sign.',
               ],
               code: `n = [1; 2; -1];    % normal vector to the plane
 d = 4;             % right-hand side: n·x = 4

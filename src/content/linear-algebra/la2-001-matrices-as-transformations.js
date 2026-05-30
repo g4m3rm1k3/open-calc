@@ -119,6 +119,7 @@
               prose: [
                 '`A * i_hat` multiplies the $2 \\times 2$ matrix by the column vector $[1;0]$. This computes $0 \\cdot \\text{col}_1 + 1 \\cdot \\text{col}_2$... no: for `[1;0]` the result is $1 \\cdot \\text{col}_1 + 0 \\cdot \\text{col}_2$ = column 1 exactly. Similarly `A * [0;1]` returns column 2. This directly confirms: **the columns of a matrix are the destinations of the basis vectors**.',
                 '`3*A(:,1) + 1*A(:,2)` computes the linear combination manually — 3 times the first column (destination of î) plus 1 times the second column (destination of ĵ). The `disp(verify)` line confirms this equals `A * v` where `v = [3;1]`. Every matrix-vector product is a weighted sum of the matrix columns, with weights equal to the input vector components.',
+                '`det(A)` for this rotation matrix equals $1$ — rotation never stretches or squishes area. Verify by computing $(0)(0) - (-1)(1) = 1$ by hand. This is why rotating a machined part on a CNC table does not change the dimensions — the rotation matrix has $\\det = 1$, which means it is an **isometry**: lengths and areas are preserved exactly.',
               ],
               code: `% 90° counter-clockwise rotation matrix
 A = [0 -1; 1 0];
@@ -146,6 +147,7 @@ disp('Linear combination check:'); disp(verify)`,
               prose: [
                 'Each transform is defined by two columns: shear `[1 1; 0 1]` — left column $[1,0]$ keeps î fixed, right column $[1,1]$ slides ĵ one unit right while keeping it at height 1. Reflection `[1 0; 0 -1]` — î unchanged, ĵ flips sign on its $y$-component (pointing down instead of up). Projection `[1 0; 0 0]` — î unchanged, ĵ maps to zero, so all $y$-information is permanently destroyed.',
                 'Squish `[3 0; 0 0.5]`: left column $[3,0]$ means î triples in length; right column $[0,0.5]$ means ĵ shrinks to half. Before running: predict `squish * [2;1]` by computing $2 \\cdot [3,0] + 1 \\cdot [0,0.5]$ in your head. Then run the cell to check.',
+                'The `fprintf` output for each transform follows the pattern: "name: [2;1] → [output]". For the projection `[1 0; 0 0]`, any vector maps to `[x; 0]` — the $y$-component is permanently destroyed, confirming $\\det = 0$ and rank $= 1$. The fact that information is lost is irreversible: given only the output `[2;0]`, you cannot reconstruct whether the input was `[2;1]`, `[2;5]`, or any `[2;y]`.',
               ],
               code: `% The four famous 2D transformation types
 v = [2; 1];
@@ -176,6 +178,7 @@ fprintf('Squish [2;1] --> [%g;%g]\\n', squish*v)`,
               prose: [
                 'After rotating by $\\theta$, î = $[1,0]$ (at angle $0°$ on the unit circle) moves to $[\\cos\\theta, \\sin\\theta]$ — column 1. ĵ = $[0,1]$ (at $90°$) moves to $[-\\sin\\theta, \\cos\\theta]$ — column 2. `cos(theta)` and `sin(theta)` in MATLAB compute those exact values when `theta` is in radians, which is why `theta_deg * pi / 180` converts degrees first.',
                 '`norm(i_new)` computes $\\sqrt{\\cos^2\\theta + \\sin^2\\theta} = 1$ — the Pythagorean identity proves rotation preserves vector length. `dot(R(:,1), R(:,2))` computes $\\cos\\theta \\cdot (-\\sin\\theta) + \\sin\\theta \\cdot \\cos\\theta = 0$ — the two columns are always perpendicular. A matrix with unit-length, mutually perpendicular columns is called **orthogonal**; every rotation matrix is orthogonal.',
+                'For an orthogonal matrix, $R^{-1} = R^\\top$ — invert a rotation by transposing. `R\'` in MATLAB is the transpose (for real matrices). Verify: `R * R\'` should equal the $2 \\times 2$ identity matrix. This is the mathematical reason "undo rotation" works: the transpose IS the reverse rotation by $-\\theta$, computed at zero extra cost compared to a general matrix inverse.',
               ],
               code: `theta_deg = 45;
 theta = theta_deg * pi / 180;
@@ -204,6 +207,7 @@ fprintf('Dot product of columns: %.6f  (should be 0)\\n', dot(R(:,1), R(:,2)))`,
               prose: [
                 '`path_program` is a $2 \\times 4$ matrix — each column is one $(X,Y)$ tool position. `R * path_program` multiplies the $2 \\times 2$ rotation matrix by this $2 \\times 4$ matrix. MATLAB applies $R$ to each column independently: column $k$ of the result is $R \\cdot \\text{col}_k(\\text{path\\_program})$. One matrix multiply corrects all four points simultaneously — this is why matrix operations are used instead of looping over each coordinate.',
                 '`norm(raw_pt - corrected_pt)` computes the Euclidean distance $\\sqrt{(x_1-x_2)^2 + (y_1-y_2)^2}$ between the uncorrected and G68-corrected positions for one point. This is the actual positional error you would measure in the machined part if the rotation correction were skipped. Even a 5° offset at 10mm from origin gives a noticeable error on tight-tolerance features.',
+                'The loop `for k = 1:size(path_program, 2)` iterates over columns. Each column is one $(X, Y)$ waypoint; `R * path_program(:,k)` applies the $2 \\times 2$ rotation to that waypoint. In production code, you would write `R * path_program` (no loop) — MATLAB broadcasts the matrix multiply across all columns at once. The loop here makes the individual column-multiplication explicit so you can see each transformation happening independently.',
               ],
               code: `% CNC part is clamped 5 degrees off-axis
 theta = 5 * pi / 180;
@@ -248,6 +252,7 @@ fprintf('\\nMax positional error without G68: %.4f mm\\n', error)`,
               prose: [
                 '`A @ i_hat` is the NumPy matrix-vector product. For `i_hat = [1.0, 0.0]`, the formula gives $1 \\cdot \\text{col}_0(A) + 0 \\cdot \\text{col}_1(A) = $ column 0 of A exactly — confirming the "first column = destination of î" rule. `A @ j_hat` similarly returns column 1.',
                 '`3*(A@i_hat) + 1*(A@j_hat)` computes the linear combination manually, weighted by the components of `v = [3.0, 1.0]`. The result must match `A @ v`, which `print(f"Verify: ...")` confirms. This is not a coincidence — it is the definition of matrix-vector multiplication. The plot makes it visual: the "After" panel shows all three vectors rotated exactly 90° CCW, with lengths unchanged.',
+                '`np.linalg.det(A)` computes the determinant, which equals the signed area scaling factor of the transformation. For the 90° rotation matrix `[[0,-1],[1,0]]`, $\\det = (0)(0) - (-1)(1) = 1$ — rotation preserves area (and orientation). For a reflection, $\\det = -1$ — area is preserved but orientation flips. For a projection, $\\det = 0$ — area collapses to zero because the image is lower-dimensional.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -290,6 +295,7 @@ plt.show()`,
               prose: [
                 '`quick_transform(matrix, vector)` is an OpenCalc helper that draws the coordinate grid before and after applying `matrix`. It applies the same $2 \\times 2$ matrix-vector product `A @ v` to a dense grid of sample points and plots both the original (gray) and transformed (colored) grids. The `vector` argument marks one specific input vector and its image as an arrow.',
                 'Try replacing `[[0,-1],[1,0]]` with a shear `[[1,1],[0,1]]` — grid lines stay parallel but tilt. Try `[[1,0],[0,0]]` (projection) — the entire grid collapses onto the x-axis. Every matrix that keeps grid lines straight and evenly spaced is a linear transformation.',
+                'What you are seeing geometrically is the **fundamental theorem of linear transformations**: any linear map is completely determined by what it does to the basis vectors. The `quick_transform` visualization makes this concrete — the entire transformed grid is determined solely by the two column vectors of the matrix. Change one column entry and the entire grid warps accordingly.',
               ],
               code: `from opencalc import quick_transform
 
@@ -303,6 +309,7 @@ quick_transform(rotation, vector=[2, 1])`,
               prose: [
                 'Each entry in `transformations` maps a name to a $2 \\times 2$ NumPy array. `T @ v` applies that transformation to `v = [2.0, 1.0]` — a linear combination of `T`\'s columns weighted by 2 and 1. The loop runs the same formula for all five matrices; the output for each is determined entirely by the column structure of `T`.',
                 'The 5-panel subplot shows the input vector (blue, faded) and output vector (red) side by side. For "Project x-axis", the red arrow always lies on the x-axis — the second column is zero, so the $y$-component is always destroyed. For "90 deg rotation", the output is perpendicular to the input at the same length. Read each matrix\'s columns before running — predict the output direction and length before the cell executes.',
+                '`np.linalg.det(T)` for each transformation gives the signed area scaling factor. Shear: $\\det = 1$ (parallelogram area preserved). Reflection: $\\det = -1$ (orientation flips). Projection: $\\det = 0$ (collapses to a line, zero area). Scale: $\\det = \\text{scale}_x \\times \\text{scale}_y$ (area scales by the product of the scale factors). Rotation: $\\det = 1$ always (rotation never changes area). These determinant values are all computable from the column entries without running the code.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -337,6 +344,36 @@ for ax, (name, T) in zip(axes, transformations.items()):
 plt.suptitle("Common 2x2 Transformations applied to v=[2,1]", fontsize=11, y=1.02)
 plt.tight_layout()
 plt.show()`,
+            },
+            {
+              id: 4,
+              cellTitle: 'Application: composing transformations for a robot arm',
+              prose: [
+                '`R @ S` multiplies the two transformation matrices together. Reading right to left: first `S` scales the vector, then `R` rotates it. The combined matrix `R @ S` does BOTH operations in one matrix-vector multiply — no need to apply them separately. This is the core efficiency of matrix composition: $n$ transformations applied to $m$ points requires one $O(n^3)$ matrix-multiplication step, then $m$ cheap $O(n^2)$ matrix-vector products.',
+                '`np.linalg.det(R @ S)` equals `np.linalg.det(R) * np.linalg.det(S)` — the determinant of a product equals the product of the determinants. For rotation $\\det(R) = 1$ and for uniform scaling by $s$ the $\\det(S) = s^2$ in 2D. So the composed transform scales area by $s^2$ and preserves orientation — exactly what you would expect geometrically.',
+                'Comparing `R @ S` vs `S @ R` in the output shows that the two matrices produce DIFFERENT results — the order of matrix multiplication matters. This non-commutativity is why "rotate then scale" and "scale then rotate" give different final configurations in a robot arm. In robotics, the order of joint transformations is fixed by the physical structure and must match exactly in the software.',
+              ],
+              code: `import numpy as np
+
+# Robot arm: scale the tool reach, then rotate to target angle
+s = 2.0      # tool reach scaled by 2
+theta = np.pi / 4   # rotate 45 degrees
+
+S = np.array([[s, 0],
+              [0, s]])
+R = np.array([[np.cos(theta), -np.sin(theta)],
+              [np.sin(theta),  np.cos(theta)]])
+
+RS = R @ S   # first scale, then rotate
+SR = S @ R   # first rotate, then scale
+
+v = np.array([1.0, 0.0])  # initial tool direction (pointing right)
+
+print("R @ S applied to [1,0]:", RS @ v)
+print("S @ R applied to [1,0]:", SR @ v)
+print("Same result?", np.allclose(RS @ v, SR @ v))
+print("det(R @ S) =", np.linalg.det(RS).round(4), "  det(R)*det(S) =", np.linalg.det(R)*np.linalg.det(S))
+`,
             },
             {
               id: 'c1',

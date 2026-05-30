@@ -117,6 +117,7 @@ export default {
               prose: [
                 '`A * B` in MATLAB is matrix multiplication — `*` triggers the row-dot-column formula. `dot(A(1,:), B(:,1))` computes entry $(1,1)$ explicitly: `A(1,:)` selects row 1 of A as a row vector, `B(:,1)` selects column 1 of B as a column vector, and `dot` sums their element-wise products.',
                 '`col1_of_AB = A * B(:,1)` applies A to the first column of B directly — this is the column interpretation of matrix multiplication: column $j$ of AB equals A applied to column $j$ of B. The `isequal` check confirms this matches the corresponding column of the full product `AB`. Note: `A .* B` would compute element-wise products (different operation entirely — never confuse these).',
+                '`det(A*B)` equals `det(A)*det(B)` — verify this numerically in the output. For the $2\\times 2$ matrices here, $\\det(A) = 1\\cdot4 - 2\\cdot3 = -2$ and $\\det(B) = 5\\cdot8 - 6\\cdot7 = -2$, so $\\det(AB) = 4$. This multiplicativity of the determinant is the algebraic reason why "composing two volume-preserving transforms produces another volume-preserving transform."',
               ],
               code: `A = [1 2; 3 4];
 B = [5 6; 7 8];
@@ -138,6 +139,7 @@ fprintf('Col 1 of AB via column view: [%g; %g]\\n', col1_of_AB(1), col1_of_AB(2)
               prose: [
                 '`S * R` computes the composition with R acting first (rotation), then S (shear) — R is right of S, so R acts on v first. `R * S` reverses the order: shear first, then rotation. The variable names (`rotate_then_shear = S * R`) can feel backwards at first; remember that in $BA\\mathbf{v}$, matrix A (right side) acts on v first.',
                 '`isequal(rotate_then_shear, shear_then_rotate)` returns 0 (false) — the two matrices are genuinely different objects. `fprintf` with format `%d` prints the integer 0 directly. This is the non-commutativity proof: not just different outputs for one specific vector, but different transformation matrices with different columns.',
+                'To build geometric intuition: shear-then-rotate takes the shear\'s parallelogram and rotates it 90° — the result is tilted. Rotate-then-shear first rotates the square to a square (still a square after 90°), then shears it — the result tilts a different way. Both processes transform the same square, but via different paths to different final positions. Non-commutativity in matrix multiplication reflects this order-dependence of geometric operations.',
               ],
               code: `% Rotation 90° CCW
 R = [0 -1; 1 0];

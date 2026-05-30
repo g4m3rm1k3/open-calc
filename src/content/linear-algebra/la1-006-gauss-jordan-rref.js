@@ -88,6 +88,7 @@ export default {
               prose: [
                 '`rref(A)` applies Gauss-Jordan elimination to the augmented matrix and returns the RREF directly. For a $3 \\times 3$ system with a unique solution, the result is $[I | \\mathbf{c}]$ — the $3 \\times 3$ identity on the left and the solution column on the right. You read the answer from the last column: row 1 gives $x_1$, row 2 gives $x_2$, row 3 gives $x_3$. No substitution step is needed.',
                 'A unique solution requires every variable to be a pivot variable, which means `rank(A(:,1:3)) == 3` — all three coefficient columns have a leading 1 with zeros elsewhere. Change one right-hand side entry (e.g., set the last entry of $\\mathbf{b}$ to a value that contradicts the others) and watch the RREF change from $[I|\\mathbf{c}]$ to a contradiction row.',
+                'Reading the solution from RREF: pivot row 1 says $x_1 = c_1$, pivot row 2 says $x_2 = c_2$, pivot row 3 says $x_3 = c_3$ — where $c_1, c_2, c_3$ are the entries in the last column. No back-substitution is needed because Gauss-JORDAN (not just Gauss) eliminated entries both below AND above each pivot. That extra "back-elimination" step is what makes the RREF more expensive than REF but more directly readable.',
               ],
               code: `% Unique solution: 3 equations, 3 unknowns
 A = [2 1 -1 8; -3 -1 2 -11; -2 1 2 -3];
@@ -100,6 +101,7 @@ R = rref(A)
               prose: [
                 '`rref([1 2 3 4; 2 4 6 9; 0 0 0 1])` produces a row of the form `[0 0 0 1]` — which reads $0x_1 + 0x_2 + 0x_3 = 1$, i.e., $0 = 1$. This is the inconsistency signature: a **pivot in the augmented column** (the last column). No combination of $x_1, x_2, x_3$ can satisfy $0 = 1$, so the system has no solution.',
                 'Why does this happen algebraically? The first two equations have coefficient rows $[1\\ 2\\ 3]$ and $[2\\ 4\\ 6] = 2 \\times [1\\ 2\\ 3]$ — they are parallel planes. Equation 1 says $x_1 + 2x_2 + 3x_3 = 4$; equation 2 says the same combination equals $9/2 \\neq 4$. These planes never intersect. The third row `[0 0 0 1]` is the algebraic record of that impossibility — the elimination revealed the contradiction that was hidden in the original system.',
+                'The inconsistency check in code is: `rank(A(:,1:end-1)) < rank(A)`. If the augmented matrix has higher rank than the coefficient matrix, $\\mathbf{b}$ is not in the column space of $A$ — the system is inconsistent. In practice, `rref(A)` is enough to see this visually: look for any row of the form `[0 0 ... 0 | nonzero]` in the output.',
               ],
               code: `% Inconsistent system
 A = [1 2 3 4; 2 4 6 9; 0 0 0 1];
@@ -112,6 +114,7 @@ R = rref(A)
               prose: [
                 '`rref([1 2 -1 3 9; 0 0 1 -2 5])` reduces to `[1 2 0 1 14; 0 0 1 -2 5]`. Columns 1 and 3 contain leading 1s with zeros elsewhere — they are **pivot columns** ($x_1$ and $x_3$ are determined). Columns 2 and 4 have no leading 1 anywhere — they are **free variable columns** ($x_2$ and $x_4$ are unconstrained). Free variables = unknowns - rank = 4 - 2 = 2.',
                 'To write the general solution: assign parameters $x_2 = s$ and $x_4 = t$. Row 2 (pivot in column 3) gives $x_3 - 2t = 5$, so $x_3 = 5 + 2t$. Row 1 (pivot in column 1) gives $x_1 + 2s + t = 14$, so $x_1 = 14 - 2s - t$. Every pair $(s, t) \\in \\mathbb{R}^2$ produces a valid solution — this is a 2-parameter family. Verify by substituting back: all four unknowns satisfy both original equations for any $s$ and $t$.',
+                'The dimension of the solution set equals the nullity: `n - rank(A)`. Here $4 - 2 = 2$, so the solution is a 2D plane (affine subspace) in $\\mathbb{R}^4$. The particular solution (setting all free variables to 0) gives the specific point $\\mathbf{x}_p = [14, 0, 5, 0]^\\top$; the null space directions give the "shape" of the solution family. The complete solution is $\\mathbf{x}_p + s\\mathbf{v}_1 + t\\mathbf{v}_2$ where $\\mathbf{v}_1, \\mathbf{v}_2$ span the null space.',
               ],
               code: `% Underdetermined: 2 equations, 4 unknowns
 A = [1 2 -1 3 9; 0 0 1 -2 5];
@@ -124,6 +127,7 @@ R = rref(A)
               prose: [
                 '`rank(coeff)` counts pivot columns in the $3 \\times 3$ coefficient block — how many independent equations constrain the three unknowns. `rank(A)` does the same for the full augmented matrix including $\\mathbf{b}$. The three-way decision: if `r_aug > r_coeff`, appending $\\mathbf{b}$ added an independent row, meaning $\\mathbf{b}$ is outside the column space — **inconsistent**. If both equal `n_unknowns`, every variable is a pivot variable — **unique solution**. Otherwise — **infinitely many**, with `n_unknowns - r_coeff` free variables.',
                 'The `if/elseif/else` block is the same decision tree you draw on paper, now automated. For this specific system, try changing the last column to `[3; 7; 11]` (so $b_3 = b_1 + b_2$): the system becomes consistent with a free variable. Try `[3; 7; 12]` (so $b_3 \\neq b_1 + b_2$): it becomes inconsistent. The single number `r_aug - r_coeff` tells you which case you are in.',
+                'The nullity `n_unknowns - r_coeff` is exactly the dimension of the null space of $A$ — the number of free parameters in the solution family. When nullity $= 0$, the solution is a unique point. When nullity $= 1$, the solution is a line. When nullity $= 2$, it is a plane. Recognizing this correspondence between algebraic rank and geometric dimension is one of the central themes connecting chapters 1 and 2 of this course.',
               ],
               code: `% Challenge: classify the system
 A = [1 2 0 3; 2 4 1 7; 3 6 1 10];
@@ -238,6 +242,7 @@ plt.show()`,
               prose: [
                 '`A.rank()` counts pivot columns in the RREF of $A$ alone — the number of independent equations. `Ab.rank()` does the same for the augmented matrix $[A|\\mathbf{b}]$. The three-way comparison `r_Ab > r_A` / `r_A == n` / `else` directly implements the consistency theorem: if appending $\\mathbf{b}$ raised the rank, $\\mathbf{b}$ is outside the column space of $A$ — the system is inconsistent. If ranks match and equal $n$, every column is a pivot column with no free variables — unique solution. If ranks match but are less than $n$, there are `n - r_A` free variables — infinitely many solutions.',
                 'The bar chart makes the theorem visual: for a unique solution, all three bars (rank($A$), rank($[A|b]$), unknowns $n$) reach the same height. For inconsistency, the orange rank($[A|b]$) bar stands taller than the blue rank($A$) bar — the extra rank came from appending $\\mathbf{b}$, meaning $\\mathbf{b}$ is not in the column space. For infinite solutions, both rank bars match but fall short of the green $n$ bar — that vertical gap between blue/orange and green is the number of free variables.',
+                'The `classify_system` function is a direct translation of the Consistency Theorem into code. The theorem states: consistent iff $\\text{rank}(A) = \\text{rank}([A|\\mathbf{b}])$; unique iff consistent AND $\\text{rank}(A) = n$; infinite otherwise. Every `if/elif/else` branch matches one condition exactly. When you write code like this, you are not "programming" — you are transcribing a mathematical decision tree into syntax that a computer can evaluate.',
               ],
               code: `from sympy import Matrix
 import numpy as np
@@ -301,6 +306,7 @@ plt.show()`,
               prose: [
                 '`manual_rref` implements the three Gauss-Jordan phases directly. For each column (left to right, skipping the augmented column), it searches for a nonzero entry at or below `pivot_row` using `abs(A[r, col]) > 1e-10` (a small tolerance instead of exact zero to handle floating-point). It then swaps that row up, scales the pivot row by dividing `A[pivot_row] /= A[pivot_row, col]` so the leading entry becomes exactly 1, and finally loops `for r in range(rows)` — ALL rows, not just those below — to zero out every other entry in that column. That all-rows loop is the Gauss-Jordan addition: ordinary Gaussian elimination only loops over rows below the pivot.',
                 'The printed output traces each of the three operations: "Swap R$i$ <-> R$j$" shows a row interchange, "Scale R$i$" shows the division step (pivot → 1), and "R$i$ <- R$i$ - factor * R$j$" shows the elimination step. Count the "Scale" lines — there is exactly one per pivot, so the count equals rank($A$). The before/after heatmap compresses the full operation sequence visually: after RREF, the left block (coefficient columns) shows the identity structure — one distinct "hot" cell per row on the diagonal, surrounded by white (zero) entries.',
+                'Notice that `manual_rref` adds the condition `abs(A[r, col]) > 1e-10` rather than `!= 0`. This is necessary because floating-point arithmetic produces values like $2.7 \\times 10^{-16}$ instead of exact 0. Using a small tolerance (epsilon) instead of exact zero comparison is a fundamental principle of numerical linear algebra — one you will revisit in the numerical stability lesson (LA7). On paper we check for exact zero; in code we check "is this small enough to treat as zero?"',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -369,6 +375,42 @@ for ax, mat, title in [(axes[0], M.astype(float), 'Original Augmented Matrix'),
     plt.colorbar(im, ax=ax)
 plt.tight_layout()
 plt.show()`,
+            },
+            {
+              id: 4,
+              cellTitle: 'Application: null space basis via RREF',
+              prose: [
+                '`Matrix(A.tolist()).rref()` returns two objects: the RREF matrix and a tuple of **pivot column indices**. In the code, `pivot_cols = set(pivots)` makes it fast to check whether column $j$ is a pivot column. Any column NOT in `pivot_cols` corresponds to a free variable — its index goes into `free_cols`. This is the direct algorithmic form of the statement "nullity = number of non-pivot columns."',
+                'The null space basis vector for free variable $j$ is constructed by: (1) setting $x_j = 1$ and all other free variables to 0, (2) reading each pivot row to find what the pivot variable must equal. For row $i$ with pivot in column $p_i$, the RREF entry at position $(i, j)$ gives the coefficient: $x_{p_i} = -\\text{rref}[i, j]$. The resulting vector satisfies $A\\mathbf{v} = \\mathbf{0}$ exactly — verify this with `A @ v` in the code.',
+                '`np.allclose(A @ v, 0)` checks that the null space vector truly satisfies $A\\mathbf{v} = \\mathbf{0}$ to machine precision. This is the code equivalent of plugging back in to check your answer. Every computed null space vector should pass this check — if it does not, the basis construction has a bug. Running this verification is standard practice in numerical work: never trust a computed answer without checking it satisfies the original equation.',
+              ],
+              code: `import numpy as np
+from sympy import Matrix
+
+# 3×5 matrix — rank 2, so nullity = 3
+A_arr = np.array([[1, 2, 0, 3, 4],
+                  [0, 0, 1, 2, 1],
+                  [1, 2, 1, 5, 5]], dtype=float)
+A = Matrix(A_arr.tolist())
+rref_mat, pivots = A.rref()
+
+pivot_cols = set(pivots)
+free_cols  = [j for j in range(A_arr.shape[1]) if j not in pivot_cols]
+
+print(f"Rank = {len(pivots)},  Nullity = {len(free_cols)}")
+print(f"Pivot columns: {list(pivots)}")
+print(f"Free variable columns: {free_cols}")
+
+null_vectors = []
+for j in free_cols:
+    v = np.zeros(A_arr.shape[1])
+    v[j] = 1.0
+    for row_idx, p_col in enumerate(pivots):
+        v[p_col] = -float(rref_mat[row_idx, j])
+    null_vectors.append(v)
+    print(f"Null basis vector for x_{j}: {v.round(4)}")
+    print(f"  Verify A @ v = {A_arr @ v}  (should be ~0)")
+`,
             },
             {
               id: 'c1',
