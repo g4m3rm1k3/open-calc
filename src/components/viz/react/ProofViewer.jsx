@@ -8,42 +8,21 @@
  */
 
 import { useState, useEffect, useRef } from "react";
+import katex from "katex";
 
-// ─── KaTeX loader ──────────────────────────────────────────────────────────────
-function useMath() {
-  const [ready, setReady] = useState(
-    typeof window !== "undefined" && !!window.katex,
-  );
-  useEffect(() => {
-    if (window.katex) {
-      setReady(true);
-      return;
-    }
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css";
-    document.head.appendChild(link);
-    const s = document.createElement("script");
-    s.src = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js";
-    s.onload = () => setReady(true);
-    document.head.appendChild(s);
-  }, []);
-  return ready;
-}
-
-function M({ t, display = false, ready }) {
+function M({ t, display = false }) {
   const ref = useRef(null);
   useEffect(() => {
-    if (!ready || !ref.current || !window.katex || !t) return;
+    if (!ref.current || !t) return;
     try {
-      window.katex.render(t, ref.current, {
+      katex.render(t, ref.current, {
         throwOnError: false,
         displayMode: display,
       });
     } catch (_) {
       if (ref.current) ref.current.textContent = t;
     }
-  }, [t, display, ready]);
+  }, [t, display]);
   if (!t) return null;
   return <span ref={ref} style={{ display: display ? "block" : "inline" }} />;
 }
@@ -59,7 +38,7 @@ const DEPTH_ACCENTS = [
 const DEPTH_LABELS = ["Why?", "But why?", "Prove it", "From scratch", "Axioms"];
 
 // ─── WhyPanel ──────────────────────────────────────────────────────────────────
-function WhyPanel({ why, depth = 0, ready }) {
+function WhyPanel({ why, depth = 0 }) {
   const [open, setOpen] = useState(false);
   if (!why) return null;
 
@@ -98,7 +77,7 @@ function WhyPanel({ why, depth = 0, ready }) {
 
           {why.math && (
             <div className="proof-well proof-well--compact">
-              <M t={why.math} display ready={ready} />
+              <M t={why.math} display />
             </div>
           )}
 
@@ -139,7 +118,7 @@ function WhyPanel({ why, depth = 0, ready }) {
                         className="proof-well proof-well--compact"
                         style={{ marginTop: 6 }}
                       >
-                        <M t={st.math} display ready={ready} />
+                        <M t={st.math} display />
                       </div>
                     )}
                   </div>
@@ -149,7 +128,7 @@ function WhyPanel({ why, depth = 0, ready }) {
           )}
 
           {why.why && (
-            <WhyPanel why={why.why} depth={depth + 1} ready={ready} />
+            <WhyPanel why={why.why} depth={depth + 1} />
           )}
         </div>
       )}
@@ -158,7 +137,7 @@ function WhyPanel({ why, depth = 0, ready }) {
 }
 
 // ─── Single proof step ─────────────────────────────────────────────────────────
-function ProofStep({ step, idx, total, ready }) {
+function ProofStep({ step, idx, total }) {
   return (
     <div className="proof-step-card">
       <div className="proof-ribbon">
@@ -173,13 +152,13 @@ function ProofStep({ step, idx, total, ready }) {
         <p className="proof-instruction">{step.instruction}</p>
 
         <div className="proof-well">
-          <M t={step.math} display ready={ready} />
+          <M t={step.math} display />
         </div>
 
         {step.note && <p className="proof-note">{step.note}</p>}
 
         <div style={{ paddingBottom: 12 }}>
-          <WhyPanel why={step.why} depth={0} ready={ready} />
+          <WhyPanel why={step.why} depth={0} />
         </div>
       </div>
     </div>
@@ -189,7 +168,6 @@ function ProofStep({ step, idx, total, ready }) {
 // ─── Main component ────────────────────────────────────────────────────────────
 export default function ProofViewer({ proof }) {
   const [step, setStep] = useState(0);
-  const ready = useMath();
   const steps = proof?.steps ?? [];
 
   useEffect(() => {
@@ -222,7 +200,7 @@ export default function ProofViewer({ proof }) {
           <div className="proof-subtitle">{proof.subtitle}</div>
         )}
         <div className="proof-well proof-well--hero">
-          <M t={proof.problem} display ready={ready} />
+          <M t={proof.problem} display />
         </div>
         {proof.preamble && <p className="proof-preamble">{proof.preamble}</p>}
       </div>
@@ -252,7 +230,6 @@ export default function ProofViewer({ proof }) {
         step={steps[step]}
         idx={step}
         total={steps.length}
-        ready={ready}
       />
 
       {/* Navigation */}

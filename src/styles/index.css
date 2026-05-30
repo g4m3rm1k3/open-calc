@@ -62,13 +62,7 @@
     @apply font-sans text-slate-800 dark:text-slate-200 antialiased bg-[var(--color-page-bg)];
   }
 
-  /* Hide page content while a proof modal is open, but keep the background visible */
-  body.proof-modal-open #root {
-    visibility: hidden;
-  }
-  body.proof-modal-open [data-bg] {
-    visibility: visible;
-  }
+
 
   /* Scrollbar styling */
   ::-webkit-scrollbar {

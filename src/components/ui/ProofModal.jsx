@@ -14,14 +14,12 @@ export default function ProofModal({ entry, proof, onClose }) {
     return () => window.removeEventListener("keydown", handler);
   }, [onClose]);
 
-  // Lock body scroll and hide page content while open
+  // Lock body scroll while open
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    document.body.classList.add("proof-modal-open");
     return () => {
       document.body.style.overflow = prev;
-      document.body.classList.remove("proof-modal-open");
     };
   }, []);
 
@@ -35,7 +33,9 @@ export default function ProofModal({ entry, proof, onClose }) {
         alignItems: "center",
         justifyContent: "center",
         padding: "0px",
-        background: "transparent",
+        background: "rgba(0, 0, 0, 0.6)",
+        backdropFilter: "blur(4px)",
+        WebkitBackdropFilter: "blur(4px)",
       }}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
