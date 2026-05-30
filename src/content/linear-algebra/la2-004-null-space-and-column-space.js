@@ -170,6 +170,7 @@ fprintf('||A * null_basis|| = %.2e  (should be ≈ 0)\\n', residual)`,
               prose: [
                 '`P2 - P1` and `P3 - P1` compute edge vectors from the first probe point. `M_good = [P2-P1, P3-P1]` assembles a 2×2 matrix whose columns are those two direction vectors. `rank(M_good) = 2` means the vectors point in independent directions — together they span the full 2D plane of the workpiece surface.',
                 'For the bad layout: `P3_bad = [50; 0]` is collinear with P1 and P2 (all on the x-axis). `M_bad` has columns `[100; 0]` and `[50; 0]` — proportional, so rank = 1. `null(M_bad)` returns the y-direction: the y-component of the surface is entirely undetermined. The CNC controller cannot reconstruct the part plane from this data alone.',
+                '`null_dir` printed as `[0; 1]` (the y-direction) is not a coincidence — it is the **Fundamental Theorem** in action: $N(A) \\perp C(A^T)$. The row space of `M_bad` spans only the x-axis, so its null space must be perpendicular to that: the y-axis. Every direction the probe CAN measure (x-axis) is perpendicular to every direction it CANNOT determine (y-axis). `null(M_bad)` reveals exactly which surface direction is missing from the probe setup.',
               ],
               code: `% Good probe layout: 3 non-collinear points define a plane
 P1 = [0;   0  ];
@@ -197,6 +198,7 @@ fprintf('  Unknown direction: [%.3f; %.3f]\\n', null_dir(1), null_dir(2))`,
               prose: [
                 '`rank(A)` and `rank([A b])` compare the rank of $A$ alone vs the augmented matrix $[A|\\mathbf{b}]$. If $\\text{rank}([A|\\mathbf{b}]) > \\text{rank}(A)$, appending $\\mathbf{b}$ added an independent row — $\\mathbf{b}$ is outside $C(A)$, so the system is inconsistent. If the ranks are equal, $\\mathbf{b} \\in C(A)$ and the system is consistent.',
                 'For `b_good`: $A\\mathbf{x} = \\mathbf{b}$ has a solution because $\\mathbf{b}$ lies in the column space. For `b_bad`: the rank jumps, revealing the contradiction. `A \\ b_good` solves the consistent system via backslash — attempting `A \\ b_bad` would return a least-squares approximation (not an exact solution), another clue that $\\mathbf{b}_{\\text{bad}} \\notin C(A)$.',
+                '`rank([A b_good]) == rank(A)` is true because `b_good = 2 * col1` — appending a vector already in the column space adds no new independent direction. `rank([A b_bad]) > rank(A)` because `b_bad = [1;4]` is NOT a multiple of `[1;3]` — it lies off the column space line and needs one more dimension to be explained. This rank jump is the algebraic signature of inconsistency: the system must simultaneously satisfy two contradictory equations, and no $\\mathbf{x}$ can do both.',
               ],
               code: `% Column space consistency check
 A = [1 2; 3 6];  % rank 1
@@ -233,6 +235,7 @@ else,            disp('-> INCONSISTENT  (b NOT in C(A))'); end`,
               prose: [
                 '`np.linalg.matrix_rank(A)` counts linearly independent columns by computing the SVD and counting singular values above a numerical threshold. For `A = [[1,2],[3,4]]`: columns `[1,3]` and `[2,4]` point in different directions — rank = 2 = n. For `B = [[1,2],[3,6]]`: column 2 = 2×column 1 — only one independent direction, rank = 1.',
                 'The rank-nullity theorem $\\text{rank} + \\text{nullity} = n$ printed for `B`: $1 + 1 = 2$. The parallelogram plot shows this geometrically — `A` produces a non-degenerate parallelogram (columns span the plane), `B` produces a degenerate one: both arrows collapse to the same line (zero-area parallelogram = rank 1 = zero determinant).',
+                '`plt.Polygon([origin, c1, c1+c2, c2])` draws the parallelogram whose **signed area equals the determinant**. For `A` (rank 2), the area is nonzero — the columns span the plane. For `B` (rank 1), col2 = 2×col1 so the parallelogram degenerates to a line with area 0. `np.linalg.matrix_rank` computes this via SVD: it counts singular values above a threshold. Zero area ↔ a zero singular value ↔ rank drops by 1. This ties the determinant (from la2-003) to rank: det = 0 ↔ rank < n ↔ nullity > 0.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -271,6 +274,7 @@ plt.show()`,
               prose: [
                 '`scipy.linalg.null_space(B)` computes $N(B) = \\{\\mathbf{x}: B\\mathbf{x}=\\mathbf{0}\\}$ via SVD: the right singular vectors corresponding to near-zero singular values span the null space. For `B = [[1,2],[3,6]]` (rank 1): one singular value $\\approx 0$, so `null_B` is a single normalized column.',
                 '`B @ null_B` prints near-zero (around $10^{-16}$) — the verification that `null_B` satisfies $B\\mathbf{x}=\\mathbf{0}$. The plot shows the null vector (red) and its negative — the null space is this entire 1D line through the origin. By the Fundamental Theorem, the null space is perpendicular to the row space. Notice the blue column-space line and the red null-space line are orthogonal: they are the two complementary subspaces of $\\mathbb{R}^2$ for this rank-1 matrix.',
+                '`np.dot(null_B[:,0], B[:,0])` should print near zero — the null vector is perpendicular to the column direction. This is $N(A) \\perp C(A^T)$ (Fundamental Theorem): the null space and row space are orthogonal complements in the input space $\\mathbb{R}^n$. For $B$: col1 = $[1,3]^T$ (column space direction), null vector $\\approx [-0.894, 0.447]^T$ (which is $[-2,1]/\\sqrt{5}$, the null space direction). Their dot product: $-0.894 + 3(0.447) = -0.894 + 1.341 \\approx 0$. Perpendicularity is not a numerical accident — it is guaranteed by the theorem.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -308,6 +312,7 @@ plt.show()`,
               prose: [
                 '`np.linalg.matrix_rank(A)` counts the pivot columns — the rank. `n = A.shape[1]` is the number of columns. `nullity = n - rank` is the Rank-Nullity theorem applied directly: the gap between input dimension ($n=4$) and output dimension (rank) is exactly the number of crushed directions (null space dimension). For this matrix with 2 pivot columns, 2 directions survive and 2 are annihilated.',
                 '`rank_Ab = np.linalg.matrix_rank(np.column_stack([A, b]))` augments $A$ with $\\mathbf{b}$ and recomputes the rank. If it increases, $\\mathbf{b}$ added a new independent direction that $A$\'s columns can\'t span — inconsistent. The bar chart shows both rank tests side by side: equal bars (blue = orange) mean consistent, a taller orange bar means $\\mathbf{b} \\notin C(A)$. The gap between the orange rank($[A|b]$) and blue rank($A$) bars visually encodes the consistency test.',
+                '`b_good = A @ np.array([1., 0., 2., 0.])` constructs a vector guaranteed to be in $C(A)$ — any $A\\mathbf{x}$ is in $C(A)$ by definition, so this is a cheat code for constructing consistent right-hand sides. `b_bad = np.array([1., 0., 0.])` was chosen to likely lie outside $C(A)$. The Rank-Nullity theorem applies here: with 2 pivot columns (rank 2) and 2 free columns (nullity 2), the null space has dimension 2 — meaning there are infinitely many $\\mathbf{x}$ solving $A\\mathbf{x} = \\mathbf{b}_{\\text{good}}$, each differing by a null space vector.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -343,6 +348,52 @@ ax.set_xticks(x); ax.set_xticklabels(['b_good\\n(consistent)', 'b_bad\\n(inconsi
 ax.set_ylabel('rank value'); ax.set_ylim(0, 4)
 ax.set_title('Consistency test: equal bars = b in C(A)', fontsize=12)
 ax.legend(); ax.grid(True, axis='y', alpha=0.3)
+plt.tight_layout()
+plt.show()`,
+            },
+            {
+              id: 4,
+              cellTitle: 'Application: visualizing the four subspaces — Fundamental Theorem',
+              prose: [
+                '`linalg.null_space(A)` and `linalg.orth(A.T)` both return bases for subspaces in the **input space** $\\mathbb{R}^2$ (2 columns). `np.dot(null_basis[:,0], row_space[:,0])` prints near zero — confirming $N(A) \\perp C(A^T)$: the null space (directions destroyed by $A$) and row space (directions that survive) are always orthogonal. This is the first half of the Fundamental Theorem of Linear Algebra.',
+                '`linalg.orth(A)` and `linalg.null_space(A.T)` both return bases for subspaces in the **output space** $\\mathbb{R}^2$ (2 rows). `np.dot(col_space[:,0], left_null[:,0])` prints near zero — confirming $C(A) \\perp N(A^T)$: the reachable outputs (column space) and unreachable directions (left null space) are orthogonal. For this rank-1 matrix, one direction in the output is reachable and one is "orphaned" — never produced by any input.',
+                'The two-panel plot displays both halves of the Fundamental Theorem: the **left panel** shows input $\\mathbb{R}^2$ split into null space (red, destroyed) and row space (blue, surviving), at 90° to each other. The **right panel** shows output $\\mathbb{R}^2$ split into column space (blue, reachable) and left null space (red, unreachable), also at 90°. Together, the four arrows — two per panel, always perpendicular — are a geometric proof that every vector in $\\mathbb{R}^n$ can be uniquely decomposed into a "surviving part" and a "crushed part."',
+              ],
+              code: `import numpy as np
+import matplotlib.pyplot as plt
+from scipy import linalg
+
+# Rank-1 matrix from Example 1
+A = np.array([[1., 2.], [3., 6.]])
+
+# Input space R^2: null space N(A) and row space C(A^T)
+null_basis = linalg.null_space(A)      # 2x1 (nullity=1)
+row_space  = linalg.orth(A.T)          # 2x1 (rank=1)
+
+# Output space R^2: column space C(A) and left null space N(A^T)
+col_space  = linalg.orth(A)            # 2x1 (rank=1)
+left_null  = linalg.null_space(A.T)    # 2x1 (m - rank = 1)
+
+print(f"rank(A) = {np.linalg.matrix_rank(A)}")
+print(f"N(A) ⊥ C(Aᵀ)? dot = {np.dot(null_basis[:,0], row_space[:,0]):.2e}  (≈ 0)")
+print(f"C(A) ⊥ N(Aᵀ)? dot = {np.dot(col_space[:,0], left_null[:,0]):.2e}  (≈ 0)")
+
+fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+panels = [
+  (axes[0], null_basis[:,0], 'N(A) — null (destroyed)', row_space[:,0],  'C(Aᵀ) — row (survives)', 'Input space ℝ²'),
+  (axes[1], left_null[:,0],  'N(Aᵀ) — left null',       col_space[:,0],  'C(A) — col (reachable)', 'Output space ℝ²'),
+]
+for ax, red_vec, red_lbl, blue_vec, blue_lbl, title in panels:
+    origin = np.zeros(2)
+    for vec, lbl, color in [(red_vec, red_lbl, 'crimson'), (blue_vec, blue_lbl, 'steelblue')]:
+        ax.annotate('', xy=vec, xytext=origin,
+                    arrowprops=dict(arrowstyle='->', color=color, lw=2.5))
+        ax.text(vec[0]+0.05, vec[1]+0.05, lbl, color=color, fontsize=9, fontweight='bold')
+    ax.set_xlim(-1.5, 1.5); ax.set_ylim(-1.5, 1.5)
+    ax.set_aspect('equal'); ax.grid(True, alpha=0.3)
+    ax.axhline(0, color='k', lw=0.5); ax.axvline(0, color='k', lw=0.5)
+    ax.set_title(title, fontsize=11)
+plt.suptitle('Fundamental Theorem: null ⊥ row, col ⊥ left-null', fontsize=11)
 plt.tight_layout()
 plt.show()`,
             },

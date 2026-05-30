@@ -113,6 +113,7 @@ export default {
               prose: [
                 '`det(A)` computes the determinant. For $A = \\begin{bmatrix}a & b \\\\ c & d\\end{bmatrix}$, the formula is $ad - bc$. For `A = [3 1; 2 4]`: $3 \\cdot 4 - 1 \\cdot 2 = 10 \\neq 0$ — invertible. The `fprintf` line prints each part of the formula explicitly so you can trace the arithmetic.',
                 'For `S = [2 4; 1 2]`: $\\det = 2 \\cdot 2 - 4 \\cdot 1 = 0$ — column 2 is $2 \\times$ column 1 (proportional). A zero determinant means the transformation squishes the entire plane onto a single line, destroying information. No inverse can recover what was annihilated.',
+                '`det(F)` with `F = [0 1; 1 0]` (reflection across $y = x$) returns $-1$: the magnitude $|-1| = 1$ means area is preserved, and the negative sign means **orientation is reversed** (counterclockwise loops become clockwise). `A * inv(A)` in the last block prints the $2 \\times 2$ identity — off-diagonal entries are $\\sim 10^{-15}$ (machine epsilon), not exactly 0, because floating-point arithmetic is finite. `disp(A * A_inv)` lets you confirm this numerically.',
               ],
               code: `% Invertible matrix
 A = [3 1; 2 4];
@@ -137,6 +138,7 @@ disp('A * inv(A):'); disp(A * A_inv)`,
               prose: [
                 'For `A_base = [2 3; 1 2]` with `A(2,2)` varying: the determinant is $2 \\cdot (2,2) - 3 \\cdot 1 = 2(A_{22}) - 3$. When $A_{22} = 1.5$, the determinant hits zero exactly. The loop approaches that critical value and prints `det(A)` at each step — you can watch the number approach 0.',
                 'Mathematically, the $2 \\times 2$ inverse formula is $A^{-1} = \\frac{1}{\\det(A)}\\begin{bmatrix}d & -b \\\\ -c & a\\end{bmatrix}$. As $\\det(A) \\to 0$, the $1/\\det$ factor blows up, sending all entries of $A^{-1}$ to $\\pm\\infty$. MATLAB\'s `inv(A)` will return a matrix with enormous entries (or `Inf`) — not a signal that the problem is interesting, but that the problem is ill-conditioned.',
+                'The formula $\\det\\begin{bmatrix}2&3\\\\1&d\\end{bmatrix} = 2d - 3$ is **linear** in $d$ — the determinant crosses zero at exactly $d = 1.5$, like a straight line crossing the $x$-axis. There is a sharp boundary: at $d = 1.4999$ the matrix is invertible (barely), at $d = 1.5$ it is singular. Near this boundary the inverse exists mathematically but has enormous entries — the system $A\\mathbf{x} = \\mathbf{b}$ becomes extremely sensitive to small changes in $\\mathbf{b}$ (a phenomenon called **ill-conditioning**). Numerical solvers measure this sensitivity via the **condition number**.',
               ],
               code: `% Start with an invertible matrix and make it singular
 A_base = [2 3; 1 2];
@@ -161,6 +163,7 @@ fprintf('\\nAt (2,2)=1.5: det = %g  (singular!)\\n', det(A_sing))`,
               prose: [
                 '`A \\ b` solves $A\\mathbf{x} = \\mathbf{b}$ via LU factorization — two triangular solves, $O(n^2)$ work given the factorization. `inv(A) * b` first computes all $n^2$ entries of $A^{-1}$ ($O(n^3)$ extra work) then multiplies, accumulating more floating-point error. Backslash is not just faster — it is numerically more stable because it avoids amplifying rounding errors through the full inverse.',
                 '`norm(A*x_solve - b)` computes the residual $\\|A\\mathbf{x} - \\mathbf{b}\\|_2$ to verify accuracy — should be near `1e-15`. Use `inv(A)` only when you genuinely need the matrix entries (for analysis or symbolic work), never just to multiply by a single right-hand side vector.',
+                '`norm(x_solve - x_inv) < 1e-10` confirms both approaches agree for this small $2 \\times 2$ case. The difference only matters at scale: for a $5000 \\times 5000$ system, `A\\b` requires $O(n^3)$ for LU factorization once; each subsequent solve for a new $\\mathbf{b}$ only costs $O(n^2)$. Computing `inv(A)` also costs $O(n^3)$ but materializes all $n^2 = 25{,}000{,}000$ entries, each accumulating more rounding error. The backslash operator is the professional default for exactly this reason.',
               ],
               code: `A = [3 1; 2 4];
 b = [10; 8];
@@ -186,6 +189,7 @@ fprintf('Same result: %d\\n', norm(x_solve - x_inv) < 1e-10)`,
               prose: [
                 'A CNC machine probes 3 reference points on the workpiece to establish the work coordinate system. These 3 points must NOT be collinear — if they are, the determinant of their position matrix is 0 and no unique plane (or coordinate frame) can be defined.',
                 'This is why fixturing specifications require probe points to be spread far apart in a triangular pattern.',
+                '`cond(M_good)` prints the **condition number** — the ratio of the largest to smallest singular value. For a well-spread fixture this is moderate (close to 1 is ideal). `cond(M_bad)` prints a huge number (or `Inf`) because `M_bad` is exactly singular. In practice, CNC controllers reject a calibration if `cond(M) > 100` — a condition number above 100 means a 1% measurement noise in the probe position could cause a 100% error in the computed coordinate frame, making the machined part dangerous.',
               ],
               code: `% Three probe points on the workpiece
 % Format: each column is [X; Y; Z]
@@ -227,6 +231,7 @@ fprintf('Condition number (bad):  %.2e  (huge = near-singular)\\n', cond(M_bad))
               prose: [
                 '`np.linalg.det(A)` computes the determinant using LU decomposition (more numerically stable than the $ad-bc$ formula for large matrices). For $2 \\times 2$: $\\det(A) = a \\cdot d - b \\cdot c = 3 \\cdot 4 - 1 \\cdot 2 = 10$. Geometrically, this means $A$ scales all areas by a factor of 10 — a unit square maps to a parallelogram of area 10.',
                 '`np.linalg.det(S)` with `S = [[2,4],[1,2]]` returns exactly 0: $2 \\cdot 2 - 4 \\cdot 1 = 0$. Row 2 of S is half of row 1 — they are linearly dependent. The rank of S is 1, not 2, so S maps the entire plane onto a single line (a 1D subspace). Any area becomes zero. No inverse exists.',
+                '`plt.Polygon([origin, c1, c1+c2, c2])` draws the parallelogram spanned by the two column vectors — its **signed area equals the determinant**. For matrix `A` (det=10), the blue shaded region is a large parallelogram with area 10. For `S` (det=0), the two column vectors `col1 = [2,1]` and `col2 = [4,2]` are collinear ($\\text{col2} = 2 \\times \\text{col1}$), so the "parallelogram" degenerates to a line segment with zero area. This picture is the geometric definition of the determinant.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -267,6 +272,7 @@ plt.show()`,
               prose: [
                 '`np.linalg.inv(A)` computes $A^{-1}$ — the unique matrix satisfying $AA^{-1} = I_n$. For $2 \\times 2$: $A^{-1} = \\frac{1}{\\det(A)}\\begin{bmatrix}d & -b \\\\ -c & a\\end{bmatrix}$. For `A = [[3,1],[2,4]]` with $\\det = 10$: $A^{-1} = \\frac{1}{10}\\begin{bmatrix}4 & -1 \\\\ -2 & 3\\end{bmatrix}$.',
                 '`np.allclose(A @ A_inv, np.eye(2))` verifies $AA^{-1} \\approx I$ to floating-point precision — `allclose` is needed because matrix multiplication accumulates rounding errors that prevent exact equality. The bar chart compares entries of $AA^{-1}$ against the identity: the diagonals should be 1 and the off-diagonals 0.',
+                'The three heatmaps show `A`, `A_inv`, and `A @ A_inv`. Notice `A_inv` has completely different values than `A` — the inverse is NOT entry-wise reciprocal. For example, `A[0,0] = 3.0` but `A_inv[0,0] = 0.4` (= $4/10$ from the formula: the $d$ entry divided by $\\det$). The `A @ A_inv` heatmap should show exactly 1 on the diagonal and 0 off-diagonal. The `round(10)` call reveals that off-diagonal entries are $\\sim 10^{-16}$ (machine epsilon, not exactly 0) — inherent floating-point behavior.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -297,6 +303,7 @@ plt.show()`,
               prose: [
                 '`np.linalg.solve(A, b)` uses LU factorization internally: it factors $A = LU$ once ($O(n^3)$), then performs two triangular solves for $\\mathbf{b}$ ($O(n^2)$). `np.linalg.inv(A) @ b` computes the full inverse (all $n^2$ entries, more floating-point operations), then multiplies. Both give the same answer numerically but `solve` is the correct professional approach — lower error accumulation.',
                 'The line plot shows $\\det\\begin{bmatrix}2&3\\\\1&d\\end{bmatrix} = 2d - 3$ as a function of the entry $d$. The red dashed line marks $\\det = 0$ — the singular boundary. Left of $d=1.5$ the matrix has a negative determinant (orientation-flipping but still invertible). Right of $d=1.5$ it is positive-det invertible. Exactly at $d=1.5$ it is singular. The shaded regions make it visual: blue is invertible-positive, red is invertible-negative, and the boundary itself is the non-invertible point.',
+                '`fill_between(d_vals, dets, 0, where=(dets > 0))` shades the region between the det curve and 0 wherever the determinant is positive. The orange vertical line at $d = 1.5$ is the singular boundary: exactly at this $d$, $\\text{col2} = [3, 1.5]^T = 1.5 \\times \\text{col1} = [2, 1]^T$ — proportional columns, zero area, no inverse. The residual `norm(A @ x_solve - b)` printed above the plot is the gold-standard verification: if `np.linalg.solve` computed $\\mathbf{x}$ correctly, substituting back should give exactly $\\mathbf{b}$ with residual near machine epsilon $\\sim 10^{-15}$.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -326,6 +333,38 @@ ax.set_title('Singular boundary: det = 0 at d = 1.5', fontsize=12)
 ax.legend(fontsize=9); ax.grid(True, alpha=0.3)
 plt.tight_layout()
 plt.show()`,
+            },
+            {
+              id: 4,
+              cellTitle: 'Application: matrix cipher — encrypt and decrypt with A and A⁻¹',
+              prose: [
+                '`K @ m` applies the key matrix to the message vector in one step — this IS the matrix-vector product from la2-001. `np.linalg.det(K) = 1.0` tells us two things: (1) the transformation preserves area exactly, and (2) the inverse formula $K^{-1} = \\frac{1}{\\det}\\begin{bmatrix}d&-b\\\\-c&a\\end{bmatrix}$ has a clean scalar of 1 — for a key matrix, this means the inverse has integer entries, which matters for classical integer arithmetic ciphers.',
+                '`np.linalg.inv(K)` computes the decryption key. For `K = [[3,5],[1,2]]` with $\\det = 1$: swap diagonal entries to get $\\begin{bmatrix}2&*\\\\*&3\\end{bmatrix}$, negate off-diagonal to get $\\begin{bmatrix}2&-5\\\\-1&3\\end{bmatrix}$, divide by det=1 — the inverse is $\\begin{bmatrix}2&-5\\\\-1&3\\end{bmatrix}$. `K_inv @ c` applies this decryption key to recover $\\mathbf{m}$.',
+                '`np.allclose(m_recovered, m)` confirms perfect recovery: $K^{-1}(K\\mathbf{m}) = (K^{-1}K)\\mathbf{m} = I\\mathbf{m} = \\mathbf{m}$. This is the matrix algebra of "play the transformation backwards" — the inverse undoes the encryption exactly. `np.allclose(K @ K_inv, np.eye(2))` shows the same principle: $KK^{-1} = I$ means the two operations cancel completely.',
+              ],
+              code: `import numpy as np
+
+# Hill cipher key matrix
+K = np.array([[3., 5.], [1., 2.]])
+det_K = np.linalg.det(K)
+print(f"Key matrix K:\\n{K}")
+print(f"det(K) = {det_K:.1f}  (non-zero -> invertible -> decryptable)")
+
+# Encrypt message vector m
+m = np.array([3., 5.])
+c = K @ m
+print(f"\\nMessage m = {m}")
+print(f"Ciphertext c = K @ m = {c}")
+
+# Decrypt: apply K_inv to recover m
+K_inv = np.linalg.inv(K)
+print(f"\\nDecryption key K_inv:\\n{K_inv}")
+m_recovered = K_inv @ c
+print(f"Recovered: K_inv @ c = {m_recovered}")
+print(f"Exact recovery: {np.allclose(m_recovered, m)}")
+
+# Verify K @ K_inv = I
+print(f"\\nK @ K_inv = I? {np.allclose(K @ K_inv, np.eye(2))}")`,
             },
             {
               id: 'c1',

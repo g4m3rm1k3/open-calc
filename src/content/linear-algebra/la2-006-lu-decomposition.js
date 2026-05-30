@@ -125,6 +125,7 @@ export default {
               prose: [
                 '`[L, U, P] = lu(A)` returns the factorization $PA = LU$ with partial pivoting. `P` is a permutation matrix (records row swaps); `L` is unit lower triangular ($1$s on diagonal, Gaussian elimination multipliers below); `U` is upper triangular (the row-reduced result).',
                 '`P*A - L*U` should be a zero matrix — this verifies $PA = LU$ to machine precision. `prod(diag(U))` computes $U_{11} \\cdot U_{22} \\cdot U_{33}$. `det(P)` returns $\\pm 1$ based on the number of row swaps. Together: $\\det(A) = \\det(P^{-1}) \\cdot \\underbrace{\\det(L)}_{=1} \\cdot \\det(U) = (\\pm 1) \\cdot \\prod_i U_{ii}$ — the determinant costs nothing extra after factorization.',
+                'The entries below the diagonal of `L` are the **Gaussian elimination multipliers** — $L_{ij} = m_{ij}$ is the factor used to zero out row $i$, column $j$ during elimination. Displaying `L` shows these multipliers directly: e.g., $L_{21} = 2$ means "row 2 was updated by subtracting 2 × row 1." Storing these multipliers instead of discarding them is the key insight of LU: the elimination work is recorded and reused for any future right-hand side.',
               ],
               code: `A = [2 1 1; 4 3 3; 8 7 9];
 

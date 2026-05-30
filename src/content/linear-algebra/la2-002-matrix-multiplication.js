@@ -131,7 +131,12 @@ fprintf('Entry (1,1) = row1(A) · col1(B) = %g\\n', entry_11)
 
 % Column view: col j of AB = A * col j of B
 col1_of_AB = A * B(:,1);
-fprintf('Col 1 of AB via column view: [%g; %g]\\n', col1_of_AB(1), col1_of_AB(2))`,
+fprintf('Col 1 of AB via column view: [%g; %g]\\n', col1_of_AB(1), col1_of_AB(2))
+fprintf('Matches AB(:,1)? %d\\n', isequal(col1_of_AB, AB(:,1)))
+
+% Determinant multiplicativity: det(AB) = det(A)*det(B)
+fprintf('det(A)=%g, det(B)=%g, det(A)*det(B)=%g = det(AB)=%g\\n', ...
+    det(A), det(B), det(A)*det(B), det(AB))`,
             },
             {
               id: 2,
@@ -167,6 +172,7 @@ fprintf('AB == BA? %d  (0 = NO = non-commutative)\\n', isequal(rotate_then_shear
               prose: [
                 '`composite = M_mirror * R_G68` pre-multiplies right-to-left: `R_G68` (7° rotation) acts first on any tool position, then `M_mirror` (x-axis flip) acts on the result. `composite * path_in` applies this combined transformation to all three path points simultaneously — `path_in` is $2 \\times 3$, so MATLAB applies the $2 \\times 2$ composite to each column independently.',
                 '`norm(step2 - path_out) < 1e-10` verifies that applying the transformations sequentially (step 1: rotate, step 2: mirror) gives the same result as the single composite matrix. The `1e-10` threshold handles floating-point rounding errors. This is the fundamental property: one matrix product replaces an arbitrary chain of sequential transformations.',
+                'Read the **columns** of `composite` to understand the transformation geometrically: column 1 is where $\\hat{i} = [1,0]^T$ lands after G68 then mirror, and column 2 is where $\\hat{j} = [0,1]^T$ lands. For the CNC programmer, these columns answer a critical question: if I program a move in the +X direction, which direction does the machine actually travel after applying the work rotation and mirror? The composite matrix\'s columns answer this directly — no need to mentally simulate two steps.',
               ],
               code: `% Simulate CNC post-processor matrix chain
 % Each step: a 2×2 matrix acting on [X; Y] tool positions
@@ -209,6 +215,7 @@ fprintf('\\nSame result via two steps? %d\\n', norm(step2 - path_out) < 1e-10)`,
               prose: [
                 '`(A*B)*C` and `A*(B*C)` produce the same composite matrix — associativity holds. Each grouping is two matrix-matrix products (order of grouping does not change the left-to-right sequence of the three transforms). The `norm((A*B)*C - A*(B*C)) < 1e-12` check confirms this numerically.',
                 'Applying three matrices to a vector $\\mathbf{v}$ costs 3 matrix-vector multiplications if done one at a time: $A(B(C\\mathbf{v}))$. Pre-computing $M = ABC$ costs one matrix-matrix product (done once), then every vector only needs $M\\mathbf{v}$ — one multiplication instead of three. `M * v` vs `A * (B * (C * v))` proves this gives the same result for any $\\mathbf{v}$.',
+                '`norm(left_assoc - right_assoc) < 1e-12` checks associativity numerically — the residual is near machine epsilon ($\\sim 10^{-16}$), confirming that grouping doesn\'t change the result even in floating point. The practical upshot: MATLAB evaluates `A*B*C` left-to-right as `(A*B)*C` automatically. For $n \\times n$ matrices, each matrix-matrix product costs $O(n^3)$ operations. The grouping can matter for non-square chains — the **matrix chain multiplication** problem finds the optimal grouping to minimize total operations, a classic dynamic programming application.',
               ],
               code: `% Verify associativity: (A*B)*C = A*(B*C)
 A = [2 1; 0 3];
@@ -247,6 +254,7 @@ fprintf('Equal: %d\\n', norm(result_pre - result_seq) < 1e-12)`,
               prose: [
                 '`A @ B` is NumPy matrix multiplication. `r0 = A[0]` extracts row 0 of A as a 1D array; `B[:, 0]` extracts column 0 of B as a 1D array. `np.dot(r0, c0)` computes their dot product $\\sum_k r0_k \\cdot c0_k$ — this is the formula for entry $(0,0)$ of the product.',
                 'The heatmap shows A, B, and AB as color grids. Notice that AB entries (≈19–50) are much larger than A or B entries (1–8) — each entry accumulates products of multiple elements. `vmin=-60, vmax=60` normalizes all three plots to the same color scale so the magnitudes are visually comparable.',
+                '`np.linalg.det(AB)` equals `np.linalg.det(A) * np.linalg.det(B)` — **determinant multiplicativity**: composing two transformations multiplies their area-scaling factors. For these matrices, $\\det(A) = 1\\cdot4 - 2\\cdot3 = -2$ (A flips orientation and scales area by 2) and $\\det(B) = 5\\cdot8 - 6\\cdot7 = -2$, so $\\det(AB) = 4$. This is why composing two rotation matrices (each with det = 1) always gives another rotation — the product of two 1s is still 1.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -275,7 +283,11 @@ for ax, M, title in zip(axes, [A, B, AB], ['A', 'B', 'A @ B']):
 
 plt.suptitle("Matrix Multiplication: A @ B", fontsize=12)
 plt.tight_layout()
-plt.show()`,
+plt.show()
+
+# Determinant multiplicativity: det(A @ B) = det(A) * det(B)
+dA, dB = np.linalg.det(A), np.linalg.det(B)
+print(f"det(A)={dA:.1f}, det(B)={dB:.1f}, det(A)*det(B)={dA*dB:.1f}, det(A@B)={np.linalg.det(AB):.1f}")`,
             },
             {
               id: 2,
@@ -283,6 +295,7 @@ plt.show()`,
               prose: [
                 '`shear @ rotate` computes S after R (shear second, rotate first) — R is on the right so it acts first. `rotate @ shear` reverses the order. `np.allclose(rotate_then_shear, shear_then_rotate)` returns `False` — the matrices are genuinely different.',
                 '`transform_square(T)` builds a $2 \\times 5$ array of the unit square corners and applies `T @ pts` — multiplying the $2 \\times 2$ transform by the $2 \\times 5$ corner matrix, transforming all five points simultaneously. The filled polygon plot shows the unit square (blue) warped into different parallelograms (red) for each composition order — the same square ends up in visibly different positions, making non-commutativity geometric.',
+                'Read the **columns** of each product matrix to trace where $\\hat{i}$ and $\\hat{j}$ land. Column 0 of `rotate_then_shear` is `rotate_then_shear @ [1,0]` = $[1, 1]^T$, meaning $\\hat{i}$ ends up at $(1,1)$ after rotate-then-shear. Column 0 of `shear_then_rotate` is $[0, 1]^T$, meaning $\\hat{i}$ ends up at $(0,1)$. These are exactly the rightmost corners of the two red polygons in the plot — the matrix columns ARE the transformed basis vectors, visible in the picture.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -327,6 +340,7 @@ plt.show()`,
               prose: [
                 '`step1 = B @ v` applies B (rotation) to v first. `step2 = A @ step1` applies A (scale) to the rotated vector — two sequential matrix-vector products. `result = AB @ v` applies the pre-composed product in one step. `np.allclose(step2, result)` confirms both paths agree to floating-point precision: $(AB)\\mathbf{v} = A(B\\mathbf{v})$ is the associativity property.',
                 'The efficiency argument: `AB = A @ B` is computed once (a matrix-matrix product). Then each vertex only needs `AB @ v` — one product instead of two. For a scene with millions of vertices rendered at 60 fps, pre-multiplying the transformation chain is what makes real-time rendering computationally feasible.',
+                '`np.linalg.det(AB)` tells you how the composition scales area: $\\det(A) = 2 \\cdot 0.5 - 0 = 1$ (scale $x2$ then shrink $y \\times 0.5$ preserves area) and $\\det(B) = \\cos^2(90°) + \\sin^2(90°) = 1$ (all rotations preserve area), so $\\det(AB) = 1$. The arrow plot confirms: the three vectors change direction and length, but the signed area of any parallelogram they span is unchanged by $AB$. Composing two area-preserving transforms always gives another area-preserving transform — the determinant law guarantees this algebraically.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -355,6 +369,57 @@ for vec, color, lbl in [(v,'steelblue','v (original)'), (step1,'darkorange','B*v
 ax.set_xlim(-2, 4); ax.set_ylim(-2, 4)
 ax.set_aspect('equal'); ax.grid(True, alpha=0.3)
 ax.axhline(0, color='k', lw=0.5); ax.axvline(0, color='k', lw=0.5)
+plt.tight_layout()
+plt.show()`,
+            },
+            {
+              id: 4,
+              cellTitle: 'Application: 2D robot arm — composing joint rotations',
+              prose: [
+                '`rot2d(deg)` constructs the $2\\times2$ rotation matrix $R(\\theta)=\\begin{bmatrix}\\cos\\theta & -\\sin\\theta \\\\ \\sin\\theta & \\cos\\theta\\end{bmatrix}$ by substituting `np.radians(deg)` — NumPy trig functions expect radians. This is the same rotation matrix from la2-001; here we build two of them, one per joint, and multiply them together.',
+                '`R_combined = R_shoulder @ R_elbow` is the forward kinematics composition: `R_elbow` acts first (rotates the forearm relative to the upper arm), then `R_shoulder` acts second (rotates everything into world coordinates). Reading right-to-left: $R_{\\text{shoulder}} R_{\\text{elbow}} \\mathbf{v}$ = "apply elbow rotation first, then shoulder rotation." `forearm_vec = R_combined @ np.array([L2, 0])` places the forearm endpoint by applying this composed rotation to a vector of length L2 pointing along the x-axis.',
+                '`np.linalg.det(R_combined)` prints `1.0` — the composition of two rotations is still a rotation (det = 1 means area-preserving and orientation-preserving). This confirms det(AB) = det(A)·det(B): $1 \\times 1 = 1$. No matter how many pure rotations you chain, the result is always a pure rotation. The plot shows this: the arm bends, but no part of it is scaled or reflected.',
+              ],
+              code: `import numpy as np
+import matplotlib.pyplot as plt
+
+def rot2d(deg):
+    rad = np.radians(deg)
+    return np.array([[np.cos(rad), -np.sin(rad)],
+                     [np.sin(rad),  np.cos(rad)]])
+
+shoulder_angle = 30   # degrees from world x-axis
+elbow_angle    = 45   # degrees relative to upper arm
+
+L1 = 2.0  # upper arm length
+L2 = 1.5  # forearm length
+
+R_shoulder = rot2d(shoulder_angle)
+R_elbow    = rot2d(elbow_angle)
+
+# Forearm orientation = R_shoulder @ R_elbow: elbow acts first, shoulder second
+R_combined = R_shoulder @ R_elbow
+
+upper_arm_vec = R_shoulder @ np.array([L1, 0.0])
+elbow_pos     = upper_arm_vec
+forearm_vec   = R_combined @ np.array([L2, 0.0])
+wrist_pos     = elbow_pos + forearm_vec
+
+print(f"Elbow position: ({elbow_pos[0]:.3f}, {elbow_pos[1]:.3f})")
+print(f"Wrist position: ({wrist_pos[0]:.3f}, {wrist_pos[1]:.3f})")
+print(f"det(R_shoulder)={np.linalg.det(R_shoulder):.4f}, det(R_elbow)={np.linalg.det(R_elbow):.4f}")
+print(f"det(R_combined)={np.linalg.det(R_combined):.4f}  (should be 1.0)")
+
+fig, ax = plt.subplots(figsize=(6, 6))
+origin = np.array([0.0, 0.0])
+pts = np.array([origin, elbow_pos, wrist_pos])
+ax.plot(pts[:, 0], pts[:, 1], 'o-', color='steelblue', lw=3, markersize=10)
+for pos, label in [(origin, 'Shoulder'), (elbow_pos, 'Elbow'), (wrist_pos, 'Wrist')]:
+    ax.annotate(label, pos, textcoords='offset points', xytext=(8, 5), fontsize=10)
+ax.set_xlim(-1, 5); ax.set_ylim(-1, 5)
+ax.set_aspect('equal'); ax.grid(True, alpha=0.3)
+ax.axhline(0, color='k', lw=0.5); ax.axvline(0, color='k', lw=0.5)
+ax.set_title(f'Robot Arm: shoulder={shoulder_angle}°, elbow={elbow_angle}°', fontsize=12)
 plt.tight_layout()
 plt.show()`,
             },

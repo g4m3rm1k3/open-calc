@@ -167,6 +167,7 @@ fprintf('Match: %d\\n', abs(det_manual - d) < 1e-10)`,
               prose: [
                 '`det(A*B)` multiplies two $2\\times 2$ matrices and computes the determinant of the product. `det(A)*det(B)` computes them separately and multiplies. Both should give the same number — this is Property 6. Geometrically: $A$ scales areas by $\\det(A)$ and $B$ scales them by $\\det(B)$; composing them scales by $\\det(A) \\cdot \\det(B)$.',
                 '`A_swap = A([2 1], :)` reorders rows using MATLAB index vector `[2 1]`: row 2 goes first, row 1 goes second. `det(A_swap)` should equal $-\\det(A)$ — one row swap flips the sign (Property 2). `T = [3 1 5; 0 2 4; 0 0 7]` is upper triangular: `det(T)` should equal $3 \\times 2 \\times 7 = 42$ — the triangular matrix rule (only the diagonal matters).',
+                '`det(A\') == det(A)` (Property 7) means the determinant is immune to transposing — a non-obvious fact. Its consequence: everything true about rows is equally true about columns (since transposing turns columns into rows). This is why you can expand along any row OR any column in cofactor expansion and get the same answer. For triangular $T$: MATLAB\'s `det(T)` computes LU internally and returns $U_{11} \\cdot U_{22} \\cdot U_{33}$ — since $T$ is already upper triangular, $U = T$ and the product is just the diagonal.',
               ],
               code: `A = [2 1; 5 3];
 B = [1 0; 2 4];
@@ -197,6 +198,7 @@ fprintf('3*2*7 = %g\\n', 3*2*7)`,
               prose: [
                 'A 3-axis CNC router follows three independent axis vectors. If the vectors are coplanar (det = 0), the machine cannot reach all points in 3D — one direction of motion is impossible.',
                 'This is the determinant test for 3D linear independence: are three motion directions truly independent?',
+                '`det(M_good) = 1.0` (the standard orthogonal axes form a unit cube — volume 1). `det(M_bad) ≈ 0` because `Z_flat = [0.5; 0.866; 0]` lies entirely in the XY plane — the three vectors are coplanar. For the CNC controller, this means: no commanded Z-axis move will actually produce motion out of the XY plane. The determinant is the **controllability test**: $\\det \\neq 0$ guarantees the machine can reach any point in 3D; $\\det = 0$ means the workspace is dimensionally degenerate.',
               ],
               code: `% Three axis direction vectors of a CNC machine
 % Good: X, Y, Z axes are orthogonal
@@ -225,6 +227,7 @@ fprintf('\\nConclusion: det tests whether 3 motion axes span full 3D.\\n')`,
               prose: [
                 '`det(A*B)` computes the determinant of the product directly. `det(A)*det(B)` computes them separately and multiplies. Property 6 guarantees they are equal — this verifies that the volume-scaling factors compose multiplicatively: if $A$ scales volume by $\\det(A)$ and $B$ by $\\det(B)$, then $AB$ scales by their product.',
                 '`det(k*A)` scales every entry of $A$ by $k$, which scales every row by $k$. Since there are $n$ rows and each row-scale multiplies the determinant by $k$, the result is $\\det(kA) = k^n \\det(A)$. The code checks this for $k=3$ and $n=3$: `det(3*A)` should equal $3^3 \\cdot \\det(A) = 27 \\det(A)$. This is the most common misconception — students expect $k \\cdot \\det(A)$ but get $k^n \\cdot \\det(A)$.',
+                'The `fprintf` line printing `Common mistake: 3*det(A) = ... (WRONG for n>1)` explicitly shows the wrong answer for comparison. The key insight: scaling a $3\\times3$ matrix by 3 triples every row independently — the parallelpiped formed by the three column vectors is scaled by 3 in each of 3 independent directions, so volume scales by $3^3 = 27$. This is why $\\det(2I_n) = 2^n$, not 2 — the identity times 2 scales ALL dimensions simultaneously.',
               ],
               code: `A = [2 -1 0; 3 2 1; 0 1 4];
 B = [1 0 2; -1 3 0; 2 1 1];
@@ -264,6 +267,7 @@ fprintf('Scaling matches k^n rule: %d\\n', abs(det(k*A) - k^n*dA) < 1e-10)`,
               prose: [
                 '`np.linalg.det(A)` uses LU decomposition internally — not cofactor expansion. The manual block computes each $2 \\times 2$ minor: `M11 = 5*9 - 6*2 = 33`, `M12 = 4*9 - 6*7 = -6`, `M13 = 4*2 - 5*7 = -27`. Signs from $(-1)^{1+j}$: `1*M11 - 2*M12 + 3*M13 = 33 + 12 - 81 = -36`.',
                 'The matrix heatmap (left) shows the entries with color intensity. The right panel shows the three cofactor values as colored cells — their signed weighted sum equals the determinant. A lighter tile means a smaller cofactor contribution to the total.',
+                'The cofactor expansion connects directly to the **Leibniz formula**: $\\det(A) = \\sum_{\\sigma \\in S_n} \\text{sgn}(\\sigma) \\prod_i a_{i,\\sigma(i)}$. For $n=3$, there are $3! = 6$ permutations — exactly 6 products in the full expansion. Cofactor expansion along row 1 groups these 6 terms into 3 pairs (one pair per entry in row 1), each pair being a $2\\times2$ determinant. So cofactor expansion is just a structured way to sum the 6 Leibniz terms. For $n=4$ there are $4! = 24$ terms; for $n=10$ there are $10! = 3{,}628{,}800$ — which is why computers use LU for large matrices.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -305,6 +309,7 @@ plt.show()`,
               prose: [
                 'Sarrus\'s rule sums six products: three from forward diagonals (top-left to bottom-right) minus three from backward diagonals (top-right to bottom-left). These six terms correspond exactly to the $3! = 6$ permutations in the Leibniz formula $\\det(A) = \\sum_{\\sigma \\in S_3} \\text{sgn}(\\sigma) \\prod_i a_{i,\\sigma(i)}$. This is why it only works for $3\\times 3$: a $4\\times 4$ has $4! = 24$ terms, not 6.',
                 '`grid = np.hstack([A, A[:, :2]])` extends to a $3 \\times 5$ grid by copying the first two columns. Each forward diagonal uses column indices $[k, k+1, k+2]$ for $k = 0, 1, 2$ (going right and down). The backward diagonals use $[k+2, k+1, k]$ (going left and down). The plot shows each diagonal in a separate color with its product labeled — forward products are added, backward products are subtracted.',
+                'Sarrus\'s rule gives the same result as cofactor expansion because it is just a visual shortcut for the same 6 Leibniz-formula terms. **Critical warning**: Sarrus only works for exactly $3\\times3$. For $4\\times4$, copying the first 3 columns and tracing diagonals would produce 8 diagonal products — but there are $4! = 24$ Leibniz terms. The extra 16 terms are NOT captured by diagonals. This is why Sarrus\'s rule is taught only as a $3\\times3$ trick; cofactor expansion (or LU) is the general method.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -363,6 +368,7 @@ plt.show()`,
               prose: [
                 '`np.linalg.det(A @ B)` computes $\\det(AB)$ directly; `dA * dB` multiplies two separately computed determinants. They should match to floating-point precision — this is Property 6. The geometric meaning: if $A$ scales areas by $\\det(A)$ and $B$ by $\\det(B)$, composing them scales by the product.',
                 '`A_swapped = A[[1,0], :]` uses NumPy fancy indexing to reorder rows 0↔1. `det(A_swapped)` should equal $-\\det(A)$ — one row swap flips the sign. `T = [[3,1,5],[0,2,4],[0,0,7]]` is upper triangular: `det(T)` should equal $3 \\times 2 \\times 7 = 42$ (the triangular matrix rule). The bar chart plots LHS vs RHS for each property — matching heights confirm each property holds.',
+                'The bar chart makes equality visual: every pair of bars (blue = LHS, orange = RHS) should be the same height. A height difference means a property failed numerically — useful for debugging. `det(A^T) = det(A)` appears especially surprising (the matrix changes shape, but its determinant is invariant to transposing). This property implies: cofactor expansion along column $j$ gives the same result as expansion along row $j$ of $A^T$, which has the same determinant — proving column expansion is valid.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -395,6 +401,48 @@ ax.set_xticks(x); ax.set_xticklabels(properties, fontsize=10)
 ax.set_ylabel('Determinant value')
 ax.set_title('Determinant Properties: LHS vs RHS (should match)', fontsize=12)
 ax.legend(); ax.axhline(0, color='k', lw=0.5); ax.grid(True, alpha=0.3, axis='y')
+plt.tight_layout()
+plt.show()`,
+            },
+            {
+              id: 4,
+              cellTitle: 'Application: 3D volume test — do three crystal lattice vectors span a crystal cell?',
+              prose: [
+                '`np.linalg.det(L)` with `L` having the three lattice vectors as columns computes the **signed volume** of the unit cell (the parallelepiped spanned by the three vectors). For a real crystal, this volume is the volume of the repeating unit cell in ångströms cubed. `abs(np.linalg.det(L))` gives the positive volume. If `det = 0`, the three vectors are coplanar — they don\'t define a 3D crystal; they define a 2D layer.',
+                '`L_degenerate` with `a3 = 2*a1 + a2` makes column 3 a linear combination of columns 1 and 2 — the three vectors are coplanar. `np.linalg.det(L_degenerate)` returns 0 (or near-zero due to floating point). The plot shows both parallelpiped cases: the valid crystal (non-zero volume) as a 3D wireframe, and the degenerate case as a flat 2D shape.',
+                '`np.linalg.matrix_rank(L)` confirms the degenerate case: rank 2 instead of 3 — two independent directions remain, but the third is a linear combination. The determinant and rank tell the same story: $\\det \\neq 0 \\iff \\text{rank} = n \\iff$ the vectors are linearly independent and span the full 3D space. Both tests are used in crystallography software to validate that a proposed unit cell is non-degenerate before computing diffraction patterns.',
+              ],
+              code: `import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+
+# Three lattice vectors of a simple orthorhombic crystal (in Angstroms)
+a1 = np.array([3.0, 0.0, 0.0])  # a-axis
+a2 = np.array([0.0, 4.0, 0.0])  # b-axis
+a3 = np.array([0.0, 0.0, 5.0])  # c-axis
+L = np.column_stack([a1, a2, a3])
+
+vol = abs(np.linalg.det(L))
+print(f"Valid crystal: det = {np.linalg.det(L):.1f}, volume = {vol:.1f} Å³")
+print(f"  rank(L) = {np.linalg.matrix_rank(L)}  (3 = full rank = valid 3D cell)")
+
+# Degenerate case: a3 lies in the a1-a2 plane
+a3_bad = 2*a1 + a2
+L_bad = np.column_stack([a1, a2, a3_bad])
+print(f"\nDegenerate: det = {np.linalg.det(L_bad):.6f}  (≈ 0)")
+print(f"  rank(L_bad) = {np.linalg.matrix_rank(L_bad)}  (only 2 independent directions!)")
+
+# Plot both as parallelepipeds
+fig = plt.figure(figsize=(10, 5))
+for idx, (vecs, title) in enumerate([(L, f'Valid cell (vol={vol:.0f} ų)'), (L_bad, 'Degenerate (vol≈0)')]):
+    ax = fig.add_subplot(1, 2, idx+1, projection='3d')
+    o = np.zeros(3)
+    for v, c in zip(vecs.T, ['steelblue','darkorange','green']):
+        ax.quiver(*o, *v, color=c, arrow_length_ratio=0.15, lw=2)
+    ax.set_title(title, fontsize=11)
+    ax.set_xlim(0, 7); ax.set_ylim(0, 7); ax.set_zlim(0, 7)
+    ax.set_xlabel('X'); ax.set_ylabel('Y'); ax.set_zlabel('Z')
+plt.suptitle('det = volume of unit cell (0 = degenerate / coplanar)', fontsize=11)
 plt.tight_layout()
 plt.show()`,
             },

@@ -1203,6 +1203,42 @@ G01 Z-10. F60
 G00 Z5.
 M99`,
     },
+    {
+      id: "O0005",
+      name: "5-Axis Tilted Wall",
+      desc: "B-axis tilt 30°, side-wall milling pass",
+      code: `O0005 (5-AXIS TILTED WALL)
+(--- TOOL 1: 10mm END MILL ---)
+G21 G90 G17 G40 G49
+T1 M06
+G43 H1
+S3000 M03
+M08
+(--- RAPID TO HOME CLEARANCE ---)
+G28 G91 Z0.
+G90
+(--- TILT B-AXIS TO 30 DEG ---)
+G00 B30.
+G00 X-30. Y0.
+G00 Z10.
+(--- PLUNGE AND SIDE-WALL PASS ---)
+G01 Z-5. F100
+G01 X-30. Y-40. F200
+G01 X30. Y-40.
+G01 X30. Y0.
+G00 Z10.
+(--- SECOND DEPTH PASS ---)
+G01 Z-12. F100
+G01 X-30. F200
+G01 Y40.
+G01 X30.
+G00 Z10.
+(--- RETURN B TO 0, GO HOME ---)
+G00 B0.
+G28 G91 Z0.
+G90
+M09 M05 M30`,
+    },
   ],
   lathe: [
     {
@@ -4112,16 +4148,34 @@ export default function CNCSimPro() {
   // ms.pos is the single source of truth — updated by both step() and jog().
   // The path polylines (backplotPathPoints) are the trace lines; the tool
   // indicator always tracks live machine position so jogging moves it.
-  const backplotToolPosition = useMemo(
-    () => ({
-      machineX: mach.isLathe ? (ms.pos.Z ?? 0) : (ms.pos.X ?? 0),
-      machineY: mach.isLathe ? 0 : (ms.pos.Y ?? 0),
-      machineZ: mach.isLathe
-        ? (ms.pos.X ?? 0) / 2
-        : (ms.pos.Z ?? 0) + backplotZOffset,
-    }),
-    [mach.isLathe, ms.pos.X, ms.pos.Y, ms.pos.Z, backplotZOffset],
-  );
+  const backplotToolPosition = useMemo(() => {
+    // Compute live tool axis from B/C rotary angles (5-axis tilt)
+    const _bRad = ((ms.pos.B || 0) * Math.PI) / 180;
+    const _cRad = ((ms.pos.C || 0) * Math.PI) / 180;
+    const _cosB = Math.cos(_bRad), _sinB = Math.sin(_bRad);
+    const _cosC = Math.cos(_cRad), _sinC = Math.sin(_cRad);
+    // WCS offset for current work coordinate system
+    const _wcsOff = ms.offsets?.[ms.wcs] || {};
+    if (mach.isLathe) {
+      return {
+        machineX: (ms.pos.Z ?? 0) + (_wcsOff.Z || 0),
+        machineY: 0,
+        machineZ: ((ms.pos.X ?? 0) + (_wcsOff.X || 0)) / 2,
+        toolAxisX: 0, toolAxisY: 0, toolAxisZ: 1,
+        b: 0, c: 0,
+      };
+    }
+    return {
+      machineX: (ms.pos.X ?? 0) + (_wcsOff.X || 0),
+      machineY: (ms.pos.Y ?? 0) + (_wcsOff.Y || 0),
+      machineZ: (ms.pos.Z ?? 0) + (_wcsOff.Z || 0) + backplotZOffset,
+      toolAxisX: -_sinB * _cosC,
+      toolAxisY: -_sinB * _sinC,
+      toolAxisZ: _cosB,
+      b: ms.pos.B || 0,
+      c: ms.pos.C || 0,
+    };
+  }, [mach.isLathe, ms.pos.X, ms.pos.Y, ms.pos.Z, ms.pos.B, ms.pos.C, ms.wcs, ms.offsets, backplotZOffset]);
   const unitScale = ms.units === "inch" ? 25.4 : 1;
   const backplotToolDiameter =
     ((activeTool?.dia ?? 10) + (activeTool?.wearR ?? 0) * 2) / unitScale;
@@ -5765,6 +5819,11 @@ export default function CNCSimPro() {
                   transformMode={transformMode}
                   snapGrid={snapGrid}
                   facePickMode={facePickMode}
+                  machineHome={machDef?.machineHome ? {
+                    x: machDef.machineHome.X || 0,
+                    y: machDef.machineHome.Y || 0,
+                    z: machDef.machineHome.Z || 0,
+                  } : null}
                 />
               ) : (
                 <canvas
