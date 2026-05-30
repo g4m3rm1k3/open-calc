@@ -27,6 +27,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'How to Choose and Apply a Preconditioner (4 Steps)',
+        body: '1. **Diagnose the problem.** Compute $\\kappa(A)$ (or estimate it from eigenvalue bounds). Identify the source: if diagonal entries vary widely → diagonal scaling. If $A$ is SPD from an elliptic PDE → IC(0) or AMG. If $A$ is non-symmetric from convection → ILU(k). If $A$ is block-structured → block Jacobi.\n2. **Build the preconditioner.** Jacobi: $O(n)$, one pass over diagonal. ILU(0): $O(\\text{nnz})$, same sparsity as $A$. IC(0): same but enforces symmetry (SPD systems only). AMG: $O(n\\log n)$ setup, good for elliptic PDEs.\n3. **Apply $M^{-1}$ each Krylov step.** For ILU: solve $L\\mathbf{z}_1 = \\mathbf{r}$ (forward), then $U\\mathbf{z} = \\mathbf{z}_1$ (backward). This is one preconditioner application. For PCG (SPD): use split form $M = LL^\\top$; the implicit system is $L^{-1}AL^{-\\top}$.\n4. **Monitor and adapt.** If residual stagnates after few iterations: increase ILU fill level (try ILU(1) or ILU(2)), or switch to AMG. If applying $M^{-1}$ is too slow: revert to lighter preconditioner. Profile time per iteration, not just iteration count.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 4 of 5 — Iterative Solvers & Preconditioning',
         body: '**Previous (Lesson 3):** GMRES — Arnoldi orthogonalization, Hessenberg least squares, convergence for non-symmetric systems.\n**This lesson:** Preconditioning — Jacobi, SSOR, ILU(0), AMG; how to cluster eigenvalues and make Krylov methods practical.\n**Next (Lesson 5):** Sparse Direct Solvers — fill-in reduction, reordering, when to use direct vs iterative methods.',
@@ -248,6 +253,9 @@ kappa_prec = eig_prec(end)/eig_prec(1)
   rigor: {
     prose: [
       '**Block and domain decomposition preconditioners.** For parallel computation, the matrix can be partitioned into blocks: $A = \\begin{bmatrix}A_{11}&A_{12}\\\\A_{21}&A_{22}\\end{bmatrix}$. Block Jacobi preconditioner: $M = \\text{blkdiag}(A_{11}, A_{22})$ — solve each block independently (parallelizable). Block ILU: account for off-diagonal blocks. Domain decomposition preconditioners (Schwarz methods) solve the system independently on overlapping subdomains and combine solutions.',
+      '**SSOR and spectral analysis.** The Symmetric Successive Over-Relaxation (SSOR) preconditioner uses $M_{SSOR} = (D - \\omega L)D^{-1}(D - \\omega U)/\\omega(2-\\omega)$ where $\\omega \\in (0,2)$. For the 2D Poisson equation on an $n\\times n$ grid: $\\kappa(A) = O(n^2/h^2)$, while $\\kappa(M_{SSOR}^{-1}A) = O(h^{-1}) = O(n)$ — a factor of $n$ improvement. With optimal $\\omega$: CG+SSOR needs $O(n^{1/2}) = O(N^{1/4})$ iterations (vs $O(N^{1/2})$ unpreconditioned), for total work $O(N^{5/4})$. While not as good as AMG\'s $O(N)$, SSOR is easy to implement and widely used.',
+      '**Sparse Approximate Inverse (SPAI) and Neumann series.** An alternative to triangular ILU: directly approximate $M^{-1} \\approx A^{-1}$ as a sparse matrix. The Neumann expansion $A^{-1} = D^{-1}\\sum_{k=0}^\\infty (I - D^{-1}A)^k$ gives $M^{-1} \\approx D^{-1}(I + (I - D^{-1}A))$ (first-order truncation) as a sparse explicit approximate inverse. SPAI computes the sparse $M^{-1}$ that minimizes $\\|I - AM^{-1}\\|_F$ subject to a fixed sparsity pattern. Advantages: $M^{-1}$ is explicit and trivially parallelizable (no triangular solve required). Disadvantage: setup cost is high.',
+      '**Convergence theory for ILU-preconditioned GMRES.** For convection-diffusion operators $-\\varepsilon \\Delta u + \\mathbf{v} \\cdot \\nabla u = f$ discretized on a grid with step $h$: the Peclet number $Pe = |\\mathbf{v}|h/\\varepsilon$ controls difficulty. For $Pe \\leq 1$ (diffusion-dominated): ILU(0)+GMRES converges in $O(1/\\sqrt{h})$ iterations. For $Pe \\gg 1$ (convection-dominated): ILU(0) fails to cluster eigenvalues; one must use upwind discretization + ILU, or domain decomposition. This explains why CFD at high Reynolds numbers is hard: the Peclet number is large.',
     ],
     callouts: [
       {
@@ -325,11 +333,42 @@ kappa_prec = eig_prec(end)/eig_prec(1)
   challenges: [
     {
       id: 'ch-la9-004-1',
-      title: 'Why ILU(0) works',
+      title: 'ILU(0) = exact LU for tridiagonal matrices',
       difficulty: 'medium',
-      prompt: 'ILU(0) for a tridiagonal matrix $A$ produces an exact LU factorization (no fill-in dropped). Explain why and what $\\kappa(U^{-1}L^{-1}A)$ should be.',
-      hint: 'What is the sparsity pattern of $L$ and $U$ when $A$ is tridiagonal?',
-      solution: 'For a tridiagonal $A$, the LU factors $L$ (bidiagonal, lower) and $U$ (bidiagonal, upper) have the same sparsity pattern as $A$ — no fill-in is generated. So ILU(0) = exact LU for tridiagonal matrices, meaning $LU = A$ exactly, and $U^{-1}L^{-1}A = I$, $\\kappa = 1$. CG+ILU(0) converges in 1 step (in exact arithmetic) for tridiagonal systems.',
+      problem: 'Explain why ILU(0) applied to a tridiagonal matrix $A$ produces the exact LU factorization (no entries are dropped). What does this imply for $\\kappa(U^{-1}L^{-1}A)$ and the CG iteration count?',
+      walkthrough: [
+        { expression: 'A \\text{ tridiagonal} \\Rightarrow L \\text{ bidiagonal (lower)},\\quad U \\text{ bidiagonal (upper)}', annotation: 'In standard LU factorization of a tridiagonal $A$, the only non-zeros in $L$ are the sub-diagonal; in $U$, only the super-diagonal and diagonal. These match the sparsity of $A$.' },
+        { expression: '\\text{ILU(0): drop fill-in at positions where } a_{ij} = 0', annotation: 'For tridiagonal $A$, the LU elimination never creates fill-in beyond the sub/superdiagonal — the sparsity pattern already contains all needed positions.' },
+        { expression: '\\Rightarrow \\text{ILU(0) drops NO entries} \\Rightarrow LU = A \\text{ exactly}', annotation: 'No fill-in is created at any zero position, so no entries need to be dropped. The ILU(0) factors are identical to the exact LU factors.' },
+        { expression: 'U^{-1}L^{-1}A = U^{-1}L^{-1}(LU) = I \\Rightarrow \\kappa = 1', annotation: 'With the exact preconditioner $M = LU = A$, the preconditioned matrix is the identity.' },
+        { expression: '\\text{PCG+ILU(0) converges in 1 step (exact arithmetic)}', annotation: 'Condition number 1 means CG needs just 1 step. ILU(0) for tridiagonal is a free exact solve — O(n) setup and O(n) apply.' },
+      ],
+    },
+    {
+      id: 'ch-la9-004-2',
+      title: 'Diagonal preconditioner on a scaled system',
+      difficulty: 'easy',
+      problem: 'For $A = \\text{diag}(1, 100)$ and $\\mathbf{b} = (1, 100)^\\top$: (a) compute $\\kappa(A)$; (b) apply Jacobi preconditioner $M = \\text{diag}(A)$ and compute $\\kappa(M^{-1}A)$; (c) estimate CG iterations saved.',
+      walkthrough: [
+        { expression: '\\kappa(A) = \\lambda_{\\max}/\\lambda_{\\min} = 100/1 = 100', annotation: 'Eigenvalues of a diagonal matrix are its diagonal entries; condition number is ratio of largest to smallest.' },
+        { expression: 'M = \\text{diag}(1, 100),\\quad M^{-1} = \\text{diag}(1, 1/100)', annotation: 'Jacobi preconditioner: inverse of the diagonal of $A$.' },
+        { expression: 'M^{-1}A = \\text{diag}(1\\cdot1,\\ (1/100)\\cdot100) = \\text{diag}(1, 1) = I', annotation: 'The preconditioned matrix is the identity — perfect condition number.' },
+        { expression: '\\kappa(M^{-1}A) = 1', annotation: 'Condition number 1 is optimal.' },
+        { expression: 'k_{\\text{no prec}} \\approx \\frac{1}{2}\\sqrt{100}\\ln(2 \\times 10^6) \\approx 72 \\text{ iters},\\quad k_{\\text{Jacobi}} = 1 \\text{ iter}', annotation: 'Without preconditioner: $\\approx 72$ CG steps. With Jacobi: 1 step. This extreme savings occurs because the poor conditioning was entirely due to diagonal scaling.' },
+      ],
+    },
+    {
+      id: 'ch-la9-004-3',
+      title: 'Split preconditioning preserves SPD',
+      difficulty: 'hard',
+      problem: 'If $A \\succ 0$ (symmetric positive definite) and $M = LL^\\top$ (Cholesky), show that the split-preconditioned matrix $\\hat{A} = L^{-1}AL^{-\\top}$ is symmetric positive definite. Why does this matter for CG?',
+      walkthrough: [
+        { expression: '\\hat{A} = L^{-1}AL^{-\\top}', annotation: 'Split preconditioning: left multiply by $L^{-1}$, right multiply by $L^{-\\top}$. This is not the same as left preconditioning $M^{-1}A$.' },
+        { expression: '\\hat{A}^\\top = (L^{-1}AL^{-\\top})^\\top = (L^{-\\top})^\\top A^\\top (L^{-1})^\\top = L^{-1}A^\\top L^{-\\top}', annotation: 'Transpose: $(ABC)^\\top = C^\\top B^\\top A^\\top$.' },
+        { expression: 'A = A^\\top \\Rightarrow \\hat{A}^\\top = L^{-1}AL^{-\\top} = \\hat{A}', annotation: 'Since $A$ is symmetric, $\\hat{A}$ is also symmetric. ✓' },
+        { expression: '\\forall \\mathbf{v} \\neq 0: \\mathbf{v}^\\top \\hat{A}\\mathbf{v} = \\mathbf{v}^\\top L^{-1}AL^{-\\top}\\mathbf{v} = (L^{-\\top}\\mathbf{v})^\\top A (L^{-\\top}\\mathbf{v}) > 0', annotation: '$A \\succ 0$ means $\\mathbf{w}^\\top A\\mathbf{w} > 0$ for any $\\mathbf{w} \\neq 0$. Set $\\mathbf{w} = L^{-\\top}\\mathbf{v}$ — nonzero since $L$ is invertible.' },
+        { expression: '\\hat{A} \\succ 0 \\Rightarrow \\text{CG applies to } \\hat{A}\\hat{\\mathbf{x}} = L^{-1}\\mathbf{b}', annotation: 'The split-preconditioned system is SPD — CG is valid. PCG implements this implicitly without forming $\\hat{A}$ explicitly.' },
+      ],
     },
   ],
 
@@ -482,6 +521,29 @@ kappa_prec = eig_prec(end)/eig_prec(1)
       whyThisTechniqueWins: 'The diagonal of $H + \\lambda I$ varies significantly across layers (different learning rates per parameter). Diagonal preconditioning reduces $\\kappa$ substantially for "scale-separated" Hessians. This is the basis for adaptive optimizers like Adam, which maintain diagonal Hessian estimates.',
     },
   ],
+
+  semantics: {
+    core: [
+      { symbol: '\\kappa(M^{-1}A)', meaning: 'Preconditioned condition number — the quantity that controls Krylov convergence rate. A good preconditioner makes this close to 1.' },
+      { symbol: 'M = LU \\text{ with dropped fill-in}', meaning: 'ILU($k$) factorization — $L,U$ have the sparsity of $A$ plus $k$ levels of fill. ILU(0) keeps only original non-zeros; ILU(1) allows one extra fill level per row.' },
+      { symbol: '\\hat{A} = L^{-1}AL^{-\\top}', meaning: 'Split preconditioned system (when $M = LL^\\top$) — explicitly SPD even when $M^{-1}A$ is not symmetric. PCG applies CG to this system implicitly.' },
+      { symbol: 'M_{left}^{-1}A\\mathbf{x} = M_{left}^{-1}\\mathbf{b}', meaning: 'Left preconditioning — residual minimized is $\\|M^{-1}\\mathbf{r}\\|$; the preconditioned residual, not the true one.' },
+      { symbol: 'AM_{right}^{-1}\\mathbf{y} = \\mathbf{b},\\ \\mathbf{x} = M_{right}^{-1}\\mathbf{y}', meaning: 'Right preconditioning — true residual $\\|\\mathbf{b}-A\\mathbf{x}\\|$ is minimized. Preferred for GMRES so convergence is measured in meaningful units.' },
+      { symbol: 'A_c = RAP', meaning: 'AMG coarse-grid operator — $R$ restricts fine to coarse, $P = R^\\top$ prolongates. V-cycle applies fine smoothing, restrict, coarse solve, prolongate, fine smooth.' },
+    ],
+    rulesOfThumb: [
+      'Start with ILU(0); if it stagnates after 50 iterations, try ILU(1) or SSOR with optimal $\\omega$.',
+      'Diagonal scaling (Jacobi preconditioner) only helps when the large $\\kappa$ is caused by widely varying diagonal entries — check diagonal range first.',
+      'For SPD systems: use IC(0) (incomplete Cholesky) not ILU(0) — IC preserves symmetry and is half the storage.',
+      'AMG is the gold standard for elliptic PDEs ($\\kappa$ bounded independent of $n$), but has high setup cost — worth it when solving multiple times.',
+      'Profile wall time, not iteration count: ILU(2) may converge in half the iterations of ILU(0) but cost 3× per iteration — making it slower overall.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: ['la7-003', 'la9-001'],
+    futureLinks: ['la9-005', 'la10-001'],
+  },
 
   debugging: [
     {

@@ -27,6 +27,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'How to Apply the Conjugate Gradient Method (5 Steps)',
+        body: '1. **Verify $A$ is SPD.** Check $A = A^\\top$ and that all eigenvalues are positive (or that $A$ arises from a positive definite assembly). CG will diverge or produce nonsense if $A$ is not SPD.\n2. **Initialize.** Compute residual $\\mathbf{r}_0 = \\mathbf{b} - A\\mathbf{x}_0$ (use $\\mathbf{x}_0 = \\mathbf{0}$ if no better guess). Set direction $\\mathbf{d}_0 = \\mathbf{r}_0$. Store $\\rho_0 = \\mathbf{r}_0^\\top \\mathbf{r}_0$.\n3. **Compute step length.** One matrix-vector product: $\\mathbf{q} = A\\mathbf{d}_k$. Then $\\alpha_k = \\rho_k / (\\mathbf{d}_k^\\top \\mathbf{q})$. This is the EXACT minimizer of $f(\\mathbf{x}_k + \\alpha \\mathbf{d}_k)$ along direction $\\mathbf{d}_k$.\n4. **Update iterate and residual.** $\\mathbf{x}_{k+1} = \\mathbf{x}_k + \\alpha_k \\mathbf{d}_k$. $\\mathbf{r}_{k+1} = \\mathbf{r}_k - \\alpha_k \\mathbf{q}$. Reuse $\\mathbf{q}$ from step 3 — no extra matrix-vector product needed.\n5. **Update direction and loop.** $\\rho_{k+1} = \\mathbf{r}_{k+1}^\\top \\mathbf{r}_{k+1}$. $\\beta_k = \\rho_{k+1}/\\rho_k$. $\\mathbf{d}_{k+1} = \\mathbf{r}_{k+1} + \\beta_k \\mathbf{d}_k$. Stop when $\\sqrt{\\rho_{k+1}} < \\text{tol} \\cdot \\|\\mathbf{b}\\|$.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 2 of 5 — Iterative Solvers & Preconditioning',
         body: '**Previous (Lesson 1):** Jacobi and Gauss-Seidel — stationary iterations, matrix splitting, spectral radius convergence criterion.\n**This lesson:** Conjugate Gradient — Krylov subspace optimization, $A$-conjugate directions, $\\sqrt{\\kappa}$ convergence rate, eigenvalue clustering.\n**Next (Lesson 3):** GMRES — Krylov methods for non-symmetric systems via Arnoldi orthogonalization.',
@@ -259,6 +264,9 @@ disp('sqrt(kappa) heuristic:')
   rigor: {
     prose: [
       '**Lanczos connection.** Running CG on $A$ implicitly builds an orthogonal tridiagonalization $T_k = Q_k^\\top A Q_k$ (Lanczos process). The CG iterates are the solutions of $T_k \\mathbf{y}_k = \\|\\mathbf{r}_0\\|\\mathbf{e}_1$. In finite arithmetic, orthogonality is lost (Lanczos breakdown) — practical implementations use reorthogonalization. The Lanczos eigenvalues (Ritz values) also give excellent estimates of the eigenvalues of $A$.',
+      '**Preconditioned CG.** To accelerate convergence, replace the standard inner product with the $M$-inner product where $M \\approx A$ is a symmetric positive definite preconditioner: $\\langle \\mathbf{u}, \\mathbf{v} \\rangle_M = \\mathbf{u}^\\top M^{-1}\\mathbf{v}$. The preconditioned CG (PCG) iterates solve $M^{-1}A\\mathbf{x} = M^{-1}\\mathbf{b}$ but in the $M$-norm, and converge at rate $(\\sqrt{\\kappa(M^{-1}A)}-1)/(\\sqrt{\\kappa(M^{-1}A)}+1)$. Good preconditioners: incomplete Cholesky (IC or ICC), SSOR, algebraic multigrid (AMG). PCG requires one extra solve $M\\mathbf{z} = \\mathbf{r}$ per iteration — cheap if $M$ has sparse triangular factors.',
+      '**Finite precision loss of orthogonality.** In exact arithmetic, the Krylov vectors $\\{\\mathbf{r}_0, A\\mathbf{r}_0, \\ldots\\}$ are theoretically orthogonal after each CG step. In floating point, round-off causes gradual loss of $A$-conjugacy: the effective rank of the Krylov basis grows more slowly than $k$, and CG may need more than $m$ steps even for a matrix with $m$ distinct eigenvalues. Practical strategies: (1) accept some extra iterations; (2) use the true residual $\\mathbf{r} = \\mathbf{b} - A\\mathbf{x}$ (recomputed from scratch every 50 steps) to detect stagnation; (3) use the Lanczos-based MINRES with selective reorthogonalization.',
+      '**Nonlinear CG and optimization.** The Fletcher-Reeves (FR) formula $\\beta_k = \\|\\mathbf{g}_{k+1}\\|^2/\\|\\mathbf{g}_k\\|^2$ (where $\\mathbf{g}_k = \\nabla f(\\mathbf{x}_k)$) generalizes linear CG to nonlinear objective functions. The Polak-Ribière (PR) variant $\\beta_k = \\mathbf{g}_{k+1}^\\top(\\mathbf{g}_{k+1} - \\mathbf{g}_k)/\\|\\mathbf{g}_k\\|^2$ is preferred in practice — it resets the direction when $\\beta_k < 0$, avoiding convergence to saddle points. Nonlinear CG underpins training algorithms for neural networks (CG-based optimizers) and is a core tool in large-scale nonlinear optimization.',
     ],
     callouts: [
       {
@@ -294,11 +302,47 @@ disp('sqrt(kappa) heuristic:')
   challenges: [
     {
       id: 'ch-la9-002-1',
-      title: 'Steepest descent vs CG',
+      title: 'Steepest descent vs CG convergence rate',
       difficulty: 'medium',
-      prompt: 'Steepest descent (gradient descent) uses $\\mathbf{d}_k = \\mathbf{r}_k$ (restart direction each step) instead of the conjugate direction. Show it does NOT have the Krylov optimality property.',
-      hint: 'Steepest descent does not maintain $A$-orthogonality between directions.',
-      solution: 'Steepest descent picks $\\mathbf{x}_{k+1}$ that minimizes $f$ along $\\mathbf{r}_k$, but does not maintain any orthogonality of directions. New residual $\\mathbf{r}_{k+1} \\perp \\mathbf{r}_k$ (ordinary inner product), but the search directions are not $A$-orthogonal. As a result, the iterates do not minimize the error over the entire Krylov subspace — they zig-zag, converging at rate $((\\kappa-1)/(\\kappa+1))^{2k}$ vs CG\'s $(\\sqrt{\\kappa}-1)^{2k}/(\\sqrt{\\kappa}+1)^{2k}$. For $\\kappa = 100$: steepest descent convergence factor 0.98, CG 0.82 — CG is dramatically faster.',
+      problem: 'Compare the convergence factor of steepest descent to CG for $\\kappa = 100$. By how many iterations does CG beat steepest descent to reach error $10^{-6}$?',
+      walkthrough: [
+        { expression: '\\text{Steepest descent factor: } \\rho_{SD} = \\left(\\frac{\\kappa-1}{\\kappa+1}\\right)^2 = \\left(\\frac{99}{101}\\right)^2 \\approx 0.9610', annotation: 'Steepest descent error reduces by factor $\\rho_{SD}$ per step; for $\\kappa=100$ this is close to 1 — very slow.' },
+        { expression: '\\text{CG factor: } \\rho_{CG} = \\left(\\frac{\\sqrt{\\kappa}-1}{\\sqrt{\\kappa}+1}\\right)^2 = \\left(\\frac{9}{11}\\right)^2 \\approx 0.6694', annotation: 'CG uses $\\sqrt{\\kappa}$ in the formula — for $\\kappa=100$, $\\sqrt{\\kappa}=10$.' },
+        { expression: 'k_{SD} = \\log(10^{-6}/2)/\\log(0.9610) \\approx 370', annotation: 'Steepest descent needs about 370 iterations.' },
+        { expression: 'k_{CG} = \\log(10^{-6}/2)/\\log(0.6694) \\approx 34', annotation: 'CG needs only about 34 iterations. The $\\sqrt{\\kappa}$ vs $\\kappa$ difference is enormous.' },
+        { expression: '370 / 34 \\approx 11\\times \\text{ speedup}', annotation: 'CG is about 11 times faster for $\\kappa = 100$. As $\\kappa$ grows, CG advantage grows as $\\sqrt{\\kappa}$.' },
+      ],
+    },
+    {
+      id: 'ch-la9-002-2',
+      title: 'Verify $A$-conjugacy after step 1',
+      difficulty: 'easy',
+      problem: 'For $A = \\begin{bmatrix}4&1\\\\1&3\\end{bmatrix}$, $\\mathbf{x}_0 = \\mathbf{0}$, $\\mathbf{b} = (9,7)^\\top$: compute the first CG step and verify that $\\mathbf{d}_1^\\top A \\mathbf{d}_0 = 0$ ($A$-conjugacy).',
+      walkthrough: [
+        { expression: '\\mathbf{r}_0 = (9,7)^\\top,\\quad \\mathbf{d}_0 = (9,7)^\\top', annotation: 'Initial residual = initial direction.' },
+        { expression: 'A\\mathbf{d}_0 = (4\\cdot9+1\\cdot7,\\ 1\\cdot9+3\\cdot7)^\\top = (43,30)^\\top', annotation: 'Matrix-vector product.' },
+        { expression: '\\alpha_0 = \\frac{\\mathbf{r}_0^\\top\\mathbf{r}_0}{\\mathbf{d}_0^\\top A\\mathbf{d}_0} = \\frac{81+49}{9\\cdot43+7\\cdot30} = \\frac{130}{597}', annotation: 'Optimal step length.' },
+        { expression: '\\mathbf{r}_1 = \\mathbf{r}_0 - \\alpha_0 A\\mathbf{d}_0 = (9,7)^\\top - \\frac{130}{597}(43,30)^\\top \\approx (-0.366, 0.488)^\\top', annotation: 'New residual.' },
+        { expression: '\\beta_0 = \\frac{\\mathbf{r}_1^\\top\\mathbf{r}_1}{\\mathbf{r}_0^\\top\\mathbf{r}_0} \\approx \\frac{0.372}{130} \\approx 0.00286', annotation: 'Direction update coefficient.' },
+        { expression: '\\mathbf{d}_1 = \\mathbf{r}_1 + \\beta_0 \\mathbf{d}_0 \\approx (-0.340, 0.508)^\\top', annotation: 'New conjugate direction.' },
+        { expression: '\\mathbf{d}_1^\\top A\\mathbf{d}_0 = (-0.340)(43) + (0.508)(30) \\approx -14.62 + 15.24 \\approx 0 \\checkmark', annotation: '$A$-conjugacy verified — the correction via $\\beta_0$ exactly removes the $A$-component along $\\mathbf{d}_0$.' },
+      ],
+    },
+    {
+      id: 'ch-la9-002-3',
+      title: 'CG terminates in 2 steps on a 3×3 matrix with 2 eigenvalues',
+      difficulty: 'hard',
+      problem: 'Let $A = \\text{diag}(1,1,4)$ and $\\mathbf{b} = (1,1,1)^\\top$. Show that CG starting from $\\mathbf{x}_0 = \\mathbf{0}$ converges in exactly 2 steps even though $n = 3$.',
+      walkthrough: [
+        { expression: '\\mathbf{r}_0 = (1,1,1)^\\top,\\quad \\mathbf{d}_0 = (1,1,1)^\\top', annotation: 'Initial residual and direction.' },
+        { expression: 'A\\mathbf{d}_0 = (1,1,4)^\\top', annotation: '$A$ is diagonal so $A\\mathbf{d}_0$ just scales each component.' },
+        { expression: '\\alpha_0 = \\frac{3}{1+1+4} = \\frac{3}{6} = \\frac{1}{2}', annotation: '$\\rho_0 = 1+1+1=3$; $\\mathbf{d}_0^\\top A\\mathbf{d}_0 = 1+1+4=6$.' },
+        { expression: '\\mathbf{x}_1 = (1/2, 1/2, 1/2)^\\top,\\quad \\mathbf{r}_1 = (1/2, 1/2, -1)^\\top', annotation: '$\\mathbf{r}_1 = (1,1,1) - (1/2)(1,1,4) = (1/2, 1/2, -1)$.' },
+        { expression: '\\beta_0 = \\frac{1/4+1/4+1}{3} = \\frac{3/2}{3} = 1/2', annotation: '$\\rho_1 = 1/4+1/4+1 = 3/2$; $\\beta_0 = (3/2)/3 = 1/2$.' },
+        { expression: '\\mathbf{d}_1 = (1/2+1/2,\\ 1/2+1/2,\\ -1+1/2)^\\top = (1,1,-1/2)^\\top', annotation: '$\\mathbf{d}_1 = \\mathbf{r}_1 + \\beta_0 \\mathbf{d}_0$.' },
+        { expression: 'A\\mathbf{d}_1 = (1,1,-2)^\\top,\\quad \\alpha_1 = \\frac{3/2}{1+1+1} = \\frac{1}{2}', annotation: '$\\mathbf{d}_1^\\top A\\mathbf{d}_1 = 1+1+1=3$; $\\alpha_1 = (3/2)/3 = 1/2$.' },
+        { expression: '\\mathbf{x}_2 = (1/2+1/2,\\ 1/2+1/2,\\ 1/2-1/4)^\\top = (1,1,1/4)^\\top = A^{-1}\\mathbf{b} \\checkmark', annotation: 'Exact solution: $A^{-1}\\mathbf{b} = \\text{diag}(1,1,1/4)(1,1,1)^\\top = (1,1,1/4)^\\top$. 2 steps for 2 distinct eigenvalues ✓' },
+      ],
     },
   ],
 
@@ -370,6 +414,29 @@ disp('sqrt(kappa) heuristic:')
       whyThisTechniqueWins: 'CG with AMG preconditioner: direct Cholesky has $O(n^{3/2})$ fill for 2D problems (too expensive at $n = 10^6$). Unpreconditioned CG needs $O(\\sqrt{n}) = O(1000)$ iterations. AMG reduces $\\kappa$ to $O(1)$, giving convergence in dozens of iterations.',
     },
   ],
+
+  semantics: {
+    core: [
+      { symbol: '\\mathcal{K}_k(A,\\mathbf{r}_0) = \\operatorname{span}\\{\\mathbf{r}_0, A\\mathbf{r}_0, \\ldots, A^{k-1}\\mathbf{r}_0\\}', meaning: '$k$-th Krylov subspace — the search space for the $k$-th CG iterate. Grows by one dimension per step.' },
+      { symbol: '\\langle \\mathbf{u},\\mathbf{v}\\rangle_A = \\mathbf{u}^\\top A\\mathbf{v}', meaning: '$A$-inner product (energy inner product) — the geometry in which CG performs its orthogonalization. Requires $A \\succ 0$.' },
+      { symbol: '\\alpha_k = \\frac{\\mathbf{r}_k^\\top\\mathbf{r}_k}{\\mathbf{d}_k^\\top A\\mathbf{d}_k}', meaning: 'Optimal CG step length — exact minimizer of $f(\\mathbf{x}_k + \\alpha \\mathbf{d}_k)$ along direction $\\mathbf{d}_k$. One matrix-vector product $A\\mathbf{d}_k$ per step.' },
+      { symbol: '\\beta_k = \\frac{\\mathbf{r}_{k+1}^\\top\\mathbf{r}_{k+1}}{\\mathbf{r}_k^\\top\\mathbf{r}_k}', meaning: 'Direction update coefficient — chosen to make $\\mathbf{d}_{k+1}$ $A$-conjugate to $\\mathbf{d}_k$. Requires only inner products, no extra matrix products.' },
+      { symbol: '\\|\\mathbf{e}^{(k)}\\|_A = \\sqrt{(\\mathbf{x}^*-\\mathbf{x}_k)^\\top A (\\mathbf{x}^*-\\mathbf{x}_k)}', meaning: 'Energy norm of the error — the quantity CG minimizes at each step. Equals the 2-norm for the preconditioned system.' },
+      { symbol: '\\|\\mathbf{e}^{(k)}\\|_A \\leq 2\\left(\\frac{\\sqrt{\\kappa}-1}{\\sqrt{\\kappa}+1}\\right)^k \\|\\mathbf{e}^{(0)}\\|_A', meaning: 'CG convergence bound — the factor $(\\sqrt{\\kappa}-1)/(\\sqrt{\\kappa}+1)$ replaces the $(\\kappa-1)/(\\kappa+1)$ factor of steepest descent, giving $\\sqrt{\\kappa}$ vs $\\kappa$ in the exponent.' },
+    ],
+    rulesOfThumb: [
+      'CG converges in exactly $m$ steps in exact arithmetic when $A$ has $m$ distinct eigenvalues — matrix size $n$ does not matter.',
+      'Practical iteration count is $O(\\sqrt{\\kappa})$ — a factor of $\\sqrt{\\kappa}$ better than stationary methods ($O(\\kappa)$ iterations).',
+      'Each CG iteration costs exactly one matrix-vector product plus $O(n)$ vector operations — the dominant cost is the sparsity of $A$.',
+      'Preconditioning is almost always essential: for finite element problems, AMG preconditioned CG reduces $O(\\sqrt{n})$ to $O(1)$ iterations.',
+      'CG only stores 3 vectors ($\\mathbf{x}, \\mathbf{r}, \\mathbf{d}$) regardless of iteration count — $O(n)$ memory, unlike GMRES which stores the full Krylov basis.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: ['la5-003', 'la9-001'],
+    futureLinks: ['la9-003', 'la9-004'],
+  },
 
   debugging: [
     {

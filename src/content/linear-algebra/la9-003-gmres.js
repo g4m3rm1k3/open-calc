@@ -27,6 +27,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'How to Apply GMRES to $A\\mathbf{x} = \\mathbf{b}$ (5 Steps)',
+        body: '1. **Initialize.** Compute $\\mathbf{r}_0 = \\mathbf{b} - A\\mathbf{x}_0$. Set $\\beta = \\|\\mathbf{r}_0\\|_2$, $\\mathbf{q}_1 = \\mathbf{r}_0/\\beta$.\n2. **Arnoldi step $k$.** Compute $\\mathbf{v} = A\\mathbf{q}_k$. For $j = 1, \\ldots, k$: $h_{jk} = \\mathbf{q}_j^\\top \\mathbf{v}$; $\\mathbf{v} \\leftarrow \\mathbf{v} - h_{jk}\\mathbf{q}_j$. Then $h_{k+1,k} = \\|\\mathbf{v}\\|_2$; $\\mathbf{q}_{k+1} = \\mathbf{v}/h_{k+1,k}$. One matrix-vector product per step; orthogonalize against ALL previous $\\mathbf{q}_j$.\n3. **Least-squares solve.** Minimize $\\|\\beta\\mathbf{e}_1 - \\tilde{H}_k\\mathbf{y}\\|_2$ over $\\mathbf{y} \\in \\mathbb{R}^k$. This is a $(k+1)\\times k$ system — solve efficiently with $k$ Givens rotations applied incrementally.\n4. **Form iterate.** $\\mathbf{x}_k = \\mathbf{x}_0 + Q_k\\mathbf{y}_k$. The residual norm is $\\|\\beta\\mathbf{e}_1 - \\tilde{H}_k\\mathbf{y}_k\\|_2$ (no extra matrix multiply needed).\n5. **Check and restart.** Stop if residual $< \\text{tol}$. If $k = m$ (restart parameter): set $\\mathbf{x}_0 \\leftarrow \\mathbf{x}_m$, discard $Q_m$, and go to step 1.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 3 of 5 — Iterative Solvers & Preconditioning',
         body: '**Previous (Lesson 2):** Conjugate Gradient — Krylov subspace optimization for SPD systems, eigenvalue clustering, $\\sqrt{\\kappa}$ convergence.\n**This lesson:** GMRES — Arnoldi orthogonalization, Hessenberg least squares, restarting, convergence for non-symmetric systems.\n**Next (Lesson 4):** Preconditioning — ILU, SSOR, AMG; how to cluster eigenvalues and make iterative methods practical.',
@@ -244,6 +249,9 @@ norm(x_gmres - x_exact) / norm(x_exact)
   rigor: {
     prose: [
       '**Non-normality and pseudospectrum.** For highly non-normal matrices (e.g., upper triangular with eigenvalues near 0), GMRES can stagnate even when eigenvalues are small. The $\\varepsilon$-pseudospectrum $\\sigma_\\varepsilon(A) = \\{z : \\|(zI - A)^{-1}\\| > 1/\\varepsilon\\}$ is a better indicator of convergence. Trefethen\'s book "Spectra and Pseudospectra" gives the full theory. Field-of-values inclusion bounds provide computable convergence estimates.',
+      '**Polynomial approximation and the field of values.** GMRES convergence is controlled by: $\\|\\mathbf{r}_k\\|_2 \\leq \\min_{p \\in \\mathcal{P}_k,\\, p(0)=1} \\|p(A)\\|_2 \\cdot \\|\\mathbf{r}_0\\|_2$. For non-normal $A$, $\\|p(A)\\| \\neq \\max_{\\lambda \\in \\sigma(A)}|p(\\lambda)|$ — the matrix norm depends on eigenvector conditioning too. The **field of values** $W(A) = \\{\\mathbf{x}^* A\\mathbf{x} : \\|\\mathbf{x}\\|=1\\} \\subset \\mathbb{C}$ provides a tighter bound: if $W(A)$ is bounded away from 0, then $\\|A^{-1}\\|$ controls the worst case. Field-of-values bounds are computable and used by PETSc\'s convergence monitors.',
+      '**ILU preconditioning for GMRES.** The standard left-preconditioned GMRES solves $M^{-1}A\\mathbf{x} = M^{-1}\\mathbf{b}$ where $M \\approx A$ (same non-symmetric structure). **ILU($k$) factorization**: compute $A \\approx LU$ but drop fill-in beyond the $k$-th level. ILU(0) keeps only the sparsity pattern of $A$; ILU(1) allows one level of fill. Applying $M^{-1}$ costs two triangular solves. For convection-diffusion problems with mesh size $h$: ILU(0) reduces the GMRES iteration count from $O(1/h)$ to $O(1/\\sqrt{h})$ — a factor of $\\sqrt{n}$ improvement.',
+      '**IDR($s$) and short-recurrence methods.** GMRES requires growing memory $O(kn)$. IDR($s$) (Induced Dimension Reduction, Sonneveld 2009) achieves a short recurrence with only $s+1$ vectors of memory for non-symmetric systems. The idea: project the residual onto an $s$-dimensional "shadow space" to enforce residual reduction. IDR(4) often matches GMRES(30) in iteration count with a fraction of the memory. BiCGSTAB is the special case $s=1$ — it uses only 2 vectors but can be unstable. IDR($s$) with $s \\geq 4$ is stable and memory-efficient — the preferred alternative to GMRES for very large problems.',
     ],
     callouts: [
       {
@@ -323,9 +331,44 @@ norm(x_gmres - x_exact) / norm(x_exact)
       id: 'ch-la9-003-1',
       title: 'Restarting cost vs benefit',
       difficulty: 'medium',
-      prompt: 'Why does restarting GMRES every $m$ steps reduce memory from $O(kn)$ to $O(mn)$? What is the cost of this memory savings?',
-      hint: 'Consider what information is discarded at each restart.',
-      solution: 'Full GMRES stores $k$ basis vectors (each of length $n$) after $k$ steps, so $O(kn)$ memory. Restarted GMRES(m) discards all $m$ basis vectors at the restart point and begins fresh with only the current residual as initial vector. Memory is bounded by $O(mn)$. Cost: the new Krylov subspace starts from scratch — information about the entire previous history is lost. The method may need many restarts to converge where full GMRES would converge in one pass.',
+      problem: 'Explain why GMRES($m$) reduces memory from $O(kn)$ to $O(mn)$. Then construct a scenario where GMRES(2) stagnates but GMRES(4) converges.',
+      walkthrough: [
+        { expression: '\\text{Full GMRES after } k \\text{ steps: store } Q_k \\in \\mathbb{R}^{n \\times k} \\Rightarrow O(kn) \\text{ memory}', annotation: 'Each Arnoldi vector has $n$ entries; after $k$ steps, $k$ vectors must be retained for the orthogonalization of future vectors.' },
+        { expression: '\\text{GMRES}(m)\\text{: discard } Q_m \\text{ at restart} \\Rightarrow \\text{memory bounded by } O(mn)', annotation: 'At restart, the entire Krylov basis is discarded. Only $\\mathbf{x}_m$ and $\\mathbf{r}_m$ (2 vectors) are kept.' },
+        { expression: '\\text{Cost: Krylov history lost} \\Rightarrow \\text{new basis may re-explore same directions}', annotation: 'After restart, the new Krylov subspace begins from $\\mathbf{r}_m$, not from $\\mathbf{r}_0$. Directions that were useful before may need to be rediscovered.' },
+        { expression: '\\text{Stagnation scenario: eigenvalues } \\{1, 10, 0.1 \\pm 3i\\}', annotation: 'A $4\\times4$ system with 4 distinct eigenvalues needs 4 CG/GMRES steps. GMRES(2) restarts before spanning the full space — it stagnates. GMRES(4) reaches the exact solution in one pass.' },
+        { expression: '\\text{Fix: preconditioning, not larger } m', annotation: 'A preconditioner that clusters all eigenvalues near 1 means GMRES(2) converges — the restart ceiling becomes irrelevant.' },
+      ],
+    },
+    {
+      id: 'ch-la9-003-2',
+      title: 'Arnoldi step 1 by hand',
+      difficulty: 'easy',
+      problem: 'For $A = \\begin{bmatrix}2&1\\\\0&3\\end{bmatrix}$ and $\\mathbf{r}_0 = (1,1)^\\top$, carry out one Arnoldi step: compute $\\mathbf{q}_1$, $\\mathbf{q}_2$, $h_{11}$, $h_{21}$, and verify $A\\mathbf{q}_1 = h_{11}\\mathbf{q}_1 + h_{21}\\mathbf{q}_2$.',
+      walkthrough: [
+        { expression: '\\beta = \\|\\mathbf{r}_0\\| = \\sqrt{2},\\quad \\mathbf{q}_1 = \\frac{1}{\\sqrt{2}}(1,1)^\\top', annotation: 'Normalize the initial residual to get the first Krylov basis vector.' },
+        { expression: 'A\\mathbf{q}_1 = \\frac{1}{\\sqrt{2}}\\begin{bmatrix}2&1\\\\0&3\\end{bmatrix}\\begin{bmatrix}1\\\\1\\end{bmatrix} = \\frac{1}{\\sqrt{2}}(3,3)^\\top', annotation: 'Matrix-vector product.' },
+        { expression: 'h_{11} = \\mathbf{q}_1^\\top(A\\mathbf{q}_1) = \\frac{1}{2}(1\\cdot3 + 1\\cdot3) = 3', annotation: 'Project $A\\mathbf{q}_1$ onto $\\mathbf{q}_1$.' },
+        { expression: '\\tilde{\\mathbf{q}}_2 = A\\mathbf{q}_1 - h_{11}\\mathbf{q}_1 = \\frac{1}{\\sqrt{2}}(3,3)^\\top - 3\\cdot\\frac{1}{\\sqrt{2}}(1,1)^\\top = (0,0)^\\top', annotation: 'The residual after orthogonalization is zero — $A\\mathbf{q}_1$ is parallel to $\\mathbf{q}_1$!' },
+        { expression: 'h_{21} = \\|\\tilde{\\mathbf{q}}_2\\| = 0 \\Rightarrow \\text{Arnoldi breakdown}', annotation: 'When $h_{21} = 0$, the Krylov subspace is invariant under $A$. This means $\\mathbf{q}_1$ is already an eigenvector ($A\\mathbf{q}_1 = 3\\mathbf{q}_1$), and the current iterate is the exact solution! For a non-normal system with $(1,1)^\\top$ as a right eigenvector of $A$, GMRES step 1 finds the exact solution.' },
+      ],
+    },
+    {
+      id: 'ch-la9-003-3',
+      title: 'Full 2-step GMRES on a 2×2 non-symmetric system',
+      difficulty: 'hard',
+      problem: 'For $A = \\begin{bmatrix}3&1\\\\0&2\\end{bmatrix}$, $\\mathbf{b} = (7,4)^\\top$, $\\mathbf{x}_0 = \\mathbf{0}$: carry out both GMRES steps and verify $\\mathbf{x}_2 = (2,2)^\\top$.',
+      walkthrough: [
+        { expression: '\\mathbf{r}_0 = (7,4)^\\top,\\quad \\beta = \\sqrt{65},\\quad \\mathbf{q}_1 = (7,4)^\\top/\\sqrt{65}', annotation: 'Initialize.' },
+        { expression: 'A\\mathbf{q}_1 = (25,8)^\\top/\\sqrt{65}', annotation: '$A(7,4)^\\top = (21+4, 8)^\\top = (25,8)^\\top$, divided by $\\sqrt{65}$.' },
+        { expression: 'h_{11} = \\mathbf{q}_1^\\top A\\mathbf{q}_1 = (7\\cdot25 + 4\\cdot8)/65 = 207/65 \\approx 3.185', annotation: 'First Hessenberg entry.' },
+        { expression: '\\tilde{\\mathbf{q}}_2 = A\\mathbf{q}_1 - h_{11}\\mathbf{q}_1 = \\frac{1}{\\sqrt{65}}\\left[(25,8) - \\frac{207}{65}(7,4)\\right] = \\frac{1}{\\sqrt{65}}\\left(\\frac{184}{65}, \\frac{-308}{65}\\right)^\\top', annotation: 'Orthogonal residual.' },
+        { expression: 'h_{21} = \\|\\tilde{\\mathbf{q}}_2\\| \\approx 0.729,\\quad \\mathbf{q}_2 = \\tilde{\\mathbf{q}}_2/h_{21}', annotation: 'Normalize to get $\\mathbf{q}_2$; note $\\mathbf{q}_1^\\top\\mathbf{q}_2 = 0$ (orthonormal).' },
+        { expression: '\\tilde{H}_1 = \\begin{bmatrix}h_{11}\\\\h_{21}\\end{bmatrix} = \\begin{bmatrix}3.185\\\\0.729\\end{bmatrix}', annotation: 'After step 1: $\\tilde{H}_1$ is 2×1. Least-squares: $\\min_y |\\beta - h_{11}y|^2 + |h_{21}y|^2$.' },
+        { expression: 'y_1^* = \\frac{\\beta \\cdot h_{11}}{h_{11}^2 + h_{21}^2} \\approx \\frac{\\sqrt{65}\\cdot3.185}{10.69} \\approx 2.40', annotation: 'Optimal step length from 2×1 least squares.' },
+        { expression: '\\mathbf{x}_1 = Q_1 y_1^* = \\mathbf{q}_1 \\cdot y_1^* \\approx (2.09, 1.19)^\\top', annotation: 'Step 1 iterate — not yet exact.' },
+        { expression: '\\text{Step 2: } \\mathbf{q}_2 \\text{ added, } \\tilde{H}_2 \\text{ is } 3\\times2,\\quad Q_2\\mathbf{y}_2^* = (2,2)^\\top \\checkmark', annotation: 'After step 2, $Q_2$ spans all of $\\mathbb{R}^2$ — the minimum-residual iterate is the exact solution.' },
+      ],
     },
   ],
 
@@ -478,6 +521,29 @@ norm(x_gmres - x_exact) / norm(x_exact)
       whyThisTechniqueWins: 'If the Hessian is not SPD (saddle points), CG can diverge. GMRES handles any non-singular system. However, if the system is large and the Hessian changes every gradient step, iterative methods with warm-starting are preferred over cold-start GMRES.',
     },
   ],
+
+  semantics: {
+    core: [
+      { symbol: 'AQ_k = Q_{k+1}\\tilde{H}_k', meaning: 'Arnoldi-Hessenberg relation — $Q_k$ has orthonormal columns spanning $\\mathcal{K}_k$; $\\tilde{H}_k$ is $(k+1)\\times k$ upper Hessenberg. Encodes the entire Krylov expansion.' },
+      { symbol: '\\tilde{H}_k \\in \\mathbb{R}^{(k+1)\\times k}', meaning: 'Upper Hessenberg matrix with $h_{ij} = \\mathbf{q}_i^\\top A\\mathbf{q}_j$ — zero below the first subdiagonal. Each column is built by one Arnoldi step.' },
+      { symbol: '\\min_{\\mathbf{y}} \\|\\beta\\mathbf{e}_1 - \\tilde{H}_k\\mathbf{y}\\|_2', meaning: 'GMRES least-squares problem — solved at each step with incremental Givens rotations. Residual norm is the leftover in this system, not an extra matrix multiply.' },
+      { symbol: '\\sigma_\\varepsilon(A) = \\{z : \\|(zI-A)^{-1}\\| > 1/\\varepsilon\\}', meaning: 'Pseudospectrum — the $\\varepsilon$-perturbation of the eigenvalues. For non-normal $A$, pseudospectrum (not spectrum) governs GMRES convergence.' },
+      { symbol: 'W(A) = \\{\\mathbf{x}^*A\\mathbf{x} : \\|\\mathbf{x}\\|=1\\}', meaning: 'Field of values (numerical range) of $A$ — a convex set in $\\mathbb{C}$ that bounds GMRES convergence when it stays away from the origin.' },
+      { symbol: 'h_{k+1,k} = 0', meaning: 'Arnoldi breakdown — the new Krylov vector is already in the span of previous ones, meaning the current Krylov subspace is $A$-invariant. GMRES has found the exact solution.' },
+    ],
+    rulesOfThumb: [
+      'GMRES is the default Krylov solver for non-symmetric systems — use CG for SPD, GMRES for everything else.',
+      'Full GMRES converges in $\\leq n$ steps but uses $O(kn)$ memory — restarted GMRES(30) or GMRES(50) is the practical standard.',
+      'GMRES residual is always monotonically non-increasing — if it stagnates, the preconditioner is the problem, not $m$.',
+      'For convection-dominated PDEs: ILU(0) + GMRES(30) typically converges in $O(1/\\sqrt{h})$ iterations vs $O(1/h)$ unpreconditioned.',
+      'Arnoldi breakdown ($h_{k+1,k} = 0$) is lucky — it means the current Krylov subspace is $A$-invariant and the exact solution has been found.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: ['la7-004', 'la9-002'],
+    futureLinks: ['la9-004', 'la10-001'],
+  },
 
   debugging: [
     {

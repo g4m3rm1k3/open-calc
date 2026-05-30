@@ -27,6 +27,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'How to Analyze a Bounded Operator on a Hilbert Space (4 Steps)',
+        body: '1. **Check boundedness and compute the operator norm.** Verify $\\|T\\mathbf{x}\\| \\leq C\\|\\mathbf{x}\\|$ for all $\\mathbf{x}$. The operator norm is $\\|T\\| = \\sup_{\\|\\mathbf{x}\\|=1}\\|T\\mathbf{x}\\|$ — for matrices this is the largest singular value $\\sigma_1$.\n2. **Find the spectrum.** Classify each $\\lambda$ where $(T-\\lambda I)$ fails to be invertible: (a) **Point spectrum**: $\\ker(T-\\lambda I) \\neq 0$ — $\\lambda$ is an eigenvalue. (b) **Continuous spectrum**: $(T-\\lambda I)$ injective but range only dense. (c) **Residual spectrum**: range not dense. For matrices: spectrum = set of eigenvalues.\n3. **Check normality.** If $T^*T = TT^*$ (normal), then $r(T) = \\|T\\|$ and eigenvectors for distinct eigenvalues are orthogonal. If $T = T^*$ (self-adjoint), all eigenvalues are real. These properties fail for non-normal operators (like Jordan blocks).\n4. **Apply the spectral theorem.** For a compact self-adjoint operator: $T = \\sum_i \\lambda_i \\langle \\cdot, \\mathbf{e}_i \\rangle \\mathbf{e}_i$ (eigenbasis expansion). Apply the functional calculus: $f(T) = \\sum_i f(\\lambda_i) \\langle \\cdot, \\mathbf{e}_i \\rangle \\mathbf{e}_i$ for any function $f$. For matrices: $f(A) = Qf(\\Lambda)Q^{-1}$ (diagonal case) or $Qf(\\Lambda)Q^\\top$ (symmetric case).',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 4 of 5 — Advanced Theory',
         body: '**Previous (Lesson 3):** Exterior Algebra — antisymmetric tensors, wedge product, determinants as volume, differential forms.\n**This lesson:** Operator Theory — bounded operators, operator norm, spectrum (point/continuous/residual), compact operators, spectral theorem.\n**Next (Lesson 5):** Banach and Hilbert Spaces — completeness, projections, Riesz representation, $L^2$ space, Fourier series.',
@@ -215,6 +220,9 @@ S(k+1,k+1)  % should match
   rigor: {
     prose: [
       '**Fredholm operators and index.** $T \\in \\mathcal{B}(H)$ is **Fredholm** if $\\ker T$ and $H/\\overline{\\text{im} T}$ are both finite-dimensional. The **Fredholm index** $\\text{ind}(T) = \\dim\\ker T - \\dim\\text{coker}T$ is stable under compact perturbations. Fredholm operators are generalizations of linear maps between finite-dimensional spaces (where index = dimension formula from rank-nullity). The Atiyah-Singer index theorem computes indices of elliptic differential operators geometrically.',
+      '**General spectral theorem via spectral measures.** For any bounded normal operator $T$ on a Hilbert space, there exists a projection-valued measure $E$ (spectral measure) on $\\sigma(T) \\subseteq \\mathbb{C}$ such that $T = \\int_{\\sigma(T)} \\lambda\\,dE(\\lambda)$. For a compact self-adjoint operator, $E$ is atomic: supported on isolated eigenvalues, and the integral reduces to $T = \\sum_i \\lambda_i E_i$ where $E_i$ is the projection onto the $\\lambda_i$-eigenspace. For a multiplication operator $Mf = m(x)f(x)$ on $L^2(\\mu)$, the spectral measure is $E(S)f = \\chi_{m^{-1}(S)} f$ — characteristic function of the preimage. Every normal operator is unitarily equivalent to a multiplication operator on some $L^2$ space — this is the abstract content of the spectral theorem, and it reduces the analysis of any normal operator to the analysis of a scalar-valued function.',
+      '**C*-algebras and abstract operator theory.** A **C*-algebra** is a Banach algebra $\\mathcal{A}$ with an involution $*$ satisfying $\\|a^*a\\| = \\|a\\|^2$. The two canonical examples are $\\mathcal{B}(H)$ (all bounded operators on $H$) and $C(X)$ (continuous functions on a compact Hausdorff space $X$, with $f^* = \\bar{f}$). The Gelfand-Naimark theorem: every commutative C*-algebra is isometrically isomorphic to $C(X)$ for some compact Hausdorff space $X$; every abstract C*-algebra embeds isometrically into $\\mathcal{B}(H)$ for some Hilbert space $H$. This is profound: the spectral theory of operators is encoded in the "topology of the spectrum," and studying an operator algebra is equivalent to studying a certain function algebra on its spectrum.',
+      '**Pseudospectrum and non-normal transient behavior.** The $\\varepsilon$-pseudospectrum of $T$ is $\\sigma_\\varepsilon(T) = \\{\\lambda \\in \\mathbb{C} : \\|(T-\\lambda I)^{-1}\\| > \\varepsilon^{-1}\\}$. For normal operators, $\\sigma_\\varepsilon(T)$ is simply the $\\varepsilon$-neighborhood of $\\sigma(T)$ — the resolvent is uniformly well-conditioned. For non-normal operators, $\\sigma_\\varepsilon(T)$ can be much larger than $\\sigma(T)$: the resolvent is large near "pseudo-eigenvalues" where $\\|(T-\\lambda I)^{-1}\\|$ is large but not infinite. Practical consequence: for a highly non-normal matrix (e.g., a convection-dominated PDE discretization), the eigenvalues predict long-time behavior, but the pseudospectrum predicts transient amplification. Eigenvalues of non-normal matrices can be exponentially sensitive to tiny perturbations.',
     ],
     callouts: [
       {
@@ -265,11 +273,75 @@ S(k+1,k+1)  % should match
   challenges: [
     {
       id: 'ch-la10-004-1',
-      title: 'Self-adjoint implies real spectrum',
+      title: 'Self-adjoint implies real eigenvalues',
       difficulty: 'medium',
-      prompt: 'For a bounded self-adjoint operator $T = T^*$ on a Hilbert space, prove that all eigenvalues are real.',
-      hint: 'Compute $\\langle T\\mathbf{x}, \\mathbf{x}\\rangle$ two ways for an eigenvector $\\mathbf{x}$.',
-      solution: 'Let $T\\mathbf{x} = \\lambda\\mathbf{x}$ with $\\mathbf{x} \\neq 0$. Then $\\lambda\\|\\mathbf{x}\\|^2 = \\langle\\lambda\\mathbf{x},\\mathbf{x}\\rangle = \\langle T\\mathbf{x},\\mathbf{x}\\rangle = \\langle\\mathbf{x},T^*\\mathbf{x}\\rangle = \\langle\\mathbf{x},T\\mathbf{x}\\rangle = \\langle\\mathbf{x},\\lambda\\mathbf{x}\\rangle = \\bar{\\lambda}\\|\\mathbf{x}\\|^2$. Since $\\|\\mathbf{x}\\|^2 > 0$: $\\lambda = \\bar{\\lambda}$, so $\\lambda \\in \\mathbb{R}$.',
+      problem: 'For a bounded self-adjoint operator $T = T^*$ on a Hilbert space, prove that all eigenvalues are real.',
+      walkthrough: [
+        {
+          expression: 'T\\mathbf{x} = \\lambda\\mathbf{x}, \\; \\mathbf{x} \\neq 0 \\quad \\Rightarrow \\quad \\langle T\\mathbf{x}, \\mathbf{x} \\rangle = \\lambda\\|\\mathbf{x}\\|^2',
+          annotation: 'Start from the eigenvector equation. Take the inner product of both sides with $\\mathbf{x}$: the right side is $\\langle \\lambda \\mathbf{x}, \\mathbf{x} \\rangle = \\lambda \\langle \\mathbf{x}, \\mathbf{x} \\rangle = \\lambda \\|\\mathbf{x}\\|^2$.',
+        },
+        {
+          expression: '\\langle T\\mathbf{x}, \\mathbf{x} \\rangle = \\langle \\mathbf{x}, T^*\\mathbf{x} \\rangle = \\langle \\mathbf{x}, T\\mathbf{x} \\rangle = \\langle \\mathbf{x}, \\lambda\\mathbf{x} \\rangle = \\bar{\\lambda}\\|\\mathbf{x}\\|^2',
+          annotation: 'Use the adjoint relation $\\langle T\\mathbf{x}, \\mathbf{y}\\rangle = \\langle \\mathbf{x}, T^*\\mathbf{y}\\rangle$. With $T^* = T$, the left side becomes $\\langle \\mathbf{x}, T\\mathbf{x}\\rangle = \\bar{\\lambda}\\|\\mathbf{x}\\|^2$ (complex conjugate appears when pulling $\\lambda$ out of the second argument of the inner product).',
+        },
+        {
+          expression: '\\lambda\\|\\mathbf{x}\\|^2 = \\bar{\\lambda}\\|\\mathbf{x}\\|^2 \\quad \\Rightarrow \\quad \\lambda = \\bar{\\lambda} \\quad \\Rightarrow \\quad \\lambda \\in \\mathbb{R}',
+          annotation: 'Both expressions equal $\\langle T\\mathbf{x}, \\mathbf{x}\\rangle$. Since $\\|\\mathbf{x}\\|^2 > 0$ (eigenvector is nonzero), divide both sides by it: $\\lambda = \\bar{\\lambda}$, which means $\\text{Im}(\\lambda) = 0$. Every eigenvalue is real.',
+        },
+        {
+          expression: '\\text{Same proof for orthogonality: if } T\\mathbf{x}=\\lambda\\mathbf{x}, \\; T\\mathbf{y}=\\mu\\mathbf{y}, \\; \\lambda\\neq\\mu \\Rightarrow \\langle\\mathbf{x},\\mathbf{y}\\rangle=0',
+          annotation: 'Compute $\\lambda\\langle\\mathbf{x},\\mathbf{y}\\rangle = \\langle T\\mathbf{x},\\mathbf{y}\\rangle = \\langle\\mathbf{x},T\\mathbf{y}\\rangle = \\mu\\langle\\mathbf{x},\\mathbf{y}\\rangle$. Since $\\lambda\\neq\\mu$, we get $\\langle\\mathbf{x},\\mathbf{y}\\rangle=0$. Eigenvectors for distinct eigenvalues of a self-adjoint operator are orthogonal — same proof as for symmetric matrices.',
+        },
+      ],
+    },
+    {
+      id: 'ch-la10-004-2',
+      title: 'Spectral decomposition and functional calculus',
+      difficulty: 'easy',
+      problem: 'Let $A = \\begin{pmatrix}5&-2\\\\-2&2\\end{pmatrix}$. Find the spectral decomposition $A = \\sum_i \\lambda_i \\mathbf{q}_i\\mathbf{q}_i^\\top$, then use it to compute $A^{1/2}$ (matrix square root) and $e^A$.',
+      walkthrough: [
+        {
+          expression: '\\det(A-\\lambda I) = (5-\\lambda)(2-\\lambda)-4 = \\lambda^2-7\\lambda+6 = (\\lambda-1)(\\lambda-6)',
+          annotation: 'Characteristic polynomial: eigenvalues are $\\lambda_1 = 1$ and $\\lambda_2 = 6$.',
+        },
+        {
+          expression: '\\lambda_1=1: (A-I)v=0 \\Rightarrow \\mathbf{q}_1 = \\tfrac{1}{\\sqrt{5}}(1,2)^\\top; \\quad \\lambda_2=6: \\mathbf{q}_2 = \\tfrac{1}{\\sqrt{5}}(2,-1)^\\top',
+          annotation: 'For $\\lambda_1=1$: $(A-I)=\\begin{pmatrix}4&-2\\\\-2&1\\end{pmatrix}$, null vector $(1,2)^\\top$ normalized. For $\\lambda_2=6$: $(A-6I)=\\begin{pmatrix}-1&-2\\\\-2&-4\\end{pmatrix}$, null vector $(2,-1)^\\top$ normalized. Verify orthogonality: $(1)(2)+(2)(-1)=0$ ✓.',
+        },
+        {
+          expression: 'A^{1/2} = \\sqrt{1}\\,\\mathbf{q}_1\\mathbf{q}_1^\\top + \\sqrt{6}\\,\\mathbf{q}_2\\mathbf{q}_2^\\top = \\tfrac{1}{5}\\begin{pmatrix}1+4\\sqrt{6} & 2-2\\sqrt{6} \\\\ 2-2\\sqrt{6} & 4+\\sqrt{6}\\end{pmatrix}',
+          annotation: 'Functional calculus: apply $f(x) = \\sqrt{x}$ to eigenvalues. $A^{1/2} = f(\\lambda_1) \\mathbf{q}_1\\mathbf{q}_1^\\top + f(\\lambda_2) \\mathbf{q}_2\\mathbf{q}_2^\\top$. Each rank-1 term: $\\mathbf{q}_i\\mathbf{q}_i^\\top = \\frac{1}{5}\\begin{pmatrix}1&2\\\\2&4\\end{pmatrix}$ and $\\frac{1}{5}\\begin{pmatrix}4&-2\\\\-2&1\\end{pmatrix}$.',
+        },
+        {
+          expression: 'e^A = e^1\\,\\mathbf{q}_1\\mathbf{q}_1^\\top + e^6\\,\\mathbf{q}_2\\mathbf{q}_2^\\top = \\tfrac{e}{5}\\begin{pmatrix}1&2\\\\2&4\\end{pmatrix} + \\tfrac{e^6}{5}\\begin{pmatrix}4&-2\\\\-2&1\\end{pmatrix}',
+          annotation: 'Same pattern with $f(x) = e^x$. The functional calculus: for symmetric matrices, ANY matrix function reduces to applying $f$ pointwise to eigenvalues and reassembling with the eigenvector projectors.',
+        },
+      ],
+    },
+    {
+      id: 'ch-la10-004-3',
+      title: 'Operator norm vs spectral radius: power iteration bound',
+      difficulty: 'hard',
+      problem: 'Explain why iterating $\\mathbf{x}_{k+1} = A\\mathbf{x}_k$ eventually decays for any starting vector $\\mathbf{x}_0$ if and only if $r(A) < 1$. Why is the operator norm $\\|A\\| < 1$ a sufficient but not necessary condition?',
+      walkthrough: [
+        {
+          expression: 'A^k \\mathbf{x}_0 \\to 0 \\text{ as } k \\to \\infty \\iff r(A) < 1 \\quad (\\text{spectral radius theorem})',
+          annotation: 'The spectral radius formula $r(A) = \\lim_{k\\to\\infty}\\|A^k\\|^{1/k}$ implies: if $r(A) < 1$, then $\\|A^k\\| \\to 0$ (eventually, for large $k$), so $\\|A^k\\mathbf{x}_0\\| \\leq \\|A^k\\|\\|\\mathbf{x}_0\\| \\to 0$. Conversely, if $r(A) \\geq 1$, there is a vector (eigenvector if $r(A)$ is an eigenvalue, or a growing perturbation otherwise) for which the iteration does not decay.',
+        },
+        {
+          expression: '\\|A\\| < 1 \\Rightarrow r(A) \\leq \\|A\\| < 1',
+          annotation: 'Since spectral radius $r(A) \\leq \\|A\\|$ always, if $\\|A\\| < 1$ then $r(A) < 1$. So convergence is guaranteed. But the condition is not necessary.',
+        },
+        {
+          expression: 'N = \\begin{pmatrix}0&0.9\\\\0&0\\end{pmatrix}: r(N)=0<1, \\; \\|N\\|=0.9, \\; N^2=0',
+          annotation: 'Here $\\|N\\| = 0.9 < 1$ and $r(N) = 0 < 1$ — both conditions hold. But consider $M = \\begin{pmatrix}0&1.5\\\\0&0\\end{pmatrix}$: $r(M)=0 < 1$ but $\\|M\\|=1.5 > 1$. Yet $M^2 = 0$, so $M^k = 0$ for $k \\geq 2$ — the iteration converges in just two steps.',
+        },
+        {
+          expression: '\\text{Transient growth possible when } r(A)<1 \\text{ but } \\|A\\| > 1',
+          annotation: 'For non-normal $A$ with $r(A)<1$ but $\\|A^k\\|$ large for some $k$ before eventual decay: the iteration may initially grow before decaying. The pseudospectrum captures this — it explains transient amplification when eigenvalues alone suggest stability. This is practically important in fluid mechanics and convection-dominated PDEs.',
+        },
+      ],
     },
   ],
 
@@ -418,15 +490,38 @@ S(k+1,k+1)  % should match
   transferPrompts: [
     {
       situation: 'You want to apply the matrix function $f(A) = e^{At}$ (matrix exponential, used in solving ODEs). $A$ is symmetric. How do you use the spectral decomposition?',
-      competingTechniques: ['Compute via Taylor series: $e^{At} = I + At + A^2t^2/2! + \\cdots$ (slow, hard to implement)', 'Use spectral decomposition: $A = Q\\Lambda Q^\\top$, then $e^{At} = Qe^{\\Lambda t}Q^\\top$ where $e^{\\Lambda t} = \\text{diag}(e^{\\lambda_1 t}, \\ldots)$'],
-      whyThisTechniqueWins: 'The spectral decomposition reduces $f(A)$ to applying $f$ pointwise to eigenvalues. This is both conceptually clear (the functional calculus) and numerically efficient — one eigendecomposition, then trivial diagonal arithmetic.',
+      competingTechniques: 'Compute via Taylor series $e^{At} = I + At + A^2t^2/2! + \\cdots$ vs use spectral decomposition $A = Q\\Lambda Q^\\top$ so $e^{At} = Q\\,\\text{diag}(e^{\\lambda_i t})\\,Q^\\top$.',
+      whyThisTechniqueWins: 'The spectral decomposition reduces $f(A)$ to applying $f$ pointwise to eigenvalues. One eigendecomposition, then trivial diagonal arithmetic — this is the functional calculus.',
     },
     {
       situation: 'In quantum mechanics, you measure the energy of a particle whose state is $\\psi = \\frac{1}{\\sqrt{2}}(v_1 + v_2)$ where $v_1, v_2$ are energy eigenstates with $E_1=2$, $E_2=5$. What energies can you observe and with what probability?',
-      competingTechniques: ['Compute $\\langle \\psi | H | \\psi \\rangle$ (gives expected value, not individual outcomes)', 'Apply the spectral theorem: energy measurement yields eigenvalue $E_i$ with probability $|\\langle v_i, \\psi \\rangle|^2$'],
-      whyThisTechniqueWins: 'The spectral theorem gives the full probability distribution: $P(E=2) = |1/\\sqrt{2}|^2 = 1/2$, $P(E=5) = 1/2$. Expected value: $(2+5)/2=3.5$. The spectral decomposition is the mathematical foundation of quantum measurement theory.',
+      competingTechniques: 'Compute $\\langle \\psi | H | \\psi \\rangle$ to get the expected energy vs apply the spectral theorem to get the full probability distribution of individual measurement outcomes.',
+      whyThisTechniqueWins: 'The spectral theorem gives $P(E=2)=1/2$, $P(E=5)=1/2$ — the full distribution, not just the average. The expected-value approach loses information about which outcomes are possible.',
     },
   ],
+
+  semantics: {
+    core: [
+      { symbol: '\\|T\\|', meaning: 'Operator norm: $\\sup_{\\|\\mathbf{x}\\|=1}\\|T\\mathbf{x}\\|$; the smallest Lipschitz constant for $T$. For matrices: equals the largest singular value $\\sigma_1$.' },
+      { symbol: '\\sigma(T)', meaning: 'Spectrum of $T$: all $\\lambda$ where $(T-\\lambda I)$ is not boundedly invertible. Splits into point spectrum (eigenvalues), continuous spectrum, and residual spectrum.' },
+      { symbol: 'T^*', meaning: 'Hilbert space adjoint: unique operator satisfying $\\langle T\\mathbf{x}, \\mathbf{y}\\rangle = \\langle \\mathbf{x}, T^*\\mathbf{y}\\rangle$ for all $\\mathbf{x},\\mathbf{y}$. For matrices: $T^* = A^*$ (conjugate transpose). Self-adjoint: $T = T^*$.' },
+      { symbol: 'r(T)', meaning: 'Spectral radius: $\\max\\{|\\lambda| : \\lambda \\in \\sigma(T)\\}$. Equals $\\|T\\|$ for normal operators ($T^*T=TT^*$). Formula: $r(T) = \\lim_{n\\to\\infty}\\|T^n\\|^{1/n}$.' },
+      { symbol: 'T \\text{ compact}', meaning: 'Compact operator: image of bounded sets is precompact; limit of finite-rank operators. Nonzero spectrum consists of isolated eigenvalues accumulating only at 0. If also self-adjoint: eigenvectors span $H$.' },
+      { symbol: 'T = \\sum_i \\lambda_i \\langle \\cdot, \\mathbf{e}_i\\rangle \\mathbf{e}_i', meaning: 'Spectral decomposition (compact self-adjoint): infinite-dimensional analogue of symmetric matrix eigendecomposition. Functional calculus: $f(T) = \\sum_i f(\\lambda_i)\\langle\\cdot,\\mathbf{e}_i\\rangle\\mathbf{e}_i$.' },
+    ],
+    rulesOfThumb: [
+      'Operator norm hierarchy: $r(A) \\leq \\|A\\|_2 \\leq \\|A\\|_F$ always. For normal matrices (symmetric, orthogonal, unitary): $r(A) = \\|A\\|_2$.',
+      'Convergence of $A^k \\mathbf{x}_0$ to 0 requires $r(A) < 1$, not $\\|A\\| < 1$. For non-normal matrices, $\\|A\\| > 1$ is possible even with $r(A) < 1$ (transient growth before eventual decay).',
+      'For a symmetric (Hermitian) matrix: eigenvalues are real, eigenvectors orthogonal, $\\|A\\|_2 = $ max $|\\lambda_i|$. Use the spectral decomposition for matrix functions.',
+      'Spectrum of a finite-rank operator (matrix) = eigenvalues (all non-invertibility comes from the null space). In infinite dimensions, there can be non-invertibility without a null vector.',
+      'Compact operators: think of them as "approximately finite-rank." Their spectral theory is as close to matrix theory as possible in infinite dimensions.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: ['la3-003', 'la10-003'],
+    futureLinks: ['la10-005'],
+  },
 
   debugging: [
     {

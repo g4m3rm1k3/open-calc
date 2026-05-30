@@ -693,12 +693,12 @@ check = 3.5*X_axis + 2.0*Y_axis + (-1.5)*Z_axis`,
   transferPrompts: [
     {
       situation: 'You are given the magnitude and direction angle of a vector and need to write it as a column.',
-      competingTechniques: ['Guess the components from context', 'Use $v_x = r\\cos\\theta$, $v_y = r\\sin\\theta$'],
+      competingTechniques: 'Guess the components from context vs. use $v_x = r\\cos\\theta$, $v_y = r\\sin\\theta$',
       whyThisTechniqueWins: 'The component formula is exact and works for any angle. Guessing only works for 0°, 90°, 180°, 270°.',
     },
     {
       situation: 'You need a vector pointing north-east with length exactly 1.',
-      competingTechniques: ['Write $[1, 1]$ (wrong — length is $\\sqrt{2}$)', 'Write $[1/\\sqrt{2},\\; 1/\\sqrt{2}]$ (unit vector at 45°)'],
+      competingTechniques: 'Write $[1, 1]$ (wrong — length is $\\sqrt{2}$) vs. write $[1/\\sqrt{2},\\; 1/\\sqrt{2}]$ (unit vector at 45°)',
       whyThisTechniqueWins: 'Always normalize: compute $[1,1]$, find its magnitude $\\sqrt{2}$, divide each component. The result $[0.707, 0.707]$ has length exactly 1.',
     },
   ],

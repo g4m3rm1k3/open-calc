@@ -309,9 +309,71 @@ print(f"\\nAlternative solution ||q_other||: {np.linalg.norm(q_other):.4f} (larg
       id: 'ch-la4-008-1',
       title: 'Pseudoinverse of a rank-1 matrix',
       difficulty: 'medium',
-      prompt: 'For a rank-1 matrix $A = \\mathbf{u}\\mathbf{v}^\\top$ (outer product), derive a formula for $A^+$ in terms of $\\mathbf{u}$ and $\\mathbf{v}$.',
-      hint: 'The SVD of $A = \\mathbf{u}\\mathbf{v}^\\top$ has one nonzero singular value $\\sigma = \\|\\mathbf{u}\\|\\|\\mathbf{v}\\|$.',
-      solution: 'Normalize: $\\hat{u} = \\mathbf{u}/\\|\\mathbf{u}\\|$, $\\hat{v} = \\mathbf{v}/\\|\\mathbf{v}\\|$, $\\sigma = \\|\\mathbf{u}\\|\\|\\mathbf{v}\\|$. SVD: $A = \\hat{u}\\cdot\\sigma\\cdot\\hat{v}^\\top$. Pseudoinverse: $A^+ = \\hat{v}\\cdot(1/\\sigma)\\cdot\\hat{u}^\\top = \\mathbf{v}\\mathbf{u}^\\top/(\\|\\mathbf{u}\\|^2\\|\\mathbf{v}\\|^2)$. Check: $AA^+A = \\mathbf{u}\\mathbf{v}^\\top \\cdot \\frac{\\mathbf{v}\\mathbf{u}^\\top}{\\|\\mathbf{u}\\|^2\\|\\mathbf{v}\\|^2}\\cdot\\mathbf{u}\\mathbf{v}^\\top = \\mathbf{u}\\mathbf{v}^\\top = A$ ✓.',
+      problem: 'For a rank-1 matrix $A = \\mathbf{u}\\mathbf{v}^\\top$ (outer product of $\\mathbf{u} \\in \\mathbb{R}^m$, $\\mathbf{v} \\in \\mathbb{R}^n$), derive a formula for $A^+$ in terms of $\\mathbf{u}$ and $\\mathbf{v}$. Then verify that $AA^+A = A$.',
+      hint: 'The SVD of $A = \\mathbf{u}\\mathbf{v}^\\top$ has one nonzero singular value $\\sigma = \\|\\mathbf{u}\\|\\|\\mathbf{v}\\|$. The left and right singular vectors are $\\hat{\\mathbf{u}} = \\mathbf{u}/\\|\\mathbf{u}\\|$ and $\\hat{\\mathbf{v}} = \\mathbf{v}/\\|\\mathbf{v}\\|$.',
+      walkthrough: [
+        {
+          expression: 'A = \\mathbf{u}\\mathbf{v}^\\top = \\|\\mathbf{u}\\|\\|\\mathbf{v}\\| \\cdot \\frac{\\mathbf{u}}{\\|\\mathbf{u}\\|} \\cdot \\frac{\\mathbf{v}^\\top}{\\|\\mathbf{v}\\|}',
+          annotation: 'Factor out the norms: $\\sigma = \\|\\mathbf{u}\\|\\|\\mathbf{v}\\|$ is the single nonzero singular value. $\\hat{\\mathbf{u}} = \\mathbf{u}/\\|\\mathbf{u}\\|$ and $\\hat{\\mathbf{v}} = \\mathbf{v}/\\|\\mathbf{v}\\|$ are the left and right singular vectors.',
+        },
+        {
+          expression: 'A^+ = \\hat{\\mathbf{v}} \\cdot \\frac{1}{\\sigma} \\cdot \\hat{\\mathbf{u}}^\\top = \\frac{\\mathbf{v}\\mathbf{u}^\\top}{\\|\\mathbf{u}\\|^2 \\|\\mathbf{v}\\|^2}',
+          annotation: 'Pseudoinverse formula $V\\Sigma^+U^\\top$ with a single singular value: $\\hat{\\mathbf{v}} \\cdot (1/\\sigma) \\cdot \\hat{\\mathbf{u}}^\\top = \\frac{\\mathbf{v}}{\\|\\mathbf{v}\\|} \\cdot \\frac{1}{\\|\\mathbf{u}\\|\\|\\mathbf{v}\\|} \\cdot \\frac{\\mathbf{u}^\\top}{\\|\\mathbf{u}\\|}$.',
+        },
+        {
+          expression: 'AA^+A = (\\mathbf{u}\\mathbf{v}^\\top) \\cdot \\frac{\\mathbf{v}\\mathbf{u}^\\top}{\\|\\mathbf{u}\\|^2\\|\\mathbf{v}\\|^2} \\cdot (\\mathbf{u}\\mathbf{v}^\\top) = \\mathbf{u}\\mathbf{v}^\\top = A',
+          annotation: '$\\mathbf{v}^\\top\\mathbf{v} = \\|\\mathbf{v}\\|^2$ and $\\mathbf{u}^\\top\\mathbf{u} = \\|\\mathbf{u}\\|^2$ cancel the denominators. Moore-Penrose condition 1 ✓.',
+        },
+      ],
+      answer: 'A⁺ = vuᵀ / (‖u‖²‖v‖²). Verified: AA⁺A = A ✓.',
+    },
+    {
+      id: 'ch-la4-008-2',
+      title: 'Minimum-norm solution for an underdetermined system',
+      difficulty: 'medium',
+      problem: 'The system $x_1 + x_2 + x_3 = 4$, $x_1 - x_2 = 0$ has infinitely many solutions. Find the minimum-norm solution using the pseudoinverse. Verify it lies in the row space of $A$.',
+      hint: '$A = \\begin{pmatrix}1&1&1\\\\1&-1&0\\end{pmatrix}$ (full row rank). For full row rank: $A^+ = A^\\top(AA^\\top)^{-1}$.',
+      walkthrough: [
+        {
+          expression: 'A = \\begin{pmatrix}1&1&1\\\\1&-1&0\\end{pmatrix}, \\quad AA^\\top = \\begin{pmatrix}3&0\\\\0&2\\end{pmatrix}',
+          annotation: '$A$ has full row rank (2 rows, rank 2). $AA^\\top$ is diagonal — easy to invert.',
+        },
+        {
+          expression: 'A^+ = A^\\top(AA^\\top)^{-1} = \\begin{pmatrix}1&1\\\\1&-1\\\\1&0\\end{pmatrix}\\begin{pmatrix}1/3&0\\\\0&1/2\\end{pmatrix} = \\begin{pmatrix}1/3&1/2\\\\1/3&-1/2\\\\1/3&0\\end{pmatrix}',
+          annotation: 'Right inverse formula for full row rank matrices.',
+        },
+        {
+          expression: '\\hat{\\mathbf{x}} = A^+\\mathbf{b} = \\begin{pmatrix}1/3&1/2\\\\1/3&-1/2\\\\1/3&0\\end{pmatrix}\\begin{pmatrix}4\\\\0\\end{pmatrix} = \\begin{pmatrix}4/3\\\\4/3\\\\4/3\\end{pmatrix}',
+          annotation: '$\\mathbf{b} = (4, 0)^\\top$. The minimum-norm solution has all three components equal — the most "spread out" solution.',
+        },
+        {
+          expression: '\\|\\hat{\\mathbf{x}}\\| = \\sqrt{3 \\cdot (4/3)^2} = \\frac{4}{\\sqrt{3}} \\approx 2.31',
+          annotation: 'Any other solution has larger norm. For example, $(4,0,0)^\\top$ also satisfies the system: $\\|(4,0,0)\\| = 4 > 2.31$.',
+        },
+      ],
+      answer: 'Minimum-norm solution: x̂ = [4/3, 4/3, 4/3]ᵀ. Lies in the row space (orthogonal to N(A)).',
+    },
+    {
+      id: 'ch-la4-008-3',
+      title: 'Verify all four Moore-Penrose conditions',
+      difficulty: 'hard',
+      problem: 'For $A = \\begin{pmatrix}1&0\\\\0&1\\\\0&0\\end{pmatrix}$ (3×2, rank 2), compute $A^+$ and verify all four Moore-Penrose conditions: (1) $AA^+A=A$, (2) $A^+AA^+=A^+$, (3) $(AA^+)^\\top=AA^+$, (4) $(A^+A)^\\top=A^+A$.',
+      hint: 'This is the simplest case: the SVD of $A$ is trivial ($U = I_3$, $V = I_2$, $\\Sigma$ = first two rows of $I_3$). The pseudoinverse just "chops" the extra row.',
+      walkthrough: [
+        {
+          expression: 'A^+ = \\begin{pmatrix}1&0&0\\\\0&1&0\\end{pmatrix}',
+          annotation: '$\\Sigma = \\begin{pmatrix}1&0\\\\0&1\\\\0&0\\end{pmatrix}$, $\\Sigma^+ = \\begin{pmatrix}1&0&0\\\\0&1&0\\end{pmatrix}$. With $U = I_3$, $V = I_2$: $A^+ = V\\Sigma^+U^\\top = \\Sigma^+$.',
+        },
+        {
+          expression: 'AA^+ = \\begin{pmatrix}1&0\\\\0&1\\\\0&0\\end{pmatrix}\\begin{pmatrix}1&0&0\\\\0&1&0\\end{pmatrix} = \\begin{pmatrix}1&0&0\\\\0&1&0\\\\0&0&0\\end{pmatrix}',
+          annotation: 'This is the projection onto the first two coordinates — exactly the column space of $A$.',
+        },
+        {
+          expression: 'AA^+A = \\begin{pmatrix}1&0&0\\\\0&1&0\\\\0&0&0\\end{pmatrix}\\begin{pmatrix}1&0\\\\0&1\\\\0&0\\end{pmatrix} = \\begin{pmatrix}1&0\\\\0&1\\\\0&0\\end{pmatrix} = A \\checkmark',
+          annotation: 'Condition 1 ✓. Conditions 2-4: $A^+AA^+ = A^+$ ✓ (similar); $(AA^+)^\\top = AA^+$ ✓ (diagonal matrix); $(A^+A)^\\top = I_2^\\top = I_2 = A^+A$ ✓.',
+        },
+      ],
+      answer: 'A⁺ = [[1,0,0],[0,1,0]]. All four Moore-Penrose conditions verified: AA⁺A=A ✓, A⁺AA⁺=A⁺ ✓, (AA⁺)ᵀ=AA⁺ ✓, (A⁺A)ᵀ=A⁺A ✓.',
     },
   ],
 
@@ -460,12 +522,12 @@ print(f"\\nAlternative solution ||q_other||: {np.linalg.norm(q_other):.4f} (larg
   transferPrompts: [
     {
       situation: 'In a robotics arm with 7 joints controlling a 6D end-effector pose, the Jacobian $J$ is $6\\times 7$ (underdetermined). You want to move the end-effector with velocity $\\mathbf{v}$. How do you find joint velocities $\\dot{q}$?',
-      competingTechniques: ['Use any particular solution to $J\\dot{q}=v$ (ignore redundancy)', 'Use $\\dot{q}^* = J^+\\mathbf{v}$ (minimum-norm joint velocities)'],
+      competingTechniques: 'Use any particular solution to Jq̇=v (ignore redundancy); Use q̇* = J⁺v (minimum-norm joint velocities)',
       whyThisTechniqueWins: 'The pseudoinverse solution $J^+\\mathbf{v}$ gives the minimum-energy joint motion — the redundant DOF is used to minimize joint effort. Alternative: $\\dot{q}^* + (I-J^+J)\\mathbf{z}$ for any $\\mathbf{z}$ (null space term) can further optimize secondary objectives like avoiding joint limits.',
     },
     {
       situation: 'A linear regression model has more features than training samples (overparameterized, $n > m$). The normal equations $X^\\top X\\hat{\\beta} = X^\\top\\mathbf{y}$ are underdetermined. Which solution does gradient descent on squared loss converge to?',
-      competingTechniques: ['Add regularization (ridge, LASSO) to ensure uniqueness', 'Use gradient descent initialized at zero — converges to $X^+\\mathbf{y}$ (minimum norm)'],
+      competingTechniques: 'Add regularization (ridge, LASSO) to ensure uniqueness; Use gradient descent initialized at zero — converges to X⁺y (minimum norm)',
       whyThisTechniqueWins: 'When initialized at zero, gradient descent converges exactly to the minimum-norm solution $\\hat{\\beta} = X^+\\mathbf{y}$ — this is an implicit regularization effect. Understanding the pseudoinverse explains WHY overparameterized networks trained with SGD generalize: they find the minimum-norm solution, which tends to be simpler.',
     },
   ],
@@ -484,4 +546,43 @@ print(f"\\nAlternative solution ||q_other||: {np.linalg.norm(q_other):.4f} (larg
       repairStrategy: '$\\Sigma^+$ = TRANSPOSE $\\Sigma$ (swap $m\\times n$ to $n\\times m$) AND replace each nonzero diagonal entry $\\sigma_i$ by $1/\\sigma_i$. Leave zero entries as zero. For $\\Sigma = \\text{diag}(3,2,0)$ (3×3): $\\Sigma^+ = \\text{diag}(1/3, 1/2, 0)$ (3×3 same shape since square here).',
     },
   ],
+
+  semantics: {
+    core: [
+      { symbol: 'A^+ = V\\Sigma^+ U^\\top', meaning: 'Moore-Penrose pseudoinverse via SVD — Σ⁺ transposes Σ and inverts each nonzero diagonal entry' },
+      { symbol: '\\hat{\\mathbf{x}} = A^+\\mathbf{b}', meaning: 'Minimum-norm least-squares solution — simultaneously minimizes ‖Ax−b‖ and ‖x‖' },
+      { symbol: 'AA^+', meaning: 'Orthogonal projector onto the column space C(A)' },
+      { symbol: 'A^+A', meaning: 'Orthogonal projector onto the row space C(Aᵀ)' },
+      { symbol: '(A^\\top A + \\lambda I)^{-1}A^\\top', meaning: 'Tikhonov-regularized pseudoinverse — shrinks near-zero singular values to prevent noise amplification' },
+    ],
+    rulesOfThumb: [
+      'Full column rank: A⁺ = (AᵀA)⁻¹Aᵀ (left inverse, least-squares solution). Full row rank: A⁺ = Aᵀ(AAᵀ)⁻¹ (right inverse, minimum-norm solution).',
+      'The min-norm solution A⁺b lies in the row space C(Aᵀ) — it has no null space component.',
+      'AA⁺ and A⁺A are orthogonal projectors (symmetric, idempotent). Check: (AA⁺)ᵀ = AA⁺ and (AA⁺)² = AA⁺.',
+      'Near-zero singular values amplify noise. Use regularization when σₖ < ε·σ₁.',
+      'For a square invertible A, A⁺ = A⁻¹ exactly.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: [
+      {
+        lessonId: 'la4-002-svd',
+        label: 'SVD',
+        note: 'The pseudoinverse is built directly from the SVD: A⁺ = VΣ⁺Uᵀ. Every pseudoinverse computation begins with the SVD.',
+      },
+      {
+        lessonId: 'la4-003',
+        label: 'Least Squares',
+        note: 'For full column rank A, A⁺b = (AᵀA)⁻¹Aᵀb — exactly the normal equations solution from Least Squares. The pseudoinverse generalizes this to rank-deficient and underdetermined cases.',
+      },
+    ],
+    futureLinks: [
+      {
+        lessonId: 'la4-009',
+        label: 'Low-Rank Approximation',
+        note: 'The rank-k pseudoinverse (using only the k largest singular values) solves the regularized least squares problem and connects to low-rank approximation: Aₖ⁺ = Vₖ Σₖ⁻¹ Uₖᵀ.',
+      },
+    ],
+  },
 };

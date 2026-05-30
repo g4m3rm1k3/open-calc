@@ -882,12 +882,12 @@ C = np.array([0.0, 0.0, 3.0])
   transferPrompts: [
     {
       situation: 'A game engine must check whether a bullet (modeled as a ray) hits a wall (modeled as a plane). Which formula applies?',
-      competingTechniques: ['Line-plane intersection formula', 'Distance formula', 'Cross product'],
+      competingTechniques: 'Line-plane intersection formula vs. distance formula vs. cross product',
       whyThisTechniqueWins: 'The line-plane intersection formula t=(d-n·P₀)/(n·d) gives the exact parameter t where the ray hits the plane. If t>0, the hit is in front of the camera. If t<0, the ray is going away from the wall. Distance only tells you how far off-plane a static point is — it does not give intersection timing.',
     },
     {
       situation: 'A mesh triangle is defined by vertices A, B, C. A renderer must shade the surface correctly, which requires a unit normal. What is the workflow?',
-      competingTechniques: ['Cross product of edge vectors', 'Average of vertex positions', 'Dot product of edges'],
+      competingTechniques: 'Cross product of edge vectors vs. average of vertex positions vs. dot product of edges',
       whyThisTechniqueWins: 'u = B-A and v = C-A are vectors lying in the triangle plane. n = u×v is perpendicular to both — it is the triangle normal. Normalize: n̂ = n/‖n‖. The dot product gives a scalar (angle), not a direction; averaging positions gives the centroid, not the normal.',
     },
   ],

@@ -25,6 +25,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'How to Build the Matrix of a Linear Map (5 Steps)',
+        body: '**Given:** $T: V \\to W$ and ordered bases $\\mathcal{B} = (\\mathbf{b}_1,\\ldots,\\mathbf{b}_n)$ for $V$ and $\\mathcal{C} = (\\mathbf{c}_1,\\ldots,\\mathbf{c}_m)$ for $W$.\n**Step 1.** Apply $T$ to the first basis vector: compute $T(\\mathbf{b}_1) \\in W$.\n**Step 2.** Express $T(\\mathbf{b}_1)$ in the output basis $\\mathcal{C}$: find scalars $a_1,\\ldots,a_m$ such that $T(\\mathbf{b}_1) = a_1\\mathbf{c}_1 + \\cdots + a_m\\mathbf{c}_m$.\n**Step 3.** Write $(a_1,\\ldots,a_m)^\\top$ as the first column of $[T]$.\n**Step 4.** Repeat steps 1–3 for each remaining basis vector $\\mathbf{b}_2,\\ldots,\\mathbf{b}_n$. Each gives one column.\n**Step 5.** Verify: $[T]\\,[\\mathbf{v}]_{\\mathcal{B}} = [T(\\mathbf{v})]_{\\mathcal{C}}$ for a test vector $\\mathbf{v}$.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 4 of 6 — Abstract Vector Spaces',
         body: '**Previous:** Linear Transformations — maps between vector spaces that preserve linear structure.\n**This lesson:** Matrix Representations — how to encode any linear transformation as a matrix once you choose bases, and how the matrix changes when you change the bases.\n**Next:** Isomorphisms — when two vector spaces are "structurally identical" and the precise meaning of that statement.',
@@ -188,6 +193,9 @@ print("Same map, different basis — det and tr preserved:",
   rigor: {
     prose: [
       '**Canonical forms.** Under change of basis, matrices can be brought to simpler "canonical forms." Jordan Normal Form is the canonical form for any square matrix over $\\mathbb{C}$ under similarity. Rational Normal Form (Frobenius form) is the canonical form over $\\mathbb{Q}$. Smith Normal Form applies to integer matrices. The theory of canonical forms classifies all linear endomorphisms of a finite-dimensional space.',
+      '**Jordan Normal Form (JNF).** Every $A \\in M_n(\\mathbb{C})$ is similar to a Jordan matrix $J = \\text{diag}(J_{n_1}(\\lambda_1), \\ldots, J_{n_k}(\\lambda_k))$ where each Jordan block is $J_m(\\lambda) = \\lambda I_m + N_m$ with $N_m$ the $m\\times m$ nilpotent shift (ones on the superdiagonal). The JNF is unique up to reordering of blocks. JNF explains everything about matrix powers, matrix exponentials, and ODEs: since $J_m(\\lambda)^t = e^{\\lambda t}(I + tN_m + \\frac{t^2}{2}N_m^2 + \\cdots)$ terminates after $m$ terms (because $N_m^m = 0$), all solutions to $\\dot{x} = Ax$ are combinations of $e^{\\lambda t} \\cdot \\text{polynomial}(t)$.',
+      '**Smith Normal Form.** For an integer matrix $A \\in M_{m\\times n}(\\mathbb{Z})$, Smith Normal Form is the canonical form under multiplication by invertible integer matrices on both sides: $S = PAQ$ where $S = \\text{diag}(d_1, \\ldots, d_r, 0, \\ldots)$ with $d_1 | d_2 | \\cdots | d_r$ (each divides the next). The $d_i$ are the **invariant factors** of $A$. Smith Normal Form classifies finitely generated abelian groups: $\\mathbb{Z}^n / A\\mathbb{Z}^n \\cong \\mathbb{Z}/d_1 \\oplus \\cdots \\oplus \\mathbb{Z}/d_r$. In linear algebra over fields (where every nonzero element is a unit), Smith form reduces to rank-revealing form. Over polynomial rings $\\mathbb{F}[x]$, Smith form gives the rational canonical form, classifying matrices up to similarity.',
+      '**Minimal polynomial and the Cayley-Hamilton theorem.** The characteristic polynomial of $A$ is $p_A(\\lambda) = \\det(\\lambda I - A)$. Cayley-Hamilton: $p_A(A) = 0$ (the matrix satisfies its own characteristic equation). The minimal polynomial $m_A(\\lambda)$ is the monic polynomial of smallest degree with $m_A(A) = 0$. It divides $p_A$ and has the same roots (same eigenvalues, but possibly with smaller multiplicity). For diagonalizable matrices, $m_A$ has no repeated roots; for Jordan blocks $J_m(\\lambda)$, $m_A = (x-\\lambda)^m$. The minimal polynomial controls the function calculus: $f(A)$ is defined for any $f$ that extends to the eigenvalues and, for repeated eigenvalues, whose derivatives up to the Jordan block size exist.',
     ],
     callouts: [
       {
@@ -303,6 +311,34 @@ print("Same map, different basis — det and tr preserved:",
         '**Compute $P^{-1}(AP)$:** $\\begin{bmatrix}1/2&1/2\\\\1/2&-1/2\\end{bmatrix}\\begin{bmatrix}1&-1\\\\-1&-1\\end{bmatrix} = \\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$.',
         '**Result:** $P^{-1}AP = \\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$ — the same $90°$ rotation matrix! This makes sense: a rotation looks the same in any orthonormal-like basis. The representation changed, but the geometric content did not.',
       ],
+    },
+    {
+      id: 'ch-la6-004-2',
+      title: 'Multiplication-by-x as a linear map',
+      difficulty: 'easy',
+      problem: 'Let $M_x: P_2 \\to P_3$ be $M_x(p) = x \\cdot p(x)$ (multiply by $x$). Using the standard bases $\\{1, x, x^2\\}$ for $P_2$ and $\\{1, x, x^2, x^3\\}$ for $P_3$, find the matrix $[M_x]$, state its size, and verify with $p(x) = 3 - 2x + x^2$.',
+      hint: 'Apply $M_x$ to each basis vector of $P_2$ and express the result in the basis of $P_3$. The result is a 4×3 matrix.',
+      walkthrough: [
+        { expression: 'M_x(1) = x = 0\\cdot1 + 1\\cdot x + 0\\cdot x^2 + 0\\cdot x^3 \\implies \\text{column 1} = (0,1,0,0)^\\top', annotation: 'x in basis {1,x,x^2,x^3} has coordinates (0,1,0,0).' },
+        { expression: 'M_x(x) = x^2 \\implies \\text{column 2} = (0,0,1,0)^\\top, \\quad M_x(x^2) = x^3 \\implies \\text{column 3} = (0,0,0,1)^\\top', annotation: 'Each basis polynomial gets shifted up one degree.' },
+        { expression: '[M_x] = \\begin{bmatrix}0&0&0\\\\1&0&0\\\\0&1&0\\\\0&0&1\\end{bmatrix} \\quad (4 \\times 3)', annotation: 'A 4×3 "shift" matrix — it moves each coefficient one step up the polynomial degree.' },
+        { expression: '[M_x]\\begin{bmatrix}3\\\\-2\\\\1\\end{bmatrix} = \\begin{bmatrix}0\\\\3\\\\-2\\\\1\\end{bmatrix}', annotation: 'Verify: $M_x(3-2x+x^2) = 3x-2x^2+x^3$. In the basis of $P_3$: coefficients $(0,3,-2,1)^\\top$ ✓.' },
+      ],
+      answer: '$[M_x] = \\begin{bmatrix}0&0&0\\\\1&0&0\\\\0&1&0\\\\0&0&1\\end{bmatrix}$ (4×3). Verified: $[M_x](3,-2,1)^\\top = (0,3,-2,1)^\\top$, corresponding to $3x - 2x^2 + x^3$ ✓.',
+    },
+    {
+      id: 'ch-la6-004-3',
+      title: 'Matrix powers via Jordan structure',
+      difficulty: 'hard',
+      problem: 'Let $A = \\begin{bmatrix}1&2\\\\0&1\\end{bmatrix}$. Write $A = I + 2N$ where $N = \\begin{bmatrix}0&1\\\\0&0\\end{bmatrix}$ and show that $A^n = I + 2nN$ for all $n \\geq 1$ by expanding $(I+2N)^n$ using the binomial theorem with $N^2 = 0$. Then verify $A^{10}$.',
+      hint: 'Compute $N^2$ first. Since $N^2 = 0$, the binomial series truncates after the linear term: $(I+2N)^n = \\sum_{k=0}^{n} \\binom{n}{k} (2N)^k = I + n(2N)$ (all higher terms vanish).',
+      walkthrough: [
+        { expression: 'N^2 = \\begin{bmatrix}0&1\\\\0&0\\end{bmatrix}\\begin{bmatrix}0&1\\\\0&0\\end{bmatrix} = \\begin{bmatrix}0&0\\\\0&0\\end{bmatrix}', annotation: '$N$ is nilpotent of degree 2: $N^2 = 0$, so all higher powers $N^k = 0$ for $k \\geq 2$.' },
+        { expression: 'A^n = (I+2N)^n = \\sum_{k=0}^{n}\\binom{n}{k}(2N)^k = \\binom{n}{0}I + \\binom{n}{1}(2N) + 0 + 0 + \\cdots = I + 2nN', annotation: 'Binomial expansion truncates at $k=1$ since $N^2 = 0$.' },
+        { expression: 'A^n = \\begin{bmatrix}1&0\\\\0&1\\end{bmatrix} + 2n\\begin{bmatrix}0&1\\\\0&0\\end{bmatrix} = \\begin{bmatrix}1&2n\\\\0&1\\end{bmatrix}', annotation: 'The upper-triangular Jordan block structure is preserved; the off-diagonal entry grows linearly in $n$.' },
+        { expression: 'A^{10} = \\begin{bmatrix}1&20\\\\0&1\\end{bmatrix}', annotation: 'Verify directly: $A^2 = \\begin{bmatrix}1&4\\\\0&1\\end{bmatrix}$, $A^3 = \\begin{bmatrix}1&6\\\\0&1\\end{bmatrix}$, ..., pattern confirmed.' },
+      ],
+      answer: '$A^n = \\begin{bmatrix}1&2n\\\\0&1\\end{bmatrix}$. Derived using $N^2=0$ and the binomial theorem. $A^{10} = \\begin{bmatrix}1&20\\\\0&1\\end{bmatrix}$.',
     },
   ],
 
@@ -465,6 +501,34 @@ print("Same map, different basis — det and tr preserved:",
       whyThisTechniqueWins: 'Compute similarity invariants: if $\\det(A) \\neq \\det(B)$ or $\\text{tr}(A) \\neq \\text{tr}(B)$ or characteristic polynomials differ, they are NOT similar. If all invariants agree, they might be similar.',
     },
   ],
+
+  semantics: {
+    core: [
+      { symbol: '[T]_{\\mathcal{B}}^{\\mathcal{C}}', meaning: 'Matrix of T in bases B (domain) and C (codomain); shape dim(W) × dim(V); j-th column = C-coordinates of T(b_j)' },
+      { symbol: '[T(\\mathbf{v})]_{\\mathcal{C}} = [T]_{\\mathcal{B}}^{\\mathcal{C}}[\\mathbf{v}]_{\\mathcal{B}}', meaning: 'The fundamental formula: abstract linear map = matrix multiplication in coordinates' },
+      { symbol: 'P^{-1}AP = B', meaning: 'Matrix similarity: A and B represent the same linear map T in different bases; P columns are the new basis vectors in the old coordinates' },
+      { symbol: '\\det(A), \\text{tr}(A)', meaning: 'Similarity invariants: preserved under change of basis; they are properties of the linear map, not its matrix representation' },
+      { symbol: 'A = PDP^{-1}', meaning: 'Diagonalization: D is the matrix of T in the eigenvector basis; diagonal entries are eigenvalues; P columns are eigenvectors' },
+    ],
+    rulesOfThumb: [
+      'Apply T to each basis vector → express in output basis → use as column. This is the one universal rule.',
+      'The matrix shape is (dim codomain) × (dim domain) — rows = output dimension, columns = input dimension.',
+      'Similarity invariants (det, tr, eigenvalues, characteristic polynomial) are basis-independent — they belong to the map, not the matrix.',
+      'Diagonalization = finding the basis where the matrix is diagonal = finding the eigenvector basis.',
+      'If N is nilpotent (N^k = 0 for some k), then f(I + cN) = f(I) + f\'(I)(cN) + ... truncates after k terms — use this for matrix powers and exponentials.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: [
+      { id: 'la6-003', label: 'Linear Transformations', reason: 'The matrix representation is the coordinate version of an abstract linear map; the abstract map comes first' },
+      { id: 'la3-002', label: 'Eigenvalues and eigenvectors', reason: 'Diagonalization A = PDP^{-1} is exactly finding the basis where the matrix representation is diagonal' },
+    ],
+    futureLinks: [
+      { id: 'la6-005', label: 'Isomorphisms', reason: 'A bijective linear map T has an invertible matrix [T]; the change-of-basis matrix P is itself an isomorphism' },
+      { id: 'la6-006', label: 'Change of Basis', reason: 'The P^{-1}AP formula is the central object of la6-006; understanding it here provides the foundation' },
+    ],
+  },
 
   debugging: [
     {

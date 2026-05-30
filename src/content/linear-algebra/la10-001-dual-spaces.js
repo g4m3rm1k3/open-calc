@@ -27,6 +27,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'How to Find the Dual Basis and Apply the Dual Map (4 Steps)',
+        body: '1. **Write the Kronecker delta conditions.** For each dual basis vector $e^i$, require $e^i(\\mathbf{b}_j) = \\delta^i_j$ — equals 1 if $i=j$, else 0. Write $e^i(\\mathbf{x}) = a_1 x_1 + \\cdots + a_n x_n$ with unknowns $a_1, \\ldots, a_n$.\n2. **Solve the linear system.** Substituting each basis vector $\\mathbf{b}_j$ gives $n$ equations in $n$ unknowns. This is equivalent to solving $B^\\top \\mathbf{a} = \\mathbf{e}_i$ where $B$ has columns $\\mathbf{b}_j$. Equivalently, the dual basis vectors are the rows of $B^{-1}$.\n3. **Express any functional in the dual basis.** For $f \\in V^*$, compute its coordinates by evaluating $f$ on each primal basis vector: $f = f(\\mathbf{b}_1)\\, e^1 + \\cdots + f(\\mathbf{b}_n)\\, e^n$.\n4. **Apply the dual map.** If $T: V \\to W$ has matrix $A$, the dual map $T^*: W^* \\to V^*$ sends $g \\mapsto g \\circ T$. In coordinates: represent $g$ as a row vector $\\mathbf{g}^\\top$; then $T^*(g)$ has row vector $\\mathbf{g}^\\top A = (A^\\top \\mathbf{g})^\\top$. The matrix of $T^*$ is $A^\\top$.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 1 of 5 — Advanced Theory',
         body: '**Previous (Chapter 9):** Iterative Solvers — Jacobi, CG, GMRES, preconditioning, sparse direct solvers.\n**This lesson:** Dual Spaces — linear functionals, dual basis, row vectors as covectors, dual map = transpose, double dual.\n**Next (Lesson 2):** Tensor Products — multilinear maps, tensor algebra, Kronecker product in computation.',
@@ -214,6 +219,9 @@ disp('Adjoint check: (Av)^T w = v^T (A^T w):')
   rigor: {
     prose: [
       '**Duality in infinite dimensions.** For a Banach space $X$, the dual $X^* = \\mathcal{B}(X, \\mathbb{F})$ (bounded linear functionals). The bidual $X^{**}$ contains $X$ isometrically via $\\iota$, but $X$ may be a proper subspace of $X^{**}$ (a space for which $X = X^{**}$ is called **reflexive**). Examples: $L^p$ spaces for $1 < p < \\infty$ are reflexive; $L^1$, $L^\\infty$, and $\\ell^1$ are not. Hilbert spaces are always reflexive (Riesz representation theorem: $H^* \\cong H$).',
+      '**Riesz representation theorem.** In a Hilbert space $H$, every bounded linear functional $f: H \\to \\mathbb{F}$ is of the form $f(v) = \\langle u, v \\rangle$ for a unique $u \\in H$. The map $u \\mapsto \\langle u, \\cdot \\rangle$ is the canonical anti-linear isomorphism $H \\to H^*$ (anti-linear because $\\langle cu, v \\rangle = \\bar{c}\\langle u, v \\rangle$ over $\\mathbb{C}$; linear over $\\mathbb{R}$). In $\\mathbb{R}^n$ with the standard inner product, every functional $f(\\mathbf{x}) = \\mathbf{a}^\\top \\mathbf{x}$ is represented by the column vector $\\mathbf{a}$ — this is why inner product spaces feel self-dual. However, this identification requires the inner product as extra structure. The natural isomorphism $V \\cong V^{**}$ (evaluation map) requires no extra structure, making it more fundamental. Recognizing which isomorphisms are natural and which require choices is the first step toward category theory.',
+      '**Linear maps as tensors: $L(V,W) \\cong V^* \\otimes W$.** The dual space perspective connects directly to tensor products (Lesson 2). A linear map $T: V \\to W$ can be identified with an element of $V^* \\otimes W$: each "rank-1" map $\\mathbf{v} \\mapsto f(\\mathbf{v})\\, \\mathbf{w}$ corresponds to $f \\otimes \\mathbf{w} \\in V^* \\otimes W$, and any $T$ decomposes as $T = \\sum_{ij} A_{ij}\\, \\mathbf{e}^i \\otimes \\mathbf{f}_j$ (a sum over dual-basis/basis pairs). In coordinates, the matrix entry $A_{ij}$ is the coefficient of $\\mathbf{e}^i \\otimes \\mathbf{f}_j$: it "eats" $\\mathbf{e}_j$ from the right (via $\\mathbf{e}^i$) and outputs along $\\mathbf{f}_j$. This reveals that a matrix is not just an array of numbers — it is a bilinear object with one "input" index (in $V^*$) and one "output" index (in $W$). The metric tensor in differential geometry and the stress tensor in mechanics follow the same pattern.',
+      '**Categorical naturality.** The isomorphism $V \\cong V^*$ (via inner product) is NOT natural in the categorical sense: it depends on a chosen inner product structure, and no single isomorphism works uniformly for all linear maps. The evaluation isomorphism $\\iota: V \\to V^{**}$ IS natural: for any linear map $T: V \\to W$, the diagram $T^{**} \\circ \\iota_V = \\iota_W \\circ T$ commutes without any choices. A **natural transformation** between functors formalizes this: the collection of maps $\\iota_V$ (one for each space $V$) forms a natural transformation from the identity functor to the double-dual functor $(-)^{**}$. Category theory, developed from exactly these observations by Eilenberg and Mac Lane in 1945, is the language of "coordinate-free" mathematics — it will appear in operator theory (Lesson 4) and throughout modern algebra.',
     ],
     callouts: [
       {
@@ -267,9 +275,73 @@ disp('Adjoint check: (Av)^T w = v^T (A^T w):')
       id: 'ch-la10-001-1',
       title: 'Row space is dual to column space',
       difficulty: 'medium',
-      prompt: 'Show that the row space of $A$ is naturally identified with the dual of the column space of $A$ (modulo null space).',
-      hint: 'Use the rank-nullity theorem and the annihilator relationship.',
-      solution: 'The row space of $A$ is $\\text{rowspace}(A) = \\text{null}(A)^\\perp \\subset \\mathbb{R}^n$. Via the dual map, the row vectors act as linear functionals on $\\mathbb{R}^n$: $\\mathbf{a}_i^\\top: \\mathbf{x} \\mapsto \\mathbf{a}_i^\\top\\mathbf{x}$ vanishes on $\\text{null}(A)$. So row vectors descend to well-defined functionals on $\\mathbb{R}^n/\\text{null}(A) \\cong \\text{colspace}(A)$. Since both have dimension $r = \\text{rank}(A)$, the row space $\\cong$ dual of the column space.',
+      problem: 'Show that the row space of an $m \\times n$ matrix $A$ of rank $r$ is naturally identified (as a vector space) with the dual of the column space of $A$.',
+      walkthrough: [
+        {
+          expression: '\\text{row space}(A) \\subseteq \\mathbb{R}^n, \\quad \\text{col space}(A) \\subseteq \\mathbb{R}^m, \\quad \\dim = r \\text{ for both}',
+          annotation: 'Both the row space and column space have dimension equal to the rank $r$. So any isomorphism between them would be a map between equal-dimensional spaces — a good sign. But we want a natural (basis-independent) identification.',
+        },
+        {
+          expression: '\\text{Each row } \\mathbf{a}_i^\\top \\text{ defines a functional on } \\mathbb{R}^n: \\mathbf{x} \\mapsto \\mathbf{a}_i^\\top \\mathbf{x}',
+          annotation: 'A row vector of $A$ acts as a linear functional on $\\mathbb{R}^n$. This functional vanishes on $\\text{null}(A)$: if $A\\mathbf{x} = 0$, then every row dot $\\mathbf{x}$ equals zero. So each row gives a well-defined functional on the quotient space $\\mathbb{R}^n / \\text{null}(A)$.',
+        },
+        {
+          expression: '\\mathbb{R}^n / \\text{null}(A) \\cong \\text{col}(A) \\quad \\text{(first isomorphism theorem: } T \\text{ induces iso on quotient)}',
+          annotation: 'By the first isomorphism theorem for vector spaces: $A: \\mathbb{R}^n \\to \\mathbb{R}^m$ induces an isomorphism $\\bar{A}: \\mathbb{R}^n/\\text{null}(A) \\xrightarrow{\\sim} \\text{col}(A)$. So functionals on $\\mathbb{R}^n/\\text{null}(A)$ correspond to functionals on $\\text{col}(A)$.',
+        },
+        {
+          expression: '\\text{row}(A) \\cong (\\text{col}(A))^* \\quad \\text{(both have dimension } r \\text{, map is injective)}',
+          annotation: 'The map from row vectors to functionals on $\\text{col}(A)$ is injective (a row in the null space of $A$ from the right is zero). Since both spaces have dimension $r$, this injection is an isomorphism. The row space is the dual of the column space — a natural identification that uses only the linear map structure of $A$, no inner product needed.',
+        },
+      ],
+    },
+    {
+      id: 'ch-la10-001-2',
+      title: 'Dual of the standard basis: verify and apply',
+      difficulty: 'easy',
+      problem: 'The standard basis of $\\mathbb{R}^3$ is $\\{\\mathbf{e}_1, \\mathbf{e}_2, \\mathbf{e}_3\\}$. (a) Write down the three dual basis functionals $e^1, e^2, e^3$ explicitly. (b) Verify the Kronecker delta property. (c) Express $f(x,y,z) = 4x - 3z$ in the dual basis.',
+      walkthrough: [
+        {
+          expression: 'e^1(x,y,z) = x, \\quad e^2(x,y,z) = y, \\quad e^3(x,y,z) = z',
+          annotation: 'Each dual basis functional $e^i$ must equal 1 on $\\mathbf{e}_i$ and 0 on the others. For the standard basis: $e^i$ simply picks out the $i$-th coordinate. These are coordinate projections.',
+        },
+        {
+          expression: 'e^1(\\mathbf{e}_1) = 1,\\; e^1(\\mathbf{e}_2)=0,\\; e^1(\\mathbf{e}_3)=0 \\quad \\checkmark',
+          annotation: 'Verification for $e^1$: applying $e^1(x,y,z) = x$ to the three standard basis vectors gives $e^1(1,0,0)=1$, $e^1(0,1,0)=0$, $e^1(0,0,1)=0$. The Kronecker delta property holds. Same for $e^2$ and $e^3$ by symmetry.',
+        },
+        {
+          expression: 'f = f(\\mathbf{e}_1)\\, e^1 + f(\\mathbf{e}_2)\\, e^2 + f(\\mathbf{e}_3)\\, e^3',
+          annotation: 'The decomposition formula: compute $f$ on each standard basis vector to get coordinates in the dual basis. Here $f(1,0,0)=4$, $f(0,1,0)=0$, $f(0,0,1)=-3$.',
+        },
+        {
+          expression: 'f = 4\\, e^1 + 0\\, e^2 + (-3)\\, e^3 \\quad \\Rightarrow \\quad f(x,y,z) = 4x - 3z \\; \\checkmark',
+          annotation: 'The dual basis coordinates of $f$ are exactly its coefficient vector $[4, 0, -3]$. For the standard basis, dual-basis coordinates equal the row vector of coefficients — confirming that the standard basis is self-dual (its own dual basis).',
+        },
+      ],
+    },
+    {
+      id: 'ch-la10-001-3',
+      title: 'Fredholm alternative via annihilators',
+      difficulty: 'hard',
+      problem: 'Use the annihilator to derive the Fredholm alternative: $A\\mathbf{x} = \\mathbf{b}$ has a solution if and only if $\\mathbf{y}^\\top \\mathbf{b} = 0$ for every $\\mathbf{y}$ satisfying $A^\\top \\mathbf{y} = 0$.',
+      walkthrough: [
+        {
+          expression: '\\mathbf{b} \\in \\text{col}(A) \\iff f(\\mathbf{b}) = 0 \\; \\forall f \\in \\text{col}(A)^0',
+          annotation: 'A vector $\\mathbf{b}$ is in a subspace $W$ if and only if every functional in the annihilator $W^0$ vanishes on $\\mathbf{b}$. This is the fundamental annihilator membership test: instead of checking column-space membership directly, check against all vanishing functionals.',
+        },
+        {
+          expression: '\\text{col}(A)^0 = \\{f \\in (\\mathbb{R}^m)^* : f(A\\mathbf{x}) = 0 \\; \\forall \\mathbf{x}\\}',
+          annotation: 'The annihilator of $\\text{col}(A)$: all functionals that vanish on every vector of the form $A\\mathbf{x}$. Write $f$ as a row vector $\\mathbf{y}^\\top$. Then $f(A\\mathbf{x}) = \\mathbf{y}^\\top A \\mathbf{x} = (A^\\top \\mathbf{y})^\\top \\mathbf{x} = 0$ for all $\\mathbf{x}$ iff $A^\\top \\mathbf{y} = 0$.',
+        },
+        {
+          expression: '\\text{col}(A)^0 = \\{\\mathbf{y}^\\top : A^\\top \\mathbf{y} = 0\\} = \\text{null}(A^\\top)^\\top',
+          annotation: 'The annihilator of the column space of $A$ equals the left null space of $A$ (functionals represented by vectors in $\\ker(A^\\top)$). This confirms the dimension count: $\\dim\\text{col}(A) + \\dim\\text{null}(A^\\top) = m$.',
+        },
+        {
+          expression: 'A\\mathbf{x} = \\mathbf{b} \\text{ solvable} \\iff \\mathbf{y}^\\top \\mathbf{b} = 0 \\; \\forall \\mathbf{y} \\in \\text{null}(A^\\top)',
+          annotation: 'Combining: solvability $\\iff$ $\\mathbf{b}$ is annihilated by everything in $\\text{col}(A)^0$ $\\iff$ $\\mathbf{y}^\\top\\mathbf{b} = 0$ for all $\\mathbf{y}$ with $A^\\top\\mathbf{y} = 0$. This is the Fredholm alternative — a completely dual-space proof that avoids row reduction entirely.',
+        },
+      ],
     },
   ],
 
@@ -428,15 +500,38 @@ disp('Adjoint check: (Av)^T w = v^T (A^T w):')
   transferPrompts: [
     {
       situation: 'You have a machine learning model that outputs $\\mathbf{w}^\\top \\mathbf{x}$ (a linear classifier). A colleague says "the weight vector and input are the same kind of thing." How would you respond using dual space language?',
-      competingTechniques: ['Treat $\\mathbf{w}$ and $\\mathbf{x}$ as both column vectors in $\\mathbb{R}^n$', 'Recognize $\\mathbf{w}^\\top$ as an element of the dual space $(\\mathbb{R}^n)^*$'],
+      competingTechniques: 'Treat $\\mathbf{w}$ and $\\mathbf{x}$ as both column vectors in $\\mathbb{R}^n$ vs recognize $\\mathbf{w}^\\top$ as an element of the dual space $(\\mathbb{R}^n)^*$ (a covector).',
       whyThisTechniqueWins: 'Dual space language clarifies the type: $\\mathbf{x}$ is a data point (vector), $\\mathbf{w}^\\top$ is a decision functional (covector). This distinction matters when changing coordinates — a basis change transforms them differently (contravariant vs. covariant).',
     },
     {
       situation: 'A system $A\\mathbf{x} = \\mathbf{b}$ has a solution iff $\\mathbf{b}$ is in the column space of $A$. Use duality (annihilator) to reformulate this condition in terms of the left null space.',
-      competingTechniques: ['Check column space membership directly (row reduce and verify)', 'Use the annihilator: $\\mathbf{b} \\in \\text{col}(A)$ iff $f(\\mathbf{b})=0$ for all $f \\in \\text{col}(A)^0$'],
-      whyThisTechniqueWins: 'The dual condition is $A^\\top \\mathbf{y} = 0 \\Rightarrow \\mathbf{y}^\\top \\mathbf{b} = 0$ (Fredholm alternative), which is useful in theory and in sensitivity analysis — it characterizes solvability without explicitly constructing the column space.',
+      competingTechniques: 'Check column space membership directly (row reduce and verify) vs use the annihilator: $\\mathbf{b} \\in \\text{col}(A)$ iff $f(\\mathbf{b})=0$ for all $f \\in \\text{col}(A)^0$ (Fredholm alternative).',
+      whyThisTechniqueWins: 'The dual condition $A^\\top \\mathbf{y} = 0 \\Rightarrow \\mathbf{y}^\\top \\mathbf{b} = 0$ characterizes solvability without constructing the column space explicitly — useful in theory and sensitivity analysis.',
     },
   ],
+
+  semantics: {
+    core: [
+      { symbol: 'V^*', meaning: 'Dual space of $V$: all linear functionals $f: V \\to \\mathbb{F}$. A vector space in its own right; $\\dim V^* = \\dim V$ for finite-dimensional $V$.' },
+      { symbol: 'e^i(\\mathbf{e}_j) = \\delta^i_j', meaning: 'Kronecker delta property defining the dual basis: dual basis vector $e^i$ evaluates to 1 on $\\mathbf{e}_i$ and 0 on all other basis vectors. Uniquely determines $e^i$ given the primal basis.' },
+      { symbol: 'T^*: W^* \\to V^*', meaning: 'Dual map (transpose): defined by $T^*(g) = g \\circ T$. Pre-composing with $T$ reverses the direction. Matrix of $T^*$ is $A^\\top$ when $T$ has matrix $A$.' },
+      { symbol: 'W^0', meaning: 'Annihilator of $W \\subseteq V$: all $f \\in V^*$ such that $f(\\mathbf{w}) = 0$ for all $\\mathbf{w} \\in W$. Satisfies $\\dim W + \\dim W^0 = \\dim V$. Encodes solvability via the Fredholm alternative.' },
+      { symbol: '\\iota: V \\to V^{**}', meaning: 'Natural evaluation isomorphism: $\\iota(\\mathbf{v})(f) = f(\\mathbf{v})$. Basis-independent (natural). Contrast with $V \\cong V^*$, which requires an inner product and is not natural.' },
+      { symbol: 'f = \\sum_i f(\\mathbf{e}_i)\\, e^i', meaning: 'Dual basis decomposition: coordinates of $f \\in V^*$ in the dual basis are the values of $f$ on the primal basis vectors. The primal-basis-to-dual-coordinates map requires no matrix inversion.' },
+    ],
+    rulesOfThumb: [
+      'Compute the dual basis as rows of $B^{-1}$ (where columns of $B$ are the primal basis vectors). Never try to guess the dual basis without solving the Kronecker delta system.',
+      'Row vectors are covectors: $\\mathbf{a}^\\top \\mathbf{x}$ is a functional $\\mathbf{a}^\\top \\in (\\mathbb{R}^n)^*$ applied to a vector $\\mathbf{x} \\in \\mathbb{R}^n$. They live in different (though isomorphic) spaces.',
+      'The transpose is the dual map — not just a notational trick. When in doubt about where a transpose comes from, ask: "which space does this object live in?"',
+      'Annihilator dimension: $\\dim W^0 = \\dim V - \\dim W$. For $W$ = column space of $A$: $W^0$ = left null space of $A$, confirming rank-nullity.',
+      'Natural vs chosen isomorphism: $V \\cong V^{**}$ (natural, no choices) vs $V \\cong V^*$ (needs inner product). In physics: column vectors (contravariant) transform differently from row vectors (covariant) under coordinate changes.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: ['la3-001', 'la6-001'],
+    futureLinks: ['la10-002', 'la10-005'],
+  },
 
   debugging: [
     {

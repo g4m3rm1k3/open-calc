@@ -25,6 +25,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'How to Find the Kernel and Image of a Linear Map (5 Steps)',
+        body: '**Given:** A linear map $T: V \\to W$.\n**Step 1.** Verify linearity: check $T(\\mathbf{u}+\\mathbf{v}) = T(\\mathbf{u})+T(\\mathbf{v})$ and $T(c\\mathbf{v}) = cT(\\mathbf{v})$ (or equivalently $T(c\\mathbf{u}+d\\mathbf{v}) = cT(\\mathbf{u})+dT(\\mathbf{v})$).\n**Step 2.** Find $\\ker(T)$: set $T(\\mathbf{v}) = \\mathbf{0}$ and solve. For a matrix $A$: find the null space via RREF.\n**Step 3.** Find $\\text{im}(T)$: apply $T$ to each basis vector of $V$. The span of the resulting vectors is the image.\n**Step 4.** State rank $= \\dim(\\text{im}\\,T)$ and nullity $= \\dim(\\ker T)$.\n**Step 5.** Verify rank-nullity: rank + nullity $= \\dim(V)$.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 3 of 6 — Abstract Vector Spaces',
         body: '**Previous:** Basis and Dimension — measuring the size of a vector space.\n**This lesson:** Linear Transformations — maps between vector spaces that preserve addition and scalar multiplication, with kernel and image as the key structural subspaces.\n**Next:** Matrix Representations — how to write any linear transformation as a matrix once you choose bases.',
@@ -208,6 +213,8 @@ print(kernel_basis.round(10))
     prose: [
       '**Category theory perspective.** Linear transformations are the morphisms in the category **Vect**$_\\mathbb{F}$ of vector spaces. Isomorphisms are the invertible morphisms. The category has products ($V \\times W$), coproducts (direct sum $V \\oplus W$), and internal Hom-sets ($\\text{Hom}(V,W)$ — itself a vector space). The natural transformations between Hom functors correspond to bilinear maps, leading to tensor products.',
       '**Dual space.** The dual space $V^* = \\text{Hom}(V, \\mathbb{F})$ is the space of all linear functionals $\\phi: V \\to \\mathbb{F}$. For finite-dimensional $V$, $V^* \\cong V$ (non-canonically — requires a basis). For infinite-dimensional spaces, $V^*$ can be strictly larger. The dual map $T^*: W^* \\to V^*$ defined by $T^*(\\phi)(v) = \\phi(T(v))$ is the transpose operation at the abstract level.',
+      '**First isomorphism theorem.** If $T: V \\to W$ is linear, then the quotient space $V / \\ker T$ is isomorphic to $\\text{im}(T)$: the map $\\tilde{T}(\\mathbf{v} + \\ker T) = T(\\mathbf{v})$ is well-defined, injective, and surjective onto $\\text{im}(T)$. Rank-nullity is the dimension count of this theorem: $\\dim(V / \\ker T) = \\dim(\\text{im}\\,T)$, so $\\dim V - \\dim \\ker T = \\dim(\\text{im}\\,T)$. The theorem also tells you $T$ is injective iff $V \\cong \\text{im}(T)$ (no information lost) and surjective iff $W \\cong V / \\ker T$.',
+      '**Composition and functor of linear maps.** If $S: U \\to V$ and $T: V \\to W$ are linear, then $T \\circ S: U \\to W$ is linear and $[T \\circ S] = [T][S]$ (matrix product = function composition). This is why matrix multiplication is defined the way it is. Formally: the assignment $V \\mapsto V$ and $T \\mapsto [T]$ is a functor from the category of vector spaces to the category of matrices. Functoriality — $(T \\circ S)^* = S^* \\circ T^*$ for dual maps — is why the transpose of a product reverses order: $(AB)^\\top = B^\\top A^\\top$.',
     ],
     callouts: [
       {
@@ -320,6 +327,36 @@ print(kernel_basis.round(10))
         '**Rank-Nullity:** $\\dim(\\ker T) + \\dim(\\text{im } T) = 0 + 4 = 4 = \\dim P_3$ ✓.',
         '**Interpretation:** Adding the derivative of a polynomial never destroys information — you can always recover $p$ from $p + p\'$ (by inverting the operator $I + D$).',
       ],
+    },
+    {
+      id: 'ch-la6-003-2',
+      title: 'Symmetrization map on matrices',
+      difficulty: 'easy',
+      problem: 'Let $T: M_{2\\times 2} \\to M_{2\\times 2}$ be defined by $T(A) = A + A^\\top$ (add the transpose). Show $T$ is linear, find $\\ker(T)$ and $\\text{im}(T)$, and verify rank-nullity.',
+      hint: 'The kernel consists of matrices where $A = -A^\\top$ (skew-symmetric). The image consists of symmetric matrices, since $A + A^\\top$ is always symmetric.',
+      walkthrough: [
+        { expression: 'T(aA + bB) = (aA+bB) + (aA+bB)^\\top = a(A+A^\\top) + b(B+B^\\top) = aT(A)+bT(B) \\checkmark', annotation: 'Linearity holds because transposing is linear.' },
+        { expression: '\\ker(T) = \\{A : A + A^\\top = 0\\} = \\{A : A^\\top = -A\\} = \\text{Skew}_{2\\times2}', annotation: 'T(A) = 0 iff A is skew-symmetric. A 2×2 skew-symmetric matrix has the form [[0,a],[-a,0]], one free parameter. $\\dim(\\ker T) = 1$.' },
+        { expression: '\\text{im}(T) \\subseteq \\text{Sym}_{2\\times2} \\text{ (since } A+A^\\top \\text{ is always symmetric)}', annotation: 'Since $T(A)^\\top = (A+A^\\top)^\\top = A^\\top + A = T(A)$, every output is symmetric.' },
+        { expression: 'T(E_{11}) = 2E_{11},\\; T(E_{12}) = E_{12}+E_{21},\\; T(E_{22}) = 2E_{22} \\implies \\text{im}(T) = \\text{Sym}_{2\\times2}', annotation: 'Apply T to the 4 standard basis matrices $E_{ij}$. The outputs span all symmetric matrices. $\\dim(\\text{im}\\,T) = 3$.' },
+        { expression: '\\dim(\\ker T) + \\dim(\\text{im}\\,T) = 1 + 3 = 4 = \\dim(M_{2\\times2}) \\checkmark', annotation: 'Rank-Nullity holds. The skew-symmetric and symmetric subspaces are complementary: $M_{2\\times2} = \\text{Sym} \\oplus \\text{Skew}$, which is why rank + nullity = 4.' },
+      ],
+      answer: '$T$ is linear; $\\ker(T) = \\text{Skew}_{2\\times2}$ (dim 1); $\\text{im}(T) = \\text{Sym}_{2\\times2}$ (dim 3). Rank + Nullity $= 1 + 3 = 4 = \\dim(M_{2\\times2})$ ✓.',
+    },
+    {
+      id: 'ch-la6-003-3',
+      title: 'Constructing a map with prescribed kernel and image',
+      difficulty: 'hard',
+      problem: 'Construct a linear map $T: \\mathbb{R}^3 \\to \\mathbb{R}^3$ with $\\ker(T) = \\text{Span}\\{(1,1,0)^\\top, (0,1,1)^\\top\\}$ and $\\text{im}(T) = \\text{Span}\\{(1,2,1)^\\top\\}$. Find the matrix $A$ of $T$ and verify both conditions.',
+      hint: 'Rank-Nullity requires rank = 1 and nullity = 2. A rank-1 matrix has the form $A = \\mathbf{v}\\mathbf{r}^\\top$. Choose $\\mathbf{v} = (1,2,1)^\\top$ (the image direction) and $\\mathbf{r}^\\top$ perpendicular to both kernel vectors.',
+      walkthrough: [
+        { expression: '\\text{rank} + \\text{nullity} = 1 + 2 = 3 = \\dim(\\mathbb{R}^3) \\checkmark', annotation: 'A rank-1 map: nullity = 2. This is consistent by rank-nullity.' },
+        { expression: '\\mathbf{r} \\perp (1,1,0) \\text{ and } \\mathbf{r} \\perp (0,1,1): \\quad \\mathbf{r} = (1,1,0) \\times (0,1,1) = (1\\cdot1-0\\cdot1,\\; 0\\cdot0-1\\cdot1,\\; 1\\cdot1-1\\cdot0) = (1,-1,1)', annotation: 'The row direction $\\mathbf{r}$ must be orthogonal to both kernel vectors. Compute via cross product.' },
+        { expression: 'A = \\mathbf{v}\\mathbf{r}^\\top = \\begin{bmatrix}1\\\\2\\\\1\\end{bmatrix}\\begin{bmatrix}1&-1&1\\end{bmatrix} = \\begin{bmatrix}1&-1&1\\\\2&-2&2\\\\1&-1&1\\end{bmatrix}', annotation: 'Outer product gives the matrix. All rows are multiples of $\\mathbf{r}^\\top$, so the rank is 1 and all columns are multiples of $\\mathbf{v}$.' },
+        { expression: 'A(1,1,0)^\\top = (1-1, 2-2, 1-1)^\\top = (0,0,0)^\\top \\checkmark \\quad A(0,1,1)^\\top = (-1+1,-2+2,-1+1)^\\top = (0,0,0)^\\top \\checkmark', annotation: 'Both kernel vectors map to zero.' },
+        { expression: 'A(1,0,0)^\\top = (1,2,1)^\\top \\checkmark \\quad \\text{col}(A) = \\text{Span}\\{(1,2,1)^\\top\\} \\checkmark', annotation: 'The first column of A is $(1,2,1)^\\top$; all columns are multiples of it — the image is the required span.' },
+      ],
+      answer: '$A = \\begin{bmatrix}1&-1&1\\\\2&-2&2\\\\1&-1&1\\end{bmatrix}$. Kernel = $\\text{Span}\\{(1,1,0)^\\top,(0,1,1)^\\top\\}$, image = $\\text{Span}\\{(1,2,1)^\\top\\}$. Rank = 1, nullity = 2, sum = 3 ✓.',
     },
   ],
 
@@ -512,6 +549,34 @@ print(kernel_basis.round(10))
       whyThisTechniqueWins: 'Similar matrices have the same characteristic polynomial, eigenvalues, trace, determinant, rank, and nullity — all of these are preserved by similarity. But the converse fails: matrices with the same eigenvalues are not necessarily similar (Jordan form distinguishes them). The geometric picture is "same map, rotated basis."',
     },
   ],
+
+  semantics: {
+    core: [
+      { symbol: 'T(c\\mathbf{u}+d\\mathbf{v}) = cT(\\mathbf{u})+dT(\\mathbf{v})', meaning: 'Definition of a linear map T: V → W; preserves both addition and scalar multiplication in one condition' },
+      { symbol: '\\ker(T)', meaning: 'Kernel (null space) of T: {v ∈ V : T(v) = 0}; always a subspace of the domain V' },
+      { symbol: '\\text{im}(T)', meaning: 'Image (range) of T: {T(v) : v ∈ V}; always a subspace of the codomain W' },
+      { symbol: '[T]_{\\mathcal{B}}^{\\mathcal{C}}', meaning: 'Matrix of T in bases B (domain) and C (codomain); j-th column = C-coordinates of T(b_j)' },
+      { symbol: 'V/\\ker T \\cong \\text{im}(T)', meaning: 'First isomorphism theorem: the quotient by the kernel is isomorphic to the image; gives rank-nullity as a dimension equation' },
+    ],
+    rulesOfThumb: [
+      'T(0) = 0 always — if a map fails this, stop: it is not linear. This eliminates all translations and affine maps.',
+      'Kernel ⊆ domain (V), image ⊆ codomain (W) — they live in different spaces.',
+      'rank + nullity = dim(domain) — always the number of COLUMNS (domain dimension), not rows.',
+      'To build the matrix: apply T to each basis vector of V, express the result in the basis of W, stack as columns.',
+      'Similar matrices A ~ B mean the same map in different bases; same rank, trace, determinant, eigenvalues.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: [
+      { id: 'la6-001', label: 'Abstract Vector Spaces', reason: 'Kernel and image are subspaces — the subspace test from la6-001 applies to both' },
+      { id: 'la6-002', label: 'Basis and Dimension', reason: 'Rank-nullity uses dimension; building the matrix requires choosing bases for domain and codomain' },
+    ],
+    futureLinks: [
+      { id: 'la6-004', label: 'Matrix Representations', reason: 'The [T]_B^C construction is the central topic of la6-004 — how to compute and change the matrix' },
+      { id: 'la6-005', label: 'Isomorphisms', reason: 'A linear map is an isomorphism iff it is bijective iff ker = {0} and im = W; la6-005 studies these invertible maps' },
+    ],
+  },
 
   debugging: [
     {

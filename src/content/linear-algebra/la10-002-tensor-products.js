@@ -27,6 +27,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'How to Use Tensor Products and the Kronecker Product (4 Steps)',
+        body: '1. **Identify the bilinear map.** Confirm your map $B: V \\times W \\to U$ is linear in each argument separately. Determine $\\dim V$ and $\\dim W$ — the resulting tensor space has dimension $(\\dim V)(\\dim W)$.\n2. **Build the basis.** Use $\\{\\mathbf{e}_i \\otimes \\mathbf{f}_j\\}$ as the canonical basis for $V \\otimes W$. Any element is a sum of elementary tensors $\\sum_{ij} c_{ij}\\, \\mathbf{e}_i \\otimes \\mathbf{f}_j$ — in matrix coordinates, the coefficient matrix $[c_{ij}]$.\n3. **Compute the Kronecker product.** $A \\otimes B$: replace each scalar entry $a_{ij}$ by the block $a_{ij}B$. Result size: $(m_A m_B) \\times (n_A n_B)$. Properties: $(A \\otimes B)(C \\otimes D) = AC \\otimes BD$; $(A \\otimes B)^{-1} = A^{-1} \\otimes B^{-1}$ (when invertible); eigenvalues are all products $\\lambda_i(A)\\lambda_j(B)$.\n4. **Apply the vec identity.** To solve $AXB = C$ or $AX + XB = C$: vectorize using $\\text{vec}(AXB) = (B^\\top \\otimes A)\\,\\text{vec}(X)$. The Sylvester equation $AX + XB = C$ becomes $(I \\otimes A + B^\\top \\otimes I)\\,\\text{vec}(X) = \\text{vec}(C)$ — a standard linear system of size $mn \\times mn$.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 2 of 5 — Advanced Theory',
         body: '**Previous (Lesson 1):** Dual Spaces — linear functionals, dual basis, row vectors as covectors, transpose as dual map.\n**This lesson:** Tensor Products — bilinear maps, universal property, matrices as rank-1 tensors, Kronecker product, vectorization identity.\n**Next (Lesson 3):** Exterior Algebra — antisymmetric tensors, wedge product, determinants as volume forms, differential forms.',
@@ -223,6 +228,9 @@ residual
   rigor: {
     prose: [
       '**Symmetric and antisymmetric tensors.** The tensor product is symmetric ($V \\otimes W \\cong W \\otimes V$) but not canonically ordered. The **symmetric algebra** $\\text{Sym}^k V = V^{\\otimes k} / (\\text{swap relations})$ captures multilinear symmetric functions. The **exterior algebra** $\\Lambda^k V$ captures antisymmetric multilinear functions — the wedge product (next lesson). The determinant is an element of $\\Lambda^n \\mathbb{R}^n \\cong \\mathbb{R}$.',
+      '**Tensor rank vs matrix rank.** Every element of $V \\otimes W$ is a finite sum of elementary tensors; the **tensor rank** is the minimum number of summands needed. For order-2 tensors (matrices), rank equals matrix rank — the SVD delivers a rank-$r$ decomposition $A = \\sum_{i=1}^r \\sigma_i \\mathbf{u}_i \\mathbf{v}_i^\\top$ with $r$ terms. For order-3+ tensors, rank is NP-hard to compute in general. Moreover, real and complex tensor ranks can differ: a real tensor may require more summands over $\\mathbb{R}$ than over $\\mathbb{C}$. Strassen\'s $2\\times 2$ matrix multiplication tensor has rank 7 (not 8) — this is precisely why Strassen\'s algorithm uses only 7 multiplications instead of 8.',
+      '**Spectral properties of Kronecker products.** If $A$ has eigenvalues $\\lambda_i$ with eigenvectors $\\mathbf{u}_i$, and $B$ has eigenvalues $\\mu_j$ with eigenvectors $\\mathbf{v}_j$, then $A \\otimes B$ has eigenvalues $\\lambda_i \\mu_j$ with eigenvectors $\\mathbf{u}_i \\otimes \\mathbf{v}_j$. Proof: $(A \\otimes B)(\\mathbf{u}_i \\otimes \\mathbf{v}_j) = (A\\mathbf{u}_i) \\otimes (B\\mathbf{v}_j) = \\lambda_i \\mathbf{u}_i \\otimes \\mu_j \\mathbf{v}_j = \\lambda_i \\mu_j (\\mathbf{u}_i \\otimes \\mathbf{v}_j)$. This immediately explains when the Sylvester equation $AX - XB = C$ has a unique solution: the system $(I \\otimes A - B^\\top \\otimes I)\\text{vec}(X) = \\text{vec}(C)$ is non-singular iff no eigenvalue of $B^\\top \\otimes I$ equals an eigenvalue of $I \\otimes A$, i.e., $\\lambda_i(A) \\neq \\lambda_j(B)$ for all $i,j$.',
+      '**Tensor networks and contraction.** In quantum many-body physics and modern ML, large tensor products are handled via tensor networks: networks of small tensors connected by contractions. A **contraction** sums over a shared index, generalizing matrix multiplication: $C_{ik} = \\sum_j A_{ij} B_{jk}$. The `einsum` notation makes this explicit: `np.einsum(\'ij,jk->ik\', A, B)` is matrix multiplication; `np.einsum(\'ij,kl->ijkl\', A, B)` is the outer product. Efficient contraction order matters: contracting in the wrong sequence can increase cost from $O(n^3)$ to $O(n^4)$ for the same result. This is the "optimal contraction order" problem — NP-hard in general but tractable for tree-structured networks.',
     ],
     callouts: [
       {
@@ -273,11 +281,75 @@ residual
   challenges: [
     {
       id: 'ch-la10-002-1',
-      title: 'Not every matrix is rank-1',
+      title: 'Not every matrix is an elementary tensor',
       difficulty: 'medium',
-      prompt: 'Show that the identity matrix $I_2 \\in \\mathbb{R}^{2\\times 2}$ cannot be written as a single outer product $\\mathbf{u}\\mathbf{v}^\\top$. What is the minimum number of outer products needed?',
-      hint: 'A single outer product has rank 1. What is the rank of $I_2$?',
-      solution: '$I_2 = \\begin{bmatrix}1&0\\\\0&1\\end{bmatrix}$ has rank 2. A rank-1 matrix $\\mathbf{u}\\mathbf{v}^\\top$ has $\\det = 0$ (since it has a 0 eigenvalue), but $\\det I_2 = 1 \\neq 0$. Minimum outer products needed = rank$(I_2)$ = 2: $I_2 = \\mathbf{e}_1\\mathbf{e}_1^\\top + \\mathbf{e}_2\\mathbf{e}_2^\\top$.',
+      problem: 'Show that $I_2 \\in \\mathbb{R}^{2 \\times 2}$ cannot be written as a single outer product $\\mathbf{u}\\mathbf{v}^\\top$. Find the minimum number of elementary tensors needed and give an explicit decomposition.',
+      walkthrough: [
+        {
+          expression: '\\mathbf{u}\\mathbf{v}^\\top \\text{ has rank 1 for any nonzero } \\mathbf{u}, \\mathbf{v}',
+          annotation: 'An outer product $\\mathbf{u}\\mathbf{v}^\\top$ has all rows proportional to $\\mathbf{v}^\\top$: row $i$ is $u_i \\mathbf{v}^\\top$. So the row space is one-dimensional — rank 1. Equivalently, $\\det(\\mathbf{u}\\mathbf{v}^\\top) = 0$ (by Sylvester\'s determinant identity or direct computation).',
+        },
+        {
+          expression: '\\text{rank}(I_2) = 2 \\quad (\\det I_2 = 1 \\neq 0)',
+          annotation: 'The identity matrix $I_2$ has rank 2: its two rows $(1,0)$ and $(0,1)$ are linearly independent. Since rank $= 2 > 1$, it cannot be a single outer product.',
+        },
+        {
+          expression: 'I_2 = \\mathbf{e}_1 \\mathbf{e}_1^\\top + \\mathbf{e}_2 \\mathbf{e}_2^\\top = \\begin{pmatrix}1\\\\0\\end{pmatrix}\\begin{pmatrix}1&0\\end{pmatrix} + \\begin{pmatrix}0\\\\1\\end{pmatrix}\\begin{pmatrix}0&1\\end{pmatrix}',
+          annotation: 'This is the spectral decomposition of $I_2$: each term $\\mathbf{e}_i \\mathbf{e}_i^\\top$ is a rank-1 projection. Two elementary tensors are needed — matching the rank.',
+        },
+        {
+          expression: '\\text{Minimum outer products} = \\text{rank}(M) \\quad \\text{for any matrix } M',
+          annotation: 'The tensor rank of a matrix equals its matrix rank. The SVD $M = \\sum_{i=1}^r \\sigma_i \\mathbf{u}_i \\mathbf{v}_i^\\top$ gives an explicit rank-$r$ decomposition into $r$ elementary tensors. This is the best possible.',
+        },
+      ],
+    },
+    {
+      id: 'ch-la10-002-2',
+      title: 'Kronecker product eigenvalues by hand',
+      difficulty: 'easy',
+      problem: 'Let $A = \\begin{pmatrix}2&0\\\\0&3\\end{pmatrix}$ and $B = \\begin{pmatrix}1&0\\\\0&4\\end{pmatrix}$. List all eigenvalues of $A \\otimes B$ and give the corresponding eigenvectors (as elementary tensors).',
+      walkthrough: [
+        {
+          expression: '\\lambda(A) = \\{2, 3\\} \\text{ with eigenvectors } \\mathbf{e}_1, \\mathbf{e}_2; \\quad \\mu(B) = \\{1, 4\\} \\text{ with eigenvectors } \\mathbf{e}_1, \\mathbf{e}_2',
+          annotation: 'Both $A$ and $B$ are diagonal, so their eigenvalues are the diagonal entries and their eigenvectors are the standard basis vectors.',
+        },
+        {
+          expression: '\\lambda(A \\otimes B) = \\{\\lambda_i \\mu_j\\} = \\{2\\cdot1, 2\\cdot4, 3\\cdot1, 3\\cdot4\\} = \\{2, 8, 3, 12\\}',
+          annotation: 'Eigenvalues of $A \\otimes B$ are all pairwise products of eigenvalues of $A$ and $B$. For diagonal matrices this is immediate from the block structure.',
+        },
+        {
+          expression: '\\mathbf{e}_1 \\otimes \\mathbf{e}_1 = (1,0,0,0)^\\top,\\; \\mathbf{e}_1 \\otimes \\mathbf{e}_2 = (0,1,0,0)^\\top,\\; \\mathbf{e}_2 \\otimes \\mathbf{e}_1 = (0,0,1,0)^\\top,\\; \\mathbf{e}_2 \\otimes \\mathbf{e}_2 = (0,0,0,1)^\\top',
+          annotation: 'Eigenvectors of $A \\otimes B$ are $\\mathbf{u}_i \\otimes \\mathbf{v}_j$. In standard coordinates: tensor products of standard basis vectors are again standard basis vectors (of $\\mathbb{R}^4$). The eigenvector for eigenvalue $\lambda_i \mu_j$ is $\mathbf{u}_i \otimes \mathbf{v}_j$.',
+        },
+        {
+          expression: '(A \\otimes B)(\\mathbf{e}_1 \\otimes \\mathbf{e}_2) = (A\\mathbf{e}_1) \\otimes (B\\mathbf{e}_2) = 2\\mathbf{e}_1 \\otimes 4\\mathbf{e}_2 = 8(\\mathbf{e}_1 \\otimes \\mathbf{e}_2) \\; \\checkmark',
+          annotation: 'Verification for the $(1,2)$ pair: mixed-product property $(A \\otimes B)(u \\otimes v) = (Au) \\otimes (Bv)$. The eigenvectors are indeed the tensor products of individual eigenvectors.',
+        },
+      ],
+    },
+    {
+      id: 'ch-la10-002-3',
+      title: 'Sylvester equation solvability from eigenvalues',
+      difficulty: 'hard',
+      problem: 'Determine whether $AX - XB = C$ has a unique solution, given $A = \\begin{pmatrix}1&0\\\\0&4\\end{pmatrix}$ and $B = \\begin{pmatrix}3&0\\\\0&4\\end{pmatrix}$. If not unique, characterize the solution set.',
+      walkthrough: [
+        {
+          expression: '\\text{vec}(AX - XB) = (I \\otimes A - B^\\top \\otimes I)\\text{vec}(X)',
+          annotation: 'Vectorize: $\\text{vec}(AX) = (I \\otimes A)\\text{vec}(X)$ and $\\text{vec}(XB) = (B^\\top \\otimes I)\\text{vec}(X)$. So the equation becomes the $4 \\times 4$ linear system $(I \\otimes A - B^\\top \\otimes I)\\text{vec}(X) = \\text{vec}(C)$.',
+        },
+        {
+          expression: '\\lambda(I \\otimes A) = \\{1, 1, 4, 4\\} \\quad \\lambda(B^\\top \\otimes I) = \\{3, 3, 4, 4\\}',
+          annotation: 'Eigenvalues of $I \\otimes A$: products $1 \\cdot \\lambda_j(A) \\in \\{1, 4\\}$ each with multiplicity 2. Eigenvalues of $B^\\top \\otimes I$: products $\\lambda_i(B) \\cdot 1 \\in \\{3, 4\\}$ each with multiplicity 2.',
+        },
+        {
+          expression: '\\lambda(I \\otimes A - B^\\top \\otimes I) = \\{1-3, 1-4, 4-3, 4-4\\} = \\{-2, -3, 1, 0\\}',
+          annotation: 'Since $A$ and $B$ are both diagonal, $I \\otimes A$ and $B^\\top \\otimes I$ commute and share eigenvectors. The eigenvalues of the difference are the pairwise differences $\\lambda_i(A) - \\lambda_j(B)$. One of these is zero: $4 - 4 = 0$.',
+        },
+        {
+          expression: '\\det(I \\otimes A - B^\\top \\otimes I) = 0 \\Rightarrow \\text{system is singular}',
+          annotation: 'The $4 \\times 4$ Kronecker system is singular because eigenvalue $4$ of $A$ equals eigenvalue $4$ of $B$. The equation $AX - XB = C$ does NOT have a unique solution. It has no solution (if $C$ is not in the column space of the Kronecker matrix) or infinitely many (if $C$ is compatible). Use the Fredholm alternative for $X_{22}$: solvability requires the $(2,2)$ entry of $C$ to equal zero for the corresponding row.',
+        },
+      ],
     },
   ],
 
@@ -431,15 +503,38 @@ residual
   transferPrompts: [
     {
       situation: 'A neural network layer computes $Y = \\sigma(W_1 X W_2^\\top)$ where $X$ is a feature matrix. You need to optimize over $X$ while holding $W_1, W_2$ fixed. How would you use the vec-Kronecker trick?',
-      competingTechniques: ['Treat $X$ as a matrix and take matrix derivatives', 'Vectorize: $\\text{vec}(Y) = (W_2 \\otimes W_1)\\text{vec}(X)$, then use standard vector calculus'],
-      whyThisTechniqueWins: 'The vec form converts the bilinear matrix equation into a linear system in $\\text{vec}(X)$, enabling standard gradient descent or least-squares methods on vectors.',
+      competingTechniques: 'Treat $X$ as a matrix and take matrix derivatives directly vs vectorize using $\\text{vec}(W_1 X W_2^\\top) = (W_2 \\otimes W_1)\\text{vec}(X)$ and apply standard vector-calculus gradient methods.',
+      whyThisTechniqueWins: 'The vec form converts the bilinear matrix equation into a linear system in $\\text{vec}(X)$, enabling standard gradient descent or least-squares methods without matrix-derivative conventions.',
     },
     {
       situation: 'You have a quantum circuit on 3 qubits. A gate $G$ acts only on qubit 2 (leaving qubits 1 and 3 unchanged). What is the full 8×8 matrix for this gate?',
-      competingTechniques: ['Manually compute the 8×8 matrix by expanding basis states', 'Use Kronecker product: $I \\otimes G \\otimes I$ where $G$ is the 2×2 gate matrix'],
-      whyThisTechniqueWins: 'The Kronecker product gives a direct formula and generalizes to any number of qubits. The mixed-product property then correctly predicts how multi-gate circuits compose.',
+      competingTechniques: 'Manually expand the 8×8 matrix by working through all 8 basis states vs use Kronecker product: $I_2 \\otimes G \\otimes I_2$ where $G$ is the 2×2 gate matrix.',
+      whyThisTechniqueWins: 'The Kronecker product gives a direct formula that generalizes to any number of qubits. The mixed-product property $(A \\otimes B)(C \\otimes D) = AC \\otimes BD$ then correctly predicts how multi-gate circuits compose.',
     },
   ],
+
+  semantics: {
+    core: [
+      { symbol: '\\mathbf{v} \\otimes \\mathbf{w}', meaning: 'Elementary (rank-1) tensor: outer product in matrix coordinates; bilinear in both arguments. Every element of $V \\otimes W$ is a finite sum of these, but not every element is itself a single elementary tensor.' },
+      { symbol: '\\dim(V \\otimes W) = (\\dim V)(\\dim W)', meaning: 'Dimension is the product (not sum) of factor dimensions. Basis: $\\{\\mathbf{e}_i \\otimes \\mathbf{f}_j\\}$ — each primal basis vector paired with each secondary basis vector.' },
+      { symbol: 'A \\otimes B', meaning: 'Kronecker product: replace each entry $a_{ij}$ by the block $a_{ij}B$. Size: $(m_A m_B) \\times (n_A n_B)$. Eigenvalues: all products $\\lambda_i(A) \\mu_j(B)$.' },
+      { symbol: '\\text{vec}(AXB) = (B^\\top \\otimes A)\\,\\text{vec}(X)', meaning: 'Vectorization identity: stacking columns converts any matrix linear equation $AXB = C$ into the standard linear system $(B^\\top \\otimes A)\\text{vec}(X) = \\text{vec}(C)$.' },
+      { symbol: '\\text{rank}_T', meaning: 'Tensor rank: minimum number of elementary tensors whose sum equals $T$. For matrices, equals matrix rank. For order-3+ tensors: NP-hard to compute; real and complex ranks can differ.' },
+      { symbol: '(A \\otimes B)(C \\otimes D) = AC \\otimes BD', meaning: 'Mixed-product property: Kronecker products compose factor-wise. Implies $(A \\otimes B)^{-1} = A^{-1} \\otimes B^{-1}$ and $\\text{eig}(A \\otimes B) = \\{\\lambda_i(A)\\mu_j(B)\\}$.' },
+    ],
+    rulesOfThumb: [
+      'Tensor rank of a matrix = matrix rank. To check if a matrix is an elementary tensor, compute its rank — if rank = 1, it is; if rank > 1, it is not.',
+      'Dimension check for Kronecker: $A \\in \\mathbb{R}^{m \\times n}$, $B \\in \\mathbb{R}^{p \\times q}$ gives $A \\otimes B \\in \\mathbb{R}^{mp \\times nq}$. A common error is writing dimensions additively ($m+p$) instead of multiplicatively.',
+      '$A \\otimes B \\neq B \\otimes A$ in general (even when both are square). The two are related by permutation matrices, not equal.',
+      'Sylvester equation $AX - XB = C$ has a unique solution iff $\\lambda_i(A) \\neq \\lambda_j(B)$ for all $i, j$ — the Kronecker system $(I \\otimes A - B^\\top \\otimes I)$ must be nonsingular.',
+      'When the vec-Kronecker system is large ($mn > 10^4$), do NOT form the Kronecker matrix explicitly — use the Bartels-Stewart algorithm or Schur decompositions to solve Sylvester equations in $O(n^3)$.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: ['la3-001', 'la10-001'],
+    futureLinks: ['la10-003', 'la10-004'],
+  },
 
   debugging: [
     {

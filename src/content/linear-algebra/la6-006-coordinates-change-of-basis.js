@@ -26,6 +26,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'How to Convert Vectors and Matrices Between Two Bases (4 Steps)',
+        body: '**Given:** Two ordered bases $\\mathcal{B}$ and $\\mathcal{B}\'$ for $\\mathbb{R}^n$ (or any finite-dim space over $\\mathbb{F}$).\n**Step 1.** Form $P$: write each $\\mathcal{B}\'$ basis vector in $\\mathcal{B}$-coordinates and use these as columns. When $\\mathcal{B}$ is the standard basis, $P$ simply has the $\\mathcal{B}\'$ vectors as columns.\n**Step 2.** Convert a vector: $[\\mathbf{v}]_{\\mathcal{B}\'} = P^{-1} [\\mathbf{v}]_{\\mathcal{B}}$. (Equivalently, $[\\mathbf{v}]_{\\mathcal{B}} = P [\\mathbf{v}]_{\\mathcal{B}\'} $).\n**Step 3.** Convert a matrix (linear map $T: V \\to V$): $[T]_{\\mathcal{B}\'} = P^{-1} [T]_{\\mathcal{B}} P$.\n**Step 4.** Verify: $P \\cdot [\\mathbf{v}]_{\\mathcal{B}\'} = [\\mathbf{v}]_{\\mathcal{B}}$ (round-trip) and $\\det([T]_{\\mathcal{B}\'}) = \\det([T]_{\\mathcal{B}})$ (determinant is invariant).',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 6 of 6 — Abstract Vector Spaces',
         body: '**Previous:** Isomorphisms — bijective linear maps and the classification of finite-dimensional spaces.\n**This lesson:** Coordinates and Change of Basis — the mechanics of converting vectors and matrices between different bases, and why $P^{-1}AP$ is the right formula.\n**Next:** End of Chapter 6.',
@@ -203,6 +208,9 @@ print("Same tr:", np.isclose(np.trace(A), np.trace(A_new)))`,
   rigor: {
     prose: [
       '**Congruence vs similarity.** Under change of orthonormal basis (unitary transformation $U$), the transformation $A \\mapsto U^{-1}AU = U^\\top AU$ is called **orthogonal similarity** (or unitary similarity over $\\mathbb{C}$). Eigenvalues are preserved. For symmetric matrices, the Spectral Theorem says you can always find an orthonormal basis of eigenvectors — achieving real diagonal $D = Q^\\top AQ$. Congruence ($A \\mapsto P^\\top AP$) is different — it classifies quadratic forms and is relevant for Sylvester\'s law of inertia.',
+      '**Gram matrix under basis change.** In an inner product space with basis $\\mathcal{B} = (\\mathbf{b}_1, \\ldots, \\mathbf{b}_n)$, the Gram matrix is $G_{ij} = \\langle \\mathbf{b}_i, \\mathbf{b}_j \\rangle$. Under a basis change $P$ (so the new basis vectors are $P$-combinations of the old), the Gram matrix transforms as $G_{\\text{new}} = P^\\top G_{\\text{old}} P$ — this is **congruence**, not similarity. When the basis is orthonormal, $G = I$ (the identity). Gram-Schmidt orthogonalization computes the change-of-basis matrix $P$ that transforms any basis to an orthonormal one, making $G_{\\text{new}} = I$. In differential geometry, the metric tensor $g_{ij}$ transforms by congruence under coordinate changes — this is the same formula.',
+      '**Functor of coordinates.** The assignment $V \\xrightarrow{\\phi_{\\mathcal{B}}} \\mathbb{F}^n$ is functorial: if $T: V \\to V$ is a linear map, then $\\phi_{\\mathcal{B}} \\circ T \\circ \\phi_{\\mathcal{B}}^{-1}: \\mathbb{F}^n \\to \\mathbb{F}^n$ is the matrix $[T]_{\\mathcal{B}}$. Changing bases from $\\mathcal{B}$ to $\\mathcal{B}\'$ corresponds to conjugating all matrices by the transition matrix $P = \\phi_{\\mathcal{B}\'} \\circ \\phi_{\\mathcal{B}}^{-1}$. The group $GL(n, \\mathbb{F})$ acts on the space of matrices by conjugation $A \\mapsto PAP^{-1}$, and the orbits of this action are exactly the similarity classes. Two matrices are similar iff they lie in the same orbit — iff they represent the same linear map in different bases.',
+      '**Vandermonde change of basis.** In the space $P_n$ of polynomials of degree $\\leq n$, two natural bases arise: the **monomial basis** $\\mathcal{M} = (1, x, x^2, \\ldots, x^n)$ and the **Lagrange basis** $\\mathcal{L} = (\\ell_0, \\ldots, \\ell_n)$ defined by $\\ell_i(x_j) = \\delta_{ij}$ for distinct nodes $x_0 < x_1 < \\cdots < x_n$. In $\\mathcal{M}$, a polynomial is represented by its coefficient vector $[a_0, \\ldots, a_n]^T$; in $\\mathcal{L}$, it is represented by its value vector $[p(x_0), \\ldots, p(x_n)]^T$. The change-of-basis matrix from $\\mathcal{M}$ to $\\mathcal{L}$ is the **Vandermonde matrix** $V_{ij} = x_j^i$, so $[p]_{\\mathcal{L}} = V[p]_{\\mathcal{M}}$. The Vandermonde determinant $\\det V = \\prod_{i < j}(x_j - x_i) \\neq 0$ when nodes are distinct, proving $V$ is invertible. This is the theoretical foundation of polynomial interpolation: for any $n+1$ target values $y_0, \\ldots, y_n$ at distinct nodes, there is exactly one polynomial of degree $\\leq n$ passing through all $(x_i, y_i)$ — the unique solution to $V[a]_{\\mathcal{M}} = [y]_{\\mathcal{L}}$.',
     ],
     callouts: [
       {
@@ -316,6 +324,36 @@ print("Same tr:", np.isclose(np.trace(A), np.trace(A_new)))`,
         '**Change-of-basis matrix:** $P = \\begin{bmatrix}1&1\\\\0&1\\end{bmatrix}$. $P^{-1} = \\begin{bmatrix}1&-1\\\\0&1\\end{bmatrix}$ ($\\det = 1$).',
         '**Verify:** $P^{-1}AP = \\begin{bmatrix}1&-1\\\\0&1\\end{bmatrix}\\begin{bmatrix}2&1\\\\0&3\\end{bmatrix}\\begin{bmatrix}1&1\\\\0&1\\end{bmatrix} = \\begin{bmatrix}2&0\\\\0&3\\end{bmatrix} = D$ ✓.',
         '**Interpretation:** In the eigenvector basis, $A$ acts as "multiply by 2 in the $\\mathbf{v}_1$ direction and by 3 in the $\\mathbf{v}_2$ direction." No mixing between the two directions.',
+      ],
+    },
+    {
+      id: 'ch-la6-006-2',
+      title: 'Coordinate conversion in a non-standard basis',
+      difficulty: 'easy',
+      problem: 'Let $\\mathcal{B} = \\{(2,1),(1,1)\\}$. Find $[\\mathbf{v}]_{\\mathcal{B}}$ for $\\mathbf{v} = (5,3)$. Verify by reconstructing $\\mathbf{v}$ from your answer.',
+      hint: 'Form $P = [\\mathbf{b}_1 | \\mathbf{b}_2]$ and compute $P^{-1}\\mathbf{v}$.',
+      walkthrough: [
+        { expression: 'P = \\begin{bmatrix}2&1\\\\1&1\\end{bmatrix}', annotation: 'Columns are $\\mathbf{b}_1=(2,1)$ and $\\mathbf{b}_2=(1,1)$.' },
+        { expression: '\\det(P) = 2\\cdot1 - 1\\cdot1 = 1', annotation: 'Determinant is 1, so $P^{-1}$ is just the adjugate (swap diagonal, negate off-diagonal).' },
+        { expression: 'P^{-1} = \\begin{bmatrix}1&-1\\\\-1&2\\end{bmatrix}', annotation: 'For $2\\times2$ with $\\det=1$: swap diagonal entries, negate off-diagonal entries.' },
+        { expression: '[\\mathbf{v}]_{\\mathcal{B}} = P^{-1}\\mathbf{v} = \\begin{bmatrix}1&-1\\\\-1&2\\end{bmatrix}\\begin{bmatrix}5\\\\3\\end{bmatrix} = \\begin{bmatrix}2\\\\1\\end{bmatrix}', annotation: 'Row 1: $5-3=2$. Row 2: $-5+6=1$. The $\\mathcal{B}$-coordinates are $(2,1)$.' },
+        { expression: '\\text{Verify: }2(2,1)+1(1,1)=(4,2)+(1,1)=(5,3)=\\mathbf{v}\\checkmark', annotation: 'Reconstruct $\\mathbf{v}$ from the $\\mathcal{B}$-coordinates confirms the answer.' },
+      ],
+    },
+    {
+      id: 'ch-la6-006-3',
+      title: 'Diagonalize and compute matrix powers',
+      difficulty: 'hard',
+      problem: 'Diagonalize $A = \\begin{bmatrix}4&2\\\\1&3\\end{bmatrix}$ by finding an eigenvector basis $P$. Then use $A = PDP^{-1}$ to compute $A^n$ in closed form and verify for $n = 2$.',
+      hint: 'Characteristic polynomial: $(4-\\lambda)(3-\\lambda)-2 = \\lambda^2-7\\lambda+10$. Find the roots, get eigenvectors, form $P$, then $A^n = PD^nP^{-1}$.',
+      walkthrough: [
+        { expression: '\\det(A-\\lambda I) = (4-\\lambda)(3-\\lambda)-2 = \\lambda^2-7\\lambda+10 = (\\lambda-2)(\\lambda-5)', annotation: 'Characteristic polynomial. Eigenvalues: $\\lambda_1=2$, $\\lambda_2=5$.' },
+        { expression: '\\lambda_1=2:\\;(A-2I)=\\begin{bmatrix}2&2\\\\1&1\\end{bmatrix},\\;x_1+x_2=0\\;\\Rightarrow\\;\\mathbf{v}_1=(1,-1)^T', annotation: 'Check: $A(1,-1)^T=(4-2,1-3)^T=(2,-2)^T=2\\cdot(1,-1)^T$ ✓' },
+        { expression: '\\lambda_2=5:\\;(A-5I)=\\begin{bmatrix}-1&2\\\\1&-2\\end{bmatrix},\\;-x_1+2x_2=0\\;\\Rightarrow\\;\\mathbf{v}_2=(2,1)^T', annotation: 'Check: $A(2,1)^T=(8+2,2+3)^T=(10,5)^T=5\\cdot(2,1)^T$ ✓' },
+        { expression: 'P=\\begin{bmatrix}1&2\\\\-1&1\\end{bmatrix},\\quad\\det P=3,\\quad P^{-1}=\\tfrac{1}{3}\\begin{bmatrix}1&-2\\\\1&1\\end{bmatrix}', annotation: 'Eigenvectors as columns. $\\det P=1\\cdot1-2\\cdot(-1)=3$.' },
+        { expression: 'A^n = PD^nP^{-1} = \\begin{bmatrix}1&2\\\\-1&1\\end{bmatrix}\\begin{bmatrix}2^n&0\\\\0&5^n\\end{bmatrix}\\tfrac{1}{3}\\begin{bmatrix}1&-2\\\\1&1\\end{bmatrix}', annotation: '$D^n = \\text{diag}(2^n,5^n)$ because powers of a diagonal matrix raise each entry to that power.' },
+        { expression: 'A^n = \\tfrac{1}{3}\\begin{bmatrix}2^n+2\\cdot5^n & 2(5^n-2^n)\\\\5^n-2^n & 2\\cdot2^n+5^n\\end{bmatrix}', annotation: 'Multiply $PD^n = [[2^n,2\\cdot5^n],[-2^n,5^n]]$, then multiply by $P^{-1}$ on the right.' },
+        { expression: 'n=2:\\;\\tfrac{1}{3}\\begin{bmatrix}4+50&2(25-4)\\\\25-4&8+25\\end{bmatrix}=\\tfrac{1}{3}\\begin{bmatrix}54&42\\\\21&33\\end{bmatrix}=\\begin{bmatrix}18&14\\\\7&11\\end{bmatrix}', annotation: 'Direct check: $A^2=A\\cdot A=\\begin{bmatrix}18&14\\\\7&11\\end{bmatrix}$ ✓' },
       ],
     },
   ],
@@ -479,6 +517,29 @@ print("Same tr:", np.isclose(np.trace(A), np.trace(A_new)))`,
       whyThisTechniqueWins: 'Normal modes are the eigenvectors of the system matrix. Changing to the normal-mode basis diagonalizes the system, decoupling the equations. This is $P^{-1}AP = D$ applied to physics: the right basis makes the problem trivial.',
     },
   ],
+
+  semantics: {
+    core: [
+      { symbol: 'P', meaning: 'Change-of-basis matrix: columns are new basis vectors written in old coordinates. $P$ converts from new-basis coordinates to old: $\\mathbf{v}_{\\text{old}} = P\\,[\\mathbf{v}]_{\\text{new}}$.' },
+      { symbol: '[\\mathbf{v}]_{\\mathcal{B}}', meaning: 'Coordinate vector of $\\mathbf{v}$ in basis $\\mathcal{B}$: the list of coefficients $c_1,\\ldots,c_n$ with $\\mathbf{v}=c_1\\mathbf{b}_1+\\cdots+c_n\\mathbf{b}_n$. Different bases give different coordinate lists for the same vector.' },
+      { symbol: 'P^{-1}AP', meaning: 'Similarity transformation: the matrix of the same linear map in the new basis. Eigenvalues, trace, determinant, rank, characteristic polynomial, and Jordan structure are all preserved.' },
+      { symbol: 'A \\sim B', meaning: '$A$ is similar to $B$: there exists invertible $P$ with $B=P^{-1}AP$. Similarity classes are orbits of the GL$(n,\\mathbb{F})$ conjugation action — the intrinsic invariants of one linear map.' },
+      { symbol: 'D = P^{-1}AP', meaning: 'Diagonalization: $D$ is diagonal with eigenvalues on the diagonal; $P$ has corresponding eigenvectors as columns. Achievable iff $A$ has $n$ linearly independent eigenvectors.' },
+      { symbol: 'P_{A\\to C}=P_{B\\to C}\\cdot P_{A\\to B}', meaning: 'Composition rule: change-of-basis matrices compose right-to-left (apply $A\\to B$ first, then $B\\to C$).' },
+    ],
+    rulesOfThumb: [
+      '$P$ converts new-basis coords TO standard — use $P^{-1}$ to convert standard coords TO new-basis coordinates.',
+      'Compose change-of-basis matrices right-to-left: $P_{A\\to C}=P_{B\\to C}\\cdot P_{A\\to B}$.',
+      'Similarity preserves eigenvalues, trace, determinant, rank, minimal polynomial, and Jordan structure — but NOT individual matrix entries.',
+      'Diagonalization $P^{-1}AP=D$ is the change of basis to eigenvectors; it works iff $A$ has $n$ independent eigenvectors.',
+      'For orthonormal bases, $P$ is orthogonal so $P^{-1}=P^T$ — no matrix inversion needed.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: ['la6-003', 'la6-004'],
+    futureLinks: ['la3-002', 'la7-001'],
+  },
 
   debugging: [
     {

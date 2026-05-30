@@ -33,6 +33,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'How to Perform PCA on a Dataset (5 Steps)',
+        body: '1. **Center.** Subtract column means: $X_c = X - \\bar{X}$. PCA measures variance around the mean; without this, PC1 points toward the data centroid, not the spread direction.\n2. **SVD.** Compute $X_c = U\\Sigma V^\\top$ via `np.linalg.svd(X_c, full_matrices=False)`. Columns of $V$ are the principal directions; $\\sigma_i^2/(n-1)$ is the variance along direction $i$.\n3. **Scree plot.** Compute explained ratios $e_i = \\sigma_i^2 / \\sum_j \\sigma_j^2$. Plot $e_i$ vs $i$; find the "elbow" where adding more components gives diminishing returns.\n4. **Choose $k$.** Keep the smallest $k$ satisfying $\\sum_{i=1}^k e_i \\geq 0.95$ (or another threshold). Fewer components = more compression; more = less reconstruction error.\n5. **Project and reconstruct.** Scores: $Z = X_c V_k$ ($n\\times k$). Reconstruction: $\\hat{X}_c = ZV_k^\\top$. Eckart-Young guarantees $\\|X_c - \\hat{X}_c\\|_F = \\sqrt{\\sigma_{k+1}^2 + \\cdots + \\sigma_r^2}$ — the minimum possible for rank-$k$ approximations.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 1 of 4 — Applications of Linear Algebra',
         body: '**Chapter 7 (Numerical Methods):** QR, Cholesky, conditioning, stability, sparse matrices.\n**Chapter 8 (Applications), this chapter:** Where the math meets real problems.\n**This lesson:** PCA — eigenvalue decomposition of data covariance; dimensionality reduction.\n**Next:** Markov chains and PageRank — stationary distributions as eigenvectors.',
@@ -239,6 +244,9 @@ var_explained
   rigor: {
     prose: [
       '**Kernel PCA.** When data is not linearly separable in the original space, **kernel PCA** maps data to a high-dimensional feature space via a kernel function $k(\\mathbf{x}, \\mathbf{y})$ and performs PCA there — without ever explicitly computing the feature vectors. The kernel matrix $K_{ij} = k(\\mathbf{x}_i, \\mathbf{x}_j)$ is diagonalized. Common kernels: Gaussian (RBF), polynomial.',
+      '**Randomized SVD for large-scale PCA.** When the data matrix is too large for full SVD ($n$ or $p$ in the millions), randomized SVD computes an approximate rank-$k$ factorization in $O(np\\log k)$ time instead of $O(np\\min(n,p))$. Algorithm: sample a random projection $Y = A\\Omega$ ($\\Omega$ is $p\\times(k+s)$ Gaussian with $s\\approx10$ oversampling), compute QR of $Y$ to get orthonormal $Q$, project $B = Q^\\top A$, then SVD of $B$. The error is near-optimal: $\\|A - Q Q^\\top A\\|_F \\leq (1+\\varepsilon)\\|A-A_k\\|_F$ with high probability. `sklearn.decomposition.TruncatedSVD` and `sklearn.utils.extmath.randomized_svd` implement this. For a $10^6 \\times 10^4$ matrix with $k=50$: full SVD costs $\\sim10^{14}$ flops; randomized SVD costs $\\sim5\\times10^{10}$ — a 2000× speedup.',
+      '**PCA, whitening, and factor models.** In factor analysis, $\\mathbf{x}_i = \\Lambda \\mathbf{f}_i + \\boldsymbol{\\varepsilon}_i$ where $\\mathbf{f}_i$ are $k$ latent factors and $\\Lambda$ is the loading matrix. PCA estimates $\\Lambda$ as the top-$k$ eigenvectors of the covariance, and the scores $Z = XV_k$ are estimates of the factors (up to rotation). Whitening transforms $Y = \\Sigma^{-1/2}X$ so that each direction has unit variance and directions are decorrelated: $\\text{Cov}(Y) = I$. PCA-whitening — project to $k$ PCs, then divide each score by its standard deviation — is standard preprocessing for ICA (Independent Component Analysis) and many deep learning pipelines, because whitened data makes subsequent optimization isotropic.',
+      '**Eckart-Young theorem and matrix compression.** The Frobenius-norm reconstruction error of rank-$k$ PCA is $\\|X_c - \\hat{X}_c\\|_F^2 = \\sigma_{k+1}^2 + \\cdots + \\sigma_r^2$ — the sum of squared discarded singular values. No rank-$k$ matrix achieves a smaller Frobenius error (Eckart-Young, 1936). A practical consequence for image compression: a $m\\times m$ grayscale image can be stored as a rank-$k$ SVD using $k(m+m) = 2km$ numbers instead of $m^2$. Storage breakeven at $k = m/2$ — but for natural images, $k \\ll m/2$ suffices for visually acceptable quality. For a $256\\times256$ image, $k=20$ uses $20\\times512 = 10240$ values (16% of original) and captures most visual structure.',
     ],
     callouts: [
       {
@@ -276,9 +284,39 @@ var_explained
       id: 'ch-la8-001-1',
       title: 'Covariance vs SVD equivalence',
       difficulty: 'medium',
-      prompt: 'Show that the eigenvectors of $C = X^\\top X/(n-1)$ (covariance matrix) equal the right singular vectors of $X$ (columns of $V$ in $X = U\\Sigma V^\\top$).',
-      hint: 'Substitute the SVD into the expression for $C$ and simplify.',
-      solution: '$C = X^\\top X/(n-1) = (U\\Sigma V^\\top)^\\top (U\\Sigma V^\\top)/(n-1) = V\\Sigma^2 V^\\top/(n-1)$. This is the eigendecomposition of $C$ — eigenvalues $\\lambda_i = \\sigma_i^2/(n-1)$ and eigenvectors = columns of $V$.',
+      problem: 'Show that the eigenvectors of $C = X^\\top X/(n-1)$ (covariance matrix) equal the right singular vectors of $X$ (columns of $V$ in $X = U\\Sigma V^\\top$).',
+      walkthrough: [
+        { expression: 'C = \\frac{X^\\top X}{n-1} = \\frac{(U\\Sigma V^\\top)^\\top (U\\Sigma V^\\top)}{n-1}', annotation: 'Substitute X = UΣV^T into the covariance formula.' },
+        { expression: '= \\frac{V\\Sigma U^\\top U\\Sigma V^\\top}{n-1} = \\frac{V\\Sigma^2 V^\\top}{n-1}', annotation: 'Use U^T U = I (U is orthogonal). The result is V times a diagonal matrix times V^T.' },
+        { expression: 'C\\mathbf{v}_i = \\frac{\\sigma_i^2}{n-1}\\mathbf{v}_i \\quad \\Rightarrow \\quad \\lambda_i = \\frac{\\sigma_i^2}{n-1}', annotation: 'The expression V(Σ²/(n-1))V^T is already the eigendecomposition of C. Columns of V are the eigenvectors (= principal directions) and eigenvalues are σ²/(n-1).' },
+        { expression: '\\text{Numerical implication: SVD of } X \\text{ gives } C\\text{\'s eigenvectors without forming } C = X^\\top X', annotation: 'Forming C squares the condition number: κ(C) = κ(X)². Computing SVD of X directly avoids this and is numerically preferred for ill-conditioned data.' },
+      ],
+    },
+    {
+      id: 'ch-la8-001-2',
+      title: 'PCA of perfectly correlated data',
+      difficulty: 'easy',
+      problem: 'Data (already centered): $X_c = \\begin{bmatrix}-2&-2\\\\0&0\\\\2&2\\end{bmatrix}$. Compute $C = X_c^\\top X_c/2$, find eigenvalues and eigenvectors, and state how many PCs capture 100% of variance.',
+      walkthrough: [
+        { expression: 'X_c^\\top X_c = \\begin{bmatrix}-2&0&2\\\\-2&0&2\\end{bmatrix}\\begin{bmatrix}-2&-2\\\\0&0\\\\2&2\\end{bmatrix} = \\begin{bmatrix}8&8\\\\8&8\\end{bmatrix}', annotation: 'Each entry: (−2)(−2)+(0)(0)+(2)(2)=8. Both columns of X_c are identical, so X_c^T X_c has equal rows and columns.' },
+        { expression: 'C = \\frac{1}{2}\\begin{bmatrix}8&8\\\\8&8\\end{bmatrix} = \\begin{bmatrix}4&4\\\\4&4\\end{bmatrix}', annotation: 'Divide by n-1 = 2. C is rank 1 — signaling that the two features are perfectly correlated.' },
+        { expression: '\\det(C-\\lambda I) = \\lambda^2 - 8\\lambda = \\lambda(\\lambda-8) = 0 \\Rightarrow \\lambda_1=8,\\; \\lambda_2=0', annotation: 'Trace = 8 (sum of eigenvalues ✓). The zero eigenvalue confirms rank 1.' },
+        { expression: '\\mathbf{v}_1 = \\tfrac{1}{\\sqrt{2}}(1,1)^\\top \\;(\\text{from }(C-8I)\\mathbf{v}=0), \\quad \\mathbf{v}_2 = \\tfrac{1}{\\sqrt{2}}(1,-1)^\\top', annotation: 'PC1 is the diagonal direction — the data lies on the line y=x. PC2 has zero variance: the data has no spread perpendicular to y=x.' },
+        { expression: 'R_1 = \\lambda_1/(\\lambda_1+\\lambda_2) = 8/8 = 100\\%', annotation: 'One PC captures 100% of variance. The rank-1 data is effectively 1-dimensional, lying on a line.' },
+      ],
+    },
+    {
+      id: 'ch-la8-001-3',
+      title: 'Rank-1 approximation and Eckart-Young error',
+      difficulty: 'hard',
+      problem: 'Let $X = \\begin{pmatrix}2&1\\\\1&2\\end{pmatrix}$. Compute the SVD, find the rank-1 approximation $X_1$, and verify the Eckart-Young error formula $\\|X - X_1\\|_F = \\sigma_2$.',
+      walkthrough: [
+        { expression: 'X^\\top X = \\begin{pmatrix}5&4\\\\4&5\\end{pmatrix}, \\quad \\text{eigenvalues: } \\lambda=9,1 \\Rightarrow \\sigma_1=3,\\;\\sigma_2=1', annotation: 'Compute eigenvalues of X^T X: det(X^T X - λI) = (5-λ)²-16 = λ²-10λ+9 = (λ-9)(λ-1).' },
+        { expression: 'V = \\begin{pmatrix}1/\\sqrt{2}&1/\\sqrt{2}\\\\1/\\sqrt{2}&-1/\\sqrt{2}\\end{pmatrix}, \\quad U = \\tfrac{1}{\\sqrt{2}}\\begin{pmatrix}1&1\\\\1&-1\\end{pmatrix}', annotation: 'v_1 = (1,1)^T/√2 (from (X^T X - 9I)v=0), v_2 = (1,-1)^T/√2. Then u_i = X v_i / σ_i: u_1 = X(1,1)^T/(3√2) = (1,1)^T/√2, u_2 = X(1,-1)^T/(√2) = (1,-1)^T/√2.' },
+        { expression: 'X_1 = \\sigma_1 \\mathbf{u}_1 \\mathbf{v}_1^\\top = 3 \\cdot \\tfrac{1}{\\sqrt{2}}\\begin{pmatrix}1\\\\1\\end{pmatrix}\\cdot\\tfrac{1}{\\sqrt{2}}(1,1) = \\tfrac{3}{2}\\begin{pmatrix}1&1\\\\1&1\\end{pmatrix}', annotation: 'Rank-1 approximation: outer product of first left and right singular vectors, scaled by σ_1.' },
+        { expression: 'X - X_1 = \\begin{pmatrix}2&1\\\\1&2\\end{pmatrix} - \\begin{pmatrix}3/2&3/2\\\\3/2&3/2\\end{pmatrix} = \\begin{pmatrix}1/2&-1/2\\\\-1/2&1/2\\end{pmatrix}', annotation: 'The error matrix is the rank-1 outer product σ_2 u_2 v_2^T.' },
+        { expression: '\\|X-X_1\\|_F = \\sqrt{4\\cdot(1/2)^2} = \\sqrt{1} = 1 = \\sigma_2\\;\\checkmark', annotation: 'Eckart-Young: ||X - X_1||_F = σ_2 = 1. No other rank-1 matrix achieves smaller Frobenius error.' },
+      ],
     },
   ],
 
@@ -324,6 +362,29 @@ var_explained
     { situation: 'You have a $50000 \\times 20000$ gene expression matrix and want to visualize samples.', competingTechniques: 'Use all 20000 genes directly; use t-SNE; use PCA then t-SNE.', whyThisTechniqueWins: 'PCA reduces to ~50 components first (removing noise), then t-SNE on the 50-dim scores is fast and captures nonlinear structure. Direct t-SNE on 20000 features is computationally prohibitive.' },
     { situation: 'You want to remove correlated noise from a signal measured by 10 sensors.', competingTechniques: 'Average all sensors; use PCA; use ICA.', whyThisTechniqueWins: 'PCA identifies the dominant signal directions. Discard low-variance PCs (which capture noise) and reconstruct from the top PCs. Simple averaging ignores the variance structure.' },
   ],
+  semantics: {
+    core: [
+      { symbol: 'C = X^\\top X/(n-1)', meaning: 'Sample covariance matrix — eigenvalues are variances along principal directions, eigenvectors are the principal components.' },
+      { symbol: 'X = U\\Sigma V^\\top', meaning: 'SVD of centered data: columns of $V$ are principal directions, $\\sigma_i^2/(n-1)$ is the variance along PC $i$.' },
+      { symbol: 'Z = X_c V_k', meaning: 'Score matrix — the $n\\times k$ projection of centered data onto the top-$k$ principal components.' },
+      { symbol: 'R_k = \\sum_{i=1}^k \\lambda_i / \\sum_i \\lambda_i', meaning: 'Explained variance ratio — fraction of total variance captured by the first $k$ PCs; target 90–95%.' },
+      { symbol: 'X_k = \\sum_{i=1}^k \\sigma_i \\mathbf{u}_i\\mathbf{v}_i^\\top', meaning: 'Rank-$k$ approximation (Eckart-Young optimal) — minimizes both Frobenius and spectral norm errors over all rank-$k$ matrices.' },
+      { symbol: '\\|X_c - X_k\\|_F = \\sqrt{\\sigma_{k+1}^2+\\cdots+\\sigma_r^2}', meaning: 'Eckart-Young reconstruction error — directly computed from discarded singular values; no rank-$k$ matrix achieves smaller Frobenius error.' },
+    ],
+    rulesOfThumb: [
+      'Always mean-center before PCA — without centering, PC1 aligns with the data centroid direction, not the spread direction.',
+      'Use SVD of $X_c$ for PCA, not eigendecomposition of $C = X^\\top X$ — SVD avoids squaring the condition number: $\\kappa(C) = \\kappa(X)^2$.',
+      'Choose $k$ where cumulative explained variance $\\geq 90$–$95\\%$; use the scree elbow as a visual check.',
+      'When $n \\ll p$ (few samples, many features), eigendecompose the $n\\times n$ Gram matrix $XX^\\top$ instead of the $p\\times p$ covariance — same non-zero eigenvalues, much cheaper.',
+      'PCA is linear — for data on a nonlinear manifold (spiral, Swiss roll), use kernel PCA, t-SNE, or UMAP instead.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: ['la5-003', 'la5-001'],
+    futureLinks: ['la8-002', 'la9-001'],
+  },
+
   debugging: [
     { commonError: 'Forgetting to mean-center the data before PCA.', symptom: 'PC1 points in the direction of the data mean rather than the spread direction; explained variance ratios do not reflect true structure.', whyItHappened: 'The covariance formula assumes centered data. Without centering, $X^\\top X$ measures second moments, not variance.', repairStrategy: 'Always subtract the column means: $X \\leftarrow X - \\mathbf{1}\\bar{\\mathbf{x}}^\\top$ before computing SVD or covariance.' },
     { commonError: 'Using the wrong singular vectors (columns of $U$ instead of $V$) as principal components.', symptom: 'Projected scores have wrong dimension; reconstruction fails.', whyItHappened: 'Confusion between left ($U$, $n \\times n$) and right ($V$, $p \\times p$) singular vectors. PCs live in feature space (dimension $p$), so they come from $V$.', repairStrategy: 'Remember: $Z = XV_k$ (project data onto $V_k$). $U_k$ contains the normalized scores, not the component directions.' },

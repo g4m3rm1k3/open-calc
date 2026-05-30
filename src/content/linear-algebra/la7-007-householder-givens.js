@@ -33,6 +33,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'How to Apply a Householder Reflector to a Matrix (4 Steps)',
+        body: '1. **Form $\\mathbf{v}$.** For column $k$ of $A$, take the subvector $\\mathbf{x} = A[k{:},k]$. Compute $\\mathbf{v} = \\mathbf{x} + \\operatorname{sign}(x_1)\\|\\mathbf{x}\\|\\mathbf{e}_1$. Use $+$ (not $-$) regardless of the sign of $x_1$ — this is the cancellation-safe form.\n2. **Compute the scale $\\beta$.** Set $\\beta = 2/(\\mathbf{v}^\\top\\mathbf{v})$. Store only $\\beta$ and $\\mathbf{v}$ — never form the $m\\times m$ matrix $H = I - \\beta\\mathbf{v}\\mathbf{v}^\\top$.\n3. **Apply to the panel.** For each column $j \\geq k$: compute scalar $s = \\mathbf{v}^\\top A[k{:},j]$, then update $A[k{:},j] \\mathrel{-}= \\beta\\cdot s\\cdot\\mathbf{v}$. Cost: $O((m-k)(n-k))$ flops — a rank-1 update, not a matrix multiply.\n4. **Repeat for each column.** After $\\min(m-1,n)$ steps, $A$ is upper triangular ($=R$). Accumulate $Q = H_1\\cdots H_n$ only if explicitly needed — most least-squares solvers avoid forming $Q$.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 7 of 7 — Numerical Linear Algebra',
         body: '**Previous (Lesson 6):** Schur decomposition — always-existing upper triangular eigenvalue form, the QR algorithm.\n**This lesson:** Householder reflections and Givens rotations — the elementary orthogonal operations that implement QR stably in all production software.\n**Next (Chapter 8):** Iterative methods — conjugate gradient, GMRES — which use these building blocks at massive scale.',
@@ -263,6 +268,9 @@ fprintf('G^T*G - I: %.2e\\n', norm(G_13''*G_13 - eye(2)))
   rigor: {
     prose: [
       '**Loss of orthogonality in Gram-Schmidt.** Classical Gram-Schmidt suffers from catastrophic cancellation: if two columns nearly point in the same direction, subtracting the projection gives a vector near zero, with huge relative error. Modified Gram-Schmidt (MGS) avoids this by updating projections sequentially. But even MGS loses orthogonality when $A$ is nearly rank-deficient. The loss of orthogonality in MGS is bounded by $\\|Q^\\top Q - I\\|_F \\leq c\\epsilon_{\\text{mach}}\\kappa(A)^2$, where $\\kappa(A)$ is the condition number. Householder maintains $\\|Q^\\top Q-I\\|_F \\leq c\\epsilon_{\\text{mach}}$ regardless of $\\kappa(A)$.',
+      '**Rank-revealing QR with column pivoting.** The standard Householder QR processes columns left-to-right. Column-pivoted QR selects at each step the column with the largest remaining norm as the next pivot: $AP = QR$ where $P$ is a permutation. The diagonal entries of $R$ satisfy $|r_{11}| \\geq |r_{22}| \\geq \\cdots \\geq |r_{nn}|$. If $A$ is numerically rank-deficient, the small diagonal entries reveal this: the numerical rank is the number of entries $|r_{kk}| > \\text{tol}$. The Golub-Businger algorithm implementing this requires $O(n)$ extra work per step for norm updates (maintain $\\|A[k{:},j]\\|^2$ with Rank-1 downdate after each step). MATLAB\'s `[Q,R,E] = qr(A)` and `scipy.linalg.qr(A, pivoting=True)` return this pivoted factorization.',
+      '**Backward stability of Householder QR.** Householder QR is backward stable: the computed $\\hat{Q}$ and $\\hat{R}$ satisfy $\\hat{Q}\\hat{R} = A + \\delta A$ with $\\|\\delta A\\|_F \\leq c(m,n)\\,\\epsilon_{\\text{mach}}\\|A\\|_F$, where $c$ grows only polynomially with $m$ and $n$ (typically $c \\approx 3$). Orthogonality loss: $\\|\\hat{Q}^\\top\\hat{Q}-I\\|_F = O(\\epsilon_{\\text{mach}})$ regardless of $\\kappa(A)$, compared to $O(\\kappa(A)\\,\\epsilon_{\\text{mach}})$ for modified Gram-Schmidt and $O(\\kappa(A)^2\\epsilon_{\\text{mach}})$ for classical GS. This makes Householder QR reliable for least-squares problems even when $A$ has condition number up to $1/\\epsilon_{\\text{mach}} \\approx 10^{16}$.',
+      '**Blocked Householder and LAPACK\'s `dgeqrf`.** LAPACK processes QR in blocks of $b$ columns (typically $b=64$). For a block of $b$ reflectors $H_{k+1}\\cdots H_{k+b}$, the compact WY representation writes their product as $I - WY^\\top$ where $W,Y \\in \\mathbb{R}^{m\\times b}$ are accumulated once at cost $O(mb^2)$. Applying the whole block to the remaining $(n-b)$ columns costs one Level-3 BLAS call: $A[k{:},k+b{:}] \\mathrel{-}= W(Y^\\top A[k{:},k+b{:}])$, using 2mb(n-b) flops at near-peak hardware throughput. Compared to the unblocked algorithm (Level-2 BLAS), the blocked version achieves 5–10× speedup on modern CPUs and GPUs due to cache reuse. This is why `numpy.linalg.qr` is fast even for large matrices.',
     ],
     callouts: [
       {
@@ -318,9 +326,38 @@ fprintf('G^T*G - I: %.2e\\n', norm(G_13''*G_13 - eye(2)))
       id: 'ch-la7-007-1',
       title: 'Proof that Householder is orthogonal',
       difficulty: 'easy',
-      prompt: 'Prove that $H = I - 2\\mathbf{v}\\mathbf{v}^\\top/\\|\\mathbf{v}\\|^2$ is both symmetric and orthogonal (hence $H^{-1} = H$).',
-      hint: 'Compute $H^\\top H$ directly, using the fact that $\\mathbf{v}\\mathbf{v}^\\top$ is symmetric and $(\\mathbf{v}\\mathbf{v}^\\top)^2 = \\|\\mathbf{v}\\|^2\\mathbf{v}\\mathbf{v}^\\top$.',
-      solution: 'Symmetry: $H^\\top = (I - 2\\mathbf{v}\\mathbf{v}^\\top/\\|\\mathbf{v}\\|^2)^\\top = I - 2(\\mathbf{v}\\mathbf{v}^\\top)^\\top/\\|\\mathbf{v}\\|^2 = I - 2\\mathbf{v}\\mathbf{v}^\\top/\\|\\mathbf{v}\\|^2 = H$. Orthogonality: $H^\\top H = H^2 = (I - 2P)^2$ where $P = \\mathbf{v}\\mathbf{v}^\\top/\\|\\mathbf{v}\\|^2$ is the projection. $P^2 = (\\mathbf{v}\\mathbf{v}^\\top/\\|\\mathbf{v}\\|^2)^2 = \\mathbf{v}(\\mathbf{v}^\\top\\mathbf{v})\\mathbf{v}^\\top/\\|\\mathbf{v}\\|^4 = \\mathbf{v}\\mathbf{v}^\\top/\\|\\mathbf{v}\\|^2 = P$. So $H^2 = I - 4P + 4P^2 = I - 4P + 4P = I$ ✓.',
+      problem: 'Prove that $H = I - 2\\mathbf{v}\\mathbf{v}^\\top/\\|\\mathbf{v}\\|^2$ is both symmetric and orthogonal (hence $H^{-1} = H$).',
+      walkthrough: [
+        { expression: 'H^\\top = \\left(I - \\frac{2\\mathbf{v}\\mathbf{v}^\\top}{\\|\\mathbf{v}\\|^2}\\right)^\\top = I - \\frac{2(\\mathbf{v}\\mathbf{v}^\\top)^\\top}{\\|\\mathbf{v}\\|^2} = I - \\frac{2\\mathbf{v}\\mathbf{v}^\\top}{\\|\\mathbf{v}\\|^2} = H', annotation: 'Outer product vv^T is symmetric: (vv^T)^T = vv^T. So H^T = H.' },
+        { expression: 'P = \\frac{\\mathbf{v}\\mathbf{v}^\\top}{\\|\\mathbf{v}\\|^2} \\Rightarrow P^2 = \\frac{\\mathbf{v}(\\mathbf{v}^\\top\\mathbf{v})\\mathbf{v}^\\top}{\\|\\mathbf{v}\\|^4} = \\frac{\\mathbf{v}\\mathbf{v}^\\top}{\\|\\mathbf{v}\\|^2} = P', annotation: 'P is the rank-1 projection onto v. Idempotent: projecting twice equals projecting once.' },
+        { expression: 'H^2 = (I-2P)^2 = I - 4P + 4P^2 = I - 4P + 4P = I', annotation: 'Use P^2=P to simplify. So H^2=I, which means H^{-1}=H. Combined with H^T=H: H^T H = H^2 = I, confirming orthogonality.' },
+        { expression: '\\det H = -1 \\text{ (reflection, not rotation)}', annotation: 'Eigenvalues of H are +1 (multiplicity n-1, for vectors perpendicular to v) and -1 (for v itself). Product of eigenvalues = det(H) = -1.' },
+      ],
+    },
+    {
+      id: 'ch-la7-007-2',
+      title: 'Givens rotation parameters and verification',
+      difficulty: 'easy',
+      problem: 'For $a=4$, $b=3$: (a) find $c$, $s$, $r$ for the Givens rotation that maps $(a,b)^\\top \\to (r,0)^\\top$; (b) write $G$; (c) verify $G(4,3)^\\top = (5,0)^\\top$ and $G^\\top G = I$.',
+      walkthrough: [
+        { expression: 'r = \\sqrt{a^2+b^2} = \\sqrt{16+9} = 5, \\quad c = a/r = 4/5, \\quad s = b/r = 3/5', annotation: 'The rotation angle θ = arctan(b/a). We never need θ explicitly — only c and s.' },
+        { expression: 'G = \\begin{pmatrix}c&s\\\\-s&c\\end{pmatrix} = \\begin{pmatrix}4/5&3/5\\\\-3/5&4/5\\end{pmatrix}', annotation: 'G rotates by -θ in the (a,b) plane, mapping the vector to the positive horizontal axis.' },
+        { expression: 'G\\begin{pmatrix}4\\\\3\\end{pmatrix} = \\begin{pmatrix}(4/5)(4)+(3/5)(3)\\\\(-3/5)(4)+(4/5)(3)\\end{pmatrix} = \\begin{pmatrix}16/5+9/5\\\\-12/5+12/5\\end{pmatrix} = \\begin{pmatrix}5\\\\0\\end{pmatrix}\\;\\checkmark', annotation: 'The second component cancels to zero — this is the designed effect of the rotation.' },
+        { expression: 'G^\\top G = \\begin{pmatrix}4/5&-3/5\\\\3/5&4/5\\end{pmatrix}\\begin{pmatrix}4/5&3/5\\\\-3/5&4/5\\end{pmatrix} = \\begin{pmatrix}1&0\\\\0&1\\end{pmatrix}\\;\\checkmark', annotation: 'c^2+s^2 = 16/25+9/25 = 1 on the diagonal; cs-sc = 0 off-diagonal. G is orthogonal.' },
+      ],
+    },
+    {
+      id: 'ch-la7-007-3',
+      title: 'Householder reflector for a 4-vector with zero leading entry',
+      difficulty: 'hard',
+      problem: 'Find the Householder reflector $H$ such that $H(0,3,4,0)^\\top = (-5,0,0,0)^\\top$. Verify $H\\mathbf{x}$ gives the correct result, and confirm $\\|\\mathbf{x}\\|$ is preserved.',
+      walkthrough: [
+        { expression: '\\mathbf{x} = (0,3,4,0)^\\top, \\quad \\|\\mathbf{x}\\| = \\sqrt{0+9+16+0} = 5', annotation: 'Norm of x is 5. The target is to map x to -5e_1 = (-5,0,0,0)^T.' },
+        { expression: '\\mathbf{v} = \\mathbf{x} + \\operatorname{sign}(x_1)\\|\\mathbf{x}\\|\\mathbf{e}_1 = (0,3,4,0)^\\top + 1\\cdot5\\cdot(1,0,0,0)^\\top = (5,3,4,0)^\\top', annotation: 'sign(0) = +1 by convention. v[0] = 0+5 = 5; no catastrophic cancellation since x_1=0 is not close to ||x||.' },
+        { expression: '\\|\\mathbf{v}\\|^2 = 25+9+16+0 = 50, \\quad \\beta = 2/50 = 1/25', annotation: 'The scale factor β = 2/||v||^2 is used in place of forming the full n×n matrix H.' },
+        { expression: '\\mathbf{v}^\\top\\mathbf{x} = 5\\cdot0+3\\cdot3+4\\cdot4+0\\cdot0 = 25', annotation: 'Inner product v^T x = 25. This is the scalar needed for the rank-1 update.' },
+        { expression: 'H\\mathbf{x} = \\mathbf{x} - \\beta(\\mathbf{v}^\\top\\mathbf{x})\\mathbf{v} = (0,3,4,0)^\\top - \\tfrac{1}{25}\\cdot25\\cdot(5,3,4,0)^\\top = (0,3,4,0)^\\top - (5,3,4,0)^\\top = (-5,0,0,0)^\\top\\;\\checkmark', annotation: 'The formula H x = x - 2(v^T x / ||v||^2) v. Norm check: ||Hx|| = 5 = ||x|| ✓ — orthogonal transformations preserve length.' },
+      ],
     },
   ],
 
@@ -474,15 +511,38 @@ fprintf('G^T*G - I: %.2e\\n', norm(G_13''*G_13 - eye(2)))
   transferPrompts: [
     {
       situation: 'An online learning system updates a linear regression model every time a new data point $(\\mathbf{x}_{\\text{new}}, y_{\\text{new}})$ arrives. The current model is stored as the QR factorization of the data matrix $X$. How do you update the factorization without recomputing from scratch?',
-      competingTechniques: ['Recompute QR from scratch for the new $X$ matrix with the extra row', 'Append $\\mathbf{x}_{\\text{new}}^\\top$ to $R$ and use $n$ Givens rotations to restore upper triangular form'],
+      competingTechniques: 'Recompute QR from scratch ($O(mn^2)$ for the full matrix with the extra row) vs append $\\mathbf{x}_{\\text{new}}^\\top$ to $R$ and apply $n$ Givens rotations to restore upper triangular form ($O(n^2)$).',
       whyThisTechniqueWins: 'The update via Givens costs $O(n^2)$ instead of $O(mn^2)$ for a full recomputation. For large datasets with many updates, this is the difference between real-time and batch processing.',
     },
     {
       situation: 'A scientific computing pipeline needs to compute the QR decomposition of a $10000 \\times 100$ matrix on a GPU, where parallelism is key. Should it use Householder or Givens?',
-      competingTechniques: ['Householder QR: each step zeros a column and is inherently sequential (each step depends on the previous)', 'Givens: pairs of rows can be processed in parallel (tournament reduction pattern)'],
+      competingTechniques: 'Householder QR (each column step is sequential — step $k+1$ depends on step $k$, limiting parallelism) vs Givens rotations with tournament reduction (row pairs processed in parallel, $O(\\log m)$ rounds).',
       whyThisTechniqueWins: 'Givens rotations can be parallelized using a "communication-avoiding" tournament reduction: in the first round, rows 1-2, 3-4, 5-6, ... are processed simultaneously. In the second round, results are combined. Total: $O(\\log m)$ parallel steps of $O(n^2)$ work each, vs Householder\'s $O(n)$ sequential steps.',
     },
   ],
+
+  semantics: {
+    core: [
+      { symbol: 'H = I - 2\\mathbf{v}\\mathbf{v}^\\top/\\|\\mathbf{v}\\|^2', meaning: 'Householder reflector: symmetric, orthogonal ($H^{-1}=H$), maps $\\mathbf{x}$ to $-\\operatorname{sign}(x_1)\\|\\mathbf{x}\\|\\mathbf{e}_1$.' },
+      { symbol: '\\mathbf{v} = \\mathbf{x} + \\operatorname{sign}(x_1)\\|\\mathbf{x}\\|\\mathbf{e}_1', meaning: 'Stable reflector vector — the $+$ prevents cancellation when $x_1 \\approx \\|\\mathbf{x}\\|$; using $-$ would lose digits.' },
+      { symbol: 'G(c,s)', meaning: 'Givens rotation: $2\\times2$ matrix $\\begin{pmatrix}c&s\\\\-s&c\\end{pmatrix}$ with $c^2+s^2=1$; zeros one entry, costs 6 operations, preserves all other matrix entries.' },
+      { symbol: '\\beta = 2/\\|\\mathbf{v}\\|^2', meaning: 'Scale factor for applying H efficiently: $H\\mathbf{x} = \\mathbf{x} - \\beta(\\mathbf{v}^\\top\\mathbf{x})\\mathbf{v}$. Store $\\beta$ and $\\mathbf{v}$, never the $m\\times m$ matrix.' },
+      { symbol: 'I - WY^\\top', meaning: 'WY (compact) representation of a product of $b$ Householder reflectors — enables Level-3 BLAS for cache efficiency; used in LAPACK\'s blocked `dgeqrf`.' },
+      { symbol: '|r_{kk}|', meaning: 'Diagonal entry of $R$ after $k$-th Householder step: $r_{kk} = -\\operatorname{sign}(x_1)\\|\\mathbf{x}\\|$. Decreasing $|r_{kk}|$ signals near rank-deficiency.' },
+    ],
+    rulesOfThumb: [
+      'For dense matrix QR, use Householder ($O(mn^2)$, stable). Never use classical Gram-Schmidt on ill-conditioned matrices.',
+      'For sparse matrices or incremental row updates, use Givens — each rotation touches exactly two rows and preserves existing zeros.',
+      'Always form $\\mathbf{v} = \\mathbf{x} + \\operatorname{sign}(x_1)\\|\\mathbf{x}\\|\\mathbf{e}_1$ with $+$, not $-$ — avoids catastrophic cancellation when $x_1 \\approx \\|\\mathbf{x}\\|$.',
+      'Never form $H$ as an explicit $m\\times m$ matrix; store only $\\mathbf{v}$ and apply as a rank-1 update to save memory and time.',
+      'If $|r_{kk}|$ drops suddenly during QR, the matrix is near rank-deficient: use column-pivoted QR (`scipy.linalg.qr(..., pivoting=True)`) to detect and handle this.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: ['la7-004', 'la7-001'],
+    futureLinks: ['la8-001', 'la8-003'],
+  },
 
   debugging: [
     {

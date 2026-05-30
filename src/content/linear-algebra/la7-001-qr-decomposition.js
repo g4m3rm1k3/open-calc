@@ -35,6 +35,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'How to Compute QR via Gram-Schmidt (5 Steps)',
+        body: '**Given:** An $m \\times n$ matrix $A = [\\mathbf{a}_1 | \\cdots | \\mathbf{a}_n]$ with linearly independent columns.\n**Step 1.** Set $\\tilde{\\mathbf{q}}_1 = \\mathbf{a}_1$. Compute $r_{11} = \\|\\tilde{\\mathbf{q}}_1\\|$ and normalize: $\\mathbf{q}_1 = \\tilde{\\mathbf{q}}_1 / r_{11}$.\n**Step 2.** For $j = 2, \\ldots, n$: compute each off-diagonal $r_{ij} = \\mathbf{q}_i^\\top \\mathbf{a}_j$ for $i = 1, \\ldots, j-1$.\n**Step 3.** Orthogonalize: $\\tilde{\\mathbf{q}}_j = \\mathbf{a}_j - \\sum_{i=1}^{j-1} r_{ij}\\mathbf{q}_i$.\n**Step 4.** Compute $r_{jj} = \\|\\tilde{\\mathbf{q}}_j\\|$ and normalize: $\\mathbf{q}_j = \\tilde{\\mathbf{q}}_j / r_{jj}$.\n**Step 5.** Assemble $Q = [\\mathbf{q}_1 | \\cdots | \\mathbf{q}_n]$ and $R$ with entries $r_{ij}$ in positions $(i,j)$, zeros below the diagonal. Verify: $Q^\\top Q = I_n$ and $QR = A$.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 1 of 7 — Numerical Linear Algebra',
         body: '**Chapter 6 (Abstract Algebra):** Abstract vector spaces, bases, coordinates, change of basis.\n**Chapter 7 (Numerical Methods), this chapter:** How to compute reliably — factorizations that control condition numbers.\n**This lesson:** QR decomposition — orthonormal column basis, least squares, QR eigenvalue algorithm.\n**Next:** Cholesky decomposition — the efficient factorization for symmetric positive definite matrices.',
@@ -199,6 +204,9 @@ x_normal
   rigor: {
     prose: [
       '**Connection to Cholesky.** If $A$ has full column rank, $A^\\top A = (QR)^\\top(QR) = R^\\top Q^\\top Q R = R^\\top R$. So the Cholesky factorization of $A^\\top A$ is $R^\\top R$. This connects QR to the Cholesky factorization of the Gram matrix — and explains why the QR approach to least squares is equivalent to Cholesky on the normal equations, but without forming $A^\\top A$ explicitly.',
+      '**Householder reflections — formal treatment.** A Householder reflector is $H = I - 2\\mathbf{u}\\mathbf{u}^\\top$ where $\\|\\mathbf{u}\\| = 1$. It is symmetric ($H^\\top = H$) and orthogonal ($H^\\top H = I - 4\\mathbf{u}\\mathbf{u}^\\top + 4\\mathbf{u}(\\mathbf{u}^\\top\\mathbf{u})\\mathbf{u}^\\top = I$), so $H^2 = I$ — a reflection. Given a vector $\\mathbf{x}$, choosing $\\mathbf{u} \\propto \\mathbf{x} - \\|\\mathbf{x}\\|\\mathbf{e}_1$ makes $H\\mathbf{x} = \\|\\mathbf{x}\\|\\mathbf{e}_1$: the reflection zeros out all components below the first. Applying $n$ such reflectors column by column gives $H_{n-1}\\cdots H_1 A = R$ (upper triangular), so $A = QR$ with $Q = H_1\\cdots H_{n-1}$ orthogonal. The sign convention (choosing the sign of $\\|\\mathbf{x}\\|$ to avoid cancellation) is critical for numerical stability — this is the reason Householder QR is backward stable while classical Gram-Schmidt is not.',
+      '**QR and volume.** Since $Q$ is orthogonal ($|\\det Q| = 1$), we have $|\\det A| = |\\det Q||\\det R| = \\prod_{j=1}^n r_{jj}$. This has a geometric interpretation: $r_{11}$ is the length of the first column of $A$; $r_{22}$ is the length of the component of the second column perpendicular to the first; $r_{33}$ is the triple-perpendicular component; and so on. Their product is the $n$-dimensional volume of the parallelepiped spanned by the columns of $A$. More generally, Gram-Schmidt reveals the orthogonal complement structure step by step: after processing $k$ columns, $\\text{span}(\\mathbf{q}_1,\\ldots,\\mathbf{q}_k) = \\text{span}(\\mathbf{a}_1,\\ldots,\\mathbf{a}_k)$ and the $(k{+}1)$-th Gram-Schmidt step peels off exactly the part of $\\mathbf{a}_{k+1}$ not already in this span.',
+      '**Backward stability.** An algorithm is **backward stable** if its computed output is the exact output for a slightly perturbed input: $\\tilde{\\mathbf{x}} = f(\\tilde{A})$ with $\\|\\tilde{A} - A\\| \\leq c\\,\\varepsilon_{\\text{mach}}\\|A\\|$. Householder QR is backward stable: the computed $\\tilde{Q},\\tilde{R}$ satisfy $\\tilde{Q}\\tilde{R} = A + \\delta A$ with $\\|\\delta A\\| \\leq c n^{3/2}\\varepsilon_{\\text{mach}}\\|A\\|$. Classical Gram-Schmidt, by contrast, is only **forward stable**: the computed $\\tilde{Q}$ satisfies $\\|\\tilde{Q}^\\top\\tilde{Q} - I\\| \\leq c\\kappa(A)\\varepsilon_{\\text{mach}}$ — orthogonality degrades in proportion to the condition number. For $\\kappa(A) = 10^8$, classical Gram-Schmidt loses 8 digits of orthogonality; Householder loses none. Modified Gram-Schmidt is also backward stable (it can be interpreted as classical Gram-Schmidt applied to a slightly perturbed input), but its constant $c$ is larger than Householder.',
     ],
     callouts: [
       {
@@ -333,6 +341,37 @@ x_normal
         '**Via QR:** The condition number of $R$ is $\\kappa(A) \\approx \\sqrt{2}/\\varepsilon = \\sqrt{2} \\times 10^8$ — still manageable with 64-bit floats.',
         '**Rule of thumb:** Normal equations need $\\kappa(A)^2 \\ll 10^{16}$, so $\\kappa(A) \\ll 10^8$. QR needs $\\kappa(A) \\ll 10^{16}$. QR tolerates much more ill-conditioning.',
         "**In practice:** MATLAB's `\\` operator uses QR for overdetermined systems precisely for this reason.",
+      ],
+    },
+    {
+      id: 'ch-la7-001-2',
+      title: 'QR by Gram-Schmidt on a 3×2 matrix',
+      difficulty: 'easy',
+      problem: 'Find the QR decomposition of $A = \\begin{bmatrix}1&0\\\\0&1\\\\1&1\\end{bmatrix}$ by Gram-Schmidt. Verify $Q^\\top Q = I_2$ and $QR = A$.',
+      hint: 'Normalize the first column to get $\\mathbf{q}_1$, then subtract the projection of $\\mathbf{a}_2$ onto $\\mathbf{q}_1$ and normalize the remainder to get $\\mathbf{q}_2$.',
+      walkthrough: [
+        { expression: '\\mathbf{a}_1 = (1,0,1)^\\top,\\quad r_{11} = \\|\\mathbf{a}_1\\| = \\sqrt{2},\\quad \\mathbf{q}_1 = \\tfrac{1}{\\sqrt{2}}(1,0,1)^\\top', annotation: 'Normalize the first column. $r_{11}$ = norm of first column.' },
+        { expression: 'r_{12} = \\mathbf{q}_1^\\top\\mathbf{a}_2 = \\tfrac{1}{\\sqrt{2}}(1\\cdot0+0\\cdot1+1\\cdot1) = \\tfrac{1}{\\sqrt{2}}', annotation: 'Project second column onto $\\mathbf{q}_1$.' },
+        { expression: '\\tilde{\\mathbf{q}}_2 = \\mathbf{a}_2 - r_{12}\\mathbf{q}_1 = (0,1,1)^\\top - \\tfrac{1}{\\sqrt{2}}\\cdot\\tfrac{1}{\\sqrt{2}}(1,0,1)^\\top = (-\\tfrac{1}{2},1,\\tfrac{1}{2})^\\top', annotation: 'Subtract the projection: $(0,1,1)^\\top - (1/2, 0, 1/2)^\\top$.' },
+        { expression: 'r_{22} = \\|\\tilde{\\mathbf{q}}_2\\| = \\sqrt{\\tfrac{1}{4}+1+\\tfrac{1}{4}} = \\sqrt{\\tfrac{3}{2}} = \\tfrac{\\sqrt{6}}{2}', annotation: 'Compute the norm for the second diagonal of $R$.' },
+        { expression: '\\mathbf{q}_2 = \\tfrac{\\tilde{\\mathbf{q}}_2}{r_{22}} = \\tfrac{2}{\\sqrt{6}}(-\\tfrac{1}{2},1,\\tfrac{1}{2})^\\top = (-\\tfrac{1}{\\sqrt{6}},\\tfrac{2}{\\sqrt{6}},\\tfrac{1}{\\sqrt{6}})^\\top', annotation: 'Normalize. Check: $\\mathbf{q}_1^\\top\\mathbf{q}_2 = \\frac{1}{\\sqrt{2}}(-\\frac{1}{\\sqrt{6}})+0+\\frac{1}{\\sqrt{2}}(\\frac{1}{\\sqrt{6}}) = 0$ ✓' },
+        { expression: 'Q = \\begin{bmatrix}1/\\sqrt{2}&-1/\\sqrt{6}\\\\0&2/\\sqrt{6}\\\\1/\\sqrt{2}&1/\\sqrt{6}\\end{bmatrix},\\quad R = \\begin{bmatrix}\\sqrt{2}&1/\\sqrt{2}\\\\0&\\sqrt{6}/2\\end{bmatrix}', annotation: 'Verify: $Q^\\top Q = I_2$ and $QR = A$ ✓' },
+      ],
+    },
+    {
+      id: 'ch-la7-001-3',
+      title: 'One step of the QR eigenvalue algorithm',
+      difficulty: 'hard',
+      problem: 'Given $A = \\begin{bmatrix}2&1\\\\1&3\\end{bmatrix}$, compute one QR iteration: (a) factor $A = Q_0R_0$, (b) form $A_1 = R_0Q_0$, (c) verify $A_1$ is similar to $A$ (same trace/det), and (d) check whether the off-diagonal entry of $A_1$ is smaller than that of $A$.',
+      hint: 'Use Gram-Schmidt on the columns of $A$ to find $Q_0, R_0$. Then $A_1 = R_0Q_0 = Q_0^{-1}AQ_0$ — a similarity transformation.',
+      walkthrough: [
+        { expression: '\\mathbf{a}_1=(2,1)^\\top,\\;r_{11}=\\sqrt{5},\\;\\mathbf{q}_1=\\tfrac{1}{\\sqrt{5}}(2,1)^\\top', annotation: 'Normalize first column.' },
+        { expression: 'r_{12}=\\mathbf{q}_1^\\top\\mathbf{a}_2=\\tfrac{2}{\\sqrt{5}}+\\tfrac{3}{\\sqrt{5}}=\\sqrt{5},\\;\\tilde{\\mathbf{q}}_2=(1,3)^\\top-\\sqrt{5}\\cdot\\tfrac{1}{\\sqrt{5}}(2,1)^\\top=(-1,2)^\\top', annotation: 'Project and subtract.' },
+        { expression: 'r_{22}=\\sqrt{5},\\;\\mathbf{q}_2=\\tfrac{1}{\\sqrt{5}}(-1,2)^\\top', annotation: 'Check: $\\mathbf{q}_1^\\top\\mathbf{q}_2=\\frac{-2+2}{5}=0$ ✓' },
+        { expression: 'Q_0 = \\tfrac{1}{\\sqrt{5}}\\begin{bmatrix}2&-1\\\\1&2\\end{bmatrix},\\quad R_0 = \\begin{bmatrix}\\sqrt{5}&\\sqrt{5}\\\\0&\\sqrt{5}\\end{bmatrix} = \\sqrt{5}\\begin{bmatrix}1&1\\\\0&1\\end{bmatrix}', annotation: 'Assembled QR. Verify $Q_0^\\top Q_0 = I$ and $Q_0R_0 = A$.' },
+        { expression: 'A_1 = R_0Q_0 = \\sqrt{5}\\begin{bmatrix}1&1\\\\0&1\\end{bmatrix}\\cdot\\tfrac{1}{\\sqrt{5}}\\begin{bmatrix}2&-1\\\\1&2\\end{bmatrix} = \\begin{bmatrix}3&1\\\\1&2\\end{bmatrix}', annotation: 'Flip order: $R_0Q_0 \\neq Q_0R_0$ in general!' },
+        { expression: '\\text{tr}(A_1)=5=\\text{tr}(A),\\quad\\det(A_1)=6-1=5=\\det(A)\\checkmark', annotation: 'Similarity invariants preserved: $A_1 = Q_0^{-1}AQ_0$.' },
+        { expression: '\\text{Off-diagonal: }|A_{12}|=1 \\to |{A_1}_{12}|=1', annotation: 'No shrinkage after just one step on this symmetric matrix — in practice, shifts are used to accelerate convergence. The off-diagonals do converge to 0 eventually.' },
       ],
     },
   ],
@@ -496,6 +535,29 @@ x_normal
       whyThisTechniqueWins: 'QR is preferred over normal equations because it avoids squaring the condition number ($10^{20}$ would destroy 16-digit double precision). Ridge regression and SVD truncation also help but change the estimator; QR solves the original least squares problem stably.',
     },
   ],
+
+  semantics: {
+    core: [
+      { symbol: 'Q', meaning: 'Orthogonal factor of QR: $m \\times n$ with orthonormal columns ($Q^\\top Q = I_n$). In thin QR, $Q$ encodes the orthonormal basis for the column space of $A$.' },
+      { symbol: 'R', meaning: 'Upper triangular factor of QR: $n \\times n$ with positive diagonal entries (by convention). The diagonal $r_{jj}$ is the norm of the $j$-th column after removing all previous directions.' },
+      { symbol: 'r_{ij} = \\mathbf{q}_i^\\top \\mathbf{a}_j', meaning: 'Off-diagonal entry of $R$ ($i < j$): the scalar projection of the $j$-th original column onto the $i$-th orthonormal basis vector. Records how much of $\\mathbf{a}_j$ lies along $\\mathbf{q}_i$.' },
+      { symbol: '\\kappa(A)^2', meaning: 'Condition number of $A^\\top A$ (normal equations matrix). Squaring the condition number is why normal equations fail for ill-conditioned problems — QR avoids forming $A^\\top A$.' },
+      { symbol: 'H = I - 2\\mathbf{u}\\mathbf{u}^\\top', meaning: 'Householder reflector: orthogonal, symmetric, $H^2 = I$. Chosen to map a given vector to $\\|\\mathbf{x}\\|\\mathbf{e}_1$. The production-grade way to compute QR — backward stable, unlike classical Gram-Schmidt.' },
+      { symbol: 'A_{k+1} = R_k Q_k', meaning: 'One step of the QR eigenvalue algorithm: factor $A_k = Q_k R_k$, then flip. Each step is a similarity transformation preserving eigenvalues. The sequence converges to upper triangular Schur form.' },
+    ],
+    rulesOfThumb: [
+      'Normal equations square the condition number: $\\kappa(A^\\top A) = \\kappa(A)^2$. Use QR instead for least squares.',
+      'The $R$ matrix is a record of Gram-Schmidt arithmetic: norms on the diagonal, inner products above it.',
+      'Householder QR is backward stable; classical Gram-Schmidt is not — use Householder for production code.',
+      '$|\\det A| = \\prod_j r_{jj}$: the diagonal of $R$ encodes the volume of the parallelepiped spanned by columns of $A$.',
+      'QR iteration (flip $Q_k, R_k$) converges to eigenvalues without ever computing the characteristic polynomial.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: ['la5-002', 'la5-003'],
+    futureLinks: ['la7-002', 'la7-003', 'la7-006'],
+  },
 
   debugging: [
     {

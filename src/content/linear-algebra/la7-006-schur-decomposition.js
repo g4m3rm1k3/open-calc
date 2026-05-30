@@ -33,6 +33,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'How to Use the Schur Decomposition to Compute a Matrix Function (4 Steps)',
+        body: '1. **Compute the Schur form.** Call `scipy.linalg.schur(A)` (Python) or `schur(A)` (MATLAB) to get $A = QTQ^*$, $Q$ unitary, $T$ upper triangular. Verify: $\\|QTQ^* - A\\| < \\varepsilon$.\n2. **Apply $f$ to $T$.** For normal $A$: $f(T) = \\operatorname{diag}(f(t_{11}),\\ldots,f(t_{nn}))$ — just evaluate $f$ at each eigenvalue. For non-normal $A$: use Parlett\'s recurrence — diagonal entries are $f(t_{ii})$; off-diagonal entries satisfy a triangular Sylvester recurrence.\n3. **Reconstruct.** Form $f(A) = Qf(T)Q^*$. Since $Q$ is unitary, $\\operatorname{cond}(Q)=1$ — no numerical error amplification.\n4. **Validate.** Check $\\|f(A) - f_{\\text{ref}}\\|$ against a reference (power series for small $\\|A\\|$, or a dense algorithm for small $n$). For the matrix exponential: `scipy.linalg.expm` implements this pipeline — use it rather than implementing from scratch.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 6 of 7 — Numerical Linear Algebra',
         body: '**Previous (Lesson 5):** Sparse matrices — CSR storage, fill-in, sparse matvec.\n**This lesson:** Schur decomposition — the always-existing, numerically safe triangular eigenvalue form.\n**Next (Lesson 7):** Householder reflections and Givens rotations — the elementary building blocks that implement QR stably.',
@@ -224,6 +229,9 @@ max(max(abs(tril(Ak,-1))))
   rigor: {
     prose: [
       '**Schur-stable algorithms.** Modern eigenvalue algorithms are designed to produce the Schur form directly. The Francis double-shift QR algorithm (used in LAPACK\'s `dhseqr`) applies two complex conjugate shifts simultaneously, working entirely in real arithmetic, converging to the real Schur form in $O(n^3)$ flops. The Jacobi algorithm (for symmetric matrices) produces the Schur form (= spectral decomposition) by applying plane rotations to zero out off-diagonal entries. Krylov methods (Arnoldi, Lanczos) build the Schur form of a large sparse matrix restricted to a Krylov subspace — the connection to GMRES and eigenvalue problems.',
+      '**Convergence of the shifted QR algorithm.** The unshifted QR iteration converges at rate $|\\lambda_{k+1}/\\lambda_k|$ per step for eigenvalue $\\lambda_k$ — slow when eigenvalues are close. The Wilkinson shift $\\mu_k$ selects the eigenvalue of the bottom-right $2\\times2$ submatrix of $A_k$ closest to $a_{nn}$, giving cubic convergence on symmetric matrices and guaranteed quadratic convergence in general. The Francis double-shift processes two complex conjugate shifts in a single real step, avoiding complex arithmetic for real $A$. Deflation: when $|a_{k+1,k}| < \\text{tol}\\cdot(|a_{kk}|+|a_{k+1,k+1}|)$, set the sub-diagonal entry to zero and reduce to two independent subproblems. Total cost for the complete Schur form: $O(n^3)$.',
+      '**Hessenberg reduction as preprocessing.** Before running QR iterations, reduce $A$ to upper Hessenberg form $H$ (zero below the first subdiagonal) via $n-2$ Householder reflections: $P_{n-2}\\cdots P_1 A P_1\\cdots P_{n-2} = H$. Cost: $O(n^3)$ once. The benefit: each subsequent QR step on a Hessenberg matrix costs only $O(n^2)$ (using $n-1$ Givens rotations to chase the bulge), versus $O(n^3)$ on a general matrix. Since $O(n)$ shifts are needed for all $n$ eigenvalues, the QR phase costs $O(n)\\cdot O(n^2) = O(n^3)$ total. Without Hessenberg reduction: $O(n)\\cdot O(n^3) = O(n^4)$ — four times as costly and unacceptable for large $n$.',
+      '**Matrix functions via Parlett\'s method.** For a normal matrix $A = QDQ^*$ with diagonal $D$, the matrix function $f(A) = Qf(D)Q^*$ is immediate: just evaluate $f$ at each eigenvalue. For a non-normal matrix $A = QTQ^*$, computing $f(T)$ for upper triangular $T$ requires Parlett\'s algorithm: the diagonal entries are $f(T)_{ii} = f(t_{ii})$, and the off-diagonal entries satisfy a recurrence that propagates upward through the superdiagonals. When eigenvalues $t_{ii} \\approx t_{jj}$ are nearly equal, the divided-difference formula has near-cancellation; block Parlett with reordering of clustered eigenvalues removes this instability. Applications: `scipy.linalg.expm` (matrix exponential for ODEs and control), `scipy.linalg.sqrtm` (matrix square root for covariance models), and `scipy.linalg.logm` (matrix logarithm for Riemannian optimization on positive definite matrices) all implement this Schur-plus-Parlett pipeline.',
     ],
     callouts: [
       {
@@ -277,9 +285,40 @@ max(max(abs(tril(Ak,-1))))
       id: 'ch-la7-006-1',
       title: 'Normal iff Schur diagonal',
       difficulty: 'medium',
-      prompt: 'Prove that $A$ is normal ($A^*A = AA^*$) if and only if its Schur form $T$ (in $A=QTQ^*$) is diagonal.',
-      hint: 'For the forward direction, use $A^*A = AA^*$ to show $T^*T = TT^*$; then show an upper triangular normal matrix must be diagonal.',
-      solution: '($\\Rightarrow$) If $A^*A=AA^*$, then $QT^*Q^*\\cdot QTQ^* = QTQ^*\\cdot QT^*Q^*$ gives $T^*T=TT^*$ (normal). Let $T=(t_{ij})$ upper triangular. Normality: $(T^*T)_{ii} = \\sum_j|t_{ji}|^2 = \\sum_j|t_{ij}|^2 = (TT^*)_{ii}$. Since $T$ is upper triangular, $t_{ji}=0$ for $j>i$. So $\\sum_{j\\leq i}|t_{ji}|^2 = \\sum_{j\\geq i}|t_{ij}|^2$. For $i=1$: $|t_{11}|^2=\\sum_j|t_{1j}|^2$, meaning $|t_{1j}|^2=0$ for $j>1$. Induction: all off-diagonal entries are zero. $T$ is diagonal. ($\\Leftarrow$) If $T=D$ (diagonal), then $T^*T=|D|^2=TT^*$, so $A=QDQ^*$ is normal.',
+      problem: 'Prove that $A$ is normal ($A^*A = AA^*$) if and only if its Schur form $T$ (in $A=QTQ^*$) is diagonal.',
+      walkthrough: [
+        { expression: 'A^*A=AA^* \\Rightarrow (QT^*Q^*)(QTQ^*) = (QTQ^*)(QT^*Q^*) \\Rightarrow T^*T=TT^*', annotation: 'Substitute A = QTQ^* and use Q^*Q = I. Normality of A translates directly to normality of T.' },
+        { expression: '(T^*T)_{ii} = \\sum_j|t_{ji}|^2, \\quad (TT^*)_{ii} = \\sum_j|t_{ij}|^2', annotation: 'Write out the diagonal entries of T^*T and TT^*. Since T is upper triangular, t_{ji}=0 for j > i.' },
+        { expression: 'i=1:\\; |t_{11}|^2 = \\sum_{j \\geq 1}|t_{1j}|^2 \\Rightarrow |t_{1j}|^2=0 \\text{ for } j>1', annotation: 'LHS has only the term j=1 (upper triangular). RHS has all j≥1. So all entries in row 1 above the diagonal must be zero.' },
+        { expression: '\\text{Induction: row 2, then 3, ... gives } t_{ij}=0 \\text{ for all } i < j \\Rightarrow T \\text{ is diagonal}', annotation: 'After zeroing row 1, the same argument applies to the (n-1)×(n-1) lower-right submatrix. By induction, T is diagonal.' },
+        { expression: '(\\Leftarrow)\\; T=D \\Rightarrow T^*T = D^*D = DD^* = TT^* \\Rightarrow A=QDQ^* \\text{ is normal}', annotation: 'Diagonal matrices always commute with their conjugates, so diagonal Schur form implies A is normal.' },
+      ],
+    },
+    {
+      id: 'ch-la7-006-2',
+      title: 'Real and complex Schur forms of a normal matrix',
+      difficulty: 'easy',
+      problem: 'Let $A = \\begin{pmatrix}2&1\\\\-1&2\\end{pmatrix}$. (a) Show $A$ is normal. (b) Find the eigenvalues. (c) Write both the real and complex Schur forms.',
+      walkthrough: [
+        { expression: 'A^\\top A = \\begin{pmatrix}2&-1\\\\1&2\\end{pmatrix}\\begin{pmatrix}2&1\\\\-1&2\\end{pmatrix} = \\begin{pmatrix}5&0\\\\0&5\\end{pmatrix} = AA^\\top', annotation: 'Both products equal 5I, so A is normal. This means its Schur form will be diagonal (over C).' },
+        { expression: '\\det(A-\\lambda I) = (2-\\lambda)^2+1 = 0 \\Rightarrow \\lambda = 2\\pm i', annotation: 'The characteristic polynomial has complex roots. A is a dilation-rotation: scaling by √5 and rotating by arctan(1/2).' },
+        { expression: '\\text{Real Schur form: } T_R = A = \\begin{pmatrix}2&1\\\\-1&2\\end{pmatrix},\\; Q_R = I', annotation: 'A is already in real Schur block form [[α,β],[-β,α]] with α=2, β=1. No transformation needed.' },
+        { expression: '\\text{Complex Schur form: } T_C = \\begin{pmatrix}2+i&0\\\\0&2-i\\end{pmatrix},\\; Q_C = \\tfrac{1}{\\sqrt{2}}\\begin{pmatrix}1&1\\\\-i&i\\end{pmatrix}', annotation: 'Over C, normal A has diagonal T. The columns of Q_C are orthonormal eigenvectors. Verify: Q_C^* T_C Q_C = A and Q_C^* Q_C = I.' },
+      ],
+    },
+    {
+      id: 'ch-la7-006-3',
+      title: 'One QR iteration step: eigenvalue preservation and convergence',
+      difficulty: 'hard',
+      problem: 'Apply one step of the basic QR iteration to $A = \\begin{pmatrix}2&1\\\\1&2\\end{pmatrix}$ (symmetric, eigenvalues 1 and 3). Compute $Q_0, R_0$ via Gram-Schmidt, form $A_1 = R_0Q_0$, verify eigenvalue preservation, and show the off-diagonal entry decreased.',
+      walkthrough: [
+        { expression: 'a_1=(2,1)^\\top,\\; r_{11}=\\sqrt{5},\\; q_1=(2,1)^\\top/\\sqrt{5}', annotation: 'Normalize the first column of A to get q1.' },
+        { expression: 'r_{12} = q_1^\\top a_2 = \\tfrac{2+2}{\\sqrt{5}} = \\tfrac{4}{\\sqrt{5}},\\; \\tilde{q}_2 = (1,2)^\\top - \\tfrac{4}{\\sqrt{5}}\\cdot\\tfrac{(2,1)^\\top}{\\sqrt{5}} = (-\\tfrac{3}{5}, \\tfrac{6}{5})^\\top', annotation: 'Orthogonalize the second column against q1.' },
+        { expression: 'r_{22} = \\|\\tilde{q}_2\\| = \\tfrac{3\\sqrt{5}}{5},\\; q_2 = (-1,2)^\\top/\\sqrt{5}', annotation: 'Normalize the remainder to get q2. Check: q1·q2 = (-2+2)/5 = 0 ✓.' },
+        { expression: 'Q_0 = \\tfrac{1}{\\sqrt{5}}\\begin{pmatrix}2&-1\\\\1&2\\end{pmatrix},\\; R_0 = \\begin{pmatrix}\\sqrt{5}&4/\\sqrt{5}\\\\0&3/\\sqrt{5}\\end{pmatrix}', annotation: 'Verify: Q_0 R_0 = A (QR factorization) and Q_0^T Q_0 = I ✓.' },
+        { expression: 'A_1 = R_0 Q_0 = \\tfrac{1}{\\sqrt{5}}\\begin{pmatrix}\\sqrt{5}&4/\\sqrt{5}\\\\0&3/\\sqrt{5}\\end{pmatrix}\\begin{pmatrix}2&-1\\\\1&2\\end{pmatrix} = \\begin{pmatrix}14/5&3/5\\\\3/5&6/5\\end{pmatrix}', annotation: 'A1 = Q0^T A Q0 — an orthogonal similarity, so eigenvalues are preserved.' },
+        { expression: '\\operatorname{tr}(A_1) = \\tfrac{14}{5}+\\tfrac{6}{5} = 4 = \\operatorname{tr}(A)\\;\\checkmark, \\quad \\det(A_1) = \\tfrac{84-9}{25} = 3 = \\det(A)\\;\\checkmark', annotation: 'Both trace and determinant (symmetric functions of eigenvalues) match A. Off-diagonal: 3/5 < 1 (original) — converging toward the diagonal Schur form.' },
+      ],
     },
   ],
 
@@ -428,15 +467,38 @@ max(max(abs(tril(Ak,-1))))
   transferPrompts: [
     {
       situation: 'You need to compute the matrix function $f(A) = e^A$ (matrix exponential) for a general (possibly defective) matrix $A$. How does the Schur decomposition help?',
-      competingTechniques: ['Try to diagonalize $A = PDP^{-1}$ (fails for defective matrices)', 'Compute Schur form $A = QTQ^*$, then $e^A = Qe^TQ^*$'],
+      competingTechniques: 'Diagonalize $A = PDP^{-1}$ then $e^A = Pe^DP^{-1}$ (fails for defective matrices; $P$ can be ill-conditioned even when it exists) vs compute Schur form $A = QTQ^*$ and apply Parlett\'s method to upper triangular $T$.',
       whyThisTechniqueWins: 'The Schur form always exists, and $e^T$ for an upper triangular $T$ can be computed exactly (using Parlett\'s method or the Padé approximation). Since $Q$ is unitary, $e^A = Qe^TQ^*$ is numerically stable. MATLAB\'s `expm` uses a Padé approximant applied to the Schur form.',
     },
     {
       situation: 'A control engineer needs to solve the discrete Lyapunov equation $AXA^\\top - X + Q = 0$ for the covariance matrix $X$ (used in Kalman filtering). How does the Schur form lead to an efficient solution?',
-      competingTechniques: ['Vectorize the equation: $(A\\otimes A)\\text{vec}(X) = -\\text{vec}(Q)$ (creates an $n^2 \\times n^2$ system)', 'Apply Schur: $A=QTQ^\\top$, reduce to a triangular system solved column by column in $O(n^3)$'],
+      competingTechniques: 'Vectorize the equation to $(A\\otimes A)\\operatorname{vec}(X) = -\\operatorname{vec}(Q)$, creating an $n^2\\times n^2$ system ($O(n^6)$ flops), vs apply Schur decomposition $A = QTQ^\\top$ to reduce to a triangular Sylvester equation solved column by column ($O(n^3)$).',
       whyThisTechniqueWins: 'The Kronecker approach requires $O(n^6)$ flops for an $n\\times n$ system. The Schur-based approach (Bartels-Stewart algorithm) reduces to solving a triangular system for each column of the transformed $X$, costing $O(n^3)$.',
     },
   ],
+
+  semantics: {
+    core: [
+      { symbol: 'A = QTQ^*', meaning: 'Schur decomposition: Q unitary ($\\kappa(Q)=1$), T upper triangular, eigenvalues of A on the diagonal of T.' },
+      { symbol: '\\kappa(Q) = 1', meaning: 'The unitary Q has condition number 1 — the key numerical stability advantage of Schur over diagonalization $A=PDP^{-1}$ where $\\kappa(P)$ can be huge.' },
+      { symbol: 'A^*A = AA^*', meaning: 'A is normal — exactly when its Schur T is diagonal. Includes symmetric, skew-symmetric, unitary, and orthogonal matrices.' },
+      { symbol: '\\mu_k \\text{ (Wilkinson shift)}', meaning: 'Eigenvalue of the bottom-right $2\\times2$ block of $A_k$ closest to $a_{nn}$; drives cubic convergence of QR iteration on symmetric matrices.' },
+      { symbol: '\\text{Real Schur form}', meaning: 'Block upper triangular with real arithmetic: $1\\times1$ blocks for real eigenvalues, $2\\times2$ blocks $\\begin{pmatrix}\\alpha&\\beta\\\\-\\beta&\\alpha\\end{pmatrix}$ for complex conjugate pairs $\\alpha\\pm i\\beta$.' },
+      { symbol: 'f(A) = Qf(T)Q^*', meaning: 'Matrix function via Schur: for normal A apply f to each diagonal entry; for general A use Parlett\'s triangular recurrence on T.' },
+    ],
+    rulesOfThumb: [
+      'For numerical eigenvalue computation always use Schur (or SVD for Hermitian matrices) — never diagonalization, which amplifies errors by $\\kappa(P)$.',
+      'Symmetric A → Schur form is diagonal (spectral theorem); general A → Schur is upper triangular with eigenvalues on diagonal but non-zero off-diagonals possible.',
+      'Upper triangular matrix is already in Schur form: T = A, Q = I. Check this first before computing anything.',
+      'QR algorithm convergence: eigenvalues separated by ratio 10 converge in ~5 steps; nearly equal eigenvalues need Wilkinson shifts (add these before running 10+ iterations).',
+      'For matrix functions ($e^A$, $A^{1/2}$, $\\log A$) use `scipy.linalg.expm/sqrtm/logm` — they implement Schur + Parlett internally and are numerically vetted.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: ['la7-001', 'la5-003'],
+    futureLinks: ['la7-007', 'la8-001'],
+  },
 
   debugging: [
     {

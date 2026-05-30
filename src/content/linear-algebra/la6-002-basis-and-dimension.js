@@ -25,6 +25,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'How to Find a Basis for a Subspace Defined by Constraints (5 Steps)',
+        body: '**Given:** A subspace $W$ defined by linear constraints on a vector space $V$.\n**Step 1.** Write the general element of $V$ with all unknowns free: e.g., $p(x) = a_0 + a_1x + \\cdots$ or $\\mathbf{v} = (x_1, x_2, \\ldots)$.\n**Step 2.** Apply each constraint to eliminate variables. Each independent constraint removes one free parameter.\n**Step 3.** Express the remaining general element as a linear combination of coefficient vectors, one per free parameter.\n**Step 4.** Read off the coefficient vectors — these form the basis for $W$.\n**Step 5.** Count the basis vectors = $\\dim(W)$. Verify: $\\dim(W) = \\dim(V) - (\\text{number of independent constraints})$.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 2 of 6 — Abstract Vector Spaces',
         body: '**Previous:** Abstract Vector Spaces — the ten axioms that define what a vector space is.\n**This lesson:** Basis and Dimension — how to measure the size of any vector space, and why all bases have the same number of vectors.\n**Next:** Linear Transformations — maps between vector spaces that preserve the vector space structure.',
@@ -199,6 +204,9 @@ print("Standard coordinates of v:", coords_std, "(same as v itself)")
   rigor: {
     prose: [
       '**Infinite-dimensional spaces.** Not every vector space has a finite basis. $P = \\bigcup_n P_n$ (all polynomials) has a countably infinite basis $\\{1, x, x^2, \\ldots\\}$, called a Hamel basis. $C[0,1]$ (continuous functions) also has a Hamel basis, but it requires the Axiom of Choice to prove its existence — no explicit basis can be written down. For analysis, the relevant notion is a Schauder basis (allowing infinite linear combinations), which relates to completeness of the space.',
+      '**The coordinate isomorphism.** Any $n$-dimensional vector space $V$ over $\\mathbb{F}$ is isomorphic to $\\mathbb{F}^n$. Given a basis $\\mathcal{B} = \\{\\mathbf{b}_1, \\ldots, \\mathbf{b}_n\\}$, the coordinate map $\\phi_{\\mathcal{B}}: V \\to \\mathbb{F}^n$ defined by $\\phi_{\\mathcal{B}}(\\mathbf{v}) = [\\mathbf{v}]_{\\mathcal{B}} = (c_1, \\ldots, c_n)^\\top$ is a vector space isomorphism (bijective and linear). This means all $n$-dimensional spaces over $\\mathbb{F}$ are "the same" — there is only one $n$-dimensional space per field, up to isomorphism. In particular, $P_n \\cong \\mathbb{R}^{n+1} \\cong M_{1\\times(n+1)}$, even though the objects look completely different.',
+      '**Zorn\'s lemma and the existence of bases.** Every vector space — even infinite-dimensional ones — has a Hamel basis, but proving this requires Zorn\'s lemma (equivalent to the Axiom of Choice). The proof: the collection of all linearly independent subsets of $V$, partially ordered by inclusion, satisfies the hypotheses of Zorn\'s lemma. The maximal element of this poset is a basis. For finite-dimensional spaces the construction terminates in finitely many steps without Choice. Zorn\'s lemma also guarantees that every independent set extends to a basis and every spanning set contains a basis.',
+      '**The replacement theorem (formal statement).** If $V$ is spanned by $m$ vectors and $\\{\\mathbf{u}_1, \\ldots, \\mathbf{u}_k\\}$ is linearly independent, then $k \\leq m$. Proof: since $\\mathbf{u}_1$ is in the span of the spanning set, we can replace one spanning vector with $\\mathbf{u}_1$ (by independence it contributes something new). Repeating for $\\mathbf{u}_2, \\ldots, \\mathbf{u}_k$: at each step we replace one spanning vector, using up one of the $m$ available replacements. The process requires $k \\leq m$ replacements, establishing $k \\leq m$. From this, if two bases both span $V$, applying the lemma in each direction gives $m \\leq n$ and $n \\leq m$, so $m = n$. This is the rigorous foundation for dimension being well-defined.',
     ],
     callouts: [
       {
@@ -319,6 +327,34 @@ print("Standard coordinates of v:", coords_std, "(same as v itself)")
         '**Apply the dimension formula:** $\\dim(W_1 + W_2) = \\dim W_1 + \\dim W_2 - \\dim(W_1 \\cap W_2)$. So $3 = 2 + 2 - \\dim(W_1 \\cap W_2)$, giving $\\dim(W_1 \\cap W_2) = 1$.',
         '**What is $W_1 \\cap W_2$?** A vector $\\mathbf{w} \\in W_1 \\cap W_2$ must be in both spans. $\\mathbf{w} \\in W_1 \\Rightarrow \\mathbf{w} = a\\mathbf{v}_1 + b\\mathbf{v}_2$; $\\mathbf{w} \\in W_2 \\Rightarrow \\mathbf{w} = c\\mathbf{v}_2 + d\\mathbf{v}_3$. Setting equal and using independence: $a = 0$, $d = 0$, $b = c$. So $\\mathbf{w} = b\\mathbf{v}_2$ and $W_1 \\cap W_2 = \\text{Span}\\{\\mathbf{v}_2\\}$.',
       ],
+    },
+    {
+      id: 'ch-la6-002-2',
+      title: 'Basis for upper triangular matrices',
+      difficulty: 'easy',
+      problem: 'Let $T = \\{A \\in M_{2\\times 2} : A \\text{ is upper triangular}\\}$. Show $T$ is a subspace of $M_{2\\times 2}$, find a basis, and state $\\dim(T)$.',
+      hint: 'Write the general upper triangular matrix with free parameters and read off the basis vectors. The subspace test is quick — the sum and scalar multiple of upper triangular matrices are still upper triangular.',
+      walkthrough: [
+        { expression: 'A = \\begin{bmatrix}a & b \\\\ 0 & c\\end{bmatrix} \\in T, \\quad a, b, c \\in \\mathbb{R}', annotation: 'General element of $T$: the lower-left entry is always 0, giving 3 free parameters.' },
+        { expression: '\\mathbf{0} \\in T, \\quad A + B = \\begin{bmatrix}a_1+a_2 & b_1+b_2 \\\\ 0 & c_1+c_2\\end{bmatrix} \\in T, \\quad kA \\in T \\checkmark', annotation: 'All three subspace conditions hold trivially — upper triangularity is preserved by addition and scaling.' },
+        { expression: 'A = a\\underbrace{\\begin{bmatrix}1&0\\\\0&0\\end{bmatrix}}_{B_1} + b\\underbrace{\\begin{bmatrix}0&1\\\\0&0\\end{bmatrix}}_{B_2} + c\\underbrace{\\begin{bmatrix}0&0\\\\0&1\\end{bmatrix}}_{B_3}', annotation: 'Each free parameter corresponds to one basis matrix. Read off $B_1, B_2, B_3$ directly from the parameterization.' },
+        { expression: '\\text{Basis: } \\left\\{\\begin{bmatrix}1&0\\\\0&0\\end{bmatrix},\\begin{bmatrix}0&1\\\\0&0\\end{bmatrix},\\begin{bmatrix}0&0\\\\0&1\\end{bmatrix}\\right\\}, \\quad \\dim(T) = 3', annotation: 'Three parameters → dimension 3. Check: $T \\oplus \\text{Skew}_{2\\times 2}$ does not reconstruct $M_{2\\times2}$ (dim 4), so $T$ is not a complement of skew matrices — upper triangular and symmetric are different subspaces.' },
+      ],
+      answer: '$T$ is a 3-dimensional subspace of $M_{2\\times2}$. Basis: $\\{E_{11}, E_{12}, E_{22}\\}$. These are linearly independent (each has its nonzero entry in a different position).',
+    },
+    {
+      id: 'ch-la6-002-3',
+      title: 'Redundant spanning set — find the basis',
+      difficulty: 'hard',
+      problem: 'The set $S = \\{1+x,\\; 1-x,\\; x+x^2,\\; 1+x+x^2\\}$ spans some subspace $W \\subseteq P_2$. Find a basis for $W$, state $\\dim(W)$, and express the dependent vector as a linear combination of the others.',
+      hint: 'Write each polynomial as a coordinate vector in the basis $\\{1, x, x^2\\}$, form a $4\\times 3$ matrix (one row per polynomial), and row reduce.',
+      walkthrough: [
+        { expression: '\\begin{bmatrix}1&1&0\\\\1&-1&0\\\\0&1&1\\\\1&1&1\\end{bmatrix} \\xrightarrow{R_2-R_1,\\;R_4-R_1} \\begin{bmatrix}1&1&0\\\\0&-2&0\\\\0&1&1\\\\0&0&1\\end{bmatrix}', annotation: 'Coordinate vectors (rows): $1+x\\mapsto[1,1,0]$, $1-x\\mapsto[1,-1,0]$, $x+x^2\\mapsto[0,1,1]$, $1+x+x^2\\mapsto[1,1,1]$. Subtract row 1 from row 2 and row 4.' },
+        { expression: '\\xrightarrow{R_2 \\div (-2)} \\begin{bmatrix}1&1&0\\\\0&1&0\\\\0&1&1\\\\0&0&1\\end{bmatrix} \\xrightarrow{R_1-R_2,\\;R_3-R_2} \\begin{bmatrix}1&0&0\\\\0&1&0\\\\0&0&1\\\\0&0&1\\end{bmatrix}', annotation: 'Pivot in row 2, then eliminate. Row 3 becomes $[0,0,1]$, same as row 4 — the 4th polynomial is now visibly redundant.' },
+        { expression: '\\xrightarrow{R_4-R_3} \\begin{bmatrix}1&0&0\\\\0&1&0\\\\0&0&1\\\\0&0&0\\end{bmatrix}, \\quad \\text{rank} = 3', annotation: 'Row 4 zeros out. Rank = 3 = $\\dim(P_2)$, so $W = P_2$. The first 3 rows (polynomials) are the pivot rows.' },
+        { expression: '1+x+x^2 = \\tfrac{1}{2}(1+x) + \\tfrac{1}{2}(1-x) + (x+x^2)', annotation: 'Read the dependency from the row operation $R_4 = R_1$. Verify: $\\tfrac{1}{2}(1+x)+\\tfrac{1}{2}(1-x)+(x+x^2) = 1+x+x^2$ ✓. The 4th vector is a combination of the first three.' },
+      ],
+      answer: 'Basis for $W$: $\\{1+x, 1-x, x+x^2\\}$. $\\dim(W) = 3$, so $W = P_2$. Dependent vector: $1+x+x^2 = \\frac{1}{2}(1+x) + \\frac{1}{2}(1-x) + (x+x^2)$.',
     },
   ],
 
@@ -505,6 +541,34 @@ print("Standard coordinates of v:", coords_std, "(same as v itself)")
       whyThisTechniqueWins: 'By the dimension theorem, for a set of exactly $n$ vectors in an $n$-dimensional space, independence and spanning are equivalent — you only need to check one. For $\\mathbb{R}^n$, form the matrix of the vectors and check if it\'s invertible (det $\\neq 0$). This halves the work.',
     },
   ],
+
+  semantics: {
+    core: [
+      { symbol: '\\{\\mathbf{b}_1,\\ldots,\\mathbf{b}_n\\}', meaning: 'A basis for V: a linearly independent spanning set; the number of vectors n is dim(V)' },
+      { symbol: '[\\mathbf{v}]_{\\mathcal{B}}', meaning: 'The coordinate vector of v in basis B: the unique (c1,...,cn) such that v = c1 b1 + ⋯ + cn bn' },
+      { symbol: '\\dim(V)', meaning: 'Dimension of V: the number of vectors in any basis; invariant under change of basis and isomorphism' },
+      { symbol: '\\text{rank}(A) + \\text{nullity}(A) = n', meaning: 'Rank-Nullity theorem: pivot columns + free columns = total columns (n); column count of A' },
+      { symbol: '\\dim(W_1 + W_2) = \\dim W_1 + \\dim W_2 - \\dim(W_1 \\cap W_2)', meaning: 'Inclusion-exclusion for subspace dimensions; analogous to |A ∪ B| = |A| + |B| − |A ∩ B|' },
+    ],
+    rulesOfThumb: [
+      'dim(P_n) = n+1, dim(M_{m×n}) = mn — each free entry or coefficient is one dimension.',
+      'In an n-dimensional space, n vectors are a basis iff they are independent (OR iff they span) — checking one property is enough when the count matches.',
+      'Each independent linear constraint on a subspace reduces dimension by exactly 1; k independent constraints give dim = n − k.',
+      'Row-reduce the matrix of candidate basis vectors: pivot rows survive, zero rows are redundant — the rank equals the dimension of the span.',
+      'Coordinates change with the basis; the vector does not. Changing basis = choosing a different reference frame, not a different mathematical object.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: [
+      { id: 'la6-001', label: 'Abstract Vector Spaces', reason: 'Vector spaces and subspaces are the setting; the definition of basis requires knowing what a vector space is' },
+      { id: 'la2-001', label: 'Null space and column space', reason: 'Concrete instances of basis and dimension: null space basis found via RREF free variables, column space via pivot columns' },
+    ],
+    futureLinks: [
+      { id: 'la6-003', label: 'Linear Transformations', reason: 'Rank-nullity theorem appears here as dim(ker T) + dim(im T) = dim(domain); the proof uses bases directly' },
+      { id: 'la6-006', label: 'Change of Basis', reason: 'The coordinate map [v]_B is the key object; switching bases is just changing the isomorphism F^n → V' },
+    ],
+  },
 
   debugging: [
     {

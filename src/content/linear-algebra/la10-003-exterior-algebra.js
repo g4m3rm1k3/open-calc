@@ -27,6 +27,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'How to Compute with the Wedge Product (4 Steps)',
+        body: '1. **Expand bilinearly.** Distribute over addition and pull out scalars: $(\\alpha\\mathbf{u}+\\beta\\mathbf{w}) \\wedge \\mathbf{v} = \\alpha(\\mathbf{u}\\wedge\\mathbf{v}) + \\beta(\\mathbf{w}\\wedge\\mathbf{v})$. Apply linearity in both arguments.\n2. **Apply the alternating property.** Immediately replace $\\mathbf{e}_i \\wedge \\mathbf{e}_i = 0$ (any repeated factor vanishes) and $\\mathbf{e}_j \\wedge \\mathbf{e}_i = -(\\mathbf{e}_i \\wedge \\mathbf{e}_j)$ (swapping reverses sign). Always rewrite each basis term with indices in increasing order.\n3. **Read off the determinant or k-minor.** The coefficient of $\\mathbf{e}_{i_1}\\wedge\\cdots\\wedge\\mathbf{e}_{i_k}$ in $\\mathbf{v}_1 \\wedge \\cdots \\wedge \\mathbf{v}_k$ is the $k \\times k$ minor of $[\\mathbf{v}_1|\\cdots|\\mathbf{v}_k]$ using rows $i_1,\\ldots,i_k$.\n4. **Compute k-volume.** For $k$ vectors in $\\mathbb{R}^k$ (square case): $\\text{Vol} = |\\det[\\mathbf{v}_1|\\cdots|\\mathbf{v}_k]|$. For $k$ vectors in $\\mathbb{R}^n$ with $k < n$ (non-square case): use the Gram determinant $\\text{Vol} = \\sqrt{\\det(V^\\top V)}$ where $V = [\\mathbf{v}_1|\\cdots|\\mathbf{v}_k]$.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 3 of 5 — Advanced Theory',
         body: '**Previous (Lesson 2):** Tensor Products — bilinear maps, universal property, Kronecker product, vectorization identity.\n**This lesson:** Exterior Algebra — antisymmetric tensors, wedge product, determinants as volume, differential forms.\n**Next (Lesson 4):** Operator Theory — bounded operators, spectrum, spectral theorem for compact self-adjoint operators.',
@@ -224,6 +229,9 @@ abs(vol_2d - area_cross)
   rigor: {
     prose: [
       '**Stokes\' theorem unifies everything.** Let $\\omega$ be a smooth $(k-1)$-form and $M$ a compact $k$-dimensional manifold with boundary $\\partial M$. Then $\\int_M d\\omega = \\int_{\\partial M} \\omega$. This single formula specializes to: the fundamental theorem of calculus ($k=1$), Green\'s theorem ($k=2$ in $\\mathbb{R}^2$), classical Stokes\' theorem ($k=2$ in $\\mathbb{R}^3$), and the divergence theorem ($k=3$). The exterior derivative $d$ and the wedge product are the algebraic machinery behind all of these.',
+      '**The exterior derivative and $d^2=0$.** The exterior derivative $d: \\Omega^k(M) \\to \\Omega^{k+1}(M)$ generalizes gradient, curl, and divergence to arbitrary differential forms. For a 0-form (scalar function) $f$: $df = \\sum_i \\frac{\\partial f}{\\partial x_i}\\,dx_i$ — this is the gradient. For a 1-form $\\omega = \\sum_i f_i\\,dx_i$: $d\\omega = \\sum_{i<j}\\left(\\frac{\\partial f_j}{\\partial x_i} - \\frac{\\partial f_i}{\\partial x_j}\\right) dx_i \\wedge dx_j$ — this is the curl. For a 2-form in $\\mathbb{R}^3$: $d$ produces the divergence form. The defining property is $d^2 = 0$: applying $d$ twice always gives zero. In classical vector calculus: $\\text{curl}(\\nabla f) = 0$ and $\\text{div}(\\text{curl}\\,\\mathbf{F}) = 0$ are both special cases of $d^2 = 0$. This single algebraic fact unifies two otherwise-separate vector calculus identities.',
+      '**De Rham cohomology.** Since $d^2 = 0$, the image of $d$ (exact forms) is always a subspace of the kernel of $d$ (closed forms). The **de Rham cohomology** $H^k_{\\text{dR}}(M) = \\ker(d: \\Omega^k \\to \\Omega^{k+1}) / \\text{im}(d: \\Omega^{k-1} \\to \\Omega^k)$ measures the difference — it is zero unless the space has "holes" that prevent exact forms from accounting for all closed forms. The de Rham theorem establishes $H^k_{\\text{dR}}(M) \\cong H^k(M;\\mathbb{R})$ (singular cohomology with real coefficients), connecting differential forms to topological invariants. Concretely: a closed but non-exact 1-form on a circle ($\\mathbb{S}^1$) corresponds to the fact that you cannot globally define a single-valued antiderivative of $d\\theta$ — it detects the "hole" in the circle.',
+      '**Pfaffian and skew-symmetric determinants.** For a $2n \\times 2n$ skew-symmetric matrix $A$ ($A^\\top = -A$), the determinant is always a perfect square: $\\det(A) = (\\text{Pf}(A))^2$. The **Pfaffian** $\\text{Pf}(A)$ arises from the exterior algebra: it is the coefficient of $(e_1 \\wedge \\cdots \\wedge e_{2n})$ in $\\frac{1}{n!}\\left(\\sum_{i<j} a_{ij}\\, e_i \\wedge e_j\\right)^n$. For a $4\\times 4$ skew matrix: $\\text{Pf}(A) = a_{12}a_{34} - a_{13}a_{24} + a_{14}a_{23}$. The Pfaffian appears in quantum field theory (fermionic Gaussian integrals), the combinatorics of perfect matchings in graphs (Kasteleyn\'s theorem for counting matchings in planar graphs), and numerical eigenvalue algorithms for skew-symmetric matrices.',
     ],
     callouts: [
       {
@@ -274,11 +282,75 @@ abs(vol_2d - area_cross)
   challenges: [
     {
       id: 'ch-la10-003-1',
-      title: 'Alternating property proves det swap',
+      title: 'Alternating property implies antisymmetry',
       difficulty: 'medium',
-      prompt: 'Using only the alternating property $\\mathbf{v} \\wedge \\mathbf{v} = 0$, prove that $\\mathbf{u} \\wedge \\mathbf{v} = -(\\mathbf{v} \\wedge \\mathbf{u})$. Then explain why swapping two rows of a determinant changes its sign.',
-      hint: 'Expand $(\\mathbf{u} + \\mathbf{v}) \\wedge (\\mathbf{u} + \\mathbf{v}) = 0$ by linearity.',
-      solution: 'By alternating: $(\\mathbf{u}+\\mathbf{v}) \\wedge (\\mathbf{u}+\\mathbf{v}) = 0$. Expand: $\\mathbf{u}\\wedge\\mathbf{u} + \\mathbf{u}\\wedge\\mathbf{v} + \\mathbf{v}\\wedge\\mathbf{u} + \\mathbf{v}\\wedge\\mathbf{v} = 0$. Since $\\mathbf{u}\\wedge\\mathbf{u} = \\mathbf{v}\\wedge\\mathbf{v} = 0$: $\\mathbf{u}\\wedge\\mathbf{v} + \\mathbf{v}\\wedge\\mathbf{u} = 0$, so $\\mathbf{u}\\wedge\\mathbf{v} = -(\\mathbf{v}\\wedge\\mathbf{u})$. For the determinant: swapping two rows in $[\\mathbf{v}_1|\\cdots|\\mathbf{v}_n]$ swaps the corresponding factors in $\\mathbf{v}_1 \\wedge \\cdots \\wedge \\mathbf{v}_n$, flipping the sign.',
+      problem: 'Using only the alternating property $\\mathbf{v} \\wedge \\mathbf{v} = 0$ and bilinearity, prove that $\\mathbf{u} \\wedge \\mathbf{v} = -(\\mathbf{v} \\wedge \\mathbf{u})$. Then use this to explain why swapping two rows of a matrix changes the determinant sign.',
+      walkthrough: [
+        {
+          expression: '(\\mathbf{u} + \\mathbf{v}) \\wedge (\\mathbf{u} + \\mathbf{v}) = 0 \\quad (\\text{alternating: any vector wedged with itself is 0})',
+          annotation: 'Apply the alternating property to the vector $\\mathbf{u} + \\mathbf{v}$: since anything wedged with itself gives 0, the whole expression is 0.',
+        },
+        {
+          expression: '\\mathbf{u}\\wedge\\mathbf{u} + \\mathbf{u}\\wedge\\mathbf{v} + \\mathbf{v}\\wedge\\mathbf{u} + \\mathbf{v}\\wedge\\mathbf{v} = 0',
+          annotation: 'Expand using bilinearity (distributivity over addition in both factors). Each term is a wedge of two vectors.',
+        },
+        {
+          expression: '0 + \\mathbf{u}\\wedge\\mathbf{v} + \\mathbf{v}\\wedge\\mathbf{u} + 0 = 0 \\quad \\Rightarrow \\quad \\mathbf{u}\\wedge\\mathbf{v} = -(\\mathbf{v}\\wedge\\mathbf{u})',
+          annotation: 'The two self-wedge terms vanish by alternating property: $\\mathbf{u}\\wedge\\mathbf{u} = 0$ and $\\mathbf{v}\\wedge\\mathbf{v}=0$. The remaining two terms must sum to zero, so they are negatives of each other.',
+        },
+        {
+          expression: '\\text{Row swap in det}: \\mathbf{v}_1\\wedge\\cdots\\wedge\\mathbf{v}_i\\wedge\\cdots\\wedge\\mathbf{v}_j\\wedge\\cdots = -(\\mathbf{v}_1\\wedge\\cdots\\wedge\\mathbf{v}_j\\wedge\\cdots\\wedge\\mathbf{v}_i\\wedge\\cdots)',
+          annotation: 'For the determinant: swapping rows $i$ and $j$ in $[\\mathbf{v}_1|\\cdots|\\mathbf{v}_n]$ swaps the two corresponding factors in $\\mathbf{v}_1 \\wedge \\cdots \\wedge \\mathbf{v}_n$, which negates the whole product by the antisymmetry we just proved.',
+        },
+      ],
+    },
+    {
+      id: 'ch-la10-003-2',
+      title: 'Compute a wedge product and read the determinant',
+      difficulty: 'easy',
+      problem: 'Expand the wedge product $(2\\mathbf{e}_1 + \\mathbf{e}_2) \\wedge (\\mathbf{e}_1 + 3\\mathbf{e}_2)$ in $\\mathbb{R}^2$ and read off the value of $\\det\\begin{pmatrix}2&1\\\\1&3\\end{pmatrix}$.',
+      walkthrough: [
+        {
+          expression: '(2\\mathbf{e}_1+\\mathbf{e}_2)\\wedge(\\mathbf{e}_1+3\\mathbf{e}_2) = 2\\mathbf{e}_1\\wedge\\mathbf{e}_1 + 6\\mathbf{e}_1\\wedge\\mathbf{e}_2 + \\mathbf{e}_2\\wedge\\mathbf{e}_1 + 3\\mathbf{e}_2\\wedge\\mathbf{e}_2',
+          annotation: 'Expand bilinearly: distribute the wedge product over addition in both factors.',
+        },
+        {
+          expression: '= 0 + 6\\mathbf{e}_1\\wedge\\mathbf{e}_2 - \\mathbf{e}_1\\wedge\\mathbf{e}_2 + 0 = 5\\mathbf{e}_1\\wedge\\mathbf{e}_2',
+          annotation: 'Apply alternating: $\\mathbf{e}_1\\wedge\\mathbf{e}_1 = 0$ and $\\mathbf{e}_2\\wedge\\mathbf{e}_2 = 0$. Apply antisymmetry: $\\mathbf{e}_2\\wedge\\mathbf{e}_1 = -\\mathbf{e}_1\\wedge\\mathbf{e}_2$. Collect terms.',
+        },
+        {
+          expression: '\\mathbf{v}_1\\wedge\\mathbf{v}_2 = 5\\,(\\mathbf{e}_1\\wedge\\mathbf{e}_2) = \\det\\begin{pmatrix}2&1\\\\1&3\\end{pmatrix} \\cdot (\\mathbf{e}_1\\wedge\\mathbf{e}_2)',
+          annotation: 'The coefficient of the basis element $\\mathbf{e}_1\\wedge\\mathbf{e}_2$ in the top exterior power is exactly the determinant. Reading off: $\\det = 5$.',
+        },
+        {
+          expression: '\\det\\begin{pmatrix}2&1\\\\1&3\\end{pmatrix} = 6 - 1 = 5 \\; \\checkmark',
+          annotation: 'Direct verification: $2 \\cdot 3 - 1 \\cdot 1 = 5$. The wedge product computation gives the same answer as cofactor expansion — they are the same thing from different angles.',
+        },
+      ],
+    },
+    {
+      id: 'ch-la10-003-3',
+      title: 'Gram determinant gives 2-volume in R^4',
+      difficulty: 'hard',
+      problem: 'Compute the area of the parallelogram spanned by $\\mathbf{v}_1=(1,0,1,0)^\\top$ and $\\mathbf{v}_2=(0,1,0,1)^\\top$ in $\\mathbb{R}^4$. Explain why there is no cross product formula here.',
+      walkthrough: [
+        {
+          expression: 'V = \\begin{pmatrix}1&0\\\\0&1\\\\1&0\\\\0&1\\end{pmatrix} \\in \\mathbb{R}^{4\\times 2}, \\quad G = V^\\top V = \\begin{pmatrix}\\mathbf{v}_1^\\top\\mathbf{v}_1 & \\mathbf{v}_1^\\top\\mathbf{v}_2 \\\\ \\mathbf{v}_2^\\top\\mathbf{v}_1 & \\mathbf{v}_2^\\top\\mathbf{v}_2\\end{pmatrix}',
+          annotation: 'Form the $4\\times 2$ matrix $V$ with the two vectors as columns, then compute the $2\\times 2$ Gram matrix $G = V^\\top V$. The Gram matrix encodes all pairwise inner products.',
+        },
+        {
+          expression: '\\mathbf{v}_1^\\top\\mathbf{v}_1 = 1+0+1+0 = 2, \\quad \\mathbf{v}_1^\\top\\mathbf{v}_2 = 0+0+0+0 = 0, \\quad \\mathbf{v}_2^\\top\\mathbf{v}_2 = 0+1+0+1 = 2',
+          annotation: 'Compute each inner product: $\\mathbf{v}_1^\\top\\mathbf{v}_1 = 2$, $\\mathbf{v}_1^\\top\\mathbf{v}_2 = 0$ (orthogonal!), $\\mathbf{v}_2^\\top\\mathbf{v}_2 = 2$.',
+        },
+        {
+          expression: 'G = \\begin{pmatrix}2&0\\\\0&2\\end{pmatrix}, \\quad \\det G = 4, \\quad \\text{Area} = \\sqrt{\\det G} = 2',
+          annotation: 'Since $\\mathbf{v}_1 \\perp \\mathbf{v}_2$ (inner product = 0) and both have length $\\sqrt{2}$, the Gram matrix is diagonal. The parallelogram is a rectangle: area $= \\sqrt{2} \\cdot \\sqrt{2} = 2$.',
+        },
+        {
+          expression: '\\text{No cross product in } \\mathbb{R}^4: \\; \\text{cross product} \\cong \\star(\\mathbf{v}_1 \\wedge \\mathbf{v}_2) \\in \\Lambda^{4-2}\\mathbb{R}^4 = \\Lambda^2\\mathbb{R}^4 \\quad (6\\text{-dimensional})',
+          annotation: 'The Hodge star in $\\mathbb{R}^4$ maps $\\Lambda^2\\mathbb{R}^4 \\to \\Lambda^2\\mathbb{R}^4$ (both 6-dimensional). The result is a 2-vector, not a single vector. A "cross product" producing a vector from two vectors only works in $\\mathbb{R}^3$ (where $\\Lambda^{3-2} = \\Lambda^1$ is the original vector space). The Gram determinant formula works in any dimension.',
+        },
+      ],
     },
   ],
 
@@ -442,15 +514,38 @@ abs(vol_2d - area_cross)
   transferPrompts: [
     {
       situation: 'You are computing the Jacobian of a change of variables in a double integral. The Jacobian matrix $J$ maps $du\\,dv$ to $dx\\,dy$. How does the wedge product explain why you multiply by $|\\det J|$ in the change-of-variables formula?',
-      competingTechniques: ['Just memorize the formula $dx\\,dy = |\\det J|\\,du\\,dv$', 'Use the wedge product: $dx \\wedge dy = \\det(J)\\, du \\wedge dv$, so area scales by $|\\det J|$'],
-      whyThisTechniqueWins: 'The wedge product derivation shows WHY the formula holds and generalizes immediately to $n$ dimensions and to integration on manifolds (Stokes\' theorem). The memorized formula is a special case.',
+      competingTechniques: 'Just memorize the formula $dx\\,dy = |\\det J|\\,du\\,dv$ vs use the wedge product: $dx \\wedge dy = \\det(J)\\, du \\wedge dv$, deriving the factor from first principles.',
+      whyThisTechniqueWins: 'The wedge product derivation shows WHY the formula holds and generalizes immediately to $n$ dimensions and to manifolds (Stokes\' theorem). The memorized formula is just the 2D case.',
     },
     {
       situation: 'In computer graphics, you need to test whether point $P$ is inside triangle $(A,B,C)$ using only signed areas.',
-      competingTechniques: ['Use barycentric coordinates (requires solving a linear system)', 'Check signs of three 2D wedge products: $(B-A)\\wedge(P-A)$, $(C-B)\\wedge(P-B)$, $(A-C)\\wedge(P-C)$'],
-      whyThisTechniqueWins: 'The wedge product test ($P$ is inside iff all three have the same sign) is direct and numerically efficient — just three 2×2 determinants. No linear system needed, and the sign tells you orientation for free.',
+      competingTechniques: 'Use barycentric coordinates (requires solving a linear system) vs check signs of three 2D wedge products: $(B-A)\\wedge(P-A)$, $(C-B)\\wedge(P-B)$, $(A-C)\\wedge(P-C)$.',
+      whyThisTechniqueWins: 'The wedge product test ($P$ is inside iff all three have the same sign) is three $2\\times 2$ determinants — no linear system needed, and the sign encodes orientation for free.',
     },
   ],
+
+  semantics: {
+    core: [
+      { symbol: '\\mathbf{u} \\wedge \\mathbf{v}', meaning: 'Wedge product: antisymmetric bilinear operation; measures oriented area. $\\mathbf{u}\\wedge\\mathbf{v} = -(\\mathbf{v}\\wedge\\mathbf{u})$; $\\mathbf{u}\\wedge\\mathbf{u}=0$. In coordinates: the $2\\times 2$ minor of $[\\mathbf{u}|\\mathbf{v}]$.' },
+      { symbol: '\\Lambda^k V', meaning: '$k$-th exterior power: antisymmetric $k$-tensors. $\\dim \\Lambda^k V = \\binom{n}{k}$. Basis: $\\mathbf{e}_{i_1}\\wedge\\cdots\\wedge\\mathbf{e}_{i_k}$ for $i_1 < \\cdots < i_k$. Top power $\\Lambda^n V$ is 1-dimensional.' },
+      { symbol: '\\det A', meaning: 'Coefficient of $\\mathbf{e}_1\\wedge\\cdots\\wedge\\mathbf{e}_n$ in $\\mathbf{v}_1\\wedge\\cdots\\wedge\\mathbf{v}_n$: the unique alternating multilinear form with $\\det(I)=1$. All determinant properties follow from wedge product axioms.' },
+      { symbol: '\\sqrt{\\det(V^\\top V)}', meaning: 'Gram determinant: $k$-dimensional volume of the parallelepiped spanned by the columns of $V \\in \\mathbb{R}^{n\\times k}$. Reduces to $|\\det V|$ when $k=n$. Required for $k<n$ where a square determinant doesn\'t exist.' },
+      { symbol: 'd^2 = 0', meaning: 'Exterior derivative $d: \\Omega^k \\to \\Omega^{k+1}$ satisfies $d \\circ d = 0$. Encodes curl(grad f)=0 and div(curl F)=0 as one identity. The source of de Rham cohomology.' },
+      { symbol: '\\int_M d\\omega = \\int_{\\partial M} \\omega', meaning: 'Generalized Stokes\' theorem: a single formula unifying FTC ($k=1$), Green\'s ($k=2$, $\\mathbb{R}^2$), classical Stokes\' ($k=2$, $\\mathbb{R}^3$), and Gauss\' divergence theorem ($k=3$).' },
+    ],
+    rulesOfThumb: [
+      'Always rewrite wedge products with indices in increasing order immediately: $\\mathbf{e}_j \\wedge \\mathbf{e}_i = -\\mathbf{e}_i \\wedge \\mathbf{e}_j$ for $i<j$. Failure to do this is the most common sign error.',
+      '$\\dim \\Lambda^k V = \\binom{n}{k}$: product rule at $k=1$ gives $n$, at $k=n$ gives 1 (determinant lives in 1D space). For $k=2$, $n=3$: dimension 3 — same as $V$ itself.',
+      'Cross product works only in $\\mathbb{R}^3$ because $\\Lambda^{n-2}\\mathbb{R}^n$ is 1-dimensional only when $n=3$. In $\\mathbb{R}^4$, the result of a "cross product" is a bivector in $\\Lambda^2\\mathbb{R}^4$ (6 dimensions), not a vector.',
+      'To compute $k$-volume in $\\mathbb{R}^n$ for $k<n$: always use the Gram determinant $\\sqrt{\\det(V^\\top V)}$. Trying to apply a square determinant formula will fail.',
+      '$d^2 = 0$ is the unified source of "curl of grad = 0" and "div of curl = 0" — remember both as one law, not two.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: ['la2-007', 'la10-002'],
+    futureLinks: ['la10-004', 'la10-005'],
+  },
 
   debugging: [
     {

@@ -811,12 +811,12 @@ v = np.array([1.0, 0.0])
   transferPrompts: [
     {
       situation: 'A robotics arm has three joints. Each joint applies a rotation matrix $R_1$, $R_2$, $R_3$ to transform from the base frame to the end-effector frame. The controller must compute the end-effector position for 1000 different joint angle configurations per second. How does it minimize computation?',
-      competingTechniques: ['Apply three matrix-vector products per configuration', 'Pre-multiply the three matrices into one, then apply once per configuration'],
+      competingTechniques: 'Apply three matrix-vector products per configuration vs. pre-multiply the three matrices into one, then apply once per configuration',
       whyThisTechniqueWins: 'Pre-compute $M = R_3 R_2 R_1$ once per joint configuration update. Then apply $M \\mathbf{v}$ to each point. Three matrix-vector products per point → one. For complex models with thousands of points, this is a 3× speedup at the cost of one matrix-matrix multiplication.',
     },
     {
       situation: 'A student claims: "To undo a rotation by 90° followed by a shear, I just undo the shear and then undo the rotation — in any order." Is this correct?',
-      competingTechniques: ['Undo in the same order (undo rotation first, then undo shear)', 'Undo in reverse order (undo shear first, then undo rotation)'],
+      competingTechniques: 'Undo in the same order (undo rotation first, then undo shear) vs. undo in reverse order (undo shear first, then undo rotation)',
       whyThisTechniqueWins: 'To undo $SR\\mathbf{v}$, you reverse: first undo $S$ (apply $S^{-1}$), then undo $R$ (apply $R^{-1}$). The inverse of $SR$ is $R^{-1} S^{-1}$ — reversed order. Undoing in the same order would be $(SR)^{-1} \\neq S^{-1} R^{-1}$.',
     },
   ],

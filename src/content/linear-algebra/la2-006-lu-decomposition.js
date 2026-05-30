@@ -940,12 +940,12 @@ b = np.array([6., 14., 10.])
   transferPrompts: [
     {
       situation: 'A finite element solver must assemble a $10000 \\times 10000$ stiffness matrix and solve it for 50 different load vectors (different structural loads on the same mesh). Why is LU factorization the right approach, and what is the computational saving?',
-      competingTechniques: ['Solve the full system fresh each time using Gaussian elimination', 'Factor once with LU, then solve each load vector with triangular substitutions'],
+      competingTechniques: 'Solve the full system fresh each time using Gaussian elimination vs. factor once with LU, then solve each load vector with triangular substitutions',
       whyThisTechniqueWins: 'Factoring once: $O(n^3)$ = $10^{12}$ operations. Each subsequent solve: $O(n^2) = 10^8$ operations. For 50 loads: $10^{12} + 50 \\times 10^8 = 1.05 \\times 10^{12}$ operations vs $50 \\times 10^{12}$ fresh solves — a 47.6× speedup for the amortized loads.',
     },
     {
       situation: 'A robotics simulation uses LU decomposition to solve dynamics equations in real-time at 1000 Hz. Between time steps, the mass matrix $M$ (which determines how mass resists acceleration) changes slightly. Should the simulation re-factor $M$ every step, or cache and reuse the LU factorization?',
-      competingTechniques: ['Re-factor $M$ every time step', 'Cache the LU factorization and only update when $M$ changes significantly'],
+      competingTechniques: 'Re-factor $M$ every time step vs. cache the LU factorization and only update when $M$ changes significantly',
       whyThisTechniqueWins: 'If $M$ changes every time step (robot joint positions change), refactoring every step is unavoidable. But if the dynamics include slowly-changing terms, caching and reusing the factorization (or doing low-rank updates) saves significant computation. The engineer must profile the update rate vs. the factorization cost.',
     },
   ],

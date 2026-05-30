@@ -669,12 +669,12 @@ fprintf('norm(x_row + x_null - x) (should be ~0): %.2e\\n', norm(x_row+x_null-x)
   transferPrompts: [
     {
       situation: 'A compressed sensing problem gives you $m$ measurements of an $n$-dimensional signal ($m < n$). The system $A\\mathbf{x}=\\mathbf{b}$ is underdetermined. How do the four fundamental subspaces tell you about recoverability?',
-      competingTechniques: ['Try to solve by least squares (gives a particular solution)', 'Analyze the null space: signals in $N(A)$ are completely invisible to the measurements'],
+      competingTechniques: 'Try to solve by least squares (gives a particular solution) vs. analyze the null space: signals in $N(A)$ are completely invisible to the measurements',
       whyThisTechniqueWins: 'The null space $N(A)$ has dimension $n-m$ — a large family of signals that produce zero measurements. Any solution $\\mathbf{x}_0$ could actually be $\\mathbf{x}_0 +$ (any null space vector). Recovery requires additional assumptions (like sparsity) to identify which element of the null space coset is the true signal.',
     },
     {
       situation: 'In a linear regression model $X\\boldsymbol{\\beta} = \\mathbf{y}$ (overdetermined, $m > n$), the system usually has no exact solution. How do the four subspaces describe what the model can and cannot fit?',
-      competingTechniques: ['Just minimize $\\|X\\boldsymbol{\\beta}-\\mathbf{y}\\|^2$ (least squares)', 'Decompose $\\mathbf{y} = \\mathbf{y}_{\\text{col}} + \\mathbf{y}_{\\text{left null}}$ and recognize only $\\mathbf{y}_{\\text{col}}$ is fittable'],
+      competingTechniques: 'Just minimize $\\|X\\boldsymbol{\\beta}-\\mathbf{y}\\|^2$ (least squares) vs. decompose $\\mathbf{y} = \\mathbf{y}_{\\text{col}} + \\mathbf{y}_{\\text{left null}}$ and recognize only $\\mathbf{y}_{\\text{col}}$ is fittable',
       whyThisTechniqueWins: 'The component of $\\mathbf{y}$ in $C(X)$ is what the model CAN fit exactly; the component in $N(X^\\top)$ (left null space) is the irreducible residual. Least squares gives the best possible $\\hat{\\mathbf{y}} = P_{C(X)}\\mathbf{y}$ — the projection onto the column space.',
     },
   ],

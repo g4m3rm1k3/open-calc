@@ -810,12 +810,12 @@ sqrt(dot(diff_vec, diff_vec))   % distance unchanged by offset`,
   transferPrompts: [
     {
       situation: 'A graphics engineer has pure red=[1,0,0], green=[0,1,0], blue=[0,0,1]. A designer requests color [0.8, 0.2, 0.6]. Can she produce it, and what are the RGB intensity values?',
-      competingTechniques: ['Trial and error with color sliders', 'Linear combination decomposition'],
+      competingTechniques: 'Trial and error with color sliders vs. linear combination decomposition',
       whyThisTechniqueWins: 'Since {red, green, blue} form a basis for color space, every color has a unique decomposition. The answer is directly [0.8, 0.2, 0.6] \u2014 the coordinates ARE the intensity scalars.',
     },
     {
       situation: 'A surveyor has two landmark reference vectors for her coordinate system. Both landmarks happen to lie due North at different distances. Can she express every 2D position in the region as a linear combination of those two reference vectors?',
-      competingTechniques: ['Three-point triangulation', 'Two-vector span test'],
+      competingTechniques: 'Three-point triangulation vs. two-vector span test',
       whyThisTechniqueWins: 'Both vectors point North \u2014 they are collinear. Their span is a 1D line, not the plane. A span test reveals the system is insufficient before any field measurements are taken.',
     },
   ],

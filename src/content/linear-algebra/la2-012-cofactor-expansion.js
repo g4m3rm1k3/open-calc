@@ -847,12 +847,12 @@ print(np.round(A_sing @ adj_sing, 10))`,
   transferPrompts: [
     {
       situation: 'A student computes $\\det(A) = 7$ by expanding along row 2, then gets $\\det(A) = 9$ by expanding along row 3. They conclude that determinants are row-dependent.',
-      competingTechniques: ['Trust the first answer and discard the second', 'Average the two results', 'Identify an arithmetic error — Laplace\'s theorem guarantees both must agree'],
+      competingTechniques: 'Trust the first answer and discard the second vs. average the two results vs. identify an arithmetic error — Laplace\'s theorem guarantees both must agree',
       whyThisTechniqueWins: 'Laplace\'s theorem is exact: all expansions give the same determinant. Any discrepancy proves an error — wrong sign, wrong submatrix, or arithmetic mistake. Averaging or choosing one hides the bug. The only correct response is to recompute until both agree.',
     },
     {
       situation: 'A control engineer needs to invert a $6 \\times 6$ state-space matrix for a symbolic controller design. They must produce a closed-form formula for $A^{-1}$ in terms of the system parameters.',
-      competingTechniques: ['Numerical LU factorization', 'Symbolic cofactor expansion via computer algebra system', 'Row reduction on the symbolic matrix by hand'],
+      competingTechniques: 'Numerical LU factorization vs. symbolic cofactor expansion via computer algebra system vs. row reduction on the symbolic matrix by hand',
       whyThisTechniqueWins: 'For a symbolic $6 \\times 6$, CAS-based cofactor expansion produces an exact rational function of the parameters — exactly what controller design requires. Numerical LU gives a number for specific parameter values only. Hand row-reduction of a $6 \\times 6$ symbolic matrix is error-prone. For small $n$ with symbolic entries, the adjugate formula is the correct tool.',
     },
   ],

@@ -775,12 +775,12 @@ b = np.array([9.0, 3.0, 1.0])
   transferPrompts: [
     {
       situation: 'You are given a 5×3 overdetermined system (more equations than unknowns) representing sensor measurements with noise. Which technique applies?',
-      competingTechniques: ['Gaussian elimination (exact solution)', 'Least squares (np.linalg.lstsq)', 'Ignoring extra equations'],
+      competingTechniques: 'Gaussian elimination (exact solution) vs. least squares (np.linalg.lstsq) vs. ignoring extra equations',
       whyThisTechniqueWins: 'Gaussian elimination finds exact solutions when they exist, but overdetermined systems usually have no exact solution. Least squares minimizes the residual ||Ax−b||² and is the right tool for noisy data. Gaussian elimination remains essential as a subroutine inside the least-squares solver.',
     },
     {
       situation: 'You need to check whether three vectors in ℝ³ are linearly independent — without computing a determinant.',
-      competingTechniques: ['Row-reduce the matrix formed by the three column vectors', 'Compute the determinant', 'Check by inspection'],
+      competingTechniques: 'Row-reduce the matrix formed by the three column vectors vs. compute the determinant vs. check by inspection',
       whyThisTechniqueWins: 'Form the 3×3 matrix with the vectors as columns and row-reduce. If you get 3 pivot columns (rank 3), they are independent. If rank < 3, they are dependent. This generalizes to any size — determinants only work for square matrices and give less insight into which vectors are redundant.',
     },
   ],

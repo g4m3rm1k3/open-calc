@@ -26,6 +26,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'Procedure: Compute the Best Rank-$k$ Approximation',
+        body: 'Step 1. **Compute the full SVD.** $A = U\\Sigma V^\\top$ with $\\sigma_1 \\geq \\sigma_2 \\geq \\cdots \\geq \\sigma_r > 0$.\n\nStep 2. **Choose $k$.** Either specify $k$ directly, or choose $k$ to capture a target energy fraction: find smallest $k$ with $\\sum_{i=1}^k \\sigma_i^2 / \\sum_i \\sigma_i^2 \\geq$ target.\n\nStep 3. **Form $A_k$.** Keep only the first $k$ columns of $U$, first $k$ singular values, and first $k$ rows of $V^\\top$:\n$A_k = U_k \\Sigma_k V_k^\\top = \\sum_{i=1}^k \\sigma_i \\mathbf{u}_i \\mathbf{v}_i^\\top$\n\nStep 4. **Compute the error.** 2-norm error $= \\sigma_{k+1}$. Frobenius error $= \\sqrt{\\sigma_{k+1}^2 + \\cdots + \\sigma_r^2}$. Eckart-Young guarantees no rank-$k$ matrix does better.\n\nStep 5. **Verify the compression.** Storage: $k(m+n+1)$ numbers vs $mn$ original. Check that $A_k$ is close enough to $A$ for the intended use case.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 9 of 9 — Orthogonality & SVD',
         body: '**Previous (Lesson 8):** Pseudoinverse — the minimum-norm least-squares solution via $A^+ = V\\Sigma^+U^T$.\n**This lesson:** Low-Rank Approximation — the Eckart-Young theorem and why keeping the top $k$ singular values is the best possible rank-$k$ approximation in both the 2-norm and Frobenius norm.\n**Next (Chapter 6):** Abstract Vector Spaces — extending the ideas of bases, dimension, and linear transformations beyond $\\mathbb{R}^n$.',
@@ -237,6 +242,9 @@ for k in [1, 2, 3]:
   rigor: {
     prose: [
       '**Matrix completion and the Netflix problem.** Given a partially observed matrix $M$ (most entries missing), find the lowest-rank matrix consistent with the observations. Under incoherence conditions (the singular vectors are "spread out"), $M$ can be exactly recovered from $O(rn\\log n)$ random entries by nuclear norm minimization — far fewer than the $mn$ total entries. This is the mathematical foundation of collaborative filtering: if user preferences form a low-rank matrix (users cluster into groups, items cluster into genres), then a few ratings suffice to predict all ratings.',
+      '**Proof sketch of Eckart-Young.** Suppose $B$ is any rank-$k$ matrix. We want to show $\\|A - B\\|_2 \\geq \\sigma_{k+1}$. Since rank$(B) = k$, there exists a nonzero $\\mathbf{w} \\in N(B) \\cap \\text{span}(\\mathbf{v}_1,\\ldots,\\mathbf{v}_{k+1})$ (a nonzero vector in both the null space of $B$ and the span of the first $k+1$ right singular vectors — this intersection is nonempty by dimension counting). Then $\\|A - B\\|_2 \\geq \\|(A-B)\\mathbf{w}/\\|\\mathbf{w}\\|\\|_2 = \\|A\\mathbf{w}/\\|\\mathbf{w}\\|\\|_2 \\geq \\sigma_{k+1}$ (since $\\mathbf{w}$ is a linear combination of $\\mathbf{v}_1,\\ldots,\\mathbf{v}_{k+1}$ and $A\\mathbf{v}_i = \\sigma_i\\mathbf{u}_i$, the minimum stretch in this subspace is $\\sigma_{k+1}$).',
+      '**Stable rank and numerical rank.** The "numerical rank" of a matrix at tolerance $\\varepsilon$ is the number of singular values exceeding $\\varepsilon \\sigma_1$. The "stable rank" is $\\|A\\|_F^2 / \\|A\\|_2^2 = \\sum \\sigma_i^2 / \\sigma_1^2$, which measures how "spread out" the singular values are. A matrix with stable rank much smaller than its true rank is highly compressible — the top few singular values dominate. Random matrices have stable rank $\\approx \\min(m,n)$ (all singular values similar), while structured data matrices have stable rank $\\ll \\min(m,n)$.',
+      '**Relation to PCA and the bias-variance tradeoff.** In PCA, choosing $k$ balances two competing effects. Small $k$: high bias (the model is too simple, misses real structure), but low variance (not sensitive to noise in the training data). Large $k$: low bias (captures all real structure), but high variance (fits noise). The "elbow" in the scree plot (where singular values stop decaying fast) suggests a natural $k$ — above this point, additional components capture mostly noise rather than signal. This is the linear algebra version of the bias-variance tradeoff that governs all of machine learning.',
     ],
     callouts: [
       {
@@ -292,9 +300,75 @@ for k in [1, 2, 3]:
       id: 'ch-la4-009-1',
       title: 'When does rank-k perfectly reconstruct?',
       difficulty: 'medium',
-      prompt: 'Prove that $A_k = A$ (the rank-$k$ approximation equals $A$ exactly) if and only if rank$(A) \\leq k$.',
+      problem: 'Prove that $A_k = A$ (the rank-$k$ approximation equals $A$ exactly) if and only if rank$(A) \\leq k$.',
       hint: 'Use the SVD expansion $A = \\sum_{i=1}^r \\sigma_i u_i v_i^\\top$ and the definition $A_k = \\sum_{i=1}^k \\sigma_i u_i v_i^\\top$.',
-      solution: '($\\Rightarrow$) If rank$(A) \\leq k$, then $A = \\sum_{i=1}^r \\sigma_i u_i v_i^\\top$ with $r \\leq k$. So $A_k = \\sum_{i=1}^{\\min(r,k)}\\sigma_i u_i v_i^\\top = \\sum_{i=1}^r \\sigma_i u_i v_i^\\top = A$. ($\\Leftarrow$) If $A_k = A$, then $A = A_k$ has rank $\\leq k$ (since $A_k$ is a sum of $k$ rank-1 matrices). Therefore rank$(A) \\leq k$.',
+      walkthrough: [
+        {
+          expression: 'A = \\sum_{i=1}^r \\sigma_i \\mathbf{u}_i \\mathbf{v}_i^\\top, \\quad A_k = \\sum_{i=1}^{\\min(r,k)} \\sigma_i \\mathbf{u}_i \\mathbf{v}_i^\\top',
+          annotation: 'The SVD has exactly $r = \\text{rank}(A)$ nonzero terms. $A_k$ keeps the first $\\min(r,k)$ terms.',
+        },
+        {
+          expression: '(\\Rightarrow) \\text{ If } \\text{rank}(A) \\leq k \\text{ then } r \\leq k \\text{, so } A_k = \\sum_{i=1}^r \\sigma_i \\mathbf{u}_i \\mathbf{v}_i^\\top = A',
+          annotation: 'When $r \\leq k$, all $r$ nonzero terms are kept: $A_k$ has all the same terms as $A$ and none extra.',
+        },
+        {
+          expression: '(\\Leftarrow) \\text{ If } A_k = A \\text{, then } A \\text{ is a sum of } k \\text{ rank-1 matrices} \\implies \\text{rank}(A) \\leq k',
+          annotation: 'A sum of at most $k$ rank-1 matrices has rank at most $k$.',
+        },
+      ],
+      answer: 'Aₖ = A ↔ rank(A) ≤ k. If rank(A) = r ≤ k, all r nonzero SVD terms are retained. Conversely, if Aₖ = A, A has rank ≤ k.',
+    },
+    {
+      id: 'ch-la4-009-2',
+      title: 'Compute rank-1 and rank-2 approximations with errors',
+      difficulty: 'easy',
+      problem: 'For $A = \\begin{pmatrix}4&0&0\\\\0&2&0\\\\0&0&1\\end{pmatrix}$: (a) write $A_1$ and $A_2$; (b) compute $\\|A-A_1\\|_2$, $\\|A-A_1\\|_F$, $\\|A-A_2\\|_2$, $\\|A-A_2\\|_F$; (c) what percentage of Frobenius energy does rank-2 capture?',
+      hint: '$A$ is already diagonal — the SVD is trivial: $\\sigma_1=4, \\sigma_2=2, \\sigma_3=1$, singular vectors = standard basis.',
+      walkthrough: [
+        {
+          expression: 'A_1 = \\begin{pmatrix}4&0&0\\\\0&0&0\\\\0&0&0\\end{pmatrix}, \\quad A_2 = \\begin{pmatrix}4&0&0\\\\0&2&0\\\\0&0&0\\end{pmatrix}',
+          annotation: 'Keep the top 1 (resp. 2) singular values; zero out the rest.',
+        },
+        {
+          expression: '\\|A-A_1\\|_2 = \\sigma_2 = 2, \\quad \\|A-A_1\\|_F = \\sqrt{4+1} = \\sqrt{5}',
+          annotation: '2-norm error = next singular value. Frobenius error = √(σ₂²+σ₃²) = √(4+1).',
+        },
+        {
+          expression: '\\|A-A_2\\|_2 = \\sigma_3 = 1, \\quad \\|A-A_2\\|_F = 1',
+          annotation: 'Only σ₃=1 is discarded.',
+        },
+        {
+          expression: '\\text{Energy captured by rank-2: } \\frac{16+4}{16+4+1} = \\frac{20}{21} \\approx 95.2\\%',
+          annotation: '$\\|A\\|_F^2 = 16+4+1 = 21$. Rank-2 keeps $16+4 = 20$: $20/21 \\approx 95.2\\%$ of total energy.',
+        },
+      ],
+      answer: 'A₁ = diag(4,0,0), A₂ = diag(4,2,0). ‖A−A₁‖₂=2, ‖A−A₁‖_F=√5. ‖A−A₂‖₂=1, ‖A−A₂‖_F=1. Rank-2 captures 95.2% of energy.',
+    },
+    {
+      id: 'ch-la4-009-3',
+      title: 'Compression ratio for an image matrix',
+      difficulty: 'medium',
+      problem: 'A grayscale image is stored as a $512 \\times 512$ matrix. (a) How many numbers does the full matrix store? (b) A rank-20 approximation stores only $U_{512\\times 20}$, $\\Sigma_{20\\times 1}$, and $V_{512\\times 20}$. How many numbers is that? (c) What is the compression ratio? (d) If the singular values are $\\sigma_i = 1000/i$ and you want to capture $\\geq 99\\%$ of the Frobenius energy, what is the minimum $k$?',
+      hint: 'Total energy $= \\sum_{i=1}^{512} (1000/i)^2 = 10^6 \\sum_{i=1}^{512} 1/i^2 \\approx 10^6 \\cdot 1.639$. Cumulative energy for rank $k$: $10^6 \\sum_{i=1}^k 1/i^2$.',
+      walkthrough: [
+        {
+          expression: '\\text{Full: } 512 \\times 512 = 262{,}144 \\text{ numbers}',
+          annotation: 'The original matrix.',
+        },
+        {
+          expression: '\\text{Rank-20: } 512 \\cdot 20 + 20 + 512 \\cdot 20 = 20480 + 20 + 20480 = 40980 \\text{ numbers}',
+          annotation: '$U$ (512×20) + $\\Sigma$ (20 scalars) + $V$ (512×20).',
+        },
+        {
+          expression: '\\text{Compression ratio: } \\frac{262144}{40980} \\approx 6.4\\times',
+          annotation: 'The rank-20 approximation requires only ~16% the storage of the original.',
+        },
+        {
+          expression: '\\sum_{i=1}^k \\frac{1}{i^2} \\geq 0.99 \\sum_{i=1}^{512} \\frac{1}{i^2} \\approx 0.99 \\times 1.639',
+          annotation: 'Need $\\sum_{i=1}^k 1/i^2 \\geq 1.622$. Since $\\sum_{i=1}^{10} 1/i^2 \\approx 1.5498$, $\\sum_{i=1}^{14} 1/i^2 \\approx 1.609$, $\\sum_{i=1}^{17} 1/i^2 \\approx 1.626 > 1.622$. Minimum $k \\approx 17$.',
+        },
+      ],
+      answer: '(a) 262,144. (b) 40,980. (c) ≈6.4× compression. (d) k≈17 to capture 99% of energy.',
     },
   ],
 
@@ -453,12 +527,12 @@ for k in [1, 2, 3]:
   transferPrompts: [
     {
       situation: 'A recommender system has a 500,000 user × 100,000 movie rating matrix, but only 1% of entries are observed. How does low-rank structure make this tractable?',
-      competingTechniques: ['Try to fill in the matrix by interpolation', 'Model the matrix as low-rank (say rank 50): 50 "user taste" vectors × 50 "movie profile" vectors'],
+      competingTechniques: 'Try to fill in the matrix by interpolation; Model the matrix as low-rank (say rank 50): 50 "user taste" vectors × 50 "movie profile" vectors',
       whyThisTechniqueWins: 'A rank-50 matrix has only $50\\times(500000+100000) = 30$ million parameters vs $50$ billion entries. The low-rank assumption converts a hopelessly under-determined problem into an over-determined one. Nuclear norm minimization or alternating least squares can recover the rank-50 matrix from the 1% observations under incoherence conditions.',
     },
     {
       situation: 'A high-dimensional dynamical system (e.g., fluid simulation on a $10^6$-node mesh) needs to be simulated over time. The state at each time is a $10^6$-dimensional vector. How does low-rank approximation help?',
-      competingTechniques: ['Simulate the full $10^6$-dimensional system at each timestep', 'Find the top $k$ POD (proper orthogonal decomposition) modes, reduce to $k$-dimensional system'],
+      competingTechniques: 'Simulate the full 10⁶-dimensional system at each timestep; Find the top k POD (proper orthogonal decomposition) modes, reduce to k-dimensional system',
       whyThisTechniqueWins: 'If the snapshots matrix (each column = one timestep) has rapidly decaying singular values, the dynamics live in a low-dimensional subspace. Projecting the PDE onto this subspace gives a $k \\times k$ system that is thousands of times cheaper to simulate, with errors bounded by the discarded singular values.',
     },
   ],
@@ -477,4 +551,43 @@ for k in [1, 2, 3]:
       repairStrategy: 'Each rank-1 term needs: $m$ numbers for $u_i$, $1$ for $\\sigma_i$, $n$ for $v_i$. Total for rank-$k$: $k(m+1+n)$ numbers. Compression only helps when $k(m+n+1) < mn$, i.e., $k < mn/(m+n+1) \\approx \\min(m,n)/2$ (roughly).',
     },
   ],
+
+  semantics: {
+    core: [
+      { symbol: 'A_k = \\sum_{i=1}^k \\sigma_i \\mathbf{u}_i \\mathbf{v}_i^\\top', meaning: 'Rank-k truncated SVD — keep only the top k singular value/vector triples' },
+      { symbol: '\\|A - A_k\\|_2 = \\sigma_{k+1}', meaning: 'Eckart-Young: 2-norm error equals the next discarded singular value' },
+      { symbol: '\\|A - A_k\\|_F = \\sqrt{\\sigma_{k+1}^2 + \\cdots + \\sigma_r^2}', meaning: 'Frobenius error equals RMS of discarded singular values' },
+      { symbol: '\\frac{\\sum_{i=1}^k \\sigma_i^2}{\\|A\\|_F^2}', meaning: 'Fraction of total energy captured by rank-k approximation' },
+      { symbol: 'k(m + n + 1)', meaning: 'Storage cost of rank-k approximation (U: mk, Σ: k, V: nk numbers)' },
+    ],
+    rulesOfThumb: [
+      'Eckart-Young: Aₖ is the BEST rank-k approximation in BOTH 2-norm and Frobenius simultaneously. No other rank-k matrix is closer.',
+      'Compression helps when k(m+n+1) < mn, i.e., k < mn/(m+n) ≈ min(m,n)/2.',
+      'Fast singular value decay = high compressibility. Natural images/data: top 5-20% of singular values hold 90%+ of energy.',
+      'The "elbow" in the scree plot (singular values vs index) marks where noise starts dominating over signal.',
+      'For full SVD: A has rank r, Aₖ = A exactly when k ≥ r.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: [
+      {
+        lessonId: 'la4-002-svd',
+        label: 'SVD',
+        note: 'Low-rank approximation IS the truncated SVD. Every algorithm in this lesson begins with $A = U\\Sigma V^\\top$ — the full SVD — then discards the small singular values.',
+      },
+      {
+        lessonId: 'la4-006',
+        label: 'Spectral Theorem',
+        note: 'For symmetric matrices, SVD = spectral decomposition. PCA is the spectral decomposition of the covariance matrix, and the Eckart-Young theorem applied to $C = Q\\Lambda Q^\\top$ gives the best low-dimensional projection.',
+      },
+    ],
+    futureLinks: [
+      {
+        lessonId: 'la5-001',
+        label: 'Abstract Vector Spaces',
+        note: 'The ideas of rank, dimension, and low-rank structure generalize to abstract function spaces. The counterpart of SVD for integral operators is the Hilbert-Schmidt expansion — the functional analogue of the spectral decomposition.',
+      },
+    ],
+  },
 };

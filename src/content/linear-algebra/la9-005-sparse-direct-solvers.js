@@ -27,6 +27,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'How to Use a Sparse Direct Solver (4 Steps)',
+        body: '1. **Reorder.** Compute a fill-reducing permutation: AMD (`amd(A)` in MATLAB/SciPy) for general sparse; nested dissection for regular grids. Form $PAP^\\top$ (same sparsity, different order). Never skip reordering for non-trivial problems.\n2. **Symbolic factorization.** Determine the sparsity pattern of $L$ and $U$ (or $L$ and $L^\\top$ for SPD) from the graph of $PAP^\\top$ without computing any values. This step identifies and allocates all memory needed for the factors — fast ($O(\\text{nnz})$) and done once per sparsity pattern.\n3. **Numerical factorization.** Compute the actual values of $L$ and $U$. This is the expensive step: $O(N^{3/2})$ flops for 2D with ND, $O(N^2)$ for 3D. Partial pivoting is applied (or diagonal dominance is assumed for Cholesky). Done once per matrix value; reused for all right-hand sides.\n4. **Solve.** For each right-hand side $\\mathbf{b}$: (a) permute: $\\hat{\\mathbf{b}} = P\\mathbf{b}$; (b) forward solve: $L\\mathbf{y} = \\hat{\\mathbf{b}}$; (c) backward solve: $U\\mathbf{x} = \\mathbf{y}$; (d) unpermute: $\\mathbf{x}^{\\text{true}} = P^\\top\\mathbf{x}$. Cost: $O(\\text{nnz}(L) + \\text{nnz}(U))$ per RHS.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 5 of 5 — Iterative Solvers & Preconditioning',
         body: '**Previous (Lesson 4):** Preconditioning — Jacobi, ILU, AMG; eigenvalue clustering for Krylov efficiency.\n**This lesson:** Sparse Direct Solvers — fill-in, reordering (AMD, nested dissection), CHOLMOD/SuperLU/PARDISO, direct vs iterative tradeoffs.\n**Next (Chapter 10):** Dual Spaces and Advanced Theory — the abstract framework that unifies everything in Chapters 1–9.',
@@ -247,6 +252,9 @@ disp('Factorized once, solved 10 RHS cheaply.')
   rigor: {
     prose: [
       '**MUMPS and parallel direct solvers.** MUMPS (Multifrontal Massively Parallel sparse direct Solver) uses the **multifrontal method**: represent the factorization as a sequence of dense matrix operations on "frontal matrices" derived from the elimination tree. Subtrees can be processed in parallel. MUMPS is MPI-parallel and used in many industrial codes. PARDISO (Intel) uses a supernodal approach and is OpenMP-parallel. For very large 3D problems, iterative methods (CG/GMRES + AMG) remain dominant because $O(n^{4/3})$ fill-in is still too much.',
+      '**Elimination tree theory and parallel factorization.** The elimination tree $T(A)$ captures the dependency structure of Cholesky: node $j$ is the parent of node $i$ ($i < j$) if column $j$ is the leftmost column of $L$ that shares a nonzero in row $i$ below the diagonal. Two nodes in disjoint subtrees share no data dependencies and can be computed in parallel. For natural ordering of a path graph (tridiagonal), $T(A)$ is itself a path of depth $n-1$ — purely sequential. For nested dissection of a $\\sqrt{N} \\times \\sqrt{N}$ grid, $T(A)$ is a balanced binary tree of depth $O(\\log N)$. Each level of the tree can be processed in parallel, giving theoretical speedup $O(N / \\log N)$ on sufficient processors. This is why ND is preferred not only for fill-in minimization but also for parallel implementations in codes like MUMPS and Elemental.',
+      '**Supernodal factorization and BLAS efficiency.** A **supernode** is a maximal set of consecutive columns of $L$ with identical nonzero structure — the same row indices below the diagonal. Processing a supernode allows the factorization kernel to be expressed as a dense rank-$k$ update (DSYRK, DGEMM), achieving peak FLOPS on modern CPUs via cache-friendly memory access. CHOLMOD uses supernodal Cholesky; PARDISO uses supernodal LU. Typical supernode widths: 5–50 columns for 2D FEM problems, larger for 3D. Practical impact: supernodal codes run at 50–80% of peak FLOP rate; purely sparse column-by-column codes run at 5–10%. This is not a minor implementation detail — it is the reason commercial solvers achieve the wall-clock performance they do. The supernodal grouping arises naturally from ND reordering, so reordering serves two purposes: fill-in reduction and supernode creation.',
+      '**Iterative refinement and mixed-precision factorization.** After computing $LU \\approx PAP^\\top$, the computed solution $\\hat{x}_0$ satisfies $A \\hat{x}_0 = b + \\delta b$ with $\\|\\delta b\\| = O(\\varepsilon_{\\text{mach}} \\|A\\| \\|\\hat{x}_0\\|)$. For ill-conditioned $A$ ($\\kappa \\gg 1$), the forward error $\\|x - \\hat{x}_0\\|$ can be large. **Iterative refinement** corrects this: (1) compute residual $r_0 = b - A\\hat{x}_0$ in higher precision; (2) solve $A \\,\\delta x = r_0$ using the same $L$, $U$ (two triangular solves — cheap); (3) update $\\hat{x}_1 = \\hat{x}_0 + \\delta x$. One refinement step reduces forward error from $O(\\kappa \\varepsilon_{\\text{mach}})$ to $O(\\varepsilon_{\\text{mach}})$ provided $\\kappa < \\varepsilon_{\\text{mach}}^{-1/2}$. LAPACK\'s \\texttt{DSGESV} exploits this with **mixed-precision**: factorize in single precision (4$\\times$ less memory, $4\\times$ faster BLAS), then refine in double to achieve double-precision accuracy — a key strategy for GPU-accelerated solvers where single-precision throughput is $8$–$16\\times$ higher.',
     ],
     callouts: [
       {
@@ -324,11 +332,83 @@ disp('Factorized once, solved 10 RHS cheaply.')
   challenges: [
     {
       id: 'ch-la9-005-1',
-      title: 'Elimination tree depth',
+      title: 'Elimination tree depth: path vs nested dissection',
       difficulty: 'hard',
-      prompt: 'For a path graph (tridiagonal matrix $A$), draw the elimination tree with natural ordering. What is its depth? How does depth relate to the potential for parallel factorization?',
-      hint: 'The elimination tree for a tridiagonal matrix with natural ordering is a path.',
-      solution: 'Tridiagonal with natural ordering: node $i$ is parent of $i-1$ (eliminating $i-1$ creates a fill entry in column $i$). The elimination tree is a path of length $n$ — depth $n-1$. Sequential factorization only. With nested dissection: the elimination tree is balanced with depth $O(\\log n)$ — enabling $O(n/\\log n)$ parallel speedup on $n/\\log n$ processors.',
+      problem: 'For a tridiagonal (path graph) matrix with natural ordering, describe the elimination tree and its depth. Then explain how nested dissection changes the tree structure and what that means for parallel factorization.',
+      walkthrough: [
+        {
+          expression: 'T(A)_{\\text{natural}}: n-1 \\to n-2 \\to \\cdots \\to 1 \\quad (\\text{depth} = n-1)',
+          annotation: 'Natural order: eliminating column $i$ creates a fill entry in column $i+1$ (the first nonzero to the right). So column $i+1$ is the parent of column $i$. The result is a chain — depth $n-1$. Every column depends on the previous one: no parallelism at all.',
+        },
+        {
+          expression: '\\text{Critical path: depth}(T) \\Rightarrow \\text{minimum sequential steps}',
+          annotation: 'The depth of the elimination tree equals the minimum number of sequential factorization steps, regardless of how many processors are available. Depth $n-1$ means the factorization is inherently sequential for a tridiagonal with natural ordering — adding processors does not help.',
+        },
+        {
+          expression: 'T(A)_{\\text{ND}}: \\text{balanced binary tree, depth} = O(\\log n)',
+          annotation: 'Nested dissection ordering: the separator node is numbered last (highest index). Each of the two sub-problems is itself ND-ordered, recursively. The elimination tree becomes a balanced binary tree with depth $O(\\log n)$. All nodes at the same depth in the tree are independent and can be computed in parallel.',
+        },
+        {
+          expression: '\\text{Parallel speedup} = O\\!\\left(\\frac{n}{\\log n}\\right) \\text{ on } \\frac{n}{\\log n} \\text{ processors}',
+          annotation: 'With $p = n/\\log n$ processors and depth $O(\\log n)$, Brent\'s theorem gives total time $O(\\log n)$, giving speedup $O(n/\\log n)$. For large $n$ this is near-optimal parallel efficiency. This is precisely why MUMPS and other parallel sparse solvers use ND ordering.',
+        },
+      ],
+    },
+    {
+      id: 'ch-la9-005-2',
+      title: 'Tridiagonal: zero fill-in under natural order',
+      difficulty: 'easy',
+      problem: 'Prove that a tridiagonal $n \\times n$ matrix $A$ produces zero fill-in when eliminated in natural order $(1, 2, \\ldots, n)$.',
+      walkthrough: [
+        {
+          expression: '\\text{Eliminate column 1: only } a_{21} \\neq 0 \\text{ below diagonal}',
+          annotation: 'Column 1 of a tridiagonal has nonzeros only at positions $(1,1)$ and $(2,1)$. The Schur complement update modifies only the $(2,2)$ entry (already nonzero) — no new nonzero entries are created.',
+        },
+        {
+          expression: '\\text{After eliminating column 1: row 2 is unchanged except } a_{22}',
+          annotation: 'The only row that gets modified is row 2 (the only row with a nonzero in column 1 below the diagonal). Row 2 already has nonzeros at columns 2 and 3 — no new nonzeros appear.',
+        },
+        {
+          expression: '\\text{Same argument at every step } i: \\text{ column } i \\text{ has one subdiagonal entry at row } i+1',
+          annotation: 'By induction: when we reach column $i$, it has already been partially updated but remains tridiagonal in its structure. There is exactly one nonzero below $(i,i)$, at row $i+1$. The update only touches row $i+1$ at columns $i+1$ and $i+2$ — both already occupied.',
+        },
+        {
+          expression: '\\text{Fill-in} = 0 \\Rightarrow L, U \\text{ are bidiagonal}',
+          annotation: 'Conclusion: the LU factors of a tridiagonal are bidiagonal (lower and upper). This is the reason 1D finite difference problems are trivially solved by direct methods — no fill-in, $O(n)$ factorization, exactly like the original matrix.',
+        },
+      ],
+    },
+    {
+      id: 'ch-la9-005-3',
+      title: 'Arrow matrix fill-in: natural vs reverse order',
+      difficulty: 'medium',
+      problem: 'An $n \\times n$ arrow matrix $A$ has nonzeros only on the diagonal and in the first row and column (i.e., $a_{1j} \\neq 0$ and $a_{i1} \\neq 0$ for all $i, j$, and $a_{ij} = 0$ for $i,j \\geq 2, i \\neq j$). Compute the fill-in under (a) natural order and (b) reverse order $(n, n-1, \\ldots, 1)$.',
+      walkthrough: [
+        {
+          expression: 'A = \\begin{bmatrix} * & * & * & * \\\\ * & * & & \\\\ * & & * & \\\\ * & & & * \\end{bmatrix} \\quad (\\text{pattern, } n=4)',
+          annotation: 'The arrow (or "arrowhead") matrix: dense first row and column, diagonal elsewhere. Variables $2, \\ldots, n$ are each connected only to variable 1 — they are "leaves" attached to the hub at node 1.',
+        },
+        {
+          expression: '\\text{Natural order: eliminate column 1 first}',
+          annotation: 'Eliminating column 1: rows $2, 3, \\ldots, n$ all have a nonzero in column 1. After the elimination, every pair of rows $(i, j)$ with $i,j \\geq 2$ gets a new entry at column $j$ if row $j$ was involved. The entire $(2:n) \\times (2:n)$ block fills in completely.',
+        },
+        {
+          expression: '\\text{Fill-in (natural)} = (n-1)^2 - (n-1) = (n-1)(n-2) = O(n^2)',
+          annotation: 'After eliminating column 1, the remaining $(n-1) \\times (n-1)$ submatrix is dense — all entries filled in. From $n-1$ nonzeros, we created $(n-1)^2$ nonzeros. This is the worst case for direct methods without reordering.',
+        },
+        {
+          expression: '\\text{Reverse order: eliminate columns } n, n-1, \\ldots, 2 \\text{ first}',
+          annotation: 'Column $n$ has nonzeros only at $(n,n)$ and $(1,n)$. The only row below the diagonal in column $n$ is... none (column $n$ has no subdiagonal entries). Wait — the arrowhead has nonzeros in column 1 below the diagonal, but in columns $2, \\ldots, n$ only the first row and diagonal are nonzero. So eliminating column $k \\geq 2$ first: there is no nonzero below the diagonal, so no elimination step occurs at all.',
+        },
+        {
+          expression: '\\text{Fill-in (reverse)} = 0 \\quad \\text{(eliminating leaves creates nothing)}',
+          annotation: 'Leaves $n, n-1, \\ldots, 2$ each have one above-diagonal entry (in row 1) and one diagonal entry. No subdiagonal entries to create fill. Eliminating them in reverse order: zero fill-in until the very last step. Column 1 is eliminated last and it is already alone — zero fill-in for the whole factorization.',
+        },
+        {
+          expression: '\\text{Lesson: reordering transforms } O(n^2) \\to O(n) \\text{ fill-in on the same matrix}',
+          annotation: 'The matrix values did not change — only the variable ordering changed. The graph interpretation: natural order eliminates the hub (node 1) first, forcing all leaves to connect to each other (complete graph). Reverse order eliminates leaves first, which have no mutual connections — the hub is eliminated last with nothing left.',
+        },
+      ],
     },
   ],
 
@@ -481,6 +561,29 @@ disp('Factorized once, solved 10 RHS cheaply.')
       whyThisTechniqueWins: 'The stiffness matrix $K$ is fixed. Cholesky factorization: done once. Each of 50 load cases: two triangular solves, $O(\\text{nnz}(L))$ work. Total work: $O(N^{3/2}) + 50 \\cdot O(N\\log N)$ vs GMRES $50 \\cdot O(N^{3/2})$. Direct solver wins decisively for many right-hand sides.',
     },
   ],
+
+  semantics: {
+    core: [
+      { symbol: '\\text{fill-in}(A, P)', meaning: 'Nonzeros appearing in $L$ or $U$ of $PAP^\\top$ that were zero in $PAP^\\top$; a purely structural property — same for any matrix with the same sparsity pattern. Reordering $P$ minimizes this.' },
+      { symbol: '\\text{AMD}(A)', meaning: 'Approximate Minimum Degree ordering: greedily eliminate the node with fewest connections (smallest degree) at each step. Runs in $O(\\text{nnz}(A))$ time; good general-purpose heuristic used by MATLAB\'s backslash and CHOLMOD.' },
+      { symbol: '\\text{ND}(G)', meaning: 'Nested Dissection: find a separator $S$ of size $O(\\sqrt{n})$ in graph $G$, number the two subgraphs first, recurse. For 2D grids achieves $O(n \\log n)$ fill-in; for 3D achieves $O(n^{4/3})$.' },
+      { symbol: 'T(A)', meaning: 'Elimination tree of $A$: node $j$ is the parent of $i$ if $L_{ij} \\neq 0$ and $j$ is the smallest such column. Nodes in disjoint subtrees are independent — the depth of $T(A)$ is the critical path length for parallel factorization.' },
+      { symbol: '\\text{nnz}(L) / \\text{nnz}(A)', meaning: 'Fill ratio: ratio of nonzeros in the Cholesky factor to nonzeros in $A$. Rule of thumb: if fill ratio $> 50$, a direct solve will be expensive — consider iterative. For 2D with ND, fill ratio $\\approx O(\\log n) \\ll 1$.' },
+      { symbol: '\\text{supernode}', meaning: 'Maximal set of consecutive columns of $L$ with identical nonzero structure. Processing supernodes converts sparse updates into dense BLAS3 calls (DGEMM/DSYRK), achieving 50–80% of peak FLOP rate vs 5–10% for scalar sparse codes.' },
+    ],
+    rulesOfThumb: [
+      'Always reorder before factoring: `amd(A)` in MATLAB/SciPy for general sparse; ND for regular grids. Skipping reordering can cause 10–100× excess fill-in.',
+      '2D direct solve: use sparse direct (CHOLMOD, SuperLU) for $n < 10^5$ unknowns; switch to iterative + AMG for larger 2D problems.',
+      '3D direct solve: ND gives $O(N^{4/3})$ fill-in — already $10^8$ entries for $N = 10^6$. For 3D $n > 10^4$, iterative methods almost always win.',
+      'Factor once, solve many: the factorization cost is amortized over multiple right-hand sides. For $k$ RHS with same $A$, direct solvers win when $k \\geq \\sqrt{N} / \\log N$.',
+      'Check the fill ratio before committing: compute \'nnz(chol(A(p,p))) / nnz(A)\' in MATLAB. If the ratio exceeds 50, switch to iterative + ILU or AMG preconditioner.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: ['la7-003', 'la9-004'],
+    futureLinks: ['la10-001', 'la10-002'],
+  },
 
   debugging: [
     {

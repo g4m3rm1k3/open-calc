@@ -25,6 +25,11 @@
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'How to Test Whether a Subset Is a Subspace (3 Steps)',
+        body: '**Given:** A subset $W$ of a known vector space $V$.\n**Step 1.** Check $\\mathbf{0} \\in W$: substitute the zero vector and verify it satisfies the defining condition. If it fails, stop — $W$ is not a subspace.\n**Step 2.** Check closure under addition: take two arbitrary elements $\\mathbf{u}, \\mathbf{v} \\in W$ and verify $\\mathbf{u} + \\mathbf{v} \\in W$.\n**Step 3.** Check closure under scalar multiplication: take arbitrary $\\mathbf{v} \\in W$ and $c \\in \\mathbb{F}$, verify $c\\mathbf{v} \\in W$.\n**Result:** All three pass → $W$ is a subspace (the remaining 7 axioms are inherited from $V$). Any single failure → not a subspace.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 1 of 6 — Abstract Vector Spaces',
         body: '**Previous:** This is the start of Chapter 6.\n**This lesson:** Abstract Vector Spaces — defining vector spaces by ten axioms, recognizing when a set qualifies, and testing subspaces.\n**Next:** Basis and Dimension — how to measure the "size" of any vector space with a single number.',
@@ -261,6 +266,8 @@ c
     prose: [
       '**Fields and scalars.** A vector space is defined over a field $\\mathbb{F}$. Common fields: $\\mathbb{R}$ (real numbers), $\\mathbb{Q}$ (rationals), $\\mathbb{C}$ (complex numbers), $\\mathbb{F}_2 = \\{0,1\\}$ (binary field). Linear algebra over $\\mathbb{F}_2$ is used in coding theory and cryptography. The choice of field affects everything: $\\mathbb{R}^n$ over $\\mathbb{R}$ has dimension $n$; the same set of $n$-tuples over $\\mathbb{Q}$ is a completely different vector space.',
       '**Modules.** When scalars come from a ring instead of a field (e.g., integers $\\mathbb{Z}$), the structure is called a **module**. Abelian groups, lattices, and free modules generalize vector spaces. The theory is richer and more complex — not every module has a basis.',
+      '**Direct sums.** A vector space $V$ is the **direct sum** $V = U \\oplus W$ of two subspaces $U$ and $W$ if every vector $\\mathbf{v} \\in V$ decomposes uniquely as $\\mathbf{v} = \\mathbf{u} + \\mathbf{w}$ with $\\mathbf{u} \\in U$ and $\\mathbf{w} \\in W$. Equivalently: $U + W = V$ and $U \\cap W = \\{\\mathbf{0}\\}$. The dimension formula follows immediately: $\\dim(U \\oplus W) = \\dim(U) + \\dim(W)$. The symmetric–antisymmetric decomposition $M_{2\\times 2} = \\mathrm{Sym}_2 \\oplus \\mathrm{Skew}_2$ (dimensions $3 + 1 = 4$) is the canonical example — every matrix splits uniquely as $A = \\tfrac{A+A^\\top}{2} + \\tfrac{A-A^\\top}{2}$.',
+      '**Quotient spaces.** Given a subspace $W \\subseteq V$, the **quotient space** $V/W$ has cosets $\\{\\mathbf{v} + W : \\mathbf{v} \\in V\\}$ as elements, with $(\\mathbf{u}+W) + (\\mathbf{v}+W) = (\\mathbf{u}+\\mathbf{v})+W$ and $c(\\mathbf{v}+W) = c\\mathbf{v}+W$. The first isomorphism theorem gives $\\dim(V/W) = \\dim(V) - \\dim(W)$. Quotient spaces formalize "ignoring the $W$ directions": if $T: V \\to U$ is a linear map with null space $W$, then $V/W \\cong \\mathrm{Im}(T)$, rewriting rank–nullity as $\\dim(V/W) = \\mathrm{rank}(T)$ — the same bookkeeping, more abstract language.',
     ],
     callouts: [
       {
@@ -390,6 +397,22 @@ c
         '**Independence:** The Wronskian determinant at $t=0$ is non-zero: $\\det[y_i^{(j-1)}(0)] = \\det\\begin{bmatrix}1&1&1\\\\0&1&-1\\\\0&1&1\\end{bmatrix} = 2 \\neq 0$.',
         '**Conclusion:** $\\dim = 3$. Basis: $\\{1, e^t, e^{-t}\\}$. General solution: $y = c_1 + c_2 e^t + c_3 e^{-t}$ for arbitrary $c_1, c_2, c_3 \\in \\mathbb{R}$.',
       ],
+    },
+    {
+      id: 'ch-la6-001-3',
+      title: 'Exotic vector space: positive reals with unusual operations',
+      difficulty: 'hard',
+      problem: 'Define $V = \\mathbb{R}_{>0}$ (positive reals) with "addition" $a \\oplus b = ab$ and "scalar multiplication" $c \\otimes a = a^c$. Verify all 10 vector space axioms (zero vector, additive inverse, four addition laws, four scalar laws) and find the isomorphism between $V$ and $(\\mathbb{R}, +, \\cdot)$.',
+      hint: 'Find the "zero vector" first: what element $e$ satisfies $a \\oplus e = a$ for all $a > 0$? Then for the isomorphism, think about what function turns multiplication into addition.',
+      walkthrough: [
+        { expression: '\\mathbf{0}_V = 1, \\quad a \\oplus 1 = a \\cdot 1 = a \\checkmark', annotation: 'The multiplicative identity 1 plays the role of the zero vector. Axiom 4 holds.' },
+        { expression: '(-a)_V = \\tfrac{1}{a} > 0, \\quad a \\oplus \\tfrac{1}{a} = 1 = \\mathbf{0}_V \\checkmark', annotation: 'The reciprocal $1/a$ is the additive inverse. It stays positive, so it lives in $V$. Axiom 5 holds.' },
+        { expression: 'c \\otimes (a \\oplus b) = (ab)^c = a^c b^c = (c \\otimes a) \\oplus (c \\otimes b) \\checkmark', annotation: 'Distributivity over addition (axiom 7) follows from $(ab)^c = a^c b^c$.' },
+        { expression: '(c+d) \\otimes a = a^{c+d} = a^c a^d = (c \\otimes a) \\oplus (d \\otimes a) \\checkmark', annotation: 'Distributivity over scalar addition (axiom 8) follows from $a^{c+d} = a^c a^d$.' },
+        { expression: 'c \\otimes (d \\otimes a) = c \\otimes a^d = (a^d)^c = a^{cd} = (cd) \\otimes a \\checkmark \\quad 1 \\otimes a = a^1 = a \\checkmark', annotation: 'Axioms 9 (associativity of scalar mult.) and 10 (identity scalar) both hold. All remaining axioms (commutativity and associativity of $\\oplus$) follow from commutativity/associativity of multiplication.' },
+        { expression: '\\varphi: \\mathbb{R} \\to \\mathbb{R}_{>0}, \\quad \\varphi(x) = e^x \\text{ is an isomorphism}', annotation: '$\\varphi(x+y) = e^{x+y} = e^x e^y = \\varphi(x) \\oplus \\varphi(y)$ and $\\varphi(cx) = e^{cx} = (e^x)^c = c \\otimes \\varphi(x)$. Bijective with inverse $\\ln$. So $(\\mathbb{R}_{>0}, \\oplus, \\otimes) \\cong (\\mathbb{R}, +, \\cdot)$ — same 1D structure, different labels.' },
+      ],
+      answer: 'All 10 axioms hold: zero vector = 1, inverse of $a$ = $1/a$, distributive laws follow from exponent rules. Isomorphism: $\\varphi(x) = e^x$ with inverse $\\ln$.',
     },
   ],
 
@@ -588,6 +611,35 @@ c
       whyThisTechniqueWins: 'The three-condition subspace test (zero, closed addition, closed scalar mult.) is sufficient and minimal — the other 7 axioms are inherited from the ambient space. This collapses a 10-step check to 3.',
     },
   ],
+
+  semantics: {
+    core: [
+      { symbol: '(V, +, \\cdot)', meaning: 'A vector space: a set V with addition and scalar multiplication satisfying the 10 axioms; objects in V are called vectors regardless of appearance' },
+      { symbol: '\\mathbf{0}_V', meaning: 'The unique zero vector in V: the additive identity satisfying v + 0 = v for all v' },
+      { symbol: 'W \\leq V', meaning: 'W is a subspace of V: a non-empty subset closed under addition and scalar multiplication (equivalently: contains 0 and all linear combinations)' },
+      { symbol: 'V \\cong W', meaning: 'V and W are isomorphic: same dimension, connected by a bijective linear map; algebraically identical' },
+      { symbol: 'V = U \\oplus W', meaning: 'Direct sum: every vector in V decomposes uniquely as u + w; dim(U ⊕ W) = dim(U) + dim(W)' },
+      { symbol: 'V/W', meaning: 'Quotient space: elements are cosets v + W; dim(V/W) = dim(V) − dim(W) by the first isomorphism theorem' },
+    ],
+    rulesOfThumb: [
+      'A homogeneous linear constraint (= 0) always defines a subspace; inhomogeneous (= c ≠ 0) never does — the zero vector fails.',
+      `dim(P_n) = n+1, dim(M_{m×n}) = mn, dim(C[a,b]) = ∞ — know these on sight.`,
+      'The zero vector test is the cheapest: if 0 ∉ W, stop immediately — it is not a subspace.',
+      'Span of any set is always a subspace — use this to build subspaces quickly from spanning vectors.',
+      'Isomorphic spaces have the same dimension and are algebraically identical: P_3 ≅ R^4 ≅ M_{2×2} (all dimension 4).',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: [
+      { id: 'la1-001', label: 'Vectors in ℝⁿ', reason: 'The prototype vector space — all 10 axioms hold here; verify abstract axioms in ℝⁿ first' },
+      { id: 'la2-001', label: 'Null space and column space', reason: 'Null space = subspace of ℝⁿ; column space = subspace of ℝᵐ; both are abstract subspaces of the most concrete space' },
+    ],
+    futureLinks: [
+      { id: 'la6-002', label: 'Basis and Dimension', reason: 'Dimension is the key invariant of an abstract vector space — formally defined next lesson' },
+      { id: 'la6-003', label: 'Linear Transformations', reason: 'Maps between abstract vector spaces; kernel and image are subspaces; rank–nullity is the dimension version of the first isomorphism theorem' },
+    ],
+  },
 
   debugging: [
     {

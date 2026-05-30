@@ -796,12 +796,12 @@ x2_t = 1 / (t + 1)
   transferPrompts: [
     {
       situation: 'An electrical engineer derives the steady-state currents in a 2-node circuit as a function of voltage $V$. She has the system $A\\mathbf{I}(V) = \\mathbf{b}(V)$ where both $A$ and $\\mathbf{b}$ depend on the parameter $V$. She needs a formula for $I_1(V)$ that she can differentiate. Should she use LU or Cramer\'s Rule?',
-      competingTechniques: ['LU decomposition (numerical)', 'Cramer\'s Rule (symbolic)'],
+      competingTechniques: 'LU decomposition (numerical) vs. Cramer\'s Rule (symbolic)',
       whyThisTechniqueWins: 'Cramer\'s Rule gives $I_1(V) = \\det(A_1(\\mathbf{b}(V)))/\\det(A(V))$ — a rational function of $V$ that can be differentiated analytically. LU would give a numerical answer for each specific $V$, but not a differentiable formula. Symbolic differentiation tools can process the Cramer formula.',
     },
     {
       situation: 'A control engineer needs to find the transfer function $H(s) = x_1(s)/u(s)$ for a MIMO system described by a $3\\times 3$ matrix equation $A(s)\\mathbf{x}(s) = \\mathbf{b}(s)$ in the Laplace domain. How does Cramer\'s Rule help?',
-      competingTechniques: ['Invert the matrix symbolically', 'Apply Cramer\'s Rule to each output'],
+      competingTechniques: 'Invert the matrix symbolically vs. apply Cramer\'s Rule to each output',
       whyThisTechniqueWins: 'Cramer\'s Rule gives each transfer function as a ratio of two determinants: $H_i(s) = \\det(A_i(\\mathbf{b}(s)))/\\det(A(s))$. The denominator $\\det(A(s))$ is the characteristic polynomial (poles). The numerator gives the zeros. This directly exposes the system\'s stability properties in terms of poles and zeros.',
     },
   ],

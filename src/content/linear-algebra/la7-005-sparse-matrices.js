@@ -33,6 +33,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'How to Solve a Large Sparse Linear System (4 Steps)',
+        body: '1. **Identify sparsity.** Estimate $nnz$ and density $= nnz/n^2$. If density $< 1\\%$ and $n > 10^4$, sparse methods are mandatory — dense LU will run out of memory or time.\n2. **Reorder.** Apply AMD (symmetric SPD matrices) or METIS/nested dissection (2D/3D meshes) to get a permutation $P$; work with $PAP^\\top$. This step alone can reduce fill-in by 100×.\n3. **Choose method.** For 2D problems or $n < 10^5$: sparse direct solver (CHOLMOD, SuperLU). For 3D problems or $n > 10^5$ updated at each time step: iterative solver (CG for SPD, GMRES otherwise) with a preconditioner.\n4. **Factor and solve.** Direct: compute $L$ of $PAP^\\top = LL^\\top$, solve $Lz = Pb$ then $L^\\top y = z$, recover $x = P^\\top y$. Iterative: run preconditioned CG — each iteration costs one matvec $O(nnz)$; monitor $\\|b - Ax_k\\|/\\|b\\| < \\text{tol}$.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 5 of 7 — Numerical Linear Algebra',
         body: '**Previous (Lesson 4):** Numerical stability — catastrophic cancellation, machine epsilon, partial pivoting.\n**This lesson:** Sparse matrices — CSR storage, sparse matvec, fill-in, and reordering for direct solvers.\n**Next (Lesson 6):** Schur decomposition — the block upper triangular form for eigenvalue computation.',
@@ -229,6 +234,8 @@ nnz(L) + nnz(U)
     prose: [
       '**Supernodal methods.** Modern sparse direct solvers (PARDISO, SuperLU, CHOLMOD) use **supernodes** — groups of columns with identical sparsity patterns — to apply dense BLAS-3 operations on blocks, getting cache efficiency similar to dense factorization within each supernode.',
       '**Iterative vs direct.** For 2D problems, direct sparse solvers ($O(n^{3/2})$) are competitive with iterative methods. For 3D, direct solvers require $O(n^2)$ storage and $O(n^3)$ work — iterative methods with preconditioners (CG, GMRES) are the only viable approach.',
+      '**Conjugate gradient and Krylov subspaces.** The conjugate gradient (CG) method is the preeminent iterative solver for SPD systems $A\\mathbf{x} = \\mathbf{b}$. Starting from $\\mathbf{x}_0$, CG builds an $A$-conjugate basis for the Krylov subspace $\\mathcal{K}_k(A, \\mathbf{r}_0) = \\operatorname{span}\\{\\mathbf{r}_0, A\\mathbf{r}_0, \\ldots, A^{k-1}\\mathbf{r}_0\\}$, minimizing $\\|\\mathbf{e}_k\\|_A$ over this subspace at iteration $k$. Each step costs exactly one sparse matvec plus $O(n)$ vector operations. Convergence is geometric: $\\|\\mathbf{e}_k\\|_A \\leq 2\\left(\\frac{\\sqrt{\\kappa}-1}{\\sqrt{\\kappa}+1}\\right)^k \\|\\mathbf{e}_0\\|_A$, so roughly $O(\\sqrt{\\kappa})$ iterations are needed to reduce the error by a fixed factor. For a 2D Poisson problem, $\\kappa = O(n^{1/2})$ (after scaling) and unpreconditioned CG needs $O(n^{1/4})$ iterations — total cost $O(n^{5/4})$, better than sparse direct $O(n^{3/2})$ when $n$ is large. Incomplete Cholesky IC(0) preconditioner reduces $\\kappa$ from $O(h^{-2})$ to $O(h^{-1})$, halving the iteration count. For non-symmetric systems, GMRES (Generalized Minimal Residual) builds the same Krylov subspace but minimizes the residual norm rather than the $A$-norm error.',
+      '**Nested dissection: optimal reordering for structured meshes.** Nested dissection achieves provably optimal fill-in for structured 2D and 3D problems. The algorithm for a $\\sqrt{n} \\times \\sqrt{n}$ grid: find a separator of $O(\\sqrt{n})$ nodes splitting the graph into two equal halves; label both halves recursively first, then label the separator nodes last. The separator appears last in the elimination order, so it fills only within itself; the two halves are independent and generate no mutual fill. Recursing $\\log_2 n$ levels yields $O(n \\log n)$ fill and $O(n^{3/2})$ factorization flops — optimal for 2D, matching the best possible result. For 3D problems with $N$ unknowns, separators have size $O(N^{2/3})$ and the analysis gives $O(N^{4/3})$ fill and $O(N^2)$ factorization. METIS implements multilevel graph partitioning to approximate nested dissection on unstructured meshes; SCOTCH and PT-SCOTCH extend this to distributed-memory parallel machines.',
     ],
     callouts: [
       {
@@ -311,11 +318,41 @@ nnz(L) + nnz(U)
   challenges: [
     {
       id: 'ch-la7-005-1',
-      title: 'CSR construction',
+      title: 'CSR construction by hand',
       difficulty: 'medium',
-      prompt: 'Write out the CSR (Compressed Sparse Row) representation of the $3 \\times 3$ matrix $A = \\begin{bmatrix}1&0&2\\\\0&3&0\\\\4&0&5\\end{bmatrix}$.',
-      hint: 'List values row by row, keeping column indices.',
-      solution: '`values = [1, 2, 3, 4, 5]`, `col_idx = [0, 2, 1, 0, 2]` (0-indexed), `row_ptr = [0, 2, 3, 5]`. Row 0 has non-zeros at positions 0-1 in `values`; row 1 at position 2; row 2 at positions 3-4.',
+      problem: 'Build the CSR representation of $A = \\begin{bmatrix}1&0&2\\\\0&3&0\\\\4&0&5\\end{bmatrix}$. State the three arrays `values`, `col_idx`, `row_ptr`, and verify $nnz = 5$.',
+      walkthrough: [
+        { expression: '\\text{Row 0: } (0,0,1),\\,(0,2,2); \\quad \\text{Row 1: } (1,1,3); \\quad \\text{Row 2: } (2,0,4),\\,(2,2,5)', annotation: 'Read each row left-to-right, recording (row, col, value) for every non-zero. Five non-zeros total.' },
+        { expression: '\\text{values} = [1,2,3,4,5], \\quad \\text{col\\_idx} = [0,2,1,0,2]', annotation: 'Flatten non-zeros row by row. col_idx[k] is the column of the k-th stored value.' },
+        { expression: '\\text{row\\_ptr} = [0,2,3,5]', annotation: 'row_ptr[0]=0 (row 0 starts at index 0), row_ptr[1]=2 (row 1 starts at index 2), row_ptr[2]=3, row_ptr[3]=5=nnz (sentinel).' },
+        { expression: '|\\text{values}| = |\\text{col\\_idx}| = nnz = 5, \\quad |\\text{row\\_ptr}| = n+1 = 4', annotation: 'Always verify: values and col_idx have length nnz; row_ptr has length n+1 with row_ptr[n]=nnz.' },
+      ],
+    },
+    {
+      id: 'ch-la7-005-2',
+      title: 'Sparse matvec without touching zeros',
+      difficulty: 'easy',
+      problem: 'Given $A = \\begin{bmatrix}3&0&1\\\\0&2&0\\\\1&0&4\\end{bmatrix}$ with CSR arrays `values=[3,1,2,1,4]`, `col_idx=[0,2,1,0,2]`, `row_ptr=[0,2,3,5]`, compute $A\\mathbf{x}$ for $\\mathbf{x}=(1,0,2)^\\top$ using only the stored non-zeros.',
+      walkthrough: [
+        { expression: 'y_0: \\text{ row\\_ptr}[0]{=}0 \\text{ to } \\text{row\\_ptr}[1]{-}1{=}1 \\Rightarrow 3\\cdot x_0 + 1\\cdot x_2 = 3(1)+1(2) = 5', annotation: 'Row 0 spans indices 0 and 1 in values. Multiply each value by x at col_idx[k]. The zero at position (0,1) was never accessed.' },
+        { expression: 'y_1: \\text{ index } 2 \\Rightarrow 2\\cdot x_1 = 2(0) = 0', annotation: 'Row 1 has one non-zero at index 2. One multiply-add.' },
+        { expression: 'y_2: \\text{ indices } 3,4 \\Rightarrow 1\\cdot x_0 + 4\\cdot x_2 = 1(1)+4(2) = 9', annotation: 'Row 2 spans indices 3 and 4. Two multiply-adds.' },
+        { expression: 'A\\mathbf{x} = (5,0,9)^\\top; \\quad \\text{total flops} = 2\\cdot nnz = 10 \\text{ vs } 2n^2=18 \\text{ dense}', annotation: 'Verify: dense gives (3+0+2, 0+0+0, 1+0+8)=(5,0,9)^T ✓. Sparse used 5 multiply-adds; dense used 9 — sparse skipped 4 zero multiplications.' },
+      ],
+    },
+    {
+      id: 'ch-la7-005-3',
+      title: 'Fill-in and reordering for an arrowhead matrix',
+      difficulty: 'hard',
+      problem: 'Let $A = \\begin{bmatrix}6&2&2&2\\\\2&4&0&0\\\\2&0&5&0\\\\2&0&0&3\\end{bmatrix}$ (hub at row/col 0). (a) Count $nnz(A)$. (b) Perform one Gaussian elimination step (eliminate col 0 from rows 1–3) and identify the fill-in. (c) Show that reordering to hub-last using $P=[1,2,3,0]$ eliminates all fill.',
+      walkthrough: [
+        { expression: 'nnz(A) = 10: \\quad 4 \\text{ diagonal} + 3 \\text{ off-diag pairs} \\times 2 = 10', annotation: 'A is symmetric: diagonal entries (0,0),(1,1),(2,2),(3,3) plus off-diag pairs (0,1),(0,2),(0,3) and their transposes.' },
+        { expression: 'm_{10}=m_{20}=m_{30} = \\tfrac{2}{6} = \\tfrac{1}{3}', annotation: 'Multipliers for eliminating col 0: l_{i0} = a_{i0}/a_{00} = 2/6.' },
+        { expression: 'R_1 \\leftarrow R_1 - \\tfrac{1}{3}R_0 = [0,\\,\\tfrac{10}{3},\\,-\\tfrac{2}{3},\\,-\\tfrac{2}{3}]', annotation: 'New non-zeros appear at (1,2) and (1,3): fill-in! Similarly R2 gets fill at (2,1),(2,3) and R3 at (3,1),(3,2).' },
+        { expression: '\\text{After step 1: 6 new non-zeros} \\Rightarrow nnz = 16; \\text{ 3×3 submatrix rows/cols 1–3 is now dense}', annotation: 'The sparse structure is destroyed after one step. All subsequent elimination finds no zeros to skip — the factors L and U are nearly full.' },
+        { expression: 'PAP^\\top = \\begin{bmatrix}4&0&0&2\\\\0&5&0&2\\\\0&0&3&2\\\\2&2&2&6\\end{bmatrix} \\quad (P=[1,2,3,0])', annotation: 'Hub moved to last row/col. Rows 0–2 of the reordered matrix are diagonal with one nonzero in the last column only.' },
+        { expression: '\\text{Leaf-first: cols 0,1,2 each update only row 3 (already non-zero)} \\Rightarrow \\text{no fill-in}', annotation: 'Eliminating col 0 from rows 1,2,3: only row 3 has a non-zero at col 0 (value 2). Rows 1 and 2 are untouched. The LU factors stay sparse: nnz(L+U) = nnz(A) + n = 14 vs 22 without reordering.' },
+      ],
     },
   ],
 
@@ -468,6 +505,29 @@ nnz(L) + nnz(U)
       whyThisTechniqueWins: 'The user-item matrix has $\\sim 10^8$ non-zeros out of $10^{12}$ possible entries ($10^{-2}$% dense). Computing the full similarity matrix densely requires $10^{12}$ entries and $10^{18}$ flops. Sparse matvec with the interaction matrix enables efficient approximate similarity computation in $O(nnz)$ per query.',
     },
   ],
+
+  semantics: {
+    core: [
+      { symbol: 'nnz(A)', meaning: 'Number of non-zero entries in $A$ — the fundamental measure of sparsity; determines storage and matvec cost $O(nnz)$.' },
+      { symbol: '\\text{CSR triple}', meaning: 'values[], col_idx[], row_ptr[] — compressed sparse row storage; total memory $O(nnz + n)$ vs $O(n^2)$ dense.' },
+      { symbol: '\\text{fill-in}', meaning: 'Zero entries of $A$ that become non-zero in $L$ or $U$ during factorization; controlled by reordering before factoring.' },
+      { symbol: 'P^\\top AP', meaning: 'Symmetrically permuted matrix — same eigenvalues and solution as $A$, but AMD/nested dissection ordering minimizes fill in the factors.' },
+      { symbol: '\\mathcal{K}_k(A,\\mathbf{r}_0)', meaning: 'Krylov subspace of order $k$ — the search space that CG minimizes $\\|\\mathbf{e}\\|_A$ over at iteration $k$; each step costs one sparse matvec.' },
+      { symbol: '\\sqrt{\\kappa(A)}', meaning: 'Square root of the condition number governs CG iteration count: roughly $\\sqrt{\\kappa}$ iterations to reduce error by $1/e$ — precondition to reduce $\\kappa$.' },
+    ],
+    rulesOfThumb: [
+      'If density $= nnz/n^2 < 1\\%$ and $n > 10^4$, sparse storage and algorithms are mandatory — dense methods exhaust memory or time.',
+      'Always reorder before sparse direct factorization: AMD for symmetric matrices, METIS/nested dissection for 2D/3D meshes. Skipping reordering can increase fill-in by 100×.',
+      'Build matrices in COO format (append $(i,j,v)$ triples freely), then convert to CSR for computation — most libraries provide this one-line conversion.',
+      'For 3D problems ($N$ unknowns), direct solvers cost $O(N^{4/3})$ storage and $O(N^2)$ flops; preconditioned iterative solvers cost $O(N \\cdot \\sqrt{\\kappa})$ — iterative wins for large $N$.',
+      'Precondition before CG/GMRES: incomplete Cholesky IC(0) is cheap to compute and often halves the iteration count by reducing the effective condition number.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: ['la7-004', 'la5-002'],
+    futureLinks: ['la7-006', 'la8-002'],
+  },
 
   debugging: [
     {

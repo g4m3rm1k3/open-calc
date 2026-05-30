@@ -33,6 +33,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'How to Identify and Fix Catastrophic Cancellation (4 Steps)',
+        body: '**Given:** A formula that computes a quantity involving subtraction of two terms.\n**Step 1.** Identify the cancellation: is there a step where two nearly equal quantities are subtracted? If $|a - b| \\ll |a|$, relative error in $a$ and $b$ can dominate the result.\n**Step 2.** Estimate the digits lost: if $a \\approx b$ to $k$ decimal digits, you lose $k$ digits of precision in $a - b$.\n**Step 3.** Find an algebraically equivalent form that avoids the cancellation. Common techniques: multiply by conjugate ($\\sqrt{x+h} - \\sqrt{x}$ → $h/(\\sqrt{x+h}+\\sqrt{x})$); use Taylor series for small arguments ($e^x - 1$ → $x + x^2/2 + \\ldots$ for $|x| \\ll 1$); use trig identities ($1 - \\cos x$ → $2\\sin^2(x/2)$).\n**Step 4.** Verify the stable form gives the same answer for ordinary inputs and does not cancel for small/extreme inputs.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 4 of 7 — Numerical Linear Algebra',
         body: '**Previous (Lesson 3):** Matrix norms and condition numbers — problem sensitivity to input perturbations.\n**This lesson:** Numerical stability — algorithm-introduced errors: catastrophic cancellation, floating-point, pivoting.\n**Next (Lesson 5):** Sparse matrices — exploiting near-zero structure at massive scale.',
@@ -212,6 +217,9 @@ residual
   rigor: {
     prose: [
       '**Floating-point standard (IEEE 754).** Modern hardware follows IEEE 754 (1985, updated 2008). Each floating-point operation ($+, -, \\times, \\div, \\sqrt{}$) is performed as if in infinite precision, then rounded to the nearest representable value. This gives the fundamental axiom: $fl(a \\circ b) = (a \\circ b)(1 + \\varepsilon)$ with $|\\varepsilon| \\leq \\varepsilon_\\text{mach}$. Higher-level operations (like matrix multiply) are implemented by composing elementary operations.',
+      '**Kahan compensated summation.** Straightforward summation of $n$ numbers accumulates error $O(n\\varepsilon_\\text{mach})$: each addition incurs a relative error, and errors pile up. Kahan\'s algorithm maintains a compensation variable $c$ that captures the bits lost in the previous addition: $y = a_i - c$; $t = S + y$; $c = (t - S) - y$; $S = t$. The net effect is that the accumulated error is $O(\\varepsilon_\\text{mach})$ regardless of $n$ — a factor of $n$ improvement. The extra cost is a few floating-point operations per element, negligible compared to the precision gain. Python\'s `math.fsum` uses an even more aggressive variant that achieves exact summation.',
+      '**Complete pivoting vs partial pivoting.** Partial pivoting searches only column $k$ for the largest pivot — costing $O(n)$ per step and $O(n^2)$ total. Complete pivoting searches the entire remaining $(n-k) \\times (n-k)$ submatrix for the globally largest entry — costing $O(n^3)$ total (matching the factorization cost itself). Complete pivoting gives a smaller growth factor bound: $\\rho_n \\leq (n \\prod_{k=2}^n k^{1/(k-1)})^{1/2} \\approx n^{1.09}$ vs the partial-pivoting bound $\\rho_n \\leq 2^{n-1}$. In practice, partial pivoting is universally preferred because (a) the $2^{n-1}$ bound is essentially never achieved on real matrices, (b) the $O(n^2)$ search cost fits naturally into cache-efficient BLAS-2 operations, and (c) partial pivoting is backward stable for all practical purposes.',
+      '**Error accumulation and condition numbers.** When solving $A\\mathbf{x} = \\mathbf{b}$ with a backward-stable algorithm (error $\\|E\\| \\approx \\varepsilon_\\text{mach}\\|A\\|$), the forward error bound is $\\|\\hat{x} - x\\|/\\|x\\| \\lesssim \\kappa(A) \\cdot \\varepsilon_\\text{mach}$. This combines both error sources into one formula: conditioning captures problem sensitivity, backward error captures algorithm quality. The bound is sharp: for Hilbert matrices and other ill-conditioned examples, the actual forward error closely matches $\\kappa(A)\\varepsilon_\\text{mach}$. Iterative refinement can improve the answer by one or two extra digits: compute residual $r = b - A\\hat{x}$ in higher precision, solve $Ae = r$, update $\\hat{x} \\leftarrow \\hat{x} + e$. Each refinement step multiplies the error by approximately $\\kappa(A) \\varepsilon_\\text{mach}$ — if this is $< 1$, the iteration converges.',
     ],
     callouts: [
       {
@@ -289,11 +297,46 @@ residual
   challenges: [
     {
       id: 'ch-la7-004-1',
-      title: 'Stable quadratic formula',
+      title: 'Stable quadratic formula derivation',
       difficulty: 'medium',
-      prompt: 'The standard quadratic formula $x = (-b \\pm \\sqrt{b^2 - 4ac})/(2a)$ is unstable when $b^2 \\gg 4ac$ (one root involves subtracting nearly equal numbers). Derive a numerically stable version.',
-      hint: 'Multiply numerator and denominator by the conjugate to avoid cancellation.',
-      solution: 'If $b > 0$: compute $x_1 = (-b - \\sqrt{b^2-4ac})/(2a)$ stably (both negative), then use Vieta\'s formula $x_1 x_2 = c/a$ to get $x_2 = c/(ax_1)$. If $b < 0$: compute $x_1 = (-b + \\sqrt{b^2-4ac})/(2a)$ stably. This avoids cancellation in both cases.',
+      problem: 'The standard quadratic formula $x = (-b \\pm \\sqrt{b^2-4ac})/(2a)$ is unstable for $x^2 - 1000x + 1 = 0$ (where $b^2 \\gg 4ac$). (a) Identify the cancellation, (b) compute the large root stably, and (c) use Vieta\'s formula to get the small root without cancellation.',
+      hint: 'When $b > 0$: the minus sign gives two negative quantities (no cancellation) → large root. Then Vieta: $x_1 x_2 = c/a$.',
+      walkthrough: [
+        { expression: '\\text{Standard: }x = \\frac{1000 \\pm \\sqrt{10^6 - 4}}{2} = \\frac{1000 \\pm 999.998\\ldots}{2}', annotation: 'The "minus" root: $(1000 - 999.998)/2 \\approx 0.001$. This subtracts two nearly equal 4-digit numbers — cancellation!' },
+        { expression: '\\text{4-digit arithmetic: }\\sqrt{999996}\\approx999.998\\approx1000\\Rightarrow x_2=(1000-1000)/2=0', annotation: 'In 4-digit arithmetic, the discriminant rounds to 1000, giving the wrong answer 0 instead of 0.001.' },
+        { expression: 'x_1 = \\frac{1000 + \\sqrt{999996}}{2} \\approx \\frac{1000 + 1000}{2} = 1000', annotation: 'The large root (plus sign) has no cancellation: both terms are positive and far from equal.' },
+        { expression: 'x_1 x_2 = c/a = 1 \\Rightarrow x_2 = 1/x_1 = 1/1000 = 0.001\\checkmark', annotation: 'Vieta\'s formula avoids all cancellation. Division by the accurately-computed large root gives the small root exactly.' },
+        { expression: '\\text{Rule: for }b>0\\text{, compute }x_1=\\frac{-b-\\sqrt{b^2-4ac}}{2a}\\text{ (no cancel), then }x_2=\\frac{c}{ax_1}', annotation: 'General stable quadratic formula: choose sign to avoid cancellation, then use Vieta for the other root.' },
+      ],
+    },
+    {
+      id: 'ch-la7-004-2',
+      title: 'Catastrophic cancellation in $(1 - \\cos x)/x^2$',
+      difficulty: 'easy',
+      problem: 'For $x = 10^{-8}$, the formula $(1 - \\cos x)/x^2$ should return approximately $1/2$. (a) Explain why direct computation gives $0$ in double precision. (b) Use the identity $1 - \\cos x = 2\\sin^2(x/2)$ to find a stable alternative and verify it gives $1/2$.',
+      hint: 'In double precision, $\\cos(10^{-8}) \\approx 1.0000000000000000$ exactly — all 16 digits go to representing the integer part.',
+      walkthrough: [
+        { expression: '\\cos(10^{-8}) = 1 - \\tfrac{(10^{-8})^2}{2} + \\ldots = 1 - 5\\times10^{-17}+\\ldots', annotation: 'Mathematically, $\\cos(10^{-8})$ differs from 1 by $5\\times10^{-17}$.' },
+        { expression: 'fl(\\cos(10^{-8})) = 1.0000000000000000\\text{ exactly}', annotation: 'In double precision, $\\varepsilon_\\text{mach}\\approx2.2\\times10^{-16}$. The difference $5\\times10^{-17}$ is below one unit in the last place of 1.0, so it rounds to exactly 1.' },
+        { expression: 'fl(1 - fl(\\cos(10^{-8}))) = 1 - 1 = 0;\\quad (1-\\cos x)/x^2 = 0/(10^{-8})^2 = 0', annotation: 'All 16 significant digits were destroyed in one subtraction. The formula returns 0 instead of 1/2.' },
+        { expression: '1-\\cos x = 2\\sin^2(x/2)\\Rightarrow\\frac{1-\\cos x}{x^2} = \\frac{2\\sin^2(x/2)}{x^2}', annotation: 'Stable form: $\\sin(x/2)\\approx x/2$ for small $x$, no near-equal subtraction.' },
+        { expression: '\\frac{2\\sin^2(10^{-8}/2)}{(10^{-8})^2} = \\frac{2(5\\times10^{-9})^2}{10^{-16}} = \\frac{2\\times25\\times10^{-18}}{10^{-16}} = \\frac{1}{2}\\checkmark', annotation: 'The stable form computes $\\sin(5\\times10^{-9})\\approx5\\times10^{-9}$ directly (no cancellation) and returns the correct value $1/2$.' },
+      ],
+    },
+    {
+      id: 'ch-la7-004-3',
+      title: 'Trace partial pivoting on a 3×3 matrix',
+      difficulty: 'hard',
+      problem: 'Carry out LU factorization with partial pivoting on $A = \\begin{bmatrix}2&1&1\\\\4&3&3\\\\8&7&9\\end{bmatrix}$. Record all row swaps, show each multiplier, and verify all $|l_{ij}| \\leq 1$.',
+      hint: 'At each step, find the largest absolute value in the current column and swap. The multiplier is (row entry)/(pivot), which must be $\\leq 1$ after swapping.',
+      walkthrough: [
+        { expression: '\\text{Col 1: }\\max(|2|,|4|,|8|)=8\\text{ at row 3}\\Rightarrow\\text{swap rows 1 and 3}', annotation: 'Partial pivoting: move the largest column entry to the pivot position.' },
+        { expression: '\\begin{bmatrix}8&7&9\\\\4&3&3\\\\2&1&1\\end{bmatrix};\\quad m_{21}=4/8=1/2,\\;m_{31}=2/8=1/4', annotation: 'Both multipliers $\\leq 1$ ✓ — this is guaranteed by choosing the maximum as pivot.' },
+        { expression: 'R_2\\leftarrow R_2-\\tfrac{1}{2}R_1,\\;R_3\\leftarrow R_3-\\tfrac{1}{4}R_1:\\;\\begin{bmatrix}8&7&9\\\\0&-1/2&-3/2\\\\0&-3/4&-5/4\\end{bmatrix}', annotation: 'After eliminating column 1.' },
+        { expression: '\\text{Col 2: }\\max(|-1/2|,|-3/4|)=3/4\\text{ at row 3}\\Rightarrow\\text{swap rows 2 and 3}', annotation: 'Partial pivoting again: row with larger magnitude subdiagonal entry moves up.' },
+        { expression: '\\begin{bmatrix}8&7&9\\\\0&-3/4&-5/4\\\\0&-1/2&-3/2\\end{bmatrix};\\quad m_{32}=(-1/2)/(-3/4)=2/3\\leq1\\checkmark', annotation: 'Multiplier still $\\leq 1$ after swap.' },
+        { expression: 'R_3\\leftarrow R_3-\\tfrac{2}{3}R_2:\\;U=\\begin{bmatrix}8&7&9\\\\0&-3/4&-5/4\\\\0&0&-2/3\\end{bmatrix}', annotation: '$-3/2 + (2/3)(5/4) = -3/2 + 5/6 = -9/6+5/6 = -2/3$. All pivots non-zero, all multipliers $\\leq 1$ ✓' },
+      ],
     },
   ],
 
@@ -446,6 +489,29 @@ residual
       whyThisTechniqueWins: 'Kahan summation maintains a "compensation" variable to capture lost low-order bits, reducing accumulated error from $O(n\\varepsilon)$ to $O(\\varepsilon)$ regardless of $n$. This is the numerical stability principle applied to iterative optimization.',
     },
   ],
+
+  semantics: {
+    core: [
+      { symbol: '\\varepsilon_\\text{mach} \\approx 2.2\\times10^{-16}', meaning: 'Machine epsilon (double precision): the gap between 1.0 and the next representable number. Every floating-point operation introduces relative error $\\leq \\varepsilon_\\text{mach}$.' },
+      { symbol: 'fl(a \\circ b) = (a\\circ b)(1+\\delta),\\;|\\delta|\\leq\\varepsilon_\\text{mach}', meaning: 'IEEE 754 fundamental axiom: each basic operation is performed in infinite precision then rounded. The relative error per operation is bounded by $\\varepsilon_\\text{mach}$.' },
+      { symbol: '\\text{catastrophic cancellation}', meaning: 'Subtraction of two nearly equal numbers $a \\approx b$: the result $a - b$ is tiny while both $a$ and $b$ carry absolute errors of order $\\varepsilon_\\text{mach}|a|$. The relative error in $a - b$ can be $\\varepsilon_\\text{mach}|a|/|a-b| \\gg 1$.' },
+      { symbol: '\\text{backward stable}', meaning: 'An algorithm is backward stable if the computed output is the exact output for a slightly perturbed input: $\\tilde{f}(x) = f(x + \\delta x)$ with $\\|\\delta x\\|/\\|x\\| = O(\\varepsilon_\\text{mach})$. Combined with $\\kappa$: forward error $\\lesssim \\kappa(A)\\,\\varepsilon_\\text{mach}$.' },
+      { symbol: '|l_{ij}| \\leq 1', meaning: 'Partial-pivoting multiplier bound: by swapping to the largest pivot before each elimination step, all multipliers stay $\\leq 1$ in magnitude, preventing unstable error amplification.' },
+      { symbol: '\\rho_n = \\|U\\|_\\infty/\\|A\\|_\\infty', meaning: 'Growth factor for LU: measures how much entries grow during elimination. Partial pivoting bounds $\\rho_n \\leq 2^{n-1}$ in theory; in practice $\\rho_n = O(n)$ for real-world matrices.' },
+    ],
+    rulesOfThumb: [
+      'Every floating-point operation introduces relative error $\\leq \\varepsilon_\\text{mach}$. Catastrophic cancellation can consume ALL digits in a single subtraction.',
+      'To fix cancellation: rationalize (multiply by conjugate), use Taylor series for small arguments, or use identity transformations to avoid near-equal subtractions.',
+      'Partial pivoting makes LU backward stable: all multipliers $\\leq 1$, growth factor stays small for typical matrices.',
+      'Backward stable + well-conditioned → accurate. Backward stable + ill-conditioned → inaccurate (but the algorithm is blameless).',
+      'Never compare floats with ==. Use $|a - b| < \\varepsilon \\cdot \\max(|a|, |b|, 1)$ with a problem-appropriate tolerance.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: ['la7-003'],
+    futureLinks: ['la7-005', 'la7-006'],
+  },
 
   debugging: [
     {

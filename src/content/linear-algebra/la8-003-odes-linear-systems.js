@@ -33,6 +33,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'How to Analyze Stability of $\\dot{\\mathbf{x}} = A\\mathbf{x}$ (4 Steps)',
+        body: '1. **Find eigenvalues.** Compute $\\det(A - \\lambda I) = 0$ by hand for small $n$, or use `np.linalg.eigvals(A)`. For upper or lower triangular $A$, eigenvalues are the diagonal entries.\n2. **Check real parts.** If all $\\operatorname{Re}(\\lambda_i) < 0$: asymptotically stable — all solutions $\\to \\mathbf{0}$. If any $\\operatorname{Re}(\\lambda_i) > 0$: unstable. If $\\operatorname{Re}(\\lambda_i) = 0$ for some $i$: marginally stable (need Lyapunov analysis to decide).\n3. **Classify modes.** Real $\\lambda$: pure exponential growth/decay. Complex $\\lambda = \\sigma\\pm i\\omega$: oscillation at frequency $\\omega$ with amplitude $\\propto e^{\\sigma t}$. Check the imaginary part for oscillatory behavior.\n4. **Write the general solution** (diagonalizable case). Eigenvectors $\\mathbf{v}_i$ for eigenvalues $\\lambda_i$: $\\mathbf{x}(t) = \\sum_i c_i e^{\\lambda_i t}\\mathbf{v}_i$ where $\\mathbf{c} = P^{-1}\\mathbf{x}_0$ and $P=[\\mathbf{v}_1|\\cdots|\\mathbf{v}_n]$.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 3 of 4 — Applications of Linear Algebra',
         body: '**Previous (Lesson 2):** Markov chains and PageRank — stationary distributions as dominant eigenvectors.\n**This lesson:** ODEs and linear systems — eigenvalues determine stability; $\\dot{\\mathbf{x}} = A\\mathbf{x}$ solved by $e^{At}$.\n**Next (Lesson 4):** Computer graphics — rotations, projections, homogeneous coordinates.',
@@ -218,6 +223,9 @@ traj(:, end)
   rigor: {
     prose: [
       '**Control theory connections.** In the linear time-invariant (LTI) system $\\dot{\\mathbf{x}} = A\\mathbf{x} + B\\mathbf{u}$, the input $\\mathbf{u}$ can be chosen to place eigenvalues anywhere (if the system is controllable). **Pole placement** designs feedback $\\mathbf{u} = -K\\mathbf{x}$ so that $A - BK$ has desired eigenvalues. Linear Quadratic Regulator (LQR) finds the optimal $K$ minimizing a quadratic cost — solved by the algebraic Riccati equation.',
+      '**Lyapunov stability and the matrix inequality.** A quadratic Lyapunov function $V(\\mathbf{x}) = \\mathbf{x}^\\top P\\mathbf{x}$ (with $P \\succ 0$) has time derivative $\\dot{V} = \\mathbf{x}^\\top(A^\\top P + PA)\\mathbf{x}$. If $A^\\top P + PA \\prec 0$ (negative definite), then $\\dot{V} < 0$ everywhere and the origin is asymptotically stable. This leads to the **Lyapunov equation**: given $Q \\succ 0$, solve $A^\\top P + PA = -Q$ for $P \\succ 0$. A unique positive definite solution exists if and only if $A$ is Hurwitz. The equation is solved in $O(n^3)$ via the Schur decomposition of $A$ — a purely algebraic stability certificate that avoids computing eigenvalues.',
+      '**Computing $e^{At}$ via the Schur decomposition.** For general (possibly non-diagonalizable) $A$: use $A = QTQ^*$ (Schur, cf. la7-006) to write $e^{At} = Q\\, e^{Tt}\\, Q^*$. Since $T$ is upper triangular, $e^{Tt}$ is computed efficiently via Parlett\'s recurrence along the superdiagonal. In practice, `scipy.linalg.expm` uses the Padé approximant with scaling-and-squaring: $e^A \\approx R_m(A/2^s)^{2^s}$ where $R_m$ is a rational $(m,m)$ Padé approximant. This achieves backward stability with relative error $O(\\varepsilon_{\\text{mach}})$ and runs in $O(n^3)$.',
+      '**Controllability and the Kalman rank condition.** The LTI system $(A, B)$ is **controllable** iff the Kalman controllability matrix $\\mathcal{C} = [B \\mid AB \\mid A^2B \\mid \\cdots \\mid A^{n-1}B]$ satisfies $\\operatorname{rank}(\\mathcal{C}) = n$. Equivalently (PBH test): $(A - \\lambda I,\\, B)$ has full column rank for every eigenvalue $\\lambda$ of $A$. Controllability is exactly the condition under which pole placement and LQR are possible — it guarantees every eigenvalue of $A$ can be moved to any desired location by state feedback $\\mathbf{u} = -K\\mathbf{x}$.',
     ],
     callouts: [
       {
@@ -255,9 +263,42 @@ traj(:, end)
       id: 'ch-la8-003-1',
       title: 'Stability of coupled populations',
       difficulty: 'medium',
-      prompt: 'The linearized Lotka-Volterra equations near equilibrium are $\\dot{\\mathbf{x}} = \\begin{bmatrix}0&-a\\\\b&0\\end{bmatrix}\\mathbf{x}$ with $a, b > 0$. Is this system stable?',
-      hint: 'Compute the eigenvalues and check their real parts.',
-      solution: 'Eigenvalues: $\\lambda = \\pm\\sqrt{-ab} = \\pm i\\sqrt{ab}$ (purely imaginary). Real part is 0 — marginally stable (center). Solutions are pure oscillations (neither growing nor decaying). This is the classical predator-prey cycle.',
+      problem: 'The linearized Lotka-Volterra equations near equilibrium are $\\dot{\\mathbf{x}} = \\begin{bmatrix}0&-a\\\\b&0\\end{bmatrix}\\mathbf{x}$ with $a, b > 0$. Classify the stability. What do solutions look like?',
+      walkthrough: [
+        { expression: 'A = \\begin{bmatrix}0 & -a \\\\ b & 0\\end{bmatrix}', annotation: 'Write the system matrix. Zero diagonal means no self-damping — no intrinsic decay in either population.' },
+        { expression: '\\det(A - \\lambda I) = \\lambda^2 + ab = 0', annotation: 'Characteristic polynomial: $(0-\\lambda)^2 - (-a)(b) = \\lambda^2 + ab = 0$.' },
+        { expression: '\\lambda = \\pm i\\sqrt{ab}', annotation: 'Eigenvalues are purely imaginary since $a,b > 0$ so $ab > 0$. No real part.' },
+        { expression: '\\operatorname{Re}(\\lambda) = 0 \\text{ for both eigenvalues}', annotation: 'Neither strictly negative nor positive — marginally stable (center equilibrium).' },
+        { expression: '\\mathbf{x}(t) \\text{ oscillates with frequency } \\omega = \\sqrt{ab},\\ \\text{amplitude constant}', annotation: 'Classical predator-prey cycles — perpetual oscillation with no growth or decay.' },
+      ],
+    },
+    {
+      id: 'ch-la8-003-2',
+      title: 'Classify a stable node',
+      difficulty: 'easy',
+      problem: 'Classify the stability of $A = \\begin{bmatrix}-2&1\\\\0&-3\\end{bmatrix}$ and identify what type of equilibrium the origin is.',
+      walkthrough: [
+        { expression: 'A \\text{ is upper triangular}', annotation: 'Eigenvalues of a triangular matrix are its diagonal entries — read them off directly.' },
+        { expression: '\\lambda_1 = -2,\\quad \\lambda_2 = -3', annotation: 'Both eigenvalues are real and negative.' },
+        { expression: '\\operatorname{Re}(\\lambda_1) = -2 < 0,\\quad \\operatorname{Re}(\\lambda_2) = -3 < 0', annotation: 'Both real parts are strictly negative: asymptotically stable by the Hurwitz criterion.' },
+        { expression: '\\text{Real (not complex) eigenvalues} \\Rightarrow \\text{stable node}', annotation: 'No imaginary parts means no oscillation — solutions decay monotonically toward zero along eigenvector directions.' },
+        { expression: '\\mathbf{x}(t) = c_1 e^{-2t}\\mathbf{v}_1 + c_2 e^{-3t}\\mathbf{v}_2 \\to \\mathbf{0}', annotation: 'Both modes decay exponentially; the $e^{-3t}$ mode dies faster, so the $\\mathbf{v}_1$ direction dominates long-term.' },
+      ],
+    },
+    {
+      id: 'ch-la8-003-3',
+      title: 'Solve an IVP by eigendecomposition',
+      difficulty: 'hard',
+      problem: 'For $A = \\begin{bmatrix}-1&4\\\\0&-2\\end{bmatrix}$ with $\\mathbf{x}(0) = (1,1)^\\top$, find $\\mathbf{x}(t)$ explicitly and verify at $t=0$ and by checking $\\dot{\\mathbf{x}}(0) = A\\mathbf{x}(0)$.',
+      walkthrough: [
+        { expression: '\\lambda_1 = -1,\\quad \\lambda_2 = -2', annotation: 'Upper triangular — eigenvalues are diagonal entries. Both negative: asymptotically stable.' },
+        { expression: '(A + I)\\mathbf{v} = 0:\\quad A+I = \\begin{bmatrix}0&4\\\\0&-1\\end{bmatrix} \\Rightarrow \\mathbf{v}_1 = (1,0)^\\top', annotation: 'Eigenvector for $\\lambda_1 = -1$: the null space of $A+I$ is spanned by $(1,0)^\\top$.' },
+        { expression: '(A + 2I)\\mathbf{v} = 0:\\quad A+2I = \\begin{bmatrix}1&4\\\\0&0\\end{bmatrix} \\Rightarrow \\mathbf{v}_2 = (-4,1)^\\top', annotation: 'Eigenvector for $\\lambda_2 = -2$: null space of $A+2I$ is spanned by $(-4,1)^\\top$.' },
+        { expression: '\\mathbf{x}(t) = c_1 e^{-t}(1,0)^\\top + c_2 e^{-2t}(-4,1)^\\top', annotation: 'General solution as superposition of two modes.' },
+        { expression: 'c_2 = 1,\\quad c_1 - 4c_2 = 1 \\Rightarrow c_1 = 5', annotation: 'From $y$-component: $c_2 = 1$. From $x$-component: $c_1 + c_2(-4) = 1 \\Rightarrow c_1 = 5$.' },
+        { expression: '\\mathbf{x}(t) = \\bigl(5e^{-t} - 4e^{-2t},\\; e^{-2t}\\bigr)^\\top', annotation: 'Explicit solution. Verify: $\\mathbf{x}(0) = (5-4,\\ 1)^\\top = (1,1)^\\top$ ✓' },
+        { expression: '\\dot{\\mathbf{x}}(0) = (3,-2)^\\top,\\quad A\\mathbf{x}(0) = \\begin{bmatrix}-1&4\\\\0&-2\\end{bmatrix}\\!\\begin{pmatrix}1\\\\1\\end{pmatrix} = (3,-2)^\\top \\checkmark', annotation: 'Cross-check: derivative at $t=0$ matches $A\\mathbf{x}_0$.' },
+      ],
     },
   ],
 
@@ -304,6 +345,29 @@ traj(:, end)
     { situation: 'You are designing an autopilot and need all system states to converge to zero after a disturbance.', competingTechniques: 'Check $\\det(A) > 0$; check all eigenvalues have negative real parts; check the trace of $A$ is negative.', whyThisTechniqueWins: 'Only the eigenvalue condition (Hurwitz stability) is both necessary and sufficient. Trace negative is necessary but not sufficient for $n > 2$. Determinant positive is neither necessary nor sufficient in general.' },
     { situation: 'You want to model a spring-mass-damper system and predict whether it oscillates or decays monotonically.', competingTechniques: 'Simulate numerically; compute eigenvalues; measure the discriminant of the characteristic polynomial.', whyThisTechniqueWins: 'Eigenvalues give immediate classification: complex $\\Rightarrow$ oscillatory, real negative $\\Rightarrow$ monotone decay. The discriminant of the char. poly. is the same computation — but eigenvalue language generalizes to higher-order systems directly.' },
   ],
+  semantics: {
+    core: [
+      { symbol: '\\mathbf{x}(t) = e^{At}\\mathbf{x}_0', meaning: 'General solution to $\\dot{\\mathbf{x}} = A\\mathbf{x}$ — the matrix exponential propagates the initial condition forward in time.' },
+      { symbol: '\\lambda = \\sigma + i\\omega', meaning: 'Complex eigenvalue of $A$ — real part $\\sigma$ governs exponential growth/decay rate; imaginary part $\\omega$ governs oscillation frequency.' },
+      { symbol: 'A \\text{ Hurwitz}', meaning: 'All eigenvalues of $A$ have strictly negative real parts — equivalent to asymptotic stability of $\\dot{\\mathbf{x}} = A\\mathbf{x}$.' },
+      { symbol: '\\begin{bmatrix}0&1\\\\-b&-a\\end{bmatrix}', meaning: 'Companion matrix for $\\ddot{x}+a\\dot{x}+bx=0$ — its eigenvalues are the characteristic roots of the ODE; diagonal entries are 0 and $-a$.' },
+      { symbol: 'A^\\top P + PA = -Q', meaning: 'Lyapunov equation — has unique $P \\succ 0$ solution iff $A$ is Hurwitz; provides an algebraic stability certificate without computing eigenvalues.' },
+      { symbol: '\\mathcal{C} = [B \\mid AB \\mid \\cdots \\mid A^{n-1}B]', meaning: 'Kalman controllability matrix — $\\operatorname{rank}(\\mathcal{C}) = n$ iff the system $(A,B)$ is controllable and pole placement is possible.' },
+    ],
+    rulesOfThumb: [
+      'Stability requires ALL eigenvalue real parts negative — one positive eigenvalue destabilizes the entire system regardless of the others.',
+      'For $2\\times 2$ matrices: trace $< 0$ and $\\det > 0$ are necessary and sufficient for Hurwitz stability — a quick hand-check.',
+      'Converting an $n$-th order ODE to first-order always produces an $n\\times n$ companion matrix with the same characteristic polynomial.',
+      'Complex eigenvalues of a real $A$ always come in conjugate pairs $\\sigma\\pm i\\omega$ — oscillation always pairs up, never appears alone.',
+      'The matrix exponential $e^{At}$ at $t=0$ is always $I$ — use this as a sanity check for any explicit formula.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: ['la5-001', 'la7-006'],
+    futureLinks: ['la8-004', 'la9-002'],
+  },
+
   debugging: [
     { commonError: 'Using $e^A$ (matrix exponential at a fixed time) instead of $e^{At}$ (as a function of $t$).', symptom: 'The "solution" is a fixed matrix, not a trajectory. Plugging in $t = 0$ does not give $\\mathbf{x}_0$.', whyItHappened: 'The matrix exponential requires the scalar $t$ to be included in the exponent: $e^{At}$ depends on $t$, not just $A$.', repairStrategy: 'Always write $e^{At}$ and verify: (1) at $t=0$, $e^{A \\cdot 0} = I$; (2) differentiate to confirm $\\frac{d}{dt}e^{At} = Ae^{At}$.' },
     { commonError: 'Confusing the state-space conversion: putting $-b, -a$ in the wrong entries.', symptom: '$\\ddot{x} + a\\dot{x} + bx = 0$ is converted to the wrong companion matrix, giving incorrect eigenvalues.', whyItHappened: 'The companion matrix for $\\ddot{x} + a\\dot{x} + bx = 0$ with state $(x, \\dot{x})$ is $\\begin{bmatrix}0&1\\\\-b&-a\\end{bmatrix}$, not $\\begin{bmatrix}0&1\\\\b&a\\end{bmatrix}$. Sign errors are common.', repairStrategy: 'Rearrange the ODE as $\\ddot{x} = -bx - a\\dot{x}$ to read off the second row directly: the second row of $A$ is $(-b, -a)$.' },

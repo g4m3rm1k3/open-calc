@@ -25,6 +25,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'How to Verify a Map Is an Isomorphism (5 Steps)',
+        body: '**Given:** A proposed map $T: V \\to W$.\n**Step 1.** Verify linearity: check $T(c\\mathbf{u}+d\\mathbf{v}) = cT(\\mathbf{u}) + dT(\\mathbf{v})$ for arbitrary vectors and scalars.\n**Step 2.** Find $\\ker(T)$: solve $T(\\mathbf{v}) = \\mathbf{0}$. If the only solution is $\\mathbf{v} = \\mathbf{0}$, then $T$ is injective.\n**Step 3.** Compare dimensions: if $\\dim V = \\dim W$, then injectivity alone implies surjectivity (by rank-nullity) → $T$ is an isomorphism.\n**Step 4.** If dimensions are equal and the matrix of $T$ is available, check $\\det([T]) \\neq 0$ — equivalent to bijectivity.\n**Step 5.** Write $T^{-1}$ explicitly and verify $T^{-1}(T(\\mathbf{v})) = \\mathbf{v}$ for a test vector.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 5 of 6 — Abstract Vector Spaces',
         body: '**Previous:** Matrix Representations — encoding linear maps as matrices in a chosen basis.\n**This lesson:** Isomorphisms — bijective linear maps that identify two vector spaces as structurally identical, with dimension as the complete invariant.\n**Next:** Coordinates and Change of Basis — the mechanics of converting between different coordinate systems.',
@@ -192,6 +197,8 @@ print("This is: 2*B1 + (-1)*B2 + 3*B3 = [[2,-1],[-1,3]] ✓")`,
     prose: [
       '**Automorphisms.** An isomorphism $T: V \\to V$ (from a space to itself) is called an **automorphism**. The set of all automorphisms of $V$ forms a group under composition: the **general linear group** $GL(V)$. For $V = \\mathbb{R}^n$, $GL(\\mathbb{R}^n) \\cong GL(n, \\mathbb{R})$ = group of invertible $n\\times n$ real matrices. Automorphisms are the "symmetries" of the vector space.',
       '**Functorial isomorphisms.** The canonical isomorphism $V \\cong V^{**}$ sends $\\mathbf{v} \\mapsto (\\phi \\mapsto \\phi(\\mathbf{v}))$. This is a natural transformation between the identity functor and the double-dual functor, valid for all finite-dimensional $V$ simultaneously. In contrast, $V \\cong V^*$ requires choosing an inner product or a basis.',
+      '**First isomorphism theorem as a source of isomorphisms.** The first isomorphism theorem ($V / \\ker T \\cong \\text{im}(T)$) is the standard machine for building isomorphisms. If you know the kernel and image of a linear map, you immediately get an isomorphism between the quotient and the image. For example: $\\mathbb{R}^3 / \\text{Span}\\{\\mathbf{e}_3\\} \\cong \\mathbb{R}^2$ (modding out the $z$-axis gives the $xy$-plane). More usefully: $P_3 / \\ker D \\cong P_2$ where $D$ is differentiation, saying the classes of polynomials that share the same derivative are isomorphic to the space of all lower-degree polynomials.',
+      '**Infinite-dimensional isomorphisms.** The classification theorem fails for infinite-dimensional spaces: there exist non-isomorphic infinite-dimensional spaces over the same field (uncountable-dimensional vs countable-dimensional over $\\mathbb{Q}$, for example). For Hilbert spaces (complete inner product spaces), the correct invariant is the orthonormal dimension (cardinality of an orthonormal basis). All separable Hilbert spaces are isomorphic as Hilbert spaces — this is the content of the Riesz-Fischer theorem. The Fourier transform is the concrete isomorphism $L^2[0,2\\pi] \\cong \\ell^2$ (functions to square-summable sequences).',
     ],
     callouts: [
       {
@@ -326,6 +333,21 @@ print("This is: 2*B1 + (-1)*B2 + 3*B3 = [[2,-1],[-1,3]] ✓")`,
         '**Determinant:** $\\det(A) = 1(1-(-1)) = 2 \\neq 0$.',
         '**Conclusion:** $A$ is invertible → $T$ is bijective → $T$ is an isomorphism. Its inverse gives polynomial interpolation: given values at $0, 1, -1$, find the unique quadratic through those points.',
       ],
+    },
+    {
+      id: 'ch-la6-005-3',
+      title: 'Evaluation isomorphism and polynomial interpolation',
+      difficulty: 'hard',
+      problem: 'Let $T: P_2 \\to \\mathbb{R}^3$ be defined by $T(p) = (p(0), p(1), p(2))^\\top$. (a) Find the matrix of $T$ in the standard bases. (b) Compute $\\det([T])$ to verify $T$ is an isomorphism. (c) Find $T^{-1}(1, 3, 9)^\\top$ — the unique polynomial in $P_2$ satisfying $p(0)=1, p(1)=3, p(2)=9$.',
+      hint: 'For part (a): apply $T$ to each basis polynomial $\\{1, x, x^2\\}$ and use the outputs as columns. For part (c): solve the resulting $3 \\times 3$ linear system.',
+      walkthrough: [
+        { expression: 'T(1) = (1,1,1)^\\top, \\quad T(x) = (0,1,2)^\\top, \\quad T(x^2) = (0,1,4)^\\top', annotation: 'Evaluate each basis polynomial at $x = 0, 1, 2$ to get the three columns.' },
+        { expression: '[T] = \\begin{bmatrix}1&0&0\\\\1&1&1\\\\1&2&4\\end{bmatrix}', annotation: 'Vandermonde matrix for nodes 0, 1, 2. Its determinant equals the product of differences of nodes.' },
+        { expression: '\\det([T]) = 1 \\cdot \\det\\begin{bmatrix}1&1\\\\2&4\\end{bmatrix} = 4-2 = 2 \\neq 0', annotation: 'Non-zero determinant → $T$ is invertible → $T$ is an isomorphism. In general, $\\det(\\text{Vandermonde}) = \\prod_{i>j}(x_i-x_j) = (1-0)(2-0)(2-1) = 2$.' },
+        { expression: '\\begin{bmatrix}1&0&0\\\\1&1&1\\\\1&2&4\\end{bmatrix}\\begin{bmatrix}a\\\\b\\\\c\\end{bmatrix} = \\begin{bmatrix}1\\\\3\\\\9\\end{bmatrix} \\implies a=1, \\; b+c=2, \\; 2b+4c=8', annotation: 'Solve row by row: row 1 gives $a=1$; subtract row 1 from rows 2 and 3 to isolate $b$ and $c$.' },
+        { expression: 'c = 2, \\; b = 0, \\; a = 1 \\implies p(x) = 1 + 2x^2', annotation: 'Verify: $p(0)=1$ ✓, $p(1)=3$ ✓, $p(2)=9$ ✓. The isomorphism $T^{-1}$ performs polynomial interpolation — finding the unique quadratic through three given points.' },
+      ],
+      answer: '$[T] = \\begin{bmatrix}1&0&0\\\\1&1&1\\\\1&2&4\\end{bmatrix}$, $\\det = 2 \\neq 0$ → isomorphism. $T^{-1}(1,3,9)^\\top = 1 + 2x^2$.',
     },
   ],
 
@@ -487,6 +509,34 @@ print("This is: 2*B1 + (-1)*B2 + 3*B3 = [[2,-1],[-1,3]] ✓")`,
       whyThisTechniqueWins: 'Just compute the dimensions. If dimensions match, an isomorphism exists (you can always construct one via bases). If dimensions differ, no isomorphism is possible — no need to search.',
     },
   ],
+
+  semantics: {
+    core: [
+      { symbol: 'V \\cong W', meaning: 'V and W are isomorphic: there exists a bijective linear map T: V → W; the spaces are structurally identical' },
+      { symbol: '\\phi_{\\mathcal{B}}: V \\xrightarrow{\\sim} \\mathbb{F}^n', meaning: 'Coordinate isomorphism: maps v to its B-coordinates; requires choosing an ordered basis B; changes with the basis choice' },
+      { symbol: 'GL(V)', meaning: 'General linear group: all automorphisms (invertible linear maps V → V); for V = R^n this is GL(n, R)' },
+      { symbol: 'V \\cong W \\Leftrightarrow \\dim V = \\dim W', meaning: 'Classification theorem for finite-dimensional spaces over the same field; dimension is the complete invariant' },
+      { symbol: 'V \\cong V^{**}', meaning: 'Double dual isomorphism: v ↦ (φ ↦ φ(v)); natural — requires no basis choice; not available for infinite-dimensional spaces' },
+    ],
+    rulesOfThumb: [
+      'Check dimensions first: if dim(V) ≠ dim(W), no isomorphism exists — stop there.',
+      'To show T: V → W is an isomorphism when dim(V) = dim(W): just check ker(T) = {0} (injectivity implies surjectivity by rank-nullity).',
+      'Computing det([T]) ≠ 0 is the fastest check when T has a matrix: invertible matrix = isomorphism.',
+      'Coordinate isomorphism φ_B is NOT natural: it requires a basis B and changes when B changes. Natural isomorphisms exist without basis choices.',
+      'First isomorphism theorem builds isomorphisms for free: V/ker(T) ≅ im(T) always.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: [
+      { id: 'la6-002', label: 'Basis and Dimension', reason: 'The classification theorem uses dimension; the coordinate isomorphism requires choosing a basis' },
+      { id: 'la6-003', label: 'Linear Transformations', reason: 'Isomorphisms are bijective linear maps; bijectivity tested via ker = {0} and rank-nullity' },
+    ],
+    futureLinks: [
+      { id: 'la6-004', label: 'Matrix Representations', reason: 'An invertible matrix represents an isomorphism in coordinates; similar matrices represent the same isomorphism in different bases' },
+      { id: 'la6-006', label: 'Change of Basis', reason: 'Two choices of basis give two coordinate isomorphisms; the change-of-basis matrix converts between them' },
+    ],
+  },
 
   debugging: [
     {

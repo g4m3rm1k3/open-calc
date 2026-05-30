@@ -33,6 +33,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'How to Compute the Cholesky Factor Column by Column (4 Steps)',
+        body: '**Given:** An $n \\times n$ symmetric positive definite matrix $A$.\n**Step 1.** For each column $j = 1, \\ldots, n$, compute the diagonal entry: $l_{jj} = \\sqrt{a_{jj} - \\sum_{k=1}^{j-1} l_{jk}^2}$. If the quantity under the square root is $\\leq 0$, stop — $A$ is not positive definite.\n**Step 2.** For each row $i = j+1, \\ldots, n$, compute the subdiagonal entry: $l_{ij} = \\bigl(a_{ij} - \\sum_{k=1}^{j-1} l_{ik} l_{jk}\\bigr) \\big/ l_{jj}$.\n**Step 3.** Set all entries above the diagonal to zero: $l_{ij} = 0$ for $i < j$.\n**Step 4.** Assemble $L$ and verify: compute $LL^\\top$ and confirm it equals $A$ (spot-check 2–3 entries).',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 2 of 7 — Numerical Linear Algebra',
         body: '**Previous (Lesson 1):** QR decomposition — orthonormal basis, least squares, condition number $\\kappa(A)$ vs $\\kappa(A)^2$.\n**This lesson:** Cholesky — the fast, stable factorization for symmetric positive definite matrices. Connection: $A^\\top A = R^\\top R$ links QR and Cholesky.\n**Next (Lesson 3):** Matrix norms and condition numbers — quantifying sensitivity of factorizations.',
@@ -217,6 +222,8 @@ round(empirical_cov, 2)
     prose: [
       '**Blocked Cholesky.** For large matrices, the standard column-by-column Cholesky is memory-bound. **Blocked Cholesky** computes the factorization in blocks of columns, enabling cache-efficient implementation with BLAS-3 operations. This gives 10-100× speedup on modern hardware. LAPACK\'s DPOTRF uses blocked Cholesky.',
       '**Incomplete Cholesky.** For sparse SPD matrices, you can compute an incomplete Cholesky factorization by zeroing out fill-in entries — the result is not exact ($A \\approx LL^\\top$ instead of $=$) but serves as a powerful preconditioner for iterative solvers like conjugate gradient.',
+      '**$LDL^\\top$ factorization.** Every SPD matrix also factors as $A = \\hat{L}D\\hat{L}^\\top$ where $\\hat{L}$ is unit lower triangular (1s on the diagonal) and $D$ is diagonal with positive entries. The relation to Cholesky is $D_{jj} = l_{jj}^2$ and $\\hat{L}_{ij} = l_{ij}/l_{jj}$. The $\\hat{L}D\\hat{L}^\\top$ form avoids square roots during the factorization — each $d_j$ is computed by subtraction alone, and square roots appear only if you want $L$ afterward. More importantly, $LDL^\\top$ extends to symmetric indefinite matrices: with Bunch-Kaufman pivoting, any symmetric $A$ factors as $P^\\top A P = \\hat{L} D \\hat{L}^\\top$ where $D$ contains $1\\times1$ (real eigenvalue) and $2\\times2$ diagonal blocks (complex-conjugate pairs). LAPACK\'s DSYTRF uses this approach for symmetric indefinite systems.',
+      '**Schur complement and eigenvalue interlacing.** The Cholesky algorithm reduces the $n\\times n$ problem to $(n-1)\\times(n-1)$ via the Schur complement: after processing column 1, the remaining block becomes $S_1 = B - \\boldsymbol{\\ell}\\boldsymbol{\\ell}^\\top$ where $\\boldsymbol{\\ell} = \\mathbf{v}/l_{11}$. That $S_1$ is SPD follows because $A$ is SPD: for any vector $\\mathbf{w}$, setting $\\mathbf{x} = (0, \\mathbf{w}^\\top)^\\top$ gives $\\mathbf{w}^\\top S_1 \\mathbf{w} = \\mathbf{x}^\\top A\\mathbf{x} - \\ldots > 0$ (the detailed argument uses the block factorization). The eigenvalues of $S_1$ interlace with those of $A$ by the Cauchy interlacing theorem: if $\\lambda_1 \\geq \\cdots \\geq \\lambda_n > 0$ then $\\lambda_1 \\geq \\mu_1 \\geq \\lambda_2 \\geq \\cdots \\geq \\lambda_{n-1} \\geq \\mu_{n-1} \\geq \\lambda_n > 0$. This guarantees the smallest eigenvalue of every Schur complement is at least $\\lambda_n > 0$ — the algorithm never encounters a non-positive pivot on a genuine SPD matrix.',
     ],
     callouts: [
       {
@@ -340,6 +347,36 @@ round(empirical_cov, 2)
         '**Step 3:** $l_{22} = \\sqrt{a_{22} - l_{21}^2} = \\sqrt{3 - 4} = \\sqrt{-1}$ — imaginary!',
         '**Conclusion:** Cholesky fails → $A$ is NOT positive definite. Verification: $\\det(A) = 3-4 = -1 < 0$ confirms indefiniteness (mixed eigenvalue signs).',
         "**Key insight:** Attempting Cholesky is equivalent to Sylvester's criterion — the pivots in Cholesky are exactly the leading principal minors divided by the previous pivot. A negative pivot means a negative leading minor, which means not PD.",
+      ],
+    },
+    {
+      id: 'ch-la7-002-2',
+      title: 'Cholesky of a 3×3 SPD matrix',
+      difficulty: 'medium',
+      problem: 'Compute the Cholesky factorization of $A = \\begin{bmatrix}4&2&0\\\\2&5&1\\\\0&1&3\\end{bmatrix}$. Verify $LL^\\top = A$ by spot-checking two entries.',
+      hint: 'Work column by column. Column 1: $l_{11}=\\sqrt{4}$, $l_{21}=2/l_{11}$, $l_{31}=0/l_{11}$. Column 2: $l_{22}=\\sqrt{a_{22}-l_{21}^2}$, $l_{32}=(a_{32}-l_{31}l_{21})/l_{22}$. Column 3: $l_{33}=\\sqrt{a_{33}-l_{31}^2-l_{32}^2}$.',
+      walkthrough: [
+        { expression: 'l_{11}=\\sqrt{4}=2,\\quad l_{21}=2/2=1,\\quad l_{31}=0/2=0', annotation: 'Column 1: diagonal $=\\sqrt{a_{11}}$; subdiagonals $= a_{i1}/l_{11}$.' },
+        { expression: 'l_{22}=\\sqrt{5-1^2}=2,\\quad l_{32}=(1-0\\cdot1)/2=\\tfrac{1}{2}', annotation: 'Column 2: $l_{22}=\\sqrt{a_{22}-l_{21}^2}$. For $l_{32}$: subtract $l_{31}l_{21}=0$ (no correction since $l_{31}=0$).' },
+        { expression: 'l_{33}=\\sqrt{3-0^2-(\\tfrac{1}{2})^2}=\\sqrt{3-\\tfrac{1}{4}}=\\sqrt{\\tfrac{11}{4}}=\\tfrac{\\sqrt{11}}{2}', annotation: 'Column 3: subtract squared contributions from both columns 1 and 2.' },
+        { expression: 'L=\\begin{bmatrix}2&0&0\\\\1&2&0\\\\0&1/2&\\sqrt{11}/2\\end{bmatrix}', annotation: 'Lower triangular factor. All diagonal entries positive, confirming $A$ is SPD.' },
+        { expression: '(LL^\\top)_{33}=0^2+(\\tfrac{1}{2})^2+(\\tfrac{\\sqrt{11}}{2})^2=0+\\tfrac{1}{4}+\\tfrac{11}{4}=3=a_{33}\\checkmark', annotation: 'Spot-check (3,3) entry.' },
+        { expression: '(LL^\\top)_{23}=1\\cdot0+2\\cdot\\tfrac{1}{2}+0\\cdot\\tfrac{\\sqrt{11}}{2}=1=a_{23}\\checkmark', annotation: 'Spot-check (2,3) entry. Full multiplication verifies all entries match $A$.' },
+      ],
+    },
+    {
+      id: 'ch-la7-002-3',
+      title: 'Log-determinant and Mahalanobis distance via Cholesky',
+      difficulty: 'hard',
+      problem: 'Given $A = \\begin{bmatrix}4&2\\\\2&3\\end{bmatrix}$ with Cholesky factor $L = \\begin{bmatrix}2&0\\\\1&\\sqrt{2}\\end{bmatrix}$ (from Example 1), use $L$ to: (a) compute $\\log\\det A$ without computing the determinant directly, and (b) compute the Mahalanobis distance $\\delta^2 = \\mathbf{b}^\\top A^{-1}\\mathbf{b}$ for $\\mathbf{b} = (8,9)^\\top$ without inverting $A$.',
+      hint: 'Use $\\log\\det A = 2\\sum_j\\log l_{jj}$ for part (a). For part (b), observe $\\mathbf{b}^\\top A^{-1}\\mathbf{b} = \\|L^{-1}\\mathbf{b}\\|^2$, so solve $L\\mathbf{y}=\\mathbf{b}$ by forward substitution and compute $\\|\\mathbf{y}\\|^2$.',
+      walkthrough: [
+        { expression: '\\log\\det A = 2(\\log l_{11}+\\log l_{22}) = 2(\\log 2+\\log\\sqrt{2}) = 2\\bigl(\\log 2+\\tfrac{1}{2}\\log 2\\bigr) = 3\\log 2', annotation: '$\\det(LL^\\top)=(\\det L)^2=(l_{11}l_{22})^2$, so $\\log\\det A = 2(\\log l_{11}+\\log l_{22})$.' },
+        { expression: 'e^{3\\log 2}=2^3=8=\\det A\\checkmark', annotation: 'Direct check: $\\det A=4\\cdot3-2\\cdot2=8$ ✓. The log formula avoids overflow for large matrices where $\\det A$ can be astronomically large or small.' },
+        { expression: '\\delta^2=\\mathbf{b}^\\top A^{-1}\\mathbf{b}=\\mathbf{b}^\\top(LL^\\top)^{-1}\\mathbf{b}=(L^{-1}\\mathbf{b})^\\top(L^{-1}\\mathbf{b})=\\|L^{-1}\\mathbf{b}\\|^2', annotation: 'Key identity: Mahalanobis distance equals the squared norm of $L^{-1}\\mathbf{b}$. Get $L^{-1}\\mathbf{b}$ via forward substitution — no matrix inversion needed.' },
+        { expression: 'L\\mathbf{y}=\\mathbf{b}:\\;2y_1=8\\Rightarrow y_1=4;\\;y_1+\\sqrt{2}\\,y_2=9\\Rightarrow y_2=5/\\sqrt{2}', annotation: 'Forward substitution (as in Example 3).' },
+        { expression: '\\delta^2=\\|\\mathbf{y}\\|^2=4^2+(5/\\sqrt{2})^2=16+\\tfrac{25}{2}=\\tfrac{57}{2}', annotation: 'The Cholesky method computes the Mahalanobis distance at the cost of a single triangular solve.' },
+        { expression: '\\text{Verify: }A^{-1}=\\tfrac{1}{8}\\begin{bmatrix}3&-2\\\\-2&4\\end{bmatrix},\\;(8,9)A^{-1}(8,9)^\\top=\\tfrac{1}{8}(48+180)=\\tfrac{228}{8}=\\tfrac{57}{2}\\checkmark', annotation: 'Confirms the answer. But for large matrices, forming $A^{-1}$ explicitly costs $O(n^3)$ and is numerically unstable — always use the triangular-solve approach.' },
       ],
     },
   ],
@@ -508,6 +545,29 @@ round(empirical_cov, 2)
       whyThisTechniqueWins: 'For large sparse 3D problems, direct Cholesky fills in too much ($O(n^2)$ storage). Unpreconditioned CG converges slowly for ill-conditioned systems. Incomplete Cholesky as a preconditioner reduces the condition number, making preconditioned CG converge in far fewer iterations — the best of both worlds.',
     },
   ],
+
+  semantics: {
+    core: [
+      { symbol: 'A = LL^\\top', meaning: 'Cholesky factorization: $A$ is SPD iff it has a unique lower triangular factor $L$ with positive diagonal. Matrix analogue of $a = (\\sqrt{a})^2$ for scalars.' },
+      { symbol: 'l_{jj} = \\sqrt{a_{jj} - \\sum_{k<j}l_{jk}^2}', meaning: 'Diagonal entry formula: subtract the squared contributions of all previous columns, then take the square root. A non-positive result under the root means $A$ is not positive definite.' },
+      { symbol: '\\log\\det A = 2\\sum_j \\log l_{jj}', meaning: 'Numerically stable log-determinant from Cholesky. Avoids overflow/underflow when entries of $A$ are very large or small. Central to Gaussian likelihoods, information criteria, and entropy calculations.' },
+      { symbol: 'S = B - \\boldsymbol{\\ell}\\boldsymbol{\\ell}^\\top', meaning: 'Schur complement: the remaining $(n-1)\\times(n-1)$ block after processing column 1. It is SPD whenever $A$ is SPD, which is why Cholesky can induct to smaller problems.' },
+      { symbol: '\\mathbf{x}^\\top A\\mathbf{x} > 0', meaning: 'Positive definiteness: the quadratic form is strictly positive for all nonzero $\\mathbf{x}$. Geometrically, $A$ acts as a bowl curved upward in every direction.' },
+      { symbol: 'L\\mathbf{w} \\sim \\mathcal{N}(\\mathbf{0}, \\Sigma)', meaning: 'Gaussian sampling: if $\\mathbf{w}\\sim\\mathcal{N}(0,I)$ and $\\Sigma=LL^\\top$, then $L\\mathbf{w}$ has covariance $LL^\\top=\\Sigma$. The Cholesky factor injects correlations into independent random samples.' },
+    ],
+    rulesOfThumb: [
+      'Cholesky costs $n^3/3$ flops — half of LU. Always use it when the matrix is known to be SPD.',
+      'Cholesky as an SPD test: encountering a non-positive value under the square root means the matrix is not positive definite.',
+      'Use $\\log\\det A = 2\\sum_j\\log l_{jj}$ to compute log-determinants stably — never multiply diagonal entries of $L$ directly when they can be large or small.',
+      'For sampling from $\\mathcal{N}(\\boldsymbol{\\mu},\\Sigma)$: compute Cholesky of $\\Sigma$ once, then generate each new sample with one matrix-vector product $L\\mathbf{w}$.',
+      'For symmetric indefinite matrices, use $LDL^\\top$ with Bunch-Kaufman pivoting (LAPACK DSYTRF) — Cholesky will fail.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: ['la5-002', 'la7-001'],
+    futureLinks: ['la7-003', 'la8-001'],
+  },
 
   debugging: [
     {

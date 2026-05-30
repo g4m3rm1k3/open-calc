@@ -802,12 +802,12 @@ b = np.array([3.0, 3.0])
   transferPrompts: [
     {
       situation: 'A CNC machinist is checking whether a cutting tool force vector $\\mathbf{F} = [8, 6, 0]^T$ is doing useful work in the feed direction $\\mathbf{d} = [1, 0, 0]^T$. What fraction of the force is effective?',
-      competingTechniques: ['Measuring angles with a protractor', 'Dot product projection'],
+      competingTechniques: 'Measuring angles with a protractor vs. dot product projection',
       whyThisTechniqueWins: 'The effective component is the dot product projection: $(\\mathbf{F}\\cdot\\hat{\\mathbf{d}}) = 8$. Total force magnitude is 10. So only 80% is effective. This generalizes to any direction in any dimension instantly.',
     },
     {
       situation: 'A 3D graphics shader needs to decide how brightly to illuminate a triangle face. The light direction is $\\mathbf{L}$ and the face normal is $\\mathbf{n}$. How should it compute brightness?',
-      competingTechniques: ['Angle-based lookup table', 'Dot product of normal and light direction'],
+      competingTechniques: 'Angle-based lookup table vs. dot product of normal and light direction',
       whyThisTechniqueWins: 'Brightness = $\\max(0, \\hat{\\mathbf{n}}\\cdot\\hat{\\mathbf{L}})$. When normal and light fully align (angle 0°), brightness = 1. When perpendicular, brightness = 0. This runs in one GPU operation per pixel.',
     },
   ],

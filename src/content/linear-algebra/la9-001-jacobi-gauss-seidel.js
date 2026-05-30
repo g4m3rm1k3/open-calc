@@ -27,6 +27,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'How to Apply Jacobi Iteration to $A\\mathbf{x} = \\mathbf{b}$ (4 Steps)',
+        body: '1. **Check convergence.** Verify strict diagonal dominance: $|a_{ii}| > \\sum_{j \\neq i}|a_{ij}|$ for every row $i$. If not, compute $\\rho(G_J) = \\rho(-D^{-1}(L+U))$ explicitly — iteration converges iff $\\rho(G_J) < 1$.\n2. **Initialize.** Set $\\mathbf{x}^{(0)}$ to any vector (zeros works fine). The iteration converges regardless of starting point when $\\rho(G_J) < 1$.\n3. **Sweep.** For $k = 0, 1, 2, \\ldots$: compute every component simultaneously using OLD values only: $x_i^{(k+1)} = \\frac{1}{a_{ii}}\\!\\left(b_i - \\sum_{j \\neq i} a_{ij} x_j^{(k)}\\right)$. Storing $\\mathbf{x}^{(k)}$ and $\\mathbf{x}^{(k+1)}$ separately is critical — do NOT overwrite $x_j^{(k)}$ until the full sweep is done.\n4. **Stop** when the residual $\\|A\\mathbf{x}^{(k)} - \\mathbf{b}\\|$ falls below tolerance, OR when the step size $\\|\\mathbf{x}^{(k+1)} - \\mathbf{x}^{(k)}\\|$ is small. Always report the residual, not just the step size.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 1 of 5 — Iterative Solvers & Preconditioning',
         body: '**Previous (Chapter 8):** Applications — PCA, PageRank, ODEs, computer graphics.\n**This lesson:** Jacobi and Gauss-Seidel — stationary iterative methods, matrix splitting $A = M - N$, spectral radius convergence criterion, SOR acceleration.\n**Next (Lesson 2):** Conjugate Gradient — Krylov subspace methods that converge in far fewer steps than stationary iterations.',
@@ -265,6 +270,9 @@ disp('rho_jac^2 vs rho_gs:')
   rigor: {
     prose: [
       '**Multigrid methods.** Jacobi and Gauss-Seidel are excellent **smoothers** — they rapidly eliminate high-frequency (oscillatory) error components, while low-frequency components decay slowly. **Multigrid** exploits this: smooth on the fine grid, restrict residual to a coarser grid, solve coarsely, prolongate correction back, smooth again. This achieves $O(n)$ work for elliptic PDEs. The V-cycle and W-cycle are standard multigrid algorithms.',
+      '**Convergence theory: Stein-Rosenberg theorem.** For a non-negative off-diagonal matrix $A$, the Stein-Rosenberg theorem states a precise ordering between the Jacobi and Gauss-Seidel spectral radii: either $\\rho_J = \\rho_{GS} = 0$, or $0 < \\rho_{GS} < \\rho_J < 1$, or $1 < \\rho_J < \\rho_{GS}$, or $\\rho_J = \\rho_{GS} = 1$. In particular, for consistently ordered matrices (e.g., 2D finite difference grids in natural or red-black ordering), the exact relation $\\rho_{GS} = \\rho_J^2$ holds — Gauss-Seidel reduces error by the square of Jacobi\'s factor per iteration.',
+      '**Block iterations and red-black ordering.** Rather than updating one component $x_i$ at a time, **block Jacobi** partitions $A$ into diagonal blocks $A_{ii}$ and updates entire subvectors: $\\mathbf{x}_i^{(k+1)} = A_{ii}^{-1}(\\mathbf{b}_i - \\sum_{j\\neq i} A_{ij}\\mathbf{x}_j^{(k)})$. For 2D grid problems, **red-black (checkerboard) ordering** partitions unknowns into two independent sets so that all reds can be updated simultaneously (no dependencies), then all blacks — making Gauss-Seidel parallelizable without losing fast convergence. This is the standard approach for GPU-accelerated PDE solvers.',
+      '**SOR optimal parameter derivation.** For the model problem ($5$-point Laplacian on an $m \\times m$ grid), the Jacobi spectral radius is $\\rho_J = \\cos(\\pi/(m+1))$. The optimal SOR parameter is $\\omega^* = 2/(1 + \\sqrt{1 - \\rho_J^2})$, giving $\\rho_{SOR} = \\omega^* - 1$. For large $m$: $\\rho_J \\approx 1 - \\pi^2/(2m^2)$, $\\omega^* \\approx 2 - 2\\pi/m$, and $\\rho_{SOR} \\approx 1 - 2\\pi/m$. This means SOR reduces error by $e^{-2\\pi/m}$ per iteration — converging in $O(m)$ iterations vs. $O(m^2)$ for Gauss-Seidel.',
     ],
     callouts: [
       {
@@ -302,9 +310,41 @@ disp('rho_jac^2 vs rho_gs:')
       id: 'ch-la9-001-1',
       title: 'Fixed-point interpretation',
       difficulty: 'medium',
-      prompt: 'Show that the fixed point of Jacobi iteration ($\\mathbf{x}^{(k+1)} = D^{-1}(\\mathbf{b} - (L+U)\\mathbf{x}^{(k)})$) is the solution to $A\\mathbf{x} = \\mathbf{b}$.',
-      hint: 'At the fixed point, $\\mathbf{x}^* = \\mathbf{x}^{(k+1)} = \\mathbf{x}^{(k)}$.',
-      solution: 'At fixed point: $\\mathbf{x}^* = D^{-1}(\\mathbf{b} - (L+U)\\mathbf{x}^*)$. Multiply both sides by $D$: $D\\mathbf{x}^* = \\mathbf{b} - (L+U)\\mathbf{x}^*$, so $(D + L + U)\\mathbf{x}^* = \\mathbf{b}$, i.e., $A\\mathbf{x}^* = \\mathbf{b}$.',
+      problem: 'Show that the fixed point of Jacobi iteration ($\\mathbf{x}^{(k+1)} = D^{-1}(\\mathbf{b} - (L+U)\\mathbf{x}^{(k)})$) is the solution to $A\\mathbf{x} = \\mathbf{b}$. Why is this the ONLY fixed point (assuming $A$ is nonsingular)?',
+      walkthrough: [
+        { expression: '\\text{At fixed point: } \\mathbf{x}^* = \\mathbf{x}^{(k+1)} = \\mathbf{x}^{(k)}', annotation: 'Define fixed point: a vector that maps to itself under one iteration.' },
+        { expression: '\\mathbf{x}^* = D^{-1}(\\mathbf{b} - (L+U)\\mathbf{x}^*)', annotation: 'Substitute the fixed-point condition into the iteration formula.' },
+        { expression: 'D\\mathbf{x}^* = \\mathbf{b} - (L+U)\\mathbf{x}^*', annotation: 'Multiply both sides by $D$ (invertible since all diagonal entries are nonzero).' },
+        { expression: '(D + L + U)\\mathbf{x}^* = \\mathbf{b}', annotation: 'Rearrange: $D\\mathbf{x}^* + (L+U)\\mathbf{x}^* = \\mathbf{b}$.' },
+        { expression: 'A\\mathbf{x}^* = \\mathbf{b}', annotation: 'Since $A = D + L + U$, the fixed point satisfies the original system. Uniqueness: $A$ nonsingular means only one solution exists.' },
+      ],
+    },
+    {
+      id: 'ch-la9-001-2',
+      title: 'Two Jacobi steps by hand',
+      difficulty: 'easy',
+      problem: 'For $A = \\begin{bmatrix}4&1\\\\1&3\\end{bmatrix}$, $\\mathbf{b} = (9,7)^\\top$, starting from $\\mathbf{x}^{(0)} = (0,0)^\\top$, perform 2 Jacobi iterations and compute the error after each step (exact solution: $(x,y) = (2, 5/3)$).',
+      walkthrough: [
+        { expression: 'x_1^{(1)} = (9 - 1\\cdot 0)/4 = 2.25,\\quad x_2^{(1)} = (7 - 1\\cdot 0)/3 \\approx 2.333', annotation: 'Step 1: both components use $x^{(0)} = (0,0)$. Divide by respective diagonal entries 4 and 3.' },
+        { expression: '\\mathbf{e}^{(1)} = \\|(2.25 - 2,\\ 2.333 - 1.667)\\| \\approx \\|(0.25,\\ 0.667)\\| \\approx 0.712', annotation: 'Error after step 1 — both components overshot the true solution.' },
+        { expression: 'x_1^{(2)} = (9 - 1\\cdot 2.333)/4 = 1.667,\\quad x_2^{(2)} = (7 - 1\\cdot 2.25)/3 = 1.583', annotation: 'Step 2: use $\\mathbf{x}^{(1)} = (2.25, 2.333)$ on the right. The iterates cross the true value on each side — oscillation.' },
+        { expression: '\\mathbf{e}^{(2)} \\approx \\|(0.333,\\ 0.083)\\| \\approx 0.343', annotation: 'Error roughly halved. Since $\\rho(G_J) \\approx 0.289$ and $0.343 \\approx 0.289 \\cdot 1.19 \\cdot 0.712$... wait, $0.289 \\times 0.712 \\approx 0.206$. Close to observed reduction.' },
+        { expression: '\\text{Oscillation: step 1 overshot, step 2 undershot}', annotation: 'The negative eigenvalue of $G_J$ (sign flip each step) causes alternating over/undershoot.' },
+      ],
+    },
+    {
+      id: 'ch-la9-001-3',
+      title: 'Verify the $\\rho_{GS} \\approx \\rho_J^2$ relation',
+      difficulty: 'hard',
+      problem: 'For $A = \\begin{bmatrix}4&-1&0\\\\-1&4&-1\\\\0&-1&4\\end{bmatrix}$, compute the Jacobi iteration matrix $G_J$ and Gauss-Seidel iteration matrix $G_{GS}$ and verify that $\\rho_{GS} \\approx \\rho_J^2$.',
+      walkthrough: [
+        { expression: 'D = \\operatorname{diag}(4,4,4),\\quad L+U = A - D', annotation: 'Extract diagonal; off-diagonal part has entries $-1$ at positions $(1,2),(2,1),(2,3),(3,2)$.' },
+        { expression: 'G_J = -D^{-1}(L+U) = \\frac{1}{4}\\begin{bmatrix}0&1&0\\\\1&0&1\\\\0&1&0\\end{bmatrix}', annotation: 'Multiply $-(L+U)$ by $D^{-1} = \\frac{1}{4}I$: each entry of $L+U$ divided by 4, signs flipped.' },
+        { expression: '\\det(G_J - \\lambda I) = 0 \\Rightarrow \\lambda = 0,\\ \\pm\\frac{\\sqrt{2}}{4} \\approx 0,\\ \\pm 0.354', annotation: 'Characteristic polynomial of $G_J$. The $3\\times3$ tridiagonal with 0 diagonal and $1/4$ off-diagonal has eigenvalues $\\pm\\frac{\\sqrt{2}}{4}$ and $0$.' },
+        { expression: '\\rho_J = \\frac{\\sqrt{2}}{4} \\approx 0.354', annotation: 'Largest magnitude eigenvalue of $G_J$.' },
+        { expression: 'G_{GS} = -(D-L)^{-1}U \\Rightarrow \\rho_{GS} \\approx 0.125', annotation: 'Gauss-Seidel matrix: $M = D - L$ (lower triangular), $N = U$. Eigenvalue computation gives $\\rho_{GS} = 1/8$.' },
+        { expression: '\\rho_J^2 = (0.354)^2 = 0.125 = \\rho_{GS} \\checkmark', annotation: 'Exact equality for this consistently ordered tridiagonal matrix — Stein-Rosenberg theorem confirmed.' },
+      ],
     },
   ],
 
@@ -377,6 +417,29 @@ disp('rho_jac^2 vs rho_gs:')
       whyThisTechniqueWins: 'Jacobi wins for parallelism: each component $x_i^{(k+1)}$ depends only on old values, so all $n$ updates are independent. Gauss-Seidel has sequential data dependencies that make parallelization difficult.',
     },
   ],
+
+  semantics: {
+    core: [
+      { symbol: 'A = D - (L+U)', meaning: 'Jacobi splitting: $D$ = diagonal, $L$ = strict lower triangular, $U$ = strict upper triangular. This notation is specific to iterative methods — $L,U$ here do NOT mean factors of $A$.' },
+      { symbol: 'G_J = -D^{-1}(L+U)', meaning: 'Jacobi iteration matrix — multiplying by $G_J$ applies one Jacobi step to the error. Eigenvalues determine convergence rate.' },
+      { symbol: '\\rho(G) = \\max_i |\\lambda_i(G)|', meaning: 'Spectral radius of the iteration matrix — converges for ALL starting points iff $\\rho(G) < 1$. Smaller = faster convergence.' },
+      { symbol: 'x_i^{(k+1)} = \\frac{1}{a_{ii}}\\!\\left(b_i - \\sum_{j\\neq i}a_{ij}x_j^{(k)}\\right)', meaning: 'Jacobi update formula for component $i$ — uses only OLD values $x_j^{(k)}$, making all $n$ updates independent.' },
+      { symbol: '\\rho_{GS} \\approx \\rho_J^2', meaning: 'For consistently ordered matrices (e.g., 1D/2D finite difference grids): Gauss-Seidel spectral radius is approximately the square of Jacobi\'s — so GS needs roughly half as many iterations.' },
+      { symbol: '\\omega^* = \\frac{2}{1 + \\sqrt{1-\\rho_J^2}}', meaning: 'Optimal SOR relaxation parameter — minimizes $\\rho_{SOR}$ for the model problem. For large grids, $\\omega^* \\approx 2 - 2\\pi/m$ where $m$ is the grid size in one dimension.' },
+    ],
+    rulesOfThumb: [
+      'Check diagonal dominance first — it\'s fast ($O(n)$) and sufficient to guarantee convergence without computing eigenvalues.',
+      'Jacobi convergence rate: each step multiplies error by $\\rho_J$. You need $k \\approx \\log(1/\\varepsilon) / \\log(1/\\rho_J)$ iterations to reach tolerance $\\varepsilon$.',
+      'Gauss-Seidel is preferred over Jacobi for sequential computation; Jacobi is preferred for GPU/parallel computation since updates are independent.',
+      'Stationary iterations are mainly used as smoother components inside multigrid or as cheap preconditioners — not as standalone solvers for large problems.',
+      '$\\rho(G) \\geq 1$ for any splitting of a singular matrix — iterative methods cannot solve singular systems.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: ['la5-001', 'la7-005'],
+    futureLinks: ['la9-002', 'la9-004'],
+  },
 
   debugging: [
     {

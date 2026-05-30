@@ -33,6 +33,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'How to Assess the Conditioning of a Linear System (4 Steps)',
+        body: '**Given:** A square matrix $A$ and a linear system $A\\mathbf{x} = \\mathbf{b}$.\n**Step 1.** Compute $\\kappa_2(A) = \\sigma_{\\max}/\\sigma_{\\min}$ (ratio of largest to smallest singular value). For SPD matrices, use $\\kappa_2 = \\lambda_{\\max}/\\lambda_{\\min}$ instead.\n**Step 2.** Apply the digits-lost rule: $\\kappa_2 \\approx 10^k$ means $k$ significant digits are lost in double precision (~16 digits). If $k \\geq 16$, the system is numerically singular.\n**Step 3.** Bound the error: if $\\mathbf{b}$ has relative error $\\varepsilon$, the relative error in $\\mathbf{x}$ is at most $\\kappa(A) \\cdot \\varepsilon$. Include perturbations in $A$ too: total bound $\\lesssim \\kappa(A)(\\|\\delta A\\|/\\|A\\| + \\|\\delta\\mathbf{b}\\|/\\|\\mathbf{b}\\|)$.\n**Step 4.** If $\\kappa(A)$ is too large, consider: row/column equilibration (diagonal scaling), preconditioning, or Tikhonov regularization $(A^\\top A + \\lambda I)$ to cap the effective condition number.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 3 of 7 — Numerical Linear Algebra',
         body: '**Previous (Lesson 2):** Cholesky decomposition — fast SPD factorization, $\\frac{1}{3}n^3$ flops.\n**This lesson:** Matrix norms and condition numbers — how much can input errors corrupt the output?\n**Next (Lesson 4):** Numerical stability — does the algorithm introduce extra error beyond what conditioning predicts?',
@@ -215,6 +220,9 @@ cond(A)
   rigor: {
     prose: [
       '**Backward vs forward error.** The perturbation bound above is a **forward error** bound (error in the solution). In backward error analysis (Wilkinson\'s approach), you ask: what is the smallest perturbation $\\delta A$ such that $x_\\text{computed}$ solves $(A + \\delta A)x = b$ exactly? An algorithm is **backward stable** if $\\|\\delta A\\| / \\|A\\| = O(\\varepsilon_\\text{mach})$. Forward error is then bounded by $\\kappa(A) \\cdot \\varepsilon_\\text{mach}$. LAPACK algorithms are generally backward stable.',
+      '**Perturbation in the matrix $A$.** When the matrix itself has errors — e.g., entries measured or rounded — the bound becomes: if $(A + \\delta A)(\\mathbf{x} + \\delta\\mathbf{x}) = \\mathbf{b}$ and $\\|\\delta A\\|/\\|A\\| = \\varepsilon_A$, then $\\|\\delta\\mathbf{x}\\|/\\|\\mathbf{x}\\| \\lesssim \\kappa(A) \\cdot \\varepsilon_A$. Including perturbations in both $A$ and $\\mathbf{b}$ simultaneously: $\\|\\delta\\mathbf{x}\\|/\\|\\mathbf{x}\\| \\lesssim \\kappa(A)\\bigl(\\|\\delta A\\|/\\|A\\| + \\|\\delta\\mathbf{b}\\|/\\|\\mathbf{b}\\|\\bigr)$. This combined bound is the key message: the condition number sets the amplification ceiling for all input errors, whether in $A$ or $\\mathbf{b}$. In floating-point arithmetic, both $A$ and $\\mathbf{b}$ are typically rounded to machine precision $\\varepsilon_\\text{mach}$, so the total forward error is $\\lesssim 2\\kappa(A)\\varepsilon_\\text{mach}$.',
+      '**Preconditioning to reduce condition number.** A preconditioner $M$ approximates $A^{-1}$ cheaply. Left preconditioning replaces $A\\mathbf{x}=\\mathbf{b}$ with $(MA)\\mathbf{x}=M\\mathbf{b}$, whose condition number is $\\kappa(MA) \\leq \\kappa(M)\\kappa(A)$ — with a good $M$, $\\kappa(MA) \\ll \\kappa(A)$. Common choices: (1) diagonal scaling $M = D^{-1}$ where $D_{ii} = A_{ii}$ (equilibration — balances row magnitudes); (2) incomplete LU or incomplete Cholesky (drop fill-in entries to keep sparsity); (3) algebraic multigrid (exploits problem hierarchy). If $M = A^{-1}$ exactly, $\\kappa(MA) = 1$ — perfect conditioning — but that requires solving the original problem. In practice, preconditioning reduces $\\kappa$ by factors of $10^2$–$10^6$ for structured problems like discretized PDEs.',
+      '**SVD and the pseudoinverse for rank-deficient systems.** When $A$ has very small singular values, the standard inverse $A^{-1}$ amplifies noise catastrophically. The **Moore-Penrose pseudoinverse** $A^+ = V\\Sigma^+ U^\\top$ replaces $1/\\sigma_i$ with $1/\\sigma_i$ for $\\sigma_i > \\text{threshold}$ and $0$ for small $\\sigma_i$, zeroing out noisy directions. This gives the minimum-norm least-squares solution. **Tikhonov regularization** adds a penalty: minimize $\\|A\\mathbf{x}-\\mathbf{b}\\|^2 + \\lambda^2\\|\\mathbf{x}\\|^2$, giving solution $(A^\\top A + \\lambda^2 I)^{-1}A^\\top\\mathbf{b}$. The effective condition number is $(\\sigma_1^2 + \\lambda^2)/(\\sigma_n^2 + \\lambda^2)$, which is capped at $1/\\lambda^2$ for small $\\sigma_n$. Choosing $\\lambda$ appropriately trades bias (inexact solution) for reduced variance (stable computation) — the classic bias-variance tradeoff in numerical linear algebra.',
     ],
     callouts: [
       {
@@ -294,9 +302,45 @@ cond(A)
       id: 'ch-la7-003-1',
       title: 'Conditioning of scaled matrices',
       difficulty: 'medium',
-      prompt: 'If $\\kappa(A) = 100$, what is $\\kappa(2A)$? What is $\\kappa(DA)$ where $D$ is a diagonal scaling matrix?',
-      hint: 'Use $\\kappa(cA) = \\kappa(A)$ and analyze $\\|DA\\| \\cdot \\|(DA)^{-1}\\|$.',
-      solution: '$\\kappa(2A) = \\|2A\\| \\cdot \\|(2A)^{-1}\\| = 2\\|A\\| \\cdot \\frac{1}{2}\\|A^{-1}\\| = \\kappa(A) = 100$. Scaling by a constant does not change the condition number. Diagonal scaling $D$ generally changes $\\kappa(DA)$ — the goal of equilibration/preconditioning is to choose $D$ to minimize it.',
+      problem: 'If $\\kappa(A) = 100$, what is $\\kappa(2A)$? Then take $A = \\begin{bmatrix}1&0\\\\0&100\\end{bmatrix}$ and $D = \\begin{bmatrix}100&0\\\\0&1\\end{bmatrix}$. Compute $\\kappa(A)$ and $\\kappa(DA)$ to show that non-uniform scaling can dramatically change the condition number.',
+      hint: 'For $\\kappa(2A)$: expand using $\\|cA\\|=|c|\\|A\\|$ and $\\|(cA)^{-1}\\|=|c|^{-1}\\|A^{-1}\\|$. For the diagonal case, singular values of a diagonal matrix are just its diagonal entries.',
+      walkthrough: [
+        { expression: '\\kappa(2A) = \\|2A\\| \\cdot \\|(2A)^{-1}\\| = 2\\|A\\| \\cdot \\tfrac{1}{2}\\|A^{-1}\\| = \\kappa(A) = 100', annotation: 'Constant scaling cancels: $|c|$ in the norm and $1/|c|$ in the inverse norm.' },
+        { expression: '\\kappa(cA) = \\kappa(A)\\text{ for any scalar }c \\neq 0', annotation: 'Uniform scaling does not change conditioning — it does not alter the relative spread of singular values.' },
+        { expression: '\\kappa(A) = \\sigma_{\\max}/\\sigma_{\\min} = 100/1 = 100', annotation: 'Singular values of diagonal $A$ are just the absolute diagonal entries: 1 and 100.' },
+        { expression: 'DA = \\begin{bmatrix}100&0\\\\0&100\\end{bmatrix} = 100I\\;\\Rightarrow\\;\\kappa(DA) = 100/100 = 1', annotation: 'Diagonal scaling by $D_{ii}=1/A_{ii}$ (here $D=\\text{diag}(100,1)$ and $A_{ii}=(1,100)$) makes all diagonal entries equal — perfectly conditioned. This is the idea behind equilibration.' },
+        { expression: 'A = \\begin{bmatrix}1&0\\\\0&100\\end{bmatrix}:\\;\\kappa=100.\\quad DA=100I:\\;\\kappa=1.\\quad\\text{Improvement: }100\\to 1', annotation: 'Choosing $D$ to equalize singular values is the principle behind diagonal preconditioning.' },
+      ],
+    },
+    {
+      id: 'ch-la7-003-2',
+      title: 'Computing all four norms of a matrix',
+      difficulty: 'easy',
+      problem: 'For $A = \\begin{bmatrix}2&-1\\\\0&3\\end{bmatrix}$, compute $\\|A\\|_1$, $\\|A\\|_\\infty$, $\\|A\\|_F$, and $\\kappa_2(A)$ using the eigenvalues of $A^\\top A$.',
+      hint: '1-norm = max column abs-sum; $\\infty$-norm = max row abs-sum. For $\\kappa_2$: find eigenvalues of $A^\\top A$, then $\\kappa_2 = \\sqrt{\\lambda_{\\max}/\\lambda_{\\min}}$.',
+      walkthrough: [
+        { expression: '\\|A\\|_1 = \\max(|2|+|0|,\\;|-1|+|3|) = \\max(2,4) = 4', annotation: 'Max absolute column sum: column 1 gives 2, column 2 gives 4.' },
+        { expression: '\\|A\\|_\\infty = \\max(|2|+|-1|,\\;|0|+|3|) = \\max(3,3) = 3', annotation: 'Max absolute row sum: both rows sum to 3.' },
+        { expression: '\\|A\\|_F = \\sqrt{4+1+0+9} = \\sqrt{14} \\approx 3.74', annotation: 'Square root of sum of all squared entries.' },
+        { expression: 'A^\\top A = \\begin{bmatrix}2&0\\\\-1&3\\end{bmatrix}\\begin{bmatrix}2&-1\\\\0&3\\end{bmatrix} = \\begin{bmatrix}4&-2\\\\-2&10\\end{bmatrix}', annotation: 'Singular values of $A$ = square roots of eigenvalues of $A^\\top A$.' },
+        { expression: '\\det(A^\\top A - \\lambda I) = (4-\\lambda)(10-\\lambda)-4 = \\lambda^2-14\\lambda+36 = 0\\;\\Rightarrow\\;\\lambda = 7\\pm\\sqrt{13}', annotation: '$\\lambda_1 = 7+\\sqrt{13}\\approx10.61$, $\\lambda_2 = 7-\\sqrt{13}\\approx3.39$.' },
+        { expression: '\\kappa_2(A) = \\sqrt{\\lambda_1/\\lambda_2} = \\sqrt{(7+\\sqrt{13})/(7-\\sqrt{13})} \\approx \\sqrt{10.61/3.39} \\approx 1.77', annotation: 'Well-conditioned: $\\log_{10}(1.77)\\approx0.25$ digits lost — essentially zero precision loss.' },
+      ],
+    },
+    {
+      id: 'ch-la7-003-3',
+      title: 'Perturbation analysis — quantifying error amplification',
+      difficulty: 'hard',
+      problem: 'Let $A = \\begin{bmatrix}1000&0\\\\0&0.001\\end{bmatrix}$ and $\\mathbf{b} = (1000, 0.001)^\\top$. (a) Compute $\\kappa_2(A)$ and estimate digits lost in double precision. (b) Find the exact solution $\\mathbf{x}$. (c) Perturb $\\mathbf{b}$ to $\\mathbf{b}\'=(1000, 0.002)^\\top$, find the new solution $\\mathbf{x}\'$, and verify the relative error amplification is bounded by $\\kappa_2(A)$.',
+      hint: 'For a diagonal matrix, $\\kappa_2$ = ratio of largest to smallest diagonal. After computing both solutions, compare $(\\|\\delta\\mathbf{x}\\|/\\|\\mathbf{x}\\|) \\div (\\|\\delta\\mathbf{b}\\|/\\|\\mathbf{b}\\|)$ to the bound.',
+      walkthrough: [
+        { expression: '\\kappa_2(A) = 1000/0.001 = 10^6;\\quad \\log_{10}(10^6)=6\\text{ digits lost};\\quad 16-6=10\\text{ reliable digits}', annotation: 'Significant but not catastrophic. With $\\kappa>10^{16}$, the system would be numerically singular.' },
+        { expression: 'A\\mathbf{x}=\\mathbf{b}:\\;x_1=1000/1000=1,\\;x_2=0.001/0.001=1\\;\\Rightarrow\\;\\mathbf{x}=(1,1)^\\top', annotation: 'Diagonal system: each component is solved independently.' },
+        { expression: 'A\\mathbf{x}\'=\\mathbf{b}\':\\;x_1\'=1000/1000=1,\\;x_2\'=0.002/0.001=2\\;\\Rightarrow\\;\\mathbf{x}\'=(1,2)^\\top', annotation: 'Doubling the tiny $y$-component of $\\mathbf{b}$ (from 0.001 to 0.002) doubled $x_2$ from 1 to 2.' },
+        { expression: '\\frac{\\|\\delta\\mathbf{b}\\|}{\\|\\mathbf{b}\\|} = \\frac{\\|(0,0.001)\\|}{\\|(1000,0.001)\\|} \\approx \\frac{0.001}{1000} = 10^{-6}', annotation: 'The relative perturbation in $\\mathbf{b}$ is tiny — one part in a million.' },
+        { expression: '\\frac{\\|\\delta\\mathbf{x}\\|}{\\|\\mathbf{x}\\|} = \\frac{\\|(0,1)\\|}{\\|(1,1)\\|} = \\frac{1}{\\sqrt{2}} \\approx 0.707', annotation: 'The relative error in the solution is 71%! A million-fold amplification of a tiny input perturbation.' },
+        { expression: '\\text{Amplification} = 0.707/10^{-6} \\approx 7\\times 10^5 \\leq \\kappa_2(A)=10^6\\checkmark', annotation: 'The perturbation bound $\\kappa(A) \\cdot \\varepsilon$ is confirmed: the actual amplification is less than $\\kappa_2(A)$, and the bound is tight (about 70% saturated).' },
+      ],
     },
   ],
 
@@ -449,6 +493,29 @@ cond(A)
       whyThisTechniqueWins: 'Nearly degenerate elements produce ill-conditioned stiffness matrices. The fix is to check $\\kappa(K)$ before solving: if it exceeds $1/\\varepsilon_{\\text{mach}}$, the system is numerically singular. Mesh quality (well-shaped elements) controls conditioning.',
     },
   ],
+
+  semantics: {
+    core: [
+      { symbol: '\\kappa(A) = \\|A\\| \\cdot \\|A^{-1}\\|', meaning: 'Condition number: worst-case relative error amplification from input perturbations to solution errors. Equals $\\sigma_{\\max}/\\sigma_{\\min}$ for the 2-norm.' },
+      { symbol: '\\|A\\|_1', meaning: 'Induced 1-norm: maximum absolute column sum. Computed as $\\max_j \\sum_i |a_{ij}|$.' },
+      { symbol: '\\|A\\|_\\infty', meaning: 'Induced $\\infty$-norm: maximum absolute row sum. Computed as $\\max_i \\sum_j |a_{ij}|$.' },
+      { symbol: '\\|A\\|_F = \\sqrt{\\sum_{ij}a_{ij}^2}', meaning: 'Frobenius norm: square root of sum of all squared entries. Equal to $\\sqrt{\\sum_i\\sigma_i^2}$. Not an induced norm but easy to compute and satisfies submultiplicativity.' },
+      { symbol: '\\kappa \\approx 10^k \\Rightarrow k \\text{ digits lost}', meaning: 'Rule of thumb for double precision (~16 digits): if $\\kappa(A)\\approx 10^k$, solving $A\\mathbf{x}=\\mathbf{b}$ loses $k$ significant digits. If $k\\geq 16$, the answer is numerically meaningless.' },
+      { symbol: 'A^+ = V\\Sigma^+ U^\\top', meaning: 'Moore-Penrose pseudoinverse: zeros out small singular values instead of inverting them. Gives minimum-norm least-squares solution for rank-deficient or ill-conditioned systems.' },
+    ],
+    rulesOfThumb: [
+      '$\\kappa(cA) = \\kappa(A)$ for any scalar $c$ — uniform scaling never changes the condition number.',
+      'Orthogonal matrices have $\\kappa = 1$ — they preserve norms exactly. QR and Householder use this to avoid ill-conditioning.',
+      '1-norm = max column abs-sum; $\\infty$-norm = max row abs-sum. These are the cheapest induced norms to compute by hand.',
+      'If $\\kappa(A)\\cdot\\varepsilon_{\\text{mach}} > 1$ (roughly $\\kappa > 10^{16}$), the system is numerically singular in double precision.',
+      'Preconditioning and diagonal scaling reduce $\\kappa$ by equalizing singular values. Tikhonov regularization caps effective $\\kappa$ at $1/\\lambda^2$.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: ['la4-003', 'la7-001'],
+    futureLinks: ['la7-004', 'la8-001'],
+  },
 
   debugging: [
     {

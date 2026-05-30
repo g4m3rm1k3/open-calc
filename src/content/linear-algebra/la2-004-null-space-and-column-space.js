@@ -831,12 +831,12 @@ A = np.array([[1., 2., 3.],
   transferPrompts: [
     {
       situation: 'A data scientist fits a linear model $A\\mathbf{x} = \\mathbf{b}$ to predict housing prices. She has 1000 data points (rows) but only 3 features (columns: square footage, bedrooms, bathrooms). She finds the RREF has rank 2. What does this tell her about her features?',
-      competingTechniques: ['Inspect feature correlations visually', 'Compute rank of the design matrix'],
+      competingTechniques: 'Inspect feature correlations visually vs. compute rank of the design matrix',
       whyThisTechniqueWins: 'Rank 2 means only 2 features are truly independent — one is a linear combination of the others (e.g., "bedrooms" may be proportional to "square footage" in this dataset). The null space has dimension 1, revealing the redundant direction. Removing the redundant feature avoids multicollinearity in regression.',
     },
     {
       situation: 'A graphics engineer applies a "depth collapse" matrix that squishes 3D coordinates to 2D screen pixels. A depth-recovery algorithm tries to invert this to reconstruct 3D positions. Why will this always fail, and what does null space theory say?',
-      competingTechniques: ['Try to compute the inverse of the projection matrix', 'Analyze null space dimension'],
+      competingTechniques: 'Try to compute the inverse of the projection matrix vs. analyze null space dimension',
       whyThisTechniqueWins: 'The projection matrix has nullity ≥ 1 (the z-direction maps to zero). You cannot reconstruct which z-depth produced a given pixel — infinitely many 3D points project to the same 2D point. Null space theory says: no inverse exists; the entire z-axis is in the null space and is permanently unrecoverable from screen coordinates alone.',
     },
   ],

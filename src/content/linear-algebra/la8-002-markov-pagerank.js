@@ -33,6 +33,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'How to Compute PageRank via Power Iteration (4 Steps)',
+        body: '1. **Build the link matrix $M$.** Set $M[j,i] = 1/\\text{outdeg}(i)$ if page $i$ links to $j$, else 0. For dangling nodes (out-degree 0), set the entire column to $1/n$. Verify: column sums all equal 1.\n2. **Form the Google matrix.** $G = \\alpha M + (1-\\alpha)/n \\cdot \\mathbf{1}\\mathbf{1}^\\top$ with $\\alpha \\approx 0.85$. Never form $G$ explicitly — apply it as $G\\mathbf{r} = \\alpha M\\mathbf{r} + (1-\\alpha)/n \\cdot \\mathbf{1}$ using only the sparse $M$.\n3. **Power iterate.** Initialize $\\mathbf{r} = \\mathbf{1}/n$. Repeat $\\mathbf{r} \\leftarrow G\\mathbf{r}$ until $\\|\\mathbf{r}_{\\text{new}} - \\mathbf{r}\\|_1 < 10^{-8}$. Convergence rate: $\\alpha^k \\approx 0.85^k$ per step — about 50 iterations regardless of $n$.\n4. **Read rankings.** Sort pages by $r_i$ descending. Verify: $\\sum_i r_i = 1$. The score $r_i$ is the long-run fraction of time a teleporting surfer spends on page $i$.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 2 of 4 — Applications of Linear Algebra',
         body: '**Previous (Lesson 1):** PCA — eigenvectors of the covariance matrix reveal the directions of maximum variance.\n**This lesson:** Markov chains and PageRank — stationary distributions as dominant eigenvectors; power iteration at web scale.\n**Next (Lesson 3):** ODEs and linear systems — eigenvalues determine stability; matrix exponential gives exact solutions.',
@@ -221,6 +226,9 @@ order
   rigor: {
     prose: [
       '**Detailed balance.** A Markov chain satisfies **detailed balance** if $\\pi_i P_{ij} = \\pi_j P_{ji}$ for all $i, j$. If so, $\\boldsymbol{\\pi}$ is the stationary distribution. Detailed balance means the chain is reversible (time-reversal looks the same). Symmetric random walks on graphs satisfy detailed balance with $\\pi_i \\propto \\deg(i)$. MCMC (Markov Chain Monte Carlo) designs chains satisfying detailed balance with the desired distribution.',
+      '**The power method and deflation.** The power method applies beyond Markov chains: for any matrix $A$ with a unique dominant eigenvalue $\\lambda_1$ (largest in magnitude), starting from a generic vector $\\mathbf{v}_0$, the iteration $\\mathbf{v}_{k+1} = A\\mathbf{v}_k/\\|A\\mathbf{v}_k\\|$ converges to the dominant eigenvector at rate $(|\\lambda_2|/|\\lambda_1|)^k$. For PageRank, $\\lambda_1 = 1$ and $|\\lambda_2| \\leq \\alpha = 0.85$, giving convergence at rate $0.85^k$. Deflation extends the power method to find subsequent eigenvectors: after finding $\\mathbf{v}_1$, form $A_1 = A - \\lambda_1 \\mathbf{v}_1 \\mathbf{w}_1^\\top$ (where $\\mathbf{w}_1$ is the left eigenvector with $\\mathbf{w}_1^\\top \\mathbf{v}_1 = 1$), and apply the power method to $A_1$. This is the idea behind inverse iteration, shift-and-invert, and the Lanczos algorithm for sparse eigenvalue problems.',
+      '**Metropolis-Hastings and MCMC.** In Bayesian statistics, samples from a posterior $p(\\theta | \\text{data}) \\propto p(\\text{data}|\\theta)p(\\theta)$ are needed but intractable. Metropolis-Hastings constructs a Markov chain with $p$ as its stationary distribution: given current state $\\theta$, propose $\\theta\'\\sim q(\\cdot|\\theta)$ and accept with probability $\\min\\left(1, \\frac{p(\\theta\')q(\\theta|\\theta\')}{p(\\theta)q(\\theta\'|\\theta)}\\right)$. The resulting chain satisfies detailed balance with $p$. Mixing time for random-walk Metropolis scales as $O(d)$ in dimension $d$. Hamiltonian Monte Carlo (HMC, used in Stan) exploits gradient information to take longer steps, achieving mixing time $O(d^{1/4})$ — dramatically faster in high dimensions. Linear algebra (eigenvalue analysis of the chain) tells you when MCMC will be practical.',
+      '**Conductance and the Cheeger inequality.** The conductance of a Markov chain is $\\phi = \\min_{S:\\,\\pi(S) \\leq 1/2} Q(S,\\bar{S})/\\pi(S)$ where $Q(S,\\bar{S}) = \\sum_{i\\in S,j\\notin S}\\pi_i P_{ij}$ is the probability flow across the cut. Cheeger\'s inequality bridges conductance and the spectral gap: $\\phi^2/2 \\leq 1 - \\lambda_2 \\leq 2\\phi$. A well-connected graph (high conductance $\\phi$) has a large spectral gap and mixes fast. PageRank with teleportation guarantees $\\phi \\geq (1-\\alpha)/n$, giving a spectral gap of at least $(1-\\alpha)^2/(2n^2)$ — a weak lower bound, but enough to ensure convergence in $O(\\log n / (1-\\alpha))$ steps. The Cheeger inequality is the theoretical bridge between graph structure (connectivity) and algorithmic performance (mixing time).',
     ],
     callouts: [
       {
@@ -258,9 +266,36 @@ order
       id: 'ch-la8-002-1',
       title: 'Teleportation effect',
       difficulty: 'medium',
-      prompt: 'Why does PageRank add the teleportation term $(1-\\alpha)/n \\cdot \\mathbf{1}\\mathbf{1}^\\top$? What problem does it solve?',
-      hint: 'Consider pages with no out-links ("dangling nodes") and isolated components.',
-      solution: 'Two problems: (1) Dangling nodes — pages with no out-links make the matrix not column-stochastic. (2) Reducibility — pages in disconnected components have no way to transfer rank. Teleportation adds probability $(1-\\alpha)$ of jumping to any random page, making the Google matrix fully dense, irreducible, and aperiodic — guaranteeing a unique stationary distribution.',
+      problem: 'Why does PageRank add the teleportation term $(1-\\alpha)/n \\cdot \\mathbf{1}\\mathbf{1}^\\top$? What two problems does it solve, and what algebraic property does it guarantee?',
+      walkthrough: [
+        { expression: '\\text{Problem 1: dangling nodes.} \\quad \\text{If outdeg}(i)=0,\\text{ column } i \\text{ of } M \\text{ is all zeros} \\Rightarrow \\sum_i r_i \\text{ decreases each step}', annotation: 'Dangling nodes absorb rank without redistributing it — rank "leaks out" of the system, causing power iteration to fail.' },
+        { expression: '\\text{Problem 2: reducibility.} \\quad \\text{If graph has isolated components, rank trapped in each component} \\Rightarrow \\text{multiple stationary distributions}', annotation: 'Without full connectivity, Perron-Frobenius does not apply and the stationary distribution is not unique.' },
+        { expression: 'G = \\alpha M + \\frac{1-\\alpha}{n}\\mathbf{1}\\mathbf{1}^\\top: \\quad G_{ij} = \\alpha M_{ij} + \\frac{1-\\alpha}{n} > 0 \\text{ for all } i,j', annotation: 'The teleportation term makes every entry of G strictly positive. A positive stochastic matrix is automatically irreducible and aperiodic.' },
+        { expression: '\\Rightarrow \\text{Perron-Frobenius applies: unique positive stationary distribution } \\boldsymbol{\\pi} \\text{ with all } \\pi_i > 0', annotation: 'With α=0.85: the surfer follows links 85% of the time and jumps randomly 15% of the time. This single change fixes both problems and guarantees convergence in ~50 iterations.' },
+      ],
+    },
+    {
+      id: 'ch-la8-002-2',
+      title: 'Stationary distribution of a 2-state chain',
+      difficulty: 'easy',
+      problem: 'Find the stationary distribution of $P = \\begin{pmatrix}0.9&0.1\\\\0.3&0.7\\end{pmatrix}$ (row-stochastic). Verify $\\boldsymbol{\\pi}P = \\boldsymbol{\\pi}$.',
+      walkthrough: [
+        { expression: '\\boldsymbol{\\pi}P = \\boldsymbol{\\pi}: \\quad 0.9\\pi_1 + 0.3\\pi_2 = \\pi_1 \\Rightarrow 0.3\\pi_2 = 0.1\\pi_1', annotation: 'Write the first stationary equation: the probability of being in state 1 after one step equals π_1.' },
+        { expression: '\\pi_1 = 3\\pi_2, \\quad \\pi_1 + \\pi_2 = 1 \\Rightarrow 3\\pi_2 + \\pi_2 = 1 \\Rightarrow \\pi_2 = \\tfrac{1}{4},\\; \\pi_1 = \\tfrac{3}{4}', annotation: 'Substitute the ratio into the normalization condition.' },
+        { expression: '\\text{Check: } \\boldsymbol{\\pi}P = (\\tfrac{3}{4}, \\tfrac{1}{4})\\begin{pmatrix}0.9&0.1\\\\0.3&0.7\\end{pmatrix} = (\\tfrac{0.675+0.075}{1}, \\tfrac{0.075+0.175}{1}) = (\\tfrac{3}{4}, \\tfrac{1}{4})\\;\\checkmark', annotation: 'Direct verification: πP = π. The chain spends 75% of time in state 1 and 25% in state 2 long-run, regardless of starting point.' },
+      ],
+    },
+    {
+      id: 'ch-la8-002-3',
+      title: 'Verify detailed balance',
+      difficulty: 'hard',
+      problem: 'For $P = \\begin{pmatrix}0&1&0\\\\1/2&0&1/2\\\\0&1&0\\end{pmatrix}$ and proposed $\\boldsymbol{\\pi} = (1/4, 1/2, 1/4)$, verify detailed balance $\\pi_i P_{ij} = \\pi_j P_{ji}$ for all $(i,j)$, and confirm $\\boldsymbol{\\pi}P = \\boldsymbol{\\pi}$.',
+      walkthrough: [
+        { expression: '(i,j)=(1,2):\\; \\pi_1 P_{12} = \\tfrac{1}{4}\\cdot1 = \\tfrac{1}{4},\\quad \\pi_2 P_{21} = \\tfrac{1}{2}\\cdot\\tfrac{1}{2} = \\tfrac{1}{4}\\;\\checkmark', annotation: 'Flow from state 1 to 2 equals flow from 2 to 1 — detailed balance holds.' },
+        { expression: '(i,j)=(2,3):\\; \\pi_2 P_{23} = \\tfrac{1}{2}\\cdot\\tfrac{1}{2} = \\tfrac{1}{4},\\quad \\pi_3 P_{32} = \\tfrac{1}{4}\\cdot1 = \\tfrac{1}{4}\\;\\checkmark', annotation: 'All three non-trivial pairs satisfy balance. Pairs with P_{ij}=0 trivially satisfy 0=0.' },
+        { expression: '\\boldsymbol{\\pi}P:\\;\\text{row 1} = 0 + \\tfrac{1}{2}\\cdot\\tfrac{1}{2} + \\tfrac{1}{4}\\cdot0 = \\tfrac{1}{4} = \\pi_1\\;\\checkmark', annotation: 'Verify stationarity directly: πP = π. Since detailed balance implies stationarity, this is expected.' },
+        { expression: '\\text{Also: } \\pi_2 = \\tfrac{1}{4}\\cdot1 + 0 + \\tfrac{1}{4}\\cdot1 = \\tfrac{1}{2}\\;\\checkmark,\\quad \\pi_3 = \\tfrac{1}{2}\\cdot\\tfrac{1}{2} = \\tfrac{1}{4}\\;\\checkmark', annotation: 'All three components match. The chain is reversible — it is a random walk on the path 1-2-3 with the degree-proportional stationary distribution π_i ∝ deg(i): degrees are 1,2,1, so π=(1/4,1/2,1/4).' },
+      ],
     },
   ],
 
@@ -307,6 +342,29 @@ order
     { situation: 'You want to rank academic papers by importance using their citation graph.', competingTechniques: 'Count raw citations; use PageRank on the citation graph; use HITS.', whyThisTechniqueWins: 'PageRank weights citations by the importance of the citing paper — a citation from a landmark paper counts more. Raw counts treat all citations equally. HITS additionally distinguishes survey papers (hubs) from foundational papers (authorities).' },
     { situation: 'You are building a recommendation system and want to model user behavior as a Markov chain.', competingTechniques: 'Collaborative filtering; Markov chain transition model; deep learning.', whyThisTechniqueWins: 'Markov transition model captures sequential behavior (what users click next) efficiently. The stationary distribution predicts long-run preferences. It is interpretable and fast to update.' },
   ],
+  semantics: {
+    core: [
+      { symbol: 'P \\text{ (row-stochastic)}', meaning: 'Transition matrix; $P_{ij}$ = probability of going from state $i$ to state $j$; rows sum to 1; $\\boldsymbol{\\pi}P = \\boldsymbol{\\pi}$ for stationary $\\boldsymbol{\\pi}$.' },
+      { symbol: '\\boldsymbol{\\pi}P = \\boldsymbol{\\pi}', meaning: 'Stationary distribution equation — $\\boldsymbol{\\pi}$ is a left eigenvector of $P$ with eigenvalue 1; unchanged by one step of the chain.' },
+      { symbol: 'M \\text{ (column-stochastic)}', meaning: 'PageRank link matrix; column $j$ gives $1/\\text{outdeg}(j)$ in each linked row; column sums = 1; used with column-vector $\\mathbf{r}$: $M\\mathbf{r} \\to \\mathbf{r}$.' },
+      { symbol: 'G = \\alpha M + (1-\\alpha)/n\\cdot\\mathbf{1}\\mathbf{1}^\\top', meaning: 'Google matrix — strictly positive, irreducible, aperiodic; unique stationary distribution by Perron-Frobenius; never form explicitly.' },
+      { symbol: '|\\lambda_2|', meaning: 'Second-largest eigenvalue magnitude; controls mixing rate — error after $k$ iterations $\\leq C|\\lambda_2|^k$; spectral gap = $1-|\\lambda_2|$.' },
+      { symbol: '\\pi_i P_{ij} = \\pi_j P_{ji}', meaning: 'Detailed balance (reversibility) — sufficient for $\\boldsymbol{\\pi}$ to be stationary; required by Metropolis-Hastings MCMC for any target distribution.' },
+    ],
+    rulesOfThumb: [
+      'Verify column sums (or row sums) = 1 before power iteration — a column not summing to 1 means rank leaks out of the system.',
+      'Always add teleportation for web/network graphs — dangling nodes and isolated components prevent convergence to a unique distribution.',
+      'About 50–100 power iterations suffice for PageRank with $\\alpha = 0.85$ regardless of web size — convergence rate $0.85^k$ depends only on $\\alpha$, not $n$.',
+      'Spectral gap $< 0.1$ means slow mixing (hundreds of iterations); gap $> 0.5$ means fast mixing (tens of iterations) — use this to estimate cost before running.',
+      'For MCMC design, target detailed balance $\\pi_i P_{ij} = \\pi_j P_{ji}$ — this automatically guarantees $\\boldsymbol{\\pi}$ is the stationary distribution without solving the stationary equations.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: ['la5-001', 'la7-005'],
+    futureLinks: ['la8-003', 'la9-003'],
+  },
+
   debugging: [
     { commonError: 'Using a row-stochastic matrix instead of column-stochastic for PageRank column-vector formulation.', symptom: 'Power iteration $\\mathbf{r} \\leftarrow M\\mathbf{r}$ does not preserve the sum of $\\mathbf{r}$ to 1.', whyItHappened: 'Confusion between row-stochastic (rows sum to 1, used with row-vector distributions) and column-stochastic (columns sum to 1, used with column-vector distributions).', repairStrategy: 'Check: if $\\mathbf{r}$ is a column vector and you compute $M\\mathbf{r}$, then $M$ must be column-stochastic ($\\mathbf{1}^\\top M = \\mathbf{1}^\\top$). Verify with `sum(M, 1)` (MATLAB) or `M.sum(0)` (Python).' },
     { commonError: 'Forgetting to add teleportation, leaving dangling nodes in the graph.', symptom: 'Some columns of $M$ sum to 0 (dangling nodes); power iteration diverges or rank leaks out of the system.', whyItHappened: 'Pages with no out-links absorb rank without redistributing it.', repairStrategy: 'Replace dangling-node columns with $\\mathbf{1}/n$ before adding teleportation, or use the Google matrix formula directly: $G = \\alpha M + (1-\\alpha)\\mathbf{e}\\mathbf{e}^\\top/n$.' },

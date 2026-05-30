@@ -33,6 +33,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'How to Build and Compose 4×4 Transformation Matrices (4 Steps)',
+        body: '1. **Identify the transforms needed** and their order (stated left-to-right in English, e.g., "scale, then rotate, then translate").\n2. **Write each as a 4×4 matrix.** Translation: identity with $(t_x,t_y,t_z)^\\top$ in the last column. Rotation $R_z(\\theta)$: top-left $2\\times2$ is $\\begin{bmatrix}\\cos\\theta&-\\sin\\theta\\\\\\sin\\theta&\\cos\\theta\\end{bmatrix}$, rest is identity. Scaling: diagonal $(s_x, s_y, s_z, 1)$.\n3. **Compose right-to-left.** If you want "scale first, rotate second, translate third": form $M = T \\cdot R \\cdot S$. The rightmost matrix acts on the vertex first.\n4. **Apply to vertices.** Points as $(x,y,z,1)^\\top$; directions as $(x,y,z,0)^\\top$. After perspective projection, divide $x,y,z$ by $w$ to get normalized device coordinates.',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 4 of 4 — Applications of Linear Algebra',
         body: '**Previous (Lesson 3):** ODEs and linear systems — eigenvalues determine stability; matrix exponential.\n**This lesson:** Computer graphics — homogeneous coordinates, 4×4 MVP pipeline, rotation matrices are orthogonal.\n**Next (Chapter 9):** Iterative solvers — conjugate gradient, GMRES, preconditioning for large sparse systems.',
@@ -281,6 +286,9 @@ p_ndc
   rigor: {
     prose: [
       '**The special orthogonal group SO(3).** All $3 \\times 3$ rotation matrices form the Lie group $\\text{SO}(3) = \\{R \\in \\mathbb{R}^{3 \\times 3} : R^\\top R = I, \\det R = 1\\}$. The tangent space at the identity is the Lie algebra $\\mathfrak{so}(3)$ = skew-symmetric matrices. The exponential map $R = e^{[\\hat{\\mathbf{n}}]_\\times \\theta}$ connects Rodrigues\' formula to the matrix exponential. Affine transformations form the group $\\text{SE}(3) = \\text{SO}(3) \\ltimes \\mathbb{R}^3$ (special Euclidean group).',
+      '**Quaternions and SLERP.** Unit quaternions $q = a + b\\mathbf{i} + c\\mathbf{j} + d\\mathbf{k}$ with $|q|=1$ form a double cover of $\\text{SO}(3)$: both $q$ and $-q$ represent the same rotation. Composition is quaternion multiplication (bilinear, associative, non-commutative) — 16 multiplications vs. 27 for $3\\times3$ matrices. **SLERP** (spherical linear interpolation) interpolates $q(t) = q_0 (q_0^{-1} q_1)^t$ smoothly along the great circle on $S^3$, avoiding gimbal lock and producing natural-looking animation. Game engines and IMUs use quaternions internally; $4\\times4$ matrices are only assembled at the last step for the GPU.',
+      '**Projective geometry and homogeneous coordinates.** The projective space $\\mathbb{RP}^3$ identifies all scalar multiples $\\lambda(x,y,z,w)$ as the same point. Standard 3D is the affine patch $w \\neq 0$; the plane at infinity is $w = 0$. A perspective camera is a projective transformation (linear map on $\\mathbb{RP}^3$) — this is why parallel lines in 3D meet at a vanishing point on screen. The **cross-ratio** of four collinear points is preserved under all projective transformations — the foundation of projective invariance in computer vision and photogrammetry.',
+      '**Numerical drift and reorthogonalization.** Composing many rotation matrices in floating point causes $R^\\top R - I$ to drift away from zero — each multiplication introduces $O(\\varepsilon_{\\text{mach}})$ error, which accumulates. Solutions: (1) use quaternions and renormalize $q \\leftarrow q / |q|$ after each step (4 divisions vs. 9-entry correction); (2) Gram-Schmidt or SVD reorthogonalization — compute SVD $R = U\\Sigma V^\\top$ and replace with $UV^\\top$ (nearest orthogonal matrix in Frobenius norm); (3) use the **polar decomposition** $R = (AA^\\top)^{-1/2} A$ to project any nearly-rotation matrix back to $SO(3)$.',
     ],
     callouts: [
       {
@@ -348,11 +356,43 @@ p_ndc
   challenges: [
     {
       id: 'ch-la8-004-1',
-      title: 'Non-commutativity',
+      title: 'Non-commutativity of rotation and translation',
       difficulty: 'easy',
-      prompt: 'Show that translation and rotation do not commute: construct a $4\\times 4$ example where $TR \\neq RT$.',
-      hint: 'Apply both orders to the same point and compare.',
-      solution: 'Let $T = $ translate by $(1,0,0)$ and $R = R_z(90°)$. Point $\\mathbf{p} = (1,0,0,1)^\\top$. $TR\\mathbf{p}$: first rotate to $(0,1,0,1)$, then translate to $(1,1,0,1)$. $RT\\mathbf{p}$: first translate to $(2,0,0,1)$, then rotate to $(0,2,0,1)$. Results differ, so $TR \\neq RT$.',
+      problem: 'Let $T$ = translate by $(1,0,0)$ and $R = R_z(90°)$. Apply point $\\mathbf{p} = (1,0,0,1)^\\top$ to both $T \\cdot R$ and $R \\cdot T$. Show $TR \\neq RT$ by computing both results.',
+      walkthrough: [
+        { expression: 'R_z(90°)\\mathbf{p} = (0,1,0,1)^\\top', annotation: '$R_z(90°)$ maps $(1,0,0) \\to (0,1,0)$ since $\\cos90°=0$, $\\sin90°=1$.' },
+        { expression: 'T \\cdot (R_z\\mathbf{p}) = T(0,1,0,1)^\\top = (1,1,0,1)^\\top', annotation: 'Translate $(0,1,0)$ by $(1,0,0)$: add $t_x=1$ to $x$-component.' },
+        { expression: 'T\\mathbf{p} = (2,0,0,1)^\\top', annotation: 'Translate $(1,0,0)$ by $(1,0,0)$: $x$ becomes $1+1=2$.' },
+        { expression: 'R_z(90°) \\cdot (T\\mathbf{p}) = R_z(2,0,0,1)^\\top = (0,2,0,1)^\\top', annotation: '$R_z(90°)$ maps $(2,0,0) \\to (0,2,0)$.' },
+        { expression: 'TR\\mathbf{p} = (1,1,0,1)^\\top \\neq RT\\mathbf{p} = (0,2,0,1)^\\top', annotation: 'The two orders give different results — translation and rotation do NOT commute in 3D.' },
+      ],
+    },
+    {
+      id: 'ch-la8-004-2',
+      title: 'Verify rotation matrix is orthogonal',
+      difficulty: 'easy',
+      problem: 'Show that $R_z(\\theta) = \\begin{bmatrix}\\cos\\theta&-\\sin\\theta\\\\\\sin\\theta&\\cos\\theta\\end{bmatrix}$ satisfies $R^\\top R = I$ for any $\\theta$.',
+      walkthrough: [
+        { expression: 'R^\\top = \\begin{bmatrix}\\cos\\theta&\\sin\\theta\\\\-\\sin\\theta&\\cos\\theta\\end{bmatrix}', annotation: 'Transpose: swap rows and columns. The off-diagonal entries swap signs.' },
+        { expression: 'R^\\top R = \\begin{bmatrix}\\cos\\theta&\\sin\\theta\\\\-\\sin\\theta&\\cos\\theta\\end{bmatrix}\\begin{bmatrix}\\cos\\theta&-\\sin\\theta\\\\\\sin\\theta&\\cos\\theta\\end{bmatrix}', annotation: 'Set up the product.' },
+        { expression: '(1,1)\\text{ entry}: \\cos^2\\theta + \\sin^2\\theta = 1', annotation: 'Pythagorean identity.' },
+        { expression: '(1,2)\\text{ entry}: \\cos\\theta(-\\sin\\theta) + \\sin\\theta\\cos\\theta = 0', annotation: 'Off-diagonal: terms cancel.' },
+        { expression: 'R^\\top R = I \\Rightarrow R^{-1} = R^\\top', annotation: 'Orthogonality proved for all $\\theta$ — inverting a rotation costs only a transpose.' },
+      ],
+    },
+    {
+      id: 'ch-la8-004-3',
+      title: 'Compose scale, rotate, translate',
+      difficulty: 'medium',
+      problem: 'Build the single $4\\times4$ matrix $M$ that: (1) scales uniformly by $2$; (2) rotates $90°$ around the $z$-axis; (3) translates by $(3,-1,0)$. Apply $M$ to the origin $(0,0,0,1)^\\top$ and to the point $(1,0,0,1)^\\top$.',
+      walkthrough: [
+        { expression: 'S = \\operatorname{diag}(2,2,2,1)', annotation: 'Scaling matrix: scale factors on diagonal, $w$-entry stays 1.' },
+        { expression: 'R_z = \\begin{bmatrix}0&-1&0&0\\\\1&0&0&0\\\\0&0&1&0\\\\0&0&0&1\\end{bmatrix}', annotation: '$\\cos90°=0$, $\\sin90°=1$ — note the $-\\sin$ in position $(1,2)$.' },
+        { expression: 'T = \\begin{bmatrix}1&0&0&3\\\\0&1&0&-1\\\\0&0&1&0\\\\0&0&0&1\\end{bmatrix}', annotation: 'Translation: $(3,-1,0)$ in the last column.' },
+        { expression: 'M = T \\cdot R_z \\cdot S = \\begin{bmatrix}0&-2&0&3\\\\2&0&0&-1\\\\0&0&2&0\\\\0&0&0&1\\end{bmatrix}', annotation: 'Compose right-to-left: $S$ first, $R_z$ second, $T$ last. Top-left $3\\times3$ is $R_z \\cdot S = 2R_z$.' },
+        { expression: 'M(0,0,0,1)^\\top = (3,-1,0,1)^\\top', annotation: 'The origin maps to the translation offset $(3,-1,0)$ — correct since no rotation/scale changes the zero vector.' },
+        { expression: 'M(1,0,0,1)^\\top = (0+3,\\ 2-1,\\ 0,\\ 1)^\\top = (3,1,0,1)^\\top', annotation: 'Scale $(1,0,0) \\to (2,0,0)$; rotate $\\to (0,2,0)$; translate $\\to (3,1,0)$ ✓' },
+      ],
     },
   ],
 
@@ -505,6 +545,29 @@ p_ndc
       whyThisTechniqueWins: 'To rotate around the center $(c_x, c_y)$: translate center to origin, rotate, translate back, then translate to final position. This is: $T(100,200) \\cdot T(c_x,c_y) \\cdot R(\\theta) \\cdot T(-c_x,-c_y)$. One $3 \\times 3$ matrix (2D homogeneous), applied to all vertices at once.',
     },
   ],
+
+  semantics: {
+    core: [
+      { symbol: '(x,y,z,1)^\\top', meaning: 'Homogeneous representation of a 3D point — the $w=1$ entry makes translation act as a matrix multiplication.' },
+      { symbol: '(x,y,z,0)^\\top', meaning: 'Homogeneous representation of a direction vector — $w=0$ means translation does NOT affect it; only rotation and scaling apply.' },
+      { symbol: 'T(t_x,t_y,t_z)', meaning: '$4\\times4$ translation matrix: identity with $(t_x,t_y,t_z)^\\top$ in the last column, $1$ at $(4,4)$.' },
+      { symbol: 'M_{mvp} = P \\cdot V \\cdot M', meaning: 'MVP pipeline: $M$ = model-to-world, $V$ = world-to-camera (view), $P$ = camera-to-clip (perspective). Applied right-to-left; computed once per draw call.' },
+      { symbol: 'R^\\top R = I,\\quad \\det R = 1', meaning: 'Defining properties of a rotation matrix: orthogonality (inverse = transpose, free) plus orientation-preserving (no reflection).' },
+      { symbol: 'R = e^{[\\hat{\\mathbf{n}}]_\\times \\theta}', meaning: 'Rodrigues exponential map: rotation by angle $\\theta$ about unit axis $\\hat{\\mathbf{n}}$ — connects the Lie algebra (skew-symmetric matrices) to the Lie group SO(3).' },
+    ],
+    rulesOfThumb: [
+      'Matrix transforms compose right-to-left: if you want "scale then rotate then translate," write $M = T \\cdot R \\cdot S$.',
+      'Points get $w=1$; directions get $w=0$ — this is the only difference, but it controls whether translation acts.',
+      '$R^{-1} = R^\\top$ for any rotation matrix — inverting a rotation is free (just transpose).',
+      'Parallel lines in 3D converge to vanishing points on screen because perspective projection is a projective (not affine) transformation.',
+      'To rotate around a point other than the origin: translate the pivot to origin, rotate, translate back — three matrix multiplications.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: ['la7-001', 'la8-003'],
+    futureLinks: ['la9-001', 'la10-001'],
+  },
 
   debugging: [
     {

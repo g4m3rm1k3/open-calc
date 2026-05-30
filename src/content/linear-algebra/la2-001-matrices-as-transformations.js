@@ -823,12 +823,12 @@ v = np.array([4.0, 2.0])
   transferPrompts: [
     {
       situation: 'A video game engine applies 60 rotations per second to every object in the scene. Each object has 100 vertices. How does the engine avoid computing a fresh rotation for each vertex?',
-      competingTechniques: ['Rotate each vertex independently using trigonometry', 'Build the rotation matrix once and multiply'],
+      competingTechniques: 'Rotate each vertex independently using trigonometry vs. build the rotation matrix once and multiply',
       whyThisTechniqueWins: 'Build the rotation matrix $R_\\theta$ once (2 trig calls). Then multiply every vertex position by $R_\\theta$ — pure matrix-vector products, no trig per vertex. At 60 fps with 1000 objects × 100 vertices, this is the difference between 6 million trig calls vs 6 million simple multiplications.',
     },
     {
       situation: 'A neural network applies a learned "weight matrix" $W$ to an input vector of pixel values. How is this a linear transformation, and what does the column interpretation tell you about what $W$ "learns"?',
-      competingTechniques: ['Think of W as a table of weights to be added', 'Think of W as a linear transformation between feature spaces'],
+      competingTechniques: 'Think of W as a table of weights to be added vs. think of W as a linear transformation between feature spaces',
       whyThisTechniqueWins: 'Column $j$ of $W$ tells you: "this is the direction in output space that input feature $j$ contributes to." Reading $W$ geometrically reveals what the layer has learned to detect — rather than just opaque multiplications.',
     },
   ],

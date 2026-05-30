@@ -829,12 +829,12 @@ C = np.array([[2., -1.], [4., 3.]])
   transferPrompts: [
     {
       situation: 'A CNC probe measures the positions of three reference holes on a fixture. The machine needs to compute the coordinate transformation from "fixture frame" to "machine frame." What happens if two of the three holes happen to be at the same X-coordinate?',
-      competingTechniques: ['Proceed with the transformation calculation', 'Check the determinant of the setup matrix first'],
+      competingTechniques: 'Proceed with the transformation calculation vs. check the determinant of the setup matrix first',
       whyThisTechniqueWins: 'If two reference points share an X-coordinate, the setup matrix has proportional columns — $\\det = 0$. The coordinate transformation is undefined. The machine controller should check $\\det$ and refuse to proceed rather than computing a singular or near-singular transformation that would crash the tool.',
     },
     {
       situation: 'In 3D computer graphics, a "view matrix" transforms 3D world coordinates to camera coordinates. A projective "perspective matrix" then collapses 3D to 2D screen coordinates. Why can you invert the view matrix but not the perspective matrix?',
-      competingTechniques: ['Try to invert both matrices', 'Check the determinant of each'],
+      competingTechniques: 'Try to invert both matrices vs. check the determinant of each',
       whyThisTechniqueWins: 'The view matrix is a rigid rotation/translation ($\\det \\neq 0$, invertible — you can reverse the camera placement). The perspective matrix deliberately collapses the $z$-dimension to create depth cues, making $\\det = 0$. You cannot recover 3D depth from a 2D projection — the $z$-information is permanently destroyed.',
     },
   ],

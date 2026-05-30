@@ -744,12 +744,12 @@ for i, M in enumerate([M1, M2, M3], 1):
   transferPrompts: [
     {
       situation: 'A machine learning engineer trains a linear regression model. The normal equations require solving $(X^\\top X)\\mathbf{w} = X^\\top\\mathbf{y}$. She recognizes that $X^\\top X$ has a special structure. What is it and how does it affect the choice of solver?',
-      competingTechniques: ['Use general LU decomposition', 'Use Cholesky decomposition (since $X^\\top X$ is SPD when X has full column rank)'],
+      competingTechniques: 'Use general LU decomposition vs. use Cholesky decomposition (since $X^\\top X$ is SPD when X has full column rank)',
       whyThisTechniqueWins: '$X^\\top X$ is symmetric positive definite (it is a Gram matrix). Cholesky decomposition uses about half the operations of LU ($n^3/6$ vs $n^3/3$) and is numerically stabler. Never use general LU when the matrix is SPD.',
     },
     {
       situation: 'A simulation uses a $1000 \\times 1000$ rotation matrix $R$ at every time step. The code computes $R^{-1}$ via LU decomposition each time. A colleague says "just use the transpose." Who is right and why?',
-      competingTechniques: ['Compute LU and solve for $R^{-1}$ ($O(n^3)$ per step)', 'Transpose $R$ to get $R^{-1}$ ($O(n^2)$ per step)'],
+      competingTechniques: 'Compute LU and solve for $R^{-1}$ ($O(n^3)$ per step) vs. transpose $R$ to get $R^{-1}$ ($O(n^2)$ per step)',
       whyThisTechniqueWins: 'Rotation matrices are orthogonal ($R^\\top R = I$), so $R^{-1} = R^\\top$. Transposing is $O(n^2)$ — just rearranging memory. LU inversion is $O(n^3)$. For $n = 1000$ at every time step, this is a $1000\\times$ speedup per inversion.',
     },
   ],

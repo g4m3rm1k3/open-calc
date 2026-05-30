@@ -27,6 +27,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'procedure',
+        title: 'How to Work in a Hilbert Space (4 Steps)',
+        body: '1. **Identify the inner product.** Write $\\langle \\cdot, \\cdot \\rangle$ explicitly and verify three properties: bilinearity/sesquilinearity, symmetry ($\\langle x,y\\rangle = \\overline{\\langle y,x\\rangle}$), positive-definiteness ($\\langle x,x\\rangle > 0$ for $x \\neq 0$). The induced norm is $\\|x\\| = \\sqrt{\\langle x,x\\rangle}$.\n2. **Build an orthonormal basis (ONB).** Apply Gram-Schmidt to a spanning set $\\{v_1, \\ldots\\}$: subtract projections, normalize. Verify $\\langle e_i, e_j \\rangle = \\delta_{ij}$.\n3. **Compute Fourier coefficients.** For any $\\mathbf{x} \\in H$, the coefficient on $e_k$ is $c_k = \\langle \\mathbf{x}, e_k \\rangle$. The projection onto $\\text{span}\\{e_1,\\ldots,e_N\\}$ is $P_N\\mathbf{x} = \\sum_{k=1}^N c_k\\, e_k$.\n4. **Use Parseval\'s identity.** For a complete ONB: $\\|\\mathbf{x}\\|^2 = \\sum_k |c_k|^2$. For a finite truncation: $\\|\\mathbf{x} - P_N\\mathbf{x}\\|^2 = \\|\\mathbf{x}\\|^2 - \\sum_{k=1}^N |c_k|^2$ (Bessel\'s inequality gives $\\leq$, not $=$, for incomplete sets).',
+      },
+      {
         type: 'sequencing',
         title: 'Lesson 5 of 5 — Advanced Theory',
         body: '**Previous (Lesson 4):** Operator Theory — bounded operators, spectrum, compact operators, spectral theorem.\n**This lesson:** Banach and Hilbert Spaces — completeness, projection theorem, Parseval\'s identity, Riesz representation, $L^2$ space.\n**This is the final lesson of the linear algebra course.**',
@@ -240,6 +245,9 @@ disp(['sum c_k^2 = ', num2str(sum(c.^2))])
   rigor: {
     prose: [
       '**Reproducing kernel Hilbert spaces (RKHS).** An RKHS is a Hilbert space $H$ of functions $f: X \\to \\mathbb{R}$ such that every evaluation functional $\\text{ev}_x: f \\mapsto f(x)$ is bounded. By Riesz: there exists $k_x \\in H$ with $f(x) = \\langle f, k_x\\rangle$. The function $K(x, y) = k_y(x) = \\langle k_x, k_y\\rangle$ is the **reproducing kernel**. The RKHS determines the kernel and vice versa (Mercer\'s theorem). SVMs, Gaussian process regression, and kernel ridge regression are all naturally formulated in RKHS.',
+      '**Weak convergence and compactness.** A sequence $\\mathbf{x}_n \\in H$ converges weakly ($\\mathbf{x}_n \\rightharpoonup \\mathbf{x}$) if $\\langle \\mathbf{x}_n, \\mathbf{y}\\rangle \\to \\langle \\mathbf{x}, \\mathbf{y}\\rangle$ for all $\\mathbf{y} \\in H$. In finite dimensions, weak and strong convergence coincide. In infinite dimensions they differ: the standard ONB $\\{\\mathbf{e}_n\\}$ in $\\ell^2$ converges weakly to 0 (since $\\langle \\mathbf{e}_n, \\mathbf{y}\\rangle = y_n \\to 0$ for any $\\mathbf{y} \\in \\ell^2$) but $\\|\\mathbf{e}_n\\| = 1 \\not\\to 0$ — no strong convergence. The closed unit ball in a Hilbert space is weakly compact (every bounded sequence has a weakly convergent subsequence). This is the key tool in the calculus of variations: a minimizing sequence $\\mathbf{x}_n$ with $\\|\\mathbf{x}_n\\| \\leq C$ has a weakly convergent subsequence, and for weakly lower semicontinuous functionals, the weak limit is the minimizer.',
+      '**Sobolev spaces and elliptic PDE.** The Sobolev space $H^k(\\Omega)$ consists of $L^2(\\Omega)$ functions whose weak derivatives up to order $k$ are also in $L^2(\\Omega)$, with inner product $\\langle u, v\\rangle_{H^k} = \\sum_{|\\alpha|\\leq k} \\int_\\Omega D^\\alpha u \\cdot D^\\alpha v\\,dx$. For the Poisson equation $-\\Delta u = f$: the natural variational (weak) formulation is $\\int \\nabla u \\cdot \\nabla v = \\int fv$ for all $v \\in H_0^1(\\Omega)$. By the Lax-Milgram theorem (Hilbert space generalization of matrix invertibility), if the bilinear form on the left is coercive and bounded, a unique solution exists in $H^1_0$. All elliptic PDE theory rests on this structure: Sobolev spaces are exactly the Hilbert spaces where weak solutions naturally live.',
+      '**Abstract Fourier analysis.** Every separable Hilbert space is unitarily isomorphic to $\\ell^2$ — there is, up to isomorphism, only one separable infinite-dimensional Hilbert space. The content of this result is that any complete ONB serves as a "coordinate system": $L^2[0,2\\pi]$ with trigonometric basis, $L^2(\\mathbb{R})$ with Hermite functions, $L^2(\\mathbb{S}^2)$ with spherical harmonics, $\\ell^2$ with standard basis — all isomorphic as Hilbert spaces. The choice of ONB encodes the geometry of the underlying domain and the symmetries of the problem. The Fourier transform on $L^2(\\mathbb{R})$ is unitary — it preserves the $L^2$ norm (Plancherel theorem) and diagonalizes differentiation ($\\widehat{f\'} = 2\\pi i \\xi \\hat{f}$), making convolution equations into pointwise multiplication equations.',
     ],
     callouts: [
       {
@@ -292,9 +300,77 @@ disp(['sum c_k^2 = ', num2str(sum(c.^2))])
       id: 'ch-la10-005-1',
       title: 'Parallelogram law characterizes Hilbert spaces',
       difficulty: 'hard',
-      prompt: 'Prove that a norm comes from an inner product iff it satisfies the parallelogram law: $\\|\\mathbf{x} + \\mathbf{y}\\|^2 + \\|\\mathbf{x} - \\mathbf{y}\\|^2 = 2\\|\\mathbf{x}\\|^2 + 2\\|\\mathbf{y}\\|^2$.',
-      hint: 'For the forward direction, expand $\\|\\mathbf{x} \\pm \\mathbf{y}\\|^2 = \\langle\\mathbf{x}\\pm\\mathbf{y},\\mathbf{x}\\pm\\mathbf{y}\\rangle$. For the reverse, use the polarization identity to define the inner product.',
-      solution: 'Forward: $\\|\\mathbf{x}+\\mathbf{y}\\|^2 = \\|\\mathbf{x}\\|^2 + 2\\text{Re}\\langle\\mathbf{x},\\mathbf{y}\\rangle + \\|\\mathbf{y}\\|^2$ and $\\|\\mathbf{x}-\\mathbf{y}\\|^2 = \\|\\mathbf{x}\\|^2 - 2\\text{Re}\\langle\\mathbf{x},\\mathbf{y}\\rangle + \\|\\mathbf{y}\\|^2$. Sum: $2\\|\\mathbf{x}\\|^2 + 2\\|\\mathbf{y}\\|^2$. Reverse: define $\\langle\\mathbf{x},\\mathbf{y}\\rangle = \\frac{1}{4}(\\|\\mathbf{x}+\\mathbf{y}\\|^2 - \\|\\mathbf{x}-\\mathbf{y}\\|^2)$ (polarization identity, real case) and verify this is a valid inner product using the parallelogram law.',
+      problem: 'Prove that a Banach space norm $\\|\\cdot\\|$ comes from an inner product if and only if it satisfies the parallelogram law: $\\|\\mathbf{x}+\\mathbf{y}\\|^2 + \\|\\mathbf{x}-\\mathbf{y}\\|^2 = 2\\|\\mathbf{x}\\|^2 + 2\\|\\mathbf{y}\\|^2$.',
+      walkthrough: [
+        {
+          expression: '\\|\\mathbf{x}+\\mathbf{y}\\|^2 = \\langle\\mathbf{x}+\\mathbf{y},\\mathbf{x}+\\mathbf{y}\\rangle = \\|\\mathbf{x}\\|^2 + 2\\langle\\mathbf{x},\\mathbf{y}\\rangle + \\|\\mathbf{y}\\|^2',
+          annotation: 'Forward direction ($\\Rightarrow$): expand $\\|\\mathbf{x}\\pm\\mathbf{y}\\|^2$ using bilinearity and symmetry of the inner product.',
+        },
+        {
+          expression: '\\|\\mathbf{x}+\\mathbf{y}\\|^2 + \\|\\mathbf{x}-\\mathbf{y}\\|^2 = 2\\|\\mathbf{x}\\|^2 + 2\\|\\mathbf{y}\\|^2 \\quad (\\text{cross terms cancel})',
+          annotation: 'Add the two expansions: the $\\pm 2\\langle\\mathbf{x},\\mathbf{y}\\rangle$ terms cancel. This proves the parallelogram law for any inner product norm.',
+        },
+        {
+          expression: '\\langle\\mathbf{x},\\mathbf{y}\\rangle := \\tfrac{1}{4}(\\|\\mathbf{x}+\\mathbf{y}\\|^2 - \\|\\mathbf{x}-\\mathbf{y}\\|^2) \\quad (\\text{polarization identity, real case})',
+          annotation: 'Reverse direction ($\\Leftarrow$): define the proposed inner product via the polarization identity. This formula expresses the inner product in terms of the norm — if the parallelogram law holds, this definition is consistent.',
+        },
+        {
+          expression: '\\langle\\mathbf{x},\\mathbf{x}\\rangle = \\tfrac{1}{4}(\\|2\\mathbf{x}\\|^2 - 0) = \\|\\mathbf{x}\\|^2 \\; \\checkmark, \\quad \\langle\\mathbf{x},\\mathbf{y}\\rangle = \\langle\\mathbf{y},\\mathbf{x}\\rangle \\; \\checkmark',
+          annotation: 'Positive-definiteness follows: $\\langle\\mathbf{x},\\mathbf{x}\\rangle = \\|\\mathbf{x}\\|^2 \\geq 0$, equals 0 iff $\\|\\mathbf{x}\\|=0$ iff $\\mathbf{x}=0$. Symmetry holds by definition. The hard part (bilinearity) requires using the parallelogram law for the additivity $\\langle\\mathbf{x}+\\mathbf{z},\\mathbf{y}\\rangle = \\langle\\mathbf{x},\\mathbf{y}\\rangle + \\langle\\mathbf{z},\\mathbf{y}\\rangle$ — it goes through but requires several applications of the law.',
+        },
+      ],
+    },
+    {
+      id: 'ch-la10-005-2',
+      title: 'Orthogonal projection in L² with explicit Gram-Schmidt',
+      difficulty: 'easy',
+      problem: 'In $L^2[0,1]$, project $f(x)=x^3$ onto $M = \\text{span}\\{1, x\\}$. First build an ONB for $M$, then find the Fourier coefficients and the best approximation.',
+      walkthrough: [
+        {
+          expression: 'e_1 = 1 \\text{ (normalized: } \\|1\\|^2 = \\int_0^1 1\\,dx = 1)',
+          annotation: 'First ONB element: the constant function 1 has $L^2$ norm 1, so it is already normalized.',
+        },
+        {
+          expression: 'x - \\langle x, e_1\\rangle e_1 = x - \\tfrac{1}{2} \\quad (\\langle x, 1\\rangle = \\int_0^1 x\\,dx = 1/2)',
+          annotation: 'Gram-Schmidt: orthogonalize $x$ against $e_1$. Subtract the projection $\\langle x,e_1\\rangle e_1 = \\frac{1}{2}$.',
+        },
+        {
+          expression: 'e_2 = \\frac{x-1/2}{\\|x-1/2\\|} = \\sqrt{12}(x-1/2) \\quad (\\|x-1/2\\|^2 = 1/12)',
+          annotation: 'Normalize: $\\|x-\\frac{1}{2}\\|^2 = \\int_0^1(x-\\frac{1}{2})^2 dx = 1/12$. So $e_2 = \\sqrt{12}(x-\\frac{1}{2})$.',
+        },
+        {
+          expression: 'c_1 = \\langle x^3, 1\\rangle = \\tfrac{1}{4}, \\quad c_2 = \\langle x^3, \\sqrt{12}(x-\\tfrac{1}{2})\\rangle = \\sqrt{12}\\cdot\\tfrac{1}{20} = \\tfrac{\\sqrt{12}}{20}',
+          annotation: 'Fourier coefficients: $c_1 = \\int_0^1 x^3 dx = 1/4$. For $c_2$: $\\int_0^1 x^3\\sqrt{12}(x-\\frac{1}{2})dx = \\sqrt{12}(\\int_0^1 x^4 dx - \\frac{1}{2}\\int_0^1 x^3 dx) = \\sqrt{12}(\\frac{1}{5}-\\frac{1}{8}) = \\sqrt{12}\\cdot\\frac{3}{40}$.',
+        },
+        {
+          expression: 'Pf = c_1 e_1 + c_2 e_2 = \\tfrac{1}{4} + \\tfrac{\\sqrt{12}}{20}\\cdot\\sqrt{12}(x-\\tfrac{1}{2}) = \\tfrac{1}{4} + \\tfrac{12}{20}(x-\\tfrac{1}{2}) = \\tfrac{3}{5}x - \\tfrac{1}{20}',
+          annotation: 'Assemble the projection. Check: for the constant term, $\\frac{1}{4} + \\frac{12}{20}(-\\frac{1}{2}) = \\frac{1}{4} - \\frac{3}{10} = -\\frac{1}{20}$ ✓. The best linear approximation to $x^3$ in $L^2[0,1]$ is $\\frac{3}{5}x - \\frac{1}{20}$.',
+        },
+      ],
+    },
+    {
+      id: 'ch-la10-005-3',
+      title: 'Parseval vs Bessel: truncated Fourier series',
+      difficulty: 'medium',
+      problem: 'In $L^2[0,1]$ with the standard ONB $\\{1, \\sqrt{2}\\cos(2\\pi kx), \\sqrt{2}\\sin(2\\pi kx)\\}_{k\\geq 1}$, explain why $\\sum_{k=0}^{N}|c_k|^2 \\leq \\|f\\|^2$ (Bessel) but $\\sum_{k=0}^{\\infty}|c_k|^2 = \\|f\\|^2$ (Parseval). Show how to use the difference to compute approximation error.',
+      walkthrough: [
+        {
+          expression: 'P_N f = \\sum_{k=0}^N c_k e_k \\in \\text{span}\\{e_0, \\ldots, e_N\\} = M_N',
+          annotation: 'The $N$-term Fourier expansion is the orthogonal projection of $f$ onto the finite-dimensional subspace $M_N$ spanned by the first $N$ basis functions. By the projection theorem, this is the best $N$-term approximation in $L^2$.',
+        },
+        {
+          expression: '\\|f\\|^2 = \\|P_N f\\|^2 + \\|f - P_N f\\|^2 = \\sum_{k=0}^N|c_k|^2 + \\|f-P_Nf\\|^2',
+          annotation: 'Pythagorean theorem in $H$: since $P_Nf \in M_N$ and $f - P_Nf \perp M_N$, the squared norms add. So $\\|f\\|^2 = \\|P_Nf\\|^2 + \\|f-P_Nf\\|^2$.',
+        },
+        {
+          expression: '\\|f-P_Nf\\|^2 \\geq 0 \\Rightarrow \\sum_{k=0}^N|c_k|^2 \\leq \\|f\\|^2 \\quad (\\textbf{Bessel})',
+          annotation: 'Since the error squared is non-negative, the partial sum of squared coefficients cannot exceed the total squared norm. This is Bessel\'s inequality — valid for any orthonormal set, complete or not.',
+        },
+        {
+          expression: '\\text{Parseval (complete ONB)}: \\lim_{N\\to\\infty}\\|f-P_Nf\\|^2 = 0 \\Rightarrow \\|f\\|^2 = \\sum_{k=0}^\\infty |c_k|^2',
+          annotation: 'A complete ONB (one that spans a dense subspace) satisfies: the projection $P_Nf$ converges to $f$ in $L^2$ norm as $N\\to\\infty$. The completeness of the ONB is what upgrades Bessel\'s inequality to Parseval\'s equality. The truncation error is $\\|f-P_Nf\\|^2 = \\|f\\|^2 - \\sum_{k=0}^N |c_k|^2$.',
+        },
+      ],
     },
   ],
 
@@ -443,15 +519,38 @@ disp(['sum c_k^2 = ', num2str(sum(c.^2))])
   transferPrompts: [
     {
       situation: 'In signal processing, you receive a noisy signal $y = f + \\epsilon$ where $f$ is in a known subspace $M$ (e.g., band-limited signals) and $\\epsilon$ is noise. How does the projection theorem tell you to denoise?',
-      competingTechniques: ['Average nearby samples', 'Project $y$ onto $M$: take $\\hat{f} = P_M y$, the best approximation of $y$ in $M$'],
-      whyThisTechniqueWins: 'The projection theorem guarantees $P_M y$ is the UNIQUE nearest point in $M$ to $y$. Since $f \\in M$ and $\\epsilon \\perp M$ (approximately), $P_M y \\approx f$. This is the mathematical basis of Wiener filtering and signal denoising.',
+      competingTechniques: 'Average nearby samples (no structural knowledge used) vs project $y$ onto $M$: take $\\hat{f} = P_M y$, the unique nearest point in $M$ to $y$.',
+      whyThisTechniqueWins: 'The projection theorem guarantees $P_M y$ is the UNIQUE nearest point in $M$ to $y$. Since $f \\in M$ and $\\epsilon \\perp M$ approximately, $P_M y \\approx f$. This is the mathematical basis of Wiener filtering and band-limited denoising.',
     },
     {
-      situation: 'In machine learning, you want to compute $K(x,y) = \\phi(x)^\\top\\phi(y)$ where $\\phi$ maps inputs to a high-dimensional feature space. The feature space is too large to compute explicitly. How does RKHS/Riesz help?',
-      competingTechniques: ['Explicitly compute $\\phi(x)$ and dot product', 'Use the kernel $K(x,y)$ directly via the RKHS reproducing property'],
-      whyThisTechniqueWins: 'By the Riesz representation theorem, every evaluation functional in the RKHS is an inner product: $f(x) = \\langle f, K_x\\rangle_H$. This means you never need to explicitly compute $\\phi(x)$ — just evaluate the kernel $K$. This is the mathematical content of the "kernel trick" in SVMs and Gaussian processes.',
+      situation: 'In machine learning, you want to compute $K(x,y) = \\phi(x)^\\top\\phi(y)$ where $\\phi$ maps inputs to a very high-dimensional feature space. How does the RKHS reproducing property let you skip computing $\\phi$ explicitly?',
+      competingTechniques: 'Explicitly compute and store $\\phi(x)$ for each input then take the dot product vs use the kernel $K(x,y)$ directly via the reproducing property $f(x) = \\langle f, k_x \\rangle_H$.',
+      whyThisTechniqueWins: 'By the Riesz theorem, every evaluation functional in the RKHS is an inner product. This means you only need to evaluate $K(x,y)$ — never the explicit feature map $\\phi$. This is the kernel trick in SVMs and Gaussian processes.',
     },
   ],
+
+  semantics: {
+    core: [
+      { symbol: '(H, \\langle\\cdot,\\cdot\\rangle)', meaning: 'Hilbert space: complete inner product space. Norm $\\|\\mathbf{x}\\|^2 = \\langle\\mathbf{x},\\mathbf{x}\\rangle$. Adds geometry (angles, orthogonality) to the Banach space structure. Examples: $\\mathbb{R}^n$, $\\ell^2$, $L^2(\\Omega)$.' },
+      { symbol: 'P_M \\mathbf{x}', meaning: 'Orthogonal projection: unique nearest point in closed subspace $M$ to $\\mathbf{x}$. Decomposition: $\\mathbf{x} = P_M\\mathbf{x} + \\mathbf{x}^\\perp$ with $\\mathbf{x}^\\perp \\perp M$. Pythagorean: $\\|\\mathbf{x}\\|^2 = \\|P_M\\mathbf{x}\\|^2 + \\|\\mathbf{x}^\\perp\\|^2$.' },
+      { symbol: '\\|\\mathbf{x}\\|^2 = \\sum_n |c_n|^2', meaning: 'Parseval\'s identity: for a complete ONB, squared norm = sum of squared Fourier coefficients. Bessel\'s inequality ($\\leq$) holds for any orthonormal set; equality requires completeness.' },
+      { symbol: 'H^* \\cong H', meaning: 'Riesz representation: every bounded functional $f: H \\to \\mathbb{F}$ equals $\\langle \\cdot, \\mathbf{y}\\rangle$ for unique $\\mathbf{y}$ with $\\|\\mathbf{y}\\| = \\|f\\|$. Hilbert spaces are self-dual.' },
+      { symbol: 'L^2(\\Omega)', meaning: 'Space of square-integrable functions: inner product $\\langle f,g\\rangle = \\int_\\Omega fg$. Canonical infinite-dimensional Hilbert space containing Fourier series, wavefunctions, and PDE solutions.' },
+      { symbol: '\\mathbf{x}_n \\rightharpoonup \\mathbf{x}', meaning: 'Weak convergence: $\\langle\\mathbf{x}_n,\\mathbf{y}\\rangle \\to \\langle\\mathbf{x},\\mathbf{y}\\rangle$ for all $\\mathbf{y}$. Weaker than norm convergence; closed unit ball is weakly compact. Used in calculus of variations to extract convergent subsequences.' },
+    ],
+    rulesOfThumb: [
+      'To project $f$ onto a finite-dimensional subspace with ONB $\\{e_k\\}$: compute inner products $c_k = \\langle f, e_k\\rangle$ and form $Pf = \\sum_k c_k e_k$. Never solve a linear system unless the basis is not orthonormal.',
+      'Truncation error from Parseval: $\\|f - P_N f\\|^2 = \\|f\\|^2 - \\sum_{k=1}^N|c_k|^2$. To bound the error to within $\\varepsilon$, find the $N$ where the tail $\\|f\\|^2 - \\sum_1^N |c_k|^2 < \\varepsilon^2$.',
+      'Only $L^2$ among $L^p$ is a Hilbert space. Check the parallelogram law to verify: $L^1$ and $L^\\infty$ fail it. This explains why sparsity ($L^1$) and robustness ($L^\\infty$) do not have "projection" geometry.',
+      'The Riesz vector has the same norm as the functional: $\\|f\\| = \\|\\mathbf{y}\\|$. This gives a quick way to compute the operator norm of any linear functional on a Hilbert space.',
+      'Projection onto a non-closed subspace may not exist. In $L^2[0,1]$, the subspace of ALL polynomials is not closed (its closure is all of $L^2$ by Stone-Weierstrass). Polynomials of degree $\\leq n$ ARE closed (finite-dimensional).',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: ['la6-001', 'la10-004'],
+    futureLinks: [],
+  },
 
   debugging: [
     {

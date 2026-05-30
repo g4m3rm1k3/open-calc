@@ -438,6 +438,7 @@ A = np.array([[2., 0., 1.],
       'The determinant is formally defined as the unique function $\\mathbb{R}^{n \\times n} \\to \\mathbb{R}$ satisfying three axioms: (1) multilinearity in each row, (2) antisymmetry under row swaps (swapping two rows changes the sign), and (3) $\\det(I_n) = 1$. All seven properties and the cofactor expansion formula are theorems that follow from these three axioms alone.',
       'The **Leibniz formula** gives an explicit closed form:\n\n$\\det(A) = \\sum_{\\sigma \\in S_n} \\text{sgn}(\\sigma) \\prod_{i=1}^{n} a_{i,\\sigma(i)}$\n\nwhere $S_n$ is the set of all $n!$ permutations of $\\{1, \\ldots, n\\}$ and $\\text{sgn}(\\sigma) = +1$ for even permutations, $-1$ for odd. For $n = 3$, $S_3$ has $3! = 6$ permutations — exactly the six terms in Sarrus\'s rule.',
       'Computational complexity: cofactor expansion runs in $O(n!)$ time — for $n = 20$, that is $2.4 \\times 10^{18}$ operations (one calculation per nanosecond would take 76 years). LU decomposition computes the determinant in $O(n^3)$ time: reduce to upper triangular, multiply diagonal entries, apply sign corrections for row swaps. For $n = 20$: 8,000 operations instead of $2.4 \\times 10^{18}$. This is why no practical software uses cofactor expansion for matrices larger than 3×3.',
+      'The determinant connects to geometry via the **exterior algebra**: $\\det(A)$ is the scalar by which $A$ scales the $n$-dimensional unit hypercube. In 2D, $|\\det(A)|$ equals the area of the parallelogram spanned by the two column vectors; in 3D, it equals the volume of the parallelepiped. This geometric view explains why $\\det(AB) = \\det(A)\\det(B)$: composing two transformations compounds their scaling factors. It also clarifies why a zero determinant signals collapse — the image has zero $n$-dimensional volume, meaning the transformation squashes space into a lower-dimensional subspace.',
     ],
     callouts: [
       {
@@ -960,12 +961,12 @@ A = np.array([[2., 0., 1.],
   transferPrompts: [
     {
       situation: 'A structural engineer writes a system of 3 equations for the forces in a truss. She sets up the $3\\times 3$ coefficient matrix and computes its determinant — it comes out to 0. What does this tell her about the truss?',
-      competingTechniques: ['Attempt to solve the system anyway', 'Interpret the zero determinant geometrically'],
+      competingTechniques: 'Attempt to solve the system anyway vs. interpret the zero determinant geometrically',
       whyThisTechniqueWins: 'Determinant 0 means the system is singular — either no solution (the truss is over-constrained with contradictory forces) or infinitely many (under-determined, meaning the truss can deform without any applied forces — a structural failure mode). The determinant gives this diagnosis before any solving.',
     },
     {
       situation: 'In 3D computer graphics, a bounding-box computation needs to check whether three points are collinear (all on one line). You have three 3D points $P_1, P_2, P_3$. How do you test collinearity using a determinant?',
-      competingTechniques: ['Compute parametric line equations and check each point', 'Form a 3×3 matrix with the points as rows and compute the determinant'],
+      competingTechniques: 'Compute parametric line equations and check each point vs. form a 3×3 matrix with the points as rows and compute the determinant',
       whyThisTechniqueWins: 'Form the matrix with rows $[P_1, 1]$, $[P_2, 1]$, $[P_3, 1]$ (homogeneous coordinates). $\\det = 0$ iff the three points are collinear (lie on one line). This is one matrix computation instead of three parametric substitutions, and it generalizes naturally to higher dimensions.',
     },
   ],

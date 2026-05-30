@@ -837,12 +837,12 @@ A = np.array([
   transferPrompts: [
     {
       situation: 'You need to find the null space of a 3×4 matrix A (all x such that Ax=0). Which tool applies?',
-      competingTechniques: ['np.linalg.solve (for Ax=b with specific b)', 'RREF of [A|0]', 'np.linalg.det(A)'],
+      competingTechniques: 'np.linalg.solve (for Ax=b with specific b) vs. RREF of [A|0] vs. np.linalg.det(A)',
       whyThisTechniqueWins: 'Set up [A|0] and compute RREF. Free variable columns directly yield null space basis vectors. np.linalg.solve only handles unique solutions; det only applies to square matrices and gives no vector information.',
     },
     {
       situation: 'Given 5 vectors in ℝ³, determine if they are linearly independent and identify any redundant ones.',
-      competingTechniques: ['RREF of matrix with vectors as columns', 'Compute a 5×5 determinant', 'Visual inspection'],
+      competingTechniques: 'RREF of matrix with vectors as columns vs. compute a 5×5 determinant vs. visual inspection',
       whyThisTechniqueWins: 'Form a 3×5 matrix with the vectors as columns and compute RREF. Pivot columns are independent; non-pivot columns are linear combinations of earlier pivots. Determinants only work on square matrices and give a single number, not which vectors are redundant.',
     },
   ],
