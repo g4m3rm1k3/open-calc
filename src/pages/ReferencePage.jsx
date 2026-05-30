@@ -7,13 +7,13 @@ import ProofModal from '../components/ui/ProofModal.jsx'
 import MathReferenceBackground from '../components/reference/MathReferenceBackground.jsx'
 
 const COLOR_CLASSES = {
-  blue:    { badge: 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300',    tab: 'bg-blue-600 text-white',    tabInactive: 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30' },
-  green:   { badge: 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300',  tab: 'bg-green-600 text-white',   tabInactive: 'text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/30' },
-  purple:  { badge: 'bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300', tab: 'bg-purple-600 text-white', tabInactive: 'text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/30' },
-  cyan:    { badge: 'bg-cyan-100 dark:bg-cyan-900/40 text-cyan-700 dark:text-cyan-300',    tab: 'bg-cyan-600 text-white',    tabInactive: 'text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/30' },
-  orange:  { badge: 'bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300', tab: 'bg-orange-500 text-white', tabInactive: 'text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/30' },
-  emerald: { badge: 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300', tab: 'bg-emerald-600 text-white', tabInactive: 'text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30' },
-  rose:    { badge: 'bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300',    tab: 'bg-rose-600 text-white',    tabInactive: 'text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/30' },
+  blue:    { tab: 'bg-blue-600 text-white',    tabInactive: 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30', cover: 'from-blue-600 via-blue-700 to-indigo-800',    glow: '0 20px 50px -8px rgba(59,130,246,0.45)',    accent: '#60a5fa' },
+  green:   { tab: 'bg-green-600 text-white',   tabInactive: 'text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/30', cover: 'from-green-600 via-green-700 to-emerald-800',  glow: '0 20px 50px -8px rgba(34,197,94,0.45)',     accent: '#4ade80' },
+  purple:  { tab: 'bg-purple-600 text-white',  tabInactive: 'text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/30', cover: 'from-purple-600 via-purple-700 to-violet-900', glow: '0 20px 50px -8px rgba(168,85,247,0.45)',    accent: '#c084fc' },
+  cyan:    { tab: 'bg-cyan-600 text-white',    tabInactive: 'text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/30', cover: 'from-cyan-500 via-sky-600 to-blue-700',        glow: '0 20px 50px -8px rgba(6,182,212,0.45)',     accent: '#22d3ee' },
+  orange:  { tab: 'bg-orange-500 text-white',  tabInactive: 'text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/30', cover: 'from-orange-500 via-orange-600 to-red-700',   glow: '0 20px 50px -8px rgba(249,115,22,0.45)',    accent: '#fb923c' },
+  emerald: { tab: 'bg-emerald-600 text-white', tabInactive: 'text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30', cover: 'from-emerald-500 via-emerald-600 to-teal-800', glow: '0 20px 50px -8px rgba(16,185,129,0.45)',    accent: '#34d399' },
+  rose:    { tab: 'bg-rose-600 text-white',    tabInactive: 'text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/30', cover: 'from-rose-500 via-rose-600 to-pink-800',       glow: '0 20px 50px -8px rgba(244,63,94,0.45)',     accent: '#fb7185' },
 }
 
 function FormulaCard({ entry, onOpenProof }) {
@@ -28,62 +28,77 @@ function FormulaCard({ entry, onOpenProof }) {
     }
   }, [entry.latex])
 
-  // Subtle categorical sheen
-  const sheenClass = {
-    blue:    'from-blue-600/5 to-transparent',
-    green:   'from-green-600/5 to-transparent',
-    purple:  'from-purple-600/5 to-transparent',
-    cyan:    'from-cyan-600/5 to-transparent',
-    orange:  'from-orange-600/5 to-transparent',
-    emerald: 'from-emerald-600/5 to-transparent',
-    rose:    'from-rose-600/5 to-transparent',
-  }[entry.color] || 'from-slate-600/5 to-transparent'
-
   return (
     <button
       onClick={hasProof ? () => onOpenProof(entry) : undefined}
-      className={`relative w-full text-left bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[8px] overflow-hidden transition-all duration-300 group shadow-lg shadow-slate-950/10 ${
-        hasProof
-          ? 'hover:shadow-2xl hover:shadow-brand-500/10 hover:border-amber-400 dark:hover:border-amber-600 hover:-translate-y-1.5 cursor-pointer'
-          : 'hover:shadow-xl cursor-default hover:-translate-y-0.5'
-      }`}
+      onMouseEnter={e => { if (hasProof) e.currentTarget.style.boxShadow = c.glow }}
+      onMouseLeave={e => { e.currentTarget.style.boxShadow = '' }}
+      className={`relative w-full text-left overflow-hidden rounded-2xl group transition-all duration-300
+        shadow-[0_4px_20px_rgba(0,0,0,0.15),0_1px_4px_rgba(0,0,0,0.1)]
+        dark:shadow-[0_4px_24px_rgba(0,0,0,0.5),0_1px_4px_rgba(0,0,0,0.3)]
+        ${hasProof
+          ? 'hover:-translate-y-2 cursor-pointer'
+          : 'hover:-translate-y-0.5 cursor-default'
+        }`}
     >
-      {/* Sheen Accent */}
-      <div className={`absolute inset-0 bg-gradient-to-tr ${sheenClass} opacity-100 pointer-events-none`} />
+      {/* Book cover — colored gradient top section */}
+      <div className={`relative bg-gradient-to-br ${c.cover} px-5 pt-4 pb-5 overflow-hidden`}>
+        {/* Subtle gloss sheen on cover */}
+        <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
+        {/* Embossed grid texture */}
+        <div className="absolute inset-0 opacity-[0.06] pointer-events-none"
+          style={{ backgroundImage: 'repeating-linear-gradient(0deg,transparent,transparent 11px,rgba(255,255,255,0.8) 11px,rgba(255,255,255,0.8) 12px),repeating-linear-gradient(90deg,transparent,transparent 11px,rgba(255,255,255,0.8) 11px,rgba(255,255,255,0.8) 12px)' }} />
 
-      <div className="relative z-10 px-5 pt-5 pb-2 flex items-start justify-between gap-2">
-        <div className="font-bold text-[15px] text-slate-800 dark:text-slate-50 group-hover:text-blue-600 dark:group-hover:text-blue-300 transition-colors leading-tight">
-          {entry.name}
-        </div>
-        <div className="flex items-center gap-1.5 flex-shrink-0">
-          {hasProof && (
-            <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-amber-500 text-white shadow-lg shadow-amber-500/20">
-              Proof
+        <div className="relative flex items-start justify-between gap-2">
+          <div className="font-bold text-[15px] text-white leading-tight drop-shadow">
+            {entry.name}
+          </div>
+          <div className="flex items-center gap-1.5 flex-shrink-0 mt-0.5">
+            {hasProof && (
+              <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-amber-400 text-amber-950 shadow-lg shadow-amber-900/30">
+                Proof
+              </span>
+            )}
+            <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-white/20 text-white backdrop-blur-sm border border-white/10">
+              {entry.categoryLabel}
             </span>
-          )}
-          <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full shadow-sm ${c.badge}`}>
-            {entry.categoryLabel}
-          </span>
+          </div>
         </div>
       </div>
-      <div
-        className="relative z-10 px-5 py-5 overflow-x-auto text-center text-slate-900 dark:text-slate-50 bg-slate-50 dark:bg-slate-900 my-1 mx-3 rounded-[8px] border border-slate-100 dark:border-slate-700 shadow-inner"
-        dangerouslySetInnerHTML={{ __html: html }}
-      />
-      <div className="relative z-10 px-5 pb-4 min-h-[46px] flex flex-col justify-end">
-        {entry.note && (
-          <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium italic line-clamp-2 leading-relaxed">
-            {entry.note}
-          </div>
-        )}
-        {hasProof && (
-          <div className="flex items-center gap-1 text-[11px] text-amber-600 dark:text-amber-400 font-black opacity-0 group-hover:opacity-100 transition-all transform translate-x-[-4px] group-hover:translate-x-0 mt-1">
-            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
-            </svg>
-            EXPLORE PROOF
-          </div>
-        )}
+
+      {/* Page separator — simulates book spine edge */}
+      <div className="h-[3px] w-full bg-gradient-to-r from-black/20 via-black/5 to-black/20 dark:from-black/40 dark:via-black/10 dark:to-black/40" />
+
+      {/* Page body — formula + note */}
+      <div className="bg-[#fdfcf8] dark:bg-[#13131e] px-4 pt-4 pb-4">
+        {/* Typeset formula well */}
+        <div
+          className="overflow-x-auto text-center text-slate-900 dark:text-slate-50 rounded-xl border border-slate-200/70 dark:border-slate-700/50
+            bg-white dark:bg-slate-800/50
+            shadow-[inset_0_1px_3px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_3px_rgba(0,0,0,0.3)]
+            px-4 py-4"
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
+
+        {/* Note + proof CTA */}
+        <div className="mt-3 min-h-[28px] flex flex-col justify-end">
+          {entry.note && (
+            <div className="text-[11px] text-slate-400 dark:text-slate-500 font-medium italic line-clamp-2 leading-relaxed">
+              {entry.note}
+            </div>
+          )}
+          {hasProof && (
+            <div
+              className="flex items-center gap-1 text-[11px] font-black opacity-0 group-hover:opacity-100 transition-all duration-200 translate-x-[-4px] group-hover:translate-x-0 mt-1"
+              style={{ color: c.accent }}
+            >
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
+              </svg>
+              EXPLORE PROOF
+            </div>
+          )}
+        </div>
       </div>
     </button>
   )
