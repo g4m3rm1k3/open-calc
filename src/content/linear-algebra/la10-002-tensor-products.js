@@ -59,7 +59,11 @@ export default {
               id: 1,
 
               cellTitle: 'Kronecker product and rank identity',
-              prose: 'Build Kronecker products, verify that rank(A⊗B) = rank(A)*rank(B), and confirm the block structure by inspection.',
+              prose: [
+                'Build Kronecker products, verify that rank(A⊗B) = rank(A)*rank(B), and confirm the block structure by inspection.',
+                '`np.kron(A, B)` computes the Kronecker product. For 2×2 A and 3×3 B, the result is 6×6. Block structure: `kron(A, B)[i*3:(i+1)*3, j*3:(j+1)*3] == A[i,j]*B`. Verify rank: `np.linalg.matrix_rank(np.kron(A,B)) == np.linalg.matrix_rank(A)*np.linalg.matrix_rank(B)`.',
+                'The eigenvalue property: `np.kron(A,B)` has eigenvalues `lambda_i * mu_j` where lambda_i are eigenvalues of A and mu_j are eigenvalues of B. Verify: `sorted(np.linalg.eigvals(np.kron(A,B)).real)` equals `sorted([la*mu for la in eigvals_A for mu in eigvals_B])`. This is why Kronecker products appear in quantum mechanics (product states) and in 2D finite-element problems.',
+              ],
               code: `import numpy as np
 
 A = np.array([[1, 2], [3, 4]], dtype=float)
@@ -93,7 +97,11 @@ print(f"All products eig(A)*eig(B) (sorted):   {np.sort(np.real(eK_expected)).ro
               id: 2,
 
               cellTitle: 'Vectorization identity and Sylvester equation',
-              prose: 'Verify vec(AXB) = (B^T ⊗ A) vec(X), then use it to solve a Sylvester equation AX + XB = C by converting to a standard linear system.',
+              prose: [
+                'Verify vec(AXB) = (B^T ⊗ A) vec(X), then use it to solve a Sylvester equation AX + XB = C by converting to a standard linear system.',
+                'The vec operator stacks columns: `vec(X) = X.flatten(order="F")` (Fortran order = column-major). Verify: `np.kron(B.T, A) @ X.flatten("F")` should equal `(A @ X @ B).flatten("F")`. The identity vec(AXB) = (B^T ⊗ A) vec(X) transforms the matrix equation AXB=C into the linear system `(B^T⊗A) vec(X) = vec(C)`.',
+                'Sylvester equation AX + XB = C: rewrite as `(I⊗A + B^T⊗I) vec(X) = vec(C)`. Solve: `M = np.kron(np.eye(n), A) + np.kron(B.T, np.eye(m)); x_vec = np.linalg.solve(M, C.flatten("F")); X = x_vec.reshape(C.shape, order="F")`. Verify: `np.allclose(A @ X + X @ B, C)`. Compare to `scipy.linalg.solve_sylvester(A, B, C)` — same answer.',
+              ],
               code: `import numpy as np
 
 # Verify vec identity: vec(AXB) = (B^T ⊗ A) vec(X)
@@ -149,7 +157,11 @@ print(C_s)
             {
               id: 1,
               cellTitle: 'Kronecker product basics',
-              prose: ['Compute the Kronecker product and verify its key properties.'],
+              prose: [
+                'Compute the Kronecker product and verify its key properties.',
+                '`C = kron(A,B)` in MATLAB. Block structure: `C(1:3,1:3) == A(1,1)*B`, `C(1:3,4:6) == A(1,2)*B`, etc. Rank: `rank(kron(A,B)) == rank(A)*rank(B)`. Eigenvalues: `sort(eig(kron(A,B)))` should equal `sort([la*mu for la in eig(A) for mu in eig(B)])`.',
+                'Mixed product property: `kron(A,B)*kron(C,D) == kron(A*C, B*D)`. Verify: `norm(kron(A,B)*kron(C,D) - kron(A*C, B*D))` near zero. This property is why Kronecker products solve 2D PDE discretisations efficiently: the 2D Laplacian is `kron(I,T) + kron(T,I)` where T is the 1D Laplacian.',
+              ],
               code: `% Kronecker product
 A = [1 2; 3 4]
 B = [0 1; 1 0]
@@ -179,7 +191,11 @@ norm(K_inv - K_inv_direct)
             {
               id: 2,
               cellTitle: 'Sylvester equation via vec',
-              prose: ['Solve AX + XB = C using the Kronecker product and vec identity.'],
+              prose: [
+                'Solve AX + XB = C using the Kronecker product and vec identity.',
+                'Vec operator: `vec(X) = X(:)` (stacks columns). The identity `vec(AXB) = kron(B\',A)*vec(X)`. Sylvester equation: `A*X + X*B = C` becomes `(kron(I_n,A) + kron(B\',I_m)) * vec(X) = vec(C)`. Solve: `M = kron(eye(n),A) + kron(B\',eye(m)); x_vec = M\\C(:); X = reshape(x_vec, size(C))`.',
+                'Verify: `norm(A*X + X*B - C)` should be near zero. Also compare to MATLAB\'s `sylvester(A,B,C)` — same answer, but `sylvester` uses the Schur decomposition (O(n³)) rather than solving the n²×n² Kronecker system (O(n⁶)) — much faster. The Kronecker approach is educational and works for small n, but production code uses Schur-based solvers.',
+              ],
               code: `% Solve Sylvester equation AX + XB = C
 % Using: vec(AXI + IXB) = (I⊗A + B^T⊗I) vec(X) = vec(C)
 A = [2 1; 0 3]

@@ -64,7 +64,11 @@ export default {
             {
               id: 1,
               cellTitle: 'PCA step by step on synthetic data',
-              prose: 'Perform PCA on a correlated 2D dataset: center, SVD, find principal components, compute explained variance.',
+              prose: [
+                'Perform PCA on a correlated 2D dataset: center, SVD, find principal components, compute explained variance.',
+                'Step by step: (1) `X_c = X - X.mean(axis=0)` — center the data. (2) `U, s, Vt = np.linalg.svd(X_c, full_matrices=False)` — SVD of centered data. (3) `components = Vt` — principal components (rows). (4) `scores = X_c @ Vt.T` — projected data. (5) `var_explained = s**2 / (s**2).sum()` — variance fractions.',
+                'The scatter plot shows the original data with principal component arrows overlaid. Arrow 1 (PC1) points in the direction of maximum variance; arrow 2 (PC2) is perpendicular. Arrow lengths represent the square root of variance explained. The projection onto PC1 (right subplot) shows the 1D representation that preserves the most information.',
+              ],
               code: `import numpy as np
 
 rng = np.random.default_rng(42)
@@ -98,7 +102,11 @@ print("Cumulative:             PC1 = {:.1f}%  both = 100%".format(
             {
               id: 2,
               cellTitle: 'Project to k=1 component and reconstruct',
-              prose: 'Reduce the 2D data to 1 principal component (the direction of max variance) and reconstruct the approximation.',
+              prose: [
+                'Reduce the 2D data to 1 principal component (the direction of max variance) and reconstruct the approximation.',
+                '`k=1; X_reduced = scores[:, :k]` — 1D representation. `X_reconstructed = X_reduced @ Vt[:k, :] + X.mean(axis=0)` — map back to original space. The reconstruction error is `np.linalg.norm(X - X_reconstructed, "fro")`. For data with strong correlation, this is tiny; for uncorrelated data, it is large.',
+                'The plot shows original points (blue), projected points on the PC1 line (orange), and reconstruction error lines (red). Each data point is projected orthogonally onto PC1 — the red lines ARE the reconstruction error vectors. The Pythagorean identity: `‖X‖²_F = ‖X_reduced‖²_F + ‖X_error‖²_F` — the variance explained by PC1 is `s[0]²/sum(s²)`, and the reconstruction error captures the rest.',
+              ],
               code: `import numpy as np
 
 rng = np.random.default_rng(42)
@@ -130,7 +138,11 @@ print(f"  Match: {abs(s[1] - error_fro) < 1e-10}")
             {
               id: 3,
               cellTitle: 'PCA on iris dataset',
-              prose: 'Apply PCA to the classic 4-feature iris dataset and reduce to 2 principal components.',
+              prose: [
+                'Apply PCA to the classic 4-feature iris dataset and reduce to 2 principal components.',
+                '`from sklearn.datasets import load_iris; iris = load_iris(); X = iris.data; y = iris.target`. Centre: `X_c = X - X.mean(axis=0)`. SVD: `_, s, Vt = np.linalg.svd(X_c)`. Project to 2D: `X_2d = X_c @ Vt[:2].T`. The scree plot shows `s**2 / (s**2).sum()` per component — typically the first 2 components explain >95% of variance in iris.',
+                'The 2D scatter coloured by class (setosa/versicolor/virginica) shows that PCA separates the three species well even though it is unsupervised (knows nothing about the labels). This demonstrates that the principal components capture the biologically meaningful variation. Overlay the loadings (Vt[:2].T) as arrows to show which features drive each PC.',
+              ],
               code: `import numpy as np
 
 # Iris dataset (4 features: sepal length, sepal width, petal length, petal width)
@@ -173,7 +185,11 @@ for cls, label in enumerate(["setosa", "versicolor", "virginica"]):
             {
               id: 1,
               cellTitle: 'PCA step by step',
-              prose: ['Perform PCA on a small 2D dataset and find principal components.'],
+              prose: [
+                'Perform PCA on a small 2D dataset and find principal components.',
+                'Steps: `Xc = X - mean(X); C = (Xc\'*Xc)/size(Xc,1); [V,D] = eig(C)`. Sort: `[d,idx] = sort(diag(D),\'descend\'); V = V(:,idx)`. PC scores: `scores = Xc*V`. Variance fractions: `var_frac = diag(D(idx,idx))/sum(diag(D))`.',
+                'The scatter plot with eigenvectors overlaid confirms: PC1 points along the major axis of the data cloud (max variance direction), PC2 is perpendicular. The eigenvalue ratio `d(1)/sum(d)` tells you what fraction of information you keep with just PC1. For strongly correlated data this is often >90%.',
+              ],
               code: `% Generate 2D data with correlation
 rng(42)
 n = 100
@@ -199,7 +215,11 @@ V
             {
               id: 2,
               cellTitle: 'Low-rank approximation',
-              prose: ['Reconstruct data using only the top-1 principal component.'],
+              prose: [
+                'Reconstruct data using only the top-1 principal component.',
+                '`k=1; scores_k = Xc * V(:,1:k); X_reconstructed = scores_k * V(:,1:k)\' + mean(X)`. Reconstruction error: `norm(X - X_reconstructed, \'fro\')`. This is the Eckart-Young theorem applied to PCA: the rank-k approximation minimises the Frobenius error among all rank-k approximations.',
+                'Plot original data and reconstructed data overlaid. Each reconstructed point lies on the PC1 line — the projection squashes the 2D data onto 1D. The green residual lines show what was lost. The fraction of variance RETAINED is `sum(d(1:k))/sum(d)`. Equivalently, `1 - norm(Xc-Xc*V(:,1:k)*V(:,1:k)\',\'fro\')^2 / norm(Xc,\'fro\')^2`.',
+              ],
               code: `% Use data from above (re-create here)
 rng(42); n = 100
 t = linspace(0, 2*pi, n)';

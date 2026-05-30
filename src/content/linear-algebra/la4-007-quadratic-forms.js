@@ -66,7 +66,11 @@ export default {
             {
               id: 1,
               cellTitle: 'Classify and diagonalize a quadratic form',
-              prose: ['Q(x) = 3x1^2 + 4x1*x2 + 3x2^2 = x^T * A * x. What conic is Q = 1?'],
+              prose: [
+                'Q(x) = 3x1^2 + 4x1*x2 + 3x2^2 = x^T * A * x. What conic is Q = 1?',
+                'Build the symmetric matrix: `A = [3 2; 2 3]` (off-diagonal entries = half the cross term coefficient, so 4/2 = 2). Then `[V, D] = eig(A)` gives the principal axes V and eigenvalues D. In principal coordinates `y = V\'*x` the quadratic form becomes `D(1,1)*y1^2 + D(2,2)*y2^2 = 1` — a standard ellipse or hyperbola.',
+                'The shape is determined by eigenvalue signs: both positive → ellipse (PD), mixed signs → hyperbola (indefinite). The axis lengths are `1/sqrt(lambda_i)` — smaller eigenvalue gives the longer axis. Plot the level set with `contour(X, Y, Q_values, [1])` to confirm.',
+              ],
               code: `% 3x1^2 + 4x1*x2 + 3x2^2: off-diagonal = half of 4 = 2
 A = [3 2; 2 3]
 [Q, D] = eig(A)
@@ -82,7 +86,11 @@ Q
             {
               id: 2,
               cellTitle: 'Positive definiteness via Sylvester criterion',
-              prose: ['Test A and B for positive definiteness using leading principal minors.'],
+              prose: [
+                'Test A and B for positive definiteness using leading principal minors.',
+                'Sylvester\'s criterion: compute minors with `det(A(1:k, 1:k))` for k = 1, 2, ..., n. If all are positive, A is PD. Also try `chol(A)` — it succeeds only for PD matrices (MATLAB returns an error otherwise). The `chol` test is O(n³) but faster in practice than computing all eigenvalues.',
+                'A quick numeric check: `all(eig(A) > 0)`. Compare this to the Sylvester result and the Cholesky result — all three methods agree. Each has a use case: eigenvalues give the full picture, Sylvester avoids all eigenvalue computation, and `chol` is the fastest test in code.',
+              ],
               code: `A = [4 2; 2 3]
 disp('Leading principal minors of A:')
 m1 = A(1,1)
@@ -104,7 +112,11 @@ diag(D)
             {
               id: 3,
               cellTitle: 'Computing the change of variables',
-              prose: ['Find the rotation Q that eliminates cross terms in 3x1^2 + 4x1*x2 + 3x2^2.'],
+              prose: [
+                'Find the rotation Q that eliminates cross terms in 3x1^2 + 4x1*x2 + 3x2^2.',
+                '`[Q, D] = eig(A)` gives the rotation matrix Q (columns are orthonormal eigenvectors). The change of variables is `y = Q\'*x` — rotating coordinates to align with the principal axes. In y-coordinates: `Q(x) = D(1,1)*y1^2 + D(2,2)*y2^2` — no cross term.',
+                'Verify by substituting `x = Q*y` into `x\'*A*x`: `(Q*y)\'*A*(Q*y) = y\'*Q\'*A*Q*y = y\'*D*y`. Since D is diagonal, there are no cross terms. Plot the original quadratic form Q(x)=1 and the diagonalized form D(1,1)*y1^2+D(2,2)*y2^2=1 in the same figure — they are the same ellipse, just with axes aligned to coordinate axes.',
+              ],
               code: `A = [3 2; 2 3]
 [Q, D] = eig(A)
 lambdas = diag(D);
@@ -149,7 +161,11 @@ Q'*Q
             {
               id: 1,
               cellTitle: 'Classify quadratic forms — eigenvalue signs determine the shape',
-              prose: 'The level set $Q(\\mathbf{x}) = 1$ is an ellipse when both eigenvalues are positive (PD), a hyperbola when eigenvalues have mixed signs (indefinite), and degenerate when an eigenvalue is zero (PSD). Principal axes are the eigenvectors — the directions that orient the shape. Plot three cases and compare their eigenvalue signs to the conic type.',
+              prose: [
+                'The level set $Q(\\mathbf{x}) = 1$ is an ellipse when both eigenvalues are positive (PD), a hyperbola when eigenvalues have mixed signs (indefinite), and degenerate when an eigenvalue is zero (PSD). Principal axes are the eigenvectors — the directions that orient the shape. Plot three cases and compare their eigenvalue signs to the conic type.',
+                'To compute Q on a grid: `Q_vals = np.einsum("ij,jk,ik->i", X_flat, A, X_flat)` or equivalently `((X_flat @ A) * X_flat).sum(axis=1)`. Reshape back to the grid shape for `plt.contour`. The `[1]` level gives the conic; `[0.25, 0.5, 1, 2, 4]` levels show the full family.',
+                'For each matrix, compute `vals = np.linalg.eigh(A)[0]`. The classification rule in code: `"PD" if (vals > 0).all() else "ND" if (vals < 0).all() else "indefinite" if (vals > 0).any() and (vals < 0).any() else "PSD"`. Print this alongside the contour plot to connect algebra to geometry.',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -205,7 +221,11 @@ print("Blue contour = Q(x,y) = 1")
             {
               id: 2,
               cellTitle: 'Sylvester\'s criterion — testing positive definiteness without eigenvalues',
-              prose: 'Sylvester\'s criterion: $A$ is positive definite iff all **leading principal minors** are positive. The $k$-th leading principal minor is $\\det(A_{k \\times k})$ — the determinant of the upper-left $k \\times k$ submatrix. This avoids eigenvalue computation. Compare results to the direct eigenvalue test.',
+              prose: [
+                'Sylvester\'s criterion: $A$ is positive definite iff all **leading principal minors** are positive. The $k$-th leading principal minor is $\\det(A_{k \\times k})$ — the determinant of the upper-left $k \\times k$ submatrix. This avoids eigenvalue computation. Compare results to the direct eigenvalue test.',
+                '`minors = [np.linalg.det(A[:k, :k]) for k in range(1, n+1)]` computes all leading minors. `all(m > 0 for m in minors)` is Sylvester\'s test. Cross-check with `all(np.linalg.eigvalsh(A) > 0)` — both should agree. Also try `np.linalg.cholesky(A)` which raises `LinAlgError` for non-PD matrices.',
+                'The bar chart of minor values visualises Sylvester\'s criterion: all bars above zero = PD, first negative bar shows where positive definiteness fails. This is especially useful for large matrices where you want to know HOW CLOSE to positive semidefinite (smallest minor approaching zero) without computing all eigenvalues.',
+              ],
               code: `import numpy as np
 
 # Sylvester's criterion: test positive definiteness without eigenvalues
@@ -240,7 +260,11 @@ for name, A in matrices.items():
             {
               id: 3,
               cellTitle: 'CNC surface finish optimization — Hessian tells you if you found a minimum',
-              prose: 'At a critical point of $f(\\mathbf{x})$ (where $\\nabla f = 0$), the Hessian $H$ is symmetric. If $H$ is positive definite, you have a local minimum. If indefinite, a saddle. Here we model surface roughness $R_a$ as a quadratic function of feed rate $f$ and cutting speed $v$, then check that the Hessian at the nominal point confirms it\'s a minimum.',
+              prose: [
+                'At a critical point of $f(\\mathbf{x})$ (where $\\nabla f = 0$), the Hessian $H$ is symmetric. If $H$ is positive definite, you have a local minimum. If indefinite, a saddle. Here we model surface roughness $R_a$ as a quadratic function of feed rate $f$ and cutting speed $v$, then check that the Hessian at the nominal point confirms it\'s a minimum.',
+                'For a quadratic model `Ra = a*f**2 + b*v**2 + c*f*v + d*f + e*v + const`, the Hessian is constant: `H = np.array([[2*a, c], [c, 2*b]])`. Check PD with `np.linalg.eigvalsh(H) > 0`. The surface is convex everywhere — no local minima can be saddle points.',
+                'The 3D surface plot shows the Ra landscape over (feed, speed) space. The contour lines on the floor are level sets of the quadratic form. The minimum location is `x_min = -np.linalg.solve(H, grad_linear)` where `grad_linear` is the gradient of the linear terms — this is the normal equations from least squares appearing in optimization!',
+              ],
               code: `import numpy as np
 from scipy.optimize import minimize
 

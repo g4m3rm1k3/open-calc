@@ -59,7 +59,11 @@ export default {
               id: 1,
 
               cellTitle: 'Fourier coefficients as inner products',
-              prose: 'Compute Fourier coefficients of f(x)=x² in an orthonormal polynomial basis on [0,1], verify Parseval\'s identity, and compare the projection against the true function.',
+              prose: [
+                'Compute Fourier coefficients of f(x)=x² in an orthonormal polynomial basis on [0,1], verify Parseval\'s identity, and compare the projection against the true function.',
+                '`x = np.linspace(0,1,500)`. Legendre polynomial basis (orthonormal on [0,1]): `from scipy.special import legendre; phi_k = legendre(k)`. Coefficients: `c_k = np.trapz(x**2 * phi_k(2*x-1) * np.sqrt(2*k+1), x)` (change of variable to [-1,1]). Partial sums: `f_approx = sum(c_k * phi_k(2*x-1)*sqrt(2k+1) for k)`.',
+                'Parseval: `sum(c_k**2) ≈ np.trapz((x**2)**2, x) = 1/5`. Verify by computing partial sums of `c_k²` — they should approach 1/5 as more terms are added. Plot the approximation vs true x² for k=1,2,3,5 terms. With 3 Legendre polynomials, x² is represented exactly (since x² is a degree-2 polynomial, in the 3-dimensional span of {1,x,x²}).',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 from numpy.polynomial import legendre
@@ -116,7 +120,11 @@ plt.tight_layout(); plt.show()
               id: 2,
 
               cellTitle: 'Riesz representation: functionals ↔ vectors',
-              prose: 'Verify the Riesz representation theorem in R^n: every bounded linear functional is an inner product with some fixed vector, and that vector has norm equal to the operator norm of the functional.',
+              prose: [
+                'Verify the Riesz representation theorem in R^n: every bounded linear functional is an inner product with some fixed vector, and that vector has norm equal to the operator norm of the functional.',
+                'A linear functional f on R^n is a row vector: `f = np.array([a,b,c,...])`. Riesz representation: the "representing vector" is `v_f = f` (in standard basis). Verify: `f @ x == v_f @ x` for all x. Operator norm: `max(abs(f@x)/norm(x) for random x)` should converge to `norm(f)` — confirming the operator norm equals the norm of the representing vector.',
+                '`f = np.array([2,-1,3])`. Representing vector: `v = np.array([2,-1,3])`. Operator norm: `max over unit sphere = norm(f) = sqrt(4+1+9) = sqrt(14)`. Verify: `np.linalg.norm(f)` equals the maximum of `abs(f@x)` over `x` with `norm(x)=1`. The maximizer is `x = v/norm(v)` — the functional is maximised in the direction of its own representing vector.',
+              ],
               code: `import numpy as np
 
 # In R^n, every linear functional f: R^n -> R has the form f(x) = <x, y>
@@ -162,7 +170,11 @@ print("\\nThis is the Riesz representation theorem: every functional is an inner
             {
               id: 1,
               cellTitle: 'Discrete Parseval\'s identity',
-              prose: ['Verify Parseval\'s identity: sum of squared Fourier coefficients = squared norm.'],
+              prose: [
+                'Verify Parseval\'s identity: sum of squared Fourier coefficients = squared norm.',
+                'In R^n with orthonormal basis Q (columns): `c = Q\'*v` (Fourier coefficients). Parseval: `sum(c.^2) == norm(v)^2`. Verify: `norm(c)^2` vs `norm(v)^2`. Also: `Q*c == v` (reconstruct v from coefficients). This is the finite-dimensional version — it works exactly because Q is orthonormal.',
+                'Test with several vectors and several orthonormal bases (standard, random Gram-Schmidt, eigenvectors of A). Parseval holds for ALL orthonormal bases — the identity `‖v‖² = Σcₖ²` is basis-independent. This is the discrete version of Parseval\'s theorem for Fourier series: the ℓ² norm of the coefficients equals the L² norm of the function.',
+              ],
               code: `% Parseval's identity in R^n (finite-dim Hilbert space)
 % Use an orthonormal basis and compute Fourier coefficients
 n = 6
@@ -192,7 +204,11 @@ norm(x - x_reconstructed)
             {
               id: 2,
               cellTitle: 'L^2 Fourier series projection',
-              prose: ['Approximate a function by its first k Fourier modes (projection in L^2).'],
+              prose: [
+                'Approximate a function by its first k Fourier modes (projection in L^2).',
+                'Discretise [0,1]: `x = linspace(0,1,200); f = x - 0.5` (sawtooth-like). Fourier basis: `phi_k(x) = sqrt(2)*sin(k*pi*x)` (orthonormal on [0,1]). Coefficient: `c_k = trapz(f .* phi_k(x), x)`. Partial sum: `f_k = sum(c_k * phi_k(x) for k=1:K)`.',
+                'Plot `f` and `f_1, f_3, f_5, f_10` overlaid. The approximation improves with more modes. The Gibbs phenomenon: at a discontinuity, the truncated Fourier series overshoots by ~9% regardless of how many terms you take. `norm(f - f_K)` tracks convergence: plot vs K to confirm the convergence rate is O(1/K) for this piecewise-smooth function.',
+              ],
               code: `% Approximate f(x) = x on [0,1] by Fourier series
 % Orthonormal basis: {sqrt(2)*sin(n*pi*x)} for n=1,2,...
 n_points = 200

@@ -291,6 +291,47 @@ print("\\nzeta=0: marginally stable (pure oscillation)")
 print("zeta>0: stable (decays to equilibrium)")
 print("Settling time ~ 2/|Re(lam)| seconds")`,
             },
+            {
+              id: 4,
+              cellTitle: "Application: phase portrait of a linear ODE — stable focus, center, saddle",
+              prose: [
+                "The matrix exponential $e^{At}$ solves $\\dot{\\mathbf{x}} = A\\mathbf{x}$: the solution starting at $\\mathbf{x}_0$ is $\\mathbf{x}(t) = e^{At}\\mathbf{x}_0$. The eigenvalue structure of $A$ determines the qualitative behavior: complex eigenvalues $a \\pm bi$ give a spiral (stable focus if $a<0$, unstable if $a>0$, center if $a=0$); real eigenvalues of mixed sign give a saddle; equal negative eigenvalues give a node.",
+                "Each subplot shows 20 trajectories from random starting points. The eigenvalues printed in the title summarize the dynamics. Stable focus (top-left): all trajectories spiral into the origin — both Re$(\\lambda) < 0$. Center (top-right): trajectories are ellipses — pure imaginary eigenvalues, no decay. Saddle (bottom-left): trajectories hyperbolas — one positive, one negative eigenvalue. Unstable focus (bottom-right): all trajectories spiral outward.",
+                "Reading this phase portrait is a key skill in dynamical systems, control theory, and physics. For a CNC servo, you want a stable focus with the eigenvalues positioned to give fast settling and small overshoot: Re$(\\lambda) \\approx -5$ to $-20$ (time constant 50–200 ms) and Im$(\\lambda)$ small (little oscillation). The `expm` call for each time point computes $e^{At}$ exactly — this is how ODE solvers work under the hood for linear systems.",
+              ],
+              code: `import numpy as np
+import matplotlib.pyplot as plt
+from scipy.linalg import expm
+
+fig, axes = plt.subplots(2, 2, figsize=(10, 9))
+fig.suptitle("Phase portraits: x(t) = e^(At) x0 for different eigenvalue types", fontsize=12)
+
+configs = [
+    (np.array([[-1.,  2.], [-2., -1.]]), "Stable focus  λ = -1 ± 2i"),
+    (np.array([[ 0.,  1.], [-4.,  0.]]), "Center  λ = ±2i"),
+    (np.array([[ 2.,  0.], [ 0., -1.]]), "Saddle  λ = +2, -1"),
+    (np.array([[ 0.5, 1.5], [-1.5, 0.5]]), "Unstable focus  λ = 0.5 ± 1.5i"),
+]
+t_span = np.linspace(0, 4, 200)
+
+np.random.seed(7)
+for ax, (A, title) in zip(axes.ravel(), configs):
+    evals = np.linalg.eigvals(A)
+    for _ in range(20):
+        x0 = np.random.randn(2) * 0.8
+        traj = np.array([expm(A * t) @ x0 for t in t_span])
+        norm = np.linalg.norm(x0)
+        color = plt.cm.coolwarm(np.clip(norm / 1.5, 0, 1))
+        ax.plot(traj[:, 0], traj[:, 1], lw=1, alpha=0.7, color=color)
+        ax.scatter([x0[0]], [x0[1]], s=15, color=color, zorder=5)
+    ax.set_title(title, fontsize=10)
+    ax.set_xlim(-3, 3); ax.set_ylim(-3, 3)
+    ax.set_aspect('equal'); ax.grid(True, alpha=0.25)
+    ax.axhline(0, color='k', lw=0.4); ax.axvline(0, color='k', lw=0.4)
+
+plt.tight_layout()
+plt.show()`,
+            },
           ],
         },
       },

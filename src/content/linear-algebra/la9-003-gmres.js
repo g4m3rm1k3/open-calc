@@ -58,7 +58,11 @@ export default {
             {
               id: 1,
               cellTitle: 'Arnoldi process and GMRES solve',
-              prose: 'Implement the Arnoldi process and use it to solve a non-symmetric system. Verify that the Hessenberg relation AQ = Q_ext * H holds.',
+              prose: [
+                'Implement the Arnoldi process and use it to solve a non-symmetric system. Verify that the Hessenberg relation AQ = Q_ext * H holds.',
+                'Arnoldi: `Q[:,0] = r0/norm(r0)`. For k in range(m): `v = A @ Q[:,k]`; for j in range(k+1): `H[j,k] = Q[:,j]@v; v -= H[j,k]*Q[:,j]`; `H[k+1,k] = norm(v); Q[:,k+1] = v/H[k+1,k]`. After m steps: `A @ Q[:,:m] ≈ Q[:,:m+1] @ H[:m+1,:m]`.',
+                'Verify: `np.allclose(A @ Q_m, Q_ext @ H_m)`. The Hessenberg H is upper triangular with one non-zero subdiagonal — this structure is what makes GMRES efficient. Also check `np.allclose(Q_m.T @ Q_m, np.eye(m))` — the Krylov basis is orthonormal. This orthogonality is why Arnoldi is more numerically stable than building the Krylov basis naively.',
+              ],
               code: `import numpy as np
 from scipy.linalg import solve_triangular
 
@@ -113,7 +117,11 @@ print(f"Direct solve error: {np.linalg.norm(np.linalg.solve(A, b) - x_star):.2e}
             {
               id: 2,
               cellTitle: 'GMRES residual convergence vs CG failure',
-              prose: 'Show that scipy GMRES converges on a non-symmetric system while CG fails. Track residual norm each iteration.',
+              prose: [
+                'Show that scipy GMRES converges on a non-symmetric system while CG fails. Track residual norm each iteration.',
+                'Build non-symmetric A: `A = np.diag(np.ones(n-1), -1)*(-0.5) + np.eye(n)*3 + np.diag(np.ones(n-1), 1)*(-1)` (unsymmetric tridiagonal). `scipy.sparse.linalg.gmres(A, b, callback=...)` tracks residual. Try CG on the same system — it will diverge or give wrong answer because CG requires SPD.',
+                'The residual convergence plot shows GMRES residuals decreasing steadily. The CG residuals oscillate and fail to converge. This demonstrates the fundamental limitation of CG: it exploits symmetry (A-orthogonality of search directions), which breaks for non-symmetric A. GMRES uses Arnoldi (which works for any A) at the cost of storing all previous search directions.',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 from scipy.sparse.linalg import gmres, cg
@@ -168,7 +176,11 @@ plt.legend(); plt.grid(True); plt.tight_layout(); plt.show()
             {
               id: 1,
               cellTitle: 'Arnoldi factorization',
-              prose: ['Build the Arnoldi basis Q and upper Hessenberg matrix H for a small non-symmetric system.'],
+              prose: [
+                'Build the Arnoldi basis Q and upper Hessenberg matrix H for a small non-symmetric system.',
+                'Arnoldi iteration: `Q(:,1)=r0/norm(r0)`. For k=1:m: `v=A*Q(:,k); for j=1:k, H(j,k)=Q(:,j)\'*v; v=v-H(j,k)*Q(:,j); end; H(k+1,k)=norm(v); Q(:,k+1)=v/H(k+1,k)`. After m steps verify: `norm(A*Q(:,1:m) - Q(:,1:m+1)*H(1:m+1,1:m))`.',
+                'Verify orthonormality: `norm(Q(:,1:m)\'*Q(:,1:m) - eye(m))` should be near machine epsilon. The Hessenberg structure of H: `norm(tril(H,-2))` is near zero (only one subdiagonal). GMRES solves the least-squares problem `min‖H*y - beta*e1‖` in the Krylov space, then reconstructs `x = Q*y`. Each step adds one Arnoldi vector and updates the Hessenberg H.',
+              ],
               code: `% Non-symmetric test matrix
 A = [3 1 0;
      1 2 1;
@@ -203,7 +215,11 @@ Q' * Q
             {
               id: 2,
               cellTitle: 'Full GMRES solve',
-              prose: ['Use built-in gmres to solve a non-symmetric system and compare to direct solve.'],
+              prose: [
+                'Use built-in gmres to solve a non-symmetric system and compare to direct solve.',
+                'MATLAB has no built-in gmres — use the MATLAB `gmres(A,b,restart,tol,maxit)` function. `[x_gmres, flag, relres, iter] = gmres(A, b, [], 1e-8, 100)`. Compare to direct: `x_direct = A\\b`. `norm(x_gmres - x_direct)/norm(x_direct)` should be < `tol`.',
+                'The restart parameter (first argument after b) controls memory usage: `gmres(A,b,k,...)` restarts every k iterations, reducing memory from O(k*n) to O(k*n) with a smaller k. Without restart, GMRES stores all Krylov vectors — O(iter*n) memory. Plot residual vs cumulative matvec count for restart=5, 20, and full (no restart). Larger restart → faster convergence but more memory.',
+              ],
               code: `% Non-symmetric convection-diffusion-like matrix
 n = 30
 h = 1/(n+1)

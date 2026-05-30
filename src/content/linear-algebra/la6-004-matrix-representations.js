@@ -66,7 +66,11 @@ export default {
             {
               id: 1,
               cellTitle: 'Matrix of differentiation in standard basis',
-              prose: ['Build D: P3 -> P3 by T(p) = p prime using basis {1, x, x^2, x^3}.'],
+              prose: [
+                'Build D: P3 -> P3 by T(p) = p prime using basis {1, x, x^2, x^3}.',
+                'The matrix-building recipe: apply T to each basis vector, write the output as a coordinate column. `T(1)=0=[0;0;0;0]`, `T(x)=1=[1;0;0;0]`, `T(x^2)=2x=[0;2;0;0]`, `T(x^3)=3x^2=[0;0;3;0]`. Stack as columns: `D = [0 1 0 0; 0 0 2 0; 0 0 0 3; 0 0 0 0]`.',
+                'Verify: `p = [2;-1;3;1]` encodes 2-x+3x^2+x^3. `D*p = [-1;6;3;0]` should encode -1+6x+3x^2 = D(2-x+3x^2+x^3) ✓. The matrix is nilpotent: `D^4 = zeros(4,4)` because differentiating a degree-3 polynomial 4 times always gives zero. This is a property of the map, not just this basis.',
+              ],
               code: `% T(1) = 0  -> [0,0,0,0]
 % T(x) = 1  -> [1,0,0,0]
 % T(x^2) = 2x -> [0,2,0,0]
@@ -88,7 +92,11 @@ dp
             {
               id: 2,
               cellTitle: 'Change of basis: standard to eigenbasis',
-              prose: ['A linear map T on R^2 with matrix A = [3 1; 0 2]. Find its matrix in the eigenbasis.'],
+              prose: [
+                'A linear map T on R^2 with matrix A = [3 1; 0 2]. Find its matrix in the eigenbasis.',
+                '`[P, D] = eig(A)` gives eigenvector matrix P and diagonal D. The matrix in the eigenbasis is `P_inv_A_P = inv(P)*A*P` which equals `D` exactly. The same map T looks diagonal when described in eigencoordinates — this is WHY diagonalization is useful. `norm(inv(P)*A*P - D)` should be near zero.',
+                'Similarity invariants check: `det(A) == det(D)` (both equal 3×2=6), `trace(A) == trace(D)` (both equal 5), `eig(A) == diag(D)` (same eigenvalues). These are properties of the MAP T, not the coordinate system. Changing basis changes the matrix but preserves det, trace, and eigenvalues — these are the "intrinsic" features of a linear transformation.',
+              ],
               code: `A = [3 1; 0 2]
 [P, D] = eig(A)
 disp('Eigenvalues (diagonal of D):')
@@ -131,7 +139,11 @@ norm(A - A_check)
             {
               id: 1,
               cellTitle: 'Build the matrix of differentiation D: P_3 → P_3',
-              prose: 'To build $[D]$ for differentiation in the basis $\\{1, x, x^2, x^3\\}$: compute $D(\\mathbf{b}_j) = \\mathbf{b}_j\'$ for each basis vector, express the result as a coordinate vector, and use it as the $j$-th column. Apply the matrix to verify it correctly differentiates a polynomial.',
+              prose: [
+                'To build $[D]$ for differentiation in the basis $\\{1, x, x^2, x^3\\}$: compute $D(\\mathbf{b}_j) = \\mathbf{b}_j\'$ for each basis vector, express the result as a coordinate vector, and use it as the $j$-th column. Apply the matrix to verify it correctly differentiates a polynomial.',
+                '`D = np.diag([1,2,3], k=1)` is a one-liner — the differentiation matrix has the coefficients 1,2,3 on the superdiagonal because D(x^n) = n*x^(n-1). Apply: `p = np.array([2, -1, 3, 1])` (2-x+3x²+x³). `D @ p` gives `[-1, 6, 3, 0]` encoding -1+6x+3x² ✓.',
+                'The nilpotency check: `np.linalg.matrix_power(D, 4)` should be the zero matrix (every 4th derivative of a cubic polynomial is zero). The eigenvalues of D are all zero — confirm with `np.linalg.eigvals(D)`. A nilpotent matrix always has all-zero eigenvalues, and this matrix IS a Jordan block — connecting back to the Jordan normal form lesson.',
+              ],
               code: `import numpy as np
 
 # Differentiation D: P_3 -> P_3, D(p) = p'
@@ -163,7 +175,11 @@ print("Match:", np.allclose(dp_coords, [-1., 0., 9., 0.]))`,
             {
               id: 2,
               cellTitle: 'Change of basis: P^{-1}AP — same map, different coordinates',
-              prose: 'If $A$ represents map $T$ in the standard basis, then $P^{-1}AP$ represents the same map in the basis formed by the columns of $P$. When $P$ is the eigenvector matrix, $P^{-1}AP = D$ is diagonal — the simplest possible representation. Similarity invariants (det, trace, eigenvalues) are preserved.',
+              prose: [
+                'If $A$ represents map $T$ in the standard basis, then $P^{-1}AP$ represents the same map in the basis formed by the columns of $P$. When $P$ is the eigenvector matrix, $P^{-1}AP = D$ is diagonal — the simplest possible representation. Similarity invariants (det, trace, eigenvalues) are preserved.',
+                '`vals, P = np.linalg.eig(A)`. The diagonal matrix: `D = np.diag(vals)`. Verify: `np.allclose(np.linalg.inv(P) @ A @ P, D)` should be True. This is the diagonalization identity. `np.linalg.det(A)` should equal `np.linalg.det(D)` (product of eigenvalues), and `np.trace(A)` should equal `np.trace(D)` (sum of eigenvalues).',
+                'The power of similar matrices: if you need A^100, compute `P @ np.diag(vals**100) @ np.linalg.inv(P)` instead of multiplying A by itself 100 times. This is O(n²) after eigendecomposition vs O(n³ * 100) for repeated multiplication. Plot both computations for n=5 and several power values to see the speedup — this is why diagonalization matters in practice.',
+              ],
               code: `import numpy as np
 
 A = np.array([[3., 1.],

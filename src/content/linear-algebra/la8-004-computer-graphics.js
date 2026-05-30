@@ -64,7 +64,11 @@ export default {
             {
               id: 1,
               cellTitle: 'Build 4x4 transformation matrices',
-              prose: 'Construct translation, rotation, and scaling matrices in homogeneous coordinates.',
+              prose: [
+                'Construct translation, rotation, and scaling matrices in homogeneous coordinates.',
+                'Translation: `T = np.eye(4); T[:3,3] = [tx,ty,tz]`. Rotation around Z: `theta = np.pi/4; Rz = np.eye(4); Rz[0,0]=Rz[1,1]=np.cos(theta); Rz[0,1]=-np.sin(theta); Rz[1,0]=np.sin(theta)`. Scale: `S = np.diag([sx,sy,sz,1])`. Apply: `M = T @ Rz @ S; point = np.array([1,0,0,1]); result = M @ point`.',
+                'The homogeneous coordinate trick: points are `[x,y,z,1]`, vectors are `[x,y,z,0]`. Translation works on points (the 4th component 1 picks up the translation column) but NOT on vectors (4th component 0 cancels it). This is exactly what you want — translating a direction makes no sense geometrically. Test: `M @ np.array([1,0,0,0])` should not include the translation.',
+              ],
               code: `import numpy as np
 
 def translation(tx, ty, tz):
@@ -95,7 +99,11 @@ print("\\nTransformed point (1,0,0):", np.round(p_transformed[:3], 4))
             {
               id: 2,
               cellTitle: 'Order matters: commutativity test',
-              prose: 'Verify that matrix multiplication is NOT commutative for transformations.',
+              prose: [
+                'Verify that matrix multiplication is NOT commutative for transformations.',
+                '`M1 = T @ R` (translate then rotate) vs `M2 = R @ T` (rotate then translate). `np.allclose(M1, M2)` will return False. Apply both to a triangle: `tri = np.array([[0,1,0],[0,0,1],[0,0,0],[1,1,1]])`. Plot `(M1 @ tri)[:2]` and `(M2 @ tri)[:2]` to see the different results.',
+                'The geometric intuition: "rotate about the origin, then move" is different from "move, then rotate about the original origin." The order encodes the reference point of the rotation. In game engines, the transform stack is always read right-to-left: `M = T @ R @ S` means "first scale, then rotate, then translate." Reversing gives a completely different object position.',
+              ],
               code: `import numpy as np
 
 def rotation_z(theta):
@@ -128,7 +136,11 @@ print("Order matters! (T @ R) != (R @ T)")
             {
               id: 3,
               cellTitle: 'Simple perspective projection',
-              prose: 'Apply a perspective projection matrix to see how 3D points become 2D screen coordinates.',
+              prose: [
+                'Apply a perspective projection matrix to see how 3D points become 2D screen coordinates.',
+                'Perspective matrix for near=n, far=f, fov=90°: `P = np.array([[1,0,0,0],[0,1,0,0],[0,0,-(f+n)/(f-n),-2*f*n/(f-n)],[0,0,-1,0]])`. Apply to homogeneous point: `q = P @ [x,y,z,1]`. Divide by w (perspective divide): `screen = q[:2]/q[3]`. The z coordinate controls the division — distant objects (large z) divide more → appear smaller.',
+                'Project a 3D cube onto 2D. Plot all 8 projected vertices and connect the edges. As the cube moves further from the camera (increase z), observe the projected size shrinking. The perspective divide `x_screen = x/z` and `y_screen = y/z` is the fundamental operation: it is a projective transformation, not a linear one (but it IS a linear map in homogeneous coordinates).',
+              ],
               code: `import numpy as np
 
 def perspective(fov_y, aspect, near, far):
@@ -175,7 +187,11 @@ print("Objects at z=-2 appear larger than z=-5 (perspective effect)")
             {
               id: 1,
               cellTitle: 'Building transformation matrices',
-              prose: ['Construct translation, rotation, and scaling matrices in homogeneous coordinates.'],
+              prose: [
+                'Construct translation, rotation, and scaling matrices in homogeneous coordinates.',
+                'Translation: `T = eye(4); T(1:3,4) = [tx;ty;tz]`. Rotation about Z: `theta=pi/4; Rz=eye(4); Rz(1,1)=cos(theta); Rz(1,2)=-sin(theta); Rz(2,1)=sin(theta); Rz(2,2)=cos(theta)`. Scale: `S=diag([sx sy sz 1])`. Compose: `M = T * Rz * S`.',
+                'Apply to a 3D point `p=[1;0;0;1]` (homogeneous): `result = M*p`. The 4th component stays 1 (point, not vector). A direction vector `v=[1;0;0;0]` is unaffected by translation: `T*v = v`. This is the geometric reason homogeneous coordinates exist: they unify linear (rotation, scale) and affine (translation) transformations into a single matrix multiplication.',
+              ],
               code: `% Translation matrix T(tx,ty,tz)
 tx = 3; ty = 1; tz = -2
 T = eye(4)
@@ -206,7 +222,11 @@ M
             {
               id: 2,
               cellTitle: 'Transform a triangle',
-              prose: ['Apply the composed transform to vertices of a triangle in 3D.'],
+              prose: [
+                'Apply the composed transform to vertices of a triangle in 3D.',
+                '`verts = [0 1 0.5; 0 0 1; 0 0 0; 1 1 1]` (columns = homogeneous vertices). Apply: `result = M * verts`. Extract 3D coords: `result(1:3,:) ./ result(4,:)`. For affine transforms (w stays 1 throughout), the division does nothing. For perspective, it performs the projection.',
+                'Plot original triangle (blue) and transformed triangle (red) side by side. Compose several transforms: `M_total = T2 * R * S * T1` and observe the combined effect. The order matters: `T2 * R * S * T1` means "first T1, then S, then R, then T2" — read right-to-left.',
+              ],
               code: `% Triangle vertices in homogeneous coords (columns = points)
 V = [1  2  1.5;  % x
      0  0  1.5;  % y
@@ -238,7 +258,11 @@ disp('Distance between v1 and v2 before/after rotation:')
             {
               id: 3,
               cellTitle: 'Perspective projection',
-              prose: ['Build a perspective projection matrix and project 3D points.'],
+              prose: [
+                'Build a perspective projection matrix and project 3D points.',
+                'Near/far clip planes n=1, f=10. `P = [1 0 0 0; 0 1 0 0; 0 0 -(f+n)/(f-n) -2*f*n/(f-n); 0 0 -1 0]`. Apply: `q = P * [x;y;z;1]`. Perspective divide: `screen = q(1:2)/q(4)`. Note q(4) = -z (for camera looking in -z direction), so `screen = [x/-z; y/-z]`.',
+                'Project a 3D cube: `cube_verts` with z values from 2 to 8. Closer vertices appear larger (projected coords are larger). Plot the projected 2D positions and draw edges. Vary the z distance of the whole cube and observe the size change — this is perspective scaling, the mathematical foundation of all 3D graphics rendering.',
+              ],
               code: `% Perspective projection matrix
 % fov=60 deg, aspect=16/9, near=0.1, far=100
 fov = pi/3; aspect = 16/9; near = 0.1; far = 100

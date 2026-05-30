@@ -64,7 +64,11 @@ export default {
             {
               id: 1,
               cellTitle: 'Compute and verify the Schur decomposition',
-              prose: 'Factor A = Q T Q.T using scipy, verify T is upper triangular with eigenvalues on the diagonal.',
+              prose: [
+                'Factor A = Q T Q.T using scipy, verify T is upper triangular with eigenvalues on the diagonal.',
+                '`T, Q = scipy.linalg.schur(A)`. Verify: `np.allclose(Q @ T @ Q.T, A)` (reconstruction), `np.allclose(Q.T @ Q, np.eye(n))` (Q is orthogonal), `np.allclose(T, np.triu(T))` (T is upper triangular). The eigenvalues of A are `np.diag(T)` for a real matrix with real eigenvalues, or 2×2 blocks on the diagonal for complex conjugate pairs.',
+                'For matrices with complex eigenvalues, `scipy.linalg.schur(A)` returns the real Schur form (2×2 blocks for complex pairs) unless you pass `output="complex"` for the complex Schur form. Print `np.diag(T)` and compare to `np.linalg.eigvals(A)` — they should be the same set of values. The Schur decomposition exists for every square matrix, unlike diagonalization.',
+              ],
               code: `import numpy as np
 from scipy.linalg import schur
 
@@ -88,7 +92,11 @@ print("Q orthogonal? ||Q.T Q - I||:", np.linalg.norm(Q.T @ Q - np.eye(3)))
             {
               id: 2,
               cellTitle: 'Symmetric matrix: Schur = spectral theorem',
-              prose: 'For a symmetric matrix, the Schur form T is diagonal. Verify that the eigenvectors (columns of Q) are orthonormal.',
+              prose: [
+                'For a symmetric matrix, the Schur form T is diagonal. Verify that the eigenvectors (columns of Q) are orthonormal.',
+                'For symmetric A: `T, Q = scipy.linalg.schur(A)`. `np.allclose(T, np.diag(np.diag(T)))` should be True — T is diagonal. This IS the spectral theorem: every symmetric matrix has a Schur decomposition where T is diagonal. The columns of Q are the orthonormal eigenvectors.',
+                'Compare to `np.linalg.eigh(A)` which computes the same thing directly. `T_diag = np.diag(T)` should equal `np.sort(np.linalg.eigh(A)[0])` (same eigenvalues, possibly in different order). The Schur decomposition is the more general concept — diagonalizability of symmetric matrices is a special case.',
+              ],
               code: `import numpy as np
 from scipy.linalg import schur
 
@@ -111,7 +119,11 @@ print("Expected (trace=6, det=8): eigenvalues are 2 and 4")
             {
               id: 3,
               cellTitle: 'Basic QR iteration converges to Schur form',
-              prose: 'Run the basic QR algorithm on a matrix and watch it converge to upper triangular form (the Schur form).',
+              prose: [
+                'Run the basic QR algorithm on a matrix and watch it converge to upper triangular form (the Schur form).',
+                'The basic QR iteration: start with A₀=A; at each step, factor Aₖ=QₖRₖ, set Aₖ₊₁=RₖQₖ. `A_iter = A.copy(); for _ in range(50): Q, R = np.linalg.qr(A_iter); A_iter = R @ Q`. After convergence, `A_iter` is upper triangular (the Schur form), and the diagonal entries are the eigenvalues.',
+                'Track convergence: at each iteration, record `np.linalg.norm(np.tril(A_iter, -1))` (norm of the sub-diagonal part). Plot this vs iteration on a semilogy plot — it should converge to zero. The rate of convergence is `|λ_{k+1}/λₖ|` (ratio of consecutive eigenvalues). This is the basic algorithm; LAPACK uses shifts and deflation to make it O(n²) per step.',
+              ],
               code: `import numpy as np
 
 A = np.array([[4.0, 3.0, 2.0],
@@ -146,7 +158,11 @@ print("True eigenvalues:", np.round(np.sort(np.linalg.eigvals(A)).real, 4))
             {
               id: 1,
               cellTitle: 'Computing the Schur decomposition',
-              prose: ['Compute the Schur form and verify the decomposition properties.'],
+              prose: [
+                'Compute the Schur form and verify the decomposition properties.',
+                '`[Q, T] = schur(A)` in MATLAB returns unitary Q and quasi-upper-triangular T (real Schur form: 1×1 blocks for real eigenvalues, 2×2 blocks for complex conjugate pairs). Verify: `norm(Q*T*Q\' - A)` (reconstruction), `norm(Q\'*Q - eye(n))` (orthogonality), `norm(tril(T,-1))` (lower part should be ~0 except for 2×2 blocks).',
+                'Get complex Schur form: `[Q_c, T_c] = schur(A, \'complex\')`. Now T_c is exactly upper triangular and `diag(T_c)` gives the eigenvalues directly. Compare `diag(T_c)` to `eig(A)` — same values. The real Schur form is preferred for numerical computation because it avoids complex arithmetic when A is real.',
+              ],
               code: `% Schur decomposition: A = Q T Q*
 A = [4 1 2; 0 3 1; 0 0 2]  % upper triangular (Schur = itself)
 disp('Matrix A:')
@@ -177,7 +193,11 @@ TB
             {
               id: 2,
               cellTitle: 'QR iteration converges to Schur form',
-              prose: ['Run the basic QR iteration and observe convergence to upper triangular form.'],
+              prose: [
+                'Run the basic QR iteration and observe convergence to upper triangular form.',
+                'Basic QR iteration in MATLAB: `A_k = A; for k = 1:50, [Q,R] = qr(A_k); A_k = R*Q; end`. After convergence, `A_k` should be quasi-upper-triangular and `diag(A_k)` should approximate the eigenvalues of A.',
+                'Track convergence: `sub_norm(k) = norm(tril(A_k,-1),\'fro\')` at each step. `semilogy(sub_norm)` shows the convergence rate. Compare to `eig(A)` — the diagonal of A_k approaches the eigenvalues. The rate is `|lambda_2/lambda_1|` — slow if eigenvalues are close in magnitude. This is why production algorithms use Wilkinson shifts to accelerate convergence.',
+              ],
               code: `% QR algorithm: basic version (unshifted)
 A = [3 1 0; 1 2 1; 0 1 1]  % symmetric, eigenvalues should be real
 

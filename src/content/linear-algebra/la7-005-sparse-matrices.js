@@ -69,7 +69,11 @@ export default {
             {
               id: 1,
               cellTitle: 'Build a sparse tridiagonal matrix',
-              prose: 'Create the 1D Laplacian (tridiagonal: 2 on diagonal, -1 off-diagonal) as both dense and CSR sparse. Compare memory usage.',
+              prose: [
+                'Create the 1D Laplacian (tridiagonal: 2 on diagonal, -1 off-diagonal) as both dense and CSR sparse. Compare memory usage.',
+                '`from scipy.sparse import diags`. `L = diags([-1,2,-1], [-1,0,1], shape=(n,n), format="csr")`. Dense version: `L_dense = L.toarray()`. Memory: `L.data.nbytes + L.indices.nbytes + L.indptr.nbytes` (sparse) vs `L_dense.nbytes` (dense). For n=10000, sparse uses ~3*n*8 bytes ≈ 240 KB; dense uses n²*8 bytes ≈ 800 MB.',
+                'The CSR (Compressed Sparse Row) format stores three arrays: `data` (non-zero values), `indices` (column positions), `indptr` (row start pointers). `L.nnz` gives the number of non-zeros — for a tridiagonal n×n matrix, nnz = 3n-2. The density is `(3n-2)/n² ≈ 3/n` — approaches 0 as n grows. Sparsity matters when density < ~10%.',
+              ],
               code: `import numpy as np
 import scipy.sparse as sp
 
@@ -95,7 +99,11 @@ print(f"Non-zeros: {A_sparse.nnz} out of {n*n}")
             {
               id: 2,
               cellTitle: 'Sparse vs dense matrix-vector product timing',
-              prose: 'Compare the time to compute A @ x for sparse vs dense. For n = 10000, the difference should be dramatic.',
+              prose: [
+                'Compare the time to compute A @ x for sparse vs dense. For n = 10000, the difference should be dramatic.',
+                '`import time; x = np.random.randn(n)`. Sparse: `t0=time.time(); L @ x; print(time.time()-t0)`. Dense: `t0=time.time(); L_dense @ x; print(time.time()-t0)`. For n=10000, sparse should be 100-1000× faster. The complexity: sparse matvec is O(nnz) ≈ O(3n); dense matvec is O(n²).',
+                'Plot time vs n on a loglog plot for both methods. The slopes tell you the complexity: dense should slope at 2 (O(n²)), sparse at 1 (O(n)). The crossover point where sparse beats dense is around n=30-50 for a tridiagonal matrix. For memory bandwidth reasons, the actual crossover is higher in practice — but the asymptotic advantage is clear from the plot.',
+              ],
               code: `import numpy as np
 import scipy.sparse as sp
 import time
@@ -125,7 +133,11 @@ print(f"Max error: {np.max(np.abs(y_sp - y_dn)):.2e}")
             {
               id: 3,
               cellTitle: 'Observe fill-in during sparse LU',
-              prose: 'Factor a sparse matrix with scipy and measure how much fill-in is generated. Compare orderings.',
+              prose: [
+                'Factor a sparse matrix with scipy and measure how much fill-in is generated. Compare orderings.',
+                '`from scipy.sparse.linalg import splu`. `lu = splu(L)`. `fill = lu.L.nnz + lu.U.nnz - L.nnz`. For the 1D Laplacian (tridiagonal), splu produces no fill-in. For the 2D Laplacian (5-point stencil), the natural ordering creates significant fill; the AMD (Approximate Minimum Degree) reordering minimizes it.',
+                'Visualise the sparsity pattern: `plt.spy(L)` shows the original pattern; `plt.spy(lu.L + lu.U)` shows the factorisation pattern. AMD reordering: `perm = splu(L, permc_spec="MMD_AT_PLUS_A").perm_c`. Apply: `L_perm = L[perm, :][:, perm]`; compare `splu(L_perm).L.nnz` to `splu(L).L.nnz`. Good orderings can reduce fill-in by 10-100× for 2D problems.',
+              ],
               code: `import numpy as np
 import scipy.sparse as sp
 from scipy.sparse.linalg import splu
@@ -162,7 +174,11 @@ print("For 3D mesh: use iterative solvers instead")
             {
               id: 1,
               cellTitle: 'Build and inspect a sparse matrix',
-              prose: ['Create the tridiagonal stiffness matrix for a 1D finite-difference problem.'],
+              prose: [
+                'Create the tridiagonal stiffness matrix for a 1D finite-difference problem.',
+                '`n = 10; A = sparse(n, n); for i = 1:n, A(i,i)=2; if i>1, A(i,i-1)=-1; end; if i<n, A(i,i+1)=-1; end; end`. Or more efficiently: `A = spdiags([-ones(n,1), 2*ones(n,1), -ones(n,1)], [-1,0,1], n, n)`. `spy(A)` shows the tridiagonal pattern.',
+                '`whos A` shows type as sparse. `nnz(A)` gives 3n-2 non-zeros. Memory comparison: `nnz(A)*8` bytes (sparse) vs `n^2*8` bytes (dense). `A_dense = full(A); whos A A_dense` side-by-side shows the difference. For n=1000: sparse ~24 KB, dense ~8 MB — 300× larger for this simple case.',
+              ],
               code: `% 1D Laplacian (tridiagonal): -1, 2, -1
 n = 10
 e = ones(n, 1)
@@ -185,7 +201,11 @@ disp('Sparse storage (approx bytes, 3*nnz*8):')
             {
               id: 2,
               cellTitle: 'Sparse solve and fill-in',
-              prose: ['Compare fill-in with natural ordering vs permuted ordering.'],
+              prose: [
+                'Compare fill-in with natural ordering vs permuted ordering.',
+                'For the 2D Laplacian on an n×n grid (n²×n² matrix, 5n²-4n non-zeros): `[L_factor,U_factor,P,Q] = lu(A_2d)`. `nnz(L_factor+U_factor)` — fill-in count. With natural ordering, this is much larger than `nnz(A_2d)`. Apply reverse Cuthill-McKee ordering: `p = symrcm(A_2d); A_perm = A_2d(p,p); [L2,U2,~,~] = lu(A_perm); nnz(L2+U2)`.',
+                'The `spy` plots compare the factor sparsity patterns side-by-side. Natural ordering creates dense "staircase" blocks in L and U. The permuted ordering preserves a near-banded structure with far less fill. The total work for the factorisation is proportional to `sum(col_nonzeros^2)` — the permuted version does far less work, which translates directly to faster solves for large finite-element problems.',
+              ],
               code: `% 2D Laplacian (5-point stencil) for n x n grid
 n = 8
 N = n * n    % total unknowns

@@ -115,6 +115,7 @@ export default {
               prose: [
                 'For A*x = b with more rows than columns (overdetermined), `x = A \\ b` gives the least squares solution automatically.',
                 'Manually: solve (A\'*A)*x_hat = A\'*b. Verify by checking A\'*(b - A*x_hat) ≈ 0 (residual perpendicular to col(A)).',
+                'Internally, MATLAB uses QR decomposition (not the normal equations) — QR is numerically stable even when A is ill-conditioned because it avoids squaring the condition number.',
               ],
               code: `A = [1 1; 1 2; 1 3];
 b = [1; 2; 2];
@@ -140,6 +141,7 @@ fprintf('A''*e (should be 0): [%.2e; %.2e]\\n', A'*e)`,
               prose: [
                 'Fitting y = ax + b to data: build A = [x, 1] and solve A \\ y.',
                 'The residual norm –e– measures fit quality. Smaller = better fit.',
+                'The design matrix A = [x, 1] structure follows directly from the model: each row encodes the coefficients for one equation y_i = a*x_i + b*1. Adding a column of ones is how you include a constant (intercept) term in any linear model.',
               ],
               code: `% Study hours vs exam score
 x_data = [2; 4; 5; 7; 9; 10; 12];
@@ -163,6 +165,7 @@ fprintf('R^2: %.6f\\n', 1 - var(residuals)/var(y_data))`,
               prose: [
                 'A touch probe measures surface points (x_i, y_i, z_i). Fit z = ax + by + c using least squares with A = [x, y, 1].',
                 'The residuals represent surface deviation from a perfect plane (waviness, tilt, etc.).',
+                'This is an overdetermined system because there are more probe measurements than unknowns (a, b, c). Least squares is essential here — no exact solution exists unless the surface is perfectly flat, so we minimise total squared deviation instead.',
               ],
               code: `% CNC probe measurements of workpiece surface (x, y, z in mm)
 probe_pts = [
@@ -214,7 +217,11 @@ fprintf('RMS surface deviation: %.6f mm\\n', rms(residuals))`,
             {
               id: 1,
               cellTitle: 'Solving an overdetermined system',
-              prose: 'An overdetermined system (more equations than unknowns) usually has no exact solution. Least squares finds the x̂ that minimizes ‖b − Ax‖². `np.linalg.lstsq(A, b, rcond=None)` solves this directly. Compare to directly applying the normal equations.',
+              prose: [
+                'An overdetermined system (more equations than unknowns) usually has no exact solution. Least squares finds the x̂ that minimizes ‖b − Ax‖². `np.linalg.lstsq(A, b, rcond=None)` solves this directly. Compare to directly applying the normal equations.',
+                'The left plot shows the data points and the fitted line; the green vertical segments are the residuals — the distances between each measured y and the predicted ŷ. Minimising the sum of squared residual lengths is exactly what `lstsq` does.',
+                '`lstsq` uses QR decomposition internally, which is more stable than forming the normal equations A.T @ A explicitly (that squaring operation doubles the condition number). Always prefer `lstsq` over `np.linalg.solve(A.T @ A, A.T @ b)`.',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -245,7 +252,11 @@ plt.show()`,
             {
               id: 2,
               cellTitle: 'Linear regression as least squares',
-              prose: 'Fitting the line y = ax + c to data points is a least squares problem. Build the matrix A with a column of x-values and a column of ones. Solve for [a, c].',
+              prose: [
+                'Fitting the line y = ax + c to data points is a least squares problem. Build the matrix A with a column of x-values and a column of ones. Solve for [a, c].',
+                '`np.column_stack([x, np.ones_like(x)])` builds the design matrix: each row [x_i, 1] encodes one equation y_i = a*x_i + c*1. The ones column is how you add a constant term to any linear model — the same trick works for polynomials by adding x², x³ columns.',
+                'The residual plot (right) should look randomly scattered around zero if the linear model is a good fit. A curved pattern in the residuals is a signal that the model needs more terms (e.g., a quadratic column).',
+              ],
               code: `import numpy as np
 from opencalc import Figure, BLUE, AMBER
 

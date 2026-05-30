@@ -69,7 +69,11 @@ export default {
             {
               id: 1,
               cellTitle: 'Compare norms and condition numbers',
-              prose: 'Compute 1-norm, 2-norm, inf-norm, Frobenius norm, and condition number for well- and ill-conditioned matrices.',
+              prose: [
+                'Compute 1-norm, 2-norm, inf-norm, Frobenius norm, and condition number for well- and ill-conditioned matrices.',
+                '`np.linalg.norm(A, 1)` — max column sum. `np.linalg.norm(A, 2)` — largest singular value (= σ₁). `np.linalg.norm(A, np.inf)` — max row sum. `np.linalg.norm(A, "fro")` — square root of sum of squared entries. `np.linalg.cond(A)` — ratio σ₁/σₙ.',
+                'For the Hilbert matrix `scipy.linalg.hilbert(n)`, print condition numbers for n=2,4,6,8,10. Watch cond(H) grow exponentially — roughly `10^(3.5*n)`. This explains why fitting high-degree polynomials to data fails numerically: the Vandermonde design matrix has almost the same exponential growth in condition number.',
+              ],
               code: `import numpy as np
 
 A_good = np.array([[2.0, 1.0], [1.0, 3.0]])
@@ -90,7 +94,11 @@ print("  Singular values:", np.linalg.svd(A_bad, compute_uv=False))
             {
               id: 2,
               cellTitle: 'Observe error amplification directly',
-              prose: 'Perturb b by a tiny relative amount and measure how much the solution changes. Compare to what the condition number predicted.',
+              prose: [
+                'Perturb b by a tiny relative amount and measure how much the solution changes. Compare to what the condition number predicted.',
+                '`delta_b = 1e-6 * np.random.randn(n); x_true = np.linalg.solve(A, b); x_perturbed = np.linalg.solve(A, b + delta_b)`. Relative error in b: `np.linalg.norm(delta_b)/np.linalg.norm(b)`. Relative error in x: `np.linalg.norm(x_perturbed-x_true)/np.linalg.norm(x_true)`. The ratio (error in x) / (error in b) ≤ cond(A).',
+                'The bound is tight for the worst-case b direction: if delta_b points along the right singular vector of A corresponding to σ_min, the amplification equals cond(A) exactly. The scatter plot of 1000 random perturbations shows that most directions give amplification well below cond(A), but the maximum always approaches it — confirming cond(A) is the correct worst-case bound.',
+              ],
               code: `import numpy as np
 
 A = np.array([[1.0, 1.0], [1.0, 1.0001]])
@@ -114,7 +122,11 @@ print("Amplification <= cond(A)?", rel_err_x / rel_err_b <= np.linalg.cond(A) * 
             {
               id: 3,
               cellTitle: 'Hilbert matrix — condition number grows exponentially',
-              prose: 'The Hilbert matrix H[i,j] = 1/(i+j+1) looks harmless but becomes numerically singular around n = 12.',
+              prose: [
+                'The Hilbert matrix H[i,j] = 1/(i+j+1) looks harmless but becomes numerically singular around n = 12.',
+                '`H = scipy.linalg.hilbert(n)` or manually `H = 1/(i+j+1)` for i,j in range. `np.linalg.cond(H)` grows as roughly `e^{3.5n}`. For n=12, cond ≈ 10^16 — that exceeds double precision (10^16), so the computed inverse is essentially random.',
+                'Test: solve Hx=b (for known x, so you know the true answer). Plot the relative error `norm(x_computed - x_true)/norm(x_true)` vs n on a semilogy plot. The error should track `eps * cond(H)` — a straight line on the semilogy plot with slope ≈ 3.5. Around n=12, the error reaches 1 (100% error) — the solution is meaningless. This is why Hilbert matrices are the canonical "numerically evil" example.',
+              ],
               code: `import numpy as np
 
 print(f"{'n':>4}  {'kappa':>12}  {'digits lost':>12}")
@@ -143,7 +155,11 @@ print("H_12 is numerically singular in float64")
             {
               id: 1,
               cellTitle: 'Compare norms and condition numbers',
-              prose: ['Compute various norms and condition numbers for well- and ill-conditioned matrices.'],
+              prose: [
+                'Compute various norms and condition numbers for well- and ill-conditioned matrices.',
+                '`norm(A,1)` — max column sum. `norm(A,2)` — largest singular value. `norm(A,inf)` — max row sum. `norm(A,\'fro\')` — Frobenius. `cond(A)` — ratio of largest to smallest singular value. For the Hilbert matrix: `H = hilb(6); disp(cond(H))` — should be ~10^7.',
+                'The condition number tells you how many digits of accuracy you lose: for cond(A) = 10^k, you lose approximately k decimal digits. With double precision (~16 digits), a condition number of 10^12 leaves only 4 reliable digits. Print `log10(cond(A))` to read the "digits lost" directly — this is the most practically useful interpretation.',
+              ],
               code: `% Well-conditioned matrix
 A_good = [2 1; 1 3]
 disp('A_good norms:')
@@ -167,7 +183,11 @@ kappa_bad
             {
               id: 2,
               cellTitle: 'Error amplification demonstration',
-              prose: ['Perturb b slightly and see how much the solution changes for ill-conditioned A.'],
+              prose: [
+                'Perturb b slightly and see how much the solution changes for ill-conditioned A.',
+                '`x_true = A\\b; delta_b = 1e-6*randn(size(b)); x_perturb = A\\(b+delta_b)`. Relative perturbation in b: `norm(delta_b)/norm(b)`. Relative error in solution: `norm(x_perturb-x_true)/norm(x_true)`. The amplification ratio `(error in x)/(error in b)` should be ≤ `cond(A)`.',
+                'Run the experiment for 100 random perturbations and plot the amplification ratio as a histogram. The maximum will approach `cond(A)`; most perturbations give much smaller amplification. The key lesson: cond(A) is a worst-case bound, not typical behavior. But if your b comes from noisy measurements, you must assume you might hit the worst case.',
+              ],
               code: `% Ill-conditioned matrix
 A = [1 1; 1 1.0001]
 b = [2; 2.0001]

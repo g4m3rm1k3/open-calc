@@ -59,7 +59,11 @@ export default {
               id: 1,
 
               cellTitle: 'Signed area, orientation, and antisymmetry',
-              prose: 'Verify the three wedge product rules computationally: antisymmetry (swap = negate), nilpotency (v∧v = 0), and that shears preserve area.',
+              prose: [
+                'Verify the three wedge product rules computationally: antisymmetry (swap = negate), nilpotency (v∧v = 0), and that shears preserve area.',
+                'In 2D, the wedge product `u∧v` is represented by `np.cross(u,v)` (the scalar determinant). Antisymmetry: `np.cross(u,v) == -np.cross(v,u)`. Nilpotency: `np.cross(u,u) == 0`. Shear: `S = np.array([[1,k],[0,1]])`. Area of parallelogram: `np.cross(u,v)`. After shear: `np.cross(S@u, S@v) == np.linalg.det(S) * np.cross(u,v) == np.cross(u,v)` (since det(S)=1).',
+                'Visualise: draw parallelogram with vertices 0, u, v, u+v (blue). Draw sheared parallelogram 0, Su, Sv, Su+Sv (red). Both have the same area (|cross product|). The shapes look very different but signed area is preserved. This is the geometric meaning of determinant = 1 for shear matrices.',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
@@ -102,7 +106,11 @@ plt.tight_layout(); plt.show()
               id: 2,
 
               cellTitle: 'Gram determinant: k-dimensional volume',
-              prose: 'Compute the volume of a k-dimensional parallelepiped in R^n using the Gram determinant formula sqrt(det(V^T V)).',
+              prose: [
+                'Compute the volume of a k-dimensional parallelepiped in R^n using the Gram determinant formula sqrt(det(V^T V)).',
+                '`V = np.column_stack([v1, v2, ..., vk])` — k vectors as columns. k-volume = `np.sqrt(np.linalg.det(V.T @ V))`. For k=2 in R^3: this equals `np.linalg.norm(np.cross(v1,v2))` (area of parallelogram). For k=1: it equals `np.linalg.norm(v1)`. For k=n: it equals `abs(np.linalg.det(V))`.',
+                'Verify the cross-product agreement: `v1 = np.array([1,0,0]); v2 = np.array([0,1,0])`. Gram: `np.sqrt(det(V.T@V)) = 1`. Cross product magnitude: `norm(cross(v1,v2)) = 1`. Now rotate both vectors: `area` is preserved (since det(rotation)=1). This confirms Gram determinant gives the intrinsic k-dimensional volume independent of the ambient embedding.',
+              ],
               code: `import numpy as np
 
 # Three vectors in R^4 — compute the 3D volume of the parallelepiped they span
@@ -149,7 +157,11 @@ print(f"det({scale}*A) = {np.linalg.det(scale * A):.4f}  = {scale}^3 * det(A)")
             {
               id: 1,
               cellTitle: 'Determinant as oriented area',
-              prose: ['Verify that the determinant gives signed area/volume and satisfies alternating property.'],
+              prose: [
+                'Verify that the determinant gives signed area/volume and satisfies alternating property.',
+                '`u=[3;1]; v=[1;2]; area_signed = det([u v])`. Swap: `area_swapped = det([v u])`. Verify: `area_swapped == -area_signed`. Nilpotency: `det([u u]) == 0`. Multilinearity: `det([2*u v]) == 2*det([u v])`.',
+                'Visualisation: `fill([0 u(1) u(1)+v(1) v(1)], [0 u(2) u(2)+v(2) v(2)], \'blue\', \'FaceAlpha\', 0.3)`. The signed area is positive if u,v have counter-clockwise orientation and negative if clockwise. This sign is the key feature that makes determinants so powerful — they detect orientation.',
+              ],
               code: `% 2D: det gives signed area of parallelogram
 u = [3; 1]
 v = [1; 2]
@@ -178,7 +190,11 @@ vol
             {
               id: 2,
               cellTitle: 'Gram determinant for k-volume',
-              prose: ['Compute the k-dimensional volume of a parallelotope using the Gram determinant.'],
+              prose: [
+                'Compute the k-dimensional volume of a parallelotope using the Gram determinant.',
+                '`V = [v1 v2]` (columns). Gram determinant: `vol = sqrt(det(V\'*V))`. For 2 vectors in R^3: this equals `norm(cross(v1,v2))`. For 3 vectors in R^3: `sqrt(det(V\'*V)) == abs(det(V))` (same as ordinary determinant for square V).',
+                'Test: `v1=[1;0;0]; v2=[0;1;0]`. Gram: `sqrt(det([v1 v2]\'*[v1 v2])) = 1`. Rotate both: `R=expm([0 -pi/4 0; pi/4 0 0; 0 0 0]); v1r=R*v1; v2r=R*v2; sqrt(det([v1r v2r]\'*[v1r v2r]))` still equals 1. The Gram determinant gives intrinsic area that is rotation-invariant — it measures the "size" of the 2D subspace, not the orientation in R^3.',
+              ],
               code: `% Volume of parallelogram in R^3 spanned by 2 vectors
 % (result lives in a 2D plane, 2D volume)
 v1 = [1; 2; 0]

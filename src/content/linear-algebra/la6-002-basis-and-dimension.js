@@ -66,7 +66,11 @@ export default {
             {
               id: 1,
               cellTitle: 'Basis for the symmetric 2x2 matrices',
-              prose: ['Symmetric 2x2 matrices form a 3-dimensional subspace of M_2x2. Find a basis.'],
+              prose: [
+                'Symmetric 2x2 matrices form a 3-dimensional subspace of M_2x2. Find a basis.',
+                'A general 2×2 symmetric matrix has the form `[a b; b c]` — three free parameters (a,b,c). Write it as `a*E1 + b*E2 + c*E3` where `E1=[1 0;0 0]`, `E2=[0 1;1 0]`, `E3=[0 0;0 1]`. These three matrices are the basis. Verify independence: if `a*E1+b*E2+c*E3 = 0` for all scalars, then reading off the (1,1) entry gives a=0, (1,2) gives b=0, (2,2) gives c=0.',
+                'The dimension of the space of n×n symmetric matrices is `n*(n+1)/2`: n diagonal entries plus `n*(n-1)/2` upper-triangle entries. For 2×2: 2+1=3. For 3×3: 3+3=6. To confirm in MATLAB: `S = rand(3,3); S = (S+S\')/2; disp(rank([S(:) eye(9)]))` — a random symmetric 3×3 matrix has rank 6 in the 9-dimensional matrix space.',
+              ],
               code: `% General symmetric 2x2: [a b; b c]
 % = a*[1 0;0 0] + b*[0 1;1 0] + c*[0 0;0 1]
 B1 = [1 0; 0 0]
@@ -86,7 +90,11 @@ A_reconstructed = a*B1 + b*B2 + c*B3
             {
               id: 2,
               cellTitle: 'Finding the basis of a subspace via RREF',
-              prose: ['Subspace W = {p in P_2 : p(1) = 0}. Find a basis.'],
+              prose: [
+                'Subspace W = {p in P_2 : p(1) = 0}. Find a basis.',
+                'The constraint p(1)=0 means a+b+c=0, so a=-b-c. Parametrically: p(x) = b*(-1+x) + c*(-1+x²). The two polynomials (-1+x) and (-1+x²) form the basis. In MATLAB: `B = [-1 -1; 1 0; 0 1]` (columns are basis vectors as coefficients [a;b;c]). `rank(B)` is 2, confirming independence. Any p with p(1)=0 is `B * [s;t]` for some scalars s,t.',
+                'This is a general technique: take the constraint equation(s), solve for the dependent variables in terms of free variables, then read off the basis from the parametric form. The number of free variables equals the dimension. Here: 1 constraint on 3 parameters → dim = 3-1 = 2. This is exactly `nullity` when the constraint is expressed as a matrix equation.',
+              ],
               code: `% p(x) = a + bx + cx^2 with p(1) = a + b + c = 0
 % So a = -b - c. General element: (-b-c) + bx + cx^2
 %   = b(-1+x) + c(-1+x^2)
@@ -133,7 +141,11 @@ disp('Dimension of W: 2')
             {
               id: 1,
               cellTitle: 'Rank-nullity theorem — null space basis via SVD',
-              prose: 'The null space of $A$ is a subspace of $\\mathbb{R}^n$ (the number of columns). Its dimension is the nullity. The rank-nullity theorem: $\\text{rank}(A) + \\text{nullity}(A) = n$. We find the null space basis using SVD: the right singular vectors corresponding to zero singular values span the null space.',
+              prose: [
+                'The null space of $A$ is a subspace of $\\mathbb{R}^n$ (the number of columns). Its dimension is the nullity. The rank-nullity theorem: $\\text{rank}(A) + \\text{nullity}(A) = n$. We find the null space basis using SVD: the right singular vectors corresponding to zero singular values span the null space.',
+                '`U, s, Vt = np.linalg.svd(A)`. Columns of `Vt.T` corresponding to near-zero singular values span the null space. `tol = 1e-10; null_basis = Vt[s < tol].T`. Verify: `np.allclose(A @ null_basis, 0)` should be True. `rank + nullity = n` means `len(s[s > tol]) + null_basis.shape[1] == A.shape[1]`.',
+                'The SVD approach is more numerically stable than using RREF, which can have rounding errors for nearly-rank-deficient matrices. Compare: `scipy.linalg.null_space(A)` does exactly this SVD approach. For a 3×5 matrix with rank 2, nullity = 3 — the null space is 3-dimensional, and any linear combination of the 3 null-space basis vectors solves Ax=0.',
+              ],
               code: `import numpy as np
 
 # Find a basis for the null space of A (subspace of R^n)
@@ -163,7 +175,11 @@ print((A @ null_basis).round(10))
             {
               id: 2,
               cellTitle: 'Coordinates in a non-standard basis',
-              prose: 'Every vector has a unique coordinate representation in any basis. To find the $\\mathcal{B}$-coordinates of $\\mathbf{v}$, solve the linear system $[\\mathbf{b}_1 | \\mathbf{b}_2 | \\cdots] \\mathbf{c} = \\mathbf{v}$. The coordinates change with the basis, but the vector $\\mathbf{v}$ itself does not.',
+              prose: [
+                'Every vector has a unique coordinate representation in any basis. To find the $\\mathcal{B}$-coordinates of $\\mathbf{v}$, solve the linear system $[\\mathbf{b}_1 | \\mathbf{b}_2 | \\cdots] \\mathbf{c} = \\mathbf{v}$. The coordinates change with the basis, but the vector $\\mathbf{v}$ itself does not.',
+                '`B = np.column_stack([b1, b2])` — each basis vector is a column. `coords = np.linalg.solve(B, v)` gives the B-coordinates. Verify: `B @ coords` should recover `v` exactly. The coordinates `[c1, c2]` mean `v = c1*b1 + c2*b2`.',
+                'Plot both the standard-basis and B-basis coordinate grid overlaid in R^2. The same point v looks like (vx, vy) in standard coordinates but (c1, c2) in B-coordinates. The change-of-basis matrix B IS the translation map — multiplying by B converts B-coords to standard coords, and `np.linalg.inv(B)` does the reverse. This is the geometric meaning of basis change.',
+              ],
               code: `import numpy as np
 
 # Coordinates in a non-standard basis

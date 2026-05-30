@@ -59,7 +59,11 @@ export default {
               id: 1,
 
               cellTitle: 'Fill-in: arrow matrix natural order vs reversed',
-              prose: 'Demonstrate the arrow matrix example from the lesson: natural elimination order causes complete fill-in; reversed order causes zero fill-in.',
+              prose: [
+                'Demonstrate the arrow matrix example from the lesson: natural elimination order causes complete fill-in; reversed order causes zero fill-in.',
+                'Arrow matrix: `A = np.diag(np.ones(n)); A[-1,:] = 1; A[:,-1] = 1` (all 1s on diagonal plus last row/column). Natural order: `splu(csc_matrix(A)).L.nnz + ... - A.nnz` — measures fill-in. Reversed: `perm = list(range(n-1,0,-1))+[0]; A_rev = A[perm,:][:,perm]; splu(csc_matrix(A_rev))` — zero fill-in!',
+                'The spy plots side by side: left shows L+U for natural order (dense last row/column of L fills in), right shows L+U for reversed order (diagonal L only). This is the classic example proving that ordering matters enormously. For an n×n arrow matrix: natural order produces O(n²) fill; reversed order produces O(n) fill.',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 from scipy.sparse import lil_matrix, csc_matrix
@@ -107,7 +111,11 @@ plt.tight_layout(); plt.show()
               id: 2,
 
               cellTitle: 'Factorize once, solve many times',
-              prose: 'Show the main advantage of direct solvers: pay the factorization cost once, then solve for many right-hand sides cheaply.',
+              prose: [
+                'Show the main advantage of direct solvers: pay the factorization cost once, then solve for many right-hand sides cheaply.',
+                '`lu = splu(A_sparse)`. Factor once: `import time; t_factor = time.time(); lu = splu(A_sp); t_factor = time.time()-t_factor`. Solve m RHS: `t_solve = time.time(); for b in rhs_list: lu.solve(b); t_solve = (time.time()-t_solve)/m`. Compare `t_factor` vs `t_solve` — factorization is 10-100× more expensive than a single solve.',
+                'Plot: stacked bar showing (1) cost of factorizing each time = m * t_lu, vs (2) cost of factorize-once + m solves = t_factor + m * t_solve. The break-even point is typically around 5-10 RHS. For m > 10, the once-and-reuse strategy dominates. This pattern appears everywhere: pre-compute LU/Cholesky once when solving PDEs at many time steps or Monte Carlo samples.',
+              ],
               code: `import numpy as np
 import time
 from scipy.sparse import diags
@@ -162,7 +170,11 @@ print(f"\\nSolution agreement: {np.max(np.abs(X1 - X2)):.2e} (should be ~0)")
             {
               id: 1,
               cellTitle: 'Fill-in demonstration',
-              prose: ['Compare fill-in in LU factorization of a sparse matrix with and without reordering.'],
+              prose: [
+                'Compare fill-in in LU factorization of a sparse matrix with and without reordering.',
+                'Arrow matrix: `n=10; A=eye(n,\'sparse\'); A(n,:)=1; A(:,n)=1`. Natural order: `[L,U,P]=lu(A); spy(L+U)`. Reversed order: `p=[n:-1:1]; Ap=A(p,p); [L2,U2,~]=lu(Ap); spy(L2+U2)`. `nnz(L+U)` vs `nnz(L2+U2)` shows the fill-in difference.',
+                'For the 10×10 arrow matrix, natural order gives L+U with O(n²) = 100 non-zeros; reversed order gives O(n) = 20. The spy plots show: natural order has a dense last column in L; reversed order has only the diagonal in L. For a 1000×1000 arrow matrix, this is the difference between 10^6 and 10^3 non-zeros in the factor.',
+              ],
               code: `% Build a 2D Poisson sparse matrix (small example)
 n_side = 10; n = n_side^2
 e = ones(n,1)
@@ -198,7 +210,11 @@ disp(['Fill reduction: ', num2str(nnz_natural/nnz_amd), 'x'])
             {
               id: 2,
               cellTitle: 'Multiple right-hand sides',
-              prose: ['Factorize once, solve many times — the key advantage of direct solvers.'],
+              prose: [
+                'Factorize once, solve many times — the key advantage of direct solvers.',
+                'Using MATLAB: `[L,U,P] = lu(A_sparse); for k=1:m, x = U \\ (L \\ (P*b_list(:,k))); end`. The LU factorization is computed once. Each solve is just two triangular solves (forward + back substitution) — O(nnz(L) + nnz(U)) work, far cheaper than refactorizing.',
+                'Time the three approaches: (1) `A\\b` each time (refactorizes), (2) precomputed LU using `\\ (L \\ (P*b))`, (3) direct solve via `A\\b` for a single RHS (baseline). Bar chart: time per RHS for each approach across m=1,5,20,100 RHS. The crossover where precomputed LU wins is around 3-5 RHS for this problem size.',
+              ],
               code: `% Direct solver advantage: factor once, solve many RHS
 n = 500
 e = ones(n,1)

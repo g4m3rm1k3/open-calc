@@ -117,6 +117,7 @@
               prose: [
                 '`orth(A)` computes an orthonormal basis for the column space of A. `[Q,R] = qr(A)` gives the full QR decomposition.',
                 'Manual Gram-Schmidt: normalize v1, subtract projection from v2, normalize. Verify e1·e2 = 0.',
+                'The classical Gram-Schmidt can lose orthogonality due to floating-point cancellation: if $\\mathbf{v}_2$ is nearly parallel to $\\mathbf{v}_1$, the subtracted projection is nearly equal to $\\mathbf{v}_2$, and catastrophic cancellation makes the result nearly zero. MATLAB\'s `orth()` uses the modified Gram-Schmidt algorithm (or Householder reflections) which subtracts projections one at a time and is numerically stable. For teaching, classical is fine; for production code, always use `orth()` or `qr()`.',
               ],
               code: `v1 = [3; 4];
 v2 = [2; 0];
@@ -139,6 +140,7 @@ fprintf('||e1|| = %.6f  ||e2|| = %.6f  (should be 1)\\n', norm(e1), norm(e2))`,
               prose: [
                 '`[Q, R] = qr(A)` factorizes A into orthogonal Q and upper-triangular R. Q*R = A exactly.',
                 'Q*Q\' = I confirms the columns are orthonormal. R encodes the projection coefficients.',
+                'The upper-triangular structure of $R$ encodes the Gram-Schmidt computation: $R_{jj}$ is the norm of the $j$-th column after removing projections onto all previous orthonormal vectors, and $R_{ij}$ for $i < j$ is the dot product $\\mathbf{q}_i^T \\mathbf{v}_j$ (the projection coefficient). So $A = QR$ literally expresses each column of $A$ as a linear combination of the $Q$ columns: $\\mathbf{v}_j = R_{1j}\\mathbf{q}_1 + \\cdots + R_{jj}\\mathbf{q}_j$ — Gram-Schmidt captured as matrix arithmetic.',
               ],
               code: `A = [1 1 0; 1 0 1; 0 1 1];
 
@@ -158,6 +160,7 @@ fprintf('Max off-diagonal error: %.2e\\n', max(max(abs(Q'*Q - eye(3)))))`,
               prose: [
                 'A probe measures slightly non-orthogonal axis directions due to machine geometry tolerances. Gram-Schmidt creates a perfect orthonormal reference frame.',
                 'The off-diagonal entries of V\'*V (before Gram-Schmidt) quantify the squareness error in radians.',
+                'The machine squareness error is $[V^TV]_{ij} = \\cos(\\angle(\\mathbf{v}_i, \\mathbf{v}_j))$ for unit axis vectors — if the axes are exactly orthogonal, $V^TV = I$; any deviation from identity is a squareness error in radians. After Gram-Schmidt, $Q^TQ = I$ exactly (to floating-point precision), meaning all squareness errors are corrected in the new orthonormal basis. Subsequent position measurements in the $Q$ basis are therefore free of geometric coupling between axes.',
               ],
               code: `% Measured CNC axis directions (slightly non-orthogonal due to tolerance)
 v_X = [1.000; 0.0012; 0.0008];    % X-axis direction (measured)
@@ -203,6 +206,7 @@ fprintf('Max residual: %.2e\\n', max(max(abs(Q'*Q - eye(3)))))`,
               prose: [
                 'This cell implements Gram-Schmidt line by line. `e1 = v1 / np.linalg.norm(v1)` normalizes the first vector — this is the base case with nothing to subtract. For `v2`, the scalar projection `np.dot(v2, e1)` computes how much of `v2` points in the `e1` direction (the "contamination"). Multiplying by `e1` turns it into a vector, and subtracting removes that contamination entirely.',
                 'After normalization, `np.dot(e1, e2)` should be 0 (orthogonality) and `np.linalg.norm(e1)` should be 1 (unit length). The matplotlib plot confirms this geometrically: the two output arrows are exactly at 90°, regardless of how tilted the input vectors were.',
+                'Classical Gram-Schmidt can lose orthogonality numerically: if $\\mathbf{v}_2$ is nearly parallel to $\\mathbf{v}_1$, catastrophic cancellation in `v2 - np.dot(e1,v2)*e1` makes the result nearly zero, and the normalized $\\mathbf{e}_2$ points in a near-random direction. Modified Gram-Schmidt (subtracting projections one at a time after each normalization) is more stable. `np.linalg.qr` uses Householder reflections which are the most stable: it avoids explicit projections entirely. Always use `np.linalg.qr` in production code.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -243,6 +247,7 @@ plt.show()`,
               prose: [
                 '`np.linalg.qr(A)` runs Gram-Schmidt (in a numerically stabilized form) on the columns of `A` and returns `Q` (orthonormal columns) and `R` (upper triangular). `Q @ R` reconstructs `A` exactly — this is the matrix form of the Gram-Schmidt identity. The entries of `R` encode the scalar projections: `R[i,j]` = (projection of v_j onto e_i).',
                 '`Q.T @ Q` should equal the identity matrix — this is the algebraic statement that columns of `Q` are orthonormal. The heatmap makes this vivid: only the diagonal entries are 1, all off-diagonal entries are 0 (up to floating-point noise ~1e-16). If any off-diagonal entry is large, Gram-Schmidt has failed to orthogonalize.',
+                'The off-diagonal entries of `Q.T @ Q` measure residual non-orthogonality after the computation — they should all be $< 10^{-14}$ for well-conditioned input. The diagonal entries of $R$ give the "effective lengths" of each new orthogonal direction: if $R_{jj}$ is very small compared to $\\|\\mathbf{v}_j\\|$, column $j$ of $A$ is nearly in the span of the previous columns (linearly dependent). `np.linalg.matrix_rank(A)` uses this fact: it counts the number of singular values above a threshold.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt

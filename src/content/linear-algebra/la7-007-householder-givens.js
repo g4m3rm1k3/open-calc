@@ -64,7 +64,11 @@ export default {
             {
               id: 1,
               cellTitle: 'Build a Householder reflector',
-              prose: 'Construct H for a given vector x so that Hx = ||x|| e_1. Verify it is orthogonal and symmetric.',
+              prose: [
+                'Construct H for a given vector x so that Hx = ||x|| e_1. Verify it is orthogonal and symmetric.',
+                'Formula: `v = x + np.sign(x[0])*np.linalg.norm(x)*np.eye(len(x))[:,0]; v = v/np.linalg.norm(v); H = np.eye(len(x)) - 2*np.outer(v,v)`. Verify: `np.allclose(H @ x, np.linalg.norm(x)*np.eye(len(x))[:,0])` (maps x to ‖x‖e₁), `np.allclose(H.T, H)` (symmetric), `np.allclose(H @ H, np.eye(len(x)))` (orthogonal, H² = I).',
+                'The sign choice `+sign(x[0])` avoids catastrophic cancellation when x is nearly parallel to e₁. Without it, `v ≈ x - x = 0` — the reflector degenerates. With the sign choice, ‖v‖ = ‖x‖ + |x₁| which is always large. This is a key numerical detail that separates textbook formulas from production implementations.',
+              ],
               code: `import numpy as np
 
 def householder(x):
@@ -90,7 +94,11 @@ print("H involutory? ||H^2 - I|| =", np.linalg.norm(H @ H - np.eye(3)))
             {
               id: 2,
               cellTitle: 'Householder QR factorization',
-              prose: 'Apply Householder reflectors column by column to triangularize A. Compare the result to numpy.linalg.qr.',
+              prose: [
+                'Apply Householder reflectors column by column to triangularize A. Compare the result to numpy.linalg.qr.',
+                'Algorithm: start with R = A, Q = I. For column k: extract `x = R[k:, k]`, build Householder H_k (acts on the subspace from row k), apply to R: `R[k:, k:] = H_k @ R[k:, k:]`, accumulate Q: `Q[:, k:] = Q[:, k:] @ H_k.T`. After n-1 steps, R is upper triangular.',
+                'Compare: `np.allclose(Q @ R, A)` and `np.allclose(Q.T @ Q, np.eye(n))`. Compare R to `np.linalg.qr(A)[1]` — they should be equal (up to sign). The key efficiency: never form H_k as a full n×n matrix. Instead apply the rank-1 update `H_k @ v = v - 2*(u.T@v)*u` directly — each application costs O(n) instead of O(n²).',
+              ],
               code: `import numpy as np
 
 def householder_qr(A):
@@ -123,7 +131,11 @@ print("||Q.T Q - I||:", np.linalg.norm(Q.T @ Q - np.eye(4)))
             {
               id: 3,
               cellTitle: 'Stability: Householder vs classical Gram-Schmidt',
-              prose: 'For an ill-conditioned matrix, compare how far Q deviates from orthogonality between Gram-Schmidt and Householder.',
+              prose: [
+                'For an ill-conditioned matrix, compare how far Q deviates from orthogonality between Gram-Schmidt and Householder.',
+                'Build a Vandermonde matrix `A = np.vander(np.linspace(0.1, 1, 10), 8)` (high condition number). Classical Gram-Schmidt: implement the MGS/CGS algorithm manually to get Q_gs. Householder: `Q_hh, _ = np.linalg.qr(A)`. Orthogonality error: `norm(Q.T @ Q - I)` for both.',
+                'The orthogonality error for classical Gram-Schmidt scales like `cond(A) * eps` — for a Vandermonde matrix with cond ~10^8, this means ~10^-8 orthogonality error. Householder gives ~10^-14 (near machine epsilon). Plot both errors as a function of matrix condition number. Householder is always better by a factor of roughly `cond(A)` — for ill-conditioned problems, this is the difference between garbage and a correct answer.',
+              ],
               code: `import numpy as np
 
 # Nearly rank-deficient matrix (ill-conditioned)
@@ -166,7 +178,11 @@ print("Gram-Schmidt Q loses orthogonality; Householder keeps it machine-precise"
             {
               id: 1,
               cellTitle: 'Householder QR factorization',
-              prose: ['Implement Householder QR and compare orthogonality to Gram-Schmidt.'],
+              prose: [
+                'Implement Householder QR and compare orthogonality to Gram-Schmidt.',
+                'Householder reflector for column k: `x = A(k:end,k); v = x + sign(x(1))*norm(x)*eye(length(x),1); v = v/norm(v); H = eye(length(x)) - 2*(v*v\')`. Apply to A: `A(k:end,:) = H * A(k:end,:)`. After all columns, A becomes R.',
+                'Compare orthogonality: compute Gram-Schmidt Q via `[Q_gs,~] = qr(A)` vs explicit Householder accumulation. `norm(Q_gs\'*Q_gs - eye(n))` vs `norm(Q_hh\'*Q_hh - eye(n))`. For a Vandermonde matrix with `vander(0.1:0.1:1, 8)`, Householder wins by many orders of magnitude. MATLAB\'s `qr` function uses Householder — this is why it is numerically preferred over Gram-Schmidt.',
+              ],
               code: `% Householder QR factorization
 function [Q, R] = householder_qr(A)
     [m, n] = size(A)
@@ -208,7 +224,11 @@ max(max(abs(QTQ)))
             {
               id: 2,
               cellTitle: 'Givens rotation for sparse update',
-              prose: ['Apply a Givens rotation to zero one entry, preserving other zeros.'],
+              prose: [
+                'Apply a Givens rotation to zero one entry, preserving other zeros.',
+                'Givens rotation to zero A(i,j): `r = hypot(A(i,i), A(j,i)); c = A(i,i)/r; s = A(j,i)/r; G = eye(n); G(i,i)=c; G(i,j)=s; G(j,i)=-s; G(j,j)=c; A_new = G * A`. After applying, `A_new(j,i)` is exactly zero. Verify: `A_new(j,i)` ≈ 0, `norm(G*G\' - eye(n))` ≈ 0 (Givens is orthogonal).',
+                'The key advantage over Householder: a Givens rotation is a rank-2 update (only rows i and j change). For a sparse matrix, applying a Givens rotation touches only 2 rows — it preserves zeros in all other rows. `spy(A)` before and after shows which zeros are preserved. This is why Givens rotations are used for QR updates (adding/removing a row from A without full re-factorization).',
+              ],
               code: `% Givens rotation: zero out one element
 % G * [a; b] = [r; 0]
 function G = givens(a, b)

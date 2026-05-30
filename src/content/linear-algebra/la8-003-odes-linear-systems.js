@@ -64,7 +64,11 @@ export default {
             {
               id: 1,
               cellTitle: 'Matrix exponential and stability classification',
-              prose: 'Check eigenvalue real parts to classify stability, then compute the matrix exponential using scipy.',
+              prose: [
+                'Check eigenvalue real parts to classify stability, then compute the matrix exponential using scipy.',
+                '`vals = np.linalg.eigvals(A)`. Stable: `all(vals.real < 0)`. Unstable: `any(vals.real > 0)`. Marginally stable: `all(vals.real <= 0) and any(vals.real == 0)`. `scipy.linalg.expm(A * t)` computes the matrix exponential at time t — this is the solution operator: `x(t) = expm(A*t) @ x0`.',
+                'For a 2×2 system, plot the phase portrait using `ax.streamplot`. The eigenvalue classification appears directly in the portrait: negative reals → stable node; complex with negative real parts → stable focus; positive reals → unstable node; purely imaginary → center. Each type has a distinct visual signature.',
+              ],
               code: `import numpy as np
 from scipy.linalg import expm
 
@@ -88,7 +92,11 @@ for name, A in systems.items():
             {
               id: 2,
               cellTitle: 'Simulate ODE trajectory using matrix exponential',
-              prose: 'Solve x_dot = A x analytically via matrix exponential and plot the trajectory.',
+              prose: [
+                'Solve x_dot = A x analytically via matrix exponential and plot the trajectory.',
+                '`t_vals = np.linspace(0, 5, 200); x0 = np.array([2.0, 0.5])`. For each t: `x_t = scipy.linalg.expm(A * t) @ x0`. Stack: `trajectory = np.array([scipy.linalg.expm(A*t) @ x0 for t in t_vals])`. Plot `trajectory[:,0]` and `trajectory[:,1]` vs t, plus the phase portrait.',
+                'Compare to `scipy.integrate.odeint(lambda x,t: A@x, x0, t_vals)` — they should agree perfectly. The matrix exponential approach is exact (no numerical integration error); scipy\'s odeint uses Runge-Kutta approximation. For linear systems, `expm` is always preferred. The phase portrait `plt.plot(*trajectory.T)` shows the trajectory as a curve in state space.',
+              ],
               code: `import numpy as np
 from scipy.linalg import expm
 
@@ -112,7 +120,11 @@ print("Final distance from origin:", np.round(np.linalg.norm(x_traj[-1]), 6))
             {
               id: 3,
               cellTitle: 'Second-order ODE as first-order system',
-              prose: 'Convert x_ddot + a*x_dot + b*x = 0 to state space and analyze stability by eigenvalues.',
+              prose: [
+                'Convert x_ddot + a*x_dot + b*x = 0 to state space and analyze stability by eigenvalues.',
+                'Define state vector `[x, x_dot]`. System matrix: `A = np.array([[0, 1], [-b, -a]])`. This is the companion matrix. Eigenvalues of A are the roots of the characteristic polynomial `s² + as + b = 0`: `λ = (-a ± sqrt(a²-4b))/2`. For a damped oscillator (a>0, b>0): both eigenvalues have negative real part → stable.',
+                '`vals = np.linalg.eigvals(A)`. For underdamped (a²<4b): complex conjugate pair → decaying oscillations. For overdamped (a²>4b): two real negative values → no oscillation. For critically damped (a²=4b): repeated eigenvalue. Plot trajectories for all three regimes overlaid — the eigenvalue type directly determines the qualitative shape of the response curve.',
+              ],
               code: `import numpy as np
 
 # Spring-mass-damper: x'' + 2*zeta*wn*x' + wn^2*x = 0
@@ -148,7 +160,11 @@ for name, wn, zeta in configs:
             {
               id: 1,
               cellTitle: 'Stability from eigenvalues',
-              prose: ['Check stability of a 2x2 linear system by examining eigenvalue real parts.'],
+              prose: [
+                'Check stability of a 2x2 linear system by examining eigenvalue real parts.',
+                '`lam = eig(A); stable = all(real(lam) < 0)`. For a stable focus: `A = [-1 2; -2 -1]` — complex eigenvalues with negative real parts. For an unstable node: `A = [1 0; 0 2]` — positive real eigenvalues. Print eigenvalues and stability classification for both.',
+                'The phase portrait confirms stability: `[x1,x2] = meshgrid(-3:0.3:3,-3:0.3:3); dx1 = A(1,1)*x1+A(1,2)*x2; dx2 = A(2,1)*x1+A(2,2)*x2; quiver(x1,x2,dx1,dx2)`. Arrows spiraling inward = stable focus; arrows pointing outward = unstable. This visual is exactly what the eigenvalue sign predicts.',
+              ],
               code: `% Stable system: both eigenvalues have negative real part
 A_stable = [-2 1; -1 -3]
 eigs_stable = eig(A_stable)
@@ -175,7 +191,11 @@ eigs_osc
             {
               id: 2,
               cellTitle: 'Solution via matrix exponential',
-              prose: ['Solve dx/dt = Ax with x0 via diagonalization. Sample the trajectory.'],
+              prose: [
+                'Solve dx/dt = Ax with x0 via diagonalization. Sample the trajectory.',
+                '`[P,D] = eig(A); t_vals = 0:0.05:5; x0=[2;0.5]`. For each t: `x(:,k) = P * diag(exp(diag(D)*t_vals(k))) * (P\\x0)`. Or: `x(:,k) = expm(A*t_vals(k)) * x0` using the built-in matrix exponential. `expm` in MATLAB uses the Padé approximation.',
+                'Plot x1(t) and x2(t) separately (time-domain) and the phase portrait x2 vs x1 (state-space). A stable focus gives a decaying spiral in the phase portrait and damped oscillations in the time domain. The matrix exponential captures ALL of this in one formula: `x(t) = expm(A*t)*x0`.',
+              ],
               code: `% System: damped oscillator
 A = [-0.5 2; -2 -0.5]
 [P, D] = eig(A)

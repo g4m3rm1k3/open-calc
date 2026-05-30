@@ -59,7 +59,11 @@ export default {
               id: 1,
 
               cellTitle: 'Dual basis construction and verification',
-              prose: 'Compute the dual basis for a non-standard basis of R^3 and verify the Kronecker delta property. Then express a linear functional in the dual basis.',
+              prose: [
+                'Compute the dual basis for a non-standard basis of R^3 and verify the Kronecker delta property. Then express a linear functional in the dual basis.',
+                '`B = np.column_stack([b1,b2,b3])` (basis vectors as columns). Dual basis: `B_dual = np.linalg.inv(B).T` (rows of B⁻¹ are the dual basis vectors). Verify Kronecker delta: `B_dual.T @ B` should equal `np.eye(3)` — so `b_i_dual @ b_j = delta_ij`.',
+                'Express functional `f(x) = 2*x1 - x2 + 3*x3` (represented by row vector `[2,-1,3]` in standard basis) in the dual B-basis: `f_B_coords = np.array([2,-1,3]) @ B`. These are the coefficients of f in the dual basis {b1_dual, b2_dual, b3_dual}. Verify: `f_B_coords @ B_dual.T @ v == np.array([2,-1,3]) @ v` for any test vector v.',
+              ],
               code: `import numpy as np
 
 # Basis for R^3: columns of B are basis vectors
@@ -104,7 +108,11 @@ print(f"Reconstructed: {f_reconstructed}  (should match [2, -1, 3])")
               id: 2,
 
               cellTitle: 'Transpose as the dual map',
-              prose: 'Verify the abstract definition of the dual map: T*(g) = g ∘ T. Show that this forces T* to have matrix A^T.',
+              prose: [
+                'Verify the abstract definition of the dual map: T*(g) = g ∘ T. Show that this forces T* to have matrix A^T.',
+                'T: R^3→R^2 with matrix A. Functional g: R^2→R with row vector w (so g(y) = w@y). Dual map T*(g) = g∘T has matrix `w @ A` (a row vector in R^3 dual). For ALL choices of w: T*(g) corresponds to the row `w @ A = (A.T @ w.T).T`. This is why T* has matrix A.T.',
+                'Verify: pick three test functionals `g1=[1,0], g2=[0,1], g3=[1,1]` (row vectors). For each: `T_star_g = g_i @ A`. Then `T_star_g @ v == g_i @ (A @ v)` for all test vectors v. `np.allclose(g_i @ A @ v, g_i @ A @ v)` — trivially true. The insight: T* just swaps the order, and this swap is precisely what transposition does.',
+              ],
               code: `import numpy as np
 
 # Linear map T: R^3 -> R^2, represented by matrix A
@@ -151,7 +159,11 @@ print("\\nConclusion: transpose is not an accident — it IS the dual map in coo
             {
               id: 1,
               cellTitle: 'Dual basis construction',
-              prose: ['Construct the dual basis for a non-standard basis of R^3.'],
+              prose: [
+                'Construct the dual basis for a non-standard basis of R^3.',
+                '`B = [b1 b2 b3]`. Dual basis vectors are rows of `inv(B)`: `B_dual = inv(B)`. Verify: `B_dual*B` should equal `eye(3)` — the Kronecker delta property `b_i^dual(b_j) = delta_ij`.',
+                'Test: functional `f(x) = 2*x1 - 3*x2 + x3` has row-vector representation `w=[2,-3,1]` in standard basis. In dual B-basis: `w_B = w*B` (coordinates of f in dual basis). Verify: `w_B * B_dual * v` equals `w*v` for any test vector v. The dual basis gives an alternative coordinate system for functionals.',
+              ],
               code: `% Basis for R^3 (columns of B are basis vectors)
 B = [1 1 0;
      0 1 1;
@@ -176,7 +188,11 @@ check
             {
               id: 2,
               cellTitle: 'Dual map = transpose',
-              prose: ['Verify that the dual map of a linear map T corresponds to the matrix transpose.'],
+              prose: [
+                'Verify that the dual map of a linear map T corresponds to the matrix transpose.',
+                'T: R^3 → R^2 with matrix A. The dual map T*: (R^2)* → (R^3)* has matrix A\'. Verify: for functional `g` (row vector in R^2), `T*(g)(v) = g(T(v)) = g*(A*v) = g*A*v`. This equals `(A\'*g\')\' * v` — so T* acts by A\' on coordinate vectors.',
+                'Numerical check: `A = [1 2 3; 4 5 6]; g = [1,-1]; v = [2;-1;3]`. Compute two ways: (1) `g*(A*v)`, (2) `(A\'*g\')\' * v`. They should be equal. Also: `g*A` gives the row-vector representation of T*(g) in the dual basis of R^3. The statement "dual map = transpose" is this identity.',
+              ],
               code: `% Linear map T: R^3 -> R^2, matrix A
 A = [1 2 3; 4 5 6]
 disp('Matrix of T:')

@@ -109,6 +109,7 @@ export default {
               prose: [
                 '`dot(a,b)` computes the dot product. Scalar projection c = dot(a,b)/dot(a,a). Vector projection p = c*a.',
                 'The error e = b - p must satisfy dot(a,e) ≈ 0 (perpendicularity).',
+                'The scalar projection formula $c = \\frac{\\mathbf{a}\\cdot\\mathbf{b}}{\\mathbf{a}\\cdot\\mathbf{a}}$ is exactly the solution to the normal equation $\\mathbf{a}^T(\\mathbf{b} - c\\mathbf{a}) = 0$ — minimize $\\|\\mathbf{b} - c\\mathbf{a}\\|^2$ by setting the derivative to zero. This makes orthogonal projection the 1D special case of least squares: "find the scalar $c$ such that $c\\mathbf{a}$ is closest to $\\mathbf{b}$." The perpendicularity check `dot(a, e) < 1e-10` confirms the Pythagorean theorem: $\\|\\mathbf{b}\\|^2 = \\|\\mathbf{p}\\|^2 + \\|\\mathbf{e}\\|^2$.',
               ],
               code: `a = [1; 1; 1];    % line direction
 b = [1; 2; 3];    % vector to project
@@ -128,6 +129,7 @@ fprintf('Perpendicularity check: a·e = %.2e  (should be 0)\\n', dot(a, e))`,
               prose: [
                 'P = a*a\' / (a\'*a) is the projection matrix onto the line spanned by a.',
                 'For subspace projection (column space of A): P = A*inv(A\'*A)*A\'.',
+                'The idempotent property $P^2 = P$ is automatic: after the first projection, the vector is already in the column space of $A$, so projecting again does nothing. Verify: `P*P - P` should be the zero matrix. The complementary projector $I - P$ projects onto the null space of $A^T$ (the left null space) — and $(I-P)P = 0$ means the two projections are orthogonal: `rank(P) = rank(A)` tells you the dimension of the subspace being projected onto.',
               ],
               code: `% Projection onto a line
 a = [1; 2];
@@ -150,6 +152,7 @@ fprintf('P idempotent (P^2 - P, should be 0):\\n'); disp(P_sub^2 - P_sub)`,
               prose: [
                 'The cross-track error is the perpendicular distance from the current tool position to the programmed path direction.',
                 'Closest point on path = projection of tool position b onto path direction a. Cross-track error = ||b - proj||.',
+                'The cross-track error is the perpendicular distance from the tool to the path — exactly $\\|\\mathbf{b} - \\text{proj}_{\\mathbf{a}}\\mathbf{b}\\|$. CNC controllers use this in real time: the tool\'s actual position $\\mathbf{b}$ (from encoder feedback) is projected onto the programmed path direction $\\mathbf{a}$, and the perpendicular component $\\mathbf{e}$ drives the correction. A cross-track error > 0 means the tool has drifted off the path; the controller applies a lateral correction proportional to $\\|\\mathbf{e}\\|$ to bring it back.',
               ],
               code: `% CNC: tool path from waypoint 1 to waypoint 2
 wp1 = [10; 0; 5];   % mm — path start
@@ -198,6 +201,7 @@ fprintf('Direction of error:  [%.4f, %.4f, %.4f]\\n', cross_track(1)/error_mag, 
               prose: [
                 'The projection of **b** onto the line spanned by **a** is the closest point on that line to **b**.',
                 'Formula: proj = (a·b / a·a) × a. The error e = b − proj is always perpendicular to a.',
+                'The left plot shows $\\mathbf{b}$ (blue), its projection $\\mathbf{p}$ (orange) on the line, and the error $\\mathbf{e}$ (green) perpendicular to $\\mathbf{a}$. The right plot verifies the Pythagorean identity: $\\|\\mathbf{b}\\|^2 = \\|\\mathbf{p}\\|^2 + \\|\\mathbf{e}\\|^2$. This decomposition is exact (not approximate) — projection splits any vector into two mutually perpendicular components: one in the subspace, one orthogonal to it. No information is lost, just reorganized.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -236,6 +240,7 @@ plt.show()`,
               prose: [
                 'The projection matrix P = aaᵀ / aᵀa projects any vector onto the line spanned by a in one multiplication.',
                 'Key property: P² = P (idempotent). Projecting twice gives the same result — the projected vector is already on the line.',
+                'The projection matrix $P = \\mathbf{a}\\mathbf{a}^T / \\mathbf{a}^T\\mathbf{a}$ is rank-1 (outer product divided by scalar) — it collapses all of $\\mathbb{R}^n$ onto a 1D subspace (the line through $\\mathbf{a}$). The complementary matrix $I - P$ is also a projection: it projects onto the $(n-1)$-dimensional plane orthogonal to $\\mathbf{a}$. Together $P$ and $I-P$ partition any vector: `v = P @ v + (I-P) @ v`, confirming that the two projections are complementary and exhaustive.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt

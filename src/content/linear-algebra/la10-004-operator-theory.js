@@ -59,7 +59,11 @@ export default {
               id: 1,
 
               cellTitle: 'Operator norm vs spectral radius: normal vs non-normal',
-              prose: 'Compare operator norms and spectral radii for a normal matrix (diagonal) and a non-normal matrix (nilpotent/Jordan block). Verify the spectral radius formula r(T) = lim ||T^n||^(1/n).',
+              prose: [
+                'Compare operator norms and spectral radii for a normal matrix (diagonal) and a non-normal matrix (nilpotent/Jordan block). Verify the spectral radius formula r(T) = lim ||T^n||^(1/n).',
+                'Normal matrix: `A = np.diag([3, 2, 1])`. `np.linalg.norm(A, 2) == max(abs(eigenvalues)) == 3`. Non-normal: `N = np.array([[0,1,0],[0,0,1],[0,0,0]])` (nilpotent). `np.linalg.norm(N, 2) ≈ 1` but `max(abs(np.linalg.eigvals(N))) = 0`. Operator norm > spectral radius for non-normal operators!',
+                'Verify the limit: `[np.linalg.norm(np.linalg.matrix_power(N,k))**(1/k) for k in range(1,30)]`. This should approach `max(abs(eigvals)) = 0` as k→∞, but converge very slowly. For the nilpotent N: N^3=0, so the limit jumps to 0 at k=3. Plot both sequences on a semilogy plot to see the convergence of the spectral radius formula.',
+              ],
               code: `import numpy as np
 
 def operator_norm(A):
@@ -100,7 +104,11 @@ print(f"  True spectral radius   = {r_true:.5f}")
               id: 2,
 
               cellTitle: 'Compact operator approximation via truncation',
-              prose: 'Approximate the infinite-dimensional multiplication operator T(x)_n = (1/n)*x_n by its N×N truncation, and verify that the eigenvalues converge to the infinite-dimensional spectrum.',
+              prose: [
+                'Approximate the infinite-dimensional multiplication operator T(x)_n = (1/n)*x_n by its N×N truncation, and verify that the eigenvalues converge to the infinite-dimensional spectrum.',
+                '`T_N = np.diag([1/(k+1) for k in range(N)])`. `np.linalg.eigvals(T_N)` gives eigenvalues `{1, 1/2, 1/3, ..., 1/N}`. As N→∞, these fill in the interval (0,1] densely. The "infinite-dimensional spectrum" is the continuous set [0,1].',
+                'Plot eigenvalues for N=10, 50, 200 on the real line as scatter plots. Watch the eigenvalues fill in (0,1] more and more densely. The norm `np.linalg.norm(T_N, 2) = 1` for all N — the operator norm of the truncation converges to the operator norm of the infinite-dimensional operator. This demonstrates that finite-dimensional truncation is a valid approximation technique for compact operators.',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -143,7 +151,11 @@ print("  (0 is in the continuous/residual spectrum)")
             {
               id: 1,
               cellTitle: 'Operator norm = largest singular value',
-              prose: ['Verify that the operator (2-)norm of a matrix equals its largest singular value.'],
+              prose: [
+                'Verify that the operator (2-)norm of a matrix equals its largest singular value.',
+                '`norm(A,2)` in MATLAB. `s = svd(A); sigma_max = s(1)`. Verify: `abs(norm(A,2) - sigma_max) < 1e-10`. Also verify: `max(abs(eig(A)))` (spectral radius) can be LESS than `norm(A,2)` for non-normal A.',
+                'Test with two matrices: `A=diag([3,2,1])` (normal — norm = spectral radius = 3) and `N=[0 1 0; 0 0 1; 0 0 0]` (nilpotent — norm(N,2)≈1 but spectral radius = 0). Display both norm and spectral radius side-by-side. The gap between them measures "non-normality" — a large gap means power iterations converge slowly.',
+              ],
               code: `% Random matrix
 A = [3 1 2; 0 2 1; 1 0 4]
 
@@ -174,7 +186,11 @@ spec_radius <= op_norm + 1e-10
             {
               id: 2,
               cellTitle: 'Compact operator: finite-rank approximation',
-              prose: ['A compact operator is the limit of finite-rank operators. SVD truncation demonstrates this.'],
+              prose: [
+                'A compact operator is the limit of finite-rank operators. SVD truncation demonstrates this.',
+                '`[U,S,V] = svd(A)`. Rank-k approximation: `A_k = U(:,1:k)*S(1:k,1:k)*V(:,1:k)\'`. The approximation error: `norm(A-A_k,2) = S(k+1,k+1)` (spectral norm). As k→rank(A), the error → 0. The sequence A_1, A_2, ... converges to A in operator norm.',
+                'Plot `norm(A-A_k,\'fro\')` vs k. It decreases monotonically to zero as k approaches rank(A). This visualisation shows that a matrix can be seen as the limit of finite-rank operators: each A_k is a rank-k operator, and they converge to A. The rate of convergence is determined by how fast the singular values decay.',
+              ],
               code: `% Simulate a "compact operator" by truncating SVD
 % Larger matrix, add structure
 rng(7)

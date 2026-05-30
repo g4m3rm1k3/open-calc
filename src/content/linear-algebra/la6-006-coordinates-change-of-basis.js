@@ -67,7 +67,11 @@ export default {
             {
               id: 1,
               cellTitle: 'Non-standard basis in R^2',
-              prose: ['New basis B = {[1;1]/sqrt(2), [-1;1]/sqrt(2)} (45 degree rotation). Find coordinates of v=[1;0] in B.'],
+              prose: [
+                'New basis B = {[1;1]/sqrt(2), [-1;1]/sqrt(2)} (45 degree rotation). Find coordinates of v=[1;0] in B.',
+                'The change-of-basis matrix is `P = [b1 b2]` (columns = basis vectors). To find B-coordinates: `v_B = P \\ v` (solve P*c=v for c). In this case: `v_B = inv(P)*v = P\'*v` because P is orthonormal (rotation matrix — its inverse equals its transpose). `P = [b1, b2]; c = P\'*v; disp(c)`.',
+                'Verify round-trip: `norm(P*c - v)` should be near machine epsilon. Geometrically: v=[1;0] lies at 45° from the new basis axes, so its B-coordinates are [1/√2, -1/√2] — the projections onto b1 and b2. This is exactly what the dot product gives: `c(1) = dot(v,b1); c(2) = dot(v,b2)` (valid because B is orthonormal).',
+              ],
               code: `% New basis vectors
 b1 = [1;  1] / sqrt(2)
 b2 = [-1; 1] / sqrt(2)
@@ -93,7 +97,11 @@ norm(v - v_recovered) < 1e-9
             {
               id: 2,
               cellTitle: 'Matrix in new basis',
-              prose: ['Rotation matrix R = [0 -1; 1 0] in standard basis. Represent it in basis B from above.'],
+              prose: [
+                'Rotation matrix R = [0 -1; 1 0] in standard basis. Represent it in basis B from above.',
+                'The similarity transformation: `R_B = inv(P)*R*P` (or `P\'*R*P` since P is orthonormal). This gives R\'s matrix in B-coordinates. `disp(R_B)` — for a 90° rotation with B being the 45° rotated basis, the result should still look like a rotation matrix but possibly with different entries.',
+                'The invariants check: `det(R)` equals `det(R_B)` (both 1 — rotation preserves area), `trace(R)` equals `trace(R_B)` (both 0), `eig(R)` equals `eig(R_B)` (same eigenvalues ±i). These confirm that the rotation map is the same in both coordinate systems — only the numerical entries of the matrix change, not what the map does.',
+              ],
               code: `% Rotation matrix (90 degrees CCW) in standard basis
 R = [0 -1; 1 0]
 
@@ -144,7 +152,11 @@ diag(D_new)
             {
               id: 1,
               cellTitle: 'Change-of-basis matrix — coordinate conversion in R^2',
-              prose: 'Given basis $\\mathcal{B} = \\{\\mathbf{b}_1, \\mathbf{b}_2\\}$, build $P = [\\mathbf{b}_1 | \\mathbf{b}_2]$. Then $[\\mathbf{v}]_{\\mathcal{B}} = P^{-1}\\mathbf{v}$ (from standard to $\\mathcal{B}$) and $\\mathbf{v} = P[\\mathbf{v}]_{\\mathcal{B}}$ (from $\\mathcal{B}$ to standard). Verify by round-tripping: convert to $\\mathcal{B}$ and back.',
+              prose: [
+                'Given basis $\\mathcal{B} = \\{\\mathbf{b}_1, \\mathbf{b}_2\\}$, build $P = [\\mathbf{b}_1 | \\mathbf{b}_2]$. Then $[\\mathbf{v}]_{\\mathcal{B}} = P^{-1}\\mathbf{v}$ (from standard to $\\mathcal{B}$) and $\\mathbf{v} = P[\\mathbf{v}]_{\\mathcal{B}}$ (from $\\mathcal{B}$ to standard). Verify by round-tripping: convert to $\\mathcal{B}$ and back.',
+                '`P = np.column_stack([b1, b2])`. Convert to B-coords: `v_B = np.linalg.solve(P, v)`. Convert back: `v_reconstructed = P @ v_B`. `np.allclose(v, v_reconstructed)` must be True. When B is orthonormal, `np.linalg.solve(P, v)` simplifies to `P.T @ v` because `P^{-1} = P^T` for orthogonal P.',
+                'Visualise on a grid: plot the standard basis grid (light grey), the B-basis grid (light blue), and mark the same point v in both coordinate systems. The same physical point has coordinates (vx, vy) in standard and (c1, c2) in B. Hovering a cursor over the point and reading both coordinate labels side-by-side builds intuition for "coordinates are descriptions, not the point itself".',
+              ],
               code: `import numpy as np
 
 b1 = np.array([1., 1.]) / np.sqrt(2)   # 45° rotation basis
@@ -176,7 +188,11 @@ print(f"B-basis angle:  {angle_B:.2f}°  (should be ~{angle - 45:.2f}°)")`,
             {
               id: 2,
               cellTitle: 'P^{-1}AP — matrix in a new basis, similarity invariants',
-              prose: 'Changing to a new basis transforms the matrix $A$ to $A\' = P^{-1}AP$ (similar matrices). Similarity invariants — determinant, trace, eigenvalues — are preserved because they describe the map itself, not its coordinate representation.',
+              prose: [
+                'Changing to a new basis transforms the matrix $A$ to $A\' = P^{-1}AP$ (similar matrices). Similarity invariants — determinant, trace, eigenvalues — are preserved because they describe the map itself, not its coordinate representation.',
+                '`A_new = np.linalg.inv(P) @ A @ P`. Invariants: `np.isclose(np.linalg.det(A), np.linalg.det(A_new))`, `np.isclose(np.trace(A), np.trace(A_new))`, `np.allclose(sorted(np.linalg.eigvals(A).real), sorted(np.linalg.eigvals(A_new).real))`. All three should be True.',
+                'The best choice of P is the eigenvector matrix: `P = np.linalg.eig(A)[1]`. Then `A_new = np.diag(np.linalg.eig(A)[0])` — the diagonal matrix. In the eigenbasis, the map just scales each axis independently. This is diagonalization expressed as a change of basis: you are choosing coordinates where the map looks simplest.',
+              ],
               code: `import numpy as np
 
 A = np.array([[2., 1.],

@@ -58,7 +58,11 @@ export default {
             {
               id: 1,
               cellTitle: 'CG from scratch with convergence tracking',
-              prose: 'Implement conjugate gradient on a tridiagonal SPD system, track the energy-norm error each step, and compare against the theoretical bound.',
+              prose: [
+                'Implement conjugate gradient on a tridiagonal SPD system, track the energy-norm error each step, and compare against the theoretical bound.',
+                'CG algorithm: `r=b-A@x; p=r.copy(); rsold=r@r`. Each step: `Ap=A@p; alpha=rsold/(p@Ap); x+=alpha*p; r-=alpha*Ap; rsnew=r@r; beta=rsnew/rsold; p=r+beta*p; rsold=rsnew`. Track `residuals.append(np.sqrt(rsold))` and A-norm error `np.sqrt((x_true-x)@A@(x_true-x))`.',
+                'Semilogy plot of residuals vs iteration. The theoretical bound: `‖e_k‖_A ≤ 2 * ((√κ-1)/(√κ+1))^k * ‖e_0‖_A` where κ=cond(A). Plot the theoretical bound as a dashed line. The actual convergence often beats the bound significantly — the bound is worst-case (for uniformly distributed eigenvalues), but clustered eigenvalues give super-linear convergence.',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -113,7 +117,11 @@ plt.legend(); plt.grid(True); plt.tight_layout(); plt.show()
             {
               id: 2,
               cellTitle: 'Distinct eigenvalues → exact convergence steps',
-              prose: 'Verify empirically that CG converges in exactly m steps when the matrix has m distinct eigenvalues, regardless of the matrix size n.',
+              prose: [
+                'Verify empirically that CG converges in exactly m steps when the matrix has m distinct eigenvalues, regardless of the matrix size n.',
+                'Build a 50×50 diagonal matrix with only 3 distinct eigenvalues: `A = np.diag(np.tile([1,2,5], 17)[:50])`. Run CG — it converges in exactly 3 steps! The reason: CG minimises the error over the Krylov space Kₖ(A,r₀); with m distinct eigenvalues, the minimal polynomial of A has degree m, and the exact solution lies in Kₘ.',
+                'Test with different eigenvalue sets: `[1,2,5]` (3 distinct) → 3 steps. `[1,2,3,4,5]` (5 distinct) → 5 steps. `np.random.uniform(1,10,50)` (50 distinct) → up to 50 steps. This is the exact-arithmetic theorem: CG converges in at most m steps (number of distinct eigenvalues). In floating point, near-identical eigenvalues behave like one eigenvalue.',
+              ],
               code: `import numpy as np
 
 def run_cg(A, b, tol=1e-10):
@@ -168,7 +176,11 @@ print("\\nConclusion: CG iteration count = number of DISTINCT eigenvalues, not m
             {
               id: 1,
               cellTitle: 'CG implementation',
-              prose: ['Implement conjugate gradient for an SPD system and track residual norm.'],
+              prose: [
+                'Implement conjugate gradient for an SPD system and track residual norm.',
+                'CG in MATLAB: `r=b-A*x; p=r; rsold=r\'*r; for k=1:n, Ap=A*p; alpha=rsold/(p\'*Ap); x=x+alpha*p; r=r-alpha*Ap; rsnew=r\'*r; p=r+(rsnew/rsold)*p; rsold=rsnew; res(k)=sqrt(rsold); end`. Track `res` for the semilogy convergence plot.',
+                'The residual plot shows linear convergence on a semilogy plot — each step reduces the residual by a roughly constant factor. The slope is `log((sqrt(kappa)-1)/(sqrt(kappa)+1))` where `kappa=cond(A)`. Larger condition number → shallower slope → more iterations needed. This directly motivates preconditioning: reduce kappa, get fewer iterations.',
+              ],
               code: `% Build SPD test system (2D Poisson-like, small)
 n = 20
 % Tridiagonal SPD matrix
@@ -209,7 +221,11 @@ norm(x - x_exact) / norm(x_exact)
             {
               id: 2,
               cellTitle: 'Convergence vs condition number',
-              prose: ['Compare CG iteration counts for systems with different condition numbers.'],
+              prose: [
+                'Compare CG iteration counts for systems with different condition numbers.',
+                'Build SPD matrices with different condition numbers: `A_k = diag(linspace(1,kappa,n))` for kappa=5,20,100,500. Run CG to tolerance `1e-8` and record iteration counts. Plot iteration count vs kappa — it should grow as `~sqrt(kappa)` (the theoretical bound is `(1/2)*log(2/tol)*sqrt(kappa)`).',
+                'A loglog plot of iterations vs kappa should show slope ~0.5 (square root relationship). The bar chart of iteration counts makes the message immediate: kappa=500 needs ~10× more iterations than kappa=5. This is why preconditioning (transforming to a system with smaller kappa) is so valuable — halving sqrt(kappa) halves iteration count.',
+              ],
               code: `% Compare convergence for different kappa
 function iters = run_cg(A, b, tol)
     n = length(b)

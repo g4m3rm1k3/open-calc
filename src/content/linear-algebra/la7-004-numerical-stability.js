@@ -69,7 +69,11 @@ export default {
             {
               id: 1,
               cellTitle: 'Machine epsilon and catastrophic cancellation',
-              prose: 'Measure machine epsilon and observe how subtracting nearly equal numbers destroys all significant digits.',
+              prose: [
+                'Measure machine epsilon and observe how subtracting nearly equal numbers destroys all significant digits.',
+                '`eps = np.finfo(float).eps` — about 2.2e-16. Catastrophic cancellation: `a = 1.0 + 1e-15; b = 1.0; print(a - b)` gives 0.0 in many cases because 1+1e-15 rounds to 1.0 exactly. A less extreme example: `x = np.array([1e8, 1, -1e8]); print(np.sum(x))` — should be 1.0 but can be 0.0 depending on summation order.',
+                'The classic fix: Kahan summation or compensated summation. `np.sum(x)` uses pairwise summation internally for better accuracy. For the quadratic formula `(-b ± sqrt(b²-4ac))/2a`, when b²>>4ac, one root suffers catastrophic cancellation — use the stabilised form `c/(a*(-b ∓ sqrt(b²-4ac)))` instead. Demonstrate both forms for b=10^6, a=1, c=1 and compare to true roots.',
+              ],
               code: `import numpy as np
 
 eps = np.finfo(float).eps
@@ -99,7 +103,11 @@ print(f"True value: 0.5")
             {
               id: 2,
               cellTitle: 'LU with and without pivoting',
-              prose: 'Compare naive LU (no pivoting) vs scipy LU with partial pivoting on a nearly singular matrix.',
+              prose: [
+                'Compare naive LU (no pivoting) vs scipy LU with partial pivoting on a nearly singular matrix.',
+                'Naive LU: implement Gaussian elimination without pivoting. For `A = [[1e-20, 1], [1, 1]]`, the (2,1) multiplier is `1/1e-20 = 10^20` — this multiplied by the first row introduces huge errors. `scipy.linalg.lu(A)` with partial pivoting first swaps rows to put the largest element in the pivot position, keeping multipliers ≤ 1.',
+                '`P, L, U = scipy.linalg.lu(A)` — P is the permutation matrix. `np.allclose(P @ A, L @ U)` should be True. Compare `np.linalg.solve(A, b)` (uses LAPACK with pivoting) to the naive LU solution. For an ill-conditioned matrix, the residual `norm(A @ x_naive - b)` will be much larger than `norm(A @ x_pivoting - b)` — demonstrating that pivoting is not optional for stability.',
+              ],
               code: `import numpy as np
 from scipy.linalg import lu, solve
 
@@ -140,7 +148,11 @@ print("The multiplier without pivoting was:", round(m, 2))
             {
               id: 1,
               cellTitle: 'Machine epsilon and catastrophic cancellation',
-              prose: ['Observe floating-point precision limits and catastrophic cancellation.'],
+              prose: [
+                'Observe floating-point precision limits and catastrophic cancellation.',
+                '`eps = eps(1.0)` — machine epsilon in MATLAB (~2.2e-16). Test: `a = 1 + 1e-15; disp(a - 1)` — this may print 0 because 1+1e-15 rounds to 1. The classic catastrophic cancellation: computing `sqrt(x+1) - sqrt(x)` for large x. Naive: `disp(sqrt(1e8+1) - sqrt(1e8))` loses digits. Stable: `disp(1/(sqrt(1e8+1)+sqrt(1e8)))` uses the identity `(a-b) = (a²-b²)/(a+b)`.',
+                'Plot the error `|naive - true|` vs x on a semilogy plot as x grows. The error grows linearly with x (you lose one digit per decade). The stabilised form maintains constant absolute error. This demonstrates the general principle: whenever you subtract two nearly equal quantities, find an algebraically equivalent form that avoids the subtraction.',
+              ],
               code: `% Machine epsilon
 eps_machine = eps('double')
 disp('Machine epsilon (double):')
@@ -166,7 +178,11 @@ a - 1   % should be 1e-15 but may differ
             {
               id: 2,
               cellTitle: 'Effect of pivoting on numerical accuracy',
-              prose: ['Solve an ill-conditioned system with and without pivoting strategy. Observe accuracy.'],
+              prose: [
+                'Solve an ill-conditioned system with and without pivoting strategy. Observe accuracy.',
+                '`[L,U,P] = lu(A)` in MATLAB always uses partial pivoting. `P*A = L*U`. Solve: `x = U \\ (L \\ (P*b))`. The naive no-pivot version: implement Gaussian elimination manually. For `A=[1e-15 1; 1 1]`, without pivoting the first pivot is 1e-15, giving multiplier 1/1e-15 = 10^15 — numerical disaster.',
+                'Compare residuals: `norm(A*x_lu - b)/norm(b)` for pivoted vs naive. Plot a bar chart comparing residual norms for several ill-conditioned test matrices. The pivoted version consistently gives residuals near `cond(A)*eps`, while the naive version can be 10^10× worse. This is why you should always use `A\\b` in MATLAB (which uses LAPACK with pivoting) rather than implementing Gaussian elimination yourself.',
+              ],
               code: `% Matrix that requires pivoting for stability
 % Small (1,1) entry creates large multiplier without pivoting
 eps_val = 1e-10

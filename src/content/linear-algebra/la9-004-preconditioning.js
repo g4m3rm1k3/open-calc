@@ -59,7 +59,11 @@ export default {
               id: 1,
 
               cellTitle: 'Eigenvalue clustering: no preconditioner vs Jacobi vs ILU',
-              prose: 'Build a 1D Poisson matrix, compute eigenvalues of the original and preconditioned systems, and plot the clustering effect.',
+              prose: [
+                'Build a 1D Poisson matrix, compute eigenvalues of the original and preconditioned systems, and plot the clustering effect.',
+                'Jacobi preconditioner: `M_J = np.diag(np.diag(A))`. Preconditioned system: `A_pc = np.linalg.solve(M_J, A)`. ILU: `from scipy.sparse.linalg import spilu; ilu = spilu(A_sp); M_ilu = LinearOperator(...)`. Plot eigenvalues of A, `inv(M_J)@A`, and `inv(M_ilu)@A` as three scatter plots in the complex plane.',
+                'For the 1D Poisson matrix (symmetric, positive), all eigenvalues are real and positive. Without preconditioning: eigenvalues spread from near-0 to ~4 (condition number = 4n²/π²). With Jacobi: condition improves by factor ~2. With ILU(0): eigenvalues cluster near 1 (condition number ≈ 1). The tighter the cluster around 1, the faster CG converges.',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 from scipy.linalg import solve_triangular
@@ -112,7 +116,11 @@ plt.tight_layout(); plt.show()
               id: 2,
 
               cellTitle: 'CG iteration count vs preconditioner quality',
-              prose: 'Compare CG convergence with three preconditioners on a larger system. Count iterations needed to reach tolerance 1e-8.',
+              prose: [
+                'Compare CG convergence with three preconditioners on a larger system. Count iterations needed to reach tolerance 1e-8.',
+                '`scipy.sparse.linalg.cg(A, b, M=M_pc, tol=1e-8)` runs preconditioned CG. The M parameter is the preconditioner (approximate inverse of A). No preconditioner: `M=None`. Jacobi: `M=diags(1/A.diagonal())`. ILU: `M=spilu(A)`. Record iteration counts for each.',
+                'Bar chart of iteration counts: [None, Jacobi, ILU]. ILU is typically 5-10× fewer iterations than no preconditioner. The tradeoff: ILU is expensive to compute and apply (one sparse triangular solve per iteration vs one diagonal multiply). For small problems, the overhead of ILU exceeds the benefit. For large problems (n>1000), ILU almost always wins.',
+              ],
               code: `import numpy as np
 from scipy.sparse import diags
 from scipy.sparse.linalg import cg, LinearOperator
@@ -174,7 +182,11 @@ plt.legend(); plt.grid(True); plt.tight_layout(); plt.show()
             {
               id: 1,
               cellTitle: 'Diagonal preconditioner effect',
-              prose: ['See how diagonal (Jacobi) preconditioning changes the condition number.'],
+              prose: [
+                'See how diagonal (Jacobi) preconditioning changes the condition number.',
+                '`D = diag(diag(A)); M_inv = inv(D); A_pc = M_inv * A`. `cond(A)` vs `cond(A_pc)`. For a matrix with strongly varying diagonal entries, Jacobi preconditioning dramatically reduces the condition number. For a uniform-diagonal matrix (like the Poisson problem), Jacobi barely helps.',
+                'Eigenvalue scatter plot: `eig(A)` vs `eig(A_pc)`. For Jacobi, each eigenvalue is divided by the corresponding diagonal entry — this normalises the "scaling" difference between rows. The resulting eigenvalues cluster more tightly. The condition number reduction is `max(A_ii)/min(A_ii)` in the best case for a diagonal-dominant matrix.',
+              ],
               code: `% Ill-conditioned SPD matrix with varying diagonal
 n = 10
 % Diagonal entries vary by 3 orders of magnitude
@@ -203,7 +215,11 @@ kappa_A / kappa_prec
             {
               id: 2,
               cellTitle: 'Preconditioned CG iteration count',
-              prose: ['Count CG iterations with and without ILU preconditioning.'],
+              prose: [
+                'Count CG iterations with and without ILU preconditioning.',
+                'Build tridiagonal SPD system. Standard CG: implement CG and count iterations to `norm(r)/norm(b) < 1e-8`. Preconditioned CG: use `M = inv(diag(diag(A)))` as Jacobi preconditioner, replace the standard inner products with M-inner products. Compare iteration counts.',
+                'The table: [no-precond iterations, Jacobi iterations, direct-solve iterations]. Direct solve always uses "1 iteration" (just A\\b) but takes O(n) work for a tridiagonal. Iterative methods pay off when A is large and sparse and you only need moderate accuracy. The CG convergence with Jacobi should need roughly `sqrt(cond(A)/cond(A_pc_approx))` times fewer iterations than unpreconditioned.',
+              ],
               code: `% 1D Poisson: A is tridiagonal SPD
 n = 200
 e = ones(n,1)

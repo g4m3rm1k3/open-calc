@@ -111,7 +111,11 @@ export default {
             {
               id: 1,
               cellTitle: 'Computing SVD: [U,S,V] = svd(A)',
-              prose: ['MATLAB returns S as a full diagonal matrix. Use diag(S) to extract singular values.'],
+              prose: [
+                'MATLAB returns S as a full diagonal matrix. Use diag(S) to extract singular values.',
+                'The three matrices encode the full transformation: $A = U\\Sigma V^T$ means "rotate by $V^T$, scale by $\\Sigma$, then rotate by $U$." Columns of $U$ are output directions, columns of $V$ are input directions, and diagonal entries of $S$ are the stretching factors (singular values). The singular values appear in descending order: $\\sigma_1 \\geq \\sigma_2 \\geq \\cdots \\geq 0$.',
+                'Verify the reconstruction with `norm(A - U*S*V\\'', \\'fro\\') < 1e-10`. The full format gives $S$ as an $m\\times n$ matrix; for a tall matrix ($m > n$), the last $m-n$ columns of $U$ span the left null space and correspond to zero singular values — this is why `svd(A, \\'econ\\')` (economy form) returns a smaller $U$ and drops those columns.',
+              ],
               code: `A = [3 1 1; 1 3 1]   % 2x3 matrix
 [U, S, V] = svd(A)
 disp('Singular values:')
@@ -131,7 +135,11 @@ norm(A - U*S*V')
             {
               id: 2,
               cellTitle: 'Low-rank approximation',
-              prose: ['Keep only the k largest singular values to build the best rank-k approximation.'],
+              prose: [
+                'Keep only the k largest singular values to build the best rank-k approximation.',
+                'The Eckart-Young theorem guarantees that $A_k = U_k\\Sigma_k V_k^T$ is the best rank-$k$ approximation in both Frobenius and spectral norms: $\\|A - A_k\\|_F = \\sqrt{\\sigma_{k+1}^2 + \\cdots + \\sigma_r^2}$ and $\\|A - A_k\\|_2 = \\sigma_{k+1}$. No other rank-$k$ matrix comes closer to $A$.',
+                'The energy fraction `sum(s[:k]**2) / sum(s**2)` measures what fraction of $\\|A\\|_F^2$ rank $k$ captures. Most real-world matrices (images, toolpaths, sensor readings) are nearly low-rank: 90% of the energy is typically captured by just 5–10% of the singular values. This makes truncated SVD the fundamental tool for lossy compression and dimensionality reduction.',
+              ],
               code: `A = magic(6)   % 6x6 magic square
 [U, S, V] = svd(A);
 sigma = diag(S);
@@ -151,7 +159,11 @@ end
             {
               id: 3,
               cellTitle: 'CNC toolpath compression',
-              prose: ['A 3D toolpath is a 3xm matrix. SVD reveals its dominant shape and enables compression.'],
+              prose: [
+                'A 3D toolpath is a 3xm matrix. SVD reveals its dominant shape and enables compression.',
+                'The first singular value and vectors capture the dominant axis of the toolpath (primary feed direction). The second captures secondary variation (side steps in a raster pattern). If the toolpath is nearly 1D, $\\sigma_1 \\gg \\sigma_2$, and the rank-1 approximation reproduces the dominant shape with minimal error. Plotting `diag(S)` shows how quickly the singular values drop — a steep cliff indicates a truly low-rank path.',
+                'Compression trade-off: full storage needs $3\\times m$ numbers; rank-$k$ needs $k(3 + m + 1)$ numbers (U: $3k$, S: $k$, Vt: $km$). For $m = 10000$ points with $k = 2$: full = 30000, compressed = 20008 — about 33% savings. For smooth CNC tool paths, rank-2 or rank-3 captures the geometry with sub-micron reconstruction error.',
+              ],
               code: `% Simulate a helical CNC toolpath (3 x m matrix)
 m = 200;
 t = linspace(0, 4*pi, m);
@@ -190,7 +202,11 @@ fprintf('Storage: %d numbers vs original %d (%.0f%% compression)\\n', ...
             {
               id: 1,
               cellTitle: 'Computing the SVD',
-              prose: '`np.linalg.svd(A)` returns U, S, Vt where A = U @ diag(S) @ Vt. U has orthonormal columns, S contains singular values in descending order, Vt has orthonormal rows. The rank of A equals the number of non-zero singular values.',
+              prose: [
+                '`np.linalg.svd(A)` returns U, S, Vt where A = U @ diag(S) @ Vt. U has orthonormal columns, S contains singular values in descending order, Vt has orthonormal rows. The rank of A equals the number of non-zero singular values.',
+                'The heatmaps show the four matrices side by side. $U$ and $V^T$ have entries near $\\pm 1$ on their "active" directions and 0 elsewhere — they are rotation/reflection matrices. $\\Sigma$ is diagonal with the singular values on the main diagonal. Multiplying left-to-right: $V^T$ rotates input space, $\\Sigma$ stretches along the new axes, $U$ rotates to output space. `np.allclose(U @ np.diag(s) @ Vt, A)` verifies the reconstruction is exact.',
+                'Use `full_matrices=False` (economy SVD) to get compact output: $U$ has shape $(m, k)$ and $V^T$ has shape $(k, n)$ where $k = \\min(m,n)$. The full $U$ and $V^T$ include extra columns/rows spanning the null spaces — useful theoretically but wasteful in memory. Singular values are always real and non-negative even for complex or non-square matrices; `np.linalg.matrix_rank(A)` counts those above `max(m,n) * eps * s[0]`.',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -221,7 +237,11 @@ plt.show()`,
             {
               id: 2,
               cellTitle: 'Low-rank approximation — Eckart-Young theorem',
-              prose: 'The rank-k approximation keeps only the k largest singular values. It is the best possible rank-k approximation (Eckart-Young theorem). Watch how quickly the approximation improves as k increases.',
+              prose: [
+                'The rank-k approximation keeps only the k largest singular values. It is the best possible rank-k approximation (Eckart-Young theorem). Watch how quickly the approximation improves as k increases.',
+                'The visualization maps the unit circle (input space) to an ellipse (output space) via $A$. The axes of the ellipse are the left singular vectors $\\mathbf{u}_1, \\mathbf{u}_2$, and their lengths are the singular values $\\sigma_1, \\sigma_2$. The condition number $\\sigma_1/\\sigma_2$ is the ratio of the ellipse semi-axes — a nearly circular ellipse means a well-conditioned matrix; a very elongated one means ill-conditioned.',
+                'The left singular vectors $V$ columns tell you which input directions get stretched most: $A\\mathbf{v}_1 = \\sigma_1\\mathbf{u}_1$ means $\\mathbf{v}_1$ maps to $\\sigma_1\\mathbf{u}_1$ in the output. The energy fraction $\\sigma_k^2 / \\|A\\|_F^2$ tells you what fraction of the total stretching power is in the $k$-th singular value — for most data matrices, the first few account for 95%+ of the energy.',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -263,7 +283,11 @@ plt.show()`,
             {
               id: 3,
               cellTitle: 'Condition number — numerical stability',
-              prose: 'The condition number = σ₁ / σₙ (largest / smallest singular value). It measures how much a small change in b amplifies the error in the solution to Ax = b. A large condition number means the matrix is nearly singular — small input errors cause large output errors.',
+              prose: [
+                'The condition number = σ₁ / σₙ (largest / smallest singular value). It measures how much a small change in b amplifies the error in the solution to Ax = b. A large condition number means the matrix is nearly singular — small input errors cause large output errors.',
+                '`np.linalg.cond(A)` returns $\\sigma_1/\\sigma_n$. The well-conditioned matrix has $\\kappa \\approx 2$: a 1% change in $\\mathbf{b}$ causes at most a 2% change in $\\mathbf{x}$. The ill-conditioned $B$ has $\\kappa \\approx 10^4$: rows are almost proportional ($[1,2]$ and $[1.001, 2.001]$), so $B$ nearly collapses a direction — a tiny perturbation in $\\mathbf{b}$ can cause a massive change in the solution.',
+                'Numerically, condition number $> 1/\\epsilon_{\\text{machine}} \\approx 10^{16}$ means the matrix is effectively singular. For least squares, a condition number $> 10^8$ means losing 8 decimal digits of precision in the solution. Regularization (ridge regression, `np.linalg.lstsq` with `rcond` parameter) fixes ill-conditioning by treating $\\sigma_i < \\text{rcond} \\cdot \\sigma_1$ as zero, effectively projecting onto a well-conditioned subspace.',
+              ],
               code: `import numpy as np
 
 # Well-conditioned

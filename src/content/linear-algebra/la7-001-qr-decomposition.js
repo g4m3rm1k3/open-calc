@@ -71,7 +71,11 @@ export default {
             {
               id: 1,
               cellTitle: 'Compute QR and verify',
-              prose: 'Factor A = QR using numpy, verify Q has orthonormal columns, and check that QR reconstructs A exactly.',
+              prose: [
+                'Factor A = QR using numpy, verify Q has orthonormal columns, and check that QR reconstructs A exactly.',
+                '`Q, R = np.linalg.qr(A)` returns the thin QR by default. Verify orthonormality: `np.allclose(Q.T @ Q, np.eye(Q.shape[1]))`. Verify reconstruction: `np.allclose(Q @ R, A)`. Check R is upper triangular: `np.allclose(R, np.triu(R))`.',
+                'For a tall matrix (m > n), Q has shape (m, n) and R has shape (n, n). The columns of Q form an orthonormal basis for the column space of A — this is Gram-Schmidt, but computed stably via Householder reflections. `np.linalg.qr(A, mode="complete")` gives the full Q (m×m) with the extra columns spanning the left null space of A.',
+              ],
               code: `import numpy as np
 
 A = np.array([[1, 2, 3],
@@ -93,7 +97,11 @@ print("||QR - A|| (should be ~0):", np.linalg.norm(Q @ R - A))
             {
               id: 2,
               cellTitle: 'Least squares via QR vs normal equations',
-              prose: 'Fit a line to 4 data points using both QR and the normal equations. Compare the answers and the condition numbers.',
+              prose: [
+                'Fit a line to 4 data points using both QR and the normal equations. Compare the answers and the condition numbers.',
+                'QR approach: `Q, R = np.linalg.qr(A); x_qr = np.linalg.solve(R, Q.T @ b)`. Normal equations: `x_normal = np.linalg.solve(A.T @ A, A.T @ b)`. Both should give the same answer for well-conditioned A. The condition number of A.T@A is `cond(A)^2` — that squaring is why the normal equations are numerically dangerous.',
+                'Print both: `np.linalg.cond(A)` and `np.linalg.cond(A.T @ A)`. For a typical design matrix with condition 10, the normal equations have condition 100. For condition 10^6, the normal equations have condition 10^12 — beyond double precision. The QR approach keeps condition at `cond(A)` because R shares condition with A, not A.T@A.',
+              ],
               code: `import numpy as np
 
 # Design matrix: fit y = c0 + c1*t
@@ -121,7 +129,11 @@ print("  kappa(R)     =", round(np.linalg.cond(R), 2))
             {
               id: 3,
               cellTitle: 'Condition number disaster with near-singular A',
-              prose: 'For an ill-conditioned design matrix, the normal equations amplify errors catastrophically while QR stays stable.',
+              prose: [
+                'For an ill-conditioned design matrix, the normal equations amplify errors catastrophically while QR stays stable.',
+                'Build an ill-conditioned matrix: `A = np.vander(np.linspace(0,1,10), 8)` (Vandermonde matrix for polynomial fitting has very high condition number). `np.linalg.cond(A)` will be >10^10. Solve with QR: `x_qr = np.linalg.lstsq(A, b, rcond=None)[0]`. Solve with normal equations: `x_ne = np.linalg.solve(A.T @ A, A.T @ b)`.',
+                'Compare residuals: `np.linalg.norm(A @ x_qr - b)` vs `np.linalg.norm(A @ x_ne - b)`. The QR residual will be much smaller. The bar chart of coefficients shows the normal-equations solution has wild oscillations (the ill-conditioning has amplified noise into large, spurious coefficient values), while QR gives smoother, more reliable coefficients.',
+              ],
               code: `import numpy as np
 
 # Polynomial design matrix (Vandermonde) — gets ill-conditioned fast
@@ -150,7 +162,11 @@ print("QR approach uses kappa(A) — far more headroom")
             {
               id: 1,
               cellTitle: 'Compute QR and verify',
-              prose: ['Factor A = QR, verify Q has orthonormal columns, reconstruct A.'],
+              prose: [
+                'Factor A = QR, verify Q has orthonormal columns, reconstruct A.',
+                '`[Q, R] = qr(A, 0)` gives the thin (economy) QR. Verify: `norm(Q\'*Q - eye(size(Q,2)))` (should be ~1e-15), `norm(Q*R - A)` (should be ~1e-15), `istriu(R)` (should be 1). The `0` flag requests economy QR; without it MATLAB returns the full square Q.',
+                'For a 4×3 matrix, economy QR gives Q as 4×3 and R as 3×3. Full QR gives Q as 4×4 and R as 4×3. The extra column in full Q spans the left null space. The diagonal entries of R are the "lengths" of the Gram-Schmidt basis vectors — they should all be positive (with MATLAB\'s default convention).',
+              ],
               code: `A = [1  2  3;
      4  5  6;
      7  8 10;
@@ -166,7 +182,11 @@ norm(A - Q*R)
             {
               id: 2,
               cellTitle: 'Least squares via QR',
-              prose: ['Solve least-squares problem min||Ax-b|| using QR decomposition.'],
+              prose: [
+                'Solve least-squares problem min||Ax-b|| using QR decomposition.',
+                'The QR least squares formula: `[Q,R] = qr(A,0); x = R \\ (Q\'*b)`. This is equivalent to `x = A\\b` (MATLAB uses QR internally for overdetermined systems). The formula comes from: Ax=b → QRx=b → Rx=Q\'b → `x = R\\(Q\'*b)`.',
+                'Compare residuals: `norm(A*x - b)` using QR should equal `norm(A*(A\\b) - b)` to machine precision. The speedup comes when you have many right-hand sides b: factor once with QR, then each new b requires only `R\\(Q\'*b)` — two triangular solves instead of a full factorization.',
+              ],
               code: `A = [1 1; 1 2; 1 3; 1 4]
 b = [1; 2; 2; 4]
 

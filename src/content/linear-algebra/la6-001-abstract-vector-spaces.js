@@ -66,7 +66,11 @@
             {
               id: 1,
               cellTitle: 'Checking the subspace conditions',
-              prose: ['Is W = {(x,y,z) : x + y + z = 0} a subspace of R^3?'],
+              prose: [
+                'Is W = {(x,y,z) : x + y + z = 0} a subspace of R^3?',
+                'Three checks: (1) zero vector — `0+0+0=0` ✓; (2) closure under addition — if `u1+u2+u3=0` and `v1+v2+v3=0` then `(u1+v1)+(u2+v2)+(u3+v3)=0` ✓; (3) closure under scalar multiplication — if `x+y+z=0` then `c*x+c*y+c*z=c*0=0` ✓. Numerically: `u=[1;-1;0]; v=[2;0;-2]; disp(u+v)` should satisfy the constraint.',
+                'The MATLAB check: define `in_W = @(p) abs(sum(p)) < 1e-10; disp(in_W([0;0;0]))` (true for zero), `disp(in_W(u+v))` (true for sum), `disp(in_W(3*u))` (true for scalar multiple). All three returning 1 confirms W is a subspace. The geometric picture: W is a plane through the origin (the normal vector [1,1,1] has zero inner product with everything in W).',
+              ],
               code: `% Check 1: Does zero vector satisfy x+y+z=0?
 zero_vec = [0; 0; 0];
 disp('Zero vector in W? (0+0+0=0):')
@@ -92,7 +96,11 @@ rref([1 1 1])
             {
               id: 2,
               cellTitle: 'Polynomial addition: P2 is a vector space',
-              prose: ['Represent polynomials as coefficient vectors and verify closure.'],
+              prose: [
+                'Represent polynomials as coefficient vectors and verify closure.',
+                'Encode p(x) = a + bx + cx² as the column vector [a;b;c]. Addition becomes vector addition: `p+q = p_vec + q_vec`. Scalar multiplication: `2*p = 2*p_vec`. These operations always produce another polynomial of degree ≤ 2, which maps to another vector in R^3. This is the isomorphism P_2 ≅ R^3.',
+                'Test: `p = [1;2;3]; q = [0;1;-1]; r = p + q; disp(r)`. Interpret: r encodes 1 + 3x + 2x². Check closure under multiplication by -3: `disp(-3*p)` gives [-3;-6;-9], encoding -3 - 6x - 9x². Both stay in P_2 — confirming P_2 satisfies all vector space axioms under these operations.',
+              ],
               code: `% p(x) = 1 + 2x + 3x^2  represented as [1, 2, 3]
 % q(x) = 4 + 0x - x^2   represented as [4, 0, -1]
 p = [1; 2; 3]
@@ -145,7 +153,11 @@ disp('It is isomorphic to R^3')
             {
               id: 1,
               cellTitle: 'Subspace test: two examples',
-              prose: 'Verify that W = {(x,y,z) : x+2y-z=0} is a subspace of R^3 by checking closure under addition and scalar multiplication. Then show a non-example.',
+              prose: [
+                'Verify that W = {(x,y,z) : x+2y-z=0} is a subspace of R^3 by checking closure under addition and scalar multiplication. Then show a non-example.',
+                '`in_W = lambda v: abs(v[0] + 2*v[1] - v[2]) < 1e-10`. The three checks: `in_W([0,0,0])` (zero vector), `in_W(u + v)` (closure under addition for any u,v in W), `in_W(3*u)` (closure under scalar multiplication). All must return True. For the non-example (e.g. W2 = {x+y=1}), show `in_W2([0,0])` returns False — immediately fails at the zero vector test.',
+                'The key insight: any set defined by a HOMOGENEOUS linear equation (equal to zero) is a subspace; sets defined by INHOMOGENEOUS equations (equal to a non-zero constant) are not subspaces because the zero vector fails. This is why the standard subspace test starts with the zero vector — it is the quickest filter.',
+              ],
               code: `import numpy as np
 
 def in_W(v):
@@ -176,7 +188,11 @@ print("=> Not a subspace: doesn't contain zero and not closed under addition")
             {
               id: 2,
               cellTitle: 'Polynomial vector space P_2 ≅ R^3',
-              prose: 'Treat polynomials as coefficient vectors. Verify vector space operations and test whether {1+x, 1-x} spans P_1.',
+              prose: [
+                'Treat polynomials as coefficient vectors. Verify vector space operations and test whether {1+x, 1-x} spans P_1.',
+                'Encode p(x) = a + bx as `np.array([a, b])`. Addition is `p_vec + q_vec`; scalar multiplication is `c * p_vec`. To test spanning: build the matrix `B = np.column_stack([[1,1],[1,-1]])` (each column = one basis vector). Then `[1,x]` span P_1 iff `np.linalg.matrix_rank(B) == 2` and every vector can be solved: `np.linalg.solve(B, target_vec)` gives the coordinates.',
+                'Try to express `5 + 3x` in the {1+x, 1-x} basis: solve `c1*[1,1] + c2*[1,-1] = [5,3]`. The system `B @ [c1,c2] = [5,3]` gives `c1=4, c2=1`. Verify: `4*(1+x) + 1*(1-x) = 5 + 3x` ✓. Since det(B) ≠ 0, this works for ANY target polynomial — confirming {1+x, 1-x} is a basis for P_1.',
+              ],
               code: `import numpy as np
 
 # p(x) = a0 + a1*x + a2*x^2 stored as [a0, a1, a2]
@@ -201,7 +217,11 @@ print("=> {1+x, 1-x} spans P_1")
             {
               id: 3,
               cellTitle: "ODE solution space — a 2D vector space",
-              prose: "Solutions to y'' + y = 0 form a 2D vector space spanned by {sin(t), cos(t)}. Verify that any solution is a linear combination of these basis elements.",
+              prose: [
+                "Solutions to y'' + y = 0 form a 2D vector space spanned by {sin(t), cos(t)}. Verify that any solution is a linear combination of these basis elements.",
+                "The Wronskian matrix `W = [[sin(t), cos(t)], [cos(t), -sin(t)]]` has determinant `det(W) = -sin²(t) - cos²(t) = -1 ≠ 0` everywhere — confirming {sin, cos} are linearly independent at every point. In code: `t = np.linspace(0, 2*np.pi, 100); W = np.array([[np.sin(t), np.cos(t)],[np.cos(t), -np.sin(t)]]);  dets = np.linalg.det(W.transpose(2,0,1))` should be all -1.",
+                "Any initial condition (y(0)=a, y'(0)=b) determines a unique solution `y(t) = b*sin(t) + a*cos(t)`. The system `[[sin(0),cos(0)],[cos(0),-sin(0)]] @ [c1,c2] = [a,b]` gives `c2=a, c1=b`. Plot several solutions for different (a,b) pairs overlaid — they all look like sine waves with different amplitudes and phases, confirming the 2D nature of the solution space.",
+              ],
               code: `import numpy as np
 from scipy.integrate import odeint
 
@@ -233,7 +253,11 @@ print("=> Any solution = c1*cos(t) + c2*sin(t) — a 2D vector space")
             {
               id: 1,
               cellTitle: 'Subspace check and spanning',
-              prose: ['Test whether W = {(x,y,z): x+2y-z=0} is a subspace, then check whether {1+x, 1-x} spans P_1.'],
+              prose: [
+                'Test whether W = {(x,y,z): x+2y-z=0} is a subspace, then check whether {1+x, 1-x} spans P_1.',
+                'The subspace test in three lines: `u=[1;-2;-3]; v=[3;0;3]; disp(u(1)+2*u(2)-u(3))` (should be 0), `w=u+v; disp(w(1)+2*w(2)-w(3))` (should be 0), `s=3*u; disp(s(1)+2*s(2)-s(3))` (should be 0). For spanning: `B=[1 1; 1 -1]; disp(rank(B))` should be 2; then solve `B\\[5;3]` to express 5+3x in the new basis.',
+                'The key connection: subspace test checks three axioms (zero, addition, scalar); spanning test checks rank. Combining both: a set of vectors is a BASIS for a subspace iff it spans the subspace AND is linearly independent. The `rank(B)==n` check confirms both simultaneously when the matrix is square.',
+              ],
               code: `% Subspace check: W = {(x,y,z): x+2y-z=0}
 u = [1; 0; 1]   % 1+0-1=0 ✓
 v = [2; 1; 4]   % 2+2-4=0 ✓

@@ -66,7 +66,11 @@ export default {
             {
               id: 1,
               cellTitle: 'Eigenvectors of a symmetric matrix are orthogonal',
-              prose: ['For A = A^T, verify that eigenvectors are orthogonal and eigenvalues are real.'],
+              prose: [
+                'For A = A^T, verify that eigenvectors are orthogonal and eigenvalues are real.',
+                '`[V, D] = eig(A)` returns eigenvectors as columns of V and eigenvalues on the diagonal of D. For a symmetric matrix, check `V\'*V` — it should be the identity matrix (columns are orthonormal). Check `imag(diag(D))` — it should be all zeros (eigenvalues are real).',
+                'The orthogonality condition `V\'*V ≈ eye(n)` confirms the spectral theorem: symmetric matrices always have a complete orthonormal basis of eigenvectors. This is special — a general (non-symmetric) matrix may not have any orthogonal eigenvectors at all.',
+              ],
               code: `A = [4 2 0; 2 3 1; 0 1 2]
 disp('Is A symmetric? A - A^T:')
 A - A'
@@ -81,7 +85,11 @@ Q' * Q
             {
               id: 2,
               cellTitle: 'Spectral decomposition: A = Q*Lambda*Q^T',
-              prose: ['Reconstruct A as a sum of rank-1 outer products scaled by eigenvalues.'],
+              prose: [
+                'Reconstruct A as a sum of rank-1 outer products scaled by eigenvalues.',
+                'The spectral decomposition is `A = V*D*V\'` which expands as `sum_i lambda_i * v_i * v_i\'`. Each term `lambda_i * v_i * v_i\'` is a rank-1 matrix — a "slice" of A associated with one eigenvalue. Add them all up and you recover the full A.',
+                'To confirm: compute the partial sums `A1 = lambda1 * v1 * v1\'`, then `A2 = A1 + lambda2 * v2 * v2\'`, etc. Each rank-1 term adds one more "mode" to the reconstruction. The dominant eigenvalue contributes the most — this is the principle behind truncated spectral approximations.',
+              ],
               code: `A = [4 2 0; 2 3 1; 0 1 2]
 [Q, D] = eig(A)
 lambdas = diag(D);
@@ -101,7 +109,11 @@ norm(A - A_reconstructed)
             {
               id: 3,
               cellTitle: 'Non-symmetric matrix: complex eigenvalues',
-              prose: ['Compare with a non-symmetric matrix to see what symmetry prevents.'],
+              prose: [
+                'Compare with a non-symmetric matrix to see what symmetry prevents.',
+                'For a non-symmetric B, `[V, D] = eig(B)` can return complex eigenvalues. Check `isreal(diag(D))` — it will return false. Check `V\'*V` — it will NOT be the identity. The eigenvectors are not orthogonal, so you cannot write B = V*D*V\' (you would need V*D*inv(V)).',
+                'This comparison shows exactly what the spectral theorem guarantees: symmetry forces real eigenvalues AND orthogonal eigenvectors. Lose symmetry and you lose both. Plot `abs(diag(D))` for both A and B side-by-side to visualize the difference in eigenvalue structure.',
+              ],
               code: `B = [1 2; -3 4]
 disp('B - B^T (not symmetric):')
 B - B'
@@ -147,7 +159,11 @@ imag(eigenvalues_B)
             {
               id: 1,
               cellTitle: 'Orthogonal diagonalization of a symmetric matrix',
-              prose: '`np.linalg.eigh` is specifically for symmetric matrices — it returns real eigenvalues and orthonormal eigenvectors. The spectral decomposition $A = Q\\Lambda Q^T$ writes $A$ as a sum of rank-1 outer products $\\lambda_i \\mathbf{q}_i \\mathbf{q}_i^T$. Verify that $Q^T Q = I$ (eigenvectors are orthonormal) and that the reconstruction is exact.',
+              prose: [
+                '`np.linalg.eigh` is specifically for symmetric matrices — it returns real eigenvalues and orthonormal eigenvectors. The spectral decomposition $A = Q\\Lambda Q^T$ writes $A$ as a sum of rank-1 outer products $\\lambda_i \\mathbf{q}_i \\mathbf{q}_i^T$. Verify that $Q^T Q = I$ (eigenvectors are orthonormal) and that the reconstruction is exact.',
+                'Always use `eigh` instead of `eig` for symmetric/Hermitian matrices — it is 3× faster and guaranteed to return real eigenvalues. `eigenvalues, Q = np.linalg.eigh(A)` unpacks directly. Reconstruct with `A_reconstructed = Q @ np.diag(eigenvalues) @ Q.T` and check `np.allclose(A, A_reconstructed)`.',
+                'The rank-1 term loop `sum(lam * np.outer(q, q) for lam, q in zip(eigenvalues, Q.T))` builds the spectral expansion explicitly. Use `np.cumsum` to plot how quickly the partial sums converge — if one eigenvalue dominates, one term nearly reconstructs A (this is the basis for dimensionality reduction).',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -181,7 +197,11 @@ plt.show()`,
             {
               id: 2,
               cellTitle: 'Functions of symmetric matrices via spectral decomposition',
-              prose: 'For a symmetric matrix $A = Q\\Lambda Q^T$, any function $f(A) = Q f(\\Lambda) Q^T$ — just apply $f$ to each eigenvalue. This works for $A^{1/2}$ (matrix square root), $A^{-1}$, and $e^A$. These would be impossible or expensive to compute directly but become trivial once you have the spectral decomposition.',
+              prose: [
+                'For a symmetric matrix $A = Q\\Lambda Q^T$, any function $f(A) = Q f(\\Lambda) Q^T$ — just apply $f$ to each eigenvalue. This works for $A^{1/2}$ (matrix square root), $A^{-1}$, and $e^A$. These would be impossible or expensive to compute directly but become trivial once you have the spectral decomposition.',
+                'Pattern: `def mat_func(A, f): vals, Q = np.linalg.eigh(A); return Q @ np.diag(f(vals)) @ Q.T`. Call it as `mat_func(A, np.sqrt)` for the square root, `mat_func(A, lambda v: 1/v)` for the inverse, `mat_func(A, np.exp)` for the matrix exponential. Three different matrix functions, one three-line function.',
+                'Verify each result: `A_sqrt @ A_sqrt` should equal A (square root property); `A_inv @ A` should equal the identity; compare `mat_func(A, np.exp)` against `scipy.linalg.expm(A)`. All checks pass because the spectral theorem guarantees eigenvectors are orthogonal — `Q @ Q.T = I` makes the formula exact.',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -215,7 +235,11 @@ plt.show()`,
             {
               id: 3,
               cellTitle: 'PCA for CNC tool wear monitoring',
-              prose: 'The covariance matrix $C = \\frac{1}{N}X^T X$ is symmetric positive semidefinite. Its eigenvectors (principal components) are the directions of maximum variance in the sensor data. As a tool wears, a second dominant direction (chatter) appears — the ratio of the second to first eigenvalue grows, giving a real-time wear indicator.',
+              prose: [
+                'The covariance matrix $C = \\frac{1}{N}X^T X$ is symmetric positive semidefinite. Its eigenvectors (principal components) are the directions of maximum variance in the sensor data. As a tool wears, a second dominant direction (chatter) appears — the ratio of the second to first eigenvalue grows, giving a real-time wear indicator.',
+                '`C = X.T @ X / len(X)` builds the covariance matrix; `vals, vecs = np.linalg.eigh(C)` gives eigenvalues in ascending order (use `[::-1]` to sort descending). `vals / vals.sum()` converts to explained-variance fractions. The first eigenvector `vecs[:, -1]` points in the direction of greatest variation in the sensor data.',
+                'The wear indicator is `vals[-2] / vals[-1]` — the ratio of the second-largest to largest eigenvalue. For a sharp tool, chatter is absent and this ratio is small (≈ 0.05). As the tool dulls, vibration grows in a second direction and the ratio climbs toward 0.3–0.5. Plot this ratio over time to get a continuous, unsupervised wear signal from raw sensor data.',
+              ],
               code: `import numpy as np
 
 # PCA for CNC tool wear monitoring

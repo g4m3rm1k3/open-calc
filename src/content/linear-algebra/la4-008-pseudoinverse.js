@@ -56,7 +56,11 @@ export default {
             {
               id: 1,
               cellTitle: 'Pseudoinverse via SVD',
-              prose: ['Compute the pseudoinverse directly from the SVD and verify the Moore-Penrose conditions.'],
+              prose: [
+                'Compute the pseudoinverse directly from the SVD and verify the Moore-Penrose conditions.',
+                'The recipe: `[U, S, V] = svd(A, \'econ\')`. Invert non-zero singular values: `S_inv = diag(1./diag(S))`. Reconstruct: `A_plus = V * S_inv * U\'`. The `pinv(A)` function does exactly this internally. Verify: `norm(A * A_plus * A - A)` and `norm(A_plus * A * A_plus - A_plus)` should both be near machine epsilon.',
+                'The Moore-Penrose conditions are the defining properties of the pseudoinverse — any matrix satisfying all four is THE pseudoinverse (unique). Checking them numerically gives confidence that your SVD-based formula is correct. For a full-rank matrix, `A_plus = inv(A)` and all four conditions reduce to standard matrix inverse identities.',
+              ],
               code: `% Overdetermined system: more equations than unknowns
 A = [1 2; 3 4; 5 6]
 b = [1; 2; 3]
@@ -87,7 +91,11 @@ norm((A*A_plus)' - A*A_plus, 'fro')
             {
               id: 2,
               cellTitle: 'Underdetermined system: min-norm solution',
-              prose: ['For an underdetermined system, A+ gives the minimum-norm solution among infinitely many.'],
+              prose: [
+                'For an underdetermined system, A+ gives the minimum-norm solution among infinitely many.',
+                'With `m < n` (more unknowns than equations), `A*x = b` has infinitely many solutions: `x = A_plus*b + (I - A_plus*A)*z` for any vector z. The null-space term `(I - A_plus*A)*z` adds a vector in the null space of A. The pseudoinverse solution `x_min = A_plus*b` has z=0, giving the minimum-norm member of this family.',
+                'Verify minimum-norm: compute several particular solutions by adding different null-space vectors `z`, then compare their norms. `norm(A_plus * b)` should be strictly less than all others. Plot `norm(x_min + null_term*t)` vs t — it is a parabola minimized at t=0, confirming `x_min` is the bottom of the norm landscape.',
+              ],
               code: `% Underdetermined: more unknowns than equations
 A = [1 2 3; 4 5 6]
 b = [1; 2]
@@ -148,7 +156,11 @@ null_A'' * x_min
             {
               id: 1,
               cellTitle: 'Computing the pseudoinverse via SVD',
-              prose: 'The pseudoinverse $A^+ = V\\Sigma^+U^T$ inverts the non-zero singular values. `np.linalg.pinv` does this automatically. Verify the four Moore-Penrose conditions: $AA^+A = A$, $A^+AA^+ = A^+$, $(AA^+)^T = AA^+$, $(A^+A)^T = A^+A$.',
+              prose: [
+                'The pseudoinverse $A^+ = V\\Sigma^+U^T$ inverts the non-zero singular values. `np.linalg.pinv` does this automatically. Verify the four Moore-Penrose conditions: $AA^+A = A$, $A^+AA^+ = A^+$, $(AA^+)^T = AA^+$, $(A^+A)^T = A^+A$.',
+                'Build it manually: `U, s, Vt = np.linalg.svd(A, full_matrices=False); A_plus = Vt.T @ np.diag(1/s) @ U.T`. The `rcond` parameter in `np.linalg.pinv` controls which singular values are treated as zero — values below `rcond * max(s)` are zeroed out (regularisation). `np.linalg.pinv(A, rcond=1e-10)` gives the exact pseudoinverse for well-conditioned A.',
+                'Check all four conditions: `np.allclose(A @ A_plus @ A, A)`, `np.allclose(A_plus @ A @ A_plus, A_plus)`, `np.allclose((A @ A_plus).T, A @ A_plus)`, `np.allclose((A_plus @ A).T, A_plus @ A)`. Conditions 3 and 4 say AA⁺ and A⁺A are symmetric — geometrically, they are orthogonal projection matrices onto the column space of A and row space of A respectively.',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -185,7 +197,11 @@ plt.show()`,
             {
               id: 2,
               cellTitle: 'Overdetermined vs underdetermined — one formula handles both',
-              prose: 'For an overdetermined system ($m > n$), $A^+\\mathbf{b}$ is the least-squares solution. For an underdetermined system ($m < n$), it is the minimum-norm exact solution. The same `np.linalg.pinv` works for both.',
+              prose: [
+                'For an overdetermined system ($m > n$), $A^+\\mathbf{b}$ is the least-squares solution. For an underdetermined system ($m < n$), it is the minimum-norm exact solution. The same `np.linalg.pinv` works for both.',
+                'Overdetermined test: `m, n = 5, 3` (more equations); compute `x_hat = A_plus @ b`; verify `np.linalg.norm(A @ x_hat - b)` is the smallest achievable residual. Underdetermined test: `m, n = 3, 5` (more unknowns); compute `x_min = A_plus @ b`; verify `A @ x_min` equals b exactly and that no other solution has smaller norm.',
+                'Side-by-side bar charts: left shows the residual norm vs several solutions for the overdetermined case (A_plus gives the minimum); right shows solution norm vs several particular solutions for the underdetermined case (A_plus gives the minimum). This dual role — minimum residual OR minimum norm — is the power of the pseudoinverse.',
+              ],
               code: `import numpy as np
 
 print("=== Overdetermined (3 equations, 2 unknowns) ===")
@@ -212,7 +228,11 @@ print(f"Another solution norm: {np.linalg.norm(x_other):.4f} (larger than min-no
             {
               id: 3,
               cellTitle: 'Robot Jacobian pseudoinverse — minimum-norm joint velocities',
-              prose: 'A 3-joint planar robot with end-effector position in 2D has a 2×3 Jacobian. Since 3 joints > 2 DOF (underdetermined), there are infinitely many joint velocity solutions for any desired end-effector motion. The pseudoinverse picks the minimum-norm joint velocities — minimizing energy and avoiding sudden joint accelerations.',
+              prose: [
+                'A 3-joint planar robot with end-effector position in 2D has a 2×3 Jacobian. Since 3 joints > 2 DOF (underdetermined), there are infinitely many joint velocity solutions for any desired end-effector motion. The pseudoinverse picks the minimum-norm joint velocities — minimizing energy and avoiding sudden joint accelerations.',
+                '`J_plus = np.linalg.pinv(J)` computes the pseudoinverse of the Jacobian. `dq = J_plus @ dx_desired` gives joint velocities. The null-space component `(np.eye(3) - J_plus @ J) @ z` for any z produces joint motion that does NOT move the end-effector — you can use this for obstacle avoidance or joint-limit management while tracking a trajectory.',
+                'Plot the 3-link arm at several configurations along a straight-line end-effector path. Notice the joint angles change smoothly (minimum-norm picks the gentlest joint motion). Also plot `np.linalg.norm(dq)` along the path — it stays low because the pseudoinverse minimises joint speed, not just finds any solution.',
+              ],
               code: `import numpy as np
 
 # Simplified 3-joint planar robot Jacobian at a given configuration

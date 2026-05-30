@@ -58,7 +58,11 @@ export default {
             {
               id: 1,
               cellTitle: 'Jacobi iteration with convergence tracking',
-              prose: 'Implement Jacobi from scratch on a diagonally dominant system, track the error each iteration, and verify that the convergence rate matches the theoretical spectral radius.',
+              prose: [
+                'Implement Jacobi from scratch on a diagonally dominant system, track the error each iteration, and verify that the convergence rate matches the theoretical spectral radius.',
+                '`D = np.diag(np.diag(A)); R = A - D`. Jacobi iteration: `x = np.zeros(n); for k in range(max_iter): x = np.linalg.solve(D, b - R @ x); errors.append(np.linalg.norm(A@x-b))`. The Jacobi iteration matrix is `G_J = -np.linalg.inv(D) @ R`. Convergence rate = `np.max(np.abs(np.linalg.eigvals(G_J)))`.',
+                'Semilogy plot of `errors` vs iteration. The slope matches `log(rho(G_J))` — theoretical rate confirmed. For a tridiagonal SPD matrix, `rho(G_J) = cos(pi/(n+1))`, which approaches 1 as n grows — explaining why Jacobi slows down for large systems. This is why multigrid was invented.',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -104,7 +108,11 @@ plt.legend(); plt.grid(True); plt.tight_layout(); plt.show()
             {
               id: 2,
               cellTitle: 'Gauss-Seidel vs Jacobi comparison',
-              prose: 'Implement Gauss-Seidel and compare convergence rates. For this matrix class, verify the theoretical prediction that rho_GS ≈ rho_Jacobi².',
+              prose: [
+                'Implement Gauss-Seidel and compare convergence rates. For this matrix class, verify the theoretical prediction that rho_GS ≈ rho_Jacobi².',
+                'Gauss-Seidel: `L = np.tril(A); U_upper = np.triu(A, 1)`. Iteration: `x = np.linalg.solve(L, b - U_upper @ x)`. GS uses updated values immediately (within same iteration), so `G_GS = -np.linalg.inv(L) @ U_upper`. Compare `rho_GS = max(|eig(G_GS)|)` vs `rho_J = max(|eig(G_J)|)`. For symmetric tridiagonal: `rho_GS ≈ rho_J²`.',
+                'Plot convergence of both methods on the same semilogy plot. GS converges in roughly half as many iterations. The theoretical ratio `log(rho_GS)/log(rho_J) ≈ 2` is visible as the GS slope being twice as steep. This factor-of-2 advantage of GS is a fundamental result — Gauss-Seidel is always at least as fast as Jacobi for SPD matrices.',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -175,7 +183,11 @@ print(f"Gauss-Seidel iterations: {len(errs_gs)}")
             {
               id: 1,
               cellTitle: 'Jacobi method',
-              prose: ['Solve a diagonally dominant system with Jacobi iteration.'],
+              prose: [
+                'Solve a diagonally dominant system with Jacobi iteration.',
+                '`D = diag(diag(A)); R = A - D`. Jacobi: `x = zeros(n,1); for k=1:100, x = D \\ (b - R*x); res(k)=norm(A*x-b); end`. The iteration matrix is `G = -inv(D)*R`. Convergence: `rho_J = max(abs(eig(G)))`.',
+                'The semilogy convergence plot: residual per iteration. The slope is `log(rho_J)`. Verify: `diff(log(res))` should be approximately constant and equal to `log(rho_J)`. Diagonal dominance (`|A(i,i)| > sum(|A(i,j)| for j≠i)`) guarantees convergence. Test: make the diagonal smaller until convergence fails — you will see the residual stop decreasing.',
+              ],
               code: `% Strictly diagonally dominant system
 A = [4 -1  0;
     -1  4 -1;
@@ -211,7 +223,11 @@ A \\ b
             {
               id: 2,
               cellTitle: 'Gauss-Seidel comparison',
-              prose: ['Compare Gauss-Seidel convergence rate to Jacobi on the same system.'],
+              prose: [
+                'Compare Gauss-Seidel convergence rate to Jacobi on the same system.',
+                'Gauss-Seidel: `L = tril(A); U = triu(A,1)`. Iteration: `x = L \\ (b - U*x)`. GS iteration matrix: `G_GS = -L\\U`. `rho_GS = max(abs(eig(G_GS)))`. For symmetric tridiagonal A: verify `rho_GS ≈ rho_J^2` numerically.',
+                'Overlay Jacobi and GS convergence on the same semilogy plot with different colors. Count iterations to reach `norm(r) < 1e-8`. GS needs roughly half as many. Bar chart: [Jacobi iterations, GS iterations] — the visual makes the 2× speedup immediate. Also print `rho_J^2` and `rho_GS` side by side to confirm the theoretical prediction.',
+              ],
               code: `A = [4 -1  0;
     -1  4 -1;
      0 -1  4]

@@ -69,7 +69,11 @@ export default {
             {
               id: 1,
               cellTitle: 'Compute Cholesky and verify',
-              prose: 'Build an SPD matrix, factor it with Cholesky, and verify A = L @ L.T.',
+              prose: [
+                'Build an SPD matrix, factor it with Cholesky, and verify A = L @ L.T.',
+                '`L = np.linalg.cholesky(A)` returns the lower triangular L. Verify: `np.allclose(L @ L.T, A)`. The diagonal entries of L are all positive (required for SPD). If A is not SPD, `cholesky` raises `LinAlgError` — use this as a quick SPD test: `try: np.linalg.cholesky(A); print("SPD") except: print("not SPD")`.',
+                'Cholesky costs ~n³/3 flops vs ~2n³/3 for LU — exactly half. That factor of 2 matters for large n. Also check: `L[i,j] = (A[i,j] - sum(L[i,k]*L[j,k] for k in range(j))) / L[j,j]` is the explicit formula for each entry. The zero upper triangle is never stored in practice, so Cholesky also uses half the memory.',
+              ],
               code: `import numpy as np
 from scipy.linalg import cholesky, solve_triangular
 
@@ -93,7 +97,11 @@ print("||L @ L.T - A||:", np.linalg.norm(L @ L.T - A))
             {
               id: 2,
               cellTitle: 'Solve Ax = b using two triangular solves',
-              prose: 'With A = L @ L.T, solve Ax = b as two triangular systems: L y = b, then L.T x = y.',
+              prose: [
+                'With A = L @ L.T, solve Ax = b as two triangular systems: L y = b, then L.T x = y.',
+                '`L = np.linalg.cholesky(A)`. Step 1 (forward substitution): `y = scipy.linalg.solve_triangular(L, b, lower=True)`. Step 2 (back substitution): `x = scipy.linalg.solve_triangular(L.T, y, lower=False)`. Each triangular solve is O(n²) — together O(n²), vs O(n³) to factor. When you have many right-hand sides, factor once and solve many times.',
+                'Verify: `np.allclose(A @ x, b)`. Compare to `np.linalg.solve(A, b)` — they should agree. The split into two triangular solves is how LAPACK\'s DPOTRS works: factor with DPOTRF once (stores L), then solve with DPOTRS repeatedly (uses stored L). This pattern powers all SPD linear algebra in finite-element and Gaussian process codes.',
+              ],
               code: `import numpy as np
 from scipy.linalg import cholesky, solve_triangular
 
@@ -121,7 +129,11 @@ print("Difference:        ", np.linalg.norm(x - x_ref))
             {
               id: 3,
               cellTitle: 'Sampling correlated Gaussians',
-              prose: 'Use the Cholesky factor to generate samples from a 2D Gaussian with a given covariance. The key identity: if w ~ N(0,I) then L @ w ~ N(0, Sigma).',
+              prose: [
+                'Use the Cholesky factor to generate samples from a 2D Gaussian with a given covariance. The key identity: if w ~ N(0,I) then L @ w ~ N(0, Sigma).',
+                '`L = np.linalg.cholesky(Sigma)`. Generate standard normals: `W = np.random.randn(2, n_samples)`. Transform: `X = L @ W`. `X` now has covariance `L @ I @ L.T = L @ L.T = Sigma`. Verify: `np.cov(X)` should be close to Sigma for large n_samples.',
+                'The scatter plot shows X as correlated points in 2D: the ellipse shape and orientation directly reflect Sigma. The eigenvectors of Sigma give the principal axes; eigenvalues give the variance along each axis. Overlay the Sigma ellipse (computed from eigendecomposition) on the scatter plot to confirm visually that the Cholesky transform correctly reproduced the target covariance structure.',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -157,7 +169,11 @@ print("(should be close to Sigma for large n)")
             {
               id: 1,
               cellTitle: 'Compute Cholesky and verify',
-              prose: ['Factor an SPD matrix A = L*L^T, verify, and solve Ax = b.'],
+              prose: [
+                'Factor an SPD matrix A = L*L^T, verify, and solve Ax = b.',
+                '`L = chol(A, \'lower\')` returns the lower triangular factor. Verify: `norm(L*L\' - A)` (should be ~1e-14). MATLAB\'s default `chol(A)` returns the upper triangular factor U where A=U\'*U — use `\'lower\'` flag to get L as in the mathematical definition.',
+                'Solve Ax=b in two steps: `y = L \\ b` (forward substitution), `x = L\' \\ y` (back substitution). Check: `norm(A*x - b)`. Compare flop count: two triangular solves = 2*n^2 flops; compare to `A\\b` for a general matrix which uses LU = 2n^3/3 + 2n^2 flops. For n=1000, triangular solve is 1000× faster than full factorization.',
+              ],
               code: `B = [2 1 0; 1 3 1; 0 1 4]
 A = B' * B
 disp('Eigenvalues (all positive for SPD):')
@@ -182,7 +198,11 @@ norm(A*x - b)
             {
               id: 2,
               cellTitle: 'Cholesky for sampling correlated normals',
-              prose: ['Use Cholesky to generate correlated samples from a 2D Gaussian.'],
+              prose: [
+                'Use Cholesky to generate correlated samples from a 2D Gaussian.',
+                '`Sigma = [4 2; 2 3]; L = chol(Sigma, \'lower\')`. Generate standard normals: `W = randn(2, 1000)`. Transform: `X = L * W`. The transformed samples have covariance `L*I*L\' = Sigma`. Verify: `cov_est = (X*X\')/(size(X,2)-1); disp(cov_est)` should be close to Sigma.',
+                'The scatter plot shows the elliptical shape determined by Sigma. The principal axes align with the eigenvectors of Sigma. Overlay the exact ellipse: `[V,D]=eig(Sigma); t=linspace(0,2*pi,100); ellipse = V*sqrt(D)*[cos(t);sin(t)]`. The scatter should fill this ellipse — confirming the Cholesky transform correctly maps white noise to the desired correlation structure.',
+              ],
               code: `Sigma = [4 2; 2 3]
 L = chol(Sigma, 'lower')
 disp('Verify L*L^T = Sigma:')

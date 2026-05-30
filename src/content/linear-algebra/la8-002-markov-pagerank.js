@@ -64,7 +64,11 @@ export default {
             {
               id: 1,
               cellTitle: 'Weather Markov chain — power iteration',
-              prose: 'Model sunny/cloudy/rainy weather with a transition matrix and find the stationary distribution by repeatedly multiplying the transition matrix.',
+              prose: [
+                'Model sunny/cloudy/rainy weather with a transition matrix and find the stationary distribution by repeatedly multiplying the transition matrix.',
+                '`P = np.array([[0.7,0.2,0.1],[0.3,0.5,0.2],[0.2,0.3,0.5]])`. Each row must sum to 1: `np.allclose(P.sum(axis=1), 1)`. Power iteration: `v = np.array([1,0,0]); for _ in range(50): v = v @ P`. After convergence `v` is the stationary distribution. Exact: `vals, vecs = np.linalg.eig(P.T); v_stat = vecs[:,np.argmax(vals.real)].real; v_stat /= v_stat.sum()`.',
+                'The convergence plot shows the probability of each state vs iteration number. All three curves converge to the stationary distribution regardless of the starting state. The rate of convergence is `|λ₂/λ₁|` (ratio of second-largest to largest eigenvalue). Plot `|v_k - v_stat|` on a semilogy plot — slope is `log|λ₂|`, giving you the mixing time directly.',
+              ],
               code: `import numpy as np
 
 # Row-stochastic transition matrix (P[i,j] = prob of going from state i to state j)
@@ -96,7 +100,11 @@ print("Eigenvalue check: P.T has eigenvalue 1?", np.round(sorted(np.linalg.eigva
             {
               id: 2,
               cellTitle: 'PageRank on a small web graph',
-              prose: 'Build a small 5-page web graph and compute PageRank using the Google matrix with teleportation.',
+              prose: [
+                'Build a small 5-page web graph and compute PageRank using the Google matrix with teleportation.',
+                'Build adjacency: `A[i,j]=1` if page i links to page j. Normalize rows: `P = A / A.sum(axis=1, keepdims=True)`. Google matrix with damping d=0.85: `G = d*P + (1-d)*np.ones((n,n))/n`. PageRank: power iterate `v = np.ones(n)/n; for _ in range(100): v = v @ G` or find the eigenvector of G^T with eigenvalue 1.',
+                'Bar chart of PageRank scores. The page with the most incoming links from high-PageRank pages scores highest — not just the page with the most links. The teleportation term `(1-d)/n` guarantees the Markov chain is ergodic (connected and aperiodic), ensuring a unique stationary distribution. Without it, pages with no outgoing links ("dangling nodes") can cause the chain to get stuck.',
+              ],
               code: `import numpy as np
 
 # 5-page directed web graph (link matrix M, column-stochastic)
@@ -145,7 +153,11 @@ print("Ranking (most to least important):", ranking)
             {
               id: 1,
               cellTitle: 'Weather Markov chain',
-              prose: ['Model sunny/cloudy/rainy weather with transition matrix. Find stationary distribution.'],
+              prose: [
+                'Model sunny/cloudy/rainy weather with transition matrix. Find stationary distribution.',
+                '`P = [0.7 0.2 0.1; 0.3 0.5 0.2; 0.2 0.3 0.5]`. Power iteration: `v = [1;0;0]; for k=1:50, v = P\'*v; end; disp(v)`. Eigenvector method: `[V,D]=eig(P\'); [~,idx]=max(diag(D)); pi=V(:,idx); pi=pi/sum(pi); disp(pi)`.',
+                'The convergence plot: `v_hist(k,:) = v\'` after each iteration, then `plot(v_hist)`. All three rows converge to pi regardless of starting state. The second eigenvalue magnitude `abs(eig(P\')); sort(...)` gives the mixing rate — how many steps until the chain "forgets" its initial state.',
+              ],
               code: `% Transition matrix P: P(i,j) = prob of going to state j from state i
 % States: 1=Sunny, 2=Cloudy, 3=Rainy
 P = [0.7 0.2 0.1;
@@ -170,7 +182,11 @@ pi_stat
             {
               id: 2,
               cellTitle: 'Power iteration for PageRank',
-              prose: ['Compute PageRank for a small web graph via power iteration.'],
+              prose: [
+                'Compute PageRank for a small web graph via power iteration.',
+                'Adjacency: `A` with A(i,j)=1 if page i links to j. Normalize: `D = diag(sum(A,2)); P = inv(D)*A` (row-stochastic). Google matrix: `d=0.85; G = d*P + (1-d)*ones(n)/n`. Power iterate: `v=ones(n,1)/n; for k=1:100, v=G\'*v; end`.',
+                'Bar chart of PageRank. Pages with many high-PR inbound links score highest. The gap between top and bottom PageRank values reveals the "authority" structure of the graph. Change d from 0.85 to 0.99 and rerun — observe how ranking becomes more extreme as teleportation decreases (less diffusion means authority concentrates more).',
+              ],
               code: `% Small web graph: 5 pages
 % Column-stochastic link matrix (column j = where page j links to)
 M = [0   0   0   1/2 0;

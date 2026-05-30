@@ -57,7 +57,11 @@ export default {
             {
               id: 1,
               cellTitle: 'SVD truncation and energy',
-              prose: ['Compute low-rank approximations and measure how much energy each rank captures.'],
+              prose: [
+                'Compute low-rank approximations and measure how much energy each rank captures.',
+                '`[U, S, V] = svd(A)` returns the full SVD. For a rank-k approximation: take the first k columns of U, the top-left k×k block of S, and the first k columns of V. `A_k = U(:,1:k) * S(1:k,1:k) * V(:,1:k)\'`. The energy fraction is `sum(diag(S(1:k,1:k)).^2) / sum(diag(S).^2)`.',
+                'Plot both: (1) singular values on a semilogy plot — look for the "elbow" where values drop sharply, that is the natural rank; (2) energy fraction vs k — most matrices reach 95% energy with very small k. These two plots together tell you how much compression is possible before you start losing significant information.',
+              ],
               code: `% Create a test matrix with decaying singular values
 rng(42)
 A = randn(10, 8)  % random 10x8 matrix
@@ -89,7 +93,11 @@ end
             {
               id: 2,
               cellTitle: 'Image compression via SVD',
-              prose: ['Simulate image compression by approximating a matrix with low-rank truncated SVD.'],
+              prose: [
+                'Simulate image compression by approximating a matrix with low-rank truncated SVD.',
+                'For a grayscale image matrix M (pixels as matrix entries), `[U, S, V] = svd(M)` decomposes it. The rank-k approximation `M_k = U(:,1:k) * S(1:k,1:k) * V(:,1:k)\'` stores only `k*(m+n+1)` numbers instead of `m*n`. The compression ratio is `k*(m+n+1) / (m*n)`. For k=10 on a 100×100 image: 10*(100+100+1)/10000 = 20.1% of original size.',
+                'Show the reconstructed image using `imagesc(M_k); colormap(gray)` for several values of k. At k=1, you see only the dominant brightness gradient. By k=5–10, the main structure is recognizable. By k=20–30, the image looks nearly identical to the original. This is the Eckart-Young theorem in action: each added rank-1 term `sigma_i * u_i * v_i\'` fills in one more "frequency layer".',
+              ],
               code: `% Create a structured "image-like" matrix
 n = 50
 [X, Y] = meshgrid(1:n, 1:n)
@@ -144,7 +152,11 @@ end
             {
               id: 1,
               cellTitle: 'Eckart-Young theorem — verify best rank-k approximation',
-              prose: 'The rank-$k$ truncated SVD is the best rank-$k$ approximation. $\\|A - A_k\\|_2 = \\sigma_{k+1}$ and $\\|A - A_k\\|_F = \\sqrt{\\sigma_{k+1}^2 + \\cdots}$. No other rank-$k$ matrix does better. We verify: for each $k$, compute the error and confirm it equals the $(k+1)$-th singular value.',
+              prose: [
+                'The rank-$k$ truncated SVD is the best rank-$k$ approximation. $\\|A - A_k\\|_2 = \\sigma_{k+1}$ and $\\|A - A_k\\|_F = \\sqrt{\\sigma_{k+1}^2 + \\cdots}$. No other rank-$k$ matrix does better. We verify: for each $k$, compute the error and confirm it equals the $(k+1)$-th singular value.',
+                'Pattern: `U, s, Vt = np.linalg.svd(A, full_matrices=False)`. Rank-k approximation: `A_k = U[:, :k] @ np.diag(s[:k]) @ Vt[:k, :]`. Error in spectral norm: `np.linalg.norm(A - A_k, ord=2)` should equal `s[k]`. Error in Frobenius norm: `np.linalg.norm(A - A_k, "fro")` should equal `np.sqrt(np.sum(s[k:]**2))`.',
+                'The two error curves (spectral and Frobenius) both decrease as k increases, but at different rates. The Frobenius curve drops faster because it sums the remaining singular values squared. The spectral curve drops one step at a time (each step = one singular value). Plotting both helps you decide k: where does the "elbow" in the Frobenius curve occur?',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -179,7 +191,11 @@ plt.show()`,
             {
               id: 2,
               cellTitle: 'PCA as low-rank approximation of the covariance matrix',
-              prose: 'PCA finds the $k$ directions of maximum variance in data. The covariance matrix $C = X^TX/m$ is symmetric — its eigenvectors are the principal components. Projecting data onto the top $k$ eigenvectors is equivalent to the rank-$k$ approximation $X \\approx X_k$ (Eckart-Young applied to the data matrix).',
+              prose: [
+                'PCA finds the $k$ directions of maximum variance in data. The covariance matrix $C = X^TX/m$ is symmetric — its eigenvectors are the principal components. Projecting data onto the top $k$ eigenvectors is equivalent to the rank-$k$ approximation $X \\approx X_k$ (Eckart-Young applied to the data matrix).',
+                'Centre the data first: `X_c = X - X.mean(axis=0)`. Then `U, s, Vt = np.linalg.svd(X_c, full_matrices=False)`. The principal components are the rows of Vt; scores (projected data) are `X_c @ Vt[:k].T`. Variance explained by each PC is `s**2 / (s**2).sum()`. This is mathematically equivalent to `np.linalg.eigh(X_c.T @ X_c)` but numerically more stable.',
+                'The biplot shows data projected onto PC1 and PC2. Overlay the original feature directions as arrows scaled by `s[i]`. Long arrows = high-variance features. The angle between arrows shows correlation — perpendicular arrows = uncorrelated features. This directly visualises the geometry: PCA finds orthogonal directions of maximum spread.',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -212,7 +228,11 @@ plt.show()`,
             {
               id: 3,
               cellTitle: 'CNC toolpath compression via low-rank SVD',
-              prose: 'A smooth 3D CNC toolpath has low-dimensional structure — it lives near a 2D surface. Store the path as a $3 \\times m$ matrix and compute the SVD. The rank-$k$ approximation captures the dominant shape with far fewer numbers. Measure how much of the path geometry (Frobenius energy) the rank-2 approximation preserves.',
+              prose: [
+                'A smooth 3D CNC toolpath has low-dimensional structure — it lives near a 2D surface. Store the path as a $3 \\times m$ matrix and compute the SVD. The rank-$k$ approximation captures the dominant shape with far fewer numbers. Measure how much of the path geometry (Frobenius energy) the rank-2 approximation preserves.',
+                '`U, s, Vt = np.linalg.svd(path, full_matrices=False)`. Rank-2 approximation: `path_2 = U[:, :2] @ np.diag(s[:2]) @ Vt[:2, :]`. Compression ratio: `2*(3+m+1)/(3*m)`. The Frobenius error is `np.linalg.norm(path - path_2, "fro")` — if the path is truly nearly 2D, this will be tiny even at rank 2.',
+                'Plot the original 3D path and the rank-2 approximation overlaid in 3D with `ax.plot3D`. If the path is a helix or spiral in a tilted plane, the rank-2 approximation captures the plane but misses the third dimension. The error quantifies how "out-of-plane" the actual path is — useful for detecting whether a nominally-flat toolpath has unwanted Z-axis variation.',
+              ],
               code: `import numpy as np
 
 # Helical CNC toolpath: x=cos(t), y=sin(t), z=t/(2pi)

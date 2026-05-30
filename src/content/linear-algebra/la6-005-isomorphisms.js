@@ -66,7 +66,11 @@ export default {
             {
               id: 1,
               cellTitle: 'Isomorphism: P2 to R^3',
-              prose: ['Show the coordinate map phi: P_2 -> R^3 is linear and invertible.'],
+              prose: [
+                'Show the coordinate map phi: P_2 -> R^3 is linear and invertible.',
+                'Linearity check: `phi(p+q) = phi(p) + phi(q)` in MATLAB means `[a+c; b+d; e+f] == [a;b;e]+[c;d;f]` — always true by vector addition. `phi(s*p) = s*phi(p)` similarly. Invertibility: `phi_inv([a;b;c])` returns `a + b*x + c*x^2`. `phi(phi_inv(v)) = v` for any v in R^3.',
+                'The identity `phi(phi_inv([2;-1;3]))` encodes then decodes `2-x+3x^2`: result should be `[2;-1;3]`. This round-trip confirms bijectivity. The key insight: isomorphisms preserve ALL linear algebra structure — linear independence, span, dimension, linear maps. Problems in P_2 can be solved in R^3 (where you have explicit matrix tools) and the answers translate back.',
+              ],
               code: `% phi: a + bx + cx^2 -> [a; b; c]
 % Basis for P_2: {1, x, x^2}
 
@@ -90,7 +94,11 @@ disp('Any computation in R^3 translates to P_2 and back')
             {
               id: 2,
               cellTitle: 'Translating a linear algebra question',
-              prose: ['Are p1 = 1+x, p2 = 1+x^2, p3 = x+x^2 linearly independent in P_2?'],
+              prose: [
+                'Are p1 = 1+x, p2 = 1+x^2, p3 = x+x^2 linearly independent in P_2?',
+                'Translate: `v1=[1;1;0]; v2=[1;0;1]; v3=[0;1;1]`. Build `M = [v1 v2 v3]`. Check `rank(M)` — if 3, the vectors are independent (so the polynomials are linearly independent). If < 3, `null(M)` gives the dependence relation.',
+                'The dependence relation in polynomial terms: if `null(M) = [a;b;c]`, then `a*p1 + b*p2 + c*p3 = 0` in P_2. Verify: substitute x=0 and x=1 as spot checks. This is the power of the isomorphism: polynomial independence questions become rank questions on matrices — questions that MATLAB can answer instantly.',
+              ],
               code: `% Translate via phi: coordinate vectors
 v1 = [1; 1; 0]  % 1 + x
 v2 = [1; 0; 1]  % 1 + x^2
@@ -137,7 +145,11 @@ end
             {
               id: 1,
               cellTitle: 'Coordinate isomorphism: translate P_2 problems to R^3',
-              prose: 'The coordinate map $\\phi: P_2 \\to \\mathbb{R}^3$, $\\phi(a + bx + cx^2) = (a,b,c)^T$, is an isomorphism. To check if polynomials in $P_2$ are linearly independent, just check if their coordinate vectors in $\\mathbb{R}^3$ are linearly independent (using rank).',
+              prose: [
+                'The coordinate map $\\phi: P_2 \\to \\mathbb{R}^3$, $\\phi(a + bx + cx^2) = (a,b,c)^T$, is an isomorphism. To check if polynomials in $P_2$ are linearly independent, just check if their coordinate vectors in $\\mathbb{R}^3$ are linearly independent (using rank).',
+                'Encode each polynomial as a NumPy array: `p1 = np.array([1,1,0])` (1+x), `p2 = np.array([1,0,1])` (1+x²). Build `M = np.column_stack([p1, p2, p3])`. `np.linalg.matrix_rank(M)` — if it equals the number of polynomials, they are linearly independent.',
+                'For a dependence relation: `null_space = scipy.linalg.null_space(M)`. The non-trivial null vector `[a,b,c]` means `a*p1 + b*p2 + c*p3 = 0` as polynomials. Verify by evaluating at several x values: `a*(1+x) + b*(1+x**2) + c*(x+x**2)` for x in range(5) should all be near zero. This demonstrates that the isomorphism correctly translates polynomial linear dependence into matrix rank.',
+              ],
               code: `import numpy as np
 
 # Translate a P_2 independence question to R^3
@@ -163,7 +175,11 @@ print(f"2 + 5x - 3x^2 = {coords[0]:.4f}*(1+x) + {coords[1]:.4f}*(1+x^2) + {coord
             {
               id: 2,
               cellTitle: 'Build an explicit isomorphism and verify it',
-              prose: 'An isomorphism $T: V \\to W$ must be linear (matrix), injective (full column rank), and surjective (full row rank). When $\\dim V = \\dim W$, checking either injectivity or surjectivity alone suffices. Verify $T^{-1}$ is also linear.',
+              prose: [
+                'An isomorphism $T: V \\to W$ must be linear (matrix), injective (full column rank), and surjective (full row rank). When $\\dim V = \\dim W$, checking either injectivity or surjectivity alone suffices. Verify $T^{-1}$ is also linear.',
+                'For T represented by matrix M (dim V = dim W = n): `np.linalg.matrix_rank(M) == n` is the single check for isomorphism (full rank ↔ invertible ↔ injective ↔ surjective when square). `T_inv = np.linalg.inv(M)`. Verify: `np.allclose(M @ T_inv, np.eye(n))` and `np.allclose(T_inv @ M, np.eye(n))`.',
+                'Test with a non-isomorphism: build M_rank_deficient with `M[0] = M[1]`. `np.linalg.matrix_rank(M_rank_deficient) < n` — not full rank, not an isomorphism. `np.linalg.solve(M_rank_deficient, b)` will raise `LinAlgError`. This shows why dim(V) = dim(W) is necessary but not sufficient — you also need T to be injective.',
+              ],
               code: `import numpy as np
 
 # Isomorphism T: R^3 -> Sym(2x2) (2x2 symmetric matrices)

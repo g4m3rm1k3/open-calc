@@ -66,7 +66,11 @@ export default {
             {
               id: 1,
               cellTitle: 'Kernel and image via RREF',
-              prose: ['For T: R^4 -> R^3 given by matrix A, find ker(T) and im(T).'],
+              prose: [
+                'For T: R^4 -> R^3 given by matrix A, find ker(T) and im(T).',
+                'Kernel = null space of A: `[~,~,V] = svd(A); null_cols = V(:, rank(A)+1:end)`. Image = column space of A: `[Q,R,E] = qr(A,\'vector\'); im_basis = A(:,E(1:rank(A)))`. Or simply: `rank(A)` tells you dim(im(T)), and `size(A,2) - rank(A)` gives dim(ker(T)) via rank-nullity.',
+                'The rank-nullity check: `disp(rank(A) + size(null_cols,2))` should equal `size(A,2)` (number of columns = domain dimension). Verify the kernel: `disp(norm(A * null_cols))` should be near zero. Verify the image: `disp(rank([A, b]))` — if it equals `rank(A)`, then b is in the image (the system Ax=b is consistent).',
+              ],
               code: `A = [1 2 -1 3;
      2 4  0 6;
      1 2  1 3]
@@ -86,7 +90,11 @@ A(:, [1 3])
             {
               id: 2,
               cellTitle: 'Matrix representation of differentiation',
-              prose: ['Represent D: P_3 -> P_2 (differentiation) as a matrix using standard bases.'],
+              prose: [
+                'Represent D: P_3 -> P_2 (differentiation) as a matrix using standard bases.',
+                'For each basis vector of P_3 — namely 1, x, x², x³ — apply D and write the result in the P_2 basis {1, x, x²}. D(1)=0=[0;0;0], D(x)=1=[1;0;0], D(x²)=2x=[0;2;0], D(x³)=3x²=[0;0;3]. Stack as columns: `M = [0 1 0 0; 0 0 2 0; 0 0 0 3]`. This 3×4 matrix IS differentiation.',
+                'Test: `p = [1;2;3;4]` encodes 1+2x+3x²+4x³. `M*p` should give [2;6;12] encoding 2+6x+12x² = D(1+2x+3x²+4x³) ✓. The kernel of M is the span of [1;0;0;0] (constants — their derivative is zero), confirming ker(D) = constants. The image of M is all of P_2 (rank=3=dim(P_2)), confirming D is surjective.',
+              ],
               code: `% Basis for P_3: {1, x, x^2, x^3}  (columns)
 % Basis for P_2: {1, x, x^2}         (rows)
 % D(1) = 0, D(x) = 1, D(x^2) = 2x, D(x^3) = 3x^2
@@ -133,7 +141,11 @@ rank(D_matrix)
             {
               id: 1,
               cellTitle: 'Matrix representation of T(p) = p + p\'',
-              prose: 'To represent $T: P_3 \\to P_3$, $T(p) = p + p\'$ as a matrix: compute $T$ applied to each basis vector $\\{1, x, x^2, x^3\\}$, then write the result as a coordinate vector. These become the columns of the matrix $[T]$.',
+              prose: [
+                'To represent $T: P_3 \\to P_3$, $T(p) = p + p\'$ as a matrix: compute $T$ applied to each basis vector $\\{1, x, x^2, x^3\\}$, then write the result as a coordinate vector. These become the columns of the matrix $[T]$.',
+                'Column-by-column: T(1) = 1+0 = 1 → [1,0,0,0]. T(x) = x+1 → [1,1,0,0]. T(x²) = x²+2x → [0,2,1,0]. T(x³) = x³+3x² → [0,0,3,1]. Stack as columns: `M = np.array([[1,1,0,0],[0,1,2,0],[0,0,1,3],[0,0,0,1]])`. The upper-bidiagonal structure reflects the "shift by one degree" that differentiation causes.',
+                'Verify: `p_vec = np.array([1,2,3,4])` (encodes 1+2x+3x²+4x³). `T_p = M @ p_vec` should encode `(1+2x+3x²+4x³) + (2+6x+12x²)` = `3+8x+15x²+4x³` → [3,8,15,4]. Check: `np.allclose(M @ p_vec, [3,8,15,4])` ✓. This single matrix-vector multiplication captures both the polynomial and its derivative.',
+              ],
               code: `import numpy as np
 
 # Matrix representation of differentiation D: P_3 -> P_3, T(p) = p + p'
@@ -170,7 +182,11 @@ print("Matches:", np.allclose(Tp_coords, [5., 1., -1., 0.]))
             {
               id: 2,
               cellTitle: 'Rank-nullity for differentiation D: P_4 → P_3',
-              prose: 'Differentiation $D: P_4 \\to P_3$, $D(p) = p\'$. The kernel is the constants (only $p\'=0$ means $p$ is constant). The image is all of $P_3$ (every polynomial of degree $\\leq 3$ is the derivative of something). Verify rank + nullity = $\\dim(P_4) = 5$.',
+              prose: [
+                'Differentiation $D: P_4 \\to P_3$, $D(p) = p\'$. The kernel is the constants (only $p\'=0$ means $p$ is constant). The image is all of $P_3$ (every polynomial of degree $\\leq 3$ is the derivative of something). Verify rank + nullity = $\\dim(P_4) = 5$.',
+                '`D = np.zeros((4,5)); D[range(4), range(1,5)] = np.arange(1,5)` builds the differentiation matrix. `np.linalg.matrix_rank(D)` is 4 (image = all of P_3). `scipy.linalg.null_space(D)` returns the 1-dimensional null space (constants). `4 + 1 == 5` confirms rank-nullity ✓.',
+                'The bar chart of singular values visually shows rank: 4 non-zero values + 1 zero. This is the Rank-Nullity theorem in picture form. The non-zero singular values also show "how strongly" each frequency component (polynomial degree) gets mapped — D(x^n) = n*x^(n-1), so higher-degree terms produce larger singular values.',
+              ],
               code: `import numpy as np
 
 # Rank-nullity for differentiation D: P_4 -> P_3

@@ -66,7 +66,11 @@ export default {
             {
               id: 1,
               cellTitle: 'Standard vs weighted inner products',
-              prose: ['Compare the geometry induced by two different inner products on R^2.'],
+              prose: [
+                'Compare the geometry induced by two different inner products on R^2.',
+                'The standard dot product treats all directions equally — unit circles are circles. A weighted inner product `u_W = u\'*W*v` with `W = diag([w1, w2])` stretches the geometry: the "unit sphere" becomes an ellipse and orthogonality is redefined. Run `dot(u, W*v)` to compute the W-inner product of u and v.',
+                'The angle under a weighted inner product is `theta_W = acos(dot(u,W*v) / (sqrt(dot(u,W*u)) * sqrt(dot(v,W*v))))`. Notice how the same two vectors can be orthogonal in one inner product space and nearly parallel in another — the inner product defines the geometry, not the vectors.',
+              ],
               code: `u = [3; 1]
 v = [1; 2]
 
@@ -90,7 +94,11 @@ disp(['Weighted angle (deg): ' num2str(acos(real(cos_theta_w))*180/pi)])
             {
               id: 2,
               cellTitle: 'Cauchy-Schwarz verification',
-              prose: ['Verify |<u,v>| <= ||u|| * ||v|| for several vector pairs.'],
+              prose: [
+                'Verify |<u,v>| <= ||u|| * ||v|| for several vector pairs.',
+                'Cauchy-Schwarz is the deepest single inequality in linear algebra — it is the reason angles between vectors are well-defined (the ratio |<u,v>| / (‖u‖‖v‖) always lies in [0,1]). Use `abs(dot(u,v)) / (norm(u)*norm(v))` to compute the ratio and confirm it never exceeds 1.',
+                'Equality holds exactly when u and v are parallel (one is a scalar multiple of the other). Generate random pairs with `randn(2,1)` and plot the ratio — you will see it approaches 1 only for nearly-parallel vectors, confirming the geometric interpretation.',
+              ],
               code: `% Test many random pairs
 n = 100;
 violations = 0;
@@ -156,7 +164,11 @@ abs(lhs - rhs) < 1e-9
             {
               id: 1,
               cellTitle: 'Trig function orthogonality — the integral inner product',
-              prose: 'The inner product $\\langle f, g \\rangle = \\int_{-\\pi}^{\\pi} f(x)g(x)\\,dx$ on functions works exactly like the dot product. Two trig functions $\\sin(mx)$ and $\\sin(nx)$ are orthogonal when $m \\neq n$ — their inner product is zero. We verify this numerically using np.trapz (the trapezoidal rule for numerical integration).',
+              prose: [
+                'The inner product $\\langle f, g \\rangle = \\int_{-\\pi}^{\\pi} f(x)g(x)\\,dx$ on functions works exactly like the dot product. Two trig functions $\\sin(mx)$ and $\\sin(nx)$ are orthogonal when $m \\neq n$ — their inner product is zero. We verify this numerically using np.trapz (the trapezoidal rule for numerical integration).',
+                '`x = np.linspace(-np.pi, np.pi, 1000)` discretises the domain. `np.trapz(f * g, x)` approximates the integral — the finer the grid, the closer to the true value. The heatmap shows every (m,n) pair: near-zero off-diagonal entries confirm orthogonality; the diagonal entries give the norms ‖sin(nx)‖².',
+                'This orthogonality is the mathematical reason Fourier series work: each frequency component sin(nx) lives in its own "direction" of the function space, so you can extract any coefficient independently using `(1/π) * np.trapz(f * np.sin(n*x), x)` without crosstalk from other frequencies.',
+              ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -191,7 +203,11 @@ plt.show()`,
             {
               id: 2,
               cellTitle: 'Weighted inner product — geometry changes with weights',
-              prose: 'The weighted inner product $\\langle \\mathbf{u}, \\mathbf{v} \\rangle_W = \\mathbf{u}^T W \\mathbf{v}$ with $W = \\text{diag}(w_1,\\ldots,w_n)$ arises in weighted least squares. When sensors have unequal noise variance $\\sigma_i^2$, set $w_i = 1/\\sigma_i^2$ so precise measurements count more. The same vectors $\\mathbf{u},\\mathbf{v}$ can have completely different angles under the standard vs. weighted inner product.',
+              prose: [
+                'The weighted inner product $\\langle \\mathbf{u}, \\mathbf{v} \\rangle_W = \\mathbf{u}^T W \\mathbf{v}$ with $W = \\text{diag}(w_1,\\ldots,w_n)$ arises in weighted least squares. When sensors have unequal noise variance $\\sigma_i^2$, set $w_i = 1/\\sigma_i^2$ so precise measurements count more. The same vectors $\\mathbf{u},\\mathbf{v}$ can have completely different angles under the standard vs. weighted inner product.',
+                '`W = np.diag(weights)` builds the weight matrix. `inner_W = u @ W @ v` computes the weighted inner product. `norm_W = np.sqrt(u @ W @ u)` gives the W-induced norm. These three operations are all you need — everything else (projection, orthogonality, angle) follows from them.',
+                'The scatter plot shows the same dataset under two inner products: standard (dots in standard position) and weighted (dots stretched along the high-weight axis). The "nearest neighbour" relationship can change entirely — a point that looks close in standard geometry may be far in weighted geometry, which matters in classification and data compression.',
+              ],
               code: `import numpy as np
 
 variances = np.array([0.01, 0.01, 1.0, 1.0])
@@ -218,7 +234,11 @@ print("Different inner products give different geometries on the same space.")`,
             {
               id: 3,
               cellTitle: 'CNC chatter detection as a function inner product',
-              prose: 'To detect chatter at frequency $\\omega_c$, compute $\\langle f, \\sin(\\omega_c t) \\rangle = \\int_0^T f(t)\\sin(\\omega_c t)\\,dt$. If this Fourier coefficient is large, the cutting force contains that frequency. This is the inner product on the function space $L^2[0,T]$ — orthogonality of trig functions means each frequency is tested independently.',
+              prose: [
+                'To detect chatter at frequency $\\omega_c$, compute $\\langle f, \\sin(\\omega_c t) \\rangle = \\int_0^T f(t)\\sin(\\omega_c t)\\,dt$. If this Fourier coefficient is large, the cutting force contains that frequency. This is the inner product on the function space $L^2[0,T]$ — orthogonality of trig functions means each frequency is tested independently.',
+                '`np.trapz(force * np.sin(omega_c * t), t)` computes the sine coefficient. `np.trapz(force * np.cos(omega_c * t), t)` gives the cosine coefficient. The amplitude at that frequency is `np.sqrt(sin_coeff**2 + cos_coeff**2)`. Compare to `np.abs(np.fft.rfft(force))` — the FFT computes all these inner products at once.',
+                'The bar chart of Fourier coefficients is a "fingerprint" of the signal. A spike at the spindle frequency or its harmonics signals chatter. This is why inner product spaces matter in engineering: the orthogonality of basis functions is what makes frequency-domain analysis possible without crosstalk between channels.',
+              ],
               code: `import numpy as np
 
 T = 1.0; fs = 4096
