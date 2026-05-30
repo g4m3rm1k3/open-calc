@@ -14,6 +14,15 @@ const GAMES = [
     tags: ['Group Theory', 'Linear Algebra'],
   },
   {
+    key: 'matrix-game',
+    label: 'Linear Algebra',
+    emoji: 'λ',
+    color: 'cyan',
+    desc: 'Seven interactive lessons — vectors, matrix transforms, determinants, and eigenvectors — taught through watch → explore → prove phases.',
+    path: '/matrix-game',
+    tags: ['Linear Algebra', 'Interactive'],
+  },
+  {
     key: 'stem-tetris',
     label: 'STEM Tetris',
     emoji: '🟦',

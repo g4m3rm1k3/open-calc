@@ -536,7 +536,7 @@ function CycleDisplay({ cycles, label }) {
 }
 
 // ─── Main Component ───────────────────────────────────────────────────────────
-export default function RubiksCube() {
+export default function RubiksCube({ onBack }) {
   const [phase, setPhase] = useState('intro') // 'intro' | 'learn' | 'play'
   const [state, setState] = useState(solvedState)
   const [history, setHistory] = useState([]) // array of move names
@@ -727,6 +727,11 @@ export default function RubiksCube() {
         fontFamily: 'system-ui, sans-serif',
       }}>
         <div style={{ maxWidth: 780, width: '100%' }}>
+          {onBack && (
+            <button onClick={onBack} style={{ background: 'none', border: 'none', color: '#4dd0ff', cursor: 'pointer', fontSize: 11, letterSpacing: '2px', fontFamily: 'monospace', padding: '0 0 16px 0', opacity: 0.7 }}>
+              ← GAMES
+            </button>
+          )}
           {/* Step progress */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 32 }}>
             {['① Story', '② Learn', '③ Play'].map((label, i) => (
@@ -851,6 +856,11 @@ export default function RubiksCube() {
         fontFamily: 'system-ui, sans-serif',
       }}>
         <div style={{ maxWidth: 800, width: '100%' }}>
+          {onBack && (
+            <button onClick={onBack} style={{ background: 'none', border: 'none', color: '#4dd0ff', cursor: 'pointer', fontSize: 11, letterSpacing: '2px', fontFamily: 'monospace', padding: '0 0 16px 0', opacity: 0.7 }}>
+              ← GAMES
+            </button>
+          )}
           {/* Step progress */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 20 }}>
             {['① Story', '② Learn', '③ Play'].map((label, i) => (
@@ -1003,6 +1013,11 @@ export default function RubiksCube() {
       <div style={{ flex: '0 0 65%', display: 'flex', flexDirection: 'column', padding: '20px 20px 20px 24px', gap: 20, overflowY: 'auto', height: '100vh' }}>
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+          {onBack && (
+            <button onClick={onBack} style={{ background: 'none', border: 'none', color: '#4dd0ff', cursor: 'pointer', fontSize: 11, letterSpacing: '2px', fontFamily: 'monospace', opacity: 0.7 }}>
+              ← GAMES
+            </button>
+          )}
           <button
             onClick={() => setPhase('intro')}
             style={{ background: 'none', border: '1px solid rgba(77,208,255,0.3)', color: '#4dd0ff', borderRadius: 6, padding: '4px 10px', fontSize: 12, cursor: 'pointer' }}
