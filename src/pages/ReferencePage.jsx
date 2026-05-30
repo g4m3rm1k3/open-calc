@@ -42,7 +42,7 @@ function FormulaCard({ entry, onOpenProof }) {
   return (
     <button
       onClick={hasProof ? () => onOpenProof(entry) : undefined}
-      className={`relative w-full text-left bg-white dark:bg-slate-950/54 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-[8px] overflow-hidden transition-all duration-300 group shadow-lg shadow-slate-950/10 ${
+      className={`relative w-full text-left bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[8px] overflow-hidden transition-all duration-300 group shadow-lg shadow-slate-950/10 ${
         hasProof
           ? 'hover:shadow-2xl hover:shadow-brand-500/10 hover:border-amber-400 dark:hover:border-amber-600 hover:-translate-y-1.5 cursor-pointer'
           : 'hover:shadow-xl cursor-default hover:-translate-y-0.5'
@@ -67,7 +67,7 @@ function FormulaCard({ entry, onOpenProof }) {
         </div>
       </div>
       <div
-        className="relative z-10 px-5 py-5 overflow-x-auto text-center text-slate-900 dark:text-slate-50 bg-slate-50 dark:bg-white/8 my-1 mx-3 rounded-[8px] border border-slate-100 dark:border-white/10 shadow-inner"
+        className="relative z-10 px-5 py-5 overflow-x-auto text-center text-slate-900 dark:text-slate-50 bg-slate-50 dark:bg-slate-900 my-1 mx-3 rounded-[8px] border border-slate-100 dark:border-slate-700 shadow-inner"
         dangerouslySetInnerHTML={{ __html: html }}
       />
       <div className="relative z-10 px-5 pb-4 min-h-[46px] flex flex-col justify-end">
