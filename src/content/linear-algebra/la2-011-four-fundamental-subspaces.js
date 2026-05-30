@@ -72,6 +72,7 @@ export default {
               prose: [
                 'The SVD A = U Σ Vᵀ directly reveals all four subspaces. The first r columns of U (corresponding to nonzero singular values) span C(A); the remaining m-r columns span N(Aᵀ). The first r columns of V span C(Aᵀ); the remaining n-r columns span N(A). One decomposition, four subspaces.',
                 'The bar chart shows the four dimensions side by side. For this 3×4 rank-2 matrix: C(A) and C(Aᵀ) both have dim 2; N(A) has dim 2; N(Aᵀ) has dim 1. Verify rank-nullity: 2+2=4=n for the n-side, and 2+1=3=m for the m-side. The dot product check confirms orthogonality to machine precision.',
+                'The SVD partitions the $r$ nonzero singular values from the $n-r$ zero singular values: the first $r$ columns of $V$ (right singular vectors for $\\sigma > 0$) span the row space, and the remaining $n-r$ columns span the null space. Similarly for $U$ and the column-side subspaces. This is why `linalg.null_space` works — it calls SVD internally and extracts $V$-columns corresponding to $\\sigma \\approx 0$. The tolerance `s > 1e-10` is the numerical threshold that decides "zero vs nonzero" singular value.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -123,6 +124,7 @@ plt.show()`,
               prose: [
                 'Ax = b is solvable iff b ⊥ N(Aᵀ) (Fredholm alternative). The code extracts the left null space via SVD: U[:, r:] gives the columns of U that correspond to zero singular values. These are the vectors b must be orthogonal to. Here A = [1 2; 2 4] has rank 1, so N(Aᵀ) is 1-dimensional.',
                 'The variable b1 = [1, 2] is proportional to the first row of A, so it is in C(A) — Fredholm check prints ~0. The variable b2 = [1, 3] is not proportional, so it is outside C(A) — Fredholm check is nonzero. The rank augmentation test confirms both results independently.',
+                'The Fredholm alternative is a solvability theorem: EITHER $A\\mathbf{x} = \\mathbf{b}$ has a solution, OR there exists $\\mathbf{y} \\in N(A^\\top)$ with $\\mathbf{y}^\\top\\mathbf{b} \\neq 0$ — never both. The `fredholm_check = left_null.T @ b` computes this inner product. For $\\mathbf{b}_2$, it is nonzero: this nonzero value is the "obstruction" — it tells you specifically WHY the system has no solution. The `rank_match` double-check is the Rouché-Capelli theorem: $A\\mathbf{x} = \\mathbf{b}$ is solvable iff rank$(A)$ = rank$([A|\\mathbf{b}])$.',
               ],
               code: `import numpy as np
 
@@ -157,6 +159,7 @@ for b, label in [(b1, "b1=[1,2]"), (b2, "b2=[1,3]")]:
               prose: [
                 'For a 2×2 rank-1 matrix A = [1 2; 2 4], the column space C(A) is just a line through the origin. Every input vector x maps to a point on this line — the entire plane collapses onto a 1D subspace. Vectors in N(A) = span{[-2,1]^T} all land on zero.',
                 'The left subplot shows the input plane colored by distance from origin. The right subplot shows where every grid point maps after multiplication by A. The collapse from 2D to 1D is the geometric meaning of det(A) = 0. Compare to the invertible case A_inv = [1 1; 0 1] where the plane stretches but stays 2D.',
+                'The null space vector of `A_sing` is $[-2, 1]^\\top$ — verify `A_sing @ np.array([-2.,1.])` gives $[0,0]$. Every grid point that differs by a multiple of $[-2,1]$ maps to the same output point. In the right plot, the entire 2D grid collapses onto a 1D line — the column space of A_sing, which is span$\\{[1,2]^\\top\\}$. Points of the same color (same distance from origin) that lie along the null direction get compressed to one point: the irreversible information loss of rank 1.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -188,6 +191,7 @@ plt.show()`,
               prose: [
                 'For an underdetermined system Ax=b (more unknowns than equations), there are infinitely many solutions. The pseudoinverse A^+ = np.linalg.pinv(A) gives the minimum-norm solution — the unique solution in the row space C(Aᵀ). Any other solution adds a null space component, increasing the norm.',
                 'Verify: x_min = A^+ b should satisfy A @ x_min ≈ b, and np.linalg.lstsq returns the same answer. Also verify that x_min is in the row space by checking that null(A)^T @ x_min ≈ 0. Compute a second solution x2 = x_min + null_vec and confirm ||x2|| > ||x_min||.',
+                'The pseudoinverse selects the minimum-norm solution because $\\mathbf{x}_{\\min} \\in C(A^\\top)$ and any other solution is $\\mathbf{x}_{\\min} + \\mathbf{n}$ for $\\mathbf{n} \\in N(A)$. Since row space and null space are orthogonal (by the theorem proved in rigor), the Pythagorean theorem gives $\\|\\mathbf{x}_{\\min} + \\mathbf{n}\\|^2 = \\|\\mathbf{x}_{\\min}\\|^2 + \\|\\mathbf{n}\\|^2 \\geq \\|\\mathbf{x}_{\\min}\\|^2$. So adding any non-zero null vector strictly increases the norm — $\\mathbf{x}_{\\min}$ is the unique shortest solution. The `null_A.T @ x_min ≈ 0` check confirms $\\mathbf{x}_{\\min}$ has no null component.',
               ],
               code: `import numpy as np
 from scipy import linalg
@@ -214,6 +218,52 @@ print(f"A @ x2 = {(A @ x2).round(6)}  (still satisfies Ax=b)")
 # Verify x_min is in row space: null_A^T @ x_min ≈ 0
 print(f"\\nnull_A^T @ x_min = {(null_A.T @ x_min).round(10)}  (should be ~0 — x_min in row space)")`,
             },
+            {
+              id: 5,
+              cellTitle: 'Application: four subspaces of a data matrix',
+              prose: [
+                'For a data matrix $A$ where rows are observations and columns are features, the four subspaces have concrete meaning. The column space $C(A)$ is the span of all feature combinations the model can represent. The null space $N(A)$ is the set of feature-weight vectors that produce zero predictions on all training data — these are the "invisible" directions to the model. The row space $C(A^\\top)$ is the span of all training observations, and the left null space $N(A^\\top)$ contains the combinations of observations that sum to zero.',
+                'This cell builds a small data matrix where two features are correlated (nearly linearly dependent) and computes the singular values to reveal near-redundancy. A near-zero singular value means a near-zero-dimensional direction — almost a null space direction. Ridge regression (from la2-009) adds $\\lambda I$ to push these near-zero singular values away from zero, regularizing the null space.',
+                'The singular value plot is the "spectrum" of the data matrix: each singular value $\\sigma_i$ is the standard deviation of the data in the $i$-th principal direction. Near-zero singular values correspond to near-redundant features or near-dependent observations. The ratio $\\sigma_{\\max}/\\sigma_{\\min}$ = condition number: when it is large, the four subspaces are not clean — the boundary between "active" and "null" is blurry, and the choice of numerical tolerance matters.',
+              ],
+              code: `import numpy as np
+import matplotlib.pyplot as plt
+from scipy import linalg
+
+# Data matrix: 5 observations, 4 features; feature 4 ≈ feature 1 + feature 2
+np.random.seed(42)
+n_obs, n_feat = 5, 4
+A = np.random.randn(n_obs, n_feat)
+A[:, 3] = A[:, 0] + A[:, 1] + 0.01 * np.random.randn(n_obs)  # nearly dependent
+
+U, s, Vt = np.linalg.svd(A)
+r_exact = np.linalg.matrix_rank(A)           # numerical rank
+r_approx = np.sum(s > 0.1 * s.max())        # effective rank (loose threshold)
+
+print(f"Exact rank: {r_exact}, effective rank (σ > 0.1×σ_max): {r_approx}")
+print(f"Singular values: {s.round(3)}")
+print(f"Condition number: {s.max() / s.min():.1f}")
+
+# Four subspace dimensions
+print(f"C(A) dim = {r_exact}  (column space, in R^{n_obs})")
+print(f"N(A) dim = {n_feat - r_exact}  (null space, in R^{n_feat})")
+print(f"C(A^T) dim = {r_exact}  (row space, in R^{n_feat})")
+print(f"N(A^T) dim = {n_obs - r_exact}  (left null space, in R^{n_obs})")
+
+null_vec = linalg.null_space(A)
+print(f"\\nNull space vector (near [1, 1, 0, -1] up to scaling):")
+print(null_vec.round(3))
+print(f"A @ null_vec: {(A @ null_vec).round(6).ravel()}  (should be ~0)")
+
+fig, ax = plt.subplots(figsize=(7, 3.5))
+ax.bar(range(1, len(s)+1), s, color=['steelblue']*r_exact + ['crimson']*(len(s)-r_exact), alpha=0.8)
+ax.axhline(0.1*s.max(), color='orange', linestyle='--', lw=1.5, label='0.1×σ_max threshold')
+ax.set_xlabel('Index i'); ax.set_ylabel('Singular value σᵢ')
+ax.set_title('Singular values: blue=active directions, red=near-null directions')
+ax.legend(); ax.grid(True, alpha=0.3, axis='y')
+plt.tight_layout()
+plt.show()`,
+            },
           ],
         },
       },
@@ -230,6 +280,7 @@ print(f"\\nnull_A^T @ x_min = {(null_A.T @ x_min).round(10)}  (should be ~0 — 
               prose: [
                 'The SVD [U, S, V] = svd(A, \'econ\') factorizes A = U*S*V\'. The first r columns of U span C(A), the first r columns of V span C(A^T), the last n-r columns of V span N(A), and the last m-r columns of U span N(A^T). Here A is 2×3 with rank r=2, so the single last column of V is the null space basis and the left null space is empty (m-r = 0).',
                 'The final check row_space\' * null_space computes all inner products between the row-space and null-space basis vectors. The result should be a matrix of near-zero values — confirming C(A^T) ⊥ N(A). A single matrix multiply verifies the fundamental orthogonality property.',
+                'The SVD [U,S,V] = svd(A) partitions the $r$ active directions from the $n-r$ null directions: $V(:,1:r)$ spans the row space (large $\\sigma$), $V(:,r+1:\\text{end})$ spans the null space ($\\sigma \\approx 0$). For this 2×3 rank-2 matrix, the check `row_space\' * null_space` is a $2 \\times 1$ matrix — two inner products, both near zero. The same SVD produces all four subspaces in one call, which is why numerical code uses SVD rather than RREF for subspace computations.',
               ],
               code: `% Matrix A (2x3, rank 2)
 A = [1 2 3; 4 5 6]
@@ -267,6 +318,7 @@ row_space' * null_space
               prose: [
                 'The Fredholm check left_null\' * b1 computes the inner product of every left-null-space basis vector with b1. A result of ~0 confirms b1 ∈ C(A), so Ax=b1 is solvable. A non-zero result for b2 confirms b2 ∉ C(A). Here A = [1 2; 2 4] has rank 1, so the left null space has dimension m-r = 2-1 = 1.',
                 'The rank augmentation test [rank(A), rank([A b])] is the Rouché-Capelli theorem: if rank does not increase when b is appended, b is in the column space. Both methods — Fredholm and rank augmentation — are equivalent and should always agree. Run both and compare their answers for b1 and b2.',
+                'The Rouché-Capelli theorem says: $A\\mathbf{x} = \\mathbf{b}$ is solvable iff rank$(A)$ = rank$([A|\\mathbf{b}])$. When $\\mathbf{b} \\in C(A)$, appending $\\mathbf{b}$ adds no new pivot (rank stays the same). When $\\mathbf{b} \\notin C(A)$, the augmented matrix gains one more pivot and rank increases by 1. The Fredholm check `left_null\' * b` is more informative: it not only tells you THAT the system is unsolvable, but identifies the specific direction in $N(A^\\top)$ that is not orthogonal to $\\mathbf{b}$ — the obstruction that prevents solvability.',
               ],
               code: `A = [1 2 3; 4 5 6; 7 8 9]  % rank 2, 3x3
 b1 = [1; 2; 3]   % test: is b1 in C(A)?
@@ -299,6 +351,7 @@ disp('Rank of [A b2] vs rank(A):')
               prose: [
                 'This cell computes all four subspaces using only row reduction — the method taught in the lesson. rref(A) gives the RREF; non-zero rows are the row space basis. The pivot positions identify which columns to take from original A for the column space. null(A) and null(A\') compute the null spaces numerically.',
                 'The final check row_space * null_A should print ~0: a 2×1 matrix of near-zeros confirming C(A^T) ⊥ N(A). Notice that the column space basis uses the original A columns, not the RREF columns — row operations preserve row space and null space but NOT column space.',
+                'The key insight: always take column space basis vectors from the ORIGINAL matrix $A$, not from the RREF $R$. Row operations change the column VECTORS but preserve the column INDICES of pivots. So from the RREF, identify WHICH columns are pivot columns (here columns 1 and 2), then grab those columns from the original $A$. The `A(:, 1:r)` line is correct here because columns 1 and 2 happen to be the pivot columns — but in general, use `rref(A, \'tol\', 1e-10)` to find pivot column indices first.',
               ],
               code: `A = [1 2 3; 4 5 6; 7 8 9];   % rank 2, 3x3
 [m, n] = size(A);
@@ -329,6 +382,7 @@ row_space * null_A
               prose: [
                 'Any vector x ∈ ℝⁿ splits uniquely as x = x_row + x_null where x_row ∈ C(A^T) and x_null ∈ N(A). The projection onto N(A) is P_null = V*V\' where V is the null space basis matrix. The row space projection is P_row = I - P_null.',
                 'After running: verify that A*x_null ≈ 0 (the null component maps to zero), that x_row and x_null are orthogonal (dot product ≈ 0), and that x_row + x_null = x exactly. This is the core geometric meaning of the four fundamental subspaces — they explain the exact structure of every vector in the domain.',
+                'The two projections $P_{\\text{null}} = VV^\\top$ and $P_{\\text{row}} = I - VV^\\top$ are orthogonal projectors: $P^2 = P$ (idempotent) and $P^\\top = P$ (symmetric). They sum to the identity: $P_{\\text{null}} + P_{\\text{row}} = I$. The check `A*x_null ≈ 0` confirms $\\mathbf{x}_{\\text{null}} \\in N(A)$; `dot(x_row, x_null) ≈ 0` confirms orthogonality of the row and null spaces. This orthogonal decomposition is the foundation of the pseudoinverse: $A^+ = V_r \\Sigma_r^{-1} U_r^\\top$, which inverts $A$ only on its row space component.',
               ],
               code: `A = [1 0 2; 0 1 -1];   % 2x3, rank 2
 x = [3; -1; 2];          % arbitrary vector in R^3

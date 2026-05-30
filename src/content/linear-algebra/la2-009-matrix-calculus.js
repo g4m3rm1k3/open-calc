@@ -118,6 +118,7 @@ J_numerical = J_num
               prose: [
                 'For f(x) = x^T Ax − b^T x, the gradient is ∇f = 2Ax − b and the Hessian is H = 2A (constant — it does not depend on x). Newton\'s method solves H·Δx = −∇f for the step, computed as x_star = x0 - H \\ grad_f(x0) (MATLAB backslash solves the linear system). For a quadratic, this single step lands exactly at the minimum because minimizing the quadratic Taylor approximation IS minimizing f itself.',
                 'Try changing x0 to [100; -50] or [-3; 7]: the result is always the same x*. The printed gradient at x_star shows ~1e-14 (machine zero), and the analytic check confirms: setting ∇f = 0 gives 2Ax = b, so x* = A \\ b / 2.',
+                'Newton\'s method is immune to the condition number: it solves $H\\Delta\\mathbf{x} = -\\nabla f$ exactly, landing at $\\mathbf{x}^*$ in one step regardless of how elongated the quadratic bowl is. Add `disp(cond(A))` to see $\\kappa(A) \\approx 5$ here — gradient descent would need $O(\\kappa)$ iterations to converge. Replace A with `diag([100, 1])` ($\\kappa = 100$) and observe Newton still converges in one step while gradient descent would need hundreds of iterations with the safe step size $\\alpha < 1/\\lambda_{\\max}(H)$.',
               ],
               code: `A = [4 1; 1 3];
 b = [2; 1];
@@ -146,6 +147,7 @@ disp('Difference (should be ~0):'); disp(norm(x_star - x_analytic))
               prose: [
                 'This challenge implements gradient descent on f(x) = ||Ax − b||^2 for a 3×2 overdetermined system. The step size alpha = 0.9/λ_max(A^T A) is the largest safe value — use max(eig(AtA)) to find λ_max. Any larger and the iterations diverge. Each update applies x = x − alpha * ∇f where ∇f = 2A^T(Ax − b).',
                 'After 150 steps, compare the GD result to the exact normal-equations solution. The difference f(GD) − f(x*) should be near zero. Try halving alpha and doubling the iterations — you\'ll see convergence is exponentially slower when the step size drops, confirming that rate ∝ (1 − 2α·λ_min) per iteration.',
+                'The convergence rate per step is $(\\kappa-1)/(\\kappa+1)$, where $\\kappa = \\lambda_{\\max}/\\lambda_{\\min}$ of $A^\\top A$. Add `cond_AtA = cond(AtA)` after the loop: that $\\kappa$ value determines the theoretical slope of the loss curve on a semilog plot. Try changing alpha to `1.1/lambda_max` — the iterations diverge because the largest-eigenvalue mode grows rather than shrinks. The boundary $\\alpha = 1/\\lambda_{\\max}$ is the exact stability threshold; any larger step causes exponential growth rather than decay.',
               ],
               code: `A = [4 1; 2 3; 1 2];   % overdetermined 3x2 system
 b = [1; 2; 3];
@@ -212,6 +214,7 @@ disp('Step size alpha used:'); disp(alpha)
               prose: [
                 'The finite difference approximation: ∂f/∂xᵢ ≈ [f(x + εeᵢ) - f(x)] / ε for small ε.',
                 'Compare numerical gradient with the analytic result ∇f = 2Ax for f(x) = x^T A x.',
+                'The contour plot shows WHY the gradient points uphill: the arrows are perpendicular to the level curves (contours of constant $f$) and point toward higher $f$ values. At the minimum (red dot), $\\nabla f = \\mathbf{0}$ — the arrows vanish there. Setting $2A\\mathbf{x} + \\mathbf{b} = \\mathbf{0}$ gives $\\mathbf{x}^* = -A^{-1}\\mathbf{b}/2$, which is exactly what `np.linalg.solve(2*A, -b)` computes. Gradient descent from any starting point follows $-\\nabla f$ and spirals into $\\mathbf{x}^*$ — the arrows in the plot point AWAY from $\\mathbf{x}^*$, so stepping against them navigates toward it.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -259,6 +262,7 @@ plt.show()`,
               prose: [
                 'The Jacobian J is an m×n matrix where J[i,j] = ∂f_i/∂x_j.',
                 'For f(x) = Ax (linear), the Jacobian is just A itself — the "derivative" of a linear map is the map.',
+                'The `numerical_jacobian` function above works for ANY differentiable function $f: \\mathbb{R}^n \\to \\mathbb{R}^m$ — it probes each input direction with $\\pm\\epsilon$ perturbations and measures how every output responds. This is how automatic differentiation libraries verify their analytical gradients. In engineering, this formula is used for error propagation: if inputs have covariance $\\Sigma$, the output covariance is approximately $J\\Sigma J^\\top$ — the Jacobian propagates uncertainty through any nonlinear function, which is the core operation in the Extended Kalman Filter.',
               ],
               code: `import numpy as np
 
@@ -292,6 +296,7 @@ print("Match:", np.allclose(J_num, A))`,
               prose: [
                 'Newton\'s method: x_new = x - H^{-1} @ grad. For quadratic f(x) = x^T A x - b^T x, H = 2A and the method converges in ONE step.',
                 'For non-quadratic f, Newton\'s method converges quadratically (extremely fast near the minimum).',
+                'The one-step convergence works because `H = 2*A` is constant — it does not depend on `x`. For any `x0`, `x0 - np.linalg.solve(H, grad_f(x0))` jumps directly to $\\mathbf{x}^*$ in a single linear solve. For a non-quadratic $f$, the Hessian changes at each step so Newton iterates, but near the minimum where $f \\approx$ quadratic, convergence is quadratic: the error squares each step ($10^{-2} \\to 10^{-4} \\to 10^{-8} \\to \\ldots$). The `np.linalg.solve(H, ...)` step costs $O(n^3)$ for an $n\\times n$ Hessian — that is why large-scale ML uses diagonal or low-rank Hessian approximations (e.g., Adam optimizer).',
               ],
               code: `import numpy as np
 
@@ -319,6 +324,7 @@ print(f"f(x*) = {f(x_star):.6f}  (minimum value)")`,
               prose: [
                 'Implement gradient descent on f(x) = ||Ax - b||^2 from scratch. The step size must satisfy alpha < 1/lambda_max(A^T A) for convergence — use np.linalg.eigvalsh to compute lambda_max and set alpha = 0.9/lambda_max. Each step is x = x - alpha * grad_f(x) where grad_f(x) = 2 * A.T @ (A @ x - b).',
                 'Plot the loss on a semilog scale: the straight line confirms exponential convergence — a characteristic signature of gradient descent on a quadratic objective. Compare the final x to the exact least-squares solution from numpy\'s normal equations.',
+                'The semilogy plot gives the convergence rate directly: if the loss decreases by factor $r$ each step, the log-loss decreases linearly by $\\log(r)$ per iteration. The theoretical rate is $r = (\\kappa-1)/(\\kappa+1)$ where $\\kappa$ = `np.linalg.cond(AtA)`. Compute it after the loop and compare to the actual plot slope. Also try `alpha = 1.05/lam_max` — the iterations diverge because the largest-eigenvalue mode amplifies rather than decays. The safe boundary $\\alpha < 1/\\lambda_{\\max}$ ensures every eigenvalue mode contracts each step — like a system of independent damped springs, each with its own decay rate.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -357,6 +363,53 @@ ax.set_title('Gradient Descent on Least-Squares: Exponential Convergence')
 ax.legend(); ax.grid(True, alpha=0.3)
 plt.tight_layout()
 plt.show()`,
+            },
+            {
+              id: 5,
+              cellTitle: 'Application: Ridge regression regularization path',
+              prose: [
+                'Ridge regression minimizes $f(\\mathbf{x}) = \\|A\\mathbf{x} - \\mathbf{b}\\|^2 + \\lambda\\|\\mathbf{x}\\|^2$. Setting the gradient $2(A^\\top A + \\lambda I)\\mathbf{x} - 2A^\\top\\mathbf{b} = \\mathbf{0}$ gives the closed-form solution $\\hat{\\mathbf{x}}_\\lambda = (A^\\top A + \\lambda I)^{-1}A^\\top\\mathbf{b}$. The $\\lambda I$ term adds $\\lambda$ to every eigenvalue of $A^\\top A$, making the solve `np.linalg.solve(A.T @ A + lam * np.eye(n), A.T @ b)` always numerically stable for any $\\lambda > 0$ — even when $A^\\top A$ is singular.',
+                'The regularization path sweeps $\\lambda$ from $10^{-3}$ to $10^3$ and tracks two quantities. The left plot shows coefficient shrinkage: as $\\lambda$ grows, $\\hat{\\mathbf{x}}_\\lambda$ shrinks toward $\\mathbf{0}$ because the penalty term dominates the gradient and pulls every coordinate to zero. The right plot shows the bias-variance trade-off: larger $\\lambda$ reduces $\\|\\hat{\\mathbf{x}}\\|$ (variance) but increases $\\|A\\hat{\\mathbf{x}} - \\mathbf{b}\\|$ (bias). At $\\lambda = 0$, ridge equals OLS; at $\\lambda \\to \\infty$, $\\hat{\\mathbf{x}} \\to \\mathbf{0}$.',
+                'The condition number of $(A^\\top A + \\lambda I)$ is $\\kappa = (\\lambda_{\\max}(A^\\top A) + \\lambda)/(\\lambda_{\\min}(A^\\top A) + \\lambda)$. When $A^\\top A$ is nearly singular ($\\lambda_{\\min} \\approx 0$), adding even a small $\\lambda$ stabilizes the condition dramatically. Compare `np.linalg.cond(A.T @ A)` to `np.linalg.cond(A.T @ A + 0.1 * np.eye(n))` at the bottom of the cell to see this regularization effect quantitatively.',
+              ],
+              code: `import numpy as np
+import matplotlib.pyplot as plt
+
+# Ridge regression: minimize ||Ax - b||^2 + lambda * ||x||^2
+# Gradient = 2*(A.T @ A + lam*I) @ x - 2*A.T @ b  → solution below
+np.random.seed(42)
+m, n = 20, 15
+A = np.random.randn(m, n)
+x_true = np.random.randn(n)
+b = A @ x_true + 0.5 * np.random.randn(m)
+
+x_ols = np.linalg.lstsq(A, b, rcond=None)[0]
+
+lambdas = np.logspace(-3, 3, 60)
+norms, residuals = [], []
+for lam in lambdas:
+    x_r = np.linalg.solve(A.T @ A + lam * np.eye(n), A.T @ b)
+    norms.append(np.linalg.norm(x_r))
+    residuals.append(np.linalg.norm(A @ x_r - b))
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 4))
+axes[0].semilogx(lambdas, norms, 'steelblue', linewidth=2)
+axes[0].axhline(np.linalg.norm(x_ols), color='red', linestyle='--', label='OLS norm')
+axes[0].set_xlabel('lambda'); axes[0].set_ylabel('||x_ridge||')
+axes[0].set_title('Coefficient norm shrinks as lambda grows')
+axes[0].legend(); axes[0].grid(True, alpha=0.3)
+
+axes[1].semilogx(lambdas, residuals, 'orange', linewidth=2)
+axes[1].axhline(np.linalg.norm(A @ x_ols - b), color='red', linestyle='--', label='OLS residual')
+axes[1].set_xlabel('lambda'); axes[1].set_ylabel('||Ax - b||')
+axes[1].set_title('Residual grows as regularization increases')
+axes[1].legend(); axes[1].grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+
+AtA = A.T @ A
+print(f"cond(A.T @ A)         = {np.linalg.cond(AtA):.1f}")
+print(f"cond(A.T @ A + 0.1*I) = {np.linalg.cond(AtA + 0.1*np.eye(n)):.1f}")`,
             },
           ]
         }

@@ -13,8 +13,7 @@ import OpenInGrapher from "../components/lesson/OpenInGrapher.jsx";
 import LessonQuizBlock from "../components/lesson/LessonQuizBlock.jsx";
 import { useVideoPlayer } from "../context/VideoPlayerContext.jsx";
 import TutorPanel from "../components/tutor/TutorPanel.jsx";
-import { useOptionalLesson } from "../hooks/useOptionalLesson.js";
-
+import { useOptionalLesson } from "../hooks/useOptionalLesson.js";import WikiIntro from '../components/lesson/WikiIntro.jsx'
 export default function LessonPage() {
   const { chapterId, lessonSlug, "*": rest } = useParams();
   const slug = lessonSlug + (rest ? `/${rest}` : "");
@@ -177,6 +176,8 @@ export default function LessonPage() {
           )}
         </div>
       </header>
+
+      <WikiIntro query={lesson.title} />
 
       {lesson.hook && (
         <section className="oc-shell-card mb-10 p-6 sm:p-7">

@@ -114,6 +114,7 @@ export default {
               prose: [
                 'For each entry (i,j), delete row i and column j, compute det of the 2×2 remainder, multiply by the sign (-1)^(i+j).',
                 'We extract submatrices manually: A([rows], [cols]) selects those rows and columns.',
+                'The sign pattern $(-1)^{i+j}$ is the checkerboard: position $(1,1)$ gets $+$, then signs alternate along every row and column. For a $3\\times 3$ matrix: corners and center get $+$; edge midpoints get $-$. This pattern is baked into each `(+1)*det(...)` and `(-1)*det(...)` line. The cofactor matrix C_mat has all nine $C_{ij}$ values arranged so that $(C_{\\text{mat}})_{ij} = C_{ij}$ — and the ADJUGATE is its transpose, so $\\text{adj}(A)_{ij} = C_{ji}$.',
               ],
               code: `A = [2 1 3; 0 4 1; 5 2 6];
 disp('Matrix A:'); disp(A)
@@ -155,6 +156,7 @@ disp(C_mat)`,
               prose: [
                 'The adjugate is the TRANSPOSE of the cofactor matrix. Then A^{-1} = adj(A) / det(A).',
                 'We verify two identities: A * adj(A) = det(A)*I, and the adjugate inverse matches inv(A).',
+                'The identity `A * adj_A = det(A)*I` holds because: diagonal entry $(i,i)$ = $\\sum_j a_{ij}C_{ij}$ = cofactor expansion of row $i$ = $\\det(A)$; off-diagonal entry $(i,k)$ with $i \\neq k$ = $\\sum_j a_{ij}C_{kj}$ = cofactor expansion using ROW $i$ ENTRIES but ROW $k$ COFACTORS — this computes the determinant of a matrix with row $k$ replaced by row $i$, giving a matrix with two identical rows, so $\\det = 0$. This **Alien Cofactor Theorem** is what makes every off-diagonal entry zero and the identity exact.',
               ],
               code: `% Build adjugate = transpose of cofactor matrix
 adj_A = C_mat';
@@ -183,6 +185,7 @@ disp(['Max difference between methods: ', num2str(max(max(abs(A_inv_adj - inv(A)
               prose: [
                 'Expanding along a row with zeros skips entire minor computations — each zero entry contributes nothing to the sum. Here `det` is computed two ways: naive row 1 expansion (all three minors), and strategic expansion along the sparsest row (only non-zero entries need minors). Both give the same determinant but the second uses fewer multiplications.',
                 '`A([2 3], [1 3])` is MATLAB submatrix indexing: select rows 2 and 3, columns 1 and 3, to get the $2\\times 2$ minor for position $(1,2)$. The sign $(-1)^{1+2} = -1$ flips that minor\'s contribution.',
+                'Cofactor expansion costs $O(n!)$ operations — for $n=3$ that is $6$ multiplications; for $n=4$ that is $24$; for $n=20$ that is $20! \\approx 10^{18}$ — computationally impossible. The magic square demonstration shows `det(D) = 0` for the $4\\times 4$ case. MATLAB\'s `det()` uses LU decomposition ($O(n^3)$, here just $64$ operations) for ALL matrices, not cofactor expansion. Cofactor expansion is used for hand calculation ($n \\leq 4$), symbolic algebra systems, and theoretical proofs — never for numerical computation.',
               ],
               code: `B = [0 0 3; 1 2 4; 5 6 7];
 disp('Matrix B:'); disp(B)
@@ -207,6 +210,7 @@ disp('That is 4 x 3 = 12 two-by-two determinants. Use row reduction for n>=4.')`
               prose: [
                 'When det(A) = 0, the formula A^{-1} = adj(A)/det(A) fails — but adj(A) itself is still well-defined. This cell computes adj(A) for a singular matrix, verifies A*adj(A) = 0 (since det(A)=0, the adjugate identity gives the zero matrix), then checks that every column of adj(A) lies in the null space of A. This connects cofactors directly to the Fredholm alternative: the adjugate "discovers" the null space without row reduction.',
                 'The loop `for j = 1:3; disp(norm(A * adj_A(:,j))); end` computes `||A * col_j||` for each column of adj(A). Each value should be near machine epsilon (~1e-14), confirming A * col_j = 0. The last block uses null(A) to find the null space by SVD and verifies that the nonzero column of adj(A) is a scalar multiple of that null vector.',
+                'When $A$ is singular, $A \\cdot \\text{adj}(A) = \\det(A) \\cdot I = \\mathbf{0}$ (the zero matrix). This means EVERY column of $\\text{adj}(A)$ satisfies $A\\mathbf{v} = \\mathbf{0}$ — they all lie in $N(A)$. The adjugate "discovers" the null space algebraically, without row reduction or SVD. The ratio comparison between `nonzero_col` and `null_vec` confirms they are scalar multiples of each other — two different algorithms for finding the same geometric object.',
               ],
               code: `% Build a rank-1 matrix (two identical rows)
 A = [1 2 3; 2 4 6; 0 1 2];
@@ -260,6 +264,7 @@ disp(nonzero_col ./ null_vec(:,1))`,
               prose: [
                 'The `minor(M, row, col)` function uses `np.delete` twice: first delete the specified row, then delete the specified column from the result. This extracts the $(n-1)\\times(n-1)$ submatrix that defines minor $M_{ij}$. The `cofactor(M, i, j)` function multiplies the minor\'s determinant by $(-1)^{i+j}$ — the checkerboard sign.',
                 'The list comprehension `[[cofactor(A, i, j) for j in range(3)] for i in range(3)]` builds the full $3 \\times 3$ cofactor matrix in one pass. The expansion `sum(A[0,j] * C[0,j] for j in range(3))` uses row 0 — matching $\\det(A) = \\sum_j a_{0j}C_{0j}$. The heatmap visualization makes the sign pattern visible: blue entries are negative cofactors, red are positive.',
+                'The cofactor $C_{ij}$ equals $\\partial(\\det A)/\\partial a_{ij}$ — the rate of change of the determinant with respect to entry $(i,j)$. Verify this: compute `det(A + 1e-6 * e_ij) - det(A)` for a unit perturbation matrix $e_{ij}$ and divide by $10^{-6}$; the result should match `C[i,j]` to 5+ digits. This calculus interpretation is why cofactors appear in Jacobi\'s formula $\\frac{d}{dt}\\det(A(t)) = \\text{tr}(\\text{adj}(A)\\dot{A})$ for differentiating determinants.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -305,6 +310,7 @@ plt.show()`,
               prose: [
                 'The `cofactor_matrix(A)` function uses `np.ix_(rows, cols)` for fancy indexing — `np.ix_` broadcasts two index arrays so `A[np.ix_(rows, cols)]` selects the correct submatrix without a loop over entries. The transpose `adj_A = C.T` moves entry $C_{ij}$ to position $(j,i)$, which is the definition: $(\\text{adj}(A))_{ij} = C_{ji}$.',
                 'Dividing `adj_A / d` gives $A^{-1} = \\text{adj}(A)/\\det(A)$. The verification `A @ adj_A` should print `det(A)*I` — diagonal entries equal $\\det(A)$ (cofactor expansion along each row), off-diagonal entries equal 0 (alien cofactor sums). The maximum absolute difference between methods should be near $10^{-14}$ (floating-point precision).',
+                'The off-diagonal entries of `A @ adj_A` are zero by the **Alien Cofactor Theorem**: entry $(i,k)$ with $i \\neq k$ equals $\\sum_j a_{ij}C_{kj}$, which is the determinant of the matrix formed by copying row $i$ of $A$ into row $k$ position — giving a matrix with two identical rows, so $\\det = 0$. This theorem is why the adjugate identity $A \\cdot \\text{adj}(A) = \\det(A) \\cdot I$ holds exactly: diagonal entries are genuine cofactor expansions ($\\det A$), off-diagonal entries are alien expansions ($0$). No approximation — it is exact algebra.',
               ],
               code: `import numpy as np
 

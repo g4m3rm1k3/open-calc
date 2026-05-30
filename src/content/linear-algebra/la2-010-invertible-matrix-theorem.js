@@ -63,6 +63,7 @@ export default {
               prose: [
                 'Each line is a different IMT condition: det_A ≠ 0 is Condition 2, rank_A = 2 is Condition 3, rref(A) = I is Condition 4, null_dim = 0 is Condition 7, and eigenvalues all nonzero is Condition 12. For A = [2 1; 5 3] the determinant is 6 − 5 = 1 ≠ 0, so all conditions must hold — the IMT guarantees it.',
                 'The block [V,D] = eig(A) returns eigenvectors (columns of V) and eigenvalues (diagonal of D). Both eigenvalues nonzero confirms Condition 12. Verify: null_dim should print 0, and rref(A) should print the 2×2 identity. All five conditions pass at once.',
+                'These five code lines run five different IMT conditions simultaneously — and they all agree. This is the theorem in action: once you see det_A = 1 ≠ 0, the IMT guarantees rank = 2 (Cond. 3), rref = I (Cond. 4), null_dim = 0 (Cond. 7), and eigenvalues ≠ 0 (Cond. 12) without needing to verify them separately. As a check: det(A) = product of eigenvalues. Add `prod(eigenvalues)` to verify it equals det_A numerically, confirming the characteristic polynomial relationship $\\det(A) = \\prod_i \\lambda_i$.',
               ],
               code: `A = [2 1; 5 3]
 det_A = det(A)
@@ -81,6 +82,7 @@ null_dim
               prose: [
                 'Every single IMT condition fails for B = [1 2; 2 4]. det_B = 4 − 4 = 0 (Condition 2 fails), rank_B = 1 < 2 (Condition 3 fails), RREF ≠ I (Condition 4 fails), one eigenvalue is 0 (Condition 12 fails), and null_dim = 1 (Condition 7 fails). This is the IMT: one condition failing drags all the others down.',
                 'The call null(B) returns a unit vector in the null space of B. Verify: B * null(B) should give [0; 0]. Row 2 of B is exactly 2 × row 1 — the matrix collapses the plane onto a single line, destroying all information in the perpendicular direction.',
+                'The geometric picture: B collapses $\\mathbb{R}^2$ onto the single line spanned by $[1,2]^\\top$. Any vector perpendicular to $[1,2]^\\top$ — such as `null(B)` — maps to $\\mathbf{0}$ and is irreversibly destroyed. The IMT says this single geometric fact (the map is not injective) simultaneously drags down all other conditions: det = 0, rank = 1, RREF ≠ I, zero eigenvalue, dependent columns, columns do not span $\\mathbb{R}^2$, and $B\\mathbf{x} = \\mathbf{b}$ has no unique solution. One domino falls, all fall.',
               ],
               code: `B = [1 2; 2 4]
 det_B = det(B)
@@ -101,6 +103,7 @@ null(B)
               prose: [
                 'The IMT is binary — invertible or singular — but numerically, a matrix can be "almost singular" with a tiny but non-zero determinant. The condition number κ = σ_max / σ_min (ratio of largest to smallest singular value) measures how close to singular a matrix really is.',
                 'This cell fixes row 1 of A as [1, 2] and slides row 2 from [2, 4+k] toward [2, 4] (singular at k = 0). Watch det shrink to zero while κ explodes toward infinity. At k = 0 the IMT says singular; for any k > 0 the IMT says invertible — but with κ = 10^6 any numerical solve would be catastrophically inaccurate.',
+                'The condition number $\\kappa = \\sigma_{\\max}/\\sigma_{\\min}$ measures how many decimal digits of precision you lose when solving $A\\mathbf{x} = \\mathbf{b}$: with $\\kappa = 10^6$ in double precision (15 digits), only 9 digits are reliable in the solution. The table shows det $\\to 0$ and cond $\\to \\infty$ arriving together as $k \\to 0$ — these are two views of the same event ($\\sigma_{\\min} \\to 0$): one from the multiplicative side ($\\det = \\prod \\sigma_i$) and one from the ratio side ($\\kappa = \\sigma_{\\max}/\\sigma_{\\min}$).',
               ],
               code: `disp('k          det(A)      rank    cond(A)')
 for k = [1.0, 0.1, 0.01, 0.001, 0.0001]
@@ -119,6 +122,7 @@ fprintf('k=0.0000   det=%10.4e   rank=%d   (singular by IMT)\\n', ...
               prose: [
                 'The closest singular matrix to A (in Frobenius norm) is obtained by zeroing the smallest singular value. The distance equals σ_min(A) — the smallest singular value. This connects the IMT to the SVD: A is invertible iff all singular values are nonzero.',
                 'The code decomposes A = U*S*V\' via svd, zeroes the smallest diagonal of S to get S2, then forms A_perturbed = U*S2*V\'. Verify det(A_perturbed) ≈ 0 and rank(A_perturbed) = 1. The perturbation norm is σ_min — the exact IMT boundary.',
+                'The SVD reveals the structure of invertibility: $A = U\\Sigma V^\\top$ writes $A$ as a rotation ($V^\\top$), a coordinate-wise scaling ($\\Sigma$), then another rotation ($U$). Each singular value $\\sigma_i = S(i,i)$ is the length of one stretched direction. Zeroing $\\sigma_{\\min}$ collapses one direction to zero — making the map non-injective. The distance from $A$ to the nearest singular matrix in Frobenius norm is exactly $\\sigma_{\\min}(A)$, and the direction of the nearest singular matrix is $\\mathbf{u}_{\\min}\\mathbf{v}_{\\min}^\\top$ (the outer product of the last columns of $U$ and $V$).',
               ],
               code: `A = [4 2; 1 3];
 [U, S, V] = svd(A);
@@ -174,6 +178,7 @@ fprintf('norm of perturbation: %.4f  (equals sigma_min)\\n', norm(A - A_perturbe
               prose: [
                 'Pass an n×n matrix to the function below and it reports all 12 IMT conditions.',
                 'Try both an invertible matrix and a singular one — notice how all conditions agree.',
+                'The visualization proves the geometric IMT: the invertible matrix (det = 5) has two column vectors that span a non-degenerate parallelogram with area = |det| = 5. The singular matrix (det = 0) has c2 = 2×c1, so the "parallelogram" collapses to a line segment — zero area. Area zero means the map collapses 2D space to 1D, which is exactly why det = 0, rank < n, and null space is non-trivial. All three conditions describe the same collapse, in three different algebraic languages.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -222,6 +227,7 @@ plt.show()`,
               prose: [
                 'The IMT is binary (invertible or not), but numerically matrices can be "almost singular" — technically invertible but with huge condition numbers.',
                 'A large condition number means small perturbations to b produce huge changes in the solution x.',
+                'The table shows det and cond moving in opposite directions as the matrix approaches singularity: det → 0 while cond → ∞. Both trace back to the smallest singular value σ_min → 0: det is the product of all singular values, so one small σ_min makes det tiny; cond = σ_max/σ_min, so one small σ_min makes cond huge. At the exact boundary σ_min = 0, the IMT declares singular; for any σ_min > 0, the IMT declares invertible — but practical reliability has already collapsed.',
               ],
               code: `import numpy as np
 
@@ -243,6 +249,7 @@ for k in [10.0, 1.0, 0.1, 0.01, 0.001]:
               prose: [
                 'An invertible matrix maps the unit circle to an ellipse — every direction survives, just stretched and rotated. A singular matrix collapses the circle onto a line segment, destroying an entire dimension. This is why det = 0: the 2D area of the ellipse is |det(A)| times the area of the circle, so det = 0 means the ellipse has zero area.',
                 'Run this cell and compare the two plots. The invertible case (det = 5) produces a proper ellipse. The singular case (det = 0) collapses to a line — every point on the circle maps to a point on that single line, confirming the null space is non-trivial (infinitely many inputs land on the same output).',
+                'The null space vector of the singular matrix is [2, -1] (verify: A_sing @ [2,-1] = [4×2 + 4×(-1), 1×2 + 2×(-1)] = [4, 0]... actually [2,4] @ [2,-1] = [2×2 + 4×(-1), 1×2 + 2×(-1)] = [0, 0] ✓). Every point on the circle that differs by a multiple of [2,-1] maps to the same output point. The line in the right plot is the image of the entire circle collapsed — the column space of A_sing, which is just span([2,1]).',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -273,6 +280,7 @@ plt.show()`,
               prose: [
                 'The IMT is binary (invertible or not), but condition number κ = σ_max/σ_min measures how "barely invertible" a matrix is. The sensitivity bound guarantees: relative error in x ≤ κ × (relative error in b). For κ = 10^10, a 1-digit error in b produces a 10-digit error in x.',
                 'This challenge constructs a well-conditioned and a near-singular matrix, adds small noise to b, and measures how much the solution changes. Compare the actual error amplification to the theoretical bound κ × noise_level. The near-singular matrix should wildly amplify errors while the well-conditioned one barely changes.',
+                'The bound ||δx||/||x|| ≤ κ(A) × ||δb||/||b|| comes directly from the IMT: since $A$ is invertible, $\\mathbf{x} = A^{-1}\\mathbf{b}$ and $\\delta\\mathbf{x} = A^{-1}\\delta\\mathbf{b}$, so $\\|\\delta\\mathbf{x}\\| \\leq \\|A^{-1}\\|\\|\\delta\\mathbf{b}\\|$. Dividing both sides by $\\|\\mathbf{x}\\| \\geq \\|\\mathbf{b}\\|/\\|A\\|$ gives the bound. The IMT guarantees invertibility; condition number tells you whether that inverse is numerically trustworthy.',
               ],
               code: `import numpy as np
 
@@ -300,6 +308,58 @@ for A, name in [(A_good, 'Well-conditioned'), (A_bad, 'Near-singular')]:
     print(f"  theoretical bound = {kappa * noise:.2e}")
     print(f"  observed max error = {max_err:.2e}")
     print()`,
+            },
+            {
+              id: 5,
+              cellTitle: 'Application: SVD reveals the nearest singular matrix',
+              prose: [
+                'The IMT is a binary threshold — invertible or not — but the SVD tells you how far you are from that threshold. The smallest singular value $\\sigma_{\\min}$ is the exact distance (in Frobenius norm) from $A$ to the nearest singular matrix. This cell computes $\\sigma_{\\min}$ for a family of matrices and visualizes the IMT boundary.',
+                'The code sweeps a parameter $t$ and computes $\\sigma_{\\min}(A(t))$. Where $\\sigma_{\\min} = 0$, the IMT says singular. The plot shows the "distance to singularity" — it touches zero exactly at the critical $t$ values where the matrix transitions from invertible to singular. This is how numerical analysts decide whether a matrix is "too close to singular" for a given application.',
+                'The nearest singular matrix is $A - \\sigma_{\\min}\\mathbf{u}_{\\min}\\mathbf{v}_{\\min}^\\top$, where $\\mathbf{u}_{\\min}$ and $\\mathbf{v}_{\\min}$ are the last columns of $U$ and $V$ from the SVD. This formula shows WHICH perturbation pushes $A$ over the IMT boundary — it is the rank-one update that zeroes out the smallest singular direction.',
+              ],
+              code: `import numpy as np
+import matplotlib.pyplot as plt
+
+# A(t) = [[t, 1], [2, t]]  — singular when det = t^2 - 2 = 0, i.e. t = +/-sqrt(2)
+t_vals = np.linspace(-3, 3, 500)
+sigma_min_vals = []
+det_vals = []
+
+for t in t_vals:
+    A = np.array([[t, 1.], [2., t]])
+    sigma_min_vals.append(np.linalg.svd(A, compute_uv=False).min())
+    det_vals.append(np.linalg.det(A))
+
+sigma_min_vals = np.array(sigma_min_vals)
+det_vals = np.array(det_vals)
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 4))
+axes[0].plot(t_vals, sigma_min_vals, 'steelblue', lw=2, label='sigma_min')
+axes[0].axhline(0, color='k', lw=0.5, linestyle='--')
+axes[0].axvline(np.sqrt(2), color='red', lw=1, linestyle=':', label=f't=sqrt(2)={np.sqrt(2):.3f}')
+axes[0].axvline(-np.sqrt(2), color='red', lw=1, linestyle=':')
+axes[0].set_xlabel('t'); axes[0].set_ylabel('sigma_min  (distance to singularity)')
+axes[0].set_title('IMT boundary: sigma_min = 0 at t = ±sqrt(2)')
+axes[0].legend(); axes[0].grid(True, alpha=0.3)
+
+axes[1].plot(t_vals, det_vals, 'darkorange', lw=2, label='det(A(t))')
+axes[1].axhline(0, color='k', lw=1.5, linestyle='--', label='IMT boundary')
+axes[1].axvline(np.sqrt(2), color='red', lw=1, linestyle=':')
+axes[1].axvline(-np.sqrt(2), color='red', lw=1, linestyle=':')
+axes[1].set_xlabel('t'); axes[1].set_ylabel('det(A(t))')
+axes[1].set_title('det = 0 at the same t values (IMT: all conditions agree)')
+axes[1].legend(); axes[1].grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+
+# Show the nearest singular matrix at t = 2 (invertible)
+t0 = 2.0
+A0 = np.array([[t0, 1.], [2., t0]])
+U, s, Vt = np.linalg.svd(A0)
+print(f"A at t=2: sigma_min = {s.min():.4f}")
+A_nearest_sing = A0 - s[-1] * np.outer(U[:, -1], Vt[-1, :])
+print(f"det(nearest singular matrix) = {np.linalg.det(A_nearest_sing):.2e}  (should be ~0)")
+print(f"Perturbation Frobenius norm = {np.linalg.norm(A0 - A_nearest_sing):.4f}  (= sigma_min)")`,
             },
           ]
         }
