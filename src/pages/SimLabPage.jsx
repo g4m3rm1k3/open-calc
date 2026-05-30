@@ -4,6 +4,7 @@ import Editor from '@monaco-editor/react'
 import { setupOpenCalcMonaco } from '../utils/monacoThemes.js'
 import { SIM_TEMPLATES } from '../data/simTemplates.js'
 import { Play, RotateCcw, ChevronDown, Terminal, Code2, X, Sun, Moon, ArrowLeft } from 'lucide-react'
+import { buildSandbox } from '../utils/simSandbox.js'
 
 // ── Snippet library ───────────────────────────────────────────────────────────
 const SNIPPETS = [
@@ -55,8 +56,9 @@ const SNIPPETS = [
   },
 ]
 
-// ── Sandbox srcdoc (supports 3D Three.js and 2D Canvas) ────────────────────
-function buildSandbox() {
+// ── (sandbox imported from src/utils/simSandbox.js) ─────────────────────────
+// Previously inlined — now shared with SimNotebook
+function _buildSandboxLEGACY() {
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -485,7 +487,7 @@ export default function SimLabPage() {
               language="javascript"
               value={code}
               onChange={v => setCode(v ?? '')}
-              theme={darkMode ? 'opencalc-dark' : 'vs-light'}
+              theme={darkMode ? 'open-calc-dark' : 'open-calc-light'}
               beforeMount={setupOpenCalcMonaco}
               onMount={editor => { editorRef.current = editor }}
               options={{
