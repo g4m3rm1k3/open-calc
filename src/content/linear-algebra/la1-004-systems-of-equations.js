@@ -285,6 +285,7 @@ plt.show()`,
               prose: [
                 'Rearranging each equation to $y = f(x)$ form lets you plot them as functions. $2x + y = 8$ becomes $y = 8 - 2x$ (slope $-2$, intercept $8$); $x + 3y = 9$ becomes $y = (9-x)/3$ (slope $-1/3$, intercept $3$). These two lines have different slopes, so they must cross at exactly one point.',
                 '`np.linalg.solve(A, b)` still finds the solution, and the scatter dot at `(x[0], x[1])` marks the intersection. If you change the coefficient matrix so the two lines become parallel (same slope), `solve` would raise a `LinAlgError` — use that as a signal to check the rank.',
+                'The geometric picture confirms the algebra: $n$ equations in $n$ unknowns define $n$ hyperplanes (lines in 2D, planes in 3D). A unique solution is a single intersection point. Parallel lines (inconsistent) never meet. Coincident lines (infinite solutions) overlap entirely. The rank of $A$ counts how many of those hyperplanes are truly independent — i.e., how much independent information you actually have.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -365,6 +366,32 @@ ax2.grid(True, alpha=0.3); ax2.legend(fontsize=9)
 
 plt.tight_layout()
 plt.show()`,
+            },
+            {
+              id: 4,
+              cellTitle: 'Application: Kirchhoff circuit — solving for branch currents',
+              prose: [
+                '`A = np.array(...)` encodes Kirchhoff\'s Voltage Law and Current Law as a linear system. Each row is one equation: the top row says "sum of voltage drops around loop 1 equals the source voltage," which becomes $5I_1 - 2I_2 = 10$ after applying Ohm\'s Law ($V = IR$) to each resistor. The matrix entry $-2$ in the first row captures the shared resistor between loops.',
+                '`np.linalg.solve(A, b)` finds the branch currents in one call. The result is exact (within floating-point precision) because the system is square and non-singular — Kirchhoff\'s laws always yield a well-determined system when the circuit topology is valid. `A @ x` recovering `b` exactly confirms no arithmetic error.',
+                'Reading off `I1, I2 = x[0], x[1]` and computing `P = I1**2 * R1 + I2**2 * R2` gives the power dissipated in each resistor via $P = I^2 R$. This is the payoff of solving the linear system: every circuit quantity — voltage, current, power — follows by substitution from the solution vector $\\mathbf{x}$.',
+              ],
+              code: `import numpy as np
+
+# Two-loop circuit: R1=3Ω shared, R2=2Ω in loop1, R3=4Ω in loop2
+# Loop 1: (R2 + R1)*I1 - R1*I2 = V1   ->  5*I1 - 3*I2 = 10
+# Loop 2: -R1*I1 + (R3 + R1)*I2 = V2  -> -3*I1 + 7*I2 = 5
+A = np.array([[ 5.0, -3.0],
+              [-3.0,  7.0]])
+b = np.array([10.0, 5.0])
+
+x = np.linalg.solve(A, b)
+I1, I2 = x[0], x[1]
+
+print(f"Branch currents:  I1 = {I1:.4f} A,  I2 = {I2:.4f} A")
+print(f"Verify A @ x = {A @ x}  (should equal b = {b})")
+print(f"Power in R2 (2Ω): P = I1^2 * 2 = {I1**2 * 2:.4f} W")
+print(f"Power in R3 (4Ω): P = I2^2 * 4 = {I2**2 * 4:.4f} W")
+`,
             },
             {
               id: 'c1',

@@ -117,6 +117,7 @@ export default {
               prose: [
                 '`P0 + t*d` is the parametric line formula: `t*d` scales the direction vector by the parameter, and adding `P0` shifts the result to start at the base point. Changing `t` in the `for` loop walks along the line — negative `t` goes "backward" from `P0`, positive `t` goes "forward."',
                 '`t_from_x = (Q(1) - P0(1)) / d(1)` solves the $x$-component equation for $t$: from $x = x_0 + t d_x$, rearrange to $t = (x - x_0) / d_x$. If a point lies on the line, all three components must give the same $t$ value. Comparing `t_from_x`, `t_from_y`, `t_from_z` is the on-line test — equal values confirm the point is on the line.',
+                'The parametric form $\\mathbf{r}(t) = \\mathbf{P}_0 + t\\,\\mathbf{d}$ is a one-parameter family of points. The direction vector `d = [3; -1; 2]` does not have to be a unit vector — it just sets the "speed" at which you move along the line. Scaling `d` by 2 gives the same geometric line but reaches the same physical point at $t=1$ that the original reaches at $t=2$. In robotics path planning, $\\|\\mathbf{d}\\|=1$ is standard so that $t$ directly equals arc length.',
               ],
               code: `% Parametric line: r(t) = P0 + t*d
 P0 = [1; 2; -1];      % base point

@@ -371,6 +371,7 @@ fig.show()`,
               prose: [
                 '`np.cross(edge1, edge2)` finds the face normal from two edge vectors. `edge1 = P2 - P1` and `edge2 = P3 - P1` are both vectors lying in the triangle plane, so their cross product is perpendicular to the plane — that perpendicular direction is the normal. Dividing by `np.linalg.norm(normal)` makes it a unit vector (`unit_normal`), which is required for the dot product to correctly report brightness as a value between 0 and 1.',
                 'The lighting model `brightness = max(0.0, np.dot(unit_normal, -light))` computes how directly the face "faces" the light source: `np.dot(unit_normal, -light)` gives $\\cos\\theta$ where $\\theta$ is the angle between the face normal and the incoming light direction. At $\\theta = 0°$ (face directly toward light), $\\cos 0° = 1$ — fully lit. At $\\theta = 90°$ (face edge-on), $\\cos 90° = 0$ — no illumination. `max(0, ...)` clamps negative values (back-facing surfaces) to zero rather than "negative brightness."',
+                '`np.linalg.norm(normal)` — before normalizing — gives $\\|\\mathbf{edge_1} \\times \\mathbf{edge_2}\\| = \\|\\mathbf{edge_1}\\|\\|\\mathbf{edge_2}\\|\\sin\\theta$, which equals twice the triangle area. For the triangle with edges $[3,0,0]$ and $[0,4,0]$, the cross product is $[0,0,12]$ with magnitude 12, confirming area $= 12/2 = 6$. This dual use — normal direction AND area measurement — is why the cross product is the fundamental tool for 3D mesh geometry.',
               ],
               code: `import numpy as np
 

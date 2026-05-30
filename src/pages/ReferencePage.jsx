@@ -70,12 +70,14 @@ function FormulaCard({ entry, onOpenProof }) {
       <div className="h-[3px] w-full bg-gradient-to-r from-black/20 via-black/5 to-black/20 dark:from-black/40 dark:via-black/10 dark:to-black/40" />
 
       {/* Page body — formula + note */}
-      <div className="bg-[#fdfcf8] dark:bg-[#13131e] px-4 pt-4 pb-4">
-        {/* Typeset formula well */}
+      <div className="bg-[#e8e2d5] dark:bg-[#0d0d18] px-4 pt-4 pb-4"
+        style={{ boxShadow: 'inset 0 3px 6px rgba(0,0,0,0.08)' }}>
+        {/* Typeset formula well — elevated off the parchment */}
         <div
-          className="overflow-x-auto text-center text-slate-900 dark:text-slate-50 rounded-xl border border-slate-200/70 dark:border-slate-700/50
-            bg-white dark:bg-slate-800/50
-            shadow-[inset_0_1px_3px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_3px_rgba(0,0,0,0.3)]
+          className="overflow-x-auto text-center text-slate-900 dark:text-slate-100 rounded-xl
+            bg-white dark:bg-[#1c1c2e]
+            border border-slate-300/80 dark:border-slate-600/60
+            shadow-[0_2px_8px_rgba(0,0,0,0.10),0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.5),0_1px_2px_rgba(0,0,0,0.4)]
             px-4 py-4"
           dangerouslySetInnerHTML={{ __html: html }}
         />
@@ -83,7 +85,7 @@ function FormulaCard({ entry, onOpenProof }) {
         {/* Note + proof CTA */}
         <div className="mt-3 min-h-[28px] flex flex-col justify-end">
           {entry.note && (
-            <div className="text-[11px] text-slate-400 dark:text-slate-500 font-medium italic line-clamp-2 leading-relaxed">
+            <div className="text-[11px] text-stone-500 dark:text-slate-500 font-medium italic line-clamp-2 leading-relaxed">
               {entry.note}
             </div>
           )}
