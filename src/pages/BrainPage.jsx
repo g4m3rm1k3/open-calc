@@ -17,7 +17,11 @@
 import { lazy, Suspense, useState } from 'react'
 import { Brain, Clock, Star, Lock, ChevronRight, Zap, RotateCcw, Hash, Grid3x3 } from 'lucide-react'
 
-const DualNBack = lazy(() => import('../components/brain/DualNBack.jsx'))
+const DualNBack        = lazy(() => import('../components/brain/DualNBack.jsx'))
+const StroopTask       = lazy(() => import('../components/brain/StroopTask.jsx'))
+const MentalRotation   = lazy(() => import('../components/brain/MentalRotation.jsx'))
+const ArithmeticSprint = lazy(() => import('../components/brain/ArithmeticSprint.jsx'))
+const PatternMemory    = lazy(() => import('../components/brain/PatternMemory.jsx'))
 
 // ─── Puzzle Registry ──────────────────────────────────────────────────────────
 // To add a puzzle: push an entry here + create the component.
@@ -43,22 +47,24 @@ const PUZZLES = [
     description: 'Name the ink colour, not the word — your brain wants to read, you have to override it. Trains executive attention and conflict resolution.',
     icon:        Zap,
     color:       'rose',
-    difficulty:  'Beginner → Hard',
+    difficulty:  'Adaptive',
     timeEst:     '3–5 min',
     science:     'Stroop (1935); MacLeod (1991) Psych Bull',
-    status:      'soon',
+    status:      'available',
+    component:   StroopTask,
   },
   {
     id:         'mental-rotation',
     title:      'Mental Rotation',
     tagline:    'Spatial reasoning & visuospatial memory',
-    description: 'Judge whether two 3-D shapes are the same object at different angles. Builds spatial working memory and correlates with STEM performance.',
+    description: 'Judge whether two shapes are the same object at different orientations or mirror images. Builds spatial working memory and correlates with STEM performance.',
     icon:        RotateCcw,
     color:       'sky',
     difficulty:  'Adaptive',
     timeEst:     '5 min',
     science:     'Shepard & Metzler (1971) Science',
-    status:      'soon',
+    status:      'available',
+    component:   MentalRotation,
   },
   {
     id:         'arithmetic-sprint',
@@ -70,19 +76,21 @@ const PUZZLES = [
     difficulty:  'Adaptive',
     timeEst:     '3–5 min',
     science:     'Dehaene (1992) Cognition',
-    status:      'soon',
+    status:      'available',
+    component:   ArithmeticSprint,
   },
   {
     id:         'pattern-memory',
     title:      'Pattern Memory',
     tagline:    'Episodic memory & visual sequence recall',
-    description: 'Watch a growing sequence of highlighted cells, then replay it. Classic working memory span task in visual form.',
+    description: 'Watch a growing sequence of highlighted cells, then replay it. Classic Corsi block-tapping working memory span task in visual form.',
     icon:        Star,
     color:       'emerald',
     difficulty:  'Adaptive',
     timeEst:     '4–8 min',
     science:     'Corsi (1972) block-tapping paradigm',
-    status:      'soon',
+    status:      'available',
+    component:   PatternMemory,
   },
 ]
 
