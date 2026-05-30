@@ -41,6 +41,7 @@ import {
   Library,
   FlaskConical,
   Heart,
+  Brain,
 } from "lucide-react";
 import TICalc from "../calculator/TICalc.jsx";
 import SigmaCalc from "../calculator/SigmaCalc.jsx";
@@ -345,6 +346,9 @@ function TopBar({
           <NavLink to="/health" title="Health Tracker" aria-label="Health Tracker" className={({ isActive }) => `p-2 rounded-lg transition-all ${isActive ? "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`}>
             <Heart className="w-5 h-5" />
           </NavLink>
+          <NavLink to="/brain" title="Brain Training" aria-label="Brain Training" className={({ isActive }) => `p-2 rounded-lg transition-all ${isActive ? "bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 border border-violet-300 dark:border-violet-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`}>
+            <Brain className="w-5 h-5" />
+          </NavLink>
           <NavLink to="/docs" title="Docs" aria-label="Technical Docs" className={({ isActive }) => `p-2 rounded-lg transition-all ${isActive ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`}>
             <FileText className="w-5 h-5" />
           </NavLink>
@@ -480,6 +484,7 @@ export default function AppShell({ children }) {
   const isStemTetrisRoute = location.pathname.startsWith("/stem-tetris");
   const isCardAcademyRoute = location.pathname.startsWith("/card-academy");
   const isHealthRoute = location.pathname.startsWith("/health");
+  const isBrainRoute  = location.pathname.startsWith("/brain");
   const isRubiksCubeRoute = location.pathname.startsWith("/rubiks-cube");
   const isMatrixGameRoute = location.pathname.startsWith("/matrix-game");
   
@@ -791,7 +796,7 @@ onMenuToggle={() => setSidebarOpen((o) => !o)}
 
         {/* Main content */}
         <main
-          className={`transition-[padding] duration-500 ease-in-out pb-20 lg:pb-0 ${(isChemistryRoute || isOpenMatRoute) ? "h-screen overflow-hidden" : "min-h-screen"} ${isHealthRoute ? "bg-white dark:bg-slate-950" : ""} ${sidebarPinned ? "lg:pl-[280px]" : "lg:pl-3"} ${chatOpen ? "lg:pr-[400px]" : "lg:pr-0"} pt-14`}
+          className={`transition-[padding] duration-500 ease-in-out pb-20 lg:pb-0 ${(isChemistryRoute || isOpenMatRoute) ? "h-screen overflow-hidden" : "min-h-screen"} ${(isHealthRoute || isBrainRoute) ? "bg-white dark:bg-slate-950" : ""} ${sidebarPinned ? "lg:pl-[280px]" : "lg:pl-3"} ${chatOpen ? "lg:pr-[400px]" : "lg:pr-0"} pt-14`}
           style={{
             ...(scratchSnap === 'left'  ? { paddingLeft:  `${(sidebarPinned ? 280 : 12) + scratchSnapW}px` } : {}),
             ...(scratchSnap === 'right' ? { paddingRight: `${scratchSnapW}px` } : {}),
