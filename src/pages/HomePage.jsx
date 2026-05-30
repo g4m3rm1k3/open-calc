@@ -120,30 +120,30 @@ const DOMAINS = [
 
 // ── Labs ──────────────────────────────────────────────────────────────────────
 const LABS = [
-  { key:'openmat',        label:'OpenMAT',        emoji:'⚛️',  color:'indigo',  desc:'Full-featured math computation engine — symbolic algebra, 3D graphing, matrix tools.',       path:'/openmat',        tags:['Math','Platform']     },
-  { key:'cnc-sim',        label:'CNC Simulator',  emoji:'🔧',  color:'amber',   desc:'Program and simulate CNC toolpaths with a live 3D backplot and fixture management.',         path:'/cnc-sim',        tags:['Engineering','CAD']   },
-  { key:'logic-sim',      label:'Logic Suite',    emoji:'⚡',  color:'violet',  desc:'Design and simulate digital logic circuits gate-by-gate with truth tables.',                 path:'/logic-sim',      tags:['CS','Engineering']    },
-  { key:'chemistry',      label:'Chemistry Lab',  emoji:'🧪',  color:'cyan',    desc:'Explore chemical reactions, periodic table data, and molecular structures interactively.',  event:'chemistry',      tags:['Chemistry','Lab']     },
-  { key:'physics',        label:'Physics Engine', emoji:'🌌',  color:'fuchsia', desc:'Simulate rigid body dynamics, forces, springs, pendulums, and wave mechanics.',             event:'physics',        tags:['Physics','Simulation']},
-  { key:'cad-pro',        label:'CAD Pro',        emoji:'📐',  color:'slate',   desc:'Parametric 3D modelling with constraint-based design tools.',                                path:'/cad-pro',        tags:['Engineering','Design']},
-  { key:'universal-calc', label:'Universal Calc', emoji:'🧮',  color:'emerald', desc:'One calculator for everything — unit conversion, constants, formulas & numerical methods.', path:'/universal-calc', tags:['Math','Tools']        },
+  { key:'openmat',        label:'OpenMAT',        emoji:'⚛️',  color:'indigo',  desc:'Full-featured math computation engine — symbolic algebra, 3D graphing, matrix tools.',       path:'/openmat',        tags:['Math','Platform'],      cover:{ grad:'from-indigo-800 via-violet-900 to-purple-950',  mark:'∫∑∇',   sub:'Computation Engine'      } },
+  { key:'cnc-sim',        label:'CNC Simulator',  emoji:'🔧',  color:'amber',   desc:'Program and simulate CNC toolpaths with a live 3D backplot and fixture management.',         path:'/cnc-sim',        tags:['Engineering','CAD'],    cover:{ grad:'from-amber-700 via-orange-800 to-red-950',       mark:'G0',    sub:'CNC · CAM · Toolpaths'   } },
+  { key:'logic-sim',      label:'Logic Suite',    emoji:'⚡',  color:'violet',  desc:'Design and simulate digital logic circuits gate-by-gate with truth tables.',                 path:'/logic-sim',      tags:['CS','Engineering'],     cover:{ grad:'from-violet-800 via-purple-900 to-indigo-950',   mark:'⊕∧∨',  sub:'Gates · Truth Tables'    } },
+  { key:'chemistry',      label:'Chemistry Lab',  emoji:'🧪',  color:'cyan',    desc:'Explore chemical reactions, periodic table data, and molecular structures interactively.',  event:'chemistry',      tags:['Chemistry','Lab'],      cover:{ grad:'from-cyan-700 via-teal-800 to-blue-950',         mark:'⚗',    sub:'Reactions · Molecules'   } },
+  { key:'physics',        label:'Physics Engine', emoji:'🌌',  color:'fuchsia', desc:'Simulate rigid body dynamics, forces, springs, pendulums, and wave mechanics.',             event:'physics',        tags:['Physics','Simulation'], cover:{ grad:'from-fuchsia-700 via-pink-800 to-rose-950',       mark:'F=ma', sub:'Rigid Body Dynamics'     } },
+  { key:'cad-pro',        label:'CAD Pro',        emoji:'📐',  color:'slate',   desc:'Parametric 3D modelling with constraint-based design tools.',                                path:'/cad-pro',        tags:['Engineering','Design'], cover:{ grad:'from-slate-600 via-slate-700 to-slate-900',       mark:'⊡⊢',   sub:'Parametric Design'       } },
+  { key:'universal-calc', label:'Universal Calc', emoji:'🧮',  color:'emerald', desc:'One calculator for everything — unit conversion, constants, formulas & numerical methods.', path:'/universal-calc', tags:['Math','Tools'],         cover:{ grad:'from-emerald-700 via-teal-800 to-cyan-950',       mark:'π e',  sub:'Universal Constants'     } },
 ]
 
 // ── Games ─────────────────────────────────────────────────────────────────────
 const GAMES = [
-  { key:'rubiks',     label:"Rubik's Cube",        emoji:'🎲',  color:'emerald', desc:"Group theory, permutations & non-commutativity through the world's most famous puzzle.",    path:'/rubiks-cube',    tags:['Group Theory','3D']        },
-  { key:'matrix',     label:'Linear Algebra Game', emoji:'λ',   color:'cyan',    desc:'Seven interactive lessons — vectors, transforms, determinants & eigenvectors.',             path:'/matrix-game',    tags:['Linear Algebra','Interactive']},
-  { key:'tetris',     label:'STEM Tetris',          emoji:'🟦',  color:'fuchsia', desc:'Classic Tetris with six STEM lenses: matrix ops, 2×2 transforms, probability distributions.',path:'/stem-tetris',    tags:['Math','CS']                },
-  { key:'cards',      label:'STEM Card Academy',    emoji:'🃏',  color:'indigo',  desc:'Five card games teaching probability, statistics & neuroscience through play.',             path:'/card-academy',   tags:['Probability','Stats']      },
-  { key:'asteroids',  label:'Vector Asteroids',     emoji:'🌀',  color:'violet',  desc:'Blast rocks through 10 waves — velocity, dot products, matrix transforms via gameplay.',    path:'/asteroids-la',   tags:['Linear Algebra','Arcade']  },
-  { key:'arkanoid',   label:'Arkanoid Learn',        emoji:'🎮',  color:'rose',    desc:'Break bricks by answering math questions. Miss one and the wall fights back.',             path:'/arkanoid-learn', tags:['Arcade','Math']            },
-  { key:'stemquest',  label:'STEM Quest',            emoji:'🗺️',  color:'amber',   desc:'An interactive adventure map packed with multi-subject STEM challenges.',                  path:'/stem-quest',     tags:['Adventure','Multi-subject'] },
-  { key:'opencraft',  label:'OpenCraft',             emoji:'⛏️',  color:'teal',    desc:'Build and explore in a physics-based voxel sandbox.',                                       path:'/open-craft',     tags:['Sandbox','Physics']        },
-  { key:'runner',     label:'Reality Runner',        emoji:'🏃',  color:'sky',     desc:'Run through physics simulations and dodge equations in real time.',                         path:'/reality-runner', tags:['Runner','Physics']         },
-  { key:'basketball', label:'Basketball Lab',        emoji:'🏀',  color:'orange',  desc:'Apply trajectory and calculus to perfect your arc and sink every shot.',                   event:'basketball',     tags:['Physics','Calculus']       },
-  { key:'pool',       label:'Physics Pool',          emoji:'🎱',  color:'purple',  desc:'Explore collision physics and bank angles on the felt.',                                    event:'pool',           tags:['Physics','Geometry']       },
-  { key:'golf',       label:'Mini Golf',             emoji:'⛳',  color:'green',   desc:'Apply geometry and projectile motion to sink every putt.',                                  event:'golf',           tags:['Geometry','Physics']       },
-  { key:'football',   label:'Football Calculus',     emoji:'🏈',  color:'amber',   desc:'Use integration and optimization to analyse routes and trajectories.',                      event:'football',       tags:['Calculus','Sports']        },
+  { key:'rubiks',     label:"Rubik's Cube",        emoji:'🎲',  color:'emerald', desc:"Group theory, permutations & non-commutativity through the world's most famous puzzle.",     path:'/rubiks-cube',    tags:['Group Theory','3D'],          cover:{ grad:'from-emerald-700 via-green-800 to-teal-900',    mark:'3×3',   sub:'Group Theory'           } },
+  { key:'matrix',     label:'Linear Algebra Game', emoji:'λ',   color:'cyan',    desc:'Seven interactive lessons — vectors, transforms, determinants & eigenvectors.',              path:'/matrix-game',    tags:['Linear Algebra','Interactive'],cover:{ grad:'from-cyan-700 via-sky-800 to-blue-900',          mark:'[Ax]',  sub:'7 Interactive Lessons'  } },
+  { key:'tetris',     label:'STEM Tetris',          emoji:'🟦',  color:'fuchsia', desc:'Classic Tetris with six STEM lenses: matrix ops, 2×2 transforms, probability distributions.',path:'/stem-tetris',    tags:['Math','CS'],                  cover:{ grad:'from-fuchsia-700 via-purple-800 to-violet-900', mark:'████',  sub:'6 STEM Lenses'          } },
+  { key:'cards',      label:'STEM Card Academy',    emoji:'🃏',  color:'indigo',  desc:'Five card games teaching probability, statistics & neuroscience through play.',              path:'/card-academy',   tags:['Probability','Stats'],        cover:{ grad:'from-indigo-700 via-violet-800 to-purple-900',  mark:'♠ ♥',  sub:'Probability & Stats'    } },
+  { key:'asteroids',  label:'Vector Asteroids',     emoji:'🌀',  color:'violet',  desc:'Blast rocks through 10 waves — velocity, dot products, matrix transforms via gameplay.',     path:'/asteroids-la',   tags:['Linear Algebra','Arcade'],    cover:{ grad:'from-violet-700 via-indigo-800 to-blue-900',    mark:'v⃗→',   sub:'10 Waves'               } },
+  { key:'arkanoid',   label:'Arkanoid Learn',        emoji:'🎮',  color:'rose',    desc:'Break bricks by answering math questions. Miss one and the wall fights back.',              path:'/arkanoid-learn', tags:['Arcade','Math'],              cover:{ grad:'from-rose-700 via-pink-800 to-red-900',          mark:'▬▬▬',  sub:'Math Breakout'          } },
+  { key:'stemquest',  label:'STEM Quest',            emoji:'🗺️',  color:'amber',   desc:'An interactive adventure map packed with multi-subject STEM challenges.',                   path:'/stem-quest',     tags:['Adventure','Multi-subject'],  cover:{ grad:'from-amber-600 via-orange-700 to-red-800',       mark:'◈◈◈',  sub:'STEM Adventure'         } },
+  { key:'opencraft',  label:'OpenCraft',             emoji:'⛏️',  color:'teal',    desc:'Build and explore in a physics-based voxel sandbox.',                                        path:'/open-craft',     tags:['Sandbox','Physics'],          cover:{ grad:'from-teal-700 via-cyan-800 to-blue-900',         mark:'⬛⬛',  sub:'Physics Sandbox'        } },
+  { key:'runner',     label:'Reality Runner',        emoji:'🏃',  color:'sky',     desc:'Run through physics simulations and dodge equations in real time.',                          path:'/reality-runner', tags:['Runner','Physics'],           cover:{ grad:'from-sky-600 via-blue-700 to-indigo-800',        mark:'▶▶▶',  sub:'Physics Runner'         } },
+  { key:'basketball', label:'Basketball Lab',        emoji:'🏀',  color:'orange',  desc:'Apply trajectory and calculus to perfect your arc and sink every shot.',                    event:'basketball',     tags:['Physics','Calculus'],         cover:{ grad:'from-orange-600 via-red-700 to-rose-800',        mark:'⌒',    sub:'Trajectory · Calculus'  } },
+  { key:'pool',       label:'Physics Pool',          emoji:'🎱',  color:'purple',  desc:'Explore collision physics and bank angles on the felt.',                                     event:'pool',           tags:['Physics','Geometry'],         cover:{ grad:'from-purple-700 via-violet-800 to-indigo-900',   mark:'⊙●',   sub:'Collision Physics'      } },
+  { key:'golf',       label:'Mini Golf',             emoji:'⛳',  color:'green',   desc:'Apply geometry and projectile motion to sink every putt.',                                   event:'golf',           tags:['Geometry','Physics'],         cover:{ grad:'from-green-600 via-emerald-700 to-teal-800',     mark:'⌒⛳',  sub:'Geometry · Projectile'  } },
+  { key:'football',   label:'Football Calculus',     emoji:'🏈',  color:'amber',   desc:'Use integration and optimization to analyse routes and trajectories.',                       event:'football',       tags:['Calculus','Sports'],          cover:{ grad:'from-amber-600 via-yellow-700 to-orange-800',    mark:'∫ dt', sub:'Integration & Routes'   } },
 ]
 
 // ── Pre-built course → chapters lookup ───────────────────────────────────────
@@ -195,49 +195,134 @@ function CourseCard({ course, chapters, getLessonStatus }) {
   )
 }
 
-// ── Lab / Game feature card ───────────────────────────────────────────────────
-const FEATURE_GLOW = {
-  indigo:'rgba(99,102,241,0.45)',  blue:'rgba(59,130,246,0.45)',   emerald:'rgba(16,185,129,0.45)',
-  red:'rgba(239,68,68,0.45)',      purple:'rgba(168,85,247,0.45)', orange:'rgba(249,115,22,0.45)',
-  teal:'rgba(20,184,166,0.45)',    amber:'rgba(245,158,11,0.45)',  sky:'rgba(14,165,233,0.45)',
-  cyan:'rgba(6,182,212,0.45)',     rose:'rgba(244,63,94,0.45)',    violet:'rgba(139,92,246,0.45)',
-  fuchsia:'rgba(217,70,239,0.45)',slate:'rgba(100,116,139,0.45)', green:'rgba(34,197,94,0.45)',
+// ── Lab card ──────────────────────────────────────────────────────────────────
+const LAB_GLOW = {
+  indigo:'rgba(99,102,241,0.55)',   amber:'rgba(245,158,11,0.55)',  violet:'rgba(139,92,246,0.55)',
+  cyan:'rgba(6,182,212,0.55)',      fuchsia:'rgba(217,70,239,0.55)',slate:'rgba(100,116,139,0.45)',
+  emerald:'rgba(16,185,129,0.55)',
 }
 
-function FeatureCard({ item }) {
+// Blueprint grid overlay — reinforces the "technical tool" identity
+const GRID_OVL = {
+  backgroundImage: [
+    'repeating-linear-gradient(rgba(255,255,255,0.04) 0 1px, transparent 1px 100%)',
+    'repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 1px, transparent 1px 100%)',
+  ].join(','),
+  backgroundSize: '22px 22px',
+}
+
+function LabCard({ item }) {
   const ref = useRef(null)
-  const glow = `0 0 30px ${FEATURE_GLOW[item.color] ?? 'rgba(100,116,139,0.45)'}`
+  const { grad, mark, sub } = item.cover
+  const glow = `0 0 36px ${LAB_GLOW[item.color] ?? 'rgba(100,116,139,0.45)'}`
 
   const inner = (
     <div
       ref={ref}
-      className="group relative h-full rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm transition-all duration-300 overflow-hidden hover:border-white/20 hover:scale-[1.025] hover:-translate-y-0.5"
+      className="group rounded-xl border border-white/10 bg-[#060a14] overflow-hidden transition-all duration-300 hover:border-white/22 hover:scale-[1.025] hover:-translate-y-0.5"
       onMouseEnter={() => { if (ref.current) ref.current.style.boxShadow = glow }}
       onMouseLeave={() => { if (ref.current) ref.current.style.boxShadow = '' }}
     >
-      <div className="p-4">
-        <div className="text-3xl mb-2 leading-none">{item.emoji}</div>
-        <h4 className="font-bold text-white/90 text-sm mb-1.5">{item.label}</h4>
-        <p className="text-slate-400 text-xs leading-relaxed mb-3 line-clamp-3">{item.desc}</p>
+      {/* Cover: gradient + blueprint grid + watermark */}
+      <div className={`relative overflow-hidden bg-gradient-to-br ${grad}`}>
+        <div className="absolute inset-0 pointer-events-none" style={GRID_OVL} />
+        {/* Watermark symbol — sits far right, very faint */}
+        <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none select-none leading-none font-black text-white/[0.07] text-[52px] tracking-tighter">{mark}</div>
+        {/* Main content */}
+        <div className="relative flex items-center gap-3.5 px-4 py-4">
+          <span className="text-[2rem] leading-none">{item.emoji}</span>
+          <div>
+            <h4 className="font-bold text-white text-sm leading-tight">{item.label}</h4>
+            <span className="text-white/45 text-[11px] font-mono">{sub}</span>
+          </div>
+          <span className="ml-auto text-white/25 text-xs font-bold group-hover:text-white/80 group-hover:translate-x-0.5 transition-all shrink-0">Launch →</span>
+        </div>
+      </div>
+      {/* Body */}
+      <div className="px-4 py-3">
+        <p className="text-slate-400 text-xs leading-relaxed mb-3 line-clamp-2">{item.desc}</p>
         <div className="flex flex-wrap gap-1">
           {item.tags.map(t => (
-            <span key={t} className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-slate-500">{t}</span>
+            <span key={t} className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-white/5 border border-white/8 text-slate-500">{t}</span>
           ))}
         </div>
       </div>
-      <div className="absolute bottom-3 right-3 text-white/25 text-xs group-hover:text-white/60 transition-colors">→</div>
     </div>
   )
 
   if (item.event) {
     return (
-      <button className="block w-full text-left h-full"
+      <button className="block w-full text-left"
         onClick={() => window.dispatchEvent(new CustomEvent('oc-open-game', { detail: { game: item.event } }))}>
         {inner}
       </button>
     )
   }
-  return <Link to={item.path} className="block h-full">{inner}</Link>
+  return <Link to={item.path} className="block">{inner}</Link>
+}
+
+// ── Game card ─────────────────────────────────────────────────────────────────
+const GAME_GLOW = {
+  emerald:'rgba(16,185,129,0.55)',  cyan:'rgba(6,182,212,0.55)',     fuchsia:'rgba(217,70,239,0.55)',
+  indigo:'rgba(99,102,241,0.55)',   violet:'rgba(139,92,246,0.55)',  rose:'rgba(244,63,94,0.55)',
+  amber:'rgba(245,158,11,0.55)',    teal:'rgba(20,184,166,0.55)',    sky:'rgba(14,165,233,0.55)',
+  orange:'rgba(249,115,22,0.55)',   purple:'rgba(168,85,247,0.55)', green:'rgba(34,197,94,0.55)',
+}
+
+// Dot matrix overlay — more playful / arcade feel
+const DOTS_OVL = {
+  backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.10) 1.5px, transparent 1.5px)',
+  backgroundSize: '13px 13px',
+}
+
+function GameCard({ item }) {
+  const ref = useRef(null)
+  const { grad, mark, sub } = item.cover
+  const glow = `0 0 36px ${GAME_GLOW[item.color] ?? 'rgba(100,116,139,0.45)'}`
+
+  const inner = (
+    <div
+      ref={ref}
+      className="group rounded-xl border border-white/10 bg-[#060a14] overflow-hidden transition-all duration-300 hover:border-white/22 hover:scale-[1.025] hover:-translate-y-0.5"
+      onMouseEnter={() => { if (ref.current) ref.current.style.boxShadow = glow }}
+      onMouseLeave={() => { if (ref.current) ref.current.style.boxShadow = '' }}
+    >
+      {/* Cover: gradient + dot matrix + large watermark behind content */}
+      <div className={`relative overflow-hidden bg-gradient-to-br ${grad}`}>
+        <div className="absolute inset-0 pointer-events-none" style={DOTS_OVL} />
+        {/* Large bottom-right watermark */}
+        <div className="absolute bottom-0 right-2 pointer-events-none select-none leading-none font-black text-white/[0.09] text-[48px] tracking-tight">{mark}</div>
+        {/* Content stacks vertically for more visual presence */}
+        <div className="relative px-4 pt-5 pb-4">
+          <div className="text-[2rem] leading-none mb-1.5">{item.emoji}</div>
+          <h4 className="font-bold text-white text-sm leading-tight">{item.label}</h4>
+          <span className="text-white/45 text-[11px]">{sub}</span>
+        </div>
+      </div>
+      {/* Body */}
+      <div className="px-4 py-3">
+        <p className="text-slate-400 text-xs leading-relaxed mb-3 line-clamp-2">{item.desc}</p>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex flex-wrap gap-1">
+            {item.tags.map(t => (
+              <span key={t} className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-white/5 border border-white/8 text-slate-500">{t}</span>
+            ))}
+          </div>
+          <span className="text-white/25 text-xs font-bold shrink-0 group-hover:text-white/80 group-hover:translate-x-0.5 transition-all">Play →</span>
+        </div>
+      </div>
+    </div>
+  )
+
+  if (item.event) {
+    return (
+      <button className="block w-full text-left"
+        onClick={() => window.dispatchEvent(new CustomEvent('oc-open-game', { detail: { game: item.event } }))}>
+        {inner}
+      </button>
+    )
+  }
+  return <Link to={item.path} className="block">{inner}</Link>
 }
 
 // ── Domain section ────────────────────────────────────────────────────────────
@@ -360,7 +445,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {LABS.map(item => <FeatureCard key={item.key} item={item} />)}
+            {LABS.map(item => <LabCard key={item.key} item={item} />)}
           </div>
         </section>
 
@@ -374,7 +459,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {GAMES.map(item => <FeatureCard key={item.key} item={item} />)}
+            {GAMES.map(item => <GameCard key={item.key} item={item} />)}
           </div>
         </section>
 

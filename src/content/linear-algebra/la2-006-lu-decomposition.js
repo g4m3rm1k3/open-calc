@@ -148,6 +148,7 @@ fprintf('det(A) from MATLAB     = %g\\n', det(A))`,
               prose: [
                 '`solve_LU = @(b) U \\ (L \\ (P * b))` defines a function encapsulating the two-phase solve: (1) `P * b` reorders $\\mathbf{b}$ to match the pivot permutation; (2) `L \\ (P*b)` solves $L\\mathbf{y} = P\\mathbf{b}$ by forward substitution ($O(n^2)$); (3) `U \\ y` solves $U\\mathbf{x} = \\mathbf{y}$ by back substitution ($O(n^2)$). This function reuses the same `L`, `U`, `P` for any right-hand side without refactoring.',
                 '`norm(A*x1 - b1) < 1e-10` checks the residual $\\|A\\mathbf{x}_1 - \\mathbf{b}_1\\|$ — near-zero confirms $\\mathbf{x}_1$ is correct. The second call `solve_LU(b2)` costs only $O(n^2)$ because the factorization is already done. For $k$ right-hand sides: one $O(n^3)$ factorization + $k \\times O(n^2)$ solves vs $k \\times O(n^3)$ fresh eliminations.',
+                'The anonymous function `solve_LU = @(b) U \\\\ (L \\\\ (P * b))` chains three operations that implement $\\mathbf{x} = U^{-1}(L^{-1}(P\\mathbf{b}))$ right-to-left: (1) `P * b` permutes $\\mathbf{b}$ to match the row-swap order recorded during factorization, (2) `L \\\\ (P*b)` forward-substitutes through $L$ in $O(n^2)$, (3) `U \\\\ y` back-substitutes through $U$ in $O(n^2)$. In structural engineering, the stiffness matrix $K$ encodes material properties and geometry — fixed for a given physical structure. Only the load vector changes between analyses (gravity, wind, seismic). Factoring $K$ once and calling `solve_LU` for each load case is exactly what commercial FEM packages do internally.',
               ],
               code: `A = [2 1 1; 4 3 3; 8 7 9];
 [L, U, P] = lu(A);
@@ -174,6 +175,7 @@ fprintf('Verify A*x2 = b2: %d\\n', norm(A*x2 - b2) < 1e-10)`,
               prose: [
                 'Rather than calling `A \\ b` (which calls LAPACK), this cell implements the two substitution phases as explicit loops — exactly what is happening inside the built-in solver. `for i = 1:n` iterates top to bottom through $L$; the inner `for j = 1:i-1` subtracts the contributions of already-known $y_j$ values. Since $L_{ii} = 1$ always, no division is needed in forward substitution.',
                 '`for i = n:-1:1` iterates bottom to top through $U$; the inner `for j = i+1:n` subtracts contributions of already-known $x_j$. Division by `U(i,i)` is required because $U$\'s diagonal entries are the pivots (not necessarily 1). `norm(x_manual - x_builtin) < 1e-10` confirms the manual implementation matches MATLAB\'s built-in solver — same algorithm, just written out.',
+                'The inner sum in forward substitution — `for j = 1:i-1: y(i) -= L(i,j)*y(j)` — is the dot product of the $i$-th row of $L$ (below-diagonal part) with already-computed entries of $\\mathbf{y}$, precisely "undoing" the effect of the Gaussian elimination multipliers stored there. Writing this manually reveals that `A \\\\ b` is not magical: it is two loops of $O(n^2)$ multiplications and subtractions, entirely determined by the triangular structure of $L$ and $U$. Each multiplication in the inner loop corresponds to one entry in the staircase pattern of the triangular matrices — the geometry of the algorithm IS the geometry of the triangles.',
               ],
               code: `L = [1 0 0; 2 1 0; 4 3 1];
 U = [2 1 1; 0 1 1; 0 0 2];
@@ -212,6 +214,7 @@ fprintf('Match with A\\\\b: %d\\n', norm(x_manual - x_builtin) < 1e-10)`,
               prose: [
                 '`[L, U, P] = lu(K)` factors the $4\\times 4$ stiffness matrix once — this is the $O(n^3)$ investment. `cond(K)` is the condition number: a large condition number means small input errors (measurement noise in the forces) could produce large errors in the computed displacements. For a well-conditioned stiffness matrix, the LU solution is reliable.',
                 '`solve_K = @(F) U \\ (L \\ (P * F))` reuses the same factorization for all three load cases. Each call is $O(n^2)$: permute $F$, forward-substitute through $L$, back-substitute through $U$. `max(abs(disp))` extracts the maximum nodal deflection — the critical engineering output, checked against allowable deformation tolerances.',
+                'The stiffness matrix $K$ encodes only structural properties — spring constants, geometry, material stiffness — not the applied forces. Factoring $K$ once captures all structural information; between load cases only $\\mathbf{F}$ changes. In real FEM software, a $10{,}000 \\times 10{,}000$ stiffness matrix is factored $O(n^3)$ once during assembly, then reused for hundreds of load combinations, mode shapes, and sensitivity analyses — each at $O(n^2)$. The condition number `cond(K) ≈ 5` confirms this stiffness matrix is well-conditioned: small errors in measured forces $\\mathbf{F}$ produce proportionally small errors in computed deflections, so the simulation results are reliable.',
               ],
               code: `% Simplified 4×4 FEM stiffness matrix (symmetric positive definite)
 % Represents spring-connected nodes in a CNC gantry frame
@@ -254,8 +257,9 @@ fprintf('Max deflection (rapid):     %.4f mm\\n', max(abs(disp_rapid)))`,
               id: 1,
               cellTitle: 'Manual LU decomposition of a 3×3 matrix',
               prose: [
-                '`scipy.linalg.lu(A)` returns `(P, L, U)` such that $A = P \\cdot L \\cdot U$ (scipy convention: $A = PLU$, not $PA = LU$). `P` is the permutation matrix; `L` is unit lower triangular ($1$s on diagonal); `U` is upper triangular. `np.allclose(P @ A, L @ U)` verifies this — if `False`, the factorization has a bug.',
-                'The heatmap shows `L`, `U`, and `L@U` side by side. `L` is clearly lower triangular (zeros above the diagonal). `U` is upper triangular (zeros below). `L@U` reconstructs `P@A` — the original matrix with its rows permuted by the partial pivoting. The red/blue color scale shows positive (blue) vs negative (red) entries.',
+                '`scipy.linalg.lu(A)` returns `(P, L, U)` such that $A = P \\cdot L \\cdot U$ (scipy convention: $A = PLU$, not $PA = LU$). `P` is the permutation matrix; `L` is unit lower triangular ($1$s on diagonal); `U` is upper triangular. `np.allclose(A, P @ L @ U)` verifies this — if `False`, the factorization has a bug.',
+                'The heatmap shows `L`, `U`, and `L@U` side by side. `L` is clearly lower triangular (zeros above the diagonal). `U` is upper triangular (zeros below). `L@U` reconstructs `P.T @ A` — the rows of $A$ in the pivot-permuted order that Gaussian elimination processed them. The red/blue color scale shows positive (blue) vs negative (red) entries.',
+                '**scipy vs MATLAB convention:** `scipy.linalg.lu` uses $A = P L U$ — $P$ reorders the rows of $LU$ to reconstruct $A$. MATLAB\'s `[L,U,P] = lu(A)` uses $P \\cdot A = L \\cdot U$ (same factorization, $P$ defined on the opposite side). Because of this, the correct verification in scipy is `np.allclose(A, P @ L @ U)`, not `np.allclose(P @ A, L @ U)` — those are different things! The heatmap\'s third panel shows $L \\cdot U = P^T A$: this is the pivoted view of $A$ that $L$ and $U$ "see" — the row order in which Gaussian elimination was applied.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -265,10 +269,10 @@ A = np.array([[2., 1., 1.], [4., 3., 3.], [8., 7., 9.]])
 P, L, U = linalg.lu(A)
 print("L ="); print(L.round(4))
 print("U ="); print(U.round(4))
-print("P@A = L@U?", np.allclose(P @ A, L @ U))
+print("A = P@L@U?", np.allclose(A, P @ L @ U))
 
 fig, axes = plt.subplots(1, 3, figsize=(11, 3.5))
-for ax, M, title in zip(axes, [L, U, L@U], ['L (lower tri)', 'U (upper tri)', 'L @ U = P@A']):
+for ax, M, title in zip(axes, [L, U, L@U], ['L (lower tri)', 'U (upper tri)', 'L@U = P.T @ A']):
     ax.imshow(M, cmap='RdBu_r', aspect='equal', vmin=-10, vmax=10)
     ax.set_title(title, fontsize=12)
     for i in range(M.shape[0]):
@@ -276,7 +280,7 @@ for ax, M, title in zip(axes, [L, U, L@U], ['L (lower tri)', 'U (upper tri)', 'L
             ax.text(j, i, f'{M[i,j]:.2f}', ha='center', va='center', fontsize=10,
                     color='white' if abs(M[i,j]) > 5 else 'black')
     ax.set_xticks([]); ax.set_yticks([])
-plt.suptitle("LU Decomposition: A = L @ U (with partial pivoting)", fontsize=11)
+plt.suptitle("LU Decomposition: A = P @ L @ U (scipy: A = P·L·U)", fontsize=11)
 plt.tight_layout()
 plt.show()`,
             },
@@ -286,6 +290,7 @@ plt.show()`,
               prose: [
                 '`scipy.linalg.solve_triangular(L, Pb, lower=True)` performs forward substitution: solves $L\\mathbf{y} = P^T\\mathbf{b}$ in $O(n^2)$. The `lower=True` flag tells scipy to use the triangular structure — without it, scipy would use a general $O(n^3)$ solver unnecessarily. `P.T @ b` is $P^T \\mathbf{b}$ because $P^T = P^{-1}$ for permutation matrices.',
                 '`solve_triangular(U, y)` performs back substitution: solves $U\\mathbf{x} = \\mathbf{y}$ (default `lower=False` = upper triangular). The bar chart shows the vector at each pipeline stage: $\\mathbf{b} \\to P^T\\mathbf{b} \\to \\mathbf{y} \\to \\mathbf{x}$. Each transition applies one triangular solve, transforming the problem through the LU layers until $\\mathbf{x}$ emerges.',
+                '**Why `P.T @ b`, not `P @ b`?** Since scipy returns $A = P L U$, solving $Ax = b$ means $(PLU)x = b$. Multiply both sides by $P^T = P^{-1}$: $(LU)x = P^T b$. So the right-hand side must be permuted by $P^T$ — the INVERSE permutation — before entering the triangular solvers. Notice in the bar chart: the step $\\mathbf{b} \\to P^T\\mathbf{b}$ reorders the entries (if pivoting swapped rows during factorization). The subsequent steps through $L$ and $U$ always work in the "elimination order" — the order in which rows were processed when building the factorization.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -323,6 +328,7 @@ plt.show()`,
               prose: [
                 '`lu_factor(A)` returns a compact representation `(lu_array, piv)`: `lu_array` stores both $L$ and $U$ in-place (upper triangle = $U$, strict lower triangle = the multipliers of $L$, with $L$\'s diagonal 1s implied). This saves memory vs storing $L$ and $U$ as two separate full matrices.',
                 '`lu_solve(lu_factored, b)` extracts $L$ and $U$ from the compact form, applies the pivot permutation to $\\mathbf{b}$, then solves in $O(n^2)$. `np.allclose(A @ x1, b1)` verifies the residual. Calling `lu_solve` a second time with `b2` costs only $O(n^2)$ — the $O(n^3)$ factorization is already paid.',
+                '**In-place storage:** `lu_factor` stores $L$ and $U$ compactly in a single array the same size as $A$: the upper triangle (including diagonal) holds $U$, and the strict lower triangle holds the Gaussian multipliers of $L$ (with $L$\'s diagonal 1s omitted since they are always 1). This halves memory vs two separate matrices. The speedup from reusing `lu_factored` scales with problem size: for an $n \\times n$ matrix and $k$ right-hand sides, the total cost ratio is $kn^3 / (n^3 + kn^2) \\approx n/3$ for large $k$ — a $1000 \\times 1000$ system with 100 right-hand sides runs roughly $300\\times$ faster with LU reuse than by running `solve` from scratch each time.',
               ],
               code: `import numpy as np
 from scipy.linalg import lu_factor, lu_solve
@@ -356,6 +362,7 @@ print("Verify A @ x2 = b2:", np.allclose(A @ x2, b2))`,
               prose: [
                 '`np.prod(np.diag(U))` computes $U_{11} \\cdot U_{22} \\cdot U_{33}$ — the determinant of the upper triangular factor (product of diagonal entries of any triangular matrix). `np.linalg.det(P)` returns $+1$ if the number of row swaps is even, $-1$ if odd.',
                 '`det_P * diag_product` assembles $\\det(A) = \\det(P^{-1}) \\cdot \\underbrace{\\det(L)}_{1} \\cdot \\det(U) = (\\pm 1) \\cdot \\prod_i U_{ii}$. `np.isclose` confirms it matches `np.linalg.det(A)` — this is exactly what NumPy does internally: it calls LAPACK LU routines and multiplies the diagonal of $U$ with the swap sign.',
+                '**Why not cofactor expansion?** The Leibniz formula requires $n!$ signed products — for $n = 20$, that is $20! \\approx 2.4 \\times 10^{18}$ multiplications, physically impossible. LU uses the multiplicativity $\\det(AB) = \\det(A)\\det(B)$ to reduce the problem to multiplying just $n$ diagonal entries of $U$ after factorization. The $O(n^3)$ factorization dominates, but that was paid for solving anyway. This is why `np.linalg.det`, `scipy.linalg.det`, MATLAB\'s `det()`, and every numerical library compute determinants via LU — cofactor expansion is only viable for $n \\leq 3$ and appears in textbook derivations, never in production code.',
               ],
               code: `import numpy as np
 from scipy.linalg import lu
@@ -381,6 +388,56 @@ print(f"det(P) (swap sign): {det_P:.0f}")
 print(f"det(A) from LU: {det_from_LU:.4f}")
 print(f"np.linalg.det(A): {np.linalg.det(A):.4f}")
 print(f"Match: {np.isclose(det_from_LU, np.linalg.det(A))}")`,
+            },
+            {
+              id: 5,
+              cellTitle: 'Application: 1D heat diffusion — one stiffness matrix, three temperature profiles',
+              prose: [
+                '`np.diag(np.full(n, 2.0)) - np.diag(np.ones(n-1), 1) - np.diag(np.ones(n-1), -1)` builds the tridiagonal matrix $K$ that discretizes the operator $-u\'\'(x)$ on an interior grid. Each row of $K$ encodes the equation $(2u_i - u_{i-1} - u_{i+1})/h^2 = f_i$ — the temperature at node $i$ is determined by its neighbors. Dividing by $h^2$ scales the matrix to match the physical PDE. $K$ encodes only the physical structure (grid spacing, boundary conditions) — it never changes between heat source scenarios.',
+                '`lu_factor(K)` performs the $O(n^3)$ factorization once. Each call to `lu_solve(lu_K, f)` costs $O(n^2)$: a uniform source `f1 = ones(n)`, a sinusoidal source `f2 = sin(πx)`, and a narrow Gaussian spike at the center `f3`. The three resulting arrays `u1`, `u2`, `u3` are equilibrium temperature profiles — each shaped by the same physical structure but driven by a different heat source.',
+                'The plot reveals the physics: uniform heating produces a symmetric parabola (exact solution $u = x(1-x)/2$); sinusoidal forcing gives a slightly sharper arc; the Gaussian spike creates a sharp local peak that decays rapidly toward the boundaries. All three are computed from the single `lu_K` factorization — this LU pattern generalizes directly to any FEM or PDE solver where the differential operator (encoded in $K$) is fixed but forcing terms vary between runs.',
+              ],
+              code: `import numpy as np
+import matplotlib.pyplot as plt
+from scipy.linalg import lu_factor, lu_solve
+
+# Discretize -u''(x) = f(x) on [0,1], Dirichlet BCs u(0) = u(1) = 0
+n = 30
+h = 1.0 / (n + 1)
+x = np.linspace(h, 1 - h, n)
+
+# Tridiagonal stiffness matrix (finite-difference Laplacian, scaled by 1/h^2)
+K = (np.diag(np.full(n, 2.0))
+   - np.diag(np.ones(n - 1), 1)
+   - np.diag(np.ones(n - 1), -1)) / h**2
+
+# Factor once — K encodes the physics, not the source
+lu_K = lu_factor(K)
+
+# Three different heat source distributions (right-hand sides)
+f1 = np.ones(n)                                  # uniform source
+f2 = np.sin(np.pi * x)                          # sinusoidal peak at center
+f3 = np.exp(-0.5 * ((x - 0.5) / 0.05)**2)      # Gaussian spike at x=0.5
+
+# Solve each (O(n^2) — factorization already paid)
+u1 = lu_solve(lu_K, f1)
+u2 = lu_solve(lu_K, f2)
+u3 = lu_solve(lu_K, f3) / np.max(np.abs(lu_solve(lu_K, f3))) * 0.15  # scale for visibility
+
+x_full = np.r_[0, x, 1]
+fig, ax = plt.subplots(figsize=(8, 4.5))
+for u, label, color in zip([u1, u2, u3],
+                            ['Uniform  (f=1)', 'Sinusoidal  (f=sin(πx))', 'Gaussian spike  (f≈δ(x−0.5))'],
+                            ['steelblue', 'darkorange', 'crimson']):
+    ax.plot(x_full, np.r_[0, u, 0], lw=2.5, label=label)
+
+ax.set_xlabel('x')
+ax.set_ylabel('Temperature u(x)')
+ax.set_title('1D Heat Diffusion: Same K (one LU factorization), Three Source Profiles')
+ax.legend()
+ax.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 'c1',

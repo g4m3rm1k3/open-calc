@@ -80,6 +80,7 @@ export default {
               prose: [
                 '`norm(A - A\')` computes $\\|A - A^\\top\\|_F$. For a symmetric matrix this is exactly zero — every off-diagonal pair satisfies $a_{ij} = a_{ji}$. If this norm is nonzero, the matrix is NOT symmetric and no further steps apply.',
                 '`[V, D] = eig(A)` returns the eigendecomposition: columns of `V` are eigenvectors, diagonal of `D` contains eigenvalues. For any real symmetric matrix, MATLAB guarantees `diag(D)` contains only real numbers — a consequence of the Spectral Theorem. `V\' * V` should equal `I` (orthonormal eigenvectors) and `V * D * V\'` should reconstruct `A`.',
+                'The Spectral Theorem says $A = V\\Lambda V^\\top$ exactly: the eigenvectors of $A$ form an orthonormal basis of $\\mathbb{R}^n$ (hence $V^\\top V = I$), and $A$ acts by rotating to the eigenvector basis ($V^\\top$), scaling each coordinate by the corresponding eigenvalue ($\\Lambda$), then rotating back ($V$). `norm(V*D*V\' - A)` near $10^{-13}$ confirms this algebraically to machine precision — contrasting with general (non-symmetric) matrices, where `eig` may return complex eigenvectors that are NOT guaranteed orthogonal.',
               ],
               code: `A = [4 2 1; 2 3 1; 1 1 5];
 fprintf('Symmetry check: norm(A - A\\') = %g (should be 0)\\n', norm(A - A'))
@@ -97,6 +98,7 @@ fprintf('Reconstruct: norm(V*D*V\\' - A) = %g\\n', norm(V*D*V' - A))`,
               prose: [
                 '`Q = [cos(t) -sin(t); sin(t) cos(t)]` builds a 2D rotation by angle `t`. Each column has unit length and the two columns are perpendicular — the definition of orthonormal columns.',
                 '`Q.\'*Q` (using real transpose `Q.\'` to avoid parsing issues) computes $Q^\\top Q$: entry $(i,j)$ is the dot product of column $i$ with column $j$ of $Q$. Orthonormal columns give 1 on the diagonal and 0 elsewhere — exactly $I$. `det(Q)` confirms $+1$ (proper rotation, no reflection). `norm(Q.\' - inv(Q))` verifies $Q^{-1} = Q^\\top$ to machine precision — inversion for free.',
+                'Length preservation `||v|| == ||Qv||` follows from $(Q\\mathbf{v})^\\top(Q\\mathbf{v}) = \\mathbf{v}^\\top Q^\\top Q \\mathbf{v} = \\mathbf{v}^\\top I \\mathbf{v} = \\|\\mathbf{v}\\|^2$. This algebraic identity means orthogonal matrices have condition number exactly 1: no direction is amplified or damped more than any other. Algorithms like Gram-Schmidt, QR decomposition, and the FFT deliberately produce orthogonal intermediate matrices for exactly this reason — to prevent numerical errors from accumulating.',
               ],
               code: `t = pi/3;   % 60 degree rotation
 Q = [cos(t) -sin(t); sin(t) cos(t)];
@@ -116,6 +118,7 @@ fprintf('||v|| = %g,  ||Qv|| = %g  (preserved)\\n', norm(v), norm(Qv))`,
               prose: [
                 '`x\' * A * x` computes the quadratic form $\\mathbf{x}^\\top A \\mathbf{x}$: a scalar that gives the "energy" of $\\mathbf{x}$ with respect to $A$. For a positive definite matrix, this value is always strictly positive regardless of which nonzero $\\mathbf{x}$ is used. The loop tests 5 random vectors — all outputs should be positive.',
                 '`eig(A)` confirms SPD via the eigenvalue test: all eigenvalues positive. `det(A(1,1)) > 0` and `det(A) > 0` are the two Sylvester leading principal minors — all positive → SPD. This is the fastest manual check for $2\\times 2$.',
+                'The `for k = 1:5` loop is a probabilistic SPD check: each random $\\mathbf{x}$ tests the quadratic form $\\mathbf{x}^\\top A \\mathbf{x}$ from a different direction. If every direction gives a positive value, confidence grows. But for a rigorous test, use `chol(A)` — MATLAB throws an error if $A$ is NOT positive definite, so a successful `chol` call is a definitive certificate of SPD. (Conversely, the loop could miss a negative direction by unlucky sampling.)',
               ],
               code: `A = [5 2; 2 3];   % symmetric
 fprintf('Leading principal minors (Sylvester criterion):\\n')
