@@ -25,9 +25,10 @@ const FEEDBACK_MS = 700
 const BLOCK_LENGTHS = [15, 20]
 
 const DIFFICULTY_LEVELS = [
-  { label: 'Easy',   ops: ['+', '-'], maxA: 20, maxB: 20,  mulMax: 0, divMax: 0  },
-  { label: 'Medium', ops: ['+', '-', '×'], maxA: 50, maxB: 20,  mulMax: 10, divMax: 0  },
-  { label: 'Hard',   ops: ['+', '-', '×', '÷'], maxA: 99, maxB: 25, mulMax: 12, divMax: 12 },
+  { label: 'Easy',   ops: ['+', '-'],         maxA: 20,  maxB: 20,  mulMax: 0,  divMax: 0,  negSub: false, pemdas: false },
+  { label: 'Medium', ops: ['+', '-', '×'],     maxA: 50,  maxB: 30,  mulMax: 10, divMax: 0,  negSub: true,  pemdas: false },
+  { label: 'Hard',   ops: ['+', '-', '×', '÷'], maxA: 99,  maxB: 25,  mulMax: 12, divMax: 12, negSub: true,  pemdas: true  },
+  { label: 'Expert', ops: ['+', '-', '×', '÷'], maxA: 99,  maxB: 25,  mulMax: 12, divMax: 12, negSub: true,  pemdas: true, parens: true },
 ]
 
 // ─── Problem generation ───────────────────────────────────────────────────────
@@ -35,18 +36,50 @@ function randInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
-function generateProblem(diffIdx) {
-  const { ops, maxA, maxB, mulMax, divMax } = DIFFICULTY_LEVELS[diffIdx]
-  const op = ops[Math.floor(Math.random() * ops.length)]
+// PEMDAS 3-term templates (no parentheses) — answer requires order of operations
+const PEMDAS_TEMPLATES = [
+  { make: (a,b,c) => ({ display: `${a} + ${b} × ${c}`,  answer: a + b*c  }) },
+  { make: (a,b,c) => ({ display: `${a} − ${b} × ${c}`,  answer: a - b*c  }) },
+  { make: (a,b,c) => ({ display: `${a} × ${b} + ${c}`,  answer: a*b + c  }) },
+  { make: (a,b,c) => ({ display: `${a} × ${b} − ${c}`,  answer: a*b - c  }) },
+  { make: (a,b,c) => ({ display: `${a} × ${b} ÷ ${c}`,  answer: (a*b)/c }) },  // clean div: ensure divisible
+]
 
+// PEMDAS with parentheses (Expert) — parens change standard order
+const PARENS_TEMPLATES = [
+  { make: (a,b,c) => ({ display: `(${a} + ${b}) × ${c}`, answer: (a+b)*c }) },
+  { make: (a,b,c) => ({ display: `(${a} − ${b}) × ${c}`, answer: (a-b)*c }) },
+  { make: (a,b,c) => ({ display: `${a} × (${b} + ${c})`, answer: a*(b+c) }) },
+  { make: (a,b,c) => ({ display: `${a} × (${b} − ${c})`, answer: a*(b-c) }) },
+  { make: (a,b,c) => ({ display: `(${a} + ${b}) ÷ ${c}`, answer: (a+b)/c }) },  // ensure divisible
+]
+
+function generateProblem(diffIdx) {
+  const { ops, maxA, maxB, mulMax, divMax, negSub, pemdas, parens } = DIFFICULTY_LEVELS[diffIdx]
+
+  // 40% chance of PEMDAS problem if the level supports it
+  if (parens && Math.random() < 0.5) {
+    return generateParensProblem(mulMax)
+  }
+  if (pemdas && Math.random() < 0.4) {
+    return generatePemdasProblem(mulMax, divMax)
+  }
+
+  const op = ops[Math.floor(Math.random() * ops.length)]
   let a, b, answer
 
   if (op === '+') {
     a = randInt(1, maxA); b = randInt(1, maxB)
     answer = a + b
   } else if (op === '-') {
-    a = randInt(1, maxA); b = randInt(1, Math.min(a, maxB))
-    answer = a - b
+    if (negSub) {
+      // Allow negative answers: pick freely
+      a = randInt(1, maxA); b = randInt(1, maxB)
+      answer = a - b
+    } else {
+      a = randInt(1, maxA); b = randInt(1, Math.min(a, maxB))
+      answer = a - b
+    }
   } else if (op === '×') {
     a = randInt(2, mulMax); b = randInt(2, mulMax)
     answer = a * b
@@ -56,7 +89,50 @@ function generateProblem(diffIdx) {
     a = b * answer
   }
 
-  return { a, b, op, answer, display: `${a} ${op} ${b}` }
+  return { a, b, op, answer, display: `${a} ${op} ${b}`, isPemdas: false }
+}
+
+function generatePemdasProblem(mulMax, divMax) {
+  const tmpl = PEMDAS_TEMPLATES[Math.floor(Math.random() * PEMDAS_TEMPLATES.length)]
+  let a, b, c, result
+  // Keep retrying until we get a clean integer answer
+  let attempts = 0
+  do {
+    a = randInt(2, 9)
+    b = randInt(2, Math.min(mulMax, 9))
+    c = randInt(2, Math.min(mulMax, 9))
+    // For ×÷ template, ensure clean division
+    if (tmpl.make.toString().includes('(a*b)/c')) {
+      c = [2, 3, 4][Math.floor(Math.random() * 3)]
+      b = c * randInt(1, 4)  // make a*b divisible by c
+    }
+    result = tmpl.make(a, b, c)
+    attempts++
+  } while (!Number.isInteger(result.answer) && attempts < 20)
+
+  return { ...result, isPemdas: true }
+}
+
+function generateParensProblem(mulMax) {
+  const tmpl = PARENS_TEMPLATES[Math.floor(Math.random() * PARENS_TEMPLATES.length)]
+  let a, b, c, result
+  let attempts = 0
+  do {
+    a = randInt(2, 9)
+    b = randInt(2, 9)
+    c = randInt(2, Math.min(mulMax, 9))
+    // For ÷ template, ensure (a+b) divisible by c
+    if (tmpl.make.toString().includes('(a+b)/c')) {
+      const sum = a + b
+      const divisors = [2,3,4,5,6].filter(d => sum % d === 0)
+      if (!divisors.length) { attempts++; continue }
+      c = divisors[Math.floor(Math.random() * divisors.length)]
+    }
+    result = tmpl.make(a, b, c)
+    attempts++
+  } while (!Number.isInteger(result.answer) && attempts < 20)
+
+  return { ...result, isPemdas: true }
 }
 
 // ─── Persistence ──────────────────────────────────────────────────────────────
@@ -153,22 +229,25 @@ const TUTORIAL_STEPS = [
   },
   {
     title: 'Operations scale with difficulty',
-    body: 'Easy: small additions and subtractions. Medium adds times-tables. Hard adds larger numbers and division. Difficulty is auto-suggested after each block based on your accuracy.',
+    body: 'Easy: small positive +/−. Medium adds × and allows negative answers. Hard adds ÷ and 3-term order-of-operations problems. Expert is all of the above plus parentheses that change the order.',
     visual: () => (
-      <div className="space-y-3">
+      <div className="space-y-2">
         {DIFFICULTY_LEVELS.map((d, i) => (
           <div key={i} className="flex items-center gap-3 rounded-xl bg-slate-100 dark:bg-slate-800 p-2.5">
-            <span className="w-16 text-sm font-semibold text-slate-700 dark:text-slate-300">{d.label}</span>
+            <span className="w-14 text-sm font-semibold text-slate-700 dark:text-slate-300">{d.label}</span>
             <div className="flex gap-1.5 flex-wrap">
               {d.ops.map(op => (
                 <span key={op} className="px-2 py-0.5 rounded-lg bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 text-xs font-bold border border-amber-200 dark:border-amber-700">
                   {op}
                 </span>
               ))}
+              {d.negSub && <span className="px-2 py-0.5 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400 text-xs">neg −</span>}
+              {d.pemdas && <span className="px-2 py-0.5 rounded-lg bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400 text-xs font-semibold">PEMDAS</span>}
+              {d.parens && <span className="px-2 py-0.5 rounded-lg bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400 text-xs font-semibold">(  )</span>}
             </div>
-            <span className="text-xs text-slate-400 ml-auto">up to {d.maxA}</span>
           </div>
         ))}
+        <p className="text-xs text-slate-400 italic pt-1">Hard example: 3 + 4 × 2 → answer is 11, not 14!</p>
       </div>
     ),
   },
@@ -389,7 +468,7 @@ export default function ArithmeticSprint() {
               <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Difficulty</p>
               <p className="text-xs text-slate-400">Operations and number size</p>
             </div>
-            <div className="flex gap-1.5">
+            <div className="grid grid-cols-2 gap-1.5">
               {DIFFICULTY_LEVELS.map((d, i) => (
                 <button key={i} onClick={() => setDiffIdx(i)}
                   className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${i === diffIdx ? 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-700' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300'}`}>
@@ -436,6 +515,9 @@ export default function ArithmeticSprint() {
             : feedback === 'wrong' ? 'bg-rose-50 dark:bg-rose-950/20 border-rose-400'
             : 'bg-slate-900 border-slate-700'
           }`}>
+            {problem.isPemdas && feedback === null && (
+              <p className="text-[10px] font-bold uppercase tracking-widest text-rose-400 mb-2">Order of operations!</p>
+            )}
             <p className={`text-4xl font-black tracking-wide ${feedback === null ? 'text-amber-400' : feedback === 'correct' ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-700 dark:text-slate-200'}`}>
               {problem.display}
             </p>

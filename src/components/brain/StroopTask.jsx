@@ -256,6 +256,7 @@ export default function StroopTask() {
   const [feedback,     setFeedback]     = useState(null)     // null | 'correct' | 'wrong'
   const [blockResult,  setBlockResult]  = useState(null)
   const [suggestDiff,  setSuggestDiff]  = useState(null)
+  const [shuffledColors, setShuffledColors] = useState([])
   const [stats,        setStats]        = useState(loadStats)
   const [showInfo,     setShowInfo]     = useState(() => (loadStats().sessions?.length ?? 0) === 0)
   const timerRef     = useRef(null)
@@ -288,6 +289,9 @@ export default function StroopTask() {
     trialRef.current    = t
     historyRef.current  = newHistory
     trialIdxRef.current = nextIdx
+    // Shuffle button order every trial so muscle memory can't form
+    const cols = COLORS.slice(0, DIFFICULTY_LEVELS[dIdx].numColors)
+    setShuffledColors([...cols].sort(() => Math.random() - 0.5))
     setTrial(t)
     setTrialIdx(nextIdx)
     setFeedback(null)
@@ -310,16 +314,16 @@ export default function StroopTask() {
     }, FEEDBACK_MS)
   }, [feedback, diffIdx, blockLen, advanceToTrial])
 
-  // Keyboard: 1–N keys map to colour buttons
+  // Keyboard: 1–N keys map to the current shuffled button order
   useEffect(() => {
     if (phase !== 'playing') return
     const handler = (e) => {
       const idx = parseInt(e.key) - 1
-      if (idx >= 0 && idx < activeColors.length) handleAnswer(activeColors[idx].name)
+      if (idx >= 0 && idx < shuffledColors.length) handleAnswer(shuffledColors[idx].name)
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [phase, activeColors, handleAnswer])
+  }, [phase, shuffledColors, handleAnswer])
 
   const startBlock = () => {
     clearTimeout(timerRef.current)
@@ -431,15 +435,15 @@ export default function StroopTask() {
             )}
           </div>
 
-          {/* Colour buttons */}
-          <div className="grid grid-cols-3 gap-2">
-            {activeColors.map((c, i) => (
+          {/* Colour buttons — shuffled every trial so positions can't become habitual */}
+          <div className="flex flex-wrap gap-2 justify-center">
+            {shuffledColors.map((c, i) => (
               <button key={c.name} onClick={() => handleAnswer(c.name)}
                 disabled={feedback !== null}
-                className="py-3 rounded-xl font-bold text-white text-sm transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
+                className="flex-1 min-w-[80px] py-3 rounded-xl font-bold text-white text-sm transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
                 style={{ background: c.hex }}>
                 {c.name}
-                <span className="block text-[10px] font-normal opacity-70">key {i + 1}</span>
+                <span className="block text-[10px] font-normal opacity-60">{i + 1}</span>
               </button>
             ))}
           </div>
