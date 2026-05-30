@@ -209,4 +209,11 @@ export const COURSES = [
     desc: "Zero to Software Engineer — Complete C++ Mastery",
     color: "blue",
   },
+  {
+    key: "sim-1",
+    label: "Sim Lab",
+    path: "/course/sim-1",
+    desc: "Build Physics, Graphics & Math Simulations",
+    color: "sky",
+  },
 ];

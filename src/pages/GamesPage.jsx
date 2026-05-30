@@ -6,9 +6,11 @@ import { GAMES } from '../data/games.js'
 
 export default function GamesPage() {
   useEffect(() => {
-    document.title = 'Games — UpSkillOS'
-    return () => { document.title = 'UpSkillOS' }
-  }, [])
+    document.title = "Games — UpSkillOS";
+    return () => {
+      document.title = "UpSkillOS";
+    };
+  }, []);
 
   return (
     <div className="relative min-h-[calc(100vh-9rem)] text-white">
@@ -24,7 +26,8 @@ export default function GamesPage() {
             Arcade learning.
           </h1>
           <p className="max-w-2xl text-base leading-7 text-slate-100/76 sm:text-lg">
-            Apply what you're learning through arcade challenges, physics playgrounds, and sports math.
+            Apply what you're learning through arcade challenges, physics
+            playgrounds, and sports math.
           </p>
         </div>
 
@@ -40,5 +43,5 @@ export default function GamesPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

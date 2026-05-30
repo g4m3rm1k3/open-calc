@@ -1,4 +1,4 @@
-# open-calc Architecture Map
+# UpSkillOS Architecture Map
 
 > A complete reference document for contributors. Covers every layer of the app — routing, layout, content formats, viz system, reference system, progress system, known inconsistencies, and a tiered contribution guide.
 
@@ -155,6 +155,15 @@ Courses are imported from their `index.js` file, which either exports a **single
 | `math-1/` | Math 1 | Single object | Schema A |
 | `chemistry-1/` | Chemistry | Array of chapters | **Schema E** |
 | `digital-fundamentals/` | Digital Fundamentals | Array of chapters | **Schema E** |
+| `dsa-1/` | Data Structures & Algorithms | Single object | Schema A |
+| `dp-1/` | Dynamic Programming | Single object | Schema A |
+| `design-1/` | Interface Design | Single object | Schema A |
+| `sql-0/` | SQL Fundamentals | Single object | Schema A |
+| `sql-1/` | Python + SQL | Single object | Schema A |
+| `nosql-1/` | NoSQL Databases | Single object | Schema A |
+| `applied-statistics/` | Applied Statistics | Single object | Schema A |
+| `cli-0/` | Command Line | Single object | Schema A |
+| `cpp-0/` through `cpp-4/` | C++ Programming | Single object each | Schema A |
 | `proofs/` | (Proof data, not a course — used by Reference) | n/a | n/a |
 
 **Chapter number convention:**

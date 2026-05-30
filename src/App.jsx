@@ -38,6 +38,8 @@ const HealthTrackerPage = lazy(() => import('./pages/HealthTrackerPage.jsx'));
 const BrainPage = lazy(() => import('./pages/BrainPage.jsx'));
 const RubiksCubePage = lazy(() => import("./pages/RubiksCubePage.jsx"));
 const MatrixGamePage = lazy(() => import("./pages/MatrixGamePage.jsx"));
+const RobotArmLabPage = lazy(() => import("./pages/RobotArmLabPage.jsx"));
+const SimLabPage = lazy(() => import("./pages/SimLabPage.jsx"));
 const Fallback = () => (
   <div className="flex items-center justify-center h-64">
     <LoadingSpinner size="lg" />
@@ -100,6 +102,8 @@ export default function App() {
                     <Route path="brain" element={<BrainPage />} />
                     <Route path="rubiks-cube" element={<RubiksCubePage />} />
                     <Route path="matrix-game" element={<MatrixGamePage />} />
+                    <Route path="robot-arm-lab" element={<RobotArmLabPage />} />
+                    <Route path="sim-lab" element={<SimLabPage />} />
                   </Routes>
                 </Suspense>
               </AppShell>

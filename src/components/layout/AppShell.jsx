@@ -63,6 +63,7 @@ import ChemistryPage from "../../pages/ChemistryPage.jsx";
 import PhysicsPage from "../../pages/PhysicsPage.jsx";
 import DynamicBackground from "../ui/DynamicBackground.jsx";
 import BackgroundPicker from "../ui/BackgroundPicker.jsx";
+import AlphaMascot from "../mascot/AlphaMascot.jsx";
 
 function MobileLocationBadge() {
   const { chapterId, lessonSlug } = useParams();
@@ -487,6 +488,8 @@ export default function AppShell({ children }) {
   const isBrainRoute  = location.pathname.startsWith("/brain");
   const isRubiksCubeRoute = location.pathname.startsWith("/rubiks-cube");
   const isMatrixGameRoute = location.pathname.startsWith("/matrix-game");
+  const isRobotArmLabRoute = location.pathname.startsWith("/robot-arm-lab");
+  const isSimLabRoute = location.pathname.startsWith("/sim-lab");
   
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarPinned, setSidebarPinned] = useState(() => {
@@ -627,10 +630,10 @@ export default function AppShell({ children }) {
     return () => window.removeEventListener("oc-open-game", handler);
   }, []);
 
-  if (isOpenMatRoute || isArkanoidLearnRoute || isRealityRunnerRoute || isCNCSimRoute || isCadProRoute || isOpenCraftRoute || isStemQuestRoute || isDocsRoute || isAsteroidsRoute || isStemTetrisRoute || isCardAcademyRoute || isRubiksCubeRoute || isMatrixGameRoute) {
+  if (isOpenMatRoute || isArkanoidLearnRoute || isRealityRunnerRoute || isCNCSimRoute || isCadProRoute || isOpenCraftRoute || isStemQuestRoute || isDocsRoute || isAsteroidsRoute || isStemTetrisRoute || isCardAcademyRoute || isRubiksCubeRoute || isMatrixGameRoute || isRobotArmLabRoute || isSimLabRoute) {
     return (
       <GrapherContext.Provider value={{ openGrapher }}>
-        <div className={`h-screen overflow-hidden ${(isArkanoidLearnRoute || isRealityRunnerRoute || isCadProRoute || isOpenCraftRoute || isStemQuestRoute || isAsteroidsRoute || isStemTetrisRoute || isCardAcademyRoute || isRubiksCubeRoute || isMatrixGameRoute) ? "bg-[#08111f]" : "bg-white dark:bg-slate-950"}`}>
+        <div className={`h-screen overflow-hidden ${(isArkanoidLearnRoute || isRealityRunnerRoute || isCadProRoute || isOpenCraftRoute || isStemQuestRoute || isAsteroidsRoute || isStemTetrisRoute || isCardAcademyRoute || isRubiksCubeRoute || isMatrixGameRoute || isRobotArmLabRoute || isSimLabRoute) ? "bg-[#08111f]" : "bg-white dark:bg-slate-950"}`}>
           <div className="h-full w-full overflow-hidden">
             {children ?? <Outlet />}
           </div>
@@ -1101,6 +1104,8 @@ onMenuToggle={() => setSidebarOpen((o) => !o)}
             <PhysicsPage onClose={() => setPhysicsOpen(false)} />
           </div>
         )}
+
+        <AlphaMascot />
       </div>
     </GrapherContext.Provider>
     </ChatProvider>

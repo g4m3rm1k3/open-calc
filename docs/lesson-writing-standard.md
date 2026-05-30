@@ -1,4 +1,5 @@
-# Lesson Writing Standard — open-calc Linear Algebra
+# UpSkillOS Lesson Writing Standard
+> Applies to all Schema A courses: Calculus, Linear Algebra, Geometry, Physics, Discrete Math, Precalc, Chemistry (Schema E where noted). The gold standard examples are **Calculus Chapter 2 & 3** and **Linear Algebra Chapters 1–4**.
 
 ## The One-Sentence Test
 Before writing anything, complete this sentence:

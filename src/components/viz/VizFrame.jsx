@@ -312,6 +312,7 @@ const VIZ_REGISTRY = {
   JSNotebook: lazy(() => import("./react/JSNotebook.jsx")),
   SQLNotebook: lazy(() => import("./react/SQLNotebook.jsx")),
   ScienceNotebook: lazy(() => import("./react/ScienceNotebook.jsx")),
+  SimNotebook: lazy(() => import("./react/SimNotebook.jsx")),
   // Chemistry lessons
   WhyChemistry: lazy(() => import("./react/WhyChemistry.jsx")),
   WhatIsAnAtom: lazy(() => import("./react/WhatIsAnAtom.jsx")),
@@ -1125,6 +1126,7 @@ const PHONE_OK = new Set([
   "JSNotebook",
   "SQLNotebook",
   "ScienceNotebook",
+  "SimNotebook",
   "VideoEmbed",
   "VideoCarousel",
   "VideoLauncher",

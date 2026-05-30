@@ -1,5 +1,25 @@
 export const LABS = [
   {
+    key: 'sim-lab',
+    label: 'Sim Lab',
+    emoji: '🔭',
+    color: 'sky',
+    desc: 'Build your own physics simulations from scratch — projectile motion, orbital mechanics, spring systems, particle effects, and more. Monaco editor + live 3D Three.js sandbox.',
+    path: '/sim-lab',
+    tags: ['Physics', 'Three.js', 'Simulation'],
+    cover: { grad: 'from-sky-700 via-blue-800 to-indigo-950', mark: '∫dt', sub: 'Physics · Three.js · Code' },
+  },
+  {
+    key: 'robot-arm-sim',
+    label: 'Robot Arm Simulator',
+    emoji: '🦾',
+    color: 'teal',
+    desc: 'Learn robot programming from zero — trig, FK, IK, 4×4 transforms, obstacle avoidance, Fanuc TP. 19 missions, 2D + 6-DOF 3D arm, real Python & MATLAB.',
+    path: '/robot-arm-lab',
+    tags: ['Robotics', 'Python', 'MATLAB'],
+    cover: { grad: 'from-teal-700 via-cyan-800 to-blue-950', mark: '🦾', sub: 'FK · IK · Fanuc TP' },
+  },
+  {
     key: 'openmat',
     label: 'OpenMAT',
     emoji: '⚛️',
