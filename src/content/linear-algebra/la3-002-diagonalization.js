@@ -105,6 +105,7 @@ export default {
               prose: [
                 '`[P, D] = eig(A)` returns two matrices: P whose columns are eigenvectors, and D whose diagonal entries are the corresponding eigenvalues. `diag(D)` extracts the diagonal as a column vector. The eigenvectors in P are automatically ordered to match the eigenvalues in D — column $i$ of P corresponds to entry $(i,i)$ of D.',
                 'The verification `norm(A - A_reconstructed) < 1e-10` checks $\\|A - PDP^{-1}\\| < \\epsilon$. If this fails, P is singular (columns not independent), which means A is defective. The block `AP - PD` checks the defining relation directly: $A \\cdot P = P \\cdot D$ expands to $n$ simultaneous eigenvector equations $A\\mathbf{v}_i = \\lambda_i\\mathbf{v}_i$ at once.',
+                'Column order in $P$ must match eigenvalue position in $D$: if $\\mathbf{v}_1$ is column 1 of $P$, then $\\lambda_1$ must be entry $(1,1)$ of $D$. `eig(A)` returns them paired, so as long as you use the P and D from the same call without reordering, the matching is automatic. Defectiveness manifests numerically as a near-singular $P$: `rcond(P)` returns a very small number, and `inv(P)` has enormous entries, causing the reconstruction $PDP^{-1}$ to differ wildly from $A$.',
               ],
               code: `A = [4 1; 2 3];
 [P, D] = eig(A);
@@ -129,6 +130,7 @@ disp(A*P - P*D)`,
               prose: [
                 '`diag(diag(D).^k)` is the key line: `diag(D)` extracts the eigenvalues as a vector, `.^k` raises each element to the $k$th power (element-wise), and `diag(...)` puts them back on a diagonal matrix. This replaces what would otherwise be 99 matrix-matrix multiplications for $k=100$ with two scalar exponentiations.',
                 'Direct `A^100` in MATLAB internally uses matrix exponentiation by squaring ($O(n^3 \\log k)$), not naive repeated multiplication. Via diagonalization it is $O(n^3)$ for one eigendecomposition plus $O(n)$ for $D^k$ plus $O(n^2)$ for assembly — essentially the same asymptotic cost but the diagonalization approach gives an exact closed-form formula, not just a number.',
+                'The identity $\\det(A^k) = \\det(A)^k$ follows directly from diagonalization: $\\det(PD^kP^{-1}) = \\det(D^k) = \\prod_i \\lambda_i^k = (\\prod_i \\lambda_i)^k = \\det(A)^k$. The spectral radius $\\rho(A) = \\max_i |\\lambda_i|$ governs the long-run behavior: if $\\rho(A) > 1$, repeated multiplication by $A$ amplifies vectors without bound; if $\\rho(A) < 1$, $A^k \\to 0$ as $k \\to \\infty$. For Markov chains (PageRank), we need $\\rho \\leq 1$ with a unique dominant eigenvalue — that is precisely why the damping factor is essential.',
               ],
               code: `A = [4 1; 2 3];
 [P, D] = eig(A);
@@ -152,6 +154,7 @@ fprintf('Max difference: %.2e\\n', max(max(abs(A_direct - A_k))))`,
               prose: [
                 'The physical idea: a CNC frame with 2 degrees of freedom has two natural vibration modes (eigenvectors of $M^{-1}K$). Any initial displacement $\\mathbf{x}_0$ can be written as $\\mathbf{x}_0 = q_1\\mathbf{v}_1 + q_2\\mathbf{v}_2$ where $q_i$ are modal coordinates. `P \\ x0` solves $P\\mathbf{q} = \\mathbf{x}_0$ for the modal coordinate vector $\\mathbf{q}$.',
                 'In modal (eigenvector) coordinates, the modes are completely decoupled — mode 1 oscillates at $\\omega_1$ with no coupling to mode 2. `q0 .* cos(omega * t(i))` computes both modes simultaneously (element-wise). `P * modal_response` maps back to physical coordinates. This is diagonalization in action: the stiffness matrix is diagonal in the eigenvector basis, so each mode integrates independently.',
+                '`P \\ x0` (MATLAB left-division) solves $P\\mathbf{q} = \\mathbf{x}_0$ for modal coordinates $\\mathbf{q}$ — it decomposes the initial displacement into how much of each mode shape is excited. This is exactly the coordinate change $\\mathbf{q} = P^{-1}\\mathbf{x}_0$. Real CNC frames include damping: each modal response becomes $q_i e^{-\\zeta_i \\omega_i t}\\cos(\\omega_{d,i} t)$ where $\\zeta_i$ is the modal damping ratio. The diagonalization still holds — the modes remain decoupled — but now each mode decays at its own rate rather than oscillating forever.',
               ],
               code: `% 2-DOF CNC frame: mass-normalized stiffness matrix
 A = [2 -1; -1 3] * 1e4;  % stiffness in N/m
@@ -201,6 +204,7 @@ fprintf('Peak displacement at node 2: %.4f mm\\n', max(abs(x(2,:)))*1e3)`,
               prose: [
                 '`np.linalg.eig(A)` returns `(eigenvalues, eigenvectors)` — the eigenvalues as a 1D array and eigenvectors as columns. `np.diag(evals)` builds the diagonal matrix $D$ from the eigenvalue array. The heatmap comparison shows $A$, $D$, and $PDP^{-1}$ side by side: $D$ has off-diagonal zeros (pure scaling), while $PDP^{-1}$ matches $A$ exactly.',
                 'The `np.allclose(A_check, A)` check passes when reconstruction error is below $10^{-8}$. If it fails, the eigenvectors in P are nearly linearly dependent — A is near-defective and numerical errors blow up when forming $P^{-1}$. For such cases, use a more stable algorithm like `scipy.linalg.schur` instead.',
+                'The heatmap reveals the core contrast: $D$ has non-zeros only on the diagonal (pure scaling, no coupling between axes) while $A$ has off-diagonal entries that mix the two coordinate components. The heatmap of $PDP^{-1}$ reproduces $A$ entry-for-entry, confirming the factorization works. Red entries are positive, blue are negative — the sign pattern of $D$ is entirely determined by the eigenvalues alone, and the change-of-basis matrix $P$ encodes all the coordinate rotation needed to expose that simple structure.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -233,6 +237,7 @@ plt.show()`,
               prose: [
                 '`evals**n` raises each eigenvalue to the $n$th power element-wise — this is the entire cost of computing $D^n$. The function `power_via_diag` packages the full formula $A^n = PD^nP^{-1}$ in three lines: one eigendecomposition, one diagonal exponentiation, two matrix multiplications.',
                 'The det verification `det(A^n) = det(A)^n` is a consequence of the product rule $\\det(PD^nP^{-1}) = \\det(P)\\det(D^n)\\det(P^{-1}) = \\det(D^n) = \\prod_i \\lambda_i^n = (\\prod_i \\lambda_i)^n = \\det(A)^n$. The plot shows both series matching exactly, confirming the diagonalization formula is correct.',
+                'The spectral radius $\\rho(A) = \\max_i |\\lambda_i|$ governs long-run behavior under repeated multiplication: for this $A$ with eigenvalues 5 and 2, $\\rho = 5$, so $A^n$ grows like $5^n$. The dominant eigenvector (for $\\lambda = 5$) eventually swamps all other components — this is power iteration in exact arithmetic. The plot of $\\det(A^n) = 10^n$ shows exponential growth because $\\det(A) = 5 \\cdot 2 = 10 > 1$. If all $|\\lambda_i| < 1$, the determinant would shrink to zero and $A^n \\to 0$.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -262,6 +267,58 @@ ax.plot(ns, pred, 's--', color='darkorange', lw=2, label='det(A)^n')
 ax.set_xlabel('n'); ax.set_ylabel('Determinant')
 ax.set_title("det(A^n) = det(A)^n (verified)", fontsize=12)
 ax.legend(); ax.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Application: Markov chain long-run prediction via A^n',
+              prose: [
+                'A Markov transition matrix $P$ has columns that sum to 1 (or rows, depending on convention). Here each column is a transition probability distribution: `T[i,j]` is the probability of moving from state $j$ to state $i$. Diagonalization applies directly: $T^n = PD^nP^{-1}$ predicts the state distribution after $n$ steps from any starting state. For a regular (irreducible, aperiodic) Markov chain, all eigenvalues except the dominant one satisfy $|\\lambda_i| < 1$, so $D^n \\to \\text{diag}(1, 0, 0, \\ldots)$ and $T^n$ converges to a rank-1 matrix with the stationary distribution in every column.',
+                'The stationary distribution $\\boldsymbol{\\pi}$ is the eigenvector for $\\lambda = 1$ (normalized to sum to 1): after enough steps, the chain forgets its initial state and converges to $\\boldsymbol{\\pi}$ regardless of where it started. `T_n @ start` computes the state distribution after $n$ steps; the plot shows convergence from a pure starting state toward the steady state. The convergence rate is determined by the second-largest eigenvalue $|\\lambda_2|$ — the smaller it is, the faster mixing occurs.',
+                'This is exactly the mathematics behind PageRank: the web graph is a Markov chain where the "random surfer" jumps between pages. The PageRank vector is the stationary distribution — the dominant eigenvector of the transition matrix. $T^n$ converging to a column of $\\boldsymbol{\\pi}$\'s is why power iteration (repeatedly multiplying by $T$) finds PageRank: it is just $A^k = PD^kP^{-1}$ with the off-diagonal eigenvalues shrinking to zero each step.',
+              ],
+              code: `import numpy as np
+import matplotlib.pyplot as plt
+
+# 3-state Markov chain: states = [Sunny, Cloudy, Rainy]
+# T[i,j] = P(go to state i | currently in state j)
+T = np.array([[0.7, 0.3, 0.2],
+              [0.2, 0.4, 0.3],
+              [0.1, 0.3, 0.5]])
+
+evals, P = np.linalg.eig(T)
+P_inv = np.linalg.inv(P)
+
+print(f"Eigenvalues: {evals.real.round(4)}")
+print("Note: dominant eigenvalue = 1.0 (stationary distribution exists)")
+
+# Stationary distribution = eigenvector for lambda=1, normalized
+idx_dom = np.argmax(evals.real)
+pi = P[:, idx_dom].real
+pi = pi / pi.sum()  # normalize to sum to 1
+print(f"Stationary distribution: Sunny={pi[0]:.3f}, Cloudy={pi[1]:.3f}, Rainy={pi[2]:.3f}")
+
+# Predict state after n steps starting from pure Sunny
+start = np.array([1., 0., 0.])  # start Sunny
+
+ns = [1, 2, 5, 10, 20, 50]
+states = ['Sunny', 'Cloudy', 'Rainy']
+probs = []
+for n in ns:
+    Dn = np.diag(evals**n)
+    Tn = (P @ Dn @ P_inv).real
+    probs.append(Tn @ start)
+
+fig, ax = plt.subplots(figsize=(9, 4))
+colors = ['gold', 'steelblue', 'slategray']
+for s in range(3):
+    ax.plot(ns, [p[s] for p in probs], 'o-', color=colors[s], lw=2, label=states[s])
+    ax.axhline(pi[s], color=colors[s], lw=1, linestyle='--', alpha=0.5)
+ax.set_xlabel('Steps n', fontsize=11)
+ax.set_ylabel('Probability', fontsize=11)
+ax.set_title('Markov chain converges to stationary distribution (dashed lines)', fontsize=11)
+ax.legend(); ax.grid(True, alpha=0.3); ax.set_ylim(0, 1)
 plt.tight_layout()
 plt.show()`,
             },

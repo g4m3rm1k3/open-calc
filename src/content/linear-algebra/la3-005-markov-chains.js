@@ -64,6 +64,7 @@ export default {
               prose: [
                 'Build the $3\\times 3$ transition matrix $P$ where column $j$ gives the probability distribution of leaving state $j$. Run `sum(P)` to confirm all column sums equal 1 — that is the stochastic property. Then call `[V,D] = eig(P)` to find all eigenvalues.',
                 'The eigenvalue closest to 1 in `diag(D)` corresponds to the steady-state distribution. The matching column of $V$ is the steady-state eigenvector (before normalization). Confirm: the other eigenvalues all satisfy $|\\lambda| \\leq 1$, consistent with Perron-Frobenius. Any column-stochastic matrix will always have exactly one eigenvalue at 1.',
+                'The Perron-Frobenius theorem guarantees $\\lambda = 1$ is the dominant eigenvalue because each column sums to 1: $\\mathbf{1}^T P = \\mathbf{1}^T$ makes the all-ones vector $\\mathbf{1}$ a left eigenvector for $\\lambda = 1$. All other eigenvalues satisfy $|\\lambda| \\leq 1$ (since the spectral radius of a column-stochastic matrix cannot exceed 1). Irreducibility (every state reachable from every state) ensures $\\lambda = 1$ is a simple root with a unique positive stationary distribution — the steady state is unique.',
               ],
               code: `% Columns: [from Sunny, from Rainy, from Cloudy]
 % Rows:    [to Sunny;  to Rainy;  to Cloudy]
@@ -85,6 +86,7 @@ eigenvalues = diag(D)
               prose: [
                 'Start with $\\mathbf{x}_0 = [1; 0; 0]$ (all probability in the Sunny state). Multiply by $P$ repeatedly in a loop: `x = P * x`. After 20 iterations, compare to the normalized eigenvector `q` extracted from `eig(P)` using the index where `|lambda - 1|` is smallest.',
                 'After 20 steps the values of `x` and `q` match to many decimal places — starting from any distribution, the chain converges to the same steady state. This is Perron-Frobenius in action: the $\\lambda = 1$ component survives; all others ($|\\lambda_i| < 1$) shrink to zero. The spectral gap $1 - |\\lambda_2|$ controls how fast those other components vanish.',
+                'This is diagonalization in action: decompose the starting distribution $\\mathbf{x}_0 = c_1\\mathbf{v}_1 + c_2\\mathbf{v}_2 + c_3\\mathbf{v}_3$ in the eigenvector basis. After $n$ steps: $P^n\\mathbf{x}_0 = c_1 \\cdot 1^n \\mathbf{v}_1 + c_2\\lambda_2^n\\mathbf{v}_2 + c_3\\lambda_3^n\\mathbf{v}_3$. As $n \\to \\infty$, $\\lambda_2^n, \\lambda_3^n \\to 0$ (since $|\\lambda_{2,3}| < 1$), leaving $c_1\\mathbf{v}_1 = \\boldsymbol{\\pi}$. The coefficient $c_1 = \\mathbf{1}^T\\mathbf{x}_0 = 1$ since $\\mathbf{x}_0$ is a probability vector — the stationary distribution is always reached regardless of starting state.',
               ],
               code: `P = [0.7  0.3  0.4; 0.2  0.5  0.3; 0.1  0.2  0.3]
 
@@ -114,6 +116,7 @@ disp('Steady-state distribution q:'); q
               prose: [
                 'Sort the absolute values of all eigenvalues in descending order with `sort(abs(diag(D)), \'descend\')`. The first entry is 1 (the steady-state eigenvalue). The second entry is $|\\lambda_2|$ — the "mixing eigenvalue." Compute `spectral_gap = 1 - lambdas(2)`.',
                 'A large spectral gap means $|\\lambda_2|^k$ decays quickly. For this 3-state chain, read off $|\\lambda_2|$ and estimate how many steps until $|\\lambda_2|^k < 0.01$. A spectral gap near 0 would mean thousands of steps to converge — the hallmark of a slowly-mixing chain (common in large networks like the web graph).',
+                'The error after $n$ steps is bounded by $|\\lambda_2|^n$: if $|\\lambda_2| = 0.3$, after 10 steps the residual is $0.3^{10} \\approx 6 \\times 10^{-6}$. Google\'s PageRank modifies the transition matrix to $dP + (1-d)\\mathbf{1}\\mathbf{1}^T/n$ with damping $d \\approx 0.85$, guaranteeing $|\\lambda_2| \\leq d$ regardless of graph structure. This bounds mixing time to $\\log(\\epsilon)/\\log(d) \\approx 41$ iterations for $\\epsilon = 10^{-3}$ — fast enough to run PageRank on a billion-page web graph with 50 iterations.',
               ],
               code: `P = [0.7  0.3  0.4; 0.2  0.5  0.3; 0.1  0.2  0.3]
 [V, D] = eig(P)
@@ -168,6 +171,7 @@ spectral_gap
               prose: [
                 'Define $P$ as the 2-state Sunny/Rainy transition matrix. Run `np.linalg.eig(P.T)` — transposing so that the column of $V$ corresponds to the right eigenvector of $P^\\top$ (i.e., the steady-state vector). Find the index where `|eval - 1|` is smallest, extract that column, and normalize by dividing by its sum.',
                 'NumPy normalizes eigenvectors to unit Euclidean ($L^2$) norm, not unit $L^1$ norm. The divide-by-sum step converts the $L^2$-normalized vector into a proper probability distribution. The convergence plot (left panel) shows the probability of being Sunny after each multiplication step, converging toward the dashed steady-state line. The heat map (right panel) shows the transition matrix entries.',
+                'We take the eigenvector of $P^T$ rather than $P$ itself because the stationary distribution satisfies the left eigenvector equation $\\boldsymbol{\\pi}^T P = \\boldsymbol{\\pi}^T$, which is equivalent to $P^T\\boldsymbol{\\pi} = \\boldsymbol{\\pi}$ — the right eigenvector of $P^T$. `np.linalg.eig(P.T)` finds it directly. The $L^1$ normalization `pi / pi.sum()` converts the unit-$L^2$-norm eigenvector to a probability distribution — dividing by the sum ensures all entries sum to 1, which is the required normalization for a probability vector.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -209,6 +213,7 @@ plt.show()`,
               prose: [
                 'Extract both eigenvalues with `np.linalg.eig(P.T)`. Plot them on the number line (left panel) to see that one is exactly 1 and the other is the mixing eigenvalue $\\lambda_2$. The right panel shows a bar chart of the stationary distribution.',
                 'The gap between $\\lambda_1 = 1$ and the dashed line at $x=1$ in the left plot is zero; the distance of $\\lambda_2$ from 1 is the spectral gap. This gap is $1 - |\\lambda_2|$ and controls convergence speed: if $|\\lambda_2| = 0.6$, then $0.6^k < 0.001$ requires only $k \\approx 14$ steps. Verify with `np.allclose(P.T @ stationary, stationary)`.',
+                'Mixing time $\\tau \\approx \\log(1/\\epsilon) / \\log(1/|\\lambda_2|)$: for $|\\lambda_2| = 0.4$ and target accuracy $\\epsilon = 0.01$, $\\tau \\approx \\log(100)/\\log(2.5) \\approx 5$ steps. The spectral gap $1 - |\\lambda_2|$ is the key quantity: a gap near 1 (say 0.6) means very fast convergence; a gap near 0 (say 0.01, common in sparse large-scale graphs) means thousands of steps. The Google damping factor guarantees a minimum gap of $(1-d)/n$ regardless of graph structure — bounding worst-case mixing time even on adversarial link structures.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -243,6 +248,7 @@ plt.show()`,
               prose: [
                 'Model a 4-page web graph with transition matrix $P$ where $P_{ij}$ is the probability a surfer on page $j$ clicks a link to page $i$. Call `np.linalg.eig(P.T)` to find the steady-state distribution (PageRank). Normalize the eigenvector for $\\lambda = 1$ to get a probability distribution over pages.',
                 'The heat map (left panel) shows the transition probabilities — read it column by column to understand which pages each page links to. The bar chart (right panel) shows the PageRank scores. Pages with more inlinks (or links from high-ranked pages) receive higher steady-state probability. This is the core of Google\'s original ranking algorithm: importance = steady-state fraction of time a random surfer spends on the page.',
+                'Power iteration finds PageRank because it is literally repeated matrix-vector multiplication: $P^n\\mathbf{x}_0 \\to \\boldsymbol{\\pi}$ as the non-dominant eigenvector components decay at rate $|\\lambda_i|^n$. The random surfer model with damping $d$ modifies the matrix to $\\tilde{P} = dP + (1-d)\\mathbf{1}\\mathbf{1}^T/n$, which adds a dense teleportation term ensuring all states communicate and $\\lambda = 1$ is strictly dominant. The PageRank score of page $i$ is exactly the steady-state probability — pages linked to by many other high-PageRank pages get high scores, creating the recursive importance weighting Google patented.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -267,6 +273,63 @@ axes[1].bar([f'Page {i+1}' for i in range(4)], pagerank,
 axes[1].set_title("PageRank (stationary distribution)", fontsize=11)
 axes[1].set_ylabel("Score"); axes[1].set_ylim(0, 0.4)
 axes[1].grid(True, alpha=0.3, axis='y')
+plt.tight_layout()
+plt.show()`,
+            },
+            {
+              id: 4,
+              cellTitle: 'Application: network centrality as stationary distribution',
+              prose: [
+                'A directed graph can be encoded as a column-stochastic matrix $P$ where $P_{ij} = 1/\\text{out-degree}(j)$ if there is an edge from $j$ to $i$, and 0 otherwise. The stationary distribution of the corresponding random walk is the **eigenvector centrality** — the relative importance of each node equals the long-run fraction of time a random walker spends there. Nodes with many high-centrality inbound links get high scores.',
+                'The heat map shows the transition matrix entries: column $j$ represents "given you are at node $j$, where do you go next?" Uniform columns (all entries $1/k$) mean the node links to $k$ others equally. The bar chart shows each node\'s PageRank-style centrality score from the stationary distribution. Nodes with high in-degree from other important nodes rank highest — this is the recursive definition of importance that PageRank formalized.',
+                'This is eigenvalue computation at the core of modern search engines. The dominant eigenvector of the (damped) transition matrix gives PageRank scores. Adding the damping term $(1-d)/n$ to every entry prevents the algorithm from getting "stuck" in sink nodes (pages with no outbound links) and guarantees unique convergence. The CNC machine availability example from the earlier cell is exactly this pattern: steady-state availability = dominant eigenvector of the availability Markov chain.',
+              ],
+              code: `import numpy as np
+import matplotlib.pyplot as plt
+
+# 6-node directed graph: adjacency list (i -> j means edge from i to j)
+n_nodes = 6
+edges = [(0,1),(0,2),(1,2),(1,3),(2,4),(3,0),(3,4),(4,5),(5,3),(5,0),(2,0)]
+labels = [f'Page {i}' for i in range(n_nodes)]
+
+# Build column-stochastic transition matrix (with dangling node fix)
+P = np.zeros((n_nodes, n_nodes))
+for src, dst in edges:
+    P[dst, src] += 1.0
+# Normalize columns (uniform jump for zero-out-degree nodes)
+col_sums = P.sum(axis=0)
+for j in range(n_nodes):
+    if col_sums[j] > 0:
+        P[:, j] /= col_sums[j]
+    else:
+        P[:, j] = 1.0 / n_nodes  # dangling node: teleport uniformly
+
+# PageRank damping
+d = 0.85
+P_damp = d * P + (1 - d) / n_nodes * np.ones((n_nodes, n_nodes))
+
+# Stationary distribution via eigenvector
+evals, evecs = np.linalg.eig(P_damp.T)
+idx = np.argmax(evals.real)
+pagerank = evecs[:, idx].real
+pagerank = pagerank / pagerank.sum()
+
+print("PageRank scores:")
+for i, score in enumerate(pagerank):
+    print(f"  {labels[i]}: {score:.4f}")
+
+fig, axes = plt.subplots(1, 2, figsize=(11, 4.5))
+im = axes[0].imshow(P, cmap='Blues', aspect='equal')
+axes[0].set_xticks(range(n_nodes)); axes[0].set_xticklabels(labels, rotation=45, fontsize=8)
+axes[0].set_yticks(range(n_nodes)); axes[0].set_yticklabels(labels, fontsize=8)
+axes[0].set_title("Transition matrix P", fontsize=11)
+plt.colorbar(im, ax=axes[0])
+
+colors = plt.cm.Greens(np.linspace(0.4, 0.9, n_nodes))
+axes[1].barh(labels, pagerank, color=colors)
+axes[1].set_xlabel('PageRank score (steady-state probability)', fontsize=10)
+axes[1].set_title("Eigenvector centrality = dominant eigenvector", fontsize=11)
+axes[1].grid(True, alpha=0.3, axis='x')
 plt.tight_layout()
 plt.show()`,
             },

@@ -14,6 +14,7 @@ import LessonQuizBlock from "../components/lesson/LessonQuizBlock.jsx";
 import { useVideoPlayer } from "../context/VideoPlayerContext.jsx";
 import TutorPanel from "../components/tutor/TutorPanel.jsx";
 import { useOptionalLesson } from "../hooks/useOptionalLesson.js";import WikiIntro from '../components/lesson/WikiIntro.jsx'
+import WikiDiagrams from '../components/lesson/WikiDiagrams.jsx'
 export default function LessonPage() {
   const { chapterId, lessonSlug, "*": rest } = useParams();
   const slug = lessonSlug + (rest ? `/${rest}` : "");
@@ -177,8 +178,6 @@ export default function LessonPage() {
         </div>
       </header>
 
-      <WikiIntro query={lesson.title} />
-
       {lesson.hook && (
         <section className="oc-shell-card mb-10 p-6 sm:p-7">
           <p className="oc-section-kicker mb-3">Why This Matters</p>
@@ -208,6 +207,9 @@ export default function LessonPage() {
               )}
         </section>
       )}
+
+      <WikiIntro query={lesson.title} tags={lesson.tags} />
+      <WikiDiagrams query={lesson.title} tags={lesson.tags} />
 
       {lesson.tags?.length > 0 && (
         <div className="mb-8 flex flex-wrap gap-2">

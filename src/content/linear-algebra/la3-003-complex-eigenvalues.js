@@ -106,6 +106,7 @@ export default {
               prose: [
                 'For a rotation-scaling matrix $A = \\begin{bmatrix}a&-b\\\\b&a\\end{bmatrix}$, the eigenvalues are $\\lambda = a \\pm bi$. `eig(A)` returns these automatically as complex numbers. `real(lk)` and `imag(lk)` extract the real and imaginary parts, `abs(lk)` computes $|\\lambda| = \\sqrt{a^2+b^2}$, and `rad2deg(angle(lk))` converts the argument to degrees.',
                 'The stability test `all(abs(lambda) < 1)` checks whether every eigenvalue is strictly inside the unit circle — the discrete-time stability criterion. For the matrix with $a=0.8$, $b=0.6$: $|\\lambda| = \\sqrt{0.64+0.36} = 1.0$, so this is a pure rotation with no scaling (neutral stability). Changing $a$ and $b$ while watching $|\\lambda|$ shows how slight growth or decay is introduced.',
+                'Complex eigenvalues always appear in conjugate pairs for real matrices: since the characteristic polynomial has real coefficients, complex roots must come in conjugate pairs $a \\pm bi$. For each conjugate pair, `abs(lk)` and `abs(lk_conj)` are identical (same magnitude), and `angle(lk_conj) = -angle(lk)` (opposite rotation direction). The eigenvectors are also conjugates: $\\text{Re}(\\mathbf{v})$ and $\\text{Im}(\\mathbf{v})$ form a 2D "rotation plane" in which $A$ acts as rotation by $\\arg(\\lambda)$ scaled by $|\\lambda|$.',
               ],
               code: `% Matrix with complex eigenvalues (rotation + scaling)
 a = 0.8; b = 0.6;
@@ -129,6 +130,7 @@ fprintf('\\n|λ| < 1 → stable? %d\\n', all(abs(lambda) < 1))`,
               prose: [
                 'The rotation matrix $R_\\theta = \\begin{bmatrix}\\cos\\theta&-\\sin\\theta\\\\\\sin\\theta&\\cos\\theta\\end{bmatrix}$ has eigenvalues $e^{\\pm i\\theta} = \\cos\\theta \\pm i\\sin\\theta$. Since $|e^{\\pm i\\theta}| = 1$ always, pure rotations are neutral — neither growing nor decaying. `real(lambda(1))` reads $\\cos\\theta$ and `abs(imag(lambda(1)))` reads $|\\sin\\theta|$.',
                 'The table shows how trace $= 2\\cos\\theta$ changes as $\\theta$ varies: trace $= 2$ at $\\theta=0°$ (identity), trace $= 0$ at $\\theta=90°$ (pure quarter-turn), trace $= -2$ at $\\theta=180°$ (negation). This gives a fast check: if trace is between $-2$ and $2$, the $2\\times 2$ matrix has complex eigenvalues on the unit circle; if outside, eigenvalues are real.',
+                'Rotation matrices are orthogonal ($R^T R = I$), which forces all singular values to equal 1 and all eigenvalues to satisfy $|\\lambda| = 1$ — they lie exactly on the unit circle. Computing $R_\\theta^n = R_{n\\theta}$ in eigenvalue form: $\\lambda^n = e^{in\\theta}$, so $n$ rotations by $\\theta$ = one rotation by $n\\theta$. This is the matrix-algebra form of De Moivre\'s theorem: $(\\cos\\theta + i\\sin\\theta)^n = \\cos(n\\theta) + i\\sin(n\\theta)$. The table confirms it: `trace(R^n) = 2*cos(n*theta)`.',
               ],
               code: `% Sweep rotation angle and watch eigenvalues
 angles_deg = 0:30:330;
@@ -149,6 +151,7 @@ end`,
               prose: [
                 'The state matrix `A_ctrl` is derived from a discrete 2nd-order PID model at 1 kHz sampling. Its eigenvalues determine stability: if any $|\\lambda| \\geq 1$, the controller is on or beyond the stability boundary. `abs(lk)` computes each eigenvalue\'s magnitude; the code flags the controller as stable only if all magnitudes are strictly below 1.',
                 'When eigenvalues are complex, `abs(angle(lk)) / (2*pi) * 1000` converts the argument to chatter frequency in Hz: an eigenvalue with argument $\\theta$ radians/sample at 1000 samples/s oscillates at $\\theta/(2\\pi) \\times 1000$ Hz. This is the predicted chatter tone if the controller becomes marginally unstable. Engineers detune $K_p$ and $K_d$ to push all eigenvalues away from the unit circle boundary while keeping the chatter frequency above the audible range.',
+                'In continuous-time systems (differential equations), stability requires $\\text{Re}(\\lambda) < 0$. In discrete-time systems sampled at rate $f_s$, stability requires $|\\lambda| < 1$ — the half-plane $\\{s : \\text{Re}(s) < 0\\}$ maps to the unit disk $\\{z : |z| < 1\\}$ via $z = e^{sT}$ where $T = 1/f_s = 1/1000$ s. This is why the code checks `all(abs(lambda) < 1)` rather than `all(real(lambda) < 0)`: the sampler converts continuous-time poles to discrete-time poles, changing the stability boundary from the imaginary axis to the unit circle.',
               ],
               code: `% CNC spindle controller state matrix (2nd-order discrete model)
 % Gains tuned for 1 kHz sampling
@@ -193,6 +196,7 @@ fprintf('\\nController is %s\\n', ternary(stable, 'STABLE', 'UNSTABLE'))`,
               prose: [
                 'NumPy returns complex eigenvalues as Python complex numbers. `np.abs(evals)` computes $|\\lambda|$ for each eigenvalue (element-wise), and `np.angle(evals)` returns the argument $\\theta = \\arctan(b/a)$ in radians. For the 45° rotation matrix, both eigenvalues have $|\\lambda| = 1$ and arguments $\\pm\\pi/4$.',
                 'The heatmap plots both eigenvalues as points in the complex plane with the unit circle for reference. Points on the unit circle → neutral stability. The dashed unit circle is the boundary separating convergence (inside) from divergence (outside). For the rotation matrix, both points lie exactly on the circle at angle $\\pm 45°$.',
+                'Complex eigenvalues always appear as conjugate pairs for real matrices — `np.linalg.eig` returns them in consecutive entries with `evals[1] == np.conj(evals[0])`. Each pair corresponds to a 2D rotation-scaling plane in which the matrix acts as $|\\lambda|$-scaling combined with $\\arg(\\lambda)$-rotation. The eigenvectors are also conjugates: `evecs[:,1] == np.conj(evecs[:,0])`. Taking `np.real(evecs[:,0])` and `np.imag(evecs[:,0])` gives the two real vectors that span this rotation plane — the basis in which $A$ becomes a pure rotation-scaling block.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -224,6 +228,7 @@ plt.show()`,
               prose: [
                 'The matrix `A = [[0.9, -0.4],[0.4, 0.9]]` has $a=0.9$, $b=0.4$, so $|\\lambda| = \\sqrt{0.81+0.16} = \\sqrt{0.97} \\approx 0.985 < 1$. Each multiplication by $A$ rotates by $\\arctan(0.4/0.9) \\approx 24°$ and shrinks by $0.985$. After 40 steps the vector is much closer to the origin — the left plot shows the inward spiral.',
                 'The right plot shows $\\|v_n\\|$ vs step $n$ on a linear scale: the norm decays geometrically as $|\\lambda|^n \\approx 0.985^n$. For the spiral to be visible, the magnitude change per step is subtle; the angular sweep is about $24°$/step, taking roughly $360°/24° = 15$ steps per "lap." Understanding both plots together shows why $|\\lambda|$ is the key quantity: it controls the radial decay rate.',
+                'The spiral trajectory has a closed form: $\\mathbf{x}_n = |\\lambda|^n[\\cos(n\\theta)\\mathbf{p} - \\sin(n\\theta)\\mathbf{q}]$ where $\\mathbf{p} = \\text{Re}(\\mathbf{v})$, $\\mathbf{q} = \\text{Im}(\\mathbf{v})$, and $\\theta = \\arg(\\lambda)$. The $|\\lambda|^n$ factor controls radius (spiral inward if $|\\lambda| < 1$, outward if $|\\lambda| > 1$) and $\\cos(n\\theta)/\\sin(n\\theta)$ controls angular position. This is the matrix analog of Euler\'s formula: $e^{(a+ib)t} = e^{at}(\\cos bt + i\\sin bt)$ where $a = \\ln|\\lambda|$ and $b = \\theta = \\arg(\\lambda)$.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -253,6 +258,58 @@ axes[1].plot(norms, 'o-', color='darkorange', markersize=3)
 axes[1].set_xlabel("Iteration"); axes[1].set_ylabel("||v||")
 axes[1].set_title("Norm decays exponentially", fontsize=11)
 axes[1].grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Application: discrete filter stability — eigenvalues of the system matrix',
+              prose: [
+                'A discrete-time system $\\mathbf{x}_{n+1} = A\\mathbf{x}_n$ is stable iff all eigenvalues of $A$ satisfy $|\\lambda| < 1$. Each eigenvalue has magnitude $r = |\\lambda|$ (controls radial growth/decay) and argument $\\theta = \\arg(\\lambda)$ (controls oscillation frequency). The system produces a spiral trajectory in state space: inward if $r < 1$, circular if $r = 1$, outward if $r > 1$. The natural frequency of oscillation in samples is $f = \\theta / (2\\pi)$ cycles per sample.',
+                'The stability boundary plot shows a grid of $(a, b)$ values for $A = \\begin{bmatrix}a&-b\\\\b&a\\end{bmatrix}$ colored by stability ($|\\lambda| = \\sqrt{a^2+b^2} < 1$). The stable region is exactly the unit disk — reflecting the fact that eigenvalues of this rotation-scaling matrix are $a \\pm bi$. Varying $a$ (the "growth" parameter) moves the eigenvalue radially, while varying $b$ (the "rotation" parameter) rotates it without changing $|\\lambda|$.',
+                'This pattern directly models a CNC servo controlled with a digital filter: the filter coefficients determine the matrix $A$, and stability requires all eigenvalues inside the unit disk. Over-aggressive gains push eigenvalues outside — the servo oscillates and crashes. The frequency of oscillation at the stability boundary ($|\\lambda| = 1$) is the "ringing frequency" that appears as vibration on the machined surface.',
+              ],
+              code: `import numpy as np
+import matplotlib.pyplot as plt
+
+# Rotation-scaling matrix A = [[a,-b],[b,a]] with eigenvalues a+bi, a-bi
+# Stable iff |lambda| = sqrt(a^2 + b^2) < 1
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+# Left: stability boundary in (a,b) space
+a_vals = np.linspace(-1.4, 1.4, 100)
+b_vals = np.linspace(-1.4, 1.4, 100)
+AA, BB = np.meshgrid(a_vals, b_vals)
+mag = np.sqrt(AA**2 + BB**2)  # |lambda| for this family of matrices
+axes[0].contourf(AA, BB, mag, levels=[0, 1], colors=['lightgreen'], alpha=0.6)
+axes[0].contour(AA, BB, mag, levels=[1], colors=['red'], linewidths=2)
+axes[0].set_xlabel('a (real part of lambda)', fontsize=10)
+axes[0].set_ylabel('b (imag part of lambda)', fontsize=10)
+axes[0].set_title('Stability region: |lambda| < 1 (green)', fontsize=11)
+axes[0].set_aspect('equal'); axes[0].grid(True, alpha=0.3)
+
+# Right: phase portrait for three systems
+x0 = np.array([1., 0.])
+configs = [
+    (0.90, 0.30, 'steelblue',  f'Stable |λ|={np.sqrt(0.9**2+0.3**2):.2f}'),
+    (1.00, 0.00, 'darkorange', 'Neutral |λ|=1.00'),
+    (1.05, 0.20, 'crimson',    f'Unstable |λ|={np.sqrt(1.05**2+0.2**2):.2f}'),
+]
+for a, b, color, label in configs:
+    A_sys = np.array([[a, -b], [b, a]])
+    traj = [x0.copy()]
+    x = x0.copy()
+    for _ in range(20):
+        x = A_sys @ x
+        traj.append(x.copy())
+    traj = np.array(traj)
+    axes[1].plot(traj[:, 0], traj[:, 1], 'o-', color=color, lw=1.5, markersize=3, label=label)
+    axes[1].scatter([traj[0, 0]], [traj[0, 1]], s=50, color=color, zorder=5)
+axes[1].set_title("Phase portraits: 20 steps from x0=[1,0]", fontsize=11)
+axes[1].set_aspect('equal'); axes[1].grid(True, alpha=0.3)
+axes[1].axhline(0, color='k', lw=0.5); axes[1].axvline(0, color='k', lw=0.5)
+axes[1].legend(fontsize=9)
 plt.tight_layout()
 plt.show()`,
             },

@@ -105,6 +105,7 @@
               prose: [
                 '`[V, D] = eig(A)` returns two outputs: V is the matrix of eigenvectors (each column is one eigenvector), and D is a diagonal matrix with the eigenvalues on the diagonal. `lambda = diag(D)` extracts them as a vector. The loop checks the defining equation $Av = \\lambda v$ for each pair: `A*v` should equal `lam*v` to within floating-point precision.',
                 'The sanity checks `trace(A) == sum(lambda)` and `det(A) == prod(lambda)` follow from the characteristic polynomial: $\\det(A - \\lambda I) = (\\lambda_1 - \\lambda)(\\lambda_2 - \\lambda)\\cdots$, which at $\\lambda = 0$ gives $\\det(A) = \\lambda_1\\lambda_2\\cdots$, and the coefficient of $\\lambda^{n-1}$ gives the trace identity.',
+                'The columns of V are unit-normalized — `norm(V(:,k)) == 1` — so the eigenvector MATLAB returns for $\\lambda=5$ is `[2;1]/sqrt(5)`, not the "natural" `[2;1]`. When comparing with hand calculations, rescale via `v = V(:,k) / V(1,k)` to fix the first component to 1. If $A$ is real symmetric, MATLAB\'s `eig` still works but may return tiny imaginary parts from floating-point noise; `real(V)` and `real(lambda)` discard them safely when you know the eigenvalues are real.',
               ],
               code: `A = [4 2; 1 3];  % 2×2 asymmetric matrix
 
@@ -134,6 +135,7 @@ fprintf('det(A)   = %g = product of eigenvalues = %g\\n', det(A), prod(lambda))`
               prose: [
                 'The characteristic polynomial of a 2×2 matrix is $p(\\lambda) = \\lambda^2 - \\text{tr}(A)\\lambda + \\det(A)$. `poly(A)` returns the coefficients in descending order: `[1, -trace(A), det(A)]`. The coefficient of $\\lambda$ is $-\\text{tr}(A)$ (negative of the sum of eigenvalues) and the constant term is $\\det(A)$ (product of eigenvalues).',
                 '`roots(coeffs)` finds the polynomial roots numerically — these are the eigenvalues. Comparing `eigenvalues_from_poly` with `eig(A)` confirms both approaches agree. For 3×3 and larger, `poly(A)` produces higher-degree coefficients, and the roots become the characteristic equation solutions: use this to see the full characteristic polynomial symbolically before MATLAB solves it.',
+                'The coefficients from `poly(A)` connect to Vieta\'s formulas: for $p(\\lambda) = \\lambda^2 + c_1\\lambda + c_0$, the sum of roots equals $-c_1 = \\text{tr}(A)$ and the product equals $c_0 = \\det(A)$. Internally MATLAB computes `poly(A)` by finding eigenvalues first (via QR iteration) and then forming $(\\lambda - \\lambda_1)(\\lambda - \\lambda_2)\\cdots$ — so `roots(poly(A))` is never more accurate than `eig(A)` directly. Use this workflow to teach the connection between the polynomial and the eigenvalues; in production always call `eig()` without the detour through `poly`.',
               ],
               code: `A = [4 2; 1 3];
 
@@ -156,6 +158,7 @@ fprintf('Eigenvalues from eig():           [%g, %g]\\n', eigs_direct(1), eigs_di
               prose: [
                 'Power iteration works because multiplying by $A$ stretches the dominant eigenvector direction by $|\\lambda_{\\max}|$ and stretches every other direction by smaller factors. After many steps, the dominant direction grows relative to all others, and normalizing at each step keeps the vector unit-length so it converges to $v_{\\max}$ without blowing up.',
                 'The eigenvalue estimate `lambda_est = norm(x_new)` uses the fact that after the dominant direction dominates, `A*x ≈ lambda_max * x`, so `norm(A*x) ≈ |lambda_max| * norm(x) = |lambda_max|`. Convergence is geometric with ratio $|\\lambda_2/\\lambda_1|$: if the two largest eigenvalues are close in magnitude, convergence is slow. PageRank uses a damping factor to ensure this ratio stays bounded.',
+                'For this matrix $|\\lambda_2/\\lambda_1| = 2/5 = 0.4$, so each iteration multiplies the error by 0.4 — after 10 iterations the error is roughly $0.4^{10} \\approx 10^{-4}$, matching the output above. When eigenvalues are nearly equal in magnitude (ratio near 1), convergence is extremely slow — this is why Google\'s PageRank uses damping factor $d \\approx 0.85$: it adds a uniform teleportation term that shifts all non-dominant eigenvalues away from 1 by at least $(1-d)/n$, guaranteeing fast convergence even on web graphs with near-equal eigenvalues.',
               ],
               code: `A = [4 2; 1 3];
 [V_true, D] = eig(A);
@@ -186,6 +189,7 @@ end`,
               prose: [
                 'The CNC frame equations of motion are $M\\ddot{\\mathbf{u}} + K\\mathbf{u} = \\mathbf{0}$. Substituting $\\mathbf{u}(t) = \\mathbf{v}e^{i\\omega t}$ gives the generalized eigenvalue problem $K\\mathbf{v} = \\omega^2 M\\mathbf{v}$. Multiplying both sides by $M^{-1}$ converts it to the standard form $M^{-1}K\\mathbf{v} = \\omega^2\\mathbf{v}$. Each eigenvalue $\\lambda_k = \\omega_k^2$ is a squared natural frequency; `sqrt(lambda)` recovers $\\omega_k$ in rad/s.',
                 'The eigenvectors (mode shapes) tell you which parts of the machine move and in which direction at each natural frequency. `freq_Hz(k) * 60` converts a frequency in Hz to spindle speed in RPM. If the spindle rotates at a frequency matching a natural frequency, the frame resonates — this produces chatter: violent vibration that ruins surface finish and can break cutting tools. Staying away from these RPM values avoids resonance.',
+                'The diagonal mass matrix $M = \\text{diag}(5, 3)$ decouples the two degrees of freedom at zero stiffness coupling — each mass would move independently. The off-diagonal $-2\\times10^4$ N/m entries in $K$ introduce coupling: force from one mass transfers to the other, creating two coupled natural frequencies instead of two independent ones. Real CNC frames have 6+ DOF per rigid body (three translations, three rotations), but the analysis is identical: build $M$ and $K$ from geometry and material properties, call `eig(M \\ K)` or the generalized `eig(K, M)`, convert to Hz, and plot the frequency response function (FRF) to identify RPM danger zones before running the machine.',
               ],
               code: `% Simplified 2-DOF CNC frame model
 % M = mass matrix (kg), K = stiffness matrix (N/m)
@@ -234,6 +238,7 @@ fprintf('\\nChatter avoidance: choose spindle speed NOT in [%.0f, %.0f] RPM\\n',
               prose: [
                 '`np.linalg.eig(A)` returns a tuple: `(eigenvalues, eigenvectors)`. `eigenvectors[:,i]` is the $i$-th eigenvector (a column). The loop checks `np.allclose(A @ v, lam * v)` — this verifies the defining equation $Av = \\lambda v$ for each pair. `allclose` uses a default tolerance of $10^{-8}$, which handles floating-point rounding.',
                 'The arrow plots show the geometric meaning: the left panel displays both eigenvectors as directions in 2D space. The right panel overlays $v_1$, $Av_1$, and $\\lambda v_1$ — all three arrows point the same direction, confirming $Av_1 = \\lambda_1 v_1$. For a non-eigenvector like $[1,1]^T$, $Av$ would point in a completely different direction.',
+                '`np.linalg.eig` calls LAPACK\'s `dgeev` routine, which uses implicit double-shift QR — one of the most numerically robust algorithms in scientific computing. For real symmetric matrices, prefer `np.linalg.eigh` instead: it guarantees real outputs, produces exactly orthogonal eigenvectors, and runs faster by exploiting symmetry. Regular `eig` on a symmetric matrix may return tiny imaginary parts due to floating-point rounding; `np.linalg.eigh` eliminates this entirely. Eigenvectors are always returned with unit norm regardless of which routine you use: `np.linalg.norm(eigenvectors[:, i])` equals 1.0 for every $i$.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -275,6 +280,7 @@ plt.show()`,
               prose: [
                 'These two identities follow from the characteristic polynomial structure. Writing $\\det(A - \\lambda I) = (\\lambda_1 - \\lambda)(\\lambda_2 - \\lambda) = \\lambda^2 - (\\lambda_1+\\lambda_2)\\lambda + \\lambda_1\\lambda_2$, the coefficient of $\\lambda^{n-1}$ is $-\\text{tr}(A)$ and the constant term (at $\\lambda=0$) is $\\det(A) = \\lambda_1\\lambda_2$. Both must match.',
                 'The bar charts make the comparison visual: trace equals the sum of the two eigenvalue bars, and det equals their product. Run this cell on any matrix you are working with as a quick sanity check — if the bars do not match, you computed an eigenvalue incorrectly.',
+                'For large matrices ($n > 500$), `np.linalg.det(A)` overflows to `inf` because it multiplies $n$ numbers together — the determinant of a 1000×1000 matrix can be astronomically large or tiny. Use the log-determinant instead: `np.sum(np.log(np.abs(evals)))` gives $\\log|\\det(A)|$ safely, and `int(np.sum(evals < 0)) % 2` checks whether the sign is negative. As a numerical diagnostic: if `evals.sum()` differs from `np.trace(A)` by more than `1e-10 * np.linalg.norm(A, \'fro\')`, suspect near-repeated eigenvalues or a nearly-singular matrix.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -304,6 +310,7 @@ plt.show()`,
               prose: [
                 'The visualization plots the two eigenvectors (blue and amber) as arrows from the origin. Each one is labeled with its eigenvalue $\\lambda$ — the stretch factor. The green arrow shows a general vector $[1,1]^T$; the dashed arrow shows $A[1,1]^T$, which points in a different direction. Try to see how $[1,1]^T$ is a linear combination of the eigenvectors, and how $A$ stretches each component independently.',
                 'Eigenvectors define the "natural axes" of the transformation: along each eigenvector direction, the matrix acts like simple scalar multiplication. In any other direction, the matrix mixes the components. The next lesson (Diagonalization) rebuilds the coordinate system along these natural axes so $A$ becomes a diagonal matrix.',
+                'The `opencalc Figure` API maps directly to the geometric picture: `fig.vector(v1.tolist())` draws the eigenvector as an arrow from the origin; `fig.arrow(g.tolist(), Ag.tolist())` shows where $A$ sends a non-eigenvector. The key visual: the eigenvector arrows (blue and amber) would stay on their lines under repeated application of $A$ — if you plotted $A^k\\mathbf{g}$ for $k = 1, 2, 3, \\ldots$, the result would rotate toward the dominant eigenvector $v_1$ with each step. That is the visual explanation of power iteration: any starting vector eventually aligns with the direction $A$ stretches most.',
               ],
               code: `import numpy as np
 from opencalc import Figure, BLUE, AMBER, GREEN
@@ -329,6 +336,59 @@ fig.vector(g.tolist(),  color=GREEN, label="v")
 fig.arrow(g.tolist(), Ag.tolist(), color=GREEN, dashed=True, label="Av")
 
 fig.show()`,
+            },
+            {
+              id: 4,
+              cellTitle: 'Application: PCA via eigenvalues of the covariance matrix',
+              prose: [
+                'The covariance matrix $C = X^\\top X / (n-1)$ is symmetric positive semidefinite, so `np.linalg.eigh` (not `eig`) is the right tool: it guarantees real eigenvalues and exactly orthogonal eigenvectors by exploiting symmetry. The eigenvalues of $C$ equal the variances along each principal component direction; the eigenvectors are those directions. Sorting eigenvalues descending makes PC1 the direction of maximum variance and PC2 perpendicular to it.',
+                'The arrows scale by $\\sqrt{\\lambda_i}$ (one standard deviation) so their length visually represents the spread of data in each principal direction. PC1 points along the dominant correlation axis of the dataset — it is the direction that "explains" the most variance. The bar chart translates eigenvalues to percentages: $\\lambda_i / \\sum_j \\lambda_j$ is the fraction of total variance captured by principal component $i$.',
+                'This is PCA in its mathematical core: eigenvectors of the covariance matrix define new axes aligned with the data\'s natural variation, and eigenvalues quantify how much variation each axis captures. In high-dimensional data (images, gene expression, sensor arrays), keeping only the top $k$ eigenvectors discards noise while retaining $\\sum_{i=1}^k \\lambda_i / \\sum_j \\lambda_j$ of the total variance. Every PCA plot and dimension-reduction step in data science is eigenvalue computation on a covariance matrix.',
+              ],
+              code: `import numpy as np
+import matplotlib.pyplot as plt
+
+np.random.seed(42)
+n = 200
+mean = [2., 3.]
+cov_true = [[3., 2.], [2., 2.]]
+data = np.random.multivariate_normal(mean, cov_true, n)
+
+# Center and compute sample covariance
+X = data - data.mean(axis=0)
+C = (X.T @ X) / (n - 1)
+
+# eigh guarantees real outputs and orthogonal eigenvectors for symmetric matrices
+evals, evecs = np.linalg.eigh(C)
+idx = np.argsort(evals)[::-1]         # sort descending
+evals, evecs = evals[idx], evecs[:, idx]
+
+var_explained = evals / evals.sum()
+print(f"Covariance matrix:\\n{C.round(3)}")
+print(f"Eigenvalues (variance per PC): {evals.round(3)}")
+print(f"PC1 explains {var_explained[0]:.1%}, PC2 explains {var_explained[1]:.1%}")
+
+fig, axes = plt.subplots(1, 2, figsize=(11, 4.5))
+origin = np.zeros(2)
+axes[0].scatter(X[:, 0], X[:, 1], alpha=0.4, s=15, color='steelblue')
+colors = ['crimson', 'darkorange']
+for i in range(2):
+    arrow_end = np.sqrt(evals[i]) * evecs[:, i]
+    axes[0].annotate('', xy=arrow_end, xytext=origin,
+                     arrowprops=dict(arrowstyle='->', color=colors[i], lw=2.5))
+    axes[0].text(arrow_end[0] * 1.15, arrow_end[1] * 1.15,
+                 f'PC{i+1}  (λ={evals[i]:.2f})', color=colors[i], fontsize=9, fontweight='bold')
+axes[0].set_title("Eigenvectors = principal components", fontsize=11)
+axes[0].set_aspect('equal'); axes[0].grid(True, alpha=0.3)
+axes[0].axhline(0, color='k', lw=0.5); axes[0].axvline(0, color='k', lw=0.5)
+
+axes[1].bar(['PC1', 'PC2'], var_explained * 100, color=colors, alpha=0.85)
+axes[1].set_ylabel('Variance explained (%)', fontsize=10)
+axes[1].set_ylim(0, 100)
+axes[1].set_title("Eigenvalue = variance along each PC", fontsize=11)
+axes[1].grid(True, alpha=0.3, axis='y')
+plt.tight_layout()
+plt.show()`,
             },
             {
               id: 'c1',

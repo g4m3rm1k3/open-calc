@@ -70,6 +70,7 @@ export default {
               prose: [
                 'Build the Jordan block $J = \\begin{bmatrix}3&1\\\\0&3\\end{bmatrix}$. Call `eig(J)` to get the eigenvalue matrix $D$ and eigenvector matrix $V$. Then check `det(V)` — if it is zero (or near-zero), the eigenvectors are linearly dependent and the matrix is defective.',
                 'Both eigenvalues equal 3 (algebraic multiplicity 2), but `det(V) ≈ 0` confirms there is only one independent eigenvector. The eigenvector matrix is singular — diagonalization is impossible. This is the defining test for a defective matrix.',
+                'When `det(V)` is exactly 0, MATLAB\'s `eig` returns duplicate eigenvectors — it cannot find a second independent one and reuses the same vector. Numerically, a near-defective matrix (two eigenvalues very close but not equal) causes `det(V)` to be near-zero rather than exactly 0, and `inv(V)` amplifies floating-point errors by the condition number `rcond(V)`. Always check `rcond(V)` before computing `inv(V)`: if it is less than `eps`, the computed diagonalization $PDP^{-1}$ will differ wildly from $A$.',
               ],
               code: `J = [3 1; 0 3]
 [V, D] = eig(J)
@@ -87,6 +88,7 @@ det(V)
               prose: [
                 'Form $B = J - 3I$ and use `rref(B)` to find the null space — that gives the true eigenvector $\\mathbf{v}_1 = [1; 0]$. Then solve $(J - 3I)\\mathbf{v}_2 = \\mathbf{v}_1$ by forming the augmented matrix `[B v1]` and applying `rref`. The solution $\\mathbf{v}_2 = [0; 1]$ is the generalized eigenvector.',
                 'The Jordan chain condition $(J-3I)\\mathbf{v}_2 = \\mathbf{v}_1$ is what makes $\\mathbf{v}_2$ a generalized (not true) eigenvector. Verify with `B * v2` — the result must equal $\\mathbf{v}_1$, not $\\mathbf{0}$. Together $\\{\\mathbf{v}_1, \\mathbf{v}_2\\}$ span $\\mathbb{R}^2$ and form the columns of the change-of-basis matrix $S$.',
+                'Geometrically, $\\mathbf{v}_2$ is not an eigenvector: $J\\mathbf{v}_2 = \\lambda\\mathbf{v}_2 + \\mathbf{v}_1$ means $J$ maps $\\mathbf{v}_2$ to a mixture of $\\mathbf{v}_2$ stretched plus $\\mathbf{v}_1$ added. There is no direction that $J$ stretches alone — the eigenspace is 1D but the matrix acts on a 2D space. The generalized eigenvector fills the missing dimension and enables the Jordan basis to span $\\mathbb{R}^2$. In this basis $S^{-1}JS = \\begin{bmatrix}\\lambda&1\\\\0&\\lambda\\end{bmatrix}$ is the closest to diagonal this matrix can get.',
               ],
               code: `J = [3 1; 0 3]
 lam = 3;
@@ -109,6 +111,7 @@ B * v2
               prose: [
                 'Compute `J^2`, `J^3`, `J^4` directly in OpenMAT. Then build the predicted value `J_pred = [3^n, n*3^(n-1); 0, 3^n]` for $n=4$ and compare with `J^4`. Both should match exactly.',
                 'The off-diagonal entry $n \\cdot 3^{n-1}$ grows polynomially in $n$ — for $n=4$ it is $4 \\cdot 27 = 108$, which is larger than the diagonal $3^4 = 81$. This polynomial growth is the signature of a Jordan block: powers of a defective matrix grow faster than the eigenvalue alone would suggest.',
+                'Contrast with a diagonalizable matrix having the same eigenvalue: $3I$ gives $(3I)^n = 3^n I$ — purely exponential. The Jordan block adds a polynomial factor: off-diagonal entry $n \\cdot 3^{n-1}$ grows faster than the diagonal $3^n$ for small $n$, but both are eventually dominated by the exponential. For control systems: even if $|\\lambda| < 1$ (stable), a Jordan block causes the transient to initially grow (polynomial factor) before the exponential decay wins. Critical damping ($\\zeta = 1$) in mechanical systems is exactly a repeated eigenvalue — the response decays as fast as possible without oscillation.',
               ],
               code: `J = [3 1; 0 3]
 disp('J^2:')
@@ -164,6 +167,7 @@ J^4
               prose: [
                 'Build $J = [[3,1],[0,3]]$ and call `np.linalg.eig(J)` — both eigenvalues equal 3. Then check `np.linalg.matrix_rank(evecs)`: rank 1 means the two returned eigenvectors are not independent. The heat-map grid shows $J$, $J^2$, and $J^3$ with values annotated, so you can read the off-diagonal growth directly.',
                 'The rank test is the key diagnostic: a non-defective matrix with distinct eigenvalues always returns rank $= n$. Here rank = 1 < 2 confirms only one independent eigenvector exists. Watch the off-diagonal entries in the heat maps — they are 1, 6, 27, following $n \\cdot 3^{n-1}$, which grows faster than the diagonal $3^n$.',
+                'Near-defective matrices (two eigenvalues very close but not equal) cause the eigenvector matrix to be nearly singular. `np.linalg.cond(evecs)` (condition number) grows large as two eigenvalues approach each other, and `np.linalg.inv(evecs)` amplifies floating-point error by that factor. Always check `np.linalg.matrix_rank(evecs)` and `np.linalg.cond(evecs)` before inverting: a rank-deficient or near-singular `evecs` means the diagonalization is numerically unreliable and you should use `scipy.linalg.jordan_form` or the Schur decomposition instead.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -192,6 +196,7 @@ plt.show()`,
               prose: [
                 'Compare two matrices with eigenvalue 3: the scalar multiple $3I$ (diagonalizable) and the Jordan block $J$ (defective). Compute `np.linalg.matrix_power(M, n) @ v` for $n = 0, \\ldots, 7$ to get the norm growth of each. The semi-log plot (`ax.semilogy`) lets you see whether the growth is purely exponential (straight line) or faster.',
                 'For $3I$, the norm grows exactly as $3^n$ — a straight line on the log scale, matching the gray dashed reference. For the Jordan block, the norm grows as $\\|J^n v\\| \\approx 3^n \\sqrt{1 + n^2/9}$ — bending above the straight line. This polynomial correction from the $n\\lambda^{n-1}$ term is the observable signature of the Jordan defect.',
+                'The semilogy plot isolates the polynomial factor: a purely diagonalizable matrix would show a straight line ($3^n$ is linear on a log scale), but the Jordan block off-diagonal entry $n \\cdot 3^{n-1}$ curves upward because $\\log(n \\cdot 3^{n-1}) = \\log n + (n-1)\\log 3$ has an extra $\\log n$ term. For $|\\lambda| < 1$ this polynomial factor initially fights the exponential decay, creating a transient "bump" in the response before decay wins — this is why critically-damped ($\\zeta = 1$) control systems sometimes show a small overshoot at startup.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -223,6 +228,7 @@ plt.show()`,
               prose: [
                 'Build three matrices — a diagonalizable $2\\times 2$, a $2\\times 2$ Jordan block, and a $3\\times 3$ Jordan block — and display each as a heat map with entry values annotated. Call `np.linalg.eig(M)[0]` to show the eigenvalues of each matrix in the subplot title.',
                 'Scan the heat maps from left to right: the diagonalizable matrix has no superdiagonal 1s; the $2\\times 2$ Jordan block has one; the $3\\times 3$ block has two. The number of superdiagonal 1s = block size $- 1$ = number of generalized eigenvectors needed. The 1s are the visual signature of defectiveness — each one represents an eigenvector the eigenspace is missing.',
+                'The critically damped case is the engineering sweet spot: a double real eigenvalue with exactly one independent eigenvector. In a spring-mass-damper, critical damping ($\\zeta = 1$) means the system returns to rest as fast as possible without oscillating — the Jordan block structure gives a response of the form $e^{\\lambda t}(c_1 + c_2 t)\\mathbf{x}_0$, where the $t$ factor is the polynomial from the Jordan block. Underdamped ($\\zeta < 1$): complex eigenvalue pair, oscillates. Overdamped ($\\zeta > 1$): two distinct real eigenvalues, decays monotonically but more slowly than critical.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -244,6 +250,59 @@ for ax, (name, M) in zip(axes, matrices):
                     color='white' if abs(M[i,j]) > 1 else 'black')
     ax.set_xticks([]); ax.set_yticks([])
 plt.suptitle("Diagonalizable vs Jordan form", fontsize=11)
+plt.tight_layout()
+plt.show()`,
+            },
+            {
+              id: 4,
+              cellTitle: 'Application: transient response comparison — diagonalizable vs Jordan block',
+              prose: [
+                'The step response of a discrete-time system $\\mathbf{x}_{n+1} = A\\mathbf{x}_n$ reveals the Jordan structure in its transient behavior. For a diagonalizable matrix, each component decays (or grows) purely as $\\lambda^n$. For a Jordan block with repeated eigenvalue, the response has the form $(c_1 + c_2 n)\\lambda^n$ — the polynomial factor $n$ causes an initial growth even when $|\\lambda| < 1$.',
+                'The comparison plot overlays three trajectories: a diagonalizable matrix (two distinct eigenvalues), a Jordan block (repeated eigenvalue, one eigenvector), and the scalar $\\lambda^n$ curve without the polynomial factor. The Jordan block trajectory overshoots the scalar curve initially before the exponential decay wins. This overshoot is the physical signature of critical damping — the system approaches equilibrium without oscillation but with a polynomial-shaped initial transient.',
+                'For control design: placing a repeated eigenvalue $\\lambda = r$ corresponds to critically damped response with no oscillation. If $r$ is slightly below 1, the response decays smoothly to zero; the Jordan block just adds a mild initial overshoot. This is why critically damped responses feel "sluggish" compared to slightly underdamped ones — the polynomial factor slows the initial response even though decay is guaranteed.',
+              ],
+              code: `import numpy as np
+import matplotlib.pyplot as plt
+
+lam = 0.85   # eigenvalue (stable: |lam| < 1)
+
+# Diagonalizable: two distinct eigenvalues lam and lam+0.1
+A_diag = np.array([[lam, 0.], [0., lam + 0.1]])
+evals_d, P_d = np.linalg.eig(A_diag)
+
+# Jordan block: repeated eigenvalue lam, only one eigenvector
+A_jord = np.array([[lam, 1.], [0., lam]])
+
+x0 = np.array([1., 0.5])
+n_steps = 30
+steps = np.arange(n_steps + 1)
+
+traj_diag = [x0.copy()]
+traj_jord = [x0.copy()]
+x_d, x_j = x0.copy(), x0.copy()
+for _ in range(n_steps):
+    x_d = A_diag @ x_d
+    x_j = A_jord @ x_j
+    traj_diag.append(x_d.copy())
+    traj_jord.append(x_j.copy())
+traj_diag = np.array(traj_diag)
+traj_jord = np.array(traj_jord)
+
+# Scalar lambda^n for comparison
+scalar_decay = lam**steps
+
+fig, axes = plt.subplots(1, 2, figsize=(11, 4))
+axes[0].plot(steps, traj_diag[:, 0], 'o-', color='steelblue', lw=2, markersize=3, label='Diagonalizable x[0]')
+axes[0].plot(steps, traj_jord[:, 0], 's-', color='crimson', lw=2, markersize=3, label='Jordan block x[0]')
+axes[0].plot(steps, scalar_decay, '--', color='gray', lw=1.5, label=f'Scalar λⁿ (λ={lam})')
+axes[0].set_title("Component x[0] over time", fontsize=11)
+axes[0].set_xlabel('n'); axes[0].legend(fontsize=9); axes[0].grid(True, alpha=0.3)
+
+axes[1].semilogy(steps, np.abs(traj_diag[:, 0]), 'o-', color='steelblue', lw=2, markersize=3, label='Diagonalizable')
+axes[1].semilogy(steps, np.abs(traj_jord[:, 0]), 's-', color='crimson', lw=2, markersize=3, label='Jordan block')
+axes[1].semilogy(steps, scalar_decay, '--', color='gray', lw=1.5, label='Scalar λⁿ')
+axes[1].set_title("Log scale: polynomial factor visible as curve", fontsize=11)
+axes[1].set_xlabel('n'); axes[1].legend(fontsize=9); axes[1].grid(True, alpha=0.3)
 plt.tight_layout()
 plt.show()`,
             },

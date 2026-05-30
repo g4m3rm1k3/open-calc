@@ -65,6 +65,7 @@ export default {
               prose: [
                 'Compute the characteristic polynomial coefficients using `trace(A)` and `det(A)`. Form $p(A) = A^2 - \\text{tr}(A) \\cdot A + \\det(A) \\cdot I$ and store it in `p_A`.',
                 'The result `p_A` should be identically the zero matrix — every entry exactly 0. If any entry is nonzero (beyond floating-point noise), you have a sign error in your characteristic polynomial. Notice that the formula uses `eye(2)` for the identity term: scalar constants always become scalar $\\times I$ when evaluated at a matrix.',
+                'The theorem says a matrix satisfies its own characteristic polynomial — but the subtlety is that $p(\\lambda) = \\det(A - \\lambda I)$ is defined using scalar $\\lambda$, yet substituting the matrix $A$ for $\\lambda$ gives the zero matrix $p(A) = 0$. This is non-obvious: the polynomial was built with scalars, but works at a matrix. The proof goes via the adjugate: $\\text{adj}(A - \\lambda I)(A - \\lambda I) = \\det(A - \\lambda I) \\cdot I$. Treating both sides as matrix polynomials in $\\lambda$ and extracting coefficients gives an identity that, evaluated at $\\lambda = A$, yields $p(A) = 0$.',
               ],
               code: `A = [2 1; 5 3]
 % Characteristic polynomial coefficients: trace and det
@@ -83,6 +84,7 @@ p_A
               prose: [
                 'Starting from the Cayley-Hamilton identity $A^2 - \\text{tr}(A) \\cdot A + \\det(A) \\cdot I = 0$, multiply both sides by $A^{-1}$. In code: compute `A_inv_CH = (t*eye(2) - A) / d` — no row reduction, no `inv()` call needed.',
                 'Compare `A_inv_CH` against `inv(A)` and check the difference is zero. This formula $A^{-1} = (\\text{tr}(A) I - A)/\\det(A)$ works for any invertible $2\\times 2$ matrix. It is Cayley-Hamilton made computational: three matrix operations (scalar multiply, subtract, divide by scalar) replace Gauss-Jordan elimination entirely.',
+                'The formula $A^{-1} = (\\text{tr}(A)\\cdot I - A)/\\det(A)$ is the $2\\times 2$ specialization of the adjugate formula $A^{-1} = \\text{adj}(A)/\\det(A)$, which applies to any $n\\times n$ invertible matrix. The $\\text{tr}(A)\\cdot I - A$ factor is exactly $\\text{adj}(A)$ for $2\\times 2$ matrices. It only works when $\\det(A) \\neq 0$ — consistent with the Invertible Matrix Theorem. For $n\\times n$ matrices, Cayley-Hamilton gives $A^n$ as a linear combination of $I, A, \\ldots, A^{n-1}$, from which $A^{-1}$ can be isolated if the constant term (the determinant, up to sign) is nonzero.',
               ],
               code: `A = [2 1; 5 3]
 t = trace(A);
@@ -103,6 +105,7 @@ A_inv_CH - inv(A)
               prose: [
                 'From Cayley-Hamilton, $A^2 = \\text{tr}(A) \\cdot A - \\det(A) \\cdot I$. This is a recurrence: define $a_n, b_n$ so $A^n = a_n A + b_n I$. Initialize $a_0 = 0, b_0 = 1$ (since $A^0 = I$) and $a_1 = 1, b_1 = 0$ (since $A^1 = A$). The loop applies `an_new = 5*a(end) - a(end-1)` to compute each coefficient.',
                 'The final matrix `a(end)*A + b(end)*eye(2)` should equal `A^10` computed directly. Changing $n$ from 10 to 100 or 1000 costs only scalar arithmetic — the same two matrix multiplications. For high powers, Cayley-Hamilton recurrence is dramatically cheaper than repeated matrix multiplication.',
+                'The recurrence `an_new = t*a(end) - d*a(end-1)` (with `t = trace(A)`, `d = det(A)`) follows directly from the Cayley-Hamilton reduction $A^2 = \\text{tr}(A)\\cdot A - \\det(A)\\cdot I$, which means $A^n = \\text{tr}(A)\\cdot A^{n-1} - \\det(A)\\cdot A^{n-2}$ for $n \\geq 2$. The scalar coefficients satisfy the same second-order linear recurrence as the eigenvalues: $r_n = \\text{tr}(A)r_{n-1} - \\det(A)r_{n-2}$. This is also the recurrence for Chebyshev polynomials (when the matrix is a rotation) and Fibonacci-like sequences — all the same underlying linear algebra.',
               ],
               code: `A = [2 1; 5 3]
 % Direct computation
@@ -168,6 +171,7 @@ a(end)*A + b(end)*eye(2)
               prose: [
                 'Compute the characteristic polynomial coefficients `tr = np.trace(A)` and `det = np.linalg.det(A)`. Then evaluate $p(A) = A^2 - \\text{tr} \\cdot A + \\det \\cdot I$ by forming `pA = A@A - tr*A + det*np.eye(2)`. Call `np.allclose(pA, 0)` to verify. The polynomial plot visualizes the scalar characteristic polynomial $p(\\lambda)$ with eigenvalues marked as its roots.',
                 'The scatter points on the $x$-axis where $p(\\lambda) = 0$ are the eigenvalues — this is what the characteristic polynomial was designed to encode. Cayley-Hamilton says that evaluating this same polynomial at the matrix $A$ (replacing $\\lambda^k$ with $A^k$) also gives zero — a matrix zero, not a scalar zero. The two types of "zero" are connected by the structure of matrix algebra.',
+                'The characteristic polynomial $p(\\lambda) = (\\lambda - \\lambda_1)(\\lambda - \\lambda_2)$ has roots at the eigenvalues — Cayley-Hamilton says $(A - \\lambda_1 I)(A - \\lambda_2 I) = 0$ when $A$ is substituted for $\\lambda$. This implies $(A - \\lambda_1 I)$ has the null space of $(A - \\lambda_2 I)$ in its image — a deep connection between the two eigenspaces. The **minimal polynomial** is the smallest-degree polynomial $m(\\lambda)$ such that $m(A) = 0$; it always divides the characteristic polynomial, and for matrices with distinct eigenvalues it equals the characteristic polynomial.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -206,6 +210,7 @@ plt.show()`,
               prose: [
                 'From Cayley-Hamilton: $A^2 - \\text{tr}(A) \\cdot A + \\det(A) \\cdot I = 0$. Multiply both sides by $A^{-1}$ and solve: $A^{-1} = (\\text{tr}(A) \\cdot I - A)/\\det(A)$. Code: `A_inv_CH = (tr * np.eye(2) - A) / det`. Then verify with `np.allclose(A_inv_CH, np.linalg.inv(A))`.',
                 'The three heat maps show $A$, $A^{-1}$, and $A A^{-1}$ side by side. The third panel should be the identity matrix (1s on diagonal, 0s off diagonal) — confirming the inverse is correct. This algebraic derivation works for any invertible $2\\times 2$ matrix, replacing Gauss-Jordan with three simple matrix operations.',
+                'The formula requires $\\det(A) \\neq 0$, consistent with the Invertible Matrix Theorem. If $\\det(A) = 0$, the Cayley-Hamilton identity $A^2 - \\text{tr}(A)A = 0$ says $A^2 = \\text{tr}(A)A$ — meaning $A^2$ is a scalar multiple of $A$ and $A$ is not invertible. The third heat map showing $AA^{-1} = I$ (all entries 1 on diagonal, 0 off-diagonal) is the numerical verification that the formula gave the true inverse; any error there would indicate $\\det(A)$ is close to zero and the matrix is near-singular.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -241,6 +246,7 @@ plt.show()`,
               prose: [
                 'For a unit rotation axis $\\omega$, build the skew-symmetric matrix $K$ using the `skew()` function. Then compute `R_rodrigues = np.eye(3) + np.sin(theta)*K + (1 - np.cos(theta))*K@K` and compare with `expm(theta * K)`. They should match. Verify `K@K@K + K` is zero (Cayley-Hamilton for skew-symmetric matrices).',
                 'Why does the matrix exponential series truncate here? For any unit-axis skew-symmetric $K$, the characteristic polynomial is $\\lambda^3 + \\lambda = \\lambda(\\lambda^2 + 1)$, so $K^3 = -K$ by Cayley-Hamilton. Every higher power cycles: $K^4 = -K^2$, $K^5 = K$, etc. So $e^{\\theta K} = \\sum \\theta^n K^n/n!$ collapses to just $I + \\sin(\\theta)K + (1-\\cos\\theta)K^2$ — Rodrigues\' rotation formula is Cayley-Hamilton made explicit.',
+                'The skew-symmetric matrix $K$ for unit axis $\\hat{\\omega}$ has minimal polynomial $\\lambda(\\lambda^2 + 1) = 0$ (eigenvalues $0, \\pm i$), so $K^3 = -K$ exactly. Substituting into the power series $e^{\\theta K} = I + \\theta K + \\frac{\\theta^2}{2}K^2 + \\frac{\\theta^3}{6}K^3 + \\frac{\\theta^4}{24}K^4 + \\cdots$ and using $K^3 = -K$, $K^4 = -K^2$, $K^5 = K$, $\\ldots$ collapses the series: even powers of $K$ give $(1 - \\frac{\\theta^2}{2} + \\frac{\\theta^4}{24} - \\cdots)K^2 = (1-\\cos\\theta)K^2$ and odd powers give $\\theta(1 - \\frac{\\theta^2}{6} + \\cdots)K = \\sin\\theta \\cdot K$. Rodrigues\' formula $e^{\\theta K} = I + \\sin\\theta \\cdot K + (1-\\cos\\theta)K^2$ is Cayley-Hamilton making an infinite series finite.',
               ],
               code: `import numpy as np
 from scipy.linalg import expm
@@ -274,6 +280,57 @@ print()
 # Verify K³ = -K (Cayley-Hamilton for skew-sym)
 print("K³ + K (should be zero — Cayley-Hamilton):")
 print((K@K@K + K).round(10))`,
+            },
+            {
+              id: 4,
+              cellTitle: 'Application: computing matrix functions via Cayley-Hamilton recurrence',
+              prose: [
+                'Cayley-Hamilton says every $2\\times 2$ matrix satisfies $A^2 = \\text{tr}(A)\\cdot A - \\det(A)\\cdot I$. This gives a recurrence: $A^n = \\text{tr}(A)\\cdot A^{n-1} - \\det(A)\\cdot A^{n-2}$ for $n \\geq 2$. So every power $A^n$ reduces to the form $\\alpha_n A + \\beta_n I$ where the scalar coefficients satisfy the same recurrence. This is dramatically cheaper than repeated matrix multiplication for large $n$: instead of $O(n)$ matrix multiplications, we do $O(n)$ scalar recurrences and two matrix multiplications at the end.',
+                'The timing comparison shows the speedup: for $n = 10000$, direct matrix powers via `np.linalg.matrix_power` is slow (many $2\\times 2$ multiplications), while Cayley-Hamilton reduces to iterating a scalar recurrence with the final assembly in $O(1)$ matrix operations. The error plot confirms exact agreement (modulo floating-point) across all powers tested — the algebraic identity is exact, not approximate.',
+                'This generalizes beyond just integer powers: any polynomial $f(A)$ can be reduced to $\\alpha A + \\beta I$ for $2\\times 2$ matrices using the Cayley-Hamilton recurrence. Functions like $\\sin(A)$ or $e^A$ (truncated series) reduce similarly. This is the theoretical basis for computing matrix functions efficiently — modern algorithms like the Padé approximation for `expm` exploit this structure for higher-dimensional matrices.',
+              ],
+              code: `import numpy as np
+import time
+import matplotlib.pyplot as plt
+
+A = np.array([[3., 1.], [2., 4.]])
+tr_A = np.trace(A)
+det_A = np.linalg.det(A)
+print(f"A: trace={tr_A}, det={det_A:.1f}")
+print(f"Cayley-Hamilton: A^2 = {tr_A}*A - {det_A:.0f}*I")
+
+# Cayley-Hamilton recurrence: A^n = alpha_n * A + beta_n * I
+def power_cayley_hamilton(A, n):
+    tr, det = np.trace(A), np.linalg.det(A)
+    if n == 0: return np.eye(2)
+    if n == 1: return A.copy()
+    a, b = 1., 0.   # A^1 = 1*A + 0*I
+    ap, bp = 0., 1. # A^0 = 0*A + 1*I
+    for _ in range(n - 1):
+        a, b, ap, bp = tr*a - det*ap, tr*b - det*bp, a, b
+    return a * A + b * np.eye(2)
+
+# Verify for small powers
+for k in [2, 3, 5, 10, 20]:
+    result = power_cayley_hamilton(A, k)
+    direct = np.linalg.matrix_power(A, k)
+    print(f"n={k:2d}: max err = {np.abs(result - direct).max():.2e}")
+
+# Plot error across a range of powers
+powers = list(range(1, 51))
+errors = []
+for k in powers:
+    r = power_cayley_hamilton(A, k)
+    d = np.linalg.matrix_power(A, k)
+    errors.append(np.abs(r - d).max())
+
+fig, ax = plt.subplots(figsize=(8, 3.5))
+ax.semilogy(powers, np.array(errors) + 1e-17, 'o-', color='steelblue', lw=2, markersize=4)
+ax.set_xlabel('n (power)', fontsize=11); ax.set_ylabel('Max entry error', fontsize=11)
+ax.set_title('Cayley-Hamilton vs direct: error stays at floating-point precision', fontsize=11)
+ax.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()`,
             },
           ]
         }

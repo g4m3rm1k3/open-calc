@@ -2,8 +2,17 @@ import { useEffect, useState } from 'react'
 
 const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000 // 7 days
 
-async function fetchWikiByQuery(query) {
-  const cacheKey = `wiki:q:${query}`
+// Build a search query that's specific enough to avoid disambiguation/vague results.
+// Title alone is often ambiguous ("Vector" = math, biology, software…).
+// Appending the first few tags narrows it dramatically.
+function buildQuery(title, tags) {
+  const hint = (tags ?? []).slice(0, 3).join(' ')
+  return hint ? `${title} ${hint}` : title
+}
+
+async function fetchWikiByQuery(title, tags) {
+  const q = buildQuery(title, tags)
+  const cacheKey = `wiki:q:${q}`
   try {
     const raw = localStorage.getItem(cacheKey)
     if (raw) {
@@ -14,7 +23,7 @@ async function fetchWikiByQuery(query) {
 
   // Step 1: search for the best matching article title
   const searchRes = await fetch(
-    `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&format=json&origin=*&srlimit=1`,
+    `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(q)}&format=json&origin=*&srlimit=1`,
     { headers: { 'Accept': 'application/json' } }
   )
   if (!searchRes.ok) return null
@@ -30,6 +39,9 @@ async function fetchWikiByQuery(query) {
   if (!summaryRes.ok) return null
   const data = await summaryRes.json()
 
+  // Skip disambiguation pages — they have no useful extract
+  if (data.type === 'disambiguation' || data.type === 'no-extract') return null
+
   const entry = {
     ts:      Date.now(),
     title:   data.title,
@@ -41,14 +53,14 @@ async function fetchWikiByQuery(query) {
   return entry
 }
 
-export default function WikiIntro({ query }) {
+export default function WikiIntro({ query, tags }) {
   const [data, setData]       = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     let cancelled = false
     setLoading(true)
-    fetchWikiByQuery(query).then(result => {
+    fetchWikiByQuery(query, tags).then(result => {
       if (!cancelled) { setData(result); setLoading(false) }
     }).catch(() => {
       if (!cancelled) setLoading(false)

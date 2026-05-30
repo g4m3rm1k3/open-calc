@@ -347,6 +347,7 @@ print(f"det(A) = {d:.4f}, det(A)*I diagonal = {d:.4f}")`,
               prose: [
                 'Every cofactor carries the sign $(-1)^{i+j}$ from the checkerboard pattern plus a magnitude from the corresponding minor. This cell overlays both on a heatmap: the sign pattern is shown as the checkerboard template, and the actual cofactor magnitudes reveal which minors are largest. Strategic expansion picks the row or column where the magnitudes of the nonzero entries are smallest — that row/column has both zeros (skipped terms) and often simpler remaining minors.',
                 'The second plot shows what happens to the cofactor matrix as a row of $A$ is scaled toward zero: the cofactor magnitudes in that row hold steady (cofactors do not depend on the entries of the row being deleted), while the corresponding column of the adjugate — which receives those cofactors transposed — grows in relative weight. Watching this helps build intuition for why singular matrices can have nonzero adjugates.',
+                'Reading the three heatmaps left to right teaches the full adjugate construction: (1) sign checkerboard $(-1)^{i+j}$; (2) cofactor matrix $C$ where $C_{ij}$ = sign × minor det; (3) adj$(A) = C^\\top$ where adj$(A)_{ij} = C_{ji}$. Notice adj$(A)$ is NOT the transpose of $A$ — it is the transpose of the COFACTOR matrix. Try a diagonal matrix $A = \\text{diag}(d_1,d_2,d_3)$: the cofactors are $C_{ii} = d_j d_k$ (product of other diagonals) and $C_{ij}=0$ for $i \\neq j$, so adj$(A)$ is also diagonal with entries $d_2 d_3, d_1 d_3, d_1 d_2$, and $A^{-1} = \\text{diag}(1/d_1, 1/d_2, 1/d_3)$.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -391,6 +392,7 @@ plt.show()`,
               prose: [
                 'When $\\det(A) \\to 0$, the inverse $A^{-1} = \\text{adj}(A)/\\det(A)$ blows up — but $\\text{adj}(A)$ itself remains finite. This challenge explores that limit: vary a parameter $t$ that drives $A$ toward singularity ($t \\to 0$ makes two rows nearly equal), plot the condition number $\\kappa(A)$ and the norm of $\\text{adj}(A)$, and observe that the adjugate norm stays bounded while the inverse norm diverges.',
                 'At $t = 0$ exactly, $A$ is singular: $\\text{adj}(A)$ is nonzero and its columns lie in $N(A)$ (every column satisfies $Ax = 0$). This is the algebraic statement of the Fredholm alternative: the adjugate "detects" the null space even when the inverse fails to exist.',
+                'The two plots tell a coherent story: as $t \\to 0$, $1/|\\det(A)|$ and cond$(A)$ both blow up (left plot) while $\\|\\text{adj}(A)\\|$ stays bounded (right plot). Since $\\|A^{-1}\\| = \\|\\text{adj}(A)\\|/|\\det(A)|$, the inverse diverges because $\\det \\to 0$ drives the denominator to zero, not because the numerator grows. At $t = 0$ exactly, the adjugate becomes a rank-1 matrix whose columns all point along the null space direction — the algebraic trace of the one direction that $A$ collapses to zero.',
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -437,6 +439,59 @@ A_sing = np.array([[1., 2., 3.], [1., 2., 3.], [0., 1., 2.]])
 adj_sing = cofactor_matrix(A_sing).T
 print("A * adj(A_singular) (should be zero matrix):")
 print(np.round(A_sing @ adj_sing, 10))`,
+            },
+            {
+              id: 5,
+              cellTitle: 'Application: symbolic inverse via adjugate for a parametric matrix',
+              prose: [
+                'The adjugate formula shines when you need a SYMBOLIC inverse — an expression in terms of parameters, not numbers. This cell computes the adjugate and inverse of a parametric 2×2 rotation-scale matrix $A(\\theta, s) = s\\begin{bmatrix}\\cos\\theta & -\\sin\\theta \\\\ \\sin\\theta & \\cos\\theta\\end{bmatrix}$ and verifies the formula gives $A^{-1}(\\theta,s) = \\frac{1}{s}\\begin{bmatrix}\\cos\\theta & \\sin\\theta \\\\ -\\sin\\theta & \\cos\\theta\\end{bmatrix}$. This is why cofactors matter: numerical inversion (LU) gives numbers; the adjugate formula gives functions.',
+                'The code sweeps $\\theta$ from 0 to $2\\pi$ at fixed $s=2$ and verifies that $A(\\theta) \\cdot A^{-1}(\\theta) = I$ at every angle. The maximum entry of $|AA^{-1} - I|$ should stay near machine epsilon ($10^{-15}$) for all $\\theta$. The plot shows how the determinant (always $s^2 = 4$) and the condition number (always $1$, since rotation matrices are orthogonal) stay constant — a rotation-scale matrix is perfectly conditioned regardless of $\\theta$.',
+                'This demonstrates why Cramer\'s rule (from la2-008) works: both Cramer\'s rule and the adjugate formula are cofactor-based, and both produce rational functions of the matrix entries. For a linear control system $\\dot{\\mathbf{x}} = A\\mathbf{x} + B\\mathbf{u}$, the closed-form transfer function $(sI - A)^{-1}B$ is computed exactly this way — adjugate of $(sI-A)$ divided by $\\det(sI-A) = p(s)$ (the characteristic polynomial). The adjugate entries are the numerator polynomials, $p(s)$ is the denominator.',
+              ],
+              code: `import numpy as np
+import matplotlib.pyplot as plt
+
+def adjugate_2x2(A):
+    return np.array([[A[1,1], -A[0,1]], [-A[1,0], A[0,0]]])
+
+# Parametric: A(theta, s) = s * rotation_matrix(theta)
+s = 2.0
+thetas = np.linspace(0, 2*np.pi, 400)
+
+max_errors = []
+dets, conds = [], []
+for theta in thetas:
+    A = s * np.array([[np.cos(theta), -np.sin(theta)],
+                       [np.sin(theta),  np.cos(theta)]])
+    d = np.linalg.det(A)   # = s^2 for all theta
+    adj = adjugate_2x2(A)
+    A_inv = adj / d
+    # Verify A @ A_inv = I
+    err = np.abs(A @ A_inv - np.eye(2)).max()
+    max_errors.append(err)
+    dets.append(d)
+    conds.append(np.linalg.cond(A))
+
+fig, axes = plt.subplots(1, 3, figsize=(13, 3.5))
+axes[0].plot(thetas/np.pi, max_errors, 'steelblue', lw=2)
+axes[0].set_xlabel('theta / pi'); axes[0].set_ylabel('max|A A^-1 - I|')
+axes[0].set_title('Adjugate inverse error (should be ~1e-15)')
+axes[0].grid(True, alpha=0.3)
+
+axes[1].plot(thetas/np.pi, dets, 'darkorange', lw=2)
+axes[1].axhline(s**2, color='red', linestyle='--', label=f's² = {s**2}')
+axes[1].set_xlabel('theta / pi'); axes[1].set_ylabel('det(A)')
+axes[1].set_title(f'det = s² = {s**2} for all theta')
+axes[1].legend(); axes[1].grid(True, alpha=0.3)
+
+axes[2].plot(thetas/np.pi, conds, 'green', lw=2)
+axes[2].set_xlabel('theta / pi'); axes[2].set_ylabel('cond(A)')
+axes[2].set_title('Condition number = 1 (perfectly conditioned)')
+axes[2].grid(True, alpha=0.3)
+
+plt.suptitle('Rotation-scale matrix A(theta, s=2): adjugate gives exact symbolic inverse', fontsize=10)
+plt.tight_layout()
+plt.show()`,
             },
           ],
         },

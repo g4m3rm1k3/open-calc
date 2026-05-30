@@ -81,6 +81,7 @@ export default {
               prose: [
                 "Call `eig(A)` to get eigenvalues. The diagonal of $D$ will be complex: $-1 \\pm 2i$. Extract real and imaginary parts with `real(eigenvalues)` and `imag(eigenvalues)`. Verify with `exp(trace(A))` — this equals `det(e^A)` by Liouville's formula.",
                 "Negative real parts ($-1$) confirm stability; nonzero imaginary parts ($\\pm 2$) confirm oscillation. The `det(e^A) = e^{\\text{tr}(A)} = e^{-2}$ check is a quick sanity test — if your computed `det(expm(A))` doesn't match `exp(trace(A))`, something is wrong with your exponential computation.",
+                "Liouville's formula $\\det(e^A) = e^{\\text{tr}(A)}$ follows from diagonalization: $e^A = Pe^DP^{-1}$, so $\\det(e^A) = \\det(e^D) = \\prod_i e^{\\lambda_i} = e^{\\sum \\lambda_i} = e^{\\text{tr}(A)}$. The identity holds even for non-diagonalizable matrices. A key consequence: $e^A$ is always invertible with $(e^A)^{-1} = e^{-A}$, even if $A$ itself is singular — $\\det(e^A) = e^{\\text{tr}(A)}$ is always positive. The stability condition $\\text{Re}(\\lambda_i) < 0$ for all $i$ guarantees $\\|e^{At}\\| \\to 0$ as $t \\to \\infty$, confirming the system settles to zero.",
               ],
               code: `A = [-1 2; -2 -1]
 [V, D] = eig(A)
@@ -99,6 +100,7 @@ exp(trace(A))
               prose: [
                 "Call `[P, D] = eig(A)` to diagonalize. Form `eDt = diag(exp(diag(D) * t))` — this exponentiates each diagonal entry of $D$ independently. Then `eAt_diag = P * eDt * inv(P)` applies the similarity transform to get $e^{At}$. Verify at $t=0$: the result should be the identity matrix.",
                 "Why does `diag(exp(diag(D)*t))` work? Because $e^{Dt} = \\text{diag}(e^{\\lambda_1 t}, e^{\\lambda_2 t})$ — the power series for a diagonal matrix collapses to independent scalar exponentials for each entry. This is exact, not an approximation. Take the real part of the result since the imaginary parts cancel (the original matrix $A$ is real).",
+                "The formula $e^{At} = Pe^{Dt}P^{-1}$ follows from the power series: $(PDP^{-1})^k = PD^kP^{-1}$, so $e^{At} = \\sum_k \\frac{(At)^k}{k!} = P(\\sum_k \\frac{D^kt^k}{k!})P^{-1} = Pe^{Dt}P^{-1}$. For complex eigenvalue $\\lambda = a \\pm bi$: $e^{\\lambda t} = e^{at}(\\cos bt \\pm i\\sin bt)$ — real part $a$ controls exponential decay (negative for stability) and imaginary part $b$ controls oscillation frequency. `real(P * diag(exp(diag(D)*t)) * inv(P))` discards imaginary parts that arise only from floating-point round-off since $A$ is real.",
               ],
               code: `A = [-1 2; -2 -1]
 [P, D] = eig(A)
@@ -124,6 +126,7 @@ eAt0 = real(P * eDt0 * inv(P))
               prose: [
                 "For each time step in `times = [0, 0.5, 1.0, 2.0]`, compute `eAt = real(P * diag(exp(diag(D)*t)) * inv(P))` and then `xt = eAt * x0`. The loop prints the state vector at each time, showing how both components change.",
                 "Watch the numbers: at $t=0$, $\\mathbf{x} = [2; 0] = \\mathbf{x}_0$. By $t=2$, both components are near zero — the decaying spiral has brought the trajectory to the origin. The complex eigenvalues $-1 \\pm 2i$ predict decay with time constant $1/|{-1}| = 1$ second and oscillation period $2\\pi/2 \\approx 3.14$ seconds.",
+                "Reading the output: at $t=0$, $\\mathbf{x} = [2;0] = \\mathbf{x}_0$ exactly ($e^{A\\cdot 0} = I$). At $t=0.5$, amplitude is $e^{-0.5} \\approx 0.6$ of initial — the real part $-1$ of the eigenvalue gives time constant $\\tau = 1/|\\text{Re}(\\lambda)| = 1$ second. The imaginary part $\\pm 2$ gives oscillation at $f = 2/(2\\pi) \\approx 0.32$ Hz (period $\\approx 3.14$ s). By $t = 2$, amplitude is $e^{-2} \\approx 0.14$ of initial. The system reaches 1% of initial amplitude at $t \\approx 5\\tau = 5$ s — the standard settling time rule.",
               ],
               code: `A = [-1 2; -2 -1]
 x0 = [2; 0]
@@ -185,6 +188,7 @@ end
               prose: [
                 "Use `expm(A)` from `scipy.linalg` to compute the matrix exponential. Compare against the exact result for a diagonal matrix: `eA_exact = np.diag([np.exp(-1), np.exp(-2)])`. Verify Liouville: `np.linalg.det(eA)` should equal `np.exp(np.trace(A))`. The left plot shows $\\|e^{tA}\\|$ decreasing as $t$ grows.",
                 "The norm of $e^{tA}$ decays because both eigenvalues of $A$ are negative. When the eigenvalues are $\\lambda_1, \\lambda_2$, the dominant norm behavior is $\\sim e^{\\max(\\lambda_i) t}$. The heat map (right plot) shows the entries of $e^A$ at $t=1$ — note the off-diagonal entries are zero since $A$ is diagonal, making $e^A$ diagonal too.",
+                "`scipy.linalg.expm` uses the Padé approximation with scaling and squaring — far more numerically stable than truncating the power series. For $\\|A\\| = 100$, the power series needs $\\approx 200$ terms for 6-digit accuracy; Padé with $m=13$ achieves 15 digits with far fewer operations by using a rational approximation $r_m(A) = p_m(A)/q_m(A)$ plus repeated squaring to reduce $A$ to small norm first. Always use `expm` from `scipy.linalg` in practice; the manual power series is for understanding the definition, not for computation.",
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -224,6 +228,7 @@ plt.show()`,
               prose: [
                 "Set $A = [[0,-1],[1,0]]$ (the rotation generator) and $\\mathbf{x}_0 = [1,0]$. Compute `traj = [expm(t*A) @ x0 for t in ts]` over one full period $t \\in [0, 2\\pi]$. The left panel plots the phase-space trajectory $x_2$ vs $x_1$; the right panel shows both components as functions of $t$.",
                 "The rotation generator $A = [[0,-1],[1,0]]$ has eigenvalues $\\pm i$, so $e^{At}$ is a rotation by angle $t$. The trajectory is a perfect circle: $x_1(t) = \\cos(t)$, $x_2(t) = \\sin(t)$. Check: `expm(np.pi/2 * A) @ x0` rotates $[1,0]$ by 90° to $[0,1]$, and `expm(np.pi * A) @ x0` gives $[-1,0]$ ✓.",
+                "The connection to Euler's formula is exact: for $A = \\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$ (eigenvalues $\\pm i$), $e^{A\\theta} = \\cos(\\theta)I + \\sin(\\theta)A = R_\\theta$ — the rotation matrix. Euler's formula $e^{i\\theta} = \\cos\\theta + i\\sin\\theta$ and the rotation matrix formula $e^{\\theta A} = \\cos\\theta \\cdot I + \\sin\\theta \\cdot A$ are the same identity: one for the $1\\times1$ complex algebra, one for the $2\\times2$ rotation algebra. The skew-symmetric generator $A$ plays the role of $i$ — squaring it gives $A^2 = -I$, just like $i^2 = -1$.",
               ],
               code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -262,6 +267,7 @@ plt.show()`,
               prose: [
                 "Loop over damping ratios $\\zeta \\in \\{0, 0.3, 0.5, 0.7, 1.0, 1.5, 2.0\\}$. For each, build the second-order state matrix $A = [[0,1],[-\\omega^2, -2\\zeta\\omega]]$ and compute `np.linalg.eigvals(A)`. Print the real and imaginary parts of the eigenvalue and whether all real parts are negative.",
                 "Reading the table column by column: at $\\zeta = 0$ the real part is 0 — marginally stable (pure oscillation, `stable=False`). For any $\\zeta > 0$, the real part is $-\\zeta\\omega < 0$ — asymptotically stable. The settling time $\\approx 2/|\\text{Re}(\\lambda)|$ is longest near critical damping ($\\zeta = 1$) but without oscillation; for $\\zeta > 1$ (overdamped), settling is pure exponential decay.",
+                "The eigenvalue design map: $\\lambda = -\\zeta\\omega_n \\pm i\\omega_n\\sqrt{1-\\zeta^2}$. Engineering eigenvalues: `real(lambda) = -zeta` sets decay rate (larger $|\\text{Re}|$ means faster settling but requires more actuator force); `abs(imag(lambda)) = sqrt(1-zeta**2)` sets oscillation frequency. In a CNC servo, controller gains $K_p$, $K_d$, $K_i$ directly determine the characteristic polynomial coefficients and hence the eigenvalue locations — this is called **pole placement**. Increasing $K_d$ (derivative gain) moves eigenvalues further into the left half-plane, increasing damping and reducing oscillation at the cost of sensitivity to measurement noise.",
               ],
               code: `import numpy as np
 from scipy.linalg import expm
