@@ -583,4 +583,357 @@ export default {
     { id: 'SVGDiagram', props: { type: 'free-body-diagram' }, title: 'Force diagram: F = ma' },
     { id: 'ForceBlockSim', title: 'Interactive: F = ma', props: {} },
   ],
-}
+
+  misconceptions: [
+    {
+      id: 'p4-002-m1',
+      misconception: 'A larger net force means the object has a larger velocity.',
+      correction: 'Net force determines ACCELERATION, not velocity. F_net = ma. An object can have a huge velocity with zero net force (spacecraft coasting) or zero velocity with a huge net force (ball just released from rest). The connection is: force changes velocity, but the instantaneous velocity depends on all prior history, not on the current force.',
+      correctionExample: 'Car at 60 mph with engine off, coasting: net force ≈ 0, velocity = 60 mph. Same car from rest with engine on: net force = large, velocity = 0 mph initially. The large-force car has lower velocity at that instant.',
+    },
+    {
+      id: 'p4-002-m2',
+      misconception: 'Mass and weight are the same thing.',
+      correction: 'Mass (kg) is an intrinsic scalar property — resistance to acceleration, same everywhere in the universe. Weight (N) is a force W = mg that depends on local gravity g. On the Moon (g ≈ 1.6 m/s²), your mass is identical to Earth, but your weight is 1/6. In F = ma, the "m" is mass, not weight.',
+      correctionExample: '70 kg person: mass = 70 kg everywhere. Weight on Earth = 70×9.8 = 686 N. Weight on Moon = 70×1.6 = 112 N. In deep space (no gravity): weight ≈ 0 N, mass still 70 kg.',
+    },
+  ],
+
+  transferPrompts: [
+    {
+      id: 'p4-002-t1',
+      prompt: `An elevator accelerates upward at 2 m/s². A 60 kg person stands on a scale inside. The scale reads "apparent weight." Use ΣF = ma (with both gravity down and normal force up) to find what the scale reads. Then find the reading when the elevator accelerates downward at 2 m/s². What happens to scale reading in free fall?`,
+      connection: 'F = ma applied to the person\'s vertical motion: N − mg = ma. The scale reads N, not mg. This is the "apparent weight" concept that connects to weightlessness in orbit (free fall with forward velocity).',
+    },
+    {
+      id: 'p4-002-t2',
+      prompt: `A car of mass 1500 kg accelerates from 0 to 27 m/s (≈60 mph) in 9 s. Estimate the average net force required. The engine provides thrust F_engine; road friction and air drag resist. If air drag at highway speed is about 400 N, what is the required engine force during acceleration? How does engine force change as the car approaches top speed (where a → 0)?`,
+      connection: 'F = ma: net force = m × a. As a → 0 (constant speed), net force → 0, so engine force must exactly equal all resistive forces — Newton\'s Second Law reduces to the First Law.',
+    },
+  ],
+
+  debugging: [
+    {
+      id: 'p4-002-d1',
+      error: `A student: "A 5 kg block is pushed with 30 N and friction is 10 N. F = ma, so 30 = 5a, giving a = 6 m/s²."`,
+      fix: `The student used only the applied force, not the NET force. Newton\'s Second Law requires the vector sum of ALL forces:
+F_net = F_applied − F_friction = 30 − 10 = 20 N
+a = F_net / m = 20 / 5 = 4 m/s²
+Always compute ΣF first, then apply a = ΣF/m. Using any single force in F = ma gives the wrong answer whenever other forces are present.`,
+    },
+    {
+      id: 'p4-002-d2',
+      error: `A student: "A 70 kg person in an elevator accelerating up at 3 m/s² feels a force of F = ma = 70 × 3 = 210 N. So the scale reads 210 N."`,
+      fix: `The 210 N is the NET force, not the scale reading. The scale reads the NORMAL force N:
+ΣF = N − mg = ma
+N = m(g + a) = 70(9.8 + 3) = 70 × 12.8 = 896 N
+The scale shows 896 N (the person feels heavier). The 210 N is just the excess above weight. You must account for all forces — gravity is always present.`,
+    },
+  ],
+
+  mastery: {
+    targetLevel: 'Apply F = ma to single objects in multiple dimensions; handle normal, friction, tension, and gravity; integrate for non-constant acceleration.',
+    checklistItems: [
+      'Can compute F_net = ΣF (vector sum of all forces) before applying a = F_net/m',
+      'Can resolve forces into x- and y-components and apply F = ma independently in each direction',
+      'Can solve for unknown forces given acceleration (or vice versa)',
+      'Can handle weight W = mg vs. mass m — weight is a force, mass is inertia',
+      'Can integrate a(t) = F(t)/m for time-varying forces instead of using SUVAT',
+    ],
+    commonStruggles: [
+      'Using only the applied force in F = ma instead of the net force ΣF',
+      'Confusing the scale reading (normal force) with weight (mg) in elevator problems',
+      'Applying SUVAT when force varies with time — must integrate instead',
+    ],
+    nextSteps: 'Lesson p4-003 (Newton\'s Third Law) introduces action-reaction pairs that must be tracked when multiple objects interact.',
+  },
+
+  semantics: {
+    core: [
+      { symbol: '\\vec{F}_{\\text{net}} = m\\vec{a}', meaning: 'Newton\'s Second Law: NET force (vector sum of ALL forces) equals mass times acceleration' },
+      { symbol: 'a = F_{\\text{net}}/m', meaning: 'Acceleration: net force divided by mass; force and acceleration are in the same direction' },
+      { symbol: 'W = mg', meaning: 'Weight (N): gravitational force on mass m in field g; distinct from mass (kg)' },
+      { symbol: 'N', meaning: 'Normal force (N): contact force perpendicular to surface; equals mg only on horizontal surfaces with no vertical acceleration' },
+      { symbol: '\\sum F_x = ma_x,\\; \\sum F_y = ma_y', meaning: 'Component form: apply F = ma independently in each direction' },
+    ],
+    rulesOfThumb: [
+      'Always find F_NET first; then apply a = F_net/m. Never plug a single force into F = ma directly.',
+      'Weight W = mg is a force (Newtons). Mass m is inertia (kg). They are different quantities.',
+      'In elevators: scale reads N, not mg. N = m(g ± a) — plus when accelerating up, minus when down.',
+      'For time-varying F(t): a(t) = F(t)/m, then integrate for v(t) and x(t). SUVAT requires constant a.',
+      'F = ma is a vector equation: direction matters. Forces pointing left subtract from forces pointing right.',
+    ],
+  },
+
+  notebooks: {
+    python: {
+      type: 'PythonNotebook',
+      title: "Newton's Second Law in Python",
+      cells: [
+        {
+          cellTitle: 'F = ma: visualizing the triad',
+          type: 'code',
+          language: 'python',
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+# F = ma: how the three quantities relate
+# Fix one, vary a second, compute the third
+
+m = 5.0  # kg (fixed mass)
+F_values = np.linspace(0, 50, 200)
+a_from_F = F_values / m   # a = F/m
+
+fig, axes = plt.subplots(1, 3, figsize=(14, 4))
+
+# Plot 1: a vs F (fixed m=5 kg)
+axes[0].plot(F_values, a_from_F, 'b-', linewidth=2)
+axes[0].set_xlabel('Net Force F (N)'); axes[0].set_ylabel('Acceleration a (m/s²)')
+axes[0].set_title(f'a = F/m  (m = {m} kg): linear')
+axes[0].grid(True)
+
+# Plot 2: a vs m (fixed F=20 N) — inverse relationship
+F_fixed = 20
+m_values = np.linspace(0.5, 10, 200)
+a_from_m = F_fixed / m_values
+axes[1].plot(m_values, a_from_m, 'r-', linewidth=2)
+axes[1].set_xlabel('Mass m (kg)'); axes[1].set_ylabel('Acceleration a (m/s²)')
+axes[1].set_title(f'a = F/m  (F = {F_fixed} N): inverse')
+axes[1].grid(True)
+
+# Plot 3: F needed for constant a across different masses
+a_fixed = 3  # m/s²
+F_needed = m_values * a_fixed
+axes[2].plot(m_values, F_needed, 'g-', linewidth=2)
+axes[2].set_xlabel('Mass m (kg)'); axes[2].set_ylabel('Required Force F (N)')
+axes[2].set_title(f'F = ma  (a = {a_fixed} m/s²): linear in mass')
+axes[2].grid(True)
+
+plt.tight_layout(); plt.show()
+
+print(f"Summary: For m={m} kg:")
+for F in [10, 20, 40]:
+    print(f"  F = {F} N → a = {F/m:.1f} m/s²")`,
+          prose: [
+            'a_from_F = F_values / m applies a = F/m element-wise — for each force value, compute the resulting acceleration with fixed mass. The linear relationship shows doubling F doubles a.',
+            'a_from_m = F_fixed / m_values shows the inverse relationship: doubling mass halves acceleration for the same force. The hyperbolic curve (1/m shape) reveals why a feather and a bowling ball accelerate differently under the same push.',
+            'F_needed = m_values * a_fixed shows F = ma directly: to achieve the same acceleration (3 m/s²) for heavier objects, you need proportionally more force. A 10 kg object needs 30 N; a 5 kg object needs 15 N.',
+          ],
+        },
+        {
+          cellTitle: 'Elevator: apparent weight vs true weight',
+          type: 'code',
+          language: 'python',
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+m = 70   # kg
+g = 9.8  # m/s²
+W_true = m * g  # true weight
+
+# Elevator accelerates: up (+), down (-), free fall (-g)
+a_values = np.linspace(-g, g, 300)
+N_apparent = m * (g + a_values)   # N = m(g + a)
+
+plt.figure(figsize=(8, 5))
+plt.plot(a_values, N_apparent, 'b-', linewidth=2)
+plt.axhline(W_true, color='k', linestyle='--', label=f'True weight = {W_true:.0f} N')
+plt.axhline(0, color='r', linestyle=':', label='Weightless (N = 0)')
+plt.xlabel('Elevator acceleration (m/s²)')
+plt.ylabel('Scale reading N (N)')
+plt.title(f'Apparent weight vs. acceleration  (m = {m} kg)')
+plt.legend(); plt.grid(True)
+
+# Mark key points
+key_accs = [g, 3, 0, -3, -g]
+for a in key_accs:
+    N = m * (g + a)
+    plt.scatter([a], [N], s=80, color='red', zorder=5)
+    plt.annotate(f'a={a:.1f}: N={N:.0f}N', xy=(a, N), xytext=(a-0.5, N+30), fontsize=8)
+
+plt.show()
+print(f"True weight: {W_true:.0f} N")
+print(f"a = +3 m/s² (up): N = {m*(g+3):.0f} N (heavier)")
+print(f"a =  0 m/s²: N = {m*(g+0):.0f} N (normal)")
+print(f"a = -3 m/s² (down): N = {m*(g-3):.0f} N (lighter)")
+print(f"a = -g (free fall): N = {m*(g-g):.0f} N (weightless)")`,
+          prose: [
+            'N_apparent = m * (g + a_values) implements ΣF = ma → N − mg = ma → N = m(g + a). When a > 0 (accelerating up), N > mg — you feel heavier. When a < 0 (accelerating down), N < mg — you feel lighter.',
+            'The plot crosses W_true (dashed line) at a = 0: this is the "resting in elevator" case where normal force exactly equals weight. The crossing at N = 0 (dotted red) is free fall: no contact force, you\'re weightless even though gravity still acts.',
+            'The key insight: the scale doesn\'t measure gravity — it measures the contact force N. At a = −g (free fall), there is no contact force even though gravity (686 N on this person) is still present. Astronauts in orbit are in perpetual free fall — that\'s why they\'re weightless.',
+          ],
+        },
+        {
+          cellTitle: 'Variable force integration: F(t) = 6t N',
+          type: 'code',
+          language: 'python',
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+# F(t) = 6t N acting on m = 2 kg, starting from rest
+m = 2.0  # kg
+# a(t) = F(t)/m = 3t  (time-varying — SUVAT doesn't apply!)
+
+t = np.linspace(0, 3, 300)
+F = 6 * t          # force increases linearly
+a = F / m          # a(t) = 3t
+v = 1.5 * t**2     # v(t) = ∫a dt = 3t²/2 = 1.5t² (from rest, v(0)=0)
+x = 0.5 * t**3     # x(t) = ∫v dt = t³/2 (from x(0)=0)
+
+fig, axes = plt.subplots(3, 1, figsize=(9, 9), sharex=True)
+axes[0].plot(t, F, 'r-', linewidth=2); axes[0].set_ylabel('F (N)'); axes[0].set_title('F(t) = 6t: linearly increasing force')
+axes[1].plot(t, a, 'b-', linewidth=2); axes[1].set_ylabel('a (m/s²)'); axes[1].set_title('a(t) = F/m = 3t: also linear (NOT constant!)')
+axes[2].plot(t, v, 'g-', linewidth=2); axes[2].set_ylabel('v (m/s)'); axes[2].set_xlabel('t (s)'); axes[2].set_title('v(t) = ∫a dt = 1.5t²: quadratic (not SUVAT!)')
+for ax in axes: ax.grid(True)
+plt.tight_layout(); plt.show()
+
+t_check = 3.0
+v_analytical = 1.5 * t_check**2
+print(f"At t=3s: F={6*t_check:.0f}N, a={3*t_check:.0f}m/s², v={v_analytical:.1f}m/s")
+print(f"SUVAT would give v = a*t = {3*t_check}*3 = {9*t_check:.0f} m/s — WRONG (a is not constant)")`,
+          prose: [
+            'v = 1.5 * t**2 is the analytical integral of a(t) = 3t: ∫3t dt = 3t²/2. This is a quadratic in time, NOT linear (v ≠ at) because acceleration is itself varying. SUVAT assumes constant a — it would give v = at = 3×3×3 = 27 m/s instead of the correct 13.5 m/s.',
+            'x = 0.5 * t**3 is the second integral: ∫(3t²/2) dt = t³/2. A cubic position function — not the parabola you\'d get from constant acceleration.',
+            'The three stacked plots show the full chain F → a → v. With F varying, a varies, and v is not simply proportional to t. The correct approach: always integrate when F or a is not constant.',
+          ],
+        },
+        {
+          cellTitle: 'Challenge: measure mass from force-acceleration data',
+          type: 'code',
+          language: 'python',
+          challengeType: 'write',
+          starterCode: `import numpy as np
+import matplotlib.pyplot as plt
+
+# Experimental data: known force applied to unknown mass
+# From F = ma: m = F/a → fit the slope
+np.random.seed(0)
+F_applied = np.array([5, 10, 15, 20, 25, 30, 35, 40])  # N
+# True mass = 4.2 kg; add noise to simulate real measurement
+a_measured = F_applied / 4.2 + np.random.normal(0, 0.15, len(F_applied))
+
+# TODO:
+# 1. Plot a_measured vs F_applied with error bars (use std=0.15)
+# 2. Fit a line through origin: a = F/m → find m from slope
+#    Hint: np.polyfit(F_applied, a_measured, 1) gives [slope, intercept]
+#    slope = 1/m, so m_estimated = 1/slope
+# 3. Plot the best-fit line overlaid on the data
+# 4. Print the estimated mass and compare to the true value (4.2 kg)
+`,
+        },
+      ],
+    },
+    matlab: {
+      type: 'OpenMatNotebook',
+      title: "Newton's Second Law in MATLAB/Octave",
+      cells: [
+        {
+          cellTitle: 'F = ma relationships',
+          type: 'code',
+          language: 'matlab',
+          code: `% F = ma: three plots showing the relationships
+m_fixed = 5; F_fixed = 20; a_fixed = 3;
+F_vals = linspace(0, 50, 200);
+m_vals = linspace(0.5, 10, 200);
+
+figure;
+subplot(1,3,1);
+plot(F_vals, F_vals/m_fixed, 'b-', 'LineWidth', 2);
+xlabel('F_{net} (N)'); ylabel('a (m/s^2)');
+title(sprintf('a = F/m  (m = %d kg)', m_fixed)); grid on;
+
+subplot(1,3,2);
+plot(m_vals, F_fixed./m_vals, 'r-', 'LineWidth', 2);
+xlabel('m (kg)'); ylabel('a (m/s^2)');
+title(sprintf('a = F/m  (F = %d N)', F_fixed)); grid on;
+
+subplot(1,3,3);
+plot(m_vals, a_fixed*m_vals, 'g-', 'LineWidth', 2);
+xlabel('m (kg)'); ylabel('F = ma (N)');
+title(sprintf('F = ma  (a = %d m/s^2)', a_fixed)); grid on;`,
+          prose: [
+            'F_vals / m_fixed computes a = F/m for a vector of force values with scalar mass. MATLAB broadcasts the scalar m_fixed across the vector. The result is a straight line: doubling F doubles a.',
+            'F_fixed ./ m_vals (with ./) divides scalar F by each element of m_vals. The hyperbolic (1/m) shape shows the inverse relationship: heavier objects accelerate less under the same force.',
+            'a_fixed * m_vals computes F = ma — how much force you need to achieve fixed acceleration across different masses. Linear in mass: 10 kg needs 3× the force of a 3.3 kg object for the same 3 m/s² acceleration.',
+          ],
+        },
+        {
+          cellTitle: 'Elevator apparent weight',
+          type: 'code',
+          language: 'matlab',
+          code: `m = 70; g = 9.8;
+W_true = m * g;
+a_vals = linspace(-g, g, 300);
+N_vals = m * (g + a_vals);  % N = m(g+a)
+
+figure;
+plot(a_vals, N_vals, 'b-', 'LineWidth', 2);
+hold on;
+yline(W_true, 'k--', sprintf('True weight = %.0f N', W_true), 'LineWidth', 1.5);
+yline(0, 'r:', 'Weightless', 'LineWidth', 1.5);
+xlabel('Acceleration (m/s^2)'); ylabel('Scale reading N (N)');
+title(sprintf('Apparent weight: N = m(g+a)  (m=%d kg)', m)); grid on;
+
+% Key points
+key_a = [g, 3, 0, -3, -g];
+scatter(key_a, m*(g+key_a), 80, 'r', 'filled');
+fprintf('\\nScale readings:\\n');
+for a = key_a
+    fprintf('  a=%+.1f m/s^2: N = %.0f N\\n', a, m*(g+a));
+end`,
+          prose: [
+            'N_vals = m * (g + a_vals) implements N = m(g + a) — the normal force equation from ΣF = N − mg = ma. When a > 0 (accelerating up), N > mg; when a < 0 (accelerating down), N < mg.',
+            'yline() draws horizontal reference lines at W_true and 0. The intersection with the curve at a = 0 is the stationary case (N = mg). The intersection with N = 0 line is free fall (a = −g): no contact force even though gravity still acts.',
+            'The scatter points mark key elevator states. The print loop shows the exact scale readings: accelerating up at g gives N = 2W (double weight); free fall gives N = 0 (weightless).',
+          ],
+        },
+        {
+          cellTitle: 'Variable force: F(t) = 6t',
+          type: 'code',
+          language: 'matlab',
+          code: `% F(t) = 6t N on m = 2 kg — must integrate, SUVAT fails
+m = 2;
+t = linspace(0, 3, 300);
+F = 6 * t;           % F(t) = 6t
+a = F / m;           % a(t) = 3t
+v = 1.5 * t.^2;      % v(t) = ∫a dt = 3t²/2
+x = 0.5 * t.^3;      % x(t) = ∫v dt = t³/2
+
+figure;
+subplot(3,1,1); plot(t, F, 'r-', 'LineWidth', 2); ylabel('F (N)');
+title('Variable force F(t) = 6t on m = 2 kg'); grid on;
+subplot(3,1,2); plot(t, a, 'b-', 'LineWidth', 2); ylabel('a (m/s^2)');
+title('a(t) = 3t: NOT constant — SUVAT invalid'); grid on;
+subplot(3,1,3); plot(t, v, 'g-', 'LineWidth', 2); ylabel('v (m/s)'); xlabel('t (s)');
+title('v(t) = 1.5t^2 (from integration)'); grid on;
+
+fprintf('At t=3s: v_correct=%.1f m/s\\n', 1.5*9);
+fprintf('SUVAT gives: v = a*t = 9*3 = %.0f m/s — WRONG!\\n', 9*3);`,
+          prose: [
+            'v = 1.5 * t.^2 is the analytical integral of a = 3t. The .^2 squares each element of t. This is a parabola in time — v grows quadratically, not linearly, because a itself is increasing.',
+            'The three stacked subplots show the chain: F(t) is linear, a(t) = F/m is also linear, but v(t) = ∫a dt is quadratic. Each integration adds one power of t.',
+            'The fprintf comparison shows why SUVAT fails: it would predict v = at = 9×3 = 27 m/s, while the correct answer from integration is v = 1.5×9 = 13.5 m/s. SUVAT treats a as constant; here a varies with time.',
+          ],
+        },
+        {
+          cellTitle: 'Challenge: measure mass from experimental data',
+          type: 'code',
+          language: 'matlab',
+          challengeType: 'write',
+          starterCode: `% Measure mass from F vs a data using F = ma → slope = 1/m
+rng(0);
+F_applied = [5, 10, 15, 20, 25, 30, 35, 40];   % N (known)
+a_measured = F_applied / 4.2 + 0.15*randn(1, length(F_applied));  % noisy
+
+% TODO:
+% 1. Plot a_measured vs F_applied with scatter()
+% 2. Fit: p = polyfit(F_applied, a_measured, 1) → slope = p(1) = 1/m
+% 3. m_estimated = 1/p(1)
+% 4. Overlay the fit line: plot(F_applied, polyval(p, F_applied))
+% 5. Print m_estimated vs true value 4.2 kg
+`,
+        },
+      ],
+    },
+  },
+};

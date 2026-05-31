@@ -564,4 +564,355 @@ Third Law pair: the action and reaction forces always act on DIFFERENT objects. 
   viz: [
     { id: 'SVGDiagram', props: { type: 'action-reaction' }, title: 'Action-reaction force pairs' },
   ],
-}
+
+  misconceptions: [
+    {
+      id: 'p4-003-m1',
+      misconception: 'Action-reaction pairs cancel each other, so they always result in zero net force and no motion.',
+      correction: 'Action-reaction forces act on DIFFERENT objects and can NEVER be on the same free-body diagram. They cannot cancel because they don\'t act on the same object. A horse pulling a cart: the horse pulls the cart forward (on the cart); the cart pulls the horse backward (on the horse). These are on different FBDs. Whether the horse accelerates forward depends on the forces on the HORSE only (ground friction forward beats cart tension backward).',
+      correctionExample: 'Book on table: gravity pulls book down (on book); book pulls Earth up (on Earth). Table pushes book up (on book); book pushes table down (on table). The two forces on the BOOK — gravity and normal — are NOT a 3rd law pair; they just happen to be equal. The 3rd law pairs involve the Earth and the table.',
+    },
+    {
+      id: 'p4-003-m2',
+      misconception: 'A stronger, heavier object exerts a larger force on a lighter object than the lighter object exerts back.',
+      correction: 'Newton\'s Third Law is absolute: the forces are EQUAL in magnitude regardless of mass or strength. A truck hitting a mosquito: the truck exerts exactly the same force on the mosquito as the mosquito exerts on the truck. The truck barely decelerates (huge mass); the mosquito is destroyed (tiny mass). Same force, very different accelerations because a = F/m and m differs enormously.',
+      correctionExample: 'Earth pulling you down: F = mg ≈ 700 N. You pull Earth upward with the same 700 N. Earth\'s acceleration = 700/(6×10²⁴) ≈ 10⁻²² m/s² — immeasurably small. Equal forces, wildly different outcomes.',
+    },
+  ],
+
+  transferPrompts: [
+    {
+      id: 'p4-003-t1',
+      prompt: `A rocket in space fires its engines, expelling hot gas backward. There is no air to "push against." How does Newton\'s Third Law explain how the rocket accelerates? Specifically, identify the action-reaction pair and explain why ejecting more mass at higher speed produces more thrust.`,
+      connection: 'Rocket on exhaust gas (action) → exhaust gas on rocket (reaction). Thrust = rate of momentum transfer: F = Δ(mv)/Δt. Newton\'s 3rd law enables propulsion without anything to push against.',
+    },
+    {
+      id: 'p4-003-t2',
+      prompt: `During a head-on car collision between a 2000 kg SUV and a 1000 kg compact car, both come to rest. The SUV driver claims "we hit them harder — our car weighs more." The compact car driver claims "they hit us with a bigger force." Who is right? Use Newton\'s Third Law and then F = ma to explain why the compact car occupants experience more dangerous accelerations.`,
+      connection: 'Same force (3rd law), but a = F/m: smaller car mass → larger acceleration → more dangerous deceleration for occupants. The 3rd law gives equal forces; physics determines unequal consequences.',
+    },
+  ],
+
+  debugging: [
+    {
+      id: 'p4-003-d1',
+      error: `A student draws a free-body diagram for a horse pulling a cart. They include: (1) tension from the rope on the horse, (2) ground friction on the horse, AND (3) the horse's pull on the cart (reaction force). The student says "the horse can't accelerate because forces 1 and 3 cancel."`,
+      fix: `Force (3) — the horse's pull on the cart — belongs on the CART's free-body diagram, not the horse's. You never put action-reaction pairs on the same FBD. The horse's FBD has: ground friction (forward) and rope tension (backward). If friction > tension: net force forward → horse accelerates. The cart's FBD separately has: rope tension (forward) and maybe friction (backward).`,
+    },
+    {
+      id: 'p4-003-d2',
+      error: `A student identifies the 3rd law pair for a book resting on a table as: "gravity pulls the book down (action) and the table pushes the book up (reaction)."`,
+      fix: `These are NOT a Newton's Third Law pair. A 3rd law pair must be: the same type of force, between the same two objects, equal and opposite.
+The actual 3rd law pairs are:
+1. Earth pulls book down (gravity) ↔ book pulls Earth up (gravity)
+2. Table pushes book up (normal) ↔ book pushes table down (normal)
+
+The gravity (Earth) and normal force (table) are different types of forces from different sources — they are NOT a 3rd law pair, even though they happen to be equal (because the book is in equilibrium).`,
+    },
+  ],
+
+  mastery: {
+    targetLevel: 'Correctly identify Newton\'s Third Law pairs; recognize that action-reaction forces act on different objects; explain why 3rd law pairs never appear on the same FBD.',
+    checklistItems: [
+      'Can identify the exact 3rd law pair for any given force: same magnitude, opposite direction, same type of force, different objects',
+      'Can explain why action-reaction forces do NOT cancel: they act on different objects',
+      'Can draw separate FBDs for interacting objects and correctly include only forces acting ON that object',
+      'Can explain rocket propulsion, walking, and swimming using Newton\'s Third Law',
+    ],
+    commonStruggles: [
+      'Putting action-reaction forces on the same FBD — they always belong on different diagrams',
+      'Identifying "gravity + normal force on book" as a 3rd law pair — they are two different kinds of force from two different sources',
+      'Thinking heavier objects exert more force in collisions — 3rd law forces are always equal regardless of mass',
+    ],
+    nextSteps: 'Lesson p4-004 (Free Body Diagrams) systematizes the process of identifying all forces on an object correctly.',
+  },
+
+  semantics: {
+    core: [
+      { symbol: 'F_{AB} = -F_{BA}', meaning: 'Newton\'s 3rd Law: force of A on B equals and opposes force of B on A — always equal magnitude, opposite direction' },
+      { symbol: '\\text{same type, different objects}', meaning: 'Rule for 3rd law pairs: gravity↔gravity, normal↔normal, tension↔tension — and ALWAYS on separate objects' },
+      { symbol: 'F_{\\text{on cart}}', meaning: 'Subscript notation: force acting ON the cart — always specify which object the force acts on when using 3rd law' },
+    ],
+    rulesOfThumb: [
+      '3rd law pairs: same type of force, same magnitude, opposite direction, on DIFFERENT objects.',
+      'Action-reaction pairs never appear on the same free-body diagram — they act on different objects.',
+      'Mass doesn\'t affect the force magnitude in a 3rd law pair. A bug and a truck exchange equal forces.',
+      'To find the 3rd law partner of "Earth pulls book down (gravity)": "book pulls Earth up (gravity)." Swap the names.',
+      'Walking works because the floor pushes you forward (reaction) when you push backward on the floor (action).',
+    ],
+  },
+
+  notebooks: {
+    python: {
+      type: 'PythonNotebook',
+      title: "Newton's Third Law in Python",
+      cells: [
+        {
+          cellTitle: 'Action-reaction: equal forces, unequal accelerations',
+          type: 'code',
+          language: 'python',
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+# Collision: truck (2000 kg) hits compact car (1000 kg)
+# Newton's 3rd Law: both experience the same magnitude force during collision
+m_truck = 2000   # kg
+m_compact = 1000 # kg
+
+# Impulse = F*Δt = Δp. Both experience the same impulse magnitude.
+# If both start at v_truck=20 m/s, v_compact=0 (compact at rest), find velocities after
+# Using momentum conservation: m1*v1 + m2*v2 = (m1+m2)*v_final (perfectly inelastic)
+v_truck_i = 20   # m/s (initial)
+v_compact_i = 0
+
+v_final = (m_truck * v_truck_i + m_compact * v_compact_i) / (m_truck + m_compact)
+
+# Impulse on each car (from momentum change): J = Δp = m*Δv
+J_truck   = m_truck   * (v_final - v_truck_i)     # negative (slowed)
+J_compact = m_compact * (v_final - v_compact_i)   # positive (sped up)
+
+# 3rd Law: same force magnitude during collision
+delta_t = 0.05  # s (collision duration)
+F_on_compact = J_compact / delta_t
+F_on_truck   = J_truck   / delta_t
+
+print("Newton's Third Law: action-reaction in a collision")
+print(f"Compact car mass: {m_compact} kg,  Truck mass: {m_truck} kg")
+print(f"Before: v_truck = {v_truck_i} m/s,  v_compact = {v_compact_i} m/s")
+print(f"After:  both at v_final = {v_final:.2f} m/s")
+print()
+print(f"Impulse on compact: {J_compact:.0f} N·s  →  Force = {F_on_compact:.0f} N")
+print(f"Impulse on truck:   {J_truck:.0f} N·s  →  Force = {F_on_truck:.0f} N")
+print(f"Force ratio: {abs(F_on_compact/F_on_truck):.3f}  (should be exactly 1.0 — 3rd Law!)")
+print()
+# Accelerations differ because masses differ!
+a_compact = F_on_compact / m_compact
+a_truck   = F_on_truck   / m_truck
+print(f"Acceleration of compact: {abs(a_compact):.2f} m/s²")
+print(f"Acceleration of truck:   {abs(a_truck):.2f} m/s²")
+print(f"Ratio: {abs(a_compact/a_truck):.1f}x — compact experiences {abs(a_compact/a_truck):.0f}× more acceleration!")`,
+          prose: [
+            'v_final = (m_truck*v_i + m_compact*0) / (m_truck + m_compact) is the perfectly inelastic collision formula from momentum conservation. Both objects end up at the same velocity when they stick together.',
+            'J_truck = m_truck*(v_final - v_truck_i) and J_compact = m_compact*(v_final - v_compact_i) compute the impulse on each vehicle. The 3rd Law says |J_truck| = |J_compact| — the impulses are equal in magnitude (opposite sign because they point in opposite directions).',
+            'The key result: same force (same impulse), but a = F/m gives different accelerations. The compact car is half the mass, so it experiences twice the acceleration. This is why smaller cars are more dangerous in collisions — same force, more violent deceleration.',
+          ],
+        },
+        {
+          cellTitle: 'Rocket propulsion: no air needed',
+          type: 'code',
+          language: 'python',
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+# Rocket: ejects mass at exhaust velocity v_e, gaining speed via 3rd Law
+# Tsiolkovsky rocket equation: Δv = v_e * ln(m_0/m_f)
+v_exhaust = 3000  # m/s (typical chemical rocket)
+m_0 = 1000        # kg (initial: rocket + fuel)
+m_propellant = np.linspace(0, 900, 300)  # kg of propellant burned
+m_current = m_0 - m_propellant
+delta_v = v_exhaust * np.log(m_0 / m_current)
+
+plt.figure(figsize=(8, 5))
+plt.plot(m_propellant / m_0 * 100, delta_v / 1000, 'b-', linewidth=2)
+plt.xlabel('Propellant burned (% of initial mass)')
+plt.ylabel('Δv (km/s)')
+plt.title(f'Tsiolkovsky rocket equation: Δv = v_e × ln(m₀/m_f)  [v_e = {v_exhaust/1000:.0f} km/s]')
+plt.grid(True)
+plt.axhline(7.8, color='r', linestyle='--', label='Orbital velocity ≈ 7.8 km/s')
+plt.legend()
+plt.show()
+
+# Find propellant fraction needed for orbit
+frac_needed = 1 - np.exp(-7800 / v_exhaust)
+print(f"To reach orbit (Δv=7.8 km/s): burn {frac_needed*100:.0f}% of initial mass as propellant")
+print(f"For m0=1000 kg: only {(1-frac_needed)*1000:.0f} kg makes it to orbit")`,
+          prose: [
+            'delta_v = v_exhaust * np.log(m_0 / m_current) implements the Tsiolkovsky rocket equation: Δv = v_e ln(m₀/m_f). This is derived from Newton\'s 3rd Law applied to continuous propellant ejection — each bit of exhaust pushes the rocket forward.',
+            'The logarithm means diminishing returns: burning the first 50% of your mass gives much more Δv than burning the next 50%. This is why rockets are mostly fuel — you need to carry fuel to burn later, which costs more fuel to lift now.',
+            'The red dashed line shows orbital velocity (~7.8 km/s). With v_exhaust = 3000 m/s, you need to burn about 92% of your initial mass as propellant. This is why multi-stage rockets exist — drop empty tanks to reduce mass and improve the ratio.',
+          ],
+        },
+        {
+          cellTitle: 'Identifying 3rd Law pairs in a scene',
+          type: 'code',
+          language: 'python',
+          code: `# Newton's 3rd Law pair identifier
+# Given a force, find its 3rd law partner
+
+def find_3rd_law_pair(force_description):
+    """
+    A 3rd Law pair has: same type, same magnitude, opposite direction, different objects.
+    Input format: "Object A exerts [type] force on Object B"
+    """
+    # Examples of 3rd law pairs
+    pairs = [
+        ("Earth pulls book down (gravity)",   "Book pulls Earth up (gravity)"),
+        ("Table pushes book up (normal)",     "Book pushes table down (normal)"),
+        ("Person pushes floor backward",       "Floor pushes person forward (reaction)"),
+        ("Rocket pushes exhaust backward",    "Exhaust pushes rocket forward"),
+        ("Truck pushes compact car forward",  "Compact car pushes truck backward"),
+        ("Horse pulls cart forward (tension)", "Cart pulls horse backward (tension)"),
+    ]
+
+    print("Common 3rd Law Pairs:")
+    print("="*65)
+    for action, reaction in pairs:
+        print(f"  ACTION:   {action}")
+        print(f"  REACTION: {reaction}")
+        print(f"  → Same type, equal magnitude, opposite direction, different objects")
+        print()
+
+    print("Key rule: swap the two object names in the force description.")
+    print("The reaction is: [Object B] exerts the SAME TYPE of force on [Object A]")
+    print("              in the OPPOSITE direction.")
+
+find_3rd_law_pair(None)`,
+          prose: [
+            'The pairs dictionary captures the essential pattern: each 3rd law pair involves the same type of force (gravity↔gravity, normal↔normal, tension↔tension) between the same two objects. The only thing that changes is direction.',
+            'The "swap the names" rule is the practical algorithm: to find the 3rd law partner of "Earth pulls book down (gravity)", swap Earth and book: "book pulls Earth up (gravity)." This always works.',
+            'The "Floor pushes person forward" example explains walking: you push backward on the floor (action), the floor pushes you forward (reaction). Without a surface to push against, you cannot accelerate forward — this is why you can\'t walk on perfectly frictionless ice.',
+          ],
+        },
+        {
+          cellTitle: 'Challenge: system of two connected blocks',
+          type: 'code',
+          language: 'python',
+          challengeType: 'write',
+          starterCode: `import numpy as np
+
+# Two blocks connected by a string on a frictionless surface
+# Block A (m_A = 3 kg) is pulled right by F = 12 N
+# Block B (m_B = 2 kg) is connected behind A by string tension T
+# Newton's 3rd Law: A pulls B forward via T; B pulls A backward via T
+
+m_A = 3.0  # kg
+m_B = 2.0  # kg
+F = 12.0   # N applied to A
+
+# TODO:
+# 1. Treat system as one object: a = F / (m_A + m_B)
+# 2. Find tension T from FBD of block B alone: T = m_B * a
+# 3. Verify from FBD of block A: F - T = m_A * a (should be consistent)
+# 4. Print a and T
+# 5. Identify the 3rd law pair involving the string tension
+`,
+        },
+      ],
+    },
+    matlab: {
+      type: 'OpenMatNotebook',
+      title: "Newton's Third Law in MATLAB/Octave",
+      cells: [
+        {
+          cellTitle: 'Collision: equal forces, unequal accelerations',
+          type: 'code',
+          language: 'matlab',
+          code: `% Newton's 3rd Law: same collision force on truck and compact car
+m_truck = 2000; m_compact = 1000;  % kg
+v_truck_i = 20; v_compact_i = 0;   % m/s
+
+% Perfectly inelastic collision (they stick)
+v_final = (m_truck*v_truck_i + m_compact*v_compact_i) / (m_truck + m_compact);
+
+dt = 0.05;  % collision duration (s)
+J_compact = m_compact * (v_final - v_compact_i);  % impulse on compact
+J_truck   = m_truck   * (v_final - v_truck_i);    % impulse on truck
+
+F_compact = J_compact / dt;
+F_truck   = J_truck   / dt;
+
+a_compact = abs(F_compact) / m_compact;
+a_truck   = abs(F_truck)   / m_truck;
+
+fprintf("Force on compact:  %.0f N\\n", F_compact);
+fprintf("Force on truck:    %.0f N\\n", F_truck);
+fprintf("Force ratio: %.3f (should be 1.0 — 3rd Law!)\\n", abs(F_compact/F_truck));
+fprintf("Accel compact: %.2f m/s^2  vs  truck: %.2f m/s^2\\n", a_compact, a_truck);
+fprintf("Compact sees %.1fx more acceleration!\\n", a_compact/a_truck);`,
+          prose: [
+            'The impulse on each vehicle is computed from momentum change: J = mΔv. The 3rd Law says these impulses are equal in magnitude — abs(F_compact/F_truck) prints exactly 1.000.',
+            'a_compact = abs(F_compact)/m_compact and a_truck = abs(F_truck)/m_truck apply F = ma to each vehicle separately. Same force, but m_compact = m_truck/2 means a_compact = 2×a_truck.',
+            'The factor-of-2 difference in acceleration is why the compact car is more dangerous: same energy of collision, same force, but occupants of the lighter car experience twice the deceleration. This is physics, not just engineering.',
+          ],
+        },
+        {
+          cellTitle: 'Rocket equation: Tsiolkovsky',
+          type: 'code',
+          language: 'matlab',
+          code: `% Rocket equation: Δv = v_e * ln(m0/mf) — from Newton's 3rd Law
+v_e = 3000;  % m/s exhaust velocity
+m_0 = 1000;  % kg initial mass
+prop_pct = linspace(0, 90, 300);  % % propellant burned
+m_f = m_0 * (1 - prop_pct/100);
+delta_v = v_e * log(m_0 ./ m_f);   % log = natural log in MATLAB
+
+figure;
+plot(prop_pct, delta_v/1000, 'b-', 'LineWidth', 2);
+hold on;
+yline(7.8, 'r--', 'Orbital velocity 7.8 km/s', 'LineWidth', 1.5);
+xlabel('Propellant burned (% initial mass)');
+ylabel('\Deltav (km/s)');
+title(sprintf('Tsiolkovsky rocket equation (v_e = %d m/s)', v_e));
+grid on;
+
+frac_needed = 1 - exp(-7800/v_e);
+fprintf('To reach orbit: burn %.0f%% of initial mass\\n', frac_needed*100);
+fprintf('Payload fraction: %.0f%%\\n', (1-frac_needed)*100);`,
+          prose: [
+            'delta_v = v_e * log(m_0 ./ m_f) applies the Tsiolkovsky equation. Note: log in MATLAB is the natural logarithm (ln), not log base 10. The ./ divides m_0 by each element of the vector m_f.',
+            'The logarithmic growth means each additional unit of Δv costs exponentially more propellant. Reaching orbital velocity (7.8 km/s) requires burning ~92% of the initial mass — leaving only ~8% as payload.',
+            'yline() marks the orbital velocity target. The intersection of the curve with the dashed line shows exactly what propellant fraction is needed. This is why rockets have multiple stages — drop empty tanks and launch a lighter second stage.',
+          ],
+        },
+        {
+          cellTitle: '3rd Law pair analysis',
+          type: 'code',
+          language: 'matlab',
+          code: `% Analyze forces in a book-on-table scenario
+m_book = 0.5;  % kg
+g = 9.8;
+
+% All forces and their 3rd law partners
+fprintf('Book-on-Table: Force Pairs Analysis\\n');
+fprintf('=====================================\\n');
+fprintf('Object: BOOK\\n');
+fprintf('  F1 = Earth pulls book down: F = %.2f N (downward)\\n', m_book*g);
+fprintf('  F2 = Table pushes book up:  F = %.2f N (upward)\\n', m_book*g);
+fprintf('  Net force on book: %.2f N -> equilibrium\\n\\n', 0);
+
+fprintf('3rd Law PARTNERS (NOT on same FBD):\\n');
+fprintf('  Partner of F1: Book pulls Earth up: %.2f N (gravity, upward)\\n', m_book*g);
+fprintf('  Partner of F2: Book pushes table down: %.2f N (normal, downward)\\n\\n', m_book*g);
+
+fprintf('COMMON ERROR: F1 and F2 (gravity and normal on book)\\n');
+fprintf('are NOT a 3rd law pair!\\n');
+fprintf('  - They are different types of force (gravity vs contact)\\n');
+fprintf('  - They involve different second objects (Earth vs table)\\n');
+fprintf('  - They ARE equal because book is in equilibrium, not because 3rd law\\n');`,
+          prose: [
+            'The fprintf statements spell out all force relationships explicitly. The book has TWO forces on its FBD (gravity down, normal up) — they are equal because the book is in equilibrium (ΣF = 0), NOT because they are a 3rd law pair.',
+            'The 3rd law partners are on DIFFERENT objects: "Earth pulls book" pairs with "book pulls Earth" (both gravitational); "Table pushes book" pairs with "book pushes table" (both normal force).',
+            'The common error section explicitly names the confusion students make. F1 and F2 are NOT a 3rd law pair even though they are equal in magnitude: they are different force types from different sources. They happen to be equal because equilibrium forces balance, not because of the 3rd law.',
+          ],
+        },
+        {
+          cellTitle: 'Challenge: two-block system',
+          type: 'code',
+          language: 'matlab',
+          challengeType: 'write',
+          starterCode: `% Two blocks connected by a string on frictionless surface
+% Block A (m_A=3 kg) pulled by F=12 N; Block B (m_B=2 kg) behind A
+m_A = 3; m_B = 2; F = 12;
+
+% TODO:
+% 1. Compute system acceleration: a = F/(m_A + m_B)
+% 2. FBD of block B: only T acts → T = m_B * a
+% 3. FBD of block A: F - T = m_A * a (verify consistency)
+% 4. Print a and T
+% 5. Identify the 3rd law pair: A pulls B forward (T) → B pulls A backward (-T)
+`,
+        },
+      ],
+    },
+  },
+};

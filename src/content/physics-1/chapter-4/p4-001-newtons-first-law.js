@@ -449,4 +449,379 @@ export default {
   viz: [
     { id: 'SVGDiagram', props: { type: 'kinematic-chain' }, title: 'The kinematics chain — forces drive acceleration' },
   ],
-}
+
+  misconceptions: [
+    {
+      id: 'p4-001-m1',
+      misconception: 'An object moving at constant velocity must have a force pushing it forward.',
+      correction: 'Constant velocity means zero acceleration, which means zero NET force. No forward force is needed to maintain constant velocity — only to overcome friction (if friction exists). In the absence of friction, zero force produces constant velocity. This is the exact content of Newton\'s First Law, and the thing Aristotle got wrong for 2000 years.',
+      correctionExample: 'A hockey puck on frictionless ice: no applied force, yet it slides forever at constant speed. A spacecraft in deep space: engines off, zero net force, yet it maintains 2000 m/s indefinitely.',
+    },
+    {
+      id: 'p4-001-m2',
+      misconception: 'An object at rest has no forces acting on it.',
+      correction: 'An object at rest often has multiple forces acting on it — they simply cancel. A book on a table has gravity (down) AND normal force (up). Both are real forces. The NET force is zero, which is why the acceleration is zero. "Zero net force" does not mean "zero forces."',
+      correctionExample: 'Book on table: F_gravity = 10 N down, F_normal = 10 N up. ΣF = 0. Two real forces, zero net force, zero acceleration.',
+    },
+  ],
+
+  transferPrompts: [
+    {
+      id: 'p4-001-t1',
+      prompt: `In special relativity, Einstein showed there is no experiment you can do inside a sealed box to determine whether you are at rest or moving at constant velocity — only acceleration is detectable without looking outside. How does this connect to Newton\'s First Law? What does "inertial reference frame" mean in the context of both Newton\'s mechanics and Einstein\'s relativity?`,
+      connection: 'Newton\'s First Law says rest and constant velocity are physically equivalent (same net force = 0). Einstein\'s principle of relativity elevates this to a fundamental symmetry of physics.',
+    },
+    {
+      id: 'p4-001-t2',
+      prompt: `A curling stone slides down an ice sheet toward the target. Sweepers brush the ice to reduce friction and steer the stone. Without sweeping, friction gradually decelerates the stone. With vigorous sweeping (near-zero friction), the stone barely decelerates. How does this real sport illustrate Newton\'s First Law? What would happen in the limit of perfectly frictionless ice?`,
+      connection: 'Curling makes Galileo\'s thought experiment physical: reduce friction → stone travels farther. Zero friction → stone never stops. The First Law is the zero-friction limit.',
+    },
+  ],
+
+  debugging: [
+    {
+      id: 'p4-001-d1',
+      error: `A student writes: "A book slides across a table at 2 m/s. Since it's moving, there must be a net force of F = ma = 1 kg × 2 m/s = 2 N pushing it."`,
+      fix: `The student confused velocity with acceleration. F = ma uses ACCELERATION, not velocity. Moving at constant velocity means a = 0, so F_net = m × 0 = 0 N. The book is decelerating to a stop because FRICTION provides a net force — not because of its velocity. If the table were frictionless, the book would continue at 2 m/s with zero net force forever.`,
+    },
+    {
+      id: 'p4-001-d2',
+      error: `A student testing for equilibrium: "ΣFx = 10 − 6 = 4 N. Since 4 ≠ 0, the object is not in equilibrium." The forces are: 10 N right, 6 N left, 8 N up, 8 N down.`,
+      fix: `The student correctly found ΣFx = +4 N ≠ 0, so the object is NOT in equilibrium — the student's conclusion is actually correct. But the analysis is incomplete: ΣFy = 8 − 8 = 0 N. In 2D equilibrium, BOTH components must be zero. Here ΣFx ≠ 0, so the object accelerates horizontally even though it's in vertical equilibrium. Always check both components when testing for equilibrium.`,
+    },
+  ],
+
+  mastery: {
+    targetLevel: 'Correctly apply Newton\'s First Law: identify when net force is zero, recognize that constant velocity (including rest) requires zero net force, and explain the concept of inertia.',
+    checklistItems: [
+      'Can state Newton\'s First Law precisely: "an object remains at rest or moves at constant velocity unless acted upon by a non-zero net force"',
+      'Can identify the conditions for equilibrium (ΣF = 0) in both rest and constant-velocity situations',
+      'Can distinguish between "no force" and "no net force" — an object can have multiple forces and still be in equilibrium',
+      'Can recognize that the straight-line x(t) graph is the kinematic signature of zero net force',
+      'Can explain why Aristotle was wrong: friction was the hidden variable causing deceleration',
+    ],
+    commonStruggles: [
+      'Confusing velocity and acceleration: moving objects don\'t require a net force — only accelerating objects do',
+      'Assuming objects at rest have no forces — they often have multiple balanced forces',
+    ],
+    nextSteps: 'Lesson p4-002 (Newton\'s Second Law) answers: when net force IS non-zero, exactly how much acceleration results?',
+  },
+
+  semantics: {
+    core: [
+      { symbol: '\\sum \\vec{F} = 0', meaning: 'Equilibrium condition — net force is zero; object is at rest or moving at constant velocity' },
+      { symbol: '\\vec{a} = 0', meaning: 'Zero acceleration — velocity is constant (not necessarily zero)' },
+      { symbol: 'm', meaning: 'Mass (kg) — scalar measure of inertia; resistance to change in velocity' },
+      { symbol: 'v = \\text{const}', meaning: 'Constant velocity (including v = 0) — the state when ΣF = 0' },
+      { symbol: 'x(t) = x_0 + v_0 t', meaning: 'Linear position function — the kinematic consequence of ΣF = 0 (straight line on x-t graph)' },
+    ],
+    rulesOfThumb: [
+      'Constant velocity (including rest) ↔ ΣF = 0. Moving does NOT require a net force.',
+      'Curved x-t graph always signals net force. Straight x-t always signals equilibrium.',
+      'At rest ≠ no forces acting. At rest means ΣF = 0, which allows many individual forces.',
+      'Mass quantifies inertia: larger mass → harder to start, harder to stop, harder to turn.',
+      'Friction is not inertia — it is a force that CAUSES deceleration. Inertia would maintain constant velocity without friction.',
+    ],
+  },
+
+  notebooks: {
+    python: {
+      type: 'PythonNotebook',
+      title: "Newton's First Law in Python",
+      cells: [
+        {
+          cellTitle: 'ΣF = 0 → x(t) is a straight line',
+          type: 'code',
+          language: 'python',
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+# Newton's First Law: zero net force → constant velocity → linear x(t)
+t = np.linspace(0, 5, 200)
+
+cases = [
+    {'label': 'At rest (v₀=0)', 'x0': 0, 'v0': 0},
+    {'label': 'Moving right (v₀=+3 m/s)', 'x0': 0, 'v0': 3},
+    {'label': 'Moving left (v₀=−2 m/s)', 'x0': 10, 'v0': -2},
+]
+
+fig, ax = plt.subplots(figsize=(8, 5))
+for case in cases:
+    x = case['x0'] + case['v0'] * t
+    ax.plot(t, x, linewidth=2, label=case['label'])
+
+ax.set_xlabel('Time t (s)')
+ax.set_ylabel('Position x (m)')
+ax.set_title("Newton's First Law: ΣF = 0 → x(t) is a straight line")
+ax.legend(); ax.grid(True)
+plt.show()
+
+print("All three are straight lines — the signature of zero net force.")
+print("A curved x(t) always signals a non-zero net force acting.")`,
+          prose: [
+            'x = case["x0"] + case["v0"] * t is Newton\'s First Law expressed kinematically: ΣF = 0 → a = 0 → v = constant → x = x₀ + v₀t. No acceleration term because net force is zero.',
+            'Three physically different situations (at rest, moving right, moving left) produce three different lines — but all are straight lines. Straightness on the x-t graph is the universal signature of zero net force.',
+            'This is what Galileo understood and Aristotle missed: on a frictionless surface, all three situations would persist forever. The moving-left line doesn\'t turn around; the moving-right line doesn\'t slow down. Friction was always causing the deceleration Aristotle observed, not some "natural tendency to stop."',
+          ],
+        },
+        {
+          cellTitle: 'Aristotle vs Galileo: friction is the hidden variable',
+          type: 'code',
+          language: 'python',
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+def simulate_friction(v0, mu_k, g=9.8, t_end=5, dt=0.005):
+    t_vals, x_vals, v_vals = [0], [0], [v0]
+    t, v, x = 0, v0, 0
+    while t < t_end and v > 0:
+        a = -mu_k * g          # friction deceleration: a = -μₖg
+        v = max(0, v + a * dt)
+        x = x + v * dt
+        t = t + dt
+        t_vals.append(t); v_vals.append(v); x_vals.append(x)
+    return np.array(t_vals), np.array(x_vals), np.array(v_vals)
+
+v0 = 5  # initial speed (m/s)
+scenarios = [
+    ('Aristotle\'s rough table (μ=0.50)', 0.50),
+    ('Smooth floor (μ=0.10)', 0.10),
+    ('Near-frictionless (μ=0.01)', 0.01),
+]
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+t_frictionless = np.linspace(0, 5, 200)
+
+for label, mu in scenarios:
+    t_arr, x_arr, v_arr = simulate_friction(v0, mu)
+    ax1.plot(t_arr, x_arr, linewidth=2, label=label)
+    ax2.plot(t_arr, v_arr, linewidth=2, label=label)
+
+# Galileo's ideal: zero friction
+ax1.plot(t_frictionless, v0 * t_frictionless, 'k--', linewidth=2, label='Galileo (μ=0: v constant)')
+ax2.plot(t_frictionless, np.full_like(t_frictionless, v0), 'k--', linewidth=2, label='Galileo (μ=0)')
+
+for ax in [ax1, ax2]:
+    ax.legend(fontsize=8); ax.grid(True)
+ax1.set_xlabel('t (s)'); ax1.set_ylabel('x (m)'); ax1.set_title('Position: straight line only at μ=0')
+ax2.set_xlabel('t (s)'); ax2.set_ylabel('v (m/s)'); ax2.set_title('Velocity: constant only at μ=0 (First Law)')
+plt.tight_layout(); plt.show()`,
+          prose: [
+            'a = -mu_k * g computes the friction deceleration: F_friction = μmg, so a = F/m = μg. Each scenario has the same initial speed v0 = 5 m/s but different friction coefficients μ.',
+            'The velocity plot shows the key insight: as μ decreases, the object travels farther before stopping. In the limit μ → 0 (dashed line), the object never stops. Aristotle watched the rough-table case and generalized. Galileo extrapolated to zero friction.',
+            'The position plot shows straight lines only when friction is zero (Galileo\'s ideal). Every curved x-t line represents friction doing work to decelerate the object. The First Law holds exactly only when the net force is truly zero — which friction prevents in practice.',
+          ],
+        },
+        {
+          cellTitle: 'Checking equilibrium from force data',
+          type: 'code',
+          language: 'python',
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+# Check equilibrium: ΣF = 0? Analyze multiple force scenarios
+def check_equilibrium(forces, tol=0.01):
+    """forces: list of (Fx, Fy) tuples"""
+    Fx_net = sum(f[0] for f in forces)
+    Fy_net = sum(f[1] for f in forces)
+    F_net_mag = np.sqrt(Fx_net**2 + Fy_net**2)
+    in_equilibrium = F_net_mag < tol
+    return Fx_net, Fy_net, F_net_mag, in_equilibrium
+
+# Three scenarios
+scenarios = [
+    ('Book on table', [(0, -9.8), (0, 9.8)]),          # gravity + normal
+    ('Box being pushed (friction present)', [(20, 0), (-20, 0), (0, -49), (0, 49)]),  # ΣF=0
+    ('Accelerating box', [(30, 0), (-10, 0), (0, -49), (0, 49)]),   # ΣFx ≠ 0
+]
+
+for name, forces in scenarios:
+    Fx, Fy, Fmag, eq = check_equilibrium(forces)
+    print(f"{name}:")
+    print(f"  ΣFx = {Fx:.2f} N,  ΣFy = {Fy:.2f} N,  |ΣF| = {Fmag:.2f} N")
+    print(f"  Equilibrium? {eq} ({'zero acceleration' if eq else 'non-zero acceleration — will accelerate!'})")
+    print()`,
+          prose: [
+            'check_equilibrium(forces) computes the vector sum of all forces by summing x-components separately from y-components. This is the computational version of "ΣFx = 0 AND ΣFy = 0" — both conditions must hold for true equilibrium.',
+            'The "book on table" scenario has gravity (0, −9.8) and normal force (0, +9.8): ΣF = (0, 0). Two real forces cancel — this is the classic demonstration that "at rest" does not mean "no forces."',
+            'The "accelerating box" scenario has ΣFx = 20 N ≠ 0: this box will accelerate even though it\'s in vertical equilibrium. In 2D problems you must check BOTH axes independently — vertical balance doesn\'t guarantee horizontal balance.',
+          ],
+        },
+        {
+          cellTitle: 'Challenge: classify motion as inertial or accelerated',
+          type: 'code',
+          language: 'python',
+          challengeType: 'write',
+          starterCode: `import numpy as np
+import matplotlib.pyplot as plt
+
+# Position data from a sensor — is the motion inertial (ΣF=0) or accelerated?
+np.random.seed(42)
+t = np.linspace(0, 5, 50)
+
+# Dataset 1: inertial (v=3 m/s, no acceleration)
+x_inertial = 3*t + 1 + np.random.normal(0, 0.05, len(t))
+
+# Dataset 2: accelerated (a=2 m/s², v0=1 m/s)
+x_accel = 0.5*2*t**2 + 1*t + np.random.normal(0, 0.1, len(t))
+
+def classify_motion(t_data, x_data, threshold=0.1):
+    # TODO:
+    # 1. Fit degree-1 (linear) and degree-2 (quadratic) polynomials using np.polyfit
+    # 2. Compute residuals: mean squared error for each fit
+    # 3. If linear residual < threshold: return ("inertial", estimated_velocity)
+    # 4. Else: return ("net force detected", estimated_acceleration)
+    #    Hint: quadratic coeff c2 = a/2, so a = 2*c2
+    pass
+
+for name, x_data in [("Inertial?", x_inertial), ("Accelerated?", x_accel)]:
+    result = classify_motion(t, x_data)
+    print(f"{name}: {result}")
+`,
+        },
+      ],
+    },
+    matlab: {
+      type: 'OpenMatNotebook',
+      title: "Newton's First Law in MATLAB/Octave",
+      cells: [
+        {
+          cellTitle: 'ΣF = 0 → linear x(t)',
+          type: 'code',
+          language: 'matlab',
+          code: `% Newton's First Law: ΣF = 0 → constant velocity → linear x(t)
+t = linspace(0, 5, 200);
+
+cases = {0, 0, 'At rest (v0=0)'; 0, 3, 'Moving right (v0=3 m/s)'; 10, -2, 'Moving left (v0=-2 m/s)'};
+
+figure; hold on;
+for i = 1:size(cases,1)
+    x0 = cases{i,1}; v0 = cases{i,2}; label = cases{i,3};
+    x = x0 + v0 * t;   % x = x0 + v0*t: linear when a=0
+    plot(t, x, 'LineWidth', 2, 'DisplayName', label);
+end
+xlabel('Time t (s)'); ylabel('Position x (m)');
+title('First Law: ΣF=0 → x(t) is a straight line');
+legend; grid on;
+fprintf('Straight line = zero net force. Curved line = net force present.\\n');`,
+          prose: [
+            'x = x0 + v0 * t is the MATLAB implementation of x(t) = x₀ + v₀t. When acceleration a = 0 (ΣF = 0), position grows linearly with time. Three different initial conditions produce three different lines — but all straight.',
+            'The cell array cases stores {x0, v0, label} for each scenario. The loop plots all three on the same axes using hold on. Each case represents a different velocity (at rest, rightward, leftward), but all have the same physics: zero net force, constant velocity.',
+            'The key observation: straightness on the x-t graph is the diagnostic. If you measured position over time and got a straight line, you know net force was zero. Curvature means acceleration means net force — and Newton\'s Second Law applies.',
+          ],
+        },
+        {
+          cellTitle: 'Friction simulation: Aristotle to Galileo',
+          type: 'code',
+          language: 'matlab',
+          code: `% Simulate sliding under different friction levels
+v0 = 5; g = 9.8;
+mus = [0.50, 0.10, 0.01, 0.00];   % friction coefficients
+labels = {'Aristotle (mu=0.50)', 'Smooth (mu=0.10)', 'Near-frictionless (mu=0.01)', 'Galileo (mu=0)'};
+
+dt = 0.005; t_end = 5;
+figure;
+subplot(1,2,1); hold on;
+subplot(1,2,2); hold on;
+
+for i = 1:length(mus)
+    mu = mus(i);
+    if mu == 0
+        t_arr = linspace(0, t_end, 500);
+        x_arr = v0 * t_arr;
+        v_arr = v0 * ones(size(t_arr));
+    else
+        t_arr = 0; x = 0; v = v0;
+        x_arr = 0; v_arr = v0;
+        while t_arr(end) < t_end && v > 0
+            a = -mu * g;
+            v = max(0, v + a*dt);
+            x = x + v*dt;
+            t_arr(end+1) = t_arr(end) + dt;
+            x_arr(end+1) = x;
+            v_arr(end+1) = v;
+        end
+    end
+    subplot(1,2,1); plot(t_arr, x_arr, 'LineWidth', 2, 'DisplayName', labels{i});
+    subplot(1,2,2); plot(t_arr, v_arr, 'LineWidth', 2, 'DisplayName', labels{i});
+end
+
+subplot(1,2,1); xlabel('t (s)'); ylabel('x (m)');
+title('Position: straight only at mu=0'); legend('FontSize', 7); grid on;
+subplot(1,2,2); xlabel('t (s)'); ylabel('v (m/s)');
+title('Velocity: constant only at mu=0'); legend('FontSize', 7); grid on;`,
+          prose: [
+            'The loop varies friction coefficient mu from 0.50 (Aristotle\'s rough table) to 0.00 (Galileo\'s ideal). For each non-zero mu, the simulation integrates a = −μg step by step: MATLAB\'s loop performs Euler integration with dt = 0.005 s.',
+            'max(0, v + a*dt) ensures velocity never goes negative — the block stops when it reaches v = 0, not when the simulation says v < 0. This is physically correct: friction acts opposite to motion, not in the direction that would reverse motion.',
+            'The plots confirm Galileo\'s extrapolation: as mu → 0, the velocity curve approaches a flat horizontal line (constant velocity) and the position curve approaches a straight line. This is the First Law in the limit of zero friction.',
+          ],
+        },
+        {
+          cellTitle: 'Vector equilibrium check',
+          type: 'code',
+          language: 'matlab',
+          code: `% Check equilibrium: ΣFx = 0 AND ΣFy = 0?
+function [Fx_net, Fy_net, Fmag, in_eq] = check_eq(forces, tol)
+    if nargin < 2, tol = 0.01; end
+    Fx_net = sum(forces(:,1));
+    Fy_net = sum(forces(:,2));
+    Fmag = sqrt(Fx_net^2 + Fy_net^2);
+    in_eq = Fmag < tol;
+end
+
+% Scenario 1: Book on table
+f1 = [0, -9.8; 0, 9.8];   % gravity + normal
+[Fx, Fy, Fm, eq] = check_eq(f1);
+fprintf('Book on table: SigFx=%.2f N, SigFy=%.2f N, |SF|=%.2f N → eq=%d\\n', Fx, Fy, Fm, eq);
+
+% Scenario 2: Pushed box (friction balances applied force)
+f2 = [20, 0; -20, 0; 0, -49; 0, 49];   % push, friction, gravity, normal
+[Fx, Fy, Fm, eq] = check_eq(f2);
+fprintf('Balanced push:  SigFx=%.2f N, SigFy=%.2f N, |SF|=%.2f N → eq=%d\\n', Fx, Fy, Fm, eq);
+
+% Scenario 3: Unbalanced — net force right
+f3 = [30, 0; -10, 0; 0, -49; 0, 49];
+[Fx, Fy, Fm, eq] = check_eq(f3);
+fprintf('Net force right: SigFx=%.2f N, SigFy=%.2f N, |SF|=%.2f N → eq=%d\\n', Fx, Fy, Fm, eq);`,
+          prose: [
+            'The function check_eq takes a matrix where each row is one force [Fx, Fy] and sums the columns. sum(forces(:,1)) adds all x-components; sum(forces(:,2)) adds all y-components. This is the vector equilibrium check ΣFx = 0 AND ΣFy = 0.',
+            'Scenario 1 (book on table): [0, −9.8] + [0, +9.8] = [0, 0]. Two real forces cancel perfectly — the book has zero net force and zero acceleration even though forces are acting.',
+            'Scenario 3 confirms the 2D equilibrium rule: even though ΣFy = 0 (vertical balance), ΣFx = 20 N (horizontal imbalance). The box is in vertical equilibrium but NOT in horizontal equilibrium — it will accelerate rightward. Always check both components.',
+          ],
+        },
+        {
+          cellTitle: 'Challenge: classify motion from position data',
+          type: 'code',
+          language: 'matlab',
+          challengeType: 'write',
+          starterCode: `% Classify motion as inertial (ΣF=0) or accelerated from sensor data
+rng(42);
+t = linspace(0, 5, 50)';
+
+% Dataset 1: inertial
+x_inertial = 3*t + 1 + 0.05*randn(size(t));
+
+% Dataset 2: accelerated (a = 2 m/s²)
+x_accel = 0.5*2*t.^2 + t + 0.1*randn(size(t));
+
+function [classification, value] = classify_motion(t_data, x_data, threshold)
+    if nargin < 3, threshold = 0.1; end
+    % TODO:
+    % 1. p1 = polyfit(t_data, x_data, 1) — linear fit [v, x0]
+    % 2. p2 = polyfit(t_data, x_data, 2) — quadratic fit [a/2, v0, x0]
+    % 3. res1 = mean((polyval(p1, t_data) - x_data).^2) — linear residuals
+    % 4. If res1 < threshold: classification='inertial', value=p1(1) (velocity)
+    % 5. Else: classification='net force', value=2*p2(1) (acceleration = 2*c2)
+    classification = 'TODO'; value = 0;
+end
+
+[c1, v1] = classify_motion(t, x_inertial);
+fprintf('Dataset 1: %s, value = %.2f\\n', c1, v1);
+[c2, a2] = classify_motion(t, x_accel);
+fprintf('Dataset 2: %s, value = %.2f\\n', c2, a2);
+`,
+        },
+      ],
+    },
+  },
+};

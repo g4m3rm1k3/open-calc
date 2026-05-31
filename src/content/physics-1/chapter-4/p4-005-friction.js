@@ -554,6 +554,360 @@ export default {
     },
   ],
 
+  misconceptions: [
+    {
+      id: 'p1-ch4-005-mis1',
+      misconception: 'Kinetic friction gets larger as the object speeds up.',
+      why: `Students conflate kinetic friction with air resistance or viscous drag, which DO increase with speed. In the Coulomb model, $f_k = \\mu_k N$ depends only on the normal force — it is completely independent of speed.`,
+      correction: `Kinetic friction is constant (for given surfaces and normal force) regardless of how fast the object moves. The block sliding at 1 m/s and at 10 m/s experiences the same $f_k$.`,
+      correctionExample: `A 5 kg block ($\\mu_k = 0.4$, $g = 10$) sliding on a horizontal floor has $f_k = 0.4 \\times 50 = 20\\,\\text{N}$ at any speed — whether the block is moving at 2 m/s or 20 m/s.`,
+    },
+    {
+      id: 'p1-ch4-005-mis2',
+      misconception: 'Static friction always equals $\\mu_s N$.',
+      why: `Students memorize the formula $f_s = \\mu_s N$ without noticing the inequality: $f_s \\le \\mu_s N$. Static friction is a reaction force — it adjusts to whatever value is needed to prevent motion, up to the maximum.`,
+      correction: `$\\mu_s N$ is the MAXIMUM static friction, not the actual value. If you push with 40 N and the maximum is 100 N, static friction is exactly 40 N, not 100 N.`,
+      correctionExample: `A 20 kg box ($\\mu_s = 0.5$, $N = 200\\,\\text{N}$, $f_{s,max} = 100\\,\\text{N}$). If you push with 60 N, static friction is 60 N — not 100 N. The box stays still and $a = 0$.`,
+    },
+  ],
+
+  transferPrompts: [
+    {
+      id: 'p1-ch4-005-tp1',
+      prompt: `Anti-lock braking systems (ABS) prevent wheel lockup during hard braking. Why does a skidding (locked) wheel stop a car MORE slowly than a wheel on the verge of slipping?`,
+      connection: `ABS exploits $\\mu_s > \\mu_k$: a wheel at the verge of slipping uses static friction (larger), while a locked sliding wheel uses kinetic friction (smaller). ABS pulses the brakes to keep wheels in the static regime, maximizing braking force.`,
+    },
+    {
+      id: 'p1-ch4-005-tp2',
+      prompt: `Rock climbers apply chalk (magnesium carbonate) to their hands before climbing. How does this relate to the $\\mu_s N$ friction model, and why does chalk help?`,
+      connection: `Chalk absorbs sweat, which would lower $\\mu_s$ between skin and rock. By keeping the surface dry, chalk maintains a higher $\\mu_s$ — the maximum static friction $\\mu_s N$ stays large enough to support the climber's weight component along the rock face.`,
+    },
+  ],
+
+  debugging: [
+    {
+      id: 'p1-ch4-005-dbg1',
+      error: `A student is told a block is already sliding and writes $f_s = \\mu_s N$ to find the friction force. The answer is too high.`,
+      explanation: `The block is sliding, so kinetic friction applies — not static. Static friction ($f_s \\le \\mu_s N$) only acts when the object is at rest. Once motion begins, use $f_k = \\mu_k N$, which is smaller since $\\mu_k < \\mu_s$.`,
+      fix: `Identify the motion state FIRST. If the object is sliding: $f_k = \\mu_k N$. If stationary (or checking whether it starts): check $f_{s,max} = \\mu_s N$ against the applied force.`,
+    },
+    {
+      id: 'p1-ch4-005-dbg2',
+      error: `A block sits on a 30° ramp. A student writes $N = mg$ and computes friction incorrectly.`,
+      explanation: `On a ramp, the normal force is perpendicular to the surface, not vertical. The component of gravity perpendicular to the ramp is $mg\\cos\\theta$, so $N = mg\\cos\\theta$. Setting $N = mg$ overestimates friction.`,
+      fix: `Always derive N from $\\Sigma F_{\\perp} = 0$ (perpendicular to the surface). On a ramp: $N = mg\\cos\\theta$. So $f_k = \\mu_k mg\\cos\\theta$ — not $\\mu_k mg$.`,
+    },
+  ],
+
+  mastery: {
+    targetLevel: `Apply both static and kinetic friction models: determine whether an object moves, compute acceleration when sliding, find the critical angle for spontaneous sliding, and correctly adjust the normal force when applied forces change it.`,
+    checklistItems: [
+      `Correctly identify static vs. kinetic regime before choosing a friction formula`,
+      `Compute N from $\\Sigma F_y = 0$ including all vertical components (angled pushes, tension)`,
+      `Use $f_{s,max} = \\mu_s N$ as a threshold test; compare to the applied force`,
+      `Apply $f_k = \\mu_k N$ (constant) once sliding is confirmed`,
+      `Derive critical angle: $\\tan\\theta_c = \\mu_s \\Rightarrow \\theta_c = \\arctan(\\mu_s)$`,
+      `Recognize friction is independent of contact area and speed (Coulomb model)`,
+    ],
+    commonStruggles: [
+      `Forgetting that N changes when forces are applied at angles (upward pulls reduce N; downward pushes increase it)`,
+      `Using $\\mu_s N$ as the actual static friction force rather than the maximum`,
+      `Applying kinetic friction formula to a stationary object (or static to a moving one)`,
+    ],
+    nextSteps: [
+      `Inclined planes with friction (p4-007) — combines ramp decomposition with friction thresholds`,
+      `Pulley systems (p4-008) — friction on ramps connected by strings, tension modified by friction`,
+      `Energy methods (Ch. 6) — work done by friction equals $f_k \\times d$ (thermal energy generated)`,
+    ],
+  },
+
+  semantics: {
+    core: [
+      { symbol: `\\mu_s`, meaning: `Coefficient of static friction — dimensionless ratio characterizing the maximum static grip between two surfaces` },
+      { symbol: `\\mu_k`, meaning: `Coefficient of kinetic friction — always less than $\\mu_s$; characterizes sliding resistance` },
+      { symbol: `f_s \\le \\mu_s N`, meaning: `Static friction inequality — adjusts up to maximum; prevents motion` },
+      { symbol: `f_k = \\mu_k N`, meaning: `Kinetic friction equation — fixed value that opposes the direction of sliding` },
+      { symbol: `N`, meaning: `Normal force — contact force perpendicular to the surface; NOT always $mg$` },
+      { symbol: `\\theta_c = \\arctan(\\mu_s)`, meaning: `Critical angle — ramp angle at which gravity just overcomes maximum static friction` },
+    ],
+    rulesOfThumb: [
+      `Always determine the motion state (static or kinetic) before choosing a friction formula`,
+      `$\\mu_k < \\mu_s$ always — starting friction exceeds sliding friction`,
+      `Friction force is independent of contact area — a wide and narrow block on the same surface have the same $f$`,
+      `Normal force equals $mg$ only on a horizontal surface with no other vertical forces`,
+      `For ramp problems, compute $N = mg\\cos\\theta$ first, then multiply by $\\mu$`,
+    ],
+  },
+
+  notebooks: {
+    python: {
+      type: 'PythonNotebook',
+      title: 'Friction: Static vs Kinetic — Python Lab',
+      cells: [
+        {
+          cellTitle: 'The friction curve: static vs kinetic',
+          type: 'code',
+          language: 'python',
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+m, g = 30, 10
+mu_s, mu_k = 0.45, 0.30
+N = m * g
+f_s_max = mu_s * N   # threshold where static gives way to kinetic
+f_k = mu_k * N       # constant kinetic value once sliding
+
+F_app = np.linspace(0, 200, 500)
+# np.where: in static regime f equals F_app; in kinetic regime f = f_k (constant)
+friction = np.where(F_app <= f_s_max, F_app, f_k)
+
+fig, ax = plt.subplots(figsize=(8, 5))
+ax.plot(F_app, friction, 'b-', lw=2.5)
+ax.axvline(f_s_max, color='red', ls='--', label=f'f_s_max = {f_s_max:.0f} N (sliding starts)')
+ax.axhline(f_k, color='green', ls=':', lw=2, label=f'f_k = {f_k:.0f} N (kinetic, constant)')
+ax.annotate('Static regime\\n(f = F_app)', xy=(50, 55), fontsize=10, color='navy')
+ax.annotate('Kinetic regime\\n(f = const)', xy=(150, f_k - 16), fontsize=10, color='darkgreen')
+ax.set_xlabel('Applied force F_app (N)')
+ax.set_ylabel('Friction force f (N)')
+ax.set_title(f'Friction curve: mu_s={mu_s}, mu_k={mu_k}, m={m} kg')
+ax.legend(); ax.grid(True, alpha=0.3)
+plt.tight_layout(); plt.savefig('friction_curve.png', dpi=120); plt.show()`,
+          prose: [
+            `\`np.where(F_app <= f_s_max, F_app, f_k)\` implements the piecewise Coulomb model: in the static regime the friction exactly cancels the applied force; at the threshold $f_{s,max} = \\mu_s N$ the surface "breaks loose" and friction drops to the fixed kinetic value $f_k = \\mu_k N$.`,
+            `The vertical red dashed line marks $f_{s,max} = 135\\,\\text{N}$ — the force you must exceed to initiate sliding. The green dotted line shows $f_k = 90\\,\\text{N}$ that remains once sliding. The 45 N gap between them is why the box "suddenly feels easier" once it starts moving.`,
+            `This plot is NOT differentiable at the transition point — friction has a jump discontinuity in its derivative there. This is what makes friction a piecewise function and why it requires careful handling in dynamics simulations.`,
+          ],
+        },
+        {
+          cellTitle: 'Sliding block: constant deceleration to a stop',
+          type: 'code',
+          language: 'python',
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+mu_k, g = 0.35, 10
+v0 = 8          # m/s initial speed
+a = -mu_k * g   # constant deceleration from f_k = mu_k * m * g  =>  a = -mu_k * g
+t_stop = -v0 / a  # solve v0 + a*t = 0 for t
+
+t = np.linspace(0, t_stop * 1.2, 300)
+v = np.maximum(0, v0 + a * t)      # v(t) = v0 + at; clamp at 0 when block stops
+# x(t) = v0*t + 0.5*a*t^2 (valid up to t_stop; constant after)
+x = np.where(t <= t_stop,
+             v0*t + 0.5*a*t**2,
+             v0*t_stop + 0.5*a*t_stop**2)
+
+fig, axes = plt.subplots(1, 2, figsize=(11, 4))
+axes[0].plot(t, v, 'b-', lw=2.5)
+axes[0].axvline(t_stop, color='r', ls='--', label=f'Stops at t={t_stop:.2f} s')
+axes[0].set_xlabel('t (s)'); axes[0].set_ylabel('v (m/s)')
+axes[0].set_title('Velocity: linear decrease to zero'); axes[0].legend(); axes[0].grid(True, alpha=0.3)
+
+axes[1].plot(t, x, 'g-', lw=2.5)
+axes[1].axvline(t_stop, color='r', ls='--', label=f'Stops after {v0**2/(2*mu_k*g):.2f} m')
+axes[1].set_xlabel('t (s)'); axes[1].set_ylabel('x (m)')
+axes[1].set_title('Position: parabola then flat'); axes[1].legend(); axes[1].grid(True, alpha=0.3)
+
+plt.tight_layout(); plt.savefig('sliding_block.png', dpi=120); plt.show()
+print(f'Stopping time: {t_stop:.2f} s,  stopping distance: {v0**2/(2*mu_k*g):.2f} m')`,
+          prose: [
+            `Since $f_k = \\mu_k N = \\mu_k mg$, Newton's second law gives $ma = -\\mu_k mg \\Rightarrow a = -\\mu_k g$ — a constant deceleration that doesn't depend on mass. This is why a heavy truck and a sports car (same $\\mu_k$) take the same distance to stop if they have the same initial speed.`,
+            `The velocity plot is a straight line with slope $a = -\\mu_k g = -3.5\\,\\text{m/s}^2$, and the position is a downward-opening parabola — exactly the SUVAT kinematics from Chapter 2, now with the acceleration determined by friction.`,
+            `The stopping distance formula $d = v_0^2 / (2\\mu_k g)$ comes from $v^2 = v_0^2 + 2ad$ with $v = 0$: quadrupling speed requires four times the braking distance. This is why highway speed limits matter.`,
+          ],
+        },
+        {
+          cellTitle: 'Critical angle: when does a block slide spontaneously?',
+          type: 'code',
+          language: 'python',
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+m, g = 10, 10
+angles = np.linspace(0, 80, 300)
+theta_rad = np.radians(angles)
+
+fig, ax = plt.subplots(figsize=(8, 5))
+for mu_s in [0.2, 0.4, 0.6, 0.8]:
+    # Along slope: W_parallel = mg sin(theta)  (drives sliding)
+    # Max static friction: f_s_max = mu_s * N = mu_s * mg cos(theta)  (resists sliding)
+    # Net tendency = mg sin - mu_s * mg cos; positive means slides
+    F_net = m * g * (np.sin(theta_rad) - mu_s * np.cos(theta_rad))
+    # Clamp: if net is negative, no force needed — block stays put
+    ax.plot(angles, np.maximum(0, F_net), lw=2, label=f'mu_s = {mu_s}')
+    theta_c = np.degrees(np.arctan(mu_s))
+    ax.axvline(theta_c, ls=':', alpha=0.4)
+
+ax.set_xlabel('Ramp angle (deg)')
+ax.set_ylabel('Net sliding tendency (N)')
+ax.set_title(f'Block slides spontaneously above critical angle (m={m} kg)')
+ax.legend(); ax.grid(True, alpha=0.3)
+plt.tight_layout(); plt.savefig('critical_angle.png', dpi=120); plt.show()
+
+for mu_s in [0.2, 0.4, 0.6, 0.8]:
+    theta_c = np.degrees(np.arctan(mu_s))
+    print(f'  mu_s = {mu_s}:  critical angle = {theta_c:.1f} deg')`,
+          prose: [
+            `At angle $\\theta$, gravity pulls the block down the slope with $W_\\parallel = mg\\sin\\theta$, while maximum static friction resists with $f_{s,max} = \\mu_s mg\\cos\\theta$. Sliding starts when $W_\\parallel > f_{s,max}$: $mg\\sin\\theta > \\mu_s mg\\cos\\theta \\Rightarrow \\tan\\theta > \\mu_s$.`,
+            `The critical angle $\\theta_c = \\arctan(\\mu_s)$ is where the curves leave zero. Above it, even maximum friction can't prevent motion. This is why measuring $\\theta_c$ experimentally (by tilting a surface until the block just slides) gives a direct measurement of $\\mu_s$.`,
+            `Notice the lines start rising at different angles depending on $\\mu_s$: rubber on concrete ($\\mu_s \\approx 0.8$) needs a steep 38.7° ramp before it slides; wet ice ($\\mu_s \\approx 0.1$, $\\theta_c \\approx 5.7°$) would slide on nearly any incline.`,
+          ],
+        },
+        {
+          cellTitle: 'Challenge: recover mu_k from braking distance data',
+          type: 'code',
+          language: 'python',
+          challengeType: 'write',
+          starterCode: `def find_mu_k(v0, d, g=9.8):
+    # From v^2 = v0^2 - 2*mu_k*g*d with v=0:
+    # 0 = v0^2 - 2*mu_k*g*d  =>  mu_k = v0^2 / (2*g*d)
+    mu_k = ___ / ___
+    return mu_k
+
+result = find_mu_k(30, 45, g=10)
+print(f"mu_k = {result:.4f}")
+
+# Verify: deceleration a = mu_k*g should stop in exactly d meters
+a = result * 10
+d_check = 30**2 / (2 * a)
+print(f"Check: braking distance = {d_check:.2f} m  (should be 45.00)")`,
+          prose: [
+            `From kinematics $v^2 = v_0^2 - 2\\mu_k g d$ with final speed $v = 0$: rearranging gives $\\mu_k = v_0^2 / (2gd)$. Fill in the two blanks to complete the formula and run the verification check below it.`,
+            `This is how automotive engineers measure traction on different road surfaces: drive at known speed, apply brakes, measure stopping distance, and solve for $\\mu_k$. ABS systems are tuned based on exactly this kind of measurement.`,
+            `Test with v0=30 m/s, d=45 m, g=10: expected $\\mu_k = 900 / 900 = 1.0$. Also try v0=10 m/s, d=25 m, g=10: $\\mu_k = 100 / 500 = 0.2$ (wet asphalt).`,
+          ],
+        },
+      ],
+    },
+    matlab: {
+      type: 'OpenMatNotebook',
+      title: 'Friction: Static vs Kinetic — MATLAB/Octave Lab',
+      cells: [
+        {
+          cellTitle: 'The friction curve: static vs kinetic',
+          type: 'code',
+          language: 'matlab',
+          code: `m = 30; g = 10;
+mu_s = 0.45; mu_k = 0.30;
+N = m * g;
+f_s_max = mu_s * N;   % threshold: static gives way to kinetic
+f_k = mu_k * N;       % constant kinetic friction once sliding
+
+F_app = linspace(0, 200, 500);
+% Piecewise: static regime f = F_app; kinetic regime f = f_k
+friction = F_app .* (F_app <= f_s_max) + f_k * (F_app > f_s_max);
+
+figure; plot(F_app, friction, 'b-', 'LineWidth', 2.5); hold on;
+xline(f_s_max, 'r--', sprintf('f_{s,max} = %.0f N', f_s_max), 'LineWidth', 1.5);
+yline(f_k, 'g:', sprintf('f_k = %.0f N', f_k), 'LineWidth', 2);
+xlabel('Applied force F_{app} (N)'); ylabel('Friction force f (N)');
+title(sprintf('Friction curve: mu_s=%.2f, mu_k=%.2f, m=%d kg', mu_s, mu_k, m));
+legend('Friction', 'f_{s,max}', 'f_k'); grid on;`,
+          prose: [
+            `In MATLAB/Octave, the piecewise logic uses logical arrays: \`F_app <= f_s_max\` produces a 0/1 array that selects the static piece ($f = F_{app}$) and \`F_app > f_s_max\` selects the kinetic piece ($f = f_k$). This is the same Coulomb model as the Python version.`,
+            `The \`xline\` and \`yline\` commands mark the threshold at $f_{s,max} = \\mu_s N = 135\\,\\text{N}$ and the kinetic plateau at $f_k = 90\\,\\text{N}$. The 45 N drop at the transition is the μ_s − μ_k gap.`,
+            `The dot operator (\`.*\`) is element-wise multiplication on arrays — essential in MATLAB when multiplying two arrays element by element rather than performing matrix multiplication.`,
+          ],
+        },
+        {
+          cellTitle: 'Sliding block: constant deceleration to a stop',
+          type: 'code',
+          language: 'matlab',
+          code: `mu_k = 0.35; g = 10;
+v0 = 8;              % m/s initial speed
+a = -mu_k * g;       % a = -mu_k*g (constant deceleration)
+t_stop = -v0 / a;    % solve v0 + a*t = 0
+
+t = linspace(0, t_stop * 1.2, 300);
+v = max(0, v0 + a * t);   % v(t) = v0 + at; clamp at 0
+x = zeros(size(t));
+for i = 1:length(t)
+    if t(i) <= t_stop
+        x(i) = v0*t(i) + 0.5*a*t(i)^2;
+    else
+        x(i) = v0*t_stop + 0.5*a*t_stop^2;
+    end
+end
+
+figure;
+subplot(1,2,1); plot(t, v, 'b-', 'LineWidth', 2.5); hold on;
+xline(t_stop, 'r--', sprintf('Stop at t=%.2f s', t_stop));
+xlabel('t (s)'); ylabel('v (m/s)'); title('Velocity vs time'); grid on;
+
+subplot(1,2,2); plot(t, x, 'g-', 'LineWidth', 2.5); hold on;
+xline(t_stop, 'r--', sprintf('d=%.2f m', v0^2/(2*mu_k*g)));
+xlabel('t (s)'); ylabel('x (m)'); title('Position vs time'); grid on;
+
+fprintf('Stopping time: %.2f s,  stopping distance: %.2f m\\n', t_stop, v0^2/(2*mu_k*g));`,
+          prose: [
+            `The for-loop implements the piecewise position: parabolic while $t \\le t_{stop}$, then flat afterward. In MATLAB, \`max(0, ...)\` clamps velocity to zero once the block stops (kinetic friction cannot reverse direction).`,
+            `The deceleration $a = -\\mu_k g = -3.5\\,\\text{m/s}^2$ is constant, so the velocity is linear and position is quadratic — SUVAT equations apply directly. The mass cancels from $ma = -\\mu_k mg$.`,
+            `Stopping distance formula: $d = v_0^2 / (2\\mu_k g)$. Try changing \`v0\` to 16 m/s — the stopping distance should be four times larger (16² vs 8² gives factor of 4), confirming the quadratic dependence.`,
+          ],
+        },
+        {
+          cellTitle: 'Critical angle for different surface pairs',
+          type: 'code',
+          language: 'matlab',
+          code: `m = 10; g = 10;
+angles = linspace(0, 80, 300);
+theta_rad = deg2rad(angles);  % MATLAB uses radians in trig functions
+
+figure; hold on;
+mu_vals = [0.2, 0.4, 0.6, 0.8];
+colors = {'b', 'r', 'g', 'm'};
+for i = 1:length(mu_vals)
+    mu_s = mu_vals(i);
+    % Net sliding tendency = mg sin(theta) - mu_s * mg cos(theta)
+    F_net = m * g * (sin(theta_rad) - mu_s * cos(theta_rad));
+    F_net_clamped = max(0, F_net);   % negative means block stays
+    plot(angles, F_net_clamped, colors{i}, 'LineWidth', 2, ...
+         'DisplayName', sprintf('mu_s = %.1f', mu_s));
+end
+
+xlabel('Ramp angle (deg)'); ylabel('Net sliding tendency (N)');
+title('Block slides spontaneously above critical angle');
+legend('Location', 'northwest'); grid on;
+
+fprintf('Critical angles:\\n');
+for i = 1:length(mu_vals)
+    theta_c = rad2deg(atan(mu_vals(i)));
+    fprintf('  mu_s = %.1f:  theta_c = %.1f deg\\n', mu_vals(i), theta_c);
+end`,
+          prose: [
+            `\`deg2rad\` converts the angle array to radians for MATLAB's \`sin\` and \`cos\` functions. The net sliding tendency is $mg(\\sin\\theta - \\mu_s \\cos\\theta)$; \`max(0, ...)\` clamps negative values to zero (block stays put below critical angle).`,
+            `\`rad2deg(atan(mu_s))\` computes the critical angle $\\theta_c = \\arctan(\\mu_s)$. This is the angle at which the block is on the verge of sliding — tilting the ramp just past this angle causes spontaneous motion.`,
+            `Measuring the critical angle experimentally gives $\\mu_s$ directly: $\\mu_s = \\tan(\\theta_c)$. This is a standard lab technique — simpler than measuring friction forces with sensors.`,
+          ],
+        },
+        {
+          cellTitle: 'Challenge: recover mu_k from braking distance data',
+          type: 'code',
+          language: 'matlab',
+          challengeType: 'write',
+          starterCode: `function mu_k = find_mu_k(v0, d, g)
+    % From v^2 = v0^2 - 2*mu_k*g*d with v=0:
+    %   mu_k = v0^2 / (2*g*d)
+    mu_k = ___ / ___;
+end
+
+result = find_mu_k(30, 45, 10);
+fprintf('mu_k = %.4f\\n', result);
+
+% Verify: braking distance check
+a = result * 10;
+d_check = 30^2 / (2 * a);
+fprintf('Check: braking distance = %.2f m  (should be 45.00)\\n', d_check);`,
+          prose: [
+            `Fill in the formula $\\mu_k = v_0^2 / (2gd)$ to complete the function. With v0=30, d=45, g=10: $\\mu_k = 900 / 900 = 1.0$ (high-friction surface like dry rubber).`,
+            `The verification computes the stopping distance backward from $\\mu_k$ — if the formula is correct, it should return exactly 45 m. This round-trip check is a general debugging technique: compute a quantity, derive the input from it, compare.`,
+            `Try calling \`find_mu_k(20, 80, 10)\` — expected $\\mu_k = 400/1600 = 0.25$ (wet road). Notice that a car going twice as fast (20 vs 10 m/s) on the same road needs four times the stopping distance.`,
+          ],
+        },
+      ],
+    },
+  },
+
   viz: [
     { id: 'SVGDiagram', props: { type: 'free-body-diagram' }, title: 'Friction force on a block' },
     { id: 'ForceBlockSim', props: {}, title: 'Interactive: static vs. kinetic friction' },

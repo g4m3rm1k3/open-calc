@@ -24,27 +24,24 @@ export default {
 
   intuition: {
     prose: [
-      // ── CORE IDEA ────────────────────────────────────────────────────────
-      `The dot product answers this question: **how much of vector $\\vec{A}$ is in the direction of $\\vec{B}$?** The answer is a single number — a scalar, not a vector. That's why it's also called the **scalar product**.`,
+      `You push a box with force $\\vec{F} = (60, 0)$ N while it slides along displacement $\\vec{d} = (4, 3)$ m. Before reading on, predict: does the 3 m vertical component of the displacement affect the work done by this purely horizontal force?`,
 
-      // ── PHYSICAL MOTIVATION ──────────────────────────────────────────────
+      `The dot product answers this question: **how much of vector $\\vec{A}$ is in the direction of $\\vec{B}$?** The answer is a single number — a scalar, not a vector. That's why it's also called the **scalar product**. When you compute $\\vec{F}\\cdot\\vec{d} = (60)(4) + (0)(3) = 240$ J, the vertical component simply drops out — it contributes nothing, exactly as predicted.`,
+
       `Imagine you're pulling a suitcase on wheels. You grab the handle and pull at an angle $\\phi$ above the horizontal. The suitcase moves horizontally — it doesn't care about the vertical component of your pull. Only the horizontal part of your force does work. That horizontal component is $|\\vec{F}|\\cos\\phi$ — the magnitude of the force multiplied by the cosine of the angle. Multiply that by the distance moved, and you have the work done. That multiplication is the dot product: $W = \\vec{F}\\cdot\\vec{d} = |\\vec{F}||\\vec{d}|\\cos\\phi$.`,
 
-      // ── THREE KEY CASES ──────────────────────────────────────────────────
       'Three cases to memorise:',
-      '**Parallel** ($\\phi = 0°$): $\\cos0°=1$, so $\\vec{A}\\cdot\\vec{B} = |\\vec{A}||\\vec{B}|$. Maximum overlap — the vectors point exactly the same way.',
-      '**Perpendicular** ($\\phi = 90°$): $\\cos90°=0$, so $\\vec{A}\\cdot\\vec{B} = 0$. Zero overlap — the vectors are completely crosswise. A perpendicular force does zero work.',
-      '**Anti-parallel** ($\\phi = 180°$): $\\cos180°=-1$, so $\\vec{A}\\cdot\\vec{B} = -|\\vec{A}||\\vec{B}|$. Maximum negative overlap — the vectors fight each other. Friction does negative work on a moving object.',
+      `**Parallel** ($\\phi = 0°$): $\\cos0°=1$, so $\\vec{A}\\cdot\\vec{B} = |\\vec{A}||\\vec{B}|$. Maximum overlap — the vectors point exactly the same way.`,
+      `**Perpendicular** ($\\phi = 90°$): $\\cos90°=0$, so $\\vec{A}\\cdot\\vec{B} = 0$. Zero overlap — the vectors are completely crosswise. A perpendicular force does zero work.`,
+      `**Anti-parallel** ($\\phi = 180°$): $\\cos180°=-1$, so $\\vec{A}\\cdot\\vec{B} = -|\\vec{A}||\\vec{B}|$. Maximum negative overlap — the vectors fight each other. Friction does negative work on a moving object.`,
 
-      // ── PROJECTION PICTURE ───────────────────────────────────────────────
       `The geometric picture: draw both vectors tail-to-tail. Drop a perpendicular from the tip of $\\vec{B}$ onto the line of $\\vec{A}$. The foot of that perpendicular is the **projection** of $\\vec{B}$ onto $\\vec{A}$. The dot product is: (length of that projection) × (magnitude of $\\vec{A}$). Or equivalently: (length of projection of $\\vec{A}$ onto $\\vec{B}$) × (magnitude of $\\vec{B}$). Both give the same number — the dot product is commutative.`,
     ],
     callouts: [
       {
         type: 'definition',
         title: 'Dot product — geometric definition',
-        body:
-          `\\vec{A} \\cdot \\vec{B} = |\\vec{A}||\\vec{B}|\\cos\\phi\\n\\nwhere $\\phi$ is the angle between the vectors measured tail-to-tail ($0 \\le \\phi \\le 180°$).`,
+        body: `\\vec{A} \\cdot \\vec{B} = |\\vec{A}||\\vec{B}|\\cos\\phi`,
       },
       {
         type: 'insight',
@@ -63,6 +60,11 @@ export default {
         title: 'Physics application: Work',
         body:
           `$W = \\vec{F}\\cdot\\vec{d} = |F||d|\\cos\\phi$ where $\\phi$ is the angle between force and displacement. If you push perpendicular to motion ($\\phi=90°$), you do zero work — the force transfers no energy. This is why a centripetal force (always perpendicular to motion in circular paths) does no work.`,
+      },
+      {
+        type: 'procedure',
+        title: 'Two ways to compute the dot product',
+        body: `1. **Component method:** Multiply matching components and sum — $\\vec{A}\\cdot\\vec{B} = A_xB_x + A_yB_y$ (no angle needed)\n2. **Geometric method:** Use $|\\vec{A}||\\vec{B}|\\cos\\phi$ when you know the angle between the vectors\n3. **Sign check:** Result > 0 means acute angle ($\\phi < 90°$); = 0 means perpendicular; < 0 means obtuse ($\\phi > 90°$)`,
       },
     ],
     visualizations: [
@@ -88,7 +90,7 @@ export default {
       '$\\vec{A}\\cdot\\vec{B} = A_xB_x + A_yB_y$ (in 2D)',
       '$\\vec{A}\\cdot\\vec{B} = A_xB_x + A_yB_y + A_zB_z$ (in 3D)',
       `Multiply matching components and sum. That's the entire calculation. This works because the basis vectors $\\hat{\\imath}$, $\\hat{\\jmath}$, $\\hat{k}$ are orthonormal: $\\hat{\\imath}\\cdot\\hat{\\imath}=1$, $\\hat{\\jmath}\\cdot\\hat{\\jmath}=1$, $\\hat{k}\\cdot\\hat{k}=1$, and $\\hat{\\imath}\\cdot\\hat{\\jmath}=0$, etc. The cross-terms vanish and we're left with just the matching pairs.`,
-      'Both formulas give the same number — and equating them is how we\'ll find the angle between any two vectors in the next lesson.',
+      `Both formulas give the same number — and equating them is how we'll find the angle between any two vectors in the next lesson.`,
       `A special case worth memorising: $\\vec{A}\\cdot\\vec{A} = |\\vec{A}|^2$. The dot product of a vector with itself equals its magnitude squared. This means $|\\vec{A}| = \\sqrt{\\vec{A}\\cdot\\vec{A}}$ — another way to compute magnitude.`,
     ],
     callouts: [
@@ -126,15 +128,16 @@ export default {
 
   rigor: {
     prose: [
-      `The dot product is the unique bilinear form on $\\mathbb{R}^n$ that is symmetric and positive-definite. "Bilinear" means linear in each argument separately. "Symmetric" means $\\vec{A}\\cdot\\vec{B}=\\vec{B}\\cdot\\vec{A}$. "Positive-definite" means $\\vec{A}\\cdot\\vec{A}\\ge 0$ with equality only when $\\vec{A}=\\vec{0}$.`,
-      `The dot product defines the notion of **angle** and **distance** in $\\mathbb{R}^n$. It is the inner product for the standard Euclidean space. In Linear Algebra you will generalise this to function spaces and complex vector spaces — but the physics intuition ("how much does one vector point in the direction of another?") remains exactly the same.`,
+      `The dot product is the unique bilinear form on $\\mathbb{R}^n$ that is symmetric and positive-definite. "Bilinear" means linear in each argument separately: $\\vec{A}\\cdot(\\lambda\\vec{B}+\\mu\\vec{C}) = \\lambda(\\vec{A}\\cdot\\vec{B})+\\mu(\\vec{A}\\cdot\\vec{C})$. "Symmetric" means $\\vec{A}\\cdot\\vec{B}=\\vec{B}\\cdot\\vec{A}$. "Positive-definite" means $\\vec{A}\\cdot\\vec{A}\\ge 0$ with equality only when $\\vec{A}=\\vec{0}$.`,
+      `The dot product is coordinate-independent: if you rotate your entire coordinate system, every vector's components change, but all pairwise dot products remain the same. This is because the angle $\\phi$ between two vectors is a geometric quantity — it doesn't depend on which axes you chose. The value $|\\vec{A}||\\vec{B}|\\cos\\phi$ is therefore an invariant of the pair of vectors, not of the coordinate frame. This invariance is why the dot product is the right tool for physics: a physical relationship like $W = \\vec{F}\\cdot\\vec{d}$ must be the same regardless of which way you orient your coordinate axes.`,
+      `Geometrically, the dot product measures the signed area of the rectangle whose sides are $|\\vec{A}|$ and the scalar projection of $\\vec{B}$ onto $\\vec{A}$, where $\\text{comp}_{\\vec{A}}\\vec{B} = |\\vec{B}|\\cos\\phi$. The Cauchy-Schwarz inequality $|\\vec{A}\\cdot\\vec{B}| \\le |\\vec{A}||\\vec{B}|$ is simply the statement that $|\\cos\\phi| \\le 1$ for all angles — the dot product can never exceed the product of the magnitudes. Equality holds when the vectors are parallel ($\\phi=0°$ or $\\phi=180°$).`,
+      `The dot product defines the notion of **angle** and **distance** in $\\mathbb{R}^n$: $\\cos\\phi = \\frac{\\vec{A}\\cdot\\vec{B}}{|\\vec{A}||\\vec{B}|}$ and $|\\vec{A}| = \\sqrt{\\vec{A}\\cdot\\vec{A}}$. In Linear Algebra, you will generalise this to abstract inner product spaces — function spaces, complex vector spaces, and even infinite-dimensional Hilbert spaces. The Fourier series representation of a function is literally the "dot product" of that function with each basis wave. The physics intuition ("how much does one thing point in the direction of another?") carries through every generalisation.`,
     ],
     callouts: [
       {
         type: 'theorem',
         title: 'Cauchy-Schwarz inequality',
-        body:
-          `|\\vec{A}\\cdot\\vec{B}| \\le |\\vec{A}||\\vec{B}|\\n\\nThe dot product can never exceed the product of the magnitudes. Equality holds when the vectors are parallel ($\\phi=0°$ or $\\phi=180°$). This follows directly from $|\\cos\\phi| \\le 1$.`,
+        body: `|\\vec{A}\\cdot\\vec{B}| \\le |\\vec{A}||\\vec{B}|`,
       },
       {
         type: 'insight',
@@ -178,196 +181,6 @@ export default {
       props: { type: 'dot-product-projection' },
       title: 'Proof: geometric = component formula',
       caption: `Expanding $(A_x\\hat{i}+A_y\\hat{j})\\cdot(B_x\\hat{i}+B_y\\hat{j})$ and applying orthonormality ($\\hat{i}\\cdot\\hat{j}=0$, $\\hat{i}\\cdot\\hat{i}=1$) leaves only $A_xB_x + A_yB_y$. The two formulas are identical.`,
-    }],
-  },
-
-  python: {
-    title: 'Dot Product Lab — Work, Angles, and Projections in Code',
-    description:
-      `NumPy makes the dot product one line of code. We'll use it to compute work, check perpendicularity, and find angles — building up to a real solar panel efficiency calculator.`,
-    placement: 'after_rigor',
-    visualizations: [{
-      id: 'PythonNotebook',
-      title: 'Dot Product Lab',
-      mathBridge: 'numpy.dot() implements the dot product exactly. Use it whenever you need "how much overlap."',
-      caption: 'Run each cell top-to-bottom.',
-      props: {
-        initialCells: [
-
-          // ── CELL 1: The two formulas ───────────────────────────────────
-          {
-            id: 1,
-            cellTitle: '1 · Both dot product formulas in Python',
-            prose:
-              `There are two ways to compute the dot product. Both give the same answer:\n1. **Geometric**: \`|A| * |B| * cos(angle_between)\`\n2. **Component**: \`A[0]*B[0] + A[1]*B[1]\` or just \`np.dot(A, B)\`\n\nLet's verify they agree for two vectors at 60° apart.`,
-            code: [
-              'import numpy as np',
-              '',
-              '# Two vectors at 60° to each other',
-              'A = np.array([4.0, 0.0])   # points right, magnitude 4',
-              'B = np.array([3.0, 3*np.sqrt(3)])  # magnitude 6, at 60° from A',
-              '',
-              '# Method 1: geometric formula',
-              'phi = np.radians(60)',
-              'dot_geometric = np.linalg.norm(A) * np.linalg.norm(B) * np.cos(phi)',
-              '',
-              '# Method 2: component formula',
-              'dot_component = A[0]*B[0] + A[1]*B[1]',
-              '',
-              '# Method 3: numpy shorthand (use this in practice)',
-              'dot_numpy = np.dot(A, B)',
-              '',
-              'print(f"Geometric:  {dot_geometric:.4f}")',
-              'print(f"Component:  {dot_component:.4f}")',
-              'print(f"np.dot:     {dot_numpy:.4f}")',
-              'print(f"All equal?  {np.allclose([dot_geometric, dot_component], dot_numpy)}")',
-            ].join('\n'),
-            output: '', status: 'idle', figureJson: null,
-          },
-
-          // ── CELL 2: Work ────────────────────────────────────────────────
-          {
-            id: 2,
-            cellTitle: '2 · Computing work with the dot product',
-            prose:
-              `Work done by a force: $W = \\vec{F}\\cdot\\vec{d} = |F||d|\\cos\\phi$.\n\nA person pulls a crate with 60 N at 30° above horizontal. The crate moves 10 m horizontally. How much work is done?`,
-            code: [
-              '# Force vector: 60 N at 30° above horizontal',
-              'F_mag = 60.0   # N',
-              'F_angle = np.radians(30)',
-              'F = np.array([F_mag * np.cos(F_angle), F_mag * np.sin(F_angle)])',
-              '',
-              '# Displacement vector: 10 m horizontal (no vertical component)',
-              'd = np.array([10.0, 0.0])',
-              '',
-              '# Work = dot product',
-              'W = np.dot(F, d)',
-              '',
-              'print(f"Force:       {F} N")',
-              'print(f"Displacement:{d} m")',
-              'print(f"Work done:   {W:.2f} J")',
-              '',
-              '# Sanity check: only the horizontal part of F does work',
-              'F_horizontal = F[0]   # x-component',
-              'W_check = F_horizontal * d[0]',
-              'print(f"Check (F_x * d_x): {W_check:.2f} J  ✓")',
-              '',
-              '# What if force was perpendicular? (F pointing straight up)',
-              'F_perp = np.array([0.0, 60.0])',
-              'W_perp = np.dot(F_perp, d)',
-              'print(f"\\nPerpendicular force work: {W_perp:.2f} J (zero — no work done!)")',
-            ].join('\n'),
-            output: '', status: 'idle', figureJson: null,
-          },
-
-          // ── CELL 3: CHALLENGE — work calculation ─────────────────────────
-          {
-            id: 3,
-            cellTitle: '3 · Challenge: friction work',
-            challengeType: 'fill-in',
-            challengeNumber: 1,
-            challengeTitle: 'Work done by friction',
-            difficulty: 'easy',
-            prompt:
-              `A box slides 8 m to the right (displacement = (8, 0) m). Kinetic friction acts at 180° (opposing motion) with magnitude 25 N.\n\nCompute \`W_friction = np.dot(F_friction, d)\`. Friction should do **negative** work (it removes energy from the system).`,
-            starterBlock: [
-              'F_friction = np.array([___, ___])  # 25 N at 180°',
-              'd_box = np.array([___, ___])        # 8 m to the right',
-              'W_friction = np.dot(___, ___)',
-            ].join('\n'),
-            code: [
-              'F_friction = np.array([-25.0, 0.0])   # 25 N at 180° = pointing left',
-              'd_box = np.array([8.0, 0.0])           # 8 m to the right',
-              'W_friction = np.dot(F_friction, d_box)',
-              'print(f"Friction force: {F_friction} N")',
-              'print(f"Displacement:  {d_box} m")',
-              'print(f"Work by friction: {W_friction:.1f} J")',
-              'print("Negative work = friction removes kinetic energy.")',
-            ].join('\n'),
-            output: '', status: 'idle', figureJson: null,
-            testCode: [
-              'import numpy as np',
-              'assert "W_friction" in dir(), "Compute W_friction"',
-              'assert np.isclose(W_friction, -200.0, atol=0.1), f"W_friction should be -200 J, got {W_friction:.1f} J"',
-              '"SUCCESS: W_friction = -200 J. Friction does negative work — it removes 200 J of kinetic energy."',
-            ].join('\n'),
-            hint:
-              `F_friction = np.array([-25.0, 0.0])  — friction points LEFT (at 180°), so x-component is negative.\nd_box = np.array([8.0, 0.0])  — displacement is to the right.\nW_friction = np.dot(F_friction, d_box) = (-25)(8) + (0)(0) = -200 J.`,
-          },
-
-          // ── CELL 4: Three landmark cases ─────────────────────────────────
-          {
-            id: 4,
-            cellTitle: '4 · The three landmark cases visualised',
-            prose:
-              'Let\'s verify the three landmark cases: parallel, perpendicular, and anti-parallel.',
-            code: [
-              'A = np.array([5.0, 0.0])   # Reference vector, magnitude 5',
-              '',
-              '# Case 1: Parallel (angle = 0°)',
-              'B_parallel = np.array([3.0, 0.0])  # same direction',
-              '',
-              '# Case 2: Perpendicular (angle = 90°)',
-              'B_perp = np.array([0.0, 4.0])  # at right angles',
-              '',
-              '# Case 3: Anti-parallel (angle = 180°)',
-              'B_anti = np.array([-6.0, 0.0])  # opposite direction',
-              '',
-              'cases = [("Parallel (0°)", B_parallel),',
-              '         ("Perpendicular (90°)", B_perp),',
-              '         ("Anti-parallel (180°)", B_anti)]',
-              '',
-              'for name, B in cases:',
-              '    dot = np.dot(A, B)',
-              '    expected = "|A||B|" if dot > 0 else ("0" if np.isclose(dot, 0) else "-|A||B|")',
-              '    print(f"{name:25s}: A·B = {dot:6.1f}  ({expected})")',
-            ].join('\n'),
-            output: '', status: 'idle', figureJson: null,
-          },
-
-          // ── CELL 5: CHALLENGE — solar panel efficiency ────────────────────
-          {
-            id: 5,
-            cellTitle: '5 · Challenge: solar panel power output',
-            challengeType: 'write',
-            challengeNumber: 2,
-            challengeTitle: 'Optimal solar panel angle',
-            difficulty: 'medium',
-            prompt:
-              `A solar panel has a **normal vector** (the vector pointing perpendicular to its surface). The power it generates is proportional to $\\hat{n}\\cdot\\hat{s}$ where $\\hat{n}$ is the unit normal and $\\hat{s}$ is the unit vector pointing toward the sun.\n\nThe sun is at 40° above the horizon. Compute the efficiency for three panel orientations:\n1. Flat panel: normal points straight up → $\\hat{n}_1 = (0, 1)$\n2. Tilted 40°: normal points at 40° from vertical → $\\hat{n}_2 = (\\sin40°, \\cos40°)$  (should give max = 1.0)\n3. Tilted 80°: $\\hat{n}_3 = (\\sin80°, \\cos80°)$\n\nStore results in \`efficiencies\` (a list of 3 floats). The "tilted 40°" panel should give efficiency 1.0.`,
-            code: [
-              '# The sun\'s direction: 40° above horizon',
-              'sun_angle = np.radians(40)',
-              '# sun_hat = unit vector pointing toward the sun',
-              '# ...',
-              '',
-              '# Panel normals',
-              '# n1 = flat panel: straight up',
-              '# n2 = tilted 40°: normal at 40° from vertical',
-              '# n3 = tilted 80°: normal at 80° from vertical',
-              '',
-              '# Compute efficiency = dot(n_hat, sun_hat) for each',
-              '# efficiencies = [...]',
-            ].join('\n'),
-            output: '', status: 'idle', figureJson: null,
-            testCode: [
-              'import numpy as np',
-              'assert "efficiencies" in dir(), "Compute efficiencies list"',
-              'assert len(efficiencies) == 3, "efficiencies should have 3 values"',
-              '# Flat panel efficiency',
-              'expected_flat = np.cos(np.radians(40))   # ~0.766',
-              'assert np.isclose(efficiencies[0], expected_flat, atol=0.01), f"Flat panel: expected {expected_flat:.3f}, got {efficiencies[0]:.3f}"',
-              '# Tilted 40° should give 1.0 (perfect alignment)',
-              'assert np.isclose(efficiencies[1], 1.0, atol=0.01), f"40° tilt: should be 1.0, got {efficiencies[1]:.3f}"',
-              '# Tilted 80°',
-              'expected_80 = np.cos(np.radians(40))  # same efficiency as flat by symmetry',
-              '"SUCCESS: Solar panel efficiency computed. The panel tilted to match the sun\'s elevation angle gives 100% efficiency. Dot product = power extraction!"',
-            ].join('\n'),
-            hint:
-              `sun_hat = np.array([np.cos(sun_angle), np.sin(sun_angle)]).\nn1 = np.array([0, 1]).\nn2 = np.array([np.sin(np.radians(40)), np.cos(np.radians(40))])  — tilted 40° from vertical.\nefficiency_i = np.dot(n_i, sun_hat).\nWhen the normal exactly faces the sun, dot product = 1 (cos 0° = 1).`,
-          },
-        ],
-      },
     }],
   },
 
@@ -418,8 +231,8 @@ export default {
           annotation: 'Sketch both vectors. $\\vec{A}$ has positive $x$ and $y$; $\\vec{B}$ has negative $x$ and positive $y$.',
         },
         {
-          expression: '\\text{The angle between them is less than }90°\\text{? Let\'s check:}',
-          annotation: 'Both vectors have positive $y$-components, so they\'re both in the upper half-plane. The angle between them is likely acute.',
+          expression: '\\text{Both vectors have positive }y\\text{-components — they both lean upward. Angle likely acute.}',
+          annotation: 'Both vectors are in the upper half-plane. A shared upward component suggests the angle between them is less than 90°.',
         },
         {
           expression: '\\vec{A}\\cdot\\vec{B} = (3)(-1)+(4)(2) = -3+8 = +5',
@@ -492,52 +305,346 @@ export default {
     },
   ],
 
-  // ── Quiz ─────────────────────────────────────────────────────────────────
+  notebooks: {
+    python: {
+      type: 'PythonNotebook',
+      cells: [
+        {
+          cellTitle: 'Both dot product formulas — verify they agree',
+          type: 'code',
+          language: 'python',
+          code: `import numpy as np
+
+# Two vectors at 60° to each other
+A = np.array([4.0, 0.0])           # points right, magnitude 4
+B = np.array([3.0, 3*np.sqrt(3)]) # magnitude 6, at 60° from A
+
+# Method 1: geometric formula — need the angle
+phi = np.radians(60)
+dot_geometric = np.linalg.norm(A) * np.linalg.norm(B) * np.cos(phi)
+
+# Method 2: component formula — multiply matching pairs and sum
+dot_component = A[0]*B[0] + A[1]*B[1]
+
+# Method 3: numpy shorthand (use this in practice)
+dot_numpy = np.dot(A, B)
+
+print(f"Geometric:  {dot_geometric:.4f}")
+print(f"Component:  {dot_component:.4f}")
+print(f"np.dot:     {dot_numpy:.4f}")
+print(f"All equal?  {np.allclose([dot_geometric, dot_component], dot_numpy)}")`,
+          prose: [
+            `\`np.dot(A, B)\` computes $A_xB_x + A_yB_y$ — the component formula in one call. The result is a scalar (a plain float), not a vector. This is what "scalar product" means in code.`,
+            `The geometric formula requires knowing $\\phi$ in advance; the component formula does not. In practice, use \`np.dot\` and only reach for $|A||B|\\cos\\phi$ when the angle is given directly.`,
+            `Both methods return 12.0, confirming they are the same formula derived two different ways — as the proof in the rigor section shows by expanding $(A_x\\hat{i}+A_y\\hat{j})\\cdot(B_x\\hat{i}+B_y\\hat{j})$ and applying orthonormality.`,
+          ],
+        },
+        {
+          cellTitle: 'Visualising the three landmark cases',
+          type: 'code',
+          language: 'python',
+          code: `import matplotlib.pyplot as plt
+import numpy as np
+
+fig, axes = plt.subplots(1, 3, figsize=(12, 4))
+A = np.array([3.0, 0.0])
+cases = [
+    ("Parallel\\nφ=0°, dot>0",       np.array([2.0,  0.0]),  "tab:green"),
+    ("Perpendicular\\nφ=90°, dot=0",  np.array([0.0,  2.0]),  "tab:orange"),
+    ("Anti-parallel\\nφ=180°, dot<0", np.array([-2.0, 0.0]),  "tab:red"),
+]
+
+for ax, (title, B, color) in zip(axes, cases):
+    ax.quiver(0,0,A[0],A[1], angles='xy', scale_units='xy', scale=1,
+              color='steelblue', width=0.04)
+    ax.quiver(0,0,B[0],B[1], angles='xy', scale_units='xy', scale=1,
+              color=color, width=0.04)
+    dot = np.dot(A, B)
+    ax.set_title(f"{title}\\nA·B = {dot:.1f}", fontsize=10)
+    ax.set_xlim(-3.5, 3.5); ax.set_ylim(-1, 3.5)
+    ax.axhline(0, color='k', lw=0.5); ax.axvline(0, color='k', lw=0.5)
+    ax.set_aspect('equal'); ax.grid(True, alpha=0.3)
+    ax.text(A[0]/2+0.1, 0.15, 'A', color='steelblue', fontsize=12)
+    ax.text(B[0]/2+0.1, B[1]/2+0.1, 'B', color=color, fontsize=12)
+
+plt.suptitle("Three landmark dot product cases", fontsize=13)
+plt.tight_layout()
+plt.show()`,
+          prose: [
+            `The left panel shows parallel vectors: both point right, so $A_xB_x > 0$ and $A_yB_y = 0$, giving a positive dot product equal to $|A||B|$. This is the maximum possible value.`,
+            `The middle panel shows perpendicular vectors: $A$ horizontal, $B$ vertical. $(3)(0)+(0)(2) = 0$. Each component pair contributes nothing — perpendicular directions are completely independent.`,
+            `The right panel shows anti-parallel vectors: $B$ points left while $A$ points right, so $A_xB_x = (3)(-2) = -6 < 0$. Friction on a sliding object is anti-parallel to displacement — that is why friction does negative work.`,
+          ],
+        },
+        {
+          cellTitle: 'Work done by force — real application',
+          type: 'code',
+          language: 'python',
+          code: `import numpy as np
+
+# A rope pulls a crate at 30° above horizontal with 60 N
+F_mag, angle = 60.0, np.radians(30)
+F = np.array([F_mag * np.cos(angle), F_mag * np.sin(angle)])
+d = np.array([10.0, 0.0])   # 10 m horizontal displacement
+
+W_rope = np.dot(F, d)
+print(f"Force vector: ({F[0]:.2f}, {F[1]:.2f}) N")
+print(f"Displacement: {d} m")
+print(f"Work by rope: {W_rope:.2f} J")
+print(f"Check: only F_x * d_x = {F[0]:.2f} * 10 = {F[0]*10:.2f} J")
+
+# Gravity acts downward — does zero work on horizontal motion
+g, m = 9.8, 20.0
+F_gravity = np.array([0.0, -m*g])
+W_gravity = np.dot(F_gravity, d)
+print(f"\\nGravity: {F_gravity} N")
+print(f"Work by gravity: {W_gravity:.2f} J  (perpendicular to d → zero)")
+
+# Sweep angles to find which angle maximises work
+angles = np.linspace(0, np.pi, 200)
+works = [np.dot(np.array([60*np.cos(a), 60*np.sin(a)]), d) for a in angles]
+best = np.degrees(angles[np.argmax(works)])
+print(f"\\nAngle maximising work: {best:.0f}° (force aligned with displacement)")`,
+          prose: [
+            `$W = \\vec{F}\\cdot\\vec{d}$ extracts only the component of force along the displacement. Since $d_y=0$, the term $F_yd_y = 0$ regardless of how large the vertical component of force is — the rope's upward pull does zero work.`,
+            `Gravity and horizontal displacement are perpendicular ($\\phi=90°$), confirming $W_{\\text{gravity}} = 0$. The centripetal force in circular motion works the same way — always perpendicular to velocity, so it never changes speed.`,
+            `The sweep shows work = $60 \\times 10 \\times \\cos\\phi$. Maximum at $\\phi=0°$ when force is fully aligned with motion. This is why you push a car horizontally, not at an angle.`,
+          ],
+        },
+        {
+          cellTitle: 'Challenge: solar panel efficiency',
+          type: 'code',
+          language: 'python',
+          challengeType: 'write',
+          starterCode: `import numpy as np
+
+# The sun is at 40° above the horizon
+sun_angle = np.radians(40)
+# sun_hat = np.array([___, ___])   # x = cos(angle from horizontal), y = sin(...)
+
+# Three panel orientations — define their unit normal vectors
+# n1: flat panel — normal points straight up:   n1 = np.array([___, ___])
+# n2: tilted 40° from vertical:                 n2 = np.array([sin(40°), cos(40°)])
+# n3: tilted 80° from vertical:                 n3 = np.array([___, ___])
+
+# Efficiency = dot(n_hat, sun_hat) for each panel
+# efficiencies = [np.dot(n1, sun_hat), np.dot(n2, sun_hat), np.dot(n3, sun_hat)]
+
+# print your results here`,
+          prose: [
+            `A panel's power output is proportional to $\\hat{n}\\cdot\\hat{s}$ — the dot product of the panel's unit normal and the sun's unit direction. When the panel faces the sun directly, $\\phi=0°$ and efficiency = 1 (100%).`,
+            `\`sun_hat = np.array([np.cos(sun_angle), np.sin(sun_angle)])\`. For n2 tilted 40° from vertical: its normal is 40° away from straight-up, so x-component = $\\sin40°$, y-component = $\\cos40°$.`,
+            `When the panel's normal exactly faces the sun, $\\hat{n}\\cdot\\hat{s} = 1$. This is why solar panels are angled — not flat — to maximise the dot product with the sun's direction. This is the dot product as a real engineering design tool.`,
+          ],
+        },
+      ],
+    },
+    matlab: {
+      type: 'OpenMatNotebook',
+      cells: [
+        {
+          cellTitle: 'Both dot product formulas in MATLAB',
+          type: 'code',
+          language: 'matlab',
+          code: `% Two vectors at 60° to each other
+A = [4.0, 0.0];           % points right, magnitude 4
+B = [3.0, 3*sqrt(3)];     % magnitude 6, at 60° from A
+
+% Method 1: geometric formula — need the angle
+phi = deg2rad(60);
+dot_geometric = norm(A) * norm(B) * cos(phi);
+
+% Method 2: component formula — manual
+dot_component = A(1)*B(1) + A(2)*B(2);
+
+% Method 3: MATLAB built-in (use this in practice)
+dot_matlab = dot(A, B);
+
+fprintf('Geometric:  %.4f\\n', dot_geometric);
+fprintf('Component:  %.4f\\n', dot_component);
+fprintf('dot():      %.4f\\n', dot_matlab);
+all_equal = abs(dot_geometric - dot_matlab) < 1e-10 && ...
+            abs(dot_component - dot_matlab) < 1e-10;
+fprintf('All equal?  %d\\n', all_equal);`,
+          prose: [
+            `MATLAB's \`dot(A, B)\` computes the dot product directly — identical to NumPy's \`np.dot(A, B)\`. Both implement $A_xB_x + A_yB_y$. Note that MATLAB uses 1-based indexing: \`A(1)\` is $A_x$, \`A(2)\` is $A_y$.`,
+            `\`norm(A)\` returns the Euclidean magnitude $|A| = \\sqrt{A_x^2+A_y^2}$; \`deg2rad\` converts degrees to radians for \`cos()\`. The geometric formula needs the angle in radians — a common source of bugs.`,
+            `All three methods return 12.0, confirming that the geometric definition and the component formula are identical. The proof works by expanding the component sum using the orthonormality of $\\hat{i}$ and $\\hat{j}$.`,
+          ],
+        },
+        {
+          cellTitle: 'Visualising the three landmark cases',
+          type: 'code',
+          language: 'matlab',
+          code: `A = [3, 0];
+B_cases = {[2, 0], [0, 2], [-2, 0]};
+titles = {'Parallel (φ=0°)', 'Perpendicular (φ=90°)', 'Anti-parallel (φ=180°)'};
+colors = {'b', [0.9 0.5 0], 'r'};
+
+figure('Position', [100 100 900 300]);
+for k = 1:3
+    subplot(1, 3, k);
+    B = B_cases{k};
+    quiver(0, 0, A(1), A(2), 0, 'b', 'LineWidth', 2); hold on;
+    quiver(0, 0, B(1), B(2), 0, 'Color', colors{k}, 'LineWidth', 2);
+    dp = dot(A, B);
+    title(sprintf('%s\\nA·B = %.1f', titles{k}, dp));
+    xlim([-3.5 3.5]); ylim([-1 3.5]);
+    axis equal; grid on;
+    text(A(1)/2+0.1, 0.2, 'A', 'Color', 'b', 'FontSize', 12);
+    text(B(1)/2+0.1, B(2)/2+0.1, 'B', 'Color', colors{k}, 'FontSize', 12);
+end
+sgtitle('Three landmark dot product cases');`,
+          prose: [
+            `\`quiver(0,0,Ax,Ay,0)\` draws a vector from the origin with the final \`0\` disabling auto-scaling so arrows appear at their true length. \`hold on\` allows drawing multiple arrows in the same subplot.`,
+            `\`dot(A,B)\` returns the scalar dot product. The three panels confirm: parallel → positive, perpendicular → zero, anti-parallel → negative. These three cases determine the sign of any dot product.`,
+            `\`sgtitle\` adds a title spanning all subplots — useful for grouped comparisons. \`subplot(1,3,k)\` creates a 1×3 panel grid. \`axis equal\` ensures vectors look geometrically correct.`,
+          ],
+        },
+        {
+          cellTitle: 'Work done by force — real application',
+          type: 'code',
+          language: 'matlab',
+          code: `% Rope pulls crate at 30° above horizontal with 60 N force
+F_mag = 60;
+angle = deg2rad(30);
+F = [F_mag * cos(angle), F_mag * sin(angle)];
+d = [10, 0];   % 10 m horizontal displacement
+
+W_rope = dot(F, d);
+fprintf('Force: (%.2f, %.2f) N\\n', F(1), F(2));
+fprintf('Work by rope: %.2f J\\n', W_rope);
+fprintf('Check F_x*d_x = %.2f * 10 = %.2f J\\n', F(1), F(1)*10);
+
+% Gravity perpendicular to horizontal displacement
+g = 9.8; m = 20;
+F_gravity = [0, -m*g];
+W_gravity = dot(F_gravity, d);
+fprintf('\\nWork by gravity: %.2f J (perpendicular to d -> zero)\\n', W_gravity);
+
+% Sweep angles to find which maximises work
+angles = linspace(0, pi, 200);
+works = 60 * 10 * cos(angles);   % |F||d|cos(phi), |d|=10
+[max_W, idx] = max(works);
+fprintf('\\nMax work %.2f J at angle %.0f degrees\\n', max_W, rad2deg(angles(idx)));`,
+          prose: [
+            `$W = \\vec{F}\\cdot\\vec{d}$ in MATLAB is \`dot(F, d)\`. Since $d_y = 0$, the term $F_y d_y = 0$ and only the horizontal force component does work — the vertical rope pull lifts but doesn't move the crate forward.`,
+            `Gravity and horizontal displacement are perpendicular ($\\phi=90°$), confirming $W_{\\text{gravity}} = 0$. This is a standard physics sanity check: if two vectors are perpendicular, \`dot\` must return zero.`,
+            `The sweep uses $|F||d|\\cos\\phi$ directly. \`linspace(0,pi,200)\` samples all angles. Maximum work is at $\\phi=0°$ — force fully aligned with displacement. \`max()\` returns both the value and its index.`,
+          ],
+        },
+        {
+          cellTitle: 'Challenge: solar panel efficiency',
+          type: 'code',
+          language: 'matlab',
+          challengeType: 'write',
+          starterCode: `% The sun is at 40° above the horizon
+sun_angle = deg2rad(40);
+% sun_hat = [___, ___]   % [cos(angle), sin(angle)]
+
+% Three panel unit normals
+% n1: flat panel — straight up:     n1 = [___, ___]
+% n2: tilted 40° from vertical:     n2 = [sin(deg2rad(40)), cos(deg2rad(40))]
+% n3: tilted 80° from vertical:     n3 = [___, ___]
+
+% Efficiency = dot(n_i, sun_hat) for each
+% eff1 = dot(n1, sun_hat);
+% eff2 = ___
+% eff3 = ___
+
+% fprintf('Flat: %.3f, Tilted 40: %.3f, Tilted 80: %.3f\\n', eff1, eff2, eff3)`,
+          prose: [
+            `Panel power output is proportional to $\\hat{n}\\cdot\\hat{s}$ — the dot product of the panel's unit normal with the sun's unit direction. When the normal faces the sun directly, $\\phi=0°$ and efficiency = 1.`,
+            `\`sun_hat = [cos(sun_angle), sin(sun_angle)]\`. For n2 tilted 40° from vertical: its normal points 40° away from straight-up, so \`n2 = [sin(deg2rad(40)), cos(deg2rad(40))]\`.`,
+            `The panel aligned with the sun achieves \`dot(n2, sun_hat) = 1.0\` because $\\phi=0°$. This is the dot product as engineering: maximise $\\hat{n}\\cdot\\hat{s}$ to maximise power. Real solar trackers do exactly this calculation.`,
+          ],
+        },
+      ],
+    },
+  },
+
   quiz: [
     {
       id: 'p1-ch1-010-q1',
+      type: 'choice',
       question: `The dot product $\\vec{A}\\cdot\\vec{B}$ produces:`,
       options: [`A vector perpendicular to both`, `A scalar (a number)`, `A unit vector`, `A vector in the same direction as $\\vec{A}$`],
-      answer: 1,
+      answer: `A scalar (a number)`,
+      hints: [
+        'Think about what "scalar product" means.',
+        'The cross product gives a vector; the dot product gives a...',
+      ],
+      reviewSection: 'intuition',
       explanation: `The dot product (scalar product) takes two vectors and produces a single number — a scalar. This distinguishes it from the cross product.`,
     },
     {
       id: 'p1-ch1-010-q2',
+      type: 'choice',
       question: `$\\vec{A} = (3, 4)$ and $\\vec{B} = (4, -3)$. What is $\\vec{A}\\cdot\\vec{B}$?`,
       options: [`$25$`, `$0$`, `$7$`, `$-7$`],
-      answer: 1,
+      answer: `$0$`,
+      hints: [
+        'Use the component formula: $A_xB_x + A_yB_y$.',
+        '$x$-terms: $3\\times4 = 12$; $y$-terms: $4\\times(-3) = ?$',
+      ],
+      reviewSection: 'math',
       explanation: `$\\vec{A}\\cdot\\vec{B} = (3)(4) + (4)(-3) = 12 - 12 = 0$. The vectors are perpendicular!`,
     },
     {
       id: 'p1-ch1-010-q3',
+      type: 'choice',
       question: `Work is defined as $W = \\vec{F}\\cdot\\vec{d}$. If $\\vec{F}$ is perpendicular to $\\vec{d}$, the work done is:`,
       options: [`$|F||d|$`, `$-|F||d|$`, `$0$`, `$|F|+|d|$`],
-      answer: 2,
+      answer: `$0$`,
+      hints: [
+        'What is $\\cos90°$?',
+        '$W = |F||d|\\cos\\phi$ — substitute $\\phi=90°$.',
+      ],
+      reviewSection: 'intuition',
       explanation: `$W = |F||d|\\cos90° = |F||d|(0) = 0$. A force perpendicular to motion does no work — no matter how large the force.`,
     },
     {
       id: 'p1-ch1-010-q4',
+      type: 'choice',
       question: `$\\vec{A}\\cdot\\vec{A} = ?$`,
       options: [`$1$`, `$|\\vec{A}|^2$`, `$0$`, `$2|\\vec{A}|$`],
-      answer: 1,
+      answer: `$|\\vec{A}|^2$`,
+      hints: [
+        'What is the angle between a vector and itself?',
+        '$\\vec{A}\\cdot\\vec{A} = A_x^2 + A_y^2 + A_z^2$ — does that look familiar?',
+      ],
+      reviewSection: 'math',
       explanation: `$\\vec{A}\\cdot\\vec{A} = A_x^2+A_y^2+A_z^2 = |\\vec{A}|^2$. The angle between a vector and itself is 0°, so $\\cos0° = 1$.`,
     },
     {
       id: 'p1-ch1-010-q5',
+      type: 'choice',
       question: `The dot product is positive when the angle $\\phi$ between the vectors is:`,
       options: [`$\\phi > 90°$`, `$\\phi = 90°$`, `$\\phi < 90°$`, `Always`],
-      answer: 2,
+      answer: `$\\phi < 90°$`,
+      hints: [
+        'The sign of the dot product equals the sign of $\\cos\\phi$.',
+        '$\\cos\\phi$ is positive, zero, or negative for what ranges of $\\phi$?',
+      ],
+      reviewSection: 'intuition',
       explanation: `$\\cos\\phi > 0$ for $\\phi < 90°$ (acute). $\\cos\\phi = 0$ at $90°$. $\\cos\\phi < 0$ for $\\phi > 90°$ (obtuse).`,
     },
     {
       id: 'p1-ch1-010-q6',
+      type: 'choice',
       question: `Is $\\vec{A}\\cdot\\vec{B} = \\vec{B}\\cdot\\vec{A}$?`,
       options: [`No — order matters`, `Yes — the dot product is commutative`, `Only when vectors are parallel`, `Only in 2D`],
-      answer: 1,
+      answer: `Yes — the dot product is commutative`,
+      hints: [
+        'Try the component formula: does $A_xB_x + A_yB_y = B_xA_x + B_yA_y$?',
+        'Ordinary multiplication of numbers is commutative — and the component formula is just sums of products.',
+      ],
+      reviewSection: 'math',
       explanation: `$A_xB_x + A_yB_y = B_xA_x + B_yA_y$. The dot product is commutative.`,
     },
     {
       id: 'p1-ch1-010-q7',
+      type: 'choice',
       question: `$(\\vec{A}\\cdot\\vec{B})\\cdot\\vec{C}$ is:`,
       options: [
         `A vector in the direction of $\\vec{C}$`,
@@ -545,11 +652,17 @@ export default {
         `Equal to $\\vec{A}\\cdot(\\vec{B}\\cdot\\vec{C})$`,
         `Always zero`,
       ],
-      answer: 1,
+      answer: `Undefined — you cannot dot a scalar with a vector`,
+      hints: [
+        'What type of object is $\\vec{A}\\cdot\\vec{B}$?',
+        'The dot product requires two vectors as inputs — check what the second dot product here is trying to dot.',
+      ],
+      reviewSection: 'math',
       explanation: `$\\vec{A}\\cdot\\vec{B}$ is a scalar. Scalars cannot be dotted with vectors. The dot product is not associative in this sense.`,
     },
     {
       id: 'p1-ch1-010-q8',
+      type: 'choice',
       question: `The Cauchy-Schwarz inequality states $|\\vec{A}\\cdot\\vec{B}| \\le |\\vec{A}||\\vec{B}|$. When does equality hold?`,
       options: [
         `When $\\vec{A} = \\vec{B}$`,
@@ -557,8 +670,132 @@ export default {
         `When $\\vec{A}$ and $\\vec{B}$ are perpendicular`,
         `Always`,
       ],
-      answer: 1,
+      answer: `When $\\vec{A}$ and $\\vec{B}$ are parallel (same or opposite directions)`,
+      hints: [
+        'Cauchy-Schwarz follows from $|\\cos\\phi| \\le 1$. When is $|\\cos\\phi| = 1$?',
+        '$|\\cos\\phi| = 1$ at $\\phi = 0°$ or $\\phi = 180°$ — what do those angles mean geometrically?',
+      ],
+      reviewSection: 'rigor',
       explanation: `Equality holds when $|\\cos\\phi| = 1$, i.e. $\\phi = 0°$ (same direction) or $\\phi = 180°$ (opposite). In both cases the vectors are parallel.`,
     },
+    {
+      id: 'p1-ch1-010-q9',
+      type: 'choice',
+      question: `$\\vec{A} = (1, 0, 0)$ and $\\vec{B} = (0, 1, 0)$. What is $\\vec{A}\\cdot\\vec{B}$, and what does this tell you?`,
+      options: [
+        `$1$ — the vectors are parallel`,
+        `$0$ — the vectors are perpendicular`,
+        `$-1$ — the vectors are anti-parallel`,
+        `$\\sqrt{2}$ — the sum of their magnitudes`,
+      ],
+      answer: `$0$ — the vectors are perpendicular`,
+      hints: [
+        'Apply the 3D component formula: $A_xB_x + A_yB_y + A_zB_z$.',
+        'These are the $x$ and $y$ unit vectors $\\hat{i}$ and $\\hat{j}$ — they point in perpendicular directions.',
+      ],
+      reviewSection: 'math',
+      explanation: `$\\vec{A}\\cdot\\vec{B} = (1)(0) + (0)(1) + (0)(0) = 0$. This confirms that the basis vectors $\\hat{i}$ and $\\hat{j}$ are orthogonal (perpendicular) — a fact used in the proof that the component formula equals the geometric definition.`,
+    },
+    {
+      id: 'p1-ch1-010-q10',
+      type: 'choice',
+      question: `A particle experiences force $\\vec{F} = (3, -4)$ N and moves along $\\vec{d} = (8, 6)$ m. What is the work done?`,
+      options: [`$0$ J`, `$-24$ J`, `$50$ J`, `$25$ J`],
+      answer: `$0$ J`,
+      hints: [
+        'Apply $W = \\vec{F}\\cdot\\vec{d} = F_xd_x + F_yd_y$.',
+        'Compute $x$-term and $y$-term separately before summing.',
+      ],
+      reviewSection: 'examples',
+      explanation: `$W = (3)(8) + (-4)(6) = 24 - 24 = 0$ J. The force and displacement are perpendicular — no net work is done despite both being non-zero. This is a common surprise: large forces and large displacements don't guarantee work.`,
+    },
   ],
+
+  misconceptions: [
+    {
+      id: 'p1-ch1-010-m1',
+      wrong: 'The dot product of two non-zero vectors can never be zero.',
+      correction: 'It can — and it is zero precisely when the vectors are perpendicular. $\\vec{A}=(3,-2)$ and $\\vec{B}=(4,6)$ have dot product $12-12=0$ even though both are non-zero vectors.',
+      correctionExample: '$\\vec{A}=(3,-2),\\;\\vec{B}=(4,6):\\quad \\vec{A}\\cdot\\vec{B} = 12-12 = 0$',
+    },
+    {
+      id: 'p1-ch1-010-m2',
+      wrong: 'If $\\vec{A}\\cdot\\vec{B} = \\vec{A}\\cdot\\vec{C}$, then $\\vec{B} = \\vec{C}$.',
+      correction: 'False. The dot product is not one-to-one — many different vectors $\\vec{B}$ can give the same dot product with a fixed $\\vec{A}$. For example, with $\\vec{A}=(1,0)$: $\\vec{B}=(5,0)$ and $\\vec{C}=(5,99)$ both give $\\vec{A}\\cdot\\vec{B} = \\vec{A}\\cdot\\vec{C} = 5$. You cannot cancel $\\vec{A}$ from both sides.',
+      correctionExample: '$\\vec{A}=(1,0),\\;\\vec{B}=(5,0),\\;\\vec{C}=(5,99):\\quad \\vec{A}\\cdot\\vec{B}=5=\\vec{A}\\cdot\\vec{C}$ but $\\vec{B}\\ne\\vec{C}$',
+    },
+  ],
+
+  transferPrompts: [
+    {
+      id: 'p1-ch1-010-t1',
+      prompt: `In signal processing, two discrete signals $x[n]$ and $y[n]$ are called "uncorrelated" if $\\sum_n x[n]y[n] = 0$. How does this relate to the dot product, and why is a zero correlation physically meaningful?`,
+    },
+    {
+      id: 'p1-ch1-010-t2',
+      prompt: `In machine learning, the "cosine similarity" between two vectors is $\\frac{\\vec{A}\\cdot\\vec{B}}{|\\vec{A}||\\vec{B}|}$. What does a cosine similarity of 1 mean? Of 0? Of −1? Why divide by the magnitudes?`,
+    },
+  ],
+
+  debugging: [
+    {
+      id: 'p1-ch1-010-d1',
+      buggyCode: `A = [3, 4]
+B = [2, -1]
+dot = A * B
+print(dot)`,
+      language: 'python',
+      issue: 'In Python, `A * B` with lists gives an error or element-wise multiplication with NumPy arrays — it does NOT compute the dot product.',
+      fix: `import numpy as np
+A = np.array([3, 4])
+B = np.array([2, -1])
+dot = np.dot(A, B)   # or A @ B
+print(dot)  # Should print 2`,
+    },
+    {
+      id: 'p1-ch1-010-d2',
+      buggyCode: `import numpy as np
+A = np.array([1, 2, 3])
+B = np.array([4, 5, 6])
+dot = A[0]*B[0] + A[1]*B[1]   # forgot z-term
+print(dot)`,
+      language: 'python',
+      issue: 'For 3D vectors the component formula needs all three terms: $A_xB_x + A_yB_y + A_zB_z$. The code drops the $z$-term, giving 14 instead of the correct 32.',
+      fix: `import numpy as np
+A = np.array([1, 2, 3])
+B = np.array([4, 5, 6])
+dot = np.dot(A, B)   # handles any dimension automatically
+print(dot)  # 1*4 + 2*5 + 3*6 = 4+10+18 = 32`,
+    },
+  ],
+
+  mastery: {
+    targetLevel: 'You can compute the dot product both ways (component and geometric), identify the angle range from its sign, and apply $W = \\vec{F}\\cdot\\vec{d}$ in multi-force problems.',
+    prerequisites: ['Vector components and magnitude', 'Trigonometry: $\\cos0°=1$, $\\cos90°=0$, $\\cos180°=-1$'],
+    unlocks: ['Finding the angle between two vectors (dot product ÷ product of magnitudes)', 'Scalar projection and vector projection', 'Cross product'],
+    checkpoints: [
+      'Can compute $\\vec{A}\\cdot\\vec{B}$ from components and from magnitudes + angle — and get the same answer',
+      'Can identify perpendicular vectors using the dot product test (result = 0)',
+      'Can compute work done by a force using $W = \\vec{F}\\cdot\\vec{d}$ and explain why a perpendicular force does zero work',
+      'Can predict the sign of a dot product from a sketch before computing',
+    ],
+  },
+
+  semantics: {
+    core: [
+      { symbol: '\\vec{A}\\cdot\\vec{B}', meaning: 'Dot product (scalar product) — a single number measuring "overlap" between $\\vec{A}$ and $\\vec{B}$' },
+      { symbol: '\\phi', meaning: 'Angle between the two vectors measured tail-to-tail, always in $[0°, 180°]$' },
+      { symbol: '|\\vec{A}||\\vec{B}|\\cos\\phi', meaning: 'Geometric form — requires knowing the angle between vectors' },
+      { symbol: 'A_xB_x + A_yB_y', meaning: 'Component form — requires only the $x$ and $y$ components, no angle needed' },
+      { symbol: 'W = \\vec{F}\\cdot\\vec{d}', meaning: 'Work = dot product of force and displacement; only the component of force along $\\vec{d}$ contributes' },
+      { symbol: '\\vec{A}\\cdot\\vec{A} = |\\vec{A}|^2', meaning: 'Self-dot equals magnitude squared — connects the dot product to vector length' },
+    ],
+    rulesOfThumb: [
+      'Dot product positive → vectors are more aligned than opposed ($\\phi < 90°$); negative → more opposed ($\\phi > 90°$); zero → perfectly perpendicular.',
+      'The dot product is a scalar — it has no direction. If your answer is a vector, you made an error.',
+      'Use the component formula when you know $x$,$y$,$z$; use the geometric formula when you know magnitudes and angle.',
+      'A force perpendicular to motion does zero work — no matter how large the force is.',
+      'The dot product is the inner product: it defines angle and length in any $n$-dimensional space, not just 2D and 3D.',
+    ],
+  },
 }

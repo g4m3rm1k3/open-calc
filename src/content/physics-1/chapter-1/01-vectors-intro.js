@@ -130,7 +130,7 @@ export default {
         type: 'definition',
         title: 'Unit vectors î and ĵ',
         body:
-          `\\hat{\\imath} = (1,\\,0)$ — points in the $+x$ direction, magnitude 1. \\hat{\\jmath} = (0,\\,1)$ — points in the $+y$ direction, magnitude 1. In 3D, $\\hat{k}$ points in $+z$. Unit vectors have no units — they are pure direction indicators.`,
+          `$\\hat{\\imath} = (1,\\,0)$ — points in the $+x$ direction, magnitude 1. $\\hat{\\jmath} = (0,\\,1)$ — points in the $+y$ direction, magnitude 1. In 3D, $\\hat{k}$ points in $+z$. Unit vectors have no units — they are pure direction indicators.`,
       },
       {
         type: 'mnemonic',
@@ -235,304 +235,301 @@ export default {
     ],
   },
 
-  // ── Python Notebook ──────────────────────────────────────────────────────
-  // Embedded as a PythonNotebook visualization in the math section
-  python: {
-    title: 'Vectors in Python — from first principles to real physics',
-    description:
-      `We will represent vectors as NumPy arrays, compute magnitudes and angles, and build up to a real-world application: tracking a plane in flight.`,
-    placement: 'after_rigor',
-    visualizations: [
-      {
-        id: 'PythonNotebook',
-        title: 'Vector Lab 1 — Vectors with NumPy',
-        mathBridge: 'Python treats vectors exactly like physics does: as arrays of numbers. NumPy makes the arithmetic clean.',
-        caption: 'Run each cell top-to-bottom. Variables carry between cells.',
-        props: {
-          initialCells: [
+  notebooks: {
+    python: {
+      type: 'PythonNotebook',
+      title: 'Vectors in Python — from arrows to code',
+      cells: [
 
-            // ── CELL 1: What is a vector in Python? ─────────────────────────
-            {
-              id: 1,
-              cellTitle: '1 · What a vector looks like in Python',
-              prose:
-                `In physics we write $\\vec{v} = 3\\hat{\\imath} + 4\\hat{\\jmath}$ to mean "3 units east, 4 units north."\n\nIn Python (using NumPy) we write \`v = np.array([3, 4])\`. The first element is the x-component, the second is the y-component.\n\nThat's it — a vector is just a list of components. All the physics follows from this.`,
-              code: [
-                'import numpy as np',
-                '',
-                '# A 2D velocity vector: 3 m/s east, 4 m/s north',
-                'v = np.array([3.0, 4.0])',
-                '',
-                'print(f"Vector v = {v}")',
-                'print(f"x-component: {v[0]} m/s")',
-                'print(f"y-component: {v[1]} m/s")',
-              ].join('\n'),
-              output: '',
-              status: 'idle',
-              figureJson: null,
-            },
+        {
+          cellTitle: 'Vectors as arrays: creation, magnitude, direction',
+          type: 'code',
+          language: 'python',
+          code: `import numpy as np
+import matplotlib.pyplot as plt
 
-            // ── CELL 2: Magnitude ────────────────────────────────────────────
-            {
-              id: 2,
-              cellTitle: '2 · Computing the magnitude (speed)',
-              prose:
-                `The magnitude $|\\vec{v}| = \\sqrt{v_x^2 + v_y^2}$ is just the Pythagorean theorem.\n\nFor our vector $\\vec{v} = (3, 4)$: magnitude $= \\sqrt{9 + 16} = \\sqrt{25} = 5$ m/s.\n\nNumPy gives us \`np.linalg.norm()\` for this — it works in 2D, 3D, or any dimension.`,
-              code: [
-                '# Method 1: manual Pythagorean theorem',
-                'manual = np.sqrt(v[0]**2 + v[1]**2)',
-                'print(f"Manual:      {manual:.4f} m/s")',
-                '',
-                '# Method 2: NumPy built-in (use this in practice)',
-                'magnitude = np.linalg.norm(v)',
-                'print(f"np.linalg.norm: {magnitude:.4f} m/s")',
-                '',
-                '# They should be identical',
-                'print(f"Same? {np.isclose(manual, magnitude)}")',
-              ].join('\n'),
-              output: '',
-              status: 'idle',
-              figureJson: null,
-            },
+# In physics: v = 3î + 4ĵ (3 m/s east, 4 m/s north)
+# In NumPy:   v = np.array([3.0, 4.0])  — same idea, just a list of components
+v = np.array([3.0, 4.0])
 
-            // ── CELL 3: Direction / angle ────────────────────────────────────
-            {
-              id: 3,
-              cellTitle: '3 · Computing the direction (angle)',
-              prose:
-                `The direction is $\\theta = \\arctan(v_y / v_x)$. In Python, use \`np.arctan2(y, x)\` — this two-argument version handles all four quadrants automatically (it's the correct version; avoid \`np.arctan(y/x)\` which breaks in Quadrants II and III).\n\n\`np.arctan2\` returns radians. Multiply by \`180/π\` (or use \`np.degrees()\`) to convert to degrees.`,
-              code: [
-                '# arctan2 handles all 4 quadrants correctly',
-                'angle_rad = np.arctan2(v[1], v[0])   # arctan2(y, x) — note the order!',
-                'angle_deg = np.degrees(angle_rad)',
-                '',
-                'print(f"Angle: {angle_rad:.4f} radians")',
-                'print(f"Angle: {angle_deg:.2f}°")',
-                '',
-                '# Verify: for v=(3,4), angle should be arctan(4/3) ≈ 53.13°',
-                'print(f"Check: arctan(4/3) = {np.degrees(np.arctan(4/3)):.2f}°")',
-              ].join('\n'),
-              output: '',
-              status: 'idle',
-              figureJson: null,
-            },
+# Magnitude: |v| = sqrt(vx^2 + vy^2)  — Pythagorean theorem
+magnitude = np.linalg.norm(v)   # works in 2D, 3D, or any dimension
 
-            // ── CELL 4: CHALLENGE — components → magnitude (fill-in) ─────────
-            {
-              id: 4,
-              cellTitle: '4 · Challenge: a force vector',
-              challengeType: 'fill-in',
-              challengeNumber: 1,
-              challengeTitle: 'Magnitude and direction of a force',
-              difficulty: 'easy',
-              prompt:
-                `A force vector has components $F_x = -6.0$ N and $F_y = 8.0$ N. Compute its magnitude and direction. The direction should be between 90° and 180° (Quadrant II — left and up).`,
-              starterBlock: [
-                'F = np.array([___, ___])           # fill in Fx and Fy',
-                'F_mag = np.linalg.norm(___)         # compute magnitude',
-                'F_angle = np.degrees(np.arctan2(___, ___))  # angle in degrees',
-              ].join('\n'),
-              code: [
-                '# Define the force vector',
-                'F = np.array([-6.0, 8.0])',
-                'F_mag = np.linalg.norm(F)',
-                'F_angle = np.degrees(np.arctan2(F[1], F[0]))',
-                '',
-                'print(f"|F| = {F_mag:.2f} N")',
-                'print(f"θ   = {F_angle:.2f}°")',
-              ].join('\n'),
-              output: '',
-              status: 'idle',
-              figureJson: null,
-              testCode: [
-                'import numpy as np',
-                'assert "F" in dir(), "Define the vector F"',
-                'assert "F_mag" in dir(), "Compute F_mag"',
-                'assert "F_angle" in dir(), "Compute F_angle"',
-                'assert np.isclose(F_mag, 10.0, atol=0.01), f"|F| should be 10.0 N, got {F_mag:.2f}"',
-                'assert np.isclose(F_angle, 126.87, atol=0.1), f"θ should be ≈126.87°, got {F_angle:.2f}°"',
-                '"SUCCESS: |F| = 10.0 N at 126.87° — Quadrant II as expected."',
-              ].join('\n'),
-              hint:
-                `F = np.array([-6.0, 8.0]).\nMagnitude: np.linalg.norm(F) — should give 10.\nAngle: np.arctan2(F[1], F[0]) — arctan2 handles Quadrant II automatically.`,
-            },
+# Direction: theta = arctan2(vy, vx)
+# Use arctan2 (two-argument), NOT arctan(vy/vx) — arctan2 handles all 4 quadrants
+angle_deg = np.degrees(np.arctan2(v[1], v[0]))
 
-            // ── CELL 5: Rebuilding from polar form ───────────────────────────
-            {
-              id: 5,
-              cellTitle: '5 · Converting magnitude+angle back to components',
-              prose:
-                `We just went Components → Polar. Now go the other way: Polar → Components.\n\nGiven $|\\vec{A}| = 10$ and $\\theta = 53.13°$, recover $A_x$ and $A_y$:\n$A_x = |\\vec{A}|\\cos\\theta$,  $A_y = |\\vec{A}|\\sin\\theta$.\n\nWe can verify the round-trip is exact.`,
-              code: [
-                'magnitude = 10.0',
-                'theta_deg = 53.13',
-                'theta_rad = np.radians(theta_deg)',
-                '',
-                'Ax = magnitude * np.cos(theta_rad)',
-                'Ay = magnitude * np.sin(theta_rad)',
-                '',
-                'print(f"Components: Ax = {Ax:.4f},  Ay = {Ay:.4f}")',
-                'print(f"Expected:   Ax ≈ 6.0,      Ay ≈ 8.0")',
-                '',
-                '# Round-trip check',
-                'recovered = np.array([Ax, Ay])',
-                'print(f"Round-trip magnitude: {np.linalg.norm(recovered):.4f}")',
-              ].join('\n'),
-              output: '',
-              status: 'idle',
-              figureJson: null,
-            },
+print(f"v = {v} m/s")
+print(f"|v| = {magnitude:.4f} m/s  (should be 5.0)")
+print(f"theta = {angle_deg:.2f} deg  (should be 53.13 deg)")
 
-            // ── CELL 6: Real-world — aircraft velocity ───────────────────────
-            {
-              id: 6,
-              cellTitle: '6 · Real world: tracking an aircraft',
-              prose:
-                `A radar system picks up an aircraft and reports its velocity as:\n**speed = 250 m/s**, **heading = 310°** (measured clockwise from north, like a compass).\n\nPhysics uses angles measured counterclockwise from the +x axis (east). A compass heading of 310° = 50° west of north = 90° + 50° = 140° in physics convention. More precisely, the physics angle is: $\\theta_{physics} = 90° - \\theta_{heading}$ (or add/subtract 360° to keep in range).\n\nRun the cell to decompose the aircraft's velocity into east and north components.`,
-              code: [
-                '# Radar reports: speed=250 m/s, heading=310° (clockwise from north)',
-                'speed = 250.0          # m/s',
-                'heading_deg = 310.0    # compass heading, clockwise from north',
-                '',
-                '# Convert compass heading → physics angle (CCW from +x/east)',
-                'physics_angle_deg = 90.0 - heading_deg   # = 90 - 310 = -220 → same as 140°',
-                'physics_angle_rad = np.radians(physics_angle_deg)',
-                '',
-                '# Decompose into east (x) and north (y) components',
-                'v_east  = speed * np.cos(physics_angle_rad)',
-                'v_north = speed * np.sin(physics_angle_rad)',
-                '',
-                'v_aircraft = np.array([v_east, v_north])',
-                'print(f"Aircraft velocity vector: {v_aircraft} m/s")',
-                'print(f"East  component: {v_east:.1f} m/s")',
-                'print(f"North component: {v_north:.1f} m/s")',
-                'print(f"Speed check: {np.linalg.norm(v_aircraft):.1f} m/s (should be 250)")',
-              ].join('\n'),
-              output: '',
-              status: 'idle',
-              figureJson: null,
-            },
-
-            // ── CELL 7: Visualise ────────────────────────────────────────────
-            {
-              id: 7,
-              cellTitle: '7 · Visualising vectors with matplotlib',
-              prose:
-                `A picture is worth a thousand equations. Let's plot both the aircraft's velocity vector and its east/north components on the same diagram.`,
-              code: [
-                'import matplotlib.pyplot as plt',
-                '',
-                'fig, ax = plt.subplots(figsize=(6, 6))',
-                'ax.set_aspect("equal")',
-                'ax.set_facecolor("#0a1628")',
-                'fig.patch.set_facecolor("#0a1628")',
-                '',
-                '# Draw the full velocity vector',
-                'ax.annotate("", xy=(v_east, v_north), xytext=(0, 0),',
-                '            arrowprops=dict(arrowstyle="->", color="#38b6ff", lw=2.5))',
-                '',
-                '# Draw east component (horizontal)',
-                'ax.annotate("", xy=(v_east, 0), xytext=(0, 0),',
-                '            arrowprops=dict(arrowstyle="->", color="#ff4545", lw=2))',
-                '',
-                '# Draw north component (vertical)',
-                'ax.annotate("", xy=(v_east, v_north), xytext=(v_east, 0),',
-                '            arrowprops=dict(arrowstyle="->", color="#00c875", lw=2))',
-                '',
-                '# Labels',
-                'ax.text(v_east/2, -18, f"east: {v_east:.0f} m/s", color="#ff4545", ha="center", fontsize=11)',
-                'ax.text(v_east+15, v_north/2, f"north: {v_north:.0f} m/s", color="#00c875", fontsize=11)',
-                'ax.text(v_east/2 + 20, v_north/2 + 20, f"|v|= {speed:.0f} m/s\\n310° heading",',
-                '        color="#38b6ff", fontsize=11)',
-                '',
-                '# Axes',
-                'ax.axhline(0, color="white", alpha=0.3, lw=0.7)',
-                'ax.axvline(0, color="white", alpha=0.3, lw=0.7)',
-                'ax.set_xlabel("East → (m/s)", color="white")',
-                'ax.set_ylabel("North → (m/s)", color="white")',
-                'ax.set_title("Aircraft velocity decomposed into components", color="white", pad=12)',
-                'ax.tick_params(colors="white")',
-                'for spine in ax.spines.values(): spine.set_color("#1e2d3d")',
-                '',
-                'plt.tight_layout()',
-                'plt.savefig("/tmp/vector_aircraft.png", dpi=100, bbox_inches="tight",',
-                '            facecolor="#0a1628")',
-                'plt.show()',
-                'print("Vector diagram saved.")',
-              ].join('\n'),
-              output: '',
-              status: 'idle',
-              figureJson: null,
-            },
-
-            // ── CELL 8: CHALLENGE — 3D vector ────────────────────────────────
-            {
-              id: 8,
-              cellTitle: '8 · Challenge: extend to 3D',
-              challengeType: 'write',
-              challengeNumber: 2,
-              challengeTitle: '3D velocity of a drone',
-              difficulty: 'medium',
-              prompt:
-                `A drone has velocity components: $v_x = 5$ m/s (east), $v_y = 3$ m/s (north), $v_z = 2$ m/s (up).\n\n1. Create the 3D numpy array \`v_drone\`.\n2. Compute its speed \`speed_3d = np.linalg.norm(v_drone)\`.\n3. Compute the angle above the horizontal: \`phi = np.degrees(np.arctan2(v_drone[2], np.linalg.norm(v_drone[:2])))\`.\n\nExpected: speed ≈ 6.16 m/s, angle ≈ 18.9° above horizontal.`,
-              code: [
-                '# Write your solution here',
-                '# v_drone = np.array([___, ___, ___])',
-                '# speed_3d = ...',
-                '# phi = ...',
-              ].join('\n'),
-              output: '',
-              status: 'idle',
-              figureJson: null,
-              testCode: [
-                'import numpy as np',
-                'assert "v_drone" in dir(), "Define v_drone as a 3D numpy array"',
-                'assert len(v_drone) == 3, "v_drone should have 3 components"',
-                'assert "speed_3d" in dir(), "Compute speed_3d"',
-                'assert "phi" in dir(), "Compute phi (elevation angle)"',
-                'assert np.isclose(speed_3d, np.sqrt(5**2+3**2+2**2), atol=0.01), f"speed_3d wrong: {speed_3d:.3f}"',
-                'assert np.isclose(phi, np.degrees(np.arctan2(2, np.sqrt(25+9))), atol=0.1), f"phi wrong: {phi:.2f}°"',
-                '"SUCCESS: 3D vector computed correctly. The XY speed is √(5²+3²)=√34≈5.83 m/s, and the drone climbs at ≈18.9° above horizontal."',
-              ].join('\n'),
-              hint:
-                `v_drone = np.array([5.0, 3.0, 2.0]).\nspeed_3d = np.linalg.norm(v_drone)  →  √(5²+3²+2²) = √38 ≈ 6.16.\nFor phi: the "horizontal speed" is the XY magnitude = np.linalg.norm(v_drone[:2]).\nphi = arctan2(v_z, horizontal_speed).`,
-            },
-
-            // ── CELL 9: CHALLENGE — quadrant check ───────────────────────────
-            {
-              id: 9,
-              cellTitle: '9 · Challenge: quadrant detective',
-              challengeType: 'write',
-              challengeNumber: 3,
-              challengeTitle: 'Four vectors, four quadrants',
-              difficulty: 'medium',
-              prompt:
-                `Four vectors are given as (magnitude, angle_degrees):\n- A: (5, 30°) — Quadrant I\n- B: (5, 150°) — Quadrant II\n- C: (5, 210°) — Quadrant III\n- D: (5, 330°) — Quadrant IV\n\nFor each one, compute the component form using \`np.cos\` / \`np.sin\`. Store them as \`A\`, \`B\`, \`C\`, \`D\` (4 numpy arrays). All should have magnitude ≈ 5.`,
-              code: [
-                '# Convert each (mag, angle_deg) to component form',
-                '# A: magnitude=5, angle=30°',
-                '# ...',
-              ].join('\n'),
-              output: '',
-              status: 'idle',
-              figureJson: null,
-              testCode: [
-                'import numpy as np',
-                'for name, arr, ang in [("A",A,30),("B",B,150),("C",C,210),("D",D,330)]:',
-                '    assert isinstance(arr, np.ndarray), f"{name} must be a numpy array"',
-                '    assert len(arr) == 2, f"{name} must be 2D"',
-                '    assert np.isclose(np.linalg.norm(arr), 5.0, atol=0.01), f"|{name}| should be 5, got {np.linalg.norm(arr):.3f}"',
-                '    expected = np.array([5*np.cos(np.radians(ang)), 5*np.sin(np.radians(ang))])',
-                '    assert np.allclose(arr, expected, atol=0.01), f"{name} components wrong"',
-                '"SUCCESS: All four quadrant vectors computed correctly!"',
-              ].join('\n'),
-              hint:
-                `Pattern: A = np.array([5*np.cos(np.radians(30)), 5*np.sin(np.radians(30))]).\nRepeat for each angle. Notice how the signs of the components change with quadrant:\nQ1: (+,+)  Q2: (−,+)  Q3: (−,−)  Q4: (+,−)`,
-            },
+# Round-trip verification: recover components from magnitude + angle
+Ax = magnitude * np.cos(np.radians(angle_deg))
+Ay = magnitude * np.sin(np.radians(angle_deg))
+print(f"Round-trip: ({Ax:.4f}, {Ay:.4f})  (should match original)")`,
+          prose: [
+            `\`np.array([3.0, 4.0])\` is exactly $\\vec{v} = 3\\hat{\\imath} + 4\\hat{\\jmath}$: the first element is the $x$-component, the second is $y$. NumPy stores vectors as arrays of numbers — the same component form used in all physics calculations.`,
+            `\`np.linalg.norm(v)\` computes $|\\vec{v}| = \\sqrt{v_x^2 + v_y^2} = \\sqrt{9+16} = 5$. This is the Pythagorean theorem applied to the right triangle formed by the components. The function works in any dimension — just pass a longer array for 3D.`,
+            `\`np.arctan2(vy, vx)\` — note the argument order is (y, x), not (x, y). This two-argument version correctly handles all four quadrants, returning angles from −180° to +180°. The single-argument \`np.arctan(vy/vx)\` only returns angles from −90° to +90° and gives wrong answers in Quadrants II and III.`,
           ],
         },
-      },
-    ],
+        {
+          cellTitle: 'Visualizing vector components with matplotlib',
+          type: 'code',
+          language: 'python',
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+# Three vectors to visualize: the vector, its x-component, and its y-component
+v = np.array([3.0, 4.0])
+vx = np.array([v[0], 0.0])   # horizontal leg of the right triangle
+vy_start = np.array([v[0], 0.0])   # vertical leg starts at end of vx
+
+fig, ax = plt.subplots(figsize=(6, 6))
+ax.set_aspect('equal')
+
+# Draw the full vector v in blue
+ax.annotate('', xy=v, xytext=(0, 0),
+            arrowprops=dict(arrowstyle='->', color='blue', lw=2.5))
+ax.text(v[0]/2 + 0.2, v[1]/2 + 0.1, f'|v| = {np.linalg.norm(v):.1f}', color='blue', fontsize=11)
+
+# Draw x-component in red
+ax.annotate('', xy=vx, xytext=(0, 0),
+            arrowprops=dict(arrowstyle='->', color='red', lw=2))
+ax.text(v[0]/2, -0.4, f'vx = {v[0]:.1f}', color='red', ha='center', fontsize=11)
+
+# Draw y-component in green (starts at end of x-component)
+ax.annotate('', xy=v, xytext=vy_start,
+            arrowprops=dict(arrowstyle='->', color='green', lw=2))
+ax.text(v[0] + 0.15, v[1]/2, f'vy = {v[1]:.1f}', color='green', fontsize=11)
+
+# Angle arc
+theta = np.linspace(0, np.arctan2(v[1], v[0]), 30)
+ax.plot(0.6*np.cos(theta), 0.6*np.sin(theta), 'k-', lw=1)
+ax.text(0.7, 0.25, f'θ = {np.degrees(np.arctan2(v[1], v[0])):.1f}°', fontsize=10)
+
+ax.set_xlim(-0.5, 4.5); ax.set_ylim(-0.7, 5)
+ax.axhline(0, color='k', lw=0.7); ax.axvline(0, color='k', lw=0.7)
+ax.set_xlabel('x (east)'); ax.set_ylabel('y (north)')
+ax.set_title('Vector = x-component (red) + y-component (green)')
+ax.grid(True, alpha=0.3)
+plt.tight_layout(); plt.savefig('vector_components.png', dpi=120); plt.show()`,
+          prose: [
+            `\`ax.annotate('', xy=endpoint, xytext=startpoint, arrowprops=...)\` draws an arrow from \`xytext\` to \`xy\`. The three arrows show the three sides of the right triangle: the full vector $\\vec{v}$ (blue), the $x$-component (red, horizontal), and the $y$-component (green, vertical). This is the geometric meaning of $\\vec{v} = v_x\\hat{\\imath} + v_y\\hat{\\jmath}$.`,
+            `The red arrow goes from origin to $(v_x, 0)$; the green arrow starts where red ends and goes up to $(v_x, v_y)$. Together they trace the two legs of the right triangle whose hypotenuse is $\\vec{v}$. This is why magnitude $= \\sqrt{v_x^2 + v_y^2}$ — it is literally the Pythagorean theorem.`,
+            `The angle arc marks $\\theta = \\arctan(v_y/v_x) \\approx 53.1°$ — the angle between the vector and the positive $x$-axis. Every arrow in a physics diagram can be decomposed this way: find the triangle, read off the components.`,
+          ],
+        },
+        {
+          cellTitle: 'All four quadrants: signs of components',
+          type: 'code',
+          language: 'python',
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+# Four vectors, one per quadrant, all magnitude 5
+cases = [
+    (5, 30,  'Quadrant I',   'blue'),
+    (5, 150, 'Quadrant II',  'red'),
+    (5, 210, 'Quadrant III', 'green'),
+    (5, 330, 'Quadrant IV',  'orange'),
+]
+
+fig, axes = plt.subplots(2, 2, figsize=(9, 9))
+axes = axes.flatten()
+
+for ax, (mag, angle_deg, label, color) in zip(axes, cases):
+    theta = np.radians(angle_deg)
+    vx = mag * np.cos(theta)   # A_x = |A| cos(theta)
+    vy = mag * np.sin(theta)   # A_y = |A| sin(theta)
+
+    ax.set_aspect('equal'); ax.set_xlim(-6, 6); ax.set_ylim(-6, 6)
+    ax.axhline(0, color='k', lw=0.7); ax.axvline(0, color='k', lw=0.7)
+    ax.annotate('', xy=(vx, vy), xytext=(0, 0),
+                arrowprops=dict(arrowstyle='->', color=color, lw=2.5))
+    # Component legs
+    ax.plot([0, vx], [0, 0], color=color, ls='--', lw=1.5, alpha=0.6)
+    ax.plot([vx, vx], [0, vy], color=color, ls='--', lw=1.5, alpha=0.6)
+    ax.set_title(f'{label}: {angle_deg}°\\nvx={vx:.2f}, vy={vy:.2f}', fontsize=10)
+    ax.grid(True, alpha=0.2)
+    # Verify magnitude
+    assert abs(np.sqrt(vx**2 + vy**2) - mag) < 1e-9
+
+print("Signs of components by quadrant:")
+for mag, angle, label, _ in cases:
+    vx = mag * np.cos(np.radians(angle))
+    vy = mag * np.sin(np.radians(angle))
+    print(f"  {label} ({angle}°): vx={vx:+.2f}, vy={vy:+.2f}")
+
+plt.tight_layout(); plt.savefig('four_quadrants.png', dpi=120); plt.show()`,
+          prose: [
+            `For each vector, $v_x = |v|\\cos\\theta$ and $v_y = |v|\\sin\\theta$ — the same two formulas regardless of quadrant. The sign of each component follows automatically from the sign of cosine and sine at that angle: Q1 (+,+), Q2 (−,+), Q3 (−,−), Q4 (+,−).`,
+            `The dashed lines are the component "shadows" — projections of the vector onto each axis. This is the geometric meaning of decomposition: finding how much of the vector lies along each axis. Even for Q3 (both negative), the formulas give the right answer without any special cases.`,
+            `The \`assert\` line verifies that $\\sqrt{v_x^2 + v_y^2} = 5$ for all four vectors. This is a useful debugging habit: after computing components, always check that their magnitude recovers the original value. If it doesn't, a formula is wrong.`,
+          ],
+        },
+        {
+          cellTitle: 'Challenge: Quadrant-safe angle computation',
+          type: 'code',
+          language: 'python',
+          challengeType: 'write',
+          starterCode: `import numpy as np
+
+# A force F has components Fx = -6.0 N, Fy = 8.0 N  (Quadrant II)
+# Complete the function that returns magnitude AND direction in degrees
+def describe_vector(vx, vy):
+    magnitude = ___           # Pythagorean theorem
+    angle_deg = ___           # Use arctan2, convert to degrees
+    return magnitude, angle_deg
+
+mag, ang = describe_vector(-6.0, 8.0)
+print(f"|F| = {mag:.2f} N")
+print(f"theta = {ang:.2f} deg  (should be 126.87 for Q2)")
+
+# Test it on all four quadrants
+test_cases = [(3, 4, 5, 53.13), (-3, 4, 5, 126.87), (-3, -4, 5, -126.87), (3, -4, 5, -53.13)]
+for vx, vy, exp_mag, exp_ang in test_cases:
+    m, a = describe_vector(vx, vy)
+    print(f"({vx:+}, {vy:+}): |v|={m:.2f} (exp {exp_mag}), ang={a:.2f} (exp {exp_ang})")`,
+          prose: [
+            `Fill in the two blanks: magnitude uses \`np.linalg.norm\` or \`np.sqrt(vx**2 + vy**2)\`; angle uses \`np.degrees(np.arctan2(vy, vx))\`. Note the argument order for \`arctan2\`: (y, x), not (x, y).`,
+            `The test cases cover all four quadrants. The correct answers for $(−3, 4)$ is $126.87°$ — if you used \`np.arctan(4/−3)\` instead of \`arctan2\`, you'd get $−53.13°$, which is the wrong quadrant entirely. This is why \`arctan2\` exists.`,
+            `Once this function works, you can describe ANY 2D vector — regardless of its quadrant — with two numbers: magnitude and angle. This is the fundamental operation you'll use throughout physics when converting between component form and magnitude-direction form.`,
+          ],
+        },
+      ],
+    },
+    matlab: {
+      type: 'OpenMatNotebook',
+      title: 'Vectors in MATLAB/Octave',
+      cells: [
+        {
+          cellTitle: 'Vectors as arrays: creation, magnitude, direction',
+          type: 'code',
+          language: 'matlab',
+          code: `% In physics: v = 3i-hat + 4j-hat  (3 m/s east, 4 m/s north)
+% In MATLAB:  v = [3.0, 4.0]  — a row vector (or column vector [3;4])
+v = [3.0, 4.0];
+
+% Magnitude: norm(v) = sqrt(vx^2 + vy^2)
+magnitude = norm(v);   % same as sqrt(v(1)^2 + v(2)^2)
+
+% Direction: atan2(vy, vx) — note argument order (y, x)
+angle_deg = rad2deg(atan2(v(2), v(1)));   % rad2deg converts to degrees
+
+fprintf('v = [%.1f, %.1f] m/s\\n', v(1), v(2));
+fprintf('|v| = %.4f m/s  (should be 5.0)\\n', magnitude);
+fprintf('theta = %.2f deg  (should be 53.13)\\n', angle_deg);
+
+% Round-trip: recover components from magnitude + angle
+Ax = magnitude * cos(deg2rad(angle_deg));   % deg2rad: degrees -> radians
+Ay = magnitude * sin(deg2rad(angle_deg));
+fprintf('Round-trip: (%.4f, %.4f)  (should match original)\\n', Ax, Ay);`,
+          prose: [
+            `In MATLAB, \`v = [3.0, 4.0]\` creates a row vector whose elements are the x and y components. \`v(1)\` is the x-component and \`v(2)\` is the y-component (MATLAB uses 1-based indexing, unlike Python's 0-based). \`norm(v)\` computes $|\\vec{v}| = \\sqrt{v_x^2 + v_y^2}$ — the same formula as NumPy's \`linalg.norm\`.`,
+            `\`atan2(y, x)\` is MATLAB's quadrant-safe arctangent — argument order is (y, x), matching NumPy's \`arctan2(y, x)\`. \`rad2deg\` converts the radian result to degrees. Use \`deg2rad\` for the reverse direction when feeding degrees into \`sin\` or \`cos\`.`,
+            `The round-trip check computes $A_x = |v|\\cos\\theta$ and $A_y = |v|\\sin\\theta$ to recover the original components. If these match the input \`[3.0, 4.0]\`, the forward (components → polar) and inverse (polar → components) conversions are consistent.`,
+          ],
+        },
+        {
+          cellTitle: 'Visualizing vector components with quiver',
+          type: 'code',
+          language: 'matlab',
+          code: `v = [3.0, 4.0];
+vx_comp = [v(1), 0];        % x-component as a vector from origin
+vy_start = [v(1), 0];       % y-component starts where x ends
+
+figure; hold on; axis equal;
+xlim([-0.5, 4.5]); ylim([-0.7, 5]);
+
+% Full vector (blue): quiver(x0, y0, dx, dy)
+quiver(0, 0, v(1), v(2), 'b', 'LineWidth', 2.5, 'MaxHeadSize', 0.5, 'DisplayName', sprintf('|v|=%.1f', norm(v)));
+
+% x-component (red, horizontal leg)
+quiver(0, 0, v(1), 0, 'r', 'LineWidth', 2, 'MaxHeadSize', 0.5, 'DisplayName', sprintf('vx=%.1f', v(1)));
+
+% y-component (green, vertical leg from end of x-component)
+quiver(v(1), 0, 0, v(2), 'g', 'LineWidth', 2, 'MaxHeadSize', 0.5, 'DisplayName', sprintf('vy=%.1f', v(2)));
+
+% Angle arc
+theta_vec = linspace(0, atan2(v(2), v(1)), 30);
+plot(0.6*cos(theta_vec), 0.6*sin(theta_vec), 'k-', 'LineWidth', 1);
+text(0.7, 0.25, sprintf('\\theta = %.1f°', rad2deg(atan2(v(2), v(1)))), 'FontSize', 10);
+
+xline(0, 'k-', 'LineWidth', 0.7); yline(0, 'k-', 'LineWidth', 0.7);
+xlabel('x (east)'); ylabel('y (north)');
+title('Vector = x-component (red) + y-component (green)');
+legend; grid on;`,
+          prose: [
+            `\`quiver(x0, y0, dx, dy)\` draws an arrow starting at $(x_0, y_0)$ with length $(dx, dy)$. The three \`quiver\` calls draw the full vector (blue), its x-component (red), and its y-component (green) — the same right-triangle decomposition as in the Python version.`,
+            `The green arrow starts at \`(v(1), 0)\` — the end of the red arrow — and goes up by \`v(2)\`. This shows that adding the x-component vector and the y-component vector head-to-tail gives the original vector $\\vec{v}$. That is the geometric meaning of $\\vec{v} = v_x\\hat{\\imath} + v_y\\hat{\\jmath}$.`,
+            `The angle arc is drawn by plotting parametric points \`(0.6*cos(theta), 0.6*sin(theta))\` from 0 to $\\theta$. The radius 0.6 is chosen to be visible without overlapping the arrows. This is a standard technique for marking angles in MATLAB plots.`,
+          ],
+        },
+        {
+          cellTitle: 'All four quadrants: signs of components',
+          type: 'code',
+          language: 'matlab',
+          code: `% Four vectors, one per quadrant, all magnitude 5
+angles = [30, 150, 210, 330];
+labels = {'Q1 (+,+)', 'Q2 (-,+)', 'Q3 (-,-)', 'Q4 (+,-)'};
+colors = {'b', 'r', 'g', [1 0.5 0]};   % blue, red, green, orange
+
+figure;
+for i = 1:4
+    subplot(2, 2, i); hold on; axis equal;
+    xlim([-6, 6]); ylim([-6, 6]);
+    xline(0, 'k-', 'LineWidth', 0.7); yline(0, 'k-', 'LineWidth', 0.7);
+
+    theta = deg2rad(angles(i));
+    vx = 5 * cos(theta);   % Ax = |A| cos(theta)
+    vy = 5 * sin(theta);   % Ay = |A| sin(theta)
+
+    % Full vector
+    quiver(0, 0, vx, vy, colors{i}, 'LineWidth', 2.5, 'MaxHeadSize', 0.4);
+    % Component dashed lines
+    plot([0, vx], [0, 0], '--', 'Color', colors{i}, 'LineWidth', 1.5, 'Alpha', 0.6);
+    plot([vx, vx], [0, vy], '--', 'Color', colors{i}, 'LineWidth', 1.5, 'Alpha', 0.6);
+
+    title(sprintf('%s  %d°\\nvx=%.2f, vy=%.2f', labels{i}, angles(i), vx, vy), 'FontSize', 9);
+    grid on;
+    assert(abs(sqrt(vx^2 + vy^2) - 5) < 1e-9, 'Magnitude mismatch');
+end`,
+          prose: [
+            `\`deg2rad(angles(i))\` converts degrees to radians for \`cos\` and \`sin\` (which always expect radians in MATLAB/Octave). The formulas $v_x = 5\\cos\\theta$ and $v_y = 5\\sin\\theta$ give the correct signed components for any quadrant — no special cases needed.`,
+            `The subplot layout (2×2 grid) puts each quadrant in its own panel. The dashed lines trace the component legs of the right triangle. Notice the signs: in Q2 (150°), cos is negative so $v_x < 0$; in Q3 (210°), both are negative; in Q4 (330°), sin is negative so $v_y < 0$.`,
+            `The \`assert\` statement verifies $\\sqrt{v_x^2 + v_y^2} = 5$ for every case. If the formula were wrong (e.g., using \`sind\` and \`cosd\` inconsistently), the assert would catch it. MATLAB's \`assert\` throws an error if the condition is false — useful for debugging.`,
+          ],
+        },
+        {
+          cellTitle: 'Challenge: Quadrant-safe angle computation',
+          type: 'code',
+          language: 'matlab',
+          challengeType: 'write',
+          starterCode: `function [magnitude, angle_deg] = describe_vector(vx, vy)
+    magnitude = ___;          % norm or sqrt formula
+    angle_deg = ___;          % atan2, convert to degrees
+end
+
+[mag, ang] = describe_vector(-6.0, 8.0);
+fprintf('|F| = %.2f N\\n', mag);
+fprintf('theta = %.2f deg  (should be 126.87 for Q2)\\n', ang);
+
+% Test all four quadrants
+test_cases = [3, 4, 5, 53.13; -3, 4, 5, 126.87; -3, -4, 5, -126.87; 3, -4, 5, -53.13];
+for i = 1:size(test_cases, 1)
+    [m, a] = describe_vector(test_cases(i,1), test_cases(i,2));
+    fprintf('(%+.0f,%+.0f): |v|=%.2f (exp %.2f), ang=%.2f (exp %.2f)\\n', ...
+            test_cases(i,1), test_cases(i,2), m, test_cases(i,3), a, test_cases(i,4));
+end`,
+          prose: [
+            `Fill the two blanks: \`magnitude = norm([vx, vy])\` (or \`sqrt(vx^2 + vy^2)\`); \`angle_deg = rad2deg(atan2(vy, vx))\`. The argument order for \`atan2\` is (y, x) in both MATLAB and Python.`,
+            `The test matrix has one row per quadrant. The key test is the Q2 case $(-3, 4)$: \`atan2(4, -3)\` returns $\\approx 2.21$ rad $= 126.87°$, while \`atan(-4/3)\` returns $-53.13°$ — the wrong quadrant by 180°. This is why \`atan2\` exists.`,
+            `Once this function works correctly for all four quadrants, you have the fundamental tool for every physics problem involving vectors: given components, find magnitude and direction. This exact computation appears in projectile motion, force decomposition, and electromagnetic field problems.`,
+          ],
+        },
+      ],
+    },
   },
 
   // ── Examples ─────────────────────────────────────────────────────────────
@@ -750,7 +747,7 @@ export default {
         },
       ],
       answer:
-        `\\vec{A} \\neq \\vec{B}_{180°}$ (same magnitude, different direction). \\vec{A} = \\vec{B}_{53.13°}$ (same magnitude AND same direction).`,
+        `$\\vec{A} \\neq \\vec{B}_{180°}$ (same magnitude, different direction). $\\vec{A} = \\vec{B}_{53.13°}$ (same magnitude AND same direction).`,
     },
     {
       id: 'ch1-001-ch5',
@@ -806,67 +803,164 @@ export default {
     },
   },
 
+  misconceptions: [
+    {
+      id: 'p1-ch1-001-mis1',
+      misconception: 'Speed and velocity are the same thing — just different words for how fast something moves.',
+      why: `Students learn "velocity" as a synonym for "speed" in everyday language, and carry that into physics. The distinction only becomes clear when direction matters — which is most of the time.`,
+      correction: `Speed is a scalar (magnitude only). Velocity is a vector (magnitude + direction). A car going around a circular track at constant speed has constant speed but changing velocity — because its direction changes every instant. This is why the car is accelerating even though it never speeds up or slows down.`,
+      correctionExample: `60 mph is a speed. 60 mph north is a velocity. After making a U-turn at 60 mph, the speed is still 60 mph, but the velocity has reversed direction — it is now 60 mph south. The two velocities have the same magnitude but opposite direction: they are different vectors.`,
+    },
+    {
+      id: 'p1-ch1-001-mis2',
+      misconception: 'Two vectors with the same magnitude are equal.',
+      why: `Students focus on the magnitude formula $|\\vec{A}| = \\sqrt{A_x^2+A_y^2}$ and forget that direction is also required for equality.`,
+      correction: `Vectors are equal only if BOTH magnitude AND direction match — equivalently, all components must be equal: $\\vec{A} = \\vec{B}$ iff $A_x = B_x$ AND $A_y = B_y$. Equal magnitudes with different directions are different vectors entirely.`,
+      correctionExample: `$\\vec{A} = (3, 4)$ and $\\vec{B} = (-3, 4)$ both have magnitude 5. But $A_x = 3 \\neq -3 = B_x$, so $\\vec{A} \\neq \\vec{B}$. One points into Q1 (northeast), the other into Q2 (northwest).`,
+    },
+  ],
+
+  transferPrompts: [
+    {
+      id: 'p1-ch1-001-tp1',
+      prompt: `Your phone's GPS reports your location as latitude/longitude coordinates $(x, y)$, and your velocity as speed + compass heading. When the navigation app calculates your arrival time, it needs to know your velocity vector components in the east-north coordinate system. How does it convert "45 mph at heading 310°" into components?`,
+      connection: `Compass heading is measured clockwise from north; physics uses counterclockwise from east. The conversion is $\\theta_{physics} = 90° - \\theta_{heading}$. Then $v_x = v\\cos\\theta_{physics}$ (east) and $v_y = v\\sin\\theta_{physics}$ (north). Every navigation system uses exactly this component decomposition to compute position updates.`,
+    },
+    {
+      id: 'p1-ch1-001-tp2',
+      prompt: `A structural engineer needs to check whether a bridge cable can support a load. The cable exerts a tension of 50 kN at 40° above horizontal. What are the horizontal and vertical components of this force? Why does the engineer care more about the vertical component than the horizontal one for checking whether the bridge deck sags?`,
+      connection: `$F_x = 50\\cos40° \\approx 38.3$ kN (horizontal), $F_y = 50\\sin40° \\approx 32.1$ kN (vertical). The vertical component directly opposes the weight of the bridge deck, so it determines whether the structure sags. The horizontal component creates tension along the deck and must be handled by anchor points. Force decomposition into components is the first step in every structural analysis.`,
+    },
+  ],
+
+  debugging: [
+    {
+      id: 'p1-ch1-001-dbg1',
+      error: `A student computes the direction of $\\vec{F} = (-6, 8)$ N by typing \`atan(-8/6)\` into their calculator and gets $-53.13°$.`,
+      explanation: `\`atan(y/x)\` always returns angles between $-90°$ and $+90°$ (Quadrants I and IV only). For $\\vec{F} = (-6, 8)$, which is in Quadrant II, the correct answer is $180° - 53.13° = 126.87°$. The single-argument arctangent loses the sign information of $x$ and $y$ separately.`,
+      fix: `Always use \`atan2(y, x)\` (Python: \`np.arctan2\`, calculator: \`atan2\`). It takes $y$ and $x$ as separate arguments, preserves their individual signs, and returns the correct angle for all four quadrants. For $(-6, 8)$: \`atan2(8, -6)\` returns $126.87°$.`,
+    },
+    {
+      id: 'p1-ch1-001-dbg2',
+      error: `A student needs the speed of an object with velocity $\\vec{v} = (5, -3)$ m/s. They add the components: $5 + (-3) = 2$ m/s.`,
+      explanation: `Speed is the MAGNITUDE of velocity, not the sum of components. Adding components is not a meaningful operation for recovering magnitude — it would give different answers depending on the choice of coordinate system (rotate the axes and the components change, but the magnitude doesn't).`,
+      fix: `Use the Pythagorean formula: $|\\vec{v}| = \\sqrt{v_x^2 + v_y^2} = \\sqrt{25 + 9} = \\sqrt{34} \\approx 5.83$ m/s. Always square both components, add, then take the square root. Negative components square to positive — $(-3)^2 = 9$.`,
+    },
+  ],
+
+  mastery: {
+    targetLevel: `Identify vector vs. scalar quantities, convert fluently between component form $(A_x, A_y)$ and polar form $(|A|, \\theta)$, apply the quadrant-safe arctangent, and explain the free vector rule.`,
+    checklistItems: [
+      `Can correctly classify any physical quantity as vector or scalar, with justification`,
+      `Can compute $A_x = |\\vec{A}|\\cos\\theta$ and $A_y = |\\vec{A}|\\sin\\theta$ for any angle`,
+      `Can compute $|\\vec{A}| = \\sqrt{A_x^2 + A_y^2}$ and identify the correct quadrant for $\\theta$`,
+      `Uses \`atan2(y, x)\` (not \`atan(y/x)\`) to find angles — and knows WHY`,
+      `Can state the free vector rule and explain why position does not change a vector`,
+      `Can verify component calculations by round-tripping back to the original magnitude`,
+    ],
+    commonStruggles: [
+      `Using \`arctan(vy/vx)\` instead of \`arctan2(vy, vx)\` — gets wrong quadrant for Q2 and Q3`,
+      `Confusing speed (scalar) and velocity (vector) — especially on conceptual questions`,
+      `Thinking equal magnitudes means equal vectors — forgetting direction must also match`,
+    ],
+    nextSteps: [
+      `02-vector-notation.js — formal notation for all the forms vectors take in physics and math`,
+      `03-components-magnitudes.js — more practice converting between forms with harder angles`,
+      `04-adding-vectors.js — adding two vectors by adding their components separately`,
+    ],
+  },
+
+  semantics: {
+    core: [
+      { symbol: `\\vec{A}`, meaning: `Vector — a quantity with both magnitude and direction; drawn as an arrow` },
+      { symbol: `|\\vec{A}| = \\sqrt{A_x^2 + A_y^2}`, meaning: `Magnitude (Euclidean norm) — always non-negative; the "length" of the arrow` },
+      { symbol: `(A_x, A_y)`, meaning: `Component form — how much of the vector lies along each axis; signs encode direction` },
+      { symbol: `\\hat{\\imath},\\, \\hat{\\jmath}`, meaning: `Unit vectors in $+x$ and $+y$ directions — magnitude 1, no units; pure direction markers` },
+      { symbol: `\\theta = \\arctan_2(A_y, A_x)`, meaning: `Direction angle measured counterclockwise from $+x$ axis; use atan2 for all quadrants` },
+    ],
+    rulesOfThumb: [
+      `Test for vector: would reversing direction change the physical situation? Yes → vector. No → scalar.`,
+      `Magnitudes are always $\\geq 0$; components can be negative (negative means opposite to that axis direction).`,
+      `Always use atan2(y, x) for angles from components — never atan(y/x) alone.`,
+      `After computing components, verify: $\\sqrt{A_x^2 + A_y^2}$ should recover the original magnitude.`,
+      `Free vector rule: position on the page doesn't matter — only magnitude and direction define a vector.`,
+    ],
+  },
+
   // ── Quiz ─────────────────────────────────────────────────────────────────
   quiz: [
     {
       id: 'p1-ch1-001-q1',
-      question: `Which of the following is a VECTOR quantity?`,
+      type: 'choice',
+      question: `Which of the following is a vector quantity?`,
       options: [`Temperature (°C)`, `Mass (kg)`, `Velocity (m/s)`, `Energy (J)`],
-      answer: 2,
-      explanation: `Velocity has both magnitude (speed) and direction. Temperature, mass, and energy are scalars — described by a single number with a unit.`,
+      answer: `Velocity (m/s)`,
+      hints: [`A vector requires both magnitude AND direction to specify it completely.`, `Temperature, mass, and energy are single numbers — no direction needed.`],
+      reviewSection: 'intuition',
     },
     {
       id: 'p1-ch1-001-q2',
+      type: 'choice',
       question: `What is the magnitude of $\\vec{A} = (3, 4)$ m?`,
       options: [`$3$ m`, `$4$ m`, `$7$ m`, `$5$ m`],
-      answer: 3,
-      explanation: `$|\\vec{A}| = \\sqrt{3^2 + 4^2} = \\sqrt{9+16} = \\sqrt{25} = 5$ m. The 3-4-5 Pythagorean triple.`,
+      answer: `$5$ m`,
+      hints: [`$|\\vec{A}| = \\sqrt{A_x^2 + A_y^2}$.`, `$\\sqrt{3^2 + 4^2} = \\sqrt{9+16} = \\sqrt{25} = 5$ m. The 3-4-5 right triangle.`],
+      reviewSection: 'math',
     },
     {
       id: 'p1-ch1-001-q3',
-      question: `A vector is moved to a different location on the page without changing its length or direction. Which statement is true?`,
+      type: 'choice',
+      question: `A vector arrow is slid to a different location on the page without rotating or stretching. What is true?`,
       options: [
-        `The vector has changed`,
+        `The vector has changed — position matters`,
         `The vector is the same (free vector rule)`,
         `The components change when the position changes`,
-        `Only the direction changes`,
+        `Only the magnitude changes`,
       ],
-      answer: 1,
-      explanation: `Free vector rule: a vector is defined by its magnitude and direction only — position does not matter. Sliding a vector without rotating or stretching it leaves it unchanged.`,
+      answer: `The vector is the same (free vector rule)`,
+      hints: [`A vector is defined by magnitude and direction only.`, `Position on the page is irrelevant — you can draw a vector anywhere without changing what it is.`],
+      reviewSection: 'intuition',
     },
     {
       id: 'p1-ch1-001-q4',
+      type: 'choice',
       question: `$\\vec{A}$ has magnitude 10 and $\\theta = 30°$ from $+x$. What is $A_x$?`,
       options: [`$5$`, `$5\\sqrt{3}$`, `$10$`, `$\\sqrt{3}/2$`],
-      answer: 1,
-      explanation: `$A_x = |\\vec{A}|\\cos30° = 10 \\times \\frac{\\sqrt{3}}{2} = 5\\sqrt{3} \\approx 8.66$.`,
+      answer: `$5\\sqrt{3}$`,
+      hints: [`$A_x = |\\vec{A}|\\cos\\theta$.`, `$\\cos 30° = \\sqrt{3}/2$, so $A_x = 10 \\times \\sqrt{3}/2 = 5\\sqrt{3} \\approx 8.66$.`],
+      reviewSection: 'math',
     },
     {
       id: 'p1-ch1-001-q5',
+      type: 'choice',
       question: `Which best describes a scalar?`,
       options: [
         `A quantity with magnitude and direction`,
         `A quantity with direction only`,
         `A quantity with magnitude only, described by a single number`,
-        `A vector of magnitude 1`,
+        `A unit vector (magnitude 1)`,
       ],
-      answer: 2,
-      explanation: `A scalar is fully described by one number and a unit — no direction needed. Examples: mass, temperature, speed, energy.`,
+      answer: `A quantity with magnitude only, described by a single number`,
+      hints: [`Scalar = single number + unit.`, `Examples: mass (5 kg), temperature (25°C), speed (10 m/s), energy (200 J). All fully specified without a direction.`],
+      reviewSection: 'intuition',
     },
     {
       id: 'p1-ch1-001-q6',
-      question: `A car travels 60 mph north, then 60 mph east. Which statement about the two velocities is correct?`,
+      type: 'choice',
+      question: `A car travels at 60 mph north. It turns and now travels at 60 mph east. The two velocities are:`,
       options: [
-        `They are equal — same speed`,
-        `They are different vectors — same magnitude but different direction`,
-        `They are the same scalar`,
-        `The second velocity is twice the first`,
+        `Equal — same speed`,
+        `Different vectors — same magnitude but different direction`,
+        `The same scalar quantity`,
+        `The second is twice the first`,
       ],
-      answer: 1,
-      explanation: `Same speed (magnitude), different direction → different velocity vectors. This is why speed and velocity are distinct: speed is scalar, velocity is vector.`,
+      answer: `Different vectors — same magnitude but different direction`,
+      hints: [`Vectors are equal only if BOTH magnitude and direction match.`, `Same speed (60 mph) but different direction (north vs east) means different velocity vectors.`],
+      reviewSection: 'intuition',
     },
     {
       id: 'p1-ch1-001-q7',
+      type: 'choice',
       question: `$\\vec{A} = (A_x, A_y)$ and $\\vec{B} = (B_x, B_y)$. When is $\\vec{A} = \\vec{B}$?`,
       options: [
         `When they have the same starting point`,
@@ -874,15 +968,46 @@ export default {
         `When $|\\vec{A}| = |\\vec{B}|$`,
         `When they point in the same direction`,
       ],
-      answer: 1,
-      explanation: `Vector equality requires every component to match. Same magnitude but different direction = different vectors. Same direction but different magnitude = different vectors.`,
+      answer: `When $A_x = B_x$ AND $A_y = B_y$`,
+      hints: [`Vector equality requires every component to match.`, `Same magnitude ≠ equal vectors. Same direction ≠ equal vectors. Both conditions must hold simultaneously.`],
+      reviewSection: 'rigor',
     },
     {
       id: 'p1-ch1-001-q8',
-      question: `$\\vec{A} = (5, 0)$. What is the direction $\\theta$ of $\\vec{A}$ from the $+x$-axis?`,
-      options: [`$90°$`, `$45°$`, `$180°$`, `$0°$`],
-      answer: 3,
-      explanation: `$(5, 0)$ points along the positive $x$-axis — $\\theta = 0°$. A zero $y$-component means no "northward" tilt.`,
+      type: 'choice',
+      question: `$\\vec{A} = (0, -5)$. What is the direction $\\theta$ of $\\vec{A}$ from the $+x$-axis?`,
+      options: [`$90°$`, `$0°$`, `$270°$ (or $-90°$)`, `$180°$`],
+      answer: `$270°$ (or $-90°$)`,
+      hints: [`$(0, -5)$ has no x-component and a negative y-component — it points straight down.`, `$\\arctan_2(-5, 0) = -90°$, equivalent to $270°$. The vector points in the $-y$ direction (south).`],
+      reviewSection: 'math',
+    },
+    {
+      id: 'p1-ch1-001-q9',
+      type: 'choice',
+      question: `$\\vec{F} = (-3, 4)$ N. A student computes the angle as $\\arctan(4/(-3)) \\approx -53.1°$. What is wrong?`,
+      options: [
+        `Nothing — $-53.1°$ is correct`,
+        `The sign of the angle is wrong; it should be $+53.1°$`,
+        `The vector is in Quadrant II; the correct angle is $180° - 53.1° = 126.9°$`,
+        `The magnitude should be computed first`,
+      ],
+      answer: `The vector is in Quadrant II; the correct angle is $180° - 53.1° = 126.9°$`,
+      hints: [`$(-3, 4)$ has negative x and positive y — that is Quadrant II.`, `\`atan(y/x)\` only returns angles in $(-90°, 90°)$. For Q2 vectors, always add $180°$ or use \`atan2(y, x)\` directly.`],
+      reviewSection: 'math',
+    },
+    {
+      id: 'p1-ch1-001-q10',
+      type: 'choice',
+      question: `Weight and mass: which is a vector and which is a scalar?`,
+      options: [
+        `Both are scalars`,
+        `Both are vectors`,
+        `Mass is scalar; weight is a vector (gravitational force, directed downward)`,
+        `Mass is vector; weight is scalar`,
+      ],
+      answer: `Mass is scalar; weight is a vector (gravitational force, directed downward)`,
+      hints: [`Mass = amount of matter (kg) — just a number, no direction.`, `Weight = gravitational force $\\vec{W} = m\\vec{g}$, directed toward Earth's center. Force is always a vector.`],
+      reviewSection: 'intuition',
     },
   ],
 

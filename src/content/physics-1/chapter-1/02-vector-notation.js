@@ -250,227 +250,455 @@ export default {
     },
   ],
 
-  // ── Python Notebook ──────────────────────────────────────────────────────
-  python: {
-    title: 'Vector Notation in Python — all forms, one object',
-    description: `We represent vectors with NumPy arrays and practice converting between every notation form: component, unit-vector, magnitude-angle, and unit vector.`,
-    placement: 'after_rigor',
-    visualizations: [
-      {
-        id: 'PythonNotebook',
-        title: 'Notation Lab — One Vector, Five Representations',
-        caption: 'Run each cell to see all five notations for the same vector.',
-        props: {
-          initialCells: [
-            {
-              id: 1,
-              cellTitle: '1 · Define a vector and display all notations',
-              prose: `In physics we write $\\vec{F} = 3\\hat{\\imath} + 4\\hat{\\jmath}$ N. In Python: \`F = np.array([3.0, 4.0])\`.\n\nLet us compute every notation form from this single array.`,
-              code: [
-                'import numpy as np',
-                '',
-                '# Define the vector',
-                'F = np.array([3.0, 4.0])   # F_x = 3 N, F_y = 4 N',
-                '',
-                '# (a) Component notation: just print the array',
-                'print(f"(a) Component form:       F = ({F[0]}, {F[1]}) N")',
-                '',
-                '# (b) Unit-vector notation',
-                'print(f"(b) Unit-vector form:     F = {F[0]}*i_hat + {F[1]}*j_hat  N")',
-                '',
-                '# (c) Magnitude',
-                'mag = np.linalg.norm(F)',
-                'print(f"(c) Magnitude:            |F| = {mag:.4f} N")',
-                '',
-                '# (d) Angle (physics convention: CCW from +x)',
-                'angle = np.degrees(np.arctan2(F[1], F[0]))',
-                'print(f"(d) Magnitude-angle form: |F|∠θ = {mag:.2f} N ∠ {angle:.2f}°")',
-                '',
-                '# (e) Unit vector',
-                'F_hat = F / mag',
-                'print(f"(e) Unit vector:          F_hat = ({F_hat[0]:.4f}, {F_hat[1]:.4f})")',
-              ].join('\n'),
-              output: '',
-              status: 'idle',
-              figureJson: null,
-            },
-            {
-              id: 2,
-              cellTitle: '2 · Verify the unit vector has magnitude 1',
-              prose: `A unit vector must have magnitude exactly 1 — that is its defining property. Let us verify and also show that $\\hat{F}$ points in the same direction as $\\vec{F}$.`,
-              code: [
-                '# The unit vector computed above',
-                'print(f"|F_hat| = {np.linalg.norm(F_hat):.10f}  (should be exactly 1)")',
-                '',
-                '# Same direction check: angle should match F',
-                'angle_hat = np.degrees(np.arctan2(F_hat[1], F_hat[0]))',
-                'print(f"Angle of F_hat = {angle_hat:.2f}°  (matches F at {angle:.2f}°)")',
-                '',
-                '# Scaling: F = |F| * F_hat',
-                'F_reconstructed = mag * F_hat',
-                'print(f"mag * F_hat = ({F_reconstructed[0]:.4f}, {F_reconstructed[1]:.4f})  (should be (3, 4))")',
-              ].join('\n'),
-              output: '',
-              status: 'idle',
-              figureJson: null,
-            },
-            {
-              id: 3,
-              cellTitle: '3 · Convert from magnitude-angle to components',
-              prose: `Starting from magnitude-angle form $|\\vec{A}| = 13$, $\\theta = 112.6°$, recover the components.\n\n$A_x = |\\vec{A}|\\cos\\theta$,  $A_y = |\\vec{A}|\\sin\\theta$.`,
-              code: [
-                'mag_A = 13.0',
-                'theta_deg = 112.6',
-                'theta_rad = np.radians(theta_deg)',
-                '',
-                'Ax = mag_A * np.cos(theta_rad)',
-                'Ay = mag_A * np.sin(theta_rad)',
-                '',
-                'print(f"A_x = {Ax:.3f}")',
-                'print(f"A_y = {Ay:.3f}")',
-                '',
-                '# Round-trip check: recover magnitude and angle',
-                'mag_check = np.linalg.norm([Ax, Ay])',
-                'angle_check = np.degrees(np.arctan2(Ay, Ax))',
-                'print(f"Round-trip: |A| = {mag_check:.4f}, θ = {angle_check:.2f}°")',
-              ].join('\n'),
-              output: '',
-              status: 'idle',
-              figureJson: null,
-            },
-            {
-              id: 4,
-              cellTitle: '4 · 3-D vectors: unit-vector notation with î ĵ k̂',
-              prose: `In 3-D we add a $z$-component and a third basis vector $\\hat{k}$:\n$\\vec{B} = B_x\\hat{\\imath} + B_y\\hat{\\jmath} + B_z\\hat{k}$\n\nThe Pythagorean theorem extends: $|\\vec{B}| = \\sqrt{B_x^2 + B_y^2 + B_z^2}$.`,
-              code: [
-                'B = np.array([2.0, -6.0, 3.0])   # same vector as in lesson challenges',
-                '',
-                'mag_B = np.linalg.norm(B)',
-                'B_hat = B / mag_B',
-                '',
-                'print(f"B = {B[0]}*i + {B[1]}*j + {B[2]}*k")',
-                'print(f"|B| = sqrt({B[0]**2:.0f} + {B[1]**2:.0f} + {B[2]**2:.0f}) = {mag_B:.4f}")',
-                'print(f"B_hat = ({B_hat[0]:.4f}, {B_hat[1]:.4f}, {B_hat[2]:.4f})")',
-                'print(f"|B_hat| = {np.linalg.norm(B_hat):.10f}")',
-              ].join('\n'),
-              output: '',
-              status: 'idle',
-              figureJson: null,
-            },
-            {
-              id: 5,
-              cellTitle: '5 · Challenge: unit vector for a 3-D force',
-              challengeType: 'fill-in',
-              challengeNumber: 1,
-              challengeTitle: 'Find the unit vector for a 3-D force',
-              difficulty: 'medium',
-              prompt: `A cable pulls with force $\\vec{T} = 6\\hat{\\imath} - 2\\hat{\\jmath} + 9\\hat{k}$ N. Find its magnitude and unit vector.`,
-              starterBlock: [
-                'T = np.array([___, ___, ___])   # fill in 6, -2, 9',
-                'T_mag = np.linalg.norm(___)',
-                'T_hat = ___ / ___',
-              ].join('\n'),
-              code: [
-                'T = np.array([6.0, -2.0, 9.0])',
-                'T_mag = np.linalg.norm(T)',
-                'T_hat = T / T_mag',
-                '',
-                'print(f"|T| = {T_mag:.4f} N")',
-                'print(f"T_hat = ({T_hat[0]:.4f}, {T_hat[1]:.4f}, {T_hat[2]:.4f})")',
-                'print(f"Verify |T_hat| = {np.linalg.norm(T_hat):.6f}")',
-              ].join('\n'),
-              output: '',
-              status: 'idle',
-              figureJson: null,
-              testCode: [
-                'import numpy as np',
-                'assert "T" in dir(), "Define T"',
-                'assert "T_mag" in dir(), "Compute T_mag"',
-                'assert "T_hat" in dir(), "Compute T_hat"',
-                'assert np.isclose(T_mag, 11.0, atol=0.01), f"|T| should be 11.0, got {T_mag:.4f}"',
-                'assert np.isclose(np.linalg.norm(T_hat), 1.0, atol=1e-6), "T_hat must have magnitude 1"',
-                '"SUCCESS: |T| = 11.0 N; T_hat = (6/11, -2/11, 9/11)"',
-              ].join('\n'),
-              hint: `T = np.array([6.0, -2.0, 9.0]). |T| = sqrt(36+4+81) = sqrt(121) = 11. T_hat = T / 11.`,
-            },
+  misconceptions: [
+    {
+      id: 'p1-ch1-002-mis1',
+      misconception: `$\\hat{i}$ (the unit vector along $+x$) is the same as $i = \\sqrt{-1}$ (the imaginary unit).`,
+      why: `Both symbols look identical when written without context. Students who have seen complex numbers first sometimes confuse them when switching to physics.`,
+      correction: `In physics, $\\hat{\\imath}$ (with a hat) is a unit vector along the $+x$ axis with magnitude 1. The imaginary unit $i = \\sqrt{-1}$ has nothing to do with direction. Context and the hat symbol distinguish them. Many physics texts use $\\hat{e}_x$ instead to avoid any ambiguity.`,
+      correctionExample: `$\\vec{F} = 3\\hat{\\imath} + 4\\hat{\\jmath}$ means a force 3 N in the $+x$ direction plus 4 N in the $+y$ direction. No imaginary numbers involved.`,
+    },
+    {
+      id: 'p1-ch1-002-mis2',
+      misconception: `The unit vector $\\hat{A}$ is just $\\vec{A}$ with its magnitude set to 1 — so a unit vector has magnitude 1 N (or m/s, etc.).`,
+      why: `Students see that $\\hat{A}$ has magnitude 1 and assume "1" carries the units of the original vector.`,
+      correction: `Unit vectors are dimensionless — they have no physical units. $\\hat{A} = \\vec{A}/|\\vec{A}|$ is a pure direction indicator. The units cancel: if $\\vec{F}$ is in N and $|\\vec{F}|$ is in N, then $\\hat{F} = \\vec{F}/|\\vec{F}|$ is in N/N = dimensionless.`,
+      correctionExample: `$\\vec{F} = (3, 4)$ N has $|\\vec{F}| = 5$ N. The unit vector $\\hat{F} = (0.6, 0.8)$ — no units. To reconstruct: $\\vec{F} = 5\\,\\text{N} \\times (0.6, 0.8) = (3, 4)$ N.`,
+    },
+  ],
+
+  transferPrompts: [
+    {
+      id: 'p1-ch1-002-tp1',
+      prompt: `In computer graphics, every surface has a "normal vector" $\\hat{n}$ — a unit vector pointing perpendicular to the surface. Why must it be a unit vector (not just any perpendicular vector)? How would a lighting calculation break if $|\\hat{n}| \\neq 1$?`,
+      connection: `Lighting calculations use the dot product $\\hat{n} \\cdot \\hat{L}$ (where $\\hat{L}$ is the light direction) to compute how bright a surface appears. Both must be unit vectors for the result to be a cosine between 0 and 1. If $|\\hat{n}| = 2$, the brightness calculation gives values up to 2, producing physically impossible "over-bright" surfaces.`,
+    },
+    {
+      id: 'p1-ch1-002-tp2',
+      prompt: `A GPS navigation system receives signals from three satellites at positions $\\vec{r}_1$, $\\vec{r}_2$, $\\vec{r}_3$ relative to you. To find your position, it needs to know the direction from you to each satellite — but not the distance. How would you compute those direction unit vectors, and why are unit vectors sufficient for the direction information?`,
+      connection: `Direction from origin to satellite $i$: $\\hat{r}_i = \\vec{r}_i / |\\vec{r}_i|$. The unit vector carries only directional information (angular position of the satellite), which is what matters for computing the direction of the signal received. The distance $|\\vec{r}_i|$ is given by the signal travel time. Separating direction from magnitude is exactly what unit vectors are designed for.`,
+    },
+  ],
+
+  debugging: [
+    {
+      id: 'p1-ch1-002-dbg1',
+      error: `A student computes the unit vector of $\\vec{F} = (3, 4)$ as $\\hat{F} = (3, 4) / (3+4) = (3/7, 4/7)$.`,
+      explanation: `The denominator is the SUM of components ($3 + 4 = 7$), not the MAGNITUDE ($\\sqrt{9+16} = 5$). The unit vector formula divides by $|\\vec{F}| = \\sqrt{F_x^2 + F_y^2}$, not by $F_x + F_y$. Adding components has no geometric meaning.`,
+      fix: `$|\\vec{F}| = \\sqrt{3^2 + 4^2} = 5$. $\\hat{F} = (3/5, 4/5) = (0.6, 0.8)$. Verify: $\\sqrt{0.6^2 + 0.8^2} = \\sqrt{0.36 + 0.64} = \\sqrt{1} = 1$ ✓.`,
+    },
+    {
+      id: 'p1-ch1-002-dbg2',
+      error: `A student is given $\\vec{B} = 2\\hat{\\imath} - 6\\hat{\\jmath} + 3\\hat{k}$ and writes: $|\\vec{B}| = 2 - 6 + 3 = -1$.`,
+      explanation: `Magnitude is NOT the sum of components. Summing signed components can give a negative number — but magnitude is always non-negative. This error would make the unit vector undefined (dividing by $-1$ would flip the direction).`,
+      fix: `$|\\vec{B}| = \\sqrt{2^2 + (-6)^2 + 3^2} = \\sqrt{4 + 36 + 9} = \\sqrt{49} = 7$. Square each component (making negatives positive), add, then take the square root.`,
+    },
+  ],
+
+  mastery: {
+    targetLevel: `Recognize all standard vector notations ($\\vec{A}$, $\\mathbf{A}$, $(A_x, A_y)$, $A_x\\hat{\\imath}+A_y\\hat{\\jmath}$, $|\\vec{A}|\\angle\\theta$), compute unit vectors by dividing by magnitude, and extend to 3D.`,
+    checklistItems: [
+      `Can identify and translate between arrow, bold, component, unit-vector, and magnitude-angle notations`,
+      `Can compute $\\hat{A} = \\vec{A}/|\\vec{A}|$ for any 2D or 3D vector`,
+      `Can verify a unit vector by confirming its magnitude equals 1`,
+      `Understands that unit vectors are dimensionless direction indicators`,
+      `Can reconstruct any vector as $\\vec{A} = |\\vec{A}|\\hat{A}$ (magnitude × direction)`,
+    ],
+    commonStruggles: [
+      `Dividing by the sum of components instead of the magnitude when computing unit vectors`,
+      `Confusing $\\hat{\\imath}$ (unit vector) with $i$ (imaginary unit)`,
+      `Thinking unit vectors carry the units (N, m/s, etc.) of the original vector`,
+    ],
+    nextSteps: [
+      `03-components-magnitudes.js — deeper practice with the two conversion directions`,
+      `04-adding-vectors-parallelogram.js — adding vectors using components`,
+      `10-dot-product-intro.js — unit vectors appear in the dot product definition`,
+    ],
+  },
+
+  semantics: {
+    core: [
+      { symbol: `\\hat{A}`, meaning: `Unit vector in the direction of $\\vec{A}$; dimensionless, magnitude exactly 1` },
+      { symbol: `\\hat{A} = \\vec{A}/|\\vec{A}|`, meaning: `How to compute a unit vector: divide by magnitude` },
+      { symbol: `\\hat{\\imath},\\, \\hat{\\jmath},\\, \\hat{k}`, meaning: `Standard basis unit vectors along $+x$, $+y$, $+z$ axes respectively` },
+      { symbol: `\\vec{A} = A_x\\hat{\\imath} + A_y\\hat{\\jmath}`, meaning: `Unit-vector notation: every 2D vector is a sum of scaled basis vectors` },
+      { symbol: `|\\vec{A}|`, meaning: `Magnitude (scalar) — always $\\geq 0$; same as $\\|\\vec{A}\\|$` },
+    ],
+    rulesOfThumb: [
+      `Unit vector = same direction, magnitude exactly 1; verify by computing $\\sqrt{\\hat{A}_x^2 + \\hat{A}_y^2} = 1$.`,
+      `All notation forms ($\\vec{A}$, $\\mathbf{A}$, $(A_x, A_y)$, $A_x\\hat{\\imath}+A_y\\hat{\\jmath}$) describe the same object.`,
+      `$|\\vec{A}|$ is always non-negative; you cannot have a negative magnitude.`,
+      `Unit vectors are dimensionless — the units of $\\vec{A}$ cancel when you divide by $|\\vec{A}|$.`,
+      `Any vector decomposes as $\\vec{A} = |\\vec{A}|\\hat{A}$ — magnitude times direction unit vector.`,
+    ],
+  },
+
+  notebooks: {
+    python: {
+      type: 'PythonNotebook',
+      title: 'Vector Notation in Python',
+      cells: [
+        {
+          cellTitle: 'All five notations for one vector',
+          type: 'code',
+          language: 'python',
+          code: `import numpy as np
+
+# F = 3 N east + 4 N north  →  five equivalent descriptions
+F = np.array([3.0, 4.0])   # component form
+
+mag = np.linalg.norm(F)                          # |F| = sqrt(3^2+4^2)
+angle = np.degrees(np.arctan2(F[1], F[0]))       # theta = atan2(y,x)
+F_hat = F / mag                                   # unit vector = F / |F|
+
+print("All five notations for the same vector F = (3, 4) N:")
+print(f"  (a) Component:       ({F[0]}, {F[1]}) N")
+print(f"  (b) Unit-vector:     {F[0]}*i_hat + {F[1]}*j_hat  N")
+print(f"  (c) Bold:            F = (equivalent to the above)")
+print(f"  (d) Magnitude-angle: {mag:.2f} N at {angle:.2f} deg")
+print(f"  (e) Unit vector:     F_hat = ({F_hat[0]:.4f}, {F_hat[1]:.4f})")
+print()
+print(f"Verify F_hat magnitude: {np.linalg.norm(F_hat):.10f}  (must be 1)")
+print(f"Reconstruct F = |F| * F_hat: {mag * F_hat}  (must match original)")`,
+          prose: [
+            `\`F = np.array([3.0, 4.0])\` is the component form — the foundation from which all other notations are computed. The unit-vector form $3\\hat{\\imath} + 4\\hat{\\jmath}$ is just a human-readable way of writing the same array.`,
+            `\`F_hat = F / mag\` computes the unit vector $\\hat{F} = \\vec{F}/|\\vec{F}|$ — element-wise division divides each component by the magnitude. The result has the same direction but length 1.`,
+            `The reconstruction \`mag * F_hat\` verifies the decomposition $\\vec{F} = |\\vec{F}|\\hat{F}$: magnitude times unit vector gives back the original. All five notations carry identical information — they're just different ways of writing the same arrow.`,
           ],
         },
-      },
-    ],
+        {
+          cellTitle: 'Visualizing a vector and its unit vector',
+          type: 'code',
+          language: 'python',
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+F = np.array([3.0, 4.0])
+mag = np.linalg.norm(F)
+F_hat = F / mag   # unit vector: same direction, length 1
+
+fig, ax = plt.subplots(figsize=(6, 6))
+ax.set_aspect('equal')
+
+# Draw original vector F (blue, full length)
+ax.annotate('', xy=F, xytext=(0, 0),
+            arrowprops=dict(arrowstyle='->', color='blue', lw=2.5))
+ax.text(F[0]/2 - 0.5, F[1]/2 + 0.2, f'F = {mag:.1f} N', color='blue', fontsize=12)
+
+# Draw unit vector F_hat (red, length 1, same direction)
+ax.annotate('', xy=F_hat, xytext=(0, 0),
+            arrowprops=dict(arrowstyle='->', color='red', lw=2.5))
+ax.text(F_hat[0] + 0.05, F_hat[1] - 0.25, r'$\\hat{F}$' + f' = 1 (no units)', color='red', fontsize=11)
+
+# Draw the "shrunk" scale factor
+ax.annotate('', xy=F, xytext=F_hat,
+            arrowprops=dict(arrowstyle='<->', color='purple', lw=1.5))
+ax.text((F[0] + F_hat[0])/2 + 0.15, (F[1] + F_hat[1])/2, f'× {mag:.0f}', color='purple', fontsize=10)
+
+ax.set_xlim(-0.5, 4.5); ax.set_ylim(-0.5, 5.5)
+ax.axhline(0, color='k', lw=0.7); ax.axvline(0, color='k', lw=0.7)
+ax.set_xlabel('x'); ax.set_ylabel('y')
+ax.set_title('Vector F (blue) and its unit vector F_hat (red)')
+ax.grid(True, alpha=0.3)
+plt.tight_layout(); plt.savefig('unit_vector.png', dpi=120); plt.show()`,
+          prose: [
+            `The blue arrow is $\\vec{F} = (3, 4)$ N with length 5. The red arrow is $\\hat{F} = (0.6, 0.8)$ with length 1 — same direction, just scaled down by a factor of $|\\vec{F}| = 5$.`,
+            `The purple double-arrow marks the "× 5" scaling between $\\hat{F}$ and $\\vec{F}$. This visualizes the decomposition $\\vec{F} = |\\vec{F}|\\hat{F}$: start with the unit vector, scale it by the magnitude, and you get the original vector back.`,
+            `Both arrows have the same angle — that is what "same direction" means. The only difference is length. This is why unit vectors are useful: they carry pure directional information, separated from the magnitude.`,
+          ],
+        },
+        {
+          cellTitle: '3D vectors: extending to x, y, z with hat-k',
+          type: 'code',
+          language: 'python',
+          code: `import numpy as np
+
+# 3D vector from lesson challenge: B = 2*i_hat - 6*j_hat + 3*k_hat
+B = np.array([2.0, -6.0, 3.0])
+
+mag_B = np.linalg.norm(B)   # |B| = sqrt(Bx^2 + By^2 + Bz^2)
+B_hat = B / mag_B            # unit vector in 3D
+
+print(f"B = {B[0]}*i_hat + {B[1]}*j_hat + {B[2]}*k_hat")
+print(f"|B| = sqrt({B[0]**2:.0f} + {(B[1])**2:.0f} + {B[2]**2:.0f})")
+print(f"    = sqrt({B[0]**2 + B[1]**2 + B[2]**2:.0f}) = {mag_B:.4f}")
+print(f"B_hat = ({B_hat[0]:.4f}, {B_hat[1]:.4f}, {B_hat[2]:.4f})")
+print(f"|B_hat| = {np.linalg.norm(B_hat):.10f}  (must be 1)")
+print()
+
+# Show the orthonormal basis vectors
+i_hat = np.array([1, 0, 0])
+j_hat = np.array([0, 1, 0])
+k_hat = np.array([0, 0, 1])
+print("Standard basis magnitudes:", np.linalg.norm(i_hat), np.linalg.norm(j_hat), np.linalg.norm(k_hat))
+print("Verify B = Bx*i + By*j + Bz*k:", B[0]*i_hat + B[1]*j_hat + B[2]*k_hat)`,
+          prose: [
+            `In 3D, \`B = np.array([2.0, -6.0, 3.0])\` stores all three components. \`np.linalg.norm(B)\` computes $|B| = \\sqrt{B_x^2 + B_y^2 + B_z^2} = \\sqrt{4+36+9} = 7$ — the Pythagorean theorem in 3D.`,
+            `The last block constructs the standard basis vectors explicitly and verifies $\\vec{B} = B_x\\hat{\\imath} + B_y\\hat{\\jmath} + B_z\\hat{k}$ by linear combination. This shows that the unit-vector notation is just a compact way of writing a weighted sum of basis vectors.`,
+            `Notice $-6$ squared is $36$ (positive) — squaring removes the sign, which is why magnitude is always non-negative. A common mistake is adding signed components instead of squaring them: $2 + (-6) + 3 = -1 \\neq 7$.`,
+          ],
+        },
+        {
+          cellTitle: 'Challenge: find the unit vector for a 3D cable force',
+          type: 'code',
+          language: 'python',
+          challengeType: 'write',
+          starterCode: `import numpy as np
+
+# A cable exerts force T = 6*i_hat - 2*j_hat + 9*k_hat  N
+# 1. Create the numpy array T
+# 2. Compute T_mag = |T|
+# 3. Compute T_hat = unit vector of T
+# 4. Verify |T_hat| = 1
+
+T = np.array([___, ___, ___])   # fill in 6, -2, 9
+T_mag = ___                     # magnitude formula
+T_hat = ___                     # unit vector formula
+
+print(f"|T| = {T_mag:.4f} N  (expected 11.0)")
+print(f"T_hat = ({T_hat[0]:.4f}, {T_hat[1]:.4f}, {T_hat[2]:.4f})")
+print(f"|T_hat| = {np.linalg.norm(T_hat):.10f}  (must be 1.0)")`,
+          prose: [
+            `Fill in three blanks: the array values \`[6, -2, 9]\`, the magnitude \`np.linalg.norm(T)\`, and the unit vector \`T / T_mag\`. Expected: $|T| = \\sqrt{36+4+81} = \\sqrt{121} = 11$ N.`,
+            `The unit vector $\\hat{T} = T/11 = (6/11, -2/11, 9/11) \\approx (0.545, -0.182, 0.818)$. It tells you which direction the cable pulls — useful in statics where you need to decompose a cable force into components.`,
+            `The verification \`np.linalg.norm(T_hat)\` should print exactly 1.0 (or very close due to floating point). If it doesn't, your \`T_hat\` formula is wrong. This round-trip check is a habit worth building.`,
+          ],
+        },
+      ],
+    },
+    matlab: {
+      type: 'OpenMatNotebook',
+      title: 'Vector Notation in MATLAB/Octave',
+      cells: [
+        {
+          cellTitle: 'All five notations for one vector',
+          type: 'code',
+          language: 'matlab',
+          code: `% F = 3 N east + 4 N north — five equivalent descriptions
+F = [3.0, 4.0];   % component form (row vector)
+
+mag = norm(F);                          % |F| = sqrt(Fx^2 + Fy^2)
+angle_deg = rad2deg(atan2(F(2), F(1))); % theta using atan2(y,x)
+F_hat = F / mag;                        % unit vector = F / |F|
+
+fprintf('All five notations for F = (3, 4) N:\\n');
+fprintf('  (a) Component:       (%.1f, %.1f) N\\n', F(1), F(2));
+fprintf('  (b) Unit-vector:     %.1f*i_hat + %.1f*j_hat  N\\n', F(1), F(2));
+fprintf('  (d) Magnitude-angle: %.2f N at %.2f deg\\n', mag, angle_deg);
+fprintf('  (e) Unit vector:     F_hat = (%.4f, %.4f)\\n', F_hat(1), F_hat(2));
+fprintf('\\n');
+fprintf('Verify |F_hat| = %.10f  (must be 1)\\n', norm(F_hat));
+fprintf('Reconstruct |F|*F_hat = (%.4f, %.4f)  (must match original)\\n', (mag*F_hat)(1), (mag*F_hat)(2));`,
+          prose: [
+            `In MATLAB, \`F = [3.0, 4.0]\` is a row vector with the same two components as the Python \`np.array([3.0, 4.0])\`. \`norm(F)\` computes the Euclidean magnitude and \`F / mag\` divides each element by the scalar magnitude to give the unit vector.`,
+            `\`atan2(F(2), F(1))\` — note 1-based indexing: \`F(1)\` is x, \`F(2)\` is y. The function signature is \`atan2(y, x)\`, same as Python's \`arctan2\`. \`rad2deg\` converts radians to degrees.`,
+            `The reconstruction \`mag * F_hat\` uses scalar-times-vector multiplication. In MATLAB this broadcasts the scalar across all elements. The result should exactly match \`F = [3.0, 4.0]\`, confirming the decomposition $\\vec{F} = |\\vec{F}|\\hat{F}$.`,
+          ],
+        },
+        {
+          cellTitle: 'Visualizing a vector and its unit vector',
+          type: 'code',
+          language: 'matlab',
+          code: `F = [3.0, 4.0];
+mag = norm(F);
+F_hat = F / mag;
+
+figure; hold on; axis equal;
+xlim([-0.5, 4.5]); ylim([-0.5, 5.5]);
+
+% Original vector F (blue)
+quiver(0, 0, F(1), F(2), 'b', 'LineWidth', 2.5, 'MaxHeadSize', 0.4, ...
+       'DisplayName', sprintf('|F| = %.1f N', mag));
+
+% Unit vector F_hat (red, same direction, length 1)
+quiver(0, 0, F_hat(1), F_hat(2), 'r', 'LineWidth', 2.5, 'MaxHeadSize', 0.4, ...
+       'DisplayName', sprintf('|F_hat| = 1 (dimensionless)'));
+
+% Scale factor annotation
+quiver(F_hat(1), F_hat(2), F(1)-F_hat(1), F(2)-F_hat(2), 'm', ...
+       'LineWidth', 1.5, 'MaxHeadSize', 0.3, 'DisplayName', sprintf('x %.0f', mag));
+
+xline(0, 'k-', 'LineWidth', 0.7); yline(0, 'k-', 'LineWidth', 0.7);
+xlabel('x'); ylabel('y');
+title('Vector F (blue) and unit vector F-hat (red)');
+legend('Location', 'northwest'); grid on;`,
+          prose: [
+            `Three \`quiver\` calls draw: (1) the full vector $\\vec{F}$ from origin to $(3, 4)$; (2) the unit vector $\\hat{F}$ from origin to $(0.6, 0.8)$; (3) a magenta arrow from the tip of $\\hat{F}$ to the tip of $\\vec{F}$, representing the "× 5" scaling.`,
+            `Both arrows have identical angles — same direction. The only difference is length: 5 for the blue, 1 for the red. This is the visual proof that $\\hat{F}$ contains all directional information from $\\vec{F}$, with magnitude stripped out.`,
+            `\`'MaxHeadSize', 0.4\` scales the arrowhead relative to the arrow length. Without this, MATLAB auto-scales arrowheads and the short unit-vector arrow would look disproportionate.`,
+          ],
+        },
+        {
+          cellTitle: '3D vectors: extending to x, y, z with hat-k',
+          type: 'code',
+          language: 'matlab',
+          code: `% 3D vector: B = 2*i_hat - 6*j_hat + 3*k_hat
+B = [2.0, -6.0, 3.0];
+
+mag_B = norm(B);     % |B| = sqrt(Bx^2 + By^2 + Bz^2)
+B_hat = B / mag_B;   % 3D unit vector
+
+fprintf('B = %.1f*i_hat + %.1f*j_hat + %.1f*k_hat\\n', B(1), B(2), B(3));
+fprintf('|B| = sqrt(%.0f + %.0f + %.0f) = sqrt(%.0f) = %.4f\\n', ...
+        B(1)^2, B(2)^2, B(3)^2, B(1)^2+B(2)^2+B(3)^2, mag_B);
+fprintf('B_hat = (%.4f, %.4f, %.4f)\\n', B_hat(1), B_hat(2), B_hat(3));
+fprintf('|B_hat| = %.10f  (must be 1)\\n', norm(B_hat));
+
+% Standard basis vectors
+i_hat = [1, 0, 0]; j_hat = [0, 1, 0]; k_hat = [0, 0, 1];
+fprintf('Basis magnitudes: %.0f, %.0f, %.0f\\n', norm(i_hat), norm(j_hat), norm(k_hat));
+fprintf('Verify B = Bx*i + By*j + Bz*k: (%.1f, %.1f, %.1f)\\n', ...
+        B(1)*i_hat + B(2)*j_hat + B(3)*k_hat);`,
+          prose: [
+            `In MATLAB, 3D vectors are just longer arrays: \`B = [2.0, -6.0, 3.0]\`. \`norm(B)\` applies the 3D Pythagorean formula $\\sqrt{B_x^2+B_y^2+B_z^2}$ automatically regardless of the array length.`,
+            `The basis construction \`B(1)*i_hat + B(2)*j_hat + B(3)*k_hat\` confirms that the unit-vector notation is literally scalar multiplication and vector addition. MATLAB performs this as element-wise arithmetic on row vectors.`,
+            `Note \`B(2)^2 = (-6)^2 = 36\` — MATLAB's \`^\` operator squares the value, not the sign. This is why magnitude is always positive even when components are negative.`,
+          ],
+        },
+        {
+          cellTitle: 'Challenge: find the unit vector for a 3D cable force',
+          type: 'code',
+          language: 'matlab',
+          challengeType: 'write',
+          starterCode: `% A cable exerts force T = 6*i_hat - 2*j_hat + 9*k_hat  N
+% 1. Create row vector T = [6, -2, 9]
+% 2. Compute T_mag = norm(T)
+% 3. Compute T_hat = T / T_mag
+% 4. Verify norm(T_hat) = 1
+
+T = [___, ___, ___];    % fill in 6, -2, 9
+T_mag = ___;             % magnitude
+T_hat = ___;             % unit vector
+
+fprintf('|T| = %.4f N  (expected 11.0)\\n', T_mag);
+fprintf('T_hat = (%.4f, %.4f, %.4f)\\n', T_hat(1), T_hat(2), T_hat(3));
+fprintf('|T_hat| = %.10f  (must be 1.0)\\n', norm(T_hat));`,
+          prose: [
+            `Fill in \`T = [6, -2, 9]\`, \`T_mag = norm(T)\`, and \`T_hat = T / T_mag\`. Expected: $|T| = \\sqrt{36+4+81} = \\sqrt{121} = 11$ N, $\\hat{T} \\approx (0.5455, -0.1818, 0.8182)$.`,
+            `The unit vector $\\hat{T}$ tells a structural engineer which direction the cable force acts. Once you know $\\hat{T}$, you can write the full force as $\\vec{T} = 11\\hat{T}$ — factoring magnitude from direction is exactly what unit vectors enable.`,
+            `\`norm(T_hat)\` should print 1.0000000000 (10 decimal places). Any deviation beyond floating-point precision ($\\sim 10^{-15}$) indicates a formula error.`,
+          ],
+        },
+      ],
+    },
   },
 
   // ── Quiz ─────────────────────────────────────────────────────────────────
   quiz: [
     {
       id: 'p1-ch1-002-q1',
+      type: 'choice',
       question: `Which notation represents a unit vector?`,
       options: [`$\\vec{A}$`, `$\\mathbf{A}$`, `$\\hat{A}$`, `$|\\vec{A}|$`],
-      answer: 2,
-      explanation: `The hat (^) symbol indicates a unit vector — magnitude exactly 1, direction only.`,
+      answer: `$\\hat{A}$`,
+      hints: [`A "hat" ($\\hat{\\ }$) on a symbol signals a unit vector — magnitude exactly 1.`, `$\\vec{A}$ and $\\mathbf{A}$ are full vectors; $|\\vec{A}|$ is the magnitude (scalar).`],
+      reviewSection: 'intuition',
     },
     {
       id: 'p1-ch1-002-q2',
+      type: 'choice',
       question: `The expression $|\\vec{F}|$ represents:`,
       options: [
         `A vector in the direction of $\\vec{F}$`,
-        `The magnitude of $\\vec{F}$ — a scalar`,
+        `The magnitude of $\\vec{F}$ — a non-negative scalar`,
         `The unit vector of $\\vec{F}$`,
         `The components of $\\vec{F}$`,
       ],
-      answer: 1,
-      explanation: `Vertical bars strip the direction, leaving only the magnitude — a non-negative scalar.`,
+      answer: `The magnitude of $\\vec{F}$ — a non-negative scalar`,
+      hints: [`Vertical bars around a vector notation always indicate magnitude.`, `The result is a single non-negative number — no direction information.`],
+      reviewSection: 'intuition',
     },
     {
       id: 'p1-ch1-002-q3',
-      question: `A force vector has $F_x = 3$ N, $F_y = 4$ N. What is the unit vector $\\hat{F}$?`,
+      type: 'choice',
+      question: `A force has $F_x = 3$ N, $F_y = 4$ N. What is the unit vector $\\hat{F}$?`,
       options: [`$(3, 4)$`, `$(0.6, 0.8)$`, `$(3/7, 4/7)$`, `$(1.5, 2)$`],
-      answer: 1,
-      explanation: `$|\\vec{F}| = \\sqrt{9+16} = 5$. $\\hat{F} = (3/5, 4/5) = (0.6, 0.8)$.`,
+      answer: `$(0.6, 0.8)$`,
+      hints: [`$|\\vec{F}| = \\sqrt{9+16} = 5$ N. Then $\\hat{F} = \\vec{F}/|\\vec{F}|$.`, `$(3/5, 4/5) = (0.6, 0.8)$. Verify: $\\sqrt{0.6^2 + 0.8^2} = 1$. ✓`],
+      reviewSection: 'math',
     },
     {
       id: 'p1-ch1-002-q4',
-      question: `In 3-D, what is $\\hat{k}$?`,
+      type: 'choice',
+      question: `In 3D, what is $\\hat{k}$?`,
       options: [
         `A unit vector along $+y$`,
         `A unit vector along $+z$`,
         `A unit vector along $+x$`,
-        `The imaginary unit`,
+        `The imaginary unit $\\sqrt{-1}$`,
       ],
-      answer: 1,
-      explanation: `$\\hat{k} = (0, 0, 1)$ — a unit vector pointing in the $+z$ direction.`,
+      answer: `A unit vector along $+z$`,
+      hints: [`$\\hat{\\imath}$ = x-axis, $\\hat{\\jmath}$ = y-axis, $\\hat{k}$ = z-axis.`, `$\\hat{k} = (0, 0, 1)$ — the third axis. It is NOT the imaginary unit (which has no hat).`],
+      reviewSection: 'math',
     },
     {
       id: 'p1-ch1-002-q5',
-      question: `Which expression is a SCALAR?`,
+      type: 'choice',
+      question: `Which of the following is a scalar?`,
       options: [
         `$F_x\\hat{\\imath} + F_y\\hat{\\jmath}$`,
         `$\\vec{F}$`,
         `$\\sqrt{F_x^2+F_y^2}$`,
         `$(F_x, F_y)$`,
       ],
-      answer: 2,
-      explanation: `$\\sqrt{F_x^2+F_y^2} = |\\vec{F}|$ is the magnitude — a non-negative number with no direction.`,
+      answer: `$\\sqrt{F_x^2+F_y^2}$`,
+      hints: [`Magnitude $= \\sqrt{F_x^2+F_y^2} = |\\vec{F}|$ — a non-negative number with no direction.`, `All other options are vectors (they have directional content).`],
+      reviewSection: 'intuition',
     },
     {
       id: 'p1-ch1-002-q6',
-      question: `A 3-D vector $\\vec{B} = 2\\hat{\\imath} - 6\\hat{\\jmath} + 3\\hat{k}$. What is $|\\vec{B}|$?`,
-      options: [`$-1$`, `$7$`, `$11$`, `$\\sqrt{49}$`],
-      answer: 1,
-      explanation: `$|\\vec{B}| = \\sqrt{4+36+9} = \\sqrt{49} = 7$. Options B and D are the same answer.`,
+      type: 'choice',
+      question: `$\\vec{B} = 2\\hat{\\imath} - 6\\hat{\\jmath} + 3\\hat{k}$. What is $|\\vec{B}|$?`,
+      options: [`$-1$`, `$7$`, `$11$`, `$49$`],
+      answer: `$7$`,
+      hints: [`$|\\vec{B}| = \\sqrt{2^2 + (-6)^2 + 3^2}$. Squaring removes the sign from $-6$.`, `$\\sqrt{4+36+9} = \\sqrt{49} = 7$.`],
+      reviewSection: 'math',
     },
     {
       id: 'p1-ch1-002-q7',
+      type: 'choice',
       question: `If $\\hat{A} = (0.6, 0.8)$, what is $|\\hat{A}|$?`,
       options: [`$1.4$`, `$1.0$`, `$0.7$`, `$0.6$`],
-      answer: 1,
-      explanation: `$|\\hat{A}| = \\sqrt{0.36 + 0.64} = \\sqrt{1.00} = 1.0$. A unit vector always has magnitude 1.`,
+      answer: `$1.0$`,
+      hints: [`Unit vectors have magnitude exactly 1, by definition.`, `$\\sqrt{0.6^2+0.8^2} = \\sqrt{0.36+0.64} = \\sqrt{1.0} = 1.0$.`],
+      reviewSection: 'intuition',
     },
     {
       id: 'p1-ch1-002-q8',
-      question: `The magnitude-angle form $|\\vec{A}|\\angle\\theta$ is equivalent to which component form when $|\\vec{A}|=5$ and $\\theta=53.1°$?`,
+      type: 'choice',
+      question: `$|\\vec{A}|=5$, $\\theta=53.1°$. Which component form matches?`,
       options: [`$(3, 4)$`, `$(4, 3)$`, `$(5, 0)$`, `$(2.5, 2.5)$`],
-      answer: 0,
-      explanation: `$A_x = 5\\cos53.1° \\approx 3$, $A_y = 5\\sin53.1° \\approx 4$. The 3-4-5 triangle.`,
+      answer: `$(3, 4)$`,
+      hints: [`$A_x = 5\\cos53.1° \\approx 3$; $A_y = 5\\sin53.1° \\approx 4$.`, `The 3-4-5 triangle: $\\cos(53.1°) \\approx 0.6$, $\\sin(53.1°) \\approx 0.8$.`],
+      reviewSection: 'math',
+    },
+    {
+      id: 'p1-ch1-002-q9',
+      type: 'choice',
+      question: `A student computes $|\\vec{A}| = A_x + A_y$ for $\\vec{A} = (3, -4)$ and gets $-1$. What is the error?`,
+      options: [
+        `Magnitude should be $|A_x| + |A_y| = 7$`,
+        `Magnitude uses the Pythagorean formula: $\\sqrt{3^2+(-4)^2} = 5$`,
+        `The negative component makes the magnitude negative`,
+        `Magnitude equals $A_x - A_y = 7$`,
+      ],
+      answer: `Magnitude uses the Pythagorean formula: $\\sqrt{3^2+(-4)^2} = 5$`,
+      hints: [`Magnitude is NEVER a sum of components — it is always $\\sqrt{\\sum A_i^2}$.`, `Squaring removes the negative: $(-4)^2 = 16$, so $|\\vec{A}| = \\sqrt{9+16} = 5$.`],
+      reviewSection: 'math',
+    },
+    {
+      id: 'p1-ch1-002-q10',
+      type: 'choice',
+      question: `What are the units of the unit vector $\\hat{F}$ if $\\vec{F}$ is measured in Newtons?`,
+      options: [
+        `Newtons (N)`,
+        `Meters (m)`,
+        `Dimensionless (no units)`,
+        `N/m`,
+      ],
+      answer: `Dimensionless (no units)`,
+      hints: [`$\\hat{F} = \\vec{F}/|\\vec{F}|$. Units of numerator: N. Units of denominator: N. N/N = dimensionless.`, `Unit vectors are pure direction indicators — they carry no physical units.`],
+      reviewSection: 'intuition',
     },
   ],
 }

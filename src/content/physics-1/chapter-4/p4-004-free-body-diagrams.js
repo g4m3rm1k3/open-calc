@@ -551,4 +551,381 @@ export default {
   viz: [
     { id: 'SVGDiagram', props: { type: 'free-body-diagram' }, title: 'Free body diagram method' },
   ],
-}
+
+  misconceptions: [
+    {
+      id: 'p4-004-m1',
+      misconception: 'The acceleration arrow should appear on the free-body diagram as one of the forces.',
+      correction: 'Acceleration is NOT a force and does NOT belong on an FBD. An FBD shows only forces — things that act ON the object. Acceleration is the RESULT of all the forces, computed after the FBD is complete using ΣF = ma. Drawing acceleration on the FBD treats a result as a cause.',
+      correctionExample: 'A block accelerating right: FBD shows applied force (right), friction (left), gravity (down), normal (up). After drawing these four forces: ΣFx = F_applied − F_friction = ma. The acceleration arrow is computed separately, after the FBD.',
+    },
+    {
+      id: 'p4-004-m2',
+      misconception: 'For a block on an incline, the weight arrow should be drawn along the slope.',
+      correction: 'Gravity always points straight DOWN toward the Earth, regardless of the surface orientation. On an incline, weight W = mg points vertically downward. You then DECOMPOSE it into components parallel and perpendicular to the slope: W‖ = mg sinθ (down the slope) and W⊥ = mg cosθ (into the slope). But the original force arrow is always vertical.',
+      correctionExample: 'Block on 30° incline: weight arrow points straight down. Components: W‖ = mg sin30° = 0.5mg (parallel, down the slope); W⊥ = mg cos30° = 0.87mg (perpendicular, into slope). The component arrows are for calculation, not the force itself.',
+    },
+  ],
+
+  transferPrompts: [
+    {
+      id: 'p4-004-t1',
+      prompt: `A structural engineer analyzes a beam supported at both ends and carrying a heavy load at the center. To find the support reactions (upward forces at each end), they draw a free-body diagram of the entire beam. What forces go on this FBD? How is the FBD method here the same as the one used in physics — even though engineering uses "equilibrium analysis" language?`,
+      connection: 'FBD + ΣF = 0 (statics) is the same as FBD + ΣF = ma (dynamics). When the beam doesn\'t accelerate, you recover the static case. The FBD method is universal.',
+    },
+    {
+      id: 'p4-004-t2',
+      prompt: `A skydiver reaches terminal velocity — they stop accelerating and fall at constant speed. Draw the FBD and write the equation ΣF = 0 that describes this state. If the skydiver weighs 800 N, what is the drag force at terminal velocity? What happens to the FBD if they tuck into a ball (increasing speed)?`,
+      connection: 'Terminal velocity = equilibrium (ΣF = 0 → a = 0). FBD: gravity (down) = drag (up). When they tuck, drag decreases momentarily → ΣF ≠ 0 → they accelerate until new terminal velocity.',
+    },
+  ],
+
+  debugging: [
+    {
+      id: 'p4-004-d1',
+      error: `A student draws an FBD for a block being pushed across a rough floor. They include: (1) applied force F (right), (2) friction (left), (3) gravity (down), (4) normal force (up), and (5) "motion" arrow (right). They then write ΣFx = F − friction + motion = ma.`,
+      fix: `"Motion" is not a force. Only real forces that act ON the block belong on the FBD. The motion arrow represents velocity, not a force — it cannot be included in ΣF = ma. Remove it.
+Correct FBD forces: F (right), f_k (left), W = mg (down), N (up).
+Correct equations: ΣFx = F − f_k = ma_x; ΣFy = N − mg = 0.`,
+    },
+    {
+      id: 'p4-004-d2',
+      error: `A student drawing an FBD for a ball suspended by two strings (strings at angles) draws three forces: T₁ (along left string), T₂ (along right string), W (down). But they label the angle of T₁ as 40° from horizontal, then write: ΣFy = T₁ sin40° + T₂ sin50° − W = 0. When they solve, the answer is wrong.`,
+      fix: `The issue is not the force identification — those three forces are correct. The issue is defining the angles. If T₁ is 40° from horizontal, its y-component is T₁ sin40°. But if the problem stated the angle from VERTICAL, it would be T₁ cos40°. Always draw the angle clearly on the FBD, state whether it's from horizontal or vertical, and verify: for a force near-horizontal, the y-component should be small (sin gives small values for small angles).`,
+    },
+  ],
+
+  mastery: {
+    targetLevel: 'Draw correct free-body diagrams identifying all and only forces acting ON the object; resolve forces into components; set up ΣFx = max and ΣFy = may correctly.',
+    checklistItems: [
+      'Can draw an FBD with only forces acting ON the chosen object (no velocities, accelerations, or forces on other objects)',
+      'Can identify common forces: gravity (mg down), normal (⊥ to surface), tension (along string, away from object), friction (opposing relative motion), applied force',
+      'Can decompose tilted forces into x and y components using trigonometry',
+      'Can set up two independent equations ΣFx = max and ΣFy = may from an FBD',
+    ],
+    commonStruggles: [
+      'Including acceleration or velocity as a force on the FBD',
+      'Drawing weight along the slope (it always points straight down)',
+      'Mixing up which angle is θ when decomposing forces on inclined surfaces',
+    ],
+    nextSteps: 'Lesson p4-005 (Friction) adds the friction force model f = μN to complete the FBD toolkit.',
+  },
+
+  semantics: {
+    core: [
+      { symbol: 'N', meaning: 'Normal force (N): contact force perpendicular to surface, pointing away from surface' },
+      { symbol: 'T', meaning: 'Tension (N): force along a string or rope, pulling the object toward the string attachment' },
+      { symbol: 'W = mg', meaning: 'Weight (N): gravitational force, always directed straight downward toward Earth' },
+      { symbol: '\\sum F_x = ma_x', meaning: 'x-direction Newton\'s 2nd Law: sum all force x-components, set equal to mass × x-acceleration' },
+      { symbol: '\\sum F_y = ma_y', meaning: 'y-direction Newton\'s 2nd Law: same for y-components; if no vertical acceleration, ΣFy = 0' },
+    ],
+    rulesOfThumb: [
+      'FBD rule: only forces that ACT on the object. No velocity, acceleration, or forces on other objects.',
+      'Weight always points straight DOWN, regardless of surface orientation. Decompose it into components for calculation.',
+      'Normal force is always perpendicular to the contact surface, pointing AWAY from the surface (it pushes, not pulls).',
+      'Free-body → two equations → solve. Never skip the FBD step for multi-force problems.',
+      'Check: number of unknowns ≤ number of equations (usually 2 for 2D). More unknowns → need another constraint.',
+    ],
+  },
+
+  notebooks: {
+    python: {
+      type: 'PythonNotebook',
+      title: 'Free Body Diagrams in Python',
+      cells: [
+        {
+          cellTitle: 'Draw an FBD using matplotlib arrows',
+          type: 'code',
+          language: 'python',
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+
+def draw_fbd(forces, title="Free Body Diagram"):
+    """Draw an FBD. forces = list of (Fx, Fy, label) tuples."""
+    fig, ax = plt.subplots(1, 1, figsize=(6, 6))
+
+    # Draw the object (block)
+    block = plt.Rectangle((-0.3, -0.3), 0.6, 0.6, linewidth=2,
+                           edgecolor='black', facecolor='lightblue', zorder=5)
+    ax.add_patch(block)
+
+    # Draw each force as an arrow
+    colors = ['blue', 'red', 'green', 'orange', 'purple']
+    for i, (Fx, Fy, label) in enumerate(forces):
+        magnitude = np.sqrt(Fx**2 + Fy**2)
+        scale = 0.4 / max(magnitude, 0.01)  # normalize to visible length
+        ax.annotate('', xy=(Fx*scale, Fy*scale), xytext=(0, 0),
+                    arrowprops=dict(arrowstyle='->', color=colors[i % len(colors)],
+                                   lw=2.5, mutation_scale=20))
+        ax.text(Fx*scale*1.15, Fy*scale*1.15, f'{label}\n({Fx:.0f}N, {Fy:.0f}N)',
+                color=colors[i % len(colors)], fontsize=9, ha='center')
+
+    ax.set_xlim(-1.2, 1.2); ax.set_ylim(-1.2, 1.2)
+    ax.axhline(0, color='gray', linewidth=0.5); ax.axvline(0, color='gray', linewidth=0.5)
+    ax.set_xlabel('x'); ax.set_ylabel('y')
+    ax.set_title(title); ax.set_aspect('equal'); ax.grid(True, alpha=0.3)
+    plt.tight_layout(); plt.show()
+
+# Example: block being pushed on rough surface
+# Applied: 30 N right; Friction: 8 N left; Weight: 25 N down; Normal: 25 N up
+forces = [(30, 0, 'Applied F'), (-8, 0, 'Friction'), (0, -25, 'Weight'), (0, 25, 'Normal')]
+draw_fbd(forces, "Block on rough floor (m=2.5 kg)")
+
+# Check equilibrium
+Fx_net = sum(f[0] for f in forces)
+Fy_net = sum(f[1] for f in forces)
+m = 2.5
+print(f"ΣFx = {Fx_net} N  →  ax = {Fx_net/m:.1f} m/s²")
+print(f"ΣFy = {Fy_net} N  →  ay = {Fy_net/m:.1f} m/s² (stays on floor)")`,
+          prose: [
+            'draw_fbd() plots each force as an arrow from the origin. ax.annotate() draws the arrow from (0,0) to the scaled force vector, with the label positioned at the tip. This is exactly what a hand-drawn FBD shows: forces radiating from the center of the object.',
+            'The scale = 0.4/max(magnitude, 0.01) normalizes all arrows to roughly equal visual length. In a real FBD, arrow length is proportional to force magnitude — but for clarity in code, we normalize to see all arrows clearly.',
+            'The sum at the bottom verifies Newton\'s Second Law: ΣFx = 30−8 = 22 N gives ax = 22/2.5 = 8.8 m/s². ΣFy = 25−25 = 0 N gives ay = 0 (block doesn\'t fly up or fall through the floor).',
+          ],
+        },
+        {
+          cellTitle: 'FBD for inclined surface: decompose weight',
+          type: 'code',
+          language: 'python',
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+def incline_fbd(theta_deg, mu_k, m=5.0, g=9.8):
+    theta = np.radians(theta_deg)
+    W = m * g
+    # Weight components along and perpendicular to slope
+    W_parallel = W * np.sin(theta)     # down the slope
+    W_perp = W * np.cos(theta)         # into the slope
+    N = W_perp                          # normal force = perpendicular weight
+    f_k = mu_k * N                      # kinetic friction (opposing motion = up slope)
+    F_net = W_parallel - f_k            # net force down the slope
+    a = F_net / m
+
+    print(f"Incline angle: {theta_deg}°, μ_k = {mu_k}, m = {m} kg")
+    print(f"  Weight W = {W:.2f} N (vertical)")
+    print(f"  W‖ = mg sinθ = {W_parallel:.2f} N  (down slope)")
+    print(f"  W⊥ = mg cosθ = {W_perp:.2f} N  (into slope)")
+    print(f"  Normal N = W⊥ = {N:.2f} N")
+    print(f"  Friction f_k = μN = {f_k:.2f} N  (up slope, opposing motion)")
+    print(f"  Net force = {W_parallel:.2f} - {f_k:.2f} = {F_net:.2f} N  (down slope)")
+    print(f"  Acceleration = {a:.3f} m/s²")
+    return a
+
+# Compare different angles
+print("Acceleration on slope for different angles (μ_k = 0.2):")
+for angle in [15, 30, 45, 60]:
+    a = incline_fbd(angle, 0.2, m=5.0)
+    print()`,
+          prose: [
+            'W_parallel = W * np.sin(theta) and W_perp = W * np.cos(theta) decompose the vertical weight into components. On a θ = 30° slope: W‖ = 0.5×W (half the weight pulls down the slope); W⊥ = 0.87×W (most of weight presses into slope). This is standard incline decomposition.',
+            'N = W_perp because ΣF_perp = 0 (block doesn\'t sink into slope or fly off it). This gives N = mg cosθ, which decreases as the slope steepens. Consequently, friction f = μN also decreases on steeper slopes, even though W‖ increases.',
+            'The net force = W‖ − f_k shows the competition: steeper slope increases the driving force but reduces friction. At the critical angle where W‖ = f_k: mg sinθ = μmg cosθ → tanθ = μ. Above this angle, the block slides.',
+          ],
+        },
+        {
+          cellTitle: 'Connected objects: solve the system',
+          type: 'code',
+          language: 'python',
+          code: `import numpy as np
+
+# Two blocks: A on table (m_A=3 kg), B hanging (m_B=2 kg)
+# Connected by massless rope over frictionless pulley
+# Find a and T from combined FBD analysis
+
+m_A = 3.0; m_B = 2.0; g = 9.8; mu_k = 0.2
+
+N_A = m_A * g  # normal force on A
+f_A = mu_k * N_A  # friction on A (opposing motion → left)
+
+# System equations from FBDs:
+# Block A: T - f_A = m_A * a  (horizontal)
+# Block B: m_B*g - T = m_B * a  (vertical)
+# Add the two equations to eliminate T:
+# m_B*g - f_A = (m_A + m_B) * a
+
+a = (m_B * g - f_A) / (m_A + m_B)
+T = m_A * a + f_A  # from block A equation
+
+print("Atwood-like: Block A on table, Block B hanging")
+print(f"  m_A = {m_A} kg, m_B = {m_B} kg, μ_k = {mu_k}")
+print(f"  f_friction = μN_A = {f_A:.2f} N")
+print(f"  Acceleration a = (m_B*g - f) / (m_A + m_B) = {a:.3f} m/s²")
+print(f"  Tension T = m_A*a + f = {T:.2f} N")
+print()
+# Verify with block B:
+T_verify = m_B * (g - a)
+print(f"  Verify T from block B: m_B*(g-a) = {T_verify:.2f} N  {'✓' if abs(T - T_verify) < 0.001 else '✗'}")`,
+          prose: [
+            'The key move is setting up SEPARATE FBDs for each block, then adding the equations to eliminate T. Block A: T − f_A = m_A×a. Block B: m_B×g − T = m_B×a. Adding: m_B×g − f_A = (m_A + m_B)×a.',
+            'This works because the two blocks share the same acceleration magnitude a (connected by inextensible string). The constraint connects the two separate FBDs into one solvable system.',
+            'The verification step computes T from the block B equation independently and checks it matches. In exam problems, always verify using the other equation — if they disagree, there\'s an error in the setup.',
+          ],
+        },
+        {
+          cellTitle: 'Challenge: three-force FBD equilibrium',
+          type: 'code',
+          language: 'python',
+          challengeType: 'write',
+          starterCode: `import numpy as np
+
+# A traffic light (mass m = 25 kg) hangs from two cables.
+# Cable 1 makes 30° with the horizontal (left side).
+# Cable 2 makes 45° with the horizontal (right side).
+# The light is in equilibrium (a = 0).
+
+m = 25.0; g = 9.8
+theta1 = np.radians(30)  # cable 1 angle from horizontal
+theta2 = np.radians(45)  # cable 2 angle from horizontal
+W = m * g                # weight (down)
+
+# TODO:
+# 1. Set up ΣFx = 0: -T1*cos(theta1) + T2*cos(theta2) = 0
+# 2. Set up ΣFy = 0: T1*sin(theta1) + T2*sin(theta2) - W = 0
+# 3. Solve as 2×2 linear system: np.linalg.solve(A, b) where:
+#    A = [[−cos30, cos45], [sin30, sin45]]
+#    b = [0, W]
+# 4. Print T1 and T2 in Newtons
+# 5. Verify: compute ΣFx and ΣFy — should both be ≈ 0
+`,
+        },
+      ],
+    },
+    matlab: {
+      type: 'OpenMatNotebook',
+      title: 'Free Body Diagrams in MATLAB/Octave',
+      cells: [
+        {
+          cellTitle: 'Force decomposition and net force',
+          type: 'code',
+          language: 'matlab',
+          code: `% FBD: compute net force from all forces acting on an object
+% Block on rough floor: F_applied=30N, friction=8N, weight=25N, normal=25N
+forces = [30, 0; -8, 0; 0, -25; 0, 25];  % each row: [Fx, Fy]
+labels = {'Applied', 'Friction', 'Weight', 'Normal'};
+
+Fx_net = sum(forces(:,1));   % sum all x-components
+Fy_net = sum(forces(:,2));   % sum all y-components
+m = 2.5;  % kg
+
+fprintf('Force analysis:\\n');
+for i = 1:size(forces,1)
+    fprintf('  %s: Fx=%.0f N, Fy=%.0f N\\n', labels{i}, forces(i,1), forces(i,2));
+end
+fprintf('Net: SigFx=%.0f N, SigFy=%.0f N\\n', Fx_net, Fy_net);
+fprintf('Acceleration: ax=%.2f m/s^2, ay=%.2f m/s^2\\n', Fx_net/m, Fy_net/m);
+
+% Plot force vectors
+figure; hold on;
+colors = {'b','r','g','m'};
+for i = 1:size(forces,1)
+    quiver(0, 0, forces(i,1)/30, forces(i,2)/30, 0, 'Color', colors{i}, 'LineWidth', 2, 'MaxHeadSize', 0.5);
+    text(forces(i,1)/30*1.2, forces(i,2)/30*1.2, labels{i}, 'Color', colors{i}, 'FontSize', 9);
+end
+rectangle('Position', [-0.3 -0.3 0.6 0.6], 'FaceColor', [0.7 0.9 1], 'LineWidth', 2);
+xlim([-1.5 1.5]); ylim([-1.5 1.5]); grid on; axis equal;
+title('FBD: block on rough floor'); xlabel('x'); ylabel('y');`,
+          prose: [
+            'forces = [30, 0; -8, 0; 0, -25; 0, 25] is a 4×2 matrix where each row is one force [Fx, Fy]. MATLAB\'s sum(forces(:,1)) sums the first column (all x-components); sum(forces(:,2)) sums the second column (all y-components).',
+            'The loop prints each force component using forces(i,1) and forces(i,2) — MATLAB uses 1-based indexing. The net force is then used to compute acceleration.',
+            'quiver(0, 0, dx, dy, 0) draws an arrow from the origin with the given displacement. The scale factor /30 normalizes all forces to similar arrow lengths for visual clarity.',
+          ],
+        },
+        {
+          cellTitle: 'Inclined plane decomposition',
+          type: 'code',
+          language: 'matlab',
+          code: `% Decompose weight on inclined surface
+theta_deg = 30; m = 5.0; g = 9.8; mu_k = 0.2;
+theta = deg2rad(theta_deg);
+W = m * g;
+
+W_par  = W * sin(theta);   % component down the slope
+W_perp = W * cos(theta);   % component into slope
+N = W_perp;                % normal force
+f_k = mu_k * N;            % kinetic friction (up slope)
+F_net = W_par - f_k;       % net force down slope
+a = F_net / m;
+
+fprintf('Incline: theta=%d deg, mu_k=%.1f, m=%.1f kg\\n', theta_deg, mu_k, m);
+fprintf('  W = %.2f N (vertical)\\n', W);
+fprintf('  W_par = mg*sin(theta) = %.2f N (down slope)\\n', W_par);
+fprintf('  W_perp = mg*cos(theta) = %.2f N (into slope)\\n', W_perp);
+fprintf('  N = %.2f N, f_k = %.2f N\\n', N, f_k);
+fprintf('  a = (W_par - f_k)/m = %.3f m/s^2\\n', a);
+
+% Plot acceleration vs angle
+angles = 0:1:80;
+a_vals = (m*g*sin(deg2rad(angles)) - mu_k*m*g*cos(deg2rad(angles))) / m;
+figure;
+plot(angles, a_vals, 'b-', 'LineWidth', 2);
+hold on; yline(0, 'r--', 'a=0 (critical angle)', 'LineWidth', 1.5);
+xlabel('Angle (degrees)'); ylabel('Acceleration (m/s^2)');
+title(sprintf('Block on slope: a vs angle (mu_k=%.1f)', mu_k)); grid on;
+crit_angle = atan(mu_k)*180/pi;
+fprintf('Critical angle (tan(theta)=mu): %.1f deg\\n', crit_angle);`,
+          prose: [
+            'W_par = W * sin(theta) and W_perp = W * cos(theta) perform the decomposition. deg2rad() converts the input angle from degrees to radians for MATLAB\'s trig functions.',
+            'The critical angle computation atan(mu_k) uses the condition W_par = f_k → mg sinθ = μmg cosθ → tanθ = μ. Below this angle: friction holds the block. Above: block slides. The plot crosses zero at exactly this angle.',
+            'The acceleration array a_vals is computed element-wise for all angles using sin/cos applied to deg2rad(angles) — MATLAB vectorizes this automatically. The curve shows a starts negative (friction holds), crosses zero at the critical angle, then grows positive (block accelerates faster as angle increases).',
+          ],
+        },
+        {
+          cellTitle: 'Solve connected object system',
+          type: 'code',
+          language: 'matlab',
+          code: `% Block A on table, Block B hanging — solve for a and T
+m_A = 3.0; m_B = 2.0; g = 9.8; mu_k = 0.2;
+
+N_A = m_A * g;
+f_A = mu_k * N_A;
+
+% From FBDs: two equations
+% T - f_A = m_A * a  (block A)
+% m_B*g - T = m_B * a  (block B)
+% Matrix form: [m_A, -1; m_B, 1] * [a; T] = [f_A; m_B*g]
+A_mat = [m_A, -1; m_B, 1];   % coefficient matrix
+b_vec = [f_A; m_B*g];         % right-hand side
+
+x = A_mat \ b_vec;             % solve: x = [a; T]
+a = x(1); T = x(2);
+
+fprintf('Block A (%.1f kg) on table (mu=%.1f), Block B (%.1f kg) hanging\\n', m_A, mu_k, m_B);
+fprintf('Friction on A: f = %.2f N\\n', f_A);
+fprintf('Acceleration: a = %.3f m/s^2\\n', a);
+fprintf('Tension: T = %.2f N\\n', T);
+
+% Verify
+fprintf('Verify: m_B*g - T = %.2f N  vs  m_B*a = %.2f N\\n', m_B*g-T, m_B*a);`,
+          prose: [
+            'A_mat \\ b_vec is MATLAB\'s backslash operator for solving a linear system Ax = b. This is more numerically stable than inverting A explicitly. The system is 2×2 with unknowns [a; T].',
+            'The two equations come from separate FBDs: for block A (net horizontal force), and for block B (net vertical force). The acceleration constraint a_A = a_B = a (inextensible rope) links them.',
+            'The verification check computes m_B×g − T and m_B×a independently — they should be equal (both equal the net force on block B). The backslash solver is exact for 2×2 systems with non-singular A.',
+          ],
+        },
+        {
+          cellTitle: 'Challenge: cable equilibrium',
+          type: 'code',
+          language: 'matlab',
+          challengeType: 'write',
+          starterCode: `% Traffic light hanging from two cables
+m = 25; g = 9.8; W = m*g;
+theta1 = deg2rad(30);  % cable 1 from horizontal
+theta2 = deg2rad(45);  % cable 2 from horizontal
+
+% ΣFx = 0: -T1*cos(theta1) + T2*cos(theta2) = 0
+% ΣFy = 0: T1*sin(theta1) + T2*sin(theta2) = W
+% Matrix form: A*[T1;T2] = [0; W]
+
+% TODO:
+% 1. Build 2x2 matrix A = [-cos(t1), cos(t2); sin(t1), sin(t2)]
+% 2. b = [0; W]
+% 3. Solve: tensions = A \ b
+% 4. Print T1 and T2
+% 5. Verify ΣFy = T1*sin(t1) + T2*sin(t2) ≈ W
+`,
+        },
+      ],
+    },
+  },
+};
