@@ -137,12 +137,11 @@ function computeFit(feat, probes){
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PROBE TRANSFORM MATRIX  (4×4 homogeneous, approach along local Z)
+// PROBE TRANSFORM MATRIX  (4×4 homogeneous)
 // ─────────────────────────────────────────────────────────────────────────────
 function probeMatrix(feat, px, py, pz){
   if(feat==='circle'||feat==='cylinder'){
     const a=Math.atan2(pz,px), c=Math.cos(a), s=Math.sin(a)
-    // t1=circumferential, t2=axial(Y), n=radial outward
     return [[(-s).toFixed(3),(0).toFixed(3),c.toFixed(3),px.toFixed(3)],
             [(0).toFixed(3),(1).toFixed(3),(0).toFixed(3),py.toFixed(3)],
             [c.toFixed(3),(0).toFixed(3),s.toFixed(3),pz.toFixed(3)],
@@ -158,10 +157,88 @@ function probeMatrix(feat, px, py, pz){
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// CONSTANTS + SURFACE NORMAL HELPER
+// ─────────────────────────────────────────────────────────────────────────────
+const NOM_R   = 12.5
+const RUBY_R  = 1.5   // radius of ruby ball tip (mm)
+const HOVER_GAP = 8   // distance from surface to hover before touching
+
+// Returns unit normal pointing AWAY from solid into probe space
+function getSurfaceNormal(feat, hx, hy, hz){
+  if(feat==='circle'){
+    const len=Math.hypot(hx,hz)||1
+    return { nx:-hx/len, ny:0, nz:-hz/len }  // inward toward bore axis
+  }
+  if(feat==='plane'){
+    return { nx:0, ny:1, nz:0 }
+  }
+  if(feat==='cylinder'){
+    const len=Math.hypot(hx,hz)||1
+    return { nx:hx/len, ny:0, nz:hz/len }    // outward away from shaft
+  }
+  return { nx:0, ny:1, nz:0 }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// WARPED GEOMETRY BUILDERS
+// ─────────────────────────────────────────────────────────────────────────────
+// VIS_SCALE exaggerates truth errors so they're visible at CMM tolerances
+const VIS_SCALE = 18
+
+function buildWarpedCylGeo(nomR, height, circ_fn, segs=64, hSegs=8){
+  const halH=height/2, rows=hSegs+1, cols=segs+1
+  const positions=[]
+  for(let ri=0;ri<rows;ri++){
+    const y=-halH+ri*height/hSegs
+    for(let ci=0;ci<cols;ci++){
+      const a=ci*Math.PI*2/segs
+      const dr=circ_fn?circ_fn(a,y)*VIS_SCALE:0
+      const r=nomR+dr
+      positions.push(r*Math.cos(a), y, r*Math.sin(a))
+    }
+  }
+  const indices=[]
+  for(let ri=0;ri<hSegs;ri++){
+    for(let ci=0;ci<segs;ci++){
+      const a=ri*cols+ci, b=ri*cols+ci+1
+      const d=(ri+1)*cols+ci, e=(ri+1)*cols+ci+1
+      indices.push(a,b,d, b,e,d)
+    }
+  }
+  const geo=new THREE.BufferGeometry()
+  geo.setAttribute('position',new THREE.Float32BufferAttribute(positions,3))
+  geo.setIndex(indices); geo.computeVertexNormals()
+  return geo
+}
+
+function buildWarpedPlaneGeo(w, depth, height_fn, segs=32){
+  const hw=w/2, hd=depth/2, rows=segs+1, cols=segs+1
+  const positions=[]
+  for(let ri=0;ri<rows;ri++){
+    const z=-hd+ri*depth/segs
+    for(let ci=0;ci<cols;ci++){
+      const x=-hw+ci*w/segs
+      const y=height_fn?height_fn(x,z):0
+      positions.push(x,y,z)
+    }
+  }
+  const indices=[]
+  for(let ri=0;ri<segs;ri++){
+    for(let ci=0;ci<segs;ci++){
+      const a=ri*cols+ci, b=ri*cols+ci+1
+      const dd=(ri+1)*cols+ci, e=(ri+1)*cols+ci+1
+      indices.push(a,b,dd, b,e,dd)
+    }
+  }
+  const geo=new THREE.BufferGeometry()
+  geo.setAttribute('position',new THREE.Float32BufferAttribute(positions,3))
+  geo.setIndex(indices); geo.computeVertexNormals()
+  return geo
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // THREE.JS SCENE BUILDERS
 // ─────────────────────────────────────────────────────────────────────────────
-const NOM_R = 12.5
-
 function buildCircleScene(){
   const g = new THREE.Group()
   // Workpiece block
@@ -170,85 +247,98 @@ function buildCircleScene(){
     new THREE.MeshStandardMaterial({ color:0x1a2d45, transparent:true, opacity:0.75, roughness:0.6, metalness:0.3 })
   )
   g.add(block)
-  // Bore visible (BackSide — inner wall)
-  const boreVis = new THREE.Mesh(
-    new THREE.CylinderGeometry(NOM_R,NOM_R,15,64),
-    new THREE.MeshStandardMaterial({ color:0x0a1a30, side:THREE.BackSide, roughness:0.15, metalness:0.7, transparent:true, opacity:0.8 })
+
+  // Visible bore: WARPED inner surface (BackSide — visible from inside)
+  const boreGeo=buildWarpedCylGeo(NOM_R,15,(a)=>TRUTH.circle.circ(a))
+  const boreVis = new THREE.Mesh(boreGeo,
+    new THREE.MeshStandardMaterial({ color:0x0d1e3a, side:THREE.BackSide, roughness:0.12, metalness:0.75, transparent:true, opacity:0.9 })
   )
   g.add(boreVis)
-  // Bore hit mesh (invisible DoubleSide for raycasting)
+
+  // Invisible hit mesh (nominal, DoubleSide for raycasting)
   const boreHit = new THREE.Mesh(
     new THREE.CylinderGeometry(NOM_R,NOM_R,15,64),
     new THREE.MeshBasicMaterial({ transparent:true, opacity:0, side:THREE.DoubleSide, depthWrite:false })
   )
-  g.add(boreHit)
-  g.userData.hitMesh = boreHit
+  g.add(boreHit); g.userData.hitMesh = boreHit
+
   // Nominal rings
   ;[-7,7].forEach(y=>{
     const ring=new THREE.Mesh(
       new THREE.TorusGeometry(NOM_R,0.3,8,64),
-      new THREE.MeshBasicMaterial({ color:0x38bdf8, transparent:true, opacity:0.7 })
+      new THREE.MeshBasicMaterial({ color:0x38bdf8, transparent:true, opacity:0.5 })
     )
     ring.rotation.x=Math.PI/2; ring.position.y=y; g.add(ring)
   })
-  // Axis dashes
-  const axPts=[new THREE.Vector3(0,-9,0),new THREE.Vector3(0,9,0)]
-  g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(axPts),new THREE.LineBasicMaterial({color:0x38bdf8,transparent:true,opacity:0.4})))
+  // Axis
+  g.add(new THREE.Line(
+    new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,-9,0),new THREE.Vector3(0,9,0)]),
+    new THREE.LineBasicMaterial({color:0x38bdf8,transparent:true,opacity:0.35})
+  ))
   return g
 }
 
 function buildPlaneScene(){
   const g = new THREE.Group()
-  // Plate
+  // Plate base
   const plate = new THREE.Mesh(
     new THREE.BoxGeometry(80,4,80),
-    new THREE.MeshStandardMaterial({ color:0x1a2d45, roughness:0.5, metalness:0.2 })
+    new THREE.MeshStandardMaterial({ color:0x132030, roughness:0.55, metalness:0.25 })
   )
   plate.position.y=-2; g.add(plate)
-  // Top edge lines (nominal boundary)
-  const edgeGeo=new THREE.EdgesGeometry(new THREE.BoxGeometry(80,0.1,80))
-  g.add(new THREE.LineSegments(edgeGeo,new THREE.LineBasicMaterial({color:0x38bdf8,transparent:true,opacity:0.6})))
-  // Hit mesh (top surface, invisible)
+
+  // Visible top surface: WARPED (shows tilt + bumps)
+  const T=TRUTH.plane
+  const surfGeo=buildWarpedPlaneGeo(80,80,(x,z)=>
+    (T.tiltX*x + T.tiltZ*z + T.offset + T.bump(x,z))
+  )
+  const surfVis=new THREE.Mesh(surfGeo,
+    new THREE.MeshStandardMaterial({ color:0x1a3050, roughness:0.42, metalness:0.55 })
+  )
+  g.add(surfVis)
+
+  // Invisible hit mesh (flat plane for raycasting)
   const hit=new THREE.Mesh(
     new THREE.PlaneGeometry(80,80),
     new THREE.MeshBasicMaterial({ transparent:true, opacity:0, side:THREE.DoubleSide, depthWrite:false })
   )
   hit.rotation.x=-Math.PI/2; g.add(hit)
   g.userData.hitMesh=hit
+
   // Grid lines on surface
   for(let i=-40;i<=40;i+=10){
-    const pts1=[new THREE.Vector3(i,0.05,-40),new THREE.Vector3(i,0.05,40)]
-    const pts2=[new THREE.Vector3(-40,0.05,i),new THREE.Vector3(40,0.05,i)]
-    const m=new THREE.LineBasicMaterial({color:0x1a3550,transparent:true,opacity:0.6})
-    g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts1),m))
-    g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts2),m))
+    const m=new THREE.LineBasicMaterial({color:0x0d2035,transparent:true,opacity:0.5})
+    g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(i,0.06,-40),new THREE.Vector3(i,0.06,40)]),m))
+    g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-40,0.06,i),new THREE.Vector3(40,0.06,i)]),m))
   }
   return g
 }
 
 function buildCylScene(){
   const g = new THREE.Group()
-  // Shaft visible
-  const shaft=new THREE.Mesh(
-    new THREE.CylinderGeometry(NOM_R,NOM_R,60,64),
-    new THREE.MeshStandardMaterial({ color:0x1a2d45, roughness:0.35, metalness:0.6, transparent:true, opacity:0.82 })
+  // Visible shaft: WARPED outer surface
+  const cylGeo=buildWarpedCylGeo(NOM_R,60,(a,y)=>TRUTH.cylinder.circ(a,y))
+  const shaft=new THREE.Mesh(cylGeo,
+    new THREE.MeshStandardMaterial({ color:0x1a2d45, roughness:0.3, metalness:0.65, transparent:true, opacity:0.88 })
   )
   g.add(shaft)
-  // Hit mesh (invisible DoubleSide)
+
+  // Invisible hit mesh (nominal, DoubleSide)
   const hit=new THREE.Mesh(
     new THREE.CylinderGeometry(NOM_R,NOM_R,60,64),
     new THREE.MeshBasicMaterial({ transparent:true, opacity:0, side:THREE.DoubleSide, depthWrite:false })
   )
   g.add(hit); g.userData.hitMesh=hit
-  // Z-level rings at -20, 0, +20
+
+  // Level rings
   ;[-20,0,20].forEach(y=>{
     const ring=new THREE.Mesh(
-      new THREE.TorusGeometry(NOM_R+0.3,0.25,8,64),
-      new THREE.MeshBasicMaterial({ color:0x38bdf8, transparent:true, opacity:0.35 })
+      new THREE.TorusGeometry(NOM_R+0.4,0.22,8,64),
+      new THREE.MeshBasicMaterial({ color:0x38bdf8, transparent:true, opacity:0.3 })
     )
     ring.rotation.x=Math.PI/2; ring.position.y=y; g.add(ring)
   })
-  // Top/bottom caps
+  // Caps
   ;[-30,30].forEach(y=>{
     const cap=new THREE.Mesh(
       new THREE.CylinderGeometry(NOM_R,NOM_R,0.5,64),
@@ -259,30 +349,29 @@ function buildCylScene(){
   // Axis
   g.add(new THREE.Line(
     new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,-32,0),new THREE.Vector3(0,32,0)]),
-    new THREE.LineBasicMaterial({color:0x38bdf8,transparent:true,opacity:0.3})
+    new THREE.LineBasicMaterial({color:0x38bdf8,transparent:true,opacity:0.25})
   ))
   return g
 }
 
 function buildProbeGroup(){
   const g = new THREE.Group()
-  // Ruby ball
+  // Ruby ball (tip at y=0 of group — this is the contact point)
   const ruby=new THREE.Mesh(
-    new THREE.SphereGeometry(1.5,16,16),
-    new THREE.MeshStandardMaterial({ color:0xff1155, emissive:0x660022, emissiveIntensity:0.6, roughness:0.25, metalness:0.1 })
+    new THREE.SphereGeometry(RUBY_R,20,20),
+    new THREE.MeshStandardMaterial({ color:0xff1155, emissive:0x660022, emissiveIntensity:0.7, roughness:0.2, metalness:0.15 })
   )
-  // Stylus (extends up from ruby)
+  // Stylus extends from ruby center upward
   const styl=new THREE.Mesh(
-    new THREE.CylinderGeometry(0.3,0.3,40,8),
-    new THREE.MeshStandardMaterial({ color:0xaaaacc, roughness:0.4, metalness:0.7 })
+    new THREE.CylinderGeometry(0.28,0.28,38,8),
+    new THREE.MeshStandardMaterial({ color:0xaaaacc, roughness:0.35, metalness:0.75 })
   )
-  styl.position.y=20
-  // Shank
+  styl.position.y=19+RUBY_R
   const shank=new THREE.Mesh(
     new THREE.CylinderGeometry(2,2,12,12),
     new THREE.MeshStandardMaterial({ color:0x334466, roughness:0.5, metalness:0.6 })
   )
-  shank.position.y=46
+  shank.position.y=38+RUBY_R+6
   g.add(ruby); g.add(styl); g.add(shank)
   return g
 }
@@ -292,39 +381,29 @@ function buildFitOverlay(feat, fit){
   const mat=new THREE.MeshBasicMaterial({ color:0x00e5a0, wireframe:true, transparent:true, opacity:0.7 })
   if(fit.type==='circle'){
     const torus=new THREE.Mesh(new THREE.TorusGeometry(fit.r,0.4,8,64),mat)
-    torus.rotation.x=Math.PI/2
-    torus.position.set(fit.cx,0,fit.cz)
-    // center dot
+    torus.rotation.x=Math.PI/2; torus.position.set(fit.cx,0,fit.cz)
     const dot=new THREE.Mesh(new THREE.SphereGeometry(0.8,12,12),
       new THREE.MeshBasicMaterial({color:0x00e5a0}))
     dot.position.set(fit.cx,0,fit.cz); g.add(torus); g.add(dot)
   }
   if(fit.type==='plane'){
-    // Show fitted plane as a rectangle, tilted
     const pgeo=new THREE.PlaneGeometry(70,70)
-    const pmesh=new THREE.Mesh(pgeo,new THREE.MeshBasicMaterial({color:0x00e5a0,wireframe:true,transparent:true,opacity:0.5}))
+    const pmesh=new THREE.Mesh(pgeo,new THREE.MeshBasicMaterial({color:0x00e5a0,wireframe:true,transparent:true,opacity:0.5,side:THREE.DoubleSide}))
     pmesh.rotation.x=-Math.PI/2
-    // apply tilt: a = tiltX (in fitPlane coords: x→x, y→z, z→y)
-    // fit.a is coefficient of x, fit.b is coefficient of z (original fitPlane y)
-    // In 3D: y = a*x + b*z + c → tilt
     const tiltX=Math.atan(fit.a), tiltZ=Math.atan(fit.b)
-    pmesh.rotation.x=-Math.PI/2+tiltX
-    pmesh.rotation.z=-tiltZ
-    pmesh.position.y=fit.c
-    g.add(pmesh)
-    // Normal arrow
+    pmesh.rotation.x=-Math.PI/2+tiltX; pmesh.rotation.z=-tiltZ
+    pmesh.position.y=fit.c; g.add(pmesh)
     const n=fit.normal
     const arrowDir=new THREE.Vector3(n[0],n[2],n[1]).normalize()
-    const arrow=new THREE.ArrowHelper(arrowDir,new THREE.Vector3(0,fit.c,0),12,0x00e5a0,3,2)
-    g.add(arrow)
+    g.add(new THREE.ArrowHelper(arrowDir,new THREE.Vector3(0,fit.c,0),12,0x00e5a0,3,2))
   }
   return g
 }
 
 function addDot(scene, x, y, z){
   const mesh=new THREE.Mesh(
-    new THREE.SphereGeometry(0.7,10,10),
-    new THREE.MeshStandardMaterial({color:0x00e5a0,emissive:0x00a060,emissiveIntensity:0.8,roughness:0.3})
+    new THREE.SphereGeometry(0.65,10,10),
+    new THREE.MeshStandardMaterial({color:0x00e5a0,emissive:0x00a060,emissiveIntensity:0.9,roughness:0.25})
   )
   mesh.position.set(x,y,z); scene.add(mesh); return mesh
 }
@@ -391,6 +470,7 @@ export default function CmmLab({ onBack }){
   const probePosRef   = useRef({x:0,y:40,z:0})
   const targetRef     = useRef(null)
   const pendingRef    = useRef(null)
+  const animQueueRef  = useRef([])   // sequence of waypoints: retract → hover → touch
   const animIdRef     = useRef(null)
   const dragRef       = useRef({dragging:false,lx:0,ly:0,moved:0})
   const featRef       = useRef('circle')
@@ -399,14 +479,13 @@ export default function CmmLab({ onBack }){
   const setPosRef     = useRef(null)
   const addProbeRef   = useRef(null)
 
-  // keep refs in sync with state
+  // keep refs in sync
   useEffect(()=>{ featRef.current=feat }, [feat])
   useEffect(()=>{ noiseRef.current=noise }, [noise])
   setAnimRef.current  = setAnimating
   setPosRef.current   = setProbePos
   addProbeRef.current = (pt) => setProbes(prev=>[...prev,pt])
 
-  // fit
   const fit = useMemo(()=>computeFit(feat,probes),[feat,probes])
 
   // ── THREE.JS INIT (once) ───────────────────────────────────────────────────
@@ -414,16 +493,13 @@ export default function CmmLab({ onBack }){
     const mount=mountRef.current; if(!mount) return
     const W=mount.clientWidth||600, H=mount.clientHeight||500
 
-    // Scene
     const scene=new THREE.Scene()
     scene.background=new THREE.Color(0x060910)
     sceneRef.current=scene
 
-    // Camera
     const camera=new THREE.PerspectiveCamera(50,W/H,0.1,2000)
     cameraRef.current=camera
 
-    // Renderer
     const renderer=new THREE.WebGLRenderer({antialias:true})
     renderer.setSize(W,H)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio,2))
@@ -431,13 +507,13 @@ export default function CmmLab({ onBack }){
     mount.appendChild(renderer.domElement)
     rendererRef.current=renderer
 
-    // Lights
-    scene.add(new THREE.AmbientLight(0xffffff,0.45))
-    const dir=new THREE.DirectionalLight(0xffffff,0.9)
+    scene.add(new THREE.AmbientLight(0xffffff,0.5))
+    const dir=new THREE.DirectionalLight(0xffffff,0.85)
     dir.position.set(40,60,40); dir.castShadow=true; scene.add(dir)
-    scene.add(new THREE.PointLight(0x38bdf8,0.3,200))
+    const fill=new THREE.DirectionalLight(0x4488ff,0.3)
+    fill.position.set(-30,20,-30); scene.add(fill)
+    scene.add(new THREE.PointLight(0x38bdf8,0.25,200))
 
-    // Grid
     const grid=new THREE.GridHelper(160,16,0x0e1a28,0x0a1420)
     grid.position.y=-8; scene.add(grid)
 
@@ -480,7 +556,7 @@ export default function CmmLab({ onBack }){
       )
       camera.lookAt(0,0,0)
 
-      // Probe animation
+      // Probe animation — lerp to current target, drain queue on arrival
       const pos=probePosRef.current, tgt=targetRef.current
       if(tgt){
         pos.x+=(tgt.x-pos.x)*0.14
@@ -488,17 +564,24 @@ export default function CmmLab({ onBack }){
         pos.z+=(tgt.z-pos.z)*0.14
         const pg2=probeGrpRef.current
         if(pg2) pg2.position.set(pos.x,pos.y,pos.z)
-        const d=Math.hypot(pos.x-tgt.x,pos.y-tgt.y,pos.z-tgt.z)
-        if(d<0.4){
+        const dist=Math.hypot(pos.x-tgt.x,pos.y-tgt.y,pos.z-tgt.z)
+        if(dist<0.35){
           pos.x=tgt.x; pos.y=tgt.y; pos.z=tgt.z
-          targetRef.current=null
-          setAnimRef.current(false)
-          if(pendingRef.current){
-            const pt=pendingRef.current; pendingRef.current=null
-            // Add dot to scene
-            const dot=addDot(sceneRef.current,pt.x,pt.y,pt.z)
-            dotsRef.current.push(dot)
-            addProbeRef.current(pt)
+          if(pg2) pg2.position.set(pos.x,pos.y,pos.z)
+          // Drain queue: advance to next waypoint
+          const next=animQueueRef.current.shift()
+          if(next){
+            targetRef.current=next
+          } else {
+            // All waypoints done — deposit probe point
+            targetRef.current=null
+            setAnimRef.current(false)
+            if(pendingRef.current){
+              const pt=pendingRef.current; pendingRef.current=null
+              const dot=addDot(sceneRef.current,pt.x,pt.y,pt.z)
+              dotsRef.current.push(dot)
+              addProbeRef.current(pt)
+            }
           }
         }
         const now=Date.now()
@@ -509,7 +592,6 @@ export default function CmmLab({ onBack }){
     }
     tick()
 
-    // Resize
     const onResize=()=>{
       const W2=mount.clientWidth, H2=mount.clientHeight
       camera.aspect=W2/H2; camera.updateProjectionMatrix()
@@ -524,7 +606,7 @@ export default function CmmLab({ onBack }){
       window.removeEventListener('mouseup',onUp)
       canvas.removeEventListener('wheel',onWheel)
       window.removeEventListener('resize',onResize)
-      mount.removeChild(renderer.domElement)
+      if(mount.contains(renderer.domElement)) mount.removeChild(renderer.domElement)
       renderer.dispose()
     }
   },[])
@@ -532,22 +614,18 @@ export default function CmmLab({ onBack }){
   // ── FEATURE CHANGE ─────────────────────────────────────────────────────────
   useEffect(()=>{
     const scene=sceneRef.current; if(!scene) return
-    // Remove old feature group
-    if(featGrpRef.current){ scene.remove(featGrpRef.current) }
-    // Remove dots
+    if(featGrpRef.current) scene.remove(featGrpRef.current)
     dotsRef.current.forEach(d=>scene.remove(d)); dotsRef.current=[]
     if(fitGrpRef.current){ scene.remove(fitGrpRef.current); fitGrpRef.current=null }
     setProbes([])
-    // Build new
-    const fg = feat==='circle'?buildCircleScene(): feat==='plane'?buildPlaneScene():buildCylScene()
+    const fg=feat==='circle'?buildCircleScene():feat==='plane'?buildPlaneScene():buildCylScene()
     scene.add(fg); featGrpRef.current=fg; hitMeshRef.current=fg.userData.hitMesh
-    // Reset probe
-    const start = feat==='circle'?{x:0,y:30,z:0}: feat==='plane'?{x:0,y:30,z:0}:{x:30,y:20,z:0}
+    // Park probe safely above feature
+    const start=feat==='circle'?{x:0,y:30,z:0}:feat==='plane'?{x:0,y:25,z:0}:{x:0,y:40,z:0}
     probePosRef.current={...start}
-    targetRef.current=null
+    targetRef.current=null; animQueueRef.current=[]
     if(probeGrpRef.current) probeGrpRef.current.position.set(start.x,start.y,start.z)
     setProbePos({...start})
-    // Camera angle per feature
     if(feat==='circle')      orbitRef.current={theta:Math.PI/4,phi:0.9,r:80}
     else if(feat==='plane')  orbitRef.current={theta:Math.PI/5,phi:0.65,r:120}
     else                     orbitRef.current={theta:Math.PI/4,phi:1.1,r:100}
@@ -557,9 +635,7 @@ export default function CmmLab({ onBack }){
   useEffect(()=>{
     const scene=sceneRef.current; if(!scene) return
     if(fitGrpRef.current){ scene.remove(fitGrpRef.current); fitGrpRef.current=null }
-    if(fit){
-      const fg=buildFitOverlay(feat,fit); scene.add(fg); fitGrpRef.current=fg
-    }
+    if(fit){ const fg=buildFitOverlay(feat,fit); scene.add(fg); fitGrpRef.current=fg }
   },[fit,feat])
 
   // ── CLICK TO PROBE ─────────────────────────────────────────────────────────
@@ -567,8 +643,8 @@ export default function CmmLab({ onBack }){
     if(animating) return
     const mount=mountRef.current, rend=rendererRef.current, cam=cameraRef.current
     if(!mount||!rend||!cam||!hitMeshRef.current) return
-    // Don't fire if it was a drag (moved resets on mousedown; by click time dragging is false but moved still reflects drag distance)
-    if(dragRef.current.moved > 4) return
+    if(dragRef.current.moved > 4) return   // was a drag, not a click
+
     const rect=rend.domElement.getBoundingClientRect()
     const mouse=new THREE.Vector2(
       (e.clientX-rect.left)/rect.width*2-1,
@@ -578,14 +654,40 @@ export default function CmmLab({ onBack }){
     ray.setFromCamera(mouse,cam)
     const hits=ray.intersectObject(hitMeshRef.current)
     if(!hits.length) return
+
     const h=hits[0].point
+    const {nx,ny,nz}=getSurfaceNormal(featRef.current,h.x,h.y,h.z)
+
+    // Ruby is tangent to surface: ball center = surface point + normal * RUBY_R
+    const touchPos={x:h.x+nx*RUBY_R, y:h.y+ny*RUBY_R, z:h.z+nz*RUBY_R}
+    const hoverPos={x:h.x+nx*(RUBY_R+HOVER_GAP), y:h.y+ny*(RUBY_R+HOVER_GAP), z:h.z+nz*(RUBY_R+HOVER_GAP)}
+
+    // Safe retract position so probe never clips through geometry during transit
+    const cur=probePosRef.current
+    let retractPos, queue
+    if(featRef.current==='circle'){
+      // Bore: retract to bore center at hover height, then approach radially
+      retractPos={x:0, y:hoverPos.y, z:0}
+      queue=[hoverPos, touchPos]
+    } else if(featRef.current==='plane'){
+      // Plane: lift up to clearance height directly above target, then descend
+      retractPos={x:hoverPos.x, y:20, z:hoverPos.z}
+      queue=[hoverPos, touchPos]
+    } else {
+      // Cylinder: retract radially outward from current, transit to clearance near target, approach
+      const a_cur=Math.atan2(cur.z,cur.x)
+      const a_tgt=Math.atan2(h.z,h.x)
+      const clearR=NOM_R+20
+      retractPos={x:clearR*Math.cos(a_cur), y:hoverPos.y, z:clearR*Math.sin(a_cur)}
+      const transit={x:clearR*Math.cos(a_tgt), y:hoverPos.y, z:clearR*Math.sin(a_tgt)}
+      queue=[transit, hoverPos, touchPos]
+    }
+
     const measured=getTruthPt(featRef.current,h.x,h.y,h.z,noiseRef.current)
-    // Probe retract then touch
-    targetRef.current={x:h.x,y:h.y+8,z:h.z} // hover above first
     pendingRef.current=measured
+    animQueueRef.current=queue
+    targetRef.current=retractPos
     setAnimating(true)
-    // After a short delay, go to touch point
-    setTimeout(()=>{ targetRef.current={x:h.x,y:h.y,z:h.z} },300)
   },[animating])
 
   // ── AUTO PROBE ─────────────────────────────────────────────────────────────
@@ -598,12 +700,12 @@ export default function CmmLab({ onBack }){
         pts.push(getTruthPt('circle',NOM_R*Math.cos(a),0,NOM_R*Math.sin(a),noiseRef.current))
       }
     } else if(feat==='plane'){
-      const step=60/(Math.ceil(Math.sqrt(n))-1||1), off=-30
-      for(let i=0;i<Math.ceil(Math.sqrt(n));i++) for(let j=0;j<Math.ceil(Math.sqrt(n));j++){
-        if(pts.length>=n) break
-        pts.push(getTruthPt('plane',off+i*step,0,off+j*step,noiseRef.current))
-      }
-    } else { // cylinder
+      const side=Math.ceil(Math.sqrt(n))
+      const step=60/(side-1||1), off=-30
+      for(let i=0;i<side&&pts.length<n;i++)
+        for(let j=0;j<side&&pts.length<n;j++)
+          pts.push(getTruthPt('plane',off+i*step,0,off+j*step,noiseRef.current))
+    } else {
       const levels=3, perLevel=Math.ceil(n/levels)
       for(let l=0;l<levels;l++){
         const y=-20+l*20
@@ -613,20 +715,18 @@ export default function CmmLab({ onBack }){
         }
       }
     }
-    // Clear existing
     dotsRef.current.forEach(d=>sceneRef.current?.remove(d)); dotsRef.current=[]
     if(fitGrpRef.current){ sceneRef.current?.remove(fitGrpRef.current); fitGrpRef.current=null }
-    // Add all dots
-    pts.forEach(pt=>{
-      const d=addDot(sceneRef.current,pt.x,pt.y,pt.z); dotsRef.current.push(d)
-    })
+    pts.forEach(pt=>{ dotsRef.current.push(addDot(sceneRef.current,pt.x,pt.y,pt.z)) })
     setProbes(pts)
-    // Move probe to last point
+    // Position probe tangent to last point
     if(pts.length){
       const last=pts[pts.length-1]
-      probePosRef.current={...last}
-      if(probeGrpRef.current) probeGrpRef.current.position.set(last.x,last.y,last.z)
-      setProbePos({...last})
+      const {nx,ny,nz}=getSurfaceNormal(feat,last.x,last.y,last.z)
+      const pp={x:last.x+nx*RUBY_R, y:last.y+ny*RUBY_R, z:last.z+nz*RUBY_R}
+      probePosRef.current=pp
+      if(probeGrpRef.current) probeGrpRef.current.position.set(pp.x,pp.y,pp.z)
+      setProbePos(pp)
     }
   },[feat,animating])
 
@@ -637,13 +737,13 @@ export default function CmmLab({ onBack }){
   },[])
 
   // ── NOMINAL VALUES FOR REPORT ──────────────────────────────────────────────
-  const nomD=25.0, nomR=12.5
+  const nomD=25.0
   const actD=fit?.type==='circle'?fit.diameter:null
   const devD=actD?Math.abs(actD-nomD):null
   const tol=0.05
   const passD=devD!=null?devD<=tol:null
 
-  // ── CONCEPT PANEL CONTENT ──────────────────────────────────────────────────
+  // ── CONCEPT PANEL ──────────────────────────────────────────────────────────
   const TOPICS=[
     {id:'linearize',label:'Linearize',c:D.violet},
     {id:'normal',   label:'Normal Eq',c:D.amber},
@@ -652,17 +752,13 @@ export default function CmmLab({ onBack }){
   ]
   const topicC=TOPICS.find(t=>t.id===topic)?.c||D.violet
 
-  // ── A MATRIX PREVIEW (first 4 rows) ───────────────────────────────────────
   const aRows = useMemo(()=>{
     if(!probes.length) return []
-    if(feat==='circle'||feat==='cylinder')
-      return probes.slice(0,4).map(p=>[p.x.toFixed(3),p.z.toFixed(3),'1'])
     return probes.slice(0,4).map(p=>[p.x.toFixed(3),p.z.toFixed(3),'1'])
-  },[probes,feat])
+  },[probes])
 
   const pmat=probeMatrix(feat,probePos.x,probePos.y,probePos.z)
 
-  // ── FEATURES META ──────────────────────────────────────────────────────────
   const FEATURES=[
     {id:'circle',  label:'BORE',     sub:'circle, 2D',   c:D.green},
     {id:'plane',   label:'PLANE',    sub:'flat surface', c:D.cyan},
@@ -710,7 +806,6 @@ export default function CmmLab({ onBack }){
         {/* ── LEFT: CONCEPT PANEL ── */}
         <div style={{width:280,flexShrink:0,borderRight:`1px solid ${D.border}`,
           display:'flex',flexDirection:'column',overflow:'hidden'}}>
-          {/* Tab bar */}
           <div style={{display:'flex',borderBottom:`1px solid ${D.border}`,background:D.surface,flexShrink:0}}>
             {TOPICS.map(t=>(
               <button key={t.id} onClick={()=>setTopic(t.id)}
@@ -723,7 +818,6 @@ export default function CmmLab({ onBack }){
               </button>
             ))}
           </div>
-          {/* Content */}
           <div style={{flex:1,overflowY:'auto',padding:'14px 14px'}}>
             <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:12}}>
               <Tag c={topicC}>{TOPICS.find(t=>t.id===topic)?.label}</Tag>
@@ -733,9 +827,9 @@ export default function CmmLab({ onBack }){
             {topic==='linearize'&&<>
               {(feat==='circle'||feat==='cylinder')&&<>
                 <Def term="Linearize the Circle" c={D.violet}>
-                  x²+y²+Dx+Ey+F=0 is nonlinear in the center (cx,cy) and radius r —
-                  but D, E, F appear <em>linearly</em>. Group x²+y² to the right side:
-                  <br/><span style={{fontFamily:"'DM Mono',monospace",color:D.violetLt||D.violet}}>
+                  x²+y²+Dx+Ey+F=0 is nonlinear in (cx,cy,r) — but D, E, F appear
+                  <em> linearly</em>. Group x²+y² to the right side:<br/>
+                  <span style={{fontFamily:"'DM Mono',monospace",color:D.violet}}>
                     xᵢD + yᵢE + F = −(xᵢ²+yᵢ²)
                   </span><br/>
                   One probe point = one row of A. Stack all probes → Ax=b.
@@ -746,20 +840,22 @@ export default function CmmLab({ onBack }){
     ⎣ xₙ  zₙ  1 ⎦       ⎣ -(xₙ²+zₙ²) ⎦
 
 Solve → [D,E,F]
-cx = -D/2,  cz = -E/2,  r = √(cx²+cz²-F)`}</Eq>
-                <Insight label="THE KEY INSIGHT" c={D.violet}>
-                  The model has built-in error — actual center ≠ nominal, actual
-                  radius ≠ nominal, and the bore isn't perfectly round (form error).
-                  Probing reveals all of this because the measured points don't sit
-                  on a perfect circle. Least squares finds the BEST circle through them.
-                  The residuals are the roundness error (circularity).
+cx = -D/2,  cz = -E/2
+r  = √(cx²+cz²−F)`}</Eq>
+                <Insight label="THE VISUAL WOBBLE IS REAL" c={D.violet}>
+                  The 3D geometry is drawn with the truth model errors
+                  amplified {VIS_SCALE}× so you can see them. The bore isn't
+                  perfectly round — it has a 3-lobe form error. The math finds
+                  the best-fit circle through your imperfect probe points.
+                  Residuals = the remaining form error (circularity).
                 </Insight>
               </>}
               {feat==='plane'&&<>
                 <Def term="Plane is Already Linear" c={D.violet}>
-                  z = ax + by + c has three unknowns [a,b,c] that appear linearly.
-                  Each probe point gives one row directly — no linearization trick needed.
-                  The tilt of the surface is encoded in a and b.
+                  z = ax + by + c — three unknowns that appear linearly.
+                  Each probe point gives one row directly.
+                  The surface tilt and undulation you can see are encoded
+                  in a, b, and the residuals.
                 </Def>
                 <Eq c={D.violet}>{`A = ⎡ x₁  z₁  1 ⎤   b = ⎡ y₁ ⎤  (y=height)
     ⎢ x₂  z₂  1 ⎥       ⎢ y₂ ⎥
@@ -767,16 +863,15 @@ cx = -D/2,  cz = -E/2,  r = √(cx²+cz²-F)`}</Eq>
     ⎣ xₙ  zₙ  1 ⎦       ⎣ yₙ ⎦
 
 Solve AᵀAx̂ = Aᵀb → [a,b,c]
-Normal vector: n = normalize([-a,-b,1])`}</Eq>
+Normal n = normalize([−a,−b,1])`}</Eq>
                 <Insight label="SAME A MATRIX STRUCTURE" c={D.violet}>
-                  Notice A = [x, z, 1] is identical to the circle fit.
-                  Only b changes. The same normal equation framework covers
-                  every feature type in CMM software — one algebra, many geometries.
+                  A = [x, z, 1] is identical for bore and plane.
+                  Only b changes. One algebra, every CMM feature type.
                 </Insight>
               </>}
               {probes.length>=3&&<>
                 <div style={{fontSize:9,color:D.faint,letterSpacing:2,marginBottom:6,fontFamily:"'DM Mono',monospace"}}>
-                  YOUR A MATRIX (showing first {Math.min(4,probes.length)} of {probes.length} rows)
+                  YOUR A MATRIX (first {Math.min(4,probes.length)} of {probes.length} rows)
                 </div>
                 <div style={{fontFamily:"'DM Mono',monospace",fontSize:10,lineHeight:2,padding:'6px 10px',
                   background:D.raised,borderRadius:6,border:`1px solid ${D.border2}`}}>
@@ -792,14 +887,15 @@ Normal vector: n = normalize([-a,-b,1])`}</Eq>
                 </div>
               </>}
               {probes.length<3&&<Insight label="PROBE TO SEE THE MATH" c={D.faint}>
-                Click on the 3D model surface or use AUTO to add probe points.
-                Minimum 3 points to solve. Watch the A matrix grow with each probe.
+                Click on the 3D surface or use AUTO. The surface is imperfect —
+                compare your measured points to the nominal geometry.
+                Minimum 3 points to solve. A matrix grows with each probe.
               </Insight>}
             </>}
 
             {topic==='normal'&&<>
               <Def term="Normal Equation AᵀAx̂ = Aᵀb" c={D.amber}>
-                With n&gt;3 probes, the system is overdetermined — no exact solution
+                With n&gt;3 probes the system is overdetermined — no exact solution
                 because the bore has real form error. Least squares minimizes ‖Ax−b‖²
                 by solving the 3×3 normal equation. AᵀA is always 3×3 regardless
                 of how many probes you take.
@@ -817,7 +913,7 @@ Normal vector: n = normalize([-a,-b,1])`}</Eq>
                     </div>
                   ))}
                 </div>
-                <div style={{fontSize:9,color:D.faint,letterSpacing:2,marginBottom:6,fontFamily:"'DM Mono',monospace"}}>SOLUTION x̂ = [D, E, F]</div>
+                <div style={{fontSize:9,color:D.faint,letterSpacing:2,marginBottom:6,fontFamily:"'DM Mono',monospace"}}>SOLUTION x̂</div>
                 <div style={{padding:'8px 10px',background:D.card,borderRadius:6,border:`1px solid ${D.amber}33`,
                   fontFamily:"'DM Mono',monospace",fontSize:10,lineHeight:2,marginBottom:10}}>
                   {fit.sol.map((v,i)=>(
@@ -827,10 +923,10 @@ Normal vector: n = normalize([-a,-b,1])`}</Eq>
                   ))}
                 </div>
                 <Insight label="WHY AᵀA IS ALWAYS 3×3" c={D.amber}>
-                  No matter how many probes — 3, 8, 50 — A has 3 columns and AᵀA
-                  is always 3×3. You're solving for only 3 unknowns [D,E,F]. More probes
-                  means better statistical averaging of noise, not more unknowns.
-                  This is why CMM programs take many probes for precision features.
+                  No matter how many probes — 3, 8, 50 — AᵀA is always 3×3
+                  because you only have 3 unknowns [D,E,F]. More probes means
+                  better averaging of measurement noise, not more unknowns.
+                  This is why precision features get many probe points.
                 </Insight>
               </>:<Insight label="ADD PROBES TO SEE AᵀA" c={D.faint}>
                 Probe the surface. AᵀA appears here with ≥3 points.
@@ -839,34 +935,30 @@ Normal vector: n = normalize([-a,-b,1])`}</Eq>
 
             {topic==='cond'&&<>
               <Def term="Condition Number κ(A)" c={D.cyan}>
-                κ(A) = σ_max / σ_min measures how sensitive the solution is to
-                probe noise. High κ → small measurement errors cause large errors
-                in computed diameter. Low κ → robust measurement.
+                κ(A) = σ_max / σ_min measures sensitivity to noise. High κ →
+                small measurement errors cause large errors in computed diameter.
                 {fit&&<><br/><strong style={{color:fit.cond<200?D.green:D.red}}>
                   Your κ ≈ {f3(fit.cond,0)} — {fit.cond<200?'GOOD distribution':'POOR — probes too clustered'}
                 </strong></>}
               </Def>
               <Insight label="WHY PROBE PLACEMENT IS A SKILL" c={D.cyan}>
-                If all your probes cluster in a 30° arc, AᵀA becomes nearly singular —
-                you have almost no information about the rest of the circle.
-                κ explodes. CMM best practice:
-                distribute probes evenly around 360°. Try it: compare AUTO 8pts
-                (evenly spaced, low κ) vs clicking all points in one quadrant (high κ).
+                If all probes cluster in a 30° arc, AᵀA becomes nearly singular.
+                κ explodes. CMM best practice: evenly distribute probes around 360°.
+                Try it — compare AUTO 8pts (low κ) vs all points in one quadrant (high κ).
               </Insight>
-              <Eq c={D.cyan}>{`Probe coverage rules of thumb:
-  ≥ 3 pts  → unique solution
-  ≥ 6 pts  → reliable diameter
-  ≥ 8 pts  → circularity measurement
-  ≥ 12 pts → high-precision form error
+              <Eq c={D.cyan}>{`≥ 3 pts  → unique solution
+≥ 6 pts  → reliable diameter
+≥ 8 pts  → circularity measurement
+≥ 12 pts → high-precision form error
 
-Even spacing → low κ → robust measurement
-Clustered    → high κ → noise amplification
+Even spacing → low κ → robust
+Clustered    → high κ → noise amplified
 
 Current κ: ${fit?f3(fit.cond,1):'—'}`}</Eq>
               <Def term="Rank Deficiency" c={D.cyan}>
-                3 collinear probe points give a rank-deficient A matrix
-                (you can't fit a unique circle through 3 points on a line).
-                rank(A) must equal 3 — full column rank — for a unique solution.
+                3 collinear probe points give a rank-deficient A matrix —
+                you can't fit a unique circle through 3 collinear points.
+                rank(A) must equal 3 for a unique solution.
                 In practice: never probe in a straight line.
               </Def>
             </>}
@@ -877,27 +969,22 @@ Current κ: ${fit?f3(fit.cond,1):'—'}`}</Eq>
                   <Stat label="NOM Ø (mm)" value="25.0000"/>
                   <Stat label="ACT Ø (mm)" value={f3(actD,4)} pass={passD}/>
                   <Stat label="DEV Ø" value={devD?f3(devD,4):'—'} pass={passD}/>
-                  <Stat label="CIRC" value={f3(fit.circularity,4)}
-                    pass={fit.circularity<=0.02} />
+                  <Stat label="CIRC" value={f3(fit.circularity,4)} pass={fit.circularity<=0.02}/>
                 </div>
-                <Eq c={D.green}>{`Feature: Circle (bore, Y-axis)
-Nominal: Ø 25.0000 mm  center (0.000, 0.000)
-Actual:  Ø ${f3(actD,4)} mm  center (${f3(fit.cx,3)}, ${f3(fit.cz,3)})
+                <Eq c={D.green}>{`Feature: ${feat==='cylinder'?'Cylinder (XZ circle)':'Circle (bore)'}
+Nominal: Ø 25.0000  center (0.000, 0.000)
+Actual:  Ø ${f3(actD,4)}  center (${f3(fit.cx,3)}, ${f3(fit.cz,3)})
 Dev Ø:   ${f3(devD,4)} mm  ${passD?'PASS ✓':'FAIL ✗'} (tol ±0.050)
 Circul:  ${f3(fit.circularity,4)} mm  ${fit.circularity<=0.02?'PASS ✓':'WARN'} (tol 0.020)
-Cond(A): ${f3(fit.cond,1)}
+κ(A):    ${f3(fit.cond,1)}
 Probes:  ${probes.length}`}</Eq>
-                <Insight label="RESIDUALS = FORM ERROR (CIRCULARITY)" c={D.green}>
-                  The residuals rᵢ = (distance from probe to best-fit circle) are
-                  the part of b NOT in Col(A) — the null-space component.
-                  Circularity = max(r) − min(r) = how far the bore deviates from
-                  a perfect circle. This is a GD&T callout on every precision bore.
-                  Least squares minimizes Σrᵢ² — it cannot eliminate these because
-                  the bore truly isn't round.
+                <Insight label="RESIDUALS = FORM ERROR" c={D.green}>
+                  rᵢ = distance from probe point to best-fit circle.
+                  Circularity = max(r) − min(r) = the GD&T form tolerance.
+                  Least squares minimizes Σrᵢ² but can't eliminate these
+                  because the bore truly isn't round.
                 </Insight>
-                <div style={{fontSize:9,color:D.faint,letterSpacing:2,marginBottom:6,fontFamily:"'DM Mono',monospace"}}>
-                  RESIDUALS (mm, per probe point)
-                </div>
+                <div style={{fontSize:9,color:D.faint,letterSpacing:2,marginBottom:6,fontFamily:"'DM Mono',monospace"}}>RESIDUALS (mm)</div>
                 <div style={{display:'flex',gap:3,flexWrap:'wrap'}}>
                   {fit.residuals.map((r,i)=>(
                     <div key={i} style={{padding:'3px 6px',borderRadius:3,
@@ -917,21 +1004,21 @@ Probes:  ${probes.length}`}</Eq>
                   <Stat label="NY" value={f3(fit.normal[2],4)}/>
                   <Stat label="NZ" value={f3(fit.normal[1],4)}/>
                 </div>
-                <Eq c={D.green}>{`Fit plane: y = ${f3(fit.a,4)}x + ${f3(fit.b,4)}z + ${f3(fit.c,4)}
+                <Eq c={D.green}>{`Fit: y = ${f3(fit.a,4)}x + ${f3(fit.b,4)}z + ${f3(fit.c,4)}
 Normal: [${f3(fit.normal[0],4)}, ${f3(fit.normal[2],4)}, ${f3(fit.normal[1],4)}]
 Flatness: ${f3(fit.flatness,4)} mm  ${fit.flatness<=0.05?'PASS ✓':'FAIL ✗'} (tol 0.050)
-Cond(A): ${f3(fit.cond,1)}
+κ(A): ${f3(fit.cond,1)}
 Probes: ${probes.length}`}</Eq>
                 <Insight label="FLATNESS = RANGE OF RESIDUALS" c={D.green}>
-                  GD&T flatness = max(residuals) − min(residuals). This is the
-                  thickness of the zone that contains all probe points — the part
-                  of b in the null space of Aᵀ. Least squares minimizes Σrᵢ² but
-                  can't reduce flatness below the actual surface form error.
+                  GD&T flatness = max(r) − min(r) = the thickness of the zone
+                  containing all probe points. This is the part of b in the
+                  null space of Aᵀ — least squares can't reduce it below
+                  the actual surface form error.
                 </Insight>
               </>}
               {!fit&&<Insight label="PROBE THE FEATURE TO SEE REPORT" c={D.faint}>
-                Add at least 3 probe points to generate a GD&T measurement report
-                with actual vs nominal deviation and form error.
+                Add at least 3 probe points to generate a GD&T measurement
+                report with actual vs nominal deviation and form error.
               </Insight>}
             </>}
           </div>
@@ -940,12 +1027,17 @@ Probes: ${probes.length}`}</Eq>
         {/* ── CENTER: THREE.JS VIEWPORT ── */}
         <div ref={mountRef} onClick={onCanvasClick}
           style={{flex:1,cursor:animating?'wait':'crosshair',overflow:'hidden',position:'relative'}}>
-          {/* Overlay hint */}
           <div style={{position:'absolute',bottom:10,left:'50%',transform:'translateX(-50%)',
-            padding:'3px 14px',background:'rgba(8,11,15,0.7)',borderRadius:4,
+            padding:'3px 14px',background:'rgba(8,11,15,0.75)',borderRadius:4,
             border:`1px solid ${D.border}`,fontSize:9,color:D.faint,
             fontFamily:"'DM Mono',monospace",letterSpacing:2,pointerEvents:'none'}}>
             {animating?'PROBING…':'CLICK SURFACE TO PROBE · DRAG TO ORBIT · SCROLL TO ZOOM'}
+          </div>
+          {/* Visual error legend */}
+          <div style={{position:'absolute',top:8,left:8,padding:'4px 10px',
+            background:'rgba(8,11,15,0.7)',borderRadius:4,border:`1px solid ${D.violet}33`,
+            fontSize:8,color:D.violet,fontFamily:"'DM Mono',monospace",letterSpacing:1,pointerEvents:'none'}}>
+            ERRORS {VIS_SCALE}× VISUAL SCALE
           </div>
         </div>
 
@@ -987,10 +1079,10 @@ Probes: ${probes.length}`}</Eq>
             </button>
           </div>
 
-          {/* Probe position + matrix */}
+          {/* Probe matrix */}
           <div style={{padding:'10px 14px',borderBottom:`1px solid ${D.border}`,flexShrink:0}}>
             <div style={{fontSize:8,color:D.faint,letterSpacing:2,marginBottom:6,fontFamily:"'DM Mono',monospace"}}>
-              PROBE TRANSFORM MATRIX T — position + approach
+              PROBE TRANSFORM MATRIX T
             </div>
             <div style={{fontFamily:"'DM Mono',monospace",fontSize:9.5,lineHeight:1.95,
               padding:'7px 10px',background:D.raised,borderRadius:6,border:`1px solid ${D.border2}`}}>
@@ -1010,7 +1102,7 @@ Probes: ${probes.length}`}</Eq>
             </div>
             <div style={{fontSize:8,color:D.faint,marginTop:4,lineHeight:1.8}}>
               <span style={{color:D.violet}}>■ cols 0-2</span> = rotation (approach direction)
-              <br/><span style={{color:D.green}}>■ col 3</span> = translation (tip position, mm)
+              <br/><span style={{color:D.green}}>■ col 3</span> = ball center (mm), tangent to surface
             </div>
           </div>
 
@@ -1024,12 +1116,9 @@ Probes: ${probes.length}`}</Eq>
                 <Stat label="ACT Ø" value={f3(fit.diameter,4)} pass={passD}/>
                 <Stat label="CIRC" value={f3(fit.circularity,4)} pass={fit.circularity<=0.02}/>
               </>}
-              {fit?.type==='plane'&&<>
-                <Stat label="FLAT" value={f3(fit.flatness,4)} pass={fit.flatness<=0.05}/>
-              </>}
+              {fit?.type==='plane'&&<Stat label="FLAT" value={f3(fit.flatness,4)} pass={fit.flatness<=0.05}/>}
             </div>
 
-            {/* A matrix column explanation */}
             <div style={{fontSize:9,color:D.faint,letterSpacing:2,marginBottom:6,fontFamily:"'DM Mono',monospace"}}>
               HOW PROBING BUILDS Ax=b
             </div>
@@ -1039,26 +1128,24 @@ Probes: ${probes.length}`}</Eq>
                 Each click → 1 row of A:<br/>
                 <span style={{color:D.cyan}}>[ xᵢ  zᵢ  1 ]</span><br/>
                 bᵢ = <span style={{color:D.amber}}>-(xᵢ²+zᵢ²)</span><br/><br/>
-                Residual rᵢ = distance from<br/>
-                probe point to fit circle<br/>
-                = <span style={{color:D.red}}>circularity error</span><br/><br/>
-                AᵀA ← always 3×3 (D,E,F)<br/>
-                More probes → better cond #
+                Probe ball center = surface<br/>
+                + normal × {RUBY_R}mm (tangent)<br/><br/>
+                Residual rᵢ = <span style={{color:D.red}}>circularity error</span><br/>
+                AᵀA ← always 3×3 (D,E,F)
               </>:<>
                 Each click → 1 row of A:<br/>
                 <span style={{color:D.cyan}}>[ xᵢ  zᵢ  1 ]</span><br/>
                 bᵢ = <span style={{color:D.amber}}>yᵢ</span> (height)<br/><br/>
-                Residual rᵢ = height deviation<br/>
-                from best-fit plane<br/>
-                = <span style={{color:D.red}}>flatness error</span><br/><br/>
-                AᵀA ← always 3×3 (a,b,c)<br/>
-                Even grid → best cond #
+                Probe ball center = surface<br/>
+                + normal × {RUBY_R}mm (tangent)<br/><br/>
+                Residual rᵢ = <span style={{color:D.red}}>flatness error</span><br/>
+                AᵀA ← always 3×3 (a,b,c)
               </>}
             </div>
 
-            {/* Truth model info (teacher transparency) */}
+            {/* Hidden truth */}
             <div style={{marginTop:10,fontSize:9,color:D.faint,letterSpacing:2,marginBottom:4,fontFamily:"'DM Mono',monospace"}}>
-              HIDDEN TRUTH (real machine can't see this)
+              HIDDEN TRUTH (real CMM can't see this)
             </div>
             <div style={{padding:'7px 10px',background:'rgba(167,139,250,0.05)',
               borderRadius:6,border:`1px solid ${D.violet}22`,
@@ -1067,22 +1154,22 @@ Probes: ${probes.length}`}</Eq>
                 True cx = <span style={{color:D.violet}}>+0.047</span> mm<br/>
                 True cz = <span style={{color:D.violet}}>-0.031</span> mm<br/>
                 True r  = <span style={{color:D.violet}}>12.437</span> mm (nom 12.5)<br/>
-                Circ err= <span style={{color:D.violet}}>±0.22</span> mm (3-lobe)<br/>
-                Noise σ = <span style={{color:D.violet}}>{noise.toFixed(4)}</span> mm
+                Circ err= <span style={{color:D.violet}}>±0.18</span> mm (3-lobe)<br/>
+                Visual  = <span style={{color:D.violet}}>{VIS_SCALE}× exaggerated</span>
               </>}
               {feat==='plane'&&<>
                 True tiltX = <span style={{color:D.violet}}>0.003</span> mm/mm<br/>
                 True tiltZ = <span style={{color:D.violet}}>-0.0015</span> mm/mm<br/>
                 True offset= <span style={{color:D.violet}}>0.002</span> mm<br/>
                 Bump amp  = <span style={{color:D.violet}}>±0.04</span> mm<br/>
-                Noise σ   = <span style={{color:D.violet}}>{noise.toFixed(4)}</span> mm
+                Visual  = <span style={{color:D.violet}}>{VIS_SCALE}× exaggerated</span>
               </>}
               {feat==='cylinder'&&<>
                 True cx = <span style={{color:D.violet}}>+0.031</span> mm<br/>
                 True cz = <span style={{color:D.violet}}>-0.018</span> mm<br/>
                 True r  = <span style={{color:D.violet}}>12.465</span> mm (nom 12.5)<br/>
-                Circ err= <span style={{color:D.violet}}>±0.17</span> mm (2-lobe)<br/>
-                Noise σ = <span style={{color:D.violet}}>{noise.toFixed(4)}</span> mm
+                Circ err= <span style={{color:D.violet}}>±0.15</span> mm (2-lobe)<br/>
+                Visual  = <span style={{color:D.violet}}>{VIS_SCALE}× exaggerated</span>
               </>}
             </div>
           </div>
