@@ -10,7 +10,7 @@ export default {
   timeToComplete: 30,
   coreConcept: 'Advanced simulations combine stable integration (Verlet), scene hierarchies (pivot Groups), memory-efficient history (circular buffers), coherent randomness (noise), and emergent behavior (boids). Each technique is a standalone pattern you can drop into any project.',
   prerequisites: ['building-blocks-part-2-motion-physics'],
-  nextLesson: null,
+  nextLesson: 'building-blocks-part-4-physics-geometry-interaction',
 
   hook: {
     question: 'Why does Euler integration explode for stiff springs while Verlet stays stable? Why do boids flock without any central controller?',
