@@ -45,6 +45,7 @@ const MatrixLabPage = lazy(() => import("./pages/MatrixLabPage.jsx"));
 const Matrix3DLabPage = lazy(() => import("./pages/Matrix3DLabPage.jsx"));
 const DecompLabPage = lazy(() => import("./pages/DecompLabPage.jsx"));
 const CmmLabPage = lazy(() => import("./pages/CmmLabPage.jsx"));
+const FiveAxisKinematicsPage = lazy(() => import("./pages/FiveAxisKinematicsPage.jsx"));
 const Fallback = () => (
   <div className="flex items-center justify-center h-64">
     <LoadingSpinner size="lg" />
@@ -114,6 +115,7 @@ export default function App() {
                     <Route path="matrix-3d-lab" element={<Matrix3DLabPage />} />
                     <Route path="decomp-lab" element={<DecompLabPage />} />
                     <Route path="cmm-lab" element={<CmmLabPage />} />
+                    <Route path="five-axis" element={<FiveAxisKinematicsPage />} />
                   </Routes>
                 </Suspense>
               </AppShell>

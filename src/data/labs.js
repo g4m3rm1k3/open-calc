@@ -139,4 +139,14 @@ export const LABS = [
     tags: ['Math', 'Tools'],
     cover: { grad: 'from-emerald-700 via-teal-800 to-cyan-950', mark: 'π e', sub: 'Universal Constants' },
   },
+  {
+    key: 'five-axis',
+    label: '5-Axis Kinematics',
+    emoji: '⚙️',
+    color: 'violet',
+    desc: 'Visualize 5-axis CNC kinematics live — homogeneous transforms, surface normals, lead/lag angles, and swarf cutting on parametric shapes. Full matrix stack shown.',
+    path: '/five-axis',
+    tags: ['CNC', 'Linear Algebra', 'Kinematics'],
+    cover: { grad: 'from-violet-700 via-purple-800 to-indigo-950', mark: 'M·v', sub: 'CNC · Transforms · 5-Axis' },
+  },
 ]
