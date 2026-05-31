@@ -44,6 +44,7 @@ import dp1 from "./dp-1/index.js";
 import design1 from "./design-1/index.js";
 import threejs1 from "./three-js-1/index.js";
 import aiEngineering0 from "./ai-engineering-0/index.js";
+import aiEngineering1 from "./ai-engineering-1/index.js";
 import aiEngineering11 from "./ai-engineering-11/index.js";
 import threeJs2 from "./three-js-2/index.js";
 import canvas1 from "./canvas-1/index.js";
@@ -132,7 +133,7 @@ const APPLIED_STATS_CURRICULUM = appliedStatistics.map((ch) => ({
   ...ch,
   course: "applied-statistics",
 }));
-const AI_ENGINEERING_CURRICULUM = [...aiEngineering0, ...aiEngineering11].map(
+const AI_ENGINEERING_CURRICULUM = [...aiEngineering0, ...aiEngineering1, ...aiEngineering11].map(
   (ch) => ({ ...ch, course: "ai-engineering" }),
 );
 const SIM1_CURRICULUM = sim1.map((ch) => ({ ...ch, course: "sim-1" }));
