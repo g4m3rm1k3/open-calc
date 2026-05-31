@@ -53,7 +53,8 @@ import sql1 from "./sql-1/index.js";
 import nosql1 from "./nosql-1/index.js";
 import appliedStatistics from "./applied-statistics/index.js";
 import sim1 from "./sim-1/index.js";
-import sim2 from "./sim-2/index.js";
+import sim2 from "./sim-2/index.js"
+import sim3 from "./sim-3/index.js";
 
 const CALC_CURRICULUM = [ch0, ch1, ch2, ch3, ch4, ch5, ch6].map((ch) => ({
   ...ch,
@@ -136,6 +137,7 @@ const AI_ENGINEERING_CURRICULUM = [...aiEngineering0, ...aiEngineering11].map(
 );
 const SIM1_CURRICULUM = sim1.map((ch) => ({ ...ch, course: "sim-1" }));
 const SIM2_CURRICULUM = sim2.map((ch) => ({ ...ch, course: "sim-1" }));
+const SIM3_CURRICULUM = sim3.map((ch) => ({ ...ch, course: "sim-1" }));
 
 export const CURRICULUM = [
   ...PRECALC_CURRICULUM,
@@ -173,6 +175,7 @@ export const CURRICULUM = [
   ...CPP2_CURRICULUM,
   ...SIM1_CURRICULUM,
   ...SIM2_CURRICULUM,
+  ...SIM3_CURRICULUM,
 ];
 
 // Flat map for O(1) lookup by slug within chapter
