@@ -43,6 +43,8 @@ const DroneLabPage = lazy(() => import("./pages/DroneLabPage.jsx"));
 const SimLabPage = lazy(() => import("./pages/SimLabPage.jsx"));
 const MatrixLabPage = lazy(() => import("./pages/MatrixLabPage.jsx"));
 const Matrix3DLabPage = lazy(() => import("./pages/Matrix3DLabPage.jsx"));
+const DecompLabPage = lazy(() => import("./pages/DecompLabPage.jsx"));
+const CmmLabPage = lazy(() => import("./pages/CmmLabPage.jsx"));
 const Fallback = () => (
   <div className="flex items-center justify-center h-64">
     <LoadingSpinner size="lg" />
@@ -110,6 +112,8 @@ export default function App() {
                     <Route path="sim-lab" element={<SimLabPage />} />
                     <Route path="matrix-lab" element={<MatrixLabPage />} />
                     <Route path="matrix-3d-lab" element={<Matrix3DLabPage />} />
+                    <Route path="decomp-lab" element={<DecompLabPage />} />
+                    <Route path="cmm-lab" element={<CmmLabPage />} />
                   </Routes>
                 </Suspense>
               </AppShell>
