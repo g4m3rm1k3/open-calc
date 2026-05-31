@@ -3,6 +3,8 @@ import Editor from "@monaco-editor/react";
 import { getPyodide } from "../../utils/pyodideRuntime.js";
 import { executeScript } from "../../utils/openmatEngine.js";
 import { setupOpenCalcMonaco } from "../../utils/monacoThemes.js";
+import { MatrixInput } from "./MatrixInputFix";
+import { MatrixVisualizer, EigenExplorer } from "./MatrixVisualizer";
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  REFERENCE MATH ENGINE
@@ -1151,7 +1153,15 @@ result = backSub(upper);`,
   (code) => `${code}\nresult = gramSchmidt([1 1 0; 1 0 1; 0 1 1]);`,
 ];
 
-function validateMatlabResult(lessonId, result) {
+const normalizeMatlabArray = (v) => {
+  if (!Array.isArray(v)) return v;
+  if (v.every(r => Array.isArray(r) && r.length === 1)) return v.map(r => r[0]);
+  if (v.every(r => Array.isArray(r))) return v;
+  return v;
+};
+
+function validateMatlabResult(lessonId, rawResult) {
+  const result = normalizeMatlabArray(rawResult);
   const cl = (a, b) => Math.abs(a - b) < 1e-5;
   const clV = (u, v) => Array.isArray(u) && u.length === v.length && u.every((x, i) => cl(x, v[i]));
   // flatten column vector [[a],[b]] → [a,b]
@@ -1283,75 +1293,7 @@ const MatDisplay = ({ M, small, augAt }) => {
   );
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  MATRIX INPUT
-// ─────────────────────────────────────────────────────────────────────────────
-const MatrixInput = ({ matrix, onChange, onReset }) => {
-  const size = matrix.length;
-  const cellH = 36;
-  const fs = size <= 2 ? 26 : size === 3 ? 22 : 18;
-  const totalH = size * cellH + (size - 1) * 4;
-
-  const handleSizeChange = (n) => {
-    onChange(Array.from({ length: n }, (_, r) =>
-      Array.from({ length: n }, (_, c) => r < size && c < size ? matrix[r][c] : (r === c ? 1 : 0))
-    ));
-  };
-
-  const commit = (r, c, val) => {
-    const p = parseFloat(val);
-    if (isNaN(p)) return;
-    const m = matrix.map(row => [...row]);
-    m[r][c] = p;
-    onChange(m);
-  };
-
-  return (
-    <div>
-      <div style={{ display:"flex", gap:5, marginBottom:10, alignItems:"center" }}>
-        <span style={{ fontSize:10, color:"#555", letterSpacing:"0.06em", textTransform:"uppercase" }}>Size</span>
-        {[2,3,4].map(n => (
-          <button key={n} onClick={() => handleSizeChange(n)} style={{ width:30, height:22, borderRadius:4, background:size===n?"#2d2d2d":"transparent", border:`1px solid ${size===n?"#555":"#333"}`, color:size===n?"#c0c0c0":"#555", fontSize:10, cursor:"pointer", fontFamily:"inherit" }}>
-            {n}×{n}
-          </button>
-        ))}
-        {onReset && (
-          <button onClick={onReset} style={{ marginLeft:"auto", height:22, padding:"0 8px", borderRadius:4, background:"transparent", border:"1px solid #333", color:"#555", fontSize:10, cursor:"pointer", fontFamily:"inherit" }}>↺ Reset</button>
-        )}
-      </div>
-      <div style={{ display:"flex", alignItems:"center", gap:3 }}>
-        <div style={{ display:"flex", flexDirection:"column", height:totalH, justifyContent:"space-between", color:"#555" }}>
-          {matrix.map((_, i) => (
-            <span key={i} style={{ fontSize:fs, fontWeight:200, lineHeight:`${cellH}px`, display:"block" }}>
-              {i===0?"⎡":i===size-1?"⎣":"⎢"}
-            </span>
-          ))}
-        </div>
-        <div style={{ display:"grid", gridTemplateColumns:`repeat(${size}, 52px)`, gridTemplateRows:`repeat(${size}, ${cellH}px)`, gap:4 }}>
-          {matrix.map((row, r) => row.map((val, c) => (
-            <input
-              key={`${r}-${c}`}
-              type="text"
-              inputMode="decimal"
-              defaultValue={val}
-              onChange={(e) => { const p = parseFloat(e.target.value); if (!isNaN(p)) commit(r, c, e.target.value); }}
-              onBlur={(e) => commit(r, c, e.target.value)}
-              onFocus={(e) => e.target.select()}
-              style={{ width:52, height:cellH, textAlign:"center", background:"#252525", border:"1px solid #3a3a3a", borderRadius:4, color:"#e8e8e8", fontSize:12, fontFamily:"'SF Mono',Menlo,monospace", outline:"none" }}
-            />
-          )))}
-        </div>
-        <div style={{ display:"flex", flexDirection:"column", height:totalH, justifyContent:"space-between", color:"#555" }}>
-          {matrix.map((_, i) => (
-            <span key={i} style={{ fontSize:fs, fontWeight:200, lineHeight:`${cellH}px`, display:"block" }}>
-              {i===0?"⎤":i===size-1?"⎦":"⎥"}
-            </span>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
+// MatrixInput is imported from ./MatrixInputFix
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  MAIN COMPONENT
@@ -1371,6 +1313,7 @@ export default function MatrixLab({ onBack }) {
   const [completed, setCompleted] = useState(new Set());
   const [customMatrix, setCustomMatrix] = useState(() => (LESSONS[0].testMatrix || [[2,1,-1],[4,3,1],[-2,1,5]]).map(r=>[...r]));
   const [matrixInputKey, setMatrixInputKey] = useState(0);
+  const [showViz, setShowViz] = useState(false);
   const editorRef = useRef(null);
 
   const lesson = LESSONS[lessonIdx];
@@ -1575,11 +1518,9 @@ export default function MatrixLab({ onBack }) {
                 Reveal
               </button>
 
-              {[3,4,5,6].includes(lessonIdx) && (
-                <button onClick={handleTrace} style={{ height:26, padding:"0 12px", borderRadius:5, background:"transparent", border:"1px solid #3a3270", color:"#818cf8", fontSize:11, cursor:"pointer", fontFamily:"inherit", letterSpacing:0.2 }}>
-                  Step Through
-                </button>
-              )}
+              <button onClick={handleTrace} disabled={lessonIdx < 3} title={lessonIdx < 3 ? "Available from Lesson 4 onwards" : ""} style={{ height:26, padding:"0 12px", borderRadius:5, background:"transparent", border:"1px solid #3a3270", color:"#818cf8", fontSize:11, cursor:lessonIdx < 3 ? "default" : "pointer", fontFamily:"inherit", letterSpacing:0.2, opacity:lessonIdx < 3 ? 0.3 : 1 }}>
+                Step Through
+              </button>
 
               {isComplete && lang === "js" && (
                 <span style={{ marginLeft:4, fontSize:11, color:"#4dcd6e", background:"#1f4a2a", border:"1px solid #2d7a3e", borderRadius:4, padding:"3px 10px" }}>All tests pass</span>
@@ -1740,6 +1681,24 @@ export default function MatrixLab({ onBack }) {
                 </div>
               </div>
             )}
+
+            {/* ── Visualizer ── */}
+            <div style={{ borderTop:"1px solid #2d2d2d", flexShrink:0 }}>
+              <button onClick={() => setShowViz(v => !v)} style={{ width:"100%", padding:"9px 16px", background:"transparent", border:"none", borderBottom:showViz?"1px solid #2d2d2d":"none", color:"#555", fontSize:10, fontWeight:600, cursor:"pointer", fontFamily:"inherit", letterSpacing:"0.08em", textTransform:"uppercase", textAlign:"left", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                Visualize Matrix
+                <span style={{ fontSize:12, color:"#444" }}>{showViz ? "▲" : "▼"}</span>
+              </button>
+              {showViz && !lesson.isVector && (
+                <div style={{ padding:"12px", overflowY:"auto", maxHeight:420 }}>
+                  <MatrixVisualizer matrix={customMatrix} color={lc} lessonId={lessonIdx} />
+                  {customMatrix.length === 2 && (
+                    <div style={{ marginTop:12 }}>
+                      <EigenExplorer matrix={customMatrix} color={lc} />
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
