@@ -41,6 +41,7 @@ const MatrixGamePage = lazy(() => import("./pages/MatrixGamePage.jsx"));
 const RobotArmLabPage = lazy(() => import("./pages/RobotArmLabPage.jsx"));
 const DroneLabPage = lazy(() => import("./pages/DroneLabPage.jsx"));
 const SimLabPage = lazy(() => import("./pages/SimLabPage.jsx"));
+const MatrixLabPage = lazy(() => import("./pages/MatrixLabPage.jsx"));
 const Fallback = () => (
   <div className="flex items-center justify-center h-64">
     <LoadingSpinner size="lg" />
@@ -106,6 +107,7 @@ export default function App() {
                     <Route path="robot-arm-lab" element={<RobotArmLabPage />} />
                     <Route path="drone-lab" element={<DroneLabPage />} />
                     <Route path="sim-lab" element={<SimLabPage />} />
+                    <Route path="matrix-lab" element={<MatrixLabPage />} />
                   </Routes>
                 </Suspense>
               </AppShell>

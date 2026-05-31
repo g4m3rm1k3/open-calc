@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import Editor from "@monaco-editor/react";
 import { getPyodide } from "../../utils/pyodideRuntime.js";
 import { executeScript } from "../../utils/openmatEngine.js";
+import { setupOpenCalcMonaco } from "../../utils/monacoThemes.js";
 import TutorPanel from "../tutor/TutorPanel.jsx";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
@@ -4411,15 +4413,23 @@ export default function RobotArmLab({ onBack }) {
                 </span>
                 {runBtn}
               </div>
-              <textarea value={code} onChange={e=>setCode(e.target.value)} onKeyDown={handleKeyDown}
-                spellCheck={false}
-                style={{
-                  flex:1,background:"#060e1a",color:"#c8e8ff",
-                  border:"none",borderBottom:"1px solid #1a2e4a",
-                  padding:"14px 16px",fontFamily:"inherit",fontSize:12.5,lineHeight:1.8,
-                  resize:"none",outline:"none",minHeight:0,tabSize:4,
-                }}
-              />
+              <div style={{ flex:1, minHeight:0 }}>
+                <Editor
+                  height="100%"
+                  language="python"
+                  value={code}
+                  onChange={v=>setCode(v??'')}
+                  theme="open-calc-dark"
+                  beforeMount={setupOpenCalcMonaco}
+                  options={{
+                    fontSize:13,lineHeight:20,
+                    fontFamily:'"Fira Code","JetBrains Mono","SF Mono",monospace',
+                    minimap:{enabled:false},scrollBeyondLastLine:false,
+                    padding:{top:12,bottom:12},tabSize:4,wordWrap:'on',
+                    renderWhitespace:'none',overviewRulerLanes:0,
+                  }}
+                />
+              </div>
               {consolePanel}
             </div>
           )}
@@ -4438,15 +4448,23 @@ export default function RobotArmLab({ onBack }) {
                 {runBtn}
               </div>
               {/* MATLAB code editor */}
-              <textarea value={matlabCode} onChange={e=>setMatlabCode(e.target.value)} onKeyDown={handleMatlabKeyDown}
-                spellCheck={false}
-                style={{
-                  flex:"0 0 42%",background:"#060e1a",color:"#c8e8ff",
-                  border:"none",borderBottom:"1px solid #1a2e4a",
-                  padding:"14px 16px",fontFamily:"inherit",fontSize:12.5,lineHeight:1.8,
-                  resize:"none",outline:"none",tabSize:4,
-                }}
-              />
+              <div style={{ flex:"0 0 42%", minHeight:0 }}>
+                <Editor
+                  height="100%"
+                  language="openmat"
+                  value={matlabCode}
+                  onChange={v=>setMatlabCode(v??'')}
+                  theme="open-calc-dark"
+                  beforeMount={setupOpenCalcMonaco}
+                  options={{
+                    fontSize:13,lineHeight:20,
+                    fontFamily:'"Fira Code","JetBrains Mono","SF Mono",monospace',
+                    minimap:{enabled:false},scrollBeyondLastLine:false,
+                    padding:{top:12,bottom:12},tabSize:4,wordWrap:'on',
+                    renderWhitespace:'none',overviewRulerLanes:0,
+                  }}
+                />
+              </div>
               {/* Console */}
               {consolePanel}
               {/* Matrix view header */}

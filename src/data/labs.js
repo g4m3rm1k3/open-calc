@@ -30,6 +30,16 @@ export const LABS = [
     cover: { grad: 'from-teal-700 via-cyan-800 to-blue-950', mark: '🦾', sub: 'FK · IK · Fanuc TP' },
   },
   {
+    key: 'matrix-lab',
+    label: 'Matrix Lab',
+    emoji: '⊡',
+    color: 'violet',
+    desc: 'Master linear algebra by coding it — row ops, Gaussian elimination, determinants, inverse, and Gram-Schmidt in JS, Python, and MATLAB.',
+    path: '/matrix-lab',
+    tags: ['Math', 'Python', 'MATLAB'],
+    cover: { grad: 'from-violet-700 via-purple-800 to-indigo-950', mark: 'Ax=b', sub: 'Row Ops · RREF · QR' },
+  },
+  {
     key: 'openmat',
     label: 'OpenMAT',
     emoji: '⚛️',

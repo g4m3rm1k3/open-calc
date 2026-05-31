@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
+import Editor from '@monaco-editor/react'
 import { getPyodide } from '../../utils/pyodideRuntime.js'
 import { executeScript } from '../../utils/openmatEngine.js'
+import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
 
 // ── Math utilities ──────────────────────────────────────────────────
 const vadd = (a,b) => [a[0]+b[0], a[1]+b[1]]
@@ -1636,28 +1638,24 @@ export default function DroneLab({ onBack }) {
                 </button>
               </div>
 
-              <textarea
-                value={currentCode}
-                onChange={e=>setCode(e.target.value)}
-                readOnly={showSolution}
-                spellCheck={false}
-                onKeyDown={e=>{
-                  if(e.key==='Tab'){
-                    e.preventDefault()
-                    const s=e.target.selectionStart, end=e.target.selectionEnd
-                    const v=e.target.value
-                    setCode(v.substring(0,s)+'  '+v.substring(end))
-                    setTimeout(()=>{e.target.selectionStart=e.target.selectionEnd=s+2},0)
-                  }
-                }}
-                style={{
-                  flex:1,background:'#060e1a',color:'#c8e8ff',
-                  border:'none',borderBottom:'1px solid #1a3040',
-                  padding:'14px 16px',fontFamily:'inherit',fontSize:12,lineHeight:1.8,
-                  resize:'none',outline:'none',tabSize:2,minHeight:0,
-                  opacity:showSolution?0.75:1,
-                }}
-              />
+              <div style={{ flex:1, minHeight:0, opacity:showSolution?0.75:1 }}>
+                <Editor
+                  height="100%"
+                  language={lang==='python'?'python':lang==='matlab'?'openmat':'javascript'}
+                  value={currentCode}
+                  onChange={v=>{ if(!showSolution) setCode(v??'') }}
+                  theme="open-calc-dark"
+                  beforeMount={setupOpenCalcMonaco}
+                  options={{
+                    fontSize:13,lineHeight:20,
+                    fontFamily:'"Fira Code","JetBrains Mono","SF Mono",monospace',
+                    minimap:{enabled:false},scrollBeyondLastLine:false,
+                    padding:{top:12,bottom:12},tabSize:2,wordWrap:'on',
+                    renderWhitespace:'none',overviewRulerLanes:0,
+                    readOnly:showSolution,
+                  }}
+                />
+              </div>
 
               {/* Results panel */}
               {(syntaxErr||runtimeErr||results.length>0)&&(
