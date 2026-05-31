@@ -11,6 +11,11 @@ import dimensionalityReduction from './ae1-10-dimensionality-reduction.js'
 import svd from './ae1-11-svd.js'
 import tensorOperations from './ae1-12-tensor-operations.js'
 import numericalStability from './ae1-13-numerical-stability.js'
+import normsDistances from './ae1-14-norms-distances.js'
+import statisticsForMl from './ae1-15-statistics-for-ml.js'
+import samplingMethods from './ae1-16-sampling-methods.js'
+import linearSystems from './ae1-17-linear-systems.js'
+import convexOptimization from './ae1-18-convex-optimization.js'
 
 export default [
   {
@@ -31,6 +36,11 @@ export default [
       svd,
       tensorOperations,
       numericalStability,
+      normsDistances,
+      statisticsForMl,
+      samplingMethods,
+      linearSystems,
+      convexOptimization,
     ],
   },
 ]
