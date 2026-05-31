@@ -306,14 +306,16 @@ target = np.array([5.0, 5.0])
               prose: [
                 'In MATLAB/Octave, `v1 = [2; 1]` creates a **column vector** — a 2×1 matrix where semicolons separate rows. The semicolon means "new row," so `[2; 1]` reads "row 1 = 2, row 2 = 1." This is different from Python\'s `np.array([2, 1])`, which is a 1D array with no explicit orientation.',
                 '`c1*v1 + c2*v2` computes the linear combination: MATLAB multiplies every element of `v1` by the scalar `c1`, every element of `v2` by `c2`, then adds element-by-element. The result is always a column vector of the same shape — a new vector in the same space.',
-                'The second block reassigns `c1 = -1; c2 = 3` and evaluates `c1*v1 + c2*v2` without assigning to a variable, so MATLAB displays the result automatically. Swapping the scalars while keeping `v1` and `v2` fixed is exactly what it means to vary the linear combination — same building blocks, different amounts.',
+                'The second block reassigns `c1 = -1; c2 = 3` and computes `c1*v1 + c2*v2` with the new coefficients — `fprintf` shows both results labeled with their coefficient pair. Swapping the scalars while keeping `v1` and `v2` fixed is exactly what it means to vary the linear combination — same building blocks, different amounts.',
               ],
               code: `v1 = [2; 1];
 v2 = [0; 1];
 c1 = 1.5;  c2 = 1.0;
-combo = c1*v1 + c2*v2
+combo = c1*v1 + c2*v2;
+fprintf('c1=%.1f, c2=%.1f  ->  combo = [%.2f; %.2f]\n', c1, c2, combo(1), combo(2))
 c1 = -1;  c2 = 3;
-c1*v1 + c2*v2`,
+combo2 = c1*v1 + c2*v2;
+fprintf('c1=%.1f, c2=%.1f  ->  combo = [%.2f; %.2f]\n', c1, c2, combo2(1), combo2(2))`,
             },
             {
               id: 2,
@@ -325,14 +327,18 @@ c1*v1 + c2*v2`,
               ],
               code: `v1 = [2; 1];
 v2 = [0; 1];
-A = [v1, v2]
+A = [v1, v2];
+disp('A (columns are v1 and v2):');  disp(A)
 c = [1.5; 1.0];
-A * c
-1.5*v1 + 1.0*v2   % same result
-
+result = A * c;
+fprintf('A*c       = [%.2f; %.2f]\n', result(1), result(2))
+check = 1.5*v1 + 1.0*v2;
+fprintf('1.5v1+1v2 = [%.2f; %.2f]  (same — column picture)\n', check(1), check(2))
 target = [5; 3];
-c_solution = A \\ target
-A * c_solution`,
+c_solution = A \\ target;
+fprintf('Solve A*c = [5;3]:  c = [%.4f; %.4f]\n', c_solution(1), c_solution(2))
+verify = A * c_solution;
+fprintf('Verify A*c_sol = [%.2f; %.2f]  (= target)\n', verify(1), verify(2))`,
             },
             {
               id: 3,
@@ -343,14 +349,14 @@ A * c_solution`,
                 '`A_dep = [[2; 1], [4; 2]]` — note $[4,2]^\\top = 2 \\cdot [2,1]^\\top$. `rank(A_dep) = 1`: both columns point the same direction, so there is only one independent direction. The span is a 1D line, not the plane.',
                 '`A_three` has three 2D column vectors. `rank = 2` because in $\\mathbb{R}^2$ you can never have more than 2 independent vectors — the third is always a combination of the first two, no matter what it is.',
               ],
-              code: `A_ind = [[2; 1], [0; 1]]
-rank(A_ind)
+              code: `A_ind = [[2; 1], [0; 1]];
+fprintf('rank(A_ind) = %d  (2 independent cols -> span = R^2)\n', rank(A_ind))
 
-A_dep = [[2; 1], [4; 2]]
-rank(A_dep)
+A_dep = [[2; 1], [4; 2]];
+fprintf('rank(A_dep) = %d  (cols proportional -> 1D line only)\n', rank(A_dep))
 
-A_three = [[1;0], [0;1], [1;1]]
-rank(A_three)   % = 2, third is redundant`,
+A_three = [[1;0], [0;1], [1;1]];
+fprintf('rank(A_three) = %d  (3 cols in R^2 -> third is redundant)\n', rank(A_three))`,
             },
             {
               id: 4,
@@ -363,12 +369,18 @@ rank(A_three)   % = 2, third is redundant`,
               code: `G54_offset = [150; 80; 0];
 P1_part = [10; 5; -3];
 P2_part = [50; 5; -3];
-P1_machine = G54_offset + P1_part
-P2_machine = G54_offset + P2_part
+P1_machine = G54_offset + P1_part;
+fprintf('P1 machine: [%.0f; %.0f; %.0f]\n', P1_machine(1), P1_machine(2), P1_machine(3))
+P2_machine = G54_offset + P2_part;
+fprintf('P2 machine: [%.0f; %.0f; %.0f]\n', P2_machine(1), P2_machine(2), P2_machine(3))
 G55_offset = [300; 80; 0];
-P1_new = G55_offset + P1_part
+P1_new = G55_offset + P1_part;
+fprintf('P1 under G55: [%.0f; %.0f; %.0f]\n', P1_new(1), P1_new(2), P1_new(3))
 diff_vec = P1_part - P2_part;
-sqrt(dot(diff_vec, diff_vec))   % distance unchanged by offset`,
+dist = sqrt(dot(diff_vec, diff_vec));
+fprintf('Distance P1-P2 (part coords): %.2f mm\n', dist)
+diff_m = P1_machine - P2_machine;
+fprintf('Distance P1-P2 (machine coords): %.2f mm  (same -- offset cancels)\n', sqrt(dot(diff_m, diff_m)))`,
             },
           ],
         },

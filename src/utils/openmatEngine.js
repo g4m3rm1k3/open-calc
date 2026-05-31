@@ -443,7 +443,9 @@ function computeSvdFallback(A) {
     const norm = Math.hypot(...pair.vector) || 1;
     return pair.vector.map((entry) => entry / norm);
   });
-  const singular = eigenPairs.map((pair) => pair.sigma);
+  const maxEig = eigenPairs.length ? eigenPairs[0].value : 0;
+  const eigenTol = maxEig * Math.max(m, n) * 2.22e-16;
+  const singular = eigenPairs.map((pair) => (pair.value <= eigenTol ? 0 : pair.sigma));
   const Ucols = Vcols.map((vCol, index) => {
     const sigma = singular[index];
     const Av = normalizeVector(toPlain(math.multiply(padded, vCol)));
@@ -546,7 +548,8 @@ export function orthonormalBasis(A, mode = "orth") {
   );
   const keep = columns.filter((column, index) => {
     if (!column.some((value) => Number.isFinite(value))) return false;
-    return mode === "null" ? singular[index] <= tol : singular[index] > tol;
+    const sv = index < singular.length ? singular[index] : 0;
+    return mode === "null" ? sv <= tol : sv > tol;
   });
   return keep.length
     ? Array.from({ length: keep[0].length }, (_, row) => keep.map((col) => col[row] ?? 0))
@@ -561,9 +564,21 @@ export function svdDecomp(A) {
 // ── Formatting & workspace ────────────────────────────────────────────────────
 
 export function sprintfFormat(fmt, ...args) {
+  // Flatten matrix/vector args column-major like real MATLAB
+  const flatArgs = args.flatMap(a => {
+    const p = toPlain(a);
+    if (!Array.isArray(p)) return [p];
+    if (Array.isArray(p[0])) {
+      const rows = p.length, cols = p[0].length;
+      const out = [];
+      for (let c = 0; c < cols; c++) for (let r = 0; r < rows; r++) out.push(p[r][c]);
+      return out;
+    }
+    return p;
+  });
   let i = 0;
   return String(fmt).replace(/%[\d.]*[diouxXeEfgGs]/g, (m) => {
-    const val = args[i++];
+    const val = flatArgs[i++];
     if (val == null) return m;
     if (m.endsWith("d") || m.endsWith("i")) return Math.round(Number(val)).toString();
     if (m.endsWith("f") || m.endsWith("e") || m.endsWith("g")) {
@@ -1226,7 +1241,11 @@ function splitTopLevelCells(row) {
 }
 
 function normalizeMatrixSyntax(line) {
-  return line.replace(/\[([^\[\]]+)\]/g, (match, inner, offset, str) => {
+  // Mask single-quoted strings so brackets inside strings are never normalized
+  const strings = [];
+  const masked = line.replace(/'(?:[^']|'')*'/g, (m) => { strings.push(m); return `\x00S${strings.length - 1}\x00`; });
+
+  const normalized = masked.replace(/\[([^\[\]]+)\]/g, (match, inner, offset, str) => {
     // ── Guard: don't transform the LHS of a multi-assignment ─────────────────
     // "[X, Y] = expr"  →  must stay as "[X, Y]" for the destructuring handler.
     const after = str.slice(offset + match.length).trimStart();
@@ -1255,6 +1274,9 @@ function normalizeMatrixSyntax(line) {
     });
     return rowExprs.length === 1 ? rowExprs[0] : `vertcat(${rowExprs.join(", ")})`;
   });
+
+  // Restore string literals
+  return normalized.replace(/\x00S(\d+)\x00/g, (_, i) => strings[parseInt(i)]);
 }
 
 
@@ -1357,19 +1379,21 @@ function joinContinuationLines(source) {
 
 function replaceIndexing(line, variables, functionNames = new Set()) {
   if (variables.size === 0) return line;
+  // Mask strings so variable(expr) inside a string is never transformed
+  const strings = [];
+  const masked = line.replace(/'(?:[^']|'')*'/g, (m) => { strings.push(m); return `\x00S${strings.length - 1}\x00`; });
   // MATLAB () indexing for known variables: var(i) → var[i]
-  let result = line.replace(/\b([A-Za-z_]\w*)\s*\(([^()]+)\)/g, (match, name, inner) => {
+  let result = masked.replace(/\b([A-Za-z_]\w*)\s*\(([^()]+)\)/g, (match, name, inner) => {
     if (!variables.has(name) || functionNames.has(name)) return match;
     const expandedInner = inner.replace(/\bend\b/g, `length(${name})`);
     return `${name}[${expandedInner}]`;
   });
   // MATLAB {} cell-array indexing: fields{i} → fields[i]
-  // {} is never valid mathjs syntax, so convert for any identifier
   result = result.replace(/\b([A-Za-z_]\w*)\s*\{([^{}]+)\}/g, (match, name, inner) => {
     const expandedInner = inner.replace(/\bend\b/g, `length(${name})`);
     return `${name}[${expandedInner}]`;
   });
-  return result;
+  return result.replace(/\x00S(\d+)\x00/g, (_, i) => strings[parseInt(i)]);
 }
 
 function replaceBackslash(expr) {
@@ -1593,7 +1617,7 @@ export function createExecutionEngine(options = {}) {
     if (shape.length === 0) return Math.random();
     return makeRandomArray(shape.map(Number));
   });
-  parser.set("eye", (n) => toPlain(math.identity(Number(n))));
+  parser.set("eye", (n, m) => { const r = Math.round(Number(n)), c = m != null ? Math.round(Number(m)) : r; return toPlain(math.identity(r, c)); });
   parser.set("meshgrid", (x, y) => meshgrid(x, y));
   parser.set("diff", (value) => diffArray(value));
   parser.set("cumsum", (value) => cumulative(value, (acc, entry) => acc + entry, null));
@@ -1615,7 +1639,7 @@ export function createExecutionEngine(options = {}) {
   });
   parser.set("numel", (value) => flattenNumbers(value).length);
   parser.set("who", () => Array.from(variables));
-  parser.set("disp", (value) => { logs.push(formatValue(value)); return value; });
+  parser.set("disp", (value) => { logs.push(formatValue(value)); return null; });
   parser.set("help", () => { logs.push(HELP_TEXT); return HELP_TEXT; });
   parser.set("clc", () => { logs.length = 0; return null; });
   parser.set("clf", () => { clearPlots(); return null; });
@@ -1697,9 +1721,17 @@ export function createExecutionEngine(options = {}) {
     const D = makeDiagonal(values);
     return { __multi: [V, D], values, eigenvectors: eigvecs };
   });
-  parser.set("qr", (A) => {
+  parser.set("qr", (A, economy) => {
     const { Q, R } = math.qr(A);
-    return { __multi: [toPlain(Q), toPlain(R)], Q: toPlain(Q), R: toPlain(R) };
+    let Qp = toPlain(Q), Rp = toPlain(R);
+    if (economy === 0 || economy === "0") {
+      // Economy (thin) QR: trim Q to m×k and R to k×n where k = min(m, n)
+      const m = Qp.length, n = Array.isArray(Qp[0]) ? Qp[0].length : 1;
+      const k = Math.min(m, n);
+      Qp = Qp.map(row => (Array.isArray(row) ? row.slice(0, k) : row));
+      Rp = Array.isArray(Rp) ? Rp.slice(0, k) : Rp;
+    }
+    return { __multi: [Qp, Rp], Q: Qp, R: Rp };
   });
   parser.set("svd", (A) => svdDecomp(A));
   parser.set("trapz", (x, y = null) => trapzArray(x, y));
@@ -1772,8 +1804,22 @@ export function createExecutionEngine(options = {}) {
   parser.set("median", (v) => statMedian(v));
   parser.set("std", (v, flag = 0) => statStd(v, Number(flag)));
   parser.set("var", (v, flag = 0) => statVar(v, Number(flag)));
-  parser.set("min", (v) => statMin(v));
-  parser.set("max", (v) => statMax(v));
+  parser.set("min", (a, b) => {
+    if (b === undefined) return statMin(a);
+    const ap = toPlain(a), bp = toPlain(b);
+    if (!Array.isArray(ap) && !Array.isArray(bp)) return Math.min(Number(ap), Number(bp));
+    const av = Array.isArray(ap) ? ap : normalizeVector(ap);
+    const bv = Array.isArray(bp) ? bp : normalizeVector(bp);
+    return av.map((v, i) => Math.min(Number(v), Number(bv.length > 1 ? bv[i] : bv[0])));
+  });
+  parser.set("max", (a, b) => {
+    if (b === undefined) return statMax(a);
+    const ap = toPlain(a), bp = toPlain(b);
+    if (!Array.isArray(ap) && !Array.isArray(bp)) return Math.max(Number(ap), Number(bp));
+    const av = Array.isArray(ap) ? ap : normalizeVector(ap);
+    const bv = Array.isArray(bp) ? bp : normalizeVector(bp);
+    return av.map((v, i) => Math.max(Number(v), Number(bv.length > 1 ? bv[i] : bv[0])));
+  });
   parser.set("sum", (v) => statSum(v));
   parser.set("prod", (v) => statProd(v));
   parser.set("sort", (v, dir = "ascend") => statSort(v, String(dir)));
@@ -1821,7 +1867,10 @@ export function createExecutionEngine(options = {}) {
   });
 
   // ── Constants ────────────────────────────────────────────────────────────────
-  parser.set("eps", Number.EPSILON);
+  const _epsVal = 2.220446049250313e-16;
+  const _epsFn = (type) => _epsVal;
+  Object.defineProperty(_epsFn, "valueOf", { value: () => _epsVal });
+  parser.set("eps", _epsFn);
   parser.set("Inf", Infinity); parser.set("inf", Infinity);
   parser.set("NaN", NaN); parser.set("nan", NaN);
   parser.set("true", 1); parser.set("false", 0);
@@ -1921,6 +1970,13 @@ export function createExecutionEngine(options = {}) {
   });
   parser.set("horzcat", (...args) => {
     const ps = args.map(toPlain);
+    // If all args are 1D arrays of the same length > 1, treat each as a column vector
+    if (ps.every(p => Array.isArray(p) && !isMatrix(p) && p.length > 1)) {
+      const len = ps[0].length;
+      if (ps.every(p => p.length === len)) {
+        return Array.from({ length: len }, (_, i) => ps.map(p => p[i]));
+      }
+    }
     if (ps.every((p) => !isMatrix(p))) return ps.flatMap((p) => normalizeVector(p));
     // Determine number of rows from the 2D matrix arguments
     const nRows = Math.max(...ps.map(p => isMatrix(p) ? p.length : 0));
@@ -2174,9 +2230,14 @@ export function createExecutionEngine(options = {}) {
     return { ...s, [String(name)]: val };
   });
 
-  // Left-division: mldivide(A, b) solves A*x = b
+  // Left-division: mldivide(A, b) solves A*x = b (least-squares for non-square A)
   parser.set("mldivide", (A, b) => {
     const Ap = toPlain(A), bp = toPlain(b);
+    const sz = inferSize(Ap);
+    if (sz[0] !== sz[1]) {
+      // Overdetermined or underdetermined: use pseudoinverse (least squares)
+      return toPlain(math.multiply(math.pinv(Ap), bp));
+    }
     try {
       const sol = toPlain(math.lusolve(Ap, bp));
       // lusolve returns column vector [[x1],[x2],...] — flatten if b was a 1-D array
@@ -2186,7 +2247,7 @@ export function createExecutionEngine(options = {}) {
       }
       return sol;
     } catch {
-      return math.multiply(math.inv(Ap), bp);
+      return toPlain(math.multiply(math.pinv(Ap), bp));
     }
   });
 
@@ -2316,7 +2377,7 @@ export function executeScript(source, options = {}) {
         const names = multiAssign[1].split(",").map((n) => n.trim()).filter(Boolean);
         const rhs = replaceBackslash(preprocessLine(multiAssign[2], variables, functionNames));
         const result = toPlain(parser.evaluate(rhs));
-        const values = result?.__multi || [];
+        const values = result?.__multi ?? (Array.isArray(result) ? result : []);
         names.forEach((name, idx) => { parser.set(name, values[idx]); variables.add(name); });
         return hasSemicolon ? null : (values.length === 1 ? values[0] : values);
       }
@@ -2349,16 +2410,35 @@ export function executeScript(source, options = {}) {
 
         if (topCommas.length === 0) {
           // ── 1D indexing: A[i] = val ──────────────────────────────────────
-          const updated = Array.isArray(arr) ? [...arr] : arr;
-          const indices = evalIdx(idxExpr, Array.isArray(updated) ? updated.length : 1);
-          if (indices.length === 1) {
-            if (Array.isArray(updated)) updated[indices[0] - 1] = val;
+          // Evaluate raw to detect logical (boolean) mask vs integer indices
+          const rawIdxResult = toPlain(parser.evaluate(idxExpr.replace(/\bend\b/g, String(Array.isArray(arr) ? arr.length : 1))));
+          const flatRaw = Array.isArray(rawIdxResult) ? rawIdxResult.flat(Infinity) : [rawIdxResult];
+          const isLogicalMask = flatRaw.length > 0 && flatRaw.every(x => typeof x === 'boolean');
+          if (isLogicalMask && Array.isArray(rawIdxResult) && Array.isArray(rawIdxResult[0])) {
+            // 2D logical indexing: A(boolMatrix) = scalar — set elements where mask is true
+            const numVal = Number(val);
+            const result = (toNumericMatrix(arr) || arr).map((row, i) =>
+              row.map((elem, j) => (rawIdxResult[i]?.[j] ? numVal : elem))
+            );
+            parser.set(name, result);
+          } else if (isLogicalMask) {
+            // 1D logical indexing
+            const updated = [...normalizeVector(arr)];
+            flatRaw.forEach((b, i) => { if (b) updated[i] = Number(val); });
+            parser.set(name, updated);
           } else {
-            // Range assignment: A(2:5) = [...]
-            const vals = isCollection(val) ? normalizeVector(val) : indices.map(() => val);
-            indices.forEach((idx, k) => { if (Array.isArray(updated)) updated[idx - 1] = vals[k] ?? val; });
+            // Integer indexing (existing path)
+            const updated = Array.isArray(arr) ? [...arr] : arr;
+            const indices = evalIdx(idxExpr, Array.isArray(updated) ? updated.length : 1);
+            if (indices.length === 1) {
+              if (Array.isArray(updated)) updated[indices[0] - 1] = val;
+            } else {
+              // Range assignment: A(2:5) = [...]
+              const vals = isCollection(val) ? normalizeVector(val) : indices.map(() => val);
+              indices.forEach((idx, k) => { if (Array.isArray(updated)) updated[idx - 1] = vals[k] ?? val; });
+            }
+            parser.set(name, updated);
           }
-          parser.set(name, updated);
         } else if (topCommas.length === 1) {
           // ── 2D indexing: A[i,j] = val ────────────────────────────────────
           const rowExpr = idxExpr.slice(0, topCommas[0]).trim();
@@ -2390,6 +2470,7 @@ export function executeScript(source, options = {}) {
               parser.set(name, mat.map(row => row.filter((_, c) => !toDelete.has(c))));
             }
             variables.add(name);
+            if (!hasSemicolon) { const _v = parser.get(name); if (_v != null) logs.push(`${name} =\n${formatValue(_v)}`); }
             return hasSemicolon ? null : parser.get(name);
           }
 
@@ -2415,6 +2496,7 @@ export function executeScript(source, options = {}) {
         }
 
         variables.add(name);
+        if (!hasSemicolon) { const _v = parser.get(name); if (_v != null) logs.push(`${name} =\n${formatValue(_v)}`); }
         return hasSemicolon ? null : parser.get(name);
       }
 
@@ -2425,10 +2507,16 @@ export function executeScript(source, options = {}) {
         parser.set(name, result);
         parser.set("ans", result);
         variables.add(name);
+        if (!hasSemicolon && result != null && result !== "") {
+          logs.push(`${name} =\n${formatValue(result)}`);
+        }
         return hasSemicolon ? null : result;
       }
       const result = toPlain(parser.evaluate(replaceBackslash(line)));
       parser.set("ans", result);
+      if (!hasSemicolon && result != null && result !== "") {
+        logs.push(`ans =\n${formatValue(result)}`);
+      }
       return (hasSemicolon || result == null || result === "") ? null : result;
     } catch (error) {
       throw formatExecutionError(error, { lineNo, rawLine: trimmedRaw, normalizedLine: line });
@@ -2592,7 +2680,8 @@ export function executeScript(source, options = {}) {
       let j = pos - 1;
       while (j >= 0 && (str[j] === ' ' || str[j] === '\t')) j--;
       if (j < 0) return false;
-      return /[)\]\w]/.test(str[j]);
+      // A ' immediately after ), ], a word char, or another ' (double-transpose) is the transpose operator
+      return /[)\]\w']/.test(str[j]);
     }
 
     const rawLines = src.split(/\r?\n/);
@@ -2649,7 +2738,7 @@ export function executeScript(source, options = {}) {
           // Only treat as string if not a transpose
           let j = i - 1;
           while (j >= 0 && (text[j] === ' ' || text[j] === '\t')) j--;
-          if (j < 0 || !/[)\]\w]/.test(text[j])) { inStr = true; strCh = c; }
+          if (j < 0 || !/[)\]\w']/.test(text[j])) { inStr = true; strCh = c; }
         }
         else if (c === "[") delta++;
         else if (c === "]") delta--;
@@ -2835,7 +2924,7 @@ export function executeScript(source, options = {}) {
         else if (c === "'") {
           let j = i - 1;
           while (j >= 0 && (line[j] === " " || line[j] === "\t")) j--;
-          if (j < 0 || !/[)\]\w]/.test(line[j])) { inStr = true; strCh = c; }
+          if (j < 0 || !/[)\]\w']/.test(line[j])) { inStr = true; strCh = c; }
         }
         else if (c === "\\") bsPos.push(i);
       }
@@ -2852,12 +2941,18 @@ export function executeScript(source, options = {}) {
           let d = 0, j = li;
           for (; j >= 0; j--) { if (out[j] === ")") d++; else if (out[j] === "(") { if (!--d) { leftStart = j; break; } } }
           let k = leftStart - 1; while (k >= 0 && out[k] === " ") k--;
-          if (k >= 0 && out[k] === "-") leftStart = k;
+          if (k >= 0 && out[k] === "-") {
+            let pk = k - 1; while (pk >= 0 && out[pk] === " ") pk--;
+            if (pk < 0 || !/[\w)\]]/.test(out[pk])) leftStart = k;
+          }
         } else {
           leftStart = li;
           while (leftStart > 0 && /[\w.]/.test(out[leftStart - 1])) leftStart--;
           let k = leftStart - 1; while (k >= 0 && out[k] === " ") k--;
-          if (k >= 0 && out[k] === "-") leftStart = k;
+          if (k >= 0 && out[k] === "-") {
+            let pk = k - 1; while (pk >= 0 && out[pk] === " ") pk--;
+            if (pk < 0 || !/[\w)\]]/.test(out[pk])) leftStart = k;
+          }
         }
         // find right operand
         let ri = bs + 1; while (ri < out.length && out[ri] === " ") ri++;
@@ -2870,6 +2965,10 @@ export function executeScript(source, options = {}) {
         } else {
           rightEnd = rr;
           while (rightEnd + 1 < out.length && /[\w.]/.test(out[rightEnd + 1])) rightEnd++;
+          if (rightEnd + 1 < out.length && out[rightEnd + 1] === "(") {
+            let d = 0, j = rightEnd + 1;
+            for (; j < out.length; j++) { if (out[j] === "(") d++; else if (out[j] === ")") { if (!--d) { rightEnd = j; break; } } }
+          }
         }
         if (rightEnd === undefined) continue;
         const left = out.slice(leftStart, leftEnd + 1).trim();
@@ -2912,9 +3011,6 @@ export function executeScript(source, options = {}) {
 
   const outputBlocks = [];
   if (logs.length) outputBlocks.push(logs.filter(Boolean).join("\n"));
-  if (lastVisibleResult != null && lastVisibleResult !== "") {
-    outputBlocks.push(formatValue(lastVisibleResult));
-  }
 
   const result = {
     output: outputBlocks.filter(Boolean).join("\n\n") || (figureJson ? "Plot rendered." : "No output."),

@@ -138,16 +138,16 @@ A = [2 1; 1 3];
 b = [8; 9];
 
 % Solve with backslash — the standard MATLAB approach
-x = A \\ b
+x = A \\ b;
+fprintf('Solution: x = %.4f,  y = %.4f\n', x(1), x(2))
 
 % Verify: A*x should equal b
-disp('Verification A*x (should equal b):')
-A * x
+check = A * x;
+fprintf('Verify A*x = [%.2f; %.2f]  (should equal b = [8; 9])\n', check(1), check(2))
 
-% The backslash is NOT the same as inv(A)*b
-% Both give the same answer, but \\ is more stable
-disp('Same answer, worse code:')
-inv(A) * b`,
+% Avoid inv(A)*b — same answer, less stable
+x2 = inv(A) * b;
+fprintf('inv(A)*b = %.4f, %.4f  (same answer -- avoid inv, use backslash)\\n', x2(1), x2(2))`,
             },
             {
               id: 2,
@@ -160,20 +160,20 @@ inv(A) * b`,
               code: `% Unique solution: full rank
 A1 = [2 1; 1 3];  b1 = [8; 9];
 disp('=== Unique solution — RREF ===')
-rref([A1 b1])
-% Read: x = ..., y = ...
+disp(rref([A1 b1]))
+% Row 1: [1 0 | x_val],  Row 2: [0 1 | y_val]
 
 % Inconsistent: row [0 0 | c≠0] appears
 A2 = [1 2; 2 4];  b2 = [3; 7];
 disp('=== No solution — RREF ===')
-rref([A2 b2])
-% Second row: [0 0 | 1] → 0 = 1 → contradiction
+disp(rref([A2 b2]))
+% Second row: [0 0 | 1] -> 0 = 1 -> contradiction
 
 % Infinite solutions: row [0 0 | 0] appears, free variable
 b3 = [3; 6];
 disp('=== Infinite solutions — RREF ===')
-rref([A2 b3])
-% Second row: [0 0 | 0] → one equation was redundant`,
+disp(rref([A2 b3]))
+% Second row: [0 0 | 0] -> one equation was redundant`,
             },
             {
               id: 3,
@@ -187,14 +187,16 @@ rref([A2 b3])
 b_unique = [5; 7];
 n = size(A_unique, 2);  % number of unknowns
 
-r_A = rank(A_unique)
-r_Ab = rank([A_unique b_unique])
+r_A = rank(A_unique);
+r_Ab = rank([A_unique b_unique]);
+fprintf('rank(A) = %d,  rank([A|b]) = %d,  n = %d\\n', r_A, r_Ab, n)
 
 if r_Ab > r_A
     disp('NO SOLUTION -- inconsistent')
 elseif r_A == n
     disp('UNIQUE SOLUTION')
-    A_unique \\ b_unique
+    x = A_unique \\ b_unique;
+    fprintf('x = [%.4f; %.4f]\\n', x(1), x(2))
 else
     disp('INFINITELY MANY SOLUTIONS')
     fprintf('Number of free variables: %d\\n', n - r_A)
@@ -218,7 +220,7 @@ A = [1   -1  -1;
       0   5  -8];
 b = [0; 12; 0];
 
-I = A \\ b
+I = A \\ b;
 fprintf('I1 = %.4f A\\n', I(1));
 fprintf('I2 = %.4f A\\n', I(2));
 fprintf('I3 = %.4f A\\n', I(3));
@@ -230,7 +232,7 @@ fprintf('\\nKCL check: I1 - I2 - I3 = %.6f (should be 0)\\n', I(1)-I(2)-I(3));
 fprintf('KVL check: 10*I1 + 5*I2 = %.4f (should be 12)\\n', 10*I(1)+5*I(2));
 
 disp('Full verification A*I:')
-A * I`,
+disp(A * I)`,
             },
           ],
         },

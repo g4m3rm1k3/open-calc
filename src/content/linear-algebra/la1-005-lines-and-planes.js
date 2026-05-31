@@ -127,16 +127,17 @@ d  = [3; -1; 2];      % direction vector
 fprintf('Points along the line:\\n');
 for t = -1:2
     r = P0 + t*d;
-    fprintf('  t=%2d → (%5.1f, %5.1f, %5.1f)\\n', t, r(1), r(2), r(3))
+    fprintf('  t=%2d -> (%5.1f, %5.1f, %5.1f)\\n', t, r(1), r(2), r(3))
 end
 
 % Does the point Q = (7, 0, 3) lie on this line?
 % Solve for t from each component — they must all be equal
 Q = [7; 0; 3];
-t_from_x = (Q(1) - P0(1)) / d(1)   % expect 2
-t_from_y = (Q(2) - P0(2)) / d(2)   % expect 2
-t_from_z = (Q(3) - P0(3)) / d(3)   % expect 2
-% All equal to 2 → Q is on the line at t=2`,
+t_from_x = (Q(1) - P0(1)) / d(1);
+t_from_y = (Q(2) - P0(2)) / d(2);
+t_from_z = (Q(3) - P0(3)) / d(3);
+fprintf('t from x: %.4f,  from y: %.4f,  from z: %.4f\\n', t_from_x, t_from_y, t_from_z)
+fprintf('All equal to 2 -> Q lies on the line at t=2\\n')`,
             },
             {
               id: 2,
@@ -159,8 +160,8 @@ fprintf('n·Q = %g  (should NOT be %g)\\n', dot(n,Q), d)
 fprintf('Q is on the POSITIVE side of the plane (n·Q - d = %g)\\n', dot(n,Q)-d)
 
 % Distance from Q to the plane
-distance = abs(dot(n, Q) - d) / sqrt(dot(n, n))
-% = |2 - 4| / sqrt(1+4+1) = 2/sqrt(6) ≈ 0.8165`,
+distance = abs(dot(n, Q) - d) / sqrt(dot(n, n));
+fprintf('Distance from Q to plane: %.4f  (= 2/sqrt(6) = 0.8165)\\n', distance)`,
             },
             {
               id: 3,
@@ -179,22 +180,22 @@ n       = [1; 2; -1];
 d_plane = 4;
 
 % Step 1: check if parallel (denominator = 0)
-n_dot_dir = dot(n, dir)    % = 1-2-3 = -4
+n_dot_dir = dot(n, dir);
+fprintf('n.dir = %g  (numerator will be %g)\\n', n_dot_dir, d_plane - dot(n, P0))
 
 if abs(n_dot_dir) < 1e-10
     disp('Line is parallel to the plane — no intersection')
 else
     % Step 2: solve for t
-    t = (d_plane - dot(n, P0)) / n_dot_dir
-    % numerator: 4 - (2+0-1) = 4-1 = 3
-    % denominator: -4
-    % t = 3/(-4) = -0.75
+    t = (d_plane - dot(n, P0)) / n_dot_dir;
+    fprintf('t = %.4f  (point on line at this parameter value)\\n', t)
 
     % Step 3: compute intersection point
-    intersection = P0 + t * dir
+    intersection = P0 + t * dir;
+    fprintf('Intersection = (%.4f, %.4f, %.4f)\\n', intersection(1), intersection(2), intersection(3))
 
     % Step 4: verify
-    fprintf('Verify: n·intersection = %g (should be %g)\\n', dot(n,intersection), d_plane)
+    fprintf('Verify: n.intersection = %g (should be %g)\\n', dot(n,intersection), d_plane)
 end`,
             },
             {

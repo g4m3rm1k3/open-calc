@@ -120,18 +120,10 @@ export default {
 v = [0; 1];   % points up (y-axis)
 w = [1; 1];   % points at 45 degrees
 
-disp('u . v (perpendicular -- should be 0):')
-dot(u, v)
-
-disp('u . w (partially aligned -- should be positive):')
-dot(u, w)
-
-disp('u . (-u) (opposite -- should be negative):')
-dot(u, -u)
-
-% Self-dot: v . v = norm(v)^2
-disp('w . w = norm(w)^2 = 2:')
-dot(w, w)`,
+fprintf('u . v = %.2f   (perpendicular -> should be 0)\n', dot(u, v))
+fprintf('u . w = %.2f   (partially aligned -> positive)\n', dot(u, w))
+fprintf('u . (-u) = %.2f  (opposite direction -> negative)\n', dot(u, -u))
+fprintf('w . w = %.2f  = norm(w)^2  (squared magnitude)\n', dot(w, w))`,
             },
             {
               id: 2,
@@ -144,16 +136,17 @@ dot(w, w)`,
               code: `a = [4; 3];
 b = [1; 0];
 
-d = dot(a, b)
-na = sqrt(dot(a, a))
-nb = sqrt(dot(b, b))
-cos_theta = d / (na * nb)
-theta_deg = rad2deg(acos(cos_theta))
+d = dot(a, b);
+na = sqrt(dot(a, a));
+nb = sqrt(dot(b, b));
+cos_theta = d / (na * nb);
+theta_deg = rad2deg(acos(cos_theta));
+fprintf('dot(a,b) = %.2f,  |a| = %.2f,  |b| = %.2f\n', d, na, nb)
+fprintf('cos(theta) = %.4f,  theta = %.2f deg\n', cos_theta, theta_deg)
 
 % Orthogonality check
 p = [6; -3];  q = [1; 2];
-disp('p . q (should be 0 -- perpendicular):')
-dot(p, q)`,
+fprintf('p . q = %.2f  (should be 0 -> perpendicular confirmed)\n', dot(p, q))`,
             },
             {
               id: 3,
@@ -166,18 +159,20 @@ dot(p, q)`,
               code: `u = [3; 0; 0];   % along x-axis
 v = [0; 4; 0];   % along y-axis
 
-result = cross(u, v)
-norm(result)     % = 12 = area of parallelogram
-
-dot(result, u)   % = 0 (perpendicular to u)
-dot(result, v)   % = 0 (perpendicular to v)
-cross(v, u)      % sign flipped
+result = cross(u, v);
+fprintf('cross(u,v) = [%.0f; %.0f; %.0f]\n', result(1), result(2), result(3))
+fprintf('norm(cross) = %.2f  (= 3*4 = area of 3x4 rectangle)\n', norm(result))
+fprintf('dot(result,u) = %.2f  (perpendicular to u)\n', dot(result, u))
+fprintf('dot(result,v) = %.2f  (perpendicular to v)\n', dot(result, v))
+flipped = cross(v, u);
+fprintf('cross(v,u) = [%.0f; %.0f; %.0f]  (sign flipped)\n', flipped(1), flipped(2), flipped(3))
 
 % Normal to a plane through three points
 P1 = [1;0;0];  P2 = [0;1;0];  P3 = [0;0;1];
 edge1 = P2 - P1;
 edge2 = P3 - P1;
-normal = cross(edge1, edge2)`,
+normal = cross(edge1, edge2);
+fprintf('Plane normal = [%.4f; %.4f; %.4f]\n', normal(1), normal(2), normal(3))`,
             },
             {
               id: 4,
@@ -194,12 +189,12 @@ t = [0; 0; 1];
 theta_surface = 15 * pi/180;
 n = [sin(theta_surface); 0; cos(theta_surface)];
 
-cos_tilt = dot(t, n) / (norm(t) * norm(n))
-tilt_angle_deg = rad2deg(acos(cos_tilt))
+cos_tilt = dot(t, n) / (norm(t) * norm(n));
+tilt_angle_deg = rad2deg(acos(cos_tilt));
 
 % Cross product gives the tilt axis (axis to rotate tool around)
-tilt_axis = cross(t, n)
-tilt_axis_unit = tilt_axis / norm(tilt_axis)
+tilt_axis = cross(t, n);
+tilt_axis_unit = tilt_axis / norm(tilt_axis);
 
 fprintf('Tilt angle: %.2f deg (should be %.1f)\n', tilt_angle_deg, 15.0);
 fprintf('Tilt axis direction: [%.3f, %.3f, %.3f]\n', tilt_axis_unit(1), tilt_axis_unit(2), tilt_axis_unit(3));

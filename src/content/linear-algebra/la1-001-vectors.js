@@ -338,19 +338,18 @@ w = np.array([-6.0, 8.0])
                 '`size(v)` returns `[2  1]` (2 rows, 1 column). `size(vT)` returns `[1  2]`. Always confirm your vector is a column (first dimension larger) before doing matrix operations. Most bugs in MATLAB linear algebra come from accidentally using row vectors where column vectors are expected.',
                 '`a + b` and `3 * a` work exactly as the math defines: component-by-component addition and scalar multiplication. MATLAB applies them element-by-element to every component simultaneously — no loops needed, just as with NumPy.',
               ],
-              code: `v = [3; 4]
-vT = [3, 4]
-disp('Column v is shape:')
-size(v)
-disp('Row vT is shape:')
-size(vT)
+              code: `v = [3; 4];
+disp('v (column vector):');  disp(v)
+vT = [3, 4];
+disp('vT (row vector):');  disp(vT)
+fprintf('size(v) = [%d %d],  size(vT) = [%d %d]\\n', size(v,1), size(v,2), size(vT,1), size(vT,2))
 
 a = [2; -1; 3];
 b = [1;  4;  0];
-disp('a + b =')
-a + b
-disp('3 * a =')
-3 * a`,
+apb = a + b;
+fprintf('a + b = [%g; %g; %g]\\n', apb(1), apb(2), apb(3))
+ta = 3 * a;
+fprintf('3 * a = [%g; %g; %g]\\n', ta(1), ta(2), ta(3))`,
             },
             {
               id: 2,
@@ -362,12 +361,14 @@ disp('3 * a =')
                 'The final `sqrt(dot(unit_v, unit_v))` should print `1` (or $1.0000\\ldots$ due to floating-point). This is your verification: a correctly normalized vector always has dot product 1 with itself.',
               ],
               code: `v = [3; 4];
-magnitude = sqrt(dot(v, v))
-unit_v = v / sqrt(dot(v, v))
-sqrt(dot(unit_v, unit_v))   % should be exactly 1
+magnitude = sqrt(dot(v, v));
+fprintf('||v|| = %.4f  (should be 5)\\n', magnitude)
+unit_v = v / sqrt(dot(v, v));
+fprintf('unit_v = [%.4f; %.4f]\\n', unit_v(1), unit_v(2))
+fprintf('||unit_v|| = %.10f  (should be 1)\\n', sqrt(dot(unit_v, unit_v)))
 
 w = [1; 2; 2];
-sqrt(dot(w, w))   % should be 3: sqrt(1+4+4)=3`,
+fprintf('||w|| = %.4f  (should be 3 = sqrt(1+4+4))\\n', sqrt(dot(w, w)))`,
             },
             {
               id: 3,
@@ -378,15 +379,16 @@ sqrt(dot(w, w))   % should be 3: sqrt(1+4+4)=3`,
                 'The formula $\\|c \\cdot v\\| = |c| \\cdot \\|v\\|$ is verified by the last two lines: `abs(c)*sqrt(dot(v,v))` computes $|c|\\|v\\|$ and `sqrt(dot(c*v, c*v))` computes $\\|cv\\|$ — they must match for any scalar $c$. Try changing `c` to confirm.',
               ],
               code: `v = [1; 2; 1];
-2.5 * v
-0.4 * v
--1 * v
-0 * v
+disp('2.5 * v:');  disp(2.5 * v)
+disp('0.4 * v:');  disp(0.4 * v)
+disp('-1 * v:');   disp(-1 * v)
+disp('0 * v:');    disp(0 * v)
 
-% Key rule: ||c·v|| = |c| · ||v||
+% Key rule: ||c·v|| = |c| * ||v||
 c = -3;
-abs(c)*sqrt(dot(v, v))
-sqrt(dot(c*v, c*v))`,
+rule_rhs = abs(c) * sqrt(dot(v, v));
+rule_lhs = sqrt(dot(c*v, c*v));
+fprintf('|c|*||v|| = %.4f  and  ||c*v|| = %.4f  (equal -> rule verified)\\n', rule_rhs, rule_lhs)`,
             },
             {
               id: 4,
@@ -400,15 +402,18 @@ sqrt(dot(c*v, c*v))`,
               code: `current = [1.0; 0.5; 0.0];
 next = [3.5; 2.0; -1.5];
 
-displacement = next - current
-distance = sqrt(dot(displacement, displacement))
-direction = displacement / distance
+displacement = next - current;
+fprintf('displacement = [%.2f; %.2f; %.2f]\\n', displacement(1), displacement(2), displacement(3))
+distance = sqrt(dot(displacement, displacement));
+fprintf('distance = %.4f mm\\n', distance)
+direction = displacement / distance;
+fprintf('direction = [%.4f; %.4f; %.4f]\\n', direction(1), direction(2), direction(3))
 
 X_axis = [1; 0; 0];
 Y_axis = [0; 1; 0];
 Z_axis = [0; 0; 1];
-
-check = 3.5*X_axis + 2.0*Y_axis + (-1.5)*Z_axis`,
+check = 3.5*X_axis + 2.0*Y_axis + (-1.5)*Z_axis;
+fprintf('Reconstructed pos: [%.2f; %.2f; %.2f]  (= next)\\n', check(1), check(2), check(3))`,
             },
           ],
         },

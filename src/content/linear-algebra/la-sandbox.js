@@ -257,8 +257,20 @@ norm(A - U*S*V')`,
   ],
 
   semantics: {
-    core: ['numpy-array', 'np.linalg', 'solve', 'eig', 'svd', 'qr', 'rank', 'cond', 'broadcasting'],
-    bridges: ['lu-factorization', 'singular-value-decomposition', 'least-squares'],
+    core: [
+      { symbol: '\\mathtt{np.linalg.solve}(A, b)', meaning: 'Solves Ax=b using LU factorization — faster and more numerically stable than computing inv(A) then multiplying' },
+      { symbol: '\\mathtt{np.linalg.eig}(A)', meaning: 'Returns eigenvalues and eigenvectors of A; use eigh for symmetric matrices (guaranteed real, more efficient)' },
+      { symbol: '\\mathtt{np.linalg.svd}(A)', meaning: 'Returns U, s, Vt where A = U @ diag(s) @ Vt; full_matrices=False gives the economy (thin) decomposition' },
+      { symbol: '\\mathtt{np.linalg.cond}(A)', meaning: 'Condition number κ(A) = σ_max/σ_min — measures how much the solution amplifies input errors; cond > 1e12 means ill-conditioned' },
+      { symbol: '\\mathtt{np.linalg.matrix\\_rank}(A)', meaning: 'Number of linearly independent rows/columns; uses SVD with a tolerance to identify near-zero singular values' },
+    ],
+    rulesOfThumb: [
+      'Use solve(A, b) not inv(A) @ b — same math, half the work and better stability.',
+      'Check cond(A) before trusting a solution; cond > 1/eps means answers may have no correct digits.',
+      'svd with full_matrices=False is the economy form — columns of U match rows of Vt, size min(m,n).',
+      'eigh is twice as fast as eig for symmetric matrices and always returns real eigenvalues.',
+      'Singular values squared equal eigenvalues of AᵀA — the two decompositions are linked.',
+    ],
   },
   spiral: {
     recoveryPoints: ['la3-001-eigenvectors', 'la4-004-svd'],
