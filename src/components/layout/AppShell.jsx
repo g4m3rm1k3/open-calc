@@ -490,6 +490,7 @@ export default function AppShell({ children }) {
   const isMatrixGameRoute = location.pathname.startsWith("/matrix-game");
   const isRobotArmLabRoute = location.pathname.startsWith("/robot-arm-lab");
   const isSimLabRoute = location.pathname.startsWith("/sim-lab");
+  const isDroneLabRoute = location.pathname.startsWith("/drone-lab");
   
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarPinned, setSidebarPinned] = useState(() => {
@@ -630,10 +631,10 @@ export default function AppShell({ children }) {
     return () => window.removeEventListener("oc-open-game", handler);
   }, []);
 
-  if (isOpenMatRoute || isArkanoidLearnRoute || isRealityRunnerRoute || isCNCSimRoute || isCadProRoute || isOpenCraftRoute || isStemQuestRoute || isDocsRoute || isAsteroidsRoute || isStemTetrisRoute || isCardAcademyRoute || isRubiksCubeRoute || isMatrixGameRoute || isRobotArmLabRoute || isSimLabRoute) {
+  if (isOpenMatRoute || isArkanoidLearnRoute || isRealityRunnerRoute || isCNCSimRoute || isCadProRoute || isOpenCraftRoute || isStemQuestRoute || isDocsRoute || isAsteroidsRoute || isStemTetrisRoute || isCardAcademyRoute || isRubiksCubeRoute || isMatrixGameRoute || isRobotArmLabRoute || isSimLabRoute || isDroneLabRoute) {
     return (
       <GrapherContext.Provider value={{ openGrapher }}>
-        <div className={`h-screen overflow-hidden ${(isArkanoidLearnRoute || isRealityRunnerRoute || isCadProRoute || isOpenCraftRoute || isStemQuestRoute || isAsteroidsRoute || isStemTetrisRoute || isCardAcademyRoute || isRubiksCubeRoute || isMatrixGameRoute || isRobotArmLabRoute || isSimLabRoute) ? "bg-[#08111f]" : "bg-white dark:bg-slate-950"}`}>
+        <div className={`h-screen overflow-hidden ${(isArkanoidLearnRoute || isRealityRunnerRoute || isCadProRoute || isOpenCraftRoute || isStemQuestRoute || isAsteroidsRoute || isStemTetrisRoute || isCardAcademyRoute || isRubiksCubeRoute || isMatrixGameRoute || isRobotArmLabRoute || isSimLabRoute || isDroneLabRoute) ? "bg-[#08111f]" : "bg-white dark:bg-slate-950"}`}>
           <div className="h-full w-full overflow-hidden">
             {children ?? <Outlet />}
           </div>

@@ -10,6 +10,16 @@ export const LABS = [
     cover: { grad: 'from-sky-700 via-blue-800 to-indigo-950', mark: '∫dt', sub: 'Physics · Three.js · Code' },
   },
   {
+    key: 'drone-lab',
+    label: 'Drone Lab',
+    emoji: '🚁',
+    color: 'sky',
+    desc: 'Program a self-flying drone — 10 missions teaching displacement vectors, dot/cross products, rotation matrices, projections, Bézier paths, and PID control. JS, Python, and MATLAB.',
+    path: '/drone-lab',
+    tags: ['Robotics', 'Python', 'MATLAB'],
+    cover: { grad: 'from-sky-600 via-cyan-800 to-blue-950', mark: '🚁', sub: 'Vectors · Matrices · PID' },
+  },
+  {
     key: 'robot-arm-sim',
     label: 'Robot Arm Simulator',
     emoji: '🦾',
