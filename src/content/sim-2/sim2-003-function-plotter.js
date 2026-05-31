@@ -6,35 +6,73 @@ const sim2_003 = {
   title: 'The Function Plotter',
   description: 'Build a complete graphing calculator by combining coordinate transforms, axis drawing, and expression evaluation.',
 
-  hook: 'The expression evaluator is done. Now we need to turn numbers into pixels. This lesson covers the one idea that makes all graphing software possible: the coordinate transform that maps world coordinates (x = −5 to 5) to screen pixels (0 to 400).',
+  hook: {
+    question: 'The expression evaluator is built. Now: how do you turn a list of numbers into a curve on a screen?',
+    realWorldContext: 'Every piece of graphing software ever written — from a TI-84 to Desmos to matplotlib — solves the same fundamental problem: mapping mathematical coordinates to screen pixels. The underlying formula is one line of linear interpolation, and once you understand it, every plotting tool you\'ll ever use becomes transparent. This lesson builds a full interactive function plotter from scratch, starting from that one formula and assembling it piece by piece into a working graphing calculator.',
+  },
 
   intuition: {
     prose: [
-      'A canvas has **screen coordinates**: pixel (0, 0) is the top-left corner, and y increases downward. Math has **world coordinates**: the origin is in the center, y increases upward. To draw a math function, you need to convert between the two.',
-      'The conversion is just linear interpolation: `screenX = (worldX - xMin) / (xMax - xMin) * canvasWidth`. Think of it as rescaling a number from one range to another — the exact same idea as a lerp.',
-      'Once you have the transform, drawing a curve is simply: loop x across many small steps, convert each (x, f(x)) to screen coordinates, and connect the dots with `lineTo`.',
+      'A `<canvas>` element lives in **screen space**: pixel `(0, 0)` is the top-left corner, and y increases downward toward the bottom of the element. Mathematics lives in **world space**: the origin sits in the center, and y increases upward. Every graphing tool must reconcile these two systems before it can draw a single point.',
+      'The reconciliation is **linear interpolation**: given a world x in the range `[xMin, xMax]`, compute `screenX = (worldX - xMin) / (xMax - xMin) * W`. Read this as: "how far across the world domain is this point, as a fraction?" times the canvas width. The result is the corresponding screen pixel. The y formula is identical but adds a `1 - ...` flip to invert the axis direction.',
+      'Once the transform is defined, drawing a grid is a loop: step through every integer world coordinate, convert to screen, and draw a line. Axes are the same lines drawn in a more prominent color on top. Drawing order matters — background, then grid, then axes, then curves. Each layer paints over the last.',
+      'Drawing a curve is connect-the-dots: sample f(x) at many closely spaced x values, convert each `(worldX, worldY)` pair to screen coordinates, and connect them with `lineTo`. Sampling at one point per canvas pixel produces a path smooth enough that no individual segment is visible.',
+      'Functions like `tan(x)` jump to `±Infinity` at asymptotes. If you let `lineTo` draw through infinity, the path shoots across the entire canvas — visually wrong. The fix is a `penDown` flag: when `isFinite(y)` is false, call `moveTo` on the next valid point instead of `lineTo`. This leaves a gap at the discontinuity rather than a vertical spike.',
+      'Canvas size requires explicit management. When you set `canvas { width: 100% }` in CSS, the element stretches to fill its container, but the internal pixel buffer (`canvas.width`, `canvas.height`) stays at the last value you assigned. Before every draw, set `canvas.width = canvas.offsetWidth` to sync the buffer with the visual size — otherwise your coordinate transform operates on the wrong dimensions and the result looks clipped or blurry.',
+      'Assembling the pieces follows naturally: the `plotCurve(exprStr)` function calls `drawGrid()` to clear the canvas, compiles the expression with `new Function`, runs the sampling loop, and strokes the path. An input field and a Plot button wire the UI to `plotCurve`. Pressing Enter in the input does the same thing — two lines of event handling are all that\'s needed.',
     ],
     callouts: [
       {
+        type: 'sequencing',
+        title: 'Lesson 3 of 10 — The Visual Layer',
+        body: 'This lesson adds the canvas rendering layer on top of the expression evaluator from Lesson 2. The `toScreen`, `drawGrid`, and `plotFn` functions built here reappear in every subsequent lesson.',
+      },
+      {
         type: 'procedure',
         title: 'The Coordinate Transform',
-        body: 'Given domain [xMin, xMax] and canvas width W:\n`screenX = (worldX - xMin) / (xMax - xMin) * W`\n`screenY = (1 - (worldY - yMin) / (yMax - yMin)) * H`\nThe `1 - ...` flips the y-axis so positive points up.',
+        body: 'Given world domain `[xMin, xMax]` and canvas width `W`:\n`screenX = (worldX - xMin) / (xMax - xMin) * W`\n`screenY = (1 - (worldY - yMin) / (yMax - yMin)) * H`\nThe `1 - ...` flips the y-axis so positive world-y points up the screen.',
+      },
+      {
+        type: 'insight',
+        title: 'This Is Just a Lerp',
+        body: 'The coordinate transform is linear interpolation (lerp): `lerp(a, b, t) = a + (b - a) * t`. Setting `t = (worldX - xMin) / (xMax - xMin)` is the normalized position, and multiplying by `W` scales it to screen space. Once you see it as a lerp, the formula is memorable and applies everywhere.',
+      },
+      {
+        type: 'procedure',
+        title: 'Drawing Order for Canvas',
+        body: 'Always draw in this order: (1) fill background, (2) draw grid lines, (3) draw axes, (4) draw curves. Each step paints on top of the previous. If you draw the curve before the grid, the grid will cover it.',
+      },
+      {
+        type: 'warning',
+        title: 'Sync Canvas Buffer Before Drawing',
+        body: 'CSS `width: 100%` changes the displayed size but not the pixel buffer. Before every draw, run `canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight`. Skipping this causes blurry output and wrong coordinate math.',
       },
       {
         type: 'insight',
         title: 'How Many Sample Points?',
-        body: 'Use one sample per canvas pixel (or 2× for retina). For a 400px-wide canvas, sample x at 400 points between xMin and xMax. More points = smoother curve; fewer = visible zigzag.',
+        body: 'Use one sample per canvas pixel — or two for retina displays. For a 400px-wide canvas, sample at 400–800 points between `xMin` and `xMax`. More samples = smoother curves; fewer = visible zigzag. The cost is negligible at pixel density — each sample is just an arithmetic operation.',
       },
       {
         type: 'strategy',
-        title: 'Handle Discontinuities',
-        body: 'Functions like `tan(x)` jump to ±Infinity. Instead of drawing the jump as a line, use `moveTo` when `!isFinite(y)` and resume with `lineTo` on the next finite value. This leaves a gap at the discontinuity instead of a vertical spike.',
+        title: 'Handle Discontinuities With penDown',
+        body: 'Maintain a boolean `penDown`. When `!isFinite(y)` or `|y| > yMax * 3`, set `penDown = false` and `continue`. On the next valid point, use `moveTo` instead of `lineTo`. This produces a visual gap at jumps like `tan(x)` rather than a spike that crosses the entire canvas.',
+      },
+      {
+        type: 'insight',
+        title: 'CSS Variables Work in Canvas Too',
+        body: 'Canvas `ctx.fillStyle` and `ctx.strokeStyle` take string color values, not CSS variables. Read theme colors once at the top: `const clr = getComputedStyle(document.documentElement).getPropertyValue(\'--accent\').trim()`, then pass `clr` to `ctx.strokeStyle`. This keeps canvas drawings in sync with the app theme.',
+      },
+      {
+        type: 'strategy',
+        title: 'Test the Transform With Known Points',
+        body: 'Before drawing curves, plot a few known world coordinates as dots and verify they land in the right screen positions. `toScreen(0, 0)` should be near the center of the canvas. `toScreen(xMax, yMax)` should be near the top-right. Incorrect transforms produce curves that are shifted or mirrored.',
       },
     ],
     visualizations: [
       {
         id: 'SimNotebook',
         title: 'The Function Plotter',
+        mathBridge: 'The four cells below build the plotter in stages: the coordinate transform in isolation, then a grid, then a curve renderer with discontinuity handling, then everything assembled into an interactive app. Each cell is a standalone program — run it and verify the visual before moving on.',
         initialProps: {
           initialCells: [
             // ── Cell 1: World to Screen ──────────────────────────────────────────
@@ -51,12 +89,13 @@ const sim2_003 = {
 app.innerHTML = \`
   <style>
     * { box-sizing: border-box; font-family: system-ui, sans-serif; margin: 0; padding: 0 }
+    body, #app { background: var(--bg) }
     .wrap { padding: 16px; display: flex; flex-direction: column; gap: 12px }
-    h3  { font-size: 14px; font-weight: 700; color: #0f172a }
-    canvas { width: 100%; border-radius: 8px; border: 1px solid #e2e8f0;
-             display: block; background: white }
-    .code { background: #f1f5f9; padding: 10px 14px; border-radius: 8px;
-            font-family: monospace; font-size: 12px; color: #0f172a; line-height: 1.7 }
+    h3  { font-size: 14px; font-weight: 700; color: var(--text) }
+    canvas { width: 100%; border-radius: 8px; border: 1px solid var(--border);
+             display: block; background: var(--surface) }
+    .code { background: var(--surface2); padding: 10px 14px; border-radius: 8px;
+            font-family: monospace; font-size: 12px; color: var(--text); line-height: 1.7 }
   </style>
   <div class="wrap">
     <h3>World → Screen mapping</h3>
@@ -72,7 +111,15 @@ const canvas = app.querySelector('#cv')
 canvas.width = canvas.offsetWidth
 const ctx = canvas.getContext('2d'), W = canvas.width, H = canvas.height
 
-// World domain
+// Read theme colors from CSS variables
+const cs = getComputedStyle(document.documentElement)
+const clrBg      = cs.getPropertyValue('--bg').trim()
+const clrSurface = cs.getPropertyValue('--surface').trim()
+const clrBorder  = cs.getPropertyValue('--border').trim()
+const clrText    = cs.getPropertyValue('--text').trim()
+const clrMuted   = cs.getPropertyValue('--muted').trim()
+const clrAccent  = cs.getPropertyValue('--accent').trim()
+
 const xMin = -3, xMax = 3, yMin = -2, yMax = 2
 
 function toScreen(wx, wy) {
@@ -81,16 +128,14 @@ function toScreen(wx, wy) {
   return { sx, sy }
 }
 
-// ── Background ───────────────────────────────────────────────────────────────
-ctx.fillStyle = '#f8fafc'
+ctx.fillStyle = clrSurface
 ctx.fillRect(0, 0, W, H)
 
-// ── Draw some world-coordinate points ────────────────────────────────────────
 const points = [
-  { x: -2, y: 1,  label: '(-2, 1)',  color: '#0284c7' },
-  { x:  0, y: 0,  label: 'origin',   color: '#475569' },
-  { x:  1, y: -1, label: '(1, -1)',  color: '#dc2626' },
-  { x:  2.5, y: 1.5, label:'(2.5, 1.5)', color: '#16a34a' },
+  { x: -2, y: 1,    label: '(-2, 1)',    color: clrAccent  },
+  { x:  0, y: 0,    label: 'origin',     color: clrMuted   },
+  { x:  1, y: -1,   label: '(1, -1)',    color: '#dc2626'  },
+  { x:  2.5, y: 1.5, label: '(2.5, 1.5)', color: '#16a34a' },
 ]
 
 for (const p of points) {
@@ -104,9 +149,8 @@ for (const p of points) {
   ctx.fillText(p.label, sx + 8, sy + 4)
 }
 
-// ── Mark origin ───────────────────────────────────────────────────────────────
 const { sx: ox, sy: oy } = toScreen(0, 0)
-ctx.strokeStyle = '#cbd5e1'
+ctx.strokeStyle = clrBorder
 ctx.lineWidth = 1
 ctx.beginPath(); ctx.moveTo(ox, 0); ctx.lineTo(ox, H); ctx.stroke()
 ctx.beginPath(); ctx.moveTo(0, oy); ctx.lineTo(W, oy); ctx.stroke()`,
@@ -126,10 +170,11 @@ ctx.beginPath(); ctx.moveTo(0, oy); ctx.lineTo(W, oy); ctx.stroke()`,
 app.innerHTML = \`
   <style>
     * { box-sizing: border-box; font-family: system-ui, sans-serif; margin: 0; padding: 0 }
+    body, #app { background: var(--bg) }
     .wrap { padding: 16px; display: flex; flex-direction: column; gap: 10px }
-    h3 { font-size: 14px; font-weight: 700; color: #0f172a }
-    canvas { width: 100%; border-radius: 8px; border: 1px solid #e2e8f0;
-             display: block; background: white }
+    h3 { font-size: 14px; font-weight: 700; color: var(--text) }
+    canvas { width: 100%; border-radius: 8px; border: 1px solid var(--border);
+             display: block; background: var(--surface) }
   </style>
   <div class="wrap">
     <h3>Coordinate Grid</h3>
@@ -140,6 +185,11 @@ app.innerHTML = \`
 const canvas = app.querySelector('#cv')
 canvas.width = canvas.offsetWidth
 const ctx = canvas.getContext('2d'), W = canvas.width, H = canvas.height
+
+const cs = getComputedStyle(document.documentElement)
+const clrSurface = cs.getPropertyValue('--surface').trim()
+const clrBorder  = cs.getPropertyValue('--border').trim()
+const clrMuted   = cs.getPropertyValue('--muted').trim()
 
 const xMin = -5, xMax = 5, yMin = -4, yMax = 4
 
@@ -152,11 +202,10 @@ function toScreen(wx, wy) {
 
 function drawGrid() {
   ctx.clearRect(0, 0, W, H)
-  ctx.fillStyle = 'white'
+  ctx.fillStyle = clrSurface
   ctx.fillRect(0, 0, W, H)
 
-  // ── Light grid lines ──────────────────────────────────────────────────────
-  ctx.strokeStyle = '#e2e8f0'
+  ctx.strokeStyle = clrBorder
   ctx.lineWidth = 1
   for (let x = Math.ceil(xMin); x <= xMax; x++) {
     const { sx } = toScreen(x, 0)
@@ -167,15 +216,13 @@ function drawGrid() {
     ctx.beginPath(); ctx.moveTo(0, sy); ctx.lineTo(W, sy); ctx.stroke()
   }
 
-  // ── Main axes ─────────────────────────────────────────────────────────────
   const { sx: ox, sy: oy } = toScreen(0, 0)
-  ctx.strokeStyle = '#94a3b8'
+  ctx.strokeStyle = clrMuted
   ctx.lineWidth = 1.5
   ctx.beginPath(); ctx.moveTo(ox, 0); ctx.lineTo(ox, H); ctx.stroke()
   ctx.beginPath(); ctx.moveTo(0, oy); ctx.lineTo(W, oy); ctx.stroke()
 
-  // ── Tick labels ───────────────────────────────────────────────────────────
-  ctx.fillStyle = '#94a3b8'
+  ctx.fillStyle = clrMuted
   ctx.font = '10px system-ui'
   ctx.textAlign = 'center'
   for (let x = xMin + 1; x <= xMax - 1; x++) {
@@ -208,10 +255,11 @@ drawGrid()`,
 app.innerHTML = \`
   <style>
     * { box-sizing: border-box; font-family: system-ui, sans-serif; margin: 0; padding: 0 }
+    body, #app { background: var(--bg) }
     .wrap { padding: 16px; display: flex; flex-direction: column; gap: 10px }
-    h3 { font-size: 14px; font-weight: 700; color: #0f172a }
-    canvas { width: 100%; border-radius: 8px; border: 1px solid #e2e8f0;
-             display: block; background: white }
+    h3 { font-size: 14px; font-weight: 700; color: var(--text) }
+    canvas { width: 100%; border-radius: 8px; border: 1px solid var(--border);
+             display: block; background: var(--surface) }
   </style>
   <div class="wrap">
     <h3>f(x) = sin(x) · x  and  f(x) = tan(x)</h3>
@@ -222,6 +270,12 @@ app.innerHTML = \`
 const canvas = app.querySelector('#cv')
 canvas.width = canvas.offsetWidth
 const ctx = canvas.getContext('2d'), W = canvas.width, H = canvas.height
+
+const cs = getComputedStyle(document.documentElement)
+const clrSurface = cs.getPropertyValue('--surface').trim()
+const clrBorder  = cs.getPropertyValue('--border').trim()
+const clrMuted   = cs.getPropertyValue('--muted').trim()
+const clrAccent  = cs.getPropertyValue('--accent').trim()
 
 const xMin = -5, xMax = 5, yMin = -4, yMax = 4
 
@@ -234,18 +288,18 @@ function toScreen(wx, wy) {
 
 function drawGrid() {
   ctx.clearRect(0, 0, W, H)
-  ctx.fillStyle = 'white'; ctx.fillRect(0, 0, W, H)
-  ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1
+  ctx.fillStyle = clrSurface; ctx.fillRect(0, 0, W, H)
+  ctx.strokeStyle = clrBorder; ctx.lineWidth = 1
   for (let x = Math.ceil(xMin); x <= xMax; x++) { const {sx}=toScreen(x,0); ctx.beginPath(); ctx.moveTo(sx,0); ctx.lineTo(sx,H); ctx.stroke() }
   for (let y = Math.ceil(yMin); y <= yMax; y++) { const {sy}=toScreen(0,y); ctx.beginPath(); ctx.moveTo(0,sy); ctx.lineTo(W,sy); ctx.stroke() }
   const {sx:ox,sy:oy}=toScreen(0,0)
-  ctx.strokeStyle='#94a3b8'; ctx.lineWidth=1.5
+  ctx.strokeStyle=clrMuted; ctx.lineWidth=1.5
   ctx.beginPath(); ctx.moveTo(ox,0); ctx.lineTo(ox,H); ctx.stroke()
   ctx.beginPath(); ctx.moveTo(0,oy); ctx.lineTo(W,oy); ctx.stroke()
 }
 
 function plotFunction(fn, color, lineWidth = 2) {
-  const STEPS = W * 2   // sample at 2× pixel density
+  const STEPS = W * 2
   ctx.beginPath()
   ctx.strokeStyle = color
   ctx.lineWidth = lineWidth
@@ -255,7 +309,6 @@ function plotFunction(fn, color, lineWidth = 2) {
     const wx = xMin + (i / STEPS) * (xMax - xMin)
     const wy = fn(wx)
 
-    // If the result is not finite, lift the pen to avoid drawing vertical spikes
     if (!isFinite(wy) || Math.abs(wy) > yMax * 3) {
       penDown = false
       continue
@@ -270,14 +323,10 @@ function plotFunction(fn, color, lineWidth = 2) {
 
 drawGrid()
 
-// Plot sin(x) * x in blue
-plotFunction(x => Math.sin(x) * x, '#0284c7', 2.5)
-
-// Plot tan(x) in red — notice the gaps at discontinuities
+plotFunction(x => Math.sin(x) * x, clrAccent, 2.5)
 plotFunction(x => Math.tan(x), '#dc2626', 2)
 
-// Legend
-ctx.fillStyle = '#0284c7'; ctx.font = '12px system-ui'
+ctx.fillStyle = clrAccent; ctx.font = '12px system-ui'
 ctx.fillText('sin(x)·x', 12, 18)
 ctx.fillStyle = '#dc2626'
 ctx.fillText('tan(x)', 12, 34)`,
@@ -292,35 +341,34 @@ ctx.fillText('tan(x)', 12, 34)`,
                 'Notice the `resize()` call before `drawGrid()`. Because the canvas is set to `width: 100%` in CSS, its CSS size and its pixel buffer size can diverge. Always set `canvas.width = canvas.offsetWidth` before reading `canvas.width` for calculations — otherwise you draw into a mismatched buffer and the image looks blurry or clipped.',
               ],
               code: `// Everything together: input box, Plot button, grid, and plotted curve.
-// This is the function plotter — your own graphing calculator.
 
 app.innerHTML = \`
   <style>
     * { box-sizing: border-box; font-family: system-ui, sans-serif; margin: 0; padding: 0 }
-    body, #app { background: #f8fafc }
+    body, #app { background: var(--bg) }
     .wrap { display: flex; flex-direction: column; height: 100vh; padding: 12px; gap: 10px }
     .toolbar { display: flex; gap: 8px }
     input {
       flex: 1; padding: 9px 13px; font-size: 15px; font-family: monospace;
-      border: 1.5px solid #cbd5e1; border-radius: 8px; outline: none; background: white
+      border: 1.5px solid var(--border); border-radius: 8px; outline: none;
+      background: var(--surface); color: var(--text)
     }
-    input:focus { border-color: #0284c7 }
+    input:focus { border-color: var(--accent) }
     button {
       padding: 9px 18px; font-size: 14px; font-weight: 600;
-      border: none; border-radius: 8px; cursor: pointer; white-space: nowrap
+      border: none; border-radius: 8px; cursor: pointer; white-space: nowrap;
+      background: var(--accent); color: var(--surface)
     }
-    .plot-btn { background: #0284c7; color: white }
-    .plot-btn:hover { background: #0369a1 }
     .err { display: none; padding: 8px 12px; background: #fee2e2;
            border: 1px solid #fca5a5; border-radius: 8px; color: #7f1d1d;
            font-size: 13px; font-family: monospace }
-    canvas { flex: 1; border-radius: 10px; border: 1px solid #e2e8f0;
-             display: block; background: white; min-height: 0 }
+    canvas { flex: 1; border-radius: 10px; border: 1px solid var(--border);
+             display: block; background: var(--surface); min-height: 0 }
   </style>
   <div class="wrap">
     <div class="toolbar">
       <input id="expr" type="text" value="sin(x) * x" placeholder="f(x) = ...">
-      <button class="plot-btn" id="plotBtn">Plot</button>
+      <button id="plotBtn">Plot</button>
     </div>
     <div class="err" id="errBox"></div>
     <canvas id="cv"></canvas>
@@ -340,6 +388,16 @@ function resize() {
 }
 resize()
 
+function getColors() {
+  const cs = getComputedStyle(document.documentElement)
+  return {
+    surface: cs.getPropertyValue('--surface').trim(),
+    border:  cs.getPropertyValue('--border').trim(),
+    muted:   cs.getPropertyValue('--muted').trim(),
+    accent:  cs.getPropertyValue('--accent').trim(),
+  }
+}
+
 function toScreen(wx, wy) {
   const W = canvas.width, H = canvas.height
   return {
@@ -350,27 +408,26 @@ function toScreen(wx, wy) {
 
 function drawGrid() {
   const W = canvas.width, H = canvas.height
-  ctx.fillStyle = 'white'; ctx.fillRect(0, 0, W, H)
+  const C = getColors()
+  ctx.fillStyle = C.surface; ctx.fillRect(0, 0, W, H)
 
-  // Grid lines
-  ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1
+  ctx.strokeStyle = C.border; ctx.lineWidth = 1
   for (let x = xMin; x <= xMax; x++) { const {sx}=toScreen(x,0); ctx.beginPath(); ctx.moveTo(sx,0); ctx.lineTo(sx,H); ctx.stroke() }
   for (let y = yMin; y <= yMax; y++) { const {sy}=toScreen(0,y); ctx.beginPath(); ctx.moveTo(0,sy); ctx.lineTo(W,sy); ctx.stroke() }
 
-  // Axes
   const {sx:ox,sy:oy} = toScreen(0,0)
-  ctx.strokeStyle='#94a3b8'; ctx.lineWidth=1.5
+  ctx.strokeStyle=C.muted; ctx.lineWidth=1.5
   ctx.beginPath(); ctx.moveTo(ox,0); ctx.lineTo(ox,H); ctx.stroke()
   ctx.beginPath(); ctx.moveTo(0,oy); ctx.lineTo(W,oy); ctx.stroke()
 
-  // Tick labels
-  ctx.fillStyle='#94a3b8'; ctx.font='10px system-ui'; ctx.textAlign='center'
+  ctx.fillStyle=C.muted; ctx.font='10px system-ui'; ctx.textAlign='center'
   for (let x=xMin+1; x<=xMax-1; x++) { if(x===0)continue; const {sx}=toScreen(x,0); ctx.fillText(x,sx,oy+13) }
   ctx.textAlign='right'
   for (let y=yMin+1; y<=yMax-1; y++) { if(y===0)continue; const {sy}=toScreen(0,y); ctx.fillText(y,ox-5,sy+4) }
 }
 
 function plotCurve(exprStr) {
+  const C = getColors()
   errBox.style.display = 'none'
   drawGrid()
   try {
@@ -378,7 +435,7 @@ function plotCurve(exprStr) {
     const W  = canvas.width
     const STEPS = W * 2
     ctx.beginPath()
-    ctx.strokeStyle = '#0284c7'
+    ctx.strokeStyle = C.accent
     ctx.lineWidth = 2.5
     let penDown = false
     for (let i = 0; i <= STEPS; i++) {
@@ -390,8 +447,7 @@ function plotCurve(exprStr) {
     }
     ctx.stroke()
 
-    // Label
-    ctx.fillStyle = '#0284c7'; ctx.font = 'bold 12px system-ui'; ctx.textAlign = 'left'
+    ctx.fillStyle = C.accent; ctx.font = 'bold 12px system-ui'; ctx.textAlign = 'left'
     ctx.fillText('f(x) = ' + exprStr, 10, 18)
   } catch (e) {
     errBox.style.display = 'block'
@@ -419,30 +475,30 @@ plotCurve(input.value)`,
               code: `app.innerHTML = \`
   <style>
     * { box-sizing: border-box; font-family: system-ui, sans-serif; margin: 0; padding: 0 }
-    body, #app { background: #f8fafc }
+    body, #app { background: var(--bg) }
     .wrap { display: flex; flex-direction: column; height: 100vh; padding: 12px; gap: 10px }
     .toolbar { display: flex; gap: 8px }
     input {
       flex: 1; padding: 9px 13px; font-size: 15px; font-family: monospace;
-      border: 1.5px solid #cbd5e1; border-radius: 8px; outline: none; background: white
+      border: 1.5px solid var(--border); border-radius: 8px; outline: none;
+      background: var(--surface); color: var(--text)
     }
-    input:focus { border-color: #0284c7 }
+    input:focus { border-color: var(--accent) }
     button {
       padding: 9px 14px; font-size: 13px; font-weight: 600;
       border: none; border-radius: 8px; cursor: pointer
     }
-    .plot-btn { background: #0284c7; color: white }
-    .zoom-btn { background: #e2e8f0; color: #0f172a }
-    .zoom-btn:hover { background: #cbd5e1 }
-    canvas { flex: 1; border-radius: 10px; border: 1px solid #e2e8f0;
-             display: block; background: white; min-height: 0 }
+    .plot-btn { background: var(--accent); color: var(--surface) }
+    .zoom-btn { background: var(--surface2); color: var(--text); border: 1px solid var(--border) }
+    canvas { flex: 1; border-radius: 10px; border: 1px solid var(--border);
+             display: block; background: var(--surface); min-height: 0 }
   </style>
   <div class="wrap">
     <div class="toolbar">
       <input id="expr" type="text" value="sin(x)">
       <button class="plot-btn" id="plotBtn">Plot</button>
-      <button class="zoom-btn" id="inBtn">+ Zoom In</button>
-      <button class="zoom-btn" id="outBtn">- Zoom Out</button>
+      <button class="zoom-btn" id="inBtn">+ In</button>
+      <button class="zoom-btn" id="outBtn">- Out</button>
     </div>
     <canvas id="cv"></canvas>
   </div>
@@ -455,8 +511,17 @@ const input  = app.querySelector('#expr')
 canvas.width = canvas.offsetWidth
 canvas.height = canvas.offsetHeight
 
-// TODO: make these mutable so zoom can change them
 let xMin = -6, xMax = 6, yMin = -4, yMax = 4
+
+function getColors() {
+  const cs = getComputedStyle(document.documentElement)
+  return {
+    surface: cs.getPropertyValue('--surface').trim(),
+    border:  cs.getPropertyValue('--border').trim(),
+    muted:   cs.getPropertyValue('--muted').trim(),
+    accent:  cs.getPropertyValue('--accent').trim(),
+  }
+}
 
 function toScreen(wx, wy) {
   const W = canvas.width, H = canvas.height
@@ -468,22 +533,24 @@ function toScreen(wx, wy) {
 
 function drawGrid() {
   const W = canvas.width, H = canvas.height
-  ctx.fillStyle='white'; ctx.fillRect(0,0,W,H)
-  ctx.strokeStyle='#e2e8f0'; ctx.lineWidth=1
+  const C = getColors()
+  ctx.fillStyle=C.surface; ctx.fillRect(0,0,W,H)
+  ctx.strokeStyle=C.border; ctx.lineWidth=1
   for(let x=Math.ceil(xMin);x<=xMax;x++){const{sx}=toScreen(x,0);ctx.beginPath();ctx.moveTo(sx,0);ctx.lineTo(sx,H);ctx.stroke()}
   for(let y=Math.ceil(yMin);y<=yMax;y++){const{sy}=toScreen(0,y);ctx.beginPath();ctx.moveTo(0,sy);ctx.lineTo(W,sy);ctx.stroke()}
   const{sx:ox,sy:oy}=toScreen(0,0)
-  ctx.strokeStyle='#94a3b8';ctx.lineWidth=1.5
+  ctx.strokeStyle=C.muted;ctx.lineWidth=1.5
   ctx.beginPath();ctx.moveTo(ox,0);ctx.lineTo(ox,H);ctx.stroke()
   ctx.beginPath();ctx.moveTo(0,oy);ctx.lineTo(W,oy);ctx.stroke()
 }
 
 function plotCurve(exprStr) {
+  const C = getColors()
   drawGrid()
   try {
     const fn = new Function('x', \`with(Math){ return \${exprStr} }\`)
     const STEPS = canvas.width * 2
-    ctx.beginPath(); ctx.strokeStyle='#0284c7'; ctx.lineWidth=2.5
+    ctx.beginPath(); ctx.strokeStyle=C.accent; ctx.lineWidth=2.5
     let penDown = false
     for(let i=0;i<=STEPS;i++){
       const wx=xMin+(i/STEPS)*(xMax-xMin), wy=fn(wx)
@@ -513,36 +580,36 @@ plotCurve(input.value)`,
               prose: [
                 'Plotting two curves on the same axes means calling `plotCurve` twice with different colors after a single `drawGrid()`. The trick is to draw the grid once and then layer both curves on top — never call `drawGrid()` between the two curve draws or the first curve disappears. For the legend, `ctx.fillRect` draws a small color swatch and `ctx.fillText` places the label beside it.',
               ],
-              prompt: 'Add a second expression input to the plotter. Plot both functions on the same graph in different colors (e.g. blue and red). Add a small color-coded legend showing f(x) and g(x) expressions.',
-              hint: 'Add a second `<input id="expr2">` to the toolbar. Call `plotCurve(expr1, \'#0284c7\')` and `plotCurve(expr2, \'#dc2626\')`. For the legend, draw two small colored rectangles plus text labels using `ctx.fillRect` and `ctx.fillText`.',
+              prompt: 'Add a second expression input to the plotter. Plot both functions on the same graph in different colors. Add a small color-coded legend showing both expressions.',
+              hint: 'Call `drawGrid()` once, then `plotCurve(expr1, accentColor)` and `plotCurve(expr2, \'#dc2626\')`. For the legend, use `ctx.fillRect(10, 6, 10, 10)` and `ctx.fillText(expr, 24, 15)` for each entry.',
               code: `app.innerHTML = \`
   <style>
     * { box-sizing: border-box; font-family: system-ui, sans-serif; margin: 0; padding: 0 }
-    body, #app { background: #f8fafc }
+    body, #app { background: var(--bg) }
     .wrap { display: flex; flex-direction: column; height: 100vh; padding: 12px; gap: 8px }
     .row { display: flex; gap: 8px; align-items: center }
-    .dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0 }
-    .dot.blue { background: #0284c7 }
-    .dot.red  { background: #dc2626 }
+    .swatch { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0 }
     input {
       flex: 1; padding: 8px 12px; font-size: 14px; font-family: monospace;
-      border: 1.5px solid #cbd5e1; border-radius: 8px; outline: none; background: white
+      border: 1.5px solid var(--border); border-radius: 8px; outline: none;
+      background: var(--surface); color: var(--text)
     }
-    input:focus { border-color: #0284c7 }
+    input:focus { border-color: var(--accent) }
     button {
       padding: 8px 16px; font-size: 14px; font-weight: 600;
-      border: none; border-radius: 8px; cursor: pointer; background: #0284c7; color: white
+      border: none; border-radius: 8px; cursor: pointer;
+      background: var(--accent); color: var(--surface)
     }
-    canvas { flex: 1; border-radius: 10px; border: 1px solid #e2e8f0;
-             display: block; background: white; min-height: 0 }
+    canvas { flex: 1; border-radius: 10px; border: 1px solid var(--border);
+             display: block; background: var(--surface); min-height: 0 }
   </style>
   <div class="wrap">
     <div class="row">
-      <div class="dot blue"></div>
+      <div class="swatch" style="background: var(--accent)"></div>
       <input id="f1" type="text" value="sin(x)">
     </div>
     <div class="row">
-      <div class="dot red"></div>
+      <div class="swatch" style="background: #dc2626"></div>
       <input id="f2" type="text" value="cos(x)">
       <button id="plotBtn">Plot Both</button>
     </div>
@@ -557,6 +624,16 @@ canvas.height = canvas.offsetHeight
 
 const xMin = -6, xMax = 6, yMin = -4, yMax = 4
 
+function getColors() {
+  const cs = getComputedStyle(document.documentElement)
+  return {
+    surface: cs.getPropertyValue('--surface').trim(),
+    border:  cs.getPropertyValue('--border').trim(),
+    muted:   cs.getPropertyValue('--muted').trim(),
+    accent:  cs.getPropertyValue('--accent').trim(),
+  }
+}
+
 function toScreen(wx, wy) {
   const W=canvas.width,H=canvas.height
   return { sx:(wx-xMin)/(xMax-xMin)*W, sy:(1-(wy-yMin)/(yMax-yMin))*H }
@@ -564,18 +641,19 @@ function toScreen(wx, wy) {
 
 function drawGrid() {
   const W=canvas.width,H=canvas.height
-  ctx.fillStyle='white';ctx.fillRect(0,0,W,H)
-  ctx.strokeStyle='#e2e8f0';ctx.lineWidth=1
+  const C = getColors()
+  ctx.fillStyle=C.surface;ctx.fillRect(0,0,W,H)
+  ctx.strokeStyle=C.border;ctx.lineWidth=1
   for(let x=Math.ceil(xMin);x<=xMax;x++){const{sx}=toScreen(x,0);ctx.beginPath();ctx.moveTo(sx,0);ctx.lineTo(sx,H);ctx.stroke()}
   for(let y=Math.ceil(yMin);y<=yMax;y++){const{sy}=toScreen(0,y);ctx.beginPath();ctx.moveTo(0,sy);ctx.lineTo(W,sy);ctx.stroke()}
   const{sx:ox,sy:oy}=toScreen(0,0)
-  ctx.strokeStyle='#94a3b8';ctx.lineWidth=1.5
+  ctx.strokeStyle=C.muted;ctx.lineWidth=1.5
   ctx.beginPath();ctx.moveTo(ox,0);ctx.lineTo(ox,H);ctx.stroke()
   ctx.beginPath();ctx.moveTo(0,oy);ctx.lineTo(W,oy);ctx.stroke()
 }
 
-// TODO: implement plotCurve(exprStr, color) that draws the function in the given color
-// TODO: on Plot Both click, call drawGrid() then plotCurve for both inputs
+// TODO: implement plotFn(exprStr, color) that draws the function in the given color
+// TODO: on Plot Both click, call drawGrid() then plotFn for both inputs
 // TODO: draw a legend showing both expressions
 
 app.querySelector('#plotBtn').addEventListener('click', () => {
@@ -592,31 +670,34 @@ drawGrid()`,
               challengeTitle: 'Tangent Line',
               difficulty: 'hard',
               prose: [
-                '**Numerical differentiation** approximates the slope of f at a point without needing a symbolic formula. The centered-difference formula `(f(a+h) - f(a-h)) / (2h)` with `h = 0.0001` is accurate to about 8 decimal places for smooth functions. Once you have the slope, the tangent line is just `y = f(a) + slope * (x - a)` — a line through `(a, f(a))` with the computed gradient. Plot it as a second curve in amber to see calculus come alive visually.',
+                '**Numerical differentiation** approximates the slope of f at a point without needing a symbolic formula. The centered-difference formula `(f(a+h) - f(a-h)) / (2h)` with `h = 0.0001` is accurate to about 8 decimal places for smooth functions. Once you have the slope, the tangent line is just `y = f(a) + slope * (x - a)` — a line through `(a, f(a))` with the computed gradient. Plot it in amber to see calculus come alive visually.',
               ],
               prompt: 'Add a number input for a value `a`. After plotting f(x), also draw the tangent line to f at x=a using numerical differentiation: `f\'(a) ≈ (f(a+h) - f(a-h)) / (2h)` where h=0.0001. The tangent line is `y = f(a) + f\'(a) * (x - a)`. Draw a dot at (a, f(a)) too.',
-              hint: 'Compute `slope = (fn(a+h) - fn(a-h)) / (2*h)`. The tangent line function is `tangent = x => fn(a) + slope * (x - a)`. Plot it with `plotCurve(tangent, \'#f59e0b\', 1.5)` (passing a function directly instead of a string — adjust your plotCurve to accept either).',
+              hint: 'Compute `slope = (fn(a+h) - fn(a-h)) / (2*h)`. The tangent line function is `tangent = x => fn(a) + slope * (x - a)`. Plot it in `\'#f59e0b\'` at lineWidth 1.5. For the dot, use `ctx.arc` at `toScreen(a, fn(a))`.',
               code: `app.innerHTML = \`
   <style>
     * { box-sizing: border-box; font-family: system-ui, sans-serif; margin: 0; padding: 0 }
-    body, #app { background: #f8fafc }
+    body, #app { background: var(--bg) }
     .wrap { display: flex; flex-direction: column; height: 100vh; padding: 12px; gap: 10px }
     .toolbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap }
     input[type=text] {
       flex: 1; min-width: 100px; padding: 9px 12px; font-size: 14px; font-family: monospace;
-      border: 1.5px solid #cbd5e1; border-radius: 8px; outline: none; background: white
+      border: 1.5px solid var(--border); border-radius: 8px; outline: none;
+      background: var(--surface); color: var(--text)
     }
     input[type=number] {
       width: 70px; padding: 9px 10px; font-size: 14px; text-align: center;
-      border: 1.5px solid #cbd5e1; border-radius: 8px; outline: none; background: white
+      border: 1.5px solid var(--border); border-radius: 8px; outline: none;
+      background: var(--surface); color: var(--text)
     }
-    label { font-size: 13px; color: #475569; white-space: nowrap }
+    label { font-size: 13px; color: var(--muted); white-space: nowrap }
     button {
       padding: 9px 16px; font-size: 14px; font-weight: 600;
-      border: none; border-radius: 8px; cursor: pointer; background: #0284c7; color: white
+      border: none; border-radius: 8px; cursor: pointer;
+      background: var(--accent); color: var(--surface)
     }
-    canvas { flex: 1; border-radius: 10px; border: 1px solid #e2e8f0;
-             display: block; background: white; min-height: 0 }
+    canvas { flex: 1; border-radius: 10px; border: 1px solid var(--border);
+             display: block; background: var(--surface); min-height: 0 }
   </style>
   <div class="wrap">
     <div class="toolbar">
@@ -636,6 +717,16 @@ canvas.height = canvas.offsetHeight
 
 const xMin = -6, xMax = 6, yMin = -4, yMax = 4
 
+function getColors() {
+  const cs = getComputedStyle(document.documentElement)
+  return {
+    surface: cs.getPropertyValue('--surface').trim(),
+    border:  cs.getPropertyValue('--border').trim(),
+    muted:   cs.getPropertyValue('--muted').trim(),
+    accent:  cs.getPropertyValue('--accent').trim(),
+  }
+}
+
 function toScreen(wx, wy) {
   const W=canvas.width,H=canvas.height
   return { sx:(wx-xMin)/(xMax-xMin)*W, sy:(1-(wy-yMin)/(yMax-yMin))*H }
@@ -643,17 +734,19 @@ function toScreen(wx, wy) {
 
 function drawGrid() {
   const W=canvas.width,H=canvas.height
-  ctx.fillStyle='white';ctx.fillRect(0,0,W,H)
-  ctx.strokeStyle='#e2e8f0';ctx.lineWidth=1
+  const C = getColors()
+  ctx.fillStyle=C.surface;ctx.fillRect(0,0,W,H)
+  ctx.strokeStyle=C.border;ctx.lineWidth=1
   for(let x=Math.ceil(xMin);x<=xMax;x++){const{sx}=toScreen(x,0);ctx.beginPath();ctx.moveTo(sx,0);ctx.lineTo(sx,H);ctx.stroke()}
   for(let y=Math.ceil(yMin);y<=yMax;y++){const{sy}=toScreen(0,y);ctx.beginPath();ctx.moveTo(0,sy);ctx.lineTo(W,sy);ctx.stroke()}
   const{sx:ox,sy:oy}=toScreen(0,0)
-  ctx.strokeStyle='#94a3b8';ctx.lineWidth=1.5
+  ctx.strokeStyle=C.muted;ctx.lineWidth=1.5
   ctx.beginPath();ctx.moveTo(ox,0);ctx.lineTo(ox,H);ctx.stroke()
   ctx.beginPath();ctx.moveTo(0,oy);ctx.lineTo(W,oy);ctx.stroke()
 }
 
 function plotFn(fn, color, lineWidth=2.5) {
+  const C = getColors()
   const STEPS=canvas.width*2
   ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=lineWidth
   let penDown=false
@@ -669,14 +762,15 @@ function plotFn(fn, color, lineWidth=2.5) {
 app.querySelector('#plotBtn').addEventListener('click', () => {
   const exprStr = app.querySelector('#expr').value
   const a = parseFloat(app.querySelector('#aVal').value)
+  const C = getColors()
   drawGrid()
   try {
     const fn = new Function('x', \`with(Math){ return \${exprStr} }\`)
-    plotFn(fn, '#0284c7')
+    plotFn(fn, C.accent)
 
     // TODO: compute the derivative at a using numerical differentiation
-    // TODO: build the tangent line function and plot it in amber
-    // TODO: draw a dot at (a, f(a))
+    // TODO: build the tangent line function and plot it in '#f59e0b'
+    // TODO: draw a dot at (a, fn(a))
   } catch (e) {}
 })
 

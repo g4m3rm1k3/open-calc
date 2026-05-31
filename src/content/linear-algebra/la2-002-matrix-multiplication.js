@@ -79,6 +79,13 @@ export default {
         mathBridge: 'A five-tab module: Concept covers addition, multiplication, identity, inverse, and LU; Canonical walks through a 2×3 × 3×2 product entry by entry, a 2×2 inverse by row reduction, and an LU factorisation; Real World shows the 3D graphics pipeline and FEA usage; Interactive lets you enter any 2×2 matrices A and B and instantly computes AB, BA, det(A), A⁻¹, and A⁻¹b, plus a live graphics canvas with rotation/scale/shear sliders; Practice has five hand-calculation problems.',
         caption: 'The same math that renders every polygon in a 3D game — rotation, scale, and shear combined into a single matrix multiply.',
       },
+      {
+        id: 'TransformLab',
+        title: 'Transform Lab — Chaining Transforms',
+        mathBridge: 'Jump straight to Step 4: Chain Transforms. Enter two matrices $A$ and $B$, apply them separately, then chain them as $BA$ in one step. This is exactly what matrix multiplication means geometrically — applying two linear maps in sequence collapses to a single matrix product.',
+        caption: 'Matrix multiplication = geometry composition. The product BA encodes "apply A first, then B."',
+        initialProps: { startStep: 3 },
+      },
     ],
   },
 

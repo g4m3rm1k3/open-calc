@@ -313,6 +313,7 @@ const VIZ_REGISTRY = {
   SQLNotebook: lazy(() => import("./react/SQLNotebook.jsx")),
   ScienceNotebook: lazy(() => import("./react/ScienceNotebook.jsx")),
   SimNotebook: lazy(() => import("./react/SimNotebook.jsx")),
+  TransformLab: lazy(() => import("./react/TransformLab.jsx")),
   // Chemistry lessons
   WhyChemistry: lazy(() => import("./react/WhyChemistry.jsx")),
   WhatIsAnAtom: lazy(() => import("./react/WhatIsAnAtom.jsx")),
@@ -1205,7 +1206,7 @@ export default function VizFrame({ id, initialProps = {}, title }) {
 
   const content = (
     <Suspense fallback={<VizSkeleton />}>
-      <VizComponent params={params} onParamChange={setParams} />
+      <VizComponent key={pinId} params={params} onParamChange={setParams} />
     </Suspense>
   );
 

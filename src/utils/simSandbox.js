@@ -172,6 +172,7 @@ window.addEventListener('message', ({ data }) => {
   if (data.type === 'reset') {
     stopLoop(); hideError()
     if (currentMode==='3d') { clearScene(); renderer.render(scene,camera) }
+    else if (currentMode==='html') { const app=document.getElementById('app'); app.innerHTML=''; setHtmlTheme(isDark) }
     else { const ctx=c2d.getContext('2d'); ctx.clearRect(0,0,c2d.width,c2d.height) }
   }
   if (data.type === 'theme') {

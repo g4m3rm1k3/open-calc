@@ -79,6 +79,12 @@
         mathBridge: 'This visualization proves the column secret geometrically. Set $\\mathbf{v} = 1 \\cdot \\hat{i} + 0 \\cdot \\hat{j}$, then apply a transformation $A$. By linearity, $A\\hat{i} = 1 \\cdot (\\text{first column})$. Drag the sliders to see how any vector is just a scaled sum of the two column vectors.',
         caption: 'The linear combination law forces column 1 = destination of î, column 2 = destination of ĵ.',
       },
+      {
+        id: 'TransformLab',
+        title: 'Transform Lab — Place, Rotate, Mirror, Chain',
+        mathBridge: 'Work through all four steps: place a shape, rotate it by entering a matrix, reflect it across an axis, then chain two transforms together. Each step reinforces the same core idea — a matrix tells the plane where to send $\\hat{i}$ and $\\hat{j}$, and everything else follows.',
+        caption: 'Build hands-on intuition by constructing rotation, reflection, and composition matrices yourself.',
+      },
     ],
   },
 

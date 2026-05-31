@@ -290,6 +290,12 @@ p_ndc
           ],
         },
       },
+      {
+        id: 'TransformLab',
+        title: 'Transform Lab — 2D Intuition Before 4×4 Matrices',
+        mathBridge: 'Before diving into 4×4 homogeneous coordinates, build 2D intuition: place a shape, rotate it by constructing a rotation matrix, reflect it across an axis, then chain two transforms. Every concept — columns encode basis vector destinations, order matters, composition collapses to a product — carries directly into 3D and the graphics pipeline.',
+        caption: 'The 4×4 homogeneous matrix is just this 2×2 story extended into 3D with a translation row appended.',
+      },
     ],
   },
 

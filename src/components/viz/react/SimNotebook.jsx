@@ -301,7 +301,7 @@ function SimCell({ cell, cellNumber, isChallenge, C }) {
           ref={iframeRef}
           srcDoc={srcdoc.current}
           sandbox="allow-scripts"
-          style={{ width: '100%', border: 0, display: 'block', height: isChallenge ? 300 : 340 }}
+          style={{ width: '100%', border: 0, display: 'block', height: isChallenge ? 360 : 400 }}
           title={`sim-cell-${cell.id}`}
         />
       </div>
@@ -361,16 +361,23 @@ export default function SimNotebook({ initialCells: cellsProp, params = {} }) {
   const initialCells = cellsProp ?? params.initialCells ?? []
   const C = useColors()
 
+  // Fingerprint derived from the first cell's code (prop, not state).
+  // Stable within a lesson (user edits only change code STATE, never cell.code PROP).
+  // Changes on lesson navigation (different cell content) → forces SimCell remounts →
+  // fresh code state initialized from the new lesson's cells.
+  // Uses length + last 60 chars: lessons share the same CSS boilerplate at the start,
+  // so slicing from the front produces identical fingerprints across lessons.
+  const code0 = initialCells[0]?.code ?? ''
+  const fp = `${code0.length}|${code0.slice(-60)}`
+
   let regularCount = 0
   let challengeCount = 0
 
   return (
     <div style={{ width: '100%', fontFamily: 'sans-serif', padding: '4px 0' }}>
       {initialCells.map((cell) => {
-        const isChallenge = !!cell.challengeType
-        // Key includes code so navigating between lessons (same cell IDs, different
-        // code) forces a full remount — otherwise useState keeps stale code.
-        const cellKey = `${cell.id}::${(cell.code ?? '').slice(0, 40)}`
+        const isChallenge = !!cell.challengeType || !!cell.isChallenge
+        const cellKey = `${fp}::${cell.id}`
         if (isChallenge) {
           challengeCount++
           return (
