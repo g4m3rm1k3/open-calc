@@ -49,8 +49,11 @@ export default {
     visualizations: [
       {
         id: 'PythonNotebook',
-        type: 'PythonNotebook',
-        cells: [
+        title: 'Graph Theory for Machine Learning',
+        mathBridge: 'Graph Laplacian: L = D − A. Fiedler vector: second-smallest eigenvector of L. GNN layer: H⁽ˡ⁺¹⁾ = σ(D⁻¹A·H⁽ˡ⁾·W).',
+        caption: 'Build a Graph class with BFS/DFS, compute the Fiedler vector for spectral clustering, and simulate GNN message passing.',
+        props: {
+          initialCells: [
           {
             id: 1,
             prose: [
@@ -305,7 +308,8 @@ print("Expected: nodes 0,1,2 in one group; nodes 3,4 in another")
 except AssertionError as e:
     print(f"FAIL: {e}")`,
           },
-        ],
+          ],
+        },
       },
     ],
   },

@@ -53,8 +53,11 @@ export default {
     visualizations: [
       {
         id: 'PythonNotebook',
-        type: 'PythonNotebook',
-        cells: [
+        title: 'Convex Optimization',
+        mathBridge: "A function is convex iff its Hessian H ≽ 0. Newton's step: Δx = −H⁻¹∇f. KKT: ∇f + Σλᵢ∇gᵢ = 0, λᵢ ≥ 0, λᵢgᵢ(x) = 0.",
+        caption: 'Test convexity empirically, race Newton vs gradient descent on a quadratic, and visualize L1 vs L2 regularization geometry.',
+        props: {
+          initialCells: [
           {
             id: 1,
             prose: [
@@ -270,7 +273,8 @@ for name, f in [("x² + y²", f_circle), ("sin(x)+cos(y)", f_sincos)]:
 except AssertionError as e:
     print(f"FAIL: {e}")`,
           },
-        ],
+          ],
+        },
       },
     ],
   },

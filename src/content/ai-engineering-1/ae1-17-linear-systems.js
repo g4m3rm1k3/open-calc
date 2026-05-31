@@ -52,8 +52,11 @@ export default {
     visualizations: [
       {
         id: 'PythonNotebook',
-        type: 'PythonNotebook',
-        cells: [
+        title: 'Linear Systems',
+        mathBridge: 'Normal equations: AᵀAx = Aᵀb. Ridge: (AᵀA + λI)x = Aᵀb. Condition number: κ = σ_max/σ_min.',
+        caption: 'Implement Gaussian elimination, solve least-squares via normal equations, and measure numerical stability with condition numbers.',
+        props: {
+          initialCells: [
           {
             id: 1,
             prose: [
@@ -299,7 +302,8 @@ lam = 0.5
 except Exception as e:
     print(f"FAIL: {e}")`,
           },
-        ],
+          ],
+        },
       },
     ],
   },

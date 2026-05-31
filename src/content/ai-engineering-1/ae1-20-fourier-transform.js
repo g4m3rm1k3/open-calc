@@ -38,8 +38,11 @@ export default {
     visualizations: [
       {
         id: 'PythonNotebook',
-        type: 'PythonNotebook',
-        cells: [
+        title: 'The Fourier Transform',
+        mathBridge: 'DFT: X[k] = Σx[n]·e^(−2πi·kn/N). FFT: O(N log N) divide-and-conquer. Convolution theorem: conv(a,b) = IDFT(DFT(a)·DFT(b)).',
+        caption: 'Implement DFT from scratch, build recursive FFT, and prove the convolution theorem computationally.',
+        props: {
+          initialCells: [
           {
             id: 1,
             prose: [
@@ -267,7 +270,8 @@ X32 = dft(x32)
 except Exception as e:
     print(f"FAIL: {e}")`,
           },
-        ],
+          ],
+        },
       },
     ],
   },

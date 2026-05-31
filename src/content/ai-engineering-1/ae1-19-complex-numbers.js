@@ -37,8 +37,11 @@ export default {
     visualizations: [
       {
         id: 'PythonNotebook',
-        type: 'PythonNotebook',
-        cells: [
+        title: 'Complex Numbers for AI',
+        mathBridge: 'Euler: e^(iθ) = cos(θ) + i·sin(θ). Complex multiply = rotation + scaling. RoPE: rotate position embeddings by m·θ in each 2D subspace.',
+        caption: 'Build Complex from scratch, verify rotation via multiplication, and implement 2D RoPE positional encodings.',
+        props: {
+          initialCells: [
           {
             id: 1,
             prose: [
@@ -216,7 +219,8 @@ print("\\n4th roots of unity:")
 except AssertionError as e:
     print(f"FAIL: {e}")`,
           },
-        ],
+          ],
+        },
       },
     ],
   },

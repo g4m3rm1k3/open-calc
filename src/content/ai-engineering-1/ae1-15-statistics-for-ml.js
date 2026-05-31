@@ -53,8 +53,11 @@ export default {
     visualizations: [
       {
         id: 'PythonNotebook',
-        type: 'PythonNotebook',
-        cells: [
+        title: 'Statistics for Machine Learning',
+        mathBridge: 'R² = 1 − SS_res/SS_tot. Paired t-test: t = mean(d)/(s/√n). Bootstrap CI = [2.5th, 97.5th percentile] of resampled statistics.',
+        caption: 'Build descriptive stats, correlation measures, and model comparison tests from scratch.',
+        props: {
+          initialCells: [
           {
             id: 1,
             prose: [
@@ -300,7 +303,8 @@ try:
 except:
     print("FAIL: missing uncorrected_significant or corrected_significant variables")`,
           },
-        ],
+          ],
+        },
       },
     ],
   },

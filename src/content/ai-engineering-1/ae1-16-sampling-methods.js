@@ -52,8 +52,11 @@ export default {
     visualizations: [
       {
         id: 'PythonNotebook',
-        type: 'PythonNotebook',
-        cells: [
+        title: 'Sampling Methods',
+        mathBridge: 'Inverse CDF: X = F⁻¹(U). Temperature softmax: pᵢ = exp(zᵢ/T)/Σexp(zⱼ/T). Reparameterization: z = μ + σ·ε where ε ~ N(0,1).',
+        caption: 'Implement inverse CDF sampling, LLM temperature/top-p controls, and Metropolis-Hastings MCMC from scratch.',
+        props: {
+          initialCells: [
           {
             id: 1,
             prose: [
@@ -253,7 +256,8 @@ def reparam_sample(mu, sigma):
 except AssertionError as e:
     print(f"FAIL: {e}")`,
           },
-        ],
+          ],
+        },
       },
     ],
   },

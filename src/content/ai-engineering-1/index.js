@@ -16,6 +16,10 @@ import statisticsForMl from './ae1-15-statistics-for-ml.js'
 import samplingMethods from './ae1-16-sampling-methods.js'
 import linearSystems from './ae1-17-linear-systems.js'
 import convexOptimization from './ae1-18-convex-optimization.js'
+import complexNumbers from './ae1-19-complex-numbers.js'
+import fourierTransform from './ae1-20-fourier-transform.js'
+import graphTheory from './ae1-21-graph-theory.js'
+import stochasticProcesses from './ae1-22-stochastic-processes.js'
 
 export default [
   {
@@ -41,6 +45,10 @@ export default [
       samplingMethods,
       linearSystems,
       convexOptimization,
+      complexNumbers,
+      fourierTransform,
+      graphTheory,
+      stochasticProcesses,
     ],
   },
 ]
