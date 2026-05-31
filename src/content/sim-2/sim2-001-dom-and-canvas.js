@@ -28,7 +28,7 @@ const sim2_001 = {
     ],
     visualizations: [
       {
-        id: 'sim2-001-viz',
+        id: 'SimNotebook',
         title: 'DOM and Canvas',
         initialProps: {
           initialCells: [

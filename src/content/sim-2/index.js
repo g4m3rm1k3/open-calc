@@ -1,4 +1,4 @@
-import sim2_001 from './sim2-001-dom-and-canvas.js'
+import sim2_001 from './sim2-001-your-first-app.js'
 import sim2_002 from './sim2-002-evaluating-expressions.js'
 import sim2_003 from './sim2-003-function-plotter.js'
 

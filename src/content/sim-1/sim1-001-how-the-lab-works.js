@@ -310,6 +310,9 @@ function update(dt) {
               challengeTitle: 'Sphere with orbit — combine rotation and position',
               difficulty: 'easy',
               mode: '3d',
+              prose: [
+                'Orbiting is different from rotating: rotation spins an object around its own center, while orbiting moves an object\'s *position* in a circle around another point. The trick is `Math.cos` and `Math.sin` — a pair of functions that trace a unit circle as their input angle increases. If you set `mesh.position.x = r * Math.cos(t)` and `mesh.position.z = r * Math.sin(t)` and increase `t` over time, the mesh travels in a perfect circle of radius `r`.',
+              ],
               prompt: 'Replace the box with a sphere (THREE.SphereGeometry). Then make it orbit the origin in a circle: use Math.cos and Math.sin with a time variable to move its position instead of rotating it. The sphere should complete one full circle every 3 seconds.',
               hint: 'Accumulate a variable `t` in update(dt). Set mesh.position.x = r * Math.cos(t) and mesh.position.z = r * Math.sin(t) where r is the orbit radius. One full orbit = 2π radians — at angular speed ω = 2π/3 rad/s, t += ω * dt.',
               code: `// Starter: orbiting sphere
@@ -350,6 +353,9 @@ function update(dt) {
               challengeNumber: 2,
               challengeTitle: '2D: Two balls with trail',
               difficulty: 'medium',
+              prose: [
+                'A **motion trail** works by not fully erasing the previous frame. Instead of `ctx.clearRect(...)`, fill the canvas with a semi-transparent rectangle — `ctx.fillStyle = "rgba(2,6,15,0.15)"`. Each frame, old paint fades by 15% while new paint is drawn at full opacity. After a few dozen frames the old positions are invisible, leaving a soft glowing tail behind the moving object.',
+              ],
               mode: '2d',
               prompt: 'Start from the bouncing ball example. Add a second ball with different initial position, velocity, and color. Then add a simple trail: instead of clearing the canvas completely each frame, use `ctx.fillStyle = "rgba(2,6,15,0.15)"` — a semi-transparent fill — so old positions fade out slowly.',
               hint: 'Declare two sets of (px, py, vx, vy) variables. Update and draw both in update(). For the trail effect, replace `ctx.fillRect(...)` with `ctx.fillStyle = "rgba(2,6,15,0.15)"; ctx.fillRect(0,0,W,H)` — lower opacity = longer trail. Try values between 0.05 and 0.3.',
@@ -395,6 +401,9 @@ function update(dt) {
               challengeNumber: 3,
               challengeTitle: '3D: Build a solar system — sun, planets, moons',
               difficulty: 'hard',
+              prose: [
+                '`THREE.Group` is an invisible container object. Adding a mesh to a group means the mesh\'s position is *relative to the group*. If you place a group at a planet\'s position and put a moon inside it at `(2, 0, 0)`, the moon orbits the group\'s center — which is the planet. Rotate the group over time and the moon orbits the planet automatically, even while the planet orbits the sun. This is how nested orbital motion works.',
+              ],
               mode: '3d',
               prompt: 'Build a miniature solar system: a large glowing sun at the origin, two planets orbiting at different radii and speeds, and one moon orbiting a planet. Use THREE.Group to make the moon orbit relative to its planet. Add a PointLight at the origin to make the sun glow.',
               hint: 'THREE.Group is like an empty object you can add children to. Add a planet mesh to a group, add a moon mesh at an offset inside the group. Then rotate the group in update() — the moon orbits with the planet automatically. sun = PointLight + SphereGeometry with emissive color.',

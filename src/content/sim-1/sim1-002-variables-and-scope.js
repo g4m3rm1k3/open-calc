@@ -241,6 +241,9 @@ function update(dt) {
               challengeTitle: 'Fix the scope bug',
               difficulty: 'easy',
               mode: '3d',
+              prose: [
+                'A variable only exists inside the `{ }` block where it was declared. Writing `const box = ...` inside `init()` creates a variable that disappears the moment `init()` finishes — `update()` has no idea it exists. The fix: declare it at module scope (outside both functions) so both share the same reference. This is the most common mistake in sim code.',
+              ],
               prompt: 'This code crashes with "ReferenceError: box is not defined". The bug is a scope error — `box` is declared in the wrong place. Find it and fix it so the box spins.',
               hint: 'Look for `const box` inside `init()`. Move the declaration to module scope as `let box`, and inside `init()` just write `box = new THREE.Mesh(...)` without any `const` or `let`.',
               code: `// BROKEN — find and fix the scope bug
@@ -268,6 +271,9 @@ function update(dt) {
               challengeTitle: '2D: Add a second bouncing ball',
               difficulty: 'medium',
               mode: '2d',
+              prose: [
+                'The existing ball uses four state variables: `ball1X`, `ball1Y`, `ball1SpeedX`, `ball1SpeedY`. Adding a second ball means adding four *parallel* variables — the same four names but numbered 2. The `init()` function sets them to different starting values; `update()` runs the same physics on each set independently. This is the most direct way to add a second object before you learn arrays.',
+              ],
               prompt: 'The starter code has one ball. Add a second by declaring four more state variables (ball2X, ball2Y, ball2SpeedX, ball2SpeedY), initialising them in init() with different starting values, updating them with the same physics in update(), and drawing them in a different color.',
               hint: 'Copy the four variable declarations and rename each one (ball2X etc.). In init(), give the second ball a starting X of W * 0.7 and a negative speedX so it goes left. Add the same physics block for ball2 in update(). Draw it with fillStyle = "#ff6644".',
               code: `let ball1X, ball1Y, ball1SpeedX, ball1SpeedY
@@ -304,6 +310,9 @@ function update(dt) {
               challengeTitle: '3D: Orbiting sphere using a time accumulator',
               difficulty: 'medium',
               mode: '3d',
+              prose: [
+                'A **time accumulator** is a module-scope variable that grows by `dt` every frame — it is the total elapsed seconds since the sim started. Feeding it into `Math.cos` and `Math.sin` produces smooth circular motion: `x = r * Math.cos(t * speed)`, `z = r * Math.sin(t * speed)`. One full orbit = 2π radians, so a sphere that completes one orbit per 4 seconds needs `speed = (2 * Math.PI) / 4`.',
+              ],
               prompt: 'Create a sphere that completes one full orbit every 4 seconds. You need two module-scope variables: `sphere` and `t`. In update(), advance `t` at the right angular speed, then set sphere.position.x and sphere.position.z using Math.cos and Math.sin.',
               hint: 'One full orbit = 2π radians in 4 seconds, so angular speed = 2π / 4 = π/2 rad/s. Each frame: `t += (Math.PI / 2) * dt`. Then `sphere.position.x = RADIUS * Math.cos(t)` and `sphere.position.z = RADIUS * Math.sin(t)`.',
               code: `let sphere

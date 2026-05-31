@@ -85,6 +85,7 @@ function SimCell({ cell, cellNumber, isChallenge, C }) {
       if (!iframeRef.current || source !== iframeRef.current.contentWindow) return
       if (data?.type === 'sim_ready') {
         setReady(true)
+        iframeRef.current.contentWindow.postMessage({ type: 'theme', dark: C.dark }, '*')
         if (!isChallenge) {
           iframeRef.current.contentWindow.postMessage(
             { type: 'run', code, mode: cell.mode || '3d' }, '*'

@@ -33,7 +33,7 @@ const sim2_002 = {
     ],
     visualizations: [
       {
-        id: 'sim2-002-viz',
+        id: 'SimNotebook',
         title: 'Evaluating Expressions',
         initialProps: {
           initialCells: [
@@ -42,6 +42,10 @@ const sim2_002 = {
               id: 1,
               mode: 'html',
               cellTitle: 'Strings vs. Math',
+              prose: [
+                'In JavaScript, `"x * x"` is just a sequence of characters — the language has no idea it represents multiplication. To turn a string into executable code, you use the **`Function` constructor**: `new Function(\'x\', \'return x * x\')`. This compiles the string as a function body and returns a real callable function. The string is the *source code*; `new Function` is the compiler.',
+                'This is the exact mechanism that powers every graphing calculator, formula evaluator, and spreadsheet engine. When Excel evaluates `=A1 * B1`, it is doing something equivalent: turning a string the user typed into a computation the machine can execute.',
+              ],
               code: `// "x * x" is a string — JavaScript doesn't know it's math.
 // Open the console (bottom of this preview) to see the difference.
 
@@ -89,6 +93,10 @@ app.querySelector('#fnBox').textContent =
               id: 2,
               mode: 'html',
               cellTitle: 'Calling Math Functions',
+              prose: [
+                '`new Function(\'x\', body)` runs the body in a clean isolated scope — it cannot see your local variables, and it cannot see global browser objects like `Math`. To make `Math.sin`, `Math.cos`, and `Math.PI` available, you need to explicitly bring them in.',
+                'The cleanest way is the `with` statement: `new Function(\'x\', \'with(Math){ return \' + expr + \' }\')`. The `with(Math)` block promotes all properties of `Math` into scope, so the user can type `sin(x)` instead of `Math.sin(x)`. This is the only legitimate use case for `with` in modern JavaScript.',
+              ],
               code: `// new Function runs in an isolated scope — Math is not automatically available.
 // Pass it as a parameter, or use 'with(Math){...}' to pull everything in.
 
@@ -142,6 +150,10 @@ for (const expr of expressions) {
               id: 3,
               mode: 'html',
               cellTitle: 'Handling Bad Input',
+              prose: [
+                'User-supplied expressions will fail — not occasionally, but constantly. `"x/"` is a `SyntaxError` because the parser can\'t finish the expression. `"foo(x)"` is a `ReferenceError` because `foo` doesn\'t exist. `"1/0"` returns `Infinity`, not an error. Each failure mode needs its own response.',
+                'The pattern is: wrap every `new Function` call in a `try/catch`, and separately check `isFinite(result)` on the output. If either fails, show a friendly message — never expose the raw JavaScript error to the user. The error text is useful during development but confusing and frightening in a finished app.',
+              ],
               code: `// Users make typos. Always catch errors and show a friendly message.
 
 app.innerHTML = \`
@@ -208,6 +220,10 @@ btn.addEventListener('click', () => {
               id: 4,
               mode: 'html',
               cellTitle: 'Live Expression Evaluator',
+              prose: [
+                'A table of sample values is the simplest way to debug a function before you plot it. Pick 9 evenly-spaced x values — say `-2` to `2` in steps of `0.5` — evaluate your expression at each one, and display the results in rows. If a value is `Infinity` or `NaN`, show `"undef"` rather than letting a nonsense number through.',
+                'This is the core engine that will power the function plotter in the next lesson. The evaluator, error handling, and sample table you write here are exactly the building blocks you\'ll need — we\'ll add a canvas and coordinate transform on top.',
+              ],
               code: `// Combine input + evaluator + a table of sample values.
 // This is the expression engine we'll reuse in the function plotter.
 
@@ -273,13 +289,16 @@ function buildTable(exprStr) {
 btn.addEventListener('click', () => buildTable(exprInput.value))
 buildTable(exprInput.value)`,
             },
-            // ── Challenge 1: Unit Conversion Calculator ───────────────────────────
+            // ── Challenge 1: Fix the Evaluator ───────────────────────────────────
             {
               id: 5,
               mode: 'html',
               isChallenge: true,
               challengeTitle: 'Fix the Evaluator',
               difficulty: 'easy',
+              prose: [
+                'Debugging is a critical skill, and the best debugging is reading carefully. The evaluator below builds its `Function` body incorrectly — it\'s one small omission that makes `sqrt(x)`, `log(x)`, and `PI` all fail with `ReferenceError`. Read the body string construction line by line before running the code.',
+              ],
               prompt: 'The evaluator below has a bug — it crashes on expressions like `sqrt(x)` even though that should work. Find and fix the issue, then test it with `sqrt(x)`, `log(x)`, and `PI * x`.',
               hint: 'Look carefully at how the Function body is constructed. Is `with(Math)` actually in the body string? Check for a missing bracket or string concatenation issue.',
               code: `app.innerHTML = \`
@@ -323,13 +342,16 @@ app.querySelector('#btn').addEventListener('click', () => {
   }
 })`,
             },
-            // ── Challenge 2: Sample Table ─────────────────────────────────────────
+            // ── Challenge 2: Two-Variable Evaluator ──────────────────────────────
             {
               id: 6,
               mode: 'html',
               isChallenge: true,
               challengeTitle: 'Two-Variable Evaluator',
               difficulty: 'medium',
+              prose: [
+                '`new Function` can accept any number of parameter names before the body string. `new Function(\'x\', \'a\', body)` creates a function of two variables — call it with `fn(xValue, aValue)`. This is how you\'d build a plotter that lets the user tune an amplitude or frequency with a slider: `a * sin(x)` where `a` comes from a separate input.',
+              ],
               prompt: 'Extend the evaluator to support two variables: x and a. Add a second input for the value of `a`. The user types an expression like `a * sin(x)` and a value for `a`, and the table shows f(x, a) for x from -2 to 2 in steps of 0.5.',
               hint: 'Change `new Function(\'x\', body)` to `new Function(\'x\', \'a\', body)` and pass both `x` and `a` when calling: `fn(x, a)`. Read `a` from the second input with `parseFloat(aInput.value)`.',
               code: `app.innerHTML = \`
@@ -380,6 +402,9 @@ app.querySelector('#btn').addEventListener('click', () => {
               isChallenge: true,
               challengeTitle: 'Custom Constants',
               difficulty: 'hard',
+              prose: [
+                'Named constants unlock a much richer expression language: `k * sin(n * x)` is far more readable than `9 * sin(3 * x)`. The trick is to parse a simple definition string like `"k = 9; n = 3"` by splitting on `;`, then splitting each piece on `=` to get a key-value pair. You can inject those constants into the `Function` body as `const` declarations before the `with(Math)` block.',
+              ],
               prompt: 'Build an evaluator that lets the user define constants before the expression. The UI should have a text area for definitions like `k = 9; n = 3` and a text input for the expression like `k * sin(n * x)`. The evaluator should parse the definitions and make those constants available when evaluating.',
               hint: 'Parse the definitions by splitting on `;`, then for each `key = value` string, extract the key and evaluate the value with `parseFloat`. Build the Function body as: `const k = ...; const n = ...; with(Math){ return expr }`. Or pass an object of constants and use `with` on that too.',
               code: `app.innerHTML = \`

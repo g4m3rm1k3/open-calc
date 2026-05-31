@@ -4,14 +4,26 @@
 //   3d: scene, camera, renderer, controls, THREE
 //   2d: canvas, ctx, W, H
 //   html: app (root div element)
+// CSS variables available in html mode:
+//   --bg --surface --surface2 --border --text --muted --accent --accent-bg
 export function buildSandbox() {
   return `<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
 <style>
+  :root {
+    --bg:        #f8fafc;
+    --surface:   #ffffff;
+    --surface2:  #f1f5f9;
+    --border:    #e2e8f0;
+    --text:      #0f172a;
+    --muted:     #64748b;
+    --accent:    #0284c7;
+    --accent-bg: rgba(2,132,199,0.08);
+  }
   * { margin:0; padding:0; box-sizing:border-box }
-  body { background:#02060f; overflow:hidden; transition:background 0.25s }
+  body { background:#02060f; overflow:hidden; transition:background 0.2s }
   body > canvas { position:absolute; top:0; left:0; display:block }
   #c2d { position:absolute; top:0; left:0; display:none }
   #app { display:none; width:100%; min-height:100%; font-family:system-ui,sans-serif }
@@ -28,8 +40,35 @@ export function buildSandbox() {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script>
-let animId=null, userUpdate=null, lastTs=0, currentMode='3d'
+let animId=null, userUpdate=null, lastTs=0, currentMode='3d', isDark=false
 const c2d = document.getElementById('c2d')
+
+// ── HTML theme tokens ─────────────────────────────────────────────────────────
+function setHtmlTheme(dark) {
+  isDark = dark
+  const r = document.documentElement
+  if (dark) {
+    document.body.style.background = '#0f172a'
+    r.style.setProperty('--bg',         '#0f172a')
+    r.style.setProperty('--surface',    '#1e293b')
+    r.style.setProperty('--surface2',   '#0f172a')
+    r.style.setProperty('--border',     '#334155')
+    r.style.setProperty('--text',       '#e2e8f0')
+    r.style.setProperty('--muted',      '#94a3b8')
+    r.style.setProperty('--accent',     '#38bdf8')
+    r.style.setProperty('--accent-bg',  'rgba(56,189,248,0.10)')
+  } else {
+    document.body.style.background = '#f8fafc'
+    r.style.setProperty('--bg',         '#f8fafc')
+    r.style.setProperty('--surface',    '#ffffff')
+    r.style.setProperty('--surface2',   '#f1f5f9')
+    r.style.setProperty('--border',     '#e2e8f0')
+    r.style.setProperty('--text',       '#0f172a')
+    r.style.setProperty('--muted',      '#64748b')
+    r.style.setProperty('--accent',     '#0284c7')
+    r.style.setProperty('--accent-bg',  'rgba(2,132,199,0.08)')
+  }
+}
 
 // ── Three.js ─────────────────────────────────────────────────────────────────
 const scene    = new THREE.Scene()
@@ -75,7 +114,8 @@ function switchMode(mode) {
   } else if (mode === 'html') {
     renderer.domElement.style.display='none'; c2d.style.display='none'
     app.style.display='block'; app.innerHTML=''
-    document.body.style.overflow='auto'; document.body.style.background='#f8fafc'
+    document.body.style.overflow='auto'
+    setHtmlTheme(isDark)
   }
 }
 
@@ -136,8 +176,9 @@ window.addEventListener('message', ({ data }) => {
   }
   if (data.type === 'theme') {
     if (currentMode === 'html') {
-      document.body.style.background=data.dark?'#0f172a':'#f8fafc'
+      setHtmlTheme(data.dark)
     } else {
+      isDark = data.dark
       const bg=data.dark?'#02060f':'#e8f0f8'
       document.body.style.background=bg
       scene.background=new THREE.Color(data.dark?0x02060f:0xe8f0f8)

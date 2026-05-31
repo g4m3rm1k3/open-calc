@@ -282,6 +282,9 @@ function update(dt) {
               challengeTitle: '3D: Pulsing sphere using Math.sin',
               difficulty: 'easy',
               mode: '3d',
+              prose: [
+                '`Math.sin(t)` returns a value that oscillates smoothly between −1 and +1 as `t` grows. To shift that range to any `[min, max]` interval, use: `mid + half * Math.sin(t * speed)` where `mid = (min + max) / 2` and `half = (max - min) / 2`. For a scale between 0.5 and 1.5: `mid = 1.0`, `half = 0.5`, so `scale = 1.0 + 0.5 * Math.sin(t * speed)`.',
+              ],
               prompt: 'Make a sphere that pulses in size. In update(), set the sphere\'s scale to a value that oscillates between 0.5 and 1.5. Use Math.sin to compute the oscillation — the scale should never go below 0.5 or above 1.5. Write a helper function `pulse(t, speed)` that returns the scale value.',
               hint: 'Math.sin(t) returns −1 to 1. To shift it to 0.5–1.5: `1 + 0.5 * Math.sin(t * speed)`. Set all three scale axes: `sphere.scale.set(s, s, s)` where s is your computed scale value.',
               code: `// Write a pulse helper function and apply it to a sphere
@@ -317,6 +320,9 @@ function update(dt) {
               challengeTitle: '3D: Five spheres at evenly spaced angles',
               difficulty: 'medium',
               mode: '3d',
+              prose: [
+                'To distribute N things evenly around a circle, divide the full circle (2π radians) by N. Item `i` gets angle `i * 2π / N`. For 5 items: 0°, 72°, 144°, 216°, 288°. Feeding each angle into cos and sin gives the X and Z positions. The **phase offset** for the wave comes from reusing those same angles — `Math.sin(t + angle_i)` means each sphere is shifted slightly along the wave, creating the ripple.',
+              ],
               prompt: 'Place 5 spheres evenly around a circle of radius 4. Each sphere should have a unique color using setHSL. You need one loop and the phase offset formula: `angle = i * 2 * Math.PI / 5`. Each sphere should also bob up and down at its own phase so they create a wave effect.',
               hint: 'For position: `x = 4 * Math.cos(angle)`, `z = 4 * Math.sin(angle)`. For bobbing in update: `sphere.position.y = Math.sin(t * 2 + angle) * 1.5`. Store the meshes in an array and store each sphere\'s angle so update() can use it.',
               code: `const meshes  = []
@@ -359,6 +365,9 @@ function update(dt) {
               challengeTitle: '2D: Lissajous figure tracer',
               difficulty: 'hard',
               mode: '2d',
+              prose: [
+                'A **Lissajous figure** is a parametric curve: `x = A·cos(a·t)`, `y = B·sin(b·t)`. When `a:b = 1:1` you get an ellipse. When `a:b = 1:2` you get a figure-eight. `2:3` produces a three-lobed shape. The pattern emerges only after the trace completes enough of the curve — which is why a fading trail is essential: use a semi-transparent fill each frame instead of a hard clear so the path accumulates visibly.',
+              ],
               prompt: 'A Lissajous figure is the path traced by `x = A * Math.cos(a * t)` and `y = B * Math.sin(b * t)`. Different ratios of a:b create different shapes. Build a tracer that draws the path over time using a semi-transparent clear so old positions fade out. Try a:b = 1:2, then 2:3, then 3:4.',
               hint: 'Use `ctx.fillStyle = "rgba(2,6,15,0.04)"` instead of a solid fill to create the fading trail. Center the figure at (W/2, H/2). Scale A and B to be about W/2.5 and H/2.5. The figure traces more slowly with t += 0.4 * dt.',
               code: `let t = 0

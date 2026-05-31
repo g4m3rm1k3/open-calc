@@ -276,6 +276,9 @@ function update(dt) {
               challengeTitle: 'Circle of spheres → helix spiral',
               difficulty: 'easy',
               mode: '3d',
+              prose: [
+                'A helix is a circle that also moves upward. The X and Z positions stay exactly the same as a flat circle — `cos` and `sin` with the same angles. The only addition is a Y value that increases with index: `y = i * stepSize`. To centre the helix vertically so it sits at the origin, subtract half the total height: `y = i * step - (N - 1) * step / 2`.',
+              ],
               prompt: 'The starter code places 16 spheres in a flat circle. Change it to a helix: keep the circular X and Z positions, but set each sphere\'s Y position to `i * 0.4 - (N-1) * 0.2` so they stack upward. The camera will need adjusting.',
               hint: 'In init(), after setting position.x and position.z, set `mesh.position.y = i * 0.4 - (N-1) * 0.2`. The subtraction centres the helix vertically. Move the camera up: `camera.position.set(8, 6, 12)`.',
               code: `const spheres = []
@@ -322,6 +325,9 @@ function update(dt) {
               challengeTitle: '3D: Animated wave across a grid',
               difficulty: 'medium',
               mode: '3d',
+              prose: [
+                'A wave across a grid works by giving each cell a different **phase offset** — a value added to the time argument of `Math.sin`. If every cell used `Math.sin(t)` they would all move in perfect unison, which looks like a flat platform lifting and falling. Using `Math.sin(t + (row + col) * 0.6)` shifts each cell slightly in time, creating a diagonal ripple. The `row + col` term increases toward the far corner of the grid, so that corner is always slightly ahead or behind the near corner.',
+              ],
               prompt: 'Build a 6×6 grid of boxes. In update(), animate each box\'s Y height with `Math.sin(t * 2 + (row + col) * 0.6) * 2` — a wave that sweeps diagonally across the grid. Store `{ mesh, row, col }` objects so update() has access to row and col.',
               hint: 'Use nested loops: `for (let row = 0; row < 6; row++) { for (let col = 0; col < 6; col++) {...} }`. Push `{ mesh, row, col }` to the array. In update(), `cubes.forEach(c => { c.mesh.position.y = Math.sin(t * 2 + (c.row + c.col) * 0.6) * 2 })`.',
               code: `const cubes = []
@@ -356,6 +362,9 @@ function update(dt) {
               challengeTitle: '3D: Falling rain — particles that reset',
               difficulty: 'hard',
               mode: '3d',
+              prose: [
+                'Particle systems need a **reset condition**: when a particle goes off-screen, teleport it back to the spawn area rather than removing it. This keeps a constant count without allocating new objects every frame. The check is just `if (particle.mesh.position.y < -5)` — and the reset sets Y back to above 8 with a fresh random X and Z. Stagger the starting Y values in `init()` so all 40 drops don\'t fall in sync.',
+              ],
               prompt: 'Create 40 thin capsules (use CylinderGeometry with small radius) falling downward. Each should start at a random X, Z position and a random Y height. When a particle falls below Y = −5, reset it to a random position above Y = 8. Use an array of state objects with `{ mesh, vy }`. Gravity pulls everything down.',
               hint: 'In init(), give each particle a random starting Y between 0 and 8. In update(), apply `p.vy -= 12 * dt` (fast gravity for rain). When `p.mesh.position.y < -5`, reset: `p.mesh.position.y = 8 + Math.random() * 4`, `p.vy = 0`. For random X/Z: `randRange(-8, 8)`.',
               code: `function randRange(min, max) { return min + Math.random() * (max - min) }

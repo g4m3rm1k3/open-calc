@@ -33,7 +33,7 @@ const sim2_003 = {
     ],
     visualizations: [
       {
-        id: 'sim2-003-viz',
+        id: 'SimNotebook',
         title: 'The Function Plotter',
         initialProps: {
           initialCells: [
@@ -42,6 +42,10 @@ const sim2_003 = {
               id: 1,
               mode: 'html',
               cellTitle: 'World to Screen Transform',
+              prose: [
+                'A `<canvas>` lives in **screen space**: pixel `(0, 0)` is the top-left corner, and y increases *downward* as you move toward the bottom of the element. Mathematics lives in **world space**: the origin is in the center, y increases *upward*. Every graphing tool ever built has to reconcile these two coordinate systems.',
+                'The reconciliation is **linear interpolation**: `screenX = (worldX - xMin) / (xMax - xMin) * W`. Read it as: "what fraction of the way across the world domain is this point?" multiplied by the canvas width. The y formula adds a `1 - ...` to flip the axis direction. These two formulas are the entire foundation of 2D graphing.',
+              ],
               code: `// The key idea: map world coordinates to canvas pixels.
 
 app.innerHTML = \`
@@ -112,6 +116,10 @@ ctx.beginPath(); ctx.moveTo(0, oy); ctx.lineTo(W, oy); ctx.stroke()`,
               id: 2,
               mode: 'html',
               cellTitle: 'Drawing a Coordinate Grid',
+              prose: [
+                'A grid is just a set of vertical and horizontal lines at integer world coordinates. Loop `x` from `Math.ceil(xMin)` to `xMax`, convert each integer to a screen x, and draw a vertical line. Repeat for y. The `Math.ceil` ensures you start at the first whole number inside the domain — without it you might try to draw at a fractional world coordinate, which is valid but leaves partial lines at the edges.',
+                'The main axes are the same lines but drawn in a more prominent color after the grid. Drawing order matters in canvas: paint background first, then grid, then axes, then curves. Each layer sits on top of the last.',
+              ],
               code: `// A clean grid with axes, ticks, and labels.
 // This drawGrid function will be the foundation of the full plotter.
 
@@ -190,6 +198,10 @@ drawGrid()`,
               id: 3,
               mode: 'html',
               cellTitle: 'Plotting a Curve',
+              prose: [
+                'Drawing a curve is a connect-the-dots problem: sample the function at many closely-spaced x values, convert each `(worldX, worldY)` pair to `(screenX, screenY)`, and connect them with `lineTo`. If you sample at one point per pixel, the resulting path is smooth enough that no individual segment is visible.',
+                'Functions like `tan(x)` jump to `±Infinity` between every pair of asymptotes. If you let `lineTo` draw through infinity, you get a vertical line across the whole canvas — visually wrong. The fix is a `penDown` flag: when `isFinite(y)` is false, call `moveTo` on the next valid point instead of `lineTo`. This leaves a gap at the discontinuity rather than a spike.',
+              ],
               code: `// Sample f(x) at canvas-pixel resolution, convert to screen coords, connect with lineTo.
 // Notice how we handle discontinuities with moveTo.
 
@@ -275,6 +287,10 @@ ctx.fillText('tan(x)', 12, 34)`,
               id: 4,
               mode: 'html',
               cellTitle: 'The Complete Plotter',
+              prose: [
+                'The three pieces — expression evaluator, coordinate transform, and curve renderer — snap together cleanly. The `plotCurve` function takes an expression string, compiles it, calls `drawGrid()` to clear the canvas, then runs the sampling loop. Pressing Enter or clicking Plot calls `plotCurve` with whatever is in the text input.',
+                'Notice the `resize()` call before `drawGrid()`. Because the canvas is set to `width: 100%` in CSS, its CSS size and its pixel buffer size can diverge. Always set `canvas.width = canvas.offsetWidth` before reading `canvas.width` for calculations — otherwise you draw into a mismatched buffer and the image looks blurry or clipped.',
+              ],
               code: `// Everything together: input box, Plot button, grid, and plotted curve.
 // This is the function plotter — your own graphing calculator.
 
@@ -388,13 +404,16 @@ app.querySelector('#plotBtn').addEventListener('click', () => plotCurve(input.va
 input.addEventListener('keydown', e => { if (e.key === 'Enter') plotCurve(input.value) })
 plotCurve(input.value)`,
             },
-            // ── Challenge 1: Plot Label & Domain ─────────────────────────────────
+            // ── Challenge 1: Zoom Controls ────────────────────────────────────────
             {
               id: 5,
               mode: 'html',
               isChallenge: true,
               challengeTitle: 'Zoom Controls',
               difficulty: 'easy',
+              prose: [
+                'Zoom is nothing more than changing the domain and re-plotting. Zooming in halves `xMin/xMax/yMin/yMax` (everything shrinks toward zero); zooming out doubles them. The key: declare these with `let` instead of `const` so the zoom handlers can mutate them, then call `plotCurve` again after each change.',
+              ],
               prompt: 'Add "Zoom In" and "Zoom Out" buttons to the plotter. Zoom in should halve the domain (e.g. xMin/xMax from ±6 to ±3), zoom out should double it. Re-plot the current expression after zooming.',
               hint: 'Store xMin, xMax, yMin, yMax as mutable variables (let, not const). Zoom in: multiply all four by 0.5. Zoom out: multiply by 2. Then call plotCurve() again with the current expression.',
               code: `app.innerHTML = \`
@@ -491,6 +510,9 @@ plotCurve(input.value)`,
               isChallenge: true,
               challengeTitle: 'Plot Two Functions',
               difficulty: 'medium',
+              prose: [
+                'Plotting two curves on the same axes means calling `plotCurve` twice with different colors after a single `drawGrid()`. The trick is to draw the grid once and then layer both curves on top — never call `drawGrid()` between the two curve draws or the first curve disappears. For the legend, `ctx.fillRect` draws a small color swatch and `ctx.fillText` places the label beside it.',
+              ],
               prompt: 'Add a second expression input to the plotter. Plot both functions on the same graph in different colors (e.g. blue and red). Add a small color-coded legend showing f(x) and g(x) expressions.',
               hint: 'Add a second `<input id="expr2">` to the toolbar. Call `plotCurve(expr1, \'#0284c7\')` and `plotCurve(expr2, \'#dc2626\')`. For the legend, draw two small colored rectangles plus text labels using `ctx.fillRect` and `ctx.fillText`.',
               code: `app.innerHTML = \`
@@ -569,6 +591,9 @@ drawGrid()`,
               isChallenge: true,
               challengeTitle: 'Tangent Line',
               difficulty: 'hard',
+              prose: [
+                '**Numerical differentiation** approximates the slope of f at a point without needing a symbolic formula. The centered-difference formula `(f(a+h) - f(a-h)) / (2h)` with `h = 0.0001` is accurate to about 8 decimal places for smooth functions. Once you have the slope, the tangent line is just `y = f(a) + slope * (x - a)` — a line through `(a, f(a))` with the computed gradient. Plot it as a second curve in amber to see calculus come alive visually.',
+              ],
               prompt: 'Add a number input for a value `a`. After plotting f(x), also draw the tangent line to f at x=a using numerical differentiation: `f\'(a) ≈ (f(a+h) - f(a-h)) / (2h)` where h=0.0001. The tangent line is `y = f(a) + f\'(a) * (x - a)`. Draw a dot at (a, f(a)) too.',
               hint: 'Compute `slope = (fn(a+h) - fn(a-h)) / (2*h)`. The tangent line function is `tangent = x => fn(a) + slope * (x - a)`. Plot it with `plotCurve(tangent, \'#f59e0b\', 1.5)` (passing a function directly instead of a string — adjust your plotCurve to accept either).',
               code: `app.innerHTML = \`
