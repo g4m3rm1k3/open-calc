@@ -617,6 +617,8 @@ export default function AppShell({ children }) {
   const isDecompLabRoute = location.pathname.startsWith("/decomp-lab");
   const isCmmLabRoute = location.pathname.startsWith("/cmm-lab");
   const isFiveAxisRoute = location.pathname.startsWith("/five-axis");
+  const isDSAArraysLabRoute = location.pathname.startsWith("/dsa-arrays-lab");
+  const isDSALinkedListsLabRoute = location.pathname.startsWith("/dsa-linked-lists-lab");
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarPinned, setSidebarPinned] = useState(() => {
@@ -778,12 +780,14 @@ export default function AppShell({ children }) {
     isMatrix3DLabRoute ||
     isDecompLabRoute ||
     isCmmLabRoute ||
-    isFiveAxisRoute
+    isFiveAxisRoute ||
+    isDSAArraysLabRoute ||
+    isDSALinkedListsLabRoute
   ) {
     return (
       <GrapherContext.Provider value={{ openGrapher }}>
         <div
-          className={`h-screen overflow-hidden ${isArkanoidLearnRoute || isRealityRunnerRoute || isCadProRoute || isOpenCraftRoute || isStemQuestRoute || isAsteroidsRoute || isStemTetrisRoute || isCardAcademyRoute || isRubiksCubeRoute || isMatrixGameRoute || isRobotArmLabRoute || isSimLabRoute || isDroneLabRoute || isMatrixLabRoute || isMatrix3DLabRoute || isDecompLabRoute || isCmmLabRoute || isFiveAxisRoute ? "bg-[#08111f]" : "bg-white dark:bg-slate-950"}`}
+          className={`h-screen overflow-hidden ${isArkanoidLearnRoute || isRealityRunnerRoute || isCadProRoute || isOpenCraftRoute || isStemQuestRoute || isAsteroidsRoute || isStemTetrisRoute || isCardAcademyRoute || isRubiksCubeRoute || isMatrixGameRoute || isRobotArmLabRoute || isSimLabRoute || isDroneLabRoute || isMatrixLabRoute || isMatrix3DLabRoute || isDecompLabRoute || isCmmLabRoute || isFiveAxisRoute || isDSAArraysLabRoute || isDSALinkedListsLabRoute ? "bg-[#08111f]" : "bg-white dark:bg-slate-950"}`}
         >
           <div className="h-full w-full overflow-hidden">
             {children ?? <Outlet />}

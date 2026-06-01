@@ -1297,6 +1297,16 @@ print(fig.show())`,
 
   examples: [],
 
+  tools: [
+    {
+      id: 'dsa-linked-lists-lab',
+      type: 'lab',
+      title: 'Linked Lists — Interactive Lab',
+      description: 'Full hacker-workstation DSA lab: build nodes, prepend/append, delete, reverse, and cycle detection with animated pointer visualization and step tracer. JS + Python dual-language.',
+      href: '/dsa-linked-lists-lab',
+    },
+  ],
+
   challenges: [
     {
       id: 'dsa1-002-c1',

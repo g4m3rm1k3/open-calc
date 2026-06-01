@@ -8,6 +8,7 @@
  * Mathematics starts open; Formal Proof starts collapsed ("prove it when ready").
  */
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import VizFrame from "../viz/VizFrame.jsx";
 import Callout from "../ui/Callout.jsx";
 import StepThrough from "./StepThrough.jsx";
@@ -1139,6 +1140,39 @@ export default function MicroCycleLesson({ lesson }) {
               borderColor="border-brand-200 dark:border-brand-900/60"
             />
           ))}
+        </div>
+      )}
+      {lesson.tools?.length > 0 && (
+        <div className="mt-12">
+          <SectionDivider icon="🧪" label="Interactive Labs" color="brand" />
+          <div className="grid gap-4 sm:grid-cols-2">
+            {lesson.tools.map((tool) => (
+              <Link
+                key={tool.id}
+                to={tool.href}
+                className="group block rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 transition-all"
+              >
+                <div className="flex items-start justify-between gap-3 mb-3">
+                  <span className="text-2xl">🧪</span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                    Lab
+                  </span>
+                </div>
+                <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm mb-1 leading-snug group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                  {tool.title}
+                </h3>
+                {tool.description && (
+                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4">
+                    {tool.description}
+                  </p>
+                )}
+                <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 group-hover:gap-2.5 transition-all">
+                  Launch Lab
+                  <span className="transition-transform group-hover:translate-x-0.5">→</span>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       )}
     </div>

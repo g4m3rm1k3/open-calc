@@ -802,4 +802,14 @@ print(da)          # DA[20, 99, 30, 40, 50]`,
       hint: '_resize() should allocate a new list of double the capacity and copy all self._size elements into it. append() calls _resize() when self._size == self._cap. insert() shifts right before placing. delete() shifts left after removing.',
     },
   ],
+
+  tools: [
+    {
+      id: 'dsa-arrays-lab',
+      type: 'lab',
+      title: 'Arrays & Memory — Interactive Lab',
+      description: 'Full hacker-workstation DSA lab: implement get, insert, delete, linear search, and binary search with live memory visualization and step tracer. JS + Python dual-language.',
+      href: '/dsa-arrays-lab',
+    },
+  ],
 };
