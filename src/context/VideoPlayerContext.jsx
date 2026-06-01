@@ -1,7 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
 import { VideoPlayerContext } from "./videoPlayerContext.js";
-import { VIDEO_PLACEMENT_MAP } from "../content/videos/videoPlacementMap.js";
-import { VIDEO_DATABASE } from "../content/videos/videoDatabase.js";
 import { selectVideosByKeywords } from "../content/videos/videoSelector.js";
 import { ALL_LESSONS } from "../content/index.js";
 
@@ -101,26 +99,12 @@ export function VideoPlayerProvider({ children }) {
       return;
     }
 
-    const placement = VIDEO_PLACEMENT_MAP[lessonId];
-    if (placement) {
-      const firstSec = ["hook", "intuition", "math", "rigor"].find(
-        (s) => placement[s]?.length > 0,
-      );
-      if (firstSec) {
-        const vidId = placement[firstSec][0];
-        const video = VIDEO_DATABASE[vidId];
-        if (video) {
-          setCurrentVideo(video);
-          return;
-        }
-      }
-    }
-
-    // No explicit placement — fall back to tag-based matching
     const lesson = ALL_LESSONS.find((l) => l.id === lessonId);
     const tags = lesson?.tags ?? [];
-    if (tags.length > 0) {
-      const matched = selectVideosByKeywords({ keywords: tags, limit: 1 });
+    const courseWords = (lesson?.course ?? '').replace(/-\d+$/, '').split('-').filter(Boolean);
+    const keywords = [...new Set([...tags, ...courseWords])];
+    if (keywords.length > 0) {
+      const matched = selectVideosByKeywords({ keywords, limit: 1 });
       if (matched[0]) {
         setCurrentVideo(matched[0]);
         return;

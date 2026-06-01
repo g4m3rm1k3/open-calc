@@ -1,60 +1,13 @@
-import { VIDEO_DATABASE } from './videoDatabase.js';
-import { VIDEO_PLACEMENT_MAP } from './videoPlacementMap.js';
+import { selectVideosByKeywords } from './videoSelector.js';
 
 /**
- * Utility to fetch and format videos for a lesson and section.
- * 
- * @param {string} lessonId - Unique identifier for the lesson (e.g. 'ch2-002b')
- * @param {string} section - One of 'hook', 'intuition', 'math', 'rigor'
- * @param {string} exampleId - Optional ID for a specific example
- * 
- * @returns {Array|null} - Array of video objects or null if none found
+ * Returns videos for a lesson using tag-based matching.
+ * @param {string} lessonId - lesson id (used to look up tags from ALL_LESSONS)
+ * @param {string[]} tags - lesson tags
+ * @param {number} limit
  */
-export function getVideosForLesson(lessonId, section, exampleId = null) {
-  if (!lessonId) return null;
-
-  const placement = VIDEO_PLACEMENT_MAP[lessonId];
-  if (!placement) return null;
-
-  let videoIds = [];
-  if (exampleId && placement.examples && placement.examples[exampleId]) {
-    videoIds = placement.examples[exampleId];
-  } else if (placement[section]) {
-    videoIds = placement[section];
-  }
-
-  if (!videoIds || videoIds.length === 0) return null;
-
-  // Map IDs to full metadata from the database
-  return videoIds
-    .map((vidId) => VIDEO_DATABASE[vidId])
-    .filter(Boolean); // Filter out missing videos
-}
-
-/**
- * Formats video list into a compatible visualization object.
- * 
- * @param {Array} videos - Array of video objects from getVideosForLesson
- * @param {string} lessonId - Current lesson context
- * @returns {Object|null} - Visualization object for VizFrame
- */
-// NOTE: This function always returns null — inline video injection is disabled.
-// Videos are only accessible through FloatingVideoPlayer. The body below is
-// dead code kept for future reference. Do not call this function for new work.
-export function formatAsVisualization(videos, lessonId) {
-  return null;
-  if (!videos || videos.length === 0) return null;
-
-  return {
-    id: 'VideoLauncher',
-    title: 'Video Tutorial',
-    props: {
-      lessonId,
-      videos: videos.map((v) => ({
-        url: v.url,
-        title: v.title,
-        source: v.source,
-      })),
-    },
-  };
+export function getVideosForLesson(tags = [], limit = 15) {
+  if (!tags.length) return null;
+  const results = selectVideosByKeywords({ keywords: tags, limit });
+  return results.length > 0 ? results : null;
 }

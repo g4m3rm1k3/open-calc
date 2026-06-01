@@ -21,9 +21,7 @@ import {
   GripVertical,
 } from "lucide-react";
 import { useVideoPlayer } from "../../hooks/useVideoPlayer.js";
-import { VIDEO_PLACEMENT_MAP } from "../../content/videos/videoPlacementMap.js";
-import { VIDEO_DATABASE } from "../../content/videos/videoDatabase.js";
-import { selectVideosByKeywords } from "../../content/videos/videoSelector.js";
+import { selectVideosByKeywords, VIDEO_MAP, VIDEO_LIBRARY } from "../../content/videos/videoSelector.js";
 import { CURRICULUM, ALL_LESSONS } from "../../content/index.js";
 
 import { useNavigate } from "react-router-dom";
@@ -197,36 +195,14 @@ export default function FloatingVideoPlayer() {
     const categorized = {};
     if (custom.length > 0) categorized["Your Videos"] = custom;
 
-    const placement = VIDEO_PLACEMENT_MAP[id];
-    if (placement) {
-      // Explicit placement map override
-      if (Array.isArray(placement)) {
-        const vids = placement
-          .map((vidId) => ({ ...VIDEO_DATABASE[vidId], id: vidId }))
-          .filter((v) => v.url);
-        if (vids.length > 0) categorized["intuition"] = vids;
-      } else {
-        ["hook", "intuition", "math", "rigor", "examples"].forEach(
-          (section) => {
-            const ids =
-              section === "examples"
-                ? Object.values(placement[section] || {}).flat()
-                : placement[section] || [];
-            const vids = ids
-              .map((vidId) => ({ ...VIDEO_DATABASE[vidId], id: vidId }))
-              .filter((v) => v.url);
-            if (vids.length > 0) categorized[section] = vids;
-          },
-        );
-      }
-    } else {
-      // No explicit placement — match by lesson tags
-      const lesson = ALL_LESSONS.find((l) => l.id === id);
-      const tags = lesson?.tags ?? [];
-      if (tags.length > 0) {
-        const matched = selectVideosByKeywords({ keywords: tags, limit: 15 });
-        if (matched.length > 0) categorized["Related"] = matched;
-      }
+    const lesson = ALL_LESSONS.find((l) => l.id === id);
+    const tags = lesson?.tags ?? [];
+    // Derive subject keywords from the course slug (e.g. "python-1" → ["python"])
+    const courseWords = (lesson?.course ?? '').replace(/-\d+$/, '').split('-').filter(Boolean);
+    const keywords = [...new Set([...tags, ...courseWords])];
+    if (keywords.length > 0) {
+      const matched = selectVideosByKeywords({ keywords, limit: 20 });
+      if (matched.length > 0) categorized["Related"] = matched;
     }
 
     return Object.keys(categorized).length > 0 ? categorized : null;
@@ -251,26 +227,7 @@ export default function FloatingVideoPlayer() {
           (ch) => ch.course === course.id,
         );
         return courseChapters.some((ch) =>
-          ch.lessons.some((l) => {
-            const placement = VIDEO_PLACEMENT_MAP[l.id];
-            if (placement) {
-              if (Array.isArray(placement)) return placement.length > 0;
-              const hasRegularVids = [
-                "hook",
-                "intuition",
-                "math",
-                "rigor",
-              ].some((s) => placement[s]?.length > 0);
-              const hasExampleVids =
-                placement.examples &&
-                Object.values(placement.examples).some(
-                  (exList) => exList?.length > 0,
-                );
-              if (hasRegularVids || hasExampleVids) return true;
-            }
-            // Also include if lesson has tags that can drive tag-based matching
-            return (l.tags?.length ?? 0) > 0;
-          }),
+          ch.lessons.some((l) => (l.tags?.length ?? 0) > 0),
         );
       });
   }, []);
@@ -315,57 +272,30 @@ export default function FloatingVideoPlayer() {
 
   const allFilteredVideos = useMemo(() => {
     if (!searchQuery) return [];
-    const list = Object.entries(VIDEO_DATABASE).map(([id, meta]) => ({
-      ...meta,
-      id,
-    }));
-    Object.values(customVideos)
-      .flat()
-      .forEach((cv) => list.push(cv));
-    return list.filter(
+    const q = searchQuery.toLowerCase();
+    const fromLibrary = VIDEO_LIBRARY.filter(
       (v) =>
-        v.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        v.source?.toLowerCase().includes(searchQuery.toLowerCase()),
+        v.title?.toLowerCase().includes(q) ||
+        v.source?.toLowerCase().includes(q) ||
+        (v.tags || []).some((t) => t.toLowerCase().includes(q)),
+    ).slice(0, 50);
+    const fromCustom = Object.values(customVideos).flat().filter(
+      (cv) =>
+        cv.title?.toLowerCase().includes(q) ||
+        cv.source?.toLowerCase().includes(q),
     );
+    return [...fromLibrary, ...fromCustom];
   }, [searchQuery, customVideos]);
 
-  const getLessonInfo = (vidId) => {
-    const lessonId = Object.entries(VIDEO_PLACEMENT_MAP).find(
-      ([lId, sections]) => {
-        return Object.entries(sections).some(([sectionKey, content]) => {
-          if (sectionKey === "examples") {
-            return Object.values(content).flat().includes(vidId);
-          }
-          return Array.isArray(content) && content.includes(vidId);
-        });
-      },
-    )?.[0];
-
-    if (!lessonId) return null;
-    const lesson = ALL_LESSONS.find((l) => l.id === lessonId);
-    if (!lesson) return null;
-    return { id: lessonId, title: lesson.title, chapter: lesson.chapterNumber };
-  };
-
   const handleSearchSelect = (vid) => {
-    const info = getLessonInfo(vid.id);
     selectVideo(vid);
-    if (info) {
-      setLessonId(info.id);
-      setNavStack(["playlist"]);
-    }
     setSearchQuery("");
   };
 
   const handlePinnedSelect = (vidId) => {
-    const vid = VIDEO_DATABASE[vidId];
+    const vid = VIDEO_MAP[vidId];
     if (vid) {
       selectVideo({ ...vid, id: vidId });
-      const info = getLessonInfo(vidId);
-      if (info) {
-        setLessonId(info.id);
-        setNavStack(["playlist"]);
-      }
     }
   };
 
@@ -663,7 +593,6 @@ export default function FloatingVideoPlayer() {
                 {searchQuery ? (
                   <div className="space-y-1">
                     {allFilteredVideos.map((vid) => {
-                      const lessonInfo = getLessonInfo(vid.id);
                       return (
                         <VideoRow
                           key={vid.id}
@@ -809,7 +738,7 @@ export default function FloatingVideoPlayer() {
                             </p>
                             <div className="space-y-1">
                               {pinnedVideos.map((vidId) => {
-                                const vid = VIDEO_DATABASE[vidId];
+                                const vid = VIDEO_MAP[vidId];
                                 if (!vid) return null;
                                 return (
                                   <VideoRow

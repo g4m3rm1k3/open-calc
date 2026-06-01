@@ -193,6 +193,7 @@ export const ALL_LESSONS = CURRICULUM.flatMap((ch) =>
     ...l,
     chapterNumber: ch.number,
     chapterTitle: ch.title,
+    course: l.course ?? ch.course,
   })),
 );
 

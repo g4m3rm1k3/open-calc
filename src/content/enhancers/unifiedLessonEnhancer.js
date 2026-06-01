@@ -1,8 +1,4 @@
 import { pickTopicMissionPack } from "./topicMissionPlaybook.js";
-import {
-  getVideosForLesson,
-  formatAsVisualization,
-} from "../videos/VideoProvider.js";
 
 const REAL_WORLD_LIBRARY = {
   limits:
@@ -151,17 +147,9 @@ export function enhanceExamples(examples, lessonId) {
   return safeExamples.map((example) => {
     const steps = ensureArray(example.steps);
 
-    // Inject Videos into Example
-    const videos = getVideosForLesson(lessonId, "examples", example.id);
-    const viz = formatAsVisualization(videos, lessonId);
-    const visualizations = ensureArray(example.visualizations);
-    if (viz) {
-      visualizations.unshift(viz);
-    }
-
     const enhancedExample = {
       ...example,
-      visualizations,
+      visualizations: ensureArray(example.visualizations),
     };
 
     if (steps.length === 0) return enhancedExample;
@@ -196,19 +184,6 @@ export function enhanceLessonForUnifiedLearning(lesson) {
   const math = ensureSection(lesson.math);
   const rigor = ensureSection(lesson.rigor);
   const hook = ensureHook(lesson, topicMessage);
-
-  // Inject Videos
-  const sections = ["hook", "intuition", "math", "rigor"];
-  const dataMap = { hook, intuition, math, rigor };
-
-  sections.forEach((s) => {
-    const videos = getVideosForLesson(lesson.id, s);
-    const viz = formatAsVisualization(videos, lesson.id);
-    if (viz) {
-      if (!dataMap[s].visualizations) dataMap[s].visualizations = [];
-      dataMap[s].visualizations.unshift(viz); // Add to the front
-    }
-  });
 
   addConnectorCallouts(intuition, math, rigor, topicMessage);
 

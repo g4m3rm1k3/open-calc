@@ -1,18 +1,17 @@
-import { VIDEO_DATABASE } from "../../../content/videos/videoDatabase.js";
+import { VIDEO_MAP, selectVideosByKeywords } from "../../../content/videos/videoSelector.js";
 
 export default function VideoEmbed({ params, url: rootUrl, title: rootTitle, videoId: rootVideoId }) {
   const videoId = rootVideoId || params?.videoId;
   const title = rootTitle || params?.title;
   let src = rootUrl || params?.url;
 
-  // If no URL but we have a videoId or title, look it up in the database
+  // If no URL but we have a videoId or title, look it up
   if (!src) {
-    if (videoId && VIDEO_DATABASE[videoId]) {
-      src = VIDEO_DATABASE[videoId].url;
+    if (videoId && VIDEO_MAP[videoId]) {
+      src = VIDEO_MAP[videoId].url;
     } else if (title) {
-      // Fallback: search by title string
-      const entry = Object.values(VIDEO_DATABASE).find(v => v.title === title);
-      if (entry) src = entry.url;
+      const matched = selectVideosByKeywords({ keywords: title.split(' '), limit: 1 });
+      if (matched[0]) src = matched[0].url;
     }
   }
 

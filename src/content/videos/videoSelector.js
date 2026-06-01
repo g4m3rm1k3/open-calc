@@ -1,4 +1,10 @@
-import { VIDEO_LIBRARY } from './videoLibrary.generated.js'
+import VIDEO_LIBRARY_RAW from '../../../reports/video-library-seed.json'
+
+// Filter out entries without a URL
+export const VIDEO_LIBRARY = VIDEO_LIBRARY_RAW.filter((v) => !!v.url)
+
+// O(1) lookup by video id
+export const VIDEO_MAP = Object.fromEntries(VIDEO_LIBRARY.map((v) => [v.id, v]))
 
 function normalize(text) {
   return String(text || '')
@@ -9,7 +15,12 @@ function normalize(text) {
 }
 
 function scoreVideo(video, keywords) {
-  const hay = new Set([...(video.keywords || []), ...normalize(video.title), ...normalize(video.source), ...normalize((video.tags || []).join(' '))])
+  const hay = new Set([
+    ...(video.keywords || []),
+    ...(video.tags || []),
+    ...normalize(video.title),
+    ...normalize(video.source),
+  ])
   let score = 0
   for (const kw of keywords) {
     if (hay.has(kw)) score += 3
@@ -38,35 +49,10 @@ export function selectVideosByKeywords({
     pool = pool.filter((v) => !ex.has(v.source))
   }
 
-  const ranked = pool
+  return pool
     .map((v) => ({ v, score: scoreVideo(v, k) }))
     .filter((x) => x.score > 0)
     .sort((a, b) => b.score - a.score)
     .slice(0, limit)
     .map((x) => x.v)
-
-  return ranked
-}
-
-export function toVideoEmbedBlock(video, title = null) {
-  return {
-    type: 'viz',
-    id: 'VideoEmbed',
-    title: title || video.title || 'Video',
-    props: { url: video.url },
-  }
-}
-
-export function toVideoCarouselBlock(videos, title = 'Related Videos') {
-  return {
-    type: 'viz',
-    id: 'VideoCarousel',
-    title,
-    props: {
-      videos: videos.map((v) => ({
-        title: v.title,
-        url: v.url,
-      })),
-    },
-  }
 }
