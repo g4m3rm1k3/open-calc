@@ -134,7 +134,7 @@ const APPLIED_STATS_CURRICULUM = appliedStatistics.map((ch) => ({
   ...ch,
   course: "applied-statistics",
 }));
-const AI_ENGINEERING_CURRICULUM = [...aiEngineering0, ...aiEngineering1, ...aiEngineering11, ...aiEngineering2].map(
+const AI_ENGINEERING_CURRICULUM = [...aiEngineering0, ...aiEngineering1, ...aiEngineering2, ...aiEngineering11].map(
   (ch) => ({ ...ch, course: "ai-engineering" }),
 );
 const SIM1_CURRICULUM = sim1.map((ch) => ({ ...ch, course: "sim-1" }));

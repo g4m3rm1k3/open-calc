@@ -1067,6 +1067,12 @@ export default function PythonNotebook({ params, onParamChange }) {
 
         let testFeedback = null;
 
+        // Inject last expression result as `_` so test code can reference it
+        // (mirrors Python REPL behaviour where _ holds the last expression value)
+        try {
+          pyodide.globals.set('_', result ?? null);
+        } catch { /* ignore if result is not a transferable type */ }
+
         // 2. Run test code if provided
         if (cell.testCode) {
           try {
