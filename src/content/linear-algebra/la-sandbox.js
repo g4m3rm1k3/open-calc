@@ -1,7 +1,7 @@
 export default {
   id: 'la8-001',
   slug: 'numpy-scipy-intro',
-  chapter: 'la8',
+  chapter: 'la5',
   order: 1,
   title: 'Introduction to NumPy & SciPy for Linear Algebra',
   subtitle: 'The same math you have learned — now automated with the tools used at NASA, Google, and every data science team.',

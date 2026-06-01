@@ -41,7 +41,32 @@ export default {
         },
         title: 'Variable Logic Lab',
         caption: 'Look at the "MACROS" tab on the control panel. When the program runs, you\'ll see #100 and #101 light up. Try changing #100 from 3.0 to 1.0 and hit Run.'
-      }
+      },
+      {
+        id: 'GcodeNotebook',
+        initialProps: {
+          dialect: 'fanuc',
+          initialCells: [
+            {
+              id: 'vars-1',
+              label: '1 — Assign & Recall',
+              code: '; Assign variables then use them in coordinates\nG21 G90 G54\n#100 = 50.0   (width)\n#101 = 30.0   (height)\n#102 = 0.0    (start X)\n\nG0 X#102 Y0 Z5\nG1 Z-1 F300\nG1 X[#102 + #100] F200  ; use expression in coordinate\nG1 Y#101\nG1 X#102\nG1 Y0\nG0 Z5\nM30\n',
+            },
+            {
+              id: 'vars-2',
+              label: '2 — Arithmetic',
+              code: '; Arithmetic in variables — change #100 and watch results adapt\nG21 G90 G54\n#100 = 40.0        (base length)\n#101 = #100 / 2    (half-width = 20.0)\n#102 = #100 * 1.5  (1.5x width = 60.0)\n\nG0 X0 Y0 Z5\nG1 Z-1 F300\nG1 X#101 F200       ; cut to half-width\nG1 X#100            ; cut to full width\nG1 X#102            ; cut to 1.5x width\nG0 Z5\nM30\n',
+            },
+            {
+              id: 'vars-3',
+              label: '3 — Trig (bolt circle preview)',
+              code: '; Calculate X/Y using SIN/COS — one step of a bolt circle\nG21 G90 G54\n#100 = 25.0   (radius)\n#101 = 45.0   (angle, degrees)\n\n#110 = #100 * COS[#101]   ; X = 17.678\n#111 = #100 * SIN[#101]   ; Y = 17.678\n\nG0 X0 Y0 Z5\nG1 Z-2 F300\nG1 X#110 Y#111 F200   ; move to calculated position\nG0 Z5\nM30\n',
+            },
+          ],
+        },
+        title: 'Macro Variables — Interactive Notebook',
+        caption: 'Edit cells and run. Watch the Variables tab to see #100, #101, etc. update in real time. Start with cell 1 (Run ↑), then add cells 2 and 3 to see arithmetic and trig in action.',
+      },
     ],
     prose: [
       'A variable is just a "Named Pocket". Instead of hard-coding X1.5, we use a placeholder: `X#100`. The machine looks into pocket #100, sees what\'s inside, and uses it.',

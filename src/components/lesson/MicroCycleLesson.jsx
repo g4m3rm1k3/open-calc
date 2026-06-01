@@ -925,7 +925,7 @@ function SpiralBlock({ spiral }) {
 // ─── ✅ Assessment block ──────────────────────────────────────────────────────
 
 // Notebook IDs that should render in the labs section (after examples), not inside Math/Rigor
-const LAB_VIZ_IDS = new Set(["PythonNotebook", "OpenMatNotebook"]);
+const LAB_VIZ_IDS = new Set(["PythonNotebook", "OpenMatNotebook", "GcodeNotebook"]);
 
 function extractLabVizzes(section) {
   if (!section?.visualizations?.length) return { section, labs: [] };

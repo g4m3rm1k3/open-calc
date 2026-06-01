@@ -1,7 +1,7 @@
 export default {
   id: 'p1-ch2-012',
   slug: 'free-fall-basics',
-  chapter: 'p1',
+  chapter: 'p2',
   order: 12,
   title: "Free Fall — Basics",
   subtitle: "Near Earth's surface, all objects fall with the same acceleration: g ≈ 9.8 m/s².",

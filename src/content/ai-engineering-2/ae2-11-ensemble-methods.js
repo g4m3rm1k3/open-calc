@@ -1,7 +1,7 @@
 const lesson = {
   id: 'ae2-11',
   slug: 'ensemble-methods',
-  chapter: 'ML Fundamentals',
+  chapter: 'ae-p2',
   order: 10,
   title: 'Ensemble Methods',
   subtitle: 'Combine weak learners into a model stronger than any individual',

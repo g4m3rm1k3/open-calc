@@ -40,7 +40,32 @@ export default {
         },
         title: 'Logic & Loop Lab',
         caption: 'Hit "AUTO" and watch the tool. The machine repeats the rectangle path, but each time the counter (#100) increases, the Y-position changes. The WHILE loop automates the repetition.'
-      }
+      },
+      {
+        id: 'GcodeNotebook',
+        initialProps: {
+          dialect: 'fanuc',
+          initialCells: [
+            {
+              id: 'logic-1',
+              label: '1 — IF-THEN branch',
+              code: '; Conditional branch: only cut if #100 is big enough\nG21 G90 G54\n#100 = 35.0    (length — change to 10 to skip the cut)\n\nIF [#100 LT 20.0] GOTO 99   ; skip if too small\n\nG0 X0 Y0 Z5\nG1 Z-1 F300\nG1 X#100 F200               ; cut only runs if #100 >= 20\nG0 Z5\n\nN99 M30\n',
+            },
+            {
+              id: 'logic-2',
+              label: '2 — WHILE counter loop',
+              code: '; WHILE loop: drill a row of 5 holes spaced 10 mm apart\nG21 G90 G54\n#100 = 0        (hole counter)\n#101 = 0.0      (current X position)\n\nG0 Z5\n\nWHILE [#100 LT 5] DO 1\n  G0 X#101 Y0\n  G1 Z-3 F200      (drill)\n  G0 Z5\n  #101 = #101 + 10  (advance X by 10 mm)\n  #100 = #100 + 1   (increment counter)\nEND 1\n\nM30\n',
+            },
+            {
+              id: 'logic-3',
+              label: '3 — Nested loops (grid of holes)',
+              code: '; Nested loops: 4×3 grid of holes (4 columns, 3 rows)\nG21 G90 G54\n#100 = 0    (row counter)\n\nWHILE [#100 LT 3] DO 1\n  #101 = 0   (reset column counter each row)\n  WHILE [#101 LT 4] DO 2\n    G0 X[#101 * 15] Y[#100 * 15]\n    G1 Z-3 F200\n    G0 Z5\n    #101 = #101 + 1\n  END 2\n  #100 = #100 + 1\nEND 1\n\nM30\n',
+            },
+          ],
+        },
+        title: 'Logic & Loops — Interactive Notebook',
+        caption: 'Run each cell in sequence. The Trace shows the toolpath that results from the logic. The Variables tab shows the counter values after each run. Try changing the loop limit in cell 2 from 5 to 8 — watch the trace extend.',
+      },
     ],
     prose: [
       'A standard G-code program is a "Straight Line". It starts at the top and goes to the bottom. **Logic** turns it into a "Tree". It can branch (IF) or circle back (WHILE).',

@@ -1,7 +1,7 @@
 export default {
   id: 'p1-ch2-013',
   slug: 'free-fall-symmetry',
-  chapter: 'p1',
+  chapter: 'p2',
   order: 13,
   title: "Free Fall Symmetry",
   subtitle: "In ideal free fall, ascent and descent mirror each other about the apex.",

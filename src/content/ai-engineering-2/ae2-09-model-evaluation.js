@@ -1,7 +1,7 @@
 const lesson = {
   id: 'ae2-09',
   slug: 'model-evaluation',
-  chapter: 'ML Fundamentals',
+  chapter: 'ae-p2',
   order: 8,
   title: 'Model Evaluation & Validation',
   subtitle: 'Know exactly how well your model will perform before it hits production',

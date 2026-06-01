@@ -10,7 +10,7 @@ const VIZ_REGISTRY = {
   ErrorAccumulationLab: lazy(() => import("./cnc/ErrorAccumulationLab.jsx")),
   CNCBackplot: lazy(() => import("./cnc/CNCBackplot.jsx")),
   CNCMacroLab: lazy(() => import("./cnc/CNCMacroLab.jsx")),
-  CNCAxesExplorer: lazy(() => import("./cnc/CNCAxesExplorer.jsx")),
+  GcodeNotebook: lazy(() => import("./cnc/GcodeNotebook.jsx")),  CNCAxesExplorer: lazy(() => import("./cnc/CNCAxesExplorer.jsx")),
   CNCChainDiagram: lazy(() => import("./cnc/CNCChainDiagram.jsx")),
   CNCClosedLoopSim: lazy(() => import("./cnc/CNCClosedLoopSim.jsx")),
   CNCDialectTable: lazy(() => import("./cnc/CNCDialectTable.jsx")),

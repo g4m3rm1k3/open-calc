@@ -1,7 +1,7 @@
 const lesson = {
   id: 'ae2-10',
   slug: 'bias-variance-tradeoff',
-  chapter: 'ML Fundamentals',
+  chapter: 'ae-p2',
   order: 9,
   title: 'The Bias-Variance Tradeoff',
   subtitle: 'Every model error has a source — learn to diagnose which one is hurting you',

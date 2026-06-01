@@ -1,7 +1,7 @@
 const lesson = {
   id: 'ae2-12',
   slug: 'hyperparameter-tuning',
-  chapter: 'ML Fundamentals',
+  chapter: 'ae-p2',
   order: 11,
   title: 'Hyperparameter Tuning',
   subtitle: 'Find the right knobs to turn — and turn them efficiently',
@@ -287,7 +287,7 @@ configs = [(10**rng.uniform(-3, 0), rng.integers(2, 9)) for _ in range(n_configs
         'Bias and variance in the surrogate model',
       ],
       answer: 'Exploitation (searching near known good points) and exploration (searching uncertain regions)',
-      hints: ['EI = σ·(z·Φ(z) + φ(z)). When σ is high (uncertain region), EI is high even if μ isn't great — that\'s exploration.'],
+      hints: ['EI = σ·(z·Φ(z) + φ(z)). When σ is high (uncertain region), EI is high even if μ isn\'t great — that\'s exploration.'],
       reviewSection: 'intuition',
     },
     {

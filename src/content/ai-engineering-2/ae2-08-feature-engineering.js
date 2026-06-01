@@ -1,7 +1,7 @@
 const lesson = {
   id: 'ae2-08',
   slug: 'feature-engineering',
-  chapter: 'ML Fundamentals',
+  chapter: 'ae-p2',
   order: 7,
   title: 'Feature Engineering & Selection',
   subtitle: 'Transform raw data into signals that models can actually learn from',

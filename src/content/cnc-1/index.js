@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════
-// CNC MACRO SYSTEMS — Full Curriculum (28 lessons)
+// CNC MACRO SYSTEMS — Full Curriculum (31 lessons)
 // Fanuc-first. Complete beginner → Macro B parametric programming.
 // Both metric and imperial throughout.
 // ═══════════════════════════════════════════════════════════════
@@ -49,6 +49,11 @@ import parametricProgramming from './25-parametric-programming.js' // order 26
 import lookaheadSmoothing from './26-lookahead-smoothing.js'   // order 27
 import controllerDialects from './09-controller-dialects.js'   // order 28
 
+// ── Part 9: Masterclass — Tooling, Workholding & Setup ───────
+import toolingFundamentals from './29-tooling-fundamentals.js'
+import workholding         from './30-workholding.js'
+import setupAndProbing     from './31-setup-and-probing.js'
+
 export default {
   id: 'cnc-1',
   number: 'cnc-1',
@@ -58,7 +63,8 @@ export default {
     'Master the language and logic of the machine — from first principles. ' +
     'What CNC is, how axes and units work, the grammar of G-code, modal state machines, ' +
     'motion, tooling, and Fanuc Macro B parametric programming. ' +
-    'Metric and imperial throughout. Fanuc-first with dialect notes for Siemens and Okuma.',
+    'Metric and imperial throughout. Fanuc-first with dialect notes for Siemens and Okuma. ' +
+    'Includes masterclass lessons on tooling fundamentals, workholding, and setup & probing.',
   color: 'slate',
   lessons: [
     // Part 1 — Foundations
@@ -105,5 +111,10 @@ export default {
     // Part 8 — Advanced Topics
     lookaheadSmoothing,
     controllerDialects,
+
+    // Part 9 — Masterclass: Tooling, Workholding & Setup
+    toolingFundamentals,
+    workholding,
+    setupAndProbing,
   ],
 }

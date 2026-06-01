@@ -1,7 +1,7 @@
 export default {
   id: 'p1-ch2-016',
   slug: 'free-fall-downward-throw',
-  chapter: 'p1',
+  chapter: 'p2',
   order: 16,
   title: "Free Fall: Downward Throw",
   subtitle: "When initial velocity is downward, gravity compounds the speed increase from the very start.",

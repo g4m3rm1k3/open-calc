@@ -1,7 +1,7 @@
 export default {
   id: 'p1-ch2-011',
   slug: 'two-phase-motion',
-  chapter: 'p1',
+  chapter: 'p2',
   order: 11,
   title: "Two-Phase Motion Problems",
   subtitle: "Carry the final state of phase 1 into the initial state of phase 2.",

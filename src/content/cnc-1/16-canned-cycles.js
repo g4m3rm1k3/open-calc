@@ -225,7 +225,32 @@ drawScene(initZ);
         },
         title: 'G81 Drill Cycle Lab',
         caption: 'Watch how the single G81 line sets up the cycle, and then each XY coordinate triggers a complete drill cycle automatically. The G80 at the end cancels the cycle — without it, the next XY rapid move would trigger a drill cycle at that position!',
-      }
+      },
+      {
+        id: 'GcodeNotebook',
+        initialProps: {
+          dialect: 'fanuc',
+          initialCells: [
+            {
+              id: 'cc-1',
+              label: '1 — G81 Simple Drill',
+              code: '; G81 — simple drill, 4 holes in a row\nG21 G90 G54\nS1200 M3\nG0 X0 Y0 Z5\n\n; Activate cycle: Z depth, R-plane, feedrate\nG99 G81 Z-15.0 R2.0 F80\n\n; Each XY triggers one complete drill cycle\nX10.0 Y20.0\nX30.0\nX50.0\nX70.0\n\nG80          ; CANCEL canned cycle\nG0 Z10\nM30\n',
+            },
+            {
+              id: 'cc-2',
+              label: '2 — G83 Peck Drill',
+              code: '; G83 peck drill — 4 holes, 5 mm peck increment\n; Use for holes deeper than 3x drill diameter\nG21 G90 G54\nS800 M3\nG0 X0 Y0 Z5\n\nG99 G83 Z-30.0 R2.0 Q5.0 F60\n;       ^depth  ^R-plane ^peck\n\nX10.0 Y20.0\nX30.0\nX50.0\n\nG80\nG0 Z10\nM30\n',
+            },
+            {
+              id: 'cc-3',
+              label: '3 — Macro bolt circle',
+              code: '; 6-hole bolt circle using WHILE + canned cycle\n; Radius = 30 mm, holes evenly spaced\nG21 G90 G54\nS1200 M3\nG0 X0 Y0 Z5\n\n#100 = 0        (hole index)\n#101 = 30.0     (bolt circle radius)\n#102 = 60.0     (degrees between holes = 360/6)\n\nG99 G81 Z-12.0 R2.0 F80\n\nWHILE [#100 LT 6] DO 1\n  #103 = #100 * #102           (angle for this hole)\n  X[#101 * COS[#103]] Y[#101 * SIN[#103]]\n  #100 = #100 + 1\nEND 1\n\nG80\nG0 Z10\nM30\n',
+            },
+          ],
+        },
+        title: 'Canned Cycles — Notebook Lab',
+        caption: 'Cell 1: watch G81 fire a complete drill cycle per XY position. Cell 2: compare G83 peck drilling — notice multiple Z retract moves per hole. Cell 3: combine G81 with a macro WHILE loop to automatically position 6 holes on a bolt circle.',
+      },
     ],
     prose: [
       '**What a Canned Cycle Is**: A canned cycle is a stored subroutine inside the controller firmware. When you activate G81, you are telling the controller: "At every XY position I give you, execute this sequence: (1) rapid to R-plane, (2) feed to Z depth, (3) rapid retract." You define the parameters once; the cycle executes them automatically at each position.',

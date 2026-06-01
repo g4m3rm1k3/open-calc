@@ -140,7 +140,7 @@ function getSectionVizzes(section) {
   return vizzes.filter((v) => { const key = `${v.id}:${JSON.stringify(v.initialProps ?? v.props ?? {})}`; if (seen.has(key)) return false; seen.add(key); return true; });
 }
 
-const LAB_VIZ_IDS = new Set(["PythonNotebook", "OpenMatNotebook"]);
+const LAB_VIZ_IDS = new Set(["PythonNotebook", "OpenMatNotebook", "GcodeNotebook"]);
 
 function extractLabVizzes(section) {
   if (!section?.visualizations?.length) return { section, labs: [] };
@@ -155,7 +155,7 @@ function extractLabVizzes(section) {
 // Vizzes that work well on phone — render directly without a tap-to-expand wrapper
 const PHONE_OK_VIZ_IDS = new Set([
   "PythonNotebook", "OpenMatNotebook", "JSNotebook", "SQLNotebook",
-  "ScienceNotebook", "VideoEmbed", "VideoCarousel", "VideoLauncher",
+  "ScienceNotebook", "GcodeNotebook", "VideoEmbed", "VideoCarousel", "VideoLauncher",
 ]);
 
 function MobileVizCard({ viz, borderColor = "border-slate-200 dark:border-slate-700" }) {
