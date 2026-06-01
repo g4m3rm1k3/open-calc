@@ -21024,5 +21024,327 @@
       "audio",
       "pyqt5"
     ]
+  },
+  {
+    "id": "vid-569",
+    "title": "Python Tutorial for Beginners with VS Code",
+    "url": "https://www.youtube.com/embed/6i3e-j3wSf0",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "intro",
+      "basics",
+      "vscode",
+      "setup",
+      "beginner"
+    ]
+  },
+  {
+    "id": "vid-570",
+    "title": "Python Basics for Beginners",
+    "url": "https://www.youtube.com/embed/fLAfa-BQtOQ",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "basics",
+      "beginner",
+      "variables",
+      "strings"
+    ]
+  },
+  {
+    "id": "vid-571",
+    "title": "Python Operators for Beginners",
+    "url": "https://www.youtube.com/embed/7BxUaeROVXI",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "operators",
+      "math",
+      "arithmetic"
+    ]
+  },
+  {
+    "id": "vid-572",
+    "title": "Python Data Types for Beginners",
+    "url": "https://www.youtube.com/embed/INGJh9DEaBM",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "types",
+      "data types",
+      "int",
+      "float",
+      "str"
+    ]
+  },
+  {
+    "id": "vid-573",
+    "title": "Python User Input and Control Flow",
+    "url": "https://www.youtube.com/embed/N94vSNBF-EI",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "input",
+      "if",
+      "conditionals",
+      "control flow"
+    ]
+  },
+  {
+    "id": "vid-574",
+    "title": "Python Lists and Tuples for Beginners",
+    "url": "https://www.youtube.com/embed/KWKWswDfAb0",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "lists",
+      "tuples",
+      "data structures"
+    ]
+  },
+  {
+    "id": "vid-575",
+    "title": "Python Dictionaries and Sets for Beginners",
+    "url": "https://www.youtube.com/embed/zdVdqTLk8O0",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "dict",
+      "dictionaries",
+      "sets",
+      "data structures"
+    ]
+  },
+  {
+    "id": "vid-576",
+    "title": "Python While Loops and For Loops",
+    "url": "https://www.youtube.com/embed/23vCap6iYSs",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "while",
+      "for",
+      "loops",
+      "iteration"
+    ]
+  },
+  {
+    "id": "vid-577",
+    "title": "Python Functions for Beginners",
+    "url": "https://www.youtube.com/embed/NZMBVkTP3LA",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "functions",
+      "def",
+      "parameters"
+    ]
+  },
+  {
+    "id": "vid-578",
+    "title": "Recursion for Python Beginners with Recursive Function Examples",
+    "url": "https://www.youtube.com/embed/72uVUU1boKo",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "recursion",
+      "functions",
+      "algorithms"
+    ]
+  },
+  {
+    "id": "vid-579",
+    "title": "Python Scope tutorial for Beginners",
+    "url": "https://www.youtube.com/embed/e_UgAqOdEXY",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "scope",
+      "variables",
+      "namespaces"
+    ]
+  },
+  {
+    "id": "vid-580",
+    "title": "Python Closures for Beginners",
+    "url": "https://www.youtube.com/embed/8Lu5DdTxGCU",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "closures",
+      "functions",
+      "advanced",
+      "scope"
+    ]
+  },
+  {
+    "id": "vid-581",
+    "title": "Python f-Strings - Advanced String Formatting",
+    "url": "https://www.youtube.com/embed/ktOOKv6XJ7U",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "strings",
+      "f-strings",
+      "formatting"
+    ]
+  },
+  {
+    "id": "vid-582",
+    "title": "Python Modules for Beginners",
+    "url": "https://www.youtube.com/embed/8ArHkS70QsQ",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "modules",
+      "imports",
+      "import"
+    ]
+  },
+  {
+    "id": "vid-583",
+    "title": "Python Command Line Arguments tutorial",
+    "url": "https://www.youtube.com/embed/mZbRRQMJ7Ew",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "command line",
+      "args",
+      "sys",
+      "argparse"
+    ]
+  },
+  {
+    "id": "vid-584",
+    "title": "Python Challenges for Beginners with Solutions",
+    "url": "https://www.youtube.com/embed/odBW-NClTNA",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "challenges",
+      "exercises",
+      "practice"
+    ]
+  },
+  {
+    "id": "vid-585",
+    "title": "Python lambda, map, filter, and reduce - Higher Order Functions",
+    "url": "https://www.youtube.com/embed/YIOYJgLQYiY",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "lambda",
+      "map",
+      "filter",
+      "reduce",
+      "functions",
+      "higher order"
+    ]
+  },
+  {
+    "id": "vid-586",
+    "title": "Python Classes, Objects, Inheritance and Polymorphism for Beginners",
+    "url": "https://www.youtube.com/embed/RpBBzci_cBk",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "oop",
+      "classes",
+      "objects",
+      "inheritance",
+      "polymorphism"
+    ]
+  },
+  {
+    "id": "vid-587",
+    "title": "Python Exception Handling Tutorial for Beginners",
+    "url": "https://www.youtube.com/embed/PHzm_Iox1mE",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "exceptions",
+      "error handling",
+      "try",
+      "except"
+    ]
+  },
+  {
+    "id": "vid-588",
+    "title": "Python OOP Project for Beginners",
+    "url": "https://www.youtube.com/embed/PMFd95RgIwE",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "oop",
+      "project",
+      "classes"
+    ]
+  },
+  {
+    "id": "vid-589",
+    "title": "Python Virtual Environment and pip for Beginners",
+    "url": "https://www.youtube.com/embed/eDe-z2Qy9x4",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "venv",
+      "pip",
+      "setup",
+      "environments"
+    ]
+  },
+  {
+    "id": "vid-590",
+    "title": "Python File Handling for Beginners",
+    "url": "https://www.youtube.com/embed/BRrem1k3904",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "files",
+      "io",
+      "read",
+      "write"
+    ]
+  },
+  {
+    "id": "vid-591",
+    "title": "How to Create a Web Application in Python using Flask",
+    "url": "https://www.youtube.com/embed/jQjjqEjZK58",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "flask",
+      "web",
+      "api",
+      "project"
+    ]
+  },
+  {
+    "id": "vid-592",
+    "title": "Python Full Course for Beginners - Complete All-in-One Tutorial",
+    "url": "https://www.youtube.com/embed/H2EJuAcrZYU",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "full course",
+      "beginner",
+      "complete",
+      "tutorial"
+    ]
+  },
+  {
+    "id": "vid-593",
+    "title": "Python REST API Tutorial - How to Build a Flask REST API",
+    "url": "https://www.youtube.com/embed/z3YMz-Gocmw",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "flask",
+      "rest api",
+      "web",
+      "api",
+      "json"
+    ]
   }
 ]
