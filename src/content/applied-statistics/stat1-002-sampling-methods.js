@@ -19,6 +19,7 @@ export default {
 
   intuition: {
     prose: [
+      '**Roadmap for this lesson.** You will leave this lesson with one practical skill: given a study description, you can name the sampling method, explain its main risk, and decide whether population-level inference is valid.',
       '**Five ways to pick a sample — and why the differences matter.** Every sampling method is an answer to the question: which units from the population get measured? The five main strategies differ in how much randomness they use, how representative they are, and how expensive they are to execute.',
       '**Simple Random Sample (SRS).** Assign every unit in the population a number from 1 to N. Use a random number generator to pick n numbers. Measure those units. Every unit has the same probability of selection: n/N. Every possible group of n units has the same probability of being the sample. SRS is the theoretical gold standard: it eliminates selection bias by construction. Weakness: if the population has important subgroups, SRS may by chance under-represent them.',
       '**Stratified Random Sample.** Divide the population into non-overlapping groups called strata based on a characteristic you care about — for example, age group, income bracket, or geographic region. Within each stratum, draw a simple random sample. You guarantee representation from every stratum. Proportional stratified sampling draws the same proportion from each stratum (if stratum A is 30% of the population, take 30% of your total sample from stratum A). This typically gives a smaller margin of error than SRS for the same total sample size, because between-stratum variation is removed.',
@@ -50,7 +51,24 @@ export default {
         body: 'When units within a cluster are correlated, the effective sample size $n_{eff}$ is less than the actual number measured $n$:\n$$n_{eff} = \\frac{n}{1 + (\\bar{m}-1)\\cdot\\rho}$$\nwhere $\\bar{m}$ is the average cluster size and $\\rho$ (the intracluster correlation coefficient) measures how similar units within a cluster are. If $\\rho = 0$ (units in a cluster are no more similar than random), $n_{eff} = n$. If $\\rho = 1$ (all units in a cluster are identical), $n_{eff}$ equals the number of clusters, not the total units measured. This is why cluster sampling is less efficient than SRS — you are paying for measurements that carry less new information.',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'stat1-002-viz-1',
+        title: 'Sampling method comparison grid',
+        type: 'table',
+        purpose: 'Helps beginners separate method, cost, and inference validity in one view.',
+        misconceptionAddressed: 'Larger n automatically guarantees valid inference, regardless of sampling design.',
+        invariant: 'Only probability samples support classical confidence intervals for population claims.',
+      },
+      {
+        id: 'stat1-002-viz-2',
+        title: 'Cluster correlation effect sketch',
+        type: 'diagram',
+        purpose: 'Shows why many similar observations in one cluster add less information than the same count spread across clusters.',
+        misconceptionAddressed: 'Measuring more units always increases effective sample size one-for-one.',
+        invariant: 'When intracluster correlation rho increases, effective sample size decreases for fixed n.',
+      },
+    ],
   },
 
   math: {
@@ -404,7 +422,7 @@ print(f"Stratified is {srs_sd/strat_sd:.1f}x more precise than SRS for this popu
   ],
 
   mastery: {
-    targetLevel: 'Apply (Level 3) — given a study description, identify the sampling method, compute inclusion probabilities or stratum allocations, and evaluate whether the sample supports valid population inference.',
+    targetLevel: 3,
     solveIndependently: 'Given a population with known stratum sizes, compute proportional stratified allocation, compute the stratified mean estimate, and identify the sampling method from a study description.',
     explainVerbally: 'Explain why the 1936 Literary Digest poll failed despite having 2.4 million responses, using the specific concepts of probability sampling and coverage error.',
     detectIncorrectApplication: 'Identify when a researcher uses a convenience sample but reports it as if it were a probability sample and explain exactly what inferential claims are no longer valid.',

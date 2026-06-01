@@ -11,18 +11,23 @@ import MarkdownProse from "../components/math/MarkdownProse.jsx";
 import { enhanceLessonForUnifiedLearning } from "../content/enhancers/unifiedLessonEnhancer.js";
 import OpenInGrapher from "../components/lesson/OpenInGrapher.jsx";
 import LessonQuizBlock from "../components/lesson/LessonQuizBlock.jsx";
-import { useVideoPlayer } from "../context/VideoPlayerContext.jsx";
+import { useVideoPlayer } from "../hooks/useVideoPlayer.js";
 import TutorPanel from "../components/tutor/TutorPanel.jsx";
-import { useOptionalLesson } from "../hooks/useOptionalLesson.js";import WikiIntro from '../components/lesson/WikiIntro.jsx'
-import WikiDiagrams from '../components/lesson/WikiDiagrams.jsx'
+import { useOptionalLesson } from "../hooks/useOptionalLesson.js";
+import WikiIntro from "../components/lesson/WikiIntro.jsx";
+import WikiDiagrams from "../components/lesson/WikiDiagrams.jsx";
 export default function LessonPage() {
   const { chapterId, lessonSlug, "*": rest } = useParams();
   const slug = lessonSlug + (rest ? `/${rest}` : "");
   const key = `${chapterId}/${slug}`;
   const rawLesson = LESSON_MAP[key];
-  const { lessonSource, lessonOverride, isLoadingOverride } = useOptionalLesson(key, rawLesson);
+  const { lessonSource, lessonOverride, isLoadingOverride } = useOptionalLesson(
+    key,
+    rawLesson,
+  );
   const lesson = useMemo(
-    () => (lessonOverride ? enhanceLessonForUnifiedLearning(lessonOverride) : null),
+    () =>
+      lessonOverride ? enhanceLessonForUnifiedLearning(lessonOverride) : null,
     [lessonOverride],
   );
   const {
@@ -63,7 +68,8 @@ export default function LessonPage() {
     const handleScroll = () => {
       const winScroll = document.documentElement.scrollTop;
       const height =
-        document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        document.documentElement.scrollHeight -
+        document.documentElement.clientHeight;
       if (height === 0) return;
       const scrolled = (winScroll / height) * 100;
       setScrollPercent(scrolled);
@@ -83,7 +89,10 @@ export default function LessonPage() {
         <p className="mb-6 text-slate-500">
           The lesson at chapter/{chapterId}/{slug} doesn&apos;t exist yet.
         </p>
-        <Link to="/" className="text-brand-600 hover:underline dark:text-brand-400">
+        <Link
+          to="/"
+          className="text-brand-600 hover:underline dark:text-brand-400"
+        >
           Back to curriculum
         </Link>
       </div>
@@ -92,7 +101,8 @@ export default function LessonPage() {
 
   const lessonIndex = ALL_LESSONS.findIndex((entry) => entry.id === lesson.id);
   const prevLesson = lessonIndex > 0 ? ALL_LESSONS[lessonIndex - 1] : null;
-  const nextLesson = lessonIndex < ALL_LESSONS.length - 1 ? ALL_LESSONS[lessonIndex + 1] : null;
+  const nextLesson =
+    lessonIndex < ALL_LESSONS.length - 1 ? ALL_LESSONS[lessonIndex + 1] : null;
 
   return (
     <article className="mx-auto max-w-7xl pb-20 px-0 md:px-6 bg-[var(--color-page-bg)] lg:bg-transparent">
@@ -106,10 +116,15 @@ export default function LessonPage() {
       </div>
 
       {(() => {
-        const chapter = CURRICULUM.find((entry) => String(entry.number) === chapterId);
+        const chapter = CURRICULUM.find(
+          (entry) => String(entry.number) === chapterId,
+        );
         return (
           <nav className="mb-6 px-4 md:px-0 flex flex-wrap items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
-            <Link to="/" className="hover:text-brand-600 dark:hover:text-brand-400">
+            <Link
+              to="/"
+              className="hover:text-brand-600 dark:hover:text-brand-400"
+            >
               Home
             </Link>
             {chapter?.course && (
@@ -131,7 +146,9 @@ export default function LessonPage() {
               {chapter?.title ?? chapterId}
             </Link>
             <span>›</span>
-            <span className="text-slate-700 dark:text-slate-300">{lesson.title}</span>
+            <span className="text-slate-700 dark:text-slate-300">
+              {lesson.title}
+            </span>
           </nav>
         );
       })()}
@@ -140,12 +157,16 @@ export default function LessonPage() {
         <div className="oc-header-gradient px-8 py-10 sm:px-12 sm:py-14">
           <div className="mb-3 flex flex-wrap items-center gap-2">
             {(() => {
-              const chapter = CURRICULUM.find((entry) => String(entry.number) === chapterId);
+              const chapter = CURRICULUM.find(
+                (entry) => String(entry.number) === chapterId,
+              );
               return (
                 <>
                   <span className="rounded-full bg-brand-600 px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-white shadow-lg shadow-brand-500/30">
                     {chapter?.title ?? chapterId}
-                    {lesson.order !== undefined ? ` · Lesson ${lesson.order + 1}` : ""}
+                    {lesson.order !== undefined
+                      ? ` · Lesson ${lesson.order + 1}`
+                      : ""}
                   </span>
                   {lessonSource === "override" && (
                     <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-300">
@@ -194,7 +215,11 @@ export default function LessonPage() {
                   key={index}
                   className="mt-5 overflow-hidden rounded-2xl border border-slate-200 shadow-sm dark:border-slate-800"
                 >
-                  <VizFrame id={viz.id} initialProps={viz.initialProps ?? viz.props ?? {}} title={viz.title} />
+                  <VizFrame
+                    id={viz.id}
+                    initialProps={viz.initialProps ?? viz.props ?? {}}
+                    title={viz.title}
+                  />
                 </div>
               ))
             : lesson.hook.previewVisualizationId && (
@@ -232,7 +257,13 @@ export default function LessonPage() {
         )}
       </div>
 
-      {lesson.quiz?.length > 0 && <LessonQuizBlock key={key} lessonId={lesson.id} questions={lesson.quiz} />}
+      {lesson.quiz?.length > 0 && (
+        <LessonQuizBlock
+          key={key}
+          lessonId={lesson.id}
+          questions={lesson.quiz}
+        />
+      )}
 
       {lesson.crossRefs?.length > 0 && (
         <section className="mb-10">
@@ -253,9 +284,13 @@ export default function LessonPage() {
             to={`/chapter/${prevLesson.chapterNumber}/${prevLesson.slug}`}
             className="group flex items-center gap-2 text-sm text-slate-600 transition-colors hover:text-brand-600 dark:text-slate-400 dark:hover:text-brand-400"
           >
-            <span className="transition-transform group-hover:-translate-x-1">←</span>
+            <span className="transition-transform group-hover:-translate-x-1">
+              ←
+            </span>
             <div>
-              <div className="text-xs text-slate-400 dark:text-slate-500">Previous</div>
+              <div className="text-xs text-slate-400 dark:text-slate-500">
+                Previous
+              </div>
               <div className="font-medium">{prevLesson.title}</div>
             </div>
           </Link>
@@ -269,10 +304,14 @@ export default function LessonPage() {
             className="group flex items-center gap-2 text-right text-sm text-slate-600 transition-colors hover:text-brand-600 dark:text-slate-400 dark:hover:text-brand-400"
           >
             <div>
-              <div className="text-xs text-slate-400 dark:text-slate-500">Next</div>
+              <div className="text-xs text-slate-400 dark:text-slate-500">
+                Next
+              </div>
               <div className="font-medium">{nextLesson.title}</div>
             </div>
-            <span className="transition-transform group-hover:translate-x-1">→</span>
+            <span className="transition-transform group-hover:translate-x-1">
+              →
+            </span>
           </Link>
         ) : (
           <div />

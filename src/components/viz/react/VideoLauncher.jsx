@@ -1,5 +1,5 @@
-import { Play, Video, ExternalLink, Library, Layout } from 'lucide-react';
-import { useVideoPlayer } from '../../../context/VideoPlayerContext.jsx';
+import { Play, Video, ExternalLink, Library, Layout } from "lucide-react";
+import { useVideoPlayer } from "../../../hooks/useVideoPlayer.js";
 
 export default function VideoLauncher({ params }) {
   const { openPlayer } = useVideoPlayer();
@@ -18,9 +18,11 @@ export default function VideoLauncher({ params }) {
       </div>
 
       <div className="text-center mb-6">
-        <h4 className="text-[13px] font-black text-slate-900 dark:text-white tracking-[0.15em] uppercase mb-1">Analytical Insight</h4>
+        <h4 className="text-[13px] font-black text-slate-900 dark:text-white tracking-[0.15em] uppercase mb-1">
+          Analytical Insight
+        </h4>
         <p className="text-[10px] font-black text-indigo-500 dark:text-indigo-400 uppercase tracking-widest opacity-80">
-          {videos.length} Procedural Archive{videos.length > 1 ? 's' : ''}
+          {videos.length} Procedural Archive{videos.length > 1 ? "s" : ""}
         </p>
       </div>
 

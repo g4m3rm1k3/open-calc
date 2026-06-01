@@ -22,6 +22,7 @@ export default {
   // ── Intuition ──────────────────────────────────────────────────
   intuition: {
     prose: [
+      '**Roadmap for first-time learners.** By the end of this lesson, you should be able to do three things: (1) separate descriptive claims from inferential claims, (2) tell population from sample, and (3) classify a variable as nominal, ordinal, interval, or ratio. If you can do those three moves, you can read most introductory statistics results without getting tricked by bad wording.',
       '**Start with a concrete question.** A school district wants to know the average amount of time its 12,000 students spend on homework each night. Surveying all 12,000 is expensive and slow. Instead, a researcher randomly selects 120 students and records their nightly homework times: 45 min, 70 min, 30 min, 90 min, … After collecting all 120 values, the researcher calculates the average: 62 minutes. This single number — 62 — summarizes the 120 observations. That summarizing act is **descriptive statistics**.',
       '**The inferential leap.** The researcher then says: "Based on our sample of 120, we estimate that the average homework time for all 12,000 students in the district is approximately 62 minutes, give or take 8 minutes." She has used the sample to make a claim about the *population* she did not fully observe. That claim — with its uncertainty margin — is **inferential statistics**. Notice: the 62-minute average is a fact about the 120 students she measured. The "give or take 8 minutes" is not a fact — it is a calibrated uncertainty about the 12,000.',
       '**Before reading on, predict:** if the researcher had sampled 480 students instead of 120 — four times as many — would the "give or take" margin get larger, stay the same, or get smaller? Write your prediction before continuing.',
@@ -52,7 +53,24 @@ export default {
         body: '**Descriptive statistics:** summarize and describe data you already have. Tools: mean, median, standard deviation, histogram, boxplot. No uncertainty claims.\n\n**Inferential statistics:** use a sample to make claims about a population or test hypotheses. Tools: confidence intervals, hypothesis tests, regression models. Always involves uncertainty.\n\nA single analysis can do both: "The 120 students averaged 62 minutes [descriptive]. We estimate the district-wide average is 62 ± 8 minutes [inferential]."',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'stat1-001-viz-1',
+        title: 'Population, sample, and inference map',
+        type: 'diagram',
+        purpose: 'Contradicts the misconception that sample facts and population claims are the same statement.',
+        misconceptionAddressed: 'Students collapse x-bar and mu into one number and forget uncertainty.',
+        invariant: 'The sample statistic x-bar is fixed once the sample is collected; what changes is how uncertain we are about the population parameter mu.',
+      },
+      {
+        id: 'stat1-001-viz-2',
+        title: 'Measurement-scale decision ladder',
+        type: 'flowchart',
+        purpose: 'Prevents arithmetic errors by forcing a scale decision before calculation.',
+        misconceptionAddressed: 'If values are numeric, mean and ratios are always valid.',
+        invariant: 'As you move up nominal -> ordinal -> interval -> ratio, permitted operations strictly increase; lower-scale operations always remain valid.',
+      },
+    ],
   },
 
   // ── Math ──────────────────────────────────────────────────────
@@ -250,9 +268,9 @@ print(f"Major counts = {dict(major_counts)}  (count, not mean — major is categ
     { id: 'cp-stat1-001-1', label: 'Read: distinguish descriptive vs. inferential statistics with an example of each', type: 'read' },
     { id: 'cp-stat1-001-2', label: 'Read: identify population, sample, parameter, and statistic in a study description', type: 'read' },
     { id: 'cp-stat1-001-3', label: 'Read: classify a variable as nominal, ordinal, interval, or ratio', type: 'read' },
-    { id: 'cp-stat1-001-4', label: 'Apply the procedure callout: classify three new variables step-by-step', type: 'example' },
+    { id: 'cp-stat1-001-4', label: 'Run Python Cell 1: compare sample mean x-bar to population mean mu', type: 'lab' },
     { id: 'cp-stat1-001-5', label: 'Read: explain why computing a ratio is invalid on ordinal data using the satisfaction example', type: 'read' },
-    { id: 'cp-stat1-001-6', label: 'Complete example 1: classify heart rate and compute sample mean', type: 'example' },
+    { id: 'cp-stat1-001-6', label: 'Run Python Cell 2: match variables to valid operations', type: 'lab' },
     { id: 'cp-stat1-001-7', label: 'Complete example 2: write one descriptive and one inferential claim from survey data', type: 'example' },
     { id: 'cp-stat1-001-8', label: 'Attempt challenge 2: identify and fix the scale violation in the satisfaction report', type: 'challenge' },
   ],
@@ -403,7 +421,7 @@ print(f"Major counts = {dict(major_counts)}  (count, not mean — major is categ
 
   // ── Mastery ────────────────────────────────────────────────────
   mastery: {
-    targetLevel: 'Explain (Level 2) — identify and explain the distinction between descriptive and inferential statistics, classify measurement scales correctly, and recognize when a statistical claim is valid for the scale used.',
+    targetLevel: 2,
     solveIndependently: 'Given a dataset description, identify population vs. sample, classify three variables by measurement scale, compute the sample mean, and write one descriptive and one inferential claim with a margin-of-error statement.',
     explainVerbally: 'Explain why computing a ratio (e.g., "twice as satisfied") is invalid for ordinal data but valid for ratio data, using a concrete example with numbers.',
     detectIncorrectApplication: 'Identify when a published summary applies arithmetic to nominal or ordinal data and state specifically which operation is invalid and what the valid alternative is.',

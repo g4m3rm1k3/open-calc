@@ -1,28 +1,47 @@
-import { useState, useMemo, useRef, useEffect } from 'react';
-import { motion, AnimatePresence, useDragControls } from 'framer-motion';
-import { X, Minus, Search, Video, ChevronRight, Play, Layout, Menu, Plus, Globe, Trash2, BookOpen, ChevronLeft, Home, Layers, Compass, Sidebar as SidebarIcon, GripVertical } from 'lucide-react';
-import { useVideoPlayer } from '../../context/VideoPlayerContext.jsx';
-import { VIDEO_PLACEMENT_MAP } from '../../content/videos/videoPlacementMap.js';
-import { VIDEO_DATABASE } from '../../content/videos/videoDatabase.js';
-import { selectVideosByKeywords } from '../../content/videos/videoSelector.js';
-import { CURRICULUM, ALL_LESSONS } from '../../content/index.js';
+import { useState, useMemo, useRef, useEffect } from "react";
+import { motion, AnimatePresence, useDragControls } from "framer-motion";
+import {
+  X,
+  Minus,
+  Search,
+  Video,
+  ChevronRight,
+  Play,
+  Layout,
+  Menu,
+  Plus,
+  Globe,
+  Trash2,
+  BookOpen,
+  ChevronLeft,
+  Home,
+  Layers,
+  Compass,
+  Sidebar as SidebarIcon,
+  GripVertical,
+} from "lucide-react";
+import { useVideoPlayer } from "../../hooks/useVideoPlayer.js";
+import { VIDEO_PLACEMENT_MAP } from "../../content/videos/videoPlacementMap.js";
+import { VIDEO_DATABASE } from "../../content/videos/videoDatabase.js";
+import { selectVideosByKeywords } from "../../content/videos/videoSelector.js";
+import { CURRICULUM, ALL_LESSONS } from "../../content/index.js";
 
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 const courseTitles = {
-  'precalc': 'Pre-Calculus',
-  'calc': 'Calculus',
-  'discrete': 'Discrete Math',
-  'physics-1': 'Physics',
-  'geometry': 'Geometry',
+  precalc: "Pre-Calculus",
+  calc: "Calculus",
+  discrete: "Discrete Math",
+  "physics-1": "Physics",
+  geometry: "Geometry",
 };
 
 const courseIcons = {
-  'precalc': '📐',
-  'calc': '∂',
-  'discrete': '∴',
-  'physics-1': '🚀',
-  'geometry': '📐',
+  precalc: "📐",
+  calc: "∂",
+  discrete: "∴",
+  "physics-1": "🚀",
+  geometry: "📐",
 };
 
 export default function FloatingVideoPlayer() {
@@ -30,38 +49,53 @@ export default function FloatingVideoPlayer() {
   const dragControls = useDragControls();
   const constraintsRef = useRef(null);
   const playerRef = useRef(null);
-  const { 
-    isOpen, isMinimized, currentVideo, lessonId, 
-    searchQuery, setSearchQuery, 
-    openPlayer, closePlayer, toggleMinimize, selectVideo,
-    customVideos, addCustomVideo, setLessonId,
-    pinnedVideos, togglePin
+  const {
+    isOpen,
+    isMinimized,
+    currentVideo,
+    lessonId,
+    searchQuery,
+    setSearchQuery,
+    openPlayer,
+    closePlayer,
+    toggleMinimize,
+    selectVideo,
+    customVideos,
+    addCustomVideo,
+    setLessonId,
+    pinnedVideos,
+    togglePin,
   } = useVideoPlayer();
 
   const [isAddingCustom, setIsAddingCustom] = useState(false);
-  const [customTitle, setCustomTitle] = useState('');
-  const [customUrl, setCustomUrl] = useState('');
+  const [customTitle, setCustomTitle] = useState("");
+  const [customUrl, setCustomUrl] = useState("");
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [navStack, setNavStack] = useState(['playlist']);
+  const [navStack, setNavStack] = useState(["playlist"]);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [selectedChapter, setSelectedChapter] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  
+
   const [videoProgress, setVideoProgress] = useState(() => {
     try {
-      const saved = localStorage.getItem('open-calc-video-progress');
+      const saved = localStorage.getItem("open-calc-video-progress");
       return saved ? JSON.parse(saved) : {};
-    } catch (e) { return {}; }
+    } catch (e) {
+      return {};
+    }
   });
 
   const updateProgress = (vidId, percent) => {
     if (!vidId) return;
-    setVideoProgress(prev => {
+    setVideoProgress((prev) => {
       // Don't downgrade progress (e.g. if they rewind)
       if (prev[vidId] && prev[vidId] >= percent && percent < 95) return prev;
-      const next = { ...prev, [vidId]: Math.min(100, Math.max(prev[vidId] || 0, percent)) };
-      localStorage.setItem('open-calc-video-progress', JSON.stringify(next));
+      const next = {
+        ...prev,
+        [vidId]: Math.min(100, Math.max(prev[vidId] || 0, percent)),
+      };
+      localStorage.setItem("open-calc-video-progress", JSON.stringify(next));
       return next;
     });
   };
@@ -69,36 +103,44 @@ export default function FloatingVideoPlayer() {
   useEffect(() => {
     const handleMessage = (event) => {
       // Must come from Youtube
-      if (!event.origin.includes('youtube.com') && !event.origin.includes('youtube-nocookie.com')) return;
+      if (
+        !event.origin.includes("youtube.com") &&
+        !event.origin.includes("youtube-nocookie.com")
+      )
+        return;
       try {
         const data = JSON.parse(event.data);
-        
+
         // Sometimes YT sends onStateChange: 1 when it starts playing
-        if (data.event === 'onStateChange' && data.info === 1) {
-           // We can assume it "started"
-           if (currentVideo && (videoProgress[currentVideo.id] || 0) === 0) {
-             updateProgress(currentVideo.id, 5);
-           }
+        if (data.event === "onStateChange" && data.info === 1) {
+          // We can assume it "started"
+          if (currentVideo && (videoProgress[currentVideo.id] || 0) === 0) {
+            updateProgress(currentVideo.id, 5);
+          }
         }
 
-        if (data.event === 'infoDelivery' && data.info) {
+        if (data.event === "infoDelivery" && data.info) {
           const { currentTime, duration } = data.info;
-          if (currentTime !== undefined && duration !== undefined && currentVideo) {
+          if (
+            currentTime !== undefined &&
+            duration !== undefined &&
+            currentVideo
+          ) {
             const percent = Math.floor((currentTime / duration) * 100);
             updateProgress(currentVideo.id, percent);
           }
         }
       } catch (e) {}
     };
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
   }, [currentVideo, videoProgress]);
   const [width, setWidth] = useState(900);
   const [height, setHeight] = useState(550);
 
-  const [windowDimensions, setWindowDimensions] = useState({ 
-    w: window.innerWidth, 
-    h: window.innerHeight 
+  const [windowDimensions, setWindowDimensions] = useState({
+    w: window.innerWidth,
+    h: window.innerHeight,
   });
 
   // Sync Mobile & Viewport Check
@@ -107,13 +149,13 @@ export default function FloatingVideoPlayer() {
       setIsMobile(window.innerWidth < 768);
       setWindowDimensions({ w: window.innerWidth, h: window.innerHeight });
     };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   // Custom Resize Logic
   const [isResizing, setIsResizing] = useState(false);
-  
+
   const startResizing = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -136,11 +178,11 @@ export default function FloatingVideoPlayer() {
         setHeight(Math.min(newH, maxH));
       }
     };
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
     };
   }, [isResizing, windowDimensions]);
 
@@ -153,66 +195,91 @@ export default function FloatingVideoPlayer() {
     if (!id) return null;
     const custom = customVideos[id] || [];
     const categorized = {};
-    if (custom.length > 0) categorized['Your Videos'] = custom;
+    if (custom.length > 0) categorized["Your Videos"] = custom;
 
     const placement = VIDEO_PLACEMENT_MAP[id];
     if (placement) {
       // Explicit placement map override
       if (Array.isArray(placement)) {
-        const vids = placement.map(vidId => ({ ...VIDEO_DATABASE[vidId], id: vidId })).filter(v => v.url);
-        if (vids.length > 0) categorized['intuition'] = vids;
+        const vids = placement
+          .map((vidId) => ({ ...VIDEO_DATABASE[vidId], id: vidId }))
+          .filter((v) => v.url);
+        if (vids.length > 0) categorized["intuition"] = vids;
       } else {
-        ['hook', 'intuition', 'math', 'rigor', 'examples'].forEach(section => {
-          const ids = section === 'examples' ? Object.values(placement[section] || {}).flat() : (placement[section] || []);
-          const vids = ids.map(vidId => ({ ...VIDEO_DATABASE[vidId], id: vidId })).filter(v => v.url);
-          if (vids.length > 0) categorized[section] = vids;
-        });
+        ["hook", "intuition", "math", "rigor", "examples"].forEach(
+          (section) => {
+            const ids =
+              section === "examples"
+                ? Object.values(placement[section] || {}).flat()
+                : placement[section] || [];
+            const vids = ids
+              .map((vidId) => ({ ...VIDEO_DATABASE[vidId], id: vidId }))
+              .filter((v) => v.url);
+            if (vids.length > 0) categorized[section] = vids;
+          },
+        );
       }
     } else {
       // No explicit placement — match by lesson tags
-      const lesson = ALL_LESSONS.find(l => l.id === id);
+      const lesson = ALL_LESSONS.find((l) => l.id === id);
       const tags = lesson?.tags ?? [];
       if (tags.length > 0) {
         const matched = selectVideosByKeywords({ keywords: tags, limit: 15 });
-        if (matched.length > 0) categorized['Related'] = matched;
+        if (matched.length > 0) categorized["Related"] = matched;
       }
     }
 
     return Object.keys(categorized).length > 0 ? categorized : null;
   };
 
-  const currentLessonVideos = useMemo(() => getCategorizedVideos(lessonId), [lessonId, customVideos]);
+  const currentLessonVideos = useMemo(
+    () => getCategorizedVideos(lessonId),
+    [lessonId, customVideos],
+  );
 
   const dynamicCourses = useMemo(() => {
-    const ids = Array.from(new Set(CURRICULUM.map(c => c.course)));
-    return ids.map(id => ({
-      id,
-      title: courseTitles[id] || id.charAt(0).toUpperCase() + id.slice(1),
-      icon: courseIcons[id] || '📚'
-    })).filter(course => {
-      // Only show courses that have at least one video in the registry
-      const courseChapters = CURRICULUM.filter(ch => ch.course === course.id);
-      return courseChapters.some(ch => 
-        ch.lessons.some(l => {
-          const placement = VIDEO_PLACEMENT_MAP[l.id];
-          if (placement) {
-            if (Array.isArray(placement)) return placement.length > 0;
-            const hasRegularVids = ['hook', 'intuition', 'math', 'rigor'].some(s => placement[s]?.length > 0);
-            const hasExampleVids = placement.examples && Object.values(placement.examples).some(exList => exList?.length > 0);
-            if (hasRegularVids || hasExampleVids) return true;
-          }
-          // Also include if lesson has tags that can drive tag-based matching
-          return (l.tags?.length ?? 0) > 0;
-        })
-      );
-    });
+    const ids = Array.from(new Set(CURRICULUM.map((c) => c.course)));
+    return ids
+      .map((id) => ({
+        id,
+        title: courseTitles[id] || id.charAt(0).toUpperCase() + id.slice(1),
+        icon: courseIcons[id] || "📚",
+      }))
+      .filter((course) => {
+        // Only show courses that have at least one video in the registry
+        const courseChapters = CURRICULUM.filter(
+          (ch) => ch.course === course.id,
+        );
+        return courseChapters.some((ch) =>
+          ch.lessons.some((l) => {
+            const placement = VIDEO_PLACEMENT_MAP[l.id];
+            if (placement) {
+              if (Array.isArray(placement)) return placement.length > 0;
+              const hasRegularVids = [
+                "hook",
+                "intuition",
+                "math",
+                "rigor",
+              ].some((s) => placement[s]?.length > 0);
+              const hasExampleVids =
+                placement.examples &&
+                Object.values(placement.examples).some(
+                  (exList) => exList?.length > 0,
+                );
+              if (hasRegularVids || hasExampleVids) return true;
+            }
+            // Also include if lesson has tags that can drive tag-based matching
+            return (l.tags?.length ?? 0) > 0;
+          }),
+        );
+      });
   }, []);
 
   // Sync sidebar selection to whichever lesson is currently active
   useEffect(() => {
     if (!lessonId) return;
-    const lesson = ALL_LESSONS.find(l => l.id === lessonId);
-    const ch = CURRICULUM.find(c => c.number === lesson?.chapterNumber);
+    const lesson = ALL_LESSONS.find((l) => l.id === lessonId);
+    const ch = CURRICULUM.find((c) => c.number === lesson?.chapterNumber);
     if (ch) {
       setSelectedCourse(ch.course);
       setSelectedChapter(ch);
@@ -221,48 +288,61 @@ export default function FloatingVideoPlayer() {
 
   // Global 'V' keyboard shortcut dispatched by AppShell
   useEffect(() => {
-    const handler = () => isOpen ? toggleMinimize() : openPlayer();
-    window.addEventListener('oc-toggle-video', handler);
-    return () => window.removeEventListener('oc-toggle-video', handler);
+    const handler = () => (isOpen ? toggleMinimize() : openPlayer());
+    window.addEventListener("oc-toggle-video", handler);
+    return () => window.removeEventListener("oc-toggle-video", handler);
   }, [isOpen, toggleMinimize, openPlayer]);
 
   const pushNav = (view, data = {}) => {
-    if (view === 'chapters') setSelectedCourse(data.courseId);
-    if (view === 'lessons') setSelectedChapter(data.chapter);
-    if (view === 'playlist') { if (data.lessonId) setLessonId(data.lessonId); }
-    setNavStack(prev => [...prev, view]);
-    setSearchQuery('');
+    if (view === "chapters") setSelectedCourse(data.courseId);
+    if (view === "lessons") setSelectedChapter(data.chapter);
+    if (view === "playlist") {
+      if (data.lessonId) setLessonId(data.lessonId);
+    }
+    setNavStack((prev) => [...prev, view]);
+    setSearchQuery("");
   };
 
-  const popNav = () => { if (navStack.length > 1) setNavStack(prev => prev.slice(0, -1)); };
+  const popNav = () => {
+    if (navStack.length > 1) setNavStack((prev) => prev.slice(0, -1));
+  };
   const currentView = navStack[navStack.length - 1];
 
   const filteredChapters = useMemo(() => {
     if (!selectedCourse) return [];
-    return CURRICULUM.filter(ch => ch.course === selectedCourse);
+    return CURRICULUM.filter((ch) => ch.course === selectedCourse);
   }, [selectedCourse]);
 
   const allFilteredVideos = useMemo(() => {
     if (!searchQuery) return [];
-    const list = Object.entries(VIDEO_DATABASE).map(([id, meta]) => ({ ...meta, id }));
-    Object.values(customVideos).flat().forEach(cv => list.push(cv));
-    return list.filter(v => 
-      v.title.toLowerCase().includes(searchQuery.toLowerCase()) || v.source?.toLowerCase().includes(searchQuery.toLowerCase())
+    const list = Object.entries(VIDEO_DATABASE).map(([id, meta]) => ({
+      ...meta,
+      id,
+    }));
+    Object.values(customVideos)
+      .flat()
+      .forEach((cv) => list.push(cv));
+    return list.filter(
+      (v) =>
+        v.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        v.source?.toLowerCase().includes(searchQuery.toLowerCase()),
     );
   }, [searchQuery, customVideos]);
 
   const getLessonInfo = (vidId) => {
-    const lessonId = Object.entries(VIDEO_PLACEMENT_MAP).find(([lId, sections]) => {
-      return Object.entries(sections).some(([sectionKey, content]) => {
-        if (sectionKey === 'examples') {
-          return Object.values(content).flat().includes(vidId);
-        }
-        return Array.isArray(content) && content.includes(vidId);
-      });
-    })?.[0];
+    const lessonId = Object.entries(VIDEO_PLACEMENT_MAP).find(
+      ([lId, sections]) => {
+        return Object.entries(sections).some(([sectionKey, content]) => {
+          if (sectionKey === "examples") {
+            return Object.values(content).flat().includes(vidId);
+          }
+          return Array.isArray(content) && content.includes(vidId);
+        });
+      },
+    )?.[0];
 
     if (!lessonId) return null;
-    const lesson = ALL_LESSONS.find(l => l.id === lessonId);
+    const lesson = ALL_LESSONS.find((l) => l.id === lessonId);
     if (!lesson) return null;
     return { id: lessonId, title: lesson.title, chapter: lesson.chapterNumber };
   };
@@ -270,11 +350,11 @@ export default function FloatingVideoPlayer() {
   const handleSearchSelect = (vid) => {
     const info = getLessonInfo(vid.id);
     selectVideo(vid);
-    if (info) { 
-      setLessonId(info.id); 
-      setNavStack(['playlist']); 
+    if (info) {
+      setLessonId(info.id);
+      setNavStack(["playlist"]);
     }
-    setSearchQuery('');
+    setSearchQuery("");
   };
 
   const handlePinnedSelect = (vidId) => {
@@ -284,7 +364,7 @@ export default function FloatingVideoPlayer() {
       const info = getLessonInfo(vidId);
       if (info) {
         setLessonId(info.id);
-        setNavStack(['playlist']);
+        setNavStack(["playlist"]);
       }
     }
   };
@@ -293,28 +373,35 @@ export default function FloatingVideoPlayer() {
     e.preventDefault();
     if (!customUrl) return;
     addCustomVideo(customUrl, customTitle);
-    setCustomUrl('');
-    setCustomTitle('');
+    setCustomUrl("");
+    setCustomTitle("");
     setIsAddingCustom(false);
   };
 
   const handleOpenYouTubeSearch = () => {
     if (!lessonId) return;
-    const lesson = ALL_LESSONS.find(l => l.id === lessonId);
+    const lesson = ALL_LESSONS.find((l) => l.id === lessonId);
     if (!lesson) return;
-    
-    const tags = Array.isArray(lesson.tags) ? lesson.tags.join('+') : '';
-    const course = lesson.course === 'web-1' ? 'web+development' : (lesson.course || '');
-    const query = `${lesson.title}+${tags}+${course}+tutorial`.trim().replace(/\s+/g, '+');
-    
+
+    const tags = Array.isArray(lesson.tags) ? lesson.tags.join("+") : "";
+    const course =
+      lesson.course === "web-1" ? "web+development" : lesson.course || "";
+    const query = `${lesson.title}+${tags}+${course}+tutorial`
+      .trim()
+      .replace(/\s+/g, "+");
+
     const url = `https://www.youtube.com/results?search_query=${query}`;
-    
+
     const width = 800;
     const height = 600;
     const left = (window.innerWidth - width) / 2;
     const top = (window.innerHeight - height) / 2;
-    
-    window.open(url, 'youtubeSearchPopup', `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=yes`);
+
+    window.open(
+      url,
+      "youtubeSearchPopup",
+      `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=yes`,
+    );
   };
 
   if (!isOpen || isMinimized) return null;
@@ -322,44 +409,57 @@ export default function FloatingVideoPlayer() {
   return (
     <>
       {/* Invisible constraint layer to keep player in viewport */}
-      <div ref={constraintsRef} className="fixed inset-0 pointer-events-none z-[9997]" />
+      <div
+        ref={constraintsRef}
+        className="fixed inset-0 pointer-events-none z-[9997]"
+      />
 
       <AnimatePresence mode="wait">
-          <motion.div
-             key="expanded-player"
-             drag={!isMobile} 
-           dragControls={dragControls}
-           dragListener={false}
-           dragMomentum={false}
-           dragConstraints={{ 
-             left: 10, 
-             top: 10, 
-             right: (windowDimensions?.w || 1024) - width - 10, 
-             bottom: (windowDimensions?.h || 768) - height - 10 
-           }}
-           dragElastic={0}
-           initial={isMobile ? { opacity: 0, y: 100 } : { 
-             opacity: 0, 
-             scale: 0.9, 
-             x: (windowDimensions?.w || 1024) - width - 40, 
-             y: (windowDimensions?.h || 768) - height - 40 
-           }}
-           animate={{ opacity: 1, scale: 1 }}
-           exit={{ opacity: 0, scale: 0.9, y: isMobile ? 100 : 0 }}
-           ref={playerRef}
-           style={isMobile ? { width: '100%', height: '100%', top: 0, left: 0 } : { width, height }}
-           className={`fixed top-0 left-0 z-[9998] shadow-[0_0_100px_rgba(0,0,0,0.2)] dark:shadow-[0_0_150px_rgba(0,0,0,0.6)] overflow-hidden flex flex-col group/player ${
-             isMobile ? 'bg-slate-950 rounded-none' : 'bg-white/80 dark:bg-slate-950/60 backdrop-blur-3xl rounded-[2.5rem] border border-white/20 dark:border-white/5 ring-1 ring-black/5'
-           }`}
+        <motion.div
+          key="expanded-player"
+          drag={!isMobile}
+          dragControls={dragControls}
+          dragListener={false}
+          dragMomentum={false}
+          dragConstraints={{
+            left: 10,
+            top: 10,
+            right: (windowDimensions?.w || 1024) - width - 10,
+            bottom: (windowDimensions?.h || 768) - height - 10,
+          }}
+          dragElastic={0}
+          initial={
+            isMobile
+              ? { opacity: 0, y: 100 }
+              : {
+                  opacity: 0,
+                  scale: 0.9,
+                  x: (windowDimensions?.w || 1024) - width - 40,
+                  y: (windowDimensions?.h || 768) - height - 40,
+                }
+          }
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.9, y: isMobile ? 100 : 0 }}
+          ref={playerRef}
+          style={
+            isMobile
+              ? { width: "100%", height: "100%", top: 0, left: 0 }
+              : { width, height }
+          }
+          className={`fixed top-0 left-0 z-[9998] shadow-[0_0_100px_rgba(0,0,0,0.2)] dark:shadow-[0_0_150px_rgba(0,0,0,0.6)] overflow-hidden flex flex-col group/player ${
+            isMobile
+              ? "bg-slate-950 rounded-none"
+              : "bg-white/80 dark:bg-slate-950/60 backdrop-blur-3xl rounded-[2.5rem] border border-white/20 dark:border-white/5 ring-1 ring-black/5"
+          }`}
         >
           {/* Header - Holographic Prism Control */}
-          <div 
+          <div
             onPointerDown={(e) => dragControls.start(e)}
             className={`flex-shrink-0 flex items-center justify-between px-6 py-4 border-b border-white/10 select-none transition-all duration-500 transform ${
               !isMobile && currentVideo
-                ? 'opacity-0 translate-y-[-10px] group-hover/player:opacity-100 group-hover/player:translate-y-0 cursor-grab active:cursor-grabbing'
-                : 'opacity-100 translate-y-0 cursor-grab active:cursor-grabbing'
-            } ${isMobile ? 'bg-slate-900' : 'bg-gradient-to-r from-transparent via-white/5 to-transparent'}`}
+                ? "opacity-0 translate-y-[-10px] group-hover/player:opacity-100 group-hover/player:translate-y-0 cursor-grab active:cursor-grabbing"
+                : "opacity-100 translate-y-0 cursor-grab active:cursor-grabbing"
+            } ${isMobile ? "bg-slate-900" : "bg-gradient-to-r from-transparent via-white/5 to-transparent"}`}
           >
             <div className="flex items-center gap-4 truncate">
               <div className="relative flex items-center justify-center shrink-0">
@@ -372,7 +472,7 @@ export default function FloatingVideoPlayer() {
               </div>
               <div className="truncate flex flex-col">
                 <h3 className="text-[12px] font-black text-slate-900 dark:text-white uppercase tracking-[0.2em] leading-none mb-1.5 truncate">
-                  {currentVideo?.title || 'Tutorial Hub'}
+                  {currentVideo?.title || "Tutorial Hub"}
                 </h3>
                 {lessonId && (
                   <div className="flex items-center gap-2">
@@ -381,20 +481,25 @@ export default function FloatingVideoPlayer() {
                     </span>
                     <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
                     <p className="text-[10px] text-slate-400 font-medium truncate uppercase tracking-tight">
-                      {ALL_LESSONS.find(l => l.id === lessonId)?.title || 'Curriculum'}
+                      {ALL_LESSONS.find((l) => l.id === lessonId)?.title ||
+                        "Curriculum"}
                     </p>
                   </div>
                 )}
               </div>
             </div>
-            
+
             <div className="flex-shrink-0 flex items-center gap-1">
-              <button onClick={toggleMinimize} className="p-2 hover:bg-white/10 rounded-xl text-slate-400 hover:text-indigo-400 transition-all" title="Minimize">
+              <button
+                onClick={toggleMinimize}
+                className="p-2 hover:bg-white/10 rounded-xl text-slate-400 hover:text-indigo-400 transition-all"
+                title="Minimize"
+              >
                 <Minus size={18} />
               </button>
               <button
                 onClick={isMobile ? closePlayer : toggleMinimize}
-                className={`rounded-xl transition-all ${isMobile ? 'p-2 bg-red-600 hover:bg-red-700 text-white' : 'p-2 hover:bg-red-500/10 text-slate-400 hover:text-red-500'}`}
+                className={`rounded-xl transition-all ${isMobile ? "p-2 bg-red-600 hover:bg-red-700 text-white" : "p-2 hover:bg-red-500/10 text-slate-400 hover:text-red-500"}`}
                 title="Close"
               >
                 <X size={18} />
@@ -402,106 +507,153 @@ export default function FloatingVideoPlayer() {
             </div>
           </div>
 
-          <div className={`flex-1 flex overflow-hidden ${isMobile ? 'flex-col' : 'flex-row'}`}>
-            
+          <div
+            className={`flex-1 flex overflow-hidden ${isMobile ? "flex-col" : "flex-row"}`}
+          >
             {/* Video Player Area */}
-            <div className={`flex-1 bg-black relative group order-1 ${isMobile ? 'max-h-[40vh] min-h-[240px]' : ''}`}>
-               {isMobile && !currentVideo && (
-                 <div className="absolute inset-0 z-20 bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
-                    <Play size={40} className="text-brand-500 mb-4" />
-                    <h4 className="text-white font-bold mb-2">Tutorial Library</h4>
-                    <p className="text-xs text-slate-500">Select a section below to start watching</p>
-                 </div>
-               )}
+            <div
+              className={`flex-1 bg-black relative group order-1 ${isMobile ? "max-h-[40vh] min-h-[240px]" : ""}`}
+            >
+              {isMobile && !currentVideo && (
+                <div className="absolute inset-0 z-20 bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
+                  <Play size={40} className="text-brand-500 mb-4" />
+                  <h4 className="text-white font-bold mb-2">
+                    Tutorial Library
+                  </h4>
+                  <p className="text-xs text-slate-500">
+                    Select a section below to start watching
+                  </p>
+                </div>
+              )}
 
-                {currentVideo && (
-                  <div className="w-full h-full relative">
-                    <iframe 
-                      key={currentVideo.url} 
-                      className="w-full h-full" 
-                      src={currentVideo.url.includes('?') ? `${currentVideo.url}&enablejsapi=1&origin=${window.location.host}` : `${currentVideo.url}?enablejsapi=1&origin=${window.location.host}`} 
-                      title={currentVideo.title} 
-                      frameBorder="0" 
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen 
-                    />
-                    <button 
-                      onClick={() => updateProgress(currentVideo.id, 100)}
-                      className="absolute bottom-4 right-4 bg-slate-900/60 backdrop-blur-md text-white text-[10px] uppercase font-bold px-3 py-1.5 rounded-lg border border-white/20 hover:bg-emerald-600 hover:border-emerald-500 transition-all opacity-0 group-hover:opacity-100 shadow-xl"
-                    >
-                      {videoProgress[currentVideo.id] >= 95 ? 'Completed ✓' : 'Mark as Finished'}
-                    </button>
-                  </div>
-                )}
+              {currentVideo && (
+                <div className="w-full h-full relative">
+                  <iframe
+                    key={currentVideo.url}
+                    className="w-full h-full"
+                    src={
+                      currentVideo.url.includes("?")
+                        ? `${currentVideo.url}&enablejsapi=1&origin=${window.location.host}`
+                        : `${currentVideo.url}?enablejsapi=1&origin=${window.location.host}`
+                    }
+                    title={currentVideo.title}
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                  <button
+                    onClick={() => updateProgress(currentVideo.id, 100)}
+                    className="absolute bottom-4 right-4 bg-slate-900/60 backdrop-blur-md text-white text-[10px] uppercase font-bold px-3 py-1.5 rounded-lg border border-white/20 hover:bg-emerald-600 hover:border-emerald-500 transition-all opacity-0 group-hover:opacity-100 shadow-xl"
+                  >
+                    {videoProgress[currentVideo.id] >= 95
+                      ? "Completed ✓"
+                      : "Mark as Finished"}
+                  </button>
+                </div>
+              )}
 
-               {/* Mobile sidebar toggle Overlay button */}
-                {!isMobile && (
-                  <button 
-                  onClick={() => setSidebarOpen(!sidebarOpen)} 
+              {/* Mobile sidebar toggle Overlay button */}
+              {!isMobile && (
+                <button
+                  onClick={() => setSidebarOpen(!sidebarOpen)}
                   className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-6 h-24 bg-white/10 dark:bg-slate-900/40 backdrop-blur-3xl text-white rounded-l-[1.5rem] border-y border-l border-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-indigo-600 transition-all shadow-2xl"
                   title={sidebarOpen ? "Hide Library" : "Show Library"}
-                  >
-                    <ChevronRight size={16} className={sidebarOpen ? '' : 'rotate-180'} />
-                  </button>
-                )}
+                >
+                  <ChevronRight
+                    size={16}
+                    className={sidebarOpen ? "" : "rotate-180"}
+                  />
+                </button>
+              )}
             </div>
 
             {/* Sidebar / List Area */}
-            <div 
+            <div
               className={`flex-shrink-0 bg-slate-50/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 transition-all order-2 flex flex-col ${
-                isMobile 
-                  ? 'flex-1 overflow-hidden' 
-                  : `border-r h-full overflow-hidden ${sidebarOpen ? 'w-72' : 'w-0'}`
+                isMobile
+                  ? "flex-1 overflow-hidden"
+                  : `border-r h-full overflow-hidden ${sidebarOpen ? "w-72" : "w-0"}`
               }`}
             >
               <div className="flex-shrink-0 px-4 py-3 border-b border-white/5 bg-white/5 backdrop-blur-md flex flex-wrap items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-                 <button onClick={() => setNavStack(['courses'])} className="hover:text-indigo-400 flex items-center transition-colors">LIBRARY</button>
-                 {selectedCourse && (
-                   <>
+                <button
+                  onClick={() => setNavStack(["courses"])}
+                  className="hover:text-indigo-400 flex items-center transition-colors"
+                >
+                  LIBRARY
+                </button>
+                {selectedCourse && (
+                  <>
+                    <ChevronRight size={12} className="text-slate-600" />
+                    <button
+                      onClick={() => setNavStack(["courses", "chapters"])}
+                      className="hover:text-indigo-400 transition-colors uppercase"
+                    >
+                      {selectedCourse}
+                    </button>
+                  </>
+                )}
+                {selectedChapter &&
+                  (navStack.includes("lessons") ||
+                    navStack.includes("playlist")) && (
+                    <>
                       <ChevronRight size={12} className="text-slate-600" />
-                      <button onClick={() => setNavStack(['courses', 'chapters'])} className="hover:text-indigo-400 transition-colors uppercase">{selectedCourse}</button>
-                   </>
-                 )}
-                 {selectedChapter && (navStack.includes('lessons') || navStack.includes('playlist')) && (
-                   <>
-                      <ChevronRight size={12} className="text-slate-600" />
-                      <button onClick={() => setNavStack(['courses', 'chapters', 'lessons'])} className="hover:text-indigo-400 transition-colors">CH {selectedChapter.number}</button>
-                   </>
-                 )}
-                 {navStack.includes('playlist') && (
-                   <>
-                      <ChevronRight size={12} className="text-slate-600" />
-                      <span className="text-indigo-500">PLAYLIST</span>
-                   </>
-                 )}
+                      <button
+                        onClick={() =>
+                          setNavStack(["courses", "chapters", "lessons"])
+                        }
+                        className="hover:text-indigo-400 transition-colors"
+                      >
+                        CH {selectedChapter.number}
+                      </button>
+                    </>
+                  )}
+                {navStack.includes("playlist") && (
+                  <>
+                    <ChevronRight size={12} className="text-slate-600" />
+                    <span className="text-indigo-500">PLAYLIST</span>
+                  </>
+                )}
               </div>
 
               <div className="flex-shrink-0 px-3 py-2 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center gap-2">
-                 {navStack.length > 1 && (
-                   <button onClick={popNav} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-500"><ChevronLeft size={16} /></button>
-                 )}
-                 <button 
+                {navStack.length > 1 && (
+                  <button
+                    onClick={popNav}
+                    className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-500"
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+                )}
+                <button
                   onClick={() => {
-                    const l = ALL_LESSONS.find(l => l.id === lessonId);
+                    const l = ALL_LESSONS.find((l) => l.id === lessonId);
                     if (l) navigate(`/chapter/${l.chapterNumber}/${l.slug}`);
                   }}
                   className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-brand-500 truncate flex-1 text-left transition-colors"
-                 >
-                    {currentView === 'playlist' && lessonId ? (
-                      (() => {
-                        const l = ALL_LESSONS.find(l => l.id === lessonId);
-                        return l ? l.title : 'Playlist';
+                >
+                  {currentView === "playlist" && lessonId
+                    ? (() => {
+                        const l = ALL_LESSONS.find((l) => l.id === lessonId);
+                        return l ? l.title : "Playlist";
                       })()
-                    ) : currentView === 'courses' ? 'Subjects' : currentView}
-                 </button>
+                    : currentView === "courses"
+                      ? "Subjects"
+                      : currentView}
+                </button>
               </div>
 
               <div className="p-3 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
                 <div className="relative">
-                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <Search
+                    size={14}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                  />
                   <input
-                    type="text" placeholder="Search..."
-                    value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+                    type="text"
+                    placeholder="Search..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-1 focus:ring-brand-500 transition-all"
                   />
                 </div>
@@ -510,15 +662,15 @@ export default function FloatingVideoPlayer() {
               <div className="flex-1 overflow-y-auto p-2 scrollbar-thin">
                 {searchQuery ? (
                   <div className="space-y-1">
-                    {allFilteredVideos.map(vid => {
+                    {allFilteredVideos.map((vid) => {
                       const lessonInfo = getLessonInfo(vid.id);
                       return (
-                        <VideoRow 
-                          key={vid.id} 
-                          video={vid} 
-                          active={vid.id === currentVideo?.id} 
+                        <VideoRow
+                          key={vid.id}
+                          video={vid}
+                          active={vid.id === currentVideo?.id}
                           progress={videoProgress[vid.id] || 0}
-                          onClick={() => handleSearchSelect(vid)} 
+                          onClick={() => handleSearchSelect(vid)}
                           onPin={() => togglePin(vid.id)}
                           isPinned={pinnedVideos.includes(vid.id)}
                         />
@@ -527,134 +679,233 @@ export default function FloatingVideoPlayer() {
                   </div>
                 ) : (
                   <AnimatePresence mode="wait">
-                    {currentView === 'playlist' && (
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key="playlist">
-                          {/* Custom Video Form */}
-                          <div className="mb-6 px-2">
-                             <button 
-                               onClick={() => setIsAddingCustom(!isAddingCustom)}
-                               className="w-full py-2 px-3 flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-slate-500 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl hover:border-brand-500 hover:text-brand-500 transition-all"
-                             >
-                                <span>{isAddingCustom ? 'Cancel' : 'Add Custom Tutorial'}</span>
-                                <Plus size={12} className={isAddingCustom ? 'rotate-45 transition-transform' : 'transition-transform'} />
-                             </button>
-                             
-                             {isAddingCustom && (
-                               <motion.form 
-                                 initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
-                                 onSubmit={handleCustomSubmit} className="mt-3 space-y-3 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700"
-                               >
-                                  <input 
-                                    type="text" placeholder="Tutorial Title..." value={customTitle} onChange={e => setCustomTitle(e.target.value)}
-                                    className="w-full px-3 py-2 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none"
-                                  />
-                                  <input 
-                                    type="text" placeholder="YouTube URL..." value={customUrl} onChange={e => setCustomUrl(e.target.value)}
-                                    className="w-full px-3 py-2 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none"
-                                  />
-                                  <button type="submit" className="w-full py-2 bg-brand-600 text-white rounded-lg text-xs font-bold shadow-lg shadow-brand-500/20">Save Tutorial</button>
-                               </motion.form>
-                             )}
-                          </div>
+                    {currentView === "playlist" && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        key="playlist"
+                      >
+                        {/* Custom Video Form */}
+                        <div className="mb-6 px-2">
+                          <button
+                            onClick={() => setIsAddingCustom(!isAddingCustom)}
+                            className="w-full py-2 px-3 flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-slate-500 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl hover:border-brand-500 hover:text-brand-500 transition-all"
+                          >
+                            <span>
+                              {isAddingCustom
+                                ? "Cancel"
+                                : "Add Custom Tutorial"}
+                            </span>
+                            <Plus
+                              size={12}
+                              className={
+                                isAddingCustom
+                                  ? "rotate-45 transition-transform"
+                                  : "transition-transform"
+                              }
+                            />
+                          </button>
 
-                          {currentLessonVideos ? (
-                            <>
-                              {Object.entries(currentLessonVideos).map(([section, vids]) => (
+                          {isAddingCustom && (
+                            <motion.form
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: "auto", opacity: 1 }}
+                              onSubmit={handleCustomSubmit}
+                              className="mt-3 space-y-3 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700"
+                            >
+                              <input
+                                type="text"
+                                placeholder="Tutorial Title..."
+                                value={customTitle}
+                                onChange={(e) => setCustomTitle(e.target.value)}
+                                className="w-full px-3 py-2 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none"
+                              />
+                              <input
+                                type="text"
+                                placeholder="YouTube URL..."
+                                value={customUrl}
+                                onChange={(e) => setCustomUrl(e.target.value)}
+                                className="w-full px-3 py-2 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none"
+                              />
+                              <button
+                                type="submit"
+                                className="w-full py-2 bg-brand-600 text-white rounded-lg text-xs font-bold shadow-lg shadow-brand-500/20"
+                              >
+                                Save Tutorial
+                              </button>
+                            </motion.form>
+                          )}
+                        </div>
+
+                        {currentLessonVideos ? (
+                          <>
+                            {Object.entries(currentLessonVideos).map(
+                              ([section, vids]) => (
                                 <div key={section} className="mb-4">
-                                  <p className="text-[9px] font-bold uppercase tracking-widest text-brand-500/60 px-2 mb-1">{section}</p>
-                                  {vids.map(vid => (
-                                    <VideoRow 
-                                      key={vid.id} 
-                                      video={vid} 
-                                      active={vid.id === currentVideo?.id} 
+                                  <p className="text-[9px] font-bold uppercase tracking-widest text-brand-500/60 px-2 mb-1">
+                                    {section}
+                                  </p>
+                                  {vids.map((vid) => (
+                                    <VideoRow
+                                      key={vid.id}
+                                      video={vid}
+                                      active={vid.id === currentVideo?.id}
                                       progress={videoProgress[vid.id] || 0}
-                                      onClick={() => selectVideo(vid)} 
+                                      onClick={() => selectVideo(vid)}
                                       onPin={() => togglePin(vid.id)}
                                       isPinned={pinnedVideos.includes(vid.id)}
                                     />
                                   ))}
                                 </div>
-                              ))}
-                              {lessonId && (
-                                <div className="mt-6 mb-4 px-2">
-                                  <button onClick={handleOpenYouTubeSearch} className="w-full flex items-center justify-center gap-2 py-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold rounded-xl transition-colors">
-                                    <Search size={14} /> Search more on YouTube
-                                  </button>
-                                </div>
-                              )}
-                            </>
-                          ) : (
-                            <div className="flex flex-col items-center justify-center py-10 px-4 text-center">
-                              <Compass size={32} className="text-slate-300 mb-3" />
-                              <p className="text-xs text-slate-500 leading-relaxed font-medium">Select a lesson from the curriculum or browse subjects above to see tutorials.</p>
-                              {lessonId && (
-                                <button onClick={handleOpenYouTubeSearch} className="mt-4 flex items-center gap-2 px-5 py-2.5 bg-brand-500 text-white rounded-lg text-xs font-bold shadow-lg shadow-brand-500/20 hover:bg-brand-600 hover:-translate-y-0.5 transition-all">
-                                  <Search size={14} /> Search YouTube
+                              ),
+                            )}
+                            {lessonId && (
+                              <div className="mt-6 mb-4 px-2">
+                                <button
+                                  onClick={handleOpenYouTubeSearch}
+                                  className="w-full flex items-center justify-center gap-2 py-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold rounded-xl transition-colors"
+                                >
+                                  <Search size={14} /> Search more on YouTube
                                 </button>
-                              )}
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <div className="flex flex-col items-center justify-center py-10 px-4 text-center">
+                            <Compass
+                              size={32}
+                              className="text-slate-300 mb-3"
+                            />
+                            <p className="text-xs text-slate-500 leading-relaxed font-medium">
+                              Select a lesson from the curriculum or browse
+                              subjects above to see tutorials.
+                            </p>
+                            {lessonId && (
+                              <button
+                                onClick={handleOpenYouTubeSearch}
+                                className="mt-4 flex items-center gap-2 px-5 py-2.5 bg-brand-500 text-white rounded-lg text-xs font-bold shadow-lg shadow-brand-500/20 hover:bg-brand-600 hover:-translate-y-0.5 transition-all"
+                              >
+                                <Search size={14} /> Search YouTube
+                              </button>
+                            )}
+                          </div>
+                        )}
+                      </motion.div>
+                    )}
+
+                    {currentView === "courses" && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        key="courses"
+                        className="space-y-1 pb-10"
+                      >
+                        {/* Quick Access Pinned Hub */}
+                        {pinnedVideos.length > 0 && (
+                          <div className="mb-8 p-1">
+                            <p className="text-[9px] font-bold uppercase tracking-widest text-brand-500 px-2 mb-3 flex items-center gap-2">
+                              <Plus size={10} className="rotate-45" /> Quick
+                              Access
+                            </p>
+                            <div className="space-y-1">
+                              {pinnedVideos.map((vidId) => {
+                                const vid = VIDEO_DATABASE[vidId];
+                                if (!vid) return null;
+                                return (
+                                  <VideoRow
+                                    key={vidId}
+                                    video={{ ...vid, id: vidId }}
+                                    active={vidId === currentVideo?.id}
+                                    progress={videoProgress[vidId] || 0}
+                                    onClick={() => {
+                                      handlePinnedSelect(vidId);
+                                      setNavStack(["playlist"]);
+                                    }}
+                                    onPin={() => togglePin(vidId)}
+                                    isPinned={true}
+                                  />
+                                );
+                              })}
                             </div>
-                          )}
-                        </motion.div>
-                      )}
-                      
-                      {currentView === 'courses' && (
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key="courses" className="space-y-1 pb-10">
-                           {/* Quick Access Pinned Hub */}
-                           {pinnedVideos.length > 0 && (
-                             <div className="mb-8 p-1">
-                               <p className="text-[9px] font-bold uppercase tracking-widest text-brand-500 px-2 mb-3 flex items-center gap-2">
-                                 <Plus size={10} className="rotate-45" /> Quick Access
-                               </p>
-                               <div className="space-y-1">
-                                 {pinnedVideos.map(vidId => {
-                                    const vid = VIDEO_DATABASE[vidId];
-                                    if (!vid) return null;
-                                    return (
-                                      <VideoRow 
-                                        key={vidId} 
-                                        video={{ ...vid, id: vidId }} 
-                                        active={vidId === currentVideo?.id} 
-                                        progress={videoProgress[vidId] || 0}
-                                        onClick={() => { handlePinnedSelect(vidId); setNavStack(['playlist']); }} 
-                                        onPin={() => togglePin(vidId)}
-                                        isPinned={true}
-                                      />
-                                    );
-                                 })}
-                               </div>
-                               <div className="mt-4 border-t border-slate-100 dark:border-slate-800/50 mx-2"></div>
-                             </div>
-                           )}
+                            <div className="mt-4 border-t border-slate-100 dark:border-slate-800/50 mx-2"></div>
+                          </div>
+                        )}
 
-                           <div className="px-2 mb-3">
-                             <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400">Available Subjects</p>
-                           </div>
+                        <div className="px-2 mb-3">
+                          <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
+                            Available Subjects
+                          </p>
+                        </div>
 
-                           {dynamicCourses.map(course => (
-                             <button onClick={() => pushNav('chapters', { courseId: course.id })} key={course.id} className="w-full flex items-center gap-3 p-3 hover:bg-white dark:hover:bg-slate-800 rounded-xl transition-all hover:translate-x-1 group">
-                               <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-lg shadow-sm group-hover:bg-brand-50 dark:group-hover:bg-brand-900 group-hover:text-brand-600 transition-colors">{course.icon}</div>
-                               <div className="text-left"><p className="text-xs font-bold text-slate-700 dark:text-slate-200 group-hover:text-brand-500 transition-colors">{course.title}</p></div>
-                               <ChevronRight size={14} className="ml-auto text-slate-300 group-hover:text-brand-500 group-hover:translate-x-1 transition-all" />
-                             </button>
-                           ))}
-                        </motion.div>
-                      )}
-                    {currentView === 'chapters' && (
-                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key="chapters" className="space-y-1">
-                        {filteredChapters.map(ch => (
-                          <button onClick={() => pushNav('lessons', { chapter: ch })} key={ch.number} className="w-full text-left p-3 hover:bg-white dark:hover:bg-slate-800 rounded-xl">
-                             <p className="text-[9px] font-bold text-brand-500 uppercase tracking-widest mb-1">Chapter {ch.number}</p>
-                             <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">{ch.title}</p>
+                        {dynamicCourses.map((course) => (
+                          <button
+                            onClick={() =>
+                              pushNav("chapters", { courseId: course.id })
+                            }
+                            key={course.id}
+                            className="w-full flex items-center gap-3 p-3 hover:bg-white dark:hover:bg-slate-800 rounded-xl transition-all hover:translate-x-1 group"
+                          >
+                            <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-lg shadow-sm group-hover:bg-brand-50 dark:group-hover:bg-brand-900 group-hover:text-brand-600 transition-colors">
+                              {course.icon}
+                            </div>
+                            <div className="text-left">
+                              <p className="text-xs font-bold text-slate-700 dark:text-slate-200 group-hover:text-brand-500 transition-colors">
+                                {course.title}
+                              </p>
+                            </div>
+                            <ChevronRight
+                              size={14}
+                              className="ml-auto text-slate-300 group-hover:text-brand-500 group-hover:translate-x-1 transition-all"
+                            />
                           </button>
                         ))}
                       </motion.div>
                     )}
-                    {currentView === 'lessons' && (
-                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key="lessons" className="space-y-1">
-                        {selectedChapter?.lessons.map(l => (
-                          <button onClick={() => pushNav('playlist', { lessonId: l.id })} key={l.id} className="w-full text-left p-3 hover:bg-white dark:hover:bg-slate-800 rounded-xl flex items-center justify-between group">
-                             <p className="text-xs font-medium text-slate-600 dark:text-slate-400 group-hover:text-brand-500">{l.title}</p>
-                             <ChevronRight size={14} className="text-slate-300" />
+                    {currentView === "chapters" && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        key="chapters"
+                        className="space-y-1"
+                      >
+                        {filteredChapters.map((ch) => (
+                          <button
+                            onClick={() => pushNav("lessons", { chapter: ch })}
+                            key={ch.number}
+                            className="w-full text-left p-3 hover:bg-white dark:hover:bg-slate-800 rounded-xl"
+                          >
+                            <p className="text-[9px] font-bold text-brand-500 uppercase tracking-widest mb-1">
+                              Chapter {ch.number}
+                            </p>
+                            <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                              {ch.title}
+                            </p>
+                          </button>
+                        ))}
+                      </motion.div>
+                    )}
+                    {currentView === "lessons" && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        key="lessons"
+                        className="space-y-1"
+                      >
+                        {selectedChapter?.lessons.map((l) => (
+                          <button
+                            onClick={() =>
+                              pushNav("playlist", { lessonId: l.id })
+                            }
+                            key={l.id}
+                            className="w-full text-left p-3 hover:bg-white dark:hover:bg-slate-800 rounded-xl flex items-center justify-between group"
+                          >
+                            <p className="text-xs font-medium text-slate-600 dark:text-slate-400 group-hover:text-brand-500">
+                              {l.title}
+                            </p>
+                            <ChevronRight
+                              size={14}
+                              className="text-slate-300"
+                            />
                           </button>
                         ))}
                       </motion.div>
@@ -667,13 +918,16 @@ export default function FloatingVideoPlayer() {
 
           {/* Resize Handle (Desktop Only) */}
           {!isMobile && (
-            <div 
+            <div
               onMouseDown={startResizing}
               className="absolute bottom-0 right-0 w-10 h-10 cursor-nwse-resize z-[10001] flex items-end justify-end p-1.5 group-hover/player:opacity-100 opacity-20 hover:opacity-100 transition-opacity"
             >
-               <div className="bg-slate-800/80 backdrop-blur-md rounded-tl-xl p-1 border-t border-l border-slate-700 shadow-xl group/handle hover:bg-brand-500 transition-colors">
-                 <GripVertical size={14} className="text-slate-400 group-hover/handle:text-white rotate-[135deg]" />
-               </div>
+              <div className="bg-slate-800/80 backdrop-blur-md rounded-tl-xl p-1 border-t border-l border-slate-700 shadow-xl group/handle hover:bg-brand-500 transition-colors">
+                <GripVertical
+                  size={14}
+                  className="text-slate-400 group-hover/handle:text-white rotate-[135deg]"
+                />
+              </div>
             </div>
           )}
         </motion.div>
@@ -685,35 +939,41 @@ export default function FloatingVideoPlayer() {
 function VideoRow({ video, active, onClick, isPinned, onPin, progress }) {
   return (
     <div className="group/row relative px-2 mb-1">
-      <button 
-        onClick={onClick} 
+      <button
+        onClick={onClick}
         className={`w-full flex items-start gap-3 p-2.5 rounded-[1.25rem] transition-all duration-300 ${
-          active 
-            ? 'bg-indigo-600/10 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 ring-1 ring-indigo-500/30 shadow-[0_0_15px_rgba(79,70,229,0.1)]' 
-            : 'hover:bg-white/40 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400'
+          active
+            ? "bg-indigo-600/10 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 ring-1 ring-indigo-500/30 shadow-[0_0_15px_rgba(79,70,229,0.1)]"
+            : "hover:bg-white/40 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400"
         }`}
       >
-        <div className={`mt-0.5 flex-shrink-0 w-14 h-10 rounded-xl overflow-hidden flex items-center justify-center bg-slate-100 dark:bg-slate-800 border border-white/10 dark:border-white/5 relative ${active ? 'ring-2 ring-indigo-500' : ''}`}>
+        <div
+          className={`mt-0.5 flex-shrink-0 w-14 h-10 rounded-xl overflow-hidden flex items-center justify-center bg-slate-100 dark:bg-slate-800 border border-white/10 dark:border-white/5 relative ${active ? "ring-2 ring-indigo-500" : ""}`}
+        >
           {(() => {
             const videoId = video.url.match(/(?:embed\/|v=)([^&?/\s]+)/)?.[1];
             if (videoId) {
               return (
                 <div className="relative w-full h-full group-hover/row:scale-110 transition-transform duration-500">
-                  <img 
-                    src={`https://img.youtube.com/vi/${videoId}/mqdefault.jpg`} 
-                    alt="" 
+                  <img
+                    src={`https://img.youtube.com/vi/${videoId}/mqdefault.jpg`}
+                    alt=""
                     className="w-full h-full object-cover"
                   />
                   {active && (
                     <div className="absolute inset-0 bg-indigo-500/20 flex items-center justify-center">
-                      <Play size={12} fill="currentColor" className="text-white" />
+                      <Play
+                        size={12}
+                        fill="currentColor"
+                        className="text-white"
+                      />
                     </div>
                   )}
                   {/* Progress Indicator */}
                   {progress > 0 && (
                     <div className="absolute bottom-0 left-0 w-full h-1 bg-black/40 backdrop-blur-sm">
-                      <div 
-                        className={`h-full transition-all duration-300 ${progress >= 95 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]'}`}
+                      <div
+                        className={`h-full transition-all duration-300 ${progress >= 95 ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]"}`}
                         style={{ width: `${progress}%` }}
                       />
                     </div>
@@ -721,7 +981,11 @@ function VideoRow({ video, active, onClick, isPinned, onPin, progress }) {
                 </div>
               );
             }
-            return active ? <Play size={14} fill="currentColor" /> : <Video size={14} />;
+            return active ? (
+              <Play size={14} fill="currentColor" />
+            ) : (
+              <Video size={14} />
+            );
           })()}
           {/* Completion Checkmark Overlay */}
           {progress >= 95 && (
@@ -730,28 +994,42 @@ function VideoRow({ video, active, onClick, isPinned, onPin, progress }) {
             </div>
           )}
         </div>
-        
+
         <div className="flex-1 text-left min-w-0 pr-6">
-          <p className="text-[12px] font-bold leading-tight mb-1 truncate tracking-tight text-slate-800 dark:text-slate-200">{video.title}</p>
+          <p className="text-[12px] font-bold leading-tight mb-1 truncate tracking-tight text-slate-800 dark:text-slate-200">
+            {video.title}
+          </p>
           <div className="flex items-center gap-1.5">
-            <span className="text-[9px] font-black text-indigo-500 uppercase tracking-widest opacity-60">Insight</span>
+            <span className="text-[9px] font-black text-indigo-500 uppercase tracking-widest opacity-60">
+              Insight
+            </span>
             <span className="w-0.5 h-0.5 rounded-full bg-slate-400 dark:bg-slate-600" />
-            <p className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter truncate">{video.source}</p>
+            <p className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter truncate">
+              {video.source}
+            </p>
           </div>
         </div>
       </button>
 
       {/* Pin Toggle */}
-      <button 
-        onClick={(e) => { e.stopPropagation(); onPin?.(); }}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onPin?.();
+        }}
         className={`absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-xl transition-all duration-300 ${
-          isPinned 
-            ? 'text-indigo-500 opacity-100 bg-indigo-500/10' 
-            : 'text-slate-300 opacity-0 group-hover/row:opacity-100 hover:text-indigo-400 hover:bg-white/20'
+          isPinned
+            ? "text-indigo-500 opacity-100 bg-indigo-500/10"
+            : "text-slate-300 opacity-0 group-hover/row:opacity-100 hover:text-indigo-400 hover:bg-white/20"
         }`}
-        title={isPinned ? 'Remove Pin' : 'Pin Tutorial'}
+        title={isPinned ? "Remove Pin" : "Pin Tutorial"}
       >
-        <Plus size={14} className={isPinned ? 'rotate-45 transition-transform' : 'transition-transform'} />
+        <Plus
+          size={14}
+          className={
+            isPinned ? "rotate-45 transition-transform" : "transition-transform"
+          }
+        />
       </button>
     </div>
   );

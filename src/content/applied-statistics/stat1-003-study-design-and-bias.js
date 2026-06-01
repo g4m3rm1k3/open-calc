@@ -19,6 +19,7 @@ export default {
 
   intuition: {
     prose: [
+      '**Roadmap for this lesson.** Your target is simple: when you read a study claim, you should be able to say what type of study it is, whether causal language is justified, and which bias is most likely to break the conclusion.',
       '**Two fundamental types of study.** Every data collection effort is either an experiment or an observational study. The distinction is not about how carefully you collect data — it is about whether you control the assignment to conditions.',
       '**Observational study:** you observe and record what happens without intervening. Who gets treatment A and who gets treatment B is decided by nature, history, or personal choice — not by the researcher. Examples: tracking smokers and non-smokers over 20 years to see who develops cancer (cohort study); interviewing lung cancer patients to see how many were smokers (case-control study); taking a survey snapshot of the population at one moment in time (cross-sectional study). Because subjects self-select into groups, the groups differ in many ways beyond the variable of interest.',
       '**Experiment:** the researcher randomly assigns subjects to conditions (treatment vs. control, drug A vs. drug B, new ad vs. old ad). Because assignment is random, the treatment and control groups are expected to be similar on all other variables — both the ones you measured and the ones you did not. This is why randomization is so powerful: it controls for confounders you did not even think to measure.',
@@ -50,7 +51,24 @@ export default {
         body: '**Cross-sectional:** measure exposure and outcome at the same point in time. Fast and cheap. Cannot establish temporal precedence (you don\'t know what came first).\n\n**Cohort study:** follow a group over time, comparing outcomes between exposed and unexposed. Can establish temporal precedence. Expensive and slow for rare outcomes.\n\n**Case-control study:** start with people who have the outcome (cases) and people who don\'t (controls), then look backwards at exposure. Efficient for rare diseases. Susceptible to recall bias.\n\n**Randomized Controlled Trial (RCT):** assigns participants randomly to treatment and control. Gold standard for causal inference. Often not feasible for ethical or practical reasons.',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'stat1-003-viz-1',
+        title: 'Causal decision flow: observational vs experiment',
+        type: 'flowchart',
+        purpose: 'Gives a repeatable decision process for choosing causal vs associational wording.',
+        misconceptionAddressed: 'Any strong correlation can be written as a causal claim.',
+        invariant: 'Without random assignment (or strong causal identification), conclusions must remain associational.',
+      },
+      {
+        id: 'stat1-003-viz-2',
+        title: 'Bias map by study pipeline stage',
+        type: 'diagram',
+        purpose: 'Shows where each bias enters: who gets in, who responds, how outcomes are measured, and what confounds remain.',
+        misconceptionAddressed: 'Bias is one generic error instead of multiple distinct failure modes.',
+        invariant: 'More data reduces variance, but it does not remove systematic bias introduced upstream.',
+      },
+    ],
   },
 
   math: {
@@ -425,7 +443,7 @@ print(f"Randomized experiment estimate:  {random_est:.1f} points  ← close to t
   ],
 
   mastery: {
-    targetLevel: 'Analyze (Level 4) — given a study description, identify its type, evaluate threats to internal and external validity, classify each threat by bias category, and propose a design improvement.',
+    targetLevel: 3,
     solveIndependently: 'Given a study, determine whether causal or associational language is appropriate, identify at least two confounders or bias sources, and propose a design change that would address the most serious threat.',
     explainVerbally: 'Explain Simpson\'s Paradox using the hospital example: why does Hospital A look better overall but Hospital B is better within every patient risk stratum?',
     detectIncorrectApplication: 'Identify when causal language is used for an observational finding and explain what additional evidence would be needed to support a causal conclusion.',

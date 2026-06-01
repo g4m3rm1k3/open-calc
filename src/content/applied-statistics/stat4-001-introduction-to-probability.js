@@ -1,172 +1,121 @@
 export default {
-  id: 'stat4-001',
-  title: 'Introduction to Probability',
-  description: 'Define probability, sample spaces, and events. Compare classical, empirical, and subjective approaches.',
-  prerequisites: ['stat1-001', 'stat1-002'],
-  coreConcept: 'Probability is a number between 0 and 1 that describes how likely an outcome is. Whether you compute it by counting equally-likely outcomes, by running many trials, or by expert judgment depends on what information you have.',
-  prerequisites: ['stat1-001'],
-
-  prose: [
-    '**30 students rolled a standard die 600 times.** They recorded 97 ones, 103 twos, 98 threes, 104 fours, 102 fives, and 96 sixes. The *relative frequency* of "1" is 97/600 ≈ 0.162 — close to but not exactly 1/6 ≈ 0.167. Both numbers estimate the same underlying probability; the gap shrinks as the number of trials grows. That is the empirical law of large numbers in action.',
-    '**Sample space, event, and outcome.** The *sample space* S is the set of all possible outcomes of a random experiment. An *outcome* is a single result; an *event* A is any subset of S. For a fair die, S = {1, 2, 3, 4, 5, 6} and the event "roll an even number" = {2, 4, 6}.',
-    '**Classical probability.** When outcomes are equally likely, P(A) = |A| / |S|. P(even) = 3/6 = 0.5. This formula requires equally-likely outcomes — it fails for a loaded die or a weather forecast.',
-    '**Empirical probability.** P(A) ≈ (number of times A occurred) / (total trials). With many trials this converges to the true probability by the *Law of Large Numbers*: as n → ∞, the relative frequency stabilises at P(A).',
-    '**Subjective probability.** When neither a symmetric sample space nor repeated trials exist, a probability is a personal degree of belief. A meteorologist\'s "70% chance of rain" and a doctor\'s "80% chance the treatment works" are subjective — calibrated by expertise, not by formula.',
-
-    { type: 'callout', variant: 'insight', body: '**Three interpretations, one axiom system.** All three approaches must satisfy the same Kolmogorov axioms: (1) P(A) ≥ 0 for every event A; (2) P(S) = 1; (3) if A and B are mutually exclusive, P(A ∪ B) = P(A) + P(B). The interpretation of "what P means" differs; the math is identical.' },
-
-    '**Probability as area.** Visualising the sample space as a rectangle with area 1 makes every probability a *proportion of area*. Events are regions inside the rectangle. Overlapping regions represent non-mutually-exclusive events. This picture will carry through the entire probability unit.',
-
-    { type: 'prediction', prompt: 'Before reading on, predict: if you flip a fair coin 10 times and get 7 heads, does the coin "owe" you more tails on the next flip? What does probability theory say?' },
-
-    '**Gambler\'s Fallacy.** Each coin flip is independent; previous results do not change future probabilities. P(heads) = 0.5 on every flip regardless of history. The coin has no memory. Short runs can deviate from 0.5 dramatically — that is expected variation, not a debt to be repaid.',
-    '**Probability vs. odds.** Probability and odds both quantify likelihood but differently. If P(A) = 0.25, the odds in favour of A are 0.25 : 0.75 = 1 : 3. Odds = P(A) / (1 − P(A)). Converting back: P = odds / (1 + odds). Sports betting and medical literature often use odds; data science prefers probability.',
+  // ── Identity ───────────────────────────────────────────────────
+  id: "stat4-001",
+  slug: "introduction-to-probability",
+  chapter: "stat4",
+  order: 1,
+  title: "Introduction to Probability",
+  subtitle:
+    "Sample spaces, events, and the three ways to assign a probability.",
+  tags: [
+    "probability",
+    "sample space",
+    "classical probability",
+    "empirical probability",
+    "subjective probability",
+    "law of large numbers",
+    "gambler's fallacy",
+    "odds",
   ],
+  aliases:
+    "probability sample space event outcome classical empirical subjective law of large numbers gamblers fallacy odds likelihood",
+  timeToComplete: 30,
+  coreConcept:
+    "Probability is a number between 0 and 1 that describes how likely an outcome is. Whether you compute it by counting equally-likely outcomes, by running many trials, or by expert judgment depends on what information you have.",
+  prerequisites: ["stat3-006"],
+  nextLesson: "stat4-002",
 
-  checkpoints: [
-    { id: 'stat4-001-cp1', label: 'A fair six-sided die is rolled. What is P(rolling a 3)?', type: 'recall' },
-    { id: 'stat4-001-cp2', label: 'A coin is flipped 1000 times with 512 heads. What is the empirical probability of heads?', type: 'recall' },
-    { id: 'stat4-001-cp3', label: 'A bag contains 4 red and 6 blue marbles. Is P(red) = 0.4 classical, empirical, or subjective probability?', type: 'concept' },
-    { id: 'stat4-001-cp4', label: 'A doctor says "I believe there is a 90% chance this treatment will work." Which type of probability is this?', type: 'concept' },
-    { id: 'stat4-001-cp5', label: 'List the sample space for flipping a coin twice.', type: 'recall' },
-    { id: 'stat4-001-cp6', label: 'If P(A) = 0.3, what are the odds in favour of A?', type: 'application' },
-    { id: 'stat4-001-cp7', label: 'After 5 coin flips all showing tails, a student says "heads is overdue." What is the name for this error?', type: 'concept' },
-    { id: 'stat4-001-cp8', label: 'Which Kolmogorov axiom ensures P(something happens) = 1?', type: 'recall' },
-  ],
+  // ── Hook ──────────────────────────────────────────────────────
+  hook: {
+    question:
+      'A weather app says 70% chance of rain. A card deck gives P(heart) = 25%. A doctor says "80% chance the treatment works." Are these three statements about probability even the same kind of thing?',
+    realWorldContext:
+      "Probability appears everywhere — in forecasts, games, clinical trials, insurance, and machine learning — but it is not always computed the same way. When a casino says the house edge on roulette is 5.26%, they used classical probability: counting equally-likely outcomes. When an epidemiologist says a vaccine is 94% effective, they used empirical probability: counting cases in a clinical trial. When a doctor estimates a patient's survival odds, they use subjective probability: expert judgment calibrated by experience. Understanding which approach applies — and what assumptions each requires — is the foundation of all statistical reasoning.",
+  },
 
-  workedExample: {
-    problem: 'A standard deck of 52 cards is shuffled. (a) What is the sample space size? (b) What is P(drawing a heart)? (c) 2600 draws with replacement are made; hearts appear 660 times. What is the empirical probability? (d) How do (b) and (c) compare?',
-    steps: [
-      { expression: '|S| = 52', annotation: 'The sample space is the 52 distinct cards.' },
-      { expression: 'P(\\text{heart}) = \\dfrac{13}{52} = 0.25', annotation: '13 hearts ÷ 52 equally-likely outcomes. Classical formula.' },
-      { expression: 'P_{\\text{emp}}(\\text{heart}) = \\dfrac{660}{2600} \\approx 0.254', annotation: 'Empirical: count of favourable outcomes ÷ total trials.' },
-      { expression: '|0.254 - 0.25| = 0.004', annotation: 'The empirical value is within 0.4 percentage points of the classical value. With more trials it would converge further.' },
+  // ── Intuition ──────────────────────────────────────────────────
+  intuition: {
+    prose: [
+      '**Start with 600 rolls of a die.** A class of 30 students each rolled a standard die 20 times and pooled their 600 results: 97 ones, 103 twos, 98 threes, 104 fours, 102 fives, and 96 sixes. The relative frequency of rolling "1" is 97/600 ≈ 0.162. The classical prediction is 1/6 ≈ 0.167. These two numbers are close but not equal — and that gap is the starting point for understanding what probability actually means.',
+      '**Sample space, outcome, and event — the vocabulary.** Before computing any probability, identify what experiment you are running and what can happen. The **sample space** $S$ is the complete list of all possible outcomes. An **outcome** is one specific result. An **event** $A$ is any collection of outcomes — any subset of $S$. For the die experiment: $S = \\{1, 2, 3, 4, 5, 6\\}$. The event "roll an even number" is $A = \\{2, 4, 6\\}$. That event contains 3 outcomes out of 6 possible.',
+      '**Classical probability: count the outcomes.** When every outcome in $S$ is equally likely, the probability of event $A$ is simply the fraction of outcomes that belong to $A$: $$P(A) = \\frac{|A|}{|S|}$$ where $|A|$ means "the number of outcomes in $A$." For our die: $P(\\text{even}) = |\\{2,4,6\\}| / |\\{1,2,3,4,5,6\\}| = 3/6 = 0.5$. This formula works for a fair die, a shuffled deck, or any situation with equally-likely outcomes. It breaks down the moment outcomes are not equally likely — a loaded die, a biased coin, or almost any real-world phenomenon.',
+      "**Empirical probability: count what happened.** When you cannot list equally-likely outcomes, run the experiment and count. $$P(A) \\approx \\frac{\\text{number of times } A \\text{ occurred}}{\\text{total number of trials}}$$ The 600-roll class experiment gives $P(1) \\approx 97/600 \\approx 0.162$. This is an estimate — it varies each time you run the experiment. The **Law of Large Numbers** guarantees that as the number of trials grows, the empirical probability gets closer and closer to the true probability. With 6000 rolls instead of 600, the estimate would be tighter.",
+      '**Subjective probability: expert belief.** When you cannot count outcomes and cannot run repeated experiments — a surgeon has never performed this exact operation before, a meteorologist has one Tuesday afternoon to forecast — probability becomes a calibrated belief. A surgeon\'s "85% chance of success" is a subjective probability: it is informed by data and experience but is ultimately a personal assessment. Subjective probability must still satisfy the same mathematical rules as all other probability — it just has a different source.',
+      '**Before reading on, predict:** A coin is flipped 10 times. The results are H H H H H H H H H H — ten heads in a row. Does the coin "owe" you tails on the 11th flip? Will tails be more likely than heads? Write your prediction.',
+      "**The Gambler's Fallacy.** Each coin flip is an independent event. Previous results do not change future probabilities. $P(\\text{heads}) = 0.5$ on every single flip, regardless of history. The coin has no memory. The Law of Large Numbers says that over a very long run, the proportion of heads approaches 0.5 — but it does not promise anything about the next flip. Believing that tails is \"due\" after a streak of heads is called the **Gambler's Fallacy**, and it causes real financial harm in casinos, investment decisions, and sports betting every day.",
+      "**Probability vs. odds.** Probability is not the only way to express likelihood. **Odds in favour** of $A$ = $P(A) : P(A^c) = P(A) : (1 - P(A))$. If $P(A) = 0.25$, the odds in favour are $0.25 : 0.75 = 1 : 3$ — for every 1 time $A$ happens, it fails 3 times. Converting back: $P = \\frac{\\text{odds for}}{\\text{odds for} + \\text{odds against}}$. Sports betting and medical research often report odds; data science and statistics prefer probability. Knowing both lets you read results in any field.",
     ],
-    answer: 'P(heart) = 0.25 classically; empirical estimate ≈ 0.254. Both describe the same probability; the difference is random variation.',
-  },
-
-  challenge: {
-    problem: 'A factory inspects 400 light bulbs; 24 are defective. (a) Compute the empirical probability of a defect. (b) Convert to odds in favour of a defect. (c) If the inspector says "I believe 1 in 15 bulbs is defective based on industry norms," classify that probability type.',
-    steps: [
-      { expression: 'P_{\\text{emp}}(\\text{defect}) = \\dfrac{24}{400} = 0.06', annotation: 'Empirical probability from observed data.' },
-      { expression: '\\text{Odds} = \\dfrac{0.06}{1-0.06} = \\dfrac{0.06}{0.94} \\approx 0.0638 \\approx 1:15.7', annotation: 'Odds in favour = P/(1-P). Often stated as "1 in 16.7" defective.' },
-      { expression: 'P_{\\text{subjective}} = \\tfrac{1}{15} \\approx 0.0\\overline{6}', annotation: 'The inspector\'s belief from industry norms is subjective — a personal degree of belief informed by experience, not from this dataset alone.' },
+    callouts: [
+      {
+        type: "procedure",
+        title: "Procedure: Choosing the Right Probability Type",
+        body: "Step 1. Are the outcomes equally likely and fully listable? → **Classical:** $P(A) = |A| / |S|$.\n\nStep 2. Can you run (or have recorded) many repeated trials? → **Empirical:** $P(A) \\approx$ (count of $A$) / (total trials).\n\nStep 3. Neither equally-likely outcomes nor repeated trials are available? → **Subjective:** a calibrated expert belief, which must still satisfy all probability axioms.\n\nDefault check: if you are computing probability for a fair coin, die, or shuffled deck, use classical. If you are reading experimental data or a study, use empirical. If a human expert is giving an estimate from experience, it is subjective.",
+      },
+      {
+        type: "insight",
+        title: "Three Interpretations, One Axiom System",
+        body: 'All three approaches must satisfy the same Kolmogorov axioms:\n\n(1) **Non-negativity:** $P(A) \\geq 0$ for every event $A$.\n(2) **Normalisation:** $P(S) = 1$ — something must happen.\n(3) **Additivity:** if $A$ and $B$ cannot both occur (mutually exclusive), $P(A \\cup B) = P(A) + P(B)$.\n\nThe interpretation of "what $P$ means" differs between classical, empirical, and subjective probability. The mathematics is identical. Every rule you will learn in this chapter (complement rule, addition rule, Bayes\' Theorem) follows from these three axioms alone.',
+      },
+      {
+        type: "warning",
+        title: "Two Classic Errors",
+        body: '**Error 1: Applying classical probability to non-uniform outcomes.** $P(A) = |A|/|S|$ requires equally-likely outcomes. If you ask "what is the probability that a randomly chosen person has blood type A?" and answer "2 outcomes (type A, not type A) so P = 1/2," you have applied the classical formula to a non-uniform space. The actual probability of blood type A is about 0.41, determined empirically.\n\n**Error 2: The Gambler\'s Fallacy.** The Law of Large Numbers is a long-run convergence result — it says nothing about any individual trial. Past results of independent events do not change future probabilities.',
+      },
     ],
-    answer: '(a) 0.06; (b) ≈ 1:15.7; (c) subjective probability.',
-  },
-
-  assessment: {
-    type: 'choice',
-    question: 'A spinner has 5 equal sections numbered 1–5. You spin it 200 times and "3" appears 38 times. The classical probability of spinning a 3 is ___; the empirical probability is ___.',
-    options: ['0.20 ; 0.190', '0.20 ; 0.200', '0.25 ; 0.190', '0.33 ; 0.190'],
-    answer: '0.20 ; 0.190',
-    explanation: 'Classical: 1/5 = 0.20. Empirical: 38/200 = 0.190.',
-  },
-
-  quiz: [
-    {
-      id: 'stat4-001-q1',
-      question: 'Which probability type requires equally-likely outcomes?',
-      options: ['Classical', 'Empirical', 'Subjective', 'Conditional'],
-      answer: 'Classical',
-      hints: ['Think about the formula P(A) = |A| / |S|.'],
-      reviewSection: 'Classical probability',
-    },
-    {
-      id: 'stat4-001-q2',
-      question: 'According to the Law of Large Numbers, as trial count grows, empirical probability:',
-      options: ['Stays fixed at 0.5', 'Converges to the true probability', 'Grows without bound', 'Becomes subjective'],
-      answer: 'Converges to the true probability',
-      hints: ['What does "law of large numbers" mean in plain language?'],
-      reviewSection: 'Empirical probability',
-    },
-    {
-      id: 'stat4-001-q3',
-      question: 'P(A) = 0.4. What are the odds in favour of A?',
-      options: ['2 : 3', '4 : 10', '3 : 2', '0.4 : 1'],
-      answer: '2 : 3',
-      hints: ['Odds = P(A) / P(not A) = 0.4 / 0.6.'],
-      reviewSection: 'Probability vs. odds',
-    },
-    {
-      id: 'stat4-001-q4',
-      question: 'Which Kolmogorov axiom guarantees P(S) = 1?',
-      options: ['Axiom 1: P(A) ≥ 0', 'Axiom 2: P(S) = 1', 'Axiom 3: addition for mutually exclusive events', 'None of them'],
-      answer: 'Axiom 2: P(S) = 1',
-      hints: ['The three axioms are non-negativity, normalisation, and additivity.'],
-      reviewSection: 'Three interpretations, one axiom system',
-    },
-    {
-      id: 'stat4-001-q5',
-      question: 'A coin is flipped 6 times; all 6 are heads. A student says "tails must come next." This is:',
-      options: ["Correct — the coin's probability balances out", 'Gambler\'s Fallacy', 'The Law of Large Numbers', 'Empirical probability'],
-      answer: "Gambler's Fallacy",
-      hints: ['Are successive flips independent of each other?'],
-      reviewSection: "Gambler's Fallacy",
-    },
-    {
-      id: 'stat4-001-q6',
-      question: 'An event A has sample space S = {1,2,3,4,5,6,7,8}. A = {2,4,6,8}. P(A) = ?',
-      options: ['0.25', '0.50', '0.75', '4'],
-      answer: '0.50',
-      hints: ['Count elements in A and divide by |S|.'],
-      reviewSection: 'Classical probability',
-    },
-  ],
-
-  misconceptions: [
-    {
-      error: 'Applying classical probability to a non-uniform sample space.',
-      correction: 'Classical P = |A|/|S| only when all outcomes are equally likely. A loaded die, a weighted spinner, or a real-world phenomenon requires empirical data or a model.',
-    },
-    {
-      error: 'Assuming independent events "balance out" in the short run (Gambler\'s Fallacy).',
-      correction: 'Each trial is independent. Past outcomes do not change future probabilities. The Law of Large Numbers is a statement about infinite limits, not a guarantee in any finite window.',
-    },
-    {
-      error: 'Confusing probability and odds.',
-      correction: 'P(A) = 0.25 means odds of 1:3, not 25:75 reduced to 1:3 meaning different things in different contexts. Always state whether you are giving a probability (between 0 and 1) or odds (a ratio).',
-    },
-  ],
-
-  transferPrompts: [
-    'A quality-control engineer says "based on last year\'s data, 2% of parts fail." Is this classical, empirical, or subjective? What would you need to compute a classical probability for the same event?',
-    'An insurance actuary sets a 0.003 annual probability of flood damage for a specific zip code. What type of probability is this? What data was likely used?',
-  ],
-
-  debugging: [
-    {
-      symptom: 'You compute P(A) > 1 or P(A) < 0.',
-      cause: 'Arithmetic error or misidentification of |A| or |S|. P must always lie in [0, 1].',
-      fix: 'Recount the favourable outcomes and total outcomes. Check whether your denominator is the full sample space, not a subset.',
-    },
-    {
-      symptom: 'Empirical probability does not match classical probability even after 1000 trials.',
-      cause: 'Small deviations are expected and normal. Verify there is no systematic bias in how the experiment is run.',
-      fix: 'Check that the experiment is truly random. The gap between empirical and classical shrinks on average as n grows, but any single run can deviate.',
-    },
-  ],
-
-  mastery: {
-    targetLevel: 'Apply',
-    successCriteria: [
-      'Correctly identify which probability type is appropriate for a given scenario.',
-      'Compute classical probability from a finite equally-likely sample space.',
-      'Compute empirical probability from frequency data.',
-      'Convert between probability and odds.',
-      'Identify and name the Gambler\'s Fallacy.',
+    visualizations: [
+      {
+        id: "stat4-001-viz-1",
+        title: "Sample space rectangle: probability as area",
+        type: "diagram",
+        purpose:
+          "Shows that probability is a proportion of a whole — a fraction of area in the sample space rectangle. Prepares students for Venn diagram reasoning in stat4-002.",
+        misconceptionAddressed:
+          "Students think of probability as a count rather than a proportion. This visual anchors it as a fraction of a whole.",
+        invariant:
+          "The total area of the rectangle is always 1. Every event is a region inside it. The probability of an event is the fraction of the rectangle it occupies.",
+      },
+      {
+        id: "stat4-001-viz-2",
+        title:
+          "Law of Large Numbers: empirical probability converging to true probability",
+        type: "line-chart",
+        purpose:
+          'Shows that empirical probability is noisy for small n and stable for large n. Directly addresses the common question "how do we know the empirical estimate is right?"',
+        misconceptionAddressed:
+          "Students think empirical probability is exact from a small sample, or that it never converges.",
+        invariant:
+          "As n grows, the running proportion fluctuates less and centres on the true probability. The convergence is guaranteed but the path is random.",
+      },
     ],
-    commonErrors: ['Using classical formula with unequal outcomes', 'Confusing probability and odds', 'Gambler\'s Fallacy'],
-    prerequisites: ['Fractions and ratios', 'Basic set notation (|S|, subsets)'],
-    nextSteps: ['stat4-002: Complement, Union, Intersection'],
   },
 
+  // ── Math ──────────────────────────────────────────────────────
+  math: {
+    prose: [
+      "**Formal setup.** Let $S$ be a non-empty set (the sample space). An **event** is a subset $A \\subseteq S$. A **probability function** $P$ assigns to each event a real number satisfying the three Kolmogorov axioms: (1) $P(A) \\geq 0$, (2) $P(S) = 1$, (3) for any two mutually exclusive events $A \\cap B = \\emptyset$: $P(A \\cup B) = P(A) + P(B)$. Every other probability rule is a consequence of these three.",
+      "**Classical probability formula.** If $S$ is finite and all outcomes are equally likely, $P(A) = |A| / |S|$ where $|A|$ denotes the number of outcomes in $A$. This follows directly from axioms 2 and 3: if $S$ has $n$ equally-likely singleton outcomes $\\{s_1\\}, \\ldots, \\{s_n\\}$, then $P(\\{s_i\\}) = 1/n$ for each $i$, so $P(A) = \\sum_{s_i \\in A} P(\\{s_i\\}) = |A| \\cdot (1/n)$.",
+      "**Law of Large Numbers (informal).** Let $A$ be an event with true probability $P(A) = p$. Perform $n$ independent repetitions. The empirical probability $\\hat{p}_n = f_n / n$ satisfies: for every $\\varepsilon > 0$, $P(|\\hat{p}_n - p| > \\varepsilon) \\to 0$ as $n \\to \\infty$. In plain language: the probability that the empirical estimate deviates from the true probability by more than any fixed amount goes to zero as $n$ grows.",
+      "**Odds and probability conversion.** Given $P(A) = p$, the odds in favour of $A$ are $\\text{odds}(A) = p / (1 - p)$. The inverse: $p = \\text{odds}(A) / (1 + \\text{odds}(A))$. $p = 0.5$ gives odds $= 1$ (even odds); $p = 0.9$ gives odds $= 9$ (9:1 in favour).",
+    ],
+  },
+
+  // ── Rigor ─────────────────────────────────────────────────────
+  rigor: {
+    prose: [
+      "**Measure theory foundation.** In advanced probability, $S$ is equipped with a $\\sigma$-algebra $\\mathcal{F}$ — a collection of subsets closed under complement and countable unions. The probability function $P: \\mathcal{F} \\to [0,1]$ is a measure with $P(S) = 1$. For discrete $S$ this is elementary; for continuous $S$ (e.g., $S = \\mathbb{R}$) it requires the Borel $\\sigma$-algebra. This is why the classical formula $P(A) = |A|/|S|$ only applies to finite $S$ with equally-likely outcomes.",
+      "**Frequentist vs. Bayesian interpretations.** The Kolmogorov axioms define the mathematics; they do not prescribe the meaning of $P$. The **frequentist** interpretation: probability is the long-run relative frequency of a repeatable experiment. The **Bayesian** interpretation: probability is a degree of belief about any uncertain proposition, updated via Bayes' Theorem as evidence accumulates. Both are internally consistent. This course uses both — classical/empirical probability is frequentist; Bayes' Theorem (stat4-004) is Bayesian.",
+      '**Why the Gambler\'s Fallacy is a formal error.** Two events $A$ and $B$ are **independent** if $P(A \\cap B) = P(A) \\cdot P(B)$. For a fair coin, successive flips are independent by assumption. The $k$-th flip\'s outcome lives on a different trial from the $(k-1)$-th flip. The intersection of "flip 10 = heads" and "flip 11 = heads" has probability $0.5 \\times 0.5 = 0.25$, regardless of all prior results. There is no mechanism by which past independent outcomes can affect future ones.',
+    ],
+    visualizations: [],
+  },
+
+  // ── Code / Notebooks ──────────────────────────────────────────
   python: {
     cells: [
       {
-        id: 'stat4-001-cell-1',
-        type: 'python',
-        cellTitle: 'Simulate Empirical Probability: Fair Die',
+        id: "stat4-001-cell-1",
+        type: "python",
+        cellTitle: "Simulate Empirical Probability: Fair Die",
         code: `import random
 
 # Simulate rolling a fair die 600 times
@@ -195,12 +144,13 @@ fig.bars(
 )
 fig.text(3.5, 0.235, "Empirical vs Classical P (600 die rolls)", size=12, bold=True)
 fig.show()`,
-        instructions: 'Run the cell. Compare the empirical probabilities in the table to 1/6 ≈ 0.1667. Modify `n` to 60, then to 6000 and re-run — notice how the empirical probabilities get closer to 0.1667 as n increases. This is the Law of Large Numbers.',
+        instructions:
+          "Run the cell. Compare the empirical probabilities in the table to 1/6 ≈ 0.1667. Modify `n` to 60, then to 6000 and re-run — notice how the empirical probabilities get closer to 0.1667 as n increases. This is the Law of Large Numbers.",
       },
       {
-        id: 'stat4-001-cell-2',
-        type: 'python',
-        cellTitle: 'Classical Probability: Card Deck',
+        id: "stat4-001-cell-2",
+        type: "python",
+        cellTitle: "Classical Probability: Card Deck",
         code: `# Classical probability from a 52-card deck
 # Sample space: 52 equally-likely cards
 
@@ -229,12 +179,13 @@ values = [p_heart, p_ace, p_face, p_red_ace]
 fig.bars(labels=labels, values=values, color="coral")
 fig.text(2.5, 0.32, "Classical Probabilities — 52-Card Deck", size=12, bold=True)
 fig.show()`,
-        instructions: 'Run the cell to see four classical probabilities visualised. Change `num_hearts` to 13 and recompute — the fraction should always be count / 52. Try computing P(not a heart) = 1 − P(heart) and verify it equals 39/52.',
+        instructions:
+          "Run the cell to see four classical probabilities visualised. Change `num_hearts` to 13 and recompute — the fraction should always be count / 52. Try computing P(not a heart) = 1 − P(heart) and verify it equals 39/52.",
       },
       {
-        id: 'stat4-001-cell-3',
-        type: 'python',
-        cellTitle: 'Probability vs. Odds Converter',
+        id: "stat4-001-cell-3",
+        type: "python",
+        cellTitle: "Probability vs. Odds Converter",
         code: `# Convert between probability and odds
 
 def prob_to_odds(p):
@@ -266,7 +217,8 @@ fig.text(0.5, 9.3, "Odds in Favour vs. Probability", size=12, bold=True)
 fig.text(0.5, -0.7, "P(A)", size=11)
 fig.text(-0.1, 5, "Odds", size=11)
 fig.show()`,
-        instructions: 'Run the cell. Notice that odds grow non-linearly — once P > 0.5, odds increase steeply. When P = 0.5, odds are 1:1. Modify the list `probs` to include 0.01 and 0.99 and observe the extreme odds.',
+        instructions:
+          "Run the cell. Notice that odds grow non-linearly — once P > 0.5, odds increase steeply. When P = 0.5, odds are 1:1. Modify the list `probs` to include 0.01 and 0.99 and observe the extreme odds.",
       },
     ],
   },

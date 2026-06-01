@@ -1,0 +1,13 @@
+patient_id,group,age,baseline_bp,week8_bp,adherence_pct,side_effect
+P001,treatment,54,148,134,92,no
+P002,treatment,61,152,138,88,yes
+P003,control,57,147,145,90,no
+P004,control,63,155,151,85,yes
+P005,treatment,49,144,130,95,no
+P006,control,52,146,143,91,no
+P007,treatment,66,158,141,83,yes
+P008,control,59,150,148,87,no
+P009,treatment,55,149,136,90,no
+P010,control,62,153,149,84,yes
+P011,treatment,58,151,137,89,no
+P012,control,53,145,142,93,no
