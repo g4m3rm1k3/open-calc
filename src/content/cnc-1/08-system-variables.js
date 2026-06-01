@@ -40,8 +40,101 @@ export default {
           initialCode: '(PROBE SIMULATION) \n#100 = #5021 (READ CURRENT MACHINE X) \nG01 X5.0 F50 \n#101 = #5021 (READ AGAIN AT X5.0) \n \nIF [#101 NE 5.0] GOTO 999 (ALARM IF POSITION MISMATCH) \nM30 \n \nN999 \n#3000 = 1 (POSITIONING ERROR)'
         },
         title: 'System Telemetry Lab',
-        caption: 'Look at the MACROS tab. #100 and #101 will grab values directly from the machine’s internal encoders (#5021). If the machine doesn’t reach X5.0, the "Smart Macro" triggers alarm #3000.'
-      }
+        caption: 'Look at the MACROS tab. #100 and #101 will grab values directly from the machine\'s internal encoders (#5021). If the machine doesn\'t reach X5.0, the "Smart Macro" triggers alarm #3000.',
+      },
+      {
+        id: 'GcodeNotebook',
+        type: 'GcodeNotebook',
+        initialProps: {
+          dialect: 'fanuc',
+          initialCells: [
+            {
+              id: 'sv-1',
+              label: '1 — Reading current machine position: #5021-#5026',
+              code:
+                '; System variables #5021-#5026 hold the current MACHINE position\n' +
+                '; (not program position — machine coordinates, G53 space).\n' +
+                '; Read them AFTER a move to capture where the tool actually is.\n' +
+                '; Use G04 P0 to flush the lookahead buffer before reading.\n' +
+                'G21 G90 G54\n' +
+                'G0 X50 Y30 Z5\n' +
+                'G04 P0                    ; flush lookahead: ensure motors have stopped\n' +
+                '#100 = #5021             ; capture actual X position (machine coords)\n' +
+                '#101 = #5022             ; capture actual Y position\n' +
+                '#102 = #5023             ; capture actual Z position\n' +
+                '(MSG, Position captured: X=#100  Y=#101  Z=#102)\n' +
+                'M30\n',
+            },
+            {
+              id: 'sv-2',
+              label: '2 — #3000 macro alarm: validate before cutting',
+              code:
+                '; #3000 = message triggers a MACHINE ALARM and halts the program.\n' +
+                '; Use it to validate inputs before executing dangerous moves.\n' +
+                '; The alarm number is your custom code; the string is the display message.\n' +
+                '#100 = 15.0               ; depth argument (set this from G65 in real use)\n' +
+                '#101 = 50.0               ; max allowed depth (safety limit)\n' +
+                '; Check: if requested depth exceeds safety limit, alarm out\n' +
+                'IF [#100 GT #101] THEN #3000 = 1 (DEPTH EXCEEDS LIMIT - CHECK PROGRAM)\n' +
+                '; Check: if depth is zero or negative, alarm out\n' +
+                'IF [#100 LE 0] THEN #3000 = 2 (DEPTH MUST BE POSITIVE)\n' +
+                '; Safe to proceed\n' +
+                'G0 X0 Y0 Z5\n' +
+                'G1 Z[-#100] F150\n' +
+                'G0 Z50\n' +
+                'M30\n',
+            },
+            {
+              id: 'sv-3',
+              label: '3 — Writing work offsets: auto-correct G54 from probe measurement',
+              code:
+                '; #5221 = G54 X offset, #5222 = G54 Y offset (read-write)\n' +
+                '; A probe measures part position and updates G54 automatically.\n' +
+                '; This is how self-correcting probing macros work.\n' +
+                'G21 G90\n' +
+                '; Simulate: probe measured part at X=0.15 (should be X=0)\n' +
+                '; Correction: shift G54 X by -0.15 to re-zero the part\n' +
+                '#110 = #5221              ; read current G54 X offset\n' +
+                '#111 = 0.15              ; measured offset error from probe\n' +
+                '#5221 = [#110 - #111]    ; write corrected offset back to G54\n' +
+                '(MSG, G54 X corrected by -0.15mm)\n' +
+                '; Now the machine uses the updated G54 for all subsequent moves\n' +
+                'G54\n' +
+                'G0 X0 Y0 Z5\n' +
+                'M30\n',
+            },
+          ],
+        },
+        title: 'System Variables — Machine Telemetry',
+        caption: 'Cell 1: read actual machine position with G04 P0 buffer flush before sampling. Cell 2: #3000 macro alarm — validate inputs and halt before dangerous moves. Cell 3: write to #5221 to auto-correct G54 from a probe measurement.',
+      },
+    ],
+    callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 24 of 31 — System Variables',
+        body: 'User variables (#1–#999) hold your data. System variables (#1000+) expose the machine\'s own internal state. Reading them turns your macro into a sensor; writing to the offset registers turns it into a self-correcting system.',
+      },
+      {
+        type: 'definition',
+        title: '#5021–#5026 — Current machine position (read-only)',
+        body: '#5021=X, #5022=Y, #5023=Z (machine coordinates, G53 space). These update in real-time as the tool moves. Always precede a position read with G04 P0 to flush the lookahead buffer — without it, you may read a position the machine has not reached yet.',
+      },
+      {
+        type: 'definition',
+        title: '#3000 — Macro alarm (write-only)',
+        body: 'Writing #3000 = N (message text) immediately halts the machine and displays the message on the operator screen. Use it for input validation in parametric macros: check that depth is positive, diameter is in range, and tool number is valid before executing any motion.',
+      },
+      {
+        type: 'definition',
+        title: '#5221–#5225 — G54 work offset registers (read-write)',
+        body: '#5221=G54 X, #5222=G54 Y, #5223=G54 Z, #5224=G54 A, #5225=G54 B. Writing to these immediately updates the Work Offset table — the same table you see on the controller screen. Probing macros use this to auto-zero the part after measurement.',
+      },
+      {
+        type: 'warning',
+        title: 'Lookahead: use G04 P0 before reading positions',
+        body: 'The controller reads ahead 50–100 blocks to plan acceleration. A #100 = #5021 read may execute while the tool is still several moves away. G04 P0 (zero-time dwell) forces the lookahead buffer to flush — all queued moves complete before the position read executes.',
+      },
     ],
     prose: [
       'Think of **System Variables (#5000)** as the "Diagnostic Port" on your car. You can use it to see your Speed, RPM, and Fuel level. You can also use it to change the car\'s internal settings (like the radio preset or seat position).',

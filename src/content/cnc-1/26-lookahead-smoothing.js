@@ -479,6 +479,38 @@ draw();
         caption: 'Try switching between G61 and G64 at the top of the square contour. Also note G09 on one block — the exact stop check applies only to that move, then G64 resumes. The backplot path looks identical; the speed difference is invisible in a simulator but dramatic on a real machine.',
       },
     ],
+    callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 26 of 31 — Lookahead & Smoothing',
+        body: 'You have programmed motion. This lesson explains what happens inside the controller between blocks: how fast it can process commands, how it blends corners, and why every corner rounds slightly at high feed. This is the physics behind surface finish.',
+      },
+      {
+        type: 'definition',
+        title: 'G64 — Continuous path mode (default)',
+        body: 'The controller pre-reads upcoming blocks (lookahead buffer) and builds a continuous velocity profile. Shallow corners are barely slowed; sharp corners slow proportionally; reversals still stop. The tool never stops between moves unless a reversal forces it. Use G64 for all contouring and profiling.',
+      },
+      {
+        type: 'definition',
+        title: 'G61 — Exact stop mode',
+        body: 'The machine decelerates to zero and waits within the in-position tolerance at every block endpoint before executing the next block. Slower but geometrically exact. Required for probing (probe must be stationary at trigger), boring retract (prevent bore wall scratch), and tapping.',
+      },
+      {
+        type: 'definition',
+        title: 'G09 — One-shot exact stop check (non-modal)',
+        body: 'Applies exact stop to a single block only, then the program returns to whatever modal mode (G61 or G64) was active. Use G09 to guarantee a single critical position (pocket corner, datum probe point, thread start) without slowing the entire toolpath.',
+      },
+      {
+        type: 'insight',
+        title: 'Block cycle time caps feedrate on dense CAM toolpaths',
+        body: 'F_max = (segment_length × 60,000) / BCT_ms. At 0.2mm CAM segments and 4ms block cycle time: F_max = 3000 mm/min regardless of what you program. If your machine runs slower than the programmed feed on dense toolpaths, this is the cause — not acceleration limits.',
+      },
+      {
+        type: 'insight',
+        title: 'Following error rounds every corner at high speed',
+        body: 'Following error E = F / (Kv × 1000). At F=3000 mm/min and Kv=30: E = 0.1mm. The servo physically lags 0.1mm behind the commanded position at all times. At a 90° corner, the tool begins turning before fully reaching the corner — creating a visible radius even in G64. Higher Kv reduces this but risks servo oscillation.',
+      },
+    ],
     prose: [
       '**The Controller\'s Job Between Blocks**: Think of the CNC controller as reading a book — it reads blocks one at a time. After reading a block, it must parse the G-codes, evaluate any macro expressions, compute the interpolation trajectory for every axis, and queue the motion for the servo drives. This takes time — the **block cycle time (BCT)**. On a Fanuc Series 0 from the 1990s, BCT was about 16 milliseconds. A modern Fanuc 30i can process a block in 0.5 milliseconds. That 32× difference is why older machines struggle with HSM toolpaths that newer ones handle easily.',
 

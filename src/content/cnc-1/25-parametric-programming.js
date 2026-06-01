@@ -181,6 +181,33 @@ export default {
         caption: 'Work through the Python version first. The logic is identical — only syntax differs. The critical difference: Python uses radians, Fanuc Macro B SIN/COS use degrees.',
       },
     ],
+    callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 25 of 31 — Parametric Programming',
+        body: 'Variables, arithmetic, loops, and subroutines all come together here. A parametric program is the proof of concept: one piece of code that machines any part in a family by changing a few numbers at the top.',
+      },
+      {
+        type: 'definition',
+        title: 'Parametric programming — variables instead of hard-coded coordinates',
+        body: 'A hard-coded program: G1 X40. — one specific dimension. A parametric program: G1 X#105 where #105 = #102 * COS[#104]. Change #102 (radius) and every position recalculates automatically. The program becomes a description of the geometry, not a sequence of specific numbers.',
+      },
+      {
+        type: 'definition',
+        title: 'Bolt circle algorithm: polar → Cartesian in a loop',
+        body: 'For N equally-spaced holes on radius R: loop i from 0 to N-1. Angle = i × (360 / N). X = R × COS[Angle]. Y = R × SIN[Angle]. Four lines of macro code that generate any bolt circle: 4-hole, 6-hole, 12-hole, any pitch circle diameter.',
+      },
+      {
+        type: 'insight',
+        title: 'Python uses radians; Fanuc uses degrees',
+        body: 'Python math.sin() and math.cos() take radians. Fanuc SIN[] and COS[] take degrees. When translating Python bolt circle code: the Python angle * math.pi / 180 conversion disappears in Fanuc because Fanuc is already in degrees. This is the single biggest translation gotcha.',
+      },
+      {
+        type: 'procedure',
+        title: 'Parametric macro structure: declare, compute, move, increment, loop',
+        body: '1. Declare parameters at top (#101=N, #102=R, #103=depth). 2. Initialize counter (#100=0). 3. WHILE [#100 LT #101] DO1. 4. Compute position from counter. 5. G81 cycle (or G0/G1 drill). 6. #100 = #100 + 1. END1. M30.',
+      },
+    ],
     prose: [
       '**What "parametric" means**: Hard-coded G-code programs have the part dimensions baked in as literal numbers. `G01 X40.` means exactly 40mm — change the part, rewrite the line. A parametric program replaces literal numbers with variables: `G00 X#105` where `#105 = #102 * COS[#104]`. Change `#102` (the radius), and all the X positions recompute automatically.',
 

@@ -106,7 +106,149 @@ export default {
   },
 
   intuition: {
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'GcodeNotebook',
+        type: 'GcodeNotebook',
+        initialProps: {
+          dialect: 'fanuc',
+          initialCells: [
+            {
+              id: 'setup-1',
+              label: '1 — Manual WCS establishment from edge find (G54 X Y Z)',
+              code:
+                '; SETUP STEP 1: Set G54 from a manual edge find.\n' +
+                '; Edge finder OD = 10mm (radius = 5mm).\n' +
+                '; Operator jogged to X edge, machine position was X-151.430.\n' +
+                '; Part X0 = machine X-151.430 + 5.000 = -146.430\n' +
+                '; Operator jogged to Y edge, machine position was Y-88.200.\n' +
+                '; Part Y0 = machine Y-88.200 + 5.000 = -83.200\n' +
+                '; Z was touched off with a gage block (height = 25mm):\n' +
+                '; Machine Z at contact = -398.250, so part Z0 = -398.250 + 25.000 = -373.250\n' +
+                '; These values are entered into the G54 offset table:\n' +
+                '; G54: X=-146.430, Y=-83.200, Z=-373.250\n' +
+                '; Now G0 X0 Y0 in the program goes exactly to the part corner.\n' +
+                '(VERIFY SETUP: DRY RUN WITH Z +50mm)\n' +
+                'G21 G90 G17 G40 G49 G80 G94\n' +
+                'T1 M06\n' +
+                'G43 H1\n' +
+                'G54\n' +
+                'S3000 M03\n' +
+                'G0 X0 Y0 Z50          ; air check: spindle should be directly above part corner\n' +
+                'M00                   ; PAUSE — verify position visually before proceeding\n' +
+                'G0 Z5\n' +
+                'M05\n' +
+                'M30\n',
+            },
+            {
+              id: 'setup-2',
+              label: '2 — G43 tool length offset: activate for each tool, verify before plunge',
+              code:
+                '; SETUP STEP 2: Every tool gets its own G43 H offset.\n' +
+                '; H1 through H4 store each tool length offset.\n' +
+                '; If H-register is 0, G43 does nothing — catastrophic plunge risk.\n' +
+                '; Procedure: touch each tool off to the work surface Z0,\n' +
+                ';   record machine Z, enter into Hxx register.\n' +
+                'G21 G90 G17 G40 G80 G94\n' +
+                '\n' +
+                '(--- TOOL 1: 12mm END MILL ---)\n' +
+                'T1 M06\n' +
+                'G43 H1                ; activate TLO for T1 (stored in H1)\n' +
+                'G54\n' +
+                'S3000 M03 M08\n' +
+                'G0 X10 Y10 Z5\n' +
+                'G1 Z-5 F150           ; with G43 H1, Z-5 is 5mm below work surface Z0\n' +
+                'G0 Z50\n' +
+                '\n' +
+                '(--- TOOL 2: 6mm DRILL ---)\n' +
+                'T2 M06\n' +
+                'G43 H2                ; switch to T2 offset — critical, must not forget\n' +
+                'G54\n' +
+                'S2500 M03 M08\n' +
+                'G0 X30 Y30 Z5\n' +
+                'G81 X30 Y30 Z-8 R2 F100   ; drill cycle with correct TLO\n' +
+                'G80\n' +
+                'G0 Z50\n' +
+                '\n' +
+                'M05 M09\n' +
+                'G91 G28 Z0\n' +
+                'G90\n' +
+                'M30\n',
+            },
+            {
+              id: 'setup-3',
+              label: '3 — Probing macro: auto-set G54 and verify tool lengths',
+              code:
+                '; ADVANCED SETUP: On-machine probing macros (Renishaw-style).\n' +
+                '; G65 P9810 = protected positioning (avoids collision during probe approach).\n' +
+                '; G65 P9811 = measure X surface and write result to G54.\n' +
+                '; G65 P9812 = measure Y surface.\n' +
+                '; G65 P9814 = measure tool length vs tool setter.\n' +
+                '; These macros eliminate manual math and human entry errors.\n' +
+                'G21 G90 G17 G40 G49 G80 G94\n' +
+                '\n' +
+                '(--- PROBE T99: RENISHAW PROBE ---)\n' +
+                'T99 M06               ; spindle probe tool\n' +
+                'G43 H99\n' +
+                'G54\n' +
+                'S0 M03                ; probe runs at 0 RPM or very low\n' +
+                '\n' +
+                '(SET G54 FROM PART DATUM)\n' +
+                'G65 P9810 Z10.0       ; safe position above part\n' +
+                'G65 P9811 X0 D10.0    ; probe X surface, offset = part X0 + probe radius 5mm\n' +
+                'G65 P9812 Y0 D10.0    ; probe Y surface\n' +
+                'G65 P9810 Z-5.0       ; descend to work surface\n' +
+                'G65 P9813 Z0          ; probe Z surface, set G54 Z\n' +
+                '\n' +
+                '(PROBE TOOL LENGTHS - T1 and T2)\n' +
+                'T1 M06\n' +
+                'G65 P9814 H1          ; measure T1 length, write to H1\n' +
+                'T2 M06\n' +
+                'G65 P9814 H2          ; measure T2 length, write to H2\n' +
+                '\n' +
+                'M05\n' +
+                'G91 G28 Z0\n' +
+                'G90\n' +
+                'M30\n',
+            },
+          ],
+        },
+        title: 'Setup & Probing in G-Code',
+        caption: 'Cell 1: manual edge-find setup — edge finder math, G54 entry, and air-check before cutting. Cell 2: two-tool program showing G43 H activation and the risk of missing it. Cell 3: probing macros (Renishaw-style) that auto-set G54 and tool lengths without manual math.',
+      },
+    ],
+    callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 31 of 31 — Setup and Probing (Final Lesson)',
+        body: 'This is the capstone. Every lesson in this course leads here: you have a machine, a program, tools, and a workpiece. Setup is the bridge between the virtual G-code world and real metal. Do this correctly and every other lesson pays off. Do it wrong and nothing else matters.',
+      },
+      {
+        type: 'definition',
+        title: 'WCS (G54): the translation between machine home and part datum',
+        body: 'The machine knows its own home position (X0 Y0 Z0 at machine home). Your program uses a different origin — the part corner or center. G54 stores the XYZ offset between those two origins. When G54 is active, all program coordinates are measured from the part datum, not machine home.',
+      },
+      {
+        type: 'definition',
+        title: 'G43 H[n]: the translation between reference Z and actual tool length',
+        body: 'Every tool has a different length. G43 H1 tells the controller: "add the H1 register value to every Z position in the program." The result: Z-5.0 in the program always means 5mm below the work surface, regardless of which tool is in the spindle. Never start a Z move into material without G43 active.',
+      },
+      {
+        type: 'warning',
+        title: 'Missing G43 is the most dangerous setup error',
+        body: 'If G43 H1 is omitted and H1 = 0, the tool plunges by the wrong amount — typically 50–300 mm too deep depending on the tool length. This destroys the tool, possibly the vise, and can damage the spindle. Always verify G43 is on the same block as the first Z move. Use G49 to cancel, never leave G43 state ambiguous between tools.',
+      },
+      {
+        type: 'procedure',
+        title: 'First-article protocol: measure before the batch',
+        body: '1. Run the program in single-block mode with Z raised 50 mm — air check. 2. Verify X/Y position visually at every critical move. 3. If air check passes, run to first cut. 4. Stop after first feature: measure Z depth, X/Y position, and critical diameter/dimension. 5. Correct any offsets. 6. Only start the batch after all critical dimensions pass on piece 1.',
+      },
+      {
+        type: 'insight',
+        title: 'Probing macros eliminate human math errors',
+        body: 'Manual edge finding requires the operator to: jog to the edge, read the machine position, add or subtract the probe radius, and type a number into the offset table. Each step is an error opportunity. A probing macro does all of this in a few seconds with no operator math. Any shop running more than 10 setups per week should invest in on-machine probing.',
+      },
+    ],
     prose: [
       '**Setup as a Translation Problem**: The G-code programmer writes coordinates relative to a convenient ' +
       'origin on the drawing (usually a corner or center of the part). The machine has its own origin — ' +

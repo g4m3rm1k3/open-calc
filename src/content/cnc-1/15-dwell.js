@@ -62,7 +62,105 @@ export default {
         },
         title: 'Dwell at Bore Depth',
         caption: 'G04 P500 pauses all axis motion for 500ms. The spindle continues rotating, completing several clean revolutions at the bottom of the bore before retract. This eliminates the spiral witness mark.',
-      }
+      },
+      {
+        id: 'GcodeNotebook',
+        type: 'GcodeNotebook',
+        initialProps: {
+          dialect: 'fanuc',
+          initialCells: [
+            {
+              id: 'dwell-1',
+              label: '1 — G04 P_: pause all axes, spindle keeps spinning',
+              code:
+                '; G04 = dwell. All axis motion stops for the duration.\n' +
+                '; The spindle keeps rotating — G04 does not touch M03/M04.\n' +
+                '; G04 P_ = milliseconds (Fanuc standard)\n' +
+                '; G04 P1000 = 1 second. G04 P500 = 0.5 second.\n' +
+                'G21 G90\n' +
+                'S800 M03\n' +
+                'G0 X0 Y0 Z5\n' +
+                'G1 Z-25 F40               ; plunge boring bar to depth\n' +
+                'G04 P500                  ; dwell 500ms = ~6 full revolutions at 800 RPM\n' +
+                '; Revolutions during dwell = (RPM / 60000) * P_ms\n' +
+                '; = (800 / 60000) * 500 = 6.67 revolutions\n' +
+                'G0 Z50                    ; retract cleanly after full revolutions\n' +
+                'M05\n' +
+                'M30\n',
+            },
+            {
+              id: 'dwell-2',
+              label: '2 — G04 after M03 spindle start (ramp-up wait)',
+              code:
+                '; Some machines take 200–500ms to reach full spindle speed after M03.\n' +
+                '; If you move immediately, the tool enters material while\n' +
+                '; the spindle is still accelerating — poor surface finish or tool breakage.\n' +
+                '; A brief G04 after M03 lets the spindle reach full RPM first.\n' +
+                'G21 G90\n' +
+                'T1 M06\n' +
+                'G43 H1\n' +
+                'S2500 M03\n' +
+                'G04 P300                  ; wait 300ms for spindle ramp-up\n' +
+                'G0 X0 Y0 Z5\n' +
+                'M08\n' +
+                'G1 Z-3 F200               ; now cutting at full speed\n' +
+                'G1 X50 F300\n' +
+                'G0 Z50\n' +
+                'M05 M09\n' +
+                'M30\n',
+            },
+            {
+              id: 'dwell-3',
+              label: '3 — G04 is non-modal: fires once, no cancel needed',
+              code:
+                '; G04 executes once and then the machine returns to\n' +
+                '; whatever modal state it was in before the dwell.\n' +
+                '; There is no "G04 off" or cancel code needed.\n' +
+                'G21 G90\n' +
+                'S1000 M03\n' +
+                'G0 X0 Y0 Z5\n' +
+                'G1 Z-10 F80               ; first bore\n' +
+                'G04 P400                  ; dwell at depth 1\n' +
+                'G0 Z5\n' +
+                'G0 X30                    ; move to second hole (G01 modal still active)\n' +
+                'G1 Z-10 F80               ; second bore\n' +
+                'G04 P400                  ; dwell at depth 2 (same P, separate G04 block)\n' +
+                'G0 Z50\n' +
+                'M05\n' +
+                'M30\n',
+            },
+          ],
+        },
+        title: 'G04 Dwell — Pause, Ramp, Non-Modal',
+        caption: 'Cell 1: G04 P in milliseconds — spindle stays running while axes pause. Cell 2: using dwell after M03 to let the spindle reach full speed before cutting. Cell 3: G04 is non-modal — it fires once, no cancel needed.',
+      },
+    ],
+    callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 15 of 31 — Dwell',
+        body: 'G04 is one of the simplest codes in CNC, but it solves a real precision problem. Every machinist who bores holes needs to know this.',
+      },
+      {
+        type: 'definition',
+        title: 'G04 P_ — Timed Axis Pause',
+        body: 'G04 halts all axis motion for the programmed duration. Spindle state is unchanged — if M03 was active, the spindle keeps spinning. On Fanuc: P is in milliseconds (G04 P1000 = 1 second). Some controllers use P in seconds — verify with your machine manual.',
+      },
+      {
+        type: 'definition',
+        title: 'Why bore quality depends on dwell',
+        body: 'At the moment a boring bar reverses, it is still rotating. Without a pause, the tool spirals upward through the bore surface, leaving a microscopic helix mark. G04 at depth lets the bar complete full clean revolutions before retract — the bore is round and has a consistent surface finish.',
+      },
+      {
+        type: 'insight',
+        title: 'Calculate dwell from RPM: 1 rev = 60000 / RPM ms',
+        body: 'At 800 RPM: one revolution = 60000 / 800 = 75ms. For 3 clean revolutions use G04 P225. For a comfortable safe margin, use P500 (6+ revolutions at 800 RPM). Higher RPM = shorter per-revolution time.',
+      },
+      {
+        type: 'insight',
+        title: 'G04 is non-modal',
+        body: 'Unlike G01 or G00, G04 does not stay active. It fires once and the machine returns to its previous modal motion state. There is nothing to cancel. Multiple dwells require multiple G04 blocks.',
+      },
     ],
     prose: [
       '**What G04 Does**: G04 is a timed pause. All axis motion stops. The spindle keeps spinning (if it was on — G04 does not affect spindle state). After the programmed duration, the program continues with the next block. It is that simple.',

@@ -197,7 +197,111 @@ calc();
         },
         title: 'Feeds & Speeds Applied',
         caption: 'The calculated S and F values appear directly in the G-code. The plunge feedrate is 25% of the cutting feedrate — this is a universal rule for end mills entering material axially.',
-      }
+      },
+      {
+        id: 'GcodeNotebook',
+        type: 'GcodeNotebook',
+        initialProps: {
+          dialect: 'fanuc',
+          initialCells: [
+            {
+              id: 'fs-1',
+              label: '1 — RPM from cutting speed: the fundamental formula',
+              code:
+                '; RPM = (Vc × 1000) / (π × D)\n' +
+                '; Vc = cutting speed in m/min (from tool/material chart)\n' +
+                '; D  = tool diameter in mm\n' +
+                '; Example: 12mm carbide end mill, aluminum 6061, Vc = 250 m/min\n' +
+                '#101 = 250              ; Vc: cutting speed m/min (aluminum with carbide)\n' +
+                '#102 = 12              ; tool diameter mm\n' +
+                '#103 = [#101 * 1000 / [3.14159 * #102]]  ; RPM formula\n' +
+                '(MSG, Calculated RPM = ) \n' +
+                '(#103 should equal ~6631 RPM)\n' +
+                '; Then write S into the program:\n' +
+                'G21 G90 G97\n' +
+                'S6600 M03              ; use the calculated RPM\n' +
+                'M05\n' +
+                'M30\n',
+            },
+            {
+              id: 'fs-2',
+              label: '2 — Feedrate from chip load: the second formula',
+              code:
+                '; Feedrate (F) = RPM × chip_load × number_of_flutes\n' +
+                '; chip_load: mm per tooth per revolution (from tool spec)\n' +
+                '; 4-flute 12mm carbide, aluminum roughing\n' +
+                '#110 = 6600            ; RPM from cell 1\n' +
+                '#111 = 0.04            ; chip load mm/tooth (aluminum roughing)\n' +
+                '#112 = 4               ; number of flutes\n' +
+                '#113 = [#110 * #111 * #112]  ; feedrate formula = 1056 mm/min\n' +
+                '(MSG, Calculated feedrate = )\n' +
+                '(#113 should equal ~1056 mm/min)\n' +
+                '#114 = [#113 * 0.25]   ; plunge feed = 25% of cutting feed = 264 mm/min\n' +
+                'G21 G90 G97\n' +
+                'S6600 M03\n' +
+                'G0 X0 Y0 Z5\n' +
+                'G1 Z-3 F264            ; plunge at 25% feedrate\n' +
+                'G1 X60 F1056           ; cut at full calculated feedrate\n' +
+                'G0 Z50\n' +
+                'M05\n' +
+                'M30\n',
+            },
+            {
+              id: 'fs-3',
+              label: '3 — Steel vs aluminum: same diameter, very different numbers',
+              code:
+                '; Material determines cutting speed (Vc).\n' +
+                '; Aluminum: Vc = 250 m/min → RPM = 6631  (runs fast)\n' +
+                '; Steel:    Vc = 100 m/min → RPM = 2653  (runs slow)\n' +
+                '; Same 12mm tool, same flute count — only Vc changes.\n' +
+                'G21 G90 G97\n' +
+                '(--- ALUMINUM PASS ---)\n' +
+                'S6600 M03\n' +
+                'G0 X0 Y0 Z5\n' +
+                'G1 Z-3 F250\n' +
+                'G1 X60 F1056           ; aluminum: high RPM, high feed\n' +
+                'G0 Z5\n' +
+                '(--- STEEL PASS ---)\n' +
+                'S2650 M03\n' +
+                'G0 X80 Y0\n' +
+                'G1 Z-3 F200\n' +
+                'G1 X140 F400           ; steel: lower RPM, lower feed\n' +
+                'G0 Z50\n' +
+                'M05\n' +
+                'M30\n',
+            },
+          ],
+        },
+        title: 'Feeds & Speeds — Calculate, Then Code',
+        caption: 'Cell 1: RPM formula from cutting speed and diameter. Cell 2: feedrate formula from RPM × chip load × flutes, with 25% plunge rule. Cell 3: same tool diameter in aluminum vs steel — see how different the numbers become.',
+      },
+    ],
+    callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 17 of 31 — Feeds & Speeds',
+        body: 'You have written programs that move a tool. This lesson covers how fast to move it and how fast to spin it — the two numbers that determine whether you cut clean chips or break tools.',
+      },
+      {
+        type: 'definition',
+        title: 'Cutting Speed (Vc) — not RPM',
+        body: 'Vc is the speed of the cutting edge moving through material, in m/min or SFM. It is a material + tool material property, not a machine setting. You cannot set Vc directly on the machine — you convert it to RPM first using the diameter. Aluminum carbide Vc ≈ 200–300 m/min. Steel carbide Vc ≈ 80–130 m/min.',
+      },
+      {
+        type: 'definition',
+        title: 'Chip Load — feed per tooth',
+        body: 'Chip load is the thickness of the chip each flute removes per revolution. Units: mm/tooth or in/tooth. Too small: rubbing, heat, tool wear. Too large: chatter, tool breakage. Chip load comes from the tool manufacturer spec sheet for a given diameter and material.',
+      },
+      {
+        type: 'insight',
+        title: 'Two formulas cover every situation',
+        body: 'RPM = (Vc × 1000) / (π × D). Feedrate = RPM × chip_load × flutes. Memorize these two. Everything else — plunge rate, ramping rate, finishing passes — derives from them.',
+      },
+      {
+        type: 'warning',
+        title: 'Plunge feedrate = 25% of cutting feedrate',
+        body: 'End mill center cutting edges are far less efficient than the side edges. When plunging straight down into material, use 25%–33% of the calculated cutting feedrate. Some tools (non-center-cutting end mills) cannot plunge at all — they require a ramping or helical entry path.',
+      },
     ],
     prose: [
       '**Two Formulas. That\'s It.**: Everything in feeds and speeds comes down to two equations. First, the **Cutting Speed Formula** gives you RPM from material cutting speed and tool diameter. Second, the **Feedrate Formula** gives you the F-word from RPM, chip load, and number of flutes. Learn these two and you can set up any operation on any machine.',

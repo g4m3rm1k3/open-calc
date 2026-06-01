@@ -6,6 +6,11 @@ export default {
   title: 'Absolute vs Incremental',
   subtitle: 'G90 / G91 — Where Am I Going vs How Far Do I Go?',
   tags: ['G90', 'G91', 'absolute', 'incremental', 'distance mode', 'coordinate mode', 'modal', 'RS-274', 'error propagation'],
+  aliases: 'G90 G91 absolute incremental distance mode coordinate mode error propagation cumulative error modal group 3',
+  timeToComplete: 15,
+  coreConcept: 'G90 (absolute) measures every coordinate from Work Zero; G91 (incremental) measures every coordinate from the current tool position. Absolute mode is standard for most programs; incremental mode is used for patterns but introduces cumulative error risk — a single wrong number in G91 shifts every subsequent move.',
+  prerequisites: ['cnc-modal-groups'],
+  nextLesson: 'machine-home',
 
   semantics: {
     core: [
@@ -73,30 +78,127 @@ export default {
         caption: 'Both sections draw the same L-shape. Notice how G91 uses relative distances (30, 20, -30) while G90 uses absolute positions (30, 20, 0). Also notice: G91 needs a NEGATIVE number to go back left; G90 just says X0. Absolute mode is more readable and less error-prone.',
       },
       {
-        id: 'ErrorAccumulationLab',
-        props: {
-          initialCode:
-            '(ERROR ACCUMULATION DEMO — same typo, different results)\n' +
-            'G21 G90\n' +
-            'G00 X0 Y0\n' +
-            '(Intended: three +10 mm moves in X)\n' +
-            '(--- G90 with typo in second block: X19.9 instead of X20 ---\n' +
-            'G01 X10.0 F100\n' +
-            'G01 X19.9      (typo!)\n' +
-            'G01 X30.0      (corrects itself)\n' +
-            '\n' +
-            'G00 X0 Y0\n' +
-            'G91\n' +
-            '(--- G91 with same typo ---\n' +
-            'G01 X10.0\n' +
-            'G01 X9.9       (typo!)\n' +
-            'G01 X10.0      (still off by 0.1)\n' +
-            'G90\n' +
-            'M30'
+        id: 'GcodeNotebook',
+        type: 'GcodeNotebook',
+        initialProps: {
+          dialect: 'fanuc',
+          initialCells: [
+            {
+              id: 'abs-1',
+              label: '1 — Same shape: G90 (absolute) vs G91 (incremental)',
+              code:
+                '; Both sections cut the same staircase.\n' +
+                '; G90: coordinates are POSITIONS from work zero.\n' +
+                '; G91: coordinates are DISTANCES from current position.\n' +
+                'G21\n' +
+                '\n' +
+                '; ── G90 ABSOLUTE ──\n' +
+                'G90\n' +
+                'G0 X0 Y0\n' +
+                'G1 X20 F200          ; go TO X=20\n' +
+                'G1 X20 Y20           ; go TO X=20, Y=20 (X did not move!)\n' +
+                'G1 X40 Y20           ; go TO X=40\n' +
+                'G1 X40 Y40           ; go TO Y=40\n' +
+                'G0 X0 Y0\n' +
+                '\n' +
+                '; ── G91 INCREMENTAL ──\n' +
+                'G91\n' +
+                'G0 X0 Y0\n' +
+                'G1 X20 F200          ; move +20 from current\n' +
+                'G1 Y20               ; move +20 in Y from current\n' +
+                'G1 X20               ; move +20 in X from current\n' +
+                'G1 Y20               ; move +20 in Y from current\n' +
+                'G90                  ; ALWAYS restore G90 at the end\n' +
+                'G0 X0 Y0\n' +
+                'M30\n',
+            },
+            {
+              id: 'abs-2',
+              label: '2 — Error propagation: why G91 is risky',
+              code:
+                '; A single 0.5mm typo in G91 corrupts EVERY move after it.\n' +
+                '; In G90, the same typo only affects ONE move — then self-corrects.\n' +
+                'G21\n' +
+                '\n' +
+                '; ── G90: typo on step 2 (X19.5 instead of X20) ──\n' +
+                'G90\n' +
+                'G0 X0 Y0\n' +
+                'G1 X20 F200          ; correct — lands at X=20\n' +
+                'G1 X19.5 Y20         ; TYPO — lands at X=19.5 (0.5 off)\n' +
+                'G1 X40 Y40           ; SELF-CORRECTS — G90 goes to X=40 regardless\n' +
+                'G0 X0 Y0\n' +
+                '\n' +
+                '; ── G91: same typo propagates ──\n' +
+                'G91\n' +
+                'G0 X0 Y0\n' +
+                'G1 X20 F200          ; correct\n' +
+                'G1 X-0.5 Y20         ; TYPO — now 0.5mm off\n' +
+                'G1 X20 Y20           ; ALSO 0.5mm off — error compounds\n' +
+                'G90\n' +
+                'G0 X0 Y0\n' +
+                'M30\n',
+            },
+            {
+              id: 'abs-3',
+              label: '3 — G91 proper use: home return and repeating patterns',
+              code:
+                '; G91 IS correct for two specific patterns:\n' +
+                '; 1. The standard Z home return (G28 G91 Z0)\n' +
+                '; 2. Repeating patterns where distance is more natural than position\n' +
+                'G21 G90\n' +
+                'G0 X0 Y0\n' +
+                '\n' +
+                '; ── REPEATING PATTERN in G91 ──\n' +
+                '; Drill 5 holes 15mm apart — incremental spacing is natural here:\n' +
+                'G91\n' +
+                'G1 X0 F200           ; start at current position\n' +
+                'G1 X15               ; +15mm to next hole\n' +
+                'G1 X15               ; +15mm\n' +
+                'G1 X15               ; +15mm\n' +
+                'G1 X15               ; +15mm\n' +
+                '\n' +
+                '; ── RETURN HOME in G91 (the right way) ──\n' +
+                'G91 G28 Z0           ; from WHEREVER Z is, go home in Z\n' +
+                'G90                  ; restore absolute — mandatory\n' +
+                'M30\n',
+            },
+          ],
         },
-        title: 'Error Accumulation Lab',
-        caption: 'A single 0.1 mm typo in G91 shifts every subsequent move forever. G90 isolates the error to one block. Run both and watch the final X position.',
-      }
+        title: 'Absolute vs Incremental — Feel the Difference',
+        caption: 'Cell 1: same shape in both modes — see how G90 uses positions, G91 uses distances. Cell 2: introduce a typo — G90 self-corrects on the next block, G91 propagates the error forever. Cell 3: the two cases where G91 is actually correct.',
+      },
+    ],
+    callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 5 of 31 — Coordinate Interpretation',
+        body: 'You know axes (L1), units (L2), blocks (L3), modal state (L4). Now you learn how the controller interprets the numbers inside each block — as absolute positions or relative distances.',
+      },
+      {
+        type: 'definition',
+        title: 'G90 — Absolute Mode',
+        body: 'Every coordinate is measured from Work Zero. X50 always means "the point 50 mm from origin," regardless of where the tool is. Writing X50 twice in a row: the second command does nothing — tool is already there.',
+      },
+      {
+        type: 'definition',
+        title: 'G91 — Incremental Mode',
+        body: 'Every coordinate is a distance added to the current position. X50 means "move 50 mm from here." Writing X50 twice moves the tool 100 mm total. Each value is a delta (Δ), not a destination.',
+      },
+      {
+        type: 'warning',
+        title: 'G91 errors compound — G90 errors self-correct',
+        body: 'A single typo in G91 shifts every subsequent move by the same amount. The error never goes away. In G90, a typo only affects one block; the next absolute coordinate lands in the right place regardless.',
+      },
+      {
+        type: 'procedure',
+        title: 'When to use G91',
+        body: '1. Standard Z home return: G91 G28 Z0 (from wherever Z is, go home). 2. Repeating patterns where step distance is natural (bolt circle spacing, equal slots). Always switch back to G90 immediately after.',
+      },
+      {
+        type: 'warning',
+        title: 'Always end G91 blocks with G90',
+        body: 'Leaving G91 active after a home return is the #1 cause of absolute-mode crashes. The next programmer reads X50 and expects it means 50 mm from origin — but the controller is still adding it to current position.',
+      },
     ],
     prose: [
       '**Absolute (G90) — "Where is it?"**: In absolute mode, every coordinate in your program refers to a fixed location in space — measured from Work Zero. X25.4 always means "the point that is 25.4 mm to the right of work zero," no matter where the tool currently is. If you write X25.4 twice in a row, the second command does nothing — the tool is already there.',

@@ -6,6 +6,11 @@ export default {
   title: 'Rapid Motion',
   subtitle: 'G00 — Moving at Maximum Speed (and Why That\'s Dangerous)',
   tags: ['G00', 'rapid', 'dog-leg', 'positioning', 'air moves', 'clearance plane'],
+  aliases: 'G00 rapid motion positioning move air move clearance plane dog-leg path maximum speed rapid override collision crash safe height',
+  timeToComplete: 15,
+  coreConcept: 'G00 moves all axes simultaneously at machine maximum speed to a target position; the path is not guaranteed straight (each axis moves at its own maximum rate, creating a \'dog-leg\' path). Rapid is for positioning in air only — always retract Z to a safe height before issuing a rapid X or Y move.',
+  prerequisites: ['cnc-tool-length-comp'],
+  nextLesson: 'linear-motion',
 
   semantics: {
     core: [
@@ -221,7 +226,98 @@ document.getElementById('btnReset').addEventListener('click', ()=>{
         },
         title: 'Safe G00 Usage Pattern',
         caption: 'This shows the correct pattern: G00 only at clearance height, G01 for plunging. Run it and trace which moves are rapid vs feed.',
-      }
+      },
+      {
+        id: 'GcodeNotebook',
+        type: 'GcodeNotebook',
+        initialProps: {
+          dialect: 'fanuc',
+          initialCells: [
+            {
+              id: 'rapid-1',
+              label: '1 — G00 path is NOT straight: the dog-leg',
+              code:
+                '; G00 moves each axis at ITS OWN maximum speed independently.\n' +
+                '; Watch the trace: the path is an L-shape (dog-leg), not diagonal.\n' +
+                '; X has further to travel. Y finishes first and stops. X keeps going.\n' +
+                'G21 G90\n' +
+                'G0 X0 Y0            ; start position\n' +
+                'G0 X80 Y20          ; ← dog-leg: Y arrives at 20, then X finishes to 80\n' +
+                '                    ; PATH IS NOT STRAIGHT — it bends at Y=20, X=still moving\n' +
+                'M30\n' +
+                '\n' +
+                '; Compare with G01 (add feedrate) — that path is perfectly straight:\n' +
+                '; G1 X80 Y20 F300\n',
+            },
+            {
+              id: 'rapid-2',
+              label: '2 — The clearance plane rule: Z first, always',
+              code:
+                '; The ONLY safe G00 pattern:\n' +
+                '; 1. Retract Z to clearance FIRST\n' +
+                '; 2. Rapid XY\n' +
+                '; 3. Plunge with G01 — never G00\n' +
+                'G21 G90\n' +
+                'G0 X20 Y10          ; somewhere over a feature\n' +
+                'G1 Z-5 F200         ; cutting depth\n' +
+                '\n' +
+                '; ── CORRECT SEQUENCE to move to next feature ──\n' +
+                'G0 Z5               ; Step 1: retract Z to clearance plane\n' +
+                'G0 X60 Y35          ; Step 2: rapid XY — dog-leg is safe at Z+5\n' +
+                'G1 Z-5 F200         ; Step 3: plunge with controlled feedrate\n' +
+                '\n' +
+                '; ── WRONG — never do this ──\n' +
+                '; G0 X60 Y35        ; XY rapid while at depth — dog-leg INTO part\n' +
+                'G0 Z5\n' +
+                'M30\n',
+            },
+            {
+              id: 'rapid-3',
+              label: '3 — Rapid has no F-word; rapid override is the only control',
+              code:
+                '; F-word is completely ignored in G00.\n' +
+                '; Rapid speed is set by machine parameters — typically 20,000+ mm/min.\n' +
+                '; The ONLY way to slow rapid is the rapid override switch on the panel (25/50/100%).\n' +
+                '; For program prove-out: always set rapid override to 25% and have a hand on FEED HOLD.\n' +
+                'G21 G90\n' +
+                'G0 X0 Y0 Z5         ; rapid — all axes at max speed\n' +
+                'G0 X50 F1000        ; F1000 is silently IGNORED in G00\n' +
+                '                    ; the machine still moves at machine-parameter rapid speed\n' +
+                'G1 X0 F1000         ; now G01 is active — F1000 takes effect\n' +
+                'M30\n',
+            },
+          ],
+        },
+        title: 'G00 Rapid — See the Dog-Leg',
+        caption: 'Cell 1: watch the trace make an L-shape, not a straight line — that is the dog-leg. Cell 2: the clearance plane protocol — Z first, then XY, then plunge with G01. Cell 3: F-word is ignored in G00; only rapid override controls speed.',
+      },
+    ],
+    callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 9 of 31 — Positioning Without Cutting',
+        body: 'You know how coordinates work (lessons 5–8). Now you learn the two motion modes: G00 (rapid, air only) and G01 (linear feed, cutting). This lesson is G00.',
+      },
+      {
+        type: 'definition',
+        title: 'G00 — Rapid Positioning',
+        body: 'Each axis moves at its own maximum speed independently. No feedrate control. Path is NOT straight. Use only in air, never while in contact with material.',
+      },
+      {
+        type: 'warning',
+        title: 'G00 path is a dog-leg, not a straight line',
+        body: 'If X needs 80mm and Y needs 20mm, Y arrives first and stops. X continues alone. The path bends — it does not go diagonally. Any fixture or clamp near the intermediate positions in this bent path will be hit. CAM tools do not always visualize this accurately.',
+      },
+      {
+        type: 'procedure',
+        title: 'Clearance plane protocol — every rapid, every time',
+        body: '1. G0 Z5 (retract Z to clearance height, at least 5mm above all clamps).\n2. G0 X__ Y__ (rapid to new XY — dog-leg is safe at clearance height).\n3. G1 Z-__ F__ (plunge at a controlled feedrate — NEVER G00 into material).',
+      },
+      {
+        type: 'warning',
+        title: 'F-word is ignored in G00',
+        body: 'Writing G0 X50 F100 does not slow the rapid to F100. The F-word is silently ignored. Rapid speed is a machine parameter. The only in-program control is the rapid override switch on the operator panel.',
+      },
     ],
     prose: [
       '**The Dog-Leg Problem**: G00 tells the controller "get to those coordinates as fast as possible." Each axis motor drives independently at its own maximum speed. If X needs to travel 120mm and Y only 30mm, Y finishes first. While X is still moving, Y is stopped at its destination. The resulting path is an L-shape, not a straight line. The exact shape depends on each axis\'s individual rapid speed and the distances involved.',

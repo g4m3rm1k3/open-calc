@@ -38,8 +38,119 @@ export default {
           initialCode: '(SIEMENS STYLE) \nR1 = 5.0 (WIDTH) \nR2 = 3.0 (HEIGHT) \n \nG01 X=R1 Y=0 F100 \nY=R2 \nX=0 \nY=0 \n \n(FANUC STYLE) \n#1 = 5.0 \n#2 = 3.0 \n \nG01 X#1 Y0 F100 \nY#2 \nX0 \nY0'
         },
         title: 'Multi-Style Lab',
-        caption: 'Notice how the same logic (drawing a rectangle) is expressed differently. Siemens often uses the equal sign (X=R1), while Fanuc appends the variable directly (X#1).'
-      }
+        caption: 'Notice how the same logic (drawing a rectangle) is expressed differently. Siemens often uses the equal sign (X=R1), while Fanuc appends the variable directly (X#1).',
+      },
+      {
+        id: 'GcodeNotebook',
+        type: 'GcodeNotebook',
+        initialProps: {
+          dialect: 'fanuc',
+          initialCells: [
+            {
+              id: 'dialect-1',
+              label: '1 — Fanuc Macro B: the most common standard',
+              code:
+                '; Fanuc Macro B — the dominant dialect in North American shops.\n' +
+                '; Variables: #1-#33 local, #100-#199 common, #500-#999 permanent.\n' +
+                '; Arithmetic requires square brackets: #1 = [#2 + #3]\n' +
+                '; Access in motion: G1 X#1 (no equals sign)\n' +
+                '; Conditional: IF [#100 GT 10] GOTO 100\n' +
+                '; Loop: WHILE [#100 LT 6] DO1 ... END1\n' +
+                '#100 = 40.0               ; width\n' +
+                '#101 = 25.0               ; height\n' +
+                'G21 G90\n' +
+                'G0 X0 Y0 Z5\n' +
+                'G1 Z-2 F100\n' +
+                'G1 X#100 F300             ; Fanuc: variable used directly in word\n' +
+                'G1 Y#101\n' +
+                'G1 X0\n' +
+                'G1 Y0\n' +
+                'G0 Z5\n' +
+                'M30\n',
+            },
+            {
+              id: 'dialect-2',
+              label: '2 — Siemens comparison: R-parameters, GUD, CYCLE calls',
+              code:
+                '; SIEMENS SINUMERIK syntax (shown as comments for reference — runs as Fanuc):\n' +
+                '; R-parameters: R1=40.0 R2=25.0  (no # prefix)\n' +
+                '; Access in motion: G1 X=R1      (equals sign required)\n' +
+                '; Arithmetic: R3=R1+R2           (no brackets needed)\n' +
+                '; Conditional: IF R1>10 GOTOF LABEL1\n' +
+                '; Loop:        WHILE R1<6 DO ... ENDWHILE\n' +
+                '; Cycles: CYCLE83(...)           (built-in drilling cycle call)\n' +
+                '; Long var names: DEF REAL PART_WIDTH = 40.0\n' +
+                '\n' +
+                '; Equivalent Fanuc code (this actually runs in the simulator):\n' +
+                '#1 = 40.0                 ; same as Siemens R1=40.0\n' +
+                '#2 = 25.0                 ; same as R2=25.0\n' +
+                'G21 G90\n' +
+                'G0 X0 Y0 Z5\n' +
+                'G1 Z-2 F100\n' +
+                'G1 X#1 F300\n' +
+                'G1 Y#2\n' +
+                'G1 X0\n' +
+                'G1 Y0\n' +
+                'G0 Z5\n' +
+                'M30\n',
+            },
+            {
+              id: 'dialect-3',
+              label: '3 — Okuma OSP: VC variables, WHILE syntax closest to Python',
+              code:
+                '; OKUMA OSP UserTask syntax (shown as comments — runs as Fanuc):\n' +
+                '; Local variables: V1, V2, ..., V32\n' +
+                '; Common variables: VC1, VC2, ..., VC200\n' +
+                '; Access in motion: G1 X=V1       (equals sign, like Siemens)\n' +
+                '; Conditional: IF V1 > 10 THEN GOTO L100 END-IF\n' +
+                '; Loop: WHILE VC1 LT 6 ... ENDWHILE  (closest to Python syntax)\n' +
+                '; Okuma has no bracket requirement for arithmetic\n' +
+                '\n' +
+                '; Translation table (same rectangle, three dialects):\n' +
+                '; FANUC:   #100 = 40.0 → G1 X#100\n' +
+                '; SIEMENS: R100 = 40.0 → G1 X=R100\n' +
+                '; OKUMA:   VC100 = 40.0 → G1 X=VC100\n' +
+                '; All three are the same register. Different spelling, same concept.\n' +
+                '#100 = 40.0\n' +
+                'G21 G90\n' +
+                'G0 X0 Y0 Z5\n' +
+                'G1 Z-2 F100\n' +
+                'G1 X#100 F300\n' +
+                'G0 Z5\n' +
+                'M30\n',
+            },
+          ],
+        },
+        title: 'Controller Dialects — Fanuc, Siemens, Okuma',
+        caption: 'Cell 1: Fanuc Macro B with square bracket syntax and # prefix. Cell 2: Siemens R-parameter style — X=R1 equals-sign access, no brackets needed. Cell 3: Okuma OSP VC variables — syntax closest to Python. All three express the same geometry.',
+      },
+    ],
+    callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 27 of 31 — Controller Dialects',
+        body: 'You have learned Fanuc Macro B throughout this course. This lesson shows you how to read a Siemens or Okuma program and translate it. The logic is identical — only the spelling changes.',
+      },
+      {
+        type: 'definition',
+        title: 'The three major CNC controller families',
+        body: 'Fanuc (dominant in North America and Asia — uses # variables, brackets, Macro B syntax). Siemens SINUMERIK (dominant in Europe — uses R parameters, GUD named variables, CYCLE calls). Okuma OSP (known for stability — uses V/VC variables, WHILE/ENDWHILE syntax closest to Python).',
+      },
+      {
+        type: 'definition',
+        title: 'Variable naming: the only significant syntax difference',
+        body: 'Fanuc: #100 = value, access as X#100. Siemens: R100 = value, access as X=R100. Okuma: VC100 = value, access as X=VC100. All three refer to the same concept — a numbered register that holds a floating-point value. The # vs R vs VC prefix is purely dialect.',
+      },
+      {
+        type: 'insight',
+        title: 'Arithmetic brackets differ: Fanuc requires them, others often do not',
+        body: 'Fanuc Macro B: #1 = [#2 + #3] — brackets required around every expression. Siemens: R1 = R2 + R3 — no brackets needed. Okuma: V1 = V2 + V3 — same. When translating Fanuc → Siemens, strip the brackets. When translating Siemens → Fanuc, add them.',
+      },
+      {
+        type: 'insight',
+        title: 'Read the specific machine manual — options vary',
+        body: 'Controller firmware versions, installed options, and machine builder customizations can change which macro features are available on a specific machine. "Fanuc" is not one controller — it is a family with dozens of models. Always check the Programming Manual for the exact machine you are programming.',
+      },
     ],
     prose: [
       'Think of dialects as **Slang**. In one part of the world, a "fizzy drink" is "Soda". In another, it’s "Pop". But it’s the same drink. Similarly, #100 and R100 are just local names for a piece of memory.',

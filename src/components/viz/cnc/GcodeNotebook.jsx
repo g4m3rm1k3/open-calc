@@ -380,10 +380,14 @@ let _cellId = 0
 const newId = () => `cell-${++_cellId}`
 
 export default function GcodeNotebook({
-  initialCells,
-  dialect = 'fanuc',
-  height = 520,
+  params = {},
+  initialCells: initialCellsProp,
+  dialect: dialectProp = 'fanuc',
+  height: heightProp = 520,
 }) {
+  const initialCells = params.initialCells ?? initialCellsProp
+  const dialect = params.dialect ?? dialectProp
+  const height = params.height ?? heightProp
   const isDark = useIsDark()
   const C = useMemo(() => makeC(isDark), [isDark])
 

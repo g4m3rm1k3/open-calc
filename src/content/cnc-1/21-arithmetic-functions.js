@@ -253,6 +253,33 @@ export default {
         caption: 'Run each cell. The Python code shows the logic; the comments show the exact Fanuc Macro B equivalent. Cell 5 generates a complete, real G-code program for a 6-hole bolt circle using the full macro arithmetic toolkit.',
       },
     ],
+    callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 21 of 31 — Arithmetic & Functions',
+        body: 'Variables (lesson 20) and conditionals/loops (lesson 20b) gave you the structure. This lesson gives you the math toolkit: the specific functions that turn a variable into a position on a bolt circle, a taper depth, or a thread pitch.',
+      },
+      {
+        type: 'definition',
+        title: 'Square brackets [ ] — Fanuc expression delimiter',
+        body: 'All arithmetic in Fanuc Macro B must be wrapped in square brackets. You cannot write #1 = #2 + #3 — you must write #1 = [#2 + #3]. Brackets can be nested: #1 = [[#2 + #3] * SIN[#4]]. The innermost brackets evaluate first.',
+      },
+      {
+        type: 'definition',
+        title: 'Trigonometry: SIN, COS, ATAN — all in degrees',
+        body: 'Fanuc trig functions work in degrees, not radians. SIN[45] = 0.7071. COS[45] = 0.7071. ATAN two-argument form: ATAN[y]/[x] gives four-quadrant arctangent (0–360°). Always use the two-argument ATAN for angles around a circle.',
+      },
+      {
+        type: 'definition',
+        title: 'Rounding: ROUND, FIX, FUP',
+        body: 'ROUND[#x] = round to nearest integer. FIX[#x] = truncate toward zero (floor for positives, ceiling for negatives). FUP[#x] = truncate away from zero (ceiling for positives, floor for negatives). Use ROUND for coordinates; use FIX/FUP for loop counters.',
+      },
+      {
+        type: 'insight',
+        title: 'Bolt circle: polar-to-Cartesian is the core pattern',
+        body: 'Every evenly-spaced hole pattern uses the same math: X = R × COS[angle], Y = R × SIN[angle]. In a macro, loop angle from 0 to 360 in steps of 360/N. This one pattern covers 4-hole, 6-hole, 8-hole, any-hole bolt circles.',
+      },
+    ],
     prose: [
       '**Square Brackets Are Required**: In Fanuc Macro B, all expressions must be wrapped in `[ ]`. You cannot write `#1 = #2 + #3` — you must write `#1 = [#2 + #3]`. The brackets tell the interpreter to evaluate the expression rather than treat it as a literal coordinate.',
 

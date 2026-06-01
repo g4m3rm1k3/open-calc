@@ -12,6 +12,11 @@ export default {
   title: 'Circular Interpolation: The Geometry of the Arc',
   subtitle: 'Mastering G02/G03, Trigonometric Centers, and Helical Logic',
   tags: ['G02', 'G03', 'IJK', 'G17', 'arcs', 'kinematics', 'trigonometry'],
+  aliases: 'G02 G03 circular interpolation arc clockwise counterclockwise IJK I J K radius R-word G17 G18 G19 plane helical arc full circle',
+  timeToComplete: 25,
+  coreConcept: 'G02 (CW) and G03 (CCW) move the tool along a circular arc; the center is defined by incremental I/J/K vectors from the start point, or by an R-word for simple arcs. Start and end must be equidistant from the center or the controller alarms.',
+  prerequisites: ['cnc-linear-interpolation'],
+  nextLesson: 'plane-selection',
 
   semantics: {
     core: [
@@ -95,9 +100,109 @@ export default {
             'G02 X3.0 Y3.0 I-1.0 J0.0'
         },
         title: 'The Circular Kinematics Lab',
-        caption: 'Watch the "Compass" effect. In the first arc, the center is 1.0" to the right (I1.0) ' +
-                 'of where the tool started. In the full circle, the center is 1.0" to the left (I-1.0).'
-      }
+        caption: 'Watch the "Compass" effect. In the first arc, the center is 1.0" to the right (I1.0) of where the tool started. In the full circle, the center is 1.0" to the left (I-1.0).',
+      },
+      {
+        id: 'GcodeNotebook',
+        type: 'GcodeNotebook',
+        initialProps: {
+          dialect: 'fanuc',
+          initialCells: [
+            {
+              id: 'arc-1',
+              label: '1 — G02 CW and G03 CCW: same center, opposite direction',
+              code:
+                '; I and J are the vector FROM the start point TO the center.\n' +
+                '; G02 = clockwise.  G03 = counter-clockwise.\n' +
+                '; Both arcs below have the same center offset: I=50, J=0.\n' +
+                'G21 G90 G17\n' +
+                'G0 X0 Y0\n' +
+                '; CW semicircle: start (0,0), end (100,0), center at (50,0)\n' +
+                'G2 X100 Y0 I50 J0 F300     ; curves DOWN (clockwise in XY)\n' +
+                'G0 X0 Y0\n' +
+                '; CCW semicircle: same geometry, opposite direction\n' +
+                'G3 X100 Y0 I50 J0 F300     ; curves UP (counter-clockwise)\n' +
+                'G0 X0 Y0\n' +
+                'M30\n',
+            },
+            {
+              id: 'arc-2',
+              label: '2 — R-word vs I/J: convenience vs precision',
+              code:
+                '; R-word is shorthand — just give the radius.\n' +
+                '; But R cannot do full 360° circles. Use I/J for those.\n' +
+                'G21 G90 G17\n' +
+                'G0 X0 Y0\n' +
+                '; R-word (simple arcs only):\n' +
+                'G2 X60 Y0 R30 F300          ; CW arc radius=30, start (0,0) end (60,0)\n' +
+                'G0 X0 Y0\n' +
+                '; Same arc with I/J (always works):\n' +
+                'G2 X60 Y0 I30 J0 F300       ; center is 30mm right of start point\n' +
+                'G0 X0 Y0\n' +
+                '; Full 360° circle — R fails here, MUST use I/J:\n' +
+                'G0 X50 Y0                   ; move to circle start position\n' +
+                'G2 X50 Y0 I-50 J0 F300      ; start=end, center at origin\n' +
+                'G0 X0 Y0\n' +
+                'M30\n',
+            },
+            {
+              id: 'arc-3',
+              label: '3 — Rounded corners: blend G01 into G02',
+              code:
+                '; Real parts combine straight lines and arcs.\n' +
+                '; This cuts a rectangle with 10mm radius rounded corners.\n' +
+                '; Each G02 arc blends one wall smoothly into the next.\n' +
+                'G21 G90 G17\n' +
+                'G0 X10 Y0\n' +
+                'G1 Z-2 F150\n' +
+                'G1 X70 F300             ; bottom edge\n' +
+                'G2 X80 Y10 I0 J10       ; bottom-right corner, center 10mm up\n' +
+                'G1 Y50                  ; right edge\n' +
+                'G2 X70 Y60 I-10 J0      ; top-right corner, center 10mm left\n' +
+                'G1 X10                  ; top edge\n' +
+                'G2 X0  Y50 I0  J-10     ; top-left corner, center 10mm down\n' +
+                'G1 Y10                  ; left edge\n' +
+                'G2 X10 Y0  I10 J0       ; bottom-left corner, center 10mm right\n' +
+                'G0 Z5\n' +
+                'M30\n',
+            },
+          ],
+        },
+        title: 'G02/G03 Arcs — Center, Direction, Corners',
+        caption: 'Cell 1: same I/J center, G02 vs G03 — watch the path flip direction. Cell 2: R-word shorthand vs I/J precision, and why R fails on full circles. Cell 3: rounded rectangle — blending G01 straight walls with G02 corner arcs.',
+      },
+    ],
+    callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 11 of 31 — Curved Motion',
+        body: 'Linear motion (lesson 10) covers straight lines. Arcs are the other fundamental path shape. G01/G02/G03 together cover every 2D toolpath in CNC machining.',
+      },
+      {
+        type: 'definition',
+        title: 'G02 / G03 — Circular Interpolation',
+        body: 'G02 = clockwise arc. G03 = counter-clockwise arc. Direction is defined looking DOWN the active plane axis (in G17/XY plane: clockwise = G02 when looking down Z). Both are modal in group 1, just like G01.',
+      },
+      {
+        type: 'definition',
+        title: 'I and J — center vectors from the start point',
+        body: 'I = X-distance from arc start to center. J = Y-distance from arc start to center. These are ALWAYS incremental (relative to start), even in G90 absolute mode. If you are at X=20 and the center is at X=35, I = +15.',
+      },
+      {
+        type: 'warning',
+        title: 'Start and end must be equidistant from center',
+        body: 'The controller checks that Rs (start radius) = Re (end radius) before executing. If they differ by more than the tolerance in machine parameters (typically 0.001mm), the machine alarms: "ARC RADIUS ERROR." Check your I/J math or your start/end coordinates.',
+      },
+      {
+        type: 'warning',
+        title: 'R-word cannot program a full 360° circle',
+        body: 'When start = end, the R-word is geometrically ambiguous — two circles satisfy any given R through the same point. The controller alarms or does nothing. Use I/J for full circles.',
+      },
+      {
+        type: 'insight',
+        title: 'G02/G03 are modal — cancel with G01',
+        body: 'After a G02 or G03, the motion mode is still "arc." A subsequent block with only coordinates will try to continue an arc. If you want a straight line next, explicitly write G01.',
+      },
     ],
     prose: [
       '### I. The Philosophy of the Arc',

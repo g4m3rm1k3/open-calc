@@ -10,6 +10,11 @@ export default {
     'CAD', 'CAM', 'post-processor', 'history', 'Fanuc', 'Siemens',
     'closed-loop', 'open-loop', 'interpolation', 'EIA RS-274',
   ],
+  aliases: 'what is CNC introduction computer numerical control G-code CAD CAM post-processor controller servo drive Fanuc history RS-274 machining basics VMC lathe interpolation closed loop',
+  timeToComplete: 40,
+  coreConcept: 'A CNC machine executes a plain-text list of numbered coordinate commands; the chain CAD → CAM → Post-Processor → G-code → Controller → Servo converts any drawn geometry into a physically cut part without human hand guidance.',
+  prerequisites: [],
+  nextLesson: 'machine-axes-kinematics',
 
   semantics: {
     core: [
@@ -313,6 +318,43 @@ export default {
       'result of a mistake somewhere in the CAD→CAM→G-code→Controller chain — or a setup mistake ' +
       '(wrong offset, wrong tool length) that the programmer didn\'t account for. Understanding ' +
       'the full chain, and where it can break, is the foundational skill this course builds.',
+    ],
+    callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 1 of 31 — CNC from Zero',
+        body: '**Previous:** (start of course)\n**This lesson:** What CNC is — the full CAD→CAM→G-code→Controller chain, machine types, servo systems, and why this language has survived unchanged for 65 years.\n**Next:** Machine Axes & Kinematics — X, Y, Z, the right-hand rule, and the Programmer\'s Illusion.',
+      },
+      {
+        type: 'procedure',
+        title: 'The 6-Step Chain: How a Drawing Becomes a Part',
+        body: 'Step 1. **CAD** — Engineer draws the part geometry (Fusion 360, SolidWorks). Output: a .STEP or .F3D file. No machining information.\nStep 2. **CAM** — Programmer selects tools, defines toolpaths and cutting parameters. Output: an internal generic toolpath.\nStep 3. **Post-Processor** — Translates the generic toolpath into the specific G-code dialect of the target controller. Output: a plain-text .nc file.\nStep 4. **Controller** — Reads the .nc file block by block, interpolates motion at 1,000–4,000 cycles/sec.\nStep 5. **Servo Drives** — Amplify controller signals into motor current; encoders report actual position back.\nStep 6. **Part** — Metal is removed. The part\'s accuracy is the cumulative result of every step above.',
+      },
+      {
+        type: 'definition',
+        title: 'G-Code: A Language That Has Not Changed in 65 Years',
+        body: 'G-code (EIA RS-274, 1959) is a plain-text programming language where each line is a **block**. A block tells the controller: what type of motion (G-word), where to go (X Y Z), how fast (F), spindle state (S), and miscellaneous functions (M-word). The G stands for **preparatory function** — it prepares the controller for a specific mode. A G-code program from 1975 will largely still run on a modern Fanuc controller today.',
+      },
+      {
+        type: 'insight',
+        title: 'Why Fanuc First',
+        body: 'Fanuc (founded 1970) runs 50–60% of the world\'s CNC machines. Haas, the most common brand in US job shops, uses a Fanuc-compatible dialect. Learning Fanuc Macro B means you can read the majority of machines in any shop in any country. Siemens 840D, Okuma OSP, and Heidenhain use the same concepts — only the punctuation and keywords differ. We note dialect differences throughout.',
+      },
+      {
+        type: 'warning',
+        title: 'Units Mismatch Will Crash the Machine',
+        body: '**G21** = metric (mm, mm/min). **G20** = imperial (inches, ipm). A program written in inches running on a machine left in G21 mode will execute every coordinate as if it is in millimeters — 25.4× smaller than intended. The controller has no idea. Always include G20 or G21 explicitly at the top of every program. Never rely on the machine being in the expected units state.',
+      },
+      {
+        type: 'insight',
+        title: 'Closed-Loop vs Open-Loop: The Key Safety Distinction',
+        body: 'Industrial CNC machines use **servo drives** (closed-loop): an encoder on each axis reports actual position back to the controller at 100,000+ times/second. If the axis cannot keep up, the controller detects the growing **following error** and triggers an alarm — the machine stops safely.\n\nHobbyist machines often use **stepper motors** (open-loop): the controller sends pulses and *assumes* each pulse moved the axis. Under cutting load, steppers lose steps silently. The controller continues from the wrong assumed position. No alarm. Dimensional errors accumulate.',
+      },
+      {
+        type: 'warning',
+        title: 'The Controller Has No Judgment',
+        body: 'A CNC controller will execute exactly what the program says, nothing more. If your G-code commands a rapid move at 30 m/min into a vise jaw, it will execute without hesitation. A spindle crash can destroy a $20,000–$80,000 spindle assembly. Every crash traces to one broken link in the chain: wrong G-code, wrong offset, wrong post-processor, wrong units. The machine is not a collaborator — it is a precise executor.',
+      },
     ],
   },
 

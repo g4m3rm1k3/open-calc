@@ -202,7 +202,111 @@ document.getElementById('btnG96').addEventListener('click',()=>drawChart('g96'))
         },
         title: 'Full Spindle & Coolant Program',
         caption: 'Trace the M-code sequence: tool change → spindle start → coolant on → cut → coolant off → spindle stop → home → end. This is the standard professional sequence.',
-      }
+      },
+      {
+        id: 'GcodeNotebook',
+        type: 'GcodeNotebook',
+        initialProps: {
+          dialect: 'fanuc',
+          initialCells: [
+            {
+              id: 'spindle-1',
+              label: '1 — S sets the register; M03 starts the spindle',
+              code:
+                '; S-word alone does NOT start the spindle.\n' +
+                '; It only writes a speed into the register.\n' +
+                '; M03 = spindle CW. M04 = spindle CCW. M05 = stop.\n' +
+                'G21 G90 G97               ; G97 = fixed RPM mode\n' +
+                'S2500                     ; register = 2500 RPM (spindle still OFF)\n' +
+                'T1 M06                    ; tool change (spindle must already be stopped)\n' +
+                'S2500 M03                 ; NOW spindle starts at 2500 RPM, CW\n' +
+                'G0 X0 Y0 Z5\n' +
+                'G1 Z-2 F200\n' +
+                'G1 X50 F300\n' +
+                'G0 Z50\n' +
+                'M05                       ; spindle STOP (required before tool change)\n' +
+                'M30\n',
+            },
+            {
+              id: 'spindle-2',
+              label: '2 — G96 constant surface speed vs G97 fixed RPM',
+              code:
+                '; G97 = fixed RPM (mills). S-word = RPM directly.\n' +
+                '; G96 = constant surface speed (CSS), used on lathes.\n' +
+                ';   In G96: S-word = m/min (metric) or SFM (inch)\n' +
+                ';   Controller adjusts RPM as diameter changes.\n' +
+                '; G50 = maximum RPM clamp (safety: prevents over-speed at small diameters)\n' +
+                'G21 G90\n' +
+                'G50 S3000                 ; clamp: never exceed 3000 RPM\n' +
+                'G96 S200 M03              ; CSS mode: 200 m/min surface speed, CW\n' +
+                '; As diameter shrinks, RPM rises automatically:\n' +
+                '; D=80mm → ~796 RPM\n' +
+                '; D=40mm → ~1592 RPM\n' +
+                '; D=20mm → ~3000 RPM (clamped by G50)\n' +
+                'G97 S1500 M03             ; switch back to fixed RPM before milling\n' +
+                'M05\n' +
+                'M30\n',
+            },
+            {
+              id: 'spindle-3',
+              label: '3 — Coolant sequence: on before cut, off after retract',
+              code:
+                '; M08 = flood coolant on. M09 = coolant off.\n' +
+                '; Coolant must be ON before the tool contacts material.\n' +
+                '; Turn it OFF after the tool has cleared the part.\n' +
+                '; NEVER leave coolant on at program end (pools in machine).\n' +
+                'G21 G90 G97\n' +
+                'T1 M06\n' +
+                'G43 H1\n' +
+                'S2500 M03\n' +
+                'G0 X0 Y0 Z5\n' +
+                'M08                       ; flood on as tool approaches\n' +
+                'G1 Z-3 F150               ; plunge into cut\n' +
+                'G1 X80 F300               ; cutting pass\n' +
+                'G0 Z10                    ; retract clear of part\n' +
+                'M09                       ; coolant off after clearing part\n' +
+                'M05                       ; spindle off\n' +
+                'G91 G28 Z0\n' +
+                'G90 G28 X0 Y0\n' +
+                'M30\n',
+            },
+          ],
+        },
+        title: 'Spindle & Coolant Sequencing',
+        caption: 'Cell 1: S-word vs M03 — understand the register/execute distinction. Cell 2: G97 (fixed RPM) vs G96 (CSS) and the G50 speed clamp. Cell 3: professional coolant sequencing — on before cut, off after retract.',
+      },
+    ],
+    callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 13 of 31 — Spindle & Coolant',
+        body: 'You now know how to define positions and move the tool. Spindle and coolant are what make those moves actually cut metal. Every complete CNC program will include the M-codes taught in this lesson.',
+      },
+      {
+        type: 'definition',
+        title: 'S-word — Spindle Speed Register',
+        body: 'S sets the target speed. In G97 mode: S = RPM directly. In G96 mode: S = surface speed (m/min or SFM). Writing S alone does NOT start the spindle. The spindle starts only when M03 or M04 is commanded.',
+      },
+      {
+        type: 'definition',
+        title: 'G97 vs G96 — RPM Mode vs Constant Surface Speed',
+        body: 'G97 = fixed RPM (standard for milling). G96 = controller automatically adjusts RPM to maintain constant surface speed as part diameter changes. G96 is primarily for lathes during facing and turning operations.',
+      },
+      {
+        type: 'warning',
+        title: 'G50 is required with G96 — never omit it',
+        body: 'In G96 mode, as the tool approaches X=0 (the center), the calculated RPM approaches infinity. Without a G50 maximum speed clamp, the controller will attempt to spin the spindle dangerously fast. Always program G50 Sxxx before G96 on a lathe.',
+      },
+      {
+        type: 'warning',
+        title: 'Never command a tool change with the spindle running',
+        body: 'M06 with an active spindle can cause the machine to fault, damage the ATC arm, or break the spindle taper. Always M05 before M06. Professional safe start blocks always include an M05 or confirm spindle-stop before calling a tool change.',
+      },
+      {
+        type: 'insight',
+        title: 'M03 direction matters — right-hand tools need CW',
+        body: 'Standard end mills, drills, and reamers have right-hand flutes. They cut in M03 (CW viewed from above). Running them in M04 reverses the chip load, rubs instead of cutting, and breaks tools immediately. M04 is only for left-hand tools and some back-boring applications.',
+      },
     ],
     prose: [
       '**S-word is a Request, Not a Command**: Writing S2500 sets the spindle speed register to 2500 RPM. But the spindle does NOT start. It only starts when M03 (CW) or M04 (CCW) is commanded. You can set S on a separate line before M03, or combine them: S2500 M03 in the same block.',

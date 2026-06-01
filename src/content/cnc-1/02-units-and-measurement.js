@@ -13,6 +13,11 @@ export default {
   title: 'Units & Measurement: The Language of Precision',
   subtitle: 'G20/G21 — From the Mars Orbiter to the Sub-Micron Chip',
   tags: ['G20', 'G21', 'metric', 'imperial', 'inch', 'millimeter', 'tolerance', 'conversion', 'kinematics'],
+  aliases: 'G20 G21 metric imperial inch millimeter units measurement tolerance precision conversion 25.4 power-on defaults unit mismatch crash',
+  timeToComplete: 15,
+  coreConcept: 'G21 activates metric mode (mm, mm/min); G20 activates inch mode (inches, ipm). Both are modal — the machine remembers the setting until changed. Always state units explicitly at the top of every program; never rely on the machine being in the expected mode.',
+  prerequisites: ['cnc-machine-axes-masterclass'],
+  nextLesson: 'program-structure',
 
   semantics: {
     core: [
@@ -91,8 +96,78 @@ export default {
         },
         title: 'Visualizing the 25.4x Difference',
         caption: 'Watch how the machine interprets the number "1.0" depending on the active unit mode. ' +
-                 'In G20, it is a significant move. In G21, it is almost invisible.'
-      }
+                 'In G20, it is a significant move. In G21, it is almost invisible.',
+      },
+      {
+        id: 'GcodeNotebook',
+        type: 'GcodeNotebook',
+        initialProps: {
+          dialect: 'fanuc',
+          initialCells: [
+            {
+              id: 'units-1',
+              label: '1 — Same numbers, totally different size',
+              code:
+                '; G20 = inches.  G21 = millimeters.\n' +
+                '; These two programs have IDENTICAL coordinate numbers.\n' +
+                '; Switch between G20 and G21 on line 3 and re-run.\n' +
+                '; Watch the trace change size by a factor of 25.4.\n' +
+                'G90\n' +
+                'G20              ; ← try changing to G21\n' +
+                'G0 X0 Y0\n' +
+                'G0 X3.0 Y0       ; 3.0 inches = 76.2 mm — or — 3.0 mm?\n' +
+                'G0 X3.0 Y2.0\n' +
+                'G0 X0   Y2.0\n' +
+                'G0 X0   Y0\n' +
+                'M30\n',
+            },
+            {
+              id: 'units-2',
+              label: '2 — Feedrate is also unit-dependent',
+              code:
+                '; F20 means 20 ipm in G20, or 20 mm/min in G21.\n' +
+                '; 20 mm/min = 0.79 ipm — almost stopped.\n' +
+                '; 20 ipm = 508 mm/min — screaming in metric mode.\n' +
+                '; Both programs below cut the same path. Change the unit and feedrate together.\n' +
+                'G90 G20           ; inch mode\n' +
+                'G0 X0 Y0 Z5\n' +
+                'G1 Z-0.1 F5       ; 5 ipm plunge (inch)\n' +
+                'G1 X3.0 F20       ; 20 ipm feed (inch)\n' +
+                '\n' +
+                '; Metric equivalent:\n' +
+                '; G90 G21\n' +
+                '; G1 Z-2.54 F127  ; 127 mm/min plunge (= 5 ipm × 25.4)\n' +
+                '; G1 X76.2 F508   ; 508 mm/min feed (= 20 ipm × 25.4)\n' +
+                'G0 Z5\n' +
+                'M30\n',
+            },
+            {
+              id: 'units-3',
+              label: '3 — The safety line: always declare units first',
+              code:
+                '; Every professional program starts with an explicit unit declaration.\n' +
+                '; Never assume the machine is in the mode you expect.\n' +
+                '; This is the minimum safe opening block:\n' +
+                'G21 G90 G17 G40 G49 G80\n' +
+                '; G21 = metric    G90 = absolute\n' +
+                '; G17 = XY plane  G40 = cancel cutter comp\n' +
+                '; G49 = cancel TLO  G80 = cancel canned cycle\n' +
+                '\n' +
+                '; Now cut a 50mm square — units are known, no surprises:\n' +
+                'G0 X0 Y0 Z5\n' +
+                'G1 Z-1 F200\n' +
+                'G1 X50 F300\n' +
+                'G1 Y50\n' +
+                'G1 X0\n' +
+                'G1 Y0\n' +
+                'G0 Z5\n' +
+                'M30\n',
+            },
+          ],
+        },
+        title: 'Units — See the 25.4× Difference Live',
+        caption: 'Cell 1: toggle G20/G21 and watch the same number become 25.4× bigger or smaller. Cell 2: feedrate is also unit-dependent — F20 is almost stopped in metric. Cell 3: the mandatory safety line that opens every program.',
+      },
     ],
     prose: [
       '### I. The Great Divide: A Tale of Two Systems',

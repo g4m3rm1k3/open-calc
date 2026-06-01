@@ -913,6 +913,38 @@ draw();
         caption: 'Run every cell in order. Each builds on the last. Cell 1.1 introduces the three building blocks. By Cell 1.8, you are generating real G-code for both Fanuc and Okuma controllers. Cell 1.9 shows how infinite loops happen — and how to prevent them.',
       },
     ],
+    callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 20 of 31 — Programming Pseudolanguage',
+        body: 'Variables (lesson 20) are the building blocks. This lesson adds the other two foundations of all programming: conditions (IF/ELSE) and loops (WHILE). These three ideas — in any language — are all you need to write any CNC macro.',
+      },
+      {
+        type: 'definition',
+        title: 'The three building blocks of all programming',
+        body: 'Variables (store and recall values), Conditions (IF [test] THEN / ELSE — take different paths), and Loops (WHILE [test] DO — repeat until done). Every programming language — Python, JavaScript, Fanuc Macro B, Okuma OSP, Siemens — is just different syntax for these three ideas.',
+      },
+      {
+        type: 'definition',
+        title: 'WHILE/DO/END — the Fanuc loop construct',
+        body: 'WHILE [condition] DO1 ... END1 repeats the block while condition is true. DO1/END1 can nest as DO2/END2, DO3/END3 (up to 3 levels on most Fanuc controls). The condition uses relational operators: LT (<), LE (≤), GT (>), GE (≥), EQ (=), NE (≠).',
+      },
+      {
+        type: 'definition',
+        title: 'IF/GOTO vs IF/THEN — two Fanuc conditional forms',
+        body: 'Form 1: IF [condition] GOTO N_ — jumps to a block label if condition is true. Form 2: IF [condition] THEN #var = value — executes assignment if condition is true. GOTO is older and found in most programs. The THEN form is cleaner for simple assignments.',
+      },
+      {
+        type: 'warning',
+        title: 'Infinite loops: the counter MUST change inside the loop',
+        body: 'If the WHILE condition never becomes false, the program runs forever. The most common cause: forgetting to increment the counter variable inside the loop body. Always verify that the variable used in WHILE [#100 LT N] is incremented (or decremented) somewhere inside the DO...END block.',
+      },
+      {
+        type: 'insight',
+        title: 'Python ↔ Fanuc translation is mechanical',
+        body: 'Python `while count < 6:` → Fanuc `WHILE [#100 LT 6] DO1`. Python `if x > 0:` → Fanuc `IF [#1 GT 0] GOTO 100`. The logic is identical; only the punctuation changes. Use Python to reason about what you want to do, then translate to Fanuc syntax.',
+      },
+    ],
     prose: [
       '**Why This Lesson Exists**: Fanuc Macro B syntax looks intimidating: `#100 = [#101 * COS[#103]]`, `WHILE [#100 LT 6] DO 1`, `IF [#1 GT 0] GOTO 100`. A machinist who has never programmed before sees this and panics. But the underlying logic is not complex — it is the same three ideas that every programming language in the world uses. This lesson teaches those ideas in Python first, then shows the CNC translation.',
 

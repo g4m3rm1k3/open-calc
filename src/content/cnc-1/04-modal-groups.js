@@ -6,6 +6,11 @@ export default {
   title: 'Modal Groups',
   subtitle: 'The Controller\'s State Machine — Sticky Settings That Rule Everything',
   tags: ['modal', 'G-code groups', 'state machine', 'default state', 'non-modal', 'power-on defaults'],
+  aliases: 'modal groups G-code state machine sticky codes power-on defaults non-modal one-shot initialization block G17 G40 G49 G80 G90',
+  timeToComplete: 20,
+  coreConcept: 'Modal G-codes stay active until changed — selecting one from a group cancels the previous member of that group. The controller maintains a state machine of current settings that persists between programs. Always start every program with an explicit initialization block to put the machine in a known state.',
+  prerequisites: ['cnc-program-structure'],
+  nextLesson: 'absolute-vs-incremental',
 
   semantics: {
     core: [
@@ -61,7 +66,74 @@ export default {
         },
         title: 'Modal State Lab',
         caption: 'Trace through the code carefully. After G01 X8.0 F50, notice that X10.0 and Y3.0 are both cutting moves at F50 — even though neither re-states G01. Then G00 switches Group 1 back to rapid. The controller\'s modal state is everything.',
-      }
+      },
+      {
+        id: 'GcodeNotebook',
+        type: 'GcodeNotebook',
+        initialProps: {
+          dialect: 'fanuc',
+          initialCells: [
+            {
+              id: 'modal-1',
+              label: '1 — G01 is sticky: set it once, it runs until changed',
+              code:
+                '; Modal = "the controller remembers it until you change it."\n' +
+                '; G01 (cutting feed) is active from the moment you write it.\n' +
+                '; Watch the trace — every move after G01 is a cut, not a rapid.\n' +
+                'G21 G90\n' +
+                'G0 X0 Y0            ; Group 1 = G00 (rapid)\n' +
+                'G1 X50 F200         ; Group 1 switches to G01. F200 also becomes modal.\n' +
+                'Y50                 ; ← no G1 written. Controller still in G01. Still F200.\n' +
+                'X0                  ; ← still G01 F200\n' +
+                'Y0                  ; ← still G01 F200 — closing the square\n' +
+                'G0 X0               ; ← G00 cancels G01. Now back to rapid.\n' +
+                'M30\n',
+            },
+            {
+              id: 'modal-2',
+              label: '2 — The dangerous modal: leaving G01 active by mistake',
+              code:
+                '; What happens when you forget G00 and rapid while in G01?\n' +
+                '; The controller feeds instead of rapids — same speed as your last cut.\n' +
+                'G21 G90\n' +
+                'G0 X0 Y0 Z5\n' +
+                'G1 Z-3 F100         ; enter cutting mode at 100 mm/min\n' +
+                'G1 X40 F300         ; cut right\n' +
+                '; FORGOT to write G0 before this "rapid" return:\n' +
+                'X0 Y0               ; ← still G01 F300. Feeds back through the part.\n' +
+                '\n' +
+                '; CORRECT version:\n' +
+                '; G0 Z5             ; retract first (breaks out of G01)\n' +
+                '; G0 X0 Y0          ; now this is a true rapid\n' +
+                'G0 Z5\n' +
+                'M30\n',
+            },
+            {
+              id: 'modal-3',
+              label: '3 — The initialization block resets all critical groups',
+              code:
+                '; This one line puts the controller in a KNOWN state.\n' +
+                '; Paste it at the top of every program — no exceptions.\n' +
+                'G21 G90 G17 G40 G49 G80\n' +
+                '; G21 = metric (Group 6)\n' +
+                '; G90 = absolute (Group 3)\n' +
+                '; G17 = XY plane (Group 2)\n' +
+                '; G40 = no cutter comp (Group 7)\n' +
+                '; G49 = no tool length offset (Group 8)\n' +
+                '; G80 = no canned cycle (Group 9)\n' +
+                '\n' +
+                '; Now a normal program runs with no modal-state surprises:\n' +
+                'G0 X0 Y0 Z5\n' +
+                'G1 Z-1 F200\n' +
+                'G1 X60 F400\n' +
+                'G0 Z5\n' +
+                'M30\n',
+            },
+          ],
+        },
+        title: 'Modal Groups — State Machine in Action',
+        caption: 'Cell 1: G01 is sticky — once set, every axis move is a cut until you write G00. Cell 2: the most common modal mistake — forgetting to switch back to G00. Cell 3: the initialization block that kills all modal surprises before they happen.',
+      },
     ],
     prose: [
       '**The Radio Button Analogy**: Imagine a control panel with columns of radio buttons. Each column is a modal group. You can press exactly one button per column — pressing a new button automatically releases the old one. You can press one button in each column at the same time. This is exactly how modal groups work. G00, G01, G02, G03 are all in Group 1 (motion). Only one can be active.',

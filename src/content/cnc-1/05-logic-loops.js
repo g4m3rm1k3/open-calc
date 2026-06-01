@@ -67,6 +67,33 @@ export default {
         caption: 'Run each cell in sequence. The Trace shows the toolpath that results from the logic. The Variables tab shows the counter values after each run. Try changing the loop limit in cell 2 from 5 to 8 — watch the trace extend.',
       },
     ],
+    callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 22 of 31 — Logic & Loops',
+        body: 'Variables store data. Arithmetic computes from it. Logic and loops are what make the controller act on those results: branch when a condition is met, repeat until a counter reaches its limit. Together these four lessons (20–22) form the complete macro programming foundation.',
+      },
+      {
+        type: 'definition',
+        title: 'IF [condition] GOTO N_ — conditional branch',
+        body: 'Tests a condition. If true, jumps execution to the block with that N-number. If false, continues to the next block. Condition operators: LT (<), LE (≤), GT (>), GE (≥), EQ (=), NE (≠). Example: IF [#100 GT 6] GOTO 900 — exit the section when counter exceeds 6.',
+      },
+      {
+        type: 'definition',
+        title: 'WHILE [condition] DO1 ... END1 — counted loop',
+        body: 'Repeats the block between DO1 and END1 while the condition is true. The variable inside the condition MUST change inside the loop body or the loop runs forever. Nesting: DO1/END1, DO2/END2, DO3/END3 (up to 3 levels on Fanuc).',
+      },
+      {
+        type: 'warning',
+        title: 'Infinite loop: the counter must change inside the loop',
+        body: 'WHILE [#100 LT 6] DO1 with no #100 = #100 + 1 inside the block runs forever, freezing the machine. The controller has no timeout. You must power-cycle to recover. Always write the increment line immediately after the operation inside the loop.',
+      },
+      {
+        type: 'insight',
+        title: 'GOTO is a jump; loops are structured',
+        body: 'GOTO can jump anywhere in the program — forward or backward. It is powerful but can create confusing spaghetti code. WHILE/DO/END is structured — it has a clear start and end. Prefer WHILE loops when you can; use GOTO for exit jumps and error handling.',
+      },
+    ],
     prose: [
       'A standard G-code program is a "Straight Line". It starts at the top and goes to the bottom. **Logic** turns it into a "Tree". It can branch (IF) or circle back (WHILE).',
 

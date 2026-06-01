@@ -122,7 +122,154 @@ export default {
   },
 
   intuition: {
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'GcodeNotebook',
+        type: 'GcodeNotebook',
+        initialProps: {
+          dialect: 'fanuc',
+          initialCells: [
+            {
+              id: 'wh-1',
+              label: '1 — Two-operation program: Op1 establishes datum, Op2 references it',
+              code:
+                '; Op1: machine the datum surfaces (base and reference edge).\n' +
+                '; Op2: flip part, reference the machined datum, machine features.\n' +
+                '; Key rule: never reference a raw (unmachined) surface twice.\n' +
+                '\n' +
+                '(--- OP 1: FACE AND SIDE ---)\n' +
+                'G21 G90 G17 G40 G49 G80 G94\n' +
+                'T1 M06                    ; face mill\n' +
+                'G43 H1\n' +
+                'S1800 M03 M08\n' +
+                'G54                       ; Op1 WCS (raw setup)\n' +
+                'G0 X-10 Y0 Z5\n' +
+                'G1 Z-1 F120               ; face mill: establish flat datum surface\n' +
+                'G1 X110 F400\n' +
+                'G0 Z50\n' +
+                'M05 M09\n' +
+                'M01                       ; STOP: flip part, reseat on machined face\n' +
+                '\n' +
+                '(--- OP 2: MACHINE FEATURES FROM DATUM ---)\n' +
+                'G21 G90 G17 G40 G49 G80 G94\n' +
+                'T2 M06                    ; end mill\n' +
+                'G43 H2\n' +
+                'S3000 M03 M08\n' +
+                'G55                       ; Op2 WCS (re-zeroed from machined datum)\n' +
+                'G0 X10 Y10 Z5\n' +
+                'G1 Z-5 F150\n' +
+                'G1 X90 F400\n' +
+                'G0 Z50\n' +
+                'M05 M09\n' +
+                'G91 G28 Z0\n' +
+                'G90\n' +
+                'M30\n',
+            },
+            {
+              id: 'wh-2',
+              label: '2 — Using G55/G56 for tombstone multi-fixture program',
+              code:
+                '; Tombstone: 4 faces, each loaded with the same part.\n' +
+                '; G54 = Face 1, G55 = Face 2, G56 = Face 3, G57 = Face 4.\n' +
+                '; The rotary axis (4th axis, B or A) indexes between faces.\n' +
+                '; All faces run the same sub — only the WCS changes.\n' +
+                'G21 G90 G17 G40 G49 G80 G94\n' +
+                'T1 M06\n' +
+                'G43 H1\n' +
+                'S3000 M03 M08\n' +
+                '\n' +
+                '(--- FACE 1: G54 ---)\n' +
+                'G54\n' +
+                'G65 P9300                 ; call part machining sub\n' +
+                '\n' +
+                '(--- FACE 2: G55 ---)\n' +
+                'G55\n' +
+                'G65 P9300\n' +
+                '\n' +
+                '(--- FACE 3: G56 ---)\n' +
+                'G56\n' +
+                'G65 P9300\n' +
+                '\n' +
+                '(--- FACE 4: G57 ---)\n' +
+                'G57\n' +
+                'G65 P9300\n' +
+                '\n' +
+                'M05 M09\n' +
+                'G91 G28 Z0\n' +
+                'G90\n' +
+                'M30\n' +
+                '\n' +
+                '(SUB 9300: machine one part)\n' +
+                'N9300\n' +
+                'G0 X10 Y10 Z5\n' +
+                'G1 Z-3 F150\n' +
+                'G1 X90 F400\n' +
+                'G0 Z5\n' +
+                'M99\n',
+            },
+            {
+              id: 'wh-3',
+              label: '3 — Parallel seat check in macro before cutting',
+              code:
+                '; Best practice: check for part lift before machining.\n' +
+                '; Use a probe (G31) or manual check — simulated here as a validation.\n' +
+                '; If the part is seated poorly, alarm out before the spindle starts.\n' +
+                '; This macro checks that the part height is within tolerance.\n' +
+                'G21 G90\n' +
+                '#100 = 0                  ; expected Z height of seated part\n' +
+                '#101 = 0.05               ; max acceptable seating error (mm)\n' +
+                '; In real use: probe the part surface here with G31\n' +
+                '; #102 = #5023            ; read Z position from probe contact\n' +
+                '; Simulate: measured height is slightly off\n' +
+                '#102 = 0.06               ; simulated probe reading\n' +
+                '#103 = [#102 - #100]      ; seating error\n' +
+                'IF [#103 LT 0] THEN #103 = [-#103]  ; absolute value\n' +
+                'IF [#103 GT #101] THEN #3000 = 10 (PART SEATING ERROR - CHECK PARALLELS)\n' +
+                '; Passed: proceed with machining\n' +
+                'G0 X0 Y0 Z5\n' +
+                'G1 Z-3 F150\n' +
+                'G1 X60 F300\n' +
+                'G0 Z50\n' +
+                'M30\n',
+            },
+          ],
+        },
+        title: 'Workholding in G-Code',
+        caption: 'Cell 1: two-operation program — Op1 machines the datum, M01 pauses for flip, Op2 runs from G55 referenced to the machined datum. Cell 2: tombstone program — same sub called with G54/G55/G56/G57 for each face. Cell 3: macro-based seating check before cutting.',
+      },
+    ],
+    callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 30 of 31 — Workholding',
+        body: 'Your G-code is correct. Your speeds and feeds are correct. Your tools are correct. The part is still wrong. 90% of the time, it is the workholding. This lesson covers the principles that prevent that failure mode.',
+      },
+      {
+        type: 'definition',
+        title: '6 Degrees of Freedom — what workholding must constrain',
+        body: 'A rigid body in 3D space has 6 DOF: translate in X, Y, Z; rotate about X (pitch), Y (roll), Z (yaw). Complete workholding constrains all 6. Under-constrained: the part can move during cutting. Over-constrained: the fixture stresses the part and causes distortion.',
+      },
+      {
+        type: 'definition',
+        title: '3-2-1 locating principle',
+        body: '3 contact points on the primary (base) plane — fixes Z and 2 rotations. 2 points on the secondary (side) face — fixes X and 1 rotation. 1 point on the tertiary (end) face — fixes Y. Total: exactly 6 DOF constrained. Any additional points over-constrain. A standard vise applies 3-2-1 automatically.',
+      },
+      {
+        type: 'warning',
+        title: 'Clamping is restraint, not location',
+        body: 'The part must be located (seated against datums) BEFORE the clamp is tightened. The vise jaw provides clamping force but it is the parallels and fixed jaw that locate the part. Tighten → tap part against parallels with dead-blow mallet → retighten. The initial tighten often lifts the part slightly off the parallels.',
+      },
+      {
+        type: 'insight',
+        title: 'Soft jaws: bore them under clamping load',
+        body: 'The vise jaw deflects when clamped. If you bore soft jaws while the vise is at the clamping gap, the bore exactly compensates for deflection. Open to part diameter, insert part, clamp — perfect contact. Bored without preload: 0.05–0.1mm spring-out when the part seats, causing location error.',
+      },
+      {
+        type: 'procedure',
+        title: 'Two-operation parts: machine datum in Op1, reference it in Op2',
+        body: '1. Op1: machine the reference surfaces (face, edge) in G54. 2. Stop (M01), flip part. 3. Op2: probe or indicate the machined datum and write G55 offsets. 4. Machine features in G55. Never reference a raw (saw-cut, as-cast) surface as a datum for Op2 — it is not flat enough to repeat.',
+      },
+    ],
     prose: [
       '**The 3-2-1 Principle in a Standard Vise**: A Kurt vise applies this automatically. ' +
       'The fixed jaw provides the 2-point X-location contact (secondary plane). ' +

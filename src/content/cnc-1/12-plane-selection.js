@@ -60,7 +60,103 @@ export default {
         },
         title: 'Plane Selection Lab',
         caption: 'G17 selects the XY plane — the I and J offsets define the arc center in X and Y. Try changing G17 to G18 and observe how the arc geometry changes in the backplot.',
-      }
+      },
+      {
+        id: 'GcodeNotebook',
+        type: 'GcodeNotebook',
+        initialProps: {
+          dialect: 'fanuc',
+          initialCells: [
+            {
+              id: 'plane-1',
+              label: '1 — G17 vs G18: same command, different result',
+              code:
+                '; G17 = XY plane (default for vertical mills)\n' +
+                '; G18 = ZX plane (default for lathes)\n' +
+                '; The arc center offsets I/J/K mean DIFFERENT things in each plane.\n' +
+                'G21 G90\n' +
+                '; G17 (XY): I goes in X, J goes in Y\n' +
+                'G17\n' +
+                'G0 X0 Y0 Z5\n' +
+                'G1 Z-2 F80\n' +
+                'G2 X30 Y30 I0 J15 F200     ; arc in XY plane, center is 15mm up in Y\n' +
+                'G0 Z5\n' +
+                '; G18 (ZX): I goes in X, K goes in Z\n' +
+                'G18\n' +
+                'G0 X0 Y0 Z5\n' +
+                'G1 X30 F200\n' +
+                'G2 X0 Z-10 I-15 K0 F200    ; arc in ZX plane (note: Z axis now moves)\n' +
+                'G17                         ; always reset to G17 when done!\n' +
+                'G0 Z50\n' +
+                'M30\n',
+            },
+            {
+              id: 'plane-2',
+              label: '2 — Helical interpolation: arc + Z descent together',
+              code:
+                '; Helical interpolation: the active plane axes trace an arc\n' +
+                '; while the third axis descends at constant feed.\n' +
+                '; In G17: XY is the arc, Z is the helix axis.\n' +
+                '; This is how ramp-in toolpaths and thread milling work.\n' +
+                'G21 G90 G17\n' +
+                'G0 X50 Y0 Z5\n' +
+                'G1 Z0 F100\n' +
+                '; One full helical loop: start=end in XY, descend 5mm in Z\n' +
+                'G3 X50 Y0 I-50 J0 Z-5 F300  ; CCW helix, 1 turn, 5mm pitch\n' +
+                'G3 X50 Y0 I-50 J0 Z-10 F300 ; second turn\n' +
+                'G0 Z50\n' +
+                'M30\n',
+            },
+            {
+              id: 'plane-3',
+              label: '3 — Safe start block: why G17 must be explicit',
+              code:
+                '; DANGER: If a previous program ran in G18,\n' +
+                '; the plane is STILL G18 when your program starts.\n' +
+                '; Safe start block MUST reset the plane every single time.\n' +
+                '\n' +
+                '; BAD: no plane in safe start (relies on previous state)\n' +
+                'G21 G90 G40 G49 G80         ; missing G17!\n' +
+                'G0 X0 Y0 Z5\n' +
+                'G2 X30 Y30 I15 J0 F200      ; might cut in wrong plane\n' +
+                'G0 Z50\n' +
+                'M30\n' +
+                '; --------------------------------------------------------\n' +
+                '; GOOD: explicit G17 in safe start\n' +
+                '; G21 G90 G17 G40 G49 G80   <- this is the correct form\n',
+            },
+          ],
+        },
+        title: 'G17/G18/G19 — Plane Selection',
+        caption: 'Cell 1: same arc command behaves differently in G17 vs G18. Cell 2: helical interpolation in G17 — XY arc plus Z descent in one move. Cell 3: why the safe start block must explicitly set G17 every time.',
+      },
+    ],
+    callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 12 of 31 — Plane Selection',
+        body: 'Arcs (lesson 11) are 2D shapes. The controller needs to know which 2D plane they live in. G17/G18/G19 is that declaration. Without it, I/J/K offsets mean different things on different machines.',
+      },
+      {
+        type: 'definition',
+        title: 'G17 / G18 / G19 — Active Cutting Plane',
+        body: 'G17 = XY plane (arcs use I and J). G18 = ZX plane (arcs use I and K). G19 = YZ plane (arcs use J and K). Modal — stays active until changed. G17 is the default for vertical mills; G18 is the default for lathes.',
+      },
+      {
+        type: 'definition',
+        title: 'Helical Interpolation',
+        body: 'When you command an arc in G17 and also include a Z word, the controller cuts an arc in XY while simultaneously moving Z at constant feed. The result is a helix. This is how thread milling cycles and ramp-in toolpaths work.',
+      },
+      {
+        type: 'warning',
+        title: 'Plane is persistent — always reset in safe start',
+        body: 'If a previous program ran in G18, that plane is still active when your program loads. An arc in G17 will execute in G18 and may plunge the Z axis unexpectedly. The safe start block `G21 G90 G17 G40 G49 G80` must include G17 explicitly.',
+      },
+      {
+        type: 'insight',
+        title: 'Cutter comp (G41/G42) follows the active plane',
+        body: 'Cutter compensation calculates the offset perpendicular to the toolpath — and "perpendicular" is defined within the active plane. Never switch planes while cutter comp is active. Always cancel comp with G40 before changing planes.',
+      },
     ],
     prose: [
       '**Why planes exist**: A CNC controller is a 3D machine, but a circle is inherently a 2D shape. To interpolate a circular arc, the controller needs to know which two axes form the circle — it drives those two axes in coordination while the third axis either stays still (flat arc) or moves at constant feed (helical interpolation). The plane code is the instruction that specifies those two axes.',

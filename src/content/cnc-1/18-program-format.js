@@ -169,7 +169,130 @@ sections.forEach(sec => {
         },
         title: 'Complete Program Lab',
         caption: 'This is a complete, professional-format CNC program. Run it from start to finish. Every section has a purpose. This is the template you will use for every program you write.',
-      }
+      },
+      {
+        id: 'GcodeNotebook',
+        type: 'GcodeNotebook',
+        initialProps: {
+          dialect: 'fanuc',
+          initialCells: [
+            {
+              id: 'fmt-1',
+              label: '1 — The 8-section program skeleton',
+              code:
+                '; Section 1: O-number (program identity)\n' +
+                'O0100\n' +
+                '; Section 2: Safe start block (resets ALL modal state)\n' +
+                'G21 G90 G17 G40 G49 G80 G94\n' +
+                '; Section 3: Tool setup\n' +
+                'T1 M06\n' +
+                'G43 H1\n' +
+                '; Section 4: Spindle & coolant\n' +
+                'S2500 M03\n' +
+                'M08\n' +
+                '; Section 5: Rapid positioning\n' +
+                'G54\n' +
+                'G0 X0 Y0 Z5\n' +
+                '; Section 6: Cutting operations\n' +
+                'G1 Z-3 F150\n' +
+                'G1 X50 F300\n' +
+                'G0 Z5\n' +
+                '; Section 7: Optional stop (remove for production)\n' +
+                'M01                    ; operator can skip with Optional Stop switch\n' +
+                '; Section 8: Safe end sequence\n' +
+                'M09\n' +
+                'M05\n' +
+                'G91 G28 Z0\n' +
+                'G90 G28 X0 Y0\n' +
+                'M30\n',
+            },
+            {
+              id: 'fmt-2',
+              label: '2 — Why the safe start block is non-negotiable',
+              code:
+                '; If a previous program left G91 active, your first G00 goes in the wrong direction.\n' +
+                '; If G41 (cutter comp) is still active, your first move offsets unexpectedly.\n' +
+                '; If G81 (canned cycle) is active, the next XY drills a hole.\n' +
+                '; The safe start block cancels ALL of these in one line:\n' +
+                '; G21 = metric, G90 = absolute, G17 = XY plane,\n' +
+                '; G40 = cancel cutter comp, G49 = cancel tool length comp,\n' +
+                '; G80 = cancel canned cycles, G94 = feed per minute mode\n' +
+                '\n' +
+                '; BAD: no safe start (relies on previous program state)\n' +
+                '; T1 M06\n' +
+                '; G43 H1\n' +
+                '; S2000 M03 ...\n' +
+                '\n' +
+                '; GOOD: explicit reset every time\n' +
+                'G21 G90 G17 G40 G49 G80 G94\n' +
+                'T1 M06\n' +
+                'G43 H1\n' +
+                'S2000 M03\n' +
+                'G0 X0 Y0 Z5\n' +
+                'G1 Z-3 F150\n' +
+                'G0 Z50\n' +
+                'M05 M09\n' +
+                'M30\n',
+            },
+            {
+              id: 'fmt-3',
+              label: '3 — M00 mandatory stop vs M01 optional stop',
+              code:
+                '; M00 = ALWAYS stops (requires operator Cycle Start to continue)\n' +
+                '; M01 = stops ONLY if Optional Stop switch is ON\n' +
+                ';       In production (switch OFF), M01 is ignored — no cycle time lost\n' +
+                'G21 G90 G17 G40 G49 G80 G94\n' +
+                'T1 M06\n' +
+                'G43 H1\n' +
+                'S2500 M03 M08\n' +
+                'G0 X0 Y0 Z5\n' +
+                'G1 Z-3 F150\n' +
+                'G1 X50 F300\n' +
+                'G0 Z5\n' +
+                'M01                    ; optional: inspect part during setup, ignored in production\n' +
+                'T2 M06\n' +
+                'G43 H2\n' +
+                'S3000 M03 M08\n' +
+                'G0 X25 Y25 Z5\n' +
+                'G1 Z-10 F150\n' +
+                'G0 Z5\n' +
+                'M09 M05\n' +
+                'G91 G28 Z0\n' +
+                'G90\n' +
+                'M30\n',
+            },
+          ],
+        },
+        title: 'Program Format — Structure That Keeps You Safe',
+        caption: 'Cell 1: the complete 8-section skeleton — every professional program follows this. Cell 2: why the safe start block must appear at the top every time. Cell 3: M01 optional stop — how to inspect during setup without adding cycle time in production.',
+      },
+    ],
+    callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 18 of 31 — Program Format',
+        body: 'This is the unifying lesson for everything before it. Every code you have learned (G00, G01, G02, G43, M03, G04...) fits into the 8-section structure taught here. This structure applies to every CNC program you will ever write.',
+      },
+      {
+        type: 'definition',
+        title: 'Safe Start Block — G21 G90 G17 G40 G49 G80 G94',
+        body: 'One line that resets all critical modal states: G21=metric, G90=absolute, G17=XY plane, G40=cancel cutter comp, G49=cancel tool length comp, G80=cancel canned cycles, G94=feed per minute. Machine controllers retain state between programs — without this reset, the previous program\'s modals can cause the first move to be wrong.',
+      },
+      {
+        type: 'definition',
+        title: 'M00 vs M01 — Two kinds of program pause',
+        body: 'M00 = mandatory program stop. Always halts. Requires operator Cycle Start to continue. M01 = optional stop. Only halts if the Optional Stop switch on the pendant is ON. In production with switch OFF, M01 is silently skipped — zero cycle time penalty.',
+      },
+      {
+        type: 'insight',
+        title: 'M30 vs M02 — always use M30',
+        body: 'Both end the program. M30 rewinds the program pointer to the beginning so the next Cycle Start immediately re-runs it. M02 may or may not rewind depending on controller version. Use M30 as the universal standard.',
+      },
+      {
+        type: 'procedure',
+        title: 'N-number convention: increments of 10, end sequence at N900+',
+        body: 'Number blocks N10, N20, N30... leaving gaps for insertion. Reserve N900+ for the end sequence so any macro or subroutine can jump to the end with GOTO 900 as an emergency exit pattern.',
+      },
     ],
     prose: [
       '**The 8-Section Program Template**: Every CNC program, from the simplest drill to the most complex 5-axis toolpath, follows the same basic structure. The sections are: (1) O-number, (2) Safe start block, (3) Tool setup, (4) Spindle & coolant, (5) Rapid positioning, (6) Cutting operations, (7) Optional stops, (8) Safe end sequence. Skip any section and you create a potential crash or quality problem.',

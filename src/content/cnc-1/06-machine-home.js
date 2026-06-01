@@ -6,6 +6,11 @@ export default {
   title: 'Machine Home & Reference Return',
   subtitle: 'G28 / G30 — The Machine\'s Internal GPS Reset',
   tags: ['G28', 'G30', 'home', 'reference', 'homing', 'machine zero', 'limit switch'],
+  aliases: 'G28 G30 machine home reference return homing machine zero limit switch reference point incremental encoder absolute encoder startup',
+  timeToComplete: 15,
+  coreConcept: 'G28 sends every axis to machine zero (home) via an intermediate point that you specify; it must be run with an intermediate move in G91 to avoid crashing through the part. All sessions on machines with incremental encoders must start with a reference return to establish the absolute coordinate origin.',
+  prerequisites: ['cnc-absolute-incremental'],
+  nextLesson: 'coordinate-systems',
 
   semantics: {
     core: [
@@ -206,7 +211,109 @@ draw(toolX, toolY);
         },
         title: 'Home Return Lab',
         caption: 'Run this program and watch the toolpath. Notice how Z retracts first (Phase 1), then XY moves home (Phase 2). This order is critical — reversing it would drag the tool across the part.',
-      }
+      },
+      {
+        id: 'GcodeNotebook',
+        type: 'GcodeNotebook',
+        initialProps: {
+          dialect: 'fanuc',
+          initialCells: [
+            {
+              id: 'home-1',
+              label: '1 — G28: two-step, not one jump',
+              code:
+                '; G28 always travels THROUGH the intermediate point first.\n' +
+                '; Change the intermediate point below and see the path change.\n' +
+                'G21 G90\n' +
+                'G0 X30 Y20          ; tool somewhere in work area\n' +
+                '\n' +
+                '; Intermediate point = (X30, Y20, Z10) in absolute,\n' +
+                '; then move to machine home\n' +
+                'G28 X30 Y20 Z10     ; step 1: go to (30,20,10), then home\n' +
+                'M30\n' +
+                '\n' +
+                '; Compare: G28 Z0 only homes Z — X and Y do not move\n' +
+                '; G28 X0 Y0 only homes X,Y — Z does not move\n',
+            },
+            {
+              id: 'home-2',
+              label: '2 — Why G91 G28 Z0 is the safe pattern',
+              code:
+                '; G91 G28 Z0 decoded:\n' +
+                '; G91 = incremental mode\n' +
+                '; Z0  = move Z by 0mm from current position (intermediate = current Z)\n' +
+                '; G28 = then go to Z home\n' +
+                '; Result: Z goes home without first trying to reach Z=0 (part surface)\n' +
+                'G21 G90\n' +
+                'G0 X25 Y15\n' +
+                'G1 Z-5 F100         ; tool is at depth in the part\n' +
+                '\n' +
+                '; SAFE — intermediate point is current Z, so Z immediately homes:\n' +
+                'G91 G28 Z0\n' +
+                'G90\n' +
+                '\n' +
+                '; DANGEROUS (do not run on a real machine):\n' +
+                '; G90 G28 Z0   ← intermediate = Z=0 in absolute = part surface\n' +
+                '; Tool would plunge TO Z=0 before going home\n' +
+                'G28 X0 Y0\n' +
+                'M30\n',
+            },
+            {
+              id: 'home-3',
+              label: '3 — Full program end: the standard closing block',
+              code:
+                '; This is the block every production program ends with.\n' +
+                '; Memorize it. Use it every time.\n' +
+                'G21 G90\n' +
+                'G0 X40 Y30\n' +
+                'G1 Z-3 F150\n' +
+                'G1 X80 F300         ; some cutting...\n' +
+                '\n' +
+                '; ─── STANDARD PROGRAM END ───\n' +
+                'G0 Z5               ; rapid clear — tool out of part\n' +
+                'M5                  ; spindle stop (taught in Lesson 13)\n' +
+                'G91 G28 Z0          ; home Z safely\n' +
+                'G90                 ; restore absolute\n' +
+                'G28 X0 Y0           ; home XY\n' +
+                'M30                 ; program end + rewind\n',
+            },
+          ],
+        },
+        title: 'G28 — Home Return in Practice',
+        caption: 'Cell 1: see how G28 routes through the intermediate point. Cell 2: understand why G91 Z0 is the safe Z home pattern and why G90 Z0 is dangerous. Cell 3: the complete program-end closing block — memorize this sequence.',
+      },
+    ],
+    callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 6 of 31 — The Machine\'s GPS Reset',
+        body: 'You now know axes, units, blocks, modal state, and absolute vs incremental. This lesson explains what happens before any of those matter — establishing the origin the machine measures from.',
+      },
+      {
+        type: 'definition',
+        title: 'Machine Home (Reference Point)',
+        body: 'A fixed physical position detected by a precision reference switch. When an axis "homes," it drives until it hits this switch, then sets its encoder to the factory-calibrated coordinate. All G53 (machine coordinate) positions are measured from here.',
+      },
+      {
+        type: 'definition',
+        title: 'G28 — Two-Step Return',
+        body: 'G28 moves to the intermediate point you specify IN THE BLOCK first, then from there to machine home. It never moves directly to home. This allows you to lift Z off the part before the XY home move.',
+      },
+      {
+        type: 'procedure',
+        title: 'The safe home return — every program, every time',
+        body: '1. G0 Z5 (or higher) — rapid clear of the part.\n2. M5 — stop spindle.\n3. G91 G28 Z0 — home Z via current position.\n4. G90 — restore absolute.\n5. G28 X0 Y0 — home XY.',
+      },
+      {
+        type: 'warning',
+        title: 'Never use G90 G28 Z0 at depth',
+        body: 'In G90 (absolute), the intermediate point for G28 Z0 is Z=0 in the current work offset — which is the part surface. The machine tries to move the buried tool UP to Z=0 and then to Z home, but it first moves TO Z=0, which may be into or at the part. Always use G91 for Z home returns.',
+      },
+      {
+        type: 'insight',
+        title: 'G91 G28 Z0 decoded',
+        body: 'G91 switches to incremental. Z0 means "move Z by 0 mm from current position" — the intermediate point is exactly where Z already is. G28 then moves Z from that intermediate position straight to home. No downward motion is possible. This is why the idiom works.',
+      },
     ],
     prose: [
       '**Why the Machine Needs a Home**: CNC machines with incremental encoders lose their position reference the moment power is cut. The encoder knows how far each motor has rotated since the last reference event — but without a reference event, it has no idea where that puts it in physical space. Homing drives each axis until it hits a precision reference switch (or a Z-pulse from an absolute encoder). The controller then says: "OK — this switch position = (X-500, Y-400, Z-200) in machine coordinates." Everything else is relative to that.',

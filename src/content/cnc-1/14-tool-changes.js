@@ -168,7 +168,132 @@ draw();
         },
         title: 'ATC Motion Sequence',
         caption: 'Three phases of every tool change: retract Z to machine home, execute the physical swap, then descend to the approach position. If any phase is interrupted — wrong Z on M06, or missing G43 after — the program is unsafe.',
-      }
+      },
+      {
+        id: 'GcodeNotebook',
+        type: 'GcodeNotebook',
+        initialProps: {
+          dialect: 'fanuc',
+          initialCells: [
+            {
+              id: 'tc-1',
+              label: '1 — T stages the tool; M06 swaps it',
+              code:
+                '; T__ = rotate carousel to that pocket (staging).\n' +
+                '; M06 = execute the physical exchange.\n' +
+                '; These are TWO separate steps by design.\n' +
+                'G21 G90\n' +
+                'T1 M06                    ; swap: bring T1 into spindle\n' +
+                'G43 H1                    ; activate T1 length offset\n' +
+                'S2000 M03 M08\n' +
+                'G0 X0 Y0 Z5\n' +
+                'G1 Z-3 F150\n' +
+                'G1 X60 F300               ; cutting with T1\n' +
+                'T2                        ; stage T2 during the cut (carousel indexes while cutting)\n' +
+                'G0 Z5\n' +
+                'G91 G28 Z0               ; retract Z to machine home before tool change\n' +
+                'G90\n' +
+                'M05 M09\n' +
+                'T2 M06                    ; now swap T2 into spindle\n' +
+                'G43 H2                    ; activate T2 length offset\n' +
+                'S3000 M03 M08\n' +
+                'G0 X0 Y0 Z5\n' +
+                'G1 Z-5 F120\n' +
+                'G0 Z50\n' +
+                'M05 M09\n' +
+                'M30\n',
+            },
+            {
+              id: 'tc-2',
+              label: '2 — What happens if you forget G43 after M06',
+              code:
+                '; After a tool change, the new tool has a different length.\n' +
+                '; G43 H_ applies the stored offset so Z depth is correct.\n' +
+                '; Without G43, Z coordinates reference the WRONG zero.\n' +
+                'G21 G90\n' +
+                'T1 M06\n' +
+                '; MISSING G43 H1 here!\n' +
+                '; If T1 is 50mm shorter than T0 was at calibration,\n' +
+                '; all Z depths will be 50mm too shallow (or too deep).\n' +
+                '; This is a common source of scrapped parts.\n' +
+                '\n' +
+                '; CORRECT form:\n' +
+                'T1 M06\n' +
+                'G43 H1                    ; always apply length comp after every tool change\n' +
+                'S2000 M03\n' +
+                'G0 X0 Y0 Z5\n' +
+                'G1 Z-3 F150\n' +
+                'G0 Z50\n' +
+                'M05\n' +
+                'M30\n',
+            },
+            {
+              id: 'tc-3',
+              label: '3 — Two-tool program: face mill then drill',
+              code:
+                '; Professional two-operation program:\n' +
+                '; Op1: T1 face mill. Stage T2 during cut.\n' +
+                '; Op2: T2 drill. Stage T3 during drill if needed.\n' +
+                'G21 G90\n' +
+                'T1 M06\n' +
+                'G43 H1\n' +
+                'S1800 M03 M08\n' +
+                'G0 X0 Y0 Z5\n' +
+                'G1 Z-1 F120               ; face pass depth\n' +
+                'G1 X100 F400              ; face mill pass\n' +
+                'T2                        ; stage drill while face milling\n' +
+                'G0 Z5\n' +
+                'G91 G28 Z0\n' +
+                'G90\n' +
+                'M05 M09\n' +
+                'T2 M06\n' +
+                'G43 H2\n' +
+                'S2500 M03 M08\n' +
+                'G0 X50 Y50 Z5\n' +
+                'G1 Z-15 F200              ; drill hole\n' +
+                'G0 Z50\n' +
+                'M05 M09\n' +
+                'G91 G28 Z0\n' +
+                'G90 G28 X0 Y0\n' +
+                'M30\n',
+            },
+          ],
+        },
+        title: 'Tool Changes — Stage, Swap, Compensate',
+        caption: 'Cell 1: T stages while you cut; M06 does the swap; G43 activates the new length. Cell 2: what goes wrong without G43. Cell 3: complete two-tool program with staging optimization.',
+      },
+    ],
+    callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 14 of 31 — Automatic Tool Changes',
+        body: 'Single-tool programs are exercises. Real parts need multiple operations with different tools. This lesson covers the complete tool-change protocol every production program requires.',
+      },
+      {
+        type: 'definition',
+        title: 'T-word — Tool Selection',
+        body: 'T__ rotates the carousel to position that tool pocket in the "ready" position. The tool does NOT enter the spindle yet. This is staging. On machines with slow carousel indexing, staging the next tool during the current cut eliminates carousel wait time at the change.',
+      },
+      {
+        type: 'definition',
+        title: 'M06 — Tool Change Execution',
+        body: 'M06 fires the physical exchange: the ATC arm pulls the current tool from the spindle, inserts the staged tool, and retracts. The spindle must be stopped (M05) and Z must be at machine home before M06 executes. Many controllers auto-stop the spindle on M06, but always program M05 explicitly.',
+      },
+      {
+        type: 'warning',
+        title: 'G43 H_ must follow every tool change',
+        body: 'Every tool has a different physical length. G43 H_ loads the length offset for that tool from the offset register, so subsequent Z moves reference the correct workpiece Z=0. Forgetting G43 after M06 means the new tool runs with the wrong Z reference — almost certainly causing scrap or a crash.',
+      },
+      {
+        type: 'warning',
+        title: 'Z must be at home before M06',
+        body: 'The ATC arm needs physical clearance to reach the spindle. Always program G91 G28 Z0 before M06 to retract Z to machine home. Never trust the controller to auto-retract; explicit Z home is non-negotiable.',
+      },
+      {
+        type: 'insight',
+        title: 'H-number convention: H matches T',
+        body: 'There is no automatic link between T and H. By convention, shops store T1 length in H1, T2 in H2, etc. Some controllers can auto-apply H on M06, but never assume this on an unfamiliar machine. Always write G43 H_ explicitly.',
+      },
     ],
     prose: [
       '**The Two-Step Design**: `T_` and `M06` are always two separate actions by design. `T2` tells the carousel to rotate and stage tool #2 in the ready position — but the tool in the spindle does not change yet. `M06` fires the physical exchange: the spindle moves to the ATC position, the arm swoops in, pulls the current tool, inserts the staged tool, and retracts. On slow carousels, staging the next tool (`T2`) during the previous cut buys time — the carousel can rotate during machining instead of making you wait.',

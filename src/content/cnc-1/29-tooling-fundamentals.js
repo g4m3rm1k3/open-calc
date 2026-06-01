@@ -132,7 +132,115 @@ export default {
   },
 
   intuition: {
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'GcodeNotebook',
+        type: 'GcodeNotebook',
+        initialProps: {
+          dialect: 'fanuc',
+          initialCells: [
+            {
+              id: 'tool-1',
+              label: '1 — Aluminum: 2-flute, high helix, DLC/uncoated, high RPM',
+              code:
+                '; Aluminum 6061: very soft, sticky, produces long stringy chips.\n' +
+                '; Tool requirements:\n' +
+                ';   - 2 flutes: maximum chip space (prevents packing/welding)\n' +
+                ';   - High helix 45-60°: pulls chips up and out aggressively\n' +
+                ';   - DLC or uncoated: TiAlN causes built-up edge in aluminum\n' +
+                ';   - High Vc: 200-300 m/min for carbide\n' +
+                '; 12mm 2-flute carbide end mill in aluminum:\n' +
+                '; RPM = (250 * 1000) / (3.14159 * 12) = 6631\n' +
+                '; Feed = RPM * chip_load * flutes = 6631 * 0.04 * 2 = 530 mm/min\n' +
+                'G21 G90 G97\n' +
+                'S6600 M03 M08\n' +
+                'G0 X0 Y0 Z5\n' +
+                'G1 Z-8 F150                ; plunge at 25%: 530*0.25=132 → use 150\n' +
+                'G1 X60 F530                ; full cutting feedrate\n' +
+                'G0 Z50\n' +
+                'M05 M09\n' +
+                'M30\n',
+            },
+            {
+              id: 'tool-2',
+              label: '2 — Steel: 4-flute, TiAlN coated, lower RPM and feed',
+              code:
+                '; 4140 steel HRC 30: tough, abrasive, produces segmented chips.\n' +
+                '; Tool requirements:\n' +
+                ';   - 4 flutes: more edges for finish, adequate chip room at lower feed\n' +
+                ';   - Low-to-medium helix 30-35°: stronger edge for harder material\n' +
+                ';   - TiAlN coating: survives 800°C, excellent oxidation resistance\n' +
+                ';   - Lower Vc: 100-150 m/min for carbide in steel\n' +
+                '; 12mm 4-flute TiAlN carbide in 4140 steel:\n' +
+                '; RPM = (120 * 1000) / (3.14159 * 12) = 3183\n' +
+                '; Feed = 3183 * 0.025 * 4 = 318 mm/min\n' +
+                'G21 G90 G97\n' +
+                'S3200 M03 M08\n' +
+                'G0 X0 Y0 Z5\n' +
+                'G1 Z-4 F80                 ; plunge at 25%: 318*0.25=79 → use 80\n' +
+                'G1 X60 F320                ; cutting feedrate\n' +
+                'G0 Z50\n' +
+                'M05 M09\n' +
+                'M30\n',
+            },
+            {
+              id: 'tool-3',
+              label: '3 — Insert roughing: high MRR, replaceable edges',
+              code:
+                '; Indexable insert face mill: APKT or SEHT style.\n' +
+                '; Best for: large stock removal, facing, roughing passes.\n' +
+                '; Inserts replaced (not reground) when worn — lower cost per edge.\n' +
+                '; Face mill Ø80mm with 5 inserts (APKT 1604), steel:\n' +
+                '; Vc = 180 m/min → RPM = (180*1000)/(3.14159*80) = 716\n' +
+                '; Chip load per tooth = 0.2mm, Feed = 716*0.2*5 = 716 mm/min\n' +
+                '; Axial depth: 2mm (roughing pass)\n' +
+                'G21 G90 G97\n' +
+                'S720 M03 M08\n' +
+                'G0 X-10 Y0 Z5\n' +
+                'G1 Z-2 F200                ; rapid-feed plunge: face mill enters radially\n' +
+                'G1 X100 F720               ; face mill pass at full feedrate\n' +
+                'G0 Z50\n' +
+                'M05 M09\n' +
+                'M30\n',
+            },
+          ],
+        },
+        title: 'Tool Selection in G-Code',
+        caption: 'Cell 1: aluminum strategy — 2-flute, DLC, high RPM, high feed. Cell 2: steel strategy — 4-flute, TiAlN, lower RPM, lower feed. Cell 3: insert roughing — high chip load, replaceable edges for maximum material removal rate.',
+      },
+    ],
+    callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 29 of 31 — Tooling Fundamentals',
+        body: 'You have programmed feeds and speeds (lesson 17). This lesson explains WHY those numbers work for specific tools in specific materials. Tool selection is the multiplier: the same speeds and feeds that give you 200 parts from the right tool give you 20 from the wrong one.',
+      },
+      {
+        type: 'definition',
+        title: 'Flute count rule: 2 for aluminum, 4 for steel',
+        body: '2 flutes: maximum chip gullet space — prevents aluminum chips from packing and welding into the flutes. 4 flutes: more cutting edges, better finish, adequate chip room at the lower chip loads required for steel. 3 flutes: compromise for light aluminum finishing or smooth steel contouring.',
+      },
+      {
+        type: 'definition',
+        title: 'Coating selection: TiAlN for steel, uncoated/DLC for aluminum',
+        body: 'TiAlN (dark gray): max temp 800°C, ideal for steel, stainless, cast iron. DLC/uncoated: aluminum, copper, composites. NEVER use TiAlN in aluminum — the aluminum atom bonds to the coating and welds to the flute face (built-up edge), destroying surface finish in 2–3 parts.',
+      },
+      {
+        type: 'definition',
+        title: 'Solid carbide vs indexable insert',
+        body: 'Solid carbide: one-piece tool ground from carbide rod. Use for toleranced features, finishing, small diameters (< 25mm). Indexable insert: replaceable cutting tips in a tool body. Use for roughing, large depths of cut, lathe turning. Lower cost per edge, easier field replacement.',
+      },
+      {
+        type: 'insight',
+        title: 'Helix angle: high for aluminum, low for steel',
+        body: 'High helix (45–60°): aggressive chip evacuation, lower axial cutting force, ideal for aluminum and thin-wall parts. Low helix (30°): stronger cutting edge, better for interrupted cuts and hard materials. High helix in steel causes chatter; low helix in aluminum causes chip packing.',
+      },
+      {
+        type: 'warning',
+        title: 'Corner radius on inserts and end mills: always the largest that fits',
+        body: 'A larger corner radius distributes the cutting force over more edge length — longer tool life, better finish, higher SFM. Use the largest corner radius the part geometry allows. Small radii (0.1–0.2mm) are for tight corner requirements only — they are weak and chatter-prone.',
+      },
+    ],
     prose: [
       '**The Four Pillars of Tool Selection**: Every tool selection decision reduces to four properties: ' +
       '(1) **Substrate** — what the tool is made of (HSS, carbide, cermet, CBN, PCD). ' +

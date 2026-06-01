@@ -252,6 +252,38 @@ drawScene(initZ);
         caption: 'Cell 1: watch G81 fire a complete drill cycle per XY position. Cell 2: compare G83 peck drilling — notice multiple Z retract moves per hole. Cell 3: combine G81 with a macro WHILE loop to automatically position 6 holes on a bolt circle.',
       },
     ],
+    callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 16 of 31 — Canned Cycles',
+        body: 'You now know all basic motion codes (G00, G01, G02, G03). Canned cycles are firmware-stored sequences that execute one of those motions at every position you give them. They are the shorthand that makes multi-hole programs practical.',
+      },
+      {
+        type: 'definition',
+        title: 'Canned Cycle — G81/G82/G83/G84',
+        body: 'A canned cycle is a stored controller subroutine. G81 = simple drill (rapid to R, feed to Z, rapid out). G82 = counterbore (drill + dwell at depth). G83 = peck drill (repeated Q-depth pecks with chip-clearing retracts). G84 = rigid tapping (synchronized spindle reversal at depth). All are modal in Group 9.',
+      },
+      {
+        type: 'definition',
+        title: 'R-plane — rapid approach height',
+        body: 'R is the height above the workpiece surface where the controller switches from G00 rapid to G01 feed. Program R just above the material (R2.0mm or R0.1in). Too high wastes time on every hole; too low gives the controller no room to decelerate before feeding.',
+      },
+      {
+        type: 'definition',
+        title: 'G98 vs G99 — return plane choice',
+        body: 'G99 = after each hole, retract only to the R-plane (fast, use when table between holes is clear). G98 = after each hole, retract to the initial tool position before the cycle call (use when clamps or raised features exist between holes).',
+      },
+      {
+        type: 'warning',
+        title: 'Always end canned cycles with G80',
+        body: 'Canned cycles are modal — they stay active until cancelled. Without G80, the next XY move in your program (like a rapid to the tool change position) will trigger a drill cycle at that location. Every canned cycle block must end with an explicit G80.',
+      },
+      {
+        type: 'insight',
+        title: 'G83 peck depth rule: Q < hole diameter, use when depth > 3× diameter',
+        body: 'In G83, Q is the peck increment. A good starting point is Q = 0.5–1× drill diameter per peck. Peck drilling becomes mandatory when hole depth exceeds 3× drill diameter — beyond that, chips pack the flutes, heat spikes, and drills break without warning.',
+      },
+    ],
     prose: [
       '**What a Canned Cycle Is**: A canned cycle is a stored subroutine inside the controller firmware. When you activate G81, you are telling the controller: "At every XY position I give you, execute this sequence: (1) rapid to R-plane, (2) feed to Z depth, (3) rapid retract." You define the parameters once; the cycle executes them automatically at each position.',
 

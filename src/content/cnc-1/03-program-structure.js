@@ -6,6 +6,11 @@ export default {
   title: 'Program Structure',
   subtitle: 'Blocks, Words, and the Anatomy of G-Code',
   tags: ['block', 'word', 'address', 'O-number', 'N-number', 'comment', 'EOB', 'program format'],
+  aliases: 'G-code program structure block word address O number N number comment EOB end of block anatomy of G-code line format',
+  timeToComplete: 15,
+  coreConcept: 'A G-code program is a sequence of blocks (lines); each block contains words (letter + number pairs) that tell the controller the motion type, coordinates, feedrate, spindle state, and miscellaneous functions. Every professional program begins with a safety block that sets known modal state.',
+  prerequisites: ['cnc-units-measurement'],
+  nextLesson: 'modal-groups',
 
   semantics: {
     core: [
@@ -66,7 +71,71 @@ export default {
         },
         title: 'Fully Annotated G-Code Program',
         caption: 'Read each line. Every word has a purpose. The N-numbers help you find lines. The comments explain intent. Run the program and watch the toolpath — then look back at the code and trace which lines drew which moves.',
-      }
+      },
+      {
+        id: 'GcodeNotebook',
+        type: 'GcodeNotebook',
+        initialProps: {
+          dialect: 'fanuc',
+          initialCells: [
+            {
+              id: 'struct-1',
+              label: '1 — Strip a program to its absolute minimum',
+              code:
+                '; What is the LEAST a working program needs?\n' +
+                '; Answer: one motion command and an end.\n' +
+                '; Remove words one at a time and see what still runs.\n' +
+                'G0 X50 Y50          ; G-word + axis words = one valid block\n' +
+                'M30                 ; end — required\n' +
+                '\n' +
+                '; Now add back the safety line:\n' +
+                '; G21 G90 G17 G40 G49 G80\n' +
+                '; G0 X50 Y50\n' +
+                '; M30\n',
+            },
+            {
+              id: 'struct-2',
+              label: '2 — N-numbers are labels, not line numbers',
+              code:
+                '; N-numbers let you jump to a block with GOTO.\n' +
+                '; They are OPTIONAL. The controller does not care about the order.\n' +
+                '; Delete any N-word below — the program still runs identically.\n' +
+                'G21 G90\n' +
+                'N10  G0 X0 Y0       ; N10 is a label, not required\n' +
+                'N20  G1 X30 F200\n' +
+                'N30  G1 Y30\n' +
+                'N40  G1 X0\n' +
+                'N50  G1 Y0\n' +
+                'N60  M30\n' +
+                '\n' +
+                '; Try running without any N-words — same result:\n' +
+                '; G21 G90\n' +
+                '; G1 X30 F200   Y30   X0   Y0\n' +
+                '; M30\n',
+            },
+            {
+              id: 'struct-3',
+              label: '3 — Every word in a block fires together',
+              code:
+                '; Multiple words in one block = simultaneous effect.\n' +
+                '; This block: switch to G01, set feedrate, AND move — all at once:\n' +
+                'G21 G90\n' +
+                'G0 X0 Y0\n' +
+                '; --- ONE block that does three things ---\n' +
+                'G1 X50 F300         ; G1 (motion mode) + X50 (target) + F300 (feedrate)\n' +
+                '; Compare: splitting into three blocks does the SAME thing:\n' +
+                '; G1\n' +
+                '; X50\n' +
+                '; F300\n' +
+                '; (but splitting is bad practice — keep related words together)\n' +
+                'G0 X0\n' +
+                'M30\n',
+            },
+          ],
+        },
+        title: 'Program Structure — Build It Word by Word',
+        caption: 'Cell 1: find the absolute minimum program. Cell 2: N-numbers are labels, not required. Cell 3: multiple words in one block act simultaneously. Each cell removes the mystery of what G-code "grammar" actually means.',
+      },
     ],
     prose: [
       '**The Block = The Sentence**: A block is a single complete instruction. The controller reads the entire block, processes all the words in it, then acts. N10 G21 G90 G17 is one block containing three words (G21, G90, G17). They all take effect simultaneously when that block is executed.',

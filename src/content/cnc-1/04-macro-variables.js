@@ -68,6 +68,33 @@ export default {
         caption: 'Edit cells and run. Watch the Variables tab to see #100, #101, etc. update in real time. Start with cell 1 (Run ↑), then add cells 2 and 3 to see arithmetic and trig in action.',
       },
     ],
+    callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 20 of 31 — Macro Variables',
+        body: 'Until now, every coordinate in your programs has been a fixed number. Variables break that constraint. With variables, one program can cut any pocket size, any bolt circle radius, any taper angle — without rewriting the code.',
+      },
+      {
+        type: 'definition',
+        title: 'Variable — a named storage register',
+        body: 'A variable is a numbered register that holds a value. Writing #100 = 25.0 stores 25.0. Using #100 in a motion word (G1 X#100) reads from that register at runtime. The machine does not care whether you wrote 25.0 or #100 — it sees the same number.',
+      },
+      {
+        type: 'definition',
+        title: 'Variable scopes: local, common, permanent',
+        body: 'Fanuc: #1–#33 = local (reset on each G65 call), #100–#199 = common (shared across all programs, cleared at power-off), #500–#999 = permanent (survive power-off, used for fixture offsets and shop constants). Siemens uses R variables. Okuma uses VC variables. Same concept, different syntax.',
+      },
+      {
+        type: 'insight',
+        title: 'Variables make programs parametric',
+        body: 'A parametric program is one where dimensions come from variable inputs rather than fixed coordinates. One program can drill any hole pattern by changing a few variable assignments at the top. This is the foundation of every custom macro cycle in production CNC.',
+      },
+      {
+        type: 'warning',
+        title: '#0 is null — uninitialized variables cause undefined behavior',
+        body: 'On Fanuc, a variable that has never been assigned has the value #0 (null/undefined). Using a null variable in a motion word (G1 X#100 when #100 = null) causes an alarm or unpredictable motion. Always initialize variables before using them.',
+      },
+    ],
     prose: [
       'A variable is just a "Named Pocket". Instead of hard-coding X1.5, we use a placeholder: `X#100`. The machine looks into pocket #100, sees what\'s inside, and uses it.',
 

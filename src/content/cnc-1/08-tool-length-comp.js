@@ -6,6 +6,11 @@ export default {
   title: 'Tool Length Compensation',
   subtitle: 'G43 / G44 / G49 — Making Every Tool Tip Reach the Same Z Zero',
   tags: ['G43', 'G44', 'G49', 'H-word', 'tool length offset', 'TLO', 'Z-axis', 'tool setup'],
+  aliases: 'G43 G44 G49 tool length compensation TLO H-word tool offset Z-axis tool length offset setter touch-off setter spindle nose gauge',
+  timeToComplete: 20,
+  coreConcept: 'G43 H[n] adds the stored length offset for tool n to every Z coordinate; this makes the tool tip reach the programmed Z depth regardless of how long the tool is. Every tool change requires activating the correct H offset — a wrong or missing H value sends the Z to the wrong depth with no alarm.',
+  prerequisites: ['cnc-coordinate-systems'],
+  nextLesson: 'rapid-motion',
 
   semantics: {
     core: [
@@ -215,7 +220,115 @@ document.getElementById('withG43').addEventListener('click', ()=>drawScene(true)
         },
         title: 'Multi-Tool Program With G43',
         caption: 'Notice: G43 H1 for tool 1, then G43 H2 for tool 2. Each activates a different stored length offset. Despite different physical lengths, both tools produce moves referenced to the same Z=0 datum.',
-      }
+      },
+      {
+        id: 'GcodeNotebook',
+        type: 'GcodeNotebook',
+        initialProps: {
+          dialect: 'fanuc',
+          initialCells: [
+            {
+              id: 'tlo-1',
+              label: '1 — G43 activates the stored length; G49 cancels it',
+              code:
+                '; The H-register holds the tool length measured at setup.\n' +
+                '; G43 H1 = "add the H1 value to every Z move from now on."\n' +
+                '; G49  = "stop compensating — Z moves hit the gauge line, not the tip."\n' +
+                'G21 G90 G54\n' +
+                'T1 M6               ; mount tool 1 (length stored in H1)\n' +
+                'G43 H1 Z5           ; activate TLO — Z5 now means "tip is 5mm above Z=0"\n' +
+                'G0 X0 Y0\n' +
+                'G1 Z-3 F200         ; tip cuts 3mm deep — spindle physically higher by H1\n' +
+                'G0 Z5\n' +
+                'G49                 ; cancel TLO — always cancel before program end\n' +
+                'M30\n',
+            },
+            {
+              id: 'tlo-2',
+              label: '2 — Two tools, same Z=0 datum',
+              code:
+                '; Both tools cut to Z-5 (5mm below part surface).\n' +
+                '; Tool 1 is short, tool 2 is long — but both tips hit the same depth.\n' +
+                '; The difference in spindle height is exactly the difference in H values.\n' +
+                'G21 G90 G54\n' +
+                '\n' +
+                '; ─── TOOL 1 (short, H1 stored) ───\n' +
+                'T1 M6\n' +
+                'G43 H1 Z10          ; TLO for tool 1 active\n' +
+                'S2000 M3\n' +
+                'G0 X0 Y0\n' +
+                'G1 Z-5 F200         ; tip at Z-5 regardless of tool length\n' +
+                'G1 X50 F300\n' +
+                'G0 Z10\n' +
+                '\n' +
+                '; ─── TOOL 2 (long, H2 stored) ───\n' +
+                'T2 M6\n' +
+                'G43 H2 Z10          ; switch TLO — H2 is different from H1\n' +
+                'G0 X0 Y0\n' +
+                'G1 Z-5 F150         ; SAME Z-5 command — different spindle position\n' +
+                'G1 X50 F200\n' +
+                'G0 Z10\n' +
+                '\n' +
+                'G49\n' +
+                'M30\n',
+            },
+            {
+              id: 'tlo-3',
+              label: '3 — The crash: missing G43 after a tool change',
+              code:
+                '; This is the #1 G43-related crash pattern.\n' +
+                '; Tool 2 is loaded but the G43 still has H1 (tool 1\'s length).\n' +
+                '; If tool 2 is longer than tool 1, Z will be SHALLOWER than expected.\n' +
+                '; If tool 2 is shorter, Z will be DEEPER — potentially crashing.\n' +
+                'G21 G90 G54\n' +
+                'T1 M6\n' +
+                'G43 H1 Z10          ; tool 1 TLO active\n' +
+                'G1 Z-5 F200         ; correct depth for tool 1\n' +
+                'G0 Z10\n' +
+                '\n' +
+                'T2 M6\n' +
+                '; ← MISSING: G43 H2 Z10   ← TLO still set to H1!\n' +
+                'G1 Z-5 F150         ; WRONG depth — spindle position calculated for tool 1\'s length\n' +
+                '\n' +
+                '; CORRECT version:\n' +
+                '; T2 M6\n' +
+                '; G43 H2 Z10    ← always update G43 after every M6\n' +
+                '; G1 Z-5 F150\n' +
+                'G0 Z10\n' +
+                'G49 M30\n',
+            },
+          ],
+        },
+        title: 'Tool Length Compensation — G43 in Practice',
+        caption: 'Cell 1: G43 activates a stored H-value offset for all Z moves; G49 cancels it. Cell 2: two different tools, same Z-5 command — G43 makes the tips hit the same depth. Cell 3: the most common G43 crash — forgetting to update H after a tool change.',
+      },
+    ],
+    callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 8 of 31 — The Z-Axis Tool Offset',
+        body: 'Work offsets (lesson 7) handle X/Y/Z positioning for different part locations. Tool length compensation handles the Z offset for different tool lengths. Together, they define the complete coordinate offset system.',
+      },
+      {
+        type: 'definition',
+        title: 'G43 H[n] — Apply Tool Length Offset',
+        body: 'Adds the length stored in H-register n to every Z coordinate. If H1 = 75.0, then G43 H1 active means every Z command moves the spindle 75mm higher than the programmed Z value — so the tool TIP lands at the programmed position.',
+      },
+      {
+        type: 'definition',
+        title: 'G49 — Cancel Tool Length Offset',
+        body: 'Turns off all TLO. Z commands now move the spindle gauge line (the reference face of the spindle) to the programmed position, not the tool tip. G43 H0 is identical to G49.',
+      },
+      {
+        type: 'warning',
+        title: 'Always G43 H[n] immediately after every tool change',
+        body: 'When M06 executes, the active G43 H value does NOT automatically update to the new tool. The old H value stays in the modal state. If tool 1 was 60mm and tool 2 is 120mm, the 60mm H value will drive the new tool 60mm too deep. Update G43 on the same line as, or immediately after, every tool change.',
+      },
+      {
+        type: 'insight',
+        title: 'Match H number to T number — always',
+        body: 'Write T1 → G43 H1. Write T3 → G43 H3. This is a convention, not a rule the controller enforces. But following it means you never have to think about which H goes with which T. Every setup sheet, every programmer, every machine should use this convention.',
+      },
     ],
     prose: [
       '**The Core Problem**: A CNC spindle can hold tools of wildly different lengths. If the controller simply commands "move Z to -5.0 from work zero," it is moving the SPINDLE GAUGE LINE (the reference plane on the spindle face) to -5.0. For a 60mm tool, the tip would be at 60 - 5 = 55mm ABOVE the part. For a 120mm tool at the same spindle position, the tip would be 115mm below the gauge, which might be 110mm below the part surface. Neither is correct.',

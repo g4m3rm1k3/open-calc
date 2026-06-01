@@ -17,6 +17,11 @@ export default {
     'Cartesian geometry', 'linear interpolation', 'rotary motion', 
     'work offsets', 'spindle orientation', 'vector math'
   ],
+  aliases: 'machine axes X Y Z axis Cartesian coordinate system right-hand rule VMC HMC spindle axis rotary axes A B C work offset G53 G54 table motion programmer illusion',
+  timeToComplete: 30,
+  coreConcept: 'CNC machines navigate a 3D Cartesian grid: Z is always the spindle axis (Z+ always moves the tool away from the part), the programmer always thinks from the tool\'s perspective even when the table moves, and machine zero (G53) and work zero (G54–59) are two separate coordinate realities that coexist simultaneously.',
+  prerequisites: ['cnc-what-is-cnc'],
+  nextLesson: 'units-and-measurement',
 
   semantics: {
     core: [
@@ -85,8 +90,70 @@ export default {
         id: 'CNCAxesExplorer',
         props: { height: 500, showRotary: true, showSecondary: true, initialAxis: 'Z' },
         title: 'The Kinematic Universe',
-        caption: 'Explore the interplay between linear and rotary axes. Note how A, B, and C rotations are inextricably tied to their linear counterparts X, Y, and Z.'
-      }
+        caption: 'Explore the interplay between linear and rotary axes. Note how A, B, and C rotations are inextricably tied to their linear counterparts X, Y, and Z.',
+      },
+      {
+        id: 'GcodeNotebook',
+        type: 'GcodeNotebook',
+        initialProps: {
+          dialect: 'fanuc',
+          initialCells: [
+            {
+              id: 'axes-1',
+              label: '1 — Feel X, then Y, then Z separately',
+              code:
+                '; Run this cell. Watch only the Trace.\n' +
+                '; X goes LEFT/RIGHT. Y goes FRONT/BACK. Z goes UP/DOWN.\n' +
+                '; Change the numbers — does the trace move the way you expected?\n' +
+                'G21 G90\n' +
+                'G0 X50              ; --- move ONLY in X ---\n' +
+                'G0 X0 Y40           ; --- now ONLY in Y ---\n' +
+                'G0 X0 Y0 Z30        ; --- Z lifts the tool UP ---\n' +
+                'G0 X0 Y0 Z0\n' +
+                'M30\n',
+            },
+            {
+              id: 'axes-2',
+              label: '2 — Z+ is always the safe direction',
+              code:
+                '; Z+ = AWAY from the part. Always.\n' +
+                '; On a VMC: Z+ goes UP (spindle rises). On a lathe: Z+ points toward tailstock.\n' +
+                '; Try changing Z-10 to Z10 below — which version is safe?\n' +
+                'G21 G90\n' +
+                'G0 X25 Y25          ; move over a feature\n' +
+                'G0 Z-10             ; ← DANGEROUS: tool plunges INTO the part\n' +
+                '; G0 Z10            ; ← SAFE: tool lifts away from the part\n' +
+                'G0 Z0\n' +
+                'M30\n',
+            },
+            {
+              id: 'axes-3',
+              label: '3 — ALWAYS retract Z before moving X or Y',
+              code:
+                '; The Z-Priority Rule. Commit this to muscle memory.\n' +
+                '; Compare the two sequences below — enable one, disable the other.\n' +
+                'G21 G90\n' +
+                '\n' +
+                '; ── SAFE SEQUENCE ──\n' +
+                'G0 X10 Y10          ; start position\n' +
+                'G0 Z-5              ; plunge to depth\n' +
+                '; ↓ to move to the next feature, lift Z FIRST:\n' +
+                'G0 Z5               ; retract\n' +
+                'G0 X50 Y10          ; now move laterally — tool is clear\n' +
+                'G0 Z-5              ; re-engage\n' +
+                '\n' +
+                '; ── CRASH SEQUENCE (comment above, uncomment below) ──\n' +
+                '; G0 X10 Y10\n' +
+                '; G0 Z-5\n' +
+                '; G0 X50 Y10        ; ← lateral rapid with tool buried = CRASH\n' +
+                'G0 Z0\n' +
+                'M30\n',
+            },
+          ],
+        },
+        title: 'Axis Moves — Feel Each Axis',
+        caption: 'Cell 1: move one axis at a time and watch the trace. Cell 2: understand why Z+ is the safety direction. Cell 3: the Z-priority rule — retract Z before every lateral rapid. This rule prevents the most common beginner crash.',
+      },
     ],
     prose: [
       '### I. The Philosophical Foundation: René Descartes and the Grid',
@@ -125,6 +192,38 @@ export default {
       '1. **The Physical Universe (G53):** This is the "Machine Home." It is defined by physical limit switches. When the machine "Homes" at startup, it is finding its absolute physical origin. You generally NEVER program in G53 coordinates because they change depending on where the table is. ' +
       '2. **The Part Universe (G54-G59):** This is the "Work Offset." You pick a corner of your raw material or the center of a bore and tell the machine: "This is (0,0,0) for my program." ' +
       'The **DRO (Digital Readout)** is your window into these universes. It shows the distance from the tool tip to your Work Zero.',
+    ],
+    callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 2 of 31 — Machine Axes',
+        body: '**Previous:** What Is CNC — the CAD→CAM→G-code→Controller chain.\n**This lesson:** The 3D coordinate grid of a CNC machine — X/Y/Z, rotary axes A/B/C, the right-hand rule, and the two coordinate realities (machine zero vs. work zero).\n**Next:** Units & Measurement — G20/G21, the 25.4 factor, and decimal precision.',
+      },
+      {
+        type: 'definition',
+        title: 'Z Is Always the Spindle Axis',
+        body: 'By ISO 841 standard, **Z is always the axis of spindle rotation**. On a VMC, Z is vertical. On an HMC, Z is horizontal. The critical rule: **Z+ always increases distance between the tool and the workpiece**. When a program misbehaves, the operator\'s first instinct is \'Rapid Z Up\' — because Z+ is always the safe direction away from the part.',
+      },
+      {
+        type: 'insight',
+        title: 'The Programmer\'s Illusion',
+        body: 'On most VMCs, the spindle moves only in Z. The table moves in X and Y. But the programmer **always thinks from the tool\'s perspective** as if the tool is moving and the part is stationary. Program `G1 X2.0` to move the tool 2 inches to the right — the machine internally moves the table 2 inches to the LEFT. The controller handles the inversion. You handle the geometry.',
+      },
+      {
+        type: 'procedure',
+        title: 'Right-Hand Rule: Determining Positive Rotation Direction',
+        body: 'To find the positive direction of a rotary axis:\n\nStep 1. Point your right-hand thumb in the positive direction of the corresponding linear axis (e.g., X+ for the A axis).\nStep 2. Your fingers curl in the **A+** direction (positive rotation around X).\n\n- **A** rotates around **X** — thumb points X+, fingers curl A+\n- **B** rotates around **Y** — thumb points Y+, fingers curl B+\n- **C** rotates around **Z** — thumb points Z+, fingers curl C+ (clockwise when viewed from above)',
+      },
+      {
+        type: 'warning',
+        title: 'Z-Priority Rule: Retract Z Before Moving X or Y',
+        body: 'Never command an X or Y move while the tool is at cutting depth. Always retract Z to a safe height first.\n\n**Safe sequence:**\nG0 Z5.0     ; retract above part\nG0 X50 Y30  ; then move laterally\n\n**Crash sequence:**\nG0 X50 Y30  ; rapid with tool buried in part — will crash\n\nThis is the single most common cause of collisions for beginners.',
+      },
+      {
+        type: 'insight',
+        title: 'Two Coordinate Worlds: G53 vs G54',
+        body: '**G53 (Machine Coordinate System):** Absolute physical zero, defined by hardware limit switches. Fixed. You almost never program in G53.\n\n**G54–G59 (Work Coordinate Systems):** Relative zero that you set at setup time — usually a part corner or center bore. The machine stores the vector from G53 to G54 as a work offset. Your program runs entirely in G54 space. One machine can hold six different work offsets simultaneously (useful for multi-part fixtures or pallets).',
+      },
     ],
   },
 

@@ -2,10 +2,15 @@ export default {
   id: 'cnc-linear-motion',
   slug: 'linear-interpolation',
   chapter: 'cnc-1',
-  order: 9,
+  order: 10,
   title: 'Linear Interpolation',
-  subtitle: 'Rapid (G00) vs. Linear (G01)',
+  subtitle: 'G01 — Cutting in a Straight Line at Controlled Speed',
   tags: ['G00', 'G01', 'feedrate', 'modal', 'axes', 'dog-leg', 'interpolation', 'G61', 'G64', 'lookahead'],
+  aliases: 'G01 linear interpolation feedrate F-word ipm mm/min cutting feed modal velocity decomposition G61 G64 lookahead exact stop',
+  timeToComplete: 25,
+  coreConcept: 'G01 moves all axes simultaneously so that the tool travels in a mathematically straight line at a controlled feedrate; the controller decomposes the total vector speed F into per-axis components so all axes start and finish together. G01 is the only motion code safe for cutting.',
+  prerequisites: ['cnc-rapid-motion'],
+  nextLesson: 'circular-arcs',
 
   semantics: {
     core: [
@@ -126,6 +131,102 @@ export default {
           'through lines 6–8 — the feed move happens without re-stating G01 each time. ' +
           'This is modal behavior. Try changing one of the middle lines to G00 — ' +
           'watch it jump at rapid speed instead of cutting.',
+      },
+      {
+        id: 'GcodeNotebook',
+        type: 'GcodeNotebook',
+        initialProps: {
+          dialect: 'fanuc',
+          initialCells: [
+            {
+              id: 'lin-1',
+              label: '1 — F is the total vector speed, not per-axis',
+              code:
+                '; G01 X80 Y60 F300 means the TIP moves at 300 mm/min along the diagonal.\n' +
+                '; The controller splits that into Vx and Vy automatically.\n' +
+                '; Both axes start AND finish at exactly the same moment — that is what makes the path straight.\n' +
+                'G21 G90\n' +
+                'G0 X0 Y0\n' +
+                'G1 X80 Y60 F300     ; straight diagonal at 300 mm/min total vector speed\n' +
+                'G1 X0 Y0 F300       ; back — same speed, same straight line\n' +
+                'M30\n' +
+                '\n' +
+                '; Now try G0 X80 Y60 instead of G1 — watch the dog-leg vs straight path\n',
+            },
+            {
+              id: 'lin-2',
+              label: '2 — F is modal: set it once',
+              code:
+                '; F is modal — once programmed it stays active until changed.\n' +
+                '; Every block below after the first G1 is a cutting move at the last F value.\n' +
+                'G21 G90\n' +
+                'G0 X0 Y0\n' +
+                'G1 X50 F200         ; sets F200 modal\n' +
+                'Y40                 ; still G1 F200 — no need to repeat\n' +
+                'X0                  ; still G1 F200\n' +
+                'Y0                  ; still G1 F200\n' +
+                'G1 X50 F400         ; NOW change feedrate to F400\n' +
+                'Y40                 ; G1 F400 active\n' +
+                'G0 X0 Y0            ; G00 cancels G01 from modal group 1\n' +
+                'M30\n',
+            },
+            {
+              id: 'lin-3',
+              label: '3 — G61 exact stop vs G64 blending at corners',
+              code:
+                '; G61 = Exact Stop: tool decelerates to ZERO at each block endpoint.\n' +
+                '; G64 = Lookahead: controller blends moves together — tool never fully stops.\n' +
+                '; G64 is default and right for most milling.\n' +
+                '; G61 is for sharp corners where dimensional accuracy matters more than speed.\n' +
+                'G21 G90\n' +
+                '\n' +
+                '; Try G61 (exact stop at every corner):\n' +
+                'G61\n' +
+                'G1 X50 F300\n' +
+                'G1 Y50 F300\n' +
+                'G1 X0  F300\n' +
+                'G1 Y0  F300\n' +
+                '\n' +
+                '; Then try G64 (blended — machine never stops at corners):\n' +
+                '; G64\n' +
+                '; G1 X50 F300\n' +
+                '; G1 Y50 F300   ; faster cycle time, slightly rounded corners\n' +
+                '; G1 X0  F300\n' +
+                '; G1 Y0  F300\n' +
+                'G0 X0 Y0\n' +
+                'M30\n',
+            },
+          ],
+        },
+        title: 'G01 Linear Motion — Feedrate and Modal Behavior',
+        caption: 'Cell 1: F is total vector speed — the controller splits it per-axis so the path is always straight. Cell 2: F is modal — set it once and it carries. Cell 3: G61 exact stop vs G64 lookahead blending at corners.',
+      },
+    ],
+    callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 10 of 31 — Controlled Cutting Motion',
+        body: 'G00 (lesson 9) positions in air at max speed. G01 cuts at controlled speed. These two codes are the foundation every other motion code (G02, G03, canned cycles) builds on.',
+      },
+      {
+        type: 'definition',
+        title: 'G01 — Linear Interpolation',
+        body: 'Commands all axes to move simultaneously so the tool tip travels in a straight line. The controller solves the per-axis speeds mathematically so all axes start and finish at exactly the same moment. Requires an active F-word.',
+      },
+      {
+        type: 'definition',
+        title: 'F-word — Feedrate',
+        body: 'The total velocity of the tool TIP along the programmed path. In G21 (metric): mm/min. In G20 (inch): ipm. F is modal — once set it remains active until changed. F has no effect in G00.',
+      },
+      {
+        type: 'warning',
+        title: 'G01 with no active F will alarm',
+        body: 'If the controller reaches a G01 block with no F ever programmed, most controllers will fault with a feedrate error alarm. Always include F on the first G01 block of the program.',
+      },
+      {
+        type: 'insight',
+        title: 'G64 blending vs G61 exact stop',
+        body: 'G64 (default) blends moves at corners — the tool never fully stops, giving better surface finish and shorter cycle time. G61 decelerates to zero at each block endpoint, giving sharper corners at the cost of speed. Use G64 for contours, G61 for precision corners.',
       },
     ],
 
