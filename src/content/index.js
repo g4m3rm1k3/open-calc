@@ -1,4 +1,5 @@
 import { COURSES } from "./courses.js";
+import { getAllAutoChapters } from "./autoLoader.js";
 import ch0 from "./chapter-0/index.js";
 import ch1 from "./chapter-1/index.js";
 import ch2 from "./chapter-2/index.js";
@@ -33,7 +34,7 @@ import chemistry4 from "./chemistry-4/index.js";
 
 import digitalFundamentals from "./digital-fundamentals/index.js";
 import cnc1 from "./cnc-1/index.js";
-import git0 from "./git-0/index.js";
+// git-0 migrated to src/content/lessons/git-0/
 import cli0 from "./cli-0/index.js";
 import cpp0 from "./cpp-0/index.js";
 import cpp1 from "./cpp-1/index.js";
@@ -108,7 +109,8 @@ const DIGITAL_FUNDAMENTALS_CURRICULUM = digitalFundamentals.map((ch) => ({
   course: "digital-fundamentals",
 }));
 const CNC_CURRICULUM = [cnc1].map((ch) => ({ ...ch, course: "cnc-logic" }));
-const GIT0_CURRICULUM = [git0].map((ch) => ({ ...ch, course: "git-0" }));
+// git-0 migrated to lessons/ — auto-loaded by getAllAutoChapters()
+const GIT0_CURRICULUM = [];
 const CLI0_CURRICULUM = [cli0].map((ch) => ({ ...ch, course: "cli-0" }));
 const CPP0_CURRICULUM = [cpp0].map((ch) => ({ ...ch, course: "cpp" }));
 const CPP1_CURRICULUM = [cpp1].map((ch) => ({ ...ch, course: "cpp" }));
@@ -178,6 +180,7 @@ export const CURRICULUM = [
   ...SIM1_CURRICULUM,
   ...SIM2_CURRICULUM,
   ...SIM3_CURRICULUM,
+  ...getAllAutoChapters(),
 ];
 
 // Flat map for O(1) lookup by slug within chapter

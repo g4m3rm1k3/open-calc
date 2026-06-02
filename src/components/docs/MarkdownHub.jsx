@@ -574,17 +574,20 @@ export default function MarkdownHub() {
           </span>
 
           <div className="flex flex-wrap bg-slate-200/50 dark:bg-slate-950/50 p-1 rounded-lg gap-1 border border-slate-200/50 dark:border-slate-800/50">
-            {['tutorials', 'editor'].map((nextTab) => (
+            {[
+              { id: 'tutorials', label: '📖 Tutorials' },
+              { id: 'editor',    label: '✏️ Editor' },
+            ].map(({ id, label }) => (
               <button
-                key={nextTab}
-                onClick={() => setTab(nextTab)}
-                className={`px-3 py-1 text-xs font-bold capitalize rounded-md transition-all ${
-                  tab === nextTab
+                key={id}
+                onClick={() => setTab(id)}
+                className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${
+                  tab === id
                     ? 'bg-white dark:bg-slate-800 text-brand-600 dark:text-brand-400 shadow-sm'
                     : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800/50'
                 }`}
               >
-                {nextTab === 'tutorials' ? '📖 Tutorials' : '✏️ Editor'}
+                {label}
               </button>
             ))}
           </div>

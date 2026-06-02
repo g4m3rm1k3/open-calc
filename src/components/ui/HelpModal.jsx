@@ -1,6 +1,11 @@
 ﻿// HelpModal.jsx — Interactive contributor tutorial system
 // A full in-app documentation site for contributors of all skill levels.
 import { useState, useEffect } from "react";
+
+const TEMPLATE_MODULES = import.meta.glob('/src/content/templates/*.js', {
+  query: '?raw',
+  import: 'default',
+});
 import {
   X,
   Download,
@@ -35,151 +40,389 @@ import {
 
 const TPL_MATH = `// math-lesson-template.js
 // ================================================================
-// MATH / CALCULUS LESSON TEMPLATE  —  open-calc
+// MATH / CALCULUS / LINEAR ALGEBRA LESSON TEMPLATE  —  UpSkillOS
 // ================================================================
 // Lines starting with // are INSTRUCTIONS. Delete when done.
+// UPPER_CASE words are placeholders — replace them all.
 // ================================================================
 
 export default {
 
   // ── IDENTITY (REQUIRED) ─────────────────────────────────────
-  id: 'ch1-your-topic',
-  //  ^ Unique label. Format: ch{N}-topic-name
-  //    Example: 'ch0-real-numbers'   'ch3-chain-rule'
+  id: 'COURSE-CHAPTER-ORDER-SLUG',
+  //  ^ Unique across ALL lessons. Format: course-ch-order-topic
+  //    Example: 'calc-2-001-chain-rule'  'la1-003-dot-product'
   //    IMPORTANT: Must be unique — no two lessons share one.
 
-  slug: 'your-topic',
-  //   ^ Appears in the URL: /chapter/1/your-topic
+  slug: 'DESCRIPTIVE-URL-SLUG',
+  //   ^ Appears in the URL. Lowercase, hyphens, no spaces.
 
-  chapter: 1,
-  //       ^ Chapter NUMBER. Must match chapter file exactly.
+  chapter: 'CHAPTER-KEY',
+  //        ^ Must match the chapter's number field in index.js
+  //          For calculus: an integer (0–6). Others: a string like 'la1.1'
 
-  order: 0,
-  //     ^ Position in chapter list (0 = first).
+  order: 1,
+  //     ^ Integer position within the chapter (1 = first lesson).
 
-  title: 'Your Lesson Title',
+  title: 'LESSON TITLE',
   subtitle: 'One sentence describing what this teaches.',
-  tags: ['keyword1', 'keyword2'],
+  tags: ['KEYWORD1', 'KEYWORD2', 'KEYWORD3'],
 
   // ── HOOK ────────────────────────────────────────────────────
   hook: {
-    question: 'What question does this lesson answer?',
-    realWorldContext: 'One or two sentences of real-world motivation.',
+    question: 'What real question does this lesson answer?',
+    realWorldContext: 'Where does this concept appear outside the classroom?',
   },
 
   // ── INTUITION ───────────────────────────────────────────────
+  // Build the idea from scratch. No formulas yet — just the mental model.
   intuition: {
-    text: \`
-Write your explanation here.
-
-Formatting: **bold** *italic* \\\`code\\\` $f(x)$ inline math $display math$
-
-Tip: Explain the concept as if talking to a curious 16-year-old.
-Don't introduce the formula yet — build the IDEA first.
-    \`,
-
+    prose: [
+      '**Start with a concrete example.** DESCRIBE A SPECIFIC SITUATION WITH NUMBERS. Notice that OBSERVATION — this is the seed of the idea.',
+      '**Find the pattern.** When we change INPUT by AMOUNT, OUTPUT changes by RELATED_AMOUNT. The ratio FORMULA_FRAGMENT keeps appearing.',
+      '**Name it and state it.** The CONCEPT is defined as: FORMULA. Every term corresponds to something we saw above.',
+      '**Before reading on, predict:** if SCENARIO, what would CONCEPT equal? Write your guess, then check in the Math section.',
+    ],
+    callouts: [
+      {
+        type: 'sequencing',
+        title: 'Chapter X, Lesson Y',
+        body: '**Previous:** PREVIOUS_LESSON_TITLE\\n**This lesson:** THIS_LESSON_SUMMARY\\n**Next:** NEXT_LESSON_TITLE',
+      },
+      {
+        type: 'procedure',
+        title: 'How to compute CONCEPT',
+        body: '1. Identify WHAT_TO_LOOK_FOR\\n2. Compute INTERMEDIATE_STEP\\n3. Apply FORMULA\\n4. Check SANITY_CHECK',
+      },
+    ],
     visualizations: [
-      // { id: 'ComponentName', props: {} }
-      // Common: PythonNotebook, JSNotebook, RiemannSum, UnitCircle
+      // { id: 'VIZ_ID', title: 'Title', caption: 'One sentence.' }
+      // Find all available viz IDs in the Contributor Docs → Using Vizs
     ],
   },
 
-  // ── FORMAL MATH (optional) ──────────────────────────────────
+  // ── FORMAL MATH ─────────────────────────────────────────────
   math: {
-    definition: 'Formal statement. LaTeX: $f\'(x) = \\\\lim_{h \\\\to 0} \\\\frac{f(x+h)-f(x)}{h}$',
-    examples: [
+    prose: [
+      '**Setup.** Let VARIABLES represent QUANTITIES. We want to show GOAL.',
+      '**Step 1.** Starting from DEFINITION: $EQUATION$. This is valid because REASON.',
+      '**Result.** We arrive at $FORMULA$. This matches our intuition because CONNECTION.',
+    ],
+    callouts: [
       {
-        problem:  'Find the derivative of $f(x) = x^2$.',
-        solution: 'Using the power rule: $f\'(x) = 2x$.',
+        type: 'warning',
+        title: 'Common mistake: WHAT_STUDENTS_GET_WRONG',
+        body: 'DESCRIBE_THE_MISTAKE. The correct approach is: CORRECT_APPROACH.',
       },
     ],
+    visualizations: [],
   },
 
-  // ── UNDERSTANDING CHECK (ungraded) ───────────────────────────
-  assessment: {
-    questions: [
-      {
-        question: 'In your own words, what does this concept mean?',
-        answer:   'Expected answer here.',
-        hint:     'Think about... (a nudge toward the answer)',
-      },
-    ],
-  },
+  // ── EXAMPLES ────────────────────────────────────────────────
+  // Minimum 3: easy, medium, hard. Example 1 walks every step.
+  examples: [
+    {
+      title: 'Example 1 (Easy): SPECIFIC_PROBLEM_STATEMENT',
+      steps: [
+        { expression: 'STARTING_EXPRESSION', annotation: 'We are given INPUT. Our goal is OUTPUT. We start by FIRST_ACTION.' },
+        { expression: 'AFTER_STEP_1', annotation: 'Apply RULE. This works because REASON_FROM_INTUITION.' },
+        { expression: 'FINAL_ANSWER', annotation: 'This is the answer. Sanity check: VERIFICATION.' },
+      ],
+    },
+    {
+      title: 'Example 2 (Medium): SPECIFIC_PROBLEM_STATEMENT',
+      steps: [
+        { expression: '...', annotation: '...' },
+        { expression: '...', annotation: '...' },
+      ],
+    },
+    {
+      title: 'Example 3 (Hard): SPECIFIC_PROBLEM_STATEMENT',
+      steps: [
+        { expression: '...', annotation: '...' },
+        { expression: '...', annotation: '...' },
+      ],
+    },
+  ],
 
-  // ── SCORED QUIZ ──────────────────────────────────────────────
-  quiz: {
-    questions: [
+  // ── QUIZ ────────────────────────────────────────────────────
+  // Minimum 6 questions. IMPORTANT: answer must be copied EXACTLY from options.
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      question: 'QUESTION TEXT',
+      options: ['Option A', 'Option B', 'Option C', 'Option D'],
+      answer: 'Option A',  // must match one of the options above exactly
+      hints: ['Think about HINT_1.', 'Recall that HINT_2.'],
+      reviewSection: 'intuition',  // 'intuition' | 'math' | 'examples'
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      question: 'QUESTION TEXT',
+      options: ['Option A', 'Option B', 'Option C', 'Option D'],
+      answer: 'Option B',
+      hints: ['HINT'],
+      reviewSection: 'math',
+    },
+    // Add 4 more questions...
+  ],
+
+  // ── PYTHON NOTEBOOK ─────────────────────────────────────────
+  // Top-level python field — rendered as the Python Lab tab.
+  python: {
+    title: 'LESSON_TITLE — Python Lab',
+    cells: [
       {
-        question: 'What is the derivative of $x^3$?',
-        answer:   '$3x^2$',
-        hints: [
-          'Try the power rule.',
-          'Multiply by the exponent, then reduce it by 1.',
+        id: 1,
+        cellTitle: 'CELL_TITLE: concept or formula name',
+        prose: [
+          'EXPLAIN what each line of code does and WHY — connect it to the formula.',
+          'What should the student observe when they run it?',
         ],
+        code: \`import numpy as np
+
+# EXPLAIN_WHAT_STUDENTS_COMPUTE
+result = ...  # fill in
+
+print(f"Result: {result}")\`,
+        testCode: \`assert abs(result - EXPECTED_VALUE) < 1e-6, "Check your formula"\`,
+      },
+      {
+        id: 2,
+        cellTitle: 'Visualize: WHAT_THIS_PLOTS',
+        prose: [
+          'EXPLAIN THE PLOT — what shape appears and how it confirms the formula.',
+          'Run this cell and notice HOW_THE_PLOT_SHOWS_THE_CONCEPT.',
+        ],
+        code: \`import numpy as np
+import matplotlib.pyplot as plt
+
+x = np.linspace(-3, 3, 300)
+y = ...  # compute using the formula from this lesson
+
+plt.figure(figsize=(8, 4))
+plt.plot(x, y, 'b-', linewidth=2, label='LABEL')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.title('CHART_TITLE')
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()\`,
+      },
+      {
+        id: 3,
+        cellTitle: 'Application: REAL_WORLD_SCENARIO',
+        prose: [
+          'REALISTIC PROBLEM: DESCRIBE_THE_SCENARIO. Show how the formula solves it.',
+          'EXPECTED OUTPUT: tell students what the answer should be.',
+        ],
+        code: \`import numpy as np
+
+# Problem: PROBLEM_STATEMENT
+given_value = ...
+answer = ...
+
+print(f"Answer: {answer:.4f}")\`,
+      },
+      {
+        id: 4,
+        cellTitle: 'Challenge: PROBLEM_TITLE',
+        prose: [
+          'HARDER PROBLEM combining this lesson with something from a previous lesson. No starter code.',
+          'Hint: ONE_HINT',
+        ],
+        code: \`# Your solution here
+\`,
       },
     ],
   },
 
+  // ── MATLAB / OPENMAT NOTEBOOK ────────────────────────────────
+  // Remove this section if you do not want a MATLAB notebook.
+  openmat: {
+    title: 'LESSON_TITLE — MATLAB Lab',
+    cells: [
+      {
+        id: 1,
+        cellTitle: 'CELL_TITLE: concept in MATLAB syntax',
+        prose: [
+          'MATLAB SYNTAX: semicolons suppress output; % is the comment character; fprintf prints.',
+          'CONNECT TO FORMULA: how does this code compute the formula from this lesson?',
+        ],
+        code: \`% EXPLAIN_WHAT_THIS_COMPUTES
+x = ...;  % WHAT_TO_FILL_IN
+result = ...;
+fprintf('Result: %f\\n', result);\`,
+      },
+      {
+        id: 2,
+        cellTitle: 'Visualize: WHAT_THIS_PLOTS',
+        prose: ['MATLAB PLOT: describe what figure() / plot() produces and how it shows the formula.'],
+        code: \`x = linspace(-3, 3, 300);
+y = ...;
+figure; plot(x, y, 'b-', 'LineWidth', 2);
+xlabel('x'); ylabel('y'); title('CHART_TITLE'); grid on;\`,
+      },
+      {
+        id: 3,
+        cellTitle: 'Application: REAL_WORLD_SCENARIO',
+        prose: ['SAME APPLICATION as the Python cell, in MATLAB syntax.'],
+        code: \`% Problem: PROBLEM_STATEMENT
+given_value = ...;
+answer = ...;
+fprintf('Answer: %.4f\\n', answer);\`,
+      },
+      {
+        id: 4,
+        cellTitle: 'Challenge: PROBLEM_TITLE',
+        prose: ['HARDER PROBLEM. Write from scratch in MATLAB syntax.', 'Hint: ONE_HINT'],
+        code: \`% Your solution here
+\`,
+      },
+    ],
+  },
 }
 `;
 
 const TPL_PYTHON = `// python-lesson-template.js
 // ================================================================
-// PYTHON / CODING LESSON TEMPLATE  —  open-calc
+// PYTHON / CODING LESSON TEMPLATE  —  UpSkillOS
+// ================================================================
+// Lines starting with // are INSTRUCTIONS. Delete when done.
+// UPPER_CASE words are placeholders — replace them all.
 // ================================================================
 
 export default {
-  id: 'py1-your-topic',
-  slug: 'your-topic',
-  chapter: 1,
-  order: 0,
-  title: 'Your Python Lesson Title',
+  id: 'py-CHAPTER-ORDER-SLUG',
+  //  ^ Example: 'py-1-3-for-loops'
+  slug: 'DESCRIPTIVE-SLUG',
+  chapter: 'CHAPTER-KEY',
+  //        ^ Must match the chapter's number in index.js. Example: 'python.1'
+  order: 1,
+  title: 'LESSON TITLE',
   subtitle: 'What will students build or learn to do?',
-  tags: ['python', 'your-topic'],
+  tags: ['python', 'KEYWORD1', 'KEYWORD2'],
 
   hook: {
     question: 'What will students be able to do by the end of this?',
     realWorldContext: 'Why is this Python skill useful in the real world?',
+    previewVisualizationId: 'PythonNotebook',
   },
 
   intuition: {
-    text: \`
-Explain the concept here — BEFORE any code.
-
-What is the big idea? What problem are we solving?
-Then the notebook below lets students try it themselves.
-    \`,
+    prose: [
+      '**Context.** EXPLAIN_THE_CONCEPT_WITHOUT_CODE — the idea first, then we implement it.',
+      '**What you will build.** By the end of this lesson, you will be able to CONCRETE_SKILL.',
+    ],
+    callouts: [
+      {
+        type: 'sequencing',
+        title: 'Chapter X, Lesson Y',
+        body: '**Previous:** PREVIOUS_LESSON\\n**This lesson:** THIS_LESSON\\n**Next:** NEXT_LESSON',
+      },
+    ],
     visualizations: [
-      // PythonNotebook adds an interactive Python editor right here.
-      { id: 'PythonNotebook', props: {} },
-    ],
-  },
-
-  assessment: {
-    questions: [
       {
-        question: 'What does this code print?  print(2 ** 10)',
-        answer: '1024',
-        hint: '** is the Python exponentiation operator.',
+        id: 'PythonNotebook',
+        title: 'Python Lab',
+        props: {
+          initialCells: [
+            // ── Cell 1 — Concept ──────────────────────────────
+            {
+              id: 1,
+              cellTitle: 'CELL_TITLE: concept or Python construct',
+              prose: [
+                '**CONCEPT_NAME.** EXPLAIN_WHAT_THIS_CELL_DEMONSTRATES. Connect every line to the concept.',
+                'What should the student observe when they run it?',
+              ],
+              code: \`# WHAT_THIS_CELL_COMPUTES
+
+my_list = [1, 2, 3, 4, 5]
+
+for item in my_list:
+    print(item)\`,
+            },
+
+            // ── Cell 2 — Visualization ────────────────────────
+            {
+              id: 2,
+              cellTitle: 'Visualize: WHAT_THIS_PLOTS',
+              prose: [
+                '**EXPLAIN THE PLOT.** DESCRIBE_WHAT_SHAPE_APPEARS and how it connects to the concept.',
+                'Run this cell and notice HOW_THE_PLOT_CONFIRMS_THE_CONCEPT.',
+              ],
+              code: \`import matplotlib.pyplot as plt
+import numpy as np
+
+x = list(range(10))
+y = [i ** 2 for i in x]  # EXPLAIN_WHAT_THIS_COMPUTES
+
+plt.figure(figsize=(7, 4))
+plt.plot(x, y, 'o-', color='steelblue', linewidth=2)
+plt.xlabel('X_LABEL')
+plt.ylabel('Y_LABEL')
+plt.title('CHART_TITLE')
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+
+print(f"Values: {y}")\`,
+            },
+
+            // ── Cell 3 — Application ─────────────────────────
+            {
+              id: 3,
+              cellTitle: 'Application: REAL_TASK',
+              prose: [
+                '**REALISTIC TASK.** DESCRIBE_THE_SCENARIO. Show how this lesson\'s concept solves it.',
+                'EXPECTED OUTPUT: tell students what the answer should be so they can verify.',
+              ],
+              code: \`# Task: PROBLEM_STATEMENT
+data = [23, 45, 12, 67, 34, 89, 11, 56]
+
+result = ...  # write your solution here
+
+print(f"Result: {result}")\`,
+              testCode: \`assert result == EXPECTED_VALUE, f"Expected EXPECTED_VALUE, got {result}"\`,
+            },
+
+            // ── Cell 4 — Challenge ────────────────────────────
+            {
+              id: 4,
+              cellTitle: 'Challenge: PROBLEM_TITLE',
+              prose: [
+                '**HARDER PROBLEM.** Combine this lesson with something from a previous lesson. No starter code.',
+                'Hint: ONE_SMALL_HINT',
+              ],
+              code: \`# Your solution here
+\`,
+            },
+          ],
+        },
       },
     ],
   },
 
-  quiz: {
-    questions: [
-      {
-        question: 'How do you define a function in Python?',
-        answer: 'Use: def function_name(parameters): then indent the body.',
-        hints: ['Start with the keyword: def', 'def add(a, b): return a + b'],
-      },
-    ],
-  },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      question: 'QUESTION',
+      options: ['Option A', 'Option B', 'Option C', 'Option D'],
+      answer: 'Option A',
+      hints: ['HINT'],
+      reviewSection: 'intuition',
+    },
+    // Add at least 2 more questions
+  ],
 }
 `;
 
 const TPL_PROOF = `// proof-lesson-template.js
 // ================================================================
-// PROOF / GEOMETRY LESSON TEMPLATE  —  open-calc
+// PROOF / GEOMETRY LESSON TEMPLATE  —  UpSkillOS
 // ================================================================
 
 export default {
@@ -245,7 +488,7 @@ geometric or intuitive argument first.
 
 const TPL_VIZ = `// MyVizComponent.jsx
 // ================================================================
-// VIZ COMPONENT (prose + toggles)  —  open-calc
+// VIZ COMPONENT (prose + toggles)  —  UpSkillOS
 // ================================================================
 
 import { useState, useEffect } from 'react'
@@ -294,7 +537,7 @@ export default function MyVizComponent({ params = {} }) {
 
 const TPL_CANVAS = `// MyCanvasViz.jsx
 // ================================================================
-// VIZ COMPONENT (HTML5 Canvas)  —  open-calc
+// VIZ COMPONENT (HTML5 Canvas)  —  UpSkillOS
 // ================================================================
 
 import { useState, useEffect, useRef } from 'react'
@@ -538,16 +781,15 @@ const LESSON_ZONES = [
       "You can embed multiple visualizations — they appear in order.",
     ],
     code: `  intuition: {
-    text: \`
-Imagine zooming into a curve so far that it
-looks like a straight line. The **derivative**
-is the slope of that imaginary tiny line.
-
-The closer you zoom, the more accurate the slope.
-Zoom infinitely close: $f'(x)$.
-    \`,
+    prose: [
+      'Imagine zooming into a curve so far that it looks like a straight line. The **derivative** is the slope of that imaginary tiny line.',
+      'The closer you zoom, the more accurate the slope. Zoom infinitely close: $f\'(x)$.',
+    ],
+    callouts: [
+      { type: 'sequencing', title: 'Lesson N of M', body: '**Previous:** ...\n**This:** ...\n**Next:** ...' },
+    ],
     visualizations: [
-      { id: 'SecantToTangent', props: {} },
+      { id: 'SecantToTangent', title: 'Secant to Tangent', props: {} },
     ],
   },`,
     renderMockup: () => (
@@ -767,10 +1009,15 @@ function Para({ children }) {
 
 // ─── DOWNLOAD CARD ───────────────────────────────────────────────────────────
 
-function DownloadCard({ icon, title, filename, desc, template }) {
+function DownloadCard({ icon, title, filename, desc, template, templateKey }) {
   const [done, setDone] = useState(false);
-  const handle = () => {
-    downloadFile(filename, template);
+  const handle = async () => {
+    let content = template;
+    if (templateKey) {
+      const loader = TEMPLATE_MODULES[`/src/content/templates/${templateKey}`];
+      if (loader) content = await loader();
+    }
+    downloadFile(filename, content);
     setDone(true);
     setTimeout(() => setDone(false), 2000);
   };
@@ -1000,6 +1247,39 @@ function SectionOverview() {
         <strong>chapters</strong>. You write lessons as simple text files — the
         app reads them and renders them automatically.
       </Para>
+
+      <H3>Two ways to contribute</H3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-4">
+        <div className="p-4 rounded-2xl border-2 border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/20">
+          <div className="text-lg mb-2">📥</div>
+          <div className="text-sm font-bold text-amber-800 dark:text-amber-300 mb-1">
+            Path A — No code required
+          </div>
+          <ol className="text-xs text-amber-700 dark:text-amber-400 space-y-1 leading-relaxed">
+            <li>1. Go to <strong>Your First Lesson</strong> → download a template</li>
+            <li>2. Fill in the placeholders (every field has instructions)</li>
+            <li>3. Email to <strong>m1k3ymcl34n@gmail.com</strong> with subject <code className="font-mono bg-amber-100 dark:bg-amber-900/50 px-1 rounded">[Lesson Submission] Your Title</code></li>
+          </ol>
+          <div className="mt-3 text-[10px] text-amber-600 dark:text-amber-500">
+            A developer reviews, tests, and adds it for you.
+          </div>
+        </div>
+        <div className="p-4 rounded-2xl border-2 border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/20">
+          <div className="text-lg mb-2">💻</div>
+          <div className="text-sm font-bold text-blue-800 dark:text-blue-300 mb-1">
+            Path B — Developer (clone + PR)
+          </div>
+          <ol className="text-xs text-blue-700 dark:text-blue-400 space-y-1 leading-relaxed font-mono">
+            <li>1. git clone github.com/g4m3rm1k3/upskillos</li>
+            <li>2. npm install && npm run dev</li>
+            <li>3. Add lesson → register in index.js</li>
+            <li>4. Open a pull request</li>
+          </ol>
+          <div className="mt-3 text-[10px] text-blue-600 dark:text-blue-500">
+            See <strong>Your First Lesson</strong> for the full walkthrough.
+          </div>
+        </div>
+      </div>
 
       <div className="flex flex-wrap items-center gap-2 my-5 p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
         {[
@@ -1271,6 +1551,12 @@ function SectionFirstLesson() {
       <SectionHeading sub="A complete walkthrough — from download to live lesson.">
         Your First Lesson
       </SectionHeading>
+      <Note color="amber">
+        <strong>Not a developer?</strong> Download a template below (Step 1), fill it in, then email it to{" "}
+        <strong>m1k3ymcl34n@gmail.com</strong> with subject{" "}
+        <code className="font-mono bg-amber-100 dark:bg-amber-900/50 px-1 rounded">[Lesson Submission] Your Title</code>.
+        {" "}Steps 2–8 are for developers who want to add it themselves.
+      </Note>
       <Para>
         Follow these 8 steps. By the end you'll have a fully working lesson live
         in the app. You don't need to know JavaScript — just fill in the fields.
@@ -1331,7 +1617,9 @@ function SectionTypes() {
   const types = [
     { id: "math", label: "📐 Math / Calculus" },
     { id: "python", label: "🐍 Python / Code" },
+    { id: "matlab", label: "🔢 MATLAB / OpenMat" },
     { id: "proof", label: "📝 Proof / Geometry" },
+    { id: "simulation", label: "🎮 Simulation" },
     { id: "web", label: "🌐 Web / JavaScript" },
     { id: "science", label: "🔬 Science / ScienceNotebook" },
   ];
@@ -1364,10 +1652,10 @@ function SectionTypes() {
   → examples → assessment → quiz`}</CodeBlock>
         <DownloadCard
           icon="📐"
-          title="Math Lesson Template"
-          filename="math-lesson-template.js"
-          template={TPL_MATH}
-          desc="All sections with commented instructions. For calculus, algebra, geometry, or any math topic."
+          title="Concept / Math Lesson Template"
+          filename="template-concept.js"
+          templateKey="template-concept.js"
+          desc="All sections with commented instructions. For calculus, algebra, linear algebra, or physics."
         />
       </div>
     ),
@@ -1395,9 +1683,9 @@ function SectionTypes() {
         <DownloadCard
           icon="🐍"
           title="Python Lesson Template"
-          filename="python-lesson-template.js"
-          template={TPL_PYTHON}
-          desc="Lesson with an embedded Python notebook cell."
+          filename="template-python.js"
+          templateKey="template-python.js"
+          desc="Lesson with an embedded Python notebook — 4 cells: concept → viz → application → challenge."
         />
       </div>
     ),
@@ -1433,6 +1721,77 @@ function SectionTypes() {
         />
       </div>
     ),
+    matlab: (
+      <div>
+        <Para>
+          For lessons that teach math or engineering concepts using MATLAB/Octave
+          syntax. Uses <Cb>OpenMatNotebook</Cb> — same 4-cell structure as the
+          Python notebook (concept → visualization → application → challenge).
+        </Para>
+        <H3>Adding the notebook</H3>
+        <CodeBlock>{`intuition: {
+  visualizations: [
+    {
+      id: 'OpenMatNotebook',
+      title: 'MATLAB Lab',
+      initialProps: { initialCells: [...] },
+    },
+  ],
+}`}</CodeBlock>
+        <Note color="amber">
+          OpenMatNotebook uses <Cb>initialProps</Cb> (not <Cb>props</Cb>).
+          Each cell: <Cb>{`{ id, cellTitle, prose[], code }`}</Cb>
+        </Note>
+        <H3>Key MATLAB syntax differences</H3>
+        <CodeBlock>{`[3; 4]    % column vector  (semicolon = new row)
+[3, 4]    % row vector     (comma = new column)
+%         % comment character (not #)
+fprintf('Value: %f\\n', x)   % print formatted output`}</CodeBlock>
+        <DownloadCard
+          icon="🔢"
+          title="MATLAB / OpenMat Lesson Template"
+          filename="template-openmat.js"
+          templateKey="template-openmat.js"
+          desc="MATLAB/Octave notebook with 4 cells: concept → visualization → application → challenge."
+        />
+      </div>
+    ),
+    simulation: (
+      <div>
+        <Para>
+          For lessons with a real-time interactive simulation — 3D scenes with
+          Three.js or 2D canvas animations at 60 fps. The simulation renders
+          inside the lesson next to the prose.
+        </Para>
+        <H3>Typical structure</H3>
+        <CodeBlock>{`hook → intuition (prose + callouts)
+  → simulation viz (full-width interactive)
+  → examples → quiz`}</CodeBlock>
+        <H3>Registering your simulation</H3>
+        <Para>
+          Create your component in{" "}
+          <Cb>src/components/viz/react/YourSim.jsx</Cb> (Three.js) or{" "}
+          <Cb>src/components/viz/canvas/YourSim.jsx</Cb> (Canvas 2D), then
+          register it in <Cb>VizFrame.jsx</Cb>:
+        </Para>
+        <CodeBlock>{`YourSim: lazy(() => import('./react/YourSim.jsx')),`}</CodeBlock>
+        <Para>
+          Then reference it in your lesson's <Cb>intuition.visualizations</Cb>:
+        </Para>
+        <CodeBlock>{`intuition: {
+  visualizations: [
+    { id: 'YourSim', title: 'Interactive: ...', caption: '...' },
+  ],
+}`}</CodeBlock>
+        <DownloadCard
+          icon="🎮"
+          title="Simulation Lesson Template"
+          filename="template-simulation.js"
+          templateKey="template-simulation.js"
+          desc="Three.js 3D or Canvas 2D at 60 fps — lesson file + component scaffold."
+        />
+      </div>
+    ),
     science: (
       <div>
         <Para>
@@ -1447,11 +1806,29 @@ export { LESSON_CHEM_1_0 }   // named export — for the viz wrapper
 export default LESSON_CHEM_1_0  // default export — for the chapter index`}</CodeBlock>
         <H3>Cells in a ScienceNotebook lesson</H3>
         <CodeBlock>{`cells: [
-  { type: 'prose',    content: 'Explanation text...' },
-  { type: 'callout',  variant: 'key-idea', title: 'Big Idea', body: '...' },
-  { type: 'step',     label: '1', content: 'First step...' },
-  { type: 'formula',  latex: 'E = mc^2' },
-  { type: 'viz',      id: 'MyVizId' },
+  // Prose narrative — full Markdown supported
+  { type: 'markdown', instruction: '### Heading\\n\\nExplanation text...' },
+
+  // Live interactive demo — HTML/CSS/JS in a sandboxed iframe
+  {
+    type: 'js',
+    instruction: 'Explain what to do and observe.',
+    html: '<div id="app">...</div>',
+    css: 'body { margin: 0; }',
+    startCode: '// vanilla JS that auto-runs on load',
+    outputHeight: 320,
+  },
+
+  // Multiple-choice concept check
+  {
+    type: 'choice',
+    instruction: '**Check your understanding.** Which statement is correct?',
+    options: [
+      { label: 'Option A', correct: false, explanation: 'Why A is wrong.' },
+      { label: 'Option B', correct: true,  explanation: 'Why B is correct.' },
+      { label: 'Option C', correct: false, explanation: 'Why C is wrong.' },
+    ],
+  },
 ]`}</CodeBlock>
         <H3>Viz wrapper — required for every ScienceNotebook lesson</H3>
         <Para>
@@ -1479,6 +1856,13 @@ export default function WhyChemistry({ params }) {
         <Note color="violet">
           Full spec: CONTRIBUTING.md § 7 — ScienceNotebook Lesson Format
         </Note>
+        <DownloadCard
+          icon="🔬"
+          title="Science Lesson Template"
+          filename="template-science.js"
+          templateKey="template-science.js"
+          desc="Chemistry, biology — narrative + interactive demo cells. Two exports required."
+        />
       </div>
     ),
     web: (
@@ -1505,6 +1889,13 @@ export default function WhyChemistry({ params }) {
             <div>• Monaco editor (VS Code-like)</div>
           </div>
         </div>
+        <DownloadCard
+          icon="🌐"
+          title="JavaScript / Web Lesson Template"
+          filename="template-javascript.js"
+          templateKey="template-javascript.js"
+          desc="HTML + CSS + JS live-preview notebook with JSNotebook."
+        />
       </div>
     ),
   };

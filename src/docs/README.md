@@ -1,4 +1,16 @@
-# Welcome to the Docs
+# Welcome to Open-Calc Docs
+
+## Want to contribute a lesson or video?
+
+Open the **contributing** folder in the sidebar. Start with `01 Overview` for the full guide, or jump straight to the template for your lesson type:
+
+- **03 Concept Template** — math, physics, linear algebra, calculus
+- **04 Coding Template** — Python and JavaScript lessons
+- **05 Simulation Template** — Three.js and Canvas 2D simulations
+- **06 Science Template** — chemistry and lab-style lessons
+- **08 Adding Videos** — link YouTube videos to lessons
+
+---
 
 This is your documentation hub. Tutorials live here and are available to everyone.
 
