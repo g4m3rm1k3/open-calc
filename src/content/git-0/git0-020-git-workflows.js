@@ -45,6 +45,7 @@ const lesson = {
     visualizations: [
       {
         id: "GitWorkspace",
+        title: "VS Code Panel",
         mathBridge:
           "**Practice the GitHub Flow entirely from the panel.** This is the workflow your team actually uses day-to-day: (1) click the branch name at the bottom → New Branch → `feature/inventory` (2) edit `game-design.txt` to add the feature (3) stage and commit (4) click the branch name → switch to `main` (5) from `main`, merge the feature branch in. The Source Control panel is how most developers run this workflow without touching the terminal. Use GitTerminal to inspect the final `git log --graph` after to see the shape it produced.",
         props: {
@@ -60,6 +61,7 @@ const lesson = {
       },
       {
         id: "GitTerminal",
+        title: "Terminal",
         mathBridge:
           "**Simulate the GitHub Flow in the terminal** — the workflow used by most modern teams.\n\n1. `git switch main && git pull` — start from the latest main\n2. `git switch -c feature/inventory-system` — branch for your feature\n3. Make 2-3 focused commits (edit files, `git add`, `git commit -m '...'`)\n4. `git switch main` — go back to main\n5. `git merge feature/inventory-system` — merge your feature (fast-forward)\n6. `git branch -d feature/inventory-system` — delete the feature branch\n7. `git log --oneline --graph` — see the clean linear history\n\nThat's it. No special commands, no ceremony — just short-lived branches that merge back to main frequently.",
         props: {
@@ -75,6 +77,7 @@ const lesson = {
       },
       {
         id: "GitKrakenView",
+        title: "GitKraken",
         mathBridge:
           "**The graph shows workflow shape.** GitHub Flow creates short branches that merge back quickly — the graph stays close to a single lane. Gitflow creates parallel long-lived branches (`develop`, `release/1.x`, `hotfix/`) that diverge and converge with structure. Trunk-based development barely has branches — almost everything commits directly to main. Create commits and branches here to see how the graph shape reflects the workflow philosophy.",
         props: {

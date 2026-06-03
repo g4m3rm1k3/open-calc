@@ -32,6 +32,7 @@ const lesson = {
     visualizations: [
       {
         id: "GitWorkspace",
+        title: "VS Code Panel",
         mathBridge:
           "**Use this panel to set up the rebase scenario.** Create a feature branch (click the branch name → New Branch → `feature/rooms`), make 2 commits, then switch back to `main` and make 1 more commit. Now both branches have diverged. Switch to GitTerminal and run `git rebase main` from your feature branch. Come back here after — the Source Control panel shows your working tree is clean and the feature branch now sits ahead of main with no merge commit.",
         props: {
@@ -47,6 +48,7 @@ const lesson = {
       },
       {
         id: "GitTerminal",
+        title: "Terminal",
         mathBridge:
           "**Practice rebasing in the terminal.**\n\n1. Create a feature branch: `git switch -c feature/rooms`\n2. Make 2 commits on it (edit a file, commit twice)\n3. Switch back to main: `git switch main`\n4. Make 1 commit on main\n5. Switch back: `git switch feature/rooms`\n6. Rebase: `git rebase main` — your feature commits move on top of main\n7. Inspect: `git log --oneline` — see the clean linear history\n\nIf a conflict occurs: edit the file, `git add <file>`, `git rebase --continue`.",
         props: {
@@ -62,6 +64,7 @@ const lesson = {
       },
       {
         id: "GitKrakenView",
+        title: "GitKraken",
         mathBridge:
           "**Compare rebase vs merge in the graph.** After a merge, the graph shows a fork-and-rejoin — two parallel lanes meeting at a merge commit. After a rebase + fast-forward, the graph is a single straight line with no merge commit. Make commits on two branches, merge one way, compare visually. The code result is identical; only the history shape differs.",
         props: {

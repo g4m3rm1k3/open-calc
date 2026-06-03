@@ -30,6 +30,7 @@ const lesson = {
     visualizations: [
       {
         id: "GitWorkspace",
+        title: "VS Code Panel",
         mathBridge:
           "**The message input field above the ✓ Commit button** is VS Code's commit message box. In the terminal: `git commit -m 'message'`. For multiline messages: `git commit` opens your default editor (usually nano or vim — set with `git config --global core.editor 'code --wait'` to use VS Code).\n\nAfter committing, run `git log --oneline` in the terminal to see your messages as a list. You'll immediately see which ones are readable and which ones are noise.",
         props: {
@@ -45,6 +46,7 @@ const lesson = {
       },
       {
         id: "GitTerminal",
+        title: "Terminal",
         mathBridge:
           "**In the terminal, commit message quality is obvious at a glance.** `git log --oneline` prints one line per commit — your message is the entire entry. A message like `stuff` tells you nothing. A message like `Add difficulty levels to combat rooms` tells you exactly what changed.\n\nTry: make commits in the VS Code panel tab with both vague and precise messages, then run `git log --oneline` here to see the difference immediately.",
         props: {
@@ -60,6 +62,7 @@ const lesson = {
       },
       {
         id: "GitKrakenView",
+        title: "GitKraken",
         mathBridge:
           "**The commit message is the only label on each dot in the graph.** In GitKraken, the central lane shows your message next to each commit. A vague message like `fix` leaves you scanning diffs to figure out what happened. A precise message lets you navigate history by reading the graph alone.\n\nMake commits in the VS Code panel or terminal tabs and watch the messages appear here.",
         props: {

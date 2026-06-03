@@ -32,6 +32,7 @@ const lesson = {
     visualizations: [
       {
         id: "GitWorkspace",
+        title: "VS Code Panel",
         mathBridge:
           "**Experience the stash workflow visually.** Edit `game-design.txt` — add a half-finished feature. Notice it appears as a modified file in the Source Control panel. Now imagine you need to switch tasks. Stash your work, switch branches (your file goes back to its last committed state), fix the urgent thing, then pop the stash to get your WIP back.",
         props: {
@@ -47,6 +48,7 @@ const lesson = {
       },
       {
         id: "GitTerminal",
+        title: "Terminal",
         mathBridge:
           "**Practice stashing in the terminal.**\n\n1. Edit a file without committing\n2. `git stash push -m 'WIP: dungeon room redesign'` — stash it\n3. `git stash list` — see your saved stash\n4. `git status` — working tree is clean\n5. Make an unrelated commit (e.g., fix a typo in `controls.txt`)\n6. `git stash pop` — restore your WIP on top of the new commit\n\nTo apply without removing from the stash list: `git stash apply stash@{0}`.",
         props: {
@@ -62,6 +64,7 @@ const lesson = {
       },
       {
         id: "GitKrakenView",
+        title: "GitKraken",
         mathBridge:
           "**Stashes are invisible in the commit graph** — they're stored in `refs/stash`, not on any branch. Notice: no matter how many times you `git stash push` and `git stash pop`, the graph doesn't change. Only committed work appears as nodes. This is the contract: the graph shows your permanent history; the stash is a temporary side pocket. If you want stashed work to appear in the graph, you have to commit it or create a branch from the stash with `git stash branch`.",
         props: {

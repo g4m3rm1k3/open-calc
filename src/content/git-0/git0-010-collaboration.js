@@ -40,6 +40,7 @@ const lesson = {
     visualizations: [
       {
         id: "GitWorkspace",
+        title: "VS Code Panel",
         mathBridge:
           "**This multi-branch graph is what GitHub's commit history and GitKraken's central panel both show** — branches as parallel lanes, merges as convergence points.\n\nThe full terminal workflow for a feature branch:\n```\ngit checkout main && git pull          # start from latest main\ngit checkout -b my-feature             # create branch\n# ... commit your work ...\ngit push -u origin my-feature          # push and set upstream\n# (open PR on GitHub, get reviewed and approved)\ngit checkout main && git pull          # get the merged result\ngit branch -d my-feature               # delete local branch\n```\n\nIn VS Code: use the Source Control panel's branch picker in the bottom status bar. The GitHub Pull Requests extension (by GitHub) adds a PR panel directly in VS Code — you can create, review, and merge PRs without leaving the editor.",
         props: {

@@ -32,6 +32,7 @@ const lesson = {
     visualizations: [
       {
         id: "GitWorkspace",
+        title: "VS Code Panel",
         mathBridge:
           "**Use this panel to build a commit history to tag.** Make 3 commits representing milestones — perhaps adding a scoring system, then enemy AI, then a save system. Give them clear messages. Tags in Git don't show up as changes in the Source Control panel (they're metadata, not file changes), but the commits you tag here become your release history. Switch to GitTerminal to create lightweight and annotated tags on the commits you've just made.",
         props: {
@@ -47,6 +48,7 @@ const lesson = {
       },
       {
         id: "GitTerminal",
+        title: "Terminal",
         mathBridge:
           "**Practice creating and pushing tags.**\n\n- `git tag` — list existing tags\n- `git tag v0.1.0` — create a lightweight tag at HEAD\n- `git tag -a v1.0.0 -m 'First stable release'` — annotated tag with message\n- `git show v1.0.0` — see the tag details\n- `git push origin v1.0.0` — push a specific tag\n- `git tag -d v0.1.0` — delete a local tag\n\nMake a couple of commits first, then tag specific commits to simulate a real release history.",
         props: {
@@ -62,6 +64,7 @@ const lesson = {
       },
       {
         id: "GitKrakenView",
+        title: "GitKraken",
         mathBridge:
           "**Tags appear as labeled diamonds on commits in the graph.** Create commits and tag them (`git tag v0.1.0`, `git tag v1.0.0`) — in the visual graph each tag shows up as a permanent marker pinned to that exact commit. Releases become navigation points in your history you can always return to with `git checkout v1.0.0`.",
         props: {

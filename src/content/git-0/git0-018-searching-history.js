@@ -38,6 +38,7 @@ const lesson = {
     visualizations: [
       {
         id: "GitWorkspace",
+        title: "VS Code Panel",
         mathBridge:
           "**Build a varied commit history to search through.** Make 5–6 commits with different messages — some mentioning 'controls', some mentioning 'rooms', some mentioning 'bugfix'. Edit different files each time. This gives you a realistic history to explore. Then switch to GitTerminal and use `git log --grep`, `git log -S`, and `git blame` to find specific commits and changes. The richer the history you create here, the more meaningful the search results.",
         props: {
@@ -53,6 +54,7 @@ const lesson = {
       },
       {
         id: "GitTerminal",
+        title: "Terminal",
         mathBridge:
           "**Practice searching git history in the terminal.**\n\nFirst make several commits with varied messages, then try:\n\n- `git log --oneline` — compact history\n- `git log --grep='controls'` — find commits mentioning 'controls'\n- `git log --all --oneline --graph` — full graph with all branches\n- `git log -S 'health potions' --oneline` — find when 'health potions' was added/removed\n- `git log --since='1 week ago'` — recent commits\n- `git blame controls.txt` — see who last changed each line\n- `git show HEAD~2` — inspect a specific past commit\n\nAfter a few commits, try `git bisect start` to practice the binary search workflow.",
         props: {
@@ -68,6 +70,7 @@ const lesson = {
       },
       {
         id: "GitKrakenView",
+        title: "GitKraken",
         mathBridge:
           "**The graph is the visual form of `git log --graph`.** After building a history of varied commits in the panel, compare what you see here against `git log --oneline --graph` in the terminal — they render the same data. Click any commit node to see its full message and diff. When you find a commit with `git log --grep` in the terminal, locate it visually here by matching the message. Both views answer the same question: 'what changed, and when?'",
         props: {

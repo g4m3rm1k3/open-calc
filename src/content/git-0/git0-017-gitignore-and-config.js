@@ -32,6 +32,7 @@ const lesson = {
     visualizations: [
       {
         id: "GitWorkspace",
+        title: "VS Code Panel",
         mathBridge:
           "**See .gitignore in action.** Create a `.gitignore` file in the panel and add patterns like `*.log`, `build/`, `.env`. Then create those files (`app.log`, `build/output.js`, `.env`) — notice that gitignored files appear grayed out or absent from the Source Control panel. Only the `.gitignore` itself shows as a change to stage and commit.",
         props: {
@@ -52,6 +53,7 @@ const lesson = {
       },
       {
         id: "GitTerminal",
+        title: "Terminal",
         mathBridge:
           "**Practice git config in the terminal.**\n\n- `git config --list` — see all current config\n- `git config user.name` — see your name\n- `git config --global user.email 'you@example.com'` — set globally\n- `git config --global alias.st status` — create `git st` shortcut\n- `git config --global alias.lg 'log --oneline --graph --decorate'` — pretty log\n- `git config --global core.editor 'code --wait'` — use VS Code as editor\n\nAfter setting the aliases, try `git st` and `git lg`.",
         props: {
@@ -67,6 +69,7 @@ const lesson = {
       },
       {
         id: "GitKrakenView",
+        title: "GitKraken",
         mathBridge:
           "**Gitignored files never appear in the commit graph** because they're never committed. After adding `.gitignore` patterns for `*.log` and `.env`, try creating those files and staging — they won't show up. The graph stays clean: only intentional tracked changes produce commit nodes. The graph is a record of what Git was explicitly told to save — `.gitignore` is how you keep noise, secrets, and build artifacts out of that permanent record.",
         props: {

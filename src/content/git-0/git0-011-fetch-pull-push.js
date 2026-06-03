@@ -32,6 +32,7 @@ const lesson = {
     visualizations: [
       {
         id: "GitWorkspace",
+        title: "VS Code Panel",
         mathBridge:
           "**The Source Control panel shows the sync state between your local branch and the remote.** After a `git fetch`, incoming commits appear as a notification in the panel's sync indicator. After `git pull`, the working tree updates to match. Make a commit here, then use GitTerminal to push it — watch the panel's ahead/behind indicator change as your local branch gets ahead of the remote, then sync back to zero after the push.",
         props: {
@@ -47,6 +48,7 @@ const lesson = {
       },
       {
         id: "GitTerminal",
+        title: "Terminal",
         mathBridge:
           "**Practice fetch, pull, and push in the terminal.**\n\n- `git fetch origin` — download remote updates (nothing changes locally)\n- `git log --oneline origin/main` — see what commits are on the remote\n- `git merge origin/main` — integrate remote commits into your branch\n- `git push` — send your local commits to the remote\n- `git push -u origin feature/nav` — push and set upstream tracking\n\nAfter committing a change, run `git log --oneline` and then `git push` to see it in action.",
         props: {
@@ -62,6 +64,7 @@ const lesson = {
       },
       {
         id: "GitKrakenView",
+        title: "GitKraken",
         mathBridge:
           "**The graph shows the ahead/behind state between local and remote branches.** When your branch has commits the remote doesn't, it shows ahead. When the remote has commits you don't, it shows behind. After `git pull` you'll see the branches converge; after `git push` you'll see `origin/main` move to match your local `main`.",
         props: {

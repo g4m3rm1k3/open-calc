@@ -26,6 +26,7 @@ const lesson = {
     visualizations: [
       {
         id: "GitWorkspace",
+        title: "VS Code Panel",
         mathBridge:
           "**The panel above is VS Code's Source Control staging UI.** The two sections map directly:\n\n- **Changes** (yellow M) = working directory — modified but not staged\n- **Staged Changes** (green S) = staging area — ready to commit\n\nTerminal equivalents for each action:\n- Click **+** next to a file → `git add filename`\n- Click **–** next to a staged file → `git restore --staged filename`\n- Click **✓ Commit** with a message → `git commit -m 'message'`\n- `git status` in the terminal shows both sections at once\n\nIn GitKraken: drag files between 'Unstaged Files' and 'Staged Files'. In Fork: click the checkboxes. Same operation, different UI.",
         props: {
@@ -42,6 +43,7 @@ const lesson = {
       },
       {
         id: "GitTerminal",
+        title: "Terminal",
         mathBridge:
           "**The terminal above runs real Git commands against the same repository.** Try these now:\n\n```\ngit status          # see both zones at once\ngit add game-design.txt   # stage one file\ngit status          # note: it moved to Staged Changes above\ngit commit -m 'Initial game concept'\ngit log --oneline   # see the commit in history\n```\n\nEvery button click in the VS Code panel has a terminal equivalent. The terminal is not an alternative — it's the same operation, just typed. Professionals switch between both depending on what's faster.",
         props: {
@@ -57,6 +59,7 @@ const lesson = {
       },
       {
         id: "GitKrakenView",
+        title: "GitKraken",
         mathBridge:
           "**The graph above is a GitKraken-style visual history.** Once you make commits (in the terminal or VS Code panel), each one appears here as a circle on a timeline.\n\n- Click any commit circle to see its files in the right panel\n- Click a branch name on the left to switch branches\n- The blue `HEAD` badge shows where you are right now\n\nGUI clients like GitKraken, Fork, and Sourcetree all show this same graph. They're visualizing the exact same data as `git log --oneline --graph`. Make a commit in the terminal above and watch it appear here.",
         props: {
