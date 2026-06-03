@@ -31,6 +31,7 @@ const lesson = {
     visualizations: [
       {
         id: "GitWorkspace",
+        title: "VS Code Panel",
         mathBridge:
           "**The branch selector in the top-left mirrors VS Code's branch indicator in the bottom-left status bar.** Click it to switch branches or click **+** to create one.\n\nTerminal equivalents:\n- Create a branch and switch → `git checkout -b branch-name` (or `git switch -c branch-name`)\n- Switch to an existing branch → `git checkout main` (or `git switch main`)\n- List all branches → `git branch`\n- Delete a merged branch → `git branch -d branch-name`\n\nIn GitKraken: double-click a commit and select 'Create Branch Here'. Branches appear as parallel lanes in the central graph.",
         props: {
@@ -48,6 +49,7 @@ const lesson = {
       },
       {
         id: "GitTerminal",
+        title: "Terminal",
         mathBridge:
           "**Branch commands are the three you'll use daily.** Create a branch in the VS Code panel tab, then try the same operations here:\n\n- `git branch` — list all branches (asterisk marks current)\n- `git checkout -b feature-name` — create and switch in one step\n- `git switch main` — switch to an existing branch\n- `git branch -d branch-name` — delete a fully merged branch",
         props: {
@@ -63,6 +65,7 @@ const lesson = {
       },
       {
         id: "GitKrakenView",
+        title: "GitKraken",
         mathBridge:
           "**Branches become parallel lanes in the graph.** Create branches and commits in the VS Code panel or terminal tabs, then switch here: each branch appears as a separate labeled line, and commits on different branches sit side by side.\n\nHEAD (the blue badge) shows which branch you're currently on. This is why developers use visual tools for branch-heavy work — the spatial layout makes the project structure immediately obvious.",
         props: {

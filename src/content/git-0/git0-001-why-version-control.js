@@ -26,6 +26,7 @@ const lesson = {
     visualizations: [
       {
         id: "GitWorkspace",
+        title: "VS Code Panel",
         mathBridge:
           "**This panel simulates VS Code's Source Control sidebar** — press Cmd+Shift+G (Mac) or Ctrl+Shift+G (Windows) to open the real one in any project. Every action here runs a git command:\n\n- Click **Save** in the editor → writes the file to disk (git doesn't know yet)\n- Type a message and click **✓ Commit** → `git commit -m 'your message'`\n- The dot that appears in the graph → what you'd see in `git log --oneline`\n\nGitKraken, Fork, and GitHub Desktop show the same history with different UIs — but every button runs one of these same terminal commands.",
         props: {
@@ -40,6 +41,7 @@ const lesson = {
       },
       {
         id: "GitTerminal",
+        title: "Terminal",
         mathBridge:
           "**The terminal below runs real Git commands.** The VS Code panel above is just a GUI wrapper around these same commands:\n\n```\ngit status              # see what files git knows about\ngit add game-design.txt # tell git to track this file\ngit commit -m 'Initial game concept'\ngit log --oneline       # one line per commit\n```\n\nYou don't need to pick one tool — professionals switch between the terminal and the panel constantly depending on what's faster. They're running identical operations.",
         props: {
@@ -53,6 +55,7 @@ const lesson = {
       },
       {
         id: "GitKrakenView",
+        title: "GitKraken",
         mathBridge:
           "**This is how Git history looks in a visual client like GitKraken, Fork, or Sourcetree.** Once you make commits (in the panel or terminal above), each one appears here as a dot on a timeline.\n\n- Click any commit dot to see exactly which files changed\n- The left sidebar shows all your branches\n- `HEAD` (the blue badge) marks where you currently are\n\nThis graph is the visual form of `git log --oneline --graph`. Make a commit above and watch it appear here instantly — all three views share the same repository.",
         props: {

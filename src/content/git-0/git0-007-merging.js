@@ -26,6 +26,7 @@ const lesson = {
     visualizations: [
       {
         id: "GitWorkspace",
+        title: "VS Code Panel",
         mathBridge:
           "**VS Code's Source Control sidebar shows merges the same way.** After a fast-forward, the graph continues in a straight line. After a merge commit, you see two lines converging.\n\nTerminal workflow:\n```\ngit checkout main       # switch to branch being merged INTO\ngit merge feature       # bring feature's commits into main\n```\n- Fast-forward output: `Fast-forward`\n- Merge commit output: opens editor for merge message (or auto-generates `Merge branch 'feature'`)\n- After merging: `git branch -d feature` to delete the branch\n\nIn GitKraken: right-click a branch in the left panel → 'Merge into current branch'. In VS Code: use the Source Control panel's branch menu → Merge Branch.",
         props: {
@@ -43,6 +44,7 @@ const lesson = {
       },
       {
         id: "GitTerminal",
+        title: "Terminal",
         mathBridge:
           "**Merging is two commands: switch then merge.** Create and populate branches in the VS Code panel tab, then execute the merge here:\n\n```\ngit checkout main        # switch to the branch being merged INTO\ngit merge feature-name   # bring that branch's commits into main\n```\n\nAfterwards, `git log --oneline --graph` shows whether it was a fast-forward (straight line) or a merge commit (two lines converging).",
         props: {
@@ -59,6 +61,7 @@ const lesson = {
       },
       {
         id: "GitKrakenView",
+        title: "GitKraken",
         mathBridge:
           "**The graph makes merge types instantly visual.** A fast-forward merge continues the line without a new dot. A true merge commit shows two lanes converging at a single point with two parent lines leading into it.\n\nDo both merge types in the VS Code panel or terminal tabs, then come here: you'll see exactly why teams use `--no-ff` to force a merge commit even when a fast-forward is possible — it preserves a clear record of when each branch landed.",
         props: {

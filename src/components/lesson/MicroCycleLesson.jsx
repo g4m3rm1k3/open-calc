@@ -288,59 +288,19 @@ function VizCard({
   );
 }
 
-// ─── Tab group for multiple vizzes in one section ─────────────────────────
-
-const VIZ_TAB_LABELS = {
-  GitWorkspace: "VS Code Panel",
-  GitTerminal: "Terminal",
-  GitKrakenView: "GitKraken",
-  ShellTerminal: "Terminal",
-};
+// ─── Viz group — always stacked ───────────────────────────────────────────
 
 function VizTabGroup({ vizzes, lessonId }) {
-  const [activeIdx, setActiveIdx] = useState(0);
-  if (vizzes.length <= 1) {
-    return vizzes.length === 1 ? (
-      <VizCard
-        viz={vizzes[0]}
-        noteId={lessonId ? `${lessonId}:viz:${vizzes[0].id}` : undefined}
-        borderColor="border-slate-200 dark:border-slate-700"
-      />
-    ) : null;
-  }
+  if (vizzes.length === 0) return null;
   return (
-    <div className="rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-900">
-      <div className="flex border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80">
-        {vizzes.map((viz, i) => {
-          const label = viz.title ?? VIZ_TAB_LABELS[viz.id] ?? viz.id;
-          const isActive = i === activeIdx;
-          return (
-            <button
-              key={i}
-              onClick={() => setActiveIdx(i)}
-              className={`px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors border-b-2 -mb-px ${
-                isActive
-                  ? "border-brand-500 text-brand-700 dark:text-brand-300 bg-white dark:bg-slate-900"
-                  : "border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
-              }`}
-            >
-              {label}
-            </button>
-          );
-        })}
-      </div>
+    <div className="flex flex-col gap-4">
       {vizzes.map((viz, i) => (
-        <div key={i} style={{ display: i === activeIdx ? "block" : "none" }}>
-          {viz.mathBridge && (
-            <div className="px-4 py-3 bg-indigo-50 dark:bg-indigo-950/40 border-b border-indigo-100 dark:border-indigo-900/50 [&_p]:text-sm [&_p]:text-indigo-900 [&_p]:dark:text-indigo-200 [&_strong]:text-indigo-800 [&_strong]:dark:text-indigo-100">
-              <MarkdownProse text={viz.mathBridge} />
-            </div>
-          )}
-          <VizFrame
-            id={viz.id}
-            initialProps={viz.initialProps ?? viz.props ?? {}}
-          />
-        </div>
+        <VizCard
+          key={i}
+          viz={viz}
+          noteId={lessonId ? `${lessonId}:viz:${viz.id}:${i}` : undefined}
+          borderColor="border-slate-200 dark:border-slate-700"
+        />
       ))}
     </div>
   );

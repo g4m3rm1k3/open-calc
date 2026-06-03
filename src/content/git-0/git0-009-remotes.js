@@ -33,6 +33,7 @@ const lesson = {
     visualizations: [
       {
         id: "GitWorkspace",
+        title: "VS Code Panel",
         mathBridge:
           "**This panel shows your local commit history.** In a real project, the sync step sends those commits to GitHub/GitLab. VS Code shows the sync status in the bottom-left status bar (↓ to pull, ↑ to push).\n\nCore terminal commands:\n```\ngit remote -v                    # show configured remotes and URLs\ngit push                         # send commits to remote\ngit push -u origin main          # first push; -u sets default upstream\ngit pull                         # fetch + merge remote commits\ngit fetch origin                 # download remote commits (no merge yet)\ngit clone https://...            # copy a full remote repo to your machine\n```\n\nIn GitKraken: the Push and Pull buttons are in the top toolbar. Remote branches appear as labeled nodes in the graph next to your local branches.",
         props: {

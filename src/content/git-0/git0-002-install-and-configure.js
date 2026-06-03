@@ -26,6 +26,7 @@ const lesson = {
     visualizations: [
       {
         id: "GitWorkspace",
+        title: "VS Code Panel",
         mathBridge:
           "**This panel simulates VS Code's Source Control sidebar.** The commit message field at the top and the ✓ Commit button work exactly as they do in VS Code. Terminal equivalents:\n\n- Click **Save** in editor → writes file to disk, no git involvement\n- Click **✓ Commit** with a message → `git commit -m 'message'`\n- Click **↩ Restore** on a file → `git restore filename`\n- Each dot in the graph → one commit in `git log --oneline`\n\nGitKraken shows the same graph as a visual branching diagram. GitHub Desktop has a summary/description field instead of a one-line message. Same underlying commit.",
         props: {
@@ -40,6 +41,7 @@ const lesson = {
       },
       {
         id: "GitTerminal",
+        title: "Terminal",
         mathBridge:
           "**Run `git log --oneline` to see the commit chain as a numbered list.** Each entry is a short hash + your commit message — the same dots as in the VS Code panel above, but as text.\n\nTry:\n- Make a few commits in the VS Code panel tab\n- Come back here and run `git log --oneline`\n- Run `git show <hash>` to inspect any commit's diff",
         props: {
@@ -53,6 +55,7 @@ const lesson = {
       },
       {
         id: "GitKrakenView",
+        title: "GitKraken",
         mathBridge:
           "**This is the same history drawn as a visual graph.** Every commit you make in the VS Code panel or terminal appears here as a dot. The connecting lines show parent→child order — newest at top, oldest at bottom.\n\nThis is the central diagram in GitKraken, Fork, and Sourcetree. All three tools are just different ways to display the same commit chain.",
         props: {

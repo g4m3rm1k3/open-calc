@@ -31,6 +31,7 @@ const lesson = {
     visualizations: [
       {
         id: "GitWorkspace",
+        title: "VS Code Panel",
         mathBridge:
           "**The git graph below each commit in this panel is the same history VS Code's Timeline view shows,** and what GitKraken displays as its central branching diagram. Each dot is a commit. Click a dot to check it out.\n\nTerminal equivalents:\n- View history → `git log --oneline`\n- See what changed in a commit → `git show <hash>`\n- Jump to a past commit → `git checkout <hash>`\n- Return to present → `git checkout main`\n- Restore one file from any commit → `git restore --source=<hash> filename`",
         props: {
@@ -46,6 +47,7 @@ const lesson = {
       },
       {
         id: "GitTerminal",
+        title: "Terminal",
         mathBridge:
           "**The terminal has the richest history tools.** Make commits in the VS Code panel tab, then explore the history here:\n\n- `git log --oneline` — compact list, newest first\n- `git log --oneline --graph` — add ASCII branch visualization\n- `git show <hash>` — see exactly what changed in any commit\n- `git checkout <hash>` — travel to a past commit (then `git checkout main` to return)",
         props: {
@@ -61,6 +63,7 @@ const lesson = {
       },
       {
         id: "GitKrakenView",
+        title: "GitKraken",
         mathBridge:
           "**Click any commit dot to see its full diff.** The right panel shows which files changed and which lines were added (+) or removed (−) — this is what `git show <hash>` prints in the terminal, just displayed visually.\n\nMake commits in the VS Code panel or terminal tabs, then come back here and click through the dots to read your project's history.",
         props: {

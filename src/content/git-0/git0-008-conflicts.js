@@ -26,6 +26,7 @@ const lesson = {
     visualizations: [
       {
         id: "GitWorkspace",
+        title: "VS Code Panel",
         mathBridge:
           "**When a conflict occurs, VS Code's Source Control sidebar marks the file with a red C.** Click it to open the merge editor:\n- **Accept Current Change** → keeps HEAD's version (your branch)\n- **Accept Incoming Change** → keeps the other branch's version\n- **Accept Both Changes** → puts both versions one after the other\n- **Compare Changes** → shows a diff side by side\n\nYou can also edit the result panel directly for custom resolutions.\n\nTerminal workflow during a conflict:\n```\ngit status                          # shows 'both modified: filename'\n# Edit the file, remove markers\ngit add filename                    # stage the resolution\ngit commit                          # completes the merge\n# or to cancel the entire merge:\ngit merge --abort\n```",
         props: {

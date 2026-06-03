@@ -80,7 +80,7 @@ function ScaledArrow({ vec, scale, color, label, showBoth = false }) {
 }
 
 export default function BasisVectorProof({ params = {} }) {
-  const currentStep = params.currentStep ?? 0;
+  const [currentStep, setCurrentStep] = useState(params.currentStep ?? 0);
   const step = STEPS[Math.min(currentStep, STEPS.length - 1)];
 
   // Animate scale smoothly
@@ -175,13 +175,27 @@ export default function BasisVectorProof({ params = {} }) {
 
       {/* Insight */}
       <div style={{
-        margin: "0 20px 20px", padding: "12px 16px",
+        margin: "0 20px 12px", padding: "12px 16px",
         background: "#0c1a2e", borderRadius: 10,
         borderLeft: "3px solid #0ea5e9",
         fontSize: 13, color: "#94a3b8", lineHeight: 1.6
       }}>
         <span style={{ color: "#38bdf8", fontWeight: 600 }}>Insight: </span>
         {step.insight}
+      </div>
+
+      {/* Nav buttons */}
+      <div style={{ display: "flex", justifyContent: "space-between", padding: "0 20px 20px", gap: 8 }}>
+        <button
+          onClick={() => setCurrentStep(s => Math.max(0, s - 1))}
+          disabled={currentStep === 0}
+          style={{ flex: 1, padding: "8px 0", borderRadius: 8, border: "1px solid #334155", background: currentStep === 0 ? "#0f172a" : "#1e293b", color: currentStep === 0 ? "#334155" : "#94a3b8", fontSize: 13, fontWeight: 600, cursor: currentStep === 0 ? "default" : "pointer" }}
+        >← Prev</button>
+        <button
+          onClick={() => setCurrentStep(s => Math.min(STEPS.length - 1, s + 1))}
+          disabled={currentStep === STEPS.length - 1}
+          style={{ flex: 1, padding: "8px 0", borderRadius: 8, border: "1px solid #334155", background: currentStep === STEPS.length - 1 ? "#0f172a" : "#1e293b", color: currentStep === STEPS.length - 1 ? "#334155" : "#f59e0b", fontSize: 13, fontWeight: 600, cursor: currentStep === STEPS.length - 1 ? "default" : "pointer" }}
+        >Next →</button>
       </div>
     </div>
   );

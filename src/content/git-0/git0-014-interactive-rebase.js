@@ -37,6 +37,7 @@ const lesson = {
     visualizations: [
       {
         id: "GitWorkspace",
+        title: "VS Code Panel",
         mathBridge:
           "**Use this panel to generate messy commits to clean up.** Edit `game-design.txt` three times, committing after each with rough messages: `'wip'`, `'fix typo'`, `'more changes'`. These are the kind of in-progress commits you'd squash before opening a PR. Then switch to GitTerminal and run `git rebase -i HEAD~3` to collapse them into one polished commit. The panel's commit history is the before; after the rebase it shows only the single clean commit.",
         props: {
@@ -52,6 +53,7 @@ const lesson = {
       },
       {
         id: "GitTerminal",
+        title: "Terminal",
         mathBridge:
           "**Practice interactive rebase in the terminal.**\n\n1. Make 3 small commits on a feature branch (edit a file 3 times, commit after each)\n2. Run `git rebase -i HEAD~3` — an editor opens listing 3 commits\n3. In the editor, change `pick` to `squash` (or `s`) on commits 2 and 3\n4. Save and close — Git opens another editor for the combined commit message\n5. Write a clean message and save\n6. Run `git log --oneline` — 3 commits are now 1\n\n**Common actions:** `pick` (keep), `squash` (combine with previous), `fixup` (squash, discard message), `reword` (edit message), `drop` (delete).",
         props: {
@@ -67,6 +69,7 @@ const lesson = {
       },
       {
         id: "GitKrakenView",
+        title: "GitKraken",
         mathBridge:
           "**The graph shows the before and after of squashing.** Before `git rebase -i HEAD~3`, you'll see 3 separate commit nodes on the branch. After squashing them to 1, those 3 nodes are replaced by a single commit with a new SHA. The branch becomes shorter and cleaner — exactly the kind of history you want before merging a feature branch. The old commit hashes are gone; only the new squashed commit's hash remains in the graph.",
         props: {

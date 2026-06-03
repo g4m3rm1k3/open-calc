@@ -32,6 +32,7 @@ const lesson = {
     visualizations: [
       {
         id: "GitWorkspace",
+        title: "VS Code Panel",
         mathBridge:
           "**Practice the feature branch workflow** — the foundation of every GitHub Pull Request.\n\n1. Create a branch: click the branch name in the panel → New Branch → name it `feature/score-system`\n2. Edit `game-design.txt` to add a scoring section\n3. Stage and commit: click **+** next to the file, write a message, click **✓ Commit**\n4. Push: click **Publish Branch** (or the sync icon)\n\nIn a real GitHub project, you'd then open a PR to merge this branch back to `main`.",
         props: {
@@ -47,6 +48,7 @@ const lesson = {
       },
       {
         id: "GitTerminal",
+        title: "Terminal",
         mathBridge:
           "**Run the full feature branch workflow in the terminal:**\n\n- `git switch -c feature/score-system` — create and switch to a new branch\n- `# edit a file`\n- `git add game-design.txt`\n- `git commit -m 'Add scoring system design'`\n- `git push -u origin feature/score-system` — push the branch to remote\n\nAt this point you'd open GitHub in your browser and click 'Compare & pull request'.",
         props: {
@@ -62,6 +64,7 @@ const lesson = {
       },
       {
         id: "GitKrakenView",
+        title: "GitKraken",
         mathBridge:
           "**The graph shows the complete lifecycle of a feature branch.** After running the GitHub Flow in the panel — branch, commit, push, merge — switch here to see the shape it produced. A PR merged without rebasing creates a fork-and-rejoin: two lanes that split at the branch point and converge at the merge commit. A PR merged with a fast-forward produces a straight single line. Both are valid; the graph makes the difference visible at a glance.",
         props: {

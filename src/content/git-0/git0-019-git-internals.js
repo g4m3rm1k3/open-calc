@@ -47,6 +47,7 @@ const lesson = {
     visualizations: [
       {
         id: "GitWorkspace",
+        title: "VS Code Panel",
         mathBridge:
           "**Every commit you make here creates three Git objects in `.git/objects/`.** Stage and commit a file change in this panel. Under the hood Git: (1) hashes the file content into a **blob** object, (2) hashes the directory snapshot into a **tree** object, (3) creates a **commit** object pointing to that tree plus author metadata. The panel shows you the surface; switch to GitTerminal and run `git cat-file -p HEAD` to read the raw commit object that this single button click produced.",
         props: {
@@ -62,6 +63,7 @@ const lesson = {
       },
       {
         id: "GitTerminal",
+        title: "Terminal",
         mathBridge:
           "**Explore Git's object store.** Make a commit first, then peel back the layers:\n\n- `git cat-file -p HEAD` — see the raw commit object: tree hash, parent hash, author, message\n- Copy the tree hash and run `git cat-file -p <tree-hash>` — see the directory listing as Git sees it\n- Copy a blob hash and run `git cat-file -p <blob-hash>` — see the raw file content\n- `git ls-tree HEAD` — shortcut to list the tree\n- `git rev-parse HEAD` — get the full SHA of HEAD\n- `git hash-object controls.txt` — compute the SHA of a file without storing it\n\nEvery file version, every directory snapshot, every commit — they're all just objects in `.git/objects/`.",
         props: {
@@ -77,6 +79,7 @@ const lesson = {
       },
       {
         id: "GitKrakenView",
+        title: "GitKraken",
         mathBridge:
           "**Every node in this graph IS a commit object in `.git/objects/`.** Click any commit dot — the hash shown is exactly what `git cat-file -p <hash>` reads. The connecting lines represent the `parent:` field inside each commit object: a pointer to the previous commit's hash. The graph isn't a separate data structure; it's a rendering of the linked list of commit objects that Git has always maintained. The visual graph and the raw object store are the same thing, seen two different ways.",
         props: {
