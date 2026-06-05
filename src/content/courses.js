@@ -98,6 +98,27 @@ export const COURSES = [
     color: "sky",
   },
   {
+    key: "elec-0",
+    label: "Electrical Fundamentals",
+    path: "/course/elec-0",
+    desc: "Voltage, Current, Resistance & Industrial Circuits",
+    color: "amber",
+  },
+  {
+    key: "logic-0",
+    label: "Boolean Logic",
+    path: "/course/logic-0",
+    desc: "Gates, Truth Tables & Digital Fundamentals",
+    color: "violet",
+  },
+  {
+    key: "plc-0",
+    label: "PLC Programming",
+    path: "/course/plc-0",
+    desc: "Ladder Logic, Timers, Counters & Industrial Control",
+    color: "orange",
+  },
+  {
     key: "cnc-logic",
     label: "CNC Macro Systems",
     path: "/course/cnc-logic",

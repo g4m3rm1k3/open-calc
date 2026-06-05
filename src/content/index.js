@@ -31,6 +31,9 @@ import chemistry2 from "./chemistry-2/index.js";
 import chemistry3 from "./chemistry-3/index.js";
 import chemistry4 from "./chemistry-4/index.js";
 
+import elec0 from "./elec-0/index.js";
+import logic0 from "./logic-0/index.js";
+import plc0 from "./plc-0/index.js";
 import digitalFundamentals from "./digital-fundamentals/index.js";
 import cnc1 from "./cnc-1/index.js";
 import git0 from "./git-0/index.js";
@@ -103,6 +106,9 @@ const CHEMISTRY_CURRICULUM = [
   ...chemistry3,
   ...chemistry4,
 ].map((ch) => ({ ...ch, course: "chemistry-1" }));
+const ELEC0_CURRICULUM = elec0.map((ch) => ({ ...ch, course: "elec-0" }));
+const LOGIC0_CURRICULUM = logic0.map((ch) => ({ ...ch, course: "logic-0" }));
+const PLC0_CURRICULUM = plc0.map((ch) => ({ ...ch, course: "plc-0" }));
 const DIGITAL_FUNDAMENTALS_CURRICULUM = digitalFundamentals.map((ch) => ({
   ...ch,
   course: "digital-fundamentals",
@@ -155,6 +161,9 @@ export const CURRICULUM = [
   ...TETRIS_CURRICULUM,
   ...CS_CURRICULUM,
   ...CHEMISTRY_CURRICULUM,
+  ...ELEC0_CURRICULUM,
+  ...LOGIC0_CURRICULUM,
+  ...PLC0_CURRICULUM,
   ...DIGITAL_FUNDAMENTALS_CURRICULUM,
   ...CNC_CURRICULUM,
   ...GIT0_CURRICULUM,
