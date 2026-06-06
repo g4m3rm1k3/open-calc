@@ -206,7 +206,24 @@ export default {
       },
     ],
     title: 'Deriving v(t) = gt from the limit definition of the derivative',
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'SVGDiagram',
+        props: { type: 'limit-convergence' },
+        title: 'The limit: Δx/Δt converges to gt as Δt → 0',
+        mathBridge:
+          'The diagram shows the algebraic steps side by side with their geometric meaning. Row 1: write Δx/Δt for x = ½gt². Row 2: expand (t+Δt)². Row 3: cancel the ½gt² terms. Row 4: factor and divide by Δt. Row 5: the result is gt + ½gΔt — take Δt→0 and the second term vanishes. The key moment is step 4: after dividing by Δt, the expression is no longer 0/0 but gt + ½gΔt, which has a well-defined limit.',
+        caption: 'The algebraic cancellation in steps 2–4 is what makes the limit possible — it converts 0/0 into a finite expression plus a vanishing remainder.',
+      },
+      {
+        id: 'FunctionPlotter',
+        title: 'v(t) = gt — the limiting function for free fall',
+        mathBridge:
+          'This is the result of the limit derivation: v(t) = gt is a straight line through the origin with slope g = 9.8 m/s². It is the instantaneous velocity at every moment of free fall. At t=0, v=0 (dropped from rest). At t=1, v=9.8 m/s. At t=2, v=19.6 m/s. Every point on this line is what the limit converged to at that time.',
+        caption: 'v(t) = gt — the exact instantaneous velocity function, derived via the limit from x = ½gt².',
+        props: { fn: '9.8*x', xMin: 0, xMax: 5, yMin: 0, yMax: 50, xLabel: 't (s)', yLabel: 'v (m/s)' },
+      },
+    ],
   },
 
   examples: [

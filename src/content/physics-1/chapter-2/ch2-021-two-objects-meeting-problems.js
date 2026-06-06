@@ -15,8 +15,10 @@ export default {
   },
   intuition: {
     prose: [
-      "Write separate position functions for each object in the same coordinate frame.",
-      "Meeting condition is x1(t)=x2(t).",
+      "**Same technique, harder algebra.** Two-object meeting problems with acceleration use exactly the same meeting condition: x₁(t) = x₂(t). The only difference is that one or both position functions is now quadratic (½at²) instead of linear. Setting a quadratic equal to a linear expression gives a quadratic equation — which may have zero, one, or two physical solutions.",
+      "**Two solutions means two meetings.** If the discriminant is positive, you get two values of t. Both can be physically meaningful: the objects could meet on the way up and again on the way down (for a thrown ball), or a faster accelerating object could pass a slower one and then be overtaken back. Always check which roots satisfy t ≥ 0.",
+      "**Delayed start — shift t.** If Object B starts moving at t = τ (not t = 0), its position function uses (t − τ) as the time variable: x_B = x_B0 + v_B(t−τ) + ½a_B(t−τ)². This substitution is easy to miss. Then solve for t ≥ τ (B must have started before they can meet).",
+      "**One useful check: plug t back in.** After finding t_meet, compute x₁(t_meet) and x₂(t_meet) separately. They must be equal. If they are not, there is an algebra error somewhere.",
     ],
     visualizations: [
       {
@@ -48,7 +50,14 @@ export default {
     ],
   },
   math: {
-    prose: ["Relative motion can reduce setup complexity: x_rel = x1 - x2."],
+    prose: [
+      "**The meeting condition.** Objects 1 and 2 meet when x₁(t) = x₂(t). Write each position using the constant-acceleration kinematic equation: x = x₀ + v₀t + ½at². Set them equal and collect all terms on one side.",
+      "**General setup.** Moving everything left: ½(a₁−a₂)t² + (v₁₀−v₂₀)t + (x₁₀−x₂₀) = 0. Label the coefficients A = ½(a₁−a₂), B = v₁₀−v₂₀, C = x₁₀−x₂₀. This is a standard quadratic At² + Bt + C = 0.",
+      "**Three discriminant cases.** Compute Δ = B²−4AC. If Δ < 0 the objects never meet (no real roots). If Δ = 0 they just touch once (tangent paths). If Δ > 0 there are two distinct times; both can be physically valid if they satisfy t ≥ 0.",
+      "**Constant-velocity limit.** When both accelerations are equal (A = 0), the equation becomes linear: t = −C/B = (x₂₀−x₁₀)/(v₁₀−v₂₀). If also B = 0, the relative velocity is zero; the objects maintain constant separation and never meet (unless C = 0, meaning they started at the same position).",
+      "**Delayed start.** If Object B begins moving at time τ, replace every t in its equations with (t−τ) and restrict solutions to t ≥ τ. The quadratic coefficients are the same except C = x₁(τ) − x₂₀, computed at the moment B starts.",
+      "**Calculus view.** Define the gap function g(t) = x₁(t) − x₂(t). A meeting is a zero of g. The derivative g′(t) = v₁(t) − v₂(t) is the relative velocity. When g′ = 0 at the same instant as g = 0, the objects touch and separate with zero relative speed — that is the Δ = 0 case. When g changes sign between two zeros, the objects have crossed paths twice.",
+    ],
     visualizations: [
       {
         id: 'SVGDiagram',
@@ -56,6 +65,16 @@ export default {
         mathBridge:
           "Identify equation setup and solve for physically valid meeting time.",
         caption: "Reject nonphysical roots (e.g., negative time).",
+      },
+      {
+        id: 'FunctionPlotter',
+        title: 'Gap function g(t) = x₁(t) − x₂(t)',
+        props: {
+          fn: 't*t - 5*t - 0',
+          xMin: 0, xMax: 6, yMin: -8, yMax: 10,
+          xLabel: 't (s)', yLabel: 'g(t) = x₁ − x₂ (m)',
+        },
+        caption: 'Zeros of g(t) are meeting times. When the curve dips below the x-axis the objects have crossed (Object 1 is behind Object 2).',
       },
     ],
   },
@@ -81,28 +100,235 @@ export default {
   examples: [
     {
       id: "ch2-021-ex1",
-      title: "Catch-up case",
-      problem: "x1=2t, x2=20+t. Find meeting time and position.",
+      title: "Catch-up case (constant velocity)",
+      problem: "Object 1 starts at x = 0, v₁ = 2 m/s. Object 2 starts at x = 20 m, v₂ = 1 m/s (same direction, slower). When and where do they meet?",
       steps: [
         {
+          expression: "x_1=2t,\\quad x_2=20+t",
+          annotation: "Write position functions.",
+        },
+        {
           expression: "2t=20+t\\Rightarrow t=20\\,\\text{s}",
-          annotation: "Set positions equal.",
+          annotation: "Set equal and solve — linear equation, one root.",
         },
         {
           expression: "x=2(20)=40\\,\\text{m}",
-          annotation: "Substitute into either equation.",
+          annotation: "Substitute t into either equation to get position.",
+        },
+        {
+          expression: "\\text{Check: }x_2=20+20=40\\,\\text{m}\\;\\checkmark",
+          annotation: "Both equations give 40 m — correct.",
         },
       ],
-      conclusion: "They meet at 20 s and 40 m.",
+      conclusion: "They meet at t = 20 s, x = 40 m. Object 1 closed a 20 m gap at 1 m/s relative speed, so 20 s is the expected answer.",
+    },
+    {
+      id: "ch2-021-ex2",
+      title: "Head-on approach",
+      problem: "Object A is at x = 0, moving right at 10 m/s. Object B is at x = 80 m, moving left at 6 m/s. Where do they meet?",
+      steps: [
+        {
+          expression: "x_A=10t,\\quad x_B=80-6t",
+          annotation: "B has negative velocity (moving left), so its position decreases.",
+        },
+        {
+          expression: "10t=80-6t\\Rightarrow 16t=80\\Rightarrow t=5\\,\\text{s}",
+          annotation: "Set equal and solve.",
+        },
+        {
+          expression: "x=10(5)=50\\,\\text{m}",
+          annotation: "Meeting position — 50 m from A's start, 30 m from B's start.",
+        },
+      ],
+      conclusion: "They meet at 50 m from A's origin after 5 s. The closing speed was 16 m/s over 80 m, giving 80/16 = 5 s.",
+    },
+    {
+      id: "ch2-021-ex3",
+      title: "Accelerating pursuer — quadratic, two roots",
+      problem: "Object 1 starts at x = 0 with v₀ = 0, a = 2 m/s². Object 2 is at x = 100 m moving left at 5 m/s, a = 0. Find all meetings.",
+      steps: [
+        {
+          expression: "x_1=t^2,\\quad x_2=100-5t",
+          annotation: "Write position functions: x₁ = ½(2)t², x₂ = 100 − 5t.",
+        },
+        {
+          expression: "t^2=100-5t\\Rightarrow t^2+5t-100=0",
+          annotation: "Set equal, rearrange to standard quadratic form.",
+        },
+        {
+          expression: "t=\\frac{-5\\pm\\sqrt{25+400}}{2}=\\frac{-5\\pm\\sqrt{425}}{2}",
+          annotation: "Quadratic formula with A=1, B=5, C=−100.",
+        },
+        {
+          expression: "t_1=\\frac{-5+20.6}{2}\\approx 7.8\\,\\text{s},\\quad t_2=\\frac{-5-20.6}{2}\\approx -12.8\\,\\text{s}",
+          annotation: "Two roots — only t₁ ≥ 0 is physical.",
+        },
+        {
+          expression: "x=7.8^2\\approx 60.8\\,\\text{m}",
+          annotation: "One meeting only: t ≈ 7.8 s, x ≈ 60.8 m.",
+        },
+      ],
+      conclusion: "They meet once at t ≈ 7.8 s, x ≈ 60.8 m. The negative root corresponds to a meeting 'before the clock started' — physically meaningless here.",
+    },
+    {
+      id: "ch2-021-ex4",
+      title: "Delayed-start pursuit",
+      problem: "Object A leaves x = 0 at t = 0 with v = 6 m/s (constant). Object B leaves x = 0 at t = 4 s from rest with a = 3 m/s². When does B catch A?",
+      steps: [
+        {
+          expression: "x_A=6t\\quad(\\text{for all }t\\ge 0)",
+          annotation: "A moves at constant 6 m/s from the start.",
+        },
+        {
+          expression: "x_B=\\tfrac{1}{2}(3)(t-4)^2\\quad(\\text{for }t\\ge 4)",
+          annotation: "B uses (t−4) because it starts at t = 4 s.",
+        },
+        {
+          expression: "6t=\\tfrac{3}{2}(t-4)^2\\Rightarrow 1.5t^2-18t+24=0\\Rightarrow t^2-12t+16=0",
+          annotation: "Expand, collect, divide through by 1.5.",
+        },
+        {
+          expression: "t=6\\pm\\sqrt{36-16}=6\\pm\\sqrt{20}\\approx 6\\pm 4.47",
+          annotation: "Two roots: t ≈ 10.47 s and t ≈ 1.53 s.",
+        },
+        {
+          expression: "t\\approx 1.53\\,\\text{s}\\;<\\;4\\,\\text{s}\\;\\Rightarrow\\;\\text{discard}",
+          annotation: "Root at 1.53 s is before B starts — discard.",
+        },
+        {
+          expression: "t\\approx 10.47\\,\\text{s},\\quad x=6(10.47)\\approx 62.8\\,\\text{m}",
+          annotation: "Physical meeting: B catches A at t ≈ 10.47 s, x ≈ 62.8 m.",
+        },
+      ],
+      conclusion: "B catches A roughly 10.5 s after A left, 62.8 m from the start. The key technique is replacing t with (t−4) and restricting to t ≥ 4 in B's equation.",
     },
   ],
   challenges: [
     {
       id: "ch2-021-ch1",
+      difficulty: "easy",
+      problem: "x₁(t) = 5t and x₂(t) = 10 + 5t. Do they ever meet? Why or why not?",
+      hint: "Write the meeting condition and check the relative velocity.",
+      answer: "No. Setting 5t = 10 + 5t gives 0 = 10 — a contradiction. Relative velocity is zero (same speed, same direction) and the 10 m initial gap never closes.",
+    },
+    {
+      id: "ch2-021-ch2",
       difficulty: "medium",
-      problem: "If x1(t)=5t and x2(t)=10+5t, do they meet?",
-      hint: "Compare relative speed.",
-      answer: "No. Relative speed is zero and initial separation is nonzero.",
+      problem: "Object 1: x₀ = 0, v₀ = 4 m/s, a = 2 m/s². Object 2: x₀ = 0, v₀ = 10 m/s, a = 0. Find both meeting times and positions.",
+      hint: "Set up the quadratic At² + Bt + C = 0. Both roots will be ≥ 0.",
+      answer: "A = ½(2−0) = 1, B = 4−10 = −6, C = 0−0 = 0. So t² − 6t = 0 → t(t−6) = 0. Roots: t = 0 s and t = 6 s. At t = 0: x = 0 m (they start at the same point). At t = 6 s: x₁ = 0 + 4(6) + ½(2)(36) = 60 m; x₂ = 10(6) = 60 m. ✓ They meet at t = 0 (shared start) and t = 6 s (Object 1 catches back up after Object 2 pulls ahead).",
+    },
+    {
+      id: "ch2-021-ch3",
+      difficulty: "hard",
+      problem: "A train leaves Station A heading right at 20 m/s. Fifteen seconds later, a second train leaves Station A heading right, accelerating from rest at 4 m/s². How far from Station A does the second train catch the first?",
+      hint: "Use τ = 15 s for the delayed-start substitution. Set x₁ = x₂ and solve for t ≥ 15.",
+      answer: "x₁ = 20t. x₂ = ½(4)(t−15)² = 2(t−15)². Set equal: 20t = 2(t²−30t+225) → 2t² − 60t + 450 = 20t → 2t² − 80t + 450 = 0 → t² − 40t + 225 = 0. t = (40 ± √(1600−900))/2 = (40 ± √700)/2 ≈ (40 ± 26.46)/2. Roots: t ≈ 33.2 s and t ≈ 6.8 s. Discard t ≈ 6.8 s (before the second train departs). Meeting at t ≈ 33.2 s: x = 20(33.2) ≈ 664 m from Station A.",
+    },
+  ],
+
+  misconceptions: [
+    {
+      id: "ch2-021-m1",
+      wrong: "If the quadratic gives two positive roots, I must have made an algebra error — there can only be one meeting.",
+      correction: "Two positive roots are both physically valid. They correspond to two distinct meeting events: the objects meet on the way out, separate, and meet again on the way back (or one overtakes the other twice). Always report all physical roots.",
+      example: "Two objects start at the same point with Object 2 faster but Object 1 accelerating. They diverge at first, then Object 1 catches up and they meet again at t = 6 s (see Challenge 2 above).",
+    },
+    {
+      id: "ch2-021-m2",
+      wrong: "I can just flip the sign on a negative root (t = −3 → t = 3) and use it.",
+      correction: "A negative root means the equations predict a meeting at t < 0 — before the scenario began. You cannot flip its sign. The physical interpretation is that no future meeting occurs (for that root). If both roots are negative, the objects will never meet in the future.",
+      example: "In Ex 3, t₂ ≈ −12.8 s. This would be a meeting 12.8 s before the clock started. In the physical scenario starting at t = 0, it is irrelevant.",
+    },
+    {
+      id: "ch2-021-m3",
+      wrong: "The meeting position must be between the two starting positions.",
+      correction: "Not always. In a catch-up problem where both objects move in the same direction, the meeting position is ahead of both starting positions. In a delayed-pursuit problem, the meeting point can be far ahead of the starting positions.",
+      example: "Ex 1: both start at x = 0 and x = 20, but they meet at x = 40 — beyond both starting points.",
+    },
+    {
+      id: "ch2-021-m4",
+      wrong: "When Object B has a delayed start, I can still write x_B = x_B0 + v_B·t without modification.",
+      correction: "If B starts at time τ, its time-in-motion is (t − τ), not t. The correct equation is x_B = x_B0 + v_B(t−τ) + ½a_B(t−τ)². Using raw t overstates how far B has traveled.",
+      example: "In Ex 4, B starts at t = 4. Using x_B = ½(3)t² instead of ½(3)(t−4)² would give a meeting time roughly 2 s too early and a position ~12 m too far.",
+    },
+  ],
+
+  transferPrompts: [
+    {
+      id: "ch2-021-t1",
+      prompt: "Missile intercept systems solve x_missile(t) = x_target(t) thousands of times per second. Acceleration terms come from thrust curves. What additional real-world complexity does this add beyond our quadratic model?",
+      domain: "aerospace / defense",
+    },
+    {
+      id: "ch2-021-t2",
+      prompt: "Two trucks leave cities 400 km apart heading toward each other. Truck A drives at 90 km/h; Truck B leaves 30 min later at 110 km/h. Write the meeting condition, solve for t, and find the meeting point. What does the delayed-start substitution look like in hours?",
+      domain: "logistics / transportation",
+    },
+    {
+      id: "ch2-021-t3",
+      prompt: "In orbital mechanics, a spacecraft rendezvous requires both vehicles to reach the same position AND the same velocity at the same time. Why is matching velocity also necessary — and how does that add a second equation to the system?",
+      domain: "space / orbital mechanics",
+    },
+  ],
+
+  debugging: [
+    {
+      id: "ch2-021-d1",
+      title: "Forgetting the (t−τ) substitution",
+      buggyWork: "B starts at t = 4 s. Student writes x_B = ½(3)t² → meeting: t² + ... = 0 → t ≈ 8 s.",
+      issue: "The student used t (total elapsed time) instead of (t − 4) (B's travel time). B hasn't been moving for t seconds — only for (t − 4) seconds.",
+      fix: "Replace every t in B's kinematics with (t − 4): x_B = ½(3)(t−4)². This shifts the parabola rightward by 4 s. The corrected meeting time is t ≈ 10.47 s.",
+    },
+    {
+      id: "ch2-021-d2",
+      title: "Trusting one equation for the check",
+      buggyWork: "Student finds t = 7 s and verifies only x₁(7) = 49 m. Reports 'meeting at 49 m' without computing x₂(7).",
+      issue: "Checking only one equation can hide algebra errors (sign mistakes, wrong coefficient). Both equations must give the same x.",
+      fix: "Always compute x₁(t_meet) AND x₂(t_meet) separately and confirm they agree. If they differ by even 0.1 m, revisit the algebra.",
+    },
+  ],
+
+  mastery: {
+    summary: "You have mastered two-object meeting problems when you can set up and solve x₁(t) = x₂(t) for any combination of constant velocities and constant accelerations, handle both the linear and quadratic cases, correctly apply the delayed-start substitution, interpret all roots physically (keeping t ≥ 0 and t ≥ τ), and verify your answer by checking both position equations at the meeting time.",
+    checkCriteria: [
+      "Can write A, B, C for the quadratic At² + Bt + C = 0 directly from the problem parameters without intermediate steps.",
+      "Knows when the equation is linear (A = 0) vs quadratic (A ≠ 0) and handles each appropriately.",
+      "Correctly replaces t with (t−τ) when one object has a delayed start, and discards roots below τ.",
+      "Interprets two positive roots as two physical meeting events, not an error.",
+      "Verifies the answer by substituting t_meet into both x₁ and x₂ and confirming equality.",
+      "Recognizes the 'no-meeting' case: Δ < 0 (never meets) or relative velocity = 0 with nonzero gap (parallel tracks).",
+    ],
+  },
+
+  formulas: [
+    {
+      id: "ch2-021-f1",
+      latex: "x_1(t)=x_2(t)",
+      description: "Meeting condition: two objects meet when their positions are equal at the same time.",
+      variables: { "x_1": "position of Object 1 (m)", "x_2": "position of Object 2 (m)", "t": "time (s)" },
+    },
+    {
+      id: "ch2-021-f2",
+      latex: "A t^2 + B t + C = 0, \\quad A=\\tfrac{1}{2}(a_1-a_2),\\; B=v_{10}-v_{20},\\; C=x_{10}-x_{20}",
+      description: "Standard quadratic form of the meeting condition for constant-acceleration objects.",
+      variables: {
+        "a_1, a_2": "accelerations (m/s²)",
+        "v_{10}, v_{20}": "initial velocities (m/s)",
+        "x_{10}, x_{20}": "initial positions (m)",
+      },
+    },
+    {
+      id: "ch2-021-f3",
+      latex: "t = \\frac{-B \\pm \\sqrt{B^2 - 4AC}}{2A}",
+      description: "Quadratic formula giving the two candidate meeting times.",
+      variables: { "A, B, C": "coefficients from meeting condition setup", "t": "candidate meeting times (s)" },
+    },
+    {
+      id: "ch2-021-f4",
+      latex: "x_B(t) = x_{B0} + v_B(t-\\tau) + \\tfrac{1}{2}a_B(t-\\tau)^2, \\quad t \\ge \\tau",
+      description: "Position of Object B when it starts moving at delay time τ.",
+      variables: { "x_{B0}": "initial position (m)", "v_B": "initial velocity (m/s)", "a_B": "acceleration (m/s²)", "\\tau": "delay time (s)" },
     },
   ],
 
@@ -268,6 +494,131 @@ export default {
               output: '',
               status: 'idle',
               figureJson: null,
+            },
+          ],
+        },
+      },
+    ],
+  },
+
+  // ── MATLAB / OpenMAT Notebook ─────────────────────────────────────────────
+  openmat: {
+    title: 'OpenMAT Lab — Two-Object Meeting Problems',
+    description: 'Solve meeting-point equations symbolically and numerically in MATLAB. Handle constant-velocity, constant-acceleration, and delayed-start cases.',
+    placement: 'after-examples',
+    visualizations: [
+      {
+        id: 'OpenMatNotebook',
+        title: 'Meeting problems in MATLAB',
+        props: {
+          initialCells: [
+            {
+              cellTitle: 'Algebraic meeting time — general quadratic solver',
+              type: 'code',
+              language: 'matlab',
+              prose: 'Solve the general meeting equation At² + Bt + C = 0 for any combination of constant-velocity and constant-acceleration objects.',
+              code: [
+                `% Two-object meeting — general setup`,
+                `% Object 1: x1 = x10 + v10*t + 0.5*a1*t^2`,
+                `% Object 2: x2 = x20 + v20*t + 0.5*a2*t^2`,
+                ``,
+                `x10 = 0;   v10 = 0;   a1 = 2;   % accelerating from rest`,
+                `x20 = 100; v20 = -5;  a2 = 0;   % constant velocity, moving left`,
+                ``,
+                `A = 0.5*(a1 - a2);`,
+                `B = v10 - v20;`,
+                `C = x10 - x20;`,
+                ``,
+                `fprintf('Quadratic: %.2f*t^2 + %.2f*t + %.2f = 0\\n', A, B, C);`,
+                ``,
+                `disc = B^2 - 4*A*C;`,
+                `if disc < 0`,
+                `    disp('No real roots — objects never meet.');`,
+                `elseif abs(A) < 1e-9`,
+                `    t_meet = -C / B;`,
+                `    fprintf('Linear case: t = %.3f s\\n', t_meet);`,
+                `    fprintf('Position: x = %.3f m\\n', x10 + v10*t_meet + 0.5*a1*t_meet^2);`,
+                `else`,
+                `    t_roots = [(-B + sqrt(disc))/(2*A), (-B - sqrt(disc))/(2*A)];`,
+                `    for k = 1:2`,
+                `        t = t_roots(k);`,
+                `        x = x10 + v10*t + 0.5*a1*t^2;`,
+                `        if t >= 0`,
+                `            fprintf('t = %.3f s  ->  x = %.3f m  (physical)\\n', t, x);`,
+                `        else`,
+                `            fprintf('t = %.3f s  (before scenario — discard)\\n', t);`,
+                `        end`,
+                `    end`,
+                `end`,
+              ].join('\n'),
+            },
+            {
+              cellTitle: 'Visualise x(t) curves — find intersections graphically',
+              type: 'code',
+              language: 'matlab',
+              prose: 'Plot both position-time curves. Intersections are meeting events. Uses the same parameters as Cell 1.',
+              code: [
+                `x10 = 0;   v10 = 0;   a1 = 2;`,
+                `x20 = 100; v20 = -5;  a2 = 0;`,
+                ``,
+                `% Find physical meeting time for axis limits`,
+                `A = 0.5*(a1-a2); B = v10-v20; C = x10-x20;`,
+                `disc = B^2 - 4*A*C;`,
+                `t_roots = [(-B+sqrt(disc))/(2*A), (-B-sqrt(disc))/(2*A)];`,
+                `t_phys = t_roots(t_roots >= 0);`,
+                `t_max = max(t_phys) * 1.3;`,
+                ``,
+                `t = linspace(0, t_max, 400);`,
+                `x1 = x10 + v10*t + 0.5*a1*t.^2;`,
+                `x2 = x20 + v20*t + 0.5*a2*t.^2;`,
+                ``,
+                `figure;`,
+                `plot(t, x1, 'b-', 'LineWidth', 2, 'DisplayName', 'Object 1 (accelerating)'); hold on;`,
+                `plot(t, x2, 'r-', 'LineWidth', 2, 'DisplayName', 'Object 2 (constant v)');`,
+                `for k = 1:length(t_phys)`,
+                `    tm = t_phys(k);`,
+                `    xm = x10 + v10*tm + 0.5*a1*tm^2;`,
+                `    plot(tm, xm, 'ko', 'MarkerSize', 10, 'MarkerFaceColor', 'orange');`,
+                `    text(tm+0.2, xm, sprintf('t=%.1fs', tm), 'FontSize', 9);`,
+                `end`,
+                `xlabel('t (s)'); ylabel('x (m)');`,
+                `title('Two-object meeting — x(t) curves');`,
+                `legend('Location','best'); grid on;`,
+              ].join('\n'),
+            },
+            {
+              cellTitle: 'Delayed-start pursuit',
+              type: 'code',
+              language: 'matlab',
+              prose: 'Object A leaves x = 0 at t = 0 with v = 6 m/s. Object B leaves x = 0 at t = 4 s from rest at a = 3 m/s². Find when B catches A.',
+              code: [
+                `v_A = 6;         % m/s`,
+                `a_B = 3;         % m/s^2`,
+                `tau = 4;         % B starts at t = tau`,
+                ``,
+                `% x_A = v_A * t`,
+                `% x_B = 0.5*a_B*(t - tau)^2   for t >= tau`,
+                ``,
+                `% x_A = x_B  ->  v_A*t = 0.5*a_B*(t-tau)^2`,
+                `% Expand and collect:  0.5*a_B*t^2 - (a_B*tau + v_A)*t + 0.5*a_B*tau^2 = 0`,
+                `A = 0.5*a_B;`,
+                `B = -(a_B*tau + v_A);`,
+                `C = 0.5*a_B*tau^2;`,
+                ``,
+                `disc = B^2 - 4*A*C;`,
+                `t_roots = [(-B + sqrt(disc))/(2*A), (-B - sqrt(disc))/(2*A)];`,
+                ``,
+                `disp('Roots:');`,
+                `for k = 1:2`,
+                `    t = t_roots(k);`,
+                `    if t >= tau`,
+                `        x = v_A * t;`,
+                `        fprintf('  t = %.3f s   x = %.3f m  (B has started - physical)\\n', t, x);`,
+                `    else`,
+                `        fprintf('  t = %.3f s  (before B starts at tau=%.0fs — discard)\\n', t, tau);`,
+                `    end`,
+                `end`,
+              ].join('\n'),
             },
           ],
         },

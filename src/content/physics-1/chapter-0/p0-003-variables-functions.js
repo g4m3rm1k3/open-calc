@@ -163,7 +163,24 @@ export default {
           '\\text{A ball thrown up then caught:}\\\\x(t) = \\begin{cases} v_0 t - \\frac{1}{2}gt^2 & 0 \\le t \\le t_{\\text{catch}} \\\\ x_{\\text{catch}} & t > t_{\\text{catch}} \\end{cases}\\\\\\text{Different rules for different time intervals.}',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'FunctionPlotter',
+        title: 'Composition — kinetic energy KE(v(t)) = ½m(at)² grows as t²',
+        mathBridge:
+          'Velocity grows linearly (v = at), so KE = ½mv² = ½m(at)² = ½ma²t² — which grows as t². Even though KE depends on v and v depends on t, you can compose them into one function of t. The curve bends upward (quadratic) even though v was linear. This is composition: the output of one function feeds into another.',
+        caption: 'KE(v(t)) = ½ma²t² — energy grows quadratically in time even though velocity grows linearly.',
+        props: { fn: '0.5 * 2 * (9.8 * x)^2', xMin: 0, xMax: 3, yMin: 0, yMax: 850, xLabel: 't (s)', yLabel: 'KE (J)' },
+      },
+      {
+        id: 'SVGDiagram',
+        props: { type: 'function-domain' },
+        title: 'Domain of x(t) — the model is only valid while the ball is airborne',
+        mathBridge:
+          'The dashed red extension shows what x(t) = 1.5 + 12t − 4.9t² predicts past t ≈ 2.57 s: negative position — underground. This is the model outside its domain. The solid blue curve shows the valid domain (0 ≤ t ≤ 2.57 s). Every physics function has a domain; identifying it is part of solving the problem.',
+        caption: 'The formula gives a number for any t — but physics only validates it while the ball is in the air.',
+      },
+    ],
   },
 
   rigor: {
@@ -205,7 +222,23 @@ export default {
       },
     ],
     title: 'Why v(t) = at is linear — and what that means physically',
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'PositionVelocityAcceleration',
+        title: 'Linearity vs quadratic — v(t) straight, x(t) curved',
+        mathBridge:
+          'Compare the velocity panel (v = at, straight line — linear) with the position panel (x = ½at², curved — quadratic). They describe the same motion. Linearity means equal time intervals produce equal velocity changes. The velocity graph\'s constant slope is exactly the acceleration a. Drag the time slider — notice how on the v(t) graph the slope never changes, while on the x(t) graph the slope keeps increasing.',
+        caption: 'v(t) is linear (equal time → equal Δv). x(t) is quadratic (equal time → growing Δx). Same object, different mathematical shapes.',
+      },
+      {
+        id: 'SVGDiagram',
+        props: { type: 'function-mapping' },
+        title: 'Formal function: one input → exactly one output',
+        mathBridge:
+          'The left oval is the domain (valid times). Each arrow maps one time value to exactly one position. Notice: every arrow has exactly one head — no branching, no ambiguity. This is the formal definition. A "multi-valued relation" would have one input mapping to two outputs — physically impossible (an object cannot be in two places at once).',
+        caption: 'A function maps each input to exactly one output. Physics requires this — a quantity must be well-defined at each instant.',
+      },
+    ],
   },
 
   examples: [

@@ -9,57 +9,69 @@ const RED_SUITS = new Set(["H", "D"]);
 function PlayingCard({ rank = "A", suit = "S", faceDown = false }) {
   const isRed = RED_SUITS.has(suit);
   const sym = SUIT_SYMBOLS[suit] || suit;
+  const color = isRed ? "#ef4444" : "#e2e8f0";
   if (faceDown) {
     return (
-      <svg width="80" height="112" viewBox="0 0 80 112" style={{ filter: "drop-shadow(2px 3px 6px rgba(0,0,0,0.5))", flexShrink: 0 }}>
+      <svg width="64" height="90" viewBox="0 0 72 100" style={{ filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.6))", flexShrink: 0 }}>
         <defs>
-          <pattern id="backpat" patternUnits="userSpaceOnUse" width="10" height="10">
-            <rect width="10" height="10" fill="#1a3a6e" />
-            <path d="M0 0L10 10M10 0L0 10" stroke="#2855a0" strokeWidth="1" />
+          <linearGradient id="backGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#1e293b"/>
+            <stop offset="100%" stopColor="#0f172a"/>
+          </linearGradient>
+          <pattern id="backpat" patternUnits="userSpaceOnUse" width="8" height="8">
+            <path d="M0 8L8 0M-2 2L2 -2M6 10L10 6" stroke="#334155" strokeWidth="1" opacity="0.6" />
           </pattern>
         </defs>
-        <rect x="2" y="2" width="76" height="108" rx="8" fill="url(#backpat)" stroke="#c0a840" strokeWidth="2" />
-        <rect x="6" y="6" width="68" height="100" rx="5" fill="none" stroke="#c0a840" strokeWidth="1" />
+        <rect x="0" y="0" width="72" height="100" rx="6" fill="url(#backGrad)" stroke="#475569" strokeWidth="1" />
+        <rect x="5" y="5" width="62" height="90" rx="4" fill="url(#backpat)" />
+        <circle cx="36" cy="50" r="14" fill="none" stroke="#06b6d4" strokeWidth="2" opacity="0.8"/>
       </svg>
     );
   }
   return (
-    <svg width="80" height="112" viewBox="0 0 80 112" style={{ filter: "drop-shadow(2px 3px 6px rgba(0,0,0,0.5))", flexShrink: 0 }}>
-      <rect x="2" y="2" width="76" height="108" rx="8" fill="#fffef5" stroke="#c8b060" strokeWidth="1.5" />
-      <text x="8" y="22" fontSize="15" fontFamily="Georgia,serif" fontWeight="bold" fill={isRed ? "#c0131a" : "#0f1014"}>{rank}</text>
-      <text x="8" y="36" fontSize="13" fontFamily="Georgia,serif" fill={isRed ? "#c0131a" : "#0f1014"}>{sym}</text>
-      <text x="40" y="64" fontSize="30" fontFamily="Georgia,serif" fill={isRed ? "#c0131a" : "#0f1014"} textAnchor="middle" dominantBaseline="middle">{sym}</text>
-      <text x="72" y="95" fontSize="15" fontFamily="Georgia,serif" fontWeight="bold" fill={isRed ? "#c0131a" : "#0f1014"} textAnchor="middle" transform="rotate(180,72,95)">{rank}</text>
+    <svg width="64" height="90" viewBox="0 0 72 100" style={{ filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.6))", flexShrink: 0 }}>
+      <rect x="0" y="0" width="72" height="100" rx="6" fill="#1e293b" stroke="#334155" strokeWidth="1" />
+      <text x="8" y="22" fontSize="16" fontFamily="'Inter', sans-serif" fontWeight="700" fill={color}>{rank}</text>
+      <text x="8" y="38" fontSize="14" fontFamily="'Inter', sans-serif" fill={color}>{sym}</text>
+      <text x="36" y="56" fontSize="32" fontFamily="'Inter', sans-serif" fill={color} textAnchor="middle" dominantBaseline="middle" opacity="0.9">{sym}</text>
+      <text x="64" y="86" fontSize="16" fontFamily="'Inter', sans-serif" fontWeight="700" fill={color} textAnchor="middle" transform="rotate(180,64,86)">{rank}</text>
     </svg>
   );
 }
 
-function DieComponent({ value, size = 64 }) {
+function DieComponent({ value, size = 48 }) {
   const pips = {
     1: [[.5,.5]],
-    2: [[.28,.28],[.72,.72]],
-    3: [[.28,.28],[.5,.5],[.72,.72]],
-    4: [[.28,.28],[.72,.28],[.28,.72],[.72,.72]],
-    5: [[.28,.28],[.72,.28],[.5,.5],[.28,.72],[.72,.72]],
-    6: [[.28,.22],[.72,.22],[.28,.5],[.72,.5],[.28,.78],[.72,.78]],
+    2: [[.25,.25],[.75,.75]],
+    3: [[.25,.25],[.5,.5],[.75,.75]],
+    4: [[.25,.25],[.75,.25],[.25,.75],[.75,.75]],
+    5: [[.25,.25],[.75,.25],[.5,.5],[.25,.75],[.75,.75]],
+    6: [[.25,.2],[.75,.2],[.25,.5],[.75,.5],[.25,.8],[.75,.8]],
   }[value] || [];
-  const r = size * 0.075;
+  const r = size * 0.08;
   return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ filter: "drop-shadow(2px 3px 5px rgba(0,0,0,0.5))", flexShrink: 0 }}>
-      <rect x="3" y="3" width={size-6} height={size-6} rx={size*0.15} fill="#fffef5" stroke="#c8b060" strokeWidth="1.5" />
-      {pips.map(([cx,cy],i) => <circle key={i} cx={cx*size} cy={cy*size} r={r} fill="#1a1a1a" />)}
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.6))", flexShrink: 0 }}>
+      <rect x="0" y="0" width={size} height={size} rx={size*0.15} fill="#1e293b" stroke="#475569" strokeWidth="1" />
+      {pips.map(([cx,cy],i) => <circle key={i} cx={cx*size} cy={cy*size} r={r} fill="#06b6d4" />)}
     </svg>
   );
 }
 
-function Chip({ color="red", label="5" }) {
-  const C = { white:["#f0f0f0","#aaa","#222"], red:["#d32f2f","#8b0000","#fff"], blue:["#1565c0","#003c8f","#fff"], green:["#2e7d32","#1b5e20","#fff"], black:["#212121","#000","#fff"], purple:["#6a1b9a","#38006b","#fff"], yellow:["#f9a825","#c17900","#222"] };
-  const [fill,stroke,text] = C[color]||C.red;
+function Chip({ color="cyan", label="5" }) {
+  const C = { 
+    cyan:["#0891b2","#06b6d4","#fff"], 
+    pink:["#db2777","#ec4899","#fff"], 
+    purple:["#7e22ce","#a855f7","#fff"], 
+    gold:["#b45309","#f59e0b","#fff"], 
+    slate:["#334155","#475569","#fff"]
+  };
+  const [fill,stroke,text] = C[color]||C.cyan;
   return (
-    <svg width="48" height="48" viewBox="0 0 48 48" style={{ filter: "drop-shadow(1px 2px 4px rgba(0,0,0,0.5))", flexShrink: 0 }}>
-      <circle cx="24" cy="24" r="22" fill={fill} stroke={stroke} strokeWidth="2" />
-      <circle cx="24" cy="24" r="16" fill="none" stroke={stroke} strokeWidth="1.5" strokeDasharray="4 3" />
-      <text x="24" y="29" textAnchor="middle" fontSize="12" fontWeight="bold" fontFamily="Georgia,serif" fill={text}>{label}</text>
+    <svg width="40" height="40" viewBox="0 0 48 48" style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.6))", flexShrink: 0 }}>
+      <circle cx="24" cy="24" r="22" fill="#0f172a" stroke={stroke} strokeWidth="2" />
+      <circle cx="24" cy="24" r="18" fill={fill} opacity="0.2" />
+      <circle cx="24" cy="24" r="16" fill="none" stroke={stroke} strokeWidth="1.5" strokeDasharray="4 4" opacity="0.8" />
+      <text x="24" y="29" textAnchor="middle" fontSize="13" fontWeight="bold" fontFamily="'Inter', sans-serif" fill={text}>{label}</text>
     </svg>
   );
 }
@@ -67,27 +79,29 @@ function Chip({ color="red", label="5" }) {
 /* ─────────────────────────────────────────────
    SHARED UI PIECES
 ───────────────────────────────────────────── */
-const G = "#c8a940"; // gold
-const FELT = "#1a5c38";
-const DARK = "#0f1e0f";
+const NEON_CYAN = "#06b6d4";
+const NEON_PURP = "#a855f7";
+const NEON_PINK = "#ec4899";
+const DARK_BG = "#020617";
+const PANEL_BG = "rgba(15, 23, 42, 0.6)";
 
 function TableWrap({ children, style={} }) {
   return (
-    <div style={{ background: FELT, borderRadius: 18, padding: "28px 24px", border: `5px solid #3d2b1f`, boxShadow: "inset 0 2px 12px rgba(0,0,0,0.4)", ...style }}>
+    <div style={{ background: PANEL_BG, backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", borderRadius: 16, padding: "28px 24px", border: `1px solid rgba(6, 182, 212, 0.2)`, boxShadow: "inset 0 0 30px rgba(6,182,212,0.05), 0 8px 32px rgba(0,0,0,0.5)", ...style }}>
       {children}
     </div>
   );
 }
 
-function TableLabel({ children }) {
-  return <div style={{ textAlign:"center", color:G, fontFamily:"Georgia,serif", fontSize:10, letterSpacing:2.5, marginBottom:14, opacity:.85 }}>{children}</div>;
+function TableLabel({ children, color=NEON_CYAN }) {
+  return <div style={{ textAlign:"center", color: color, fontFamily:"'Inter', sans-serif", fontSize:11, letterSpacing:2, fontWeight:"600", marginBottom:14, textTransform:"uppercase", textShadow:`0 0 10px ${color}60` }}>{children}</div>;
 }
 
-function CardRow({ cards, label, score }) {
+function CardRow({ cards, label, score, color=NEON_CYAN }) {
   return (
-    <div style={{ marginBottom: 8 }}>
-      {label && <TableLabel>{label}{score != null ? ` — ${score}` : ""}</TableLabel>}
-      <div style={{ display:"flex", justifyContent:"center", gap:12, flexWrap:"wrap" }}>
+    <div style={{ marginBottom: 12 }}>
+      {label && <TableLabel color={color}>{label}{score != null ? ` — ${score}` : ""}</TableLabel>}
+      <div style={{ display:"flex", justifyContent:"center", gap:8, flexWrap:"wrap" }}>
         {cards.map((c,i) => <PlayingCard key={i} rank={c.rank} suit={c.suit} faceDown={c.faceDown} />)}
       </div>
     </div>
@@ -95,7 +109,7 @@ function CardRow({ cards, label, score }) {
 }
 
 function Divider() {
-  return <div style={{ height:1, background:"rgba(200,169,64,.25)", margin:"16px 0" }} />;
+  return <div style={{ height:1, background:"linear-gradient(90deg, transparent, rgba(6,182,212,0.3), transparent)", margin:"20px 0" }} />;
 }
 
 /* ─────────────────────────────────────────────
@@ -104,11 +118,11 @@ function Divider() {
 function BlackjackVisual() {
   return (
     <TableWrap>
-      <CardRow label="DEALER" cards={[{rank:"7",suit:"D"},{faceDown:true}]} />
+      <CardRow color={NEON_PINK} label="DEALER" cards={[{rank:"7",suit:"D"},{faceDown:true}]} />
       <Divider />
       <CardRow label="PLAYER — BLACKJACK!" score={21} cards={[{rank:"A",suit:"S"},{rank:"K",suit:"H"}]} />
-      <div style={{ display:"flex", justifyContent:"center", gap:10, marginTop:14 }}>
-        <Chip color="green" label="25" /><Chip color="black" label="100" />
+      <div style={{ display:"flex", justifyContent:"center", gap:10, marginTop:16 }}>
+        <Chip color="cyan" label="25" /><Chip color="slate" label="100" />
       </div>
     </TableWrap>
   );
@@ -117,10 +131,10 @@ function BlackjackVisual() {
 function PokerVisual() {
   return (
     <TableWrap>
-      <CardRow label="COMMUNITY CARDS" cards={[{rank:"A",suit:"C"},{rank:"K",suit:"D"},{rank:"7",suit:"H"},{faceDown:true},{faceDown:true}]} />
-      <div style={{ textAlign:"center", marginTop:10, marginBottom:10 }}>
-        <div style={{ display:"inline-flex", gap:8 }}><Chip color="red" label="5"/><Chip color="blue" label="25"/><Chip color="green" label="25"/></div>
-        <div style={{ color:G, fontSize:12, opacity:.8, fontFamily:"Georgia,serif", marginTop:4 }}>Pot: $180</div>
+      <CardRow color={NEON_PURP} label="COMMUNITY CARDS" cards={[{rank:"A",suit:"C"},{rank:"K",suit:"D"},{rank:"7",suit:"H"},{rank:"2",suit:"C"},{faceDown:true}]} />
+      <div style={{ textAlign:"center", marginTop:14, marginBottom:14 }}>
+        <div style={{ display:"inline-flex", gap:8 }}><Chip color="pink" label="5"/><Chip color="cyan" label="25"/><Chip color="cyan" label="25"/></div>
+        <div style={{ color:NEON_CYAN, fontSize:12, opacity:.8, fontFamily:"'Inter', sans-serif", marginTop:8 }}>Pot: $180</div>
       </div>
       <Divider />
       <CardRow label="YOUR HOLE CARDS" cards={[{rank:"A",suit:"H"},{rank:"A",suit:"D"}]} />
@@ -135,23 +149,23 @@ function RouletteVisual() {
     <TableWrap style={{ padding:"20px 14px" }}>
       <div style={{ overflowX:"auto" }}>
         <div style={{ minWidth:520 }}>
-          <div style={{ display:"grid", gridTemplateColumns:"36px repeat(12, 1fr) 36px", gap:3, marginBottom:4 }}>
-            <div style={{ background:"#198754", borderRadius:5, display:"flex",alignItems:"center",justifyContent:"center",color:"white",fontWeight:"bold",fontSize:13,fontFamily:"Georgia,serif",gridRow:"1/4",padding:"4px 2px" }}>0</div>
+          <div style={{ display:"grid", gridTemplateColumns:"36px repeat(12, 1fr) 36px", gap:4, marginBottom:4 }}>
+            <div style={{ background:"rgba(6,182,212,0.1)", border:"1px solid rgba(6,182,212,0.4)", borderRadius:6, display:"flex",alignItems:"center",justifyContent:"center",color:NEON_CYAN,fontWeight:"bold",fontSize:13,fontFamily:"'Inter', sans-serif",gridRow:"1/4" }}>0</div>
             {rows.map((row,ri) => row.map(n => (
-              <div key={n} style={{ background:reds.has(n)?"#c0131a":"#1a1a1a", borderRadius:3, color:"white", textAlign:"center", fontSize:10, fontFamily:"Georgia,serif", fontWeight:"bold", padding:"5px 0" }}>{n}</div>
+              <div key={n} style={{ background:reds.has(n)?"rgba(236,72,153,0.1)":"rgba(30,41,59,0.5)", border:reds.has(n)?"1px solid rgba(236,72,153,0.3)":"1px solid rgba(148,163,184,0.2)", borderRadius:4, color:reds.has(n)?NEON_PINK:"#cbd5e1", textAlign:"center", fontSize:11, fontFamily:"'Inter', sans-serif", fontWeight:"600", padding:"6px 0" }}>{n}</div>
             )))}
-            <div style={{ background:"#198754", borderRadius:5, display:"flex",flexDirection:"column",justifyContent:"space-around",alignItems:"center",color:"white",fontSize:9,gridRow:"1/4",padding:"4px 2px",gap:2 }}>
+            <div style={{ background:"rgba(6,182,212,0.05)", border:"1px solid rgba(6,182,212,0.2)", borderRadius:6, display:"flex",flexDirection:"column",justifyContent:"space-around",alignItems:"center",color:NEON_CYAN,fontSize:9,gridRow:"1/4",padding:"4px 2px",gap:2 }}>
               <span>2:1</span><span>2:1</span><span>2:1</span>
             </div>
           </div>
-          <div style={{ display:"grid", gridTemplateColumns:"36px repeat(3, 1fr) 36px", gap:3, marginBottom:3 }}>
+          <div style={{ display:"grid", gridTemplateColumns:"36px repeat(3, 1fr) 36px", gap:4, marginBottom:4 }}>
             <div/>{["1st 12","2nd 12","3rd 12"].map(d=>(
-              <div key={d} style={{ background:"#1d8a4c",borderRadius:3,color:G,textAlign:"center",fontSize:10,fontFamily:"Georgia,serif",padding:"5px 0",border:"1px solid rgba(200,169,64,.3)" }}>{d}</div>
+              <div key={d} style={{ background:"rgba(6,182,212,0.05)",borderRadius:4,color:NEON_CYAN,textAlign:"center",fontSize:10,fontFamily:"'Inter', sans-serif",padding:"6px 0",border:"1px solid rgba(6,182,212,0.2)" }}>{d}</div>
             ))}<div/>
           </div>
-          <div style={{ display:"grid", gridTemplateColumns:"36px repeat(6, 1fr) 36px", gap:3 }}>
+          <div style={{ display:"grid", gridTemplateColumns:"36px repeat(6, 1fr) 36px", gap:4 }}>
             <div/>{["1-18","Even","Red","Black","Odd","19-36"].map((b,i)=>(
-              <div key={b} style={{ background:i===2?"#c0131a":i===3?"#1a1a1a":"#1d8a4c",borderRadius:3,color:G,textAlign:"center",fontSize:10,fontFamily:"Georgia,serif",padding:"5px 0",border:"1px solid rgba(200,169,64,.3)" }}>{b}</div>
+              <div key={b} style={{ background:i===2?"rgba(236,72,153,0.1)":i===3?"rgba(30,41,59,0.5)":"rgba(6,182,212,0.05)",borderRadius:4,color:i===2?NEON_PINK:i===3?"#cbd5e1":NEON_CYAN,textAlign:"center",fontSize:10,fontFamily:"'Inter', sans-serif",padding:"6px 0",border:i===2?"1px solid rgba(236,72,153,0.3)":i===3?"1px solid rgba(148,163,184,0.2)":"1px solid rgba(6,182,212,0.2)" }}>{b}</div>
             ))}<div/>
           </div>
         </div>
@@ -165,23 +179,23 @@ function CrapsVisual() {
     <TableWrap>
       <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:8 }}>
         {["Don't Pass Bar","Pass Line"].map(b=>(
-          <div key={b} style={{ background:"#1d8a4c",border:"1px solid rgba(200,169,64,.35)",borderRadius:6,color:G,textAlign:"center",fontSize:11,fontFamily:"Georgia,serif",padding:"8px 4px" }}>{b}</div>
+          <div key={b} style={{ background:"rgba(139,92,246,0.1)",border:"1px solid rgba(139,92,246,0.3)",borderRadius:8,color:NEON_PURP,textAlign:"center",fontSize:11,fontFamily:"'Inter', sans-serif",fontWeight:"600",padding:"8px 4px" }}>{b}</div>
         ))}
       </div>
       <div style={{ display:"grid",gridTemplateColumns:"repeat(6,1fr)",gap:6,marginBottom:8 }}>
         {[4,5,6,8,9,10].map(n=>(
-          <div key={n} style={{ background:"#164d2e",border:"1px solid rgba(200,169,64,.25)",borderRadius:6,color:G,textAlign:"center",fontFamily:"Georgia,serif",fontWeight:"bold",fontSize:18,padding:"10px 0" }}>{n}</div>
+          <div key={n} style={{ background:"rgba(6,182,212,0.05)",border:"1px solid rgba(6,182,212,0.2)",borderRadius:8,color:NEON_CYAN,textAlign:"center",fontFamily:"'Inter', sans-serif",fontWeight:"bold",fontSize:18,padding:"10px 0" }}>{n}</div>
         ))}
       </div>
-      <div style={{ display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:6,marginBottom:16 }}>
+      <div style={{ display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:6,marginBottom:20 }}>
         {["Come","Field","Don't Come"].map(b=>(
-          <div key={b} style={{ background:"#1d8a4c",border:"1px solid rgba(200,169,64,.3)",borderRadius:6,color:G,textAlign:"center",fontSize:10,fontFamily:"Georgia,serif",padding:"7px 4px" }}>{b}</div>
+          <div key={b} style={{ background:"rgba(6,182,212,0.05)",border:"1px solid rgba(6,182,212,0.2)",borderRadius:8,color:NEON_CYAN,textAlign:"center",fontSize:10,fontFamily:"'Inter', sans-serif",padding:"7px 4px" }}>{b}</div>
         ))}
       </div>
       <div style={{ display:"flex",justifyContent:"center",gap:24 }}>
         <DieComponent value={5}/><DieComponent value={3}/>
       </div>
-      <div style={{ textAlign:"center",color:G,fontSize:12,fontFamily:"Georgia,serif",marginTop:10,opacity:.9 }}>Point: 8</div>
+      <div style={{ textAlign:"center",color:NEON_CYAN,fontSize:12,fontFamily:"'Inter', sans-serif",fontWeight:"600",marginTop:14,opacity:.9 }}>Point: 8</div>
     </TableWrap>
   );
 }
@@ -189,15 +203,15 @@ function CrapsVisual() {
 function BaccaratVisual() {
   return (
     <TableWrap>
-      <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:20,marginBottom:16 }}>
-        <CardRow label="PLAYER — 7" cards={[{rank:"5",suit:"H"},{rank:"2",suit:"C"}]} />
-        <CardRow label="BANKER — 6" cards={[{rank:"3",suit:"S"},{rank:"3",suit:"D"}]} />
+      <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:20,marginBottom:20 }}>
+        <CardRow color={NEON_CYAN} label="PLAYER — 7" cards={[{rank:"5",suit:"H"},{rank:"2",suit:"C"}]} />
+        <CardRow color={NEON_PINK} label="BANKER — 6" cards={[{rank:"3",suit:"S"},{rank:"3",suit:"D"}]} />
       </div>
       <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8 }}>
-        {[["Player","1.24%","#1d8a4c"],["Tie","14.4%","#6d2e1a"],["Banker","1.06%","#1d8a4c"]].map(([l,e,bg])=>(
-          <div key={l} style={{ background:bg,borderRadius:6,border:"1px solid rgba(200,169,64,.3)",color:G,textAlign:"center",fontFamily:"Georgia,serif",padding:"8px 4px" }}>
+        {[["Player","1.24%",NEON_CYAN,"rgba(6,182,212,0.1)"],["Tie","14.4%",NEON_PURP,"rgba(139,92,246,0.1)"],["Banker","1.06%",NEON_PINK,"rgba(236,72,153,0.1)"]].map(([l,e,tc,bg])=>(
+          <div key={l} style={{ background:bg,borderRadius:8,border:`1px solid ${tc}40`,color:tc,textAlign:"center",fontFamily:"'Inter', sans-serif",padding:"10px 4px" }}>
             <div style={{ fontSize:12,fontWeight:"bold" }}>{l}</div>
-            <div style={{ fontSize:9,opacity:.7 }}>HE: {e}</div>
+            <div style={{ fontSize:10,opacity:.8,marginTop:2 }}>HE: {e}</div>
           </div>
         ))}
       </div>
@@ -208,12 +222,12 @@ function BaccaratVisual() {
 function ThreeCardVisual() {
   return (
     <TableWrap>
-      <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:12 }}>
-        <CardRow label="DEALER" cards={[{rank:"Q",suit:"S"},{rank:"8",suit:"H"},{rank:"4",suit:"C"}]} />
-        <CardRow label="PLAYER — FLUSH" cards={[{rank:"A",suit:"D"},{rank:"K",suit:"D"},{rank:"J",suit:"D"}]} />
+      <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:16 }}>
+        <CardRow color={NEON_PINK} label="DEALER" cards={[{rank:"Q",suit:"S"},{rank:"8",suit:"H"},{rank:"4",suit:"C"}]} />
+        <CardRow color={NEON_CYAN} label="PLAYER — FLUSH" cards={[{rank:"A",suit:"D"},{rank:"K",suit:"D"},{rank:"J",suit:"D"}]} />
       </div>
-      <div style={{ background:"rgba(200,169,64,.12)",border:"1px solid rgba(200,169,64,.3)",borderRadius:8,padding:"10px",textAlign:"center" }}>
-        <div style={{ color:G,fontFamily:"Georgia,serif",fontSize:13,fontWeight:"bold" }}>Player wins! Pair Plus pays 3:1</div>
+      <div style={{ background:"rgba(6,182,212,0.08)",border:"1px solid rgba(6,182,212,0.3)",borderRadius:10,padding:"12px",textAlign:"center",boxShadow:"0 0 15px rgba(6,182,212,0.1)" }}>
+        <div style={{ color:NEON_CYAN,fontFamily:"'Inter', sans-serif",fontSize:13,fontWeight:"bold" }}>Player wins! Pair Plus pays 3:1</div>
       </div>
     </TableWrap>
   );
@@ -223,16 +237,19 @@ function SolitaireVisual() {
   const foundations = [{rank:"A",suit:"S"},{rank:"A",suit:"H"},{rank:"A",suit:"D"},{rank:"A",suit:"C"}];
   return (
     <TableWrap>
-      <TableLabel>FOUNDATION PILES (build Ace → King)</TableLabel>
-      <div style={{ display:"flex",justifyContent:"center",gap:12,marginBottom:16 }}>
+      <TableLabel color={NEON_PURP}>FOUNDATION PILES (build Ace → King)</TableLabel>
+      <div style={{ display:"flex",justifyContent:"center",gap:8,marginBottom:20 }}>
         {foundations.map((c,i)=><PlayingCard key={i} rank={c.rank} suit={c.suit}/>)}
       </div>
       <Divider/>
       <TableLabel>TABLEAU (alternating colors, descending rank)</TableLabel>
-      <div style={{ display:"flex",justifyContent:"center",gap:10 }}>
+      <div style={{ display:"flex",justifyContent:"center",gap:6 }}>
         <PlayingCard rank="K" suit="S"/>
         <PlayingCard rank="Q" suit="H"/>
         <PlayingCard rank="J" suit="C"/>
+        <PlayingCard rank="10" suit="D"/>
+        <PlayingCard faceDown/>
+        <PlayingCard faceDown/>
         <PlayingCard faceDown/>
       </div>
     </TableWrap>
@@ -243,15 +260,15 @@ function YahtzeeVisual() {
   return (
     <TableWrap>
       <TableLabel>FULL HOUSE — 3+2</TableLabel>
-      <div style={{ display:"flex",justifyContent:"center",gap:12,marginBottom:16 }}>
+      <div style={{ display:"flex",justifyContent:"center",gap:12,marginBottom:20 }}>
         <DieComponent value={5}/><DieComponent value={5}/><DieComponent value={5}/>
         <DieComponent value={3}/><DieComponent value={3}/>
       </div>
       <Divider/>
-      <TableLabel>KEEP ALL — SCORE 25 PTS</TableLabel>
-      <div style={{ display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:6 }}>
+      <TableLabel color={NEON_PURP}>KEEP ALL — SCORE 25 PTS</TableLabel>
+      <div style={{ display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8 }}>
         {["Ones","Twos","Threes","Fours","Fives","Sixes"].map(s=>(
-          <div key={s} style={{ background:"#164d2e",border:"1px solid rgba(200,169,64,.25)",borderRadius:5,color:G,textAlign:"center",fontSize:10,fontFamily:"Georgia,serif",padding:"5px 0" }}>{s}</div>
+          <div key={s} style={{ background:"rgba(6,182,212,0.05)",border:"1px solid rgba(6,182,212,0.2)",borderRadius:6,color:NEON_CYAN,textAlign:"center",fontSize:11,fontWeight:"600",fontFamily:"'Inter', sans-serif",padding:"8px 0" }}>{s}</div>
         ))}
       </div>
     </TableWrap>
@@ -262,15 +279,15 @@ function FarkleVisual() {
   return (
     <TableWrap>
       <TableLabel>SIX-DICE ROLL</TableLabel>
-      <div style={{ display:"flex",justifyContent:"center",gap:10,flexWrap:"wrap",marginBottom:16 }}>
+      <div style={{ display:"flex",justifyContent:"center",gap:10,flexWrap:"wrap",marginBottom:20 }}>
         {[1,5,3,3,2,4].map((v,i)=><DieComponent key={i} value={v}/>)}
       </div>
       <Divider/>
-      <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:8 }}>
+      <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:10 }}>
         {[["1 = 100 pts","keep"],["5 = 50 pts","keep"],["Three 3s = 300","keep? bank?"],["2,4 = 0 pts","cannot keep"]].map(([l,s])=>(
-          <div key={l} style={{ background:"rgba(200,169,64,.08)",border:"1px solid rgba(200,169,64,.2)",borderRadius:6,padding:"8px 10px" }}>
-            <div style={{ color:G,fontSize:11,fontFamily:"Georgia,serif",fontWeight:"bold" }}>{l}</div>
-            <div style={{ color:"#8a7a55",fontSize:10,fontFamily:"Georgia,serif" }}>{s}</div>
+          <div key={l} style={{ background:"rgba(6,182,212,0.05)",border:"1px solid rgba(6,182,212,0.2)",borderRadius:8,padding:"10px 12px" }}>
+            <div style={{ color:NEON_CYAN,fontSize:12,fontFamily:"'Inter', sans-serif",fontWeight:"bold" }}>{l}</div>
+            <div style={{ color:"#94a3b8",fontSize:11,fontFamily:"'Inter', sans-serif",marginTop:2 }}>{s}</div>
           </div>
         ))}
       </div>
@@ -282,22 +299,119 @@ function RummyVisual() {
   return (
     <TableWrap>
       <TableLabel>YOUR HAND</TableLabel>
-      <div style={{ display:"flex",justifyContent:"center",gap:8,flexWrap:"wrap",marginBottom:16 }}>
+      <div style={{ display:"flex",justifyContent:"center",gap:6,flexWrap:"wrap",marginBottom:20 }}>
         <PlayingCard rank="3" suit="H"/><PlayingCard rank="4" suit="H"/><PlayingCard rank="5" suit="H"/>
         <PlayingCard rank="7" suit="S"/><PlayingCard rank="7" suit="D"/><PlayingCard rank="7" suit="C"/>
         <PlayingCard rank="K" suit="S"/>
       </div>
       <Divider/>
-      <div style={{ display:"flex",justifyContent:"space-around",flexWrap:"wrap",gap:8 }}>
+      <div style={{ display:"flex",justifyContent:"space-around",flexWrap:"wrap",gap:12 }}>
         <div style={{ textAlign:"center" }}>
-          <div style={{ color:"#1d8a4c",fontSize:10,fontFamily:"Georgia,serif",letterSpacing:1,marginBottom:6 }}>SEQUENCE (RUN)</div>
-          <div style={{ display:"flex",gap:6 }}><PlayingCard rank="3" suit="H"/><PlayingCard rank="4" suit="H"/><PlayingCard rank="5" suit="H"/></div>
+          <div style={{ color:NEON_CYAN,fontSize:11,fontFamily:"'Inter', sans-serif",fontWeight:"bold",letterSpacing:1,marginBottom:8 }}>SEQUENCE (RUN)</div>
+          <div style={{ display:"flex",gap:4 }}><PlayingCard rank="3" suit="H"/><PlayingCard rank="4" suit="H"/><PlayingCard rank="5" suit="H"/></div>
         </div>
         <div style={{ textAlign:"center" }}>
-          <div style={{ color:"#c8a940",fontSize:10,fontFamily:"Georgia,serif",letterSpacing:1,marginBottom:6 }}>SET (GROUP)</div>
-          <div style={{ display:"flex",gap:6 }}><PlayingCard rank="7" suit="S"/><PlayingCard rank="7" suit="D"/><PlayingCard rank="7" suit="C"/></div>
+          <div style={{ color:NEON_PURP,fontSize:11,fontFamily:"'Inter', sans-serif",fontWeight:"bold",letterSpacing:1,marginBottom:8 }}>SET (GROUP)</div>
+          <div style={{ display:"flex",gap:4 }}><PlayingCard rank="7" suit="S"/><PlayingCard rank="7" suit="D"/><PlayingCard rank="7" suit="C"/></div>
         </div>
       </div>
+    </TableWrap>
+  );
+}
+
+function CribbageVisual() {
+  return (
+    <TableWrap>
+      <TableLabel>CRIBBAGE HAND SCORING</TableLabel>
+      <div style={{ display:"flex",justifyContent:"center",gap:6,flexWrap:"wrap",marginBottom:20 }}>
+        <PlayingCard rank="5" suit="S"/><PlayingCard rank="5" suit="D"/><PlayingCard rank="J" suit="H"/><PlayingCard rank="4" suit="C"/>
+        <div style={{ marginLeft: 16 }}>
+          <PlayingCard rank="6" suit="H"/>
+        </div>
+      </div>
+      <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:10 }}>
+        {[["Fifteens (5+10, etc.)","2 pts each"],["Pairs (5+5)","2 pts"],["Runs (4-5-6)","3 pts"],["Nobs (Jack of start suit)","1 pt"]].map(([l,s])=>(
+          <div key={l} style={{ background:"rgba(139,92,246,0.05)",border:"1px solid rgba(139,92,246,0.2)",borderRadius:8,padding:"10px 12px" }}>
+            <div style={{ color:NEON_PURP,fontSize:12,fontFamily:"'Inter', sans-serif",fontWeight:"bold" }}>{l}</div>
+            <div style={{ color:"#94a3b8",fontSize:11,fontFamily:"'Inter', sans-serif",marginTop:2 }}>{s}</div>
+          </div>
+        ))}
+      </div>
+    </TableWrap>
+  );
+}
+
+function PaiGowVisual() {
+  return (
+    <TableWrap>
+      <TableLabel>PAI GOW HAND SPLIT</TableLabel>
+      <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:16 }}>
+        <div>
+          <div style={{ color:NEON_CYAN, fontSize:10, marginBottom:8, textAlign:"center", fontWeight:"bold" }}>5-CARD HAND (Must be higher)</div>
+          <div style={{ display:"flex", gap:6 }}>
+            <PlayingCard rank="A" suit="S"/><PlayingCard rank="K" suit="S"/><PlayingCard rank="Q" suit="S"/><PlayingCard rank="J" suit="S"/><PlayingCard rank="10" suit="S"/>
+          </div>
+        </div>
+        <Divider />
+        <div>
+          <div style={{ color:NEON_PURP, fontSize:10, marginBottom:8, textAlign:"center", fontWeight:"bold" }}>2-CARD HAND</div>
+          <div style={{ display:"flex", gap:6 }}>
+            <PlayingCard rank="8" suit="H"/><PlayingCard rank="8" suit="D"/>
+          </div>
+        </div>
+      </div>
+    </TableWrap>
+  );
+}
+
+function SicBoVisual() {
+  return (
+    <TableWrap>
+      <TableLabel>SIC BO ROLL</TableLabel>
+      <div style={{ display:"flex",justifyContent:"center",gap:16,marginBottom:20 }}>
+        <DieComponent value={4}/><DieComponent value={4}/><DieComponent value={6}/>
+      </div>
+      <Divider/>
+      <div style={{ display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8 }}>
+        {[["Small (4-10)","Loses"],["Big (11-17)","Wins (14)"],["Double 4","Wins"]].map(([l,s])=>(
+          <div key={l} style={{ background:"rgba(6,182,212,0.05)",border:"1px solid rgba(6,182,212,0.2)",borderRadius:8,padding:"10px 4px",textAlign:"center" }}>
+            <div style={{ color:NEON_CYAN,fontSize:11,fontFamily:"'Inter', sans-serif",fontWeight:"bold" }}>{l}</div>
+            <div style={{ color:"#94a3b8",fontSize:10,fontFamily:"'Inter', sans-serif",marginTop:2 }}>{s}</div>
+          </div>
+        ))}
+      </div>
+    </TableWrap>
+  );
+}
+
+function LetItRideVisual() {
+  return (
+    <TableWrap>
+      <CardRow color={NEON_PURP} label="COMMUNITY CARDS" cards={[{rank:"A",suit:"S"},{faceDown:true}]} />
+      <div style={{ textAlign:"center", marginTop:14, marginBottom:14 }}>
+        <div style={{ display:"inline-flex", gap:16 }}>
+          <Chip color="cyan" label="$10"/><Chip color="cyan" label="$10"/><Chip color="cyan" label="$10"/>
+        </div>
+        <div style={{ color:"#94a3b8", fontSize:11, fontFamily:"'Inter', sans-serif", marginTop:8 }}>You can pull back up to 2 bets</div>
+      </div>
+      <Divider />
+      <CardRow label="YOUR HAND" cards={[{rank:"K",suit:"S"},{rank:"Q",suit:"S"},{rank:"J",suit:"S"}]} />
+    </TableWrap>
+  );
+}
+
+function CaribbeanVisual() {
+  return (
+    <TableWrap>
+      <CardRow color={NEON_PINK} label="DEALER HAND" cards={[{rank:"A",suit:"H"},{faceDown:true},{faceDown:true},{faceDown:true},{faceDown:true}]} />
+      <div style={{ textAlign:"center", marginTop:14, marginBottom:14 }}>
+        <div style={{ display:"inline-flex", gap:16 }}>
+          <Chip color="cyan" label="ANTE"/><Chip color="pink" label="PLAY (2x)"/><Chip color="gold" label="JACKPOT"/>
+        </div>
+        <div style={{ color:"#94a3b8", fontSize:11, fontFamily:"'Inter', sans-serif", marginTop:8 }}>Dealer needs A-K or better to qualify</div>
+      </div>
+      <Divider />
+      <CardRow label="YOUR HAND" cards={[{rank:"K",suit:"C"},{rank:"K",suit:"D"},{rank:"4",suit:"S"},{rank:"8",suit:"H"},{rank:"2",suit:"C"}]} />
     </TableWrap>
   );
 }
@@ -306,7 +420,7 @@ function GenericCardVisual({ cards }) {
   return (
     <TableWrap>
       <TableLabel>EXAMPLE HAND</TableLabel>
-      <div style={{ display:"flex",justifyContent:"center",gap:10,flexWrap:"wrap" }}>
+      <div style={{ display:"flex",justifyContent:"center",gap:6,flexWrap:"wrap" }}>
         {cards.map((c,i)=><PlayingCard key={i} rank={c.rank} suit={c.suit} faceDown={c.faceDown}/>)}
       </div>
     </TableWrap>
@@ -337,6 +451,11 @@ function GameVisual({ game }) {
     farkle: <FarkleVisual/>,
     rummy: <RummyVisual/>,
     gin_rummy: <RummyVisual/>,
+    cribbage: <CribbageVisual/>,
+    pai_gow: <PaiGowVisual/>,
+    sic_bo: <SicBoVisual/>,
+    let_it_ride: <LetItRideVisual/>,
+    caribbean_stud: <CaribbeanVisual/>
   };
   if (map[game.id]) return map[game.id];
   if (game.visualCards) return <GenericCardVisual cards={game.visualCards}/>;
@@ -448,6 +567,57 @@ const GAMES = [
     mistakes:["Playing hands below Q-6-4.","Overlooking the Ante Bonus — it pays even if you lose to the dealer."],
     payouts:[{bet:"Ante/Play win",pays:"1:1"},{bet:"Pair Plus — Pair",pays:"1:1"},{bet:"Pair Plus — Flush",pays:"3:1"},{bet:"Pair Plus — Straight",pays:"6:1"},{bet:"Pair Plus — Three of a Kind",pays:"30:1"},{bet:"Pair Plus — Straight Flush",pays:"40:1"}],
   },
+  {
+    id:"pai_gow", name:"Pai Gow Poker", emoji:"🀄", category:"Casino — Cards",
+    players:"1–6 vs. Dealer", difficulty:"Medium", type:"card",
+    tagline:"Split 7 cards into a high and low hand to beat the dealer.",
+    overview:"Pai Gow Poker is a slower-paced casino game where you receive seven cards and must arrange them into two hands: a 5-card hand and a 2-card hand. You must beat both of the dealer's corresponding hands to win your bet.",
+    terminology:[
+      {term:"High Hand",def:"Your 5-card hand. Must rank higher than your 2-card hand."},
+      {term:"Low Hand",def:"Your 2-card hand. Can only be a pair or high cards."},
+      {term:"Copy",def:"A tie between hands. The dealer wins all copies."},
+      {term:"Fouling",def:"Making your 2-card hand higher than your 5-card hand (an automatic loss)."},
+      {term:"House Way",def:"The standardized set of rules the dealer must use to set their hand."},
+    ],
+    setup:["Played with a 53-card deck (standard deck plus one Joker).","The Joker acts as a bug: it can complete a straight or flush, otherwise it is an Ace.","Place your bet. You receive 7 cards."],
+    howToPlay:["Arrange your 7 cards into a 5-card high hand and a 2-card low hand.","The 5-card hand MUST be stronger than the 2-card hand.","The dealer sets their hand according to strict 'House Way' rules.","Compare 5-card hands, then 2-card hands.","Win both = You win 1:1 (minus 5% commission).","Win one, lose one = Push (your bet is returned).","Lose both (or tie/copy) = You lose the bet."],
+    strategy:["The optimal strategy is complex, but generally: if no pairs, put the highest card in the back and next two highest in the front.","With two pair: split them unless you have an Ace to play in the front.","You can ask the dealer to set your hand 'House Way' if unsure."],
+    mistakes:["Fouling your hand by making the 2-card hand stronger.","Not utilizing the Joker properly (it's not fully wild)."],
+    payouts:[{bet:"Win both hands",pays:"1:1 (minus 5% comm.)"},{bet:"Win 1, Lose 1",pays:"Push"},{bet:"Lose both",pays:"Loss"}],
+  },
+  {
+    id:"let_it_ride", name:"Let It Ride", emoji:"🏇", category:"Casino — Cards",
+    players:"1–7", difficulty:"Easy", type:"card",
+    tagline:"Pull bets back if you don't like your cards.",
+    overview:"Let It Ride flips the usual betting structure: you start with three bets and can pull two of them back as cards are revealed. You win based on a payout table for your final 5-card hand (no dealer hand to beat).",
+    terminology:[
+      {term:"Pull",def:"Taking back one of your three bets."},
+      {term:"Let It Ride",def:"Leaving your bet on the table."},
+      {term:"Community Cards",def:"Two face-down cards shared by all players."},
+    ],
+    setup:["Place three equal bets on circles marked 1, 2, and $ (or 3).","You are dealt three private cards; two community cards are dealt face-down."],
+    howToPlay:["Look at your 3 cards. If you like them, 'Let It Ride'. If not, pull your bet back from circle 1.","The dealer reveals the first community card.","Look at your 4-card hand. Again, 'Let It Ride' or pull back the bet from circle 2.","The final community card is revealed. Your third bet ($) cannot be pulled back.","If your 5-card hand is a Pair of 10s or better, all remaining bets win according to the paytable."],
+    strategy:["With 3 cards: Only let it ride if you have a paying pair (10s+), 3-to-a-Royal, or 3-to-a-Straight Flush (with high cards).","With 4 cards: Let it ride if you have a paying pair, two pair, 4-to-a-Flush, or an open-ended 4-to-a-Straight (with high cards).","Otherwise, always pull your bet back."],
+    mistakes:["Letting it ride on weak draws just because you 'feel lucky'.","Pulling a bet when you already have a guaranteed paying hand (Pair of 10s or better)."],
+    payouts:[{bet:"Pair of 10s or better",pays:"1:1"},{bet:"Two Pair",pays:"2:1"},{bet:"Three of a Kind",pays:"3:1"},{bet:"Straight",pays:"11:1"},{bet:"Flush",pays:"8:1"},{bet:"Full House",pays:"11:1"},{bet:"Four of a Kind",pays:"50:1"},{bet:"Straight Flush",pays:"200:1"},{bet:"Royal Flush",pays:"1000:1"}],
+  },
+  {
+    id:"caribbean_stud", name:"Caribbean Stud Poker", emoji:"🌴", category:"Casino — Cards",
+    players:"1–7 vs. Dealer", difficulty:"Easy", type:"card",
+    tagline:"5-card stud against the house with a huge jackpot.",
+    overview:"A casino table game based on 5-card stud poker. You play against the dealer, but the dealer must 'qualify' to play. There is also a progressive jackpot side bet for premium hands.",
+    terminology:[
+      {term:"Ante",def:"Initial mandatory bet."},
+      {term:"Play",def:"A bet exactly 2x the Ante to stay in the hand."},
+      {term:"Qualify",def:"The dealer needs at least an Ace and a King in their 5-card hand to qualify."},
+      {term:"Progressive",def:"A $1 side bet that pays out for flushes, full houses, and straight/royal flushes."},
+    ],
+    setup:["Place your Ante bet. Optionally place a $1 chip for the progressive jackpot.","You receive 5 cards face-down.","The dealer receives 5 cards (4 face-down, 1 face-up)."],
+    howToPlay:["Look at your hand and the dealer's upcard.","Decide to Fold (lose Ante) or Play (place bet 2x the Ante).","Dealer reveals their hand.","If dealer does NOT qualify (worse than A-K): You win 1:1 on Ante; Play bet pushes.","If dealer QUALIFIES and you win: Ante wins 1:1. Play bet wins based on a paytable (Pair 1:1, Two Pair 2:1, etc.).","If dealer QUALIFIES and you lose: You lose both bets."],
+    strategy:["Always Play with a pair or higher.","Always Fold with less than Ace-King high.","If you hold Ace-King, Play if the dealer's upcard matches one of your other three cards (makes it less likely the dealer paired)."],
+    mistakes:["Folding small pairs.","Playing weak Ace-high or King-high hands without the other."],
+    payouts:[{bet:"Ante Win",pays:"1:1"},{bet:"Play - Pair/High Card",pays:"1:1"},{bet:"Play - Two Pair",pays:"2:1"},{bet:"Play - Three of a Kind",pays:"3:1"},{bet:"Play - Straight",pays:"4:1"},{bet:"Play - Flush",pays:"5:1"},{bet:"Play - Full House",pays:"7:1"},{bet:"Play - 4 of a Kind",pays:"20:1"}],
+  },
   /* ── CASINO TABLE GAMES ── */
   {
     id:"roulette", name:"Roulette", emoji:"🎡", category:"Casino — Table",
@@ -487,9 +657,42 @@ const GAMES = [
     strategy:["Pass Line + maximum Free Odds: house edge under 0.5%.","Place 6 and 8 are the next-best bets — 1.52% house edge.","Avoid center bets (Hardways, Any Seven, Big 6/8) — house edges 9–16%."],
     mistakes:["Not taking Free Odds — it's the only zero-edge bet in the casino.","Betting Field or Any Seven — looks tempting, terrible value.","Betting Hardways as a primary strategy."],
     payouts:[{bet:"Pass / Come",pays:"1:1"},{bet:"Free Odds on 4 or 10",pays:"2:1"},{bet:"Free Odds on 5 or 9",pays:"3:2"},{bet:"Free Odds on 6 or 8",pays:"6:5"},{bet:"Place 6 or 8",pays:"7:6"},{bet:"Place 5 or 9",pays:"7:5"}],
-    visualDice:[5,3],
+  },
+  {
+    id:"sic_bo", name:"Sic Bo", emoji:"🎲", category:"Casino — Dice",
+    players:"1–10", difficulty:"Easy", type:"dice",
+    tagline:"Predict the outcome of three shaking dice.",
+    overview:"An ancient Chinese game of chance played with three dice. The dealer shakes them in a glass dome, and players bet on the massive table layout showing all possible combinations.",
+    terminology:[
+      {term:"Small",def:"Total score of the 3 dice is 4 to 10 (excluding triples)."},
+      {term:"Big",def:"Total score of the 3 dice is 11 to 17 (excluding triples)."},
+      {term:"Triple",def:"All three dice show the same number (e.g., 4-4-4)."},
+    ],
+    setup:["Buy chips and place them on the table layout before the dealer stops betting.","The dealer activates the shaker, rolling the 3 dice."],
+    howToPlay:["Place your bets on any area of the board (Total sum, Small/Big, Doubles, Triples, specific numbers).","The dealer reveals the three dice.","Winning areas light up on the board, and payouts are made."],
+    strategy:["Betting Small or Big offers the best odds (House edge ~2.78%), paying 1:1.","Avoid specific triples (House edge can be 16%+) unless just for fun.","Combination bets (two specific numbers) have decent odds (~2.77% edge)."],
+    mistakes:["Chasing massive payouts like 'Specific Triple' (180:1) as a primary strategy.","Betting conflicting outcomes that cancel each other out."],
+    payouts:[{bet:"Small / Big",pays:"1:1"},{bet:"Specific Double",pays:"10:1"},{bet:"Specific Triple",pays:"180:1"},{bet:"Any Triple",pays:"30:1"},{bet:"Two-Dice Combination",pays:"6:1"}],
   },
   /* ── CLASSIC CARD GAMES ── */
+  {
+    id:"cribbage", name:"Cribbage", emoji:"🧮", category:"Classic — Cards",
+    players:"2", difficulty:"Medium", type:"card",
+    tagline:"Score points with fifteens, pairs, and runs on a wooden board.",
+    overview:"Cribbage is a beloved classic card game uniquely scored on a pegboard. Players create combinations of cards that sum to 15, form pairs, or make runs. A unique element is the 'Crib', a separate hand scored by the dealer.",
+    terminology:[
+      {term:"The Crib",def:"Four extra cards (two discarded by each player) that belong to the dealer."},
+      {term:"Pegging",def:"Scoring points during the card-playing phase."},
+      {term:"Fifteen",def:"Any combination of cards summing exactly to 15 (scores 2 points)."},
+      {term:"Nobs",def:"Holding a Jack of the same suit as the starter card (scores 1 point)."},
+      {term:"Muggins",def:"Stealing points an opponent forgot to claim (if playing with this optional rule)."},
+    ],
+    setup:["Standard 52-card deck and a Cribbage board.","Deal 6 cards to each player.","Each player chooses 2 cards to discard face-down into the 'Crib'.","Non-dealer cuts the deck; dealer flips the top card (the Starter). If it's a Jack, dealer pegs 2 points ('His Heels')."],
+    howToPlay:["**The Play:** Players take turns laying down one card face-up, announcing the running total.","Total cannot exceed 31. If you can't play, say 'Go'. Opponent plays until they can't. Last player to play pegs 1 (or 2 if exactly 31).","Peg points during play for reaching 15, pairs, and runs.","**The Show:** After all cards are played, players score their hands using their 4 cards + the Starter card.","Score 2 pts for every combination of 15. Score pairs (2), triples (6), runs (1 pt/card), and flushes.","Non-dealer scores first, then dealer scores their hand, then dealer scores the Crib.","First to 121 points wins."],
+    strategy:["When discarding to opponent's crib, break up 15s, 5s, and connected cards (e.g., 7-8).","When discarding to your own crib, give yourself 5s or connected cards.","During play, try not to make the count 21 (sets up opponent for an easy 31).","Leading a 4 is very safe; leading a 5 is very dangerous (opponent plays a 10-card for 15)."],
+    mistakes:["Missing 15s during the Show (count methodically!).","Discarding a 5 to the opponent's crib (5s are the most valuable cards in cribbage)."],
+    payouts:[{bet:"Fifteen",pays:"2 pts"},{bet:"Pair",pays:"2 pts"},{bet:"Run of 3+",pays:"1 pt per card"},{bet:"Flush (4 or 5)",pays:"1 pt per card"},{bet:"Nobs",pays:"1 pt"},{bet:"Target",pays:"121 pts to win"}],
+  },
   {
     id:"rummy", name:"Rummy", emoji:"🎴", category:"Classic — Cards",
     players:"2–6", difficulty:"Easy", type:"card",
@@ -501,16 +704,13 @@ const GAMES = [
       {term:"Sequence (Run)",def:"Three or more consecutive cards of the same suit (e.g., 4♥ 5♥ 6♥)."},
       {term:"Deadwood",def:"Unmelded cards remaining in your hand — each counts against your score."},
       {term:"Discard Pile",def:"Face-up pile that players may draw from instead of the stock."},
-      {term:"Stock",def:"The face-down draw pile."},
       {term:"Going Out",def:"Melding your remaining cards and discarding your final card to end the round."},
-      {term:"Knock",def:"Ending the round even with some unmatched deadwood (variant rule)."},
     ],
-    setup:["Standard 52-card deck. 2 players: deal 10 cards each. 3–4 players: 7 cards. 5–6 players: 6 cards.","Place remaining cards face-down as the stock.","Turn the top card face-up beside the stock to start the discard pile.","Youngest player goes first (or cut for high card)."],
-    howToPlay:["On your turn: draw the top card from the stock OR the top card from the discard pile.","Optionally lay down any valid melds face-up on the table.","Optionally add cards to existing melds (your own or other players').","Discard one card face-up to end your turn.","First player to meld all cards and discard wins the round.","Remaining players score penalty points equal to their deadwood (face cards = 10; Ace = 1)."],
-    strategy:["Watch the discard pile — it reveals what opponents are building.","Don't draw from the discard pile unless it completes a meld.","Hold on to high-value cards (face cards) only if they're nearly melded.","Going out quickly, even with small deadwood in some variants, prevents opponents from building.","Flexible cards (middle-rank cards like 6, 7, 8) can form melds in more directions."],
-    mistakes:["Drawing from the discard pile too liberally — you're showing opponents what you need.","Hoarding high-value unmatched cards — they hurt your score when someone goes out.","Forgetting you can add cards to other players' existing melds."],
-    payouts:[{bet:"Winner",pays:"0 points"},{bet:"Loser penalty",pays:"Sum of deadwood"},{bet:"First to 100 pts loses",pays:"(or wins — varies by variant)"}],
-    visualCards:[{rank:"3",suit:"H"},{rank:"4",suit:"H"},{rank:"5",suit:"H"},{rank:"7",suit:"S"},{rank:"7",suit:"D"},{rank:"7",suit:"C"},{rank:"K",suit:"S"}],
+    setup:["Standard 52-card deck. 2 players: deal 10 cards each. 3–4 players: 7 cards. 5–6 players: 6 cards.","Place remaining cards face-down as the stock.","Turn the top card face-up beside the stock to start the discard pile."],
+    howToPlay:["On your turn: draw the top card from the stock OR the top card from the discard pile.","Optionally lay down any valid melds face-up on the table.","Optionally add cards to existing melds (your own or other players').","Discard one card face-up to end your turn.","First player to meld all cards and discard wins the round."],
+    strategy:["Watch the discard pile — it reveals what opponents are building.","Don't draw from the discard pile unless it completes a meld.","Flexible cards (middle-rank cards like 6, 7, 8) can form melds in more directions."],
+    mistakes:["Drawing from the discard pile too liberally — you're showing opponents what you need.","Hoarding high-value unmatched cards — they hurt your score when someone goes out."],
+    payouts:[{bet:"Winner",pays:"0 points"},{bet:"Loser penalty",pays:"Sum of deadwood"}],
   },
   {
     id:"gin_rummy", name:"Gin Rummy", emoji:"🥃", category:"Classic — Cards",
@@ -522,283 +722,81 @@ const GAMES = [
       {term:"Knock",def:"Ending the round with 10 or fewer points of deadwood."},
       {term:"Undercut",def:"If the non-knocker's deadwood is ≤ the knocker's, non-knocker wins and gets a 25-pt bonus."},
       {term:"Layoff",def:"After a knock, the non-knocker may add their unmatched cards to the knocker's melds."},
-      {term:"Deadwood",def:"Unmelded cards in your hand — Ace=1, face cards=10, numbered=face value."},
     ],
-    setup:["Standard 52-card deck; Aces are low.","Deal 10 cards to each player.","Place remaining cards as the stock. Turn one card up to start discard pile.","The non-dealer may take the upcard; if they decline, dealer may take it. If both decline, non-dealer draws from stock and play begins."],
-    howToPlay:["Draw one card (stock or discard). Form melds in your hand. Discard one card.","When your deadwood is 10 or less, you may Knock by discarding face-down.","After a Knock: both players reveal hands. Non-knocker may lay off cards onto knocker's melds.","Score = knocker's deadwood minus non-knocker's remaining deadwood.","If knocker wins: they score the difference. If non-knocker ties or beats knocker: undercut! Non-knocker scores difference plus 25-pt bonus.","Gin (zero deadwood): score opponent's deadwood plus 25-pt bonus.","Game ends when a player reaches 100 points. Line bonus (+25) and box bonuses are added."],
-    strategy:["Aim for Gin when you're close — the 25-point bonus is significant.","Knock early with low deadwood rather than risking an undercut.","Watch the discard pile carefully — if you see your opponent drawing specific suits or ranks, stop discarding those.","A 10-point knock is only worth it if your opponent has high deadwood.","Middle-rank cards (5,6,7,8) are the most versatile for melds."],
-    mistakes:["Knocking with too much deadwood — opponent may undercut you.","Drawing from the discard pile when it reveals your meld strategy.","Discarding without thinking about what your opponent needs."],
-    payouts:[{bet:"Knock win",pays:"Deadwood difference"},{bet:"Gin",pays:"Opponent deadwood + 25 bonus"},{bet:"Undercut",pays:"Difference + 25 bonus to non-knocker"},{bet:"Game win (100 pts)",pays:"+25 line bonus"}],
+    setup:["Standard 52-card deck; Aces are low.","Deal 10 cards to each player.","Turn one card up to start discard pile."],
+    howToPlay:["Draw one card (stock or discard). Form melds in your hand. Discard one card.","When your deadwood is 10 or less, you may Knock by discarding face-down.","After a Knock: both players reveal hands. Non-knocker may lay off cards onto knocker's melds.","Score = knocker's deadwood minus non-knocker's remaining deadwood.","If knocker wins: they score the difference. If non-knocker ties or beats knocker: undercut! Non-knocker scores difference plus 25-pt bonus."],
+    strategy:["Aim for Gin when you're close — the 25-point bonus is significant.","Knock early with low deadwood rather than risking an undercut."],
+    mistakes:["Knocking with too much deadwood — opponent may undercut you.","Discarding without thinking about what your opponent needs."],
+    payouts:[{bet:"Knock win",pays:"Deadwood difference"},{bet:"Gin",pays:"Opponent deadwood + 25 bonus"},{bet:"Undercut",pays:"Difference + 25 bonus to non-knocker"}],
     visualCards:[{rank:"J",suit:"D"},{rank:"Q",suit:"D"},{rank:"K",suit:"D"},{rank:"7",suit:"H"},{rank:"7",suit:"S"},{rank:"7",suit:"C"},{rank:"4",suit:"S"},{rank:"9",suit:"H"},{rank:"2",suit:"C"},{rank:"A",suit:"S"}],
-  },
-  {
-    id:"crazy_eights", name:"Crazy Eights", emoji:"8️⃣", category:"Classic — Cards",
-    players:"2–5", difficulty:"Easy", type:"card",
-    tagline:"Be the first to empty your hand by matching suit or rank.",
-    overview:"Crazy Eights is one of the most popular shedding card games and the direct ancestor of Uno. Match the top card of the discard pile by suit or rank, or play an Eight (wild card) to change the suit. First to empty their hand wins.",
-    terminology:[
-      {term:"Wild Card",def:"An Eight — can be played on anything, and lets you call a new suit."},
-      {term:"Skip / Draw",def:"Certain cards cause the next player to skip a turn or draw cards (variant rules)."},
-      {term:"Knocking",def:"Some variants let you knock if you can't play, instead of drawing."},
-    ],
-    setup:["Standard 52-card deck.","Deal 5 cards to each player (7 cards for 2-player).","Place remaining cards face-down as the draw pile.","Turn the top card face-up to start the discard pile. If it's an Eight, bury it and flip another."],
-    howToPlay:["On your turn, play a card that matches the top discard's suit OR rank.","If you play an Eight, announce the new suit that must be followed.","If you cannot play, draw from the stock until you can play (or draw 1 in some variants).","In standard rules: 2 = next player draws 2; Q = skip; A = reverse direction (4+ players).","First player to play all their cards wins.","Other players score the cards remaining in their hands (Eights = 50, face cards = 10, numbered = face value)."],
-    strategy:["Save Eights for emergencies — when you're stuck and need a lifeline.","Change suit to one where opponents are likely to get stuck.","Pay attention to what suit opponents are holding based on their draws.","Try to empty your hand of one suit to open up plays."],
-    mistakes:["Playing Eights too early just because you can.","Ignoring what suit opponents might need."],
-    payouts:[{bet:"Winner",pays:"0 points"},{bet:"8",pays:"50 points against"},{bet:"Face card",pays:"10 points against"},{bet:"Numbered card",pays:"Face value against"}],
-    visualCards:[{rank:"8",suit:"H"},{rank:"Q",suit:"H"},{rank:"Q",suit:"S"},{rank:"Q",suit:"D"},{rank:"3",suit:"C"}],
-  },
-  {
-    id:"go_fish", name:"Go Fish", emoji:"🐠", category:"Classic — Cards",
-    players:"2–6", difficulty:"Easy", type:"card",
-    tagline:"Ask opponents for cards to collect the most four-of-a-kind sets.",
-    overview:"Go Fish is a classic and simple card game, especially beloved by younger players. Collect sets of four cards of the same rank by asking opponents for specific cards. If they don't have it, they say \"Go Fish\" and you draw from the pond.",
-    terminology:[
-      {term:"Book",def:"A complete set of four cards of the same rank (all four 7s, all four Queens, etc.)."},
-      {term:"Go Fish",def:"The response when an opponent asks for a card you don't have — they draw from the deck."},
-      {term:"The Pond",def:"The face-down draw pile in the center of the table."},
-    ],
-    setup:["Standard 52-card deck.","Deal 7 cards to each player (5 cards if 4+ players).","Remaining cards go face-down in the center as the pond.","Sort your hand and check for any immediate Books."],
-    howToPlay:["On your turn, ask any one opponent for a specific rank you hold at least one of (e.g., \"Do you have any 7s?\").","If they do: they must hand over ALL cards of that rank. You get another turn.","If they don't: they say \"Go Fish!\" and you draw the top card from the pond.","If you draw the card you asked for, show it and take another turn.","When you complete a Book (all four of a rank), lay it face-up in front of you.","The game ends when all cards are in Books. Most Books wins."],
-    strategy:["Remember what others have asked for — they must hold at least one of what they ask.","Ask for ranks you have three of — completing a Book is the priority.","Keep track of what each player picks up from the pond.","Ask the player most likely to have the card (based on observed draws/asks)."],
-    mistakes:["Asking for a rank you don't hold yourself (not allowed).","Forgetting to lay down a completed Book immediately.","Not paying attention to opponents' questions (they reveal what they hold)."],
-    payouts:[{bet:"Most Books",pays:"Winner"},{bet:"Tie",pays:"Shared win"}],
-    visualCards:[{rank:"7",suit:"S"},{rank:"7",suit:"H"},{rank:"7",suit:"D"},{rank:"7",suit:"C"}],
-  },
-  {
-    id:"war", name:"War", emoji:"⚔️", category:"Classic — Cards",
-    players:"2", difficulty:"Easy", type:"card",
-    tagline:"The simplest card game ever — flip and compare.",
-    overview:"War is arguably the simplest card game there is — virtually no decisions, pure luck, and beloved by children everywhere. Split the deck and flip cards simultaneously. Higher card takes both. If they tie, it's War.",
-    terminology:[
-      {term:"War",def:"When both players flip cards of equal rank — each player plays three face-down cards and one face-up."},
-      {term:"Battle",def:"Each simultaneous flip of cards."},
-    ],
-    setup:["Standard 52-card deck.","Split the deck evenly — 26 cards each, face-down.","Aces are high (beat all other cards)."],
-    howToPlay:["Simultaneously, both players flip the top card of their pile.","Higher card wins both cards (place them at the bottom of the winner's pile).","If cards are equal rank: War! Each player places 3 cards face-down, then flips a 4th card up. Higher face-up card wins all 10 cards.","If the War cards also tie, repeat the War procedure.","The player who collects all 52 cards wins."],
-    strategy:["There is no strategy — War is entirely luck-based. Enjoy the chaos!"],
-    mistakes:["Looking at your cards — they should always stay face-down until played.","Shuffling poorly before splitting — this can create lopsided games."],
-    payouts:[{bet:"Win all 52 cards",pays:"Victory"}],
-    visualCards:[{rank:"A",suit:"S"},{rank:"A",suit:"H"}],
   },
   {
     id:"solitaire", name:"Klondike Solitaire", emoji:"🂡", category:"Solo — Cards",
     players:"1", difficulty:"Easy", type:"card",
     tagline:"The classic solo card game — build four foundation piles Ace to King.",
-    overview:"Klondike Solitaire (commonly called simply \"Solitaire\") is the most played card game in history — largely due to its inclusion in Windows. The goal is to move all 52 cards to four Foundation piles, one per suit, built up from Ace to King.",
+    overview:"Klondike Solitaire (commonly called simply \"Solitaire\") is the most played card game in history. The goal is to move all 52 cards to four Foundation piles, one per suit, built up from Ace to King.",
     terminology:[
       {term:"Tableau",def:"The seven columns of cards you build and manipulate during play."},
       {term:"Foundation",def:"Four piles (one per suit) built Ace → King. Filling all four wins the game."},
       {term:"Stock",def:"The remaining draw pile after the Tableau is dealt."},
       {term:"Waste Pile",def:"Cards drawn from the Stock go here. Top card is available to play."},
-      {term:"Sequence",def:"Cards in the Tableau must be placed in descending rank, alternating Red/Black."},
     ],
-    setup:["Shuffle 52 cards.","Deal 7 columns: column 1 gets 1 card, column 2 gets 2, … column 7 gets 7 cards.","Top card of each column is face-up; rest are face-down.","Remaining 24 cards form the Stock (draw pile)."],
-    howToPlay:["Move cards between Tableau columns: place a card on one that is one rank higher and opposite color.","You may move face-up sequences of cards together as a unit.","When a face-down card is uncovered, flip it face-up.","An empty column can only be filled with a King (or a sequence starting with a King).","Draw from the Stock (1 or 3 cards at a time depending on variant).","Ace → Foundation: move any Ace to a Foundation. Then build 2, 3, 4… up to King on that Foundation.","Win by getting all 52 cards onto the Foundations."],
-    strategy:["Prioritize uncovering face-down Tableau cards over moving to Foundations early.","Move Kings to empty columns only if they free important face-down cards.","In draw-3 variant, plan your Stock cycling carefully.","Avoid stacking too many cards on one column — spread them out."],
-    mistakes:["Moving cards to Foundations too eagerly — you may need them in the Tableau.","Filling empty columns with small cards instead of Kings.","Not thinking ahead when there are multiple valid moves."],
-    payouts:[{bet:"All 52 to Foundation",pays:"Victory"},{bet:"Win rate (Vegas draw-1)",pays:"~34%"}],
+    setup:["Shuffle 52 cards.","Deal 7 columns: column 1 gets 1 card, column 2 gets 2, … column 7 gets 7 cards.","Top card of each column is face-up; rest are face-down.","Remaining 24 cards form the Stock."],
+    howToPlay:["Move cards between Tableau columns: place a card on one that is one rank higher and opposite color.","You may move face-up sequences of cards together as a unit.","When a face-down card is uncovered, flip it face-up.","An empty column can only be filled with a King.","Draw from the Stock (1 or 3 cards at a time depending on variant).","Ace → Foundation: move any Ace to a Foundation. Then build 2, 3, 4… up to King on that Foundation."],
+    strategy:["Prioritize uncovering face-down Tableau cards over moving to Foundations early.","Move Kings to empty columns only if they free important face-down cards."],
+    mistakes:["Emptying a column without a King ready to fill it.","Moving cards to Foundations too quickly, trapping cards you need for the Tableau."],
+    payouts:[{bet:"Win",pays:"All cards in Foundations"}],
   },
   {
-    id:"golf_card", name:"Golf (Card Game)", emoji:"⛳", category:"Classic — Cards",
-    players:"2–4", difficulty:"Easy", type:"card",
-    tagline:"Like golf — lowest score wins after 9 holes (rounds).",
-    overview:"Golf is a delightful low-luck card game where each player has a 2x3 grid of six cards, most face-down. You swap cards trying to get the lowest score. Pairs in a column cancel each other out (score zero). After 9 rounds (\"holes\"), the lowest total wins — just like golf.",
+    id:"yahtzee", name:"Yahtzee", emoji:"🎲", category:"Classic — Dice",
+    players:"1+", difficulty:"Easy", type:"dice",
+    tagline:"Roll dice to fill scoring categories — aim for the elusive 5-of-a-kind.",
+    overview:"Yahtzee is a classic dice game of probability and risk. Roll 5 dice up to three times per turn to achieve specific combinations (like poker hands) and fill your 13-category scorecard.",
     terminology:[
-      {term:"Hole",def:"One complete round of play (drawing/swapping until someone knocks)."},
-      {term:"Column Pair",def:"Two cards of the same rank in the same column — they cancel out and score 0."},
-      {term:"Knock",def:"A player reveals their last face-down card, signaling the end of the hole."},
-      {term:"Score",def:"Numbered cards = face value; Ace = 1; J/Q = 10; K = 0; Joker = -2 (optional)."},
+      {term:"Yahtzee",def:"Five of a kind. Worth 50 points."},
+      {term:"Upper Section",def:"Categories for 1s, 2s, 3s, 4s, 5s, 6s."},
+      {term:"Lower Section",def:"Poker-style combinations (3 of a kind, Full House, Straights)."},
     ],
-    setup:["Standard 52-card deck (add 2 Jokers optional).","Deal 6 cards face-down to each player in a 2-wide, 3-tall grid.","Each player turns 2 of their 6 cards face-up at the start.","Remaining cards form the draw pile; top card starts the discard pile."],
-    howToPlay:["On your turn: draw from the stock OR take the top discard.","Swap the drawn card with any face-down or face-up card in your grid (discard the replaced card).","Or discard the drawn card and flip any one face-down card in your grid face-up (if drawing from stock).","If two cards in the same column are the same rank, they form a pair and score 0.","When a player has all 6 cards face-up, they knock. All other players get one final turn.","Total all face-up cards; pairs in same column = 0; unpaired cards score as listed.","After 9 holes, lowest cumulative score wins."],
-    strategy:["Prioritize revealing unknown face-down cards early to have information.","Always try to make column pairs — reducing your score by pairing is very powerful.","Kings (0 points) are the most valuable cards — swap them in for face cards.","If your score is already very low, knock as soon as possible before opponents catch up."],
-    mistakes:["Keeping high cards hoping for a pair — swap them out if they don't pair quickly.","Not knocking soon enough when you have a great hand.","Forgetting that Jokers score -2 (if used) — they're extremely valuable."],
-    payouts:[{bet:"Lowest 9-hole total",pays:"Winner"},{bet:"Column pair",pays:"0 points each card"}],
-    visualCards:[{rank:"K",suit:"S"},{rank:"K",suit:"H"},{rank:"2",suit:"C"},{rank:"A",suit:"D"},{faceDown:true},{faceDown:true}],
-  },
-  /* ── DICE GAMES ── */
-  {
-    id:"yahtzee", name:"Yahtzee", emoji:"🎲", category:"Dice Games",
-    players:"2–10", difficulty:"Easy", type:"dice",
-    tagline:"Roll five dice up to three times to complete your scorecard.",
-    overview:"Yahtzee is the quintessential dice game. On each turn you roll five dice up to three times, keeping any dice you want between rolls. Your goal is to fill in all 13 scoring categories on your scorecard over 13 rounds. Highest total score wins.",
-    terminology:[
-      {term:"Yahtzee",def:"All five dice showing the same face — scores 50 points. Subsequent Yahtzees score 100 bonus points each."},
-      {term:"Full House",def:"Three of one kind + two of another. Scores 25 points."},
-      {term:"Large Straight",def:"Five sequential dice (1-2-3-4-5 or 2-3-4-5-6). Scores 40 points."},
-      {term:"Small Straight",def:"Four sequential dice. Scores 30 points."},
-      {term:"Chance",def:"Any five dice — score is just the sum. Your safety net category."},
-      {term:"Upper Section Bonus",def:"Score 63+ in the upper section (aces through sixes) to earn a 35-point bonus."},
-    ],
-    setup:["Each player gets a scorecard.","Decide who goes first (highest single die roll).","Each turn consists of up to 3 rolls of all 5 dice."],
-    howToPlay:["Roll all 5 dice.","Set aside any dice you want to keep. Re-roll the rest (or all if you choose).","After up to 3 rolls, you must choose a scoring category to fill in.","Each category can only be used once per game.","If you can't score anywhere useful, take a \"0\" in any unfilled category.","After 13 rounds (all categories filled), tally scores. Highest wins."],
-    strategy:["Prioritize Yahtzee — it's the highest single-category score and yields bonuses.","Fill upper section with at least 3 of each number to hit the 63-point bonus (equivalent to three of each 1–6).","Use Chance for a bad roll rather than wasting a good category.","Large Straight is hard — go for it early when you have 4 of 5.","Keep Yahtzee opportunities open — even a pair of 6s is worth re-rolling for."],
-    mistakes:["Using Chance too early — save it for a genuinely bad roll.","Scoring low amounts in upper section hoping to hit 63 bonus later.","Wasting Yahtzee bonus by not having prepared the bonus slot.","Forgetting that Yahtzee can be used as a joker for lower-section categories."],
-    payouts:[{bet:"Three of a Kind",pays:"Sum of all dice"},{bet:"Four of a Kind",pays:"Sum of all dice"},{bet:"Full House",pays:"25 pts"},{bet:"Small Straight",pays:"30 pts"},{bet:"Large Straight",pays:"40 pts"},{bet:"Yahtzee",pays:"50 pts"},{bet:"Yahtzee Bonus",pays:"+100 pts each"}],
-    visualDice:[5,5,5,3,3],
+    setup:["Each player gets a scorecard.","Determine who goes first."],
+    howToPlay:["On your turn, roll 5 dice.","You may keep any number of dice and reroll the rest, up to 2 more times (3 rolls total).","After your 3rd roll (or sooner if you choose), you MUST enter a score or a zero in one of your 13 categories.","Once a category is filled, it cannot be used again.","Game ends after 13 rounds when scorecards are full."],
+    strategy:["Always aim for the Upper Section bonus (63 points required, meaning an average of three-of-a-kind for every number).","Use 'Chance' as a garbage bin for terrible rolls.","Don't waste early rolls putting zeros in hard categories — you might hit them later."],
+    mistakes:["Using Chance too early in the game.","Ignoring the 35-point Upper Section bonus."],
+    payouts:[{bet:"Yahtzee",pays:"50 pts"},{bet:"Large Straight",pays:"40 pts"},{bet:"Small Straight",pays:"30 pts"},{bet:"Full House",pays:"25 pts"}],
   },
   {
-    id:"farkle", name:"Farkle", emoji:"💥", category:"Dice Games",
-    players:"2–8", difficulty:"Easy", type:"dice",
-    tagline:"Keep rolling for points — but know when to bank before you Farkle!",
-    overview:"Farkle is a press-your-luck dice game. On your turn, roll all six dice and set aside any scoring dice. Then choose: bank your points, or roll the remaining dice to try to add more. If you roll and score nothing — you've Farkled, losing all accumulated points for that turn.",
+    id:"farkle", name:"Farkle", emoji:"🎲", category:"Classic — Dice",
+    players:"2+", difficulty:"Easy", type:"dice",
+    tagline:"Push your luck rolling six dice, but don't Farkle!",
+    overview:"A risk-taking dice game where you roll six dice to score points. You can keep rolling as long as you score, but if you roll and score nothing, you 'Farkle' and lose all points for that turn.",
     terminology:[
-      {term:"Farkle",def:"A roll where none of the dice score — you lose all turn points and your turn ends."},
-      {term:"Hot Dice",def:"When all six dice score in a single roll — you may roll all six again and keep accumulating."},
-      {term:"Banking",def:"Choosing to stop rolling and add your current turn points to your total score."},
-      {term:"Opening Score",def:"Most variants require 500 points in one turn to \"get on the board.\""},
+      {term:"Farkle",def:"Rolling the dice and getting zero scoring combinations. Turn ends, zero points."},
+      {term:"Hot Dice",def:"Scoring with all six dice. You get to pick them all up and keep rolling!"},
+      {term:"Bank",def:"Stopping your turn and adding your accumulated points to your total."},
     ],
-    setup:["Six standard dice.","Agree on a winning score (most common: 10,000 points).","Each player needs a score sheet."],
-    howToPlay:["Roll all six dice.","Set aside at least one scoring die (you must set aside something if any scoring dice exist).","Scoring dice: 1 = 100 pts; 5 = 50 pts; three 1s = 1,000 pts; three 2s = 200 pts; three of any number = that number × 100 pts.","Bank your points, or roll the remaining dice for more.","If all 6 dice score (Hot Dice), roll all 6 again with your running total intact.","If a roll yields no scoring dice: Farkle! Turn ends, all turn points lost.","First player to reach the target score (e.g., 10,000) triggers the final round — all others get one more turn."],
-    strategy:["Always bank if you have accumulated a large number (500+) with few dice remaining.","Rolling 2 dice: Farkle probability is about 44% — be cautious.","Rolling 1 die: 67% Farkle chance — almost never worth it unless you're close to a milestone.","Straight (1-2-3-4-5-6) = 1,500 pts — extremely valuable, bank it.","Three pairs = 1,500 pts — bank it."],
-    mistakes:["Always rolling all 6 dice without considering remaining die count.","Banking 50 points when you have 5 dice left — too conservative.","Never banking anything over 300 — greed leads to Farkles."],
-    payouts:[{bet:"Single 1",pays:"100 pts"},{bet:"Single 5",pays:"50 pts"},{bet:"Three 1s",pays:"1,000 pts"},{bet:"Three of a kind (2–6)",pays:"100× the number"},{bet:"Straight 1–6",pays:"1,500 pts"},{bet:"Three pairs",pays:"1,500 pts"},{bet:"Hot Dice",pays:"Keep all, re-roll all 6"}],
-    visualDice:[1,5,3,3,2,4],
+    setup:["Six dice and a scorepad.","Decide on winning score (usually 10,000)."],
+    howToPlay:["Roll all 6 dice.","Set aside at least one scoring die/combination (1s, 5s, three-of-a-kind).","Choose to Bank your points OR roll the remaining dice to push your luck.","If you roll and get no scoring dice, you Farkle. Turn over, no points.","If you score with all 6 dice, you have 'Hot Dice' and can reroll all 6 and keep accumulating."],
+    strategy:["Bank your points! Risking 1000 points on 2 dice is almost never mathematically correct.","Three Farkles in a row usually carries a 1000-point penalty, so play safe if you have 2 Farkles."],
+    mistakes:["Getting greedy and rolling 1 or 2 dice trying to hit a 1 or 5.","Not banking a large score when you have it."],
+    payouts:[{bet:"1",pays:"100 pts"},{bet:"5",pays:"50 pts"},{bet:"Three 1s",pays:"1000 pts"},{bet:"Three 2s-6s",pays:"100 × face value"}],
   },
   {
-    id:"liar_dice", name:"Liar's Dice", emoji:"🎭", category:"Dice Games",
-    players:"2–6", difficulty:"Medium", type:"dice",
-    tagline:"Bluff and call out bluffs in this classic deception dice game.",
-    overview:"Liar's Dice (also called Perudo or Dudo) is a bluffing game where all players roll their dice secretly under a cup. Players take turns bidding on how many dice of a certain face value exist across ALL players' cups. Call someone's bluff if you think they're lying — and lose a die if you're wrong.",
+    id:"spades", name:"Spades", emoji:"♠", category:"Classic — Cards",
+    players:"4 (partners)", difficulty:"Medium", type:"card",
+    tagline:"Bid how many tricks you can win, with Spades as the permanent trump.",
+    overview:"Spades is a partnership trick-taking game. You and your partner sit across from each other. Before the hand starts, everyone 'bids' how many tricks they think they can take. Spades are always trump.",
     terminology:[
-      {term:"Bid",def:"A claim about the total quantity of a certain face value across all cups (e.g., \"four 3s\")."},
-      {term:"Call",def:"Challenge the previous player's bid (\"Liar!\"). Reveal all dice to check."},
-      {term:"Ace / Wildcard",def:"In many variants, 1s are wild and count as any face value."},
-      {term:"Palafico",def:"Special rule when a player has one die left — aces are no longer wild."},
+      {term:"Trick",def:"One round of cards (4 cards played). Highest card of led suit wins, unless trumped."},
+      {term:"Trump",def:"The Spade suit. A spade beats any card of any other suit."},
+      {term:"Bid",def:"Your prediction of how many tricks you will win."},
+      {term:"Nil",def:"A bid of zero tricks. Very risky but carries a huge bonus (+100) or penalty (-100)."},
+      {term:"Bags (Sandbags)",def:"Tricks you win over your combined bid. Accumulating 10 bags loses you 100 points."},
     ],
-    setup:["Each player gets 5 dice and a cup.","All players roll their dice secretly and look at their own dice only.","Youngest or randomly chosen player bids first."],
-    howToPlay:["The opening player makes a bid: a quantity and face value (e.g., \"three 4s\" — meaning at least three 4s exist across all players' hidden dice).","Each player must either raise the bid OR call \"Liar!\"","Raising the bid: increase quantity, or keep quantity and increase face value, or both.","Calling \"Liar!\": all players reveal dice. Count total dice of the bid face (plus wild 1s if using that rule).","If the bid was valid (enough or more dice exist): the caller loses one die.","If the bid was invalid: the bidder loses one die.","A player who loses all their dice is eliminated. Last player with dice wins."],
-    strategy:["Use your own dice to anchor bids — if you have two 3s, bidding \"three 3s\" is likely safe.","Watch who bids confidently and who raises hesitantly — it reveals information.","Lowball bids early in the game to force opponents to overcommit.","Call quickly when a bid requires more dice than exist (e.g., \"ten 6s\" with only 15 total dice)."],
-    mistakes:["Being too predictable — always bidding based on what you hold makes you easy to read.","Calling too often — you should only call when the math is against the bidder.","Ignoring wild aces — they significantly expand what's likely."],
-    payouts:[{bet:"Last player with dice",pays:"Winner"}],
-    visualDice:[3,3,5,1,2],
-  },
-  {
-    id:"bunco", name:"Bunco", emoji:"🎊", category:"Dice Games",
-    players:"12 (or any multiple of 4)", difficulty:"Easy", type:"dice",
-    tagline:"Fast and social — roll three dice trying to match the target number.",
-    overview:"Bunco is a social, luck-based dice game played in teams of two across six rounds. No skill required — just roll three dice and count how many match the round number. It's all about speed, noise, and fun.",
-    terminology:[
-      {term:"Bunco",def:"Rolling three dice all matching the current round number in one roll — 21 points!"},
-      {term:"Round",def:"Six rounds total, numbered 1–6. Each round's target number matches the round number."},
-      {term:"Set",def:"A set is won by the first team to reach 21 points (or whoever leads when time is called)."},
-    ],
-    setup:["12 players seated at 3 tables of 4 (2 teams of 2 at each table).","Designate a Head Table.","Each table has 3 dice and a score sheet.","A bell signals start/stop."],
-    howToPlay:["Round 1: target number is 1. Players roll three dice as fast as possible.","Count any die showing a 1 — score that many points.","If all three dice show 1: Bunco! Score 21 points and ring the bell immediately.","If none match: nothing scored; pass dice to partner who rolls immediately.","The round ends when the Head Table hits 21 (or Bunco). Bell rings.","Winning team stays at Head Table; losing team rotates down. Partners reshuffle.","After 6 rounds, tally wins, losses, and Buncos. Prizes often awarded for most wins, most Buncos, and most losses."],
-    strategy:["There is virtually no strategy in Bunco — it's pure luck and speed.","Roll fast — speed matters when rounds end by the Head Table bell."],
-    mistakes:["Slowing down to count carefully — just roll and count quickly.","Forgetting to ring the bell on a Bunco."],
-    payouts:[{bet:"Most wins",pays:"Main prize"},{bet:"Most Buncos",pays:"Secondary prize"},{bet:"Most losses",pays:"Consolation prize (traditional)"}],
-    visualDice:[1,1,1],
-  },
-  /* ── SOLITAIRE / SOLO ── */
-  {
-    id:"freecell", name:"FreeCell", emoji:"🗂️", category:"Solo — Cards",
-    players:"1", difficulty:"Medium", type:"card",
-    tagline:"Nearly every deal is winnable — pure logic and planning.",
-    overview:"FreeCell is a Solitaire variant where all 52 cards are dealt face-up. There are no hidden cards — the game is entirely about strategy. Four Free Cells act as temporary parking spots. Nearly every deal (99.99%) is mathematically winnable if played correctly.",
-    terminology:[
-      {term:"Free Cell",def:"One of four temporary holding spots above the Tableau. Each holds exactly one card."},
-      {term:"Foundation",def:"Four piles (one per suit) built Ace → King. Fill all four to win."},
-      {term:"Tableau",def:"Eight columns of face-up cards — the main playing area."},
-      {term:"Supermove",def:"Moving multiple cards as a group — only possible if enough empty Free Cells and columns exist."},
-    ],
-    setup:["Deal all 52 cards into 8 columns face-up: first 4 columns get 7 cards; last 4 get 6 cards.","Four Free Cells and four Foundation piles are empty at start."],
-    howToPlay:["Move cards one at a time (or groups via supermoves).","Tableau columns: play cards in descending rank, alternating red/black.","Free Cells can hold any single card — but using them all is dangerous.","Move Aces to Foundation immediately. Build up by suit.","Win by moving all 52 cards to Foundations."],
-    strategy:["Plan 5–10 moves ahead — FreeCell rewards lookahead.","Never fill all four Free Cells — you'll lock yourself out of moves.","Prioritize freeing up columns — an empty column is powerful.","Don't move a card to a Free Cell unless you have a clear plan to use it.","Work on multiple foundation suits simultaneously."],
-    mistakes:["Using Free Cells as permanent parking — they're temporary only.","Moving Kings to empty columns without a clear purpose.","Focusing on one suit without advancing others."],
-    payouts:[{bet:"All 52 to Foundation",pays:"Victory"},{bet:"No moves left",pays:"Loss (~0.01% of deals)"}],
-  },
-  {
-    id:"spider", name:"Spider Solitaire", emoji:"🕷️", category:"Solo — Cards",
-    players:"1", difficulty:"Hard", type:"card",
-    tagline:"Build eight complete suit sequences to remove all cards from the Tableau.",
-    overview:"Spider Solitaire uses two full decks (104 cards). The objective is to build eight complete sequences from King to Ace within the Tableau. Completed sequences are automatically removed. Spider is widely considered the hardest popular Solitaire variant.",
-    terminology:[
-      {term:"Sequence",def:"13 cards of the same suit from King down to Ace — completing one removes it."},
-      {term:"Tableau",def:"Ten columns of face-down cards with face-up cards on top."},
-      {term:"Deal",def:"Pressing the deal button deals one card face-up to each of the 10 columns from the stock."},
-      {term:"One-Suit / Two-Suit / Four-Suit",def:"Difficulty modes. One-Suit uses one suit repeated; Four-Suit uses all four (hardest)."},
-    ],
-    setup:["Two 52-card decks (104 cards total).","Deal: 4 columns of 6 cards, 6 columns of 5 cards — all face-down except the top card.","Remaining 50 cards are the stock (5 deals of 10 cards remain)."],
-    howToPlay:["Move cards or sequences between Tableau columns. Sequences must be consecutive and same-suit to move as a group.","You can stack cards of mixed suits — but they can't move as a group.","If a column is empty, any card or valid sequence can go there.","When stuck, deal 10 more cards from the stock (one to each column). You must deal if any column is empty.","Complete a King-to-Ace sequence of the same suit — it's removed. Do this 8 times to win."],
-    strategy:["Keep at least one empty column as a maneuvering space.","Focus on one or two suits first — try to clear a full sequence quickly.","Don't deal from the stock if you can still make progress on the Tableau.","Keep sequences same-suited even if mixed-suit stacks are available."],
-    mistakes:["Building mixed-suit stacks extensively — they block powerful moves.","Dealing from stock too soon.","Filling all empty columns with kings too early."],
-    payouts:[{bet:"8 complete sequences removed",pays:"Victory"}],
-  },
-  /* ── CLASSIC FAMILY GAMES ── */
-  {
-    id:"uno", name:"Uno", emoji:"🎨", category:"Family & Party",
-    players:"2–10", difficulty:"Easy", type:"card",
-    tagline:"Shed your cards and call 'Uno' when one remains.",
-    overview:"Uno is the world's best-selling commercial card game. Players race to discard all their cards by matching color or number. Special action cards add chaos: Skip, Reverse, Draw Two, and the feared Wild Draw Four.",
-    terminology:[
-      {term:"Uno",def:"Call this when you play your second-to-last card. Forgetting = draw 4 penalty."},
-      {term:"Wild",def:"Can be played on anything. You choose the next color."},
-      {term:"Wild Draw Four",def:"Opponent draws 4 and loses their turn. Must challenge if you suspect the player could have played a color card."},
-      {term:"Stack",def:"House rule (official in 2019+ rules): Draw 2s can be stacked onto Draw 2s."},
-      {term:"Bluffing",def:"Playing a Wild Draw Four when you actually have a matching color card — illegal but unchallenged often."},
-    ],
-    setup:["108-card Uno deck (19 of each color 1–9, plus action cards).","Deal 7 cards to each player.","Place remaining cards face-down as draw pile.","Flip top card to start the discard pile."],
-    howToPlay:["Match the top discard by color OR by number/symbol.","If you can't play, draw one card. If playable, play it; otherwise keep it.","Special cards: Skip = next player loses turn. Reverse = direction flips. Draw Two = next player draws 2 and loses turn.","Wild = choose any color. Wild Draw Four = next player draws 4 and loses turn.","When you have one card left, say \"Uno!\" before playing your second-to-last card.","First player to empty their hand wins the round. Others score penalties."],
-    strategy:["Hold Wild cards for moments when you truly need a color change.","Use Draw 2 and Skip cards to slow down the leader.","Pay attention to hand sizes — target players close to winning.","Change color to one opponents are short on.","Challenge Wild Draw Fours when you suspect bluffing."],
-    mistakes:["Forgetting to say \"Uno!\" — you'll be forced to draw 4.","Playing Wilds too early when a color match is available.","Ignoring hand sizes of other players."],
-    payouts:[{bet:"Round win",pays:"0 pts"},{bet:"Numbered card in others' hands",pays:"Face value against loser"},{bet:"Action card",pays:"20 pts against loser"},{bet:"Wild / Wild Draw Four",pays:"50 pts against loser"}],
-    visualCards:[{rank:"7",suit:"H"},{rank:"7",suit:"D"},{rank:"S",suit:"S"}],
-  },
-  {
-    id:"old_maid", name:"Old Maid", emoji:"👵", category:"Family & Party",
-    players:"2–8", difficulty:"Easy", type:"card",
-    tagline:"Don't be left holding the Old Maid at the end.",
-    overview:"Old Maid is a classic matching game for all ages. Remove three of the four Queens from a standard deck (leaving one \"Old Maid\"). Players pair up cards and try to avoid being the one holding the unmatched Old Maid at the end.",
-    terminology:[
-      {term:"Old Maid",def:"The single unmatched Queen (the odd one out when one Queen is removed)."},
-      {term:"Pair",def:"Two cards of the same rank — when matched, discard them."},
-    ],
-    setup:["Remove three Queens from a 52-card deck, leaving one (the Old Maid).","Deal all cards to players (some may have one more than others).","Players examine their hands and discard any pairs they hold immediately."],
-    howToPlay:["Starting with the dealer, spread your hand face-down to the player on your left.","That player draws one card blind. If it pairs something in their hand, discard the pair.","Continue clockwise — each player draws blindly from the player to their right.","As pairs are made and discarded, hands shrink. Eventually one card remains — the Old Maid.","The player left holding the Old Maid loses (or \"is\" the Old Maid)."],
-    strategy:["In some variants, you can try to make the Old Maid obvious to bluff your opponent.","Draw from the edges of an opponent's hand — some players involuntarily shift the unwanted card."],
-    mistakes:["Looking at opponents' cards (not allowed).","Not discarding pairs immediately."],
-    payouts:[{bet:"Last player holding Old Maid",pays:"Loses"}],
-    visualCards:[{rank:"Q",suit:"S"},{rank:"5",suit:"H"},{rank:"5",suit:"C"},{rank:"9",suit:"D"},{rank:"9",suit:"S"}],
-  },
-  {
-    id:"snap", name:"Snap", emoji:"👏", category:"Family & Party",
-    players:"2–6", difficulty:"Easy", type:"card",
-    tagline:"Slap the pile and shout Snap when two cards match!",
-    overview:"Snap is a fast-reaction card game perfect for kids and adults who want quick fun. Players take turns flipping cards onto a central pile. When two consecutive face-up cards match in rank, the first person to shout \"Snap!\" and slap the pile wins all the cards.",
-    terminology:[
-      {term:"Snap",def:"Called when the top two face-up cards in the center match in rank."},
-      {term:"Snap Pool",def:"When two players call Snap simultaneously, cards go to a central pool won by the next Snap."},
-      {term:"False Snap",def:"Calling Snap when cards don't match — you must give each player one card as a penalty."},
-    ],
-    setup:["Standard 52-card deck.","Deal all cards face-down equally to each player.","Players hold their piles without looking."],
-    howToPlay:["Players take turns flipping the top card of their pile onto a central face-up pile.","Cards must be flipped away from yourself so you can't see them before others.","When two face-up cards on the pile match in rank: shout \"Snap!\" and slap the pile.","First to slap takes all the cards in the central pile.","A player who runs out of cards is eliminated. Last player holding cards wins."],
-    strategy:["Watch the cards carefully — don't just focus on the one being flipped.","Stay alert and keep your hand hovering near the pile as the deck runs low."],
-    mistakes:["False Snap penalty — look carefully before calling.","Flipping too quickly without giving others a chance to see (considered poor form)."],
-    payouts:[{bet:"Collect all 52 cards",pays:"Winner"}],
-    visualCards:[{rank:"8",suit:"S"},{rank:"8",suit:"H"}],
-  },
-  {
-    id:"spades", name:"Spades", emoji:"♠️", category:"Classic — Cards",
-    players:"4 (2 teams)", difficulty:"Medium", type:"card",
-    tagline:"A trick-taking team game where Spades are always trump.",
-    overview:"Spades is a beloved trick-taking game played in fixed partnerships. Partners sit across from each other. Before each hand, both partners bid how many tricks they expect to win. Spades always serve as the trump suit. Hit your bid exactly for bonus points; overbid and collect \"bags\" that can cost you later.",
-    terminology:[
-      {term:"Trick",def:"One round of four played cards — the highest card (or highest spade) wins."},
-      {term:"Trump",def:"Spades. Always beat any other suit."},
-      {term:"Bid",def:"Before play, each player declares how many tricks they expect to win."},
-      {term:"Nil",def:"Bidding zero tricks — if successful, earns 100 bonus points. Fail and lose 100."},
-      {term:"Blind Nil",def:"Bidding zero tricks without seeing your cards (200 point swing — very risky)."},
-      {term:"Bags",def:"Overtricks (winning more tricks than you bid). Every 10 bags = -100 pts."},
-      {term:"Breaking Spades",def:"Spades can't be led until they've been played on another suit (or you have only spades)."},
-    ],
-    setup:["Standard 52-card deck. No Jokers.","Deal 13 cards to each player.","Players bid starting left of the dealer. Bids range from 0 (Nil) to 13.","Team bid = sum of the two partners' individual bids."],
-    howToPlay:["Player left of dealer leads first.","Players must follow the lead suit if possible. If not, play any card (including spades).","Highest card of the lead suit wins unless a spade was played — highest spade wins.","Spades cannot be led until broken (unless you have nothing but spades).","After 13 tricks, score the hand.","If team meets or exceeds their bid: 10× bid + 1 per overtrick.","If team fails to meet bid: -10× bid.","Nil bidders: +100 if they take 0 tricks; -100 if they take even 1 (partner covers)."],
-    strategy:["Count your guaranteed tricks (aces, guarded kings, spades) when bidding.","Don't over-bid — bags accumulate and cost you 100 pts at every 10th bag.","Communication with partner: bid honestly so the team's combined bid is achievable.","Use high spades to capture important tricks late in the hand.","If partner bids Nil, help them avoid tricks — lead low cards and cover their dangerous cards."],
-    mistakes:["Overbidding consistently — bags will penalize you eventually.","Bidding too conservatively and leaving points on the table.","Leading high cards early when saving them would be more valuable.","Not covering your partner's Nil bid."],
-    payouts:[{bet:"Meet bid",pays:"10× bid pts"},{bet:"Overtrick (bag)",pays:"+1 pt each"},{bet:"10 bags accumulated",pays:"-100 pts"},{bet:"Successful Nil",pays:"+100 pts"},{bet:"Failed Nil",pays:"-100 pts"},{bet:"Game win (typically 500 pts)",pays:"Victory"}],
-    visualCards:[{rank:"A",suit:"S"},{rank:"K",suit:"S"},{rank:"Q",suit:"H"},{rank:"J",suit:"D"},{rank:"2",suit:"C"}],
+    setup:["Standard 52-card deck. Players across from each other are partners.","Deal all 13 cards to each player."],
+    howToPlay:["**Bidding:** Starting left of dealer, each player bids 0 (Nil) to 13. Partners' bids are added together to form the team bid.","**Play:** Player left of dealer leads. Must follow suit. If void, you can play a Spade (trump) or slough another suit.","You cannot lead Spades until they have been 'broken' (played on a previous trick).","**Scoring:** If the team meets or exceeds their combined bid, they score 10x the bid. Extra tricks are 'bags' (1 pt each).","If the team fails to reach their bid, they lose 10x the bid."],
+    strategy:["Don't bid nil if you have high spades or few cards in a suit.","Count the spades! There are 13 total. Keep track of how many have been played.","Lead your strong suits early to draw out opponents' trumps."],
+    mistakes:["Bidding too many tricks without accounting for partner's bid.","Forgetting to track 'bags' and accidentally taking a 100-point penalty."],
+    payouts:[{bet:"Meet bid",pays:"10× bid pts"},{bet:"Overtrick (bag)",pays:"+1 pt each"},{bet:"10 bags accumulated",pays:"-100 pts"},{bet:"Successful Nil",pays:"+100 pts"}],
+    visualCards:[{rank:"A",suit:"S"},{rank:"K",suit:"S"},{rank:"Q",suit:"H"},{rank:"J",suit:"D"}],
   },
   {
     id:"hearts", name:"Hearts", emoji:"♥️", category:"Classic — Cards",
@@ -809,14 +807,12 @@ const GAMES = [
       {term:"Shoot the Moon",def:"Take all 13 Hearts plus the Queen of Spades. All other players get 26 pts. Extremely risky."},
       {term:"Queen of Spades",def:"The most feared card — worth 13 points on its own."},
       {term:"Blood",def:"Hearts — the penalty suit. Each heart = 1 point."},
-      {term:"Bleeding Spades",def:"Leading spades to force out the Queen of Spades."},
-      {term:"Passing",def:"Before each hand, pass 3 cards to an opponent (direction rotates)."},
     ],
-    setup:["Standard 52-card deck.","Deal all 13 cards to each player.","Before play: pass 3 cards left (hand 1), right (hand 2), across (hand 3), no pass (hand 4). Repeat cycle."],
-    howToPlay:["Player with 2♣ leads it. Players must follow suit; if unable, play any card.","No penalty cards (hearts or Q♠) can be played on the first trick unless that's all you have.","Highest card of the lead suit wins the trick.","Play continues until all 13 tricks are played.","Count penalty points: 1 per heart, 13 for the Queen of Spades.","When any player reaches 100, the player with the lowest score wins."],
-    strategy:["Pass the Queen of Spades, Ace and King of Spades (she needs protection), and high hearts.","Void a suit early — this lets you ditch penalty cards when that suit is led.","Watch for Shoot the Moon attempts — if someone is collecting all hearts, start giving them the Queen of Spades too (or stop giving them hearts).","Keep the Ace or King of Spades only if you have mid-spades to protect them."],
-    mistakes:["Holding the Queen of Spades without low spades to protect her.","Ignoring that an opponent may be attempting Shoot the Moon.","Leading high cards in hearts early — gift others their penalty avoidance."],
-    payouts:[{bet:"Win trick with hearts/QS",pays:"-1/-13 pts per card"},{bet:"Shoot the Moon",pays:"All others get 26 pts"},{bet:"Lowest score at 100-pt cap",pays:"Winner"}],
+    setup:["Standard 52-card deck. Deal all 13 cards to each player.","Before play: pass 3 cards left (hand 1), right (hand 2), across (hand 3), no pass (hand 4)."],
+    howToPlay:["Player with 2♣ leads it. Must follow suit; if unable, play any card.","No penalty cards (hearts or Q♠) can be played on the first trick unless that's all you have.","Highest card of the lead suit wins the trick.","Count penalty points at end: 1 per heart, 13 for Q♠. First to 100 loses."],
+    strategy:["Pass the Queen of Spades, Ace and King of Spades (she needs protection), and high hearts.","Void a suit early — this lets you ditch penalty cards when that suit is led."],
+    mistakes:["Holding the Queen of Spades without low spades to protect her.","Leading high hearts early — gift others their penalty avoidance."],
+    payouts:[{bet:"Win trick with hearts/QS",pays:"-1/-13 pts per card"},{bet:"Shoot the Moon",pays:"All others get 26 pts"}],
     visualCards:[{rank:"Q",suit:"S"},{rank:"A",suit:"H"},{rank:"K",suit:"H"},{rank:"2",suit:"C"}],
   },
 ];
@@ -825,15 +821,15 @@ const GAMES = [
    HAND RANKINGS, PAYOUTS, STEP LIST
 ───────────────────────────────────────────── */
 function HandRankings({ rankings }) {
-  const tc = {1:"#c0131a",2:"#b87d12",3:"#1d6e3c",4:"#143a72",5:"#555"};
+  const tc = {1:"#ec4899",2:"#8b5cf6",3:"#06b6d4",4:"#3b82f6",5:"#64748b"};
   return (
-    <div style={{ display:"flex",flexDirection:"column",gap:6 }}>
+    <div style={{ display:"flex",flexDirection:"column",gap:8 }}>
       {rankings.map((h,i) => (
-        <div key={i} style={{ display:"flex",alignItems:"center",gap:12,padding:"8px 12px",background:"rgba(255,255,255,.03)",borderRadius:8,border:"1px solid rgba(200,169,64,.12)" }}>
-          <div style={{ width:24,height:24,borderRadius:"50%",background:tc[h.tier],display:"flex",alignItems:"center",justifyContent:"center",color:"white",fontSize:11,fontWeight:"bold",flexShrink:0 }}>{i+1}</div>
+        <div key={i} style={{ display:"flex",alignItems:"center",gap:16,padding:"10px 16px",background:"rgba(30,41,59,0.4)",borderRadius:12,border:"1px solid rgba(148,163,184,0.1)",boxShadow:"0 2px 10px rgba(0,0,0,0.2)" }}>
+          <div style={{ width:28,height:28,borderRadius:"50%",background:tc[h.tier],display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:13,fontWeight:"bold",flexShrink:0,boxShadow:`0 0 10px ${tc[h.tier]}80` }}>{i+1}</div>
           <div style={{ flex:1 }}>
-            <div style={{ color:"#e8d5a0",fontFamily:"Georgia,serif",fontWeight:"bold",fontSize:13 }}>{h.rank}</div>
-            <div style={{ color:"#8a7a55",fontSize:11,fontFamily:"Georgia,serif" }}>{h.example}</div>
+            <div style={{ color:"#f8fafc",fontFamily:"'Inter', sans-serif",fontWeight:"700",fontSize:14 }}>{h.rank}</div>
+            <div style={{ color:"#94a3b8",fontSize:12,fontFamily:"'Inter', sans-serif",marginTop:2 }}>{h.example}</div>
           </div>
         </div>
       ))}
@@ -843,29 +839,29 @@ function HandRankings({ rankings }) {
 
 function PayoutsTable({ payouts }) {
   return (
-    <div style={{ background:"rgba(200,169,64,.05)",border:"1px solid rgba(200,169,64,.2)",borderRadius:10,overflow:"hidden" }}>
-      <div style={{ display:"flex",justifyContent:"space-between",padding:"8px 14px",background:"rgba(200,169,64,.1)",borderBottom:"1px solid rgba(200,169,64,.2)" }}>
-        <span style={{ color:"#7a6030",fontSize:10,letterSpacing:2 }}>BET / OUTCOME</span>
-        <span style={{ color:"#7a6030",fontSize:10,letterSpacing:2 }}>PAYS</span>
+    <div style={{ background:"rgba(15,23,42,0.4)",border:"1px solid rgba(6,182,212,0.2)",borderRadius:12,overflow:"hidden",boxShadow:"0 4px 15px rgba(0,0,0,0.3)" }}>
+      <div style={{ display:"flex",justifyContent:"space-between",padding:"10px 16px",background:"rgba(6,182,212,0.1)",borderBottom:"1px solid rgba(6,182,212,0.2)" }}>
+        <span style={{ color:NEON_CYAN,fontSize:11,letterSpacing:1.5,fontWeight:"600",fontFamily:"'Inter', sans-serif" }}>BET / OUTCOME</span>
+        <span style={{ color:NEON_CYAN,fontSize:11,letterSpacing:1.5,fontWeight:"600",fontFamily:"'Inter', sans-serif" }}>PAYS</span>
       </div>
       {payouts.map((p,i) => (
-        <div key={i} style={{ display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px 14px",background:i%2===0?"rgba(255,255,255,.04)":"transparent" }}>
-          <span style={{ color:"#b0a070",fontFamily:"Georgia,serif",fontSize:13 }}>{p.bet}</span>
-          <span style={{ color:G,fontFamily:"Georgia,serif",fontWeight:"bold",fontSize:13 }}>{p.pays}</span>
+        <div key={i} style={{ display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 16px",background:i%2===0?"rgba(30,41,59,0.3)":"transparent" }}>
+          <span style={{ color:"#cbd5e1",fontFamily:"'Inter', sans-serif",fontSize:13 }}>{p.bet}</span>
+          <span style={{ color:NEON_PINK,fontFamily:"'Inter', sans-serif",fontWeight:"bold",fontSize:13,textShadow:`0 0 8px ${NEON_PINK}60` }}>{p.pays}</span>
         </div>
       ))}
     </div>
   );
 }
 
-function StepList({ items, accent="gold" }) {
-  const ac = accent==="red" ? "#c0131a" : G;
+function StepList({ items, accent="cyan" }) {
+  const ac = accent==="pink" ? NEON_PINK : NEON_CYAN;
   return (
-    <div style={{ display:"flex",flexDirection:"column",gap:8 }}>
+    <div style={{ display:"flex",flexDirection:"column",gap:10 }}>
       {items.map((item,i) => (
-        <div key={i} style={{ display:"flex",gap:12,alignItems:"flex-start",padding:"10px 14px",background:"rgba(255,255,255,.03)",borderRadius:8,border:"1px solid rgba(200,169,64,.1)" }}>
-          <div style={{ width:24,height:24,borderRadius:"50%",background:ac,color:accent==="red"?"white":"#1a1200",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:"bold",flexShrink:0,fontFamily:"Georgia,serif" }}>{i+1}</div>
-          <span style={{ color:"#c4b07a",fontFamily:"Georgia,serif",fontSize:13,lineHeight:1.7 }}>{item}</span>
+        <div key={i} style={{ display:"flex",gap:14,alignItems:"flex-start",padding:"12px 16px",background:"rgba(30,41,59,0.4)",borderRadius:12,border:`1px solid ${ac}30`,boxShadow:"0 2px 10px rgba(0,0,0,0.2)" }}>
+          <div style={{ width:26,height:26,borderRadius:"50%",background:`${ac}20`,color:ac,border:`1px solid ${ac}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:"bold",flexShrink:0,fontFamily:"'Inter', sans-serif" }}>{i+1}</div>
+          <span style={{ color:"#e2e8f0",fontFamily:"'Inter', sans-serif",fontSize:14,lineHeight:1.6 }}>{item}</span>
         </div>
       ))}
     </div>
@@ -874,23 +870,24 @@ function StepList({ items, accent="gold" }) {
 
 function TermGrid({ terms }) {
   return (
-    <div style={{ display:"grid",gridTemplateColumns:"repeat(auto-fill, minmax(250px, 1fr))",gap:10 }}>
+    <div style={{ display:"grid",gridTemplateColumns:"repeat(auto-fill, minmax(250px, 1fr))",gap:12 }}>
       {terms.map((t,i) => (
-        <div key={i} style={{ padding:"10px 14px",background:"rgba(200,169,64,.06)",borderRadius:8,border:"1px solid rgba(200,169,64,.18)" }}>
-          <div style={{ color:G,fontFamily:"Georgia,serif",fontWeight:"bold",fontSize:12,marginBottom:4 }}>{t.term}</div>
-          <div style={{ color:"#a09060",fontFamily:"Georgia,serif",fontSize:12,lineHeight:1.5 }}>{t.def}</div>
+        <div key={i} style={{ padding:"14px 16px",background:"rgba(30,41,59,0.4)",borderRadius:12,border:"1px solid rgba(139,92,246,0.3)",boxShadow:"0 2px 10px rgba(0,0,0,0.2)",transition:"transform 0.2s",cursor:"default" }}>
+          <div style={{ color:NEON_PURP,fontFamily:"'Inter', sans-serif",fontWeight:"bold",fontSize:13,marginBottom:6,textShadow:`0 0 8px ${NEON_PURP}60` }}>{t.term}</div>
+          <div style={{ color:"#cbd5e1",fontFamily:"'Inter', sans-serif",fontSize:13,lineHeight:1.6 }}>{t.def}</div>
         </div>
       ))}
     </div>
   );
 }
 
-function RuleSection({ title, children, accent="gold" }) {
+function RuleSection({ title, children, accent="cyan" }) {
+  const ac = accent==="pink" ? NEON_PINK : NEON_CYAN;
   return (
-    <div style={{ marginBottom:32 }}>
-      <div style={{ display:"flex",alignItems:"center",gap:10,marginBottom:14 }}>
-        <div style={{ width:3,height:20,background:accent==="red"?"#c0131a":G,borderRadius:2,flexShrink:0 }}/>
-        <h3 style={{ margin:0,fontFamily:"Georgia,serif",color:"#e8d5a0",fontSize:16,fontWeight:"bold",letterSpacing:.5 }}>{title}</h3>
+    <div style={{ marginBottom:40 }}>
+      <div style={{ display:"flex",alignItems:"center",gap:12,marginBottom:18 }}>
+        <div style={{ width:4,height:22,background:ac,borderRadius:2,flexShrink:0,boxShadow:`0 0 10px ${ac}` }}/>
+        <h3 style={{ margin:0,fontFamily:"'Inter', sans-serif",color:"#f8fafc",fontSize:18,fontWeight:"700",letterSpacing:.5 }}>{title}</h3>
       </div>
       {children}
     </div>
@@ -912,7 +909,7 @@ export default function GameRules({ onClose }) {
 
   const game = GAMES.find(g => g.id === selectedId) || GAMES[0];
 
-  const diffColor = { Easy:"#1d8a4c", Medium:"#b87d12", Hard:"#c0131a" };
+  const diffColor = { Easy:NEON_CYAN, Medium:NEON_PURP, Hard:NEON_PINK };
 
   const select = (id) => {
     setSelectedId(id);
@@ -926,50 +923,50 @@ export default function GameRules({ onClose }) {
   }, {});
 
   return (
-    <div style={{ display:"flex", height:"100vh", background:"#0d1f0d", fontFamily:"Georgia,serif", overflow:"hidden" }}>
+    <div style={{ display:"flex", height:"100vh", background:DARK_BG, fontFamily:"'Inter', sans-serif", overflow:"hidden" }}>
 
       {/* ── SIDEBAR ── */}
-      <aside style={{ width:220, flexShrink:0, background:"#090f09", borderRight:"1px solid rgba(200,169,64,.18)", display:"flex", flexDirection:"column", overflow:"hidden" }}>
-        <div style={{ padding:"16px 14px 12px", borderBottom:"1px solid rgba(200,169,64,.15)" }}>
+      <aside style={{ width:260, flexShrink:0, background:"rgba(15,23,42,0.95)", borderRight:"1px solid rgba(6,182,212,0.2)", display:"flex", flexDirection:"column", overflow:"hidden", backdropFilter:"blur(10px)", zIndex:10 }}>
+        <div style={{ padding:"20px 16px 16px", borderBottom:"1px solid rgba(6,182,212,0.2)" }}>
           <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between",gap:8 }}>
-            <div style={{ display:"flex",alignItems:"center",gap:8 }}>
-              <div style={{ width:30,height:30,borderRadius:"50%",background:"#c8a940",display:"flex",alignItems:"center",justifyContent:"center",fontSize:15 }}>♠</div>
+            <div style={{ display:"flex",alignItems:"center",gap:12 }}>
+              <div style={{ width:36,height:36,borderRadius:"8px",background:`${NEON_CYAN}20`,border:`1px solid ${NEON_CYAN}`,color:NEON_CYAN,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,boxShadow:`0 0 15px ${NEON_CYAN}40` }}>🎰</div>
               <div>
-                <div style={{ color:G,fontWeight:"bold",fontSize:13,letterSpacing:1.5 }}>CASINO</div>
-                <div style={{ color:"#4a4020",fontSize:9,letterSpacing:2 }}>RULEBOOK</div>
+                <div style={{ color:"#f8fafc",fontWeight:"700",fontSize:15,letterSpacing:1.5 }}>CASINO</div>
+                <div style={{ color:NEON_CYAN,fontSize:10,letterSpacing:2.5,fontWeight:"600" }}>RULEBOOK</div>
               </div>
             </div>
             {onClose && (
-              <button onClick={onClose} style={{ background:"rgba(200,169,64,.12)",border:"1px solid rgba(200,169,64,.25)",borderRadius:6,color:"#c8a940",cursor:"pointer",fontSize:14,padding:"3px 7px",lineHeight:1,fontFamily:"Georgia,serif" }}>✕</button>
+              <button onClick={onClose} style={{ background:"rgba(30,41,59,0.8)",border:"1px solid rgba(148,163,184,0.3)",borderRadius:8,color:"#cbd5e1",cursor:"pointer",fontSize:14,padding:"4px 8px",lineHeight:1,transition:"all 0.2s" }}>✕</button>
             )}
           </div>
         </div>
 
-        <div style={{ padding:"10px 10px 6px" }}>
+        <div style={{ padding:"16px 12px 8px" }}>
           <input
             value={search}
             onChange={e=>setSearch(e.target.value)}
             placeholder="Search games..."
-            style={{ width:"100%",background:"rgba(200,169,64,.08)",border:"1px solid rgba(200,169,64,.22)",borderRadius:7,padding:"7px 9px",color:G,fontSize:12,fontFamily:"Georgia,serif",outline:"none",boxSizing:"border-box" }}
+            style={{ width:"100%",background:"rgba(30,41,59,0.5)",border:"1px solid rgba(6,182,212,0.3)",borderRadius:8,padding:"10px 12px",color:"#f8fafc",fontSize:13,fontFamily:"'Inter', sans-serif",outline:"none",boxSizing:"border-box",transition:"all 0.2s" }}
           />
         </div>
 
-        <div style={{ flex:1,overflowY:"auto",padding:"0 6px 12px" }}>
+        <div style={{ flex:1,overflowY:"auto",padding:"0 8px 16px" }}>
           {Object.entries(cats).map(([cat,games]) => (
             <div key={cat}>
-              <div style={{ color:"#4a4020",fontSize:8,letterSpacing:2,padding:"10px 8px 4px",textTransform:"uppercase" }}>{cat}</div>
+              <div style={{ color:"#64748b",fontSize:10,fontWeight:"600",letterSpacing:1.5,padding:"16px 10px 8px",textTransform:"uppercase" }}>{cat}</div>
               {games.map(g => {
                 const active = g.id === selectedId;
                 return (
                   <button key={g.id} onClick={()=>select(g.id)}
-                    style={{ width:"100%",textAlign:"left",padding:"8px 10px",borderRadius:7,border:"none",cursor:"pointer",
-                      background:active?"rgba(200,169,64,.15)":"transparent",
-                      borderLeft:active?"3px solid "+G:"3px solid transparent",
-                      marginBottom:1,display:"flex",alignItems:"center",gap:7,transition:"all .12s" }}>
-                    <span style={{ fontSize:12 }}>{g.emoji}</span>
+                    style={{ width:"100%",textAlign:"left",padding:"10px 12px",borderRadius:8,border:"none",cursor:"pointer",
+                      background:active?"rgba(6,182,212,0.15)":"transparent",
+                      borderLeft:active?`3px solid ${NEON_CYAN}`:"3px solid transparent",
+                      marginBottom:2,display:"flex",alignItems:"center",gap:10,transition:"all .15s" }}>
+                    <span style={{ fontSize:16 }}>{g.emoji}</span>
                     <div>
-                      <div style={{ color:active?G:"#6a5a35",fontSize:11,fontWeight:active?"bold":"normal" }}>{g.name}</div>
-                      <div style={{ color:diffColor[g.difficulty]||"#5a5a3a",fontSize:8,letterSpacing:1 }}>{g.difficulty}</div>
+                      <div style={{ color:active?"#f8fafc":"#94a3b8",fontSize:13,fontWeight:active?"600":"500" }}>{g.name}</div>
+                      <div style={{ color:diffColor[g.difficulty]||"#64748b",fontSize:10,fontWeight:"600",letterSpacing:0.5,marginTop:2 }}>{g.difficulty}</div>
                     </div>
                   </button>
                 );
@@ -978,55 +975,55 @@ export default function GameRules({ onClose }) {
           ))}
         </div>
 
-        <div style={{ padding:"8px 14px",borderTop:"1px solid rgba(200,169,64,.12)",color:"#2a2010",fontSize:8,letterSpacing:1 }}>
-          {GAMES.length} GAMES IN LIBRARY
+        <div style={{ padding:"12px 16px",borderTop:"1px solid rgba(6,182,212,0.2)",color:"#64748b",fontSize:10,letterSpacing:1.5,fontWeight:"600",textAlign:"center" }}>
+          {GAMES.length} GAMES AVAILABLE
         </div>
       </aside>
 
       {/* ── MAIN CONTENT ── */}
-      <main ref={contentRef} style={{ flex:1,overflowY:"auto",background:"#0f1e0f" }}>
+      <main ref={contentRef} style={{ flex:1,overflowY:"auto",background:`radial-gradient(circle at 50% -20%, #1e293b, ${DARK_BG} 80%)` }}>
 
         {/* Hero */}
-        <div style={{ background:"#0a140a",borderBottom:"1px solid rgba(200,169,64,.18)",padding:"28px 40px 20px" }}>
-          <div style={{ display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:12 }}>
+        <div style={{ background:"rgba(15,23,42,0.4)",borderBottom:"1px solid rgba(6,182,212,0.2)",padding:"40px 48px 30px",backdropFilter:"blur(5px)" }}>
+          <div style={{ display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:16 }}>
             <div>
-              <div style={{ display:"flex",alignItems:"center",gap:10,marginBottom:6 }}>
-                <span style={{ fontSize:28 }}>{game.emoji}</span>
+              <div style={{ display:"flex",alignItems:"center",gap:16,marginBottom:8 }}>
+                <span style={{ fontSize:36,filter:"drop-shadow(0 0 10px rgba(255,255,255,0.2))" }}>{game.emoji}</span>
                 <div>
-                  <div style={{ color:"#5a4520",fontSize:9,letterSpacing:2.5,textTransform:"uppercase",marginBottom:2 }}>{game.category}</div>
-                  <h1 style={{ margin:0,color:"#e8d5a0",fontSize:32,fontWeight:"bold",letterSpacing:.5 }}>{game.name}</h1>
+                  <div style={{ color:NEON_CYAN,fontSize:11,fontWeight:"700",letterSpacing:3,textTransform:"uppercase",marginBottom:4 }}>{game.category}</div>
+                  <h1 style={{ margin:0,color:"#f8fafc",fontSize:36,fontWeight:"800",letterSpacing:-0.5 }}>{game.name}</h1>
                 </div>
               </div>
-              <p style={{ color:"#6a5a35",fontSize:14,margin:0,fontStyle:"italic",maxWidth:520 }}>{game.tagline}</p>
+              <p style={{ color:"#94a3b8",fontSize:16,margin:0,fontWeight:"400",maxWidth:600,lineHeight:1.5 }}>{game.tagline}</p>
             </div>
-            <div style={{ display:"flex",gap:20,alignItems:"center" }}>
+            <div style={{ display:"flex",gap:24,alignItems:"center",background:"rgba(30,41,59,0.5)",padding:"16px 24px",borderRadius:12,border:"1px solid rgba(148,163,184,0.2)",boxShadow:"0 4px 15px rgba(0,0,0,0.2)" }}>
               <div style={{ textAlign:"center" }}>
-                <div style={{ color:"#4a3a20",fontSize:8,letterSpacing:1.5,marginBottom:3 }}>PLAYERS</div>
-                <div style={{ color:G,fontSize:14,fontWeight:"bold" }}>{game.players}</div>
+                <div style={{ color:"#64748b",fontSize:10,fontWeight:"600",letterSpacing:1.5,marginBottom:4 }}>PLAYERS</div>
+                <div style={{ color:"#f8fafc",fontSize:16,fontWeight:"700" }}>{game.players}</div>
               </div>
-              <div style={{ width:1,height:32,background:"rgba(200,169,64,.18)" }}/>
+              <div style={{ width:1,height:40,background:"rgba(148,163,184,0.3)" }}/>
               <div style={{ textAlign:"center" }}>
-                <div style={{ color:"#4a3a20",fontSize:8,letterSpacing:1.5,marginBottom:3 }}>DIFFICULTY</div>
-                <div style={{ color:diffColor[game.difficulty]||"#888",fontSize:14,fontWeight:"bold" }}>{game.difficulty}</div>
+                <div style={{ color:"#64748b",fontSize:10,fontWeight:"600",letterSpacing:1.5,marginBottom:4 }}>DIFFICULTY</div>
+                <div style={{ color:diffColor[game.difficulty]||"#94a3b8",fontSize:16,fontWeight:"700",textShadow:`0 0 10px ${diffColor[game.difficulty]}60` }}>{game.difficulty}</div>
               </div>
             </div>
           </div>
         </div>
 
-        <div style={{ padding:"32px 40px 60px", maxWidth:"100%" }}>
+        <div style={{ padding:"40px 48px 80px", maxWidth:1200, margin:"0 auto" }}>
 
           {/* Overview + Visual side by side */}
-          <div style={{ display:"grid",gridTemplateColumns:"1fr 380px",gap:32,marginBottom:36,alignItems:"start" }}>
+          <div style={{ display:"grid",gridTemplateColumns:"1fr 420px",gap:40,marginBottom:48,alignItems:"start" }}>
             <RuleSection title="Overview">
-              <p style={{ color:"#a09060",fontFamily:"Georgia,serif",fontSize:14,lineHeight:1.85,margin:0 }}>{game.overview}</p>
+              <p style={{ color:"#cbd5e1",fontSize:15,lineHeight:1.8,margin:0,fontWeight:"400" }}>{game.overview}</p>
             </RuleSection>
             <div>
-              <div style={{ color:"#5a4520",fontSize:8,letterSpacing:2.5,textTransform:"uppercase",marginBottom:10 }}>TABLE / EXAMPLE LAYOUT</div>
+              <div style={{ color:NEON_PURP,fontSize:10,fontWeight:"700",letterSpacing:2.5,textTransform:"uppercase",marginBottom:12 }}>TABLE / EXAMPLE LAYOUT</div>
               <GameVisual game={game}/>
             </div>
           </div>
 
-          <RuleSection title="Terminology">
+          <RuleSection title="Terminology" accent="pink">
             <TermGrid terms={game.terminology}/>
           </RuleSection>
 
@@ -1034,8 +1031,8 @@ export default function GameRules({ onClose }) {
             <StepList items={game.setup}/>
           </RuleSection>
 
-          <RuleSection title="How to Play" accent="red">
-            <StepList items={game.howToPlay} accent="red"/>
+          <RuleSection title="How to Play" accent="pink">
+            <StepList items={game.howToPlay} accent="pink"/>
           </RuleSection>
 
           {game.handRankings && (
@@ -1045,23 +1042,23 @@ export default function GameRules({ onClose }) {
           )}
 
           <RuleSection title="Strategy & Tips">
-            <div style={{ display:"flex",flexDirection:"column",gap:8 }}>
+            <div style={{ display:"flex",flexDirection:"column",gap:10 }}>
               {game.strategy.map((s,i) => (
-                <div key={i} style={{ display:"flex",gap:10,alignItems:"flex-start",padding:"10px 14px",background:"rgba(29,110,60,.12)",border:"1px solid rgba(29,110,60,.25)",borderRadius:8 }}>
-                  <span style={{ color:"#1d8a4c",fontSize:14,flexShrink:0,marginTop:1 }}>✦</span>
-                  <span style={{ color:"#b0c090",fontFamily:"Georgia,serif",fontSize:13,lineHeight:1.65 }}>{s}</span>
+                <div key={i} style={{ display:"flex",gap:14,alignItems:"flex-start",padding:"12px 16px",background:"rgba(6,182,212,0.08)",border:"1px solid rgba(6,182,212,0.3)",borderRadius:12,boxShadow:"0 2px 10px rgba(0,0,0,0.1)" }}>
+                  <span style={{ color:NEON_CYAN,fontSize:16,flexShrink:0,marginTop:0,textShadow:`0 0 8px ${NEON_CYAN}` }}>✦</span>
+                  <span style={{ color:"#e2e8f0",fontSize:14,lineHeight:1.6 }}>{s}</span>
                 </div>
               ))}
             </div>
           </RuleSection>
 
           {game.mistakes && (
-            <RuleSection title="Common Mistakes" accent="red">
-              <div style={{ display:"flex",flexDirection:"column",gap:8 }}>
+            <RuleSection title="Common Mistakes" accent="pink">
+              <div style={{ display:"flex",flexDirection:"column",gap:10 }}>
                 {game.mistakes.map((m,i) => (
-                  <div key={i} style={{ display:"flex",gap:10,alignItems:"flex-start",padding:"10px 14px",background:"rgba(192,19,26,.08)",border:"1px solid rgba(192,19,26,.2)",borderRadius:8 }}>
-                    <span style={{ color:"#c0131a",fontSize:14,flexShrink:0,marginTop:1 }}>✗</span>
-                    <span style={{ color:"#c09090",fontFamily:"Georgia,serif",fontSize:13,lineHeight:1.65 }}>{m}</span>
+                  <div key={i} style={{ display:"flex",gap:14,alignItems:"flex-start",padding:"12px 16px",background:"rgba(236,72,153,0.08)",border:"1px solid rgba(236,72,153,0.3)",borderRadius:12,boxShadow:"0 2px 10px rgba(0,0,0,0.1)" }}>
+                    <span style={{ color:NEON_PINK,fontSize:16,flexShrink:0,marginTop:0,fontWeight:"bold",textShadow:`0 0 8px ${NEON_PINK}` }}>✕</span>
+                    <span style={{ color:"#e2e8f0",fontSize:14,lineHeight:1.6 }}>{m}</span>
                   </div>
                 ))}
               </div>

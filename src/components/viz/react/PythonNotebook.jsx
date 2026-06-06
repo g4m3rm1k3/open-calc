@@ -76,6 +76,10 @@ class Figure:
     def __init__(self,width=None,height=None,square=False,xmin=-5,xmax=5,ymin=-5,ymax=5,title=None):
         self._elements=[];self._width=width;self._height=height;self._square=square
         self._xmin=xmin;self._xmax=xmax;self._ymin=ymin;self._ymax=ymax;self._title=title
+        self._xlabel=None;self._ylabel=None
+    def xlabel(self,label):self._xlabel=label;return self
+    def ylabel(self,label):self._ylabel=label;return self
+    def title(self,t):self._title=t;return self
     def grid(self,step=1,color='border'):
         self._elements.append({'type':'grid','step':step,'color':color});return self
     def axes(self,labels=True,ticks=True,xmin=None,xmax=None,ymin=None,ymax=None):
@@ -96,8 +100,10 @@ class Figure:
         self._elements.append({'type':'line','start':[self._xmin,y],'end':[self._xmax,y],'color':color,'width':width,'dashed':dashed,'alpha':0.7});return self
     def vline(self,x,color='muted',width=1,dashed=True):
         self._elements.append({'type':'line','start':[x,self._ymin],'end':[x,self._ymax],'color':color,'width':width,'dashed':dashed,'alpha':0.7});return self
-    def plot(self,fn,xmin=None,xmax=None,steps=300,color='blue',width=2.5,label=None,fill=False,fill_alpha=0.15,dashed=False):
-        x0=xmin if xmin is not None else self._xmin;x1=xmax if xmax is not None else self._xmax
+    def plot(self,fn_or_xs,ys_or_xmin=None,xmax=None,steps=300,color='blue',width=2.5,label=None,fill=False,fill_alpha=0.15,dashed=False):
+        if isinstance(fn_or_xs,(list,tuple)):
+            self._elements.append({'type':'curve','xs':list(fn_or_xs),'ys':list(ys_or_xmin),'color':color,'width':width,'label':label,'fill':fill,'fill_alpha':fill_alpha,'dashed':dashed});return self
+        fn=fn_or_xs;x0=ys_or_xmin if ys_or_xmin is not None else self._xmin;x1=xmax if xmax is not None else self._xmax
         xs=[x0+(x1-x0)*i/steps for i in range(steps+1)];ys=[]
         for x in xs:
             try:
@@ -180,7 +186,7 @@ class Figure:
     def pie(self,labels,values,colors=None):
         self._elements.append({'type':'pie','labels':[str(l) for l in labels],'values':[float(v) for v in values],'colors':colors});return self
     def show(self):
-        return json.dumps({'type':'opencalc_figure','width':self._width,'height':self._height,'square':self._square,'xmin':self._xmin,'xmax':self._xmax,'ymin':self._ymin,'ymax':self._ymax,'title':self._title,'elements':self._elements})
+        return json.dumps({'type':'opencalc_figure','width':self._width,'height':self._height,'square':self._square,'xmin':self._xmin,'xmax':self._xmax,'ymin':self._ymin,'ymax':self._ymax,'title':self._title,'xlabel':self._xlabel,'ylabel':self._ylabel,'elements':self._elements})
 
 def quick_plot(fn,xmin=-5,xmax=5,color='blue',label=None,title=None):
     fig=Figure(xmin=xmin,xmax=xmax,ymin=-10,ymax=10,title=title)

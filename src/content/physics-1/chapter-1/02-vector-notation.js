@@ -149,7 +149,24 @@ export default {
       },
     ],
     title: 'Proof: dividing by magnitude gives a unit vector',
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'SVGDiagram',
+        props: { type: 'unit-vector-normalization' },
+        title: 'Normalizing a vector — dividing by magnitude gives length 1',
+        mathBridge:
+          'The diagram shows vector A and its unit vector Â side by side. A has arbitrary length; Â has the same direction but length exactly 1. The dashed unit circle confirms |Â| = 1. Drag the tip of A to change its length and direction — Â always stays on the unit circle. This is the geometric meaning of normalization: project the vector onto the unit circle.',
+        caption: 'Â = A/|A| — same direction, length 1. Every unit vector lies on the unit circle.',
+      },
+      {
+        id: 'SVGDiagram',
+        props: { type: 'basis-vectors-ijk' },
+        title: 'Basis vectors î, ĵ, k̂ — the standard frame',
+        mathBridge:
+          'The three unit basis vectors are shown in 3D. î points along +x (length 1). ĵ points along +y (length 1). k̂ points along +z (length 1). They are orthogonal (î·ĵ = 0, etc.) and unit length (|î|=1). Any vector in 3D can be written as a linear combination: A = Ax·î + Ay·ĵ + Az·k̂. The components (Ax, Ay, Az) are just scalars telling you how much of each basis vector to include.',
+        caption: 'î, ĵ, k̂ form an orthonormal basis. Any 3D vector is a unique combination of these three.',
+      },
+    ],
   },
 
   // ── Examples ────────────────────────────────────────────────────────────

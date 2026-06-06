@@ -26,9 +26,10 @@ export default {
   ],
   intuition: {
     prose: [
-      "Constant-acceleration formulas fail when acceleration changes with time.",
-      "In that case, we accumulate acceleration to get velocity, then accumulate velocity to get position.",
-      "This is the calculus pipeline: a(t) → integrate → v(t) → integrate → x(t).",
+      "**SUVAT fails when a changes.** The familiar equations v = v₀ + at and x = x₀ + v₀t + ½at² are derived by assuming a is constant. Slide an elevator that accelerates harder as it picks up speed, a car with a varying throttle, or a rocket burning fuel — none of these have constant a. SUVAT gives the wrong answer for all of them.",
+      "**The integration pipeline.** The fix is simple in concept: go back to the definitions. Acceleration is the rate of change of velocity, so velocity is the antiderivative of acceleration. Velocity is the rate of change of position, so position is the antiderivative of velocity. Two integrations, two initial conditions, exact answer.",
+      "**Area under the curve.** Graphically, the velocity gained from t = 0 to t is the area under the a(t) curve. Displacement from t = 0 to t is the area under the v(t) curve. The Riemann integral is just a rigorous way to add up infinitely many tiny rectangles under those curves.",
+      "**Two boundary conditions per integration.** Each definite integral introduces one constant (the lower bound or the initial value). You need v₀ to anchor the velocity function, and x₀ to anchor the position function. Without initial conditions the solution is a family of functions, not a single trajectory.",
     ],
     callouts: [
       {
@@ -67,8 +68,11 @@ export default {
   },
   math: {
     prose: [
-      "For polynomial a(t), symbolic integration gives exact formulas for v(t) and x(t).",
-      "For arbitrary sampled a(t), numerical integration (e.g., Euler/trapezoid) provides practical approximations.",
+      "**Step 1 — integrate a(t) for v(t).** Starting from dv/dt = a(t) and integrating both sides from 0 to t: v(t) = v₀ + ∫₀ᵗ a(τ) dτ. The dummy variable τ is used inside the integral to avoid confusion with the upper limit t.",
+      "**Step 2 — integrate v(t) for x(t).** Similarly: x(t) = x₀ + ∫₀ᵗ v(τ) dτ. Substitute the expression from Step 1 and integrate again.",
+      "**Polynomial a(t) — fully analytic.** If a(t) = cₙtⁿ + ⋯ + c₁t + c₀ (a polynomial), every integral is exact: ∫tⁿ dt = tⁿ⁺¹/(n+1). Two integrations give v(t) and x(t) as closed-form polynomials.",
+      "**Arbitrary a(t) — numerical methods.** When a(t) comes from sensor data (e.g., an accelerometer), symbolic integration isn't possible. Euler's method approximates: vₙ₊₁ = vₙ + a(tₙ)·Δt; xₙ₊₁ = xₙ + vₙ·Δt. Smaller Δt gives smaller error (first-order convergence). The trapezoid rule is second-order and more accurate for the same step size.",
+      "**Finding extrema.** The turning point (where v = 0) and maximum displacement are found by solving v(t) = 0 for t, then evaluating x(t) at that time. This is the same technique used for constant-a problems — integration just gives the correct v(t) first.",
     ],
     callouts: [
       {
@@ -115,39 +119,113 @@ export default {
       },
       {
         expression: "v(t)-v_0=\\int_0^t a(\\tau)\\,d\\tau",
-        annotation: "Integrate with initial condition v(0)=v0.",
+        annotation: "Integrate both sides from 0 to t with initial condition v(0)=v₀.",
       },
       {
-        expression:
-          "\\frac{dx}{dt}=v(t)\\Rightarrow x(t)-x_0=\\int_0^t v(\\tau)\\,d\\tau",
-        annotation: "Integrate velocity to obtain position.",
+        expression: "v(t)=v_0+\\int_0^t a(\\tau)\\,d\\tau",
+        annotation: "Rearrange to get v(t) explicitly.",
+      },
+      {
+        expression: "\\frac{dx}{dt}=v(t)\\Rightarrow x(t)=x_0+\\int_0^t v(\\tau)\\,d\\tau",
+        annotation: "Apply the same procedure: integrate velocity with initial condition x(0)=x₀.",
+      },
+      {
+        expression: "x(t)=x_0+\\int_0^t\\!\\left[v_0+\\int_0^\\tau a(s)\\,ds\\right]d\\tau",
+        annotation: "Substituting the v(t) expression gives the full position as a double integral over a(t).",
       },
     ],
     title: "Deriving motion with variable acceleration",
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'SVGDiagram',
+        props: { type: 'kinematic-chain' },
+        title: 'Differential equation view',
+        caption: 'Two first-order ODEs — dv/dt = a(t) and dx/dt = v(t) — stacked in series. Initial conditions v₀ and x₀ make the solution unique.',
+      },
+      {
+        id: 'FunctionPlotter',
+        title: 'Acceleration a(t) = 6t and resulting v(t)',
+        props: {
+          fn: '2 + 3*x*x',
+          xMin: 0, xMax: 4, yMin: 0, yMax: 52,
+          xLabel: 't (s)', yLabel: 'v (m/s)',
+        },
+        caption: 'v(t) = 2 + 3t² — the exact result of integrating a(t) = 6t with v₀ = 2 m/s. Compare with the linear SUVAT prediction (dotted) to see the difference.',
+      },
+    ],
   },
   examples: [
     {
       id: "ch2-022-ex1",
-      title: "Polynomial acceleration example",
-      problem:
-        "\\text{Given }a(t)=6t,\\;v_0=2,\\;x_0=0.\\text{ Find }v(3)\\text{ and }x(3).",
+      title: "Polynomial acceleration — two integrations",
+      problem: "Given a(t) = 6t m/s², v₀ = 2 m/s, x₀ = 0 m. Find v(t), x(t), and evaluate both at t = 3 s.",
       steps: [
         {
-          expression: "v(t)=2+\\int_0^t6\\tau\\,d\\tau=2+3t^2",
-          annotation: "Integrate acceleration once.",
+          expression: "v(t)=v_0+\\int_0^t 6\\tau\\,d\\tau=2+\\left[3\\tau^2\\right]_0^t=2+3t^2",
+          annotation: "First integration: evaluate the definite integral and add initial velocity.",
         },
         {
           expression: "v(3)=2+3(9)=29\\,\\text{m/s}",
-          annotation: "Evaluate at t=3 s.",
+          annotation: "Evaluate at t = 3 s.",
         },
         {
-          expression:
-            "x(t)=\\int_0^t(2+3\\tau^2)d\\tau=2t+t^3\\Rightarrow x(3)=6+27=33\\,\\text{m}",
-          annotation: "Integrate velocity and evaluate.",
+          expression: "x(t)=x_0+\\int_0^t(2+3\\tau^2)\\,d\\tau=0+\\left[2\\tau+\\tau^3\\right]_0^t=2t+t^3",
+          annotation: "Second integration: integrate v(t) and add initial position.",
+        },
+        {
+          expression: "x(3)=2(3)+3^3=6+27=33\\,\\text{m}",
+          annotation: "Evaluate at t = 3 s.",
         },
       ],
-      conclusion: "At 3 s, velocity is 29 m/s and displacement is 33 m.",
+      conclusion: "v(3) = 29 m/s and x(3) = 33 m. Note: SUVAT with 'average' acceleration would give a different answer — it's only correct when a is constant.",
+    },
+    {
+      id: "ch2-022-ex2",
+      title: "Finding the turning point with a(t) = 4 − 2t",
+      problem: "a(t) = 4 − 2t m/s², v₀ = 1 m/s, x₀ = 0. Find (a) v(t), (b) when the object momentarily stops, (c) maximum displacement.",
+      steps: [
+        {
+          expression: "v(t)=1+\\int_0^t(4-2\\tau)\\,d\\tau=1+4t-t^2",
+          annotation: "Integrate a(t) with v₀ = 1.",
+        },
+        {
+          expression: "v(t)=0:\\;1+4t-t^2=0\\Rightarrow t^2-4t-1=0\\Rightarrow t=2+\\sqrt{5}\\approx 4.24\\,\\text{s}",
+          annotation: "Set v = 0 and solve the quadratic. Take the positive root (t = 2 + √5; the other root t = 2 − √5 ≈ −0.24 s is before the start).",
+        },
+        {
+          expression: "x(t)=\\int_0^t(1+4\\tau-\\tau^2)\\,d\\tau=t+2t^2-\\tfrac{t^3}{3}",
+          annotation: "Integrate v(t) to get x(t), with x₀ = 0.",
+        },
+        {
+          expression: "x_{\\max}=x(2+\\sqrt{5})\\approx (4.24)+2(4.24)^2-\\tfrac{(4.24)^3}{3}\\approx 14.5\\,\\text{m}",
+          annotation: "Substitute t_turn into x(t) for maximum displacement.",
+        },
+      ],
+      conclusion: "The object turns around at t ≈ 4.24 s after traveling about 14.5 m. After that point, v < 0 and the object moves back toward the origin.",
+    },
+    {
+      id: "ch2-022-ex3",
+      title: "Sinusoidal acceleration — oscillatory motion",
+      problem: "a(t) = A·cos(ωt), where A = 3 m/s² and ω = π rad/s. Initial conditions: v₀ = 0, x₀ = 0. Find v(t) and x(t).",
+      steps: [
+        {
+          expression: "v(t)=0+\\int_0^t A\\cos(\\omega\\tau)\\,d\\tau=\\frac{A}{\\omega}\\sin(\\omega t)=\\frac{3}{\\pi}\\sin(\\pi t)",
+          annotation: "∫cos(ωτ)dτ = sin(ωτ)/ω. With v₀ = 0, constant of integration is 0.",
+        },
+        {
+          expression: "x(t)=0+\\int_0^t\\frac{A}{\\omega}\\sin(\\omega\\tau)\\,d\\tau=\\frac{A}{\\omega^2}[1-\\cos(\\omega t)]=\\frac{3}{\\pi^2}[1-\\cos(\\pi t)]",
+          annotation: "∫sin(ωτ)dτ = −cos(ωτ)/ω. With x₀ = 0: x(t) = (A/ω²)(1 − cos(ωt)).",
+        },
+        {
+          expression: "v_{\\max}=\\frac{A}{\\omega}=\\frac{3}{\\pi}\\approx 0.955\\,\\text{m/s}",
+          annotation: "Maximum velocity occurs when sin = 1.",
+        },
+        {
+          expression: "x_{\\max}=\\frac{2A}{\\omega^2}=\\frac{6}{\\pi^2}\\approx 0.608\\,\\text{m}",
+          annotation: "Maximum displacement occurs when cos = −1 (i.e., at half a period).",
+        },
+      ],
+      conclusion: "Sinusoidal acceleration produces sinusoidal velocity (shifted 90°) and cosinusoidal position. Each integration shifts the phase by 90° and divides amplitude by ω.",
     },
   ],
   challenges: [

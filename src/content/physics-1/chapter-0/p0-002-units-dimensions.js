@@ -228,7 +228,24 @@ export default {
           `\\text{kilo- (k): } \\times 10^3 \\quad \\text{mega- (M): } \\times 10^6 \\quad \\text{giga- (G): } \\times 10^9\\\\\\text{centi- (c): } \\times 10^{-2} \\quad \\text{milli- (m): } \\times 10^{-3} \\quad \\text{micro- (μ): } \\times 10^{-6}`,
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'SVGDiagram',
+        props: { type: 'unit-conversion-chain' },
+        title: 'Unit conversion chain — km/h to m/s step by step',
+        mathBridge:
+          'Follow the chain: start with 100 km/h. Multiply by the first fraction (1000 m / 1 km) — km cancels km, leaving 100,000 m/h. Multiply by the second fraction (1 h / 3600 s) — h cancels h, leaving 27.78 m/s. At each step only one unit changes. This is the "multiply by 1" algorithm — the physical speed never changes, only its label.',
+        caption: 'Unit conversion = multiplying by fractions equal to 1 until the unwanted unit cancels.',
+      },
+      {
+        id: 'SVGDiagram',
+        props: { type: 'sig-figs-rules' },
+        title: 'Significant figures — when digits are meaningful',
+        mathBridge:
+          'The top row shows multiplication: 9.8 × 3.147 = 30.8406, but since 9.8 has only 2 sig figs the answer rounds to 31 (2 sig figs). The bottom row shows addition: 9.80 + 0.3 = 10.1, limited by the least precise decimal place (0.3 has one decimal place). Notice: extra digits after the precision limit are not wrong, just meaningless — they claim certainty you do not have.',
+        caption: 'Sig figs rule: × or ÷ → match fewest sig figs; + or − → match least precise decimal place.',
+      },
+    ],
   },
 
   rigor: {
@@ -277,7 +294,24 @@ export default {
       },
     ],
     title: 'Proving Δx = v₀t + ½at² passes the dimensional test',
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'SVGDiagram',
+        props: { type: 'buckingham-pi' },
+        title: 'Buckingham Pi — deriving the pendulum period from dimensions alone',
+        mathBridge:
+          'The diagram shows the three variables (T, L, g), their dimensions, and the exponent equations you must solve. Notice: 3 variables minus 2 independent dimensions (length, time) = 1 dimensionless group. That one group forces T = C·√(L/g). The constant C = 2π requires solving the differential equation — dimensional analysis gives the shape but not the number.',
+        caption: 'With 3 variables and 2 dimensions, Buckingham Pi guarantees one dimensionless group — which immediately gives the form of the pendulum formula.',
+      },
+      {
+        id: 'SVGDiagram',
+        props: { type: 'dimension-table' },
+        title: 'Dimension table for all mechanics quantities',
+        mathBridge:
+          'Read each row: the quantity name, its SI unit, and its dimension in terms of [M], [L], [T]. Notice that energy (Joule) and torque (N·m) have the same dimension [M·L²·T⁻²] — but they are physically different things. Dimensional analysis alone cannot distinguish them. This is why it is a necessary check, not a sufficient proof.',
+        caption: 'Every mechanics quantity has a dimension expressible in M, L, T. Matching dimensions is necessary but not sufficient for an equation to be correct.',
+      },
+    ],
   },
 
   examples: [

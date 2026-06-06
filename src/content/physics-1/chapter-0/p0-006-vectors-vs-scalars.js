@@ -217,7 +217,24 @@ export default {
       },
     ],
     title: 'The magnitude formula is the Pythagorean theorem',
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'SVGDiagram',
+        props: { type: 'vector-components-pythagorean' },
+        title: 'Magnitude from components — the Pythagorean right triangle',
+        mathBridge:
+          'The diagram shows vector A as the hypotenuse of a right triangle. The horizontal leg is A_x, the vertical leg is A_y. Drag the vector tip — the legs update in real time. The magnitude formula |A| = √(Ax² + Ay²) is exactly the Pythagorean theorem c² = a² + b² applied to this triangle. This is not a coincidence — it is how Euclidean geometry defines distance in 2D.',
+        caption: '|A| = √(Ax² + Ay²) is the Pythagorean theorem. Every vector magnitude calculation is a right triangle.',
+      },
+      {
+        id: 'SVGDiagram',
+        props: { type: 'dot-product-geometric' },
+        title: 'Dot product as projection — A·B = |A||B|cosφ',
+        mathBridge:
+          'The dot product A·B equals the component of A along B, times |B|. Geometrically: drop a perpendicular from A onto B. The length of the shadow of A on B is |A|cosφ. Multiplying by |B| gives A·B. When the vectors are perpendicular (φ = 90°), the shadow has zero length — dot product is zero. When they are parallel (φ = 0°), the shadow is |A| — maximum dot product.',
+        caption: 'A·B = |A||B|cosφ — the projection interpretation. Perpendicular vectors have zero dot product.',
+      },
+    ],
   },
 
   examples: [

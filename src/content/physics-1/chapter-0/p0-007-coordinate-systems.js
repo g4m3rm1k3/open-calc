@@ -193,7 +193,24 @@ export default {
       },
     ],
     title: 'Both sign conventions give the same flight time — proof',
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'SVGDiagram',
+        props: { type: 'sign-convention-comparison' },
+        title: 'Same throw, two sign conventions — identical physical result',
+        mathBridge:
+          'The left panel shows the "up positive" convention: v₀ is positive, g is negative (−9.8), and x increases upward. The right panel shows "down positive": v₀ is negative (going up is negative direction), g is positive (+9.8), x increases downward. Both panels show the ball following the same parabolic path. The numbers in the equations look different, but the peak height (v₀²/2g) and flight time (2v₀/g) are identical. Moral: physics is invariant under coordinate relabelling.',
+        caption: 'Two conventions, one physical event. The answer for any physical observable (height, time, speed) is the same regardless of which sign convention you choose.',
+      },
+      {
+        id: 'SVGDiagram',
+        props: { type: 'coordinate-origin-choice' },
+        title: 'Shifting the origin — x₀ changes, but Δx stays the same',
+        mathBridge:
+          'Drag the origin marker. As you move the reference point, all the x-coordinates change. But the displacement Δx = x_f − x_i stays constant — it is independent of where you put zero. Physical distances (how far the ball fell) are differences, not absolute positions. The coordinate system is a measuring tool, not physical reality.',
+        caption: 'Absolute position depends on where you put the origin. Displacement is a physical difference — it does not depend on the origin.',
+      },
+    ],
   },
 
   examples: [

@@ -230,7 +230,24 @@ export default {
       },
     ],
     title: 'Deriving v² = v₀² + 2aΔx using the chain rule',
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'SVGDiagram',
+        props: { type: 'chain-rule-derivation' },
+        title: 'Chain rule: a = v·(dv/dx) — eliminating time from kinematics',
+        mathBridge:
+          'The chain rule step a = dv/dt = (dv/dx)·(dx/dt) = v·(dv/dx) is the key algebraic move that eliminates t. The diagram shows the dependency chain: a depends on v, v depends on x, x depends on t. By chaining the derivatives, we get a relationship directly between a, v, and x — with t removed. This is why v² = v₀² + 2aΔx contains no t: time was eliminated via the chain rule.',
+        caption: 'Chain rule: a = v·dv/dx. This converts the equation of motion into a relation between v and x, eliminating t entirely.',
+      },
+      {
+        id: 'FunctionPlotter',
+        title: 'v² vs Δx is linear — confirming v² = v₀² + 2aΔx',
+        mathBridge:
+          'If v² = v₀² + 2aΔx, then a plot of v² vs Δx should be a straight line with slope 2a and y-intercept v₀². This plot shows that for free fall (v₀=0, a=9.8): v² = 2(9.8)Δx = 19.6Δx. The linearity confirms the derived formula. This is also an experimental test: if you measure v and Δx and plot v² vs Δx, a straight line validates the constant-acceleration assumption.',
+        caption: 'v² = 19.6·Δx for free fall from rest (v₀=0, a=9.8). The straight line confirms v² ∝ Δx — the calculus derivation is verified.',
+        props: { fn: '19.6*x', xMin: 0, xMax: 50, yMin: 0, yMax: 1000, xLabel: 'Δx (m)', yLabel: 'v² (m²/s²)' },
+      },
+    ],
   },
 
   examples: [
