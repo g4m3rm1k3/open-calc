@@ -4,6 +4,7 @@ import la1_003 from './la1-003-dot-and-cross-products.js';
 import la1_004 from './la1-004-systems-of-equations.js';
 import la1_005 from './la1-005-lines-and-planes.js';
 import la1_006 from './la1-006-gauss-jordan-rref.js';
+import la1_007 from './la1-007-linear-independence.js';
 
 import la2_001 from './la2-001-matrices-as-transformations.js';
 import la2_002 from './la2-002-matrix-multiplication.js';
@@ -82,6 +83,7 @@ const LA1 = {
     la1_004,
     la1_005,
     la1_006,
+    la1_007,
   ],
 };
 
