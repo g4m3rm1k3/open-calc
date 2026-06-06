@@ -80,9 +80,9 @@ export default {
     ],
     visualizations: [
       {
-        id: 'CircuitLab',
-        title: 'Ohm\'s Law — Interactive Circuit',
-        mathBridge: 'Drag the voltage and resistance sliders. Watch current (I=V/R) and power (P=IV) update in real time. This is Ohm\'s Law as a live experiment.',
+        id: 'OhmViz',
+        title: "Ohm's Law — Interactive Triangle",
+        mathBridge: "Lock any one of V, I, or R and adjust the other two. The locked value is computed by Ohm's Law. Switch to the Power view to see P = IV = I²R = V²/R — notice how doubling voltage quadruples power.",
       },
     ],
   },

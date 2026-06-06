@@ -24,7 +24,36 @@
  *   Array of { tag, label } shown as indicator lights.
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, createContext, useContext } from 'react';
+
+function useDark() {
+  const check = () => document.documentElement.classList.contains('dark');
+  const [dark, setDark] = useState(check);
+  useEffect(() => {
+    const obs = new MutationObserver(() => setDark(check()));
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => obs.disconnect();
+  }, []);
+  return dark;
+}
+
+function makeT(dark) {
+  return {
+    bg:     dark ? '#0a0f1e' : '#f8fafc',
+    panel:  dark ? '#111827' : '#ffffff',
+    card:   dark ? '#1e293b' : '#f1f5f9',
+    inset:  dark ? '#0f172a' : '#f8fafc',
+    border: dark ? '#1e293b' : '#e2e8f0',
+    fence:  dark ? '#334155' : '#d1d5db',
+    text:   dark ? '#e2e8f0' : '#1e293b',
+    sub:    dark ? '#94a3b8' : '#64748b',
+    dim:    dark ? '#475569' : '#94a3b8',
+    muted:  dark ? '#64748b' : '#9ca3af',
+    wireOff: dark ? '#334155' : '#cbd5e1',
+  };
+}
+
+const ThemeCtx = createContext(null);
 
 // ─── Tag utilities ─────────────────────────────────────────────────────────
 
@@ -317,7 +346,7 @@ const TYPE_COLORS = {
   MOV: '#64748b', ADD: '#64748b', SUB: '#64748b', MUL: '#64748b', DIV: '#64748b',
 };
 const WIRE_ON = '#10b981';
-const WIRE_OFF = '#334155';
+// WIRE_OFF is now theme-derived inside components via ThemeCtx
 
 function getElementPower(el, tags) {
   switch (el.type) {
@@ -367,12 +396,13 @@ const IS_BOX = new Set(['TON', 'TOF', 'RTO', 'CTU', 'CTD', 'EQU', 'NEQ', 'GRT', 
 const IS_CONTACT = new Set(['XIC', 'XIO']);
 
 function RungElement({ el, tags, powered, compact }) {
+  const tk = useContext(ThemeCtx);
   const isCoil = IS_COIL.has(el.type);
   const isBox = IS_BOX.has(el.type);
   const isContact = IS_CONTACT.has(el.type);
   const color = TYPE_COLORS[el.type] ?? '#64748b';
   const active = getElementPower(el, tags);
-  const wireColor = powered ? WIRE_ON : WIRE_OFF;
+  const wireColor = powered ? WIRE_ON : tk.wireOff;
   const label = getElementLabel(el, tags);
   const lines = label.split('\n');
 
@@ -386,7 +416,7 @@ function RungElement({ el, tags, powered, compact }) {
       <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
         <div style={{ width: 12, height: 2, background: wireColor }} />
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, position: 'relative' }}>
-          <div style={{ fontSize: 9, fontWeight: 600, color: '#94a3b8', textAlign: 'center', maxWidth: W, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <div style={{ fontSize: 9, fontWeight: 600, color: tk.sub, textAlign: 'center', maxWidth: W, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {lines[0]}
           </div>
           <div style={{
@@ -394,19 +424,19 @@ function RungElement({ el, tags, powered, compact }) {
           }}>
             {/* Contact bars */}
             <div style={{ position: 'absolute', left: 0, width: 10, height: 2, background: wireColor }} />
-            <div style={{ position: 'absolute', left: 10, width: 2, height: 20, background: active ? color : '#334155', borderRadius: 1 }} />
+            <div style={{ position: 'absolute', left: 10, width: 2, height: 20, background: active ? color : tk.wireOff, borderRadius: 1 }} />
             {notched && (
-              <div style={{ position: 'absolute', left: 13, top: 6, fontSize: 10, color: active ? color : '#475569', fontWeight: 800, lineHeight: 1 }}>/</div>
+              <div style={{ position: 'absolute', left: 13, top: 6, fontSize: 10, color: active ? color : tk.dim, fontWeight: 800, lineHeight: 1 }}>/</div>
             )}
-            <div style={{ position: 'absolute', right: 10, width: 2, height: 20, background: active ? color : '#334155', borderRadius: 1 }} />
+            <div style={{ position: 'absolute', right: 10, width: 2, height: 20, background: active ? color : tk.wireOff, borderRadius: 1 }} />
             <div style={{ position: 'absolute', right: 0, width: 10, height: 2, background: wireColor }} />
             {active && (
               <div style={{ position: 'absolute', inset: 2, borderRadius: 4, background: color + '18' }} />
             )}
           </div>
-          {lines[1] && <div style={{ fontSize: 9, color: active ? color : '#64748b', fontWeight: active ? 700 : 400 }}>{lines[1]}</div>}
+          {lines[1] && <div style={{ fontSize: 9, color: active ? color : tk.muted, fontWeight: active ? 700 : 400 }}>{lines[1]}</div>}
         </div>
-        <div style={{ width: 12, height: 2, background: (powered && active) ? WIRE_ON : WIRE_OFF }} />
+        <div style={{ width: 12, height: 2, background: (powered && active) ? WIRE_ON : tk.wireOff }} />
       </div>
     );
   }
@@ -420,16 +450,16 @@ function RungElement({ el, tags, powered, compact }) {
           <div style={{
             width: 36, height: 28,
             borderRadius: '50%',
-            border: `2.5px solid ${powered ? color : '#334155'}`,
+            border: `2.5px solid ${powered ? color : tk.wireOff}`,
             background: powered ? color + '22' : 'transparent',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 8, color: powered ? color : '#475569', fontWeight: 700,
+            fontSize: 8, color: powered ? color : tk.dim, fontWeight: 700,
           }}>
             {el.type === 'OTL' ? 'L' : el.type === 'OTU' ? 'U' : ''}
           </div>
-          {lines[1] && <div style={{ fontSize: 9, color: '#64748b' }}>{lines[1]}</div>}
+          {lines[1] && <div style={{ fontSize: 9, color: tk.muted }}>{lines[1]}</div>}
         </div>
-        <div style={{ width: 16, height: 2, background: '#1e293b' }} />
+        <div style={{ width: 16, height: 2, background: tk.border }} />
       </div>
     );
   }
@@ -443,19 +473,19 @@ function RungElement({ el, tags, powered, compact }) {
       <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
         <div style={{ width: 8, height: 2, background: wireColor }} />
         <div style={{
-          border: `2px solid ${powered ? color : '#334155'}`,
+          border: `2px solid ${powered ? color : tk.wireOff}`,
           borderRadius: 6,
-          background: powered ? color + '14' : '#0f172a',
+          background: powered ? color + '14' : tk.inset,
           padding: '3px 8px',
           minWidth: W, minHeight: H,
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 1,
         }}>
-          <div style={{ fontSize: 9, fontWeight: 800, color: powered ? color : '#475569', letterSpacing: '0.05em' }}>{el.type}</div>
+          <div style={{ fontSize: 9, fontWeight: 800, color: powered ? color : tk.dim, letterSpacing: '0.05em' }}>{el.type}</div>
           {lines.map((l, li) => (
-            <div key={li} style={{ fontSize: li === 0 ? 9 : 10, color: powered ? '#e2e8f0' : '#64748b', fontFamily: 'monospace', textAlign: 'center' }}>{l}</div>
+            <div key={li} style={{ fontSize: li === 0 ? 9 : 10, color: powered ? tk.text : tk.muted, fontFamily: 'monospace', textAlign: 'center' }}>{l}</div>
           ))}
         </div>
-        <div style={{ width: 8, height: 2, background: powered ? WIRE_ON : WIRE_OFF }} />
+        <div style={{ width: 8, height: 2, background: powered ? WIRE_ON : tk.wireOff }} />
       </div>
     );
   }
@@ -464,20 +494,17 @@ function RungElement({ el, tags, powered, compact }) {
 }
 
 function LadderRung({ rung, tags, rungNum, compact }) {
-  // Compute power flow left-to-right
+  const tk = useContext(ThemeCtx);
   let runningPower = true;
 
   return (
     <div style={{
       display: 'flex', alignItems: 'center',
-      background: '#0f172a', borderRadius: 8,
-      border: '1px solid #1e293b',
+      background: tk.inset, borderRadius: 8,
+      border: `1px solid ${tk.border}`,
       padding: '6px 0', marginBottom: 4, overflow: 'hidden',
     }}>
-      {/* Rung number */}
-      <div style={{ width: 28, textAlign: 'right', paddingRight: 6, fontSize: 9, color: '#475569', fontWeight: 700, flexShrink: 0 }}>{rungNum}</div>
-
-      {/* Left power rail */}
+      <div style={{ width: 28, textAlign: 'right', paddingRight: 6, fontSize: 9, color: tk.dim, fontWeight: 700, flexShrink: 0 }}>{rungNum}</div>
       <div style={{ width: 4, height: compact ? 52 : 60, background: '#6366f1', borderRadius: 2, flexShrink: 0 }} />
 
       {/* Elements */}
@@ -497,16 +524,16 @@ function LadderRung({ rung, tags, rungNum, compact }) {
         })}
       </div>
 
-      {/* Right power rail */}
-      <div style={{ width: 4, height: compact ? 52 : 60, background: '#1e293b', borderRadius: 2, flexShrink: 0 }} />
+      <div style={{ width: 4, height: compact ? 52 : 60, background: tk.border, borderRadius: 2, flexShrink: 0 }} />
     </div>
   );
 }
 
 function BranchElement({ el, tags, powered, compact }) {
+  const tk = useContext(ThemeCtx);
   return (
     <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 2, borderLeft: `2px solid ${powered ? WIRE_ON : WIRE_OFF}`, borderRight: `2px solid ${powered ? WIRE_ON : WIRE_OFF}`, padding: '4px 0' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2, borderLeft: `2px solid ${powered ? WIRE_ON : tk.wireOff}`, borderRight: `2px solid ${powered ? WIRE_ON : tk.wireOff}`, padding: '4px 0' }}>
         {(el.branches ?? []).map((branch, bi) => (
           <div key={bi} style={{ display: 'flex', alignItems: 'center', paddingLeft: 4, paddingRight: 4 }}>
             {branch.map((subEl, si) => {
@@ -523,31 +550,25 @@ function BranchElement({ el, tags, powered, compact }) {
 // ─── INT tag editor ────────────────────────────────────────────────────────
 
 function IntTagEditor({ name, value, onChange }) {
+  const tk = useContext(ThemeCtx);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(String(value));
   if (editing) {
     return (
-      <input
-        autoFocus
-        value={draft}
+      <input autoFocus value={draft}
         onChange={e => setDraft(e.target.value)}
-        onBlur={() => {
-          const n = parseInt(draft, 10);
-          if (!isNaN(n)) onChange(n);
-          setEditing(false);
-        }}
+        onBlur={() => { const n = parseInt(draft, 10); if (!isNaN(n)) onChange(n); setEditing(false); }}
         onKeyDown={e => {
           if (e.key === 'Enter') { const n = parseInt(draft, 10); if (!isNaN(n)) onChange(n); setEditing(false); }
           if (e.key === 'Escape') setEditing(false);
         }}
-        style={{ width: 70, fontFamily: 'monospace', fontSize: 12, background: '#1e293b', color: '#6366f1', border: '1px solid #6366f1', borderRadius: 4, padding: '2px 6px', textAlign: 'right' }}
+        style={{ width: 70, fontFamily: 'monospace', fontSize: 12, background: tk.card, color: '#6366f1', border: '1px solid #6366f1', borderRadius: 4, padding: '2px 6px', textAlign: 'right' }}
       />
     );
   }
   return (
-    <span onClick={() => { setDraft(String(value)); setEditing(true); }}
-      title="Click to edit"
-      style={{ fontFamily: 'monospace', fontSize: 12, fontWeight: 700, color: '#6366f1', cursor: 'text', borderBottom: '1px dashed #334155' }}>
+    <span onClick={() => { setDraft(String(value)); setEditing(true); }} title="Click to edit"
+      style={{ fontFamily: 'monospace', fontSize: 12, fontWeight: 700, color: '#6366f1', cursor: 'text', borderBottom: `1px dashed ${tk.fence}` }}>
       {value}
     </span>
   );
@@ -556,6 +577,8 @@ function IntTagEditor({ name, value, onChange }) {
 // ─── Main component ────────────────────────────────────────────────────────
 
 export default function PLCLadderSim({ params = {}, initialProps }) {
+  const dark = useDark();
+  const tk = makeT(dark);
   const cfg = (params && Object.keys(params).length > 0 ? params : initialProps) ?? {};
   const {
     program = [],
@@ -621,162 +644,164 @@ export default function PLCLadderSim({ params = {}, initialProps }) {
   const intTags = tagEntries.filter(([, t]) => t.type === 'INT' || t.type === 'DINT');
 
   return (
-    <div style={{ fontFamily: 'system-ui, sans-serif', background: '#0a0f1e', color: '#e2e8f0', borderRadius: 12, overflow: 'hidden' }}>
-      {/* Header */}
-      <div style={{ padding: '10px 16px', background: '#111827', borderBottom: '1px solid #1e293b', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
-          <div style={{ width: 8, height: 8, borderRadius: '50%', background: running ? '#10b981' : '#ef4444', boxShadow: running ? '0 0 8px #10b981' : 'none' }} />
-          <span style={{ fontWeight: 700, fontSize: 13, color: '#e2e8f0' }}>{title}</span>
-          <span style={{ fontSize: 10, color: '#475569' }}>scan #{scanCount}</span>
-        </div>
-        <div style={{ display: 'flex', gap: 6 }}>
-          <button onClick={() => setRunning(r => !r)}
-            style={{ padding: '4px 12px', borderRadius: 16, fontSize: 11, fontWeight: 700, cursor: 'pointer', border: '1px solid', borderColor: running ? '#10b981' : '#ef4444', background: 'transparent', color: running ? '#10b981' : '#ef4444' }}>
-            {running ? '⏸ Pause' : '▶ Run'}
-          </button>
-          <button onClick={resetAll}
-            style={{ padding: '4px 12px', borderRadius: 16, fontSize: 11, fontWeight: 700, cursor: 'pointer', border: '1px solid #334155', background: 'transparent', color: '#94a3b8' }}>
-            Reset
-          </button>
-        </div>
-      </div>
-
-      {/* Tab bar */}
-      <div style={{ display: 'flex', background: '#111827', borderBottom: '1px solid #1e293b' }}>
-        {['ladder', 'io', 'tags'].map(tab => (
-          <button key={tab} onClick={() => setActiveTab(tab)}
-            style={{ padding: '6px 16px', fontSize: 11, fontWeight: 700, cursor: 'pointer', border: 'none', background: activeTab === tab ? '#1e293b' : 'transparent', color: activeTab === tab ? '#e2e8f0' : '#64748b', borderBottom: activeTab === tab ? '2px solid #6366f1' : '2px solid transparent', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-            {tab === 'io' ? 'I/O' : tab.charAt(0).toUpperCase() + tab.slice(1)}
-          </button>
-        ))}
-      </div>
-
-      {/* Ladder view */}
-      {activeTab === 'ladder' && (
-        <div style={{ padding: 12, overflowX: 'auto' }}>
-          {description && <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 10, fontStyle: 'italic' }}>{description}</p>}
-          {program.map((rung, i) => (
-            <LadderRung key={i} rung={rung} tags={tags} rungNum={i + 1} compact={compact} />
-          ))}
-          {program.length === 0 && (
-            <div style={{ textAlign: 'center', color: '#475569', padding: 24, fontSize: 12 }}>No program loaded. Configure via initialProps.program</div>
-          )}
-        </div>
-      )}
-
-      {/* I/O panel */}
-      {activeTab === 'io' && (
-        <div style={{ padding: 12 }}>
-          {inputs.length > 0 && (
-            <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 10, fontWeight: 700, color: '#6366f1', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: 8 }}>Digital Inputs</div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-                {inputs.map(inp => {
-                  const tagName = typeof inp === 'string' ? inp : inp.tag;
-                  const label = typeof inp === 'string' ? inp : (inp.label ?? inp.tag);
-                  const val = getTagValue(tags, tagName);
-                  return (
-                    <button key={tagName} onClick={() => toggleInput(tagName)}
-                      style={{
-                        padding: '10px 16px', borderRadius: 10, cursor: 'pointer',
-                        border: `2px solid ${val ? '#6366f1' : '#334155'}`,
-                        background: val ? '#1e1b4b' : '#0f172a',
-                        color: val ? '#a5b4fc' : '#64748b',
-                        fontSize: 11, fontWeight: 700, textAlign: 'left', minWidth: 100,
-                        transition: 'all 0.1s',
-                      }}>
-                      <div style={{ fontSize: 9, color: '#64748b', marginBottom: 2 }}>{tagName}</div>
-                      <div>{label}</div>
-                      <div style={{ fontFamily: 'monospace', fontSize: 14, marginTop: 2, color: val ? '#10b981' : '#ef4444' }}>{val ? '1 (ON)' : '0 (OFF)'}</div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {outputs.length > 0 && (
-            <div>
-              <div style={{ fontSize: 10, fontWeight: 700, color: '#10b981', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: 8 }}>Digital Outputs</div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-                {outputs.map(out => {
-                  const tagName = typeof out === 'string' ? out : out.tag;
-                  const label = typeof out === 'string' ? out : (out.label ?? out.tag);
-                  const val = getTagValue(tags, tagName);
-                  return (
-                    <div key={tagName} style={{
-                      padding: '10px 16px', borderRadius: 10,
-                      border: `2px solid ${val ? '#10b981' : '#1e293b'}`,
-                      background: val ? '#052e16' : '#0f172a',
-                      minWidth: 100,
-                    }}>
-                      <div style={{ fontSize: 9, color: '#475569', marginBottom: 2 }}>{tagName}</div>
-                      <div style={{ fontSize: 11, fontWeight: 700, color: val ? '#10b981' : '#64748b' }}>{label}</div>
-                      <div style={{ fontFamily: 'monospace', fontSize: 14, marginTop: 2, color: val ? '#10b981' : '#475569' }}>{val ? '1 (ON)' : '0 (OFF)'}</div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {inputs.length === 0 && outputs.length === 0 && (
-            <div style={{ color: '#475569', fontSize: 12, textAlign: 'center', padding: 20 }}>No I/O configured. Add inputs/outputs via initialProps.</div>
-          )}
-        </div>
-      )}
-
-      {/* Tags watch window */}
-      {activeTab === 'tags' && (
-        <div style={{ padding: 12 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 8 }}>
-            {boolTags.map(([name, tag]) => (
-              <div key={name} style={{ background: '#111827', border: `1px solid ${tag.value ? '#22c55e33' : '#1e293b'}`, borderRadius: 8, padding: '6px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: 11, fontFamily: 'monospace', color: '#94a3b8' }}>{name}</span>
-                <span style={{ fontFamily: 'monospace', fontSize: 12, fontWeight: 700, color: tag.value ? '#10b981' : '#475569' }}>{tag.value ? '1' : '0'}</span>
-              </div>
-            ))}
-            {intTags.map(([name, tag]) => (
-              <div key={name} style={{ background: '#111827', border: '1px solid #1e293b', borderRadius: 8, padding: '6px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: 11, fontFamily: 'monospace', color: '#94a3b8' }}>{name}</span>
-                <IntTagEditor name={name} value={tag.value ?? 0} onChange={v => setTags(prev => ({ ...prev, [name]: { ...prev[name], value: v } }))} />
-              </div>
-            ))}
-            {timerTags.map(([name, tag]) => (
-              <div key={name} style={{ background: '#111827', border: `1px solid ${tag.EN ? '#f59e0b33' : '#1e293b'}`, borderRadius: 8, padding: '6px 10px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <span style={{ fontSize: 11, fontFamily: 'monospace', color: '#f59e0b' }}>{name}</span>
-                  <span style={{ fontSize: 9, color: '#475569' }}>TIMER</span>
-                </div>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  {[['EN', tag.EN], ['DN', tag.DN], ['TT', tag.TT]].map(([k, v]) => (
-                    <span key={k} style={{ fontSize: 10, fontFamily: 'monospace', color: v ? '#f59e0b' : '#475569' }}>{k}:{v ? '1' : '0'}</span>
-                  ))}
-                  <span style={{ fontSize: 10, fontFamily: 'monospace', color: '#e2e8f0' }}>ACC:{Math.round(tag.ACC)}ms</span>
-                </div>
-                <div style={{ marginTop: 4, height: 4, background: '#1e293b', borderRadius: 2, overflow: 'hidden' }}>
-                  <div style={{ height: '100%', background: '#f59e0b', borderRadius: 2, width: `${Math.min(100, (tag.ACC / tag.PRE) * 100)}%`, transition: 'width 0.1s' }} />
-                </div>
-                <button onClick={() => resetTag(name, 'TIMER')} style={{ marginTop: 4, fontSize: 9, color: '#475569', background: 'transparent', border: 'none', cursor: 'pointer', padding: 0 }}>Reset</button>
-              </div>
-            ))}
-            {counterTags.map(([name, tag]) => (
-              <div key={name} style={{ background: '#111827', border: `1px solid ${tag.DN ? '#8b5cf633' : '#1e293b'}`, borderRadius: 8, padding: '6px 10px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <span style={{ fontSize: 11, fontFamily: 'monospace', color: '#8b5cf6' }}>{name}</span>
-                  <span style={{ fontSize: 9, color: '#475569' }}>COUNTER</span>
-                </div>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: 10, fontFamily: 'monospace', color: tag.DN ? '#8b5cf6' : '#475569' }}>DN:{tag.DN ? '1' : '0'}</span>
-                  <span style={{ fontSize: 10, fontFamily: 'monospace', color: '#e2e8f0' }}>ACC:{tag.ACC}</span>
-                  <span style={{ fontSize: 10, fontFamily: 'monospace', color: '#94a3b8' }}>PRE:{tag.PRE}</span>
-                </div>
-                <button onClick={() => resetTag(name, 'COUNTER')} style={{ marginTop: 4, fontSize: 9, color: '#475569', background: 'transparent', border: 'none', cursor: 'pointer', padding: 0 }}>Reset</button>
-              </div>
-            ))}
+    <ThemeCtx.Provider value={tk}>
+      <div style={{ fontFamily: 'system-ui, sans-serif', background: tk.bg, color: tk.text, borderRadius: 12, overflow: 'hidden' }}>
+        {/* Header */}
+        <div style={{ padding: '10px 16px', background: tk.panel, borderBottom: `1px solid ${tk.border}`, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
+            <div style={{ width: 8, height: 8, borderRadius: '50%', background: running ? '#10b981' : '#ef4444', boxShadow: running ? '0 0 8px #10b981' : 'none' }} />
+            <span style={{ fontWeight: 700, fontSize: 13 }}>{title}</span>
+            <span style={{ fontSize: 10, color: tk.dim }}>scan #{scanCount}</span>
+          </div>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button onClick={() => setRunning(r => !r)}
+              style={{ padding: '4px 12px', borderRadius: 16, fontSize: 11, fontWeight: 700, cursor: 'pointer', border: '1px solid', borderColor: running ? '#10b981' : '#ef4444', background: 'transparent', color: running ? '#10b981' : '#ef4444' }}>
+              {running ? '⏸ Pause' : '▶ Run'}
+            </button>
+            <button onClick={resetAll}
+              style={{ padding: '4px 12px', borderRadius: 16, fontSize: 11, fontWeight: 700, cursor: 'pointer', border: `1px solid ${tk.fence}`, background: 'transparent', color: tk.sub }}>
+              Reset
+            </button>
           </div>
         </div>
-      )}
-    </div>
+
+        {/* Tab bar */}
+        <div style={{ display: 'flex', background: tk.panel, borderBottom: `1px solid ${tk.border}` }}>
+          {['ladder', 'io', 'tags'].map(tab => (
+            <button key={tab} onClick={() => setActiveTab(tab)}
+              style={{ padding: '6px 16px', fontSize: 11, fontWeight: 700, cursor: 'pointer', border: 'none', background: activeTab === tab ? tk.card : 'transparent', color: activeTab === tab ? tk.text : tk.muted, borderBottom: activeTab === tab ? '2px solid #6366f1' : '2px solid transparent', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              {tab === 'io' ? 'I/O' : tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </button>
+          ))}
+        </div>
+
+        {/* Ladder view */}
+        {activeTab === 'ladder' && (
+          <div style={{ padding: 12, overflowX: 'auto' }}>
+            {description && <p style={{ fontSize: 12, color: tk.sub, marginBottom: 10, fontStyle: 'italic' }}>{description}</p>}
+            {program.map((rung, i) => (
+              <LadderRung key={i} rung={rung} tags={tags} rungNum={i + 1} compact={compact} />
+            ))}
+            {program.length === 0 && (
+              <div style={{ textAlign: 'center', color: tk.dim, padding: 24, fontSize: 12 }}>No program loaded. Configure via initialProps.program</div>
+            )}
+          </div>
+        )}
+
+        {/* I/O panel */}
+        {activeTab === 'io' && (
+          <div style={{ padding: 12 }}>
+            {inputs.length > 0 && (
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ fontSize: 10, fontWeight: 700, color: '#6366f1', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: 8 }}>Digital Inputs</div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+                  {inputs.map(inp => {
+                    const tagName = typeof inp === 'string' ? inp : inp.tag;
+                    const label = typeof inp === 'string' ? inp : (inp.label ?? inp.tag);
+                    const val = getTagValue(tags, tagName);
+                    return (
+                      <button key={tagName} onClick={() => toggleInput(tagName)}
+                        style={{
+                          padding: '10px 16px', borderRadius: 10, cursor: 'pointer',
+                          border: `2px solid ${val ? '#6366f1' : tk.fence}`,
+                          background: val ? (dark ? '#1e1b4b' : '#ede9fe') : tk.inset,
+                          color: val ? '#a5b4fc' : tk.muted,
+                          fontSize: 11, fontWeight: 700, textAlign: 'left', minWidth: 100,
+                          transition: 'all 0.1s',
+                        }}>
+                        <div style={{ fontSize: 9, color: tk.muted, marginBottom: 2 }}>{tagName}</div>
+                        <div>{label}</div>
+                        <div style={{ fontFamily: 'monospace', fontSize: 14, marginTop: 2, color: val ? '#10b981' : '#ef4444' }}>{val ? '1 (ON)' : '0 (OFF)'}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {outputs.length > 0 && (
+              <div>
+                <div style={{ fontSize: 10, fontWeight: 700, color: '#10b981', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: 8 }}>Digital Outputs</div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+                  {outputs.map(out => {
+                    const tagName = typeof out === 'string' ? out : out.tag;
+                    const label = typeof out === 'string' ? out : (out.label ?? out.tag);
+                    const val = getTagValue(tags, tagName);
+                    return (
+                      <div key={tagName} style={{
+                        padding: '10px 16px', borderRadius: 10,
+                        border: `2px solid ${val ? '#10b981' : tk.border}`,
+                        background: val ? (dark ? '#052e16' : '#dcfce7') : tk.inset,
+                        minWidth: 100,
+                      }}>
+                        <div style={{ fontSize: 9, color: tk.dim, marginBottom: 2 }}>{tagName}</div>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: val ? '#10b981' : tk.muted }}>{label}</div>
+                        <div style={{ fontFamily: 'monospace', fontSize: 14, marginTop: 2, color: val ? '#10b981' : tk.dim }}>{val ? '1 (ON)' : '0 (OFF)'}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {inputs.length === 0 && outputs.length === 0 && (
+              <div style={{ color: tk.dim, fontSize: 12, textAlign: 'center', padding: 20 }}>No I/O configured. Add inputs/outputs via initialProps.</div>
+            )}
+          </div>
+        )}
+
+        {/* Tags watch window */}
+        {activeTab === 'tags' && (
+          <div style={{ padding: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 8 }}>
+              {boolTags.map(([name, tag]) => (
+                <div key={name} style={{ background: tk.panel, border: `1px solid ${tag.value ? '#22c55e33' : tk.border}`, borderRadius: 8, padding: '6px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: 11, fontFamily: 'monospace', color: tk.sub }}>{name}</span>
+                  <span style={{ fontFamily: 'monospace', fontSize: 12, fontWeight: 700, color: tag.value ? '#10b981' : tk.dim }}>{tag.value ? '1' : '0'}</span>
+                </div>
+              ))}
+              {intTags.map(([name, tag]) => (
+                <div key={name} style={{ background: tk.panel, border: `1px solid ${tk.border}`, borderRadius: 8, padding: '6px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: 11, fontFamily: 'monospace', color: tk.sub }}>{name}</span>
+                  <IntTagEditor name={name} value={tag.value ?? 0} onChange={v => setTags(prev => ({ ...prev, [name]: { ...prev[name], value: v } }))} />
+                </div>
+              ))}
+              {timerTags.map(([name, tag]) => (
+                <div key={name} style={{ background: tk.panel, border: `1px solid ${tag.EN ? '#f59e0b33' : tk.border}`, borderRadius: 8, padding: '6px 10px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                    <span style={{ fontSize: 11, fontFamily: 'monospace', color: '#f59e0b' }}>{name}</span>
+                    <span style={{ fontSize: 9, color: tk.dim }}>TIMER</span>
+                  </div>
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    {[['EN', tag.EN], ['DN', tag.DN], ['TT', tag.TT]].map(([k, v]) => (
+                      <span key={k} style={{ fontSize: 10, fontFamily: 'monospace', color: v ? '#f59e0b' : tk.dim }}>{k}:{v ? '1' : '0'}</span>
+                    ))}
+                    <span style={{ fontSize: 10, fontFamily: 'monospace', color: tk.text }}>ACC:{Math.round(tag.ACC)}ms</span>
+                  </div>
+                  <div style={{ marginTop: 4, height: 4, background: tk.card, borderRadius: 2, overflow: 'hidden' }}>
+                    <div style={{ height: '100%', background: '#f59e0b', borderRadius: 2, width: `${Math.min(100, (tag.ACC / tag.PRE) * 100)}%`, transition: 'width 0.1s' }} />
+                  </div>
+                  <button onClick={() => resetTag(name, 'TIMER')} style={{ marginTop: 4, fontSize: 9, color: tk.dim, background: 'transparent', border: 'none', cursor: 'pointer', padding: 0 }}>Reset</button>
+                </div>
+              ))}
+              {counterTags.map(([name, tag]) => (
+                <div key={name} style={{ background: tk.panel, border: `1px solid ${tag.DN ? '#8b5cf633' : tk.border}`, borderRadius: 8, padding: '6px 10px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                    <span style={{ fontSize: 11, fontFamily: 'monospace', color: '#8b5cf6' }}>{name}</span>
+                    <span style={{ fontSize: 9, color: tk.dim }}>COUNTER</span>
+                  </div>
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: 10, fontFamily: 'monospace', color: tag.DN ? '#8b5cf6' : tk.dim }}>DN:{tag.DN ? '1' : '0'}</span>
+                    <span style={{ fontSize: 10, fontFamily: 'monospace', color: tk.text }}>ACC:{tag.ACC}</span>
+                    <span style={{ fontSize: 10, fontFamily: 'monospace', color: tk.sub }}>PRE:{tag.PRE}</span>
+                  </div>
+                  <button onClick={() => resetTag(name, 'COUNTER')} style={{ marginTop: 4, fontSize: 9, color: tk.dim, background: 'transparent', border: 'none', cursor: 'pointer', padding: 0 }}>Reset</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </ThemeCtx.Provider>
   );
 }

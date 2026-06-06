@@ -61,9 +61,9 @@ export default {
     ],
     visualizations: [
       {
-        id: 'CircuitLab',
+        id: 'OhmViz',
         title: 'Power Dissipation — P=IV=I²R=V²/R',
-        mathBridge: "Watch the power readout as you move the sliders. Notice: doubling voltage quadruples power (P = V²/R). Doubling resistance halves power. The relationship is not linear. At 24V and 10Ω (near-short), power is 57.6W — that wire gets very hot very fast. At 24V and 1kΩ, power is only 0.576W — barely warm.",
+        mathBridge: "Open the Power view. Move the sliders and notice: doubling voltage quadruples power (P = V²/R — the square relationship). Doubling resistance halves power. At 24V and 10Ω, power is 57.6W — a near-short that will melt wire. At 24V and 1kΩ, power is only 0.576W — barely warm.",
       },
     ],
   },

@@ -61,6 +61,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'RelayContactorViz',
+        title: 'Relay & Contactor — Control vs Power Circuit',
+        mathBridge: "Hold 'Energize Coil' to close the relay. Watch the 24VDC control circuit energize the coil, which closes the NO contact and connects the 120VAC motor circuit. The Ladder tab shows how this wiring maps directly to PLC ladder logic notation.",
+      },
+      {
         id: 'RelayLadderSim',
         title: 'Relay Ladder Logic Simulator',
         mathBridge: "Select 'Motor Seal-in'. Press START — the Run Bit latches via the parallel feedback contact. Press STOP to break the circuit. This is the SR latch implemented in ladder logic.",
