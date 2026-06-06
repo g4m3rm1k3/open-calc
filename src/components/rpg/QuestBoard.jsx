@@ -9,12 +9,16 @@ export function QuestBoard({ rpgData, acceptQuest, completeQuest }) {
 
   const handleGenerateQuest = async () => {
     setError(null);
-    const newQuest = await generateQuest(rpgData);
-    if (newQuest && newQuest.questName) {
-      newQuest.id = Date.now().toString();
-      acceptQuest(newQuest);
-    } else {
-      setError("Failed to consult the Coach. The magical weave might be disrupted.");
+    try {
+      const newQuest = await generateQuest(rpgData);
+      if (newQuest && newQuest.questName) {
+        newQuest.id = Date.now().toString();
+        acceptQuest(newQuest);
+      } else {
+        setError("Coach returned an empty scroll. Try again.");
+      }
+    } catch (err) {
+      setError(`Coach error: ${err?.message || 'Unknown error'}`);
     }
   };
 

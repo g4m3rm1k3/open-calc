@@ -52,7 +52,19 @@ export function useRPGCoachAI() {
       const engine = await ensureEngine();
       
       const hasBaseline = rpgData.workoutLogs && rpgData.workoutLogs.length > 0;
-      const recentLogs = hasBaseline ? rpgData.workoutLogs.slice(0, 3).map(l => `${l.type} x${l.value} (RPE: ${l.rpe || 'unknown'})`).join(', ') : 'None yet';
+      const recentLogs = hasBaseline
+        ? rpgData.workoutLogs.slice(0, 3).map(l => {
+            const m = l.metrics || {};
+            const detail = m.reps
+              ? `${m.sets || 1}x${m.reps} reps`
+              : m.distance
+              ? `${m.distance}km`
+              : m.duration
+              ? `${m.duration}min`
+              : '';
+            return `${l.exerciseId || 'exercise'} ${detail} (RPE: ${m.rpe || 'unknown'})`;
+          }).join(', ')
+        : 'None yet';
 
       let prompt = `Generate a new daily quest for a Level ${rpgData.level} ${rpgData.heroClass}. 
 Their experience level is: ${rpgData.experienceLevel || 'Beginner'}.
@@ -99,7 +111,7 @@ Remember to return ONLY valid JSON.`;
       }
     } catch (err) {
       console.error("Error generating quest:", err);
-      return null;
+      throw err;
     } finally {
       setIsThinking(false);
     }

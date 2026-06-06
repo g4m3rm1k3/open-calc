@@ -135,14 +135,14 @@ export function solveAnalog(netlist, nodes, simState, dt = 1/60) {
            const r_on = n.type === "LED" ? 50.0 : 10.0;
            addConductance(nA, nC, 1.0 / r_on);
            const i_f = v_f / r_on;
-           I_inject[nA] -= i_f;
-           I_inject[nC] += i_f;
+           I_inject[nA] += i_f;
+           I_inject[nC] -= i_f;
         } else if (n.type === "ZENER_DIODE" && v_diff < -5.1) {
            const r_on = 10.0;
            addConductance(nA, nC, 1.0 / r_on);
            const i_z = -5.1 / r_on;
-           I_inject[nA] -= i_z;
-           I_inject[nC] += i_z;
+           I_inject[nA] += i_z;
+           I_inject[nC] -= i_z;
         } else {
            addConductance(nA, nC, 1e-9);
         }
@@ -174,8 +174,8 @@ export function solveAnalog(netlist, nodes, simState, dt = 1/60) {
           // Base-Emitter diode
           addConductance(nB, nE, 1.0 / 50.0);
           const i_f = 0.6 / 50.0;
-          I_inject[nB] -= i_f;
-          I_inject[nE] += i_f;
+          I_inject[nB] += i_f;
+          I_inject[nE] -= i_f;
         } else {
           addConductance(nC, nE, 1e-9);
           addConductance(nB, nE, 1e-9);
@@ -190,8 +190,8 @@ export function solveAnalog(netlist, nodes, simState, dt = 1/60) {
           addConductance(nE, nC, 1.0 / 10.0);
           addConductance(nE, nB, 1.0 / 50.0);
           const i_f = 0.6 / 50.0;
-          I_inject[nE] -= i_f;
-          I_inject[nB] += i_f;
+          I_inject[nE] += i_f;
+          I_inject[nB] -= i_f;
         } else {
           addConductance(nE, nC, 1e-9);
           addConductance(nE, nB, 1e-9);
@@ -249,6 +249,43 @@ export function solveAnalog(netlist, nodes, simState, dt = 1/60) {
       handleLogicGate(5, [3, 4], (a, b) => (a || b), n.pinNets);
       handleLogicGate(7, [8, 9], (a, b) => (a || b), n.pinNets);
       handleLogicGate(10, [11, 12], (a, b) => (a || b), n.pinNets);
+    }
+    if (n.type === "74HC86") { // XOR
+      handleLogicGate(2, [0, 1], (a, b) => (a !== b), n.pinNets);
+      handleLogicGate(5, [3, 4], (a, b) => (a !== b), n.pinNets);
+      handleLogicGate(7, [8, 9], (a, b) => (a !== b), n.pinNets);
+      handleLogicGate(10, [11, 12], (a, b) => (a !== b), n.pinNets);
+    }
+    
+    if (n.type === "74HC47") {
+      const pB=0, pC=1, pD=5, pA=6, pGnd=7, pE=8, pD_out=9, pC_out=10, pB_out=11, pA_out=12, pG_out=13, pF_out=14, pVcc=15;
+      const getIn = (idx) => n.pinNets[idx] !== undefined && V[n.pinNets[idx]] > 2.5;
+      const val = (getIn(pA)?1:0) + (getIn(pB)?2:0) + (getIn(pC)?4:0) + (getIn(pD)?8:0);
+      
+      let a=1,b=1,c=1,d=1,e=1,f=1,g=1;
+      switch(val) {
+        case 0: a=0; b=0; c=0; d=0; e=0; f=0; g=1; break;
+        case 1: a=1; b=0; c=0; d=1; e=1; f=1; g=1; break;
+        case 2: a=0; b=0; c=1; d=0; e=0; f=1; g=0; break;
+        case 3: a=0; b=0; c=0; d=0; e=1; f=1; g=0; break;
+        case 4: a=1; b=0; c=0; d=1; e=1; f=0; g=0; break;
+        case 5: a=0; b=1; c=0; d=0; e=1; f=0; g=0; break;
+        case 6: a=0; b=1; c=0; d=0; e=0; f=0; g=0; break;
+        case 7: a=0; b=0; c=0; d=1; e=1; f=1; g=1; break;
+        case 8: a=0; b=0; c=0; d=0; e=0; f=0; g=0; break;
+        case 9: a=0; b=0; c=0; d=0; e=1; f=0; g=0; break;
+      }
+      
+      const vcc = n.pinNets[pVcc], gnd = n.pinNets[pGnd];
+      const drive = (idx, isHigh) => {
+        const outNet = n.pinNets[idx];
+        if (outNet !== undefined) {
+          if (isHigh && vcc !== undefined) addConductance(outNet, vcc, 1/50);
+          else if (!isHigh && gnd !== undefined) addConductance(outNet, gnd, 1/50);
+        }
+      };
+      drive(pA_out, a); drive(pB_out, b); drive(pC_out, c); drive(pD_out, d);
+      drive(pE_out, e); drive(pF_out, f); drive(pG_out, g);
     }
 
     if (n.type === "VOLTAGE_REGULATOR") {

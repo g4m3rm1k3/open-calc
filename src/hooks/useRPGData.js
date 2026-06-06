@@ -170,21 +170,30 @@ export function useRPGData() {
   };
 
   const completeQuest = (questId, rewardXP, rewardGold) => {
-    const active = rpgData.activeQuests.filter(q => q.id !== questId);
     const completed = rpgData.activeQuests.find(q => q.id === questId);
-    
     if (!completed) return;
-    
+
     completed.completedAt = new Date().toISOString();
-    
+
+    // Compute XP/level inline — calling addXP() separately reads stale state and overwrites this save
+    const newXp = rpgData.xp + rewardXP;
+    const newLevel = Math.floor(Math.sqrt(newXp / 100)) + 1;
+    const leveledUp = newLevel > rpgData.level;
+    const newMaxHp = leveledUp ? 100 + (newLevel * 10) : rpgData.maxHp;
+    const newHp = leveledUp ? newMaxHp : rpgData.hp;
+
     saveData({
       ...rpgData,
-      activeQuests: active,
+      activeQuests: rpgData.activeQuests.filter(q => q.id !== questId),
       completedQuests: [completed, ...rpgData.completedQuests].slice(0, 20),
-      gold: rpgData.gold + rewardGold
+      gold: rpgData.gold + rewardGold,
+      xp: newXp,
+      level: newLevel,
+      hp: newHp,
+      maxHp: newMaxHp,
     });
 
-    addXP(rewardXP);
+    return leveledUp;
   };
 
   return {

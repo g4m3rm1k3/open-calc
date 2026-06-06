@@ -9,6 +9,7 @@ import { RadarChart } from '../components/rpg/RadarChart';
 import { RPGFantasyBackground } from '../components/rpg/RPGFantasyBackground';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import { PREBUILT_PLANS } from '../data/rpgPrebuiltPlans';
+import { getExerciseDetails } from '../data/rpgExercises';
 
 export default function RPGWorkoutPage() {
   const { 
@@ -87,15 +88,26 @@ export default function RPGWorkoutPage() {
                 <p className="text-slate-500 text-sm italic">No recent training logs.</p>
               ) : (
                 <ul className="space-y-3">
-                  {rpgData.workoutLogs.slice(0, 5).map(log => (
-                    <li key={log.id} className="flex justify-between items-center text-sm border-b border-slate-800 pb-2">
-                      <div>
-                        <span className="font-bold text-slate-300 capitalize">{log.type}</span>
-                        <span className="text-slate-500 ml-2">x {log.value}</span>
-                      </div>
-                      <span className="text-emerald-400 font-mono">+{log.xpEarned} XP</span>
-                    </li>
-                  ))}
+                  {rpgData.workoutLogs.slice(0, 5).map(log => {
+                    const ex = getExerciseDetails(log.exerciseId);
+                    const m = log.metrics || {};
+                    const detail = m.reps
+                      ? `${m.sets || 1}×${m.reps}`
+                      : m.distance
+                      ? `${m.distance}km`
+                      : m.duration
+                      ? `${m.duration}min`
+                      : '';
+                    return (
+                      <li key={log.id} className="flex justify-between items-center text-sm border-b border-slate-800 pb-2">
+                        <div>
+                          <span className="font-bold text-slate-300">{ex?.name || log.exerciseId}</span>
+                          {detail && <span className="text-slate-500 ml-2">{detail}</span>}
+                        </div>
+                        <span className="text-emerald-400 font-mono">+{log.xpEarned} XP</span>
+                      </li>
+                    );
+                  })}
                 </ul>
               )}
             </div>
