@@ -6,7 +6,9 @@ import { WorkoutLogger } from '../components/rpg/WorkoutLogger';
 import { QuestBoard } from '../components/rpg/QuestBoard';
 import { PlanBuilder } from '../components/rpg/PlanBuilder';
 import { RadarChart } from '../components/rpg/RadarChart';
+import { RPGFantasyBackground } from '../components/rpg/RPGFantasyBackground';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
+import { PREBUILT_PLANS } from '../data/rpgPrebuiltPlans';
 
 export default function RPGWorkoutPage() {
   const { 
@@ -32,16 +34,22 @@ export default function RPGWorkoutPage() {
   // If user hasn't selected a class yet
   if (!rpgData.heroClass) {
     return (
-      <div className="min-h-screen bg-slate-950 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/20 via-slate-950 to-slate-950 text-slate-200">
-        <ClassSelector onSelect={setOnboardingData} />
+      <div className="min-h-screen text-slate-200 relative">
+        <RPGFantasyBackground />
+        <div className="relative z-10">
+          <ClassSelector onSelect={setOnboardingData} />
+        </div>
       </div>
     );
   }
 
+  const activePlan = [...PREBUILT_PLANS, ...(rpgData.customPlans || [])].find(p => p.id === rpgData.activePlanId);
+
   // Dashboard View
   return (
-    <div className="min-h-screen bg-slate-950 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-fuchsia-900/20 via-slate-950 to-slate-950 text-slate-200 p-4 md:p-8 pb-32 md:pb-8">
-      <div className="max-w-6xl mx-auto space-y-6">
+    <div className="min-h-screen text-slate-200 p-4 md:p-8 pb-32 md:pb-8 relative">
+      <RPGFantasyBackground />
+      <div className="max-w-6xl mx-auto space-y-6 relative z-10">
         
         {/* Header Section */}
         <header className="mb-8">
@@ -70,7 +78,7 @@ export default function RPGWorkoutPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Left Column: Actions */}
           <div className="space-y-6">
-            <WorkoutLogger logDetailedWorkout={logDetailedWorkout} activePlanId={rpgData.activePlanId} />
+            <WorkoutLogger logDetailedWorkout={logDetailedWorkout} activePlan={activePlan} />
             
             {/* Logs Preview */}
             <div className="bg-slate-900/40 rounded-2xl p-6 border border-slate-800">

@@ -16,15 +16,14 @@ Classes:
 Rules:
 - Speak in an encouraging, slightly magical/RPG gamemaster tone, but keep the science strictly accurate.
 - When generating a quest, provide exactly 1 workout challenge suitable for their level.
-- Output JSON ONLY in the following format:
+- Output JSON ONLY in the exact format below. DO NOT include any markdown formatting, code blocks, or conversational text.
 {
   "questName": "Name of the Quest",
   "description": "Flavor text explaining why this helps their specific class based on fitness science. If they have no baseline, explain that this is a baseline assessment.",
   "task": "The specific workout task (e.g. Do 50 Pushups)",
   "rewardXP": 150,
   "rewardGold": 50
-}
-- DO NOT wrap the JSON in markdown code blocks, just return the raw JSON string.`;
+}`;
 
 export function useRPGCoachAI() {
   const engineRef = useRef(null);
@@ -81,12 +80,21 @@ Remember to return ONLY valid JSON.`;
 
       let content = response.choices[0].message.content?.trim() || "";
       
+      // Clean up common LLM JSON mistakes
+      content = content.replace(/```json/g, '').replace(/```/g, '').trim();
+      
       // Robust JSON extraction: find the first '{' and the last '}'
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       
       if (jsonMatch) {
-        return JSON.parse(jsonMatch[0]);
+        try {
+          return JSON.parse(jsonMatch[0]);
+        } catch (parseErr) {
+          console.error("Failed to parse extracted JSON:", jsonMatch[0]);
+          throw parseErr;
+        }
       } else {
+        console.error("No JSON object found in raw LLM response:", content);
         throw new Error("No JSON object found in LLM response");
       }
     } catch (err) {

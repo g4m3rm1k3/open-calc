@@ -134,7 +134,15 @@ export function PlanBuilder({ rpgData, setActivePlan, saveCustomPlan }) {
   }
 
   // List View
-  const allPlans = [...PREBUILT_PLANS, ...(rpgData.customPlans || [])];
+  const allPlans = [...PREBUILT_PLANS, ...(rpgData.customPlans || [])].sort((a, b) => {
+    // Put active plan first
+    if (a.id === rpgData.activePlanId) return -1;
+    if (b.id === rpgData.activePlanId) return 1;
+    // Put class-recommended plans second
+    if (a.class === rpgData.heroClass && b.class !== rpgData.heroClass) return -1;
+    if (b.class === rpgData.heroClass && a.class !== rpgData.heroClass) return 1;
+    return 0;
+  });
 
   return (
     <div className="bg-slate-900/80 border border-slate-700 rounded-2xl p-6 backdrop-blur-xl">
@@ -144,7 +152,7 @@ export function PlanBuilder({ rpgData, setActivePlan, saveCustomPlan }) {
         </h2>
         <button 
           onClick={() => setView('create')}
-          className="bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+          className="bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-colors shadow-[0_0_10px_rgba(16,185,129,0.3)]"
         >
           <Plus size={16} /> New Plan
         </button>
@@ -153,15 +161,24 @@ export function PlanBuilder({ rpgData, setActivePlan, saveCustomPlan }) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {allPlans.map(plan => {
           const isActive = rpgData.activePlanId === plan.id;
+          const isRecommended = plan.class === rpgData.heroClass;
+
           return (
             <div 
               key={plan.id}
-              className={`p-5 rounded-xl border transition-all ${
+              className={`p-5 rounded-xl border transition-all relative overflow-hidden ${
                 isActive 
                   ? 'bg-emerald-500/10 border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.2)]' 
-                  : 'bg-slate-950/50 border-slate-800 hover:border-slate-600'
+                  : isRecommended
+                    ? 'bg-fuchsia-900/20 border-fuchsia-500/30 hover:border-fuchsia-400/50'
+                    : 'bg-slate-950/50 border-slate-800 hover:border-slate-600'
               }`}
             >
+              {isRecommended && !isActive && (
+                <div className="absolute top-0 right-0 bg-fuchsia-600 text-white text-[9px] font-black uppercase px-2 py-1 rounded-bl-lg">
+                  Class Synergy
+                </div>
+              )}
               <div className="flex justify-between items-start mb-2">
                 <h3 className="font-bold text-lg text-slate-200">{plan.name}</h3>
                 {plan.type === 'prebuilt' && <span className="text-[10px] bg-slate-800 text-cyan-400 px-2 py-1 rounded-full uppercase tracking-widest font-black">Prebuilt</span>}
