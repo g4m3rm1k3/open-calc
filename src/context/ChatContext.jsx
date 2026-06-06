@@ -100,10 +100,15 @@ export function ChatProvider({ children }) {
   const currentLessonRef = useRef(null);
 
   function reelectHost() {
+    const myPk = keypair.current?.pk ?? "";
     let bestId = "local";
     let bestScore = myGpuScoreRef.current;
-    for (const [pid, score] of peerScoresRef.current) {
-      if (score > bestScore) { bestScore = score; bestId = pid; }
+    let bestPk = myPk;
+    for (const [pid, { score, pk }] of peerScoresRef.current) {
+      // Higher score wins; equal score → lower pk wins (deterministic across both clients)
+      if (score > bestScore || (score === bestScore && pk < bestPk)) {
+        bestScore = score; bestId = pid; bestPk = pk;
+      }
     }
     lovelaceHostIdRef.current = bestId;
     setLovelaceHostId(bestId);
@@ -159,9 +164,17 @@ export function ChatProvider({ children }) {
     return () => { try { nostrPool.current?.close?.([], {}); } catch {} };
   }, []);
 
-  // Compute GPU score once on mount
+  // Compute GPU score once on mount, then re-announce so peers can re-elect
   useEffect(() => {
-    getGpuScore().then(score => { myGpuScoreRef.current = score; reelectHost(); });
+    getGpuScore().then(score => {
+      myGpuScoreRef.current = score;
+      reelectHost();
+      sendLovelaceChannelRef.current?.({
+        type: "announce",
+        score,
+        pk: keypair.current?.pk ?? "",
+      });
+    });
   }, []);
 
   function makeIncomingMsg(data, peerId) {
@@ -208,7 +221,7 @@ export function ChatProvider({ children }) {
 
         receiveLv((data, peerId) => {
           if (data?.type === "announce") {
-            peerScoresRef.current.set(peerId, data.score ?? 0);
+            peerScoresRef.current.set(peerId, { score: data.score ?? 0, pk: data.pk ?? peerId });
             reelectHost();
           } else if (data?.type === "lesson-presence") {
             peerLessonsRef.current.set(
@@ -237,7 +250,7 @@ export function ChatProvider({ children }) {
 
       room.onPeerJoin(() => {
         setGlobalPeers(n => n + 1);
-        sendLv?.({ type: "announce", score: myGpuScoreRef.current });
+        sendLv?.({ type: "announce", score: myGpuScoreRef.current, pk: keypair.current?.pk ?? "" });
         const myLesson = currentLessonRef.current;
         if (myLesson) {
           sendLv?.({

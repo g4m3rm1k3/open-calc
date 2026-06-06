@@ -109,7 +109,23 @@ export function solveAnalog(netlist, nodes, simState, dt = 1/60) {
       if (n.pinNets[1] !== undefined) I_inject[n.pinNets[1]] -= i_eq;
     }
     
-    if (n.type === "LED" || n.type === "DIODE") {
+    if (n.type === "INDUCTOR") {
+      const L = n.state?.value || 0.001; // 1mH
+      if (!n.state) n.state = {};
+      let i_curr = n.state.current || 0;
+      
+      const v0 = n.pinNets[0] !== undefined ? (simState.voltages[n.pinNets[0]] || 0) : 0;
+      const v1 = n.pinNets[1] !== undefined ? (simState.voltages[n.pinNets[1]] || 0) : 0;
+      
+      // Inject current (Forward Euler)
+      if (n.pinNets[0] !== undefined) I_inject[n.pinNets[0]] -= i_curr;
+      if (n.pinNets[1] !== undefined) I_inject[n.pinNets[1]] += i_curr;
+      
+      n.state.current = i_curr + (dt / L) * (v0 - v1);
+      addConductance(n.pinNets[0], n.pinNets[1], 1e-6); // Avoid floating node
+    }
+    
+    if (n.type === "LED" || n.type === "DIODE" || n.type === "ZENER_DIODE") {
       const nA = n.pinNets[0]; // anode
       const nC = n.pinNets[1]; // cathode
       if (nA !== undefined && nC !== undefined) {
@@ -121,6 +137,12 @@ export function solveAnalog(netlist, nodes, simState, dt = 1/60) {
            const i_f = v_f / r_on;
            I_inject[nA] -= i_f;
            I_inject[nC] += i_f;
+        } else if (n.type === "ZENER_DIODE" && v_diff < -5.1) {
+           const r_on = 10.0;
+           addConductance(nA, nC, 1.0 / r_on);
+           const i_z = -5.1 / r_on;
+           I_inject[nA] -= i_z;
+           I_inject[nC] += i_z;
         } else {
            addConductance(nA, nC, 1e-9);
         }
@@ -227,6 +249,45 @@ export function solveAnalog(netlist, nodes, simState, dt = 1/60) {
       handleLogicGate(5, [3, 4], (a, b) => (a || b), n.pinNets);
       handleLogicGate(7, [8, 9], (a, b) => (a || b), n.pinNets);
       handleLogicGate(10, [11, 12], (a, b) => (a || b), n.pinNets);
+    }
+
+    if (n.type === "VOLTAGE_REGULATOR") {
+      const nIn = n.pinNets[0], nGnd = n.pinNets[1], nOut = n.pinNets[2];
+      if (nIn !== undefined && nGnd !== undefined && nOut !== undefined) {
+        const v_in = V[nIn];
+        const v_gnd = V[nGnd];
+        if (v_in > v_gnd + 6.0) {
+          const target_out = v_gnd + 5.0;
+          addConductance(nOut, nGnd, 1.0 / 0.1);
+          const i_inj = target_out / 0.1;
+          I_inject[nOut] += i_inj;
+          I_inject[nGnd] -= i_inj;
+          addConductance(nIn, nGnd, 1.0 / 1000); 
+        } else {
+          addConductance(nIn, nOut, 1.0 / 1000);
+        }
+      }
+    }
+
+    if (n.type === "OP_AMP") {
+      const nP = n.pinNets[0], nN = n.pinNets[1], nOut = n.pinNets[2], nVcc = n.pinNets[3], nGnd = n.pinNets[4];
+      if (nOut !== undefined) {
+        const vP = nP !== undefined ? V[nP] : 0;
+        const vN = nN !== undefined ? V[nN] : 0;
+        const vcc = nVcc !== undefined ? V[nVcc] : 5.0;
+        const gnd = nGnd !== undefined ? V[nGnd] : 0.0;
+        
+        const gain = 100000;
+        let targetV = gnd + gain * (vP - vN);
+        if (targetV > vcc - 1.5) targetV = vcc - 1.5; // LM358 isn't rail-to-rail high
+        if (targetV < gnd) targetV = gnd;
+        
+        const gGnd = nGnd !== undefined ? nGnd : 0;
+        addConductance(nOut, gGnd, 1.0 / 50.0);
+        const i_inj = targetV / 50.0;
+        I_inject[nOut] += i_inj;
+        if (nGnd !== undefined) I_inject[nGnd] -= i_inj;
+      }
     }
 
     if (n.type === "555_TIMER") {

@@ -285,6 +285,134 @@ const COMP_DEFS = {
       ctx.fillText("74HC32 OR", x + w/2, y + h/2);
     }
   },
+  INDUCTOR: {
+    w: 3, h: 1,
+    pins: [
+      { id: "p1", x: 0, y: 0, type: PIN_IN }, { id: "p2", x: 2, y: 0, type: PIN_IN }
+    ],
+    render: (ctx, x, y, w, h, C) => {
+      ctx.strokeStyle = C.icPins; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(x+CELL/2, y+CELL/2); ctx.lineTo(x+CELL, y+CELL/2);
+      ctx.arc(x+CELL*1.5, y+CELL/2, CELL/3, Math.PI, 0);
+      ctx.arc(x+CELL*2.0, y+CELL/2, CELL/3, Math.PI, 0);
+      ctx.lineTo(x+w-CELL/2, y+CELL/2); ctx.stroke();
+    }
+  },
+  ZENER_DIODE: {
+    w: 2, h: 1,
+    pins: [
+      { id: "anode", x: 0, y: 0, type: PIN_IN }, { id: "cathode", x: 1, y: 0, type: PIN_IN }
+    ],
+    render: (ctx, x, y, w, h, C) => {
+      ctx.strokeStyle = C.icPins; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(x+CELL/2, y+CELL/2); ctx.lineTo(x+w-CELL/2, y+CELL/2); ctx.stroke();
+      ctx.fillStyle = "#f97316"; // orange glass body
+      ctx.fillRect(x + CELL/2 + 4, y + CELL/2 - 5, w - CELL - 8, 10);
+      ctx.fillStyle = "#1e293b"; // cathode stripe
+      ctx.fillRect(x + w - CELL/2 - 8, y + CELL/2 - 5, 3, 10);
+      // Zener wings
+      ctx.fillRect(x + w - CELL/2 - 8, y + CELL/2 - 5, 6, 2);
+      ctx.fillRect(x + w - CELL/2 - 10, y + CELL/2 + 3, 5, 2);
+    }
+  },
+  VOLTAGE_REGULATOR: {
+    w: 3, h: 1,
+    pins: [
+      { id: "in", x: 0, y: 0, type: PIN_IN }, { id: "gnd", x: 1, y: 0, type: PIN_GND }, { id: "out", x: 2, y: 0, type: PIN_OUT }
+    ],
+    render: (ctx, x, y, w, h, C) => {
+      ctx.fillStyle = "#1e293b"; // TO-220 body
+      ctx.fillRect(x+CELL/2, y, w-CELL, h+CELL);
+      ctx.fillStyle = "#cbd5e1"; // Tab
+      ctx.fillRect(x+CELL/2, y-CELL/2, w-CELL, Math.max(CELL/2, 4));
+      ctx.fillStyle = "#94a3b8"; ctx.font = "9px sans-serif"; ctx.textAlign="center";
+      ctx.fillText("7805", x+w/2, y+CELL);
+    }
+  },
+  OP_AMP: {
+    w: 4, h: 4,
+    pins: [
+      { id: "1out", x: 0, y: 3, type: PIN_OUT }, { id: "1inN", x: 1, y: 3, type: PIN_IN }, { id: "1inP", x: 2, y: 3, type: PIN_IN }, { id: "gnd", x: 3, y: 3, type: PIN_GND },
+      { id: "vcc", x: 0, y: 0, type: PIN_PWR }, { id: "2out", x: 1, y: 0, type: PIN_OUT }, { id: "2inN", x: 2, y: 0, type: PIN_IN }, { id: "2inP", x: 3, y: 0, type: PIN_IN }
+    ],
+    render: (ctx, x, y, w, h, C) => {
+      ctx.fillStyle = C.icBody; ctx.fillRect(x - CELL/4, y + CELL/2, w + CELL/2, h - CELL);
+      ctx.fillStyle = C.bg; ctx.beginPath(); ctx.arc(x - CELL/4, y + h/2, CELL/4, -Math.PI/2, Math.PI/2); ctx.fill();
+      ctx.fillStyle = C.icText; ctx.font = "bold 12px monospace"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillText("LM358", x + w/2, y + h/2);
+      ctx.fillStyle = C.icPins;
+      for (let i=0; i<4; i++) {
+        ctx.fillRect(x + i*CELL - 2, y + CELL/2 - 6, 4, 6);
+        ctx.fillRect(x + i*CELL - 2, y + h - CELL/2, 4, 6);
+      }
+    }
+  },
+  RGB_LED: {
+    w: 4, h: 2,
+    pins: [
+      { id: "r", x: 0, y: 1, type: PIN_IN }, { id: "gnd", x: 1, y: 1, type: PIN_GND }, { id: "g", x: 2, y: 1, type: PIN_IN }, { id: "b", x: 3, y: 1, type: PIN_IN }
+    ],
+    render: (ctx, x, y, w, h, C, state, inputs) => {
+      const gnd = inputs.gnd || 0;
+      const vr = (inputs.r || 0) - gnd;
+      const vg = (inputs.g || 0) - gnd;
+      const vb = (inputs.b || 0) - gnd;
+      
+      const rr = Math.min(255, Math.max(0, (vr - 2.0) * 100));
+      const gg = Math.min(255, Math.max(0, (vg - 2.0) * 100));
+      const bb = Math.min(255, Math.max(0, (vb - 2.0) * 100));
+      
+      const isOn = rr > 10 || gg > 10 || bb > 10;
+      
+      ctx.fillStyle = isOn ? `rgb(${rr},${gg},${bb})` : "#f8fafc";
+      ctx.beginPath(); ctx.arc(x+w/2, y+h/2, CELL, 0, Math.PI*2); ctx.fill();
+      ctx.strokeStyle = "#cbd5e1"; ctx.lineWidth=2; ctx.stroke();
+      if (isOn) { ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = 20; ctx.fill(); ctx.shadowBlur = 0; }
+    }
+  },
+  BUZZER: {
+    w: 3, h: 3,
+    pins: [
+      { id: "p", x: 0, y: 2, type: PIN_IN }, { id: "n", x: 2, y: 2, type: PIN_GND }
+    ],
+    render: (ctx, x, y, w, h, C, state, inputs) => {
+      const v = (inputs.p || 0) - (inputs.n || 0);
+      const isBuzzing = Math.abs(v) > 1.0;
+      const offset = isBuzzing ? (Math.random() * 2 - 1) : 0;
+      ctx.fillStyle = "#0f172a";
+      ctx.beginPath(); ctx.arc(x+w/2 + offset, y+h/2 + offset, CELL*1.2, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = "#cbd5e1";
+      ctx.beginPath(); ctx.arc(x+w/2 + offset, y+h/2 + offset, CELL*0.5, 0, Math.PI*2); ctx.fill();
+      if (isBuzzing) {
+        ctx.strokeStyle = "#ef4444"; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(x+w/2, y+h/2, CELL*1.5 + Math.random()*5, 0, Math.PI*2); ctx.stroke();
+      }
+    }
+  },
+  DC_MOTOR: {
+    w: 3, h: 4,
+    pins: [
+      { id: "p", x: 0, y: 3, type: PIN_IN }, { id: "n", x: 2, y: 3, type: PIN_IN }
+    ],
+    render: (ctx, x, y, w, h, C, state, inputs) => {
+      const v = (inputs.p || 0) - (inputs.n || 0);
+      const isSpinning = Math.abs(v) > 0.5;
+      if (isSpinning) {
+        state.angle = (state.angle || 0) + v * 0.1;
+      }
+      ctx.fillStyle = "#64748b";
+      ctx.fillRect(x+CELL/2, y, w-CELL, h-CELL);
+      ctx.fillStyle = "#cbd5e1";
+      ctx.beginPath(); ctx.arc(x+w/2, y+h/2 - CELL/2, CELL, 0, Math.PI*2); ctx.fill();
+      
+      ctx.save();
+      ctx.translate(x+w/2, y+h/2 - CELL/2);
+      ctx.rotate(state.angle || 0);
+      ctx.fillStyle = "#f8fafc";
+      ctx.fillRect(-CELL/4, -CELL*0.8, CELL/2, CELL*1.6);
+      ctx.restore();
+    }
+  },
   SEVEN_SEG: {
     w: 5, h: 4,
     pins: [
@@ -345,7 +473,8 @@ const DRAWERS = [
       { type: "RESISTOR", label: "10k Ω (Brown-Blk-Org)", state: { value: 10000, bands: ["#8b4513", "#000000", "#f97316"] } },
       { type: "RESISTOR", label: "100k Ω (Brown-Blk-Yel)", state: { value: 100000, bands: ["#8b4513", "#000000", "#eab308"] } },
       { type: "RESISTOR", label: "1M Ω (Brown-Blk-Grn)", state: { value: 1000000, bands: ["#8b4513", "#000000", "#22c55e"] } },
-      { type: "PHOTORESISTOR", label: "Photoresistor (LDR)", state: { light: 0.5 } }
+      { type: "PHOTORESISTOR", label: "Photoresistor (LDR)", state: { light: 0.5 } },
+      { type: "INDUCTOR", label: "1 mH Inductor", state: { value: 0.001 } }
     ]
   },
   {
@@ -362,9 +491,12 @@ const DRAWERS = [
     title: "Semiconductors",
     items: [
       { type: "LED", label: "Red LED" },
+      { type: "RGB_LED", label: "RGB LED" },
       { type: "DIODE", label: "1N4148 Diode" },
+      { type: "ZENER_DIODE", label: "5.1V Zener Diode" },
       { type: "NPN_TRANSISTOR", label: "2N3904 (NPN)" },
       { type: "PNP_TRANSISTOR", label: "2N3906 (PNP)" },
+      { type: "VOLTAGE_REGULATOR", label: "7805 5V Regulator" },
       { type: "SEVEN_SEG", label: "7-Segment Display" }
     ]
   },
@@ -372,10 +504,18 @@ const DRAWERS = [
     title: "Logic ICs",
     items: [
       { type: "555_TIMER", label: "555 Timer IC" },
+      { type: "OP_AMP", label: "LM358 Op-Amp" },
       { type: "74HC00", label: "74HC00 (Quad NAND)" },
       { type: "74HC04", label: "74HC04 (Hex NOT)" },
       { type: "74HC08", label: "74HC08 (Quad AND)" },
       { type: "74HC32", label: "74HC32 (Quad OR)" }
+    ]
+  },
+  {
+    title: "Actuators & Outputs",
+    items: [
+      { type: "BUZZER", label: "Piezo Buzzer" },
+      { type: "DC_MOTOR", label: "DC Motor" }
     ]
   }
 ];
@@ -533,7 +673,7 @@ export default function LogicSim({ params = {} }) {
     const ctx = canvas.getContext("2d");
     const W = canvas.width, H = canvas.height;
     const st = stateRef.current;
-    const { nodes, wires, draggingWire, panX, panY, zoom, selectedNode, selectedWire } = st;
+    const { nodes, wires, draggingWire, panX, panY, zoom, selectedNode, selectedWire, simState } = st;
     const BB_WIDTH = boardSize * CELL;
 
     ctx.clearRect(0, 0, W, H);

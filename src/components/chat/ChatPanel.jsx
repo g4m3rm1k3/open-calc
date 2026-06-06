@@ -158,7 +158,7 @@ function ActiveLessonsPanel({ activeLessons }) {
         )}
       </button>
       {expanded && (
-        <div className="px-3 pb-2 flex flex-col gap-1">
+        <div className="px-3 pb-2 flex flex-col gap-1 max-h-[4.5rem] overflow-y-auto">
           {[...activeLessons.entries()].map(([lessonId, { title, users }]) => (
             <div
               key={lessonId}
@@ -553,7 +553,7 @@ export default function ChatPanel({ isOpen, onClose }) {
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: "100%", opacity: 0 }}
             transition={{ type: "spring", damping: 28, stiffness: 400 }}
-            className="fixed right-0 top-[90px] bottom-0 w-[400px] z-[9999] flex flex-col bg-white/80 dark:bg-slate-950/80 backdrop-blur-3xl border-l border-white/20 dark:border-white/10 shadow-[-10px_0_40px_rgba(0,0,0,0.05)] dark:shadow-[-20px_0_100px_rgba(0,0,0,0.4)]"
+            className="fixed right-0 top-14 bottom-0 w-[400px] z-[9999] flex flex-col bg-white/80 dark:bg-slate-950/80 backdrop-blur-3xl border-l border-white/20 dark:border-white/10 shadow-[-10px_0_40px_rgba(0,0,0,0.05)] dark:shadow-[-20px_0_100px_rgba(0,0,0,0.4)]"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-5 border-b border-white/10 shrink-0">
