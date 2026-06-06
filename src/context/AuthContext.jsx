@@ -15,38 +15,39 @@ import {
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { auth, db } from '../firebase'
 
-// All localStorage keys that get synced to the cloud.
-// Sensitive keys (nostr private key, AI API key) are intentionally excluded.
+// Keys synced to Firestore — only meaningful user data, no caches or UI ephemera.
 const SYNC_KEYS = [
-  'oc-pins',
-  'open-calc-pinned-videos',
-  'open-calc-custom-videos',
-  'open-calc-video-progress',
-  'oc-brain-stroop',
-  'oc-brain-mental-rotation',
-  'oc-brain-dnback',
-  'oc-brain-arithmetic',
-  'oc-brain-pattern',
-  'rfl-completed-v2',
-  'rfl-intro-seen',
-  'oc_memory',
-  'oc_formulas',
-  'openmat-documents',
-  'openmat-active-document-id',
-  'universal-calc-recent-inputs',
-  'oc-theme',
-  'oc-sidebar-pinned',
-  'oc-bg-config',
-  'cnc_tool_libraries_v1',
-  'csv4',
-  'oc-health-v1',
-  'oc-sticky-notes',
-  'ARKANOID_CUSTOM_LEVELS',
-  'oc-pad-shapes',
-  'oc-welcome-seen',
-  'oc-chat-username',
-  'tetrisHighScore',
+  'oc-progress',      // course lesson progress (checkpoints, quiz scores, reading %)
+  'oc-sticky-notes',  // user notes
+  'oc-health-v1',     // health tracker logs
+  'rfl-completed-v2', // robot arm lab mission completions
+  'oc-pins',          // pinned lessons/tools
+  'oc-theme',         // dark/light preference
 ]
+
+// All app-owned localStorage keys — cleared on sign-out so shared computers stay clean.
+// Wider than SYNC_KEYS: includes caches, ephemeral state, and game scores we don't sync.
+const ALL_APP_KEYS_PREFIX = 'oc-'
+const ALL_APP_KEYS_EXACT = [
+  'open-calc-pinned-videos', 'open-calc-custom-videos', 'open-calc-video-progress',
+  'openmat-documents', 'openmat-active-document-id',
+  'oc_memory', 'oc_formulas',
+  'cnc_tool_libraries_v1', 'csv4',
+  'tetrisHighScore', 'ARKANOID_CUSTOM_LEVELS',
+  'rfl-completed-v2', 'rfl-intro-seen',
+  'universal-calc-recent-inputs',
+]
+
+function clearAllAppData() {
+  // Clear everything with the oc- prefix (covers progress, wiki cache, notes, etc.)
+  const toRemove = []
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i)
+    if (key?.startsWith(ALL_APP_KEYS_PREFIX)) toRemove.push(key)
+  }
+  toRemove.forEach(k => localStorage.removeItem(k))
+  ALL_APP_KEYS_EXACT.forEach(k => localStorage.removeItem(k))
+}
 
 function snapshotLocalStorage() {
   const data = {}
@@ -138,7 +139,7 @@ export function AuthProvider({ children }) {
   const signOut = async () => {
     if (user) await pushToFirestore(user.uid).catch(() => {})
     await fbSignOut(auth)
-    for (const key of SYNC_KEYS) localStorage.removeItem(key)
+    clearAllAppData()
   }
 
   return (
