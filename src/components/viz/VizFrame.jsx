@@ -336,6 +336,23 @@ const VIZ_REGISTRY = {
   LinearTransformationsViz: lazy(() => import("./react/LinearTransformationsViz.jsx")),
   EigenvaluesModuleViz: lazy(() => import("./react/EigenvaluesModuleViz.jsx")),
   OrthogonalityModuleViz: lazy(() => import("./react/OrthogonalityModuleViz.jsx")),
+  // ── New deep-intuition LA visualizations ──────────────────────────────────
+  MatrixTransformViz: lazy(() => import("./react/MatrixTransformViz.jsx")),
+  DeterminantGeometricViz: lazy(() => import("./react/DeterminantGeometricViz.jsx")),
+  ChangeOfBasisViz: lazy(() => import("./react/ChangeOfBasisViz.jsx")),
+  SVDGeometricViz: lazy(() => import("./react/SVDGeometricViz.jsx")),
+  NullSpaceColumnSpaceViz: lazy(() => import("./react/NullSpaceColumnSpaceViz.jsx")),
+  EigenvalueHunterViz: lazy(() => import("./react/EigenvalueHunterViz.jsx")),
+  RowReductionChallengeViz: lazy(() => import("./react/RowReductionChallengeViz.jsx")),
+  LinearIndependenceViz: lazy(() => import("./react/LinearIndependenceViz.jsx")),
+  ProjectionChallengeViz: lazy(() => import("./react/ProjectionChallengeViz.jsx")),
+  MarkovSteadyStateViz: lazy(() => import("./react/MarkovSteadyStateViz.jsx")),
+  CNCCoordinateFrameViz: lazy(() => import("./react/CNCCoordinateFrameViz.jsx")),
+  RobotArmViz: lazy(() => import("./react/RobotArmViz.jsx")),
+  LeastSquaresDataViz: lazy(() => import("./react/LeastSquaresDataViz.jsx")),
+  PageRankEigenvectorViz: lazy(() => import("./react/PageRankEigenvectorViz.jsx")),
+  PCAVarianceViz: lazy(() => import("./react/PCAVarianceViz.jsx")),
+
   PythonNotebook: lazy(() => import("./react/PythonNotebook.jsx")),
   OpenMatNotebook: lazy(() => import("./react/OpenMatNotebook.jsx")),
   JSNotebook: lazy(() => import("./react/JSNotebook.jsx")),
@@ -1150,6 +1167,17 @@ const VIZ_REGISTRY = {
   QuantifierNegationPusher: lazy(
     () => import("./react/QuantifierNegationPusher.jsx"),
   ),
+
+  // ─── Applied Statistics distribution vizzes ──────────────────────────────
+  NormalDistributionViz: lazy(() => import("./react/NormalDistributionViz.jsx")),
+  PoissonDistributionViz: lazy(() => import("./react/PoissonDistributionViz.jsx")),
+  BinomialDistributionViz: lazy(() => import("./react/BinomialDistributionViz.jsx")),
+  CLTSimulatorViz: lazy(() => import("./react/CLTSimulatorViz.jsx")),
+  TDistributionViz: lazy(() => import("./react/TDistributionViz.jsx")),
+  ChiSquaredDistViz: lazy(() => import("./react/ChiSquaredDistViz.jsx")),
+  HypothesisTestViz: lazy(() => import("./react/HypothesisTestViz.jsx")),
+  RegressionScatterViz: lazy(() => import("./react/RegressionScatterViz.jsx")),
+  DiscretePMFViz: lazy(() => import("./react/DiscretePMFViz.jsx")),
 };
 
 // Vizzes that work fine on a phone-sized screen

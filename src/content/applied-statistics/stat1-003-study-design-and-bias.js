@@ -432,6 +432,39 @@ print(f"Randomized experiment estimate:  {random_est:.1f} points  ← close to t
     ],
   },
 
+  definitions: [
+    {
+      term: "confounding variable",
+      definition:
+        "A variable associated with both the exposure and the outcome, creating a spurious apparent relationship between them; controlled by randomization in an experiment.",
+    },
+    {
+      term: "randomized controlled trial (RCT)",
+      definition:
+        "An experiment where participants are randomly assigned to treatment and control conditions; the gold standard for establishing causal conclusions because randomization controls all confounders.",
+    },
+    {
+      term: "selection bias",
+      definition:
+        "A systematic difference between those included in a study and those excluded, on characteristics related to the outcome; distorts estimates regardless of sample size.",
+    },
+    {
+      term: "internal validity",
+      definition:
+        "The degree to which a study design supports valid causal conclusions within the study population; maximized by random assignment of participants to conditions.",
+    },
+    {
+      term: "external validity",
+      definition:
+        "The degree to which study conclusions generalize beyond the study sample to other populations, settings, or time periods; a separate dimension from internal validity.",
+    },
+    {
+      term: "Simpson's Paradox",
+      definition:
+        "A phenomenon where an association observed in aggregate data reverses direction when the data are broken into subgroups, due to a confounder distributed differently across groups.",
+    },
+  ],
+
   spiral: {
     recoveryPoints: [],
     futureLinks: [
@@ -630,6 +663,80 @@ print(f"Randomized experiment estimate:  {random_est:.1f} points  ← close to t
         "The reversal happens because a third variable (risk level) is distributed very differently across the groups.",
       ],
       reviewSection: "Example 3 — Simpson's Paradox",
+    },
+    {
+      id: "stat1-003-quiz-7",
+      type: "choice",
+      text: "Which action justifies a causal conclusion from a study?",
+      options: [
+        "Collecting a very large sample (n > 10,000)",
+        "Randomly assigning participants to treatment and control conditions",
+        "Measuring every possible confounding variable",
+        "Using a validated, highly accurate outcome measurement instrument",
+      ],
+      answer:
+        "Randomly assigning participants to treatment and control conditions",
+      hints: [
+        "Random SELECTION supports generalizability to the population. Which action supports causal inference?",
+        "Only random ASSIGNMENT controls for all confounders — measured and unmeasured alike.",
+      ],
+      reviewSection:
+        'Intuition → "Experiment" paragraph and Math → "Randomization as confounder control"',
+    },
+    {
+      id: "stat1-003-quiz-8",
+      type: "choice",
+      text: "A case-control study begins by:",
+      options: [
+        "Randomly assigning individuals to treatment and control groups",
+        "Selecting people with and without the outcome of interest, then comparing their past exposures",
+        "Following a cohort forward in time from a measured exposure to an eventual outcome",
+        "Measuring both exposure and outcome simultaneously in a cross-sectional snapshot",
+      ],
+      answer:
+        "Selecting people with and without the outcome of interest, then comparing their past exposures",
+      hints: [
+        "Case-control studies work backwards from the outcome.",
+        "You start with 'cases' (who have the disease) and 'controls' (who don't), then look at their history.",
+      ],
+      reviewSection: 'Intuition → "Types of Observational Studies" callout',
+    },
+    {
+      id: "stat1-003-quiz-9",
+      type: "choice",
+      text: "Regression to the mean as a confound means that:",
+      options: [
+        "The regression model coefficient has been fitted to the wrong data",
+        "Extreme initial scores naturally move closer to average on re-measurement, which inflates apparent treatment effects",
+        "Controlling for more covariates always increases the regression coefficient",
+        "The sample mean always converges to the population mean with larger n",
+      ],
+      answer:
+        "Extreme initial scores naturally move closer to average on re-measurement, which inflates apparent treatment effects",
+      hints: [
+        "Think about students who were tutored after failing an exam — what would happen to their next score even without tutoring?",
+        "Extreme low scores are partly random noise; subsequent scores regress toward the mean.",
+      ],
+      reviewSection:
+        "Transfer Prompts — tutoring program and regression to the mean",
+    },
+    {
+      id: "stat1-003-quiz-10",
+      type: "choice",
+      text: "The 'fundamental problem of causal inference' (Holland, 1986) states that:",
+      options: [
+        "Confounders can never be completely measured in any real study",
+        "Sample sizes are always too small to reliably detect causal effects",
+        "Only one potential outcome per unit is ever observable — the one corresponding to the treatment actually received",
+        "Correlation can never imply causation under any study design",
+      ],
+      answer:
+        "Only one potential outcome per unit is ever observable — the one corresponding to the treatment actually received",
+      hints: [
+        "Each unit has Y_i(1) and Y_i(0) — but you can only observe one.",
+        "The counterfactual (what would have happened under the other treatment) is permanently unobservable.",
+      ],
+      reviewSection: "Rigor section — R1 The Rubin Causal Model",
     },
   ],
 

@@ -111,11 +111,20 @@ print(f"IQR={iqr}, Fences: [{lower_fence:.1f}, {upper_fence:.1f}]")
 outliers = [x for x in salaries if x < lower_fence or x > upper_fence]
 print(f"Outliers: {outliers}")
 
-fig = Figure(width=6, height=7)
-fig.axes(xmin=0.5, xmax=1.5, ymin=40, ymax=160)
-fig.boxplot(values=salaries, x=1.0, width=0.4, color="steelblue")
-fig.text(1.0, 155, "Salary Distribution ($000s)", size=12, bold=True)
-fig.show()
+import matplotlib.pyplot as plt
+
+fig, ax = plt.subplots(figsize=(5, 6))
+bp = ax.boxplot(salaries, patch_artist=True,
+                boxprops=dict(facecolor="steelblue", alpha=0.5),
+                medianprops=dict(color="crimson", lw=2),
+                flierprops=dict(marker="o", markerfacecolor="orange",
+                                markersize=8, linestyle="none"))
+ax.set_ylabel("Salary ($000s)")
+ax.set_xticklabels(["All Staff"])
+ax.set_title("Salary Distribution\n(orange dot = outlier)")
+ax.yaxis.grid(True, linestyle="--", alpha=0.5)
+plt.tight_layout()
+plt.show()
 `,
         instructions:
           "Notice the outlier at $145k — it appears as a dot above the upper whisker. The median line should be below the center of the box, suggesting right skew (a longer upper whisker and the high outlier pulling the mean up).",
@@ -133,15 +142,25 @@ groups = [("Method A", method_a, 1.0, "steelblue"),
           ("Method B", method_b, 2.0, "tomato"),
           ("Method C", method_c, 3.0, "seagreen")]
 
-fig = Figure(width=9, height=7)
-fig.axes(xmin=0, xmax=4, ymin=40, ymax=110)
+import matplotlib.pyplot as plt
 
-for label, data, x_pos, color in groups:
-    fig.boxplot(values=data, x=x_pos, width=0.5, color=color)
-    fig.text(x_pos, 42, label, size=10)
-
-fig.text(2.0, 106, "Test Scores by Teaching Method", size=12, bold=True)
-fig.show()
+fig, ax = plt.subplots(figsize=(8, 5))
+colors = ["steelblue", "tomato", "seagreen"]
+bp = ax.boxplot(
+    [method_a, method_b, method_c],
+    patch_artist=True,
+    labels=["Method A", "Method B", "Method C"],
+    medianprops=dict(color="black", lw=2),
+    flierprops=dict(marker="o", markersize=7, linestyle="none")
+)
+for patch, color in zip(bp["boxes"], colors):
+    patch.set_facecolor(color)
+    patch.set_alpha(0.55)
+ax.set_ylabel("Test Score")
+ax.set_title("Test Scores by Teaching Method")
+ax.yaxis.grid(True, linestyle="--", alpha=0.5)
+plt.tight_layout()
+plt.show()
 
 # Print summaries for comparison
 for label, data, _, _ in groups:
@@ -352,6 +371,29 @@ for label, data, _, _ in groups:
       ],
       answer:
         "A complete response includes a reproducible computation, contextual interpretation, and a limitation statement tied to assumptions.",
+    },
+  ],
+
+  definitions: [
+    {
+      term: "boxplot",
+      definition: "A graphical display of the five-number summary (min, Q1, median, Q3, max) with whiskers extending to the outermost non-outlier values and individual dots for outliers. Also called a box-and-whisker plot.",
+    },
+    {
+      term: "whisker",
+      definition: "The lines extending from the box in a boxplot, reaching to the farthest data value that still falls within 1.5×IQR of the quartile. Whiskers do NOT extend to the actual min/max when outliers are present.",
+    },
+    {
+      term: "modified boxplot",
+      definition: "The standard modern boxplot: whiskers truncate at the Tukey fences and outliers are plotted individually as dots. Contrasts with older 'regular' boxplots that extend whiskers to the actual min and max.",
+    },
+    {
+      term: "side-by-side boxplot",
+      definition: "Multiple boxplots drawn on the same axis with the same scale, one per group. The standard tool for visually comparing center, spread, skewness, and outliers across multiple groups simultaneously.",
+    },
+    {
+      term: "notched boxplot",
+      definition: "A boxplot variant with a notch around the median at median ± 1.58×IQR/√n. Non-overlapping notches between two groups provide roughly 95% confidence that the population medians differ.",
     },
   ],
 
@@ -575,6 +617,61 @@ for label, data, _, _ in groups:
       ],
       reviewSection:
         'Intuition → "Side-by-side boxplots: the group comparison tool"',
+    },
+    {
+      id: "stat3-004-quiz-7",
+      type: "choice",
+      text: "The median line inside a boxplot corresponds to which summary statistic?",
+      options: ["Mean", "Q2 (50th percentile)", "Midpoint of Q1 and Q3", "Trimmed mean"],
+      answer: "Q2 (50th percentile)",
+      hints: [
+        "The three horizontal lines on a boxplot are Q1, Q2 (median), and Q3.",
+        "The median is Q2, the 50th percentile. The mean is NOT displayed in a standard boxplot.",
+      ],
+      reviewSection: 'Intuition → "Anatomy of a boxplot"',
+    },
+    {
+      id: "stat3-004-quiz-8",
+      type: "choice",
+      text: "A right-skewed distribution will show which pattern in a boxplot?",
+      options: [
+        "Longer lower whisker and median near Q3",
+        "Longer upper whisker and median closer to Q1",
+        "Equal whisker lengths and centered median",
+        "No whiskers — only a box",
+      ],
+      answer: "Longer upper whisker and median closer to Q1",
+      hints: [
+        "Right skew = long tail on the right (high values). Upper whisker captures the right tail.",
+        "Median bunched toward lower values (Q1 side) in a right-skewed distribution.",
+      ],
+      reviewSection: "Insight callout — Reading Skewness from a Boxplot",
+    },
+    {
+      id: "stat3-004-quiz-9",
+      type: "choice",
+      text: "For Q1=25, Q3=45, IQR=20, the Tukey upper fence is:",
+      options: ["65", "75", "85", "70"],
+      answer: "75",
+      hints: ["Upper fence = Q3 + 1.5 × IQR.", "45 + 1.5 × 20 = 45 + 30 = 75."],
+      reviewSection: "Math section — Tukey fence values formally",
+    },
+    {
+      id: "stat3-004-quiz-10",
+      type: "choice",
+      text: "A dataset has Q1=25, Q3=45, and the upper fence is 75. A data point at 82 would be displayed on the boxplot as:",
+      options: [
+        "The tip of the upper whisker",
+        "An outlier dot beyond the whisker",
+        "Inside the box between Q1 and Q3",
+        "Part of the upper whisker but not the tip",
+      ],
+      answer: "An outlier dot beyond the whisker",
+      hints: [
+        "82 > 75 (upper fence) → outlier by Tukey rule.",
+        "Outliers are plotted as individual dots above the whisker; the whisker stops at the largest non-outlier value.",
+      ],
+      reviewSection: "Procedure: Draw a Boxplot by Hand",
     },
   ],
 

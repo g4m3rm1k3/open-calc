@@ -141,11 +141,23 @@ print(f"Within 1 SD: {within_1/n*100:.1f}% (expected ~68%)")
 print(f"Within 2 SD: {within_2/n*100:.1f}% (expected ~95%)")
 print(f"Within 3 SD: {within_3/n*100:.1f}% (expected ~99.7%)")
 
-fig = Figure(width=8, height=5)
-fig.axes(xmin=35, xmax=115, ymin=0, ymax=30)
-fig.histogram(values=scores, bins=15, color="steelblue")
-fig.text(75, 29, "Exam Scores (Mean=75, SD=10)", size=12, bold=True)
-fig.show()
+import matplotlib.pyplot as plt
+
+fig, ax = plt.subplots(figsize=(8, 5))
+ax.hist(scores, bins=15, color="steelblue", edgecolor="white")
+ax.axvline(xbar, color="crimson", lw=2, label=f"Mean = {xbar:.1f}")
+ax.axvline(xbar - s, color="orange", lw=1.5, ls="--",
+           label=f"±1σ = [{xbar-s:.1f}, {xbar+s:.1f}]")
+ax.axvline(xbar + s, color="orange", lw=1.5, ls="--")
+ax.axvline(xbar - 2*s, color="gold", lw=1.5, ls=":",
+           label=f"±2σ = [{xbar-2*s:.1f}, {xbar+2*s:.1f}]")
+ax.axvline(xbar + 2*s, color="gold", lw=1.5, ls=":")
+ax.set_xlabel("Exam Score")
+ax.set_ylabel("Count")
+ax.set_title("Exam Scores — Empirical Rule Visualization")
+ax.legend(fontsize=8)
+plt.tight_layout()
+plt.show()
 `,
         instructions:
           "The histogram should look roughly bell-shaped. Verify that the empirical 68-95-99.7 rule holds approximately for this simulated normal data.",
@@ -349,6 +361,34 @@ fig.show()
       ],
       answer:
         "A complete response includes a reproducible computation, contextual interpretation, and a limitation statement tied to assumptions.",
+    },
+  ],
+
+  definitions: [
+    {
+      term: "range",
+      definition:
+        "max − min; the simplest spread measure. Fragile: a single outlier can change it dramatically.",
+    },
+    {
+      term: "interquartile range (IQR)",
+      definition:
+        "Q3 − Q1; the spread of the middle 50% of the data. Resistant to outliers; paired with the median for skewed distributions.",
+    },
+    {
+      term: "variance (s²)",
+      definition:
+        "The average squared deviation from the mean: s² = Σ(xᵢ − x̄)² / (n−1). In squared units of the original data; unbiased estimator of the population variance σ².",
+    },
+    {
+      term: "standard deviation (s)",
+      definition:
+        "The square root of variance; the typical distance a data point lies from the mean, in the original units. Sensitive to outliers; paired with the mean for symmetric data.",
+    },
+    {
+      term: "coefficient of variation (CV)",
+      definition:
+        "CV = (s / x̄) × 100%; standard deviation expressed as a percentage of the mean. Allows comparison of spread across datasets with different units or scales.",
     },
   ],
 
@@ -572,6 +612,71 @@ fig.show()
         "CV_X = 25/100 = 25%. CV_Y = 400/2000 = 20%.",
       ],
       reviewSection: "Challenge 2 — CV for comparing variability",
+    },
+    {
+      id: "stat3-002-quiz-7",
+      type: "choice",
+      text: "Dataset A: [10, 10, 10, 10, 10]. Dataset B: [0, 5, 10, 15, 20]. Both have mean 10. Which has the larger standard deviation?",
+      options: [
+        "Dataset A (all values equal the mean, so SD is large)",
+        "Dataset B (values spread from 0 to 20)",
+        "Both have the same standard deviation",
+        "Cannot be determined without the sample size",
+      ],
+      answer: "Dataset B (values spread from 0 to 20)",
+      hints: [
+        "When every value equals the mean, all deviations are zero → SD = 0.",
+        "Dataset A has zero spread; Dataset B has deviations of ±10, ±5, 0 from the mean.",
+      ],
+      reviewSection:
+        'Intuition → "Before reading on, predict" — Dataset A vs. Dataset B',
+    },
+    {
+      id: "stat3-002-quiz-8",
+      type: "choice",
+      text: "By the Empirical Rule, approximately what percentage of values fall within 2 standard deviations of the mean for a normal distribution?",
+      options: ["50%", "68%", "95%", "99.7%"],
+      answer: "95%",
+      hints: [
+        "The 68-95-99.7 rule: ±1σ → 68%, ±2σ → 95%, ±3σ → 99.7%.",
+        "Two standard deviations covers most, but not almost all, of the normal distribution.",
+      ],
+      reviewSection: "Math section — Empirical Rule (68-95-99.7 Rule)",
+    },
+    {
+      id: "stat3-002-quiz-9",
+      type: "choice",
+      text: "The sample variance formula uses n − 1 in the denominator (instead of n) because:",
+      options: [
+        "It gives a smaller value that is easier to interpret",
+        "The sample mean was estimated from the same data, consuming one degree of freedom; n−1 corrects the systematic underestimate",
+        "n − 1 is always larger than n, making the variance estimate more conservative",
+        "It makes the formula match the population variance formula",
+      ],
+      answer:
+        "The sample mean was estimated from the same data, consuming one degree of freedom; n−1 corrects the systematic underestimate",
+      hints: [
+        "Deviations (xᵢ − x̄) always sum to zero — so the last deviation is determined by the others.",
+        "With only n−1 independent pieces of deviation information, dividing by n−1 makes s² unbiased.",
+      ],
+      reviewSection: 'Intuition → "Why Divide by n−1, Not n?" callout',
+    },
+    {
+      id: "stat3-002-quiz-10",
+      type: "choice",
+      text: "Which spread measure is correctly paired with the median as a center summary?",
+      options: [
+        "Standard deviation",
+        "Variance",
+        "Interquartile range (IQR)",
+        "Coefficient of variation",
+      ],
+      answer: "Interquartile range (IQR)",
+      hints: [
+        "Mean + SD go together for symmetric data. What goes with the median?",
+        "IQR and median are both resistant (robust) to outliers — they form a natural pair for skewed data.",
+      ],
+      reviewSection: 'Intuition → "Matched Pairs: Center and Spread" callout',
     },
   ],
 

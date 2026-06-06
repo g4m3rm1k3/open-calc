@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: "stat2-005",
   slug: "scatter-plots-and-line-charts",
   chapter: "stat2",
@@ -22,7 +22,7 @@ export default {
     "scatter plot scatter diagram line chart time series correlation association trend outlier fig.scatter fig.plot linear nonlinear",
   timeToComplete: 35,
   coreConcept:
-    "A scatter plot shows the relationship between two quantitative variables — direction, form, strength, and outliers. A line chart connects sequential data points to show trends or changes over time. The correlation coefficient r quantifies linear strength but misses non-linear patterns, clusters, and influential points that are immediately visible in a scatter plot.",
+    "A scatter plot shows the relationship between two quantitative variables â€” direction, form, strength, and outliers. A line chart connects sequential data points to show trends or changes over time. The correlation coefficient r quantifies linear strength but misses non-linear patterns, clusters, and influential points that are immediately visible in a scatter plot.",
   prerequisites: ["stat2-002", "stat2-003"],
   nextLesson: "stat2-006",
 
@@ -30,15 +30,15 @@ export default {
     question:
       "Two datasets both have r = 0.70. Are their scatter plots the same?",
     realWorldContext:
-      'Not at all. Dataset A might show a tight cluster of points along a straight line — a genuine strong linear relationship. Dataset B might show a broad oval cloud with a few outliers pulling r upward — the "relationship" is mostly driven by two extreme observations. Dataset C might show a perfect S-curve that happens to have overall r = 0.70 because the curve is monotone. All three have r = 0.70 but require completely different analytical approaches. The scatter plot reveals what r cannot: the shape of the relationship, whether there are distinct subgroups, and which points are influential. This is why the scatter plot is the mandatory first step before any regression analysis.',
+      'Not at all. Dataset A might show a tight cluster of points along a straight line â€” a genuine strong linear relationship. Dataset B might show a broad oval cloud with a few outliers pulling r upward â€” the "relationship" is mostly driven by two extreme observations. Dataset C might show a perfect S-curve that happens to have overall r = 0.70 because the curve is monotone. All three have r = 0.70 but require completely different analytical approaches. The scatter plot reveals what r cannot: the shape of the relationship, whether there are distinct subgroups, and which points are influential. This is why the scatter plot is the mandatory first step before any regression analysis.',
   },
 
   intuition: {
     prose: [
       "**Four features to describe in every scatter plot.** When you look at a scatter plot, describe four things:\n1. **Direction:** Positive association (as x increases, y increases) or negative (as x increases, y decreases)?\n2. **Form:** Linear (points scatter around a line) or nonlinear (curved, S-shaped, parabolic)?\n3. **Strength:** How tightly do points cluster around the trend? Strong (close together), moderate (some scatter), weak (widely scattered)?\n4. **Unusual features:** Outliers (isolated points far from the main cloud), influential points (points that would greatly change the regression line if removed), clusters or gaps (two separate groups of points).",
-      '**Correlation coefficient r recap.** The Pearson correlation $r = \\frac{\\sum(x_i - \\bar{x})(y_i - \\bar{y})}{\\sqrt{\\sum(x_i-\\bar{x})^2 \\cdot \\sum(y_i-\\bar{y})^2}}$ is a number between -1 and +1 that measures the strength and direction of the LINEAR association between x and y. Conventions: |r| ≥ 0.8 = strong, 0.5 ≤ |r| < 0.8 = moderate, |r| < 0.5 = weak. Important limits: r measures only linear association (a perfect parabola has r ≈ 0 if symmetric); r is sensitive to outliers (one extreme point can shift r by 0.3 or more); r = 0 does not mean "no relationship" — it means no linear relationship.',
+      '**Correlation coefficient r recap.** The Pearson correlation $r = \\frac{\\sum(x_i - \\bar{x})(y_i - \\bar{y})}{\\sqrt{\\sum(x_i-\\bar{x})^2 \\cdot \\sum(y_i-\\bar{y})^2}}$ is a number between -1 and +1 that measures the strength and direction of the LINEAR association between x and y. Conventions: |r| â‰¥ 0.8 = strong, 0.5 â‰¤ |r| < 0.8 = moderate, |r| < 0.5 = weak. Important limits: r measures only linear association (a perfect parabola has r â‰ˆ 0 if symmetric); r is sensitive to outliers (one extreme point can shift r by 0.3 or more); r = 0 does not mean "no relationship" â€” it means no linear relationship.',
       "**Before reading on, predict:** You have monthly average temperature (x) and monthly energy consumption (y, electricity + heating) for a city over one year. Would you expect r to be positive, negative, or near zero? Would the scatter plot be linear?",
-      "**Line charts for time series.** A line chart is a scatter plot where (1) the x-axis is time (or an ordered sequence) and (2) consecutive points are connected by line segments. The line encoding makes the temporal progression visible — you see upward trends, downward trends, plateaus, seasonal cycles, and abrupt jumps. Use a line chart when: the x-axis is genuinely time-ordered, consecutive values are meaningfully connected (the line between them represents a trajectory), and you want to show change over time rather than the distribution at one point in time.",
+      "**Line charts for time series.** A line chart is a scatter plot where (1) the x-axis is time (or an ordered sequence) and (2) consecutive points are connected by line segments. The line encoding makes the temporal progression visible â€” you see upward trends, downward trends, plateaus, seasonal cycles, and abrupt jumps. Use a line chart when: the x-axis is genuinely time-ordered, consecutive values are meaningfully connected (the line between them represents a trajectory), and you want to show change over time rather than the distribution at one point in time.",
       "**Scatter plot with a trend line overlay.** To add a linear trend line to a scatter plot, compute the regression line $\\hat{y} = b_0 + b_1 x$ and plot it using `fig.plot()` with a few points on the line. The trend line helps the reader see the overall direction and form, especially when the scatter is moderate to weak. (Regression details are in stat8; here we focus on the visual.)",
       "**Overplotting.** When many data points have similar x and y values (e.g., integer-valued scores with lots of ties), points overlap into a blob. The visual density of the blob does not accurately represent the actual point density. Use `alpha` (transparency) in `fig.scatter()` to show overlapping points as darker regions. Add a small amount of random jitter (small noise on x or y) to spread overlapping discrete values.",
     ],
@@ -46,17 +46,17 @@ export default {
       {
         type: "procedure",
         title: "Procedure: Describing a Scatter Plot",
-        body: 'Step 1. Direction: Do points trend upward (positive) or downward (negative) left to right? Or no trend?\n\nStep 2. Form: Do the points roughly follow a straight line? A curve? A U-shape? Multiple clusters?\n\nStep 3. Strength: Are points tightly packed around the trend (strong) or widely scattered (weak)?\n\nStep 4. Unusual features: Are there isolated points far from the main cloud (outliers)? Are there two separate groups (clusters)? Are there any points that would dramatically change a regression line if removed (influential points — typically extreme x-values)?\n\nStep 5. Write a one-sentence summary combining all four: "There is a [strong/moderate/weak] [positive/negative] [linear/curved] association between x and y, with [one notable outlier at x=..., y=...]."',
+        body: 'Step 1. Direction: Do points trend upward (positive) or downward (negative) left to right? Or no trend?\n\nStep 2. Form: Do the points roughly follow a straight line? A curve? A U-shape? Multiple clusters?\n\nStep 3. Strength: Are points tightly packed around the trend (strong) or widely scattered (weak)?\n\nStep 4. Unusual features: Are there isolated points far from the main cloud (outliers)? Are there two separate groups (clusters)? Are there any points that would dramatically change a regression line if removed (influential points â€” typically extreme x-values)?\n\nStep 5. Write a one-sentence summary combining all four: "There is a [strong/moderate/weak] [positive/negative] [linear/curved] association between x and y, with [one notable outlier at x=..., y=...]."',
       },
       {
         type: "insight",
         title: "Influential Points vs. Outliers",
-        body: "An **outlier** is a point that does not follow the overall pattern of the data — it has an unusually large residual (vertical distance from the regression line).\n\nAn **influential point** is a point whose removal would substantially change the regression line. An influential point is almost always at an extreme x-value (high leverage).\n\nA point can be:\n- An outlier but not influential: a point with unusual y-value but average x-value. It increases scatter (se) but does not strongly pull the line.\n- Influential but not an outlier: a point with extreme x-value that happens to fall on the existing trend line. It strongly constrains the line position but fits the pattern.\n- Both: a point with extreme x and unusual y — the most dangerous case. It pulls the regression line toward itself, away from the true relationship.\n\nAlways check: what happens to the regression line if you remove that point?",
+        body: "An **outlier** is a point that does not follow the overall pattern of the data â€” it has an unusually large residual (vertical distance from the regression line).\n\nAn **influential point** is a point whose removal would substantially change the regression line. An influential point is almost always at an extreme x-value (high leverage).\n\nA point can be:\n- An outlier but not influential: a point with unusual y-value but average x-value. It increases scatter (se) but does not strongly pull the line.\n- Influential but not an outlier: a point with extreme x-value that happens to fall on the existing trend line. It strongly constrains the line position but fits the pattern.\n- Both: a point with extreme x and unusual y â€” the most dangerous case. It pulls the regression line toward itself, away from the true relationship.\n\nAlways check: what happens to the regression line if you remove that point?",
       },
       {
         type: "warning",
         title: "Correlation Is Not the Full Story",
-        body: 'r = 0 does NOT mean "no relationship" — it means no LINEAR relationship. A perfect parabola (y = x²) has r = 0 if centered at x=0.\n\nr is sensitive to outliers. One extreme point at (x=100, y=100) in a dataset of points clustered near (0,0) with no correlation can create r = 0.9.\n\nr does not distinguish: one linear relationship vs. two separate clusters vs. a curved trend vs. an outlier-driven apparent trend. Plot first.',
+        body: 'r = 0 does NOT mean "no relationship" â€” it means no LINEAR relationship. A perfect parabola (y = xÂ²) has r = 0 if centered at x=0.\n\nr is sensitive to outliers. One extreme point at (x=100, y=100) in a dataset of points clustered near (0,0) with no correlation can create r = 0.9.\n\nr does not distinguish: one linear relationship vs. two separate clusters vs. a curved trend vs. an outlier-driven apparent trend. Plot first.',
       },
     ],
     visualizations: [],
@@ -71,8 +71,8 @@ export default {
 
   rigor: {
     prose: [
-      "**R1 — Leverage and cook's distance.** A formal measure of influence is Cook's Distance $D_i = \\frac{\\sum_{j=1}^n (\\hat{y}_j - \\hat{y}_{j(i)})^2}{p \\cdot \\text{MSE}}$, where $\\hat{y}_{j(i)}$ is the predicted value when observation $i$ is excluded. Large $D_i$ (conventionally $D_i > 1$) indicates an influential observation. Leverage $h_{ii}$ measures how extreme observation $i$ is in the x-direction; high leverage combined with a large residual creates high influence.",
-      "**R2 — Spearman rank correlation.** Pearson r requires approximately linear relationships and is sensitive to outliers. When the relationship is monotone but nonlinear, or when there are extreme outliers, Spearman's rank correlation $r_s$ is more appropriate. $r_s$ is computed by ranking both x and y values (replacing each with their rank) and computing Pearson r on the ranks. $r_s$ measures monotone association and is robust to outliers and nonlinearity.",
+      "**R1 â€” Leverage and cook's distance.** A formal measure of influence is Cook's Distance $D_i = \\frac{\\sum_{j=1}^n (\\hat{y}_j - \\hat{y}_{j(i)})^2}{p \\cdot \\text{MSE}}$, where $\\hat{y}_{j(i)}$ is the predicted value when observation $i$ is excluded. Large $D_i$ (conventionally $D_i > 1$) indicates an influential observation. Leverage $h_{ii}$ measures how extreme observation $i$ is in the x-direction; high leverage combined with a large residual creates high influence.",
+      "**R2 â€” Spearman rank correlation.** Pearson r requires approximately linear relationships and is sensitive to outliers. When the relationship is monotone but nonlinear, or when there are extreme outliers, Spearman's rank correlation $r_s$ is more appropriate. $r_s$ is computed by ranking both x and y values (replacing each with their rank) and computing Pearson r on the ranks. $r_s$ measures monotone association and is robust to outliers and nonlinearity.",
     ],
     visualizations: [],
   },
@@ -80,87 +80,109 @@ export default {
   python: {
     cells: [
       {
-        id: "stat2-005-cell-1",
-        type: "python",
-        cellTitle: "Scatter plot: describe the relationship",
-        code: `# Hours of sleep vs. reaction time (milliseconds)
-sleep  = [5.0, 5.5, 6.0, 6.5, 7.0, 7.0, 7.5, 7.5, 8.0, 8.0, 8.5, 9.0]
-react  = [310, 285, 270, 250, 235, 245, 220, 230, 210, 225, 205, 195]
+        id: 'stat2-005-py1',
+        cellTitle: 'Scatter Plot â€” Sleep vs. Reaction Time',
+        prose: `Describe a scatter plot using four features: direction (positive/negative), form (linear/curved), strength (tight/loose), and unusual features (outliers, clusters). Run this cell and describe all four features before reading the correlation.`,
+        code: `import matplotlib.pyplot as plt
+import numpy as np
 
-fig = Figure(width=7, height=5)
-fig.axes(xmin=4.5, xmax=9.5, ymin=180, ymax=330)
-fig.scatter(xs=sleep, ys=react, color="coral", size=6)
-fig.text(7, 325, "Sleep Hours vs. Reaction Time", size=13, bold=True)
-fig.show()
+sleep = [5.0, 5.5, 6.0, 6.5, 7.0, 7.0, 7.5, 7.5, 8.0, 8.0, 8.5, 9.0]
+react = [310, 285, 270, 250, 235, 245, 220, 230, 210, 225, 205, 195]
 
-# Compute correlation manually
-n = len(sleep)
-xbar = sum(sleep)/n
-ybar = sum(react)/n
-sx = (sum((x-xbar)**2 for x in sleep)/(n-1))**0.5
-sy = (sum((y-ybar)**2 for y in react)/(n-1))**0.5
-r = sum((sleep[i]-xbar)*(react[i]-ybar) for i in range(n)) / ((n-1)*sx*sy)
-print(f"r = {r:.3f}")
-`,
-        instructions:
-          "Describe the scatter plot using all four features: direction, form, strength, unusual features. Then check if r matches your visual assessment.",
+r = np.corrcoef(sleep, react)[0, 1]
+print(f"Pearson r = {r:.3f}")
+print("Direction:", "positive" if r > 0 else "negative")
+print("Strength: strong (|r| > 0.8)" if abs(r) > 0.8 else f"Strength: moderate (|r| = {abs(r):.2f})")
+
+fig, ax = plt.subplots(figsize=(8, 5))
+ax.scatter(sleep, react, color='coral', s=70, alpha=0.85, edgecolor='white', zorder=3)
+ax.set_xlabel('Hours of Sleep')
+ax.set_ylabel('Reaction Time (ms)')
+ax.set_title('Sleep Hours vs. Reaction Time', fontsize=13, fontweight='bold')
+
+# Regression line
+m, b = np.polyfit(sleep, react, 1)
+xr = np.linspace(4.5, 9.5, 100)
+ax.plot(xr, m * xr + b, 'navy', lw=2, linestyle='--', alpha=0.7, label=f'y={m:.1f}x+{b:.0f}')
+ax.legend()
+plt.tight_layout()
+plt.show()
+
+print()
+print("Four features to describe:")
+print("  Direction: negative â€” more sleep â†’ faster reactions (lower ms)")
+print("  Form: approximately linear")
+print("  Strength: strong (r â‰ˆ -0.98)")
+print("  Unusual: no obvious outliers or clusters in this dataset")`,
       },
       {
-        id: "stat2-005-cell-2",
-        type: "python",
-        cellTitle: "Scatter plot with trend line overlay",
-        code: `import pandas as pd
+        id: 'stat2-005-py2',
+        cellTitle: 'Scatter Plot â€” Regression Line Overlay',
+        prose: `Use np.polyfit() to compute a regression line and overlay it on a scatter plot. The regression line always passes through (xÌ„, È³). Run this and verify that property.`,
+        code: `import matplotlib.pyplot as plt
+import numpy as np
 
-# Study hours vs. exam score (from stat2-002)
 hours  = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5,
           6.0, 6.5, 7.0, 7.5, 8.0]
 scores = [52, 57, 63, 65, 70, 73, 78, 79, 85, 86, 88, 90, 92, 93, 95]
 
-# Compute regression line manually
-n = len(hours)
-xbar = sum(hours)/n
-ybar = sum(scores)/n
-b1 = sum((hours[i]-xbar)*(scores[i]-ybar) for i in range(n)) / \
-     sum((x-xbar)**2 for x in hours)
-b0 = ybar - b1*xbar
-print(f"Regression line: y = {b0:.2f} + {b1:.2f}x")
+b1, b0 = np.polyfit(hours, scores, 1)
+print(f"Regression line: score = {b0:.2f} + {b1:.2f} Ã— hours")
 
-# Plot scatter + regression line
-fig = Figure(width=7, height=5)
-fig.axes(xmin=0, xmax=9, ymin=45, ymax=100)
-fig.scatter(xs=hours, ys=scores, color="coral", size=5)
+xbar = np.mean(hours)
+ybar = np.mean(scores)
+y_at_xbar = b0 + b1 * xbar
+print(f"Check: at xÌ„={xbar:.2f}, line gives y={y_at_xbar:.2f}  (È³={ybar:.2f}) âœ“")
 
-# Add regression line: compute y at x=0 and x=9
-line_x = [0, 9]
-line_y = [b0 + b1*x for x in line_x]
-fig.plot(xs=line_x, ys=line_y, color="navy", lw=2)
+r = np.corrcoef(hours, scores)[0, 1]
+print(f"r = {r:.3f},  rÂ² = {r**2:.3f}  ({r**2*100:.1f}% of score variance explained by hours)")
 
-fig.text(4.5, 98, "Study Hours vs. Exam Score", size=13, bold=True)
-fig.show()
-`,
-        instructions:
-          "The regression line passes through (x̄, ȳ). Verify: compute the line y-value at x=xbar and check it equals ybar.",
+fig, ax = plt.subplots(figsize=(8, 5))
+ax.scatter(hours, scores, color='coral', s=60, alpha=0.85, edgecolor='white', zorder=3, label='Data')
+xr = np.linspace(0, 9, 100)
+ax.plot(xr, b0 + b1 * xr, 'navy', lw=2, label=f'y = {b0:.1f} + {b1:.1f}x')
+ax.axvline(xbar, color='gray', lw=1, linestyle=':', alpha=0.7)
+ax.axhline(ybar, color='gray', lw=1, linestyle=':', alpha=0.7)
+ax.annotate(f'(xÌ„, È³) = ({xbar:.1f}, {ybar:.1f})', xy=(xbar, ybar), xytext=(3, 65),
+            arrowprops=dict(arrowstyle='->', color='gray'), fontsize=10)
+ax.set_xlabel('Hours Studied'); ax.set_ylabel('Exam Score')
+ax.set_title('Study Hours vs. Exam Score with Regression Line')
+ax.legend()
+plt.tight_layout()
+plt.show()`,
       },
       {
-        id: "stat2-005-cell-3",
-        type: "python",
-        cellTitle: "Line chart: monthly temperature trend",
-        code: `# Average monthly temperature (°C)
-months = list(range(1, 13))  # 1=Jan, 12=Dec
+        id: 'stat2-005-py3',
+        cellTitle: 'Line Chart â€” Seasonal Temperature Trend',
+        prose: `A line chart reveals trends over time. The connecting lines imply that values change continuously between measurements â€” only use line charts when consecutive points are truly ordered and connected. Run this to see a seasonal pattern.`,
+        code: `import matplotlib.pyplot as plt
+import numpy as np
+
+month_names = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+months = list(range(1, 13))
 temps  = [2.1, 3.4, 7.8, 13.2, 18.5, 22.3, 24.7, 23.9, 19.4, 13.1, 7.2, 3.0]
 
-fig = Figure(width=8, height=5)
-fig.axes(xmin=0, xmax=13, ymin=-2, ymax=28)
-fig.plot(xs=months, ys=temps, color="tomato", lw=2)
-fig.scatter(xs=months, ys=temps, color="tomato", size=4)
-fig.text(6.5, 27, "Monthly Average Temperature", size=13, bold=True)
-fig.show()
+print(f"Max temperature: {max(temps)}Â°C in {month_names[temps.index(max(temps))]}")
+print(f"Min temperature: {min(temps)}Â°C in {month_names[temps.index(min(temps))]}")
+print(f"Annual range: {max(temps) - min(temps):.1f}Â°C")
 
-print("Max temperature:", max(temps), "in month", months[temps.index(max(temps))])
-print("Min temperature:", min(temps), "in month", months[temps.index(min(temps))])
-`,
-        instructions:
-          "The line chart shows a clear seasonal pattern — temperature peaks in summer (month 7) and bottoms in winter (month 1). Try overlaying a scatter() call with the same data to highlight individual data points.",
+fig, ax = plt.subplots(figsize=(10, 5))
+ax.plot(months, temps, color='tomato', lw=2.5, marker='o', markersize=8, markerfacecolor='white', markeredgewidth=2)
+ax.fill_between(months, temps, alpha=0.1, color='tomato')
+ax.set_xticks(months)
+ax.set_xticklabels(month_names)
+ax.set_ylabel('Average Temperature (Â°C)')
+ax.set_title('Monthly Average Temperature â€” Seasonal Pattern', fontsize=13, fontweight='bold')
+ax.axhline(0, color='gray', lw=0.8, linestyle='--')
+ax.set_ylim(-3, 28)
+
+# Annotate peak
+peak_month = temps.index(max(temps)) + 1
+ax.annotate(f'Peak: {max(temps)}Â°C', xy=(peak_month, max(temps)),
+            xytext=(peak_month - 2.5, max(temps) + 2),
+            arrowprops=dict(arrowstyle='->', color='gray'), fontsize=10)
+plt.tight_layout()
+plt.show()`,
       },
     ],
   },
@@ -171,13 +193,13 @@ print("Min temperature:", min(temps), "in month", months[temps.index(min(temps))
       title: "Describe four features of a scatter plot",
       difficulty: "easy",
       problem:
-        "A scatter plot of average daily temperature (x, °C) vs. daily ice cream sales (y, units) shows points trending upward from lower-left to upper-right, roughly following a straight line, with moderate scatter around the trend, and one isolated point at (8°C, 350 units) far above the trend. Describe all four features.",
+        "A scatter plot of average daily temperature (x, Â°C) vs. daily ice cream sales (y, units) shows points trending upward from lower-left to upper-right, roughly following a straight line, with moderate scatter around the trend, and one isolated point at (8Â°C, 350 units) far above the trend. Describe all four features.",
       steps: [
         {
           expression:
-            "\\text{Direction: positive — as temperature increases, sales increase}",
+            "\\text{Direction: positive â€” as temperature increases, sales increase}",
           annotation:
-            "Points go from lower-left to upper-right — a positive association.",
+            "Points go from lower-left to upper-right â€” a positive association.",
           strategyTitle: "Feature 1: Direction",
         },
         {
@@ -188,16 +210,16 @@ print("Min temperature:", min(temps), "in month", months[temps.index(min(temps))
         },
         {
           expression:
-            "\\text{Strength: moderate — noticeable scatter around the line}",
+            "\\text{Strength: moderate â€” noticeable scatter around the line}",
           annotation:
-            'The description says "moderate scatter" — points are not tightly packed. The correlation would likely be 0.5–0.75.',
+            'The description says "moderate scatter" â€” points are not tightly packed. The correlation would likely be 0.5â€“0.75.',
           strategyTitle: "Feature 3: Strength",
         },
         {
           expression:
-            "\\text{Unusual: outlier at (8°C, 350 units) — far above the trend}",
+            "\\text{Unusual: outlier at (8Â°C, 350 units) â€” far above the trend}",
           annotation:
-            "This point has a cool temperature (8°C) but very high sales (350 units). It deviates from the general pattern. Possible explanation: a special event on that day (festival, sale). Investigate before including in regression.",
+            "This point has a cool temperature (8Â°C) but very high sales (350 units). It deviates from the general pattern. Possible explanation: a special event on that day (festival, sale). Investigate before including in regression.",
           strategyTitle: "Feature 4: Unusual features",
         },
       ],
@@ -237,7 +259,7 @@ print("Min temperature:", min(temps), "in month", months[temps.index(min(temps))
           expression:
             "r = \\frac{44}{(n-1) s_x s_y} = \\frac{44}{4 \\times 3.16 \\times 3.70} = \\frac{44}{46.77} \\approx 0.941",
           annotation:
-            "Interpretation: r ≈ 0.94 indicates a strong positive linear association. 88.7% of the variance in y is explained by the linear relationship with x (r² ≈ 0.887).",
+            "Interpretation: r â‰ˆ 0.94 indicates a strong positive linear association. 88.7% of the variance in y is explained by the linear relationship with x (rÂ² â‰ˆ 0.887).",
           strategyTitle: "Step 5: r and interpretation",
         },
       ],
@@ -251,7 +273,7 @@ print("Min temperature:", min(temps), "in month", months[temps.index(min(temps))
       steps: [
         {
           expression:
-            "\\text{Annual trend: compare Jan (45) to Dec (48) — roughly flat with 6.7\\% growth}",
+            "\\text{Annual trend: compare Jan (45) to Dec (48) â€” roughly flat with 6.7\\% growth}",
           annotation:
             "Jan=45 and Dec=48 are similar, suggesting no strong year-over-year growth trend in this single year. Traffic is roughly at the same level at start and end.",
           strategyTitle: "(a) Annual trend",
@@ -260,14 +282,14 @@ print("Min temperature:", min(temps), "in month", months[temps.index(min(temps))
           expression:
             "\\text{Seasonal: peaks in summer (Jun=70, Jul=74), troughs in winter (Jan=45, Feb=47)}",
           annotation:
-            "Traffic rises from spring through summer and falls in fall through winter. This is a regular seasonal pattern — probably driven by school calendars, vacations, or other seasonal factors.",
+            "Traffic rises from spring through summer and falls in fall through winter. This is a regular seasonal pattern â€” probably driven by school calendars, vacations, or other seasonal factors.",
           strategyTitle: "(b) Seasonal pattern",
         },
         {
           expression:
             "\\text{Peak: July (74k). Trough: January (45k). Range: 29k (64\\% variation)}",
           annotation:
-            "The seasonal swing is 29,000 visits — summer is 64% higher than winter. This is large enough to significantly affect any business planning based on this data.",
+            "The seasonal swing is 29,000 visits â€” summer is 64% higher than winter. This is large enough to significantly affect any business planning based on this data.",
           strategyTitle: "(c) Peak and trough",
         },
       ],
@@ -284,19 +306,19 @@ print("Min temperature:", min(temps), "in month", months[temps.index(min(temps))
       walkthrough: [
         {
           expression:
-            "\\text{First 9 points: x ∈ [1,9], y ≈ 2x — tight linear relationship}",
+            "\\text{First 9 points: x âˆˆ [1,9], y â‰ˆ 2x â€” tight linear relationship}",
           annotation:
-            "Plotting the first 9 points reveals a very tight linear relationship: y ≈ 2x. These points have almost no scatter around the line y = 0 + 2x.",
+            "Plotting the first 9 points reveals a very tight linear relationship: y â‰ˆ 2x. These points have almost no scatter around the line y = 0 + 2x.",
         },
         {
           expression:
-            "\\text{10th point: (50, 100) — which is exactly y = 2x = 100}",
+            "\\text{10th point: (50, 100) â€” which is exactly y = 2x = 100}",
           annotation:
-            "The 10th point at (50, 100) falls exactly on the extension of y = 2x from the first 9 points. It is not an outlier in terms of the pattern — it follows the same relationship.",
+            "The 10th point at (50, 100) falls exactly on the extension of y = 2x from the first 9 points. It is not an outlier in terms of the pattern â€” it follows the same relationship.",
         },
         {
           expression:
-            "\\text{Influential? Removing (50,100) shifts the x-range from 1–50 to 1–9}",
+            "\\text{Influential? Removing (50,100) shifts the x-range from 1â€“50 to 1â€“9}",
           annotation:
             "With the 10th point, the regression line is anchored by a data point 50 units away. Its extreme x-value gives it very high leverage. However, because it falls on the trend, removing it barely changes the slope.",
         },
@@ -308,14 +330,14 @@ print("Min temperature:", min(temps), "in month", months[temps.index(min(temps))
         },
       ],
       answer:
-        "The 10th point (50, 100) has high leverage (extreme x) but is not an outlier (falls on the linear trend). It is influential but in a benign way — it confirms the trend without distorting it.",
+        "The 10th point (50, 100) has high leverage (extreme x) but is not an outlier (falls on the linear trend). It is influential but in a benign way â€” it confirms the trend without distorting it.",
     },
     {
       id: "stat2-005-ch2",
       title: "Build a scatter plot with regression line from scratch",
       difficulty: "hard",
       problem:
-        "Data: advertising spend (x, $000s) = [5, 10, 15, 20, 25, 30] and sales (y, $000s) = [22, 41, 58, 79, 94, 112]. (a) Compute x̄, ȳ, b₁, b₀. (b) Write complete opencalc code to display the scatter plot and regression line.",
+        "Data: advertising spend (x, $000s) = [5, 10, 15, 20, 25, 30] and sales (y, $000s) = [22, 41, 58, 79, 94, 112]. (a) Compute xÌ„, È³, bâ‚, bâ‚€. (b) Write complete opencalc code to display the scatter plot and regression line.",
       walkthrough: [
         {
           expression:
@@ -332,7 +354,7 @@ print("Min temperature:", min(temps), "in month", months[temps.index(min(temps))
           expression:
             "b_1 = 1575/437.5 = 3.6, \\quad b_0 = 67.7 - 3.6(17.5) = 67.7 - 63.0 = 4.7",
           annotation:
-            "Regression line: ŷ = 4.7 + 3.6x. Interpretation: for each additional $1,000 in ad spend, sales increase by $3,600.",
+            "Regression line: Å· = 4.7 + 3.6x. Interpretation: for each additional $1,000 in ad spend, sales increase by $3,600.",
         },
         {
           expression:
@@ -342,7 +364,7 @@ print("Min temperature:", min(temps), "in month", months[temps.index(min(temps))
         },
       ],
       answer:
-        "b₁ = 3.6, b₀ = 4.7. Regression line: ŷ = 4.7 + 3.6x. Scatter + line plot: fig.scatter() then fig.plot() with line y-values at x=5 and x=30.",
+        "bâ‚ = 3.6, bâ‚€ = 4.7. Regression line: Å· = 4.7 + 3.6x. Scatter + line plot: fig.scatter() then fig.plot() with line y-values at x=5 and x=30.",
     },
     ,
     {
@@ -367,35 +389,35 @@ print("Min temperature:", min(temps), "in month", months[temps.index(min(temps))
       {
         symbol: "r",
         meaning:
-          "Pearson correlation coefficient — measures strength and direction of LINEAR association. Range: −1 to +1.",
+          "Pearson correlation coefficient â€” measures strength and direction of LINEAR association. Range: âˆ’1 to +1.",
       },
       {
         symbol: "r^2",
         meaning:
-          "Coefficient of determination — proportion of variance in y explained by the linear relationship with x.",
+          "Coefficient of determination â€” proportion of variance in y explained by the linear relationship with x.",
       },
       {
         symbol: "b_1",
         meaning:
-          "Regression slope = r × (s_y/s_x) — expected change in y per unit increase in x.",
+          "Regression slope = r Ã— (s_y/s_x) â€” expected change in y per unit increase in x.",
       },
       {
         symbol: "b_0",
-        meaning: "Regression intercept = ȳ − b₁x̄ — predicted y when x = 0.",
+        meaning: "Regression intercept = È³ âˆ’ bâ‚xÌ„ â€” predicted y when x = 0.",
       },
       {
         symbol: "\\hat{y}",
         meaning:
-          "Predicted value of y from the regression equation: ŷ = b₀ + b₁x.",
+          "Predicted value of y from the regression equation: Å· = bâ‚€ + bâ‚x.",
       },
     ],
     rulesOfThumb: [
       "Always plot the scatter before computing r or fitting a regression.",
       "r = 0 means no linear relationship, NOT no relationship.",
-      "r is sensitive to outliers — one extreme point can dominate.",
+      "r is sensitive to outliers â€” one extreme point can dominate.",
       "Line chart only for ordered/sequential data. Connecting unordered dots is misleading.",
       "Both scatter + line are often plotted together: scatter shows raw data, line shows trend.",
-      "|r| ≥ 0.8 = strong, 0.5–0.8 = moderate, < 0.5 = weak (rough conventions).",
+      "|r| â‰¥ 0.8 = strong, 0.5â€“0.8 = moderate, < 0.5 = weak (rough conventions).",
     ],
   },
 
@@ -405,7 +427,7 @@ print("Min temperature:", min(temps), "in month", months[temps.index(min(temps))
       {
         lessonId: "stat8-001",
         label: "Linear Regression",
-        note: "stat8 develops the regression line formally, including slope/intercept formulas, residuals, R², and inference.",
+        note: "stat8 develops the regression line formally, including slope/intercept formulas, residuals, RÂ², and inference.",
       },
       {
         lessonId: "stat3-006",
@@ -420,6 +442,15 @@ print("Min temperature:", min(temps), "in month", months[temps.index(min(temps))
     ],
   },
 
+  definitions: [
+    { term: "scatter plot", definition: "A chart for two quantitative variables where each observation is a point at (x, y). Reveals the form (linear/curved), direction (positive/negative), strength (tight/loose), and presence of outliers in the association. The primary diagnostic before fitting a regression model." },
+    { term: "association (statistical)", definition: "The systematic co-variation between two variables. Described by four features: form (linear, curved, or no pattern), direction (positive = both increase together, negative = one increases as the other decreases), strength (how tightly clustered the points are), and unusual features (outliers, clusters, gaps)." },
+    { term: "line chart", definition: "A chart where consecutive data points are connected by lines. Appropriate only for sequential data (usually time series) where the ordering is meaningful and interpolation between points is reasonable. Connecting unordered categorical data with a line is misleading — use a bar chart instead." },
+    { term: "time series", definition: "Data recorded sequentially over time at regular intervals (daily, monthly, annually). A line chart is the standard display. Key patterns to look for: trend (long-term direction), seasonality (repeating periodic patterns), and abrupt structural breaks (sudden level changes)." },
+    { term: "overplotting", definition: "The problem that occurs when many data points overlap in a scatter plot, forming a solid blob that hides density structure. Remedies: alpha transparency (overlapping points accumulate to darker color), jitter (adding small random noise), hex-bin plots (count points per grid cell and color by density), or random subsampling." },
+    { term: "trend line (smoother)", definition: "A curve added to a scatter plot to summarize the overall pattern of the association without assuming linearity. A LOESS (locally weighted regression) smoother fits flexible curves that follow the data's local shape, making non-linearity, U-shapes, and change points visible." },
+  ],
+
   checkpoints: [
     {
       id: "cp-stat2-005-1",
@@ -428,7 +459,7 @@ print("Min temperature:", min(temps), "in month", months[temps.index(min(temps))
     },
     {
       id: "cp-stat2-005-2",
-      label: "Read: explain two limits of the Pearson r — what it misses",
+      label: "Read: explain two limits of the Pearson r â€” what it misses",
       type: "read",
     },
     {
@@ -451,13 +482,13 @@ print("Min temperature:", min(temps), "in month", months[temps.index(min(temps))
     {
       id: "cp-stat2-005-6",
       label:
-        "Lab: run cell 2 and verify the regression line passes through (x̄, ȳ)",
+        "Lab: run cell 2 and verify the regression line passes through (xÌ„, È³)",
       type: "lab",
     },
     {
       id: "cp-stat2-005-7",
       label:
-        "Attempt challenge 2: compute b₁, b₀ and write the complete scatter + line chart code",
+        "Attempt challenge 2: compute bâ‚, bâ‚€ and write the complete scatter + line chart code",
       type: "challenge",
     },
     {
@@ -496,9 +527,9 @@ print("Min temperature:", min(temps), "in month", months[temps.index(min(temps))
       answer: "Nonlinear patterns, outliers, and clusters",
       hints: [
         "r = 0.816 for all four of Anscombe's datasets.",
-        "r only measures linear association — curves, clusters, and influential points are invisible to r.",
+        "r only measures linear association â€” curves, clusters, and influential points are invisible to r.",
       ],
-      reviewSection: 'Intuition → "Correlation coefficient r recap" paragraph',
+      reviewSection: 'Intuition â†’ "Correlation coefficient r recap" paragraph',
     },
     {
       id: "stat2-005-quiz-2",
@@ -516,7 +547,7 @@ print("Min temperature:", min(temps), "in month", months[temps.index(min(temps))
         "What does the line segment between two points imply?",
         "A line chart implies continuity and order between consecutive points.",
       ],
-      reviewSection: 'Intuition → "Line charts for time series" paragraph',
+      reviewSection: 'Intuition â†’ "Line charts for time series" paragraph',
     },
     {
       id: "stat2-005-quiz-3",
@@ -530,46 +561,41 @@ print("Min temperature:", min(temps), "in month", months[temps.index(min(temps))
       ],
       answer: "An outlier with a large negative residual",
       hints: [
-        "The point is in the middle of the x-range — not extreme in x.",
-        "It is far below the trend line — large residual.",
+        "The point is in the middle of the x-range â€” not extreme in x.",
+        "It is far below the trend line â€” large residual.",
       ],
-      reviewSection: "Insight callout — Influential Points vs. Outliers",
+      reviewSection: "Insight callout â€” Influential Points vs. Outliers",
     },
     {
       id: "stat2-005-quiz-4",
       type: "choice",
-      text: "r = −0.85 means:",
+      text: "r = âˆ’0.85 means:",
       options: [
         "There is no relationship between x and y",
-        "There is a strong negative linear association — as x increases, y tends to decrease",
+        "There is a strong negative linear association â€” as x increases, y tends to decrease",
         "x causes a decrease in y",
-        "The regression slope is −0.85",
+        "The regression slope is âˆ’0.85",
       ],
       answer:
-        "There is a strong negative linear association — as x increases, y tends to decrease",
+        "There is a strong negative linear association â€” as x increases, y tends to decrease",
       hints: [
         "r = -0.85: negative direction (as x increases, y decreases), |r| = 0.85 (strong).",
         "Correlation is not causation.",
       ],
-      reviewSection: 'Intuition → "Correlation coefficient r recap" paragraph',
+      reviewSection: 'Intuition â†’ "Correlation coefficient r recap" paragraph',
     },
     {
-      id: "stat2-005-quiz-5",
-      type: "choice",
-      text: "To add a regression line to a scatter plot in opencalc, you:",
+      type: 'choice',
+      question: `To add a regression line to a scatter plot with matplotlib, you:`,
       options: [
-        "Call fig.regression(data=xs, ys=ys)",
-        "Compute b₀ and b₁, then call fig.plot() with xs=[x_min, x_max] and the corresponding y values",
-        "The trend line is drawn automatically by fig.scatter()",
-        "Call fig.bars() with the slope value",
+        `Call plt.regression(xs, ys)`,
+        `Use np.polyfit(x, y, 1) to get slope and intercept, then call plt.plot() with a range of x values`,
+        `The trend line is drawn automatically by plt.scatter()`,
+        `Call plt.bar() with the slope value`,
       ],
-      answer:
-        "Compute b₀ and b₁, then call fig.plot() with xs=[x_min, x_max] and the corresponding y values",
-      hints: [
-        "A regression line is a straight line — two points define it.",
-        "fig.plot() draws a line through any two points.",
-      ],
-      reviewSection: "Code cell 2 — scatter plot with trend line overlay",
+      answer: `Use np.polyfit(x, y, 1) to get slope and intercept, then call plt.plot() with a range of x values`,
+      hints: [`np.polyfit(x, y, 1) returns [slope, intercept]. Create a dense x range with np.linspace(), compute y = slope*x + intercept, and plot with plt.plot().`],
+      reviewSection: 'Cell 2 â€” scatter plot with regression line overlay',
     },
     {
       id: "stat2-005-quiz-6",
@@ -587,7 +613,59 @@ print("Min temperature:", min(temps), "in month", months[temps.index(min(temps))
         "When many points overlap at the same location, the visual density should represent the actual data density.",
         "Transparency causes overlapping points to accumulate to a darker color.",
       ],
-      reviewSection: 'Intuition → "Overplotting" paragraph',
+      reviewSection: 'Intuition â†’ "Overplotting" paragraph',
+    },
+    {
+      type: 'choice',
+      question: `x = [1,2,3,4,5], y = [1,4,9,16,25]. The Pearson correlation r is approximately 0.97. What does this tell you?`,
+      options: [
+        `The relationship is linear with slope â‰ˆ 0.97`,
+        `r is high, but the relationship is actually quadratic (y = xÂ²), not linear`,
+        `x causes y to increase`,
+        `The linear model will be an excellent fit`,
+      ],
+      answer: `r is high, but the relationship is actually quadratic (y = xÂ²), not linear`,
+      hints: [`r measures linear association. A quadratic y=xÂ² over a positive x range has a high r because both variables are increasing â€” but the true relationship is not linear. Plot before fitting.`],
+      reviewSection: 'Intuition â€” correlation does not detect nonlinearity',
+    },
+    {
+      type: 'choice',
+      question: `rÂ² = 0.81 in a linear regression. The correct interpretation is:`,
+      options: [
+        `The slope is 0.81`,
+        `81% of the variance in y is explained by the linear relationship with x`,
+        `81% of data points are above the regression line`,
+        `The regression line passes through 81% of the points`,
+      ],
+      answer: `81% of the variance in y is explained by the linear relationship with x`,
+      hints: [`rÂ² (coefficient of determination) measures the proportion of variance in y explained by x. rÂ²=0.81 means 81% explained, 19% unexplained (residual variance).`],
+      reviewSection: 'Cell 2 â€” rÂ² interpretation',
+    },
+    {
+      type: 'choice',
+      question: `In matplotlib, \`ax.annotate("label", xy=(3, 10), xytext=(5, 15), arrowprops=...)\` does what?`,
+      options: [
+        `Draws a circle at (3,10)`,
+        `Places a text label "label" at (5,15) with an arrow pointing to (3,10)`,
+        `Adds a legend entry`,
+        `Moves an existing data point to (5,15)`,
+      ],
+      answer: `Places a text label "label" at (5,15) with an arrow pointing to (3,10)`,
+      hints: [`xy = the point being annotated (arrowhead), xytext = where the text label appears (arrow tail). This is the standard pattern for annotating specific data points.`],
+      reviewSection: 'Cell 2 â€” annotating the mean point',
+    },
+    {
+      type: 'choice',
+      question: `Monthly sales data shows a sharp spike in December. Is this an outlier, seasonality, or neither?`,
+      options: [
+        `An outlier â€” it deviates from the yearly average`,
+        `Seasonality â€” a predictable, recurring annual pattern driven by known causes`,
+        `Neither â€” spikes on line charts are always data entry errors`,
+        `An influential point that distorts the regression line`,
+      ],
+      answer: `Seasonality â€” a predictable, recurring annual pattern driven by known causes`,
+      hints: [`Outliers are unexpected deviations. Seasonality is expected, recurring variation tied to a calendar cycle (holiday shopping â†’ December spike in retail).`],
+      reviewSection: 'Cell 3 â€” line chart seasonal pattern',
     },
   ],
 
@@ -597,9 +675,9 @@ print("Min temperature:", min(temps), "in month", months[temps.index(min(temps))
       whyStudentsThinkIt:
         'r = 0 is associated with "no correlation" and students interpret that as "no relationship."',
       correctionExample:
-        "y = x² (for x from -3 to 3) has a perfect deterministic relationship: knowing x tells you exactly y. But the symmetric parabola produces r = 0 because the positive and negative sides cancel. Plot it — the relationship is obvious visually. r = 0 means no LINEAR relationship, not no relationship.",
+        "y = xÂ² (for x from -3 to 3) has a perfect deterministic relationship: knowing x tells you exactly y. But the symmetric parabola produces r = 0 because the positive and negative sides cancel. Plot it â€” the relationship is obvious visually. r = 0 means no LINEAR relationship, not no relationship.",
       contrastCase:
-        "Random noise: if x and y are generated independently, r ≈ 0 and there genuinely is no relationship. Compare to y = sin(x): r ≈ 0 but there is a perfect nonlinear relationship.",
+        "Random noise: if x and y are generated independently, r â‰ˆ 0 and there genuinely is no relationship. Compare to y = sin(x): r â‰ˆ 0 but there is a perfect nonlinear relationship.",
     },
     {
       falseBelief:
@@ -607,7 +685,7 @@ print("Min temperature:", min(temps), "in month", months[temps.index(min(temps))
       whyStudentsThinkIt:
         'Students learn "|r| closer to 1 means stronger." They apply this without checking whether r is inflated by outliers.',
       correctionExample:
-        "Dataset: 9 points in a cloud with r ≈ 0.1, plus one extreme point at (x=100, y=100). The overall r could be 0.9 — not because the 9 points have a strong relationship, but because the one extreme point creates apparent correlation. The scatter plot would immediately show the truth.",
+        "Dataset: 9 points in a cloud with r â‰ˆ 0.1, plus one extreme point at (x=100, y=100). The overall r could be 0.9 â€” not because the 9 points have a strong relationship, but because the one extreme point creates apparent correlation. The scatter plot would immediately show the truth.",
       contrastCase:
         "A genuine r = 0.9 with no outliers: all 50 points form a tight ellipse. Here r = 0.9 accurately reflects a strong linear relationship.",
     },
@@ -617,7 +695,7 @@ print("Min temperature:", min(temps), "in month", months[temps.index(min(temps))
       whyStudentsThinkIt:
         "Both use an x-y coordinate system with dots (and lines). Students see them as similar.",
       correctionExample:
-        'A line chart of "student ID number vs. exam score" would connect students in ID order and imply that there is a meaningful trajectory from student 1 to student 2 to student 3. There is not — the connection is arbitrary. A scatter plot shows the relationship without implying order.',
+        'A line chart of "student ID number vs. exam score" would connect students in ID order and imply that there is a meaningful trajectory from student 1 to student 2 to student 3. There is not â€” the connection is arbitrary. A scatter plot shows the relationship without implying order.',
       contrastCase:
         'A line chart of "month vs. average temperature" is correct: months have a natural order, and the trajectory from January to February to March represents a genuine progression through the year.',
     },
@@ -633,7 +711,7 @@ print("Min temperature:", min(temps), "in month", months[temps.index(min(temps))
         "Line chart connecting sales in chronological order",
       ],
       whyThisTechniqueWins:
-        "Scatter plot first: with 500 transactions there may be clusters (neighborhood price tiers), nonlinearity (diminishing returns for very large houses), and outliers (luxury homes at unusual prices). Computing r without looking would miss all of this. A line chart would be wrong — the 500 transactions are not a time series. Scatter plot → four features → correlation → regression → residual check is the correct sequence.",
+        "Scatter plot first: with 500 transactions there may be clusters (neighborhood price tiers), nonlinearity (diminishing returns for very large houses), and outliers (luxury homes at unusual prices). Computing r without looking would miss all of this. A line chart would be wrong â€” the 500 transactions are not a time series. Scatter plot â†’ four features â†’ correlation â†’ regression â†’ residual check is the correct sequence.",
     },
     {
       situation:
@@ -651,13 +729,13 @@ print("Min temperature:", min(temps), "in month", months[temps.index(min(temps))
   debugging: [
     {
       commonError:
-        "The regression line does not pass through the scatter cloud — it is far above or below.",
+        "The regression line does not pass through the scatter cloud â€” it is far above or below.",
       symptom:
         "The line plotted with fig.plot() appears disconnected from the scatter points.",
       whyItHappened:
-        "The y-values for the line were computed using the wrong formula (e.g., forgot to add b₀, or mixed up b₀ and b₁). Or the x-range for the line (line_x) is different from the data range.",
+        "The y-values for the line were computed using the wrong formula (e.g., forgot to add bâ‚€, or mixed up bâ‚€ and bâ‚). Or the x-range for the line (line_x) is different from the data range.",
       repairStrategy:
-        "Verify: (1) line_y = [b0 + b1*x for x in line_x] — not just b1*x. (2) Check b₀ and b₁ by verifying the line passes through (x̄, ȳ): compute b0 + b1*xbar and compare to ybar. They should be equal. (3) Ensure line_x covers the same range as the scatter x-values.",
+        "Verify: (1) line_y = [b0 + b1*x for x in line_x] â€” not just b1*x. (2) Check bâ‚€ and bâ‚ by verifying the line passes through (xÌ„, È³): compute b0 + b1*xbar and compare to ybar. They should be equal. (3) Ensure line_x covers the same range as the scatter x-values.",
     },
     {
       commonError: "r computed manually differs from expected value.",
@@ -666,15 +744,15 @@ print("Min temperature:", min(temps), "in month", months[temps.index(min(temps))
       whyItHappened:
         "Common mistakes: (1) using n instead of n-1 in the denominator (computing population instead of sample standard deviation); (2) computing the sum of products incorrectly (forgetting to subtract the means); (3) arithmetic errors in sy or sx.",
       repairStrategy:
-        "Step by step: compute xbar and ybar first. Then compute each (xi-xbar) and (yi-ybar) as a list. Multiply pairs to get cross-products. Sum them. Compute sx and sy with denominator n-1. Compute r = sum_of_products / ((n-1) × sx × sy). Verify with a calculator or Python: `import statistics; statistics.correlation(x, y)` (Python 3.10+).",
+        "Step by step: compute xbar and ybar first. Then compute each (xi-xbar) and (yi-ybar) as a list. Multiply pairs to get cross-products. Sum them. Compute sx and sy with denominator n-1. Compute r = sum_of_products / ((n-1) Ã— sx Ã— sy). Verify with a calculator or Python: `import statistics; statistics.correlation(x, y)` (Python 3.10+).",
     },
   ],
 
   mastery: {
     targetLevel:
-      "Apply (Level 3) — describe a scatter plot using all four features, compute r manually, identify outliers and influential points, and write opencalc code for scatter + regression line.",
+      "Apply (Level 3) â€” describe a scatter plot using all four features, compute r manually, identify outliers and influential points, and write opencalc code for scatter + regression line.",
     solveIndependently:
-      "Given 5–8 (x, y) data points, compute r, compute the regression line (b₀, b₁), write complete opencalc code for a scatter + line chart, and describe the relationship in one sentence.",
+      "Given 5â€“8 (x, y) data points, compute r, compute the regression line (bâ‚€, bâ‚), write complete opencalc code for a scatter + line chart, and describe the relationship in one sentence.",
     explainVerbally:
       'Explain why r = 0 does not mean "no relationship" and give a concrete example of a dataset with r = 0 that has a perfect nonlinear relationship.',
     detectIncorrectApplication:

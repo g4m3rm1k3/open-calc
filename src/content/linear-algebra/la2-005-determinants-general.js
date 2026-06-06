@@ -74,6 +74,12 @@ export default {
     ],
     visualizations: [
       {
+        id: 'DeterminantGeometricViz',
+        title: 'Determinant as Signed Parallelogram Area — Draggable',
+        mathBridge: 'Drag the red vector tip (v₁) and blue vector tip (v₂) to reshape the parallelogram. The |det| updates live inside the shape. When v₂ is counterclockwise from v₁ the determinant is positive (green); clockwise makes it negative (red). Drag them to be parallel to see det = 0 — the parallelogram collapses to a line, the matrix is singular.',
+        caption: 'The sign of the determinant encodes orientation — positive means counterclockwise, negative means the coordinate system has been flipped.',
+      },
+      {
         id: 'LALesson06_Inverses',
         title: 'Determinant as Volume Scaling',
         mathBridge: 'The yellow shape starts as the unit square (area = 1). Watch the determinant value as you adjust the matrix entries. The key insight extends to 3×3: the determinant is the signed volume of the parallelepiped formed by the three column vectors. A determinant of 2 means volumes double. A determinant of 0 means the three column vectors are coplanar and volume collapses to zero — space is irreversibly flattened.',

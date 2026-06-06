@@ -123,11 +123,19 @@ for major, count in sorted_majors:
     labels_list.append(major)
     values_list.append(count)
 
-fig = Figure(width=8, height=5)
-fig.axes(xmin=-0.5, xmax=len(labels_list)-0.5, ymin=0, ymax=max(values_list)+2)
-fig.bars(labels=labels_list, values=values_list, color="steelblue")
-fig.text((len(labels_list)-1)/2, max(values_list)+1.5, "Student Majors", size=12, bold=True)
-fig.show()
+import matplotlib.pyplot as plt
+
+fig, ax = plt.subplots(figsize=(7, 4))
+bars = ax.bar(labels_list, values_list, color="steelblue", edgecolor="white")
+for bar, val in zip(bars, values_list):
+    ax.text(bar.get_x() + bar.get_width() / 2,
+            bar.get_height() + 0.3, str(val),
+            ha="center", va="bottom", fontsize=9)
+ax.set_xlabel("Major")
+ax.set_ylabel("Count")
+ax.set_title("Student Majors (sorted by frequency — Pareto arrangement)")
+plt.tight_layout()
+plt.show()
 `,
         instructions: 'Notice that the table is sorted by frequency (descending). This is called a Pareto arrangement and makes the modal category immediately obvious. The bar chart should match the table ordering.',
       },
@@ -199,6 +207,33 @@ fig.show()
         { expression: '\\text{Shape: right-skewed. Peak at [10,15), tail extends to [25,30)}', annotation: 'The distribution peaks in the middle-lower range and has a right tail (frequencies decrease to the right: 22, 10, 5). Left side rises steeply (8, 20, 35). The distribution is right-skewed (positive skew): more mass is below the peak than above.' },
       ],
       answer: '(a) Modal class: [10,15). (b) Cumulative rel. freq up to 20 = 85%. (c) Right-skewed: peak at [10,15) with a longer right tail.',
+    },
+  ],
+
+  definitions: [
+    {
+      term: "frequency",
+      definition: "The count of observations that fall within a particular category or class interval. Denoted fᵢ for class i.",
+    },
+    {
+      term: "relative frequency",
+      definition: "The proportion of observations in a class: fᵢ/n. Relative frequencies are unit-free, sum to 1, and enable comparison across groups of different sizes.",
+    },
+    {
+      term: "cumulative frequency",
+      definition: "The running total of relative frequencies up through class k: Fₖ = Σᵢ₌₁ᵏ rᵢ. Answers: 'What fraction of data falls at or below this value?' Fₖ = 1 at the last class.",
+    },
+    {
+      term: "class interval",
+      definition: "A contiguous range of values that defines one row of a frequency table. Typically written as [a, b) (left-closed, right-open). All class intervals should have equal width for numerical data.",
+    },
+    {
+      term: "modal class",
+      definition: "The class interval with the highest frequency in a frequency table. Analogous to the mode for raw data.",
+    },
+    {
+      term: "ogive",
+      definition: "A graph of cumulative relative frequency versus the upper boundary of each class interval. Approximates the empirical CDF and can be used to read off approximate percentiles.",
     },
   ],
 
@@ -313,6 +348,56 @@ fig.show()
       answer: 'Histogram',
       hints: ['Each class interval becomes one bar in a histogram.', 'Bar height = frequency. Bar width = class width. No gaps between bars (continuous data).'],
       reviewSection: 'Insight callout — Frequency Table → Histogram',
+    },
+    {
+      id: 'stat3-005-quiz-7',
+      type: 'choice',
+      text: 'The modal class in a frequency table is:',
+      options: [
+        'The class containing the mean',
+        'The class with the highest frequency',
+        'The middle class when classes are sorted',
+        'The class with the largest cumulative frequency',
+      ],
+      answer: 'The class with the highest frequency',
+      hints: ['Mode = most frequent. Modal class = the class interval that appears most.', 'This is NOT the same as the median class or the mean class.'],
+      reviewSection: 'Semantics — modal class definition',
+    },
+    {
+      id: 'stat3-005-quiz-8',
+      type: 'choice',
+      text: 'Class midpoints are [55, 65, 75] with relative frequencies [0.20, 0.50, 0.30]. The approximate mean is:',
+      options: ['65.0', '66.0', '67.5', '63.3'],
+      answer: '66.0',
+      hints: [
+        'Approximate mean = Σ(midpoint × relative frequency).',
+        '55×0.20 + 65×0.50 + 75×0.30 = 11 + 32.5 + 22.5 = 66.0.',
+      ],
+      reviewSection: 'Math section — Mean from a frequency table',
+    },
+    {
+      id: 'stat3-005-quiz-9',
+      type: 'choice',
+      text: 'A frequency table has cumulative relative frequencies: [60,70) → 0.25, [70,80) → 0.70, [80,90) → 0.95. The 60th percentile falls in which class?',
+      options: ['[60,70)', '[70,80)', '[80,90)', 'Cannot be determined'],
+      answer: '[70,80)',
+      hints: [
+        'The 60th percentile is the value below which 60% of observations fall.',
+        'Cumulative frequency crosses 0.60 in [70,80) (goes from 0.25 to 0.70). So 60th percentile is in [70,80).',
+      ],
+      reviewSection: 'Examples — Cumulative frequency and percentile from a table',
+    },
+    {
+      id: 'stat3-005-quiz-10',
+      type: 'choice',
+      text: 'The Freedman-Diaconis rule for bin width uses which statistic to make it robust to outliers?',
+      options: ['Standard deviation', 'Range', 'IQR', 'Mean'],
+      answer: 'IQR',
+      hints: [
+        'The Freedman-Diaconis rule: width = 2 × IQR × n^(−1/3).',
+        'IQR is used instead of range because IQR is not distorted by extreme outliers.',
+      ],
+      reviewSection: 'Rigor section — Bin width and information content',
     },
   ],
 

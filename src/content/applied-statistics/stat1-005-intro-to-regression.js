@@ -22,23 +22,30 @@ export default {
 
   intuition: {
     prose: [
-      "Roadmap for this lesson: by the end, you should be able to fit a straight-line model, interpret slope in context, and check whether the model is trustworthy using residuals.",
-      "Start with concrete points: (2 hours, 58 score), (4, 65), (6, 74), (8, 82). A line through this cloud captures trend: more study tends to higher score.",
-      "Regression chooses b0 and b1 by minimizing squared errors. Each error is e = y - y-hat. Squaring penalizes large misses and avoids cancellation of positive/negative errors.",
-      "Prediction moment: if slope b1 is 3.5, what score change do you predict when study hours increase by 2?",
-      "Interpretation: slope b1 is expected change in y for +1 unit x. Here +2 hours implies about +7 points.",
-      "R-squared measures how much variance in y is explained by x in this linear model. It is a fit summary, not a causality proof.",
+      "**Roadmap for this lesson.** By the end, you will be able to: (1) fit a straight-line model from two lists of numbers using the least-squares formulas, (2) interpret slope and intercept with correct units and context, (3) compute and interpret $R^2$, and (4) check whether the model is trustworthy using a residual plot.",
+      "**From scatter to equation.** In stat2-005, scatter plots revealed the direction, shape, and strength of association between two quantitative variables. A scatter plot tells you *whether* a relationship exists. Linear regression takes the next step: it gives you a concrete *equation* so you can use one variable to *predict* another. For a study of 80 students — each with a recorded study-hours value and an exam score — the goal is to find the one straight line that best summarizes how scores tend to change with study hours.",
+      "**The least-squares criterion.** Any line $\\hat{y} = b_0 + b_1 x$ makes a prediction $\\hat{y}_i = b_0 + b_1 x_i$ for each observation. The prediction error for observation $i$ is the **residual**: $e_i = y_i - \\hat{y}_i$ — positive when the model underpredicts, negative when it overpredicts. Many different lines through the scatter cloud might seem plausible. Ordinary least squares (OLS) picks the unique line that minimizes the **sum of squared residuals**: $\\text{SSE} = \\sum_{i=1}^n e_i^2$. Squaring each error penalizes large misses more heavily than small ones and prevents positive and negative errors from cancelling each other out.",
+      "**Before reading on, predict:** for the four data points $(2, 58),\\; (4, 65),\\; (6, 74),\\; (8, 82)$: does the slope look positive or negative? Roughly estimate the slope (change in score per extra study hour) using just the first and last points.",
+      "**Interpreting slope and intercept with units.** Suppose the fitted equation is $\\hat{\\text{score}} = 48.4 + 4.2 \\times \\text{hours}$. The **slope** $b_1 = 4.2$ means: each additional study hour is associated with an average increase of 4.2 exam points. This is always a rate-of-change, and it must be stated with units (points per hour). The **intercept** $b_0 = 48.4$ is the predicted score at 0 study hours. It is mathematically necessary for the formula but often should not be interpreted literally — if 0 hours is not in the observed data range, the intercept is an extrapolation.",
+      "**$R^2$ and what it tells you.** The coefficient of determination $R^2 = 1 - \\text{SSE}/\\text{SST}$ measures what fraction of the total variation in $y$ the linear model accounts for. $R^2 = 0$ means the model explains nothing; $R^2 = 1$ means perfect fit. $R^2 = 0.87$ for the study-hours model means 87% of the student-to-student variation in scores is explained by variation in study hours; the remaining 13% is due to other factors (prior knowledge, sleep, test anxiety). **High $R^2$ does not prove causation** — it measures fit, not mechanism.",
+      "**Residuals as model diagnostics.** After fitting, always plot residuals $e_i$ against $x_i$. A healthy plot shows residuals scattered randomly around zero with no visible pattern. Red-flag patterns: a **U-shape or arch** signals nonlinearity (the true relationship is curved); a **fan shape** signals heteroscedasticity (variance grows with $x$); **runs of positives then negatives** signal autocorrelation. OLS guarantees that residuals sum to zero, but zero mean is necessary, not sufficient — the pattern matters.",
+      "**Extrapolation: the edge of the model.** Regression is validated only within the range of observed $x$ values. Predicting outside this range is **extrapolation**: the linear relationship may break down entirely. If a model of plant growth is fitted from 0 to 20 cm/week of watering, using it to predict growth at 200 cm/week would be absurd. Always note the observed $x$ range and label out-of-range predictions as unreliable extrapolations.",
     ],
     callouts: [
       {
         type: "procedure",
-        title: "Procedure: Build and Evaluate a Simple Regression",
-        body: "Step 1. Plot x vs y and inspect rough linear trend.\nStep 2. Fit y-hat = b0 + b1 x.\nStep 3. Interpret b1 (rate of change) and b0 (baseline at x=0, if meaningful).\nStep 4. Check residual plot for pattern, curvature, or variance funnel.\nStep 5. Report prediction with context and uncertainty limits.",
+        title: "Procedure: Fit and Evaluate a Simple Linear Regression",
+        body: "Step 1. Plot x vs y — inspect for linear trend, outliers, and curvature before fitting.\nStep 2. Fit $\\hat{y} = b_0 + b_1 x$ using the least-squares formulas (or software).\nStep 3. Interpret $b_1$ (rate of change, with units) and $b_0$ (baseline at x=0, if meaningful).\nStep 4. Report $R^2$ and interpret as the fraction of y-variance explained by the model.\nStep 5. Plot residuals vs x — look for patterns that signal model failure.\nStep 6. State predictions with a note on whether they are interpolations or extrapolations.",
       },
       {
         type: "warning",
         title: "Association Is Not Causation",
-        body: "A high R-squared can still come from confounding, reverse causality, or selection bias. Causal claims require design assumptions or experiments.",
+        body: "A high $R^2$ does not prove that $x$ causes $y$. The correlation could arise from a confounding variable (both $x$ and $y$ are driven by a third variable), reverse causation ($y$ causes $x$), or selection bias in how the data were collected. Causal interpretation requires an experimental design with random assignment (stat1-003) or an explicit causal identification strategy.",
+      },
+      {
+        type: "insight",
+        title: "When Is Linear Regression Appropriate?",
+        body: "Check four conditions before reporting a linear regression:\n\n1. **Linearity** — the scatter plot shows a roughly linear cloud, not a curve.\n2. **Independence** — observations are not serially correlated (e.g., time-series data often violates this).\n3. **Constant variance** — the spread of residuals does not fan out as x increases (homoscedasticity).\n4. **Appropriate outcome type** — the response is continuous (not binary, not count data with many zeros).\n\nViolating (1) means you need a nonlinear term; violating (4) means you need a different model class (logistic regression, Poisson regression).",
       },
     ],
     visualizations: [
@@ -54,19 +61,19 @@ export default {
 
   math: {
     prose: [
-      "Model: y_i = b0 + b1 x_i + e_i, where e_i are residual errors.",
-      "Least squares objective: minimize SSE = sum_i (y_i - (b0 + b1 x_i))^2.",
-      "Closed-form slope and intercept: b1 = Sxy/Sxx and b0 = y-bar - b1 x-bar.",
-      "Goodness-of-fit: R^2 = 1 - SSE/SST, where SST = sum_i (y_i - y-bar)^2.",
+      "**The statistical model.** $y_i = \\beta_0 + \\beta_1 x_i + \\varepsilon_i$, where $\\varepsilon_i$ are independent errors with $E[\\varepsilon_i] = 0$ and $\\text{Var}(\\varepsilon_i) = \\sigma^2$ (Gauss-Markov assumptions). The true parameters $\\beta_0, \\beta_1$ are unknown; we estimate them from data.",
+      "**Least-squares formulas.** Define $S_{xx} = \\sum_{i=1}^n (x_i - \\bar{x})^2$ and $S_{xy} = \\sum_{i=1}^n (x_i - \\bar{x})(y_i - \\bar{y})$. The OLS estimates are: $b_1 = S_{xy}/S_{xx}$ and $b_0 = \\bar{y} - b_1 \\bar{x}$. The OLS line always passes through $(\\bar{x}, \\bar{y})$ — the sample centroid.",
+      "**Connection to correlation.** The sample correlation $r = S_{xy} / \\sqrt{S_{xx} S_{yy}}$ is related to the slope by $b_1 = r \\cdot (s_y / s_x)$, where $s_y$ and $s_x$ are sample standard deviations. The slope is the correlation scaled by the ratio of standard deviations. Correlation is unit-free; slope has units of $y$ per unit of $x$.",
+      "**Goodness of fit.** Partition the total sum of squares: $\\text{SST} = \\text{SSR} + \\text{SSE}$, where $\\text{SST} = \\sum(y_i - \\bar{y})^2$ (total variance in $y$), $\\text{SSR} = \\sum(\\hat{y}_i - \\bar{y})^2$ (explained by the model), $\\text{SSE} = \\sum(y_i - \\hat{y}_i)^2$ (residual/unexplained). The coefficient of determination $R^2 = 1 - \\text{SSE}/\\text{SST} = \\text{SSR}/\\text{SST}$ equals the square of the Pearson correlation for simple regression: $R^2 = r^2$.",
     ],
   },
 
   rigor: {
     prose: [
-      "Formal statement: OLS estimates are best linear unbiased under Gauss-Markov assumptions (linearity, zero-mean errors, homoscedasticity, no perfect multicollinearity).",
-      "Invariant viewpoint: centering x does not change slope; it shifts intercept. Scale changes in x rescale slope but preserve fitted values when transformed consistently.",
-      "Geometric interpretation: y is projected onto span{1, x} in R^n, and residuals are orthogonal to fitted values.",
-      "Future abstraction link: multiple regression generalizes to matrix form y = Xb + e with b-hat = (X^T X)^(-1) X^T y.",
+      "**R1 — Gauss-Markov Theorem.** Under assumptions (L) linearity, (E) $E[\\varepsilon_i] = 0$, (H) $\\text{Var}(\\varepsilon_i) = \\sigma^2$ (homoscedasticity), and (I) uncorrelated errors, the OLS estimators $b_0, b_1$ are the **Best Linear Unbiased Estimators** (BLUE): among all linear unbiased estimators, they have the smallest variance. 'Best' means minimum variance; 'unbiased' means $E[b_1] = \\beta_1$. These properties hold without requiring normality of $\\varepsilon_i$.",
+      "**R2 — Geometric interpretation.** In $\\mathbb{R}^n$, the $n$ observations form a vector $\\mathbf{y}$. OLS projects $\\mathbf{y}$ orthogonally onto the column space of the design matrix $\\mathbf{X} = [\\mathbf{1} \\mid \\mathbf{x}]$. The fitted values $\\hat{\\mathbf{y}} = \\mathbf{X}(\\mathbf{X}^T\\mathbf{X})^{-1}\\mathbf{X}^T \\mathbf{y}$ are the projection; the residuals $\\mathbf{e} = \\mathbf{y} - \\hat{\\mathbf{y}}$ are orthogonal to $\\hat{\\mathbf{y}}$. This orthogonality is why $\\sum e_i = 0$ and $\\sum x_i e_i = 0$ are always exactly satisfied (they are the normal equations).",
+      "**R3 — Scale and centering invariance.** Centering $x$ by subtracting $\\bar{x}$ does not change $b_1$ — it only shifts $b_0$ to equal $\\bar{y}$ (since the line now passes through the origin in centered coordinates). Scaling $x$ by a constant $c$ multiplies $b_1$ by $1/c$ but preserves fitted values: if you convert hours to minutes, the slope changes from 4.2 points/hour to 0.07 points/minute, but predicted scores are identical.",
+      "**R4 — Forward link: multiple regression.** Adding additional predictors $x_2, x_3, \\ldots, x_p$ generalizes simple regression to the matrix form $\\mathbf{y} = \\mathbf{X}\\boldsymbol{\\beta} + \\boldsymbol{\\varepsilon}$, with OLS solution $\\hat{\\boldsymbol{\\beta}} = (\\mathbf{X}^T\\mathbf{X})^{-1}\\mathbf{X}^T\\mathbf{y}$. Each coefficient $\\hat{\\beta}_j$ now measures the effect of $x_j$ holding all other predictors constant — the 'partial effect.' This is the mechanism by which regression 'controls for' confounders in observational studies (with the caveat from stat1-003: only measured confounders are controlled).",
     ],
   },
 
@@ -83,10 +90,73 @@ export default {
       {
         id: "stat1-005-cell-2",
         type: "python",
-        cellTitle: "Residual diagnostics basics",
-        code: "import numpy as np\n\nresid = df['resid'].values\nprint('Residual mean:', np.mean(resid))\nprint('Residual std:', np.std(resid, ddof=1))\n\n# quick pattern check by correlation with x\ncorr_rx = np.corrcoef(df['hours'], resid)[0,1]\nprint('corr(x, residual):', round(corr_rx, 4))\nprint('If residual pattern is strong, linear model may be mis-specified.')",
+        cellTitle: "Residual diagnostics",
+        code: `import numpy as np
+
+resid = df['resid'].values
+print(f"Residual mean:  {np.mean(resid):.4f}  (OLS guarantees ≈ 0)")
+print(f"Residual std:   {np.std(resid, ddof=1):.4f}")
+
+# Pattern check: correlation of residuals with x
+corr_rx = np.corrcoef(df['hours'], resid)[0, 1]
+print(f"corr(x, residual): {corr_rx:.4f}  (should be ≈ 0 for good fit)")
+print()
+if abs(corr_rx) > 0.1:
+    print("WARNING: residuals correlate with x — possible misspecification.")
+else:
+    print("Residuals show no linear pattern with x — linear fit is appropriate.")
+`,
         instructions:
-          "A strong residual-vs-x pattern signals nonlinearity or omitted variables.",
+          "OLS guarantees that residuals have zero mean and zero correlation with x. A strong non-zero correlation or any visible pattern (curvature, fan shape) in a residual plot signals model failure.",
+      },
+      {
+        id: "stat1-005-cell-3",
+        type: "python",
+        cellTitle: "Visualize regression: scatter + fitted line + residual plot",
+        code: `import numpy as np
+import matplotlib.pyplot as plt
+
+np.random.seed(4)
+hours = np.linspace(1, 10, 80)
+scores = 48 + 4.2 * hours + np.random.normal(0, 5, size=len(hours))
+
+# Fit OLS manually
+xbar, ybar = hours.mean(), scores.mean()
+Sxx = ((hours - xbar) ** 2).sum()
+Sxy = ((hours - xbar) * (scores - ybar)).sum()
+b1 = Sxy / Sxx
+b0 = ybar - b1 * xbar
+yhat = b0 + b1 * hours
+resid = scores - yhat
+R2 = 1 - (resid ** 2).sum() / ((scores - ybar) ** 2).sum()
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4))
+
+# Left: scatter + fitted line
+ax1.scatter(hours, scores, alpha=0.5, color="steelblue", s=30, label="Observed")
+x_line = np.array([hours.min(), hours.max()])
+ax1.plot(x_line, b0 + b1 * x_line, color="crimson", lw=2,
+         label=f"ŷ = {b0:.1f} + {b1:.2f}x   R²={R2:.3f}")
+ax1.set_xlabel("Study Hours")
+ax1.set_ylabel("Exam Score")
+ax1.set_title("Scatter Plot + OLS Regression Line")
+ax1.legend(fontsize=9)
+
+# Right: residual plot
+ax2.scatter(hours, resid, alpha=0.5, color="orange", s=30)
+ax2.axhline(0, color="black", lw=1.5, linestyle="--")
+ax2.set_xlabel("Study Hours (x)")
+ax2.set_ylabel("Residual  (y - ŷ)")
+ax2.set_title("Residual Plot\\n(random scatter = good; patterns = bad)")
+
+plt.tight_layout()
+plt.show()
+print(f"b0 = {b0:.3f}  (intercept: predicted score at 0 hours)")
+print(f"b1 = {b1:.3f}  (slope: each extra hour → +{b1:.1f} points on average)")
+print(f"R² = {R2:.3f}  ({R2*100:.1f}% of score variance explained by study hours)")
+`,
+        instructions:
+          "The scatter + line plot shows the OLS fit. The residual plot shows random scatter around zero — confirming the linear model is appropriate here. Change the random seed or try adding a nonlinear term to the score generation to see what a bad residual plot looks like.",
       },
     ],
   },
@@ -363,11 +433,121 @@ export default {
     {
       id: "stat1-005-quiz-6",
       type: "choice",
-      text: "If b1 is negative, then as x increases, predicted y tends to:",
+      text: "If b₁ is negative, then as x increases, predicted y tends to:",
       options: ["Increase", "Decrease", "Stay constant", "Become undefined"],
       answer: "Decrease",
-      hints: ["Sign of slope controls direction."],
-      reviewSection: "Intuition -> slope interpretation",
+      hints: [
+        "Sign of the slope controls the direction of the relationship.",
+        "ŷ = b₀ + b₁x: if b₁ < 0, larger x makes b₁x more negative.",
+      ],
+      reviewSection:
+        'Intuition → "Interpreting slope and intercept" paragraph',
+    },
+    {
+      id: "stat1-005-quiz-7",
+      type: "choice",
+      text: "R² = 0.85 for a regression of exam score on study hours. The best interpretation is:",
+      options: [
+        "The regression line passes through 85% of the data points",
+        "85% of the variation in exam scores is explained by the linear relationship with study hours",
+        "The slope is statistically significant at the 85% level",
+        "85% of predictions fall within one standard deviation of the observed values",
+      ],
+      answer:
+        "85% of the variation in exam scores is explained by the linear relationship with study hours",
+      hints: [
+        "R² = 1 − SSE/SST. SST is total variance; SSE is unexplained residual variance.",
+        "R² = 0 means the model explains nothing; R² = 1 means perfect fit.",
+      ],
+      reviewSection: 'Math section — "Goodness of fit" and R² formula',
+    },
+    {
+      id: "stat1-005-quiz-8",
+      type: "choice",
+      text: "The OLS slope b₁ is computed as:",
+      options: [
+        "S_{xy} / S_{xx}",
+        "S_{xx} / S_{xy}",
+        "ȳ − b₀x̄",
+        "(Σy) / (Σx)",
+      ],
+      answer: "S_{xy} / S_{xx}",
+      hints: [
+        "S_{xy} = Σ(xᵢ − x̄)(yᵢ − ȳ) is the covariance sum; S_{xx} = Σ(xᵢ − x̄)² is the variance sum for x.",
+        "Slope = covariation in x and y ÷ variation in x alone.",
+      ],
+      reviewSection: 'Math section — "Least-squares formulas"',
+    },
+    {
+      id: "stat1-005-quiz-9",
+      type: "choice",
+      text: "Why is predicting y for x values far outside the observed data range unreliable?",
+      options: [
+        "The formula b₀ + b₁x becomes undefined for x outside the range",
+        "The linear relationship verified within the data may not hold beyond those x values",
+        "The standard error becomes negative outside the observed range",
+        "R² drops to zero for extrapolated predictions",
+      ],
+      answer:
+        "The linear relationship verified within the data may not hold beyond those x values",
+      hints: [
+        "A linear fit is only checked to be adequate within the range of observed x.",
+        "Consider: a growth model for plants watered 0–20 cm/week predicts impossible things at 500 cm/week.",
+      ],
+      reviewSection:
+        'Intuition → "Extrapolation: the edge of the model" paragraph',
+    },
+    {
+      id: "stat1-005-quiz-10",
+      type: "choice",
+      text: "The intercept b₀ in ŷ = b₀ + b₁x is best interpreted as:",
+      options: [
+        "The rate of change in y per one-unit increase in x",
+        "The predicted value of y when x = 0 (if x = 0 is within or near the observed data range)",
+        "The average residual across all observations",
+        "The Pearson correlation coefficient between x and y",
+      ],
+      answer:
+        "The predicted value of y when x = 0 (if x = 0 is within or near the observed data range)",
+      hints: [
+        "Set x = 0 in ŷ = b₀ + b₁(0) = b₀.",
+        "If x = 0 is far outside the observed data range, b₀ is an extrapolation and may be meaningless in context.",
+      ],
+      reviewSection:
+        'Intuition → "Interpreting slope and intercept with units" paragraph',
+    },
+  ],
+
+  definitions: [
+    {
+      term: "simple linear regression",
+      definition:
+        "A statistical model ŷ = b₀ + b₁x that fits a straight line to data by minimizing the sum of squared residuals (OLS); used to predict a continuous response from a single predictor.",
+    },
+    {
+      term: "slope (b₁)",
+      definition:
+        "The expected change in the response y for a one-unit increase in the predictor x; always interpreted with units (e.g., points per hour). Equal to S_{xy} / S_{xx}.",
+    },
+    {
+      term: "intercept (b₀)",
+      definition:
+        "The predicted value of y when x = 0; only meaningful if x = 0 is within or near the observed data range. Equal to ȳ − b₁x̄.",
+    },
+    {
+      term: "residual (eᵢ)",
+      definition:
+        "The difference between the observed value and the fitted value: eᵢ = yᵢ − ŷᵢ. Positive means the model underpredicted; negative means overpredicted. OLS guarantees residuals sum to zero.",
+    },
+    {
+      term: "R² (coefficient of determination)",
+      definition:
+        "The proportion of total variance in y explained by the linear model: R² = 1 − SSE/SST. Ranges from 0 (no fit) to 1 (perfect fit); equals r² (Pearson correlation squared) in simple regression.",
+    },
+    {
+      term: "ordinary least squares (OLS)",
+      definition:
+        "The method of fitting a regression line by minimizing SSE = Σ(yᵢ − ŷᵢ)²; produces the Best Linear Unbiased Estimators (BLUE) under the Gauss-Markov assumptions.",
     },
   ],
 

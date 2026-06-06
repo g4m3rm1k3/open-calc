@@ -425,6 +425,39 @@ print(f"Stratified is {srs_sd/strat_sd:.1f}x more precise than SRS for this popu
     ],
   },
 
+  definitions: [
+    {
+      term: "probability sample",
+      definition:
+        "A sample where every unit in the population has a known, non-zero probability of being selected; required for valid statistical inference about the population.",
+    },
+    {
+      term: "simple random sample (SRS)",
+      definition:
+        "Every unit is equally likely to be selected and every possible group of n units is equally likely to be the sample; the theoretical gold standard that eliminates selection bias by construction.",
+    },
+    {
+      term: "stratified sampling",
+      definition:
+        "The population is divided into non-overlapping strata; an independent SRS is drawn within each stratum, guaranteeing representation and typically reducing variance when strata differ on the outcome.",
+    },
+    {
+      term: "cluster sampling",
+      definition:
+        "The population is divided into groups (clusters); some clusters are randomly selected and all (or some) units within them are measured; cost-efficient for geographically dispersed populations.",
+    },
+    {
+      term: "sampling frame",
+      definition:
+        "The list or mechanism actually used to draw the sample; coverage error arises when the frame does not fully match the target population (e.g., a phone directory that excludes unlisted numbers).",
+    },
+    {
+      term: "intracluster correlation (ρ)",
+      definition:
+        "The degree to which units within the same cluster are similar to each other; higher ρ means cluster sampling is less statistically efficient than SRS for the same total n.",
+    },
+  ],
+
   spiral: {
     recoveryPoints: [],
     futureLinks: [
@@ -613,6 +646,77 @@ print(f"Stratified is {srs_sd/strat_sd:.1f}x more precise than SRS for this popu
         "If n/N ≈ 0, what does (1 − n/N) equal?",
       ],
       reviewSection: "Math section — SRS variance formula",
+    },
+    {
+      id: "stat1-002-quiz-7",
+      type: "choice",
+      text: "The 'sampling frame' is best described as:",
+      options: [
+        "The formula used to compute the margin of error",
+        "The actual list or mechanism from which sample units are drawn",
+        "The target population before any sampling occurs",
+        "The statistical model used to analyze the collected data",
+      ],
+      answer: "The actual list or mechanism from which sample units are drawn",
+      hints: [
+        "The frame is what you actually sample from — which may not perfectly match the target population.",
+        "Coverage error arises when the frame and the target population don't overlap completely.",
+      ],
+      reviewSection: 'Intuition → "Sampling Frame" callout',
+    },
+    {
+      id: "stat1-002-quiz-8",
+      type: "choice",
+      text: "A national researcher wants to measure reading scores across thousands of schools spread across the entire country. The most cost-effective probability sampling approach is:",
+      options: [
+        "Simple random sample of individual students nationwide",
+        "Cluster sampling — randomly select school districts, then test all schools in those districts",
+        "Systematic sample of every 100th enrolled student",
+        "Stratified sampling by student grade level only",
+      ],
+      answer:
+        "Cluster sampling — randomly select school districts, then test all schools in those districts",
+      hints: [
+        "The schools are geographically dispersed — how can you minimize travel costs?",
+        "Cluster sampling trades some precision for large field-cost savings when units are spread out.",
+      ],
+      reviewSection: 'Intuition → "Cluster Sampling" paragraph',
+    },
+    {
+      id: "stat1-002-quiz-9",
+      type: "choice",
+      text: "In Neyman (optimal) allocation, a larger sub-sample should be drawn from a stratum when:",
+      options: [
+        "The stratum has a smaller population size",
+        "The stratum has lower outcome variability",
+        "The stratum is larger and/or has higher variability on the outcome",
+        "The stratum is the most difficult to reach in the field",
+      ],
+      answer:
+        "The stratum is larger and/or has higher variability on the outcome",
+      hints: [
+        "Neyman allocation: n_h ∝ N_h × S_h.",
+        "More observations help most where there is more to learn (high S_h) or where more of the population lives (large N_h).",
+      ],
+      reviewSection: "Math section — Optimal Neyman allocation",
+    },
+    {
+      id: "stat1-002-quiz-10",
+      type: "choice",
+      text: "A probability sample achieves a 30% response rate. This can introduce bias when:",
+      options: [
+        "The sampling interval happens to match a population cycle",
+        "Non-respondents differ systematically from respondents on the outcome variable",
+        "The finite population correction was omitted from the variance formula",
+        "The sample size is smaller than 100",
+      ],
+      answer:
+        "Non-respondents differ systematically from respondents on the outcome variable",
+      hints: [
+        "A probability sample only guarantees valid inference if the selected units actually participate.",
+        "If the 70% who did not respond are systematically different, the realized effective sample is not representative.",
+      ],
+      reviewSection: "Rigor section — R2 Non-response and missing data",
     },
   ],
 

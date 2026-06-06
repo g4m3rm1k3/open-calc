@@ -406,6 +406,45 @@ print(f"Major counts = {dict(major_counts)}  (count, not mean — major is categ
     ],
   },
 
+  // ── Definitions ───────────────────────────────────────────────
+  definitions: [
+    {
+      term: "descriptive statistics",
+      definition:
+        "Methods that summarize and describe data you already have — charts, averages, percentages — without generalizing beyond the observed sample.",
+    },
+    {
+      term: "inferential statistics",
+      definition:
+        "Methods that use sample data to make estimates or test hypotheses about a population not fully observed; always involves quantified uncertainty.",
+    },
+    {
+      term: "population",
+      definition:
+        "The complete set of all units (people, measurements, events) about which you want to draw conclusions.",
+    },
+    {
+      term: "sample",
+      definition:
+        "A subset of the population that is actually observed and measured; used to make inferences about the full population.",
+    },
+    {
+      term: "parameter",
+      definition:
+        "A numerical characteristic of the entire population (e.g., μ, σ); typically unknown and written with Greek letters in standard notation.",
+    },
+    {
+      term: "statistic",
+      definition:
+        "A numerical characteristic computed from sample data (e.g., x̄, s); used to estimate the corresponding unknown population parameter.",
+    },
+    {
+      term: "measurement scale",
+      definition:
+        "A classification of how a variable is measured: nominal (unordered categories), ordinal (ordered categories, unequal gaps), interval (equal gaps, no true zero), or ratio (equal gaps plus a true zero).",
+    },
+  ],
+
   // ── Spiral ────────────────────────────────────────────────────
   spiral: {
     recoveryPoints: [],
@@ -587,6 +626,71 @@ print(f"Major counts = {dict(major_counts)}  (count, not mean — major is categ
       ],
       reviewSection:
         'Intuition → "Parameter vs. Statistic — a Notation Convention" callout',
+    },
+    {
+      id: "stat1-001-quiz-7",
+      type: "choice",
+      text: "A hospital has complete records for all 3,200 patients treated last year and computes the average length of stay from all 3,200 records. The resulting average is:",
+      options: [
+        "A sample statistic x̄",
+        "A population parameter μ",
+        "An inferential estimate",
+        "A margin of error",
+      ],
+      answer: "A population parameter μ",
+      hints: [
+        "If you measured every unit in the population, is any sampling involved?",
+        "No sample = no inferential uncertainty — the parameter is known exactly.",
+      ],
+      reviewSection:
+        'Intuition → "Population vs. sample — always clarify which you have" paragraph',
+    },
+    {
+      id: "stat1-001-quiz-8",
+      type: "choice",
+      text: "A researcher reports: 'The proportion of all 40,000 registered voters who support the measure is estimated to be 0.58 ± 0.04 (95% CI).' Which part of this statement is the inferential component?",
+      options: [
+        "'40,000 registered voters'",
+        "'0.58' (the point estimate from the sample)",
+        "'± 0.04 (95% CI)'",
+        "The word 'proportion'",
+      ],
+      answer: "'± 0.04 (95% CI)'",
+      hints: [
+        "The point estimate 0.58 is computed from sample data — is that descriptive or inferential?",
+        "The uncertainty range ± 0.04 represents the inferential step beyond the sample.",
+      ],
+      reviewSection: 'Intuition → "The inferential leap" paragraph',
+    },
+    {
+      id: "stat1-001-quiz-9",
+      type: "choice",
+      text: "In standard statistical notation, σ (sigma) represents:",
+      options: [
+        "Sample standard deviation",
+        "Population standard deviation",
+        "Sample correlation coefficient",
+        "Population proportion",
+      ],
+      answer: "Population standard deviation",
+      hints: [
+        "Greek letters label population parameters.",
+        "σ is the population-level spread measure; its sample counterpart is s.",
+      ],
+      reviewSection:
+        'Intuition → "Parameter vs. Statistic — a Notation Convention" callout',
+    },
+    {
+      id: "stat1-001-quiz-10",
+      type: "choice",
+      text: "The number of days a student was absent (0, 1, 2, 3, …) is which measurement scale?",
+      options: ["Nominal", "Ordinal", "Interval", "Ratio"],
+      answer: "Ratio",
+      hints: [
+        "Is 0 absences a meaningful 'none of the quantity'?",
+        "Can you say 4 days is twice as many as 2 days? That requires ratio scale.",
+      ],
+      reviewSection: 'Intuition → "Four types of data" paragraph',
     },
   ],
 

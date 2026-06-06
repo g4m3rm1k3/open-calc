@@ -367,6 +367,7 @@ async function getPyodide() {
       "matplotlib",
       "scikit-learn",
       "scipy",
+      "statsmodels",
       "sqlite3",
       "sympy",
     ]);

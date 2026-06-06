@@ -351,6 +351,33 @@ for orig, z in zip(scores, z_scores):
     },
   ],
 
+  definitions: [
+    {
+      term: "percentile",
+      definition: "The pth percentile is the value below which p% of the observations in a sorted dataset fall. For example, the 90th percentile is the value below which 90% of the data lies.",
+    },
+    {
+      term: "quartile",
+      definition: "One of three values (Q1, Q2, Q3) that divide a sorted dataset into four equal groups. Q1 = 25th percentile, Q2 = 50th percentile (median), Q3 = 75th percentile. IQR = Q3 − Q1.",
+    },
+    {
+      term: "z-score",
+      definition: "A standardized score measuring how many standard deviations an observation is from the mean: z = (x − μ)/σ. Positive z means above the mean; negative z means below. Z-scores are dimensionless and enable comparison across different distributions.",
+    },
+    {
+      term: "five-number summary",
+      definition: "A concise description of a distribution using five order statistics: {min, Q1, median, Q3, max}. Forms the basis for a boxplot.",
+    },
+    {
+      term: "Tukey fence",
+      definition: "Heuristic rule for outlier detection: values below Q1 − 1.5×IQR or above Q3 + 1.5×IQR are flagged as potential outliers. For normally distributed data, fewer than 0.7% of values fall outside these fences.",
+    },
+    {
+      term: "percentile rank",
+      definition: "The percentage of values in a dataset that fall below a given value: (number of values < x) / n × 100%. Answers: 'What fraction of the data is below this observation?'",
+    },
+  ],
+
   semantics: {
     core: [
       {
@@ -565,6 +592,59 @@ for orig, z in zip(scores, z_scores):
         "This is the definition of the standard normal distribution.",
       ],
       reviewSection: "Insight callout — Why Z-Scores Enable Comparison",
+    },
+    {
+      id: "stat3-003-quiz-7",
+      type: "choice",
+      text: "The five-number summary consists of:",
+      options: [
+        "Mean, SD, min, max, n",
+        "Min, Q1, median, Q3, max",
+        "Q1, Q2, Q3, IQR, range",
+        "Min, mean, median, mode, max",
+      ],
+      answer: "Min, Q1, median, Q3, max",
+      hints: [
+        "The five-number summary uses five positional statistics (order statistics).",
+        "It is the data source for a boxplot — all five are needed to draw one.",
+      ],
+      reviewSection: "Math section — Five-number summary",
+    },
+    {
+      id: "stat3-003-quiz-8",
+      type: "choice",
+      text: "Find the median of the sorted dataset [12, 15, 18, 22, 25, 28, 35] (n=7).",
+      options: ["18", "22", "25", "20"],
+      answer: "22",
+      hints: [
+        "For odd n, the median is the value at position (n+1)/2.",
+        "(7+1)/2 = 4. The 4th value in [12,15,18,22,25,28,35] is 22.",
+      ],
+      reviewSection: "Procedure callout — Find Q1, Q2, Q3",
+    },
+    {
+      id: "stat3-003-quiz-9",
+      type: "choice",
+      text: "Q3 is equivalent to which percentile?",
+      options: ["50th", "60th", "75th", "90th"],
+      answer: "75th",
+      hints: [
+        "The quartiles divide data at the 25th, 50th, and 75th percentiles.",
+        "Q1 = 25th, Q2 = 50th (median), Q3 = 75th.",
+      ],
+      reviewSection: "Intuition — Quartiles divide data into four equal groups",
+    },
+    {
+      id: "stat3-003-quiz-10",
+      type: "choice",
+      text: "A dataset has Q1 = 30 and IQR = 20. What is the Tukey lower fence?",
+      options: ["0", "−10", "20", "10"],
+      answer: "0",
+      hints: [
+        "Lower fence = Q1 − 1.5 × IQR.",
+        "30 − 1.5 × 20 = 30 − 30 = 0.",
+      ],
+      reviewSection: "Rigor section — Outlier flagging with quartiles",
     },
   ],
 

@@ -21,6 +21,19 @@ import stat4_003 from "./stat4-003-conditional-probability.js";
 import stat4_004 from "./stat4-004-bayes-theorem.js";
 import stat4_005 from "./stat4-005-counting-principles.js";
 import stat4_006 from "./stat4-006-probability-rules-summary.js";
+import stat5_001 from "./stat5-001-discrete-random-variables.js";
+import stat5_002 from "./stat5-002-binomial-distribution.js";
+import stat5_003 from "./stat5-003-poisson-distribution.js";
+import stat5_004 from "./stat5-004-normal-distribution.js";
+import stat5_005 from "./stat5-005-central-limit-theorem.js";
+import stat6_001 from "./stat6-001-logic-of-hypothesis-testing.js";
+import stat6_002 from "./stat6-002-t-tests.js";
+import stat6_003 from "./stat6-003-chi-squared-tests.js";
+import stat6_004 from "./stat6-004-inference-for-proportions.js";
+import stat6_005 from "./stat6-005-one-way-anova.js";
+import stat7_001 from "./stat7-001-simple-linear-regression.js";
+import stat7_002 from "./stat7-002-multiple-regression.js";
+import stat7_003 from "./stat7-003-correlation.js";
 
 // Chapter 1: Foundations of Statistical Thinking
 const STAT1 = {
@@ -54,4 +67,28 @@ const STAT4 = {
   lessons: [stat4_001, stat4_002, stat4_003, stat4_004, stat4_005, stat4_006],
 };
 
-export default [STAT1, STAT2, STAT3, STAT4];
+// Chapter 5: Probability Distributions
+const STAT5 = {
+  title: "Probability Distributions",
+  number: "stat5",
+  slug: "probability-distributions",
+  lessons: [stat5_001, stat5_002, stat5_003, stat5_004, stat5_005],
+};
+
+// Chapter 6: Statistical Inference
+const STAT6 = {
+  title: "Statistical Inference",
+  number: "stat6",
+  slug: "statistical-inference",
+  lessons: [stat6_001, stat6_002, stat6_003, stat6_004, stat6_005],
+};
+
+// Chapter 7: Regression Analysis
+const STAT7 = {
+  title: "Regression Analysis",
+  number: "stat7",
+  slug: "regression-analysis",
+  lessons: [stat7_001, stat7_002, stat7_003],
+};
+
+export default [STAT1, STAT2, STAT3, STAT4, STAT5, STAT6, STAT7];

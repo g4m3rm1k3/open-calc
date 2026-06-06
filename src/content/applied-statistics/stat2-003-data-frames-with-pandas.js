@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   id: "stat2-003",
   slug: "data-frames-with-pandas",
   chapter: "stat2",
@@ -18,7 +18,7 @@ export default {
     "pandas dataframe series iloc loc filter groupby head describe column row tabular data python",
   timeToComplete: 40,
   coreConcept:
-    "A DataFrame is a 2-dimensional table of data with labeled rows and columns. In statistics, rows are observations and columns are variables. pandas is the standard Python library for working with DataFrames — selecting, filtering, grouping, and summarizing data before visualizing it.",
+    "A DataFrame is a 2-dimensional table of data with labeled rows and columns. In statistics, rows are observations and columns are variables. pandas is the standard Python library for working with DataFrames â€” selecting, filtering, grouping, and summarizing data before visualizing it.",
   prerequisites: ["stat2-002"],
   nextLesson: "stat2-004",
 
@@ -33,9 +33,9 @@ export default {
     prose: [
       '**What a DataFrame is.** A DataFrame is a table: rows are observations (cases, individuals, records), columns are variables (features, attributes). Each column has a name and a data type. Each row has an index (a label or integer). pandas gives you a DataFrame with two key access patterns: `df["column_name"]` to get one column, and `df.iloc[row, col]` / `df.loc[label]` to get individual cells or slices.',
       '**Creating a DataFrame from scratch.** You can create a small DataFrame directly from a Python dictionary:\n```python\nimport pandas as pd\ndata = {"name": ["Alice","Bob","Carol"], "age": [25,32,28], "score": [88,74,91]}\ndf = pd.DataFrame(data)\n```\nEach dictionary key becomes a column name; each list becomes the column values. All lists must have the same length.',
-      '**Before reading on, predict:** If `df` has 3 columns (name, age, score) and you write `df["age"]`, what do you expect to get back — a single value, a list, or a column object?',
-      "**Inspecting a DataFrame.** Four essential inspection methods you will use every time you see new data:\n- `df.shape` → (number_of_rows, number_of_columns) as a tuple\n- `df.head(n)` → first n rows (default n=5). Use this to preview the data structure.\n- `df.dtypes` → column names and their data types (int64, float64, object for strings, bool)\n- `df.describe()` → for every numeric column: count, mean, std, min, 25th percentile, median, 75th percentile, max. This is the fastest way to get summary statistics for all variables simultaneously.",
-      '**Selecting columns and rows.** `df["column"]` or `df.column` returns one column as a Series. `df[["col1","col2"]]` returns a new DataFrame with those two columns. To select rows by position: `df.iloc[0]` (first row), `df.iloc[0:5]` (first 5 rows), `df.iloc[2, 1]` (row 2, column 1 — zero-indexed). To select rows by label: `df.loc[label]`. To select specific rows and columns: `df.loc[rows, columns]`.',
+      '**Before reading on, predict:** If `df` has 3 columns (name, age, score) and you write `df["age"]`, what do you expect to get back â€” a single value, a list, or a column object?',
+      "**Inspecting a DataFrame.** Four essential inspection methods you will use every time you see new data:\n- `df.shape` â†’ (number_of_rows, number_of_columns) as a tuple\n- `df.head(n)` â†’ first n rows (default n=5). Use this to preview the data structure.\n- `df.dtypes` â†’ column names and their data types (int64, float64, object for strings, bool)\n- `df.describe()` â†’ for every numeric column: count, mean, std, min, 25th percentile, median, 75th percentile, max. This is the fastest way to get summary statistics for all variables simultaneously.",
+      '**Selecting columns and rows.** `df["column"]` or `df.column` returns one column as a Series. `df[["col1","col2"]]` returns a new DataFrame with those two columns. To select rows by position: `df.iloc[0]` (first row), `df.iloc[0:5]` (first 5 rows), `df.iloc[2, 1]` (row 2, column 1 â€” zero-indexed). To select rows by label: `df.loc[label]`. To select specific rows and columns: `df.loc[rows, columns]`.',
       '**Filtering rows.** `df[df["age"] > 30]` returns all rows where the age column is greater than 30. This uses a boolean mask: `df["age"] > 30` is a Series of True/False, and `df[mask]` keeps only the True rows. Multiple conditions: `df[(df["age"] > 30) & (df["score"] >= 80)]`. Note the use of `&` (not `and`) and parentheses around each condition.',
       '**Adding and modifying columns.** `df["new_col"] = df["col1"] + df["col2"]` creates a new column as the element-wise sum. `df["letter_grade"] = df["score"].apply(lambda x: "A" if x >= 90 else "B")` creates a column by applying a function to each value in score. You can modify any existing column the same way.',
       '**Grouping and aggregation.** `df.groupby("category")["value"].mean()` splits the DataFrame by the unique values of "category", then computes the mean of "value" within each group. Replace `.mean()` with `.sum()`, `.count()`, `.median()`, `.std()`. This is the pandas equivalent of the "stratified mean" from stat1-002: `df.groupby("department")["salary"].mean()` gives the mean salary per department.',
@@ -44,17 +44,17 @@ export default {
       {
         type: "procedure",
         title: "Procedure: First Steps with Any New Dataset",
-        body: "Step 1. `df.shape` — How many rows and columns? Does it match what you expect?\n\nStep 2. `df.head(5)` — Do the first 5 rows look correct? Are column names meaningful?\n\nStep 3. `df.dtypes` — Are numeric columns stored as numbers (int64/float64) or accidentally as strings (object)?\n\nStep 4. `df.describe()` — For each numeric column: Does the min/max make sense? Is the mean plausible? Are the percentiles consistent?\n\nStep 5. `df.isnull().sum()` — How many missing values per column? More than 5% missing in a column warrants investigation before analysis.",
+        body: "Step 1. `df.shape` â€” How many rows and columns? Does it match what you expect?\n\nStep 2. `df.head(5)` â€” Do the first 5 rows look correct? Are column names meaningful?\n\nStep 3. `df.dtypes` â€” Are numeric columns stored as numbers (int64/float64) or accidentally as strings (object)?\n\nStep 4. `df.describe()` â€” For each numeric column: Does the min/max make sense? Is the mean plausible? Are the percentiles consistent?\n\nStep 5. `df.isnull().sum()` â€” How many missing values per column? More than 5% missing in a column warrants investigation before analysis.",
       },
       {
         type: "insight",
-        title: "Series vs. DataFrame — The Key Distinction",
-        body: 'A **Series** is a 1-dimensional labeled array. It has one index and one column of values. Think of it as a single column pulled out of a table.\n\nA **DataFrame** is a 2-dimensional labeled table. It has an index and multiple named columns. Think of it as a collection of Series that share the same index.\n\n`df["age"]` returns a **Series** (one column).\n`df[["age","score"]]` returns a **DataFrame** (two columns).\n\nThe single-bracket vs. double-bracket syntax is not a typo — it determines whether you get a 1D Series or a 2D DataFrame back.',
+        title: "Series vs. DataFrame â€” The Key Distinction",
+        body: 'A **Series** is a 1-dimensional labeled array. It has one index and one column of values. Think of it as a single column pulled out of a table.\n\nA **DataFrame** is a 2-dimensional labeled table. It has an index and multiple named columns. Think of it as a collection of Series that share the same index.\n\n`df["age"]` returns a **Series** (one column).\n`df[["age","score"]]` returns a **DataFrame** (two columns).\n\nThe single-bracket vs. double-bracket syntax is not a typo â€” it determines whether you get a 1D Series or a 2D DataFrame back.',
       },
       {
         type: "warning",
         title: "Common pandas Gotchas",
-        body: '1. **Boolean filter: use `&` not `and`** — `df[(df.age > 30) & (df.score > 80)]` not `df[df.age > 30 and df.score > 80]`. The `and` keyword does not work element-wise on arrays.\n\n2. **SettingWithCopyWarning:** `df2 = df[df.age > 30]; df2["new_col"] = 5` — modifying a filtered copy may not update the original. Use `df.loc[df.age > 30, "new_col"] = 5` to modify in place.\n\n3. **dtypes matter:** If a numeric column is stored as "object" (string), all arithmetic operations will fail or produce wrong results. Fix: `df["age"] = df["age"].astype(float)`.\n\n4. **reset_index() after filtering:** After filtering, the row indices are still from the original DataFrame (e.g., rows 0, 3, 7, ...). Use `df_filtered.reset_index(drop=True)` to get consecutive indices starting from 0.',
+        body: '1. **Boolean filter: use `&` not `and`** â€” `df[(df.age > 30) & (df.score > 80)]` not `df[df.age > 30 and df.score > 80]`. The `and` keyword does not work element-wise on arrays.\n\n2. **SettingWithCopyWarning:** `df2 = df[df.age > 30]; df2["new_col"] = 5` â€” modifying a filtered copy may not update the original. Use `df.loc[df.age > 30, "new_col"] = 5` to modify in place.\n\n3. **dtypes matter:** If a numeric column is stored as "object" (string), all arithmetic operations will fail or produce wrong results. Fix: `df["age"] = df["age"].astype(float)`.\n\n4. **reset_index() after filtering:** After filtering, the row indices are still from the original DataFrame (e.g., rows 0, 3, 7, ...). Use `df_filtered.reset_index(drop=True)` to get consecutive indices starting from 0.',
       },
     ],
     visualizations: [],
@@ -62,15 +62,15 @@ export default {
 
   math: {
     prose: [
-      '**Aggregation operations are vectorized.** In pandas, operations like `df["score"].mean()` compute the mean over all values in the column in one call — equivalent to $\\bar{x} = \\frac{1}{n}\\sum_{i=1}^n x_i$, where $n$ is the number of non-null values. Similarly, `df["score"].std()` computes the sample standard deviation using Bessel\'s correction (denominator $n-1$, not $n$). `df["score"].var()` computes the sample variance. These match the statistical formulas in stat3.',
+      '**Aggregation operations are vectorized.** In pandas, operations like `df["score"].mean()` compute the mean over all values in the column in one call â€” equivalent to $\\bar{x} = \\frac{1}{n}\\sum_{i=1}^n x_i$, where $n$ is the number of non-null values. Similarly, `df["score"].std()` computes the sample standard deviation using Bessel\'s correction (denominator $n-1$, not $n$). `df["score"].var()` computes the sample variance. These match the statistical formulas in stat3.',
       '**GroupBy as stratified summaries.** `df.groupby("group")["value"].agg(["mean","std","count"])` produces a table where each row is one group, and columns are the requested statistics. This is equivalent to computing the stratum means $\\bar{y}_h$ and variances $s_h^2$ from stat1-002, but automated across all strata simultaneously.',
     ],
   },
 
   rigor: {
     prose: [
-      '**R1 — pandas vs. numpy arrays.** pandas DataFrames are built on numpy arrays. A pandas Series stores its values as a numpy array internally. The key difference: numpy arrays are pure numeric with positional indexing. pandas adds: named labels (index, column names), mixed data types across columns, and a richer set of data manipulation operations. When you call `df["score"].values`, you get back the raw numpy array — useful when you need to pass data to a function that expects plain arrays.',
-      '**R2 — Chaining and mutation.** Every pandas operation that transforms data (filter, select, rename, sort) returns a new DataFrame by default — it does not modify the original. This is called immutable operation. If you want to chain: `df.dropna().query("age > 25").groupby("dept")["salary"].mean()` — each step returns a new object. To actually save the result, assign it: `result = df.dropna().query("age > 25")...`. The original `df` is unchanged unless you use `inplace=True` (available for some operations, but generally discouraged for clarity).',
+      '**R1 â€” pandas vs. numpy arrays.** pandas DataFrames are built on numpy arrays. A pandas Series stores its values as a numpy array internally. The key difference: numpy arrays are pure numeric with positional indexing. pandas adds: named labels (index, column names), mixed data types across columns, and a richer set of data manipulation operations. When you call `df["score"].values`, you get back the raw numpy array â€” useful when you need to pass data to a function that expects plain arrays.',
+      '**R2 â€” Chaining and mutation.** Every pandas operation that transforms data (filter, select, rename, sort) returns a new DataFrame by default â€” it does not modify the original. This is called immutable operation. If you want to chain: `df.dropna().query("age > 25").groupby("dept")["salary"].mean()` â€” each step returns a new object. To actually save the result, assign it: `result = df.dropna().query("age > 25")...`. The original `df` is unchanged unless you use `inplace=True` (available for some operations, but generally discouraged for clarity).',
     ],
     visualizations: [],
   },
@@ -101,7 +101,7 @@ print("\\nSummary statistics:")
 print(df.describe())
 `,
         instructions:
-          "Notice that `df.describe()` only shows GPA and credits — it skips student and major because they are strings, not numbers.",
+          "Notice that `df.describe()` only shows GPA and credits â€” it skips student and major because they are strings, not numbers.",
       },
       {
         id: "stat2-003-cell-2",
@@ -162,10 +162,11 @@ print(df.groupby("major")["gpa"].agg(["mean", "std", "count"]))
           'What does `df.groupby("major")["gpa"].std()` give you? How would you use those values to set up a stratified sampling design?',
       },
       {
-        id: "stat2-003-cell-4",
-        type: "python",
-        cellTitle: "Add a column and visualize with opencalc",
+        id: 'stat2-003-py4',
+        cellTitle: 'Add a column and visualize with matplotlib',
+        prose: `Use df.apply() to add a derived column, then visualize the result as a bar chart with matplotlib. Run this cell, then try changing the GPA cutoff from 3.5 to 3.7.`,
         code: `import pandas as pd
+import matplotlib.pyplot as plt
 
 data = {
     "major":   ["Math","CS","Stats","CS","Math","Stats","CS","Math"],
@@ -173,24 +174,26 @@ data = {
 }
 df = pd.DataFrame(data)
 
-# Add a letter grade column
+# Add a letter grade column using apply
 df["letter"] = df["gpa"].apply(lambda x: "A" if x >= 3.5 else "B")
 print(df)
 
 # Count students per letter grade
-grade_counts = df["letter"].value_counts()
-labels = list(grade_counts.index)
-counts = list(grade_counts.values)
+grade_counts = df["letter"].value_counts().sort_index()
+labels = grade_counts.index.tolist()
+counts = grade_counts.values.tolist()
 
-# Visualize
-fig = Figure(width=6, height=5)
-fig.axes(xmin=-1, xmax=2, ymin=0, ymax=8)
-fig.bars(labels=labels, values=counts, color="steelblue")
-fig.text(0.5, 8.3, "Students by Letter Grade", size=13, bold=True)
-fig.show()
-`,
-        instructions:
-          'Try changing the cutoff: `"A" if x >= 3.7`. How does the bar chart change?',
+print("\\nGrade counts:", dict(zip(labels, counts)))
+
+# Visualize with matplotlib
+fig, ax = plt.subplots(figsize=(6, 5))
+ax.bar(labels, counts, color='steelblue', alpha=0.85, edgecolor='white')
+ax.set_title('Students by Letter Grade', fontsize=13, fontweight='bold')
+ax.set_xlabel('Letter Grade')
+ax.set_ylabel('Count')
+ax.set_ylim(0, max(counts) + 1)
+plt.tight_layout()
+plt.show()`,
       },
     ],
   },
@@ -281,7 +284,7 @@ fig.show()
         {
           expression: "\\texttt{fig.bars(labels=labels, values=values)}",
           annotation:
-            "Now labels and values are plain Python lists — the correct input format for fig.bars().",
+            "Now labels and values are plain Python lists â€” the correct input format for fig.bars().",
           strategyTitle: "Step 4: Visualize",
         },
       ],
@@ -319,7 +322,7 @@ fig.show()
         },
       ],
       answer:
-        "DataFrame → filter STEM → groupby major and mean GPA → bars() with axes ymin=0, ymax=4.2.",
+        "DataFrame â†’ filter STEM â†’ groupby major and mean GPA â†’ bars() with axes ymin=0, ymax=4.2.",
     },
     {
       id: "stat2-003-ch2",
@@ -331,13 +334,13 @@ fig.show()
         {
           expression: "\\text{Problem 1: min age = -3.0 (impossible)}",
           annotation:
-            'Negative ages are data entry errors. Identify which rows have age < 0: `df[df["age"] < 0]`. Decide: are they typos for a positive age (e.g., -3 → 3)? Or are they a different encoding (e.g., -999 for missing)? If missing, set to NaN: `df.loc[df["age"] < 0, "age"] = float("nan")`.',
+            'Negative ages are data entry errors. Identify which rows have age < 0: `df[df["age"] < 0]`. Decide: are they typos for a positive age (e.g., -3 â†’ 3)? Or are they a different encoding (e.g., -999 for missing)? If missing, set to NaN: `df.loc[df["age"] < 0, "age"] = float("nan")`.',
         },
         {
           expression:
             "\\text{Problem 2: max age = 98.0 (possibly valid but warrants check)}",
           annotation:
-            'Age 98 is biologically possible. But the distribution has mean=35 and the max is 98 — check if it is a single extreme outlier or a cluster. `df[df["age"] > 80]` reveals all old-age records. Decide based on context whether they are valid or errors.',
+            'Age 98 is biologically possible. But the distribution has mean=35 and the max is 98 â€” check if it is a single extreme outlier or a cluster. `df[df["age"] > 80]` reveals all old-age records. Decide based on context whether they are valid or errors.',
         },
         {
           expression: '\\texttt{df.loc[df["age"] < 0, "age"] = float("nan")}',
@@ -375,7 +378,7 @@ fig.show()
     core: [
       {
         symbol: "\\texttt{df.shape}",
-        meaning: "(n_rows, n_cols) tuple — check dataset dimensions first",
+        meaning: "(n_rows, n_cols) tuple â€” check dataset dimensions first",
       },
       {
         symbol: "\\texttt{df.describe()}",
@@ -384,15 +387,15 @@ fig.show()
       },
       {
         symbol: '\\texttt{df["col"]}',
-        meaning: "Select one column — returns a Series",
+        meaning: "Select one column â€” returns a Series",
       },
       {
         symbol: '\\texttt{df[["col1","col2"]]}',
-        meaning: "Select multiple columns — returns a DataFrame",
+        meaning: "Select multiple columns â€” returns a DataFrame",
       },
       {
         symbol: "\\texttt{df[boolean\\_mask]}",
-        meaning: 'Filter rows where mask is True — e.g., df[df["age"] > 30]',
+        meaning: 'Filter rows where mask is True â€” e.g., df[df["age"] > 30]',
       },
       {
         symbol: '\\texttt{df.groupby("col")["val"].mean()}',
@@ -401,11 +404,11 @@ fig.show()
       {
         symbol: "\\texttt{df.isnull().sum()}",
         meaning:
-          "Count missing values per column — first check in any new dataset",
+          "Count missing values per column â€” first check in any new dataset",
       },
     ],
     rulesOfThumb: [
-      "Every new dataset: shape → head → dtypes → describe → isnull().sum() before any analysis.",
+      "Every new dataset: shape â†’ head â†’ dtypes â†’ describe â†’ isnull().sum() before any analysis.",
       "Boolean filter: use `&` for AND, `|` for OR, wrap each condition in parentheses.",
       "Convert pandas Series to list with `.tolist()` before passing to opencalc Figure methods.",
       "groupby + agg is the pandas version of stratified statistics.",
@@ -433,6 +436,15 @@ fig.show()
       },
     ],
   },
+
+  definitions: [
+    { term: "DataFrame", definition: "pandas' core 2D data structure: a table of rows and columns where each column is a named Series. Similar to a spreadsheet or SQL table. Created via pd.read_csv(), pd.DataFrame(dict), or other constructors. Each column can have a different dtype (int, float, str, datetime)." },
+    { term: "Series", definition: "pandas' 1D labeled array. A single column (or row) of a DataFrame is a Series. Has an index (row labels) and a dtype. Created via df['column_name'] or pd.Series(list). Most numpy operations work element-wise on Series." },
+    { term: ".loc and .iloc indexing", definition: ".loc[rows, cols] selects by label (row index name, column name). .iloc[rows, cols] selects by integer position (0-based). Use .loc for named access, .iloc for positional access. Both support slices and boolean arrays." },
+    { term: "boolean indexing", definition: "Selecting rows that satisfy a condition: df[df['age'] > 30] returns all rows where the age column exceeds 30. The condition creates a boolean Series; only True rows are returned. Multiple conditions use & (and) and | (or) with parentheses: df[(df['age'] > 30) & (df['city'] == 'NY')]." },
+    { term: "groupby", definition: "df.groupby('column').agg({'other': 'mean'}) splits the DataFrame into groups by a categorical column, applies an aggregation function to each group, and combines results. Analogous to SQL GROUP BY. Supports multiple grouping columns and multiple aggregations simultaneously." },
+    { term: "tidy data", definition: "A data format where each variable is a column, each observation is a row, and each cell is a single value (Wickham 2014). Tidy data works directly with pandas, seaborn, and statsmodels. Messy formats (wide tables, multiple variables in one column) require reshaping via pd.melt() or pd.pivot_table()." },
+  ],
 
   checkpoints: [
     {
@@ -517,7 +529,7 @@ fig.show()
         "shape gives the dimensions of the table.",
         "df.shape[0] is the number of rows; df.shape[1] is the number of columns.",
       ],
-      reviewSection: 'Intuition → "Inspecting a DataFrame" paragraph',
+      reviewSection: 'Intuition â†’ "Inspecting a DataFrame" paragraph',
     },
     {
       id: "stat2-003-quiz-2",
@@ -531,10 +543,10 @@ fig.show()
       ],
       answer: "Series, DataFrame",
       hints: [
-        "Single bracket with one column name → 1D object (Series).",
-        "Double bracket with a list of names → 2D object (DataFrame).",
+        "Single bracket with one column name â†’ 1D object (Series).",
+        "Double bracket with a list of names â†’ 2D object (DataFrame).",
       ],
-      reviewSection: "Insight callout — Series vs. DataFrame",
+      reviewSection: "Insight callout â€” Series vs. DataFrame",
     },
     {
       id: "stat2-003-quiz-3",
@@ -551,7 +563,7 @@ fig.show()
         "Use `&` for element-wise AND in pandas, not the Python keyword `and`.",
         "Each condition must be in its own parentheses.",
       ],
-      reviewSection: "Warning callout — Common pandas Gotchas",
+      reviewSection: "Warning callout â€” Common pandas Gotchas",
     },
     {
       id: "stat2-003-quiz-4",
@@ -566,27 +578,22 @@ fig.show()
       answer: "45 values in the income column are missing (NaN)",
       hints: [
         "isnull() returns True for NaN values.",
-        ".sum() counts the True values — i.e., the number of NaN entries per column.",
+        ".sum() counts the True values â€” i.e., the number of NaN entries per column.",
       ],
-      reviewSection: "Procedure callout — First Steps with Any New Dataset",
+      reviewSection: "Procedure callout â€” First Steps with Any New Dataset",
     },
     {
-      id: "stat2-003-quiz-5",
-      type: "choice",
-      text: "To pass a pandas Series to `fig.histogram()`, you should:",
+      type: 'choice',
+      question: `To pass a pandas Series to plt.hist(), which of the following works?`,
       options: [
-        "Pass the Series directly — opencalc accepts pandas Series",
-        "Call `.tolist()` on the Series to convert it to a plain Python list",
-        "Call `.values` to get a numpy array and pass that",
-        "Either `.tolist()` or `.values.tolist()` will work; convert before passing",
+        `Pass the Series directly â€” plt.hist() accepts pandas Series natively`,
+        `Must call .tolist() first; plt.hist() cannot accept Series`,
+        `Must convert to a numpy array with np.array() first`,
+        `Must use plt.bar() instead; plt.hist() does not accept Series`,
       ],
-      answer:
-        "Either `.tolist()` or `.values.tolist()` will work; convert before passing",
-      hints: [
-        "fig.histogram() expects a Python list.",
-        "Both `.tolist()` and `.values.tolist()` produce a Python list.",
-      ],
-      reviewSection: "Example 3 — Step 1: List for histogram",
+      answer: `Pass the Series directly â€” plt.hist() accepts pandas Series natively`,
+      hints: [`matplotlib's plt.hist() can accept any array-like input including pandas Series. No explicit conversion is required.`],
+      reviewSection: 'Cell 4 â€” visualizing pandas data',
     },
     {
       id: "stat2-003-quiz-6",
@@ -598,7 +605,59 @@ fig.show()
         "This is the fastest way to get distributional statistics for all numeric columns simultaneously.",
         "The output includes percentiles (25%, 50%, 75%) which correspond to quartiles.",
       ],
-      reviewSection: 'Intuition → "Inspecting a DataFrame" paragraph',
+      reviewSection: 'Intuition â†’ "Inspecting a DataFrame" paragraph',
+    },
+    {
+      type: 'choice',
+      question: `What does \`df["gpa"].apply(lambda x: "A" if x >= 3.5 else "B")\` return?`,
+      options: [
+        `A scalar â€” the average GPA rounded to A or B`,
+        `A new Series with "A" or "B" for each row based on the GPA value`,
+        `A filtered DataFrame of rows with GPA >= 3.5`,
+        `A boolean Series (True/False)`,
+      ],
+      answer: `A new Series with "A" or "B" for each row based on the GPA value`,
+      hints: [`.apply(func) applies the function to each element in the Series and returns a new Series of the same length.`],
+      reviewSection: 'Cell 4 â€” df.apply()',
+    },
+    {
+      type: 'choice',
+      question: `\`df.groupby("major")["gpa"].agg(["mean", "count"])\` returns:`,
+      options: [
+        `A single number â€” the overall mean GPA`,
+        `A DataFrame with one row per unique major, columns mean and count`,
+        `A list of (major, gpa) tuples`,
+        `The same result as df.describe()`,
+      ],
+      answer: `A DataFrame with one row per unique major, columns mean and count`,
+      hints: [`.groupby() splits the data by the specified column. .agg() applies multiple functions to each group, returning one row per group.`],
+      reviewSection: 'Cell 3 â€” GroupBy',
+    },
+    {
+      type: 'choice',
+      question: `\`df["major"].value_counts()\` returns:`,
+      options: [
+        `The number of unique majors`,
+        `A Series with one entry per unique major, showing how many times each major appears`,
+        `A boolean Series indicating which rows have a non-null major`,
+        `The most common major as a string`,
+      ],
+      answer: `A Series with one entry per unique major, showing how many times each major appears`,
+      hints: [`.value_counts() counts occurrences of each unique value. Results are sorted by count descending by default.`],
+      reviewSection: 'Intuition â€” groupby and value_counts',
+    },
+    {
+      type: 'choice',
+      question: `To sort a DataFrame by the "gpa" column from highest to lowest, you use:`,
+      options: [
+        `df.sort("gpa", order="desc")`,
+        `df.sort_values("gpa", ascending=False)`,
+        `df.order_by("gpa", reverse=True)`,
+        `df["gpa"].sort(reverse=True)`,
+      ],
+      answer: `df.sort_values("gpa", ascending=False)`,
+      hints: [`df.sort_values(column, ascending=False) sorts in descending order. ascending=True is the default.`],
+      reviewSection: 'Intuition â€” sorting and filtering',
     },
   ],
 
@@ -608,7 +667,7 @@ fig.show()
       whyStudentsThinkIt:
         "They both select a column and appear nearly identical in syntax.",
       correctionExample:
-        "Type `type(df[\"gpa\"])` → `<class 'pandas.core.series.Series'>`. Type `type(df[[\"gpa\"]])` → `<class 'pandas.core.frame.DataFrame'>`. A Series has no column name structure; a DataFrame does. If you need to pass a column to a function that expects a DataFrame (e.g., some scikit-learn functions), you must use double brackets.",
+        "Type `type(df[\"gpa\"])` â†’ `<class 'pandas.core.series.Series'>`. Type `type(df[[\"gpa\"]])` â†’ `<class 'pandas.core.frame.DataFrame'>`. A Series has no column name structure; a DataFrame does. If you need to pass a column to a function that expects a DataFrame (e.g., some scikit-learn functions), you must use double brackets.",
       contrastCase:
         'Most opencalc and stats functions expect plain lists: `df["gpa"].tolist()`. If you need a DataFrame structure (e.g., for multi-column operations), use `df[["gpa","major"]]`.',
     },
@@ -638,7 +697,7 @@ fig.show()
         "You receive a CSV file with 5,000 rows of student records: student_id, school_name (50 different schools), grade_level (9, 10, 11, 12), math_score, reading_score. Before running any analysis, you want to understand the data.",
       competingTechniques: [
         "Open the CSV in a spreadsheet and scroll through rows",
-        "Use pandas: shape → head → dtypes → describe → isnull → groupby school_name",
+        "Use pandas: shape â†’ head â†’ dtypes â†’ describe â†’ isnull â†’ groupby school_name",
         "Jump directly to computing correlations between math_score and reading_score",
       ],
       whyThisTechniqueWins:
@@ -653,7 +712,7 @@ fig.show()
         'Use groupby("day_of_week")["order_id"].count()',
       ],
       whyThisTechniqueWins:
-        'Both value_counts() and groupby().count() work here. `df["day_of_week"].value_counts()` is simpler for a frequency count. But for sorting in the correct weekday order (Mon→Sun rather than alphabetical), you need to convert to a Categorical type or sort manually after. `groupby()` gives more control and is more generalizable to other aggregations (e.g., total revenue per day). Convert the result to lists with `.index.tolist()` and `.values.tolist()` for `fig.bars()`.',
+        'Both value_counts() and groupby().count() work here. `df["day_of_week"].value_counts()` is simpler for a frequency count. But for sorting in the correct weekday order (Monâ†’Sun rather than alphabetical), you need to convert to a Categorical type or sort manually after. `groupby()` gives more control and is more generalizable to other aggregations (e.g., total revenue per day). Convert the result to lists with `.index.tolist()` and `.values.tolist()` for `fig.bars()`.',
     },
   ],
 
@@ -681,7 +740,7 @@ fig.show()
 
   mastery: {
     targetLevel:
-      "Apply (Level 3) — given a DataFrame description, write correct pandas code to inspect, filter, aggregate, and prepare data for visualization.",
+      "Apply (Level 3) â€” given a DataFrame description, write correct pandas code to inspect, filter, aggregate, and prepare data for visualization.",
     solveIndependently:
       "Given a new DataFrame with specified columns and types, write the five-step inspection pipeline, a boolean filter with two conditions, a groupby aggregation, and conversion to lists for fig.bars().",
     explainVerbally:

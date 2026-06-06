@@ -29,23 +29,30 @@ export default {
 
   intuition: {
     prose: [
-      "Roadmap for this lesson: you will compute one confidence interval end-to-end, explain what it means in plain language, and avoid the most common interpretation mistake.",
-      "Start with concrete data: in a sample of n = 100 users, average daily app usage is x-bar = 42 minutes with sample standard deviation s = 12 minutes. The sample mean is one estimate of the true population mean mu.",
-      "Now ask the inferential question: how far could x-bar be from mu just due to sampling noise? The standard error of the mean is s/sqrt(n) = 12/10 = 1.2 minutes.",
-      "For an approximate 95% interval, multiply standard error by about 2. Margin of error is about 2.4 minutes. The interval is 42 +/- 2.4, so [39.6, 44.4].",
-      "Prediction moment: before reading on, predict what happens to interval width when n goes from 100 to 400 while s stays the same.",
-      "Because standard error scales as 1/sqrt(n), quadrupling n halves the standard error and halves the margin. Larger samples narrow confidence intervals.",
+      "**Roadmap for this lesson.** By the end you will be able to: (1) build a 95% confidence interval for a population mean or proportion from scratch, (2) state the correct frequentist interpretation without making the most common probability error, and (3) plan a sample size to achieve a desired margin of error.",
+      "**Why a single number is not enough.** In stat1-001, the school district researcher computed a sample mean of 62 minutes from 120 students. She knows $\\bar{x} = 62$. But different samples of 120 students would produce different sample means — perhaps 59, 65, 63, 61. This variability is called **sampling variability**: the sample mean $\\bar{x}$ is a random variable that fluctuates from sample to sample. A confidence interval captures how much it fluctuates and uses that to say how far the true population mean $\\mu$ could plausibly be from the one number we computed.",
+      "**The key building block: standard error.** The **standard error of the mean** (SE) measures the typical distance between $\\bar{x}$ and $\\mu$ across repeated samples: $SE = s/\\sqrt{n}$, where $s$ is the sample standard deviation. For a homework study with $s = 14$ minutes and $n = 120$ students: $SE = 14/\\sqrt{120} \\approx 1.28$ minutes. This tells us the sample mean typically lands within about 1.28 minutes of the true district-wide mean — not guaranteed, but predictable on average.",
+      "**The Central Limit Theorem does the heavy lifting.** For large enough samples (typically $n \\geq 30$), the sampling distribution of $\\bar{x}$ is approximately normal regardless of the shape of the original population distribution. This is the **Central Limit Theorem (CLT)**. Because $\\bar{x} \\approx N(\\mu, SE^2)$, we know that about 95% of all possible sample means land within $\\pm 1.96 \\times SE$ of $\\mu$ — so the interval $\\bar{x} \\pm 1.96 \\times SE$ captures $\\mu$ in approximately 95% of all samples.",
+      "**Before reading on, predict:** if $n$ increases from 120 to 480 while $s$ stays the same, what happens to the SE and the width of the confidence interval? Write your prediction before continuing.",
+      "**Constructing the interval step by step.** Using the homework study values: $\\bar{x} = 62$, $SE \\approx 1.28$, $z^* = 1.96$ for 95% confidence. Margin of error: $ME = 1.96 \\times 1.28 \\approx 2.5$ minutes. The 95% CI is $[62 - 2.5,\\; 62 + 2.5] = [59.5, 64.5]$ minutes. Interpretation in context: based on the sample of 120 students, plausible values for the district-wide average homework time range from 59.5 to 64.5 minutes per night.",
+      "**The correct interpretation — get this exactly right.** A 95% CI does NOT mean 'there is a 95% probability that $\\mu$ is in [59.5, 64.5].' After computing the interval from your data, the unknown $\\mu$ is a fixed (not random) number — it either is or is not in the interval, and you cannot know which. The 95% refers to the **method**: if you repeated this sampling procedure 100 times and built 100 separate intervals, about 95 of them would contain $\\mu$. Confidence is a long-run property of the procedure, not a probability about one realized interval.",
+      "**Small samples: the t-distribution.** When $n < 30$ or — as is always the case in practice — the population standard deviation $\\sigma$ is unknown, the critical value $z^* = 1.96$ is not quite right. Instead, use the **t-distribution** with $df = n - 1$ degrees of freedom: $\\bar{x} \\pm t^*_{n-1} \\cdot (s/\\sqrt{n})$. For $n = 15$, $t^*_{14} \\approx 2.145$ for 95% confidence — wider than 1.96. The t-distribution has heavier tails to account for the extra uncertainty from estimating $\\sigma$ with $s$. As $n \\to \\infty$, $t^* \\to 1.96$.",
     ],
     callouts: [
       {
         type: "procedure",
         title: "Procedure: Build a 95% CI for a Mean",
-        body: "Step 1. Compute sample mean x-bar and sample standard deviation s.\nStep 2. Compute standard error: SE = s/sqrt(n).\nStep 3. Pick critical value (about 2 for large samples; exact t* for small samples).\nStep 4. Compute margin: ME = critical * SE.\nStep 5. Report interval: x-bar +/- ME and interpret in context.",
+        body: "Step 1. Compute sample mean $\\bar{x}$ and sample standard deviation $s$.\nStep 2. Compute standard error: $SE = s/\\sqrt{n}$.\nStep 3. Choose critical value: $z^* = 1.96$ for large $n$; $t^*_{n-1}$ for small $n$ or unknown $\\sigma$.\nStep 4. Compute margin of error: $ME = z^* \\times SE$ (or $t^* \\times SE$).\nStep 5. Report interval: $\\bar{x} \\pm ME$ and interpret in the context of the problem with units.",
       },
       {
         type: "warning",
         title: "What a 95% CI Does NOT Mean",
-        body: "It does not mean there is a 95% chance the fixed parameter is inside this one computed interval. It means this method captures the true parameter in 95% of repeated samples.",
+        body: "It does not mean there is a 95% probability that $\\mu$ is inside this one computed interval. After computing $[59.5, 64.5]$, the parameter $\\mu$ is fixed — it either is or is not in the interval. The 95% refers to the long-run frequency: this method produces intervals that contain $\\mu$ in 95% of repeated samples. Confidence is about the procedure, not about the specific realized interval.",
+      },
+      {
+        type: "insight",
+        title: "Confidence Level vs. Width Trade-off",
+        body: "Higher confidence requires a larger critical value, which widens the interval:\n\n• 90% confidence: $z^* = 1.645$ → narrower, less certain\n• 95% confidence: $z^* = 1.96$ → standard choice\n• 99% confidence: $z^* = 2.576$ → wider, more certain\n\nYou cannot increase both confidence and precision simultaneously without collecting more data. The only way to narrow an interval while keeping the confidence level fixed is to increase $n$.",
       },
     ],
     visualizations: [
@@ -61,18 +68,19 @@ export default {
 
   math: {
     prose: [
-      "For a population mean mu, estimated with sample mean x-bar from size n, a large-sample interval is x-bar +/- z* (s/sqrt(n)).",
-      "For 95% confidence, z* ~= 1.96. For small n with unknown sigma, use t* with df = n - 1.",
-      "For a proportion p with sample p-hat, an approximate 95% interval is p-hat +/- 1.96 * sqrt(p-hat(1-p-hat)/n).",
+      "**Large-sample z-interval for a mean.** When $n \\geq 30$ (or the population is known to be approximately normal), the $100(1-\\alpha)$% confidence interval for $\\mu$ is: $\\bar{x} \\pm z^* \\cdot \\dfrac{s}{\\sqrt{n}}$, where $z^* = 1.645$ (90%), $z^* = 1.96$ (95%), or $z^* = 2.576$ (99%). The standard error $SE = s/\\sqrt{n}$ is the estimated standard deviation of the sampling distribution of $\\bar{x}$.",
+      "**t-interval for small samples or unknown $\\sigma$.** The pivot statistic $T = (\\bar{x} - \\mu)/(s/\\sqrt{n})$ follows a $t_{n-1}$ distribution. The $100(1-\\alpha)$% CI is: $\\bar{x} \\pm t^*_{n-1} \\cdot \\dfrac{s}{\\sqrt{n}}$. Values of $t^*$ for 95% confidence: $n=10 \\Rightarrow t^*_9 = 2.262$; $n=20 \\Rightarrow t^*_{19} = 2.093$; $n=30 \\Rightarrow t^*_{29} = 2.045$; $n \\to \\infty \\Rightarrow t^* \\to 1.96$.",
+      "**CI for a proportion.** For sample proportion $\\hat{p} = X/n$ from $n$ independent Bernoulli trials, an approximate 95% CI is: $\\hat{p} \\pm 1.96 \\sqrt{\\dfrac{\\hat{p}(1-\\hat{p})}{n}}$. The SE is maximized at $\\hat{p} = 0.5$, giving the conservative worst-case $SE_{\\max} = 0.5/\\sqrt{n}$. This is the basis for the rule of thumb that 1,068 people give ±3% margin for any proportion at 95% confidence.",
+      "**Sample size planning.** To achieve margin $\\leq E$ for a mean: $n \\geq \\left(\\dfrac{z^* \\cdot s}{E}\\right)^2$. For a proportion (using $\\hat{p} = 0.5$ as the conservative worst case): $n \\geq \\left(\\dfrac{z^*}{2E}\\right)^2$. For 95% confidence and $E = 0.03$: $n \\geq (1.96/0.06)^2 = (32.67)^2 \\approx 1{,}068$.",
     ],
   },
 
   rigor: {
     prose: [
-      "Formal statement: if assumptions hold, the interval estimator I(X) has coverage P(mu in I(X)) = 0.95.",
-      "Invariant viewpoint: confidence level is a property of the procedure, not the realized interval.",
-      "Geometric interpretation: each sample maps to a point estimate; CI adds a symmetric uncertainty radius around that point.",
-      "Future abstraction link: confidence intervals are dual to hypothesis tests; two-sided 95% CI corresponds to alpha = 0.05 test decisions.",
+      "**R1 — Formal coverage statement.** Let $I(X_1, \\ldots, X_n)$ be a confidence interval procedure. It achieves nominal coverage $1-\\alpha$ if $P_\\theta(\\theta \\in I(X)) = 1-\\alpha$ for all $\\theta \\in \\Theta$. For the t-interval under normality, this coverage is exact for all $n$. For the z-interval via CLT, it is approximate — the approximation improves as $n$ grows. Coverage is a property of the random procedure $(I(\\cdot))$, not of the realized fixed interval $[\\hat{l}, \\hat{u}]$ after data are observed.",
+      "**R2 — Invariant: confidence level is a method property.** After observing data, the interval is a fixed set of numbers and $\\mu$ is a fixed unknown. The statement '$P(\\mu \\in [59.5, 64.5]) = 0.95$' has no frequentist meaning — it is either 0 or 1. The probability statement is valid only before data are collected, when the endpoints are still random variables. This is why the Bayesian credible interval is conceptually different: it uses a prior and produces a statement $P(\\theta \\in I \\mid \\text{data}) = 0.95$ with a genuine posterior probability.",
+      "**R3 — Geometric interpretation.** In $\\mathbb{R}^n$, a sample of $n$ observations is a single point. The sample mean projects this point onto the line spanned by $(1, 1, \\ldots, 1)/\\sqrt{n}$. The confidence interval adds a symmetric radius $\\pm ME$ around this projection on the parameter axis. The interval will cover the true parameter exactly when the projection falls within $ME$ of the true mean — which happens with probability $1-\\alpha$ under the model.",
+      "**R4 — Duality with hypothesis tests.** A two-sided 95% CI $[\\hat{l}, \\hat{u}]$ for $\\mu$ is equivalent to the set of null hypotheses $\\mu_0$ that a two-sided $\\alpha = 0.05$ test would fail to reject. That is: $\\mu_0 \\in [\\hat{l}, \\hat{u}] \\iff |\\bar{x} - \\mu_0|/(s/\\sqrt{n}) < t^*_{n-1}$. This duality means every confidence interval encodes a family of hypothesis test decisions — a fact that becomes central in stat6 (hypothesis testing).",
     ],
   },
 
@@ -89,10 +97,67 @@ export default {
       {
         id: "stat1-004-cell-2",
         type: "python",
-        cellTitle: "Sampling-size effect on interval width",
-        code: "import numpy as np\n\ndef ci_width(s, n, z=1.96):\n    return 2 * z * s / np.sqrt(n)\n\nfor n in [25, 100, 400, 1600]:\n    print(f'n={n:4d}, width={ci_width(12, n):.3f}')",
+        cellTitle: "Sample size effect on interval width",
+        code: `import numpy as np
+
+def ci_width(s, n, z=1.96):
+    return 2 * z * s / np.sqrt(n)
+
+print(f"{'n':>6}  {'Width':>8}  {'Ratio to n=25':>14}")
+print("-" * 34)
+base = ci_width(12, 25)
+for n in [25, 100, 400, 1600]:
+    w = ci_width(12, n)
+    print(f"{n:>6}  {w:>8.3f}  {w/base:>14.3f}")
+
+print()
+print("To halve the width, sample size must quadruple.")
+print("This is the 1/sqrt(n) law — diminishing returns on precision.")
+`,
         instructions:
-          "Observe that width scales with 1/sqrt(n): to halve width, sample size must quadruple.",
+          "Each time n quadruples, the width halves. Going from n=25 to n=1600 multiplies n by 64 but only reduces width by a factor of 8 (= √64). Precision has diminishing returns.",
+      },
+      {
+        id: "stat1-004-cell-3",
+        type: "python",
+        cellTitle: "Visualize CI coverage: what '95% confidence' really means",
+        code: `import numpy as np
+import matplotlib.pyplot as plt
+
+np.random.seed(42)
+true_mean = 70       # true population mean (unknown in practice)
+sigma = 10           # population SD (known here for z-interval)
+n = 40               # sample size
+n_trials = 40        # number of intervals to simulate
+z_star = 1.96
+
+fig, ax = plt.subplots(figsize=(8, 7))
+hits = 0
+for i in range(n_trials):
+    sample = np.random.normal(true_mean, sigma, n)
+    xbar = sample.mean()
+    se = sigma / np.sqrt(n)
+    lo, hi = xbar - z_star * se, xbar + z_star * se
+    captured = lo <= true_mean <= hi
+    hits += int(captured)
+    color = "steelblue" if captured else "crimson"
+    ax.plot([lo, hi], [i, i], color=color, lw=2)
+    ax.plot(xbar, i, "o", color=color, ms=4)
+
+ax.axvline(true_mean, color="black", lw=2, linestyle="--",
+           label=f"True μ = {true_mean}")
+ax.set_xlabel("Value")
+ax.set_ylabel("Trial number")
+ax.set_title(f"95% CI Coverage Simulation\\n"
+             f"{hits}/{n_trials} intervals contain μ   (red = miss)")
+ax.legend()
+plt.tight_layout()
+plt.show()
+print(f"Coverage: {hits}/{n_trials} = {hits/n_trials:.1%}")
+print("Expected: ~95%.  Run with a different seed to see variation.")
+`,
+        instructions:
+          "The red intervals missed the true mean — this is expected and not an error. Roughly 5% of 95% confidence intervals will miss. This is what '95% confidence' actually means: a long-run property of the method. Change np.random.seed() to see a different trial; the coverage rate should stay near 95% over many runs.",
       },
     ],
   },
@@ -391,11 +456,119 @@ export default {
     {
       id: "stat1-004-quiz-6",
       type: "choice",
-      text: "A 99% CI is usually compared with a 95% CI:",
-      options: ["narrower", "same width", "wider", "invalid"],
-      answer: "wider",
-      hints: ["Higher confidence uses larger critical value."],
-      reviewSection: "Math section",
+      text: "A 99% CI is wider than a 95% CI for the same data because:",
+      options: [
+        "The sample size is smaller at 99%",
+        "The critical value z* is larger at 99% confidence",
+        "The standard deviation is larger at higher confidence",
+        "Wider intervals are always less accurate",
+      ],
+      answer: "The critical value z* is larger at 99% confidence",
+      hints: [
+        "z* = 1.96 for 95%; z* = 2.576 for 99%.",
+        "Larger critical value → larger margin of error → wider interval.",
+      ],
+      reviewSection: "Math section — z* values by confidence level",
+    },
+    {
+      id: "stat1-004-quiz-7",
+      type: "choice",
+      text: "The critical value z* = 1.96 for a 95% CI comes from:",
+      options: [
+        "The sample standard deviation",
+        "The t-distribution with n degrees of freedom",
+        "The standard normal distribution: the value that leaves 2.5% in each tail",
+        "A rule of thumb that 2 is close enough to 1.96",
+      ],
+      answer:
+        "The standard normal distribution: the value that leaves 2.5% in each tail",
+      hints: [
+        "For 95% confidence, 5% is split equally between the two tails: 2.5% each.",
+        "z* = 1.96 is the 97.5th percentile of the standard normal N(0,1).",
+      ],
+      reviewSection: "Math section — large-sample z-interval",
+    },
+    {
+      id: "stat1-004-quiz-8",
+      type: "choice",
+      text: "You want a 95% CI margin of error ≤ 3 points for a mean. Your pilot study suggests σ ≈ 15. Approximately what minimum sample size do you need?",
+      options: ["25", "97", "196", "384"],
+      answer: "97",
+      hints: [
+        "Use n ≥ (z* × s / E)² = (1.96 × 15 / 3)².",
+        "1.96 × 15 / 3 = 9.8; then 9.8² ≈ 96 → round up to 97.",
+      ],
+      reviewSection: "Math section — sample size planning",
+    },
+    {
+      id: "stat1-004-quiz-9",
+      type: "choice",
+      text: "A t-interval uses t* instead of z* = 1.96 primarily when:",
+      options: [
+        "The population distribution is not perfectly symmetric",
+        "The sample size is large (n > 100)",
+        "The sample size is small and σ is unknown (estimated by s)",
+        "You want a one-sided interval instead of two-sided",
+      ],
+      answer: "The sample size is small and σ is unknown (estimated by s)",
+      hints: [
+        "The t-distribution accounts for extra uncertainty from estimating σ with s.",
+        "As n → ∞, the t-distribution converges to the standard normal, so t* → 1.96.",
+      ],
+      reviewSection:
+        'Intuition → "Small samples: the t-distribution" paragraph',
+    },
+    {
+      id: "stat1-004-quiz-10",
+      type: "choice",
+      text: "A 95% CI for mean daily screen time is [4.1, 5.7] hours. Which statement is correctly worded?",
+      options: [
+        "There is a 95% probability that the true mean is between 4.1 and 5.7 hours",
+        "95% of individuals have daily screen time between 4.1 and 5.7 hours",
+        "This method, applied repeatedly, captures the true mean in about 95% of samples",
+        "We are 95% certain that this specific interval contains the true mean",
+      ],
+      answer:
+        "This method, applied repeatedly, captures the true mean in about 95% of samples",
+      hints: [
+        "After computing [4.1, 5.7], the true mean μ is fixed — probability is either 0 or 1.",
+        "Confidence is a long-run property of the procedure, not of this one realized interval.",
+      ],
+      reviewSection:
+        'Intuition → "The correct interpretation" paragraph and the CI coverage simulation cell',
+    },
+  ],
+
+  definitions: [
+    {
+      term: "standard error (SE)",
+      definition:
+        "The standard deviation of a sample statistic (like x̄) across repeated samples; quantifies how much the estimate fluctuates. For the mean: SE = s/√n.",
+    },
+    {
+      term: "margin of error (ME)",
+      definition:
+        "Half the width of a confidence interval: ME = z* × SE. Represents the maximum likely distance between the sample estimate and the true population parameter.",
+    },
+    {
+      term: "confidence interval (CI)",
+      definition:
+        "An interval estimate [x̄ − ME, x̄ + ME] derived from sample data; the method that produced it captures the true population parameter in a specified percentage of repeated samples.",
+    },
+    {
+      term: "confidence level",
+      definition:
+        "The long-run proportion of confidence intervals (from the same procedure) that contain the true parameter; e.g., 95% means about 95 of every 100 such intervals capture μ.",
+    },
+    {
+      term: "t-distribution",
+      definition:
+        "A symmetric, bell-shaped distribution with heavier tails than the standard normal; used for confidence intervals when σ is unknown and n is small. Parameterized by df = n − 1; converges to N(0,1) as n → ∞.",
+    },
+    {
+      term: "Central Limit Theorem (CLT)",
+      definition:
+        "For large enough n (typically ≥ 30), the sampling distribution of x̄ is approximately N(μ, σ²/n), regardless of the shape of the underlying population distribution.",
     },
   ],
 

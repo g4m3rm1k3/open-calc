@@ -1,11 +1,11 @@
-export default {
+﻿export default {
   id: "stat2-006",
   slug: "data-visualization-example",
   chapter: "stat2",
   order: 6,
   title: "Data Visualization Example",
   subtitle:
-    "End-to-end exploratory data analysis — inspect, choose charts, interpret findings.",
+    "End-to-end exploratory data analysis â€” inspect, choose charts, interpret findings.",
   tags: [
     "EDA",
     "exploratory data analysis",
@@ -35,14 +35,14 @@ export default {
     question:
       "You receive a new dataset with 8 columns and 500 rows. What is the first thing you do?",
     realWorldContext:
-      'A data analyst at a healthcare company receives a file: patient_data.csv. Before running any regression or test, they spend the first hour in EDA. They learn: column "age" has a maximum of 999 — clearly a data entry error. Column "bmi" has 23 missing values. The "readmission" outcome is heavily imbalanced: 88% No, 12% Yes. A scatter plot of "length_of_stay vs. cost" shows two distinct clusters — one for surgery patients and one for medical patients. None of this would be visible from a summary table alone. EDA is not optional setup — it is where the real analytical work begins.',
+      'A data analyst at a healthcare company receives a file: patient_data.csv. Before running any regression or test, they spend the first hour in EDA. They learn: column "age" has a maximum of 999 â€” clearly a data entry error. Column "bmi" has 23 missing values. The "readmission" outcome is heavily imbalanced: 88% No, 12% Yes. A scatter plot of "length_of_stay vs. cost" shows two distinct clusters â€” one for surgery patients and one for medical patients. None of this would be visible from a summary table alone. EDA is not optional setup â€” it is where the real analytical work begins.',
   },
 
   intuition: {
     prose: [
-      "**The EDA workflow.** A complete EDA follows this sequence:\n1. **Inspect** — shape, column names, dtypes, missing values, descriptive statistics.\n2. **Univariate** — analyze each variable individually: histogram for quantitative, bar chart for categorical.\n3. **Bivariate** — analyze pairs of variables: scatter for two quantitative, grouped bar for categorical+quantitative, correlation matrix.\n4. **Interpret** — write a plain-language summary: what did you find? distributions, outliers, unexpected patterns, data quality issues.\n5. **Document** — record your findings before moving to modeling. EDA findings directly inform which models are appropriate.",
-      "**Before reading on, predict:** You have a dataset of 200 college students: age, major, GPA, hours_studied_per_week, passed_exam (0 or 1). List one chart you would make for each stage of the EDA workflow — one univariate chart and one bivariate chart.",
-      "**Choosing the right chart for each variable pair.** The correct chart depends on the types of both variables:\n- Quantitative + Quantitative → Scatter plot\n- Quantitative + Categorical → Boxplot (or grouped bar of means)\n- Categorical + Categorical → Grouped bar or stacked bar\n- Single quantitative → Histogram or boxplot\n- Single categorical → Bar chart\n- Quantitative over time → Line chart",
+      "**The EDA workflow.** A complete EDA follows this sequence:\n1. **Inspect** â€” shape, column names, dtypes, missing values, descriptive statistics.\n2. **Univariate** â€” analyze each variable individually: histogram for quantitative, bar chart for categorical.\n3. **Bivariate** â€” analyze pairs of variables: scatter for two quantitative, grouped bar for categorical+quantitative, correlation matrix.\n4. **Interpret** â€” write a plain-language summary: what did you find? distributions, outliers, unexpected patterns, data quality issues.\n5. **Document** â€” record your findings before moving to modeling. EDA findings directly inform which models are appropriate.",
+      "**Before reading on, predict:** You have a dataset of 200 college students: age, major, GPA, hours_studied_per_week, passed_exam (0 or 1). List one chart you would make for each stage of the EDA workflow â€” one univariate chart and one bivariate chart.",
+      "**Choosing the right chart for each variable pair.** The correct chart depends on the types of both variables:\n- Quantitative + Quantitative â†’ Scatter plot\n- Quantitative + Categorical â†’ Boxplot (or grouped bar of means)\n- Categorical + Categorical â†’ Grouped bar or stacked bar\n- Single quantitative â†’ Histogram or boxplot\n- Single categorical â†’ Bar chart\n- Quantitative over time â†’ Line chart",
       '**Missing values as a data quality signal.** When pandas reports `df.isnull().sum()` showing 15 missing values in "income," do not immediately drop them. Ask: are they missing randomly (a few left blanks), or systematically (all high-income respondents skipped the income question)? Systematic missing values introduce bias. Plot a bar chart of missingness by group before deciding how to handle them.',
       "**Interpreting shape: symmetry and skewness.** A histogram of household incomes in almost any country is right-skewed: most values are moderate (the peak), but there is a long right tail of very high incomes. The mean is pulled right by the tail (mean > median for right-skewed distributions). A histogram of age at retirement is roughly symmetric and bell-shaped. A histogram of a uniform random variable is flat. Recognizing these shapes guides the choice of summary statistics (mean/sd for symmetric, median/IQR for skewed) and statistical tests.",
     ],
@@ -50,17 +50,17 @@ export default {
       {
         type: "procedure",
         title: "Procedure: Complete EDA Checklist",
-        body: "Step 1. `df.shape` — how many rows and columns?\n\nStep 2. `df.dtypes` — which columns are numeric vs. categorical?\n\nStep 3. `df.isnull().sum()` — which columns have missing values, and how many?\n\nStep 4. `df.describe()` — for numeric columns: min, max (check for impossible values), mean, std, quartiles.\n\nStep 5. Univariate: histogram for each numeric column; bar chart for each categorical column.\n\nStep 6. Bivariate: scatter for numeric pairs with interesting expected relationships; boxplot or grouped bar for numeric vs. categorical.\n\nStep 7. Write a 3–5 sentence summary: what is the distribution of the main outcome variable? What relationships did you find? What data quality issues exist?\n\nNote: Do not start modeling until steps 1–7 are complete.",
+        body: "Step 1. `df.shape` â€” how many rows and columns?\n\nStep 2. `df.dtypes` â€” which columns are numeric vs. categorical?\n\nStep 3. `df.isnull().sum()` â€” which columns have missing values, and how many?\n\nStep 4. `df.describe()` â€” for numeric columns: min, max (check for impossible values), mean, std, quartiles.\n\nStep 5. Univariate: histogram for each numeric column; bar chart for each categorical column.\n\nStep 6. Bivariate: scatter for numeric pairs with interesting expected relationships; boxplot or grouped bar for numeric vs. categorical.\n\nStep 7. Write a 3â€“5 sentence summary: what is the distribution of the main outcome variable? What relationships did you find? What data quality issues exist?\n\nNote: Do not start modeling until steps 1â€“7 are complete.",
       },
       {
         type: "insight",
         title: 'The "Plot First" Rule',
-        body: 'Anscombe\'s quartet (four datasets with identical mean, variance, and r = 0.816) is the classic demonstration of why you must plot before computing statistics.\n\nIn practice, a common version of this mistake is: computing correlation between two variables and reporting "moderate positive correlation (r = 0.61)" without noticing that the scatter plot shows TWO clusters — a group of younger customers and a group of older customers — each with weak correlation, but with a strong between-group difference creating the apparent overall correlation.\n\nRule: compute r (or any statistic) only after looking at the scatter plot. The chart informs which statistics are meaningful.',
+        body: 'Anscombe\'s quartet (four datasets with identical mean, variance, and r = 0.816) is the classic demonstration of why you must plot before computing statistics.\n\nIn practice, a common version of this mistake is: computing correlation between two variables and reporting "moderate positive correlation (r = 0.61)" without noticing that the scatter plot shows TWO clusters â€” a group of younger customers and a group of older customers â€” each with weak correlation, but with a strong between-group difference creating the apparent overall correlation.\n\nRule: compute r (or any statistic) only after looking at the scatter plot. The chart informs which statistics are meaningful.',
       },
       {
         type: "warning",
         title: "Five EDA Mistakes to Avoid",
-        body: "1. **Dropping missing values without investigation** — always check if missingness is systematic before dropping.\n2. **Using mean and SD for a skewed distribution** — report median and IQR instead.\n3. **Treating every outlier as an error** — outliers may be real, important data points (high-value customers, extreme events). Investigate before removing.\n4. **Only examining individual variables, not relationships** — a variable that looks normal by itself may split into two clusters when conditioned on another variable.\n5. **Skipping EDA because the dataset looks clean** — data entry errors and unexpected distributions appear in clean-looking datasets all the time.",
+        body: "1. **Dropping missing values without investigation** â€” always check if missingness is systematic before dropping.\n2. **Using mean and SD for a skewed distribution** â€” report median and IQR instead.\n3. **Treating every outlier as an error** â€” outliers may be real, important data points (high-value customers, extreme events). Investigate before removing.\n4. **Only examining individual variables, not relationships** â€” a variable that looks normal by itself may split into two clusters when conditioned on another variable.\n5. **Skipping EDA because the dataset looks clean** â€” data entry errors and unexpected distributions appear in clean-looking datasets all the time.",
       },
     ],
     visualizations: [],
@@ -68,14 +68,14 @@ export default {
 
   math: {
     prose: [
-      "**Five-number summary and outlier fences.** The five-number summary is {min, Q1, median, Q3, max}. The interquartile range IQR = Q3 − Q1. Outlier fences: lower fence = Q1 − 1.5 × IQR, upper fence = Q3 + 1.5 × IQR. Any value below the lower fence or above the upper fence is a potential outlier by the Tukey rule. A boxplot displays these five values visually — the box spans Q1 to Q3, the median line is inside the box, and whiskers extend to the last data value within the fences.",
+      "**Five-number summary and outlier fences.** The five-number summary is {min, Q1, median, Q3, max}. The interquartile range IQR = Q3 âˆ’ Q1. Outlier fences: lower fence = Q1 âˆ’ 1.5 Ã— IQR, upper fence = Q3 + 1.5 Ã— IQR. Any value below the lower fence or above the upper fence is a potential outlier by the Tukey rule. A boxplot displays these five values visually â€” the box spans Q1 to Q3, the median line is inside the box, and whiskers extend to the last data value within the fences.",
     ],
   },
 
   rigor: {
     prose: [
-      "**R1 — EDA vs. confirmatory data analysis.** EDA (Tukey, 1977) is exploratory — the goal is discovery, not confirmation. You look at the data with an open mind: what is unusual? what patterns exist? EDA generates hypotheses. Confirmatory analysis (t-tests, regression, chi-square) tests pre-specified hypotheses. The two must not be confused: hypotheses that emerge from EDA should be tested on new data, or at minimum acknowledged as post-hoc (data-driven) hypotheses with lower evidential weight.",
-      "**R2 — Correlation matrix.** For a dataset with k numeric variables, the correlation matrix is a k×k symmetric matrix where entry (i,j) = r between variable i and variable j. Diagonal entries = 1.0. A heat map of the correlation matrix is a standard EDA output for medium-dimensional datasets (k ≤ 20). Values close to +1 or −1 suggest strong linear relationships. Values near 0 suggest no linear relationship (but could still have nonlinear ones). In pandas: `df.corr()` computes the correlation matrix.",
+      "**R1 â€” EDA vs. confirmatory data analysis.** EDA (Tukey, 1977) is exploratory â€” the goal is discovery, not confirmation. You look at the data with an open mind: what is unusual? what patterns exist? EDA generates hypotheses. Confirmatory analysis (t-tests, regression, chi-square) tests pre-specified hypotheses. The two must not be confused: hypotheses that emerge from EDA should be tested on new data, or at minimum acknowledged as post-hoc (data-driven) hypotheses with lower evidential weight.",
+      "**R2 â€” Correlation matrix.** For a dataset with k numeric variables, the correlation matrix is a kÃ—k symmetric matrix where entry (i,j) = r between variable i and variable j. Diagonal entries = 1.0. A heat map of the correlation matrix is a standard EDA output for medium-dimensional datasets (k â‰¤ 20). Values close to +1 or âˆ’1 suggest strong linear relationships. Values near 0 suggest no linear relationship (but could still have nonlinear ones). In pandas: `df.corr()` computes the correlation matrix.",
     ],
     visualizations: [],
   },
@@ -123,56 +123,55 @@ print(df.describe())
           "This is the mandatory first step: understand what you have before plotting. Note which columns are numeric vs. categorical. Are there any impossible values in describe()?",
       },
       {
-        id: "stat2-006-cell-2",
-        type: "python",
-        cellTitle: "Step 2: Univariate analysis",
+        id: 'stat2-006-py2',
+        cellTitle: 'Step 2: Univariate Analysis',
+        prose: `Analyze one variable at a time first. Use a histogram for continuous variables (GPA) and a bar chart for categorical ones (major). Run this cell and describe the GPA distribution shape before looking at summary statistics.`,
         code: `import pandas as pd
+import matplotlib.pyplot as plt
 
 data = {
-    "age":           [18,19,20,21,22,18,19,20,21,22,18,19,20,21,22,
-                      18,19,20,21,22,18,19,20,21,22,18,19,20,21,22],
-    "major":         ["CS","CS","Math","Math","CS","Bio","Bio","CS","Math","Bio",
-                      "CS","Bio","Math","CS","Math","Bio","CS","Math","Bio","CS",
-                      "Math","CS","Bio","Math","CS","Bio","CS","Math","CS","Bio"],
-    "gpa":           [3.5,3.2,3.8,2.9,3.6,3.1,3.4,2.7,3.9,3.0,
-                      3.3,2.8,3.7,3.5,3.2,2.6,3.9,3.4,3.1,3.8,
-                      3.6,3.0,2.9,3.5,3.7,3.2,3.8,3.3,3.4,2.8],
-    "hours_studied": [8,6,10,5,9,4,7,3,12,5,
-                      6,4,11,8,6,3,13,7,5,10,
-                      9,5,4,8,11,6,12,7,9,4],
-    "passed":        [1,1,1,0,1,0,1,0,1,0,
-                      1,0,1,1,1,0,1,1,0,1,
-                      1,0,0,1,1,1,1,1,1,0],
+    "major":   ["CS","CS","Math","Math","CS","Bio","Bio","CS","Math","Bio",
+                "CS","Bio","Math","CS","Math","Bio","CS","Math","Bio","CS",
+                "Math","CS","Bio","Math","CS","Bio","CS","Math","CS","Bio"],
+    "gpa":     [3.5,3.2,3.8,2.9,3.6,3.1,3.4,2.7,3.9,3.0,
+                3.3,2.8,3.7,3.5,3.2,2.6,3.9,3.4,3.1,3.8,
+                3.6,3.0,2.9,3.5,3.7,3.2,3.8,3.3,3.4,2.8],
 }
 df = pd.DataFrame(data)
+
+print("GPA stats:")
+print(df["gpa"].describe().round(3))
+print()
+print("Major counts:")
+print(df["major"].value_counts().to_dict())
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
 
 # Histogram: GPA distribution
-gpa_vals = df["gpa"].tolist()
-
-fig = Figure(width=7, height=5)
-fig.axes(xmin=2.4, xmax=4.1, ymin=0, ymax=10)
-fig.histogram(values=gpa_vals, bins=8, color="steelblue")
-fig.text(3.25, 9.7, "GPA Distribution", size=13, bold=True)
-fig.show()
+axes[0].hist(df["gpa"], bins=8, color='steelblue', edgecolor='white', alpha=0.9)
+axes[0].set_title('GPA Distribution', fontsize=12, fontweight='bold')
+axes[0].set_xlabel('GPA'); axes[0].set_ylabel('Count')
+axes[0].axvline(df["gpa"].mean(), color='red', lw=2, linestyle='--',
+                label=f'mean={df["gpa"].mean():.2f}')
+axes[0].legend()
 
 # Bar chart: major frequency
-major_counts = df["major"].value_counts()
-print("Major counts:", major_counts.to_dict())
+major_counts = df["major"].value_counts().sort_values(ascending=False)
+axes[1].bar(major_counts.index, major_counts.values, color='coral', edgecolor='white', alpha=0.9)
+axes[1].set_title('Students per Major', fontsize=12, fontweight='bold')
+axes[1].set_xlabel('Major'); axes[1].set_ylabel('Count')
+axes[1].set_ylim(0, major_counts.max() + 2)
 
-fig2 = Figure(width=6, height=5)
-fig2.axes(xmin=-1, xmax=3, ymin=0, ymax=14)
-fig2.bars(labels=major_counts.index.tolist(), values=major_counts.values.tolist(), color="coral")
-fig2.text(1, 13.5, "Students per Major", size=13, bold=True)
-fig2.show()
-`,
-        instructions:
-          "Describe the GPA histogram: what is the shape? Is it symmetric or skewed? Are there outliers? Then examine the major bar chart: are the three majors balanced?",
+plt.tight_layout()
+plt.show()`,
       },
       {
-        id: "stat2-006-cell-3",
-        type: "python",
-        cellTitle: "Step 3: Bivariate analysis — hours studied vs. GPA",
+        id: 'stat2-006-py3',
+        cellTitle: 'Step 3: Bivariate Analysis â€” Hours Studied vs. GPA',
+        prose: `After understanding each variable alone, look at relationships between pairs. A scatter plot of hours studied vs. GPA reveals whether more study time is associated with higher grades â€” and how strong that association is.`,
         code: `import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
 
 data = {
     "gpa":           [3.5,3.2,3.8,2.9,3.6,3.1,3.4,2.7,3.9,3.0,
@@ -187,41 +186,37 @@ data = {
 }
 df = pd.DataFrame(data)
 
-# Scatter: hours studied vs GPA
-hours = df["hours_studied"].tolist()
-gpa   = df["gpa"].tolist()
+hours = df["hours_studied"].values
+gpa = df["gpa"].values
+r = np.corrcoef(hours, gpa)[0, 1]
+b1, b0 = np.polyfit(hours, gpa, 1)
+print(f"r(hours, gpa) = {r:.3f}  â†’  {'strong' if abs(r)>0.7 else 'moderate'} positive association")
+print(f"Regression: GPA = {b0:.2f} + {b1:.3f} Ã— hours")
 
-# Compute correlation
-n = len(hours)
-xbar = sum(hours)/n
-ybar = sum(gpa)/n
-sx = (sum((x-xbar)**2 for x in hours)/(n-1))**0.5
-sy = (sum((y-ybar)**2 for y in gpa)/(n-1))**0.5
-r = sum((hours[i]-xbar)*(gpa[i]-ybar) for i in range(n)) / ((n-1)*sx*sy)
-print(f"r(hours, gpa) = {r:.3f}")
+# Color by major
+colors = {'CS': 'steelblue', 'Math': 'tomato', 'Bio': 'seagreen'}
 
-# Compute regression line
-b1 = r * sy/sx
-b0 = ybar - b1*xbar
-print(f"Regression: GPA = {b0:.2f} + {b1:.3f} * hours")
+fig, ax = plt.subplots(figsize=(9, 5))
+for major, group in df.groupby("major"):
+    ax.scatter(group["hours_studied"], group["gpa"],
+               color=colors[major], s=60, alpha=0.85, edgecolor='white',
+               label=major, zorder=3)
 
-fig = Figure(width=7, height=5)
-fig.axes(xmin=2, xmax=14, ymin=2.4, ymax=4.1)
-fig.scatter(xs=hours, ys=gpa, color="coral", size=6)
-# Overlay regression line
-line_y = [b0 + b1*x for x in [2, 14]]
-fig.plot(xs=[2, 14], ys=line_y, color="navy", lw=2)
-fig.text(8, 4.07, "Hours Studied vs. GPA", size=13, bold=True)
-fig.show()
-`,
-        instructions:
-          "Interpret r: is the association strong, moderate, or weak? Positive or negative? Does the scatter plot show any outliers or clusters that r might be hiding?",
+xr = np.linspace(2, 14, 100)
+ax.plot(xr, b0 + b1 * xr, 'navy', lw=2, linestyle='--',
+        label=f'y = {b0:.2f} + {b1:.3f}x')
+ax.set_xlabel('Hours Studied'); ax.set_ylabel('GPA')
+ax.set_title('Hours Studied vs. GPA  (colored by major)', fontsize=12, fontweight='bold')
+ax.legend()
+plt.tight_layout()
+plt.show()`,
       },
       {
-        id: "stat2-006-cell-4",
-        type: "python",
-        cellTitle: "Step 4: Pass rate by major",
+        id: 'stat2-006-py4',
+        cellTitle: 'Step 4: Pass Rate by Major',
+        prose: `Comparing a binary outcome (pass/fail) across groups requires proportions, not raw counts. Use groupby().mean() to compute pass rates, then display as a bar chart. The y-axis must start at 0.`,
         code: `import pandas as pd
+import matplotlib.pyplot as plt
 
 data = {
     "major":  ["CS","CS","Math","Math","CS","Bio","Bio","CS","Math","Bio",
@@ -233,22 +228,30 @@ data = {
 }
 df = pd.DataFrame(data)
 
-# Pass rate by major (proportion)
-pass_rate = df.groupby("major")["passed"].mean()
+pass_rate = df.groupby("major")["passed"].mean().sort_values(ascending=False)
+counts = df.groupby("major")["passed"].agg(["sum", "count"])
 print("Pass rate by major:")
-print(pass_rate.round(3))
+for major in pass_rate.index:
+    n_pass = int(counts.loc[major, "sum"])
+    n_total = int(counts.loc[major, "count"])
+    print(f"  {major:<5}: {n_pass}/{n_total} = {pass_rate[major]*100:.1f}%")
 
-labels = pass_rate.index.tolist()
-values = [round(v, 3) for v in pass_rate.values.tolist()]
+fig, ax = plt.subplots(figsize=(7, 5))
+bars = ax.bar(pass_rate.index, pass_rate.values,
+              color=['steelblue', 'tomato', 'seagreen'], alpha=0.85, edgecolor='white')
+ax.set_ylim(0, 1.15)
+ax.set_ylabel('Pass Rate (proportion)')
+ax.set_title('Exam Pass Rate by Major', fontsize=13, fontweight='bold')
+ax.axhline(df["passed"].mean(), color='gray', lw=2, linestyle='--',
+           label=f'Overall mean: {df["passed"].mean()*100:.1f}%')
+ax.legend()
 
-fig = Figure(width=6, height=5)
-fig.axes(xmin=-1, xmax=3, ymin=0, ymax=1.0)
-fig.bars(labels=labels, values=values, color="teal")
-fig.text(1, 0.97, "Exam Pass Rate by Major", size=13, bold=True)
-fig.show()
-`,
-        instructions:
-          "Are pass rates substantially different across majors? Is this difference meaningful, or could it be explained by chance? (The chi-square test in stat7 will answer this formally.)",
+for bar, val in zip(bars, pass_rate.values):
+    ax.text(bar.get_x() + bar.get_width()/2, val + 0.03,
+            f'{val*100:.1f}%', ha='center', fontsize=11, fontweight='bold')
+
+plt.tight_layout()
+plt.show()`,
       },
     ],
   },
@@ -263,7 +266,7 @@ fig.show()
       steps: [
         {
           expression:
-            "\\text{Step 1: df.shape → e.g., (1500, 5). 1500 rows, 5 columns.}",
+            "\\text{Step 1: df.shape â†’ e.g., (1500, 5). 1500 rows, 5 columns.}",
           annotation:
             "Reasonable dataset size. No columns accidentally split into extra columns.",
           strategyTitle: "Step 1: Shape",
@@ -277,16 +280,16 @@ fig.show()
         },
         {
           expression:
-            "\\text{Step 3: df.isnull().sum() — check if any column has missing values}",
+            "\\text{Step 3: df.isnull().sum() â€” check if any column has missing values}",
           annotation:
             "If days_on_market has 50 missing: are they all the most recent listings (days not yet countable)? Or random? If systematic, dropping them could bias analyses toward older listings.",
           strategyTitle: "Step 3: Missing values",
         },
         {
           expression:
-            "\\text{Step 4: df.describe() — check price max for outliers, bedrooms min for negatives}",
+            "\\text{Step 4: df.describe() â€” check price max for outliers, bedrooms min for negatives}",
           annotation:
-            "Check: is there a house with price=$0 (entry error)? bedrooms=0 (studio — valid)? sqft=1 (entry error)? days_on_market=10000 (error or unusual)?",
+            "Check: is there a house with price=$0 (entry error)? bedrooms=0 (studio â€” valid)? sqft=1 (entry error)? days_on_market=10000 (error or unusual)?",
           strategyTitle: "Step 4: Describe",
         },
         {
@@ -310,34 +313,34 @@ fig.show()
       title: "Choose the right chart for each variable pair",
       difficulty: "medium",
       problem:
-        "Dataset: age (int), salary (float), department (str, 4 levels), performance_rating (1–5, int), tenure_years (float). For each pair, name the correct chart:\n(a) salary vs. age\n(b) performance_rating distribution alone\n(c) salary by department\n(d) department vs. performance_rating",
+        "Dataset: age (int), salary (float), department (str, 4 levels), performance_rating (1â€“5, int), tenure_years (float). For each pair, name the correct chart:\n(a) salary vs. age\n(b) performance_rating distribution alone\n(c) salary by department\n(d) department vs. performance_rating",
       steps: [
         {
           expression: "\\text{(a) salary vs. age: scatter plot}",
           annotation:
             "Both are quantitative. Scatter shows direction, form, strength, and outliers of the relationship.",
-          strategyTitle: "(a) Q+Q → scatter",
+          strategyTitle: "(a) Q+Q â†’ scatter",
         },
         {
           expression:
-            "\\text{(b) performance\\_rating alone: bar chart (ordinal 1–5)}",
+            "\\text{(b) performance\\_rating alone: bar chart (ordinal 1â€“5)}",
           annotation:
-            "performance_rating is ordinal (discrete, ordered). A bar chart in natural order (1 → 5) shows the distribution. A histogram would also work if treated as continuous, but bars in 1–5 order are cleaner.",
-          strategyTitle: "(b) Single ordinal → bar",
+            "performance_rating is ordinal (discrete, ordered). A bar chart in natural order (1 â†’ 5) shows the distribution. A histogram would also work if treated as continuous, but bars in 1â€“5 order are cleaner.",
+          strategyTitle: "(b) Single ordinal â†’ bar",
         },
         {
           expression:
             "\\text{(c) salary by department: boxplot or grouped bar of means}",
           annotation:
             "One quantitative + one categorical (4 levels). Boxplot shows the full distribution of salary within each department: median, spread, and outliers. Grouped bar of means would show only the central tendency.",
-          strategyTitle: "(c) Q+Cat → boxplot",
+          strategyTitle: "(c) Q+Cat â†’ boxplot",
         },
         {
           expression:
             "\\text{(d) department vs. performance\\_rating: grouped bar or stacked bar}",
           annotation:
-            "Two categorical variables (4 departments × 5 rating levels). A grouped bar chart with one group per department and one bar per rating level compares the distribution of ratings across departments.",
-          strategyTitle: "(d) Cat+Cat → grouped bar",
+            "Two categorical variables (4 departments Ã— 5 rating levels). A grouped bar chart with one group per department and one bar per rating level compares the distribution of ratings across departments.",
+          strategyTitle: "(d) Cat+Cat â†’ grouped bar",
         },
       ],
     },
@@ -351,7 +354,7 @@ fig.show()
         {
           expression: "\\text{Bimodal histogram: two peaks at \\$20 and \\$75}",
           annotation:
-            "Two peaks suggest two subpopulations: one low-spend group (budget plan?) and one high-spend group (premium plan?). These are not uniformly distributed — the data has a natural split.",
+            "Two peaks suggest two subpopulations: one low-spend group (budget plan?) and one high-spend group (premium plan?). These are not uniformly distributed â€” the data has a natural split.",
           strategyTitle: "Step 1: Interpret bimodal",
         },
         {
@@ -385,31 +388,31 @@ fig.show()
       title: "Design a complete EDA plan",
       difficulty: "medium",
       problem:
-        "Dataset: fitness_tracker.csv — user_id, age, gender (M/F), steps_per_day (int), calories_burned (float), sleep_hours (float), heart_rate_avg (int). Design a complete EDA plan: list every chart you would make, the chart type, and what you expect to find.",
+        "Dataset: fitness_tracker.csv â€” user_id, age, gender (M/F), steps_per_day (int), calories_burned (float), sleep_hours (float), heart_rate_avg (int). Design a complete EDA plan: list every chart you would make, the chart type, and what you expect to find.",
       walkthrough: [
         {
           expression:
             "\\text{Univariate: histogram(steps\\_per\\_day), histogram(calories\\_burned), histogram(sleep\\_hours)}",
           annotation:
-            "Steps and calories are likely right-skewed (a few very active users). Sleep hours should be approximately normal (centered around 7–8 hours). Histograms reveal shape, outliers, and whether any values seem impossible (steps=1,000,000?).",
+            "Steps and calories are likely right-skewed (a few very active users). Sleep hours should be approximately normal (centered around 7â€“8 hours). Histograms reveal shape, outliers, and whether any values seem impossible (steps=1,000,000?).",
         },
         {
           expression:
-            "\\text{Univariate: bar(gender) — check balance, bar(age) — likely discrete bins}",
+            "\\text{Univariate: bar(gender) â€” check balance, bar(age) â€” likely discrete bins}",
           annotation:
             "Gender bar: is the sample balanced? Age: is there a wide range? Are all age groups represented?",
         },
         {
           expression:
-            "\\text{Bivariate: scatter(steps, calories) — expect strong positive linear}",
+            "\\text{Bivariate: scatter(steps, calories) â€” expect strong positive linear}",
           annotation:
-            "More steps → more calories burned. This is likely strong and roughly linear. May show different trends for M vs. F users (consider coloring by gender).",
+            "More steps â†’ more calories burned. This is likely strong and roughly linear. May show different trends for M vs. F users (consider coloring by gender).",
         },
         {
           expression:
-            "\\text{Bivariate: scatter(sleep\\_hours, heart\\_rate\\_avg) — expect negative correlation}",
+            "\\text{Bivariate: scatter(sleep\\_hours, heart\\_rate\\_avg) â€” expect negative correlation}",
           annotation:
-            "More sleep → lower resting heart rate. Could be moderate negative. Check for outliers (athletes with unusually low heart rate despite little sleep).",
+            "More sleep â†’ lower resting heart rate. Could be moderate negative. Check for outliers (athletes with unusually low heart rate despite little sleep).",
         },
         {
           expression:
@@ -426,37 +429,37 @@ fig.show()
       title: "Detect and explain a data quality issue",
       difficulty: "hard",
       problem:
-        'You run `df.describe()` on a health dataset and find: "systolic_bp" has min=10, max=280, mean=122, std=45. The normal healthy range is 90–180 mmHg for most adults. (a) What are the data quality concerns? (b) How would you investigate with visualization? (c) What actions would you take?',
+        'You run `df.describe()` on a health dataset and find: "systolic_bp" has min=10, max=280, mean=122, std=45. The normal healthy range is 90â€“180 mmHg for most adults. (a) What are the data quality concerns? (b) How would you investigate with visualization? (c) What actions would you take?',
       walkthrough: [
         {
           expression:
-            "\\text{Concern 1: min=10 — impossible. Systolic BP cannot be 10 mmHg in a living person (minimum viable ≈ 70)}",
+            "\\text{Concern 1: min=10 â€” impossible. Systolic BP cannot be 10 mmHg in a living person (minimum viable â‰ˆ 70)}",
           annotation:
-            "A value of 10 is certainly a data entry error: either the decimal was misplaced (100 → 10), a digit was missed, or the column was misread from another measurement unit.",
+            "A value of 10 is certainly a data entry error: either the decimal was misplaced (100 â†’ 10), a digit was missed, or the column was misread from another measurement unit.",
         },
         {
           expression:
-            "\\text{Concern 2: max=280 — possible but concerning. Hypertensive crisis starts at >180. Values 180–280 are rare but real.}",
+            "\\text{Concern 2: max=280 â€” possible but concerning. Hypertensive crisis starts at >180. Values 180â€“280 are rare but real.}",
           annotation:
-            "Max=280 could be real (severe hypertensive emergency) or a data entry error (28.0 → 280). Requires investigation rather than automatic removal.",
+            "Max=280 could be real (severe hypertensive emergency) or a data entry error (28.0 â†’ 280). Requires investigation rather than automatic removal.",
         },
         {
           expression:
-            "\\text{Concern 3: std=45 — very large. Normally systolic BP std is 10–20 mmHg in a study sample.}",
+            "\\text{Concern 3: std=45 â€” very large. Normally systolic BP std is 10â€“20 mmHg in a study sample.}",
           annotation:
             "A large std may be inflated by the extreme outliers (min=10, max=280). After removing impossible values, std would likely drop substantially.",
         },
         {
           expression:
-            "\\text{Investigation: histogram(systolic\\_bp) — look for spike at 10, long right tail above 180}",
+            "\\text{Investigation: histogram(systolic\\_bp) â€” look for spike at 10, long right tail above 180}",
           annotation:
-            "The histogram will show the overall distribution and visually identify where the outliers sit. A boxplot would also show the outlier flags below Q1-1.5×IQR and above Q3+1.5×IQR.",
+            "The histogram will show the overall distribution and visually identify where the outliers sit. A boxplot would also show the outlier flags below Q1-1.5Ã—IQR and above Q3+1.5Ã—IQR.",
         },
         {
           expression:
             "\\text{Actions: (1) Flag/remove values <70 as impossible. (2) Flag values >200 for manual review. (3) Report to data owner.}",
           annotation:
-            "Never silently drop outliers. Document what was removed and why. Rerun describe() after cleaning to verify the distribution looks plausible (mean ~122, std ~15–20).",
+            "Never silently drop outliers. Document what was removed and why. Rerun describe() after cleaning to verify the distribution looks plausible (mean ~122, std ~15â€“20).",
         },
       ],
       answer:
@@ -485,37 +488,37 @@ fig.show()
       {
         symbol: "\\text{EDA}",
         meaning:
-          "Exploratory Data Analysis — systematic inspection and visualization of a dataset before modeling.",
+          "Exploratory Data Analysis â€” systematic inspection and visualization of a dataset before modeling.",
       },
       {
         symbol: "\\text{IQR}",
         meaning:
-          "Interquartile Range = Q3 − Q1. The range of the middle 50% of data.",
+          "Interquartile Range = Q3 âˆ’ Q1. The range of the middle 50% of data.",
       },
       {
         symbol: "\\text{Lower fence} = Q1 - 1.5 \\times \\text{IQR}",
         meaning:
-          "Tukey outlier threshold — values below this are flagged as potential outliers.",
+          "Tukey outlier threshold â€” values below this are flagged as potential outliers.",
       },
       {
         symbol: "\\text{Upper fence} = Q3 + 1.5 \\times \\text{IQR}",
         meaning:
-          "Tukey outlier threshold — values above this are flagged as potential outliers.",
+          "Tukey outlier threshold â€” values above this are flagged as potential outliers.",
       },
       {
         symbol: "\\texttt{df.describe()}",
         meaning:
-          "pandas method — returns count, mean, std, min, 25%, 50%, 75%, max for each numeric column.",
+          "pandas method â€” returns count, mean, std, min, 25%, 50%, 75%, max for each numeric column.",
       },
       {
         symbol: "\\texttt{df.isnull().sum()}",
-        meaning: "pandas method — returns count of missing values per column.",
+        meaning: "pandas method â€” returns count of missing values per column.",
       },
     ],
     rulesOfThumb: [
-      "Always run the EDA checklist (shape → dtypes → missing → describe → univariate → bivariate) before any modeling.",
+      "Always run the EDA checklist (shape â†’ dtypes â†’ missing â†’ describe â†’ univariate â†’ bivariate) before any modeling.",
       "Plot before computing statistics: a number without a picture can mislead.",
-      "Investigate missing values before dropping — systematic missingness introduces bias.",
+      "Investigate missing values before dropping â€” systematic missingness introduces bias.",
       "Never silently remove outliers: document what was removed and why.",
       "An EDA finding (bimodal distribution, unexpected cluster) directly changes which models are appropriate.",
       "Write a plain-language EDA summary before writing any model code.",
@@ -528,7 +531,7 @@ fig.show()
       {
         lessonId: "stat3-001",
         label: "Measures of Center",
-        note: "stat3 formalizes mean, median, mode — the EDA describe() summary statistics.",
+        note: "stat3 formalizes mean, median, mode â€” the EDA describe() summary statistics.",
       },
       {
         lessonId: "stat3-004",
@@ -542,6 +545,15 @@ fig.show()
       },
     ],
   },
+
+  definitions: [
+    { term: "exploratory data analysis (EDA)", definition: "The systematic process of inspecting a dataset before modeling: check shape and types (.info()), look at distributions (.hist(), .boxplot()), examine relationships (.scatter(), correlation matrix), identify missing values and outliers. EDA informs every modeling decision that follows." },
+    { term: "EDA workflow", definition: "Standard sequence: (1) load and inspect (.head(), .info(), .describe()); (2) univariate distributions (histograms for continuous, bar charts for categorical); (3) bivariate relationships (scatter plots for continuous pairs, grouped boxplots for continuous vs. categorical); (4) multivariate overview (correlation heatmap, pair plot); (5) formulate hypotheses based on patterns seen." },
+    { term: "pair plot (scatter matrix)", definition: "A grid of scatter plots for every pair of quantitative variables in a dataset, with univariate distributions on the diagonal. Produced by seaborn.pairplot() or pd.plotting.scatter_matrix(). Quickly reveals all pairwise associations and distributions in one figure. Essential for multivariate datasets." },
+    { term: "correlation matrix", definition: "A square matrix where entry (i, j) = Pearson correlation r(xᵢ, xⱼ) for all pairs of quantitative variables. Visualized as a heatmap with color encoding correlation magnitude and sign. Computed via df.corr(). Values range −1 to +1; the diagonal is always 1." },
+    { term: "outlier", definition: "An observation that deviates markedly from the general pattern of the data. Visually: isolated points far from clusters in scatter plots, or points beyond the whiskers in boxplots. Can be data entry errors (investigate and fix), genuine extreme values (keep and note), or structural anomalies (may require separate analysis)." },
+    { term: "data story", definition: "A coherent narrative that ties visualizations together with context and interpretation. Effective data stories: start with a question, show the most relevant chart(s), annotate key features (peaks, drops, outliers), and state a clear finding. Audience should not need to decode — labels, titles, and annotations guide attention." },
+  ],
 
   checkpoints: [
     {
@@ -564,7 +576,7 @@ fig.show()
     {
       id: "cp-stat2-006-4",
       label:
-        "Lab: run cell 2 and describe the GPA histogram — shape, skewness, any outliers",
+        "Lab: run cell 2 and describe the GPA histogram â€” shape, skewness, any outliers",
       type: "lab",
     },
     {
@@ -618,13 +630,13 @@ fig.show()
       type: "choice",
       text: "The correct order for an EDA workflow is:",
       options: [
-        "Model → visualize → clean data",
-        "Compute statistics → plot → interpret",
-        "Inspect (shape/types/missing/describe) → univariate → bivariate → interpret",
-        "Bivariate → univariate → data cleaning",
+        "Model â†’ visualize â†’ clean data",
+        "Compute statistics â†’ plot â†’ interpret",
+        "Inspect (shape/types/missing/describe) â†’ univariate â†’ bivariate â†’ interpret",
+        "Bivariate â†’ univariate â†’ data cleaning",
       ],
       answer:
-        "Inspect (shape/types/missing/describe) → univariate → bivariate → interpret",
+        "Inspect (shape/types/missing/describe) â†’ univariate â†’ bivariate â†’ interpret",
       hints: [
         "You need to understand the data structure before plotting.",
         "Univariate (single variables) before bivariate (pairs).",
@@ -647,7 +659,7 @@ fig.show()
         "The variable pair type determines the chart type.",
       ],
       reviewSection:
-        "Example 2 — Choose the right chart for each variable pair",
+        "Example 2 â€” Choose the right chart for each variable pair",
     },
     {
       id: "stat2-006-quiz-3",
@@ -666,7 +678,7 @@ fig.show()
         "The mechanism of missingness determines the appropriate handling strategy.",
       ],
       reviewSection:
-        'Intuition → "Missing values as a data quality signal" paragraph',
+        'Intuition â†’ "Missing values as a data quality signal" paragraph',
     },
     {
       id: "stat2-006-quiz-4",
@@ -684,7 +696,7 @@ fig.show()
         "A single population usually produces a unimodal (one-peak) histogram.",
         "Two peaks often correspond to two groups in the data (e.g., two plan types, two age groups).",
       ],
-      reviewSection: "Example 3 — Interpret an EDA finding",
+      reviewSection: "Example 3 â€” Interpret an EDA finding",
     },
     {
       id: "stat2-006-quiz-5",
@@ -703,7 +715,7 @@ fig.show()
         "Always investigate impossible values rather than silently dropping or replacing them.",
       ],
       reviewSection:
-        "Procedure step 4: describe() — check min/max for impossible values",
+        "Procedure step 4: describe() â€” check min/max for impossible values",
     },
     {
       id: "stat2-006-quiz-6",
@@ -721,18 +733,70 @@ fig.show()
         "Tukey (1977) coined the EDA term and distinguished it from confirmatory analysis.",
         "Hypotheses generated from EDA on the same data require new data or adjustment for being data-driven.",
       ],
-      reviewSection: "Rigor section — R1 EDA vs. confirmatory analysis",
+      reviewSection: "Rigor section â€” R1 EDA vs. confirmatory analysis",
+    },
+    {
+      type: 'choice',
+      question: `In cell 3, pass rates are compared across majors using proportions instead of raw counts. Why?`,
+      options: [
+        `Proportions are easier to compute`,
+        `The majors have different sizes, so raw counts favor larger groups regardless of actual pass rate`,
+        `Raw counts cannot be displayed in a bar chart`,
+        `Proportions are always more accurate than counts`,
+      ],
+      answer: `The majors have different sizes, so raw counts favor larger groups regardless of actual pass rate`,
+      hints: [`If CS has 50 passes (out of 100 students) and Math has 40 passes (out of 60 students), Math has a higher pass rate (67% vs. 50%) despite fewer raw passes.`],
+      reviewSection: 'Cell 4 â€” pass rate by major',
+    },
+    {
+      type: 'choice',
+      question: `In cell 3, the scatter plot is colored by major. What additional insight does this provide compared to a monochrome scatter?`,
+      options: [
+        `It makes the chart look better`,
+        `It reveals whether the hours-GPA relationship differs across majors, or if certain majors cluster differently`,
+        `It adds a third y-axis for the major variable`,
+        `It automatically draws separate regression lines per major`,
+      ],
+      answer: `It reveals whether the hours-GPA relationship differs across majors, or if certain majors cluster differently`,
+      hints: [`Adding a categorical color dimension turns a 2-variable scatter into an effective 3-variable display, revealing group differences without separate plots.`],
+      reviewSection: 'Cell 3 â€” scatter colored by major',
+    },
+    {
+      type: 'choice',
+      question: `The overall mean pass rate horizontal line in cell 4 helps you:`,
+      options: [
+        `See which majors are above and below the overall average in one glance`,
+        `Automatically adjust all bars to the mean`,
+        `Replace the y-axis`,
+        `Compute the p-value for the difference`,
+      ],
+      answer: `See which majors are above and below the overall average in one glance`,
+      hints: [`A reference line (axhline) adds context: it shows the baseline each group is compared against, making differences from the average immediately visible.`],
+      reviewSection: 'Cell 4 â€” reference line for comparison',
+    },
+    {
+      type: 'choice',
+      question: `After EDA, you find that GPA has a strong positive correlation with hours studied AND that CS students study the most. Before concluding "CS major causes higher GPA", you should:`,
+      options: [
+        `Run a larger EDA to confirm`,
+        `Check whether major is a confounding variable â€” CS students may study more AND have higher GPAs for reasons unrelated to major`,
+        `Replace scatter plots with bar charts for clearer visualization`,
+        `Correlation above 0.7 is strong enough to establish causation`,
+      ],
+      answer: `Check whether major is a confounding variable â€” CS students may study more AND have higher GPAs for reasons unrelated to major`,
+      hints: [`Correlation is not causation. A confound is a third variable that affects both the x and y variables, creating an apparent relationship. EDA can identify confounds but cannot eliminate them.`],
+      reviewSection: 'Rigor â€” EDA generates hypotheses, not conclusions',
     },
   ],
 
   misconceptions: [
     {
       falseBelief:
-        "EDA is just a quick look at the data — a few summary statistics and one histogram.",
+        "EDA is just a quick look at the data â€” a few summary statistics and one histogram.",
       whyStudentsThinkIt:
         'Students see EDA as a preliminary step that does not require much work. They want to get to the "real" analysis quickly.',
       correctionExample:
-        "The healthcare analyst example: without EDA, the bimodal distribution in monthly_charges would go unnoticed. The regression model would produce misleading coefficients because it would be trying to fit one line to two distinct subpopulations. The model would appear to fit (reasonable R²) but make systematically wrong predictions for each group. EDA is where the analytical thinking happens.",
+        "The healthcare analyst example: without EDA, the bimodal distribution in monthly_charges would go unnoticed. The regression model would produce misleading coefficients because it would be trying to fit one line to two distinct subpopulations. The model would appear to fit (reasonable RÂ²) but make systematically wrong predictions for each group. EDA is where the analytical thinking happens.",
       contrastCase:
         "EDA on a well-understood, cleaned dataset from a database with enforced constraints can be briefer. If you know the data is clean and well-structured, the EDA still happens but confirms rather than discovers.",
     },
@@ -741,7 +805,7 @@ fig.show()
       whyStudentsThinkIt:
         "Students learn that outliers affect statistics and distort regression. They conclude that removing outliers always improves analysis.",
       correctionExample:
-        "In a customer transaction dataset, a customer who spent $50,000 in one order is an outlier. But this is a real, valuable observation — removing it would make your model blind to high-value customers, exactly the segment the business most wants to understand.",
+        "In a customer transaction dataset, a customer who spent $50,000 in one order is an outlier. But this is a real, valuable observation â€” removing it would make your model blind to high-value customers, exactly the segment the business most wants to understand.",
       contrastCase:
         "A patient age of 150 years is clearly a data entry error and should be removed after documentation. The rule is: outliers from entry errors should be corrected/removed; outliers that represent real extreme observations should be investigated and usually retained (possibly with a flag variable).",
     },
@@ -751,9 +815,9 @@ fig.show()
       whyStudentsThinkIt:
         "EDA tutorials often focus on describe() and histograms. Students miss the bivariate step.",
       correctionExample:
-        'A variable "exam_score" has a perfectly normal-looking histogram. A variable "study_hours" also looks normal. But the scatter plot reveals two clusters: one group of students with low hours and low scores, and another with high hours and high scores — with no students in the middle. This bimodal relationship is completely invisible in the univariate histograms.',
+        'A variable "exam_score" has a perfectly normal-looking histogram. A variable "study_hours" also looks normal. But the scatter plot reveals two clusters: one group of students with low hours and low scores, and another with high hours and high scores â€” with no students in the middle. This bimodal relationship is completely invisible in the univariate histograms.',
       contrastCase:
-        "When two variables are truly independent, univariate analysis captures everything. Bivariate analysis is essential when you expect a relationship — which is almost always the case in applied statistics.",
+        "When two variables are truly independent, univariate analysis captures everything. Bivariate analysis is essential when you expect a relationship â€” which is almost always the case in applied statistics.",
     },
   ],
 
@@ -764,21 +828,21 @@ fig.show()
       competingTechniques: [
         "Run logistic regression directly on all variables",
         "Compute correlation matrix of all numeric variables",
-        "Full EDA: inspect → univariate → bivariate → interpret → document",
+        "Full EDA: inspect â†’ univariate â†’ bivariate â†’ interpret â†’ document",
       ],
       whyThisTechniqueWins:
-        'Full EDA first: correlation matrix would miss that "likes" and "shares" are heavily right-skewed (a few posts get millions). Logistic regression directly would be distorted by extreme outliers. EDA reveals: the distribution shape of each metric, whether viral posts cluster at certain post lengths, whether virality rates differ by platform — each of these findings changes model design (log-transform likes, add platform dummy, remove outliers from certain platforms).',
+        'Full EDA first: correlation matrix would miss that "likes" and "shares" are heavily right-skewed (a few posts get millions). Logistic regression directly would be distorted by extreme outliers. EDA reveals: the distribution shape of each metric, whether viral posts cluster at certain post lengths, whether virality rates differ by platform â€” each of these findings changes model design (log-transform likes, add platform dummy, remove outliers from certain platforms).',
     },
     {
       situation:
-        "A university wants to understand grade distributions across departments. Dataset: student_id, department (12 levels), year (1–4), final_grade (0–100), course_type (required/elective).",
+        "A university wants to understand grade distributions across departments. Dataset: student_id, department (12 levels), year (1â€“4), final_grade (0â€“100), course_type (required/elective).",
       competingTechniques: [
         "Compute mean grade per department and sort",
         "Box plots of final_grade by department",
         "Full EDA including histogram, boxplot by department, boxplot by year, histogram by course_type",
       ],
       whyThisTechniqueWins:
-        "Full EDA: boxplots by department reveal not just means but spread and outliers — one department might have a wide spread (many failing students) while another is tightly clustered around 90. The year dimension might show grade inflation over years (or grade improvement as students mature). Course type splits might reveal that elective courses have higher grades. Mean comparison alone misses all of this structure.",
+        "Full EDA: boxplots by department reveal not just means but spread and outliers â€” one department might have a wide spread (many failing students) while another is tightly clustered around 90. The year dimension might show grade inflation over years (or grade improvement as students mature). Course type splits might reveal that elective courses have higher grades. Mean comparison alone misses all of this structure.",
     },
   ],
 
@@ -789,9 +853,9 @@ fig.show()
       symptom:
         'describe() shows "passed" column mean = 0.666667, dtype float64, but you expected integer counts.',
       whyItHappened:
-        'This is expected and correct: df["passed"].mean() is the pass rate (proportion), not a count. pandas computes the mean of 0/1 values, which is a float between 0 and 1. This is the proportion of students who passed — a useful EDA statistic.',
+        'This is expected and correct: df["passed"].mean() is the pass rate (proportion), not a count. pandas computes the mean of 0/1 values, which is a float between 0 and 1. This is the proportion of students who passed â€” a useful EDA statistic.',
       repairStrategy:
-        'This is not an error — it is meaningful. If you genuinely need only integers and float output seems wrong, check for a mixed-type column (some values were read as strings, converting the column to float). Fix with `df["col"] = pd.to_numeric(df["col"], errors="coerce")` and investigate any coercion failures.',
+        'This is not an error â€” it is meaningful. If you genuinely need only integers and float output seems wrong, check for a mixed-type column (some values were read as strings, converting the column to float). Fix with `df["col"] = pd.to_numeric(df["col"], errors="coerce")` and investigate any coercion failures.',
     },
     {
       commonError:
@@ -799,7 +863,7 @@ fig.show()
       symptom:
         "You call fig.histogram(values=gpa_vals, bins=8) but only one bar appears or the chart looks strange.",
       whyItHappened:
-        "The axes range (xmin/xmax) does not cover the data range. If all GPA values are 2.6–3.9 but your axes go xmin=0, xmax=10, the 8 bins span 0–10 and the narrow data range collapses into 1–2 bins. Or your ymax is too small, cutting off the bars.",
+        "The axes range (xmin/xmax) does not cover the data range. If all GPA values are 2.6â€“3.9 but your axes go xmin=0, xmax=10, the 8 bins span 0â€“10 and the narrow data range collapses into 1â€“2 bins. Or your ymax is too small, cutting off the bars.",
       repairStrategy:
         "Set xmin and xmax to match your data range: `xmin = min(values) - 0.1, xmax = max(values) + 0.1`. Set ymax to accommodate the tallest bar, e.g., `ymax = n/bins * 2` as a rough estimate, then adjust after viewing.",
     },
@@ -807,7 +871,7 @@ fig.show()
 
   mastery: {
     targetLevel:
-      "Apply + Analyze (Level 3–4) — execute a complete EDA on a new dataset including all five stages, correctly choose chart types for all variable-pair combinations, identify data quality issues, and write a plain-language interpretation summary.",
+      "Apply + Analyze (Level 3â€“4) â€” execute a complete EDA on a new dataset including all five stages, correctly choose chart types for all variable-pair combinations, identify data quality issues, and write a plain-language interpretation summary.",
     solveIndependently:
       "Given a new dataset description (column names and types), design a complete EDA plan listing every chart, the chart type, and the expected finding.",
     explainVerbally:

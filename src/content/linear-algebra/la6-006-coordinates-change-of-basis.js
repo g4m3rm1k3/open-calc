@@ -58,6 +58,12 @@ export default {
     ],
     visualizations: [
       {
+        id: 'ChangeOfBasisViz',
+        title: 'Two Grids, One Vector — Draggable Basis Explorer',
+        mathBridge: 'The standard grid is fixed (gray). The B-grid (colored) shows the new basis vectors b₁ and b₂ — drag their tips to reshape it. The purple vector stays fixed in space but its coordinates update in both systems. Key observation: as you squish the B-basis vectors closer together, the B-coordinates grow larger — you need more copies of a small ruler to reach the same point.',
+        caption: 'A vector does not change when you change basis — only its coordinate description changes.',
+      },
+      {
         id: 'OpenMatNotebook',
         title: 'Change-of-Basis Computations',
         mathBridge: 'Compute change-of-basis matrices and verify coordinate conversions.',

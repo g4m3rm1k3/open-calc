@@ -1417,6 +1417,7 @@ function replaceBackslash(expr) {
 export function preprocessLine(line, variables, functionNames = new Set()) {
   let output = stripMatlabComment(line).trim();
   if (!output) return "";
+  if (/^pkg\s+/i.test(output)) return "";
   output = output.replace(/\bnull\s*\(/g, "nullspace(");
   output = output.replace(/^hold\s+on$/i, "hold('on')");
   output = output.replace(/^hold\s+off$/i, "hold('off')");
@@ -1518,6 +1519,137 @@ export const HELP_TEXT = [
   "── Extensions ──",
   "window.OpenMAT.registerExtension(name, { functions, onRun })",
 ].join("\n");
+
+// ── Statistical distribution math helpers ─────────────────────────────────────
+// All internal — prefixed with _ to avoid namespace collision.
+
+function _erf(x) {
+  const t = 1 / (1 + 0.3275911 * Math.abs(x));
+  const y = 1 - t * (0.254829592 + t * (-0.284496736 + t * (1.421413741 + t * (-1.453152027 + t * 1.061405429)))) * Math.exp(-x * x);
+  return x >= 0 ? y : -y;
+}
+
+function _gammaln(x) {
+  if (x <= 0) return Infinity;
+  const c = [76.18009172947146, -86.50532032941677, 24.01409824083091, -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5];
+  let y = x, tmp = x + 5.5;
+  tmp -= (x + 0.5) * Math.log(tmp);
+  let ser = 1.000000000190015;
+  for (let j = 0; j < 6; j++) { y += 1; ser += c[j] / y; }
+  return -tmp + Math.log(2.5066282746310005 * ser / x);
+}
+
+function _gammainc(a, x) {
+  if (x <= 0) return 0;
+  if (x < a + 1) {
+    let term = 1 / a, sum = term;
+    for (let n = 1; n < 300; n++) { term *= x / (a + n); sum += term; if (Math.abs(term) < 1e-14 * Math.abs(sum)) break; }
+    return Math.min(1, sum * Math.exp(-x + a * Math.log(x) - _gammaln(a)));
+  }
+  let b = x + 1 - a, c = 1e300, d = 1 / b, h = d;
+  for (let i = 1; i <= 300; i++) {
+    const an = -i * (i - a);
+    b += 2;
+    d = an * d + b; if (Math.abs(d) < 1e-300) d = 1e-300;
+    c = b + an / c; if (Math.abs(c) < 1e-300) c = 1e-300;
+    d = 1 / d; h *= d * c;
+    if (Math.abs(d * c - 1) < 1e-14) break;
+  }
+  return 1 - Math.min(1, h * Math.exp(-x + a * Math.log(x) - _gammaln(a)));
+}
+
+function _betacf(x, a, b) {
+  const qab = a + b, qap = a + 1, qam = a - 1;
+  let c = 1, d = 1 - qab * x / qap;
+  if (Math.abs(d) < 1e-300) d = 1e-300;
+  d = 1 / d; let h = d;
+  for (let m = 1; m <= 200; m++) {
+    const m2 = 2 * m;
+    let aa = m * (b - m) * x / ((qam + m2) * (a + m2));
+    d = 1 + aa * d; if (Math.abs(d) < 1e-300) d = 1e-300;
+    c = 1 + aa / c; if (Math.abs(c) < 1e-300) c = 1e-300;
+    d = 1 / d; h *= d * c;
+    aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2));
+    d = 1 + aa * d; if (Math.abs(d) < 1e-300) d = 1e-300;
+    c = 1 + aa / c; if (Math.abs(c) < 1e-300) c = 1e-300;
+    d = 1 / d; const del = d * c; h *= del;
+    if (Math.abs(del - 1) < 3e-7) break;
+  }
+  return h;
+}
+
+function _betainc(x, a, b) {
+  if (x <= 0) return 0;
+  if (x >= 1) return 1;
+  const lbeta = _gammaln(a) + _gammaln(b) - _gammaln(a + b);
+  const bt = Math.exp(a * Math.log(x) + b * Math.log(1 - x) - lbeta);
+  return x < (a + 1) / (a + b + 2) ? bt * _betacf(x, a, b) / a : 1 - bt * _betacf(1 - x, b, a) / b;
+}
+
+function _norminvScalar(p) {
+  if (p <= 0) return -Infinity;
+  if (p >= 1) return Infinity;
+  const a = [-3.969683028665376e+01,2.209460984245205e+02,-2.759285104469687e+02,1.383577518672690e+02,-3.066479806614716e+01,2.506628277459239e+00];
+  const b = [-5.447609879822406e+01,1.615858368580409e+02,-1.556989798598866e+02,6.680131188771972e+01,-1.328068155288572e+01];
+  const c = [-7.784894002430293e-03,-3.223964580411365e-01,-2.400758277161838e+00,-2.549732539343734e+00,4.374664141464968e+00,2.938163982698783e+00];
+  const d = [7.784695709041462e-03,3.224671290700398e-01,2.445134137142996e+00,3.754408661907416e+00];
+  const plo = 0.02425, phi = 1 - plo;
+  let q, r;
+  if (p < plo) { q = Math.sqrt(-2 * Math.log(p)); return (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1); }
+  if (p <= phi) { q = p - 0.5; r = q*q; return (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q / (((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1); }
+  q = Math.sqrt(-2 * Math.log(1 - p));
+  return -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+}
+
+function _tcdfScalar(t, df) {
+  const x = df / (df + t * t);
+  const ib = _betainc(x, df / 2, 0.5);
+  return t >= 0 ? 1 - ib / 2 : ib / 2;
+}
+
+function _tpdfScalar(t, df) {
+  return Math.exp(_gammaln((df+1)/2) - _gammaln(df/2) - 0.5*Math.log(df*Math.PI) - (df+1)/2*Math.log(1+t*t/df));
+}
+
+function _tinvScalar(p, df) {
+  if (p <= 0) return -Infinity;
+  if (p >= 1) return Infinity;
+  let t = _norminvScalar(p);
+  for (let i = 0; i < 80; i++) {
+    const ft = _tcdfScalar(t, df) - p;
+    if (Math.abs(ft) < 1e-12) break;
+    const fpdf = _tpdfScalar(t, df);
+    if (fpdf < 1e-300) break;
+    t -= ft / fpdf;
+  }
+  return t;
+}
+
+function _chi2cdfScalar(x, df) { return x <= 0 ? 0 : _gammainc(df / 2, x / 2); }
+
+function _chi2pdfScalar(x, df) {
+  if (x <= 0) return 0;
+  return Math.exp((df/2-1)*Math.log(x) - x/2 - _gammaln(df/2) - df/2*Math.log(2));
+}
+
+function _chi2invScalar(p, df) {
+  if (p <= 0) return 0;
+  if (p >= 1) return Infinity;
+  const h = 2/(9*df), z = _norminvScalar(p);
+  let x = Math.max(1e-6, df * Math.pow(Math.max(0, 1 - h + z * Math.sqrt(h)), 3));
+  for (let i = 0; i < 80; i++) {
+    const fx = _chi2cdfScalar(x, df) - p;
+    if (Math.abs(fx) < 1e-12) break;
+    const fpdf = _chi2pdfScalar(x, df);
+    if (fpdf < 1e-300) break;
+    x = Math.max(1e-10, x - fx / fpdf);
+  }
+  return x;
+}
+
+function _ewDistrib(fn) {
+  return (v, ...params) => isCollection(v) ? mapDeep(v, (x) => fn(Number(x), ...params.map(Number))) : fn(Number(v), ...params.map(Number));
+}
 
 // ── Execution engine ──────────────────────────────────────────────────────────
 
@@ -2102,6 +2234,170 @@ export function createExecutionEngine(options = {}) {
   parser.set("drawnow",   () => null);
   parser.set("print",     () => null);
   parser.set("saveas",    () => null);
+  parser.set("yline", (yVal) => {
+    const y = Number(yVal);
+    plotState.series.push({ kind: "plot", x: [-1e9, 1e9], y: [y, y], label: null });
+    return y;
+  });
+  parser.set("xline", (xVal) => {
+    const x = Number(xVal);
+    plotState.series.push({ kind: "plot", x: [x, x], y: [-1e9, 1e9], label: null });
+    return x;
+  });
+
+  // ── Statistical distributions ────────────────────────────────────────────────
+  parser.set("normcdf",  (x, mu = 0, sigma = 1) => _ewDistrib((xv, m, s) => 0.5 * (1 + _erf((xv - m) / (s * Math.SQRT2))))(x, mu, sigma));
+  parser.set("normpdf",  (x, mu = 0, sigma = 1) => _ewDistrib((xv, m, s) => { const z = (xv - m) / s; return Math.exp(-0.5*z*z) / (s * Math.sqrt(2*Math.PI)); })(x, mu, sigma));
+  parser.set("norminv",  (p, mu = 0, sigma = 1) => _ewDistrib((pv, m, s) => _norminvScalar(pv) * s + m)(p, mu, sigma));
+  parser.set("tcdf",     (t, df) => _ewDistrib(_tcdfScalar)(t, df));
+  parser.set("tpdf",     (t, df) => _ewDistrib(_tpdfScalar)(t, df));
+  parser.set("tinv",     (p, df) => _ewDistrib(_tinvScalar)(p, df));
+  parser.set("chi2cdf",  (x, df) => _ewDistrib(_chi2cdfScalar)(x, df));
+  parser.set("chi2pdf",  (x, df) => _ewDistrib(_chi2pdfScalar)(x, df));
+  parser.set("chi2inv",  (p, df) => _ewDistrib(_chi2invScalar)(p, df));
+  parser.set("poisspdf", (k, lam) => _ewDistrib((kv, l) => { const ki = Math.round(kv); if (ki < 0 || l < 0) return 0; if (l === 0) return ki === 0 ? 1 : 0; return Math.exp(ki * Math.log(l) - l - _gammaln(ki + 1)); })(k, lam));
+  parser.set("poisscdf", (k, lam) => _ewDistrib((kv, l) => { let s = 0; for (let i = 0; i <= Math.floor(kv); i++) s += (l === 0 ? (i === 0 ? 1 : 0) : Math.exp(i * Math.log(l) - l - _gammaln(i + 1))); return s; })(k, lam));
+  parser.set("binopdf",  (k, n, p) => _ewDistrib((kv, nn, pp) => { const ki = Math.round(kv); if (ki < 0 || ki > nn) return 0; if (pp === 0) return ki === 0 ? 1 : 0; if (pp === 1) return ki === nn ? 1 : 0; return Math.exp(_gammaln(nn+1) - _gammaln(ki+1) - _gammaln(nn-ki+1) + ki*Math.log(pp) + (nn-ki)*Math.log(1-pp)); })(k, n, p));
+  parser.set("binocdf",  (k, n, p) => _ewDistrib((kv, nn, pp) => { const kf = Math.floor(kv); if (kf < 0) return 0; if (kf >= nn) return 1; let s = 0; for (let i = 0; i <= kf; i++) { if (pp === 0) { s += i === 0 ? 1 : 0; } else if (pp === 1) { s += i === nn ? 1 : 0; } else s += Math.exp(_gammaln(nn+1) - _gammaln(i+1) - _gammaln(nn-i+1) + i*Math.log(pp) + (nn-i)*Math.log(1-pp)); } return s; })(k, n, p));
+  parser.set("fcdf",     (x, df1, df2) => _ewDistrib((xv, d1, d2) => { if (xv <= 0) return 0; return _betainc(d1*xv/(d1*xv+d2), d1/2, d2/2); })(x, df1, df2));
+  parser.set("fpdf",     (x, df1, df2) => _ewDistrib((xv, d1, d2) => { if (xv <= 0) return 0; return Math.exp(_gammaln((d1+d2)/2)-_gammaln(d1/2)-_gammaln(d2/2)+(d1/2-1)*Math.log(xv)+(d1/2)*Math.log(d1/d2)-((d1+d2)/2)*Math.log(1+d1*xv/d2)); })(x, df1, df2));
+  parser.set("finv",     (p, df1, df2) => _ewDistrib((pv, d1, d2) => {
+    if (pv <= 0) return 0; if (pv >= 1) return Infinity;
+    const fcdf = (xv) => xv <= 0 ? 0 : _betainc(d1*xv/(d1*xv+d2), d1/2, d2/2);
+    const fpdf = (xv) => xv <= 0 ? 0 : Math.exp(_gammaln((d1+d2)/2)-_gammaln(d1/2)-_gammaln(d2/2)+(d1/2-1)*Math.log(xv)+(d1/2)*Math.log(d1/d2)-((d1+d2)/2)*Math.log(1+d1*xv/d2));
+    let x = Math.max(1e-6, d1 / Math.max(1, d2));
+    for (let i = 0; i < 80; i++) { const fx = fcdf(x) - pv; if (Math.abs(fx) < 1e-12) break; const fd = fpdf(x); if (fd < 1e-300) break; x = Math.max(1e-10, x - fx/fd); }
+    return x;
+  })(p, df1, df2));
+  parser.set("gammaln",  (x) => _ewDistrib(_gammaln)(x));
+  parser.set("betainc",  (x, a, b) => _ewDistrib(_betainc)(x, a, b));
+  parser.set("gammainc", (x, a) => _ewDistrib((xv, av) => _gammainc(av, xv))(x, a));
+
+  // ── Sampling ─────────────────────────────────────────────────────────────────
+  parser.set("randsample", (population, n, replacement) => {
+    const pp = toPlain(population);
+    const popArr = typeof pp === "number" ? Array.from({ length: Math.round(pp) }, (_, i) => i + 1) : normalizeVector(population);
+    const count = Math.round(Number(n));
+    const withRepl = replacement === true || Number(replacement) === 1;
+    if (withRepl) return Array.from({ length: count }, () => popArr[Math.floor(Math.random() * popArr.length)]);
+    const arr = [...popArr];
+    const result = [];
+    for (let i = 0; i < count && arr.length > 0; i++) result.push(arr.splice(Math.floor(Math.random() * arr.length), 1)[0]);
+    return result;
+  });
+  parser.set("datasample", (data, n, replacement) => parser.get("randsample")(data, n, replacement));
+
+  // ── Regression ───────────────────────────────────────────────────────────────
+  parser.set("regress", (y, X) => {
+    const yv = normalizeVector(y);
+    const n = yv.length;
+    const Xm = toNumericMatrix(X);
+    const p = Xm[0].length;
+    const Xt = toPlain(math.transpose(Xm));
+    const XtX = toPlain(math.multiply(Xt, Xm));
+    const XtXinv = toPlain(math.inv(XtX));
+    const b = normalizeVector(toPlain(math.multiply(math.multiply(XtXinv, Xt), yv)));
+    const yhat = Xm.map(row => row.reduce((s, xi, i) => s + xi * b[i], 0));
+    const r = yv.map((yi, i) => yi - yhat[i]);
+    const df = n - p;
+    const sse = r.reduce((s, ri) => s + ri * ri, 0);
+    const s2 = sse / df;
+    const ymean = statMean(yv);
+    const sst = yv.reduce((s, yi) => s + (yi - ymean) ** 2, 0);
+    const R2 = 1 - sse / sst;
+    const F = ((sst - sse) / (p - 1)) / s2;
+    const fp = 1 - _betainc(F*(p-1)/(F*(p-1)+df), (p-1)/2, df/2);
+    const XtXinvDiag = normalizeVector(toPlain(math.diag(XtXinv)));
+    const se_b = XtXinvDiag.map(v => Math.sqrt(Math.abs(s2 * v)));
+    const tcrit = _tinvScalar(0.975, df);
+    const bint = b.map((bi, i) => [bi - tcrit * se_b[i], bi + tcrit * se_b[i]]);
+    const rint = r.map(ri => [ri - 2 * Math.sqrt(s2), ri + 2 * Math.sqrt(s2)]);
+    const stats = [R2, F, fp, s2];
+    return { __multi: [b, bint, r, rint, stats], b, bint, r, rint, stats };
+  });
+  parser.set("fitlm", (x, y) => {
+    const yv = normalizeVector(y);
+    const n = yv.length;
+    const xp = toPlain(x);
+    const X = isMatrix(xp) ? toNumericMatrix(x).map(row => [1, ...row]) : normalizeVector(x).map(xi => [1, xi]);
+    const p = X[0].length;
+    // Pure-JS OLS — avoids MathJS matrix/array dimension edge cases
+    // Xt: p×n
+    const Xt = Array.from({length: p}, (_, i) => X.map(row => row[i]));
+    // XtX: p×p
+    const XtX = Array.from({length: p}, (_, i) =>
+      Array.from({length: p}, (_, j) => X.reduce((s, row) => s + row[i] * row[j], 0)));
+    // XtXinv: p×p
+    const XtXinv = toPlain(math.inv(XtX));
+    // Xty = Xt × yv (p,)
+    const Xty = Array.from({length: p}, (_, i) => X.reduce((s, row, k) => s + row[i] * yv[k], 0));
+    // b = XtXinv × Xty (p,)
+    const b = XtXinv.map(row => row.reduce((s, v, k) => s + v * Xty[k], 0));
+    const yhat = X.map(row => row.reduce((s, xi, i) => s + xi * b[i], 0));
+    const residuals = yv.map((yi, i) => yi - yhat[i]);
+    const df = n - p;
+    const sse = residuals.reduce((s, ri) => s + ri * ri, 0);
+    const s2 = sse / df;
+    const ymean = statMean(yv);
+    const sst = yv.reduce((s, yi) => s + (yi - ymean) ** 2, 0);
+    const R2 = 1 - sse / sst;
+    const R2adj = 1 - (1 - R2) * (n - 1) / df;
+    const F = (sst - sse) / (p - 1) / s2;
+    // SE from diagonal of XtXinv
+    const se = XtXinv.map((row, i) => Math.sqrt(Math.abs(s2 * row[i])));
+    const tStats = b.map((bi, i) => bi / se[i]);
+    const pValues = tStats.map(t => 2 * (1 - _tcdfScalar(Math.abs(t), df)));
+    const names = ['(Intercept)', ...Array.from({ length: p-1 }, (_, i) => `x${i+1}`)];
+    const hdr = `  ${'Name'.padEnd(16)} ${'Estimate'.padStart(12)}  ${'SE'.padStart(12)}  ${'tStat'.padStart(8)}  ${'pValue'.padStart(8)}`;
+    const rows = b.map((bi, i) => `  ${names[i].padEnd(16)} ${bi.toFixed(6).padStart(12)}  ${se[i].toFixed(6).padStart(12)}  ${tStats[i].toFixed(4).padStart(8)}  ${pValues[i].toFixed(4).padStart(8)}`);
+    const Fpval = 1 - _betainc(F*(p-1)/(F*(p-1)+Math.max(1,df)), (p-1)/2, df/2);
+    const summary = [`Linear regression model`, ``, `Coefficients:`, hdr, `  ${'-'.repeat(64)}`, ...rows, ``, `R-squared: ${R2.toFixed(6)},  Adjusted R-squared: ${R2adj.toFixed(6)}`, `F-statistic: ${F.toFixed(4)},  p-value: ${Fpval.toFixed(4)}`].join('\n');
+    logs.push(summary);
+    return {
+      Coefficients: { Estimate: b, SE: se, tStat: tStats, pValue: pValues },
+      Fitted: yhat, Residuals: residuals,
+      R2, R2adj, MSE: s2, df,
+      Rsquared: { Ordinary: R2, Adjusted: R2adj },
+      DFE: df, NumCoefficients: p,
+      ModelFitVsNullModel: { Fstat: F, Pvalue: Fpval },
+    };
+  });
+
+  // pkg: no-op (all pkg lines are already stripped in preprocessLine, but register as fallback)
+  parser.set("pkg", () => null);
+
+  // corr: Pearson correlation between two vectors
+  parser.set("corr", (x, y) => {
+    const xv = normalizeVector(x), yv2 = normalizeVector(y);
+    const mx = statMean(xv), my = statMean(yv2);
+    const num = xv.reduce((s, xi, i) => s + (xi - mx) * (yv2[i] - my), 0);
+    const den = Math.sqrt(
+      xv.reduce((s, xi) => s + (xi - mx) ** 2, 0) *
+      yv2.reduce((s, yi) => s + (yi - my) ** 2, 0));
+    return den === 0 ? 0 : num / den;
+  });
+
+  // table: create a simple column-store object (Var1, Var2, ...)
+  parser.set("table", (...cols) => {
+    const out = {};
+    cols.forEach((col, i) => { out[`Var${i + 1}`] = normalizeVector(col); });
+    return out;
+  });
+
+  // plotResiduals: stub — renders residuals vs fitted or normal Q-Q
+  parser.set("plotResiduals", (lm, type) => {
+    const fitted = normalizeVector(lm.Fitted);
+    const res = normalizeVector(lm.Residuals);
+    if (String(type) === 'fitted') {
+      registerPlot("scatter", fitted, res);
+    } else {
+      const n_r = res.length;
+      const sorted = [...res].sort((a, b) => a - b);
+      const zvals = sorted.map((_, i) => _norminvScalar((i + 0.5) / n_r));
+      registerPlot("scatter", zvals, sorted);
+    }
+    return null;
+  });
 
   // ── Numerical methods ───────────────────────────────────────────────────────
   // ode45: RK4 fixed-step solver

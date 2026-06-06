@@ -1,4 +1,4 @@
-﻿export default {
+export default {
   // ── Identity ───────────────────────────────────────────────────
   id: 'la2-001',
   slug: 'matrices-as-transformations',
@@ -67,6 +67,12 @@
       },
     ],
     visualizations: [
+      {
+        id: 'MatrixTransformViz',
+        title: 'Live Grid Deformation — Edit Any 2×2 Matrix',
+        mathBridge: 'Edit the four entries a, b, c, d and watch the entire grid deform in real time. The red arrow shows where î lands (first column) and green shows where ĵ lands (second column). Use the t-slider to animate the transformation smoothly from identity to your matrix. Presets include Shear, Rotate 45°, Reflect X, and Singular (det=0).',
+        caption: 'Every matrix entry you change instantly reshapes the grid — making the column-as-destination rule visceral and immediate.',
+      },
       {
         id: 'LALesson04_Matrices',
         title: 'Warping the Grid — Interactive',

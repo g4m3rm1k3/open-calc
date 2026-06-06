@@ -86,10 +86,10 @@ export default {
         caption: 'Compare the PMF heights (individual probabilities) against the CDF steps (cumulative probabilities). The CDF jump at each point equals the PMF bar height at that point.',
       },
       {
-        id: 'ExpectedValueCenterOfMass',
-        title: 'Expected Value as Center of Mass',
-        mathBridge: 'Imagine placing physical weights at each possible value $x$, with weight proportional to $P(X=x)$. The point where the number line balances is exactly $E[X] = \\sum x P(X=x)$. This physical interpretation makes clear why $E[X]$ need not equal any actual outcome — the balance point of a see-saw need not coincide with any weight.',
-        caption: 'Drag the probability weights to see how the balance point (expected value) shifts.',
+        id: 'CardDiceLab',
+        title: 'Simulate Rolling a Die — See Expected Value Emerge',
+        mathBridge: 'Run many trials and watch the running average converge to $E[X] = 3.5$. This is the Law of Large Numbers in action: for large $n$, the sample mean $\\bar{X}$ gets arbitrarily close to $E[X]$. The histogram of outcomes should approach the flat PMF of a fair die.',
+        caption: 'Compare your simulated average against the theoretical expected value after 100, 1000, and 10000 rolls.',
       },
     ],
   },
@@ -260,17 +260,17 @@ Var_one = E2_one - E_one**2
 print("=== Single Policy ===")
 print(f"  Outcomes: {profit_values}")
 print(f"  Probs:    {profit_probs}")
-print(f"  E[profit per policy] = ${E_one:.2f}")
-print(f"  SD[profit per policy] = ${np.sqrt(Var_one):.2f}")
+print(f"  E[profit per policy] = \${E_one:.2f}")
+print(f"  SD[profit per policy] = \${np.sqrt(Var_one):.2f}")
 print()
 
 # Linearity: expected total profit from n policies
 n_policies = 10_000
 E_total = n_policies * E_one
 print(f"=== Portfolio of {n_policies:,} Policies ===")
-print(f"  E[total profit] = {n_policies} × ${E_one:.2f} = ${E_total:,.2f}")
+print(f"  E[total profit] = {n_policies} × \${E_one:.2f} = \${E_total:,.2f}")
 break_even_premium = payout * p_claim
-print(f"  Break-even premium = ${break_even_premium:.2f} (before operating costs)")
+print(f"  Break-even premium = \${break_even_premium:.2f} (before operating costs)")
 
 # Simulate total profit distribution
 np.random.seed(0)
@@ -664,6 +664,33 @@ rng(42);
     },
   ],
 
+  definitions: [
+    {
+      term: "random variable",
+      definition: "A function that assigns a real number to each outcome in a sample space. Discrete random variables have a finite or countably infinite set of possible values.",
+    },
+    {
+      term: "probability mass function (PMF)",
+      definition: "A complete description of a discrete random variable listing each possible value x and its probability P(X=x). Must satisfy: all probabilities ≥ 0 and sum = 1.",
+    },
+    {
+      term: "expected value E[X]",
+      definition: "The long-run average of a random variable over many repetitions: E[X] = Σ x·P(X=x). Also called the mean of the distribution. Not necessarily a possible outcome (e.g., E[die roll] = 3.5).",
+    },
+    {
+      term: "variance Var(X)",
+      definition: "The average squared distance from the mean: Var(X) = E[(X−μ)²] = E[X²] − (E[X])². Measures how spread out the distribution is. Always ≥ 0.",
+    },
+    {
+      term: "linearity of expectation",
+      definition: "E[aX+b] = aE[X]+b and E[X+Y] = E[X]+E[Y] unconditionally — no independence required. One of the most powerful tools in probability.",
+    },
+    {
+      term: "cumulative distribution function (CDF)",
+      definition: "F(a) = P(X ≤ a): the accumulated probability up to and including a. Non-decreasing, starts at 0, ends at 1. For ranges: P(a < X ≤ b) = F(b) − F(a).",
+    },
+  ],
+
   // ── Semantic Layer ─────────────────────────────────────────────
   semantics: {
     core: [
@@ -794,6 +821,54 @@ rng(42);
       answer: 'E[Y] = −1, Var(Y) = 16',
       hints: ['E[−2X+5] = −2E[X]+5 = −6+5 = −1. Var(−2X+5) = (−2)²Var(X) = 4·4 = 16.'],
       reviewSection: 'Math → Linearity rules for E and Var',
+    },
+    {
+      id: 'stat5-001-q7',
+      type: 'choice',
+      text: 'PMF: $P(X=1)=0.2$, $P(X=3)=0.3$, $P(X=5)=0.5$. Using the shortcut, what is $\\text{Var}(X)$?',
+      options: ['2.44', '1.56', '3.6', '15.4'],
+      answer: '2.44',
+      hints: [
+        'E[X] = 0.2(1)+0.3(3)+0.5(5) = 0.2+0.9+2.5 = 3.6.',
+        'E[X²] = 0.2(1)+0.3(9)+0.5(25) = 0.2+2.7+12.5 = 15.4. Var = 15.4 − 3.6² = 15.4 − 12.96 = 2.44.',
+      ],
+      reviewSection: 'Intuition → Variance measures spread around the mean',
+    },
+    {
+      id: 'stat5-001-q8',
+      type: 'choice',
+      text: 'PMF: $P(X=0)=0.4$, $P(X=1)=0.4$, $P(X=2)=0.2$. What is $P(1 \\leq X \\leq 2)$?',
+      options: ['0.4', '0.6', '0.2', '0.8'],
+      answer: '0.6',
+      hints: [
+        'P(1 ≤ X ≤ 2) = P(X=1) + P(X=2).',
+        '0.4 + 0.2 = 0.6.',
+      ],
+      reviewSection: 'Callout → CDF vs PMF',
+    },
+    {
+      id: 'stat5-001-q9',
+      type: 'choice',
+      text: '$X$ and $Y$ are independent with $E[X]=3$, $E[Y]=5$, $\\text{Var}(X)=2$, $\\text{Var}(Y)=3$. What is $\\text{Var}(X+Y)$?',
+      options: ['5', '8', '15', '√5'],
+      answer: '5',
+      hints: [
+        'For independent random variables: Var(X+Y) = Var(X) + Var(Y).',
+        '2 + 3 = 5. Independence means Cov(X,Y) = 0, so no cross term.',
+      ],
+      reviewSection: 'Warning callout → Var(X+Y) ≠ Var(X)+Var(Y) in general',
+    },
+    {
+      id: 'stat5-001-q10',
+      type: 'choice',
+      text: 'PMF: $P(X=0)=0.1$, $P(X=1)=0.2$, $P(X=2)=0.3$, $P(X=3)=0.4$. What is $F(3) = P(X \\leq 3)$?',
+      options: ['0.4', '0.6', '0.7', '1.0'],
+      answer: '1.0',
+      hints: [
+        'F(3) = P(X=0)+P(X=1)+P(X=2)+P(X=3) = 0.1+0.2+0.3+0.4.',
+        '0.1+0.2+0.3+0.4 = 1.0. The CDF at the maximum value always equals 1.',
+      ],
+      reviewSection: 'Callout → CDF vs PMF: Two Ways to Describe a Distribution',
     },
   ],
 

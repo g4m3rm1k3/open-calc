@@ -60,6 +60,16 @@ export const GAMES = [
     cover: { grad: 'from-violet-700 via-indigo-800 to-blue-900', mark: 'v→', sub: '10 Waves' },
   },
   {
+    key: 'vector-command',
+    label: 'Vector Command 3D',
+    emoji: '🚀',
+    color: 'cyan',
+    desc: 'Full 3D mission campaign: use RREF, Cross Products, and Integrals to intercept targets.',
+    path: '/vector-command',
+    tags: ['Linear Algebra', '3D', 'Calculus'],
+    cover: { grad: 'from-cyan-700 via-blue-800 to-indigo-900', mark: 'R³', sub: '3D Missions' },
+  },
+  {
     key: 'arkanoid',
     label: 'Arkanoid Learn',
     emoji: '🎮',

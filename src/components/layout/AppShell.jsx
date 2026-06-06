@@ -613,6 +613,7 @@ export default function AppShell({ children }) {
   const isStemQuestRoute = location.pathname.startsWith("/stem-quest");
   const isDocsRoute = location.pathname.startsWith("/docs");
   const isAsteroidsRoute = location.pathname.startsWith("/asteroids-la");
+  const isVectorCommandRoute = location.pathname.startsWith("/vector-command");
   const isStemTetrisRoute = location.pathname.startsWith("/stem-tetris");
   const isCardAcademyRoute = location.pathname.startsWith("/card-academy");
   const isCardQuestRoute = location.pathname.startsWith("/card-quest");
@@ -781,6 +782,7 @@ export default function AppShell({ children }) {
     isStemQuestRoute ||
     isDocsRoute ||
     isAsteroidsRoute ||
+    isVectorCommandRoute ||
     isStemTetrisRoute ||
     isCardAcademyRoute ||
     isCardQuestRoute ||
@@ -800,7 +802,7 @@ export default function AppShell({ children }) {
     return (
       <GrapherContext.Provider value={{ openGrapher }}>
         <div
-          className={`h-screen overflow-hidden ${isArkanoidLearnRoute || isRealityRunnerRoute || isCadProRoute || isOpenCraftRoute || isStemQuestRoute || isAsteroidsRoute || isStemTetrisRoute || isCardAcademyRoute || isCardQuestRoute || isRubiksCubeRoute || isMatrixGameRoute || isRobotArmLabRoute || isSimLabRoute || isDroneLabRoute || isMatrixLabRoute || isMatrix3DLabRoute || isDecompLabRoute || isCmmLabRoute || isFiveAxisRoute || isDSAArraysLabRoute || isDSALinkedListsLabRoute ? "bg-[#08111f]" : "bg-white dark:bg-slate-950"}`}
+          className={`h-screen overflow-hidden ${isArkanoidLearnRoute || isRealityRunnerRoute || isCadProRoute || isOpenCraftRoute || isStemQuestRoute || isAsteroidsRoute || isVectorCommandRoute || isStemTetrisRoute || isCardAcademyRoute || isCardQuestRoute || isRubiksCubeRoute || isMatrixGameRoute || isRobotArmLabRoute || isSimLabRoute || isDroneLabRoute || isMatrixLabRoute || isMatrix3DLabRoute || isDecompLabRoute || isCmmLabRoute || isFiveAxisRoute || isDSAArraysLabRoute || isDSALinkedListsLabRoute ? "bg-[#08111f]" : "bg-white dark:bg-slate-950"}`}
         >
           <div className="h-full w-full overflow-hidden">
             {children ?? <Outlet />}

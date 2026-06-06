@@ -17,7 +17,7 @@ export default {
   hook: {
     question: 'A factory produces 10,000 microchips per day, each with a 2% defect rate. How many defective chips should the quality engineer expect today — and how unusual would it be to see more than 250 defectives?',
     realWorldContext: 'The binomial distribution is the workhorse of quality control, clinical trials, and digital marketing. When Pfizer runs a Phase III vaccine trial with 40,000 participants and 95% efficacy, statisticians use the binomial distribution to determine how many infections are "expected" in the placebo group and whether the observed count is unusual. When Google runs an A/B test showing a new button to 50,000 users with a baseline 3% click-through rate, the number of clicks follows a binomial distribution — which tells the engineering team whether a measured improvement is statistically real or just random variation. In CNC manufacturing, each part either passes or fails inspection: Binomial(n, p) models the number of failed parts per batch, powering the control charts on every factory floor. Understanding the binomial is the gateway to hypothesis testing, confidence intervals, and logistic regression.',
-    previewVisualizationId: 'BinomialPMFViz',
+    previewVisualizationId: 'BinomialDistributionViz',
   },
 
   // ── Intuition ──────────────────────────────────────────────────
@@ -82,16 +82,10 @@ export default {
     ],
     visualizations: [
       {
-        id: 'BinomialPMFViz',
+        id: 'BinomialDistributionViz',
         title: 'Binomial PMF — Effect of n and p',
-        mathBridge: 'Two sliders control $n$ (number of trials) and $p$ (success probability). Watch how the PMF bar chart shifts and spreads. When $p = 0.5$, the distribution is symmetric. As $p \\to 0$ or $p \\to 1$, it becomes skewed. As $n$ increases (with fixed $p$), the distribution spreads but its SHAPE approaches the bell curve — this is the Central Limit Theorem appearing in real time.',
-        caption: 'Drag the p slider toward 0 or 1 to see skewness. Increase n to watch the bell curve emerge.',
-      },
-      {
-        id: 'NormalApproximationViz',
-        title: 'Normal Approximation to the Binomial',
-        mathBridge: 'When $np \\geq 5$ and $n(1-p) \\geq 5$, the binomial bars are closely approximated by the normal bell curve $N(np, np(1-p))$. The visualization overlays the normal PDF on the binomial PMF. The approximation fails for small $n$ or extreme $p$ — making the mismatch visible.',
-        caption: 'The normal curve fits the binomial bars when both np≥5 and n(1-p)≥5.',
+        mathBridge: 'Two sliders control $n$ (number of trials) and $p$ (success probability). Watch how the PMF bar chart shifts and spreads. When $p = 0.5$, the distribution is symmetric. As $p \\to 0$ or $p \\to 1$, it becomes skewed. As $n$ increases (with fixed $p$), the distribution spreads but its SHAPE approaches the bell curve — this is the Central Limit Theorem appearing in real time. Toggle "Show normal approximation" to overlay $N(np, np(1-p))$: the approximation is only valid when $np \\geq 5$ AND $n(1-p) \\geq 5$.',
+        caption: 'Drag p toward 0 or 1 to see skewness. Increase n and toggle the normal overlay to watch the bell curve emerge.',
       },
     ],
   },
@@ -301,7 +295,8 @@ observed = 35
                 '`binocdf(k, n, p)` computes the CDF $P(X \\leq k)$. The theoretical mean $np$ and variance $np(1-p)$ are computed explicitly as scalars here rather than calling a distribution object.',
                 'The `bar` function plots the PMF. Setting the bar width to 0.6 and using `FaceColor` with an RGB triplet matches the blue aesthetic. The vertical red line at `mu` marks the expected value.',
               ],
-              code: `% Binomial PMF and statistics
+              code: `pkg load statistics
+% Binomial PMF and statistics
 n = 20; p = 0.3;
 k_vals = 0:n;
 pmf_vals = binopdf(k_vals, n, p);
@@ -621,6 +616,33 @@ observed = 135;
     },
   ],
 
+  definitions: [
+    {
+      term: "Bernoulli trial",
+      definition: "A single random experiment with exactly two outcomes: success (probability p) or failure (probability 1−p). The building block of the binomial distribution.",
+    },
+    {
+      term: "binomial distribution",
+      definition: "The distribution of the number of successes X in n independent Bernoulli trials each with success probability p. Notation: X ~ Binomial(n, p). E[X] = np, Var(X) = np(1−p).",
+    },
+    {
+      term: "BINS conditions",
+      definition: "Four conditions required for a Binomial model: (B)inary outcomes, (I)ndependence of trials, (N)umber of trials fixed in advance, (S)ame success probability on every trial. All four must hold.",
+    },
+    {
+      term: "combinations C(n,k)",
+      definition: "The number of ways to choose k items from n without regard to order: C(n,k) = n! / (k!(n−k)!). Used in the binomial PMF to count how many arrangements lead to k successes.",
+    },
+    {
+      term: "normal approximation to binomial",
+      definition: "When np ≥ 5 and n(1−p) ≥ 5, Binomial(n,p) ≈ N(np, np(1−p)). Allows using z-scores and the standard normal table for binomial probability calculations when n is large.",
+    },
+    {
+      term: "Bernoulli random variable",
+      definition: "A special case of the binomial with n=1: takes value 1 (success) with probability p and 0 (failure) with probability 1−p. E[X]=p, Var(X)=p(1−p).",
+    },
+  ],
+
   // ── Semantic Layer ─────────────────────────────────────────────
   semantics: {
     core: [
@@ -754,6 +776,69 @@ observed = 135;
       answer: 'Binomial(m+n, p)',
       hints: ['X+Y is the sum of m+n independent Bernoulli(p) variables. Same p is required!'],
       reviewSection: 'Rigor → Additive property of binomials',
+    },
+    {
+      id: 'stat5-002-q7',
+      type: 'choice',
+      text: '30% of customers redeem a coupon. In a group of 20 customers, what are $E[X]$ and $\\text{SD}(X)$?',
+      options: [
+        'E[X]=6, SD≈2.05',
+        'E[X]=6, SD=4.2',
+        'E[X]=14, SD≈2.05',
+        'E[X]=0.3, SD=0.7',
+      ],
+      answer: 'E[X]=6, SD≈2.05',
+      hints: [
+        'E[X] = np = 20×0.3 = 6. Var(X) = np(1−p) = 20×0.3×0.7 = 4.2.',
+        'SD = √4.2 ≈ 2.05.',
+      ],
+      reviewSection: 'Intuition → E[X]=np and Var(X)=np(1−p)',
+    },
+    {
+      id: 'stat5-002-q8',
+      type: 'choice',
+      text: 'For $X \\sim \\text{Binomial}(10, 0.4)$, compute $P(X=2)$ using $\\binom{10}{2}(0.4)^2(0.6)^8$.',
+      options: ['0.121', '0.160', '0.040', '0.288'],
+      answer: '0.121',
+      hints: [
+        'C(10,2) = 45. (0.4)² = 0.16. (0.6)⁸ ≈ 0.01680.',
+        '45 × 0.16 × 0.01680 ≈ 0.121.',
+      ],
+      reviewSection: 'Procedure: Using the Binomial PMF',
+    },
+    {
+      id: 'stat5-002-q9',
+      type: 'choice',
+      text: 'Which situation violates the BINS Independence condition and requires a different distribution?',
+      options: [
+        'Rolling a die 10 times and counting sixes',
+        'Sampling 5 cards from a 10-card deck without replacement',
+        'Counting defective parts in 100 trials with 2% defect rate',
+        'Testing 50 patients, each independently responding to a drug',
+      ],
+      answer: 'Sampling 5 cards from a 10-card deck without replacement',
+      hints: [
+        'Sampling without replacement from a small population makes trials dependent.',
+        'Use the hypergeometric distribution when sampling without replacement from a finite population.',
+      ],
+      reviewSection: 'Strategy callout — Recognizing When NOT to Use Binomial',
+    },
+    {
+      id: 'stat5-002-q10',
+      type: 'choice',
+      text: 'For $\\text{Binomial}(100, 0.04)$, is the normal approximation valid? If not, what should be used?',
+      options: [
+        'Valid: np=4 satisfies np≥5',
+        'Not valid (np=4 < 5); use Poisson approximation instead',
+        'Valid: only n needs to be ≥ 30',
+        'Valid: only n(1−p) needs to be ≥ 5',
+      ],
+      answer: 'Not valid (np=4 < 5); use Poisson approximation instead',
+      hints: [
+        'Normal approximation requires np ≥ 5 AND n(1−p) ≥ 5. Here np = 100×0.04 = 4 < 5.',
+        'For large n and small p (np moderate), use Poisson(λ=np=4) instead.',
+      ],
+      reviewSection: 'Warning callout — Normal Approximation Requires Both Checks',
     },
   ],
 

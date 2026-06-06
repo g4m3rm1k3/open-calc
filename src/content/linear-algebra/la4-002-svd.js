@@ -61,6 +61,12 @@ export default {
     ],
     visualizations: [
       {
+        id: 'SVDGeometricViz',
+        title: 'SVD — Watch Any Matrix Decompose in Real Time',
+        mathBridge: 'Drag the four matrix entries and watch σ₁, σ₂, and both rotation angles update live. The animated sequence shows Vᵀ then Σ then U applied one at a time. Try making the matrix a pure rotation (a=cosθ, b=-sinθ, c=sinθ, d=cosθ) and observe both singular values are 1. Try a rank-1 matrix and see σ₂ drop to zero — the unit circle flattens to a line segment.',
+        caption: 'Singular values measure the "stretching power" of a matrix along its best-aligned axes — they are always non-negative and always real.',
+      },
+      {
         id: 'LALesson12_SVD',
         title: 'SVD: Rotate → Stretch → Rotate',
         mathBridge: 'The visualization shows the unit circle (all unit vectors in $\\mathbb{R}^2$) being transformed by $A$. Use the step slider: Step 0 = unit circle. Step 1 = apply $V^T$ (first rotation — the circle rotates but stays circular). Step 2 = apply $\\Sigma$ (axis-aligned stretch — the circle becomes an ellipse). Step 3 = apply $U$ (final rotation — the ellipse rotates to its final position). The lengths of the ellipse axes are the singular values $\\sigma_1$ and $\\sigma_2$.',

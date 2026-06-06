@@ -32,6 +32,7 @@ const DocsPage = lazy(() => import("./pages/DocsPage.jsx"));
 const GamesPage = lazy(() => import("./pages/GamesPage.jsx"));
 const LabsPage = lazy(() => import("./pages/LabsPage.jsx"));
 const AsteroidsLAPage = lazy(() => import("./pages/AsteroidsLAPage.jsx"));
+const VectorCommandPage = lazy(() => import("./pages/VectorCommandPage.jsx"));
 const CardAcademyPage = lazy(() => import("./pages/CardAcademyPage.jsx"));
 const CardQuestPage = lazy(() => import("./pages/CardQuestPage.jsx"));
 const StemTetrisPage = lazy(() => import("./pages/StemTetrisPage.jsx"));
@@ -47,9 +48,11 @@ const Matrix3DLabPage = lazy(() => import("./pages/Matrix3DLabPage.jsx"));
 const DecompLabPage = lazy(() => import("./pages/DecompLabPage.jsx"));
 const CmmLabPage = lazy(() => import("./pages/CmmLabPage.jsx"));
 const FiveAxisKinematicsPage = lazy(() => import("./pages/FiveAxisKinematicsPage.jsx"));
+const OddsLabPage = lazy(() => import("./pages/OddsLabPage.jsx"));
 const DSAArraysLabPage = lazy(() => import("./pages/DSAArraysLabPage.jsx"));
 const DSALinkedListsLabPage = lazy(() => import("./pages/DSALinkedListsLabPage.jsx"));
 const PLCLabPage = lazy(() => import("./pages/PLCLabPage.jsx"));
+
 const Fallback = () => (
   <div className="flex items-center justify-center h-64">
     <LoadingSpinner size="lg" />
@@ -106,6 +109,7 @@ export default function App() {
                     <Route path="games" element={<GamesPage />} />
                     <Route path="labs" element={<LabsPage />} />
                     <Route path="asteroids-la" element={<AsteroidsLAPage />} />
+                    <Route path="vector-command" element={<VectorCommandPage />} />
                     <Route path="card-academy" element={<CardAcademyPage />} />
                     <Route path="card-quest" element={<CardQuestPage />} />
                     <Route path="stem-tetris" element={<StemTetrisPage />} />
@@ -121,6 +125,7 @@ export default function App() {
                     <Route path="decomp-lab" element={<DecompLabPage />} />
                     <Route path="cmm-lab" element={<CmmLabPage />} />
                     <Route path="five-axis" element={<FiveAxisKinematicsPage />} />
+                    <Route path="odds-lab" element={<OddsLabPage />} />
                     <Route path="dsa-arrays-lab" element={<DSAArraysLabPage />} />
                     <Route path="dsa-linked-lists-lab" element={<DSALinkedListsLabPage />} />
                     <Route path="plc-lab" element={<PLCLabPage />} />

@@ -133,6 +133,8 @@ for name, data, color in datasets:
         type: "python",
         cellTitle: "Visualize three distribution shapes with histograms",
         code: `import random, math
+import matplotlib.pyplot as plt
+
 random.seed(42)
 
 # Right-skewed
@@ -147,26 +149,25 @@ group1 = [round(60 + random.gauss(0, 8), 1) for _ in range(75)]
 group2 = [round(100 + random.gauss(0, 8), 1) for _ in range(75)]
 bimodal = group1 + group2
 
-# Plot right-skewed
-fig1 = Figure(width=7, height=4)
-fig1.axes(xmin=0, xmax=210, ymin=0, ymax=50)
-fig1.histogram(values=right, bins=12, color="steelblue")
-fig1.text(105, 48, "Right-Skewed Distribution", size=11, bold=True)
-fig1.show()
+fig, axes = plt.subplots(1, 3, figsize=(13, 4))
 
-# Plot symmetric
-fig2 = Figure(width=7, height=4)
-fig2.axes(xmin=55, xmax=145, ymin=0, ymax=40)
-fig2.histogram(values=sym, bins=12, color="seagreen")
-fig2.text(100, 38, "Symmetric (Approximately Normal)", size=11, bold=True)
-fig2.show()
+axes[0].hist(right, bins=14, color="steelblue", edgecolor="white", alpha=0.85)
+axes[0].set_title("Right-Skewed Distribution", fontsize=10)
+axes[0].set_xlabel("Value"); axes[0].set_ylabel("Count")
 
-# Plot bimodal
-fig3 = Figure(width=7, height=4)
-fig3.axes(xmin=30, xmax=130, ymin=0, ymax=35)
-fig3.histogram(values=bimodal, bins=14, color="goldenrod")
-fig3.text(80, 33, "Bimodal Distribution (Two Groups)", size=11, bold=True)
-fig3.show()
+axes[1].hist(sym, bins=14, color="seagreen", edgecolor="white", alpha=0.85)
+axes[1].set_title("Symmetric (Approx. Normal)", fontsize=10)
+axes[1].set_xlabel("Value")
+
+axes[2].hist(bimodal, bins=16, color="goldenrod", edgecolor="white", alpha=0.85)
+axes[2].set_title("Bimodal Distribution (Two Groups)", fontsize=10)
+axes[2].set_xlabel("Value")
+
+for ax in axes:
+    ax.yaxis.grid(True, linestyle="--", alpha=0.4)
+
+plt.tight_layout()
+plt.show()
 `,
         instructions:
           "Note the three very different shapes: right-skewed has a long right tail; symmetric is bell-shaped; bimodal has two distinct peaks. A boxplot of the bimodal data would show a single box and might not reveal the two peaks at all — this is why histogram + boxplot together tell a more complete story.",
@@ -352,6 +353,33 @@ fig3.show()
       ],
       answer:
         "A complete response includes a reproducible computation, contextual interpretation, and a limitation statement tied to assumptions.",
+    },
+  ],
+
+  definitions: [
+    {
+      term: "skewness",
+      definition: "A measure of the asymmetry of a distribution. Positive skewness (right skew): long tail to the right, mean > median. Negative skewness (left skew): long tail to the left, mean < median. Values between −0.5 and +0.5 are considered approximately symmetric.",
+    },
+    {
+      term: "right skew",
+      definition: "A distribution where the tail extends to the right (toward high values). Caused by a small number of very large values. Mean > median. Common in income, wait times, and count data. Also called positive skew.",
+    },
+    {
+      term: "left skew",
+      definition: "A distribution where the tail extends to the left (toward low values). Mean < median. Common in age-at-death, scores near a ceiling, or data with a natural upper bound. Also called negative skew.",
+    },
+    {
+      term: "kurtosis",
+      definition: "A measure of tail heaviness relative to a normal distribution. The normal has kurtosis = 3 (excess kurtosis = 0). Leptokurtic (excess kurtosis > 0): heavier tails, taller peak, more extreme values. Platykurtic (excess kurtosis < 0): lighter tails, flatter peak.",
+    },
+    {
+      term: "bimodal distribution",
+      definition: "A distribution with two distinct peaks (modes) separated by a valley. Usually indicates two subpopulations have been mixed in the dataset. The mean and median fall in the valley and do not represent either peak.",
+    },
+    {
+      term: "normal distribution",
+      definition: "A symmetric, bell-shaped distribution fully described by mean μ and SD σ. Skewness = 0, kurtosis = 3, mean = median = mode. The empirical rule (68-95-99.7) holds exactly. Many statistical methods assume normality of data or of sampling distributions.",
     },
   ],
 
@@ -581,6 +609,69 @@ fig3.show()
         "Log compresses the right tail of positively skewed data.",
       ],
       reviewSection: "Challenge 2 — log transformation",
+    },
+    {
+      id: "stat3-006-quiz-7",
+      type: "choice",
+      text: "Which distribution has mean < median?",
+      options: ["Right-skewed", "Left-skewed", "Symmetric", "Uniform"],
+      answer: "Left-skewed",
+      hints: [
+        "Left skew = negative skew = long left tail. Rare low values pull the mean down.",
+        "Mean < median → left skew. Mean > median → right skew.",
+      ],
+      reviewSection: "Intuition — Mean-median relationship and skew",
+    },
+    {
+      id: "stat3-006-quiz-8",
+      type: "choice",
+      text: "A skewness coefficient of +0.3 is classified as:",
+      options: [
+        "Highly right-skewed",
+        "Moderately right-skewed",
+        "Approximately symmetric",
+        "Highly left-skewed",
+      ],
+      answer: "Approximately symmetric",
+      hints: [
+        "Rule: |skewness| < 0.5 → approximately symmetric.",
+        "+0.3 is between −0.5 and +0.5, so the distribution is considered approximately symmetric.",
+      ],
+      reviewSection: "Math section — Pearson's moment coefficient of skewness",
+    },
+    {
+      id: "stat3-006-quiz-9",
+      type: "choice",
+      text: "The Central Limit Theorem allows using normal-based methods (confidence intervals, t-tests) even when raw data is right-skewed, provided:",
+      options: [
+        "n ≥ 10",
+        "n ≥ 40 (approximately)",
+        "The data has no outliers",
+        "The mode equals the median",
+      ],
+      answer: "n ≥ 40 (approximately)",
+      hints: [
+        "The CLT says that the sampling distribution of the mean becomes approximately normal for large n.",
+        "Rough rule: n ≥ 40 makes the CLT reliable even for moderately skewed data. Heavy skew may require n > 100.",
+      ],
+      reviewSection: "Rigor section — Central Limit Theorem preview",
+    },
+    {
+      id: "stat3-006-quiz-10",
+      type: "choice",
+      text: "A histogram has two distinct peaks with a valley between them. The best next step is:",
+      options: [
+        "Report the mean as the center",
+        "Apply a log transformation",
+        "Split the data by a relevant categorical variable to investigate subgroups",
+        "Remove values in the valley as outliers",
+      ],
+      answer: "Split the data by a relevant categorical variable to investigate subgroups",
+      hints: [
+        "Two peaks suggest two populations are mixed together.",
+        "Splitting by gender, region, product type, etc. often reveals two clean unimodal distributions.",
+      ],
+      reviewSection: "Intuition — Bimodal distributions: two populations",
     },
   ],
 

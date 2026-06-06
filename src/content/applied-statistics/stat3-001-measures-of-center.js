@@ -99,12 +99,29 @@ print(f"Mean income:   \${mean_income:,.0f}k = \${mean_income*1000:,.0f}")
 print(f"Median income: \${median_income:,.0f}k = \${median_income*1000:,.0f}")
 print(f"Ratio mean/median: {mean_income/median_income:.2f}x")
 
-# Visualize
-fig = Figure(width=7, height=5)
-fig.axes(xmin=0, xmax=1000, ymin=0, ymax=4)
-fig.histogram(values=incomes, bins=10, color="steelblue")
-fig.text(500, 3.7, "Household Income Distribution", size=12, bold=True)
-fig.show()
+import matplotlib.pyplot as plt
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
+
+ax1.hist(incomes, bins=10, color="steelblue", edgecolor="white")
+ax1.axvline(mean_income, color="crimson", lw=2,
+            label=f"Mean = {mean_income:.0f}k")
+ax1.axvline(median_income, color="seagreen", lw=2, ls="--",
+            label=f"Median = {median_income}k")
+ax1.set_xlabel("Income ($000s)")
+ax1.set_ylabel("Count")
+ax1.set_title("Household Incomes (full range)")
+ax1.legend(fontsize=8)
+
+normal = [x for x in incomes if x < 200]
+ax2.hist(normal, bins=6, color="steelblue", edgecolor="white")
+ax2.axvline(median_income, color="seagreen", lw=2, ls="--",
+            label=f"Median = {median_income}k")
+ax2.set_xlabel("Income ($000s)")
+ax2.set_title("Zoomed: 8 typical households\n($980k outlier excluded)")
+ax2.legend(fontsize=8)
+plt.tight_layout()
+plt.show()
 `,
         instructions:
           "The histogram reveals why mean and median diverge: 8 values cluster under $100k while one value ($980k) is far to the right. The mean is pulled into a region where no household actually lives.",
@@ -339,6 +356,34 @@ print(f"Difference:              {abs(weighted_gpa - simple_gpa):.3f}")
     },
   ],
 
+  definitions: [
+    {
+      term: "arithmetic mean (x̄)",
+      definition:
+        "The sum of all values divided by the count: x̄ = Σxᵢ/n. The balance point of the distribution; sensitive to every value including outliers.",
+    },
+    {
+      term: "median",
+      definition:
+        "The middle value when data is sorted (average of two middle values for even n). Divides the distribution at the 50th percentile; resistant to outliers.",
+    },
+    {
+      term: "mode",
+      definition:
+        "The most frequently occurring value(s). The only measure of center defined for nominal (categorical) data; less useful for continuous data without binning.",
+    },
+    {
+      term: "weighted mean",
+      definition:
+        "An average where each value is multiplied by a weight reflecting its importance: x̄_w = Σ(wᵢxᵢ) / Σwᵢ. Used for GPA, portfolio returns, and demographic averaging.",
+    },
+    {
+      term: "trimmed mean",
+      definition:
+        "Computed by removing the bottom p% and top p% of values before averaging the remainder; more resistant to outliers than the ordinary mean while using more data than the median.",
+    },
+  ],
+
   semantics: {
     core: [
       { symbol: "\\bar{x}", meaning: "Sample mean = (sum of all values) / n." },
@@ -539,6 +584,76 @@ print(f"Difference:              {abs(weighted_gpa - simple_gpa):.3f}")
       answer: "78",
       hints: ["Weighted mean = 0.40(90) + 0.60(70).", "36 + 42 = 78."],
       reviewSection: "Example 2 — Compute weighted mean",
+    },
+    {
+      id: "stat3-001-quiz-7",
+      type: "choice",
+      text: "The arithmetic mean minimizes which quantity over all possible choices of constant c?",
+      options: [
+        "Σ|xᵢ − c|  (sum of absolute deviations)",
+        "Σ(xᵢ − c)²  (sum of squared deviations)",
+        "max|xᵢ − c|  (maximum deviation)",
+        "Σ(xᵢ − c)   (sum of deviations)",
+      ],
+      answer: "Σ(xᵢ − c)²  (sum of squared deviations)",
+      hints: [
+        "The mean is the balance point — it minimizes squared distances from the data.",
+        "The median minimizes the sum of absolute deviations instead.",
+      ],
+      reviewSection: 'Intuition → "The Mean as a Balance Point" callout',
+    },
+    {
+      id: "stat3-001-quiz-8",
+      type: "choice",
+      text: "A dataset has a long right tail (right-skewed). Which statement about mean and median is typically true?",
+      options: [
+        "Mean = median",
+        "Mean > median (right tail pulls mean upward)",
+        "Mean < median (right tail pulls mean downward)",
+        "Cannot be determined without the exact values",
+      ],
+      answer: "Mean > median (right tail pulls mean upward)",
+      hints: [
+        "The mean is sensitive to extreme large values in the right tail.",
+        "Income data is a classic example: a few very high earners pull the mean well above the median.",
+      ],
+      reviewSection:
+        'Intuition → "Mean vs. median and distribution shape" paragraph',
+    },
+    {
+      id: "stat3-001-quiz-9",
+      type: "choice",
+      text: "The mode is the only meaningful measure of center for which type of variable?",
+      options: [
+        "Continuous quantitative variables",
+        "Interval-scale variables",
+        "Nominal (categorical) variables",
+        "Ordinal variables with known gap sizes",
+      ],
+      answer: "Nominal (categorical) variables",
+      hints: [
+        "Mean and median require ordering or arithmetic — which are not defined for categories.",
+        'You cannot average "Blood type A, B, O, AB" but you can find the most common blood type.',
+      ],
+      reviewSection: 'Intuition → "The mode: most frequent value" paragraph',
+    },
+    {
+      id: "stat3-001-quiz-10",
+      type: "choice",
+      text: "A dataset is bimodal (two distinct peaks at 30 and 70). Reporting the mean as the center summary:",
+      options: [
+        "Is the best choice because it uses all data points",
+        "May be misleading because the mean (~50) falls between the two clusters where no data lives",
+        "Is equivalent to reporting the median for symmetric distributions",
+        "Overstates the central tendency relative to the median",
+      ],
+      answer:
+        "May be misleading because the mean (~50) falls between the two clusters where no data lives",
+      hints: [
+        "The mean of {30, 70} is 50 — but no observations are near 50.",
+        "For bimodal data, describe both modes and the shape; do not report a single center number.",
+      ],
+      reviewSection: 'Intuition → "When the Mean Misleads" callout',
     },
   ],
 

@@ -58,6 +58,12 @@ export default {
     ],
     visualizations: [
       {
+        id: 'NullSpaceColumnSpaceViz',
+        title: 'Column Space & Null Space — Input Fan Visualization',
+        mathBridge: 'The cyan arrows show outputs of M for a fan of unit input vectors — they land in the column space (the image). The yellow dashed line (when visible) is the null space — all inputs that map to zero. Switch examples: Full rank 2×2 (null = {0}, col space = all of ℝ²), Rank 1 (null = a LINE, col space = a LINE), Zero map (null = all of ℝ², col space = {0}), and Projection (null = y-axis, col space = x-axis). Watch how rank + nullity always equals 2.',
+        caption: 'Every input direction either lands somewhere nonzero (in the column space) or gets crushed to zero (in the null space). Together they cover all of ℝ².',
+      },
+      {
         id: 'LALesson07_NullSpace',
         title: 'Visualizing the Crushed Space',
         mathBridge: 'Observe the 3D space being flattened into a 2D plane. Step 1: Drag the camera to see how the Column Space (the purple plane) contains all final destinations. Step 2: Notice the glowing red line piercing straight through the plane. That is the Null Space. Every vector that started on that red line was physically crushed directly into the origin $(0,0,0)$.',

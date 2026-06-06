@@ -31,7 +31,7 @@ export default {
       'A pharmaceutical company claims a new drug reduces blood pressure by more than 5 mmHg. After a clinical trial, the sample shows an average reduction of 5.9 mmHg. How do you decide whether that 0.9 mmHg difference is real — or just random noise?',
     realWorldContext:
       'Every day, decisions worth billions of dollars and millions of lives hinge on hypothesis tests. In medicine, the FDA requires randomized controlled trials to show that a new drug outperforms a placebo — not just by luck, but with a p-value below 0.05 in a pre-registered test. In technology, every A/B test at companies like Google, Netflix, and Amazon asks: "Did version B genuinely outperform version A, or did we just get a lucky sample?" In manufacturing, Six Sigma quality engineers use hypothesis tests to decide whether a new machining process has truly shifted the defect rate, or whether the improvement seen in a pilot batch is within normal random variation. In genomics, researchers conduct hundreds of thousands of simultaneous hypothesis tests to identify which genes are associated with disease. The logic in every case is identical: start with a specific claim (the null hypothesis), collect data, measure how surprising the data would be if the claim were true, and decide. Understanding this framework is the gateway to all of statistical inference.',
-    previewVisualizationId: 'pvalue-simulation-viz',
+    previewVisualizationId: 'HypothesisTestViz',
   },
 
   intuition: {
@@ -93,20 +93,12 @@ export default {
     ],
     visualizations: [
       {
-        id: 'pvalue-simulation-viz',
+        id: 'HypothesisTestViz',
         title: 'p-Value as Tail Area Under the Null Distribution',
         mathBridge:
-          'The null distribution is the sampling distribution of the test statistic when H₀ is true. The p-value is the shaded tail area beyond the observed test statistic. For a two-sided test, both tails are shaded.',
+          'Drag the z-stat slider to position your observed test statistic. The blue shaded region is the p-value — the probability of data this extreme assuming H₀ is true. The red dashed lines mark the critical values at your chosen α. When the blue region is smaller than the red region (z crosses the critical value), you reject H₀.',
         caption:
-          'Move the test statistic slider to see how the p-value changes. Notice that the p-value is the area in the tail(s), not a fixed property of the distribution.',
-      },
-      {
-        id: 'type-error-tradeoff-viz',
-        title: 'Type I vs. Type II Error Tradeoff',
-        mathBridge:
-          'Two overlapping distributions — one for H₀ true, one for H₁ true — separated by the decision boundary at the critical value. α is the area under H₀ to the right of the boundary. β is the area under H₁ to the left. Increasing α (moving the boundary left) decreases β.',
-        caption:
-          'Adjust α to see the tradeoff between Type I and Type II errors. Larger samples pull the distributions apart, reducing both errors simultaneously.',
+          'Switch between one-tailed and two-tailed, and change α, to see how the critical values and decision boundary shift.',
       },
     ],
   },
@@ -394,7 +386,8 @@ n_sims = 5000
                 'The `normpdf` and `normcdf` functions compute the normal density and CDF respectively. `normcdf(-abs(z), 0, 1)` gives the lower tail probability.',
                 'The histogram is plotted with `histogram` and a reference line for the expected uniform frequency is added with `yline`.',
               ],
-              code: `% Simulate p-value distribution under H0
+              code: `pkg load statistics
+% Simulate p-value distribution under H0
 rng(42);
 mu_0 = 10; sigma = 2; n = 25;
 n_sims = 10000;
@@ -797,6 +790,33 @@ alpha = 0.05; n_sims = 5000;
     },
   ],
 
+  definitions: [
+    {
+      term: "null hypothesis H₀",
+      definition: "The default hypothesis that is assumed true until evidence overturns it. Always specifies a precise parameter value (equality). Example: H₀: μ = 50 or H₀: p = 0.30.",
+    },
+    {
+      term: "alternative hypothesis H₁",
+      definition: "The claim the researcher is trying to find evidence for. Can be two-sided (H₁: μ ≠ 50) or one-sided (H₁: μ > 50 or H₁: μ < 50). Only adopted if sufficient evidence against H₀ is found.",
+    },
+    {
+      term: "p-value",
+      definition: "P(test statistic as extreme or more extreme | H₀ is true). The probability of observing data this extreme if the null hypothesis were true. NOT the probability that H₀ is true. Reject H₀ if p-value < α.",
+    },
+    {
+      term: "Type I error (α)",
+      definition: "Rejecting H₀ when it is actually true. A false positive. The probability of a Type I error equals the significance level α, set by the researcher (typically 0.05).",
+    },
+    {
+      term: "Type II error (β)",
+      definition: "Failing to reject H₀ when H₁ is actually true. A false negative. The probability of a Type II error is β = 1 − power. Decreasing β requires larger n or larger effect size.",
+    },
+    {
+      term: "statistical power",
+      definition: "P(reject H₀ | H₁ is true) = 1 − β. The probability of correctly detecting a true effect. Increases with larger n, larger effect size, or larger α. Target ≥ 80% in well-designed studies.",
+    },
+  ],
+
   semantics: {
     core: [
       { symbol: 'H_0', meaning: 'Null hypothesis: the specific parameter value being tested (the status quo claim). Always contains an equality.' },
@@ -959,6 +979,69 @@ alpha = 0.05; n_sims = 5000;
         'Multiple testing correction (Bonferroni, FDR) is needed to interpret these results.',
       ],
       reviewSection: 'Rigor → Warning: Multiple Testing Inflation',
+    },
+    {
+      id: 'stat6-001-quiz-7',
+      type: 'choice',
+      text: 'Statistical power is defined as:',
+      options: [
+        'P(reject H₀ | H₁ is true)',
+        'P(H₀ is true | data shows significance)',
+        '1 − α',
+        'P(reject H₀ | H₀ is true)',
+      ],
+      answer: 'P(reject H₀ | H₁ is true)',
+      hints: [
+        'Power = 1 − β where β = P(Type II error) = P(fail to reject H₀ | H₁ is true).',
+        'Power is the probability of correctly detecting a true effect.',
+      ],
+      reviewSection: 'Intuition → "Statistical power and sample size"',
+    },
+    {
+      id: 'stat6-001-quiz-8',
+      type: 'choice',
+      text: 'For a fixed significance level α, increasing the sample size n:',
+      options: [
+        'Decreases the Type I error rate below α',
+        'Increases power (reduces the chance of a Type II error)',
+        'Has no effect on power',
+        'Increases both α and β',
+      ],
+      answer: 'Increases power (reduces the chance of a Type II error)',
+      hints: [
+        'Larger n → smaller SE → test statistic is larger for the same effect size → easier to detect a true effect.',
+        'α is fixed by the researcher (the rejection threshold). n controls power/β.',
+      ],
+      reviewSection: 'Intuition → "Statistical power and sample size"',
+    },
+    {
+      id: 'stat6-001-quiz-9',
+      type: 'choice',
+      text: "Cohen's d effect size benchmark classifies d = 0.2 as:",
+      options: ['Negligible', 'Small', 'Medium', 'Large'],
+      answer: 'Small',
+      hints: [
+        "Cohen's benchmarks: d ≈ 0.2 = small, d ≈ 0.5 = medium, d ≈ 0.8 = large.",
+        'A small effect can still be statistically significant with a large enough sample.',
+      ],
+      reviewSection: 'Intuition → "Effect size: what statistical significance cannot tell you"',
+    },
+    {
+      id: 'stat6-001-quiz-10',
+      type: 'choice',
+      text: 'The key distinction between statistical significance and practical significance is:',
+      options: [
+        'Statistical significance proves the effect is large and important',
+        'A result can be statistically significant (p < α) but practically trivial, especially with large n',
+        'Practical significance requires p < 0.001',
+        'They are equivalent when n ≥ 30',
+      ],
+      answer: 'A result can be statistically significant (p < α) but practically trivial, especially with large n',
+      hints: [
+        'With n = 1,000,000, a 0.001-unit difference can be statistically significant but meaningless in practice.',
+        'Always report effect size (Cohen\'s d, percentage change) alongside the p-value.',
+      ],
+      reviewSection: 'Misconceptions → "Statistical significance implies the effect is large"',
     },
   ],
 

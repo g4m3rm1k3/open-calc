@@ -19,7 +19,7 @@ export default {
     realWorldContext: `Every time a real-estate platform displays an estimated home value, a regression equation is silently working behind the scenes. The platform recorded thousands of past sales, paired each sale price with the home's size in square feet, and used simple linear regression to fit a line through that cloud of points. The slope of that line answers the question: "On average, how much does price rise for each additional square foot?" — and the standard error on the slope answers: "How precisely do we know that rate?"
 
 The same mathematics appears across engineering and medicine. In aerospace manufacturing, CNC machinists fit a regression line relating cutting-tool wear (in microns of flank wear) to cumulative cutting time, so they can schedule tool replacement before tolerance is violated. In pharmacokinetics, researchers regress plasma drug concentration against time to estimate the elimination half-life that governs dosing schedules. In fuel economy testing, engineers regress a vehicle's fuel consumption (L/100 km) against curb weight to isolate how much each kilogram costs in efficiency. By the end of this lesson you will be able to estimate a regression line, interpret every number in a standard software output table, test whether a predictor really matters, and communicate a prediction together with its honest uncertainty band.`,
-    previewVisualizationId: 'slr-scatter-line',
+    previewVisualizationId: 'RegressionScatterViz',
   },
 
   // ── Intuition ──────────────────────────────────────────────────
@@ -82,22 +82,16 @@ The same mathematics appears across engineering and medicine. In aerospace manuf
     ],
     visualizations: [
       {
-        id: 'slr-scatter-line',
-        title: 'Scatter Plot with OLS Regression Line and Residuals',
-        mathBridge: 'Each vertical red segment shows a residual $e_i = y_i - \\hat{y}_i$. The OLS line minimizes the sum of the squares of these segment lengths. Dragging a point shows how it affects $\\hat{\\beta}_1$ and $R^2$.',
-        caption: 'Notice how points far from $\\bar{x}$ have more influence on the slope.',
+        id: 'RegressionScatterViz',
+        title: 'OLS Regression — Scatter, Fit Line, and Residuals',
+        mathBridge: 'Select a relationship strength to generate data, then toggle "Show residuals" to see the vertical red segments $e_i = y_i - \\hat{y}_i$. The amber line is the OLS fit: it minimizes $\\sum e_i^2$. Watch $R^2$ drop as data gets noisier — $R^2 = 1 - SS_{\\text{res}}/SS_{\\text{tot}}$ measures the fraction of variance in $y$ explained by the linear relationship with $x$.',
+        caption: 'Resample to see how the slope and R² change across different random samples from the same relationship.',
       },
       {
-        id: 'slr-ci-pi-bands',
-        title: 'Confidence and Prediction Bands',
-        mathBridge: 'The inner (darker) band is the 95% CI for the mean response $E[Y|x]$; the outer (lighter) band is the 95% prediction interval for a new observation. Both are narrowest at $\\bar{x}$ and widen as $x^*$ moves away.',
-        caption: 'The prediction band is always wider and does not shrink to zero even as $n \\to \\infty$.',
-      },
-      {
-        id: 'slr-residual-plot',
-        title: 'Residuals vs. Fitted Values',
-        mathBridge: 'Plotting $e_i$ against $\\hat{y}_i$ reveals violations: a U-shape indicates non-linearity; a funnel shape indicates heteroscedasticity. A good model shows random scatter around zero.',
-        caption: 'This is the most important diagnostic plot for simple linear regression.',
+        id: 'LeastSquaresFit',
+        title: 'Least Squares — Minimizing Sum of Squared Residuals',
+        mathBridge: 'The OLS estimators $\\hat{\\beta}_1 = S_{xy}/S_{xx}$ and $\\hat{\\beta}_0 = \\bar{y} - \\hat{\\beta}_1\\bar{x}$ are derived by taking partial derivatives of $\\sum(y_i - \\beta_0 - \\beta_1 x_i)^2$ with respect to $\\beta_0$ and $\\beta_1$ and setting them to zero. This is a calculus optimization — the same unconstrained minimum you learned in Chapter 3.',
+        caption: 'OLS is a direct application of multivariable optimization: the normal equations are the first-order conditions.',
       },
     ],
   },
@@ -174,7 +168,7 @@ beta0 = y_bar - beta1 * x_bar
 print(f"n = {n}")
 print(f"x̄ = {x_bar:.2f},  ȳ = {y_bar:.2f}")
 print(f"Sxx = {Sxx:.2f},  Sxy = {Sxy:.2f}")
-print(f"β̂₁ = {beta1:.4f}  (slope: ${beta1*10:.0f} per sq ft)")
+print(f"β̂₁ = {beta1:.4f}  (slope: \${beta1*10:.0f} per sq ft)")
 print(f"β̂₀ = {beta0:.4f}  (intercept)")
 
 # Residuals and fit statistics
@@ -409,7 +403,8 @@ title('Residuals vs. Fitted');`,
                 '`stats(1)` is $R^2$, `stats(2)` is the $F$-statistic, `stats(3)` is the $F$ $p$-value, and `stats(4)` is $s^2 = MSE$.',
                 'We use `fill` to shade the confidence and prediction bands, toggling transparency with `FaceAlpha`.',
               ],
-              code: `% Cell 2: Full inference with regress
+              code: `pkg load statistics
+% Cell 2: Full inference with regress
 x = [10 15 20 25 30 12 18 22 28 35]';
 y = [120 180 250 310 400 140 220 270 370 480]';
 n = length(x);
@@ -932,6 +927,67 @@ mpg = 55 - 0.015 .* weight + 2.5 .* randn(15, 1);
       hints: ['A funnel means variance increases with fitted value — the spread of $e_i$ is not constant. This violates the homoscedasticity assumption.'],
       reviewSection: 'Intuition → CNC tool wear application',
     },
+    {
+      id: 'q7',
+      type: 'choice',
+      text: 'A regression equation is $\\hat{y} = 5 + 2x$. What is the predicted value when $x = 10$?',
+      options: ['15', '20', '25', '7'],
+      answer: '25',
+      hints: ['Substitute x=10: ŷ = 5 + 2(10) = 5 + 20 = 25.', 'The intercept (5) is added to the slope times x.'],
+      reviewSection: 'Intuition → A concrete numeric warm-up',
+    },
+    {
+      id: 'q8',
+      type: 'choice',
+      text: 'The ANOVA F-test in simple linear regression tests:',
+      options: [
+        'H₀: β₀ = 0 (the intercept is zero)',
+        'H₀: β₁ = 0 (the predictor has no linear effect on y)',
+        'H₀: R² = 1 (perfect fit)',
+        'H₀: the residuals are normally distributed',
+      ],
+      answer: 'H₀: β₁ = 0 (the predictor has no linear effect on y)',
+      hints: [
+        'In simple regression, F = t² where t is the t-statistic for the slope.',
+        'F tests whether ALL slopes are zero — in simple regression there is only one slope: β₁.',
+      ],
+      reviewSection: 'Math section — Inference for the slope',
+    },
+    {
+      id: 'q9',
+      type: 'choice',
+      text: 'In simple linear regression, $R^2 = r^2$ where $r$ is the Pearson correlation. If $R^2 = 0.49$, then $|r| = $:',
+      options: ['0.49', '0.70', '0.24', '0.81'],
+      answer: '0.70',
+      hints: ['|r| = √R² = √0.49 = 0.70.', 'Note: the sign of r depends on whether the slope is positive or negative — R² does not reveal the direction.'],
+      reviewSection: 'Math section — Variance decomposition',
+    },
+    {
+      id: 'q10',
+      type: 'choice',
+      text: 'A residual-vs-fitted plot shows a U-shaped (curved) pattern with residuals negative at low fits, positive in the middle, negative again at high fits. This indicates:',
+      options: [
+        'Heteroscedasticity',
+        'Non-linearity — the relationship is curved, not linear',
+        'Autocorrelation in residuals',
+        'Normality of residuals (a good sign)',
+      ],
+      answer: 'Non-linearity — the relationship is curved, not linear',
+      hints: [
+        'Systematic patterns in residuals indicate a violation of the linearity assumption.',
+        'A U-shape means the model underpredicts at extreme x values and overpredicts in the middle — the true relationship is curved.',
+      ],
+      reviewSection: 'Intuition → Regression diagnostics: reading the residual plot',
+    },
+  ],
+
+  definitions: [
+    { term: "simple linear regression", definition: "A model predicting y from one quantitative predictor x: ŷ = β₀ + β₁x. The slope β₁ gives the expected change in y per unit x; the intercept β₀ is the predicted y when x = 0." },
+    { term: "ordinary least squares (OLS)", definition: "The method for estimating regression coefficients by minimizing the sum of squared residuals Σeᵢ². Produces the BLUE (Best Linear Unbiased Estimator) under the Gauss-Markov conditions (linearity, independence, homoscedasticity, no perfect multicollinearity)." },
+    { term: "regression slope β₁", definition: "b₁ = Σ(xᵢ − x̄)(yᵢ − ȳ) / Σ(xᵢ − x̄)². The expected change in y per unit increase in x. Units of y per unit of x. A positive slope means x and y move together; negative means they move oppositely." },
+    { term: "residual eᵢ", definition: "The difference between observed and predicted: eᵢ = yᵢ − ŷᵢ. OLS minimizes Σeᵢ². Residual plots (residuals vs. fitted values) are the primary tool for checking model assumptions — random scatter is good; patterns indicate violations." },
+    { term: "R² (coefficient of determination)", definition: "R² = 1 − SSE/SST = proportion of variability in y explained by the linear relationship with x. Ranges 0–1. In SLR, R² = r². A high R² does not validate the model form — always check residual plots." },
+    { term: "prediction interval", definition: "An interval for a single new observation: ŷ* ± t* · SE_pred, where SE_pred includes both estimation uncertainty and individual variability (σ²). Always wider than the confidence interval for the mean response, and does not collapse to zero as n → ∞." },
   ],
 
   // ── Misconceptions ────────────────────────────────────────────

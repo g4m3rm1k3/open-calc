@@ -66,7 +66,7 @@ function EpsilonDeltaViz() {
       </div>
       <svg ref={svgRef} style={{ width: "100%", display: "block", borderRadius: 8, background: "var(--color-background-secondary)" }} />
       <p style={{ fontSize: 11, color: "var(--color-text-tertiary)", marginTop: 4 }}>
-        Green band = ε tolerance on the output. Gold band = δ response on the input. ε-δ definition: for any ε>0, find δ>0 so that when x is within δ of a, f(x) is within ε of L. The limit IS the L that makes this work for every ε.
+        Green band = ε tolerance on the output. Gold band = δ response on the input. ε-δ definition: for any ε{'>'}0, find δ{'>'}0 so that when x is within δ of a, f(x) is within ε of L. The limit IS the L that makes this work for every ε.
       </p>
     </div>
   );

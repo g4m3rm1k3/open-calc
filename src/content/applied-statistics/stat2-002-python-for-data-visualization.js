@@ -1,26 +1,26 @@
-export default {
+﻿export default {
   id: "stat2-002",
   slug: "python-for-data-visualization",
   chapter: "stat2",
   order: 2,
   title: "Python for Data Visualization",
-  subtitle: "Building charts from data using the opencalc Figure API.",
+  subtitle: "Building histograms, scatter plots, bar charts, and line charts with matplotlib.",
   tags: [
     "python",
-    "opencalc",
+    "matplotlib",
     "visualization",
-    "Figure",
     "histogram",
-    "scatter",
-    "bars",
+    "scatter plot",
+    "bar chart",
+    "pie chart",
     "line chart",
     "data analysis",
   ],
   aliases:
-    "opencalc figure API python chart histogram scatter plot bar chart pie chart data visualization code",
+    "matplotlib pyplot python chart histogram scatter plot bar chart pie chart data visualization code plt",
   timeToComplete: 40,
   coreConcept:
-    "The opencalc Figure API lets you describe charts as data structures, and the renderer draws them on a canvas. You pass arrays of values to methods like fig.histogram(), fig.scatter(), and fig.bars() — the library handles all the math and geometry.",
+    "matplotlib is Python's standard plotting library. You call functions like plt.hist(), plt.scatter(), plt.bar(), and plt.plot() to describe what you want, then plt.show() renders it. Every visualization follows the same three-step pattern: prepare the data, call the chart function, call plt.show().",
   prerequisites: ["stat2-001"],
   nextLesson: "stat2-003",
 
@@ -28,35 +28,51 @@ export default {
     question:
       "If you have 150 numbers representing exam scores, what is the fastest way to understand the distribution?",
     realWorldContext:
-      "A statistics professor collects midterm scores from 150 students: the lowest is 31, the highest is 99, and everything in between. She could compute the mean and standard deviation — but those two numbers would not tell her whether the scores are symmetric or skewed, whether there are clusters, or how many students are at risk of failing. In about 3 lines of Python, she can produce a histogram that answers all of those questions visually at once. This lesson shows you exactly how.",
+      "A statistics professor collects midterm scores from 150 students: the lowest is 31, the highest is 99, and everything in between. She could compute the mean and standard deviation â€” but those two numbers would not tell her whether the scores are symmetric or skewed, whether there are clusters, or how many students are at risk of failing. In about 3 lines of Python with matplotlib, she can produce a histogram that answers all of those questions visually at once. This lesson shows you exactly how.",
   },
 
   intuition: {
     prose: [
-      "**The opencalc Figure API.** In this environment, you create visualizations by building an opencalc `Figure` object, adding elements to it, and calling `show()`. The Figure API is designed to produce exactly the charts from stat2-001 — histogram, scatter, bars, boxplot, pie, and line — using Python lists as inputs.",
-      '**The core pattern.** Every visualization follows the same four-line structure:\n```python\nfig = Figure(width=6, height=4)\nfig.axes(xmin=0, xmax=100, ymin=0, ymax=30)\nfig.histogram(data=scores, bins=10, color="steelblue")\nfig.show()\n```\nThe `Figure()` constructor sets the canvas size. `axes()` sets the coordinate system. A chart method like `histogram()` adds the visual element. `show()` renders it.',
-      "**Before reading on, predict:** If `data = [72, 85, 91, 63, 77, 88, 95, 70, 82, 76]` and you call `fig.histogram(data=data, bins=5)`, how many bars would the histogram have, and what would each bar represent?",
-      '**Histogram.** `fig.histogram(data, bins=10, color="steelblue", alpha=0.8)` computes bin edges from the data range, counts how many values fall in each bin, and draws a bar for each bin. The height of each bar equals the count in that bin. The `bins` parameter controls the number of bars. The `density=True` option normalizes bar heights so the total area equals 1 (useful for comparing with probability distributions).',
-      '**Scatter plot.** `fig.scatter(xs, ys, color="coral", size=4)` takes two equal-length lists — x-values and y-values — and draws one dot per (x, y) pair. Use scatter for two quantitative variables. Optionally, `color` can be a list of the same length as xs/ys to color each point differently (e.g., by group). `size` controls dot radius.',
-      '**Bar chart.** `fig.bars(labels, values, color="seagreen")` takes a list of category names and a list of corresponding heights. Draws a vertical bar for each category. Use bars for one categorical variable with a count or proportion for each level.',
-      '**Line chart.** `fig.plot(xs, ys, color="navy", lw=2)` connects points in order with a line. Use for time series or other ordered sequential data. `lw` is line width.',
-      "**Setting axes correctly.** `fig.axes(xmin, xmax, ymin, ymax)` is required before any chart element. If the axes do not cover the data range, elements will be clipped or invisible. A safe pattern: compute the min and max of your data and expand slightly:\n```python\nfig.axes(xmin=min(data)-5, xmax=max(data)+5, ymin=0, ymax=expected_max_count+5)\n```",
+      "**The matplotlib pattern.** Every matplotlib visualization follows the same core structure:\n```python\nimport matplotlib.pyplot as plt\n\n# 1. Prepare your data\nscores = [72, 85, 91, 63, 77, 88]\n\n# 2. Call the chart function\nplt.hist(scores, bins=5, color='steelblue')\nplt.title('Score Distribution')\nplt.xlabel('Score')\n\n# 3. Render\nplt.show()\n```\nImport once, call chart functions, call `plt.show()` at the end.",
+      "**Histogram: one continuous variable.** `plt.hist(data, bins=10, color='steelblue', edgecolor='white')` bins the raw data, counts how many values fall in each bin, and draws one bar per bin. The bars touch because the x-axis is a continuous number line. The `bins` parameter controls the resolution: fewer bins â†’ smoother shape, more bins â†’ more detail but noisier. Use `density=True` to normalize so the total area equals 1 (useful for probability comparisons).",
+      "**Before reading on, predict:** If `data = [72, 85, 91, 63, 77, 88, 95, 70, 82, 76]` and you call `plt.hist(data, bins=5)`, how many bars would the histogram have, and what would each bar's height represent?",
+      "**Scatter plot: two quantitative variables.** `plt.scatter(x, y, color='coral', s=40, alpha=0.7)` plots one point per (x, y) pair. `s` is the marker size in pointsÂ². `alpha` controls transparency (0 = invisible, 1 = opaque) â€” useful when many points overlap. Use scatter to look for relationships: linear, curved, clustered, or none.",
+      "**Bar chart: one categorical variable.** `plt.bar(categories, values, color='seagreen')` draws one bar per category. The height encodes count or proportion. The x-axis labels are discrete categories â€” the bars are separated by small gaps to signal this. Sort by value with `sorted()` to make comparisons easier.",
+      "**Line chart: sequential data.** `plt.plot(xs, ys, color='navy', lw=2, marker='o')` connects consecutive (x, y) points with a line. Use for time series or any ordered sequence where the trend between consecutive points is meaningful. `lw` = line width; `marker` = point style ('o', 's', '^', etc.).",
+      "**Pie chart: part-to-whole.** `plt.pie(values, labels=labels, autopct='%1.1f%%')` draws sectors sized proportional to each value. The `autopct` format string controls the percentage display. Best with â‰¤5 categories and large proportion differences. For more categories, a sorted bar chart is more readable.",
+      "**Figure size and multiple subplots.** `fig, axes = plt.subplots(nrows, ncols, figsize=(width, height))` creates a grid of plots. `figsize` is in inches. `axes` is a numpy array of Axes objects; index into it with `axes[i]` or `axes[i][j]` for 2D grids. Call chart methods on individual axes: `axes[0].hist(data, bins=10)`. This is the standard pattern for side-by-side comparisons.",
     ],
     callouts: [
       {
         type: "procedure",
-        title: "Procedure: Build Any Chart in opencalc",
-        body: 'Step 1. Create the Figure: `fig = Figure(width=W, height=H)`. Typical widths: 6–8; heights: 4–5.\n\nStep 2. Set the coordinate system: `fig.axes(xmin=..., xmax=..., ymin=..., ymax=...)`. Must cover all data.\n\nStep 3. (Optional) Add a title: `fig.text(x, y, "Title", size=14, bold=True)` — place at top-center of the axes range.\n\nStep 4. Call the chart method: `fig.histogram(data, bins)` or `fig.scatter(xs, ys)` or `fig.bars(labels, values)` or `fig.plot(xs, ys)`.\n\nStep 5. (Optional) Add axis labels: `fig.text(x_center, ymin-3, "X label")` and `fig.text(xmin-8, y_center, "Y label", angle=90)`.\n\nStep 6. Render: `fig.show()`.',
+        title: "Procedure: Build Any Matplotlib Chart",
+        body: `Step 1. Import: \`import matplotlib.pyplot as plt\` (add \`import numpy as np\` if needed).
+
+Step 2. (Optional) Create figure/axes explicitly:
+\`fig, ax = plt.subplots(figsize=(8, 5))\`
+Then use \`ax.hist()\`, \`ax.scatter()\`, etc.
+Or just call \`plt.hist()\`, \`plt.scatter()\` directly on the global figure.
+
+Step 3. Call the chart function:
+- Histogram: \`plt.hist(data, bins=10, color='steelblue', edgecolor='white')\`
+- Scatter:   \`plt.scatter(x, y, color='coral', s=40, alpha=0.7)\`
+- Bar chart: \`plt.bar(categories, values, color='seagreen')\`
+- Line:      \`plt.plot(xs, ys, color='navy', lw=2, marker='o')\`
+- Pie:       \`plt.pie(values, labels=labels, autopct='%1.1f%%')\`
+
+Step 4. Add labels: \`plt.xlabel('...'), plt.ylabel('...'), plt.title('...')\`
+
+Step 5. Render: \`plt.show()\``,
       },
       {
         type: "insight",
-        title: "Histogram vs. bars() — Choosing the Right Method",
-        body: '`fig.histogram(data, bins)` — pass RAW data as a list. The method computes bins for you. Use this when you have individual observations.\n\n`fig.bars(labels, values)` — pass PRE-COMPUTED counts or proportions. Use this when you already have category totals (e.g., "Category A: 45, Category B: 30, Category C: 25").\n\nCommon mistake: calling `bars()` with raw continuous data. The bars will have one bar per unique value — which is usually wrong. Always use `histogram()` for raw continuous data.',
+        title: "hist() vs. bar() â€” Choosing the Right Function",
+        body: "`plt.hist(data, bins)` â€” pass RAW continuous data as a list. matplotlib computes the bins for you. Use when you have individual observations.\n\n`plt.bar(categories, values)` â€” pass PRE-COMPUTED counts and their category labels. Use when you already have category totals.\n\nCommon mistake: calling `plt.bar()` with raw continuous data. This creates one bar per unique value â€” usually wrong. Always use `plt.hist()` for raw continuous data.",
       },
       {
         type: "warning",
-        title: "Axes Must Cover All Data",
-        body: "If any data value is outside the `axes()` range, that element is clipped (partially or fully hidden). Always check:\n- `xmin <= min(data)` and `xmax >= max(data)` for histograms\n- `ymin = 0` for histograms and bar charts (bars extend from 0)\n- `ymax` should exceed the tallest bar (add 10–15% margin)\n\nA quick way to set axes: `fig.axes(xmin=min(data), xmax=max(data), ymin=0, ymax=len(data)//2)`.",
+        title: "plt.show() Clears the Figure",
+        body: "Calling `plt.show()` renders AND clears the current figure. Any subsequent `plt.hist()` or `plt.plot()` calls will start a fresh figure. To overlay multiple charts on the same axes, add all chart calls BEFORE `plt.show()`:\n\n```python\nplt.scatter(x, y)        # point cloud\nplt.plot(x, trend_line)  # regression line\nplt.show()               # renders both together\n```",
       },
     ],
     visualizations: [],
@@ -64,13 +80,15 @@ export default {
 
   math: {
     prose: [
-      "**Histogram bin count and range.** Given raw data with minimum value $x_{\\min}$ and maximum $x_{\\max}$, requesting $k$ bins produces edges at $e_0 = x_{\\min}$, $e_1 = x_{\\min} + h$, ..., $e_k = x_{\\max}$, where bin width $h = (x_{\\max} - x_{\\min}) / k$. The count for bin $j$ is $c_j = |\\{x_i : e_{j-1} \\le x_i < e_j\\}|$ (last bin is inclusive on the right). When `density=True`, each bar height is $c_j / (n \\cdot h)$ so $\\sum_j c_j / (n \\cdot h) \\cdot h = \\sum_j c_j/n = 1$.",
+      "**Histogram bin count and range.** Given raw data with minimum $x_{\\min}$ and maximum $x_{\\max}$, requesting $k$ bins produces edges at $e_0 = x_{\\min}$, $e_1 = x_{\\min} + h$, ..., $e_k = x_{\\max}$, where bin width $h = (x_{\\max} - x_{\\min}) / k$. The count for bin $j$ is $c_j = |\\{x_i : e_{j-1} \\le x_i < e_j\\}|$ (last bin inclusive on the right). When `density=True`, each bar height is $c_j / (n \\cdot h)$ so $\\sum_j c_j / (n \\cdot h) \\cdot h = \\sum_j c_j/n = 1$.",
+      "**Sturges' rule for default bin count.** For $n$ observations, Sturges' rule recommends $k = \\lceil \\log_2 n + 1 \\rceil$ bins. matplotlib's `bins='sturges'` implements this. For $n=20$: $k = \\lceil 4.32 + 1 \\rceil = 6$ bins. For $n=100$: $k = 8$ bins. numpy's `bins='fd'` (Freedman-Diaconis) uses IQR instead of variance and is more robust to outliers.",
     ],
   },
 
   rigor: {
     prose: [
-      "**R1 — Coordinate system and scaling.** The opencalc Figure uses a mathematical coordinate system where `axes(xmin, xmax, ymin, ymax)` defines the visible region. Internally, data coordinates are mapped to canvas pixels by linear interpolation: $\\text{pixel}_x = \\text{margin} + (x - x_{\\min}) / (x_{\\max} - x_{\\min}) \\times \\text{canvas\\_width}$. If you request a histogram with bins extending outside the axes range, those bins are clipped at the canvas boundary. This is not an error — it is intentional cropping. Use it deliberately if you want to zoom into a region of the distribution, but always note in your caption if data is excluded.",
+      "**R1 â€” matplotlib's two interfaces.** matplotlib has two coding styles: the `pyplot` (functional) interface (`plt.hist()`, `plt.show()`) and the object-oriented interface (`fig, ax = plt.subplots(); ax.hist(); plt.show()`). Both produce the same output. The pyplot interface is shorter for single plots; the OO interface is required for subplots and for fine-grained control over individual axes. In production code, the OO interface is preferred because it is explicit about which axes each call modifies.",
+      "**R2 â€” Why `density=True` matters for comparisons.** If two histograms have different sample sizes ($n_1 \\ne n_2$), their raw-count histograms are not directly comparable â€” the group with more observations will always have taller bars. Setting `density=True` normalizes each histogram to unit area, converting counts to probability density. This makes shape comparisons valid regardless of sample size: the height at $x$ now estimates the probability density $f(x)$, not the count.",
     ],
     visualizations: [],
   },
@@ -78,82 +96,131 @@ export default {
   python: {
     cells: [
       {
-        id: "stat2-002-cell-1",
-        type: "python",
-        cellTitle: "Histogram of exam scores",
-        code: `# Build a histogram of 20 exam scores
+        id: 'stat2-002-py1',
+        cellTitle: 'Histogram â€” Distribution of Exam Scores',
+        prose: `A histogram bins raw continuous data and shows how many values fall in each range. Run this cell, then try changing bins from 5 to 10 to see how the shape changes.`,
+        code: `import matplotlib.pyplot as plt
+
 scores = [72, 85, 91, 63, 77, 88, 95, 70, 82, 76,
           58, 89, 74, 67, 93, 81, 71, 86, 62, 78]
 
-fig = Figure(width=7, height=4)
-fig.axes(xmin=50, xmax=100, ymin=0, ymax=8)
-fig.histogram(data=scores, bins=5, color="steelblue", alpha=0.8)
-fig.text(75, 8.5, "Midterm Score Distribution", size=13, bold=True)
-fig.show()
-`,
-        expectedOutput:
-          "A histogram with 5 bars showing the distribution of scores from 50 to 100.",
-        instructions:
-          "Try changing `bins=5` to `bins=10`. How does the shape of the distribution change?",
+print(f"n={len(scores)}, min={min(scores)}, max={max(scores)}")
+print(f"mean â‰ˆ {sum(scores)/len(scores):.1f}")
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 4))
+
+# 5 bins
+axes[0].hist(scores, bins=5, color='steelblue', edgecolor='white', alpha=0.9)
+axes[0].set_title('5 bins â€” coarser view')
+axes[0].set_xlabel('Score'); axes[0].set_ylabel('Count')
+
+# 10 bins
+axes[1].hist(scores, bins=10, color='tomato', edgecolor='white', alpha=0.9)
+axes[1].set_title('10 bins â€” finer view')
+axes[1].set_xlabel('Score'); axes[1].set_ylabel('Count')
+
+plt.suptitle('Midterm Score Distribution â€” Effect of Bin Width', fontsize=12, fontweight='bold')
+plt.tight_layout()
+plt.show()`,
       },
       {
-        id: "stat2-002-cell-2",
-        type: "python",
-        cellTitle: "Scatter plot: study hours vs. exam score",
-        code: `# Scatter plot: hours studied vs. exam score
+        id: 'stat2-002-py2',
+        cellTitle: 'Scatter Plot â€” Study Hours vs. Exam Score',
+        prose: `A scatter plot reveals the relationship between two quantitative variables. Each point is one student: (hours studied, exam score). Look for direction, form (linear vs. curved), and outliers.`,
+        code: `import matplotlib.pyplot as plt
+import numpy as np
+
 hours  = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5,
           6.0, 6.5, 7.0, 7.5, 8.0, 1.0, 3.0, 5.0, 7.0, 4.0]
 scores = [52,  57,  63,  65,  70,  73,  78,  79,  85,  86,
           88,  90,  92,  93,  95,  49,  68,  82,  91,  77]
 
-fig = Figure(width=7, height=5)
-fig.axes(xmin=0, xmax=9, ymin=45, ymax=100)
-fig.scatter(xs=hours, ys=scores, color="coral", size=5)
-fig.text(4.5, 98, "Hours Studied vs. Exam Score", size=13, bold=True)
-fig.show()
-`,
-        expectedOutput:
-          "A scatter plot showing a positive relationship between study hours and exam scores.",
-        instructions:
-          "Notice the point at (1.0, 49) and the point at (1.0, 52). They have the same x-value but different y-values. What does that tell you about the relationship?",
+r = np.corrcoef(hours, scores)[0, 1]
+print(f"Pearson r = {r:.3f} (strong positive linear association)")
+print(f"Range: {min(hours)}â€“{max(hours)} study hours, {min(scores)}â€“{max(scores)} score")
+
+fig, ax = plt.subplots(figsize=(8, 5))
+ax.scatter(hours, scores, color='coral', s=60, alpha=0.85, edgecolor='white', zorder=3)
+
+# Add regression line
+m, b = np.polyfit(hours, scores, 1)
+xr = np.linspace(0, 9, 100)
+ax.plot(xr, m * xr + b, color='navy', lw=2, linestyle='--', label=f'y = {m:.1f}x + {b:.1f}')
+
+ax.set_xlabel('Hours Studied'); ax.set_ylabel('Exam Score')
+ax.set_title('Hours Studied vs. Exam Score')
+ax.legend()
+plt.tight_layout()
+plt.show()`,
       },
       {
-        id: "stat2-002-cell-3",
-        type: "python",
-        cellTitle: "Bar chart: students per major",
-        code: `# Bar chart: number of students per major
-majors  = ["CS", "Math", "Physics", "Stats", "Biology"]
-counts  = [42,   31,     18,        25,       38]
+        id: 'stat2-002-py3',
+        cellTitle: 'Bar Chart â€” Students Per Major',
+        prose: `A bar chart displays pre-computed counts for categorical groups. The categories (majors) have no inherent numeric order â€” you can sort them by count to make comparisons easier. Run this cell and notice how sorting changes readability.`,
+        code: `import matplotlib.pyplot as plt
 
-fig = Figure(width=7, height=5)
-fig.axes(xmin=-1, xmax=5, ymin=0, ymax=50)
-fig.bars(labels=majors, values=counts, color="seagreen")
-fig.text(2, 48, "Students per Major", size=13, bold=True)
-fig.show()
-`,
-        expectedOutput:
-          "A bar chart with five bars showing enrollment by major.",
-        instructions:
-          "Try sorting: `sorted_pairs = sorted(zip(counts, majors), reverse=True); counts, majors = zip(*sorted_pairs)`. Does sorting by count make the chart easier to read?",
+majors = ["CS", "Math", "Physics", "Stats", "Biology"]
+counts = [42, 31, 18, 25, 38]
+
+# Sort by count descending
+pairs = sorted(zip(counts, majors), reverse=True)
+counts_sorted, majors_sorted = zip(*pairs)
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+# Unsorted
+axes[0].bar(majors, counts, color='seagreen', alpha=0.85, edgecolor='white')
+axes[0].set_title('Unsorted (original order)')
+axes[0].set_ylabel('Number of Students')
+axes[0].set_ylim(0, 50)
+
+# Sorted
+axes[1].bar(majors_sorted, counts_sorted, color='steelblue', alpha=0.85, edgecolor='white')
+axes[1].set_title('Sorted by count (easier to compare)')
+axes[1].set_ylabel('Number of Students')
+axes[1].set_ylim(0, 50)
+
+for ax in axes:
+    ax.set_xlabel('Major')
+
+plt.suptitle('Students per Major', fontsize=12, fontweight='bold')
+plt.tight_layout()
+plt.show()
+
+print("Total students:", sum(counts))`,
       },
       {
-        id: "stat2-002-cell-4",
-        type: "python",
-        cellTitle: "Pie chart: grade distribution",
-        code: `# Pie chart: grade distribution in a class
-labels = ["A", "B", "C", "D", "F"]
-values = [22,  35,  28,  10,  5]
+        id: 'stat2-002-py4',
+        cellTitle: 'Pie Chart and Line Chart',
+        prose: `Pie charts show part-to-whole proportions (best with â‰¤5 categories). Line charts show sequential trends over time. Run this cell to see both.`,
+        code: `import matplotlib.pyplot as plt
 
-fig = Figure(width=6, height=6)
-fig.axes(xmin=-1, xmax=1, ymin=-1, ymax=1)
-fig.pie(labels=labels, values=values)
-fig.text(0, 1.15, "Grade Distribution", size=13, bold=True)
-fig.show()
-`,
-        expectedOutput:
-          "A pie chart with five slices labeled A through F with percentages.",
-        instructions:
-          "Pie charts work best with 5 or fewer categories and large proportion differences. This chart has 5 categories — is it readable?",
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+# Pie chart: grade distribution
+grade_labels = ["A", "B", "C", "D", "F"]
+grade_values = [22, 35, 28, 10, 5]
+colors = ['#2ecc71', '#3498db', '#f39c12', '#e67e22', '#e74c3c']
+axes[0].pie(grade_values, labels=grade_labels, autopct='%1.1f%%',
+            colors=colors, startangle=90)
+axes[0].set_title('Grade Distribution (n=100 students)')
+
+# Line chart: monthly revenue trend
+months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+revenue = [120, 135, 148, 142, 160, 175, 168, 182, 195, 210, 225, 240]
+
+axes[1].plot(months, revenue, color='navy', lw=2, marker='o', markersize=6)
+axes[1].set_title('Monthly Revenue (thousands)')
+axes[1].set_xlabel('Month')
+axes[1].set_ylabel('Revenue ($K)')
+axes[1].tick_params(axis='x', rotation=30)
+axes[1].set_ylim(0, 260)
+
+plt.suptitle('Pie Chart (part-to-whole) vs. Line Chart (trend over time)',
+             fontsize=11, fontweight='bold')
+plt.tight_layout()
+plt.show()`,
       },
     ],
   },
@@ -161,82 +228,77 @@ fig.show()
   examples: [
     {
       id: "stat2-002-ex1",
-      title: "Build a histogram from raw data — step by step",
+      title: "Build a histogram from raw data â€” step by step",
       difficulty: "easy",
       problem:
-        "You have commute times (in minutes) for 12 employees: [15, 22, 8, 35, 47, 19, 28, 12, 41, 25, 33, 18]. Write the complete code to display a histogram with 4 bins.",
+        "You have commute times (in minutes) for 12 employees: [15, 22, 8, 35, 47, 19, 28, 12, 41, 25, 33, 18]. Write the complete matplotlib code to display a histogram with 4 bins.",
       steps: [
         {
-          expression:
-            "\\text{data = [15, 22, 8, 35, 47, 19, 28, 12, 41, 25, 33, 18]}",
-          annotation:
-            "Identify the raw data. min = 8, max = 47. These determine the axes range.",
+          expression: "\\text{data = [15, 22, 8, 35, 47, 19, 28, 12, 41, 25, 33, 18]}",
+          annotation: "Identify the raw data. min = 8, max = 47. These determine the bin range.",
           strategyTitle: "Step 1: Inspect data",
         },
         {
-          expression:
-            "x_{\\min} = 8, \\quad x_{\\max} = 47, \\quad h = (47-8)/4 = 9.75 \\approx \\text{4 bins of width 9.75}",
+          expression: "h = (47 - 8) / 4 = 9.75 \\text{ â€” 4 bins of width 9.75}",
           annotation:
-            "With 4 bins, the width will be (47-8)/4 ≈ 9.75. Max count per bin: at most 4–5 values, so ymax = 6 is safe.",
-          strategyTitle: "Step 2: Plan the axes",
+            "With 4 bins, bin edges fall at roughly 8, 17.75, 27.5, 37.25, 47. Max count per bin is about 3â€“4 values.",
+          strategyTitle: "Step 2: Plan the bins",
         },
         {
-          expression: "\\texttt{fig = Figure(width=7, height=4)}",
-          annotation:
-            "Create the Figure canvas. Width 7, height 4 is a standard landscape ratio for histograms.",
-          strategyTitle: "Step 3: Create figure",
-        },
-        {
-          expression: "\\texttt{fig.axes(xmin=5, xmax=50, ymin=0, ymax=6)}",
-          annotation:
-            "Set axes slightly wider than data range (xmin=5 < 8, xmax=50 > 47). ymin=0 for a count histogram. ymax=6 leaves headroom above the tallest bar.",
-          strategyTitle: "Step 4: Set axes",
+          expression: "\\texttt{import matplotlib.pyplot as plt}",
+          annotation: "Import matplotlib. Convention: alias as plt.",
+          strategyTitle: "Step 3: Import",
         },
         {
           expression:
-            '\\texttt{fig.histogram(data=commute, bins=4, color="steelblue")}',
+            "\\texttt{plt.hist(commute, bins=4, color='steelblue', edgecolor='white')}",
           annotation:
-            "Call histogram with the raw data list and 4 bins. The method computes bin edges and counts automatically.",
-          strategyTitle: "Step 5: Add histogram",
+            "Call hist() with raw data list and bins=4. matplotlib computes bin edges and counts automatically. edgecolor='white' adds thin lines between bars for readability.",
+          strategyTitle: "Step 4: Build histogram",
         },
         {
-          expression: "\\texttt{fig.show()}",
-          annotation: "Render the figure to the output cell.",
+          expression: "\\texttt{plt.xlabel('Commute (min)'); plt.ylabel('Count'); plt.title('...')}",
+          annotation: "Add axis labels and title for clarity.",
+          strategyTitle: "Step 5: Label",
+        },
+        {
+          expression: "\\texttt{plt.show()}",
+          annotation: "Render the figure to the output cell. Must be called after all chart calls.",
           strategyTitle: "Step 6: Show",
         },
       ],
     },
     {
       id: "stat2-002-ex2",
-      title: "Scatter plot with a trend observation",
+      title: "Scatter plot with trend observation",
       difficulty: "medium",
       problem:
-        "Temperature (°C) and ice cream sales (units) for 8 days: temp = [18, 21, 25, 28, 30, 33, 35, 27], sales = [120, 145, 190, 230, 265, 310, 335, 210]. Build a scatter plot and describe what you see.",
+        "Temperature (Â°C) and ice cream sales (units) for 8 days: temp = [18, 21, 25, 28, 30, 33, 35, 27], sales = [120, 145, 190, 230, 265, 310, 335, 210]. Build a scatter plot and describe what you see.",
       steps: [
         {
-          expression: "\\text{Two quantitative variables → scatter plot}",
+          expression: "\\text{Two quantitative variables â†’ scatter plot}",
           annotation:
             "Temperature and sales are both continuous quantitative variables. A scatter plot is the correct chart type.",
           strategyTitle: "Step 1: Chart selection",
         },
         {
           expression:
-            "\\texttt{fig.axes(xmin=15, xmax=38, ymin=100, ymax=350)}",
+            "\\texttt{plt.scatter(temp, sales, color='coral', s=60, alpha=0.85)}",
           annotation:
-            "Cover data range: temp ∈ [18, 35] → xmin=15, xmax=38. Sales ∈ [120, 335] → ymin=100, ymax=350. Note: ymin=100 instead of 0 is acceptable here because we are interested in the relationship shape, not bar comparisons from zero.",
-          strategyTitle: "Step 2: Axes",
+            "Plot 8 (temp, sales) pairs as dots. s=60 is the marker size; alpha=0.85 gives slight transparency.",
+          strategyTitle: "Step 2: Plot scatter",
         },
         {
           expression:
-            '\\texttt{fig.scatter(xs=temp, ys=sales, color="coral", size=6)}',
-          annotation: "Plot the 8 (temp, sales) pairs as dots.",
-          strategyTitle: "Step 3: Plot scatter",
+            "\\texttt{plt.xlabel('Temperature (Â°C)')}\\text{ + title}",
+          annotation: "Label both axes. Always include units.",
+          strategyTitle: "Step 3: Label",
         },
         {
           expression:
-            "\\text{Observation: positive linear relationship — as temperature increases, sales increase proportionally}",
+            "\\text{Observation: positive linear relationship}",
           annotation:
-            "The 8 points appear to fall roughly along a straight line with positive slope. There are no obvious outliers or curvature. This suggests a linear model would be appropriate — but remember Anscombe: check the residuals after fitting.",
+            "The 8 points roughly follow a straight line with positive slope. As temperature increases, sales increase proportionally. No obvious outliers or curvature.",
           strategyTitle: "Step 4: Interpret",
         },
       ],
@@ -246,27 +308,26 @@ fig.show()
       title: "Bar chart: survey response frequencies",
       difficulty: "easy",
       problem:
-        "A satisfaction survey had 5 response options. Results: Very Satisfied=48, Satisfied=62, Neutral=25, Dissatisfied=14, Very Dissatisfied=9. Build a bar chart using the opencalc API.",
+        "A satisfaction survey had 5 response options. Results: Very Satisfied=48, Satisfied=62, Neutral=25, Dissatisfied=14, Very Dissatisfied=9. Build a sorted bar chart.",
       steps: [
         {
-          expression:
-            '\\text{labels = ["V.Sat", "Sat", "Neutral", "Dissat", "V.Dissat"]}',
+          expression: "\\text{Pre-computed category counts â†’ plt.bar()}",
           annotation:
-            "Pre-computed category counts — use bars(), not histogram(). The x-axis will be categorical (labels), the y-axis will be count (0 to 65+).",
+            "Category totals are already computed. Use plt.bar(), not plt.hist(). The x-axis will be discrete labels, not a continuous number line.",
           strategyTitle: "Step 1: Identify chart type",
         },
         {
-          expression: "\\texttt{fig.axes(xmin=-1, xmax=5, ymin=0, ymax=70)}",
-          annotation:
-            "For bars(), xmin and xmax must leave room for the bars. With 5 categories, index 0–4, xmin=-1 and xmax=5 provides margins on both sides. ymax=70 exceeds the max bar height (62).",
-          strategyTitle: "Step 2: Axes for bars()",
+          expression:
+            "\\texttt{labels = ['V.Sat', 'Sat', 'Neutral', 'Dissat', 'V.Dissat']}",
+          annotation: "Store category labels and their counts as matching lists.",
+          strategyTitle: "Step 2: Prepare data",
         },
         {
           expression:
-            '\\texttt{fig.bars(labels=labels, values=[48,62,25,14,9], color="steelblue")}',
+            "\\texttt{plt.bar(labels, [48, 62, 25, 14, 9], color='steelblue')}",
           annotation:
-            "Pass the label list and value list in matching order. Each label gets one bar of the corresponding height.",
-          strategyTitle: "Step 3: Build the chart",
+            "Each label gets one bar of the corresponding height. Categories are not reordered by default â€” sort explicitly if desired.",
+          strategyTitle: "Step 3: Build chart",
         },
       ],
     },
@@ -275,411 +336,238 @@ fig.show()
   challenges: [
     {
       id: "stat2-002-ch1",
-      title: "Annotate a scatter plot with a trend observation",
+      title: "Overlay a regression line on a scatter plot",
       difficulty: "medium",
       problem:
-        'Using the hours/scores data from the code cell (cell 2), add a text annotation at position (7.5, 60) that reads "Positive trend" and set bold=True. Then change the dot color to "navy". Write the complete modified code.',
+        "Using the hours/scores data from cell 2 (hours=[1,1.5,...,4.0], scores=[52,57,...,77]), write code to: (a) plot the scatter points in navy, (b) compute a linear regression line using np.polyfit, and (c) overlay the regression line in red. Call plt.show() once at the end.",
       walkthrough: [
         {
-          expression: "\\text{Same scatter setup as cell 2}",
-          annotation:
-            "Keep the Figure, axes, and scatter() call. Add the text and change color.",
+          expression: "\\texttt{import numpy as np; m, b = np.polyfit(hours, scores, 1)}",
+          annotation: "np.polyfit(x, y, degree) returns [slope, intercept] for a degree-1 polynomial. m is slope, b is intercept.",
         },
         {
-          expression:
-            '\\texttt{fig.scatter(xs=hours, ys=scores, color="navy", size=5)}',
-          annotation:
-            'Change color from "coral" to "navy" in the scatter call.',
+          expression: "\\texttt{plt.scatter(hours, scores, color='navy', s=50)}",
+          annotation: "Plot the data points first.",
         },
         {
-          expression:
-            '\\texttt{fig.text(7.5, 60, "Positive trend", size=11, bold=True)}',
+          expression: "\\texttt{xr = np.linspace(0, 9, 100); plt.plot(xr, m*xr+b, color='red', lw=2)}",
           annotation:
-            "Add text at coordinates (7.5, 60). This is within the axes range (xmax=9, ymin=45) so it will be visible.",
+            "Create a dense range of x values, compute the fitted y = mx+b for each, and plot as a line. Calling plt.scatter() then plt.plot() before plt.show() overlays both on the same axes.",
         },
         {
-          expression:
-            "\\text{Check: is (7.5, 60) inside axes range?} \\quad 0 \\le 7.5 \\le 9, \\quad 45 \\le 60 \\le 100 \\checkmark",
+          expression: "\\texttt{plt.show()}",
           annotation:
-            "The annotation is within range. If coordinates were outside axes(), the text would not appear.",
+            "Call show() once after all chart calls. Both the scatter and the regression line will appear in the same figure.",
         },
       ],
       answer:
-        'Add `fig.text(7.5, 60, "Positive trend", size=11, bold=True)` after the scatter call and change scatter color to "navy".',
+        "Call plt.scatter() for the points and plt.plot() for the regression line, then plt.show() once at the end to render both on the same axes.",
     },
     {
       id: "stat2-002-ch2",
-      title: "Build a histogram with density normalization",
+      title: "Density histogram for distribution comparison",
       difficulty: "hard",
       problem:
-        "You have 30 daily temperature readings (°C): [14,16,18,19,20,21,21,22,22,23,23,24,24,24,25,25,25,26,26,27,27,28,28,29,30,31,32,33,35,38]. Build a histogram with density=True and 7 bins. The y-axis should show density values (0 to 0.10 is a safe range for this data). Add a title.",
+        "You have 30 daily temperature readings: [14,16,18,19,20,21,21,22,22,23,23,24,24,24,25,25,25,26,26,27,27,28,28,29,30,31,32,33,35,38]. Build a histogram with density=True and bins=7. Add a normal distribution curve overlay using scipy.stats.norm. This lets you visually test whether the temperatures follow a normal distribution.",
       walkthrough: [
         {
           expression:
-            "\\text{min=14, max=38, bins=7} \\Rightarrow h = (38-14)/7 \\approx 3.43",
-          annotation:
-            "Calculate bin width to estimate maximum bar density. Roughly 3–6 observations per bin. Max density ≈ 6/(30 × 3.43) ≈ 0.058.",
-        },
-        {
-          expression: "\\texttt{fig.axes(xmin=12, xmax=40, ymin=0, ymax=0.10)}",
-          annotation:
-            "xmin=12 < 14, xmax=40 > 38. ymax=0.10 safely exceeds estimated max density 0.058.",
+            "\\texttt{import numpy as np; from scipy import stats}",
+          annotation: "Import numpy for array operations and scipy.stats for the normal distribution.",
         },
         {
           expression:
-            '\\texttt{fig.histogram(data=temps, bins=7, density=True, color="teal")}',
+            "\\texttt{plt.hist(temps, bins=7, density=True, color='teal', edgecolor='white', alpha=0.7)}",
           annotation:
-            "density=True normalizes bar heights so total area = 1. Use density mode when comparing to a probability distribution or when comparing histograms with different sample sizes.",
+            "density=True normalizes bar heights so total area = 1. This makes the y-axis a probability density, enabling overlay with a probability distribution.",
         },
         {
           expression:
-            '\\texttt{fig.text(26, 0.105, "Daily Temperatures (density)", size=12, bold=True)}',
-          annotation:
-            "Place title above ymax at y=0.105. Center horizontally at x=26 ≈ (12+40)/2.",
+            "\\mu = \\bar{x}, \\quad \\sigma = s \\quad \\text{(sample mean and std)}",
+          annotation: "Fit a normal distribution to the data using np.mean() and np.std().",
         },
-      ],
-      answer:
-        "Create Figure, set axes with ymax=0.10, call histogram with density=True and bins=7, add title text above the axes range, call show().",
-    },
-    ,
-    {
-      id: "stat2-002-ch3",
-      title: "Applied Data Challenge",
-      difficulty: "hard",
-      problem:
-        "Use a CSV dataset from data/applied-statistics, apply this lesson's core method, and report one result plus one limitation.",
-      walkthrough: [
         {
-          expression: "Import -> clean -> compute -> interpret",
-          annotation: "Show each stage and justify one design choice.",
+          expression:
+            "\\texttt{xr = np.linspace(12, 40, 200); plt.plot(xr, stats.norm.pdf(xr, mu, sigma), 'r-', lw=2)}",
+          annotation:
+            "Overlay the normal PDF (probability density function) in red. If the histogram bars roughly follow this curve, the data is approximately normal.",
         },
       ],
       answer:
-        "A complete response includes a reproducible computation, contextual interpretation, and a limitation statement tied to assumptions.",
+        "Use density=True in plt.hist(), compute sample mean and std, then overlay scipy.stats.norm.pdf evaluated at a fine x-range.",
     },
   ],
-
-  semantics: {
-    core: [
-      {
-        symbol: "\\texttt{Figure(width, height)}",
-        meaning:
-          "Creates the canvas. width/height in abstract units (not pixels).",
-      },
-      {
-        symbol: "\\texttt{fig.axes(xmin, xmax, ymin, ymax)}",
-        meaning:
-          "Sets the coordinate system. Must be called before any chart elements. Values outside this range are clipped.",
-      },
-      {
-        symbol: "\\texttt{fig.histogram(data, bins, color, density)}",
-        meaning:
-          "Draws a histogram from raw continuous data. Computes bin edges and counts automatically.",
-      },
-      {
-        symbol: "\\texttt{fig.scatter(xs, ys, color, size)}",
-        meaning: "Draws a scatter plot. xs and ys must be equal-length lists.",
-      },
-      {
-        symbol: "\\texttt{fig.bars(labels, values, color)}",
-        meaning:
-          "Draws a bar chart from pre-computed category labels and their counts/proportions.",
-      },
-      {
-        symbol: "\\texttt{fig.plot(xs, ys, color, lw)}",
-        meaning:
-          "Draws a line chart connecting (x, y) points in order. Use for time series or ordered data.",
-      },
-      {
-        symbol: "\\texttt{fig.pie(labels, values)}",
-        meaning:
-          "Draws a pie chart from labels and proportional values. Best with ≤5 categories.",
-      },
-    ],
-    rulesOfThumb: [
-      "Raw continuous data → `histogram()`. Pre-computed category counts → `bars()`. Never swap them.",
-      "Set axes before adding any elements. Data outside axes range is clipped silently.",
-      "Use `density=True` in histogram when comparing shapes across different sample sizes.",
-      "Always call `fig.show()` last — it renders the accumulated elements to the canvas.",
-    ],
-  },
-
-  spiral: {
-    recoveryPoints: [],
-    futureLinks: [
-      {
-        lessonId: "stat2-004",
-        label: "Bar Charts and Pie Charts",
-        note: "stat2-004 goes deeper on fig.bars() and fig.pie() with real datasets.",
-      },
-      {
-        lessonId: "stat2-005",
-        label: "Scatter Plots",
-        note: "stat2-005 extends scatter() with regression overlay and residual plots.",
-      },
-      {
-        lessonId: "stat3-001",
-        label: "Descriptive Statistics",
-        note: "The distributions you visualize in stat2 are described numerically (mean, median, IQR) in stat3.",
-      },
-    ],
-  },
 
   checkpoints: [
     {
       id: "cp-stat2-002-1",
-      label: "Read: describe the four-step opencalc Figure pattern",
+      label: "Read: describe the matplotlib three-step pattern (import, chart function, show)",
       type: "read",
     },
     {
       id: "cp-stat2-002-2",
-      label: "Lab: run code cell 1 and change bins from 5 to 10",
+      label: "Lab: run cell 1 and change bins from 5 to 10 â€” describe what changes",
       type: "lab",
     },
     {
       id: "cp-stat2-002-3",
-      label: "Lab: run code cell 2 and identify the point with lowest score",
+      label: "Lab: run cell 2 and identify the student with the most hours but a below-average score",
       type: "lab",
     },
     {
       id: "cp-stat2-002-4",
-      label: "Read: explain when to use histogram() vs. bars()",
+      label: "Read: explain when to use plt.hist() vs. plt.bar()",
       type: "read",
     },
     {
       id: "cp-stat2-002-5",
-      label:
-        "Complete example 1: write histogram code for commute times from scratch",
+      label: "Complete example 1: write histogram code for commute times from scratch",
       type: "example",
     },
     {
       id: "cp-stat2-002-6",
-      label: "Lab: run code cell 3 and sort bars by value",
+      label: "Lab: run cell 3 and explain why the sorted version is easier to read",
       type: "lab",
     },
     {
       id: "cp-stat2-002-7",
-      label: "Attempt challenge 1: annotate scatter plot with text",
+      label: "Attempt challenge 1: overlay a regression line on a scatter plot",
       type: "challenge",
     },
     {
       id: "cp-stat2-002-8",
-      label:
-        "Read: explain what happens if a data point falls outside the axes() range",
+      label: "Read: explain why density=True is needed when comparing two histograms with different sample sizes",
       type: "read",
     },
   ],
 
-  assessment: {
-    questions: [
-      {
-        id: "stat2-002-assess-1",
-        type: "choice",
-        text: "You have a list of 200 raw continuous measurements. Which opencalc method should you use to display their distribution?",
-        options: [
-          "fig.bars()",
-          "fig.histogram()",
-          "fig.scatter()",
-          "fig.plot()",
-        ],
-        answer: "fig.histogram()",
-        instructions:
-          "`histogram()` takes raw data and bins it automatically. `bars()` requires pre-computed category counts.",
-      },
-    ],
-  },
-
   quiz: [
     {
-      id: "stat2-002-quiz-1",
-      type: "choice",
-      text: "What does `fig.axes(xmin=0, xmax=10, ymin=0, ymax=50)` do?",
+      type: 'choice',
+      question: `What does calling \`plt.hist(data, bins=8)\` do with the raw data list?`,
       options: [
-        "Creates the figure with size 10×50",
-        "Sets the coordinate system so only data in x=[0,10] and y=[0,50] is visible",
-        "Draws x and y axis lines on the canvas",
-        "Autoscales the axes to fit the data",
+        `Draws one bar per unique value in data`,
+        `Divides the data range into 8 equal-width intervals and counts how many values fall in each`,
+        `Draws 8 points connected by a line`,
+        `Sorts data and draws the top 8 values`,
       ],
-      answer:
-        "Sets the coordinate system so only data in x=[0,10] and y=[0,50] is visible",
-      hints: [
-        "Think about what happens to a data point at x=15 when xmax=10.",
-        "axes() defines the visible window, not the figure size.",
-      ],
-      reviewSection: 'Intuition → "Setting axes correctly" paragraph',
+      answer: `Divides the data range into 8 equal-width intervals and counts how many values fall in each`,
+      hints: [`plt.hist() bins continuous data automatically. The bins parameter controls how many intervals to create.`],
+      reviewSection: 'Intuition â€” Histogram paragraph',
     },
     {
-      id: "stat2-002-quiz-2",
-      type: "choice",
-      text: "Which is the correct way to draw a bar chart for: Category A=30, Category B=45, Category C=20?",
+      type: 'choice',
+      question: `You have category counts: Region A=30, Region B=45, Region C=20. Which matplotlib call is correct?`,
       options: [
-        "fig.histogram(data=[30,45,20], bins=3)",
-        'fig.bars(labels=["A","B","C"], values=[30,45,20])',
-        'fig.scatter(xs=["A","B","C"], ys=[30,45,20])',
-        "fig.plot(xs=[0,1,2], ys=[30,45,20])",
+        `plt.hist([30, 45, 20], bins=3)`,
+        `plt.bar(['A', 'B', 'C'], [30, 45, 20])`,
+        `plt.scatter(['A', 'B', 'C'], [30, 45, 20])`,
+        `plt.plot([30, 45, 20])`,
       ],
-      answer: 'fig.bars(labels=["A","B","C"], values=[30,45,20])',
-      hints: [
-        "The data is pre-computed category counts, not raw continuous measurements.",
-        "Use bars() for categorical data with known counts.",
-      ],
-      reviewSection: "Insight callout — Histogram vs. bars()",
+      answer: `plt.bar(['A', 'B', 'C'], [30, 45, 20])`,
+      hints: [`The data is pre-computed category counts â€” use plt.bar(), not plt.hist(). plt.hist() takes raw continuous data.`],
+      reviewSection: 'Insight callout â€” hist() vs. bar()',
     },
     {
-      id: "stat2-002-quiz-3",
-      type: "choice",
-      text: "What is the purpose of `density=True` in `fig.histogram(data, bins=10, density=True)`?",
+      type: 'choice',
+      question: `What is the purpose of \`density=True\` in \`plt.hist(data, bins=10, density=True)\`?`,
       options: [
-        "It makes the bars more densely packed together",
-        "It normalizes bar heights so the total area of all bars equals 1",
-        "It increases the number of bins",
-        "It adds a smooth curve overlay",
+        `It makes the bars more densely packed together`,
+        `It normalizes bar heights so the total area of all bars equals 1`,
+        `It increases the number of bins`,
+        `It adds a smooth KDE curve overlay`,
       ],
-      answer:
-        "It normalizes bar heights so the total area of all bars equals 1",
-      hints: [
-        'What does "density" mean in probability? A probability density integrates to 1.',
-        "density=True is useful when comparing two histograms with different sample sizes.",
-      ],
-      reviewSection: "Math section — histogram bin count",
+      answer: `It normalizes bar heights so the total area of all bars equals 1`,
+      hints: [`A probability density integrates to 1. density=True converts counts to densities, enabling comparison with probability distributions.`],
+      reviewSection: 'Math section â€” histogram bin count',
     },
     {
-      id: "stat2-002-quiz-4",
-      type: "choice",
-      text: "A scatter plot is appropriate when:",
+      type: 'choice',
+      question: `A scatter plot is appropriate when:`,
       options: [
-        "You have one categorical and one quantitative variable",
-        "You have two quantitative variables and want to show their relationship",
-        "You have one quantitative variable and want to show its distribution",
-        "You have proportions of a whole and want to show part-to-whole",
+        `You have one categorical and one quantitative variable`,
+        `You have two quantitative variables and want to explore their relationship`,
+        `You have one quantitative variable and want to show its distribution`,
+        `You have proportions of a whole and want to show part-to-whole`,
       ],
-      answer:
-        "You have two quantitative variables and want to show their relationship",
-      hints: [
-        "Think: how many variables? What type?",
-        "A scatter plot uses both axes for quantitative scales.",
-      ],
-      reviewSection: 'Intuition → "Scatter plot" paragraph',
+      answer: `You have two quantitative variables and want to explore their relationship`,
+      hints: [`Think: how many variables? What type? Scatter uses both axes for quantitative scales.`],
+      reviewSection: 'Intuition â€” Scatter plot paragraph',
     },
     {
-      id: "stat2-002-quiz-5",
-      type: "choice",
-      text: "If you call `fig.axes(xmin=0, xmax=10, ymin=0, ymax=20)` and then plot a point at x=15, what happens?",
+      type: 'choice',
+      question: `You call plt.scatter(x, y) followed by plt.plot(x, trend). What does calling plt.show() once at the end produce?`,
       options: [
-        "The axes automatically expand to include the point",
-        "An error is raised",
-        "The point is clipped and not visible on the canvas",
-        "The point appears at the edge of the canvas at x=10",
+        `Two separate figures`,
+        `Only the last chart called (plot overwrites scatter)`,
+        `A single figure with both the scatter points and the line overlaid`,
+        `An error because you can't mix chart types`,
       ],
-      answer: "The point is clipped and not visible on the canvas",
-      hints: [
-        "axes() sets a fixed window. Data outside it is not shown.",
-        "This is intentional behavior — you control the visible range.",
-      ],
-      reviewSection: "Warning callout — Axes Must Cover All Data",
+      answer: `A single figure with both the scatter points and the line overlaid`,
+      hints: [`plt.show() renders everything accumulated since the last show(). Multiple chart calls before show() overlay on the same axes.`],
+      reviewSection: 'Warning callout â€” plt.show() clears the figure',
     },
     {
-      id: "stat2-002-quiz-6",
-      type: "choice",
-      text: "Which method would you use to plot a company's monthly revenue over 12 months?",
-      options: ["fig.histogram()", "fig.bars()", "fig.plot()", "fig.pie()"],
-      answer: "fig.plot()",
-      hints: [
-        "Monthly revenue over time is sequential and ordered.",
-        "A line chart shows how a value changes over time.",
+      type: 'choice',
+      question: `Which matplotlib function is best for plotting a company's monthly revenue over 12 months?`,
+      options: [`plt.hist()`, `plt.bar()`, `plt.plot()`, `plt.pie()`],
+      answer: `plt.plot()`,
+      hints: [`Monthly revenue over time is sequential and ordered â€” a line chart shows how the value changes between consecutive months.`],
+      reviewSection: 'Intuition â€” Line chart paragraph',
+    },
+    {
+      type: 'choice',
+      question: `You use \`fig, axes = plt.subplots(1, 2, figsize=(12, 5))\`. How do you add a histogram to the LEFT subplot?`,
+      options: [
+        `plt.hist(data, bins=10)`,
+        `axes[0].hist(data, bins=10)`,
+        `axes[1].hist(data, bins=10)`,
+        `fig.hist(data, bins=10)`,
       ],
-      reviewSection: 'Intuition → "Line chart" paragraph',
+      answer: `axes[0].hist(data, bins=10)`,
+      hints: [`plt.subplots() returns an array of Axes objects. Index 0 = left subplot, index 1 = right subplot. Call chart methods on individual axes objects.`],
+      reviewSection: 'Intuition â€” subplots paragraph',
+    },
+    {
+      type: 'choice',
+      question: `The \`alpha\` parameter in \`plt.scatter(x, y, alpha=0.3)\` controls:`,
+      options: [
+        `The marker shape`,
+        `The marker size`,
+        `The transparency of points (0 = invisible, 1 = fully opaque)`,
+        `The color saturation`,
+      ],
+      answer: `The transparency of points (0 = invisible, 1 = fully opaque)`,
+      hints: [`Alpha = transparency. alpha=0.3 means 30% opaque. When many points overlap, lower alpha lets overlapping points appear darker.`],
+      reviewSection: 'Intuition â€” scatter plot paragraph',
+    },
+    {
+      type: 'choice',
+      question: `A dataset has 1000 observations. Using Sturges' rule âŒˆlogâ‚‚(n) + 1âŒ‰, how many histogram bins does it recommend?`,
+      options: [`8`, `11`, `20`, `32`],
+      answer: `11`,
+      hints: [`logâ‚‚(1000) â‰ˆ 9.97. k = âŒˆ9.97 + 1âŒ‰ = âŒˆ10.97âŒ‰ = 11.`],
+      reviewSection: 'Math section â€” Sturges rule',
+    },
+    {
+      type: 'choice',
+      question: `When is a pie chart the BEST choice over a bar chart?`,
+      options: [
+        `When you have more than 10 categories`,
+        `When you have 3â€“5 categories with clearly different proportions and want to show part-to-whole`,
+        `When comparing distributions across groups`,
+        `When showing a trend over time`,
+      ],
+      answer: `When you have 3â€“5 categories with clearly different proportions and want to show part-to-whole`,
+      hints: [`Pie charts work best with few categories (â‰¤5) where the proportions are large enough to distinguish by eye. For comparisons, bar charts are more accurate.`],
+      reviewSection: 'Intuition â€” pie chart paragraph',
     },
   ],
 
-  misconceptions: [
-    {
-      falseBelief:
-        "fig.histogram() and fig.bars() are interchangeable for displaying distributions.",
-      whyStudentsThinkIt:
-        "Both produce bar-shaped charts. Students see bars in both outputs and assume they do the same thing.",
-      correctionExample:
-        "Calling `fig.bars(labels=scores, values=scores)` on a list of 200 exam scores would create 200 bars (one per unique value) — a barely readable vertical spike plot. `fig.histogram(data=scores, bins=10)` groups the values into 10 ranges and shows their frequency distribution.",
-      contrastCase:
-        'If you already have the counts per bin from a previous analysis (e.g., bin="50-60": 5, "60-70": 18, ...), then `bars()` is correct — pass the bin labels and pre-computed counts.',
-    },
-    {
-      falseBelief: "You must always start the y-axis at 0 in every chart.",
-      whyStudentsThinkIt:
-        'The "never truncate the y-axis" rule from bar charts is over-generalized.',
-      correctionExample:
-        "A line chart of daily temperature over a year. The temperature never goes below 10°C. Setting ymin=0 puts the entire line in the top 30% of the chart, compressing all visible variation. In this case, ymin=5 or ymin=10 is more informative.",
-      contrastCase:
-        "Bar charts: the zero-baseline rule is absolute for bar charts because bar length encodes the full value. For scatter plots and line charts, the baseline is not part of the visual encoding, so zooming into the relevant range is often appropriate.",
-    },
-    {
-      falseBelief:
-        "fig.show() can be called multiple times to show different charts.",
-      whyStudentsThinkIt:
-        "Students try to build two charts in one code cell by calling show() twice.",
-      correctionExample:
-        "Creating two `Figure` objects in one cell and calling `show()` on each is the correct approach. Each `Figure` is an independent canvas.",
-      contrastCase:
-        "Within one Figure, you can call multiple chart methods (e.g., fig.scatter() then fig.plot() for a scatter with regression line). But to produce two separate charts, create two separate Figure objects.",
-    },
+  definitions: [
+    { term: 'plt.hist()', definition: 'matplotlib function that bins raw continuous data and draws a histogram. Takes raw data; computes bins automatically.', symbol: null },
+    { term: 'density=True', definition: 'Histogram normalization option: converts bar heights from counts to probability densities so total area = 1.', symbol: null },
+    { term: 'plt.subplots()', definition: 'Creates a figure and a grid of Axes objects for side-by-side or multi-panel plots.', symbol: null },
+    { term: 'alpha', definition: 'Transparency parameter: 0 = invisible, 1 = fully opaque. Useful for overplotting in scatter plots.', symbol: null },
   ],
-
-  transferPrompts: [
-    {
-      situation:
-        "You are analyzing customer purchase amounts from an e-commerce site. You have 500 raw purchase amounts in dollars, ranging from $5 to $2,000, but 90% are below $200 with a few extreme purchases up to $2,000.",
-      competingTechniques: [
-        "histogram with default axes covering 0–2000",
-        "histogram with axes covering 0–300 and a note that outliers are excluded",
-        "log-transform the data then histogram",
-      ],
-      whyThisTechniqueWins:
-        "A histogram covering the full 0–2000 range would compress 90% of the data into the first 10% of the x-axis — the distribution shape would be invisible. Zooming into 0–300 shows the main distribution and notes that a small number of high-value purchases are excluded. A log transform stretches the compressed left tail and compresses the long right tail, showing the full distribution in one chart — at the cost of a non-linear x-axis that is harder to interpret. Both zooming and log transform are valid; the choice depends on the audience and the analytical question.",
-    },
-    {
-      situation:
-        "A professor wants to compare the distribution of final exam scores for three different sections of the same course (Section A: n=35, Section B: n=28, Section C: n=42).",
-      competingTechniques: [
-        "Three separate histograms in separate cells",
-        "Three boxplots side-by-side using fig.boxplot()",
-        "One combined histogram with color per section",
-      ],
-      whyThisTechniqueWins:
-        "Boxplots side-by-side (using multiple fig.boxplot() calls on the same Figure with different x positions) allow direct visual comparison of medians, IQRs, and outliers across all three sections in a single chart. Three separate histograms force the reader to scan across charts and compare shapes mentally — harder. One combined histogram with three colors overlaid is hard to read when the distributions overlap. For comparison tasks, boxplots are optimal.",
-    },
-  ],
-
-  debugging: [
-    {
-      commonError: "Chart appears blank or empty after running the cell.",
-      symptom:
-        "The code runs without errors but no chart appears, or only the axes are visible.",
-      whyItHappened:
-        "Most common cause: the data is outside the axes() range, so all elements are clipped. Second most common: forgot to call fig.show().",
-      repairStrategy:
-        "Step 1: Check that axes() was called. Step 2: Print min(data) and max(data) and verify they are within xmin/xmax. Step 3: For histograms, verify ymax > the maximum expected bin count (a rough estimate: max count ≈ n / bins × 2). Step 4: Verify fig.show() is the last line.",
-    },
-    {
-      commonError: "TypeError when passing string labels to fig.histogram().",
-      symptom:
-        '"TypeError: data must be a list of numbers" when trying to plot categories.',
-      whyItHappened:
-        'Student called `fig.histogram(data=["A","B","C","A","B"], bins=3)` trying to get a frequency count of categories.',
-      repairStrategy:
-        "Use `fig.bars()` for categorical data. You need to manually count frequencies first:\n```python\nfrom collections import Counter\ncounts = Counter(categories)\nfig.bars(labels=list(counts.keys()), values=list(counts.values()))\n```",
-    },
-  ],
-
-  mastery: {
-    targetLevel:
-      "Apply (Level 3) — given a dataset and question, write complete working opencalc code to produce the appropriate chart including axes, chart method, and title, with correct axes ranges.",
-    solveIndependently:
-      "Given any dataset (described with variable names, types, and sample values), write the complete 5-line opencalc code to display it using the correct chart type with appropriate axes.",
-    explainVerbally:
-      "Explain the difference between `fig.histogram()` and `fig.bars()` — when to use each and what goes wrong if you choose the wrong one.",
-    detectIncorrectApplication:
-      "Given broken opencalc code (wrong axes, wrong method, missing show()), identify and fix all errors.",
-    transferToUnfamiliar:
-      "Given a dataset type not covered in this lesson (e.g., a time series, a part-to-whole proportion), choose and apply the correct opencalc method without being told which one to use.",
-  },
 };
