@@ -9,17 +9,17 @@ export const PREBUILT_PLANS = [
       {
         dayName: 'Upper Heavy',
         exercises: [
-          { id: 'bench_press', targetSets: 4, targetReps: 5 },
-          { id: 'pullups', targetSets: 4, targetReps: 8 },
-          { id: 'pushups', targetSets: 3, targetReps: 15 }
+          { id: 'barbell_bench_press', targetSets: 4, targetReps: 5 },
+          { id: 'bw_pullups', targetSets: 4, targetReps: 8 },
+          { id: 'bw_pushups', targetSets: 3, targetReps: 15 }
         ]
       },
       {
         dayName: 'Lower Heavy',
         exercises: [
           { id: 'barbell_squat', targetSets: 4, targetReps: 5 },
-          { id: 'wall_sit', targetSets: 3, targetDurationMinutes: 1 },
-          { id: 'plank', targetSets: 3, targetDurationMinutes: 1 }
+          { id: 'iso_wall_sit', targetSets: 3, targetDurationMinutes: 1 },
+          { id: 'iso_plank', targetSets: 3, targetDurationMinutes: 1 }
         ]
       }
     ]
@@ -34,14 +34,14 @@ export const PREBUILT_PLANS = [
       {
         dayName: 'Long Run',
         exercises: [
-          { id: 'running_outdoor', targetDistanceKm: 5 }
+          { id: 'cardio_running', targetDistanceKm: 5 }
         ]
       },
       {
         dayName: 'Sprint Intervals',
         exercises: [
-          { id: 'sprinting', targetDistanceKm: 1 },
-          { id: 'box_jumps', targetSets: 4, targetReps: 10 }
+          { id: 'cardio_sprinting', targetDistanceKm: 1 },
+          { id: 'bw_box_jumps', targetSets: 4, targetReps: 10 }
         ]
       }
     ]
@@ -56,16 +56,16 @@ export const PREBUILT_PLANS = [
       {
         dayName: 'Calisthenics',
         exercises: [
-          { id: 'pullups', targetSets: 5, targetReps: 10 },
-          { id: 'pushups', targetSets: 5, targetReps: 20 },
-          { id: 'plank', targetSets: 3, targetDurationMinutes: 2 }
+          { id: 'bw_pullups', targetSets: 5, targetReps: 10 },
+          { id: 'bw_pushups', targetSets: 5, targetReps: 20 },
+          { id: 'iso_plank', targetSets: 3, targetDurationMinutes: 2 }
         ]
       },
       {
         dayName: 'Mobility & Flow',
         exercises: [
-          { id: 'yoga_flow', targetDurationMinutes: 30 },
-          { id: 'static_stretching', targetDurationMinutes: 15 }
+          { id: 'mob_yoga', targetDurationMinutes: 30 },
+          { id: 'mob_static_stretch', targetDurationMinutes: 15 }
         ]
       }
     ]
