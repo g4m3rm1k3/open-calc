@@ -33,6 +33,11 @@ import chemistry4 from "./chemistry-4/index.js";
 
 import elec0 from "./elec-0/index.js";
 import elec1 from "./elec-1/index.js";
+import elec2 from "./elec-2/index.js";
+import elec3 from "./elec-3/index.js";
+import elec4 from "./elec-4/index.js";
+import elec5 from "./elec-5/index.js";
+import elec6 from "./elec-6/index.js";
 import logic0 from "./logic-0/index.js";
 import plc0 from "./plc-0/index.js";
 import digitalFundamentals from "./digital-fundamentals/index.js";
@@ -109,6 +114,11 @@ const CHEMISTRY_CURRICULUM = [
 ].map((ch) => ({ ...ch, course: "chemistry-1" }));
 const ELEC0_CURRICULUM = elec0.map((ch) => ({ ...ch, course: "elec-0" }));
 const ELEC1_CURRICULUM = elec1.map((ch) => ({ ...ch, course: "elec-1" }));
+const ELEC2_CURRICULUM = elec2.map((ch) => ({ ...ch, course: "elec-2" }));
+const ELEC3_CURRICULUM = elec3.map((ch) => ({ ...ch, course: "elec-3" }));
+const ELEC4_CURRICULUM = elec4.map((ch) => ({ ...ch, course: "elec-4" }));
+const ELEC5_CURRICULUM = elec5.map((ch) => ({ ...ch, course: "elec-5" }));
+const ELEC6_CURRICULUM = elec6.map((ch) => ({ ...ch, course: "elec-6" }));
 const LOGIC0_CURRICULUM = logic0.map((ch) => ({ ...ch, course: "logic-0" }));
 const PLC0_CURRICULUM = plc0.map((ch) => ({ ...ch, course: "plc-0" }));
 const DIGITAL_FUNDAMENTALS_CURRICULUM = digitalFundamentals.map((ch) => ({
@@ -165,6 +175,11 @@ export const CURRICULUM = [
   ...CHEMISTRY_CURRICULUM,
   ...ELEC0_CURRICULUM,
   ...ELEC1_CURRICULUM,
+  ...ELEC2_CURRICULUM,
+  ...ELEC3_CURRICULUM,
+  ...ELEC4_CURRICULUM,
+  ...ELEC5_CURRICULUM,
+  ...ELEC6_CURRICULUM,
   ...LOGIC0_CURRICULUM,
   ...PLC0_CURRICULUM,
   ...DIGITAL_FUNDAMENTALS_CURRICULUM,
