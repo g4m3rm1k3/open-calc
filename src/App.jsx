@@ -48,6 +48,7 @@ const CmmLabPage = lazy(() => import("./pages/CmmLabPage.jsx"));
 const FiveAxisKinematicsPage = lazy(() => import("./pages/FiveAxisKinematicsPage.jsx"));
 const DSAArraysLabPage = lazy(() => import("./pages/DSAArraysLabPage.jsx"));
 const DSALinkedListsLabPage = lazy(() => import("./pages/DSALinkedListsLabPage.jsx"));
+const PLCLabPage = lazy(() => import("./pages/PLCLabPage.jsx"));
 const Fallback = () => (
   <div className="flex items-center justify-center h-64">
     <LoadingSpinner size="lg" />
@@ -120,6 +121,7 @@ export default function App() {
                     <Route path="five-axis" element={<FiveAxisKinematicsPage />} />
                     <Route path="dsa-arrays-lab" element={<DSAArraysLabPage />} />
                     <Route path="dsa-linked-lists-lab" element={<DSALinkedListsLabPage />} />
+                    <Route path="plc-lab" element={<PLCLabPage />} />
                   </Routes>
                 </Suspense>
               </AppShell>

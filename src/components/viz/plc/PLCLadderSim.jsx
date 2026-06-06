@@ -520,9 +520,43 @@ function BranchElement({ el, tags, powered, compact }) {
   );
 }
 
+// ─── INT tag editor ────────────────────────────────────────────────────────
+
+function IntTagEditor({ name, value, onChange }) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(String(value));
+  if (editing) {
+    return (
+      <input
+        autoFocus
+        value={draft}
+        onChange={e => setDraft(e.target.value)}
+        onBlur={() => {
+          const n = parseInt(draft, 10);
+          if (!isNaN(n)) onChange(n);
+          setEditing(false);
+        }}
+        onKeyDown={e => {
+          if (e.key === 'Enter') { const n = parseInt(draft, 10); if (!isNaN(n)) onChange(n); setEditing(false); }
+          if (e.key === 'Escape') setEditing(false);
+        }}
+        style={{ width: 70, fontFamily: 'monospace', fontSize: 12, background: '#1e293b', color: '#6366f1', border: '1px solid #6366f1', borderRadius: 4, padding: '2px 6px', textAlign: 'right' }}
+      />
+    );
+  }
+  return (
+    <span onClick={() => { setDraft(String(value)); setEditing(true); }}
+      title="Click to edit"
+      style={{ fontFamily: 'monospace', fontSize: 12, fontWeight: 700, color: '#6366f1', cursor: 'text', borderBottom: '1px dashed #334155' }}>
+      {value}
+    </span>
+  );
+}
+
 // ─── Main component ────────────────────────────────────────────────────────
 
-export default function PLCLadderSim({ initialProps = {} }) {
+export default function PLCLadderSim({ params = {}, initialProps }) {
+  const cfg = (params && Object.keys(params).length > 0 ? params : initialProps) ?? {};
   const {
     program = [],
     tags: initialTagDefs = {},
@@ -532,7 +566,7 @@ export default function PLCLadderSim({ initialProps = {} }) {
     description = '',
     scanInterval = 100,
     compact = false,
-  } = initialProps;
+  } = cfg;
 
   const [tags, setTags] = useState(() => initTags(initialTagDefs));
   const [running, setRunning] = useState(true);
@@ -705,7 +739,7 @@ export default function PLCLadderSim({ initialProps = {} }) {
             {intTags.map(([name, tag]) => (
               <div key={name} style={{ background: '#111827', border: '1px solid #1e293b', borderRadius: 8, padding: '6px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: 11, fontFamily: 'monospace', color: '#94a3b8' }}>{name}</span>
-                <span style={{ fontFamily: 'monospace', fontSize: 12, fontWeight: 700, color: '#6366f1' }}>{tag.value}</span>
+                <IntTagEditor name={name} value={tag.value ?? 0} onChange={v => setTags(prev => ({ ...prev, [name]: { ...prev[name], value: v } }))} />
               </div>
             ))}
             {timerTags.map(([name, tag]) => (

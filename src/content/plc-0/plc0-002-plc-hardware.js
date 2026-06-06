@@ -51,39 +51,9 @@ export default {
     ],
     visualizations: [
       {
-        id: 'PLCLadderSim',
-        title: 'I/O Module Simulation',
-        mathBridge: 'This simulation shows how physical I/O maps to program tags. The I/O tab represents the input module (toggle switches) and output module (indicator lights). The Tags tab shows the Input Image Table — notice that toggling an input updates the tag value, and the rung uses that tag value, not the physical switch directly.',
-        initialProps: {
-          program: [
-            [
-              { type: 'XIC', tag: 'LIMIT_SW_1', label: 'Limit Sw 1' },
-              { type: 'XIC', tag: 'LIMIT_SW_2', label: 'Limit Sw 2' },
-              { type: 'OTE', tag: 'CONVEYOR_FWD', label: 'Conveyor Fwd' },
-            ],
-            [
-              { type: 'XIC', tag: 'PHOTO_EYE', label: 'Photo Eye' },
-              { type: 'XIO', tag: 'CONVEYOR_FWD', label: 'Conv Fwd' },
-              { type: 'OTE', tag: 'PART_PRESENT', label: 'Part Present' },
-            ],
-          ],
-          tags: {
-            LIMIT_SW_1: { type: 'BOOL', value: false },
-            LIMIT_SW_2: { type: 'BOOL', value: false },
-            PHOTO_EYE: { type: 'BOOL', value: false },
-            CONVEYOR_FWD: { type: 'BOOL', value: false },
-            PART_PRESENT: { type: 'BOOL', value: false },
-          },
-          inputs: [
-            { tag: 'LIMIT_SW_1', label: 'Limit Sw 1' },
-            { tag: 'LIMIT_SW_2', label: 'Limit Sw 2' },
-            { tag: 'PHOTO_EYE', label: 'Photo Eye' },
-          ],
-          outputs: [
-            { tag: 'CONVEYOR_FWD', label: 'Conveyor Fwd' },
-            { tag: 'PART_PRESENT', label: 'Part Present' },
-          ],
-        },
+        id: 'PLCHardwareViz',
+        title: 'CompactLogix Rack Explorer',
+        mathBridge: 'Click each module in the rack to see its specifications, current draw, and live signal values. Switch to Power tab to verify the power budget. Switch to Wiring to see how sensors connect to each module type.',
       },
     ],
   },

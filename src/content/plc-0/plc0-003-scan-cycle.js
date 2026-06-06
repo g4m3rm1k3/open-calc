@@ -51,42 +51,9 @@ export default {
     ],
     visualizations: [
       {
-        id: 'PLCLadderSim',
-        title: 'Scan Cycle in Action',
-        mathBridge: 'Watch the scan-order dependency: Rung 1 drives GATE_OPEN from SENSOR_A. Rung 2 drives ALARM from GATE_OPEN. Enable SENSOR_A — both GATE_OPEN and ALARM turn on in the same scan because Rung 1 executes before Rung 2. Notice the Tags tab updating every scan.',
-        initialProps: {
-          program: [
-            [
-              { type: 'XIC', tag: 'SENSOR_A', label: 'Sensor A' },
-              { type: 'OTE', tag: 'GATE_OPEN', label: 'Gate Open' },
-            ],
-            [
-              { type: 'XIC', tag: 'GATE_OPEN', label: 'Gate Open' },
-              { type: 'OTE', tag: 'ALARM', label: 'Alarm' },
-            ],
-            [
-              { type: 'XIC', tag: 'SENSOR_B', label: 'Sensor B' },
-              { type: 'XIC', tag: 'GATE_OPEN', label: 'Gate Open' },
-              { type: 'OTE', tag: 'CONVEYOR', label: 'Conveyor' },
-            ],
-          ],
-          tags: {
-            SENSOR_A: { type: 'BOOL', value: false },
-            SENSOR_B: { type: 'BOOL', value: false },
-            GATE_OPEN: { type: 'BOOL', value: false },
-            ALARM: { type: 'BOOL', value: false },
-            CONVEYOR: { type: 'BOOL', value: false },
-          },
-          inputs: [
-            { tag: 'SENSOR_A', label: 'Sensor A' },
-            { tag: 'SENSOR_B', label: 'Sensor B' },
-          ],
-          outputs: [
-            { tag: 'GATE_OPEN', label: 'Gate Open' },
-            { tag: 'ALARM', label: 'Alarm' },
-            { tag: 'CONVEYOR', label: 'Conveyor' },
-          ],
-        },
+        id: 'PLCScanCycleViz',
+        title: 'PLC Scan Cycle — Live Animation',
+        mathBridge: 'Watch the four phases cycle: Input Scan → Program Scan → Output Scan → Housekeeping. Toggle inputs — notice the IIT freezes at scan start and doesn\'t update until the next Input Scan phase. Switch to Step mode to walk through execution one step at a time and see exactly what changes in each phase.',
       },
     ],
   },

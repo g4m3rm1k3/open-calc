@@ -90,6 +90,16 @@ export const LABS = [
     cover: { grad: 'from-amber-700 via-orange-800 to-red-950', mark: 'G0', sub: 'CNC · CAM · Toolpaths' },
   },
   {
+    key: 'plc-lab',
+    label: 'PLC Ladder Logic Lab',
+    emoji: '🏭',
+    color: 'orange',
+    desc: 'Hands-on PLC ladder logic simulator — 8 exercises from motor start/stop to full FSM state machines. Allen-Bradley naming: XIC, XIO, OTE, OTL, OTU, TON, CTU, comparison, math.',
+    path: '/plc-lab',
+    tags: ['PLC', 'Industrial', 'Automation'],
+    cover: { grad: 'from-orange-700 via-amber-800 to-yellow-950', mark: '⊣⊢', sub: 'XIC · TON · CTU · FSM' },
+  },
+  {
     key: 'logic-sim',
     label: 'Logic Suite',
     emoji: '⚡',
