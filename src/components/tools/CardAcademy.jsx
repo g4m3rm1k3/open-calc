@@ -245,6 +245,163 @@ const GameLayout = ({ left, right }) => (
 // ═══════════════════════════════════════════════
 //  GAME: BLACKJACK
 // ═══════════════════════════════════════════════
+
+// ─── Scenarios ─────────────────────────────────────────────────────────────
+const BJ_SCENARIOS = [
+  {
+    id: 'hard16',
+    badge: 'A',
+    name: 'Hard 16 vs Dealer 10',
+    desc: 'The most misplayed hand. You have 10+6 vs a dealer 10.',
+    lesson: 'Hard 16 vs dealer 10 is a losing hand either way. HIT because the dealer must draw to 17+ and will make it most of the time. Standing also loses 77% of the time — but basic strategy says HIT. Never let "fear of busting" make you deviate from the math.',
+    player: [{ rank: '10', suit: '♠', id: 'sc10s' }, { rank: '6', suit: '♥', id: 'sc6h' }],
+    dealer: [{ rank: '10', suit: '♦', id: 'sc10d' }, { rank: '7', suit: '♣', id: 'sc7c' }],
+    preCount: 0,
+  },
+  {
+    id: 'soft18',
+    badge: 'B',
+    name: 'Soft 18 vs Dealer 6',
+    desc: 'Ace+7 = soft 18. Dealer shows 6 — the worst card for the house.',
+    lesson: "Soft 18 vs dealer 6 is a DOUBLE DOWN opportunity. The dealer busts ~42% showing a 6. You're already winning — maximize it. Most beginners STAND and leave money on the table. Always double soft totals against dealer 4–6.",
+    player: [{ rank: 'A', suit: '♠', id: 'scAs' }, { rank: '7', suit: '♥', id: 'sc7h' }],
+    dealer: [{ rank: '6', suit: '♦', id: 'sc6d' }, { rank: '5', suit: '♣', id: 'sc5c' }],
+    preCount: 0,
+  },
+  {
+    id: 'hotdeck',
+    badge: 'C',
+    name: 'True Count +4 — Bet Big?',
+    desc: 'Running count is +8. True count ≈ +4. This is when MIT bet the table max.',
+    lesson: 'A true count of +4 gives the player ~2% edge over the house. Each +1 in true count ≈ 0.5% extra player edge. At a $5–$500 table, the MIT team would go to max bet here. This is the entire point of counting — waiting for moments like this.',
+    player: [{ rank: '9', suit: '♠', id: 'sc9s' }, { rank: '8', suit: '♥', id: 'sc8h' }],
+    dealer: [{ rank: '7', suit: '♦', id: 'sc7d' }, { rank: '4', suit: '♣', id: 'sc4c' }],
+    preCount: 8,
+  },
+]
+
+// ─── Tutor Modal ────────────────────────────────────────────────────────────
+const TutorModal = ({ interrupt, onRevise, onForce }) => {
+  if (!interrupt) return null
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 20 }}>
+      <div style={{ background: '#0f172a', border: '2px solid #f59e0b', borderRadius: 16, maxWidth: 460, width: '100%', padding: '24px', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}>
+        <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start', marginBottom: 16 }}>
+          <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#1c1002', border: '2px solid #f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, flexShrink: 0 }}>🤔</div>
+          <div>
+            <h3 style={{ margin: '0 0 6px', color: '#f59e0b', fontSize: 18 }}>Tutor Advice</h3>
+            <p style={{ margin: 0, color: '#e2e8f0', fontSize: 14, lineHeight: 1.5 }}>
+              You want to <strong style={{ color: '#ff4455' }}>{interrupt.intendedAction}</strong>, but basic strategy says to <strong style={{ color: '#4dff91' }}>{interrupt.advice}</strong>.
+            </p>
+          </div>
+        </div>
+        <div style={{ background: '#1e293b', borderRadius: 10, padding: 16, marginBottom: 20, color: '#a5b4fc', fontSize: 13, lineHeight: 1.6 }}>{interrupt.reason}</div>
+        <div style={{ display: 'flex', gap: 12 }}>
+          <button onClick={onRevise} style={{ flex: 1, background: '#10b981', color: '#fff', border: 'none', borderRadius: 8, padding: '12px', fontWeight: 700, cursor: 'pointer', fontSize: 14 }}>Change to {interrupt.advice}</button>
+          <button onClick={onForce} style={{ background: '#475569', color: '#cbd5e1', border: 'none', borderRadius: 8, padding: '12px', fontWeight: 600, cursor: 'pointer', fontSize: 13 }}>Force {interrupt.intendedAction}</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─── Count Quiz Modal ───────────────────────────────────────────────────────
+const CountQuizModal = ({ active, correctCount, onDone }) => {
+  const [guess, setGuess] = useState('')
+  const [feedback, setFeedback] = useState(null)
+  useEffect(() => { if (active) { setGuess(''); setFeedback(null) } }, [active])
+  if (!active) return null
+
+  const submit = () => {
+    const g = parseInt(guess, 10)
+    if (isNaN(g)) return
+    const correct = g === correctCount
+    setFeedback({ correct, guess: g })
+    if (correct) setTimeout(() => onDone(true), 900)
+    else setTimeout(() => onDone(false), 2200)
+  }
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.88)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 20 }}>
+      <div style={{ background: '#0f172a', border: '2px solid #818cf8', borderRadius: 16, maxWidth: 400, width: '100%', padding: '24px' }}>
+        <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start', marginBottom: 18 }}>
+          <div style={{ width: 52, height: 52, borderRadius: '50%', background: '#1e1b4b', border: '2px solid #818cf8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, flexShrink: 0 }}>🧠</div>
+          <div>
+            <h3 style={{ margin: '0 0 6px', color: '#818cf8', fontSize: 17 }}>Count Check!</h3>
+            <p style={{ margin: 0, color: '#e2e8f0', fontSize: 14, lineHeight: 1.5 }}>
+              Without looking at the panel — what is the <strong>running count</strong> right now?
+            </p>
+          </div>
+        </div>
+        {!feedback ? (
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+            <input
+              type="number" value={guess} onChange={e => setGuess(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && submit()} autoFocus
+              placeholder="+3 or −2"
+              style={{ flex: 1, background: '#0d1525', border: '1.5px solid #818cf866', borderRadius: 8, color: '#fff', fontSize: 22, padding: '8px 14px', fontFamily: 'monospace', outline: 'none' }}
+            />
+            <button onClick={submit} disabled={guess === ''}
+              style={{ padding: '10px 18px', borderRadius: 8, border: 'none', background: guess !== '' ? '#818cf8' : '#333', color: guess !== '' ? '#0f172a' : '#555', fontWeight: 700, cursor: guess !== '' ? 'pointer' : 'default', fontSize: 14 }}>
+              Submit
+            </button>
+          </div>
+        ) : (
+          <div style={{ textAlign: 'center', paddingTop: 4 }}>
+            <div style={{ fontSize: 28, fontWeight: 900, color: feedback.correct ? '#4dff91' : '#ff4455', marginBottom: 8 }}>
+              {feedback.correct ? '✓ Correct!' : '✗ Wrong'}
+            </div>
+            {!feedback.correct && (
+              <div style={{ fontSize: 14, color: '#a0c0ff' }}>
+                The count was <strong style={{ color: '#4dff91', fontSize: 20 }}>{correctCount >= 0 ? `+${correctCount}` : correctCount}</strong>
+                <div style={{ fontSize: 12, color: '#666', marginTop: 6 }}>Watch each card value as it's played: 2–6 = +1, 10/A = −1</div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ─── Scenario Panel ─────────────────────────────────────────────────────────
+const ScenarioPanel = ({ onSelect, onClose }) => (
+  <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999, padding: 20 }}>
+    <div style={{ background: '#0f172a', border: '1px solid #334155', borderRadius: 16, maxWidth: 520, width: '100%', padding: '24px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
+        <div>
+          <div style={{ fontSize: 16, fontWeight: 800, color: '#fff' }}>Guided Scenarios</div>
+          <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>Deal specific, notoriously difficult hands to learn the right play</div>
+        </div>
+        <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#64748b', fontSize: 20, cursor: 'pointer', padding: 4 }}>✕</button>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {BJ_SCENARIOS.map(sc => (
+          <button key={sc.id} onClick={() => onSelect(sc)} style={{
+            background: 'rgba(255,255,255,0.04)', border: '1px solid #1e293b', borderRadius: 10,
+            padding: '14px 16px', cursor: 'pointer', textAlign: 'left',
+            display: 'flex', gap: 14, alignItems: 'flex-start',
+          }}>
+            <div style={{ width: 36, height: 36, borderRadius: 8, background: '#1d6fa422', border: '1px solid #1d6fa466', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 900, color: '#4dd0ff', flexShrink: 0 }}>
+              {sc.badge}
+            </div>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#fff', marginBottom: 3 }}>{sc.name}</div>
+              <div style={{ fontSize: 12, color: '#64748b', lineHeight: 1.4 }}>{sc.desc}</div>
+            </div>
+          </button>
+        ))}
+        <button onClick={() => onSelect(null)} style={{
+          background: 'rgba(77,208,255,0.06)', border: '1px solid rgba(77,208,255,0.2)',
+          borderRadius: 10, padding: '10px 16px', cursor: 'pointer', color: '#4dd0ff', fontSize: 13, fontWeight: 700,
+        }}>
+          Random Deal (no scenario)
+        </button>
+      </div>
+    </div>
+  </div>
+)
+
 const BlackjackGame = () => {
   const [deck, setDeck] = useState([])
   const [playerHand, setPlayerHand] = useState([])
@@ -255,68 +412,100 @@ const BlackjackGame = () => {
   const [busy, setBusy] = useState(false)
   const [runningCount, setRunningCount] = useState(0)
   const [seenCards, setSeenCards] = useState([])
+  const [tutorMode, setTutorMode] = useState(true)
+  const [tutorInterrupt, setTutorInterrupt] = useState(null)
+  // New state
+  const [scenario, setScenario] = useState(null)
+  const [showScenarios, setShowScenarios] = useState(false)
+  const [handCount, setHandCount] = useState(0)
+  const [quizActive, setQuizActive] = useState(false)
+  const [correctStrategies, setCorrectStrategies] = useState(0)
+  const [correctQuizzes, setCorrectQuizzes] = useState(0)
+  const [playerLevel, setPlayerLevel] = useState(0) // 0=beginner 1=intermediate 2=advanced
+  const [levelUpMsg, setLevelUpMsg] = useState('')
 
-  const deal = () => {
-    const d = shuffle(makeDeck())
-    const ph = [d[0], d[2]], dh = [d[1], d[3]]
-    const newDeck = d.slice(4)
-    const initSeen = [d[0], d[2], d[1]]  // player cards + dealer upcard (face up)
-    const initCount = initSeen.reduce((sum, c) => sum + hiLoValue(c.rank), 0)
-    setDeck(newDeck)
-    setPlayerHand(ph)
-    setDealerHand(dh)
-    setPhase('playing')
-    setMessage('')
-    setSeenCards(initSeen)
-    setRunningCount(initCount)
-    const pv = bjHandValue(ph)
-    if (pv === 21) {
-      setMessage('Blackjack! You win!')
-      setScore((s) => ({ ...s, player: s.player + 1 }))
-      setPhase('done')
+  const checkLevelUp = useCallback((strategies, quizzes, currentLevel) => {
+    if (currentLevel < 1 && strategies >= 5) {
+      setPlayerLevel(1)
+      setLevelUpMsg('Level Up! Running Count unlocked — watch the count update as cards are played.')
+      setTimeout(() => setLevelUpMsg(''), 4000)
+      return 1
     }
+    if (currentLevel < 2 && quizzes >= 3) {
+      setPlayerLevel(2)
+      setLevelUpMsg('Level Up! True Count + EV Indicator unlocked. You think like the MIT team now.')
+      setTimeout(() => setLevelUpMsg(''), 4000)
+      return 2
+    }
+    return currentLevel
+  }, [])
+
+  const deal = useCallback(() => {
+    let ph, dh, d, initSeen, initCount
+    if (scenario) {
+      const full = shuffle(makeDeck().filter(c =>
+        !scenario.player.some(sc => sc.rank === c.rank && sc.suit === c.suit) &&
+        !scenario.dealer.some(sc => sc.rank === c.rank && sc.suit === c.suit)
+      ))
+      ph = scenario.player
+      dh = scenario.dealer
+      d = full
+      initSeen = [ph[0], ph[1], dh[0]]
+      initCount = (scenario.preCount || 0) + initSeen.reduce((sum, c) => sum + hiLoValue(c.rank), 0)
+    } else {
+      const full = shuffle(makeDeck())
+      ph = [full[0], full[2]]; dh = [full[1], full[3]]; d = full.slice(4)
+      initSeen = [ph[0], ph[1], dh[0]]
+      initCount = initSeen.reduce((sum, c) => sum + hiLoValue(c.rank), 0)
+    }
+    setDeck(d); setPlayerHand(ph); setDealerHand(dh); setPhase('playing')
+    setMessage(''); setSeenCards(initSeen); setRunningCount(initCount)
+    setHandCount(h => h + 1)
+    const pv = bjHandValue(ph)
+    if (pv === 21) { setMessage('Blackjack! You win!'); setScore(s => ({ ...s, player: s.player + 1 })); setPhase('done') }
+  }, [scenario])
+
+  const dealOrQuiz = () => {
+    // Every 3 hands: count quiz before the next deal
+    if (handCount > 0 && handCount % 3 === 0) { setQuizActive(true); return }
+    deal()
   }
 
-  const hit = useCallback(async () => {
+  const handleQuizDone = useCallback((wasCorrect) => {
+    setQuizActive(false)
+    setCorrectQuizzes(q => {
+      const next = wasCorrect ? q + 1 : q
+      checkLevelUp(correctStrategies, next, playerLevel)
+      return next
+    })
+    deal()
+  }, [deal, correctStrategies, playerLevel, checkLevelUp])
+
+  const executeHit = useCallback(async () => {
     if (phase !== 'playing' || busy) return
     setBusy(true)
     const [card, ...rest] = deck
     const newHand = [...playerHand, card]
     const newSeen = [...seenCards, card]
     const newCount = runningCount + hiLoValue(card.rank)
-    setPlayerHand(newHand)
-    setDeck(rest)
-    setSeenCards(newSeen)
-    setRunningCount(newCount)
-    const val = bjHandValue(newHand)
-    if (val > 21) {
-      setMessage(`Bust! ${val} — Dealer wins.`)
-      setScore((s) => ({ ...s, dealer: s.dealer + 1 }))
-      setPhase('done')
+    setPlayerHand(newHand); setDeck(rest); setSeenCards(newSeen); setRunningCount(newCount)
+    if (bjHandValue(newHand) > 21) {
+      setMessage(`Bust! ${bjHandValue(newHand)} — Dealer wins.`)
+      setScore(s => ({ ...s, dealer: s.dealer + 1 })); setPhase('done')
     }
     setBusy(false)
   }, [deck, playerHand, phase, busy, seenCards, runningCount])
 
-  const stand = useCallback(async () => {
+  const executeStand = useCallback(async () => {
     if (phase !== 'playing' || busy) return
-    setBusy(true)
-    setPhase('dealer')
-    let dh = [...dealerHand], d = [...deck]
-    let seen = [...seenCards]
-    let rc = runningCount
-    // reveal hole card
-    seen = [...seen, dealerHand[1]]
-    rc += hiLoValue(dealerHand[1].rank)
+    setBusy(true); setPhase('dealer')
+    let dh = [...dealerHand], d = [...deck], seen = [...seenCards], rc = runningCount
+    seen = [...seen, dealerHand[1]]; rc += hiLoValue(dealerHand[1].rank)
     while (bjHandValue(dh) < 17) {
       await sleep(600)
       const card = d.shift()
-      dh = [...dh, card]
-      seen = [...seen, card]
-      rc += hiLoValue(card.rank)
-      setDealerHand([...dh])
-      setDeck([...d])
-      setSeenCards([...seen])
-      setRunningCount(rc)
+      dh = [...dh, card]; seen = [...seen, card]; rc += hiLoValue(card.rank)
+      setDealerHand([...dh]); setDeck([...d]); setSeenCards([...seen]); setRunningCount(rc)
     }
     const dv = bjHandValue(dh), pv = bjHandValue(playerHand)
     await sleep(400)
@@ -326,102 +515,184 @@ const BlackjackGame = () => {
     else if (pv > dv) { msg = `You win! ${pv} beats ${dv}!`; winner = 'player' }
     else { msg = `Push — both ${pv}.`; winner = 'tie' }
     setMessage(msg)
-    if (winner === 'player') setScore((s) => ({ ...s, player: s.player + 1 }))
-    else if (winner === 'dealer') setScore((s) => ({ ...s, dealer: s.dealer + 1 }))
-    setPhase('done')
-    setBusy(false)
+    if (winner === 'player') setScore(s => ({ ...s, player: s.player + 1 }))
+    else if (winner === 'dealer') setScore(s => ({ ...s, dealer: s.dealer + 1 }))
+    setPhase('done'); setBusy(false)
   }, [dealerHand, deck, playerHand, phase, busy, seenCards, runningCount])
+
+  const executeDouble = useCallback(async () => {
+    if (phase !== 'playing' || busy) return
+    setBusy(true)
+    const [card, ...rest] = deck
+    const newHand = [...playerHand, card]
+    const newSeen = [...seenCards, card]
+    let newCount = runningCount + hiLoValue(card.rank)
+    setPlayerHand(newHand)
+    if (bjHandValue(newHand) > 21) {
+      setDeck(rest); setSeenCards(newSeen); setRunningCount(newCount)
+      setMessage(`Double Down — Bust! ${bjHandValue(newHand)}`)
+      setScore(s => ({ ...s, dealer: s.dealer + 1 })); setPhase('done'); setBusy(false); return
+    }
+    // Auto-stand
+    setPhase('dealer')
+    let dh = [...dealerHand], d = [...rest], seen = [...newSeen, dealerHand[1]]
+    newCount += hiLoValue(dealerHand[1].rank)
+    while (bjHandValue(dh) < 17) {
+      await sleep(600)
+      const c = d.shift()
+      dh = [...dh, c]; seen = [...seen, c]; newCount += hiLoValue(c.rank)
+      setDealerHand([...dh]); setDeck([...d]); setSeenCards([...seen]); setRunningCount(newCount)
+    }
+    const dv = bjHandValue(dh), pv = bjHandValue(newHand)
+    await sleep(400)
+    let msg, winner
+    if (dv > 21) { msg = 'Double Down — Dealer busts! You win 2×!'; winner = 'player' }
+    else if (dv > pv) { msg = `Double Down — Dealer wins: ${dv} vs ${pv}.`; winner = 'dealer' }
+    else if (pv > dv) { msg = `Double Down — You win 2×! ${pv} beats ${dv}!`; winner = 'player' }
+    else { msg = `Double Down — Push. Both ${pv}.`; winner = 'tie' }
+    setMessage(msg)
+    if (winner === 'player') setScore(s => ({ ...s, player: s.player + 1 }))
+    else if (winner === 'dealer') setScore(s => ({ ...s, dealer: s.dealer + 1 }))
+    setPhase('done'); setBusy(false)
+  }, [deck, playerHand, phase, busy, seenCards, runningCount, dealerHand])
+
+  const handleAction = (action) => {
+    if (phase !== 'playing' || busy) return
+    const pv = bjHandValue(playerHand)
+    const dealerUpcard = dealerHand[0]
+    const strat = basicStrategy(pv, dealerUpcard.rank)
+
+    if (tutorMode && action !== strat) {
+      let reason = ''
+      if (strat === 'DOUBLE' && action !== 'DOUBLE') {
+        reason = `${pv} vs dealer ${dealerUpcard.rank} is a DOUBLE opportunity. The dealer is vulnerable. Double your bet to maximise EV — you're in a winning position.`
+      } else if (action === 'DOUBLE' && strat !== 'DOUBLE') {
+        reason = `Doubling here is not basic strategy. You'd be committing more money where ${strat} is the mathematically correct play.`
+      } else if (action === 'HIT' && strat === 'STAND') {
+        reason = `You have ${pv} against dealer ${dealerUpcard.rank} — a weak card for the house. The dealer is likely to bust. STAND and collect when they do.`
+      } else if (action === 'STAND' && strat === 'HIT') {
+        reason = `You only have ${pv} vs dealer's strong ${dealerUpcard.rank}. The dealer will make 17+ most of the time. HIT to improve — the risk of busting is worth it.`
+      } else {
+        reason = `Basic strategy says ${strat} here. It has higher EV than ${action} in this exact situation.`
+      }
+      setTutorInterrupt({ intendedAction: action, advice: strat, reason })
+      return
+    }
+
+    // Correct move — track for progression
+    setCorrectStrategies(n => {
+      const next = n + 1
+      checkLevelUp(next, correctQuizzes, playerLevel)
+      return next
+    })
+    if (action === 'HIT') executeHit()
+    else if (action === 'STAND') executeStand()
+    else if (action === 'DOUBLE') executeDouble()
+  }
+
+  const dispatch = (action) => {
+    const strat = basicStrategy(bjHandValue(playerHand), dealerHand[0]?.rank)
+    setTutorInterrupt(null)
+    setCorrectStrategies(n => {
+      const next = n + 1
+      checkLevelUp(next, correctQuizzes, playerLevel)
+      return next
+    })
+    if (action === 'HIT') executeHit()
+    else if (action === 'STAND') executeStand()
+    else if (action === 'DOUBLE') executeDouble()
+    void strat
+  }
 
   const pv = bjHandValue(playerHand)
   const dv = bjHandValue(dealerHand)
   const dealerUpcard = dealerHand[0]
-
-  // Deck composition math
   const remaining = deck.length
-  const totalCards = 52
   const countPerGroup = (group, d) => d.filter(c => group.includes(c.rank)).length
   const low = countPerGroup(['2','3','4','5','6'], deck)
   const mid = countPerGroup(['7','8','9'], deck)
   const high = countPerGroup(['10','J','Q','K'], deck)
   const ace = countPerGroup(['A'], deck)
 
-  // Bust probability if player hits
   const bustIfHit = () => {
     if (pv === 0 || deck.length === 0) return 0
-    const bustCards = deck.filter(c => {
-      const testVal = BJ_VALUES[c.rank]
-      let newVal = pv + testVal
-      if (newVal > 21) {
-        // check if an ace can save it
-        const aces = playerHand.filter(h => h.rank === 'A').length
-        let v2 = newVal
-        let a2 = aces
-        while (v2 > 21 && a2 > 0) { v2 -= 10; a2-- }
-        if (v2 > 21) return true
-        return false
-      }
-      return false
+    const bust = deck.filter(c => {
+      let v = pv + BJ_VALUES[c.rank]
+      let a = playerHand.filter(h => h.rank === 'A').length
+      while (v > 21 && a > 0) { v -= 10; a-- }
+      return v > 21
     })
-    return Math.round((bustCards.length / deck.length) * 100)
+    return Math.round((bust.length / deck.length) * 100)
   }
   const bustPct = bustIfHit()
-
-  // True count
   const decksRemaining = Math.max(deck.length / 52, 0.1)
   const trueCount = (runningCount / decksRemaining).toFixed(1)
-
-  // Strategy
-  const strategy = (phase === 'playing' && dealerUpcard)
-    ? basicStrategy(pv, dealerUpcard.rank)
-    : null
+  const strategy = (phase === 'playing' && dealerUpcard) ? basicStrategy(pv, dealerUpcard.rank) : null
   const stratColor = strategy === 'STAND' ? '#4dff91' : strategy === 'HIT' ? '#ff4455' : '#ffe040'
-
-  // EV indicator
   const evFavors = parseFloat(trueCount) >= 1 ? 'PLAYER +EV' : parseFloat(trueCount) <= -1 ? 'HOUSE +EV' : 'NEUTRAL'
   const evColor = parseFloat(trueCount) >= 1 ? '#4dff91' : parseFloat(trueCount) <= -1 ? '#ff4455' : '#ffe040'
 
   const mathPanel = (
     <>
-      <MPSection title="Deck Composition">
-        <HBar label="Low (2-6)" value={low} max={20} color="#ff4455" subtitle={`${Math.round(low/Math.max(remaining,1)*100)}%`} />
-        <HBar label="Mid (7-9)" value={mid} max={12} color="#ffe040" subtitle={`${Math.round(mid/Math.max(remaining,1)*100)}%`} />
-        <HBar label="High (10-K)" value={high} max={16} color="#4dff91" subtitle={`${Math.round(high/Math.max(remaining,1)*100)}%`} />
-        <HBar label="Ace" value={ace} max={4} color="#4dd0ff" subtitle={`${Math.round(ace/Math.max(remaining,1)*100)}%`} />
-        <div style={{ fontSize: 10, color: '#555', marginTop: 2 }}>{remaining} cards remaining</div>
-      </MPSection>
+      {/* Progression indicator — only before level 1 */}
+      {playerLevel < 1 && (
+        <MPSection title="Your Progress">
+          <div style={{ fontSize: 11, color: '#aaa', lineHeight: 1.6, marginBottom: 6 }}>
+            Make <strong style={{ color: '#4dff91' }}>{Math.max(0, 5 - correctStrategies)}</strong> more correct strategy calls to unlock the <strong style={{ color: '#818cf8' }}>Running Count</strong>.
+          </div>
+          <HBar label="Correct moves" value={correctStrategies} max={5} color="#818cf8" />
+          <div style={{ fontSize: 10, color: '#555', marginTop: 4 }}>Hint: trust the Basic Strategy recommendation below.</div>
+        </MPSection>
+      )}
 
-      <MPSection title="Hi-Lo Card Count">
-        <BigNum
-          value={runningCount >= 0 ? `+${runningCount}` : runningCount}
-          label="Running Count"
-          color={runningCount > 0 ? '#4dff91' : runningCount < 0 ? '#ff4455' : '#ffe040'}
-        />
-        <Formula text={`+1 = low card (2-6)\n 0 = neutral (7-9)\n-1 = high card (10,J,Q,K,A)`} />
-        <div style={{ textAlign: 'center', marginTop: 4 }}>
-          <div style={{ fontSize: 11, color: '#aaa', marginBottom: 6 }}>
-            True Count = Running / Decks Left
+      {playerLevel >= 1 && (
+        <MPSection title="Deck Composition">
+          <HBar label="Low (2-6)" value={low} max={20} color="#ff4455" subtitle={`${Math.round(low/Math.max(remaining,1)*100)}%`} />
+          <HBar label="Mid (7-9)" value={mid} max={12} color="#ffe040" subtitle={`${Math.round(mid/Math.max(remaining,1)*100)}%`} />
+          <HBar label="High (10-K)" value={high} max={16} color="#4dff91" subtitle={`${Math.round(high/Math.max(remaining,1)*100)}%`} />
+          <HBar label="Ace" value={ace} max={4} color="#4dd0ff" subtitle={`${Math.round(ace/Math.max(remaining,1)*100)}%`} />
+          <div style={{ fontSize: 10, color: '#555', marginTop: 2 }}>{remaining} cards remaining</div>
+        </MPSection>
+      )}
+
+      {playerLevel >= 1 && (
+        <MPSection title="Hi-Lo Card Count">
+          <BigNum
+            value={runningCount >= 0 ? `+${runningCount}` : runningCount}
+            label="Running Count"
+            color={runningCount > 0 ? '#4dff91' : runningCount < 0 ? '#ff4455' : '#ffe040'}
+          />
+          <Formula text={`+1 = low (2-6)  |  0 = neutral (7-9)  |  −1 = high (10,A)`} />
+          {playerLevel >= 2 && (
+            <>
+              <div style={{ textAlign: 'center', marginTop: 8 }}>
+                <div style={{ fontSize: 11, color: '#aaa', marginBottom: 4 }}>True Count = RC ÷ Decks Left</div>
+                <div style={{ fontSize: 22, fontWeight: 900, color: '#cc44ff', fontFamily: 'monospace' }}>{runningCount >= 0 ? `+${trueCount}` : trueCount}</div>
+                <Formula text={`TC = ${runningCount} / ${decksRemaining.toFixed(2)} decks`} />
+              </div>
+              {playerLevel < 2 && (
+                <div style={{ fontSize: 11, color: '#64748b', marginTop: 6, textAlign: 'center' }}>
+                  Pass {Math.max(0, 3 - correctQuizzes)} more count quizzes to unlock True Count.
+                </div>
+              )}
+            </>
+          )}
+          {playerLevel < 2 && (
+            <div style={{ fontSize: 10, color: '#475569', marginTop: 6, textAlign: 'center' }}>
+              Pass {Math.max(0, 3 - correctQuizzes)} count quiz{correctQuizzes < 2 ? 'zes' : ''} to unlock True Count &amp; EV
+            </div>
+          )}
+          <div style={{ fontSize: 11, color: runningCount > 0 ? '#4dff91' : runningCount < 0 ? '#ff4455' : '#ffe040', textAlign: 'center', marginTop: 6, lineHeight: 1.5 }}>
+            {runningCount > 0 ? 'HOT deck — more 10s, favors player' : runningCount < 0 ? 'COLD deck — favors house' : 'Neutral deck'}
           </div>
-          <div style={{ fontSize: 22, fontWeight: 900, color: '#cc44ff', fontFamily: 'monospace' }}>
-            {runningCount >= 0 ? `+${trueCount}` : trueCount}
-          </div>
-          <Formula text={`TC = ${runningCount} / ${decksRemaining.toFixed(2)} decks`} />
-        </div>
-        <div style={{ fontSize: 11, color: runningCount > 0 ? '#4dff91' : '#ff4455', textAlign: 'center', marginTop: 4, lineHeight: 1.5 }}>
-          {runningCount > 0
-            ? 'Deck is HOT — more 10s remain, favors player'
-            : runningCount < 0
-            ? 'Deck is COLD — low cards remain, favors house'
-            : 'Deck is neutral'}
-        </div>
-      </MPSection>
+        </MPSection>
+      )}
 
       {phase === 'playing' && (
         <MPSection title="If You Hit Now">
           <HBar label="Bust probability" value={bustPct} max={100} color={bustPct > 50 ? '#ff4455' : '#ffe040'} subtitle={`${bustPct}%`} />
           <Formula text={`P(bust) = bust_cards / remaining`} />
-          <div style={{ fontSize: 11, color: '#aaa', marginTop: 4 }}>
-            At total {pv}: {bustPct}% chance of busting if you hit.
-          </div>
+          <div style={{ fontSize: 11, color: '#aaa', marginTop: 4 }}>At total {pv}: {bustPct}% bust risk if you hit.</div>
         </MPSection>
       )}
 
@@ -433,55 +704,91 @@ const BlackjackGame = () => {
               Your total: <strong style={{ color: '#fff' }}>{pv}</strong><br />
               Dealer shows: <strong style={{ color: '#fff' }}>{dealerUpcard?.rank}</strong>
             </div>
-            <div style={{ fontSize: 10, color: '#555', marginTop: 6 }}>
-              Based on standard basic strategy table (hard totals)
-            </div>
+            <div style={{ fontSize: 10, color: '#555', marginTop: 6 }}>Hard-total basic strategy table</div>
           </div>
         </MPSection>
       )}
 
-      <MPSection title="EV Indicator">
-        <div style={{ textAlign: 'center' }}>
-          <Badge label={evFavors} color={evColor} />
-          <div style={{ fontSize: 10, color: '#555', marginTop: 6, lineHeight: 1.5 }}>
-            True count &gt;= +2: player +EV<br />
-            True count &lt;= -1: house +EV<br />
-            Base house edge: ~0.5%
+      {playerLevel >= 2 && (
+        <MPSection title="EV Indicator">
+          <div style={{ textAlign: 'center' }}>
+            <Badge label={evFavors} color={evColor} />
+            <div style={{ fontSize: 10, color: '#555', marginTop: 6, lineHeight: 1.5 }}>
+              TC ≥ +2: player +EV &nbsp;|&nbsp; TC ≤ −1: house +EV<br />Base house edge: ~0.5%
+            </div>
           </div>
-        </div>
-      </MPSection>
+        </MPSection>
+      )}
     </>
   )
 
   return (
-    <GameLayout
-      left={
-        <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-            <div style={{ color: '#a0c0ff', fontSize: 14 }}>
-              <span style={{ color: '#ffd700', fontWeight: 700 }}>Player:</span> {score.player} &nbsp;
-              <span style={{ color: '#ff8080' }}>Dealer:</span> {score.dealer}
+    <>
+      <CountQuizModal active={quizActive} correctCount={runningCount} onDone={handleQuizDone} />
+      <TutorModal
+        interrupt={tutorInterrupt}
+        onRevise={() => dispatch(tutorInterrupt.advice)}
+        onForce={() => dispatch(tutorInterrupt.intendedAction)}
+      />
+      {showScenarios && (
+        <ScenarioPanel
+          onSelect={(sc) => { setScenario(sc); setShowScenarios(false) }}
+          onClose={() => setShowScenarios(false)}
+        />
+      )}
+      {levelUpMsg && (
+        <div style={{ position: 'fixed', top: 20, left: '50%', transform: 'translateX(-50%)', zIndex: 2000, background: '#0f172a', border: '2px solid #818cf8', borderRadius: 12, padding: '12px 20px', color: '#818cf8', fontWeight: 700, fontSize: 14, boxShadow: '0 4px 20px rgba(0,0,0,0.5)', maxWidth: 420, textAlign: 'center' }}>
+          ⬆️ {levelUpMsg}
+        </div>
+      )}
+      <GameLayout
+        left={
+          <div>
+            {/* Header row */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, flexWrap: 'wrap', gap: 8 }}>
+              <div style={{ color: '#a0c0ff', fontSize: 14 }}>
+                <span style={{ color: '#ffd700', fontWeight: 700 }}>Player:</span> {score.player}&nbsp;
+                <span style={{ color: '#ff8080' }}>Dealer:</span> {score.dealer}
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                {phase !== 'idle' && (
+                  <div style={{ color: '#e0e0ff', fontSize: 14 }}>
+                    Total: <strong style={{ color: pv > 21 ? '#ff4455' : pv === 21 ? '#4dff91' : '#fff' }}>{pv}</strong>
+                  </div>
+                )}
+                <button onClick={() => setShowScenarios(true)} style={{ background: scenario ? 'rgba(77,208,255,0.15)' : 'rgba(255,255,255,0.07)', border: `1px solid ${scenario ? '#4dd0ff55' : '#33415566'}`, borderRadius: 6, padding: '4px 10px', fontSize: 11, color: scenario ? '#4dd0ff' : '#64748b', fontWeight: 700, cursor: 'pointer' }}>
+                  {scenario ? `Scenario ${scenario.badge}` : 'Scenarios'}
+                </button>
+                <div onClick={() => setTutorMode(t => !t)} style={{ background: tutorMode ? 'rgba(74,222,128,0.15)' : 'rgba(255,255,255,0.07)', padding: '4px 8px', borderRadius: 6, display: 'flex', alignItems: 'center', gap: 5, cursor: 'pointer', border: `1px solid ${tutorMode ? '#4ade8055' : '#33415566'}` }}>
+                  <div style={{ width: 9, height: 9, borderRadius: '50%', background: tutorMode ? '#4ade80' : '#475569' }} />
+                  <span style={{ fontSize: 11, color: tutorMode ? '#4ade80' : '#64748b', fontWeight: 700 }}>TUTOR</span>
+                </div>
+              </div>
             </div>
-            {phase !== 'idle' && (
-              <div style={{ color: '#e0e0ff', fontSize: 14 }}>
-                Your total: <strong style={{ color: pv > 21 ? '#ff4455' : pv === 21 ? '#4dff91' : '#fff' }}>{pv}</strong>
+
+            {/* Scenario banner */}
+            {scenario && (
+              <div style={{ background: 'rgba(77,208,255,0.06)', border: '1px solid rgba(77,208,255,0.2)', borderRadius: 10, padding: '10px 14px', marginBottom: 14 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#4dd0ff', letterSpacing: 1, marginBottom: 4 }}>SCENARIO {scenario.badge} — {scenario.name.toUpperCase()}</div>
+                <div style={{ fontSize: 12, color: '#94a3b8', lineHeight: 1.5 }}>{scenario.desc}</div>
               </div>
             )}
-          </div>
 
-          <div style={{ marginBottom: 20 }}>
-            <div style={{ color: '#a0c0ff', fontSize: 12, marginBottom: 8, letterSpacing: 1 }}>DEALER</div>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', minHeight: 100 }}>
-              {dealerHand.map((c, i) => <Card key={c.id} card={c} faceDown={i === 1 && phase === 'playing'} />)}
+            {/* Dealer */}
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ color: '#a0c0ff', fontSize: 12, marginBottom: 8, letterSpacing: 1 }}>DEALER</div>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', minHeight: 100 }}>
+                {dealerHand.map((c, i) => <Card key={c.id} card={c} faceDown={i === 1 && phase === 'playing'} />)}
+              </div>
+              {phase !== 'idle' && phase !== 'playing' && (
+                <div style={{ color: '#ff8080', fontSize: 13, marginTop: 4 }}>Value: {dv}</div>
+              )}
             </div>
-            {phase !== 'idle' && phase !== 'playing' && (
-              <div style={{ color: '#ff8080', fontSize: 13, marginTop: 4 }}>Value: {dv}</div>
-            )}
-          </div>
 
-          <div style={{ marginBottom: 20 }}>
-            <div style={{ color: '#a0c0ff', fontSize: 12, marginBottom: 8, letterSpacing: 1 }}>YOUR HAND</div>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', minHeight: 100 }}>
+            {/* Player hand */}
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ color: '#a0c0ff', fontSize: 12, marginBottom: 8, letterSpacing: 1 }}>YOUR HAND</div>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', minHeight: 100 }}>
               {playerHand.map((c) => <Card key={c.id} card={c} />)}
             </div>
           </div>
@@ -492,13 +799,23 @@ const BlackjackGame = () => {
             </div>
           )}
 
-          <div style={{ display: 'flex', gap: 10 }}>
+          {scenario && phase === 'done' && (
+            <div style={{ background: 'rgba(77,208,255,0.06)', border: '1px solid rgba(77,208,255,0.2)', borderRadius: 10, padding: '12px 16px', marginBottom: 14 }}>
+              <div style={{ fontSize: 11, color: '#4dd0ff', fontWeight: 700, marginBottom: 6 }}>LESSON TAKEAWAY</div>
+              <div style={{ fontSize: 13, color: '#a0c0ff', lineHeight: 1.6 }}>{scenario.lesson}</div>
+            </div>
+          )}
+
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             {phase === 'idle' || phase === 'done' ? (
-              <button onClick={deal} style={btnStyle('#0f9960')}>{phase === 'done' ? 'Deal Again' : 'Deal Cards'}</button>
+              <button onClick={dealOrQuiz} style={btnStyle('#0f9960')}>{phase === 'done' ? 'Deal Again' : 'Deal Cards'}</button>
             ) : (
               <>
-                <button onClick={hit} disabled={busy} style={btnStyle('#1d6fa4', busy)}>Hit</button>
-                <button onClick={stand} disabled={busy} style={btnStyle('#7c3aed', busy)}>Stand</button>
+                <button onClick={() => handleAction('HIT')} disabled={busy} style={btnStyle('#1d6fa4', busy)}>Hit</button>
+                <button onClick={() => handleAction('STAND')} disabled={busy} style={btnStyle('#7c3aed', busy)}>Stand</button>
+                {pv >= 9 && pv <= 11 && (
+                  <button onClick={() => handleAction('DOUBLE')} disabled={busy} style={btnStyle('#d97706', busy)}>Double Down</button>
+                )}
               </>
             )}
           </div>
@@ -512,6 +829,7 @@ const BlackjackGame = () => {
       }
       right={mathPanel}
     />
+    </>
   )
 }
 

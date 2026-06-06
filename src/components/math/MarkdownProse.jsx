@@ -126,8 +126,10 @@ function wrapBareLatex(src) {
 
 function preprocess(text) {
   if (!text) return "";
+  // Normalize escaped newlines from lesson data strings before any other processing
+  const normalized = text.replace(/\\n/g, "\n\n");
   return (
-    wrapBareLatex(text)
+    wrapBareLatex(normalized)
       // \[…\] → $$\n…\n$$ (block / display math)
       .replace(/\\\[/g, "$$\n")
       .replace(/\\\]/g, "\n$$")

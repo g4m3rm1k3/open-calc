@@ -1,128 +1,177 @@
-// FreeFallExplorer.jsx — Ch2 L12-18 Pillar 4
-import { useState } from "react";
+// FreeFallExplorer.jsx — interactive free-fall explorer with time scrubber
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const G = 9.8;
+const MAX_T = 3;     // seconds
+const BALL_R = 10;
+const SHAFT_H = 260; // px height of the visual shaft
 
-export default function FreeFallExplorer({ params = {} }) {
-  const [convention, setConvention] = useState("up"); // "up" = up positive, "down" = down positive
-  const [v0, setV0] = useState(20);
-  const [problem, setProblem] = useState("maxHeight"); // maxHeight | timeUp | landing | velocity
+function easeInQuad(t) { return t * t; }
 
-  const sign = convention === "up" ? 1 : -1;
-  const g = convention === "up" ? -G : G;
+export default function FreeFallExplorer() {
+  const [t, setT] = useState(0);
+  const [playing, setPlaying] = useState(false);
+  const rafRef = useRef(null);
+  const startRef = useRef(null);
+  const startTRef = useRef(0);
 
-  const tPeak = Math.abs(v0) / G;
-  const hMax = v0 * v0 / (2 * G);
-  const tTotal = 2 * tPeak;
+  const x = 0.5 * G * t * t;             // m  dropped from rest
+  const v = G * t;                         // m/s
+  const maxX = 0.5 * G * MAX_T * MAX_T;   // ≈ 44.1 m
 
-  const PROBLEMS = {
-    maxHeight: {
-      label: "Max height",
-      steps: [
-        { label: "At peak, v = 0", eq: `v = 0` },
-        { label: "Use v² = v₀² + 2aΔx", eq: `0 = (${v0})² + 2(${g.toFixed(1)})h` },
-        { label: "Solve for h", eq: `h = ${v0}² / (2×${G}) = ${hMax.toFixed(2)} m` },
-      ],
-      answer: `h_max = ${hMax.toFixed(2)} m`,
-    },
-    timeUp: {
-      label: "Time to peak",
-      steps: [
-        { label: "At peak, v = 0", eq: `v = 0` },
-        { label: "Use v = v₀ + at", eq: `0 = ${v0} + (${g.toFixed(1)})t` },
-        { label: "Solve for t", eq: `t = ${v0} / ${G} = ${tPeak.toFixed(3)} s` },
-      ],
-      answer: `t_peak = ${tPeak.toFixed(3)} s`,
-    },
-    landing: {
-      label: "Total flight time",
-      steps: [
-        { label: "Returns to Δx = 0", eq: `Δx = 0` },
-        { label: "Use Δx = v₀t + ½at²", eq: `0 = ${v0}t + ½(${g.toFixed(1)})t²` },
-        { label: "Factor out t", eq: `t(${v0} + ½(${g.toFixed(1)})t) = 0` },
-        { label: "Non-zero solution", eq: `t = 2×${v0}/${G} = ${tTotal.toFixed(3)} s` },
-      ],
-      answer: `t_total = ${tTotal.toFixed(3)} s`,
-    },
-    velocity: {
-      label: "Speed on return",
-      steps: [
-        { label: "Use v² = v₀² + 2aΔx", eq: `v² = (${v0})² + 2(${g.toFixed(1)})(0)` },
-        { label: "Simplify", eq: `v² = ${v0 * v0}` },
-        { label: "Take root (falling = negative)", eq: `v = −${v0.toFixed(0)} m/s` },
-      ],
-      answer: `v_return = −${v0} m/s`,
-    },
-  };
+  // y-pixel position on the shaft (0 = top, SHAFT_H = bottom)
+  const ballY = Math.min((x / maxX) * SHAFT_H, SHAFT_H - BALL_R);
 
-  const P = PROBLEMS[problem];
+  const stop = useCallback(() => {
+    setPlaying(false);
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+  }, []);
+
+  const tick = useCallback((now) => {
+    const elapsed = (now - startRef.current) / 1000;
+    const newT = Math.min(startTRef.current + elapsed, MAX_T);
+    setT(newT);
+    if (newT < MAX_T) {
+      rafRef.current = requestAnimationFrame(tick);
+    } else {
+      setPlaying(false);
+    }
+  }, []);
+
+  const play = useCallback(() => {
+    if (t >= MAX_T) setT(0);
+    startTRef.current = t >= MAX_T ? 0 : t;
+    startRef.current = performance.now();
+    setPlaying(true);
+    rafRef.current = requestAnimationFrame(tick);
+  }, [t, tick]);
+
+  useEffect(() => () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); }, []);
+
+  // Mini x-t curve path (SVG)
+  const pathPoints = Array.from({ length: 60 }, (_, i) => {
+    const ti = (i / 59) * MAX_T;
+    const xi = 0.5 * G * ti * ti;
+    return [ti, xi];
+  });
+  const graphW = 150, graphH = 80;
+  const px = (ti) => (ti / MAX_T) * graphW;
+  const py = (xi) => graphH - (xi / maxX) * graphH;
+  const pathD = pathPoints.map(([ti, xi], i) => `${i === 0 ? "M" : "L"}${px(ti).toFixed(1)},${py(xi).toFixed(1)}`).join(" ");
+  const dotX = px(t), dotY = py(x);
 
   return (
-    <div style={{ fontFamily: "'DM Sans',system-ui,sans-serif", background: "#0f172a", borderRadius: 16, overflow: "hidden" }}>
-      <div style={{ padding: "14px 20px 0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <span style={{ fontSize: 13, color: "#818cf8", fontWeight: 700, letterSpacing: "0.08em" }}>PILLAR 4 · FREE FALL EXPLORER</span>
-        <div style={{ display: "flex", gap: 6 }}>
-          {["up", "down"].map(c => (
-            <button key={c} onClick={() => setConvention(c)} style={{
-              background: convention === c ? "#818cf8" : "#1e293b",
-              color: convention === c ? "#0f172a" : "#64748b",
-              border: `1px solid ${convention === c ? "#818cf8" : "#334155"}`,
-              borderRadius: 6, padding: "3px 10px", fontSize: 11, fontWeight: 700, cursor: "pointer"
-            }}>{c === "up" ? "↑ up positive" : "↓ down positive"}</button>
-          ))}
+    <div style={{ fontFamily: "'DM Sans',system-ui,sans-serif", background: "#0f172a", borderRadius: 16, overflow: "hidden", userSelect: "none" }}>
+      {/* Header */}
+      <div style={{ padding: "14px 20px 10px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <span style={{ fontSize: 12, color: "#818cf8", fontWeight: 700, letterSpacing: "0.08em" }}>FREE FALL EXPLORER · DROP FROM REST</span>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <span style={{ fontSize: 11, color: "#475569" }}>g = 9.8 m/s²</span>
         </div>
       </div>
 
-      <div style={{ padding: "14px 20px 0" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#64748b", marginBottom: 4 }}>
-          <span>v₀ (upward initial velocity)</span>
-          <span style={{ color: "#818cf8", fontWeight: 700 }}>{v0} m/s</span>
+      <div style={{ display: "flex", gap: 0 }}>
+        {/* Left — shaft animation */}
+        <div style={{ width: 100, flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", padding: "8px 0 16px" }}>
+          <div style={{ fontSize: 10, color: "#475569", marginBottom: 6, letterSpacing: "0.06em" }}>DROP SHAFT</div>
+          <div style={{ position: "relative", width: 36, height: SHAFT_H + BALL_R * 2, background: "#1e293b", borderRadius: 8, border: "1px solid #334155", overflow: "hidden" }}>
+            {/* Height tick marks */}
+            {[0, 5, 10, 20, 44].map((m) => {
+              const yPct = (m / maxX) * 100;
+              return (
+                <div key={m} style={{ position: "absolute", top: `${yPct}%`, left: 0, right: 0, height: 1, background: "#1e3a5f", opacity: 0.7 }} />
+              );
+            })}
+            {/* Ball */}
+            <div style={{
+              position: "absolute",
+              left: "50%",
+              top: ballY + BALL_R,
+              transform: "translate(-50%, -50%)",
+              width: BALL_R * 2,
+              height: BALL_R * 2,
+              borderRadius: "50%",
+              background: "radial-gradient(circle at 35% 35%, #e0e7ff, #818cf8)",
+              boxShadow: "0 0 8px #818cf880",
+              transition: playing ? "none" : "top 0.05s linear",
+            }} />
+            {/* Ground line */}
+            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 3, background: "#f43f5e" }} />
+          </div>
+          <div style={{ marginTop: 8, fontSize: 10, color: "#f43f5e", fontWeight: 700 }}>GROUND</div>
         </div>
-        <input type="range" min={5} max={40} step={1} value={v0} onChange={e => setV0(parseInt(e.target.value))} style={{ width: "100%", marginBottom: 14 }} />
 
-        {/* Sign convention banner */}
-        <div style={{ background: "#1e293b", borderRadius: 8, padding: "8px 14px", marginBottom: 12, display: "flex", gap: 16, fontSize: 12 }}>
-          <span style={{ color: "#64748b" }}>Convention:</span>
-          <span style={{ color: "#818cf8", fontWeight: 700 }}>v₀ = {convention === "up" ? "+" : "−"}{v0} m/s</span>
-          <span style={{ color: "#f43f5e", fontWeight: 700 }}>a = {g.toFixed(1)} m/s²</span>
-        </div>
-
-        {/* Problem selector */}
-        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
-          {Object.entries(PROBLEMS).map(([key, { label }]) => (
-            <button key={key} onClick={() => setProblem(key)} style={{
-              background: problem === key ? "#818cf8" : "#1e293b",
-              color: problem === key ? "#0f172a" : "#64748b",
-              border: `1px solid ${problem === key ? "#818cf8" : "#334155"}`,
-              borderRadius: 6, padding: "4px 12px", fontSize: 11, fontWeight: 700, cursor: "pointer"
-            }}>{label}</button>
-          ))}
-        </div>
-
-        {/* Step-by-step solution */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
-          {P.steps.map(({ label, eq }, i) => (
-            <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-              <div style={{
-                width: 22, height: 22, borderRadius: "50%", background: "#1e293b",
-                color: "#818cf8", fontSize: 11, fontWeight: 700, flexShrink: 0,
-                display: "flex", alignItems: "center", justifyContent: "center"
-              }}>{i + 1}</div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 11, color: "#64748b", marginBottom: 2 }}>{label}</div>
-                <div style={{ background: "#1e293b", borderRadius: 6, padding: "6px 12px", fontFamily: "'Fira Code',monospace", fontSize: 13, color: "#e2e8f0" }}>{eq}</div>
-              </div>
+        {/* Center — readings */}
+        <div style={{ flex: 1, padding: "8px 16px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
+          {/* Live equation display */}
+          <div style={{ background: "#1e293b", borderRadius: 10, padding: "12px 16px" }}>
+            <div style={{ fontSize: 10, color: "#64748b", marginBottom: 8, letterSpacing: "0.1em", fontWeight: 700 }}>POSITION  x = ½gt²</div>
+            <div style={{ display: "flex", gap: 6, alignItems: "baseline", fontFamily: "'Fira Code',monospace", flexWrap: "wrap" }}>
+              <span style={{ fontSize: 18, fontWeight: 800, color: "#34d399" }}>{x.toFixed(2)}</span>
+              <span style={{ fontSize: 12, color: "#64748b" }}>m</span>
+              <span style={{ fontSize: 11, color: "#334155", marginLeft: 4 }}>= ½ × 9.8 × {t.toFixed(2)}²</span>
             </div>
-          ))}
-        </div>
+          </div>
+          <div style={{ background: "#1e293b", borderRadius: 10, padding: "12px 16px" }}>
+            <div style={{ fontSize: 10, color: "#64748b", marginBottom: 8, letterSpacing: "0.1em", fontWeight: 700 }}>VELOCITY  v = gt</div>
+            <div style={{ display: "flex", gap: 6, alignItems: "baseline", fontFamily: "'Fira Code',monospace", flexWrap: "wrap" }}>
+              <span style={{ fontSize: 18, fontWeight: 800, color: "#f97316" }}>{v.toFixed(2)}</span>
+              <span style={{ fontSize: 12, color: "#64748b" }}>m/s</span>
+              <span style={{ fontSize: 11, color: "#334155", marginLeft: 4 }}>= 9.8 × {t.toFixed(2)}</span>
+            </div>
+          </div>
+          <div style={{ background: "#1e293b", borderRadius: 10, padding: "12px 16px" }}>
+            <div style={{ fontSize: 10, color: "#64748b", marginBottom: 8, letterSpacing: "0.1em", fontWeight: 700 }}>TIME</div>
+            <div style={{ display: "flex", gap: 6, alignItems: "baseline", fontFamily: "'Fira Code',monospace" }}>
+              <span style={{ fontSize: 22, fontWeight: 800, color: "#818cf8" }}>{t.toFixed(2)}</span>
+              <span style={{ fontSize: 12, color: "#64748b" }}>s</span>
+            </div>
+          </div>
 
-        <div style={{ background: "#0d2a1e", borderRadius: 10, padding: "12px 16px", borderLeft: "3px solid #10b981" }}>
-          <div style={{ fontSize: 11, color: "#64748b", marginBottom: 4 }}>Answer</div>
-          <div style={{ fontFamily: "'Fira Code',monospace", fontSize: 16, fontWeight: 700, color: "#34d399" }}>{P.answer}</div>
+          {/* x-t mini graph */}
+          <div style={{ background: "#1e293b", borderRadius: 10, padding: "10px 12px" }}>
+            <div style={{ fontSize: 10, color: "#64748b", marginBottom: 6, letterSpacing: "0.1em", fontWeight: 700 }}>x–t CURVE (x ∝ t²)</div>
+            <svg width={graphW} height={graphH} style={{ display: "block" }}>
+              <path d={pathD} fill="none" stroke="#818cf8" strokeWidth={1.5} opacity={0.5} />
+              <path d={`M0,${graphH} ${pathPoints.filter(([ti]) => ti <= t).map(([ti, xi]) => `L${px(ti).toFixed(1)},${py(xi).toFixed(1)}`).join(" ")}`} fill="none" stroke="#34d399" strokeWidth={2} />
+              {t > 0 && <circle cx={dotX} cy={dotY} r={4} fill="#34d399" />}
+              <text x={0} y={graphH - 2} fontSize={8} fill="#475569">0</text>
+              <text x={graphW - 14} y={graphH - 2} fontSize={8} fill="#475569">3 s</text>
+            </svg>
+          </div>
         </div>
       </div>
-      <div style={{ padding: "12px 20px 16px", fontSize: 12, color: "#475569" }}>
-        Toggle sign convention — the numbers change but the physics is identical. Always define your positive direction before writing equations.
+
+      {/* Time slider + controls */}
+      <div style={{ padding: "0 20px 16px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#475569", marginBottom: 4 }}>
+          <span>t = 0 s</span>
+          <span style={{ color: "#818cf8", fontWeight: 700 }}>t = {t.toFixed(2)} s</span>
+          <span>t = 3 s</span>
+        </div>
+        <input
+          type="range" min={0} max={MAX_T} step={0.01} value={t}
+          onChange={(e) => { stop(); setT(parseFloat(e.target.value)); }}
+          style={{ width: "100%", marginBottom: 10, accentColor: "#818cf8" }}
+        />
+        <div style={{ display: "flex", gap: 8 }}>
+          <button
+            onClick={playing ? stop : play}
+            style={{ flex: 1, padding: "8px 0", borderRadius: 8, border: "none", cursor: "pointer", fontWeight: 700, fontSize: 13, background: playing ? "#334155" : "#818cf8", color: playing ? "#94a3b8" : "#0f172a" }}
+          >
+            {playing ? "⏸ Pause" : t >= MAX_T ? "↺ Replay" : "▶ Play"}
+          </button>
+          <button
+            onClick={() => { stop(); setT(0); }}
+            style={{ padding: "8px 14px", borderRadius: 8, border: "1px solid #334155", cursor: "pointer", fontWeight: 700, fontSize: 13, background: "transparent", color: "#64748b" }}
+          >
+            ↺
+          </button>
+        </div>
+      </div>
+
+      <div style={{ padding: "0 20px 14px", fontSize: 11, color: "#475569", lineHeight: 1.5 }}>
+        Drag the slider or press Play. Every extra second multiplies the distance by t² — that's why free fall bends, not streaks.
       </div>
     </div>
   );

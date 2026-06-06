@@ -1046,11 +1046,13 @@ export default function MicroCycleLesson({ lesson }) {
                 </div>
               )}
               {exp.visualizationId && (
-                <VizCard
-                  viz={{ id: exp.visualizationId, title: exp.title }}
-                  noteId={lesson.id ? `${lesson.id}:homelab:${exp.id ?? i}` : undefined}
-                  borderColor="border-emerald-200 dark:border-emerald-800"
-                />
+                <div className="min-h-[520px]">
+                  <VizCard
+                    viz={{ id: exp.visualizationId, title: exp.title }}
+                    noteId={lesson.id ? `${lesson.id}:homelab:${exp.id ?? i}` : undefined}
+                    borderColor="border-emerald-200 dark:border-emerald-800"
+                  />
+                </div>
               )}
               {(exp.physicsConnection || exp.expectedAccuracy || exp.followUp) && (
                 <div className="px-5 py-4 space-y-3 bg-slate-50 dark:bg-slate-800/40 border-t border-slate-100 dark:border-slate-800">
