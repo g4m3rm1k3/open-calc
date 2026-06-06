@@ -1,7 +1,6 @@
 import { useState, useRef, useCallback } from 'react'
 import { CreateMLCEngine } from '@mlc-ai/web-llm'
 
-// Smallest capable Llama model — ~880 MB, cached after first load
 const MODEL_ID = 'Llama-3.2-1B-Instruct-q4f16_1-MLC'
 
 const SYSTEM_PROMPT = `You are Lovelace, an open-source STEM tutor named after Ada Lovelace — the pioneering mathematician and first computer programmer. You help students understand mathematics, physics, chemistry, computer science, and related subjects.
@@ -50,11 +49,27 @@ export function useLovelaceAI() {
     }
   }, [])
 
-  // Pass recent messages as context so Lovelace can see what's been discussed
-  const ask = useCallback(async (question, recentMessages = []) => {
+  // lessonContext: { id, title, definitions? } — passed when user is in a lesson
+  const ask = useCallback(async (question, recentMessages = [], lessonContext = null) => {
     setIsThinking(true)
     try {
       const engine = await ensureEngine()
+
+      const messages = [{ role: 'system', content: SYSTEM_PROMPT }]
+
+      // Inject lesson awareness before chat context
+      if (lessonContext?.title) {
+        let lessonInfo = `The student is currently studying the lesson: "${lessonContext.title}".`
+        if (lessonContext.definitions?.length) {
+          const terms = lessonContext.definitions
+            .slice(0, 8)
+            .map(d => `• ${d.term}: ${d.definition}`)
+            .join('\n')
+          lessonInfo += `\n\nKey terms in this lesson:\n${terms}`
+        }
+        messages.push({ role: 'user', content: lessonInfo })
+        messages.push({ role: 'assistant', content: `Understood — I'll keep "${lessonContext.title}" in mind when answering.` })
+      }
 
       const context = recentMessages
         .slice(-6)
@@ -62,7 +77,6 @@ export function useLovelaceAI() {
         .map(m => `${m.username}: ${m.text}`)
         .join('\n')
 
-      const messages = [{ role: 'system', content: SYSTEM_PROMPT }]
       if (context) {
         messages.push({ role: 'user', content: `Recent chat:\n${context}` })
         messages.push({ role: 'assistant', content: 'I see the recent discussion.' })

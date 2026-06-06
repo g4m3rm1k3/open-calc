@@ -1,35 +1,28 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { ChevronDown, ChevronRight, Play, RotateCcw, Plus, Trash2 } from "lucide-react";
+import { buildNetlist, solveAnalog } from "./AnalogEngine.js";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
-const CELL = 64;          // grid cell size px (Massively increased)
-const PORT_R = 12;        // port circle radius
-const NODE_PAD = 16;      // padding inside node rect
+const CELL = 24;          // grid cell size px
+const PORT_R = 4;         // hole radius
 
-// ── Colour palette (works light + dark) ──────────────────────────────────────
+// ── Colors ───────────────────────────────────────────────────────────────────
 function getColors(dark) {
   return {
     bg:       dark ? "#0f1923" : "#f8fafc",
-    grid:     dark ? "#1e293b" : "#e2e8f0",
-    nodeBg:   dark ? "#1e293b" : "#ffffff",
-    nodeBdr:  dark ? "#334155" : "#cbd5e1",
-    nodeText: dark ? "#e2e8f0" : "#1e293b",
-    portOff:  dark ? "#475569" : "#94a3b8",
-    portOn:   dark ? "#34d399" : "#059669",
-    wireOff:  dark ? "#334155" : "#cbd5e1",
-    wireOn:   dark ? "#34d399" : "#059669",
+    board:    dark ? "#e2e8f0" : "#ffffff",
+    boardHole:dark ? "#334155" : "#94a3b8",
+    railRed:  "#ef4444",
+    railBlue: "#3b82f6",
+    text:     dark ? "#e2e8f0" : "#1e293b",
+    wire:     dark ? "#34d399" : "#059669",
     wireHi:   dark ? "#38bdf8" : "#0284c7",
-    power:    dark ? "#fbbf24" : "#d97706",
-    lamp:     dark ? "#fbbf24" : "#d97706",
-    lampOff:  dark ? "#292524" : "#e7e5e4",
-    sel:      dark ? "#38bdf8" : "#0891b2",
-    gateFill: {
-      NOT:  dark ? "#312e81" : "#eef2ff",
-      AND:  dark ? "#064e3b" : "#ecfdf5",
-      OR:   dark ? "#422006" : "#fff7ed",
-      XOR:  dark ? "#1e1b4b" : "#f5f3ff",
-      NAND: dark ? "#3b0764" : "#faf5ff",
-      NOR:  dark ? "#450a0a" : "#fef2f2",
-    },
+    icBody:   dark ? "#1e293b" : "#334155",
+    icPins:   dark ? "#cbd5e1" : "#94a3b8",
+    icText:   dark ? "#94a3b8" : "#e2e8f0",
+    ledOff:   dark ? "#450a0a" : "#fef2f2",
+    ledOn:    "#ef4444",
+    sel:      "#38bdf8",
   };
 }
 
@@ -45,373 +38,603 @@ function useIsDark() {
   return isDark;
 }
 
-// ── Node definitions ──────────────────────────────────────────────────────────
-const NODE_DEFS = {
-  POWER:  { label:"1", w:2, h:1, ins:0, outs:1, compute: ()=>[true], desc:"Constant ON signal (1)" },
-  GROUND: { label:"0", w:2, h:1, ins:0, outs:1, compute: ()=>[false], desc:"Constant OFF signal (0)" },
-  SWITCH: { label:"SW",  w:2, h:1, ins:0, outs:1, compute:(_, state)=>[!!state.on], desc:"Click to toggle ON/OFF" },
-  LAMP:   { label:"OUT", w:2, h:2, ins:1, outs:0, compute:()=>[], desc:"Output indicator. Lights up when ON" },
-  NOT:    { label:"NOT", w:3, h:2, ins:1, outs:1, compute:([a])=>[!a], desc:"Inverts the signal (1 becomes 0)" },
-  AND:    { label:"AND", w:3, h:2, ins:2, outs:1, compute:([a,b])=>[a&&b], desc:"ON only if BOTH inputs are ON" },
-  OR:     { label:"OR",  w:3, h:2, ins:2, outs:1, compute:([a,b])=>[a||b], desc:"ON if AT LEAST ONE input is ON" },
-  XOR:    { label:"XOR", w:3, h:2, ins:2, outs:1, compute:([a,b])=>[a!==b], desc:"ON if inputs are DIFFERENT" },
-  NAND:   { label:"NAND",w:3, h:2, ins:2, outs:1, compute:([a,b])=>[!(a&&b)], desc:"ON unless BOTH inputs are ON" },
-  NOR:    { label:"NOR", w:3, h:2, ins:2, outs:1, compute:([a,b])=>[!(a||b)], desc:"ON only if BOTH inputs are OFF" },
+// ── Component Definitions ─────────────────────────────────────────────────────
+const PIN_IN = "IN", PIN_OUT = "OUT", PIN_PWR = "PWR", PIN_GND = "GND";
+
+const COMP_DEFS = {
+  POWER_SUPPLY: {
+    w: 2, h: 2,
+    pins: [
+      { id: "5v", x: 0, y: 0, type: PIN_PWR },
+      { id: "gnd", x: 1, y: 0, type: PIN_GND }
+    ],
+    render: (ctx, x, y, w, h, C) => {
+      ctx.fillStyle = C.icBody; ctx.fillRect(x, y, w, h);
+      ctx.fillStyle = C.railRed; ctx.fillRect(x, y, w/2, h);
+      ctx.fillStyle = C.railBlue; ctx.fillRect(x+w/2, y, w/2, h);
+      ctx.fillStyle = "#fff"; ctx.font = "bold 12px sans-serif";
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillText("+", x+w/4, y+h/2); ctx.fillText("-", x+w*0.75, y+h/2);
+    }
+  },
+  RESISTOR: {
+    w: 4, h: 1,
+    pins: [
+      { id: "p1", x: 0, y: 0, type: PIN_IN },
+      { id: "p2", x: 3, y: 0, type: PIN_IN }
+    ],
+    render: (ctx, x, y, w, h, C, state) => {
+      // Draw leads
+      ctx.strokeStyle = C.icPins; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(x+CELL/2, y+CELL/2); ctx.lineTo(x+w-CELL/2, y+CELL/2); ctx.stroke();
+      // Draw body
+      const bw = 2.5 * CELL, bh = 14;
+      ctx.fillStyle = "#eab308"; // Tan body
+      ctx.fillRect(x + w/2 - bw/2, y + CELL/2 - bh/2, bw, bh);
+      // Color bands
+      const bands = state.bands || ["red", "red", "brown"];
+      for (let i=0; i<3; i++) {
+        ctx.fillStyle = bands[i];
+        ctx.fillRect(x + w/2 - bw/2 + 8 + i*8, y + CELL/2 - bh/2, 4, bh);
+      }
+      ctx.fillStyle = "#d4af37"; // Gold tolerance
+      ctx.fillRect(x + w/2 + bw/2 - 12, y + CELL/2 - bh/2, 4, bh);
+    }
+  },
+  CAPACITOR: {
+    w: 2, h: 1,
+    pins: [
+      { id: "p1", x: 0, y: 0, type: PIN_IN },
+      { id: "p2", x: 1, y: 0, type: PIN_IN }
+    ],
+    render: (ctx, x, y, w, h, C, state) => {
+      // Draw leads
+      ctx.strokeStyle = C.icPins; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(x+CELL/2, y+CELL/2); ctx.lineTo(x+w-CELL/2, y+CELL/2); ctx.stroke();
+      // Electrolytic body
+      ctx.fillStyle = "#0f172a";
+      ctx.beginPath(); ctx.arc(x+w/2, y+CELL/2, 10, 0, Math.PI*2); ctx.fill();
+      // Negative stripe
+      ctx.fillStyle = "#e2e8f0";
+      ctx.fillRect(x+w/2+4, y+CELL/2-6, 4, 12);
+    }
+  },
+  LED: {
+    w: 2, h: 2,
+    pins: [
+      { id: "anode", x: 0, y: 1, type: PIN_IN },
+      { id: "cathode", x: 1, y: 1, type: PIN_IN }
+    ],
+    render: (ctx, x, y, w, h, C, state, inputs, simState) => {
+      // In our solver, simState.voltages is global, but inputs has node indices!
+      // Actually we just map the node ID if possible, but AnalogEngine writes V diffs?
+      // Wait, let's just use the pin net indices that are passed in the `tick` loop!
+    render: (ctx, x, y, w, h, C, state, inputs, simState) => {
+      let isOn = false;
+      if (state.voltageDiff && state.voltageDiff > 1.8) isOn = true;
+
+      ctx.fillStyle = isOn ? C.ledOn : C.ledOff;
+      ctx.beginPath(); ctx.arc(x+w/2, y+h/2, w/2 - 4, 0, Math.PI*2); ctx.fill();
+      if (isOn) { ctx.shadowColor = C.ledOn; ctx.shadowBlur = 15; ctx.fill(); ctx.shadowBlur = 0; }
+    }
+  },
+  DIODE: {
+    w: 2, h: 1,
+    pins: [
+      { id: "anode", x: 0, y: 0, type: PIN_IN },
+      { id: "cathode", x: 1, y: 0, type: PIN_IN }
+    ],
+    render: (ctx, x, y, w, h, C) => {
+      ctx.strokeStyle = C.icPins; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(x+CELL/2, y+CELL/2); ctx.lineTo(x+w-CELL/2, y+CELL/2); ctx.stroke();
+      ctx.fillStyle = "#ef4444"; // glass body
+      ctx.fillRect(x + CELL/2 + 4, y + CELL/2 - 5, w - CELL - 8, 10);
+      ctx.fillStyle = "#1e293b"; // cathode stripe
+      ctx.fillRect(x + w - CELL/2 - 8, y + CELL/2 - 5, 4, 10);
+    }
+  },
+  POTENTIOMETER: {
+    w: 3, h: 1,
+    pins: [
+      { id: "p1", x: 0, y: 0, type: PIN_IN }, { id: "pw", x: 1, y: 0, type: PIN_IN }, { id: "p2", x: 2, y: 0, type: PIN_IN }
+    ],
+    render: (ctx, x, y, w, h, C, state) => {
+      ctx.fillStyle = "#3b82f6"; ctx.fillRect(x, y-CELL/2, w, h+CELL);
+      ctx.fillStyle = "#1e293b"; ctx.beginPath(); ctx.arc(x+w/2, y+h/2, CELL/1.5, 0, Math.PI*2); ctx.fill();
+      const val = state.value ?? 0.5;
+      ctx.strokeStyle = "#fff"; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(x+w/2, y+h/2);
+      ctx.lineTo(x+w/2 + Math.cos(val*Math.PI)*10, y+h/2 - Math.sin(val*Math.PI)*10); ctx.stroke();
+    }
+  },
+  PHOTORESISTOR: {
+    w: 2, h: 1,
+    pins: [
+      { id: "p1", x: 0, y: 0, type: PIN_IN }, { id: "p2", x: 1, y: 0, type: PIN_IN }
+    ],
+    render: (ctx, x, y, w, h, C) => {
+      ctx.strokeStyle = C.icPins; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(x+CELL/2, y+CELL/2); ctx.lineTo(x+w-CELL/2, y+CELL/2); ctx.stroke();
+      ctx.fillStyle = "#eab308";
+      ctx.beginPath(); ctx.arc(x+w/2, y+CELL/2, 8, 0, Math.PI*2); ctx.fill();
+      ctx.strokeStyle = "#a16207";
+      ctx.beginPath(); ctx.moveTo(x+w/2-4, y+CELL/2); ctx.lineTo(x+w/2+4, y+CELL/2); ctx.stroke();
+    }
+  },
+  NPN_TRANSISTOR: {
+    w: 3, h: 1,
+    pins: [
+      { id: "e", x: 0, y: 0, type: PIN_IN }, { id: "b", x: 1, y: 0, type: PIN_IN }, { id: "c", x: 2, y: 0, type: PIN_IN }
+    ],
+    render: (ctx, x, y, w, h, C) => {
+      ctx.fillStyle = "#1e293b";
+      ctx.beginPath(); ctx.arc(x+w/2, y+CELL/2, 10, Math.PI, 0); ctx.fill();
+      ctx.fillRect(x+w/2-10, y+CELL/2, 20, 4);
+      ctx.fillStyle = "#94a3b8"; ctx.font = "8px sans-serif"; ctx.textAlign="center";
+      ctx.fillText("NPN", x+w/2, y+CELL/2-2);
+    }
+  },
+  PNP_TRANSISTOR: {
+    w: 3, h: 1,
+    pins: [
+      { id: "e", x: 0, y: 0, type: PIN_IN }, { id: "b", x: 1, y: 0, type: PIN_IN }, { id: "c", x: 2, y: 0, type: PIN_IN }
+    ],
+    render: (ctx, x, y, w, h, C) => {
+      ctx.fillStyle = "#1e293b";
+      ctx.beginPath(); ctx.arc(x+w/2, y+CELL/2, 10, Math.PI, 0); ctx.fill();
+      ctx.fillRect(x+w/2-10, y+CELL/2, 20, 4);
+      ctx.fillStyle = "#94a3b8"; ctx.font = "8px sans-serif"; ctx.textAlign="center";
+      ctx.fillText("PNP", x+w/2, y+CELL/2-2);
+    }
+  },
+  DIP_SWITCH: {
+    w: 4, h: 4,
+    pins: [
+      { id: "1t", x: 0, y: 0, type: PIN_IN }, { id: "2t", x: 1, y: 0, type: PIN_IN }, { id: "3t", x: 2, y: 0, type: PIN_IN }, { id: "4t", x: 3, y: 0, type: PIN_IN },
+      { id: "4b", x: 3, y: 3, type: PIN_IN }, { id: "3b", x: 2, y: 3, type: PIN_IN }, { id: "2b", x: 1, y: 3, type: PIN_IN }, { id: "1b", x: 0, y: 3, type: PIN_IN }
+    ],
+    render: (ctx, x, y, w, h, C, state) => {
+      ctx.fillStyle = "#ef4444"; ctx.fillRect(x, y+CELL/2, w, h-CELL);
+      const sw = state.switches || [false,false,false,false];
+      for (let i=0; i<4; i++) {
+        ctx.fillStyle = "#1e293b"; ctx.fillRect(x+i*CELL+4, y+CELL, 16, 24);
+        ctx.fillStyle = "#f8fafc";
+        if (sw[i]) ctx.fillRect(x+i*CELL+4, y+CELL, 16, 12);
+        else ctx.fillRect(x+i*CELL+4, y+CELL+12, 16, 12);
+      }
+    }
+  },
+  SWITCH: {
+    w: 2, h: 3,
+    pins: [
+      { id: "l1", x: 0, y: 0, type: PIN_IN },
+      { id: "r1", x: 1, y: 0, type: PIN_IN },
+      { id: "l2", x: 0, y: 2, type: PIN_IN },
+      { id: "r2", x: 1, y: 2, type: PIN_IN }
+    ],
+    render: (ctx, x, y, w, h, C, state) => {
+      ctx.fillStyle = state.on ? "#64748b" : "#94a3b8";
+      ctx.fillRect(x+2, y+2, w-4, h-4);
+      ctx.fillStyle = "#cbd5e1";
+      ctx.beginPath(); ctx.arc(x+w/2, y+h/2, Math.min(w,h)/4, 0, Math.PI*2); ctx.fill();
+    }
+  },
+  "555_TIMER": {
+    w: 4, h: 4,
+    pins: [
+      { id: "1_gnd", x: 0, y: 3, type: PIN_GND }, { id: "2_trig", x: 1, y: 3, type: PIN_IN }, { id: "3_out", x: 2, y: 3, type: PIN_OUT }, { id: "4_rst", x: 3, y: 3, type: PIN_IN },
+      { id: "8_vcc", x: 0, y: 0, type: PIN_PWR }, { id: "7_disch", x: 1, y: 0, type: PIN_IN }, { id: "6_thres", x: 2, y: 0, type: PIN_IN }, { id: "5_ctrl", x: 3, y: 0, type: PIN_IN }
+    ],
+    render: (ctx, x, y, w, h, C) => {
+      ctx.fillStyle = C.icBody; ctx.fillRect(x - CELL/4, y + CELL/2, w + CELL/2, h - CELL);
+      ctx.fillStyle = C.bg; ctx.beginPath(); ctx.arc(x - CELL/4, y + h/2, CELL/4, -Math.PI/2, Math.PI/2); ctx.fill();
+      ctx.fillStyle = C.icText; ctx.font = "bold 12px monospace"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillText("555", x + w/2, y + h/2);
+      ctx.fillStyle = C.icPins;
+      for (let i=0; i<4; i++) {
+        ctx.fillRect(x + i*CELL - 2, y + CELL/2 - 6, 4, 6);
+        ctx.fillRect(x + i*CELL - 2, y + h - CELL/2, 4, 6);
+      }
+    }
+  },
+  "74HC00": { // NAND
+    w: 7, h: 4,
+    pins: [
+      { id: "1A", x: 0, y: 3, type: PIN_IN }, { id: "1B", x: 1, y: 3, type: PIN_IN }, { id: "1Y", x: 2, y: 3, type: PIN_OUT }, { id: "2A", x: 3, y: 3, type: PIN_IN }, { id: "2B", x: 4, y: 3, type: PIN_IN }, { id: "2Y", x: 5, y: 3, type: PIN_OUT }, { id: "GND", x: 6, y: 3, type: PIN_GND },
+      { id: "VCC", x: 0, y: 0, type: PIN_PWR }, { id: "4B", x: 1, y: 0, type: PIN_IN }, { id: "4A", x: 2, y: 0, type: PIN_IN }, { id: "4Y", x: 3, y: 0, type: PIN_OUT }, { id: "3B", x: 4, y: 0, type: PIN_IN }, { id: "3A", x: 5, y: 0, type: PIN_IN }, { id: "3Y", x: 6, y: 0, type: PIN_OUT }
+    ],
+    render: (ctx, x, y, w, h, C) => {
+      ctx.fillStyle = C.icBody; ctx.fillRect(x - CELL/4, y + CELL/2, w + CELL/2, h - CELL);
+      ctx.fillStyle = C.bg; ctx.beginPath(); ctx.arc(x - CELL/4, y + h/2, CELL/4, -Math.PI/2, Math.PI/2); ctx.fill();
+      ctx.fillStyle = C.icText; ctx.font = "bold 12px monospace"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillText("74HC00 NAND", x + w/2, y + h/2);
+    }
+  },
+  "74HC04": { // NOT
+    w: 7, h: 4,
+    pins: [
+      { id: "1A", x: 0, y: 3, type: PIN_IN }, { id: "1Y", x: 1, y: 3, type: PIN_OUT }, { id: "2A", x: 2, y: 3, type: PIN_IN }, { id: "2Y", x: 3, y: 3, type: PIN_OUT }, { id: "3A", x: 4, y: 3, type: PIN_IN }, { id: "3Y", x: 5, y: 3, type: PIN_OUT }, { id: "GND", x: 6, y: 3, type: PIN_GND },
+      { id: "VCC", x: 0, y: 0, type: PIN_PWR }, { id: "6A", x: 1, y: 0, type: PIN_IN }, { id: "6Y", x: 2, y: 0, type: PIN_OUT }, { id: "5A", x: 3, y: 0, type: PIN_IN }, { id: "5Y", x: 4, y: 0, type: PIN_OUT }, { id: "4A", x: 5, y: 0, type: PIN_IN }, { id: "4Y", x: 6, y: 0, type: PIN_OUT }
+    ],
+    render: (ctx, x, y, w, h, C) => {
+      ctx.fillStyle = C.icBody; ctx.fillRect(x - CELL/4, y + CELL/2, w + CELL/2, h - CELL);
+      ctx.fillStyle = C.bg; ctx.beginPath(); ctx.arc(x - CELL/4, y + h/2, CELL/4, -Math.PI/2, Math.PI/2); ctx.fill();
+      ctx.fillStyle = C.icText; ctx.font = "bold 12px monospace"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillText("74HC04 NOT", x + w/2, y + h/2);
+    }
+  },
+  "74HC08": { // AND
+    w: 7, h: 4,
+    pins: [
+      { id: "1A", x: 0, y: 3, type: PIN_IN }, { id: "1B", x: 1, y: 3, type: PIN_IN }, { id: "1Y", x: 2, y: 3, type: PIN_OUT }, { id: "2A", x: 3, y: 3, type: PIN_IN }, { id: "2B", x: 4, y: 3, type: PIN_IN }, { id: "2Y", x: 5, y: 3, type: PIN_OUT }, { id: "GND", x: 6, y: 3, type: PIN_GND },
+      { id: "VCC", x: 0, y: 0, type: PIN_PWR }, { id: "4B", x: 1, y: 0, type: PIN_IN }, { id: "4A", x: 2, y: 0, type: PIN_IN }, { id: "4Y", x: 3, y: 0, type: PIN_OUT }, { id: "3B", x: 4, y: 0, type: PIN_IN }, { id: "3A", x: 5, y: 0, type: PIN_IN }, { id: "3Y", x: 6, y: 0, type: PIN_OUT }
+    ],
+    render: (ctx, x, y, w, h, C) => {
+      ctx.fillStyle = C.icBody; ctx.fillRect(x - CELL/4, y + CELL/2, w + CELL/2, h - CELL);
+      ctx.fillStyle = C.bg; ctx.beginPath(); ctx.arc(x - CELL/4, y + h/2, CELL/4, -Math.PI/2, Math.PI/2); ctx.fill();
+      ctx.fillStyle = C.icText; ctx.font = "bold 12px monospace"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillText("74HC08 AND", x + w/2, y + h/2);
+    }
+  },
+  "74HC32": { // OR
+    w: 7, h: 4,
+    pins: [
+      { id: "1A", x: 0, y: 3, type: PIN_IN }, { id: "1B", x: 1, y: 3, type: PIN_IN }, { id: "1Y", x: 2, y: 3, type: PIN_OUT }, { id: "2A", x: 3, y: 3, type: PIN_IN }, { id: "2B", x: 4, y: 3, type: PIN_IN }, { id: "2Y", x: 5, y: 3, type: PIN_OUT }, { id: "GND", x: 6, y: 3, type: PIN_GND },
+      { id: "VCC", x: 0, y: 0, type: PIN_PWR }, { id: "4B", x: 1, y: 0, type: PIN_IN }, { id: "4A", x: 2, y: 0, type: PIN_IN }, { id: "4Y", x: 3, y: 0, type: PIN_OUT }, { id: "3B", x: 4, y: 0, type: PIN_IN }, { id: "3A", x: 5, y: 0, type: PIN_IN }, { id: "3Y", x: 6, y: 0, type: PIN_OUT }
+    ],
+    render: (ctx, x, y, w, h, C) => {
+      ctx.fillStyle = C.icBody; ctx.fillRect(x - CELL/4, y + CELL/2, w + CELL/2, h - CELL);
+      ctx.fillStyle = C.bg; ctx.beginPath(); ctx.arc(x - CELL/4, y + h/2, CELL/4, -Math.PI/2, Math.PI/2); ctx.fill();
+      ctx.fillStyle = C.icText; ctx.font = "bold 12px monospace"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillText("74HC32 OR", x + w/2, y + h/2);
+    }
+  },
+  SEVEN_SEG: {
+    w: 5, h: 4,
+    pins: [
+      { id: "e", x: 0, y: 3, type: PIN_IN }, { id: "d", x: 1, y: 3, type: PIN_IN }, { id: "com1", x: 2, y: 3, type: PIN_GND }, { id: "c", x: 3, y: 3, type: PIN_IN }, { id: "dp", x: 4, y: 3, type: PIN_IN },
+      { id: "g", x: 0, y: 0, type: PIN_IN }, { id: "f", x: 1, y: 0, type: PIN_IN }, { id: "com2", x: 2, y: 0, type: PIN_GND }, { id: "a", x: 3, y: 0, type: PIN_IN }, { id: "b", x: 4, y: 0, type: PIN_IN }
+    ],
+    render: (ctx, x, y, w, h, C, state, inputs, simState) => {
+      ctx.fillStyle = "#1e293b"; ctx.fillRect(x, y + CELL/2, w, h - CELL);
+      
+      const v_com = Math.min(inputs["com1"] || 5, inputs["com2"] || 5);
+      const checkOn = (v) => (v - v_com) > 1.8;
+      const segs = {
+        a: checkOn(inputs.a), b: checkOn(inputs.b), c: checkOn(inputs.c),
+        d: checkOn(inputs.d), e: checkOn(inputs.e), f: checkOn(inputs.f),
+        g: checkOn(inputs.g), dp: checkOn(inputs.dp)
+      };
+      
+      const drawSeg = (sx, sy, sw, sh, on) => {
+        ctx.fillStyle = on ? C.ledOn : C.ledOff;
+        ctx.fillRect(x + sx, y + CELL/2 + sy, sw, sh);
+      };
+      const cx = w/2, cy = (h-CELL)/2, l = CELL*1.5, t = 4;
+      drawSeg(cx - l/2, cy - l - t/2, l, t, segs.a);
+      drawSeg(cx - l/2, cy - t/2, l, t, segs.g);
+      drawSeg(cx - l/2, cy + l - t/2, l, t, segs.d);
+      drawSeg(cx - l/2 - t/2, cy - l, t, l, segs.f);
+      drawSeg(cx + l/2 - t/2, cy - l, t, l, segs.b);
+      drawSeg(cx - l/2 - t/2, cy, t, l, segs.e);
+      drawSeg(cx + l/2 - t/2, cy, t, l, segs.c);
+      
+      ctx.fillStyle = C.icPins;
+      for (let i=0; i<5; i++) {
+        ctx.fillRect(x + i*CELL - 2, y + CELL/2 - 6, 4, 6);
+        ctx.fillRect(x + i*CELL - 2, y + h - CELL/2, 4, 6);
+      }
+    }
+  }
 };
 
-// ── Port position helpers ─────────────────────────────────────────────────────
-function getPortPos(node, side, idx, count) {
-  const def = NODE_DEFS[node.type];
-  const nw = def.w * CELL, nh = def.h * CELL;
-  const nx = node.gx * CELL, ny = node.gy * CELL;
-  if (side === "in") {
-    const step = nh / (count + 1);
-    return { x: nx, y: ny + step * (idx + 1) };
-  } else {
-    const step = nh / (count + 1);
-    return { x: nx + nw, y: ny + step * (idx + 1) };
+// ── Drawers UI Data ───────────────────────────────────────────────────────────
+const DRAWERS = [
+  {
+    title: "Power & Inputs",
+    items: [
+      { type: "POWER_SUPPLY", label: "5V Power Supply" },
+      { type: "SWITCH", label: "Pushbutton" },
+      { type: "DIP_SWITCH", label: "4-Pos DIP Switch", state: { switches: [false,false,false,false] } },
+      { type: "POTENTIOMETER", label: "10k Potentiometer", state: { value: 0.5 } }
+    ]
+  },
+  {
+    title: "Resistors",
+    items: [
+      { type: "RESISTOR", label: "220 Ω (Red-Red-Brown)", state: { value: 220, bands: ["#ef4444", "#ef4444", "#8b4513"] } },
+      { type: "RESISTOR", label: "330 Ω (Org-Org-Brown)", state: { value: 330, bands: ["#f97316", "#f97316", "#8b4513"] } },
+      { type: "RESISTOR", label: "1k Ω (Brown-Blk-Red)", state: { value: 1000, bands: ["#8b4513", "#000000", "#ef4444"] } },
+      { type: "RESISTOR", label: "4.7k Ω (Yel-Vio-Red)", state: { value: 4700, bands: ["#eab308", "#8b5cf6", "#ef4444"] } },
+      { type: "RESISTOR", label: "10k Ω (Brown-Blk-Org)", state: { value: 10000, bands: ["#8b4513", "#000000", "#f97316"] } },
+      { type: "RESISTOR", label: "100k Ω (Brown-Blk-Yel)", state: { value: 100000, bands: ["#8b4513", "#000000", "#eab308"] } },
+      { type: "RESISTOR", label: "1M Ω (Brown-Blk-Grn)", state: { value: 1000000, bands: ["#8b4513", "#000000", "#22c55e"] } },
+      { type: "PHOTORESISTOR", label: "Photoresistor (LDR)", state: { light: 0.5 } }
+    ]
+  },
+  {
+    title: "Capacitors",
+    items: [
+      { type: "CAPACITOR", label: "10 nF Ceramic", state: { value: 0.00000001 } },
+      { type: "CAPACITOR", label: "100 nF Ceramic", state: { value: 0.0000001 } },
+      { type: "CAPACITOR", label: "10 µF Electrolytic", state: { value: 0.00001 } },
+      { type: "CAPACITOR", label: "100 µF Electrolytic", state: { value: 0.0001 } },
+      { type: "CAPACITOR", label: "1000 µF Electrolytic", state: { value: 0.001 } }
+    ]
+  },
+  {
+    title: "Semiconductors",
+    items: [
+      { type: "LED", label: "Red LED" },
+      { type: "DIODE", label: "1N4148 Diode" },
+      { type: "NPN_TRANSISTOR", label: "2N3904 (NPN)" },
+      { type: "PNP_TRANSISTOR", label: "2N3906 (PNP)" },
+      { type: "SEVEN_SEG", label: "7-Segment Display" }
+    ]
+  },
+  {
+    title: "Logic ICs",
+    items: [
+      { type: "555_TIMER", label: "555 Timer IC" },
+      { type: "74HC00", label: "74HC00 (Quad NAND)" },
+      { type: "74HC04", label: "74HC04 (Hex NOT)" },
+      { type: "74HC08", label: "74HC08 (Quad AND)" },
+      { type: "74HC32", label: "74HC32 (Quad OR)" }
+    ]
   }
-}
-
-// ── Signal propagation (topological) ─────────────────────────────────────────
-function propagate(nodes, wires) {
-  const values = {};   
-  const inValues = {}; 
-
-  nodes.forEach(n => {
-    const def = NODE_DEFS[n.type];
-    if (def.ins === 0) {
-      const outs = def.compute([], n.state || {});
-      outs.forEach((v, i) => { values[`${n.id}-out-${i}`] = v; });
-    }
-  });
-
-  for (let pass = 0; pass < nodes.length + 2; pass++) {
-    let changed = false;
-    nodes.forEach(n => {
-      const def = NODE_DEFS[n.type];
-      if (def.ins === 0) return;
-      const ins = Array.from({ length: def.ins }, (_, i) => inValues[`${n.id}-in-${i}`] || false);
-      const outs = def.compute(ins, n.state || {});
-      outs.forEach((v, i) => {
-        const key = `${n.id}-out-${i}`;
-        if (values[key] !== v) { values[key] = v; changed = true; }
-      });
-    });
-    if (!changed) break;
-  }
-
-  wires.forEach(w => {
-    const v = values[`${w.fromNode}-out-${w.fromPort}`] || false;
-    const key = `${w.toNode}-in-${w.toPort}`;
-    if (v) inValues[key] = true;
-    else if (inValues[key] === undefined) inValues[key] = false;
-  });
-
-  for (let pass = 0; pass < 3; pass++) {
-    nodes.forEach(n => {
-      const def = NODE_DEFS[n.type];
-      if (def.ins === 0) return;
-      const ins = Array.from({ length: def.ins }, (_, i) => inValues[`${n.id}-in-${i}`] || false);
-      const outs = def.compute(ins, n.state || {});
-      outs.forEach((v, i) => {
-        const key = `${n.id}-out-${i}`;
-        if (values[key] !== v) { values[key] = v; }
-      });
-    });
-    wires.forEach(w => {
-      const v = values[`${w.fromNode}-out-${w.fromPort}`] || false;
-      const key = `${w.toNode}-in-${w.toPort}`;
-      if (v) inValues[key] = true;
-      else if (inValues[key] === undefined) inValues[key] = false;
-    });
-  }
-
-  return { values, inValues };
-}
-
-// ── Challenge definitions ─────────────────────────────────────────────────────
-const CHALLENGES = [
-  {
-    id: "c1",
-    title: "Light the lamp",
-    desc: "Connect a power source to the output lamp. Drag from the output port of POWER to the input port of the LAMP.",
-    hint: "Click the yellow dot on POWER, then click the yellow dot on OUT.",
-    starterNodes: [
-      { id:"n1", type:"POWER",  gx:2, gy:4, state:{} },
-      { id:"n2", type:"LAMP",   gx:9, gy:4, state:{} },
-    ],
-    starterWires: [],
-    locked: [],
-    check: (nodes, wires, sig) => sig.inValues["n2-in-0"] === true,
-    successMsg: "The lamp is on. You connected two nodes with a wire — that's the foundation of every circuit.",
-  },
-  {
-    id: "c2",
-    title: "NOT gate: flip the signal",
-    desc: "A NOT gate inverts its input. Connect POWER → NOT → LAMP. The lamp should stay OFF.",
-    hint: "NOT flips the signal. 1 becomes 0, so the lamp goes out.",
-    starterNodes: [
-      { id:"n1", type:"POWER", gx:2, gy:4, state:{} },
-      { id:"n2", type:"NOT",   gx:7, gy:3, state:{} },
-      { id:"n3", type:"LAMP",  gx:13, gy:4, state:{} },
-    ],
-    starterWires: [],
-    locked: ["n1","n2","n3"],
-    check: (nodes, wires, sig) => sig.inValues["n3-in-0"] === false && wires.length >= 2,
-    successMsg: "NOT is your first logic gate. It does one thing: flip. This is how computers build decisions from binary signals.",
-  },
-  {
-    id: "c3",
-    title: "AND gate: both must be true",
-    desc: "AND outputs 1 only when BOTH inputs are 1. Build a circuit where flipping either switch changes the lamp.",
-    hint: "Wire both switches to the AND inputs. The lamp only lights when both switches are ON.",
-    starterNodes: [
-      { id:"sw1", type:"SWITCH", gx:2, gy:2, state:{ on:false } },
-      { id:"sw2", type:"SWITCH", gx:2, gy:7, state:{ on:false } },
-      { id:"g1",  type:"AND",    gx:8, gy:4, state:{} },
-      { id:"lmp", type:"LAMP",   gx:14, gy:4, state:{} },
-    ],
-    starterWires: [],
-    locked: [],
-    check: (nodes, wires, sig) => {
-      const lamp = sig.inValues["lmp-in-0"];
-      const sw1 = nodes.find(n=>n.id==="sw1"), sw2 = nodes.find(n=>n.id==="sw2");
-      return wires.length >= 3 && (lamp === !!(sw1?.state?.on && sw2?.state?.on));
-    },
-    successMsg: "AND is the basis of conditional logic. In code, 'if (a && b)' is exactly this gate.",
-  },
-  {
-    id: "c4",
-    title: "OR gate: either is enough",
-    desc: "OR outputs 1 when at least one input is 1. Build it and notice how it differs from AND.",
-    hint: "The lamp lights if switch 1 OR switch 2 is on — or both.",
-    starterNodes: [
-      { id:"sw1", type:"SWITCH", gx:2, gy:2, state:{ on:false } },
-      { id:"sw2", type:"SWITCH", gx:2, gy:7, state:{ on:false } },
-      { id:"g1",  type:"OR",     gx:8, gy:4, state:{} },
-      { id:"lmp", type:"LAMP",   gx:14, gy:4, state:{} },
-    ],
-    starterWires: [],
-    locked: [],
-    check: (nodes, wires, sig) => wires.length >= 3 && sig.inValues["lmp-in-0"] !== undefined,
-    successMsg: "OR models inclusion. Any input being true is enough.",
-  },
-  {
-    id: "c5",
-    title: "XOR: build a half-adder bit",
-    desc: "XOR outputs 1 when inputs differ. Build: XOR for the sum bit, AND for the carry bit.",
-    hint: "You need XOR and AND sharing the same two inputs. Sum = XOR output. Carry = AND output.",
-    starterNodes: [
-      { id:"sw1", type:"SWITCH", gx:2, gy:3, state:{ on:false } },
-      { id:"sw2", type:"SWITCH", gx:2, gy:8, state:{ on:false } },
-      { id:"xor", type:"XOR",    gx:8, gy:2, state:{} },
-      { id:"and", type:"AND",    gx:8, gy:9, state:{} },
-      { id:"sum", type:"LAMP",   gx:15, gy:2, state:{} },
-      { id:"carry",type:"LAMP",  gx:15, gy:9, state:{} },
-    ],
-    starterWires: [],
-    locked: [],
-    check: (nodes, wires, sig) => {
-      const sw1 = nodes.find(n=>n.id==="sw1")?.state?.on || false;
-      const sw2 = nodes.find(n=>n.id==="sw2")?.state?.on || false;
-      const sumOk = sig.inValues["sum-in-0"] === (sw1 !== sw2);
-      const carryOk = sig.inValues["carry-in-0"] === (sw1 && sw2);
-      return wires.length >= 4 && sumOk && carryOk;
-    },
-    successMsg: "You built a half-adder — the fundamental building block of every CPU's arithmetic unit.",
-  },
 ];
 
-// ── Main component ────────────────────────────────────────────────────────────
-function LogicSimContent({ params = {} }) {
+// ── Prebuilt Circuits ─────────────────────────────────────────────────────────
+const PREBUILT = {
+  "blank": { nodes: [], wires: [] },
+  "led_basic": {
+    nodes: [
+      { id: "n1", type: "POWER_SUPPLY", x: 1, y: -2, state: {} },
+      { id: "n2", type: "RESISTOR", x: 5, y: 3, state: { value: 220, bands: ["#ef4444", "#ef4444", "#8b4513"] } },
+      { id: "n3", type: "LED", x: 8, y: 2, state: {} }
+    ],
+    wires: [
+      { id: "w1", h1: "rail_t1_5", h2: "strip_t_0_5", color: "#ef4444" },
+      { id: "w2", h1: "rail_t2_9", h2: "strip_t_0_9", color: "#3b82f6" }
+    ]
+  },
+  "555_astable": {
+    nodes: [
+      { id: "n1", type: "POWER_SUPPLY", x: 1, y: -2, state: {} },
+      { id: "n_555", type: "555_TIMER", x: 10, y: 6, state: {} },
+      { id: "n_r1", type: "RESISTOR", x: 5, y: 3, state: { value: 1000, bands: ["#8b4513", "#000000", "#ef4444"] } },
+      { id: "n_r2", type: "RESISTOR", x: 9, y: 3, state: { value: 10000, bands: ["#8b4513", "#000000", "#f97316"] } },
+      { id: "n_c", type: "CAPACITOR", x: 14, y: 9, state: { value: 0.0001 } },
+      { id: "n_led", type: "LED", x: 18, y: 9, state: {} },
+      { id: "n_r_led", type: "RESISTOR", x: 18, y: 12, state: { value: 220, bands: ["#ef4444", "#ef4444", "#8b4513"] } }
+    ],
+    wires: [
+      // 555 Power
+      { id: "w1", h1: "rail_t1_10", h2: "strip_t_0_10", color: "#ef4444" }, // VCC
+      { id: "w2", h1: "rail_t2_10", h2: "strip_b_4_10", color: "#3b82f6" }, // GND
+      { id: "w3", h1: "rail_t1_13", h2: "strip_t_0_13", color: "#ef4444" }, // RST to VCC
+      // Astable R1, R2, C
+      { id: "w4", h1: "rail_t1_5", h2: "strip_t_1_5", color: "#ef4444" }, // R1 to VCC
+      { id: "w5", h1: "strip_t_1_8", h2: "strip_t_1_9", color: "#22c55e" }, // R1 to R2
+      { id: "w6", h1: "strip_t_1_11", h2: "strip_t_1_9", color: "#22c55e" }, // R1/R2 to DISCH
+      { id: "w7", h1: "strip_t_2_12", h2: "strip_b_0_14", color: "#eab308" }, // R2 to C
+      { id: "w8", h1: "strip_t_3_12", h2: "strip_t_4_12", color: "#eab308" }, // THRES to C (bridge across trench internally)
+      { id: "w8b", h1: "strip_t_4_12", h2: "strip_b_0_14", color: "#eab308" }, // THRES to C
+      { id: "w9", h1: "strip_b_1_11", h2: "strip_b_0_14", color: "#eab308" }, // TRIG to C
+      { id: "w10", h1: "strip_b_0_15", h2: "rail_b1_15", color: "#3b82f6" }, // C to GND
+      // LED Output
+      { id: "w11", h1: "strip_b_2_12", h2: "strip_b_2_18", color: "#a855f7" }, // OUT to LED anode
+      { id: "w12", h1: "strip_b_3_19", h2: "strip_b_4_18", color: "#3b82f6" }, // LED cathode to R_LED
+      { id: "w13", h1: "strip_b_4_21", h2: "rail_b1_21", color: "#3b82f6" } // R_LED to GND
+    ]
+  }
+};
+
+// ── Breadboard Layout ─────────────────────────────────────────────────────────
+function getHoles(cols) {
+  const holes = [];
+  for (let c=0; c<cols; c++) {
+    holes.push({ id: `rail_t1_${c}`, x: c, y: 0, netId: "rail_top_1" });
+    holes.push({ id: `rail_t2_${c}`, x: c, y: 1, netId: "rail_top_2" });
+  }
+  for (let r=0; r<5; r++) {
+    for (let c=0; c<cols; c++) {
+      holes.push({ id: `strip_t_${r}_${c}`, x: c, y: 3 + r, netId: `strip_t_${c}` });
+    }
+  }
+  for (let r=0; r<5; r++) {
+    for (let c=0; c<cols; c++) {
+      holes.push({ id: `strip_b_${r}_${c}`, x: c, y: 9 + r, netId: `strip_b_${c}` });
+    }
+  }
+  for (let c=0; c<cols; c++) {
+    holes.push({ id: `rail_b1_${c}`, x: c, y: 15, netId: "rail_bot_1" });
+    holes.push({ id: `rail_b2_${c}`, x: c, y: 16, netId: "rail_bot_2" });
+  }
+  return holes;
+}
+
+// ── Main Component ────────────────────────────────────────────────────────────
+export default function LogicSim({ params = {} }) {
   const canvasRef = useRef(null);
   const wrapRef   = useRef(null);
   const stateRef  = useRef({
-    nodes: [], wires: [],
+    nodes: [],
+    wires: [],
     draggingWire: null,
-    selected: null,
-    hoverNode: null, hoverWire: null,
+    selectedNode: null,
+    selectedWire: null,
     mouseX: 0, mouseY: 0,
-    signals: { values:{}, inValues:{} },
     panX: 0, panY: 0, zoom: 1,
+    simState: { voltages: null },
+    netlist: null,
     _clickStart: null,
   });
 
-  const [mode, setMode]         = useState("sandbox");
-  const [chalIdx, setChalIdx]   = useState(0);
-  const [success, setSuccess]   = useState(false);
-  const [hint, setHint]         = useState(false);
-  const [tool, setTool]         = useState("wire");
-  const [, forceRender]         = useState(0);
-
+  const [boardSize, setBoardSize] = useState(60);
+  const bb_holes = useRef(getHoles(60));
+  const [openDrawer, setOpenDrawer] = useState("Power & Switches");
+  const [, forceRender] = useState(0);
   const dark = useIsDark();
   const C = getColors(dark);
 
-  // ── Load challenge or clear sandbox ────────────────────────────────────────
-  const loadChallenge = useCallback((idx) => {
-    const ch = CHALLENGES[idx];
-    const st = stateRef.current;
-    st.nodes = ch.starterNodes.map(n => ({ ...n, state: { ...(n.state||{}) } }));
-    st.wires = ch.starterWires.map(w => ({ ...w }));
-    st.signals = propagate(st.nodes, st.wires);
-    st.selected = null;
-    st.draggingWire = null;
-    st.panX = 50; st.panY = 50;
-    setSuccess(false);
-    setHint(false);
-    forceRender(r => r+1);
-  }, []);
-
-  const clearSandbox = useCallback(() => {
-    const st = stateRef.current;
-    st.nodes = [
-      { id:"p1", type:"POWER",  gx:2, gy:3, state:{} },
-      { id:"p2", type:"GROUND", gx:2, gy:8, state:{} },
-      { id:"l1", type:"LAMP",   gx:12, gy:5, state:{} },
-    ];
-    st.wires = [];
-    st.signals = propagate(st.nodes, st.wires);
-    st.selected = null; st.draggingWire = null;
-    st.panX = 50; st.panY = 50;
-    setSuccess(false);
-    forceRender(r => r+1);
-  }, []);
-
-  const deleteSelected = useCallback(() => {
-    const st = stateRef.current;
-    if (!st.selected) return;
-    st.wires = st.wires.filter(w => w.fromNode!==st.selected && w.toNode!==st.selected);
-    st.nodes = st.nodes.filter(n => n.id!==st.selected);
-    st.signals = propagate(st.nodes, st.wires);
-    st.selected = null;
-    forceRender(r => r+1);
-  }, []);
-
-  // Keyboard events for deleting
+  // Auto-center on load
   useEffect(() => {
-    const handleKeyDown = (e) => {
-      if ((e.key === "Backspace" || e.key === "Delete") && stateRef.current.selected) {
-        deleteSelected();
-      }
+    bb_holes.current = getHoles(boardSize);
+    if (wrapRef.current) {
+      const W = wrapRef.current.clientWidth;
+      const H = wrapRef.current.clientHeight;
+      const BB_W = boardSize * CELL;
+      const BB_H = 17 * CELL;
+      stateRef.current.panX = (W - BB_W)/2;
+      stateRef.current.panY = (H - BB_H)/2 + 40;
+    }
+  }, [boardSize]);
+
+  // ── Physics Ticker (60Hz Analog Simulation) ──
+  useEffect(() => {
+    let animId;
+    const loop = () => {
+      const st = stateRef.current;
+      // Rebuild netlist if needed
+      st.netlist = buildNetlist(st.nodes, st.wires, bb_holes.current);
+      
+      // Map node pins to nets for the solver
+      st.nodes.forEach(n => {
+        const def = COMP_DEFS[n.type];
+        n.pinNets = def.pins.map(pin => {
+          const hole = bb_holes.current.find(h => h.x === n.x + pin.x && h.y === n.y + pin.y);
+          if (hole) return st.netlist.holeToNetIdx[hole.id];
+          return undefined;
+        });
+      });
+
+      // Step Analog Solver
+      st.simState = solveAnalog(st.netlist, st.nodes, st.simState, 1/60);
+
+      // Extract LED voltages for visual rendering
+      st.nodes.forEach(n => {
+        if (n.type === "LED") {
+          const nA = n.pinNets[0];
+          const nC = n.pinNets[1];
+          const vA = nA !== undefined ? st.simState.voltages[nA] : 0;
+          const vC = nC !== undefined ? st.simState.voltages[nC] : 0;
+          n.state.voltageDiff = vA - vC;
+        }
+      });
+
+      draw();
+      animId = requestAnimationFrame(loop);
     };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [deleteSelected]);
+    animId = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(animId);
+  }, []);
 
-  // Init
-  useEffect(() => {
-    if (mode === "sandbox") clearSandbox();
-    else loadChallenge(0);
-  }, [mode, clearSandbox, loadChallenge]);
-
-  // ── Draw ──────────────────────────────────────────────────────────────────
+  // ── Draw ──
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     const W = canvas.width, H = canvas.height;
-    const { nodes, wires, draggingWire, selected, signals, hoverNode, hoverWire, panX, panY, zoom } = stateRef.current;
+    const st = stateRef.current;
+    const { nodes, wires, draggingWire, panX, panY, zoom, selectedNode, selectedWire } = st;
+    const BB_WIDTH = boardSize * CELL;
+
     ctx.clearRect(0, 0, W, H);
-
     ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
-    ctx.strokeStyle = C.grid; ctx.lineWidth = 0.5;
-    const sC = CELL * zoom;
-    for (let x = (Math.floor(panX) % sC); x < W; x += sC) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
-    for (let y = (Math.floor(panY) % sC); y < H; y += sC) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
 
-    const tx = x => x * sC + panX;
-    const ty = y => y * sC + panY;
+    const tx = x => x * CELL * zoom + panX;
+    const ty = y => y * CELL * zoom + panY;
 
-    wires.forEach(w => {
-      const fn = nodes.find(n => n.id === w.fromNode);
-      const tn = nodes.find(n => n.id === w.toNode);
-      if (!fn || !tn) return;
-      const fromDef = NODE_DEFS[fn.type], toDef = NODE_DEFS[tn.type];
-      const fp = getPortPos({...fn, gx:fn.gx, gy:fn.gy}, "out", w.fromPort, fromDef.outs);
-      const tp = getPortPos({...tn, gx:tn.gx, gy:tn.gy}, "in",  w.toPort,  toDef.ins);
-      const on = signals.values[`${w.fromNode}-out-${w.fromPort}`] || false;
-      const isHovDel = tool === "delete" && hoverWire && hoverWire.id === w.id;
-      ctx.strokeStyle = isHovDel ? "#ef4444" : (on ? C.wireOn : C.wireOff);
-      ctx.lineWidth = ((on ? 3 : 2) + (isHovDel ? 2 : 0)) * zoom;
-      ctx.beginPath();
-      ctx.moveTo(tx(fp.x/CELL), ty(fp.y/CELL));
-      const mx = (tx(fp.x/CELL) + tx(tp.x/CELL)) / 2;
-      ctx.bezierCurveTo(mx, ty(fp.y/CELL), mx, ty(tp.y/CELL), tx(tp.x/CELL), ty(tp.y/CELL));
-      ctx.stroke();
+    // Breadboard Body
+    ctx.fillStyle = C.board;
+    ctx.shadowColor = "rgba(0,0,0,0.1)"; ctx.shadowBlur = 20;
+    ctx.fillRect(tx(-1), ty(-1), BB_WIDTH * zoom + 2*CELL*zoom, 17 * CELL * zoom + 2*CELL*zoom);
+    ctx.shadowBlur = 0;
+
+    // Power rail lines
+    ctx.lineWidth = 3 * zoom;
+    ctx.strokeStyle = C.railRed;
+    ctx.beginPath(); ctx.moveTo(tx(0), ty(-0.5)); ctx.lineTo(tx(boardSize-1), ty(-0.5)); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(tx(0), ty(16.5)); ctx.lineTo(tx(boardSize-1), ty(16.5)); ctx.stroke();
+    ctx.strokeStyle = C.railBlue;
+    ctx.beginPath(); ctx.moveTo(tx(0), ty(1.5)); ctx.lineTo(tx(boardSize-1), ty(1.5)); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(tx(0), ty(14.5)); ctx.lineTo(tx(boardSize-1), ty(14.5)); ctx.stroke();
+
+    // Trench
+    ctx.fillStyle = C.bg;
+    ctx.fillRect(tx(0), ty(8.2), BB_WIDTH*zoom, 0.6*CELL*zoom);
+
+    // Holes
+    bb_holes.current.forEach(h => {
+      const px = tx(h.x) + CELL/2 * zoom;
+      const py = ty(h.y) + CELL/2 * zoom;
+      ctx.fillStyle = C.boardHole;
+      ctx.beginPath(); ctx.arc(px, py, PORT_R * zoom, 0, Math.PI*2); ctx.fill();
     });
 
+    // Wires
+    wires.forEach(w => {
+      const h1 = bb_holes.current.find(h => h.id === w.h1);
+      const h2 = bb_holes.current.find(h => h.id === w.h2);
+      if (!h1 || !h2) return;
+      const px1 = tx(h1.x) + CELL/2 * zoom, py1 = ty(h1.y) + CELL/2 * zoom;
+      const px2 = tx(h2.x) + CELL/2 * zoom, py2 = ty(h2.y) + CELL/2 * zoom;
+      const isSel = selectedWire === w.id;
+      
+      ctx.strokeStyle = isSel ? C.sel : (w.color || C.wire);
+      ctx.lineWidth = (isSel ? 5 : 3) * zoom;
+      ctx.lineCap = "round";
+      ctx.beginPath(); ctx.moveTo(px1, py1);
+      const dist = Math.hypot(px2-px1, py2-py1);
+      ctx.quadraticCurveTo((px1+px2)/2, (py1+py2)/2 - dist/3, px2, py2);
+      ctx.stroke();
+      
+      ctx.fillStyle = ctx.strokeStyle;
+      ctx.beginPath(); ctx.arc(px1, py1, 6*zoom, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(px2, py2, 6*zoom, 0, Math.PI*2); ctx.fill();
+    });
+
+    // Dragging Wire
     if (draggingWire) {
-      ctx.strokeStyle = C.wireHi; ctx.lineWidth = 2.5; ctx.setLineDash([4,4]);
-      const fn = nodes.find(n => n.id === draggingWire.fromNode);
-      if (fn) {
-        const def = NODE_DEFS[fn.type];
-        const fp = getPortPos(fn, draggingWire.fromSide, draggingWire.fromPort, draggingWire.fromSide==="out"?def.outs:def.ins);
-        ctx.beginPath(); ctx.moveTo(tx(fp.x/CELL), ty(fp.y/CELL)); ctx.lineTo(draggingWire.mouseX, draggingWire.mouseY); ctx.stroke();
+      const h1 = bb_holes.current.find(h => h.id === draggingWire.h1);
+      if (h1) {
+        const px1 = tx(h1.x) + CELL/2 * zoom, py1 = ty(h1.y) + CELL/2 * zoom;
+        ctx.strokeStyle = C.wireHi; ctx.lineWidth = 3 * zoom; ctx.setLineDash([5,5]);
+        ctx.beginPath(); ctx.moveTo(px1, py1);
+        const dist = Math.hypot(draggingWire.mx-px1, draggingWire.my-py1);
+        ctx.quadraticCurveTo((px1+draggingWire.mx)/2, (py1+draggingWire.my)/2 - dist/3, draggingWire.mx, draggingWire.my);
+        ctx.stroke(); ctx.setLineDash([]);
       }
-      ctx.setLineDash([]);
     }
 
+    // Nodes (Components)
     nodes.forEach(n => {
-      const def = NODE_DEFS[n.type];
-      const nw = def.w * sC, nh = def.h * sC;
-      const nx = tx(n.gx), ny = ty(n.gy);
-      const isSelected = selected === n.id;
-      const isHovDel = tool === "delete" && hoverNode && hoverNode.id === n.id;
-
-      const isLamp = n.type === "LAMP";
-      const lampOn = isLamp && (signals.inValues[`${n.id}-in-0`] || false);
-      const isPower = n.type === "POWER";
-      const isGround = n.type === "GROUND";
-      const isSwitch = n.type === "SWITCH";
-
-      ctx.beginPath();
-      if (isLamp) {
-        ctx.arc(nx + nw/2, ny + nh/2, Math.min(nw,nh)/2 - 6 * zoom, 0, 2*Math.PI);
-      } else {
-        ctx.roundRect(nx, ny, nw, nh, 8 * zoom);
+      const def = COMP_DEFS[n.type];
+      const px = tx(n.x);
+      const py = ty(n.y);
+      const pw = def.w * CELL * zoom;
+      const ph = def.h * CELL * zoom;
+      
+      ctx.save();
+      if (selectedNode === n.id) {
+        ctx.shadowColor = C.sel; ctx.shadowBlur = 15;
       }
-      ctx.fillStyle = isLamp ? (lampOn ? C.lamp : C.lampOff)
-                    : isPower ? C.power+"33"
-                    : isGround ? C.grid
-                    : isSwitch ? (n.state?.on ? C.portOn+"33" : C.nodeBg)
-                    : (C.gateFill[n.type] || C.nodeBg);
-      ctx.fill();
-      ctx.strokeStyle = isHovDel ? "#ef4444" : isSelected ? C.sel : (isLamp && lampOn ? C.lamp : isSwitch && n.state?.on ? C.portOn : C.nodeBdr);
-      ctx.lineWidth = (isSelected || isHovDel ? 3 : 1.5) * zoom;
-      ctx.stroke();
-
-      ctx.fillStyle = isLamp ? (lampOn ? "#fff" : C.nodeText)
-                    : isPower ? C.power
-                    : isSwitch ? (n.state?.on ? C.portOn : C.nodeText)
-                    : C.nodeText;
-      ctx.font = `bold ${(isLamp?14:13)*zoom}px system-ui`;
-      ctx.textAlign = "center"; ctx.textBaseline = "middle";
-      ctx.fillText(isSwitch ? (n.state?.on?"ON":"OFF") : def.label, nx + nw/2, ny + nh/2);
-
-      for (let i = 0; i < def.ins; i++) {
-        const p = getPortPos(n, "in", i, def.ins);
-        const on = signals.inValues[`${n.id}-in-${i}`] || false;
-        ctx.beginPath(); ctx.arc(tx(p.x/CELL), ty(p.y/CELL), Math.max(2, PORT_R*zoom), 0, 2*Math.PI);
-        ctx.fillStyle = on ? C.portOn : C.portOff; ctx.fill();
-        ctx.strokeStyle = C.bg; ctx.lineWidth = Math.max(1, 2*zoom); ctx.stroke();
+      
+      // Prepare pin inputs map if needed (like for 7-seg)
+      const inputs = {};
+      if (def.pins) {
+         def.pins.forEach(p => {
+             const net = n.pinNets ? n.pinNets[def.pins.indexOf(p)] : undefined;
+             inputs[p.id] = net !== undefined ? simState.voltages[net] : 0;
+         });
       }
-      for (let i = 0; i < def.outs; i++) {
-        const p = getPortPos(n, "out", i, def.outs);
-        const on = signals.values[`${n.id}-out-${i}`] || false;
-        ctx.beginPath(); ctx.arc(tx(p.x/CELL), ty(p.y/CELL), Math.max(2, PORT_R*zoom), 0, 2*Math.PI);
-        ctx.fillStyle = on ? C.portOn : C.portOff; ctx.fill();
-        ctx.strokeStyle = C.bg; ctx.lineWidth = Math.max(1, 2*zoom); ctx.stroke();
-      }
+      
+      def.render(ctx, px, py, pw, ph, C, n.state || {}, inputs, simState);
+      ctx.restore();
     });
-  }, [C, tool]);
 
-  const animRef = useRef(null);
-  useEffect(() => {
-    const loop = () => { draw(); animRef.current = requestAnimationFrame(loop); };
-    animRef.current = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(animRef.current);
-  }, [draw]);
+  }, [C, boardSize]);
 
   useEffect(() => {
     const ro = new ResizeObserver(() => {
@@ -424,59 +647,33 @@ function LogicSimContent({ params = {} }) {
     return () => ro.disconnect();
   }, []);
 
-  const hitPort = useCallback((mx, my) => {
-    const { nodes, signals, panX, panY, zoom } = stateRef.current;
-    const sC = CELL * zoom;
-    const tx = gx => gx * sC + panX;
-    const ty = gy => gy * sC + panY;
-    for (const n of nodes) {
-      const def = NODE_DEFS[n.type];
-      for (let i = 0; i < def.ins; i++) {
-        const p = getPortPos(n, "in", i, def.ins);
-        const dx = mx - tx(p.x/CELL), dy = my - ty(p.y/CELL);
-        if (Math.hypot(dx,dy) < Math.max(6, PORT_R*zoom) + 5) return { nodeId:n.id, port:i, side:"in" };
-      }
-      for (let i = 0; i < def.outs; i++) {
-        const p = getPortPos(n, "out", i, def.outs);
-        const dx = mx - tx(p.x/CELL), dy = my - ty(p.y/CELL);
-        if (Math.hypot(dx,dy) < Math.max(6, PORT_R*zoom) + 5) return { nodeId:n.id, port:i, side:"out" };
-      }
+  // ── Interaction ──
+  const getHoleAt = useCallback((mx, my) => {
+    const st = stateRef.current;
+    const sC = CELL * st.zoom;
+    for (const h of bb_holes.current) {
+      const px = h.x * sC + st.panX + sC/2;
+      const py = h.y * sC + st.panY + sC/2;
+      if (Math.hypot(mx - px, my - py) < 10 * st.zoom) return h;
     }
     return null;
   }, []);
 
-  const hitNode = useCallback((mx, my) => {
-    const { nodes, panX, panY, zoom } = stateRef.current;
-    for (const n of [...nodes].reverse()) {
-      const def = NODE_DEFS[n.type];
-      const nw = def.w * CELL * zoom, nh = def.h * CELL * zoom;
-      const nx = n.gx * CELL * zoom + panX, ny = n.gy * CELL * zoom + panY;
-      if (mx>=nx && mx<=nx+nw && my>=ny && my<=ny+nh) return n;
-    }
-    return null;
-  }, []);
-
-  const hitWire = useCallback((mx, my) => {
-    const { nodes, wires, panX, panY, zoom } = stateRef.current;
-    const tx = x => x * CELL * zoom + panX;
-    const ty = y => y * CELL * zoom + panY;
-    for (const w of wires) {
-      const fn = nodes.find(n => n.id === w.fromNode);
-      const tn = nodes.find(n => n.id === w.toNode);
-      if (!fn || !tn) continue;
-      const fromDef = NODE_DEFS[fn.type], toDef = NODE_DEFS[tn.type];
-      const fp = getPortPos({...fn, gx:fn.gx, gy:fn.gy}, "out", w.fromPort, fromDef.outs);
-      const tp = getPortPos({...tn, gx:tn.gx, gy:tn.gy}, "in",  w.toPort,  toDef.ins);
-      const p0 = { x: tx(fp.x/CELL), y: ty(fp.y/CELL) };
-      const p3 = { x: tx(tp.x/CELL), y: ty(tp.y/CELL) };
-      const midX = (p0.x + p3.x) / 2;
-      const p1 = { x: midX, y: p0.y };
-      const p2 = { x: midX, y: p3.y };
-      for (let t = 0; t <= 1; t += 0.05) {
-        const u = 1 - t;
-        const x = u*u*u*p0.x + 3*u*u*t*p1.x + 3*u*t*t*p2.x + t*t*t*p3.x;
-        const y = u*u*u*p0.y + 3*u*u*t*p1.y + 3*u*t*t*p2.y + t*t*t*p3.y;
-        if (Math.hypot(mx - x, my - y) < 10) return w;
+  const getNodeAt = useCallback((mx, my) => {
+    const st = stateRef.current;
+    for (const n of [...st.nodes].reverse()) {
+      const def = COMP_DEFS[n.type];
+      const nx = n.x * CELL * st.zoom + st.panX;
+      const ny = n.y * CELL * st.zoom + st.panY;
+      const nw = def.w * CELL * st.zoom;
+      const nh = def.h * CELL * st.zoom;
+      if (mx >= nx && mx <= nx+nw && my >= ny && my <= ny+nh) {
+         for (const pin of def.pins) {
+            const px = (n.x + pin.x) * CELL * st.zoom + st.panX + (CELL/2)*st.zoom;
+            const py = (n.y + pin.y) * CELL * st.zoom + st.panY + (CELL/2)*st.zoom;
+            if (Math.hypot(mx - px, my - py) < 10 * st.zoom) return { node: n, pin: pin };
+         }
+         return { node: n, pin: null };
       }
     }
     return null;
@@ -486,345 +683,208 @@ function LogicSimContent({ params = {} }) {
     const rect = canvasRef.current.getBoundingClientRect();
     const mx = e.clientX - rect.left, my = e.clientY - rect.top;
     const st = stateRef.current;
-
     st._clickStart = { x: mx, y: my };
 
     if (e.button === 1 || e.button === 4) {
-      st._panning = true; st._panStartX = mx - st.panX; st._panStartY = my - st.panY;
-      return;
+      st._panning = true; st._panStartX = mx - st.panX; st._panStartY = my - st.panY; return;
     }
 
-    if (tool === "delete") {
-      const node = hitNode(mx, my);
-      if (node) {
-        st.wires = st.wires.filter(w => w.fromNode!==node.id && w.toNode!==node.id);
-        st.nodes = st.nodes.filter(n => n.id!==node.id);
-        st.signals = propagate(st.nodes, st.wires);
-        st.hoverNode = null; forceRender(r=>r+1);
+    const nodeHit = getNodeAt(mx, my);
+    if (nodeHit) {
+      if (nodeHit.pin) {
+        const hole = getHoleAt(mx, my);
+        if (hole) { st.draggingWire = { h1: hole.id, mx, my }; return; }
       } else {
-        const wire = hitWire(mx, my);
-        if (wire) {
-          st.wires = st.wires.filter(w => w.id !== wire.id);
-          st.signals = propagate(st.nodes, st.wires);
-          st.hoverWire = null; forceRender(r=>r+1);
-        }
+        st.selectedNode = nodeHit.node.id;
+        st.selectedWire = null;
+        st._dragNode = nodeHit.node;
+        st._dragOffX = mx - (nodeHit.node.x * CELL * st.zoom + st.panX);
+        st._dragOffY = my - (nodeHit.node.y * CELL * st.zoom + st.panY);
+        return;
       }
+    }
+
+    const hole = getHoleAt(mx, my);
+    if (hole) {
+      st.draggingWire = { h1: hole.id, mx, my };
       return;
     }
 
-    const port = hitPort(mx, my);
-    if (port) {
-      st.draggingWire = { fromNode: port.nodeId, fromPort: port.port, fromSide: port.side, mouseX: mx, mouseY: my };
-      return;
-    }
-
-    const node = hitNode(mx, my);
-    if (node) {
-      st.selected = node.id;
-      st._dragNode = node;
-      st._dragOffX = mx - node.gx * CELL * st.zoom - st.panX;
-      st._dragOffY = my - node.gy * CELL * st.zoom - st.panY;
-      forceRender(r=>r+1);
-      return;
-    }
-    
-    st.selected = null;
+    st.selectedNode = null;
+    st.selectedWire = null;
     st._panning = true; st._panStartX = mx - st.panX; st._panStartY = my - st.panY;
-    forceRender(r => r+1);
-  }, [hitPort, hitNode, hitWire, tool]);
+  }, [getHoleAt, getNodeAt]);
 
   const onMouseMove = useCallback((e) => {
     const rect = canvasRef.current.getBoundingClientRect();
     const mx = e.clientX - rect.left, my = e.clientY - rect.top;
     const st = stateRef.current;
-    st.mouseX = mx; st.mouseY = my;
-
-    if (st._panning) { st.panX = mx - st._panStartX; st.panY = my - st._panStartY; forceRender(r=>r+1); return; }
-
-    if (tool === "delete") {
-      st.hoverNode = hitNode(mx, my);
-      st.hoverWire = st.hoverNode ? null : hitWire(mx, my);
-      forceRender(r=>r+1);
-      return;
-    }
-
-    if (st.draggingWire) { st.draggingWire.mouseX = mx; st.draggingWire.mouseY = my; return; }
+    
+    if (st._panning) { st.panX = mx - st._panStartX; st.panY = my - st._panStartY; return; }
+    if (st.draggingWire) { st.draggingWire.mx = mx; st.draggingWire.my = my; return; }
     if (st._dragNode) {
       const gx = Math.round((mx - st._dragOffX - st.panX) / (CELL * st.zoom));
       const gy = Math.round((my - st._dragOffY - st.panY) / (CELL * st.zoom));
-      st._dragNode.gx = gx; st._dragNode.gy = gy;
-      st.signals = propagate(st.nodes, st.wires);
-      return;
+      st._dragNode.x = gx; st._dragNode.y = gy;
     }
-  }, [hitNode, hitWire, tool]);
+  }, []);
 
   const onMouseUp = useCallback((e) => {
     const rect = canvasRef.current.getBoundingClientRect();
     const mx = e.clientX - rect.left, my = e.clientY - rect.top;
     const st = stateRef.current;
-
-    const dx = mx - (st._clickStart?.x || mx);
-    const dy = my - (st._clickStart?.y || my);
-    const isClick = Math.hypot(dx, dy) < 5;
+    const isClick = Math.hypot(mx - (st._clickStart?.x || mx), my - (st._clickStart?.y || my)) < 5;
 
     if (st.draggingWire) {
-      const port = hitPort(mx, my);
-      if (port && port.nodeId !== st.draggingWire.fromNode) {
-        const dw = st.draggingWire;
-        let fromNode, fromPort, toNode, toPort;
-        if (dw.fromSide === "out" && port.side === "in") {
-          fromNode=dw.fromNode; fromPort=dw.fromPort; toNode=port.nodeId; toPort=port.port;
-        } else if (dw.fromSide === "in" && port.side === "out") {
-          fromNode=port.nodeId; fromPort=port.port; toNode=dw.fromNode; toPort=dw.fromPort;
-        }
-        if (fromNode) {
-          // Allow multi! We removed the destination filter.
-          st.wires.push({ id:"w"+Date.now(), fromNode, fromPort, toNode, toPort });
-          st.signals = propagate(st.nodes, st.wires);
-          if (mode === "challenge") {
-            const ch = CHALLENGES[chalIdx];
-            if (ch.check(st.nodes, st.wires, st.signals)) setSuccess(true);
-          }
-          forceRender(r => r+1);
-        }
+      const hole = getHoleAt(mx, my);
+      if (hole && hole.id !== st.draggingWire.h1) {
+        const colors = ["#ef4444", "#3b82f6", "#22c55e", "#f59e0b", "#a855f7", "#e2e8f0"];
+        st.wires.push({ id: "w"+Date.now(), h1: st.draggingWire.h1, h2: hole.id, color: colors[Math.floor(Math.random()*colors.length)] });
       }
       st.draggingWire = null;
     } else if (st._dragNode && isClick) {
-      if (st._dragNode.type === "SWITCH") {
-        st._dragNode.state = { ...st._dragNode.state, on: !st._dragNode.state?.on };
-        st.signals = propagate(st.nodes, st.wires);
-        if (mode === "challenge") {
-          const ch = CHALLENGES[chalIdx];
-          if (ch.check(st.nodes, st.wires, st.signals)) setSuccess(true);
+      const n = st._dragNode;
+      if (n.type === "SWITCH") {
+        n.state = { on: !n.state?.on };
+      } else if (n.type === "DIP_SWITCH") {
+        const localX = mx - (n.x * CELL * st.zoom + st.panX);
+        const col = Math.floor(localX / (CELL * st.zoom));
+        if (col >= 0 && col < 4) {
+          const sw = n.state?.switches ? [...n.state.switches] : [false,false,false,false];
+          sw[col] = !sw[col];
+          n.state = { ...n.state, switches: sw };
         }
+      } else if (n.type === "POTENTIOMETER") {
+        let val = n.state?.value ?? 0.5;
+        val = (val + 0.25) > 1.0 ? 0.0 : val + 0.25;
+        n.state = { ...n.state, value: val };
+      } else if (n.type === "PHOTORESISTOR") {
+        let light = n.state?.light ?? 0.5;
+        light = light === 0.5 ? 1.0 : (light === 1.0 ? 0.0 : 0.5);
+        n.state = { ...n.state, light: light };
       }
     }
-    
+
     st._dragNode = null;
     st._panning = false;
-    forceRender(r=>r+1);
-  }, [hitPort, mode, chalIdx]);
+  }, [getHoleAt]);
 
   const onDrop = useCallback((e) => {
     e.preventDefault();
-    const type = e.dataTransfer.getData("nodeType");
-    if (!NODE_DEFS[type]) return;
+    const data = JSON.parse(e.dataTransfer.getData("application/json"));
+    if (!COMP_DEFS[data.type]) return;
+    
     const rect = wrapRef.current.getBoundingClientRect();
     const mx = e.clientX - rect.left, my = e.clientY - rect.top;
     const st = stateRef.current;
+    const def = COMP_DEFS[data.type];
     
-    // snap to grid
-    const def = NODE_DEFS[type];
-    const dropGx = Math.round((mx - st.panX) / (CELL * st.zoom)) - Math.floor(def.w / 2);
-    const dropGy = Math.round((my - st.panY) / (CELL * st.zoom)) - Math.floor(def.h / 2);
+    const dropX = Math.round((mx - st.panX) / (CELL * st.zoom)) - Math.floor(def.w / 2);
+    const dropY = Math.round((my - st.panY) / (CELL * st.zoom)) - Math.floor(def.h / 2);
 
-    const id = "n" + Date.now();
-    st.nodes.push({ id, type, gx: dropGx, gy: dropGy, state: type==="SWITCH"?{on:false}:{} });
-    st.selected = id;
-    st.signals = propagate(st.nodes, st.wires);
-    forceRender(r=>r+1);
+    st.nodes.push({ id: "n" + Date.now(), type: data.type, x: dropX, y: dropY, state: data.state || {} });
   }, []);
 
-  const handleModeSwitch = (m) => {
-    setMode(m);
-    setSuccess(false);
-    setHint(false);
-  };
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Backspace" || e.key === "Delete") {
+        const st = stateRef.current;
+        if (st.selectedNode) st.nodes = st.nodes.filter(n => n.id !== st.selectedNode);
+        if (st.selectedWire) st.wires = st.wires.filter(w => w.id !== st.selectedWire);
+        st.selectedNode = null; st.selectedWire = null;
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
-  const handleChalSwitch = (i) => {
-    setChalIdx(i);
-    loadChallenge(i);
+  const loadPrebuilt = (key) => {
+    const p = PREBUILT[key];
+    if (p) {
+      // Deep clone to avoid mutating preset
+      stateRef.current.nodes = JSON.parse(JSON.stringify(p.nodes));
+      stateRef.current.wires = JSON.parse(JSON.stringify(p.wires));
+      stateRef.current.simState = { voltages: null };
+    }
   };
-
-  const ch = CHALLENGES[chalIdx];
 
   return (
-    <div className="flex h-full w-full bg-slate-50 dark:bg-slate-950 border-0 rounded-xl overflow-hidden font-sans">
-      
-      {/* ── Sidebar (Components & Modes) ── */}
-      <div className="w-72 flex flex-col border-r border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 z-10">
+    <div className="flex flex-col w-full h-full bg-slate-50 dark:bg-slate-950 font-sans relative">
+      {/* ── Top Toolbar ── */}
+      <div className="h-12 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 flex items-center px-4 shrink-0 gap-4">
+        <select className="bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded text-sm px-3 py-1.5 outline-none text-slate-800 dark:text-slate-200"
+                onChange={e => loadPrebuilt(e.target.value)}>
+          <option value="blank">Empty Board</option>
+          <option value="led_basic">Basic LED Circuit</option>
+          <option value="555_astable">555 Astable Oscillator</option>
+        </select>
         
-        {/* Modes Section */}
-        <div className="p-4 border-b border-slate-200 dark:border-slate-800">
-          <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-3 text-lg">Logic Simulator</h3>
-          <div className="flex gap-2 mb-4 bg-slate-200 dark:bg-slate-800 p-1 rounded-lg">
-            <button 
-              className={`flex-1 py-1.5 px-3 rounded-md text-sm font-medium transition-colors ${mode === "sandbox" ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"}`}
-              onClick={() => handleModeSwitch("sandbox")}
-            >
-              Sandbox
-            </button>
-            <button 
-              className={`flex-1 py-1.5 px-3 rounded-md text-sm font-medium transition-colors ${mode === "challenge" ? "bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400"}`}
-              onClick={() => handleModeSwitch("challenge")}
-            >
-              Tutorials
-            </button>
-          </div>
+        <div className="flex items-center gap-2 ml-auto">
+          <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Board Size:</label>
+          <select className="bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded text-sm px-3 py-1.5 outline-none text-slate-800 dark:text-slate-200" 
+                  value={boardSize} onChange={e => setBoardSize(parseInt(e.target.value))}>
+            <option value={30}>Half-Size (30)</option>
+            <option value={60}>Full-Size (60)</option>
+          </select>
+        </div>
+      </div>
 
-          {mode === "challenge" && (
-            <div className="space-y-4">
-              <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-                {CHALLENGES.map((c,i) => (
-                  <button 
-                    key={c.id} 
-                    onClick={() => handleChalSwitch(i)} 
-                    className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${chalIdx===i ? "bg-emerald-600 text-white" : "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-200 dark:hover:bg-emerald-800/50"}`}
-                  >
-                    {i+1}
-                  </button>
-                ))}
-              </div>
-              <div className="bg-white dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
-                <div className="font-semibold text-slate-800 dark:text-slate-200 mb-1">{ch.title}</div>
-                <div className="text-sm text-slate-600 dark:text-slate-400">{ch.desc}</div>
-                
-                {hint && <div className="mt-2 text-sm text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-900/20 p-2 rounded">💡 {ch.hint}</div>}
-                
-                <button onClick={() => setHint(h=>!h)} className="mt-2 text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:underline">
-                  {hint ? "Hide hint" : "Need a hint?"}
+      <div className="flex-1 flex overflow-hidden">
+        {/* ── Accordion Drawers ── */}
+        <div className="w-72 flex flex-col border-r border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 z-10 flex-shrink-0">
+          <div className="p-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+            <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-1">Maker Kit Drawers</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Drag components onto the breadboard. Press Delete to remove.</p>
+          </div>
+          
+          <div className="flex-1 overflow-y-auto custom-scrollbar">
+            {DRAWERS.map((drawer) => (
+              <div key={drawer.title} className="border-b border-slate-200 dark:border-slate-800">
+                <button className="w-full flex items-center justify-between p-3 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+                        onClick={() => setOpenDrawer(openDrawer === drawer.title ? null : drawer.title)}>
+                  <span className="font-semibold text-sm text-slate-800 dark:text-slate-200">{drawer.title}</span>
+                  {openDrawer === drawer.title ? <ChevronDown className="w-4 h-4 text-slate-500" /> : <ChevronRight className="w-4 h-4 text-slate-500" />}
                 </button>
-                
-                {success && (
-                  <div className="mt-3 p-2 rounded bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800/50 text-sm text-emerald-700 dark:text-emerald-400">
-                    <span className="font-bold mr-1">Complete!</span>{ch.successMsg}
-                    {chalIdx < CHALLENGES.length-1 && (
-                      <button onClick={() => handleChalSwitch(chalIdx+1)} className="mt-2 w-full py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-bold transition-colors">
-                        Next Tutorial →
-                      </button>
-                    )}
+                {openDrawer === drawer.title && (
+                  <div className="p-3 bg-slate-50 dark:bg-slate-950 flex flex-col gap-2">
+                    {drawer.items.map((item, idx) => (
+                      <div key={idx} draggable
+                           onDragStart={e => e.dataTransfer.setData("application/json", JSON.stringify({ type: item.type, state: item.state }))}
+                           className="p-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded cursor-grab hover:border-sky-400 hover:shadow-sm transition-all text-sm font-medium text-slate-700 dark:text-slate-300">
+                        {item.label}
+                      </div>
+                    ))}
                   </div>
                 )}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Components Library */}
-        <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
-          <div className="flex justify-between items-center mb-3">
-             <div className="flex gap-1 bg-slate-200 dark:bg-slate-800 p-1 rounded-lg">
-                <button onClick={() => setTool("wire")} className={`px-3 py-1 text-xs font-bold rounded ${tool==="wire" ? "bg-white dark:bg-slate-700 shadow" : "text-slate-500"}`}>Wire</button>
-                <button onClick={() => setTool("delete")} className={`px-3 py-1 text-xs font-bold rounded ${tool==="delete" ? "bg-white dark:bg-slate-700 text-red-500 shadow" : "text-slate-500 hover:text-red-400"}`}>Delete</button>
-             </div>
-             <button onClick={() => { stateRef.current.wires=[]; stateRef.current.signals=propagate(stateRef.current.nodes,[]); forceRender(r=>r+1); }} className="text-xs text-red-500 hover:text-red-700 hover:underline">Clear</button>
-          </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mb-4 bg-slate-100 dark:bg-slate-800 p-2 rounded">
-            Drag items onto the grid. Click a placed node and press <kbd className="font-mono bg-slate-200 dark:bg-slate-700 px-1 rounded">Del</kbd> to remove.
-          </p>
-          
-          <div className="flex flex-col gap-2.5">
-            {Object.keys(NODE_DEFS).map(type => (
-              <div key={type} 
-                   draggable
-                   onDragStart={e => e.dataTransfer.setData('nodeType', type)}
-                   className="p-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg cursor-grab hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md transition-all active:cursor-grabbing group"
-              >
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded bg-slate-100 dark:bg-slate-700 flex items-center justify-center font-bold text-xs text-slate-800 dark:text-slate-200 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/30 transition-colors">
-                    {NODE_DEFS[type].label === '0' || NODE_DEFS[type].label === '1' ? NODE_DEFS[type].label : NODE_DEFS[type].label.substring(0, 3)}
-                  </div>
-                  <div>
-                    <div className="font-bold text-sm text-slate-800 dark:text-slate-200">{type}</div>
-                    <div className="text-xs text-slate-500 dark:text-slate-400 leading-tight mt-0.5">{NODE_DEFS[type].desc}</div>
-                  </div>
-                </div>
               </div>
             ))}
           </div>
         </div>
 
-      </div>
-
-      {/* ── Canvas Area ── */}
-      <div className="flex-1 relative outline-none" 
-           ref={wrapRef} 
-           onDrop={onDrop} 
-           onDragOver={e => e.preventDefault()}
-           tabIndex={0}
-      >
-        <canvas ref={canvasRef}
-          className="w-full h-full block cursor-default"
-          onMouseDown={onMouseDown}
-          onMouseMove={onMouseMove}
-          onMouseUp={onMouseUp}
-          onMouseLeave={onMouseUp}
-          onWheel={(e) => {
-            e.preventDefault();
-            const st = stateRef.current;
-            const rect = canvasRef.current.getBoundingClientRect();
-            const mx = e.clientX - rect.left;
-            const my = e.clientY - rect.top;
-            
-            // If deltaY is vertical scroll
-            if (e.ctrlKey || e.metaKey || Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-              const zoomDelta = e.deltaY > 0 ? 0.95 : 1.05;
-              const newZoom = Math.max(0.2, Math.min(3.0, st.zoom * zoomDelta));
-              const worldX = (mx - st.panX) / st.zoom;
-              const worldY = (my - st.panY) / st.zoom;
-              st.panX = mx - worldX * newZoom;
-              st.panY = my - worldY * newZoom;
-              st.zoom = newZoom;
-              forceRender(r=>r+1);
-            } else {
-              st.panX -= e.deltaX;
-              st.panY -= e.deltaY;
-            }
-          }}
-        />
-        
-        {/* Helper overlay */}
-        <div className="absolute bottom-4 right-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur border border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400 px-3 py-2 rounded-lg shadow-sm pointer-events-none flex flex-col gap-1">
-          <div className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-emerald-500"></span> Signal ON</div>
-          <div className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-slate-400 dark:bg-slate-500"></span> Signal OFF</div>
-          <hr className="my-1 border-slate-200 dark:border-slate-700" />
-          <div>Middle-click empty space to pan</div>
-          <div>Scroll to zoom, or Shift+Scroll to pan</div>
-          <div>Drag ports to wire</div>
+        {/* ── Canvas Area ── */}
+        <div className="flex-1 relative outline-none cursor-crosshair" 
+             ref={wrapRef} onDrop={onDrop} onDragOver={e => e.preventDefault()} tabIndex={0}>
+          <canvas ref={canvasRef}
+            className="w-full h-full block"
+            onMouseDown={onMouseDown} onMouseMove={onMouseMove} onMouseUp={onMouseUp} onMouseLeave={onMouseUp}
+            onWheel={(e) => {
+              e.preventDefault();
+              const st = stateRef.current;
+              const mx = e.clientX - canvasRef.current.getBoundingClientRect().left;
+              const my = e.clientY - canvasRef.current.getBoundingClientRect().top;
+              if (e.ctrlKey || e.metaKey || Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+                const zoomDelta = e.deltaY > 0 ? 0.95 : 1.05;
+                const newZoom = Math.max(0.2, Math.min(3.0, st.zoom * zoomDelta));
+                st.panX = mx - (mx - st.panX) / st.zoom * newZoom;
+                st.panY = my - (my - st.panY) / st.zoom * newZoom;
+                st.zoom = newZoom;
+              } else {
+                st.panX -= e.deltaX; st.panY -= e.deltaY;
+              }
+            }}
+          />
         </div>
       </div>
-
     </div>
-  );
-}
-
-// ── Wrapper Component ────────────────────────────────────────────────────────
-export default function LogicSim({ params = {} }) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <>
-      <div className="flex flex-col items-center justify-center py-12 px-6 border border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50 dark:bg-slate-900 shadow-sm my-6">
-        <span className="text-5xl mb-4 leading-none">🔌</span>
-        <h3 className="font-bold text-2xl text-slate-800 dark:text-slate-100 mb-2">Digital Logic Sandbox</h3>
-        <p className="text-slate-500 dark:text-slate-400 text-center max-w-md mb-6">
-          This massive interactive workspace requires a full-screen view. Jump in to start wiring gates, switches, and complex digital circuits.
-        </p>
-        <button 
-          onClick={() => setIsOpen(true)}
-          className="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-md font-bold text-lg transition-transform active:scale-95"
-        >
-          Launch Simulator
-        </button>
-      </div>
-
-      {isOpen && (
-        <div className="fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-2 md:p-6 lg:p-8">
-          <div className="relative w-full h-full max-w-[1920px] max-h-[1080px] bg-white dark:bg-slate-950 rounded-2xl overflow-hidden shadow-2xl flex flex-col border border-slate-300 dark:border-slate-700">
-            <div className="absolute top-4 right-4 z-[9999]">
-              <button 
-                onClick={() => setIsOpen(false)}
-                className="w-10 h-10 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-md flex items-center justify-center transition-transform hover:scale-105 active:scale-95"
-                title="Close Simulator"
-              >
-                <span className="text-2xl leading-none font-bold -mt-0.5">&times;</span>
-              </button>
-            </div>
-            {/* The main app container */}
-            <LogicSimContent params={params} />
-          </div>
-        </div>
-      )}
-    </>
   );
 }

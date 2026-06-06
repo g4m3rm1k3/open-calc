@@ -21346,5 +21346,6207 @@
       "api",
       "json"
     ]
+  },
+  {
+    "id": "vid-594",
+    "title": "Introduction to Matrices",
+    "url": "https://www.youtube.com/embed/xyAuNHPsq-g",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "matrix-operations"
+    ],
+    "keywords": [
+      "matrix",
+      "matrices",
+      "linear algebra",
+      "introduction"
+    ]
+  },
+  {
+    "id": "vid-595",
+    "title": "Matrix Multiplication (Part 1)",
+    "url": "https://www.youtube.com/embed/kqWCguwz23k",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "matrix-multiplication"
+    ],
+    "keywords": [
+      "matrix multiplication",
+      "matrices",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-596",
+    "title": "Matrix Multiplication (Part 2)",
+    "url": "https://www.youtube.com/embed/OMA2Mwo0aZg",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "matrix-multiplication"
+    ],
+    "keywords": [
+      "matrix multiplication",
+      "matrices",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-597",
+    "title": "Representing Linear Systems as Matrix Equations",
+    "url": "https://www.youtube.com/embed/0oGJTQCy4cQ",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "linear-systems"
+    ],
+    "keywords": [
+      "linear systems",
+      "matrix equation",
+      "matrices",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-598",
+    "title": "Solving Linear Systems with Matrices",
+    "url": "https://www.youtube.com/embed/iUQR0enP7RQ",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "linear-systems",
+      "gaussian-elimination"
+    ],
+    "keywords": [
+      "gaussian elimination",
+      "linear systems",
+      "matrices",
+      "row reduction"
+    ]
+  },
+  {
+    "id": "vid-599",
+    "title": "Reduced Row Echelon Form",
+    "url": "https://www.youtube.com/embed/JVDrlTdzxiI",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "rref",
+      "gaussian-elimination"
+    ],
+    "keywords": [
+      "rref",
+      "reduced row echelon",
+      "gaussian elimination",
+      "matrices"
+    ]
+  },
+  {
+    "id": "vid-600",
+    "title": "Matrix from Visual Representation of Transformation",
+    "url": "https://www.youtube.com/embed/JTbZDskLk4U",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "transformations"
+    ],
+    "keywords": [
+      "matrix transformation",
+      "linear transformation",
+      "matrices"
+    ]
+  },
+  {
+    "id": "vid-601",
+    "title": "Transpose of a Matrix",
+    "url": "https://www.youtube.com/embed/kYB8IZa5AuE",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "transpose"
+    ],
+    "keywords": [
+      "transpose",
+      "matrix transpose",
+      "matrices",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-602",
+    "title": "Matrix Transpose Properties",
+    "url": "https://www.youtube.com/embed/TbaltFbJ3wE",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "transpose"
+    ],
+    "keywords": [
+      "transpose",
+      "matrix transpose",
+      "properties",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-603",
+    "title": "Determinant of a 2x2 Matrix",
+    "url": "https://www.youtube.com/embed/iUQR0enP7RQ",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "determinants",
+      "matrices"
+    ],
+    "keywords": [
+      "determinant",
+      "2x2 matrix",
+      "determinants",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-604",
+    "title": "Vector Introduction for Linear Algebra",
+    "url": "https://www.youtube.com/embed/br7tS1t2SFE",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "introduction"
+    ],
+    "keywords": [
+      "vectors",
+      "linear algebra",
+      "vector introduction",
+      "vector space"
+    ]
+  },
+  {
+    "id": "vid-605",
+    "title": "Real Coordinate Spaces",
+    "url": "https://www.youtube.com/embed/WNuIhXo39_k",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "coordinate-spaces"
+    ],
+    "keywords": [
+      "coordinate space",
+      "real numbers",
+      "vectors",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-606",
+    "title": "Adding Vectors Algebraically and Graphically",
+    "url": "https://www.youtube.com/embed/Qm_OS-8COwU",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "vector-addition"
+    ],
+    "keywords": [
+      "vector addition",
+      "adding vectors",
+      "vectors",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-607",
+    "title": "Multiplying a Vector by a Scalar",
+    "url": "https://www.youtube.com/embed/fyy1TyC59gE",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "scalar-multiplication"
+    ],
+    "keywords": [
+      "scalar multiplication",
+      "vectors",
+      "linear algebra",
+      "scaling"
+    ]
+  },
+  {
+    "id": "vid-608",
+    "title": "Vector Examples",
+    "url": "https://www.youtube.com/embed/_yG3USFpGKE",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors"
+    ],
+    "keywords": [
+      "vectors",
+      "linear algebra",
+      "examples",
+      "vector operations"
+    ]
+  },
+  {
+    "id": "vid-609",
+    "title": "Parametric Representations of Lines",
+    "url": "https://www.youtube.com/embed/r4bH66iXJpI",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "parametric",
+      "lines"
+    ],
+    "keywords": [
+      "parametric",
+      "lines",
+      "vectors",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-610",
+    "title": "Linear Combinations and Span",
+    "url": "https://www.youtube.com/embed/JVDrlTdzxiI",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "span",
+      "linear-combinations"
+    ],
+    "keywords": [
+      "linear combination",
+      "span",
+      "vectors",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-611",
+    "title": "Linear Independence",
+    "url": "https://www.youtube.com/embed/zntNi3-ybfQ",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "linear-independence"
+    ],
+    "keywords": [
+      "linear independence",
+      "vectors",
+      "linearly independent",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-612",
+    "title": "More on Linear Independence",
+    "url": "https://www.youtube.com/embed/k7RM-ot2NWY",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "linear-independence"
+    ],
+    "keywords": [
+      "linear independence",
+      "vectors",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-613",
+    "title": "Span and Linear Independence Example",
+    "url": "https://www.youtube.com/embed/pMFv6liWK4M",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "span",
+      "linear-independence"
+    ],
+    "keywords": [
+      "span",
+      "linear independence",
+      "example",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-614",
+    "title": "Subspaces and the Basis for a Subspace",
+    "url": "https://www.youtube.com/embed/13r9QY6cmjc",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "subspaces",
+      "basis"
+    ],
+    "keywords": [
+      "subspace",
+      "basis",
+      "linear algebra",
+      "vectors"
+    ]
+  },
+  {
+    "id": "vid-615",
+    "title": "Linear Subspaces",
+    "url": "https://www.youtube.com/embed/zntNi3-ybfQ",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "subspaces"
+    ],
+    "keywords": [
+      "subspace",
+      "linear subspace",
+      "linear algebra",
+      "vectors"
+    ]
+  },
+  {
+    "id": "vid-616",
+    "title": "Basis of a Subspace",
+    "url": "https://www.youtube.com/embed/IgmjBEoGEjI",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "subspaces",
+      "basis"
+    ],
+    "keywords": [
+      "basis",
+      "subspace",
+      "linear algebra",
+      "span"
+    ]
+  },
+  {
+    "id": "vid-617",
+    "title": "Vector Dot Product and Vector Length",
+    "url": "https://www.youtube.com/embed/st6D5OdFV9M",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "dot-product"
+    ],
+    "keywords": [
+      "dot product",
+      "vector length",
+      "magnitude",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-618",
+    "title": "Proving Vector Dot Product Properties",
+    "url": "https://www.youtube.com/embed/5AWob_z74Xs",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "dot-product"
+    ],
+    "keywords": [
+      "dot product",
+      "properties",
+      "vectors",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-619",
+    "title": "Proof of the Cauchy-Schwarz Inequality",
+    "url": "https://www.youtube.com/embed/KDHuWxy53uM",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "cauchy-schwarz"
+    ],
+    "keywords": [
+      "cauchy schwarz",
+      "inequality",
+      "vectors",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-620",
+    "title": "Vector Triangle Inequality",
+    "url": "https://www.youtube.com/embed/aKhhYguY0DQ",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "triangle-inequality"
+    ],
+    "keywords": [
+      "triangle inequality",
+      "vectors",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-621",
+    "title": "Defining the Angle Between Vectors",
+    "url": "https://www.youtube.com/embed/3zC40n1HFng",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "angle"
+    ],
+    "keywords": [
+      "angle between vectors",
+      "dot product",
+      "vectors",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-622",
+    "title": "Defining a Plane in R3 with a Point and Normal Vector",
+    "url": "https://www.youtube.com/embed/7Itnwg_Mus0",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "planes",
+      "r3"
+    ],
+    "keywords": [
+      "plane",
+      "normal vector",
+      "R3",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-623",
+    "title": "Cross Product Introduction",
+    "url": "https://www.youtube.com/embed/tIpKfDc295M",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "cross-product"
+    ],
+    "keywords": [
+      "cross product",
+      "vectors",
+      "linear algebra",
+      "3d"
+    ]
+  },
+  {
+    "id": "vid-624",
+    "title": "Proof of Cross Product Determinant Formula",
+    "url": "https://www.youtube.com/embed/pJzmiywAgNI",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "cross-product",
+      "determinants"
+    ],
+    "keywords": [
+      "cross product",
+      "determinant",
+      "vectors",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-625",
+    "title": "Cross Product and the Right Hand Rule",
+    "url": "https://www.youtube.com/embed/cXxu3hRIzS0",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "cross-product"
+    ],
+    "keywords": [
+      "cross product",
+      "right hand rule",
+      "vectors",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-626",
+    "title": "Vector Triple Product (Proof)",
+    "url": "https://www.youtube.com/embed/ggcbk-MKB7A",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "cross-product"
+    ],
+    "keywords": [
+      "triple product",
+      "cross product",
+      "vectors",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-627",
+    "title": "Normal Vector from a Plane Equation",
+    "url": "https://www.youtube.com/embed/cJqec8fF1x4",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "planes",
+      "normal-vector"
+    ],
+    "keywords": [
+      "normal vector",
+      "plane equation",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-628",
+    "title": "Distance Between Planes",
+    "url": "https://www.youtube.com/embed/gw-4wltP5tY",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "planes",
+      "distance"
+    ],
+    "keywords": [
+      "distance",
+      "planes",
+      "vectors",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-629",
+    "title": "Matrix Vector Products",
+    "url": "https://www.youtube.com/embed/C8zOd07U3l8",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "matrix-vector-product"
+    ],
+    "keywords": [
+      "matrix vector product",
+      "matrices",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-630",
+    "title": "Introduction to the Null Space of a Matrix",
+    "url": "https://www.youtube.com/embed/GIbuFRRyoHs",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "null-space",
+      "matrices"
+    ],
+    "keywords": [
+      "null space",
+      "matrix",
+      "kernel",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-631",
+    "title": "Null Space 2: Calculating the Null Space of a Matrix",
+    "url": "https://www.youtube.com/embed/qvyboGryeA8",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "null-space",
+      "matrices"
+    ],
+    "keywords": [
+      "null space",
+      "calculating",
+      "matrix",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-632",
+    "title": "Null Space 3: Relation to Linear Independence",
+    "url": "https://www.youtube.com/embed/BclnAO7zSGo",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "null-space",
+      "linear-independence"
+    ],
+    "keywords": [
+      "null space",
+      "linear independence",
+      "kernel",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-633",
+    "title": "Column Space of a Matrix",
+    "url": "https://www.youtube.com/embed/EGNlXtjYABw",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "column-space",
+      "matrices"
+    ],
+    "keywords": [
+      "column space",
+      "matrix",
+      "range",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-634",
+    "title": "Null Space and Column Space Basis",
+    "url": "https://www.youtube.com/embed/uQhTuRlWMxw",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "null-space",
+      "column-space",
+      "basis"
+    ],
+    "keywords": [
+      "null space",
+      "column space",
+      "basis",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-635",
+    "title": "Visualizing a Column Space as a Plane in R3",
+    "url": "https://www.youtube.com/embed/Alhcv5d_XOs",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "column-space",
+      "r3"
+    ],
+    "keywords": [
+      "column space",
+      "visualization",
+      "plane",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-636",
+    "title": "Proof: Any Subspace Basis Has Same Number of Elements",
+    "url": "https://www.youtube.com/embed/CkQOCnLWPUA",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "subspaces",
+      "basis"
+    ],
+    "keywords": [
+      "basis",
+      "subspace",
+      "dimension",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-637",
+    "title": "Dimension of the Null Space or Nullity",
+    "url": "https://www.youtube.com/embed/C_VFHze3548",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "null-space",
+      "nullity",
+      "dimension"
+    ],
+    "keywords": [
+      "nullity",
+      "null space",
+      "dimension",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-638",
+    "title": "Dimension of the Column Space or Rank",
+    "url": "https://www.youtube.com/embed/Lx5sFgXjgKg",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "column-space",
+      "rank",
+      "dimension"
+    ],
+    "keywords": [
+      "rank",
+      "column space",
+      "dimension",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-639",
+    "title": "Rank-Nullity Theorem",
+    "url": "https://www.youtube.com/embed/JUgrBkPteTg",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "rank",
+      "nullity",
+      "rank-nullity"
+    ],
+    "keywords": [
+      "rank nullity",
+      "theorem",
+      "linear algebra",
+      "dimension"
+    ]
+  },
+  {
+    "id": "vid-640",
+    "title": "Showing Relation Between Basis Cols and Pivot Cols",
+    "url": "https://www.youtube.com/embed/VBTNFJnkjb4",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "basis",
+      "pivot"
+    ],
+    "keywords": [
+      "pivot columns",
+      "basis",
+      "matrices",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-641",
+    "title": "Showing that the Candidate Basis Does Span C(A)",
+    "url": "https://www.youtube.com/embed/5x6Wsqb-CvQ",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "column-space",
+      "basis",
+      "span"
+    ],
+    "keywords": [
+      "column space",
+      "basis",
+      "span",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-642",
+    "title": "A More Formal Understanding of Functions",
+    "url": "https://www.youtube.com/embed/4PCktDZJH8E",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "functions",
+      "transformations"
+    ],
+    "keywords": [
+      "functions",
+      "transformations",
+      "linear algebra",
+      "formal"
+    ]
+  },
+  {
+    "id": "vid-643",
+    "title": "Vector Transformations",
+    "url": "https://www.youtube.com/embed/wHuY97vss18",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transformations",
+      "vectors"
+    ],
+    "keywords": [
+      "vector transformation",
+      "linear algebra",
+      "transformation"
+    ]
+  },
+  {
+    "id": "vid-644",
+    "title": "Linear Transformations",
+    "url": "https://www.youtube.com/embed/gAbadNuQEjI",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transformations",
+      "linear-transformations"
+    ],
+    "keywords": [
+      "linear transformation",
+      "linear algebra",
+      "transformation"
+    ]
+  },
+  {
+    "id": "vid-645",
+    "title": "Matrix Vector Products as Linear Transformations",
+    "url": "https://www.youtube.com/embed/EcZIGv2v_eA",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transformations",
+      "matrices"
+    ],
+    "keywords": [
+      "linear transformation",
+      "matrix",
+      "vectors",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-646",
+    "title": "Linear Transformations as Matrix Vector Products",
+    "url": "https://www.youtube.com/embed/Il0oqMKtRu4",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transformations",
+      "matrices"
+    ],
+    "keywords": [
+      "linear transformation",
+      "matrix",
+      "vectors",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-647",
+    "title": "Image of a Subset Under a Transformation",
+    "url": "https://www.youtube.com/embed/kJIUbtSowRg",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transformations",
+      "image"
+    ],
+    "keywords": [
+      "image",
+      "transformation",
+      "linear algebra",
+      "subset"
+    ]
+  },
+  {
+    "id": "vid-648",
+    "title": "im(T): Image of a Transformation",
+    "url": "https://www.youtube.com/embed/BQMyeQOLvpg",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transformations",
+      "image"
+    ],
+    "keywords": [
+      "image",
+      "transformation",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-649",
+    "title": "Preimage of a Set",
+    "url": "https://www.youtube.com/embed/nBGIv3-IZRU",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transformations",
+      "preimage"
+    ],
+    "keywords": [
+      "preimage",
+      "transformation",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-650",
+    "title": "Preimage and Kernel Example",
+    "url": "https://www.youtube.com/embed/OzLJFqvSwj4",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transformations",
+      "preimage",
+      "kernel"
+    ],
+    "keywords": [
+      "preimage",
+      "kernel",
+      "transformation",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-651",
+    "title": "Sums and Scalar Multiples of Linear Transformations",
+    "url": "https://www.youtube.com/embed/r6hRJOFdHXU",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transformations",
+      "linear-combinations"
+    ],
+    "keywords": [
+      "linear transformation",
+      "scalar",
+      "sum",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-652",
+    "title": "More on Matrix Addition and Scalar Multiplication",
+    "url": "https://www.youtube.com/embed/M4nWCEJn4B0",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "scalar-multiplication"
+    ],
+    "keywords": [
+      "matrix addition",
+      "scalar multiplication",
+      "matrices",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-653",
+    "title": "Linear Transformation Examples: Scaling and Reflections",
+    "url": "https://www.youtube.com/embed/SKhAqbNWFKo",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transformations",
+      "scaling",
+      "reflections"
+    ],
+    "keywords": [
+      "scaling",
+      "reflection",
+      "transformation",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-654",
+    "title": "Linear Transformation Examples: Rotations in R2",
+    "url": "https://www.youtube.com/embed/6c-7LNn5_5k",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transformations",
+      "rotations",
+      "r2"
+    ],
+    "keywords": [
+      "rotation",
+      "transformation",
+      "R2",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-655",
+    "title": "Rotation in R3 around the X-axis",
+    "url": "https://www.youtube.com/embed/rHLEWRxRGiM",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transformations",
+      "rotations",
+      "r3"
+    ],
+    "keywords": [
+      "rotation",
+      "R3",
+      "transformation",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-656",
+    "title": "Unit Vectors and Introduction to Projections",
+    "url": "https://www.youtube.com/embed/C2PC9185gIw",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "projections",
+      "unit-vectors"
+    ],
+    "keywords": [
+      "unit vector",
+      "projection",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-657",
+    "title": "Expressing a Projection on to a Line as a Matrix Vector Product",
+    "url": "https://www.youtube.com/embed/JK-8XNIoAkI",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "projections",
+      "matrices"
+    ],
+    "keywords": [
+      "projection",
+      "line",
+      "matrix",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-658",
+    "title": "Compositions of Linear Transformations",
+    "url": "https://www.youtube.com/embed/xX7qBVa68LQ",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transformations",
+      "composition"
+    ],
+    "keywords": [
+      "composition",
+      "transformation",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-659",
+    "title": "Matrix Product as Composition",
+    "url": "https://www.youtube.com/embed/YTdh3KIqrpw",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "composition",
+      "matrix-multiplication"
+    ],
+    "keywords": [
+      "matrix product",
+      "composition",
+      "transformation",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-660",
+    "title": "Associativity of Matrix Multiplication",
+    "url": "https://www.youtube.com/embed/LOFiCAlzYds",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "matrix-multiplication",
+      "associativity"
+    ],
+    "keywords": [
+      "associativity",
+      "matrix multiplication",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-661",
+    "title": "Inverse Functions and Transformations",
+    "url": "https://www.youtube.com/embed/sYlOjyPX2AM",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transformations",
+      "inverse"
+    ],
+    "keywords": [
+      "inverse",
+      "transformation",
+      "linear algebra",
+      "function"
+    ]
+  },
+  {
+    "id": "vid-662",
+    "title": "Deriving a Method for Determining Inverses",
+    "url": "https://www.youtube.com/embed/aRXRIRCXaRI",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "inverse",
+      "matrix-inverse"
+    ],
+    "keywords": [
+      "inverse",
+      "matrix inverse",
+      "deriving",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-663",
+    "title": "Example of Finding Matrix Inverse",
+    "url": "https://www.youtube.com/embed/8VSbkNSiSko",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "inverse",
+      "matrix-inverse"
+    ],
+    "keywords": [
+      "matrix inverse",
+      "example",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-664",
+    "title": "Formula for 2x2 Inverse (Note)",
+    "url": "https://www.youtube.com/embed/iUQR0enP7RQ",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "inverse"
+    ],
+    "keywords": [
+      "inverse",
+      "2x2 matrix",
+      "formula",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-665",
+    "title": "Showing that Inverses are Linear",
+    "url": "https://www.youtube.com/embed/QWTZUSbOMbs",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "inverse",
+      "transformations"
+    ],
+    "keywords": [
+      "inverse",
+      "linear",
+      "transformation",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-666",
+    "title": "Determinant of a 2x2 Matrix",
+    "url": "https://www.youtube.com/embed/Ip3X9LOh2dk",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "determinants",
+      "matrices"
+    ],
+    "keywords": [
+      "determinant",
+      "2x2",
+      "matrix",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-667",
+    "title": "Determinant of a 3x3 Matrix",
+    "url": "https://www.youtube.com/embed/aKhhYguY0DQ",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "determinants",
+      "matrices"
+    ],
+    "keywords": [
+      "determinant",
+      "3x3",
+      "matrix",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-668",
+    "title": "Determinants along Other Rows/Cols",
+    "url": "https://www.youtube.com/embed/H9BWRYJNIv4",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "determinants",
+      "matrices"
+    ],
+    "keywords": [
+      "determinant",
+      "cofactor",
+      "expansion",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-669",
+    "title": "Rule of Sarrus of Determinants",
+    "url": "https://www.youtube.com/embed/GdeEP4CoBo8",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "determinants",
+      "matrices"
+    ],
+    "keywords": [
+      "determinant",
+      "sarrus",
+      "rule",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-670",
+    "title": "The Determinant as Area of a Parallelogram",
+    "url": "https://www.youtube.com/embed/KX2i6yXy8xk",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "determinants",
+      "geometry"
+    ],
+    "keywords": [
+      "determinant",
+      "area",
+      "parallelogram",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-671",
+    "title": "Determinants as Scaling Factors",
+    "url": "https://www.youtube.com/embed/0o4wFCSDSrk",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "determinants",
+      "transformations"
+    ],
+    "keywords": [
+      "determinant",
+      "scaling",
+      "transformation",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-672",
+    "title": "Transpose of a Matrix",
+    "url": "https://www.youtube.com/embed/23LLB9mNJvc",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "transpose"
+    ],
+    "keywords": [
+      "transpose",
+      "matrix",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-673",
+    "title": "Determinant of Transpose",
+    "url": "https://www.youtube.com/embed/5BAThcMUEuE",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "determinants",
+      "transpose"
+    ],
+    "keywords": [
+      "determinant",
+      "transpose",
+      "matrix",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-674",
+    "title": "Determinants and Linear Independence",
+    "url": "https://www.youtube.com/embed/fWOGfzC3IeY",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "determinants",
+      "linear-independence"
+    ],
+    "keywords": [
+      "determinant",
+      "linear independence",
+      "matrix",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-675",
+    "title": "Calculating Inverse Function",
+    "url": "https://www.youtube.com/embed/JUgrBkPteTg",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "inverse"
+    ],
+    "keywords": [
+      "inverse",
+      "matrix",
+      "calculation",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-676",
+    "title": "Upper Triangular Determinant",
+    "url": "https://www.youtube.com/embed/sjFoxLYIkF8",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "determinants",
+      "triangular"
+    ],
+    "keywords": [
+      "determinant",
+      "upper triangular",
+      "matrix",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-677",
+    "title": "Simpler 4x4 Determinant",
+    "url": "https://www.youtube.com/embed/VBMGo7WdkrU",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "determinants",
+      "matrices"
+    ],
+    "keywords": [
+      "determinant",
+      "4x4",
+      "matrix",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-678",
+    "title": "Determinants: Summary",
+    "url": "https://www.youtube.com/embed/H9BWRYJNIv4",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "determinants"
+    ],
+    "keywords": [
+      "determinant",
+      "summary",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-679",
+    "title": "Duplicate Row Determinant",
+    "url": "https://www.youtube.com/embed/pbODXIGBSH0",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "determinants",
+      "matrices"
+    ],
+    "keywords": [
+      "determinant",
+      "duplicate row",
+      "matrix",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-680",
+    "title": "Determinants: Proof of the Product Rule",
+    "url": "https://www.youtube.com/embed/OkFen-heBbI",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "determinants",
+      "proof"
+    ],
+    "keywords": [
+      "determinant",
+      "product rule",
+      "proof",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-681",
+    "title": "Determinants and Invertibility",
+    "url": "https://www.youtube.com/embed/vMnN7W9OLiQ",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "determinants",
+      "inverse"
+    ],
+    "keywords": [
+      "determinant",
+      "invertibility",
+      "inverse",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-682",
+    "title": "Cramer's Rule One and Two",
+    "url": "https://www.youtube.com/embed/8VSbkNSiSko",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "determinants",
+      "cramers-rule"
+    ],
+    "keywords": [
+      "cramer's rule",
+      "determinant",
+      "linear systems",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-683",
+    "title": "Transpose of a Matrix",
+    "url": "https://www.youtube.com/embed/TbaltFbJ3wE",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transpose",
+      "matrices"
+    ],
+    "keywords": [
+      "transpose",
+      "matrix",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-684",
+    "title": "Transpose of Matrix Products",
+    "url": "https://www.youtube.com/embed/gABOqCOx7DQ",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transpose",
+      "matrix-multiplication"
+    ],
+    "keywords": [
+      "transpose",
+      "matrix product",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-685",
+    "title": "Transposes of Sums and Inverses",
+    "url": "https://www.youtube.com/embed/OECp26jkvbo",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transpose",
+      "inverse"
+    ],
+    "keywords": [
+      "transpose",
+      "sum",
+      "inverse",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-686",
+    "title": "Transpose of a Vector",
+    "url": "https://www.youtube.com/embed/TbaltFbJ3wE",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transpose",
+      "vectors"
+    ],
+    "keywords": [
+      "transpose",
+      "vector",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-687",
+    "title": "Rowspace and Left Nullspace",
+    "url": "https://www.youtube.com/embed/qMdM6OTQgNg",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "row-space",
+      "null-space"
+    ],
+    "keywords": [
+      "row space",
+      "left null space",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-688",
+    "title": "Visualizing Left Nullspace and Rowspace",
+    "url": "https://www.youtube.com/embed/Alhcv5d_XOs",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "row-space",
+      "null-space"
+    ],
+    "keywords": [
+      "row space",
+      "null space",
+      "visualization",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-689",
+    "title": "Orthogonal Complements",
+    "url": "https://www.youtube.com/embed/zUMo6pnFS8E",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "orthogonality",
+      "complements"
+    ],
+    "keywords": [
+      "orthogonal complement",
+      "linear algebra",
+      "subspace"
+    ]
+  },
+  {
+    "id": "vid-690",
+    "title": "Orthogonal Complement of the Orthogonal Complement",
+    "url": "https://www.youtube.com/embed/tXSNSkpFGkA",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "orthogonality",
+      "complements"
+    ],
+    "keywords": [
+      "orthogonal complement",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-691",
+    "title": "Orthogonal Complement of the Null Space",
+    "url": "https://www.youtube.com/embed/vldb9KkEiA0",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "orthogonality",
+      "null-space"
+    ],
+    "keywords": [
+      "orthogonal complement",
+      "null space",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-692",
+    "title": "Unique Rowspace Solution to Ax=b",
+    "url": "https://www.youtube.com/embed/DHHMBGbaXFg",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "row-space",
+      "linear-systems"
+    ],
+    "keywords": [
+      "row space",
+      "linear system",
+      "solution",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-693",
+    "title": "Representing Vectors in Rn using Subspace Members",
+    "url": "https://www.youtube.com/embed/U4PCZF0wkD8",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "subspaces",
+      "vectors"
+    ],
+    "keywords": [
+      "subspace",
+      "vector representation",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-694",
+    "title": "Projections onto Subspaces",
+    "url": "https://www.youtube.com/embed/MC7l96tW8V8",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "projections",
+      "subspaces"
+    ],
+    "keywords": [
+      "projection",
+      "subspace",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-695",
+    "title": "Visualizing a Projection onto a Plane",
+    "url": "https://www.youtube.com/embed/QbKmzbBR1rk",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "projections",
+      "planes"
+    ],
+    "keywords": [
+      "projection",
+      "plane",
+      "visualization",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-696",
+    "title": "A Projection onto a Subspace is a Linear Transformation",
+    "url": "https://www.youtube.com/embed/o5dG0bgBimA",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "projections",
+      "transformations"
+    ],
+    "keywords": [
+      "projection",
+      "linear transformation",
+      "subspace",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-697",
+    "title": "Subspace Projection Matrix Example",
+    "url": "https://www.youtube.com/embed/O5aQWgQnHE8",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "projections",
+      "matrices"
+    ],
+    "keywords": [
+      "projection matrix",
+      "subspace",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-698",
+    "title": "Another Example of a Projection Matrix",
+    "url": "https://www.youtube.com/embed/uWbZlJURkfA",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "projections",
+      "matrices"
+    ],
+    "keywords": [
+      "projection matrix",
+      "example",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-699",
+    "title": "Projection is Closest Vector in Subspace",
+    "url": "https://www.youtube.com/embed/osh80YCg_GM",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "projections",
+      "subspaces"
+    ],
+    "keywords": [
+      "projection",
+      "closest vector",
+      "subspace",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-700",
+    "title": "Least Squares Approximation",
+    "url": "https://www.youtube.com/embed/QGdm8ETMR5Q",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "least-squares",
+      "approximation"
+    ],
+    "keywords": [
+      "least squares",
+      "approximation",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-701",
+    "title": "Least Squares Examples",
+    "url": "https://www.youtube.com/embed/mclfteWlT2Y",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "least-squares",
+      "examples"
+    ],
+    "keywords": [
+      "least squares",
+      "example",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-702",
+    "title": "Another Least Squares Example",
+    "url": "https://www.youtube.com/embed/E0-0aP-5DXCI",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "least-squares",
+      "examples"
+    ],
+    "keywords": [
+      "least squares",
+      "example",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-703",
+    "title": "Least Squares Approximation with a Line",
+    "url": "https://www.youtube.com/embed/JK-8XNIoAkI",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "least-squares",
+      "regression"
+    ],
+    "keywords": [
+      "least squares",
+      "line fitting",
+      "regression",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-704",
+    "title": "Least Squares Fit to a Line",
+    "url": "https://www.youtube.com/embed/JK-8XNIoAkI",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "least-squares",
+      "regression"
+    ],
+    "keywords": [
+      "least squares",
+      "fit",
+      "line",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-705",
+    "title": "Introduction to Gram-Schmidt",
+    "url": "https://www.youtube.com/embed/RDZ_2H6PxUo",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "gram-schmidt",
+      "orthogonality"
+    ],
+    "keywords": [
+      "gram schmidt",
+      "orthogonal",
+      "basis",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-706",
+    "title": "Gram-Schmidt Process Example",
+    "url": "https://www.youtube.com/embed/MGtHQCNF3FY",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "gram-schmidt",
+      "orthogonality"
+    ],
+    "keywords": [
+      "gram schmidt",
+      "example",
+      "orthogonal",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-707",
+    "title": "Gram-Schmidt Example with 3 Basis Vectors",
+    "url": "https://www.youtube.com/embed/lTCNLbG6bQQ",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "gram-schmidt",
+      "orthogonality"
+    ],
+    "keywords": [
+      "gram schmidt",
+      "example",
+      "basis",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-708",
+    "title": "Orthogonal Matrix QR Decomposition (Introduction)",
+    "url": "https://www.youtube.com/embed/JK-8XNIoAkI",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "qr-decomposition",
+      "orthogonality"
+    ],
+    "keywords": [
+      "QR decomposition",
+      "orthogonal matrix",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-709",
+    "title": "QR Decomposition (Gram-Schmidt)",
+    "url": "https://www.youtube.com/embed/JK-8XNIoAkI",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "qr-decomposition",
+      "gram-schmidt"
+    ],
+    "keywords": [
+      "QR decomposition",
+      "gram schmidt",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-710",
+    "title": "Orthonormal Bases and the Gram-Schmidt Process",
+    "url": "https://www.youtube.com/embed/P2LTAUO1TdA",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "orthonormal",
+      "gram-schmidt"
+    ],
+    "keywords": [
+      "orthonormal",
+      "gram schmidt",
+      "basis",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-711",
+    "title": "Coordinates with Respect to Orthonormal Bases",
+    "url": "https://www.youtube.com/embed/oz5PUdGEnr0",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "orthonormal",
+      "coordinates"
+    ],
+    "keywords": [
+      "orthonormal",
+      "coordinates",
+      "basis",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-712",
+    "title": "Change of Basis Matrix",
+    "url": "https://www.youtube.com/embed/PiDysIOsK3M",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "change-of-basis",
+      "matrices"
+    ],
+    "keywords": [
+      "change of basis",
+      "basis matrix",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-713",
+    "title": "Invertible Change of Basis Matrix",
+    "url": "https://www.youtube.com/embed/HZgatk9huGc",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "change-of-basis",
+      "inverse"
+    ],
+    "keywords": [
+      "change of basis",
+      "invertible",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-714",
+    "title": "Transformation Matrix with Respect to a Basis",
+    "url": "https://www.youtube.com/embed/meSwXQQNaMs",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "change-of-basis",
+      "transformations"
+    ],
+    "keywords": [
+      "transformation matrix",
+      "basis",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-715",
+    "title": "Alternate Basis Transformation Matrix Example",
+    "url": "https://www.youtube.com/embed/HAoL5fPmgrw",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "change-of-basis",
+      "transformations"
+    ],
+    "keywords": [
+      "basis transformation",
+      "example",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-716",
+    "title": "Alternate Basis Transformation Matrix Example Part 2",
+    "url": "https://www.youtube.com/embed/a7yd4x00dew",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "change-of-basis",
+      "transformations"
+    ],
+    "keywords": [
+      "basis transformation",
+      "example",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-717",
+    "title": "Changing Coordinate Systems to Help Find a Transformation Matrix",
+    "url": "https://www.youtube.com/embed/QTcSBB3uVP0",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "change-of-basis",
+      "coordinate-systems"
+    ],
+    "keywords": [
+      "coordinate system",
+      "change of basis",
+      "transformation",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-718",
+    "title": "Introduction to Eigenvalues and Eigenvectors",
+    "url": "https://www.youtube.com/embed/PhfbEr2btGQ",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "eigenvalues",
+      "eigenvectors"
+    ],
+    "keywords": [
+      "eigenvalue",
+      "eigenvector",
+      "linear algebra",
+      "introduction"
+    ]
+  },
+  {
+    "id": "vid-719",
+    "title": "Proof of Eigenvalue Formula (nxn)",
+    "url": "https://www.youtube.com/embed/D4fKn2m-Bi8",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "eigenvalues",
+      "proof"
+    ],
+    "keywords": [
+      "eigenvalue",
+      "proof",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-720",
+    "title": "Example of Finding Eigenvalues and Eigenvectors",
+    "url": "https://www.youtube.com/embed/3-xfmbdzkqc",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "eigenvalues",
+      "eigenvectors"
+    ],
+    "keywords": [
+      "eigenvalue",
+      "eigenvector",
+      "example",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-721",
+    "title": "Eigenvectors and Eigenspaces for a 3x3 Matrix",
+    "url": "https://www.youtube.com/embed/aCOn0K69Gkg",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "eigenvalues",
+      "eigenvectors",
+      "eigenspace"
+    ],
+    "keywords": [
+      "eigenspace",
+      "eigenvector",
+      "3x3",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-722",
+    "title": "Eigenvalues of a 3x3 Matrix",
+    "url": "https://www.youtube.com/embed/eO8V0LkNIwY",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "eigenvalues",
+      "matrices"
+    ],
+    "keywords": [
+      "eigenvalue",
+      "3x3",
+      "matrix",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-723",
+    "title": "Showing that an Eigenbasis Makes for Good Coordinate Systems",
+    "url": "https://www.youtube.com/embed/OAh573i_qn8",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "eigenvalues",
+      "eigenvectors",
+      "basis"
+    ],
+    "keywords": [
+      "eigenbasis",
+      "coordinate system",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-724",
+    "title": "Introduction to Eigenvalues (Visual)",
+    "url": "https://www.youtube.com/embed/PFDu9oVAE-g",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "eigenvalues",
+      "visualization"
+    ],
+    "keywords": [
+      "eigenvalue",
+      "visual",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-725",
+    "title": "Linear Algebra: Eigenvalues and Eigenvectors",
+    "url": "https://www.youtube.com/embed/mxm1vHKbJAA",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "eigenvalues",
+      "eigenvectors"
+    ],
+    "keywords": [
+      "eigenvalue",
+      "eigenvector",
+      "linear algebra"
+    ]
+  },
+  {
+    "id": "vid-726",
+    "title": "Systems and Objects",
+    "url": "https://www.youtube.com/embed/51GNAET2zFU",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "mechanics",
+      "systems"
+    ],
+    "keywords": [
+      "system",
+      "object",
+      "physics",
+      "mechanics"
+    ]
+  },
+  {
+    "id": "vid-727",
+    "title": "Fundamental Particles",
+    "url": "https://www.youtube.com/embed/tTDHS64wJkk",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "quantum",
+      "particles"
+    ],
+    "keywords": [
+      "particle",
+      "fundamental",
+      "quantum",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-728",
+    "title": "Atomic Nucleus",
+    "url": "https://www.youtube.com/embed/0aeXYK5rMzc",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "atomic",
+      "nucleus"
+    ],
+    "keywords": [
+      "nucleus",
+      "atomic",
+      "proton",
+      "neutron",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-729",
+    "title": "The Bohr Atom",
+    "url": "https://www.youtube.com/embed/GhAn8xZQ-d8",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "atomic",
+      "bohr",
+      "quantum"
+    ],
+    "keywords": [
+      "bohr",
+      "atom",
+      "electron",
+      "energy levels",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-730",
+    "title": "Objects",
+    "url": "https://www.youtube.com/embed/JUBV-KfwGJw",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "mechanics"
+    ],
+    "keywords": [
+      "object",
+      "physics",
+      "mechanics"
+    ]
+  },
+  {
+    "id": "vid-731",
+    "title": "Electric Charge",
+    "url": "https://www.youtube.com/embed/Opz_Grl_vQA",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "electricity",
+      "charge"
+    ],
+    "keywords": [
+      "electric charge",
+      "charge",
+      "electricity",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-732",
+    "title": "Positive and Negative Charge",
+    "url": "https://www.youtube.com/embed/zHJkJGBdvwE",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "electricity",
+      "charge"
+    ],
+    "keywords": [
+      "positive charge",
+      "negative charge",
+      "electricity",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-733",
+    "title": "Elementary Charge",
+    "url": "https://www.youtube.com/embed/Fz-QPXwhQTI",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "electricity",
+      "charge",
+      "constants"
+    ],
+    "keywords": [
+      "elementary charge",
+      "electron charge",
+      "physics",
+      "constants"
+    ]
+  },
+  {
+    "id": "vid-734",
+    "title": "Inertial Mass",
+    "url": "https://www.youtube.com/embed/6zEMEuvBuXQ",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "mechanics",
+      "mass"
+    ],
+    "keywords": [
+      "inertial mass",
+      "mass",
+      "inertia",
+      "physics",
+      "mechanics"
+    ]
+  },
+  {
+    "id": "vid-735",
+    "title": "Gravitational Mass",
+    "url": "https://www.youtube.com/embed/4LnFqUWthOU",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "mechanics",
+      "mass",
+      "gravity"
+    ],
+    "keywords": [
+      "gravitational mass",
+      "mass",
+      "gravity",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-736",
+    "title": "Equivalence Principle",
+    "url": "https://www.youtube.com/embed/eU2hGIrBULA",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "relativity",
+      "gravity"
+    ],
+    "keywords": [
+      "equivalence principle",
+      "gravity",
+      "mass",
+      "general relativity",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-737",
+    "title": "E=mc2",
+    "url": "https://www.youtube.com/embed/wabnINynBGc",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "relativity",
+      "energy",
+      "mass"
+    ],
+    "keywords": [
+      "E=mc2",
+      "mass energy equivalence",
+      "relativity",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-738",
+    "title": "Wave-Particle Duality - Part 1",
+    "url": "https://www.youtube.com/embed/fAVPRDnzSpE",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "quantum",
+      "waves",
+      "particles"
+    ],
+    "keywords": [
+      "wave particle duality",
+      "quantum",
+      "photon",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-739",
+    "title": "Wave-Particle Duality - Part 2",
+    "url": "https://www.youtube.com/embed/P3ABix1LJAI",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "quantum",
+      "waves",
+      "particles"
+    ],
+    "keywords": [
+      "wave particle duality",
+      "quantum",
+      "photon",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-740",
+    "title": "Spacetime",
+    "url": "https://www.youtube.com/embed/PTtPVeAjQOE",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "relativity",
+      "spacetime"
+    ],
+    "keywords": [
+      "spacetime",
+      "relativity",
+      "time",
+      "space",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-741",
+    "title": "Density",
+    "url": "https://www.youtube.com/embed/GzdRGOuNIFg",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "mechanics",
+      "density"
+    ],
+    "keywords": [
+      "density",
+      "mass",
+      "volume",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-742",
+    "title": "Resistivity",
+    "url": "https://www.youtube.com/embed/FPZiMVna1ls",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "electricity",
+      "resistivity"
+    ],
+    "keywords": [
+      "resistivity",
+      "resistance",
+      "electricity",
+      "conductivity",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-743",
+    "title": "Thermal Conductivity",
+    "url": "https://www.youtube.com/embed/TmeJFYJcdaw",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "thermodynamics",
+      "thermal"
+    ],
+    "keywords": [
+      "thermal conductivity",
+      "heat transfer",
+      "thermodynamics",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-744",
+    "title": "Electric Permittivity",
+    "url": "https://www.youtube.com/embed/5x8kj02ar34",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "electricity",
+      "permittivity"
+    ],
+    "keywords": [
+      "permittivity",
+      "electric field",
+      "dielectric",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-745",
+    "title": "Magnetic Permeability",
+    "url": "https://www.youtube.com/embed/rWd3WSsWmJQ",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "magnetism",
+      "permeability"
+    ],
+    "keywords": [
+      "permeability",
+      "magnetic field",
+      "magnetism",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-746",
+    "title": "Magnetic Dipole Moment",
+    "url": "https://www.youtube.com/embed/H1I9-VjCc-Y",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "magnetism",
+      "dipole"
+    ],
+    "keywords": [
+      "magnetic dipole",
+      "dipole moment",
+      "magnetism",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-747",
+    "title": "Vector Field",
+    "url": "https://www.youtube.com/embed/GllBa9Mosos",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "fields",
+      "vectors"
+    ],
+    "keywords": [
+      "vector field",
+      "field",
+      "physics",
+      "calculus"
+    ]
+  },
+  {
+    "id": "vid-748",
+    "title": "Scalar Field",
+    "url": "https://www.youtube.com/embed/r_FgYgf7KCE",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "fields",
+      "scalars"
+    ],
+    "keywords": [
+      "scalar field",
+      "field",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-749",
+    "title": "Gravitational Force",
+    "url": "https://www.youtube.com/embed/feGzQ4TxPRU",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "gravity",
+      "forces"
+    ],
+    "keywords": [
+      "gravitational force",
+      "gravity",
+      "newton",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-750",
+    "title": "Gravitational Field Strength",
+    "url": "https://www.youtube.com/embed/4a4p9bW9tRI",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "gravity",
+      "fields"
+    ],
+    "keywords": [
+      "gravitational field",
+      "gravity",
+      "field strength",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-751",
+    "title": "Electric Force",
+    "url": "https://www.youtube.com/embed/pFM-a7_qjFM",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "electricity",
+      "forces",
+      "coulomb"
+    ],
+    "keywords": [
+      "electric force",
+      "coulomb",
+      "charge",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-752",
+    "title": "Electric Field Strength",
+    "url": "https://www.youtube.com/embed/pOPQBlknBcM",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "electricity",
+      "fields"
+    ],
+    "keywords": [
+      "electric field",
+      "field strength",
+      "electricity",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-753",
+    "title": "Electric Field of a Sphere",
+    "url": "https://www.youtube.com/embed/pqTfk9HMLj4",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "electricity",
+      "fields",
+      "gauss"
+    ],
+    "keywords": [
+      "electric field",
+      "sphere",
+      "gauss",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-754",
+    "title": "Electric Field of a Dipole",
+    "url": "https://www.youtube.com/embed/RZxyjv8YF3k",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "electricity",
+      "fields",
+      "dipole"
+    ],
+    "keywords": [
+      "electric field",
+      "dipole",
+      "electricity",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-755",
+    "title": "Electric Field of Parallel Plates",
+    "url": "https://www.youtube.com/embed/XSXKk_A3xUM",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "electricity",
+      "fields",
+      "capacitor"
+    ],
+    "keywords": [
+      "electric field",
+      "parallel plates",
+      "capacitor",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-756",
+    "title": "Magnetic Force",
+    "url": "https://www.youtube.com/embed/dFT7-_s0jh0",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "magnetism",
+      "forces"
+    ],
+    "keywords": [
+      "magnetic force",
+      "lorentz force",
+      "magnetism",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-757",
+    "title": "Magnetic Field of a Wire",
+    "url": "https://www.youtube.com/embed/nfSJ62mzKyY",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "magnetism",
+      "fields"
+    ],
+    "keywords": [
+      "magnetic field",
+      "wire",
+      "ampere",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-758",
+    "title": "Magnetic Field of a Dipole",
+    "url": "https://www.youtube.com/embed/GSLjmi2qIfM",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "magnetism",
+      "fields",
+      "dipole"
+    ],
+    "keywords": [
+      "magnetic field",
+      "dipole",
+      "magnetism",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-759",
+    "title": "Magnetic Domains",
+    "url": "https://www.youtube.com/embed/hK_Yi5nxuKQ",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "magnetism",
+      "domains"
+    ],
+    "keywords": [
+      "magnetic domains",
+      "magnetism",
+      "ferromagnetism",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-760",
+    "title": "Contour Lines",
+    "url": "https://www.youtube.com/embed/9kNkpQTwPc0",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "fields",
+      "visualization"
+    ],
+    "keywords": [
+      "contour lines",
+      "field",
+      "equipotential",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-761",
+    "title": "Equipotential Lines",
+    "url": "https://www.youtube.com/embed/1XI4D4SgHTw",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "electricity",
+      "potential"
+    ],
+    "keywords": [
+      "equipotential",
+      "electric potential",
+      "field lines",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-762",
+    "title": "Average Value of the Electric Field",
+    "url": "https://www.youtube.com/embed/i73glKHPkYA",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "electricity",
+      "fields"
+    ],
+    "keywords": [
+      "electric field",
+      "average",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-763",
+    "title": "Motion",
+    "url": "https://www.youtube.com/embed/AlRojAXBif4",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "kinematics",
+      "motion"
+    ],
+    "keywords": [
+      "motion",
+      "kinematics",
+      "physics",
+      "mechanics"
+    ]
+  },
+  {
+    "id": "vid-764",
+    "title": "Forces",
+    "url": "https://www.youtube.com/embed/xiU-2-rM0w4",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "forces",
+      "mechanics"
+    ],
+    "keywords": [
+      "forces",
+      "mechanics",
+      "newton",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-765",
+    "title": "Interaction Forces",
+    "url": "https://www.youtube.com/embed/GPiw8jtfmCQ",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "forces",
+      "interactions"
+    ],
+    "keywords": [
+      "interaction forces",
+      "forces",
+      "newton",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-766",
+    "title": "Newton's Third Law",
+    "url": "https://www.youtube.com/embed/91QYouih4bQ",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "forces",
+      "newtons-laws"
+    ],
+    "keywords": [
+      "newton's third law",
+      "action reaction",
+      "forces",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-767",
+    "title": "Vector Sum of Forces",
+    "url": "https://www.youtube.com/embed/L1HZvT9qbE8",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "forces",
+      "vectors"
+    ],
+    "keywords": [
+      "net force",
+      "vector sum",
+      "forces",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-768",
+    "title": "Free-Body Diagrams",
+    "url": "https://www.youtube.com/embed/nDis6HbXxjg",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "forces",
+      "free-body-diagram"
+    ],
+    "keywords": [
+      "free body diagram",
+      "forces",
+      "mechanics",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-769",
+    "title": "Simple Harmonic Motion",
+    "url": "https://www.youtube.com/embed/tudxily5Qu0",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "oscillations",
+      "shm"
+    ],
+    "keywords": [
+      "simple harmonic motion",
+      "oscillation",
+      "spring",
+      "pendulum",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-770",
+    "title": "Calculating the Gravitational Force",
+    "url": "https://www.youtube.com/embed/0hOuNtRMSAI",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "gravity",
+      "forces"
+    ],
+    "keywords": [
+      "gravitational force",
+      "newton",
+      "calculation",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-771",
+    "title": "Calculating the Electric Force",
+    "url": "https://www.youtube.com/embed/p55xGPeG9zs",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "electricity",
+      "forces",
+      "coulomb"
+    ],
+    "keywords": [
+      "electric force",
+      "coulomb",
+      "calculation",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-772",
+    "title": "Measuring the Magnetic Force",
+    "url": "https://www.youtube.com/embed/KA7JbAdEgWk",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "magnetism",
+      "forces"
+    ],
+    "keywords": [
+      "magnetic force",
+      "measurement",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-773",
+    "title": "Contact Forces",
+    "url": "https://www.youtube.com/embed/ma9Y97hrsb4",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "forces",
+      "mechanics"
+    ],
+    "keywords": [
+      "contact forces",
+      "normal force",
+      "friction",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-774",
+    "title": "Momentum",
+    "url": "https://www.youtube.com/embed/uQ1UMHXyFrM",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "momentum",
+      "mechanics"
+    ],
+    "keywords": [
+      "momentum",
+      "linear momentum",
+      "physics",
+      "mechanics"
+    ]
+  },
+  {
+    "id": "vid-775",
+    "title": "Impulse",
+    "url": "https://www.youtube.com/embed/ph48Xwj_eS8",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "momentum",
+      "impulse"
+    ],
+    "keywords": [
+      "impulse",
+      "momentum",
+      "force",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-776",
+    "title": "Work Energy Principle",
+    "url": "https://www.youtube.com/embed/LNk2mUbnKus",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "energy",
+      "work"
+    ],
+    "keywords": [
+      "work energy",
+      "principle",
+      "physics",
+      "mechanics"
+    ]
+  },
+  {
+    "id": "vid-777",
+    "title": "Torque",
+    "url": "https://www.youtube.com/embed/5Zrphnd_0VI",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "rotational",
+      "torque"
+    ],
+    "keywords": [
+      "torque",
+      "rotation",
+      "moment",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-778",
+    "title": "Rotational Motion",
+    "url": "https://www.youtube.com/embed/grMWAI1RdVs",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "rotational",
+      "angular"
+    ],
+    "keywords": [
+      "rotational motion",
+      "angular velocity",
+      "rotation",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-779",
+    "title": "Angular Momentum",
+    "url": "https://www.youtube.com/embed/MULe4xv3lVk",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "rotational",
+      "angular-momentum"
+    ],
+    "keywords": [
+      "angular momentum",
+      "rotation",
+      "physics",
+      "conservation"
+    ]
+  },
+  {
+    "id": "vid-780",
+    "title": "Gravitational Forces",
+    "url": "https://www.youtube.com/embed/vdrnEC7bnYM",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "gravity",
+      "forces"
+    ],
+    "keywords": [
+      "gravity",
+      "gravitational force",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-781",
+    "title": "Electromagnetic Forces",
+    "url": "https://www.youtube.com/embed/NcnZ2AigrCs",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "electromagnetism",
+      "forces"
+    ],
+    "keywords": [
+      "electromagnetic force",
+      "electromagnetism",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-782",
+    "title": "Strong Nuclear Force",
+    "url": "https://www.youtube.com/embed/mpDDQ4uEH6M",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "nuclear",
+      "forces"
+    ],
+    "keywords": [
+      "strong nuclear force",
+      "nuclear",
+      "quarks",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-783",
+    "title": "Motion of the Center of Mass",
+    "url": "https://www.youtube.com/embed/inAOV2d4P10",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "mechanics",
+      "center-of-mass"
+    ],
+    "keywords": [
+      "center of mass",
+      "motion",
+      "physics",
+      "mechanics"
+    ]
+  },
+  {
+    "id": "vid-784",
+    "title": "Position, Velocity and Acceleration",
+    "url": "https://www.youtube.com/embed/mXbKlYSEvF8",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "kinematics",
+      "motion"
+    ],
+    "keywords": [
+      "position",
+      "velocity",
+      "acceleration",
+      "kinematics",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-785",
+    "title": "Newton's Second Law",
+    "url": "https://www.youtube.com/embed/2qdW0RSFHps",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "forces",
+      "newtons-laws"
+    ],
+    "keywords": [
+      "newton's second law",
+      "F=ma",
+      "force",
+      "acceleration",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-786",
+    "title": "Linear Momentum",
+    "url": "https://www.youtube.com/embed/RKERiyi2mlk",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "momentum",
+      "mechanics"
+    ],
+    "keywords": [
+      "linear momentum",
+      "momentum",
+      "mass",
+      "velocity",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-787",
+    "title": "Force-Time Graph",
+    "url": "https://www.youtube.com/embed/gv8nvpqo5aU",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "forces",
+      "graphs",
+      "impulse"
+    ],
+    "keywords": [
+      "force time graph",
+      "impulse",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-788",
+    "title": "Total Energy",
+    "url": "https://www.youtube.com/embed/qKDV9w_hJA0",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "energy",
+      "conservation"
+    ],
+    "keywords": [
+      "total energy",
+      "conservation of energy",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-789",
+    "title": "Work and Energy",
+    "url": "https://www.youtube.com/embed/pmOXi-My6ZI",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "energy",
+      "work"
+    ],
+    "keywords": [
+      "work",
+      "energy",
+      "physics",
+      "mechanics"
+    ]
+  },
+  {
+    "id": "vid-790",
+    "title": "Heating",
+    "url": "https://www.youtube.com/embed/wDfeQTbmj94",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "thermodynamics",
+      "heat"
+    ],
+    "keywords": [
+      "heating",
+      "heat",
+      "temperature",
+      "thermodynamics",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-791",
+    "title": "Mass and Energy",
+    "url": "https://www.youtube.com/embed/ql6TKCo2SZQ",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "energy",
+      "mass",
+      "relativity"
+    ],
+    "keywords": [
+      "mass energy",
+      "relativity",
+      "E=mc2",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-792",
+    "title": "The Vector Properties of Angular Quantities",
+    "url": "https://www.youtube.com/embed/MLh3XqHuMLk",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "rotational",
+      "vectors",
+      "angular"
+    ],
+    "keywords": [
+      "angular momentum",
+      "vector",
+      "rotation",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-793",
+    "title": "Angular Momentum of a System",
+    "url": "https://www.youtube.com/embed/eYlT30nfjn8",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "rotational",
+      "angular-momentum"
+    ],
+    "keywords": [
+      "angular momentum",
+      "system",
+      "rotation",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-794",
+    "title": "Angular Impulse",
+    "url": "https://www.youtube.com/embed/nKCx_NBOzTg",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "rotational",
+      "impulse"
+    ],
+    "keywords": [
+      "angular impulse",
+      "torque",
+      "rotation",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-795",
+    "title": "Magnetic Properties",
+    "url": "https://www.youtube.com/embed/5-gVHE2VY0o",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "magnetism",
+      "materials"
+    ],
+    "keywords": [
+      "magnetic properties",
+      "ferromagnetism",
+      "diamagnetism",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-796",
+    "title": "Electromagnetic Induction",
+    "url": "https://www.youtube.com/embed/jeTmIa00_rc",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "electromagnetism",
+      "induction",
+      "faraday"
+    ],
+    "keywords": [
+      "electromagnetic induction",
+      "faraday",
+      "flux",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-797",
+    "title": "Electrostatic Induction",
+    "url": "https://www.youtube.com/embed/dwJ-MM7yu4E",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "electricity",
+      "induction"
+    ],
+    "keywords": [
+      "electrostatic induction",
+      "charge",
+      "electricity",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-798",
+    "title": "Resistors and Capacitors",
+    "url": "https://www.youtube.com/embed/58PzPrjGsG8",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "circuits",
+      "resistors",
+      "capacitors"
+    ],
+    "keywords": [
+      "resistor",
+      "capacitor",
+      "circuit",
+      "electricity",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-799",
+    "title": "Electric Circuits",
+    "url": "https://www.youtube.com/embed/8RJ6Kdk8KDo",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "circuits",
+      "electricity"
+    ],
+    "keywords": [
+      "electric circuit",
+      "current",
+      "voltage",
+      "resistance",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-800",
+    "title": "Systems",
+    "url": "https://www.youtube.com/embed/uMMy5gaBTAM",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "systems",
+      "mechanics"
+    ],
+    "keywords": [
+      "system",
+      "physics",
+      "mechanics"
+    ]
+  },
+  {
+    "id": "vid-801",
+    "title": "Conservation Laws",
+    "url": "https://www.youtube.com/embed/O76BZIvOTSE",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "conservation",
+      "laws"
+    ],
+    "keywords": [
+      "conservation laws",
+      "energy",
+      "momentum",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-802",
+    "title": "Object Interactions",
+    "url": "https://www.youtube.com/embed/CtDt9YEz484",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "forces",
+      "interactions"
+    ],
+    "keywords": [
+      "object interaction",
+      "forces",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-803",
+    "title": "System Boundaries",
+    "url": "https://www.youtube.com/embed/_gGU1jnmjdQ",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "systems",
+      "thermodynamics"
+    ],
+    "keywords": [
+      "system boundary",
+      "open system",
+      "closed system",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-804",
+    "title": "Kinetic Energy",
+    "url": "https://www.youtube.com/embed/zDcf7eEaP0M",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "energy",
+      "kinematics"
+    ],
+    "keywords": [
+      "kinetic energy",
+      "motion",
+      "energy",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-805",
+    "title": "Internal Energy",
+    "url": "https://www.youtube.com/embed/-aEqPXk8tM4",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "energy",
+      "thermodynamics"
+    ],
+    "keywords": [
+      "internal energy",
+      "thermodynamics",
+      "heat",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-806",
+    "title": "Potential Energy",
+    "url": "https://www.youtube.com/embed/8a4D2xqHBF4",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "energy",
+      "potential"
+    ],
+    "keywords": [
+      "potential energy",
+      "gravitational potential",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-807",
+    "title": "Kinetic and Potential Energy",
+    "url": "https://www.youtube.com/embed/VgyXWXI-wec",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "energy",
+      "mechanics"
+    ],
+    "keywords": [
+      "kinetic energy",
+      "potential energy",
+      "conservation",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-808",
+    "title": "Work and Power",
+    "url": "https://www.youtube.com/embed/RWPNwElEB0Q",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "energy",
+      "work",
+      "power"
+    ],
+    "keywords": [
+      "work",
+      "power",
+      "energy",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-809",
+    "title": "Heat",
+    "url": "https://www.youtube.com/embed/ldMcDvm29eA",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "thermodynamics",
+      "heat"
+    ],
+    "keywords": [
+      "heat",
+      "thermal energy",
+      "thermodynamics",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-810",
+    "title": "Thermodynamics and P-V Diagrams",
+    "url": "https://www.youtube.com/embed/qVAvmieRM1E",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "thermodynamics",
+      "pv-diagram"
+    ],
+    "keywords": [
+      "thermodynamics",
+      "PV diagram",
+      "pressure",
+      "volume",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-811",
+    "title": "Emission and Absorption Spectra",
+    "url": "https://www.youtube.com/embed/1uPyq63aRvg",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "quantum",
+      "spectra",
+      "atomic"
+    ],
+    "keywords": [
+      "emission spectrum",
+      "absorption spectrum",
+      "atomic",
+      "photon",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-812",
+    "title": "Kirchoff's Loop Rule",
+    "url": "https://www.youtube.com/embed/paDs-Hnmklo",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "circuits",
+      "kirchhoff"
+    ],
+    "keywords": [
+      "kirchhoff's loop rule",
+      "voltage",
+      "circuit",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-813",
+    "title": "Bernoulli's Equation",
+    "url": "https://www.youtube.com/embed/ytCuHh5PwwY",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "fluids",
+      "bernoulli"
+    ],
+    "keywords": [
+      "bernoulli's equation",
+      "fluid dynamics",
+      "pressure",
+      "flow",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-814",
+    "title": "Energy-Mass Equivalence",
+    "url": "https://www.youtube.com/embed/hWcACTswM9A",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "relativity",
+      "energy",
+      "mass"
+    ],
+    "keywords": [
+      "energy mass equivalence",
+      "E=mc2",
+      "relativity",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-815",
+    "title": "Conservation of Charge in Reactions",
+    "url": "https://www.youtube.com/embed/M_esxspgiD8",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "conservation",
+      "charge",
+      "nuclear"
+    ],
+    "keywords": [
+      "conservation of charge",
+      "nuclear reaction",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-816",
+    "title": "Conservation of Electric Charge",
+    "url": "https://www.youtube.com/embed/-k7YY0d3NtA",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "conservation",
+      "charge",
+      "electricity"
+    ],
+    "keywords": [
+      "conservation of charge",
+      "electric charge",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-817",
+    "title": "Kirchhoff's Junction Rule",
+    "url": "https://www.youtube.com/embed/Rgl4OAm9tnU",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "circuits",
+      "kirchhoff"
+    ],
+    "keywords": [
+      "kirchhoff's junction rule",
+      "current",
+      "circuit",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-818",
+    "title": "Conservation of Linear Momentum",
+    "url": "https://www.youtube.com/embed/2E9fY8H6O1g",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "momentum",
+      "conservation"
+    ],
+    "keywords": [
+      "conservation of momentum",
+      "linear momentum",
+      "collision",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-819",
+    "title": "Elastic and Inelastic Collisions",
+    "url": "https://www.youtube.com/embed/8ko3qy9vgLQ",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "momentum",
+      "collisions"
+    ],
+    "keywords": [
+      "elastic collision",
+      "inelastic collision",
+      "momentum",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-820",
+    "title": "Center of Mass",
+    "url": "https://www.youtube.com/embed/ayv0MoCgtlk",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "mechanics",
+      "center-of-mass"
+    ],
+    "keywords": [
+      "center of mass",
+      "mass distribution",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-821",
+    "title": "Conservation of Angular Momentum",
+    "url": "https://www.youtube.com/embed/hgcudPr73LU",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "rotational",
+      "angular-momentum",
+      "conservation"
+    ],
+    "keywords": [
+      "conservation of angular momentum",
+      "rotation",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-822",
+    "title": "Rotational Inertia",
+    "url": "https://www.youtube.com/embed/W9fPGXyvrVM",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "rotational",
+      "inertia"
+    ],
+    "keywords": [
+      "rotational inertia",
+      "moment of inertia",
+      "rotation",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-823",
+    "title": "Continuity Equation",
+    "url": "https://www.youtube.com/embed/zgE0iNYw0JA",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "fluids",
+      "continuity"
+    ],
+    "keywords": [
+      "continuity equation",
+      "fluid dynamics",
+      "flow rate",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-824",
+    "title": "Conservation of Nucleon Number",
+    "url": "https://www.youtube.com/embed/XcNn0P-GMYw",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "nuclear",
+      "conservation"
+    ],
+    "keywords": [
+      "nucleon number",
+      "nuclear reaction",
+      "conservation",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-825",
+    "title": "Transverse and Longitudinal Waves",
+    "url": "https://www.youtube.com/embed/pqJzn8Y1HFw",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "waves",
+      "mechanics"
+    ],
+    "keywords": [
+      "transverse wave",
+      "longitudinal wave",
+      "wave",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-826",
+    "title": "Mechanical and Electromagnetic Waves",
+    "url": "https://www.youtube.com/embed/5Bnws5tpPtM",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "waves",
+      "electromagnetic"
+    ],
+    "keywords": [
+      "mechanical wave",
+      "electromagnetic wave",
+      "wave",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-827",
+    "title": "Wave Amplitude",
+    "url": "https://www.youtube.com/embed/2Kos5VrtTtA",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "waves",
+      "amplitude"
+    ],
+    "keywords": [
+      "wave amplitude",
+      "wave",
+      "oscillation",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-828",
+    "title": "Wave Energy",
+    "url": "https://www.youtube.com/embed/gy1g6BddkDM",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "waves",
+      "energy"
+    ],
+    "keywords": [
+      "wave energy",
+      "amplitude",
+      "frequency",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-829",
+    "title": "Wave Period and Frequency",
+    "url": "https://www.youtube.com/embed/v3CvAW8BDHI",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "waves",
+      "frequency"
+    ],
+    "keywords": [
+      "wave period",
+      "frequency",
+      "wave",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-830",
+    "title": "Wavelength",
+    "url": "https://www.youtube.com/embed/E-SPpUhzYZY",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "waves",
+      "wavelength"
+    ],
+    "keywords": [
+      "wavelength",
+      "wave",
+      "frequency",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-831",
+    "title": "Wave Equation",
+    "url": "https://www.youtube.com/embed/Jw_aGOrTDPo",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "waves",
+      "equation"
+    ],
+    "keywords": [
+      "wave equation",
+      "wave speed",
+      "frequency",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-832",
+    "title": "Wave Speed",
+    "url": "https://www.youtube.com/embed/1E5IcxtWktc",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "waves",
+      "speed"
+    ],
+    "keywords": [
+      "wave speed",
+      "velocity",
+      "wave",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-833",
+    "title": "Doppler Effect",
+    "url": "https://www.youtube.com/embed/kdiHmSWI2Ks",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "waves",
+      "doppler"
+    ],
+    "keywords": [
+      "doppler effect",
+      "frequency shift",
+      "wave",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-834",
+    "title": "Wave Interference",
+    "url": "https://www.youtube.com/embed/c5JfH-rCC_A",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "waves",
+      "interference"
+    ],
+    "keywords": [
+      "wave interference",
+      "constructive",
+      "destructive",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-835",
+    "title": "Wave Diffraction",
+    "url": "https://www.youtube.com/embed/1bHipDSHVG4",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "waves",
+      "diffraction"
+    ],
+    "keywords": [
+      "wave diffraction",
+      "diffraction",
+      "wave",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-836",
+    "title": "Interference Patterns",
+    "url": "https://www.youtube.com/embed/CRhsPoTOHIU",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "waves",
+      "interference"
+    ],
+    "keywords": [
+      "interference pattern",
+      "double slit",
+      "wave",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-837",
+    "title": "Diffraction Effects",
+    "url": "https://www.youtube.com/embed/SV5x-5Ce2lw",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "waves",
+      "diffraction"
+    ],
+    "keywords": [
+      "diffraction",
+      "wave",
+      "optics",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-838",
+    "title": "Wave Superposition",
+    "url": "https://www.youtube.com/embed/LJbpXx8fMUk",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "waves",
+      "superposition"
+    ],
+    "keywords": [
+      "superposition",
+      "wave",
+      "interference",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-839",
+    "title": "Traveling Waves",
+    "url": "https://www.youtube.com/embed/eu1PC4botbM",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "waves"
+    ],
+    "keywords": [
+      "traveling wave",
+      "wave",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-840",
+    "title": "Standing Waves",
+    "url": "https://www.youtube.com/embed/jz8IIk_bps0",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "waves",
+      "standing-waves"
+    ],
+    "keywords": [
+      "standing wave",
+      "resonance",
+      "wave",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-841",
+    "title": "Harmonics",
+    "url": "https://www.youtube.com/embed/WQng9sHa8MQ",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "waves",
+      "harmonics"
+    ],
+    "keywords": [
+      "harmonics",
+      "standing wave",
+      "resonance",
+      "frequency",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-842",
+    "title": "Beats",
+    "url": "https://www.youtube.com/embed/4M72kQulGKk",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "waves",
+      "beats",
+      "sound"
+    ],
+    "keywords": [
+      "beats",
+      "wave interference",
+      "frequency",
+      "sound",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-843",
+    "title": "Light Absorption, Reflection, and Transmission",
+    "url": "https://www.youtube.com/embed/DOsro2kGjGc",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "optics",
+      "light"
+    ],
+    "keywords": [
+      "light absorption",
+      "reflection",
+      "transmission",
+      "optics",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-844",
+    "title": "Specular Reflection",
+    "url": "https://www.youtube.com/embed/2cFvJkc4pQk",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "optics",
+      "reflection"
+    ],
+    "keywords": [
+      "specular reflection",
+      "mirror",
+      "optics",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-845",
+    "title": "Refraction of Light",
+    "url": "https://www.youtube.com/embed/DR-8ZRCHCXI",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "optics",
+      "refraction"
+    ],
+    "keywords": [
+      "refraction",
+      "snell's law",
+      "optics",
+      "light",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-846",
+    "title": "Ray Diagrams - Mirrors",
+    "url": "https://www.youtube.com/embed/xrMvnjOgsig",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "optics",
+      "mirrors",
+      "ray-diagrams"
+    ],
+    "keywords": [
+      "ray diagram",
+      "mirror",
+      "optics",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-847",
+    "title": "Ray Diagrams - Lenses",
+    "url": "https://www.youtube.com/embed/mfytZxM8lho",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "optics",
+      "lenses",
+      "ray-diagrams"
+    ],
+    "keywords": [
+      "ray diagram",
+      "lens",
+      "optics",
+      "focal point",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-848",
+    "title": "Electromagnetic Radiation",
+    "url": "https://www.youtube.com/embed/OzFU6XvzzgA",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "electromagnetism",
+      "radiation"
+    ],
+    "keywords": [
+      "electromagnetic radiation",
+      "spectrum",
+      "photon",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-849",
+    "title": "Electromagnetic Waves",
+    "url": "https://www.youtube.com/embed/WNkB8IY-k04",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "electromagnetism",
+      "waves"
+    ],
+    "keywords": [
+      "electromagnetic wave",
+      "light",
+      "Maxwell",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-850",
+    "title": "Photons",
+    "url": "https://www.youtube.com/embed/Y0048AI5uEQ",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "quantum",
+      "photons"
+    ],
+    "keywords": [
+      "photon",
+      "quantum",
+      "light",
+      "energy",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-851",
+    "title": "Wave-Particle Duality of Light",
+    "url": "https://www.youtube.com/embed/h1tflE-L2Dc",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "quantum",
+      "optics",
+      "light"
+    ],
+    "keywords": [
+      "wave particle duality",
+      "photon",
+      "light",
+      "quantum",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-852",
+    "title": "Matter as a Particle",
+    "url": "https://www.youtube.com/embed/rw_MjWhttFI",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "quantum",
+      "particles"
+    ],
+    "keywords": [
+      "matter",
+      "particle",
+      "quantum",
+      "de broglie",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-853",
+    "title": "Matter as a Wave",
+    "url": "https://www.youtube.com/embed/caVIh3RZOA4",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "quantum",
+      "waves"
+    ],
+    "keywords": [
+      "matter wave",
+      "de broglie",
+      "quantum",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-854",
+    "title": "Gas Pressure",
+    "url": "https://www.youtube.com/embed/H9VtHkPWNeA",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "thermodynamics",
+      "gas",
+      "pressure"
+    ],
+    "keywords": [
+      "gas pressure",
+      "pressure",
+      "thermodynamics",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-855",
+    "title": "Kinetic Theory and Temperature",
+    "url": "https://www.youtube.com/embed/1S9cuYascPQ",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "thermodynamics",
+      "kinetic-theory"
+    ],
+    "keywords": [
+      "kinetic theory",
+      "temperature",
+      "gas",
+      "thermodynamics",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-856",
+    "title": "Ideal Gas Law",
+    "url": "https://www.youtube.com/embed/ir64EcRkf5Q",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "thermodynamics",
+      "gas"
+    ],
+    "keywords": [
+      "ideal gas law",
+      "PV=nRT",
+      "pressure",
+      "volume",
+      "temperature",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-857",
+    "title": "Thermal Equilibrium",
+    "url": "https://www.youtube.com/embed/gzy4YFuKg9A",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "thermodynamics",
+      "thermal"
+    ],
+    "keywords": [
+      "thermal equilibrium",
+      "temperature",
+      "thermodynamics",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-858",
+    "title": "Second Law of Thermodynamics",
+    "url": "https://www.youtube.com/embed/YoekFxOizj4",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "thermodynamics",
+      "entropy"
+    ],
+    "keywords": [
+      "second law",
+      "thermodynamics",
+      "entropy",
+      "heat",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-859",
+    "title": "Wave Function",
+    "url": "https://www.youtube.com/embed/Xh6NRenkdRk",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "quantum",
+      "wave-function"
+    ],
+    "keywords": [
+      "wave function",
+      "quantum mechanics",
+      "probability",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-860",
+    "title": "Wave Model of an Electron",
+    "url": "https://www.youtube.com/embed/kpa_HO6yy18",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "quantum",
+      "electron"
+    ],
+    "keywords": [
+      "wave model",
+      "electron",
+      "quantum",
+      "de broglie",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-861",
+    "title": "Half-Life and Radioactive Decay",
+    "url": "https://www.youtube.com/embed/HRwey6cwGHo",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "nuclear",
+      "radioactive",
+      "half-life"
+    ],
+    "keywords": [
+      "half life",
+      "radioactive decay",
+      "nuclear",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-862",
+    "title": "Stimulated Emission",
+    "url": "https://www.youtube.com/embed/YHmGNDMV1cY",
+    "source": "physics-fundamentals",
+    "tags": [
+      "physics",
+      "quantum",
+      "laser",
+      "stimulated-emission"
+    ],
+    "keywords": [
+      "stimulated emission",
+      "laser",
+      "photon",
+      "quantum",
+      "physics"
+    ]
+  },
+  {
+    "id": "vid-863",
+    "title": "Mastering Probability and Statistics in Python",
+    "url": "https://www.youtube.com/embed/dmHcFQQPGEE",
+    "source": "data-science-python",
+    "tags": [
+      "statistics",
+      "probability",
+      "python",
+      "data-science"
+    ],
+    "keywords": [
+      "probability",
+      "statistics",
+      "python",
+      "data science"
+    ]
+  },
+  {
+    "id": "vid-864",
+    "title": "Mastering Probability and Statistics in Python - Part 1",
+    "url": "https://www.youtube.com/embed/KEhWSpdMCVk",
+    "source": "data-science-python",
+    "tags": [
+      "statistics",
+      "probability",
+      "python"
+    ],
+    "keywords": [
+      "probability",
+      "statistics",
+      "python",
+      "distributions"
+    ]
+  },
+  {
+    "id": "vid-865",
+    "title": "Mastering Probability and Statistics in Python - Part 2",
+    "url": "https://www.youtube.com/embed/Sohise7Gvvs",
+    "source": "data-science-python",
+    "tags": [
+      "statistics",
+      "probability",
+      "python"
+    ],
+    "keywords": [
+      "probability",
+      "statistics",
+      "python",
+      "hypothesis testing"
+    ]
+  },
+  {
+    "id": "vid-866",
+    "title": "Mastering Probability and Statistics in Python - Part 3",
+    "url": "https://www.youtube.com/embed/FhutZ11m7pI",
+    "source": "data-science-python",
+    "tags": [
+      "statistics",
+      "probability",
+      "python"
+    ],
+    "keywords": [
+      "probability",
+      "statistics",
+      "python",
+      "regression"
+    ]
+  },
+  {
+    "id": "vid-867",
+    "title": "Mastering Probability and Statistics in Python - Part 4",
+    "url": "https://www.youtube.com/embed/AgYr7PR9VQs",
+    "source": "data-science-python",
+    "tags": [
+      "statistics",
+      "probability",
+      "python"
+    ],
+    "keywords": [
+      "probability",
+      "statistics",
+      "python",
+      "data analysis"
+    ]
+  },
+  {
+    "id": "vid-868",
+    "title": "Mastering Probability and Statistics in Python - Part 5",
+    "url": "https://www.youtube.com/embed/O2XBkc9Z4r4",
+    "source": "data-science-python",
+    "tags": [
+      "statistics",
+      "probability",
+      "python"
+    ],
+    "keywords": [
+      "probability",
+      "statistics",
+      "python",
+      "scipy"
+    ]
+  },
+  {
+    "id": "vid-869",
+    "title": "Mastering Probability and Statistics in Python - Part 6",
+    "url": "https://www.youtube.com/embed/9Unh0dKpohA",
+    "source": "data-science-python",
+    "tags": [
+      "statistics",
+      "probability",
+      "python"
+    ],
+    "keywords": [
+      "probability",
+      "statistics",
+      "python",
+      "numpy"
+    ]
+  },
+  {
+    "id": "vid-870",
+    "title": "Mastering Probability and Statistics in Python - 1 Hour Full Course",
+    "url": "https://www.youtube.com/embed/bzpdXuRbjUY",
+    "source": "data-science-python",
+    "tags": [
+      "statistics",
+      "probability",
+      "python",
+      "full-course"
+    ],
+    "keywords": [
+      "probability",
+      "statistics",
+      "python",
+      "full course",
+      "tutorial"
+    ]
+  },
+  {
+    "id": "vid-871",
+    "title": "Mastering Probability and Statistics in Python - Full Video Series 2",
+    "url": "https://www.youtube.com/embed/lwq1zW-xhbE",
+    "source": "data-science-python",
+    "tags": [
+      "statistics",
+      "probability",
+      "python"
+    ],
+    "keywords": [
+      "probability",
+      "statistics",
+      "python",
+      "full course"
+    ]
+  },
+  {
+    "id": "vid-872",
+    "title": "Generate Data Report of any Dataset in 3 Lines of Python",
+    "url": "https://www.youtube.com/embed/SGlTOw9eZPU",
+    "source": "data-science-python",
+    "tags": [
+      "python",
+      "data-science",
+      "pandas",
+      "eda"
+    ],
+    "keywords": [
+      "data report",
+      "pandas profiling",
+      "EDA",
+      "python",
+      "data science"
+    ]
+  },
+  {
+    "id": "vid-873",
+    "title": "Tableau Overview: Unlocking the Power of Data Visualization",
+    "url": "https://www.youtube.com/embed/7oWhxM7W5cY",
+    "source": "data-science-python",
+    "tags": [
+      "data-visualization",
+      "tableau",
+      "data-science"
+    ],
+    "keywords": [
+      "tableau",
+      "data visualization",
+      "dashboard",
+      "business intelligence"
+    ]
+  },
+  {
+    "id": "vid-874",
+    "title": "Exploring the Power of GitHub: Revolutionizing Collaboration",
+    "url": "https://www.youtube.com/embed/xbhQ2G7OWd4",
+    "source": "data-science-python",
+    "tags": [
+      "git",
+      "github",
+      "version-control"
+    ],
+    "keywords": [
+      "github",
+      "git",
+      "version control",
+      "collaboration"
+    ]
+  },
+  {
+    "id": "vid-875",
+    "title": "How To Start Freelancing For Beginners",
+    "url": "https://www.youtube.com/embed/AItuxHPAH1U",
+    "source": "data-science-python",
+    "tags": [
+      "career",
+      "freelancing"
+    ],
+    "keywords": [
+      "freelancing",
+      "career",
+      "data science"
+    ]
+  },
+  {
+    "id": "vid-876",
+    "title": "How to Create a GitHub Account",
+    "url": "https://www.youtube.com/embed/h5cKAd94QNo",
+    "source": "data-science-python",
+    "tags": [
+      "git",
+      "github"
+    ],
+    "keywords": [
+      "github",
+      "account",
+      "setup",
+      "version control"
+    ]
+  },
+  {
+    "id": "vid-877",
+    "title": "Mastering Data Analysis | E-Commerce Promotions with Data Analysis",
+    "url": "https://www.youtube.com/embed/HquVFLrbfaw",
+    "source": "data-science-python",
+    "tags": [
+      "data-science",
+      "data-analysis",
+      "python"
+    ],
+    "keywords": [
+      "data analysis",
+      "e-commerce",
+      "python",
+      "pandas"
+    ]
+  },
+  {
+    "id": "vid-878",
+    "title": "Whatsapp Automation with Python: Practical Project",
+    "url": "https://www.youtube.com/embed/Q8WB72taXig",
+    "source": "data-science-python",
+    "tags": [
+      "python",
+      "automation"
+    ],
+    "keywords": [
+      "automation",
+      "python",
+      "whatsapp",
+      "scripting"
+    ]
+  },
+  {
+    "id": "vid-879",
+    "title": "Introduction To Amazon Web Services (AWS)",
+    "url": "https://www.youtube.com/embed/Bo1cyDuaqhk",
+    "source": "data-science-python",
+    "tags": [
+      "cloud",
+      "aws",
+      "data-science"
+    ],
+    "keywords": [
+      "AWS",
+      "amazon web services",
+      "cloud computing"
+    ]
+  },
+  {
+    "id": "vid-880",
+    "title": "Get Started with GitHub Copilot",
+    "url": "https://www.youtube.com/embed/pTvcQHE-MIg",
+    "source": "data-science-python",
+    "tags": [
+      "ai",
+      "github",
+      "copilot"
+    ],
+    "keywords": [
+      "github copilot",
+      "AI coding",
+      "code completion"
+    ]
+  },
+  {
+    "id": "vid-881",
+    "title": "Time Series Analysis Overview | Features of Time Series",
+    "url": "https://www.youtube.com/embed/41xVQeq0RWE",
+    "source": "data-science-python",
+    "tags": [
+      "statistics",
+      "time-series",
+      "data-science"
+    ],
+    "keywords": [
+      "time series",
+      "time series analysis",
+      "features",
+      "stationarity"
+    ]
+  },
+  {
+    "id": "vid-882",
+    "title": "Email Automation using Python: Practical Project",
+    "url": "https://www.youtube.com/embed/B_ulQUuKn9A",
+    "source": "data-science-python",
+    "tags": [
+      "python",
+      "automation"
+    ],
+    "keywords": [
+      "email automation",
+      "python",
+      "smtp",
+      "scripting"
+    ]
+  },
+  {
+    "id": "vid-883",
+    "title": "What are the Applications of PySpark",
+    "url": "https://www.youtube.com/embed/uBWWi7l7Nvo",
+    "source": "data-science-python",
+    "tags": [
+      "pyspark",
+      "big-data",
+      "data-science"
+    ],
+    "keywords": [
+      "PySpark",
+      "spark",
+      "big data",
+      "distributed computing"
+    ]
+  },
+  {
+    "id": "vid-884",
+    "title": "Mastering MongoDB: Practical Applications and Use Cases",
+    "url": "https://www.youtube.com/embed/4frkp5EsQrE",
+    "source": "data-science-python",
+    "tags": [
+      "databases",
+      "mongodb",
+      "nosql"
+    ],
+    "keywords": [
+      "MongoDB",
+      "NoSQL",
+      "database",
+      "data science"
+    ]
+  },
+  {
+    "id": "vid-885",
+    "title": "What is Reinforcement Learning in Python",
+    "url": "https://www.youtube.com/embed/-qL1PLIisD8",
+    "source": "data-science-python",
+    "tags": [
+      "machine-learning",
+      "reinforcement-learning",
+      "python"
+    ],
+    "keywords": [
+      "reinforcement learning",
+      "RL",
+      "python",
+      "agent",
+      "reward"
+    ]
+  },
+  {
+    "id": "vid-886",
+    "title": "What are the Benefits of Using a Chatbot",
+    "url": "https://www.youtube.com/embed/HZJRt3Bk_0M",
+    "source": "data-science-python",
+    "tags": [
+      "ai",
+      "chatbot",
+      "nlp"
+    ],
+    "keywords": [
+      "chatbot",
+      "AI",
+      "NLP",
+      "conversational AI"
+    ]
+  },
+  {
+    "id": "vid-887",
+    "title": "Brain Tumor Detection using Python - Complete Project",
+    "url": "https://www.youtube.com/embed/zxD-v3ve-bk",
+    "source": "data-science-python",
+    "tags": [
+      "deep-learning",
+      "computer-vision",
+      "medical-imaging"
+    ],
+    "keywords": [
+      "brain tumor",
+      "image classification",
+      "CNN",
+      "medical imaging",
+      "python"
+    ]
+  },
+  {
+    "id": "vid-888",
+    "title": "What Are Tensors in PyTorch? Deep Learning with PyTorch",
+    "url": "https://www.youtube.com/embed/Ik4ednouQ94",
+    "source": "data-science-python",
+    "tags": [
+      "deep-learning",
+      "pytorch",
+      "tensors"
+    ],
+    "keywords": [
+      "tensor",
+      "PyTorch",
+      "deep learning",
+      "neural network"
+    ]
+  },
+  {
+    "id": "vid-889",
+    "title": "How to Create Images Using AI Copilot",
+    "url": "https://www.youtube.com/embed/xSyEhfKFJE8",
+    "source": "data-science-python",
+    "tags": [
+      "ai",
+      "image-generation"
+    ],
+    "keywords": [
+      "AI image generation",
+      "copilot",
+      "generative AI"
+    ]
+  },
+  {
+    "id": "vid-890",
+    "title": "Geometric Transformations in Computer Vision",
+    "url": "https://www.youtube.com/embed/tHr-0CVS5RU",
+    "source": "data-science-python",
+    "tags": [
+      "computer-vision",
+      "image-processing",
+      "transformations"
+    ],
+    "keywords": [
+      "geometric transformation",
+      "computer vision",
+      "image processing",
+      "opencv"
+    ]
+  },
+  {
+    "id": "vid-891",
+    "title": "What is Regular Expression in Python",
+    "url": "https://www.youtube.com/embed/vKg6UEP34RE",
+    "source": "data-science-python",
+    "tags": [
+      "python",
+      "regex",
+      "text-processing"
+    ],
+    "keywords": [
+      "regular expression",
+      "regex",
+      "python",
+      "text processing"
+    ]
+  },
+  {
+    "id": "vid-892",
+    "title": "Email Automation in Python: A Practical Tutorial",
+    "url": "https://www.youtube.com/embed/yZZ6gRYIyGs",
+    "source": "data-science-python",
+    "tags": [
+      "python",
+      "automation"
+    ],
+    "keywords": [
+      "email",
+      "automation",
+      "python",
+      "smtp"
+    ]
+  },
+  {
+    "id": "vid-893",
+    "title": "The Power of Prompt Engineering: Maximizing Productivity",
+    "url": "https://www.youtube.com/embed/-1fy7jhiiwc",
+    "source": "data-science-python",
+    "tags": [
+      "ai",
+      "prompt-engineering",
+      "llm"
+    ],
+    "keywords": [
+      "prompt engineering",
+      "LLM",
+      "ChatGPT",
+      "AI productivity"
+    ]
+  },
+  {
+    "id": "vid-894",
+    "title": "Automating Hyperparameter Tuning with Optuna for Machine Learning",
+    "url": "https://www.youtube.com/embed/kR9pOvr9Urs",
+    "source": "data-science-python",
+    "tags": [
+      "machine-learning",
+      "hyperparameter-tuning",
+      "python"
+    ],
+    "keywords": [
+      "hyperparameter tuning",
+      "optuna",
+      "machine learning",
+      "optimization"
+    ]
+  },
+  {
+    "id": "vid-895",
+    "title": "Naive Bayes Classifier in Python From Scratch",
+    "url": "https://www.youtube.com/embed/03KoYDlJpxE",
+    "source": "data-science-python",
+    "tags": [
+      "machine-learning",
+      "classification",
+      "naive-bayes",
+      "python"
+    ],
+    "keywords": [
+      "naive bayes",
+      "classifier",
+      "python",
+      "machine learning",
+      "from scratch"
+    ]
+  },
+  {
+    "id": "vid-896",
+    "title": "Dimensionality Reduction in Python: Simplifying Data with Pipelines",
+    "url": "https://www.youtube.com/embed/8ckCH08WNRw",
+    "source": "data-science-python",
+    "tags": [
+      "machine-learning",
+      "dimensionality-reduction",
+      "pca"
+    ],
+    "keywords": [
+      "dimensionality reduction",
+      "PCA",
+      "pipeline",
+      "scikit-learn",
+      "python"
+    ]
+  },
+  {
+    "id": "vid-897",
+    "title": "Data Analysis Project Using Python | COVID-19 Data Analysis",
+    "url": "https://www.youtube.com/embed/zz7thyf4Vvo",
+    "source": "data-science-python",
+    "tags": [
+      "data-science",
+      "data-analysis",
+      "python",
+      "pandas"
+    ],
+    "keywords": [
+      "data analysis",
+      "COVID",
+      "pandas",
+      "python",
+      "data visualization"
+    ]
+  },
+  {
+    "id": "vid-898",
+    "title": "Object Detection Using Python & OpenCV",
+    "url": "https://www.youtube.com/embed/u3fu2tkDHG4",
+    "source": "data-science-python",
+    "tags": [
+      "computer-vision",
+      "object-detection",
+      "opencv"
+    ],
+    "keywords": [
+      "object detection",
+      "opencv",
+      "computer vision",
+      "python"
+    ]
+  },
+  {
+    "id": "vid-899",
+    "title": "Multiple Object Detection Using Python & OpenCV",
+    "url": "https://www.youtube.com/embed/8_wA9dE_NYg",
+    "source": "data-science-python",
+    "tags": [
+      "computer-vision",
+      "object-detection",
+      "opencv"
+    ],
+    "keywords": [
+      "object detection",
+      "multiple objects",
+      "opencv",
+      "python",
+      "computer vision"
+    ]
+  },
+  {
+    "id": "vid-900",
+    "title": "Real-Time Multiple Object Tracking with WebCam",
+    "url": "https://www.youtube.com/embed/ZvSMjGWBYJI",
+    "source": "data-science-python",
+    "tags": [
+      "computer-vision",
+      "object-tracking",
+      "opencv"
+    ],
+    "keywords": [
+      "object tracking",
+      "real time",
+      "webcam",
+      "opencv",
+      "computer vision"
+    ]
+  },
+  {
+    "id": "vid-901",
+    "title": "Facebook Automation Tutorial",
+    "url": "https://www.youtube.com/embed/PaA1IwTtQNk",
+    "source": "data-science-python",
+    "tags": [
+      "python",
+      "automation"
+    ],
+    "keywords": [
+      "automation",
+      "selenium",
+      "python",
+      "social media"
+    ]
+  },
+  {
+    "id": "vid-902",
+    "title": "ETL Project | Load Data from S3 to RDS",
+    "url": "https://www.youtube.com/embed/SpzWSV9n1J8",
+    "source": "data-science-python",
+    "tags": [
+      "data-engineering",
+      "etl",
+      "aws"
+    ],
+    "keywords": [
+      "ETL",
+      "S3",
+      "RDS",
+      "AWS",
+      "data pipeline"
+    ]
+  },
+  {
+    "id": "vid-903",
+    "title": "Deep Learning for Face Recognition: Siamese Network + VGGFace",
+    "url": "https://www.youtube.com/embed/7kuSJEk5jjw",
+    "source": "data-science-python",
+    "tags": [
+      "deep-learning",
+      "face-recognition",
+      "siamese-network"
+    ],
+    "keywords": [
+      "face recognition",
+      "siamese network",
+      "deep learning",
+      "VGGFace"
+    ]
+  },
+  {
+    "id": "vid-904",
+    "title": "How to Undo a Pushed Commit in Git Using Visual Studio",
+    "url": "https://www.youtube.com/embed/H2vAgLmlkLs",
+    "source": "data-science-python",
+    "tags": [
+      "git",
+      "version-control"
+    ],
+    "keywords": [
+      "git revert",
+      "undo commit",
+      "git",
+      "version control"
+    ]
+  },
+  {
+    "id": "vid-905",
+    "title": "How to Use TensorFlow Hub for Transfer Learning in Neural Networks",
+    "url": "https://www.youtube.com/embed/AORpATSOOf0",
+    "source": "data-science-python",
+    "tags": [
+      "deep-learning",
+      "transfer-learning",
+      "tensorflow"
+    ],
+    "keywords": [
+      "transfer learning",
+      "TensorFlow Hub",
+      "neural network",
+      "deep learning"
+    ]
+  },
+  {
+    "id": "vid-906",
+    "title": "Python Face Detection & Recognition | Complete Project Guide",
+    "url": "https://www.youtube.com/embed/zlSmogeuF5k",
+    "source": "data-science-python",
+    "tags": [
+      "computer-vision",
+      "face-recognition",
+      "python"
+    ],
+    "keywords": [
+      "face detection",
+      "face recognition",
+      "python",
+      "computer vision"
+    ]
+  },
+  {
+    "id": "vid-907",
+    "title": "PySpark Project: Analyze Student Data Using RDD",
+    "url": "https://www.youtube.com/embed/vVSKq8vtbAA",
+    "source": "data-science-python",
+    "tags": [
+      "pyspark",
+      "big-data",
+      "rdd"
+    ],
+    "keywords": [
+      "PySpark",
+      "RDD",
+      "big data",
+      "spark",
+      "data analysis"
+    ]
+  },
+  {
+    "id": "vid-908",
+    "title": "PySpark Project: Analyze Student Data Using RDD Part 2",
+    "url": "https://www.youtube.com/embed/IQvkx4urKaM",
+    "source": "data-science-python",
+    "tags": [
+      "pyspark",
+      "big-data",
+      "rdd"
+    ],
+    "keywords": [
+      "PySpark",
+      "RDD",
+      "big data",
+      "spark"
+    ]
+  },
+  {
+    "id": "vid-909",
+    "title": "OpenAI API Basics to Chatbot Creation",
+    "url": "https://www.youtube.com/embed/FsSet90nRDo",
+    "source": "data-science-python",
+    "tags": [
+      "ai",
+      "openai",
+      "chatbot",
+      "api"
+    ],
+    "keywords": [
+      "OpenAI",
+      "ChatGPT",
+      "API",
+      "chatbot",
+      "python"
+    ]
+  },
+  {
+    "id": "vid-910",
+    "title": "Sales Data Analysis Using AWS QuickSight | Dashboard Building",
+    "url": "https://www.youtube.com/embed/rZF8piyxUvc",
+    "source": "data-science-python",
+    "tags": [
+      "data-visualization",
+      "aws",
+      "business-intelligence"
+    ],
+    "keywords": [
+      "QuickSight",
+      "AWS",
+      "dashboard",
+      "data visualization",
+      "sales analysis"
+    ]
+  },
+  {
+    "id": "vid-911",
+    "title": "Selenium Web Scraping: Automate Text Translation & File Processing",
+    "url": "https://www.youtube.com/embed/EnfH-eidNIE",
+    "source": "data-science-python",
+    "tags": [
+      "python",
+      "web-scraping",
+      "selenium"
+    ],
+    "keywords": [
+      "selenium",
+      "web scraping",
+      "automation",
+      "python"
+    ]
+  },
+  {
+    "id": "vid-912",
+    "title": "Trading Bot with Reinforcement Learning: Gym & AnyTrading",
+    "url": "https://www.youtube.com/embed/LD8rs6Zm88g",
+    "source": "data-science-python",
+    "tags": [
+      "machine-learning",
+      "reinforcement-learning",
+      "finance"
+    ],
+    "keywords": [
+      "trading bot",
+      "reinforcement learning",
+      "gym",
+      "python",
+      "finance"
+    ]
+  },
+  {
+    "id": "vid-913",
+    "title": "Predicting Daily Sales | Machine Learning for Revenue Forecasting",
+    "url": "https://www.youtube.com/embed/P3XwjwtJFpo",
+    "source": "data-science-python",
+    "tags": [
+      "machine-learning",
+      "forecasting",
+      "regression"
+    ],
+    "keywords": [
+      "sales prediction",
+      "machine learning",
+      "forecasting",
+      "regression",
+      "python"
+    ]
+  },
+  {
+    "id": "vid-914",
+    "title": "Text Classification with TensorFlow RNN",
+    "url": "https://www.youtube.com/embed/PHZNLVNCigM",
+    "source": "data-science-python",
+    "tags": [
+      "deep-learning",
+      "nlp",
+      "rnn",
+      "tensorflow"
+    ],
+    "keywords": [
+      "text classification",
+      "RNN",
+      "TensorFlow",
+      "NLP",
+      "deep learning"
+    ]
+  },
+  {
+    "id": "vid-915",
+    "title": "Deep Learning for Temperature Conversion | Celsius to Fahrenheit with TensorFlow",
+    "url": "https://www.youtube.com/embed/DVZEG2ValMA",
+    "source": "data-science-python",
+    "tags": [
+      "deep-learning",
+      "tensorflow"
+    ],
+    "keywords": [
+      "TensorFlow",
+      "neural network",
+      "regression",
+      "deep learning",
+      "python"
+    ]
+  },
+  {
+    "id": "vid-916",
+    "title": "Text Normalization: The First Step in NLP",
+    "url": "https://www.youtube.com/embed/ruhxhymgifk",
+    "source": "data-science-python",
+    "tags": [
+      "nlp",
+      "text-processing",
+      "preprocessing"
+    ],
+    "keywords": [
+      "text normalization",
+      "NLP",
+      "preprocessing",
+      "tokenization",
+      "python"
+    ]
+  },
+  {
+    "id": "vid-917",
+    "title": "Scikit-Learn for Machine Learning: Complete Guide",
+    "url": "https://www.youtube.com/embed/PESnEZ567_8",
+    "source": "data-science-python",
+    "tags": [
+      "machine-learning",
+      "scikit-learn",
+      "python"
+    ],
+    "keywords": [
+      "scikit-learn",
+      "linear regression",
+      "SVM",
+      "random forest",
+      "machine learning",
+      "python"
+    ]
+  },
+  {
+    "id": "vid-918",
+    "title": "Handling Missing Values in Python: Complete Guide",
+    "url": "https://www.youtube.com/embed/l8xhOGGLyiU",
+    "source": "data-science-python",
+    "tags": [
+      "data-science",
+      "data-cleaning",
+      "pandas"
+    ],
+    "keywords": [
+      "missing values",
+      "data cleaning",
+      "imputation",
+      "pandas",
+      "python"
+    ]
+  },
+  {
+    "id": "vid-919",
+    "title": "Scrape Movie Titles from IMDB in Minutes! | Python Web Scraping",
+    "url": "https://www.youtube.com/embed/_l3Wt993acg",
+    "source": "data-science-python",
+    "tags": [
+      "python",
+      "web-scraping",
+      "beautifulsoup"
+    ],
+    "keywords": [
+      "web scraping",
+      "IMDB",
+      "BeautifulSoup",
+      "python"
+    ]
+  },
+  {
+    "id": "vid-920",
+    "title": "Calculator App Mini Project | ChatGPT Solution & Exception Handling",
+    "url": "https://www.youtube.com/embed/in0ezgpTDAA",
+    "source": "data-science-python",
+    "tags": [
+      "python",
+      "projects"
+    ],
+    "keywords": [
+      "python",
+      "calculator",
+      "exception handling",
+      "project"
+    ]
+  },
+  {
+    "id": "vid-921",
+    "title": "Q-Learning with FrozenLake in OpenAI Gym",
+    "url": "https://www.youtube.com/embed/fqo1-G0xDI8",
+    "source": "data-science-python",
+    "tags": [
+      "machine-learning",
+      "reinforcement-learning",
+      "q-learning"
+    ],
+    "keywords": [
+      "Q-learning",
+      "reinforcement learning",
+      "OpenAI Gym",
+      "python"
+    ]
+  },
+  {
+    "id": "vid-922",
+    "title": "Types of Encoding Explained | Python Implementation",
+    "url": "https://www.youtube.com/embed/KeqOv-RROwo",
+    "source": "data-science-python",
+    "tags": [
+      "machine-learning",
+      "feature-engineering",
+      "encoding"
+    ],
+    "keywords": [
+      "encoding",
+      "one hot encoding",
+      "label encoding",
+      "machine learning",
+      "python"
+    ]
+  },
+  {
+    "id": "vid-923",
+    "title": "Time Series Forecasting with RNN | Predicting Birthrate",
+    "url": "https://www.youtube.com/embed/L1fb14syqNM",
+    "source": "data-science-python",
+    "tags": [
+      "deep-learning",
+      "time-series",
+      "rnn"
+    ],
+    "keywords": [
+      "time series",
+      "RNN",
+      "forecasting",
+      "LSTM",
+      "python"
+    ]
+  },
+  {
+    "id": "vid-924",
+    "title": "Deep Learning Essentials: One-Hot Encoding, Scaling & Splitting Data",
+    "url": "https://www.youtube.com/embed/bV3aoSNoVGc",
+    "source": "data-science-python",
+    "tags": [
+      "deep-learning",
+      "data-preprocessing"
+    ],
+    "keywords": [
+      "one hot encoding",
+      "scaling",
+      "data splitting",
+      "neural network",
+      "deep learning"
+    ]
+  },
+  {
+    "id": "vid-925",
+    "title": "Deep Learning Implementation | Training and Testing Neural Networks",
+    "url": "https://www.youtube.com/embed/R9Dy6M6B8BE",
+    "source": "data-science-python",
+    "tags": [
+      "deep-learning",
+      "neural-networks",
+      "python"
+    ],
+    "keywords": [
+      "neural network",
+      "training",
+      "testing",
+      "deep learning",
+      "python"
+    ]
+  },
+  {
+    "id": "vid-926",
+    "title": "Hands-On PySpark Project | Analyze Employees by Department",
+    "url": "https://www.youtube.com/embed/dbg8HvSxuXU",
+    "source": "data-science-python",
+    "tags": [
+      "pyspark",
+      "big-data",
+      "data-analysis"
+    ],
+    "keywords": [
+      "PySpark",
+      "groupby",
+      "aggregation",
+      "big data",
+      "spark"
+    ]
+  },
+  {
+    "id": "vid-927",
+    "title": "PySpark Project: Advanced DataFrame Operations",
+    "url": "https://www.youtube.com/embed/FKLS3tu2Jw0",
+    "source": "data-science-python",
+    "tags": [
+      "pyspark",
+      "big-data",
+      "dataframes"
+    ],
+    "keywords": [
+      "PySpark",
+      "DataFrame",
+      "UDF",
+      "filtering",
+      "spark"
+    ]
+  },
+  {
+    "id": "vid-928",
+    "title": "Complete Web Scraping Guide Using BeautifulSoup",
+    "url": "https://www.youtube.com/embed/rl4r6AvTiQI",
+    "source": "data-science-python",
+    "tags": [
+      "python",
+      "web-scraping",
+      "beautifulsoup"
+    ],
+    "keywords": [
+      "web scraping",
+      "BeautifulSoup",
+      "requests",
+      "HTML",
+      "python"
+    ]
+  },
+  {
+    "id": "vid-929",
+    "title": "Implementing Recurrent Neural Networks for Text Classification in TensorFlow",
+    "url": "https://www.youtube.com/embed/7mSl-QjIXE4",
+    "source": "data-science-python",
+    "tags": [
+      "deep-learning",
+      "nlp",
+      "rnn",
+      "tensorflow"
+    ],
+    "keywords": [
+      "RNN",
+      "text classification",
+      "TensorFlow",
+      "deep learning",
+      "NLP"
+    ]
+  },
+  {
+    "id": "vid-930",
+    "title": "Vocabulary Building for Sentiment Classification using RNN in NLP",
+    "url": "https://www.youtube.com/embed/xjdS0UWpXQg",
+    "source": "data-science-python",
+    "tags": [
+      "deep-learning",
+      "nlp",
+      "rnn",
+      "sentiment-analysis"
+    ],
+    "keywords": [
+      "vocabulary",
+      "sentiment analysis",
+      "RNN",
+      "NLP",
+      "python"
+    ]
+  },
+  {
+    "id": "vid-931",
+    "title": "Complete Pandas Tutorial for Data Science | Series, DataFrames, and Cleaning Data",
+    "url": "https://www.youtube.com/embed/4oxktsJLvis",
+    "source": "data-science-python",
+    "tags": [
+      "python",
+      "pandas",
+      "data-science"
+    ],
+    "keywords": [
+      "pandas",
+      "DataFrame",
+      "Series",
+      "data cleaning",
+      "python",
+      "data science"
+    ]
+  },
+  {
+    "id": "vid-932",
+    "title": "Build a Machine Learning Model from Scratch in Python | Linear Regression",
+    "url": "https://www.youtube.com/embed/wSt8cgSrVTo",
+    "source": "data-science-python",
+    "tags": [
+      "machine-learning",
+      "linear-regression",
+      "python"
+    ],
+    "keywords": [
+      "linear regression",
+      "machine learning",
+      "from scratch",
+      "python",
+      "gradient descent"
+    ]
+  },
+  {
+    "id": "vid-933",
+    "title": "Machine Learning Classifier from Scratch | Distance-Based Classification",
+    "url": "https://www.youtube.com/embed/pspoZc1-wgA",
+    "source": "data-science-python",
+    "tags": [
+      "machine-learning",
+      "classification",
+      "python"
+    ],
+    "keywords": [
+      "KNN",
+      "distance",
+      "classifier",
+      "machine learning",
+      "python"
+    ]
+  },
+  {
+    "id": "vid-934",
+    "title": "K-Means Clustering Explained & Coded from Scratch in Python",
+    "url": "https://www.youtube.com/embed/wbDU2HCjEKM",
+    "source": "data-science-python",
+    "tags": [
+      "machine-learning",
+      "clustering",
+      "k-means"
+    ],
+    "keywords": [
+      "k-means",
+      "clustering",
+      "unsupervised learning",
+      "python",
+      "machine learning"
+    ]
+  },
+  {
+    "id": "vid-935",
+    "title": "Image Processing Basics in Python | RGB Channels & Grayscale",
+    "url": "https://www.youtube.com/embed/W0xadIEtgiA",
+    "source": "data-science-python",
+    "tags": [
+      "computer-vision",
+      "image-processing",
+      "python"
+    ],
+    "keywords": [
+      "image processing",
+      "RGB",
+      "grayscale",
+      "opencv",
+      "python"
+    ]
+  },
+  {
+    "id": "vid-936",
+    "title": "Python Bokeh Tutorial | Interactive Plots, Multiplots & Grid Layouts",
+    "url": "https://www.youtube.com/embed/fcWMTrrfcOw",
+    "source": "data-science-python",
+    "tags": [
+      "python",
+      "data-visualization",
+      "bokeh"
+    ],
+    "keywords": [
+      "bokeh",
+      "interactive plots",
+      "data visualization",
+      "python"
+    ]
+  },
+  {
+    "id": "vid-937",
+    "title": "Feature Selection in Machine Learning | Filter Method",
+    "url": "https://www.youtube.com/embed/ywUXqGNJx5E",
+    "source": "data-science-python",
+    "tags": [
+      "machine-learning",
+      "feature-selection"
+    ],
+    "keywords": [
+      "feature selection",
+      "filter method",
+      "machine learning",
+      "correlation",
+      "python"
+    ]
+  },
+  {
+    "id": "vid-938",
+    "title": "Wrapper Methods for Feature Selection in Machine Learning",
+    "url": "https://www.youtube.com/embed/ZzqWtxOdz3Q",
+    "source": "data-science-python",
+    "tags": [
+      "machine-learning",
+      "feature-selection"
+    ],
+    "keywords": [
+      "feature selection",
+      "wrapper method",
+      "RFE",
+      "machine learning",
+      "python"
+    ]
+  },
+  {
+    "id": "vid-939",
+    "title": "Embedded Methods for Feature Selection | Machine Learning",
+    "url": "https://www.youtube.com/embed/M3c3ffHZnaY",
+    "source": "data-science-python",
+    "tags": [
+      "machine-learning",
+      "feature-selection"
+    ],
+    "keywords": [
+      "feature selection",
+      "embedded method",
+      "LASSO",
+      "machine learning",
+      "python"
+    ]
+  },
+  {
+    "id": "vid-940",
+    "title": "Image Processing with Python | Blurring, Edge Detection & Sharpening",
+    "url": "https://www.youtube.com/embed/prK0emDxrEM",
+    "source": "data-science-python",
+    "tags": [
+      "computer-vision",
+      "image-processing",
+      "opencv"
+    ],
+    "keywords": [
+      "image processing",
+      "blurring",
+      "edge detection",
+      "sharpening",
+      "opencv",
+      "python"
+    ]
+  },
+  {
+    "id": "vid-941",
+    "title": "Need of Deep Learning for NLP | PyTorch Installation, Tensors & AutoGrad",
+    "url": "https://www.youtube.com/embed/8kGvqXOuCdY",
+    "source": "data-science-python",
+    "tags": [
+      "deep-learning",
+      "nlp",
+      "pytorch"
+    ],
+    "keywords": [
+      "deep learning",
+      "NLP",
+      "PyTorch",
+      "tensor",
+      "autograd"
+    ]
+  },
+  {
+    "id": "vid-942",
+    "title": "Python Data Scraping Project: IMDb Movie Data Extraction",
+    "url": "https://www.youtube.com/embed/wq5OlMjHOWs",
+    "source": "data-science-python",
+    "tags": [
+      "python",
+      "web-scraping",
+      "beautifulsoup"
+    ],
+    "keywords": [
+      "web scraping",
+      "IMDB",
+      "BeautifulSoup",
+      "data extraction",
+      "python"
+    ]
+  },
+  {
+    "id": "vid-943",
+    "title": "Neural Machine Translation | Encoder Decoder Model with Attention using PyTorch",
+    "url": "https://www.youtube.com/embed/qHgpdtqaoJk",
+    "source": "data-science-python",
+    "tags": [
+      "deep-learning",
+      "nlp",
+      "translation",
+      "attention"
+    ],
+    "keywords": [
+      "neural machine translation",
+      "encoder decoder",
+      "attention",
+      "PyTorch",
+      "NLP"
+    ]
+  },
+  {
+    "id": "vid-944",
+    "title": "Word Analogies in NLP: Understanding Word Relationships",
+    "url": "https://www.youtube.com/embed/bAitKTvbqU4",
+    "source": "data-science-python",
+    "tags": [
+      "nlp",
+      "word-embeddings"
+    ],
+    "keywords": [
+      "word analogies",
+      "word embeddings",
+      "word2vec",
+      "NLP",
+      "python"
+    ]
+  },
+  {
+    "id": "vid-945",
+    "title": "Understanding the Perceptron | DNN Foundation for Deep Reinforcement Learning",
+    "url": "https://www.youtube.com/embed/KJBBlIjbNmQ",
+    "source": "data-science-python",
+    "tags": [
+      "deep-learning",
+      "neural-networks",
+      "perceptron"
+    ],
+    "keywords": [
+      "perceptron",
+      "neural network",
+      "deep learning",
+      "PyTorch"
+    ]
+  },
+  {
+    "id": "vid-946",
+    "title": "YouTube Automation with Python | Fetch Channel & Playlist Data using YouTube API",
+    "url": "https://www.youtube.com/embed/wm5zMiDX-wA",
+    "source": "data-science-python",
+    "tags": [
+      "python",
+      "automation",
+      "api"
+    ],
+    "keywords": [
+      "YouTube API",
+      "automation",
+      "python",
+      "data collection"
+    ]
+  },
+  {
+    "id": "vid-947",
+    "title": "YouTube Channel Automation Project | Fetch Video Data & Generate Reports",
+    "url": "https://www.youtube.com/embed/YeaAYIb0ysw",
+    "source": "data-science-python",
+    "tags": [
+      "python",
+      "automation",
+      "api"
+    ],
+    "keywords": [
+      "YouTube API",
+      "automation",
+      "python",
+      "reports"
+    ]
+  },
+  {
+    "id": "vid-948",
+    "title": "Apache Spark With MongoDB | End-to-End ETL Project on Databricks",
+    "url": "https://www.youtube.com/embed/zQoiB3a4iVc",
+    "source": "data-science-python",
+    "tags": [
+      "big-data",
+      "spark",
+      "mongodb",
+      "etl"
+    ],
+    "keywords": [
+      "Spark",
+      "MongoDB",
+      "ETL",
+      "Databricks",
+      "big data"
+    ]
+  },
+  {
+    "id": "vid-949",
+    "title": "Convolution in CNNs Explained | PyTorch Implementation + Animations",
+    "url": "https://www.youtube.com/embed/wXvHzxGVSZ4",
+    "source": "data-science-python",
+    "tags": [
+      "deep-learning",
+      "cnn",
+      "computer-vision",
+      "pytorch"
+    ],
+    "keywords": [
+      "convolution",
+      "CNN",
+      "PyTorch",
+      "deep learning",
+      "image processing"
+    ]
+  },
+  {
+    "id": "vid-950",
+    "title": "Max Pooling Explained in CNN | PyTorch Implementation",
+    "url": "https://www.youtube.com/embed/s4uY2AaUOcE",
+    "source": "data-science-python",
+    "tags": [
+      "deep-learning",
+      "cnn",
+      "pytorch"
+    ],
+    "keywords": [
+      "max pooling",
+      "CNN",
+      "PyTorch",
+      "deep learning"
+    ]
+  },
+  {
+    "id": "vid-951",
+    "title": "Object Oriented Programming in Python | Class, Object, Self & Encapsulation",
+    "url": "https://www.youtube.com/embed/92oeSKGSC8Y",
+    "source": "data-science-python",
+    "tags": [
+      "python",
+      "oop"
+    ],
+    "keywords": [
+      "OOP",
+      "class",
+      "object",
+      "encapsulation",
+      "python"
+    ]
+  },
+  {
+    "id": "vid-952",
+    "title": "Python OOP | Inheritance, Polymorphism & Abstraction",
+    "url": "https://www.youtube.com/embed/X2cApJGnNzw",
+    "source": "data-science-python",
+    "tags": [
+      "python",
+      "oop"
+    ],
+    "keywords": [
+      "inheritance",
+      "polymorphism",
+      "abstraction",
+      "OOP",
+      "python"
+    ]
+  },
+  {
+    "id": "vid-953",
+    "title": "Python OOP Mini Project | Build a Role-Playing Game",
+    "url": "https://www.youtube.com/embed/vL2up9CTEaE",
+    "source": "data-science-python",
+    "tags": [
+      "python",
+      "oop",
+      "projects"
+    ],
+    "keywords": [
+      "OOP",
+      "project",
+      "python",
+      "game",
+      "class"
+    ]
+  },
+  {
+    "id": "vid-954",
+    "title": "Brain Tumor Detection Using CNN | Dataset, Data Loading & Transforms",
+    "url": "https://www.youtube.com/embed/1X37eBDegZc",
+    "source": "data-science-python",
+    "tags": [
+      "deep-learning",
+      "cnn",
+      "computer-vision",
+      "medical-imaging"
+    ],
+    "keywords": [
+      "CNN",
+      "brain tumor",
+      "image classification",
+      "deep learning",
+      "PyTorch"
+    ]
   }
 ]

@@ -1,4 +1,6 @@
 import { Suspense, lazy } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { ChevronLeft } from 'lucide-react'
 import LoadingSpinner from '../components/ui/LoadingSpinner.jsx'
 
 const LogicSim = lazy(() => import('../components/viz/react/LogicSim.jsx'))
@@ -14,19 +16,28 @@ const PhoneGuard = ({ name }) => (
 )
 
 export default function LogicSimPage() {
-  if (window.innerWidth < 640) return <PhoneGuard name="Logic Gate Simulator" />
+  const navigate = useNavigate();
+  if (window.innerWidth < 640) return <PhoneGuard name="Breadboard Lab" />
 
   return (
-    <div className="max-w-[1600px] w-full px-4 md:px-8 mx-auto pb-12">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1">Logic Gate Simulator</h1>
-        <p className="text-slate-500 dark:text-slate-400">
-          Build and wire digital circuits. Drag gates, connect signals, and explore Boolean logic from NOT gates to half-adders.
-        </p>
+    <div className="fixed inset-0 z-[100] bg-slate-50 dark:bg-slate-950 flex flex-col font-sans">
+      <div className="h-14 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center px-4 flex-shrink-0 shadow-sm">
+        <button 
+          onClick={() => navigate(-1)} 
+          className="flex items-center text-sm font-semibold text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors"
+        >
+          <ChevronLeft className="w-5 h-5 mr-1" />
+          Back
+        </button>
+        <div className="absolute left-1/2 -translate-x-1/2 font-bold text-lg text-slate-800 dark:text-slate-100 flex items-center gap-2">
+          <span>🔌</span> Breadboard &amp; Component Lab
+        </div>
       </div>
-      <Suspense fallback={<div className="flex justify-center py-20"><LoadingSpinner size="lg" /></div>}>
-        <LogicSim params={{}} />
-      </Suspense>
+      <div className="flex-1 relative overflow-hidden bg-slate-50 dark:bg-slate-950">
+        <Suspense fallback={<div className="flex justify-center items-center h-full"><LoadingSpinner size="lg" /></div>}>
+          <LogicSim params={{}} />
+        </Suspense>
+      </div>
     </div>
   )
 }

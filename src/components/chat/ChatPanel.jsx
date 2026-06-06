@@ -4,12 +4,13 @@ import {
   Send,
   Ban,
   Users,
-  Globe,
   BookOpen,
   Settings,
   Trash2,
   Sparkles,
   Loader2,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { useChat } from "../../hooks/useChat.js";
 import {
@@ -132,6 +133,53 @@ function BlockedUsersPanel({ onClose }) {
   );
 }
 
+// ── Active lessons section ────────────────────────────────────────────────────
+function ActiveLessonsPanel({ activeLessons }) {
+  const [expanded, setExpanded] = useState(true);
+  if (!activeLessons || activeLessons.size === 0) return null;
+
+  return (
+    <div className="border-b border-slate-200 dark:border-slate-800 shrink-0">
+      <button
+        onClick={() => setExpanded((v) => !v)}
+        className="w-full flex items-center justify-between px-4 py-2 text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-slate-900/40 transition-colors"
+      >
+        <div className="flex items-center gap-1.5">
+          <BookOpen className="w-3 h-3 text-emerald-500" />
+          <span className="text-emerald-600 dark:text-emerald-400">
+            {activeLessons.size} Active Lesson{activeLessons.size !== 1 ? "s" : ""}
+          </span>
+        </div>
+        {expanded ? (
+          <ChevronUp className="w-3 h-3" />
+        ) : (
+          <ChevronDown className="w-3 h-3" />
+        )}
+      </button>
+      {expanded && (
+        <div className="px-3 pb-2 flex flex-col gap-1">
+          {[...activeLessons.entries()].map(([lessonId, { title, users }]) => (
+            <div
+              key={lessonId}
+              className="flex items-start gap-2 px-2 py-1.5 rounded-lg bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30"
+            >
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-1.5 shrink-0" />
+              <div className="flex flex-col min-w-0">
+                <span className="text-[11px] font-semibold text-slate-700 dark:text-slate-300 truncate">
+                  {title}
+                </span>
+                <span className="text-[10px] text-slate-400 dark:text-slate-500 truncate">
+                  {users.join(", ")}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Individual message ─────────────────────────────────────────────────────────
 function ChatMessage({ msg, onBlockRequest }) {
   const [hovered, setHovered] = useState(false);
@@ -144,7 +192,6 @@ function ChatMessage({ msg, onBlockRequest }) {
         className="flex flex-col items-start gap-1 mb-3"
       >
         <div className="flex items-center gap-2 ml-1">
-          {/* Luminous AI Spark Avatar */}
           <div className="relative w-6 h-6 flex items-center justify-center">
             <div className="absolute inset-0 bg-indigo-500 rounded-full animate-pulse blur-[4px] opacity-60" />
             <div className="relative w-5 h-5 rounded-full bg-gradient-to-tr from-indigo-600 via-purple-500 to-indigo-400 flex items-center justify-center shadow-lg border border-white/20">
@@ -285,10 +332,11 @@ function MessageList({
 }
 
 // ── Chat input ─────────────────────────────────────────────────────────────────
-function ChatInput({ onSend, disabled }) {
+function ChatInput({ onSend, disabled, lovelaceActive }) {
   const [text, setText] = useState("");
   const inputRef = useRef(null);
   const hasLovelace = isLovelaceMention(text);
+  const isAiMode = hasLovelace || lovelaceActive;
 
   const submit = () => {
     const t = text.trim();
@@ -300,7 +348,7 @@ function ChatInput({ onSend, disabled }) {
 
   return (
     <div className="flex flex-col gap-2 p-4 pt-1 bg-white/20 dark:bg-black/20 border-t border-white/10 shrink-0">
-      {hasLovelace && (
+      {isAiMode && (
         <div className="flex items-center gap-2 text-[10px] text-indigo-600 dark:text-indigo-400 px-2 py-1 bg-indigo-50/50 dark:bg-indigo-950/30 rounded-lg border border-indigo-200/30 dark:border-indigo-400/10">
           <Sparkles className="w-3 h-3 animate-pulse" />
           <span className="font-bold uppercase tracking-wider">
@@ -319,7 +367,13 @@ function ChatInput({ onSend, disabled }) {
               submit();
             }
           }}
-          placeholder={disabled ? "Synchronizing…" : "Message @Lovelace…"}
+          placeholder={
+            disabled
+              ? "Synchronizing…"
+              : lovelaceActive
+                ? "Reply to Lovelace…"
+                : "Message @Lovelace…"
+          }
           disabled={disabled}
           maxLength={500}
           className="flex-1 text-[13.5px] font-semibold bg-white/80 dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-2xl px-4 py-3 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all shadow-inner"
@@ -327,7 +381,7 @@ function ChatInput({ onSend, disabled }) {
         <button
           onClick={submit}
           disabled={!text.trim() || disabled}
-          className={`p-3 rounded-2xl text-white shadow-lg transition-all duration-300 ${hasLovelace ? "bg-indigo-600 hover:bg-indigo-500 shadow-indigo-500/20" : "bg-brand-600 hover:bg-brand-500 shadow-brand-500/20"} hover:scale-105 active:scale-95`}
+          className={`p-3 rounded-2xl text-white shadow-lg transition-all duration-300 ${isAiMode ? "bg-indigo-600 hover:bg-indigo-500 shadow-indigo-500/20" : "bg-brand-600 hover:bg-brand-500 shadow-brand-500/20"} hover:scale-105 active:scale-95`}
         >
           <Send className="w-5 h-5" />
         </button>
@@ -345,18 +399,16 @@ export default function ChatPanel({ isOpen, onClose }) {
     blockedUsers,
     blockPeer,
     globalMessages,
-    lessonMessages,
     globalPeers,
-    lessonPeers,
     currentLessonId,
+    currentLessonTitle,
+    activeLessons,
     connected,
     sendMessage,
     sendLovelaceResponse,
     markAllRead,
     globalHistoryLoaded,
-    lessonHistoryLoaded,
     isLovelaceHost,
-    lovelaceHostId,
     pendingLovelaceQueries,
     sendLovelaceQuery,
     resolveLovelaceQuery,
@@ -368,19 +420,35 @@ export default function ChatPanel({ isOpen, onClose }) {
     if (isOpen) markAllRead();
   }, [isOpen]);
 
-  const [tab, setTab] = useState("global");
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(username);
   const [showSettings, setShowSettings] = useState(false);
   const [blockTarget, setBlockTarget] = useState(null);
+  const [lovelaceActive, setLovelaceActive] = useState(false);
+  const lovelaceTimeoutRef = useRef(null);
   const nameRef = useRef(null);
 
   useEffect(() => {
-    if (currentLessonId && isOpen) setTab("lesson");
-  }, [currentLessonId]);
-  useEffect(() => {
     if (editingName) nameRef.current?.focus();
   }, [editingName]);
+
+  // Auto-dismiss conversation mode after 5 minutes of silence
+  const activateLovelace = useCallback(() => {
+    setLovelaceActive(true);
+    if (lovelaceTimeoutRef.current) clearTimeout(lovelaceTimeoutRef.current);
+    lovelaceTimeoutRef.current = setTimeout(() => {
+      setLovelaceActive(false);
+    }, 5 * 60 * 1000);
+  }, []);
+
+  const dismissLovelace = useCallback(() => {
+    setLovelaceActive(false);
+    if (lovelaceTimeoutRef.current) clearTimeout(lovelaceTimeoutRef.current);
+  }, []);
+
+  useEffect(() => () => {
+    if (lovelaceTimeoutRef.current) clearTimeout(lovelaceTimeoutRef.current);
+  }, []);
 
   // Process incoming queries when we are the elected Lovelace host
   const processingRef = useRef(new Set());
@@ -389,15 +457,12 @@ export default function ChatPanel({ isOpen, onClose }) {
     for (const query of pendingLovelaceQueries) {
       if (processingRef.current.has(query.queryId)) continue;
       processingRef.current.add(query.queryId);
-      ask(query.text, query.recentMessages)
+      ask(query.text, query.recentMessages, query.lessonContext ?? null)
         .then((answer) => {
-          if (answer) sendLovelaceResponse(answer, query.room);
+          if (answer) sendLovelaceResponse(answer);
         })
         .catch(() => {
-          sendLovelaceResponse(
-            "Sorry, I ran into an error processing that.",
-            query.room,
-          );
+          sendLovelaceResponse("Sorry, I ran into an error processing that.");
         })
         .finally(() => {
           processingRef.current.delete(query.queryId);
@@ -412,50 +477,55 @@ export default function ChatPanel({ isOpen, onClose }) {
     resolveLovelaceQuery,
   ]);
 
-  const totalPeers = (globalPeers ?? 0) + (lessonPeers ?? 0);
   const lovelaceStatus = isDownloading
     ? downloadProgress || "Downloading Lovelace…"
     : isThinking
       ? "Lovelace is thinking…"
       : null;
 
+  const lessonContext = currentLessonId
+    ? { id: currentLessonId, title: currentLessonTitle }
+    : null;
+
   const handleSend = useCallback(
     async (text) => {
-      sendMessage(text, tab);
+      sendMessage(text);
 
-      if (isLovelaceMention(text)) {
-        const question = extractQuestion(text) || text;
-        const recentMsgs = tab === "global" ? globalMessages : lessonMessages;
+      const explicitMention = isLovelaceMention(text);
+      if (!explicitMention && !lovelaceActive) return;
 
-        // If we are the host (or alone), run inference locally
-        if (isLovelaceHost || totalPeers === 0) {
-          try {
-            const answer = await ask(question, recentMsgs);
-            if (answer) sendLovelaceResponse(answer, tab);
-          } catch (err) {
-            console.error("[Lovelace] ask failed:", err);
-            sendLovelaceResponse(
-              "Sorry, I ran into an error. Make sure your browser supports WebGPU (Chrome 113+).",
-              tab,
-            );
+      const question = explicitMention ? (extractQuestion(text) || text) : text;
+
+      if (isLovelaceHost || globalPeers === 0) {
+        try {
+          const answer = await ask(question, globalMessages, lessonContext);
+          if (answer) {
+            sendLovelaceResponse(answer);
+            activateLovelace();
           }
-        } else {
-          // Delegate to the peer with the best GPU
-          const queryId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-          sendLovelaceQuery(queryId, question, recentMsgs, tab);
+        } catch (err) {
+          console.error("[Lovelace] ask failed:", err);
+          sendLovelaceResponse(
+            "Sorry, I ran into an error. Make sure your browser supports WebGPU (Chrome 113+).",
+          );
         }
+      } else {
+        const queryId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        sendLovelaceQuery(queryId, question, globalMessages, lessonContext);
+        activateLovelace();
       }
     },
     [
       sendMessage,
       sendLovelaceResponse,
       ask,
-      tab,
       globalMessages,
-      lessonMessages,
+      globalPeers,
       isLovelaceHost,
-      totalPeers,
       sendLovelaceQuery,
+      lessonContext,
+      lovelaceActive,
+      activateLovelace,
     ],
   );
 
@@ -463,11 +533,6 @@ export default function ChatPanel({ isOpen, onClose }) {
     setUsername(nameInput);
     setEditingName(false);
   };
-
-  const messages = tab === "global" ? globalMessages : lessonMessages;
-  const historyLoaded =
-    tab === "global" ? globalHistoryLoaded : lessonHistoryLoaded;
-  const peers = tab === "global" ? globalPeers : lessonPeers;
 
   return (
     <>
@@ -488,7 +553,7 @@ export default function ChatPanel({ isOpen, onClose }) {
             transition={{ type: "spring", damping: 28, stiffness: 400 }}
             className="fixed right-0 top-[90px] bottom-0 w-[400px] z-[9999] flex flex-col bg-white/80 dark:bg-slate-950/80 backdrop-blur-3xl border-l border-white/20 dark:border-white/10 shadow-[-10px_0_40px_rgba(0,0,0,0.05)] dark:shadow-[-20px_0_100px_rgba(0,0,0,0.4)]"
           >
-            {/* Header - Holographic Prism */}
+            {/* Header */}
             <div className="flex items-center justify-between px-6 py-5 border-b border-white/10 shrink-0">
               <div className="flex items-center gap-4">
                 <div className="relative flex items-center justify-center">
@@ -568,68 +633,68 @@ export default function ChatPanel({ isOpen, onClose }) {
                   )}
                   <div className="ml-auto flex items-center gap-1 text-[10px] text-slate-400 dark:text-slate-500">
                     <Users className="w-3 h-3" />
-                    <span>{peers + 1}</span>
+                    <span>{globalPeers + 1}</span>
                   </div>
                 </div>
 
-                {/* Tabs */}
-                <div className="flex border-b border-slate-200 dark:border-slate-800 shrink-0">
-                  {[
-                    {
-                      id: "global",
-                      label: "Global",
-                      icon: <Globe className="w-3.5 h-3.5" />,
-                      count: globalMessages.filter(
-                        (m) => m.isLovelace || !blockedPeers.has(m.peerId),
-                      ).length,
-                      disabled: false,
-                    },
-                    {
-                      id: "lesson",
-                      label: "This Lesson",
-                      icon: <BookOpen className="w-3.5 h-3.5" />,
-                      count: lessonMessages.filter(
-                        (m) => m.isLovelace || !blockedPeers.has(m.peerId),
-                      ).length,
-                      disabled: !currentLessonId,
-                    },
-                  ].map(({ id, label, icon, count, disabled }) => (
-                    <button
-                      key={id}
-                      onClick={() => !disabled && setTab(id)}
-                      disabled={disabled}
-                      className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-semibold transition-colors ${disabled ? "opacity-40 cursor-not-allowed text-slate-400" : tab === id ? "text-brand-600 dark:text-brand-400 border-b-2 border-brand-600 dark:border-brand-400" : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"}`}
-                    >
-                      {icon}
-                      {label}
-                      {count > 0 && (
-                        <span className="ml-0.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-full px-1.5 text-[10px]">
-                          {count}
-                        </span>
-                      )}
-                    </button>
-                  ))}
-                </div>
+                {/* Active lessons */}
+                <ActiveLessonsPanel activeLessons={activeLessons} />
 
                 {/* Lovelace hint */}
-                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-violet-50 dark:bg-violet-950/30 border-b border-violet-100 dark:border-violet-900/40 shrink-0">
-                  <Sparkles className="w-3 h-3 text-violet-500 shrink-0" />
-                  <span className="text-[10px] text-violet-600 dark:text-violet-400">
-                    Tag <span className="font-bold">@Lovelace</span>,{" "}
-                    <span className="font-bold">@Love</span>, or{" "}
-                    <span className="font-bold">@Lovely</span> to ask the AI
-                    tutor
-                  </span>
-                </div>
+                {!lovelaceActive && (
+                  <div className="flex flex-col gap-0.5 px-3 py-1.5 bg-violet-50 dark:bg-violet-950/30 border-b border-violet-100 dark:border-violet-900/40 shrink-0">
+                    <div className="flex items-center gap-1.5">
+                      <Sparkles className="w-3 h-3 text-violet-500 shrink-0" />
+                      <span className="text-[10px] text-violet-600 dark:text-violet-400">
+                        Tag <span className="font-bold">@Lovelace</span>,{" "}
+                        <span className="font-bold">@Love</span>, or{" "}
+                        <span className="font-bold">@Lovely</span> to ask the AI
+                        tutor
+                      </span>
+                    </div>
+                    {currentLessonTitle && (
+                      <div className="flex items-center gap-1.5 ml-4.5">
+                        <BookOpen className="w-3 h-3 text-emerald-500 shrink-0" />
+                        <span className="text-[10px] text-emerald-600 dark:text-emerald-400 truncate">
+                          Context: <span className="font-semibold">{currentLessonTitle}</span>
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Lovelace conversation mode banner */}
+                {lovelaceActive && (
+                  <div className="flex items-center justify-between px-3 py-2 bg-indigo-50 dark:bg-indigo-950/50 border-b border-indigo-200/60 dark:border-indigo-800/40 shrink-0">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse shrink-0" />
+                      <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">
+                        Lovelace is listening
+                      </span>
+                      {currentLessonTitle && (
+                        <span className="text-[10px] text-indigo-400 dark:text-indigo-500 truncate max-w-[120px]">
+                          · {currentLessonTitle}
+                        </span>
+                      )}
+                    </div>
+                    <button
+                      onClick={dismissLovelace}
+                      title="End conversation"
+                      className="text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-200 transition-colors p-0.5"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
 
                 <MessageList
-                  messages={messages}
+                  messages={globalMessages}
                   blockedPeers={blockedPeers}
-                  historyLoaded={historyLoaded}
+                  historyLoaded={globalHistoryLoaded}
                   onBlockRequest={setBlockTarget}
                   lovelaceStatus={lovelaceStatus}
                 />
-                <ChatInput onSend={handleSend} disabled={!connected} />
+                <ChatInput onSend={handleSend} disabled={!connected} lovelaceActive={lovelaceActive} />
               </>
             )}
           </motion.div>
