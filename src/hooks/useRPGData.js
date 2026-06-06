@@ -12,6 +12,9 @@ const DEFAULT_RPG_STATE = {
   hp: 100,
   maxHp: 100,
   gold: 0,
+  stats: { STR: 10, END: 10, AGI: 10, DEX: 10 },
+  customPlans: [],
+  activePlanId: null,
   abilities: [],
   activeQuests: [],
   completedQuests: [],
@@ -122,21 +125,44 @@ export function useRPGData() {
     return leveledUp;
   };
 
-  const logWorkout = (workoutType, durationOrReps, calculatedXp, rpe = 5) => {
+  // details can include: weight, sets, reps, distance, duration, rpe
+  const logWorkout = (exerciseId, metrics, calculatedXp) => {
+    // We dynamically import or just use a generic update if we can't find it.
+    // However, it's better to pass the statFocus directly or rely on the caller
+    // since this hook doesn't import rpgExercises.js directly right now.
+    // For simplicity, we'll let the caller calculate and pass `statGains`.
+  };
+
+  const logDetailedWorkout = (exerciseId, metrics, calculatedXp, statGains) => {
     const logEntry = {
       id: Date.now().toString(),
-      type: workoutType,
-      value: durationOrReps,
+      exerciseId,
+      metrics,
       xpEarned: calculatedXp,
-      rpe: rpe,
       date: new Date().toISOString()
     };
     
-    const newLogs = [logEntry, ...rpgData.workoutLogs].slice(0, 50); // Keep last 50
+    const newLogs = [logEntry, ...rpgData.workoutLogs].slice(0, 100); 
     const leveledUp = addXP(calculatedXp);
+
+    const newStats = { ...rpgData.stats };
+    if (statGains) {
+      Object.keys(statGains).forEach(stat => {
+        newStats[stat] = (newStats[stat] || 0) + statGains[stat];
+      });
+    }
     
-    saveData({ ...rpgData, workoutLogs: newLogs });
+    saveData({ ...rpgData, workoutLogs: newLogs, stats: newStats });
     return leveledUp;
+  };
+
+  const setActivePlan = (planId) => {
+    saveData({ ...rpgData, activePlanId: planId });
+  };
+
+  const saveCustomPlan = (plan) => {
+    const existing = rpgData.customPlans.filter(p => p.id !== plan.id);
+    saveData({ ...rpgData, customPlans: [...existing, plan] });
   };
 
   const acceptQuest = (quest) => {
@@ -167,7 +193,9 @@ export function useRPGData() {
     updateHeroClass,
     setOnboardingData,
     addXP,
-    logWorkout,
+    logDetailedWorkout,
+    setActivePlan,
+    saveCustomPlan,
     acceptQuest,
     completeQuest
   };

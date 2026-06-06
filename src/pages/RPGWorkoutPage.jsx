@@ -4,6 +4,8 @@ import { ClassSelector } from '../components/rpg/ClassSelector';
 import { HeroPanel } from '../components/rpg/HeroPanel';
 import { WorkoutLogger } from '../components/rpg/WorkoutLogger';
 import { QuestBoard } from '../components/rpg/QuestBoard';
+import { PlanBuilder } from '../components/rpg/PlanBuilder';
+import { RadarChart } from '../components/rpg/RadarChart';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 
 export default function RPGWorkoutPage() {
@@ -12,7 +14,9 @@ export default function RPGWorkoutPage() {
     loading, 
     setOnboardingData, 
     addXP, 
-    logWorkout, 
+    logDetailedWorkout, 
+    setActivePlan,
+    saveCustomPlan,
     acceptQuest, 
     completeQuest 
   } = useRPGData();
@@ -47,13 +51,26 @@ export default function RPGWorkoutPage() {
           <p className="text-slate-400 font-medium">Train in reality. Level up in fantasy.</p>
         </header>
 
-        {/* Hero Stats */}
-        <HeroPanel rpgData={rpgData} />
+        {/* Hero Stats & Radar Chart */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          <div className="lg:col-span-2">
+            <HeroPanel rpgData={rpgData} />
+          </div>
+          <div className="bg-slate-900/80 border border-slate-700 rounded-2xl p-6 flex flex-col items-center justify-center backdrop-blur-xl">
+            <h3 className="text-slate-400 font-bold mb-2 text-sm uppercase tracking-wider text-center">Stat Balance</h3>
+            <RadarChart stats={rpgData.stats || { STR: 10, END: 10, AGI: 10, DEX: 10 }} maxScore={Math.max(100, ...Object.values(rpgData.stats || { STR: 100 }))} size={220} color="emerald" />
+          </div>
+        </div>
+
+        {/* Plan Builder */}
+        <div className="mb-6">
+          <PlanBuilder rpgData={rpgData} setActivePlan={setActivePlan} saveCustomPlan={saveCustomPlan} />
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Left Column: Actions */}
           <div className="space-y-6">
-            <WorkoutLogger logWorkout={logWorkout} />
+            <WorkoutLogger logDetailedWorkout={logDetailedWorkout} activePlanId={rpgData.activePlanId} />
             
             {/* Logs Preview */}
             <div className="bg-slate-900/40 rounded-2xl p-6 border border-slate-800">
