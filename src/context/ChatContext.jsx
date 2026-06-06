@@ -8,6 +8,7 @@ import {
   createPool,
   publishMessage,
   subscribeHistory,
+  subscribeLive,
 } from "../lib/nostrChat.js";
 import { getGpuScore } from "../utils/gpuScore.js";
 
@@ -77,6 +78,7 @@ export function ChatProvider({ children }) {
   const [connected, setConnected] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [globalHistoryLoaded, setGlobalHistoryLoaded] = useState(false);
+  const [roomKey, setRoomKey] = useState(0);
 
   const sendGlobalRef = useRef(null);
   const usernameRef = useRef(username);
@@ -174,9 +176,18 @@ export function ChatProvider({ children }) {
     };
   }
 
-  // Global room — joined once, no lesson sub-rooms
+  // Global room — re-runs when roomKey increments (manual reconnect)
   useEffect(() => {
+    // Reset peer state on each (re)connect
+    setGlobalPeers(0);
+    peerScoresRef.current.clear();
+    peerLessonsRef.current.clear();
+    lovelaceHostIdRef.current = "local";
+    setLovelaceHostId("local");
+
     let room;
+    const nostrLiveSub = { current: null };
+
     try {
       room = joinRoom(APP_CONFIG, "open-calc-global");
       const [send, receive] = room.makeAction("msg");
@@ -227,7 +238,6 @@ export function ChatProvider({ children }) {
       room.onPeerJoin(() => {
         setGlobalPeers(n => n + 1);
         sendLv?.({ type: "announce", score: myGpuScoreRef.current });
-        // Share current lesson with the new peer
         const myLesson = currentLessonRef.current;
         if (myLesson) {
           sendLv?.({
@@ -250,20 +260,35 @@ export function ChatProvider({ children }) {
       setConnected(true);
     } catch (e) {
       console.warn("[Chat] Global room failed:", e);
+      setConnected(false);
     }
 
     if (nostrPool.current) {
+      const liveFrom = Math.floor(Date.now() / 1000);
       subscribeHistory(
         nostrPool.current, "global", HISTORY_HOURS,
         msg => setGlobalMessages(prev => mergeMessages(prev, [msg])),
-        () => setGlobalHistoryLoaded(true),
+        () => {
+          setGlobalHistoryLoaded(true);
+          // Keep listening for new Nostr events after history is loaded
+          nostrLiveSub.current = subscribeLive(
+            nostrPool.current, "global", liveFrom,
+            msg => setGlobalMessages(prev => mergeMessages(prev, [msg])),
+          );
+        },
       );
     } else {
       setGlobalHistoryLoaded(true);
     }
 
-    return () => { try { room?.leave(); } catch {} };
-  }, []);
+    return () => {
+      try { room?.leave(); } catch {}
+      try { nostrLiveSub.current?.close(); } catch {}
+      sendGlobalRef.current = null;
+      sendLovelaceChannelRef.current = null;
+      setConnected(false);
+    };
+  }, [roomKey]);
 
   // Track lesson from URL + broadcast presence on change
   useEffect(() => {
@@ -333,6 +358,11 @@ export function ChatProvider({ children }) {
     setPendingLovelaceQueries(q => q.filter(p => p.queryId !== queryId));
   }, []);
 
+  const reconnect = useCallback(() => {
+    setConnected(false);
+    setRoomKey(k => k + 1);
+  }, []);
+
   return (
     <ChatContext.Provider
       value={{
@@ -358,6 +388,7 @@ export function ChatProvider({ children }) {
         pendingLovelaceQueries,
         sendLovelaceQuery,
         resolveLovelaceQuery,
+        reconnect,
       }}
     >
       {children}

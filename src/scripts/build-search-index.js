@@ -3,7 +3,7 @@
 // Run: node src/scripts/build-search-index.js
 // Called automatically before dev/build via npm scripts
 
-import { readFileSync, writeFileSync, renameSync, existsSync, mkdirSync } from 'fs'
+import { writeFileSync, existsSync, mkdirSync, unlinkSync } from 'fs'
 import { resolve, dirname } from 'path'
 import { fileURLToPath } from 'url'
 
@@ -146,8 +146,9 @@ async function buildIndex() {
 
   const outPath = resolve(publicDir, 'search-index.json')
   const tmpPath = outPath + '.tmp'
-  writeFileSync(tmpPath, JSON.stringify({ documents }, null, 0))
-  renameSync(tmpPath, outPath)
+  // Clean up any stale .tmp from a previous failed build
+  if (existsSync(tmpPath)) try { unlinkSync(tmpPath) } catch {}
+  writeFileSync(outPath, JSON.stringify({ documents }, null, 0))
 
   console.log(`✓ Search index built: ${documents.length} lessons indexed`)
 }

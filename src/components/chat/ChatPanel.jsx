@@ -11,6 +11,7 @@ import {
   Loader2,
   ChevronDown,
   ChevronUp,
+  RefreshCw,
 } from "lucide-react";
 import { useChat } from "../../hooks/useChat.js";
 import {
@@ -412,6 +413,7 @@ export default function ChatPanel({ isOpen, onClose }) {
     pendingLovelaceQueries,
     sendLovelaceQuery,
     resolveLovelaceQuery,
+    reconnect,
   } = useChat();
 
   const { ask, isThinking, isDownloading, downloadProgress } = useLovelaceAI();
@@ -570,6 +572,15 @@ export default function ChatPanel({ isOpen, onClose }) {
                 </div>
               </div>
               <div className="flex items-center gap-1">
+                {!connected && (
+                  <button
+                    onClick={reconnect}
+                    title="Reconnect"
+                    className="p-1.5 rounded-lg text-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition-colors"
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                  </button>
+                )}
                 <button
                   onClick={() => setShowSettings((v) => !v)}
                   title="Blocked users"
@@ -636,6 +647,25 @@ export default function ChatPanel({ isOpen, onClose }) {
                     <span>{globalPeers + 1}</span>
                   </div>
                 </div>
+
+                {/* Disconnected banner */}
+                {!connected && (
+                  <div className="flex items-center justify-between px-3 py-2 bg-amber-50 dark:bg-amber-950/40 border-b border-amber-200/60 dark:border-amber-800/40 shrink-0">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
+                      <span className="text-[10px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wide">
+                        Room disconnected
+                      </span>
+                    </div>
+                    <button
+                      onClick={reconnect}
+                      className="flex items-center gap-1 text-[10px] font-bold text-amber-600 dark:text-amber-400 hover:underline"
+                    >
+                      <RefreshCw className="w-3 h-3" />
+                      Reconnect
+                    </button>
+                  </div>
+                )}
 
                 {/* Active lessons */}
                 <ActiveLessonsPanel activeLessons={activeLessons} />
