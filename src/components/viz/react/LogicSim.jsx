@@ -106,10 +106,6 @@ const COMP_DEFS = {
       { id: "cathode", x: 1, y: 1, type: PIN_IN }
     ],
     render: (ctx, x, y, w, h, C, state, inputs, simState) => {
-      // In our solver, simState.voltages is global, but inputs has node indices!
-      // Actually we just map the node ID if possible, but AnalogEngine writes V diffs?
-      // Wait, let's just use the pin net indices that are passed in the `tick` loop!
-    render: (ctx, x, y, w, h, C, state, inputs, simState) => {
       let isOn = false;
       if (state.voltageDiff && state.voltageDiff > 1.8) isOn = true;
 
