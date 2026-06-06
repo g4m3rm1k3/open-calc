@@ -2,14 +2,9 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import {
   onAuthStateChanged,
   GoogleAuthProvider,
-  FacebookAuthProvider,
-  GithubAuthProvider,
-  OAuthProvider,
-  EmailAuthProvider,
   signInWithPopup,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  linkWithCredential,
   signOut as fbSignOut,
 } from 'firebase/auth'
 import { doc, getDoc, setDoc } from 'firebase/firestore'
@@ -125,16 +120,9 @@ export function AuthProvider({ children }) {
     }
   }, [user])
 
-  const signInWithGoogle   = () => signInWithPopup(auth, new GoogleAuthProvider())
-  const signInWithFacebook = () => signInWithPopup(auth, new FacebookAuthProvider())
-  const signInWithGithub   = () => signInWithPopup(auth, new GithubAuthProvider())
-  const signInWithApple    = () => signInWithPopup(auth, new OAuthProvider('apple.com'))
-
-  const signInWithEmail = (email, password) =>
-    signInWithEmailAndPassword(auth, email, password)
-
-  const signUpWithEmail = (email, password) =>
-    createUserWithEmailAndPassword(auth, email, password)
+  const signInWithGoogle = () => signInWithPopup(auth, new GoogleAuthProvider())
+  const signInWithEmail  = (email, password) => signInWithEmailAndPassword(auth, email, password)
+  const signUpWithEmail  = (email, password) => createUserWithEmailAndPassword(auth, email, password)
 
   const signOut = async () => {
     if (user) await pushToFirestore(user.uid).catch(() => {})
@@ -143,12 +131,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{
-      user, syncing,
-      signInWithGoogle, signInWithFacebook, signInWithGithub, signInWithApple,
-      signInWithEmail, signUpWithEmail,
-      signOut,
-    }}>
+    <AuthContext.Provider value={{ user, syncing, signInWithGoogle, signInWithEmail, signUpWithEmail, signOut }}>
       {children}
     </AuthContext.Provider>
   )
