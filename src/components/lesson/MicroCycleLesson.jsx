@@ -1005,7 +1005,7 @@ export default function MicroCycleLesson({ lesson }) {
       />
       {(() => {
         // OpenMAT / MATLAB lab — from top-level lesson.openmat field OR extracted from math.visualizations
-        const openmatRaw = lesson.openmat ?? lesson.openmatLab;
+        const openmatRaw = lesson.openmat ?? lesson.openmatLab ?? lesson.notebooks?.matlab;
         const cells = openmatRaw?.cells ?? openmatRaw?.initialCells;
         let visualizations = openmatRaw?.visualizations ?? [];
         if (visualizations.length === 0 && cells?.length > 0) {
@@ -1048,7 +1048,7 @@ export default function MicroCycleLesson({ lesson }) {
       })()}
       {(() => {
         // Python lab — from top-level lesson.python field OR extracted from math.visualizations
-        const pythonRaw = lesson.python ?? lesson.pythonLab;
+        const pythonRaw = lesson.python ?? lesson.pythonLab ?? lesson.notebooks?.python;
         const cells = pythonRaw?.cells ?? pythonRaw?.initialCells;
         let visualizations = pythonRaw?.visualizations ?? [];
         if (visualizations.length === 0 && cells?.length > 0) {

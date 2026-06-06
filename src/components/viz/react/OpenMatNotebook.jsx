@@ -617,14 +617,18 @@ const CellComponent = React.memo(function CellComponent({ cell, C, onRun, onClea
 // ─────────────────────────────────────────────────────────────────────────────
 export default function OpenMatNotebook({ params }) {
   const C = useColors();
-  const initialCells = params?.initialCells || STARTER_CELLS;
+  const normalizeCells = (raw) =>
+    (raw || STARTER_CELLS).map((c, i) =>
+      c.id != null ? c : { ...c, id: `cell-${i + 1}`, output: c.output ?? '', status: c.status ?? 'idle', figureJson: c.figureJson ?? null }
+    );
+  const initialCells = normalizeCells(params?.initialCells);
   const [cells, setCells] = useState(initialCells);
   const [executing, setExecuting] = useState(false);
   const execCount = useRef(0);
 
   // Swap cells when lesson changes (HMR or navigation)
   useEffect(() => {
-    if (params?.initialCells) setCells(params.initialCells);
+    if (params?.initialCells) setCells(normalizeCells(params.initialCells));
   }, [params?.initialCells]);
 
   const runCell = useCallback((id) => {

@@ -163,16 +163,7 @@ export default {
           '\\text{A ball thrown up then caught:}\\\\x(t) = \\begin{cases} v_0 t - \\frac{1}{2}gt^2 & 0 \\le t \\le t_{\\text{catch}} \\\\ x_{\\text{catch}} & t > t_{\\text{catch}} \\end{cases}\\\\\\text{Different rules for different time intervals.}',
       },
     ],
-    visualizations: [
-      {
-        id: 'FunctionPlotter',
-        title: 'Explore x(t) = x₀ + v₀t + ½at² — change parameters',
-        mathBridge:
-          'This is the general kinematic function. Notice: when a = 0, the curve is a straight line (constant velocity). When a > 0, the curve bends upward. When a < 0, it bends downward. The shape of the curve encodes all the physics.',
-        caption: 'Every change in initial conditions changes the shape of the curve — and vice versa.',
-        props: { fn: '0 + 5*x + 0.5*(-9.8)*x^2', xMin: 0, xMax: 1.1, yMin: 0, yMax: 3, xLabel: 't (s)', yLabel: 'x (m)' },
-      },
-    ],
+    visualizations: [],
   },
 
   rigor: {
@@ -214,16 +205,7 @@ export default {
       },
     ],
     title: 'Why v(t) = at is linear — and what that means physically',
-    visualizations: [
-      {
-        id: 'FunctionPlotter',
-        title: 'Linear vs quadratic — velocity vs position',
-        mathBridge:
-          'Plot v(t) = 9.8t (linear) and x(t) = ½(9.8)t² (quadratic) on the same screen. The linear function grows at a steady rate. The quadratic starts slow and accelerates — but with the same slope as v at every point.',
-        caption: 'Constant acceleration → linear velocity → quadratic position. Each step is an integration.',
-        props: { fn: '9.8*x', xMin: 0, xMax: 5, yMin: 0, yMax: 50 },
-      },
-    ],
+    visualizations: [],
   },
 
   examples: [
@@ -440,6 +422,403 @@ export default {
     'Domain: the range of valid inputs. A falling ball has domain 0 ≤ t ≤ t_ground',
     'x(t) is NOT x times t — it is position evaluated at time t',
   ],
+
+  notebooks: {
+    python: {
+      type: 'python',
+      cells: [
+        {
+          cellTitle: 'Defining and Evaluating Functions in Python',
+          type: 'code',
+          language: 'python',
+          prose: [
+            `In Python a physics function is just a Python function. Define x(t) once, then evaluate it at any time. This makes it easy to check many values without error-prone substitution by hand.`,
+          ],
+          code: `# The kinematic triple: x(t), v(t), a(t)
+g = 9.8   # m/s² — gravitational acceleration
+
+def x(t, x0=0, v0=0, a=g):
+    return x0 + v0*t + 0.5*a*t**2
+
+def v(t, v0=0, a=g):
+    return v0 + a*t
+
+def acc(a=g):
+    return a   # constant
+
+# Evaluate at several times
+times = [0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
+print(f"{'t (s)':>7}  {'x (m)':>10}  {'v (m/s)':>10}  {'a (m/s²)':>10}")
+print("-" * 45)
+for t in times:
+    print(f"{t:>7.1f}  {x(t):>10.3f}  {v(t):>10.3f}  {acc():>10.3f}")
+
+print()
+print("Pattern: a(t) = constant, v(t) grows linearly, x(t) grows as t²")`,
+        },
+        {
+          cellTitle: 'Plotting the Kinematic Triple',
+          type: 'code',
+          language: 'python',
+          prose: [
+            `The shape of a graph encodes the physics. Constant acceleration gives a flat a(t), linear v(t), and parabolic x(t). All three describe the same motion — just different aspects of it.`,
+          ],
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+g = 9.8
+t = np.linspace(0, 4, 300)
+
+x_vals = 0.5 * g * t**2
+v_vals = g * t
+a_vals = np.full_like(t, g)
+
+fig, axes = plt.subplots(1, 3, figsize=(14, 4))
+
+axes[0].plot(t, x_vals, 'b-', linewidth=2)
+axes[0].set_xlabel('t [s]');  axes[0].set_ylabel('x [m]')
+axes[0].set_title('x(t) = ½gt²  [quadratic]')
+axes[0].grid(True, alpha=0.3)
+
+axes[1].plot(t, v_vals, 'g-', linewidth=2)
+axes[1].set_xlabel('t [s]');  axes[1].set_ylabel('v [m/s]')
+axes[1].set_title('v(t) = gt  [linear]')
+axes[1].grid(True, alpha=0.3)
+
+axes[2].plot(t, a_vals, 'r-', linewidth=2)
+axes[2].set_xlabel('t [s]');  axes[2].set_ylabel('a [m/s²]')
+axes[2].set_title('a(t) = g  [constant]')
+axes[2].grid(True, alpha=0.3)
+axes[2].set_ylim(0, 20)
+
+plt.suptitle('The Kinematic Triple — same motion, three functions', fontsize=12)
+plt.tight_layout()
+plt.show()
+
+print("Notice: three completely different curve shapes, one physical scenario.")`,
+        },
+        {
+          cellTitle: 'Finding the Domain — When Does the Ball Land?',
+          type: 'code',
+          language: 'python',
+          prose: [
+            `The domain of a physics function is the range of times where the model is valid. For a thrown ball, x(t) < 0 means underground — that is outside the domain. We solve for the landing time to find where to stop.`,
+          ],
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+# Ball thrown upward from 1.5 m with v0 = 12 m/s
+x0, v0, a = 1.5, 12.0, -9.8
+
+def x(t):
+    return x0 + v0*t + 0.5*a*t**2
+
+# Find landing time: solve 0 = x0 + v0*t + 0.5*a*t^2
+# Using numpy's polynomial root finder
+coeffs = [0.5*a, v0, x0]   # at² + bt + c
+roots = np.roots(coeffs)
+t_land = max(roots)         # take positive root
+
+print(f"Ball parameters: x0={x0} m, v0={v0} m/s, a={a} m/s²")
+print(f"Landing time: t = {t_land:.3f} s")
+print(f"Domain of x(t): 0 ≤ t ≤ {t_land:.3f} s")
+
+t_range = np.linspace(0, t_land, 300)
+x_range = x(t_range)
+
+# Find peak
+t_peak = -v0 / a
+x_peak = x(t_peak)
+print(f"Peak: x = {x_peak:.2f} m at t = {t_peak:.2f} s")
+
+fig, ax = plt.subplots(figsize=(8, 5))
+ax.plot(t_range, x_range, 'b-', linewidth=2, label='x(t) within domain')
+
+# Show what happens outside domain
+t_outside = np.linspace(t_land, t_land + 0.5, 50)
+ax.plot(t_outside, x(t_outside), 'r--', linewidth=1.5, alpha=0.5, label='x(t) outside domain (unphysical)')
+ax.axhline(0, color='brown', linewidth=1, linestyle='-')
+ax.plot(t_peak, x_peak, 'go', markersize=10, label=f'Peak: ({t_peak:.2f} s, {x_peak:.2f} m)')
+ax.plot(t_land, 0, 'ro', markersize=10, label=f'Landing: t={t_land:.2f} s')
+ax.fill_between([0, t_land], [0, 0], [-2, -2], alpha=0.1, color='brown')
+ax.set_xlabel('t [s]');  ax.set_ylabel('x [m]')
+ax.set_title('Domain of x(t): model is only valid while ball is in the air')
+ax.legend();  ax.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()`,
+        },
+        {
+          cellTitle: 'Function Composition — Kinetic Energy as f(t)',
+          type: 'code',
+          language: 'python',
+          prose: [
+            `Function composition means using the output of one function as input to another. Kinetic energy KE = ½mv² depends on velocity; velocity depends on time. Composing them gives KE as a function of time directly.`,
+          ],
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+m = 2.0   # kg
+v0, a = 0.0, 9.8   # start from rest
+
+def v(t):
+    return v0 + a * t
+
+def KE(v_val):
+    return 0.5 * m * v_val**2
+
+# Compose: KE as function of time
+def KE_of_t(t):
+    return KE(v(t))
+
+t = np.linspace(0, 3, 200)
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 4))
+
+axes[0].plot(t, v(t), 'g-', linewidth=2)
+axes[0].set_xlabel('t [s]');  axes[0].set_ylabel('v [m/s]')
+axes[0].set_title('v(t) = at  [linear]')
+axes[0].grid(True, alpha=0.3)
+
+axes[1].plot(t, KE_of_t(t), 'm-', linewidth=2)
+axes[1].set_xlabel('t [s]');  axes[1].set_ylabel('KE [J]')
+axes[1].set_title('KE(v(t)) = ½m(at)² = ½ma²t²  [quadratic]')
+axes[1].grid(True, alpha=0.3)
+
+plt.suptitle('Composition: KE(v(t)) — energy as a function of time', fontsize=12)
+plt.tight_layout()
+plt.show()
+
+print("KE grows as t² — even though v grows linearly as t.")
+print("This is composition: KE depends on v, which depends on t.")
+print(f"At t=3s: v={v(3):.2f} m/s, KE={KE_of_t(3):.2f} J")`,
+        },
+        {
+          cellTitle: 'Challenge — Write the Full Kinematic Model for a Rocket',
+          type: 'code',
+          language: 'python',
+          code: `# Challenge: complete kinematic model
+# ─────────────────────────────────────────────────────────
+# A rocket launches from rest (v0=0, x0=0) with a = 25 m/s².
+#
+# Task 1: Write Python functions x(t) and v_func(t) using the kinematic equations.
+#
+# Task 2: Find the time when v = 200 m/s. Store in t_200.
+#
+# Task 3: Find x at that time. Store in x_at_200.
+#
+# Task 4: State the domain (the model applies while fuel burns — assume
+#         the rocket runs for 10 seconds). Store as domain = (0, 10).
+
+a_rocket = 25   # m/s²
+v0_rocket = 0
+x0_rocket = 0
+
+# Task 1
+def x_rocket(t):
+    return # YOUR CODE HERE
+
+def v_rocket(t):
+    return # YOUR CODE HERE
+
+# Task 2
+t_200 = # YOUR CODE HERE  (solve v(t) = 200 algebraically, then code it)
+
+# Task 3
+x_at_200 = # YOUR CODE HERE
+
+# Task 4
+domain = (0, 10)
+
+print(f"v = 200 m/s at t = {t_200:.2f} s")
+print(f"x at that time = {x_at_200:.2f} m")
+print(f"Model domain: {domain[0]} s ≤ t ≤ {domain[1]} s")`,
+          prose: [],
+        },
+      ],
+    },
+    matlab: {
+      type: 'matlab',
+      cells: [
+        {
+          cellTitle: 'Functions in MATLAB — Anonymous Functions and Plotting',
+          type: 'code',
+          language: 'matlab',
+          prose: [
+            `In MATLAB, the cleanest way to define a physics function is the anonymous function: \`f = @(t) expression\`. This lets you evaluate at any t and pass the function to other routines.`,
+          ],
+          code: `%% Kinematic functions as MATLAB anonymous functions
+g = 9.8;   % m/s²
+v0 = 0;    % m/s
+x0 = 0;    % m
+
+x_fun = @(t) x0 + v0.*t + 0.5.*g.*t.^2;  % position [m]
+v_fun = @(t) v0 + g.*t;                   % velocity [m/s]
+a_fun = @(t) g + 0.*t;                    % acceleration [m/s²]
+
+% Evaluate at a vector of times
+t = 0:0.5:4;  % 0, 0.5, 1, ..., 4 s
+fprintf('%7s  %10s  %10s  %10s\\n', 't (s)', 'x (m)', 'v (m/s)', 'a (m/s²)');
+fprintf('%s\\n', repmat('-', 1, 45));
+for i = 1:length(t)
+    fprintf('%7.1f  %10.3f  %10.3f  %10.3f\\n', ...
+        t(i), x_fun(t(i)), v_fun(t(i)), a_fun(t(i)));
+end`,
+        },
+        {
+          cellTitle: 'Plotting the Kinematic Triple in MATLAB',
+          type: 'code',
+          language: 'matlab',
+          prose: [
+            `MATLAB's \`subplot\` command lets you compare all three kinematic functions side by side. Notice the different curve shapes — flat, linear, quadratic — for the same falling object.`,
+          ],
+          code: `%% Plot x(t), v(t), a(t) in subplots
+g = 9.8;
+t = linspace(0, 4, 300);
+
+x_vals = 0.5.*g.*t.^2;
+v_vals = g.*t;
+a_vals = g.*ones(size(t));
+
+figure('Position', [100 100 900 300]);
+
+subplot(1,3,1);
+plot(t, x_vals, 'b-', 'LineWidth', 2);
+xlabel('t [s]');  ylabel('x [m]');
+title('x(t) = ½gt²  [quadratic]');  grid on;
+
+subplot(1,3,2);
+plot(t, v_vals, 'g-', 'LineWidth', 2);
+xlabel('t [s]');  ylabel('v [m/s]');
+title('v(t) = gt  [linear]');  grid on;
+
+subplot(1,3,3);
+plot(t, a_vals, 'r-', 'LineWidth', 2);
+xlabel('t [s]');  ylabel('a [m/s²]');
+title('a(t) = g  [constant]');  grid on;
+ylim([0 20]);
+
+sgtitle('Kinematic triple — constant acceleration');`,
+        },
+        {
+          cellTitle: 'Challenge — Domain and Piecewise Motion',
+          type: 'code',
+          language: 'matlab',
+          code: `%% Challenge: domain and piecewise function
+% ─────────────────────────────────────────────────────────
+% A ball is thrown upward from x0=2 m with v0=15 m/s, a=-9.8 m/s².
+%
+% Task 1: Write MATLAB anonymous functions x_fun and v_fun.
+%
+% Task 2: Find the landing time t_land using the roots() function.
+%         roots([0.5*a, v0, x0]) gives the two roots of 0 = x0+v0t+0.5at²
+%
+% Task 3: Plot x(t) from t=0 to t=t_land. Mark the peak and landing.
+%
+% Task 4: Add a horizontal dashed line at x=0 (the ground).
+
+x0 = 2;   v0 = 15;   a = -9.8;
+
+% Task 1
+x_fun = @(t) % YOUR CODE HERE
+v_fun = @(t) % YOUR CODE HERE
+
+% Task 2
+coeffs = [0.5*a, v0, x0];
+r = roots(coeffs);
+t_land = max(r);   % take positive root
+
+% Task 3 & 4: plotting
+t_range = linspace(0, t_land, 300);
+figure;
+plot(t_range, x_fun(t_range), 'b-', 'LineWidth', 2);
+hold on;
+% YOUR CODE: add horizontal line at y=0, mark the peak, mark landing
+xlabel('t [s]');  ylabel('x [m]');
+title(sprintf('Domain: 0 ≤ t ≤ %.2f s', t_land));
+grid on;  legend('x(t)', 'Ground');`,
+          prose: [],
+        },
+      ],
+    },
+  },
+
+  misconceptions: [
+    {
+      id: 'p0-003-misc1',
+      misconception: `"x(t) means x multiplied by t."`,
+      reality: `In mathematics and physics, f(x) always means "function f evaluated at input x" — never f times x. If multiplication were intended it would be written x·t or x×t. The notation x(t) says: "apply the position rule to time t and get a position." Context makes this unambiguous: once x is defined as a function, x(t) is always evaluation.`,
+      whyItHappens: `Students sometimes confuse function notation with multiplication because both use juxtaposition. The distinction becomes clear when you see f(3) — that clearly can't mean f×3 when 3 has no variable to combine with.`,
+    },
+    {
+      id: 'p0-003-misc2',
+      misconception: `"Time is always the independent variable in physics."`,
+      reality: `Time is the most common independent variable in kinematics, but not universally. Temperature can depend on position T(x). Pressure depends on depth P(h). Energy depends on velocity KE(v). The independent variable is whichever quantity you freely choose as the input; the dependent variable is what the physics determines.`,
+      whyItHappens: `Introductory physics uses time heavily, so students over-generalize. Explicitly asking "what does this quantity depend on?" before writing any function prevents this.`,
+    },
+    {
+      id: 'p0-003-misc3',
+      misconception: `"A physics formula is valid for all times — the domain is all real numbers."`,
+      reality: `Every physics model has a domain of validity. x(t) = ½gt² only applies while the ball is in the air. A car's braking model only applies while the car is moving. Using a model outside its domain gives wrong answers. Always ask: "For what range of inputs is this model physically valid?"`,
+      whyItHappens: `Textbook problems rarely state the domain explicitly, leading students to apply formulas past their range of validity.`,
+    },
+  ],
+
+  transferPrompts: [
+    {
+      id: 'p0-003-tp1',
+      prompt: `A hospital monitors a patient's heart rate over a 24-hour period. The data is stored as a function HR(t) where t is hours and HR is beats per minute. (a) Identify the independent and dependent variables. (b) What is the domain? (c) If HR(8) = 65 and HR(14) = 82, what physical meaning do these values have?`,
+      targetConcept: 'Independent/dependent variables, function evaluation, domain',
+      hint: `The independent variable is the one the doctor chooses to query (time). The dependent variable is the resulting measurement.`,
+    },
+    {
+      id: 'p0-003-tp2',
+      prompt: `An engineer models the stress S on a bridge cable as S(F) = F/A where F is applied force [N] and A is cross-sectional area [m²]. The cable fails when S > 250 MPa. Given A = 0.002 m², find the domain of F (in Newtons) for which the bridge is safe.`,
+      targetConcept: 'Function evaluation, domain constraint from physical limit',
+      hint: `Solve S(F) ≤ 250×10⁶. This gives the safe domain for F.`,
+    },
+  ],
+
+  debugging: [
+    {
+      id: 'p0-003-dbg1',
+      title: 'Computing t² before multiplying — order of operations error',
+      scenario: `A student evaluates x = ½ × 9.8 × 3² as "½ × 9.8 × 3 = 14.7, then 14.7² = 216." The correct answer is 44.1 m.`,
+      error: `The student squared the product (½ × 9.8 × 3) instead of squaring only t = 3 first. Order of operations requires: exponents before multiplication. In ½at², compute t² first, then multiply by a, then by ½.`,
+      fix: `x = ½ × 9.8 × (3²) = ½ × 9.8 × 9 = 44.1 m. Write parentheses around t² explicitly: (t²), then multiply.`,
+      prevention: `Always write the formula step by step: t² = 9, then a×t² = 9.8×9 = 88.2, then ½×88.2 = 44.1. Never skip steps when exponents are involved.`,
+    },
+    {
+      id: 'p0-003-dbg2',
+      title: 'Using the formula outside its domain',
+      scenario: `A student computes x(t) = 30t − 5t² at t = 10 s, getting x = 300 − 500 = −200 m. The object is a ball thrown from the ground.`,
+      error: `The ball hits the ground when x = 0: solving 30t − 5t² = 0 gives t = 6 s. The formula is only valid for 0 ≤ t ≤ 6 s. At t = 10 s the ball has been on the ground for 4 seconds — the model is meaningless outside its domain.`,
+      fix: `Always find the domain endpoints first. Here: set x(t) = 0 → t = 0 and t = 6 s. Domain: [0, 6 s]. Any answer for t > 6 is unphysical.`,
+      prevention: `For every kinematics problem, state the domain at the start: "the formula is valid for 0 ≤ t ≤ 6 s."`,
+    },
+  ],
+
+  mastery: {
+    targetLevel: `You can evaluate any kinematic function at a specific time, identify the independent and dependent variables, state the physical domain of validity, and recognize the three kinematic shapes (constant, linear, quadratic) on a graph.`,
+    checklistItems: [
+      `Evaluate x(t), v(t), and a(t) at specific times for constant-acceleration problems without error`,
+      `Identify which variable is independent and which is dependent for any physics relationship`,
+      `Find the domain of a kinematic function by solving x(t) = 0 for the endpoint`,
+      `Recognize the three kinematic curve shapes: flat (a), linear (v), parabolic (x)`,
+      `Write function composition: KE(v(t)) or any two-step dependency`,
+      `Avoid applying a formula outside its domain — always check endpoints first`,
+    ],
+    commonStruggles: [
+      `Confusing x(t) with x×t — remember: parentheses after a function name always mean evaluation`,
+      `Order-of-operations errors: t² must be computed before multiplying by a or ½`,
+      `Forgetting the domain: using x(t) past the landing time gives underground (unphysical) results`,
+      `Not recognizing that different curve shapes encode different physical behavior`,
+    ],
+    nextSteps: [
+      `Lesson 4 (Average vs Instantaneous): how does Δx/Δt behave as Δt shrinks? This requires reading x(t) carefully`,
+      `Lesson 5 (Graphs as Physics): graph shapes are a shorthand for function behavior`,
+      `Chapter 2 (Kinematics): all SUVAT equations are instances of these three kinematic functions`,
+    ],
+  },
 
   quiz: [
     {

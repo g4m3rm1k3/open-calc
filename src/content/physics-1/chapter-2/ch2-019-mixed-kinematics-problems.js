@@ -274,6 +274,76 @@ export default {
     ],
   },
 
+  misconceptions: [
+    {
+      id: 'ch2-019-misc-1',
+      misconception: `SUVAT works for any motion as long as you pick the right equation.`,
+      correction: `SUVAT only works when acceleration is constant throughout the interval. Variable acceleration (drag, springs, variable thrust) requires integration. Always check that a = constant before reaching for SUVAT.`,
+    },
+    {
+      id: 'ch2-019-misc-2',
+      misconception: `The area under a v–t graph only works if the line is straight.`,
+      correction: `Displacement = ∫v dt always. For a straight line (constant a) you get a trapezoid formula; for a curve you use numerical integration. The area interpretation works universally — the formula changes, not the principle.`,
+    },
+    {
+      id: 'ch2-019-misc-3',
+      misconception: `You must always use the formula without t when t is unknown.`,
+      correction: `That's a useful heuristic but not a rule. You can also find t first from another equation and then use a t-containing formula. The two routes always give the same answer. Pick whichever path has fewer unknowns at each step.`,
+    },
+  ],
+
+  transferPrompts: [
+    {
+      id: 'ch2-019-tp-1',
+      prompt: `A cyclist's velocity increases from 3 m/s to 9 m/s over 30 m. Find the acceleration and the time, using two different SUVAT routes. Confirm both routes give the same answer.`,
+      targetConcept: `Route 1: v² = v₀² + 2aΔx → a = (81−9)/60 = 1.2 m/s². Route 2: Δx = ½(v₀+v)t → t = 60/12 = 5 s, then a = Δv/t = 1.2 m/s². Same answer.`,
+    },
+    {
+      id: 'ch2-019-tp-2',
+      prompt: `You have a v–t graph with a curved (not straight) line. Can you still find displacement? Can you use SUVAT? Explain.`,
+      targetConcept: `Displacement is always the area under v–t regardless of shape (integrate numerically if curved). SUVAT requires constant a, so it cannot be applied to a curved v–t graph.`,
+    },
+    {
+      id: 'ch2-019-tp-3',
+      prompt: `A ball is thrown upward at 14 m/s. At what two times is the ball at height 5 m? Use the quadratic approach.`,
+      targetConcept: `Set y(t) = 5: 14t − 4.9t² = 5 → 4.9t² − 14t + 5 = 0. Roots: t = (14 ± √(196−98))/9.8 → t ≈ 0.41 s (going up) and t ≈ 2.45 s (coming down).`,
+    },
+  ],
+
+  debugging: [
+    {
+      id: 'ch2-019-dbg-1',
+      title: `Applying SUVAT to variable-acceleration motion`,
+      buggyCode: `# Object under drag: a(t) = -2*v(t), v0 = 10 m/s\n# Student uses SUVAT: Δx = v0*t + 0.5*a*t² with a = -2*10 = -20\nt = 3\na_wrong = -20  # used initial a as if constant\ndx_wrong = 10*t + 0.5*a_wrong*t**2\nprint(f"SUVAT gives {dx_wrong} m")  # -60 m — physically wrong`,
+      issue: `a is not constant — it depends on v which changes over time. SUVAT cannot be applied. Requires solving the ODE or numerical integration.`,
+      fixedCode: `import numpy as np\nfrom scipy.integrate import odeint\n\ndef dv_dt(v, t): return -2*v\nt = np.linspace(0, 3, 1000)\nv = odeint(dv_dt, [10], t).flatten()\ndx_correct = np.trapz(v, t)\nprint(f"Correct Δx = {dx_correct:.3f} m")`,
+    },
+    {
+      id: 'ch2-019-dbg-2',
+      title: `Using the wrong SUVAT equation (t present but unknown)`,
+      buggyCode: `# Known: v0=5, v=20, Δx=112.5 — find a\n# Student picks Δx = v0*t + 0.5*a*t²  but t is unknown!\nv0, v, dx = 5, 20, 112.5\n# stuck: two unknowns (a and t) in one equation`,
+      issue: `The chosen equation has two unknowns. When t is missing from the knowns, use v² = v₀² + 2aΔx which has only one unknown (a).`,
+      fixedCode: `v0, v, dx = 5, 20, 112.5\na = (v**2 - v0**2) / (2*dx)  # v² = v0² + 2a*Δx, solve for a\nprint(f"a = {a:.3f} m/s²")    # 1.5 m/s²`,
+    },
+  ],
+
+  mastery: {
+    summary: `Mixed kinematics problems require method selection before algebra. The decision tree: (1) list knowns and unknowns, (2) check if a is constant (SUVAT valid), (3) pick the equation that links exactly your known and unknown variables. Graph reading and SUVAT are complementary — slopes give acceleration, areas give displacement, and equations connect the rest.`,
+    keyTakeaways: [
+      `Always list knowns and unknowns before writing any equation.`,
+      `SUVAT is only valid when a = constant throughout the interval.`,
+      `v² = v₀² + 2aΔx is the go-to when t is unknown.`,
+      `Δx = ½(v₀+v)t is the go-to when a is unknown.`,
+      `Area under v–t = displacement regardless of graph shape.`,
+      `Slope of v–t = acceleration regardless of graph shape.`,
+    ],
+    nextSteps: [
+      `Two-object problems — simultaneous equations from separate motion equations`,
+      `Non-constant acceleration — integration replaces SUVAT`,
+      `Projectile motion — horizontal and vertical SUVAT applied simultaneously`,
+    ],
+  },
+
   // ── Quiz ──────────────────────────────────────────────────────────────────
   quiz: [
     {

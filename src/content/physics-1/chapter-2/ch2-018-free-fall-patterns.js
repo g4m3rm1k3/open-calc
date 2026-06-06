@@ -123,160 +123,274 @@ export default {
     },
   ],
 
-  // ── Python Lab ────────────────────────────────────────────────────────────
-  python: {
-    title: `Python Lab — Free Fall Pattern Recognition`,
-    description: `Practise classifying free-fall scenarios from v(t) and y(t) graphs. Generate the three canonical patterns and write code that identifies them automatically.`,
-    placement: 'after-examples',
-    visualizations: [
-      {
-        id: 'PythonNotebook',
-        title: 'Pattern classification — the three free-fall cases',
-        props: {
-          initialCells: [
-            {
-              id: 'cell-01',
-              type: 'code',
-              cellTitle: 'Three canonical v(t) signatures',
-              prose: `Plot v(t) for the three free-fall patterns: (1) drop from rest, (2) upward throw, (3) downward throw. The v-intercept and slope are the pattern fingerprints.`,
-              code: [
-                `import numpy as np`,
-                `import matplotlib.pyplot as plt`,
-                ``,
-                `g = 9.8`,
-                `t = np.linspace(0, 3, 300)`,
-                ``,
-                `cases = [`,
-                `    ('Drop from rest\\nv₀=0',    0.0,   '-g', 'steelblue'),`,
-                `    ('Upward throw\\nv₀=+14',  14.0,   '-g', 'seagreen'),`,
-                `    ('Downward throw\\nv₀=-7', -7.0,   '-g', 'tomato'),`,
-                `]`,
-                ``,
-                `fig, axes = plt.subplots(1, 3, figsize=(12, 4), sharey=True)`,
-                `for ax, (name, v0, alabel, color) in zip(axes, cases):`,
-                `    v = v0 - g*t`,
-                `    ax.plot(t, v, lw=2, color=color)`,
-                `    ax.axhline(0, color='k', lw=0.8)`,
-                `    ax.set_title(name)`,
-                `    ax.set_xlabel('t (s)')`,
-                `    ax.text(0.05, 0.05, f'v₀={v0:+.0f}\\na=−g',`,
-                `            transform=ax.transAxes, fontsize=9, color=color)`,
-                ``,
-                `axes[0].set_ylabel('v (m/s)')`,
-                `plt.suptitle('Free-fall v(t) — three canonical patterns', fontsize=12)`,
-                `plt.tight_layout()`,
-                `plt.show()`,
-              ].join('\n'),
-              output: '',
-              status: 'idle',
-              figureJson: null,
-            },
-            {
-              id: 'cell-02',
-              type: 'code',
-              cellTitle: 'y(t) curvature — all three cases',
-              prose: `Plot y(t) for all three cases. Each is concave-down (a = −g always), but the y-intercept sign of v dictates whether the curve rises first or falls immediately.`,
-              code: [
-                `import numpy as np`,
-                `import matplotlib.pyplot as plt`,
-                ``,
-                `g = 9.8`,
-                `t = np.linspace(0, 3, 300)`,
-                ``,
-                `cases = [`,
-                `    ('Drop from rest',     0.0,  'steelblue'),`,
-                `    ('Upward throw v₀=14', 14.0, 'seagreen'),`,
-                `    ('Downward throw v₀=−7', -7.0, 'tomato'),`,
-                `]`,
-                ``,
-                `fig, ax = plt.subplots(figsize=(8, 5))`,
-                `for name, v0, color in cases:`,
-                `    y = v0*t - 0.5*g*t**2`,
-                `    ax.plot(t, y, lw=2, label=name, color=color)`,
-                ``,
-                `ax.axhline(0, color='k', lw=0.8)`,
-                `ax.set_xlabel('t (s)')`,
-                `ax.set_ylabel('y (m) — up positive')`,
-                `ax.set_title('y(t) for three free-fall patterns — all concave-down')`,
-                `ax.legend()`,
-                `plt.tight_layout()`,
-                `plt.show()`,
-              ].join('\n'),
-              output: '',
-              status: 'idle',
-              figureJson: null,
-            },
-            {
-              id: 'cell-03',
-              type: 'code',
-              cellTitle: 'Classifier — identify pattern from v₀',
-              prose: `Write a function that classifies a free-fall scenario as "drop", "upward throw", or "downward throw" based on the initial velocity v₀.`,
-              code: [
-                `def classify_free_fall(v0, tol=1e-9):`,
-                `    """Classify a free-fall scenario from initial velocity."""`,
-                `    if abs(v0) < tol:`,
-                `        return "Drop from rest (v₀ = 0)"`,
-                `    elif v0 > 0:`,
-                `        return f"Upward throw (v₀ = {v0:+.2f} m/s)"`,
-                `    else:`,
-                `        return f"Downward throw (v₀ = {v0:+.2f} m/s)"`,
-                ``,
-                `def peak_height(v0, g=9.8):`,
-                `    """Return peak height above launch point (None if no apex)."""`,
-                `    if v0 <= 0:`,
-                `        return None   # no apex for drops or downward throws`,
-                `    return v0**2 / (2*g)`,
-                ``,
-                `# Test cases`,
-                `for v0 in [0, 14, -7, 20, -3]:`,
-                `    label = classify_free_fall(v0)`,
-                `    h     = peak_height(v0)`,
-                `    h_str = f"{h:.2f} m" if h else "—"`,
-                `    print(f"v₀ = {v0:+5.1f}  →  {label:<38}  apex: {h_str}")`,
-              ].join('\n'),
-              output: '',
-              status: 'idle',
-              figureJson: null,
-            },
-            {
-              id: 'cell-04',
-              type: 'code',
-              cellTitle: 'Challenge — identify the case from a v–t data series',
-              prose: `Given a sampled v(t) dataset (velocity measured every 0.1 s), write code to determine: (1) the initial velocity v₀, (2) the acceleration, and (3) which free-fall pattern it is.`,
-              code: [
-                `import numpy as np`,
-                ``,
-                `# Simulated measurement: upward throw at v0=12 m/s with noise`,
-                `g_true = 9.8`,
-                `v0_true = 12.0`,
-                `t_data = np.arange(0, 2.5, 0.1)`,
-                `v_data = v0_true - g_true*t_data + np.random.normal(0, 0.3, size=len(t_data))`,
-                ``,
-                `# Linear fit: v = v0 + a*t`,
-                `coeffs = np.polyfit(t_data, v_data, 1)`,
-                `a_fit, v0_fit = coeffs`,
-                ``,
-                `print(f"Fitted v₀ = {v0_fit:.3f} m/s  (true: {v0_true})")`,
-                `print(f"Fitted a  = {a_fit:.3f} m/s²  (true: {-g_true})")`,
-                `print()`,
-                ``,
-                `# Classification`,
-                `if abs(v0_fit) < 0.5:`,
-                `    case = "Drop from rest"`,
-                `elif v0_fit > 0:`,
-                `    case = "Upward throw"`,
-                `else:`,
-                `    case = "Downward throw"`,
-                `print(f"Classification: {case}")`,
-                `print(f"g recovered   : {-a_fit:.3f} m/s²  (error: {abs(-a_fit - g_true)/g_true*100:.2f}%)")`,
-              ].join('\n'),
-              output: '',
-              status: 'idle',
-              figureJson: null,
-            },
+  notebooks: {
+    python: {
+      type: 'python',
+      cells: [
+        {
+          cellTitle: 'Three canonical v(t) signatures',
+          type: 'code',
+          language: 'python',
+          prose: [
+            `The v-intercept (v₀) and slope (−g) are the two fingerprints of any free-fall scenario. Plot all three patterns side-by-side to build visual fluency.`,
           ],
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+g = 9.8
+t = np.linspace(0, 3, 300)
+
+cases = [
+    ('Drop from rest\\nv₀=0',    0.0,  'steelblue'),
+    ('Upward throw\\nv₀=+14',  14.0,  'seagreen'),
+    ('Downward throw\\nv₀=−7', -7.0,  'tomato'),
+]
+
+fig, axes = plt.subplots(1, 3, figsize=(12, 4), sharey=True)
+for ax, (name, v0, color) in zip(axes, cases):
+    v = v0 - g*t
+    ax.plot(t, v, lw=2, color=color)
+    ax.axhline(0, color='k', lw=0.8)
+    ax.set_title(name)
+    ax.set_xlabel('t (s)')
+    ax.text(0.05, 0.05, f'v₀={v0:+.0f}\\na=−g',
+            transform=ax.transAxes, fontsize=9, color=color)
+
+axes[0].set_ylabel('v (m/s)')
+plt.suptitle('Free-fall v(t) — three canonical patterns', fontsize=12)
+plt.tight_layout()
+plt.show()`,
         },
-      },
+        {
+          cellTitle: 'y(t) curvature — all three cases',
+          type: 'code',
+          language: 'python',
+          prose: [
+            `Every free-fall y(t) curve is concave-down (a = −g). The v₀ only shifts the initial slope — it cannot change the curvature direction.`,
+          ],
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+g = 9.8
+t = np.linspace(0, 3, 300)
+
+cases = [
+    ('Drop from rest',       0.0,  'steelblue'),
+    ('Upward throw v₀=14',  14.0,  'seagreen'),
+    ('Downward throw v₀=−7',-7.0,  'tomato'),
+]
+
+fig, ax = plt.subplots(figsize=(8, 5))
+for name, v0, color in cases:
+    y = v0*t - 0.5*g*t**2
+    ax.plot(t, y, lw=2, label=name, color=color)
+
+ax.axhline(0, color='k', lw=0.8)
+ax.set_xlabel('t (s)')
+ax.set_ylabel('y (m) — up positive')
+ax.set_title('y(t) for three free-fall patterns — all concave-down')
+ax.legend()
+plt.tight_layout()
+plt.show()`,
+        },
+        {
+          cellTitle: 'Classifier — identify pattern from v₀',
+          type: 'code',
+          language: 'python',
+          prose: [
+            `A simple function that classifies a free-fall scenario from its initial velocity. The sign and magnitude of v₀ tell you everything.`,
+          ],
+          code: `def classify_free_fall(v0, tol=1e-9):
+    if abs(v0) < tol:
+        return "Drop from rest (v₀ = 0)"
+    elif v0 > 0:
+        return f"Upward throw (v₀ = {v0:+.2f} m/s)"
+    else:
+        return f"Downward throw (v₀ = {v0:+.2f} m/s)"
+
+def peak_height(v0, g=9.8):
+    if v0 <= 0:
+        return None
+    return v0**2 / (2*g)
+
+for v0 in [0, 14, -7, 20, -3]:
+    label = classify_free_fall(v0)
+    h     = peak_height(v0)
+    h_str = f"{h:.2f} m" if h else "—"
+    print(f"v₀ = {v0:+5.1f}  →  {label:<38}  apex: {h_str}")`,
+        },
+        {
+          cellTitle: 'Challenge — identify the case from a v–t data series',
+          type: 'code',
+          language: 'python',
+          prose: [
+            `Given noisy velocity samples, fit a line to recover v₀ and a, then classify the scenario. This is how real-world kinematics data gets interpreted.`,
+          ],
+          code: `import numpy as np
+
+g_true = 9.8
+v0_true = 12.0
+t_data = np.arange(0, 2.5, 0.1)
+v_data = v0_true - g_true*t_data + np.random.normal(0, 0.3, size=len(t_data))
+
+coeffs = np.polyfit(t_data, v_data, 1)
+a_fit, v0_fit = coeffs
+
+print(f"Fitted v₀ = {v0_fit:.3f} m/s  (true: {v0_true})")
+print(f"Fitted a  = {a_fit:.3f} m/s²  (true: {-g_true})")
+
+if abs(v0_fit) < 0.5:
+    case = "Drop from rest"
+elif v0_fit > 0:
+    case = "Upward throw"
+else:
+    case = "Downward throw"
+print(f"Classification: {case}")
+print(f"g recovered   : {-a_fit:.3f} m/s²  (error: {abs(-a_fit - g_true)/g_true*100:.2f}%)")`,
+        },
+      ],
+    },
+    matlab: {
+      type: 'matlab',
+      cells: [
+        {
+          cellTitle: 'Three canonical v(t) patterns — MATLAB',
+          type: 'code',
+          language: 'matlab',
+          prose: [
+            `Plot the three free-fall v(t) fingerprints in MATLAB using subplot.`,
+          ],
+          code: `g = 9.8;
+t = linspace(0, 3, 300);
+
+v0s    = [0, 14, -7];
+names  = {'Drop from rest (v0=0)', 'Upward throw (v0=+14)', 'Downward throw (v0=-7)'};
+colors = {'b', 'g', 'r'};
+
+figure;
+for k = 1:3
+    subplot(1,3,k)
+    v = v0s(k) - g*t;
+    plot(t, v, colors{k}, 'LineWidth', 2); hold on
+    yline(0, 'k--', 'LineWidth', 0.8)
+    xlabel('t (s)'), ylabel('v (m/s)')
+    title(names{k})
+end
+sgtitle('Free-fall v(t) — three canonical patterns')`,
+        },
+        {
+          cellTitle: 'Classifier function — MATLAB',
+          type: 'code',
+          language: 'matlab',
+          prose: [
+            `Use an if-elseif-else block to classify a free-fall case from its initial velocity.`,
+          ],
+          code: `function label = classify_free_fall(v0, tol)
+    if nargin < 2, tol = 1e-9; end
+    if abs(v0) < tol
+        label = 'Drop from rest';
+    elseif v0 > 0
+        label = sprintf('Upward throw (v0 = %+.2f m/s)', v0);
+    else
+        label = sprintf('Downward throw (v0 = %+.2f m/s)', v0);
+    end
+end
+
+% Test
+for v0 = [0, 14, -7, 20, -3]
+    fprintf('v0 = %+5.1f  ->  %s\\n', v0, classify_free_fall(v0));
+end`,
+        },
+        {
+          cellTitle: 'Challenge — fit a noisy v(t) dataset in MATLAB',
+          type: 'code',
+          language: 'matlab',
+          prose: [
+            `Use polyfit on sampled v(t) data to recover v₀ and g, then classify the scenario.`,
+          ],
+          code: `rng(0);
+g_true = 9.8; v0_true = 12.0;
+t_data = (0:0.1:2.4)';
+v_data = v0_true - g_true*t_data + 0.3*randn(size(t_data));
+
+p = polyfit(t_data, v_data, 1);
+a_fit  = p(1);
+v0_fit = p(2);
+
+fprintf('Fitted v0 = %.3f m/s (true %.1f)\\n', v0_fit, v0_true);
+fprintf('Fitted a  = %.3f m/s² (true %.1f)\\n', a_fit, -g_true);
+fprintf('g recovered: %.3f m/s²\\n', -a_fit);`,
+        },
+      ],
+    },
+  },
+
+  misconceptions: [
+    {
+      id: 'ch2-018-misc-1',
+      misconception: `A concave-up y(t) curve indicates upward motion.`,
+      correction: `Curvature is set by the sign of acceleration, not velocity direction. Free fall always gives concave-down (a = −g < 0 in up-positive). An upward throw still produces a concave-down parabola; the object simply starts on the rising side.`,
+    },
+    {
+      id: 'ch2-018-misc-2',
+      misconception: `If velocity crosses zero on the v–t graph, the object has stopped and stays stopped.`,
+      correction: `Crossing zero just means the object momentarily reverses direction (the apex). The acceleration is still −g; velocity continues decreasing through zero and goes negative. The object never actually pauses — it changes direction instantaneously.`,
+    },
+    {
+      id: 'ch2-018-misc-3',
+      misconception: `A steeper v–t line means stronger gravity.`,
+      correction: `The slope of v(t) is acceleration. In ideal free fall the slope is always −g regardless of v₀, mass, or height. A steeper line would indicate a different gravitational environment (different planet), not a change in the throw.`,
+    },
+  ],
+
+  transferPrompts: [
+    {
+      id: 'ch2-018-tp-1',
+      prompt: `You measure a v(t) dataset from an unknown motion. The v-intercept is −5 m/s and the slope is −9.8 m/s². Classify the motion and describe the y(t) curve shape.`,
+      targetConcept: `Negative v-intercept + slope −g = downward throw. y(t) will be concave-down, starting with a negative (downward) slope that steepens over time.`,
+    },
+    {
+      id: 'ch2-018-tp-2',
+      prompt: `A y(t) graph rises to a maximum then falls below the starting level. What are two things you can conclude before computing any numbers?`,
+      targetConcept: `(1) The object was thrown upward (v₀ > 0 — curve rises first). (2) The object fell past its launch height (end y < start y), consistent with free fall continuing after the apex.`,
+    },
+    {
+      id: 'ch2-018-tp-3',
+      prompt: `You have three v(t) datasets. Dataset A has v₀ = 0. Dataset B has v₀ = +10 m/s. Dataset C has v₀ = −4 m/s. All have slope −9.8 m/s². Which one has an apex? What is the apex height for that case?`,
+      targetConcept: `Only Dataset B (upward throw) has an apex. h_apex = v₀²/(2g) = 100/19.6 ≈ 5.10 m.`,
+    },
+  ],
+
+  debugging: [
+    {
+      id: 'ch2-018-dbg-1',
+      title: `Misidentifying downward throw as drop from rest`,
+      buggyCode: `# Student sees v0 ≈ 0 at t=0 and labels it "drop from rest"\nv0 = -0.5  # m/s — small but nonzero\nif v0 == 0:\n    print("Drop from rest")\nelse:\n    print("Drop from rest")  # copied wrong branch`,
+      issue: `Any nonzero v₀, even small, changes the pattern. Use a tolerance for exact-zero checks and separate branches for positive vs negative v₀.`,
+      fixedCode: `v0 = -0.5\ntol = 0.1  # m/s threshold for "approximately zero"\nif abs(v0) < tol:\n    print("Approximately drop from rest")\nelif v0 > 0:\n    print("Upward throw")\nelse:\n    print("Downward throw")`,
+    },
+    {
+      id: 'ch2-018-dbg-2',
+      title: `Wrong sign for acceleration in v(t) formula`,
+      buggyCode: `g = 9.8\nv0 = 14.0\nt = 2.0\nv = v0 + g*t  # WRONG sign\nprint(f"v at t=2: {v:.2f} m/s")  # gives 33.6 instead of -5.6`,
+      issue: `In up-positive convention, a = −g. The formula is v = v₀ − gt, not v₀ + gt.`,
+      fixedCode: `g = 9.8\nv0 = 14.0\nt = 2.0\nv = v0 - g*t  # correct: a = -g\nprint(f"v at t=2: {v:.2f} m/s")  # -5.6 m/s (descending past apex)`,
+    },
+  ],
+
+  mastery: {
+    summary: `Every free-fall scenario shares the same acceleration (a = −g in up-positive). The three patterns differ only in v₀: zero (drop), positive (upward throw), negative (downward throw). On v(t) graphs the slope is always −g; on y(t) graphs the curve is always concave-down. Recognition speed comes from reading the v-intercept and curvature before touching numbers.`,
+    keyTakeaways: [
+      `v(t) slope = −g for all free-fall scenarios regardless of v₀.`,
+      `y(t) is always concave-down — curvature direction is set by a, not v₀.`,
+      `Three quick checks: axis convention → sign of a → expected v trend.`,
+      `Apex exists only when v₀ > 0; height at apex = v₀²/(2g).`,
+      `v = 0 at the apex is a direction reversal, not a stop — acceleration continues.`,
+    ],
+    nextSteps: [
+      `Mixed kinematics problems combining multiple patterns`,
+      `Two-object problems requiring simultaneous pattern identification`,
+      `Projectile motion — horizontal and vertical pattern recognition combined`,
     ],
   },
 

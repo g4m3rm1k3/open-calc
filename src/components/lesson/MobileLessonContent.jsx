@@ -533,7 +533,7 @@ export default function MobileLessonContent({ lesson }) {
 
       {/* ── OpenMAT / MATLAB lab ───────────────────────────────────── */}
       {(() => {
-        const openmatRaw = lesson.openmat ?? lesson.openmatLab;
+        const openmatRaw = lesson.openmat ?? lesson.openmatLab ?? lesson.notebooks?.matlab;
         const cells = openmatRaw?.cells ?? openmatRaw?.initialCells;
         let visualizations = openmatRaw?.visualizations ?? [];
         if (!visualizations.length && cells?.length) visualizations = [{ id: "OpenMatNotebook", initialProps: { initialCells: cells }, title: openmatRaw.title ?? "OpenMAT / MATLAB Lab" }];
@@ -551,7 +551,7 @@ export default function MobileLessonContent({ lesson }) {
 
       {/* ── Python lab ────────────────────────────────────────────── */}
       {(() => {
-        const pythonRaw = lesson.python ?? lesson.pythonLab;
+        const pythonRaw = lesson.python ?? lesson.pythonLab ?? lesson.notebooks?.python;
         const cells = pythonRaw?.cells ?? pythonRaw?.initialCells;
         let visualizations = pythonRaw?.visualizations ?? [];
         if (!visualizations.length && cells?.length) visualizations = [{ id: "PythonNotebook", props: { initialCells: cells }, title: pythonRaw.title ?? "Python Lab" }];

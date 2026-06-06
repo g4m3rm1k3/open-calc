@@ -84,6 +84,13 @@ export default {
           'Before reading the diagram, ask yourself: what three things would you need to describe motion completely? The chain shows the answer: where something is (position x), how fast it\'s moving (velocity v), and what\'s causing that speed to change (acceleration a). The arrows show that calculus connects these — but we will build that connection from algebra first, before we ever write a derivative.',
         caption: 'Physics models motion through three linked quantities: position, velocity, and acceleration. They form a chain — change one and the others respond.',
       },
+      {
+        id: 'FreeFallExplorer',
+        title: 'Free fall explorer — drag the time slider',
+        mathBridge:
+          'Move the time slider and watch the position, velocity, and x = ½gt² value update in real time. Notice how the position curve bends — it is not a straight line because the object keeps accelerating. The velocity increases linearly (constant acceleration). Connect these two curves to x = ½gt²: the position curve is exactly ½ × 9.8 × t².',
+        caption: 'Every point on the position curve satisfies x = ½gt². The velocity curve (v = gt) is its derivative — the slope of position at that instant.',
+      },
     ],
   },
 
@@ -431,6 +438,325 @@ export default {
         hint: '6 s is 3× the original 2 s. So x multiplies by 3² = 9. What is 9 × 20?',
       },
     ],
+  },
+
+  notebooks: {
+    python: {
+      type: 'PythonNotebook',
+      cells: [
+        {
+          cellTitle: 'Free Fall: x = ½gt²',
+          type: 'code',
+          language: 'python',
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+g = 9.8   # m/s²  (Earth)
+t = np.linspace(0, 5, 300)
+x = 0.5 * g * t**2
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+# Distance vs time
+axes[0].plot(t, x, 'b-', linewidth=2)
+axes[0].set_xlabel('Time t (s)')
+axes[0].set_ylabel('Distance fallen x (m)')
+axes[0].set_title('Free fall: x = ½gt²')
+axes[0].grid(True)
+
+# Mark specific times
+for t_mark in [1, 2, 3, 4]:
+    x_mark = 0.5 * g * t_mark**2
+    axes[0].plot(t_mark, x_mark, 'ro', markersize=7)
+    axes[0].annotate(f't={t_mark}s\\n{x_mark:.1f}m',
+                     xy=(t_mark, x_mark), xytext=(t_mark+0.1, x_mark-8),
+                     fontsize=8)
+
+# Distance vs t² (should be a straight line — proves the proportionality)
+axes[1].plot(t**2, x, 'g-', linewidth=2)
+axes[1].set_xlabel('t² (s²)')
+axes[1].set_ylabel('Distance fallen x (m)')
+axes[1].set_title('x vs t² — straight line confirms x ∝ t²')
+axes[1].grid(True)
+
+plt.tight_layout()
+plt.show()
+
+print("Key distances:")
+for t_val in [1, 2, 3, 4, 5]:
+    print(f"  t = {t_val}s → x = {0.5*g*t_val**2:.1f} m")`,
+          prose: [
+            '`x = 0.5 * g * t**2` is the direct implementation of x = ½gt². NumPy applies this element-wise across all 300 time values simultaneously.',
+            'The right plot shows x vs t² — a straight line. This is the visual proof that x is proportional to t²: if x ∝ t² then a plot of x against t² must be linear. Galileo confirmed this with his ramps.',
+            'The marked points show how distance grows: at t=1s, 4.9m; at t=2s, 19.6m (4×); at t=3s, 44.1m (9×). The ratios are 1:4:9 = 1²:2²:3². This is the t² signature.',
+          ],
+        },
+        {
+          cellTitle: 'Earth vs Moon vs Mars — same model, different g',
+          type: 'code',
+          language: 'python',
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+planets = {
+    'Earth':   {'g': 9.8,  'color': 'royalblue'},
+    'Moon':    {'g': 1.62, 'color': 'slategray'},
+    'Mars':    {'g': 3.72, 'color': 'tomato'},
+    'Jupiter': {'g': 24.8, 'color': 'goldenrod'},
+}
+
+t = np.linspace(0, 6, 300)
+
+fig, ax = plt.subplots(figsize=(10, 6))
+for name, data in planets.items():
+    x = 0.5 * data['g'] * t**2
+    ax.plot(t, x, linewidth=2.5, color=data['color'], label=f"{name} (g={data['g']} m/s²)")
+
+ax.set_xlabel('Time (s)', fontsize=12)
+ax.set_ylabel('Distance fallen (m)', fontsize=12)
+ax.set_title('Free fall on different worlds — same formula, different g', fontsize=13)
+ax.legend(fontsize=11)
+ax.grid(True, alpha=0.4)
+ax.set_ylim(0, 450)
+plt.tight_layout()
+plt.show()
+
+# Table comparison at t = 3s
+print("Distance fallen after 3 seconds:")
+for name, data in planets.items():
+    x3 = 0.5 * data['g'] * 3**2
+    print(f"  {name:8}: {x3:.1f} m")`,
+          prose: [
+            'The model x = ½gt² works on every body in the solar system — only g changes. Same formula, just swap the constant. This is what "model" means: a structure that generalizes across situations.',
+            'Jupiter\'s curve is nearly off the chart in 3 seconds — the same object that falls 44 m on Earth falls 334 m on Jupiter. That\'s not a different law of physics; it\'s the same law with a much larger g.',
+            'The Moon\'s shallow curve explains why Apollo astronauts could jump so high and why the famous hammer-and-feather drop (g_Moon = 1.62 m/s²) took noticeably longer than it would on Earth.',
+          ],
+        },
+        {
+          cellTitle: 'Model failure: skydiver with air resistance',
+          type: 'code',
+          language: 'python',
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+from scipy.integrate import odeint
+
+g = 9.8
+m = 80      # kg  skydiver mass
+k = 0.3     # drag coefficient (approximate for spread-eagle position)
+
+def free_fall_drag(state, t):
+    x, v = state
+    drag = k * v**2 / m   # acceleration due to drag (opposes motion)
+    a = g - drag
+    return [v, a]
+
+t = np.linspace(0, 15, 500)
+
+# No air resistance (simple model)
+x_simple = 0.5 * g * t**2
+v_simple  = g * t
+
+# With air resistance (ODE solution)
+sol = odeint(free_fall_drag, [0, 0], t)
+x_drag = sol[:, 0]
+v_drag  = sol[:, 1]
+
+fig, axes = plt.subplots(1, 2, figsize=(13, 5))
+
+axes[0].plot(t, x_simple, 'b--', linewidth=2, label='Model: no drag')
+axes[0].plot(t, x_drag,   'r-',  linewidth=2, label='Reality: with drag')
+axes[0].set_xlabel('Time (s)'); axes[0].set_ylabel('Distance fallen (m)')
+axes[0].set_title('Distance: model vs reality')
+axes[0].legend(); axes[0].grid(True)
+
+axes[1].plot(t, v_simple, 'b--', linewidth=2, label='Model: no drag (v = gt)')
+axes[1].plot(t, v_drag,   'r-',  linewidth=2, label='Reality: with drag')
+axes[1].axhline(y=g*m/k**0.5 if False else max(v_drag)*0.99,
+                color='green', linestyle=':', label='Terminal velocity')
+axes[1].set_xlabel('Time (s)'); axes[1].set_ylabel('Speed (m/s)')
+axes[1].set_title('Speed: model vs reality — notice terminal velocity')
+axes[1].legend(); axes[1].grid(True)
+
+plt.tight_layout()
+plt.show()
+
+print(f"At t=10s — simple model: {0.5*g*100:.0f}m  |  with drag: {x_drag[np.argmin(abs(t-10))]:.0f}m")
+print(f"Model overestimates by: {0.5*g*100 - x_drag[np.argmin(abs(t-10))]:.0f}m at 10s")`,
+          prose: [
+            '`odeint` solves the equation of motion with drag: ma = mg − kv². This is the "better model" — it adds the drag term the simple x = ½gt² ignores.',
+            'The distance plots diverge after about 5 seconds. At t=10s the simple model predicts 490m but reality is about 400m — an 18% overestimate, exactly the skydiver example from the lesson.',
+            'The speed plot shows the key difference: the simple model has speed growing forever (v = gt, a straight line). The drag model shows speed levelling off at "terminal velocity" — the point where drag equals gravity. This is why skydivers don\'t accelerate indefinitely.',
+          ],
+        },
+        {
+          cellTitle: 'Challenge — find g from drop times',
+          type: 'code',
+          language: 'python',
+          challengeType: 'write',
+          prompt: 'An experiment drops a ball from three known heights and records the fall times. Heights: [1.0, 2.0, 4.5] m. Times measured: [0.452, 0.639, 0.957] s. (1) Use x = ½gt² rearranged to t² = 2x/g to compute g from each pair. (2) Find the mean and standard deviation of your g estimates. (3) Plot measured time vs √(2x/g_true) to check linearity. How close is your estimated g to 9.8 m/s²?',
+          starterCode: `import numpy as np
+
+heights = np.array([1.0, 2.0, 4.5])   # m
+times   = np.array([0.452, 0.639, 0.957])  # s
+
+# TODO: From t² = 2x/g, rearrange to g = 2x/t²
+# TODO: Compute g for each measurement
+# TODO: Print mean and std of g estimates
+# TODO: Compare to 9.8 m/s²`,
+        },
+      ],
+    },
+    matlab: {
+      type: 'OpenMatNotebook',
+      cells: [
+        {
+          cellTitle: 'Free Fall: x = ½gt²',
+          type: 'code',
+          language: 'matlab',
+          code: `g = 9.8;
+t = linspace(0, 5, 300);
+x = 0.5 * g * t.^2;
+
+figure;
+subplot(1,2,1)
+plot(t, x, 'b-', 'LineWidth', 2)
+xlabel('Time t (s)'); ylabel('Distance x (m)')
+title('Free fall: x = ½gt²'); grid on
+% Mark specific times
+hold on
+for t_mark = 1:4
+    x_mark = 0.5 * g * t_mark^2;
+    plot(t_mark, x_mark, 'ro', 'MarkerSize', 8, 'MarkerFaceColor', 'r')
+    text(t_mark+0.05, x_mark-5, sprintf('t=%ds\\n%.1fm', t_mark, x_mark), 'FontSize', 8)
+end
+
+subplot(1,2,2)
+plot(t.^2, x, 'g-', 'LineWidth', 2)
+xlabel('t² (s²)'); ylabel('Distance x (m)')
+title('x vs t² — straight line confirms x ∝ t²'); grid on
+
+fprintf('Key distances:\\n')
+for t_val = 1:5
+    fprintf('  t = %ds → x = %.1f m\\n', t_val, 0.5*g*t_val^2)
+end`,
+          prose: [
+            '`x = 0.5 * g * t.^2` uses element-wise squaring `.^2` — essential in MATLAB when t is a vector. Without the dot, MATLAB would try matrix exponentiation and error.',
+            'The subplot(1,2,2) plots x vs t² — the straight line visually confirms x ∝ t². Galileo effectively did this with his water-clock ramp experiments: equal increments of t² gave equal increments of distance.',
+            'The `for` loop uses scalar indexing (t_val^2 not t_val.^2) because we\'re computing one value at a time. The fprintf call prints a readable table of key results.',
+          ],
+        },
+        {
+          cellTitle: 'Earth vs Moon vs Mars',
+          type: 'code',
+          language: 'matlab',
+          code: `g_vals   = [9.8,   1.62,   3.72,  24.8];
+names    = {'Earth', 'Moon', 'Mars', 'Jupiter'};
+colors   = {'b',     'k',    'r',   'y'};
+t = linspace(0, 6, 300);
+
+figure; hold on
+for i = 1:length(g_vals)
+    x = 0.5 * g_vals(i) * t.^2;
+    plot(t, x, colors{i}, 'LineWidth', 2.5, ...
+         'DisplayName', sprintf('%s (g=%.2f m/s²)', names{i}, g_vals(i)))
+end
+xlabel('Time (s)'); ylabel('Distance fallen (m)')
+title('Free fall on different worlds')
+legend('Location','northwest'); grid on; ylim([0 450])
+
+fprintf('\\nDistance fallen after 3 seconds:\\n')
+for i = 1:length(g_vals)
+    fprintf('  %-8s: %.1f m\\n', names{i}, 0.5*g_vals(i)*9)
+end`,
+          prose: [
+            'Cell arrays `names = {\'Earth\', ...}` store strings in MATLAB. Indexing uses `names{i}` (curly braces) not `names(i)` — the distinction matters: curly extracts content, round gives a cell array.',
+            '`sprintf(\'%s (g=%.2f)\', names{i}, g_vals(i))` builds the legend label dynamically. The `%s` formats a string, `%.2f` formats a float to 2 decimal places.',
+            'Jupiter\'s curve nearly fills the vertical axis — 334m in 3 seconds vs Earth\'s 44m. The same formula, just a different g. This is what mathematical models give you: one structure that works across all situations.',
+          ],
+        },
+        {
+          cellTitle: 'Challenge — Proportionality Reasoning',
+          type: 'code',
+          language: 'matlab',
+          challengeType: 'write',
+          prompt: 'An object falls 44.1 m in 3 seconds on Earth. Without using x = ½gt² directly: (1) Use proportionality (x ∝ t²) to predict how far it falls in 6 s, 9 s, and 1.5 s. (2) Verify each answer by computing x = ½(9.8)t² directly. (3) Plot both the proportionality prediction and the direct formula on the same graph — they should be identical.',
+          starterCode: `% Known: at t=3s, x = 44.1 m
+t_ref = 3; x_ref = 44.1;
+t_query = [6, 9, 1.5];
+
+% TODO: x_prop = x_ref * (t_query / t_ref).^2   (proportionality)
+% TODO: x_direct = 0.5 * 9.8 * t_query.^2      (direct formula)
+% TODO: compare and print both
+% TODO: plot both on same axes`,
+        },
+      ],
+    },
+  },
+
+  misconceptions: [
+    {
+      id: 'p0-001-m1',
+      misconception: 'Heavier objects fall faster.',
+      correction: 'All objects fall at the same rate in vacuum regardless of mass. Galileo proved this with a thought experiment (tied stones paradox) and experiment. The equation x = ½gt² has no mass term. On Earth, light/fluffy objects seem to fall slower because air resistance is proportionally larger for them — but that\'s drag, not gravity.',
+      correctionExample: 'Drop a coin and a sheet of paper. The paper falls slower — but crumple the paper into a tight ball and drop both: they hit at almost the same time. Same mass, same result. The difference was always air resistance, not mass.',
+    },
+    {
+      id: 'p0-001-m2',
+      misconception: 'x = ½gt² means x grows proportionally to t (if you double t, you double x).',
+      correction: 'x ∝ t², not t. Doubling t multiplies x by 4, not 2. Tripling t multiplies x by 9. The t² relationship means distance grows much faster than time — this is what acceleration looks like.',
+      correctionExample: 'At t=1s: x = 4.9 m. At t=2s: x = 19.6 m (4× more, not 2×). The ratio of distances equals the ratio of times squared: (2/1)² = 4.',
+    },
+    {
+      id: 'p0-001-m3',
+      misconception: 'A model that is sometimes wrong is useless.',
+      correction: 'Every model has a domain of validity. x = ½gt² is wrong for a skydiver at terminal velocity but exactly right for a dense ball dropped from 10 m. The model is not wrong — it is limited. Knowing its limits is part of knowing the model.',
+      correctionExample: 'Newton\'s gravity was "wrong" by Einstein\'s standard but was used to navigate to the Moon in 1969. The question is never "is this model perfect?" — it is "is this model good enough for this problem?"',
+    },
+  ],
+
+  transferPrompts: [
+    {
+      id: 'p0-001-tp1',
+      prompt: 'A camera dropped from a drone takes 2.3 s to hit the ground. Using x = ½gt², estimate the drone\'s height. Then identify one assumption you made and whether it affects the answer significantly.',
+      connection: 'x = ½(9.8)(2.3²) = ½(9.8)(5.29) ≈ 25.9 m. Assumption: no air resistance. A camera is dense enough that this barely matters — the simple model is accurate here. This is exactly the model-validity analysis the lesson introduces.',
+    },
+    {
+      id: 'p0-001-tp2',
+      prompt: 'The equation x = ½at² describes free fall with constant acceleration. The equation d = ½at² also describes how far a car travels from rest under constant acceleration a. Is the same model being reused? What physical insight does this reveal?',
+      connection: 'Yes — it is the same model. "Distance covered from rest under constant acceleration" is a single mathematical structure that applies to falling objects, accelerating cars, rockets, and anything else with constant acceleration. Physics reuses models because the underlying mathematics is the same regardless of what\'s physically causing the acceleration.',
+    },
+  ],
+
+  debugging: [
+    {
+      id: 'p0-001-db1',
+      scenario: 'A student computes x = ½ × 9.8 × 3 = 14.7 m for a 3-second fall.',
+      error: 'Did not square the time. The formula is x = ½g·t², not ½g·t. The student computed ½ × 9.8 × 3 instead of ½ × 9.8 × 3².',
+      fix: 'Always write t² explicitly: x = ½ × 9.8 × (3)² = ½ × 9.8 × 9 = 44.1 m. The correct answer is 44.1 m, not 14.7 m. Check: does the answer make sense? 14.7 m in 3 s would mean the ball was barely accelerating — but we know free fall builds speed rapidly.',
+    },
+    {
+      id: 'p0-001-db2',
+      scenario: 'A student says the model x = ½gt² is wrong because a feather doesn\'t follow it on Earth.',
+      error: 'Confusing model failure with model wrongness. The model assumes no air resistance. A feather has high drag relative to its weight — the model\'s assumption is violated for a feather in air. The model is correct within its domain (negligible air resistance); the domain simply doesn\'t include feathers in air.',
+      fix: 'Always check whether the problem satisfies the model\'s assumptions before applying it. For the feather-in-air case, a better model includes drag. The original model is not wrong — it\'s outside its domain.',
+    },
+  ],
+
+  mastery: {
+    targetLevel: 'Apply x = ½gt² to compute distances and times; use proportionality to predict scaling without recomputing; identify what a model assumes and where it breaks down.',
+    checklistItems: [
+      'Can substitute t into x = ½gt² and compute the answer correctly (squaring t first)',
+      'Can rearrange x = ½gt² to solve for t given x',
+      'Can use x ∝ t² to predict new distances from known ones without re-deriving',
+      'Can identify at least two assumptions built into x = ½gt² and one situation where each fails',
+      'Can explain in one sentence what a physics model is and why idealization is useful',
+    ],
+    commonStruggles: [
+      'Forgetting to square t — computing ½ × 9.8 × t instead of ½ × 9.8 × t²',
+      'Thinking heavier objects fall faster (Aristotelian intuition is deeply persistent)',
+      'Treating a model\'s domain limitation as a flaw rather than a feature',
+    ],
+    nextSteps: 'Lesson 2 introduces units and dimensions — the grammar that keeps physics equations consistent. Every variable in x = ½gt² has units, and tracking them reveals errors and builds intuition about what equations must look like before you solve them.',
   },
 
   mentalModel: [

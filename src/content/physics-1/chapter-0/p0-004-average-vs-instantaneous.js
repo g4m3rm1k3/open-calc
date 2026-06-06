@@ -206,16 +206,7 @@ export default {
       },
     ],
     title: 'Deriving v(t) = gt from the limit definition of the derivative',
-    visualizations: [
-      {
-        id: 'SVGDiagram',
-        props: { type: 'slope-triangle' },
-        title: 'Each algebraic step has a geometric interpretation',
-        mathBridge:
-          'Step 3 in the proof (expanding (t+Δt)²) corresponds to adding the tiny right-hand rectangleto the slope triangle. Step 6 (Δt → 0) corresponds to that rectangle shrinking to nothing. The diagram and the algebra tell the same story.',
-        caption: 'Algebra and geometry are two languages for the same idea.',
-      },
-    ],
+    visualizations: [],
   },
 
   examples: [
@@ -431,6 +422,357 @@ export default {
     'Average speed ≠ |average velocity|: speed uses total distance; velocity uses net displacement',
     'Preview: derivative of kt^n is knt^{n-1} (power rule — fully derived in Chapter 1)',
   ],
+
+  notebooks: {
+    python: {
+      type: 'python',
+      cells: [
+        {
+          cellTitle: 'Average Velocity — Secant Slope',
+          type: 'code',
+          language: 'python',
+          prose: [
+            `Average velocity is just displacement divided by time interval — the slope of the straight line (secant) joining two points on the x–t curve. This cell computes it for several intervals on x = ½gt² and shows how the answer depends on which interval you pick.`,
+          ],
+          code: `g = 9.8
+
+def x(t):
+    return 0.5 * g * t**2
+
+def avg_v(t1, t2):
+    return (x(t2) - x(t1)) / (t2 - t1)
+
+# Compute average velocity over different intervals all ending at t=3 s
+print("Average velocity ending at t=3 s:")
+print(f"{'Interval':>20}  {'avg v (m/s)':>12}")
+print("-" * 36)
+for t_start in [0, 1, 2, 2.5, 2.9]:
+    v_avg = avg_v(t_start, 3.0)
+    print(f"  [{t_start:.1f}, 3.0]       {v_avg:>12.4f}")
+
+print()
+print(f"Exact instantaneous v at t=3: {g*3:.4f} m/s")
+print("Notice: as t_start → 3, avg_v → instantaneous v(3)")`,
+        },
+        {
+          cellTitle: 'Watching the Limit Converge',
+          type: 'code',
+          language: 'python',
+          prose: [
+            `To find instantaneous velocity at a point we compute the average over shrinking intervals. As Δt → 0, the ratio Δx/Δt stabilizes at a single value — that is the derivative, the instantaneous velocity.`,
+          ],
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+g = 9.8
+
+def x(t):
+    return 0.5 * g * t**2
+
+t0 = 2.0   # evaluate instantaneous velocity at this time
+
+dt_values = np.logspace(-4, 0, 80)  # Δt from 1.0 down to 0.0001
+avg_v_vals = [(x(t0 + dt) - x(t0)) / dt for dt in dt_values]
+
+exact = g * t0
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 4))
+
+axes[0].semilogx(dt_values, avg_v_vals, 'b-', linewidth=2, label='Δx/Δt')
+axes[0].axhline(exact, color='red', linewidth=1.5, linestyle='--', label=f'v(t₀)={exact} m/s')
+axes[0].set_xlabel('Δt [s]  (log scale)');  axes[0].set_ylabel('Δx/Δt [m/s]')
+axes[0].set_title('Convergence of average velocity to instantaneous')
+axes[0].legend();  axes[0].grid(True, alpha=0.3)
+
+# Show secant lines on x–t curve
+t_range = np.linspace(0, 4, 300)
+axes[1].plot(t_range, x(t_range), 'k-', linewidth=2, label='x(t) = ½gt²')
+for dt, color in [(1.5, '#ef4444'), (0.5, '#f97316'), (0.1, '#22c55e')]:
+    t1, t2 = t0, t0 + dt
+    slope = (x(t2) - x(t1)) / (t2 - t1)
+    x_line = x(t1) + slope * (t_range - t1)
+    axes[1].plot(t_range[(t_range >= t0-0.2) & (t_range <= t2+0.2)],
+                 x_line[(t_range >= t0-0.2) & (t_range <= t2+0.2)],
+                 color=color, linewidth=1.5, linestyle='--', label=f'Δt={dt}')
+axes[1].set_xlim(1.0, 4.0);  axes[1].set_ylim(0, 80)
+axes[1].set_xlabel('t [s]');  axes[1].set_ylabel('x [m]')
+axes[1].set_title('Secant lines collapsing onto tangent')
+axes[1].legend(fontsize=8);  axes[1].grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+
+print(f"Ratio at Δt=0.0001: {(x(t0+0.0001)-x(t0))/0.0001:.4f} m/s")
+print(f"Exact v(t₀) = g×t₀ = {exact:.4f} m/s")`,
+        },
+        {
+          cellTitle: 'Deriving the Power Rule Numerically — x = kt^n',
+          type: 'code',
+          language: 'python',
+          prose: [
+            `The limit process for x = kt^n always gives v = knt^(n-1). This is the power rule of calculus. Let's verify it numerically for several values of n before we derive it formally in Chapter 1.`,
+          ],
+          code: `import numpy as np
+
+def numerical_derivative(f, t, dt=1e-7):
+    return (f(t + dt) - f(t - dt)) / (2 * dt)  # symmetric for accuracy
+
+# Test: x = k*t^n → v = k*n*t^(n-1)
+test_cases = [
+    (2,  1, 3.0),   # x = 2t¹   → v = 2    at t=3
+    (3,  2, 3.0),   # x = 3t²   → v = 18   at t=3
+    (1,  3, 2.0),   # x = t³    → v = 12   at t=2
+    (5,  0.5, 4.0), # x = 5√t   → v = 2.5  at t=4
+    (2, -1, 3.0),   # x = 2/t   → v = -2/9 at t=3
+]
+
+print(f"{'x(t)':>12}  {'t':>4}  {'numerical v':>14}  {'exact v = kn·t^(n-1)':>22}  {'match?':>7}")
+print("-" * 68)
+for k, n, t in test_cases:
+    f = lambda t, k=k, n=n: k * t**n
+    v_num = numerical_derivative(f, t)
+    v_exact = k * n * t**(n - 1)
+    ok = '✓' if abs(v_num - v_exact) < 1e-4 else '✗'
+    print(f"  {k:.0f}·t^{n:<4.1f}   {t:>4.1f}  {v_num:>14.6f}  {v_exact:>22.6f}  {ok:>7}")
+
+print()
+print("Power rule: d/dt(kt^n) = k·n·t^(n-1)  — verified numerically.")`,
+        },
+        {
+          cellTitle: 'Challenge — Instantaneous vs Average: a Real Dataset',
+          type: 'code',
+          language: 'python',
+          code: `# Challenge: compute average and approximate instantaneous velocity
+# from a position dataset (simulated GPS readings every 0.5 s)
+# ─────────────────────────────────────────────────────────
+import numpy as np
+
+# Simulated position data: x in meters, t in seconds
+t_data = np.array([0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0])
+x_data = np.array([0, 1.2, 4.9, 11.3, 20.1, 31.5, 45.3, 61.0, 78.5])
+
+# Task 1: Compute average velocity over the ENTIRE dataset (t=0 to t=4 s).
+# Store in avg_v_total.
+avg_v_total = # YOUR CODE HERE
+
+# Task 2: Compute average velocity for each 0.5 s interval.
+# Store as a list: avg_v_intervals (should have 8 values).
+avg_v_intervals = []
+for i in range(len(t_data) - 1):
+    dv = # YOUR CODE HERE
+    avg_v_intervals.append(dv)
+
+# Task 3: Approximate instantaneous velocity at t=2.0 s
+# using the symmetric interval (t=1.5 to t=2.5 s).
+# Store in inst_v_t2.
+inst_v_t2 = # YOUR CODE HERE
+
+print(f"Overall avg velocity: {avg_v_total:.2f} m/s")
+print(f"Interval avg velocities: {[round(v,2) for v in avg_v_intervals]}")
+print(f"Approx instantaneous v at t=2 s: {inst_v_t2:.2f} m/s")`,
+          prose: [],
+        },
+      ],
+    },
+    matlab: {
+      type: 'matlab',
+      cells: [
+        {
+          cellTitle: 'Average Velocity and the Secant in MATLAB',
+          type: 'code',
+          language: 'matlab',
+          prose: [
+            `MATLAB's vectorized operations make it natural to compute average velocities over many intervals at once using the \`diff\` function — which computes consecutive differences.`,
+          ],
+          code: `%% Average velocity — secant slope in MATLAB
+g = 9.8;
+x = @(t) 0.5.*g.*t.^2;
+
+% Average over shrinking intervals approaching t=2 s
+t0 = 2.0;
+dt_vals = [1.0, 0.5, 0.1, 0.05, 0.01, 0.001];
+
+fprintf('%-10s  %-15s\\n', 'Dt (s)', 'Avg v (m/s)');
+fprintf('%s\\n', repmat('-',1,28));
+for dt = dt_vals
+    avg_v = (x(t0 + dt) - x(t0)) / dt;
+    fprintf('%-10.4f  %-15.6f\\n', dt, avg_v);
+end
+
+fprintf('\\nExact v(t0) = g*t0 = %.4f m/s\\n', g*t0);
+
+%% Using diff() on a time vector
+t_vec = 0:0.5:4;
+x_vec = x(t_vec);
+avg_v_vec = diff(x_vec) ./ diff(t_vec);   % Δx/Δt at each interval
+
+fprintf('\\nInterval average velocities:\\n');
+for i = 1:length(avg_v_vec)
+    fprintf('  [%.1f, %.1f]: %.2f m/s\\n', t_vec(i), t_vec(i+1), avg_v_vec(i));
+end`,
+        },
+        {
+          cellTitle: 'Plotting Secant Lines Converging to Tangent',
+          type: 'code',
+          language: 'matlab',
+          prose: [
+            `Visualising how secant lines rotate onto the tangent as Δt shrinks is the most direct way to see the limit. Each coloured line is a secant with a different Δt.`,
+          ],
+          code: `%% Secant lines converging to tangent on x–t curve
+g = 9.8;
+x = @(t) 0.5.*g.*t.^2;
+t0 = 2.0;   % fixed base point
+
+t_range = linspace(0.5, 4.5, 300);
+figure; hold on;
+plot(t_range, x(t_range), 'k-', 'LineWidth', 2, 'DisplayName', 'x(t)');
+
+colors = lines(4);
+dt_list = [1.5, 0.8, 0.3, 0.05];
+for k = 1:length(dt_list)
+    dt = dt_list(k);
+    slope = (x(t0+dt) - x(t0)) / dt;
+    % Secant line through (t0, x(t0)) with this slope
+    t_plot = linspace(t0-0.3, t0+dt+0.3, 50);
+    x_sec  = x(t0) + slope.*(t_plot - t0);
+    plot(t_plot, x_sec, '--', 'Color', colors(k,:), 'LineWidth', 1.5, ...
+         'DisplayName', sprintf('Δt=%.2f, slope=%.2f', dt, slope));
+end
+% True tangent
+slope_tan = g * t0;
+t_tan = linspace(t0-0.5, t0+0.5, 50);
+plot(t_tan, x(t0)+slope_tan.*(t_tan-t0), 'r-', 'LineWidth', 2.5, ...
+     'DisplayName', sprintf('Tangent slope=%.2f', slope_tan));
+
+plot(t0, x(t0), 'ro', 'MarkerSize', 8, 'HandleVisibility','off');
+xlim([0.5 4.5]);  ylim([0 100]);
+xlabel('t [s]');  ylabel('x [m]');
+title('Secant lines converging to tangent as Δt → 0');
+legend('Location','northwest');  grid on;`,
+        },
+        {
+          cellTitle: 'Challenge — Power Rule Verification in MATLAB',
+          type: 'code',
+          language: 'matlab',
+          code: `%% Challenge: verify the power rule numerically in MATLAB
+% ─────────────────────────────────────────────────────────
+% For x(t) = k * t^n, the instantaneous velocity is v = k*n*t^(n-1).
+%
+% Task 1: Write a MATLAB function numerical_deriv(f, t) that computes
+%         the symmetric numerical derivative: (f(t+h) - f(t-h)) / (2h)
+%         Use h = 1e-7.
+%
+% Task 2: For each (k, n, t0) below, compare numerical_deriv to the
+%         exact power-rule result. Print both.
+
+% Test cases: [k, n, t0]
+cases = [2, 1, 3;
+         3, 2, 3;
+         1, 3, 2;
+         5, 0.5, 4];
+
+% Task 1: define numerical derivative
+h = 1e-7;
+numerical_deriv = @(f, t) (f(t+h) - f(t-h)) / (2*h);
+
+fprintf('%-15s  %-6s  %-14s  %-14s  %-6s\\n', ...
+        'x(t)', 't', 'numerical v', 'exact v', 'match?');
+fprintf('%s\\n', repmat('-',1,60));
+
+for i = 1:size(cases,1)
+    k  = cases(i,1);  n  = cases(i,2);  t0 = cases(i,3);
+    f  = @(t) k .* t.^n;
+
+    v_num   = numerical_deriv(f, t0);
+    v_exact = k .* n .* t0.^(n-1);  % YOUR CODE: fill in power rule
+
+    match = '?';   % YOUR CODE: compare and set to 'OK' or 'FAIL'
+    fprintf('%-15s  %-6.1f  %-14.6f  %-14.6f  %-6s\\n', ...
+            sprintf('%g*t^%g',k,n), t0, v_num, v_exact, match);
+end`,
+          prose: [],
+        },
+      ],
+    },
+  },
+
+  misconceptions: [
+    {
+      id: 'p0-004-misc1',
+      misconception: `"Average velocity and average speed are the same thing."`,
+      reality: `Average velocity = displacement / time = (x_f − x_i)/Δt. It can be zero, negative, or positive. Average speed = total distance / time — always positive, never zero for a moving object. A runner who runs 400 m then returns to start has average velocity = 0, but average speed = (total 800 m) / time > 0.`,
+      whyItHappens: `"Velocity" and "speed" are used interchangeably in everyday speech, but in physics they are distinct. Velocity is a vector (direction matters); speed is a scalar.`,
+    },
+    {
+      id: 'p0-004-misc2',
+      misconception: `"Instantaneous velocity at t=2 means you divide by Δt = 0, which is undefined."`,
+      reality: `We never divide by zero. We take the limit: we compute Δx/Δt for Δt = 0.1, then 0.01, then 0.001... and ask what value this sequence approaches. For any smooth function, the ratio converges to a well-defined number — that number is the instantaneous velocity. The limit is the tool that makes calculus work.`,
+      whyItHappens: `Students confuse "let Δt → 0" (limit) with "set Δt = 0" (undefined). The derivative is specifically designed to avoid this.`,
+    },
+    {
+      id: 'p0-004-misc3',
+      misconception: `"Average velocity tells you the 'real' speed because it uses actual data points, while instantaneous velocity is a mathematical abstraction."`,
+      reality: `Instantaneous velocity is more physically meaningful for Newton's laws — F = ma uses the instantaneous acceleration at each moment. Average velocity throws away everything that happened inside the interval. Radar speed guns and speedometers measure instantaneous velocity. It is not more abstract; it is what physics laws are actually written in.`,
+      whyItHappens: `Average velocity is easier to compute from data, so students assume it is more "real." In fact, the instantaneous version is the one every physical law uses.`,
+    },
+  ],
+
+  transferPrompts: [
+    {
+      id: 'p0-004-tp1',
+      prompt: `A GPS track records a car's position every 10 seconds. (a) Can you get exact instantaneous velocity from this data? (b) How would you approximate it? (c) What is the error in the approximation and how would you reduce it?`,
+      targetConcept: 'Numerical approximation of derivatives, error reduction',
+      hint: `Use symmetric intervals. Smaller Δt → smaller error, but GPS noise becomes a problem below ~1 s.`,
+    },
+    {
+      id: 'p0-004-tp2',
+      prompt: `In financial markets, a stock price P(t) changes over time. (a) What is the "average rate of return" over a week? (b) What would "instantaneous rate of return" mean? (c) Why do traders care about the instantaneous rate rather than the average?`,
+      targetConcept: 'Average vs instantaneous rates of change applied to a new domain',
+      hint: `Rate of return = ΔP/P / Δt. Instantaneous rate = limit as Δt → 0. Traders want to know if a stock is accelerating up or down right now.`,
+    },
+  ],
+
+  debugging: [
+    {
+      id: 'p0-004-dbg1',
+      title: 'Using Δx alone instead of Δx/Δt for velocity',
+      scenario: `A student computes "average velocity from t=1 to t=4" as x(4) − x(1) = 78.4 − 4.9 = 73.5. The answer has units meters, not m/s.`,
+      error: `The student computed the displacement Δx, not the average velocity Δx/Δt. Forgetting to divide by the time interval is the single most common mistake in this lesson.`,
+      fix: `Average velocity = Δx / Δt = 73.5 / (4−1) = 73.5 / 3 = 24.5 m/s.`,
+      prevention: `Always write the formula first: v̄ = Δx/Δt. Write the units explicitly — if the answer has units [m] instead of [m/s], the Δt division is missing.`,
+    },
+    {
+      id: 'p0-004-dbg2',
+      title: 'Picking a one-sided interval for numerical instantaneous velocity',
+      scenario: `A student approximates v at t=2 using (x(2.1) − x(2)) / 0.1 = 20.09 m/s. The exact value is 19.6 m/s. Error ≈ 0.5 m/s. Another student uses (x(2.1)−x(1.9))/0.2 = 19.6 m/s exactly (for a quadratic).`,
+      error: `One-sided intervals introduce a first-order error proportional to Δt. Symmetric intervals cancel this error for polynomial functions, giving a much better approximation.`,
+      fix: `Use a symmetric interval: (x(t+h) − x(t−h)) / (2h). For quadratics this is exact; for others it gives a second-order error instead of first.`,
+      prevention: `Default to symmetric intervals for numerical derivatives. Only use one-sided when you cannot access values on both sides (e.g., at the boundary t=0).`,
+    },
+  ],
+
+  mastery: {
+    targetLevel: `You can compute average velocity from any position function or data table, explain geometrically what a secant line is, and describe the limit process that converts average to instantaneous velocity. You understand why calculus was invented: physics demands instantaneous rates.`,
+    checklistItems: [
+      `Compute average velocity as Δx/Δt between any two times, including from a table of data`,
+      `Identify the secant line on an x–t graph and state its slope is average velocity`,
+      `Explain in words why instantaneous velocity requires a limit rather than direct division`,
+      `Numerically approximate instantaneous velocity using a symmetric interval and small Δt`,
+      `Distinguish average speed (total distance / time) from average velocity (displacement / time)`,
+      `Verify the pattern Δx/Δt → kt^(n-1) for x = t^n/k using the limit algebra`,
+    ],
+    commonStruggles: [
+      `Computing Δx but forgetting to divide by Δt — always write the full fraction`,
+      `Confusing "limit as Δt → 0" with "setting Δt = 0" — the limit never divides by zero`,
+      `Using one-sided intervals when symmetric would give a better numerical approximation`,
+      `Thinking average velocity is more "real" than instantaneous — it is just easier to compute`,
+    ],
+    nextSteps: [
+      `Lesson 5 (Graphs as Physics): graphs encode velocity (slope) and acceleration (curvature) visually`,
+      `Chapter 1 (Calculus Tools): formal derivative rules — power rule, chain rule, product rule`,
+      `Chapter 2 (Kinematics): every v(t) and a(t) is a derivative — the machinery from this lesson, applied`,
+    ],
+  },
 
   quiz: [
     {

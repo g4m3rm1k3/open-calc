@@ -430,6 +430,410 @@ export default {
     'The kinematic triple: a–t is flat, v–t is straight, x–t is quadratic — for constant a',
   ],
 
+  notebooks: {
+    python: {
+      type: 'python',
+      cells: [
+        {
+          cellTitle: 'Plotting x–t and v–t Together',
+          type: 'code',
+          language: 'python',
+          prose: [
+            `The x–t and v–t graphs are linked: the slope of x–t gives the value shown on v–t. Plot them side by side and confirm this relationship by picking specific points.`,
+          ],
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+g = 9.8
+v0 = 15.0   # m/s initial upward
+x0 = 0.0
+
+t = np.linspace(0, 3.1, 300)
+x_vals = x0 + v0*t - 0.5*g*t**2
+v_vals = v0 - g*t
+
+# Find turning point (v=0)
+t_peak = v0 / g
+x_peak = x0 + v0*t_peak - 0.5*g*t_peak**2
+
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
+
+ax1.plot(t, x_vals, 'b-', linewidth=2)
+ax1.axhline(0, color='brown', linewidth=1)
+ax1.axvline(t_peak, color='gray', linestyle='--', alpha=0.5)
+ax1.plot(t_peak, x_peak, 'go', markersize=10, label=f'Peak: slope=0 at t={t_peak:.2f}s')
+ax1.set_ylabel('x [m]');  ax1.set_title('x–t graph (slope = velocity)')
+ax1.legend();  ax1.grid(True, alpha=0.3)
+
+# Mark slope at t=1s
+t1 = 1.0
+slope_at_t1 = v0 - g*t1
+t_range = np.array([t1-0.3, t1+0.3])
+ax1.plot(t_range, x0 + v0*t_range - 0.5*g*t_range**2, 'r-', linewidth=0)
+# Draw tangent line
+x_at_t1 = x0 + v0*t1 - 0.5*g*t1**2
+ax1.plot(t_range, x_at_t1 + slope_at_t1*(t_range - t1), 'r-', linewidth=2,
+         label=f'Tangent at t=1: slope={slope_at_t1:.1f} m/s')
+ax1.legend(fontsize=8)
+
+ax2.plot(t, v_vals, 'g-', linewidth=2)
+ax2.axhline(0, color='brown', linewidth=1.5)
+ax2.axvline(t_peak, color='gray', linestyle='--', alpha=0.5)
+ax2.plot(t_peak, 0, 'go', markersize=10, label='v=0 at peak (x-t zero slope)')
+ax2.plot(1.0, v0 - g*1.0, 'rs', markersize=10, label=f'v(1)={v0-g*1.0:.1f} m/s = tangent slope above')
+ax2.set_xlabel('t [s]');  ax2.set_ylabel('v [m/s]')
+ax2.set_title('v–t graph (slope = acceleration, area = displacement)')
+ax2.legend(fontsize=8);  ax2.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+
+print(f"At t=1s: tangent slope on x-t = {slope_at_t1:.1f} m/s = v(1) on v-t  ✓")
+print(f"At t={t_peak:.2f}s: x-t slope = 0 and v-t crosses zero  ✓")`,
+        },
+        {
+          cellTitle: 'Area Under v–t Curve = Displacement',
+          type: 'code',
+          language: 'python',
+          prose: [
+            `The area under a v–t curve gives displacement. We verify this numerically by summing tiny rectangles (Riemann sum) and comparing to the exact formula.`,
+          ],
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+g = 9.8
+v0 = 20.0
+
+def v(t):
+    return v0 - g*t
+
+def x_exact(t, x0=0):
+    return x0 + v0*t - 0.5*g*t**2
+
+T = 4.0
+t_range = np.linspace(0, T, 400)
+v_range = v(t_range)
+
+fig, ax = plt.subplots(figsize=(10, 5))
+ax.plot(t_range, v_range, 'g-', linewidth=2.5, label='v(t) = v₀ − gt')
+ax.axhline(0, color='black', linewidth=1)
+ax.fill_between(t_range, 0, v_range, where=(v_range >= 0),
+                alpha=0.3, color='blue', label='+ area → + displacement')
+ax.fill_between(t_range, 0, v_range, where=(v_range < 0),
+                alpha=0.3, color='red', label='− area → − displacement')
+ax.set_xlabel('t [s]');  ax.set_ylabel('v [m/s]')
+ax.set_title('Area under v–t = displacement (blue+, red−)')
+ax.legend();  ax.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+
+# Numerical verification
+dt = 0.001
+t_vals = np.arange(0, T, dt)
+area_total = np.sum(v(t_vals) * dt)   # signed area
+area_pos   = np.sum(np.maximum(v(t_vals), 0) * dt)
+area_neg   = np.sum(np.minimum(v(t_vals), 0) * dt)
+
+x_formula = x_exact(T)
+
+print(f"Numerical signed area (t=0 to {T}s): {area_total:.4f} m")
+print(f"Exact displacement x({T}): {x_formula:.4f} m")
+print(f"Match: {'✓' if abs(area_total - x_formula) < 0.01 else '✗'}")
+print(f"\\nPositive area: {area_pos:.2f} m  (forward trip)")
+print(f"Negative area: {area_neg:.2f} m  (return trip)")
+print(f"Net (signed): {area_pos+area_neg:.2f} m")`,
+        },
+        {
+          cellTitle: 'Reading Motion from a Mystery Graph',
+          type: 'code',
+          language: 'python',
+          prose: [
+            `Given only a table of (t, x) data points, reconstruct the motion story: find when velocity is zero (turning point), whether acceleration is positive or negative, and estimate the velocity at each point.`,
+          ],
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+# Mystery motion data
+t_data = np.array([0, 1, 2, 3, 4, 5, 6])
+x_data = np.array([0, 8, 12, 12, 8, 0, -12])
+
+# Estimate instantaneous velocity using symmetric differences
+v_est = np.gradient(x_data, t_data)   # numpy's central-difference approximation
+
+# Estimate acceleration
+a_est = np.gradient(v_est, t_data)
+
+fig, axes = plt.subplots(3, 1, figsize=(10, 9), sharex=True)
+
+axes[0].plot(t_data, x_data, 'bo-', markersize=8, linewidth=2)
+axes[0].set_ylabel('x [m]');  axes[0].set_title('x–t graph (mystery motion)')
+axes[0].grid(True, alpha=0.3)
+
+axes[1].plot(t_data, v_est, 'gs-', markersize=8, linewidth=2)
+axes[1].axhline(0, color='black', linewidth=1)
+axes[1].set_ylabel('v [m/s]');  axes[1].set_title('v–t graph (slope of x–t)')
+axes[1].grid(True, alpha=0.3)
+
+axes[2].plot(t_data, a_est, 'rd-', markersize=8, linewidth=2)
+axes[2].axhline(0, color='black', linewidth=1)
+axes[2].set_xlabel('t [s]');  axes[2].set_ylabel('a [m/s²]')
+axes[2].set_title('a–t graph (slope of v–t)')
+axes[2].grid(True, alpha=0.3)
+
+plt.suptitle('Reading the full motion story from x–t data', fontsize=12)
+plt.tight_layout()
+plt.show()
+
+print("Motion analysis:")
+for i, t in enumerate(t_data):
+    sign_v = '+' if v_est[i] > 0.01 else ('-' if v_est[i] < -0.01 else '0')
+    print(f"  t={t}s: x={x_data[i]:>5} m,  v≈{v_est[i]:>6.1f} m/s ({sign_v}),  a≈{a_est[i]:>6.1f} m/s²")`,
+        },
+        {
+          cellTitle: 'Challenge — Compute Displacement from a v–t Table',
+          type: 'code',
+          language: 'python',
+          code: `# Challenge: compute displacement from v–t data using the trapezoid rule
+# ─────────────────────────────────────────────────────────
+import numpy as np
+
+# v–t data
+t_data = np.array([0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0])
+v_data = np.array([0, 4.9, 9.8, 14.7, 19.6, 14.7, 9.8, 4.9, 0])
+# (this is a symmetric profile: accelerates then decelerates back to zero)
+
+# Task 1: Compute displacement using the trapezoid rule manually.
+# For each adjacent pair (t_i, t_{i+1}):
+#   displacement_i = 0.5 * (v_i + v_{i+1}) * (t_{i+1} - t_i)
+# Sum all displacement_i. Store total in displacement_trap.
+
+displacement_trap = 0.0
+for i in range(len(t_data) - 1):
+    # YOUR CODE: add one trapezoid contribution per loop iteration
+    pass
+
+# Task 2: Use numpy's np.trapz() function to verify.
+displacement_numpy = # YOUR CODE HERE: np.trapz(...)
+
+# Task 3: What is the average velocity over the 4 s interval?
+avg_v = # YOUR CODE HERE
+
+print(f"Trapezoid rule:  Δx = {displacement_trap:.2f} m")
+print(f"np.trapz:        Δx = {displacement_numpy:.2f} m")
+print(f"Average velocity: {avg_v:.2f} m/s")`,
+          prose: [],
+        },
+      ],
+    },
+    matlab: {
+      type: 'matlab',
+      cells: [
+        {
+          cellTitle: 'Graph Reading in MATLAB — Slope and Area',
+          type: 'code',
+          language: 'matlab',
+          prose: [
+            `MATLAB's \`diff()\` gives finite differences for numerical slopes (velocities from positions). \`trapz()\` gives the trapezoidal area (displacement from velocities). These two functions implement the core graphical relationships.`,
+          ],
+          code: `%% Slope of x–t gives v, area under v–t gives Δx
+g = 9.8;
+v0 = 15;
+t = linspace(0, 3.06, 200);
+x_vals = v0.*t - 0.5.*g.*t.^2;
+
+% Numerical slope → velocity estimate
+dt_step = t(2) - t(1);
+v_numerical = diff(x_vals) ./ dt_step;
+t_mid = (t(1:end-1) + t(2:end)) / 2;   % midpoints
+
+figure;
+subplot(2,1,1);
+plot(t, x_vals, 'b-', 'LineWidth', 2);
+xlabel('t [s]');  ylabel('x [m]');
+title('x–t graph: parabola (constant a)');  grid on;
+
+subplot(2,1,2);
+plot(t_mid, v_numerical, 'g-', 'LineWidth', 2, 'DisplayName', 'diff(x)/dt');
+hold on;
+plot(t, v0 - g.*t, 'r--', 'LineWidth', 1.5, 'DisplayName', 'Exact v(t)');
+axhline_at_zero = yline(0, 'k-');
+xlabel('t [s]');  ylabel('v [m/s]');
+title('v–t: slope of x–t (matches exact v = v₀–gt)');
+legend;  grid on;
+
+%% Area under v–t curve
+t_full = linspace(0, 3.06, 1000);
+v_full = v0 - g.*t_full;
+area_pos = trapz(t_full(v_full>=0), v_full(v_full>=0));
+area_neg = trapz(t_full(v_full<0),  v_full(v_full<0));
+net_disp = trapz(t_full, v_full);
+
+fprintf('Positive area (up trip):   %.2f m\\n', area_pos);
+fprintf('Negative area (down trip): %.2f m\\n', area_neg);
+fprintf('Net displacement:          %.2f m\\n', net_disp);
+fprintf('Exact net displacement (x(tf)-x(0)): %.2f m\\n', ...
+        v0*3.06 - 0.5*g*3.06^2 - 0);`,
+        },
+        {
+          cellTitle: 'Trapezoid Rule — Displacement from v–t Data',
+          type: 'code',
+          language: 'matlab',
+          prose: [
+            `The trapezoid rule approximates the area under any curve. MATLAB's \`trapz()\` automates this, but it is instructive to code it manually to see how each trapezoidal strip contributes.`,
+          ],
+          code: `%% Trapezoid rule: displacement from tabular v–t data
+t_data = [0, 1, 2, 3, 4, 5, 6, 7]';
+v_data = [0, 5, 12, 21, 32, 21, 12, 5]';   % m/s
+
+% Manual trapezoid
+n = length(t_data) - 1;
+delta_x = zeros(n, 1);
+for i = 1:n
+    delta_x(i) = 0.5 * (v_data(i) + v_data(i+1)) * (t_data(i+1) - t_data(i));
+end
+total_disp_manual = sum(delta_x);
+
+% MATLAB built-in
+total_disp_trapz = trapz(t_data, v_data);
+
+fprintf('Manual trapezoid sum: %.2f m\\n', total_disp_manual);
+fprintf('MATLAB trapz():       %.2f m\\n', total_disp_trapz);
+
+% Plot v-t with shaded area
+figure;
+area(t_data, v_data, 'FaceColor', [0.4 0.7 1.0], 'FaceAlpha', 0.4);
+hold on;
+plot(t_data, v_data, 'b-o', 'LineWidth', 2, 'MarkerSize', 8);
+xlabel('t [s]');  ylabel('v [m/s]');
+title(sprintf('Displacement = area under v–t = %.2f m', total_disp_trapz));
+grid on;`,
+        },
+        {
+          cellTitle: 'Challenge — Identify Motion Phases from a v–t Graph',
+          type: 'code',
+          language: 'matlab',
+          code: `%% Challenge: analyze a multi-phase v–t profile
+% ─────────────────────────────────────────────────────────
+% A car's velocity data (in m/s) sampled every 2 seconds:
+t_data = [0,  2,  4,  6,  8, 10, 12, 14, 16]';
+v_data = [0, 10, 20, 20, 20, 15, 10,  5,  0]';
+
+% Task 1: Plot the v–t graph (v vs t).
+
+% Task 2: Identify the three motion phases by inspecting the slope:
+%   Phase A: t = 0 to ? s  (what is happening?)
+%   Phase B: t = ? to ? s  (what is happening?)
+%   Phase C: t = ? to 16 s (what is happening?)
+
+% Task 3: Compute the displacement for each phase using trapz().
+% Store in disp_A, disp_B, disp_C and total_disp.
+
+% YOUR ANALYSIS HERE
+% Hint: Phase A ends where v stops increasing. Phase B is constant v.
+%       Phase C is where v decreases.
+
+figure;
+area(t_data, v_data, 'FaceColor', [0.5 0.8 0.5], 'FaceAlpha', 0.4);
+hold on;
+plot(t_data, v_data, 'g-o', 'LineWidth', 2, 'MarkerSize', 8);
+xlabel('t [s]');  ylabel('v [m/s]');
+title('Multi-phase motion — identify phases and compute displacement');
+grid on;
+
+% YOUR CODE: compute disp_A, disp_B, disp_C, total_disp
+% disp_A = trapz(...)
+% disp_B = ...
+% disp_C = ...
+% total_disp = disp_A + disp_B + disp_C;
+
+% fprintf('Phase A: %.1f m\\n', disp_A);
+% fprintf('Phase B: %.1f m\\n', disp_B);
+% fprintf('Phase C: %.1f m\\n', disp_C);
+% fprintf('Total:   %.1f m\\n', total_disp);`,
+          prose: [],
+        },
+      ],
+    },
+  },
+
+  misconceptions: [
+    {
+      id: 'p0-005-misc1',
+      misconception: `"High position on an x–t graph means high velocity."`,
+      reality: `Velocity is the SLOPE of the x–t graph, not the height. An object at x = 100 m with a horizontal (flat) graph has zero velocity — it is at rest up high. An object at x = 0 with a steep slope is moving fast. Height tells you where the object is; slope tells you how fast it is moving.`,
+      whyItHappens: `Students intuitively read height as "more" and confuse "more position" with "more velocity." The cure is to always ask: "what is the slope here?" before reading any quantity from a graph.`,
+    },
+    {
+      id: 'p0-005-misc2',
+      misconception: `"Area under a graph always means something — even on an x–t graph."`,
+      reality: `Area under a v–t graph = displacement. But area under an x–t graph has no standard physical meaning in kinematics. Only specific combinations of axes produce meaningful areas. On the x–t graph, the relevant operation is slope (derivative), not area. On the v–t graph, area gives displacement and slope gives acceleration.`,
+      whyItHappens: `Students over-generalise the "area = physical quantity" idea from v–t graphs to all graphs.`,
+    },
+    {
+      id: 'p0-005-misc3',
+      misconception: `"When v–t crosses zero, the object has stopped permanently."`,
+      reality: `v = 0 at a single instant means the object is momentarily at rest — it is reversing direction. Before that instant, it was moving one way; after, it moves the other. "Stopped permanently" would show v = 0 for a whole interval (a flat section of the v–t graph at v=0), not just a crossing.`,
+      whyItHappens: `Students think "stopped = v = 0" and don't consider whether v is passing through zero or resting at zero.`,
+    },
+  ],
+
+  transferPrompts: [
+    {
+      id: 'p0-005-tp1',
+      prompt: `An ECG (electrocardiogram) plots electrical voltage V(t) across the heart over time. (a) What does a steep region of the V–t graph represent? (b) What does a flat region represent? (c) If you could compute the area under the V–t curve, would that have a physical meaning in this context? Why or why not?`,
+      targetConcept: 'Generalising slope = rate of change to non-kinematic graphs',
+      hint: `The slope of any y–t graph gives the rate of change of y. The area only has a standard meaning when the specific axes are paired correctly (v–t for displacement, power–time for energy, etc.).`,
+    },
+    {
+      id: 'p0-005-tp2',
+      prompt: `A company's sales revenue is plotted as R(t) over 12 months. The graph rises steeply in months 1–3, levels off from months 4–8, then falls sharply in months 9–12. (a) Describe the rate of change of revenue in each phase. (b) During which phase is revenue growing fastest? (c) If revenue is negative in months 9–12, what does the area below the axis represent?`,
+      targetConcept: 'Graph reading skills transfer to rate-of-change reasoning in any domain',
+      hint: `"Rate of change of revenue" = slope. Fastest growth = steepest positive slope.`,
+    },
+  ],
+
+  debugging: [
+    {
+      id: 'p0-005-dbg1',
+      title: 'Reading height instead of slope from x–t',
+      scenario: `A student is shown an x–t parabola that reaches x = 50 m at t = 2 s. The student says "velocity at t=2 is 50/2 = 25 m/s."`,
+      error: `The student divided position by time — that gives average velocity from t=0, not instantaneous velocity at t=2. Instantaneous velocity at t=2 is the slope of the tangent at that point, not the height divided by time.`,
+      fix: `Draw the tangent line at t=2. Its slope = Δx/Δt as Δt→0 = dx/dt at t=2. For x = ½gt²: v(2) = g×2 = 19.6 m/s — not 25 m/s.`,
+      prevention: `Never divide coordinates. Always identify whether you need slope (velocity) or area (displacement) before reading anything from a graph.`,
+    },
+    {
+      id: 'p0-005-dbg2',
+      title: 'Adding areas with different signs',
+      scenario: `A v–t graph shows v = +5 m/s for 3 s, then v = −3 m/s for 2 s. A student computes total displacement as (5×3) + (3×2) = 15 + 6 = 21 m.`,
+      error: `The student added both areas as positive. The second phase (v < 0) contributes negative displacement. The signed area below the t-axis is −6 m, not +6 m.`,
+      fix: `Δx = +15 m + (−6 m) = +9 m. The object ended up 9 m ahead, not 21 m. Distance traveled = 15 + 6 = 21 m (always positive). Displacement = +9 m (signed).`,
+      prevention: `Always shade areas below the axis differently and assign them negative signs. Check: does the object return toward start? Then some displacement is negative.`,
+    },
+  ],
+
+  mastery: {
+    targetLevel: `You can extract velocity from slope, acceleration from the slope of v–t, and displacement from the area under v–t — all by eye from a graph, without solving equations. You can also construct the x–t or v–t graph from a motion description.`,
+    checklistItems: [
+      `Read instantaneous velocity from the slope of an x–t graph at any point`,
+      `Read instantaneous acceleration from the slope of a v–t graph`,
+      `Compute displacement from the area under a v–t graph (rectangles, triangles, trapezoids)`,
+      `Identify turning points (v = 0 crossing), periods of rest (flat v–t), and direction reversals`,
+      `Recognise the "constant acceleration signature": a–t flat, v–t straight, x–t parabola`,
+      `Assign correct sign to areas above and below the v–t axis`,
+    ],
+    commonStruggles: [
+      `Confusing height with slope on x–t — always ask "what is the slope?" not "how high is it?"`,
+      `Treating v = 0 as permanent stop rather than instantaneous crossing`,
+      `Adding all areas as positive — areas below the t-axis are negative displacement`,
+      `Confusing which operation applies to which graph type (area works on v–t; slope works on x–t)`,
+    ],
+    nextSteps: [
+      `Lesson 6 (Vectors vs Scalars): velocity has direction — the sign on graphs is a 1D vector`,
+      `Chapter 2 (Kinematics): formal graph analysis, including non-constant acceleration curves`,
+      `Chapter 1 (Calculus Tools): integration makes the area-under-curve idea exact`,
+    ],
+  },
+
   quiz: [
     {
       id: 'graphs-q1',

@@ -230,16 +230,7 @@ export default {
       },
     ],
     title: 'Deriving v² = v₀² + 2aΔx using the chain rule',
-    visualizations: [
-      {
-        id: 'SVGDiagram',
-        props: { type: 'kinematic-chain' },
-        title: 'The complete kinematic chain — everything connects',
-        mathBridge:
-          'Look at this diagram one final time, with the entire Chapter 0 behind you. The left-pointing arrows are integrals. The right-pointing arrows are derivatives. Position, velocity, and acceleration are three views of the same object in motion. Calculus lets you move between any two of them, for any motion whatsoever.',
-        caption: 'This diagram is the skeleton of all of mechanics. Chapter 1 fills in the flesh.',
-      },
-    ],
+    visualizations: [],
   },
 
   examples: [
@@ -455,6 +446,415 @@ export default {
     'SUVAT is derived by integrating a=const twice — every SUVAT equation has a calculus proof',
     'Chapter 1 formalizes what Chapter 0 previewed. You already know the concepts.',
   ],
+
+  notebooks: {
+    python: {
+      type: 'python',
+      cells: [
+        {
+          cellTitle: 'SUVAT vs Calculus — Constant vs Variable Acceleration',
+          type: 'code',
+          language: 'python',
+          prose: [
+            `SUVAT equations are algebraic shortcuts valid only when acceleration is constant. Calculus (numerical integration) works for any acceleration profile. This cell shows both side by side.`,
+          ],
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+g = 9.8
+
+# ── Constant acceleration (SUVAT) ──
+v0 = 0.0;  x0 = 0.0
+t_suvat = np.linspace(0, 4, 300)
+x_suvat = x0 + v0*t_suvat + 0.5*g*t_suvat**2
+v_suvat = v0 + g*t_suvat
+
+# ── Variable acceleration (calculus required) ──
+# a(t) = g * (1 + 0.3*sin(2t))  — oscillating extra acceleration
+dt = 0.005
+t_calc = np.arange(0, 4, dt)
+a_calc = g * (1 + 0.3 * np.sin(2*t_calc))
+
+# Numerical integration: Euler's method
+v_calc = np.zeros_like(t_calc)
+x_calc = np.zeros_like(t_calc)
+v_calc[0] = v0
+x_calc[0] = x0
+for i in range(1, len(t_calc)):
+    v_calc[i] = v_calc[i-1] + a_calc[i-1] * dt
+    x_calc[i] = x_calc[i-1] + v_calc[i-1] * dt
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+axes[0].plot(t_suvat, a_calc[:len(t_suvat)], 'r-', label='Variable a(t)', alpha=0.7)
+axes[0].axhline(g, color='blue', linewidth=2, linestyle='--', label=f'Constant a={g} (SUVAT)')
+axes[0].set_xlabel('t [s]');  axes[0].set_ylabel('a [m/s²]')
+axes[0].set_title('Acceleration profiles');  axes[0].legend()
+axes[0].grid(True, alpha=0.3)
+
+axes[1].plot(t_suvat, x_suvat, 'b--', linewidth=2, label='SUVAT (constant a)')
+axes[1].plot(t_calc, x_calc, 'r-', linewidth=2, label='Euler integration (variable a)')
+axes[1].set_xlabel('t [s]');  axes[1].set_ylabel('x [m]')
+axes[1].set_title('Position: SUVAT fails for variable a')
+axes[1].legend();  axes[1].grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+
+print("SUVAT x(4) =", f"{x_suvat[-1]:.2f} m  (constant a only)")
+print("Euler x(4) =", f"{x_calc[-1]:.2f} m  (variable a)")`,
+        },
+        {
+          cellTitle: 'The Power Rule — Derivatives and Antiderivatives in Code',
+          type: 'code',
+          language: 'python',
+          prose: [
+            `The power rule says d/dt(t^n) = n·t^(n-1). Its inverse says ∫t^n dt = t^(n+1)/(n+1) + C. This cell verifies both numerically and shows how they connect position, velocity, and acceleration.`,
+          ],
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+# Starting from a(t) = 2t + 3  (variable acceleration)
+def a(t): return 2*t + 3
+
+# Antiderivative (integral): v(t) = t² + 3t + C
+# With v(0) = 5 m/s:
+v0 = 5.0
+def v(t): return t**2 + 3*t + v0
+
+# Second antiderivative: x(t) = t³/3 + 3t²/2 + v0*t + C
+# With x(0) = 0:
+x0 = 0.0
+def x(t): return t**3/3 + 1.5*t**2 + v0*t + x0
+
+# Verify numerically using np.gradient
+t = np.linspace(0, 4, 1000)
+dt_step = t[1] - t[0]
+
+x_vals = x(t)
+v_from_x = np.gradient(x_vals, t)      # derivative of x → should give v
+a_from_v = np.gradient(v_from_x, t)    # derivative of v → should give a
+
+fig, axes = plt.subplots(1, 3, figsize=(14, 4))
+
+axes[0].plot(t, x_vals, 'b-', linewidth=2, label='x(t) = t³/3 + 1.5t² + 5t')
+axes[0].set_xlabel('t [s]');  axes[0].set_ylabel('x [m]')
+axes[0].set_title('Position');  axes[0].grid(True, alpha=0.3)
+
+axes[1].plot(t, v(t), 'g-', linewidth=2.5, label='v(t) = t² + 3t + 5  [exact]')
+axes[1].plot(t, v_from_x, 'g--', linewidth=1, alpha=0.7, label='dx/dt  [numerical]')
+axes[1].set_xlabel('t [s]');  axes[1].set_ylabel('v [m/s]')
+axes[1].set_title('Velocity');  axes[1].legend(fontsize=8);  axes[1].grid(True, alpha=0.3)
+
+axes[2].plot(t, a(t), 'r-', linewidth=2.5, label='a(t) = 2t + 3  [exact]')
+axes[2].plot(t, a_from_v, 'r--', linewidth=1, alpha=0.7, label='dv/dt  [numerical]')
+axes[2].set_xlabel('t [s]');  axes[2].set_ylabel('a [m/s²]')
+axes[2].set_title('Acceleration');  axes[2].legend(fontsize=8);  axes[2].grid(True, alpha=0.3)
+
+plt.suptitle('Power rule chain: a(t) → ∫ → v(t) → ∫ → x(t)', fontsize=12)
+plt.tight_layout()
+plt.show()
+
+print(f"At t=2: x={x(2):.3f} m,  v={v(2):.3f} m/s,  a={a(2):.3f} m/s²")`,
+        },
+        {
+          cellTitle: 'When SUVAT Fails — Drag Example',
+          type: 'code',
+          language: 'python',
+          prose: [
+            `Air drag makes acceleration depend on velocity: a = g − kv². This is not constant — SUVAT cannot be used. We need to solve the differential equation numerically. This cell compares the two models.`,
+          ],
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+from scipy.integrate import odeint
+
+g = 9.8
+k = 0.01   # drag coefficient [1/m]
+
+# With drag: a = g - k*v²
+# Terminal velocity: v_term = sqrt(g/k)
+v_term = np.sqrt(g/k)
+
+# ODE: dv/dt = g - k*v²
+def ode_system(state, t):
+    v = state[0]
+    dv_dt = g - k * v**2
+    dx_dt = v
+    return [dv_dt, dx_dt]
+
+# Solve ODE
+t = np.linspace(0, 12, 400)
+sol = odeint(ode_system, [0, 0], t)  # start from rest, x=0
+v_drag = sol[:, 0]
+x_drag = sol[:, 1]
+
+# SUVAT comparison (no drag — constant acceleration = g)
+v_suvat = g * t
+x_suvat = 0.5 * g * t**2
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+axes[0].plot(t, v_suvat, 'b--', linewidth=2, label='SUVAT (no drag): v = gt')
+axes[0].plot(t, v_drag, 'r-', linewidth=2, label=f'With drag (k={k})')
+axes[0].axhline(v_term, color='orange', linestyle=':', linewidth=2, label=f'Terminal v = {v_term:.1f} m/s')
+axes[0].set_xlabel('t [s]');  axes[0].set_ylabel('v [m/s]')
+axes[0].set_title('Velocity: SUVAT overestimates (no drag limit)')
+axes[0].legend();  axes[0].grid(True, alpha=0.3)
+
+axes[1].plot(t, x_suvat, 'b--', linewidth=2, label='SUVAT')
+axes[1].plot(t, x_drag, 'r-', linewidth=2, label='With drag')
+axes[1].set_xlabel('t [s]');  axes[1].set_ylabel('x [m]')
+axes[1].set_title('Position: SUVAT overestimates distance')
+axes[1].legend();  axes[1].grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+
+print(f"Terminal velocity: v_term = √(g/k) = {v_term:.2f} m/s")
+print(f"At t=10s: SUVAT says {x_suvat[np.argmin(abs(t-10))]:.0f} m, drag model says {x_drag[np.argmin(abs(t-10))]:.0f} m")`,
+        },
+        {
+          cellTitle: 'Challenge — Integrate a Variable Acceleration',
+          type: 'code',
+          language: 'python',
+          code: `# Challenge: integrate variable acceleration to find velocity and position
+# ─────────────────────────────────────────────────────────
+import numpy as np
+
+# A rocket's acceleration profile (in m/s²):
+# For t = 0 to 5 s: a(t) = 50 - 4*t  (decreasing thrust as fuel burns)
+# For t > 5 s:      engine cuts out, only gravity: a = -9.8
+
+def a(t):
+    if t <= 5:
+        return 50 - 4*t
+    else:
+        return -9.8
+
+# Task 1: Using Euler integration with dt = 0.01 s, compute v(t) and x(t)
+# from t=0 to t=15 s, starting from rest (v0=0, x0=0).
+
+dt = 0.01
+t_vals = np.arange(0, 15, dt)
+v_vals = np.zeros(len(t_vals))
+x_vals = np.zeros(len(t_vals))
+
+# YOUR CODE: fill in Euler integration loop
+for i in range(1, len(t_vals)):
+    pass  # replace with: v_vals[i] = ..., x_vals[i] = ...
+
+# Task 2: Find the maximum height. Store in x_max.
+x_max = # YOUR CODE HERE  (hint: np.max(x_vals))
+
+# Task 3: Find when the rocket reaches maximum height. Store in t_at_max.
+t_at_max = # YOUR CODE HERE  (hint: t_vals[np.argmax(x_vals)])
+
+print(f"Max height: {x_max:.1f} m at t = {t_at_max:.2f} s")
+print(f"v at engine cutoff (t=5): {v_vals[int(5/dt)]:.1f} m/s")`,
+          prose: [],
+        },
+      ],
+    },
+    matlab: {
+      type: 'matlab',
+      cells: [
+        {
+          cellTitle: 'SUVAT vs ODE45 — MATLAB Integration',
+          type: 'code',
+          language: 'matlab',
+          prose: [
+            `MATLAB's \`ode45\` is a built-in Runge-Kutta solver for differential equations. When acceleration is variable, ode45 replaces SUVAT. When acceleration is constant, both give the same answer — but ode45 is more general.`,
+          ],
+          code: `%% SUVAT vs ode45: constant vs variable acceleration
+g = 9.8;
+v0 = 0;  x0 = 0;
+t_span = [0, 5];
+
+% ── Constant acceleration (free fall, no drag) ──
+t_suvat = linspace(0, 5, 300);
+x_suvat = x0 + v0.*t_suvat + 0.5.*g.*t_suvat.^2;
+v_suvat = v0 + g.*t_suvat;
+
+% ── ODE45: constant acceleration (should match SUVAT) ──
+% State: [v; x],  d/dt [v; x] = [g; v]
+ode_const = @(t, y) [g; y(1)];
+[t_ode, y_ode] = ode45(ode_const, t_span, [v0; x0]);
+
+% ── ODE45: variable acceleration with drag ──
+k = 0.01;
+ode_drag = @(t, y) [g - k*y(1)^2; y(1)];
+[t_drag, y_drag] = ode45(ode_drag, t_span, [v0; x0]);
+
+figure;
+subplot(1,2,1);
+plot(t_suvat, v_suvat, 'b--', 'LineWidth', 2, 'DisplayName', 'SUVAT');
+hold on;
+plot(t_ode, y_ode(:,1), 'g-', 'LineWidth', 2, 'DisplayName', 'ode45 (const a)');
+plot(t_drag, y_drag(:,1), 'r-', 'LineWidth', 2, 'DisplayName', 'ode45 (drag)');
+xlabel('t [s]');  ylabel('v [m/s]');
+title('Velocity comparison');  legend;  grid on;
+
+subplot(1,2,2);
+plot(t_suvat, x_suvat, 'b--', 'LineWidth', 2, 'DisplayName', 'SUVAT');
+hold on;
+plot(t_ode, y_ode(:,2), 'g-', 'LineWidth', 2, 'DisplayName', 'ode45 (const a)');
+plot(t_drag, y_drag(:,2), 'r-', 'LineWidth', 2, 'DisplayName', 'ode45 (drag)');
+xlabel('t [s]');  ylabel('x [m]');
+title('Position comparison');  legend;  grid on;`,
+        },
+        {
+          cellTitle: 'The Kinematic Chain in MATLAB — Symbolic vs Numerical',
+          type: 'code',
+          language: 'matlab',
+          prose: [
+            `In MATLAB, the symbolic toolbox provides exact derivatives and integrals. The \`diff()\` and \`int()\` functions are the calculus toolbox. Combined with numerical methods, they let you move up and down the kinematic chain for any function.`,
+          ],
+          code: `%% Kinematic chain: symbolic and numerical
+% Start with a(t) = 6t + 2
+syms t v0_s x0_s real
+
+a_sym  = 6*t + 2;               % a(t)
+v_sym  = int(a_sym, t) + v0_s;  % v(t) = ∫a dt + C  (C = v0)
+x_sym  = int(v_sym, t) + x0_s;  % x(t) = ∫v dt + C  (C = x0)
+
+fprintf('a(t) = %s\\n', char(a_sym));
+fprintf('v(t) = %s  (general)\\n', char(v_sym));
+fprintf('x(t) = %s  (general)\\n', char(x_sym));
+
+% Substitute initial conditions: v0=3, x0=0
+v_specific = subs(v_sym, v0_s, 3);
+x_specific = subs(x_sym, {v0_s, x0_s}, {3, 0});
+
+fprintf('\\nWith v0=3, x0=0:\\n');
+fprintf('v(t) = %s\\n', char(simplify(v_specific)));
+fprintf('x(t) = %s\\n', char(simplify(x_specific)));
+
+% Verify: differentiate x to get v, differentiate v to get a
+fprintf('\\nVerification:\\n');
+fprintf('dv/dt = %s  (should be a(t))\\n', char(diff(v_specific, t)));
+fprintf('dx/dt = %s  (should be v(t))\\n', char(simplify(diff(x_specific, t))));`,
+        },
+        {
+          cellTitle: 'Challenge — When to Use SUVAT vs ode45',
+          type: 'code',
+          language: 'matlab',
+          code: `%% Challenge: decide SUVAT or ode45 for each scenario
+% ─────────────────────────────────────────────────────────
+% For each acceleration profile, state whether SUVAT works,
+% then solve using the appropriate method.
+%
+% Scenario A: a(t) = 5  (constant)
+% Scenario B: a(t) = 10 - 2*t  (linearly decreasing)
+% Scenario C: a(t) = 8*exp(-0.5*t)  (exponentially decaying)
+%
+% For each: compute v(t) and x(t) from t=0 to t=5, with v0=0, x0=0.
+% Plot all three position curves on the same figure.
+
+t_end = 5;
+v0 = 0;  x0 = 0;
+
+a_A = @(t,y) [5;           y(1)];  % [dv/dt; dx/dt]
+a_B = @(t,y) [10 - 2*t;   y(1)];
+a_C = @(t,y) [8*exp(-0.5*t); y(1)];
+
+% YOUR CODE: use ode45 for each scenario
+% [t_A, y_A] = ode45(a_A, [0,t_end], [v0;x0]);
+% [t_B, y_B] = ode45(a_B, [0,t_end], [v0;x0]);
+% [t_C, y_C] = ode45(a_C, [0,t_end], [v0;x0]);
+
+% YOUR CODE: plot x vs t for all three
+% figure; hold on; ...
+% xlabel, ylabel, title, legend
+
+% For Scenario A only: compare ode45 result to SUVAT
+% SUVAT x_A = 0.5 * 5 * t^2
+% t_suvat = linspace(0, t_end, 100);
+% x_suvat = 0.5 * 5 * t_suvat.^2;
+% ... plot comparison
+fprintf('Which scenario(s) allow SUVAT? Only where a = constant.\\n');`,
+          prose: [],
+        },
+      ],
+    },
+  },
+
+  misconceptions: [
+    {
+      id: 'p0-008-misc1',
+      misconception: `"Calculus is only needed for hard or advanced problems — in basic physics, algebra always works."`,
+      reality: `Algebra (SUVAT) works only for constant acceleration. The moment acceleration varies — due to drag, springs, changing thrust, orbits, anything that isn't flat — SUVAT gives wrong answers. Real-world physics almost always has variable acceleration. Calculus is the language of all of mechanics, not just the advanced parts.`,
+      whyItHappens: `Introductory courses start with constant-acceleration examples, giving the impression that SUVAT is the default tool. It is a special case — calculus is the general case.`,
+    },
+    {
+      id: 'p0-008-misc2',
+      misconception: `"The derivative gives the average rate of change over an interval."`,
+      reality: `The derivative gives the instantaneous rate of change at a single point — not an average. The average rate of change over an interval is Δx/Δt (a secant slope). The derivative is the limit as that interval shrinks to zero (the tangent slope). These are related but different quantities.`,
+      whyItHappens: `Students confuse the definition (limit of Δx/Δt) with the result (instantaneous value). The limit process produces an instantaneous quantity, not an average.`,
+    },
+    {
+      id: 'p0-008-misc3',
+      misconception: `"Integration is just the reverse of differentiation — there is nothing physically different about it."`,
+      reality: `Integration and differentiation are mathematical inverses (Fundamental Theorem of Calculus), but they have different physical interpretations. Differentiation of position gives velocity (rate of change — a local property at one point). Integration of velocity gives displacement (accumulation over an interval — a global property across a range). Both are essential; neither is "just" the reverse of the other in physical terms.`,
+      whyItHappens: `Students learn the algebraic relationship first and don't develop the distinct physical intuitions for each operation.`,
+    },
+  ],
+
+  transferPrompts: [
+    {
+      id: 'p0-008-tp1',
+      prompt: `A population of bacteria grows at rate dP/dt = k·P(t), where k = 0.3 per hour. (a) Is this a constant-rate problem or does P(t) need calculus? (b) If SUVAT-style algebra (P = P₀ + k·t) were used instead of the correct exponential model, what would be the error at t = 5 hours starting from P₀ = 100? (c) What is the correct model?`,
+      targetConcept: 'Recognising when differential equations (calculus) are needed vs linear approximations (algebra)',
+      hint: `The correct answer is P = P₀·e^(kt). Compare at t=5: algebra gives 100+150=250; exponential gives 100·e^(1.5)≈448.`,
+    },
+    {
+      id: 'p0-008-tp2',
+      prompt: `An engineer designs a car's braking system. The deceleration profile is a(t) = −12 − 2t m/s² (increasingly hard braking). (a) Can SUVAT be used? (b) Using integration, find v(t) and x(t). (c) Find the stopping distance from v₀ = 25 m/s.`,
+      targetConcept: 'Identifying variable acceleration and applying integral calculus',
+      hint: `v(t) = v₀ − 12t − t². Set v=0 to find stopping time, then integrate for x.`,
+    },
+  ],
+
+  debugging: [
+    {
+      id: 'p0-008-dbg1',
+      title: 'Applying SUVAT to a variable-acceleration problem',
+      scenario: `A rocket has thrust that decreases linearly from 100 m/s² to 0 over 10 s. A student uses SUVAT with average acceleration a_avg = 50 m/s², getting Δx = ½ × 50 × 100 = 2,500 m. The correct answer (from integration) is different.`,
+      error: `SUVAT requires constant acceleration. Using an "average" acceleration in SUVAT is incorrect — SUVAT assumes a is exactly constant, not approximately constant. The correct approach is ∫v dt where v(t) = ∫a(t) dt = 100t − 5t².`,
+      fix: `a(t) = 100 − 10t → v(t) = 100t − 5t² (with v₀ = 0) → x(t) = 50t² − (5/3)t³. At t=10: x = 5000 − 1667 = 3333 m. The "average acceleration" SUVAT gives 2500 m — 25% off.`,
+      prevention: `Before using SUVAT, always check: is acceleration genuinely constant throughout the problem? If it changes in any way, use calculus (integration).`,
+    },
+    {
+      id: 'p0-008-dbg2',
+      title: 'Forgetting the constant of integration',
+      scenario: `A student integrates a(t) = 6t to get v(t) = 3t². They use v(0) = 0 without verifying it, but the problem states the object starts at v = 5 m/s.`,
+      error: `∫6t dt = 3t² + C. The constant C is determined by the initial condition v(0) = 5, giving C = 5. The correct function is v(t) = 3t² + 5. Omitting C gives v(0) = 0, contradicting the given initial velocity.`,
+      fix: `After integrating, always apply the initial condition: v(0) = 3(0) + C = C = 5. Then v(t) = 3t² + 5.`,
+      prevention: `Every integration produces +C. Always solve for C immediately using the given initial condition before continuing.`,
+    },
+  ],
+
+  mastery: {
+    targetLevel: `You can identify whether a problem requires SUVAT (constant acceleration) or calculus (variable acceleration), apply the kinematic chain (differentiate to go up, integrate to go down), and explain the physical meaning of both operations.`,
+    checklistItems: [
+      `State the necessary condition for SUVAT: acceleration must be exactly constant`,
+      `Apply the kinematic chain: differentiate x(t) to get v(t); differentiate v(t) to get a(t)`,
+      `Integrate a(t) to recover v(t) (plus constant of integration); integrate v(t) to recover x(t)`,
+      `Apply initial conditions to determine constants of integration`,
+      `Identify when a problem requires calculus: drag, springs, orbital motion, variable thrust`,
+      `Numerically integrate a variable-acceleration ODE using Euler's method or scipy.integrate.odeint`,
+    ],
+    commonStruggles: [
+      `Applying SUVAT to variable-acceleration problems — check whether a is constant before using it`,
+      `Forgetting the constant of integration after integrating — always evaluate C from initial conditions`,
+      `Thinking derivatives give averages — they give instantaneous values (limit of a ratio)`,
+      `Conflating numerical differentiation with symbolic differentiation — both give the same quantity but behave differently near discontinuities`,
+    ],
+    nextSteps: [
+      `Chapter 1 (Calculus Tools): formal power rule, chain rule, product rule, standard integrals`,
+      `Chapter 2 (Kinematics): every kinematic relationship is a derivative or integral`,
+      `Chapter 4 (Forces): F = ma is a second-order ODE — solving it for variable forces requires calculus`,
+    ],
+  },
 
   quiz: [
     {

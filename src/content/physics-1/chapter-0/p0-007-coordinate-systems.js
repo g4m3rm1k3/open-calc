@@ -193,16 +193,7 @@ export default {
       },
     ],
     title: 'Both sign conventions give the same flight time — proof',
-    visualizations: [
-      {
-        id: 'SVGDiagram',
-        props: { type: 'free-fall-axes' },
-        title: 'Side-by-side: both conventions for free fall',
-        mathBridge:
-          'Use the proof steps above while reading this diagram. Each convention has its own equation, but both conditions (x = 0 when landing)give t = 2v₀/g. The diagram shows this geometrically.',
-        caption: 'Two coordinate systems, one physical reality.',
-      },
-    ],
+    visualizations: [],
   },
 
   examples: [
@@ -419,6 +410,408 @@ export default {
     'State your convention at the start of every problem — then enforce it for every quantity',
     'Both sign conventions give identical physical answers — proof: flight time = 2v₀/g always',
   ],
+
+  notebooks: {
+    python: {
+      type: 'python',
+      cells: [
+        {
+          cellTitle: 'Sign Convention — Two Ways to Model Free Fall',
+          type: 'code',
+          language: 'python',
+          prose: [
+            `The choice of sign convention changes the equations but not the physical answer. This cell models the same thrown ball with both conventions and confirms identical flight times and maximum heights.`,
+          ],
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+g = 9.8
+v0 = 20.0    # initial speed [m/s]
+x0 = 0.0
+
+# Convention 1: upward = positive
+# x(t) = x0 + v0*t - ½g*t²,  a = -g
+def x_up_pos(t):
+    return x0 + v0*t - 0.5*g*t**2
+
+def v_up_pos(t):
+    return v0 - g*t
+
+# Convention 2: downward = positive  (initial v is negative since thrown up)
+# x(t) = x0 - v0*t + ½g*t²,  a = +g
+def x_down_pos(t):
+    return x0 - v0*t + 0.5*g*t**2
+
+def v_down_pos(t):
+    return -v0 + g*t
+
+# Find landing time for each (when x = x0)
+# Upward+: x0 + v0*t - ½g*t² = 0 → t = 2v0/g
+t_land = 2 * v0 / g
+print(f"Flight time (both conventions): {t_land:.4f} s")
+
+t = np.linspace(0, t_land, 300)
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+# Position
+axes[0].plot(t, x_up_pos(t), 'b-', linewidth=2, label='Upward+ (x rises then falls)')
+axes[0].plot(t, x_down_pos(t), 'r--', linewidth=2, label='Downward+ (x falls then rises)')
+axes[0].axhline(0, color='brown', linewidth=1)
+axes[0].set_xlabel('t [s]');  axes[0].set_ylabel('x [m]')
+axes[0].set_title('Position vs time — two conventions')
+axes[0].legend();  axes[0].grid(True, alpha=0.3)
+
+# Velocity
+axes[1].plot(t, v_up_pos(t), 'b-', linewidth=2, label='v(t) upward+')
+axes[1].plot(t, v_down_pos(t), 'r--', linewidth=2, label='v(t) downward+')
+axes[1].axhline(0, color='brown', linewidth=1)
+axes[1].set_xlabel('t [s]');  axes[1].set_ylabel('v [m/s]')
+axes[1].set_title('Velocity vs time — two conventions')
+axes[1].legend();  axes[1].grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+
+t_peak_up = v0 / g
+print(f"Max height (upward+): {x_up_pos(t_peak_up):.2f} m")
+print(f"Min x (downward+) at same time: {x_down_pos(t_peak_up):.2f} m (most negative = highest)")`,
+        },
+        {
+          cellTitle: '2D Coordinate Systems — Free Fall Under Different Frames',
+          type: 'code',
+          language: 'python',
+          prose: [
+            `In 2D we choose both a horizontal and vertical axis. For projectile motion, the x-axis is always horizontal (no gravity) and the y-axis is vertical (gravity acts). The coordinate system defines which way "positive" points — but the trajectory is the same.`,
+          ],
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+g = 9.8
+v0 = 20.0;  theta = 40.0   # degrees
+
+vx = v0 * np.cos(np.radians(theta))
+vy = v0 * np.sin(np.radians(theta))
+
+t_land = 2 * vy / g
+t = np.linspace(0, t_land, 300)
+
+# Standard convention: x right+, y up+
+x1 = vx * t
+y1 = vy * t - 0.5 * g * t**2
+
+# Alternative: x left+, y up+  (negate x component, same y)
+x2 = -vx * t   # same trajectory, mirrored left-right
+y2 = y1
+
+# Alternative: x right+, y down+  (negate y, negate vy, use +g)
+x3 = vx * t
+y3 = -vy * t + 0.5 * g * t**2   # downward positive
+
+fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+
+axes[0].plot(x1, y1, 'b-', linewidth=2)
+axes[0].set_title('Standard: x right+, y up+')
+axes[0].set_xlabel('x [m]');  axes[0].set_ylabel('y [m]')
+axes[0].axhline(0, color='brown');  axes[0].grid(True, alpha=0.3)
+axes[0].set_aspect('equal')
+
+axes[1].plot(x2, y2, 'r-', linewidth=2)
+axes[1].set_title('Mirrored: x left+, y up+')
+axes[1].set_xlabel('x [m]');  axes[1].set_ylabel('y [m]')
+axes[1].axhline(0, color='brown');  axes[1].grid(True, alpha=0.3)
+axes[1].set_aspect('equal')
+
+axes[2].plot(x3, y3, 'g-', linewidth=2)
+axes[2].set_title('Flipped: x right+, y down+')
+axes[2].set_xlabel('x [m]');  axes[2].set_ylabel('y [m]')
+axes[2].axhline(0, color='brown');  axes[2].grid(True, alpha=0.3)
+axes[2].set_aspect('equal')
+
+plt.suptitle('Same physical trajectory — three coordinate systems', fontsize=12)
+plt.tight_layout()
+plt.show()
+print("Flight time unchanged across all conventions:", f"{t_land:.2f} s")`,
+        },
+        {
+          cellTitle: 'Reference Frame — Relative Motion',
+          type: 'code',
+          language: 'python',
+          prose: [
+            `The origin is arbitrary — you can place it wherever makes the algebra simplest. For relative motion, measuring position from a moving frame changes velocities but not accelerations (in classical mechanics).`,
+          ],
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+# Two cars on a highway:
+# Car A: starts at origin, moves at 30 m/s east
+# Car B: starts 200 m east, moves at 20 m/s east
+
+v_A = 30.0   # m/s
+v_B = 20.0   # m/s
+x_A0 = 0.0
+x_B0 = 200.0
+
+t = np.linspace(0, 30, 300)
+
+x_A = x_A0 + v_A * t
+x_B = x_B0 + v_B * t
+
+# Relative position: how far ahead is B from A's perspective?
+x_rel = x_B - x_A   # B's position in A's reference frame
+
+# In A's frame, A is stationary at 0, B approaches at v_rel = v_B - v_A
+v_rel = v_B - v_A
+
+t_catch = x_B0 / (v_A - v_B)   # when A catches B (x_A = x_B)
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+axes[0].plot(t, x_A, 'b-', linewidth=2, label='Car A (30 m/s)')
+axes[0].plot(t, x_B, 'r-', linewidth=2, label='Car B (20 m/s)')
+axes[0].axvline(t_catch, color='gray', linestyle='--', alpha=0.7)
+axes[0].set_xlabel('t [s]');  axes[0].set_ylabel('position [m]')
+axes[0].set_title('Ground frame: both cars moving east')
+axes[0].legend();  axes[0].grid(True, alpha=0.3)
+
+axes[1].plot(t, x_rel, 'g-', linewidth=2, label='B relative to A')
+axes[1].axhline(0, color='gray', linestyle='--')
+axes[1].set_xlabel('t [s]');  axes[1].set_ylabel('x_B − x_A [m]')
+axes[1].set_title("A's reference frame: B approaches at 10 m/s")
+axes[1].grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+
+print(f"Relative velocity: v_B - v_A = {v_rel:.1f} m/s (B recedes from A's view)")
+print(f"A overtakes B at t = {t_catch:.1f} s")`,
+        },
+        {
+          cellTitle: 'Challenge — Same Problem, Two Sign Conventions',
+          type: 'code',
+          language: 'python',
+          code: `# Challenge: model a ball drop with both sign conventions
+# ─────────────────────────────────────────────────────────
+# A ball is dropped from rest (v0=0) from a height H = 45 m.
+# The ground is at x = 0 in both conventions.
+
+g = 9.8
+H = 45.0
+
+# Convention 1: upward positive, x0 = H, v0 = 0, a = -g
+# Task 1a: Write position function x1(t) and velocity v1(t).
+def x1(t):
+    return # YOUR CODE HERE
+
+def v1(t):
+    return # YOUR CODE HERE
+
+# Task 1b: Find t when x1(t) = 0 (ball hits ground). Store in t_land1.
+# Hint: H - ½g*t² = 0 → t = sqrt(2H/g)
+import numpy as np
+t_land1 = # YOUR CODE HERE
+
+# Convention 2: downward positive, x0 = 0, v0 = 0, a = +g
+# (ground is now at x = H = 45 m)
+def x2(t):
+    return # YOUR CODE HERE
+
+def v2(t):
+    return # YOUR CODE HERE
+
+# Task 2b: Find t when x2(t) = H. Store in t_land2.
+t_land2 = # YOUR CODE HERE
+
+print(f"Convention 1 (up+): lands at t={t_land1:.3f}s, v={v1(t_land1):.2f} m/s")
+print(f"Convention 2 (down+): lands at t={t_land2:.3f}s, v={v2(t_land2):.2f} m/s")
+print(f"Same time? {abs(t_land1 - t_land2) < 0.001}")
+print(f"Same speed? {abs(abs(v1(t_land1)) - abs(v2(t_land2))) < 0.001}")`,
+          prose: [],
+        },
+      ],
+    },
+    matlab: {
+      type: 'matlab',
+      cells: [
+        {
+          cellTitle: 'Sign Conventions in MATLAB',
+          type: 'code',
+          language: 'matlab',
+          prose: [
+            `MATLAB lets you define the kinematic functions symbolically or as anonymous functions. Here we model the same free-fall problem under both sign conventions and plot the results to confirm identical physical outcomes.`,
+          ],
+          code: `%% Two sign conventions — same physics, different equations
+g  = 9.8;
+v0 = 20.0;   % m/s initial upward speed
+x0 = 0.0;
+
+% Convention 1: upward positive
+% x(t) = x0 + v0*t - 0.5*g*t^2,  a = -g
+x_up  = @(t) x0 + v0.*t - 0.5.*g.*t.^2;
+v_up  = @(t) v0 - g.*t;
+
+% Convention 2: downward positive (invert signs)
+% x(t) = x0 - v0*t + 0.5*g*t^2,  a = +g
+x_dn  = @(t) x0 - v0.*t + 0.5.*g.*t.^2;
+v_dn  = @(t) -v0 + g.*t;
+
+t_land = 2*v0/g;
+t = linspace(0, t_land, 300);
+
+figure;
+subplot(2,1,1);
+plot(t, x_up(t), 'b-', 'LineWidth',2, 'DisplayName', 'Upward+');
+hold on;
+plot(t, x_dn(t), 'r--', 'LineWidth',2, 'DisplayName', 'Downward+');
+yline(0, 'k-');
+xlabel('t [s]');  ylabel('x [m]');
+title('Position (two sign conventions)');  legend;  grid on;
+
+subplot(2,1,2);
+plot(t, v_up(t), 'b-', 'LineWidth',2, 'DisplayName', 'v upward+');
+hold on;
+plot(t, v_dn(t), 'r--', 'LineWidth',2, 'DisplayName', 'v downward+');
+yline(0, 'k-');
+xlabel('t [s]');  ylabel('v [m/s]');
+title('Velocity (two sign conventions)');  legend;  grid on;
+
+fprintf('Flight time: %.4f s (both conventions)\\n', t_land);
+fprintf('Max height: %.2f m\\n', v0^2/(2*g));`,
+        },
+        {
+          cellTitle: 'Challenge — Projectile with Chosen Origin',
+          type: 'code',
+          language: 'matlab',
+          code: `%% Challenge: set up a projectile problem with your own coordinate origin
+% ─────────────────────────────────────────────────────────
+% A ball is thrown from the TOP of a 30 m cliff at 15 m/s
+% at 25° above horizontal. Use upward-positive and the
+% base of the cliff as the origin (y=0 at ground level).
+%
+% Task 1: Set up initial conditions (x0, y0, vx, vy).
+% Task 2: Write anonymous functions x_fun and y_fun.
+% Task 3: Find the time when y = 0 (ball hits ground).
+%         Use roots() on the quadratic 0 = y0 + vy*t - 0.5*g*t^2
+% Task 4: Find the horizontal range (x at landing time).
+% Task 5: Plot the trajectory.
+
+g  = 9.8;
+H  = 30;    % cliff height [m]
+v0 = 15;    % m/s
+th = 25;    % degrees
+
+% Task 1
+x0 = 0;
+y0 = H;     % base of cliff is y=0
+vx = v0 * cosd(th);
+vy = v0 * sind(th);   % positive: thrown upward
+
+% Task 2
+x_fun = @(t) % YOUR CODE
+y_fun = @(t) % YOUR CODE
+
+% Task 3
+coeffs = [−0.5*g, vy, y0];  % at² + bt + c for 0 = y(t)
+r = roots(coeffs);
+t_land = max(r);   % take positive root
+
+% Task 4
+range = x_fun(t_land);
+
+% Task 5
+t_range = linspace(0, t_land, 300);
+figure;
+plot(x_fun(t_range), y_fun(t_range), 'b-', 'LineWidth',2);
+hold on;  yline(0,'k-');  xline(0,'k-');
+xlabel('x [m]');  ylabel('y [m]');
+title(sprintf('Range = %.2f m, t_{land} = %.2f s', range, t_land));
+grid on;
+
+fprintf('Range: %.2f m\\n', range);
+fprintf('Landing time: %.2f s\\n', t_land);`,
+          prose: [],
+        },
+      ],
+    },
+  },
+
+  misconceptions: [
+    {
+      id: 'p0-007-misc1',
+      misconception: `"There is a 'correct' coordinate system for every problem — using the wrong one gives the wrong answer."`,
+      reality: `Any consistent coordinate system gives the correct answer. The choice of sign convention changes the form of the equations but not the physical result. Flight time, maximum height, and landing position are unchanged by convention. The goal is to choose the convention that makes the algebra easiest (usually upward positive for vertical problems).`,
+      whyItHappens: `Students see different textbooks using different conventions and think one must be right. Both are right — they just describe the same physics in different languages.`,
+    },
+    {
+      id: 'p0-007-misc2',
+      misconception: `"If I choose downward positive, gravity has a positive sign but that means it pushes objects upward."`,
+      reality: `In a downward-positive frame, positive direction IS downward. Gravity causes downward acceleration, which is positive in this frame. An object dropped falls in the positive direction — its position increases over time. The sign of a acceleration simply tells you which direction on your axis the acceleration points.`,
+      whyItHappens: `Students associate "positive = up" universally and get confused when the convention is reversed.`,
+    },
+    {
+      id: 'p0-007-misc3',
+      misconception: `"The origin must be at the starting position of the object."`,
+      reality: `The origin can be anywhere. Placing it at the floor of a building, the launch point, the landing point, or anywhere else is equally valid. Often placing the origin somewhere other than the starting position makes the algebra simpler — for example, placing y = 0 at the floor makes finding landing time straightforward (solve x(t) = 0).`,
+      whyItHappens: `Most introductory examples happen to use the launch point as origin, so students assume it must be placed there.`,
+    },
+  ],
+
+  transferPrompts: [
+    {
+      id: 'p0-007-tp1',
+      prompt: `A submarine navigates with depth measured as positive downward (surface = 0, seafloor = +800 m). (a) A torpedo is fired horizontally at depth 200 m. Set up the coordinate system and write the equations of motion. (b) If the torpedo has slight negative buoyancy (sinks slowly at 0.1 m/s²), what sign does this acceleration have in this convention? (c) Rewrite the problem with depth measured upward — which convention makes the algebra simpler here?`,
+      targetConcept: 'Choosing coordinate systems, adapting sign conventions to the problem geometry',
+      hint: `With depth positive down: torpedo starts at x=200 m, sinks (positive direction), a = +0.1 m/s². With depth positive up: start at x=−200 m, a = −0.1 m/s².`,
+    },
+    {
+      id: 'p0-007-tp2',
+      prompt: `Two cars approach each other head-on. Car A travels east at 25 m/s; Car B travels west at 30 m/s. They are 500 m apart. (a) Choose a coordinate system (define origin and positive direction). (b) Write position functions for each. (c) Find when and where they meet.`,
+      targetConcept: 'Setting up relative motion problems with explicit coordinate choice',
+      hint: `One natural choice: origin between them, positive east. Car A at x = −250 m with v = +25, Car B at x = +250 m with v = −30. Solve for when positions are equal.`,
+    },
+  ],
+
+  debugging: [
+    {
+      id: 'p0-007-dbg1',
+      title: 'Inconsistent sign convention within a single problem',
+      scenario: `A student uses upward-positive throughout but writes F_gravity = +mg (positive). Newton's second law gives a = +g, so the ball accelerates upward. Their trajectory curves the wrong way.`,
+      error: `Gravity always pulls downward. In upward-positive convention, "downward" is negative, so F_gravity = −mg and a = −g. Mixing conventions (upward positive for position, positive for gravitational force) breaks the algebra.`,
+      fix: `Choose upward positive: x is upward, v is upward, a = −g = −9.8 m/s². Then x(t) = x₀ + v₀t − ½gt² has the ball curving downward correctly.`,
+      prevention: `Write "Convention: upward = positive" at the top of every problem. Then check every signed quantity against that convention before writing any equation.`,
+    },
+    {
+      id: 'p0-007-dbg2',
+      title: 'Taking the negative root of the quadratic formula',
+      scenario: `A student solving x(t) = 0 for landing time gets t = −0.3 s and t = 4.1 s, and picks t = −0.3 s "because it's the first one."`,
+      error: `t = −0.3 s is before the throw (in the past) — it has no physical meaning. Always take the positive root. The negative root arises from extending the parabola backward in time, outside the problem's domain.`,
+      fix: `Always select t > 0. Landing at t = 4.1 s is the physical answer. The negative root corresponds to where the parabola would pass through x=0 if extended backward — unphysical.`,
+      prevention: `State the domain at the start: t ≥ 0. Immediately discard any negative time roots from the quadratic formula.`,
+    },
+  ],
+
+  mastery: {
+    targetLevel: `You can set up a coordinate system for any 1D or 2D problem, assign correct signs to all quantities (position, velocity, acceleration), and verify that the physical result is independent of the convention chosen.`,
+    checklistItems: [
+      `State your sign convention explicitly at the start of every problem ("upward = positive")`,
+      `Assign the correct sign to gravitational acceleration for both conventions`,
+      `Place the origin wherever makes the algebra simplest — not necessarily at the launch point`,
+      `Solve the quadratic for landing time and select only the physically meaningful (positive) root`,
+      `Verify that two different conventions give the same physical answer (flight time, max height)`,
+      `Set up relative motion: identify which object is the origin, subtract positions correctly`,
+    ],
+    commonStruggles: [
+      `Mixing sign conventions within a single problem — always write the convention at the top`,
+      `Choosing the negative quadratic root — always select t > 0`,
+      `Thinking the origin must be at the launch point — it can be anywhere`,
+      `Forgetting to negate velocity or acceleration when switching conventions`,
+    ],
+    nextSteps: [
+      `Chapter 2 (Kinematics): every problem in Ch.2 requires an explicit sign convention`,
+      `Chapter 4 (Forces): Newton's Second Law is ΣF = ma where signs encode direction`,
+      `Chapter 1 (Vectors): choosing coordinate directions becomes critical in 2D/3D`,
+    ],
+  },
 
   quiz: [
     {

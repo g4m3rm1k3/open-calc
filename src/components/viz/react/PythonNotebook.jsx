@@ -995,7 +995,11 @@ export default function PythonNotebook({ params, onParamChange }) {
 
   // Use initialCells from params if provided, otherwise fallback to STARTER_CELLS
   const disableRunAll = params?.disableRunAll ?? false;
-  const initialCells = params?.initialCells || STARTER_CELLS;
+  const normalizeCells = (raw) =>
+    (raw || STARTER_CELLS).map((c, i) =>
+      c.id != null ? c : { ...c, id: `cell-${i + 1}`, output: c.output ?? '', status: c.status ?? 'idle', figureJson: c.figureJson ?? null }
+    );
+  const initialCells = normalizeCells(params?.initialCells);
   const [cells, setCells] = useState(initialCells);
   const [isExecuting, setIsExecuting] = useState(false);
   const execCounterRef = useRef(0); // global execution counter — increments each time any cell runs
@@ -1003,7 +1007,7 @@ export default function PythonNotebook({ params, onParamChange }) {
   // Update cells if params.initialCells changes (mostly for HMR or switching lessons)
   useEffect(() => {
     if (params?.initialCells) {
-      setCells(params.initialCells);
+      setCells(normalizeCells(params.initialCells));
     }
   }, [params?.initialCells]);
 

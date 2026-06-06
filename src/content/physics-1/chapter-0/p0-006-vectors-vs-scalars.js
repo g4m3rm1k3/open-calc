@@ -217,16 +217,7 @@ export default {
       },
     ],
     title: 'The magnitude formula is the Pythagorean theorem',
-    visualizations: [
-      {
-        id: 'SVGDiagram',
-        props: { type: 'vector-components' },
-        title: 'The right triangle hidden in every 2D vector',
-        mathBridge:
-          'The component diagram is the Pythagorean theorem in disguise. Ax and Ay are the two legs; |A| is the hypotenuse. This means every magnitude calculation is just the Pythagorean theorem.',
-        caption: 'Vector magnitude = Pythagorean theorem. Components = trigonometry.',
-      },
-    ],
+    visualizations: [],
   },
 
   examples: [
@@ -454,6 +445,368 @@ export default {
     'Unit vectors î, ĵ — direction only, magnitude 1',
     'Never add magnitudes of non-parallel vectors: 3N + 4N ≠ 7N if they are perpendicular',
   ],
+
+  notebooks: {
+    python: {
+      type: 'python',
+      cells: [
+        {
+          cellTitle: 'Vectors as NumPy Arrays — Components and Magnitude',
+          type: 'code',
+          language: 'python',
+          prose: [
+            `In Python, a 2D vector is naturally represented as a NumPy array [Ax, Ay]. All vector operations (addition, scaling, magnitude) then use standard array arithmetic. This cell defines vectors, computes magnitudes, and adds them.`,
+          ],
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+# Define 2D vectors as NumPy arrays
+A = np.array([3.0, 4.0])   # m/s
+B = np.array([1.0, -2.0])  # m/s
+
+# Magnitude (Pythagorean theorem)
+mag_A = np.linalg.norm(A)
+mag_B = np.linalg.norm(B)
+
+# Direction (angle from +x axis)
+angle_A = np.degrees(np.arctan2(A[1], A[0]))
+angle_B = np.degrees(np.arctan2(B[1], B[0]))
+
+print("=== Vector Properties ===")
+print(f"A = {A}  m/s,  |A| = {mag_A:.3f} m/s,  θ_A = {angle_A:.1f}°")
+print(f"B = {B}  m/s,  |B| = {mag_B:.3f} m/s,  θ_B = {angle_B:.1f}°")
+
+# Vector addition
+R = A + B
+print(f"\\nA + B = {R},  |A+B| = {np.linalg.norm(R):.3f} m/s")
+
+# Scalar multiplication
+two_A = 2 * A
+neg_B = -B
+print(f"2A = {two_A}")
+print(f"-B = {neg_B}")
+
+# Key: |A + B| ≠ |A| + |B| in general
+print(f"\\n|A| + |B| = {mag_A + mag_B:.3f}  (triangle inequality: ≥ |A+B| = {np.linalg.norm(R):.3f})")`,
+        },
+        {
+          cellTitle: 'Visualising Vector Addition — Head to Tail',
+          type: 'code',
+          language: 'python',
+          prose: [
+            `Head-to-tail addition is the geometric rule: place the tail of B at the head of A. The resultant R = A + B runs from the tail of A to the head of B. This cell draws the arrows and confirms the algebra.`,
+          ],
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+def draw_vector(ax, origin, vec, color, label, lw=2):
+    ax.annotate('', xy=origin+vec, xytext=origin,
+                arrowprops=dict(arrowstyle='->', color=color, lw=lw))
+    mid = origin + 0.5*vec
+    ax.text(mid[0]+0.1, mid[1]+0.1, label, color=color, fontsize=11, fontweight='bold')
+
+# Define vectors
+A = np.array([3.0, 2.0])
+B = np.array([-1.0, 3.0])
+R = A + B
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+# Left: head-to-tail addition
+origin = np.array([0.0, 0.0])
+draw_vector(axes[0], origin, A, 'blue', f'A={A}')
+draw_vector(axes[0], A, B, 'green', f'B={B}')       # B starts at head of A
+draw_vector(axes[0], origin, R, 'red', f'R=A+B={R}', lw=2.5)
+axes[0].set_xlim(-1.5, 3.5);  axes[0].set_ylim(-0.5, 5.5)
+axes[0].set_aspect('equal');  axes[0].grid(True, alpha=0.3)
+axes[0].set_title('Head-to-tail: R = A + B')
+
+# Right: component decomposition
+draw_vector(axes[1], origin, R, 'red', f'R={R}', lw=2.5)
+draw_vector(axes[1], origin, np.array([R[0], 0]), 'purple', f'Rx={R[0]:.1f}')
+draw_vector(axes[1], np.array([R[0], 0]), np.array([0, R[1]]), 'orange', f'Ry={R[1]:.1f}')
+axes[1].set_xlim(-1, 3.5);  axes[1].set_ylim(-0.5, 5.5)
+axes[1].set_aspect('equal');  axes[1].grid(True, alpha=0.3)
+axes[1].set_title(f'Components: |R|={np.linalg.norm(R):.2f}  θ={np.degrees(np.arctan2(R[1],R[0])):.1f}°')
+
+plt.tight_layout()
+plt.show()
+
+print(f"R = ({R[0]:.1f}, {R[1]:.1f}),  |R| = {np.linalg.norm(R):.3f}")`,
+        },
+        {
+          cellTitle: 'Projectile Motion — Decomposing Initial Velocity',
+          type: 'code',
+          language: 'python',
+          prose: [
+            `A projectile's initial velocity is a vector. Decomposing it into horizontal and vertical components is the core technique of 2D kinematics. Horizontal and vertical motions are independent — the vector framework makes this explicit.`,
+          ],
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+v0 = 25.0      # m/s  initial speed
+theta = 37.0   # degrees  launch angle
+g = 9.8        # m/s²
+
+# Component decomposition
+vx = v0 * np.cos(np.radians(theta))
+vy = v0 * np.sin(np.radians(theta))
+print(f"Launch: v₀={v0} m/s at θ={theta}°")
+print(f"  vx = v₀cosθ = {vx:.3f} m/s  (horizontal)")
+print(f"  vy = v₀sinθ = {vy:.3f} m/s  (vertical)")
+print(f"  Check: √(vx²+vy²) = {np.sqrt(vx**2+vy**2):.3f} m/s ✓")
+
+# Trajectory
+t_land = 2 * vy / g
+t = np.linspace(0, t_land, 300)
+x = vx * t
+y = vy * t - 0.5 * g * t**2
+
+fig, ax = plt.subplots(figsize=(10, 5))
+ax.plot(x, y, 'b-', linewidth=2, label='Trajectory')
+ax.fill_between(x, 0, y, alpha=0.1, color='blue')
+
+# Draw initial velocity vector and components
+scale = 0.5
+ax.annotate('', xy=(vx*scale, vy*scale), xytext=(0, 0),
+            arrowprops=dict(arrowstyle='->', color='red', lw=2))
+ax.annotate('', xy=(vx*scale, 0), xytext=(0, 0),
+            arrowprops=dict(arrowstyle='->', color='purple', lw=2))
+ax.annotate('', xy=(vx*scale, vy*scale), xytext=(vx*scale, 0),
+            arrowprops=dict(arrowstyle='->', color='orange', lw=2))
+
+ax.text(vx*scale/2, vy*scale/2+0.3, f'v₀={v0}m/s', color='red', fontsize=10)
+ax.text(vx*scale/2, -0.5, f'vx={vx:.1f}m/s', color='purple', fontsize=9)
+ax.text(vx*scale+0.2, vy*scale/2, f'vy={vy:.1f}m/s', color='orange', fontsize=9)
+
+ax.set_xlabel('x [m]');  ax.set_ylabel('y [m]')
+ax.set_title('Projectile trajectory — components drive the motion independently')
+ax.set_xlim(-1, max(x)+2);  ax.set_ylim(-0.5, max(y)+1)
+ax.grid(True, alpha=0.3);  ax.axhline(0, color='brown', linewidth=1)
+plt.tight_layout()
+plt.show()`,
+        },
+        {
+          cellTitle: 'Challenge — Vector Addition and Component Extraction',
+          type: 'code',
+          language: 'python',
+          code: `# Challenge: vector operations
+# ─────────────────────────────────────────────────────────
+import numpy as np
+
+# Three displacement vectors describing a hiker's path:
+A = np.array([4.0,  0.0])   # 4 m east
+B = np.array([0.0,  3.0])   # 3 m north
+C = np.array([-1.5, 2.0])   # 1.5 m west, 2 m north
+
+# Task 1: Compute the resultant displacement R = A + B + C.
+R = # YOUR CODE HERE
+
+# Task 2: Compute the magnitude |R| (straight-line distance from start to end).
+mag_R = # YOUR CODE HERE
+
+# Task 3: Compute the angle (degrees from east/+x) of R.
+angle_R = # YOUR CODE HERE  (hint: np.degrees(np.arctan2(R[1], R[0])))
+
+# Task 4: If the hiker needs to return directly to start,
+#         what is the return vector D = -R?
+D = # YOUR CODE HERE
+
+print(f"Resultant R = {R}")
+print(f"|R| = {mag_R:.3f} m")
+print(f"Direction = {angle_R:.1f}° from east")
+print(f"Return vector D = {D}")`,
+          prose: [],
+        },
+      ],
+    },
+    matlab: {
+      type: 'matlab',
+      cells: [
+        {
+          cellTitle: 'Vectors in MATLAB — Column Vectors and Operations',
+          type: 'code',
+          language: 'matlab',
+          prose: [
+            `In MATLAB, vectors are naturally stored as column or row arrays. The \`norm()\` function computes magnitude. \`atan2d()\` gives the angle in degrees. All arithmetic operations work element-wise.`,
+          ],
+          code: `%% 2D vectors in MATLAB
+A = [3; 4];    % column vector [Ax; Ay]  m/s
+B = [1; -2];   % column vector
+
+% Magnitude
+magA = norm(A);
+magB = norm(B);
+
+% Direction angle (degrees from +x axis)
+thetaA = atan2d(A(2), A(1));
+thetaB = atan2d(B(2), B(1));
+
+fprintf('A = [%.1f, %.1f],  |A| = %.3f,  θ_A = %.1f°\\n', A(1),A(2),magA,thetaA);
+fprintf('B = [%.1f, %.1f],  |B| = %.3f,  θ_B = %.1f°\\n', B(1),B(2),magB,thetaB);
+
+% Vector addition
+R = A + B;
+magR = norm(R);
+thetaR = atan2d(R(2), R(1));
+fprintf('R = A+B = [%.1f, %.1f],  |R| = %.3f,  θ_R = %.1f°\\n', R(1),R(2),magR,thetaR);
+
+% Scalar multiplication
+fprintf('2A = [%.1f, %.1f]\\n', 2*A(1), 2*A(2));
+
+% Triangle inequality check
+fprintf('|A|+|B| = %.3f >= |A+B| = %.3f  ✓\\n', magA+magB, magR);`,
+        },
+        {
+          cellTitle: 'Projectile Motion Trajectory in MATLAB',
+          type: 'code',
+          language: 'matlab',
+          prose: [
+            `Decompose a launch velocity into components, then propagate each component independently. The x-component has no acceleration; the y-component has −g. Plot the resulting parabola.`,
+          ],
+          code: `%% Projectile motion via vector decomposition
+v0    = 25;     % m/s
+theta = 37;     % degrees
+g     = 9.8;    % m/s²
+
+vx = v0 * cosd(theta);   % horizontal component  [m/s]
+vy = v0 * sind(theta);   % vertical component    [m/s]
+
+t_land = 2 * vy / g;     % time of flight
+t = linspace(0, t_land, 300);
+
+x = vx .* t;                           % no horizontal acceleration
+y = vy .* t - 0.5 .* g .* t.^2;       % free fall in y
+
+figure;
+plot(x, y, 'b-', 'LineWidth', 2);
+hold on;
+yline(0, 'k-');
+xlabel('x [m]');  ylabel('y [m]');
+title(sprintf('Projectile: v₀=%.0fm/s, θ=%.0f°, range=%.1fm, max height=%.1fm', ...
+    v0, theta, max(x), max(y)));
+grid on;
+
+% Draw velocity components at launch
+scale = 0.5;
+quiver(0, 0, vx*scale, vy*scale, 0, 'r', 'LineWidth', 2, 'MaxHeadSize', 2);
+quiver(0, 0, vx*scale, 0,        0, 'm', 'LineWidth', 2, 'MaxHeadSize', 2);
+quiver(vx*scale, 0, 0, vy*scale, 0, Color=[1 0.5 0], 'LineWidth', 2, 'MaxHeadSize', 2);
+
+fprintf('vx = %.2f m/s,  vy = %.2f m/s\\n', vx, vy);
+fprintf('Range = %.2f m,  Max height = %.2f m\\n', max(x), max(y));`,
+        },
+        {
+          cellTitle: 'Challenge — Find the Resultant of Multiple Vectors',
+          type: 'code',
+          language: 'matlab',
+          code: `%% Challenge: resultant of multiple force vectors
+% ─────────────────────────────────────────────────────────
+% Three forces act on an object:
+F1 = [10; 0];     % 10 N east
+F2 = [0;  8];     % 8 N north
+F3 = [-3; -5];    % N
+
+% Task 1: Compute the net force Fnet = F1 + F2 + F3.
+Fnet = % YOUR CODE HERE
+
+% Task 2: Compute the magnitude of Fnet.
+mag_Fnet = % YOUR CODE HERE
+
+% Task 3: Compute the direction angle (degrees from east).
+theta_Fnet = % YOUR CODE HERE  % hint: atan2d(Fnet(2), Fnet(1))
+
+% Task 4: For the object to be in equilibrium (net force = 0),
+%         what fourth force F4 is needed?
+F4 = % YOUR CODE HERE
+
+fprintf('Fnet = [%.2f, %.2f] N\\n', Fnet(1), Fnet(2));
+fprintf('|Fnet| = %.3f N\\n', mag_Fnet);
+fprintf('Direction = %.1f° from east\\n', theta_Fnet);
+fprintf('Equilibrium force F4 = [%.2f, %.2f] N\\n', F4(1), F4(2));`,
+          prose: [],
+        },
+      ],
+    },
+  },
+
+  misconceptions: [
+    {
+      id: 'p0-006-misc1',
+      misconception: `"Adding vectors is the same as adding their magnitudes: |A + B| = |A| + |B|."`,
+      reality: `This is only true when both vectors point in exactly the same direction. In general, |A + B| ≤ |A| + |B| (triangle inequality). When they point at an angle, components must be added separately and the Pythagorean theorem gives the resultant's magnitude. The direction of R depends on the angle between A and B, not just their sizes.`,
+      whyItHappens: `Students treat magnitudes like regular numbers. Scalars add arithmetically; vectors add geometrically (head-to-tail, or component-wise).`,
+    },
+    {
+      id: 'p0-006-misc2',
+      misconception: `"A negative velocity means the object is slowing down."`,
+      reality: `A negative velocity means the object is moving in the negative direction (as defined by the coordinate system). Slowing down means the speed (magnitude of velocity) is decreasing. An object with v = −10 m/s and a = −2 m/s² is speeding up (in the negative direction). Sign indicates direction, not rate of change.`,
+      whyItHappens: `"Negative" in everyday language means "bad" or "less than zero" — associated with decrease. In physics, sign encodes direction, not change.`,
+    },
+    {
+      id: 'p0-006-misc3',
+      misconception: `"The components of a vector are smaller versions of it — they describe less motion."`,
+      reality: `Components completely describe the vector — nothing is lost. The component Ax = A·cos(θ) is the full horizontal projection. Together, Ax and Ay contain all the information in A. You can reconstruct A = √(Ax² + Ay²) at angle θ = arctan(Ay/Ax). Components are not approximations; they are an equivalent representation.`,
+      whyItHappens: `Students see the components as "pieces" and think the vector is somehow more complete. In fact, components are a different (often more useful) way to represent the same thing.`,
+    },
+  ],
+
+  transferPrompts: [
+    {
+      id: 'p0-006-tp1',
+      prompt: `A ship's GPS shows it moving at 15 knots due east for 2 hours, then at 10 knots at 30° north of east for 3 hours. (a) Express each leg as a displacement vector in nautical miles. (b) Find the resultant displacement (magnitude and direction). (c) If the ship needs to return directly to port, what is the return heading and distance?`,
+      targetConcept: 'Vector addition applied to navigation',
+      hint: `1 nautical mile per hour × hours = nautical miles. Decompose each leg into components, add, find magnitude and angle.`,
+    },
+    {
+      id: 'p0-006-tp2',
+      prompt: `A structural engineer models a pin joint where three cables meet. Cable 1 pulls with 500 N at 0°, cable 2 with 300 N at 120°, cable 3 with 400 N at 240°. (a) Find the resultant force vector. (b) Is the joint in equilibrium? (c) If not, what force would restore equilibrium?`,
+      targetConcept: 'Vector addition of forces in 2D; equilibrium condition',
+      hint: `Decompose each cable force into (Fx, Fy) components, sum all Fx and all Fy separately, then find |Fnet|.`,
+    },
+  ],
+
+  debugging: [
+    {
+      id: 'p0-006-dbg1',
+      title: 'Adding magnitudes instead of components',
+      scenario: `A student adds two vectors with magnitudes 5 and 12 (at 90° to each other) by writing R = 5 + 12 = 17.`,
+      error: `Vector addition requires adding components, not magnitudes. Two perpendicular vectors of magnitude 5 and 12 have resultant magnitude √(5² + 12²) = √(169) = 13 — not 17.`,
+      fix: `Decompose: A = (5, 0), B = (0, 12). R = A + B = (5, 12). |R| = √(25 + 144) = √169 = 13. Direction: arctan(12/5) ≈ 67.4° from A.`,
+      prevention: `Never add vector magnitudes arithmetically unless they point in the same direction. Always work in components.`,
+    },
+    {
+      id: 'p0-006-dbg2',
+      title: 'Forgetting that negative sign means opposite direction, not smaller magnitude',
+      scenario: `A student writes v = −5 m/s and concludes "the velocity is less than v = 3 m/s because −5 < 3."`,
+      error: `Comparing velocities by comparing signed numbers as pure numbers is incorrect. v = −5 m/s has magnitude 5 m/s — the object is moving faster than something with v = 3 m/s. The sign only tells direction. Speed comparison uses |v| = 5 > 3.`,
+      fix: `Speed = |v| = |−5| = 5 m/s > 3 m/s. The −5 object is moving faster (in the −x direction). Don't compare velocities numerically — compare their magnitudes for speed.`,
+      prevention: `Separate speed (magnitude, always positive) from velocity (signed, encodes direction). When comparing "how fast", use speed (|v|), not velocity.`,
+    },
+  ],
+
+  mastery: {
+    targetLevel: `You can identify any quantity as a scalar or vector, decompose a 2D vector into x- and y-components using trigonometry, add vectors using head-to-tail or component methods, and reconstruct magnitude and direction from components.`,
+    checklistItems: [
+      `Classify any physics quantity as scalar (magnitude only) or vector (magnitude + direction)`,
+      `Decompose a vector of magnitude |A| and angle θ into components: Ax = |A|cosθ, Ay = |A|sinθ`,
+      `Add two or more vectors by summing components and finding resultant magnitude and direction`,
+      `Explain why vector addition uses components — NOT adding magnitudes arithmetically`,
+      `Interpret a negative velocity as direction, not deceleration`,
+      `Reconstruct a vector from its components: |A| = √(Ax² + Ay²), θ = arctan(Ay/Ax)`,
+    ],
+    commonStruggles: [
+      `Adding magnitudes directly — vectors require component addition, not arithmetic addition`,
+      `Confusing negative velocity (direction) with decreasing speed`,
+      `Applying trig to the wrong angle — always measure θ from the axis used in the problem`,
+      `Forgetting to check quadrant when using arctan — arctan(Ay/Ax) has a ±180° ambiguity`,
+    ],
+    nextSteps: [
+      `Chapter 1 (Vectors): full 3D vectors, dot product, cross product, unit vectors`,
+      `Chapter 2 (Kinematics): 2D projectile motion uses vector decomposition at every step`,
+      `Chapter 4 (Forces): Newton's Second Law F = ma is a vector equation`,
+    ],
+  },
 
   quiz: [
     {

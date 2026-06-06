@@ -228,16 +228,7 @@ export default {
           `\\text{kilo- (k): } \\times 10^3 \\quad \\text{mega- (M): } \\times 10^6 \\quad \\text{giga- (G): } \\times 10^9\\\\\\text{centi- (c): } \\times 10^{-2} \\quad \\text{milli- (m): } \\times 10^{-3} \\quad \\text{micro- (μ): } \\times 10^{-6}`,
       },
     ],
-    visualizations: [
-      {
-        id: 'SVGDiagram',
-        props: { type: 'dimensions-equation' },
-        title: 'Every term in Δx = v₀t + ½at² checked dimension by dimension',
-        mathBridge:
-          `Cover the diagram and work out the dimension of each term yourself. Then reveal the diagram to check. This is exactly what you should do with every new formula you encounter.`,
-        caption: 'Dimensional homogeneity is a necessary (though not sufficient) condition for a correct equation.',
-      },
-    ],
+    visualizations: [],
   },
 
   rigor: {
@@ -286,15 +277,7 @@ export default {
       },
     ],
     title: 'Proving Δx = v₀t + ½at² passes the dimensional test',
-    visualizations: [
-      {
-        id: 'SVGDiagram',
-        props: { type: 'dimensions-equation' },
-        title: 'Full dimensional proof, term by term',
-        mathBridge: `Follow the proof steps above while looking at the diagram — each arrow corresponds to a step.`,
-        caption: 'A dimensional proof is a theorem: any equation failing it is provably wrong.',
-      },
-    ],
+    visualizations: [],
   },
 
   examples: [
@@ -540,6 +523,519 @@ export default {
     `Functions (sin, ln, exp) take dimensionless inputs only`,
     `Significant figures: multiplication/division → match fewest sig figs; addition/subtraction → match least precise decimal place`,
   ],
+
+  notebooks: {
+    python: {
+      type: 'python',
+      cells: [
+        {
+          cellTitle: 'Unit Conversion — Multiply by 1',
+          type: 'code',
+          language: 'python',
+          prose: [
+            `Unit conversion is multiplication by a fraction equal to 1. The physical value is unchanged; only the label changes. This cell builds a reusable converter that shows the cancellation explicitly.`,
+          ],
+          code: `# Unit conversion: multiply by conversion factors
+# Each factor equals 1 — it changes the label, not the value
+
+def convert(value, from_unit, to_unit, factor):
+    """Multiply value by factor to change from_unit to to_unit."""
+    result = value * factor
+    print(f"{value} {from_unit}  ×  ({factor} {to_unit}/{from_unit})")
+    print(f"  = {result:.6g} {to_unit}")
+    return result
+
+print("=== Speed conversions ===")
+# km/h → m/s:  ×(1000 m / 1 km) × (1 h / 3600 s) = ×(1/3.6)
+convert(100, "km/h", "m/s", 1000/3600)
+print()
+convert(27.78, "m/s", "km/h", 3600/1000)
+
+print("\\n=== Distance conversions ===")
+convert(5.0, "miles", "km",   1.60934)
+convert(8.05, "km",   "miles", 1/1.60934)
+
+print("\\n=== Key fact: 1 m/s = 3.6 km/h ===")
+print(f"3600/1000 = {3600/1000}")`,
+        },
+        {
+          cellTitle: 'Tracking Units Through a Calculation',
+          type: 'code',
+          language: 'python',
+          prose: [
+            `Each step of a physics calculation carries units through it. Writing the unit at every step lets you spot errors before the final number. Here we compute fall distance x = ½gt² and verify the result is in meters.`,
+          ],
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+g = 9.8    # m/s²
+t = np.linspace(0, 5, 200)   # s
+
+# x = ½ g t²
+# [x] = (m/s²)(s²) = m  ✓
+x = 0.5 * g * t**2
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 4))
+
+axes[0].plot(t, x, color='#2563eb', linewidth=2)
+axes[0].set_xlabel('Time t  [s]')
+axes[0].set_ylabel('Distance x  [m]')
+axes[0].set_title('x = ½gt²  —  units: (m/s²)(s²) = m  ✓')
+axes[0].grid(True, alpha=0.3)
+
+# Plot x vs t² to confirm linearity
+axes[1].plot(t**2, x, color='#16a34a', linewidth=2)
+axes[1].set_xlabel('t²  [s²]')
+axes[1].set_ylabel('x  [m]')
+axes[1].set_title('x vs t² is a straight line — slope = ½g')
+axes[1].grid(True, alpha=0.3)
+
+slope = 0.5 * g
+axes[1].annotate(f'slope = ½g = {slope} m/s²', xy=(12, 0.5*g*12),
+                 xytext=(5, 30), fontsize=10, color='#16a34a',
+                 arrowprops=dict(arrowstyle='->', color='#16a34a'))
+plt.tight_layout()
+plt.show()
+
+print("Dimensional check:")
+print(f"  [g] = m/s²,  [t²] = s²")
+print(f"  [g × t²] = (m/s²)(s²) = m  ✓")
+print(f"  x = ½ × {g} × {5.0:.1f}² = {0.5*g*25:.2f} m at t = 5 s")`,
+        },
+        {
+          cellTitle: 'The NASA Mars Orbiter — Reproducing the Mistake',
+          type: 'code',
+          language: 'python',
+          prose: [
+            `In 1999 one engineering team sent thruster impulse data in **pound-force seconds** (lbf·s); the navigation software expected **newton-seconds** (N·s). Nobody applied the conversion factor. Let's reproduce the error and see exactly how it destroyed a $327M spacecraft.`,
+          ],
+          code: `# The Mars Climate Orbiter unit error — 1999
+# Lockheed Martin software output: lbf·s (pound-force seconds)
+# JPL navigation software expected: N·s (newton-seconds)
+# Conversion factor needed: 1 lbf = 4.44822 N
+
+lbf_to_N = 4.44822   # N per lbf
+
+# Simulated thruster impulse reported by Lockheed Martin
+impulse_lbf_s = 4.45   # lbf·s  (a typical small maneuver)
+
+# What JPL software received (treated as N·s by mistake):
+impulse_wrong = impulse_lbf_s   # software assumed N·s, no conversion applied
+
+# What JPL software SHOULD have received:
+impulse_correct = impulse_lbf_s * lbf_to_N  # actual N·s
+
+print("=== Mars Climate Orbiter unit error ===")
+print(f"Impulse sent by Lockheed:   {impulse_lbf_s} lbf·s")
+print(f"JPL read it as:             {impulse_wrong:.2f} N·s  ← WRONG (4.4× too small)")
+print(f"Correct value should be:    {impulse_correct:.2f} N·s")
+print(f"Error factor:               {impulse_correct/impulse_wrong:.4f}×")
+print()
+
+# Over 10 months, small errors accumulate
+# The spacecraft arrived at Mars ~170 km too close to the surface
+# Atmosphere caused structural failure during orbital insertion
+
+months = 9.5
+daily_impulse_lbf_s = 4.45   # simplified
+cumulative_error_factor = (impulse_correct/impulse_wrong)**months
+print(f"After {months} months of accumulated error:")
+print(f"  Position error factor: ~{cumulative_error_factor:.1f}×")
+print(f"  Spacecraft entered atmosphere at wrong angle → burned up")
+print()
+print("Lesson: ALWAYS check units when receiving data from external sources.")
+print(f"The fix was one line: impulse_N_s = impulse_lbf_s * {lbf_to_N}")`,
+        },
+        {
+          cellTitle: 'Significant Figures and Order of Magnitude',
+          type: 'code',
+          language: 'python',
+          prose: [
+            `Significant figures encode measurement precision. Order of magnitude estimates give quick feasibility checks. This cell shows both: how to round to sig figs, and how Fermi estimation works.`,
+          ],
+          code: `import math
+
+def sig_figs(value, n):
+    """Round value to n significant figures."""
+    if value == 0:
+        return 0
+    d = math.ceil(math.log10(abs(value)))
+    return round(value, n - d)
+
+print("=== Significant figures in arithmetic ===")
+a = 9.8    # 2 sig figs
+b = 3.147  # 4 sig figs
+product = a * b
+print(f"{a} (2 sf) × {b} (4 sf) = {product:.4f}")
+print(f"  → rounded to 2 sf: {sig_figs(product, 2)}")
+print(f"  Rule: multiplication → use fewest sig figs (2 here)")
+print()
+
+c = 9.80   # 3 sig figs
+d = 0.3    # 1 sig fig
+total = c + d
+print(f"{c} + {d} = {total}")
+print(f"  → limited by 0.3 (1 decimal place): {total:.1f}")
+print(f"  Rule: addition → match least precise decimal place")
+print()
+
+print("=== Order of magnitude estimates ===")
+estimates = {
+    "Human hair diameter": (7e-5, "m"),
+    "Stadium width":       (2e2,  "m"),
+    "Earth radius":        (6.4e6,"m"),
+    "Speed of light":      (3e8,  "m/s"),
+    "Avogadro's number":   (6e23, "mol⁻¹"),
+}
+for name, (val, unit) in estimates.items():
+    exp = math.floor(math.log10(val))
+    print(f"  {name:25s}: ~10^{exp:+d} {unit}")
+
+print()
+print("Order of magnitude = the exponent of 10 when written in scientific notation.")
+print("Useful for quick sanity checks — if an answer is 10× too big, spot it instantly.")`,
+        },
+        {
+          cellTitle: 'Buckingham Pi — Dimensional Derivation of the Pendulum',
+          type: 'code',
+          language: 'python',
+          prose: [
+            `Dimensional analysis can derive the *form* of a physical law before any experiment. The Buckingham Pi theorem says: n variables, k independent dimensions → n−k dimensionless groups. For the pendulum (T, L, g: n=3, k=2) we get one Pi group, so T = C·√(L/g). This cell checks it numerically.`,
+          ],
+          code: `import numpy as np
+import matplotlib.pyplot as plt
+
+# Pendulum: T = 2π √(L/g)
+# Dimensional analysis gives T = C √(L/g) — can't give C = 2π without physics
+# But it predicts the FORM.
+
+g = 9.8   # m/s²
+L = np.linspace(0.1, 4.0, 200)  # m
+
+T = 2 * np.pi * np.sqrt(L / g)  # full formula
+
+# Dimensional analysis prediction: T ∝ √L (holding g fixed)
+# Plot T vs √L — should be linear
+sqrt_L = np.sqrt(L)
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 4))
+
+axes[0].plot(L, T, color='#7c3aed', linewidth=2)
+axes[0].set_xlabel('Pendulum length L  [m]')
+axes[0].set_ylabel('Period T  [s]')
+axes[0].set_title('T = 2π √(L/g)  —  confirmed by dimensional analysis')
+axes[0].grid(True, alpha=0.3)
+
+axes[1].plot(sqrt_L, T, color='#dc2626', linewidth=2)
+axes[1].set_xlabel('√L  [m^{1/2}]')
+axes[1].set_ylabel('T  [s]')
+axes[1].set_title('T vs √L is linear — slope = 2π/√g')
+axes[1].grid(True, alpha=0.3)
+
+slope = 2 * np.pi / np.sqrt(g)
+axes[1].annotate(f'slope = 2π/√g = {slope:.3f} s/m^{{1/2}}',
+                 xy=(1.0, slope*1.0), xytext=(0.4, 5),
+                 fontsize=10, color='#dc2626',
+                 arrowprops=dict(arrowstyle='->', color='#dc2626'))
+plt.tight_layout()
+plt.show()
+
+print("Dimensional analysis result: T = C √(L/g)")
+print(f"Exact physics gives C = 2π ≈ {2*np.pi:.4f}")
+print(f"Slope of T vs √L = 2π/√g = {slope:.4f} s/m^(1/2)")
+print()
+print("The form (√L/g) was derivable from dimensions alone.")
+print("Only the constant 2π required solving the differential equation.")`,
+        },
+        {
+          cellTitle: 'Challenge — Convert and Verify the Orbiter Impulse',
+          type: 'code',
+          language: 'python',
+          code: `# Challenge: Unit conversion and dimensional verification
+# ─────────────────────────────────────────────────────────
+# The Mars Climate Orbiter carried 400 kg of fuel.
+# Its main thruster produced a force of 640 N.
+# Mission duration before insertion: 9.5 months.
+#
+# Task 1: Convert 9.5 months to seconds.
+#         Use: 1 month = 30.44 days, 1 day = 86400 s
+#
+# Task 2: Compute the thruster's total impulse J = F × t
+#         in units of N·s. Confirm dimensions: [N][s] = [kg·m/s²][s] = [kg·m/s]
+#
+# Task 3: Convert that impulse to lbf·s (1 lbf = 4.44822 N)
+#         This is the value Lockheed's software would have sent.
+#         The JPL software used it without converting — as if it were already N·s.
+#         Compute the error in final momentum (kg·m/s) if the JPL software
+#         applied no conversion.
+
+months = 9.5
+
+# Task 1
+duration_s = # YOUR CODE HERE
+
+# Task 2
+F_N = 640   # N  (only used occasionally, but useful for scale)
+J_Ns = # YOUR CODE HERE  (F × duration_s)
+
+# Task 3
+lbf_per_N = 1 / 4.44822
+J_lbfs = # YOUR CODE HERE  (convert J_Ns to lbf·s)
+J_wrong = # YOUR CODE HERE  (what JPL received thinking it was N·s)
+momentum_error = # YOUR CODE HERE  (difference in kg·m/s)
+
+print(f"Duration: {duration_s:.2e} s")
+print(f"Total impulse: {J_Ns:.2e} N·s")
+print(f"In lbf·s: {J_lbfs:.2e} lbf·s")
+print(f"JPL momentum error: {momentum_error:.2e} kg·m/s")`,
+          prose: [],
+        },
+      ],
+    },
+    matlab: {
+      type: 'matlab',
+      cells: [
+        {
+          cellTitle: 'Unit Conversion in MATLAB',
+          type: 'code',
+          language: 'matlab',
+          prose: [
+            `MATLAB handles unit conversion the same way as Python: multiply by the right factor. The key difference is MATLAB's `.*` element-wise operator and its preference for row/column vectors. This cell converts speeds and distances.`,
+          ],
+          code: `%% Unit conversions — multiply by conversion factors
+% km/h → m/s
+speed_kmh = [60, 90, 100, 120];  % km/h
+speed_ms  = speed_kmh * (1000/3600);  % × (1000 m/km) × (1 h/3600 s)
+
+fprintf('Speed conversions:\\n');
+for i = 1:length(speed_kmh)
+    fprintf('  %3d km/h = %6.4f m/s\\n', speed_kmh(i), speed_ms(i));
+end
+
+%% Distance conversion: feet → meters
+ft_to_m = 0.3048;
+heights_ft = [5280, 29032, 1000];  % ft  (1 mile, Everest, round number)
+heights_m  = heights_ft .* ft_to_m;
+
+fprintf('\\nHeight conversions:\\n');
+labels = {'1 mile (5280 ft)', 'Mt Everest (29032 ft)', '1000 ft'};
+for i = 1:3
+    fprintf('  %-22s = %8.1f m\\n', labels{i}, heights_m(i));
+end
+
+%% The 1 m/s = 3.6 km/h relationship
+fprintf('\\nConversion factor: 1 m/s = %.1f km/h\\n', 3600/1000);`,
+        },
+        {
+          cellTitle: 'Dimensional Checking — SUVAT in MATLAB',
+          type: 'code',
+          language: 'matlab',
+          prose: [
+            `MATLAB doesn't track units automatically, but you can embed dimensional verification as comments alongside every line. This is the professional habit — always write the unit after each variable assignment so a reviewer can check at a glance.`,
+          ],
+          code: `%% Dimensional check of x = v0*t + 0.5*a*t^2
+% Each line annotated with its dimension
+
+g  = 9.8;   % m/s²   [L T^-2]
+v0 = 0;     % m/s    [L T^-1]
+t  = 0:0.1:5;  % s   [T]
+
+% v0*t: [L T^-1][T] = [L] = m  ✓
+term1 = v0 .* t;   % m
+
+% 0.5*g*t^2: [L T^-2][T^2] = [L] = m  ✓
+term2 = 0.5 .* g .* t.^2;  % m
+
+x = term1 + term2;  % m + m = m  ✓
+
+figure;
+subplot(1,2,1);
+plot(t, x, 'b-', 'LineWidth', 2);
+xlabel('Time t [s]');
+ylabel('Distance x [m]');
+title('x = ½gt² — dimensions verified');
+grid on;
+
+subplot(1,2,2);
+plot(t.^2, x, 'g-', 'LineWidth', 2);
+xlabel('t² [s²]');
+ylabel('x [m]');
+title('x vs t² linear — slope = ½g');
+grid on;
+
+fprintf('x at t=5s: %.2f m\\n', 0.5*g*25);
+fprintf('Dimensional check: [g][t^2] = (m/s^2)(s^2) = m  OK\\n');`,
+        },
+        {
+          cellTitle: 'Significant Figures and Pendulum — Buckingham Pi Check',
+          type: 'code',
+          language: 'matlab',
+          prose: [
+            `MATLAB's \`format\` command controls display precision. Here we check Buckingham Pi numerically: plot T vs L and T vs √L to confirm the dimensional prediction T ∝ √(L/g).`,
+          ],
+          code: `%% Pendulum: T = 2π√(L/g)  — Buckingham Pi confirms T ∝ √L
+
+g = 9.8;   % m/s²
+L = linspace(0.1, 4.0, 200);   % m
+
+T = 2*pi*sqrt(L/g);   % s — full formula
+
+figure;
+subplot(1,2,1);
+plot(L, T, 'm-', 'LineWidth', 2);
+xlabel('L [m]');  ylabel('T [s]');
+title('Pendulum period vs length');
+grid on;
+
+subplot(1,2,2);
+plot(sqrt(L), T, 'r-', 'LineWidth', 2);
+xlabel('\\surdL  [m^{1/2}]');  ylabel('T [s]');
+title('T vs \\surdL — linear as Buckingham Pi predicts');
+grid on;
+% slope should be 2π/√g
+slope = 2*pi/sqrt(g);
+text(0.5, slope*0.5+0.2, sprintf('slope = 2\\pi/\\surdg = %.3f', slope), ...
+     'Color','r','FontSize',10);
+
+%% Significant figures example
+a_2sf = 9.8;    % 2 sig figs
+t_4sf = 3.147;  % 4 sig figs
+product = a_2sf * t_4sf;
+
+fprintf('\\nSig figs example:\\n');
+fprintf('  %.1f × %.3f = %.4f\\n', a_2sf, t_4sf, product);
+fprintf('  Rounded to 2 sf: %.0f\\n', round(product, 1, 'significant'));
+fprintf('  Rule: multiply/divide → answer has fewest input sig figs\\n');`,
+        },
+        {
+          cellTitle: 'Challenge — Dimensional Analysis of Drag Force',
+          type: 'code',
+          language: 'matlab',
+          code: `%% Challenge: dimensional analysis of drag force
+% ─────────────────────────────────────────────────────────
+% The drag force on a sphere depends on:
+%   - fluid density  ρ  [kg/m³]  = [M L^-3]
+%   - sphere velocity v  [m/s]   = [L T^-1]
+%   - sphere radius   r  [m]     = [L]
+%   - fluid viscosity μ  [kg/(m·s)] = [M L^-1 T^-1]
+%
+% Task 1: From dimensions alone, find exponents a,b,c,d such that
+%         F_drag = C ρ^a v^b r^c μ^d has dimension [M L T^-2] (force)
+%         Hint: try Stokes drag: a=1, b=1, c=1, d=1 → F = C μ v r
+%         Verify this has the right dimension.
+%
+% Task 2: In MATLAB, compute the Stokes drag on a sphere of radius 1mm
+%         falling in water (μ = 1e-3 kg/(m·s)) at 1 cm/s.
+%         C = 6π for a sphere.
+
+% Task 1 verification
+mu   = 1e-3;   % kg/(m·s)
+v    = 0.01;   % m/s
+r    = 1e-3;   % m
+
+% [μ v r] = [kg/(m·s)] [m/s] [m] = kg·m/s² = N  → force ✓
+% YOUR CODE: compute F_stokes = 6*pi * mu * v * r
+F_stokes = % YOUR CODE HERE
+
+fprintf('Stokes drag: F = 6π × %.4f × %.4f × %.4f\\n', mu, v, r);
+fprintf('F_stokes = %.4e N\\n', F_stokes);
+fprintf('Dimensional check: [kg/(m·s)][m/s][m] = kg·m/s² = N  OK\\n');`,
+          prose: [],
+        },
+      ],
+    },
+  },
+
+  misconceptions: [
+    {
+      id: 'p0-002-misc1',
+      misconception: `"Changing units changes the physical value — 100 km/h is faster than 27.78 m/s."`,
+      reality: `These are identical speeds. Converting units is multiplying by 1 — the physical quantity (how fast the car moves) is unchanged. The number changes; the reality does not. 100 km/h and 27.78 m/s describe the same motion.`,
+      whyItHappens: `Students confuse the number with the physical quantity. A bigger number looks like more, but it just reflects a smaller unit.`,
+    },
+    {
+      id: 'p0-002-misc2',
+      misconception: `"Dimensional analysis only works for simple formulas — for complex equations it's too hard to apply."`,
+      reality: `Dimensional analysis works for every equation without exception. For complex expressions, apply it term by term: find the dimension of each product, then verify they all match. It requires more steps, not different logic. It is hardest when you skip it.`,
+      whyItHappens: `Students apply it on simple examples and assume it becomes impractical later. In fact, it becomes more valuable as equations grow complex, because the chance of error grows.`,
+    },
+    {
+      id: 'p0-002-misc3',
+      misconception: `"Writing more decimal places makes my answer more accurate."`,
+      reality: `Accuracy is limited by the precision of your inputs. Writing 9.8 m/s² × 3.0² s = 44.1000000 m does not make the result more accurate — the 9.8 only has 2 sig figs, so the result has 2 sig figs: 44 m. Extra digits are false precision — they imply measurement certainty you do not have.`,
+      whyItHappens: `Calculators display 8-10 digits. Students copy all digits without asking whether they are meaningful.`,
+    },
+    {
+      id: 'p0-002-misc4',
+      misconception: `"A formula that passes dimensional analysis is correct."`,
+      reality: `Dimensional analysis is a necessary check, not a sufficient one. F = mv/t (wrong) and F = ma (correct) both pass the dimensional test if we consider only [M L T⁻²]. Dimensional analysis can eliminate wrong formulas, but it cannot confirm right ones. A dimensionally valid formula can still have wrong constants, wrong signs, or wrong functional form.`,
+      whyItHappens: `Students over-trust the check after seeing it catch errors. It is a filter, not a proof.`,
+    },
+  ],
+
+  transferPrompts: [
+    {
+      id: 'p0-002-tp1',
+      prompt: `A pharmacist prepares a dose of 500 mg for a patient weighing 70 kg. The drug's dosing guideline is 7 mg/kg. Check whether the dose is correct using dimensional analysis — write out the units explicitly at every step.`,
+      targetConcept: 'Unit conversion, dimensional homogeneity',
+      hint: `[mg/kg × kg = mg]. Compute the recommended dose and compare to 500 mg.`,
+    },
+    {
+      id: 'p0-002-tp2',
+      prompt: `An engineering specification lists a pressure of 145 psi (pounds per square inch). Convert this to Pascals (Pa = kg/(m·s²) = N/m²). Given: 1 lbf = 4.44822 N, 1 inch = 0.0254 m. Show unit cancellation at every step.`,
+      targetConcept: 'Multi-step unit conversion with area units',
+      hint: `1 psi = 1 lbf/in². Convert lbf→N and in²→m² separately, then combine.`,
+    },
+    {
+      id: 'p0-002-tp3',
+      prompt: `A wind turbine's power output P depends on air density ρ [kg/m³], rotor area A [m²], and wind speed v [m/s]. Using dimensional analysis, find the simplest formula P = C·ρ^a · A^b · v^c that has dimension of power [W = kg·m²/s³].`,
+      targetConcept: 'Buckingham Pi, deriving formula form from dimensions',
+      hint: `Set up [kg·m²/s³] = [kg/m³]^a [m²]^b [m/s]^c and solve for a, b, c by matching exponents of kg, m, s.`,
+    },
+  ],
+
+  debugging: [
+    {
+      id: 'p0-002-dbg1',
+      title: 'Forgetting to convert intermediate quantities',
+      scenario: `A student computes the distance a train travels in 45 minutes at 90 km/h using x = v·t, getting x = 90 × 45 = 4050. The answer should be about 67.5 km.`,
+      error: `The student multiplied km/h by minutes without converting time to hours (or speed to km/min). The product 90 km/h × 45 min has units km·min/h — not km.`,
+      fix: `Convert time to hours first: t = 45/60 = 0.75 h. Then x = 90 km/h × 0.75 h = 67.5 km. OR convert speed to km/min: 90/60 = 1.5 km/min, then x = 1.5 × 45 = 67.5 km. Either works — just be consistent.`,
+      prevention: `Write the unit after every number and check cancellation before computing. "km/h × min" should immediately flag that h and min don't cancel.`,
+    },
+    {
+      id: 'p0-002-dbg2',
+      title: 'Mixing SI and imperial units mid-calculation',
+      scenario: `A student calculates potential energy PE = mgh using m = 150 lb, g = 9.8 m/s², h = 10 m. The result is 14,700 — but the unit is lb·m²/s², not Joules.`,
+      error: `150 lb is a weight in imperial units (force), not a mass in kg. The formula requires mass in kg. The student mixed unit systems.`,
+      fix: `Convert 150 lb to kg: 150 × 0.453592 = 68.04 kg. Then PE = 68.04 × 9.8 × 10 = 6,668 J.`,
+      prevention: `At the start of every problem, check that all values are in SI. If any number came from a table or external source, convert it first, before substituting.`,
+    },
+  ],
+
+  mastery: {
+    targetLevel: `You can convert between any SI and non-SI units using the "multiply by 1" method, showing unit cancellation. You can dimensional-check any physics formula in under 60 seconds by tracing units through each term. You can identify unit errors as the source of physically nonsensical results.`,
+    checklistItems: [
+      `Convert speed, distance, and time between SI and common units (km/h ↔ m/s, ft ↔ m, min ↔ s) without looking up the method`,
+      `State the three SI base units of mechanics and their abbreviations from memory`,
+      `Write the dimension of velocity, acceleration, force, and energy in terms of [M], [L], [T]`,
+      `Check any two-term equation for dimensional homogeneity by tracing units through each term`,
+      `Identify why writing \`sin(5 m)\` is physically meaningless (non-dimensionless argument)`,
+      `Apply significant figure rules correctly for both multiplication and addition`,
+      `Use dimensional analysis to derive the form of an unknown formula (e.g. pendulum period)`,
+    ],
+    commonStruggles: [
+      `Confusing dimension (physical type) with unit (measurement scale) — dimension is [L], unit is "meters"`,
+      `Forgetting to cancel units in multi-step conversions — always write fractions and cancel explicitly`,
+      `Over-trusting dimensional validity: a formula that passes is not necessarily correct, just not obviously wrong`,
+      `Significant figures: applying multiplication rules to addition problems, or vice versa`,
+    ],
+    nextSteps: [
+      `Lesson 3 (Variables and Functions): every variable has a unit; dimensionless functions like sin take angle in radians`,
+      `Chapter 2 (Kinematics): every SUVAT equation carries SI units — you will check them all`,
+      `Chapter 4 (Forces): Newton = kg·m/s²; dimensional analysis will catch Newton's-law errors instantly`,
+    ],
+  },
 
   quiz: [
     {
