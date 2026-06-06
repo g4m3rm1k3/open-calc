@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import AuthButton from "../auth/AuthButton.jsx";
 import {
   Link,
   NavLink,
@@ -548,6 +549,7 @@ function TopBar({
           )}
         </button>
 
+        <AuthButton />
         <div className="w-px h-8 bg-white/10 mx-2" />
       </div>
     </header>

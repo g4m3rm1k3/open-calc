@@ -32,6 +32,7 @@
     "d3": "^7.9.0",
     "d3-selection": "^3.0.0",
     "fflate": "^0.8.2",
+    "firebase": "^12.14.0",
     "framer-motion": "^12.38.0",
     "function-plot": "^1.25.3",
     "fuse.js": "^7.0.0",

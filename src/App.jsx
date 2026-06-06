@@ -3,6 +3,7 @@ import { lazy, Suspense } from "react";
 import { ProgressProvider } from "./context/ProgressContext.jsx";
 import { SearchProvider } from "./context/SearchContext.jsx";
 import { PinsProvider } from "./context/PinsContext.jsx";
+import { AuthProvider } from "./context/AuthContext.jsx";
 import AppShell from "./components/layout/AppShell.jsx";
 import { VideoPlayerProvider } from "./context/VideoPlayerContext.jsx";
 import FloatingVideoPlayer from "./components/videos/FloatingVideoPlayer.jsx";
@@ -61,6 +62,7 @@ const Fallback = () => (
 
 export default function App() {
   return (
+    <AuthProvider>
     <ProgressProvider>
       <SearchProvider>
         <PinsProvider>
@@ -137,5 +139,6 @@ export default function App() {
         </PinsProvider>
       </SearchProvider>
     </ProgressProvider>
+    </AuthProvider>
   );
 }
