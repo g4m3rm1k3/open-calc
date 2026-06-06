@@ -103,5 +103,110 @@ export const CAMPAIGN_MISSIONS = [
     ],
     puzzleType: "calculus",
     successMsg: "Tractor beam locked! We got it!"
+  },
+  {
+    level: 6,
+    title: "SHIELD CALIBRATION",
+    passcode: "FOXTROT-33",
+    environment: {
+      planetColor: "#14b8a6",
+      wireframePlanet: true,
+      galaxyColor1: "#0d9488",
+      galaxyColor2: "#0f766e",
+      targetShape: "shield"
+    },
+    story: [
+      { speaker: "COMMANDER", text: "We are entering a dense micrometeoroid field. The shields are taking a beating." },
+      { speaker: "AI-NAV", text: "To optimize shield energy, we must align our deflector plane perfectly with the incoming debris vector." },
+      { speaker: "AI-NAV", text: "We can find the optimal angle using the Dot Product. The dot product of two vectors is: A·B = |A||B|cos(θ)." },
+      { speaker: "AI-NAV", text: "Calculate the dot product of the incoming vector and our shield normal vector. If it's 0, they are orthogonal (perfect deflection)." },
+      { speaker: "COMMANDER", text: "Calibrate the shields before the hull breaches!" }
+    ],
+    puzzleType: "dot_product",
+    successMsg: "Shields optimal. Debris deflected."
+  },
+  {
+    level: 7,
+    title: "DECRYPTION",
+    passcode: "GOLF-88",
+    environment: {
+      planetColor: "#64748b",
+      wireframePlanet: false,
+      galaxyColor1: "#475569",
+      galaxyColor2: "#334155",
+      targetShape: "satellite"
+    },
+    story: [
+      { speaker: "COMMANDER", text: "We intercepted a pirate transmission, but it's encrypted with a 2x2 matrix." },
+      { speaker: "AI-NAV", text: "To decode the message vector, we must multiply it by the Inverse of the encryption matrix." },
+      { speaker: "AI-NAV", text: "The formula for the inverse of a 2x2 matrix [a b; c d] is: 1/(ad-bc) * [d -b; -c a]." },
+      { speaker: "AI-NAV", text: "Calculate the inverse matrix and apply it to the ciphertext vector." },
+      { speaker: "COMMANDER", text: "Hurry, we need to know where their main fleet is hiding." }
+    ],
+    puzzleType: "inverse",
+    successMsg: "Signal decrypted. Main fleet coordinates acquired."
+  },
+  {
+    level: 8,
+    title: "WARP CORE RESONANCE",
+    passcode: "HOTEL-11",
+    environment: {
+      planetColor: "#f43f5e",
+      wireframePlanet: false,
+      galaxyColor1: "#e11d48",
+      galaxyColor2: "#be123c",
+      targetShape: "core"
+    },
+    story: [
+      { speaker: "COMMANDER", text: "The warp core is destabilizing! The energy waves are oscillating dangerously." },
+      { speaker: "AI-NAV", text: "The core's state is governed by a transformation matrix. We need to find its 'natural frequencies'—the Eigenvalues." },
+      { speaker: "AI-NAV", text: "Eigenvalues (λ) are the scalars where det(A - λI) = 0." },
+      { speaker: "AI-NAV", text: "Calculate the characteristic equation and find the two eigenvalues to stabilize the dampeners." },
+      { speaker: "COMMANDER", text: "Don't let this ship tear itself apart!" }
+    ],
+    puzzleType: "eigenvalues",
+    successMsg: "Resonance stabilized. Warp core is safe."
+  },
+  {
+    level: 9,
+    title: "SENSOR ALIGNMENT",
+    passcode: "INDIA-44",
+    environment: {
+      planetColor: "#8b5cf6",
+      wireframePlanet: true,
+      galaxyColor1: "#7c3aed",
+      galaxyColor2: "#6d28d9",
+      targetShape: "prism"
+    },
+    story: [
+      { speaker: "COMMANDER", text: "We found the pirate fleet's stealth base, but our targeting sensors are misaligned with the sector's grid." },
+      { speaker: "AI-NAV", text: "We are operating in the standard basis, but the pirate cloaking field operates in a different basis." },
+      { speaker: "AI-NAV", text: "We need to perform a Change of Basis. Multiply the target vector by the change-of-basis matrix P." },
+      { speaker: "AI-NAV", text: "Compute the new coordinates to lock our weapons onto their cloaked ships." },
+      { speaker: "COMMANDER", text: "Align those sensors and prepare to fire." }
+    ],
+    puzzleType: "change_of_basis",
+    successMsg: "Sensors aligned. Targets locked."
+  },
+  {
+    level: 10,
+    title: "THE FINAL STRIKE",
+    passcode: "JULIET-00",
+    environment: {
+      planetColor: "#000000",
+      wireframePlanet: true,
+      galaxyColor1: "#ff0000",
+      galaxyColor2: "#990000",
+      targetShape: "dreadnought"
+    },
+    story: [
+      { speaker: "COMMANDER", text: "This is it. The pirate dreadnought. It's surrounded by a massive asteroid maze." },
+      { speaker: "AI-NAV", text: "We must navigate the maze using a sequence of 3D Transformations." },
+      { speaker: "AI-NAV", text: "We need to combine a Rotation matrix and a Translation vector into a single operation." },
+      { speaker: "AI-NAV", text: "Calculate the final position vector after applying the composite transformation." },
+      { speaker: "COMMANDER", text: "It's all on you, Pilot. Take them down." }
+    ],
+    puzzleType: "transformation",
+    successMsg: "Dreadnought destroyed. The galaxy is safe."
   }
 ];

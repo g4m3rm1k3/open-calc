@@ -35,6 +35,18 @@ export function Ship({ position, onPositionUpdate, isGameRunning }) {
     };
 
     const handleMouseDown = (e) => {
+      // Left click (button 0) for shooting, right click (button 2) or drag for looking?
+      // For simplicity, let's say any click captures mouse if not captured. 
+      // But we need to shoot. If locked, left click shoots.
+      // We don't have pointer lock here, but let's just fire on left click.
+      if (e.button === 0 && isGameRunning) {
+        if (shipRef.current) {
+          const fwd = new Vector3(0, 0, -1).applyEuler(rotation.current);
+          window.dispatchEvent(new CustomEvent('vc_shoot', { 
+            detail: { pos: shipRef.current.position.clone(), dir: fwd } 
+          }));
+        }
+      }
       isMouseDown.current = true;
       lastMouse.current = { x: e.clientX, y: e.clientY };
     };

@@ -120,6 +120,129 @@ export function generatePuzzle(missionLevel) {
         mode: 'TORPEDO TARGETING'
       };
     }
+    case 6: {
+      // Dot Product
+      const v1 = [randInt(1, 4), randInt(-3, 3), randInt(1, 4)];
+      const v2 = [randInt(-3, 3), randInt(1, 4), randInt(-3, 3)];
+      const dot = v1[0]*v2[0] + v1[1]*v2[1] + v1[2]*v2[2];
+      
+      return {
+        type: 'dot_product',
+        desc: `SHIELD ALIGNMENT: Calculate the dot product v₁ · v₂ to find the deflection scalar.`,
+        eq: `v₁ = [${v1.join(', ')}]\nv₂ = [${v2.join(', ')}]\nv₁ · v₂ = ?`,
+        inputs: [
+          { id: 'dot', label: 'v₁ · v₂ =', ans: dot }
+        ],
+        hint: `Multiply corresponding components and add them: (${v1[0]}*${v2[0]}) + (${v1[1]}*${v2[1]}) + (${v1[2]}*${v2[2]})`,
+        mode: 'SHIELD CALIBRATION'
+      };
+    }
+    case 7: {
+      // Inverse Matrix 2x2
+      let a, b, c, d, det;
+      do {
+        a = randInt(1, 4); b = randInt(1, 4);
+        c = randInt(1, 4); d = randInt(1, 4);
+        det = a * d - b * c;
+      } while (Math.abs(det) !== 1); // Keep det=1 or -1 so inverse has integers
+      
+      const v = [randInt(1, 5), randInt(1, 5)];
+      // Inverse is [d -b; -c a] * 1/det
+      const invA = d / det;
+      const invB = -b / det;
+      const invC = -c / det;
+      const invD = a / det;
+      
+      const outX = invA * v[0] + invB * v[1];
+      const outY = invC * v[0] + invD * v[1];
+
+      return {
+        type: 'inverse',
+        desc: `DECRYPTION: Matrix A encrypts the signal. Multiply the signal vector by A⁻¹ to decode.`,
+        eq: `A = [${a} ${b}; ${c} ${d}]\nSignal = [${v.join(' ')}]\nDecoded = A⁻¹ * Signal`,
+        inputs: [
+          { id: 'dx', label: 'x =', ans: outX },
+          { id: 'dy', label: 'y =', ans: outY }
+        ],
+        hint: `Det = ${det}. A⁻¹ = [${invA} ${invB}; ${invC} ${invD}]. Multiply A⁻¹ by [${v.join(', ')}].`,
+        mode: 'DECRYPTION'
+      };
+    }
+    case 8: {
+      // Eigenvalues
+      const lambda1 = randInt(1, 4);
+      const lambda2 = randInt(1, 4);
+      // Construct a 2x2 matrix with these eigenvalues
+      // Trace = L1 + L2
+      // Det = L1 * L2
+      const tr = lambda1 + lambda2;
+      const det = lambda1 * lambda2;
+      // Let a = 1, d = tr - 1
+      const a = 1;
+      const d = tr - 1;
+      // a*d - b*c = det => 1*d - b*c = det => b*c = d - det
+      // To make it easy, just give them a diagonal or triangular matrix, or a simple one
+      // Let's use a triangular matrix so the eigenvalues are on the diagonal
+      const matrix = [lambda1, randInt(1, 5), 0, lambda2];
+      
+      return {
+        type: 'eigenvalues',
+        desc: `RESONANCE: Find the two eigenvalues (λ₁, λ₂) of the core transformation matrix.`,
+        eq: `A = [${matrix[0]} ${matrix[1]}; ${matrix[2]} ${matrix[3]}]\ndet(A - λI) = 0`,
+        inputs: [
+          { id: 'l1', label: 'λ₁ =', ans: lambda1 },
+          { id: 'l2', label: 'λ₂ =', ans: lambda2 }
+        ],
+        hint: `Since this is an upper triangular matrix, the eigenvalues are just the entries on the main diagonal!`,
+        mode: 'RESONANCE'
+      };
+    }
+    case 9: {
+      // Change of Basis
+      const px = randInt(1, 3); const py = randInt(0, 2);
+      const qx = randInt(0, 2); const qy = randInt(1, 3);
+      const vx = randInt(1, 4); const vy = randInt(1, 4);
+      // new_v = P * v
+      const outX = px * vx + qx * vy;
+      const outY = py * vx + qy * vy;
+
+      return {
+        type: 'change_of_basis',
+        desc: `ALIGNMENT: Convert the targeting vector [${vx}, ${vy}] into the standard basis using matrix P.`,
+        eq: `P = [${px} ${qx}; ${py} ${qy}]\nv_new = [${vx}, ${vy}]\nv_std = P * v_new`,
+        inputs: [
+          { id: 'x', label: 'x =', ans: outX },
+          { id: 'y', label: 'y =', ans: outY }
+        ],
+        hint: `Multiply the matrix P by the column vector [${vx}, ${vy}].`,
+        mode: 'SENSOR ALIGNMENT'
+      };
+    }
+    case 10: {
+      // Transformation
+      const vx = randInt(1, 5);
+      const vy = randInt(1, 5);
+      const tx = randInt(2, 6);
+      const ty = randInt(-4, -1);
+      // Apply translation only for simplicity in math input, or 90 deg rotation then translate
+      // 90 deg rot: [-y, x]
+      const rotX = -vy;
+      const rotY = vx;
+      const finalX = rotX + tx;
+      const finalY = rotY + ty;
+
+      return {
+        type: 'transformation',
+        desc: `FINAL STRIKE: Rotate vector v by 90° CCW, then translate by T.`,
+        eq: `v = [${vx}, ${vy}]\nT = [${tx}, ${ty}]\nTransform: R(90)v + T`,
+        inputs: [
+          { id: 'fx', label: 'Final x =', ans: finalX },
+          { id: 'fy', label: 'Final y =', ans: finalY }
+        ],
+        hint: `90° CCW rotation swaps x and y and negates the new x. R(90)[${vx},${vy}] = [${rotX},${rotY}]. Then add T.`,
+        mode: 'FINAL STRIKE'
+      };
+    }
     default:
       return null;
   }

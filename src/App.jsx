@@ -38,6 +38,7 @@ const CardAcademyPage = lazy(() => import("./pages/CardAcademyPage.jsx"));
 const CardQuestPage = lazy(() => import("./pages/CardQuestPage.jsx"));
 const StemTetrisPage = lazy(() => import("./pages/StemTetrisPage.jsx"));
 const HealthTrackerPage = lazy(() => import('./pages/HealthTrackerPage.jsx'));
+const RPGWorkoutPage = lazy(() => import('./pages/RPGWorkoutPage.jsx'));
 const BrainPage = lazy(() => import('./pages/BrainPage.jsx'));
 const RubiksCubePage = lazy(() => import("./pages/RubiksCubePage.jsx"));
 const MatrixGamePage = lazy(() => import("./pages/MatrixGamePage.jsx"));
@@ -116,6 +117,7 @@ export default function App() {
                     <Route path="card-quest" element={<CardQuestPage />} />
                     <Route path="stem-tetris" element={<StemTetrisPage />} />
                     <Route path="health" element={<HealthTrackerPage />} />
+                    <Route path="rpg-workout" element={<RPGWorkoutPage />} />
                     <Route path="brain" element={<BrainPage />} />
                     <Route path="rubiks-cube" element={<RubiksCubePage />} />
                     <Route path="matrix-game" element={<MatrixGamePage />} />

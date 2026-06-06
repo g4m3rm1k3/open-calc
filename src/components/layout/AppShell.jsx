@@ -43,6 +43,7 @@ import {
   FlaskConical,
   Heart,
   Brain,
+  Swords,
 } from "lucide-react";
 import TICalc from "../calculator/TICalc.jsx";
 import SigmaCalc from "../calculator/SigmaCalc.jsx";
@@ -377,6 +378,16 @@ function TopBar({
             }
           >
             <Heart className="w-5 h-5" />
+          </NavLink>
+          <NavLink
+            to="/rpg-workout"
+            title="RPG Workout"
+            aria-label="RPG Workout"
+            className={({ isActive }) =>
+              `p-2 rounded-lg transition-all ${isActive ? "bg-fuchsia-100 dark:bg-fuchsia-900/40 text-fuchsia-700 dark:text-fuchsia-300 border border-fuchsia-300 dark:border-fuchsia-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`
+            }
+          >
+            <Swords className="w-5 h-5" />
           </NavLink>
           <NavLink
             to="/brain"
