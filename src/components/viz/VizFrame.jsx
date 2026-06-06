@@ -397,6 +397,9 @@ const VIZ_REGISTRY = {
   VectorBuilder: lazy(() => import("./react/VectorBuilder.jsx")),
   FrameSwitcher: lazy(() => import("./react/FrameSwitcher.jsx")),
   DiscreteVsContinuous: lazy(() => import("./react/DiscreteVsContinuous.jsx")),
+  // Physics p0 — HomeLab experiments (home-testable, no equipment needed)
+  FreeFallTimerLab: lazy(() => import("./react/FreeFallTimerLab.jsx")),
+  VectorWalkLab: lazy(() => import("./react/VectorWalkLab.jsx")),
   VelocityComparison: lazy(() => import("./react/VelocityComparison.jsx")),
   LocalLinearityZoom: lazy(() => import("./react/LocalLinearityZoom.jsx")),
   SplitScreenLimitSync: lazy(() => import("./react/SplitScreenLimitSync.jsx")),

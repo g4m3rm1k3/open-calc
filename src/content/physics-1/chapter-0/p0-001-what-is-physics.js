@@ -763,6 +763,24 @@ t_query = [6, 9, 1.5];
     },
   ],
 
+  homelab: {
+    title: 'HomeLab — Measure Gravity with Your Phone',
+    intro: 'You don\'t need a lab. You just need something to drop and a phone stopwatch. Galileo measured free fall in 1604. You can verify his result in your living room in 10 minutes — and get within a few percent of g = 9.8 m/s².',
+    experiments: [
+      {
+        id: 'p0-001-hl1',
+        title: 'Free-Fall Timer Lab',
+        tagline: 'Drop it. Time it. Compute g. Compare to Galileo.',
+        equipment: 'Any small dense object (coin, keys, eraser). A tape measure or ruler. A phone with stopwatch. A table, chair, or staircase.',
+        visualizationId: 'FreeFallTimerLab',
+        overview: 'Measure the drop height, predict the fall time using t = √(2h/g), then time the actual drop and compare. Do 3–5 trials to average out reaction time error. Compute your own measured value of g = 2h/t² and see how close you get to 9.8 m/s².',
+        physicsConnection: 'x = ½gt² rearranges to t = √(2x/g). If you measure x (the drop height) and t (the fall time), you can solve for g = 2x/t². This is an experimental measurement of a fundamental constant — the same number Galileo was chasing on the inclined planes of Pisa.',
+        expectedAccuracy: 'Within 5–15%. Main source of error: human reaction time (≈150–300 ms). Use the average of 5 trials to reduce this error. Heavier, denser objects (coin > tennis ball > paper) give better results because air resistance is smaller relative to gravity.',
+        followUp: 'Does a heavier object fall faster? Drop a coin and an eraser from the same height at the same time and observe. Then explain why the model predicts they should land together (no air drag assumption). Does reality match?',
+      },
+    ],
+  },
+
   mastery: {
     targetLevel: 'Apply x = ½gt² to compute distances and times; use proportionality to predict scaling without recomputing; identify what a model assumes and where it breaks down.',
     checklistItems: [

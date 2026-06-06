@@ -848,6 +848,24 @@ fprintf('Equilibrium force F4 = [%.2f, %.2f] N\\n', F4(1), F4(2));`,
     },
   ],
 
+  homelab: {
+    title: 'HomeLab — Verify Vector Addition with Your Own Feet',
+    intro: 'You do not need any equipment for this experiment — just your feet and a phone. You will walk a two-leg path and predict the straight-line return distance before you measure it. This is exactly how sailors navigated before GPS: walk two known legs, compute the resultant, then find your way back.',
+    experiments: [
+      {
+        id: 'p0-006-hl1',
+        title: 'Vector Walk Prediction Lab',
+        tagline: 'Walk two legs. Predict the shortcut home. Measure it.',
+        equipment: 'None — just your feet. A hallway or outdoor area with ~10 m of open space.',
+        visualizationId: 'VectorWalkLab',
+        overview: 'Choose two walking legs (direction + number of steps). The lab predicts the straight-line return distance using vector component addition. Walk the predicted return path and count steps. Compare your measured steps to the prediction.',
+        physicsConnection: 'Every displacement vector can be decomposed into N–S and E–W components. The resultant displacement = √(ΔN² + ΔE²). Your steps are a proportional unit of distance (≈70–80 cm per step for adults). The angle is arctan(ΔN/ΔE). This is the exact same computation that GPS satellites do for your position.',
+        expectedAccuracy: 'Within 10% if you walk straight and count carefully. Main sources of error: uneven step length, not walking a truly straight return path, counting errors.',
+        followUp: 'Try three legs instead of two. Try making the two legs equal length and perpendicular — what angle is the return path? (Should be 45°.) Try anti-parallel legs — what happens?',
+      },
+    ],
+  },
+
   mastery: {
     targetLevel: `You can identify any quantity as a scalar or vector, decompose a 2D vector into x- and y-components using trigonometry, add vectors using head-to-tail or component methods, and reconstruct magnitude and direction from components.`,
     checklistItems: [

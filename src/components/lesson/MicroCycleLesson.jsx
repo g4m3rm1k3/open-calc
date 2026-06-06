@@ -1003,6 +1003,81 @@ export default function MicroCycleLesson({ lesson }) {
         triggers={lesson.triggers}
         lessonId={lesson.id}
       />
+      {lesson.homelab && (
+        <div className="mb-10">
+          <SectionDivider
+            icon="🏠"
+            label={lesson.homelab.title ?? 'HomeLab — Try It At Home'}
+            color="emerald"
+            noteId={lesson.id ? `${lesson.id}:homelab` : undefined}
+          />
+          {lesson.homelab.intro && (
+            <p className="mb-6 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+              {lesson.homelab.intro}
+            </p>
+          )}
+          {(lesson.homelab.experiments ?? []).map((exp, i) => (
+            <div key={exp.id ?? i} className="mb-8 rounded-2xl border border-emerald-200 dark:border-emerald-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
+              <div className="px-5 py-4 bg-emerald-50 dark:bg-emerald-950/40 border-b border-emerald-100 dark:border-emerald-900/50">
+                <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-1">
+                  Experiment {i + 1}
+                </p>
+                <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base leading-snug">
+                  {exp.title}
+                </h3>
+                {exp.tagline && (
+                  <p className="mt-1 text-sm text-emerald-700 dark:text-emerald-300 font-medium italic">
+                    {exp.tagline}
+                  </p>
+                )}
+              </div>
+              {exp.equipment && (
+                <div className="px-5 py-3 bg-amber-50/60 dark:bg-amber-900/10 border-b border-amber-100 dark:border-amber-900/30 flex items-start gap-2">
+                  <span className="text-base mt-0.5">🔧</span>
+                  <div>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-amber-700 dark:text-amber-400 mr-2">Equipment</span>
+                    <span className="text-xs text-slate-700 dark:text-slate-300">{exp.equipment}</span>
+                  </div>
+                </div>
+              )}
+              {exp.overview && (
+                <div className="px-5 py-3 border-b border-slate-100 dark:border-slate-800">
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">{exp.overview}</p>
+                </div>
+              )}
+              {exp.visualizationId && (
+                <VizCard
+                  viz={{ id: exp.visualizationId, title: exp.title }}
+                  noteId={lesson.id ? `${lesson.id}:homelab:${exp.id ?? i}` : undefined}
+                  borderColor="border-emerald-200 dark:border-emerald-800"
+                />
+              )}
+              {(exp.physicsConnection || exp.expectedAccuracy || exp.followUp) && (
+                <div className="px-5 py-4 space-y-3 bg-slate-50 dark:bg-slate-800/40 border-t border-slate-100 dark:border-slate-800">
+                  {exp.physicsConnection && (
+                    <div>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 block mb-1">Physics connection</span>
+                      <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">{exp.physicsConnection}</p>
+                    </div>
+                  )}
+                  {exp.expectedAccuracy && (
+                    <div>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 block mb-1">Expected accuracy</span>
+                      <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">{exp.expectedAccuracy}</p>
+                    </div>
+                  )}
+                  {exp.followUp && (
+                    <div>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-violet-600 dark:text-violet-400 block mb-1">Try next</span>
+                      <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">{exp.followUp}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
       {(() => {
         // OpenMAT / MATLAB lab — from top-level lesson.openmat field OR extracted from math.visualizations
         const openmatRaw = lesson.openmat ?? lesson.openmatLab ?? lesson.notebooks?.matlab;

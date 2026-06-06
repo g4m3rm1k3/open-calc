@@ -491,20 +491,109 @@ function BackgammonVisual() {
   );
 }
 
-function ChessVisual() {
+function CheckersVisual() {
   return (
     <TableWrap>
-      <TableLabel>CHESS BOARD</TableLabel>
-      <div style={{ display:"flex",justifyContent:"center",marginBottom:10 }}>
-        <div style={{ display:"grid",gridTemplateColumns:"repeat(4,24px)",gridTemplateRows:"repeat(4,24px)",border:"2px solid #334155" }}>
-          {[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].map(i=>(
-              <div key={i} style={{ background:(i+Math.floor(i/4))%2===0?"#f8fafc":"#475569",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16 }}>
-              {i===0?"♜":i===1?"♞":i===2?"♝":i===3?"♛":i===12?"♖":i===13?"♘":i===14?"♗":""}
-            </div>
-          ))}
+      <TableLabel>CHECKERS BOARD</TableLabel>
+      <div style={{ display:"flex",justifyContent:"center",marginBottom:16 }}>
+        <div style={{ display:"grid",gridTemplateColumns:"repeat(8, 30px)",gridTemplateRows:"repeat(8, 30px)",border:"2px solid #334155",boxShadow:"0 4px 15px rgba(0,0,0,0.3)" }}>
+          {Array.from({length: 64}).map((_, i) => {
+            const r = Math.floor(i / 8);
+            const c = i % 8;
+            const isLight = (r + c) % 2 === 0;
+            
+            let piece = null;
+            if (!isLight) {
+              if (r < 3) piece = <div style={{width:22,height:22,borderRadius:"50%",background:"#ef4444",border:"2px solid #b91c1c",boxShadow:"inset 0 2px 4px rgba(255,255,255,0.3), 0 2px 4px rgba(0,0,0,0.5)"}}/>;
+              else if (r > 4) piece = <div style={{width:22,height:22,borderRadius:"50%",background:"#0f172a",border:"2px solid #020617",boxShadow:"inset 0 2px 4px rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.5)"}}/>;
+            }
+
+            return (
+              <div key={i} style={{ background:isLight?"#cbd5e1":"#475569",display:"flex",alignItems:"center",justifyContent:"center" }}>
+                {piece}
+              </div>
+            );
+          })}
         </div>
       </div>
-      <div style={{ textAlign:"center",color:"#94a3b8",fontSize:11,fontFamily:"'Inter', sans-serif" }}>White moves first. Control the center.</div>
+      <div style={{ textAlign:"center",color:"#94a3b8",fontSize:11,fontFamily:"'Inter', sans-serif" }}>Pieces move and capture diagonally on dark squares.</div>
+    </TableWrap>
+  );
+}
+
+function ChessVisual() {
+  const [activePiece, setActivePiece] = useState("Knight");
+
+  const isValidMove = (piece, r, c) => {
+    const dr = Math.abs(r - 4);
+    const dc = Math.abs(c - 4);
+    if (dr === 0 && dc === 0) return false;
+    
+    switch (piece) {
+      case "Pawn": return c === 4 && (r === 3 || r === 2);
+      case "Rook": return dr === 0 || dc === 0;
+      case "Bishop": return dr === dc;
+      case "Queen": return dr === 0 || dc === 0 || dr === dc;
+      case "King": return dr <= 1 && dc <= 1;
+      case "Knight": return (dr === 2 && dc === 1) || (dr === 1 && dc === 2);
+      default: return false;
+    }
+  };
+
+  const getSymbol = (piece) => {
+    switch (piece) {
+      case "Pawn": return "♙";
+      case "Rook": return "♖";
+      case "Knight": return "♘";
+      case "Bishop": return "♗";
+      case "Queen": return "♕";
+      case "King": return "♔";
+      default: return "";
+    }
+  };
+
+  return (
+    <TableWrap>
+      <TableLabel color={NEON_PURP}>INTERACTIVE MOVEMENT TUTORIAL</TableLabel>
+      <div style={{ display:"flex",justifyContent:"center",marginBottom:16 }}>
+        <div style={{ display:"grid",gridTemplateColumns:"repeat(8, 30px)",gridTemplateRows:"repeat(8, 30px)",border:"2px solid #334155",boxShadow:"0 4px 15px rgba(0,0,0,0.3)" }}>
+          {Array.from({length: 64}).map((_, i) => {
+            const r = Math.floor(i / 8);
+            const c = i % 8;
+            const isLight = (r + c) % 2 === 0;
+            const isCenter = r === 4 && c === 4;
+            const isHighlight = isValidMove(activePiece, r, c);
+            
+            let bg = isLight ? "#cbd5e1" : "#475569";
+            if (isHighlight) bg = "rgba(6,182,212,0.6)";
+            if (isCenter) bg = "rgba(139,92,246,0.6)";
+
+            return (
+              <div key={i} style={{ background:bg,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,transition:"background 0.2s" }}>
+                {isCenter ? getSymbol(activePiece) : (isHighlight ? <div style={{width:8,height:8,background:"#020617",borderRadius:"50%",opacity:0.5}}/> : "")}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <div style={{ display:"flex",justifyContent:"center",gap:6,flexWrap:"wrap" }}>
+        {["Pawn", "Knight", "Bishop", "Rook", "Queen", "King"].map(p => (
+          <button 
+            key={p} 
+            onClick={() => setActivePiece(p)}
+            style={{ background:activePiece===p?"rgba(139,92,246,0.2)":"rgba(30,41,59,0.5)", border:`1px solid ${activePiece===p?"#a855f7":"#475569"}`, color:activePiece===p?"#f8fafc":"#94a3b8", padding:"6px 12px", borderRadius:6, cursor:"pointer", fontFamily:"'Inter', sans-serif", fontSize:11, fontWeight:"600", transition:"all 0.2s" }}>
+            {getSymbol(p)} {p}
+          </button>
+        ))}
+      </div>
+      <div style={{ textAlign:"center",color:"#94a3b8",fontSize:11,fontFamily:"'Inter', sans-serif",marginTop:12,lineHeight:1.5,height:32 }}>
+        {activePiece === "Pawn" && "Pawns move straight forward 1 square (or 2 on their first move). They capture diagonally."}
+        {activePiece === "Knight" && "Knights move in an L-shape (2 squares one direction, 1 square perpendicular). They can jump over other pieces."}
+        {activePiece === "Bishop" && "Bishops move any number of squares diagonally."}
+        {activePiece === "Rook" && "Rooks move any number of squares horizontally or vertically."}
+        {activePiece === "Queen" && "Queens move any number of squares in any direction (combines Rook and Bishop)."}
+        {activePiece === "King" && "Kings move exactly 1 square in any direction."}
+      </div>
     </TableWrap>
   );
 }
@@ -579,6 +668,7 @@ function GameVisual({ game }) {
     dominoes: <DominoesVisual/>,
     mahjong: <MahjongVisual/>,
     backgammon: <BackgammonVisual/>,
+    checkers: <CheckersVisual/>,
     chess: <ChessVisual/>,
     pai_gow_tiles: <PaiGowTilesVisual/>
   };
@@ -994,22 +1084,47 @@ const GAMES = [
     mistakes:["Playing too passively and just racing without interacting.","Leaving blots carelessly when your opponent's home board is strong (meaning a hit will trap you on the bar)."],
     payouts:[{bet:"Standard win",pays:"1x stakes"},{bet:"Gammon (opp. bears off 0)",pays:"2x stakes"},{bet:"Backgammon (opp. checker stuck)",pays:"3x stakes"}],
   },
+    {
+    id:"checkers", name:"Checkers", emoji:"🔴", category:"Classic — Board",
+    players:"2", difficulty:"Easy", type:"board",
+    tagline:"Jump over your opponent's pieces to capture them all.",
+    overview:"Checkers (or Draughts) is a classic strategy board game played on an 8x8 checkered board. Players move their pieces diagonally forward on the dark squares, jumping over opponent pieces to capture them. The goal is to capture all of your opponent's pieces or block them from moving.",
+    terminology:[
+      {term:"Jump",def:"Moving diagonally over an adjacent opponent piece into an empty square to capture it."},
+      {term:"King / Crowning",def:"When a piece reaches the opponent's back row, it becomes a King and can move backwards."},
+      {term:"Mandatory Jump",def:"If you have the opportunity to capture an opponent's piece, you MUST take the jump (in standard US rules)."},
+      {term:"Double Jump",def:"Making multiple consecutive jumps with the same piece in a single turn."},
+    ],
+    setup:["Played on an 8x8 board (same as Chess).","Each player gets 12 pieces (Red and Black).","Pieces are placed only on the dark squares of the first three rows."],
+    howToPlay:["Black moves first.","Pieces can only move one square diagonally forward into an empty dark square.","If an opponent's piece is diagonally in front of you and the space behind it is empty, you can jump it to capture.","If a piece reaches the farthest row, stack another piece on it to 'Crown' it as a King.","Kings can move diagonally both forward and backward.","The game ends when one player loses all pieces or cannot make a legal move."],
+    strategy:["Keep your back row intact as long as possible to prevent your opponent from getting Kings.","Control the center of the board. Pieces on the edges are safe from capture but have limited mobility.","Force your opponent into a trap using the mandatory jump rule: sacrifice a piece to force them to move out of position."],
+    mistakes:["Leaving gaps in your back row early in the game.","Forgetting about mandatory jumps, which a skilled opponent will use to force your pieces into bad positions."],
+    payouts:[{bet:"Capture all pieces",pays:"Win"},{bet:"Opponent blocked",pays:"Win"}],
+  },
   {
     id:"chess", name:"Chess", emoji:"♟️", category:"Classic — Board",
     players:"2", difficulty:"Hard", type:"board",
     tagline:"The ultimate game of pure strategy and tactics.",
-    overview:"Chess is a two-player strategy board game played on an 8x8 grid. Each player commands an army of 16 pieces with the ultimate goal of trapping the opponent's King (Checkmate). There is no hidden information and no luck.",
+    overview:"Chess is a deeply strategic two-player board game played on an 8x8 grid. Each player commands an army of 16 pieces, each with unique movement rules. The goal is to trap the opponent's King (Checkmate). There is no hidden information and no luck.",
     terminology:[
       {term:"Check",def:"The King is under direct attack but can escape."},
       {term:"Checkmate",def:"The King is under attack and has no legal escape. Game over."},
       {term:"Stalemate",def:"A player has no legal moves but is NOT in check. Game is a draw."},
-      {term:"Castling",def:"A special defensive move involving the King and a Rook."},
-      {term:"En Passant",def:"A special pawn capture rule when an opponent's pawn moves two squares forward."},
+      {term:"Castling",def:"A defensive move where the King moves two squares toward a Rook, and the Rook hops over the King. Can only be done if neither piece has moved."},
+      {term:"En Passant",def:"If a pawn moves two squares forward past an opponent's pawn, the opponent can capture it as if it only moved one square."},
+      {term:"Fork",def:"A tactic where one piece attacks two or more opponent pieces simultaneously."},
+      {term:"Pin",def:"Attacking a piece that cannot move without exposing a more valuable piece behind it (like the King)."},
     ],
     setup:["Place pieces on the back rank: Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook.","Place 8 pawns on the second rank. White always moves first."],
-    howToPlay:["Players take turns moving one piece per turn.","Pawns move forward 1 (or 2 on first move) and capture diagonally.","Knights move in an L-shape (and jump over pieces). Bishops move diagonally. Rooks move in straight lines.","Queens combine Rook and Bishop movement. Kings move 1 square any direction.","Capture opponent pieces by landing on their square.","Trap the opponent's King to win."],
-    strategy:["Control the center four squares early.","Develop your Knights and Bishops before your Queen.","Castle early to protect your King and connect your Rooks.","Don't sacrifice pieces without a clear tactical advantage or checkmating attack."],
-    mistakes:["Bringing the Queen out too early, allowing it to be attacked while the opponent develops.","Failing to see a basic tactic like a 'fork' or 'pin'.","Stalemating a winning endgame by carelessly trapping the opponent's King without checking it."],
+    howToPlay:["White moves first. Players take turns moving one piece per turn.","Pawns move forward 1 (or 2 on first move) and capture diagonally.","Use the Interactive Board in this rulebook to see exactly how Knights, Bishops, Rooks, Queens, and Kings move.","Trap the opponent's King to win (Checkmate)."],
+    strategy:[
+      "Control the center four squares early to give your pieces maximum mobility.",
+      "Develop your minor pieces (Knights and Bishops) before bringing out your Queen.",
+      "Castle early! It protects your King and connects your Rooks on the back rank.",
+      "The Italian Game (1. e4 e5 2. Nf3 Nc6 3. Bc4) is a great, aggressive opening for beginners.",
+      "Look for tactical Forks (especially with Knights) to win material.",
+    ],
+    mistakes:["Bringing the Queen out too early, allowing it to be attacked by developing minor pieces.","Failing to see a 'Pin' and moving a piece that exposes your King.","Stalemating a winning endgame by carelessly trapping the opponent's King without checking it."],
     payouts:[{bet:"Checkmate",pays:"Win"},{bet:"Stalemate / Repetition",pays:"Draw"}],
   },
   {
