@@ -105,6 +105,13 @@ export const COURSES = [
     color: "amber",
   },
   {
+    key: "elec-1",
+    label: "DC Electricity",
+    path: "/course/elec-1",
+    desc: "KVL, KCL, Capacitors, Inductors, Magnetism & Power Sources",
+    color: "blue",
+  },
+  {
     key: "logic-0",
     label: "Boolean Logic",
     path: "/course/logic-0",
