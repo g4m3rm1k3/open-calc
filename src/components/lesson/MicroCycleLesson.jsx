@@ -455,7 +455,7 @@ function FailureModes({ modes }) {
 function LocalLinearity({ config }) {
   if (!config) return null;
   return (
-    <div className="mb-8 p-5 p-5 rounded-2xl border-2 border-dashed border-emerald-200 dark:border-emerald-900/40 bg-emerald-50/10 dark:bg-emerald-950/5">
+    <div className="mb-8 p-5  rounded-2xl border-2 border-dashed border-emerald-200 dark:border-emerald-900/40 bg-emerald-50/10 dark:bg-emerald-950/5">
       <div className="flex items-center gap-3 mb-3">
         <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
           🔍
@@ -886,7 +886,11 @@ function SpiralBlock({ spiral }) {
 // ─── ✅ Assessment block ──────────────────────────────────────────────────────
 
 // Notebook IDs that should render in the labs section (after examples), not inside Math/Rigor
-const LAB_VIZ_IDS = new Set(["PythonNotebook", "OpenMatNotebook", "GcodeNotebook"]);
+const LAB_VIZ_IDS = new Set([
+  "PythonNotebook",
+  "OpenMatNotebook",
+  "GcodeNotebook",
+]);
 
 function extractLabVizzes(section) {
   if (!section?.visualizations?.length) return { section, labs: [] };
@@ -1128,7 +1132,9 @@ export default function MicroCycleLesson({ lesson }) {
                 )}
                 <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 group-hover:gap-2.5 transition-all">
                   Launch Lab
-                  <span className="transition-transform group-hover:translate-x-0.5">→</span>
+                  <span className="transition-transform group-hover:translate-x-0.5">
+                    →
+                  </span>
                 </div>
               </Link>
             ))}

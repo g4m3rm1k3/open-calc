@@ -30,6 +30,16 @@ export const GAMES = [
     cover: { grad: 'from-fuchsia-700 via-purple-800 to-violet-900', mark: '████', sub: '6 STEM Lenses' },
   },
   {
+    key: 'card-quest',
+    label: 'Card Quest',
+    emoji: '🎲',
+    color: 'violet',
+    desc: 'Master counting, probability, permutations, statistics & linear algebra through cards and dice.',
+    path: '/card-quest',
+    tags: ['Probability', 'Combinatorics', 'Statistics'],
+    cover: { grad: 'from-violet-700 via-purple-800 to-indigo-900', mark: '⚄ C(n,r)', sub: 'Math Through Play' },
+  },
+  {
     key: 'card-academy',
     label: 'STEM Card Academy',
     emoji: '🃏',

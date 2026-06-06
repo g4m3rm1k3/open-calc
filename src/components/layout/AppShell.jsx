@@ -65,6 +65,7 @@ import PhysicsPage from "../../pages/PhysicsPage.jsx";
 import DynamicBackground from "../ui/DynamicBackground.jsx";
 import BackgroundPicker from "../ui/BackgroundPicker.jsx";
 import AlphaMascot from "../mascot/AlphaMascot.jsx";
+import GameRules from "../tools/GameRules.jsx";
 
 function MobileLocationBadge() {
   const { chapterId, lessonSlug } = useParams();
@@ -285,6 +286,7 @@ function TopBar({
   onChatToggle,
   chatOpen,
   onBgPickerToggle,
+  onGameRulesToggle,
   dark,
   toggleDark,
 }) {
@@ -401,6 +403,14 @@ function TopBar({
             title="Help"
           >
             <HelpCircle className="w-5 h-5" />
+          </button>
+          <button
+            onClick={onGameRulesToggle}
+            className="p-2 rounded-lg text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/30 transition-all font-bold"
+            title="Game Rules"
+            style={{ fontSize: 15, lineHeight: 1 }}
+          >
+            ♠
           </button>
         </RibbonGroup>
 
@@ -605,6 +615,7 @@ export default function AppShell({ children }) {
   const isAsteroidsRoute = location.pathname.startsWith("/asteroids-la");
   const isStemTetrisRoute = location.pathname.startsWith("/stem-tetris");
   const isCardAcademyRoute = location.pathname.startsWith("/card-academy");
+  const isCardQuestRoute = location.pathname.startsWith("/card-quest");
   const isHealthRoute = location.pathname.startsWith("/health");
   const isBrainRoute = location.pathname.startsWith("/brain");
   const isRubiksCubeRoute = location.pathname.startsWith("/rubiks-cube");
@@ -658,6 +669,7 @@ export default function AppShell({ children }) {
   const [polyOpen, setPolyOpen] = useState(false);
   const [laOpen, setLAOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
+  const [gameRulesOpen, setGameRulesOpen] = useState(false);
   const [scratchSnap, setScratchSnap] = useState(null);
   const [scratchSnapW, setScratchSnapW] = useState(680);
   const handleScratchSnap = useCallback((side, w) => {
@@ -771,6 +783,7 @@ export default function AppShell({ children }) {
     isAsteroidsRoute ||
     isStemTetrisRoute ||
     isCardAcademyRoute ||
+    isCardQuestRoute ||
     isRubiksCubeRoute ||
     isMatrixGameRoute ||
     isRobotArmLabRoute ||
@@ -787,7 +800,7 @@ export default function AppShell({ children }) {
     return (
       <GrapherContext.Provider value={{ openGrapher }}>
         <div
-          className={`h-screen overflow-hidden ${isArkanoidLearnRoute || isRealityRunnerRoute || isCadProRoute || isOpenCraftRoute || isStemQuestRoute || isAsteroidsRoute || isStemTetrisRoute || isCardAcademyRoute || isRubiksCubeRoute || isMatrixGameRoute || isRobotArmLabRoute || isSimLabRoute || isDroneLabRoute || isMatrixLabRoute || isMatrix3DLabRoute || isDecompLabRoute || isCmmLabRoute || isFiveAxisRoute || isDSAArraysLabRoute || isDSALinkedListsLabRoute ? "bg-[#08111f]" : "bg-white dark:bg-slate-950"}`}
+          className={`h-screen overflow-hidden ${isArkanoidLearnRoute || isRealityRunnerRoute || isCadProRoute || isOpenCraftRoute || isStemQuestRoute || isAsteroidsRoute || isStemTetrisRoute || isCardAcademyRoute || isCardQuestRoute || isRubiksCubeRoute || isMatrixGameRoute || isRobotArmLabRoute || isSimLabRoute || isDroneLabRoute || isMatrixLabRoute || isMatrix3DLabRoute || isDecompLabRoute || isCmmLabRoute || isFiveAxisRoute || isDSAArraysLabRoute || isDSALinkedListsLabRoute ? "bg-[#08111f]" : "bg-white dark:bg-slate-950"}`}
         >
           <div className="h-full w-full overflow-hidden">
             {children ?? <Outlet />}
@@ -905,6 +918,7 @@ export default function AppShell({ children }) {
             onChatToggle={() => setChatOpen((prev) => !prev)}
             chatOpen={chatOpen}
             onBgPickerToggle={() => setBgPickerOpen((o) => !o)}
+            onGameRulesToggle={() => setGameRulesOpen((prev) => !prev)}
             dark={dark}
             toggleDark={toggleDark}
           />
@@ -1232,6 +1246,11 @@ export default function AppShell({ children }) {
             onClose={() => setJsOpen(false)}
           />
           <HelpModal isOpen={helpOpen} onClose={() => setHelpOpen(false)} />
+          {gameRulesOpen && (
+            <div style={{ position: "fixed", inset: 0, zIndex: 300 }}>
+              <GameRules onClose={() => setGameRulesOpen(false)} />
+            </div>
+          )}
           {poolOpen && <PhysicsPoolLab onClose={() => setPoolOpen(false)} />}
           {basketOpen && <BasketballLab onClose={() => setBasketOpen(false)} />}
           {golfOpen && <MiniGolfGame onClose={() => setGolfOpen(false)} />}
