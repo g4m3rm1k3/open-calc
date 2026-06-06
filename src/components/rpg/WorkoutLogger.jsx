@@ -103,27 +103,25 @@ export function WorkoutLogger({ logDetailedWorkout, activePlan }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    let totalXp = 0;
-    let anyLeveledUp = false;
 
-    // Log each row
-    workoutRows.forEach(row => {
-      const { xp, statGains } = calculateRowXpAndStats(row);
-      if (xp > 0) {
-        totalXp += xp;
-        const leveledUp = logDetailedWorkout(row.id, row.metrics, xp, statGains);
-        if (leveledUp) anyLeveledUp = true;
-      }
-    });
+    const entries = workoutRows
+      .map(row => {
+        const { xp, statGains } = calculateRowXpAndStats(row);
+        return xp > 0
+          ? { exerciseId: row.id, metrics: row.metrics, calculatedXp: xp, statGains }
+          : null;
+      })
+      .filter(Boolean);
 
-    if (totalXp === 0) return;
+    if (entries.length === 0) return;
 
-    if (anyLeveledUp) {
+    const leveledUp = logDetailedWorkout(entries);
+
+    if (leveledUp) {
       setLevelUpMessage(true);
       setTimeout(() => setLevelUpMessage(false), 5000);
     }
 
-    // Clear metrics but keep the rows
     setWorkoutRows(rows => rows.map(r => ({
       ...r,
       metrics: { weight: '', sets: '', reps: '', distance: '', duration: '', rpe: 5 }

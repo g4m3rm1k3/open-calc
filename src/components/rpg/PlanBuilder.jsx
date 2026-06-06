@@ -15,23 +15,35 @@ export function PlanBuilder({ rpgData, setActivePlan, saveCustomPlan }) {
     setActivePlan(planId);
   };
 
+  const resetCreateForm = () => {
+    setNewPlanName('');
+    setNewPlanDays([{ dayName: 'Day 1', exercises: [] }]);
+    setExercisePickerOpen(null);
+  };
+
   const handleSaveCustomPlan = () => {
-    if (!newPlanName) return;
+    const trimmed = newPlanName.trim();
+    if (!trimmed) return;
+    const hasExercises = newPlanDays.some(d => d.exercises.length > 0);
+    if (!hasExercises) return;
     const plan = {
-      id: 'custom_' + Date.now(),
-      name: newPlanName,
+      id: `custom_${Date.now()}`,
+      name: trimmed,
       type: 'custom',
-      workouts: newPlanDays
+      workouts: newPlanDays,
     };
     saveCustomPlan(plan);
     setActivePlan(plan.id);
+    resetCreateForm();
     setView('list');
   };
 
   const addExerciseToDay = (dayIndex, exerciseId) => {
-    const newDays = [...newPlanDays];
-    newDays[dayIndex].exercises.push({ id: exerciseId, targetSets: 3, targetReps: 10 });
-    setNewPlanDays(newDays);
+    setNewPlanDays(days => days.map((day, i) =>
+      i === dayIndex
+        ? { ...day, exercises: [...day.exercises, { id: exerciseId, targetSets: 3, targetReps: 10 }] }
+        : day
+    ));
     setExercisePickerOpen(null);
   };
 
@@ -40,7 +52,7 @@ export function PlanBuilder({ rpgData, setActivePlan, saveCustomPlan }) {
       <div className="bg-slate-900/80 border border-slate-700 rounded-2xl p-6 backdrop-blur-xl">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">Forge New Plan</h2>
-          <button onClick={() => setView('list')} className="text-slate-400 hover:text-slate-200">
+          <button onClick={() => { resetCreateForm(); setView('list'); }} className="text-slate-400 hover:text-slate-200">
             <X size={24} />
           </button>
         </div>
@@ -60,9 +72,10 @@ export function PlanBuilder({ rpgData, setActivePlan, saveCustomPlan }) {
                 type="text" 
                 value={day.dayName}
                 onChange={e => {
-                  const newDays = [...newPlanDays];
-                  newDays[dIdx].dayName = e.target.value;
-                  setNewPlanDays(newDays);
+                  const val = e.target.value;
+                  setNewPlanDays(days => days.map((day, i) =>
+                    i === dIdx ? { ...day, dayName: val } : day
+                  ));
                 }}
                 className="bg-transparent text-emerald-400 font-bold mb-4 focus:outline-none w-full"
               />
@@ -73,12 +86,12 @@ export function PlanBuilder({ rpgData, setActivePlan, saveCustomPlan }) {
                   return (
                     <li key={eIdx} className="flex justify-between items-center bg-slate-900 p-3 rounded-lg border border-slate-800">
                       <span className="font-bold text-slate-300">{details?.name || ex.id}</span>
-                      <button 
-                        onClick={() => {
-                          const newDays = [...newPlanDays];
-                          newDays[dIdx].exercises.splice(eIdx, 1);
-                          setNewPlanDays(newDays);
-                        }}
+                      <button
+                        onClick={() => setNewPlanDays(days => days.map((day, i) =>
+                          i === dIdx
+                            ? { ...day, exercises: day.exercises.filter((_, j) => j !== eIdx) }
+                            : day
+                        ))}
                         className="text-red-400 hover:text-red-300"
                       >
                         Remove
@@ -123,12 +136,28 @@ export function PlanBuilder({ rpgData, setActivePlan, saveCustomPlan }) {
           </button>
         </div>
 
-        <button 
-          onClick={handleSaveCustomPlan}
-          className="w-full mt-8 bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-black py-4 rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.3)] flex justify-center items-center gap-2 hover:scale-[1.02] transition-transform"
-        >
-          <Save size={20} /> Forbid Plan in the Grimoire
-        </button>
+        {(() => {
+          const trimmed = newPlanName.trim();
+          const hasExercises = newPlanDays.some(d => d.exercises.length > 0);
+          const canSave = trimmed && hasExercises;
+          return (
+            <>
+              {!trimmed && newPlanName.length > 0 && (
+                <p className="text-red-400 text-xs text-center mt-6">Plan name cannot be blank.</p>
+              )}
+              {trimmed && !hasExercises && (
+                <p className="text-amber-400 text-xs text-center mt-6">Add at least one exercise before saving.</p>
+              )}
+              <button
+                onClick={handleSaveCustomPlan}
+                disabled={!canSave}
+                className="w-full mt-4 bg-gradient-to-r from-emerald-600 to-cyan-600 disabled:from-slate-700 disabled:to-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed text-white font-black py-4 rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.3)] disabled:shadow-none flex justify-center items-center gap-2 hover:scale-[1.02] disabled:hover:scale-100 transition-transform"
+              >
+                <Save size={20} /> Forbid Plan in the Grimoire
+              </button>
+            </>
+          );
+        })()}
       </div>
     );
   }

@@ -17,7 +17,7 @@ export function HeroPanel({ rpgData }) {
 
   const currentLevelXp = Math.pow(rpgData.level - 1, 2) * 100;
   const nextLevelXp = Math.pow(rpgData.level, 2) * 100;
-  const xpIntoLevel = rpgData.xp - currentLevelXp;
+  const xpIntoLevel = Math.max(0, rpgData.xp - currentLevelXp);
   const xpNeeded = nextLevelXp - currentLevelXp;
   const xpPct = Math.min(100, Math.max(0, (xpIntoLevel / xpNeeded) * 100));
   

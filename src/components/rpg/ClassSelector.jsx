@@ -88,10 +88,12 @@ export function ClassSelector({ onSelect }) {
               <label className="block text-sm font-bold text-slate-400 mb-2 uppercase tracking-wide">What are your goals?</label>
               <textarea
                 value={goals}
-                onChange={(e) => setGoals(e.target.value)}
+                onChange={(e) => setGoals(e.target.value.slice(0, 500))}
+                maxLength={500}
                 placeholder="e.g. I want to run a 5k, build muscle, lose 10lbs..."
                 className="w-full bg-slate-950 border border-slate-700 rounded-xl p-4 text-slate-200 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 resize-none h-32"
               />
+              <p className="text-xs text-slate-600 text-right mt-1">{goals.length}/500</p>
             </div>
 
             <div className="flex gap-4 pt-4">

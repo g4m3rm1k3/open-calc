@@ -125,34 +125,50 @@ export function useRPGData() {
     return leveledUp;
   };
 
-  // details can include: weight, sets, reps, distance, duration, rpe
-  const logWorkout = (exerciseId, metrics, calculatedXp) => {
-    // We dynamically import or just use a generic update if we can't find it.
-    // However, it's better to pass the statFocus directly or rely on the caller
-    // since this hook doesn't import rpgExercises.js directly right now.
-    // For simplicity, we'll let the caller calculate and pass `statGains`.
-  };
+  // entries: [{ exerciseId, metrics, calculatedXp, statGains }, ...]
+  // Accepts an array so the entire session saves in one atomic write — calling
+  // this once per row would read stale rpgData in each iteration and lose all
+  // but the last log entry.
+  const logDetailedWorkout = (entries) => {
+    if (!entries?.length) return false;
 
-  const logDetailedWorkout = (exerciseId, metrics, calculatedXp, statGains) => {
-    const logEntry = {
-      id: Date.now().toString(),
-      exerciseId,
-      metrics,
-      xpEarned: calculatedXp,
-      date: new Date().toISOString()
-    };
-    
-    const newLogs = [logEntry, ...rpgData.workoutLogs].slice(0, 100); 
-    const leveledUp = addXP(calculatedXp);
+    const now = Date.now();
+    const newEntries = entries.map((entry, i) => ({
+      id: `${now}-${i}`,
+      exerciseId: entry.exerciseId,
+      metrics: entry.metrics,
+      xpEarned: entry.calculatedXp,
+      date: new Date(now + i).toISOString(),
+    }));
+
+    const newLogs = [...newEntries, ...rpgData.workoutLogs].slice(0, 100);
+
+    const totalXp = entries.reduce((sum, e) => sum + (e.calculatedXp || 0), 0);
+    const newXp = rpgData.xp + totalXp;
+    const newLevel = Math.floor(Math.sqrt(newXp / 100)) + 1;
+    const leveledUp = newLevel > rpgData.level;
+    const newMaxHp = leveledUp ? 100 + (newLevel * 10) : rpgData.maxHp;
+    const newHp = leveledUp ? newMaxHp : rpgData.hp;
 
     const newStats = { ...rpgData.stats };
-    if (statGains) {
-      Object.keys(statGains).forEach(stat => {
-        newStats[stat] = (newStats[stat] || 0) + statGains[stat];
-      });
-    }
-    
-    saveData({ ...rpgData, workoutLogs: newLogs, stats: newStats });
+    entries.forEach(({ statGains }) => {
+      if (statGains) {
+        Object.keys(statGains).forEach(stat => {
+          newStats[stat] = (newStats[stat] || 0) + statGains[stat];
+        });
+      }
+    });
+
+    saveData({
+      ...rpgData,
+      workoutLogs: newLogs,
+      xp: newXp,
+      level: newLevel,
+      hp: newHp,
+      maxHp: newMaxHp,
+      stats: newStats,
+    });
+
     return leveledUp;
   };
 

@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import { Scroll, Zap, CheckCircle2, Loader2 } from 'lucide-react';
 import { useRPGCoachAI } from '../../hooks/useRPGCoachAI';
 
+const MAX_ACTIVE_QUESTS = 5;
+
 export function QuestBoard({ rpgData, acceptQuest, completeQuest }) {
   const { generateQuest, isThinking, isDownloading, downloadProgress } = useRPGCoachAI();
   const [error, setError] = useState(null);
@@ -77,9 +79,12 @@ export function QuestBoard({ rpgData, acceptQuest, completeQuest }) {
         <p className="text-indigo-400 text-xs mb-3 text-center animate-pulse">{downloadProgress}</p>
       )}
 
+      {rpgData.activeQuests.length >= MAX_ACTIVE_QUESTS && (
+        <p className="text-amber-400 text-xs mb-3 text-center">Complete a quest before accepting another ({MAX_ACTIVE_QUESTS} max).</p>
+      )}
       <button
         onClick={handleGenerateQuest}
-        disabled={isThinking || isDownloading}
+        disabled={isThinking || isDownloading || rpgData.activeQuests.length >= MAX_ACTIVE_QUESTS}
         className="w-full relative group overflow-hidden bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-4 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <div className="absolute inset-0 bg-gradient-to-r from-indigo-400/0 via-indigo-400/30 to-indigo-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
