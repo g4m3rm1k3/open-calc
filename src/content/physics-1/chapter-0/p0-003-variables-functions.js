@@ -456,6 +456,33 @@ export default {
     'x(t) is NOT x times t — it is position evaluated at time t',
   ],
 
+  formulas: [
+    {
+      id: 'p0-003-f1',
+      latex: 'x(t) = x_0 + v_0 t + \\tfrac{1}{2}at^2',
+      description: 'General kinematic position function for constant acceleration. Evaluated at time t, returns the position.',
+      variables: { 'x_0': 'initial position (m)', 'v_0': 'initial velocity (m/s)', a: 'acceleration (m/s², constant)', t: 'time (s)' },
+    },
+    {
+      id: 'p0-003-f2',
+      latex: 'v(t) = v_0 + at',
+      description: 'Velocity as a linear function of time under constant acceleration.',
+      variables: { 'v_0': 'initial velocity (m/s)', a: 'acceleration (m/s²)', t: 'time (s)' },
+    },
+    {
+      id: 'p0-003-f3',
+      latex: 'a(t) = a = \\text{const}',
+      description: 'Acceleration as a constant function of time (the SUVAT assumption).',
+      variables: { a: 'constant acceleration (m/s²)' },
+    },
+    {
+      id: 'p0-003-f4',
+      latex: '\\text{KE}(v(t)) = \\tfrac{1}{2}m\\bigl(v_0 + at\\bigr)^2',
+      description: 'Kinetic energy as a function of time via composition — energy grows as t².',
+      variables: { m: 'mass (kg)', 'v_0': 'initial velocity (m/s)', a: 'acceleration (m/s²)', t: 'time (s)' },
+    },
+  ],
+
   notebooks: {
     python: {
       type: 'python',

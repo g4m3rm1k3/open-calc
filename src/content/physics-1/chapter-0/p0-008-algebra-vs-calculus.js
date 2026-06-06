@@ -965,4 +965,78 @@ fprintf('Which scenario(s) allow SUVAT? Only where a = constant.\\n');`,
       reviewSection: 'Intuition — when to use each',
     },
   ],
+
+  formulas: [
+    {
+      id: 'p0-008-f1',
+      latex: '\\frac{d}{dt}(t^n) = n\\,t^{n-1}',
+      description: 'Power Rule for differentiation: bring down the exponent, reduce it by 1. The single most-used rule in calculus.',
+      variables: {
+        'n': 'any real exponent',
+        't': 'independent variable (time)',
+        'd/dt': 'derivative operator — instantaneous rate of change with respect to t',
+      },
+    },
+    {
+      id: 'p0-008-f2',
+      latex: '\\int t^n\\,dt = \\frac{t^{n+1}}{n+1} + C \\quad (n \\neq -1)',
+      description: 'Power Rule for integration: raise the exponent by 1, divide by the new exponent. Always add the constant of integration C, determined from initial conditions.',
+      variables: {
+        'n': 'any real exponent except −1',
+        'C': 'constant of integration — set by initial condition',
+      },
+    },
+    {
+      id: 'p0-008-f3',
+      latex: 'a(t) = \\frac{dv}{dt} = \\frac{d^2x}{dt^2}',
+      description: 'Acceleration is the first derivative of velocity and the second derivative of position. This is the downward direction of the kinematic chain.',
+      variables: {
+        'a(t)': 'acceleration at time t (m/s²)',
+        'v': 'velocity (m/s)',
+        'x': 'position (m)',
+      },
+    },
+    {
+      id: 'p0-008-f4',
+      latex: 'v(t) = v_0 + \\int_0^t a(\\tau)\\,d\\tau, \\quad x(t) = x_0 + \\int_0^t v(\\tau)\\,d\\tau',
+      description: 'Upward direction of the kinematic chain: integrate acceleration to get velocity, integrate velocity to get position. Works for any a(t).',
+      variables: {
+        'v_0': 'initial velocity — the constant of integration for the first integral',
+        'x_0': 'initial position — the constant of integration for the second integral',
+        '\\tau': 'dummy integration variable (time)',
+      },
+    },
+    {
+      id: 'p0-008-f5',
+      latex: 'v = v_0 + at, \\quad x = x_0 + v_0 t + \\tfrac{1}{2}at^2 \\quad (a = \\mathrm{const})',
+      description: 'SUVAT equations 1 and 3 — derived by integrating constant acceleration twice. Valid only when a is exactly constant.',
+      variables: {
+        'v_0': 'initial velocity (m/s)',
+        'x_0': 'initial position (m)',
+        'a': 'constant acceleration (m/s²)',
+        't': 'time elapsed (s)',
+      },
+    },
+    {
+      id: 'p0-008-f6',
+      latex: 'v^2 = v_0^2 + 2a\\,\\Delta x \\quad (a = \\mathrm{const})',
+      description: 'SUVAT equation 5 — derived using the chain rule a = v·(dv/dx) and integrating. Eliminates time entirely; relates speed to displacement directly.',
+      variables: {
+        'v': 'final speed (m/s)',
+        'v_0': 'initial speed (m/s)',
+        'a': 'constant acceleration (m/s²)',
+        '\\Delta x': 'displacement from start (m)',
+      },
+    },
+    {
+      id: 'p0-008-f7',
+      latex: 'x(b) - x(a) = \\int_a^b v(t)\\,dt',
+      description: 'Fundamental Theorem of Calculus applied to kinematics: net displacement equals the definite integral of velocity. Differentiation and integration are inverse operations.',
+      variables: {
+        'x(b)-x(a)': 'net displacement from time a to time b (m)',
+        'v(t)': 'velocity function (m/s)',
+        'a,\\,b': 'start and end times of integration (s)',
+      },
+    },
+  ],
 }

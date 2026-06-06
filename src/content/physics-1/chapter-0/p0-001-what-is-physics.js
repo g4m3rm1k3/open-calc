@@ -440,6 +440,27 @@ export default {
     ],
   },
 
+  formulas: [
+    {
+      id: 'p0-001-f1',
+      latex: 'x = \\tfrac{1}{2}g t^2',
+      description: 'Distance fallen from rest under constant gravitational acceleration (no air resistance).',
+      variables: { x: 'distance fallen (m)', g: 'gravitational acceleration (9.8 m/s² on Earth)', t: 'time elapsed (s)' },
+    },
+    {
+      id: 'p0-001-f2',
+      latex: 't = \\sqrt{\\dfrac{2x}{g}}',
+      description: 'Time to fall a distance x from rest (rearrangement of free-fall equation).',
+      variables: { t: 'fall time (s)', x: 'distance fallen (m)', g: 'gravitational acceleration (m/s²)' },
+    },
+    {
+      id: 'p0-001-f3',
+      latex: 'x \\propto t^2',
+      description: 'Proportionality form: distance in free fall is proportional to time squared. Doubling t quadruples x.',
+      variables: { x: 'distance fallen', t: 'time' },
+    },
+  ],
+
   notebooks: {
     python: {
       type: 'PythonNotebook',

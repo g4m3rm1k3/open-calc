@@ -558,6 +558,33 @@ export default {
     `Significant figures: multiplication/division → match fewest sig figs; addition/subtraction → match least precise decimal place`,
   ],
 
+  formulas: [
+    {
+      id: 'p0-002-f1',
+      latex: '[L],\\;[M],\\;[T]',
+      description: 'The three base dimensions of mechanics: Length, Mass, Time. Every mechanics quantity is built from these.',
+      variables: { '[L]': 'dimension of length (unit: meter)', '[M]': 'dimension of mass (unit: kilogram)', '[T]': 'dimension of time (unit: second)' },
+    },
+    {
+      id: 'p0-002-f2',
+      latex: '\\text{speed in m/s} = \\frac{\\text{speed in km/h}}{3.6}',
+      description: 'Quick conversion factor: divide km/h by 3.6 to get m/s.',
+      variables: {},
+    },
+    {
+      id: 'p0-002-f3',
+      latex: '[v] = \\text{L T}^{-1},\\quad [a] = \\text{L T}^{-2},\\quad [F] = \\text{M L T}^{-2},\\quad [E] = \\text{M L}^2\\text{T}^{-2}',
+      description: 'Dimensions of the four most important derived mechanics quantities: velocity, acceleration, force, energy.',
+      variables: { v: 'velocity', a: 'acceleration', F: 'force (Newton = kg·m/s²)', E: 'energy (Joule = kg·m²/s²)' },
+    },
+    {
+      id: 'p0-002-f4',
+      latex: 'T = C\\sqrt{\\frac{L}{g}}',
+      description: 'Pendulum period derived from dimensional analysis (Buckingham Pi). The constant C = 2π requires solving the differential equation.',
+      variables: { T: 'period (s)', L: 'pendulum length (m)', g: 'gravitational acceleration (m/s²)', C: 'dimensionless constant = 2π' },
+    },
+  ],
+
   notebooks: {
     python: {
       type: 'python',
@@ -834,7 +861,7 @@ print(f"JPL momentum error: {momentum_error:.2e} kg·m/s")`,
           type: 'code',
           language: 'matlab',
           prose: [
-            `MATLAB handles unit conversion the same way as Python: multiply by the right factor. The key difference is MATLAB's `.*` element-wise operator and its preference for row/column vectors. This cell converts speeds and distances.`,
+            'MATLAB handles unit conversion the same way as Python: multiply by the right factor. The key difference is MATLAB\'s .* element-wise operator and its preference for row/column vectors. This cell converts speeds and distances.',
           ],
           code: `%% Unit conversions — multiply by conversion factors
 % km/h → m/s

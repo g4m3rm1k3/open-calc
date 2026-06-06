@@ -416,6 +416,126 @@ function CaribbeanVisual() {
   );
 }
 
+
+function DominoesVisual() {
+  return (
+    <TableWrap>
+      <TableLabel>DOMINOES (DOUBLE SIX)</TableLabel>
+      <div style={{ display:"flex",justifyContent:"center",alignItems:"center",gap:6,marginBottom:20 }}>
+        <div style={{ width:24,height:48,background:"#f8fafc",borderRadius:4,border:"1px solid #94a3b8",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"space-around",padding:"2px 0" }}>
+          <div style={{ width:4,height:4,background:"#0f172a",borderRadius:"50%" }}/>
+          <div style={{ width:20,height:1,background:"#94a3b8" }}/>
+          <div style={{ width:4,height:4,background:"#0f172a",borderRadius:"50%" }}/>
+        </div>
+        <div style={{ width:48,height:24,background:"#f8fafc",borderRadius:4,border:"1px solid #94a3b8",display:"flex",alignItems:"center",justifyContent:"space-around",padding:"0 2px" }}>
+          <div style={{ width:4,height:4,background:"#0f172a",borderRadius:"50%" }}/>
+          <div style={{ width:1,height:20,background:"#94a3b8" }}/>
+          <div style={{ display:"flex",gap:2 }}><div style={{ width:4,height:4,background:"#0f172a",borderRadius:"50%" }}/><div style={{ width:4,height:4,background:"#0f172a",borderRadius:"50%" }}/></div>
+        </div>
+        <div style={{ width:24,height:48,background:"#f8fafc",borderRadius:4,border:"1px solid #94a3b8",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"space-around",padding:"2px 0" }}>
+          <div style={{ display:"flex",gap:2 }}><div style={{ width:4,height:4,background:"#0f172a",borderRadius:"50%" }}/><div style={{ width:4,height:4,background:"#0f172a",borderRadius:"50%" }}/></div>
+          <div style={{ width:20,height:1,background:"#94a3b8" }}/>
+          <div style={{ display:"flex",gap:2,flexDirection:"column" }}><div style={{ width:4,height:4,background:"#0f172a",borderRadius:"50%" }}/><div style={{ width:4,height:4,background:"#0f172a",borderRadius:"50%" }}/><div style={{ width:4,height:4,background:"#0f172a",borderRadius:"50%" }}/></div>
+        </div>
+      </div>
+      <div style={{ textAlign:"center",color:NEON_CYAN,fontSize:12,fontFamily:"'Inter', sans-serif" }}>Match ends to build the train.</div>
+    </TableWrap>
+  );
+}
+
+function MahjongVisual() {
+  return (
+    <TableWrap>
+      <TableLabel>MAHJONG TILES</TableLabel>
+      <div style={{ display:"flex",justifyContent:"center",gap:4,marginBottom:20 }}>
+        {["🀙","🀚","🀛","🀇","🀇","🀇","🀄","🀄"].map((t,i)=>(
+          <div key={i} style={{ width:32,height:44,background:"#f8fafc",borderRadius:4,borderBottom:"4px solid #10b981",borderRight:"2px solid #e2e8f0",display:"flex",alignItems:"center",justifyContent:"center",fontSize:24,color:"#0f172a" }}>{t}</div>
+        ))}
+      </div>
+      <div style={{ display:"flex",justifyContent:"space-around" }}>
+        <div style={{ textAlign:"center" }}>
+          <div style={{ color:NEON_CYAN,fontSize:10,fontWeight:"bold",marginBottom:4 }}>CHOW (Sequence)</div>
+          <div style={{ color:"#94a3b8",fontSize:10 }}>1-2-3 Dots</div>
+        </div>
+        <div style={{ textAlign:"center" }}>
+          <div style={{ color:NEON_PURP,fontSize:10,fontWeight:"bold",marginBottom:4 }}>PUNG (Set)</div>
+          <div style={{ color:"#94a3b8",fontSize:10 }}>Three 1-Characters</div>
+        </div>
+      </div>
+    </TableWrap>
+  );
+}
+
+function BackgammonVisual() {
+  return (
+    <TableWrap>
+      <TableLabel>BACKGAMMON BOARD</TableLabel>
+      <div style={{ background:"#854d0e",padding:8,borderRadius:8,display:"flex",gap:8,justifyContent:"center",marginBottom:20 }}>
+        <div style={{ width:80,height:60,background:"#a16207",position:"relative" }}>
+          <div style={{ position:"absolute",top:0,left:10,width:0,height:0,borderLeft:"10px solid transparent",borderRight:"10px solid transparent",borderTop:"25px solid #fef08a" }}/>
+          <div style={{ position:"absolute",top:0,left:30,width:0,height:0,borderLeft:"10px solid transparent",borderRight:"10px solid transparent",borderTop:"25px solid #1e293b" }}/>
+          <div style={{ position:"absolute",top:0,left:10,width:16,height:16,background:"#1e293b",borderRadius:"50%",border:"2px solid #334155" }}/>
+          <div style={{ position:"absolute",top:8,left:10,width:16,height:16,background:"#1e293b",borderRadius:"50%",border:"2px solid #334155" }}/>
+        </div>
+        <div style={{ width:10,background:"#422006" }}/>
+        <div style={{ width:80,height:60,background:"#a16207",position:"relative" }}>
+          <div style={{ position:"absolute",bottom:0,left:10,width:0,height:0,borderLeft:"10px solid transparent",borderRight:"10px solid transparent",borderBottom:"25px solid #1e293b" }}/>
+          <div style={{ position:"absolute",bottom:0,left:30,width:0,height:0,borderLeft:"10px solid transparent",borderRight:"10px solid transparent",borderBottom:"25px solid #fef08a" }}/>
+          <div style={{ position:"absolute",bottom:0,left:30,width:16,height:16,background:"#f8fafc",borderRadius:"50%",border:"2px solid #cbd5e1" }}/>
+        </div>
+      </div>
+      <div style={{ display:"flex",justifyContent:"center",gap:16 }}>
+        <DieComponent value={4} size={32}/><DieComponent value={2} size={32}/>
+      </div>
+    </TableWrap>
+  );
+}
+
+function ChessVisual() {
+  return (
+    <TableWrap>
+      <TableLabel>CHESS BOARD</TableLabel>
+      <div style={{ display:"flex",justifyContent:"center",marginBottom:10 }}>
+        <div style={{ display:"grid",gridTemplateColumns:"repeat(4,24px)",gridTemplateRows:"repeat(4,24px)",border:"2px solid #334155" }}>
+          {[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].map(i=>(
+              <div key={i} style={{ background:(i+Math.floor(i/4))%2===0?"#f8fafc":"#475569",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16 }}>
+              {i===0?"♜":i===1?"♞":i===2?"♝":i===3?"♛":i===12?"♖":i===13?"♘":i===14?"♗":""}
+            </div>
+          ))}
+        </div>
+      </div>
+      <div style={{ textAlign:"center",color:"#94a3b8",fontSize:11,fontFamily:"'Inter', sans-serif" }}>White moves first. Control the center.</div>
+    </TableWrap>
+  );
+}
+
+function PaiGowTilesVisual() {
+  return (
+    <TableWrap>
+      <TableLabel>PAI GOW (TILES) HAND</TableLabel>
+      <div style={{ display:"flex",justifyContent:"center",gap:24,marginBottom:20 }}>
+        <div style={{ textAlign:"center" }}>
+          <div style={{ color:NEON_CYAN,fontSize:10,fontWeight:"bold",marginBottom:8 }}>HIGH HAND</div>
+          <div style={{ display:"flex",gap:4 }}>
+            <div style={{ width:24,height:48,background:"#1e293b",borderRadius:4,border:"1px solid #475569",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"space-around",padding:"2px 0" }}>
+              <div style={{ display:"flex",gap:2 }}><div style={{ width:4,height:4,background:"#ef4444",borderRadius:"50%" }}/><div style={{ width:4,height:4,background:"#ef4444",borderRadius:"50%" }}/></div>
+              <div style={{ width:20,height:1,background:"#475569" }}/>
+              <div style={{ display:"flex",gap:2 }}><div style={{ width:4,height:4,background:"#ef4444",borderRadius:"50%" }}/><div style={{ width:4,height:4,background:"#ef4444",borderRadius:"50%" }}/></div>
+            </div>
+            <div style={{ width:24,height:48,background:"#1e293b",borderRadius:4,border:"1px solid #475569",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"space-around",padding:"2px 0" }}>
+              <div style={{ display:"flex",gap:2 }}><div style={{ width:4,height:4,background:"#ef4444",borderRadius:"50%" }}/><div style={{ width:4,height:4,background:"#ef4444",borderRadius:"50%" }}/></div>
+              <div style={{ width:20,height:1,background:"#475569" }}/>
+              <div style={{ display:"flex",gap:2 }}><div style={{ width:4,height:4,background:"#ef4444",borderRadius:"50%" }}/><div style={{ width:4,height:4,background:"#ef4444",borderRadius:"50%" }}/></div>
+            </div>
+          </div>
+          <div style={{ color:"#94a3b8",fontSize:10,marginTop:6 }}>"Gee Joon" (Supreme Pair)</div>
+        </div>
+      </div>
+    </TableWrap>
+  );
+}
+
+
 function GenericCardVisual({ cards }) {
   return (
     <TableWrap>
@@ -455,7 +575,12 @@ function GameVisual({ game }) {
     pai_gow: <PaiGowVisual/>,
     sic_bo: <SicBoVisual/>,
     let_it_ride: <LetItRideVisual/>,
-    caribbean_stud: <CaribbeanVisual/>
+    caribbean_stud: <CaribbeanVisual/>,
+    dominoes: <DominoesVisual/>,
+    mahjong: <MahjongVisual/>,
+    backgammon: <BackgammonVisual/>,
+    chess: <ChessVisual/>,
+    pai_gow_tiles: <PaiGowTilesVisual/>
   };
   if (map[game.id]) return map[game.id];
   if (game.visualCards) return <GenericCardVisual cards={game.visualCards}/>;
@@ -815,6 +940,96 @@ const GAMES = [
     payouts:[{bet:"Win trick with hearts/QS",pays:"-1/-13 pts per card"},{bet:"Shoot the Moon",pays:"All others get 26 pts"}],
     visualCards:[{rank:"Q",suit:"S"},{rank:"A",suit:"H"},{rank:"K",suit:"H"},{rank:"2",suit:"C"}],
   },
+  /* ── CLASSIC TILES & BOARDS ── */
+  {
+    id:"dominoes", name:"Dominoes (Draw)", emoji:"🁣", category:"Classic — Tiles",
+    players:"2–4", difficulty:"Easy", type:"tile",
+    tagline:"Match ends of tiles to empty your hand.",
+    overview:"Dominoes is a classic tile-based game. In the popular 'Draw' variation, players try to empty their hands by matching the pip count on one end of a tile in their hand to the open ends of the layout on the table.",
+    terminology:[
+      {term:"Bone/Tile",def:"A domino piece, featuring two ends with 0-6 pips (dots)."},
+      {term:"Boneyard",def:"The draw pile of face-down tiles."},
+      {term:"Spinner",def:"The first double played, which can be played off of on all four sides."},
+      {term:"Domino!",def:"Called out when a player plays their last tile, winning the hand."},
+    ],
+    setup:["Shuffle all 28 tiles face-down.","2 players: draw 7 tiles each. 3-4 players: draw 5 tiles each.","Remaining tiles form the boneyard."],
+    howToPlay:["The player with the heaviest double (e.g., Double 6) plays it first to start the line.","Players take turns playing a tile that matches the number of pips on an open end of the layout.","If you cannot play, you must draw from the boneyard until you get a playable tile.","The round ends when one player plays their last tile, or the game is blocked (no one can play)."],
+    strategy:["Play your heaviest (highest pip) tiles early to avoid getting stuck with them if the round ends.","If you know your opponent is blocked on a certain number, try to leave that number exposed on the ends.","Keep a variety of numbers in your hand to ensure you can always play."],
+    mistakes:["Drawing unnecessarily when you misread the board.","Playing a double early without having other tiles of that number to back it up."],
+    payouts:[{bet:"Winning hand",pays:"Sum of pips in opponents' hands"}],
+  },
+  {
+    id:"mahjong", name:"Mahjong", emoji:"🀄", category:"Classic — Tiles",
+    players:"4", difficulty:"Hard", type:"tile",
+    tagline:"Draw and discard tiles to form matching sets and pairs.",
+    overview:"Mahjong is a deeply strategic tile game similar to Rummy but played with 144 tiles based on Chinese characters and symbols. Players draw and discard tiles to complete a winning hand of four sets (Pung/Chow/Kong) and one pair.",
+    terminology:[
+      {term:"Chow",def:"A sequence of three tiles of the same suit (e.g., 1-2-3 of Bamboo)."},
+      {term:"Pung",def:"A set of three identical tiles."},
+      {term:"Kong",def:"A set of four identical tiles (requires drawing a replacement tile)."},
+      {term:"Mahjong",def:"Calling out when you complete your 14-tile winning hand."},
+    ],
+    setup:["Shuffle 144 tiles face-down and build four walls, each 18 tiles long and 2 tiles high.","Roll dice to break the wall. Dealer takes 14 tiles, others take 13."],
+    howToPlay:["On your turn, draw one tile from the wall.","If your hand isn't complete, discard one tile face-up.","Other players can claim your discard: 'Chow' (only the player to your right), 'Pung' (any player), or 'Kong' (any player).","If a discard is claimed, that player exposes the set, discards a tile, and play continues to their right.","Win by drawing or claiming a tile that completes your hand (4 sets + 1 pair)."],
+    strategy:["Be flexible early on; don't commit to a specific hand too quickly.","Watch the discards to see what opponents are building and which tiles are dead (all 4 are played).","Keep pairs of honor tiles (Dragons/Winds) as they are easy to turn into Pungs for quick points."],
+    mistakes:["Discarding a 'raw' (unseen) tile late in the game, risking someone calling Mahjong on it.","Claiming too many Chows/Pungs early, revealing your hand and limiting your defensive options."],
+    payouts:[{bet:"Win",pays:"Varies by hand complexity and local scoring rules"}],
+  },
+  {
+    id:"backgammon", name:"Backgammon", emoji:"🎲", category:"Classic — Board",
+    players:"2", difficulty:"Medium", type:"board",
+    tagline:"Race your checkers around the board using dice and strategy.",
+    overview:"Backgammon is one of the oldest board games, combining the luck of dice with deep tactical positioning. You must move all 15 of your checkers around the board and bear them off before your opponent does.",
+    terminology:[
+      {term:"Blot",def:"A single checker sitting alone on a point, vulnerable to being hit."},
+      {term:"Hit",def:"Landing on an opponent's blot, sending it to the bar."},
+      {term:"The Bar",def:"The middle divider. Hit checkers go here and must enter the opponent's home board to return."},
+      {term:"Prime",def:"Several consecutive points occupied by two or more of your checkers, blocking the opponent."},
+      {term:"Bear Off",def:"Removing your checkers from the board once they are all in your home board."},
+      {term:"Doubling Cube",def:"A die used to double the stakes of the game if you feel you have a strong advantage."},
+    ],
+    setup:["Each player has 15 checkers set up in a specific starting formation across 24 points.","Players roll one die each to determine who goes first (highest roll uses both dice for their first move)."],
+    howToPlay:["Roll two dice. Move your checkers forward by the numbers shown (e.g., roll 4-2, move one checker 4 and another 2, or one checker 6).","If you roll doubles, you play the numbers four times.","You cannot land on a point occupied by 2 or more opponent checkers.","If you land on a blot (1 opponent checker), it is 'hit' and sent to the bar.","Once all 15 checkers are in your final quadrant (home board), you can start bearing them off. First to bear off all 15 wins."],
+    strategy:["Build 'primes' (blocks of 2+ checkers) to trap your opponent's back checkers.","Avoid leaving blots in your home board or when your opponent has a strong board.","Hitting your opponent is usually the best move, especially if it traps them behind your prime."],
+    mistakes:["Playing too passively and just racing without interacting.","Leaving blots carelessly when your opponent's home board is strong (meaning a hit will trap you on the bar)."],
+    payouts:[{bet:"Standard win",pays:"1x stakes"},{bet:"Gammon (opp. bears off 0)",pays:"2x stakes"},{bet:"Backgammon (opp. checker stuck)",pays:"3x stakes"}],
+  },
+  {
+    id:"chess", name:"Chess", emoji:"♟️", category:"Classic — Board",
+    players:"2", difficulty:"Hard", type:"board",
+    tagline:"The ultimate game of pure strategy and tactics.",
+    overview:"Chess is a two-player strategy board game played on an 8x8 grid. Each player commands an army of 16 pieces with the ultimate goal of trapping the opponent's King (Checkmate). There is no hidden information and no luck.",
+    terminology:[
+      {term:"Check",def:"The King is under direct attack but can escape."},
+      {term:"Checkmate",def:"The King is under attack and has no legal escape. Game over."},
+      {term:"Stalemate",def:"A player has no legal moves but is NOT in check. Game is a draw."},
+      {term:"Castling",def:"A special defensive move involving the King and a Rook."},
+      {term:"En Passant",def:"A special pawn capture rule when an opponent's pawn moves two squares forward."},
+    ],
+    setup:["Place pieces on the back rank: Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook.","Place 8 pawns on the second rank. White always moves first."],
+    howToPlay:["Players take turns moving one piece per turn.","Pawns move forward 1 (or 2 on first move) and capture diagonally.","Knights move in an L-shape (and jump over pieces). Bishops move diagonally. Rooks move in straight lines.","Queens combine Rook and Bishop movement. Kings move 1 square any direction.","Capture opponent pieces by landing on their square.","Trap the opponent's King to win."],
+    strategy:["Control the center four squares early.","Develop your Knights and Bishops before your Queen.","Castle early to protect your King and connect your Rooks.","Don't sacrifice pieces without a clear tactical advantage or checkmating attack."],
+    mistakes:["Bringing the Queen out too early, allowing it to be attacked while the opponent develops.","Failing to see a basic tactic like a 'fork' or 'pin'.","Stalemating a winning endgame by carelessly trapping the opponent's King without checking it."],
+    payouts:[{bet:"Checkmate",pays:"Win"},{bet:"Stalemate / Repetition",pays:"Draw"}],
+  },
+  {
+    id:"pai_gow_tiles", name:"Pai Gow (Tiles)", emoji:"🀄", category:"Classic — Tiles",
+    players:"1–7 vs. Dealer", difficulty:"Hard", type:"tile",
+    tagline:"Ancient Chinese dominoes — balance your high and low hands.",
+    overview:"Pai Gow is an ancient Chinese gambling game played with a set of 32 dominoes. It is the direct ancestor of Pai Gow Poker. Players are dealt 4 tiles and must split them into a High Hand and a Low Hand to beat the dealer.",
+    terminology:[
+      {term:"Gee Joon",def:"The Supreme Pair (the 1-2 and 2-4 tiles). The highest hand in the game."},
+      {term:"Bo",def:"Pairs. The next highest ranking hands after Gee Joon."},
+      {term:"Wong / Gong",def:"Special 9 or 8 point hands made with a 12 or 2 tile."},
+      {term:"Points",def:"If no special hand, the total pips modulo 10 (e.g., 15 pips = 5 points)."},
+    ],
+    setup:["32 tiles are shuffled face-down ('washing' the tiles).","They are stacked into 8 stacks of 4 tiles (the Woodpile).","Dice are rolled to determine which player receives the first stack."],
+    howToPlay:["You receive 4 tiles.","Split them into two pairs: a High Hand and a Low Hand.","Compare your hands against the dealer's High and Low hands.","Win both = Win 1:1 (minus 5% commission).","Win 1, Lose 1 = Push.","Lose both or Tie = Lose (dealer wins all exact ties)."],
+    strategy:["The ranking of tiles and pairs is complex and must be memorized (it is not purely numerical).","Always balance your hands to avoid an automatic loss. A medium-high and medium-low hand is better than a huge high hand and a 0-point low hand."],
+    mistakes:["Playing without knowing the tile rankings (Bo, Wong, Gong).","Putting too much power into the High Hand and leaving the Low Hand defenseless."],
+    payouts:[{bet:"Win both",pays:"1:1 (minus 5%)"},{bet:"Win 1, Lose 1",pays:"Push"}],
+  },
+
 ];
 
 /* ─────────────────────────────────────────────
@@ -930,9 +1145,9 @@ export default function GameRules({ onClose }) {
         <div style={{ padding:"20px 16px 16px", borderBottom:"1px solid rgba(6,182,212,0.2)" }}>
           <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between",gap:8 }}>
             <div style={{ display:"flex",alignItems:"center",gap:12 }}>
-              <div style={{ width:36,height:36,borderRadius:"8px",background:`${NEON_CYAN}20`,border:`1px solid ${NEON_CYAN}`,color:NEON_CYAN,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,boxShadow:`0 0 15px ${NEON_CYAN}40` }}>🎰</div>
+              <div style={{ width:36,height:36,borderRadius:"8px",background:`${NEON_CYAN}20`,border:`1px solid ${NEON_CYAN}`,color:NEON_CYAN,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,boxShadow:`0 0 15px ${NEON_CYAN}40` }}>🎲</div>
               <div>
-                <div style={{ color:"#f8fafc",fontWeight:"700",fontSize:15,letterSpacing:1.5 }}>CASINO</div>
+                <div style={{ color:"#f8fafc",fontWeight:"700",fontSize:15,letterSpacing:1.5 }}>CLASSIC GAMES</div>
                 <div style={{ color:NEON_CYAN,fontSize:10,letterSpacing:2.5,fontWeight:"600" }}>RULEBOOK</div>
               </div>
             </div>

@@ -75,20 +75,18 @@ export default {
         caption: 'Every vector is just two perpendicular scalars. The right triangle connecting them is always there.',
       },
       {
-        id: 'SVGDiagram',
-        props: { type: 'vector-components' },
-        title: 'Component decomposition — the algebra behind the triangle',
+        id: 'VectorComponentDecomposer',
+        title: 'Drag the vector — watch Ax, Ay, magnitude, and angle update live',
         mathBridge:
-          'A vector \\(\\vec{A}\\) at angle θ above the x-axis forms a right triangle. The horizontal leg is A_x = A·cosθ. The vertical leg is A_y = A·sinθ. The hypotenuse is |A|. This is not a formula to memorize — it is just trigonometry (opposite = hyp·sinθ, adjacent = hyp·cosθ).',
-        caption: 'The decomposition formulas are the component drill: A_x = A cosθ, A_y = A sinθ.',
+          'Drag the arrowhead to any position. The red horizontal leg is A_x = |A|·cosθ and the green vertical leg is A_y = |A|·sinθ. The hypotenuse (the arrow itself) has length √(Ax²+Ay²). Toggle "Show Trig Overlay" to see the SOH-CAH-TOA triangle directly on the arrow. Key insight: drag to 45° — Ax = Ay and |A| = √2·Ax. Drag to 0° — Ay = 0 and |A| = Ax. The geometry of the right triangle is always there.',
+        caption: 'Every arrow hides a right triangle. Ax = A·cosθ, Ay = A·sinθ — drag to verify.',
       },
       {
-        id: 'SVGDiagram',
-        props: { type: 'vector-addition-chain' },
-        title: 'Head-to-tail vector addition',
+        id: 'VectorOperationsViz',
+        title: 'Head-to-tail and component addition — drag both vectors, see the resultant live',
         mathBridge:
-          'To add three vectors: place the second arrow at the tip of the first, the third at the tip of the second. The resultant goes from the tail of the first to the tip of the last. Alternatively: add all x-components and all y-components separately — same answer, less drawing.',
-        caption: 'Head-to-tail addition closes the polygon. The resultant is the shortcut from start to finish.',
+          'Switch between "Add" mode (tip-to-tail: place B at the head of A, resultant goes from A\'s tail to B\'s head) and "Forces" mode (component decomposition of each vector). Drag A and B to different angles and watch: the resultant R = A + B always closes the triangle. Try making A and B perpendicular — the resultant magnitude is √(|A|²+|B|²). Try making them anti-parallel — the resultant shrinks to |A|−|B|. Same magnitudes, completely different resultants — only direction matters.',
+        caption: 'Head-to-tail closes the triangle. Adding components gives the same result — two methods, one answer.',
       },
     ],
   },
@@ -120,6 +118,13 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'ForceVectorIntuition',
+        title: 'Real-world force vectors — drag magnitudes and angles to balance forces',
+        mathBridge:
+          'This is a real structural engineering tool. Each arrow is a force vector acting on a pin joint. Drag the sliders to change magnitude and direction of each force. The green "R" arrow is the net (resultant) force — the vector sum. When "Equilibrium" appears, the net force is zero: the pin joint will not move. This is how engineers design bridges and cranes: arrange force vectors so they cancel. Notice: you CANNOT achieve equilibrium just by setting magnitudes equal — directions must cancel the components too.',
+        caption: 'Real engineering: forces on a structural pin joint. Drag until the net force = 0 — that is equilibrium.',
+      },
       {
         id: 'PythonNotebook',
         title: 'Vector operations in Python — components, magnitude, addition',
@@ -233,6 +238,47 @@ export default {
         mathBridge:
           'The dot product A·B equals the component of A along B, times |B|. Geometrically: drop a perpendicular from A onto B. The length of the shadow of A on B is |A|cosφ. Multiplying by |B| gives A·B. When the vectors are perpendicular (φ = 90°), the shadow has zero length — dot product is zero. When they are parallel (φ = 0°), the shadow is |A| — maximum dot product.',
         caption: 'A·B = |A||B|cosφ — the projection interpretation. Perpendicular vectors have zero dot product.',
+      },
+      {
+        id: 'DotProductViz',
+        title: 'Drag both vectors — watch the dot product and projection update live',
+        mathBridge:
+          'Drag the tips of vectors A and B. The dot product A·B = |A||B|cosφ changes as the angle φ changes. At φ = 90° (perpendicular), the projection of A onto B vanishes — dot product = 0. At φ = 0° (parallel), dot product = |A||B| (maximum). At φ = 180° (anti-parallel), dot product = −|A||B| (minimum).',
+        caption: 'The dot product encodes how much two vectors align — zero when perpendicular, maximum when parallel.',
+      },
+    ],
+  },
+
+  realWorldApplications: {
+    title: 'Vectors in the Real World — Apply It Now',
+    description: 'Three domains where vector addition and decomposition are used daily by engineers and scientists. Each interactive viz shows the same physics you just learned, in a real context.',
+    applications: [
+      {
+        id: 'p0-006-rw1',
+        domain: 'Structural Engineering',
+        title: 'Force equilibrium at a bridge joint',
+        description: 'A bridge truss pin joint has cables pulling in different directions. The joint holds still when all force vectors add to zero. Engineers compute this every day using the same component method you just learned: ΣFx = 0 and ΣFy = 0.',
+        insight: 'The weight of the bridge deck is a downward force vector. The cable tensions are upward-angled force vectors. For the joint to be stationary, their vector sum must be zero. This is Newton\'s First Law — a stationary object has zero net force.',
+        visualizationId: 'ForceVectorIntuition',
+        mathBridge: 'Set three forces to balance: one straight down (weight) and two angled upward (cables). Equilibrium shows when Rx = 0 AND Ry = 0. This requires solving two scalar equations — one for each component.',
+      },
+      {
+        id: 'p0-006-rw2',
+        domain: 'Navigation and GPS',
+        title: 'Displacement vectors on a map',
+        description: 'A ship navigates from port: 40 km east, then 30 km north. The straight-line distance from start to end is the magnitude of the resultant displacement vector — not 40+30=70 km, but √(40²+30²) = 50 km. GPS systems compute this vector sum for every leg of a journey.',
+        insight: 'The displacement from start to end is independent of the path taken — only the net vector sum matters. This is why vector addition is the foundation of navigation: you can decompose any path into east-west and north-south legs, add the components, and find the straight-line result.',
+        visualizationId: 'VectorOperationsViz',
+        mathBridge: 'Set A = (40, 0) km (east leg) and B = (0, 30) km (north leg). The resultant R = A + B = (40, 30) km. Magnitude = √(40²+30²) = 50 km. Angle = arctan(30/40) = 36.9° north of east. That is your GPS bearing.',
+      },
+      {
+        id: 'p0-006-rw3',
+        domain: 'Projectile Motion',
+        title: 'Launch velocity decomposed into independent components',
+        description: 'A ball kicked at 25 m/s at 37° above horizontal has vx = 25 cos37° = 20 m/s and vy = 25 sin37° = 15 m/s. Horizontal and vertical motions are completely independent — the horizontal component determines range, the vertical component determines height. A vector decomposition is the first step of every projectile motion problem.',
+        insight: 'Without vector decomposition, projectile motion is a single complicated 2D problem. With it, it splits into two independent 1D problems. The x-motion has no acceleration (constant vx). The y-motion has acceleration −g (constant vy − gt). Same ball, two much simpler equations.',
+        visualizationId: 'VectorComponentDecomposer',
+        mathBridge: 'Drag the arrowhead to angle 37° with magnitude 25 (units = m/s). Read off: Ax = 20 m/s, Ay = 15 m/s. These are the independent initial velocities for the two sub-problems of projectile motion.',
       },
     ],
   },
@@ -899,6 +945,71 @@ fprintf('Equilibrium force F4 = [%.2f, %.2f] N\\n', F4(1), F4(2));`,
       answer: 'A vector with magnitude exactly 1 (dimensionless direction indicator)',
       hints: ['Unit vectors encode direction only. They are obtained by dividing a vector by its magnitude.'],
       reviewSection: 'Math — unit vectors',
+    },
+  ],
+
+  formulas: [
+    {
+      id: 'p0-006-f1',
+      latex: 'A_x = |\\vec{A}|\\cos\\theta,\\quad A_y = |\\vec{A}|\\sin\\theta',
+      description: 'Component decomposition: project a 2D vector onto the x and y axes using trigonometry.',
+      variables: {
+        'A_x': 'x-component of vector A (same units as A)',
+        'A_y': 'y-component of vector A (same units as A)',
+        '|\\vec{A}|': 'magnitude of vector A',
+        '\\theta': 'angle of A measured from the positive x-axis',
+      },
+    },
+    {
+      id: 'p0-006-f2',
+      latex: '|\\vec{A}| = \\sqrt{A_x^2 + A_y^2}',
+      description: 'Magnitude of a 2D vector — direct application of the Pythagorean theorem to the component right triangle.',
+      variables: {
+        '|\\vec{A}|': 'magnitude (length) of the vector, always ≥ 0',
+        'A_x': 'x-component',
+        'A_y': 'y-component',
+      },
+    },
+    {
+      id: 'p0-006-f3',
+      latex: '\\theta = \\arctan\\!\\left(\\frac{A_y}{A_x}\\right)',
+      description: 'Direction angle of a vector from the positive x-axis. Use atan2(Ay, Ax) in code to correctly resolve the quadrant.',
+      variables: {
+        '\\theta': 'angle from positive x-axis, −180° to +180°',
+        'A_y': 'y-component',
+        'A_x': 'x-component',
+      },
+    },
+    {
+      id: 'p0-006-f4',
+      latex: '\\vec{C} = \\vec{A} + \\vec{B} \\Rightarrow C_x = A_x + B_x,\\;C_y = A_y + B_y',
+      description: 'Vector addition by components: add x-components and y-components separately. Works for any number of vectors.',
+      variables: {
+        'C_x': 'x-component of resultant',
+        'C_y': 'y-component of resultant',
+        'A_x,\\,B_x': 'x-components of operands',
+        'A_y,\\,B_y': 'y-components of operands',
+      },
+    },
+    {
+      id: 'p0-006-f5',
+      latex: '\\vec{A} \\cdot \\vec{B} = A_x B_x + A_y B_y = |\\vec{A}||\\vec{B}|\\cos\\phi',
+      description: 'Dot product: algebraic form (sum of products of components) equals geometric form (magnitudes × cosine of angle between them).',
+      variables: {
+        '\\phi': 'angle between vectors A and B (0° = parallel, 90° = perpendicular)',
+        'A_x,\\,A_y': 'components of A',
+        'B_x,\\,B_y': 'components of B',
+      },
+    },
+    {
+      id: 'p0-006-f6',
+      latex: '\\hat{A} = \\frac{\\vec{A}}{|\\vec{A}|}',
+      description: 'Unit vector in the direction of A: divide the vector by its magnitude. Has magnitude 1, encodes direction only.',
+      variables: {
+        '\\hat{A}': 'unit vector (dimensionless, magnitude = 1)',
+        '\\vec{A}': 'original vector',
+        '|\\vec{A}|': 'magnitude of A',
+      },
     },
   ],
 }

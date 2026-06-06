@@ -440,6 +440,27 @@ export default {
     'Preview: derivative of kt^n is knt^{n-1} (power rule — fully derived in Chapter 1)',
   ],
 
+  formulas: [
+    {
+      id: 'p0-004-f1',
+      latex: '\\bar{v} = \\frac{\\Delta x}{\\Delta t} = \\frac{x_f - x_i}{t_f - t_i}',
+      description: 'Average velocity over a time interval — slope of the secant line on the x–t graph.',
+      variables: { '\\bar{v}': 'average velocity (m/s)', '\\Delta x': 'displacement (m)', '\\Delta t': 'time interval (s)' },
+    },
+    {
+      id: 'p0-004-f2',
+      latex: 'v(t) = \\lim_{\\Delta t \\to 0} \\frac{\\Delta x}{\\Delta t} = \\frac{dx}{dt}',
+      description: 'Instantaneous velocity — the derivative of position with respect to time. Slope of the tangent line at point t.',
+      variables: { 'v(t)': 'instantaneous velocity (m/s)', '\\Delta x': 'position change (m)', '\\Delta t': 'time interval shrinking to 0 (s)' },
+    },
+    {
+      id: 'p0-004-f3',
+      latex: '\\frac{d}{dt}\\bigl(\\tfrac{1}{2}g t^2\\bigr) = gt',
+      description: 'Derivative of the free-fall position function — gives the instantaneous velocity at time t.',
+      variables: { g: 'gravitational acceleration (9.8 m/s²)', t: 'time (s)' },
+    },
+  ],
+
   notebooks: {
     python: {
       type: 'python',

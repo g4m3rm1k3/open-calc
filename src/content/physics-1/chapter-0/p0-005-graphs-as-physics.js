@@ -201,6 +201,13 @@ export default {
           'Each rectangle has height v(tᵢ) and width Δt. Their total area approximates displacement. As rectangles get thinner, the approximation improves. The limiting total area is the integral — exact displacement.',
         caption: 'The integral ∫v dt is the limit of the Riemann sum — exact area, exact displacement.',
       },
+      {
+        id: 'PositionVelocityAcceleration',
+        title: 'The Fundamental Theorem in action — x, v, a linked live',
+        mathBridge:
+          'Drag the time slider. The slope of x(t) at any point equals the value of v(t) at that same point — this is the derivative relationship. The area swept under v(t) up to time t equals the accumulated displacement on x(t) — this is the integral relationship. Both together are the Fundamental Theorem of Calculus.',
+        caption: 'x(t) and v(t) are inverses of each other: slope of x = v, area under v = Δx.',
+      },
     ],
   },
 
@@ -928,6 +935,59 @@ grid on;
       answer: 'Parabola (quadratic curve)',
       hints: ['x = v₀t + ½at² is a quadratic — a parabola. The t² term creates the curvature.'],
       reviewSection: 'Math — constant-acceleration case on graphs',
+    },
+  ],
+
+  formulas: [
+    {
+      id: 'p0-005-f1',
+      latex: 'v(t) = \\frac{dx}{dt}',
+      description: 'Instantaneous velocity equals the slope (derivative) of the position–time graph at any point.',
+      variables: {
+        'v(t)': 'instantaneous velocity at time t (m/s)',
+        'dx': 'infinitesimal change in position (m)',
+        'dt': 'infinitesimal change in time (s)',
+      },
+    },
+    {
+      id: 'p0-005-f2',
+      latex: 'a(t) = \\frac{dv}{dt}',
+      description: 'Instantaneous acceleration equals the slope (derivative) of the velocity–time graph at any point.',
+      variables: {
+        'a(t)': 'instantaneous acceleration at time t (m/s²)',
+        'dv': 'infinitesimal change in velocity (m/s)',
+        'dt': 'infinitesimal change in time (s)',
+      },
+    },
+    {
+      id: 'p0-005-f3',
+      latex: '\\Delta x = \\int_{t_1}^{t_2} v(t)\\,dt',
+      description: 'Displacement equals the signed area under the velocity–time graph — above the axis is positive displacement, below is negative.',
+      variables: {
+        '\\Delta x': 'displacement from t₁ to t₂ (m)',
+        'v(t)': 'velocity as a function of time (m/s)',
+        't_1,\\,t_2': 'start and end times (s)',
+      },
+    },
+    {
+      id: 'p0-005-f4',
+      latex: '\\Delta x = \\tfrac{1}{2}(v_i + v_f)\\,\\Delta t',
+      description: 'Trapezoid area formula — displacement under a straight-line v–t segment (constant acceleration). Reduces to rectangle (v_i = v_f) or triangle (v_i = 0).',
+      variables: {
+        'v_i': 'velocity at start of interval (m/s)',
+        'v_f': 'velocity at end of interval (m/s)',
+        '\\Delta t': 'duration of interval (s)',
+      },
+    },
+    {
+      id: 'p0-005-f5',
+      latex: 'x(t) = x_0 + \\int_0^t v(\\tau)\\,d\\tau',
+      description: 'Position at time t equals initial position plus the accumulated area under the v–t curve from 0 to t. Fundamental Theorem of Calculus applied to kinematics.',
+      variables: {
+        'x_0': 'initial position at t = 0 (m)',
+        'v(\\tau)': 'velocity at intermediate time τ (m/s)',
+        't': 'current time (s)',
+      },
     },
   ],
 }

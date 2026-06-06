@@ -210,6 +210,13 @@ export default {
           'Drag the origin marker. As you move the reference point, all the x-coordinates change. But the displacement Δx = x_f − x_i stays constant — it is independent of where you put zero. Physical distances (how far the ball fell) are differences, not absolute positions. The coordinate system is a measuring tool, not physical reality.',
         caption: 'Absolute position depends on where you put the origin. Displacement is a physical difference — it does not depend on the origin.',
       },
+      {
+        id: 'FreeFallExplorer',
+        title: 'Free fall with adjustable sign convention — same trajectory, changing labels',
+        mathBridge:
+          'Adjust the initial velocity and watch the position, velocity, and acceleration curves. The physical arc of the ball never changes — but when you flip the sign convention, the v(t) line flips and a flips from −9.8 to +9.8. This is coordinate invariance: the ball does not know about your convention; the equations reflect your labelling choice.',
+        caption: 'Drag the initial velocity. The physical trajectory is invariant — the signs on v and a depend entirely on your convention.',
+      },
     ],
   },
 
@@ -927,6 +934,62 @@ fprintf('Landing time: %.2f s\\n', t_land);`,
       answer: 'Writing a = +9.8 m/s² when upward is defined as positive',
       hints: ['With upward positive, gravity is downward = negative. a = −9.8 m/s². This is the most common mistake.'],
       reviewSection: 'Intuition — standard sign convention warning',
+    },
+  ],
+
+  formulas: [
+    {
+      id: 'p0-007-f1',
+      latex: 'x(t) = x_0 + v_0 t - \\tfrac{1}{2}g t^2 \\quad (\\text{upward positive})',
+      description: 'Position function for vertical motion with upward-positive convention. The −½gt² term comes from a = −g.',
+      variables: {
+        'x_0': 'initial position (positive = above origin)',
+        'v_0': 'initial velocity (positive = upward)',
+        'g': 'gravitational constant 9.8 m/s² (always positive — the sign convention is in the − sign before it)',
+        't': 'time (s)',
+      },
+    },
+    {
+      id: 'p0-007-f2',
+      latex: 'v(t) = v_0 - g t \\quad (\\text{upward positive})',
+      description: 'Velocity function for vertical motion with upward-positive convention. Velocity decreases at rate g while the ball rises.',
+      variables: {
+        'v_0': 'initial velocity (positive = upward)',
+        'g': '9.8 m/s²',
+        't': 'time elapsed (s)',
+      },
+    },
+    {
+      id: 'p0-007-f3',
+      latex: 't_{\\text{peak}} = \\frac{v_0}{g}, \\quad x_{\\text{peak}} = x_0 + \\frac{v_0^2}{2g}',
+      description: 'Time and height of maximum altitude (when v = 0) under upward-positive convention.',
+      variables: {
+        't_{\\text{peak}}': 'time at which v = 0 and object is at maximum height',
+        'x_{\\text{peak}}': 'maximum height above origin',
+        'v_0': 'initial upward velocity (m/s)',
+        'g': '9.8 m/s²',
+      },
+    },
+    {
+      id: 'p0-007-f4',
+      latex: 't_{\\text{flight}} = \\frac{2v_0}{g}',
+      description: 'Total flight time for an object thrown upward from its launch point (returns to same height). Invariant under sign convention.',
+      variables: {
+        't_{\\text{flight}}': 'time to return to launch height (s)',
+        'v_0': 'initial upward speed (m/s)',
+        'g': '9.8 m/s²',
+      },
+    },
+    {
+      id: 'p0-007-f5',
+      latex: 'a_\\parallel = g\\sin\\theta, \\quad a_\\perp = g\\cos\\theta',
+      description: 'Gravity components for inclined-plane axes aligned with the slope. The parallel component drives acceleration down the slope; the perpendicular component is balanced by the normal force.',
+      variables: {
+        'a_\\parallel': 'acceleration component along the incline (m/s²)',
+        'a_\\perp': 'component of gravity perpendicular to incline (balanced by N)',
+        '\\theta': 'angle of incline from horizontal',
+        'g': '9.8 m/s²',
+      },
     },
   ],
 }
