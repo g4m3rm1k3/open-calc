@@ -1,8 +1,8 @@
 const lesson = {
-  id: "git-0-017",
+  id: "git-0-022",
   slug: "gitignore-and-config",
   chapter: "git-0",
-  order: 17,
+  order: 22,
   title: ".gitignore & Config",
   subtitle: "Keeping secrets, noise, and build artifacts out",
   tags: ["git", "gitignore", "config", "ignore", "security"],
@@ -114,49 +114,57 @@ const lesson = {
     },
   ],
 
-  assessment: {
-    questions: [
-      {
-        id: "git0-017-q1",
-        type: "choice",
-        text: "You add `*.log` to `.gitignore` but Git still shows `debug.log` as modified. Why?",
-        options: [
-          ".gitignore doesn't work for log files",
-          "The `*.log` pattern is wrong — it needs to be `**/*.log`",
-          "`debug.log` is already tracked by Git — .gitignore only affects untracked files",
-          "You need to restart Git for .gitignore changes to take effect",
-        ],
-        answer:
-          "`debug.log` is already tracked by Git — .gitignore only affects untracked files",
-      },
-      {
-        id: "git0-017-q2",
-        type: "choice",
-        text: "You accidentally committed an API key. What should you do first?",
-        options: [
-          "Add the file to .gitignore",
-          "Delete the commit with `git reset --hard`",
-          "Revoke and rotate the API key immediately — assume it's compromised",
-          "Push a new commit that removes the key from the file",
-        ],
-        answer:
-          "Revoke and rotate the API key immediately — assume it's compromised",
-      },
-      {
-        id: "git0-017-q3",
-        type: "choice",
-        text: "A `~/.gitignore_global` file is useful because:",
-        options: [
-          "It overrides all per-repo .gitignore files",
-          "It applies OS/editor-specific ignores (like .DS_Store) to all repos on your machine",
-          "It syncs your ignore patterns to GitHub",
-          "It prevents `git push` of ignored files",
-        ],
-        answer:
-          "It applies OS/editor-specific ignores (like .DS_Store) to all repos on your machine",
-      },
-    ],
-  },
+  quiz: [
+    {
+      id: "git0-022-q1",
+      type: "choice",
+      text: "You add `*.log` to `.gitignore` but Git still shows `debug.log` as modified. Why?",
+      options: [
+        ".gitignore doesn't work for log files",
+        "The `*.log` pattern is wrong — it needs to be `**/*.log`",
+        "`debug.log` is already tracked by Git — .gitignore only affects untracked files",
+        "You need to restart Git for .gitignore changes to take effect",
+      ],
+      answer:
+        "`debug.log` is already tracked by Git — .gitignore only affects untracked files",
+      hints: [".gitignore only prevents Git from seeing files it has never tracked. If a file is already in the history, you must untrack it first."],
+    },
+    {
+      id: "git0-022-q2",
+      type: "choice",
+      text: "You accidentally committed an API key. What should you do first?",
+      options: [
+        "Add the file to .gitignore",
+        "Delete the commit with `git reset --hard`",
+        "Revoke and rotate the API key immediately — assume it's compromised",
+        "Push a new commit that removes the key from the file",
+      ],
+      answer:
+        "Revoke and rotate the API key immediately — assume it's compromised",
+      hints: ["Git history is forever — anyone who cloned or forked the repo can recover that key. The commit being gone doesn't help."],
+    },
+    {
+      id: "git0-022-q3",
+      type: "choice",
+      text: "A `~/.gitignore_global` file is useful because:",
+      options: [
+        "It overrides all per-repo .gitignore files",
+        "It applies OS/editor-specific ignores (like .DS_Store) to all repos on your machine",
+        "It syncs your ignore patterns to GitHub",
+        "It prevents `git push` of ignored files",
+      ],
+      answer:
+        "It applies OS/editor-specific ignores (like .DS_Store) to all repos on your machine",
+      hints: ["OS and editor files (.DS_Store, .idea/) don't belong in any repo. Where do you put patterns that apply everywhere?"],
+    },
+  ],
+
+  definitions: [
+    { term: ".gitignore", definition: "A file listing patterns for files Git should completely ignore — they won't appear as untracked and will never be committed." },
+    { term: "git rm --cached", definition: "Removes a file from Git tracking without deleting it from disk. Used when a file is already committed but should now be ignored." },
+    { term: ".env", definition: "A file storing environment-specific configuration and secrets (API keys, database passwords). Always add to `.gitignore`; never commit." },
+    { term: "global gitignore", definition: "`~/.gitignore_global` — a user-level ignore file applying patterns to every repository on your machine. Set via `git config --global core.excludesfile`." },
+  ],
 };
 
 export default lesson;

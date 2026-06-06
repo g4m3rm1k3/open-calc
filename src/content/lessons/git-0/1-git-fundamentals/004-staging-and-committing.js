@@ -102,46 +102,54 @@ const lesson = {
     },
   ],
 
-  assessment: {
-    questions: [
-      {
-        id: "git0-004-q1",
-        type: "choice",
-        text: "What question should a commit message primarily answer?",
-        options: [
-          "What files were changed",
-          "How many lines of code were added",
-          "Why this change exists",
-          "Who wrote the code",
-        ],
-        answer: "Why this change exists",
-      },
-      {
-        id: "git0-004-q2",
-        type: "choice",
-        text: "Which commit message follows best practices?",
-        options: [
-          "fixed the thing",
-          "Add win condition check to dungeon exit logic",
-          "Added the win condition stuff and also fixed some other things while I was in there",
-          "WIP",
-        ],
-        answer: "Add win condition check to dungeon exit logic",
-      },
-      {
-        id: "git0-004-q3",
-        type: "choice",
-        text: "The 50-character limit applies to:",
-        options: [
-          "The total commit including all file changes",
-          "The commit body paragraph",
-          "The subject line of the commit message",
-          "The author field",
-        ],
-        answer: "The subject line of the commit message",
-      },
-    ],
-  },
+  quiz: [
+    {
+      id: "git0-004-q1",
+      type: "choice",
+      text: "What question should a commit message primarily answer?",
+      options: [
+        "What files were changed",
+        "How many lines of code were added",
+        "Why this change exists",
+        "Who wrote the code",
+      ],
+      answer: "Why this change exists",
+      hints: ["The diff already shows WHAT changed. What can't be read from the diff alone?"],
+    },
+    {
+      id: "git0-004-q2",
+      type: "choice",
+      text: "Which commit message follows best practices?",
+      options: [
+        "fixed the thing",
+        "Add win condition check to dungeon exit logic",
+        "Added the win condition stuff and also fixed some other things while I was in there",
+        "WIP",
+      ],
+      answer: "Add win condition check to dungeon exit logic",
+      hints: ["Apply the completion test: 'If applied, this commit will ___'. Which option completes that sentence coherently?"],
+    },
+    {
+      id: "git0-004-q3",
+      type: "choice",
+      text: "The 50-character limit applies to:",
+      options: [
+        "The total commit including all file changes",
+        "The commit body paragraph",
+        "The subject line of the commit message",
+        "The author field",
+      ],
+      answer: "The subject line of the commit message",
+      hints: ["Most tools show only one line per commit in list views. Which line is that?"],
+    },
+  ],
+
+  definitions: [
+    { term: "subject line", definition: "The first line of a commit message. Convention: 50 characters or fewer, imperative mood, no period at the end." },
+    { term: "imperative mood", definition: "Command form of a verb used in commit messages: 'Add', 'Fix', 'Remove' — not 'Added' or 'Fixing'." },
+    { term: "commit body", definition: "Lines after the subject in a commit message (separated by a blank line) explaining why the change was made." },
+    { term: "50/72 rule", definition: "Commit message convention: subject under 50 characters; body lines wrapped at 72 characters for terminal readability." },
+  ],
 };
 
 export default lesson;

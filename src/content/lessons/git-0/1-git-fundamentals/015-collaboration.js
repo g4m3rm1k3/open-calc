@@ -1,8 +1,8 @@
 const lesson = {
-  id: "git-0-010",
+  id: "git-0-015",
   slug: "working-as-a-team",
   chapter: "git-0",
-  order: 10,
+  order: 15,
   title: "The Collaboration Workflow",
   subtitle: "How real teams use Git together",
   tags: [
@@ -90,48 +90,56 @@ const lesson = {
     },
   ],
 
-  assessment: {
-    questions: [
-      {
-        id: "git0-010-q1",
-        type: "choice",
-        text: "In the feature branch workflow, why does nobody commit directly to `main`?",
-        options: [
-          "Git technically prevents it with a lock",
-          "main is reserved for the team lead only",
-          "main should always be deployable, and direct commits skip review and testing",
-          "Committing to main is slower than committing to a branch",
-        ],
-        answer:
-          "main should always be deployable, and direct commits skip review and testing",
-      },
-      {
-        id: "git0-010-q2",
-        type: "choice",
-        text: "What is the difference between `git fetch` and `git pull`?",
-        options: [
-          "fetch downloads commits but doesn't merge them; pull downloads and merges",
-          "fetch is for remotes; pull is for local branches",
-          "fetch merges immediately; pull asks for confirmation first",
-          "There is no difference — they are aliases for each other",
-        ],
-        answer:
-          "fetch downloads commits but doesn't merge them; pull downloads and merges",
-      },
-      {
-        id: "git0-010-q3",
-        type: "choice",
-        text: "What is a fork?",
-        options: [
-          "A branch that has been deleted on the remote",
-          "A copy of the entire repository in your own GitHub account",
-          "A merge commit with three or more parents",
-          "A Git command for splitting history",
-        ],
-        answer: "A copy of the entire repository in your own GitHub account",
-      },
-    ],
-  },
+  quiz: [
+    {
+      id: "git0-015-q1",
+      type: "choice",
+      text: "In the feature branch workflow, why does nobody commit directly to `main`?",
+      options: [
+        "Git technically prevents it with a lock",
+        "main is reserved for the team lead only",
+        "main should always be deployable, and direct commits skip review and testing",
+        "Committing to main is slower than committing to a branch",
+      ],
+      answer:
+        "main should always be deployable, and direct commits skip review and testing",
+      hints: ["The goal is for main to always be in a working, shippable state. What does committing directly bypass?"],
+    },
+    {
+      id: "git0-015-q2",
+      type: "choice",
+      text: "What is the difference between `git fetch` and `git pull`?",
+      options: [
+        "fetch downloads commits but doesn't merge them; pull downloads and merges",
+        "fetch is for remotes; pull is for local branches",
+        "fetch merges immediately; pull asks for confirmation first",
+        "There is no difference — they are aliases for each other",
+      ],
+      answer:
+        "fetch downloads commits but doesn't merge them; pull downloads and merges",
+      hints: ["fetch is always read-only — it never touches your working files. pull goes one step further."],
+    },
+    {
+      id: "git0-015-q3",
+      type: "choice",
+      text: "What is a fork?",
+      options: [
+        "A branch that has been deleted on the remote",
+        "A copy of the entire repository in your own GitHub account",
+        "A merge commit with three or more parents",
+        "A Git command for splitting history",
+      ],
+      answer: "A copy of the entire repository in your own GitHub account",
+      hints: ["Forking is a GitHub/GitLab feature, not a Git command. What does it create?"],
+    },
+  ],
+
+  definitions: [
+    { term: "pull request (PR)", definition: "A GitHub/GitLab feature to propose merging one branch into another, providing a diff, comment thread, and CI results for review." },
+    { term: "fork", definition: "A complete copy of a repository in your own GitHub account, used to contribute to projects you don't have write access to." },
+    { term: "code review", definition: "The process of teammates reading proposed changes before they are merged, leaving comments and requesting improvements." },
+    { term: "protected branch", definition: "A branch with rules enforced by GitHub/GitLab requiring review approvals and CI checks to pass before a PR can be merged." },
+  ],
 };
 
 export default lesson;

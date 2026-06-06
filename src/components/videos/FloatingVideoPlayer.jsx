@@ -52,6 +52,7 @@ export default function FloatingVideoPlayer() {
     isMinimized,
     currentVideo,
     lessonId,
+    courseVideos,
     searchQuery,
     setSearchQuery,
     openPlayer,
@@ -195,9 +196,14 @@ export default function FloatingVideoPlayer() {
     const categorized = {};
     if (custom.length > 0) categorized["Your Videos"] = custom;
 
+    // Course-specific videos take priority over keyword search
+    if (courseVideos.length > 0) {
+      categorized["Course Videos"] = courseVideos;
+      return Object.keys(categorized).length > 0 ? categorized : null;
+    }
+
     const lesson = ALL_LESSONS.find((l) => l.id === id);
     const tags = lesson?.tags ?? [];
-    // Derive subject keywords from the course slug (e.g. "python-1" → ["python"])
     const courseWords = (lesson?.course ?? '').replace(/-\d+$/, '').split('-').filter(Boolean);
     const keywords = [...new Set([...tags, ...courseWords])];
     if (keywords.length > 0) {
@@ -210,7 +216,7 @@ export default function FloatingVideoPlayer() {
 
   const currentLessonVideos = useMemo(
     () => getCategorizedVideos(lessonId),
-    [lessonId, customVideos],
+    [lessonId, customVideos, courseVideos],
   );
 
   const dynamicCourses = useMemo(() => {

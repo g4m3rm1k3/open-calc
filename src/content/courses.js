@@ -1,4 +1,6 @@
-export const COURSES = [
+import { getAllAutoCourses } from './autoLoader.js';
+
+const MANUAL_COURSES = [
   {
     key: "precalc",
     label: "Pre-Calc",
@@ -103,13 +105,6 @@ export const COURSES = [
     path: "/course/cnc-logic",
     desc: "G-Code, Kinematics & Logic",
     color: "slate",
-  },
-  {
-    key: "git-0",
-    label: "Git",
-    path: "/course/git-0",
-    desc: "Version Control, Commits, Branches & Collaboration",
-    color: "emerald",
   },
   {
     key: "dsa-1",
@@ -217,3 +212,5 @@ export const COURSES = [
     color: "sky",
   },
 ];
+
+export const COURSES = [...MANUAL_COURSES, ...getAllAutoCourses()];

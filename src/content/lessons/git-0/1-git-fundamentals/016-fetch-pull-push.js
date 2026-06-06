@@ -1,8 +1,8 @@
 const lesson = {
-  id: "git-0-011",
+  id: "git-0-016",
   slug: "fetch-pull-push",
   chapter: "git-0",
-  order: 11,
+  order: 16,
   title: "Fetch, Pull & Push",
   subtitle: "Syncing with the remote",
   tags: ["git", "fetch", "pull", "push", "sync"],
@@ -104,47 +104,55 @@ const lesson = {
     },
   ],
 
-  assessment: {
-    questions: [
-      {
-        id: "git0-011-q1",
-        type: "choice",
-        text: "What does `git fetch` do to your working files?",
-        options: [
-          "Updates them to match the remote",
-          "Nothing — it only updates remote-tracking branches",
-          "Stages all remote changes for commit",
-          "Creates new local branches for each remote branch",
-        ],
-        answer: "Nothing — it only updates remote-tracking branches",
-      },
-      {
-        id: "git0-011-q2",
-        type: "choice",
-        text: "Your `git push` is rejected with 'non-fast-forward'. This means:",
-        options: [
-          "Your local commits have a syntax error",
-          "You don't have permission to push",
-          "The remote has commits you don't have locally",
-          "Your branch is behind by more than 100 commits",
-        ],
-        answer: "The remote has commits you don't have locally",
-      },
-      {
-        id: "git0-011-q3",
-        type: "choice",
-        text: "`git pull --rebase` differs from `git pull` because it:",
-        options: [
-          "Downloads changes faster",
-          "Rebases your commits on top of remote commits instead of creating a merge commit",
-          "Pulls all branches, not just the current one",
-          "Automatically resolves conflicts",
-        ],
-        answer:
-          "Rebases your commits on top of remote commits instead of creating a merge commit",
-      },
-    ],
-  },
+  quiz: [
+    {
+      id: "git0-016-q1",
+      type: "choice",
+      text: "What does `git fetch` do to your working files?",
+      options: [
+        "Updates them to match the remote",
+        "Nothing — it only updates remote-tracking branches",
+        "Stages all remote changes for commit",
+        "Creates new local branches for each remote branch",
+      ],
+      answer: "Nothing — it only updates remote-tracking branches",
+      hints: ["Fetch is always read-only. It downloads data but never modifies your local branches or files."],
+    },
+    {
+      id: "git0-016-q2",
+      type: "choice",
+      text: "Your `git push` is rejected with 'non-fast-forward'. This means:",
+      options: [
+        "Your local commits have a syntax error",
+        "You don't have permission to push",
+        "The remote has commits you don't have locally",
+        "Your branch is behind by more than 100 commits",
+      ],
+      answer: "The remote has commits you don't have locally",
+      hints: ["For a push to succeed, the remote must be a linear ancestor of your local branch. What breaks that?"],
+    },
+    {
+      id: "git0-016-q3",
+      type: "choice",
+      text: "`git pull --rebase` differs from `git pull` because it:",
+      options: [
+        "Downloads changes faster",
+        "Rebases your commits on top of remote commits instead of creating a merge commit",
+        "Pulls all branches, not just the current one",
+        "Automatically resolves conflicts",
+      ],
+      answer:
+        "Rebases your commits on top of remote commits instead of creating a merge commit",
+      hints: ["The difference is in how your local commits get integrated — merge creates a new commit, rebase moves them."],
+    },
+  ],
+
+  definitions: [
+    { term: "git fetch", definition: "Downloads new commits and updates remote-tracking branches without touching your working files or local branches. Always safe." },
+    { term: "non-fast-forward", definition: "A push rejection error meaning the remote has commits your local branch doesn't — you must pull (or fetch + merge) first." },
+    { term: "git pull --rebase", definition: "Fetches remote commits then rebases your local commits on top of them, keeping history linear instead of creating a merge commit." },
+    { term: "--force-with-lease", definition: "A safer alternative to `--force` that rejects a force push if someone else has pushed to the remote since your last fetch." },
+  ],
 };
 
 export default lesson;

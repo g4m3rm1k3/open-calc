@@ -111,7 +111,8 @@ const DIGITAL_FUNDAMENTALS_CURRICULUM = digitalFundamentals.map((ch) => ({
 const CNC_CURRICULUM = [cnc1].map((ch) => ({ ...ch, course: "cnc-logic" }));
 // git-0 migrated to lessons/ — auto-loaded by getAllAutoChapters()
 const GIT0_CURRICULUM = [];
-const CLI0_CURRICULUM = [cli0].map((ch) => ({ ...ch, course: "cli-0" }));
+// cli-0 migrated to lessons/ — auto-loaded by getAllAutoChapters()
+const CLI0_CURRICULUM = [];
 const CPP0_CURRICULUM = [cpp0].map((ch) => ({ ...ch, course: "cpp" }));
 const CPP1_CURRICULUM = [cpp1].map((ch) => ({ ...ch, course: "cpp" }));
 const CPP2_CURRICULUM = [cpp2].map((ch) => ({ ...ch, course: "cpp" }));

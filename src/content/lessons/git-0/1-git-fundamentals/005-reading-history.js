@@ -103,46 +103,54 @@ const lesson = {
     },
   ],
 
-  assessment: {
-    questions: [
-      {
-        id: "git0-005-q1",
-        type: "choice",
-        text: "You have commits 1, 2, 3, 4, 5. You check out commit 3. What happens to commits 4 and 5?",
-        options: [
-          "They are deleted permanently",
-          "They are hidden until you run git restore",
-          "They still exist — you are just visiting commit 3",
-          "They are moved to a temporary branch",
-        ],
-        answer: "They still exist — you are just visiting commit 3",
-      },
-      {
-        id: "git0-005-q2",
-        type: "choice",
-        text: "What does `git log --oneline` show?",
-        options: [
-          "The full diff of every commit",
-          "A one-line-per-commit list with short hash and message",
-          "Only the most recent commit",
-          "All files currently in the working directory",
-        ],
-        answer: "A one-line-per-commit list with short hash and message",
-      },
-      {
-        id: "git0-005-q3",
-        type: "choice",
-        text: "What is HEAD in Git?",
-        options: [
-          "The first commit ever made in the repository",
-          "A pointer to wherever you currently are in history",
-          "The name of the default branch",
-          "The author of the most recent commit",
-        ],
-        answer: "A pointer to wherever you currently are in history",
-      },
-    ],
-  },
+  quiz: [
+    {
+      id: "git0-005-q1",
+      type: "choice",
+      text: "You have commits 1, 2, 3, 4, 5. You check out commit 3. What happens to commits 4 and 5?",
+      options: [
+        "They are deleted permanently",
+        "They are hidden until you run git restore",
+        "They still exist — you are just visiting commit 3",
+        "They are moved to a temporary branch",
+      ],
+      answer: "They still exist — you are just visiting commit 3",
+      hints: ["Commits are immutable objects. Does checking out a past commit change the object store?"],
+    },
+    {
+      id: "git0-005-q2",
+      type: "choice",
+      text: "What does `git log --oneline` show?",
+      options: [
+        "The full diff of every commit",
+        "A one-line-per-commit list with short hash and message",
+        "Only the most recent commit",
+        "All files currently in the working directory",
+      ],
+      answer: "A one-line-per-commit list with short hash and message",
+      hints: ["The flag name is a hint: one line per entry."],
+    },
+    {
+      id: "git0-005-q3",
+      type: "choice",
+      text: "What is HEAD in Git?",
+      options: [
+        "The first commit ever made in the repository",
+        "A pointer to wherever you currently are in history",
+        "The name of the default branch",
+        "The author of the most recent commit",
+      ],
+      answer: "A pointer to wherever you currently are in history",
+      hints: ["HEAD moves whenever you checkout a different commit or branch. What does it always track?"],
+    },
+  ],
+
+  definitions: [
+    { term: "git log", definition: "The command that prints the project's commit history. `--oneline` shows one line per commit: short hash + message." },
+    { term: "short hash", definition: "The first 7-8 characters of a SHA-1 hash — enough to uniquely identify a commit in most projects." },
+    { term: "detached HEAD", definition: "State where HEAD points directly to a commit hash instead of a branch name. New commits may become unreachable." },
+    { term: "git checkout", definition: "A command used to switch branches, restore files, or inspect past commits by hash." },
+  ],
 };
 
 export default lesson;

@@ -1,8 +1,8 @@
 const lesson = {
-  id: "git-0-007",
+  id: "git-0-008",
   slug: "branches",
   chapter: "git-0",
-  order: 7,
+  order: 8,
   title: "Branches",
   subtitle: "Parallel lines of development",
   tags: ["git", "branch", "switch", "checkout"],
@@ -57,46 +57,53 @@ const lesson = {
     },
   ],
 
-  assessment: {
-    questions: [
-      {
-        id: "git0-007-q1",
-        type: "choice",
-        text: "What does `git switch -c feature/nav` do?",
-        options: [
-          "Switches to an existing branch called feature/nav",
-          "Creates a branch called feature/nav and switches to it",
-          "Copies the current branch into feature/nav",
-          "Connects to a remote called feature/nav",
-        ],
-        answer: "Creates a branch called feature/nav and switches to it",
-      },
-      {
-        id: "git0-007-q2",
-        type: "choice",
-        text: "A Git branch is fundamentally:",
-        options: [
-          "A copy of all files at a point in time",
-          "A folder containing the branch's commits",
-          "A pointer (file with a commit hash) to a commit",
-          "A compressed archive of the working directory",
-        ],
-        answer: "A pointer (file with a commit hash) to a commit",
-      },
-      {
-        id: "git0-007-q3",
-        type: "choice",
-        text: "You're in 'detached HEAD' state. What should you do before making commits?",
-        options: [
-          "Nothing — commits in detached HEAD are saved automatically",
-          "Run `git attach HEAD`",
-          "Run `git switch -c new-branch-name` to create a branch",
-          "Run `git commit --attach` to re-attach",
-        ],
-        answer: "Run `git switch -c new-branch-name` to create a branch",
-      },
-    ],
-  },
+  quiz: [
+    {
+      id: "git0-008-q1",
+      type: "choice",
+      text: "What does `git switch -c feature/nav` do?",
+      options: [
+        "Switches to an existing branch called feature/nav",
+        "Creates a branch called feature/nav and switches to it",
+        "Copies the current branch into feature/nav",
+        "Connects to a remote called feature/nav",
+      ],
+      answer: "Creates a branch called feature/nav and switches to it",
+      hints: ["The `-c` flag means 'create'. `switch` moves to it."],
+    },
+    {
+      id: "git0-008-q2",
+      type: "choice",
+      text: "A Git branch is fundamentally:",
+      options: [
+        "A copy of all files at a point in time",
+        "A folder containing the branch's commits",
+        "A pointer (file with a commit hash) to a commit",
+        "A compressed archive of the working directory",
+      ],
+      answer: "A pointer (file with a commit hash) to a commit",
+      hints: ["Look at `.git/refs/heads/main` — what's inside that file?"],
+    },
+    {
+      id: "git0-008-q3",
+      type: "choice",
+      text: "You're in 'detached HEAD' state. What should you do before making commits?",
+      options: [
+        "Nothing — commits in detached HEAD are saved automatically",
+        "Run `git attach HEAD`",
+        "Run `git switch -c new-branch-name` to create a branch",
+        "Run `git commit --attach` to re-attach",
+      ],
+      answer: "Run `git switch -c new-branch-name` to create a branch",
+      hints: ["In detached HEAD, no branch label moves with your commits. What do you need to add?"],
+    },
+  ],
+
+  definitions: [
+    { term: "git switch", definition: "Modern command for changing branches: `git switch name` to move to an existing branch, `git switch -c name` to create and switch." },
+    { term: "detached HEAD", definition: "State where HEAD points directly to a commit hash instead of a branch. Commits made here are not on any branch and may be lost." },
+    { term: "git branch -d", definition: "Deletes a branch that has been fully merged. Use `-D` to force-delete even if unmerged." },
+  ],
 };
 
 export default lesson;

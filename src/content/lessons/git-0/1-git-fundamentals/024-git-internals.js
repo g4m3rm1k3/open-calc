@@ -1,8 +1,8 @@
 const lesson = {
-  id: "git-0-019",
+  id: "git-0-024",
   slug: "git-internals",
   chapter: "git-0",
-  order: 19,
+  order: 24,
   title: "Git Internals",
   subtitle: "What's actually happening inside .git/",
   tags: [
@@ -119,47 +119,57 @@ const lesson = {
     },
   ],
 
-  assessment: {
-    questions: [
-      {
-        id: "git0-019-q1",
-        type: "choice",
-        text: "A Git blob stores:",
-        options: [
-          "A filename and its contents",
-          "Raw file content only — no filename or permissions",
-          "A directory listing",
-          "A commit message and timestamp",
-        ],
-        answer: "Raw file content only — no filename or permissions",
-      },
-      {
-        id: "git0-019-q2",
-        type: "choice",
-        text: "You ran `git reset --hard` and lost some commits. How do you recover them?",
-        options: [
-          "They are gone forever — hard reset is permanent",
-          "Use `git revert` on the reset commit",
-          "Use `git reflog` to find the commit hash, then create a branch pointing to it",
-          "Use `git stash pop` to restore them",
-        ],
-        answer:
-          "Use `git reflog` to find the commit hash, then create a branch pointing to it",
-      },
-      {
-        id: "git0-019-q3",
-        type: "choice",
-        text: "Two different files with identical content will have:",
-        options: [
-          "Two different blob objects",
-          "One shared blob object (same hash, same content)",
-          "One tree object containing both",
-          "Two commits pointing to different trees",
-        ],
-        answer: "One shared blob object (same hash, same content)",
-      },
-    ],
-  },
+  quiz: [
+    {
+      id: "git0-024-q1",
+      type: "choice",
+      text: "A Git blob stores:",
+      options: [
+        "A filename and its contents",
+        "Raw file content only — no filename or permissions",
+        "A directory listing",
+        "A commit message and timestamp",
+      ],
+      answer: "Raw file content only — no filename or permissions",
+      hints: ["Filenames and paths are stored in the tree object, not the blob. The blob is just bytes."],
+    },
+    {
+      id: "git0-024-q2",
+      type: "choice",
+      text: "You ran `git reset --hard` and lost some commits. How do you recover them?",
+      options: [
+        "They are gone forever — hard reset is permanent",
+        "Use `git revert` on the reset commit",
+        "Use `git reflog` to find the commit hash, then create a branch pointing to it",
+        "Use `git stash pop` to restore them",
+      ],
+      answer:
+        "Use `git reflog` to find the commit hash, then create a branch pointing to it",
+      hints: ["The object store still has the commits — only the branch pointer moved. Where can you find the old hash?"],
+    },
+    {
+      id: "git0-024-q3",
+      type: "choice",
+      text: "Two different files with identical content will have:",
+      options: [
+        "Two different blob objects",
+        "One shared blob object (same hash, same content)",
+        "One tree object containing both",
+        "Two commits pointing to different trees",
+      ],
+      answer: "One shared blob object (same hash, same content)",
+      hints: ["Objects are content-addressed. Same bytes = same hash = same object. Git never duplicates identical content."],
+    },
+  ],
+
+  definitions: [
+    { term: "blob", definition: "A Git object storing raw file content only — no filename or directory info. The same content always produces the same blob hash." },
+    { term: "tree (git object)", definition: "A Git object representing a directory — lists filenames, permissions, and the hashes of child blobs and subtrees." },
+    { term: "commit object", definition: "A Git object containing a tree hash, parent commit hash, author, committer, and message. Everything in Git history is a chain of these." },
+    { term: "content-addressed storage", definition: "Git's storage model: every object's name is the SHA-1 hash of its content. Identical content always produces the same hash and is stored once." },
+    { term: "reflog", definition: "A local-only log of every position HEAD has pointed to. Used to recover commits after resets or rebases that made them unreachable." },
+    { term: "pack file", definition: "A compressed binary file in `.git/objects/` storing many Git objects with delta compression. Created automatically over time to save space." },
+  ],
 };
 
 export default lesson;

@@ -1,8 +1,8 @@
 const lesson = {
-  id: "git-0-015",
+  id: "git-0-020",
   slug: "stashing",
   chapter: "git-0",
-  order: 15,
+  order: 20,
   title: "Stashing Work",
   subtitle: "Set it aside and come back later",
   tags: ["git", "stash", "wip", "context-switch"],
@@ -104,48 +104,56 @@ const lesson = {
     },
   ],
 
-  assessment: {
-    questions: [
-      {
-        id: "git0-015-q1",
-        type: "choice",
-        text: "You run `git stash`. What happens to your working directory?",
-        options: [
-          "Changes are committed to a temp branch",
-          "Changes are backed up to the cloud",
-          "Modified tracked files and staged changes are saved, and the working tree is cleaned to HEAD",
-          "All files including untracked ones are deleted",
-        ],
-        answer:
-          "Modified tracked files and staged changes are saved, and the working tree is cleaned to HEAD",
-      },
-      {
-        id: "git0-015-q2",
-        type: "choice",
-        text: "`git stash pop` vs `git stash apply` — the difference is:",
-        options: [
-          "Pop works on the most recent; apply requires a specific stash number",
-          "Pop applies and removes the stash entry; apply applies but keeps the entry",
-          "Apply applies to the current branch; pop applies to main",
-          "They are identical",
-        ],
-        answer:
-          "Pop applies and removes the stash entry; apply applies but keeps the entry",
-      },
-      {
-        id: "git0-015-q3",
-        type: "choice",
-        text: "You have new files (untracked) that you want to include in the stash. What flag do you use?",
-        options: [
-          "`git stash --tracked`",
-          "`git stash -n`",
-          "`git stash -u`",
-          "`git stash --new`",
-        ],
-        answer: "`git stash -u`",
-      },
-    ],
-  },
+  quiz: [
+    {
+      id: "git0-020-q1",
+      type: "choice",
+      text: "You run `git stash`. What happens to your working directory?",
+      options: [
+        "Changes are committed to a temp branch",
+        "Changes are backed up to the cloud",
+        "Modified tracked files and staged changes are saved, and the working tree is cleaned to HEAD",
+        "All files including untracked ones are deleted",
+      ],
+      answer:
+        "Modified tracked files and staged changes are saved, and the working tree is cleaned to HEAD",
+      hints: ["Stash saves your WIP and gives you a clean working tree — like pressing pause."],
+    },
+    {
+      id: "git0-020-q2",
+      type: "choice",
+      text: "`git stash pop` vs `git stash apply` — the difference is:",
+      options: [
+        "Pop works on the most recent; apply requires a specific stash number",
+        "Pop applies and removes the stash entry; apply applies but keeps the entry",
+        "Apply applies to the current branch; pop applies to main",
+        "They are identical",
+      ],
+      answer:
+        "Pop applies and removes the stash entry; apply applies but keeps the entry",
+      hints: ["Think of a stack: pop removes the top element after reading it; apply reads without removing."],
+    },
+    {
+      id: "git0-020-q3",
+      type: "choice",
+      text: "You have new files (untracked) that you want to include in the stash. What flag do you use?",
+      options: [
+        "`git stash --tracked`",
+        "`git stash -n`",
+        "`git stash -u`",
+        "`git stash --new`",
+      ],
+      answer: "`git stash -u`",
+      hints: ["The flag includes untracked files. `-u` is short for `--include-untracked`."],
+    },
+  ],
+
+  definitions: [
+    { term: "stash", definition: "A temporary storage area for uncommitted changes. `git stash push` saves them and cleans the working tree; `git stash pop` restores them." },
+    { term: "stash stack", definition: "The ordered list of saved stashes. `stash@{0}` is the most recent; older stashes are `stash@{1}`, `stash@{2}`, etc." },
+    { term: "git stash pop", definition: "Restores the most recent stash to the working directory and removes it from the stash stack." },
+    { term: "git stash apply", definition: "Restores a stash without removing it from the stack — useful when you want to apply the same stash to multiple branches." },
+  ],
 };
 
 export default lesson;

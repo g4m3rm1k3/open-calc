@@ -1,8 +1,8 @@
 const lesson = {
-  id: "git-0-009",
+  id: "git-0-012",
   slug: "merge-conflicts",
   chapter: "git-0",
-  order: 9,
+  order: 12,
   title: "Merge Conflicts",
   subtitle: "When Git can't decide — and you have to",
   tags: ["git", "conflicts", "merge", "resolve"],
@@ -57,46 +57,53 @@ const lesson = {
     },
   ],
 
-  assessment: {
-    questions: [
-      {
-        id: "git0-009-q1",
-        type: "choice",
-        text: "A conflict occurs when:",
-        options: [
-          "Two branches modified different files",
-          "Two branches modified the same lines in the same file",
-          "The feature branch is ahead of main",
-          "You forgot to `git add` before merging",
-        ],
-        answer: "Two branches modified the same lines in the same file",
-      },
-      {
-        id: "git0-009-q2",
-        type: "choice",
-        text: "After manually editing a conflict and removing all markers, what is the next step?",
-        options: [
-          "`git merge --continue`",
-          "`git resolve filename`",
-          "`git add filename`, then `git commit`",
-          "`git push` to sync",
-        ],
-        answer: "`git add filename`, then `git commit`",
-      },
-      {
-        id: "git0-009-q3",
-        type: "choice",
-        text: "How do you cancel a merge that's in progress and return to the pre-merge state?",
-        options: [
-          "`git merge --undo`",
-          "`git reset HEAD`",
-          "`git merge --abort`",
-          "`git checkout main`",
-        ],
-        answer: "`git merge --abort`",
-      },
-    ],
-  },
+  quiz: [
+    {
+      id: "git0-012-q1",
+      type: "choice",
+      text: "A conflict occurs when:",
+      options: [
+        "Two branches modified different files",
+        "Two branches modified the same lines in the same file",
+        "The feature branch is ahead of main",
+        "You forgot to `git add` before merging",
+      ],
+      answer: "Two branches modified the same lines in the same file",
+      hints: ["Git can auto-merge non-overlapping changes. It only stops when it can't decide which version is 'right'."],
+    },
+    {
+      id: "git0-012-q2",
+      type: "choice",
+      text: "After manually editing a conflict and removing all markers, what is the next step?",
+      options: [
+        "`git merge --continue`",
+        "`git resolve filename`",
+        "`git add filename`, then `git commit`",
+        "`git push` to sync",
+      ],
+      answer: "`git add filename`, then `git commit`",
+      hints: ["Staging a file tells Git 'I've resolved this'. Then committing finalizes the merge."],
+    },
+    {
+      id: "git0-012-q3",
+      type: "choice",
+      text: "How do you cancel a merge that's in progress and return to the pre-merge state?",
+      options: [
+        "`git merge --undo`",
+        "`git reset HEAD`",
+        "`git merge --abort`",
+        "`git checkout main`",
+      ],
+      answer: "`git merge --abort`",
+      hints: ["This is the escape hatch — it puts everything back to before `git merge` was run."],
+    },
+  ],
+
+  definitions: [
+    { term: "conflict resolution", definition: "The process of editing conflict-marked files to their correct final state, removing all markers, then staging and committing to complete the merge." },
+    { term: "diff3 style", definition: "An optional conflict marker style (`git config merge.conflictstyle diff3`) that adds a third section showing the common ancestor's version for extra context." },
+    { term: "unmerged path", definition: "A file shown in `git status` as conflicted and awaiting resolution during an in-progress merge." },
+  ],
 };
 
 export default lesson;

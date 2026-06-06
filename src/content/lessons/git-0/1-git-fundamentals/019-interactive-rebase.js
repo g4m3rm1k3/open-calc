@@ -1,8 +1,8 @@
 const lesson = {
-  id: "git-0-014",
+  id: "git-0-019",
   slug: "interactive-rebase",
   chapter: "git-0",
-  order: 14,
+  order: 19,
   title: "Interactive Rebase",
   subtitle: "Rewriting commit history precisely",
   tags: ["git", "rebase", "interactive", "squash", "fixup", "amend"],
@@ -109,42 +109,51 @@ const lesson = {
     },
   ],
 
-  assessment: {
-    questions: [
-      {
-        id: "git0-014-q1",
-        type: "choice",
-        text: "In interactive rebase, `fixup` differs from `squash` because:",
-        options: [
-          "Fixup combines with the commit below, squash with the one above",
-          "Fixup discards the commit message; squash prompts you to combine messages",
-          "Fixup only works on the last commit; squash works on any",
-          "They are identical commands",
-        ],
-        answer:
-          "Fixup discards the commit message; squash prompts you to combine messages",
-      },
-      {
-        id: "git0-014-q2",
-        type: "choice",
-        text: "In a `git rebase -i` editor, the commit list is ordered:",
-        options: [
-          "Newest first (bottom = oldest)",
-          "Oldest first (top = oldest)",
-          "Alphabetically by commit message",
-          "By file size of changes",
-        ],
-        answer: "Oldest first (top = oldest)",
-      },
-      {
-        id: "git0-014-q3",
-        type: "choice",
-        text: "You want to split one large commit into two smaller ones. What's the interactive rebase command for that commit?",
-        options: ["`squash`", "`split`", "`edit`", "`reword`"],
-        answer: "`edit`",
-      },
-    ],
-  },
+  quiz: [
+    {
+      id: "git0-019-q1",
+      type: "choice",
+      text: "In interactive rebase, `fixup` differs from `squash` because:",
+      options: [
+        "Fixup combines with the commit below, squash with the one above",
+        "Fixup discards the commit message; squash prompts you to combine messages",
+        "Fixup only works on the last commit; squash works on any",
+        "They are identical commands",
+      ],
+      answer:
+        "Fixup discards the commit message; squash prompts you to combine messages",
+      hints: ["Both combine commits. The difference is what happens to the message of the commit being folded in."],
+    },
+    {
+      id: "git0-019-q2",
+      type: "choice",
+      text: "In a `git rebase -i` editor, the commit list is ordered:",
+      options: [
+        "Newest first (bottom = oldest)",
+        "Oldest first (top = oldest)",
+        "Alphabetically by commit message",
+        "By file size of changes",
+      ],
+      answer: "Oldest first (top = oldest)",
+      hints: ["The first commit in the list is the one Git will replay first. Which end of the chain is that?"],
+    },
+    {
+      id: "git0-019-q3",
+      type: "choice",
+      text: "You want to split one large commit into two smaller ones. What's the interactive rebase command for that commit?",
+      options: ["`squash`", "`split`", "`edit`", "`reword`"],
+      answer: "`edit`",
+      hints: ["`edit` pauses at that commit so you can reset and re-commit in multiple pieces."],
+    },
+  ],
+
+  definitions: [
+    { term: "interactive rebase", definition: "`git rebase -i HEAD~N` — opens an editor listing the last N commits so you can reorder, squash, edit, or drop them." },
+    { term: "squash (rebase)", definition: "Combines a commit with the one above it, merging both messages into one. Used to clean up messy WIP commits before merging." },
+    { term: "fixup", definition: "Like squash but silently discards the folded commit's message, keeping only the message of the commit above." },
+    { term: "reword", definition: "An interactive rebase command that keeps a commit's changes unchanged but opens an editor to revise its message." },
+    { term: "drop", definition: "An interactive rebase command that deletes a commit entirely, as if it never happened." },
+  ],
 };
 
 export default lesson;

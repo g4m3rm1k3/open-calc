@@ -1,8 +1,8 @@
 const lesson = {
-  id: "git-0-008",
+  id: "git-0-011",
   slug: "the-conflict-zone",
   chapter: "git-0",
-  order: 8,
+  order: 11,
   title: "Merge Conflicts",
   subtitle: "When two branches change the same thing",
   tags: ["git", "merge conflict", "conflict resolution", "fundamentals"],
@@ -75,47 +75,55 @@ const lesson = {
     },
   ],
 
-  assessment: {
-    questions: [
-      {
-        id: "git0-008-q1",
-        type: "choice",
-        text: "After a merge conflict, what must you do before you can complete the merge?",
-        options: [
-          "Run `git merge --force` to override the conflict",
-          "Delete both branches and start over",
-          "Edit the conflicting file(s) to remove markers, stage them, and commit",
-          "Run `git pull` to fetch the correct version",
-        ],
-        answer:
-          "Edit the conflicting file(s) to remove markers, stage them, and commit",
-      },
-      {
-        id: "git0-008-q2",
-        type: "choice",
-        text: "In a conflict marker block, what does the section between `=======` and `>>>>>>>` contain?",
-        options: [
-          "The version from your current branch (HEAD)",
-          "The version from the branch you are merging in",
-          "The version from the common ancestor commit",
-          "The combined version Git recommends",
-        ],
-        answer: "The version from the branch you are merging in",
-      },
-      {
-        id: "git0-008-q3",
-        type: "choice",
-        text: "What does `git merge --abort` do?",
-        options: [
-          "Commits the conflict markers as-is",
-          "Deletes all uncommitted changes",
-          "Returns everything to the state before `git merge` was run",
-          "Forces a merge ignoring all conflicts",
-        ],
-        answer: "Returns everything to the state before `git merge` was run",
-      },
-    ],
-  },
+  quiz: [
+    {
+      id: "git0-011-q1",
+      type: "choice",
+      text: "After a merge conflict, what must you do before you can complete the merge?",
+      options: [
+        "Run `git merge --force` to override the conflict",
+        "Delete both branches and start over",
+        "Edit the conflicting file(s) to remove markers, stage them, and commit",
+        "Run `git pull` to fetch the correct version",
+      ],
+      answer:
+        "Edit the conflicting file(s) to remove markers, stage them, and commit",
+      hints: ["Conflict markers are left for you to resolve. What's the three-step process after resolving?"],
+    },
+    {
+      id: "git0-011-q2",
+      type: "choice",
+      text: "In a conflict marker block, what does the section between `=======` and `>>>>>>>` contain?",
+      options: [
+        "The version from your current branch (HEAD)",
+        "The version from the branch you are merging in",
+        "The version from the common ancestor commit",
+        "The combined version Git recommends",
+      ],
+      answer: "The version from the branch you are merging in",
+      hints: ["The `>>>>>>>` line shows the name of the branch being merged in. The content above it is that branch's version."],
+    },
+    {
+      id: "git0-011-q3",
+      type: "choice",
+      text: "What does `git merge --abort` do?",
+      options: [
+        "Commits the conflict markers as-is",
+        "Deletes all uncommitted changes",
+        "Returns everything to the state before `git merge` was run",
+        "Forces a merge ignoring all conflicts",
+      ],
+      answer: "Returns everything to the state before `git merge` was run",
+      hints: ["It's a reset button for the merge. No history is written."],
+    },
+  ],
+
+  definitions: [
+    { term: "conflict marker", definition: "One of three special lines Git inserts during a merge conflict: `<<<<<<<` (start), `=======` (separator), `>>>>>>>` (end). All must be removed when resolving." },
+    { term: "incoming change", definition: "The version from the branch being merged in, shown between `=======` and `>>>>>>>` in conflict markers." },
+    { term: "git merge --abort", definition: "Cancels an in-progress merge and restores the working directory to its pre-merge state." },
+    { term: "three-way merge", definition: "The algorithm Git uses to combine two branches by comparing both tips against their common ancestor. Conflicts occur only when both branches changed the same lines." },
+  ],
 };
 
 export default lesson;

@@ -21,6 +21,7 @@ import FirstPrinciplesLesson from "./FirstPrinciplesLesson.jsx";
 import GuidedWalkthrough from "./GuidedWalkthrough.jsx";
 import UnifiedLearningDock from "./UnifiedLearningDock.jsx";
 import AssessmentBlock from "./AssessmentBlock.jsx";
+import LessonQuizBlock from "./LessonQuizBlock.jsx";
 import MarkdownProse from "../math/MarkdownProse.jsx";
 import KatexBlock from "../math/KatexBlock.jsx";
 import { parseProse } from "../math/parseProse.jsx";
@@ -567,12 +568,16 @@ export default function MobileLessonContent({ lesson }) {
         );
       })()}
 
-      {/* ── Assessment ────────────────────────────────────────────── */}
-      {lesson.assessment?.questions?.length > 0 && (
-        <div className="px-4 pb-4">
-          <AssessmentBlock assessment={lesson.assessment} />
-        </div>
-      )}
+      {/* ── Quiz / Assessment ─────────────────────────────────────── */}
+      {(() => {
+        const questions = lesson.quiz ?? lesson.assessment?.questions;
+        if (!questions?.length) return null;
+        // Use LessonQuizBlock (stars + score) when available, fall back to AssessmentBlock
+        if (lesson.quiz?.length) {
+          return <div className="px-4 pb-4"><LessonQuizBlock lessonId={lesson.id} questions={questions} /></div>;
+        }
+        return <div className="px-4 pb-4"><AssessmentBlock assessment={lesson.assessment} /></div>;
+      })()}
 
       {/* Bottom breathing room — must clear fixed bottom nav (h-14 + bottom-6 = ~80px) */}
       <div className="h-24" />

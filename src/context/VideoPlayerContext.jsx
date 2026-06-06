@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { VideoPlayerContext } from "./videoPlayerContext.js";
 import { selectVideosByKeywords } from "../content/videos/videoSelector.js";
+import { getVideosForCourse } from "../content/autoLoader.js";
 import { ALL_LESSONS } from "../content/index.js";
 
 export function VideoPlayerProvider({ children }) {
@@ -8,6 +9,7 @@ export function VideoPlayerProvider({ children }) {
   const [isMinimized, setIsMinimized] = useState(true);
   const [currentVideo, setCurrentVideo] = useState(null);
   const [lessonId, setLessonId] = useState(null);
+  const [courseVideos, setCourseVideos] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [pinnedVideos, setPinnedVideos] = useState(() => {
     const saved = localStorage.getItem("open-calc-pinned-videos");
@@ -90,16 +92,29 @@ export function VideoPlayerProvider({ children }) {
     [lessonId],
   );
 
-  // Sync current video from map when lessonId changes
+  // Sync current video when lessonId changes
   useEffect(() => {
     if (!lessonId) return;
+
+    const lesson = ALL_LESSONS.find((l) => l.id === lessonId);
+    const courseId = lesson?.course ?? null;
+
+    // Course-specific videos take priority over keyword search
+    const vids = courseId ? getVideosForCourse(courseId) : [];
+    setCourseVideos(vids);
+
     const custom = customVideos[lessonId] || [];
     if (custom.length > 0) {
       setCurrentVideo(custom[0]);
       return;
     }
 
-    const lesson = ALL_LESSONS.find((l) => l.id === lessonId);
+    if (vids.length > 0) {
+      setCurrentVideo(vids[0]);
+      return;
+    }
+
+    // Fall back to keyword search for courses without dedicated videos
     const tags = lesson?.tags ?? [];
     const courseWords = (lesson?.course ?? '').replace(/-\d+$/, '').split('-').filter(Boolean);
     const keywords = [...new Set([...tags, ...courseWords])];
@@ -121,6 +136,7 @@ export function VideoPlayerProvider({ children }) {
         isMinimized,
         currentVideo,
         lessonId,
+        courseVideos,
         searchQuery,
         setSearchQuery,
         customVideos,

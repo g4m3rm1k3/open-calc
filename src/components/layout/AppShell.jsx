@@ -27,6 +27,7 @@ import {
   Layers,
   Search,
   BookOpen,
+  BookMarked,
   Menu,
   X,
   Calculator,
@@ -65,6 +66,7 @@ import PhysicsPage from "../../pages/PhysicsPage.jsx";
 import DynamicBackground from "../ui/DynamicBackground.jsx";
 import BackgroundPicker from "../ui/BackgroundPicker.jsx";
 import AlphaMascot from "../mascot/AlphaMascot.jsx";
+import GlossaryPanel from "../glossary/GlossaryPanel.jsx";
 
 function MobileLocationBadge() {
   const { chapterId, lessonSlug } = useParams();
@@ -284,6 +286,8 @@ function TopBar({
   footballOpen,
   onChatToggle,
   chatOpen,
+  onGlossaryToggle,
+  glossaryOpen,
   onBgPickerToggle,
   dark,
   toggleDark,
@@ -488,6 +492,13 @@ function TopBar({
       <div className="flex items-center gap-2 border-l border-[var(--color-border)] pl-4 h-full">
         <ScoreWidget />
         <button
+          onClick={onGlossaryToggle}
+          className={`p-2.5 rounded-xl transition-all ${glossaryOpen ? "bg-brand-500 text-white shadow-lg shadow-brand-500/30" : "text-brand-500 hover:bg-brand-50 dark:hover:bg-brand-900/20"}`}
+          title="Glossary"
+        >
+          <BookMarked className="w-5 h-5" />
+        </button>
+        <button
           onClick={handleVideoToggle}
           className={`p-2.5 rounded-xl transition-all ${videoActive ? "bg-sky-500 text-white shadow-lg shadow-sky-500/30" : "text-sky-500 hover:bg-sky-50 dark:hover:bg-sky-900/20"}`}
           title="Video Academy"
@@ -658,6 +669,7 @@ export default function AppShell({ children }) {
   const [polyOpen, setPolyOpen] = useState(false);
   const [laOpen, setLAOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
+  const [glossaryOpen, setGlossaryOpen] = useState(false);
   const [scratchSnap, setScratchSnap] = useState(null);
   const [scratchSnapW, setScratchSnapW] = useState(680);
   const handleScratchSnap = useCallback((side, w) => {
@@ -904,6 +916,8 @@ export default function AppShell({ children }) {
             footballOpen={footballOpen}
             onChatToggle={() => setChatOpen((prev) => !prev)}
             chatOpen={chatOpen}
+            onGlossaryToggle={() => setGlossaryOpen((prev) => !prev)}
+            glossaryOpen={glossaryOpen}
             onBgPickerToggle={() => setBgPickerOpen((o) => !o)}
             dark={dark}
             toggleDark={toggleDark}
@@ -1279,6 +1293,7 @@ export default function AppShell({ children }) {
             </div>
           )}
 
+          {glossaryOpen && <GlossaryPanel onClose={() => setGlossaryOpen(false)} />}
           <AlphaMascot />
         </div>
       </GrapherContext.Provider>

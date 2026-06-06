@@ -1,8 +1,8 @@
 const lesson = {
-  id: "git-0-009",
+  id: "git-0-013",
   slug: "beyond-your-machine",
   chapter: "git-0",
-  order: 9,
+  order: 13,
   title: "Remotes",
   subtitle: "Your repository, everywhere",
   tags: ["git", "remote", "github", "push", "pull", "clone", "origin"],
@@ -83,47 +83,57 @@ const lesson = {
     },
   ],
 
-  assessment: {
-    questions: [
-      {
-        id: "git0-009-q1",
-        type: "choice",
-        text: "What does `git clone https://github.com/user/repo.git` do?",
-        options: [
-          "Downloads only the latest commit of the repository",
-          "Copies the entire repository — all history and branches — to your machine",
-          "Creates a new empty repository linked to that URL",
-          "Deletes your local repository and replaces it",
-        ],
-        answer:
-          "Copies the entire repository — all history and branches — to your machine",
-      },
-      {
-        id: "git0-009-q2",
-        type: "choice",
-        text: "What are the two operations that `git pull` performs internally?",
-        options: [
-          "git add + git commit",
-          "git checkout + git merge",
-          "git fetch + git merge",
-          "git clone + git push",
-        ],
-        answer: "git fetch + git merge",
-      },
-      {
-        id: "git0-009-q3",
-        type: "choice",
-        text: "You create a local branch `new-ui` and run `git push`. Git rejects it saying no upstream is configured. What command fixes this?",
-        options: [
-          "git remote add new-ui",
-          "git push --force",
-          "git push -u origin new-ui",
-          "git branch -u origin",
-        ],
-        answer: "git push -u origin new-ui",
-      },
-    ],
-  },
+  quiz: [
+    {
+      id: "git0-013-q1",
+      type: "choice",
+      text: "What does `git clone https://github.com/user/repo.git` do?",
+      options: [
+        "Downloads only the latest commit of the repository",
+        "Copies the entire repository — all history and branches — to your machine",
+        "Creates a new empty repository linked to that URL",
+        "Deletes your local repository and replaces it",
+      ],
+      answer:
+        "Copies the entire repository — all history and branches — to your machine",
+      hints: ["Clone downloads the full object store — every commit, every branch, all history."],
+    },
+    {
+      id: "git0-013-q2",
+      type: "choice",
+      text: "What are the two operations that `git pull` performs internally?",
+      options: [
+        "git add + git commit",
+        "git checkout + git merge",
+        "git fetch + git merge",
+        "git clone + git push",
+      ],
+      answer: "git fetch + git merge",
+      hints: ["Pull first downloads changes from the remote, then integrates them. What are those two steps individually?"],
+    },
+    {
+      id: "git0-013-q3",
+      type: "choice",
+      text: "You create a local branch `new-ui` and run `git push`. Git rejects it saying no upstream is configured. What command fixes this?",
+      options: [
+        "git remote add new-ui",
+        "git push --force",
+        "git push -u origin new-ui",
+        "git branch -u origin",
+      ],
+      answer: "git push -u origin new-ui",
+      hints: ["The `-u` flag sets the upstream tracking relationship on first push."],
+    },
+  ],
+
+  definitions: [
+    { term: "remote", definition: "A named reference to another copy of the repository, typically on GitHub, GitLab, or a company server." },
+    { term: "origin", definition: "The conventional name for the primary remote — usually the one the repository was cloned from." },
+    { term: "git push", definition: "Sends local commits to the remote repository. Fails if the remote has commits you don't have locally." },
+    { term: "git pull", definition: "Downloads remote commits (`git fetch`) and integrates them into the current branch (`git merge`). Two operations in one." },
+    { term: "git clone", definition: "Downloads a complete copy of a remote repository — all files, history, and branches — to your local machine." },
+    { term: "remote-tracking branch", definition: "A read-only local reference like `origin/main` showing where the remote's branch was at the last sync." },
+  ],
 };
 
 export default lesson;

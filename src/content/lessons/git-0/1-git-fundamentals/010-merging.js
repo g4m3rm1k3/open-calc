@@ -1,8 +1,8 @@
 const lesson = {
-  id: "git-0-008",
+  id: "git-0-010",
   slug: "merging",
   chapter: "git-0",
-  order: 8,
+  order: 10,
   title: "Merging",
   subtitle: "Bringing branches back together",
   tags: ["git", "merge", "fast-forward", "three-way-merge"],
@@ -57,46 +57,53 @@ const lesson = {
     },
   ],
 
-  assessment: {
-    questions: [
-      {
-        id: "git0-008-q1",
-        type: "choice",
-        text: "You're on main. You want to bring feature/nav into main. What do you run?",
-        options: [
-          "`git merge main feature/nav`",
-          "`git merge feature/nav`",
-          "`git switch feature/nav && git merge main`",
-          "`git pull feature/nav`",
-        ],
-        answer: "`git merge feature/nav`",
-      },
-      {
-        id: "git0-008-q2",
-        type: "choice",
-        text: "A fast-forward merge happens when:",
-        options: [
-          "The branches have conflicting changes",
-          "The target branch has no new commits since the feature branch was created",
-          "You use the `--fast` flag",
-          "Only one file was changed",
-        ],
-        answer: "The target branch has no new commits since the feature branch was created",
-      },
-      {
-        id: "git0-008-q3",
-        type: "choice",
-        text: "A merge commit is special because:",
-        options: [
-          "It contains all the changes from both branches combined",
-          "It has two parent commits instead of one",
-          "It automatically resolves all conflicts",
-          "It can only be created with the --merge flag",
-        ],
-        answer: "It has two parent commits instead of one",
-      },
-    ],
-  },
+  quiz: [
+    {
+      id: "git0-010-q1",
+      type: "choice",
+      text: "You're on main. You want to bring feature/nav into main. What do you run?",
+      options: [
+        "`git merge main feature/nav`",
+        "`git merge feature/nav`",
+        "`git switch feature/nav && git merge main`",
+        "`git pull feature/nav`",
+      ],
+      answer: "`git merge feature/nav`",
+      hints: ["You merge INTO the branch you're on. You're on main — so you name the source."],
+    },
+    {
+      id: "git0-010-q2",
+      type: "choice",
+      text: "A fast-forward merge happens when:",
+      options: [
+        "The branches have conflicting changes",
+        "The target branch has no new commits since the feature branch was created",
+        "You use the `--fast` flag",
+        "Only one file was changed",
+      ],
+      answer: "The target branch has no new commits since the feature branch was created",
+      hints: ["If main hasn't moved, there's nothing to 'combine' — Git just moves the pointer forward."],
+    },
+    {
+      id: "git0-010-q3",
+      type: "choice",
+      text: "A merge commit is special because:",
+      options: [
+        "It contains all the changes from both branches combined",
+        "It has two parent commits instead of one",
+        "It automatically resolves all conflicts",
+        "It can only be created with the --merge flag",
+      ],
+      answer: "It has two parent commits instead of one",
+      hints: ["Two branches converge at one point. How does a commit record which two lines it came from?"],
+    },
+  ],
+
+  definitions: [
+    { term: "merge base", definition: "The most recent common ancestor commit of two branches — the reference point Git uses for a three-way merge." },
+    { term: "squash merge", definition: "`git merge --squash` collapses all commits from the source branch into staged changes without creating a merge commit. You then write one clean commit." },
+    { term: "merge strategy", definition: "The algorithm Git uses to combine branches. The default `recursive` strategy handles renames and multiple common ancestors." },
+  ],
 };
 
 export default lesson;

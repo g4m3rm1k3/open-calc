@@ -99,47 +99,56 @@ const lesson = {
     },
   ],
 
-  assessment: {
-    questions: [
-      {
-        id: "git0-003-q1",
-        type: "choice",
-        text: "You edit controls.txt but do NOT run git add. Which zone is the change in?",
-        options: [
-          "The repository",
-          "The staging area",
-          "The working directory only",
-          "It has been committed automatically",
-        ],
-        answer: "The working directory only",
-      },
-      {
-        id: "git0-003-q2",
-        type: "choice",
-        text: "Why does the staging area exist?",
-        options: [
-          "Git requires it for security reasons",
-          "So you can choose exactly which changes to include in a commit",
-          "It compresses files before storing them",
-          "It backs up your files to the cloud",
-        ],
-        answer:
-          "So you can choose exactly which changes to include in a commit",
-      },
-      {
-        id: "git0-003-q3",
-        type: "choice",
-        text: "You run git add game-design.txt and then keep editing the file. What does the commit include?",
-        options: [
-          "The version of the file at the time you ran git add",
-          "The latest version you saved after git add",
-          "Both versions as separate entries",
-          "Neither — you must git add again after every edit",
-        ],
-        answer: "The version of the file at the time you ran git add",
-      },
-    ],
-  },
+  quiz: [
+    {
+      id: "git0-003-q1",
+      type: "choice",
+      text: "You edit controls.txt but do NOT run git add. Which zone is the change in?",
+      options: [
+        "The repository",
+        "The staging area",
+        "The working directory only",
+        "It has been committed automatically",
+      ],
+      answer: "The working directory only",
+      hints: ["git add is the action that moves changes from the working directory. Has that happened?"],
+    },
+    {
+      id: "git0-003-q2",
+      type: "choice",
+      text: "Why does the staging area exist?",
+      options: [
+        "Git requires it for security reasons",
+        "So you can choose exactly which changes to include in a commit",
+        "It compresses files before storing them",
+        "It backs up your files to the cloud",
+      ],
+      answer:
+        "So you can choose exactly which changes to include in a commit",
+      hints: ["You made 5 changes but want 3 separate commits. How do you pick which changes go in each?"],
+    },
+    {
+      id: "git0-003-q3",
+      type: "choice",
+      text: "You run git add game-design.txt and then keep editing the file. What does the commit include?",
+      options: [
+        "The version of the file at the time you ran git add",
+        "The latest version you saved after git add",
+        "Both versions as separate entries",
+        "Neither — you must git add again after every edit",
+      ],
+      answer: "The version of the file at the time you ran git add",
+      hints: ["git add hashes the file contents at the moment it runs. Later edits are in the working directory, not the index."],
+    },
+  ],
+
+  definitions: [
+    { term: "working directory", definition: "The actual files on your disk that you edit. Git watches them but records nothing until you stage them." },
+    { term: "staging area", definition: "The preparation zone (also called the index) where you queue file changes before packaging them into a commit." },
+    { term: "index", definition: "Git's internal name for the staging area — stored as `.git/index`. The contents of git add go here." },
+    { term: "tracked file", definition: "A file Git is monitoring because it has been staged or committed at least once." },
+    { term: "untracked file", definition: "A file in the working directory that Git has never seen — it will appear in `git status` as untracked." },
+  ],
 };
 
 export default lesson;

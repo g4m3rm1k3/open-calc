@@ -14,6 +14,12 @@
 let ALL_MODULES = {};
 try { ALL_MODULES = import.meta.glob('./lessons/**/*.js', { eager: true }); } catch { /* Node.js */ }
 
+let VIDEO_MODULES = {};
+try { VIDEO_MODULES = import.meta.glob('./lessons/*/videos.json', { eager: true }); } catch { /* Node.js */ }
+
+let META_MODULES = {};
+try { META_MODULES = import.meta.glob('./lessons/*/meta.json', { eager: true }); } catch { /* Node.js */ }
+
 function slugToTitle(slug) {
   return slug
     .split('-')
@@ -70,4 +76,77 @@ export function getAutoChapters(courseId) {
 // All auto-discovered chapters across all courses.
 export function getAllAutoChapters() {
   return Object.keys(tree).flatMap((courseId) => getAutoChapters(courseId));
+}
+
+// Auto-discovered courses from meta.json files.
+// Returns array in the same shape as entries in courses.js COURSES.
+export function getAllAutoCourses() {
+  return Object.entries(META_MODULES).map(([path, mod]) => {
+    const courseId = path.replace('./lessons/', '').replace('/meta.json', '');
+    const data = mod?.default ?? mod;
+    return {
+      key: courseId,
+      label: data.title,
+      path: `/course/${courseId}`,
+      desc: data.description,
+      color: data.color,
+      icon: data.icon,
+    };
+  });
+}
+
+// Build video tree: { [courseId]: [{ title, url }] }
+const videoTree = {};
+for (const [path, mod] of Object.entries(VIDEO_MODULES)) {
+  // path: ./lessons/git-0/videos.json
+  const rel = path.replace('./lessons/', '');
+  const parts = rel.split('/');
+  if (parts.length !== 2 || parts[1] !== 'videos.json') continue;
+  const [courseId] = parts;
+
+  const data = mod?.default ?? mod;
+  if (!Array.isArray(data)) continue;
+
+  videoTree[courseId] = data;
+}
+
+function toEmbedUrl(url) {
+  if (!url) return url;
+  if (url.includes('youtube.com/watch')) {
+    const id = url.match(/[?&]v=([^&]+)/)?.[1];
+    return id ? `https://www.youtube.com/embed/${id}` : url;
+  }
+  if (url.includes('youtu.be/')) {
+    const id = url.split('youtu.be/')[1]?.split('?')[0];
+    return id ? `https://www.youtube.com/embed/${id}` : url;
+  }
+  return url;
+}
+
+// Collect all definitions across all auto-discovered lessons
+// Each entry: { term, definition, symbol?, lessonId, lessonTitle, lessonSlug, chapterNumber, course }
+export const GLOSSARY = [];
+for (const [courseId, chapters] of Object.entries(tree)) {
+  for (const chapter of Object.values(chapters)) {
+    for (const lesson of chapter.lessons) {
+      if (!lesson.definitions?.length) continue;
+      for (const def of lesson.definitions) {
+        GLOSSARY.push({
+          ...def,
+          lessonId: lesson.id,
+          lessonTitle: lesson.title,
+          lessonSlug: lesson.slug,
+          chapterNumber: chapter.number,
+          chapterTitle: chapter.title,
+          course: courseId,
+        });
+      }
+    }
+  }
+}
+GLOSSARY.sort((a, b) => a.term.localeCompare(b.term));
+
+export function getVideosForCourse(courseId) {
+  const videos = videoTree[courseId] ?? [];
+  return videos.map((v) => ({ ...v, url: toEmbedUrl(v.url) }));
 }

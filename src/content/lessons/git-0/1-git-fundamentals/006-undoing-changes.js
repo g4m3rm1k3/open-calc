@@ -57,46 +57,55 @@ const lesson = {
     },
   ],
 
-  assessment: {
-    questions: [
-      {
-        id: "git0-006-q1",
-        type: "choice",
-        text: "You staged a file by mistake. Which command removes it from staging without losing your edits?",
-        options: [
-          "`git reset --hard HEAD`",
-          "`git restore --staged filename`",
-          "`git revert filename`",
-          "`git rm --cached filename`",
-        ],
-        answer: "`git restore --staged filename`",
-      },
-      {
-        id: "git0-006-q2",
-        type: "choice",
-        text: "A commit was pushed to main and broke production. Which undo approach is safest?",
-        options: [
-          "`git reset --hard` and force push",
-          "`git revert` to create a new undo commit",
-          "`git restore` the files and commit",
-          "`git clean -fd` to reset everything",
-        ],
-        answer: "`git revert` to create a new undo commit",
-      },
-      {
-        id: "git0-006-q3",
-        type: "choice",
-        text: "`git reset --hard HEAD~1` will:",
-        options: [
-          "Move the branch back one commit and keep changes staged",
-          "Move the branch back one commit and keep changes in the working directory",
-          "Move the branch back one commit and permanently discard all changes",
-          "Create a new commit that reverses the last one",
-        ],
-        answer: "Move the branch back one commit and permanently discard all changes",
-      },
-    ],
-  },
+  quiz: [
+    {
+      id: "git0-006-q1",
+      type: "choice",
+      text: "You staged a file by mistake. Which command removes it from staging without losing your edits?",
+      options: [
+        "`git reset --hard HEAD`",
+        "`git restore --staged filename`",
+        "`git revert filename`",
+        "`git rm --cached filename`",
+      ],
+      answer: "`git restore --staged filename`",
+      hints: ["You want to move the file from the staging area back to the working directory — not delete your edits."],
+    },
+    {
+      id: "git0-006-q2",
+      type: "choice",
+      text: "A commit was pushed to main and broke production. Which undo approach is safest?",
+      options: [
+        "`git reset --hard` and force push",
+        "`git revert` to create a new undo commit",
+        "`git restore` the files and commit",
+        "`git clean -fd` to reset everything",
+      ],
+      answer: "`git revert` to create a new undo commit",
+      hints: ["The commit is already public. Which approach adds to history rather than rewriting it?"],
+    },
+    {
+      id: "git0-006-q3",
+      type: "choice",
+      text: "`git reset --hard HEAD~1` will:",
+      options: [
+        "Move the branch back one commit and keep changes staged",
+        "Move the branch back one commit and keep changes in the working directory",
+        "Move the branch back one commit and permanently discard all changes",
+        "Create a new commit that reverses the last one",
+      ],
+      answer: "Move the branch back one commit and permanently discard all changes",
+      hints: ["--hard resets all three trees: HEAD, index, and working directory. Nothing is preserved."],
+    },
+  ],
+
+  definitions: [
+    { term: "git restore", definition: "Discards working directory changes to a file or removes a file from staging. Never touches commit history." },
+    { term: "git reset", definition: "Moves the branch pointer backward. `--soft` keeps changes staged; `--mixed` unstages them; `--hard` discards them permanently." },
+    { term: "git revert", definition: "Creates a new commit that is the exact inverse of a specified past commit. Safe for pushed branches — adds history rather than rewriting it." },
+    { term: "hard reset", definition: "`git reset --hard` — moves the branch back and permanently discards all changes in the index and working directory." },
+    { term: "soft reset", definition: "`git reset --soft` — moves the branch back but keeps all changes staged, ready to re-commit." },
+  ],
 };
 
 export default lesson;

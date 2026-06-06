@@ -1,8 +1,8 @@
 const lesson = {
-  id: "git-0-016",
+  id: "git-0-021",
   slug: "tags-and-releases",
   chapter: "git-0",
-  order: 16,
+  order: 21,
   title: "Tags & Releases",
   subtitle: "Marking milestones permanently",
   tags: ["git", "tag", "release", "versioning", "semver"],
@@ -104,42 +104,50 @@ const lesson = {
     },
   ],
 
-  assessment: {
-    questions: [
-      {
-        id: "git0-016-q1",
-        type: "choice",
-        text: "What makes an annotated tag different from a lightweight tag?",
-        options: [
-          "Annotated tags move like branches; lightweight tags don't",
-          "Annotated tags store metadata (tagger, date, message); lightweight tags are just commit pointers",
-          "Annotated tags are only for GitHub releases; lightweight are for local",
-          "Lightweight tags are pushed automatically; annotated tags are not",
-        ],
-        answer:
-          "Annotated tags store metadata (tagger, date, message); lightweight tags are just commit pointers",
-      },
-      {
-        id: "git0-016-q2",
-        type: "choice",
-        text: "You run `git push origin main`. Your new tag `v1.0.0` will:",
-        options: [
-          "Be pushed automatically with the branch",
-          "NOT be pushed — tags require an explicit push",
-          "Be pushed only if it was an annotated tag",
-          "Be pushed only if the tag points to HEAD",
-        ],
-        answer: "NOT be pushed — tags require an explicit push",
-      },
-      {
-        id: "git0-016-q3",
-        type: "choice",
-        text: "In SemVer, you introduce a new feature that is backward compatible. You increment:",
-        options: ["MAJOR", "MINOR", "PATCH", "PRE-RELEASE"],
-        answer: "MINOR",
-      },
-    ],
-  },
+  quiz: [
+    {
+      id: "git0-021-q1",
+      type: "choice",
+      text: "What makes an annotated tag different from a lightweight tag?",
+      options: [
+        "Annotated tags move like branches; lightweight tags don't",
+        "Annotated tags store metadata (tagger, date, message); lightweight tags are just commit pointers",
+        "Annotated tags are only for GitHub releases; lightweight are for local",
+        "Lightweight tags are pushed automatically; annotated tags are not",
+      ],
+      answer:
+        "Annotated tags store metadata (tagger, date, message); lightweight tags are just commit pointers",
+      hints: ["A lightweight tag is just a pointer file. An annotated tag is a full Git object — what does that let it store?"],
+    },
+    {
+      id: "git0-021-q2",
+      type: "choice",
+      text: "You run `git push origin main`. Your new tag `v1.0.0` will:",
+      options: [
+        "Be pushed automatically with the branch",
+        "NOT be pushed — tags require an explicit push",
+        "Be pushed only if it was an annotated tag",
+        "Be pushed only if the tag points to HEAD",
+      ],
+      answer: "NOT be pushed — tags require an explicit push",
+      hints: ["Tags live in `.git/refs/tags/` not `.git/refs/heads/`. Pushing a branch doesn't push the tags folder."],
+    },
+    {
+      id: "git0-021-q3",
+      type: "choice",
+      text: "In SemVer, you introduce a new feature that is backward compatible. You increment:",
+      options: ["MAJOR", "MINOR", "PATCH", "PRE-RELEASE"],
+      answer: "MINOR",
+      hints: ["MAJOR = breaking changes. PATCH = bug fixes. New feature, backward compatible = ?"],
+    },
+  ],
+
+  definitions: [
+    { term: "tag", definition: "An immovable pointer to a specific commit, used to mark releases and milestones. Unlike branches, tags never advance." },
+    { term: "lightweight tag", definition: "A simple pointer to a commit — just a file in `.git/refs/tags/` containing the commit hash." },
+    { term: "annotated tag", definition: "A full Git object with a tagger name, date, message, and optional GPG signature. Use these for real version releases." },
+    { term: "semantic versioning (SemVer)", definition: "MAJOR.MINOR.PATCH versioning. Increment MAJOR for breaking changes, MINOR for new backward-compatible features, PATCH for bug fixes." },
+  ],
 };
 
 export default lesson;

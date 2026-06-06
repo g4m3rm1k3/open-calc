@@ -93,48 +93,56 @@ const lesson = {
     },
   ],
 
-  assessment: {
-    questions: [
-      {
-        id: "git0-002-q1",
-        type: "choice",
-        text: "What makes a commit fundamentally different from a regular file save?",
-        options: [
-          "Commits are stored in the cloud automatically",
-          "Commits replace the previous version, just like a save",
-          "Commits are permanent and add to a history chain instead of overwriting",
-          "Commits only store files that changed since the last save",
-        ],
-        answer:
-          "Commits are permanent and add to a history chain instead of overwriting",
-      },
-      {
-        id: "git0-002-q2",
-        type: "choice",
-        text: "You have three commits: A, B, and C. Which statement is true?",
-        options: [
-          "Commit B no longer exists once you make commit C",
-          "Commits A, B, and C all exist and any can be restored",
-          "Only the most recent commit is accessible",
-          "Commits B and C overwrite commit A's content",
-        ],
-        answer: "Commits A, B, and C all exist and any can be restored",
-      },
-      {
-        id: "git0-002-q3",
-        type: "choice",
-        text: "What does every commit store besides the file snapshot?",
-        options: [
-          "A list of every keystroke made since the last commit",
-          "A compressed diff of what changed",
-          "A message, author, timestamp, and a pointer to the parent commit",
-          "The next commit's content, predicted automatically",
-        ],
-        answer:
-          "A message, author, timestamp, and a pointer to the parent commit",
-      },
-    ],
-  },
+  quiz: [
+    {
+      id: "git0-002-q1",
+      type: "choice",
+      text: "What makes a commit fundamentally different from a regular file save?",
+      options: [
+        "Commits are stored in the cloud automatically",
+        "Commits replace the previous version, just like a save",
+        "Commits are permanent and add to a history chain instead of overwriting",
+        "Commits only store files that changed since the last save",
+      ],
+      answer:
+        "Commits are permanent and add to a history chain instead of overwriting",
+      hints: ["A file save overwrites bytes on disk. What does a commit do instead?"],
+    },
+    {
+      id: "git0-002-q2",
+      type: "choice",
+      text: "You have three commits: A, B, and C. Which statement is true?",
+      options: [
+        "Commit B no longer exists once you make commit C",
+        "Commits A, B, and C all exist and any can be restored",
+        "Only the most recent commit is accessible",
+        "Commits B and C overwrite commit A's content",
+      ],
+      answer: "Commits A, B, and C all exist and any can be restored",
+      hints: ["Commits are permanent records. Can Git walk backward through the chain?"],
+    },
+    {
+      id: "git0-002-q3",
+      type: "choice",
+      text: "What does every commit store besides the file snapshot?",
+      options: [
+        "A list of every keystroke made since the last commit",
+        "A compressed diff of what changed",
+        "A message, author, timestamp, and a pointer to the parent commit",
+        "The next commit's content, predicted automatically",
+      ],
+      answer:
+        "A message, author, timestamp, and a pointer to the parent commit",
+      hints: ["Think about what forms the chain: each commit must know what came before it."],
+    },
+  ],
+
+  definitions: [
+    { term: "tree (git)", definition: "A Git object representing a directory snapshot — lists filenames, permissions, and the hash of each file's content (blob)." },
+    { term: "parent commit", definition: "The commit that preceded the current one. Each commit stores the parent's hash, forming the history chain." },
+    { term: "blob", definition: "A Git object storing the raw content of a file — no filename, no path, just bytes. Identical files across the repo share one blob." },
+    { term: "object store", definition: "The `.git/objects/` directory where Git permanently stores all commit, tree, blob, and tag objects." },
+  ],
 };
 
 export default lesson;

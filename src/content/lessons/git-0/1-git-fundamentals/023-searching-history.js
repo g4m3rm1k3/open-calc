@@ -1,8 +1,8 @@
 const lesson = {
-  id: "git-0-018",
+  id: "git-0-023",
   slug: "searching-history",
   chapter: "git-0",
-  order: 18,
+  order: 23,
   title: "Searching History",
   subtitle: "Tracking down when and where things changed",
   tags: ["git", "log", "blame", "bisect", "grep", "search", "debug"],
@@ -110,47 +110,55 @@ const lesson = {
     },
   ],
 
-  assessment: {
-    questions: [
-      {
-        id: "git0-018-q1",
-        type: "choice",
-        text: '`git log -S "calculateTax"` does what?',
-        options: [
-          "Searches commit messages for the word 'calculateTax'",
-          "Shows commits where the string 'calculateTax' was added or removed from file contents",
-          "Runs `calculateTax` as a shell command",
-          "Shows all commits by the author 'calculateTax'",
-        ],
-        answer:
-          "Shows commits where the string 'calculateTax' was added or removed from file contents",
-      },
-      {
-        id: "git0-018-q2",
-        type: "choice",
-        text: "`git blame` helps you:",
-        options: [
-          "Revert changes made by a specific author",
-          "See which commit last changed each line of a file",
-          "Find all commits by an author",
-          "Assign code review responsibility",
-        ],
-        answer: "See which commit last changed each line of a file",
-      },
-      {
-        id: "git0-018-q3",
-        type: "choice",
-        text: "How many commits does git bisect need to check to find a bug in 1000 commits?",
-        options: [
-          "Up to 1000 checks",
-          "About 500 checks",
-          "About 10 checks (log₂ 1000 ≈ 10)",
-          "Exactly 50 checks",
-        ],
-        answer: "About 10 checks (log₂ 1000 ≈ 10)",
-      },
-    ],
-  },
+  quiz: [
+    {
+      id: "git0-023-q1",
+      type: "choice",
+      text: '`git log -S "calculateTax"` does what?',
+      options: [
+        "Searches commit messages for the word 'calculateTax'",
+        "Shows commits where the string 'calculateTax' was added or removed from file contents",
+        "Runs `calculateTax` as a shell command",
+        "Shows all commits by the author 'calculateTax'",
+      ],
+      answer:
+        "Shows commits where the string 'calculateTax' was added or removed from file contents",
+      hints: ["`-S` is the pickaxe flag — it searches file content, not messages. `--grep` searches messages."],
+    },
+    {
+      id: "git0-023-q2",
+      type: "choice",
+      text: "`git blame` helps you:",
+      options: [
+        "Revert changes made by a specific author",
+        "See which commit last changed each line of a file",
+        "Find all commits by an author",
+        "Assign code review responsibility",
+      ],
+      answer: "See which commit last changed each line of a file",
+      hints: ["Every line of the file gets annotated with the hash, author, and date of the commit that last touched it."],
+    },
+    {
+      id: "git0-023-q3",
+      type: "choice",
+      text: "How many commits does git bisect need to check to find a bug in 1000 commits?",
+      options: [
+        "Up to 1000 checks",
+        "About 500 checks",
+        "About 10 checks (log₂ 1000 ≈ 10)",
+        "Exactly 50 checks",
+      ],
+      answer: "About 10 checks (log₂ 1000 ≈ 10)",
+      hints: ["Bisect uses binary search — it halves the remaining range each time. How many halvings does 1000 → 1 take?"],
+    },
+  ],
+
+  definitions: [
+    { term: "git blame", definition: "Annotates each line of a file with the commit hash, author, and date that last changed that line." },
+    { term: "git bisect", definition: "A binary search tool that walks through commit history — marking commits good or bad — to find the exact commit that introduced a bug." },
+    { term: "pickaxe search", definition: "`git log -S 'string'` — finds commits where the given string was added or removed from file contents. For finding when code was introduced or deleted." },
+    { term: "git log --grep", definition: "Filters the commit log to show only commits whose message matches a given pattern." },
+  ],
 };
 
 export default lesson;

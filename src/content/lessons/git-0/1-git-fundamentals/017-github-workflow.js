@@ -1,8 +1,8 @@
 const lesson = {
-  id: "git-0-012",
+  id: "git-0-017",
   slug: "github-workflow",
   chapter: "git-0",
-  order: 12,
+  order: 17,
   title: "The GitHub Workflow",
   subtitle: "Fork, pull request, and code review",
   tags: ["git", "github", "pull-request", "fork", "code-review"],
@@ -104,47 +104,55 @@ const lesson = {
     },
   ],
 
-  assessment: {
-    questions: [
-      {
-        id: "git0-012-q1",
-        type: "choice",
-        text: "A pull request is primarily:",
-        options: [
-          "A Git command that pulls from remote",
-          "A GitHub/GitLab feature for proposing and reviewing branch merges",
-          "A way to download someone else's code",
-          "A request for someone to push to your branch",
-        ],
-        answer:
-          "A GitHub/GitLab feature for proposing and reviewing branch merges",
-      },
-      {
-        id: "git0-012-q2",
-        type: "choice",
-        text: "When contributing to a repo you don't own, you should:",
-        options: [
-          "Ask the owner to add you as a collaborator first",
-          "Push directly to main",
-          "Fork the repo, clone your fork, branch, push, and open a PR",
-          "Use `git request-pull`",
-        ],
-        answer: "Fork the repo, clone your fork, branch, push, and open a PR",
-      },
-      {
-        id: "git0-012-q3",
-        type: "choice",
-        text: "'Squash and merge' on a PR means:",
-        options: [
-          "Force pushing over the target branch",
-          "All commits in the PR are combined into one commit on main",
-          "The PR is closed without merging",
-          "All merge conflicts are auto-resolved",
-        ],
-        answer: "All commits in the PR are combined into one commit on main",
-      },
-    ],
-  },
+  quiz: [
+    {
+      id: "git0-017-q1",
+      type: "choice",
+      text: "A pull request is primarily:",
+      options: [
+        "A Git command that pulls from remote",
+        "A GitHub/GitLab feature for proposing and reviewing branch merges",
+        "A way to download someone else's code",
+        "A request for someone to push to your branch",
+      ],
+      answer:
+        "A GitHub/GitLab feature for proposing and reviewing branch merges",
+      hints: ["There is no `git pull-request` command. Which platform provides this feature?"],
+    },
+    {
+      id: "git0-017-q2",
+      type: "choice",
+      text: "When contributing to a repo you don't own, you should:",
+      options: [
+        "Ask the owner to add you as a collaborator first",
+        "Push directly to main",
+        "Fork the repo, clone your fork, branch, push, and open a PR",
+        "Use `git request-pull`",
+      ],
+      answer: "Fork the repo, clone your fork, branch, push, and open a PR",
+      hints: ["You can't push to a repo you don't have write access to. What does forking give you?"],
+    },
+    {
+      id: "git0-017-q3",
+      type: "choice",
+      text: "'Squash and merge' on a PR means:",
+      options: [
+        "Force pushing over the target branch",
+        "All commits in the PR are combined into one commit on main",
+        "The PR is closed without merging",
+        "All merge conflicts are auto-resolved",
+      ],
+      answer: "All commits in the PR are combined into one commit on main",
+      hints: ["Squash collapses many commits. Where do they end up after the merge?"],
+    },
+  ],
+
+  definitions: [
+    { term: "draft PR", definition: "A pull request marked as work-in-progress that cannot be merged until explicitly marked ready for review." },
+    { term: "squash and merge", definition: "A GitHub PR merge option that collapses all commits in the PR into a single commit on the target branch." },
+    { term: "merge request (MR)", definition: "GitLab's term for a pull request — a proposal to merge one branch into another with a review interface." },
+    { term: "branch protection", definition: "GitHub/GitLab rules requiring review approvals and CI checks to pass before a branch can receive a merge." },
+  ],
 };
 
 export default lesson;

@@ -21346,5 +21346,117 @@
       "api",
       "json"
     ]
+  },
+    {
+    "id": "vid-594",
+    "title": "Vectors | Chapter 1, Essence of linear algebra",
+    "url": "https://www.youtube.com/embed/fNk_zzaMoSs",
+    "source": "3blue1brown",
+    "tags": ["linear-algebra", "vectors"]
+  },
+  {
+    "id": "vid-595",
+    "title": "Linear combinations, span, and basis vectors | Chapter 2, Essence of linear algebra",
+    "url": "https://www.youtube.com/embed/k7RM-ot2NWY",
+    "source": "3blue1brown",
+    "tags": ["linear-algebra", "vectors", "span", "basis"]
+  },
+  {
+    "id": "vid-596",
+    "title": "Linear transformations and matrices | Chapter 3, Essence of linear algebra",
+    "url": "https://www.youtube.com/embed/kYB8IZa5AuE",
+    "source": "3blue1brown",
+    "tags": ["linear-algebra", "matrices", "transformations"]
+  },
+  {
+    "id": "vid-597",
+    "title": "Matrix multiplication as composition | Chapter 4, Essence of linear algebra",
+    "url": "https://www.youtube.com/embed/XkY2DOUCWMU",
+    "source": "3blue1brown",
+    "tags": ["linear-algebra", "matrices", "multiplication"]
+  },
+  {
+    "id": "vid-598",
+    "title": "Three-dimensional linear transformations | Chapter 5, Essence of linear algebra",
+    "url": "https://www.youtube.com/embed/rHLEWRxRGiM",
+    "source": "3blue1brown",
+    "tags": ["linear-algebra", "transformations", "3d"]
+  },
+  {
+    "id": "vid-599",
+    "title": "The determinant | Chapter 6, Essence of linear algebra",
+    "url": "https://www.youtube.com/embed/Ip3X9LOh2dk",
+    "source": "3blue1brown",
+    "tags": ["linear-algebra", "determinant"]
+  },
+  {
+    "id": "vid-600",
+    "title": "Inverse matrices, column space and null space | Chapter 7, Essence of linear algebra",
+    "url": "https://www.youtube.com/embed/uQhTuRlWMxw",
+    "source": "3blue1brown",
+    "tags": ["linear-algebra", "inverse", "null-space"]
+  },
+  {
+    "id": "vid-601",
+    "title": "Nonsquare matrices as transformations between dimensions | Chapter 8, Essence of linear algebra",
+    "url": "https://www.youtube.com/embed/v8VSDg_WQlA",
+    "source": "3blue1brown",
+    "tags": ["linear-algebra", "matrices", "transformations"]
+  },
+  {
+    "id": "vid-602",
+    "title": "Dot products and duality | Chapter 9, Essence of linear algebra",
+    "url": "https://www.youtube.com/embed/LyGKycYT2v0",
+    "source": "3blue1brown",
+    "tags": ["linear-algebra", "dot-product", "duality"]
+  },
+  {
+    "id": "vid-603",
+    "title": "Cross products | Chapter 10, Essence of linear algebra",
+    "url": "https://www.youtube.com/embed/eu6i7WJeinw",
+    "source": "3blue1brown",
+    "tags": ["linear-algebra", "cross-product"]
+  },
+  {
+    "id": "vid-604",
+    "title": "Cross products in the light of linear transformations | Chapter 11, Essence of linear algebra",
+    "url": "https://www.youtube.com/embed/BaM7OCEm3G0",
+    "source": "3blue1brown",
+    "tags": ["linear-algebra", "cross-product", "transformations"]
+  },
+  {
+    "id": "vid-605",
+    "title": "Cramer's rule, explained geometrically | Chapter 12, Essence of linear algebra",
+    "url": "https://www.youtube.com/embed/jBsC34PxzoM",
+    "source": "3blue1brown",
+    "tags": ["linear-algebra", "cramer", "determinant"]
+  },
+  {
+    "id": "vid-606",
+    "title": "Change of basis | Chapter 13, Essence of linear algebra",
+    "url": "https://www.youtube.com/embed/P2LTAUO1TdA",
+    "source": "3blue1brown",
+    "tags": ["linear-algebra", "basis", "change-of-basis"]
+  },
+  {
+    "id": "vid-607",
+    "title": "Eigenvectors and eigenvalues | Chapter 14, Essence of linear algebra",
+    "url": "https://www.youtube.com/embed/PFDu9oVAE-g",
+    "source": "3blue1brown",
+    "tags": ["linear-algebra", "eigenvalues", "eigenvectors"]
+  },
+  {
+    "id": "vid-608",
+    "title": "A quick trick for computing eigenvalues | Chapter 15, Essence of linear algebra",
+    "url": "https://www.youtube.com/embed/e50Bj7jn9IQ",
+    "source": "3blue1brown",
+    "tags": ["linear-algebra", "eigenvalues"]
+  },
+  {
+    "id": "vid-609",
+    "title": "Abstract vector spaces | Chapter 16, Essence of linear algebra",
+    "url": "https://www.youtube.com/embed/TgKwz5Ikpc8",
+    "source": "3blue1brown",
+    "tags": ["linear-algebra", "vector-spaces", "abstract"]
   }
 ]

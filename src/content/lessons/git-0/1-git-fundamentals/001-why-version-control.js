@@ -93,47 +93,56 @@ const lesson = {
     },
   ],
 
-  assessment: {
-    questions: [
-      {
-        id: "git0-001-q1",
-        type: "choice",
-        text: "You edit a file, save it, and close your editor. Which is now impossible without Git?",
-        options: [
-          "Reading the current content",
-          "Editing the file again",
-          "Recovering the exact text from before you saved",
-          "Moving the file to another folder",
-        ],
-        answer: "Recovering the exact text from before you saved",
-      },
-      {
-        id: "git0-001-q2",
-        type: "choice",
-        text: "What is the main problem with the folder-copy approach to versioning (project-v1/, project-v2/, etc.)?",
-        options: [
-          "It uses too much disk space",
-          "It only works for text files",
-          "It breaks down when multiple people make different changes to different copies",
-          "Computers cannot read folders with numbers in their names",
-        ],
-        answer:
-          "It breaks down when multiple people make different changes to different copies",
-      },
-      {
-        id: "git0-001-q3",
-        type: "choice",
-        text: "Git's core design guarantee is:",
-        options: [
-          "Every operation can overwrite previous history",
-          "Only source code files can be tracked",
-          "Once committed, a snapshot is permanent and always recoverable",
-          "Files are automatically synced to a server on every save",
-        ],
-        answer: "Once committed, a state is permanent and always recoverable",
-      },
-    ],
-  },
+  quiz: [
+    {
+      id: "git0-001-q1",
+      type: "choice",
+      text: "You edit a file, save it, and close your editor. Which is now impossible without Git?",
+      options: [
+        "Reading the current content",
+        "Editing the file again",
+        "Recovering the exact text from before you saved",
+        "Moving the file to another folder",
+      ],
+      answer: "Recovering the exact text from before you saved",
+      hints: ["Think about what your editor's undo history stores — and where it lives."],
+    },
+    {
+      id: "git0-001-q2",
+      type: "choice",
+      text: "What is the main problem with the folder-copy approach to versioning (project-v1/, project-v2/, etc.)?",
+      options: [
+        "It uses too much disk space",
+        "It only works for text files",
+        "It breaks down when multiple people make different changes to different copies",
+        "Computers cannot read folders with numbers in their names",
+      ],
+      answer: "It breaks down when multiple people make different changes to different copies",
+      hints: ["What happens when two people each edit their own copy of project-v3/?"],
+    },
+    {
+      id: "git0-001-q3",
+      type: "choice",
+      text: "Git's core design guarantee is:",
+      options: [
+        "Every operation can overwrite previous history",
+        "Only source code files can be tracked",
+        "Once committed, a snapshot is permanent and always recoverable",
+        "Files are automatically synced to a server on every save",
+      ],
+      answer: "Once committed, a snapshot is permanent and always recoverable",
+      hints: ["A commit's identity is a SHA-1 hash of its entire content — what does that mean for changeability?"],
+    },
+  ],
+
+  definitions: [
+    { term: "commit", definition: "A labeled snapshot of every tracked file at a specific moment, timestamped and linked to the previous commit." },
+    { term: "repository", definition: "A Git-managed directory that stores your project files together with the full chain of commits (history)." },
+    { term: "version control", definition: "A system for recording changes to files over time so any previous state can be inspected or restored." },
+    { term: "staging area", definition: "The preparation zone where you collect file changes before packaging them into a commit." },
+    { term: "HEAD", definition: "A pointer to the most recent commit on the branch you are currently working on." },
+    { term: "SHA-1 hash", definition: "A 40-character fingerprint computed from a commit's full content. Any change to the content produces a completely different hash." },
+  ],
 };
 
 export default lesson;

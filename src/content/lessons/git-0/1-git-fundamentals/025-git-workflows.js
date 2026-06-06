@@ -1,8 +1,8 @@
 const lesson = {
-  id: "git-0-020",
+  id: "git-0-025",
   slug: "git-workflows",
   chapter: "git-0",
-  order: 20,
+  order: 25,
   title: "Git Workflows",
   subtitle: "How teams organize collaboration",
   tags: [
@@ -117,47 +117,56 @@ const lesson = {
     },
   ],
 
-  assessment: {
-    questions: [
-      {
-        id: "git0-020-q1",
-        type: "choice",
-        text: "GitHub Flow is best described as:",
-        options: [
-          "Branch off main, PR, merge — always keep main deployable",
-          "Multiple long-lived branches: main, develop, release, hotfix",
-          "Everyone commits directly to main with no branches",
-          "Each developer forks the repo and PRs to upstream",
-        ],
-        answer: "Branch off main, PR, merge — always keep main deployable",
-      },
-      {
-        id: "git0-020-q2",
-        type: "choice",
-        text: "Gitflow's `develop` branch serves as:",
-        options: [
-          "The production branch",
-          "An integration branch where features accumulate before a release",
-          "The branch used to create hotfixes",
-          "A mirror of main for backup purposes",
-        ],
-        answer:
-          "An integration branch where features accumulate before a release",
-      },
-      {
-        id: "git0-020-q3",
-        type: "choice",
-        text: "Trunk-based development handles incomplete features using:",
-        options: [
-          "Long-lived feature branches kept out of main",
-          "Feature flags that hide unfinished work at runtime",
-          "Draft commits that won't execute",
-          "A separate staging branch before main",
-        ],
-        answer: "Feature flags that hide unfinished work at runtime",
-      },
-    ],
-  },
+  quiz: [
+    {
+      id: "git0-025-q1",
+      type: "choice",
+      text: "GitHub Flow is best described as:",
+      options: [
+        "Branch off main, PR, merge — always keep main deployable",
+        "Multiple long-lived branches: main, develop, release, hotfix",
+        "Everyone commits directly to main with no branches",
+        "Each developer forks the repo and PRs to upstream",
+      ],
+      answer: "Branch off main, PR, merge — always keep main deployable",
+      hints: ["GitHub Flow is the simplest workflow. One rule: main is always deployable. How does work reach it?"],
+    },
+    {
+      id: "git0-025-q2",
+      type: "choice",
+      text: "Gitflow's `develop` branch serves as:",
+      options: [
+        "The production branch",
+        "An integration branch where features accumulate before a release",
+        "The branch used to create hotfixes",
+        "A mirror of main for backup purposes",
+      ],
+      answer:
+        "An integration branch where features accumulate before a release",
+      hints: ["In Gitflow, `main` is production-ready. Where do features accumulate before they're ready to ship?"],
+    },
+    {
+      id: "git0-025-q3",
+      type: "choice",
+      text: "Trunk-based development handles incomplete features using:",
+      options: [
+        "Long-lived feature branches kept out of main",
+        "Feature flags that hide unfinished work at runtime",
+        "Draft commits that won't execute",
+        "A separate staging branch before main",
+      ],
+      answer: "Feature flags that hide unfinished work at runtime",
+      hints: ["If you commit to main constantly, how do you ship code with incomplete features to production without breaking users?"],
+    },
+  ],
+
+  definitions: [
+    { term: "GitHub Flow", definition: "A simple team workflow: branch off main, commit, open a PR, merge. Main is always deployable. Best for most teams." },
+    { term: "Gitflow", definition: "A structured workflow with main, develop, feature, release, and hotfix branches. Designed for versioned software releases." },
+    { term: "trunk-based development", definition: "Everyone commits to main (the 'trunk') directly or via very short-lived branches. Requires strong CI/CD and feature flags." },
+    { term: "feature flag", definition: "A runtime toggle that hides incomplete features from users, allowing code to be merged to main before the feature is ready." },
+    { term: "forking workflow", definition: "Open-source contribution pattern: fork the repo, work on your fork, open a PR to the original. No write access to the original is needed." },
+  ],
 };
 
 export default lesson;

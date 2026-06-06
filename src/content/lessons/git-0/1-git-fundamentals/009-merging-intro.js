@@ -1,8 +1,8 @@
 const lesson = {
-  id: "git-0-007",
+  id: "git-0-009",
   slug: "bringing-it-together",
   chapter: "git-0",
-  order: 7,
+  order: 9,
   title: "Merging",
   subtitle: "Combining independent lines of work into one",
   tags: ["git", "merge", "fast-forward", "merge commit", "fundamentals"],
@@ -105,42 +105,50 @@ const lesson = {
     },
   ],
 
-  assessment: {
-    questions: [
-      {
-        id: "git0-007-q1",
-        type: "choice",
-        text: "What is a fast-forward merge?",
-        options: [
-          "A merge that completes in under one second",
-          "A merge where main's pointer slides to the tip of the branch because main hasn't diverged",
-          "A merge that skips the staging area",
-          "A merge that creates a squashed single commit",
-        ],
-        answer:
-          "A merge where main's pointer slides to the tip of the branch because main hasn't diverged",
-      },
-      {
-        id: "git0-007-q2",
-        type: "choice",
-        text: "You are on `main` and run `git merge feature`. What happens to the `feature` branch pointer?",
-        options: [
-          "It is deleted automatically",
-          "It moves to wherever main was before the merge",
-          "Nothing — it stays pointing to the same commit it was on",
-          "It moves to the same commit as main",
-        ],
-        answer: "Nothing — it stays pointing to the same commit it was on",
-      },
-      {
-        id: "git0-007-q3",
-        type: "choice",
-        text: "How many parents does a merge commit have?",
-        options: ["Zero", "One", "Two", "It varies"],
-        answer: "Two",
-      },
-    ],
-  },
+  quiz: [
+    {
+      id: "git0-009-q1",
+      type: "choice",
+      text: "What is a fast-forward merge?",
+      options: [
+        "A merge that completes in under one second",
+        "A merge where main's pointer slides to the tip of the branch because main hasn't diverged",
+        "A merge that skips the staging area",
+        "A merge that creates a squashed single commit",
+      ],
+      answer:
+        "A merge where main's pointer slides to the tip of the branch because main hasn't diverged",
+      hints: ["If main has no commits that the feature branch doesn't have, what does Git need to do to 'merge'?"],
+    },
+    {
+      id: "git0-009-q2",
+      type: "choice",
+      text: "You are on `main` and run `git merge feature`. What happens to the `feature` branch pointer?",
+      options: [
+        "It is deleted automatically",
+        "It moves to wherever main was before the merge",
+        "Nothing — it stays pointing to the same commit it was on",
+        "It moves to the same commit as main",
+      ],
+      answer: "Nothing — it stays pointing to the same commit it was on",
+      hints: ["You merge INTO main. Only the branch you're on (main's pointer) changes."],
+    },
+    {
+      id: "git0-009-q3",
+      type: "choice",
+      text: "How many parents does a merge commit have?",
+      options: ["Zero", "One", "Two", "It varies"],
+      answer: "Two",
+      hints: ["A merge commit records the joining of two separate lines of history. What defines those two lines?"],
+    },
+  ],
+
+  definitions: [
+    { term: "fast-forward merge", definition: "A merge where Git simply moves the target branch pointer forward because there is no divergence — no new merge commit is created." },
+    { term: "merge commit", definition: "A commit with two parents, created when two diverged branches are combined. The graph shows two lines converging to this point." },
+    { term: "common ancestor", definition: "The most recent commit both branches share before they diverged — the starting point for a three-way merge." },
+    { term: "--no-ff", definition: "Flag that forces a merge commit even when a fast-forward is possible, preserving a record that a feature branch was used." },
+  ],
 };
 
 export default lesson;

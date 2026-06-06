@@ -1,8 +1,8 @@
 const lesson = {
-  id: "git-0-006",
+  id: "git-0-007",
   slug: "parallel-timelines",
   chapter: "git-0",
-  order: 6,
+  order: 7,
   title: "Branches",
   subtitle: "Build something new without breaking what works",
   tags: ["git", "branches", "fundamentals", "git branch", "git checkout"],
@@ -105,46 +105,54 @@ const lesson = {
     },
   ],
 
-  assessment: {
-    questions: [
-      {
-        id: "git0-006-q1",
-        type: "choice",
-        text: "You create a branch `experiment` from `main` and make 3 commits on it. What happens to `main`?",
-        options: [
-          "main also advances to include the 3 commits",
-          "main is deleted to avoid conflicts",
-          "main stays exactly where it was when `experiment` was created",
-          "main is paused until you merge",
-        ],
-        answer: "main stays exactly where it was when `experiment` was created",
-      },
-      {
-        id: "git0-006-q2",
-        type: "choice",
-        text: "What does `git checkout -b new-feature` do?",
-        options: [
-          "Deletes the branch called new-feature",
-          "Creates a branch called new-feature and switches to it",
-          "Merges new-feature into main",
-          "Renames main to new-feature",
-        ],
-        answer: "Creates a branch called new-feature and switches to it",
-      },
-      {
-        id: "git0-006-q3",
-        type: "choice",
-        text: "How much disk space does creating a new branch cost in Git?",
-        options: [
-          "A full copy of every file in the project",
-          "One file per commit on the branch",
-          "About 41 bytes — a file containing the commit hash",
-          "It depends on the size of your project",
-        ],
-        answer: "About 41 bytes — a file containing the commit hash",
-      },
-    ],
-  },
+  quiz: [
+    {
+      id: "git0-007-q1",
+      type: "choice",
+      text: "You create a branch `experiment` from `main` and make 3 commits on it. What happens to `main`?",
+      options: [
+        "main also advances to include the 3 commits",
+        "main is deleted to avoid conflicts",
+        "main stays exactly where it was when `experiment` was created",
+        "main is paused until you merge",
+      ],
+      answer: "main stays exactly where it was when `experiment` was created",
+      hints: ["A branch is just a label on a commit. Committing on `experiment` moves experiment's label — not main's."],
+    },
+    {
+      id: "git0-007-q2",
+      type: "choice",
+      text: "What does `git checkout -b new-feature` do?",
+      options: [
+        "Deletes the branch called new-feature",
+        "Creates a branch called new-feature and switches to it",
+        "Merges new-feature into main",
+        "Renames main to new-feature",
+      ],
+      answer: "Creates a branch called new-feature and switches to it",
+      hints: ["The `-b` flag means 'create branch'. The `checkout` switches to it."],
+    },
+    {
+      id: "git0-007-q3",
+      type: "choice",
+      text: "How much disk space does creating a new branch cost in Git?",
+      options: [
+        "A full copy of every file in the project",
+        "One file per commit on the branch",
+        "About 41 bytes — a file containing the commit hash",
+        "It depends on the size of your project",
+      ],
+      answer: "About 41 bytes — a file containing the commit hash",
+      hints: ["A branch is stored in `.git/refs/heads/` as a text file containing a single commit hash."],
+    },
+  ],
+
+  definitions: [
+    { term: "branch", definition: "A lightweight movable label (pointer) that points to a specific commit. Creating a branch costs almost nothing — it's a 41-byte file." },
+    { term: "feature branch", definition: "A branch created to develop one feature or fix in isolation, keeping `main` clean and deployable." },
+    { term: "git checkout -b", definition: "Creates a new branch at the current commit and switches to it in one step. Modern equivalent: `git switch -c`." },
+    { term: "branch pointer", definition: "The file in `.git/refs/heads/` that records which commit a branch currently points to. It advances automatically on each commit." },
+  ],
 };
 
 export default lesson;

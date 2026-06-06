@@ -1,8 +1,8 @@
 const lesson = {
-  id: "git-0-010",
+  id: "git-0-014",
   slug: "remote-repositories",
   chapter: "git-0",
-  order: 10,
+  order: 14,
   title: "Remote Repositories",
   subtitle: "git remote, git clone, and origin",
   tags: ["git", "remote", "clone", "origin", "github"],
@@ -57,46 +57,54 @@ const lesson = {
     },
   ],
 
-  assessment: {
-    questions: [
-      {
-        id: "git0-010-q1",
-        type: "choice",
-        text: "What is `origin` in Git?",
-        options: [
-          "The original first commit in a repository",
-          "The default local branch name",
-          "A conventional name for the main remote repository URL",
-          "The Git server software",
-        ],
-        answer: "A conventional name for the main remote repository URL",
-      },
-      {
-        id: "git0-010-q2",
-        type: "choice",
-        text: "What does `origin/main` represent?",
-        options: [
-          "Your local main branch",
-          "A read-only local snapshot of where main was on the remote last sync",
-          "The remote repository's configuration file",
-          "The merge base of main and origin",
-        ],
-        answer: "A read-only local snapshot of where main was on the remote last sync",
-      },
-      {
-        id: "git0-010-q3",
-        type: "choice",
-        text: "What does `git clone` do automatically for you?",
-        options: [
-          "Sets up SSH keys for the remote",
-          "Creates a new empty repo on GitHub",
-          "Sets `origin` to the cloned URL and sets up tracking for the default branch",
-          "Clones all branches as separate folders",
-        ],
-        answer: "Sets `origin` to the cloned URL and sets up tracking for the default branch",
-      },
-    ],
-  },
+  quiz: [
+    {
+      id: "git0-014-q1",
+      type: "choice",
+      text: "What is `origin` in Git?",
+      options: [
+        "The original first commit in a repository",
+        "The default local branch name",
+        "A conventional name for the main remote repository URL",
+        "The Git server software",
+      ],
+      answer: "A conventional name for the main remote repository URL",
+      hints: ["It's just a name — you could call it anything. What do teams conventionally call the main remote?"],
+    },
+    {
+      id: "git0-014-q2",
+      type: "choice",
+      text: "What does `origin/main` represent?",
+      options: [
+        "Your local main branch",
+        "A read-only local snapshot of where main was on the remote last sync",
+        "The remote repository's configuration file",
+        "The merge base of main and origin",
+      ],
+      answer: "A read-only local snapshot of where main was on the remote last sync",
+      hints: ["It's updated by git fetch, not automatically. It's a local copy of remote state."],
+    },
+    {
+      id: "git0-014-q3",
+      type: "choice",
+      text: "What does `git clone` do automatically for you?",
+      options: [
+        "Sets up SSH keys for the remote",
+        "Creates a new empty repo on GitHub",
+        "Sets `origin` to the cloned URL and sets up tracking for the default branch",
+        "Clones all branches as separate folders",
+      ],
+      answer: "Sets `origin` to the cloned URL and sets up tracking for the default branch",
+      hints: ["After cloning, you can immediately `git push` and `git pull` without extra setup. Why?"],
+    },
+  ],
+
+  definitions: [
+    { term: "upstream (remote)", definition: "A conventional second remote name pointing to the original repo you forked from. Your fork is `origin`; the original project is `upstream`." },
+    { term: "git remote", definition: "Manages remote connections. `git remote -v` lists them; `git remote add name url` adds one; `git remote set-url` changes a URL." },
+    { term: "tracking branch", definition: "A local branch configured to sync with a specific remote branch. Set with `git push -u` so plain `git push`/`git pull` work without arguments." },
+    { term: "SSH URL", definition: "A remote URL using SSH authentication (`git@github.com:user/repo.git`). Requires an SSH key but avoids re-entering credentials." },
+  ],
 };
 
 export default lesson;

@@ -1,8 +1,8 @@
 const lesson = {
-  id: "git-0-013",
+  id: "git-0-018",
   slug: "rebasing",
   chapter: "git-0",
-  order: 13,
+  order: 18,
   title: "Rebasing",
   subtitle: "Rewriting history for a cleaner line",
   tags: ["git", "rebase", "linear-history", "base"],
@@ -104,48 +104,56 @@ const lesson = {
     },
   ],
 
-  assessment: {
-    questions: [
-      {
-        id: "git0-013-q1",
-        type: "choice",
-        text: "After `git rebase main`, what happens to the rebased commits?",
-        options: [
-          "They get merged into main immediately",
-          "They are deleted and replaced by main's commits",
-          "They get new SHA hashes, replayed on top of main's current tip",
-          "They stay unchanged but main's pointer moves",
-        ],
-        answer:
-          "They get new SHA hashes, replayed on top of main's current tip",
-      },
-      {
-        id: "git0-013-q2",
-        type: "choice",
-        text: "The golden rule of rebasing is:",
-        options: [
-          "Always rebase instead of merge",
-          "Never rebase commits that have been pushed to shared/public branches",
-          "Only rebase if there are more than 5 commits",
-          "Rebase before every `git push`",
-        ],
-        answer:
-          "Never rebase commits that have been pushed to shared/public branches",
-      },
-      {
-        id: "git0-013-q3",
-        type: "choice",
-        text: "You hit a conflict during rebase. After resolving the conflict files, what's next?",
-        options: [
-          "`git merge --continue`",
-          "`git rebase --resolved`",
-          "`git add <files>` then `git rebase --continue`",
-          "`git commit` then `git rebase --continue`",
-        ],
-        answer: "`git add <files>` then `git rebase --continue`",
-      },
-    ],
-  },
+  quiz: [
+    {
+      id: "git0-018-q1",
+      type: "choice",
+      text: "After `git rebase main`, what happens to the rebased commits?",
+      options: [
+        "They get merged into main immediately",
+        "They are deleted and replaced by main's commits",
+        "They get new SHA hashes, replayed on top of main's current tip",
+        "They stay unchanged but main's pointer moves",
+      ],
+      answer:
+        "They get new SHA hashes, replayed on top of main's current tip",
+      hints: ["Rebase changes the parent of each commit. Changing the parent changes the SHA. Same content, new hash."],
+    },
+    {
+      id: "git0-018-q2",
+      type: "choice",
+      text: "The golden rule of rebasing is:",
+      options: [
+        "Always rebase instead of merge",
+        "Never rebase commits that have been pushed to shared/public branches",
+        "Only rebase if there are more than 5 commits",
+        "Rebase before every `git push`",
+      ],
+      answer:
+        "Never rebase commits that have been pushed to shared/public branches",
+      hints: ["Rebase rewrites hashes. If teammates have already pulled those commits, what happens to their repos?"],
+    },
+    {
+      id: "git0-018-q3",
+      type: "choice",
+      text: "You hit a conflict during rebase. After resolving the conflict files, what's next?",
+      options: [
+        "`git merge --continue`",
+        "`git rebase --resolved`",
+        "`git add <files>` then `git rebase --continue`",
+        "`git commit` then `git rebase --continue`",
+      ],
+      answer: "`git add <files>` then `git rebase --continue`",
+      hints: ["Stage the resolution to tell Git you're done, then continue replaying the remaining commits."],
+    },
+  ],
+
+  definitions: [
+    { term: "rebase", definition: "Moves a branch's commits to a new starting point by replaying them one by one on top of the target. Each replayed commit gets a new SHA." },
+    { term: "golden rule of rebasing", definition: "Never rebase commits that have been pushed to a shared or public branch — it rewrites hashes and breaks collaborators' repos." },
+    { term: "git rebase --abort", definition: "Cancels an in-progress rebase and returns everything to the state before rebase started." },
+    { term: "git rebase --continue", definition: "Resumes a paused rebase after you have resolved a conflict and staged the resolved files." },
+  ],
 };
 
 export default lesson;
