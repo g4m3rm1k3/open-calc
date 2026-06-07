@@ -28,18 +28,125 @@ const CLR_LIGHT = {
   inputBg: '#f1f5f9',
 }
 
+// ── Express / require shim ────────────────────────────────────────────────────
+function makeRequire(files) {
+  const expressApps = []
+
+  function createApp() {
+    const routes = []
+    const app = { _routes: routes, set() {}, engine() {}, use() { return app } }
+    ;['get', 'post', 'put', 'patch', 'delete', 'all'].forEach(m => {
+      app[m] = (path, ...handlers) => {
+        if (typeof path === 'function') return app
+        routes.push({ method: m.toUpperCase(), path, handlers })
+        return app
+      }
+    })
+    app.route = (path) => {
+      const r = {}
+      ;['get', 'post', 'put', 'patch', 'delete'].forEach(m => {
+        r[m] = (...handlers) => { routes.push({ method: m.toUpperCase(), path, handlers }); return r }
+      })
+      return r
+    }
+    app.listen = (port, cb) => {
+      expressApps.push({ port, routes })
+      if (typeof cb === 'function') cb()
+      return { close() {}, address() { return { port } } }
+    }
+    return app
+  }
+
+  const express = () => createApp()
+  express.Router = createApp
+  express.json = () => (req, res, next) => next?.()
+  express.urlencoded = () => (req, res, next) => next?.()
+  express.static = () => (req, res, next) => next?.()
+
+  const noop = () => () => {}
+  const pathShim = {
+    join: (...p) => p.join('/').replace(/\/+/g, '/'),
+    resolve: (...p) => ('/' + p.join('/')).replace(/\/+/g, '/'),
+    dirname: p => p.split('/').slice(0, -1).join('/') || '.',
+    basename: (p, ext) => { const b = p.split('/').pop(); return ext ? b.replace(ext, '') : b },
+    extname: p => (p.match(/\.[^.]+$/) || [''])[0],
+    sep: '/',
+  }
+  const fsShim = {
+    readFileSync(name) {
+      const f = files.find(f => f.name === name || f.name.endsWith('/' + name))
+      if (!f) throw new Error(`ENOENT: no such file or directory, open '${name}'`)
+      return f.content
+    },
+    existsSync: name => files.some(f => f.name === name || f.name.endsWith('/' + name)),
+    writeFileSync: () => {},
+    readFile: (name, cb) => { try { cb(null, fsShim.readFileSync(name)) } catch (e) { cb(e) } },
+  }
+
+  const MODS = {
+    express, path: pathShim, fs: fsShim,
+    'body-parser': { json: noop, urlencoded: noop, text: noop, raw: noop },
+    cors: noop, morgan: noop, helmet: noop, compression: noop,
+    dotenv: { config: () => ({}) },
+    'method-override': noop, 'express-async-errors': {},
+    os: { platform: () => 'browser', hostname: () => 'localhost', cpus: () => [] },
+  }
+
+  function requireFn(mod) {
+    if (mod in MODS) return MODS[mod]
+    throw new Error(`'${mod}' is not available in the browser sandbox.\nSupported: express, path, fs, body-parser, cors, morgan, dotenv`)
+  }
+  requireFn._apps = expressApps
+  return requireFn
+}
+
+function runExpressRoutes(apps, logs) {
+  for (const { port, routes } of apps) {
+    logs.push(`──────────────────────────────────────────────`)
+    if (!routes.length) { logs.push('(no routes registered)'); continue }
+    for (const { method, path, handlers } of routes) {
+      if (method !== 'GET') { logs.push(`${method.padEnd(7)} ${path}  [registered]`); continue }
+      const resp = []
+      const res = {
+        _s: 200,
+        status(c) { this._s = c; return this },
+        send(b) { resp.push(typeof b === 'string' ? b : JSON.stringify(b, null, 2)) },
+        json(b) { resp.push(JSON.stringify(b, null, 2)) },
+        sendStatus(c) { resp.push(String(c)) },
+        redirect(u) { resp.push(`→ redirect ${u}`) },
+        render(v) { resp.push(`→ render '${v}'`) },
+        set() { return this }, type() { return this }, end(b) { if (b) resp.push(String(b)) },
+      }
+      const req = { method, path, url: path, params: {}, query: {}, body: {}, headers: {} }
+      try {
+        let i = 0
+        const next = (err) => { if (err) throw err; const h = handlers[i++]; if (h) h(req, res, next) }
+        next()
+        logs.push(`GET     ${path.padEnd(22)} → ${resp.join(' | ') || '(empty response)'}`)
+      } catch (e) {
+        logs.push(`GET     ${path.padEnd(22)} → Error: ${e.message}`)
+      }
+    }
+    logs.push(`──────────────────────────────────────────────`)
+  }
+}
+
 // ── JS sandbox runner ─────────────────────────────────────────────────────────
-function runJS(code) {
+function runJS(code, files = []) {
+  const src = transformESM(code)
   const logs = []
   const api = {
     log:   (...a) => logs.push(a.map(fmtVal).join(' ')),
     warn:  (...a) => logs.push(`Warning: ${a.map(fmtVal).join(' ')}`),
     error: (...a) => logs.push(`Error: ${a.map(fmtVal).join(' ')}`),
   }
+  const req = makeRequire(files)
+  const mod = { exports: {} }
   try {
-    const r = Function('console', `"use strict";\n${code}`)(api)
+    const r = Function('console', 'require', 'module', 'exports', `"use strict";\n${src}`)(api, req, mod, mod.exports)
     if (r !== undefined) logs.push(fmtVal(r))
   } catch (e) { logs.push(`Error: ${e.message}`) }
+  if (req._apps.length) runExpressRoutes(req._apps, logs)
   return logs.join('\n') || '(no output)'
 }
 
@@ -62,9 +169,46 @@ async function loadBabel() {
 
 function transpileTS(code, filename = 'file.ts') {
   return window.Babel.transform(code, {
-    presets: [['typescript', { allExtensions: true }], ['env', { targets: { esmodules: true } }]],
+    // modules:'commonjs' forces require() output so our shim can intercept it
+    presets: [['typescript', { allExtensions: true }], ['env', { targets: { esmodules: true }, modules: 'commonjs' }]],
     filename,
   }).code
+}
+
+// Convert ES module import/export to CommonJS so new Function() can run it
+function transformESM(src) {
+  // import def, { named } from 'mod'
+  src = src.replace(
+    /^import\s+(\w[\w$]*)\s*,\s*\{([^}]+)\}\s+from\s+['"]([^'"]+)['"]\s*;?$/gm,
+    (_, def, names, mod) => {
+      const tmp = `_esm_${mod.replace(/\W+/g, '_')}`
+      return `const ${tmp} = require('${mod}'); const ${def} = ${tmp}.default ?? ${tmp}; const {${names}} = ${tmp}`
+    }
+  )
+  // import * as ns from 'mod'
+  src = src.replace(
+    /^import\s+\*\s+as\s+(\w[\w$]*)\s+from\s+['"]([^'"]+)['"]\s*;?$/gm,
+    (_, name, mod) => `const ${name} = require('${mod}')`
+  )
+  // import { named } from 'mod'
+  src = src.replace(
+    /^import\s+\{([^}]+)\}\s+from\s+['"]([^'"]+)['"]\s*;?$/gm,
+    (_, names, mod) => `const {${names}} = require('${mod}')`
+  )
+  // import def from 'mod'
+  src = src.replace(
+    /^import\s+(\w[\w$]*)\s+from\s+['"]([^'"]+)['"]\s*;?$/gm,
+    (_, name, mod) => `const ${name} = require('${mod}')`
+  )
+  // import 'mod'  (side-effects only)
+  src = src.replace(/^import\s+['"]([^'"]+)['"]\s*;?$/gm, (_, mod) => `require('${mod}')`)
+  // export default → module.exports =
+  src = src.replace(/^export\s+default\s+/gm, 'module.exports = ')
+  // export const / function / class → strip export
+  src = src.replace(/^export\s+(const|let|var|async\s+function|function\s*\*?|class)\s+/gm, '$1 ')
+  // export { x, y }
+  src = src.replace(/^export\s+\{[^}]*\}\s*;?$/gm, '')
+  return src
 }
 
 // ── React/JSX → srcdoc ───────────────────────────────────────────────────────
@@ -103,7 +247,7 @@ function buildHtmlBundle(files) {
 const BANNER = [
   { text: '┌─ Workspace Terminal ────────────────────────────────────────┐', type: 'dim' },
   { text: '│  python file.py      Run Python (imports auto-loaded)       │', type: 'dim' },
-  { text: '│  node file.js        Run JavaScript                         │', type: 'dim' },
+  { text: '│  node file.js        Run JavaScript (require + Express ok)  │', type: 'dim' },
   { text: '│  node file.ts        Run TypeScript (Babel transpiled)      │', type: 'dim' },
   { text: '│  node file.jsx       Run React/JSX → Preview tab            │', type: 'dim' },
   { text: '│  tsc file.ts         Compile TS → show emitted JS           │', type: 'dim' },
@@ -188,7 +332,18 @@ const WorkspaceTerminal = forwardRef(function WorkspaceTerminal({ files = [], is
         pyodide.setStdout({ batched: t => t.split('\n').forEach(l => { if (l) print(l, 'output') }) })
         pyodide.setStderr({ batched: t => t.split('\n').forEach(l => { if (l) print(l, 'error') }) })
 
-        await pyodide.runPythonAsync(file.content)
+        try {
+          await pyodide.runPythonAsync(file.content)
+        } catch (e) {
+          // SystemExit is normal program termination — show exit code, not traceback
+          const msg = String(e)
+          if (msg.includes('SystemExit')) {
+            const code = msg.match(/SystemExit:\s*(\d+)/)?.[1]
+            if (code && code !== '0') print(`Process exited with code ${code}`, 'warn')
+          } else {
+            throw e
+          }
+        }
 
       // ── pip install ───────────────────────────────────────────────────────
       } else if (prog === 'pip' || prog === 'pip3') {
@@ -232,12 +387,12 @@ const WorkspaceTerminal = forwardRef(function WorkspaceTerminal({ files = [], is
           try {
             await loadBabel()
             const js = transpileTS(file.content, file.name)
-            printLines(runJS(js))
+            printLines(runJS(js, allFiles))
           } catch (e) {
             print(`TypeScript error: ${e.message}`, 'error')
           }
         } else {
-          printLines(runJS(file.content))
+          printLines(runJS(file.content, allFiles))
         }
 
       // ── tsc ───────────────────────────────────────────────────────────────

@@ -37,7 +37,7 @@ const LS_KEY = 'markdownhub_personal'
 
 const LANG_EXT = { javascript: 'js', js: 'js', python: 'py', py: 'py', typescript: 'ts', ts: 'ts', css: 'css', html: 'html', markup: 'html', bash: 'sh', shell: 'sh', json: 'json', text: 'txt' }
 const MONACO_LANG = { py: 'python', js: 'javascript', ts: 'typescript', sh: 'shell', xml: 'html', markup: 'html', bash: 'shell' }
-const WORKSPACE_LANG = { python: 'python', javascript: 'javascript', typescript: 'javascript', html: 'html', css: 'javascript', shell: 'javascript', json: 'javascript', plaintext: 'javascript', matlab: 'openmat', openmat: 'openmat' }
+const WORKSPACE_LANG = { python: 'python', javascript: 'javascript', typescript: 'typescript', html: 'html', css: 'javascript', shell: 'javascript', json: 'javascript', plaintext: 'javascript', matlab: 'openmat', openmat: 'openmat' }
 
 const TERM_REFS = {
   // Python dunder methods
