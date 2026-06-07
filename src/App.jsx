@@ -1,4 +1,4 @@
-import { HashRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import { ProgressProvider } from "./context/ProgressContext.jsx";
 import { SearchProvider } from "./context/SearchContext.jsx";
@@ -29,7 +29,8 @@ const AllCoursesPage = lazy(() => import("./pages/AllCoursesPage.jsx"));
 const CadProPage = lazy(() => import("./pages/CadProPage.jsx"));
 const OpenCraftPage = lazy(() => import("./pages/OpenCraftPage.jsx"));
 const StemQuestPage = lazy(() => import("./pages/StemQuestPage.jsx"));
-const DocsPage = lazy(() => import("./pages/DocsPage.jsx"));
+const DocsPage = lazy(() => import("./pages/DocsPage.jsx"))
+;
 const VizGalleryPage = lazy(() => import("./pages/VizGalleryPage.jsx"));
 const GamesPage = lazy(() => import("./pages/GamesPage.jsx"));
 const LabsPage = lazy(() => import("./pages/LabsPage.jsx"));
@@ -110,7 +111,8 @@ export default function App() {
                     <Route path="cad-pro" element={<CadProPage />} />
                     <Route path="open-craft" element={<OpenCraftPage />} />
                     <Route path="stem-quest" element={<StemQuestPage />} />
-                    <Route path="docs" element={<DocsPage />} />
+                    <Route path="studio" element={<DocsPage />} />
+                    <Route path="docs" element={<Navigate to="/studio" replace />} />
                     <Route path="viz-gallery" element={<VizGalleryPage />} />
                     <Route path="games" element={<GamesPage />} />
                     <Route path="labs" element={<LabsPage />} />

@@ -411,9 +411,9 @@ function TopBar({
             <Brain className="w-5 h-5" />
           </NavLink>
           <NavLink
-            to="/docs"
-            title="Docs"
-            aria-label="Technical Docs"
+            to="/studio"
+            title="Studio"
+            aria-label="Studio — Docs & Code"
             className={({ isActive }) =>
               `p-2 rounded-lg transition-all ${isActive ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`
             }
@@ -645,7 +645,7 @@ export default function AppShell({ children }) {
   const isOpenCraftRoute = location.pathname.startsWith("/open-craft");
   const isRealityRunnerRoute = location.pathname.startsWith("/reality-runner");
   const isStemQuestRoute = location.pathname.startsWith("/stem-quest");
-  const isDocsRoute = location.pathname.startsWith("/docs");
+  const isDocsRoute = location.pathname.startsWith("/studio") || location.pathname.startsWith("/docs");
   const isAsteroidsRoute = location.pathname.startsWith("/asteroids-la");
   const isVectorCommandRoute = location.pathname.startsWith("/vector-command");
   const isStemTetrisRoute = location.pathname.startsWith("/stem-tetris");

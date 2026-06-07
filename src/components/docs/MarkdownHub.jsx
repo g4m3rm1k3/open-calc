@@ -89,7 +89,7 @@ function buildTree(modulePaths) {
       } else {
         let dir = nodes.find((node) => node.type === 'dir' && node.name === part)
         if (!dir) {
-          dir = { type: 'dir', name: part, children: [], open: true }
+          dir = { type: 'dir', name: part, children: [], open: false }
           nodes.push(dir)
         }
         nodes = dir.children
@@ -830,7 +830,7 @@ export default function MarkdownHub() {
           </button>
 
           <span className="text-[17px] font-bold text-slate-800 dark:text-slate-100 mr-2 tracking-tight">
-            📚 Docs
+            🖥️ Studio
           </span>
 
           <div className="flex flex-wrap bg-slate-200/50 dark:bg-slate-950/50 p-1 rounded-lg gap-1 border border-slate-200/50 dark:border-slate-800/50">
