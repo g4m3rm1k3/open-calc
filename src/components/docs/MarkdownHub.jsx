@@ -1,10 +1,12 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef, createContext, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 import 'katex/dist/katex.min.css'
+import Editor from '@monaco-editor/react'
+import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
 import {
   X,
   ChevronDown,
@@ -32,6 +34,46 @@ const DOCS_MODULES = import.meta.glob('/src/docs/**/*.md', {
 
 const PREFIX = '/src/docs/'
 const LS_KEY = 'markdownhub_personal'
+
+const LANG_EXT = { javascript: 'js', js: 'js', python: 'py', py: 'py', typescript: 'ts', ts: 'ts', css: 'css', html: 'html', markup: 'html', bash: 'sh', shell: 'sh', json: 'json', text: 'txt' }
+const MONACO_LANG = { py: 'python', js: 'javascript', ts: 'typescript', sh: 'shell', xml: 'html', markup: 'html', bash: 'shell' }
+const WORKSPACE_LANG = { python: 'python', javascript: 'javascript', typescript: 'javascript', html: 'html', css: 'javascript', shell: 'javascript', json: 'javascript', plaintext: 'javascript' }
+
+const TERM_REFS = {
+  // Python dunder methods
+  '__init__':       { desc: 'Constructor — runs automatically when an instance is created.', url: 'https://docs.python.org/3/reference/datamodel.html#object.__init__', src: 'py' },
+  '__str__':        { desc: 'Returns the human-readable string representation of an object.', url: 'https://docs.python.org/3/reference/datamodel.html#object.__str__', src: 'py' },
+  '__repr__':       { desc: 'Returns the developer-facing unambiguous string representation.', url: 'https://docs.python.org/3/reference/datamodel.html#object.__repr__', src: 'py' },
+  '__len__':        { desc: 'Called by len() — return the length of the container.', url: 'https://docs.python.org/3/reference/datamodel.html#object.__len__', src: 'py' },
+  '__eq__':         { desc: 'Defines == comparison between two objects.', url: 'https://docs.python.org/3/reference/datamodel.html#object.__eq__', src: 'py' },
+  '__call__':       { desc: 'Makes an instance callable like a function: obj(args).', url: 'https://docs.python.org/3/reference/datamodel.html#object.__call__', src: 'py' },
+  '__enter__':      { desc: 'Called on entering a with block — returns the context resource.', url: 'https://docs.python.org/3/reference/datamodel.html#object.__enter__', src: 'py' },
+  '__exit__':       { desc: 'Called on leaving a with block — handles cleanup and exceptions.', url: 'https://docs.python.org/3/reference/datamodel.html#object.__exit__', src: 'py' },
+  '__slots__':      { desc: 'Restricts instance attributes to a fixed set, reducing memory.', url: 'https://docs.python.org/3/reference/datamodel.html#slots', src: 'py' },
+  // Python decorators / builtins
+  '@property':      { desc: 'Turns a method into a read-only attribute with optional setter.', url: 'https://docs.python.org/3/library/functions.html#property', src: 'py' },
+  '@classmethod':   { desc: 'Method bound to the class, not the instance — receives cls as first arg.', url: 'https://docs.python.org/3/library/functions.html#classmethod', src: 'py' },
+  '@staticmethod':  { desc: 'Method with no implicit first argument — a plain function in a class.', url: 'https://docs.python.org/3/library/functions.html#staticmethod', src: 'py' },
+  '@abstractmethod':{ desc: 'Marks a method as abstract — subclasses must implement it or cannot be instantiated.', url: 'https://docs.python.org/3/library/abc.html#abc.abstractmethod', src: 'py' },
+  '@dataclass':     { desc: 'Auto-generates __init__, __repr__, __eq__ and more from field annotations.', url: 'https://docs.python.org/3/library/dataclasses.html', src: 'py' },
+  'super()':        { desc: 'Returns a proxy to call methods from a parent class in the MRO chain.', url: 'https://docs.python.org/3/library/functions.html#super', src: 'py' },
+  'isinstance()':   { desc: 'Returns True if the object is an instance of the class or tuple of classes.', url: 'https://docs.python.org/3/library/functions.html#isinstance', src: 'py' },
+  'issubclass()':   { desc: 'Returns True if a class is a subclass of another.', url: 'https://docs.python.org/3/library/functions.html#issubclass', src: 'py' },
+  'ABC':            { desc: 'Abstract Base Class helper — inherit from this to create abstract classes.', url: 'https://docs.python.org/3/library/abc.html#abc.ABC', src: 'py' },
+  // JS / Web MDN
+  'addEventListener':     { desc: 'Registers an event handler on an EventTarget (element, document, window).', url: 'https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener', src: 'mdn' },
+  'removeEventListener':  { desc: 'Removes a previously registered event listener from an EventTarget.', url: 'https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/removeEventListener', src: 'mdn' },
+  'querySelector':        { desc: 'Returns the first element in the document matching a CSS selector.', url: 'https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector', src: 'mdn' },
+  'querySelectorAll':     { desc: 'Returns a NodeList of all elements matching a CSS selector.', url: 'https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelectorAll', src: 'mdn' },
+  'fetch':                { desc: 'Makes a network request and returns a Promise resolving to a Response.', url: 'https://developer.mozilla.org/en-US/docs/Web/API/fetch', src: 'mdn' },
+  'Promise':              { desc: 'Represents the eventual completion or failure of an async operation.', url: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise', src: 'mdn' },
+  'localStorage':         { desc: "Persists key-value data in the browser with no expiry.", url: 'https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage', src: 'mdn' },
+  'Object.keys':          { desc: "Returns an array of an object's own enumerable property names.", url: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys', src: 'mdn' },
+  'Object.values':        { desc: "Returns an array of an object's own enumerable property values.", url: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/values', src: 'mdn' },
+  'Object.entries':       { desc: "Returns an array of [key, value] pairs for an object's own properties.", url: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries', src: 'mdn' },
+  'JSON.parse':           { desc: 'Parses a JSON string and constructs the JavaScript value it describes.', url: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse', src: 'mdn' },
+  'JSON.stringify':       { desc: 'Converts a JavaScript value to a JSON string.', url: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify', src: 'mdn' },
+}
 
 function buildTree(modulePaths) {
   const root = []
@@ -113,7 +155,159 @@ const MD_CSS = `
 .md-body img { max-width: 100%; border-radius: 8px; border: 1px solid #e2e8f0; }
 .dark .md-body img { border-color: #334155; }
 .md-body .katex-display { overflow-x: auto; overflow-y: hidden; }
+/* ── Monaco code block wrapper ── */
+.md-code-block { margin: 0 0 1.2em; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; }
+.dark .md-code-block { border-color: #1e293b; }
+.md-code-header { display: flex; align-items: center; justify-content: space-between; padding: 5px 14px; background: #f1f5f9; border-bottom: 1px solid #e2e8f0; }
+.dark .md-code-header { background: #0d1526; border-bottom-color: #1e293b; }
+.md-code-lang { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; font-family: 'JetBrains Mono', monospace; }
+.dark .md-code-lang { color: #4a5568; }
+.md-code-actions { display: flex; gap: 5px; }
+.md-code-btn { font-size: 10px; font-weight: 600; padding: 2px 9px; border-radius: 4px; border: 1px solid #e2e8f0; background: white; color: #475569; cursor: pointer; transition: all 0.15s; font-family: system-ui; line-height: 1.8; }
+.dark .md-code-btn { border-color: #334155; background: #1e293b; color: #94a3b8; }
+.md-code-btn:hover { background: #e2e8f0; color: #1e293b; }
+.dark .md-code-btn:hover { background: #334155; color: #e2e8f0; }
+.md-code-btn.copied { color: #16a34a !important; border-color: #86efac !important; }
+.dark .md-code-btn.copied { color: #4ade80 !important; border-color: #166534 !important; }
+.md-code-btn.run { color: #0369a1; border-color: #bae6fd; background: #f0f9ff; }
+.dark .md-code-btn.run { color: #38bdf8; border-color: #0c4a6e; background: #082f49; }
+.md-code-btn.run:hover { background: #e0f2fe; }
+.dark .md-code-btn.run:hover { background: #0c4a6e; }
+.md-code-monaco { overflow: hidden; }
+.md-code-monaco .monaco-editor .overflow-guard { border-radius: 0 0 6px 6px; }
+/* ── Inline doc reference badge ── */
+.md-ref-badge { font-size: 8px; font-weight: 700; vertical-align: super; margin-left: 2px; padding: 1px 4px; border-radius: 3px; text-decoration: none; line-height: 1; white-space: nowrap; }
+.md-ref-badge.mdn { background: #dbeafe; color: #1d4ed8; border: 1px solid #bfdbfe; }
+.dark .md-ref-badge.mdn { background: #1e3a5f; color: #60a5fa; border-color: #1d4ed8; }
+.md-ref-badge.py { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+.dark .md-ref-badge.py { background: #3b2700; color: #fbbf24; border-color: #78350f; }
+.md-ref-badge:hover { opacity: 0.75; }
 `
+
+function useIsDark() {
+  const [dark, setDark] = useState(() =>
+    typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+  )
+  useEffect(() => {
+    const obs = new MutationObserver(() =>
+      setDark(document.documentElement.classList.contains('dark'))
+    )
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+    return () => obs.disconnect()
+  }, [])
+  return dark
+}
+
+const DocsCtx = createContext({ isDark: false, onRun: null, codeAlongOpen: false })
+
+function MdCodeBlock({ language, code }) {
+  const { isDark, onRun, codeAlongOpen } = useContext(DocsCtx)
+  const [copied, setCopied] = useState(false)
+
+  const monacoLang = MONACO_LANG[language] || language
+  const lineCount = code.split('\n').length
+  const editorHeight = Math.min(Math.max(lineCount * 19 + 24, 72), 540)
+
+  const handleCopy = useCallback(() => {
+    navigator.clipboard.writeText(code).catch(() => {})
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }, [code])
+
+  const handleDownload = useCallback(() => {
+    const ext = LANG_EXT[language] || 'txt'
+    const blob = new Blob([code], { type: 'text/plain;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `snippet.${ext}`
+    a.click()
+    URL.revokeObjectURL(url)
+  }, [code, language])
+
+  return (
+    <div className="md-code-block">
+      <div className="md-code-header">
+        <span className="md-code-lang">{monacoLang}</span>
+        <div className="md-code-actions">
+          {onRun && (
+            <button
+              onClick={() => onRun(code, monacoLang)}
+              className="md-code-btn run"
+            >
+              ▶ {codeAlongOpen ? 'Run' : 'Code Along →'}
+            </button>
+          )}
+          <button onClick={handleDownload} className="md-code-btn">↓</button>
+          <button onClick={handleCopy} className={`md-code-btn${copied ? ' copied' : ''}`}>
+            {copied ? '✓' : 'Copy'}
+          </button>
+        </div>
+      </div>
+      <div className="md-code-monaco">
+        <Editor
+          height={editorHeight}
+          language={monacoLang}
+          defaultValue={code}
+          theme={isDark ? 'open-calc-dark' : 'open-calc-light'}
+          beforeMount={setupOpenCalcMonaco}
+          options={{
+            readOnly: true,
+            minimap: { enabled: false },
+            scrollBeyondLastLine: false,
+            lineNumbers: 'on',
+            lineDecorationsWidth: 4,
+            lineNumbersMinChars: 3,
+            folding: false,
+            wordWrap: 'off',
+            fontSize: 13,
+            fontFamily: "'JetBrains Mono', Consolas, 'Courier New', monospace",
+            renderLineHighlight: 'none',
+            overviewRulerLanes: 0,
+            hideCursorInOverviewRuler: true,
+            scrollbar: { vertical: 'auto', horizontal: 'auto', alwaysConsumeMouseWheel: false, verticalScrollbarSize: 6, horizontalScrollbarSize: 6 },
+            padding: { top: 10, bottom: 10 },
+            contextmenu: false,
+            automaticLayout: true,
+            glyphMargin: false,
+          }}
+        />
+      </div>
+    </div>
+  )
+}
+
+function MdInlineCode({ children }) {
+  const text = String(children)
+  const ref = TERM_REFS[text]
+  return (
+    <>
+      <code>{text}</code>
+      {ref && (
+        <span
+          className={`md-ref-badge ${ref.src}`}
+          title={ref.desc}
+          role="link"
+          tabIndex={0}
+          style={{ cursor: 'pointer' }}
+          onClick={() => window.open(ref.url, '_blank', 'noopener,noreferrer')}
+          onKeyDown={(e) => e.key === 'Enter' && window.open(ref.url, '_blank', 'noopener,noreferrer')}
+        >
+          {ref.src}↗
+        </span>
+      )}
+    </>
+  )
+}
+
+const MD_COMPONENTS = {
+  pre({ children }) { return <>{children}</> },
+  code({ className, children }) {
+    const match = /language-(\w+)/.exec(className || '')
+    if (!match) return <MdInlineCode>{children}</MdInlineCode>
+    return <MdCodeBlock language={match[1]} code={String(children).replace(/\n$/, '')} />
+  },
+}
 
 function TreeNode({ node, activeFile, onSelect, depth = 0, overriddenPaths = new Set() }) {
   const [open, setOpen] = useState(node.open !== false)
@@ -232,7 +426,21 @@ export default function MarkdownHub() {
   const [isSaving, setIsSaving] = useState(false)
   const [tutorialOverrideActive, setTutorialOverrideActive] = useState(false)
   const [codeAlongOpen, setCodeAlongOpen] = useState(false)
-  const [docsNavOpen, setDocsNavOpen] = useState(true)
+  const [docsNavOpen, setDocsNavOpen] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 640)
+  const [pendingRun, setPendingRun] = useState(null)
+  const isDark = useIsDark()
+
+  const handleRunInCodeAlong = useCallback((code, monacoLang) => {
+    const wsLang = WORKSPACE_LANG[monacoLang] || 'javascript'
+    setCodeAlongOpen(true)
+    setPendingRun({ code, language: wsLang, key: Date.now() })
+  }, [])
+
+  const docsCtxValue = useMemo(() => ({
+    isDark,
+    onRun: handleRunInCodeAlong,
+    codeAlongOpen,
+  }), [isDark, handleRunInCodeAlong, codeAlongOpen])
 
   const overriddenPaths = useMemo(() => new Set(overrideDocs.map((doc) => doc.path)), [overrideDocs])
   const activeUserDoc = userDocs.find((doc) => doc.id === activeUserId) || null
@@ -562,11 +770,12 @@ export default function MarkdownHub() {
       <div className="flex flex-col h-[100vh] w-full bg-white dark:bg-[#07111e] text-slate-900 dark:text-slate-100 font-sans overflow-hidden inset-0 fixed z-[100]">
         <div className="h-12 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3 px-4 shrink-0 shadow-sm z-10 w-full">
           <button
-            onClick={() => navigate(-1)}
-            className="p-1.5 -ml-1 rounded-md text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
-            title="Exit Docs"
+            onClick={() => setDocsNavOpen((value) => !value)}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+            title={docsNavOpen ? 'Hide docs navigation' : 'Show docs navigation'}
           >
-            <X className="w-5 h-5" />
+            {docsNavOpen ? <PanelLeftClose className="w-3.5 h-3.5" /> : <PanelLeftOpen className="w-3.5 h-3.5" />}
+            Nav
           </button>
 
           <span className="text-[17px] font-bold text-slate-800 dark:text-slate-100 mr-2 tracking-tight">
@@ -594,15 +803,6 @@ export default function MarkdownHub() {
           </div>
 
           <div className="flex-1" />
-
-          <button
-            onClick={() => setDocsNavOpen((value) => !value)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-            title={docsNavOpen ? 'Hide docs navigation' : 'Show docs navigation'}
-          >
-            {docsNavOpen ? <PanelLeftClose className="w-3.5 h-3.5" /> : <PanelLeftOpen className="w-3.5 h-3.5" />}
-            Nav
-          </button>
 
           <button
             onClick={() => setCodeAlongOpen((value) => !value)}
@@ -683,8 +883,17 @@ export default function MarkdownHub() {
               </button>
             </>
           )}
+
+          <button
+            onClick={() => navigate(-1)}
+            className="p-1.5 rounded-md text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
+            title="Exit Docs"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
+        <DocsCtx.Provider value={docsCtxValue}>
         <div className={`flex flex-1 overflow-hidden w-full relative ${codeAlongOpen ? 'min-w-0' : ''}`}>
           <div className={`${docsNavOpen ? 'hidden sm:flex' : 'hidden'} ${codeAlongOpen ? 'w-[240px]' : 'w-[300px]'} bg-slate-50 dark:bg-slate-900/50 border-r border-slate-200 dark:border-slate-800 flex-col shrink-0 overflow-hidden`}>
             <div className="flex-1 overflow-y-auto py-3 custom-scrollbar">
@@ -782,7 +991,7 @@ export default function MarkdownHub() {
                         )}
                       </div>
                     )}
-                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]} components={MD_COMPONENTS}>
                       {content}
                     </ReactMarkdown>
                   </div>
@@ -806,7 +1015,7 @@ export default function MarkdownHub() {
             {tab === 'editor' && activeDocType && previewMode && (
               <div className="flex-1 overflow-y-auto px-6 sm:px-10 lg:px-16 py-8 bg-slate-50/50 dark:bg-[#07111e]/50 custom-scrollbar">
                 <div className="md-body mx-auto bg-white dark:bg-[#0b1322] p-8 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 min-h-full">
-                  <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+                  <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]} components={MD_COMPONENTS}>
                     {editorContent}
                   </ReactMarkdown>
                 </div>
@@ -844,10 +1053,11 @@ export default function MarkdownHub() {
 
           {codeAlongOpen && (
             <div className={`${docsNavOpen ? 'basis-[58%]' : 'basis-[54%]'} hidden md:block min-w-[420px]`}>
-              <DocsCodeWorkspace activeTitle={activeTitle} />
+              <DocsCodeWorkspace activeTitle={activeTitle} pendingRun={pendingRun} />
             </div>
           )}
         </div>
+        </DocsCtx.Provider>
       </div>
     </>
   )

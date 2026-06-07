@@ -364,6 +364,9 @@ const VIZ_REGISTRY = {
   ScienceNotebook: lazy(() => import("./react/ScienceNotebook.jsx")),
   SimNotebook: lazy(() => import("./react/SimNotebook.jsx")),
   TransformLab: lazy(() => import("./react/TransformLab.jsx")),
+  PythonOOPStepperViz: lazy(() => import("./react/PythonOOPStepperViz.jsx")),
+  PythonDictStepperViz: lazy(() => import("./react/PythonDictStepperViz.jsx")),
+  NumpyBroadcastingStepperViz: lazy(() => import("./react/NumpyBroadcastingStepperViz.jsx")),
   // Chemistry lessons
   WhyChemistry: lazy(() => import("./react/WhyChemistry.jsx")),
   WhatIsAnAtom: lazy(() => import("./react/WhatIsAnAtom.jsx")),

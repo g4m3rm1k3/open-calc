@@ -48,6 +48,13 @@ export default {
     ],
     visualizations: [
       {
+        id: 'PythonOOPStepperViz',
+        title: 'Step-by-Step OOP Walkthrough',
+        mathBridge: 'A mental model for classes, objects, and inheritance.',
+        caption: 'Click through the steps to see how Python manages objects and memory under the hood.',
+        props: {}
+      },
+      {
         id: 'PythonNotebook',
         title: 'OOP 4.1 — Classes and Objects',
         mathBridge: 'Run each cell in order. Read the prose before running — predict the output first.',

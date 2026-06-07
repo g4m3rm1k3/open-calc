@@ -66,6 +66,13 @@ export default {
     ],
     visualizations: [
       {
+        id: 'NumpyBroadcastingStepperViz',
+        title: 'Step-by-Step Broadcasting Walkthrough',
+        mathBridge: 'Broadcasting stretches the smaller array to match the larger one before performing element-wise operations.',
+        caption: 'Click through the steps to see how broadcasting aligns and stretches dimensions under the hood.',
+        props: {}
+      },
+      {
         id: 'PythonNotebook',
         title: 'Arrays & Vectorization',
         mathBridge: 'Element-wise: (a + b)_i = a_i + b_i. Dot product: a · b = Σ aᵢbᵢ. Broadcasting: scalar s applied to array a gives (s · aᵢ).',

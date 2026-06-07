@@ -69,6 +69,13 @@ export default {
     ],
     visualizations: [
       {
+        id: 'PythonDictStepperViz',
+        title: 'Step-by-Step Dictionary Walkthrough',
+        mathBridge: 'A dictionary is a hash map under the hood.',
+        caption: 'Click through the steps to see how keys are hashed and mapped to buckets in O(1) time.',
+        props: {}
+      },
+      {
         id: 'PythonNotebook',
         title: 'The Key-Value Engine',
         mathBridge: 'A dict is a mathematical function with a finite domain: f: key → value, where lookup is O(1).',

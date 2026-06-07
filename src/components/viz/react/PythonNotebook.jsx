@@ -1227,7 +1227,11 @@ export default function PythonNotebook({ params, onParamChange }) {
             width: 40,
             height: 40,
             borderRadius: "50%",
-            border: `3px solid ${C.teal}`,
+            borderWidth: 3,
+            borderStyle: "solid",
+            borderRightColor: C.teal,
+            borderBottomColor: C.teal,
+            borderLeftColor: C.teal,
             borderTopColor: "transparent",
             animation: "spin 1s linear infinite",
           }}

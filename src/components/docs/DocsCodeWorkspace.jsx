@@ -1,367 +1,484 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Editor from '@monaco-editor/react'
-import { Columns2, FileCode2, Maximize2, Minimize2, Play, RotateCcw } from 'lucide-react'
+import { ChevronDown, ChevronLeft, ChevronRight, Columns2, Download, FilePlus, FolderPlus, Maximize2, Minimize2, Play, RotateCcw, X } from 'lucide-react'
 import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
 import { executeScript } from '../../utils/openmatEngine.js'
+import WorkspaceTerminal from './WorkspaceTerminal.jsx'
+import { useIsDark } from '../../utils/useIsDark.js'
 
-let pyodidePromise = null
-
-async function getPyodide() {
-  if (!pyodidePromise) {
-    pyodidePromise = (async () => {
-      if (!window.loadPyodide) {
-        await withTimeout(new Promise((resolve, reject) => {
-          const script = document.createElement('script')
-          script.src = 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js'
-          script.onload = resolve
-          script.onerror = () => reject(new Error('Failed to load Pyodide. Check network access or try again.'))
-          document.head.appendChild(script)
-        }), 30000, 'Timed out loading Pyodide. The first Python run downloads the runtime; check network access and try again.')
-      }
-      return withTimeout(window.loadPyodide({
-        indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/',
-        fullStdLib: false,
-      }), 45000, 'Timed out initializing Pyodide.')
-    })().catch((error) => {
-      pyodidePromise = null
-      throw error
-      })
-  }
-  return pyodidePromise
+// ── Tree item helpers ─────────────────────────────────────────────────────────
+const EXT_LANG = {
+  html: 'html', css: 'css', js: 'javascript', ts: 'typescript',
+  py: 'python', json: 'json', sh: 'shell', cpp: 'cpp', c: 'c',
+  txt: 'plaintext', md: 'markdown',
+}
+const LANG_DEFAULT_NAME = {
+  html: 'index.html', css: 'style.css', javascript: 'script.js',
+  typescript: 'main.ts', python: 'main.py', shell: 'script.sh',
+  cpp: 'main.cpp', plaintext: 'notes.txt',
+}
+const LANG_DOT = {
+  html: '#e34c26', css: '#264de4', javascript: '#f0c000',
+  typescript: '#3178c6', python: '#4B8BBE', json: '#6b7280',
+  shell: '#4ade80', cpp: '#9ca3af', c: '#9ca3af',
+  plaintext: '#475569', markdown: '#60a5fa',
 }
 
-function withTimeout(promise, ms, message) {
-  let timeoutId
-  const timeout = new Promise((_, reject) => {
-    timeoutId = window.setTimeout(() => reject(new Error(message)), ms)
-  })
-  return Promise.race([promise, timeout]).finally(() => window.clearTimeout(timeoutId))
+function extLang(name) {
+  return EXT_LANG[name.split('.').pop().toLowerCase()] || 'plaintext'
 }
 
-const STARTERS = {
-  javascript: {
-    label: 'JavaScript',
-    monaco: 'javascript',
-    output: 'console',
-    code: `const values = [2, 4, 6, 8]
-const total = values.reduce((sum, value) => sum + value, 0)
-console.log('total =', total)
-console.log('average =', total / values.length)`,
-  },
-  html: {
-    label: 'HTML',
-    monaco: 'html',
-    output: 'preview',
-    code: `<main>
-  <h1>Code along</h1>
-  <p>Edit this document and run it.</p>
-</main>
-
-<style>
-  body { font-family: system-ui; padding: 2rem; }
-  h1 { color: #2563eb; }
-</style>
-
-<script>
-  console.log('HTML preview loaded')
-</script>`,
-  },
-  react: {
-    label: 'React',
-    monaco: 'javascript',
-    output: 'preview',
-    code: `function App() {
-  const [count, setCount] = React.useState(0)
-  return (
-    <main style={{ fontFamily: 'system-ui', padding: 24 }}>
-      <h1>React code-along</h1>
-      <button onClick={() => setCount(count + 1)}>
-        Count: {count}
-      </button>
-    </main>
-  )
-}`,
-  },
-  python: {
-    label: 'Python',
-    monaco: 'python',
-    output: 'console',
-    code: `values = [2, 4, 6, 8]
-total = sum(values)
-print("total =", total)
-print("average =", total / len(values))`,
-  },
-  cpp: {
-    label: 'C++',
-    monaco: 'cpp',
-    output: 'console',
-    code: `#include <iostream>
-using namespace std;
-
-// Browser C++ mode is a lightweight docs runner.
-// Add an __OUTPUT__ line to declare expected console output.
-// __OUTPUT__: total = 20
-int main() {
-    cout << "total = " << 20 << endl;
-    return 0;
-}`,
-  },
-  matlab: {
-    label: 'OpenMAT',
-    monaco: 'openmat',
-    output: 'console',
-    code: `% OpenMAT uses MATLAB-style syntax and runs through the in-app engine.
-t = linspace(0, 2*pi, 12);
-y = sin(t);
-
-disp("sampled sine values")
-y
-
-A = [1 2; 3 4]
-det(A)`,
-  },
+let _uid = 10
+function makeFile(name, content = '', parentId = null) {
+  return { id: `f${++_uid}`, type: 'file', name, content, language: extLang(name), parentId }
+}
+function makeFolder(name, parentId = null) {
+  return { id: `f${++_uid}`, type: 'folder', name, open: true, parentId }
 }
 
-function buildHtmlDoc(code) {
-  return `<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-</head>
-<body>
-${code}
-</body>
-</html>`
+// ── Bundle ────────────────────────────────────────────────────────────────────
+function buildHtmlBundle(files) {
+  const html = files.find(f => extLang(f.name) === 'html')
+  const css = files.filter(f => extLang(f.name) === 'css').map(f => f.content).join('\n')
+  const js = files.filter(f => ['javascript', 'typescript'].includes(extLang(f.name))).map(f => f.content).join('\n\n')
+
+  let doc = html?.content || '<!doctype html><html><head><meta charset="utf-8"></head><body></body></html>'
+  if (css && !doc.includes('<style>'))
+    doc = doc.includes('</head>') ? doc.replace('</head>', `<style>\n${css}\n</style>\n</head>`) : `<style>\n${css}\n</style>\n` + doc
+  if (js)
+    doc = doc.includes('</body>') ? doc.replace('</body>', `<script>\n${js}\n</script>\n</body>`) : doc + `\n<script>\n${js}\n</script>`
+  return doc
 }
 
-function buildReactDoc(code) {
-  return `<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script src="https://unpkg.com/react@18/umd/react.development.js"><\/script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"><\/script>
-  <script src="https://unpkg.com/@babel/standalone@7/babel.min.js"><\/script>
-</head>
-<body>
-  <div id="root"></div>
-  <script type="text/babel" data-presets="react">
-${code}
-try {
-  ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App))
-} catch (error) {
-  document.body.innerHTML = '<pre style="color:#dc2626;white-space:pre-wrap">' + error.message + '</pre>'
-}
-  <\/script>
-</body>
-</html>`
+// ── Colored dot for file language ─────────────────────────────────────────────
+function LangDot({ name, size = 8 }) {
+  return <span style={{ display: 'inline-block', flexShrink: 0, width: size, height: size, borderRadius: '50%', background: LANG_DOT[extLang(name)] || '#475569' }} />
 }
 
-function runJavaScript(code) {
-  const logs = []
-  const api = {
-    log: (...args) => logs.push(args.map(formatConsoleValue).join(' ')),
-    warn: (...args) => logs.push(`Warning: ${args.map(formatConsoleValue).join(' ')}`),
-    error: (...args) => logs.push(`Error: ${args.map(formatConsoleValue).join(' ')}`),
-  }
-  const result = Function('console', `"use strict";\n${code}`)(api)
-  if (result !== undefined) logs.push(formatConsoleValue(result))
-  return logs.join('\n') || 'No output.'
-}
+// ── Initial workspace ─────────────────────────────────────────────────────────
+const INIT = [makeFile('script.js', '// Welcome to Code Along!\nconsole.log("Hello!");\n')]
 
-function runCppLite(code) {
-  const declared = [...code.matchAll(/__OUTPUT__:\s*(.*)/g)].map((match) => match[1].trim())
-  if (declared.length) return declared.join('\n')
-
-  const literalCouts = [...code.matchAll(/cout\s*<<\s*["'`](.*?)["'`]/g)].map((match) => match[1])
-  if (literalCouts.length) return literalCouts.join('\n')
-
-  return [
-    'C++ docs runner ready.',
-    'For deterministic browser output, add comments like:',
-    '// __OUTPUT__: Hello from C++',
-    '',
-    'For full compile-and-run workflows, open the C++ lab or terminal tool.',
-  ].join('\n')
-}
-
-function formatConsoleValue(value) {
-  if (typeof value === 'string') return value
-  try {
-    return JSON.stringify(value, null, 2)
-  } catch {
-    return String(value)
-  }
-}
-
-export default function DocsCodeWorkspace({ activeTitle = 'Docs' }) {
-  const [language, setLanguage] = useState('javascript')
-  const [codeByLanguage, setCodeByLanguage] = useState(() =>
-    Object.fromEntries(Object.entries(STARTERS).map(([key, value]) => [key, value.code])),
-  )
-  const [output, setOutput] = useState('Choose a language and press Run.')
+// ── Component ─────────────────────────────────────────────────────────────────
+export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = null }) {
+  const [items, setItems] = useState(INIT)
+  const [activeId, setActiveId] = useState(INIT[0].id)
+  const [treeOpen, setTreeOpen] = useState(true)
+  const [adding, setAdding] = useState(null)   // { type: 'file'|'folder', parentId }
+  const [addingName, setAddingName] = useState('')
+  const [pendingReplace, setPendingReplace] = useState(null)
   const [previewDoc, setPreviewDoc] = useState('')
-  const [running, setRunning] = useState(false)
+  const [bottomTab, setBottomTab] = useState('terminal')  // 'terminal' | 'preview'
   const [outputMode, setOutputMode] = useState('split')
-  const editorRef = useRef(null)
+  const addInputRef = useRef(null)
+  const terminalRef = useRef(null)
+  const isDark = useIsDark()
 
-  const current = STARTERS[language]
-  const code = codeByLanguage[language] ?? current.code
+  // Stable refs so effects never go stale
+  const itemsRef = useRef(items)
+  const activeIdRef = useRef(activeId)
+  useEffect(() => { itemsRef.current = items }, [items])
+  useEffect(() => { activeIdRef.current = activeId }, [activeId])
 
-  const languageOptions = useMemo(() => Object.entries(STARTERS), [])
+  const files = items.filter(i => i.type === 'file')
+  const activeFile = files.find(f => f.id === activeId) ?? files[0]
 
-  const run = useCallback(async () => {
-    setRunning(true)
-    setOutput('Running...')
-    try {
-      if (language === 'javascript') {
-        setPreviewDoc('')
-        setOutput(runJavaScript(code))
-      } else if (language === 'html') {
-        setPreviewDoc(buildHtmlDoc(code))
-        setOutput('Preview refreshed.')
-      } else if (language === 'react') {
-        setPreviewDoc(buildReactDoc(code))
-        setOutput('React preview refreshed.')
-      } else if (language === 'python') {
-        setOutput('Loading Python runtime...')
-        const pyodide = await getPyodide()
-        const logs = []
-        pyodide.setStdout({ batched: (text) => logs.push(text) })
-        pyodide.setStderr({ batched: (text) => logs.push(text) })
-        setOutput('Executing Python...')
-        const result = await withTimeout(
-          pyodide.runPythonAsync(code),
-          20000,
-          'Python execution timed out.',
-        )
-        if (result !== undefined) logs.push(String(result))
-        setPreviewDoc('')
-        setOutput(logs.join('\n') || 'No output.')
-      } else if (language === 'cpp') {
-        setPreviewDoc('')
-        setOutput(runCppLite(code))
-      } else if (language === 'matlab') {
-        const result = executeScript(code)
-        setPreviewDoc('')
-        setOutput([
-          ...(result.compatibilityWarnings?.length ? [`Warnings:\n${result.compatibilityWarnings.join('\n')}`, ''] : []),
-          result.output || 'No output.',
-          result.workspace?.length
-            ? `\nWorkspace:\n${result.workspace.map((item) => `${item.name}: ${item.summary || item.className || item.size}`).join('\n')}`
-            : '',
-        ].filter(Boolean).join('\n'))
-      }
-    } catch (error) {
+  // ── Focus add-name input ───────────────────────────────────────────────────
+  useEffect(() => { if (adding) addInputRef.current?.focus() }, [adding])
+
+  // ── Inject code from docs ──────────────────────────────────────────────────
+  useEffect(() => {
+    if (!pendingRun) return
+    const { code, language: lang } = pendingRun
+    const currentItems = itemsRef.current
+    const currentActiveId = activeIdRef.current
+
+    const allFiles = currentItems.filter(i => i.type === 'file')
+    const active = allFiles.find(f => f.id === currentActiveId)
+
+    // Priority: active file if language matches, else first matching file, else create
+    const target = active?.language === lang
+      ? active
+      : allFiles.find(f => f.language === lang) ?? null
+
+    if (!target) {
+      const newFile = makeFile(LANG_DEFAULT_NAME[lang] || 'file.txt', code)
+      setItems(prev => [...prev, newFile])
+      setActiveId(newFile.id)
+      terminalRef.current?.print('Code loaded — press ▶ Run to execute.', 'info')
       setPreviewDoc('')
-      setOutput(error?.message || String(error))
-    } finally {
-      setRunning(false)
+      return
     }
-  }, [code, language])
 
-  const reset = useCallback(() => {
-    setCodeByLanguage((previous) => ({ ...previous, [language]: STARTERS[language].code }))
-    setOutput('Starter restored.')
+    setActiveId(target.id)
     setPreviewDoc('')
-  }, [language])
+
+    if (!target.content?.trim()) {
+      setItems(prev => prev.map(i => i.id === target.id ? { ...i, content: code } : i))
+      terminalRef.current?.print('Code loaded — press ▶ Run to execute.', 'info')
+    } else {
+      setPendingReplace({ code, fileId: target.id, fileName: target.name })
+    }
+  }, [pendingRun])
+
+  // ── Replace confirm / cancel ───────────────────────────────────────────────
+  const confirmReplace = useCallback(() => {
+    if (!pendingReplace) return
+    setItems(prev => prev.map(i => i.id === pendingReplace.fileId ? { ...i, content: pendingReplace.code } : i))
+    terminalRef.current?.print('Code loaded — press ▶ Run to execute.', 'info')
+    setPendingReplace(null)
+  }, [pendingReplace])
+
+  const cancelReplace = useCallback(() => setPendingReplace(null), [])
+
+  // ── Tree mutations ─────────────────────────────────────────────────────────
+  const commitAdd = useCallback(() => {
+    const name = addingName.trim()
+    if (!name || !adding) { setAdding(null); setAddingName(''); return }
+    const newItem = adding.type === 'folder'
+      ? makeFolder(name, adding.parentId)
+      : makeFile(name, '', adding.parentId)
+    setItems(prev => [...prev, newItem])
+    if (adding.type === 'file') setActiveId(newItem.id)
+    setAdding(null)
+    setAddingName('')
+  }, [adding, addingName])
+
+  const deleteItem = useCallback((id) => {
+    setItems(prev => {
+      // Remove item and all descendants
+      const toRemove = new Set()
+      const queue = [id]
+      while (queue.length) {
+        const cur = queue.shift()
+        toRemove.add(cur)
+        prev.filter(i => i.parentId === cur).forEach(i => queue.push(i.id))
+      }
+      const next = prev.filter(i => !toRemove.has(i.id))
+      const remaining = next.filter(i => i.type === 'file')
+      if (remaining.length > 0 && toRemove.has(activeIdRef.current))
+        setActiveId(remaining[0].id)
+      return next.length ? next : INIT
+    })
+  }, [])
+
+  const toggleFolder = useCallback((id) => {
+    setItems(prev => prev.map(i => i.id === id && i.type === 'folder' ? { ...i, open: !i.open } : i))
+  }, [])
+
+  const updateContent = useCallback((value) => {
+    setItems(prev => prev.map(i => i.id === activeId ? { ...i, content: value ?? '' } : i))
+  }, [activeId])
+
+  // ── Run — delegates to terminal ───────────────────────────────────────────
+  const run = useCallback(() => {
+    const af = files.find(f => f.id === activeId) ?? files[0]
+    if (!af) return
+    setBottomTab('terminal')
+    terminalRef.current?.run(af, files)
+  }, [files, activeId])
+
+  // ── Preview callback from terminal ────────────────────────────────────────
+  const handlePreview = useCallback((doc) => {
+    setPreviewDoc(doc)
+    setBottomTab('preview')
+  }, [])
+
+  const clearOutput = useCallback(() => {
+    terminalRef.current?.clear()
+    setPreviewDoc('')
+  }, [])
+
+  // ── Download all files as ZIP ─────────────────────────────────────────────
+  const downloadZip = useCallback(async () => {
+    // Dynamically load JSZip from CDN if not already loaded
+    if (!window.JSZip) {
+      await new Promise((resolve, reject) => {
+        const s = document.createElement('script')
+        s.src = 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js'
+        s.onload = resolve
+        s.onerror = reject
+        document.head.appendChild(s)
+      })
+    }
+    const zip = new window.JSZip()
+    files.forEach(f => zip.file(f.name, f.content))
+    const blob = await zip.generateAsync({ type: 'blob' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'workspace.zip'
+    a.click()
+    URL.revokeObjectURL(url)
+  }, [files])
 
   const outputIsFull = outputMode === 'full'
 
-  return (
-    <section className="h-full min-h-0 flex flex-col bg-slate-950 text-slate-100 border-l border-slate-800">
-      <header className="h-12 shrink-0 flex items-center gap-2 px-3 border-b border-slate-800 bg-slate-900">
-        <FileCode2 className="w-4 h-4 text-cyan-300" />
-        <div className="min-w-0 mr-auto">
-          <div className="text-xs font-bold truncate">Code Along</div>
-          <div className="text-[10px] text-slate-400 truncate">{activeTitle}</div>
-        </div>
-        <select
-          value={language}
-          onChange={(event) => {
-            setLanguage(event.target.value)
-            setPreviewDoc('')
-            setOutput('Language changed. Press Run when ready.')
+  // ── Recursive tree renderer ────────────────────────────────────────────────
+  function renderTree(parentId = null, depth = 0) {
+    return items
+      .filter(i => (i.parentId ?? null) === (parentId ?? null))
+      .map(item => {
+        if (item.type === 'folder') {
+          return (
+            <div key={item.id}>
+              <div
+                className={`group flex items-center gap-1 px-1 py-1 cursor-pointer select-none transition-colors ${D ? 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200' : 'text-slate-600 hover:bg-slate-200/60 hover:text-slate-900'}`}
+                style={{ paddingLeft: 6 + depth * 12 }}
+                onClick={() => toggleFolder(item.id)}
+              >
+                {item.open
+                  ? <ChevronDown className={`w-3 h-3 shrink-0 ${txt2}`} />
+                  : <ChevronRight className={`w-3 h-3 shrink-0 ${txt2}`} />}
+                <span className="text-amber-500 text-[10px]">📁</span>
+                <span className="flex-1 truncate text-[11px] font-semibold">{item.name}</span>
+                <button
+                  onClick={e => { e.stopPropagation(); deleteItem(item.id) }}
+                  className="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-red-500 rounded p-0.5 transition-all"
+                >
+                  <X className="w-2.5 h-2.5" />
+                </button>
+              </div>
+              {item.open && renderTree(item.id, depth + 1)}
+            </div>
+          )
+        }
+
+        const isActive = item.id === activeId
+        return (
+          <div
+            key={item.id}
+            onClick={() => setActiveId(item.id)}
+            className={`group flex items-center gap-1.5 py-1 cursor-pointer text-xs transition-colors select-none ${
+              isActive
+                ? D ? 'bg-slate-700/60 text-white' : 'bg-sky-100 text-sky-800'
+                : D ? 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200' : 'text-slate-600 hover:bg-slate-200/60 hover:text-slate-900'
+            }`}
+            style={{ paddingLeft: 10 + depth * 12, paddingRight: 6 }}
+          >
+            <LangDot name={item.name} />
+            <span className="flex-1 truncate font-mono text-[11px]">{item.name}</span>
+            {files.length > 1 && (
+              <button
+                onClick={e => { e.stopPropagation(); deleteItem(item.id) }}
+                className="opacity-0 group-hover:opacity-100 text-slate-600 hover:text-red-400 rounded p-0.5 transition-all"
+              >
+                <X className="w-2.5 h-2.5" />
+              </button>
+            )}
+          </div>
+        )
+      })
+  }
+
+  // ── Inline add input (shown at bottom of tree while typing) ───────────────
+  function renderAddInput() {
+    if (!adding) return null
+    const indent = adding.parentId
+      ? items.find(i => i.id === adding.parentId) ? 22 : 10
+      : 10
+    return (
+      <div className="flex items-center gap-1.5 px-1 py-0.5" style={{ paddingLeft: indent }}>
+        {adding.type === 'folder'
+          ? <span className="text-[10px]">📁</span>
+          : <LangDot name={addingName || 'file.txt'} size={7} />}
+        <input
+          ref={addInputRef}
+          value={addingName}
+          onChange={e => setAddingName(e.target.value)}
+          onKeyDown={e => {
+            if (e.key === 'Enter') commitAdd()
+            if (e.key === 'Escape') { setAdding(null); setAddingName('') }
           }}
-          className="h-8 rounded-md bg-slate-950 border border-slate-700 text-xs text-slate-100 px-2 outline-none"
-          title="Language"
-        >
-          {languageOptions.map(([key, value]) => (
-            <option key={key} value={key}>{value.label}</option>
-          ))}
-        </select>
-        <button
-          onClick={run}
-          disabled={running}
-          className="h-8 inline-flex items-center gap-1.5 rounded-md bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-700 px-3 text-xs font-bold text-white transition-colors"
-          title="Run code"
-        >
-          <Play className="w-3.5 h-3.5" /> {running ? 'Running' : 'Run'}
+          onBlur={commitAdd}
+          placeholder={adding.type === 'folder' ? 'folder name' : 'file.py'}
+          className={`flex-1 min-w-0 border border-sky-500 rounded text-[11px] px-1.5 py-0.5 outline-none font-mono ${isDark ? 'bg-slate-800 text-slate-100' : 'bg-white text-slate-900'}`}
+        />
+      </div>
+    )
+  }
+
+  const D = isDark
+  const border  = D ? 'border-slate-800'   : 'border-slate-200'
+  const bg0     = D ? 'bg-slate-950'       : 'bg-white'
+  const bg1     = D ? 'bg-slate-900'       : 'bg-slate-100'
+  const bg2     = D ? 'bg-[#0c1520]'       : 'bg-slate-50'
+  const txt1    = D ? 'text-slate-200'     : 'text-slate-800'
+  const txt2    = D ? 'text-slate-400'     : 'text-slate-500'
+  const hoverBg = D ? 'hover:bg-slate-800' : 'hover:bg-slate-200'
+  const hoverTx = D ? 'hover:text-slate-200' : 'hover:text-slate-900'
+  const btnBorder = D ? 'border-slate-700' : 'border-slate-300'
+
+  return (
+    <section className={`h-full min-h-0 flex flex-col ${bg0} ${D ? 'text-slate-100' : 'text-slate-900'} border-l ${border}`}>
+
+      {/* ── Header ── */}
+      <header className={`h-12 shrink-0 flex items-center gap-1.5 px-3 border-b ${border} ${bg1}`}>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-1.5 min-w-0">
+            {activeFile && <LangDot name={activeFile.name} size={7} />}
+            <span className={`text-xs font-bold font-mono truncate ${txt1}`}>
+              {activeFile?.name ?? 'Code Along'}
+            </span>
+          </div>
+          <div className={`text-[10px] truncate ${txt2}`}>{activeTitle}</div>
+        </div>
+        <button onClick={run} className="h-7 inline-flex items-center gap-1 rounded-md bg-emerald-600 hover:bg-emerald-500 px-2.5 text-xs font-bold text-white transition-colors">
+          <Play className="w-3 h-3" /> Run
         </button>
-        <button
-          onClick={reset}
-          className="h-8 w-8 inline-flex items-center justify-center rounded-md border border-slate-700 text-slate-300 hover:bg-slate-800 transition-colors"
-          title="Reset starter"
-        >
+        <button onClick={downloadZip} className={`h-7 w-7 flex items-center justify-center rounded border ${btnBorder} ${txt2} ${hoverBg} ${hoverTx} transition-colors`} title="Download all files as ZIP">
+          <Download className="w-3.5 h-3.5" />
+        </button>
+        <button onClick={clearOutput} className={`h-7 w-7 flex items-center justify-center rounded border ${btnBorder} ${txt2} ${hoverBg} ${hoverTx} transition-colors`} title="Clear terminal">
           <RotateCcw className="w-3.5 h-3.5" />
         </button>
-        <button
-          onClick={() => setOutputMode((mode) => (mode === 'split' ? 'full' : 'split'))}
-          className="h-8 w-8 inline-flex items-center justify-center rounded-md border border-slate-700 text-slate-300 hover:bg-slate-800 transition-colors"
-          title={outputIsFull ? 'Restore editor and output split' : 'Pop output out'}
-        >
+        <button onClick={() => setOutputMode(m => m === 'split' ? 'full' : 'split')} className={`h-7 w-7 flex items-center justify-center rounded border ${btnBorder} ${txt2} ${hoverBg} ${hoverTx} transition-colors`} title={outputIsFull ? 'Restore editor' : 'Expand output'}>
           {outputIsFull ? <Columns2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
         </button>
       </header>
 
-      <div className={`flex-1 min-h-0 grid ${outputIsFull ? 'grid-rows-[0_minmax(0,1fr)]' : 'grid-rows-[minmax(0,1fr)_minmax(150px,34%)]'}`}>
-        <div className={outputIsFull ? 'hidden' : 'min-h-0'}>
-          <Editor
-            value={code}
-            language={current.monaco}
-            theme="vs-dark"
-            beforeMount={setupOpenCalcMonaco}
-            onMount={(editor) => {
-              editorRef.current = editor
-            }}
-            onChange={(value) => setCodeByLanguage((previous) => ({ ...previous, [language]: value ?? '' }))}
-            options={{
-              minimap: { enabled: false },
-              fontSize: 13,
-              fontFamily: 'JetBrains Mono, Consolas, monospace',
-              wordWrap: 'on',
-              automaticLayout: true,
-              scrollBeyondLastLine: false,
-              tabSize: 2,
-            }}
-          />
+      {/* ── Replace confirmation banner ── */}
+      {pendingReplace && (
+        <div className={`shrink-0 flex items-center gap-2 px-3 py-2 border-b text-xs ${D ? 'bg-amber-950/70 border-amber-800/50' : 'bg-amber-50 border-amber-200'}`}>
+          <span className={`flex-1 truncate min-w-0 ${D ? 'text-amber-300' : 'text-amber-800'}`}>
+            <span className="font-bold font-mono">{pendingReplace.fileName}</span> already has code — replace it?
+          </span>
+          <button onClick={confirmReplace} className="shrink-0 px-2.5 py-1 rounded bg-amber-600 hover:bg-amber-500 text-white font-bold transition-colors">Replace</button>
+          <button onClick={cancelReplace} className={`shrink-0 px-2.5 py-1 rounded border ${btnBorder} ${txt2} ${hoverBg} transition-colors`}>Keep mine</button>
         </div>
+      )}
 
-        <div className="min-h-0 border-t border-slate-800 bg-slate-950 flex flex-col">
-          <div className="h-8 shrink-0 flex items-center gap-2 px-3 border-b border-slate-800 text-[10px] font-bold uppercase tracking-widest text-slate-400">
-            <span>{current.output === 'preview' ? 'Preview' : 'Console Output'}</span>
-            <button
-              onClick={() => setOutputMode((mode) => (mode === 'split' ? 'full' : 'split'))}
-              className="ml-auto inline-flex items-center justify-center w-6 h-6 rounded text-slate-400 hover:text-slate-100 hover:bg-slate-800"
-              title={outputIsFull ? 'Restore split view' : 'Expand output'}
-            >
-              {outputIsFull ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
-            </button>
+      {/* ── Body ── */}
+      <div className="flex flex-1 min-h-0 overflow-hidden">
+
+        {/* ── File tree ── */}
+        {treeOpen && (
+          <div className={`w-44 shrink-0 border-r ${border} ${bg2} flex flex-col overflow-hidden`}>
+
+            {/* VS Code-style explorer header */}
+            <div className={`flex items-center px-2 py-1.5 border-b ${border} shrink-0`}>
+              <span className={`flex-1 text-[9px] font-bold uppercase tracking-widest ${txt2}`}>Explorer</span>
+              <button
+                onClick={() => { setAdding({ type: 'file', parentId: null }); setAddingName('') }}
+                className={`w-5 h-5 flex items-center justify-center rounded ${txt2} ${hoverTx} ${hoverBg} transition-colors`}
+                title="New File"
+              >
+                <FilePlus className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => { setAdding({ type: 'folder', parentId: null }); setAddingName('') }}
+                className={`w-5 h-5 flex items-center justify-center rounded ${txt2} ${hoverTx} ${hoverBg} transition-colors`}
+                title="New Folder"
+              >
+                <FolderPlus className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* Tree */}
+            <div className="flex-1 overflow-y-auto py-1 custom-scrollbar">
+              {renderTree()}
+              {renderAddInput()}
+            </div>
           </div>
-          {previewDoc ? (
-            <iframe
-              title="Docs code preview"
-              srcDoc={previewDoc}
-              sandbox="allow-scripts"
-              className="flex-1 w-full bg-white"
+        )}
+
+        {/* ── Editor + output ── */}
+        <div className="flex-1 min-w-0 flex flex-col">
+
+          {/* Tab strip */}
+          <div className={`flex items-center shrink-0 ${bg2} border-b ${border} overflow-x-auto`}>
+            <button
+              onClick={() => setTreeOpen(v => !v)}
+              className={`shrink-0 h-8 w-8 flex items-center justify-center border-r ${border} ${txt2} ${hoverTx} ${hoverBg} transition-colors`}
+              title={treeOpen ? 'Hide explorer' : 'Show explorer'}
+            >
+              {treeOpen ? <ChevronLeft className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+            </button>
+            {files.map(f => (
+              <button
+                key={f.id}
+                onClick={() => setActiveId(f.id)}
+                className={`flex items-center gap-1.5 px-3 h-8 text-[11px] font-mono shrink-0 border-r ${border} transition-colors ${
+                  f.id === activeId
+                    ? D
+                      ? 'bg-slate-800 text-white border-t-2 border-t-sky-500'
+                      : 'bg-white text-slate-900 border-t-2 border-t-sky-500 shadow-sm'
+                    : D
+                      ? 'text-slate-500 hover:bg-slate-800/50 hover:text-slate-300'
+                      : 'text-slate-500 hover:bg-white/80 hover:text-slate-700'
+                }`}
+              >
+                <LangDot name={f.name} size={6} />
+                {f.name}
+              </button>
+            ))}
+          </div>
+
+          <div className={`${outputIsFull ? 'hidden' : 'flex-1'} min-h-0`}>
+            <Editor
+              key={activeId}
+              defaultValue={activeFile?.content ?? ''}
+              language={activeFile?.language ?? 'plaintext'}
+              theme={isDark ? 'open-calc-dark' : 'open-calc-light'}
+              beforeMount={setupOpenCalcMonaco}
+              onChange={updateContent}
+              options={{
+                minimap: { enabled: false },
+                fontSize: 13,
+                fontFamily: "'JetBrains Mono', Consolas, monospace",
+                wordWrap: 'off',
+                automaticLayout: true,
+                scrollBeyondLastLine: false,
+                tabSize: 2,
+                padding: { top: 8, bottom: 8 },
+              }}
             />
-          ) : (
-            <pre className="flex-1 overflow-auto whitespace-pre-wrap p-3 text-xs leading-relaxed text-slate-200 font-mono">
-              {output}
-            </pre>
-          )}
+          </div>
+
+          {/* ── Bottom pane: Terminal | Preview ── */}
+          <div className={`${outputIsFull ? 'flex-1' : 'h-[40%]'} min-h-0 border-t ${border} flex flex-col shrink-0`}>
+            {/* Tab bar */}
+            <div className={`h-7 shrink-0 flex items-center border-b ${border} ${bg2} px-1 gap-0.5`}>
+              {['terminal', 'preview'].map(tab => (
+                <button
+                  key={tab}
+                  onClick={() => setBottomTab(tab)}
+                  className={`px-3 h-6 text-[10px] font-bold rounded transition-colors capitalize ${
+                    bottomTab === tab
+                      ? D ? 'bg-slate-700 text-white' : 'bg-slate-200 text-slate-900'
+                      : D ? 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/60' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/60'
+                  }`}
+                >
+                  {tab === 'terminal' ? '⌨ Terminal' : '🖼 Preview'}
+                </button>
+              ))}
+              <button
+                onClick={() => setOutputMode(m => m === 'split' ? 'full' : 'split')}
+                className={`ml-auto w-5 h-5 flex items-center justify-center rounded ${txt2} ${hoverTx} ${hoverBg}`}
+              >
+                {outputIsFull ? <Minimize2 className="w-3 h-3" /> : <Maximize2 className="w-3 h-3" />}
+              </button>
+            </div>
+
+            {/* Terminal */}
+            <div className={`flex-1 min-h-0 ${bottomTab === 'terminal' ? 'flex flex-col' : 'hidden'}`}>
+              <WorkspaceTerminal
+                ref={terminalRef}
+                files={files}
+                isDark={isDark}
+                onPreview={handlePreview}
+              />
+            </div>
+
+            {/* Preview */}
+            <div className={`flex-1 min-h-0 ${bottomTab === 'preview' ? 'flex flex-col' : 'hidden'}`}>
+              {previewDoc
+                ? <iframe title="preview" srcDoc={previewDoc} sandbox="allow-scripts allow-same-origin" className="flex-1 w-full bg-white" />
+                : <div className={`flex-1 flex items-center justify-center text-xs ${txt2}`}>
+                    Run an HTML or React file to see the preview here.
+                  </div>
+              }
+            </div>
+          </div>
         </div>
       </div>
     </section>
