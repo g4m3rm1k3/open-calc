@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Editor from '@monaco-editor/react'
-import { ChevronDown, ChevronLeft, ChevronRight, Columns2, Download, FilePlus, FolderPlus, Maximize2, Minimize2, Play, RotateCcw, Upload, X } from 'lucide-react'
+import { ChevronDown, ChevronLeft, ChevronRight, Columns2, Download, ExternalLink, FilePlus, FolderPlus, Maximize2, Minimize2, Play, RotateCcw, Upload, X } from 'lucide-react'
 import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
 import { executeScript } from '../../utils/openmatEngine.js'
 import WorkspaceTerminal from './WorkspaceTerminal.jsx'
@@ -10,18 +10,18 @@ import { useIsDark } from '../../utils/useIsDark.js'
 const EXT_LANG = {
   html: 'html', css: 'css', js: 'javascript', ts: 'typescript',
   py: 'python', json: 'json', sh: 'shell', cpp: 'cpp', c: 'c',
-  txt: 'plaintext', md: 'markdown',
+  txt: 'plaintext', md: 'markdown', m: 'openmat',
 }
 const LANG_DEFAULT_NAME = {
   html: 'index.html', css: 'style.css', javascript: 'script.js',
   typescript: 'main.ts', python: 'main.py', shell: 'script.sh',
-  cpp: 'main.cpp', plaintext: 'notes.txt',
+  cpp: 'main.cpp', plaintext: 'notes.txt', openmat: 'script.m',
 }
 const LANG_DOT = {
   html: '#e34c26', css: '#264de4', javascript: '#f0c000',
   typescript: '#3178c6', python: '#4B8BBE', json: '#6b7280',
   shell: '#4ade80', cpp: '#9ca3af', c: '#9ca3af',
-  plaintext: '#475569', markdown: '#60a5fa',
+  plaintext: '#475569', markdown: '#60a5fa', openmat: '#e04c28',
 }
 
 function extLang(name) {
@@ -71,6 +71,23 @@ function loadSavedWorkspace() {
     })
     return { items, activeId }
   } catch { return null }
+}
+
+function openInOpenMat(code, fileName) {
+  try {
+    const docs = (() => {
+      try { return JSON.parse(localStorage.getItem('openmat-documents') || '[]') } catch { return [] }
+    })()
+    const id = `doc-studio-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+    const name = fileName || 'studio-import.m'
+    const newDoc = { id, name, code }
+    const updated = Array.isArray(docs) ? [...docs, newDoc] : [newDoc]
+    localStorage.setItem('openmat-documents', JSON.stringify(updated))
+    localStorage.setItem('openmat-active-document-id', JSON.stringify(id))
+    window.location.href = '/#/openmat'
+  } catch (e) {
+    console.error('Failed to hand off to OpenMAT:', e)
+  }
 }
 
 const _DEFAULT_FILE = makeFile('script.js', '// Welcome to Code Along!\nconsole.log("Hello!");\n')
@@ -353,7 +370,7 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = n
         ref={importFileRef}
         type="file"
         multiple
-        accept=".js,.ts,.jsx,.tsx,.py,.html,.css,.json,.md,.txt,.sh,.cpp,.c"
+        accept=".js,.ts,.jsx,.tsx,.py,.html,.css,.json,.md,.txt,.sh,.cpp,.c,.m"
         className="hidden"
         onChange={onImportFiles}
       />
@@ -369,6 +386,15 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = n
           </div>
           <div className={`text-[10px] truncate ${txt2}`}>{activeTitle}</div>
         </div>
+        {activeFile?.language === 'openmat' && (
+          <button
+            onClick={() => openInOpenMat(activeFile.content, activeFile.name)}
+            className="h-7 inline-flex items-center gap-1 rounded-md bg-orange-600 hover:bg-orange-500 px-2.5 text-xs font-bold text-white transition-colors"
+            title="Open in OpenMAT Studio"
+          >
+            <ExternalLink className="w-3 h-3" /> OpenMAT
+          </button>
+        )}
         <button onClick={run} className="h-7 inline-flex items-center gap-1 rounded-md bg-emerald-600 hover:bg-emerald-500 px-2.5 text-xs font-bold text-white transition-colors">
           <Play className="w-3 h-3" /> Run
         </button>
@@ -471,7 +497,7 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = n
             <Editor
               key={activeId}
               defaultValue={activeFile?.content ?? ''}
-              language={activeFile?.language ?? 'plaintext'}
+              language={activeFile?.language === 'openmat' ? 'plaintext' : (activeFile?.language ?? 'plaintext')}
               theme={isDark ? 'open-calc-dark' : 'open-calc-light'}
               beforeMount={setupOpenCalcMonaco}
               onChange={updateContent}

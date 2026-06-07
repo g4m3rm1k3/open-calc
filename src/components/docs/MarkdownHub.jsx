@@ -37,7 +37,7 @@ const LS_KEY = 'markdownhub_personal'
 
 const LANG_EXT = { javascript: 'js', js: 'js', python: 'py', py: 'py', typescript: 'ts', ts: 'ts', css: 'css', html: 'html', markup: 'html', bash: 'sh', shell: 'sh', json: 'json', text: 'txt' }
 const MONACO_LANG = { py: 'python', js: 'javascript', ts: 'typescript', sh: 'shell', xml: 'html', markup: 'html', bash: 'shell' }
-const WORKSPACE_LANG = { python: 'python', javascript: 'javascript', typescript: 'javascript', html: 'html', css: 'javascript', shell: 'javascript', json: 'javascript', plaintext: 'javascript' }
+const WORKSPACE_LANG = { python: 'python', javascript: 'javascript', typescript: 'javascript', html: 'html', css: 'javascript', shell: 'javascript', json: 'javascript', plaintext: 'javascript', matlab: 'openmat', openmat: 'openmat' }
 
 const TERM_REFS = {
   // Python dunder methods
@@ -332,11 +332,25 @@ function MdInlineCode({ children }) {
 }
 
 const MD_COMPONENTS = {
-  pre({ children }) { return <>{children}</> },
-  code({ className, children }) {
-    const match = /language-(\w+)/.exec(className || '')
-    if (!match) return <MdInlineCode>{children}</MdInlineCode>
-    return <MdCodeBlock language={match[1]} code={String(children).replace(/\n$/, '')} />
+  pre({ node }) {
+    // Read directly from the hast node to avoid losing className through custom `code` processing
+    const codeNode = node?.children?.[0]
+    const classNames = codeNode?.properties?.className ?? []
+    const langClass = (Array.isArray(classNames) ? classNames : [String(classNames)])
+      .find(c => /^language-/.test(String(c)))
+    const match = /language-(\w+)/.exec(langClass || '')
+    const rawCode = (codeNode?.children ?? [])
+      .filter(n => n.type === 'text')
+      .map(n => n.value)
+      .join('')
+    const code = rawCode.replace(/\n$/, '')
+    if (match) return <MdCodeBlock language={match[1]} code={code} />
+    // Unlanguaged fenced block — bare <pre>, no <code> wrapper so inline-code CSS can't bleed in
+    return <pre>{code}</pre>
+  },
+  code({ children }) {
+    // Only inline code reaches here; block code is handled entirely by `pre` via node prop
+    return <MdInlineCode>{children}</MdInlineCode>
   },
 }
 

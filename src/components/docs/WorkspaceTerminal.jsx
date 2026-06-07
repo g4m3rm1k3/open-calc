@@ -1,5 +1,6 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { getPyodide } from '../../utils/pyodideRuntime.js'
+import { executeScript } from '../../utils/openmatEngine.js'
 
 // ── Terminal colours ──────────────────────────────────────────────────────────
 const CLR_DARK = {
@@ -107,6 +108,7 @@ const BANNER = [
   { text: '│  node file.jsx       Run React/JSX → Preview tab            │', type: 'dim' },
   { text: '│  tsc file.ts         Compile TS → show emitted JS           │', type: 'dim' },
   { text: '│  pip install pkg     Install Python package via micropip    │', type: 'dim' },
+  { text: '│  openmat file.m      Run OpenMAT / MATLAB script             │', type: 'dim' },
   { text: '│  open / preview      Bundle HTML project → Preview tab      │', type: 'dim' },
   { text: '│  ls  cat  clear  help                                       │', type: 'dim' },
   { text: '└─────────────────────────────────────────────────────────────┘', type: 'dim' },
@@ -256,6 +258,28 @@ const WorkspaceTerminal = forwardRef(function WorkspaceTerminal({ files = [], is
           print(`tsc error: ${e.message}`, 'error')
         }
 
+      // ── openmat ───────────────────────────────────────────────────────────────
+      } else if (prog === 'openmat') {
+        const fname = args[0]
+        if (!fname) { print('Usage: openmat <file.m>', 'warn'); return }
+        const file = allFiles.find(f => f.name === fname) ?? findFile(fname)
+        if (!file) { print(`openmat: '${fname}': No such file`, 'error'); return }
+
+        print('» Running OpenMAT script…', 'dim')
+        try {
+          const result = executeScript(file.content, {})
+          const out = result.output ?? ''
+          if (out && out !== 'No output.') printLines(out)
+          else print('(no output)', 'dim')
+          if (result.figureJson) print('» Plot generated — click OpenMAT to view it in the full studio.', 'info')
+          if (result.compatibilityWarnings?.length) {
+            result.compatibilityWarnings.forEach(w => print(`Warning: ${w}`, 'warn'))
+          }
+          print('✓ Done', 'success')
+        } catch (e) {
+          print(`OpenMAT error: ${e.message}`, 'error')
+        }
+
       // ── open / preview ────────────────────────────────────────────────────
       } else if (prog === 'open' || prog === 'preview') {
         const fname = args[0]
@@ -308,6 +332,7 @@ const WorkspaceTerminal = forwardRef(function WorkspaceTerminal({ files = [], is
           ['node <file.ts>',           'Transpile TypeScript via Babel and run'],
           ['node <file.jsx>',          'Transpile + render React/JSX app in Preview'],
           ['tsc <file.ts>',            'Compile TypeScript and show emitted JS'],
+          ['openmat <file.m>',          'Run OpenMAT / MATLAB script in terminal'],
           ['open [file]',              'Bundle HTML+CSS+JS project in Preview'],
           ['ls',                       'List workspace files'],
           ['cat <file>',               'Print file contents'],
@@ -343,6 +368,7 @@ const WorkspaceTerminal = forwardRef(function WorkspaceTerminal({ files = [], is
       else if (isJsx)                 cmd = `node ${name}`
       else if (lang === 'typescript') cmd = `node ${name}`
       else if (lang === 'javascript') cmd = `node ${name}`
+      else if (lang === 'openmat')    cmd = `openmat ${name}`
       else                            cmd = null
 
       if (cmd) execute(cmd, allFiles)
