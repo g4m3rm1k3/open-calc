@@ -47,6 +47,25 @@ function fmtVal(v) {
   try { return JSON.stringify(v, null, 2) } catch { return String(v) }
 }
 
+// Load Babel standalone on demand for TypeScript transpilation
+async function loadBabel() {
+  if (window.Babel) return window.Babel
+  await new Promise((resolve, reject) => {
+    const s = document.createElement('script')
+    s.src = 'https://unpkg.com/@babel/standalone@7/babel.min.js'
+    s.onload = resolve; s.onerror = reject
+    document.head.appendChild(s)
+  })
+  return window.Babel
+}
+
+function transpileTS(code, filename = 'file.ts') {
+  return window.Babel.transform(code, {
+    presets: [['typescript', { allExtensions: true }], ['env', { targets: { esmodules: true } }]],
+    filename,
+  }).code
+}
+
 // ── React/JSX → srcdoc ───────────────────────────────────────────────────────
 function buildReactDoc(code) {
   return `<!doctype html><html><head><meta charset="utf-8">
@@ -84,7 +103,9 @@ const BANNER = [
   { text: '┌─ Workspace Terminal ────────────────────────────────────────┐', type: 'dim' },
   { text: '│  python file.py      Run Python (imports auto-loaded)       │', type: 'dim' },
   { text: '│  node file.js        Run JavaScript                         │', type: 'dim' },
+  { text: '│  node file.ts        Run TypeScript (Babel transpiled)      │', type: 'dim' },
   { text: '│  node file.jsx       Run React/JSX → Preview tab            │', type: 'dim' },
+  { text: '│  tsc file.ts         Compile TS → show emitted JS           │', type: 'dim' },
   { text: '│  pip install pkg     Install Python package via micropip    │', type: 'dim' },
   { text: '│  open / preview      Bundle HTML project → Preview tab      │', type: 'dim' },
   { text: '│  ls  cat  clear  help                                       │', type: 'dim' },
@@ -100,12 +121,14 @@ const WorkspaceTerminal = forwardRef(function WorkspaceTerminal({ files = [], is
   const [histIdx, setHistIdx]   = useState(-1)
   const [busy, setBusy]         = useState(false)
   const inputRef  = useRef(null)
-  const bottomRef = useRef(null)
+  const outputRef = useRef(null)
   const filesRef  = useRef(files)
 
   useEffect(() => { filesRef.current = files }, [files])
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (outputRef.current) {
+      outputRef.current.scrollTop = outputRef.current.scrollHeight
+    }
   }, [lines])
 
   // ── Print helpers ─────────────────────────────────────────────────────────
@@ -188,7 +211,7 @@ const WorkspaceTerminal = forwardRef(function WorkspaceTerminal({ files = [], is
       // ── node ──────────────────────────────────────────────────────────────
       } else if (prog === 'node') {
         const fname = args[0]
-        if (!fname) { print('Usage: node <file.js|file.jsx>', 'warn'); return }
+        if (!fname) { print('Usage: node <file.js|file.ts|file.jsx>', 'warn'); return }
         const file = allFiles.find(f => f.name === fname) ?? findFile(fname)
         if (!file) { print(`node: '${fname}': No such file`, 'error'); return }
 
@@ -196,13 +219,41 @@ const WorkspaceTerminal = forwardRef(function WorkspaceTerminal({ files = [], is
           || file.content.includes('React.')
           || /<[A-Z]/.test(file.content)
           || file.content.includes('ReactDOM')
+        const isTS = /\.tsx?$/.test(file.name) && !isJsx
 
         if (isJsx) {
           const doc = buildReactDoc(file.content)
           onPreview?.(doc, 'react')
           print(`✓ React app rendered → switch to Preview tab`, 'info')
+        } else if (isTS) {
+          print('» Transpiling TypeScript…', 'dim')
+          try {
+            await loadBabel()
+            const js = transpileTS(file.content, file.name)
+            printLines(runJS(js))
+          } catch (e) {
+            print(`TypeScript error: ${e.message}`, 'error')
+          }
         } else {
           printLines(runJS(file.content))
+        }
+
+      // ── tsc ───────────────────────────────────────────────────────────────
+      } else if (prog === 'tsc') {
+        const fname = args[0]
+        if (!fname) { print('Usage: tsc <file.ts>', 'warn'); return }
+        const file = allFiles.find(f => f.name === fname) ?? findFile(fname)
+        if (!file) { print(`tsc: '${fname}': No such file`, 'error'); return }
+        print('» Loading TypeScript compiler…', 'dim')
+        try {
+          await loadBabel()
+          const js = transpileTS(file.content, file.name)
+          const outName = fname.replace(/\.tsx?$/, '.js')
+          print(`// ── ${outName} ──`, 'info')
+          printLines(js, 'output')
+          print(`✓ Compiled successfully`, 'success')
+        } catch (e) {
+          print(`tsc error: ${e.message}`, 'error')
         }
 
       // ── open / preview ────────────────────────────────────────────────────
@@ -254,7 +305,9 @@ const WorkspaceTerminal = forwardRef(function WorkspaceTerminal({ files = [], is
           ['python3 <file.py>',        'Alias for python'],
           ['pip install <pkg>',        'Install Python package via micropip (PyPI)'],
           ['node <file.js>',           'Run JavaScript file'],
+          ['node <file.ts>',           'Transpile TypeScript via Babel and run'],
           ['node <file.jsx>',          'Transpile + render React/JSX app in Preview'],
+          ['tsc <file.ts>',            'Compile TypeScript and show emitted JS'],
           ['open [file]',              'Bundle HTML+CSS+JS project in Preview'],
           ['ls',                       'List workspace files'],
           ['cat <file>',               'Print file contents'],
@@ -285,11 +338,12 @@ const WorkspaceTerminal = forwardRef(function WorkspaceTerminal({ files = [], is
       const isJsx = /\.[jt]sx$/.test(name)
 
       let cmd
-      if (lang === 'python')                           cmd = `python ${name}`
-      else if (lang === 'html')                        cmd = `open ${name}`
-      else if (isJsx || lang === 'typescript')         cmd = `node ${name}`
-      else if (lang === 'javascript')                  cmd = `node ${name}`
-      else                                             cmd = null
+      if (lang === 'python')          cmd = `python ${name}`
+      else if (lang === 'html')       cmd = `open ${name}`
+      else if (isJsx)                 cmd = `node ${name}`
+      else if (lang === 'typescript') cmd = `node ${name}`
+      else if (lang === 'javascript') cmd = `node ${name}`
+      else                            cmd = null
 
       if (cmd) execute(cmd, allFiles)
     },
@@ -336,7 +390,7 @@ const WorkspaceTerminal = forwardRef(function WorkspaceTerminal({ files = [], is
       onClick={() => inputRef.current?.focus()}
     >
       {/* Output area */}
-      <div className="flex-1 overflow-y-auto p-3 custom-scrollbar">
+      <div ref={outputRef} className="flex-1 overflow-y-auto p-3 custom-scrollbar">
         {lines.map((line, i) => (
           <div
             key={i}
@@ -351,7 +405,6 @@ const WorkspaceTerminal = forwardRef(function WorkspaceTerminal({ files = [], is
             {line.text}
           </div>
         ))}
-        <div ref={bottomRef} />
       </div>
 
       {/* Input row */}

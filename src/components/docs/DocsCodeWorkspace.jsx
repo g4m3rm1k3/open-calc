@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Editor from '@monaco-editor/react'
-import { ChevronDown, ChevronLeft, ChevronRight, Columns2, Download, FilePlus, FolderPlus, Maximize2, Minimize2, Play, RotateCcw, X } from 'lucide-react'
+import { ChevronDown, ChevronLeft, ChevronRight, Columns2, Download, FilePlus, FolderPlus, Maximize2, Minimize2, Play, RotateCcw, Upload, X } from 'lucide-react'
 import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
 import { executeScript } from '../../utils/openmatEngine.js'
 import WorkspaceTerminal from './WorkspaceTerminal.jsx'
@@ -55,13 +55,31 @@ function LangDot({ name, size = 8 }) {
   return <span style={{ display: 'inline-block', flexShrink: 0, width: size, height: size, borderRadius: '50%', background: LANG_DOT[extLang(name)] || '#475569' }} />
 }
 
-// ── Initial workspace ─────────────────────────────────────────────────────────
-const INIT = [makeFile('script.js', '// Welcome to Code Along!\nconsole.log("Hello!");\n')]
+// ── LocalStorage persistence ──────────────────────────────────────────────────
+const LS_WS = 'studio_workspace_v1'
+
+function loadSavedWorkspace() {
+  try {
+    const raw = localStorage.getItem(LS_WS)
+    if (!raw) return null
+    const { items, activeId } = JSON.parse(raw)
+    if (!Array.isArray(items) || !items.length) return null
+    // Advance _uid past any saved IDs to prevent collisions
+    items.forEach(i => {
+      const n = parseInt(i.id.replace(/\D/g, ''), 10)
+      if (!isNaN(n) && n > _uid) _uid = n
+    })
+    return { items, activeId }
+  } catch { return null }
+}
+
+const _DEFAULT_FILE = makeFile('script.js', '// Welcome to Code Along!\nconsole.log("Hello!");\n')
+const _SAVED = loadSavedWorkspace()
 
 // ── Component ─────────────────────────────────────────────────────────────────
 export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = null }) {
-  const [items, setItems] = useState(INIT)
-  const [activeId, setActiveId] = useState(INIT[0].id)
+  const [items, setItems] = useState(() => _SAVED?.items ?? [_DEFAULT_FILE])
+  const [activeId, setActiveId] = useState(() => _SAVED?.activeId ?? _DEFAULT_FILE.id)
   const [treeOpen, setTreeOpen] = useState(true)
   const [adding, setAdding] = useState(null)   // { type: 'file'|'folder', parentId }
   const [addingName, setAddingName] = useState('')
@@ -72,6 +90,7 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = n
   const [outputMode, setOutputMode] = useState('split')
   const addInputRef = useRef(null)
   const terminalRef = useRef(null)
+  const importFileRef = useRef(null)
   const isDark = useIsDark()
 
   // Stable refs so effects never go stale
@@ -82,6 +101,11 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = n
 
   const files = items.filter(i => i.type === 'file')
   const activeFile = files.find(f => f.id === activeId) ?? files[0]
+
+  // ── Auto-save workspace to localStorage ───────────────────────────────────
+  useEffect(() => {
+    try { localStorage.setItem(LS_WS, JSON.stringify({ items, activeId })) } catch {}
+  }, [items, activeId])
 
   // ── Focus add-name input ───────────────────────────────────────────────────
   useEffect(() => { if (adding) addInputRef.current?.focus() }, [adding])
@@ -187,6 +211,20 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = n
   const clearOutput = useCallback(() => {
     terminalRef.current?.clear()
     setPreviewDoc('')
+  }, [])
+
+  // ── Import files from disk ─────────────────────────────────────────────────
+  const onImportFiles = useCallback(async (e) => {
+    const picked = Array.from(e.target.files ?? [])
+    e.target.value = ''
+    if (!picked.length) return
+    const newFiles = await Promise.all(picked.map(async (f) => {
+      const content = await f.text()
+      return makeFile(f.name, content)
+    }))
+    setItems(prev => [...prev, ...newFiles])
+    setActiveId(newFiles[newFiles.length - 1].id)
+    terminalRef.current?.print(`Imported ${newFiles.map(f => f.name).join(', ')}`, 'success')
   }, [])
 
   // ── Download all files as ZIP ─────────────────────────────────────────────
@@ -310,7 +348,15 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = n
   const btnBorder = D ? 'border-slate-700' : 'border-slate-300'
 
   return (
-    <section className={`h-full min-h-0 flex flex-col ${bg0} ${D ? 'text-slate-100' : 'text-slate-900'} border-l ${border}`}>
+    <section className={`flex-1 min-h-0 flex flex-col ${bg0} ${D ? 'text-slate-100' : 'text-slate-900'} border-l ${border}`}>
+      <input
+        ref={importFileRef}
+        type="file"
+        multiple
+        accept=".js,.ts,.jsx,.tsx,.py,.html,.css,.json,.md,.txt,.sh,.cpp,.c"
+        className="hidden"
+        onChange={onImportFiles}
+      />
 
       {/* ── Header ── */}
       <header className={`h-12 shrink-0 flex items-center gap-1.5 px-3 border-b ${border} ${bg1}`}>
@@ -372,6 +418,13 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = n
               >
                 <FolderPlus className="w-3.5 h-3.5" />
               </button>
+              <button
+                onClick={() => importFileRef.current?.click()}
+                className={`w-5 h-5 flex items-center justify-center rounded ${txt2} ${hoverTx} ${hoverBg} transition-colors`}
+                title="Import files (.js .ts .py .md .html …)"
+              >
+                <Upload className="w-3.5 h-3.5" />
+              </button>
             </div>
 
             {/* Tree */}
@@ -383,7 +436,7 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = n
         )}
 
         {/* ── Editor + output ── */}
-        <div className="flex-1 min-w-0 flex flex-col">
+        <div className="flex-1 min-w-0 min-h-0 flex flex-col overflow-hidden">
 
           {/* Tab strip */}
           <div className={`flex items-center shrink-0 ${bg2} border-b ${border} overflow-x-auto`}>
@@ -414,7 +467,7 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = n
             ))}
           </div>
 
-          <div className={`${outputIsFull ? 'hidden' : 'flex-1'} min-h-0`}>
+          <div className={`${outputIsFull ? 'hidden' : 'flex-[3]'} min-h-0`}>
             <Editor
               key={activeId}
               defaultValue={activeFile?.content ?? ''}
@@ -422,6 +475,10 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = n
               theme={isDark ? 'open-calc-dark' : 'open-calc-light'}
               beforeMount={setupOpenCalcMonaco}
               onChange={updateContent}
+              onMount={(editor) => {
+                // Force Monaco to re-measure after the flex layout settles
+                requestAnimationFrame(() => requestAnimationFrame(() => editor.layout()))
+              }}
               options={{
                 minimap: { enabled: false },
                 fontSize: 13,
@@ -436,7 +493,7 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = n
           </div>
 
           {/* ── Bottom pane: Terminal | Preview ── */}
-          <div className={`${outputIsFull ? 'flex-1' : 'h-[40%]'} min-h-0 border-t ${border} flex flex-col shrink-0`}>
+          <div className={`${outputIsFull ? 'flex-1' : 'flex-[2]'} min-h-0 border-t ${border} flex flex-col`}>
             {/* Tab bar */}
             <div className={`h-7 shrink-0 flex items-center border-b ${border} ${bg2} px-1 gap-0.5`}>
               {['terminal', 'preview'].map(tab => (

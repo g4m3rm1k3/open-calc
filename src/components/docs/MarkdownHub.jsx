@@ -554,6 +554,15 @@ export default function MarkdownHub() {
     }
   }, [selectTutorial])
 
+  // When code-along opens, Monaco measures its container before the flex layout
+  // settles (especially with a minimal sidebar). A resize event forces all
+  // ResizeObservers (including Monaco's automaticLayout) to re-measure.
+  useEffect(() => {
+    if (!codeAlongOpen) return
+    const t = setTimeout(() => window.dispatchEvent(new Event('resize')), 50)
+    return () => clearTimeout(t)
+  }, [codeAlongOpen])
+
   const selectUserDoc = useCallback((doc) => {
     setActiveDocType('user')
     setActiveUserId(doc.id)
@@ -773,13 +782,31 @@ export default function MarkdownHub() {
     const file = event.target.files?.[0]
     if (!file) return
     const raw = await file.text()
-    let parsed
-    try {
-      parsed = JSON.parse(raw)
-    } catch {
-      event.target.value = ''
+    event.target.value = ''
+
+    // .md file → create a new user doc directly
+    if (file.name.toLowerCase().endsWith('.md')) {
+      const name = file.name.replace(/\.md$/i, '').replace(/[-_]/g, ' ') || 'Imported Doc'
+      const fileDoc = { ...createLocalDoc(), name, content: raw }
+      if (backendReady) {
+        await fetch(buildOptionalBackendUrl('/api/docs/user'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, content: raw }),
+        })
+        await refreshDocsIndex()
+      } else {
+        const updated = [...userDocs, fileDoc]
+        setUserDocs(updated)
+        savePersonal(updated)
+      }
+      selectUserDoc(fileDoc)
       return
     }
+
+    // .json share pack
+    let parsed
+    try { parsed = JSON.parse(raw) } catch { return }
 
     if (backendReady) {
       await fetch(buildOptionalBackendUrl('/api/docs/share/import'), {
@@ -799,8 +826,6 @@ export default function MarkdownHub() {
       savePersonal(updated)
       selectUserDoc(fileDoc)
     }
-
-    event.target.value = ''
   }, [backendReady, refreshDocsIndex, selectUserDoc, userDocs])
 
   const activeTitle = tab === 'tutorials'
@@ -813,7 +838,7 @@ export default function MarkdownHub() {
       <input
         ref={fileInputRef}
         type="file"
-        accept=".json,.open-calc-doc.json"
+        accept=".md,.json,.open-calc-doc.json"
         className="hidden"
         onChange={onImportFile}
       />
@@ -946,7 +971,7 @@ export default function MarkdownHub() {
 
         <DocsCtx.Provider value={docsCtxValue}>
         <div className={`flex flex-1 overflow-hidden w-full relative ${codeAlongOpen ? 'min-w-0' : ''}`}>
-          <div className={`${docsNavOpen ? 'hidden sm:flex' : 'hidden'} ${codeAlongOpen ? 'w-[240px]' : 'w-[300px]'} bg-slate-50 dark:bg-slate-900/50 border-r border-slate-200 dark:border-slate-800 flex-col shrink-0 overflow-hidden`}>
+          <div className={`${docsNavOpen ? 'hidden sm:flex' : 'hidden'} ${codeAlongOpen ? 'w-[240px]' : 'w-[300px]'} bg-slate-50 dark:bg-slate-900/50 border-r border-slate-200 dark:border-slate-800 flex-col shrink-0 overflow-hidden h-full`}>
             <div className="flex-1 overflow-y-auto py-3 custom-scrollbar">
               {tab === 'tutorials' && (
                 tree.length === 0
