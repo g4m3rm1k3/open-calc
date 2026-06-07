@@ -52,6 +52,13 @@ export default {
     ],
     visualizations: [
       {
+        id: 'PythonMemoryViz',
+        title: 'Variables are Name Tags',
+        mathBridge: 'Observe how Python variables are not buckets, but name tags pointing to objects.',
+        caption: 'Step through to see how variables point to objects in the heap.',
+        props: {}
+      },
+      {
         id: 'PythonNotebook',
         title: 'The Execution Timeline',
         mathBridge: 'Compare this to a mathematical proof: every line represents a new state of the world.',

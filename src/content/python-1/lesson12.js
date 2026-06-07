@@ -62,6 +62,13 @@ export default {
     ],
     visualizations: [
       {
+        id: 'LoopUnrollerViz',
+        title: 'Loop Unrolling',
+        mathBridge: 'A for loop is just a compact way of writing a sequence of assignments and operations.',
+        caption: 'Step through to see how the loop unfolds into a flat sequence of instructions over time.',
+        props: {}
+      },
+      {
         id: 'PythonNotebook',
         title: 'The Iteration Engine',
         mathBridge:

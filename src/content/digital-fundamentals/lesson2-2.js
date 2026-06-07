@@ -550,7 +550,7 @@ function updateTableSel(){
   });
   // scroll selected row into view
   var selRow=document.querySelector('#tbody tr.sel');
-  if(selRow)selRow.scrollIntoView({block:'nearest'});
+  // if(selRow)selRow.scrollIntoView({block:'nearest'}); // removed to prevent page jump
 }
 
 // ── conversion panel ─────────────────────────────────────────────────────

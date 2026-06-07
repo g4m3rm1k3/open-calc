@@ -106,8 +106,8 @@ export default function LessonPage() {
 
   return (
     <div className="flex-1 min-h-screen relative overflow-x-hidden bg-white dark:bg-slate-950">
-      <article className="mx-auto max-w-[1440px] pb-24 pt-6 px-4 sm:px-8 md:px-12 min-h-screen relative">
       <TutorPanel lesson={lesson} />
+      <article className="mx-auto max-w-[1440px] pb-24 pt-6 px-4 sm:px-8 md:px-12 min-h-screen relative">
 
       <div className="pointer-events-none fixed left-0 top-0 z-[10001] h-1 w-full bg-slate-200 dark:bg-slate-800">
         <div

@@ -512,11 +512,16 @@ export default function CNCLab({
 
   // ─── Auto-scroll program trace to active block ─────────────────────────────
   useEffect(() => {
-    if (activeTraceRef.current) {
-      activeTraceRef.current.scrollIntoView({
-        block: "nearest",
-        behavior: "smooth",
-      });
+    if (activeTraceRef.current && traceContainerRef.current) {
+      const el = activeTraceRef.current;
+      const container = traceContainerRef.current;
+      const elTop = el.offsetTop;
+      const elBottom = elTop + el.offsetHeight;
+      const cTop = container.scrollTop;
+      const cBottom = cTop + container.clientHeight;
+      if (elTop < cTop || elBottom > cBottom) {
+        container.scrollTo({ top: elTop - container.clientHeight / 2 + el.offsetHeight / 2, behavior: "smooth" });
+      }
     }
   }, [machineState?.programPointer]);
 

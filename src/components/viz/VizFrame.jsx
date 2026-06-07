@@ -353,6 +353,10 @@ const VIZ_REGISTRY = {
   PageRankEigenvectorViz: lazy(() => import("./react/PageRankEigenvectorViz.jsx")),
   PCAVarianceViz: lazy(() => import("./react/PCAVarianceViz.jsx")),
 
+  PythonMemoryViz: lazy(() => import("./react/PythonMemoryViz.jsx")),
+  ListMemoryViz: lazy(() => import("./react/ListMemoryViz.jsx")),
+  LoopUnrollerViz: lazy(() => import("./react/LoopUnrollerViz.jsx")),
+  CallStackViz: lazy(() => import("./react/CallStackViz.jsx")),
   PythonNotebook: lazy(() => import("./react/PythonNotebook.jsx")),
   OpenMatNotebook: lazy(() => import("./react/OpenMatNotebook.jsx")),
   JSNotebook: lazy(() => import("./react/JSNotebook.jsx")),

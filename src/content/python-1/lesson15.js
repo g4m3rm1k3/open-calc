@@ -69,6 +69,13 @@ export default {
     ],
     visualizations: [
       {
+        id: 'ListMemoryViz',
+        title: 'Lists are Pointers',
+        mathBridge: 'A list object stores references (memory addresses) to other objects, not the objects themselves.',
+        caption: 'Watch how aliasing works: multiple variables can point to the same list.',
+        props: {}
+      },
+      {
         id: 'PythonNotebook',
         title: 'Lists in Action',
         mathBridge: 'A list is the computational equivalent of a finite ordered sequence: a₀, a₁, a₂, ..., aₙ₋₁.',

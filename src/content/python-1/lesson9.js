@@ -50,6 +50,13 @@ export default {
     ],
     visualizations: [
       {
+        id: 'CallStackViz',
+        title: 'The Call Stack Sandbox',
+        mathBridge: 'Observe how each function gets its own isolated environment (stack frame).',
+        caption: 'Watch the memory state as we jump in and out of functions.',
+        props: {}
+      },
+      {
         id: 'PythonNotebook',
         title: 'The Maker Space',
         mathBridge: 'We are now creating the Mathematical Functions $f(x)$ that we used earlier.',

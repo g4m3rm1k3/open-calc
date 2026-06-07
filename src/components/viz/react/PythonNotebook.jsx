@@ -216,7 +216,7 @@ def quick_transform(matrix,vector=None):
 const STARTER_CELLS = [
   {
     id: 1,
-    code: `# Python Sandbox\n# Type code here and press Shift+Enter to run\n\nprint("Hello, open-calc!")`,
+    code: `# Python Sandbox\n# Type code here and press Shift+Enter to run\n\nimport this`,
     output: "",
     status: "idle",
     figureJson: null,

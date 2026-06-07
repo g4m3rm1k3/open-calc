@@ -160,7 +160,16 @@ export default function CNCMacroLab({
   useEffect(() => {
     if (!codeRef.current || !machineState || isEditing) return
     const el = codeRef.current.querySelector(`[data-line="${machineState.programPointer}"]`)
-    if (el) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+    if (el) {
+      const container = codeRef.current;
+      const elTop = el.offsetTop;
+      const elBottom = elTop + el.offsetHeight;
+      const cTop = container.scrollTop;
+      const cBottom = cTop + container.clientHeight;
+      if (elTop < cTop || elBottom > cBottom) {
+        container.scrollTo({ top: elTop - container.clientHeight / 2 + el.offsetHeight / 2, behavior: "smooth" });
+      }
+    }
   }, [machineState?.programPointer, isEditing])
 
   // ── Canvas resize observer ─────────────────────────────────────────────────
