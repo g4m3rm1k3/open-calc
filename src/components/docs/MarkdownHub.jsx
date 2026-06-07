@@ -815,6 +815,7 @@ export default function MarkdownHub() {
         savePersonal(updated)
       }
       selectUserDoc(fileDoc)
+      setPreviewMode(true)
       return
     }
 
