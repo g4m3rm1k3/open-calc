@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { EXERCISE_DATABASE, EXERCISE_TYPES } from '../../data/rpgExercises';
 import { PREBUILT_PLANS } from '../../data/rpgPrebuiltPlans';
-import { Dumbbell, Activity, ShieldPlus, ChevronDown, X, Plus, PlaySquare, Wind, Hand } from 'lucide-react';
+import { Dumbbell, Activity, ShieldPlus, X, Plus, PlaySquare, Wind, Hand, Trophy } from 'lucide-react';
 
-// Map stats to icons for visual flair
 const getIconForType = (type) => {
   if (type === EXERCISE_TYPES.WEIGHT_REPS || type === EXERCISE_TYPES.BODYWEIGHT_REPS) return <Dumbbell size={18} className="text-emerald-400" />;
   if (type === EXERCISE_TYPES.DISTANCE_TIME) return <Wind size={18} className="text-cyan-400" />;
@@ -12,10 +11,20 @@ const getIconForType = (type) => {
   return <Activity size={18} className="text-orange-400" />;
 };
 
-export function WorkoutLogger({ logDetailedWorkout, activePlan }) {
+function formatPR(pr, type) {
+  if (!pr) return null;
+  if (type === EXERCISE_TYPES.WEIGHT_REPS) return `${pr.weight}lbs × ${pr.reps}`;
+  if (type === EXERCISE_TYPES.BODYWEIGHT_REPS) return `${pr.reps} reps`;
+  if (type === EXERCISE_TYPES.DISTANCE_TIME) return `${pr.distance}km`;
+  if (type === EXERCISE_TYPES.TIME_HOLD || type === EXERCISE_TYPES.ISOMETRIC) return `${pr.duration}min`;
+  return null;
+}
+
+export function WorkoutLogger({ logDetailedWorkout, activePlan, personalRecords = {} }) {
   const [activeDayIdx, setActiveDayIdx] = useState(0);
   const [workoutRows, setWorkoutRows] = useState([]);
   const [levelUpMessage, setLevelUpMessage] = useState(false);
+  const [newPrNames, setNewPrNames] = useState([]);
   const [showAddMenu, setShowAddMenu] = useState(false);
 
   // Load plan when activePlan or activeDayIdx changes
@@ -115,11 +124,15 @@ export function WorkoutLogger({ logDetailedWorkout, activePlan }) {
 
     if (entries.length === 0) return;
 
-    const leveledUp = logDetailedWorkout(entries);
+    const { leveledUp, newPrs } = logDetailedWorkout(entries);
 
     if (leveledUp) {
       setLevelUpMessage(true);
       setTimeout(() => setLevelUpMessage(false), 5000);
+    }
+    if (newPrs?.length) {
+      setNewPrNames(newPrs);
+      setTimeout(() => setNewPrNames([]), 5000);
     }
 
     setWorkoutRows(rows => rows.map(r => ({
@@ -144,7 +157,7 @@ export function WorkoutLogger({ logDetailedWorkout, activePlan }) {
     <div className="bg-slate-900/80 border border-slate-700 rounded-2xl p-6 relative backdrop-blur-xl">
       <AnimatePresence>
         {levelUpMessage && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
@@ -153,6 +166,22 @@ export function WorkoutLogger({ logDetailedWorkout, activePlan }) {
             <ShieldPlus size={64} className="text-emerald-400 mb-4 animate-bounce" />
             <h2 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 text-center uppercase tracking-widest drop-shadow-[0_0_10px_rgba(52,211,153,0.8)]">Level Up!</h2>
             <p className="text-emerald-200 mt-2 font-bold text-center">Your power grows.</p>
+          </motion.div>
+        )}
+        {!levelUpMessage && newPrNames.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-slate-900/95 backdrop-blur-md rounded-2xl"
+          >
+            <Trophy size={64} className="text-amber-400 mb-4 animate-bounce drop-shadow-[0_0_15px_rgba(251,191,36,0.8)]" />
+            <h2 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-300 text-center uppercase tracking-widest">New Record!</h2>
+            <div className="mt-3 space-y-1 text-center">
+              {newPrNames.map(name => (
+                <p key={name} className="text-amber-200 font-bold">{name}</p>
+              ))}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -212,7 +241,14 @@ export function WorkoutLogger({ logDetailedWorkout, activePlan }) {
                 </div>
                 <div>
                   <h4 className="font-bold text-slate-200">{exDb.name}</h4>
-                  <p className="text-[10px] text-slate-500 uppercase tracking-widest">{Object.keys(exDb.statFocus).join(' | ')}</p>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <p className="text-[10px] text-slate-500 uppercase tracking-widest">{Object.keys(exDb.statFocus).join(' | ')}</p>
+                    {formatPR(personalRecords[row.id], exDb.type) && (
+                      <span className="flex items-center gap-1 text-[10px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 px-1.5 py-0.5 rounded">
+                        <Trophy size={9} /> {formatPR(personalRecords[row.id], exDb.type)}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
 

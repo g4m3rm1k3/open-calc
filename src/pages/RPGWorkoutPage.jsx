@@ -10,6 +10,7 @@ import { RPGFantasyBackground } from '../components/rpg/RPGFantasyBackground';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import { PREBUILT_PLANS } from '../data/rpgPrebuiltPlans';
 import { getExerciseDetails } from '../data/rpgExercises';
+import { WorkoutHistoryChart } from '../components/rpg/WorkoutHistoryChart';
 
 export default function RPGWorkoutPage() {
   const { 
@@ -79,11 +80,16 @@ export default function RPGWorkoutPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Left Column: Actions */}
           <div className="space-y-6">
-            <WorkoutLogger logDetailedWorkout={logDetailedWorkout} activePlan={activePlan} />
+            <WorkoutLogger
+              logDetailedWorkout={logDetailedWorkout}
+              activePlan={activePlan}
+              personalRecords={rpgData.personalRecords || {}}
+            />
             
             {/* Logs Preview */}
             <div className="bg-slate-900/40 rounded-2xl p-6 border border-slate-800">
-              <h3 className="text-slate-400 font-bold mb-4 text-sm uppercase tracking-wider">Recent Activity</h3>
+              <WorkoutHistoryChart workoutLogs={rpgData.workoutLogs} />
+              <h3 className="text-slate-400 font-bold mb-4 mt-5 text-sm uppercase tracking-wider">Recent Activity</h3>
               {rpgData.workoutLogs.length === 0 ? (
                 <p className="text-slate-500 text-sm italic">No recent training logs.</p>
               ) : (

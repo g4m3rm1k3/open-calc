@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, Sword, Wind, Hand, Zap, Heart } from 'lucide-react';
+import { Shield, Sword, Wind, Hand, Zap, Heart, AlertTriangle } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const classMeta = {
@@ -22,6 +22,7 @@ export function HeroPanel({ rpgData }) {
   const xpPct = Math.min(100, Math.max(0, (xpIntoLevel / xpNeeded) * 100));
   
   const hpPct = Math.min(100, Math.max(0, (rpgData.hp / rpgData.maxHp) * 100));
+  const isHpLow = hpPct < 40;
 
   return (
     <div className="bg-slate-900/60 backdrop-blur-md border border-slate-700/50 rounded-2xl p-6 relative overflow-hidden shadow-xl">
@@ -74,13 +75,18 @@ export function HeroPanel({ rpgData }) {
               <span>{rpgData.hp} / {rpgData.maxHp}</span>
             </div>
             <div className="h-2 w-full bg-slate-950 rounded-full overflow-hidden border border-slate-700">
-              <motion.div 
-                className="h-full bg-gradient-to-r from-red-600 to-rose-400"
+              <motion.div
+                className={`h-full bg-gradient-to-r ${isHpLow ? 'from-red-700 to-red-500' : 'from-red-600 to-rose-400'}`}
                 initial={{ width: 0 }}
                 animate={{ width: `${hpPct}%` }}
                 transition={{ duration: 0.5 }}
               />
             </div>
+            {isHpLow && (
+              <p className="flex items-center gap-1 text-[10px] font-bold text-red-400 animate-pulse">
+                <AlertTriangle className="w-3 h-3" /> Your hero is weakening — train to restore HP.
+              </p>
+            )}
           </div>
 
         </div>
