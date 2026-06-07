@@ -61,7 +61,7 @@ export default function FunctionCompositionLab() {
          <div className="h-6 border-l-4 border-dashed border-slate-600 animate-pulse"></div>
 
          {/* Machine 1 */}
-         <div className={`w-64 py-4 px-6 rounded-xl flex flex-col items-center border-[3px] shadow-[0_0_20px_inset] transition-all duration-500 ${firstMachine.color === 'brand' ? 'bg-sky-900/40 border-sky-400 shadow-sky-500/20' : 'bg-emerald-900/40 border-emerald-400 shadow-emerald-500/20'}`}>
+         <div className={`w-64 py-4 px-6 rounded-xl flex flex-col items-center border-[3px] shadow-[0_0_20px_inset] transition-all duration-500 ${firstMachine.color === 'brand' ? 'bg-sky-900/40 border-sky-400 shadow-sky-500/20' : 'bg-emerald-900/40 border-emerald-400 dark:border-emerald-600/50 shadow-emerald-500/20'}`}>
              <span className={`text-xl font-bold ${firstMachine.color === 'brand' ? 'text-sky-300' : 'text-emerald-300'} font-mono`}>{firstMachine.label}</span>
          </div>
 
@@ -75,7 +75,7 @@ export default function FunctionCompositionLab() {
          <div className="h-6 border-l-4 border-dashed border-slate-600 animate-pulse"></div>
 
          {/* Machine 2 */}
-         <div className={`w-64 py-4 px-6 rounded-xl flex flex-col items-center border-[3px] shadow-[0_0_20px_inset] transition-all duration-500 ${secondMachine.color === 'brand' ? 'bg-sky-900/40 border-sky-400 shadow-sky-500/20' : 'bg-emerald-900/40 border-emerald-400 shadow-emerald-500/20'}`}>
+         <div className={`w-64 py-4 px-6 rounded-xl flex flex-col items-center border-[3px] shadow-[0_0_20px_inset] transition-all duration-500 ${secondMachine.color === 'brand' ? 'bg-sky-900/40 border-sky-400 shadow-sky-500/20' : 'bg-emerald-900/40 border-emerald-400 dark:border-emerald-600/50 shadow-emerald-500/20'}`}>
              <span className={`text-xl font-bold ${secondMachine.color === 'brand' ? 'text-sky-300' : 'text-emerald-300'} font-mono`}>{secondMachine.label}</span>
          </div>
 

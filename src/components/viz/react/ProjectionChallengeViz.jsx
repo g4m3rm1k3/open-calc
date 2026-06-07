@@ -119,7 +119,7 @@ export default function ProjectionChallengeViz() {
         <div className="flex gap-1 mb-3">
           {STEPS.map((_, i) => (
             <button key={i} onClick={() => setStep(i)}
-              className={`h-1.5 flex-1 rounded-full transition-colors ${i === step ? 'bg-cyan-500' : i < step ? 'bg-cyan-300 dark:bg-cyan-700' : 'bg-slate-200 dark:bg-slate-700'}`} />
+              className={`h-1.5 flex-1 rounded-full transition-colors ${i === step ? 'bg-cyan-50 dark:bg-cyan-900/300' : i < step ? 'bg-cyan-300 dark:bg-cyan-700' : 'bg-slate-200 dark:bg-slate-700'}`} />
           ))}
         </div>
         <div className="rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 p-3 mb-3">
@@ -131,11 +131,11 @@ export default function ProjectionChallengeViz() {
       {/* Action buttons */}
       <div className="flex flex-wrap gap-1 mb-3">
         <button onClick={() => setLineAngle(optimalAngle)}
-          className="text-[9px] px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-cyan-400 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors">
+          className="text-[9px] px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-cyan-400 dark:border-cyan-600/50 hover:text-cyan-600 dark:text-cyan-400 dark:hover:text-cyan-400 transition-colors">
           Snap to optimal
         </button>
         <button onClick={() => setLineAngle(Math.PI / 6)}
-          className="text-[9px] px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-cyan-400 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors">
+          className="text-[9px] px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-cyan-400 dark:border-cyan-600/50 hover:text-cyan-600 dark:text-cyan-400 dark:hover:text-cyan-400 transition-colors">
           Reset line
         </button>
         <span className={`ml-auto text-[9px] font-mono px-2 py-0.5 rounded border ${isOptimal ? 'bg-green-50 dark:bg-green-900/30 border-green-300 dark:border-green-700 text-green-700 dark:text-green-400' : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-600 text-slate-500'}`}>

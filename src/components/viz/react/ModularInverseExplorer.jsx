@@ -73,7 +73,7 @@ export default function ModularInverseExplorer() {
                 key={entry.x}
                 type="button"
                 onClick={() => setSelectedX(entry.x)}
-                className={`rounded-xl border px-3 py-2 text-sm transition ${isSelected ? "border-blue-500 bg-blue-50 text-blue-800 dark:border-blue-400 dark:bg-blue-900/50 dark:text-blue-200" : "border-slate-200 bg-slate-100 text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"}`}
+                className={`rounded-xl border px-3 py-2 text-sm transition ${isSelected ? "border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 dark:border-blue-400 dark:bg-blue-900/50 dark:text-blue-200" : "border-slate-200 bg-slate-100 text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"}`}
               >
                 x={entry.x} → {entry.value}
               </button>

@@ -536,7 +536,7 @@ function render(){
     '<div class="card" style="text-align:center">'+
       '<div style="font-size:11px;color:#94a3b8;margin-bottom:4px">Decimal value</div>'+
       '<div style="font-size:32px;font-weight:500;color:#0891b2">'+v+'</div>'+
-      '<div style="font-size:12px;color:#64748b;margin-top:4px">'+eqParts+' = '+v+'</div>'+
+      '<div style="font-size:12px;color:var(--color-text-secondary, #475569);margin-top:4px">'+eqParts+' = '+v+'</div>'+
     '</div>'+
     '<div class="card why">'+
       '<div style="font-size:12px;font-weight:600;color:#7c3aed;margin-bottom:5px">Why computers use base 2, not base 10</div>'+

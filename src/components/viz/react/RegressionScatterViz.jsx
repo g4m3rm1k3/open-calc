@@ -77,7 +77,7 @@ export default function RegressionScatterViz() {
             onClick={() => { setPreset(key); setPts(generatePoints(key)) }}
             className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
               preset === key
-                ? 'bg-indigo-500 text-white'
+                ? 'bg-indigo-50 dark:bg-indigo-900/300 text-white'
                 : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
             }`}>
             {label}

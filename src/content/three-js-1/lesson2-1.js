@@ -59,7 +59,7 @@ void main() {
 Two procedural textures on a quad. Drag the blend slider to interpolate between them, or switch to different blend modes. This is exactly how texture blending and material layering works in a fragment shader.`,
       html: `<div style="background:#0a0f1e;padding:14px;display:flex;flex-direction:column;gap:10px;align-items:center">
   <canvas id="cv" width="560" height="280" style="border-radius:8px;display:block;width:100%"></canvas>
-  <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;font-family:monospace;font-size:11px;color:#64748b;">
+  <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;font-family:monospace;font-size:11px;color:var(--color-text-secondary, #475569);">
     <div style="display:flex;gap:6px;align-items:center;">
       <span>Mix t:</span>
       <input id="blend" type="range" min="0" max="1" step="0.01" value="0.5" style="width:100px">
@@ -67,9 +67,9 @@ Two procedural textures on a quad. Drag the blend slider to interpolate between 
     </div>
     <div style="display:flex;gap:5px;">
       <button class="modeBtn" data-m="mix"        style="background:#1e2a3f;border:1px solid #38bdf8;color:#38bdf8;padding:4px 10px;border-radius:5px;cursor:pointer;font-family:monospace;font-size:10px;">mix</button>
-      <button class="modeBtn" data-m="add"        style="background:#1e2a3f;border:1px solid #334155;color:#64748b;padding:4px 10px;border-radius:5px;cursor:pointer;font-family:monospace;font-size:10px;">add</button>
-      <button class="modeBtn" data-m="multiply"   style="background:#1e2a3f;border:1px solid #334155;color:#64748b;padding:4px 10px;border-radius:5px;cursor:pointer;font-family:monospace;font-size:10px;">multiply</button>
-      <button class="modeBtn" data-m="screen"     style="background:#1e2a3f;border:1px solid #334155;color:#64748b;padding:4px 10px;border-radius:5px;cursor:pointer;font-family:monospace;font-size:10px;">screen</button>
+      <button class="modeBtn" data-m="add"        style="background:#1e2a3f;border:1px solid #334155;color:var(--color-text-secondary, #475569);padding:4px 10px;border-radius:5px;cursor:pointer;font-family:monospace;font-size:10px;">add</button>
+      <button class="modeBtn" data-m="multiply"   style="background:#1e2a3f;border:1px solid #334155;color:var(--color-text-secondary, #475569);padding:4px 10px;border-radius:5px;cursor:pointer;font-family:monospace;font-size:10px;">multiply</button>
+      <button class="modeBtn" data-m="screen"     style="background:#1e2a3f;border:1px solid #334155;color:var(--color-text-secondary, #475569);padding:4px 10px;border-radius:5px;cursor:pointer;font-family:monospace;font-size:10px;">screen</button>
     </div>
   </div>
 </div>`,

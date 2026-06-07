@@ -131,7 +131,7 @@ export default function LimitApproach({ params }) {
                 return (
                   <tr key={i} className="even:bg-slate-50 dark:even:bg-slate-800/40">
                     <td className="px-3 py-1 border border-slate-200 dark:border-slate-700 font-mono text-center">{row.x.toFixed(3)}</td>
-                    <td className={`px-3 py-1 border border-slate-200 dark:border-slate-700 font-mono text-center ${row.side === '←' ? 'text-brand-600' : 'text-emerald-600'}`}>
+                    <td className={`px-3 py-1 border border-slate-200 dark:border-slate-700 font-mono text-center ${row.side === '←' ? 'text-brand-600' : 'text-emerald-600 dark:text-emerald-400'}`}>
                       {y !== null ? y.toFixed(6) : 'undef.'}
                     </td>
                     <td className="px-3 py-1 border border-slate-200 dark:border-slate-700 text-center text-slate-500">{row.side}</td>

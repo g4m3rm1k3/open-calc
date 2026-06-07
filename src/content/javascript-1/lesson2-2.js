@@ -61,7 +61,7 @@ This is the key: closures create **private, persistent state** without global va
 </div>`,
       css: `.panel{height:100%;background:#09111c;padding:18px;border-radius:12px;display:flex;gap:24px;justify-content:center;align-items:center;font-family:monospace;}
 .group{display:flex;flex-direction:column;align-items:center;gap:10px;}
-.label{color:#475569;font-size:11px;letter-spacing:.08em;text-transform:uppercase;}
+.label{color:var(--color-text-secondary, #475569);font-size:11px;letter-spacing:.08em;text-transform:uppercase;}
 .count-box{width:80px;height:80px;border:2px solid #38bdf8;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:800;color:#38bdf8;background:#0f2233;}
 button{background:#1e3a5f;border:1px solid #38bdf8;color:#93c5fd;padding:8px 16px;border-radius:8px;cursor:pointer;font-family:monospace;font-size:13px;transition:background .2s;}
 button:hover{background:#1e4976;}`,
@@ -217,7 +217,7 @@ Run the cell and see both behaviors side by side. The \`var\` row shows the old 
   <div id="let-row" class="row good">waiting 300ms…</div>
 </div>`,
       css: `.panel{height:100%;background:#09111c;padding:18px;border-radius:12px;display:flex;flex-direction:column;gap:8px;font-family:monospace;}
-.label{color:#475569;font-size:10px;letter-spacing:.08em;text-transform:uppercase;}
+.label{color:var(--color-text-secondary, #475569);font-size:10px;letter-spacing:.08em;text-transform:uppercase;}
 .row{background:#111827;border:1px solid #1e293b;border-radius:8px;padding:10px;font-size:13px;}
 .bad{border-color:#f87171;color:#fca5a5;}
 .good{border-color:#4ade80;color:#86efac;}`,
@@ -302,7 +302,7 @@ The \`cache\` object lives inside the closure — it persists across calls witho
   </div>
 </div>`,
       css: `.panel{height:100%;background:#09111c;padding:16px;border-radius:12px;display:flex;flex-direction:column;gap:10px;font-family:monospace;}
-.label{color:#475569;font-size:10px;letter-spacing:.08em;text-transform:uppercase;}
+.label{color:var(--color-text-secondary, #475569);font-size:10px;letter-spacing:.08em;text-transform:uppercase;}
 .log-box{flex:1;background:#050e1a;border:1px solid #1e293b;border-radius:8px;padding:10px;color:#93c5fd;font-size:12px;overflow-y:auto;}
 .btn-row{display:flex;gap:6px;flex-wrap:wrap;}
 button{flex:1;background:#1e2a3f;border:1px solid #334155;color:#94a3b8;padding:8px;border-radius:8px;cursor:pointer;font-size:11px;font-family:monospace;}`,

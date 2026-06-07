@@ -90,7 +90,7 @@ Before running: look at the CSS. Count how many times \`#2563eb\` appears. Now i
 .cd-card    { background: #1e293b; border: 1px solid #334155;
   border-radius: 10px; padding: 20px;
   display: flex; flex-direction: column; gap: 4px; }
-.cd-card-label { font-size: 11px; font-weight: 600; color: #64748b;
+.cd-card-label { font-size: 11px; font-weight: 600; color: var(--color-text-secondary, #475569);
   text-transform: uppercase; letter-spacing: 0.1em; }
 .cd-card-value { font-size: 28px; font-weight: 700; color: #f1f5f9; }
 .cd-card-delta { font-size: 12px; font-weight: 500; color: #4ade80; }
@@ -247,14 +247,14 @@ The cell below builds a 10-step colour scale for any hue. This becomes your Laye
 #scale-controls { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
 .sc-row { display: flex; align-items: center; gap: 8px;
   background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 6px 12px; }
-.sc-row label { font-size: 11px; color: #64748b; white-space: nowrap; display: flex; gap: 4px; }
+.sc-row label { font-size: 11px; color: var(--color-text-secondary, #475569); white-space: nowrap; display: flex; gap: 4px; }
 .sc-row label span { color: #f1f5f9; font-weight: 600; min-width: 24px; }
 .sc-row input[type=range] { width: 100px; accent-color: #2563eb; }
 #colour-scale  { display: flex; border-radius: 8px; overflow: hidden; margin-bottom: 12px; }
 .cs-swatch { flex: 1; height: 48px; display: flex; align-items: flex-end;
   padding: 4px; cursor: pointer; }
 .cs-label  { font-size: 9px; font-weight: 700; }
-#token-output { font-family: monospace; font-size: 11px; color: #64748b;
+#token-output { font-family: monospace; font-size: 11px; color: var(--color-text-secondary, #475569);
   background: #0f172a; border: 1px solid #1e293b; border-radius: 6px;
   padding: 10px 12px; line-height: 1.9; max-height: 200px; overflow-y: auto; }`,
       startCode: `// Build a 10-step colour scale from hue + saturation
@@ -388,7 +388,7 @@ The cell below implements this complete token system and shows how changing the 
 </div>`,
       css: `body { background: #0f172a; padding: 20px; margin: 0; font-family: system-ui, sans-serif; }
 #td-controls { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px;
-  font-size: 12px; color: #64748b; }
+  font-size: 12px; color: var(--color-text-secondary, #475569); }
 #td-controls label { display: flex; align-items: center; gap: 8px;
   background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 6px 12px; }
 #td-controls label span { color: #f1f5f9; font-weight: 600; min-width: 24px; }
@@ -526,7 +526,7 @@ The test switches the brand hue from blue (217°) to teal (183°) by only changi
 .p5-controls { display: flex; gap: 8px; margin-bottom: 16px; }
 .p5-controls button { font-size: 11px; font-weight: 500; padding: 5px 12px;
   border-radius: 6px; border: 1px solid #334155; background: #1e293b;
-  color: #64748b; cursor: pointer; }
+  color: var(--color-text-secondary, #475569); cursor: pointer; }
 .p5-controls button.active { background: #2563eb; color: white; border-color: #2563eb; }
 /* Component using SEMANTIC tokens — do not change these */
 .p5-card   { background: var(--color-surface); border: 1px solid var(--color-border);
@@ -794,7 +794,7 @@ The cell below demonstrates a complete theme switch that persists across simulat
 #td2-controls { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
 #td2-toggle { padding: 7px 14px; background: #2563eb; color: white; border: none;
   border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer; }
-#td2-os-pref { font-size: 11px; color: #475569; font-family: monospace; }
+#td2-os-pref { font-size: 11px; color: var(--color-text-secondary, #475569); font-family: monospace; }
 
 /* ALL COMPONENT COLOURS USE SEMANTIC TOKENS ONLY */
 .th-app  { border-radius: 10px; overflow: hidden; border: 1px solid var(--th-border);
@@ -1072,7 +1072,7 @@ Run the audit on the themed demo from Part 4 in both light and dark modes. Notic
       css: `body { background: #0f172a; padding: 20px; margin: 0; font-family: system-ui, sans-serif; }
 #contrast-tool { max-width: 600px; }
 #ct-controls { display: flex; gap: 12px; margin: 12px 0;
-  font-size: 12px; color: #64748b; }
+  font-size: 12px; color: var(--color-text-secondary, #475569); }
 #ct-controls label { display: flex; align-items: center; gap: 6px;
   background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 6px 10px; }
 .ct-app  { background: #1e293b; border: 1px solid #334155;
@@ -1080,8 +1080,8 @@ Run the audit on the themed demo from Part 4 in both light and dark modes. Notic
 .ct-h    { font-size: 24px; font-weight: 700; color: #f1f5f9; }
 .ct-sub  { font-size: 16px; font-weight: 600; color: #cbd5e1; }
 .ct-body { font-size: 15px; color: #94a3b8; line-height: 1.6; max-width: 55ch; }
-.ct-muted{ font-size: 12px; color: #475569; }
-.ct-label{ font-size: 10px; font-weight: 700; color: #64748b; letter-spacing: 0.12em; text-transform: uppercase; }
+.ct-muted{ font-size: 12px; color: var(--color-text-secondary, #475569); }
+.ct-label{ font-size: 10px; font-weight: 700; color: var(--color-text-secondary, #475569); letter-spacing: 0.12em; text-transform: uppercase; }
 .ct-btn  { padding: 9px 18px; background: #2563eb; color: #ffffff;
   border: none; border-radius: 7px; font-size: 14px; font-weight: 600; cursor: pointer; width: fit-content; }
 .ct-link { color: #60a5fa; font-size: 14px; }
@@ -1393,7 +1393,7 @@ This cell simulates five different brand hues cycling through the same interface
 Then inject a deliberate CO-1 violation (one hardcoded hex) and watch how that one element fails to update during a rebrand. This is the production failure mode: one team member hardcodes a hex "just this once", and it becomes a maintenance liability.`,
       html: `<div id="rebrand-demo">
   <div id="rb-controls">
-    <span style="font-size:11px;color:#475569;font-family:monospace">Brand hue:</span>
+    <span style="font-size:11px;color:var(--color-text-secondary, #475569);font-family:monospace">Brand hue:</span>
     <button class="rb-btn" data-hue="217">Blue (217°)</button>
     <button class="rb-btn" data-hue="183">Teal (183°)</button>
     <button class="rb-btn" data-hue="145">Green (145°)</button>
@@ -1401,7 +1401,7 @@ Then inject a deliberate CO-1 violation (one hardcoded hex) and watch how that o
     <button class="rb-btn" data-hue="14">Red-Orange (14°)</button>
   </div>
   <div id="rb-violation-row">
-    <label style="font-size:11px;color:#64748b">
+    <label style="font-size:11px;color:var(--color-text-secondary, #475569)">
       <input type="checkbox" id="rb-inject"> Inject CO-1 violation (hardcoded hex on one element)
     </label>
   </div>
@@ -1433,7 +1433,7 @@ Then inject a deliberate CO-1 violation (one hardcoded hex) and watch how that o
 #rb-violation-row { margin-bottom: 14px; }
 .rb-btn { font-size: 11px; font-weight: 500; padding: 5px 12px;
   border-radius: 6px; border: 1px solid #334155; background: #1e293b;
-  color: #64748b; cursor: pointer; }
+  color: var(--color-text-secondary, #475569); cursor: pointer; }
 .rb-btn.active { border-color: var(--rb-interactive); color: var(--rb-interactive);
   background: var(--rb-subtle); }
 .rb-app  { border-radius: 10px; overflow: hidden; border: 1px solid #334155; max-width: 540px; }
@@ -1451,10 +1451,10 @@ Then inject a deliberate CO-1 violation (one hardcoded hex) and watch how that o
   border: 1px solid var(--rb-border-subtle);
   padding: 2px 8px; border-radius: 100px; display: inline-block; margin-bottom: 8px; }
 .rb-val  { font-size: 26px; font-weight: 700; color: #f1f5f9; margin-bottom: 2px; }
-.rb-sub  { font-size: 12px; color: #64748b; margin-bottom: 10px; }
+.rb-sub  { font-size: 12px; color: var(--color-text-secondary, #475569); margin-bottom: 10px; }
 .rb-link { font-size: 13px; font-weight: 500; color: var(--rb-interactive);
   text-decoration: none; }
-#rb-log  { margin-top: 10px; font-family: monospace; font-size: 11px; color: #475569; line-height: 1.7; }`,
+#rb-log  { margin-top: 10px; font-family: monospace; font-size: 11px; color: var(--color-text-secondary, #475569); line-height: 1.7; }`,
       startCode: `const root = document.documentElement;
 let violation = false;
 
@@ -1554,7 +1554,7 @@ The test verifies: the component uses no hardcoded hex on interactive or text el
   color: #ffffff; font-size: 14px; font-weight: 700; display: flex;
   align-items: center; justify-content: center; flex-shrink: 0; }
 .p3-name    { font-size: 15px; font-weight: 600; color: #f1f5f9; margin-bottom: 2px; }
-.p3-role    { font-size: 12px; color: #64748b; }
+.p3-role    { font-size: 12px; color: var(--color-text-secondary, #475569); }
 .p3-badge   { font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
   background: #1e3a5f; color: #60a5fa; border: 1px solid #1d4ed8;
   padding: 3px 9px; border-radius: 100px; flex-shrink: 0; }
@@ -1563,7 +1563,7 @@ The test verifies: the component uses no hardcoded hex on interactive or text el
 .p3-stats   { display: flex; gap: 16px; margin-bottom: 18px;
   padding-bottom: 16px; border-bottom: 1px solid #334155; }
 .p3-stat-v  { font-size: 20px; font-weight: 700; color: #f1f5f9; }
-.p3-stat-l  { font-size: 11px; color: #64748b; }
+.p3-stat-l  { font-size: 11px; color: var(--color-text-secondary, #475569); }
 .p3-actions { display: flex; gap: 8px; }
 .p3-primary { flex: 1; padding: 9px; background: #2563eb; color: #ffffff;
   border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }

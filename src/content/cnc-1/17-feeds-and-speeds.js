@@ -94,7 +94,7 @@ body{margin:0;background:#0f172a;color:#e2e8f0;font-family:monospace;font-size:1
 .card{background:#1e293b;border:1px solid #334155;border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:6px}
 label{color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:0.05em}
 input,select{background:#0f172a;border:1px solid #475569;border-radius:4px;color:#e2e8f0;padding:6px 8px;font-family:monospace;font-size:13px;width:100%;box-sizing:border-box}
-span{color:#64748b;font-size:11px}
+span{color:var(--color-text-secondary, #475569);font-size:11px}
 .res-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1e293b}
 .res-label{color:#94a3b8}.res-val{color:#38bdf8;font-size:15px;font-weight:bold}
 .res-code{color:#4ade80;font-size:12px;font-style:italic}

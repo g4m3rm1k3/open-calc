@@ -140,7 +140,7 @@ const PolynomialScrubber = ({ width = 900, height = 400 }) => {
              
              <div className="mt-8 text-sm text-center w-full text-slate-500 font-sans italic">
                Quotient: 1x² + {(row3[1]).toFixed(1)}x + {(row3[2]).toFixed(1)} <br/>
-               <span className="font-bold text-red-500 not-italic border-t border-red-200 block pt-2 mt-2">Remainder = {remainder.toFixed(1)}</span>
+               <span className="font-bold text-red-500 not-italic border-t border-red-200 dark:border-red-800/50 block pt-2 mt-2">Remainder = {remainder.toFixed(1)}</span>
              </div>
           </div>
         </div>

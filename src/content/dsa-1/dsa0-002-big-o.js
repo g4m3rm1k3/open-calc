@@ -250,7 +250,7 @@ function update() {
   ratio.innerHTML =
     \`n=\${n}: O(n)=\${lin} ops vs O(n²)=\${quad} ops &nbsp;→&nbsp; \` +
     \`<span style="color:#fbbf24">O(n²) is \${r}× more expensive</span><br>\` +
-    \`<span style="color:#64748b">\${insight.replace('\${n}', n)}</span>\`;
+    \`<span style="color:var(--color-text-secondary, #475569)">\${insight.replace('\${n}', n)}</span>\`;
 }
 
 sl.addEventListener('input', update);

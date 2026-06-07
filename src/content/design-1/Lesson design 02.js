@@ -92,18 +92,18 @@ Run the cell. The JavaScript reads and reports every computed spacing value. The
 /* BROKEN SPACING — arbitrary values throughout */
 .form-title { font-size: 22px; font-weight: 700; color: #f1f5f9;
   margin: 0 0 7px; }         /* ← 7px */
-.form-sub { font-size: 14px; color: #64748b; margin: 0 0 19px; } /* ← 19px */
+.form-sub { font-size: 14px; color: var(--color-text-secondary, #475569); margin: 0 0 19px; } /* ← 19px */
 .field { margin-bottom: 13px; } /* ← 13px */
 .label { display: block; font-size: 13px; font-weight: 500; color: #94a3b8;
   margin-bottom: 5px; }       /* ← 5px */
 .input { width: 100%; padding: 9px 11px; background: #0f172a;
   border: 1px solid #334155; border-radius: 6px; color: #f1f5f9;
   font-size: 14px; box-sizing: border-box; outline: none; }
-.hint { display: block; font-size: 11px; color: #475569; margin-top: 4px; }
+.hint { display: block; font-size: 11px; color: var(--color-text-secondary, #475569); margin-top: 4px; }
 .submit { width: 100%; padding: 11px; background: #2563eb; color: white;
   border: none; border-radius: 8px; font-size: 15px; font-weight: 600;
   cursor: pointer; margin-top: 17px; }   /* ← 17px */
-.legal { font-size: 12px; color: #475569; text-align: center;
+.legal { font-size: 12px; color: var(--color-text-secondary, #475569); text-align: center;
   margin-top: 11px; }         /* ← 11px */
 .legal a { color: #60a5fa; }`,
       startCode: `// Audit: read every margin and padding value in the form
@@ -270,17 +270,17 @@ Experiment: change \`--base\` from 4 to 6. Watch every spacing value update simu
   padding: var(--space-6);     /* component inset: 32px */
   width: 280px;
 }
-.tag    { font-size: 10px; font-weight: 600; color: #475569;
+.tag    { font-size: 10px; font-weight: 600; color: var(--color-text-secondary, #475569);
   letter-spacing: 0.1em; text-transform: uppercase;
   display: block; margin-bottom: var(--space-2); }  /* 8px — tight, same concept */
 .amount { font-size: 36px; font-weight: 700; color: #f1f5f9;
   margin: 0 0 var(--space-1); }                     /* 4px — very tight, same group */
-.plan   { font-size: 14px; color: #64748b; margin: 0; }
+.plan   { font-size: 14px; color: var(--color-text-secondary, #475569); margin: 0; }
 .divider { border: none; border-top: 1px solid #334155;
   margin: var(--space-5) 0; }                       /* 24px — section separator */
 .row    { display: flex; justify-content: space-between;
   margin-bottom: var(--space-2); }                  /* 8px — within a list */
-.row-label { font-size: 13px; color: #64748b; }
+.row-label { font-size: 13px; color: var(--color-text-secondary, #475569); }
 .row-value { font-size: 13px; font-weight: 500; color: #cbd5e1; }
 .status { color: #4ade80; }
 .btn    { width: 100%; padding: var(--space-3) var(--space-4); /* 12px 16px */
@@ -371,11 +371,11 @@ The cell below lets you see each role isolated and labelled. Every spacing decis
 .role-card { background: #1e293b; border: 1px solid #334155;
   border-radius: 10px; padding: 14px; min-width: 160px; flex: 1; }
 .role-label { font-size: 9px; font-weight: 700; letter-spacing: 0.14em;
-  text-transform: uppercase; color: #475569; margin-bottom: 12px; }
+  text-transform: uppercase; color: var(--color-text-secondary, #475569); margin-bottom: 12px; }
 
 /* INSET: space from container edge to content */
 #role-inset .inner-box { background: #0f172a; border: 1px dashed #334155;
-  border-radius: 6px; font-size: 12px; color: #64748b;
+  border-radius: 6px; font-size: 12px; color: var(--color-text-secondary, #475569);
   padding: var(--space-5); /* ← INSET: 24px all sides */ }
 
 /* STACK: vertical space between elements */
@@ -464,11 +464,11 @@ The rule: **the gap between groups must be at least 2.5× the gap within a group
   align-items: flex-start; padding: 24px; margin: 0; font-family: system-ui, sans-serif; }
 #proximity-demo { width: 100%; max-width: 500px; }
 #controls { margin-bottom: 24px; display: flex; flex-direction: column; gap: 10px; }
-#controls label { font-size: 12px; color: #64748b; display: flex;
+#controls label { font-size: 12px; color: var(--color-text-secondary, #475569); display: flex;
   align-items: center; gap: 10px; }
 #controls input { width: 140px; accent-color: #2563eb; }
 #controls span { color: #f1f5f9; font-weight: 600; min-width: 36px; display: inline-block; }
-#ratio-display { font-size: 12px; color: #64748b; }
+#ratio-display { font-size: 12px; color: var(--color-text-secondary, #475569); }
 #ratio-verdict { margin-left: 6px; }
 #dot-grid { display: flex; align-items: center; flex-wrap: wrap; }
 .dot { width: 18px; height: 18px; border-radius: 50%; background: #3b82f6; }
@@ -654,7 +654,7 @@ This is what it means to have a spacing system: the comments write themselves be
   font-size: 22px; font-weight: 700; color: #f1f5f9;
   margin: 0 0 var(--space-1); /* stack: space-1 = 4px — title/subtitle tight, same concept */
 }
-.form-sub { font-size: 14px; color: #64748b; margin: 0; }
+.form-sub { font-size: 14px; color: var(--color-text-secondary, #475569); margin: 0; }
 
 /* ── FORM BODY ──────────────────────────────────────────────── */
 .form-body { padding: var(--space-5) var(--space-6); }
@@ -680,7 +680,7 @@ This is what it means to have a spacing system: the comments write themselves be
 }
 .hint {
   display: block;
-  font-size: 11px; color: #475569;
+  font-size: 11px; color: var(--color-text-secondary, #475569);
   margin-top: var(--space-1); /* stack: space-1 = 4px — hint belongs to its input */
 }
 
@@ -698,7 +698,7 @@ This is what it means to have a spacing system: the comments write themselves be
   font-size: 15px; font-weight: 600; cursor: pointer;
   margin-bottom: var(--space-3); /* stack: space-3 = 12px before legal text */
 }
-.legal { font-size: 12px; color: #475569; text-align: center; margin: 0; }
+.legal { font-size: 12px; color: var(--color-text-secondary, #475569); text-align: center; margin: 0; }
 .legal a { color: #60a5fa; }`,
       startCode: `// Verify the fixed form's spacing is entirely on-grid
 // and uses only tokens from the scale
@@ -880,7 +880,7 @@ The test checks:
   border-bottom: 1px solid #334155;
 }
 .panel-title { font-size: 16px; font-weight: 600; color: #f1f5f9; margin: 0 0 3px; } /* 3px off-grid */
-.panel-desc  { font-size: 13px; color: #64748b; margin: 0; }
+.panel-desc  { font-size: 13px; color: var(--color-text-secondary, #475569); margin: 0; }
 
 .settings-section {
   padding: 14px 20px;    /* VIOLATION 2: 14px off-grid */
@@ -889,7 +889,7 @@ The test checks:
 .settings-section:last-child { border-bottom: none; }
 
 .section-label {
-  font-size: 11px; font-weight: 600; color: #475569;
+  font-size: 11px; font-weight: 600; color: var(--color-text-secondary, #475569);
   letter-spacing: 0.1em; text-transform: uppercase;
   margin-bottom: 14px;   /* VIOLATION 2: 14px off-grid */
 }
@@ -905,7 +905,7 @@ The test checks:
 
 /* VIOLATION 6: name-to-desc gap too large — breaks proximity grouping */
 .setting-name { font-size: 14px; font-weight: 500; color: #e2e8f0; margin-bottom: 8px; }
-.setting-desc { font-size: 12px; color: #64748b; }
+.setting-desc { font-size: 12px; color: var(--color-text-secondary, #475569); }
 .danger-name  { color: #f87171; }
 
 .setting-btn {
@@ -1035,7 +1035,7 @@ The rule: **your spacing system produces acceptable output at all content densit
 .density-controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
 .density-btn { font-size: 11px; font-weight: 500; padding: 6px 12px;
   border-radius: 6px; border: 1px solid #334155; background: #1e293b;
-  color: #64748b; cursor: pointer; }
+  color: var(--color-text-secondary, #475569); cursor: pointer; }
 .density-btn.active { background: #2563eb; color: white; border-color: #2563eb; }
 
 :root {
@@ -1048,7 +1048,7 @@ The rule: **your spacing system produces acceptable output at all content densit
   padding: var(--space-5) var(--space-5) var(--space-4);
   border-bottom: 1px solid #334155; }
 .list-title { font-size: 15px; font-weight: 600; color: #f1f5f9; }
-.list-count { font-size: 12px; color: #475569; }
+.list-count { font-size: 12px; color: var(--color-text-secondary, #475569); }
 
 /* THE SYSTEM: same row spacing regardless of item count */
 .list-item { display: flex; align-items: center; gap: var(--space-3);
@@ -1060,7 +1060,7 @@ The rule: **your spacing system produces acceptable output at all content densit
 .item-title { font-size: 13px; font-weight: 500; color: #e2e8f0;
   margin-bottom: var(--space-1);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.item-meta  { font-size: 11px; color: #475569; }
+.item-meta  { font-size: 11px; color: var(--color-text-secondary, #475569); }
 .item-time  { font-size: 11px; color: #334155; flex-shrink: 0; }`,
       startCode: `const datasets = {
   sparse: [
@@ -1201,13 +1201,13 @@ You're given a written spacing spec for a notification toast component. Your job
 .toast-error .toast-icon { background: #ef4444; }
 .toast-content { flex: 1; min-width: 0; }
 .toast-title { font-size: 14px; font-weight: 600; color: #f1f5f9; }
-.toast-desc  { font-size: 13px; color: #64748b; line-height: 1.5; }
+.toast-desc  { font-size: 13px; color: var(--color-text-secondary, #475569); line-height: 1.5; }
 .toast-actions { display: flex; }
 .toast-primary   { font-size: 12px; font-weight: 600; color: #60a5fa;
   background: none; border: none; cursor: pointer; padding: 0; }
-.toast-secondary { font-size: 12px; color: #475569;
+.toast-secondary { font-size: 12px; color: var(--color-text-secondary, #475569);
   background: none; border: none; cursor: pointer; padding: 0; }
-.toast-dismiss { font-size: 11px; color: #475569; background: none;
+.toast-dismiss { font-size: 11px; color: var(--color-text-secondary, #475569); background: none;
   border: none; cursor: pointer; flex-shrink: 0;
   width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; }
 
@@ -1413,7 +1413,7 @@ The audit function at the bottom is a tool you'll use in every future lesson to 
 .ref-card { background: #1e293b; border: 1px solid #334155;
   border-radius: 14px; width: 440px; overflow: hidden; }
 .ref-header { padding: var(--space-5) var(--space-6); border-bottom: 1px solid #334155; }
-.ref-tag   { font-size: 10px; font-weight: 700; color: #475569;
+.ref-tag   { font-size: 10px; font-weight: 700; color: var(--color-text-secondary, #475569);
   letter-spacing: 0.12em; text-transform: uppercase; display: block;
   margin-bottom: var(--space-1); }
 .ref-title { font-size: 18px; font-weight: 700; color: #f1f5f9; margin: 0; }
@@ -1423,7 +1423,7 @@ The audit function at the bottom is a tool you'll use in every future lesson to 
 .scale-bar { height: 8px; background: #2563eb; border-radius: 2px; flex-shrink: 0; }
 .scale-val { font-size: 12px; font-weight: 600; color: #60a5fa;
   font-family: monospace; min-width: 32px; }
-.scale-use { font-size: 12px; color: #475569; }`,
+.scale-use { font-size: 12px; color: var(--color-text-secondary, #475569); }`,
       startCode: `// Final audit — verify the reference card itself is on-grid
 const SCALE = [4, 8, 12, 16, 24, 32, 48, 64];
 

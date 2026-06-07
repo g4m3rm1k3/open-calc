@@ -83,7 +83,7 @@ export default function BipartiteQuantifierViz() {
           <div className="flex flex-col justify-between h-full relative">
             <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-bold text-slate-500">SET Y</div>
             {rightNodes.map((y) => (
-              <div key={`R${y}`} className={`w-8 h-8 flex items-center justify-center rounded-full border-2 text-xs font-bold text-white shadow-[0_0_15px_rgba(0,0,0,0.5)] z-10 transition-colors duration-500 ${mode === 'EA' && y === 2 ? 'bg-emerald-600 border-emerald-300 scale-110 shadow-[0_0_20px_#10b981]' : 'bg-slate-700 border-slate-500'}`}>
+              <div key={`R${y}`} className={`w-8 h-8 flex items-center justify-center rounded-full border-2 text-xs font-bold text-white shadow-[0_0_15px_rgba(0,0,0,0.5)] z-10 transition-colors duration-500 ${mode === 'EA' && y === 2 ? 'bg-emerald-600 border-emerald-300 dark:border-emerald-700/50 scale-110 shadow-[0_0_20px_#10b981]' : 'bg-slate-700 border-slate-500'}`}>
                 y{y}
               </div>
             ))}

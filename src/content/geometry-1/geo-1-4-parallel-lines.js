@@ -50,7 +50,7 @@ When the two lines are parallel, these pairs have exact, provable relationships.
       instruction: `### Interactive: Eight Angles, Two Intersections
 
 Drag the transversal angle slider. Toggle the parallel lock to see the relationships break when lines are not parallel. Click any angle in the table to see which pair it belongs to.`,
-      html: `<div style="padding:10px 14px 0;background:#fafaf8;display:flex;gap:14px;flex-wrap:wrap;align-items:center">
+      html: `<div style="padding:10px 14px 0;background:var(--color-background-secondary, #f8fafc);display:flex;gap:14px;flex-wrap:wrap;align-items:center">
   <label style="font-family:Georgia,serif;font-size:13px;display:flex;align-items:center;gap:8px;cursor:pointer">
     <input type="checkbox" id="par-ck" checked style="width:14px;height:14px"> Lines are parallel
   </label>
@@ -64,8 +64,8 @@ Drag the transversal angle slider. Toggle the parallel lock to see the relations
   </div>
 </div>
 <canvas id="cv" width="700" height="290"></canvas>
-<div id="ang-table" style="padding:10px 14px 4px;font-family:Georgia,serif;background:#fafaf8;border-top:1px solid #e2e8f0"></div>`,
-      css: `body{margin:0;background:#fafaf8;font-family:Georgia,serif}canvas{display:block}`,
+<div id="ang-table" style="padding:10px 14px 4px;font-family:Georgia,serif;background:var(--color-background-secondary, #f8fafc);border-top:1px solid var(--color-border-primary, #e2e8f0)"></div>`,
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc);font-family:Georgia,serif}canvas{display:block}`,
       startCode: `var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 var W=cv.width,H=cv.height;
 var parCk=document.getElementById('par-ck');
@@ -170,9 +170,9 @@ function draw(){
     var check=pr.type==='equal'?Math.abs(pr.a-pr.b)<2:Math.abs(pr.a+pr.b-180)<3;
     var ok=p&&check;
     html+='<div style="padding:4px 8px;border-radius:5px;background:'+(ok?'#f0fdf4':'#fef2f2')+';border:1px solid '+(ok?'#86efac':'#fca5a5')+'">'
-      +'<span style="color:#64748b">'+pr.name+'</span> '
+      +'<span style="color:var(--color-text-secondary, #475569)">'+pr.name+'</span> '
       +'<strong style="color:'+(ok?'#16a34a':'#dc2626')+'">'+pr.pair+' '+(ok?'✓':'✗')+'</strong>'
-      +'<div style="color:#374151">'+Math.round(pr.a)+'° & '+Math.round(pr.b)+'° ('+(pr.type==='equal'?'should be equal':'should sum to 180°')+')</div>'
+      +'<div style="color:var(--color-text-primary, #1e293b)">'+Math.round(pr.a)+'° & '+Math.round(pr.b)+'° ('+(pr.type==='equal'?'should be equal':'should sum to 180°')+')</div>'
       +'</div>';
   });
   html+='</div>';
@@ -229,10 +229,10 @@ Notice the economy: one postulate plus two previously proven theorems (Vertical 
       instruction: `### The Chain of Proofs Visualized
 
 The three theorems form a logical chain. Click each theorem to see which earlier results it depends on and how the angles connect.`,
-      html: `<div style="padding:8px 14px 0;background:#fafaf8;display:flex;gap:8px" id="thm-btns"></div>
+      html: `<div style="padding:8px 14px 0;background:var(--color-background-secondary, #f8fafc);display:flex;gap:8px" id="thm-btns"></div>
 <canvas id="cv" width="700" height="250"></canvas>
-<div id="thm-detail" style="padding:10px 14px;font-family:Georgia,serif;font-size:13px;background:#fafaf8;border-top:1px solid #e2e8f0;line-height:1.75"></div>`,
-      css: `body{margin:0;background:#fafaf8;font-family:Georgia,serif}canvas{display:block}`,
+<div id="thm-detail" style="padding:10px 14px;font-family:Georgia,serif;font-size:13px;background:var(--color-background-secondary, #f8fafc);border-top:1px solid var(--color-border-primary, #e2e8f0);line-height:1.75"></div>`,
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc);font-family:Georgia,serif}canvas{display:block}`,
       startCode: `var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 var W=cv.width,H=cv.height;
 
@@ -348,7 +348,7 @@ function render(){
   var detEl=document.getElementById('thm-detail');
   detEl.innerHTML='<strong style="color:'+thm.color+'">'+thm.label+' Theorem: </strong><em>'+thm.statement+'</em>'
     +'<br><strong>Proof chain:</strong> '+thm.reason
-    +'<br><span style="color:#9ca3af;font-size:11px">Logical dependency: '+thm.chain+'</span>';
+    +'<br><span style="color:var(--color-text-tertiary, #9ca3af);font-size:11px">Logical dependency: '+thm.chain+'</span>';
 }
 render();`,
       outputHeight: 430,

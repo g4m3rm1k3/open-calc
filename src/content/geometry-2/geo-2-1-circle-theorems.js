@@ -53,8 +53,8 @@ The Inscribed Angle Theorem connects these two types of angles: the inscribed an
 
 Drag point P around the circle. The central angle (at center O) and the inscribed angle (at P) both intercept the same arc AB. Watch the invariant: the inscribed angle is always exactly half the central angle — regardless of where P sits on the major arc.`,
       html: `<canvas id="cv" width="700" height="400" style="cursor:pointer"></canvas>
-<div id="angle-info" style="padding:10px 14px;font-family:Georgia,serif;font-size:13px;background:#fafaf8;border-top:1px solid #e2e8f0;line-height:1.7"></div>`,
-      css: `body{margin:0;background:#fafaf8}canvas{display:block}`,
+<div id="angle-info" style="padding:10px 14px;font-family:Georgia,serif;font-size:13px;background:var(--color-background-secondary, #f8fafc);border-top:1px solid var(--color-border-primary, #e2e8f0);line-height:1.7"></div>`,
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc)}canvas{display:block}`,
       startCode: `var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 var W=cv.width,H=cv.height;
 var cx=W/2,cy=H/2,R=150;
@@ -247,7 +247,7 @@ This converse is used constantly in construction and engineering: if you want to
 
 The left panel shows Thales' Theorem: any point on the semicircle sees the diameter at 90°. The right panel shows the equal inscribed angles corollary: two points on the same arc see the same chord at the same angle. Drag the points to verify.`,
       html: `<canvas id="cv" width="700" height="320" style="cursor:pointer"></canvas>`,
-      css: `body{margin:0;background:#fafaf8}canvas{display:block}`,
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc)}canvas{display:block}`,
       startCode: `var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 var W=cv.width,H=cv.height;
 
@@ -405,8 +405,8 @@ This result is used in compass-and-straightedge constructions and in proving the
 
 Drag point P outside the circle. The two tangent segments from P to the circle are always equal. The right angles at the tangent points are shown — these are the HL congruence in action.`,
       html: `<canvas id="cv" width="700" height="340" style="cursor:pointer"></canvas>
-<div id="tang-info" style="padding:10px 14px;font-family:Georgia,serif;font-size:13px;background:#fafaf8;border-top:1px solid #e2e8f0;line-height:1.7"></div>`,
-      css: `body{margin:0;background:#fafaf8}canvas{display:block}`,
+<div id="tang-info" style="padding:10px 14px;font-family:Georgia,serif;font-size:13px;background:var(--color-background-secondary, #f8fafc);border-top:1px solid var(--color-border-primary, #e2e8f0);line-height:1.7"></div>`,
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc)}canvas{display:block}`,
       startCode: `var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 var W=cv.width,H=cv.height;
 var cx=W/2,cy=H/2,R=110;
@@ -485,7 +485,7 @@ function draw(){
     '<strong>PT₁ = '+pt1+'</strong> and <strong>PT₂ = '+pt2+'</strong>. '
     +(equal?'<strong style="color:#1a3a2a">Equal ✓</strong>':'')
     +'<br>Proof: △OT₁P ≅ △OT₂P by HL (OT₁ = OT₂ = radius, ∠T₁ = ∠T₂ = 90°, OP shared). By CPCTC: PT₁ = PT₂.'
-    +'<br><span style="color:#9ca3af;font-size:11px">Drag P to change the external point. The tangent segments always remain equal.</span>';
+    +'<br><span style="color:var(--color-text-tertiary, #9ca3af);font-size:11px">Drag P to change the external point. The tangent segments always remain equal.</span>';
 }
 function draw_invalid(){
   ctx.fillStyle='#dc2626';ctx.font='13px Georgia';ctx.textAlign='center';ctx.fillText('P must be outside the circle',W/2,H/2);

@@ -82,7 +82,7 @@ export default function LogicalOperatorsExplorer({ params = {} }) {
           <button
             onClick={() => setP(!p)}
             className={`w-full py-6 text-3xl font-bold rounded-2xl transition-all ${
-              p ? 'bg-emerald-100 dark:bg-emerald-900 text-emerald-700' : 'bg-slate-200 dark:bg-slate-700 text-slate-500'
+              p ? 'bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300' : 'bg-slate-200 dark:bg-slate-700 text-slate-500'
             }`}
           >
             {p ? 'TRUE' : 'FALSE'}
@@ -93,7 +93,7 @@ export default function LogicalOperatorsExplorer({ params = {} }) {
           <button
             onClick={() => setQ(!q)}
             className={`w-full py-6 text-3xl font-bold rounded-2xl transition-all ${
-              q ? 'bg-emerald-100 dark:bg-emerald-900 text-emerald-700' : 'bg-slate-200 dark:bg-slate-700 text-slate-500'
+              q ? 'bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300' : 'bg-slate-200 dark:bg-slate-700 text-slate-500'
             }`}
           >
             {q ? 'TRUE' : 'FALSE'}
@@ -103,7 +103,7 @@ export default function LogicalOperatorsExplorer({ params = {} }) {
 
       <div
         className={`p-8 rounded-3xl text-center text-4xl font-bold mb-8 ${
-          result ? 'bg-emerald-100 dark:bg-emerald-900 text-emerald-700' : 'bg-red-100 dark:bg-red-900 text-red-700'
+          result ? 'bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300' : 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300'
         }`}
       >
         RESULT: {result ? 'TRUE' : 'FALSE'}

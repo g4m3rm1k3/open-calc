@@ -46,7 +46,7 @@ Open the **Console** tab to see the log.`,
 .label{color:#94a3b8;font-size:11px;letter-spacing:.08em;text-transform:uppercase;}
 .code-box{background:#111827;border:1px solid #334155;border-radius:8px;padding:10px;font-size:14px;}
 .result-box{background:#0c2035;border:1px solid #38bdf8;border-radius:8px;padding:10px;font-size:18px;font-weight:800;color:#38bdf8;}
-.hint{color:#64748b;font-size:11px;}`,
+.hint{color:var(--color-text-secondary, #475569);font-size:11px;}`,
       startCode: `const result = 2 + 3 * 4;
 console.log('2 + 3 * 4 =', result);
 document.getElementById('val').textContent = result;`,
@@ -91,7 +91,7 @@ This is often called a **chained assignment**.`,
 .label{color:#94a3b8;font-size:11px;letter-spacing:.08em;text-transform:uppercase;}
 .code-box{background:#111827;border:1px solid #334155;border-radius:8px;padding:10px;font-size:14px;}
 .result-box{background:#0c2035;border:1px solid #38bdf8;border-radius:8px;padding:10px;font-size:15px;font-weight:800;color:#38bdf8;}
-.hint{color:#64748b;font-size:11px;}`,
+.hint{color:var(--color-text-secondary, #475569);font-size:11px;}`,
       startCode: `let x = 0;
 const y = (x = 5);
 console.log('x:', x);
@@ -147,7 +147,7 @@ Run the cell and compare both outputs.`,
 .card{background:#111827;border:1px solid #334155;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px;}
 .card-label{color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.08em;}
 .card-val{background:#0c2035;border:1px solid #38bdf8;border-radius:8px;padding:8px;color:#38bdf8;font-weight:800;text-align:center;font-size:15px;}
-.footer{grid-column:1/-1;color:#64748b;font-size:11px;}`,
+.footer{grid-column:1/-1;color:var(--color-text-secondary, #475569);font-size:11px;}`,
       startCode: `const score = 82;
 
 // if statement — no return value
@@ -204,7 +204,7 @@ Run this and watch the console.`,
       css: `.panel{height:100%;background:#0a1220;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:10px;font-family:monospace;color:#cbd5e1;}
 .label{color:#94a3b8;font-size:11px;letter-spacing:.08em;text-transform:uppercase;}
 .result-box{background:#0c2035;border:1px solid #38bdf8;border-radius:8px;padding:10px;font-size:14px;color:#38bdf8;font-weight:800;}
-.hint{color:#64748b;font-size:11px;}`,
+.hint{color:var(--color-text-secondary, #475569);font-size:11px;}`,
       startCode: `const nums = [3, 1, 4, 1, 5, 9, 2];
 
 // Arrow function expression passed directly as an argument
@@ -254,7 +254,7 @@ Run the cell and compare what \`bad()\` and \`good()\` return.`,
 .result-box{border-radius:8px;padding:10px;font-size:14px;font-weight:800;}
 .result-bad{background:#1f0a0a;border:1px solid #ef4444;color:#f87171;}
 .result-good{background:#0c2035;border:1px solid #10b981;color:#34d399;}
-.hint{color:#64748b;font-size:11px;}`,
+.hint{color:var(--color-text-secondary, #475569);font-size:11px;}`,
       startCode: `const bad  = () => { name: 'Ada' };       // block, returns undefined
 const good = () => ({ name: 'Ada' });    // object expression
 
@@ -296,7 +296,7 @@ Watch the console — only the truthy branch fires.`,
 </div>`,
       css: `.panel{height:100%;background:#0a1220;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:10px;font-family:monospace;color:#cbd5e1;}
 .row{background:#111827;border:1px solid #334155;border-radius:8px;padding:10px;font-size:13px;}
-.hint{color:#64748b;font-size:11px;}`,
+.hint{color:var(--color-text-secondary, #475569);font-size:11px;}`,
       startCode: `const isLoggedIn = true;
 const username = '';
 
@@ -324,7 +324,7 @@ JavaScript evaluates operands **left to right**. Run this and watch the call ord
 </div>`,
       css: `.panel{height:100%;background:#0a1220;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:10px;font-family:monospace;color:#cbd5e1;}
 .row{background:#111827;border:1px solid #334155;border-radius:8px;padding:10px;font-size:13px;}
-.hint{color:#64748b;font-size:11px;}`,
+.hint{color:var(--color-text-secondary, #475569);font-size:11px;}`,
       startCode: `const log = [];
 function A() { log.push('A'); return 1; }
 function B() { log.push('B'); return 2; }

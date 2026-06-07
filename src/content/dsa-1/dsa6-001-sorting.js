@@ -46,7 +46,7 @@ function merge(l,r,d){const res=[];let i=0,j=0;while(i<l.length&&j<r.length){if(
 function ms(arr,d=0){if(arr.length<=1)return arr;const mid=Math.floor(arr.length/2);return merge(ms(arr.slice(0,mid),d+1),ms(arr.slice(mid),d+1),d);}
 const arr=[38,27,43,3,9,82,10];ms([...arr]);
 let html='<h3 style="color:#60a5fa;margin:0 0 12px">Merge Sort: ['+arr.join(', ')+']</h3>';
-log.forEach(e=>{const ind='&nbsp;'.repeat(e.d*6);html+='<div style="margin-bottom:4px;font-size:13px">'+ind+'<span style="color:#f59e0b">['+e.l.join(',')+']</span><span style="color:#64748b"> + </span><span style="color:#c084fc">['+e.r.join(',')+']</span><span style="color:#64748b"> → </span><span style="color:#4ade80">['+e.res.join(',')+']</span></div>';});
+log.forEach(e=>{const ind='&nbsp;'.repeat(e.d*6);html+='<div style="margin-bottom:4px;font-size:13px">'+ind+'<span style="color:#f59e0b">['+e.l.join(',')+']</span><span style="color:var(--color-text-secondary, #475569)"> + </span><span style="color:#c084fc">['+e.r.join(',')+']</span><span style="color:var(--color-text-secondary, #475569)"> → </span><span style="color:#4ade80">['+e.res.join(',')+']</span></div>';});
 display.innerHTML=html;`,
                 outputHeight: 300,
               },

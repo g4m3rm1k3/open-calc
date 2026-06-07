@@ -63,8 +63,8 @@ export default {
                 title: 'Memory Layout — Why arr[i] is O(1)',
                 instruction: 'Click any cell to see how its address is computed.\n\nChange the **base address** and **element size** — watch the addresses update instantly. The formula never changes: `address = base + i × size`. Two operations. Always.',
                 html: `<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:10px;font-family:monospace;font-size:12px;align-items:center">
-  <label style="color:#64748b">Base: <input id="base" type="number" value="1000" min="0" max="9999" style="width:60px;padding:4px 6px;border-radius:5px;border:1px solid #334155;background:#1e293b;color:#e2e8f0;font-family:monospace;font-size:12px"></label>
-  <label style="color:#64748b">Element size (bytes): <select id="esize" style="padding:4px 6px;border-radius:5px;border:1px solid #334155;background:#1e293b;color:#e2e8f0;font-family:monospace;font-size:12px">
+  <label style="color:var(--color-text-secondary, #475569)">Base: <input id="base" type="number" value="1000" min="0" max="9999" style="width:60px;padding:4px 6px;border-radius:5px;border:1px solid #334155;background:#1e293b;color:#e2e8f0;font-family:monospace;font-size:12px"></label>
+  <label style="color:var(--color-text-secondary, #475569)">Element size (bytes): <select id="esize" style="padding:4px 6px;border-radius:5px;border:1px solid #334155;background:#1e293b;color:#e2e8f0;font-family:monospace;font-size:12px">
     <option value="1">1 (char/bool)</option>
     <option value="2">2 (int16)</option>
     <option value="4" selected>4 (int32/float)</option>
@@ -147,9 +147,9 @@ function draw() {
       \`<span style="color:#fbbf24">base</span> + <span style="color:#818cf8">i</span> × <span style="color:#4ade80">size</span> &nbsp;=&nbsp; \` +
       \`<span style="color:#fbbf24">\${base}</span> + <span style="color:#818cf8">\${selected}</span> × <span style="color:#4ade80">\${esize}</span> &nbsp;=&nbsp; \` +
       \`<span style="color:#38bdf8;font-weight:bold">address \${addr}</span> &nbsp;&nbsp;\` +
-      \`<span style="color:#475569;font-size:10px">(2 operations, same cost for any i)</span>\`;
+      \`<span style="color:var(--color-text-secondary, #475569);font-size:10px">(2 operations, same cost for any i)</span>\`;
   } else {
-    formula.innerHTML = \`<span style="color:#475569">← Click any cell to see its address formula</span>\`;
+    formula.innerHTML = \`<span style="color:var(--color-text-secondary, #475569)">← Click any cell to see its address formula</span>\`;
   }
 }
 
@@ -178,9 +178,9 @@ draw();
     <option value="insert">Insert value 99</option>
     <option value="delete">Delete element</option>
   </select>
-  <label style="color:#64748b">at index <input id="idx" type="number" value="2" min="0" max="7" style="width:44px;padding:4px 6px;border-radius:5px;border:1px solid #334155;background:#1e293b;color:#e2e8f0;font-family:monospace;font-size:12px"></label>
+  <label style="color:var(--color-text-secondary, #475569)">at index <input id="idx" type="number" value="2" min="0" max="7" style="width:44px;padding:4px 6px;border-radius:5px;border:1px solid #334155;background:#1e293b;color:#e2e8f0;font-family:monospace;font-size:12px"></label>
   <button id="exec" style="padding:7px 16px;border-radius:6px;border:none;background:#6d28d9;color:#fff;font-family:monospace;font-size:12px;cursor:pointer">Execute →</button>
-  <button id="rst"  style="padding:7px 16px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:#64748b;font-family:monospace;font-size:12px;cursor:pointer">Reset</button>
+  <button id="rst"  style="padding:7px 16px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:var(--color-text-secondary, #475569);font-family:monospace;font-size:12px;cursor:pointer">Reset</button>
 </div>
 <canvas id="c" width="660" height="180" style="display:block;width:100%;border-radius:8px;margin-bottom:8px"></canvas>
 <div id="log" style="background:#0f172a;border:1px solid #334155;border-radius:6px;padding:8px;font-family:monospace;font-size:11px;color:#94a3b8;min-height:44px;max-height:80px;overflow-y:auto"></div>`,
@@ -309,7 +309,7 @@ document.getElementById('log').textContent = 'Set an operation and index, then c
                 html: `<canvas id="c" width="660" height="220" style="display:block;width:100%;border-radius:8px;margin-bottom:8px"></canvas>
 <div style="display:flex;gap:8px;margin-bottom:8px">
   <button id="app" style="padding:8px 20px;border-radius:6px;border:none;background:#6d28d9;color:#fff;font-family:monospace;font-size:12px;cursor:pointer">Append</button>
-  <button id="rst" style="padding:8px 16px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:#64748b;font-family:monospace;font-size:12px;cursor:pointer">Reset</button>
+  <button id="rst" style="padding:8px 16px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:var(--color-text-secondary, #475569);font-family:monospace;font-size:12px;cursor:pointer">Reset</button>
   <span id="stats" style="font-family:monospace;font-size:12px;color:#94a3b8;line-height:36px;margin-left:8px"></span>
 </div>
 <div id="event-log" style="background:#0f172a;border:1px solid #334155;border-radius:6px;padding:8px;font-family:monospace;font-size:11px;color:#94a3b8;min-height:36px;max-height:72px;overflow-y:auto"></div>`,

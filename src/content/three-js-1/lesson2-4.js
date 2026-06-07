@@ -71,7 +71,7 @@ Left: lighting in sRGB (wrong). Right: lighting in linear with gamma correction 
       <canvas id="cv2" width="270" height="200" style="border-radius:8px;display:block;"></canvas>
     </div>
   </div>
-  <div style="color:#475569;font-family:monospace;font-size:10px;">The midpoint of the gradient should appear as medium grey — only the right version is correct</div>
+  <div style="color:var(--color-text-secondary, #475569);font-family:monospace;font-size:10px;">The midpoint of the gradient should appear as medium grey — only the right version is correct</div>
 </div>`,
       css: `body{margin:0;background:#0a0f1e}`,
       startCode: `var VS = \`
@@ -185,7 +185,7 @@ gl_FragColor = vec4(ambient + diffuse + specular, 1.0);
 Drag the light position. Adjust Ka, Kd, Ks, and shininess sliders. The sphere is ray-marched in the fragment shader — all shading is computed per-pixel.`,
       html: `<div style="background:#0a0f1e;padding:14px;display:flex;flex-direction:column;gap:10px;align-items:center">
   <canvas id="cv" width="560" height="300" style="border-radius:8px;display:block;width:100%"></canvas>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;max-width:540px;font-family:monospace;font-size:11px;color:#64748b;">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;max-width:540px;font-family:monospace;font-size:11px;color:var(--color-text-secondary, #475569);">
     <div style="display:flex;flex-direction:column;gap:4px;">
       <label>Ka (ambient): <span id="kaV">0.10</span></label>
       <input id="ka" type="range" min="0" max="0.5" step="0.01" value="0.1">
@@ -199,7 +199,7 @@ Drag the light position. Adjust Ka, Kd, Ks, and shininess sliders. The sphere is
       <input id="sh" type="range" min="1" max="256" step="1" value="32">
     </div>
   </div>
-  <div style="color:#475569;font-family:monospace;font-size:10px;">Drag light (yellow dot) on the sphere</div>
+  <div style="color:var(--color-text-secondary, #475569);font-family:monospace;font-size:10px;">Drag light (yellow dot) on the sphere</div>
 </div>`,
       css: `body{margin:0;background:#0a0f1e}`,
       startCode: `var canvas = document.getElementById('cv');

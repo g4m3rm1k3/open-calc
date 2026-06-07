@@ -104,7 +104,7 @@ The question isn't "does this look correct?" The question is: **which assumption
 .nav-logo  { float: left; line-height: 48px; font-weight: 700; font-size: 16px; }
 .nav-links { float: left; margin-left: 32px; } /* ← float + magic margin */
 .nav-link  { display: inline-block; line-height: 48px; padding: 0 12px;
-  font-size: 13px; color: #64748b; text-decoration: none; }
+  font-size: 13px; color: var(--color-text-secondary, #475569); text-decoration: none; }
 .nav-link.active { color: #f1f5f9; border-bottom: 2px solid #3b82f6; }
 .nav-actions { float: right; margin-top: 10px; } /* ← magic margin-top */
 .nav-btn { padding: 7px 14px; background: #2563eb; color: white;
@@ -123,13 +123,13 @@ The question isn't "does this look correct?" The question is: **which assumption
   padding: 20px;
 }
 .stat-card:last-child { margin-right: 0; }
-.stat-label { font-size: 12px; color: #64748b; margin-bottom: 6px; }
+.stat-label { font-size: 12px; color: var(--color-text-secondary, #475569); margin-bottom: 6px; }
 .stat-value { font-size: 28px; font-weight: 700; color: #f1f5f9; margin-bottom: 4px; }
 .stat-delta { font-size: 12px; font-weight: 500; }
 .stat-delta.up   { color: #4ade80; }
 .stat-delta.down { color: #f87171; }
 
-.dash-footer { padding: 12px 24px; font-size: 12px; color: #475569;
+.dash-footer { padding: 12px 24px; font-size: 12px; color: var(--color-text-secondary, #475569);
   border-top: 1px solid #334155; clear: both; /* ← clear for floats */ }`,
       startCode: `// Audit: count magic numbers and float usage
 const elements = document.querySelectorAll('.dash *');
@@ -304,7 +304,7 @@ The cell below lets you interact with all five container properties and watch th
 .ctrl-row { display: flex; align-items: center; gap: 6px;
   background: #1e293b; border: 1px solid #334155; border-radius: 6px;
   padding: 6px 10px; }
-.ctrl-row label { font-size: 11px; color: #64748b; white-space: nowrap; }
+.ctrl-row label { font-size: 11px; color: var(--color-text-secondary, #475569); white-space: nowrap; }
 .ctrl-row select { font-size: 11px; background: #0f172a; color: #f1f5f9;
   border: 1px solid #334155; border-radius: 4px; padding: 2px 6px; cursor: pointer; }
 .flex-container {
@@ -318,7 +318,7 @@ The cell below lets you interact with all five container properties and watch th
   color: #60a5fa; min-width: 40px; display: flex; flex-direction: column;
   align-items: center; justify-content: center; transition: all 0.15s; }
 .fi-size { font-size: 9px; font-weight: 400; color: #334155; margin-top: 4px; }
-#flex-code-output { font-family: monospace; font-size: 11px; color: #475569;
+#flex-code-output { font-family: monospace; font-size: 11px; color: var(--color-text-secondary, #475569);
   background: #0f172a; border: 1px solid #1e293b; border-radius: 6px;
   padding: 10px 12px; line-height: 1.8; }`,
       startCode: `const container = document.getElementById('flex-container');
@@ -439,7 +439,7 @@ Grid thinks in two dimensions at once. Where Flexbox says "arrange these items i
 #grid-controls { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
 .ctrl-row { display: flex; align-items: center; gap: 6px; background: #1e293b;
   border: 1px solid #334155; border-radius: 6px; padding: 6px 10px; }
-.ctrl-row label { font-size: 11px; color: #64748b; white-space: nowrap; }
+.ctrl-row label { font-size: 11px; color: var(--color-text-secondary, #475569); white-space: nowrap; }
 .ctrl-row select { font-size: 11px; background: #0f172a; color: #f1f5f9;
   border: 1px solid #334155; border-radius: 4px; padding: 2px 6px; cursor: pointer; }
 .grid-container {
@@ -453,7 +453,7 @@ Grid thinks in two dimensions at once. Where Flexbox says "arrange these items i
   border-radius: 6px; padding: 20px; font-size: 22px; font-weight: 700;
   color: #a78bfa; text-align: center; min-height: 60px;
   display: flex; align-items: center; justify-content: center; }
-#grid-code-output { font-family: monospace; font-size: 11px; color: #475569;
+#grid-code-output { font-family: monospace; font-size: 11px; color: var(--color-text-secondary, #475569);
   background: #0f172a; border: 1px solid #1e293b; border-radius: 6px;
   padding: 10px 12px; line-height: 1.8; }`,
       startCode: `const grid   = document.getElementById('grid-container');
@@ -563,7 +563,7 @@ Read the CSS in the output panel carefully. Notice: not a single hardcoded pixel
 }
 .nav2-logo  { font-size: 16px; font-weight: 700; color: #f1f5f9; flex-shrink: 0; }
 .nav2-links { display: flex; gap: 4px; }
-.nav2-link  { padding: 6px 10px; font-size: 13px; color: #64748b;
+.nav2-link  { padding: 6px 10px; font-size: 13px; color: var(--color-text-secondary, #475569);
   text-decoration: none; border-radius: 6px; }
 .nav2-link.active { color: #f1f5f9; background: #334155; }
 .nav2-spacer { flex: 1; }        /* pushes btn to the right — no float needed */
@@ -590,14 +590,14 @@ Read the CSS in the output panel carefully. Notice: not a single hardcoded pixel
   border-radius: 10px;
   padding: 20px;
 }
-.s2-label { font-size: 12px; font-weight: 500; color: #64748b; }
+.s2-label { font-size: 12px; font-weight: 500; color: var(--color-text-secondary, #475569); }
 .s2-value { font-size: 28px; font-weight: 700; color: #f1f5f9; line-height: 1.1; }
 .s2-delta { font-size: 12px; font-weight: 500; }
 .s2-delta.up   { color: #4ade80; }
 .s2-delta.down { color: #f87171; }
 
 /* ── FOOTER ── */
-.dash2-footer { padding: 12px 24px; font-size: 12px; color: #475569;
+.dash2-footer { padding: 12px 24px; font-size: 12px; color: var(--color-text-secondary, #475569);
   border-top: 1px solid #334155; }`,
       startCode: `// Verify the rebuilt layout has no magic numbers
 
@@ -723,7 +723,7 @@ The test verifies: the container uses \`display: grid\`, at least one \`minmax()
 .pc-tag  { font-size: 10px; font-weight: 700; color: #3b82f6;
   letter-spacing: 0.12em; text-transform: uppercase; }
 .pc-title { font-size: 16px; font-weight: 600; color: #f1f5f9; margin: 0; line-height: 1.3; }
-.pc-body  { font-size: 13px; color: #64748b; line-height: 1.55; margin: 0; flex: 1; }
+.pc-body  { font-size: 13px; color: var(--color-text-secondary, #475569); line-height: 1.55; margin: 0; flex: 1; }
 .pc-link  { font-size: 13px; font-weight: 500; color: #60a5fa;
   text-decoration: none; margin-top: auto; }`,
       startCode: `// BUILD THE GRID
@@ -883,7 +883,7 @@ The cell below injects each failure scenario into a card component. Observe what
 #overflow-controls { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
 .ov-btn { font-size: 11px; font-weight: 500; padding: 5px 12px;
   border-radius: 6px; border: 1px solid #334155; background: #1e293b;
-  color: #64748b; cursor: pointer; }
+  color: var(--color-text-secondary, #475569); cursor: pointer; }
 .ov-btn.active { background: #2563eb; color: white; border-color: #2563eb; }
 #ov-container { max-width: 340px; transition: max-width 0.3s; }
 .ov-card { background: #1e293b; border: 1px solid #334155; border-radius: 10px;
@@ -895,7 +895,7 @@ The cell below injects each failure scenario into a card component. Observe what
 .ov-meta { flex: 1; min-width: 0; }           /* min-width: 0 allows truncation */
 .ov-name { font-size: 14px; font-weight: 600; color: #f1f5f9;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ov-role { font-size: 12px; color: #64748b;
+.ov-role { font-size: 12px; color: var(--color-text-secondary, #475569);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ov-badge { font-size: 11px; font-weight: 600; color: #16a34a;
   background: #dcfce7; padding: 2px 8px; border-radius: 100px; flex-shrink: 0; }
@@ -905,7 +905,7 @@ The cell below injects each failure scenario into a card component. Observe what
 .ov-action  { font-size: 12px; font-weight: 600; padding: 6px 12px;
   background: #2563eb; color: white; border: none; border-radius: 6px; cursor: pointer;
   flex-shrink: 0; }
-.ov-joined  { font-size: 11px; color: #475569;
+.ov-joined  { font-size: 11px; color: var(--color-text-secondary, #475569);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }`,
       startCode: `const scenarios = {
   normal: {
@@ -1136,13 +1136,13 @@ The test checks: grid is used, no floats remain, footer spans full width, and no
 }
 
 /* Keep these — base styles */
-.sb-label  { font-size: 10px; font-weight: 700; color: #475569;
+.sb-label  { font-size: 10px; font-weight: 700; color: var(--color-text-secondary, #475569);
   letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 8px; }
 .sb-list   { margin: 0 0 16px; padding-left: 0; list-style: none; }
-.sb-list a { font-size: 13px; color: #64748b; text-decoration: none;
+.sb-list a { font-size: 13px; color: var(--color-text-secondary, #475569); text-decoration: none;
   display: block; padding: 3px 0; }
 .sb-list a:hover { color: #94a3b8; }
-.sb-author { font-size: 13px; color: #64748b; padding: 2px 0; }
+.sb-author { font-size: 13px; color: var(--color-text-secondary, #475569); padding: 2px 0; }
 .sb-section { margin-bottom: 20px; }
 .ac-title  { font-size: 28px; font-weight: 700; color: #f1f5f9;
   line-height: 1.2; margin: 0 0 16px; max-width: 22ch; }
@@ -1150,7 +1150,7 @@ The test checks: grid is used, no floats remain, footer spans full width, and no
   margin: 24px 0 8px; line-height: 1.3; }
 .ac-body   { font-size: 15px; color: #94a3b8; line-height: 1.65;
   margin: 0 0 14px; max-width: 65ch; }
-.ap-footer { font-size: 12px; color: #475569; padding-top: 16px;
+.ap-footer { font-size: 12px; color: var(--color-text-secondary, #475569); padding-top: 16px;
   border-top: 1px solid #334155; margin-top: 24px; }`,
       startCode: `// CONVERT THE FLOAT LAYOUT TO CSS GRID
 // Do not change the HTML. Do not add wrapper elements.
@@ -1316,7 +1316,7 @@ The test checks: no floats, no hardcoded widths on layout elements, min-width: 0
 .ash-sidebar { float: left;         /* ← wrong: should use flex or grid */
   width: 200px; flex-shrink: 0; padding: 16px 12px;
   background: #1e293b; border-right: 1px solid #334155; }
-.asb-item { padding: 7px 10px; font-size: 13px; color: #64748b;
+.asb-item { padding: 7px 10px; font-size: 13px; color: var(--color-text-secondary, #475569);
   border-radius: 6px; margin-bottom: 2px; cursor: pointer; }
 .asb-item.active { background: #334155; color: #f1f5f9; }
 
@@ -1334,10 +1334,10 @@ The test checks: no floats, no hardcoded widths on layout elements, min-width: 0
 .ash-card { background: #1e293b; border: 1px solid #334155;
   border-radius: 10px; padding: 16px;
   display: flex; flex-direction: column; gap: 4px; }
-.ac-label { font-size: 11px; font-weight: 600; color: #64748b;
+.ac-label { font-size: 11px; font-weight: 600; color: var(--color-text-secondary, #475569);
   text-transform: uppercase; letter-spacing: 0.1em; }
 .ac-val   { font-size: 28px; font-weight: 700; color: #f1f5f9; line-height: 1.1; }
-.ac-sub   { font-size: 12px; color: #64748b; }`,
+.ac-sub   { font-size: 12px; color: var(--color-text-secondary, #475569); }`,
       startCode: `// FIX EACH VIOLATION — name the anti-pattern as you fix it
 
 // ── FIX LY-2: Float fossil — sidebar ──────────────────────────────────────────
@@ -1460,7 +1460,7 @@ The cell below tests the dashboard layout against five content scenarios. Pay at
 #stress-controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
 .str-btn { font-size: 11px; font-weight: 500; padding: 5px 12px;
   border-radius: 6px; border: 1px solid #334155; background: #1e293b;
-  color: #64748b; cursor: pointer; }
+  color: var(--color-text-secondary, #475569); cursor: pointer; }
 .str-btn.active { background: #2563eb; color: white; border-color: #2563eb; }
 .stress-grid {
   display: grid;
@@ -1470,16 +1470,16 @@ The cell below tests the dashboard layout against five content scenarios. Pay at
 }
 .sg-card { background: #1e293b; border: 1px solid #334155; border-radius: 10px;
   padding: 16px; display: flex; flex-direction: column; gap: 6px; }
-.sg-label { font-size: 11px; font-weight: 600; color: #64748b;
+.sg-label { font-size: 11px; font-weight: 600; color: var(--color-text-secondary, #475569);
   text-transform: uppercase; letter-spacing: 0.1em; }
 .sg-value { font-size: 26px; font-weight: 700; color: #f1f5f9; line-height: 1.1;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.sg-sub   { font-size: 12px; color: #64748b; }
+.sg-sub   { font-size: 12px; color: var(--color-text-secondary, #475569); }
 .sg-empty { grid-column: 1 / -1; display: flex; flex-direction: column;
   align-items: center; justify-content: center; padding: 40px;
   color: #334155; font-size: 14px; text-align: center; gap: 8px; }
 .sg-empty-icon  { font-size: 32px; }
-.sg-empty-title { font-size: 16px; font-weight: 600; color: #475569; }`,
+.sg-empty-title { font-size: 16px; font-weight: 600; color: var(--color-text-secondary, #475569); }`,
       startCode: `function makeCard(label, value, sub) {
   return \`<div class="sg-card">
     <div class="sg-label">\${label}</div>
@@ -1593,7 +1593,7 @@ The test verifies: flex is used, logo shrinks to 0, nav section has overflow hid
       css: `body { background: #0f172a; padding: 20px; margin: 0;
   font-family: system-ui, sans-serif; }
 .test-btn { font-size: 11px; padding: 5px 10px; border-radius: 5px;
-  border: 1px solid #334155; background: #1e293b; color: #64748b; cursor: pointer; }
+  border: 1px solid #334155; background: #1e293b; color: var(--color-text-secondary, #475569); cursor: pointer; }
 
 /* BASE STYLES — add layout properties in JS */
 .practice-nav { background: #1e293b; border: 1px solid #334155;
@@ -1604,7 +1604,7 @@ The test verifies: flex is used, logo shrinks to 0, nav section has overflow hid
   display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .pn-logo-text { font-size: 14px; font-weight: 700; color: #f1f5f9; white-space: nowrap; }
 .pn-links     { display: flex; gap: 2px; }
-.pn-link      { font-size: 13px; color: #64748b; text-decoration: none;
+.pn-link      { font-size: 13px; color: var(--color-text-secondary, #475569); text-decoration: none;
   padding: 6px 10px; border-radius: 6px; white-space: nowrap; }
 .pn-link.active { color: #f1f5f9; background: #334155; }
 .pn-actions   { display: flex; align-items: center; gap: 10px; }
@@ -1798,7 +1798,7 @@ The canonical layout patterns for this course. Read each one once — these are 
 }
 .rl-logo { font-size: 15px; font-weight: 700; flex-shrink: 0; }
 .rl-nav  { display: flex; gap: 2px; flex: 1; min-width: 0; overflow: hidden; }
-.rl-link { font-size: 13px; color: #64748b; padding: 5px 10px; border-radius: 6px;
+.rl-link { font-size: 13px; color: var(--color-text-secondary, #475569); padding: 5px 10px; border-radius: 6px;
   text-decoration: none; white-space: nowrap; }
 .rl-link.active { color: #f1f5f9; background: #334155; }
 .rl-spacer { flex: 1; }
@@ -1812,7 +1812,7 @@ The canonical layout patterns for this course. Read each one once — these are 
   grid-template-columns: 180px 1fr;   /* fixed sidebar, fluid content */
 }
 .rl-sidebar { background: #1e293b; border-right: 1px solid #334155; padding: 12px; }
-.rs-item    { padding: 7px 10px; font-size: 13px; color: #64748b;
+.rs-item    { padding: 7px 10px; font-size: 13px; color: var(--color-text-secondary, #475569);
   border-radius: 6px; margin-bottom: 2px; cursor: pointer; }
 .rs-item.active { background: #334155; color: #f1f5f9; }
 .rl-content { padding: 20px; overflow-y: auto; }
@@ -1825,7 +1825,7 @@ The canonical layout patterns for this course. Read each one once — these are 
 }
 .rl-card { background: #1e293b; border: 1px solid #334155; border-radius: 10px;
   padding: 16px; display: flex; flex-direction: column; gap: 4px; }
-.rc-l { font-size: 11px; font-weight: 600; color: #64748b;
+.rc-l { font-size: 11px; font-weight: 600; color: var(--color-text-secondary, #475569);
   text-transform: uppercase; letter-spacing: 0.1em; }
 .rc-v { font-size: 24px; font-weight: 700; color: #f1f5f9; }`,
       startCode: `// Final audit: verify no float, no magic widths on layout containers

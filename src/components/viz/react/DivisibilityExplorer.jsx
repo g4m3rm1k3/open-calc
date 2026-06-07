@@ -35,7 +35,7 @@ export default function DivisibilityExplorer() {
             type="number"
             value={a}
             onChange={(e) => setA(Number(e.target.value))}
-            className="mt-1 w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+            className="mt-1 w-full rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-900 dark:text-slate-100"
           />
         </label>
         <label className="block">
@@ -44,12 +44,12 @@ export default function DivisibilityExplorer() {
             type="number"
             value={b}
             onChange={(e) => setB(Number(e.target.value))}
-            className="mt-1 w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+            className="mt-1 w-full rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-900 dark:text-slate-100"
           />
         </label>
       </div>
       <div className="grid gap-3 sm:grid-cols-3 text-sm">
-        <div className="rounded-xl bg-white p-3 border border-slate-200 dark:bg-slate-950 dark:border-slate-800">
+        <div className="rounded-xl bg-white dark:bg-slate-900 p-3 border border-slate-200 dark:bg-slate-950 dark:border-slate-800">
           <div className="font-semibold mb-2">Divisors of {a}</div>
           <div className="flex flex-wrap gap-2">
             {result.divA.map((value) => (
@@ -62,7 +62,7 @@ export default function DivisibilityExplorer() {
             ))}
           </div>
         </div>
-        <div className="rounded-xl bg-white p-3 border border-slate-200 dark:bg-slate-950 dark:border-slate-800">
+        <div className="rounded-xl bg-white dark:bg-slate-900 p-3 border border-slate-200 dark:bg-slate-950 dark:border-slate-800">
           <div className="font-semibold mb-2">Divisors of {b}</div>
           <div className="flex flex-wrap gap-2">
             {result.divB.map((value) => (
@@ -75,13 +75,13 @@ export default function DivisibilityExplorer() {
             ))}
           </div>
         </div>
-        <div className="rounded-xl bg-white p-3 border border-slate-200 dark:bg-slate-950 dark:border-slate-800">
+        <div className="rounded-xl bg-white dark:bg-slate-900 p-3 border border-slate-200 dark:bg-slate-950 dark:border-slate-800">
           <div className="font-semibold mb-2">Common divisors</div>
           <div className="flex flex-wrap gap-2 mb-3">
             {result.common.map((value) => (
               <span
                 key={value}
-                className="rounded-full bg-emerald-100 px-2 py-1 text-xs text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300"
+                className="rounded-full bg-emerald-100 dark:bg-emerald-900/50 px-2 py-1 text-xs text-emerald-800 dark:text-emerald-300 dark:bg-emerald-900/30 dark:text-emerald-300"
               >
                 {value}
               </span>

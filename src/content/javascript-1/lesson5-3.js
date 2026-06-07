@@ -195,12 +195,12 @@ Timelines let you orchestrate complex multi-step animations declaratively. This 
   <script src="https://cdn.jsdelivr.net/npm/animejs@3/lib/anime.min.js"></script>
   <div id="logo" style="width:64px;height:64px;background:linear-gradient(135deg,#38bdf8,#a78bfa);border-radius:16px;opacity:0;"></div>
   <div id="headline" style="color:#e2e8f0;font-family:monospace;font-size:20px;font-weight:bold;opacity:0;">UpSkillOS</div>
-  <div id="tagline" style="color:#64748b;font-family:monospace;font-size:13px;opacity:0;">Learn JavaScript interactively.</div>
+  <div id="tagline" style="color:var(--color-text-secondary, #475569);font-family:monospace;font-size:13px;opacity:0;">Learn JavaScript interactively.</div>
   <div style="display:flex;gap:8px;margin-top:4px;">
     <button id="getStarted" style="background:#3b82f6;border:none;color:#fff;padding:10px 20px;border-radius:8px;cursor:pointer;font-family:monospace;font-size:13px;opacity:0;">Get Started</button>
     <button id="learnMore" style="background:#1e2a3f;border:1px solid #334155;color:#94a3b8;padding:10px 20px;border-radius:8px;cursor:pointer;font-family:monospace;font-size:13px;opacity:0;">Learn More</button>
   </div>
-  <button id="replayBtn" style="margin-top:8px;background:transparent;border:1px solid #1e2a3f;color:#475569;padding:6px 14px;border-radius:6px;cursor:pointer;font-family:monospace;font-size:11px;">Replay</button>
+  <button id="replayBtn" style="margin-top:8px;background:transparent;border:1px solid #1e2a3f;color:var(--color-text-secondary, #475569);padding:6px 14px;border-radius:6px;cursor:pointer;font-family:monospace;font-size:11px;">Replay</button>
 </div>`,
       css: `body{margin:0;padding:0;background:#09111c;}`,
       startCode: `function runIntro() {

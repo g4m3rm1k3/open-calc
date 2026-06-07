@@ -67,13 +67,13 @@ export default {
   </div>
   <div style="flex:1;min-width:200px">
     <div style="color:#94a3b8;font-size:11px;font-family:monospace;margin-bottom:6px">EXECUTION LOG</div>
-    <div id="log" style="font-family:monospace;font-size:11px;color:#64748b;line-height:1.7;max-height:220px;overflow-y:auto"></div>
+    <div id="log" style="font-family:monospace;font-size:11px;color:var(--color-text-secondary, #475569);line-height:1.7;max-height:220px;overflow-y:auto"></div>
   </div>
 </div>
 <div style="margin-top:10px;display:flex;gap:8px;align-items:center">
   <button id="btn-step" style="padding:7px 18px;border-radius:6px;border:none;background:#6d28d9;color:#fff;font-family:monospace;font-size:12px;cursor:pointer">Step →</button>
   <button id="btn-play" style="padding:7px 14px;border-radius:6px;border:none;background:#0d9488;color:#fff;font-family:monospace;font-size:12px;cursor:pointer">Play</button>
-  <button id="btn-rst"  style="padding:7px 12px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:#64748b;font-family:monospace;font-size:12px;cursor:pointer">Reset</button>
+  <button id="btn-rst"  style="padding:7px 12px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:var(--color-text-secondary, #475569);font-family:monospace;font-size:12px;cursor:pointer">Reset</button>
   <span id="result" style="font-family:monospace;font-size:13px;color:#4ade80;margin-left:6px"></span>
 </div>`,
                 css: `body{margin:0;padding:12px;background:#0f172a;color:#e2e8f0;box-sizing:border-box;font-family:monospace}
@@ -518,7 +518,7 @@ For each one, think: **what is the base case?** Then: **how do I reduce to a sma
                 html: `<div id="out" style="font-family:monospace;font-size:13px"></div>`,
                 css: `body{margin:0;padding:14px;background:#0f172a;color:#e2e8f0;box-sizing:border-box;font-family:monospace}
 .pass{color:#4ade80;margin:2px 0}.fail{color:#f87171;margin:2px 0}
-.section{color:#64748b;font-size:11px;margin-top:10px;border-top:1px solid #1e293b;padding-top:6px}
+.section{color:var(--color-text-secondary, #475569);font-size:11px;margin-top:10px;border-top:1px solid #1e293b;padding-top:6px}
 .banner{margin-top:12px;padding:10px 14px;border-radius:8px;font-size:13px}
 .banner.ok{background:#052e16;border:1px solid #166534;color:#4ade80}
 .banner.bad{background:#450a0a;border:1px solid #7f1d1d;color:#f87171}`,

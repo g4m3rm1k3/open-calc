@@ -125,7 +125,7 @@ export default function MarkovSteadyStateViz() {
         <div className="flex gap-1 mb-3">
           {STEPS.map((_, i) => (
             <button key={i} onClick={() => setStep(i)}
-              className={`h-1.5 flex-1 rounded-full transition-colors ${i === step ? 'bg-purple-500' : i < step ? 'bg-purple-300 dark:bg-purple-700' : 'bg-slate-200 dark:bg-slate-700'}`} />
+              className={`h-1.5 flex-1 rounded-full transition-colors ${i === step ? 'bg-purple-50 dark:bg-purple-900/300' : i < step ? 'bg-purple-300 dark:bg-purple-700' : 'bg-slate-200 dark:bg-slate-700'}`} />
           ))}
         </div>
         <div className="rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 p-3 mb-3">
@@ -287,15 +287,15 @@ export default function MarkovSteadyStateViz() {
               Iterate ▶
             </button>
             <button onClick={() => reset([...INITIAL_PI])}
-              className="text-[9px] px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-purple-400 transition-colors">
+              className="text-[9px] px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-purple-400 dark:border-purple-600/50 transition-colors">
               Reset uniform
             </button>
             <button onClick={() => reset([0, 0, 0, 1])}
-              className="text-[9px] px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-purple-400 transition-colors">
+              className="text-[9px] px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-purple-400 dark:border-purple-600/50 transition-colors">
               Start: all Error
             </button>
             <button onClick={() => reset([1, 0, 0, 0])}
-              className="text-[9px] px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-purple-400 transition-colors">
+              className="text-[9px] px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-purple-400 dark:border-purple-600/50 transition-colors">
               Start: all Idle
             </button>
             <span className="ml-auto text-[9px] font-mono text-slate-400">iter = {iterCount}</span>

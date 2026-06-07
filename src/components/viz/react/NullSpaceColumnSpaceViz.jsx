@@ -122,7 +122,7 @@ export default function NullSpaceColumnSpaceViz() {
         <div className="flex gap-1 mb-3">
           {STEPS.map((_,i)=>(
             <button key={i} onClick={()=>setStep(i)}
-              className={`h-1.5 flex-1 rounded-full transition-colors ${i===step?'bg-orange-500':i<step?'bg-orange-300 dark:bg-orange-700':'bg-slate-200 dark:bg-slate-700'}`}/>
+              className={`h-1.5 flex-1 rounded-full transition-colors ${i===step?'bg-orange-50 dark:bg-orange-900/300':i<step?'bg-orange-300 dark:bg-orange-700':'bg-slate-200 dark:bg-slate-700'}`}/>
           ))}
         </div>
         <div className="rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 p-3 mb-2">
@@ -136,7 +136,7 @@ export default function NullSpaceColumnSpaceViz() {
       <div className="flex flex-wrap gap-1 mb-3">
         {EXAMPLES.map((e,i)=>(
           <button key={e.label} onClick={()=>setExIdx(i)}
-            className={`text-[9px] px-2 py-1 rounded border transition-colors ${i===exIdx?'bg-orange-500 text-white border-orange-500':'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-orange-400'}`}>
+            className={`text-[9px] px-2 py-1 rounded border transition-colors ${i===exIdx?'bg-orange-50 dark:bg-orange-900/300 text-white border-orange-500':'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-orange-400 dark:border-orange-600/50'}`}>
             {e.label}
           </button>
         ))}
@@ -151,7 +151,7 @@ export default function NullSpaceColumnSpaceViz() {
         <span className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded px-2 py-1 text-slate-600 dark:text-slate-300">
           M=[[{a},{b}],[{c},{d}]]
         </span>
-        <span className={`bg-white dark:bg-slate-800 border rounded px-2 py-1 ${isZero?'border-yellow-400 text-yellow-600':isRank1?'border-orange-400 text-orange-600':'border-green-400 text-green-600'}`}>
+        <span className={`bg-white dark:bg-slate-800 border rounded px-2 py-1 ${isZero?'border-yellow-400 dark:border-yellow-600/50 text-yellow-600 dark:text-yellow-400':isRank1?'border-orange-400 dark:border-orange-600/50 text-orange-600 dark:text-orange-400':'border-green-400 dark:border-green-600/50 text-green-600 dark:text-green-400'}`}>
           rank={isZero?0:isRank1?1:2}
         </span>
         <span className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded px-2 py-1 text-slate-500">
@@ -241,7 +241,7 @@ export default function NullSpaceColumnSpaceViz() {
           ← Back
         </button>
         <button onClick={()=>setStep(s=>Math.min(STEPS.length-1,s+1))} disabled={step===STEPS.length-1}
-          className="px-4 py-2 rounded-lg text-sm bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-30">
+          className="px-4 py-2 rounded-lg text-sm bg-orange-50 dark:bg-orange-900/300 text-white hover:bg-orange-600 disabled:opacity-30">
           Next →
         </button>
       </div>

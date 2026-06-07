@@ -69,7 +69,7 @@ export default function ModelVsReality({ params = {} }) {
             onClick={() => setShowAirResistance(!showAirResistance)}
             className={`px-3 py-1 text-xs font-bold rounded-full border transition-all ${
               showAirResistance 
-                ? 'bg-red-500 border-red-600 text-white shadow-sm' 
+                ? 'bg-red-50 dark:bg-red-900/300 border-red-600 text-white shadow-sm' 
                 : 'bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400'
             }`}
           >
@@ -96,7 +96,7 @@ export default function ModelVsReality({ params = {} }) {
       <div className="relative h-64 border-l-2 border-b-2 border-slate-300 dark:border-slate-700 mx-10">
         {/* Ideal Ball */}
         <div 
-          className="absolute w-6 h-6 bg-blue-500/30 rounded-full border-2 border-blue-500 flex items-center justify-center transition-all duration-75"
+          className="absolute w-6 h-6 bg-blue-50 dark:bg-blue-900/300/30 rounded-full border-2 border-blue-500 flex items-center justify-center transition-all duration-75"
           style={{ top: `${idealY}%`, left: '25%', transform: 'translate(-50%, -50%)' }}
         >
           <span className="text-[8px] font-bold text-blue-700 dark:text-blue-300">Ideal</span>
@@ -105,7 +105,7 @@ export default function ModelVsReality({ params = {} }) {
         {/* Real Ball */}
         {showAirResistance && (
           <div 
-            className="absolute w-6 h-6 bg-red-500/30 rounded-full border-2 border-red-500 flex items-center justify-center transition-all duration-75"
+            className="absolute w-6 h-6 bg-red-50 dark:bg-red-900/300/30 rounded-full border-2 border-red-500 flex items-center justify-center transition-all duration-75"
             style={{ top: `${realY}%`, left: '75%', transform: 'translate(-50%, -50%)' }}
           >
             <span className="text-[8px] font-bold text-red-700 dark:text-red-300">Real</span>

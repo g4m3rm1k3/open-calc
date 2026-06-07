@@ -219,7 +219,7 @@ export default function DerivativeBuilder() {
           </button>
           <button
             onClick={() => { setTrace([]); setXVal((domain[0] + domain[1]) / 2) }}
-            className="px-3 py-1 rounded-full text-xs font-medium bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400 hover:bg-red-100"
+            className="px-3 py-1 rounded-full text-xs font-medium bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 dark:bg-red-900/20 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-800/50 dark:bg-red-900/50"
           >
             Reset Trace
           </button>

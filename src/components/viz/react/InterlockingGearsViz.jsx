@@ -109,7 +109,7 @@ export default function InterlockingGearsViz() {
           onClick={() => setSpinning(s => !s)}
           className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors ${
             spinning
-              ? 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 hover:bg-red-200'
+              ? 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 hover:bg-red-200 dark:bg-red-800/50'
               : 'bg-brand-600 hover:bg-brand-700 text-white'
           }`}
         >

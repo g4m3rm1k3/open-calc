@@ -335,11 +335,11 @@ Use the slider to increase **mesh complexity** (subdivisions). Watch the vertex 
   <div style="display:flex;gap:12px;width:100%;max-width:640px">
     <div style="flex:1;background:#0f172a;border-radius:8px;padding:10px">
       <div style="font-family:monospace;font-size:10px;color:#f87171;font-weight:700;margin-bottom:6px">drawArrays (no EBO)</div>
-      <div id="stat-arrays" style="font-family:monospace;font-size:10px;color:#64748b;line-height:1.7"></div>
+      <div id="stat-arrays" style="font-family:monospace;font-size:10px;color:var(--color-text-secondary, #475569);line-height:1.7"></div>
     </div>
     <div style="flex:1;background:#0f172a;border-radius:8px;padding:10px">
       <div style="font-family:monospace;font-size:10px;color:#4ade80;font-weight:700;margin-bottom:6px">drawElements (EBO)</div>
-      <div id="stat-ebo" style="font-family:monospace;font-size:10px;color:#64748b;line-height:1.7"></div>
+      <div id="stat-ebo" style="font-family:monospace;font-size:10px;color:var(--color-text-secondary, #475569);line-height:1.7"></div>
     </div>
   </div>
   <canvas id="cv" width="640" height="220" style="border-radius:8px;display:block;width:100%"></canvas>

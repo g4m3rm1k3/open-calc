@@ -68,8 +68,8 @@ The proof is complete. Two applications of the Alternate Interior Angles Theorem
 
 Drag the vertices to any triangle shape. The parallel line through C is constructed automatically. Watch ∠1 track ∠A and ∠2 track ∠B exactly — and observe the three angles at C always filling a straight line.`,
       html: `<canvas id="cv" width="700" height="340" style="cursor:move"></canvas>
-<div id="proof-panel" style="padding:12px 14px;font-family:Georgia,serif;background:#fafaf8;border-top:1px solid #e2e8f0;font-size:12px;line-height:1.75"></div>`,
-      css: `body{margin:0;background:#fafaf8}canvas{display:block}`,
+<div id="proof-panel" style="padding:12px 14px;font-family:Georgia,serif;background:var(--color-background-secondary, #f8fafc);border-top:1px solid var(--color-border-primary, #e2e8f0);font-size:12px;line-height:1.75"></div>`,
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc)}canvas{display:block}`,
       startCode: `var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 var W=cv.width,H=cv.height;
 var pts=[{x:150,y:270},{x:530,y:270},{x:290,y:80}];
@@ -165,11 +165,11 @@ function draw(){
   var pp=document.getElementById('proof-panel');
   pp.innerHTML='<strong>Two-column proof:</strong><table style="border-collapse:collapse;width:100%;font-size:12px;margin-top:6px">'
     +'<tr style="background:#f0f0ee"><th style="padding:4px 8px;text-align:left;width:46%">Statement</th><th style="padding:4px 8px;text-align:left">Reason</th></tr>'
-    +'<tr><td style="padding:4px 8px">Draw ℓ through C, ℓ ∥ AB</td><td style="padding:4px 8px;font-style:italic;color:#64748b">Construction (Parallel Postulate)</td></tr>'
-    +'<tr style="background:#f8f8f6"><td style="padding:4px 8px">m∠1 + m∠C + m∠2 = 180°</td><td style="padding:4px 8px;font-style:italic;color:#64748b">Straight angle along ℓ (Linear Pair / Angle Addition)</td></tr>'
-    +'<tr><td style="padding:4px 8px;color:#1e3a5f">m∠1 = m∠A</td><td style="padding:4px 8px;font-style:italic;color:#64748b">Alternate Interior Angles (AC transversal, AB ∥ ℓ)</td></tr>'
-    +'<tr style="background:#f8f8f6"><td style="padding:4px 8px;color:#1a3a2a">m∠2 = m∠B</td><td style="padding:4px 8px;font-style:italic;color:#64748b">Alternate Interior Angles (BC transversal, AB ∥ ℓ)</td></tr>'
-    +'<tr><td style="padding:4px 8px;font-weight:700">m∠A + m∠C + m∠B = 180° □</td><td style="padding:4px 8px;font-style:italic;color:#64748b">Substitution</td></tr>'
+    +'<tr><td style="padding:4px 8px">Draw ℓ through C, ℓ ∥ AB</td><td style="padding:4px 8px;font-style:italic;color:var(--color-text-secondary, #475569)">Construction (Parallel Postulate)</td></tr>'
+    +'<tr style="background:#f8f8f6"><td style="padding:4px 8px">m∠1 + m∠C + m∠2 = 180°</td><td style="padding:4px 8px;font-style:italic;color:var(--color-text-secondary, #475569)">Straight angle along ℓ (Linear Pair / Angle Addition)</td></tr>'
+    +'<tr><td style="padding:4px 8px;color:#1e3a5f">m∠1 = m∠A</td><td style="padding:4px 8px;font-style:italic;color:var(--color-text-secondary, #475569)">Alternate Interior Angles (AC transversal, AB ∥ ℓ)</td></tr>'
+    +'<tr style="background:#f8f8f6"><td style="padding:4px 8px;color:#1a3a2a">m∠2 = m∠B</td><td style="padding:4px 8px;font-style:italic;color:var(--color-text-secondary, #475569)">Alternate Interior Angles (BC transversal, AB ∥ ℓ)</td></tr>'
+    +'<tr><td style="padding:4px 8px;font-weight:700">m∠A + m∠C + m∠B = 180° □</td><td style="padding:4px 8px;font-style:italic;color:var(--color-text-secondary, #475569)">Substitution</td></tr>'
     +'</table>';
 }
 draw();`,
@@ -211,8 +211,8 @@ Each corollary takes one or two lines once you have the main theorem. This is th
 
 The exterior angle at any vertex equals the sum of the two remote interior angles. Drag the vertices to verify with any triangle.`,
       html: `<canvas id="cv" width="700" height="260" style="cursor:move"></canvas>
-<div id="ext-info" style="padding:10px 14px;font-family:Georgia,serif;font-size:13px;background:#fafaf8;border-top:1px solid #e2e8f0;line-height:1.7"></div>`,
-      css: `body{margin:0;background:#fafaf8}canvas{display:block}`,
+<div id="ext-info" style="padding:10px 14px;font-family:Georgia,serif;font-size:13px;background:var(--color-background-secondary, #f8fafc);border-top:1px solid var(--color-border-primary, #e2e8f0);line-height:1.7"></div>`,
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc)}canvas{display:block}`,
       startCode: `var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 var W=cv.width,H=cv.height;
 var pts=[{x:140,y:220},{x:510,y:220},{x:270,y:75}];
@@ -261,7 +261,7 @@ function draw(){
   document.getElementById('ext-info').innerHTML=
     '<strong>Exterior Angle Theorem:</strong> The exterior angle ('+ext+'°) = ∠A ('+aA+'°) + ∠C ('+aC+'°). '
     +'It is strictly greater than either individual remote angle: '+ext+' > '+aA+' and '+ext+' > '+aC+'.'
-    +'<br><span style="color:#9ca3af;font-size:11px">Proof: ext + ∠B = 180° (linear pair). ∠A + ∠B + ∠C = 180° (angle sum). Subtract: ext = ∠A + ∠C.</span>';
+    +'<br><span style="color:var(--color-text-tertiary, #9ca3af);font-size:11px">Proof: ext + ∠B = 180° (linear pair). ∠A + ∠B + ∠C = 180° (angle sum). Subtract: ext = ∠A + ∠C.</span>';
 }
 draw();`,
       outputHeight: 340,

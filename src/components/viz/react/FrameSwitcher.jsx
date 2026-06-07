@@ -50,7 +50,7 @@ export default function FrameSwitcher() {
       <div className="p-3 bg-white dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700">
         <p className="text-xs text-slate-500 mb-2">Time: {t.toFixed(1)} s</p>
         <div className="relative h-16 bg-slate-100 dark:bg-slate-700 rounded overflow-hidden">
-          <div className="absolute top-1/2 -translate-y-1/2 w-8 h-8 rounded bg-blue-500" style={{ left: `${Math.max(0, Math.min(92, kinematics.displayedTrain))}%` }} />
+          <div className="absolute top-1/2 -translate-y-1/2 w-8 h-8 rounded bg-blue-50 dark:bg-blue-900/300" style={{ left: `${Math.max(0, Math.min(92, kinematics.displayedTrain))}%` }} />
           <div className="absolute top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-amber-500" style={{ left: `${Math.max(0, Math.min(95, kinematics.displayedWalker))}%` }} />
         </div>
       </div>

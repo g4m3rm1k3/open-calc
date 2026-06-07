@@ -22,14 +22,14 @@ const STUDIO_CSS = `body{padding:0;margin:0;overflow:hidden;height:100vh}
 .studio{height:100vh;display:grid;grid-template-columns:1fr 1fr;background:#050a10}
 .ep{display:flex;flex-direction:column;border-right:1px solid #162438}
 .tabs{background:#03080f;border-bottom:1px solid #162438;display:flex;padding:0 8px;gap:2px;flex-shrink:0}
-.tab{padding:10px 16px;font:700 11px/1 sans-serif;letter-spacing:.06em;color:#475569;border-bottom:2px solid transparent;transition:all .25s ease;user-select:none;opacity:0.6}
+.tab{padding:10px 16px;font:700 11px/1 sans-serif;letter-spacing:.06em;color:var(--color-text-secondary, #475569);border-bottom:2px solid transparent;transition:all .25s ease;user-select:none;opacity:0.6}
 .tab.ahtml{color:#fb923c;border-color:#fb923c;background:#0a1520;opacity:1}
 .tab.acss{color:#4ade80;border-color:#4ade80;background:#0a1520;opacity:1}
 .tab.ajs{color:#facc15;border-color:#facc15;background:#0a1520;opacity:1}
-.tab.done{color:#64748b;border-color:transparent;text-decoration:line-through;opacity:0.4}
+.tab.done{color:var(--color-text-secondary, #475569);border-color:transparent;text-decoration:line-through;opacity:0.4}
 .code{flex:1;font:400 12px/1.8 'Fira Code',monospace;color:#f1f5f9;white-space:pre-wrap;word-break:break-all;margin:0;padding:20px;overflow:auto;background:#03080f}
 .pp{display:flex;flex-direction:column;background:#0a1118}
-.pb{background:#03080f;border-bottom:1px solid #162438;padding:10px 14px;font:700 10px/1 sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#475569;flex-shrink:0}
+.pb{background:#03080f;border-bottom:1px solid #162438;padding:10px 14px;font:700 10px/1 sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--color-text-secondary, #475569);flex-shrink:0}
 #pv{flex:1;border:none;width:100%;height:100%;background:#0a1118}
 .sb{background:#064e3b;border-top:1px solid #10b981;color:#6ee7b7;font:700 11px/1 sans-serif;padding:10px 14px;display:none;letter-spacing:.05em;flex-shrink:0}`;
 
@@ -95,8 +95,8 @@ function hlHTML(raw) {
   var e = raw.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   return e
     .replace(/(&lt;[\/]?)([\w\d-]+)/g,'$1<b style="color:#60a5fa">$2</b>')
-    .replace(/(&gt;)/g,'<span style="color:#475569">$1</span>')
-    .replace(/(&lt;)/g,'<span style="color:#475569">$1</span>')
+    .replace(/(&gt;)/g,'<span style="color:var(--color-text-secondary, #475569)">$1</span>')
+    .replace(/(&lt;)/g,'<span style="color:var(--color-text-secondary, #475569)">$1</span>')
     .replace(/([\w\d-]+)(=)(&quot;[^&]*&quot;)/g,'<span style="color:#fb923c">$1</span><span style="color:#4ade80">$2</span><span style="color:#4ade80">$3</span>');
 }
 
@@ -106,7 +106,7 @@ function startTyping() {
     if (pos >= code.length) {
       setTimeout(function() {
         pre.innerHTML = hlHTML(code);
-        pv.srcdoc = '<style>body{margin:0;padding:20px;background:#0d1523;font-family:sans-serif;color:#e2e8f0}h2{color:#94a3b8;margin:0 0 10px;font-size:18px;font-weight:700}p{color:#64748b;margin:0 0 10px;font-size:13px;line-height:1.6}strong{color:#94a3b8}#btn{margin-top:6px;background:#111827;color:#475569;border:1px solid #1e293b;padding:9px 18px;border-radius:6px;font-size:12px;cursor:default}</style>' + code;
+        pv.srcdoc = '<style>body{margin:0;padding:20px;background:#0d1523;font-family:sans-serif;color:#e2e8f0}h2{color:#94a3b8;margin:0 0 10px;font-size:18px;font-weight:700}p{color:var(--color-text-secondary, #475569);margin:0 0 10px;font-size:13px;line-height:1.6}strong{color:#94a3b8}#btn{margin-top:6px;background:#111827;color:var(--color-text-secondary, #475569);border:1px solid #1e293b;padding:9px 18px;border-radius:6px;font-size:12px;cursor:default}</style>' + code;
         sb.textContent = '✓ HTML rendered — structure without style or behavior';
         sb.style.display = 'block';
       }, 100);

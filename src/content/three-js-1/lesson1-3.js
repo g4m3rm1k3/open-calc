@@ -705,11 +705,11 @@ The full-screen quad passes UV coordinates (0 to 1) as a varying — your fragme
   </div>
   <div style="display:flex;gap:8px">
     <div style="flex:1;display:flex;flex-direction:column;gap:4px">
-      <div style="color:#64748b;font-family:monospace;font-size:9px">VERTEX SHADER</div>
+      <div style="color:var(--color-text-secondary, #475569);font-family:monospace;font-size:9px">VERTEX SHADER</div>
       <textarea id="vsEdit" rows="6" style="width:100%;background:#0f172a;color:#e2e8f0;border:1px solid #1e293b;border-radius:5px;padding:6px;font-family:monospace;font-size:10px;resize:vertical;box-sizing:border-box"></textarea>
     </div>
     <div style="flex:1;display:flex;flex-direction:column;gap:4px">
-      <div style="color:#64748b;font-family:monospace;font-size:9px">FRAGMENT SHADER</div>
+      <div style="color:var(--color-text-secondary, #475569);font-family:monospace;font-size:9px">FRAGMENT SHADER</div>
       <textarea id="fsEdit" rows="6" style="width:100%;background:#0f172a;color:#e2e8f0;border:1px solid #1e293b;border-radius:5px;padding:6px;font-family:monospace;font-size:10px;resize:vertical;box-sizing:border-box"></textarea>
     </div>
   </div>

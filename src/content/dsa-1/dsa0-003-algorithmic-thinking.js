@@ -69,7 +69,7 @@ export default {
 .decompose-btn{padding:4px 8px;border-radius:5px;border:none;background:#334155;color:#94a3b8;font-family:monospace;font-size:11px;cursor:pointer;white-space:nowrap;margin-top:2px}
 .decompose-btn:hover{background:#475569;color:#e2e8f0}
 .children{margin-left:28px;border-left:2px solid #334155;padding-left:12px;margin-top:4px}
-.connector{color:#475569;margin-right:4px}`,
+.connector{color:var(--color-text-secondary, #475569);margin-right:4px}`,
                 startCode: `
 const container = document.getElementById('tree');
 
@@ -165,7 +165,7 @@ container.appendChild(makeNode(TREE, 0));
     <span style="color:#a78bfa">EFFECT:</span> arr is not modified
   </div>
 </div>
-<div style="font-size:11px;color:#64748b;margin-bottom:8px;font-family:monospace">Click a test input to check it against the contract:</div>
+<div style="font-size:11px;color:var(--color-text-secondary, #475569);margin-bottom:8px;font-family:monospace">Click a test input to check it against the contract:</div>
 <div id="tests" style="display:flex;flex-direction:column;gap:6px"></div>
 <div id="result" style="margin-top:10px;padding:10px;border-radius:8px;background:#0f172a;border:1px solid #334155;font-family:monospace;font-size:12px;min-height:40px;color:#94a3b8"></div>`,
                 css: `body{margin:0;padding:12px;background:#0f172a;box-sizing:border-box;font-family:monospace}`,
@@ -195,14 +195,14 @@ tests.forEach(t => {
       result.style.borderColor = '#4ade80';
       result.innerHTML =
         \`<span style="color:#4ade80">✓ PRECONDITION MET</span> for \${arrStr}<br>\` +
-        \`<span style="color:#64748b">Reason: \${t.reason}</span><br>\` +
+        \`<span style="color:var(--color-text-secondary, #475569)">Reason: \${t.reason}</span><br>\` +
         \`<span style="color:#fbbf24">CONTRACT GUARANTEES: return value = \${t.expected}</span>\`;
     } else {
       btn.style.borderColor = '#f87171';
       result.style.borderColor = '#f87171';
       result.innerHTML =
         \`<span style="color:#f87171">✗ PRECONDITION VIOLATED</span> for \${arrStr}<br>\` +
-        \`<span style="color:#64748b">Reason: \${t.reason}</span><br>\` +
+        \`<span style="color:var(--color-text-secondary, #475569)">Reason: \${t.reason}</span><br>\` +
         \`<span style="color:#94a3b8">The function makes no promise about its output — behaviour is undefined.</span>\`;
     }
   });
@@ -226,8 +226,8 @@ tests.forEach(t => {
 <div style="display:flex;gap:8px">
   <button id="prev" style="padding:8px 18px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:#94a3b8;font-family:monospace;font-size:12px;cursor:pointer">← Prev</button>
   <button id="next" style="padding:8px 18px;border-radius:6px;border:none;background:#6d28d9;color:#fff;font-family:monospace;font-size:12px;cursor:pointer">Next Step →</button>
-  <button id="reset" style="padding:8px 18px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:#64748b;font-family:monospace;font-size:12px;cursor:pointer">Reset</button>
-  <span id="step-counter" style="font-family:monospace;font-size:12px;color:#475569;line-height:36px;margin-left:auto"></span>
+  <button id="reset" style="padding:8px 18px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:var(--color-text-secondary, #475569);font-family:monospace;font-size:12px;cursor:pointer">Reset</button>
+  <span id="step-counter" style="font-family:monospace;font-size:12px;color:var(--color-text-secondary, #475569);line-height:36px;margin-left:auto"></span>
 </div>`,
                 css: `body{margin:0;padding:12px;background:#0f172a;box-sizing:border-box}`,
                 startCode: `
@@ -341,7 +341,7 @@ drawState(steps[0]);
                 instruction: 'Click **Next Line** to step through binary search one line at a time.\n\nEach step highlights the matching line in all three panels simultaneously. This is how pseudocode becomes real code: the ideas translate directly, one line at a time.',
                 html: `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px" id="panels">
   <div>
-    <div style="color:#64748b;font-size:10px;font-weight:bold;margin-bottom:4px;font-family:monospace">PSEUDOCODE</div>
+    <div style="color:var(--color-text-secondary, #475569);font-size:10px;font-weight:bold;margin-bottom:4px;font-family:monospace">PSEUDOCODE</div>
     <div id="pseudo" style="background:#1e293b;border:1px solid #334155;border-radius:6px;padding:10px;font-family:monospace;font-size:11px;line-height:1.9"></div>
   </div>
   <div>
@@ -357,7 +357,7 @@ drawState(steps[0]);
 <div style="display:flex;gap:8px;align-items:center">
   <button id="prev2" style="padding:8px 16px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:#94a3b8;font-family:monospace;font-size:12px;cursor:pointer">← Prev</button>
   <button id="next2" style="padding:8px 16px;border-radius:6px;border:none;background:#6d28d9;color:#fff;font-family:monospace;font-size:12px;cursor:pointer">Next Line →</button>
-  <span id="lc" style="font-family:monospace;font-size:11px;color:#475569;margin-left:auto"></span>
+  <span id="lc" style="font-family:monospace;font-size:11px;color:var(--color-text-secondary, #475569);margin-left:auto"></span>
 </div>`,
                 css: `body{margin:0;padding:12px;background:#0f172a;box-sizing:border-box}`,
                 startCode: `
@@ -430,7 +430,7 @@ function render() {
     document.getElementById(id).innerHTML = lines.map((l, i) => {
       const text = esc(l[key]);
       const hi = i === cur;
-      return \`<div style="padding:1px 4px;border-radius:3px;white-space:pre;\${hi ? 'background:#312e81;color:#e2e8f0;font-weight:bold;' : 'color:#475569;'}">\${text}</div>\`;
+      return \`<div style="padding:1px 4px;border-radius:3px;white-space:pre;\${hi ? 'background:#312e81;color:#e2e8f0;font-weight:bold;' : 'color:var(--color-text-secondary, #475569);'}">\${text}</div>\`;
     }).join('');
   });
   document.getElementById('explain').textContent = lines[cur].note;
@@ -454,7 +454,7 @@ render();
                 title: 'Live Trace: Watch Binary Search Execute',
                 instruction: 'Enter a **target** to search for. Click **Search** to step through the actual execution.\n\nEach step eliminates half the remaining search space. Count the steps — you\'ll see why this is O(log n).',
                 html: `<div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;font-family:monospace;font-size:12px">
-  <span style="color:#64748b">Target:</span>
+  <span style="color:var(--color-text-secondary, #475569)">Target:</span>
   <input id="target" type="number" value="7" style="width:60px;padding:6px 8px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:#e2e8f0;font-family:monospace;font-size:12px">
   <button id="search-btn" style="padding:7px 16px;border-radius:6px;border:none;background:#6d28d9;color:#fff;font-family:monospace;font-size:12px;cursor:pointer">Search</button>
   <button id="step-btn" id="step-btn" style="padding:7px 16px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:#94a3b8;font-family:monospace;font-size:12px;cursor:pointer;display:none">Next Step →</button>

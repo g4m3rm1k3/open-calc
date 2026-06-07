@@ -279,9 +279,9 @@ Key QSS differences from CSS:
 #qss-demo { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
 .qss-panel { background:var(--c-surface); border:1px solid var(--c-border);
   border-radius:8px; overflow:hidden; }
-.panel-label { font-size:10px; font-weight:700; color:#475569; letter-spacing:.12em;
+.panel-label { font-size:10px; font-weight:700; color:var(--color-text-secondary, #475569); letter-spacing:.12em;
   text-transform:uppercase; padding:8px 12px; border-bottom:1px solid var(--c-border); }
-.qss-code { font-family:monospace; font-size:11px; color:#64748b; padding:12px;
+.qss-code { font-family:monospace; font-size:11px; color:var(--color-text-secondary, #475569); padding:12px;
   line-height:1.8; white-space:pre-wrap; }
 .live-demo { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
 .demo-btn { padding:9px 18px; border-radius:8px; border:none; font-size:14px;
@@ -378,7 +378,7 @@ function highlight(code) {
       m => \`<span style="color:#a78bfa">\${m}</span>\`)
     .replace(/\\.([a-z][a-zA-Z-]*)(\:[a-z-]+)?/g,
       m => \`<span style="color:#60a5fa">\${m}</span>\`)
-    .replace(/\{|\}/g, m => \`<span style="color:#64748b">\${m}</span>\`)
+    .replace(/\{|\}/g, m => \`<span style="color:var(--color-text-secondary, #475569)">\${m}</span>\`)
     .replace(/([a-z-]+)(\s*:)(?=\s)/g,
       (_,p,c) => \`<span style="color:#94a3b8">\${p}</span>\${c}\`);
 }
@@ -529,7 +529,7 @@ Required mappings:
 </div>`,
       css: `body { background:#0f172a; padding:20px; margin:0; font-family:system-ui,sans-serif; }
 #p1-demo { max-width:480px; }
-.p1-label { font-size:10px; font-weight:700; color:#475569;
+.p1-label { font-size:10px; font-weight:700; color:var(--color-text-secondary, #475569);
   letter-spacing:.12em; text-transform:uppercase; margin-bottom:8px; }
 .stat-card-css { background:hsl(222,39%,12%); border:1px solid hsl(217,32%,22%);
   border-radius:10px; padding:20px; display:flex; flex-direction:column; gap:4px;
@@ -540,7 +540,7 @@ Required mappings:
 .stat-delta-css { font-size:12px; color:hsl(142,60%,65%); }
 .qt-output { background:hsl(217,32%,10%); border:1px solid hsl(217,32%,18%);
   border-radius:8px; padding:14px; font-family:monospace; font-size:11px;
-  color:#64748b; line-height:1.8; white-space:pre-wrap; min-height:200px; }`,
+  color:var(--color-text-secondary, #475569); line-height:1.8; white-space:pre-wrap; min-height:200px; }`,
       startCode: `// TASK: fill in the ??? placeholders with correct Qt equivalents
 // Then verify with the audit at the bottom.
 
@@ -793,22 +793,22 @@ In Unity, the equivalent of CSS custom properties is a \`ScriptableObject\` — 
 </div>`,
       css: `body { background:#0f172a; padding:20px; margin:0; font-family:system-ui,sans-serif; }
 #p2-demo { max-width:580px; }
-.p2-label { font-size:10px; font-weight:700; color:#475569;
+.p2-label { font-size:10px; font-weight:700; color:var(--color-text-secondary, #475569);
   letter-spacing:.12em; text-transform:uppercase; margin-bottom:8px; }
 .token-viz { display:flex; align-items:center; gap:8px; margin-bottom:4px;
   flex-wrap:wrap; }
 .token-layer { background:hsl(222,39%,12%); border:1px solid hsl(217,32%,22%);
   border-radius:8px; padding:10px 12px; min-width:120px; }
-.layer-title { font-size:9px; font-weight:700; color:#475569; letter-spacing:.12em;
+.layer-title { font-size:9px; font-weight:700; color:var(--color-text-secondary, #475569); letter-spacing:.12em;
   text-transform:uppercase; margin-bottom:8px; }
 .token-item { display:flex; align-items:center; gap:8px; font-size:11px;
-  color:#64748b; margin-bottom:4px; }
+  color:var(--color-text-secondary, #475569); margin-bottom:4px; }
 .token-item::before { content:''; width:12px; height:12px; border-radius:3px;
   background:var(--c); flex-shrink:0; }
 .token-arrow { font-size:16px; color:#334155; }
 .cs-output { background:hsl(217,32%,10%); border:1px solid hsl(217,32%,18%);
   border-radius:8px; padding:14px; font-family:monospace; font-size:11px;
-  color:#64748b; line-height:1.8; white-space:pre-wrap; min-height:260px; }`,
+  color:var(--color-text-secondary, #475569); line-height:1.8; white-space:pre-wrap; min-height:260px; }`,
       startCode: `// TASK: complete the Unity C# ScriptableObject token system
 // All three layers must be present: primitives, semantic, component
 
@@ -1328,7 +1328,7 @@ This cell renders the CSS version and shows the complete specification that a Qt
   margin-bottom:16px; }
 .cd-platforms { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
 .cd-plat { display:flex; flex-direction:column; gap:8px; }
-.cd-plat-label { font-size:9px; font-weight:700; color:#475569;
+.cd-plat-label { font-size:9px; font-weight:700; color:var(--color-text-secondary, #475569);
   letter-spacing:.12em; text-transform:uppercase; }
 .stat-card-ref { background:hsl(222,39%,12%); border:1px solid hsl(217,32%,22%);
   border-radius:10px; padding:16px; display:flex; flex-direction:column; gap:4px;
@@ -1341,7 +1341,7 @@ This cell renders the CSS version and shows the complete specification that a Qt
 .scr-down { color:hsl(0,74%,65%); }
 .spec-block { background:hsl(217,32%,10%); border:1px solid hsl(217,32%,18%);
   border-radius:6px; padding:10px 12px; font-family:monospace; font-size:9.5px;
-  color:#64748b; line-height:1.7; white-space:pre-wrap; flex:1; }`,
+  color:var(--color-text-secondary, #475569); line-height:1.7; white-space:pre-wrap; flex:1; }`,
       startCode: `const qtSpec = \`
 // QVBoxLayout (flex-column)
 // setSpacing(4)         // gap: 4px
@@ -1508,7 +1508,7 @@ Run it on any spec document to verify it can be implemented on any target platfo
 .rc-tool   { font-size:11px; color:hsl(215,25%,55%); font-family:monospace; }
 .rc-audit  { background:hsl(217,32%,10%); border:1px solid hsl(217,32%,18%);
   border-radius:8px; padding:12px 14px; font-family:monospace; font-size:11px;
-  color:#64748b; line-height:1.7; }`,
+  color:var(--color-text-secondary, #475569); line-height:1.7; }`,
       startCode: `// ── COURSE CARD GRID ─────────────────────────────────────────────────────
 const lessons = [
   { n:'01', name:'Visual Hierarchy',    tool:'auditComponent()'     },

@@ -51,9 +51,9 @@ export default {
                 css: `body{margin:0;background:#0f172a;color:#e2e8f0;padding:8px}
 .sec{margin:12px 0 4px;color:#fbbf24;font-size:11px;text-transform:uppercase;letter-spacing:0.1em}
 .line{display:flex;gap:0;padding:1px 0}
-.ln{color:#475569;min-width:40px;text-align:right;padding-right:12px;user-select:none}
+.ln{color:var(--color-text-secondary, #475569);min-width:40px;text-align:right;padding-right:12px;user-select:none}
 .code{color:#e2e8f0;white-space:pre}
-.cmt{color:#475569}
+.cmt{color:var(--color-text-secondary, #475569)}
 .hl-green .code{color:#4ade80}
 .hl-blue .code{color:#38bdf8}
 .hl-amber .code{color:#fbbf24}

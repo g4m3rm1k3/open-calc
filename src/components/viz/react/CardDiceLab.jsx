@@ -148,10 +148,10 @@ function CardFace({ card, mini = false, muted = false }) {
     <div
       title={`${card.rank} of ${suitLabel}`}
       className={[
-        'relative flex shrink-0 flex-col justify-between rounded-[8px] border bg-white font-serif shadow-sm',
+        'relative flex shrink-0 flex-col justify-between rounded-[8px] border bg-white dark:bg-slate-900 font-serif shadow-sm',
         mini ? 'h-16 w-11 p-1 text-[11px]' : 'h-24 w-16 p-2 text-sm',
         muted ? 'opacity-40' : '',
-        red ? 'border-rose-200 text-rose-600' : 'border-slate-200 text-slate-950',
+        red ? 'border-rose-200 dark:border-rose-800/50 text-rose-600 dark:text-rose-400' : 'border-slate-200 text-slate-950',
       ].join(' ')}
     >
       <span className="font-black leading-none">{card.rank}</span>
@@ -334,7 +334,7 @@ function GuidedGameModule({ statsOn }) {
                   key={option}
                   onClick={() => setChoice(option)}
                   className={`rounded-[8px] border p-4 text-left font-black ${
-                    choice === option ? 'border-emerald-300 bg-emerald-300/15 text-white' : 'border-white/10 bg-white/5 text-slate-200'
+                    choice === option ? 'border-emerald-300 dark:border-emerald-700/50 bg-emerald-300/15 text-white' : 'border-white/10 bg-white/5 text-slate-200'
                   }`}
                 >
                   {option}
@@ -710,7 +710,7 @@ export default function CardDiceLab({ fullPage = false, onBack }) {
               )}
               <button
                 onClick={() => setStatsOn((v) => !v)}
-                className="inline-flex items-center gap-2 rounded-[8px] bg-white px-3 py-2 text-sm font-black text-slate-950"
+                className="inline-flex items-center gap-2 rounded-[8px] bg-white dark:bg-slate-900 px-3 py-2 text-sm font-black text-slate-950"
               >
                 {statsOn ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                 Stats {statsOn ? 'on' : 'off'}
@@ -737,7 +737,7 @@ export default function CardDiceLab({ fullPage = false, onBack }) {
               key={id}
               onClick={() => setModule(id)}
               className={`flex items-center gap-3 rounded-[8px] border p-3 text-left transition ${
-                module === id ? 'border-cyan-300 bg-cyan-300/15 shadow-lg shadow-cyan-950/30' : 'border-white/10 bg-white/5 hover:bg-white/8'
+                module === id ? 'border-cyan-300 dark:border-cyan-700/50 bg-cyan-300/15 shadow-lg shadow-cyan-950/30' : 'border-white/10 bg-white/5 hover:bg-white/8'
               }`}
             >
               <Icon className={`h-5 w-5 ${module === id ? 'text-cyan-200' : 'text-slate-400'}`} />

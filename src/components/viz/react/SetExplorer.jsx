@@ -60,13 +60,13 @@ export default function SetExplorer() {
          {/* Set B (Right) */}
          <div className="absolute top-1/2 right-8 sm:right-10 -translate-y-1/2 w-40 h-40 sm:w-48 sm:h-48 border-4 border-emerald-500 rounded-full flex items-center justify-end overflow-hidden z-10">
             {/* The Right Moon */}
-            <div className={`absolute inset-0 transition-opacity duration-500 bg-emerald-500 ${isB_only ? 'opacity-40' : 'opacity-0'}`}></div>
+            <div className={`absolute inset-0 transition-opacity duration-500 bg-emerald-50 dark:bg-emerald-900/300 ${isB_only ? 'opacity-40' : 'opacity-0'}`}></div>
          </div>
          <span className="absolute top-4 right-10 text-emerald-400 font-bold text-2xl z-30">B</span>
 
          {/* The Overlap Clip path trick */}
          <div className="absolute top-1/2 left-8 sm:left-10 -translate-y-1/2 w-40 h-40 sm:w-48 sm:h-48 rounded-full overflow-hidden z-20 pointer-events-none" style={{ clipPath: 'circle(50% at calc(100% - 2.5rem) 50%)' }}>
-            <div className={`w-40 h-40 sm:w-48 sm:h-48 rounded-full absolute -right-20 sm:-right-24 top-0 transition-all duration-500 border-l-4 border-transparent ${operation === 'INTERSECT' ? 'bg-amber-400 opacity-80 scale-105' : 'bg-teal-500 opacity-0'}`} />
+            <div className={`w-40 h-40 sm:w-48 sm:h-48 rounded-full absolute -right-20 sm:-right-24 top-0 transition-all duration-500 border-l-4 border-transparent ${operation === 'INTERSECT' ? 'bg-amber-400 opacity-80 scale-105' : 'bg-teal-50 dark:bg-teal-900/300 opacity-0'}`} />
          </div>
 
          {/* Manual DOM Overlaps to fix naive CSS clipping bugs */}

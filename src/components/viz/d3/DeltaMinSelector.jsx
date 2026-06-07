@@ -130,7 +130,7 @@ export default function DeltaMinSelector() {
              <button 
                 onClick={() => setSelectedDelta('left')}
                 className={`px-4 py-2 rounded-lg font-bold border-2 transition-all ${
-                   selectedDelta === 'left' ? 'bg-red-100 border-red-500 text-red-700' : 'bg-white border-slate-300 text-slate-600 hover:border-brand-400'
+                   selectedDelta === 'left' ? 'bg-red-100 dark:bg-red-900/50 border-red-500 text-red-700 dark:text-red-300' : 'bg-white border-slate-300 text-slate-600 hover:border-brand-400'
                 }`}
              >
                 Choose δ = 0.268 (The Larger One)
@@ -139,7 +139,7 @@ export default function DeltaMinSelector() {
              <button 
                 onClick={() => setSelectedDelta('right')}
                 className={`px-4 py-2 rounded-lg font-bold border-2 transition-all ${
-                   selectedDelta === 'right' ? 'bg-green-100 border-green-500 text-green-700' : 'bg-white border-slate-300 text-slate-600 hover:border-brand-400'
+                   selectedDelta === 'right' ? 'bg-green-100 dark:bg-green-900/50 border-green-500 text-green-700 dark:text-green-300' : 'bg-white border-slate-300 text-slate-600 hover:border-brand-400'
                 }`}
              >
                 Choose δ = 0.236 (The Smaller One)
@@ -147,13 +147,13 @@ export default function DeltaMinSelector() {
          </div>
 
          {selectedDelta === 'left' && (
-             <div className="mt-4 p-3 bg-red-50 text-red-800 text-sm border border-red-200 rounded text-center font-medium animate-in slide-in-from-top-2">
+             <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-300 text-sm border border-red-200 dark:border-red-800/50 rounded text-center font-medium animate-in slide-in-from-top-2">
                  ❌ <strong>Failure!</strong> If you choose the larger delta, the box extends to x = 2 + 0.268 = 2.268. But (2.268)² = 5.14, which completely escapes our top tolerance of 5.0!
              </div>
          )}
          
          {selectedDelta === 'right' && (
-             <div className="mt-4 p-3 bg-green-50 text-green-800 text-sm border border-green-200 rounded text-center font-medium animate-in slide-in-from-top-2">
+             <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-300 text-sm border border-green-200 dark:border-green-800/50 rounded text-center font-medium animate-in slide-in-from-top-2">
                  ✅ <strong>Success!</strong> By picking the minimum, the entire box fits safely inside the yellow epsilon strip.
              </div>
          )}

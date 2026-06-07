@@ -110,17 +110,17 @@ This is the most common real-world scenario: not a complete disaster, but a comp
   margin: 0 0 11px; }        /* SP-2: 11px off-grid */
 .bc-price-row { display: flex; align-items: baseline; gap: 4px; margin-bottom: 13px; } /* SP-2 */
 .bc-price  { font-size: 28px; font-weight: 700; color: #f1f5f9; }
-.bc-period { font-size: 13px; color: #64748b; }
+.bc-period { font-size: 13px; color: var(--color-text-secondary, #475569); }
 
 /* SP-1: uniform gap — features and other elements all spaced 8px */
 .bc-features { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
-.bc-feat { font-size: 13px; color: #64748b; }
+.bc-feat { font-size: 13px; color: var(--color-text-secondary, #475569); }
 
 .bc-cta  { width: 100%; padding: 11px;  /* SP-2: 11px off-grid */
   background: #2563eb;    /* CO-1: hardcoded hex, not a token */
   color: white; border: none; border-radius: 8px;
   font-size: 15px; font-weight: 600; cursor: pointer; margin-bottom: 11px; } /* SP-2 */
-.bc-legal { font-size: 11px; color: #475569; text-align: center; margin: 0; }`,
+.bc-legal { font-size: 11px; color: var(--color-text-secondary, #475569); text-align: center; margin: 0; }`,
       startCode: `// Combined audit — all five systems simultaneously
 
 const SPACING_SCALE  = [4, 8, 12, 16, 24, 32, 48, 64];
@@ -293,16 +293,16 @@ For a product card:
 #anatomy-demo { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; }
 #ad-labels { display: flex; flex-direction: column; gap: 12px; max-width: 280px; min-width: 220px; }
 .ad-layer { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 12px 14px; }
-.ad-layer-title { font-size: 10px; font-weight: 700; color: #475569;
+.ad-layer-title { font-size: 10px; font-weight: 700; color: var(--color-text-secondary, #475569);
   letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 8px; }
-.ad-el  { font-size: 11px; font-family: monospace; color: #64748b;
+.ad-el  { font-size: 11px; font-family: monospace; color: var(--color-text-secondary, #475569);
   padding: 2px 0; display: flex; gap: 6px; align-items: center; }
 .ad-el-level { font-size: 9px; font-weight: 700; padding: 1px 5px;
   border-radius: 3px; flex-shrink: 0; }
 .l1-marker { background: rgba(59,130,246,0.15); color: #60a5fa; }
 .l2-marker { background: rgba(168,85,247,0.15); color: #c084fc; }
 .l3-marker { background: rgba(100,116,139,0.15); color: #94a3b8; }
-.l4-marker { background: rgba(71,85,105,0.1); color: #64748b; }
+.l4-marker { background: rgba(71,85,105,0.1); color: var(--color-text-secondary, #475569); }
 /* Layer 2+ will be applied by JS */
 .product-card { background: #1e293b; border: 1px solid #334155;
   border-radius: 12px; overflow: hidden; flex: 1; max-width: 300px; min-width: 240px; }`,
@@ -1422,7 +1422,7 @@ These six scenarios test the composition model under real-world conditions. Noti
 #stress-controls { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
 .sc-btn { font-size: 11px; font-weight: 500; padding: 5px 12px;
   border-radius: 6px; border: 1px solid #334155; background: #1e293b;
-  color: #64748b; cursor: pointer; }
+  color: var(--color-text-secondary, #475569); cursor: pointer; }
 .sc-btn.active { background: #2563eb; color: white; border-color: #2563eb; }
 :root {
   --sc-surface:hsl(222,39%,12%); --sc-border:hsl(217,32%,22%);

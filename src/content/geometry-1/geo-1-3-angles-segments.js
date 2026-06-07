@@ -61,15 +61,15 @@ This single fact, combined with basic algebra, is enough to prove virtually ever
       instruction: `### Angle Types: An Interactive Reference
 
 Drag the slider to see angles of different sizes. Notice how the angle type changes at the key thresholds: 90° (right), 180° (straight). The angle measure is always the positive rotation from one ray to the other going counterclockwise.`,
-      html: `<div style="padding:14px 14px 0;background:#fafaf8">
+      html: `<div style="padding:14px 14px 0;background:var(--color-background-secondary, #f8fafc)">
   <div style="display:flex;align-items:center;gap:12px">
-    <span style="font-family:Georgia,serif;font-size:13px;color:#374151">Angle: </span>
+    <span style="font-family:Georgia,serif;font-size:13px;color:var(--color-text-primary, #1e293b)">Angle: </span>
     <input type="range" id="ang-sl" min="1" max="179" value="60" style="flex:1">
     <span id="ang-lbl" style="font-family:Georgia,serif;font-size:18px;font-weight:700;color:#1e3a5f;min-width:48px;text-align:right">60°</span>
   </div>
 </div>
 <canvas id="cv" width="700" height="280"></canvas>`,
-      css: `body{margin:0;background:#fafaf8;font-family:Georgia,serif}
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc);font-family:Georgia,serif}
 canvas{display:block}`,
       startCode: `var canvas=document.getElementById('cv');
 var ctx=canvas.getContext('2d');
@@ -189,8 +189,8 @@ Notice what the proof does: it restates the definition ("outer sides form a stra
 
 Two angles forming a straight line. Drag the vertex to change the angles. Watch the measures always sum to 180°. The algebra is displayed in real time — this is exactly what the proof formalizes.`,
       html: `<canvas id="cv" width="700" height="260" style="cursor:ew-resize"></canvas>
-<div id="algebra" style="padding:10px 14px;font-family:Georgia,serif;background:#fafaf8;border-top:1px solid #e2e8f0;font-size:13px;color:#374151;line-height:1.7"></div>`,
-      css: `body{margin:0;background:#fafaf8;font-family:Georgia,serif}`,
+<div id="algebra" style="padding:10px 14px;font-family:Georgia,serif;background:var(--color-background-secondary, #f8fafc);border-top:1px solid var(--color-border-primary, #e2e8f0);font-size:13px;color:var(--color-text-primary, #1e293b);line-height:1.7"></div>`,
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc);font-family:Georgia,serif}`,
       startCode: `var canvas=document.getElementById('cv');
 var ctx=canvas.getContext('2d');
 var W=canvas.width,H=canvas.height;
@@ -295,7 +295,7 @@ function draw(){
     +'<span style="color:#1e3a5f;font-weight:700">'+a1+'°</span> + '
     +'<span style="color:#dc2626;font-weight:700">'+a2+'°</span> = '
     +'<span style="color:#1a3a2a;font-weight:700">180°</span> ✓'
-    +'<br><span style="color:#9ca3af;font-size:11px">No matter where you drag the vertex, the two angles always sum to 180°. This is not a coincidence — it is a theorem.</span>';
+    +'<br><span style="color:var(--color-text-tertiary, #9ca3af);font-size:11px">No matter where you drag the vertex, the two angles always sum to 180°. This is not a coincidence — it is a theorem.</span>';
 }
 draw();`,
       outputHeight: 340,
@@ -337,8 +337,8 @@ What makes this satisfying is the structure: we didn't measure anything. We didn
 
 The interactive below lets you drag the crossing point to any position and verify that vertical angles remain equal. Then walk through the formal proof — each step is justified.`,
       html: `<canvas id="cv" width="700" height="300" style="cursor:move"></canvas>
-<div id="proof-panel" style="padding:14px;font-family:Georgia,serif;background:#fafaf8;border-top:1px solid #e2e8f0"></div>`,
-      css: `body{margin:0;background:#fafaf8}`,
+<div id="proof-panel" style="padding:14px;font-family:Georgia,serif;background:var(--color-background-secondary, #f8fafc);border-top:1px solid var(--color-border-primary, #e2e8f0)"></div>`,
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc)}`,
       startCode: `var canvas=document.getElementById('cv');
 var ctx=canvas.getContext('2d');
 var W=canvas.width,H=canvas.height;
@@ -436,10 +436,10 @@ function draw(){
   var pp=document.getElementById('proof-panel');
   pp.innerHTML='<strong>Proof that ∠1 = ∠3:</strong><br>'
     +'<table style="border-collapse:collapse;font-size:12px;width:100%;margin-top:8px">'
-    +'<tr><td style="padding:5px 10px;color:#1e3a5f;width:40%">m∠1 + m∠2 = 180°</td><td style="padding:5px;color:#64748b;font-style:italic">Linear Pair Theorem (∠1 and ∠2 form a straight line)</td></tr>'
-    +'<tr style="background:#f8f8f6"><td style="padding:5px 10px;color:#1e3a5f">m∠2 + m∠3 = 180°</td><td style="padding:5px;color:#64748b;font-style:italic">Linear Pair Theorem (∠2 and ∠3 form a straight line)</td></tr>'
-    +'<tr><td style="padding:5px 10px;color:#1e3a5f">m∠1 + m∠2 = m∠2 + m∠3</td><td style="padding:5px;color:#64748b;font-style:italic">Both equal 180° (substitution)</td></tr>'
-    +'<tr style="background:#f8f8f6"><td style="padding:5px 10px;color:#1a3a2a;font-weight:700">m∠1 = m∠3 □</td><td style="padding:5px;color:#64748b;font-style:italic">Subtract m∠2 from both sides (subtraction property of equality)</td></tr>'
+    +'<tr><td style="padding:5px 10px;color:#1e3a5f;width:40%">m∠1 + m∠2 = 180°</td><td style="padding:5px;color:var(--color-text-secondary, #475569);font-style:italic">Linear Pair Theorem (∠1 and ∠2 form a straight line)</td></tr>'
+    +'<tr style="background:#f8f8f6"><td style="padding:5px 10px;color:#1e3a5f">m∠2 + m∠3 = 180°</td><td style="padding:5px;color:var(--color-text-secondary, #475569);font-style:italic">Linear Pair Theorem (∠2 and ∠3 form a straight line)</td></tr>'
+    +'<tr><td style="padding:5px 10px;color:#1e3a5f">m∠1 + m∠2 = m∠2 + m∠3</td><td style="padding:5px;color:var(--color-text-secondary, #475569);font-style:italic">Both equal 180° (substitution)</td></tr>'
+    +'<tr style="background:#f8f8f6"><td style="padding:5px 10px;color:#1a3a2a;font-weight:700">m∠1 = m∠3 □</td><td style="padding:5px;color:var(--color-text-secondary, #475569);font-style:italic">Subtract m∠2 from both sides (subtraction property of equality)</td></tr>'
     +'</table>'
     +'<div style="font-size:11px;color:#94a3b8;margin-top:8px">Current values: ∠1 = ∠3 = '+a_1+'°,  ∠2 = ∠4 = '+a_2+'°</div>';
 }
@@ -496,8 +496,8 @@ Notice the structure: one definition (midpoint), one postulate (Segment Addition
 
 The construction below demonstrates the Midpoint Theorem. Drag point M along the segment. When M is the midpoint, both halves are equal and AM = AC/2. The algebra updates in real time, showing exactly when the theorem applies.`,
       html: `<canvas id="cv" width="700" height="200" style="cursor:ew-resize"></canvas>
-<div id="seg-info" style="padding:10px 14px;font-family:Georgia,serif;background:#fafaf8;border-top:1px solid #e2e8f0;font-size:13px"></div>`,
-      css: `body{margin:0;background:#fafaf8}`,
+<div id="seg-info" style="padding:10px 14px;font-family:Georgia,serif;background:var(--color-background-secondary, #f8fafc);border-top:1px solid var(--color-border-primary, #e2e8f0);font-size:13px"></div>`,
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc)}`,
       startCode: `var canvas=document.getElementById('cv');
 var ctx=canvas.getContext('2d');
 var W=canvas.width,H=canvas.height;
@@ -575,11 +575,11 @@ function draw(){
   if(isMidpoint){
     info.innerHTML='<span style="color:#1a3a2a;font-weight:700">✓ M is the midpoint of AC!</span>'
       +' AM = MC = '+Math.round(AM)+'. Midpoint Theorem: AM = AC/2 = '+Math.round(AC/2)+'. ✓'
-      +'<br><span style="color:#9ca3af;font-size:11px">Segment Addition: AM + MC = '+Math.round(AM)+' + '+Math.round(MC)+' = '+Math.round(AC)+' = AC. ✓</span>';
+      +'<br><span style="color:var(--color-text-tertiary, #9ca3af);font-size:11px">Segment Addition: AM + MC = '+Math.round(AM)+' + '+Math.round(MC)+' = '+Math.round(AC)+' = AC. ✓</span>';
   } else {
     info.innerHTML='AM = '+Math.round(AM)+',  MC = '+Math.round(MC)
       +'. <span style="color:#94a3b8">M is not the midpoint (drag toward center to make it one).</span>'
-      +'<br><span style="color:#9ca3af;font-size:11px">Segment Addition always holds: AM + MC = '+Math.round(AM)+' + '+Math.round(MC)+' = '+Math.round(AM+MC)+' = AC = '+Math.round(AC)+'.</span>';
+      +'<br><span style="color:var(--color-text-tertiary, #9ca3af);font-size:11px">Segment Addition always holds: AM + MC = '+Math.round(AM)+' + '+Math.round(MC)+' = '+Math.round(AM+MC)+' = AC = '+Math.round(AC)+'.</span>';
   }
 }
 draw();`,

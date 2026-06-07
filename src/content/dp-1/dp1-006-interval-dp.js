@@ -70,7 +70,7 @@ export default {
     <button id="prev" style="background:#374151;color:#e2e8f0;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px">← Prev</button>
     <button id="play" style="background:#1d4ed8;color:#fff;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px">▶ Play</button>
     <button id="nxt"  style="background:#374151;color:#e2e8f0;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px">Next →</button>
-    <span id="ctr" style="color:#64748b;font-size:11px;margin-left:4px">Ready</span>
+    <span id="ctr" style="color:var(--color-text-secondary, #475569);font-size:11px;margin-left:4px">Ready</span>
   </div>
   <div id="info" style="padding:8px 12px;background:#0f172a;font-size:11px;min-height:40px;border-bottom:1px solid #1e293b"></div>
   <div id="tbl" style="padding:10px 12px;overflow:auto;flex:1"></div>
@@ -142,11 +142,11 @@ function render() {
   h += "<table style='border-collapse:collapse'>";
   h += "<tr><td style='width:28px;height:24px'></td>";
   for (let j2 = 0; j2 < N; j2++)
-    h += "<td style='width:70px;height:24px;text-align:center;color:#475569;font-size:10px'>j=" + j2 + "</td>";
+    h += "<td style='width:70px;height:24px;text-align:center;color:var(--color-text-secondary, #475569);font-size:10px'>j=" + j2 + "</td>";
   h += "</tr>";
 
   for (let i2 = 0; i2 < N; i2++) {
-    h += "<tr><td style='color:#475569;font-size:10px;padding-right:4px'>i=" + i2 + "</td>";
+    h += "<tr><td style='color:var(--color-text-secondary, #475569);font-size:10px;padding-right:4px'>i=" + i2 + "</td>";
     for (let j2 = 0; j2 < N; j2++) {
       if (j2 < i2) {
         h += "<td style='width:70px;height:32px;background:#0a0f1a'></td>";
@@ -205,7 +205,7 @@ render();`,
     <button id="prev" style="background:#374151;color:#e2e8f0;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px">← Prev</button>
     <button id="play" style="background:#1d4ed8;color:#fff;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px">▶ Play</button>
     <button id="nxt"  style="background:#374151;color:#e2e8f0;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px">Next →</button>
-    <span id="ctr" style="color:#64748b;font-size:11px;margin-left:4px">Ready</span>
+    <span id="ctr" style="color:var(--color-text-secondary, #475569);font-size:11px;margin-left:4px">Ready</span>
   </div>
   <div id="info" style="padding:8px 12px;background:#0f172a;font-size:11px;min-height:40px;border-bottom:1px solid #1e293b"></div>
   <div id="tbl" style="padding:10px 12px;overflow:auto;flex:1"></div>
@@ -270,12 +270,12 @@ function render() {
   h += "<tr><td style='width:28px'></td>";
   for (let j2 = 0; j2 < N; j2++) {
     const lbl = j2 === 0 || j2 === N-1 ? "1" : RAW[j2-1];
-    h += "<td style='width:52px;height:24px;text-align:center;color:#475569;font-size:10px'>j=" + j2 + "(" + lbl + ")</td>";
+    h += "<td style='width:52px;height:24px;text-align:center;color:var(--color-text-secondary, #475569);font-size:10px'>j=" + j2 + "(" + lbl + ")</td>";
   }
   h += "</tr>";
 
   for (let i2 = 0; i2 < N; i2++) {
-    h += "<tr><td style='color:#475569;font-size:10px'>i=" + i2 + "</td>";
+    h += "<tr><td style='color:var(--color-text-secondary, #475569);font-size:10px'>i=" + i2 + "</td>";
     for (let j2 = 0; j2 < N; j2++) {
       if (j2 <= i2) { h += "<td style='width:52px;height:30px;background:#0a0f1a'></td>"; continue; }
       const isCur   = s && s.i === i2 && s.j === j2;
@@ -330,7 +330,7 @@ render();`,
     <button id="prev" style="background:#374151;color:#e2e8f0;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px">← Prev</button>
     <button id="play" style="background:#1d4ed8;color:#fff;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px">▶ Play</button>
     <button id="nxt"  style="background:#374151;color:#e2e8f0;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px">Next →</button>
-    <span id="ctr" style="color:#64748b;font-size:11px;margin-left:4px">Ready</span>
+    <span id="ctr" style="color:var(--color-text-secondary, #475569);font-size:11px;margin-left:4px">Ready</span>
   </div>
   <div id="info" style="padding:8px 12px;background:#0f172a;font-size:11px;min-height:40px;border-bottom:1px solid #1e293b"></div>
   <div id="tbl" style="padding:10px 12px;overflow:auto;flex:1"></div>
@@ -399,14 +399,14 @@ function render() {
   h += "<div style='display:flex;gap:24px'>";
 
   // isPalin table
-  h += "<div><div style='color:#64748b;font-size:10px;margin-bottom:4px'>isPalin[i][j]</div>";
+  h += "<div><div style='color:var(--color-text-secondary, #475569);font-size:10px;margin-bottom:4px'>isPalin[i][j]</div>";
   h += "<table style='border-collapse:collapse'>";
   h += "<tr><td style='width:16px'></td>";
   for (let j2 = 0; j2 < N; j2++)
-    h += "<td style='width:24px;height:20px;text-align:center;color:#475569;font-size:9px'>" + j2 + "</td>";
+    h += "<td style='width:24px;height:20px;text-align:center;color:var(--color-text-secondary, #475569);font-size:9px'>" + j2 + "</td>";
   h += "</tr>";
   for (let i2 = 0; i2 < N; i2++) {
-    h += "<tr><td style='color:#475569;font-size:9px'>" + i2 + "</td>";
+    h += "<tr><td style='color:var(--color-text-secondary, #475569);font-size:9px'>" + i2 + "</td>";
     for (let j2 = 0; j2 < N; j2++) {
       if (j2 < i2) { h += "<td style='width:24px;height:24px;background:#0a0f1a'></td>"; continue; }
       const isCur = s && s.i === i2 && s.j === j2;
@@ -424,14 +424,14 @@ function render() {
   h += "</table></div>";
 
   // dp min cuts table
-  h += "<div><div style='color:#64748b;font-size:10px;margin-bottom:4px'>dp[i][j] = min cuts</div>";
+  h += "<div><div style='color:var(--color-text-secondary, #475569);font-size:10px;margin-bottom:4px'>dp[i][j] = min cuts</div>";
   h += "<table style='border-collapse:collapse'>";
   h += "<tr><td style='width:16px'></td>";
   for (let j2 = 0; j2 < N; j2++)
-    h += "<td style='width:28px;height:20px;text-align:center;color:#475569;font-size:9px'>" + j2 + "</td>";
+    h += "<td style='width:28px;height:20px;text-align:center;color:var(--color-text-secondary, #475569);font-size:9px'>" + j2 + "</td>";
   h += "</tr>";
   for (let i2 = 0; i2 < N; i2++) {
-    h += "<tr><td style='color:#475569;font-size:9px'>" + i2 + "</td>";
+    h += "<tr><td style='color:var(--color-text-secondary, #475569);font-size:9px'>" + i2 + "</td>";
     for (let j2 = 0; j2 < N; j2++) {
       if (j2 < i2) { h += "<td style='width:28px;height:24px;background:#0a0f1a'></td>"; continue; }
       const isCur = s && s.i === i2 && s.j === j2;

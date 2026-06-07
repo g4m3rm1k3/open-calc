@@ -122,12 +122,12 @@ Both are included in the browser's performance toolkit — learn them early and 
 Type in the first input to see debounce (only fires when you stop). Move the mouse over the second area to see throttle (fires at most every 200ms regardless of speed).`,
       html: `<div style="height:100%;background:#09111c;padding:14px;border-radius:12px;box-sizing:border-box;display:flex;flex-direction:column;gap:10px;font-family:monospace;">
   <script src="https://cdn.jsdelivr.net/npm/lodash"></script>
-  <div style="color:#475569;font-size:10px;text-transform:uppercase;letter-spacing:.08em;">Debounce (fires 300ms after you stop typing)</div>
+  <div style="color:var(--color-text-secondary, #475569);font-size:10px;text-transform:uppercase;letter-spacing:.08em;">Debounce (fires 300ms after you stop typing)</div>
   <input id="searchInput" type="text" placeholder="Type something…"
     style="background:#111827;border:1px solid #334155;border-radius:8px;padding:10px;color:#e2e8f0;font-family:monospace;font-size:13px;outline:none;" />
   <div id="searchLog" style="background:#050e1a;border:1px solid #1e293b;border-radius:8px;padding:8px;font-size:12px;color:#4ade80;min-height:50px;"></div>
-  <div style="color:#475569;font-size:10px;text-transform:uppercase;letter-spacing:.08em;">Throttle (fires at most every 200ms on mouse move)</div>
-  <div id="throttleArea" style="flex:1;background:#111827;border:1px solid #334155;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#64748b;font-size:12px;cursor:crosshair;">Move mouse here</div>
+  <div style="color:var(--color-text-secondary, #475569);font-size:10px;text-transform:uppercase;letter-spacing:.08em;">Throttle (fires at most every 200ms on mouse move)</div>
+  <div id="throttleArea" style="flex:1;background:#111827;border:1px solid #334155;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--color-text-secondary, #475569);font-size:12px;cursor:crosshair;">Move mouse here</div>
   <div id="throttleLog" style="background:#050e1a;border:1px solid #1e293b;border-radius:8px;padding:8px;font-size:12px;color:#38bdf8;"></div>
 </div>`,
       css: `body{margin:0;padding:0;background:#09111c;height:100vh;}`,
@@ -323,7 +323,7 @@ Each bar should show a userId label and its completion percentage.`,
       html: `<div style="height:100%;background:#09111c;padding:14px;border-radius:12px;box-sizing:border-box;display:flex;flex-direction:column;gap:8px;">
   <script src="https://cdn.jsdelivr.net/npm/lodash"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <div id="status" style="color:#64748b;font-family:monospace;font-size:12px;">Loading…</div>
+  <div id="status" style="color:var(--color-text-secondary, #475569);font-family:monospace;font-size:12px;">Loading…</div>
   <canvas id="completionChart" style="flex:1;"></canvas>
 </div>`,
       css: `body{margin:0;padding:0;background:#09111c;height:100vh;}`,
@@ -347,7 +347,7 @@ buildCompletionChart();`,
   new Chart(document.getElementById('completionChart'), {
     type: 'bar',
     data: { labels, datasets: [{ label: 'Completion %', data, backgroundColor: 'rgba(52,211,153,0.7)', borderRadius: 4 }] },
-    options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { min: 0, max: 100, ticks: { color: '#64748b' }, grid: { color: '#1e293b' } }, y: { ticks: { color: '#64748b' } } }, plugins: { legend: { labels: { color: '#94a3b8' } } } },
+    options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { min: 0, max: 100, ticks: { color: '#64748b' }, grid: { color: 'var(--color-text-primary, #1e293b)" } }, y: { ticks: { color: '#64748b' } } }, plugins: { legend: { labels: { color: '#94a3b8' } } } },
   });
 }
 buildCompletionChart();`,

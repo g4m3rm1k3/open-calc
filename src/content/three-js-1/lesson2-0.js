@@ -85,15 +85,15 @@ Click any vertex of the triangle to see its UV coordinates. Drag the UV pins (ri
       html: `<div style="background:#0a0f1e;padding:14px;display:flex;flex-direction:column;gap:10px;align-items:center">
   <div style="display:flex;gap:12px;width:100%;justify-content:center;">
     <div style="display:flex;flex-direction:column;gap:4px;align-items:center;">
-      <div style="color:#64748b;font-family:monospace;font-size:10px;">3D Surface</div>
+      <div style="color:var(--color-text-secondary, #475569);font-family:monospace;font-size:10px;">3D Surface</div>
       <canvas id="cv3d" width="300" height="280" style="border-radius:8px;display:block;"></canvas>
     </div>
     <div style="display:flex;flex-direction:column;gap:4px;align-items:center;">
-      <div style="color:#64748b;font-family:monospace;font-size:10px;">UV Space (drag pins)</div>
+      <div style="color:var(--color-text-secondary, #475569);font-family:monospace;font-size:10px;">UV Space (drag pins)</div>
       <canvas id="cvUV" width="300" height="280" style="border-radius:8px;display:block;"></canvas>
     </div>
   </div>
-  <div id="info" style="color:#64748b;font-family:monospace;font-size:10px;text-align:center;">Click a vertex to inspect its UV</div>
+  <div id="info" style="color:var(--color-text-secondary, #475569);font-family:monospace;font-size:10px;text-align:center;">Click a vertex to inspect its UV</div>
 </div>`,
       css: `body{margin:0;background:#0a0f1e}`,
       startCode: `var c3 = document.getElementById('cv3d');
@@ -333,12 +333,12 @@ gl.uniform1i(gl.getUniformLocation(prog, 'uTexture'), 0);  // sampler reads unit
 A procedurally generated texture on a quad. Change the wrapping mode and animate UV offset using a \`uTime\` uniform — the classic water/lava scrolling effect.`,
       html: `<div style="background:#0a0f1e;padding:14px;display:flex;flex-direction:column;gap:10px;align-items:center">
   <canvas id="cv" width="580" height="320" style="border-radius:8px;display:block;width:100%"></canvas>
-  <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;font-family:monospace;font-size:11px;color:#64748b;">
+  <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;font-family:monospace;font-size:11px;color:var(--color-text-secondary, #475569);">
     <div style="display:flex;gap:6px;align-items:center;">
       <span>Wrap:</span>
       <button class="wrapBtn" data-mode="repeat"   style="background:#1e2a3f;border:1px solid #38bdf8;color:#38bdf8;padding:4px 10px;border-radius:5px;cursor:pointer;font-family:monospace;font-size:10px;">REPEAT</button>
-      <button class="wrapBtn" data-mode="clamp"    style="background:#1e2a3f;border:1px solid #334155;color:#64748b;padding:4px 10px;border-radius:5px;cursor:pointer;font-family:monospace;font-size:10px;">CLAMP</button>
-      <button class="wrapBtn" data-mode="mirror"   style="background:#1e2a3f;border:1px solid #334155;color:#64748b;padding:4px 10px;border-radius:5px;cursor:pointer;font-family:monospace;font-size:10px;">MIRROR</button>
+      <button class="wrapBtn" data-mode="clamp"    style="background:#1e2a3f;border:1px solid #334155;color:var(--color-text-secondary, #475569);padding:4px 10px;border-radius:5px;cursor:pointer;font-family:monospace;font-size:10px;">CLAMP</button>
+      <button class="wrapBtn" data-mode="mirror"   style="background:#1e2a3f;border:1px solid #334155;color:var(--color-text-secondary, #475569);padding:4px 10px;border-radius:5px;cursor:pointer;font-family:monospace;font-size:10px;">MIRROR</button>
     </div>
     <div style="display:flex;gap:6px;align-items:center;">
       <span>Tile scale:</span>

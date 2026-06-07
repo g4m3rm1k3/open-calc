@@ -99,7 +99,7 @@ export default function BlindChainRuleLab() {
               <button onClick={()=>setChecked(true)} className="px-3 py-1 rounded text-sm bg-violet-600 text-white">Check</button>
             </div>
             {checked && (
-              <div className={`mt-2 text-sm font-semibold ${correct?'text-emerald-600':'text-red-600'}`}>
+              <div className={`mt-2 text-sm font-semibold ${correct?'text-emerald-600 dark:text-emerald-400':'text-red-600 dark:text-red-400'}`}>
                 {correct ? `✓ Correct! (f∘g)'(${prob.x}) = ${prob.answer}` : `✗ Try again. Hint: ${t.fpgx} × ${t.gpx}`}
               </div>
             )}

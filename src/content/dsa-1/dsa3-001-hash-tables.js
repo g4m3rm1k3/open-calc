@@ -63,7 +63,7 @@ export default {
                 html: `<div style="margin-bottom:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
   <input id="key-in" type="text" value="name" placeholder="key" style="padding:7px 12px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:#e2e8f0;font-family:monospace;font-size:14px;width:140px">
   <button id="btn-hash" style="padding:7px 16px;border-radius:6px;border:none;background:#6d28d9;color:#fff;font-family:monospace;font-size:12px;cursor:pointer">Hash it</button>
-  <span style="font-family:monospace;font-size:11px;color:#64748b">buckets = 8</span>
+  <span style="font-family:monospace;font-size:11px;color:var(--color-text-secondary, #475569)">buckets = 8</span>
 </div>
 <div id="steps" style="font-family:monospace;font-size:12px;line-height:1.8;min-height:80px;background:#0a0f1e;border-radius:6px;padding:10px;margin-bottom:10px"></div>
 <div style="color:#94a3b8;font-size:11px;font-family:monospace;margin-bottom:6px">BUCKETS</div>
@@ -71,7 +71,7 @@ export default {
                 css: `body{margin:0;padding:12px;background:#0f172a;color:#e2e8f0;box-sizing:border-box;font-family:monospace}
 .bucket{flex:0 0 56px;min-height:44px;border:1px solid #334155;border-radius:5px;background:#1e293b;display:flex;flex-direction:column;align-items:center;padding:4px;font-size:10px;transition:all .3s}
 .bucket.hit{border-color:#6366f1;background:#1e1b4b}
-.b-idx{color:#475569;font-size:9px}.b-val{color:#a5b4fc;font-size:11px;font-weight:bold}
+.b-idx{color:var(--color-text-secondary, #475569);font-size:9px}.b-val{color:#a5b4fc;font-size:11px;font-weight:bold}
 .step-char{color:#2dd4bf}.step-op{color:#94a3b8}.step-result{color:#4ade80;font-weight:bold}`,
                 startCode: `const BUCKETS = 8;
 const stepsEl   = document.getElementById('steps');
@@ -132,11 +132,11 @@ document.getElementById('btn-hash').addEventListener('click', () => {
   <button id="btn-del" style="padding:6px 14px;border-radius:5px;border:none;background:#b91c1c;color:#fff;font-family:monospace;font-size:12px;cursor:pointer">delete</button>
 </div>
 <div id="result" style="font-family:monospace;font-size:12px;color:#94a3b8;min-height:18px;margin-bottom:8px"></div>
-<div style="color:#475569;font-size:10px;font-family:monospace;margin-bottom:4px">BUCKET  CHAIN (key → value pairs)</div>
+<div style="color:var(--color-text-secondary, #475569);font-size:10px;font-family:monospace;margin-bottom:4px">BUCKET  CHAIN (key → value pairs)</div>
 <div id="table-viz" style="font-family:monospace;font-size:12px"></div>`,
                 css: `body{margin:0;padding:12px;background:#0f172a;color:#e2e8f0;box-sizing:border-box;font-family:monospace}
 .row{display:flex;gap:8px;align-items:flex-start;margin-bottom:3px}
-.bkt{width:28px;text-align:right;color:#475569;font-size:11px;padding-top:3px;flex-shrink:0}
+.bkt{width:28px;text-align:right;color:var(--color-text-secondary, #475569);font-size:11px;padding-top:3px;flex-shrink:0}
 .chain{display:flex;gap:4px;flex-wrap:wrap}
 .pair{padding:3px 8px;border:1px solid #334155;border-radius:4px;background:#1e293b;color:#94a3b8;font-size:11px}
 .pair.hit{border-color:#6366f1;background:#1e1b4b;color:#a5b4fc}
@@ -499,7 +499,7 @@ Empty class shell. Write the entire HashTable from memory:
                 html: `<div id="out" style="font-family:monospace;font-size:13px"></div>`,
                 css: `body{margin:0;padding:14px;background:#0f172a;color:#e2e8f0;box-sizing:border-box;font-family:monospace}
 .pass{color:#4ade80;margin:2px 0}.fail{color:#f87171;margin:2px 0}
-.section{color:#64748b;font-size:11px;margin-top:10px;border-top:1px solid #1e293b;padding-top:6px}
+.section{color:var(--color-text-secondary, #475569);font-size:11px;margin-top:10px;border-top:1px solid #1e293b;padding-top:6px}
 .banner{margin-top:12px;padding:10px 14px;border-radius:8px;font-size:13px}
 .banner.ok{background:#052e16;border:1px solid #166534;color:#4ade80}
 .banner.bad{background:#450a0a;border:1px solid #7f1d1d;color:#f87171}`,

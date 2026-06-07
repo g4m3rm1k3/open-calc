@@ -52,7 +52,7 @@ export default function AbsoluteValueDiffViz() {
       <div className="mb-3">
         <label className="text-sm font-medium">
           h = {h.toFixed(2)} &nbsp;
-          <span className="text-emerald-600">(right slope = +1)</span>
+          <span className="text-emerald-600 dark:text-emerald-400">(right slope = +1)</span>
           {' '}·{' '}
           <span className="text-red-500">(left slope = −1)</span>
         </label>

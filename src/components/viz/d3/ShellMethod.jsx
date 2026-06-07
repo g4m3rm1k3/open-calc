@@ -125,7 +125,7 @@ export default function ShellMethod({ params }) {
       <div className="flex flex-wrap gap-2 mb-3 px-2">
         {AXES.map((ax, i) => (
           <button key={i} onClick={() => setAxisIdx(i)}
-            className={`px-2 py-1 rounded text-xs transition-colors ${i === axisIdx ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+            className={`px-2 py-1 rounded text-xs transition-colors ${i === axisIdx ? 'bg-emerald-50 dark:bg-emerald-900/300 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
           >Axis: {ax.label}</button>
         ))}
       </div>

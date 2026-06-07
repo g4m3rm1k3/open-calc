@@ -138,7 +138,7 @@ Two vectors A and B are shown as coloured arrows. Drag the sliders to change the
     <input id="bz" type="range" min="-2" max="2" step="0.1" value="1" style="width:100%;accent-color:#f5a623"></label>
 </div>
 <canvas id="cv" style="display:block;border-radius:0 0 6px 6px"></canvas>
-<div id="info" style="font-family:monospace;font-size:10px;color:#475569;padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px;white-space:pre"></div>`,
+<div id="info" style="font-family:monospace;font-size:10px;color:var(--color-text-secondary, #475569);padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px;white-space:pre"></div>`,
       css: `body{margin:0;background:#060610}`,
       startCode: `var renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -238,7 +238,7 @@ In the starter code:
 Try flipping the winding order (swap p1 and p2) and observe the normal flip.`,
       html: `<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.js"></script>
 <canvas id="cv" style="display:block;border-radius:6px"></canvas>
-<div id="info" style="font-family:monospace;font-size:10px;color:#475569;padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px;white-space:pre"></div>`,
+<div id="info" style="font-family:monospace;font-size:10px;color:var(--color-text-secondary, #475569);padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px;white-space:pre"></div>`,
       css: `body{margin:0;background:#060610}`,
       startCode: `var renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -319,7 +319,7 @@ In the starter:
 This algorithm is fundamental to CAD constraint solving, collision detection, and snap-to-grid tools.`,
       html: `<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.js"></script>
 <canvas id="cv" style="display:block;border-radius:6px"></canvas>
-<div id="info" style="font-family:monospace;font-size:10px;color:#475569;padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px"></div>`,
+<div id="info" style="font-family:monospace;font-size:10px;color:var(--color-text-secondary, #475569);padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px"></div>`,
       css: `body{margin:0;background:#060610}`,
       startCode: `var renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));

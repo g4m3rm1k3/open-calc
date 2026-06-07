@@ -48,12 +48,12 @@ app.innerHTML = \`
       padding: 20px;
       background: white;
       border-radius: 12px;
-      border: 1px solid #e2e8f0;
+      border: 1px solid var(--color-border-primary, #e2e8f0);
       box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
     h2 { font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 8px }
-    p  { font-size: 14px; color: #475569; line-height: 1.65; margin-bottom: 8px }
-    code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px;
+    p  { font-size: 14px; color: var(--color-text-secondary, #475569); line-height: 1.65; margin-bottom: 8px }
+    code { background: var(--color-background-tertiary, #f1f5f9); padding: 2px 6px; border-radius: 4px;
            font-size: 13px; color: #0284c7 }
   </style>
   <div class="card">
@@ -75,10 +75,10 @@ app.innerHTML = \`
 app.innerHTML = \`
   <style>
     * { box-sizing: border-box; font-family: system-ui, sans-serif; margin: 0; padding: 0 }
-    body, #app { background: #f8fafc }
+    body, #app { background: var(--color-background-secondary, #f8fafc) }
     .wrap { padding: 16px; display: flex; flex-direction: column; gap: 12px }
     h3  { font-size: 14px; font-weight: 700; color: #0f172a }
-    canvas { width: 100%; border-radius: 8px; border: 1px solid #e2e8f0;
+    canvas { width: 100%; border-radius: 8px; border: 1px solid var(--color-border-primary, #e2e8f0);
              display: block; background: white }
   </style>
   <div class="wrap">
@@ -146,7 +146,7 @@ app.innerHTML = \`
     .count-display {
       font-size: 40px; font-weight: 800; color: #0f172a;
       text-align: center; padding: 20px;
-      background: white; border-radius: 8px; border: 1px solid #e2e8f0
+      background: white; border-radius: 8px; border: 1px solid var(--color-border-primary, #e2e8f0)
     }
   </style>
   <div class="wrap">
@@ -188,7 +188,7 @@ app.innerHTML = \`
     .row { display: flex; gap: 8px }
     input[type=text] {
       flex: 1; padding: 9px 13px; font-size: 15px;
-      border: 1.5px solid #cbd5e1; border-radius: 8px; outline: none;
+      border: 1.5px solid var(--color-border-secondary, #cbd5e1); border-radius: 8px; outline: none;
       transition: border 0.15s; font-family: inherit
     }
     input[type=text]:focus { border-color: #0284c7 }
@@ -199,7 +199,7 @@ app.innerHTML = \`
     }
     .preview {
       padding: 14px 16px; background: white;
-      border-radius: 8px; border: 1px solid #e2e8f0;
+      border-radius: 8px; border: 1px solid var(--color-border-primary, #e2e8f0);
       font-size: 22px; font-weight: 700; color: #0f172a;
       min-height: 60px; word-break: break-all
     }
@@ -249,7 +249,7 @@ app.querySelector('#clearBtn').addEventListener('click', () => {
     .toolbar { display: flex; gap: 8px; align-items: center }
     button { padding: 7px 16px; font-size: 13px; font-weight: 600; border: none;
              border-radius: 6px; cursor: pointer; background: #dc2626; color: white }
-    canvas { flex: 1; border-radius: 8px; border: 1px solid #e2e8f0;
+    canvas { flex: 1; border-radius: 8px; border: 1px solid var(--color-border-primary, #e2e8f0);
              display: block; cursor: crosshair; background: #0f172a }
   </style>
   <div class="wrap">
@@ -286,7 +286,7 @@ const ctx = canvas.getContext('2d')
     h3 { font-size: 14px; font-weight: 700; color: #0f172a }
     textarea {
       width: 100%; padding: 10px; font-size: 14px; border-radius: 8px;
-      border: 1.5px solid #cbd5e1; resize: none; font-family: inherit;
+      border: 1.5px solid var(--color-border-secondary, #cbd5e1); resize: none; font-family: inherit;
       line-height: 1.5; outline: none
     }
     textarea:focus { border-color: #0284c7 }
@@ -297,7 +297,7 @@ const ctx = canvas.getContext('2d')
       height: 100%; width: 0%; border-radius: 3px;
       background: #16a34a; transition: width 0.1s, background 0.2s
     }
-    .info { display: flex; justify-content: flex-end; font-size: 12px; color: #64748b }
+    .info { display: flex; justify-content: flex-end; font-size: 12px; color: var(--color-text-secondary, #475569) }
   </style>
   <div class="wrap">
     <h3>Character Limit</h3>
@@ -332,12 +332,12 @@ box.addEventListener('input', () => {
     * { box-sizing: border-box; font-family: system-ui, sans-serif; margin: 0; padding: 0 }
     .wrap { padding: 20px; display: flex; flex-direction: column; gap: 16px }
     h3 { font-size: 14px; font-weight: 700; color: #0f172a }
-    .swatch { height: 100px; border-radius: 10px; border: 1px solid #e2e8f0; background: rgb(128,128,128) }
+    .swatch { height: 100px; border-radius: 10px; border: 1px solid var(--color-border-primary, #e2e8f0); background: rgb(128,128,128) }
     .hex { text-align: center; font-size: 20px; font-weight: 700; font-family: monospace; color: #0f172a }
     .row { display: flex; align-items: center; gap: 10px; font-size: 13px }
     .row label { width: 14px; font-weight: 700 }
     .row input  { flex: 1 }
-    .row span   { width: 30px; text-align: right; color: #64748b }
+    .row span   { width: 30px; text-align: right; color: var(--color-text-secondary, #475569) }
   </style>
   <div class="wrap">
     <h3>RGB Mixer</h3>

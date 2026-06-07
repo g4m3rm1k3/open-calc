@@ -133,7 +133,7 @@ Run the cell and watch the "Balloon" content change while the "String" remains t
       css: `.mut-viz { height: 100%; background: #0a1220; padding: 20px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; }
       .path { display: flex; align-items: center; gap: 15px; font-family: monospace; font-size: 16px; }
       .label { color: #f59e0b; font-weight: 800; }
-      .arrow { color: #475569; }
+      .arrow { color: var(--color-text-secondary, #475569); }
       .balloon { padding: 10px 20px; background: #1e293b; border: 2px solid #38bdf8; border-radius: 99px; color: #fff; transition: all 0.3s ease; }
       .mutated { transform: scale(1.1); border-color: #10b981; background: #064e3b; }
       button { padding: 8px 16px; border-radius: 8px; border: 1px solid #334155; background: #111827; color: #cbd5e1; cursor: pointer; transition: all 0.2s; }
@@ -195,7 +195,7 @@ Run to see the "execution engine" try to reach variables.`,
       </div>`,
       css: `.tdz-viz { height: 100%; background: #0a1220; padding: 20px; border-radius: 12px; position: relative; font-family: monospace; }
       .wall { position: absolute; top: 0; left: 0; width: 100%; height: 50%; background: rgba(239, 68, 68, 0.1); border-bottom: 2px dashed #ef4444; color: #fca5a5; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; }
-      .code-line { padding: 5px; color: #64748b; font-size: 13px; }
+      .code-line { padding: 5px; color: var(--color-text-secondary, #475569); font-size: 13px; }
       .highlight { color: #38bdf8; font-weight: 800; }
       .dim { opacity: 0.5; }
       .cursor { position: absolute; left: -10px; top: 15px; color: #10b981; font-weight: 800; transition: top 1s ease; font-size: 10px; }`,

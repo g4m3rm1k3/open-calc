@@ -141,7 +141,7 @@ export default function ProjectionMatrixViz() {
       </label>
 
       <div className={`rounded-lg px-3 py-2 text-sm text-center border ${
-        diff < 0.001 ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300' : 'bg-red-100 border-red-300 text-red-700'
+        diff < 0.001 ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300' : 'bg-red-100 dark:bg-red-900/50 border-red-300 dark:border-red-700/50 text-red-700 dark:text-red-300'
       }`}>
         <span className="font-mono">|P(Pb) − Pb|</span> = {diff.toFixed(6)} &nbsp;— P² = P (idempotent)
       </div>

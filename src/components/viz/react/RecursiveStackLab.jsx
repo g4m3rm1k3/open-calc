@@ -77,7 +77,7 @@ export default function RecursiveStackLab() {
          <button 
            onClick={simulateExecution} 
            disabled={isRunning}
-           className="px-8 py-3 rounded-lg font-bold uppercase transition-all duration-300 shadow-lg bg-emerald-600 hover:bg-emerald-500 text-white disabled:opacity-50 disabled:grayscale"
+           className="px-8 py-3 rounded-lg font-bold uppercase transition-all duration-300 shadow-lg bg-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/40 dark:bg-emerald-900/300 text-white disabled:opacity-50 disabled:grayscale"
          >
            {isRunning ? 'Executing Logic Stack...' : 'Commence Recursion Stack Trace'}
          </button>

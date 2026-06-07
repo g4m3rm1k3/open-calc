@@ -219,7 +219,7 @@ The tick function is a pure transformation: take the current state, compute the 
       html: `<div id="tickVis"></div><div id="tickLog"></div>`,
       css: `body{background:#0a1220;padding:14px;}
 #tickVis{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
-.tick-cell{width:28px;height:28px;border-radius:4px;background:#1e293b;border:1px solid #334155;transition:all 0.1s;display:flex;align-items:center;justify-content:center;font-family:monospace;font-size:10px;color:#475569;}
+.tick-cell{width:28px;height:28px;border-radius:4px;background:#1e293b;border:1px solid #334155;transition:all 0.1s;display:flex;align-items:center;justify-content:center;font-family:monospace;font-size:10px;color:var(--color-text-secondary, #475569);}
 .tick-cell.active{background:#22d3ee;border-color:#67e8f9;color:#0c4a6e;}
 #tickLog{border:1px solid #334155;border-radius:8px;background:#111827;color:#94a3b8;font-family:monospace;padding:10px;font-size:12px;line-height:1.8;}`,
       startCode: `// Minimal game loop demonstrating tick → update → render

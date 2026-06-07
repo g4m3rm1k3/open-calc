@@ -44,7 +44,7 @@ export default function TrigMotionBridgeLab() {
             <div className="absolute left-1/2 top-1/2 w-0.5 h-48 -translate-x-1/2 -translate-y-1/2 bg-slate-300/60" />
             <div className="absolute left-1/2 top-1/2 h-0.5 w-48 -translate-x-1/2 -translate-y-1/2 bg-slate-300/60" />
             <div
-              className="absolute w-3 h-3 rounded-full bg-rose-500"
+              className="absolute w-3 h-3 rounded-full bg-rose-50 dark:bg-rose-900/300"
               style={{
                 left: `calc(50% + ${Math.cos(theta) * 92}px - 6px)`,
                 top: `calc(50% - ${Math.sin(theta) * 92}px - 6px)`,

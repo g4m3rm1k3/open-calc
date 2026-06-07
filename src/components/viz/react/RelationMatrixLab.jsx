@@ -182,7 +182,7 @@ export default function RelationMatrixLab() {
               </div>
             )}
             {isPoset && !isEquivalence && (
-              <div className="p-3 bg-purple-500 text-white font-bold rounded shadow-[0_0_20px_#a855f7] animate-pulse text-center">
+              <div className="p-3 bg-purple-50 dark:bg-purple-900/300 text-white font-bold rounded shadow-[0_0_20px_#a855f7] animate-pulse text-center">
                  📈 PARTIAL ORDER (POSET) ACHIEVED!
               </div>
             )}

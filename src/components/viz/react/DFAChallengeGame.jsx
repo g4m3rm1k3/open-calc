@@ -70,7 +70,7 @@ export default function DFAChallengeGame() {
             setInput(randomBinary(5 + Math.floor(Math.random() * 3)))
             setReveal(false)
           }}
-          className="px-3 py-1 rounded text-sm bg-emerald-500 text-white"
+          className="px-3 py-1 rounded text-sm bg-emerald-50 dark:bg-emerald-900/300 text-white"
         >
           Random Test
         </button>

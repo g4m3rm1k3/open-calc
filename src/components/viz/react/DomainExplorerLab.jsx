@@ -43,13 +43,13 @@ export default function DomainExplorerLab() {
         <button onClick={() => setDomain('N')} className={`px-4 py-2 font-bold rounded-lg text-sm transition-colors border-b-4 ${domain === 'N' ? 'bg-amber-500 border-amber-700 text-slate-900' : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'}`}>
            ℕ (Natural Numbers)
         </button>
-        <button onClick={() => setDomain('Z')} className={`px-4 py-2 font-bold rounded-lg text-sm transition-colors border-b-4 ${domain === 'Z' ? 'bg-blue-500 border-blue-700 text-white' : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'}`}>
+        <button onClick={() => setDomain('Z')} className={`px-4 py-2 font-bold rounded-lg text-sm transition-colors border-b-4 ${domain === 'Z' ? 'bg-blue-50 dark:bg-blue-900/300 border-blue-700 text-white' : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'}`}>
            ℤ (All Integers)
         </button>
-        <button onClick={() => setDomain('C')} className={`px-4 py-2 font-bold rounded-lg text-sm transition-colors border-b-4 ${domain === 'C' ? 'bg-emerald-500 border-emerald-700 text-white' : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'}`}>
+        <button onClick={() => setDomain('C')} className={`px-4 py-2 font-bold rounded-lg text-sm transition-colors border-b-4 ${domain === 'C' ? 'bg-emerald-50 dark:bg-emerald-900/300 border-emerald-700 text-white' : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'}`}>
            ℂ (Complex Numbers)
         </button>
-        <button onClick={() => setDomain('EMPTY')} className={`px-4 py-2 font-bold rounded-lg text-sm transition-colors border-b-4 ${domain === 'EMPTY' ? 'bg-purple-500 border-purple-700 text-white' : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'}`}>
+        <button onClick={() => setDomain('EMPTY')} className={`px-4 py-2 font-bold rounded-lg text-sm transition-colors border-b-4 ${domain === 'EMPTY' ? 'bg-purple-50 dark:bg-purple-900/300 border-purple-700 text-white' : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'}`}>
            ∅ (Empty Set)
         </button>
       </div>

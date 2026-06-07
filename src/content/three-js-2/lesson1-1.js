@@ -84,7 +84,7 @@ Always keep \`MeshNormalMaterial\` in your debugging toolkit.`,
 Eight spheres, each a different material. The point light orbits to show how each material responds to changing light direction. Notice: Basic and Normal don't change with lighting — they are unlit. Lambert has no specular. Phong has a specular highlight. PBR variants respond correctly to energy conservation.`,
       html: `<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.js"></script>
 <canvas id="cv" style="display:block;border-radius:6px"></canvas>
-<div id="info" style="font-family:monospace;font-size:10px;color:#475569;padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px"></div>`,
+<div id="info" style="font-family:monospace;font-size:10px;color:var(--color-text-secondary, #475569);padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px"></div>`,
       css: `body{margin:0;background:#060610}`,
       startCode: `var renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -255,7 +255,7 @@ Requirements:
 - Add a dark grey sphere next to it (\`MeshStandardMaterial({ color: 0x333333 })\`) to contrast the emissive effect`,
       html: `<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.js"></script>
 <canvas id="cv" style="display:block;border-radius:6px"></canvas>
-<div id="info" style="font-family:monospace;font-size:10px;color:#475569;padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px"></div>`,
+<div id="info" style="font-family:monospace;font-size:10px;color:var(--color-text-secondary, #475569);padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px"></div>`,
       css: `body{margin:0;background:#060610}`,
       startCode: `var renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));

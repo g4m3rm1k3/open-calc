@@ -251,7 +251,7 @@ export default function DerivativeMotionLabPro({ params = {} }) {
           <div className="flex gap-2 flex-wrap">
             <button
               onClick={() => setPlaying((p) => !p)}
-              className="px-3 py-1 rounded-lg bg-blue-500 text-white"
+              className="px-3 py-1 rounded-lg bg-blue-50 dark:bg-blue-900/300 text-white"
             >
               {playing ? 'Pause' : 'Play'}
             </button>
@@ -295,7 +295,7 @@ export default function DerivativeMotionLabPro({ params = {} }) {
                 onClick={() => setSpeed(val)}
                 className={`px-3 py-1 rounded-lg ${
                   Math.abs(speed - val) < 0.001
-                    ? 'bg-blue-500 text-white'
+                    ? 'bg-blue-50 dark:bg-blue-900/300 text-white'
                     : 'bg-slate-200 dark:bg-slate-700'
                 }`}
               >
@@ -311,7 +311,7 @@ export default function DerivativeMotionLabPro({ params = {} }) {
                 onClick={() => setK(val)}
                 className={`px-3 py-1 rounded-lg ${
                   k === val
-                    ? 'bg-green-500 text-white'
+                    ? 'bg-green-50 dark:bg-green-900/300 text-white'
                     : 'bg-slate-200 dark:bg-slate-700'
                 }`}
               >

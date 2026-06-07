@@ -281,7 +281,7 @@ input[type=range] { width: 90px; }
 .color-btn { width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
              border: 3px solid transparent; display: inline-block; }
 .color-btn.active { border-color: #fff; }
-canvas { background: #fff; border: 2px solid #333; cursor: crosshair; touch-action: none; }`,
+canvas { background: var(--color-background-primary, #ffffff); border: 2px solid #333; cursor: crosshair; touch-action: none; }`,
       startCode: `const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 

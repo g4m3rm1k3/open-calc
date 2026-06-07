@@ -108,7 +108,7 @@ export default function CrossProductViz() {
           <span className="text-xs font-mono w-12 text-right text-slate-500">{(angleA * 180 / Math.PI).toFixed(0)}°</span>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-sm font-mono w-14 text-emerald-600">angle b</span>
+          <span className="text-sm font-mono w-14 text-emerald-600 dark:text-emerald-400">angle b</span>
           <input type="range" min="0" max={Math.PI * 2} step="0.05" value={angleB}
             onChange={e => setAngleB(parseFloat(e.target.value))} className="flex-1 accent-emerald-500" />
           <span className="text-xs font-mono w-12 text-right text-slate-500">{(angleB * 180 / Math.PI).toFixed(0)}°</span>

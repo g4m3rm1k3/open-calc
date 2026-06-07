@@ -59,7 +59,7 @@ Both blocks below do the same thing. Run both and compare. The async/await versi
 </div>`,
       css: `.app{height:100%;background:#09111c;padding:16px;border-radius:12px;display:grid;grid-template-columns:1fr 1fr;gap:14px;font-family:monospace;}
 .col{display:flex;flex-direction:column;gap:8px;}
-.label{color:#475569;font-size:10px;letter-spacing:.08em;text-transform:uppercase;}
+.label{color:var(--color-text-secondary, #475569);font-size:10px;letter-spacing:.08em;text-transform:uppercase;}
 .box{flex:1;background:#050e1a;border:1px solid #1e293b;border-radius:8px;padding:10px;color:#93c5fd;font-size:12px;white-space:pre-wrap;}
 button{background:#1e3a5f;border:1px solid #38bdf8;color:#93c5fd;padding:8px;border-radius:8px;cursor:pointer;font-size:12px;font-family:monospace;}`,
       startCode: `function delay(ms, val) {
@@ -162,7 +162,7 @@ Click "Succeed" and "Fail" to see error handling in action. Notice how the \`fin
 </div>`,
       css: `.app{height:100%;background:#09111c;padding:18px;border-radius:12px;display:flex;flex-direction:column;gap:12px;font-family:monospace;}
 .status-box{padding:10px;border-radius:8px;text-align:center;font-weight:700;font-size:13px;transition:all .3s;}
-.neutral{background:#0f172a;border:1px solid #334155;color:#64748b;}
+.neutral{background:#0f172a;border:1px solid #334155;color:var(--color-text-secondary, #475569);}
 .ok{background:#064e3b;border:1px solid #34d399;color:#6ee7b7;}
 .err{background:#450a0a;border:1px solid #f87171;color:#fca5a5;}
 .result-box{flex:1;background:#050e1a;border:1px solid #1e293b;border-radius:8px;padding:10px;color:#93c5fd;font-size:12px;white-space:pre;}
@@ -278,7 +278,7 @@ Click each button and watch the timer. The sequential version takes 3× as long 
 </div>`,
       css: `.app{height:100%;background:#09111c;padding:16px;border-radius:12px;display:grid;grid-template-columns:1fr 1fr;gap:14px;font-family:monospace;}
 .col{display:flex;flex-direction:column;gap:8px;}
-.label{color:#475569;font-size:10px;letter-spacing:.08em;text-transform:uppercase;}
+.label{color:var(--color-text-secondary, #475569);font-size:10px;letter-spacing:.08em;text-transform:uppercase;}
 .time-bar{background:#111827;border-radius:6px;height:8px;overflow:hidden;}
 .fill{height:100%;width:0%;background:#f87171;border-radius:6px;transition:width .05s linear;}
 .fill.par{background:#34d399;}

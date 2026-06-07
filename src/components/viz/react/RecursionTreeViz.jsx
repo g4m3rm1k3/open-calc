@@ -137,13 +137,13 @@ export default function RecursionTreeViz() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+    <div className="max-w-6xl mx-auto p-6 bg-white dark:bg-slate-900 rounded-lg shadow-lg">
       <h2 className="text-3xl font-bold mb-6 text-center">
         The Tree of Recursion: How Functions Call Themselves
       </h2>
 
       <div className="mb-6">
-        <div className="bg-blue-50 p-4 rounded-lg mb-4">
+        <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg mb-4">
           <h3 className="font-bold mb-2">Choose a Recursive Function</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {EXAMPLES.map((ex, index) => (
@@ -152,8 +152,8 @@ export default function RecursionTreeViz() {
                 onClick={() => setSelectedExample(index)}
                 className={`p-4 border rounded-lg text-left transition-colors ${
                   selectedExample === index
-                    ? "bg-blue-500 text-white border-blue-500"
-                    : "bg-white hover:bg-gray-50 border-gray-300"
+                    ? "bg-blue-50 dark:bg-blue-900/300 text-white border-blue-500"
+                    : "bg-white dark:bg-slate-900 hover:bg-gray-50 dark:bg-slate-800 border-gray-300"
                 }`}
               >
                 <div className="font-semibold mb-1">{ex.name}</div>
@@ -163,7 +163,7 @@ export default function RecursionTreeViz() {
           </div>
         </div>
 
-        <div className="bg-green-50 p-4 rounded-lg mb-4">
+        <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg mb-4">
           <h3 className="font-bold mb-2">Current Function: {example.name}</h3>
           <p className="mb-2">
             <strong>Definition:</strong> {example.definition}
@@ -178,13 +178,13 @@ export default function RecursionTreeViz() {
               max="6"
               value={maxDepth}
               onChange={(e) => setMaxDepth(parseInt(e.target.value))}
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+              className="w-full h-2 bg-gray-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer"
             />
           </div>
           <div className="flex gap-4">
             <button
               onClick={() => setShowComputation(!showComputation)}
-              className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
+              className="px-4 py-2 bg-purple-50 dark:bg-purple-900/300 text-white rounded hover:bg-purple-600 transition-colors"
             >
               {showComputation ? "Hide" : "Show"} Computation Steps
             </button>
@@ -194,12 +194,12 @@ export default function RecursionTreeViz() {
 
       <div className="mb-6">
         <h3 className="text-xl font-bold mb-4 text-center">Recursion Tree</h3>
-        <div className="bg-gray-50 p-4 rounded-lg">
+        <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-lg">
           <svg width="800" height="500" className="w-full border rounded">
             {renderTree(tree)}
           </svg>
         </div>
-        <p className="text-sm text-gray-600 mt-2 text-center">
+        <p className="text-sm text-gray-600 dark:text-gray-300 mt-2 text-center">
           Each node represents a function call. Lines show which calls depend on
           which subcalls.
         </p>
@@ -210,12 +210,12 @@ export default function RecursionTreeViz() {
           <h3 className="text-xl font-bold mb-4 text-center">
             Step-by-Step Computation
           </h3>
-          <div className="bg-yellow-50 p-4 rounded-lg max-h-64 overflow-y-auto">
+          <div className="bg-yellow-50 dark:bg-yellow-900/30 p-4 rounded-lg max-h-64 overflow-y-auto">
             <div className="space-y-2">
               {getComputationSteps().map((step, index) => (
                 <div
                   key={index}
-                  className="bg-white p-3 rounded border font-mono text-sm"
+                  className="bg-white dark:bg-slate-900 p-3 rounded border font-mono text-sm"
                 >
                   {step}
                 </div>
@@ -226,30 +226,30 @@ export default function RecursionTreeViz() {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <div className="border-2 border-green-300 rounded-lg p-4">
-          <h3 className="text-lg font-bold mb-3 text-center text-green-700">
+        <div className="border-2 border-green-300 dark:border-green-700/50 rounded-lg p-4">
+          <h3 className="text-lg font-bold mb-3 text-center text-green-700 dark:text-green-300">
             ✓ Base Case
           </h3>
           <div className="text-center mb-4">
             <div className="text-4xl mb-2">🎯</div>
             <div className="font-mono text-lg">F(0) = 0, F(1) = 1</div>
           </div>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 dark:text-gray-300">
             The recursion must stop somewhere. Base cases provide the "ground
             truth" that everything else builds upon. Without them, recursion
             goes forever.
           </p>
         </div>
 
-        <div className="border-2 border-blue-300 rounded-lg p-4">
-          <h3 className="text-lg font-bold mb-3 text-center text-blue-700">
+        <div className="border-2 border-blue-300 dark:border-blue-700/50 rounded-lg p-4">
+          <h3 className="text-lg font-bold mb-3 text-center text-blue-700 dark:text-blue-300">
             → Recursive Case
           </h3>
           <div className="text-center mb-4">
             <div className="text-4xl mb-2">🔄</div>
             <div className="font-mono text-lg">F(n) = F(n-1) + F(n-2)</div>
           </div>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 dark:text-gray-300">
             Express the problem in terms of smaller instances of itself. Each
             call breaks down the problem until it hits the base case, then
             builds back up.
@@ -257,13 +257,13 @@ export default function RecursionTreeViz() {
         </div>
       </div>
 
-      <div className="bg-purple-50 p-4 rounded-lg">
+      <div className="bg-purple-50 dark:bg-purple-900/30 p-4 rounded-lg">
         <h3 className="font-bold mb-2">
           Recursion vs Iteration: Different Perspectives
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-          <div className="bg-white p-3 rounded border">
-            <h4 className="font-bold text-blue-600 mb-1">Recursion (Tree)</h4>
+          <div className="bg-white dark:bg-slate-900 p-3 rounded border">
+            <h4 className="font-bold text-blue-600 dark:text-blue-400 mb-1">Recursion (Tree)</h4>
             <ul className="list-disc list-inside space-y-1">
               <li>Expresses solution in terms of smaller problems</li>
               <li>Natural for tree-like structures</li>
@@ -271,8 +271,8 @@ export default function RecursionTreeViz() {
               <li>Matches mathematical induction</li>
             </ul>
           </div>
-          <div className="bg-white p-3 rounded border">
-            <h4 className="font-bold text-green-600 mb-1">Iteration (Loop)</h4>
+          <div className="bg-white dark:bg-slate-900 p-3 rounded border">
+            <h4 className="font-bold text-green-600 dark:text-green-400 mb-1">Iteration (Loop)</h4>
             <ul className="list-disc list-inside space-y-1">
               <li>Builds solution step by step</li>
               <li>Usually more efficient</li>
@@ -281,7 +281,7 @@ export default function RecursionTreeViz() {
             </ul>
           </div>
         </div>
-        <p className="mt-3 text-xs text-gray-600">
+        <p className="mt-3 text-xs text-gray-600 dark:text-gray-300">
           <strong>Key Insight:</strong> Every recursive function can be
           rewritten iteratively, and vice versa. The choice depends on which is
           more natural for the problem and which performs better.

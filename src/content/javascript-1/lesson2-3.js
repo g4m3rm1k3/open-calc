@@ -134,7 +134,7 @@ Run this and compare the output. Each loop style suits a different situation —
   <div id="s3" class="section"></div>
 </div>`,
       css: `.panel{height:100%;background:#09111c;padding:14px;border-radius:12px;display:flex;flex-direction:column;gap:6px;font-family:monospace;overflow-y:auto;}
-.section-label{color:#475569;font-size:10px;letter-spacing:.08em;text-transform:uppercase;}
+.section-label{color:var(--color-text-secondary, #475569);font-size:10px;letter-spacing:.08em;text-transform:uppercase;}
 .section{background:#050e1a;border:1px solid #1e293b;border-radius:8px;padding:8px;color:#93c5fd;font-size:12px;line-height:1.8;}`,
       startCode: `const animals = ["cat", "dog", "elephant", "stop", "fish"];
 
@@ -225,7 +225,7 @@ Try adding another product or changing the \`inStock\` flag.`,
   <div id="total" class="total-box">$0</div>
 </div>`,
       css: `.panel{height:100%;background:#09111c;padding:14px;border-radius:12px;display:flex;flex-direction:column;gap:6px;font-family:monospace;overflow-y:auto;}
-.label{color:#475569;font-size:10px;letter-spacing:.08em;text-transform:uppercase;}
+.label{color:var(--color-text-secondary, #475569);font-size:10px;letter-spacing:.08em;text-transform:uppercase;}
 .section{background:#050e1a;border:1px solid #1e293b;border-radius:8px;padding:8px;color:#93c5fd;font-size:12px;line-height:1.7;}
 .total-box{background:#0f2233;border:2px solid #38bdf8;border-radius:8px;padding:10px;color:#38bdf8;font-size:18px;font-weight:800;text-align:center;}`,
       startCode: `const products = [

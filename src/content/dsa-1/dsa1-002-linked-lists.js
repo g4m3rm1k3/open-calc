@@ -300,7 +300,7 @@ When it works, you'll see the two nodes and the pointer between them rendered be
 .val{padding:8px 14px;background:#1e1b4b;color:#a5b4fc;font-weight:bold;font-size:15px}
 .nxt{padding:8px 10px;background:#0f172a;color:#6366f1;font-size:11px;border-left:1px solid #4b5563}
 .arrow{display:inline-block;color:#6366f1;margin:0 4px;font-size:18px;vertical-align:middle}
-.null{display:inline-block;color:#475569;font-style:italic;font-size:13px;vertical-align:middle;margin-left:4px}
+.null{display:inline-block;color:var(--color-text-secondary, #475569);font-style:italic;font-size:13px;vertical-align:middle;margin-left:4px}
 .ok{color:#4ade80;margin-top:8px;font-size:12px}
 .err{color:#f87171;margin-top:8px;font-size:12px}`,
                 startCode: `class Node {
@@ -400,8 +400,8 @@ Now build the list itself. A \`LinkedList\` tracks one thing: the \`head\` node 
 When correct, clicking **Append** will add nodes and your linked list will render live.`,
                 html: `<div style="margin-bottom:8px;display:flex;gap:8px;align-items:center">
   <button id="btn-app" style="padding:7px 16px;border-radius:6px;border:none;background:#6d28d9;color:#fff;font-family:monospace;font-size:12px;cursor:pointer">Append</button>
-  <button id="btn-rst" style="padding:7px 12px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:#64748b;font-family:monospace;font-size:12px;cursor:pointer">Reset</button>
-  <span id="status" style="font-family:monospace;font-size:11px;color:#64748b"></span>
+  <button id="btn-rst" style="padding:7px 12px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:var(--color-text-secondary, #475569);font-family:monospace;font-size:12px;cursor:pointer">Reset</button>
+  <span id="status" style="font-family:monospace;font-size:11px;color:var(--color-text-secondary, #475569)"></span>
 </div>
 <div id="list-view" style="min-height:52px;padding:4px 0"></div>
 <div id="msg" style="font-family:monospace;font-size:12px;margin-top:8px;min-height:18px"></div>`,
@@ -410,7 +410,7 @@ When correct, clicking **Append** will add nodes and your linked list will rende
 .val{padding:8px 14px;background:#1e1b4b;color:#a5b4fc;font-weight:bold;font-size:15px}
 .nxt{padding:8px 8px;background:#0f172a;color:#6366f1;font-size:10px;border-left:1px solid #4b5563}
 .arrow{display:inline-block;color:#6366f1;margin:0 3px;font-size:16px;vertical-align:middle}
-.null{display:inline-block;color:#475569;font-style:italic;font-size:12px;vertical-align:middle}
+.null{display:inline-block;color:var(--color-text-secondary, #475569);font-style:italic;font-size:12px;vertical-align:middle}
 @keyframes pop{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}`,
                 startCode: `class Node {
   constructor(val) {
@@ -439,7 +439,7 @@ class LinkedList {
 // ── Render helper (don't edit this) ───────────────────
 function renderList(list) {
   const view = document.getElementById('list-view');
-  if (!list.head) { view.innerHTML = '<span style="color:#475569">(empty)</span>'; return; }
+  if (!list.head) { view.innerHTML = '<span style="color:var(--color-text-secondary, #475569)">(empty)</span>'; return; }
   let html = '', cur = list.head;
   while (cur) {
     html += \`<span class="node"><span class="val">\${cur.val}</span><span class="nxt">next</span></span>\`;
@@ -497,7 +497,7 @@ class LinkedList {
 
 function renderList(list) {
   const view = document.getElementById('list-view');
-  if (!list.head) { view.innerHTML = '<span style="color:#475569">(empty)</span>'; return; }
+  if (!list.head) { view.innerHTML = '<span style="color:var(--color-text-secondary, #475569)">(empty)</span>'; return; }
   let html = '', cur = list.head;
   while (cur) {
     html += \`<span class="node"><span class="val">\${cur.val}</span><span class="nxt">next</span></span>\`;
@@ -548,10 +548,10 @@ Also implement \`toArray()\` — traverse the list and return all values as a JS
                 html: `<div style="margin-bottom:8px;display:flex;gap:8px;flex-wrap:wrap">
   <button id="btn-pre" style="padding:7px 14px;border-radius:6px;border:none;background:#0d9488;color:#fff;font-family:monospace;font-size:12px;cursor:pointer">Prepend</button>
   <button id="btn-app" style="padding:7px 14px;border-radius:6px;border:none;background:#6d28d9;color:#fff;font-family:monospace;font-size:12px;cursor:pointer">Append</button>
-  <button id="btn-rst" style="padding:7px 12px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:#64748b;font-family:monospace;font-size:12px;cursor:pointer">Reset</button>
+  <button id="btn-rst" style="padding:7px 12px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:var(--color-text-secondary, #475569);font-family:monospace;font-size:12px;cursor:pointer">Reset</button>
 </div>
 <div id="list-view" style="min-height:52px;padding:4px 0"></div>
-<div id="arr-view" style="font-family:monospace;font-size:11px;color:#64748b;margin-top:4px"></div>
+<div id="arr-view" style="font-family:monospace;font-size:11px;color:var(--color-text-secondary, #475569);margin-top:4px"></div>
 <div id="msg" style="font-family:monospace;font-size:12px;color:#4ade80;margin-top:6px;min-height:18px"></div>`,
                 css: `body{margin:0;padding:14px;background:#0f172a;color:#e2e8f0;box-sizing:border-box;font-family:monospace}
 .node{display:inline-flex;border:2px solid #6366f1;border-radius:6px;overflow:hidden;margin:2px;animation:pop .2s ease}
@@ -559,7 +559,7 @@ Also implement \`toArray()\` — traverse the list and return all values as a JS
 .val{padding:8px 14px;background:#1e1b4b;color:#a5b4fc;font-weight:bold;font-size:15px}
 .nxt{padding:8px 8px;background:#0f172a;color:#6366f1;font-size:10px;border-left:1px solid #4b5563}
 .arrow{display:inline-block;color:#6366f1;margin:0 3px;font-size:16px;vertical-align:middle}
-.null{display:inline-block;color:#475569;font-style:italic;font-size:12px;vertical-align:middle}
+.null{display:inline-block;color:var(--color-text-secondary, #475569);font-style:italic;font-size:12px;vertical-align:middle}
 @keyframes pop{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}`,
                 startCode: `class Node {
   constructor(val) { this.val = val; this.next = null; }
@@ -596,7 +596,7 @@ let newHead = null;
 function renderList(list, highlightHead = false) {
   const view = document.getElementById('list-view');
   const arrView = document.getElementById('arr-view');
-  if (!list.head) { view.innerHTML = '<span style="color:#475569">(empty)</span>'; arrView.textContent=''; return; }
+  if (!list.head) { view.innerHTML = '<span style="color:var(--color-text-secondary, #475569)">(empty)</span>'; arrView.textContent=''; return; }
   let html = '', cur = list.head, first = true;
   while (cur) {
     const isNew = first && highlightHead;
@@ -652,7 +652,7 @@ class LinkedList {
 function renderList(list, hl=false) {
   const view=document.getElementById('list-view');
   const av=document.getElementById('arr-view');
-  if(!list.head){view.innerHTML='<span style="color:#475569">(empty)</span>';av.textContent='';return;}
+  if(!list.head){view.innerHTML='<span style="color:var(--color-text-secondary, #475569)">(empty)</span>';av.textContent='';return;}
   let html='',cur=list.head,first=true;
   while(cur){
     html+=\`<span class="node\${first&&hl?' new':''}"><span class="val">\${cur.val}</span><span class="nxt">next</span></span>\`;
@@ -685,10 +685,10 @@ Deletion is the trickiest operation. You need the node **before** the target so 
 **Draw it first:** Before coding, draw the boxes and arrows for a 3-node list and show what changes when you delete the middle node.`,
                 html: `<div id="list-view" style="min-height:52px;padding:4px 0"></div>
 <div style="margin:8px 0;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-  <span style="color:#64748b;font-family:monospace;font-size:12px">Delete val:</span>
+  <span style="color:var(--color-text-secondary, #475569);font-family:monospace;font-size:12px">Delete val:</span>
   <input id="del-val" type="number" value="7" style="width:56px;padding:5px 8px;border-radius:5px;border:1px solid #334155;background:#1e293b;color:#e2e8f0;font-family:monospace;font-size:12px">
   <button id="btn-del" style="padding:7px 14px;border-radius:6px;border:none;background:#b91c1c;color:#fff;font-family:monospace;font-size:12px;cursor:pointer">Delete →</button>
-  <button id="btn-rst" style="padding:7px 12px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:#64748b;font-family:monospace;font-size:12px;cursor:pointer">Reset</button>
+  <button id="btn-rst" style="padding:7px 12px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:var(--color-text-secondary, #475569);font-family:monospace;font-size:12px;cursor:pointer">Reset</button>
 </div>
 <div id="msg" style="font-family:monospace;font-size:12px;min-height:18px"></div>`,
                 css: `body{margin:0;padding:14px;background:#0f172a;color:#e2e8f0;box-sizing:border-box;font-family:monospace}
@@ -697,7 +697,7 @@ Deletion is the trickiest operation. You need the node **before** the target so 
 .val{padding:8px 14px;background:#1e1b4b;color:#a5b4fc;font-weight:bold;font-size:15px}
 .nxt{padding:8px 8px;background:#0f172a;color:#6366f1;font-size:10px;border-left:1px solid #4b5563}
 .arrow{display:inline-block;color:#6366f1;margin:0 3px;font-size:16px;vertical-align:middle}
-.null{display:inline-block;color:#475569;font-style:italic;font-size:12px;vertical-align:middle}`,
+.null{display:inline-block;color:var(--color-text-secondary, #475569);font-style:italic;font-size:12px;vertical-align:middle}`,
                 startCode: `class Node {
   constructor(val) { this.val = val; this.next = null; }
 }
@@ -741,7 +741,7 @@ class LinkedList {
 // ── Render (don't edit) ───────────────────────────────
 function renderList(list, deletedVal = null) {
   const view = document.getElementById('list-view');
-  if (!list.head) { view.innerHTML = '<span style="color:#475569">(empty)</span>'; return; }
+  if (!list.head) { view.innerHTML = '<span style="color:var(--color-text-secondary, #475569)">(empty)</span>'; return; }
   let html = '', cur = list.head;
   while (cur) {
     const isDel = cur.val === deletedVal;
@@ -793,7 +793,7 @@ class LinkedList {
     }
   }
 }
-function renderList(list){const v=document.getElementById('list-view');if(!list.head){v.innerHTML='<span style="color:#475569">(empty)</span>';return;}let h='',c=list.head;while(c){h+=\`<span class="node"><span class="val">\${c.val}</span><span class="nxt">next</span></span>\`;h+=c.next?'<span class="arrow">→</span>':'<span class="null">→ null</span>';c=c.next;}v.innerHTML=h;}
+function renderList(list){const v=document.getElementById('list-view');if(!list.head){v.innerHTML='<span style="color:var(--color-text-secondary, #475569)">(empty)</span>';return;}let h='',c=list.head;while(c){h+=\`<span class="node"><span class="val">\${c.val}</span><span class="nxt">next</span></span>\`;h+=c.next?'<span class="arrow">→</span>':'<span class="null">→ null</span>';c=c.next;}v.innerHTML=h;}
 const list=new LinkedList();const MSG=document.getElementById('msg');
 [12,7,43,5,28].forEach(v=>list.append(v));renderList(list);
 document.getElementById('btn-del').addEventListener('click',()=>{const val=parseInt(document.getElementById('del-val').value);const b=list.toArray();list.delete(val);const a=list.toArray();MSG.style.color=a.length<b.length?'#4ade80':'#f87171';MSG.textContent=a.length<b.length?\`Deleted \${val} ✓ → \${JSON.stringify(a)}\`:\`\${val} not found\`;renderList(list);});
@@ -825,7 +825,7 @@ The render and test code is provided. When all four operations work, you'll see 
 .val{padding:7px 12px;background:#1e1b4b;color:#a5b4fc;font-weight:bold}
 .nxt{padding:7px 8px;background:#0f172a;color:#6366f1;font-size:10px;border-left:1px solid #4b5563}
 .arrow{color:#6366f1;margin:0 3px;font-size:15px;vertical-align:middle}
-.null{color:#475569;font-style:italic;font-size:12px;vertical-align:middle}
+.null{color:var(--color-text-secondary, #475569);font-style:italic;font-size:12px;vertical-align:middle}
 .pass{color:#4ade80;margin:4px 0;font-size:12px}
 .fail{color:#f87171;margin:4px 0;font-size:12px}
 .section{margin-top:12px;color:#94a3b8;font-size:11px;border-top:1px solid #1e293b;padding-top:8px}

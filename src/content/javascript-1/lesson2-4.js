@@ -139,7 +139,7 @@ Click the buttons to see \`this\` behave correctly with a regular method and inc
 </div>`,
       css: `.panel{height:100%;background:#09111c;padding:18px;border-radius:12px;display:flex;gap:30px;justify-content:center;align-items:center;font-family:monospace;}
 .group{display:flex;flex-direction:column;align-items:center;gap:10px;}
-.label{color:#475569;font-size:10px;letter-spacing:.08em;text-transform:uppercase;text-align:center;}
+.label{color:var(--color-text-secondary, #475569);font-size:10px;letter-spacing:.08em;text-transform:uppercase;text-align:center;}
 .count-box{width:80px;height:70px;border:2px solid #4ade80;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#4ade80;background:#071c10;}
 .count-box.bad{border-color:#f87171;color:#f87171;background:#1c0707;}
 button{background:#1e2a3f;border:1px solid #334155;color:#94a3b8;padding:8px 14px;border-radius:8px;cursor:pointer;font-family:monospace;font-size:12px;}`,
@@ -403,7 +403,7 @@ The \`entries\` + for...of combination is how you iterate objects cleanly — yo
   <div id="freeze" class="section"></div>
 </div>`,
       css: `.panel{height:100%;background:#09111c;padding:14px;border-radius:12px;display:flex;flex-direction:column;gap:6px;font-family:monospace;overflow-y:auto;}
-.label{color:#475569;font-size:10px;letter-spacing:.08em;text-transform:uppercase;}
+.label{color:var(--color-text-secondary, #475569);font-size:10px;letter-spacing:.08em;text-transform:uppercase;}
 .section{background:#050e1a;border:1px solid #1e293b;border-radius:8px;padding:8px;color:#93c5fd;font-size:12px;line-height:1.8;}`,
       startCode: `const config = { theme: "dark", lang: "en", fontSize: 14 };
 

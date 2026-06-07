@@ -114,7 +114,7 @@ while (i > 0 && j > 0) {
 
 let h = "<div style='color:#60a5fa;font-size:14px;margin-bottom:6px'>LCS Table: <b>" + JSON.stringify(s1) + "</b> vs <b>" + JSON.stringify(s2) + "</b></div>";
 h += "<table style='border-collapse:collapse;margin-bottom:10px'>";
-h += "<tr><td style='width:36px;height:32px'></td><td style='width:36px;height:32px;color:#64748b;text-align:center'>&nbsp;</td>";
+h += "<tr><td style='width:36px;height:32px'></td><td style='width:36px;height:32px;color:var(--color-text-secondary, #475569);text-align:center'>&nbsp;</td>";
 for (let j2 = 0; j2 < n; j2++) {
   h += "<td style='width:36px;height:32px;text-align:center;color:#94a3b8;font-weight:bold'>" + s2[j2] + "</td>";
 }
@@ -136,7 +136,7 @@ for (let i2 = 0; i2 <= m; i2++) {
 }
 h += "</table>";
 h += "<div style='background:#1e293b;border-radius:6px;padding:8px 12px;color:#4ade80;font-size:13px'>LCS = <b>" + JSON.stringify(lcs) + "</b> &nbsp;|&nbsp; Length = " + lcs.length + "</div>";
-h += "<div style='margin-top:6px;color:#64748b;font-size:11px'>Gold = diagonal match (+1) &nbsp;|&nbsp; Blue = traceback path &nbsp;|&nbsp; Gray = base case</div>";
+h += "<div style='margin-top:6px;color:var(--color-text-secondary, #475569);font-size:11px'>Gold = diagonal match (+1) &nbsp;|&nbsp; Blue = traceback path &nbsp;|&nbsp; Gray = base case</div>";
 out.innerHTML = h;`,
                 outputHeight: 360,
               },
@@ -191,7 +191,7 @@ const opText   = { match: "#4ade80", sub: "#fca5a5", del: "#93c5fd", ins: "#93c5
 
 let h = "<div style='color:#60a5fa;font-size:14px;margin-bottom:6px'>Edit Distance: <b>" + JSON.stringify(s1) + "</b> to <b>" + JSON.stringify(s2) + "</b></div>";
 h += "<table style='border-collapse:collapse;margin-bottom:10px'>";
-h += "<tr><td style='width:36px;height:32px'></td><td style='width:36px;height:32px;text-align:center;color:#64748b'>&nbsp;</td>";
+h += "<tr><td style='width:36px;height:32px'></td><td style='width:36px;height:32px;text-align:center;color:var(--color-text-secondary, #475569)'>&nbsp;</td>";
 for (let j2 = 0; j2 < n; j2++) {
   h += "<td style='width:36px;height:32px;text-align:center;color:#94a3b8;font-weight:bold'>" + s2[j2] + "</td>";
 }
@@ -211,7 +211,7 @@ for (let i2 = 0; i2 <= m; i2++) {
 h += "</table>";
 h += "<div style='background:#1e293b;border-radius:6px;padding:8px 12px;color:#f59e0b;margin-bottom:6px'>Edit distance = <b>" + dp[m][n] + "</b></div>";
 h += "<div style='font-size:12px;color:#94a3b8'>Operations: " + ops.join(" → ") + "</div>";
-h += "<div style='margin-top:6px;color:#64748b;font-size:11px'>Green=match | Red=sub | Blue=ins/del | Gold border=optimal path</div>";
+h += "<div style='margin-top:6px;color:var(--color-text-secondary, #475569);font-size:11px'>Green=match | Red=sub | Blue=ins/del | Gold border=optimal path</div>";
 out.innerHTML = h;`,
                 outputHeight: 340,
               },
@@ -325,7 +325,7 @@ const lis = [];
 cur = endIdx;
 while (cur !== -1) { lis.unshift(nums[cur]); cur = parent[cur]; }
 h += "<div style='background:#1e293b;border-radius:6px;padding:8px 12px;color:#4ade80;font-size:13px'>LIS = [" + lis.join(", ") + "] &nbsp;|&nbsp; Length = " + maxLen + "</div>";
-h += "<div style='margin-top:6px;color:#64748b;font-size:11px'>Number above bar = dp[i] (LIS length ending here) &nbsp;|&nbsp; Blue = LIS elements</div>";
+h += "<div style='margin-top:6px;color:var(--color-text-secondary, #475569);font-size:11px'>Number above bar = dp[i] (LIS length ending here) &nbsp;|&nbsp; Blue = LIS elements</div>";
 out.innerHTML = h;`,
                 outputHeight: 290,
               },

@@ -147,7 +147,7 @@ A real-world pattern: persist a todo list across reloads.`,
   <div id="list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px;"></div>
   <div style="display:flex;gap:8px;">
     <button id="clearDone" style="flex:1;background:#1e2a3f;border:1px solid #334155;color:#94a3b8;padding:6px;border-radius:6px;cursor:pointer;font-family:monospace;font-size:11px;">Clear Done</button>
-    <div id="status" style="flex:2;color:#475569;font-size:11px;display:flex;align-items:center;padding:0 8px;">Loaded from localStorage</div>
+    <div id="status" style="flex:2;color:var(--color-text-secondary, #475569);font-size:11px;display:flex;align-items:center;padding:0 8px;">Loaded from localStorage</div>
   </div>
 </div>`,
       css: `body{margin:0;padding:0;background:#09111c;}`,
@@ -340,7 +340,7 @@ The form has three fields: \`#name\`, \`#email\`, \`#message\`. Log \`'saved'\` 
     <textarea id="message" rows="3" placeholder="Message" style="background:#1e2a3f;border:1px solid #334155;color:#e2e8f0;padding:8px;border-radius:6px;font-family:monospace;font-size:12px;resize:none;"></textarea>
     <button type="submit" style="background:#3b82f6;border:none;color:#fff;padding:8px;border-radius:6px;cursor:pointer;font-family:monospace;font-size:12px;">Submit</button>
   </form>
-  <div id="status" style="margin-top:8px;color:#475569;font-size:11px;"></div>
+  <div id="status" style="margin-top:8px;color:var(--color-text-secondary, #475569);font-size:11px;"></div>
 </div>`,
       css: `body{margin:0;padding:0;background:#09111c;}`,
       startCode: `const FORM_KEY = 'contact_draft';

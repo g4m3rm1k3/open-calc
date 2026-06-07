@@ -865,7 +865,7 @@ function InsightPanel({ rocketD, rocketH, rocketDhdt, planeAlt, planeX, planeDxd
       <Sec id="rocket_intuition" title="🚀 Why does the camera slow down as the rocket rises?" color="#a78bfa">
         <p style={{ fontSize: 13, color: "var(--color-text-secondary)", lineHeight: 1.75, marginBottom: 8 }}>
           At launch (h=0), 1 foot of rise creates a noticeable angle change — the rocket is right on the horizon line.
-          At high altitude (h >> d), 1 foot of rise barely changes the angle — the rocket is nearly overhead.
+          At high altitude (h &gt;&gt; d), 1 foot of rise barely changes the angle — the rocket is nearly overhead.
           <br /><br />
           The formula dθ/dt = dhdt·d/(h²+d²) = (dhdt/d)·1/(1+(h/d)²) is a <strong>Lorentzian</strong>.
           It peaks at h=0 and decays smoothly to 0. Same shape appears in quantum mechanics and signal processing.

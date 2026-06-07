@@ -96,7 +96,7 @@ export default function BrakeOrCrashSim() {
 
       <div className="flex flex-wrap gap-2">
         <button onClick={() => setMode('average')} className={`px-3 py-1 rounded text-xs ${mode === 'average' ? 'bg-amber-500 text-white' : 'bg-white dark:bg-slate-800 border'}`}>Level 1: Average</button>
-        <button onClick={() => setMode('instant')} className={`px-3 py-1 rounded text-xs ${mode === 'instant' ? 'bg-emerald-500 text-white' : 'bg-white dark:bg-slate-800 border'}`}>Level 2: Instant</button>
+        <button onClick={() => setMode('instant')} className={`px-3 py-1 rounded text-xs ${mode === 'instant' ? 'bg-emerald-50 dark:bg-emerald-900/300 text-white' : 'bg-white dark:bg-slate-800 border'}`}>Level 2: Instant</button>
         <button onClick={() => setRunning((r) => !r)} className="px-3 py-1 rounded text-xs bg-brand-600 text-white">{running ? 'Brake/Pause' : 'Start'}</button>
         <button onClick={reset} className="px-3 py-1 rounded text-xs bg-slate-200 dark:bg-slate-700">Reset</button>
       </div>
@@ -106,8 +106,8 @@ export default function BrakeOrCrashSim() {
         {/* Computer estimate ghost */}
         <div className="absolute top-6 h-8 w-8 border-2 border-amber-500/70 bg-amber-300/30 rounded" style={{ left: `${Math.min(94, (estimatedX / wall) * 100)}%` }} />
         {/* True car */}
-        <div className="absolute top-5 h-10 w-10 bg-blue-500 rounded shadow" style={{ left: `${Math.min(92, (x / wall) * 100)}%` }} />
-        <div className="absolute right-2 top-2 h-14 w-2 bg-red-500" />
+        <div className="absolute top-5 h-10 w-10 bg-blue-50 dark:bg-blue-900/300 rounded shadow" style={{ left: `${Math.min(92, (x / wall) * 100)}%` }} />
+        <div className="absolute right-2 top-2 h-14 w-2 bg-red-50 dark:bg-red-900/300" />
         <div className="absolute left-2 top-1 text-[10px] text-slate-500">Ghost = stale computer estimate</div>
       </div>
 
@@ -127,7 +127,7 @@ export default function BrakeOrCrashSim() {
       </div>
 
       {crashed && (
-        <div className="p-3 rounded border border-red-300 bg-red-50 dark:bg-red-950/30 dark:border-red-800 text-red-700 dark:text-red-300 text-sm">
+        <div className="p-3 rounded border border-red-300 dark:border-red-700/50 bg-red-50 dark:bg-red-950/30 dark:border-red-800 text-red-700 dark:text-red-300 text-sm">
           Crash! Your 2-second average telemetry lagged reality. Computer estimated wall distance using stale data while true position had already reached the obstacle.
         </div>
       )}

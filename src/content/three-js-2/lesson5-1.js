@@ -126,7 +126,7 @@ Each surface comes with its mathematical definition in the info panel.`,
   <button id="btn-wire" style="padding:4px 10px;border-radius:5px;border:1px solid #475569;background:transparent;color:#94a3b8;font-family:monospace;font-size:10px;cursor:pointer;margin-left:6px">Wireframe</button>
 </div>
 <canvas id="cv" style="display:block;border-radius:0 0 6px 6px"></canvas>
-<div id="info" style="font-family:monospace;font-size:10px;color:#475569;padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px;white-space:pre"></div>`,
+<div id="info" style="font-family:monospace;font-size:10px;color:var(--color-text-secondary, #475569);padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px;white-space:pre"></div>`,
       css: `body{margin:0;background:#060610}`,
       startCode: `var renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -235,7 +235,7 @@ function waveCylinder(u, v, target) {
 **Option C — Your own!** Combine any trig functions. The only rule: map (u,v) ∈ [0,1]² → (x,y,z).`,
       html: `<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.js"></script>
 <canvas id="cv" style="display:block;border-radius:6px"></canvas>
-<div id="info" style="font-family:monospace;font-size:10px;color:#475569;padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px"></div>`,
+<div id="info" style="font-family:monospace;font-size:10px;color:var(--color-text-secondary, #475569);padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px"></div>`,
       css: `body{margin:0;background:#060610}`,
       startCode: `var renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -346,7 +346,7 @@ Requirements:
 4. Call \`geo.computeVertexNormals()\` to update shading`,
       html: `<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.js"></script>
 <canvas id="cv" style="display:block;border-radius:6px"></canvas>
-<div id="info" style="font-family:monospace;font-size:10px;color:#475569;padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px"></div>`,
+<div id="info" style="font-family:monospace;font-size:10px;color:var(--color-text-secondary, #475569);padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px"></div>`,
       css: `body{margin:0;background:#060610}`,
       startCode: `var renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));

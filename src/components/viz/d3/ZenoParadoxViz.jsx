@@ -128,7 +128,7 @@ const ZenoParadoxViz = ({ width = 800, height = 300 }) => {
         <div className="flex gap-4 mt-6">
             <button 
               onClick={() => setStepCount(p => Math.min(12, p + 1))}
-              className="px-6 py-2 bg-blue-500 text-white font-bold rounded hover:bg-blue-600 transition"
+              className="px-6 py-2 bg-blue-50 dark:bg-blue-900/300 text-white font-bold rounded hover:bg-blue-600 transition"
               disabled={stepCount >= 12}
             >
                Take Next Step

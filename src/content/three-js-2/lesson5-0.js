@@ -113,7 +113,7 @@ A CatmullRom, a Cubic Bézier, and a helix rendered as tubes. A small cone anima
   <button id="btn-wire" style="padding:5px 12px;border-radius:6px;border:1px solid #475569;background:transparent;color:#94a3b8;font-family:monospace;font-size:11px;cursor:pointer">Toggle Wireframe</button>
 </div>
 <canvas id="cv" style="display:block;border-radius:0 0 6px 6px"></canvas>
-<div id="info" style="font-family:monospace;font-size:10px;color:#475569;padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px"></div>`,
+<div id="info" style="font-family:monospace;font-size:10px;color:var(--color-text-secondary, #475569);padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px"></div>`,
       css: `body{margin:0;background:#060610}`,
       startCode: `var renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -244,7 +244,7 @@ Requirements:
 - Also show the "control handle lines" from p0→p1 and p2→p3 as thin lines`,
       html: `<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.js"></script>
 <canvas id="cv" style="display:block;border-radius:6px"></canvas>
-<div id="info" style="font-family:monospace;font-size:10px;color:#475569;padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px"></div>`,
+<div id="info" style="font-family:monospace;font-size:10px;color:var(--color-text-secondary, #475569);padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px"></div>`,
       css: `body{margin:0;background:#060610}`,
       startCode: `var renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -334,7 +334,7 @@ Requirements:
 6. Orient the object with \`setFromUnitVectors(upVec, dir)\``,
       html: `<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.js"></script>
 <canvas id="cv" style="display:block;border-radius:6px"></canvas>
-<div id="info" style="font-family:monospace;font-size:10px;color:#475569;padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px"></div>`,
+<div id="info" style="font-family:monospace;font-size:10px;color:var(--color-text-secondary, #475569);padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px"></div>`,
       css: `body{margin:0;background:#060610}`,
       startCode: `var renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));

@@ -119,15 +119,15 @@ const c = ctx.createConicGradient(startAngle, cx, cy);
       html: `<div style="display:flex; flex-wrap:wrap; gap:16px; padding:20px; background:#1a1a2e; min-height:100vh; justify-content:center; align-items:flex-start">
   <div>
     <canvas id="g1" width="240" height="200" style="display:block; background:#16213e; border:1px solid #1e3a5f; border-radius:4px"></canvas>
-    <p style="color:#475569; font:11px Courier New; margin-top:6px; text-align:center">Linear gradient</p>
+    <p style="color:var(--color-text-secondary, #475569); font:11px Courier New; margin-top:6px; text-align:center">Linear gradient</p>
   </div>
   <div>
     <canvas id="g2" width="240" height="200" style="display:block; background:#16213e; border:1px solid #1e3a5f; border-radius:4px"></canvas>
-    <p style="color:#475569; font:11px Courier New; margin-top:6px; text-align:center">Radial gradient</p>
+    <p style="color:var(--color-text-secondary, #475569); font:11px Courier New; margin-top:6px; text-align:center">Radial gradient</p>
   </div>
   <div>
     <canvas id="g3" width="240" height="200" style="display:block; background:#16213e; border:1px solid #1e3a5f; border-radius:4px"></canvas>
-    <p style="color:#475569; font:11px Courier New; margin-top:6px; text-align:center">Conic gradient + on a path</p>
+    <p style="color:var(--color-text-secondary, #475569); font:11px Courier New; margin-top:6px; text-align:center">Conic gradient + on a path</p>
   </div>
 </div>`,
       css: `* { box-sizing: border-box; margin: 0; padding: 0; }`,

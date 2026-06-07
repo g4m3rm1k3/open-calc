@@ -103,7 +103,7 @@ for (let i = 0; i < m; i++) {
 }
 h += "</table>";
 h += "<div style='background:#1e293b;border-radius:6px;padding:8px 12px;color:#f59e0b;font-size:13px'>Answer: dp[" + (m-1) + "][" + (n-1) + "] = <b>" + dp[m-1][n-1] + "</b> distinct paths</div>";
-h += "<div style='margin-top:6px;color:#64748b;font-size:11px'>Darker blue = fewer paths | Brighter = more paths | Orange = answer</div>";
+h += "<div style='margin-top:6px;color:var(--color-text-secondary, #475569);font-size:11px'>Darker blue = fewer paths | Brighter = more paths | Orange = answer</div>";
 out.innerHTML = h;`,
                 outputHeight: 310,
               },
@@ -155,7 +155,7 @@ while (pi > 0 || pj > 0) {
 let h = "<div style='color:#60a5fa;font-size:14px;margin-bottom:4px'>Minimum Path Sum — " + m + " x " + n + " grid</div>";
 h += "<div style='color:#94a3b8;font-size:12px;margin-bottom:8px'>dp[i][j] = grid[i][j] + min(above, left) &nbsp; | &nbsp; starred cells = optimal path</div>";
 h += "<div style='display:flex;gap:16px;margin-bottom:8px'>";
-h += "<div><div style='color:#64748b;font-size:11px;margin-bottom:4px'>Grid (costs)</div><table style='border-collapse:collapse'>";
+h += "<div><div style='color:var(--color-text-secondary, #475569);font-size:11px;margin-bottom:4px'>Grid (costs)</div><table style='border-collapse:collapse'>";
 for (let i = 0; i < m; i++) {
   h += "<tr>";
   for (let j = 0; j < n; j++) {
@@ -164,7 +164,7 @@ for (let i = 0; i < m; i++) {
   h += "</tr>";
 }
 h += "</table></div>";
-h += "<div><div style='color:#64748b;font-size:11px;margin-bottom:4px'>DP table (accumulated)</div><table style='border-collapse:collapse'>";
+h += "<div><div style='color:var(--color-text-secondary, #475569);font-size:11px;margin-bottom:4px'>DP table (accumulated)</div><table style='border-collapse:collapse'>";
 for (let i = 0; i < m; i++) {
   h += "<tr>";
   for (let j = 0; j < n; j++) {
@@ -223,7 +223,7 @@ let h = "<div style='color:#60a5fa;font-size:14px;margin-bottom:10px'>Space Opti
 h += "<div style='color:#94a3b8;font-size:12px;margin-bottom:10px'>dp[j] before update = value from row above. dp[j-1] after update = value from left. Same recurrence, one array.</div>";
 snapshots.forEach(function(s) {
   h += "<div style='margin-bottom:6px'>";
-  h += "<div style='color:#64748b;font-size:11px;margin-bottom:3px'>" + s.label + ":</div>";
+  h += "<div style='color:var(--color-text-secondary, #475569);font-size:11px;margin-bottom:3px'>" + s.label + ":</div>";
   h += "<div style='display:flex;gap:4px'>";
   s.arr.forEach(function(v, j) {
     const isLast = (j === n-1 && s.row === m-1);
@@ -293,7 +293,7 @@ const maxDp = Math.max(...dp.flat());
 
 let h = "<div style='display:flex;gap:16px'>";
 // Energy grid
-h += "<div><div style='color:#64748b;font-size:11px;margin-bottom:4px'>Energy map (0=low, 9=high)</div><table style='border-collapse:collapse'>";
+h += "<div><div style='color:var(--color-text-secondary, #475569);font-size:11px;margin-bottom:4px'>Energy map (0=low, 9=high)</div><table style='border-collapse:collapse'>";
 for (let i = 0; i < rows; i++) {
   h += "<tr>";
   for (let j = 0; j < cols; j++) {
@@ -304,7 +304,7 @@ for (let i = 0; i < rows; i++) {
 }
 h += "</table></div>";
 // DP table
-h += "<div><div style='color:#64748b;font-size:11px;margin-bottom:4px'>DP table (cumulative min energy)</div><table style='border-collapse:collapse'>";
+h += "<div><div style='color:var(--color-text-secondary, #475569);font-size:11px;margin-bottom:4px'>DP table (cumulative min energy)</div><table style='border-collapse:collapse'>";
 for (let i = 0; i < rows; i++) {
   h += "<tr>";
   for (let j = 0; j < cols; j++) {
@@ -315,7 +315,7 @@ for (let i = 0; i < rows; i++) {
 }
 h += "</table></div></div>";
 h += "<div style='margin-top:10px;background:#450a0a;border-radius:6px;padding:8px 12px;color:#f87171;font-size:12px'>Red cells = minimum energy seam (total cost: " + dp[rows-1][seam[rows-1]] + "). Removing this column resizes the image without distorting important content.</div>";
-h += "<div style='margin-top:6px;color:#64748b;font-size:11px'>This exact algorithm runs in Photoshop Content-Aware Scale. Grid DP at production scale.</div>";
+h += "<div style='margin-top:6px;color:var(--color-text-secondary, #475569);font-size:11px'>This exact algorithm runs in Photoshop Content-Aware Scale. Grid DP at production scale.</div>";
 out.innerHTML = h;`,
                 outputHeight: 360,
               },

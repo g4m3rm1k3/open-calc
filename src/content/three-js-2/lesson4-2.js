@@ -135,7 +135,7 @@ helperMesh.layers.set(2);  // this helper is never picked
 Move your mouse over the objects to see hover highlighting. Click to select (turn wireframe on). Click again in empty space to deselect. The intersection data (world position, face normal, distance) is shown below.`,
       html: `<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.js"></script>
 <canvas id="cv" style="display:block;border-radius:6px"></canvas>
-<div id="info" style="font-family:monospace;font-size:10px;color:#475569;padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px;white-space:pre;min-height:60px"></div>`,
+<div id="info" style="font-family:monospace;font-size:10px;color:var(--color-text-secondary, #475569);padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px;white-space:pre;min-height:60px"></div>`,
       css: `body{margin:0;background:#060610}`,
       startCode: `var renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -279,7 +279,7 @@ sphere.position.z = planeHit.z;
 \`\`\``,
       html: `<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.js"></script>
 <canvas id="cv" style="display:block;border-radius:6px"></canvas>
-<div id="info" style="font-family:monospace;font-size:10px;color:#475569;padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px"></div>`,
+<div id="info" style="font-family:monospace;font-size:10px;color:var(--color-text-secondary, #475569);padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px"></div>`,
       css: `body{margin:0;background:#060610}`,
       startCode: `var renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -384,7 +384,7 @@ faceIndicator.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), worldNorma
 The starter code has the indicator mesh set up — your job is to update it each frame from the raycast hit data.`,
       html: `<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.js"></script>
 <canvas id="cv" style="display:block;border-radius:6px"></canvas>
-<div id="info" style="font-family:monospace;font-size:10px;color:#475569;padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px;white-space:pre"></div>`,
+<div id="info" style="font-family:monospace;font-size:10px;color:var(--color-text-secondary, #475569);padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px;white-space:pre"></div>`,
       css: `body{margin:0;background:#060610}`,
       startCode: `var renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));

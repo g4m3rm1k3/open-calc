@@ -409,6 +409,16 @@ function TopBar({
           >
             <FileText className="w-5 h-5" />
           </NavLink>
+          <NavLink
+            to="/viz-gallery"
+            title="Viz Gallery"
+            aria-label="Viz Gallery"
+            className={({ isActive }) =>
+              `p-2 rounded-lg transition-all ${isActive ? "bg-fuchsia-100 dark:bg-fuchsia-900/40 text-fuchsia-700 dark:text-fuchsia-300 border border-fuchsia-300 dark:border-fuchsia-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`
+            }
+          >
+            <Sparkles className="w-5 h-5" />
+          </NavLink>
           <button
             onClick={onHelpToggle}
             className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"

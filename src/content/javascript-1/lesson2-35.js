@@ -156,8 +156,8 @@ Click "Add item" to insert a new \`<div>\` into the list, "Clear" to empty it. T
 button{background:#1e3a5f;border:1px solid #38bdf8;color:#93c5fd;padding:8px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-family:monospace;}
 .list{flex:1;display:flex;flex-direction:column;gap:6px;overflow-y:auto;}
 .item{background:#111827;border:1px solid #1e293b;border-radius:8px;padding:10px;color:#e2e8f0;font-size:13px;display:flex;justify-content:space-between;align-items:center;}
-.remove-btn{background:none;border:none;color:#475569;cursor:pointer;font-size:16px;padding:0 4px;}
-.counter{color:#475569;font-size:11px;text-align:right;}`,
+.remove-btn{background:none;border:none;color:var(--color-text-secondary, #475569);cursor:pointer;font-size:16px;padding:0 4px;}
+.counter{color:var(--color-text-secondary, #475569);font-size:11px;text-align:right;}`,
       startCode: `let count = 0;
 
 document.getElementById('addBtn').onclick = () => {
@@ -435,7 +435,7 @@ button{background:#1e3a5f;border:1px solid #38bdf8;color:#93c5fd;padding:10px;bo
 .user-list{display:flex;flex-direction:column;gap:6px;overflow-y:auto;}
 .user-card{background:#111827;border:1px solid #1e293b;border-radius:8px;padding:10px;}
 .user-card .n{color:#38bdf8;font-weight:700;font-size:13px;}
-.user-card .e{color:#64748b;font-size:11px;}
+.user-card .e{color:var(--color-text-secondary, #475569);font-size:11px;}
 .user-card .r{font-size:10px;padding:2px 6px;border-radius:4px;background:#0f2233;color:#4ade80;display:inline-block;margin-top:4px;}
 .err{color:#f87171;font-size:12px;}`,
       startCode: `const users = [];   // in-memory list of user objects

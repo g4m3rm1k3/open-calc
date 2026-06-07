@@ -156,7 +156,7 @@ export default function LinearApproximation() {
           <thead>
             <tr className="bg-slate-100 dark:bg-slate-800">
               <th className="px-2 py-1 text-left text-slate-600 dark:text-slate-400">x</th>
-              <th className="px-2 py-1 text-right text-indigo-600">f(x) exact</th>
+              <th className="px-2 py-1 text-right text-indigo-600 dark:text-indigo-400">f(x) exact</th>
               <th className="px-2 py-1 text-right text-amber-600">L(x) approx</th>
               <th className="px-2 py-1 text-right text-slate-500">error</th>
             </tr>
@@ -169,7 +169,7 @@ export default function LinearApproximation() {
               return (
                 <tr key={x} className="border-t border-slate-100 dark:border-slate-800">
                   <td className="px-2 py-0.5 font-mono">{x.toFixed(2)}</td>
-                  <td className="px-2 py-0.5 text-right font-mono text-indigo-600">{isFinite(exact) ? exact.toFixed(5) : 'undef'}</td>
+                  <td className="px-2 py-0.5 text-right font-mono text-indigo-600 dark:text-indigo-400">{isFinite(exact) ? exact.toFixed(5) : 'undef'}</td>
                   <td className="px-2 py-0.5 text-right font-mono text-amber-600">{approx.toFixed(5)}</td>
                   <td className="px-2 py-0.5 text-right font-mono text-slate-500">{isFinite(err) ? err.toFixed(5) : '—'}</td>
                 </tr>

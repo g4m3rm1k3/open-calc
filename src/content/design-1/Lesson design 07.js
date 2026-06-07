@@ -283,7 +283,7 @@ The cell below demonstrates each affordance signal. Toggle them off one by one a
       css: `body { background: #0f172a; padding: 24px; margin: 0; font-family: system-ui, sans-serif; }
 #affordance-demo { max-width: 500px; }
 #aff-controls { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;
-  font-size: 12px; color: #64748b; }
+  font-size: 12px; color: var(--color-text-secondary, #475569); }
 #aff-controls label { display: flex; align-items: center; gap: 6px;
   background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 6px 10px;
   cursor: pointer; user-select: none; }
@@ -302,7 +302,7 @@ The cell below demonstrates each affordance signal. Toggle them off one by one a
 .aff-fake-btn { padding: 10px 20px; background: #334155; color: #94a3b8;
   border-radius: 8px; font-size: 14px; font-weight: 500;
   /* no cursor:pointer, no hover state — looks interactive but isn't */ }
-#aff-legend { display: flex; gap: 16px; margin-top: 14px; font-size: 11px; color: #64748b; }
+#aff-legend { display: flex; gap: 16px; margin-top: 14px; font-size: 11px; color: var(--color-text-secondary, #475569); }
 .aff-leg-item { display: flex; align-items: center; gap: 5px; }
 .aff-dot  { width: 8px; height: 8px; border-radius: 50%; }
 .aff-dot.good { background: #4ade80; }
@@ -433,7 +433,7 @@ The cell below shows a toolbar with hit target violations. The audit reads actua
 /* BROKEN: close button even smaller */
 .tt-close   { width: 20px; height: 20px; display: flex; align-items: center;
   justify-content: center; background: transparent; border: none;
-  color: #64748b; font-size: 12px; cursor: pointer; border-radius: 4px; }
+  color: var(--color-text-secondary, #475569); font-size: 12px; cursor: pointer; border-radius: 4px; }
 .tt-close:hover { background: rgba(239,68,68,0.15); color: #f87171; }
 #target-overlay { position: relative; height: 0; }
 .target-box { position: absolute; border: 2px solid; border-radius: 4px;
@@ -1619,7 +1619,7 @@ The test verifies: your redesigned flow has ≤5 steps, you've identified the fo
 </div>`,
       css: `body { background: #0f172a; padding: 24px; margin: 0; font-family: system-ui, sans-serif; }
 #cost-audit { max-width: 560px; }
-.ca-label { font-size: 10px; font-weight: 700; color: #475569;
+.ca-label { font-size: 10px; font-weight: 700; color: var(--color-text-secondary, #475569);
   letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 8px; }
 .ca-steps { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
 .ca-step  { font-size: 11px; font-weight: 500; padding: 4px 10px;

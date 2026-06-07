@@ -76,7 +76,7 @@ export default function InductionProofSimulator({ params = {} }) {
               <div
                 key={i}
                 className={`w-16 h-16 flex items-center justify-center text-2xl font-bold rounded-2xl shadow-inner transition-all ${
-                  i < step ? 'bg-emerald-500 text-white scale-110' : 'bg-slate-200 dark:bg-slate-700 text-slate-400'
+                  i < step ? 'bg-emerald-50 dark:bg-emerald-900/300 text-white scale-110' : 'bg-slate-200 dark:bg-slate-700 text-slate-400'
                 }`}
               >
                 {i === 0 ? 'Base' : `k+${i}`}

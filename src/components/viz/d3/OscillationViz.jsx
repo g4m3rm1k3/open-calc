@@ -100,7 +100,7 @@ export default function OscillationViz() {
           format={v => `${v}×`}
         />
 
-        <div className={`rounded-lg px-4 py-2 text-sm transition-colors duration-300 ${highZoom ? 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-300' : 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-300'}`}>
+        <div className={`rounded-lg px-4 py-2 text-sm transition-colors duration-300 ${highZoom ? 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 dark:bg-red-900/20 dark:text-red-300' : 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 dark:bg-indigo-900/20 dark:text-indigo-300'}`}>
           {infoText}
         </div>
 

@@ -48,7 +48,7 @@ Run this. Then try changing \`"World"\` to your name.`,
   <div class="label">Console logs appear below</div>
 </div>`,
       css: `.output-panel{height:100%;background:#09111c;padding:18px;border-radius:12px;display:flex;flex-direction:column;gap:12px;font-family:monospace;}
-.label{color:#475569;font-size:11px;letter-spacing:.08em;text-transform:uppercase;}
+.label{color:var(--color-text-secondary, #475569);font-size:11px;letter-spacing:.08em;text-transform:uppercase;}
 .result-box{background:#0f2233;border:1px solid #38bdf8;border-radius:8px;padding:12px;font-size:15px;font-weight:700;color:#38bdf8;}`,
       startCode: `// --- Define the function (nothing runs yet) ---
 function greet(name) {
@@ -166,7 +166,7 @@ Arrow functions shine in array methods like \`.map()\`, \`.filter()\`, \`.reduce
   <div class="row" id="r3">?</div>
 </div>`,
       css: `.panel{height:100%;background:#09111c;padding:14px;border-radius:12px;display:flex;flex-direction:column;gap:8px;font-family:monospace;}
-.label{color:#475569;font-size:10px;letter-spacing:.08em;text-transform:uppercase;}
+.label{color:var(--color-text-secondary, #475569);font-size:10px;letter-spacing:.08em;text-transform:uppercase;}
 .row{background:#111827;border:1px solid #1e293b;border-radius:8px;padding:10px;color:#e2e8f0;font-size:13px;}`,
       startCode: `// Explicit return — braces required, return keyword required
 const square1 = (n) => { return n * n; };

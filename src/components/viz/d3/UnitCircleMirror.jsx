@@ -438,7 +438,7 @@ export default function UnitCircleMirror({ params }) {
                     <button 
                         key={m.id}
                         onClick={() => setViewMode(m.id)}
-                        className={`py-1.5 text-[10px] uppercase font-bold rounded ${viewMode === m.id ? 'bg-white dark:bg-slate-700 shadow-sm text-indigo-600' : 'text-slate-500'}`}
+                        className={`py-1.5 text-[10px] uppercase font-bold rounded ${viewMode === m.id ? 'bg-white dark:bg-slate-700 shadow-sm text-indigo-600 dark:text-indigo-400' : 'text-slate-500'}`}
                     >
                         {m.label}
                     </button>
@@ -453,15 +453,15 @@ export default function UnitCircleMirror({ params }) {
                   <span className="text-[10px] font-bold text-slate-600 dark:text-slate-300">Tangent (Vertical Wall)</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-indigo-500 border border-dashed border-slate-400" />
+                  <div className="w-3 h-3 rounded-full bg-indigo-50 dark:bg-indigo-900/300 border border-dashed border-slate-400" />
                   <span className="text-[10px] font-bold text-slate-600 dark:text-slate-300">Secant (Extended Radius)</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-pink-500" />
+                  <div className="w-3 h-3 rounded-full bg-pink-50 dark:bg-pink-900/300" />
                   <span className="text-[10px] font-bold text-slate-600 dark:text-slate-300">Cotangent (Horizontal Ceiling)</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-rose-500 border border-dashed border-slate-400" />
+                  <div className="w-3 h-3 rounded-full bg-rose-50 dark:bg-rose-900/300 border border-dashed border-slate-400" />
                   <span className="text-[10px] font-bold text-slate-600 dark:text-slate-300">Cosecant (Extended Radius)</span>
                 </div>
             </div>
@@ -489,7 +489,7 @@ export default function UnitCircleMirror({ params }) {
           <section className="space-y-3">
             <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">Visualization Toggles</h4>
             
-            <label className="flex items-center justify-between p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-indigo-300 transition-colors">
+            <label className="flex items-center justify-between p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-indigo-300 dark:border-indigo-700/50 transition-colors">
                 <div className="flex flex-col">
                     <span className="text-sm font-bold text-slate-700 dark:text-slate-200">Mirror Mode</span>
                     <span className="text-[10px] text-slate-500">Reflection path to Quadrant 1</span>
@@ -497,7 +497,7 @@ export default function UnitCircleMirror({ params }) {
                 <input type="checkbox" checked={mirrorMode} onChange={e => setMirrorMode(e.target.checked)} className="w-5 h-5 accent-indigo-600" />
             </label>
 
-            <label className="flex items-center justify-between p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-indigo-300 transition-colors">
+            <label className="flex items-center justify-between p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-indigo-300 dark:border-indigo-700/50 transition-colors">
                 <div className="flex flex-col">
                     <span className="text-sm font-bold text-slate-700 dark:text-slate-200">Show All Points</span>
                     <span className="text-[10px] text-slate-500">Display labels for all families</span>
@@ -519,7 +519,7 @@ export default function UnitCircleMirror({ params }) {
                             className={`flex flex-col items-center justify-center p-2 rounded-xl border transition-all ${
                                 isActive 
                                 ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg' 
-                                : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-indigo-300'
+                                : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:border-indigo-700/50'
                             }`}
                         >
                             <span className="text-[10px] opacity-80">{unitMode === 'rad' ? label : NOTABLE_ANGLES.find(n => n.l === label).d}</span>

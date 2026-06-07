@@ -262,15 +262,15 @@ Key observations:
       html: `<div style="background:#1a1a2e; padding:16px">
   <div style="display:flex; gap:16px; justify-content:center; flex-wrap:wrap">
     <div>
-      <p style="color:#64748b; font:11px Courier New; margin-bottom:6px; text-align:center">Quadratic (1 CP) — drag yellow point</p>
+      <p style="color:var(--color-text-secondary, #475569); font:11px Courier New; margin-bottom:6px; text-align:center">Quadratic (1 CP) — drag yellow point</p>
       <canvas id="quad" width="360" height="280" style="background:#16213e; border:1px solid #1e3a5f; border-radius:4px; cursor:crosshair; display:block"></canvas>
     </div>
     <div>
-      <p style="color:#64748b; font:11px Courier New; margin-bottom:6px; text-align:center">Cubic (2 CPs) — drag yellow/pink points</p>
+      <p style="color:var(--color-text-secondary, #475569); font:11px Courier New; margin-bottom:6px; text-align:center">Cubic (2 CPs) — drag yellow/pink points</p>
       <canvas id="cubic" width="360" height="280" style="background:#16213e; border:1px solid #1e3a5f; border-radius:4px; cursor:crosshair; display:block"></canvas>
     </div>
   </div>
-  <p id="info" style="color:#475569; font:10px Courier New; text-align:center; margin-top:8px">Drag control points to reshape</p>
+  <p id="info" style="color:var(--color-text-secondary, #475569); font:10px Courier New; text-align:center; margin-top:8px">Drag control points to reshape</p>
 </div>`,
       css: `* { box-sizing: border-box; margin: 0; padding: 0; }`,
       startCode: `// ── Quadratic Bézier ──────────────────────────────────

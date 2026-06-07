@@ -87,9 +87,9 @@ export default function TruthTableLab() {
     if (valid === 0) return null;
     
     const pct = Math.round((tCount / valid) * 100);
-    if (pct === 100) return { label: 'Tautology', pct, color: 'bg-yellow-500' };
-    if (pct === 0) return { label: 'Contradiction', pct, color: 'bg-red-500' };
-    return { label: 'Contingency', pct, color: 'bg-blue-500' };
+    if (pct === 100) return { label: 'Tautology', pct, color: 'bg-yellow-50 dark:bg-yellow-900/300' };
+    if (pct === 0) return { label: 'Contradiction', pct, color: 'bg-red-50 dark:bg-red-900/300' };
+    return { label: 'Contingency', pct, color: 'bg-blue-50 dark:bg-blue-900/300' };
   };
 
   return (
@@ -122,7 +122,7 @@ export default function TruthTableLab() {
         <button 
           onClick={addStatement}
           disabled={statements.length >= 7}
-          className="px-4 py-1.5 bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold text-sm rounded transition-colors"
+          className="px-4 py-1.5 bg-emerald-50 dark:bg-emerald-900/300 hover:bg-emerald-600 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold text-sm rounded transition-colors"
         >
           + Add Statement
         </button>
@@ -146,7 +146,7 @@ export default function TruthTableLab() {
                 
                 <button 
                   onClick={() => removeStatement(s.id)}
-                  className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition-colors"
+                  className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/40 dark:bg-red-900/30 dark:hover:bg-red-900/30 rounded transition-colors"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>

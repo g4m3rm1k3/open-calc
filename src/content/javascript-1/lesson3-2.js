@@ -59,7 +59,7 @@ Click each button to create a promise in a different state. Watch the state indi
 .btn-row{display:flex;gap:8px;flex-wrap:wrap;}
 button{flex:1;background:#1e2a3f;border:1px solid #334155;color:#94a3b8;padding:10px;border-radius:8px;cursor:pointer;font-size:12px;font-family:monospace;}
 .state-box{padding:14px;border-radius:8px;text-align:center;font-weight:800;font-size:16px;letter-spacing:.1em;transition:all .4s;}
-.pending{background:#0f172a;border:2px solid #475569;color:#64748b;}
+.pending{background:#0f172a;border:2px solid #475569;color:var(--color-text-secondary, #475569);}
 .fulfilled{background:#064e3b;border:2px solid #34d399;color:#6ee7b7;}
 .rejected{background:#450a0a;border:2px solid #f87171;color:#fca5a5;}
 .value-box{background:#050e1a;border:1px solid #1e293b;border-radius:8px;padding:12px;color:#93c5fd;font-size:13px;}`,
@@ -144,7 +144,7 @@ This simulates a realistic chain: fetch a user, then fetch their orders, then ca
 </div>`,
       css: `.app{height:100%;background:#09111c;padding:16px;border-radius:12px;display:flex;flex-direction:column;gap:12px;font-family:monospace;}
 .pipeline{flex:1;display:flex;flex-direction:column;gap:8px;}
-.step{background:#111827;border:1px solid #1e293b;border-radius:8px;padding:10px;font-size:12px;color:#475569;transition:all .3s;}
+.step{background:#111827;border:1px solid #1e293b;border-radius:8px;padding:10px;font-size:12px;color:var(--color-text-secondary, #475569);transition:all .3s;}
 .step.active{border-color:#38bdf8;color:#93c5fd;background:#0f2233;}
 .step.done{border-color:#34d399;color:#6ee7b7;background:#064e3b22;}
 .step.error{border-color:#f87171;color:#fca5a5;background:#450a0a22;}
@@ -281,7 +281,7 @@ Run both combinators on the same mix of passing and failing promises. Notice tha
   <button id="runBtn">Run Both</button>
 </div>`,
       css: `.app{height:100%;background:#09111c;padding:16px;border-radius:12px;display:flex;flex-direction:column;gap:10px;font-family:monospace;}
-.label{color:#475569;font-size:10px;letter-spacing:.08em;text-transform:uppercase;}
+.label{color:var(--color-text-secondary, #475569);font-size:10px;letter-spacing:.08em;text-transform:uppercase;}
 .result-box{background:#050e1a;border:1px solid #1e293b;border-radius:8px;padding:10px;font-size:12px;color:#e2e8f0;white-space:pre-wrap;min-height:50px;}
 .bad{border-color:#f87171;}.good{border-color:#34d399;}
 button{background:#1e3a5f;border:1px solid #38bdf8;color:#93c5fd;padding:10px;border-radius:8px;cursor:pointer;font-family:monospace;font-size:12px;}`,

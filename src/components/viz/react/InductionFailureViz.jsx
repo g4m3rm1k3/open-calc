@@ -70,13 +70,13 @@ export default function InductionFailureViz() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+    <div className="max-w-5xl mx-auto p-6 bg-white dark:bg-slate-900 rounded-lg shadow-lg">
       <h2 className="text-3xl font-bold mb-6 text-center">
         Why Induction Fails: The Domino Effect of Errors
       </h2>
 
       <div className="mb-6">
-        <div className="bg-blue-50 p-4 rounded-lg mb-4">
+        <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg mb-4">
           <h3 className="font-bold mb-2">Choose a Scenario to Break</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {FAILURE_SCENARIOS.map((scenario, index) => (
@@ -88,8 +88,8 @@ export default function InductionFailureViz() {
                 }}
                 className={`p-4 border rounded-lg text-left transition-colors ${
                   selectedScenario === index
-                    ? "bg-blue-500 text-white border-blue-500"
-                    : "bg-white hover:bg-gray-50 border-gray-300"
+                    ? "bg-blue-50 dark:bg-blue-900/300 text-white border-blue-500"
+                    : "bg-white dark:bg-slate-900 hover:bg-gray-50 dark:bg-slate-800 border-gray-300"
                 }`}
               >
                 <div className="font-semibold mb-1">{scenario.name}</div>
@@ -99,21 +99,21 @@ export default function InductionFailureViz() {
           </div>
         </div>
 
-        <div className="bg-green-50 p-4 rounded-lg mb-4">
+        <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg mb-4">
           <h3 className="font-bold mb-2">Current Scenario: {scenario.name}</h3>
           <p className="mb-3">
             <strong>Description:</strong> {scenario.description}
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div className="bg-white p-3 rounded border">
-              <div className="font-semibold text-green-600 mb-1">
+            <div className="bg-white dark:bg-slate-900 p-3 rounded border">
+              <div className="font-semibold text-green-600 dark:text-green-400 mb-1">
                 ✓ Base Case
               </div>
               <div className="text-sm">{scenario.baseCase}</div>
             </div>
-            <div className="bg-white p-3 rounded border">
-              <div className="font-semibold text-blue-600 mb-1">
+            <div className="bg-white dark:bg-slate-900 p-3 rounded border">
+              <div className="font-semibold text-blue-600 dark:text-blue-400 mb-1">
                 → Inductive Step
               </div>
               <div className="text-sm">{scenario.inductiveStep}</div>
@@ -123,7 +123,7 @@ export default function InductionFailureViz() {
           <div className="text-center">
             <button
               onClick={() => setShowFailure(!showFailure)}
-              className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-bold"
+              className="px-6 py-3 bg-red-50 dark:bg-red-900/300 text-white rounded-lg hover:bg-red-600 transition-colors font-bold"
             >
               {showFailure ? "Hide Failure" : "Show Where It Breaks"}
             </button>
@@ -138,16 +138,16 @@ export default function InductionFailureViz() {
         {renderVisual()}
 
         {showFailure && (
-          <div className="bg-red-50 p-4 rounded-lg border border-red-300">
-            <h4 className="font-bold text-red-700 mb-2">💥 Failure Point</h4>
-            <p className="text-red-700">{scenario.failure}</p>
+          <div className="bg-red-50 dark:bg-red-900/30 p-4 rounded-lg border border-red-300 dark:border-red-700/50">
+            <h4 className="font-bold text-red-700 dark:text-red-300 mb-2">💥 Failure Point</h4>
+            <p className="text-red-700 dark:text-red-300">{scenario.failure}</p>
           </div>
         )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <div className="border-2 border-green-300 rounded-lg p-4">
-          <h3 className="text-lg font-bold mb-3 text-center text-green-700">
+        <div className="border-2 border-green-300 dark:border-green-700/50 rounded-lg p-4">
+          <h3 className="text-lg font-bold mb-3 text-center text-green-700 dark:text-green-300">
             What Makes Induction Work
           </h3>
           <div className="space-y-2 text-sm">
@@ -166,8 +166,8 @@ export default function InductionFailureViz() {
           </div>
         </div>
 
-        <div className="border-2 border-red-300 rounded-lg p-4">
-          <h3 className="text-lg font-bold mb-3 text-center text-red-700">
+        <div className="border-2 border-red-300 dark:border-red-700/50 rounded-lg p-4">
+          <h3 className="text-lg font-bold mb-3 text-center text-red-700 dark:text-red-300">
             Common Failure Modes
           </h3>
           <div className="space-y-2 text-sm">
@@ -187,7 +187,7 @@ export default function InductionFailureViz() {
         </div>
       </div>
 
-      <div className="bg-purple-50 p-4 rounded-lg">
+      <div className="bg-purple-50 dark:bg-purple-900/30 p-4 rounded-lg">
         <h3 className="font-bold mb-2">
           The Mathematics of Failure Propagation
         </h3>

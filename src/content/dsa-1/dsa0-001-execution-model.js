@@ -275,12 +275,12 @@ text('stack → heap via reference',W/2,H-10,T.muted,10,'normal','center');
                 html: `
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:4px">
   <div>
-    <div style="font-size:11px;color:#64748b;font-family:monospace;margin-bottom:8px">VALUE TYPE (number)</div>
+    <div style="font-size:11px;color:var(--color-text-secondary, #475569);font-family:monospace;margin-bottom:8px">VALUE TYPE (number)</div>
     <div id="num-box" style="background:#1e293b;border:1.5px solid #334155;border-radius:8px;padding:12px;font-family:monospace;font-size:13px;min-height:100px"></div>
     <button id="btn-num" style="margin-top:8px;width:100%;padding:8px;border-radius:6px;border:none;background:#38bdf8;color:#0f172a;font-weight:700;font-size:12px;cursor:pointer">Copy Number</button>
   </div>
   <div>
-    <div style="font-size:11px;color:#64748b;font-family:monospace;margin-bottom:8px">REFERENCE TYPE (array)</div>
+    <div style="font-size:11px;color:var(--color-text-secondary, #475569);font-family:monospace;margin-bottom:8px">REFERENCE TYPE (array)</div>
     <div id="arr-box" style="background:#1e293b;border:1.5px solid #334155;border-radius:8px;padding:12px;font-family:monospace;font-size:13px;min-height:100px"></div>
     <button id="btn-arr" style="margin-top:8px;width:100%;padding:8px;border-radius:6px;border:none;background:#a78bfa;color:#0f172a;font-weight:700;font-size:12px;cursor:pointer">Copy Array</button>
   </div>
@@ -298,17 +298,17 @@ function row(label, val, c) { return \`<div>\${hl(label,'#64748b')} = \${hl(val,
 let numState = null, arrState = null;
 
 function renderNum() {
-  if (!numState) { numBox.innerHTML = row('a','42','#38bdf8') + '<div style="color:#475569;font-size:11px;margin-top:6px">(click to see copy)</div>'; return; }
+  if (!numState) { numBox.innerHTML = row('a','42','#38bdf8') + '<div style="color:var(--color-text-secondary, #475569);font-size:11px;margin-top:6px">(click to see copy)</div>'; return; }
   const { a, b, changed } = numState;
   numBox.innerHTML = row('a', a, '#38bdf8') + row('b', b, '#4ade80') +
-    (changed ? \`<div style="color:#4ade80;font-size:11px;margin-top:6px">b changed to \${b} — a stays \${a}</div>\` : \`<div style="color:#64748b;font-size:11px;margin-top:6px">b is a copy of a</div>\`);
+    (changed ? \`<div style="color:#4ade80;font-size:11px;margin-top:6px">b changed to \${b} — a stays \${a}</div>\` : \`<div style="color:var(--color-text-secondary, #475569);font-size:11px;margin-top:6px">b is a copy of a</div>\`);
 }
 
 function renderArr() {
-  if (!arrState) { arrBox.innerHTML = row('a','[1,2,3]','#a78bfa') + '<div style="color:#475569;font-size:11px;margin-top:6px">(click to see copy)</div>'; return; }
+  if (!arrState) { arrBox.innerHTML = row('a','[1,2,3]','#a78bfa') + '<div style="color:var(--color-text-secondary, #475569);font-size:11px;margin-top:6px">(click to see copy)</div>'; return; }
   const { a, b, changed } = arrState;
   arrBox.innerHTML = row('a', JSON.stringify(a), '#a78bfa') + row('b', JSON.stringify(b), '#f87171') +
-    (changed ? \`<div style="color:#f87171;font-size:11px;margin-top:6px">b.push(99) — a also changed!</div>\` : \`<div style="color:#64748b;font-size:11px;margin-top:6px">b = a shares the same array</div>\`);
+    (changed ? \`<div style="color:#f87171;font-size:11px;margin-top:6px">b.push(99) — a also changed!</div>\` : \`<div style="color:var(--color-text-secondary, #475569);font-size:11px;margin-top:6px">b = a shares the same array</div>\`);
 }
 
 renderNum(); renderArr();

@@ -53,8 +53,8 @@ Every triangle has exactly six measurements: three side lengths and three angle 
 
 The interactive below shows a triangle and all six of its measurements. Drag the vertices to see how changing one measurement forces others to change too.`,
       html: `<canvas id="cv" width="700" height="320" style="cursor:move"></canvas>
-<div id="measures" style="padding:10px 14px;font-family:Georgia,serif;background:#fafaf8;border-top:1px solid #e2e8f0"></div>`,
-      css: `body{margin:0;background:#fafaf8}`,
+<div id="measures" style="padding:10px 14px;font-family:Georgia,serif;background:var(--color-background-secondary, #f8fafc);border-top:1px solid var(--color-border-primary, #e2e8f0)"></div>`,
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc)}`,
       startCode: `var canvas=document.getElementById('cv');
 var ctx=canvas.getContext('2d');
 var W=canvas.width,H=canvas.height;
@@ -166,7 +166,7 @@ function draw(){
     +'<span style="color:#1e3a5f">∠A = '+angA+'°</span>, '
     +'<span style="color:#1a3a2a">∠B = '+angB+'°</span>, '
     +'<span style="color:#dc2626">∠C = '+angC+'°</span>'
-    +'<br><span style="color:#9ca3af;font-size:11px">Angle sum = '+sumAngles+'° (should be 180°; rounding error in display). All six measurements are determined once the shape is fixed.</span>';
+    +'<br><span style="color:var(--color-text-tertiary, #9ca3af);font-size:11px">Angle sum = '+sumAngles+'° (should be 180°; rounding error in display). All six measurements are determined once the shape is fixed.</span>';
 }
 draw();`,
       outputHeight: 400,
@@ -206,10 +206,10 @@ These failures are as important as the successes. They prevent you from claiming
       instruction: `### The Congruence Criteria: Why SSA Fails
 
 The interactive below demonstrates the "ambiguous case" of SSA: two triangles sharing the same two sides and a non-included angle, yet clearly not congruent. Then it shows SSS — which does work — for contrast.`,
-      html: `<div style="padding:8px 14px 0;background:#fafaf8;display:flex;gap:8px;flex-wrap:wrap" id="crit-btns"></div>
+      html: `<div style="padding:8px 14px 0;background:var(--color-background-secondary, #f8fafc);display:flex;gap:8px;flex-wrap:wrap" id="crit-btns"></div>
 <canvas id="cv" width="700" height="320"></canvas>
-<div id="crit-exp" style="padding:10px 14px;font-family:Georgia,serif;font-size:13px;color:#374151;background:#fafaf8;border-top:1px solid #e2e8f0;line-height:1.7"></div>`,
-      css: `body{margin:0;background:#fafaf8;font-family:Georgia,serif}
+<div id="crit-exp" style="padding:10px 14px;font-family:Georgia,serif;font-size:13px;color:var(--color-text-primary, #1e293b);background:var(--color-background-secondary, #f8fafc);border-top:1px solid var(--color-border-primary, #e2e8f0);line-height:1.7"></div>`,
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc);font-family:Georgia,serif}
 canvas{display:block}`,
       startCode: `var canvas=document.getElementById('cv');
 var ctx=canvas.getContext('2d');
@@ -422,8 +422,8 @@ Notice what happened: we couldn't directly compare ∠B and ∠C, because they'r
 
 The proof split the isosceles triangle into two congruent triangles using the median. This visual shows the split and highlights the corresponding parts used in the SSS argument. Drag the apex to change the triangle and verify the theorem holds.`,
       html: `<canvas id="cv" width="700" height="320" style="cursor:move"></canvas>
-<div id="iso-proof" style="padding:10px 14px;font-family:Georgia,serif;background:#fafaf8;border-top:1px solid #e2e8f0;font-size:13px"></div>`,
-      css: `body{margin:0;background:#fafaf8}`,
+<div id="iso-proof" style="padding:10px 14px;font-family:Georgia,serif;background:var(--color-background-secondary, #f8fafc);border-top:1px solid var(--color-border-primary, #e2e8f0);font-size:13px"></div>`,
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc)}`,
       startCode: `var canvas=document.getElementById('cv');
 var ctx=canvas.getContext('2d');
 var W=canvas.width,H=canvas.height;
@@ -522,7 +522,7 @@ function draw(){
     +'<span style="color:#92400e">BM = CM = '+BM+'</span> (M is midpoint), '
     +'AM = AM (reflexive).'
     +'<br>∴ △ABM ≅ △ACM by SSS. By CPCTC: <strong>∠B = ∠C = '+Math.round((angB+angC)/2)+'°</strong>.'
-    +'<br><span style="color:#9ca3af;font-size:11px">Drag apex to change the triangle. Notice ∠B = ∠C regardless of where you place A, as long as the triangle remains isosceles.</span>';
+    +'<br><span style="color:var(--color-text-tertiary, #9ca3af);font-size:11px">Drag apex to change the triangle. Notice ∠B = ∠C regardless of where you place A, as long as the triangle remains isosceles.</span>';
 }
 draw();`,
       outputHeight: 400,

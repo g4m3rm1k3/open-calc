@@ -110,7 +110,7 @@ export default function NormalDistributionViz() {
             onClick={() => setActiveK(k)}
             className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
               activeK === k
-                ? 'bg-indigo-500 text-white'
+                ? 'bg-indigo-50 dark:bg-indigo-900/300 text-white'
                 : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600'
             }`}
           >

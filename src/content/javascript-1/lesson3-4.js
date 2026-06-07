@@ -97,7 +97,7 @@ This fetches a real endpoint and displays the data. Open the console to see the 
 .url-bar{display:flex;align-items:center;gap:8px;background:#111827;border:1px solid #334155;border-radius:8px;padding:8px 12px;}
 .method{color:#34d399;font-weight:800;font-size:11px;letter-spacing:.08em;}
 .url{color:#93c5fd;font-size:11px;word-break:break-all;}
-.status-bar{background:#111827;border:1px solid #1e293b;border-radius:6px;padding:6px 10px;font-size:12px;color:#64748b;}
+.status-bar{background:#111827;border:1px solid #1e293b;border-radius:6px;padding:6px 10px;font-size:12px;color:var(--color-text-secondary, #475569);}
 .result{flex:1;background:#050e1a;border:1px solid #1e293b;border-radius:8px;padding:10px;color:#4ade80;font-size:12px;margin:0;overflow:auto;white-space:pre-wrap;}
 button{background:#1e3a5f;border:1px solid #38bdf8;color:#93c5fd;padding:10px;border-radius:8px;cursor:pointer;font-family:monospace;font-size:12px;}`,
       startCode: `const URL = 'https://jsonplaceholder.typicode.com/todos/1';
@@ -194,7 +194,7 @@ Use the form to build a request. JSONPlaceholder simulates all operations — re
 .form{display:flex;gap:8px;}
 select{flex:1;background:#111827;border:1px solid #334155;border-radius:8px;padding:10px;color:#e2e8f0;font-family:monospace;font-size:12px;}
 button{background:#1e3a5f;border:1px solid #38bdf8;color:#93c5fd;padding:10px 16px;border-radius:8px;cursor:pointer;font-size:12px;font-family:monospace;}
-.block{flex:1;background:#050e1a;border:1px solid #1e293b;border-radius:8px;padding:10px;font-size:11px;color:#64748b;white-space:pre-wrap;overflow:auto;}
+.block{flex:1;background:#050e1a;border:1px solid #1e293b;border-radius:8px;padding:10px;font-size:11px;color:var(--color-text-secondary, #475569);white-space:pre-wrap;overflow:auto;}
 .green{color:#4ade80;}`,
       startCode: `const BASE = 'https://jsonplaceholder.typicode.com';
 

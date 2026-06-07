@@ -67,7 +67,7 @@ Watch the order carefully. Predict before each step which queue drains next.`,
 </div>`,
       css: `.el-container{height:100%;background:#050e1a;padding:12px;border-radius:12px;display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:auto 1fr;gap:8px;font-family:monospace;}
 .panel{display:flex;flex-direction:column;gap:4px;}
-.panel-label{color:#475569;font-size:9px;letter-spacing:.08em;text-transform:uppercase;}
+.panel-label{color:var(--color-text-secondary, #475569);font-size:9px;letter-spacing:.08em;text-transform:uppercase;}
 .stack-box{flex:1;background:#09111c;border:1px solid #1e293b;border-radius:8px;padding:6px;display:flex;flex-direction:column-reverse;gap:4px;min-height:100px;}
 .queue-box{flex:1;background:#09111c;border:1px solid #1e293b;border-radius:8px;padding:6px;display:flex;flex-direction:column;gap:4px;min-height:100px;}
 .frame{border-radius:6px;padding:6px 8px;font-size:11px;font-weight:600;transition:all .3s;}
@@ -75,7 +75,7 @@ Watch the order carefully. Predict before each step which queue drains next.`,
 .micro .frame{background:#14222e;border:1px solid #34d399;color:#6ee7b7;}
 .macro .frame{background:#1c1a0a;border:1px solid #fbbf24;color:#fcd34d;}
 .log-panel{grid-column:1/-1;display:flex;flex-direction:column;gap:4px;}
-.log-box{background:#09111c;border:1px solid #1e293b;border-radius:8px;padding:8px;font-size:11px;color:#64748b;line-height:1.7;max-height:120px;overflow-y:auto;}
+.log-box{background:#09111c;border:1px solid #1e293b;border-radius:8px;padding:8px;font-size:11px;color:var(--color-text-secondary, #475569);line-height:1.7;max-height:120px;overflow-y:auto;}
 .log-box .m{color:#6ee7b7;}.log-box .t{color:#fcd34d;}.log-box .s{color:#93c5fd;}`,
       startCode: `const stackEl = document.getElementById('stack');
 const microEl = document.getElementById('micro');
@@ -257,7 +257,7 @@ This cell starts a 1-second "async operation" (a timer) and then immediately sta
 </div>`,
       css: `.app{height:100%;background:#09111c;padding:20px;border-radius:12px;display:flex;flex-direction:column;gap:14px;font-family:monospace;}
 .row{display:flex;align-items:center;gap:12px;}
-.label{color:#475569;font-size:12px;width:120px;}
+.label{color:var(--color-text-secondary, #475569);font-size:12px;width:120px;}
 .val{color:#38bdf8;font-size:15px;font-weight:700;}`,
       startCode: `// Start a 1000ms async operation
 setTimeout(() => {

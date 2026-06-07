@@ -74,15 +74,15 @@ The key insight: the same four triangles can be arranged two ways inside the sam
       instruction: `### Proof 1 Animated: The Two Arrangements
 
 Toggle between the two arrangements of four identical triangles inside the same (a+b)² square. Watch the empty area change shape but not size — and see why a² + b² = c² must follow.`,
-      html: `<div style="padding:10px 14px 0;background:#fafaf8;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+      html: `<div style="padding:10px 14px 0;background:var(--color-background-secondary, #f8fafc);display:flex;gap:12px;align-items:center;flex-wrap:wrap">
   <button id="toggle-arr" style="padding:7px 18px;border-radius:8px;border:1.5px solid #1e3a5f;background:#1e3a5f;color:#fff;font-family:Georgia,serif;font-size:13px;cursor:pointer">Show Arrangement 2</button>
-  <span style="font-family:Georgia,serif;font-size:13px;color:#374151">Drag slider to change triangle shape:</span>
+  <span style="font-family:Georgia,serif;font-size:13px;color:var(--color-text-primary, #1e293b)">Drag slider to change triangle shape:</span>
   <input type="range" id="ratio-sl" min="20" max="80" value="38" style="width:120px">
-  <span id="ratio-lbl" style="font-family:Georgia,serif;font-size:12px;color:#64748b">a=38, b=62</span>
+  <span id="ratio-lbl" style="font-family:Georgia,serif;font-size:12px;color:var(--color-text-secondary, #475569)">a=38, b=62</span>
 </div>
 <canvas id="cv" width="700" height="360"></canvas>
-<div id="area-info" style="padding:10px 14px;font-family:Georgia,serif;font-size:13px;background:#fafaf8;border-top:1px solid #e2e8f0;line-height:1.7"></div>`,
-      css: `body{margin:0;background:#fafaf8}canvas{display:block}`,
+<div id="area-info" style="padding:10px 14px;font-family:Georgia,serif;font-size:13px;background:var(--color-background-secondary, #f8fafc);border-top:1px solid var(--color-border-primary, #e2e8f0);line-height:1.7"></div>`,
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc)}canvas{display:block}`,
       startCode: `var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 var W=cv.width,H=cv.height;
 var arr=1;
@@ -175,7 +175,7 @@ function draw(){
   if(arr===1){
     infoEl.innerHTML='<strong>Arrangement 1:</strong> Four triangles leave an inner square of side c. '
       +'Empty area = c² = '+(c2)+'. Equation: (a+b)² = c² + 2ab = '+c2+' + '+(2*a*b)+' = '+((a+b)*(a+b))+'.'
-      +'<br><span style="color:#9ca3af;font-size:11px">Toggle to Arrangement 2 to see the same four triangles leave a² + b² empty.</span>';
+      +'<br><span style="color:var(--color-text-tertiary, #9ca3af);font-size:11px">Toggle to Arrangement 2 to see the same four triangles leave a² + b² empty.</span>';
   } else {
     infoEl.innerHTML='<strong>Arrangement 2:</strong> Same four triangles leave two squares: a² = '+a*a+' and b² = '+b*b+'. '
       +'Empty area = a² + b² = '+(a*a+b*b)+'. Equation: (a+b)² = a² + b² + 2ab = '+(a*a+b*b)+' + '+(2*a*b)+' = '+((a+b)*(a+b))+'.'
@@ -230,10 +230,10 @@ The self-similar structure of the right triangle — the altitude creates two sm
       instruction: `### Proof 2 Visualized: The Three Similar Triangles
 
 The altitude from the right angle to the hypotenuse creates three similar triangles. Click each triangle to highlight it and see which angles correspond. Drag the right-angle vertex to change the proportions.`,
-      html: `<div style="padding:8px 14px 0;background:#fafaf8;display:flex;gap:8px" id="sim-btns"></div>
+      html: `<div style="padding:8px 14px 0;background:var(--color-background-secondary, #f8fafc);display:flex;gap:8px" id="sim-btns"></div>
 <canvas id="cv" width="700" height="300" style="cursor:move"></canvas>
-<div id="sim-info" style="padding:10px 14px;font-family:Georgia,serif;font-size:13px;background:#fafaf8;border-top:1px solid #e2e8f0;line-height:1.7"></div>`,
-      css: `body{margin:0;background:#fafaf8}canvas{display:block}`,
+<div id="sim-info" style="padding:10px 14px;font-family:Georgia,serif;font-size:13px;background:var(--color-background-secondary, #f8fafc);border-top:1px solid var(--color-border-primary, #e2e8f0);line-height:1.7"></div>`,
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc)}canvas{display:block}`,
       startCode: `var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 var W=cv.width,H=cv.height;
 // Right angle at C, A and B on base
@@ -405,7 +405,7 @@ This proof illustrates something powerful: algebra and geometry are not separate
       instruction: `### Three Proofs, One Theorem
 
 Enter any values of a and b to verify the theorem. All three proof approaches are shown confirming the same result simultaneously.`,
-      html: `<div style="padding:10px 14px 0;background:#fafaf8;display:flex;gap:16px;flex-wrap:wrap;align-items:center">
+      html: `<div style="padding:10px 14px 0;background:var(--color-background-secondary, #f8fafc);display:flex;gap:16px;flex-wrap:wrap;align-items:center">
   <div style="display:flex;align-items:center;gap:8px">
     <span style="font-family:Georgia,serif;font-size:13px">a = <strong id="a-lbl">3</strong></span>
     <input type="range" id="a-sl" min="1" max="9" value="3" style="width:100px">
@@ -416,7 +416,7 @@ Enter any values of a and b to verify the theorem. All three proof approaches ar
   </div>
 </div>
 <canvas id="cv" width="700" height="280"></canvas>`,
-      css: `body{margin:0;background:#fafaf8}canvas{display:block}`,
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc)}canvas{display:block}`,
       startCode: `var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 var W=cv.width,H=cv.height;
 var aSl=document.getElementById('a-sl'),bSl=document.getElementById('b-sl');

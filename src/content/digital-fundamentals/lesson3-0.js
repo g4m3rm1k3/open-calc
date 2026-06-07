@@ -45,7 +45,7 @@ The gate symbols on schematics encode the function visually: AND uses a flat-bac
 .inp-btn.hi{background:#059669;color:#fff;border-color:#059669;font-weight:700}
 .inp-btn.lo{background:#ef4444;color:#fff;border-color:#ef4444;font-weight:700}
 .tbl td,.tbl th{padding:8px 14px;text-align:center;font-size:13px;border:0.5px solid var(--color-border-tertiary,#e2e8f0)}
-.tbl th{background:var(--color-background-secondary,#f8fafc);font-size:11px;color:#64748b;font-weight:600}
+.tbl th{background:var(--color-background-secondary,#f8fafc);font-size:11px;color:var(--color-text-secondary, #475569);font-weight:600}
 .card{background:var(--color-background-secondary,#f8fafc);border-radius:8px;padding:10px 14px;border:0.5px solid var(--color-border-tertiary,#e2e8f0);margin-top:8px}`,
       startCode: `var gate='AND',a=0,b=0;
 var GATES={
@@ -82,7 +82,7 @@ function render(){
       (g.inputs===2?'<button class="inp-btn '+(b?'hi':'lo')+'" onclick="b=b?0:1;render()">B = '+b+'</button>':'')+
     '</div>'+
     '<div style="display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:16px">'+
-      '<span style="font-size:14px;color:#64748b">Output:</span>'+
+      '<span style="font-size:14px;color:var(--color-text-secondary, #475569)">Output:</span>'+
       '<span style="font-size:32px;font-weight:700;color:'+(out?'#059669':'#ef4444')+'">'+out+'</span>'+
     '</div>'+
     '<table class="tbl" style="border-collapse:collapse;width:100%;margin-bottom:8px">'+

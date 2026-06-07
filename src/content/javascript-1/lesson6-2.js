@@ -99,7 +99,7 @@ const worker = new Worker(URL.createObjectURL(blob));
 Watch what happens when heavy computation runs on the main thread vs a worker. Click "Block Main Thread" and try to interact with the counter — you'll see the freeze. Then click "Use Worker" to see the difference.`,
       html: `<div style="background:#09111c;padding:16px;border-radius:12px;font-family:monospace;font-size:13px;display:flex;flex-direction:column;gap:12px;">
   <div style="display:flex;gap:10px;align-items:center;">
-    <div style="color:#64748b;font-size:11px;">Interaction test:</div>
+    <div style="color:var(--color-text-secondary, #475569);font-size:11px;">Interaction test:</div>
     <button id="counter" style="background:#1e2a3f;border:1px solid #334155;color:#94a3b8;padding:6px 14px;border-radius:6px;cursor:pointer;font-family:monospace;font-size:12px;">Clicks: 0</button>
   </div>
   <div style="display:flex;gap:8px;">

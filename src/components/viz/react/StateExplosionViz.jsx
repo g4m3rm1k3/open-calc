@@ -25,7 +25,7 @@ export default function StateExplosionViz() {
             onChange={(e) =>
               setBranch(Math.max(1, Number(e.target.value) || 1))
             }
-            className="mt-1 w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+            className="mt-1 w-full rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-900 dark:text-slate-100"
           />
         </label>
         <label className="block">
@@ -35,11 +35,11 @@ export default function StateExplosionViz() {
             min={0}
             value={depth}
             onChange={(e) => setDepth(Math.max(0, Number(e.target.value) || 0))}
-            className="mt-1 w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+            className="mt-1 w-full rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-900 dark:text-slate-100"
           />
         </label>
       </div>
-      <div className="rounded-xl bg-white p-4 border border-slate-200 dark:bg-slate-950 dark:border-slate-800 text-sm">
+      <div className="rounded-xl bg-white dark:bg-slate-900 p-4 border border-slate-200 dark:bg-slate-950 dark:border-slate-800 text-sm">
         <div className="font-semibold mb-2">Number of states</div>
         <div className="text-xl font-semibold">
           {branch}^{depth} = {total}

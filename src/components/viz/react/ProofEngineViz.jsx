@@ -232,7 +232,7 @@ Recursion explains generation.
       render: (state) => (
         <div className="flex flex-wrap gap-2 justify-center">
           {state.nodes.map((_, i) => (
-            <div key={i} className="px-2 py-1 bg-blue-500 text-white text-xs rounded">
+            <div key={i} className="px-2 py-1 bg-blue-50 dark:bg-blue-900/300 text-white text-xs rounded">
               {i.toString(2)}
             </div>
           ))}
@@ -339,7 +339,7 @@ Recursion reveals structure.
       {/* STEP */}
       <div className="mb-4 p-4 bg-amber-50 rounded">
         <div className="font-semibold">{current.title}</div>
-        <div className="font-mono text-emerald-600">{current.algebra}</div>
+        <div className="font-mono text-emerald-600 dark:text-emerald-400">{current.algebra}</div>
         <div className="text-sm">{current.insight}</div>
       </div>
 
@@ -349,7 +349,7 @@ Recursion reveals structure.
         {invariants.map((inv, i) => (
           <div key={i} className="flex justify-between">
             <span>{inv.label}</span>
-            <span className={inv.valid ? 'text-green-600' : 'text-red-600'}>
+            <span className={inv.valid ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
               {inv.valid ? '✓' : '✗'}
             </span>
           </div>
@@ -399,8 +399,8 @@ function gridRender(state) {
           key={i}
           className={`w-8 h-8 rounded
             ${c.role === 'primary'
-              ? 'bg-orange-500'
-              : 'bg-blue-500'}
+              ? 'bg-orange-50 dark:bg-orange-900/300'
+              : 'bg-blue-50 dark:bg-blue-900/300'}
           `}
           style={{
             gridColumn: c.x + 1,

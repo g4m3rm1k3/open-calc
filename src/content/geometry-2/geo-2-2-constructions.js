@@ -94,14 +94,14 @@ By SAS, △APM ≅ △BPM. Therefore AM = BM (M bisects AB) and ∠PMA = ∠PMB.
       instruction: `### Construction 1: Perpendicular Bisector
 
 Click through each step of the construction. The arcs appear in sequence, then the bisector line. The proof reasoning is shown for each step.`,
-      html: `<div style="padding:8px 14px 0;background:#fafaf8;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-  <button id="prev-btn" style="padding:6px 14px;border-radius:7px;border:1.5px solid #94a3b8;background:transparent;color:#64748b;font-family:Georgia,serif;font-size:12px;cursor:pointer">← Back</button>
-  <span id="step-lbl" style="font-family:Georgia,serif;font-size:13px;color:#374151;font-weight:700">Step 1 of 5</span>
+      html: `<div style="padding:8px 14px 0;background:var(--color-background-secondary, #f8fafc);display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+  <button id="prev-btn" style="padding:6px 14px;border-radius:7px;border:1.5px solid #94a3b8;background:transparent;color:var(--color-text-secondary, #475569);font-family:Georgia,serif;font-size:12px;cursor:pointer">← Back</button>
+  <span id="step-lbl" style="font-family:Georgia,serif;font-size:13px;color:var(--color-text-primary, #1e293b);font-weight:700">Step 1 of 5</span>
   <button id="next-btn" style="padding:6px 14px;border-radius:7px;border:1.5px solid #1e3a5f;background:#1e3a5f22;color:#1e3a5f;font-family:Georgia,serif;font-size:12px;font-weight:700;cursor:pointer">Next →</button>
 </div>
 <canvas id="cv" width="700" height="280"></canvas>
-<div id="step-desc" style="padding:10px 14px;font-family:Georgia,serif;font-size:13px;background:#fafaf8;border-top:1px solid #e2e8f0;line-height:1.7;min-height:52px"></div>`,
-      css: `body{margin:0;background:#fafaf8}canvas{display:block}`,
+<div id="step-desc" style="padding:10px 14px;font-family:Georgia,serif;font-size:13px;background:var(--color-background-secondary, #f8fafc);border-top:1px solid var(--color-border-primary, #e2e8f0);line-height:1.7;min-height:52px"></div>`,
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc)}canvas{display:block}`,
       startCode: `var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 var W=cv.width,H=cv.height;
 
@@ -279,13 +279,13 @@ The perpendicular bisector of AB is perpendicular to AB (which lies on ℓ) by t
       instruction: `### Construction Playground: Perpendicular Bisector and Angle Bisector
 
 Watch both constructions performed side by side. The left panel shows the perpendicular bisector with its proof annotations. The right panel shows the angle bisector. Drag the slider to reveal each construction step.`,
-      html: `<div style="padding:8px 14px 0;background:#fafaf8;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      html: `<div style="padding:8px 14px 0;background:var(--color-background-secondary, #f8fafc);display:flex;align-items:center;gap:12px;flex-wrap:wrap">
   <span style="font-family:Georgia,serif;font-size:13px">Construction progress:</span>
   <input type="range" id="prog-sl" min="0" max="100" value="0" style="flex:1;min-width:120px">
-  <span id="prog-lbl" style="font-family:Georgia,serif;font-size:12px;color:#64748b;white-space:nowrap">0%</span>
+  <span id="prog-lbl" style="font-family:Georgia,serif;font-size:12px;color:var(--color-text-secondary, #475569);white-space:nowrap">0%</span>
 </div>
 <canvas id="cv" width="700" height="320"></canvas>`,
-      css: `body{margin:0;background:#fafaf8}canvas{display:block}`,
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc)}canvas{display:block}`,
       startCode: `var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 var W=cv.width,H=cv.height;
 var sl=document.getElementById('prog-sl'),lbl=document.getElementById('prog-lbl');
@@ -441,8 +441,8 @@ This is one of the most profound lessons in mathematics: proving that something 
 
 The interactive shows the hierarchy of constructible numbers. Every number reachable by compass and straightedge is algebraic of degree 2ⁿ. The three impossible problems require degree 3. Click any node to see what operations created it.`,
       html: `<canvas id="cv" width="700" height="320"></canvas>
-<div id="node-info" style="padding:10px 14px;font-family:Georgia,serif;font-size:13px;background:#fafaf8;border-top:1px solid #e2e8f0;line-height:1.7"></div>`,
-      css: `body{margin:0;background:#fafaf8}canvas{display:block}`,
+<div id="node-info" style="padding:10px 14px;font-family:Georgia,serif;font-size:13px;background:var(--color-background-secondary, #f8fafc);border-top:1px solid var(--color-border-primary, #e2e8f0);line-height:1.7"></div>`,
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc)}canvas{display:block}`,
       startCode: `var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 var W=cv.width,H=cv.height;
 

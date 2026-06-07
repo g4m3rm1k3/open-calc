@@ -63,7 +63,7 @@ export default {
                 html: `<div style="margin-bottom:8px;display:flex;gap:8px;align-items:center">
   <button id="btn-gen" style="padding:7px 16px;border-radius:6px;border:none;background:#6d28d9;color:#fff;font-family:monospace;font-size:12px;cursor:pointer">Generate</button>
   <button id="btn-step" style="padding:7px 14px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:#94a3b8;font-family:monospace;font-size:12px;cursor:pointer">Step</button>
-  <button id="btn-rst" style="padding:7px 12px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:#64748b;font-family:monospace;font-size:12px;cursor:pointer">Reset</button>
+  <button id="btn-rst" style="padding:7px 12px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:var(--color-text-secondary, #475569);font-family:monospace;font-size:12px;cursor:pointer">Reset</button>
   <span id="info" style="font-family:monospace;font-size:11px;color:#94a3b8"></span>
 </div>
 <canvas id="c" width="620" height="220" style="display:block;width:100%;border-radius:6px;background:#0a0f1e"></canvas>
@@ -478,7 +478,7 @@ For each one, ask yourself:
                 html: `<div id="out" style="font-family:monospace;font-size:13px"></div>`,
                 css: `body{margin:0;padding:14px;background:#0f172a;color:#e2e8f0;box-sizing:border-box;font-family:monospace}
 .pass{color:#4ade80;margin:2px 0}.fail{color:#f87171;margin:2px 0}
-.section{color:#64748b;font-size:11px;margin-top:10px;border-top:1px solid #1e293b;padding-top:6px}
+.section{color:var(--color-text-secondary, #475569);font-size:11px;margin-top:10px;border-top:1px solid #1e293b;padding-top:6px}
 .banner{margin-top:12px;padding:10px 14px;border-radius:8px;font-size:13px}
 .banner.ok{background:#052e16;border:1px solid #166534;color:#4ade80}
 .banner.bad{background:#450a0a;border:1px solid #7f1d1d;color:#f87171}`,

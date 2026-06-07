@@ -18,10 +18,10 @@ export default function ModuloPartitionLab() {
   // Predefined colors for beautiful mapping
   const colors = [
     'bg-brand-500 border-brand-400',
-    'bg-emerald-500 border-emerald-400',
+    'bg-emerald-50 dark:bg-emerald-900/300 border-emerald-400 dark:border-emerald-600/50',
     'bg-amber-500 border-amber-400',
-    'bg-purple-500 border-purple-400',
-    'bg-pink-500 border-pink-400',
+    'bg-purple-50 dark:bg-purple-900/300 border-purple-400 dark:border-purple-600/50',
+    'bg-pink-50 dark:bg-pink-900/300 border-pink-400 dark:border-pink-600/50',
     'bg-sky-500 border-sky-400',
   ]
 

@@ -77,7 +77,7 @@ A \`PerspectiveCamera\` sees only the volume inside its **frustum** — a trunca
 Read every comment. Each section teaches one concept. After the scene is running, try modifying the values marked with ← to see immediate feedback.`,
       html: `<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.js"></script>
 <canvas id="cv" style="display:block;border-radius:6px"></canvas>
-<div id="info" style="font-family:monospace;font-size:10px;color:#475569;padding:6px;background:#0a0a0f;border-bottom-left-radius:6px;border-bottom-right-radius:6px"></div>`,
+<div id="info" style="font-family:monospace;font-size:10px;color:var(--color-text-secondary, #475569);padding:6px;background:#0a0a0f;border-bottom-left-radius:6px;border-bottom-right-radius:6px"></div>`,
       css: `body{margin:0;background:#060610}`,
       startCode: `// ── RENDERER ────────────────────────────────────────────────────────────────
 // WebGLRenderer creates a WebGL context on the provided canvas.
@@ -284,7 +284,7 @@ Make the cube's Y position oscillate using a sine wave. This requires adding cod
 This is the foundation of animation without delta time — we'll improve it in the Animation Loop lesson.`,
       html: `<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.js"></script>
 <canvas id="cv" style="display:block;border-radius:6px"></canvas>
-<div id="info" style="font-family:monospace;font-size:10px;color:#475569;padding:5px;background:#0a0a0f;border-bottom-left-radius:6px;border-bottom-right-radius:6px"></div>`,
+<div id="info" style="font-family:monospace;font-size:10px;color:var(--color-text-secondary, #475569);padding:5px;background:#0a0a0f;border-bottom-left-radius:6px;border-bottom-right-radius:6px"></div>`,
       css: `body{margin:0;background:#060610}`,
       startCode: `var renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));

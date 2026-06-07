@@ -153,7 +153,7 @@ export default function LowRankApproximationViz() {
           <p className="font-mono font-bold">{k} / {rank}</p>
         </div>
         <div className="rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2 py-2">
-          <p className="text-xs text-emerald-600 font-semibold">Captured</p>
+          <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold">Captured</p>
           <p className="font-mono font-bold">{captured}%</p>
         </div>
         <div className="rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2 py-2">

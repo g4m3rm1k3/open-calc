@@ -331,7 +331,7 @@ This alignment between DOM order and grid position is what makes the index → r
   justify-content: center;
   font-family: monospace;
   font-size: 9px;
-  color: #475569;
+  color: var(--color-text-secondary, #475569);
   transition: all 0.15s ease;
 }`,
       startCode: `const COLS = 10;
@@ -389,7 +389,7 @@ This separation — state in an array, visuals in the DOM, a render function con
   border-radius: 2px;
   transition: all 0.1s;
 }
-.bv-cell.filled { border-color: #475569; }
+.bv-cell.filled { border-color: var(--color-text-secondary, #475569); }
 #boardLog { color: #94a3b8; font-family: monospace; font-size: 12px; line-height: 1.8; }`,
       startCode: `const COLS = 10;
 const ROWS = 6; // small for demo

@@ -228,7 +228,7 @@ export default function InverseTrigDomainViz({ params = {} }) {
           <button key={i} onClick={() => setActive(i)}
             className={`px-3 py-1 rounded text-sm font-mono transition-colors ${
               active === i
-                ? 'bg-pink-500 text-white'
+                ? 'bg-pink-50 dark:bg-pink-900/300 text-white'
                 : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600'
             }`}>
             {t.label}

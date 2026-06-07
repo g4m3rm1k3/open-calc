@@ -128,7 +128,7 @@ export default function PigeonholeMagic({ params = {} }) {
           <div
             key={bucket.remainder}
             className={`border-2 rounded-2xl p-3 flex flex-col items-center transition-colors ${
-              bucket.items.length >= 2 ? 'border-red-400 bg-red-50 dark:bg-red-950/30' : 'border-slate-200 dark:border-slate-700'
+              bucket.items.length >= 2 ? 'border-red-400 dark:border-red-600/50 bg-red-50 dark:bg-red-950/30' : 'border-slate-200 dark:border-slate-700'
             }`}
           >
             <div className="text-xs font-mono text-slate-400 mb-1">rem {bucket.remainder}</div>
@@ -223,7 +223,7 @@ export default function PigeonholeMagic({ params = {} }) {
 
         <button
           onClick={reset}
-          className="px-6 py-4 border border-slate-300 dark:border-slate-600 font-medium rounded-2xl hover:bg-red-50 dark:hover:bg-red-950"
+          className="px-6 py-4 border border-slate-300 dark:border-slate-600 font-medium rounded-2xl hover:bg-red-50 dark:hover:bg-red-900/40 dark:bg-red-900/30 dark:hover:bg-red-950"
         >
           Reset
         </button>

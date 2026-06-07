@@ -102,13 +102,13 @@ export default function StrongInductionPuzzle() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+    <div className="max-w-6xl mx-auto p-6 bg-white dark:bg-slate-900 rounded-lg shadow-lg">
       <h2 className="text-3xl font-bold mb-6 text-center">
         Strong Induction: Using Multiple Previous Cases
       </h2>
 
       <div className="mb-6">
-        <div className="bg-blue-50 p-4 rounded-lg mb-4">
+        <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg mb-4">
           <h3 className="font-bold mb-2">Choose a Problem</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {PROBLEMS.map((prob, index) => (
@@ -121,8 +121,8 @@ export default function StrongInductionPuzzle() {
                 }}
                 className={`p-4 border rounded-lg text-left transition-colors ${
                   selectedProblem === index
-                    ? "bg-blue-500 text-white border-blue-500"
-                    : "bg-white hover:bg-gray-50 border-gray-300"
+                    ? "bg-blue-50 dark:bg-blue-900/300 text-white border-blue-500"
+                    : "bg-white dark:bg-slate-900 hover:bg-gray-50 dark:bg-slate-800 border-gray-300"
                 }`}
               >
                 <div className="font-semibold mb-1">{prob.title}</div>
@@ -132,7 +132,7 @@ export default function StrongInductionPuzzle() {
           </div>
         </div>
 
-        <div className="bg-green-50 p-4 rounded-lg mb-4">
+        <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg mb-4">
           <h3 className="font-bold mb-2">Current Problem: {problem.title}</h3>
           <p className="mb-2">
             <strong>Description:</strong> {problem.description}
@@ -151,14 +151,14 @@ export default function StrongInductionPuzzle() {
               max={problem.solution.length - 1}
               value={currentStep}
               onChange={(e) => setCurrentStep(parseInt(e.target.value))}
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+              className="w-full h-2 bg-gray-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer"
             />
           </div>
 
           <div className="flex gap-4">
             <button
               onClick={() => setShowHint(!showHint)}
-              className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
+              className="px-4 py-2 bg-purple-50 dark:bg-purple-900/300 text-white rounded hover:bg-purple-600 transition-colors"
             >
               {showHint ? "Hide Hint" : "Show Hint"}
             </button>
@@ -169,12 +169,12 @@ export default function StrongInductionPuzzle() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <div>
           <h3 className="text-xl font-bold mb-4">Current Challenge</h3>
-          <div className="bg-yellow-50 p-4 rounded-lg mb-4">
+          <div className="bg-yellow-50 dark:bg-yellow-900/30 p-4 rounded-lg mb-4">
             <div className="text-center mb-4">
-              <div className="text-4xl font-bold text-blue-600 mb-2">
+              <div className="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">
                 {currentSolution?.amount}¢
               </div>
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-gray-600 dark:text-gray-300">
                 Can you make this amount?
               </div>
             </div>
@@ -185,13 +185,13 @@ export default function StrongInductionPuzzle() {
                   {currentSolution.stamps.map((stamp, index) => (
                     <div
                       key={index}
-                      className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-sm"
+                      className="w-8 h-8 bg-blue-50 dark:bg-blue-900/300 text-white rounded-full flex items-center justify-center font-bold text-sm"
                     >
                       {stamp}
                     </div>
                   ))}
                 </div>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 dark:text-gray-300">
                   {currentSolution.explanation}
                 </p>
               </div>
@@ -199,7 +199,7 @@ export default function StrongInductionPuzzle() {
           </div>
 
           {showHint && (
-            <div className="bg-purple-50 p-4 rounded-lg">
+            <div className="bg-purple-50 dark:bg-purple-900/30 p-4 rounded-lg">
               <h4 className="font-bold mb-2">💡 Strong Induction Hint</h4>
               <p className="text-sm mb-2">
                 <strong>Regular Induction:</strong> P(k) → P(k+1)
@@ -218,7 +218,7 @@ export default function StrongInductionPuzzle() {
 
         <div>
           <h3 className="text-xl font-bold mb-4">Available Amounts</h3>
-          <div className="bg-gray-50 p-4 rounded-lg max-h-64 overflow-y-auto">
+          <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-lg max-h-64 overflow-y-auto">
             <div className="grid grid-cols-5 gap-2">
               {Array.from({ length: problem.target + 1 }, (_, i) => i).map(
                 (amount) => {
@@ -233,10 +233,10 @@ export default function StrongInductionPuzzle() {
                       key={amount}
                       className={`w-12 h-12 border-2 rounded-lg flex items-center justify-center text-sm font-bold transition-colors ${
                         isCurrent
-                          ? "bg-blue-500 text-white border-blue-500"
+                          ? "bg-blue-50 dark:bg-blue-900/300 text-white border-blue-500"
                           : available
-                            ? "bg-green-200 border-green-400 text-green-800"
-                            : "bg-gray-200 border-gray-300 text-gray-500"
+                            ? "bg-green-200 dark:bg-green-800/50 border-green-400 dark:border-green-600/50 text-green-800 dark:text-green-300"
+                            : "bg-gray-200 dark:bg-slate-700 border-gray-300 text-gray-500 dark:text-gray-400"
                       }`}
                     >
                       {amount}
@@ -245,18 +245,18 @@ export default function StrongInductionPuzzle() {
                 },
               )}
             </div>
-            <div className="mt-4 text-xs text-gray-600">
+            <div className="mt-4 text-xs text-gray-600 dark:text-gray-300">
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 bg-green-200 border border-green-400 rounded"></div>
+                  <div className="w-3 h-3 bg-green-200 dark:bg-green-800/50 border border-green-400 dark:border-green-600/50 rounded"></div>
                   <span>Available</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 bg-gray-200 border border-gray-300 rounded"></div>
+                  <div className="w-3 h-3 bg-gray-200 dark:bg-slate-700 border border-gray-300 rounded"></div>
                   <span>Not yet proven</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 bg-blue-500 border border-blue-500 rounded"></div>
+                  <div className="w-3 h-3 bg-blue-50 dark:bg-blue-900/300 border border-blue-500 rounded"></div>
                   <span>Current target</span>
                 </div>
               </div>
@@ -266,22 +266,22 @@ export default function StrongInductionPuzzle() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <div className="border-2 border-green-300 rounded-lg p-4">
-          <h3 className="text-lg font-bold mb-3 text-center text-green-700">
+        <div className="border-2 border-green-300 dark:border-green-700/50 rounded-lg p-4">
+          <h3 className="text-lg font-bold mb-3 text-center text-green-700 dark:text-green-300">
             Regular Induction
           </h3>
           <div className="text-center mb-4">
             <div className="text-4xl mb-2">➡️</div>
             <div className="font-mono text-lg">P(k) → P(k+1)</div>
           </div>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 dark:text-gray-300">
             Assumes only the immediate previous case. Good for simple patterns
             like "each number is one more than the previous."
           </p>
         </div>
 
-        <div className="border-2 border-blue-300 rounded-lg p-4">
-          <h3 className="text-lg font-bold mb-3 text-center text-blue-700">
+        <div className="border-2 border-blue-300 dark:border-blue-700/50 rounded-lg p-4">
+          <h3 className="text-lg font-bold mb-3 text-center text-blue-700 dark:text-blue-300">
             Strong Induction
           </h3>
           <div className="text-center mb-4">
@@ -290,14 +290,14 @@ export default function StrongInductionPuzzle() {
               [P(1) ∧ ... ∧ P(k)] → P(k+1)
             </div>
           </div>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 dark:text-gray-300">
             Assumes ALL previous cases. Powerful for complex dependencies where
             you might need to combine multiple earlier results.
           </p>
         </div>
       </div>
 
-      <div className="bg-purple-50 p-4 rounded-lg">
+      <div className="bg-purple-50 dark:bg-purple-900/30 p-4 rounded-lg">
         <h3 className="font-bold mb-2">Why Strong Induction Works Here</h3>
         <div className="space-y-2 text-sm">
           <p>

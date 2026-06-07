@@ -375,7 +375,7 @@ export default function ConstantDifferenceProof({ params }) {
                 id="show-difference"
                 checked={showDifference}
                 onChange={(e) => setShowDifference(e.target.checked)}
-                className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                className="w-4 h-4 rounded text-blue-600 dark:text-blue-400 focus:ring-blue-500"
               />
               <label htmlFor="show-difference" className="text-sm font-medium text-slate-700 dark:text-slate-300 cursor-pointer">
                 Show F₂(x) - F₁(x)
@@ -388,7 +388,7 @@ export default function ConstantDifferenceProof({ params }) {
                 id="show-proof"
                 checked={showProof}
                 onChange={(e) => setShowProof(e.target.checked)}
-                className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500"
+                className="w-4 h-4 rounded text-emerald-600 dark:text-emerald-400 focus:ring-emerald-500"
               />
               <label htmlFor="show-proof" className="text-sm font-medium text-slate-700 dark:text-slate-300 cursor-pointer">
                 Show slope field
@@ -416,7 +416,7 @@ export default function ConstantDifferenceProof({ params }) {
             <div className="mt-6 p-4 bg-white dark:bg-slate-800 rounded-xl border border-emerald-200 dark:border-emerald-900/50 animate-in fade-in slide-in-from-top-2">
               <p className="text-sm text-emerald-700 dark:text-emerald-400 font-bold mb-1 uppercase tracking-tight">Slope Field:</p>
               <p className="text-sm text-slate-600 dark:text-slate-400">
-                Both curves follow the <span className="text-emerald-600 font-bold dark:text-emerald-400 uppercase text-xs">same paths</span> locally. Their shapes are rigid copies of each other, shifted vertically.
+                Both curves follow the <span className="text-emerald-600 dark:text-emerald-400 font-bold dark:text-emerald-400 uppercase text-xs">same paths</span> locally. Their shapes are rigid copies of each other, shifted vertically.
               </p>
             </div>
           )}

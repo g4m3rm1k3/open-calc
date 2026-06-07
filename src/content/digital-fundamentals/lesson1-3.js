@@ -598,7 +598,7 @@ A single transistor is just a switch. Combine two or more and you get a **logic 
 .btn{padding:7px 12px;border-radius:8px;font-size:12px;cursor:pointer;border:0.5px solid var(--color-border-secondary,#e2e8f0);background:transparent;color:var(--color-text-secondary,#64748b)}
 .btn.active{background:#0891b2;color:#fff;border-color:#0891b2}
 .tbl td,.tbl th{padding:8px 12px;text-align:center;font-size:13px;border:0.5px solid var(--color-border-tertiary,#e2e8f0)}
-.tbl th{background:var(--color-background-secondary,#f8fafc);font-weight:600;font-size:11px;color:#64748b}
+.tbl th{background:var(--color-background-secondary,#f8fafc);font-weight:600;font-size:11px;color:var(--color-text-secondary, #475569)}
 .card{background:var(--color-background-secondary,#f8fafc);border-radius:8px;padding:10px 14px;border:0.5px solid var(--color-border-tertiary,#e2e8f0);margin-top:8px}
 .hi{color:#059669;font-weight:700}.lo{color:#ef4444;font-weight:700}`,
       startCode: `var gate='NOT',a=0,b=0;
@@ -648,7 +648,7 @@ function render(){
       '</div></div>'
     )+
     '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">'+
-      '<span style="font-size:13px;color:#64748b">Output:</span>'+
+      '<span style="font-size:13px;color:var(--color-text-secondary, #475569)">Output:</span>'+
       '<span style="font-size:28px;font-weight:700;color:'+(out?'#059669':'#ef4444')+'">'+out+'</span>'+
     '</div>'+
     '<table class="tbl" style="border-collapse:collapse;width:100%;margin-bottom:8px">'+

@@ -89,7 +89,7 @@ Click a vertex slot to see how its attribute data flows to that specific shader 
     <button id="btnV1" style="background:#1e2a3f;border:1px solid #334155;color:#4ade80;padding:6px 14px;border-radius:6px;cursor:pointer;font-family:monospace;font-size:11px;">Vertex 1</button>
     <button id="btnV2" style="background:#1e2a3f;border:1px solid #334155;color:#38bdf8;padding:6px 14px;border-radius:6px;cursor:pointer;font-family:monospace;font-size:11px;">Vertex 2</button>
     <button id="btnU" style="background:#1e2a3f;border:1px solid #334155;color:#c084fc;padding:6px 14px;border-radius:6px;cursor:pointer;font-family:monospace;font-size:11px;">Uniform (uTime)</button>
-    <button id="btnReset" style="background:#1e2a3f;border:1px solid #334155;color:#64748b;padding:6px 14px;border-radius:6px;cursor:pointer;font-family:monospace;font-size:11px;">Reset</button>
+    <button id="btnReset" style="background:#1e2a3f;border:1px solid #334155;color:var(--color-text-secondary, #475569);padding:6px 14px;border-radius:6px;cursor:pointer;font-family:monospace;font-size:11px;">Reset</button>
   </div>
 </div>`,
       css: `body{margin:0;background:#0a0f1e}`,
@@ -306,7 +306,7 @@ In GLSL: \`sin(uTime)\` oscillates −1→1 at 1 Hz. \`sin(uTime * 2.0)\` at 2 H
 A triangle whose vertex colours oscillate over time using \`sin(uTime + offset)\`. The entire animation is driven by a single float uniform updated 60 times per second.`,
       html: `<div style="background:#0a0f1e;padding:14px;display:flex;flex-direction:column;gap:10px;align-items:center">
   <canvas id="cv" width="560" height="320" style="border-radius:8px;display:block;width:100%"></canvas>
-  <div style="display:flex;gap:10px;align-items:center;font-family:monospace;font-size:11px;color:#475569;">
+  <div style="display:flex;gap:10px;align-items:center;font-family:monospace;font-size:11px;color:var(--color-text-secondary, #475569);">
     <span>Speed:</span>
     <input id="speed" type="range" min="0.1" max="5" step="0.1" value="1.0" style="width:120px">
     <span id="speedVal" style="color:#94a3b8;width:30px">1.0</span>
@@ -398,15 +398,15 @@ Left: each vertex has its own colour **attribute** (different per vertex). Right
       html: `<div style="background:#0a0f1e;padding:14px;display:flex;flex-direction:column;gap:10px;align-items:center">
   <div style="display:flex;gap:12px;width:100%;justify-content:center;">
     <div style="display:flex;flex-direction:column;gap:4px;align-items:center;">
-      <div style="color:#64748b;font-family:monospace;font-size:11px;">Attribute colours</div>
+      <div style="color:var(--color-text-secondary, #475569);font-family:monospace;font-size:11px;">Attribute colours</div>
       <canvas id="cv1" width="270" height="220" style="border-radius:8px;display:block;"></canvas>
     </div>
     <div style="display:flex;flex-direction:column;gap:4px;align-items:center;">
-      <div style="color:#64748b;font-family:monospace;font-size:11px;">Uniform colour</div>
+      <div style="color:var(--color-text-secondary, #475569);font-family:monospace;font-size:11px;">Uniform colour</div>
       <canvas id="cv2" width="270" height="220" style="border-radius:8px;display:block;"></canvas>
     </div>
   </div>
-  <div style="display:flex;gap:10px;align-items:center;font-family:monospace;font-size:11px;color:#475569;">
+  <div style="display:flex;gap:10px;align-items:center;font-family:monospace;font-size:11px;color:var(--color-text-secondary, #475569);">
     <span>Uniform colour:</span>
     <input id="colPick" type="color" value="#38bdf8">
   </div>

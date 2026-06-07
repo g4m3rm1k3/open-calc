@@ -176,7 +176,7 @@ export default function ArcSinTriangleDerivationLab() {
               <label className="text-xs font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
                 Input Ratio (x) <Info className="w-3 h-3 hover:text-indigo-500 cursor-help" />
               </label>
-              <span className={`text-sm font-mono font-bold ${model.isValid ? 'text-indigo-600 dark:text-indigo-400' : 'text-rose-600 animate-pulse'}`}>
+              <span className={`text-sm font-mono font-bold ${model.isValid ? 'text-indigo-600 dark:text-indigo-400' : 'text-rose-600 dark:text-rose-400 animate-pulse'}`}>
                 {model.x.toFixed(3)}
               </span>
             </div>
@@ -196,7 +196,7 @@ export default function ArcSinTriangleDerivationLab() {
                 onClick={() => setShowInvalid(!showInvalid)}
                 className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
                   showInvalid 
-                    ? 'bg-rose-100 text-rose-700 border border-rose-200 dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-800/50' 
+                    ? 'bg-rose-100 dark:bg-rose-900/50 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800/50 dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-800/50' 
                     : 'bg-slate-200 text-slate-600 border border-slate-300 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'
                 }`}
               >
@@ -426,7 +426,7 @@ export default function ArcSinTriangleDerivationLab() {
                   <div 
                     key={i} 
                     onClick={() => setCurrentStep(i)}
-                    className={`h-1.5 flex-1 rounded-full cursor-pointer transition-all ${i <= currentStep ? 'bg-indigo-500' : 'bg-slate-200 dark:bg-slate-800'}`} 
+                    className={`h-1.5 flex-1 rounded-full cursor-pointer transition-all ${i <= currentStep ? 'bg-indigo-50 dark:bg-indigo-900/300' : 'bg-slate-200 dark:bg-slate-800'}`} 
                   />
                 ))}
               </div>

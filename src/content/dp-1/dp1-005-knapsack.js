@@ -65,7 +65,7 @@ export default {
     <button id="prev" style="background:#374151;color:#e2e8f0;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px">← Prev</button>
     <button id="play" style="background:#1d4ed8;color:#fff;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px">▶ Play</button>
     <button id="nxt"  style="background:#374151;color:#e2e8f0;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px">Next →</button>
-    <span id="ctr" style="color:#64748b;font-size:11px;margin-left:4px">Ready — press Next or Play</span>
+    <span id="ctr" style="color:var(--color-text-secondary, #475569);font-size:11px;margin-left:4px">Ready — press Next or Play</span>
   </div>
   <div id="info" style="padding:8px 12px;background:#0f172a;font-size:11px;min-height:36px;border-bottom:1px solid #1e293b"></div>
   <div id="tbl" style="padding:10px 12px;overflow:auto;flex:1"></div>
@@ -135,14 +135,14 @@ function render() {
   }
 
   let h = "<table style='border-collapse:collapse'>";
-  h += "<tr><td style='width:74px;height:24px;color:#475569;font-size:10px'>item \\ cap</td>";
+  h += "<tr><td style='width:74px;height:24px;color:var(--color-text-secondary, #475569);font-size:10px'>item \\ cap</td>";
   for (let w2 = 0; w2 <= W; w2++)
-    h += "<td style='width:34px;height:24px;text-align:center;color:#475569;font-size:10px'>w=" + w2 + "</td>";
+    h += "<td style='width:34px;height:24px;text-align:center;color:var(--color-text-secondary, #475569);font-size:10px'>w=" + w2 + "</td>";
   h += "</tr>";
 
   for (let i2 = 0; i2 <= N; i2++) {
     const lbl = i2 === 0 ? "— none" : i2 + ". " + ITEMS[i2-1].name.slice(0,4);
-    h += "<tr><td style='color:#64748b;font-size:10px;padding-right:4px;white-space:nowrap'>" + lbl + "</td>";
+    h += "<tr><td style='color:var(--color-text-secondary, #475569);font-size:10px;padding-right:4px;white-space:nowrap'>" + lbl + "</td>";
     for (let w2 = 0; w2 <= W; w2++) {
       const isCur  = cur && cur.i === i2 && cur.w === w2;
       const isSkip = cur && i2 === cur.i - 1 && w2 === cur.w;
@@ -195,7 +195,7 @@ render();`,
     <button id="prev" style="background:#374151;color:#e2e8f0;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px">← Prev</button>
     <button id="play" style="background:#1d4ed8;color:#fff;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px">▶ Play</button>
     <button id="nxt"  style="background:#374151;color:#e2e8f0;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px">Next →</button>
-    <span id="ctr" style="color:#64748b;font-size:11px;margin-left:4px">Ready</span>
+    <span id="ctr" style="color:var(--color-text-secondary, #475569);font-size:11px;margin-left:4px">Ready</span>
   </div>
   <div id="info" style="padding:8px 12px;background:#0f172a;font-size:11px;min-height:36px;border-bottom:1px solid #1e293b"></div>
   <div id="bars" style="padding:16px 12px;overflow:auto;flex:1"></div>
@@ -281,7 +281,7 @@ function render() {
     h += "</div>";
   }
   h += "</div>";
-  h += "<div style='font-size:10px;color:#475569'>Blue labels = coin denominations | Orange = current | Green = source cell</div>";
+  h += "<div style='font-size:10px;color:var(--color-text-secondary, #475569)'>Blue labels = coin denominations | Orange = current | Green = source cell</div>";
   bars.innerHTML = h;
 }
 
@@ -312,7 +312,7 @@ render();`,
     <button id="prev" style="background:#374151;color:#e2e8f0;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px">← Prev</button>
     <button id="play" style="background:#1d4ed8;color:#fff;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px">▶ Play</button>
     <button id="nxt"  style="background:#374151;color:#e2e8f0;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px">Next →</button>
-    <span id="ctr" style="color:#64748b;font-size:11px;margin-left:4px">Ready</span>
+    <span id="ctr" style="color:var(--color-text-secondary, #475569);font-size:11px;margin-left:4px">Ready</span>
   </div>
   <div id="info" style="padding:8px 12px;background:#0f172a;font-size:11px;min-height:36px;border-bottom:1px solid #1e293b"></div>
   <div id="out" style="padding:10px 12px;overflow:auto;flex:1"></div>
@@ -369,7 +369,7 @@ function render() {
     h += "<div style='display:flex;flex-direction:column;align-items:center;gap:2px'>";
     h += "<div style='font-size:10px;color:" + (isCur ? "#fbbf24" : isSrc ? "#4ade80" : "#94a3b8") + "'>" + val + "</div>";
     h += "<div style='width:28px;height:" + bh + "px;background:" + bg + ";border-radius:2px 2px 0 0'></div>";
-    h += "<div style='font-size:10px;color:#475569'>" + w2 + "</div>";
+    h += "<div style='font-size:10px;color:var(--color-text-secondary, #475569)'>" + w2 + "</div>";
     h += "</div>";
   }
   h += "</div>";
@@ -406,7 +406,7 @@ render();`,
     <button id="rst"  style="background:#374151;color:#e2e8f0;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px">↺ Reset</button>
     <button id="prev" style="background:#374151;color:#e2e8f0;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px">← Prev</button>
     <button id="nxt"  style="background:#374151;color:#e2e8f0;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px">Next →</button>
-    <span id="ctr" style="color:#64748b;font-size:11px;margin-left:4px"></span>
+    <span id="ctr" style="color:var(--color-text-secondary, #475569);font-size:11px;margin-left:4px"></span>
   </div>
   <div id="info" style="padding:8px 12px;background:#0f172a;font-size:11px;min-height:36px;border-bottom:1px solid #1e293b"></div>
   <div id="tbl" style="padding:10px 12px;overflow:auto;flex:1"></div>
@@ -477,7 +477,7 @@ function render() {
   }
 
   let h = "<table style='border-collapse:collapse'>";
-  h += "<tr><td style='width:74px;height:24px;color:#475569;font-size:10px'>item \\ cap</td>";
+  h += "<tr><td style='width:74px;height:24px;color:var(--color-text-secondary, #475569);font-size:10px'>item \\ cap</td>";
   for (let w2 = 0; w2 <= W; w2++)
     h += "<td style='width:34px;height:24px;text-align:center;color:" + (w2 === W ? "#f59e0b" : "#475569") + ";font-size:10px'>" + w2 + "</td>";
   h += "</tr>";

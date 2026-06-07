@@ -46,10 +46,10 @@ Select a vertex. Watch its coordinates transform through each space as you step 
   <canvas id="cv" width="680" height="360" style="border-radius:8px;display:block;width:100%"></canvas>
   <div style="display:flex;gap:8px;font-family:monospace;font-size:11px;">
     <button class="spaceBtn" data-s="0" style="background:#f8717122;border:1px solid #f87171;color:#f87171;padding:5px 12px;border-radius:5px;cursor:pointer;font-family:monospace;font-size:10px;">Object</button>
-    <button class="spaceBtn" data-s="1" style="background:#1e2a3f;border:1px solid #334155;color:#64748b;padding:5px 12px;border-radius:5px;cursor:pointer;font-family:monospace;font-size:10px;">World</button>
-    <button class="spaceBtn" data-s="2" style="background:#1e2a3f;border:1px solid #334155;color:#64748b;padding:5px 12px;border-radius:5px;cursor:pointer;font-family:monospace;font-size:10px;">View</button>
-    <button class="spaceBtn" data-s="3" style="background:#1e2a3f;border:1px solid #334155;color:#64748b;padding:5px 12px;border-radius:5px;cursor:pointer;font-family:monospace;font-size:10px;">Clip</button>
-    <button class="spaceBtn" data-s="4" style="background:#1e2a3f;border:1px solid #334155;color:#64748b;padding:5px 12px;border-radius:5px;cursor:pointer;font-family:monospace;font-size:10px;">NDC</button>
+    <button class="spaceBtn" data-s="1" style="background:#1e2a3f;border:1px solid #334155;color:var(--color-text-secondary, #475569);padding:5px 12px;border-radius:5px;cursor:pointer;font-family:monospace;font-size:10px;">World</button>
+    <button class="spaceBtn" data-s="2" style="background:#1e2a3f;border:1px solid #334155;color:var(--color-text-secondary, #475569);padding:5px 12px;border-radius:5px;cursor:pointer;font-family:monospace;font-size:10px;">View</button>
+    <button class="spaceBtn" data-s="3" style="background:#1e2a3f;border:1px solid #334155;color:var(--color-text-secondary, #475569);padding:5px 12px;border-radius:5px;cursor:pointer;font-family:monospace;font-size:10px;">Clip</button>
+    <button class="spaceBtn" data-s="4" style="background:#1e2a3f;border:1px solid #334155;color:var(--color-text-secondary, #475569);padding:5px 12px;border-radius:5px;cursor:pointer;font-family:monospace;font-size:10px;">NDC</button>
   </div>
 </div>`,
       css: `body{margin:0;background:#0a0f1e}`,

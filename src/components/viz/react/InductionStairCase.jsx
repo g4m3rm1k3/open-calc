@@ -89,7 +89,7 @@ export default function InductionProofEngine() {
             <div
               key={i}
               className={`w-10 h-10 rounded flex items-center justify-center text-xs font-bold text-white
-                ${cell.type === 'stair' ? 'bg-orange-500' : 'bg-blue-500'}
+                ${cell.type === 'stair' ? 'bg-orange-50 dark:bg-orange-900/300' : 'bg-blue-50 dark:bg-blue-900/300'}
               `}
               style={{
                 gridColumn: cell.col + 1,
@@ -100,7 +100,7 @@ export default function InductionProofEngine() {
 
           {/* rectangle overlay */}
           {step >= 3 && (
-            <div className="absolute inset-0 border-2 border-emerald-500 flex items-center justify-center text-xs text-emerald-600 font-bold">
+            <div className="absolute inset-0 border-2 border-emerald-500 flex items-center justify-center text-xs text-emerald-600 dark:text-emerald-400 font-bold">
               n(n+1) = {n * (n + 1)}
             </div>
           )}
@@ -109,7 +109,7 @@ export default function InductionProofEngine() {
 
       {/* ALGEBRA PANEL */}
       <div className="mb-6 p-4 bg-slate-100 dark:bg-slate-800 rounded-xl">
-        <div className="font-mono text-lg text-emerald-600">
+        <div className="font-mono text-lg text-emerald-600 dark:text-emerald-400">
           {current.algebra}
         </div>
       </div>
@@ -130,7 +130,7 @@ export default function InductionProofEngine() {
 
       {/* RESULT */}
       <div className="text-center mb-6 font-mono text-lg">
-        1 + 2 + … + {n} = <span className="text-emerald-600">{sum}</span>
+        1 + 2 + … + {n} = <span className="text-emerald-600 dark:text-emerald-400">{sum}</span>
       </div>
 
       {/* CONTROLS */}

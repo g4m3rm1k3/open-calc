@@ -55,14 +55,14 @@ export default function LogicConnectiveBuilder() {
   const connective = CONNECTIVES[selectedConnective];
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+    <div className="max-w-4xl mx-auto p-6 bg-white dark:bg-slate-900 rounded-lg shadow-lg">
       <h2 className="text-2xl font-bold mb-4 text-center">
         Build Your Own Logic Expressions
       </h2>
 
       <div className="mb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div className="bg-blue-50 p-4 rounded-lg">
+          <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg">
             <h3 className="font-bold mb-2">Proposition P</h3>
             <div className="flex items-center space-x-4">
               <label className="flex items-center">
@@ -84,17 +84,17 @@ export default function LogicConnectiveBuilder() {
                 False
               </label>
             </div>
-            <div className="mt-2 text-sm text-gray-600">
+            <div className="mt-2 text-sm text-gray-600 dark:text-gray-300">
               Current value:{" "}
               <span
-                className={`font-bold ${p ? "text-green-600" : "text-red-600"}`}
+                className={`font-bold ${p ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}
               >
                 {p ? "TRUE" : "FALSE"}
               </span>
             </div>
           </div>
 
-          <div className="bg-green-50 p-4 rounded-lg">
+          <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg">
             <h3 className="font-bold mb-2">Proposition Q</h3>
             <div className="flex items-center space-x-4">
               <label className="flex items-center">
@@ -116,10 +116,10 @@ export default function LogicConnectiveBuilder() {
                 False
               </label>
             </div>
-            <div className="mt-2 text-sm text-gray-600">
+            <div className="mt-2 text-sm text-gray-600 dark:text-gray-300">
               Current value:{" "}
               <span
-                className={`font-bold ${q ? "text-green-600" : "text-red-600"}`}
+                className={`font-bold ${q ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}
               >
                 {q ? "TRUE" : "FALSE"}
               </span>
@@ -127,7 +127,7 @@ export default function LogicConnectiveBuilder() {
           </div>
         </div>
 
-        <div className="bg-yellow-50 p-4 rounded-lg mb-6">
+        <div className="bg-yellow-50 dark:bg-yellow-900/30 p-4 rounded-lg mb-6">
           <h3 className="font-bold mb-2">Choose a Logical Connective</h3>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
             {Object.entries(CONNECTIVES).map(([symbol, info]) => (
@@ -136,8 +136,8 @@ export default function LogicConnectiveBuilder() {
                 onClick={() => setSelectedConnective(symbol)}
                 className={`p-3 border rounded-lg text-center transition-colors ${
                   selectedConnective === symbol
-                    ? "bg-blue-500 text-white border-blue-500"
-                    : "bg-white hover:bg-gray-50 border-gray-300"
+                    ? "bg-blue-50 dark:bg-blue-900/300 text-white border-blue-500"
+                    : "bg-white dark:bg-slate-900 hover:bg-gray-50 dark:bg-slate-800 border-gray-300"
                 }`}
               >
                 <div className="text-2xl font-bold mb-1">{symbol}</div>
@@ -145,7 +145,7 @@ export default function LogicConnectiveBuilder() {
               </button>
             ))}
           </div>
-          <div className="mt-2 text-sm text-gray-600">
+          <div className="mt-2 text-sm text-gray-600 dark:text-gray-300">
             <strong>
               {connective.name} ({connective.symbol}):
             </strong>{" "}
@@ -158,7 +158,7 @@ export default function LogicConnectiveBuilder() {
         <h3 className="text-xl font-bold mb-4">Expression Results</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {expressions.map((item, index) => (
-            <div key={index} className="border rounded-lg p-4 bg-gray-50">
+            <div key={index} className="border rounded-lg p-4 bg-gray-50 dark:bg-slate-800">
               <div className="font-mono text-lg mb-2">
                 {item.expr
                   .replace("∧", " ∧ ")
@@ -169,7 +169,7 @@ export default function LogicConnectiveBuilder() {
               <div className="text-sm">
                 Result:{" "}
                 <span
-                  className={`font-bold ${item.result ? "text-green-600" : "text-red-600"}`}
+                  className={`font-bold ${item.result ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}
                 >
                   {item.result ? "TRUE" : "FALSE"}
                 </span>
@@ -179,7 +179,7 @@ export default function LogicConnectiveBuilder() {
         </div>
       </div>
 
-      <div className="bg-purple-50 p-4 rounded-lg">
+      <div className="bg-purple-50 dark:bg-purple-900/30 p-4 rounded-lg">
         <h3 className="font-bold mb-2">Key Insights</h3>
         <div className="space-y-2 text-sm">
           <p>

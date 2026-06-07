@@ -48,17 +48,17 @@ export default {
   <div style="background:#1e293b;border-radius:8px;padding:12px;border-top:3px solid #60a5fa">
     <div style="color:#60a5fa;font-weight:bold;margin-bottom:6px">Divide &amp; Conquer</div>
     <div style="color:#94a3b8;font-size:12px;margin-bottom:6px">Split into <i>independent</i> subproblems, solve each, combine results.</div>
-    <div style="color:#64748b;font-size:11px">merge sort · quicksort · binary search · max subarray</div>
+    <div style="color:var(--color-text-secondary, #475569);font-size:11px">merge sort · quicksort · binary search · max subarray</div>
   </div>
   <div style="background:#1e293b;border-radius:8px;padding:12px;border-top:3px solid #4ade80">
     <div style="color:#4ade80;font-weight:bold;margin-bottom:6px">Greedy</div>
     <div style="color:#94a3b8;font-size:12px;margin-bottom:6px">Always make the locally optimal choice. Works when local optimal = global optimal.</div>
-    <div style="color:#64748b;font-size:11px">activity selection · jump game · Dijkstra · Huffman</div>
+    <div style="color:var(--color-text-secondary, #475569);font-size:11px">activity selection · jump game · Dijkstra · Huffman</div>
   </div>
   <div style="background:#1e293b;border-radius:8px;padding:12px;border-top:3px solid #f59e0b">
     <div style="color:#f59e0b;font-weight:bold;margin-bottom:6px">Dynamic Programming</div>
     <div style="color:#94a3b8;font-size:12px;margin-bottom:6px">Overlapping subproblems — cache results (memoization or tabulation).</div>
-    <div style="color:#64748b;font-size:11px">fibonacci · coin change · knapsack · LCS · edit distance</div>
+    <div style="color:var(--color-text-secondary, #475569);font-size:11px">fibonacci · coin change · knapsack · LCS · edit distance</div>
   </div>
 </div>
 <div style="background:#0f172a;border-radius:6px;padding:10px;margin-top:12px;font-size:12px;color:#94a3b8">
@@ -177,7 +177,7 @@ dp.forEach((v, i) => {
   const color = v === Infinity ? '#475569' : i === amount ? '#f59e0b' : '#4ade80';
   html += '<div style="text-align:center">' +
     '<div style="background:#1e293b;border-radius:4px;padding:6px 10px;color:' + color + ';font-weight:bold">' + (v===Infinity?'∞':v) + '</div>' +
-    '<div style="color:#64748b;font-size:11px;margin-top:2px">i=' + i + '</div></div>';
+    '<div style="color:var(--color-text-secondary, #475569);font-size:11px;margin-top:2px">i=' + i + '</div></div>';
 });
 html += '</div>';
 html += '<div style="color:#4ade80;margin-top:10px">dp[6] = <b>2</b> coins (3+3)</div>';

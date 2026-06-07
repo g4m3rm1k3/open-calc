@@ -67,13 +67,13 @@ export default {
   </div>
   <div style="flex:1;min-width:180px">
     <div style="color:#94a3b8;font-size:11px;margin-bottom:6px;font-family:monospace">LOG</div>
-    <div id="log" style="min-height:180px;border:1px solid #1e293b;border-radius:6px;padding:8px;font-family:monospace;font-size:11px;color:#64748b;overflow-y:auto"></div>
+    <div id="log" style="min-height:180px;border:1px solid #1e293b;border-radius:6px;padding:8px;font-family:monospace;font-size:11px;color:var(--color-text-secondary, #475569);overflow-y:auto"></div>
   </div>
 </div>
 <div style="margin-top:10px;display:flex;gap:8px">
   <button id="btn-push" style="padding:7px 18px;border-radius:6px;border:none;background:#6d28d9;color:#fff;font-family:monospace;font-size:12px;cursor:pointer">Push</button>
   <button id="btn-pop" style="padding:7px 18px;border-radius:6px;border:none;background:#b91c1c;color:#fff;font-family:monospace;font-size:12px;cursor:pointer">Pop</button>
-  <button id="btn-rst" style="padding:7px 12px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:#64748b;font-family:monospace;font-size:12px;cursor:pointer">Reset</button>
+  <button id="btn-rst" style="padding:7px 12px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:var(--color-text-secondary, #475569);font-family:monospace;font-size:12px;cursor:pointer">Reset</button>
   <span id="msg" style="font-family:monospace;font-size:12px;color:#94a3b8;line-height:32px"></span>
 </div>`,
                 css: `body{margin:0;padding:12px;background:#0f172a;color:#e2e8f0;box-sizing:border-box;font-family:monospace}
@@ -134,17 +134,17 @@ render();`,
   <div style="color:#94a3b8;font-size:11px;margin-bottom:6px;font-family:monospace">QUEUE — front → back</div>
   <div id="queue-viz" style="min-height:56px;display:flex;gap:4px;align-items:center;border:1px solid #1e293b;border-radius:6px;padding:8px;flex-wrap:wrap"></div>
 </div>
-<div id="log" style="min-height:80px;border:1px solid #1e293b;border-radius:6px;padding:8px;font-family:monospace;font-size:11px;color:#64748b;overflow-y:auto;margin-bottom:10px"></div>
+<div id="log" style="min-height:80px;border:1px solid #1e293b;border-radius:6px;padding:8px;font-family:monospace;font-size:11px;color:var(--color-text-secondary, #475569);overflow-y:auto;margin-bottom:10px"></div>
 <div style="display:flex;gap:8px;align-items:center">
   <button id="btn-enq" style="padding:7px 18px;border-radius:6px;border:none;background:#0d9488;color:#fff;font-family:monospace;font-size:12px;cursor:pointer">Enqueue</button>
   <button id="btn-deq" style="padding:7px 18px;border-radius:6px;border:none;background:#b91c1c;color:#fff;font-family:monospace;font-size:12px;cursor:pointer">Dequeue</button>
-  <button id="btn-rst" style="padding:7px 12px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:#64748b;font-family:monospace;font-size:12px;cursor:pointer">Reset</button>
+  <button id="btn-rst" style="padding:7px 12px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:var(--color-text-secondary, #475569);font-family:monospace;font-size:12px;cursor:pointer">Reset</button>
   <span id="msg" style="font-family:monospace;font-size:11px;color:#94a3b8"></span>
 </div>`,
                 css: `body{margin:0;padding:12px;background:#0f172a;color:#e2e8f0;box-sizing:border-box;font-family:monospace}
 .item{padding:8px 14px;background:#042f2e;border:2px solid #2dd4bf;border-radius:5px;color:#2dd4bf;font-weight:bold;font-size:14px;animation:pop .2s ease}
 .item.front{border-color:#f59e0b;background:#1c1007;color:#f59e0b}
-.label{font-size:9px;color:#475569;margin-top:2px;text-align:center}
+.label{font-size:9px;color:var(--color-text-secondary, #475569);margin-top:2px;text-align:center}
 @keyframes pop{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}`,
                 startCode: `const viz = document.getElementById('queue-viz');
 const log = document.getElementById('log');
@@ -165,7 +165,7 @@ function render(newBack = false) {
     wrap.appendChild(el); wrap.appendChild(lbl);
     viz.appendChild(wrap);
   });
-  if (!queue.length) viz.innerHTML = '<span style="color:#475569;font-size:12px">(empty)</span>';
+  if (!queue.length) viz.innerHTML = '<span style="color:var(--color-text-secondary, #475569);font-size:12px">(empty)</span>';
   msg.textContent = queue.length ? \`front=\${queue[0]}  back=\${queue[queue.length-1]}  size=\${queue.length}\` : '';
 }
 
@@ -500,7 +500,7 @@ Empty shells. No hints. Write the complete Stack and Queue from memory, then imp
 All three components must work for the test suite to go green.`,
                 html: `<div id="out" style="font-family:monospace;font-size:13px"></div>`,
                 css: `body{margin:0;padding:14px;background:#0f172a;color:#e2e8f0;box-sizing:border-box;font-family:monospace}
-.pass{color:#4ade80;margin:2px 0}.fail{color:#f87171;margin:2px 0}.section{color:#64748b;font-size:11px;margin-top:10px;border-top:1px solid #1e293b;padding-top:6px}
+.pass{color:#4ade80;margin:2px 0}.fail{color:#f87171;margin:2px 0}.section{color:var(--color-text-secondary, #475569);font-size:11px;margin-top:10px;border-top:1px solid #1e293b;padding-top:6px}
 .banner{margin-top:12px;padding:10px 14px;border-radius:8px;font-size:13px}
 .banner.ok{background:#052e16;border:1px solid #166534;color:#4ade80}
 .banner.bad{background:#450a0a;border:1px solid #7f1d1d;color:#f87171}`,

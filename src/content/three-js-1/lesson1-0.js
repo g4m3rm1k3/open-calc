@@ -57,17 +57,17 @@ Drag the sliders to mix a colour. The WebGL canvas updates in real time and the 
       B (Blue) = <span id="bv">0.25</span>
       <input id="sb" type="range" min="0" max="1" step="0.01" value="0.25" style="accent-color:#38bdf8;width:100%">
     </label>
-    <div style="margin-top:4px;background:#1e293b;border-radius:6px;padding:10px;font-family:monospace;font-size:10px;line-height:2;color:#64748b">
+    <div style="margin-top:4px;background:#1e293b;border-radius:6px;padding:10px;font-family:monospace;font-size:10px;line-height:2;color:var(--color-text-secondary, #475569)">
       // Live WebGL calls:<br>
       <span style="color:#94a3b8">gl.clearColor(<span id="rl" style="color:#f87171">0.08</span>, <span id="gl2" style="color:#4ade80">0.05</span>, <span id="bl" style="color:#38bdf8">0.25</span>, 1.0);</span><br>
       <span style="color:#94a3b8">gl.clear(gl.COLOR_BUFFER_BIT);</span>
     </div>
-    <div style="background:#0f172a;border-radius:6px;padding:8px;font-family:monospace;font-size:10px;color:#475569;line-height:1.6">
+    <div style="background:#0f172a;border-radius:6px;padding:8px;font-family:monospace;font-size:10px;color:var(--color-text-secondary, #475569);line-height:1.6">
       Values 0.0–1.0 (not 0–255).<br>1.0 = full brightness.
     </div>
   </div>
   <div style="flex:1;min-width:200px;display:flex;flex-direction:column;gap:8px">
-    <div style="color:#475569;font-family:monospace;font-size:10px">WebGL canvas output:</div>
+    <div style="color:var(--color-text-secondary, #475569);font-family:monospace;font-size:10px">WebGL canvas output:</div>
     <canvas id="cv" width="300" height="200" style="border-radius:8px;border:1px solid rgba(255,255,255,0.1);width:100%;max-width:300px;display:block"></canvas>
   </div>
 </div>`,
@@ -241,10 +241,10 @@ The square uses \`requestAnimationFrame\`. Each frame: **clear → move → draw
     <label style="color:#94a3b8;font-family:monospace;font-size:11px;display:flex;align-items:center;gap:6px">Speed
       <input id="sl-spd" type="range" min="1" max="6" value="3" step="1" style="width:80px;accent-color:#38bdf8">
     </label>
-    <span id="fps-el" style="color:#64748b;font-family:monospace;font-size:11px">-- fps</span>
+    <span id="fps-el" style="color:var(--color-text-secondary, #475569);font-family:monospace;font-size:11px">-- fps</span>
   </div>
   <canvas id="cv" width="620" height="260" style="border-radius:8px;display:block"></canvas>
-  <div id="info" style="font-family:monospace;font-size:11px;color:#64748b;text-align:center;min-height:18px"></div>
+  <div id="info" style="font-family:monospace;font-size:11px;color:var(--color-text-secondary, #475569);text-align:center;min-height:18px"></div>
 </div>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center}`,
       startCode: `var canvas = document.getElementById('cv');
@@ -375,14 +375,14 @@ Drag **Zoom** to magnify both. At 3× or 4× the difference becomes unmistakable
       <div style="overflow:hidden;width:200px;height:150px;border-radius:6px;border:1.5px solid #f87171">
         <canvas id="c1" width="100" height="75" style="width:200px;height:150px;display:block;transform-origin:top left"></canvas>
       </div>
-      <div style="background:#1e293b;border-radius:4px;padding:3px 8px;font-family:monospace;font-size:9px;color:#64748b">canvas.width=100 stretched to 200px</div>
+      <div style="background:#1e293b;border-radius:4px;padding:3px 8px;font-family:monospace;font-size:9px;color:var(--color-text-secondary, #475569)">canvas.width=100 stretched to 200px</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
       <div style="color:#4ade80;font-family:monospace;font-size:10px;font-weight:700">DPR x2 APPLIED — sharp</div>
       <div style="overflow:hidden;width:200px;height:150px;border-radius:6px;border:1.5px solid #4ade80">
         <canvas id="c2" width="400" height="300" style="width:200px;height:150px;display:block;transform-origin:top left"></canvas>
       </div>
-      <div style="background:#1e293b;border-radius:4px;padding:3px 8px;font-family:monospace;font-size:9px;color:#64748b">canvas.width=400 downsampled to 200px</div>
+      <div style="background:#1e293b;border-radius:4px;padding:3px 8px;font-family:monospace;font-size:9px;color:var(--color-text-secondary, #475569)">canvas.width=400 downsampled to 200px</div>
     </div>
   </div>
 </div>`,

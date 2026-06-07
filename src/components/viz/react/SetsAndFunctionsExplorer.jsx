@@ -87,7 +87,7 @@ export default function SetsAndFunctionsExplorer({ params = {} }) {
               value={newElement}
               onChange={(e) => setNewElement(e.target.value)}
               placeholder="Add element (number)"
-              className="flex-1 p-4 border border-slate-300 dark:border-slate-600 rounded-2xl font-mono focus:outline-none focus:border-orange-400"
+              className="flex-1 p-4 border border-slate-300 dark:border-slate-600 rounded-2xl font-mono focus:outline-none focus:border-orange-400 dark:border-orange-600/50"
             />
             <button onClick={() => addElement('A')} className="px-8 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl">Add to A</button>
             <button onClick={() => addElement('B')} className="px-8 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl">Add to B</button>
@@ -126,7 +126,7 @@ export default function SetsAndFunctionsExplorer({ params = {} }) {
             ))}
           </div>
 
-          <div className={`p-6 rounded-3xl text-center font-semibold text-lg ${isBijective ? 'bg-emerald-100 dark:bg-emerald-900 text-emerald-700' : isInjective ? 'bg-amber-100 dark:bg-amber-900 text-amber-700' : 'bg-red-100 dark:bg-red-900 text-red-700'}`}>
+          <div className={`p-6 rounded-3xl text-center font-semibold text-lg ${isBijective ? 'bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300' : isInjective ? 'bg-amber-100 dark:bg-amber-900 text-amber-700' : 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300'}`}>
             {isBijective
               ? 'Bijective — perfect one-to-one correspondence'
               : isInjective

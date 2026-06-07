@@ -58,8 +58,8 @@ In geometry, the propositions you work with are geometric claims about specific 
 
 Click each statement to reveal whether it is a proposition and, if so, its truth value. Understanding what counts as a proposition is the first step in writing precise geometric claims.`,
       html: `<div id="prop-cards" style="padding:14px;display:flex;flex-direction:column;gap:8px"></div>
-<div id="prop-feedback" style="padding:10px 14px;font-family:Georgia,serif;font-size:13px;background:#fafaf8;border-top:1px solid #e2e8f0;line-height:1.7;min-height:44px;color:#64748b">Click any statement to classify it.</div>`,
-      css: `body{margin:0;background:#fafaf8;font-family:Georgia,serif}`,
+<div id="prop-feedback" style="padding:10px 14px;font-family:Georgia,serif;font-size:13px;background:var(--color-background-secondary, #f8fafc);border-top:1px solid var(--color-border-primary, #e2e8f0);line-height:1.7;min-height:44px;color:var(--color-text-secondary, #475569)">Click any statement to classify it.</div>`,
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc);font-family:Georgia,serif}`,
       startCode: `var items=[
   {text:'"Every equilateral triangle is equiangular."',
    isProp:true,truth:'True',
@@ -91,14 +91,14 @@ var cardsEl=document.getElementById('prop-cards'),feedbackEl=document.getElement
 
 items.forEach(function(item,i){
   var card=document.createElement('div');
-  card.style.cssText='border:1.5px solid #e2e8f0;border-radius:8px;padding:10px 14px;cursor:pointer;background:#fff;display:flex;align-items:center;gap:10px;transition:all .15s;';
+  card.style.cssText='border:1.5px solid var(--color-border-primary, #e2e8f0);border-radius:8px;padding:10px 14px;cursor:pointer;background:var(--color-background-primary, #ffffff);display:flex;align-items:center;gap:10px;transition:all .15s;';
 
   var numEl=document.createElement('div');
-  numEl.style.cssText='min-width:22px;height:22px;border-radius:11px;background:#e2e8f0;color:#64748b;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:sans-serif;';
+  numEl.style.cssText='min-width:22px;height:22px;border-radius:11px;background:#e2e8f0;color:var(--color-text-secondary, #475569);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:sans-serif;';
   numEl.textContent=i+1;
 
   var textEl=document.createElement('div');
-  textEl.style.cssText='font-size:13px;color:#374151;flex:1;font-family:Georgia,serif;font-style:italic;';
+  textEl.style.cssText='font-size:13px;color:var(--color-text-primary, #1e293b);flex:1;font-family:Georgia,serif;font-style:italic;';
   textEl.textContent=item.text;
 
   var badgeEl=document.createElement('div');
@@ -167,10 +167,10 @@ A theorem whose converse is also true is called a **biconditional**: P ↔ Q ("P
       instruction: `### The Four Forms of a Conditional
 
 Select any theorem below to see its original form, converse, inverse, and contrapositive. For each form, determine whether it is true or false — the results will surprise you.`,
-      html: `<div style="padding:8px 14px 0;background:#fafaf8;display:flex;gap:8px;flex-wrap:wrap" id="thm-sel"></div>
+      html: `<div style="padding:8px 14px 0;background:var(--color-background-secondary, #f8fafc);display:flex;gap:8px;flex-wrap:wrap" id="thm-sel"></div>
 <canvas id="cv" width="700" height="280"></canvas>
-<div id="cond-info" style="padding:10px 14px;font-family:Georgia,serif;font-size:13px;background:#fafaf8;border-top:1px solid #e2e8f0;line-height:1.7"></div>`,
-      css: `body{margin:0;background:#fafaf8;font-family:Georgia,serif}canvas{display:block}`,
+<div id="cond-info" style="padding:10px 14px;font-family:Georgia,serif;font-size:13px;background:var(--color-background-secondary, #f8fafc);border-top:1px solid var(--color-border-primary, #e2e8f0);line-height:1.7"></div>`,
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc);font-family:Georgia,serif}canvas{display:block}`,
       startCode: `var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 var W=cv.width,H=cv.height;
 
@@ -381,7 +381,7 @@ This is why definitions can be used in proofs in both directions:
 
 Definitions are biconditionals. The interactive below shows how the same definition is used in the forward direction (from term to property) and the backward direction (from property to term) in geometric proofs.`,
       html: `<div id="def-cards" style="padding:14px;display:flex;flex-direction:column;gap:10px"></div>`,
-      css: `body{margin:0;background:#fafaf8;font-family:Georgia,serif}`,
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc);font-family:Georgia,serif}`,
       startCode: `var defs=[
   {
     term:'Midpoint',
@@ -409,12 +409,12 @@ Definitions are biconditionals. The interactive below shows how the same definit
 var container=document.getElementById('def-cards');
 defs.forEach(function(d){
   var card=document.createElement('div');
-  card.style.cssText='border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;background:#fff;';
+  card.style.cssText='border:1px solid var(--color-border-primary, #e2e8f0);border-radius:10px;overflow:hidden;background:var(--color-background-primary, #ffffff);';
 
   var header=document.createElement('div');
-  header.style.cssText='padding:10px 14px;background:'+d.color+'18;border-bottom:1px solid #e2e8f0;';
+  header.style.cssText='padding:10px 14px;background:'+d.color+'18;border-bottom:1px solid var(--color-border-primary, #e2e8f0);';
   header.innerHTML='<div style="font-weight:700;font-size:14px;color:'+d.color+'">'+d.term+'</div>'
-    +'<div style="font-size:12px;font-style:italic;color:#374151;margin-top:3px">'+d.def+'</div>';
+    +'<div style="font-size:12px;font-style:italic;color:var(--color-text-primary, #1e293b);margin-top:3px">'+d.def+'</div>';
 
   var body=document.createElement('div');
   body.style.cssText='padding:10px 14px;display:grid;grid-template-columns:1fr 1fr;gap:10px;';
@@ -422,14 +422,14 @@ defs.forEach(function(d){
   var fw=document.createElement('div');
   fw.style.cssText='padding:8px 10px;background:#eff6ff;border-radius:7px;border-left:3px solid '+d.color+';';
   fw.innerHTML='<div style="font-size:11px;font-weight:700;color:'+d.color+';margin-bottom:4px;font-family:sans-serif">→ FORWARD: Term to Property</div>'
-    +'<div style="font-size:11px;color:#64748b;margin-bottom:4px;font-style:italic">Scenario: '+d.forward.scenario+'</div>'
-    +'<div style="font-size:12px;color:#374151;line-height:1.6">'+d.forward.use+'</div>';
+    +'<div style="font-size:11px;color:var(--color-text-secondary, #475569);margin-bottom:4px;font-style:italic">Scenario: '+d.forward.scenario+'</div>'
+    +'<div style="font-size:12px;color:var(--color-text-primary, #1e293b);line-height:1.6">'+d.forward.use+'</div>';
 
   var bk=document.createElement('div');
   bk.style.cssText='padding:8px 10px;background:#f0fdf4;border-radius:7px;border-left:3px solid '+d.color+';';
   bk.innerHTML='<div style="font-size:11px;font-weight:700;color:'+d.color+';margin-bottom:4px;font-family:sans-serif">← BACKWARD: Property to Term</div>'
-    +'<div style="font-size:11px;color:#64748b;margin-bottom:4px;font-style:italic">Scenario: '+d.backward.scenario+'</div>'
-    +'<div style="font-size:12px;color:#374151;line-height:1.6">'+d.backward.use+'</div>';
+    +'<div style="font-size:11px;color:var(--color-text-secondary, #475569);margin-bottom:4px;font-style:italic">Scenario: '+d.backward.scenario+'</div>'
+    +'<div style="font-size:12px;color:var(--color-text-primary, #1e293b);line-height:1.6">'+d.backward.use+'</div>';
 
   body.appendChild(fw);body.appendChild(bk);
   card.appendChild(header);card.appendChild(body);

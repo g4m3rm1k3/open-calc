@@ -56,7 +56,7 @@ export default function TruthTableViz() {
   const isContradiction = tableData.every((row) => row.result === "F");
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+    <div className="max-w-4xl mx-auto p-6 bg-white dark:bg-slate-900 rounded-lg shadow-lg">
       <h2 className="text-2xl font-bold mb-4 text-center">
         Truth Table Visualizer
       </h2>
@@ -94,7 +94,7 @@ export default function TruthTableViz() {
           </div>
         </div>
 
-        <div className="text-sm text-gray-600 mb-4">
+        <div className="text-sm text-gray-600 dark:text-gray-300 mb-4">
           <p>
             <strong>Syntax:</strong> Use AND, OR, NOT, IMPLIES (-&gt;), IFF
             (&lt;-&gt;), or symbols ∧ ∨ ¬ → ↔
@@ -108,7 +108,7 @@ export default function TruthTableViz() {
       <div className="overflow-x-auto">
         <table className="w-full border-collapse border border-gray-300">
           <thead>
-            <tr className="bg-gray-100">
+            <tr className="bg-gray-100 dark:bg-slate-800">
               {activeVars.map((varName) => (
                 <th
                   key={varName}
@@ -126,7 +126,7 @@ export default function TruthTableViz() {
             {tableData.map((row, index) => (
               <tr
                 key={index}
-                className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                className={index % 2 === 0 ? "bg-white dark:bg-slate-900" : "bg-gray-50 dark:bg-slate-800"}
               >
                 {activeVars.map((varName) => (
                   <td
@@ -139,10 +139,10 @@ export default function TruthTableViz() {
                 <td
                   className={`border border-gray-300 px-4 py-2 text-center font-mono font-bold ${
                     row.result === "T"
-                      ? "text-green-600"
+                      ? "text-green-600 dark:text-green-400"
                       : row.result === "F"
-                        ? "text-red-600"
-                        : "text-orange-600"
+                        ? "text-red-600 dark:text-red-400"
+                        : "text-orange-600 dark:text-orange-400"
                   }`}
                 >
                   {row.result}
@@ -153,7 +153,7 @@ export default function TruthTableViz() {
         </table>
       </div>
 
-      <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+      <div className="mt-6 p-4 bg-gray-50 dark:bg-slate-800 rounded-lg">
         <h3 className="font-bold mb-2">Analysis:</h3>
         <div className="space-y-1">
           <p>
@@ -166,7 +166,7 @@ export default function TruthTableViz() {
             <strong>Tautology:</strong>{" "}
             <span
               className={
-                isTautology ? "text-green-600 font-bold" : "text-gray-600"
+                isTautology ? "text-green-600 dark:text-green-400 font-bold" : "text-gray-600 dark:text-gray-300"
               }
             >
               {isTautology ? "YES" : "NO"}
@@ -177,7 +177,7 @@ export default function TruthTableViz() {
             <strong>Contradiction:</strong>{" "}
             <span
               className={
-                isContradiction ? "text-red-600 font-bold" : "text-gray-600"
+                isContradiction ? "text-red-600 dark:text-red-400 font-bold" : "text-gray-600 dark:text-gray-300"
               }
             >
               {isContradiction ? "YES" : "NO"}
@@ -187,7 +187,7 @@ export default function TruthTableViz() {
         </div>
       </div>
 
-      <div className="mt-4 text-sm text-gray-600">
+      <div className="mt-4 text-sm text-gray-600 dark:text-gray-300">
         <p>
           <strong>Interactive Tip:</strong> Try expressions like "P OR NOT P"
           (tautology), "P AND NOT P" (contradiction), or "(P → Q) ↔ (¬P ∨ Q)"

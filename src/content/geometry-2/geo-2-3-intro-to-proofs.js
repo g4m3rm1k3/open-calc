@@ -64,8 +64,8 @@ Every step must be explicitly justified. "It's obvious" is not a justification. 
 
 Each item below is a step from a geometric proof. Click each one to see whether it is a valid justification — and why.`,
       html: `<div id="steps-container" style="padding:14px;display:flex;flex-direction:column;gap:8px"></div>
-<div id="step-feedback" style="padding:10px 14px;font-family:Georgia,serif;font-size:13px;background:#fafaf8;border-top:1px solid #e2e8f0;line-height:1.7;min-height:48px"></div>`,
-      css: `body{margin:0;background:#fafaf8;font-family:Georgia,serif}`,
+<div id="step-feedback" style="padding:10px 14px;font-family:Georgia,serif;font-size:13px;background:var(--color-background-secondary, #f8fafc);border-top:1px solid var(--color-border-primary, #e2e8f0);line-height:1.7;min-height:48px"></div>`,
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc);font-family:Georgia,serif}`,
       startCode: `var items=[
   {statement:'∠1 = ∠3 because they are vertical angles.',
    valid:true,
@@ -106,14 +106,14 @@ var feedback=document.getElementById('step-feedback');
 
 items.forEach(function(item,i){
   var card=document.createElement('div');
-  card.style.cssText='border:1.5px solid #e2e8f0;border-radius:8px;padding:10px 14px;cursor:pointer;transition:all .15s;background:#fff;display:flex;align-items:flex-start;gap:10px;';
+  card.style.cssText='border:1.5px solid var(--color-border-primary, #e2e8f0);border-radius:8px;padding:10px 14px;cursor:pointer;transition:all .15s;background:var(--color-background-primary, #ffffff);display:flex;align-items:flex-start;gap:10px;';
 
   var numEl=document.createElement('div');
-  numEl.style.cssText='min-width:22px;height:22px;border-radius:11px;background:#e2e8f0;color:#64748b;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;font-family:sans-serif;';
+  numEl.style.cssText='min-width:22px;height:22px;border-radius:11px;background:#e2e8f0;color:var(--color-text-secondary, #475569);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;font-family:sans-serif;';
   numEl.textContent=i+1;
 
   var textEl=document.createElement('div');
-  textEl.style.cssText='font-size:13px;color:#374151;flex:1;font-family:Georgia,serif;line-height:1.6;';
+  textEl.style.cssText='font-size:13px;color:var(--color-text-primary, #1e293b);flex:1;font-family:Georgia,serif;line-height:1.6;';
   textEl.textContent=item.statement;
 
   var badge=document.createElement('div');
@@ -187,7 +187,7 @@ Split the claim into exhaustive, non-overlapping cases. Prove each case separate
 
 For each claim below, select the most appropriate proof strategy. The feedback explains why one strategy is better suited than others — and why the choice isn't always unique.`,
       html: `<div id="claims-container" style="padding:14px;display:flex;flex-direction:column;gap:16px"></div>`,
-      css: `body{margin:0;background:#fafaf8;font-family:Georgia,serif}`,
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc);font-family:Georgia,serif}`,
       startCode: `var claims=[
   {
     claim:'If a triangle has two equal angles, it has two equal sides.',
@@ -238,17 +238,17 @@ For each claim below, select the most appropriate proof strategy. The feedback e
 var container=document.getElementById('claims-container');
 claims.forEach(function(c,ci){
   var card=document.createElement('div');
-  card.style.cssText='border:1px solid #e2e8f0;border-radius:10px;padding:12px 14px;background:#fff;';
+  card.style.cssText='border:1px solid var(--color-border-primary, #e2e8f0);border-radius:10px;padding:12px 14px;background:var(--color-background-primary, #ffffff);';
 
   var claimEl=document.createElement('div');
-  claimEl.style.cssText='font-size:13px;font-weight:700;color:#1e293b;font-family:Georgia,serif;margin-bottom:10px;font-style:italic;';
+  claimEl.style.cssText='font-size:13px;font-weight:700;color:var(--color-text-primary, #1e293b);font-family:Georgia,serif;margin-bottom:10px;font-style:italic;';
   claimEl.textContent='"'+c.claim+'"';
 
   var btnRow=document.createElement('div');
   btnRow.style.cssText='display:flex;gap:7px;flex-wrap:wrap;margin-bottom:8px;';
 
   var explEl=document.createElement('div');
-  explEl.style.cssText='font-size:12px;color:#374151;font-family:Georgia,serif;line-height:1.65;padding:8px 10px;border-radius:7px;display:none;';
+  explEl.style.cssText='font-size:12px;color:var(--color-text-primary, #1e293b);font-family:Georgia,serif;line-height:1.65;padding:8px 10px;border-radius:7px;display:none;';
 
   c.strategies.forEach(function(s){
     var btn=document.createElement('button');
@@ -322,17 +322,17 @@ The □ symbol at the end of a proof (or "QED," from *quod erat demonstrandum* �
 
 The proof below shows that the diagonals of a rectangle are equal. Every step has a justification, and every justification cites something specific. Hover over any step to see why that justification is the right one — and what would happen if you tried to skip it.`,
       html: `<div id="proof-table" style="padding:14px;font-family:Georgia,serif"></div>
-<div id="hover-info" style="padding:10px 14px;font-family:Georgia,serif;font-size:13px;background:#fafaf8;border-top:1px solid #e2e8f0;line-height:1.7;min-height:48px;color:#64748b">
+<div id="hover-info" style="padding:10px 14px;font-family:Georgia,serif;font-size:13px;background:var(--color-background-secondary, #f8fafc);border-top:1px solid var(--color-border-primary, #e2e8f0);line-height:1.7;min-height:48px;color:var(--color-text-secondary, #475569)">
   Hover over any step to see why the justification is necessary.
 </div>`,
-      css: `body{margin:0;background:#fafaf8;font-family:Georgia,serif}`,
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc);font-family:Georgia,serif}`,
       startCode: `var proofSteps=[
   {
     num:'Given',
     statement:'Rectangle ABCD with diagonals AC and BD.',
     reason:'Given',
     note:'The starting conditions. A rectangle is defined as a quadrilateral with four right angles. This definition will be used in the next step.',
-    color:'#374151'
+    color:'var(--color-text-primary, #1e293b)"
   },
   {
     num:'1',
@@ -391,8 +391,8 @@ tableEl.innerHTML='<strong>Theorem:</strong> The diagonals of a rectangle are eq
     var bg=i%2===0?'#fafaf8':'#fff';
     return '<tr style="background:'+bg+';cursor:pointer" data-idx="'+i+'">'
       +'<td style="padding:6px 8px;font-weight:700;color:'+s.color+'">'+s.num+'</td>'
-      +'<td style="padding:6px 8px;color:#374151">'+s.statement+'</td>'
-      +'<td style="padding:6px 8px;font-style:italic;color:#64748b">'+s.reason+'</td></tr>';
+      +'<td style="padding:6px 8px;color:var(--color-text-primary, #1e293b)">'+s.statement+'</td>'
+      +'<td style="padding:6px 8px;font-style:italic;color:var(--color-text-secondary, #475569)">'+s.reason+'</td></tr>';
   }).join('')
   +'</table>';
 
@@ -405,7 +405,7 @@ tableEl.querySelectorAll('tr[data-idx]').forEach(function(row){
   });
   row.addEventListener('mouseleave',function(){
     row.style.background=idx%2===0?'#fafaf8':'#fff';
-    hoverEl.innerHTML='<span style="color:#64748b">Hover over any step to see why the justification is necessary.</span>';
+    hoverEl.innerHTML='<span style="color:var(--color-text-secondary, #475569)">Hover over any step to see why the justification is necessary.</span>';
   });
 });`,
       outputHeight: 480,

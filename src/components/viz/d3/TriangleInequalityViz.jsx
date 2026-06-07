@@ -174,7 +174,7 @@ const TriangleInequalityViz = ({ width = 800, height = 300 }) => {
       </div>
 
       <div className="w-full max-w-lg mt-4 text-center">
-        <div className={`p-3 rounded-lg border ${isStrict ? 'border-amber-500/50 bg-amber-500/10' : 'border-green-500/50 bg-green-500/10'} mb-4`}>
+        <div className={`p-3 rounded-lg border ${isStrict ? 'border-amber-500/50 bg-amber-500/10' : 'border-green-500/50 bg-green-50 dark:bg-green-900/300/10'} mb-4`}>
           <div className="font-mono text-lg">
             |{valA} + {valB}| {isStrict ? '<' : '='} |{valA}| + |{valB}|
           </div>

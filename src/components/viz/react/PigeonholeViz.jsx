@@ -66,7 +66,7 @@ export default function PigeonholeViz() {
                   <div 
                     key={j} 
                     className={`w-3 h-3 sm:w-4 sm:h-4 rounded-full shadow-sm animate-in fade-in slide-in-from-top-4
-                      ${isOverfilled ? 'bg-red-500' : 'bg-brand-500'}`}
+                      ${isOverfilled ? 'bg-red-50 dark:bg-red-900/300' : 'bg-brand-500'}`}
                   />
                 ))}
               </div>

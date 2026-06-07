@@ -160,11 +160,11 @@ function buildTerm(base, don, numVars) {
 
 // Group colors for highlighting
 const GROUP_COLORS = [
-  'bg-blue-200/70 dark:bg-blue-800/50 border-blue-400',
-  'bg-rose-200/70 dark:bg-rose-800/50 border-rose-400',
-  'bg-purple-200/70 dark:bg-purple-800/50 border-purple-400',
-  'bg-orange-200/70 dark:bg-orange-800/50 border-orange-400',
-  'bg-cyan-200/70 dark:bg-cyan-800/50 border-cyan-400',
+  'bg-blue-200/70 dark:bg-blue-800/50 border-blue-400 dark:border-blue-600/50',
+  'bg-rose-200/70 dark:bg-rose-800/50 border-rose-400 dark:border-rose-600/50',
+  'bg-purple-200/70 dark:bg-purple-800/50 border-purple-400 dark:border-purple-600/50',
+  'bg-orange-200/70 dark:bg-orange-800/50 border-orange-400 dark:border-orange-600/50',
+  'bg-cyan-200/70 dark:bg-cyan-800/50 border-cyan-400 dark:border-cyan-600/50',
 ];
 
 export default function KMapViz() {

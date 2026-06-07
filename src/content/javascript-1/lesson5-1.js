@@ -86,8 +86,8 @@ new Chart(ctx, {
       legend: { labels: { color: '#94a3b8' } },
     },
     scales: {
-      x: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } },
-      y: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } },
+      x: { ticks: { color: '#64748b' }, grid: { color: 'var(--color-text-primary, #1e293b)" } },
+      y: { ticks: { color: '#64748b' }, grid: { color: 'var(--color-text-primary, #1e293b)" } },
     },
   }
 });
@@ -176,7 +176,7 @@ const chart = new Chart(document.getElementById('liveChart'), {
     plugins: { legend: { labels: { color: '#94a3b8', boxWidth: 12 } } },
     scales: {
       x: { display: false },
-      y: { min: 0, max: 100, ticks: { color: '#64748b' }, grid: { color: '#1e293b' } },
+      y: { min: 0, max: 100, ticks: { color: '#64748b' }, grid: { color: 'var(--color-text-primary, #1e293b)" } },
     },
   }
 });
@@ -215,7 +215,7 @@ document.getElementById('resetBtn').onclick = () => {
 This fetches real data from JSONPlaceholder, groups it, and renders it as a pie chart. This is the full pattern: fetch → transform → chart.`,
       html: `<div style="height:100%;background:#09111c;padding:14px;border-radius:12px;box-sizing:border-box;display:flex;flex-direction:column;gap:8px;">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <div id="status" style="color:#64748b;font-family:monospace;font-size:12px;">Loading…</div>
+  <div id="status" style="color:var(--color-text-secondary, #475569);font-family:monospace;font-size:12px;">Loading…</div>
   <canvas id="pieChart" style="flex:1;max-height:260px;"></canvas>
 </div>`,
       css: `body{margin:0;padding:0;background:#09111c;height:100vh;}`,
@@ -311,7 +311,7 @@ new Chart(document.getElementById('radarChart'), {
       { label: 'Dev 3', data: dev3, borderColor: '#a78bfa', backgroundColor: 'rgba(167,139,250,0.2)' },
     ]
   },
-  options: { scales: { r: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' }, pointLabels: { color: '#94a3b8' } } }, plugins: { legend: { labels: { color: '#94a3b8' } } } }
+  options: { scales: { r: { ticks: { color: '#64748b' }, grid: { color: 'var(--color-text-primary, #1e293b)" }, pointLabels: { color: '#94a3b8' } } }, plugins: { legend: { labels: { color: '#94a3b8' } } } }
 });`,
       check: (code) =>
         /type\s*:\s*['"]radar['"]/.test(code) &&

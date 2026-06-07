@@ -82,10 +82,10 @@ Here s is the **semi-perimeter**. Heron of Alexandria proved this in the 1st cen
       instruction: `### Area Formulas by Decomposition
 
 Watch each area formula derived by rearranging pieces. Select a shape, then animate the rearrangement to see how it traces back to the rectangle.`,
-      html: `<div style="padding:8px 14px 0;background:#fafaf8;display:flex;gap:8px;flex-wrap:wrap" id="shape-btns"></div>
+      html: `<div style="padding:8px 14px 0;background:var(--color-background-secondary, #f8fafc);display:flex;gap:8px;flex-wrap:wrap" id="shape-btns"></div>
 <canvas id="cv" width="700" height="300"></canvas>
-<div id="area-panel" style="padding:10px 14px;font-family:Georgia,serif;font-size:13px;background:#fafaf8;border-top:1px solid #e2e8f0;line-height:1.7"></div>`,
-      css: `body{margin:0;background:#fafaf8}canvas{display:block}`,
+<div id="area-panel" style="padding:10px 14px;font-family:Georgia,serif;font-size:13px;background:var(--color-background-secondary, #f8fafc);border-top:1px solid var(--color-border-primary, #e2e8f0);line-height:1.7"></div>`,
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc)}canvas{display:block}`,
       startCode: `var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 var W=cv.width,H=cv.height;
 var t=0,animating=false,selected=0;
@@ -295,15 +295,15 @@ Radians are not a convention — they are the natural unit arising from the geom
       instruction: `### Arc Length, Sector Area, and the Radian
 
 Drag the angle slider. Watch arc length and sector area update using the radian formulas. Toggle between radians and degrees to see why the radian formulas are simpler.`,
-      html: `<div style="padding:10px 14px 0;background:#fafaf8;display:flex;gap:14px;flex-wrap:wrap;align-items:center">
+      html: `<div style="padding:10px 14px 0;background:var(--color-background-secondary, #f8fafc);display:flex;gap:14px;flex-wrap:wrap;align-items:center">
   <span style="font-family:Georgia,serif;font-size:13px">Angle: <strong id="ang-lbl">1.00 rad (57.3°)</strong></span>
   <input type="range" id="ang-sl" min="0.1" max="6.28" value="1.0" step="0.01" style="flex:1;min-width:120px">
   <span style="font-family:Georgia,serif;font-size:13px">Radius: <strong id="r-lbl">120</strong></span>
   <input type="range" id="r-sl" min="60" max="150" value="120" style="width:100px">
 </div>
 <canvas id="cv" width="700" height="300"></canvas>
-<div id="arc-info" style="padding:10px 14px;font-family:Georgia,serif;font-size:13px;background:#fafaf8;border-top:1px solid #e2e8f0;line-height:1.8"></div>`,
-      css: `body{margin:0;background:#fafaf8}canvas{display:block}`,
+<div id="arc-info" style="padding:10px 14px;font-family:Georgia,serif;font-size:13px;background:var(--color-background-secondary, #f8fafc);border-top:1px solid var(--color-border-primary, #e2e8f0);line-height:1.8"></div>`,
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc)}canvas{display:block}`,
       startCode: `var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 var W=cv.width,H=cv.height;
 var angSl=document.getElementById('ang-sl'),rSl=document.getElementById('r-sl');
@@ -402,7 +402,7 @@ function draw(){
     +' Arc length: <strong>s = rθ</strong> = '+r+'×'+theta.toFixed(3)+' = '+arcLen.toFixed(2)+'.'
     +' Sector area: <strong>A = ½r²θ</strong> = ½×'+r+'²×'+theta.toFixed(3)+' = '+sectorArea.toFixed(2)+'.'
     +'<br>When θ = 1 radian exactly, the arc length equals the radius. This is the definition of a radian — not a formula, a definition.'
-    +'<br><span style="color:#9ca3af;font-size:11px">Compare: in degrees, arc = (π/180)rθ and sector = (π/360)r²θ. The π/180 conversion factor appears in every formula — radians eliminate it entirely.</span>';
+    +'<br><span style="color:var(--color-text-tertiary, #9ca3af);font-size:11px">Compare: in degrees, arc = (π/180)rθ and sector = (π/360)r²θ. The π/180 conversion factor appears in every formula — radians eliminate it entirely.</span>';
 }
 angSl.oninput=draw;rSl.oninput=draw;
 draw();`,
@@ -444,12 +444,12 @@ All three methods confirm the same formula. Together they show that πr² is not
       instruction: `### Archimedes' Pizza Slice Argument
 
 The animation shows the circle cut into increasingly thin sectors and rearranged into a near-rectangle. As the number of slices increases, the shape approaches a rectangle with dimensions r × πr — proving A = πr².`,
-      html: `<div style="padding:10px 14px 0;background:#fafaf8;display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+      html: `<div style="padding:10px 14px 0;background:var(--color-background-secondary, #f8fafc);display:flex;gap:14px;align-items:center;flex-wrap:wrap">
   <span style="font-family:Georgia,serif;font-size:13px">Slices: <strong id="n-lbl">8</strong></span>
   <input type="range" id="n-sl" min="4" max="64" value="8" step="4" style="flex:1;min-width:120px">
 </div>
 <canvas id="cv" width="700" height="280"></canvas>`,
-      css: `body{margin:0;background:#fafaf8}canvas{display:block}`,
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc)}canvas{display:block}`,
       startCode: `var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 var W=cv.width,H=cv.height;
 var nSl=document.getElementById('n-sl'),nLbl=document.getElementById('n-lbl');

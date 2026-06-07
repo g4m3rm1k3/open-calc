@@ -115,19 +115,19 @@ The audit doesn't just find missing alt text — it finds missing contracts. Eac
   background:#1e293b; border-bottom:1px solid #334155; }
 .ia-logo { font-size:14px; font-weight:700; color:#f1f5f9; flex-shrink:0; }
 .ia-nav-links { display:flex; gap:2px; flex:1; }
-.ia-link { font-size:13px; color:#64748b; padding:5px 10px; border-radius:6px;
+.ia-link { font-size:13px; color:var(--color-text-secondary, #475569); padding:5px 10px; border-radius:6px;
   cursor:pointer; user-select:none; }
 .ia-link--active { color:#f1f5f9; background:#334155; }
 .ia-link:hover { background:#334155; }
 .ia-search { display:flex; align-items:center; gap:6px; background:#0f172a;
   border:1px solid #334155; border-radius:7px; padding:6px 10px; }
-.ia-search-icon { color:#64748b; font-size:14px; }
+.ia-search-icon { color:var(--color-text-secondary, #475569); font-size:14px; }
 .ia-body { padding:16px; }
 .ia-section-header { margin-bottom:12px; }
 .ia-heading { font-size:18px; font-weight:700; color:#f1f5f9; }
 .ia-cards { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
 .ia-card  { background:#1e293b; border:1px solid #334155; border-radius:8px; padding:14px; }
-.ia-card-label { font-size:10px; font-weight:600; color:#64748b;
+.ia-card-label { font-size:10px; font-weight:600; color:var(--color-text-secondary, #475569);
   text-transform:uppercase; letter-spacing:.1em; margin-bottom:4px; }
 .ia-card-value { font-size:22px; font-weight:700; color:#f1f5f9; margin-bottom:2px; }
 .ia-card-delta { font-size:11px; font-weight:500; }
@@ -146,7 +146,7 @@ The audit doesn't just find missing alt text — it finds missing contracts. Eac
   background:#161c2a; padding:8px 12px; }
 .ia-table-row { display:grid; grid-template-columns:1fr 1fr 100px; padding:10px 12px;
   border-top:1px solid #334155; }
-.ia-th { font-size:10px; font-weight:600; color:#475569; text-transform:uppercase;
+.ia-th { font-size:10px; font-weight:600; color:var(--color-text-secondary, #475569); text-transform:uppercase;
   letter-spacing:.1em; }
 .ia-sortable { cursor:pointer; color:#94a3b8; }
 .ia-td { font-size:13px; color:#e2e8f0; display:flex; align-items:center; }
@@ -370,7 +370,7 @@ The cell below shows a live ARIA explorer — change the attributes and see what
 #aria-controls { background:#1e293b; border:1px solid #334155; border-radius:8px;
   padding:14px; display:flex; flex-direction:column; gap:8px; }
 .aria-row { display:flex; align-items:center; gap:8px; }
-.aria-lbl { font-size:11px; font-family:monospace; color:#64748b; min-width:110px; }
+.aria-lbl { font-size:11px; font-family:monospace; color:var(--color-text-secondary, #475569); min-width:110px; }
 .aria-row select, .aria-row input { font-size:11px; background:#0f172a;
   color:#f1f5f9; border:1px solid #334155; border-radius:4px; padding:4px 8px;
   flex:1; outline:none; }
@@ -544,7 +544,7 @@ The test checks: a \`<nav>\` element exists, all interactive items are keyboard-
 </div>`,
       css: `body { background:#0f172a; padding:20px; margin:0; font-family:system-ui,sans-serif; }
 #p1-nav-demo { max-width:580px; display:flex; flex-direction:column; gap:8px; }
-.p1-label { font-size:10px; font-weight:700; color:#475569;
+.p1-label { font-size:10px; font-weight:700; color:var(--color-text-secondary, #475569);
   letter-spacing:.12em; text-transform:uppercase; }
 
 /* INACCESSIBLE nav (for comparison) */
@@ -552,7 +552,7 @@ The test checks: a \`<nav>\` element exists, all interactive items are keyboard-
   background:#1e293b; border:1px solid #334155; border-radius:8px; }
 .in-logo   { font-size:14px; font-weight:700; color:#f1f5f9; }
 .in-links  { display:flex; gap:2px; flex:1; }
-.in-link   { font-size:13px; color:#64748b; padding:6px 10px; border-radius:6px; cursor:pointer; }
+.in-link   { font-size:13px; color:var(--color-text-secondary, #475569); padding:6px 10px; border-radius:6px; cursor:pointer; }
 .in-link--active { color:#f1f5f9; background:#334155; }
 .in-user   { display:flex; align-items:center; gap:8px; }
 .in-avatar { width:28px; height:28px; border-radius:50%; background:#2563eb; color:white;
@@ -564,7 +564,7 @@ The test checks: a \`<nav>\` element exists, all interactive items are keyboard-
   background:#1e293b; border:1px solid #334155; border-radius:8px; }
 .an-logo  { font-size:14px; font-weight:700; color:#f1f5f9; flex-shrink:0; }
 .an-links { display:flex; gap:2px; flex:1; }
-.an-link  { font-size:13px; color:#64748b; padding:6px 10px; border-radius:6px;
+.an-link  { font-size:13px; color:var(--color-text-secondary, #475569); padding:6px 10px; border-radius:6px;
   cursor:pointer; text-decoration:none; background:none; border:none; }
 .an-link--active { color:#f1f5f9; background:#334155; }
 .an-link:hover { background:#334155; color:#f1f5f9; }
@@ -723,11 +723,11 @@ The cell below demonstrates all three rules with an interactive modal.`,
 </div>`,
       css: `body { background:#0f172a; padding:24px; margin:0; font-family:system-ui,sans-serif; }
 #focus-demo { max-width:460px; display:flex; flex-direction:column; gap:12px; }
-.fd-desc { font-size:13px; color:#64748b; line-height:1.6; margin:0; }
+.fd-desc { font-size:13px; color:var(--color-text-secondary, #475569); line-height:1.6; margin:0; }
 .fd-trigger { padding:10px 20px; background:hsl(217,76%,47%); color:white; border:none;
   border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; min-height:44px; }
 .fd-trigger:focus-visible { outline:2px solid hsl(217,76%,47%); outline-offset:3px; }
-#fd-log { font-family:monospace; font-size:11px; color:#64748b; line-height:1.7;
+#fd-log { font-family:monospace; font-size:11px; color:var(--color-text-secondary, #475569); line-height:1.7;
   background:#111827; border:1px solid #1e293b; border-radius:6px; padding:10px 12px;
   min-height:60px; }
 .fd-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6);
@@ -743,7 +743,7 @@ The cell below demonstrates all three rules with an interactive modal.`,
 .fd-btn--cancel  { background:transparent; color:#94a3b8; border:1px solid #334155; }
 .fd-btn:focus-visible { outline:2px solid hsl(217,76%,47%); outline-offset:2px; }
 .fd-close { position:absolute; top:14px; right:14px; width:28px; height:28px;
-  border-radius:50%; background:transparent; border:none; color:#64748b;
+  border-radius:50%; background:transparent; border:none; color:var(--color-text-secondary, #475569);
   font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
 .fd-close:focus-visible { outline:2px solid hsl(217,76%,47%); outline-offset:2px; }`,
       startCode: `const trigger = document.getElementById('fd-trigger');
@@ -758,7 +758,7 @@ const log     = document.getElementById('fd-log');
 function logFocus(action, el) {
   const name = el?.getAttribute('aria-label') || el?.textContent?.trim().slice(0,20) || el?.tagName;
   log.innerHTML += (log.innerHTML ? '<br>' : '') +
-    '<span style="color:#475569">' + new Date().toLocaleTimeString('en',{hour12:false}) + '</span> ' +
+    '<span style="color:var(--color-text-secondary, #475569)">' + new Date().toLocaleTimeString('en',{hour12:false}) + '</span> ' +
     action + ': <span style="color:#60a5fa">' + name + '</span>';
   // Auto-scroll log
   log.scrollTop = log.scrollHeight;
@@ -1420,7 +1420,7 @@ Each scenario has specific CSS or JavaScript requirements.`,
 #a11y-stress { max-width:480px; }
 #as-controls { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
 .as-btn { font-size:11px; font-weight:500; padding:5px 12px; border-radius:6px;
-  border:1px solid #334155; background:#1e293b; color:#64748b; cursor:pointer; }
+  border:1px solid #334155; background:#1e293b; color:var(--color-text-secondary, #475569); cursor:pointer; }
 .as-btn.active { background:#2563eb; color:white; border-color:#2563eb; }
 .as-component { background:hsl(222,39%,12%); border:1px solid hsl(217,32%,22%);
   border-radius:12px; padding:24px; transition:all 0.2s; }
@@ -1441,7 +1441,7 @@ Each scenario has specific CSS or JavaScript requirements.`,
   border:1px solid hsl(217,32%,22%); border-radius:8px; font-size:14px; cursor:pointer;
   min-height:44px; }
 button:focus-visible { outline:2px solid hsl(217,76%,47%); outline-offset:2px; }
-#as-notes { margin-top:10px; font-size:11px; color:#475569; line-height:1.7;
+#as-notes { margin-top:10px; font-size:11px; color:var(--color-text-secondary, #475569); line-height:1.7;
   font-family:monospace; }`,
       startCode: `const component = document.getElementById('as-component');
 const notes     = document.getElementById('as-notes');

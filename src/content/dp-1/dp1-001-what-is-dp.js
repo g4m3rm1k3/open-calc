@@ -63,7 +63,7 @@ for (let i = 8; i >= 0; i--) {
   const hot = c > 4 ? '#f87171' : c > 1 ? '#f59e0b' : '#4ade80';
   html += '<div style="text-align:center">' +
     '<div style="background:#1e293b;border-radius:4px;padding:5px 10px;color:' + hot + ';font-weight:bold;min-width:36px">' + c + '</div>' +
-    '<div style="color:#64748b;font-size:11px;margin-top:2px">fib(' + i + ')</div></div>';
+    '<div style="color:var(--color-text-secondary, #475569);font-size:11px;margin-top:2px">fib(' + i + ')</div></div>';
 }
 html += '</div>';
 const total = Object.values(callCount).reduce((a, b) => a + b, 0);
@@ -97,7 +97,7 @@ for (let i = 8; i >= 0; i--) {
   const c = callCount[i] || 0;
   html += '<div style="text-align:center">' +
     '<div style="background:#1e293b;border-radius:4px;padding:5px 10px;color:#4ade80;font-weight:bold;min-width:36px">' + c + '</div>' +
-    '<div style="color:#64748b;font-size:11px;margin-top:2px">fib(' + i + ')</div></div>';
+    '<div style="color:var(--color-text-secondary, #475569);font-size:11px;margin-top:2px">fib(' + i + ')</div></div>';
 }
 html += '</div>';
 const total = Object.values(callCount).reduce((a, b) => a + b, 0);
@@ -142,7 +142,7 @@ steps.slice(1).forEach(s => {
 html += '<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">';
 dp.forEach((v, i) => {
   const color = i === n ? '#f59e0b' : '#4ade80';
-  html += '<div style="text-align:center"><div style="background:#1e293b;border-radius:4px;padding:5px 10px;color:' + color + ';font-weight:bold">' + v + '</div><div style="color:#64748b;font-size:11px;margin-top:2px">dp[' + i + ']</div></div>';
+  html += '<div style="text-align:center"><div style="background:#1e293b;border-radius:4px;padding:5px 10px;color:' + color + ';font-weight:bold">' + v + '</div><div style="color:var(--color-text-secondary, #475569);font-size:11px;margin-top:2px">dp[' + i + ']</div></div>';
 });
 html += '</div>';
 d.innerHTML = html;`,
@@ -172,7 +172,7 @@ html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">';
 for (let i = 1; i <= 8; i++) {
   html += '<div style="text-align:center">' +
     '<div style="background:#1e293b;border-radius:4px;padding:5px 12px;color:#4ade80;font-weight:bold">' + dp[i] + '</div>' +
-    '<div style="color:#64748b;font-size:11px;margin-top:2px">n=' + i + '</div></div>';
+    '<div style="color:var(--color-text-secondary, #475569);font-size:11px;margin-top:2px">n=' + i + '</div></div>';
 }
 html += '</div>';
 

@@ -30,6 +30,7 @@ const CadProPage = lazy(() => import("./pages/CadProPage.jsx"));
 const OpenCraftPage = lazy(() => import("./pages/OpenCraftPage.jsx"));
 const StemQuestPage = lazy(() => import("./pages/StemQuestPage.jsx"));
 const DocsPage = lazy(() => import("./pages/DocsPage.jsx"));
+const VizGalleryPage = lazy(() => import("./pages/VizGalleryPage.jsx"));
 const GamesPage = lazy(() => import("./pages/GamesPage.jsx"));
 const LabsPage = lazy(() => import("./pages/LabsPage.jsx"));
 const AsteroidsLAPage = lazy(() => import("./pages/AsteroidsLAPage.jsx"));
@@ -109,6 +110,7 @@ export default function App() {
                     <Route path="open-craft" element={<OpenCraftPage />} />
                     <Route path="stem-quest" element={<StemQuestPage />} />
                     <Route path="docs" element={<DocsPage />} />
+                    <Route path="viz-gallery" element={<VizGalleryPage />} />
                     <Route path="games" element={<GamesPage />} />
                     <Route path="labs" element={<LabsPage />} />
                     <Route path="asteroids-la" element={<AsteroidsLAPage />} />

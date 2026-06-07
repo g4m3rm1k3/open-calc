@@ -61,13 +61,13 @@ Total angle sum = (n−2) × 180°. □
       instruction: `### Polygon Angle Sum: The Triangulation Argument
 
 Adjust the number of sides. Watch the polygon triangulate from one vertex, and see the angle sum formula in action.`,
-      html: `<div style="padding:10px 14px 0;background:#fafaf8;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      html: `<div style="padding:10px 14px 0;background:var(--color-background-secondary, #f8fafc);display:flex;align-items:center;gap:12px;flex-wrap:wrap">
   <span style="font-family:Georgia,serif;font-size:13px">Sides: <strong id="n-lbl">5</strong></span>
   <input type="range" id="n-sl" min="3" max="12" value="5" style="flex:1;min-width:100px">
   <span id="formula-lbl" style="font-family:Georgia,serif;font-size:13px;color:#1e3a5f;font-weight:700"></span>
 </div>
 <canvas id="cv" width="700" height="300"></canvas>`,
-      css: `body{margin:0;background:#fafaf8}canvas{display:block}`,
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc)}canvas{display:block}`,
       startCode: `var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 var W=cv.width,H=cv.height;
 var nSl=document.getElementById('n-sl'),nLbl=document.getElementById('n-lbl'),fLbl=document.getElementById('formula-lbl');
@@ -156,8 +156,8 @@ From this single definition, using the parallel-line theorems, we can derive all
 
 The animation shows the diagonal of a parallelogram creating two congruent triangles — the engine behind all three properties. Drag the corners to change the parallelogram shape and see the properties verified numerically.`,
       html: `<canvas id="cv" width="700" height="300" style="cursor:move"></canvas>
-<div id="para-info" style="padding:10px 14px;font-family:Georgia,serif;font-size:12px;background:#fafaf8;border-top:1px solid #e2e8f0;line-height:1.8"></div>`,
-      css: `body{margin:0;background:#fafaf8}canvas{display:block}`,
+<div id="para-info" style="padding:10px 14px;font-family:Georgia,serif;font-size:12px;background:var(--color-background-secondary, #f8fafc);border-top:1px solid var(--color-border-primary, #e2e8f0);line-height:1.8"></div>`,
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc)}canvas{display:block}`,
       startCode: `var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 var W=cv.width,H=cv.height;
 // Parallelogram ABCD: A, B fixed base; D sets the slant; C = B + (D - A)
@@ -235,7 +235,7 @@ function draw(){
     +'(AC bisected ✓)  |  '
     +'<span style="color:#9333ea">BM = '+BM+', MD = '+MD+'</span> '
     +'(BD bisected ✓)'
-    +'<br><span style="color:#9ca3af;font-size:11px">Drag A, B, or D to change the parallelogram. All properties hold regardless of shape.</span>';
+    +'<br><span style="color:var(--color-text-tertiary, #9ca3af);font-size:11px">Drag A, B, or D to change the parallelogram. All properties hold regardless of shape.</span>';
 }
 draw();`,
       outputHeight: 380,
@@ -333,13 +333,13 @@ Note: for similarity, AA suffices where AAA is needed conceptually — proving t
       instruction: `### Similarity: Same Angles, Proportional Sides
 
 Drag the scale slider to resize one triangle. Watch the side lengths change proportionally while all angles remain identical. The ratio of any pair of corresponding sides is always the scale factor k.`,
-      html: `<div style="padding:10px 14px 0;background:#fafaf8;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      html: `<div style="padding:10px 14px 0;background:var(--color-background-secondary, #f8fafc);display:flex;align-items:center;gap:12px;flex-wrap:wrap">
   <span style="font-family:Georgia,serif;font-size:13px">Scale factor k: <strong id="k-lbl">1.0</strong></span>
   <input type="range" id="k-sl" min="0.4" max="2.5" value="1.0" step="0.05" style="flex:1;min-width:120px">
 </div>
 <canvas id="cv" width="700" height="300"></canvas>
-<div id="sim-info" style="padding:10px 14px;font-family:Georgia,serif;font-size:13px;background:#fafaf8;border-top:1px solid #e2e8f0;line-height:1.8"></div>`,
-      css: `body{margin:0;background:#fafaf8}canvas{display:block}`,
+<div id="sim-info" style="padding:10px 14px;font-family:Georgia,serif;font-size:13px;background:var(--color-background-secondary, #f8fafc);border-top:1px solid var(--color-border-primary, #e2e8f0);line-height:1.8"></div>`,
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc)}canvas{display:block}`,
       startCode: `var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 var W=cv.width,H=cv.height;
 var kSl=document.getElementById('k-sl'),kLbl=document.getElementById('k-lbl');
@@ -477,15 +477,15 @@ This theorem is used in triangle geometry (incircle, excircles), in mass-point g
       instruction: `### Similar Triangles: Finding Unknown Lengths
 
 The classic application — two similar triangles where you know some sides and want to find others. Drag the slider to change what you know and see the proportion solve the unknown.`,
-      html: `<div style="padding:10px 14px 0;background:#fafaf8;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      html: `<div style="padding:10px 14px 0;background:var(--color-background-secondary, #f8fafc);display:flex;align-items:center;gap:12px;flex-wrap:wrap">
   <span style="font-family:Georgia,serif;font-size:13px">Known side AB: <strong id="ab-lbl">6</strong></span>
   <input type="range" id="ab-sl" min="3" max="12" value="6" style="flex:1;min-width:100px">
   <span style="font-family:Georgia,serif;font-size:13px">Known side A'B': <strong id="ab2-lbl">9</strong></span>
   <input type="range" id="ab2-sl" min="3" max="18" value="9" style="flex:1;min-width:100px">
 </div>
 <canvas id="cv" width="700" height="260"></canvas>
-<div id="prop-info" style="padding:10px 14px;font-family:Georgia,serif;font-size:13px;background:#fafaf8;border-top:1px solid #e2e8f0;line-height:1.8"></div>`,
-      css: `body{margin:0;background:#fafaf8}canvas{display:block}`,
+<div id="prop-info" style="padding:10px 14px;font-family:Georgia,serif;font-size:13px;background:var(--color-background-secondary, #f8fafc);border-top:1px solid var(--color-border-primary, #e2e8f0);line-height:1.8"></div>`,
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc)}canvas{display:block}`,
       startCode: `var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 var W=cv.width,H=cv.height;
 var abSl=document.getElementById('ab-sl'),ab2Sl=document.getElementById('ab2-sl');
@@ -544,7 +544,7 @@ function draw(){
     '<strong>Proportion:</strong> AB/A\'B\' = BC/B\'C\' = AC/A\'C\' = 1/'+k.toFixed(2)
     +'<br><strong>Solving for A\'C\':</strong> AC/A\'C\' = AB/A\'B\' → '+AC+'/A\'C\' = '+AB+'/'+AB2
     +' → A\'C\' = '+AC+' × '+AB2+'/'+AB+' = <strong style="color:#1a3a2a">'+AC2.toFixed(2)+'</strong>'
-    +'<br><span style="color:#9ca3af;font-size:11px">This is the universal method: identify the similar triangles, write the proportion, cross-multiply and solve.</span>';
+    +'<br><span style="color:var(--color-text-tertiary, #9ca3af);font-size:11px">This is the universal method: identify the similar triangles, write the proportion, cross-multiply and solve.</span>';
 }
 abSl.oninput=draw;ab2Sl.oninput=draw;draw();`,
       outputHeight: 380,

@@ -50,7 +50,7 @@ Run this and use the console to trace the chain. \`Object.getPrototypeOf(obj)\` 
 .node{background:#111827;border-radius:8px;padding:10px;font-size:12px;}
 .node .name{color:#38bdf8;font-weight:700;margin-bottom:4px;}
 .node .props{color:#4ade80;}
-.node .proto{color:#64748b;font-size:11px;}
+.node .proto{color:var(--color-text-secondary, #475569);font-size:11px;}
 .arrow{color:#334155;text-align:center;font-size:16px;}
 button{background:#1e3a5f;border:1px solid #38bdf8;color:#93c5fd;padding:10px;border-radius:8px;cursor:pointer;font-family:monospace;font-size:12px;}`,
       startCode: `const animal = {
@@ -158,7 +158,7 @@ Run this to see the memory difference. Both approaches work, but only the protot
 </div>`,
       css: `.app{height:100%;background:#09111c;padding:16px;border-radius:12px;display:flex;flex-direction:column;gap:14px;font-family:monospace;}
 .section{display:flex;flex-direction:column;gap:6px;}
-.label{color:#475569;font-size:10px;letter-spacing:.08em;text-transform:uppercase;}
+.label{color:var(--color-text-secondary, #475569);font-size:10px;letter-spacing:.08em;text-transform:uppercase;}
 .row{background:#111827;border:1px solid #1e293b;border-radius:8px;padding:10px;color:#e2e8f0;font-size:13px;}`,
       startCode: `// ── Method ON the instance — each object gets its own copy ─────────────
 function AnimalBad(name) {

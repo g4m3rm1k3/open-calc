@@ -93,7 +93,7 @@ export default function TruthTableBuilder({ params = {} }) {
           <button
             key={i}
             onClick={() => setExprInput(preset.expr)}
-            className="px-4 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:border-orange-400 rounded-2xl transition-colors"
+            className="px-4 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:border-orange-400 dark:border-orange-600/50 rounded-2xl transition-colors"
           >
             {preset.label}
           </button>
@@ -107,7 +107,7 @@ export default function TruthTableBuilder({ params = {} }) {
           type="text"
           value={exprInput}
           onChange={(e) => setExprInput(e.target.value)}
-          className="w-full font-mono text-lg p-4 border border-slate-300 dark:border-slate-600 rounded-2xl bg-slate-50 dark:bg-slate-950 focus:outline-none focus:border-orange-400"
+          className="w-full font-mono text-lg p-4 border border-slate-300 dark:border-slate-600 rounded-2xl bg-slate-50 dark:bg-slate-950 focus:outline-none focus:border-orange-400 dark:border-orange-600/50"
         />
       </div>
 

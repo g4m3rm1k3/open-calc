@@ -148,13 +148,13 @@ export default function RecursionStackViz() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+    <div className="max-w-6xl mx-auto p-6 bg-white dark:bg-slate-900 rounded-lg shadow-lg">
       <h2 className="text-3xl font-bold mb-6 text-center">
         The Call Stack: How Recursion Really Works
       </h2>
 
       <div className="mb-6">
-        <div className="bg-blue-50 p-4 rounded-lg mb-4">
+        <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg mb-4">
           <h3 className="font-bold mb-2">Choose a Recursive Function</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {Object.entries(FUNCTIONS).map(([key, f]) => (
@@ -166,8 +166,8 @@ export default function RecursionStackViz() {
                 }}
                 className={`p-4 border rounded-lg text-left transition-colors ${
                   selectedFunction === key
-                    ? "bg-blue-500 text-white border-blue-500"
-                    : "bg-white hover:bg-gray-50 border-gray-300"
+                    ? "bg-blue-50 dark:bg-blue-900/300 text-white border-blue-500"
+                    : "bg-white dark:bg-slate-900 hover:bg-gray-50 dark:bg-slate-800 border-gray-300"
                 }`}
               >
                 <div className="font-semibold mb-1">{f.name}</div>
@@ -177,7 +177,7 @@ export default function RecursionStackViz() {
           </div>
         </div>
 
-        <div className="bg-green-50 p-4 rounded-lg mb-4">
+        <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg mb-4">
           <h3 className="font-bold mb-2">Current Function: {func.name}</h3>
           <p className="mb-2">
             <strong>Definition:</strong> {func.description}
@@ -199,7 +199,7 @@ export default function RecursionStackViz() {
               max={selectedFunction === "fibonacci" ? "8" : "6"}
               value={inputValue}
               onChange={(e) => setInputValue(parseInt(e.target.value))}
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+              className="w-full h-2 bg-gray-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer"
               disabled={isAnimating}
             />
           </div>
@@ -208,13 +208,13 @@ export default function RecursionStackViz() {
             <button
               onClick={simulateRecursion}
               disabled={isAnimating}
-              className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:bg-gray-400 transition-colors font-bold"
+              className="px-6 py-3 bg-green-50 dark:bg-green-900/300 text-white rounded-lg hover:bg-green-600 disabled:bg-gray-400 transition-colors font-bold"
             >
               {isAnimating ? "Running..." : "Simulate Recursion"}
             </button>
             <button
               onClick={reset}
-              className="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors font-bold"
+              className="px-6 py-3 bg-gray-50 dark:bg-slate-8000 text-white rounded-lg hover:bg-gray-600 transition-colors font-bold"
             >
               Reset
             </button>
@@ -226,10 +226,10 @@ export default function RecursionStackViz() {
         <h3 className="text-xl font-bold mb-4 text-center">
           Call Stack Visualization
         </h3>
-        <div className="bg-gray-50 p-4 rounded-lg min-h-96">
+        <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-lg min-h-96">
           <div className="space-y-2">
             {callStack.length === 0 ? (
-              <div className="text-center text-gray-500 py-8">
+              <div className="text-center text-gray-500 dark:text-gray-400 py-8">
                 Click "Simulate Recursion" to see the call stack in action
               </div>
             ) : (
@@ -238,8 +238,8 @@ export default function RecursionStackViz() {
                   key={call.id}
                   className={`p-4 border-2 rounded-lg transition-all duration-300 ${
                     call.state === "calling"
-                      ? "border-blue-300 bg-blue-50"
-                      : "border-green-300 bg-green-50"
+                      ? "border-blue-300 dark:border-blue-700/50 bg-blue-50 dark:bg-blue-900/30"
+                      : "border-green-300 dark:border-green-700/50 bg-green-50 dark:bg-green-900/30"
                   }`}
                   style={{
                     marginLeft: `${call.depth * 40}px`,
@@ -249,21 +249,21 @@ export default function RecursionStackViz() {
                   <div className="flex items-center justify-between">
                     <div className="font-mono text-sm">
                       <span className="font-bold">{call.function}</span>
-                      <span className="text-gray-600">
+                      <span className="text-gray-600 dark:text-gray-300">
                         ({call.args.join(", ")})
                       </span>
                     </div>
                     <div className="text-sm">
                       {call.state === "calling" ? (
-                        <span className="text-blue-600">📞 Calling...</span>
+                        <span className="text-blue-600 dark:text-blue-400">📞 Calling...</span>
                       ) : (
-                        <span className="text-green-600">
+                        <span className="text-green-600 dark:text-green-400">
                           ✅ Returns: {call.result}
                         </span>
                       )}
                     </div>
                   </div>
-                  <div className="text-xs text-gray-500 mt-1">
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     Depth: {call.depth} | Step: {index + 1}
                   </div>
                 </div>
@@ -272,8 +272,8 @@ export default function RecursionStackViz() {
           </div>
 
           {finalResult !== null && (
-            <div className="mt-6 p-4 bg-yellow-50 border-2 border-yellow-300 rounded-lg text-center">
-              <div className="text-2xl font-bold text-yellow-700 mb-2">
+            <div className="mt-6 p-4 bg-yellow-50 dark:bg-yellow-900/30 border-2 border-yellow-300 dark:border-yellow-700/50 rounded-lg text-center">
+              <div className="text-2xl font-bold text-yellow-700 dark:text-yellow-300 mb-2">
                 🎉 Final Result
               </div>
               <div className="text-xl font-mono">
@@ -285,30 +285,30 @@ export default function RecursionStackViz() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <div className="border-2 border-green-300 rounded-lg p-4">
-          <h3 className="text-lg font-bold mb-3 text-center text-green-700">
+        <div className="border-2 border-green-300 dark:border-green-700/50 rounded-lg p-4">
+          <h3 className="text-lg font-bold mb-3 text-center text-green-700 dark:text-green-300">
             Stack Memory
           </h3>
           <div className="text-center mb-4">
             <div className="text-4xl mb-2">📚</div>
             <div className="font-mono text-lg">LIFO Structure</div>
           </div>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 dark:text-gray-300">
             Each function call creates a new "frame" on the stack. When a
             function returns, its frame is popped off. The stack grows downward
             as recursion deepens.
           </p>
         </div>
 
-        <div className="border-2 border-blue-300 rounded-lg p-4">
-          <h3 className="text-lg font-bold mb-3 text-center text-blue-700">
+        <div className="border-2 border-blue-300 dark:border-blue-700/50 rounded-lg p-4">
+          <h3 className="text-lg font-bold mb-3 text-center text-blue-700 dark:text-blue-300">
             Base Case
           </h3>
           <div className="text-center mb-4">
             <div className="text-4xl mb-2">🎯</div>
             <div className="font-mono text-lg">n ≤ 1 → 1</div>
           </div>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 dark:text-gray-300">
             The base case stops the recursion. Without it, the stack would grow
             forever until it causes a stack overflow error. Every recursive
             function needs a base case.
@@ -316,7 +316,7 @@ export default function RecursionStackViz() {
         </div>
       </div>
 
-      <div className="bg-purple-50 p-4 rounded-lg">
+      <div className="bg-purple-50 dark:bg-purple-900/30 p-4 rounded-lg">
         <h3 className="font-bold mb-2">Recursion vs Stack Overflow</h3>
         <div className="space-y-2 text-sm">
           <p>

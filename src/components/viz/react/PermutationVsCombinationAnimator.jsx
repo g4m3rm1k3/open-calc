@@ -35,7 +35,7 @@ export default function PermutationVsCombinationAnimator() {
             min={0}
             value={n}
             onChange={(e) => setN(Math.max(0, Number(e.target.value) || 0))}
-            className="mt-1 w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+            className="mt-1 w-full rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-900 dark:text-slate-100"
           />
         </label>
         <label className="block">
@@ -48,11 +48,11 @@ export default function PermutationVsCombinationAnimator() {
             onChange={(e) =>
               setK(Math.max(0, Math.min(Number(e.target.value) || 0, n)))
             }
-            className="mt-1 w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+            className="mt-1 w-full rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-900 dark:text-slate-100"
           />
         </label>
       </div>
-      <div className="rounded-xl bg-white p-4 border border-slate-200 dark:bg-slate-950 dark:border-slate-800 text-sm">
+      <div className="rounded-xl bg-white dark:bg-slate-900 p-4 border border-slate-200 dark:bg-slate-950 dark:border-slate-800 text-sm">
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="rounded-xl bg-slate-100 p-3 dark:bg-slate-800">
             <div className="font-semibold">Permutations</div>

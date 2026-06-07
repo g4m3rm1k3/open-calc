@@ -43,7 +43,7 @@ export default function SigmaDecoderLab() {
                   </div>
                   
                   <div 
-                    className={`text-lg mt-1 px-2 rounded transition-colors duration-300 flex items-center justify-center ${activePart === 'bottom' ? 'bg-emerald-500 text-slate-950 font-bold' : 'hover:bg-slate-800'}`}
+                    className={`text-lg mt-1 px-2 rounded transition-colors duration-300 flex items-center justify-center ${activePart === 'bottom' ? 'bg-emerald-50 dark:bg-emerald-900/300 text-slate-950 font-bold' : 'hover:bg-slate-800'}`}
                     onMouseEnter={() => setActivePart('bottom')}
                     onMouseLeave={() => setActivePart(null)}
                   >
@@ -52,7 +52,7 @@ export default function SigmaDecoderLab() {
                </div>
                
                <div 
-                 className={`ml-2 px-3 py-4 rounded transition-colors duration-300 flex items-center justify-center ${activePart === 'body' ? 'bg-purple-500 text-purple-950 font-bold' : 'hover:bg-slate-800'}`}
+                 className={`ml-2 px-3 py-4 rounded transition-colors duration-300 flex items-center justify-center ${activePart === 'body' ? 'bg-purple-50 dark:bg-purple-900/300 text-purple-950 font-bold' : 'hover:bg-slate-800'}`}
                  onMouseEnter={() => setActivePart('body')}
                  onMouseLeave={() => setActivePart(null)}
                >

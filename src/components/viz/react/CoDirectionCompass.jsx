@@ -60,7 +60,7 @@ export default function CoDirectionCompass() {
               <p className="mb-1">sine slope sign (cos):</p>
               <div className="h-3 rounded bg-slate-200 dark:bg-slate-800 overflow-hidden">
                 <div
-                  className={`h-full ${state.dsin >= 0 ? 'bg-emerald-500' : 'bg-rose-500'}`}
+                  className={`h-full ${state.dsin >= 0 ? 'bg-emerald-50 dark:bg-emerald-900/300' : 'bg-rose-50 dark:bg-rose-900/300'}`}
                   style={{ width: `${Math.min(100, Math.abs(state.dsin) * 100)}%` }}
                 />
               </div>
@@ -69,7 +69,7 @@ export default function CoDirectionCompass() {
               <p className="mb-1">cosine slope sign (-sin):</p>
               <div className="h-3 rounded bg-slate-200 dark:bg-slate-800 overflow-hidden">
                 <div
-                  className={`h-full ${state.dcos >= 0 ? 'bg-emerald-500' : 'bg-rose-500'}`}
+                  className={`h-full ${state.dcos >= 0 ? 'bg-emerald-50 dark:bg-emerald-900/300' : 'bg-rose-50 dark:bg-rose-900/300'}`}
                   style={{ width: `${Math.min(100, Math.abs(state.dcos) * 100)}%` }}
                 />
               </div>

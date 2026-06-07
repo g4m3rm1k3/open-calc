@@ -184,7 +184,7 @@ This makes colors easy to reason about in the same mental model: max red is \`FF
 .sliders{display:flex;flex-direction:column;gap:8px}
 .sl-row{display:flex;align-items:center;gap:10px}
 .ch-lbl{font-size:14px;font-weight:700;font-family:monospace;width:16px;flex-shrink:0}
-.sl-r{flex:1;height:6px;accent-color:#64748b}
+.sl-r{flex:1;height:6px;accent-color:var(--color-text-secondary, #475569)}
 .ch-val{font-size:12px;font-family:monospace;color:var(--color-text-secondary,#64748b);min-width:110px}
 .bit-row{display:flex;gap:12px;flex-wrap:wrap}
 .bit-group{display:flex;flex-direction:column;gap:4px;align-items:center}
@@ -242,7 +242,7 @@ Each byte is exactly 2 hex digits. **Click any byte** to see its binary breakdow
 .dump-byte:hover{background:#eff6ff;border-color:#93c5fd}
 .dump-byte.sel{background:#eff6ff;border-color:#3b82f6;color:#1d4ed8}
 .dump-sep{color:var(--color-border-secondary,#e2e8f0);user-select:none}
-.dump-ascii{color:#64748b;letter-spacing:.05em;padding-left:8px;border-left:1px solid var(--color-border-tertiary,#e2e8f0)}
+.dump-ascii{color:var(--color-text-secondary, #475569);letter-spacing:.05em;padding-left:8px;border-left:1px solid var(--color-border-tertiary,#e2e8f0)}
 .dump-dot{color:#cbd5e1}
 .detail-panel{padding:12px 14px;border-radius:8px;background:var(--color-background-secondary,#f8fafc);border:1px solid var(--color-border-tertiary,#e2e8f0);font-size:13px;color:var(--color-text-primary,#1e293b);line-height:1.75;font-family:monospace}`,
       startCode: `var DATA=[72,101,108,108,111,44,32,119,111,114,108,100,33,10,0,255,

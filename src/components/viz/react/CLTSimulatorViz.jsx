@@ -171,11 +171,11 @@ export default function CLTSimulatorViz() {
 
       <div className="flex gap-2 mb-3">
         <button onClick={() => addSamples(200)}
-          className="px-4 py-2 rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-semibold transition-colors">
+          className="px-4 py-2 rounded-lg bg-indigo-50 dark:bg-indigo-900/300 hover:bg-indigo-600 text-white text-xs font-semibold transition-colors">
           Draw 200 Samples
         </button>
         <button onClick={() => addSamples(1000)}
-          className="px-4 py-2 rounded-lg bg-indigo-400 hover:bg-indigo-500 text-white text-xs font-semibold transition-colors">
+          className="px-4 py-2 rounded-lg bg-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/40 dark:bg-indigo-900/300 text-white text-xs font-semibold transition-colors">
           +1000
         </button>
         <button onClick={reset}

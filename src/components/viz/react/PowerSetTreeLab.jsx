@@ -120,7 +120,7 @@ export default function PowerSetTreeLab() {
                      <div 
                         key={node.id} 
                         className={`absolute -translate-x-1/2 -translate-y-1/2 flex items-center justify-center transition-all duration-300 animate-slide-up-fade
-                        ${isLeaf ? 'bg-emerald-900 border border-emerald-400 text-emerald-200 px-2 py-1 rounded shadow-[0_0_10px_#10b981]' : 'bg-slate-800 border-2 border-slate-600 text-slate-300 px-2 py-1 rounded'}`}
+                        ${isLeaf ? 'bg-emerald-900 border border-emerald-400 dark:border-emerald-600/50 text-emerald-200 px-2 py-1 rounded shadow-[0_0_10px_#10b981]' : 'bg-slate-800 border-2 border-slate-600 text-slate-300 px-2 py-1 rounded'}`}
                         style={{ left: `${node.x}%`, top: `${node.y}%` }}
                      >
                         <span className="text-[11px] font-mono font-bold whitespace-nowrap">{node.label}</span>

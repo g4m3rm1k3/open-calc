@@ -152,7 +152,7 @@ export default function RowReductionChallengeViz() {
   const statusIcon = (r) => {
     if (!checked) return null;
     const s = rowStatuses[r];
-    if (s === 'ok') return <span className="ml-2 text-green-600 text-xs font-bold">✓</span>;
+    if (s === 'ok') return <span className="ml-2 text-green-600 dark:text-green-400 text-xs font-bold">✓</span>;
     if (s === 'needs-scale') return <span className="ml-2 text-red-500 text-xs">✗ needs pivot=1</span>;
     if (s === 'needs-elim') return <span className="ml-2 text-amber-500 text-xs">⚠ not fully cleared</span>;
     if (s === 'free') return <span className="ml-2 text-slate-400 text-xs">— zero row</span>;
@@ -170,7 +170,7 @@ export default function RowReductionChallengeViz() {
         <div className="flex gap-1 mb-3">
           {STEPS.map((_, i) => (
             <button key={i} onClick={() => setStep(i)}
-              className={`h-1.5 flex-1 rounded-full transition-colors ${i === step ? 'bg-emerald-500' : i < step ? 'bg-emerald-300 dark:bg-emerald-700' : 'bg-slate-200 dark:bg-slate-700'}`} />
+              className={`h-1.5 flex-1 rounded-full transition-colors ${i === step ? 'bg-emerald-50 dark:bg-emerald-900/300' : i < step ? 'bg-emerald-300 dark:bg-emerald-700' : 'bg-slate-200 dark:bg-slate-700'}`} />
           ))}
         </div>
         <div className="rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 p-3 mb-3">
@@ -260,11 +260,11 @@ export default function RowReductionChallengeViz() {
       {/* Action row */}
       <div className="flex flex-wrap gap-2 mb-3">
         <button onClick={checkRREF}
-          className="text-[10px] px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-emerald-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+          className="text-[10px] px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-emerald-400 dark:border-emerald-600/50 hover:text-emerald-600 dark:text-emerald-400 dark:hover:text-emerald-400 transition-colors">
           Check RREF ✓
         </button>
         <button onClick={reset}
-          className="text-[10px] px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-red-400 hover:text-red-500 transition-colors">
+          className="text-[10px] px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-red-400 dark:border-red-600/50 hover:text-red-500 transition-colors">
           Reset
         </button>
         {step !== 1 && <button onClick={() => setStep(1)}

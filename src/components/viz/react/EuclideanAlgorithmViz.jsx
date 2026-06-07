@@ -52,12 +52,12 @@ export default function EuclideanAlgorithmViz() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-        <div className="rounded-xl bg-white p-4 border border-slate-200 dark:bg-slate-950 dark:border-slate-800">
+        <div className="rounded-xl bg-white dark:bg-slate-900 p-4 border border-slate-200 dark:bg-slate-950 dark:border-slate-800">
           <div className="font-semibold mb-3">Visual rectangle model</div>
           {currentStep ? (
             <div className="mx-auto w-full max-w-[320px] overflow-hidden rounded-lg bg-slate-100 p-2 dark:bg-slate-900">
               <div
-                className="relative bg-white"
+                className="relative bg-white dark:bg-slate-900"
                 style={{
                   width: `${Math.round(currentStep.x * tileSize)}px`,
                   height: `${Math.round(currentStep.y * tileSize)}px`,
@@ -70,7 +70,7 @@ export default function EuclideanAlgorithmViz() {
                       <div
                         key={col}
                         style={{ width: tileSize, height: tileSize }}
-                        className="border border-slate-300 bg-emerald-100"
+                        className="border border-slate-300 dark:border-slate-700 bg-emerald-100 dark:bg-emerald-900/50"
                       />
                     ))}
                     {currentStep.r > 0 ? (
@@ -79,7 +79,7 @@ export default function EuclideanAlgorithmViz() {
                           width: tileSize * currentStep.r,
                           height: tileSize,
                         }}
-                        className="border border-slate-300 bg-slate-200"
+                        className="border border-slate-300 dark:border-slate-700 bg-slate-200"
                       />
                     ) : null}
                   </div>
@@ -93,7 +93,7 @@ export default function EuclideanAlgorithmViz() {
           )}
         </div>
 
-        <div className="rounded-xl bg-white p-4 border border-slate-200 dark:bg-slate-950 dark:border-slate-800">
+        <div className="rounded-xl bg-white dark:bg-slate-900 p-4 border border-slate-200 dark:bg-slate-950 dark:border-slate-800">
           <div className="font-semibold mb-3">Step selector</div>
           <div className="flex items-center gap-2 mb-4">
             <button

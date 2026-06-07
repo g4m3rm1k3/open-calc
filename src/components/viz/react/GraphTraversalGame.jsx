@@ -145,13 +145,13 @@ export default function GraphTraversalGame() {
         </button>
         <button
           onClick={() => setStep((s) => Math.min(expectedOrder.length, s + 1))}
-          className="px-3 py-1 rounded text-sm bg-emerald-500 text-white"
+          className="px-3 py-1 rounded text-sm bg-emerald-50 dark:bg-emerald-900/300 text-white"
         >
           Step Forward
         </button>
         <button
           onClick={() => setStep(expectedOrder.length)}
-          className="px-3 py-1 rounded text-sm bg-indigo-500 text-white"
+          className="px-3 py-1 rounded text-sm bg-indigo-50 dark:bg-indigo-900/300 text-white"
         >
           Run All
         </button>

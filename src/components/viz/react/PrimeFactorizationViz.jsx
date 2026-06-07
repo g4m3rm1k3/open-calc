@@ -68,7 +68,7 @@ export default function PrimeFactorizationViz() {
             {factors.map((prime, index) => (
               <span
                 key={`${prime}-${index}`}
-                className="rounded-full bg-indigo-100 px-3 py-1 text-sm font-semibold text-indigo-800 dark:bg-indigo-900/60 dark:text-indigo-200"
+                className="rounded-full bg-indigo-100 dark:bg-indigo-900/50 px-3 py-1 text-sm font-semibold text-indigo-800 dark:text-indigo-300 dark:bg-indigo-900/60 dark:text-indigo-200"
               >
                 {prime}
               </span>

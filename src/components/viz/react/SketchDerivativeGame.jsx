@@ -234,11 +234,11 @@ export default function SketchDerivativeGame() {
           <>
             <span className="text-sm font-bold">
               Score:{' '}
-              <span className={score >= 70 ? 'text-emerald-600' : score >= 40 ? 'text-yellow-500' : 'text-red-500'}>
+              <span className={score >= 70 ? 'text-emerald-600 dark:text-emerald-400' : score >= 40 ? 'text-yellow-500' : 'text-red-500'}>
                 {score}%
               </span>
             </span>
-            <span className="text-xs text-emerald-600 ml-1">— actual f′</span>
+            <span className="text-xs text-emerald-600 dark:text-emerald-400 ml-1">— actual f′</span>
             <span className="text-xs text-blue-500">— your sketch</span>
           </>
         )}

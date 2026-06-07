@@ -73,7 +73,7 @@ const ChainRulePeeler = () => {
               <motion.div 
                 initial={{ opacity: 0, x: -20 }} 
                 animate={{ opacity: 1, x: 0 }}
-                className="text-purple-500 font-bold bg-purple-500/10 px-3 py-1 rounded"
+                className="text-purple-500 font-bold bg-purple-50 dark:bg-purple-900/300/10 px-3 py-1 rounded"
               >
                 3(sin(x²))²
               </motion.div>
@@ -93,7 +93,7 @@ const ChainRulePeeler = () => {
               <motion.div 
                 initial={{ opacity: 0, x: -20 }} 
                 animate={{ opacity: 1, x: 0 }}
-                className="text-blue-500 font-bold bg-blue-500/10 px-3 py-1 rounded"
+                className="text-blue-500 font-bold bg-blue-50 dark:bg-blue-900/300/10 px-3 py-1 rounded"
               >
                 cos(x²)
               </motion.div>
@@ -113,7 +113,7 @@ const ChainRulePeeler = () => {
               <motion.div 
                 initial={{ opacity: 0, x: -20 }} 
                 animate={{ opacity: 1, x: 0 }}
-                className="text-red-500 font-bold bg-red-500/10 px-3 py-1 rounded"
+                className="text-red-500 font-bold bg-red-50 dark:bg-red-900/300/10 px-3 py-1 rounded"
               >
                 2x
               </motion.div>

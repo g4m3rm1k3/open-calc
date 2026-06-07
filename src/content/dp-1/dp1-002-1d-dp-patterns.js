@@ -77,7 +77,7 @@ h += "<div style='display:flex;gap:8px;margin-bottom:16px'>";
 for (let i = 0; i < n; i++) {
   h += "<div style='text-align:center'>" +
     "<div style='background:#1e293b;border:1px solid #334155;border-radius:4px;padding:6px 10px;color:#4ade80;font-weight:bold;min-width:36px'>" + dp[i] + "</div>" +
-    "<div style='color:#64748b;font-size:11px;margin-top:2px'>dp[" + i + "]</div>" +
+    "<div style='color:var(--color-text-secondary, #475569);font-size:11px;margin-top:2px'>dp[" + i + "]</div>" +
     "<div style='color:#94a3b8;font-size:11px'>val=" + nums[i] + "</div></div>";
 }
 h += "</div>";
@@ -121,7 +121,7 @@ function rob(arr) {
 const { answer, trace } = rob(nums);
 let h = "<div style='color:#60a5fa;font-size:14px;margin-bottom:8px'>Houses: [" + nums.join(", ") + "]</div>";
 h += "<table style='border-collapse:collapse;width:100%;font-size:12px;margin-bottom:12px'>";
-h += "<tr style='color:#64748b'><td style='padding:3px 6px'>i</td><td style='padding:3px 6px'>val</td><td style='padding:3px 6px'>prev2</td><td style='padding:3px 6px'>prev1</td><td style='padding:3px 6px'>curr</td><td style='padding:3px 6px'>decision</td></tr>";
+h += "<tr style='color:var(--color-text-secondary, #475569)'><td style='padding:3px 6px'>i</td><td style='padding:3px 6px'>val</td><td style='padding:3px 6px'>prev2</td><td style='padding:3px 6px'>prev1</td><td style='padding:3px 6px'>curr</td><td style='padding:3px 6px'>decision</td></tr>";
 trace.forEach(function(s) {
   h += "<tr style='border-top:1px solid #1e293b'>" +
     "<td style='padding:3px 6px;color:#94a3b8'>" + s.i + "</td>" +
@@ -159,10 +159,10 @@ h += "<div style='display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap'>";
 for (let i = 0; i < n; i++) {
   h += "<div style='text-align:center'>" +
     "<div style='background:#1e293b;border:1px solid #334155;border-radius:4px;padding:6px 10px;color:#f59e0b;font-weight:bold;min-width:36px'>" + dp[i] + "</div>" +
-    "<div style='color:#64748b;font-size:11px;margin-top:2px'>dp[" + i + "]</div>" +
+    "<div style='color:var(--color-text-secondary, #475569);font-size:11px;margin-top:2px'>dp[" + i + "]</div>" +
     "<div style='color:#94a3b8;font-size:11px'>c=" + cost[i] + "</div></div>";
 }
-h += "<div style='text-align:center'><div style='background:#1e293b;border:2px solid #4ade80;border-radius:4px;padding:6px 10px;color:#4ade80;font-weight:bold;min-width:36px'>TOP</div><div style='color:#64748b;font-size:11px;margin-top:2px'>goal</div></div>";
+h += "<div style='text-align:center'><div style='background:#1e293b;border:2px solid #4ade80;border-radius:4px;padding:6px 10px;color:#4ade80;font-weight:bold;min-width:36px'>TOP</div><div style='color:var(--color-text-secondary, #475569);font-size:11px;margin-top:2px'>goal</div></div>";
 h += "</div>";
 const steps = [];
 for (let i = 2; i < n; i++) {
@@ -224,7 +224,7 @@ for (const t of tests) {
   h += "<span style='color:#60a5fa'>DP: <b>" + dp + "</b></span>";
   h += "<span style='color:" + (wrong ? "#f87171" : "#4ade80") + "'>Greedy: <b>" + greedy + "</b></span>";
   if (wrong) h += "<span style='color:#f87171'>GREEDY WRONG by " + (dp - greedy) + "</span>";
-  else h += "<span style='color:#64748b'>(agree)</span>";
+  else h += "<span style='color:var(--color-text-secondary, #475569)'>(agree)</span>";
   h += "</div></div>";
 }
 out.innerHTML = h;`,

@@ -121,24 +121,24 @@ dayjs.min(a, b)           // a — the earlier date
 Build a live countdown to an upcoming event.`,
       html: `<div style="background:#09111c;padding:20px;border-radius:12px;font-family:monospace;display:flex;flex-direction:column;gap:12px;align-items:center;">
   <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
-  <div style="color:#64748b;font-size:12px;">Countdown to New Year</div>
+  <div style="color:var(--color-text-secondary, #475569);font-size:12px;">Countdown to New Year</div>
   <div id="countdown" style="color:#38bdf8;font-size:28px;letter-spacing:2px;">--:--:--</div>
   <div id="progress" style="width:100%;height:6px;background:#1e2a3f;border-radius:3px;">
     <div id="bar" style="height:100%;background:#38bdf8;border-radius:3px;transition:width 0.5s;width:0%;"></div>
   </div>
-  <div style="color:#475569;font-size:11px;" id="meta"></div>
+  <div style="color:var(--color-text-secondary, #475569);font-size:11px;" id="meta"></div>
   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;margin-top:4px;">
     <div style="background:#1e2a3f;border-radius:8px;padding:10px;text-align:center;">
       <div id="days" style="color:#a78bfa;font-size:18px;">--</div>
-      <div style="color:#475569;font-size:10px;">days</div>
+      <div style="color:var(--color-text-secondary, #475569);font-size:10px;">days</div>
     </div>
     <div style="background:#1e2a3f;border-radius:8px;padding:10px;text-align:center;">
       <div id="hours" style="color:#34d399;font-size:18px;">--</div>
-      <div style="color:#475569;font-size:10px;">hours</div>
+      <div style="color:var(--color-text-secondary, #475569);font-size:10px;">hours</div>
     </div>
     <div style="background:#1e2a3f;border-radius:8px;padding:10px;text-align:center;">
       <div id="minutes" style="color:#f472b6;font-size:18px;">--</div>
-      <div style="color:#475569;font-size:10px;">minutes</div>
+      <div style="color:var(--color-text-secondary, #475569);font-size:10px;">minutes</div>
     </div>
   </div>
 </div>`,
@@ -254,7 +254,7 @@ A common UI pattern: show timestamps as "5 minutes ago" and update them live.`,
       html: `<div style="background:#09111c;padding:16px;border-radius:12px;font-family:monospace;font-size:12px;color:#94a3b8;min-height:220px;">
   <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/relativeTime.js"></script>
-  <div style="color:#475569;font-size:11px;margin-bottom:10px;">Event Log (times update live)</div>
+  <div style="color:var(--color-text-secondary, #475569);font-size:11px;margin-bottom:10px;">Event Log (times update live)</div>
   <div id="log" style="display:flex;flex-direction:column;gap:6px;"></div>
   <button id="addEvt" style="margin-top:10px;width:100%;background:#1e2a3f;border:1px solid #334155;color:#94a3b8;padding:7px;border-radius:6px;cursor:pointer;font-family:monospace;font-size:11px;">+ Add Event</button>
 </div>`,
@@ -281,7 +281,7 @@ function render() {
     row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;background:#1e2a3f;padding:8px 12px;border-radius:6px;';
     row.innerHTML =
       '<span style="color:#e2e8f0;">' + e.msg + '</span>' +
-      '<span style="color:#475569;font-size:10px;" title="' + e.ts.format('HH:mm:ss') + '">' +
+      '<span style="color:var(--color-text-secondary, #475569);font-size:10px;" title="' + e.ts.format('HH:mm:ss') + '">' +
         e.ts.fromNow() +
       '</span>';
     container.appendChild(row);

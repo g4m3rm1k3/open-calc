@@ -141,9 +141,9 @@ export default function SigmaEvaluator() {
 
   // ── colour helpers ────────────────────────────────────────────────────────
   const BAR_COLORS = [
-    'bg-violet-500', 'bg-sky-500', 'bg-emerald-500',
-    'bg-amber-500',  'bg-rose-500', 'bg-teal-500',
-    'bg-fuchsia-500','bg-orange-500','bg-lime-500','bg-cyan-500',
+    'bg-violet-500', 'bg-sky-500', 'bg-emerald-50 dark:bg-emerald-900/300',
+    'bg-amber-500',  'bg-rose-50 dark:bg-rose-900/300', 'bg-teal-50 dark:bg-teal-900/300',
+    'bg-fuchsia-500','bg-orange-50 dark:bg-orange-900/300','bg-lime-500','bg-cyan-50 dark:bg-cyan-900/300',
   ];
   const maxAbs = Math.max(1, ...terms.map((t) => Math.abs(t.val)));
 

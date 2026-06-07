@@ -98,13 +98,13 @@ export default function ProofStrategyChooser() {
   const isRecommended = claimType.strategies.includes(selectedStrategy);
 
   return (
-    <div className="max-w-6xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+    <div className="max-w-6xl mx-auto p-6 bg-white dark:bg-slate-900 rounded-lg shadow-lg">
       <h2 className="text-2xl font-bold mb-4 text-center">
         Which Proof Strategy Should I Use?
       </h2>
 
       <div className="mb-6">
-        <div className="bg-blue-50 p-4 rounded-lg mb-4">
+        <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg mb-4">
           <h3 className="font-bold mb-2">
             What kind of claim are you trying to prove?
           </h3>
@@ -115,8 +115,8 @@ export default function ProofStrategyChooser() {
                 onClick={() => setSelectedClaim(index)}
                 className={`p-4 border rounded-lg text-left transition-colors ${
                   selectedClaim === index
-                    ? "bg-blue-500 text-white border-blue-500"
-                    : "bg-white hover:bg-gray-50 border-gray-300"
+                    ? "bg-blue-50 dark:bg-blue-900/300 text-white border-blue-500"
+                    : "bg-white dark:bg-slate-900 hover:bg-gray-50 dark:bg-slate-800 border-gray-300"
                 }`}
               >
                 <div className="font-semibold mb-1">{claim.type}</div>
@@ -131,7 +131,7 @@ export default function ProofStrategyChooser() {
           </div>
         </div>
 
-        <div className="bg-green-50 p-4 rounded-lg">
+        <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg">
           <h3 className="font-bold mb-2">
             Current Claim Type: {claimType.type}
           </h3>
@@ -142,7 +142,7 @@ export default function ProofStrategyChooser() {
             <strong>Recommended strategies:</strong>{" "}
             {claimType.strategies.map((s) => STRATEGIES[s].name).join(", ")}
           </p>
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-gray-600 dark:text-gray-300">
             <strong>Examples:</strong>
             <ul className="list-disc list-inside mt-1">
               {claimType.examples.map((ex, i) => (
@@ -163,8 +163,8 @@ export default function ProofStrategyChooser() {
                 onClick={() => setSelectedStrategy(key)}
                 className={`w-full p-4 border-2 rounded-lg text-left transition-all ${
                   selectedStrategy === key
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-gray-300 bg-white hover:bg-gray-50"
+                    ? "border-blue-500 bg-blue-50 dark:bg-blue-900/30"
+                    : "border-gray-300 bg-white dark:bg-slate-900 hover:bg-gray-50 dark:bg-slate-800"
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
@@ -172,8 +172,8 @@ export default function ProofStrategyChooser() {
                   <span
                     className={`px-2 py-1 rounded text-xs ${
                       claimType.strategies.includes(key)
-                        ? "bg-green-200 text-green-800"
-                        : "bg-gray-200 text-gray-600"
+                        ? "bg-green-200 dark:bg-green-800/50 text-green-800 dark:text-green-300"
+                        : "bg-gray-200 dark:bg-slate-700 text-gray-600 dark:text-gray-300"
                     }`}
                   >
                     {claimType.strategies.includes(key)
@@ -181,10 +181,10 @@ export default function ProofStrategyChooser() {
                       : "Alternative"}
                   </span>
                 </div>
-                <p className="text-sm text-gray-600 mb-2">
+                <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
                   {strat.description}
                 </p>
-                <p className="text-xs text-gray-500">Use when: {strat.when}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Use when: {strat.when}</p>
               </button>
             ))}
           </div>
@@ -195,8 +195,8 @@ export default function ProofStrategyChooser() {
           <div
             className={`p-4 rounded-lg border-2 mb-4 ${
               isRecommended
-                ? "border-green-300 bg-green-50"
-                : "border-yellow-300 bg-yellow-50"
+                ? "border-green-300 dark:border-green-700/50 bg-green-50 dark:bg-green-900/30"
+                : "border-yellow-300 dark:border-yellow-700/50 bg-yellow-50 dark:bg-yellow-900/30"
             }`}
           >
             <div className="flex items-center mb-2">
@@ -204,26 +204,26 @@ export default function ProofStrategyChooser() {
               <span
                 className={`px-2 py-1 rounded text-xs font-bold ${
                   isRecommended
-                    ? "bg-green-200 text-green-800"
-                    : "bg-yellow-200 text-yellow-800"
+                    ? "bg-green-200 dark:bg-green-800/50 text-green-800 dark:text-green-300"
+                    : "bg-yellow-200 dark:bg-yellow-800/50 text-yellow-800 dark:text-yellow-300"
                 }`}
               >
                 {isRecommended ? "✓ Good Choice" : "⚠ Alternative"}
               </span>
             </div>
             <p className="text-sm mb-3">{strategy.description}</p>
-            <p className="text-xs text-gray-600">
+            <p className="text-xs text-gray-600 dark:text-gray-300">
               <strong>When to use:</strong> {strategy.when}
             </p>
           </div>
 
-          <div className="bg-gray-50 p-4 rounded-lg">
+          <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-lg">
             <h4 className="font-bold mb-2">Example: {strategy.example}</h4>
             <div className="space-y-1">
               {strategy.steps.map((step, index) => (
                 <div
                   key={index}
-                  className="text-sm font-mono bg-white p-2 rounded border"
+                  className="text-sm font-mono bg-white dark:bg-slate-900 p-2 rounded border"
                 >
                   {index + 1}. {step}
                 </div>
@@ -233,7 +233,7 @@ export default function ProofStrategyChooser() {
         </div>
       </div>
 
-      <div className="bg-purple-50 p-4 rounded-lg">
+      <div className="bg-purple-50 dark:bg-purple-900/30 p-4 rounded-lg">
         <h3 className="font-bold mb-2">
           Decision Tree for Choosing Strategies
         </h3>
@@ -267,7 +267,7 @@ export default function ProofStrategyChooser() {
             </span>
           </div>
         </div>
-        <p className="mt-3 text-xs text-gray-600">
+        <p className="mt-3 text-xs text-gray-600 dark:text-gray-300">
           <strong>Pro Tip:</strong> Most proofs are direct proofs. Don't
           overcomplicate — start with the obvious approach!
         </p>

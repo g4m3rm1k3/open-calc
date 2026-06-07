@@ -280,7 +280,7 @@ Toggle **Cull Back Faces** to see the triangle vanish when winding flips to CW.`
     <div id="winding-lbl" style="font-family:monospace;font-size:13px;font-weight:700;padding:4px 12px;border-radius:6px;background:rgba(74,222,128,0.12);color:#4ade80;border:1px solid #4ade80">CCW — Front Face ✅</div>
   </div>
   <canvas id="cv" width="600" height="340" style="border-radius:8px;display:block;cursor:default"></canvas>
-  <div style="font-family:monospace;font-size:10px;color:#475569;text-align:center">
+  <div style="font-family:monospace;font-size:10px;color:var(--color-text-secondary, #475569);text-align:center">
     gl.drawArrays position array: [<span id="arr-lbl" style="color:#94a3b8">...</span>]
   </div>
 </div>`,
@@ -661,10 +661,10 @@ WebGL never throws JavaScript exceptions for rendering bugs. These are the 4 mos
     <button data-bug="2" class="bug-btn" style="padding:8px 12px;border-radius:7px;border:1.5px solid #475569;background:transparent;color:#94a3b8;font-family:monospace;font-size:11px;cursor:pointer;text-align:left">🐛 Bug 2: Wrong vertex count in drawArrays</button>
     <button data-bug="3" class="bug-btn" style="padding:8px 12px;border-radius:7px;border:1.5px solid #475569;background:transparent;color:#94a3b8;font-family:monospace;font-size:11px;cursor:pointer;text-align:left">🐛 Bug 3: Positions outside NDC range</button>
     <button data-bug="4" class="bug-btn" style="padding:8px 12px;border-radius:7px;border:1.5px solid #475569;background:transparent;color:#94a3b8;font-family:monospace;font-size:11px;cursor:pointer;text-align:left">🐛 Bug 4: Fragment shader compile error</button>
-    <div id="fix-panel" style="margin-top:8px;background:#0f172a;border-radius:8px;padding:10px;font-family:monospace;font-size:10px;line-height:1.8;color:#64748b;min-height:80px"></div>
+    <div id="fix-panel" style="margin-top:8px;background:#0f172a;border-radius:8px;padding:10px;font-family:monospace;font-size:10px;line-height:1.8;color:var(--color-text-secondary, #475569);min-height:80px"></div>
   </div>
   <div style="flex:1;min-width:200px;display:flex;flex-direction:column;gap:6px">
-    <div style="font-family:monospace;font-size:10px;color:#475569">WebGL output:</div>
+    <div style="font-family:monospace;font-size:10px;color:var(--color-text-secondary, #475569)">WebGL output:</div>
     <canvas id="cv" width="380" height="280" style="border-radius:8px;border:1px solid rgba(255,255,255,0.08);width:100%;max-width:380px;display:block"></canvas>
   </div>
 </div>`,

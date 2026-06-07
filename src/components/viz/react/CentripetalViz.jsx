@@ -48,7 +48,7 @@ export default function CentripetalViz(){
       </div>
       <div className="space-y-2 px-1">
         <div className="flex items-center gap-3"><span className="text-sm font-mono w-14 text-violet-600">r (m)</span><input type="range" min="40" max="100" step="5" value={r} onChange={e=>setR(parseInt(e.target.value))} className="flex-1 accent-violet-500"/><span className="text-xs font-mono w-8">{r}</span></div>
-        <div className="flex items-center gap-3"><span className="text-sm font-mono w-14 text-emerald-600">ω (rad/s)</span><input type="range" min="0.5" max="3" step="0.1" value={omega} onChange={e=>setOmega(parseFloat(e.target.value))} className="flex-1 accent-emerald-500"/><span className="text-xs font-mono w-8">{omega.toFixed(1)}</span></div>
+        <div className="flex items-center gap-3"><span className="text-sm font-mono w-14 text-emerald-600 dark:text-emerald-400">ω (rad/s)</span><input type="range" min="0.5" max="3" step="0.1" value={omega} onChange={e=>setOmega(parseFloat(e.target.value))} className="flex-1 accent-emerald-500"/><span className="text-xs font-mono w-8">{omega.toFixed(1)}</span></div>
       </div>
     </div>
   );

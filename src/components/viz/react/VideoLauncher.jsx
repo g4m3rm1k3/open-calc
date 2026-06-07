@@ -14,7 +14,7 @@ export default function VideoLauncher({ params }) {
         <div className="w-14 h-14 rounded-[1.25rem] bg-indigo-600 shadow-[0_0_30px_rgba(79,70,229,0.4)] flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-500">
           <Play size={24} fill="currentColor" />
         </div>
-        <div className="absolute inset-0 bg-indigo-500/20 blur-xl rounded-full animate-pulse -z-10" />
+        <div className="absolute inset-0 bg-indigo-50 dark:bg-indigo-900/300/20 blur-xl rounded-full animate-pulse -z-10" />
       </div>
 
       <div className="text-center mb-6">

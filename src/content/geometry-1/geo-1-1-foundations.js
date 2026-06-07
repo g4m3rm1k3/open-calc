@@ -45,7 +45,7 @@ This is why mathematics requires proof. Not because mathematicians are pedantic,
 
 These five statements are all Euclid assumed. Everything else — the Pythagorean Theorem, properties of circles, the theory of parallel lines — he derived from these alone. Click each postulate to see what it claims and why it was chosen.`,
       html: `<div id="scene" style="padding:0"></div>`,
-      css: `body{margin:0;background:#fafaf8;font-family:'Georgia',serif}
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc);font-family:'Georgia',serif}
 #scene{display:flex;flex-direction:column;gap:0}`,
       startCode: `var scene=document.getElementById('scene');
 var postulates=[
@@ -117,7 +117,7 @@ postulates.forEach(function(p,i){
   latinEl.textContent='"'+p.latin+'"';
   
   var plainEl=document.createElement('div');
-  plainEl.style.cssText='font-size:12px;color:#64748b;margin-top:4px;';
+  plainEl.style.cssText='font-size:12px;color:var(--color-text-secondary, #475569);margin-top:4px;';
   plainEl.textContent='In plain English: '+p.plain;
   
   textEl.appendChild(latinEl);
@@ -126,7 +126,7 @@ postulates.forEach(function(p,i){
   header.appendChild(textEl);
   
   var expandEl=document.createElement('div');
-  expandEl.style.cssText='padding:12px 16px 14px 54px;background:#fff;display:none;border-top:1px solid #f0f0ee;font-size:13px;color:#374151;line-height:1.7;font-family:Georgia,serif;';
+  expandEl.style.cssText='padding:12px 16px 14px 54px;background:var(--color-background-primary, #ffffff);display:none;border-top:1px solid var(--color-border-primary, #e2e8f0);font-size:13px;color:var(--color-text-primary, #1e293b);line-height:1.7;font-family:Georgia,serif;';
   expandEl.innerHTML='<strong style="color:'+p.border+'">Why this?</strong> '+p.why;
   
   card.appendChild(header);
@@ -155,7 +155,7 @@ postulates.forEach(function(p,i){
 
 // Note at bottom
 var note=document.createElement('div');
-note.style.cssText='margin:10px 14px 14px;padding:10px 14px;background:#fafaf8;border:1px solid #e2e8f0;border-radius:8px;font-size:12px;color:#64748b;font-family:Georgia,serif;line-height:1.65;';
+note.style.cssText='margin:10px 14px 14px;padding:10px 14px;background:var(--color-background-secondary, #f8fafc);border:1px solid var(--color-border-primary, #e2e8f0);border-radius:8px;font-size:12px;color:var(--color-text-secondary, #475569);font-family:Georgia,serif;line-height:1.65;';
 note.innerHTML='<strong>Euclid also stated five "Common Notions"</strong> — logical axioms not specific to geometry, such as "things equal to the same thing are equal to each other." These, combined with the five postulates, constitute the complete foundation of Euclidean geometry.';
 scene.appendChild(note);`,
       outputHeight: 460,
@@ -195,8 +195,8 @@ Once we have the postulates, we can begin deriving theorems. The first few theor
 This is the canvas below. Hover over each step of the proof to understand the logical structure.`,
       html: `<canvas id="cv" width="700" height="320"></canvas>
 <div id="proof-steps" style="padding:14px;font-family:Georgia,serif"></div>`,
-      css: `body{margin:0;background:#fafaf8;font-family:Georgia,serif}
-#proof-steps{background:#fff;border-top:1px solid #e2e8f0}`,
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc);font-family:Georgia,serif}
+#proof-steps{background:var(--color-background-primary, #ffffff);border-top:1px solid var(--color-border-primary, #e2e8f0)}`,
       startCode: `var canvas=document.getElementById('cv');
 var ctx=canvas.getContext('2d');
 var W=canvas.width,H=canvas.height;
@@ -292,7 +292,7 @@ var stepsEl=document.getElementById('proof-steps');
 
 steps.forEach(function(step,i){
   var row=document.createElement('div');
-  row.style.cssText='display:flex;gap:12px;padding:9px 0;border-bottom:1px solid #f0f0ee;align-items:flex-start;cursor:default;';
+  row.style.cssText='display:flex;gap:12px;padding:9px 0;border-bottom:1px solid var(--color-border-primary, #e2e8f0);align-items:flex-start;cursor:default;';
   
   var numEl=document.createElement('div');
   numEl.style.cssText='min-width:28px;height:28px;border-radius:14px;background:#1e3a5f;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:1px;flex-shrink:0;font-family:sans-serif;';
@@ -303,13 +303,13 @@ steps.forEach(function(step,i){
   labelEl.style.cssText='font-weight:700;color:#1e3a5f;font-size:13px;';
   labelEl.textContent=step.label+' ';
   var bodyEl=document.createElement('span');
-  bodyEl.style.cssText='font-size:13px;color:#374151;line-height:1.65;';
+  bodyEl.style.cssText='font-size:13px;color:var(--color-text-primary, #1e293b);line-height:1.65;';
   bodyEl.textContent=step.text;
   textEl.appendChild(labelEl);
   textEl.appendChild(bodyEl);
   if(step.note){
     var noteEl=document.createElement('div');
-    noteEl.style.cssText='font-size:11px;color:#9ca3af;margin-top:3px;font-style:italic;';
+    noteEl.style.cssText='font-size:11px;color:var(--color-text-tertiary, #9ca3af);margin-top:3px;font-style:italic;';
     noteEl.textContent=step.note;
     textEl.appendChild(noteEl);
   }
@@ -356,7 +356,7 @@ Alongside postulates and undefined terms, geometry requires precise definitions.
 
 Click each definition to see how it builds on the undefined terms and earlier definitions.`,
       html: `<div id="defs" style="padding:14px;display:flex;flex-direction:column;gap:8px"></div>`,
-      css: `body{margin:0;background:#fafaf8;font-family:Georgia,serif}`,
+      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc);font-family:Georgia,serif}`,
       startCode: `var defs=[
   {
     term:'Line Segment',
@@ -412,19 +412,19 @@ var defsEl=document.getElementById('defs');
 
 defs.forEach(function(d){
   var card=document.createElement('div');
-  card.style.cssText='border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;background:#fff;';
+  card.style.cssText='border:1px solid var(--color-border-primary, #e2e8f0);border-radius:10px;overflow:hidden;background:var(--color-background-primary, #ffffff);';
   
   var header=document.createElement('div');
   header.style.cssText='padding:12px 14px;cursor:pointer;display:flex;align-items:baseline;gap:10px;';
   header.innerHTML='<span style="font-weight:700;font-size:14px;color:'+d.color+'">'+d.term+'</span>'
-    +'<span style="font-family:serif;font-size:13px;color:#9ca3af;font-style:italic">'+d.symbol+'</span>'
+    +'<span style="font-family:serif;font-size:13px;color:var(--color-text-tertiary, #9ca3af);font-style:italic">'+d.symbol+'</span>'
     +'<span style="margin-left:auto;font-size:11px;color:#94a3b8">click to expand ▾</span>';
   
   var body=document.createElement('div');
-  body.style.cssText='padding:0 14px 12px;display:none;border-top:1px solid #f0f0ee;';
-  body.innerHTML='<div style="font-size:13px;color:#374151;line-height:1.65;margin-top:10px;font-style:italic">'+d.def+'</div>'
-    +'<div style="font-size:11px;color:#9ca3af;margin-top:6px;">'+d.depends+'</div>'
-    +'<div style="font-size:12px;color:#64748b;margin-top:8px;padding:8px 10px;background:#fafaf8;border-radius:6px;border-left:3px solid '+d.color+'">'+d.note+'</div>';
+  body.style.cssText='padding:0 14px 12px;display:none;border-top:1px solid var(--color-border-primary, #e2e8f0);';
+  body.innerHTML='<div style="font-size:13px;color:var(--color-text-primary, #1e293b);line-height:1.65;margin-top:10px;font-style:italic">'+d.def+'</div>'
+    +'<div style="font-size:11px;color:var(--color-text-tertiary, #9ca3af);margin-top:6px;">'+d.depends+'</div>'
+    +'<div style="font-size:12px;color:var(--color-text-secondary, #475569);margin-top:8px;padding:8px 10px;background:var(--color-background-secondary, #f8fafc);border-radius:6px;border-left:3px solid '+d.color+'">'+d.note+'</div>';
   
   var open=false;
   header.onclick=function(){

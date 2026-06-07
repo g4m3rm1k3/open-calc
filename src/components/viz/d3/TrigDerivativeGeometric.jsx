@@ -338,19 +338,19 @@ export default function TrigDerivativeGeometric({ params = {} }) {
             <div className="space-y-1.5 text-xs text-slate-500 dark:text-slate-400">
               {currentStep >= 0 && (
                 <div className="flex items-center gap-2">
-                  <span className="w-3 h-2.5 rounded-sm inline-block flex-shrink-0 bg-indigo-500" />
+                  <span className="w-3 h-2.5 rounded-sm inline-block flex-shrink-0 bg-indigo-50 dark:bg-indigo-900/300" />
                   <span>Radius → P = (cos x, sin x)</span>
                 </div>
               )}
               {currentStep >= 1 && (
                 <div className="flex items-center gap-2">
-                  <span className="w-3 h-2.5 rounded-sm inline-block flex-shrink-0 bg-rose-500" />
+                  <span className="w-3 h-2.5 rounded-sm inline-block flex-shrink-0 bg-rose-50 dark:bg-rose-900/300" />
                   <span>Velocity v = (−sin x, cos x)</span>
                 </div>
               )}
               {currentStep >= 2 && (
                 <div className="flex items-center gap-2">
-                  <span className="w-3 h-2.5 rounded-sm inline-block flex-shrink-0 bg-emerald-500" />
+                  <span className="w-3 h-2.5 rounded-sm inline-block flex-shrink-0 bg-emerald-50 dark:bg-emerald-900/300" />
                   <span>d(sin x)/dx = cos x</span>
                 </div>
               )}
@@ -362,7 +362,7 @@ export default function TrigDerivativeGeometric({ params = {} }) {
               )}
               {currentStep >= 4 && (
                 <div className="flex items-center gap-2">
-                  <span className="w-3 h-2.5 rounded-sm inline-block flex-shrink-0 bg-blue-500" />
+                  <span className="w-3 h-2.5 rounded-sm inline-block flex-shrink-0 bg-blue-50 dark:bg-blue-900/300" />
                   <span>tan x on x = 1</span>
                 </div>
               )}

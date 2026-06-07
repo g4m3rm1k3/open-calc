@@ -987,7 +987,7 @@ export default function CADPro() {
             const sk=p.features.find(f=>f.id===p.activeSketchId);
             if(!sk) return p;
             const updFeatures=p.features.map(f=>f.id===sk.id?{...f,entities:[...f.entities,newLine]}:f);
-            return{...p,features:updFeatures,sketchDrawing:false,sketchPts:[{x:pt.x,y:pt.y}],sketchDrawing:true};
+            return{...p,features:updFeatures,sketchPts:[{x:pt.x,y:pt.y}],sketchDrawing:true};
           });
         }
       } else if(tool==="circle") {

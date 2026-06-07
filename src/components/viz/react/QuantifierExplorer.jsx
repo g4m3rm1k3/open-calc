@@ -29,13 +29,13 @@ export default function QuantifierExplorer() {
   const existentialTrue = satisfying.length > 0;
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+    <div className="max-w-4xl mx-auto p-6 bg-white dark:bg-slate-900 rounded-lg shadow-lg">
       <h2 className="text-2xl font-bold mb-4 text-center">
         Universal vs. Existential: How One Counterexample Destroys Everything
       </h2>
 
       <div className="mb-6">
-        <div className="bg-blue-50 p-4 rounded-lg mb-4">
+        <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg mb-4">
           <h3 className="font-bold mb-2">Choose a Property to Test</h3>
           <div className="grid grid-cols-2 gap-2">
             {PREDICATES.map((pred, index) => (
@@ -47,8 +47,8 @@ export default function QuantifierExplorer() {
                 }}
                 className={`p-3 border rounded-lg text-center transition-colors ${
                   selectedPredicate === index
-                    ? "bg-blue-500 text-white border-blue-500"
-                    : "bg-white hover:bg-gray-50 border-gray-300"
+                    ? "bg-blue-50 dark:bg-blue-900/300 text-white border-blue-500"
+                    : "bg-white dark:bg-slate-900 hover:bg-gray-50 dark:bg-slate-800 border-gray-300"
                 }`}
               >
                 {pred.name}
@@ -57,7 +57,7 @@ export default function QuantifierExplorer() {
           </div>
         </div>
 
-        <div className="bg-green-50 p-4 rounded-lg mb-4">
+        <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg mb-4">
           <h3 className="font-bold mb-2">
             Current Property: "{predicate.name}"
           </h3>
@@ -67,15 +67,15 @@ export default function QuantifierExplorer() {
                 key={index}
                 className={`w-12 h-12 flex items-center justify-center border-2 rounded-lg text-2xl ${
                   predicate.check(animal)
-                    ? "bg-green-200 border-green-400"
-                    : "bg-red-200 border-red-400"
+                    ? "bg-green-200 dark:bg-green-800/50 border-green-400 dark:border-green-600/50"
+                    : "bg-red-200 dark:bg-red-800/50 border-red-400 dark:border-red-600/50"
                 }`}
               >
                 {animal}
               </div>
             ))}
           </div>
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-gray-600 dark:text-gray-300">
             <p>
               <strong>Satisfy the property:</strong> {satisfying.join(" ")} (
               {satisfying.length} animals)
@@ -89,15 +89,15 @@ export default function QuantifierExplorer() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <div className="border-2 border-blue-300 rounded-lg p-4">
-          <h3 className="text-lg font-bold mb-3 text-center text-blue-700">
+        <div className="border-2 border-blue-300 dark:border-blue-700/50 rounded-lg p-4">
+          <h3 className="text-lg font-bold mb-3 text-center text-blue-700 dark:text-blue-300">
             ∀ (For All)
           </h3>
           <div className="text-center mb-4">
             <div className="text-xl font-mono mb-2">
               ∀x ∈ Universe, {predicate.name.toLowerCase()}(x)
             </div>
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-gray-600 dark:text-gray-300">
               "Every single animal has this property"
             </div>
           </div>
@@ -105,14 +105,14 @@ export default function QuantifierExplorer() {
           <div
             className={`p-3 rounded-lg mb-4 ${
               universalTrue
-                ? "bg-green-100 border border-green-300"
-                : "bg-red-100 border border-red-300"
+                ? "bg-green-100 dark:bg-green-900/50 border border-green-300 dark:border-green-700/50"
+                : "bg-red-100 dark:bg-red-900/50 border border-red-300 dark:border-red-700/50"
             }`}
           >
             <div className="font-bold mb-1">
               Status:{" "}
               <span
-                className={universalTrue ? "text-green-600" : "text-red-600"}
+                className={universalTrue ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}
               >
                 {universalTrue ? "TRUE" : "FALSE"}
               </span>
@@ -124,22 +124,22 @@ export default function QuantifierExplorer() {
             </div>
           </div>
 
-          <div className="text-xs text-gray-600">
+          <div className="text-xs text-gray-600 dark:text-gray-300">
             <strong>Destruction:</strong> One counterexample destroys the entire
             universal claim. Finding a single animal that doesn't have fur
             proves "all animals have fur" is false.
           </div>
         </div>
 
-        <div className="border-2 border-green-300 rounded-lg p-4">
-          <h3 className="text-lg font-bold mb-3 text-center text-green-700">
+        <div className="border-2 border-green-300 dark:border-green-700/50 rounded-lg p-4">
+          <h3 className="text-lg font-bold mb-3 text-center text-green-700 dark:text-green-300">
             ∃ (There Exists)
           </h3>
           <div className="text-center mb-4">
             <div className="text-xl font-mono mb-2">
               ∃x ∈ Universe, {predicate.name.toLowerCase()}(x)
             </div>
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-gray-600 dark:text-gray-300">
               "At least one animal has this property"
             </div>
           </div>
@@ -147,14 +147,14 @@ export default function QuantifierExplorer() {
           <div
             className={`p-3 rounded-lg mb-4 ${
               existentialTrue
-                ? "bg-green-100 border border-green-300"
-                : "bg-red-100 border border-red-300"
+                ? "bg-green-100 dark:bg-green-900/50 border border-green-300 dark:border-green-700/50"
+                : "bg-red-100 dark:bg-red-900/50 border border-red-300 dark:border-red-700/50"
             }`}
           >
             <div className="font-bold mb-1">
               Status:{" "}
               <span
-                className={existentialTrue ? "text-green-600" : "text-red-600"}
+                className={existentialTrue ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}
               >
                 {existentialTrue ? "TRUE" : "FALSE"}
               </span>
@@ -166,7 +166,7 @@ export default function QuantifierExplorer() {
             </div>
           </div>
 
-          <div className="text-xs text-gray-600">
+          <div className="text-xs text-gray-600 dark:text-gray-300">
             <strong>Proof:</strong> Finding one example proves the existential
             claim. Finding a flying squirrel proves "some animals can fly" is
             true.
@@ -174,25 +174,25 @@ export default function QuantifierExplorer() {
         </div>
       </div>
 
-      <div className="bg-yellow-50 p-4 rounded-lg mb-6">
+      <div className="bg-yellow-50 dark:bg-yellow-900/30 p-4 rounded-lg mb-6">
         <h3 className="font-bold mb-2">Quantifier Negation Rules</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-          <div className="bg-white p-3 rounded border">
+          <div className="bg-white dark:bg-slate-900 p-3 rounded border">
             <div className="font-mono mb-1">¬∀x P(x) ≡ ∃x ¬P(x)</div>
-            <div className="text-gray-600">
+            <div className="text-gray-600 dark:text-gray-300">
               "Not all have P" means "Some don't have P"
             </div>
           </div>
-          <div className="bg-white p-3 rounded border">
+          <div className="bg-white dark:bg-slate-900 p-3 rounded border">
             <div className="font-mono mb-1">¬∃x P(x) ≡ ∀x ¬P(x)</div>
-            <div className="text-gray-600">
+            <div className="text-gray-600 dark:text-gray-300">
               "None have P" means "All don't have P"
             </div>
           </div>
         </div>
       </div>
 
-      <div className="bg-purple-50 p-4 rounded-lg">
+      <div className="bg-purple-50 dark:bg-purple-900/30 p-4 rounded-lg">
         <h3 className="font-bold mb-2">The Power of Counterexamples</h3>
         <div className="space-y-2 text-sm">
           <p>

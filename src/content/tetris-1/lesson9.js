@@ -221,7 +221,7 @@ This is the core pattern for all game feedback: add class â†’ animation plays â†
 <button id="flashBtn">Flash all</button>
 <div id="animLog" style="margin-top:8px;"></div>`,
             css: `body{background:#0a1220;padding:14px;}
-@keyframes flash{0%{background:#111827;}40%{background:#ffffff;transform:scaleY(1.08);}100%{background:#111827;}}
+@keyframes flash{0%{background:#111827;}40%{background:var(--color-background-primary, #ffffff);transform:scaleY(1.08);}100%{background:#111827;}}
 @keyframes lockPulse{0%{filter:brightness(1);}50%{filter:brightness(2.5);}100%{filter:brightness(1);}}
 .anim-cell{width:28px;height:28px;border-radius:3px;background:#111827;border:1px solid #334155;}
 .anim-cell.filled{background:#22d3ee;border-color:#67e8f9;}
@@ -552,7 +552,7 @@ The test verifies \`flashRowsThenClear\` adds the \`clearing\` class to the corr
 #board{display:grid;grid-template-columns:repeat(10,28px);grid-template-rows:repeat(20,28px);gap:2px;border:2px solid #1e293b;padding:4px;background:#0a0f1a;border-radius:4px;width:fit-content;}
 .cell{width:28px;height:28px;background:#0f1929;border:1px solid #1a2744;border-radius:2px;transition:background 0.06s ease;}
 .pv-cell{width:22px;height:22px;border-radius:3px;background:#0f1929;border:1px solid #1a2744;}
-@keyframes flash{0%{background:#0f1929;}35%{background:#ffffff;transform:scaleY(1.06);}100%{background:#0f1929;}}
+@keyframes flash{0%{background:#0f1929;}35%{background:var(--color-background-primary, #ffffff);transform:scaleY(1.06);}100%{background:#0f1929;}}
 .cell.clearing{animation:flash 0.3s ease forwards;}
 @keyframes scorePop{0%{transform:scale(1);}50%{transform:scale(1.3);}100%{transform:scale(1);}}
 .score-pop{animation:scorePop 0.25s ease;}`,
@@ -783,7 +783,7 @@ Also display a "TETRIS!" text label that appears and fades out over the board.`,
 #board{display:grid;grid-template-columns:repeat(10,28px);grid-template-rows:repeat(20,28px);gap:2px;border:2px solid #1e293b;padding:4px;background:#0a0f1a;border-radius:4px;width:fit-content;}
 .cell{width:28px;height:28px;background:#0f1929;border:1px solid #1a2744;border-radius:2px;transition:background 0.06s ease;}
 .pv-cell{width:22px;height:22px;border-radius:3px;background:#0f1929;border:1px solid #1a2744;}
-@keyframes flash{0%{background:#0f1929;}35%{background:#ffffff;transform:scaleY(1.06);}100%{background:#0f1929;}}
+@keyframes flash{0%{background:#0f1929;}35%{background:var(--color-background-primary, #ffffff);transform:scaleY(1.06);}100%{background:#0f1929;}}
 .cell.clearing{animation:flash 0.3s ease forwards;}
 @keyframes tetrisFlash{0%{filter:brightness(1);}20%{filter:brightness(3);}40%{filter:brightness(1);}60%{filter:brightness(2.5);}80%{filter:brightness(1);}100%{filter:brightness(1);}}
 #board.tetris-flash{animation:tetrisFlash 0.5s ease forwards;}
@@ -959,7 +959,7 @@ This is a shippable game. You built it from scratch.
 #board{display:grid;grid-template-columns:repeat(10,28px);grid-template-rows:repeat(20,28px);gap:2px;border:2px solid #1e293b;padding:4px;background:#0a0f1a;border-radius:4px;width:fit-content;}
 .cell{width:28px;height:28px;background:#0f1929;border:1px solid #1a2744;border-radius:2px;transition:background 0.06s ease;}
 .pv-cell{width:22px;height:22px;border-radius:3px;background:#0f1929;border:1px solid #1a2744;}
-@keyframes flash{0%{background:#0f1929;}35%{background:#ffffff;transform:scaleY(1.06);}100%{background:#0f1929;}}
+@keyframes flash{0%{background:#0f1929;}35%{background:var(--color-background-primary, #ffffff);transform:scaleY(1.06);}100%{background:#0f1929;}}
 .cell.clearing{animation:flash 0.3s ease forwards;}
 @keyframes tetrisFlash{0%{filter:brightness(1);}20%{filter:brightness(3);}40%{filter:brightness(1);}60%{filter:brightness(2.5);}100%{filter:brightness(1);}}
 #board.tetris-flash{animation:tetrisFlash 0.5s ease forwards;}

@@ -56,7 +56,7 @@ export default function QuantifierGridLab() {
         
         {/* Validation Header */}
         <div className={`absolute top-4 right-4 flex items-center gap-2 px-4 py-2 rounded-full font-bold border-2 transition-all duration-300 ${isTrue ? 'bg-emerald-900/60 border-emerald-500 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.4)]' : 'bg-red-900/40 border-red-500/50 text-red-400'}`}>
-          <div className={`w-3 h-3 rounded-full ${isTrue ? 'bg-emerald-400 animate-pulse' : 'bg-red-500'}`}></div>
+          <div className={`w-3 h-3 rounded-full ${isTrue ? 'bg-emerald-400 animate-pulse' : 'bg-red-50 dark:bg-red-900/300'}`}></div>
           {isTrue ? 'STATEMENT TRUE' : 'STATEMENT FALSE'}
         </div>
 

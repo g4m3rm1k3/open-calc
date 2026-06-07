@@ -155,7 +155,7 @@ console.log('Synchronous loop blocked progress until done.');`,
 .box::before{content:attr(data-title); display:block; color:#94a3b8; font-size:10px; margin-bottom:10px; text-transform:uppercase; letter-spacing:1px; font-weight:800;}`,
       startCode: `const s=document.getElementById('s');
 const q=document.getElementById('q');
-s.innerHTML='global() <br><span style="color:#64748b">// Running sync code...</span>';
+s.innerHTML='global() <br><span style="color:var(--color-text-secondary, #475569)">// Running sync code...</span>';
 q.innerHTML='(empty)';
 
 setTimeout(()=>{

@@ -37,7 +37,7 @@ export default function IndependenceIntuition(){
         <span className="text-xs font-mono w-12 text-right">{tCur.toFixed(2)}s</span>
       </div>
       <div className="grid grid-cols-2 gap-2">
-        <div className="flex items-center gap-2"><span className="text-xs font-mono w-14 text-emerald-600">v₀ₓ (m/s)</span><input type="range" min="5" max="25" step="1" value={v0x} onChange={e=>{setV0x(parseInt(e.target.value));setT(0);}} className="flex-1 accent-emerald-500"/><span className="text-xs font-mono w-6 text-right">{v0x}</span></div>
+        <div className="flex items-center gap-2"><span className="text-xs font-mono w-14 text-emerald-600 dark:text-emerald-400">v₀ₓ (m/s)</span><input type="range" min="5" max="25" step="1" value={v0x} onChange={e=>{setV0x(parseInt(e.target.value));setT(0);}} className="flex-1 accent-emerald-500"/><span className="text-xs font-mono w-6 text-right">{v0x}</span></div>
         <div className="flex items-center gap-2"><span className="text-xs font-mono w-14 text-red-500">v₀ᵧ (m/s)</span><input type="range" min="5" max="25" step="1" value={v0y} onChange={e=>{setV0y(parseInt(e.target.value));setT(0);}} className="flex-1 accent-red-500"/><span className="text-xs font-mono w-6 text-right">{v0y}</span></div>
       </div>
     </div>

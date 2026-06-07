@@ -120,9 +120,9 @@ export default function UnitCircle({ params }) {
                 return (
                   <tr key={i} className="even:bg-slate-50 dark:even:bg-slate-800/40">
                     <td className="px-3 py-1 border border-slate-200 dark:border-slate-700 font-mono text-center">{labels[i]}</td>
-                    <td className="px-3 py-1 border border-slate-200 dark:border-slate-700 font-mono text-center text-emerald-600">{fmt(c)}</td>
+                    <td className="px-3 py-1 border border-slate-200 dark:border-slate-700 font-mono text-center text-emerald-600 dark:text-emerald-400">{fmt(c)}</td>
                     <td className="px-3 py-1 border border-slate-200 dark:border-slate-700 font-mono text-center text-amber-600">{fmt(s)}</td>
-                    <td className="px-3 py-1 border border-slate-200 dark:border-slate-700 font-mono text-center text-blue-600">{!isFinite(t) ? 'undef.' : fmt(t)}</td>
+                    <td className="px-3 py-1 border border-slate-200 dark:border-slate-700 font-mono text-center text-blue-600 dark:text-blue-400">{!isFinite(t) ? 'undef.' : fmt(t)}</td>
                   </tr>
                 )
               })}

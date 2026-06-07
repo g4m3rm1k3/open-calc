@@ -43,9 +43,9 @@ const COLOR = {
   violet: { bg: 'bg-violet-950/60', border: 'border-violet-600', text: 'text-violet-300', badge: 'bg-violet-600 text-white', num: 'text-violet-300', dot: 'bg-violet-500' },
   sky:    { bg: 'bg-sky-950/60',    border: 'border-sky-600',    text: 'text-sky-300',    badge: 'bg-sky-600 text-white',    num: 'text-sky-300',    dot: 'bg-sky-500' },
   amber:  { bg: 'bg-amber-950/60',  border: 'border-amber-600',  text: 'text-amber-300',  badge: 'bg-amber-600 text-slate-950', num: 'text-amber-300', dot: 'bg-amber-500' },
-  emerald:{ bg: 'bg-emerald-950/60',border: 'border-emerald-600',text: 'text-emerald-300',badge: 'bg-emerald-600 text-white',num: 'text-emerald-300',dot: 'bg-emerald-500' },
-  rose:   { bg: 'bg-rose-950/60',   border: 'border-rose-600',   text: 'text-rose-300',   badge: 'bg-rose-600 text-white',   num: 'text-rose-300',   dot: 'bg-rose-500' },
-  teal:   { bg: 'bg-teal-950/60',   border: 'border-teal-600',   text: 'text-teal-300',   badge: 'bg-teal-600 text-white',   num: 'text-teal-300',   dot: 'bg-teal-500' },
+  emerald:{ bg: 'bg-emerald-950/60',border: 'border-emerald-600',text: 'text-emerald-300',badge: 'bg-emerald-600 text-white',num: 'text-emerald-300',dot: 'bg-emerald-50 dark:bg-emerald-900/300' },
+  rose:   { bg: 'bg-rose-950/60',   border: 'border-rose-600',   text: 'text-rose-300',   badge: 'bg-rose-600 text-white',   num: 'text-rose-300',   dot: 'bg-rose-50 dark:bg-rose-900/300' },
+  teal:   { bg: 'bg-teal-950/60',   border: 'border-teal-600',   text: 'text-teal-300',   badge: 'bg-teal-600 text-white',   num: 'text-teal-300',   dot: 'bg-teal-50 dark:bg-teal-900/300' },
 };
 
 function NumberRow({ numbers, color, label, dim = false }) {

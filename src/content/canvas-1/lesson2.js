@@ -172,19 +172,19 @@ The **open path** shows what happens when you call \`fill()\` without \`closePat
       html: `<div style="display:flex; flex-wrap:wrap; gap:16px; padding:16px; background:#1a1a2e; min-height:100vh; align-items:flex-start; justify-content:center">
   <div style="text-align:center">
     <canvas id="c1" width="190" height="190" style="background:#16213e; border:1px solid #1e3a5f; border-radius:4px; display:block"></canvas>
-    <p style="color:#64748b; font:11px Courier New; margin-top:6px">Triangle</p>
+    <p style="color:var(--color-text-secondary, #475569); font:11px Courier New; margin-top:6px">Triangle</p>
   </div>
   <div style="text-align:center">
     <canvas id="c2" width="190" height="190" style="background:#16213e; border:1px solid #1e3a5f; border-radius:4px; display:block"></canvas>
-    <p style="color:#64748b; font:11px Courier New; margin-top:6px">Star</p>
+    <p style="color:var(--color-text-secondary, #475569); font:11px Courier New; margin-top:6px">Star</p>
   </div>
   <div style="text-align:center">
     <canvas id="c3" width="190" height="190" style="background:#16213e; border:1px solid #1e3a5f; border-radius:4px; display:block"></canvas>
-    <p style="color:#64748b; font:11px Courier New; margin-top:6px">Hexagon (fill + stroke)</p>
+    <p style="color:var(--color-text-secondary, #475569); font:11px Courier New; margin-top:6px">Hexagon (fill + stroke)</p>
   </div>
   <div style="text-align:center">
     <canvas id="c4" width="190" height="190" style="background:#16213e; border:1px solid #1e3a5f; border-radius:4px; display:block"></canvas>
-    <p style="color:#64748b; font:11px Courier New; margin-top:6px">Open path (no closePath)</p>
+    <p style="color:var(--color-text-secondary, #475569); font:11px Courier New; margin-top:6px">Open path (no closePath)</p>
   </div>
 </div>`,
       css: `* { box-sizing: border-box; margin: 0; padding: 0; }`,
@@ -281,15 +281,15 @@ The donut shape below is a single \`beginPath\` with two arc subpaths. With \`no
       html: `<div style="display:flex; gap:32px; padding:24px; background:#1a1a2e; min-height:100vh; justify-content:center; align-items:center; flex-wrap:wrap">
   <div style="text-align:center">
     <canvas id="d1" width="200" height="200" style="background:#16213e; border:1px solid #1e3a5f; border-radius:4px; display:block"></canvas>
-    <p style="color:#64748b; font:11px Courier New; margin-top:6px">fill() — nonzero (default)</p>
+    <p style="color:var(--color-text-secondary, #475569); font:11px Courier New; margin-top:6px">fill() — nonzero (default)</p>
   </div>
   <div style="text-align:center">
     <canvas id="d2" width="200" height="200" style="background:#16213e; border:1px solid #1e3a5f; border-radius:4px; display:block"></canvas>
-    <p style="color:#64748b; font:11px Courier New; margin-top:6px">fill('evenodd') — hole appears</p>
+    <p style="color:var(--color-text-secondary, #475569); font:11px Courier New; margin-top:6px">fill('evenodd') — hole appears</p>
   </div>
   <div style="text-align:center">
     <canvas id="d3" width="200" height="200" style="background:#16213e; border:1px solid #1e3a5f; border-radius:4px; display:block"></canvas>
-    <p style="color:#64748b; font:11px Courier New; margin-top:6px">evenodd with 3 rings</p>
+    <p style="color:var(--color-text-secondary, #475569); font:11px Courier New; margin-top:6px">evenodd with 3 rings</p>
   </div>
 </div>`,
       css: `* { box-sizing: border-box; margin: 0; padding: 0; }`,

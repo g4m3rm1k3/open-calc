@@ -323,7 +323,7 @@ export default function GitWorkspace({ params = {} }) {
       >
         {/* Repo header */}
         <div className="px-3 py-2 border-b border-gray-700">
-          <div className="text-[9px] font-bold text-gray-400 uppercase tracking-widest truncate">
+          <div className="text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest truncate">
             {label}
           </div>
           <div className="flex items-center gap-1 mt-0.5">
@@ -361,7 +361,7 @@ export default function GitWorkspace({ params = {} }) {
             {showBranching && !showNewBranch && !isDetached && (
               <button
                 onClick={() => setShowNewBranch(true)}
-                className="text-[11px] text-gray-500 hover:text-gray-200 px-0.5 flex-shrink-0 leading-none"
+                className="text-[11px] text-gray-500 dark:text-gray-400 hover:text-gray-200 px-0.5 flex-shrink-0 leading-none"
                 title="New branch"
               >
                 +
@@ -399,7 +399,7 @@ export default function GitWorkspace({ params = {} }) {
         </div>
 
         {/* Explorer label */}
-        <div className="px-3 pt-2 pb-0.5 text-[9px] font-bold text-gray-500 uppercase tracking-widest">
+        <div className="px-3 pt-2 pb-0.5 text-[9px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
           Explorer
         </div>
 
@@ -573,7 +573,7 @@ export default function GitWorkspace({ params = {} }) {
             </div>
           </>
         ) : (
-          <div className="flex-1 flex items-center justify-center text-gray-600 text-sm">
+          <div className="flex-1 flex items-center justify-center text-gray-600 dark:text-gray-300 text-sm">
             Select a file to edit
           </div>
         )}
@@ -586,10 +586,10 @@ export default function GitWorkspace({ params = {} }) {
       >
         {/* Panel title */}
         <div className="px-3 py-2 border-b border-gray-700 flex items-center justify-between">
-          <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">
+          <span className="text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
             Source Control
           </span>
-          <span className="text-[9px] text-gray-600">git</span>
+          <span className="text-[9px] text-gray-600 dark:text-gray-300">git</span>
         </div>
 
         {/* Commit area */}
@@ -671,7 +671,7 @@ export default function GitWorkspace({ params = {} }) {
             {/* Unsaved buffers */}
             {unsaved.size > 0 && (
               <>
-                <div className="text-[9px] text-gray-500 uppercase tracking-widest mb-1">
+                <div className="text-[9px] text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1">
                   Unsaved
                 </div>
                 {Array.from(unsaved.keys()).map((f) => (
@@ -705,7 +705,7 @@ export default function GitWorkspace({ params = {} }) {
               untracked.length > 0 ||
               recentlyDeletedUntracked.length > 0) && (
               <>
-                <div className="text-[9px] text-gray-500 uppercase tracking-widest mb-1 mt-1">
+                <div className="text-[9px] text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1 mt-1">
                   Changes
                 </div>
                 {[
@@ -796,7 +796,7 @@ export default function GitWorkspace({ params = {} }) {
             )}
             {staged.length > 0 && (
               <div className="mt-1">
-                <div className="text-[9px] text-gray-500 uppercase tracking-widest mb-1">
+                <div className="text-[9px] text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1">
                   Staged
                 </div>
                 {staged.map((f) => (
@@ -822,7 +822,7 @@ export default function GitWorkspace({ params = {} }) {
 
         {/* Git Graph */}
         <div className="flex-1 overflow-auto">
-          <div className="px-3 pt-2 pb-1 text-[9px] font-bold text-gray-500 uppercase tracking-widest">
+          <div className="px-3 pt-2 pb-1 text-[9px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
             Git Graph
           </div>
           {isDetached && (
@@ -850,7 +850,7 @@ export default function GitWorkspace({ params = {} }) {
             </div>
           )}
           {fullHistory.length === 0 ? (
-            <div className="px-3 pb-2 text-[10px] text-gray-600">
+            <div className="px-3 pb-2 text-[10px] text-gray-600 dark:text-gray-300">
               No commits yet.
             </div>
           ) : (

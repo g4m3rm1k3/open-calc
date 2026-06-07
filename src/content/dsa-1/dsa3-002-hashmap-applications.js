@@ -60,20 +60,20 @@ export default {
   <input id="target" type="number" value="9" style="width:56px;padding:5px;border-radius:5px;border:1px solid #334155;background:#1e293b;color:#e2e8f0;font-family:monospace;font-size:13px">
   <button id="btn-step" style="padding:6px 14px;border-radius:6px;border:none;background:#6d28d9;color:#fff;font-family:monospace;font-size:12px;cursor:pointer">Step →</button>
   <button id="btn-play" style="padding:6px 12px;border-radius:6px;border:none;background:#0d9488;color:#fff;font-family:monospace;font-size:12px;cursor:pointer">Play</button>
-  <button id="btn-rst" style="padding:6px 10px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:#64748b;font-family:monospace;font-size:12px;cursor:pointer">Reset</button>
+  <button id="btn-rst" style="padding:6px 10px;border-radius:6px;border:1px solid #334155;background:#1e293b;color:var(--color-text-secondary, #475569);font-family:monospace;font-size:12px;cursor:pointer">Reset</button>
 </div>
 <div style="display:flex;gap:12px">
   <div style="flex:1;border:1px solid #7f1d1d;border-radius:6px;padding:10px">
     <div style="color:#f87171;font-size:10px;font-family:monospace;margin-bottom:6px">BRUTE FORCE — O(n²)</div>
     <div id="bf-arr" style="display:flex;gap:3px;flex-wrap:wrap;margin-bottom:6px"></div>
-    <div id="bf-info" style="font-family:monospace;font-size:11px;color:#64748b;min-height:36px"></div>
+    <div id="bf-info" style="font-family:monospace;font-size:11px;color:var(--color-text-secondary, #475569);min-height:36px"></div>
     <div id="bf-count" style="font-family:monospace;font-size:11px;color:#f87171;margin-top:4px"></div>
   </div>
   <div style="flex:1;border:1px solid #166534;border-radius:6px;padding:10px">
     <div style="color:#4ade80;font-size:10px;font-family:monospace;margin-bottom:6px">HASH MAP — O(n)</div>
     <div id="hm-arr" style="display:flex;gap:3px;flex-wrap:wrap;margin-bottom:6px"></div>
-    <div id="hm-map" style="font-family:monospace;font-size:10px;color:#64748b;min-height:20px"></div>
-    <div id="hm-info" style="font-family:monospace;font-size:11px;color:#64748b;min-height:18px"></div>
+    <div id="hm-map" style="font-family:monospace;font-size:10px;color:var(--color-text-secondary, #475569);min-height:20px"></div>
+    <div id="hm-info" style="font-family:monospace;font-size:11px;color:var(--color-text-secondary, #475569);min-height:18px"></div>
     <div id="hm-count" style="font-family:monospace;font-size:11px;color:#4ade80;margin-top:4px"></div>
   </div>
 </div>`,
@@ -384,7 +384,7 @@ Empty function signatures. Write all four from memory:
                 html: `<div id="out" style="font-family:monospace;font-size:13px"></div>`,
                 css: `body{margin:0;padding:14px;background:#0f172a;color:#e2e8f0;box-sizing:border-box;font-family:monospace}
 .pass{color:#4ade80;margin:2px 0}.fail{color:#f87171;margin:2px 0}
-.section{color:#64748b;font-size:11px;margin-top:10px;border-top:1px solid #1e293b;padding-top:6px}
+.section{color:var(--color-text-secondary, #475569);font-size:11px;margin-top:10px;border-top:1px solid #1e293b;padding-top:6px}
 .banner{margin-top:12px;padding:10px 14px;border-radius:8px;font-size:13px}
 .banner.ok{background:#052e16;border:1px solid #166534;color:#4ade80}
 .banner.bad{background:#450a0a;border:1px solid #7f1d1d;color:#f87171}`,

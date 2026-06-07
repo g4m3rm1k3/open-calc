@@ -20,7 +20,7 @@ export default function SlotMachineCounter() {
             min={1}
             value={reels}
             onChange={(e) => setReels(Math.max(1, Number(e.target.value) || 1))}
-            className="mt-1 w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+            className="mt-1 w-full rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-900 dark:text-slate-100"
           />
         </label>
         <label className="block">
@@ -32,11 +32,11 @@ export default function SlotMachineCounter() {
             onChange={(e) =>
               setSymbols(Math.max(1, Number(e.target.value) || 1))
             }
-            className="mt-1 w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+            className="mt-1 w-full rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-900 dark:text-slate-100"
           />
         </label>
       </div>
-      <div className="rounded-xl bg-white p-4 border border-slate-200 dark:bg-slate-950 dark:border-slate-800 text-sm">
+      <div className="rounded-xl bg-white dark:bg-slate-900 p-4 border border-slate-200 dark:bg-slate-950 dark:border-slate-800 text-sm">
         <div className="font-semibold mb-2">Total slot machine outcomes</div>
         <div className="text-xl font-semibold">
           {symbols}^{reels} = {outcomes}

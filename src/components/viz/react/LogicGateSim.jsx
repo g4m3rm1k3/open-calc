@@ -47,7 +47,7 @@ export default function LogicGateSim() {
 
           {/* Lightbulb Output */}
           <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-center">
-             <div className={`w-8 h-8 rounded-full border-2 transition-all duration-300 ${andResult ? 'bg-yellow-400 border-yellow-200 shadow-[0_0_20px_#facc15]' : 'bg-slate-700 border-slate-500'}`}></div>
+             <div className={`w-8 h-8 rounded-full border-2 transition-all duration-300 ${andResult ? 'bg-yellow-400 border-yellow-200 dark:border-yellow-800/50 shadow-[0_0_20px_#facc15]' : 'bg-slate-700 border-slate-500'}`}></div>
              <span className="text-xs text-white font-mono mt-2 font-bold">{andResult ? 'TRUE' : 'FALSE'}</span>
           </div>
         </div>
@@ -93,7 +93,7 @@ export default function LogicGateSim() {
 
           {/* Lightbulb Output */}
           <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-center">
-             <div className={`w-8 h-8 rounded-full border-2 transition-all duration-300 ${orResult ? 'bg-yellow-400 border-yellow-200 shadow-[0_0_20px_#facc15]' : 'bg-slate-700 border-slate-500'}`}></div>
+             <div className={`w-8 h-8 rounded-full border-2 transition-all duration-300 ${orResult ? 'bg-yellow-400 border-yellow-200 dark:border-yellow-800/50 shadow-[0_0_20px_#facc15]' : 'bg-slate-700 border-slate-500'}`}></div>
              <span className="text-xs text-white font-mono mt-2 font-bold">{orResult ? 'TRUE' : 'FALSE'}</span>
           </div>
         </div>

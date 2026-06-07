@@ -61,7 +61,7 @@ export default function WaveformViz(){
           <span className="text-xs font-mono w-6 text-right">{A}</span>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-xs font-mono w-16 text-emerald-600">λ (m)</span>
+          <span className="text-xs font-mono w-16 text-emerald-600 dark:text-emerald-400">λ (m)</span>
           <input type="range" min="2" max="8" step="0.5" value={lambda} onChange={e=>setLambda(parseFloat(e.target.value))} className="flex-1 accent-emerald-500"/>
           <span className="text-xs font-mono w-6 text-right">{lambda}</span>
         </div>

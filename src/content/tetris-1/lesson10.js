@@ -94,7 +94,7 @@ The standard mapping:
 #board{display:grid;grid-template-columns:repeat(10,28px);grid-template-rows:repeat(20,28px);gap:2px;border:2px solid #1e293b;padding:4px;background:#0a0f1a;border-radius:4px;width:fit-content;}
 .cell{width:28px;height:28px;background:#0f1929;border:1px solid #1a2744;border-radius:2px;transition:background 0.06s ease;}
 .pv-cell{width:22px;height:22px;border-radius:3px;background:#0f1929;border:1px solid #1a2744;}
-@keyframes flash{0%{background:#0f1929;}35%{background:#ffffff;transform:scaleY(1.06);}100%{background:#0f1929;}}
+@keyframes flash{0%{background:#0f1929;}35%{background:var(--color-background-primary, #ffffff);transform:scaleY(1.06);}100%{background:#0f1929;}}
 .cell.clearing{animation:flash 0.3s ease forwards;}`,
             startCode: `const COLS=10,ROWS=20,BASE_SPEED=600;
 const SCORE_TABLE=[0,100,300,500,800];
@@ -556,7 +556,7 @@ The auto-test verifies \`classifySwipe\` returns the correct gesture for four di
 #board{display:grid;grid-template-columns:repeat(10,28px);grid-template-rows:repeat(20,28px);gap:2px;border:2px solid #1e293b;padding:4px;background:#0a0f1a;border-radius:4px;width:fit-content;touch-action:none;}
 .cell{width:28px;height:28px;background:#0f1929;border:1px solid #1a2744;border-radius:2px;transition:background 0.06s ease;}
 .pv-cell{width:22px;height:22px;border-radius:3px;background:#0f1929;border:1px solid #1a2744;}
-@keyframes flash{0%{background:#0f1929;}35%{background:#fff;transform:scaleY(1.06);}100%{background:#0f1929;}}
+@keyframes flash{0%{background:#0f1929;}35%{background:var(--color-background-primary, #ffffff);transform:scaleY(1.06);}100%{background:#0f1929;}}
 .cell.clearing{animation:flash 0.3s ease forwards;}
 /* D-pad — hidden by default, shown on narrow screens */
 #dpad{display:none;grid-template-columns:repeat(3,56px);gap:8px;margin-top:4px;}
@@ -915,7 +915,7 @@ Start the final game below. It's yours.`,
 #board{display:grid;grid-template-columns:repeat(10,28px);grid-template-rows:repeat(20,28px);gap:2px;border:2px solid #1e293b;padding:4px;background:#0a0f1a;border-radius:4px;width:fit-content;touch-action:none;}
 .cell{width:28px;height:28px;background:#0f1929;border:1px solid #1a2744;border-radius:2px;transition:background 0.06s ease;}
 .pv-cell{width:22px;height:22px;border-radius:3px;background:#0f1929;border:1px solid #1a2744;}
-@keyframes flash{0%{background:#0f1929;}35%{background:#fff;transform:scaleY(1.06);}100%{background:#0f1929;}}
+@keyframes flash{0%{background:#0f1929;}35%{background:var(--color-background-primary, #ffffff);transform:scaleY(1.06);}100%{background:#0f1929;}}
 .cell.clearing{animation:flash 0.3s ease forwards;}
 @keyframes tFlash{0%{filter:brightness(1);}20%{filter:brightness(3);}50%{filter:brightness(1);}75%{filter:brightness(2);}100%{filter:brightness(1);}}
 #board.tetris-flash{animation:tFlash 0.5s ease forwards;}

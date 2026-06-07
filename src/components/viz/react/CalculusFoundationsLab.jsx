@@ -94,7 +94,7 @@ function Module2({ C, x, setX }) {
      <div className="space-y-6">
        <div className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800">
          <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-           <span className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-500 flex items-center justify-center text-sm">2</span>
+           <span className="w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/300/20 text-blue-500 flex items-center justify-center text-sm">2</span>
            "With Respect To" Decoder
          </h3>
          <div className="p-4 bg-violet-500/10 border border-violet-500/20 rounded-xl mb-6">
@@ -183,9 +183,9 @@ const MODULE_LIST = [
                   />
                </div>
                <div className="text-slate-600 text-2xl font-bold">→</div>
-               <div className="w-16 h-16 rounded-2xl bg-blue-500/10 border-2 border-blue-500 flex items-center justify-center font-mono text-2xl text-blue-500">y</div>
+               <div className="w-16 h-16 rounded-2xl bg-blue-50 dark:bg-blue-900/300/10 border-2 border-blue-500 flex items-center justify-center font-mono text-2xl text-blue-500">y</div>
                <div className="text-slate-600 text-2xl font-bold">→</div>
-               <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border-2 border-emerald-500 flex items-center justify-center font-mono text-2xl text-emerald-500">Z</div>
+               <div className="w-16 h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-900/300/10 border-2 border-emerald-500 flex items-center justify-center font-mono text-2xl text-emerald-500">Z</div>
             </div>
          </div>
 
@@ -197,7 +197,7 @@ const MODULE_LIST = [
          </div>
       </div>
       
-      <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl shrink-0">
+      <div className="p-4 bg-emerald-50 dark:bg-emerald-900/300/10 border border-emerald-500/20 rounded-xl shrink-0">
         <div className="text-emerald-400 font-bold text-xs mb-1 font-mono">THE GOLDEN RULE</div>
         <p className="text-slate-300 text-sm font-serif">"Every time a change passes through a layer, you multiply by that layer's response rate."</p>
       </div>
@@ -209,7 +209,7 @@ const MODULE_LIST = [
          <h3 className="text-xl font-semibold mb-4">Implicit vs Explicit</h3>
          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-4">
             <div className="space-y-4">
-               <div className="px-3 py-1 bg-blue-500/10 border border-blue-500/20 rounded text-blue-400 text-xs font-bold inline-block">EXPLICIT</div>
+               <div className="px-3 py-1 bg-blue-50 dark:bg-blue-900/300/10 border border-blue-500/20 rounded text-blue-400 text-xs font-bold inline-block">EXPLICIT</div>
                <div className="text-2xl font-mono text-slate-100">y = x²</div>
                <p className="text-xs text-slate-500 leading-relaxed">The dependency is direct. We know <span className="italic">exactly</span> how x controls y. We can just "look" at the RHS and differentiate.</p>
             </div>
@@ -283,12 +283,12 @@ const MODULE_LIST = [
          
          <div className="flex justify-center gap-12 items-center py-6">
             <div className="flex flex-col items-center gap-2">
-               <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center font-bold text-blue-400">f</div>
+               <div className="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-900/300/20 flex items-center justify-center font-bold text-blue-400">f</div>
                <div className="text-[10px] text-slate-500">FORWARD</div>
             </div>
             <div className="text-slate-600 text-2xl tracking-tighter">⇄</div>
             <div className="flex flex-col items-center gap-2">
-               <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center font-bold text-emerald-400">f⁻¹</div>
+               <div className="w-12 h-12 rounded-full bg-emerald-50 dark:bg-emerald-900/300/20 flex items-center justify-center font-bold text-emerald-400">f⁻¹</div>
                <div className="text-[10px] text-slate-500">BACKWARD</div>
             </div>
          </div>
@@ -321,7 +321,7 @@ const MODULE_LIST = [
   )},
   { id: 9, title: 'Failure Modes', comp: () => (
     <div className="space-y-4">
-       <div className="bg-red-500/5 border border-red-500/20 p-6 rounded-2xl">
+       <div className="bg-red-50 dark:bg-red-900/300/5 border border-red-500/20 p-6 rounded-2xl">
           <h3 className="text-red-400 font-bold mb-4 flex items-center gap-2">
             <span className="text-lg">⚠️</span> Common Confusion Modes
           </h3>
@@ -386,7 +386,7 @@ export default function CalculusFoundationsLab({ params = {} }) {
                  className={`text-left px-3 py-2 rounded-lg text-sm transition-all duration-200 flex items-center justify-between group ${activeModule === i ? 'bg-brand-600 text-white shadow-lg shadow-brand-900/20' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'}`}
                >
                  <span>{m.title}</span>
-                 {activeModule === i && <motion.span layoutId="active-dot" className="w-1.5 h-1.5 rounded-full bg-white" />}
+                 {activeModule === i && <motion.span layoutId="active-dot" className="w-1.5 h-1.5 rounded-full bg-white dark:bg-slate-900" />}
                </button>
              ))}
            </nav>

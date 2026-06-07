@@ -137,10 +137,10 @@ Press **Simulate Lag** to introduce artificial hitches. Notice: the frame-depend
       html: `<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.js"></script>
 <div style="background:#0a0a0f;padding:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
   <button id="btn-lag" style="padding:5px 14px;border-radius:6px;border:none;background:#7c3aed;color:#fff;font-family:monospace;font-size:11px;cursor:pointer">Simulate Lag Spike</button>
-  <span id="fps-el" style="font-family:monospace;font-size:11px;color:#64748b">-- FPS</span>
+  <span id="fps-el" style="font-family:monospace;font-size:11px;color:var(--color-text-secondary, #475569)">-- FPS</span>
 </div>
 <canvas id="cv" style="display:block;border-radius:0 0 6px 6px"></canvas>
-<div id="info" style="font-family:monospace;font-size:10px;color:#475569;padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px;white-space:pre"></div>`,
+<div id="info" style="font-family:monospace;font-size:10px;color:var(--color-text-secondary, #475569);padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px;white-space:pre"></div>`,
       css: `body{margin:0;background:#060610}`,
       startCode: `var renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -285,7 +285,7 @@ Use the Spring class below. Your job:
 Also display the spring's position and velocity in the info panel.`,
       html: `<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.js"></script>
 <canvas id="cv" style="display:block;border-radius:6px"></canvas>
-<div id="info" style="font-family:monospace;font-size:10px;color:#475569;padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px;white-space:pre"></div>`,
+<div id="info" style="font-family:monospace;font-size:10px;color:var(--color-text-secondary, #475569);padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px;white-space:pre"></div>`,
       css: `body{margin:0;background:#060610}`,
       startCode: `var renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -379,7 +379,7 @@ Requirements:
   <button id="btn-go" style="padding:5px 16px;border-radius:6px;border:none;background:#1d4ed8;color:#fff;font-family:monospace;font-size:11px;cursor:pointer">▶ Go</button>
 </div>
 <canvas id="cv" style="display:block;border-radius:0 0 6px 6px"></canvas>
-<div id="info" style="font-family:monospace;font-size:10px;color:#475569;padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px;white-space:pre"></div>`,
+<div id="info" style="font-family:monospace;font-size:10px;color:var(--color-text-secondary, #475569);padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px;white-space:pre"></div>`,
       css: `body{margin:0;background:#060610}`,
       startCode: `var renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));

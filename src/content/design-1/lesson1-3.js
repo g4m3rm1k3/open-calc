@@ -76,11 +76,11 @@ The audit measures three things: size ratios between levels, line-height per lev
   letter-spacing: 0.12em; text-transform: uppercase; }
 .headline  { font-size: 19px; font-weight: 700; color: #f1f5f9;
   line-height: 1.2; margin: 6px 0 4px; }
-.byline    { font-size: 12px; color: #64748b; margin: 0 0 10px; line-height: 1.4; }
+.byline    { font-size: 12px; color: var(--color-text-secondary, #475569); margin: 0 0 10px; line-height: 1.4; }
 .body      { font-size: 15px; color: #94a3b8; line-height: 1.5;  /* ← too tight for body */
   margin: 0 0 16px; }
 .article-footer { display: flex; align-items: center; gap: 8px; }
-.tag       { font-size: 11px; font-weight: 500; color: #64748b;
+.tag       { font-size: 11px; font-weight: 500; color: var(--color-text-secondary, #475569);
   background: #0f172a; border: 1px solid #334155;
   padding: 3px 8px; border-radius: 100px; }
 .read-more { font-size: 14px; font-weight: 600; color: #60a5fa;
@@ -338,7 +338,7 @@ Notice captions get *less* line-height than body — they're short, multi-word l
 .display-text { font-size: 48px; font-weight: 700; color: #f1f5f9; }
 .h1-text      { font-size: 32px; font-weight: 700; color: #f1f5f9; }
 .body-text    { font-size: 16px; color: #94a3b8; max-width: 54ch; }
-.caption-text { font-size: 12px; color: #64748b; }`,
+.caption-text { font-size: 12px; color: var(--color-text-secondary, #475569); }`,
       startCode: `// Apply the line-height function to each text level
 // line-height-ratio = base_lh - (size - base_size) * k
 
@@ -422,7 +422,7 @@ The cell below demonstrates what happens at different line lengths. Drag the sli
   font-family: system-ui, sans-serif; }
 #measure-demo { max-width: 720px; }
 #measure-controls { margin-bottom: 20px; display: flex; align-items: center; gap: 16px; }
-#measure-controls label { font-size: 12px; color: #64748b; display: flex;
+#measure-controls label { font-size: 12px; color: var(--color-text-secondary, #475569); display: flex;
   align-items: center; gap: 8px; }
 #measure-controls label span { color: #f1f5f9; font-weight: 600;
   font-family: monospace; min-width: 44px; }
@@ -516,11 +516,11 @@ There's no single right answer — but the test checks that your scale is mathem
 .pc-title    { color: #f1f5f9; font-weight: 700; margin: 0 0 8px;
   max-width: 20ch; }
 .pc-subtitle { color: #94a3b8; font-weight: 500; margin: 0 0 16px; }
-.pc-body     { color: #64748b; margin: 0 0 20px; max-width: 58ch; }
+.pc-body     { color: var(--color-text-secondary, #475569); margin: 0 0 20px; max-width: 58ch; }
 .pc-footer   { display: flex; align-items: center; gap: 12px;
   padding-top: 16px; border-top: 1px solid #334155; }
 .pc-author   { color: #e2e8f0; font-weight: 500; }
-.pc-meta     { color: #475569; }`,
+.pc-meta     { color: var(--color-text-secondary, #475569); }`,
       startCode: `// ── STEP 1: Define your scale ────────────────────────────────────────────────
 const BASE  = 14;    // body text base — try 14px or 16px
 const RATIO = 1.333; // try: 1.2, 1.25, 1.333, 1.5
@@ -773,7 +773,7 @@ There's no starter scaffolding to fill in — you write the JavaScript correctio
 .article-layout { /* No max-width — PROBLEM 1 */ }
 
 /* BROKEN — all three readability problems present */
-.al-meta    { font-size: 12px; color: #475569; margin-bottom: 12px;
+.al-meta    { font-size: 12px; color: var(--color-text-secondary, #475569); margin-bottom: 12px;
   text-transform: uppercase; letter-spacing: 0.08em; }
 .al-title   { font-size: 36px; font-weight: 700; color: #f1f5f9;
   line-height: 1.7;  /* PROBLEM 3: way too loose for heading */
@@ -784,7 +784,7 @@ There's no starter scaffolding to fill in — you write the JavaScript correctio
 .al-body    { font-size: 16px; color: #94a3b8;
   line-height: 1.3;  /* PROBLEM 2: too tight for body */
   margin: 0 0 12px; }
-.al-caption { font-size: 12px; color: #475569;
+.al-caption { font-size: 12px; color: var(--color-text-secondary, #475569);
   line-height: 1.9;  /* PROBLEM 3: too loose for caption */
   margin-top: 20px; }`,
       startCode: `// Fix the three readability problems:
@@ -917,7 +917,7 @@ This cell implements the full WCAG contrast calculation and audits the article c
 .cp-ratio.pass { color: #4ade80; }
 .cp-ratio.warn { color: #fbbf24; }
 .cp-ratio.fail { color: #f87171; }
-#contrast-log { font-family: monospace; font-size: 11px; color: #475569;
+#contrast-log { font-family: monospace; font-size: 11px; color: var(--color-text-secondary, #475569);
   line-height: 1.7; }`,
       startCode: `// Full WCAG contrast implementation
 
@@ -1043,8 +1043,8 @@ Use the anti-pattern names when you comment your fixes. The test checks the meas
 }
 .ba-byline { display: flex; gap: 12px; margin: 12px 0 16px; }
 .ba-author { font-size: 14px; font-weight: 700; color: #e2e8f0; }   /* weight 700 */
-.ba-date   { font-size: 14px; font-weight: 400; color: #64748b; }   /* weight 400 */
-.ba-read   { font-size: 14px; font-weight: 500; color: #64748b; }   /* weight 500 — VIOLATION 5 (TY-5) */
+.ba-date   { font-size: 14px; font-weight: 400; color: var(--color-text-secondary, #475569); }   /* weight 400 */
+.ba-read   { font-size: 14px; font-weight: 500; color: var(--color-text-secondary, #475569); }   /* weight 500 — VIOLATION 5 (TY-5) */
 .ba-lead   { font-size: 17px; font-weight: 600; color: #cbd5e1;     /* weight 600 — 4 weights total */
   line-height: 1.5; margin: 0 0 20px; }
 .ba-h2     { font-size: 18px; font-weight: 600; color: #f1f5f9;
@@ -1055,7 +1055,7 @@ Use the anti-pattern names when you comment your fixes. The test checks the meas
   margin: 0 0 14px; }
 .ba-callout { font-size: 20px; font-weight: 500; color: #60a5fa;
   border-left: 3px solid #2563eb; padding-left: 20px; margin: 24px 0; line-height: 1.5; }
-.ba-caption { font-size: 12px; color: #475569; line-height: 1.5;   /* should be 1.35–1.4 */
+.ba-caption { font-size: 12px; color: var(--color-text-secondary, #475569); line-height: 1.5;   /* should be 1.35–1.4 */
   margin-top: 24px; }`,
       startCode: `// FIX EACH VIOLATION — use anti-pattern names in comments
 
@@ -1189,7 +1189,7 @@ Notice which properties fail under stress and which hold. A system that only wor
 #stress-controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
 .s-btn { font-size: 11px; font-weight: 500; padding: 5px 12px;
   border-radius: 6px; border: 1px solid #334155; background: #1e293b;
-  color: #64748b; cursor: pointer; }
+  color: var(--color-text-secondary, #475569); cursor: pointer; }
 .s-btn.active { background: #2563eb; color: white; border-color: #2563eb; }
 .stress-card { background: #1e293b; border: 1px solid #334155; border-radius: 12px;
   padding: 28px; max-width: 580px; }
@@ -1199,7 +1199,7 @@ Notice which properties fail under stress and which hold. A system that only wor
   margin: 0 0 12px; max-width: 22ch; }
 .st-body  { font-size: 15px; color: #94a3b8; line-height: 1.65;
   margin: 0 0 20px; max-width: 60ch; }
-.st-footer{ font-size: 12px; color: #475569; }`,
+.st-footer{ font-size: 12px; color: var(--color-text-secondary, #475569); }`,
       startCode: `const scenarios = {
   normal: {
     eyebrow: 'ENGINEERING',
@@ -1303,17 +1303,17 @@ The test checks that all text elements pass WCAG AA against the dark background.
 .dm-card {
   background: white;          /* ← CHANGE to dark surface */
   padding: 32px; border-radius: 14px; width: 300px;
-  border: 1px solid #e2e8f0;  /* ← CHANGE to dark border */
+  border: 1px solid var(--color-border-primary, #e2e8f0);  /* ← CHANGE to dark border */
 }
 .dm-meta     { font-size: 10px; font-weight: 600; letter-spacing: 0.12em;
-  text-transform: uppercase; color: #64748b; margin-bottom: 8px; }
+  text-transform: uppercase; color: var(--color-text-secondary, #475569); margin-bottom: 8px; }
 .dm-amount   { font-size: 40px; font-weight: 700; color: #0f172a; /* ← L1 */
   line-height: 1.0; margin-bottom: 8px; }
-.dm-plan     { font-size: 16px; font-weight: 500; color: #1e293b; /* ← L2 */
+.dm-plan     { font-size: 16px; font-weight: 500; color: var(--color-text-primary, #1e293b); /* ← L2 */
   margin-bottom: 4px; }
-.dm-detail   { font-size: 13px; color: #64748b;                   /* ← L3 */
+.dm-detail   { font-size: 13px; color: var(--color-text-secondary, #475569);                   /* ← L3 */
   margin-bottom: 0; }
-.dm-divider  { border: none; border-top: 1px solid #e2e8f0; /* ← CHANGE */
+.dm-divider  { border: none; border-top: 1px solid var(--color-border-primary, #e2e8f0); /* ← CHANGE */
   margin: 20px 0; }
 .dm-cta      { display: block; width: 100%; padding: 12px;
   background: #2563eb; color: white; border: none; border-radius: 9px;
@@ -1324,7 +1324,7 @@ The test checks that all text elements pass WCAG AA against the dark background.
 // - Background: #1e293b
 // - Border: #334155
 // - L1 text (#dm-amount): #f1f5f9
-// - L2 text (#dm-plan):   #cbd5e1
+// - L2 text (#dm-plan):   var(--color-border-secondary, #cbd5e1)
 // - L3 text (#dm-detail + #dm-meta): #64748b
 // - L4 text (#dm-footnote): #334155 (barely visible — receded)
 // - Divider: #334155
@@ -1514,7 +1514,7 @@ The \`auditType()\` function is your tool for every text component going forward
 }
 /* ── LEVEL 4: Caption ── */
 .ra-caption {
-  font-size: var(--fs-1); font-weight: 400; color: #475569;
+  font-size: var(--fs-1); font-weight: 400; color: var(--color-text-secondary, #475569);
   line-height: var(--lh-caption);
   margin: 0;
 }`,

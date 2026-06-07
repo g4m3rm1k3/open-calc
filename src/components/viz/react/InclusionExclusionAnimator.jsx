@@ -23,7 +23,7 @@ export default function InclusionExclusionAnimator() {
             min={0}
             value={a}
             onChange={(e) => setA(Math.max(0, Number(e.target.value) || 0))}
-            className="mt-1 w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+            className="mt-1 w-full rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-900 dark:text-slate-100"
           />
         </label>
         <label className="block">
@@ -33,7 +33,7 @@ export default function InclusionExclusionAnimator() {
             min={0}
             value={b}
             onChange={(e) => setB(Math.max(0, Number(e.target.value) || 0))}
-            className="mt-1 w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+            className="mt-1 w-full rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-900 dark:text-slate-100"
           />
         </label>
         <label className="block">
@@ -43,11 +43,11 @@ export default function InclusionExclusionAnimator() {
             min={0}
             value={ab}
             onChange={(e) => setAB(Math.max(0, Number(e.target.value) || 0))}
-            className="mt-1 w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+            className="mt-1 w-full rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-900 dark:text-slate-100"
           />
         </label>
       </div>
-      <div className="rounded-xl bg-white p-4 border border-slate-200 dark:bg-slate-950 dark:border-slate-800 text-sm">
+      <div className="rounded-xl bg-white dark:bg-slate-900 p-4 border border-slate-200 dark:bg-slate-950 dark:border-slate-800 text-sm">
         <div className="font-semibold mb-2">Union size</div>
         <div className="text-xl font-semibold">
           {a} + {b} - {ab} = {total}

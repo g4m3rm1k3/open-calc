@@ -134,7 +134,7 @@ function spring(u, v, t) {
 Press **keys 1–6** to switch between surfaces. **Click** any point on the surface to inspect its coordinates and normal. The cone traces an animated path on the surface. Use the buttons to toggle wireframe.`,
       html: `<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.js"></script>
 <div style="background:#060610;padding:8px 10px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">
-  <span style="font-family:monospace;font-size:10px;color:#475569">Press 1–6 to switch surface:</span>
+  <span style="font-family:monospace;font-size:10px;color:var(--color-text-secondary, #475569)">Press 1–6 to switch surface:</span>
   <button class="surf-btn" data-key="saddle"  style="padding:4px 10px;border-radius:5px;border:1px solid #334;background:#0d1117;color:#64d8cb;font-family:monospace;font-size:10px;cursor:pointer">1 Saddle</button>
   <button class="surf-btn" data-key="sinc"    style="padding:4px 10px;border-radius:5px;border:1px solid #334;background:#0d1117;color:#64d8cb;font-family:monospace;font-size:10px;cursor:pointer">2 Sinc</button>
   <button class="surf-btn" data-key="torus"   style="padding:4px 10px;border-radius:5px;border:1px solid #334;background:#0d1117;color:#64d8cb;font-family:monospace;font-size:10px;cursor:pointer">3 Torus</button>
@@ -144,7 +144,7 @@ Press **keys 1–6** to switch between surfaces. **Click** any point on the surf
   <button id="btn-wire" style="padding:4px 10px;border-radius:5px;border:1px solid #475569;background:transparent;color:#94a3b8;font-family:monospace;font-size:10px;cursor:pointer;margin-left:4px">Wireframe</button>
 </div>
 <canvas id="cv" style="display:block"></canvas>
-<div id="hud" style="font-family:monospace;font-size:10px;color:#475569;padding:6px 10px;background:#060610;border-top:1px solid #0d1117;white-space:pre;min-height:52px"></div>`,
+<div id="hud" style="font-family:monospace;font-size:10px;color:var(--color-text-secondary, #475569);padding:6px 10px;background:#060610;border-top:1px solid #0d1117;white-space:pre;min-height:52px"></div>`,
       css: `body{margin:0;background:#060610;overflow:hidden}`,
       startCode: `// ════════════════════════════════════════════════════════════════════════════
 // CONFIG
@@ -397,13 +397,13 @@ function costa(u, v, target) {
 The starter code is the full Surface Explorer from the lesson — add your feature on top.`,
       html: `<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.js"></script>
 <div style="background:#060610;padding:8px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">
-  <span style="font-family:monospace;font-size:10px;color:#475569">Add your feature below the ── YOUR CODE ── comment</span>
+  <span style="font-family:monospace;font-size:10px;color:var(--color-text-secondary, #475569)">Add your feature below the ── YOUR CODE ── comment</span>
   <button class="surf-btn" data-key="saddle" style="padding:4px 10px;border-radius:5px;border:1px solid #334;background:#0d1117;color:#64d8cb;font-family:monospace;font-size:10px;cursor:pointer">Saddle</button>
   <button class="surf-btn" data-key="sinc"   style="padding:4px 10px;border-radius:5px;border:1px solid #334;background:#0d1117;color:#64d8cb;font-family:monospace;font-size:10px;cursor:pointer">Sinc</button>
   <button class="surf-btn" data-key="torus"  style="padding:4px 10px;border-radius:5px;border:1px solid #334;background:#0d1117;color:#64d8cb;font-family:monospace;font-size:10px;cursor:pointer">Torus</button>
 </div>
 <canvas id="cv" style="display:block"></canvas>
-<div id="hud" style="font-family:monospace;font-size:10px;color:#475569;padding:5px 10px;background:#060610;min-height:40px;white-space:pre"></div>`,
+<div id="hud" style="font-family:monospace;font-size:10px;color:var(--color-text-secondary, #475569);padding:5px 10px;background:#060610;min-height:40px;white-space:pre"></div>`,
       css: `body{margin:0;background:#060610}`,
       startCode: `// Full Surface Explorer (starter — extend below)
 var renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });

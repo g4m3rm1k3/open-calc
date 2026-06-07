@@ -306,12 +306,12 @@ The cell below shows all four patterns applied to the same set of values. Notice
       css: `body { background:#0f172a; padding:20px; margin:0; font-family:system-ui,sans-serif; }
 #naming-demo { max-width:600px; display:flex; flex-direction:column; gap:16px; }
 .nd-section { background:#1e293b; border:1px solid #334155; border-radius:8px; padding:14px 16px; }
-.nd-label   { font-size:10px; font-weight:700; color:#475569;
+.nd-label   { font-size:10px; font-weight:700; color:var(--color-text-secondary, #475569);
   letter-spacing:.12em; text-transform:uppercase; margin-bottom:10px; }
 .nd-tokens  { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; }
 .nd-token   { font-size:11px; font-family:monospace; padding:3px 8px;
   background:#0f172a; border:1px solid #334155; border-radius:4px; }
-.nd-token .val { color:#64748b; font-weight:400; }
+.nd-token .val { color:var(--color-text-secondary, #475569); font-weight:400; }
 .nd-verdict { font-size:11px; font-weight:500; }
 .nd-verdict.pass { color:#4ade80; }
 .nd-verdict.fail { color:#f87171; }`,
@@ -502,9 +502,9 @@ The test switches the brand from blue to teal by changing ONE Layer 1 value and 
 #p1-demo { max-width:520px; display:flex; flex-direction:column; gap:14px; }
 .p1-section { background:#1e293b; border:1px solid #334155; border-radius:8px;
   padding:12px 14px; }
-.p1-section-label { font-size:9px; font-weight:700; color:#475569;
+.p1-section-label { font-size:9px; font-weight:700; color:var(--color-text-secondary, #475569);
   letter-spacing:.14em; text-transform:uppercase; margin-bottom:8px; }
-#p1-token-list { font-family:monospace; font-size:11px; color:#64748b;
+#p1-token-list { font-family:monospace; font-size:11px; color:var(--color-text-secondary, #475569);
   line-height:1.9; }
 /* The UI uses ONLY semantic tokens — no hardcoded values */
 .p1-nav  { display:flex; align-items:center; padding:0 16px; height:44px;
@@ -524,7 +524,7 @@ The test switches the brand from blue to teal by changing ONE Layer 1 value and 
   padding:2px 8px; border-radius:100px; display:inline-block; }
 .p1-rebrand-test { display:flex; gap:6px; }
 .p1-rb-btn { font-size:11px; font-weight:500; padding:5px 12px; border-radius:6px;
-  border:1px solid #334155; background:#1e293b; color:#64748b; cursor:pointer; }
+  border:1px solid #334155; background:#1e293b; color:var(--color-text-secondary, #475569); cursor:pointer; }
 .p1-rb-btn.active { background:var(--s-interactive); color:white;
   border-color:var(--s-interactive); }`,
       startCode: `const root = document.documentElement;
@@ -774,7 +774,7 @@ The cell below shows the composition test: the same components rendered in three
       css: `body { background:#0f172a; padding:20px; margin:0; font-family:system-ui,sans-serif; }
 #comp-test { display:flex; gap:16px; flex-wrap:wrap; }
 .ct-context { display:flex; flex-direction:column; gap:8px; flex:1; min-width:200px; }
-.ctx-label  { font-size:10px; font-weight:700; color:#475569;
+.ctx-label  { font-size:10px; font-weight:700; color:var(--color-text-secondary, #475569);
   letter-spacing:.12em; text-transform:uppercase; }
 .ct-slot    { background:#1e293b; border:1px solid #334155; border-radius:8px;
   padding:12px; }
@@ -784,7 +784,7 @@ The cell below shows the composition test: the same components rendered in three
 .stat-card  { background:#111827; border:1px solid #334155; border-radius:8px;
   padding:12px; display:flex; flex-direction:column; gap:4px;
   /* NO fixed width — fills its container */ }
-.stat-label { font-size:10px; font-weight:600; color:#64748b;
+.stat-label { font-size:10px; font-weight:600; color:var(--color-text-secondary, #475569);
   text-transform:uppercase; letter-spacing:.1em; }
 .stat-value { font-size:22px; font-weight:700; color:#f1f5f9; }
 .stat-delta { font-size:11px; color:#4ade80; font-weight:500; }
@@ -997,7 +997,7 @@ The test verifies: the variant list is complete (≥4 variants), the token map i
 .badge--neutral { background:var(--badge-neutral-bg); border-color:var(--badge-neutral-border); color:var(--badge-neutral-text); }
 .doc-output { background:#111827; border:1px solid #334155; border-radius:8px;
   padding:14px 16px; }
-.doc-label  { font-size:9px; font-weight:700; color:#475569;
+.doc-label  { font-size:9px; font-weight:700; color:var(--color-text-secondary, #475569);
   letter-spacing:.14em; text-transform:uppercase; margin-bottom:8px; }
 pre         { font-family:monospace; font-size:11px; color:#94a3b8;
   margin:0; line-height:1.7; white-space:pre-wrap; }`,
@@ -1185,7 +1185,7 @@ The test checks: no synonym tokens, no hardcoded hex on interactive elements, no
 }
 
 #ss8-demo { max-width:500px; }
-.ss8-status { font-size:12px; color:#64748b; margin-bottom:12px;
+.ss8-status { font-size:12px; color:var(--color-text-secondary, #475569); margin-bottom:12px;
   padding:8px 12px; background:#1e293b; border:1px solid #334155; border-radius:6px; }
 .ss8-ui { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 
@@ -1395,9 +1395,9 @@ The governance-correct UI updates everything simultaneously. The deliberately br
 </div>`,
       css: `body { background:#0f172a; padding:20px; margin:0; font-family:system-ui,sans-serif; }
 #bc-controls { display:flex; align-items:center; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
-.bc-label    { font-size:11px; color:#475569; }
+.bc-label    { font-size:11px; color:var(--color-text-secondary, #475569); }
 .bc-btn      { font-size:11px; font-weight:500; padding:5px 12px; border-radius:6px;
-  border:1px solid #334155; background:#1e293b; color:#64748b; cursor:pointer; }
+  border:1px solid #334155; background:#1e293b; color:var(--color-text-secondary, #475569); cursor:pointer; }
 .bc-btn.active { background:var(--bc-interactive,#2563eb); color:white;
   border-color:var(--bc-interactive,#2563eb); }
 .bc-row { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:10px; }
@@ -1422,7 +1422,7 @@ The governance-correct UI updates everything simultaneously. The deliberately br
 /* DRIFTED: inline styles used for brand colours — see HTML */
 .bcd-badge { font-size:9px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
   padding:2px 8px; border-radius:100px; display:inline-block; }
-#bc-report { font-family:monospace; font-size:11px; color:#64748b; line-height:1.7; }`,
+#bc-report { font-family:monospace; font-size:11px; color:var(--color-text-secondary, #475569); line-height:1.7; }`,
       startCode: `const root = document.documentElement;
 
 function setBrand(hue) {
@@ -1501,7 +1501,7 @@ The test verifies: health score improves from the baseline, at least 3 component
 .ca-btn { padding:8px 16px; background:hsl(217,76%,47%); color:white; border:none;
   border-radius:7px; font-size:13px; font-weight:600; cursor:pointer; margin-right:8px;
   margin-bottom:12px; }
-#ca-output { font-family:monospace; font-size:11px; color:#64748b; line-height:1.9;
+#ca-output { font-family:monospace; font-size:11px; color:var(--color-text-secondary, #475569); line-height:1.9;
   background:#111827; border:1px solid #1e293b; border-radius:6px;
   padding:12px 14px; margin-bottom:12px; max-height:280px; overflow-y:auto; }
 #ca-health { font-size:13px; color:#94a3b8; }
@@ -1778,7 +1778,7 @@ Combined with \`auditComponent()\` from Lesson 6 and \`auditInteraction()\` from
   --sys-brand-hue: 217;
 }
 #ref-system { max-width:520px; display:flex; flex-direction:column; gap:12px; }
-.rs-tokens  { font-family:monospace; font-size:11px; color:#475569; background:#111827;
+.rs-tokens  { font-family:monospace; font-size:11px; color:var(--color-text-secondary, #475569); background:#111827;
   border:1px solid #1e293b; border-radius:6px; padding:10px 12px; line-height:1.8; }
 .rs-ui { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 .rs-card { background:var(--sys-surface); border:1px solid var(--sys-border);

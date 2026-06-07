@@ -177,7 +177,7 @@ export default function SignConventionExplorer() {
                 onClick={() => setPositiveUp(true)}
                 className={`px-3 py-1.5 text-xs font-bold rounded-full border transition-all ${
                   positiveUp
-                    ? 'bg-green-500 text-white border-green-600'
+                    ? 'bg-green-50 dark:bg-green-900/300 text-white border-green-600'
                     : 'bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-500'
                 }`}
               >
@@ -187,7 +187,7 @@ export default function SignConventionExplorer() {
                 onClick={() => setPositiveUp(false)}
                 className={`px-3 py-1.5 text-xs font-bold rounded-full border transition-all ${
                   !positiveUp
-                    ? 'bg-red-500 text-white border-red-600'
+                    ? 'bg-red-50 dark:bg-red-900/300 text-white border-red-600'
                     : 'bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-500'
                 }`}
               >

@@ -169,7 +169,7 @@ To iterate every cell in a 2D array you need **nested loops** — an outer loop 
       html: `<div id="matrixVis"></div><div id="matrixLog"></div>`,
       css: `body{background:#0a1220;padding:14px;}
 #matrixVis{display:grid;grid-template-columns:repeat(4,36px);gap:3px;margin-bottom:12px;width:fit-content;}
-.m-cell{width:36px;height:36px;border:1px solid #334155;border-radius:4px;background:#111827;display:flex;align-items:center;justify-content:center;font-family:monospace;font-size:13px;color:#475569;}
+.m-cell{width:36px;height:36px;border:1px solid #334155;border-radius:4px;background:#111827;display:flex;align-items:center;justify-content:center;font-family:monospace;font-size:13px;color:var(--color-text-secondary, #475569);}
 .m-cell.on{background:#0891b2;border-color:#22d3ee;color:#e0f2fe;}
 #matrixLog{border:1px solid #334155;border-radius:8px;background:#111827;color:#94a3b8;font-family:monospace;padding:10px;font-size:12px;line-height:1.8;}`,
       startCode: `// The I-piece shape as a 2D array

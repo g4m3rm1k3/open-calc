@@ -80,7 +80,7 @@ Scale(sx,sy,sz):        Rotate-Y(θ):              Translate(tx,ty,tz):
 Drag the sliders to translate, rotate, and scale a rectangle. The 4×4 Model matrix updates live. Watch how the composition order (S→R→T) affects the result.`,
       html: `<div style="background:#0a0f1e;padding:14px;display:flex;flex-direction:column;gap:10px;align-items:center">
   <canvas id="cv" width="680" height="380" style="border-radius:8px;display:block;width:100%"></canvas>
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;width:100%;max-width:640px;font-family:monospace;font-size:11px;color:#64748b;">
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;width:100%;max-width:640px;font-family:monospace;font-size:11px;color:var(--color-text-secondary, #475569);">
     <div style="display:flex;flex-direction:column;gap:4px;">
       <label>Translate X: <span id="txV">0.0</span></label>
       <input id="tx" type="range" min="-1.5" max="1.5" step="0.05" value="0">
@@ -237,7 +237,7 @@ The dot products at the right encode the translation: "how far along this axis i
 Drag the camera and target positions. The lookAt View matrix updates in real time. The right panel shows the resulting scene perspective.`,
       html: `<div style="background:#0a0f1e;padding:14px;display:flex;flex-direction:column;gap:10px;align-items:center">
   <canvas id="cv" width="680" height="400" style="border-radius:8px;display:block;width:100%"></canvas>
-  <div style="color:#475569;font-family:monospace;font-size:10px;">Drag the blue dot (camera) or green dot (target) in the top-down view</div>
+  <div style="color:var(--color-text-secondary, #475569);font-family:monospace;font-size:10px;">Drag the blue dot (camera) or green dot (target) in the top-down view</div>
 </div>`,
       css: `body{margin:0;background:#0a0f1e}`,
       startCode: `var canvas = document.getElementById('cv');
@@ -468,7 +468,7 @@ The \`−1\` in position \`[3][2]\` is what produces perspective. After matrix m
 Adjust the sliders and watch the projection matrix values change. Toggle perspective vs orthographic to see the difference.`,
       html: `<div style="background:#0a0f1e;padding:14px;display:flex;flex-direction:column;gap:10px;align-items:center">
   <canvas id="cv" width="680" height="380" style="border-radius:8px;display:block;width:100%"></canvas>
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;width:100%;max-width:640px;font-family:monospace;font-size:11px;color:#64748b;">
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;width:100%;max-width:640px;font-family:monospace;font-size:11px;color:var(--color-text-secondary, #475569);">
     <div style="display:flex;flex-direction:column;gap:3px;">
       <label>FOV: <span id="fovV">75</span>°</label>
       <input id="fov" type="range" min="10" max="150" step="1" value="75">

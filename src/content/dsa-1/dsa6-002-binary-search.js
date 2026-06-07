@@ -72,7 +72,7 @@ steps.forEach((s, i) => {
   }).join(', ');
   const dc = s.decision === 'FOUND' ? '#4ade80' : '#60a5fa';
   html += '<div style="margin-bottom:6px;padding:6px 10px;background:#1e293b;border-radius:4px">' +
-    '<span style="color:#64748b">Step ' + (i+1) + ': lo=' + s.lo + ' hi=' + s.hi + ' mid=' + s.mid + '</span><br>' +
+    '<span style="color:var(--color-text-secondary, #475569)">Step ' + (i+1) + ': lo=' + s.lo + ' hi=' + s.hi + ' mid=' + s.mid + '</span><br>' +
     '[' + row + ']<br>' +
     '<span style="color:' + dc + '">arr[' + s.mid + ']=' + s.midVal + ' → ' + s.decision + '</span>' +
     '</div>';

@@ -76,7 +76,7 @@ We'll measure the problem, then fix it layer by layer.`,
   <p class="help">Need help? Contact support@company.com</p>
 </div>`,
       css: `body {
-  background: #f1f5f9;
+  background: var(--color-background-tertiary, #f1f5f9);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -94,7 +94,7 @@ We'll measure the problem, then fix it layer by layer.`,
 /* THE PROBLEM: everything is the same weight */
 .card p, .card button {
   font-size: 15px;
-  color: #374151;
+  color: var(--color-text-primary, #1e293b);
   margin: 8px 0;
   font-weight: 400;
 }
@@ -108,7 +108,7 @@ We'll measure the problem, then fix it layer by layer.`,
   border-radius: 6px;
   cursor: pointer;
   font-size: 15px;
-  color: #374151;
+  color: var(--color-text-primary, #1e293b);
 }`,
       startCode: `// This cell is observation only — no JavaScript needed.
 // The rendering is pure HTML/CSS above.
@@ -210,8 +210,8 @@ Try changing the ratios — notice when the hierarchy collapses (levels feel the
 /* 1.5× modular scale — each level is 1/1.5 of the one above */
 .level-1 { font-size: 36px; color: #f1f5f9; font-weight: 700; line-height: 1.1; }
 .level-2 { font-size: 24px; color: #cbd5e1; font-weight: 400; line-height: 1.3; }
-.level-3 { font-size: 16px; color: #64748b; font-weight: 400; line-height: 1.5; }
-.level-4 { font-size: 11px; color: #475569; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; }`,
+.level-3 { font-size: 16px; color: var(--color-text-secondary, #475569); font-weight: 400; line-height: 1.5; }
+.level-4 { font-size: 11px; color: var(--color-text-secondary, #475569); font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; }`,
       startCode: `// Experiment: the type scale ratio
 // Try changing these — see when hierarchy breaks
 
@@ -268,7 +268,7 @@ Try toggling weights in the cell below and observe when the hierarchy strengthen
   <div class="footnote">Auto-renews March 14, 2026</div>
 </div>`,
       css: `body {
-  background: #f8fafc;
+  background: var(--color-background-secondary, #f8fafc);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -291,7 +291,7 @@ Try toggling weights in the cell below and observe when the hierarchy strengthen
 .detail { font-size: 14px; color: #6b7280; }
 .action { font-size: 14px; padding: 10px; border-radius: 6px; border: none;
            background: #2563eb; color: white; cursor: pointer; margin-top: 8px; }
-.footnote { font-size: 12px; color: #9ca3af; }`,
+.footnote { font-size: 12px; color: var(--color-text-tertiary, #9ca3af); }`,
       startCode: `// Experiment: font weight
 // The CSS above has no font-weight set yet — defaults to 400 everywhere.
 // Apply weights strategically and observe the change in hierarchy.
@@ -366,7 +366,7 @@ Notice in the toggle below how adding colour to non-primary elements immediately
   <p class="footnote">Questions? <a class="link" href="#">Contact support</a></p>
 </div>`,
       css: `body {
-  background: #f1f5f9;
+  background: var(--color-background-tertiary, #f1f5f9);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -388,12 +388,12 @@ Notice in the toggle below how adding colour to non-primary elements immediately
              background: #dcfce7; padding: 2px 8px; border-radius: 100px; width: fit-content; }
 .amount   { font-size: 36px; font-weight: 700; color: #0f172a; margin: 0; line-height: 1.1; }
 .plan     { font-size: 14px; color: #6b7280; margin: 0; }
-.divider  { height: 1px; background: #f1f5f9; margin: 4px 0; }
-.detail   { font-size: 13px; color: #9ca3af; margin: 0; }
+.divider  { height: 1px; background: var(--color-background-tertiary, #f1f5f9); margin: 4px 0; }
+.detail   { font-size: 13px; color: var(--color-text-tertiary, #9ca3af); margin: 0; }
 .cta      { margin-top: 8px; padding: 12px; border-radius: 8px; border: none;
              background: #2563eb; color: white; font-size: 15px;
              font-weight: 600; cursor: pointer; }
-.footnote { font-size: 12px; color: #9ca3af; margin: 0; text-align: center; }
+.footnote { font-size: 12px; color: var(--color-text-tertiary, #9ca3af); margin: 0; text-align: center; }
 .link     { color: #2563eb; text-decoration: none; }`,
       startCode: `// Toggle between GOOD and ANTI-PATTERN colour usage
 let currentMode = 'good';
@@ -516,7 +516,7 @@ The cell below shows the same content with uniform vs structural spacing. Notice
 }
 #comparison { display: flex; gap: 24px; }
 .col { display: flex; flex-direction: column; gap: 8px; }
-.col-label { font-size: 10px; color: #475569; letter-spacing: 0.1em; text-transform: uppercase; font-family: monospace; }
+.col-label { font-size: 10px; color: var(--color-text-secondary, #475569); letter-spacing: 0.1em; text-transform: uppercase; font-family: monospace; }
 .card {
   background: #1e293b;
   border-radius: 10px;
@@ -525,14 +525,14 @@ The cell below shows the same content with uniform vs structural spacing. Notice
 }
 .tag     { font-size: 10px; color: #94a3b8; letter-spacing: 0.08em; text-transform: uppercase; }
 .company { font-size: 16px; font-weight: 600; color: #f1f5f9; }
-.date    { font-size: 12px; color: #64748b; }
+.date    { font-size: 12px; color: var(--color-text-secondary, #475569); }
 .item    { font-size: 13px; color: #94a3b8; }
 .price   { font-size: 13px; color: #cbd5e1; }
-.tax     { font-size: 12px; color: #64748b; }
+.tax     { font-size: 12px; color: var(--color-text-secondary, #475569); }
 .total   { font-size: 16px; font-weight: 600; color: #f1f5f9; }
 .btn     { width: 100%; padding: 10px; background: #2563eb; color: white;
            border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; }
-.note    { font-size: 11px; color: #475569; text-align: center; }`,
+.note    { font-size: 11px; color: var(--color-text-secondary, #475569); text-align: center; }`,
       startCode: `// Apply the two spacing strategies
 
 // CARD 1: Uniform spacing — every element 8px apart
@@ -657,7 +657,7 @@ The card below is constructed by assigning each element to exactly one level and
   <div class="l4-footnote">Need help? Contact support@company.com</div>
 </div>`,
       css: `body {
-  background: #f1f5f9;
+  background: var(--color-background-tertiary, #f1f5f9);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -672,7 +672,7 @@ The card below is constructed by assigning each element to exactly one level and
   width: 320px;
   box-shadow: 0 2px 16px rgba(0,0,0,0.07);
 }
-.divider { height: 1px; background: #f1f5f9; margin: 20px 0; }
+.divider { height: 1px; background: var(--color-background-tertiary, #f1f5f9); margin: 20px 0; }
 
 /* LEVEL 1: The single most important element */
 .l1-amount {
@@ -687,7 +687,7 @@ The card below is constructed by assigning each element to exactly one level and
 .l2-plan {
   font-size: 18px;
   font-weight: 500;
-  color: #1e293b;
+  color: var(--color-text-primary, #1e293b);
   margin-bottom: 4px;
 }
 .l2-cta {
@@ -708,7 +708,7 @@ The card below is constructed by assigning each element to exactly one level and
 .l3-meta {
   font-size: 14px;
   font-weight: 400;
-  color: #64748b;
+  color: var(--color-text-secondary, #475569);
   margin-bottom: 2px;
 }
 
@@ -724,7 +724,7 @@ The card below is constructed by assigning each element to exactly one level and
 .l4-footnote {
   font-size: 12px;
   font-weight: 400;
-  color: #9ca3af;
+  color: var(--color-text-tertiary, #9ca3af);
   text-align: center;
 }`,
       startCode: `// The hierarchy system is now complete in CSS.
@@ -903,7 +903,7 @@ Work through the diagnostic process:
 .metric-sub {
   font-size: 14px;       /* ← should be ≤13px AND the ratio 28/14=2× is okay but sub is too heavy */
   font-weight: 500;      /* VIOLATION 1 (secondary): sub-label is too heavy */
-  color: #64748b;
+  color: var(--color-text-secondary, #475569);
   margin-bottom: 8px;    /* same gap as everything else — VIOLATION 4 spacing */
 }
 
@@ -928,7 +928,7 @@ Work through the diagnostic process:
 .update-time {
   font-size: 11px;
   font-weight: 400;
-  color: #475569;
+  color: var(--color-text-secondary, #475569);
 }`,
       startCode: `// DIAGNOSTIC TASK
 // Read the CSS above carefully. Find and fix the 5 violations.
@@ -1057,7 +1057,7 @@ This cell injects progressively more extreme data into the card. Observe what br
   border: 1px solid #334155;
 }
 .l4-label {
-  font-size: 10px; font-weight: 600; color: #64748b;
+  font-size: 10px; font-weight: 600; color: var(--color-text-secondary, #475569);
   letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px;
 }
 .l1-value {
@@ -1075,7 +1075,7 @@ This cell injects progressively more extreme data into the card. Observe what br
   white-space: nowrap;
 }
 .l3-meta {
-  font-size: 13px; font-weight: 400; color: #64748b;
+  font-size: 13px; font-weight: 400; color: var(--color-text-secondary, #475569);
   margin-bottom: 16px;
   /* Line clamping for long descriptions: */
   display: -webkit-box;
@@ -1473,17 +1473,17 @@ In Lesson 2, we build the spacing system that determines exactly how much air to
 
 /* ── LEVEL 3 — Supporting detail ── */
 .l3-detail {
-  font-size: 13px; font-weight: 400; color: #64748b;
+  font-size: 13px; font-weight: 400; color: var(--color-text-secondary, #475569);
   margin: 0;
 }
 
 /* ── LEVEL 4 — Metadata / receded ── */
 .l4-eyebrow {
-  font-size: 10px; font-weight: 600; color: #475569;
+  font-size: 10px; font-weight: 600; color: var(--color-text-secondary, #475569);
   letter-spacing: 0.1em; text-transform: uppercase; margin: 0 0 8px;
 }
 .l4-footnote {
-  font-size: 11px; font-weight: 400; color: #475569;
+  font-size: 11px; font-weight: 400; color: var(--color-text-secondary, #475569);
   margin: 0; text-align: center;
 }`,
       startCode: `// Final audit — verify the complete system

@@ -101,7 +101,7 @@ Toggle each light on/off with the buttons. Observe how each type contributes to 
   <button id="btn-spot" style="padding:5px 12px;border-radius:6px;border:none;background:#2a3f5f;color:#94a3b8;font-family:monospace;font-size:11px;cursor:pointer">Spot ON</button>
 </div>
 <canvas id="cv" style="display:block;border-radius:0 0 6px 6px"></canvas>
-<div id="info" style="font-family:monospace;font-size:10px;color:#475569;padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px"></div>`,
+<div id="info" style="font-family:monospace;font-size:10px;color:var(--color-text-secondary, #475569);padding:5px;background:#0a0a0f;border-radius:0 0 6px 6px"></div>`,
       css: `body{margin:0;background:#060610}`,
       startCode: `var renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));

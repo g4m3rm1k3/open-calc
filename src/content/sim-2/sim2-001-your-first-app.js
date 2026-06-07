@@ -28,7 +28,7 @@ const sim2_001 = {
 
       '**Why `box-sizing: border-box` is always the first rule.** By default, CSS adds padding *outside* a box\'s stated width. A div with `width: 200px; padding: 20px` is actually 240px wide. Setting `box-sizing: border-box` on `*` makes width include padding and border — the element is exactly the size you declared. Every professional stylesheet starts with this.',
 
-      '**The problem with hardcoded colors.** If you write `color: #0f172a` and `background: #ffffff`, your app looks great in light mode. Toggle dark mode and those values are still `#0f172a` on `#ffffff` — the browser cannot change them. Your text becomes invisible or you get a blinding white card in a dark interface.',
+      '**The problem with hardcoded colors.** If you write `color: #0f172a` and `background: var(--color-background-primary, #ffffff)`, your app looks great in light mode. Toggle dark mode and those values are still `#0f172a` on `#ffffff` — the browser cannot change them. Your text becomes invisible or you get a blinding white card in a dark interface.',
 
       '**CSS custom properties — the solution.** Declare a named value on `:root`: `--text: #0f172a`. Use it anywhere: `color: var(--text)`. When JavaScript updates `--text` to `#e2e8f0` for dark mode, every rule using `var(--text)` updates simultaneously — no loops, no re-running code. The sandbox defines eight variables: `--bg`, `--surface`, `--surface2`, `--border`, `--text`, `--muted`, `--accent`, and `--accent-bg`. These cover 90% of what any UI needs.',
 
@@ -59,7 +59,7 @@ const sim2_001 = {
       {
         type: 'warning',
         title: 'Never Hardcode #ffffff or #000000',
-        body: '`color: #000000` on a dark background produces near-invisible text. `background: #ffffff` in a dark UI produces a blinding white flash. The rule: any color that should change between light and dark must use `var(--something)`. The only safe hardcoded colors are things that never change — brand colors, status indicators (red for error, green for success).',
+        body: '`color: #000000` on a dark background produces near-invisible text. `background: var(--color-background-primary, #ffffff)` in a dark UI produces a blinding white flash. The rule: any color that should change between light and dark must use `var(--something)`. The only safe hardcoded colors are things that never change — brand colors, status indicators (red for error, green for success).',
       },
       {
         type: 'insight',

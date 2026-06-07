@@ -48,7 +48,7 @@ export default function UnitValidator() {
               <button 
                 key={i}
                 onClick={() => setRightDimensions(prev => prev.filter((_, idx) => idx !== i))}
-                className="px-2 py-0.5 bg-brand-50 dark:bg-brand-950/40 text-brand-600 dark:text-brand-400 rounded text-xs font-mono font-bold hover:bg-red-50 dark:hover:bg-red-950/40 hover:text-red-500 transition-colors"
+                className="px-2 py-0.5 bg-brand-50 dark:bg-brand-950/40 text-brand-600 dark:text-brand-400 rounded text-xs font-mono font-bold hover:bg-red-50 dark:hover:bg-red-900/40 dark:bg-red-900/30 dark:hover:bg-red-950/40 hover:text-red-500 transition-colors"
                 title="Click to remove"
               >
                 {dim}
