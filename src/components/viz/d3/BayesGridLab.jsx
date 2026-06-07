@@ -30,14 +30,14 @@ export default function BayesGridLab() {
       </div>
 
       <svg viewBox="0 0 620 220" className="w-full mt-4 bg-white dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700">
-        <rect x="30" y="40" width="260" height="140" fill="#e2e8f0" />
-        <rect x="330" y="40" width="260" height="140" fill="#e2e8f0" />
+        <rect x="30" y="40" width="260" height="140" className="fill-slate-200 dark:fill-slate-700/50" />
+        <rect x="330" y="40" width="260" height="140" className="fill-slate-200 dark:fill-slate-700/50" />
 
-        <rect x="30" y={180 - (stats.tp / 10000) * 140} width="260" height={(stats.tp / 10000) * 140} fill="#22c55e" />
-        <rect x="330" y={180 - (stats.fp / 10000) * 140} width="260" height={(stats.fp / 10000) * 140} fill="#ef4444" />
+        <rect x="30" y={180 - (stats.tp / 10000) * 140} width="260" height={(stats.tp / 10000) * 140} className="fill-emerald-500" />
+        <rect x="330" y={180 - (stats.fp / 10000) * 140} width="260" height={(stats.fp / 10000) * 140} className="fill-rose-500" />
 
-        <text x="160" y="30" textAnchor="middle" fontSize="13" fill="#334155">True Positives</text>
-        <text x="460" y="30" textAnchor="middle" fontSize="13" fill="#334155">False Positives</text>
+        <text x="160" y="30" textAnchor="middle" fontSize="13" className="fill-slate-700 dark:fill-slate-300 font-medium">True Positives</text>
+        <text x="460" y="30" textAnchor="middle" fontSize="13" className="fill-slate-700 dark:fill-slate-300 font-medium">False Positives</text>
       </svg>
 
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 mt-4 text-xs">

@@ -128,8 +128,15 @@ export default function AngleMeasurementViz({ params = {} }) {
 
     const ro = new ResizeObserver(draw)
     if (containerRef.current) ro.observe(containerRef.current)
+    
+    const mo = new MutationObserver(draw)
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+
     draw()
-    return () => ro.disconnect()
+    return () => {
+      ro.disconnect()
+      mo.disconnect()
+    }
   }, [params.currentStep])
 
   return <div ref={containerRef} className="w-full"><svg ref={svgRef} className="w-full" /></div>

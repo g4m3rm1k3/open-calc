@@ -209,48 +209,59 @@ The interactive below demonstrates the "ambiguous case" of SSA: two triangles sh
       html: `<div style="padding:8px 14px 0;background:var(--color-background-secondary, #f8fafc);display:flex;gap:8px;flex-wrap:wrap" id="crit-btns"></div>
 <canvas id="cv" width="700" height="320"></canvas>
 <div id="crit-exp" style="padding:10px 14px;font-family:Georgia,serif;font-size:13px;color:var(--color-text-primary, #1e293b);background:var(--color-background-secondary, #f8fafc);border-top:1px solid var(--color-border-primary, #e2e8f0);line-height:1.7"></div>`,
-      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc);font-family:Georgia,serif}
+      css: `body{margin:0;background:var(--color-background-secondary, transparent);font-family:Georgia,serif}
 canvas{display:block}`,
       startCode: `var canvas=document.getElementById('cv');
 var ctx=canvas.getContext('2d');
 var W=canvas.width,H=canvas.height;
 var expEl=document.getElementById('crit-exp');
 
+// Helper for dynamic colors
+function getCol(light, dark) { return document.documentElement.classList.contains('dark') ? dark : light; }
+
 var criteria=[
   {
-    id:'SSS',label:'SSS',color:'#1a3a2a',works:true,
+    id:'SSS',label:'SSS',color: '#1a3a2a', darkColor: '#4ade80', works:true,
     title:'SSS — Side Side Side (VALID)',
     explanation:'If all three sides of one triangle equal all three sides of another, the triangles are congruent. Reason: given three sides, there is exactly one triangle (up to reflection). The angles are completely determined by the sides via the Law of Cosines.',
     draw:function(){
+      var col = getCol('#1a3a2a', '#4ade80');
+      var textCol = getCol('#1a3a2a', '#e2e8f0');
       // Two congruent triangles with all sides labeled
-      drawTriangle(ctx,{x:130,y:260},{x:320,y:260},{x:220,y:120},'#1a3a2a','#1a3a2a',true,true,true);
-      drawTriangle(ctx,{x:390,y:260},{x:580,y:260},{x:480,y:120},'#1a3a2a','#1a3a2a',true,true,true);
-      ctx.fillStyle='#1a3a2a';ctx.font='bold 14px Georgia';ctx.textAlign='center';
+      drawTriangle(ctx,{x:130,y:260},{x:320,y:260},{x:220,y:120},col,col,true,true,true);
+      drawTriangle(ctx,{x:390,y:260},{x:580,y:260},{x:480,y:120},col,col,true,true,true);
+      ctx.fillStyle=textCol;ctx.font='bold 14px Georgia';ctx.textAlign='center';
       ctx.fillText('≅',350,205);
-      ctx.fillStyle='#1a3a2a';ctx.font='13px Georgia';
+      ctx.fillStyle=textCol;ctx.font='13px Georgia';
       ctx.fillText('All three side pairs match → congruent ✓',W/2,H-10);
     }
   },
   {
-    id:'SAS',label:'SAS',color:'#1e3a5f',works:true,
+    id:'SAS',label:'SAS',color:'#1e3a5f', darkColor: '#60a5fa', works:true,
     title:'SAS — Side Angle Side (VALID)',
     explanation:'If two sides and the included angle (the angle between those two sides) match, the triangles are congruent. Key: the angle must be BETWEEN the two sides. If you fix two sides and the angle between them, the third side and remaining angles are fully determined.',
     draw:function(){
-      drawTriangle(ctx,{x:130,y:260},{x:310,y:260},{x:200,y:120},'#1e3a5f','#1e3a5f',true,false,true);
-      markAngle(ctx,{x:130,y:260},{x:310,y:260},{x:200,y:120},'#1e3a5f',40);
-      drawTriangle(ctx,{x:400,y:260},{x:580,y:260},{x:470,y:120},'#1e3a5f','#1e3a5f',true,false,true);
-      markAngle(ctx,{x:400,y:260},{x:580,y:260},{x:470,y:120},'#1e3a5f',40);
-      ctx.fillStyle='#1e3a5f';ctx.font='bold 14px Georgia';ctx.textAlign='center';
+      var col = getCol('#1e3a5f', '#60a5fa');
+      var textCol = getCol('#1e3a5f', '#e2e8f0');
+      drawTriangle(ctx,{x:130,y:260},{x:310,y:260},{x:200,y:120},col,col,true,false,true);
+      markAngle(ctx,{x:130,y:260},{x:310,y:260},{x:200,y:120},col,40);
+      drawTriangle(ctx,{x:400,y:260},{x:580,y:260},{x:470,y:120},col,col,true,false,true);
+      markAngle(ctx,{x:400,y:260},{x:580,y:260},{x:470,y:120},col,40);
+      ctx.fillStyle=textCol;ctx.font='bold 14px Georgia';ctx.textAlign='center';
       ctx.fillText('≅',360,195);
-      ctx.fillStyle='#1e3a5f';ctx.font='13px Georgia';
+      ctx.fillStyle=textCol;ctx.font='13px Georgia';
       ctx.fillText('Two sides + included angle match → congruent ✓',W/2,H-10);
     }
   },
   {
-    id:'SSA',label:'SSA (fails)',color:'#dc2626',works:false,
+    id:'SSA',label:'SSA (fails)',color:'#dc2626', darkColor: '#f87171', works:false,
     title:'SSA — Side Side Angle (NOT VALID — the ambiguous case)',
     explanation:'Given two sides and a non-included angle, two different triangles can satisfy the conditions. The second side can "swing" to two different positions — both create valid triangles with the same SSA data but are clearly not congruent. This is called the ambiguous case.',
     draw:function(){
+      var col1 = getCol('#1e3a5f', '#60a5fa');
+      var col2 = getCol('#dc2626', '#f87171');
+      var textCol = getCol('#374151', '#94a3b8');
+
       // Triangle 1
       var A={x:130,y:250},B={x:320,y:250};
       var angle=35*Math.PI/180;
@@ -258,75 +269,78 @@ var criteria=[
       // C is at distance sideAC from A at angle angle above horizontal
       var Cx=A.x+sideAC*Math.cos(angle);
       var Cy=A.y-sideAC*Math.sin(angle);
-      // Find two intersections of circle center C radius BC_target with horizontal from B
       // Let's just use two preset triangles with same SSA
       var T1={A:{x:120,y:250},B:{x:300,y:250},C:{x:200,y:130}};
       var T2={A:{x:120,y:250},B:{x:300,y:250},C:{x:270,y:155}};
       
       // Draw both on same axes
-      ctx.strokeStyle='#1e3a5f';ctx.lineWidth=2;
+      ctx.strokeStyle=col1;ctx.lineWidth=2;
       ctx.beginPath();ctx.moveTo(T1.A.x,T1.A.y);ctx.lineTo(T1.C.x,T1.C.y);ctx.lineTo(T1.B.x,T1.B.y);ctx.stroke();
-      ctx.fillStyle='rgba(30,58,95,0.08)';
+      ctx.fillStyle=getCol('rgba(30,58,95,0.08)', 'rgba(96,165,250,0.15)');
       ctx.beginPath();ctx.moveTo(T1.A.x,T1.A.y);ctx.lineTo(T1.C.x,T1.C.y);ctx.lineTo(T1.B.x,T1.B.y);ctx.closePath();ctx.fill();
       
-      ctx.strokeStyle='#dc2626';ctx.lineWidth=2;
+      ctx.strokeStyle=col2;ctx.lineWidth=2;
       ctx.beginPath();ctx.moveTo(T2.A.x,T2.A.y);ctx.lineTo(T2.C.x,T2.C.y);ctx.lineTo(T2.B.x,T2.B.y);ctx.stroke();
-      ctx.fillStyle='rgba(220,38,38,0.08)';
+      ctx.fillStyle=getCol('rgba(220,38,38,0.08)', 'rgba(248,113,113,0.15)');
       ctx.beginPath();ctx.moveTo(T2.A.x,T2.A.y);ctx.lineTo(T2.C.x,T2.C.y);ctx.lineTo(T2.B.x,T2.B.y);ctx.closePath();ctx.fill();
 
       // Labels
-      ctx.fillStyle='#1e3a5f';ctx.font='12px Georgia';ctx.textAlign='center';
+      ctx.fillStyle=col1;ctx.font='12px Georgia';ctx.textAlign='center';
       ctx.fillText('Triangle 1',210,290);
-      ctx.fillStyle='#dc2626';
+      ctx.fillStyle=col2;
       ctx.fillText('Triangle 2',260,290);
       
-      ctx.fillStyle='#374151';ctx.font='13px Georgia';ctx.textAlign='center';
+      ctx.fillStyle=textCol;ctx.font='13px Georgia';ctx.textAlign='center';
       ctx.fillText('Same two sides, same angle at A — two different triangles! SSA ✗',W*0.38,H-10);
 
       // Right side: arc showing "swinging" second side
       var pivotX=450,pivotY=220,r2=100;
-      ctx.strokeStyle='rgba(220,38,38,0.3)';ctx.lineWidth=1.5;ctx.setLineDash([5,4]);
+      ctx.strokeStyle=getCol('rgba(220,38,38,0.3)', 'rgba(248,113,113,0.4)');ctx.lineWidth=1.5;ctx.setLineDash([5,4]);
       ctx.beginPath();ctx.arc(pivotX,pivotY,r2,-0.5,0.5);ctx.stroke();ctx.setLineDash([]);
-      ctx.strokeStyle='#dc2626';ctx.lineWidth=2;
+      ctx.strokeStyle=col2;ctx.lineWidth=2;
       ctx.beginPath();ctx.moveTo(pivotX,pivotY);ctx.lineTo(pivotX+r2*Math.cos(-0.15),pivotY+r2*Math.sin(-0.15));ctx.stroke();
       ctx.beginPath();ctx.moveTo(pivotX,pivotY);ctx.lineTo(pivotX+r2*Math.cos(0.35),pivotY+r2*Math.sin(0.35));ctx.stroke();
-      ctx.fillStyle='#dc2626';ctx.font='11px Georgia';ctx.textAlign='center';
+      ctx.fillStyle=col2;ctx.font='11px Georgia';ctx.textAlign='center';
       ctx.fillText('"swinging" side',pivotX+120,pivotY-10);
       ctx.fillText('two valid positions',pivotX+120,pivotY+6);
     }
   },
   {
-    id:'AAA',label:'AAA (fails)',color:'#92400e',works:false,
+    id:'AAA',label:'AAA (fails)',color:'#92400e', darkColor: '#fbbf24', works:false,
     title:'AAA — Angle Angle Angle (NOT VALID for congruence)',
     explanation:'Three equal angles only prove that the triangles are SIMILAR (same shape), not congruent (same shape AND size). A small equilateral triangle and a large equilateral triangle have identical angles but are clearly not the same size. AAA establishes similarity, not congruence.',
     draw:function(){
+      var col1 = getCol('#1e3a5f', '#60a5fa');
+      var col2 = getCol('#92400e', '#fbbf24');
+      var textCol = getCol('#374151', '#94a3b8');
+
       // Small and large equilateral triangles
       var s1=70,s2=120;
       var cx1=200,cx2=510;
-      function eqTri(cx,s,color){
+      function eqTri(cx,s,color,fillCol){
         var h=s*Math.sqrt(3)/2;
         var A={x:cx-s/2,y:200+h/2},B={x:cx+s/2,y:200+h/2},C={x:cx,y:200-h/2};
-        ctx.fillStyle=color+'18';
+        ctx.fillStyle=fillCol;
         ctx.beginPath();ctx.moveTo(A.x,A.y);ctx.lineTo(B.x,B.y);ctx.lineTo(C.x,C.y);ctx.closePath();ctx.fill();
         ctx.strokeStyle=color;ctx.lineWidth=2.5;
         ctx.beginPath();ctx.moveTo(A.x,A.y);ctx.lineTo(B.x,B.y);ctx.lineTo(C.x,C.y);ctx.closePath();ctx.stroke();
         ctx.fillStyle=color;ctx.font='11px Georgia';ctx.textAlign='center';
         ctx.fillText('60°',cx,200-h/2-12);ctx.fillText('60°',cx-s/2-18,200+h/2+8);ctx.fillText('60°',cx+s/2+18,200+h/2+8);
-        ctx.fillStyle=color+'cc';ctx.font='12px Georgia';
+        ctx.font='12px Georgia';
         ctx.fillText('side = '+s,cx,200+h/2+22);
       }
-      eqTri(cx1,s1,'#1e3a5f');
-      eqTri(cx2,s2,'#92400e');
-      ctx.fillStyle='#374151';ctx.font='bold 14px Georgia';ctx.textAlign='center';
+      eqTri(cx1,s1,col1,getCol('rgba(30,58,95,0.1)', 'rgba(96,165,250,0.15)'));
+      eqTri(cx2,s2,col2,getCol('rgba(146,64,14,0.1)', 'rgba(251,191,36,0.15)'));
+      ctx.fillStyle=textCol;ctx.font='bold 14px Georgia';ctx.textAlign='center';
       ctx.fillText('~',350,200);ctx.fillText('(similar, NOT ≅)',350,218);
-      ctx.fillStyle='#92400e';ctx.font='13px Georgia';
-      ctx.fillText('AAA only proves similarity — angles don\'t determine size. AAA ✗',W/2,H-10);
+      ctx.fillStyle=col2;ctx.font='13px Georgia';
+      ctx.fillText("AAA only proves similarity — angles don't determine size. AAA ✗",W/2,H-10);
     }
   }
 ];
 
 function drawTriangle(ctx,A,B,C,strokeColor,fillColor,sideAB,sideBC,sideCA){
-  ctx.fillStyle=fillColor+'18';
+  ctx.fillStyle=getCol(fillColor+'18', fillColor+'25');
   ctx.beginPath();ctx.moveTo(A.x,A.y);ctx.lineTo(B.x,B.y);ctx.lineTo(C.x,C.y);ctx.closePath();ctx.fill();
   ctx.strokeStyle=strokeColor;ctx.lineWidth=2.5;
   ctx.beginPath();ctx.moveTo(A.x,A.y);ctx.lineTo(B.x,B.y);ctx.lineTo(C.x,C.y);ctx.closePath();ctx.stroke();
@@ -360,15 +374,17 @@ var btns=[];
 criteria.forEach(function(c,i){
   var btn=document.createElement('button');
   btn.textContent=c.label;
+  var col = getCol(c.color, c.darkColor);
   btn.style.cssText='padding:6px 14px;border-radius:7px;border:1.5px solid;font-family:Georgia,serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;';
-  btn.style.borderColor=c.color+(i===0?'':'' );
-  btn.style.background=i===0?c.color+'22':'transparent';
-  btn.style.color=i===0?c.color:'rgba(55,65,81,0.5)';
+  btn.style.borderColor=col+(i===0?'':'' );
+  btn.style.background=i===0?col+'22':'transparent';
+  btn.style.color=i===0?col:'rgba(148,163,184,0.8)';
   btn.onclick=function(){
     selected=i;
     btns.forEach(function(b,j){
-      b.style.background=j===i?criteria[j].color+'22':'transparent';
-      b.style.color=j===i?criteria[j].color:'rgba(55,65,81,0.5)';
+      var bCol = getCol(criteria[j].color, criteria[j].darkColor);
+      b.style.background=j===i?bCol+'22':'transparent';
+      b.style.color=j===i?bCol:'rgba(148,163,184,0.8)';
     });
     render();
   };
@@ -376,12 +392,27 @@ criteria.forEach(function(c,i){
   btns.push(btn);
 });
 
+// Watch for dark mode changes
+var observer = new MutationObserver(function() {
+  btns.forEach(function(b,j){
+    var bCol = getCol(criteria[j].color, criteria[j].darkColor);
+    b.style.borderColor=bCol;
+    b.style.background=j===selected?bCol+'22':'transparent';
+    b.style.color=j===selected?bCol:'rgba(148,163,184,0.8)';
+  });
+  render();
+});
+observer.observe(document.documentElement, {attributes: true, attributeFilter: ['class']});
+
 function render(){
   ctx.clearRect(0,0,W,H);
-  ctx.fillStyle='#fafaf8';ctx.fillRect(0,0,W,H);
+  // Removed white background fill so it's transparent over notebook background
   criteria[selected].draw();
   var c=criteria[selected];
-  expEl.innerHTML='<strong style="color:'+c.color+'">'+c.title+'</strong><br>'+c.explanation;
+  var cCol = getCol(c.color, c.darkColor);
+  var textCol = getCol('#1e293b', '#e2e8f0');
+  expEl.style.color = textCol;
+  expEl.innerHTML='<strong style="color:'+cCol+'">'+c.title+'</strong><br>'+c.explanation;
 }
 render();`,
       outputHeight: 440,

@@ -125,8 +125,15 @@ export default function AngleAdditionProofViz({ params = {} }) {
 
     const ro = new ResizeObserver(draw)
     if (containerRef.current) ro.observe(containerRef.current)
+    
+    const mo = new MutationObserver(draw)
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+
     draw()
-    return () => ro.disconnect()
+    return () => {
+      ro.disconnect()
+      mo.disconnect()
+    }
   }, [params.currentStep])
 
   return (

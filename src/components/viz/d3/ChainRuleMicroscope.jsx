@@ -60,8 +60,8 @@ const ChainRuleMicroscope = ({ width = 900, height = 500 }) => {
     // Draw Function helper
     const drawGraph = (gElement, domainx, scalex, scaley, func, color, ptX, ptY, m, title, eqStr) => {
       // Axes
-      gElement.append('line').attr('x1', 0).attr('y1', scaley(0) || graphH/2).attr('x2', graphW).attr('y2', scaley(0) || graphH/2).attr('stroke', 'var(--border)');
-      gElement.append('line').attr('x1', scalex(0) || graphW/2).attr('y1', 0).attr('x2', scalex(0) || graphW/2).attr('y2', graphH).attr('stroke', 'var(--border)');
+      gElement.append('line').attr('x1', 0).attr('y1', scaley(0) || graphH/2).attr('x2', graphW).attr('y2', scaley(0) || graphH/2).attr('class', 'stroke-slate-300 dark:stroke-slate-700');
+      gElement.append('line').attr('x1', scalex(0) || graphW/2).attr('y1', 0).attr('x2', scalex(0) || graphW/2).attr('y2', graphH).attr('class', 'stroke-slate-300 dark:stroke-slate-700');
 
       // The Curve
       const lineRes = 100;
@@ -97,13 +97,14 @@ const ChainRuleMicroscope = ({ width = 900, height = 500 }) => {
         .attr('fill', color);
 
       // Labels
-      gElement.append('text').attr('x', graphW/2).attr('y', -10).attr('text-anchor', 'middle').attr('font-weight', 'bold').attr('fill', 'var(--text)').text(title);
+      gElement.append('text').attr('x', graphW/2).attr('y', -10).attr('text-anchor', 'middle').attr('font-weight', 'bold').attr('class', 'fill-slate-900 dark:fill-slate-100').text(title);
       
       // Slope readout bubble
       gElement.append('rect')
         .attr('x', 10).attr('y', graphH - 30)
         .attr('width', graphW - 20).attr('height', 24)
-        .attr('fill', 'var(--surface)').attr('rx', 4).attr('stroke', 'var(--border)');
+        .attr('rx', 4)
+        .attr('class', 'fill-slate-100 dark:fill-slate-800 stroke-slate-200 dark:stroke-slate-700');
         
       gElement.append('text')
         .attr('x', graphW/2).attr('y', graphH - 14)
@@ -130,7 +131,7 @@ const ChainRuleMicroscope = ({ width = 900, height = 500 }) => {
        .attr('y', height/2)
        .attr('text-anchor', 'middle')
        .attr('font-size', '24px')
-       .attr('fill', 'var(--text-muted)')
+       .attr('class', 'fill-slate-400 dark:fill-slate-500')
        .text('×');
        
     svg.append('text')
@@ -138,7 +139,7 @@ const ChainRuleMicroscope = ({ width = 900, height = 500 }) => {
        .attr('y', height/2)
        .attr('text-anchor', 'middle')
        .attr('font-size', '24px')
-       .attr('fill', 'var(--text-muted)')
+       .attr('class', 'fill-slate-400 dark:fill-slate-500')
        .text('=');
 
     // Synthesis block
@@ -159,21 +160,21 @@ const ChainRuleMicroscope = ({ width = 900, height = 500 }) => {
   }, [xVal, zoomLevel, width, height]);
 
   return (
-    <div className="viz-container bg-surface rounded-lg border border-border p-4 my-6 flex flex-col items-center">
-      <h3 className="text-xl font-bold mb-2 text-center text-text">Chain Rule "Microscope Mode"</h3>
-      <p className="text-sm text-text-muted mb-4 max-w-2xl text-center">
+    <div className="bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 my-6 flex flex-col items-center">
+      <h3 className="text-xl font-bold mb-2 text-center text-slate-900 dark:text-slate-100">Chain Rule "Microscope Mode"</h3>
+      <p className="text-sm text-slate-600 dark:text-slate-400 mb-4 max-w-2xl text-center">
         As you increase the zoom, notice how the curves flatten into literal straight lines. 
         Once they are lines, geometry proves that feeding Line 1 (x → u) into Line 2 (u → y) 
         creates a new line whose slope is exactly $m_1 \times m_2$.
       </p>
       
       <div className="w-full relative" style={{ height: height + 'px' }}>
-        <svg ref={svgRef} width="100%" height="100%" />
+        <svg ref={svgRef} width="100%" height="100%" className="overflow-visible" />
       </div>
 
-      <div className="flex items-center gap-6 mt-4 w-full max-w-3xl bg-surface-alt p-4 rounded-lg">
+      <div className="flex items-center gap-6 mt-4 w-full max-w-3xl bg-white dark:bg-slate-800 p-4 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
         <div className="flex-1 flex flex-col">
-          <label className="text-sm font-semibold mb-1 flex justify-between text-red-500">
+          <label className="text-sm font-semibold mb-1 flex justify-between text-red-600 dark:text-red-400">
             <span>Position (x)</span>
             <span>{xVal.toFixed(2)}</span>
           </label>
@@ -189,7 +190,7 @@ const ChainRuleMicroscope = ({ width = 900, height = 500 }) => {
         </div>
 
         <div className="flex-1 flex flex-col">
-          <label className="text-sm font-semibold mb-1 flex justify-between text-yellow-500">
+          <label className="text-sm font-semibold mb-1 flex justify-between text-yellow-600 dark:text-yellow-500">
             <span>Microscope Zoom</span>
             <span>{zoomLevel.toFixed(1)}x</span>
           </label>
