@@ -105,7 +105,7 @@ export default function LessonPage() {
     lessonIndex < ALL_LESSONS.length - 1 ? ALL_LESSONS[lessonIndex + 1] : null;
 
   return (
-    <article className="mx-auto max-w-7xl pb-20 px-0 md:px-6 bg-[var(--color-page-bg)] lg:bg-transparent">
+    <article className="mx-auto max-w-7xl pb-20 px-4 sm:px-6 md:px-8 bg-white dark:bg-slate-950 min-h-screen">
       <TutorPanel lesson={lesson} />
 
       <div className="pointer-events-none fixed left-0 top-0 z-[10001] h-1 w-full bg-slate-200 dark:bg-slate-800">
@@ -200,12 +200,17 @@ export default function LessonPage() {
       </header>
 
       {lesson.hook && (
-        <section className="oc-shell-card mb-10 p-6 sm:p-7">
-          <p className="oc-section-kicker mb-3">Why This Matters</p>
-          <div className="mb-4">
+        <section className="mb-16">
+          <div className="flex items-center gap-3 mb-6">
+            <span className="text-[11px] font-black uppercase tracking-[0.2em] text-brand-600 dark:text-brand-400">
+              Introduction
+            </span>
+            <div className="flex-1 h-px bg-brand-100 dark:bg-brand-900/40" />
+          </div>
+          <div className="mb-8">
             <MarkdownProse
               text={lesson.hook.question}
-              className="[&_p]:text-[18px] [&_p]:font-semibold [&_p]:leading-8 [&_p]:text-slate-900 [&_p]:dark:text-slate-50"
+              className="[&_p]:text-[20px] [&_p]:sm:text-[22px] [&_p]:font-serif [&_p]:font-medium [&_p]:leading-relaxed [&_p]:text-brand-900 [&_p]:dark:text-brand-100 italic border-l-4 border-brand-200 dark:border-brand-800 pl-6 my-6"
             />
           </div>
           <MarkdownProse text={lesson.hook.realWorldContext} />
@@ -213,7 +218,7 @@ export default function LessonPage() {
             ? lesson.hook.visualizations.map((viz, index) => (
                 <div
                   key={index}
-                  className="mt-5 overflow-hidden rounded-2xl border border-slate-200 shadow-sm dark:border-slate-800"
+                  className="mt-8 mb-4 overflow-hidden rounded-2xl border border-slate-200 shadow-sm dark:border-slate-800"
                 >
                   <VizFrame
                     id={viz.id}
@@ -223,7 +228,7 @@ export default function LessonPage() {
                 </div>
               ))
             : lesson.hook.previewVisualizationId && (
-                <div className="mt-5 overflow-hidden rounded-2xl border border-slate-200 shadow-sm dark:border-slate-800">
+                <div className="mt-8 mb-4 overflow-hidden rounded-2xl border border-slate-200 shadow-sm dark:border-slate-800">
                   <VizFrame
                     id={lesson.hook.previewVisualizationId}
                     initialProps={lesson.hook.previewVisualizationProps ?? {}}

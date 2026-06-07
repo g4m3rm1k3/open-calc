@@ -533,16 +533,16 @@ function IntuitionBlock({ data, lesson }) {
   if (!hasPrimary && !hasAlternate) return null;
 
   return (
-    <div className="oc-shell-card mb-12 overflow-hidden">
-      <div className="oc-header-gradient px-4 sm:px-6 py-5 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-xl shadow-sm">
+    <div className="mb-16">
+      <div className="oc-header-gradient rounded-3xl px-6 py-5 mb-8 border border-slate-200 dark:border-slate-800 flex items-center gap-4 shadow-sm">
+        <div className="w-12 h-12 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-2xl shadow-sm">
           🧠
         </div>
         <div className="flex flex-col">
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
+          <span className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
             Conceptual
           </span>
-          <span className="font-bold text-slate-800 dark:text-slate-100 text-sm uppercase tracking-wider">
+          <span className="font-bold text-slate-800 dark:text-slate-100 text-lg uppercase tracking-wider">
             Intuition
           </span>
         </div>
@@ -550,7 +550,7 @@ function IntuitionBlock({ data, lesson }) {
         {lesson?.id && <StickyNote noteId={`${lesson.id}:intuition`} />}
       </div>
 
-      <div className="px-4 sm:px-6 py-6">
+      <div className="py-2">
         <SemanticsBlock semantics={data.semantics ?? lesson?.semantics} />
         <SectionContent data={data} />
         {data.perspectives?.length > 0 && (
@@ -602,7 +602,6 @@ function IntuitionBlock({ data, lesson }) {
 // ─── 📐 Mathematics block ──────────────────────────────────────────────────
 
 function MathBlock({ data, lessonId }) {
-  const [open, setOpen] = useState(true);
   const isBlocksFormat = (data?.blocks?.length ?? 0) > 0;
   const vizzes = isBlocksFormat ? [] : getSectionVizzes(data);
   const hasProse = data?.prose?.length > 0 || isBlocksFormat;
@@ -612,40 +611,24 @@ function MathBlock({ data, lessonId }) {
   return (
     <div
       id={lessonId ? `${lessonId}-math` : undefined}
-      className="oc-shell-card mb-12 overflow-hidden group"
+      className="mb-16 group"
     >
-      <div
-        role="button"
-        tabIndex={0}
-        onClick={() => setOpen((o) => !o)}
-        onKeyDown={(e) =>
-          (e.key === "Enter" || e.key === " ") && setOpen((o) => !o)
-        }
-        className="oc-header-gradient w-full flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-4 hover:opacity-90 transition-all text-left cursor-pointer border-b border-brand-100 dark:border-brand-900/60"
-      >
-        <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 border border-brand-200 dark:border-brand-800 flex items-center justify-center text-xl shadow-sm">
+      <div className="oc-header-gradient rounded-3xl w-full flex items-center gap-4 px-6 py-5 mb-8 border border-brand-100 dark:border-brand-900/60 shadow-sm">
+        <div className="w-12 h-12 rounded-2xl bg-white dark:bg-slate-900 border border-brand-200 dark:border-brand-800 flex items-center justify-center text-2xl shadow-sm">
           📐
         </div>
         <div className="flex flex-col">
-          <span className="font-black text-brand-900 dark:text-brand-100 text-[10px] uppercase tracking-[0.2em]">
+          <span className="font-black text-brand-900 dark:text-brand-100 text-[11px] uppercase tracking-[0.2em]">
             Operational
           </span>
-          <span className="font-bold text-brand-800 dark:text-brand-200 text-sm uppercase tracking-wider">
+          <span className="font-bold text-brand-800 dark:text-brand-200 text-lg uppercase tracking-wider">
             Mathematics
           </span>
         </div>
         <div className="flex-1" />
-        {lessonId && (
-          <span onClick={(e) => e.stopPropagation()}>
-            <StickyNote noteId={`${lessonId}:math`} />
-          </span>
-        )}
-        <span className="bg-brand-100 dark:bg-brand-900/60 px-3 py-1 rounded-full text-brand-600 dark:text-brand-300 text-[10px] font-bold uppercase tracking-wider transition-transform group-hover:scale-105">
-          {open ? "Collapse ▲" : "Expand ▼"}
-        </span>
+        {lessonId && <StickyNote noteId={`${lessonId}:math`} />}
       </div>
-      {open && (
-        <div className="px-4 sm:px-6 py-6 space-y-6 bg-white dark:bg-slate-900">
+      <div className="py-2 space-y-6">
           {data.processDefinition?.length > 0 && (
             <div className="mb-6 p-4 rounded-xl bg-brand-600 text-white shadow-xl shadow-brand-500/20">
               <p className="text-[10px] font-bold uppercase tracking-widest text-brand-200 mb-3">
@@ -680,7 +663,6 @@ function MathBlock({ data, lessonId }) {
             </div>
           )}
         </div>
-      )}
     </div>
   );
 }
@@ -688,7 +670,6 @@ function MathBlock({ data, lessonId }) {
 // ─── ∴ Rigor / Formal Proof block ─────────────────────────────────────────
 
 function RigorBlock({ data, lessonId }) {
-  const [open, setOpen] = useState(false);
   const isBlocksFormat = (data?.blocks?.length ?? 0) > 0;
   const vizzes = isBlocksFormat ? [] : getSectionVizzes(data);
   const proofVizId = data?.visualizationId;
@@ -709,45 +690,24 @@ function RigorBlock({ data, lessonId }) {
   return (
     <div
       id={lessonId ? `${lessonId}-rigor` : undefined}
-      className="oc-shell-card mb-12 overflow-hidden group"
+      className="mb-16 group"
     >
-      <div
-        role="button"
-        tabIndex={0}
-        onClick={() => setOpen((o) => !o)}
-        onKeyDown={(e) =>
-          (e.key === "Enter" || e.key === " ") && setOpen((o) => !o)
-        }
-        className="oc-header-gradient w-full flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-4 hover:opacity-90 transition-all text-left cursor-pointer border-b border-purple-100 dark:border-purple-900/60"
-      >
-        <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 border border-purple-200 dark:border-purple-800 flex items-center justify-center text-xl shadow-sm">
+      <div className="oc-header-gradient rounded-3xl w-full flex items-center gap-4 px-6 py-5 mb-8 border border-purple-100 dark:border-purple-900/60 shadow-sm">
+        <div className="w-12 h-12 rounded-2xl bg-white dark:bg-slate-900 border border-purple-200 dark:border-purple-800 flex items-center justify-center text-2xl shadow-sm">
           ∴
         </div>
         <div className="flex flex-col">
-          <span className="font-black text-purple-900 dark:text-purple-100 text-[10px] uppercase tracking-[0.2em]">
+          <span className="font-black text-purple-900 dark:text-purple-100 text-[11px] uppercase tracking-[0.2em]">
             Formal
           </span>
-          <span className="font-bold text-purple-800 dark:text-purple-200 text-sm uppercase tracking-wider">
+          <span className="font-bold text-purple-800 dark:text-purple-200 text-lg uppercase tracking-wider">
             Rigor & Proof
           </span>
         </div>
         <div className="flex-1" />
-        {!open && (
-          <span className="text-[10px] font-bold uppercase tracking-wider text-purple-400 dark:text-purple-500 mr-4 hidden sm:inline">
-            Show the logic
-          </span>
-        )}
-        {lessonId && (
-          <span onClick={(e) => e.stopPropagation()}>
-            <StickyNote noteId={`${lessonId}:rigor`} />
-          </span>
-        )}
-        <span className="bg-purple-100 dark:bg-purple-900/60 px-3 py-1 rounded-full text-purple-600 dark:text-purple-300 text-[10px] font-bold uppercase tracking-wider transition-transform group-hover:scale-105">
-          {open ? "Collapse" : "Prove It"}
-        </span>
+        {lessonId && <StickyNote noteId={`${lessonId}:rigor`} />}
       </div>
-      {open && (
-        <div className="px-4 sm:px-6 py-6 space-y-6 bg-white dark:bg-slate-900">
+      <div className="py-2 space-y-6">
           {hasProse || hasCallouts || isBlocksFormat ? (
             <SectionContent data={data} />
           ) : null}
@@ -771,7 +731,6 @@ function RigorBlock({ data, lessonId }) {
             </div>
           )}
         </div>
-      )}
     </div>
   );
 }

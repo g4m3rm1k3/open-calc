@@ -654,6 +654,9 @@ export default function AppShell({ children }) {
   const isFiveAxisRoute = location.pathname.startsWith("/five-axis");
   const isDSAArraysLabRoute = location.pathname.startsWith("/dsa-arrays-lab");
   const isDSALinkedListsLabRoute = location.pathname.startsWith("/dsa-linked-lists-lab");
+  
+  const pathParts = location.pathname.split('/').filter(Boolean);
+  const isLessonRoute = pathParts[0] === 'chapter' && pathParts.length >= 3;
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarPinned, setSidebarPinned] = useState(() => {
@@ -904,8 +907,8 @@ export default function AppShell({ children }) {
   return (
     <ChatProvider>
       <GrapherContext.Provider value={{ openGrapher }}>
-        <div className="min-h-screen transition-colors duration-500 relative overflow-hidden">
-          <DynamicBackground mode={dark ? "dark" : "light"} config={bgConfig} />
+        <div className={`min-h-screen transition-colors duration-500 relative overflow-hidden ${isLessonRoute ? "bg-white dark:bg-slate-950" : ""}`}>
+          {!isLessonRoute && <DynamicBackground mode={dark ? "dark" : "light"} config={bgConfig} />}
           <TopBar
             onMenuToggle={() => setSidebarOpen((o) => !o)}
             sidebarOpen={sidebarOpen}

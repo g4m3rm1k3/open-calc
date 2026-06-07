@@ -174,7 +174,7 @@ const PROSE_COMPONENTS = {
   ),
   // Paragraphs
   p: ({ children }) => (
-    <p className="mb-5 last:mb-0 text-[16px] sm:text-[17px] leading-8 text-slate-700 dark:text-slate-300">
+    <p className="mb-6 last:mb-0 text-[17px] sm:text-[18px] leading-[1.75] text-slate-900 dark:text-slate-100 font-serif tracking-normal">
       {children}
     </p>
   ),
@@ -200,20 +200,20 @@ const PROSE_COMPONENTS = {
     ),
   // Unordered list
   ul: ({ children }) => (
-    <ul className="list-disc pl-6 space-y-2 mb-5 text-[16px] sm:text-[17px] leading-8 text-slate-700 dark:text-slate-300">
+    <ul className="list-disc pl-8 space-y-3 mb-6 text-[17px] sm:text-[18px] leading-[1.75] text-slate-900 dark:text-slate-100 font-serif tracking-normal">
       {children}
     </ul>
   ),
   // Ordered list
   ol: ({ children }) => (
-    <ol className="list-decimal pl-6 space-y-2 mb-5 text-[16px] sm:text-[17px] leading-8 text-slate-700 dark:text-slate-300">
+    <ol className="list-decimal pl-8 space-y-3 mb-6 text-[17px] sm:text-[18px] leading-[1.75] text-slate-900 dark:text-slate-100 font-serif tracking-normal">
       {children}
     </ol>
   ),
   li: ({ children }) => <li className="leading-7">{children}</li>,
   // Block quote
   blockquote: ({ children }) => (
-    <blockquote className="border-l-4 border-brand-300 dark:border-brand-600 pl-5 py-1 my-5 italic text-slate-600 dark:text-slate-300">
+    <blockquote className="border-l-[3px] border-brand-400 dark:border-brand-500 pl-6 py-2 my-6 italic text-slate-800 dark:text-slate-200 font-serif text-[17px] sm:text-[18px] leading-[1.8] bg-brand-50/50 dark:bg-brand-950/20 rounded-r-xl tracking-normal">
       {children}
     </blockquote>
   ),
