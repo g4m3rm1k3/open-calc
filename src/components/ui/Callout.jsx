@@ -63,10 +63,13 @@ export default function Callout({ type = 'tip', title, body }) {
 
   return (
     <div className={`callout callout-${type} my-4`}>
-      <div className="flex items-center gap-2 mb-2">
-        <span className="text-base" aria-hidden>{icon}</span>
-        <span className="text-xs font-bold uppercase tracking-wider opacity-70">{label}</span>
-        {title && <span className="text-sm font-semibold">— {title}</span>}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-3 text-current">
+        <div className="flex items-center gap-2">
+          <span className="text-xl" aria-hidden>{icon}</span>
+          <span className="text-sm font-black uppercase tracking-[0.1em] opacity-80">{label}</span>
+        </div>
+        {title && <span className="hidden sm:inline opacity-50">—</span>}
+        {title && <span className="text-base font-bold leading-tight">{title}</span>}
       </div>
       {renderBody(body)}
     </div>

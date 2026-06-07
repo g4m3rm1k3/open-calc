@@ -42,9 +42,10 @@ function ProseParagraph({ text, isFirst }) {
       <div
         className={`${isFirst ? "" : "pt-6 border-t border-slate-100 dark:border-slate-800"} pb-2 last:pb-0`}
       >
-        <p className="text-[11px] font-black uppercase tracking-[0.14em] text-brand-600 dark:text-sky-400 mb-2">
+        <h3 className="text-xl font-bold text-slate-900 dark:text-sky-400 mb-4 mt-8 flex items-center gap-3">
+          <span className="w-2 h-6 bg-brand-500 dark:bg-brand-400 rounded-full inline-block"></span>
           {heading}
-        </p>
+        </h3>
         {body && <MarkdownProse text={body} />}
       </div>
     );

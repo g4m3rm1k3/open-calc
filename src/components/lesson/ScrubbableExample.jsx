@@ -253,9 +253,9 @@ export default function ScrubbableExample({ example, number, lessonId }) {
         </div>
       </div>
 
-      <div className="p-4 sm:p-6 lg:p-8">
+      <div className="p-3 sm:p-5 lg:p-6">
         {/* Problem Statement */}
-        <div className="mb-8 p-6 bg-brand-50/50 dark:bg-brand-900/10 rounded-2xl border border-brand-100 dark:border-brand-800/50 shadow-inner">
+        <div className="mb-6 p-4 sm:p-5 bg-brand-50/50 dark:bg-brand-900/10 rounded-2xl border border-brand-100 dark:border-brand-800/50 shadow-inner">
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-600 dark:text-brand-400 mb-4 flex items-center gap-2">
              <span className="w-1.5 h-1.5 rounded-full bg-brand-500" />
              The Challenge
@@ -270,9 +270,9 @@ export default function ScrubbableExample({ example, number, lessonId }) {
         </div>
 
         {/* Active step card — always at top, Next button never moves */}
-        <div ref={activeCardRef} className="mb-4 rounded-3xl border-2 border-brand-200 dark:border-brand-800 bg-white dark:bg-slate-900 p-5 sm:p-7 shadow-premium transition-all">
+        <div ref={activeCardRef} className="mb-4 rounded-3xl border-2 border-brand-200 dark:border-brand-800 bg-white dark:bg-slate-900 p-4 sm:p-5 shadow-premium transition-all">
           {isDone ? (
-            <div className="rounded-2xl border border-emerald-100 dark:border-emerald-800/50 bg-emerald-50/50 dark:bg-emerald-950/20 p-5 mb-5 shadow-inner">
+            <div className="rounded-2xl border border-emerald-100 dark:border-emerald-800/50 bg-emerald-50/50 dark:bg-emerald-950/20 p-4 sm:p-5 mb-5 shadow-inner">
                <div className="flex items-center gap-2 mb-3">
                  <div className="p-1.5 rounded-full bg-emerald-500 text-white shadow-lg shadow-emerald-500/20">
                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -292,7 +292,7 @@ export default function ScrubbableExample({ example, number, lessonId }) {
                 <span className="text-[11px] font-black uppercase tracking-[0.25em] text-brand-600 dark:text-brand-400">Next Action</span>
               </div>
               
-              <div className="rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 p-4 sm:p-6 mb-6">
+              <div className="rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 p-3 sm:p-4 mb-4">
                 <div className="text-2xl font-black text-slate-900 dark:text-slate-50">
                   <KatexBlock expr={activeStep.expression} />
                 </div>

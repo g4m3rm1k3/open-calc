@@ -126,8 +126,9 @@ function wrapBareLatex(src) {
 
 function preprocess(text) {
   if (!text) return "";
-  // Normalize escaped newlines from lesson data strings before any other processing
-  const normalized = text.replace(/\\n/g, "\n\n");
+  // Normalize escaped newlines from lesson data strings before any other processing.
+  // We use (?![a-zA-Z]) to avoid matching \n inside LaTeX commands like \neq.
+  const normalized = text.replace(/\\n(?![a-zA-Z])/g, "\n\n");
   return (
     wrapBareLatex(normalized)
       // \[…\] → $$\n…\n$$ (block / display math)
@@ -174,7 +175,7 @@ const PROSE_COMPONENTS = {
   ),
   // Paragraphs
   p: ({ children }) => (
-    <p className="mb-6 last:mb-0 text-[18px] sm:text-[20px] leading-[1.8] text-slate-800 dark:text-slate-300 font-serif tracking-[0.01em] max-w-[75ch]">
+    <p className="mb-6 last:mb-0 text-[18px] sm:text-[20px] leading-[1.8] text-slate-800 dark:text-slate-400 font-serif tracking-[0.01em] max-w-[75ch]">
       {children}
     </p>
   ),
@@ -199,13 +200,13 @@ const PROSE_COMPONENTS = {
     ),
   // Unordered list
   ul: ({ children }) => (
-    <ul className="list-disc pl-8 space-y-3 mb-6 text-[18px] sm:text-[20px] leading-[1.8] text-slate-800 dark:text-slate-300 font-serif tracking-[0.01em] max-w-[75ch]">
+    <ul className="list-disc pl-8 space-y-3 mb-6 text-[18px] sm:text-[20px] leading-[1.8] text-slate-800 dark:text-slate-400 font-serif tracking-[0.01em] max-w-[75ch]">
       {children}
     </ul>
   ),
   // Ordered list
   ol: ({ children }) => (
-    <ol className="list-decimal pl-8 space-y-3 mb-6 text-[18px] sm:text-[20px] leading-[1.8] text-slate-800 dark:text-slate-300 font-serif tracking-[0.01em] max-w-[75ch]">
+    <ol className="list-decimal pl-8 space-y-3 mb-6 text-[18px] sm:text-[20px] leading-[1.8] text-slate-800 dark:text-slate-400 font-serif tracking-[0.01em] max-w-[75ch]">
       {children}
     </ol>
   ),
