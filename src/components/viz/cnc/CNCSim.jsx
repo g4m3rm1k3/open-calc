@@ -1,6 +1,14 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { CNCEngine, MACHINE_DEFINITIONS, TOOL_TEMPLATES } from "./CNCEngine.js";
 import CNCBackplot from "./CNCBackplot.jsx";
+import {
+  applyCoordinateSystemToOffsets,
+  coordinateSystemsToBackplotFrames,
+  createDefaultCoordinateSystems,
+  makeCoordinateSystem,
+  normalizeCoordinateSystems,
+  syncCoordinateSystemsFromOffsets,
+} from "./core/coordinateSystems.js";
 
 function channelStateToMs(ch) {
   const base = initMS();
@@ -1909,6 +1917,11 @@ export default function CNCSimPro() {
   const activeToolClass = mach.isLathe ? "lathe" : "mill";
 
   const [ms, setMs] = useState(initMS);
+  const [coordinateSystems, setCoordinateSystems] = useState(() =>
+    createDefaultCoordinateSystems(initMS().offsets),
+  );
+  const [activeCoordinateSystemId, setActiveCoordinateSystemId] =
+    useState("wcs_G54");
   const [toolLibraries, setToolLibraries] = useState(() => {
     try {
       const saved = JSON.parse(
@@ -2126,6 +2139,12 @@ export default function CNCSimPro() {
     projectFilesRef.current = projectFiles;
   }, [projectFiles]);
   useEffect(() => {
+    setCoordinateSystems((prev) => {
+      const next = syncCoordinateSystemsFromOffsets(prev, ms.offsets);
+      return JSON.stringify(prev) === JSON.stringify(next) ? prev : next;
+    });
+  }, [ms.offsets]);
+  useEffect(() => {
     if (!projectFiles.length) return;
     if (!activeFileId || !projectFiles.some((f) => f.id === activeFileId)) {
       setActiveFileId(projectFiles[0].id);
@@ -2278,6 +2297,8 @@ export default function CNCSimPro() {
       });
     }
     setMs(initMS());
+    setCoordinateSystems(createDefaultCoordinateSystems(initMS().offsets));
+    setActiveCoordinateSystemId("wcs_G54");
     const lib = getProgLib(def);
     if (lib?.length) {
       const nextFiles = exampleToProject(lib[0], "main", null, def);
@@ -2397,6 +2418,42 @@ export default function CNCSimPro() {
       ),
     );
   }, []);
+
+  const updateCoordinateSystem = useCallback((id, patch) => {
+    setCoordinateSystems((prev) => {
+      let updatedFrame = null;
+      const next = prev.map((frame) => {
+        if (frame.id !== id) return frame;
+        updatedFrame = makeCoordinateSystem({
+          ...frame,
+          ...patch,
+          origin: { ...frame.origin, ...(patch.origin || {}) },
+          rotation: { ...frame.rotation, ...(patch.rotation || {}) },
+        });
+        return updatedFrame;
+      });
+      if (updatedFrame?.id?.startsWith("wcs_")) {
+        setMs((m) => ({
+          ...m,
+          offsets: applyCoordinateSystemToOffsets(m.offsets, updatedFrame),
+        }));
+      }
+      return next;
+    });
+  }, []);
+
+  const addCoordinateSystem = useCallback(() => {
+    const nextIndex =
+      coordinateSystems.filter((frame) => frame.type === "user").length + 1;
+    const frame = makeCoordinateSystem({
+      name: `CS${nextIndex}`,
+      type: "user",
+      parentId: "setup",
+      origin: { X: stock.x || 0, Y: stock.y || 0, Z: stock.z || 0 },
+    });
+    setCoordinateSystems((prev) => [...prev, frame]);
+    setActiveCoordinateSystemId(frame.id);
+  }, [coordinateSystems, stock.x, stock.y, stock.z]);
 
   useEffect(() => {
     const next = channelStates[activeChannel];
@@ -3955,6 +4012,8 @@ export default function CNCSimPro() {
       toolLibraries,
       stock,
       fixtures,
+      coordinateSystems,
+      activeCoordinateSystemId,
       geoms,
       offsets: ms.offsets,
       wcs: ms.wcs,
@@ -4001,6 +4060,22 @@ export default function CNCSimPro() {
         if (d.tools) setTools(normalizeToolTable(d.tools, activeToolClass));
         if (d.stock) setStock(d.stock);
         if (d.fixtures) setFixtures(d.fixtures);
+        if (d.offsets || d.wcs || d.home) {
+          setMs((m) => ({
+            ...m,
+            offsets: d.offsets || m.offsets,
+            wcs: d.wcs || m.wcs,
+            home: d.home || m.home,
+          }));
+        }
+        if (d.coordinateSystems) {
+          setCoordinateSystems(
+            normalizeCoordinateSystems(d.coordinateSystems, d.offsets || {}),
+          );
+        }
+        if (d.activeCoordinateSystemId) {
+          setActiveCoordinateSystemId(d.activeCoordinateSystemId);
+        }
         if (d.geoms) setGeoms(d.geoms);
         if (d.savedProgs) setSavedProgs(d.savedProgs);
         if (d.geomDepth) setGeomDepth(d.geomDepth);
@@ -4086,6 +4161,11 @@ export default function CNCSimPro() {
   const activeT = tools[ms.activeT];
   const activeTool = activeT || tools[1] || null;
   const currentChannel = channelStates[activeChannel];
+  const activeCoordinateSystem =
+    coordinateSystems.find((frame) => frame.id === activeCoordinateSystemId) ||
+    coordinateSystems.find((frame) => frame.id === `wcs_${ms.wcs}`) ||
+    coordinateSystems[0] ||
+    null;
   const backplotIs3D = vpView === "iso";
   // Z offset to lift path and tool so stock sits on the grid.
   // G-code Z=0 (part top) → scene Z = stockDepth; Z=-5 (cut) → scene Z = stockDepth-5.
@@ -4176,6 +4256,22 @@ export default function CNCSimPro() {
       c: ms.pos.C || 0,
     };
   }, [mach.isLathe, ms.pos.X, ms.pos.Y, ms.pos.Z, ms.pos.B, ms.pos.C, ms.wcs, ms.offsets, backplotZOffset]);
+  const backplotCoordinateFrames = useMemo(
+    () =>
+      coordinateSystemsToBackplotFrames(coordinateSystems, {
+        activeId: activeCoordinateSystemId,
+        activeWCS: ms.wcs,
+        zOffset: backplotZOffset,
+        machineClass: mach.isLathe ? "lathe" : "mill",
+      }),
+    [
+      coordinateSystems,
+      activeCoordinateSystemId,
+      ms.wcs,
+      backplotZOffset,
+      mach.isLathe,
+    ],
+  );
   const unitScale = ms.units === "inch" ? 25.4 : 1;
   const backplotToolDiameter =
     ((activeTool?.dia ?? 10) + (activeTool?.wearR ?? 0) * 2) / unitScale;
@@ -5324,7 +5420,10 @@ export default function CNCSimPro() {
                     <div
                       key={k}
                       className={`wcs-item${ms.wcs === k ? " on" : ""}`}
-                      onClick={() => setMs((m) => ({ ...m, wcs: k }))}
+                      onClick={() => {
+                        setMs((m) => ({ ...m, wcs: k }));
+                        setActiveCoordinateSystemId(`wcs_${k}`);
+                      }}
                     >
                       <div>
                         <div
@@ -5440,6 +5539,199 @@ export default function CNCSimPro() {
                   >
                     Zero All
                   </button>
+                  <div className="div" />
+                  <div
+                    className="sec"
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <span>Coordinate Systems</span>
+                    <button
+                      className="btn btn-gr"
+                      style={{ fontSize: 8, padding: "2px 6px" }}
+                      onClick={addCoordinateSystem}
+                    >
+                      + Add
+                    </button>
+                  </div>
+                  {coordinateSystems.map((frame) => {
+                    const active = activeCoordinateSystemId === frame.id;
+                    return (
+                      <div
+                        key={frame.id}
+                        className={`wcs-item${active ? " on" : ""}`}
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          gap: 8,
+                        }}
+                        onClick={() => {
+                          setActiveCoordinateSystemId(frame.id);
+                          if (frame.id.startsWith("wcs_")) {
+                            setMs((m) => ({ ...m, wcs: frame.id.slice(4) }));
+                          }
+                        }}
+                      >
+                        <div style={{ minWidth: 0 }}>
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 6,
+                              fontFamily: "monospace",
+                              fontWeight: 700,
+                              fontSize: 10,
+                              color: active ? C.green2 : C.txt,
+                            }}
+                          >
+                            <span>{frame.name}</span>
+                            <span
+                              style={{
+                                fontSize: 7,
+                                color: C.txt3,
+                                textTransform: "uppercase",
+                              }}
+                            >
+                              {frame.type}
+                            </span>
+                          </div>
+                          <div style={{ display: "flex", gap: 8, marginTop: 2 }}>
+                            {["X", "Y", "Z"].map((ax) => (
+                              <span
+                                key={ax}
+                                style={{
+                                  fontSize: 8,
+                                  color: C.txt3,
+                                  fontFamily: "monospace",
+                                }}
+                              >
+                                {ax}:{(frame.origin?.[ax] || 0).toFixed(2)}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                        <button
+                          className={`btn${frame.visible !== false ? " btn-gr" : ""}`}
+                          style={{
+                            fontSize: 8,
+                            padding: "2px 6px",
+                            flexShrink: 0,
+                          }}
+                          title="Toggle this coordinate frame in the 3D viewport"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            updateCoordinateSystem(frame.id, {
+                              visible: frame.visible === false,
+                            });
+                          }}
+                        >
+                          {frame.visible !== false ? "On" : "Off"}
+                        </button>
+                      </div>
+                    );
+                  })}
+                  {activeCoordinateSystem && (
+                    <>
+                      <div className="div" />
+                      <div className="sec">Edit CS: {activeCoordinateSystem.name}</div>
+                      {!activeCoordinateSystem.locked && (
+                        <div className="field" style={{ marginBottom: 6 }}>
+                          <div className="lbl">Name</div>
+                          <input
+                            type="text"
+                            value={activeCoordinateSystem.name}
+                            onChange={(e) =>
+                              updateCoordinateSystem(activeCoordinateSystem.id, {
+                                name: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                      )}
+                      {["X", "Y", "Z"].map((ax) => (
+                        <div
+                          className="frow"
+                          key={ax}
+                          style={{ marginBottom: 4, alignItems: "center" }}
+                        >
+                          <span
+                            style={{
+                              width: 16,
+                              fontWeight: 700,
+                              fontSize: 11,
+                              color: axisColor(ax),
+                              flexShrink: 0,
+                            }}
+                          >
+                            {ax}
+                          </span>
+                          <input
+                            type="number"
+                            step={0.001}
+                            disabled={activeCoordinateSystem.locked}
+                            value={(activeCoordinateSystem.origin?.[ax] || 0).toFixed(3)}
+                            onChange={(e) =>
+                              updateCoordinateSystem(activeCoordinateSystem.id, {
+                                origin: {
+                                  [ax]: parseFloat(e.target.value) || 0,
+                                },
+                              })
+                            }
+                          />
+                        </div>
+                      ))}
+                      {["A", "B", "C"].map((ax) => (
+                        <div
+                          className="frow"
+                          key={ax}
+                          style={{ marginBottom: 4, alignItems: "center" }}
+                        >
+                          <span
+                            style={{
+                              width: 16,
+                              fontWeight: 700,
+                              fontSize: 11,
+                              color: axisColor(ax),
+                              flexShrink: 0,
+                            }}
+                          >
+                            {ax}
+                          </span>
+                          <input
+                            type="number"
+                            step={0.1}
+                            disabled={activeCoordinateSystem.locked}
+                            value={(activeCoordinateSystem.rotation?.[ax] || 0).toFixed(3)}
+                            onChange={(e) =>
+                              updateCoordinateSystem(activeCoordinateSystem.id, {
+                                rotation: {
+                                  [ax]: parseFloat(e.target.value) || 0,
+                                },
+                              })
+                            }
+                          />
+                        </div>
+                      ))}
+                      {!activeCoordinateSystem.locked && (
+                        <button
+                          className="btn btn-rd full"
+                          style={{ marginTop: 4 }}
+                          onClick={() => {
+                            setCoordinateSystems((prev) =>
+                              prev.filter((frame) => frame.id !== activeCoordinateSystem.id),
+                            );
+                            setActiveCoordinateSystemId(`wcs_${ms.wcs}`);
+                          }}
+                        >
+                          Delete Coordinate System
+                        </button>
+                      )}
+                    </>
+                  )}
                   <div className="div" />
                   <div className="sec">Machine Home</div>
                   {mach.axes.map((ax) => (
@@ -5813,6 +6105,7 @@ export default function CNCSimPro() {
                   showCuts={layers.removal}
                   stockSTLBuffer={stockSTLBuffer}
                   fixtures={fixtures}
+                  coordinateFrames={backplotCoordinateFrames}
                   selectedFixtureId={selectedFixtureId}
                   onSelectFixture={setSelectedFixtureId}
                   onFixtureTransform={handleFixtureTransform}

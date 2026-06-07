@@ -30,6 +30,7 @@ export default function CNCBackplot({
   stockSTLBuffer = null,
   // Fixture models: [{id, name, format, buffer, position:[x,y,z], rotation:[rx,ry,rz], scale:[sx,sy,sz], w, h, d}]
   fixtures = [],
+  coordinateFrames = [],
   selectedFixtureId = null,
   onSelectFixture = null, // (id|null) => void
   onFixtureTransform = null, // (id, {pos, rot, scl}) => void
@@ -51,6 +52,7 @@ export default function CNCBackplot({
   const rafRef = useRef(null);
   // Fixture / transform refs
   const fixtureLayerRef = useRef(null);
+  const coordinateFrameLayerRef = useRef(null);
   const transformControlsRef = useRef(null);
   const fixtureObjectsRef = useRef(new Map()); // id → THREE.Object3D
   const facePickModeRef = useRef(false);
@@ -146,6 +148,10 @@ export default function CNCBackplot({
     const fixtureLayer = new THREE.Group();
     scene.add(fixtureLayer);
     fixtureLayerRef.current = fixtureLayer;
+
+    const coordinateFrameLayer = new THREE.Group();
+    scene.add(coordinateFrameLayer);
+    coordinateFrameLayerRef.current = coordinateFrameLayer;
 
     // ── TransformControls ─────────────────────────────────────────────────
     const tc = new TransformControls(camera, renderer.domElement);
@@ -271,6 +277,7 @@ export default function CNCBackplot({
       clearGroup(cutsLayerRef.current);
       clearGroup(toolRef.current);
       clearGroup(fixtureLayerRef.current);
+      clearGroup(coordinateFrameLayerRef.current);
       if (gridRef.current) {
         gridRef.current.geometry?.dispose?.();
         gridRef.current.material?.dispose?.();
@@ -286,6 +293,7 @@ export default function CNCBackplot({
       cutsLayerRef.current = null;
       toolRef.current = null;
       fixtureLayerRef.current = null;
+      coordinateFrameLayerRef.current = null;
       transformControlsRef.current = null;
       gridRef.current = null;
       rafRef.current = null;
@@ -351,6 +359,100 @@ export default function CNCBackplot({
     if (!mountedRef.current) return;
     if (toolRef.current) toolRef.current.visible = !!showTool;
   }, [showTool]);
+
+  useEffect(() => {
+    const group = coordinateFrameLayerRef.current;
+    if (!group) return;
+    clearGroup(group);
+    if (!coordinateFrames?.length) return;
+
+    const makeLabel = (text, color) => {
+      const canvas = document.createElement("canvas");
+      canvas.width = 256;
+      canvas.height = 64;
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.font = "700 24px JetBrains Mono, monospace";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "rgba(15, 23, 42, 0.78)";
+      ctx.fillRect(0, 8, canvas.width, 48);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(1, 9, canvas.width - 2, 46);
+      ctx.fillStyle = color;
+      ctx.fillText(text, 12, canvas.height / 2);
+      const texture = new THREE.CanvasTexture(canvas);
+      const sprite = new THREE.Sprite(
+        new THREE.SpriteMaterial({
+          map: texture,
+          transparent: true,
+          depthWrite: false,
+        }),
+      );
+      sprite.scale.set(42, 10.5, 1);
+      return sprite;
+    };
+
+    coordinateFrames.forEach((frame) => {
+      const root = new THREE.Group();
+      const pos = frame.position || [0, 0, 0];
+      const rot = frame.rotation || [0, 0, 0];
+      root.position.set(pos[0] || 0, pos[1] || 0, pos[2] || 0);
+      root.rotation.set(rot[0] || 0, rot[1] || 0, rot[2] || 0);
+
+      const size = frame.type === "machine" ? 42 : frame.active ? 36 : 28;
+      const head = size * 0.18;
+      const shaft = size * 0.08;
+      root.add(
+        new THREE.ArrowHelper(
+          new THREE.Vector3(1, 0, 0),
+          new THREE.Vector3(0, 0, 0),
+          size,
+          0xef4444,
+          head,
+          shaft,
+        ),
+      );
+      root.add(
+        new THREE.ArrowHelper(
+          new THREE.Vector3(0, 1, 0),
+          new THREE.Vector3(0, 0, 0),
+          size,
+          0x22c55e,
+          head,
+          shaft,
+        ),
+      );
+      root.add(
+        new THREE.ArrowHelper(
+          new THREE.Vector3(0, 0, 1),
+          new THREE.Vector3(0, 0, 0),
+          size,
+          0x38bdf8,
+          head,
+          shaft,
+        ),
+      );
+
+      const ring = new THREE.Mesh(
+        new THREE.TorusGeometry(size * 0.16, size * 0.012, 8, 32),
+        new THREE.MeshBasicMaterial({
+          color: frame.active ? 0xfacc15 : 0x94a3b8,
+          transparent: true,
+          opacity: frame.active ? 0.95 : 0.55,
+        }),
+      );
+      ring.rotation.x = Math.PI / 2;
+      root.add(ring);
+
+      const labelColor = frame.active ? "#facc15" : "#cbd5e1";
+      const label = makeLabel(frame.name || frame.id || "CS", labelColor);
+      label.position.set(size * 0.42, size * 0.42, size * 0.42);
+      root.add(label);
+
+      group.add(root);
+    });
+  }, [coordinateFrames]);
 
   // ── Rebuild stock block ──────────────────────────────────────────────────
   useEffect(() => {
