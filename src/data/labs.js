@@ -40,6 +40,16 @@ export const LABS = [
     cover: { grad: 'from-violet-700 via-purple-800 to-indigo-950', mark: 'Ax=b', sub: 'Row Ops · RREF · QR' },
   },
   {
+    key: 'matrix-reducer',
+    label: 'Matrix Reducer',
+    emoji: '⊞',
+    color: 'green',
+    desc: 'Interactive row-reduction workspace — apply swap, scale, and replace operations manually, or let the solver walk you through REF and RREF step by step with exact fractions.',
+    path: '/matrix-reducer',
+    tags: ['Math', 'Linear Algebra'],
+    cover: { grad: 'from-green-700 via-emerald-800 to-teal-950', mark: 'RREF', sub: 'Row Ops · REF · RREF' },
+  },
+  {
     key: 'odds-lab',
     label: 'Probability Casino Lab',
     emoji: '21',

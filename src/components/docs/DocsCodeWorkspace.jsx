@@ -67,6 +67,7 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = n
   const [addingName, setAddingName] = useState('')
   const [pendingReplace, setPendingReplace] = useState(null)
   const [previewDoc, setPreviewDoc] = useState('')
+  const [previewFullscreen, setPreviewFullscreen] = useState(false)
   const [bottomTab, setBottomTab] = useState('terminal')  // 'terminal' | 'preview'
   const [outputMode, setOutputMode] = useState('split')
   const addInputRef = useRef(null)

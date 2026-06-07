@@ -174,7 +174,16 @@ const MD_CSS = `
 .md-code-btn.run:hover { background: #e0f2fe; }
 .dark .md-code-btn.run:hover { background: #0c4a6e; }
 .md-code-monaco { overflow: hidden; }
-.md-code-monaco .monaco-editor .overflow-guard { border-radius: 0 0 6px 6px; }
+.md-code-monaco .monaco-editor .overflow-guard { border-radius: 0; }
+.md-resize-handle { height: 6px; cursor: row-resize; background: #e2e8f0; display: flex; align-items: center; justify-content: center; transition: background 0.15s; border-radius: 0 0 8px 8px; }
+.dark .md-resize-handle { background: #1e293b; }
+.md-resize-handle:hover, .md-resize-handle.dragging { background: #3b82f6; }
+.dark .md-resize-handle:hover, .dark .md-resize-handle.dragging { background: #2563eb; }
+.md-resize-handle::after { content: ''; width: 28px; height: 2px; border-radius: 2px; background: #94a3b8; }
+.dark .md-resize-handle::after { background: #334155; }
+.md-splitter { width: 5px; cursor: col-resize; flex-shrink: 0; background: transparent; transition: background 0.15s; position: relative; z-index: 10; }
+.md-splitter:hover, .md-splitter.dragging { background: #3b82f6; }
+.dark .md-splitter:hover, .dark .md-splitter.dragging { background: #2563eb; }
 /* ── Inline doc reference badge ── */
 .md-ref-badge { font-size: 8px; font-weight: 700; vertical-align: super; margin-left: 2px; padding: 1px 4px; border-radius: 3px; text-decoration: none; line-height: 1; white-space: nowrap; }
 .md-ref-badge.mdn { background: #dbeafe; color: #1d4ed8; border: 1px solid #bfdbfe; }
@@ -203,10 +212,27 @@ const DocsCtx = createContext({ isDark: false, onRun: null, codeAlongOpen: false
 function MdCodeBlock({ language, code }) {
   const { isDark, onRun, codeAlongOpen } = useContext(DocsCtx)
   const [copied, setCopied] = useState(false)
+  const [dragging, setDragging] = useState(false)
+  const [editorHeight, setEditorHeight] = useState(() =>
+    Math.min(Math.max(code.split('\n').length * 19 + 24, 72), 540)
+  )
 
   const monacoLang = MONACO_LANG[language] || language
-  const lineCount = code.split('\n').length
-  const editorHeight = Math.min(Math.max(lineCount * 19 + 24, 72), 540)
+
+  const onResizeStart = useCallback((e) => {
+    e.preventDefault()
+    const startY = e.clientY
+    const startH = editorHeight
+    setDragging(true)
+    const onMove = (ev) => setEditorHeight(Math.max(80, startH + ev.clientY - startY))
+    const onUp = () => {
+      setDragging(false)
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+    }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+  }, [editorHeight])
 
   const handleCopy = useCallback(() => {
     navigator.clipboard.writeText(code).catch(() => {})
@@ -273,6 +299,11 @@ function MdCodeBlock({ language, code }) {
           }}
         />
       </div>
+      <div
+        className={`md-resize-handle${dragging ? ' dragging' : ''}`}
+        onMouseDown={onResizeStart}
+        title="Drag to resize"
+      />
     </div>
   )
 }
@@ -428,7 +459,27 @@ export default function MarkdownHub() {
   const [codeAlongOpen, setCodeAlongOpen] = useState(false)
   const [docsNavOpen, setDocsNavOpen] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 640)
   const [pendingRun, setPendingRun] = useState(null)
+  const [codeAlongPx, setCodeAlongPx] = useState(560)
+  const [splitterDragging, setSplitterDragging] = useState(false)
   const isDark = useIsDark()
+
+  const handleSplitterDrag = useCallback((e) => {
+    e.preventDefault()
+    const startX = e.clientX
+    const startW = codeAlongPx
+    setSplitterDragging(true)
+    const onMove = (ev) => {
+      const delta = startX - ev.clientX
+      setCodeAlongPx(Math.max(300, Math.min(startW + delta, window.innerWidth - 350)))
+    }
+    const onUp = () => {
+      setSplitterDragging(false)
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+    }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+  }, [codeAlongPx])
 
   const handleRunInCodeAlong = useCallback((code, monacoLang) => {
     const wsLang = WORKSPACE_LANG[monacoLang] || 'javascript'
@@ -972,7 +1023,7 @@ export default function MarkdownHub() {
             )}
           </div>
 
-          <div className={`${codeAlongOpen ? (docsNavOpen ? 'basis-[42%]' : 'basis-[46%]') + ' min-w-0' : 'flex-1'} flex flex-col overflow-hidden bg-white dark:bg-[#0b1322]`}>
+          <div className={`flex-1 min-w-0 flex flex-col overflow-hidden bg-white dark:bg-[#0b1322]`}>
             {tab === 'tutorials' && (
               <div className="flex-1 overflow-y-auto px-6 sm:px-10 lg:px-16 py-8 custom-scrollbar">
                 {loading ? (
@@ -1052,9 +1103,16 @@ export default function MarkdownHub() {
           </div>
 
           {codeAlongOpen && (
-            <div className={`${docsNavOpen ? 'basis-[58%]' : 'basis-[54%]'} hidden md:block min-w-[420px]`}>
-              <DocsCodeWorkspace activeTitle={activeTitle} pendingRun={pendingRun} />
-            </div>
+            <>
+              <div
+                className={`md-splitter hidden md:block${splitterDragging ? ' dragging' : ''}`}
+                onMouseDown={handleSplitterDrag}
+                title="Drag to resize"
+              />
+              <div className="hidden md:flex flex-col shrink-0 overflow-hidden" style={{ width: codeAlongPx }}>
+                <DocsCodeWorkspace activeTitle={activeTitle} pendingRun={pendingRun} />
+              </div>
+            </>
           )}
         </div>
         </DocsCtx.Provider>

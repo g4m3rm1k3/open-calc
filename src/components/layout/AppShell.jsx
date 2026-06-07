@@ -41,6 +41,7 @@ import {
   Gamepad2,
   Library,
   FlaskConical,
+  Grid3x3,
   Heart,
   Brain,
   Swords,
@@ -358,6 +359,16 @@ function TopBar({
             }
           >
             <FlaskConical className="w-5 h-5" />
+          </NavLink>
+          <NavLink
+            to="/matrix-reducer"
+            title="Matrix Reducer"
+            aria-label="Matrix Reducer"
+            className={({ isActive }) =>
+              `p-2 rounded-lg transition-all ${isActive ? "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`
+            }
+          >
+            <Grid3x3 className="w-5 h-5" />
           </NavLink>
           <NavLink
             to="/reference"

@@ -70,7 +70,7 @@ export default function PythonGeneratorStepperViz() {
           <button 
             key={i} 
             onClick={() => setStepIdx(i)}
-            className={\`h-1.5 flex-1 rounded-full transition-colors \${i === stepIdx ? 'bg-fuchsia-500' : i < stepIdx ? 'bg-fuchsia-300 dark:bg-fuchsia-800' : 'bg-slate-200 dark:bg-slate-700'}\`} 
+            className={`h-1.5 flex-1 rounded-full transition-colors ${i === stepIdx ? 'bg-fuchsia-500' : i < stepIdx ? 'bg-fuchsia-300 dark:bg-fuchsia-800' : 'bg-slate-200 dark:bg-slate-700'}`} 
           />
         ))}
       </div>
@@ -189,9 +189,9 @@ function GeneratorVisual({ stepIdx }) {
             />
           )}
 
-          <div className={\`border-2 rounded-xl p-3 w-36 text-center shadow-sm relative z-10 transition-colors \${
+          <div className={`border-2 rounded-xl p-3 w-36 text-center shadow-sm relative z-10 transition-colors ${
             stepIdx === 2 ? 'border-amber-400 bg-amber-50 dark:bg-amber-900/30' : 'border-fuchsia-400 bg-fuchsia-50 dark:bg-fuchsia-900/20'
-          }\`}>
+          }`}>
             <div className="text-[10px] font-bold text-fuchsia-600 dark:text-fuchsia-400 uppercase tracking-wider mb-2">
               Generator
             </div>
@@ -200,9 +200,9 @@ function GeneratorVisual({ stepIdx }) {
               n = {stepIdx === 2 ? 1 : stepIdx === 3 ? 2 : '?'}
             </div>
             
-            <div className={\`text-[10px] font-bold mt-2 py-0.5 px-1 rounded \${
+            <div className={`text-[10px] font-bold mt-2 py-0.5 px-1 rounded ${
               stepIdx === 2 ? 'bg-amber-200 text-amber-800 dark:bg-amber-800 dark:text-amber-100' : 'bg-fuchsia-200 text-fuchsia-800 dark:bg-fuchsia-800 dark:text-fuchsia-100'
-            }\`}>
+            }`}>
               {stepIdx === 1 ? 'READY' : stepIdx === 2 ? 'SUSPENDED' : 'RESUMED'}
             </div>
           </div>
