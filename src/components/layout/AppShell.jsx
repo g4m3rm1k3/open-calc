@@ -706,6 +706,10 @@ export default function AppShell({ children }) {
   useEffect(() => {
     if (!scratchOpen) setScratchSnap(null);
   }, [scratchOpen]);
+  useEffect(() => {
+    document.body.dataset.chatOpen = chatOpen ? '1' : '0';
+    return () => { delete document.body.dataset.chatOpen; };
+  }, [chatOpen]);
   const closeAllTools = useCallback(() => {
     setGraphOpen(false);
     setGraph3DOpen(false);

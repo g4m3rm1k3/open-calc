@@ -622,8 +622,21 @@ import {
 } from "lucide-react"
 
 // ─── TutorPanel ───────────────────────────────────────────────────────────────
+function useChatPanelOpen() {
+  const [chatOpen, setChatPanelOpen] = useState(() => document.body.dataset.chatOpen === '1')
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setChatPanelOpen(document.body.dataset.chatOpen === '1')
+    })
+    observer.observe(document.body, { attributes: true, attributeFilter: ['data-chat-open'] })
+    return () => observer.disconnect()
+  }, [])
+  return chatOpen
+}
+
 export default function TutorPanel({ lesson, context = null, onApplyCode = null }) {
   const [open, setOpen] = useState(false)
+  const chatPanelOpen = useChatPanelOpen()
   const [view, setView] = useState('chat')
   const [settings, setSettings] = useState(loadSettings)
   const [messages, setMessages] = useState([])
@@ -978,7 +991,7 @@ export default function TutorPanel({ lesson, context = null, onApplyCode = null 
           whileHover={{ scale: 1.1, rotate: 5 }}
           whileTap={{ scale: 0.9 }}
           onClick={() => setOpen(true)}
-          className="fixed z-[10005] bottom-[88px] right-4 lg:bottom-6 lg:right-6 w-14 h-14 rounded-2xl shadow-[0_10px_30px_rgba(79,70,229,0.3)] bg-indigo-600 text-white flex items-center justify-center border border-white/20 dark:border-white/10 backdrop-blur-xl transition-all"
+          className={`fixed z-[10005] w-14 h-14 rounded-2xl shadow-[0_10px_30px_rgba(79,70,229,0.3)] bg-indigo-600 text-white flex items-center justify-center border border-white/20 dark:border-white/10 backdrop-blur-xl transition-all ${chatPanelOpen ? 'bottom-[88px] right-[calc(1rem+400px)] lg:bottom-6 lg:right-[416px]' : 'bottom-[88px] right-4 lg:bottom-6 lg:right-6'}`}
           title="STEM Coach"
         >
           <div className="absolute inset-0 bg-indigo-400/20 blur-xl rounded-full animate-pulse" />
