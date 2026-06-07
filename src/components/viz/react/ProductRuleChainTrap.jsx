@@ -40,9 +40,9 @@ function M({ t, display = false }) {
 }
 
 const DS = [
-  { border: "#6366f1", bg: "#eef2ff", text: "#4338ca", panelBg: "var(--color-background-secondary)" },
-  { border: "#0891b2", bg: "#ecfeff", text: "#0e7490", panelBg: "var(--color-background-primary)" },
-  { border: "#059669", bg: "#ecfdf5", text: "#047857", panelBg: "var(--color-background-secondary)" },
+  { border: "var(--ds-0-border)", bg: "var(--ds-0-bg)", text: "var(--ds-0-text)", panelBg: "var(--color-background-secondary)" },
+  { border: "var(--ds-1-border)", bg: "var(--ds-1-bg)", text: "var(--ds-1-text)", panelBg: "var(--color-background-primary)" },
+  { border: "var(--trap-text-emerald-solid)", bg: "var(--trap-bg-emerald-light)", text: "#047857", panelBg: "var(--color-background-secondary)" },
 ];
 const DL = ["Why?", "But why?", "Prove it"];
 
@@ -142,12 +142,12 @@ const PROBLEMS = [
 // ── Parse tree data ───────────────────────────────────────────────────────────
 function ParseTree({ problem, ready }) {
   const c = {
-    root:  "#7F77DD",
-    prod:  "#7F77DD",
+    root:  "var(--trap-border-indigo)",
+    prod:  "var(--trap-border-indigo)",
     left:  "#38bdf8",
     right: "#f472b6",
     chain: "#34d399",
-    wrong: "#ef4444",
+    wrong: "var(--trap-bg-red-solid)",
     bg:    "var(--color-background-secondary)",
     border:"var(--color-border-tertiary)",
   };
@@ -214,20 +214,20 @@ function ParseTree({ problem, ready }) {
 
       {/* Level 3: Wrong vs right */}
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 4 }}>
-        <div style={{ flex: 1, minWidth: 200, padding: "10px 12px", borderRadius: 8, background: "#FCEBEB", border: "1.5px solid #ef4444" }}>
-          <div style={{ fontSize: 11, fontWeight: 600, color: "#791F1F", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>
+        <div style={{ flex: 1, minWidth: 200, padding: "10px 12px", borderRadius: 8, background: "var(--trap-bg-red-soft)", border: "1.5px solid var(--trap-border-red)" }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: "var(--trap-text-red-dark)", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>
             The trap — missing chain ×
           </div>
-          <div style={{ fontSize: 12, color: "#501313", marginBottom: 6 }}>
+          <div style={{ fontSize: 12, color: "var(--trap-text-red-darker)", marginBottom: 6 }}>
             v′ written as outer only — forgot to multiply by inner derivative:
           </div>
           <M t={"v' = " + problem.vPrimeWrong + " \\quad \\color{red}{\\times}"} display ready={ready} />
         </div>
-        <div style={{ flex: 1, minWidth: 200, padding: "10px 12px", borderRadius: 8, background: "#E1F5EE", border: "1.5px solid #1D9E75" }}>
-          <div style={{ fontSize: 11, fontWeight: 600, color: "#085041", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>
+        <div style={{ flex: 1, minWidth: 200, padding: "10px 12px", borderRadius: 8, background: "var(--trap-bg-emerald-soft)", border: "1.5px solid var(--trap-border-emerald)" }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: "var(--trap-text-emerald-darker)", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>
             Correct — chain rule inline
           </div>
-          <div style={{ fontSize: 12, color: "#0F6E56", marginBottom: 6 }}>
+          <div style={{ fontSize: 12, color: "var(--trap-text-emerald-dark)", marginBottom: 6 }}>
             v′ computed with full chain rule before plugging in:
           </div>
           <M t={"v' = " + problem.vPrimeRight + " \\quad \\color{green}{\\checkmark}"} display ready={ready} />
@@ -264,15 +264,83 @@ export default function ProductRuleChainTrap({ params = {} }) {
   });
 
   return (
-    <div style={{ fontFamily: "var(--font-sans)", padding: "4px 0" }}>
-      <style>{`@keyframes sd{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}`}</style>
+    <div className="trap-viz-container" style={{ fontFamily: "var(--font-sans)", padding: "4px 0" }}>
+      <style>{`
+  @keyframes sd{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+  .trap-viz-container {
+    --trap-bg-red-soft: #FCEBEB;
+    --trap-text-red-dark: #791F1F;
+    --trap-text-red-darker: #501313;
+    --trap-border-red: #ef4444;
+    --trap-bg-red-solid: #ef4444;
+    --trap-bg-red-trans: #ef444422;
+    --trap-bg-indigo-soft: #EEEDFE;
+    --trap-text-indigo-darker: #26215C;
+    --trap-text-indigo-dark: #3C3489;
+    --trap-border-indigo: #7F77DD;
+    --trap-bg-indigo-trans: #7F77DD22;
+    --trap-bg-emerald-soft: #E1F5EE;
+    --trap-text-emerald-darker: #085041;
+    --trap-text-emerald-dark: #0F6E56;
+    --trap-border-emerald: #1D9E75;
+    --trap-bg-emerald-trans: #1D9E7522;
+    --trap-bg-emerald-light: #ecfdf5;
+    --trap-text-emerald-solid: #059669;
+    --trap-border-emerald-solid: #059669;
+    --trap-text-amber-dark: #BA7517;
+    --trap-border-amber: #BA7517;
+    --trap-bg-amber-trans: #BA751722;
+    --ds-0-border: #6366f1;
+    --ds-0-bg: #eef2ff;
+    --ds-0-text: #4338ca;
+    --ds-1-border: #0891b2;
+    --ds-1-bg: #ecfeff;
+    --ds-1-text: #0e7490;
+    --ds-2-border: #059669;
+    --ds-2-bg: #ecfdf5;
+    --ds-2-text: #047857;
+  }
+  .dark .trap-viz-container {
+    --trap-bg-red-soft: rgba(127, 29, 29, 0.2);
+    --trap-text-red-dark: #fca5a5;
+    --trap-text-red-darker: #fecaca;
+    --trap-border-red: #ef4444;
+    --trap-bg-red-solid: #ef4444;
+    --trap-bg-red-trans: rgba(239, 68, 68, 0.2);
+    --trap-bg-indigo-soft: rgba(49, 46, 129, 0.3);
+    --trap-text-indigo-darker: #c7d2fe;
+    --trap-text-indigo-dark: #a5b4fc;
+    --trap-border-indigo: #818cf8;
+    --trap-bg-indigo-trans: rgba(129, 140, 248, 0.2);
+    --trap-bg-emerald-soft: rgba(6, 78, 59, 0.3);
+    --trap-text-emerald-darker: #6ee7b7;
+    --trap-text-emerald-dark: #34d399;
+    --trap-border-emerald: #10b981;
+    --trap-bg-emerald-trans: rgba(16, 185, 129, 0.2);
+    --trap-bg-emerald-light: rgba(6, 78, 59, 0.2);
+    --trap-text-emerald-solid: #34d399;
+    --trap-border-emerald-solid: #10b981;
+    --trap-text-amber-dark: #fbbf24;
+    --trap-border-amber: #f59e0b;
+    --trap-bg-amber-trans: rgba(245, 158, 11, 0.2);
+    --ds-0-border: #818cf8;
+    --ds-0-bg: rgba(49, 46, 129, 0.3);
+    --ds-0-text: #c7d2fe;
+    --ds-1-border: #22d3ee;
+    --ds-1-bg: rgba(8, 145, 178, 0.2);
+    --ds-1-text: #67e8f9;
+    --ds-2-border: #34d399;
+    --ds-2-bg: rgba(6, 78, 59, 0.2);
+    --ds-2-text: #6ee7b7;
+  }
+`}</style>
 
       {/* Section tabs */}
       <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 14 }}>
-        <button onClick={() => setSection("trap")} style={sectionBtn("trap", "The trap", "#ef4444")}>The trap</button>
-        <button onClick={() => setSection("list")} style={sectionBtn("list", "Shopping list", "#7F77DD")}>Shopping list analogy</button>
-        <button onClick={() => setSection("tree")} style={sectionBtn("tree", "Parse tree", "#1D9E75")}>Parse tree</button>
-        <button onClick={() => setSection("compare")} style={sectionBtn("compare", "Right vs wrong", "#BA7517")}>Right vs wrong — side by side</button>
+        <button onClick={() => setSection("trap")} style={sectionBtn("trap", "The trap", "var(--trap-bg-red-solid)")}>The trap</button>
+        <button onClick={() => setSection("list")} style={sectionBtn("list", "Shopping list", "var(--trap-border-indigo)")}>Shopping list analogy</button>
+        <button onClick={() => setSection("tree")} style={sectionBtn("tree", "Parse tree", "var(--trap-border-emerald)")}>Parse tree</button>
+        <button onClick={() => setSection("compare")} style={sectionBtn("compare", "Right vs wrong", "var(--trap-text-amber-dark)")}>Right vs wrong — side by side</button>
       </div>
 
       {/* Problem selector */}
@@ -292,8 +360,8 @@ export default function ProductRuleChainTrap({ params = {} }) {
       {/* ── SECTION: THE TRAP ── */}
       {section === "trap" && (
         <div style={{ animation: "sd .2s ease-out" }}>
-          <div style={{ ...card, borderLeft: "3px solid #ef4444", borderRadius: 0, background: "#FCEBEB", marginBottom: 14 }}>
-            <div style={{ fontSize: 14, fontWeight: 500, color: "#501313", lineHeight: 1.6 }}>
+          <div style={{ ...card, borderLeft: "3px solid var(--trap-border-red)", borderRadius: 0, background: "var(--trap-bg-red-soft)", marginBottom: 14 }}>
+            <div style={{ fontSize: 14, fontWeight: 500, color: "var(--trap-text-red-darker)", lineHeight: 1.6 }}>
               The trap: thinking in "Phase 1, Phase 2" — applying product rule first, then coming back and applying chain rule to v′ as if it were a new differentiation problem.
             </div>
           </div>
@@ -305,8 +373,8 @@ export default function ProductRuleChainTrap({ params = {} }) {
           {/* Wrong step 1 */}
           <div style={{ background: "var(--color-background-primary)", border: "0.5px solid var(--color-border-tertiary)", borderRadius: 10, overflow: "hidden", marginBottom: 8 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 16px", background: "var(--color-background-secondary)", borderBottom: "0.5px solid var(--color-border-tertiary)" }}>
-              <div style={{ width: 26, height: 26, borderRadius: "50%", background: "#ef4444", color: "#fff", fontSize: 12, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>1</div>
-              <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".07em", textTransform: "uppercase", padding: "2px 8px", borderRadius: 16, background: "#FCEBEB", color: "#791F1F" }}>Apply product rule</span>
+              <div style={{ width: 26, height: 26, borderRadius: "50%", background: "var(--trap-bg-red-solid)", color: "#fff", fontSize: 12, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>1</div>
+              <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".07em", textTransform: "uppercase", padding: "2px 8px", borderRadius: 16, background: "var(--trap-bg-red-soft)", color: "var(--trap-text-red-dark)" }}>Apply product rule</span>
             </div>
             <div style={{ padding: "14px 16px" }}>
               <p style={{ fontSize: 14, color: "var(--color-text-primary)", marginBottom: 10 }}>
@@ -323,21 +391,21 @@ export default function ProductRuleChainTrap({ params = {} }) {
           </div>
 
           {/* Wrong step 2 — THE TRAP */}
-          <div style={{ background: "var(--color-background-primary)", border: "1.5px solid #ef4444", borderRadius: 10, overflow: "hidden", marginBottom: 8 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 16px", background: "#FCEBEB", borderBottom: "1.5px solid #ef4444" }}>
-              <div style={{ width: 26, height: 26, borderRadius: "50%", background: "#ef4444", color: "#fff", fontSize: 12, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>2</div>
-              <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".07em", textTransform: "uppercase", padding: "2px 8px", borderRadius: 16, background: "#ef444422", color: "#791F1F" }}>THE TRAP — incomplete v′</span>
+          <div style={{ background: "var(--color-background-primary)", border: "1.5px solid var(--trap-border-red)", borderRadius: 10, overflow: "hidden", marginBottom: 8 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 16px", background: "var(--trap-bg-red-soft)", borderBottom: "1.5px solid var(--trap-border-red)" }}>
+              <div style={{ width: 26, height: 26, borderRadius: "50%", background: "var(--trap-bg-red-solid)", color: "#fff", fontSize: 12, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>2</div>
+              <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".07em", textTransform: "uppercase", padding: "2px 8px", borderRadius: 16, background: "var(--trap-bg-red-trans)", color: "var(--trap-text-red-dark)" }}>THE TRAP — incomplete v′</span>
               <span style={{ marginLeft: "auto", fontSize: 20 }}>⚠</span>
             </div>
             <div style={{ padding: "14px 16px" }}>
-              <p style={{ fontSize: 14, color: "#791F1F", fontWeight: 500, marginBottom: 10 }}>
+              <p style={{ fontSize: 14, color: "var(--trap-text-red-dark)", fontWeight: 500, marginBottom: 10 }}>
                 The mistake: writing v′ using only the outer part of the chain rule, then stopping.
               </p>
-              <div style={{ background: "#FCEBEB", borderRadius: 8, padding: "12px", textAlign: "center", overflowX: "auto", marginBottom: 10 }}>
+              <div style={{ background: "var(--trap-bg-red-soft)", borderRadius: 8, padding: "12px", textAlign: "center", overflowX: "auto", marginBottom: 10 }}>
                 <M t={"v = " + p.v + " \\quad\\Rightarrow\\quad v' = " + p.vPrimeWrong + " \\quad \\color{red}{\\longleftarrow \\text{ INCOMPLETE}}"} display ready={ready} />
               </div>
-              <div style={{ padding: "10px 14px", borderLeft: "3px solid #ef4444", background: "#FCEBEB", borderRadius: "0 6px 6px 0", marginBottom: 10 }}>
-                <div style={{ fontSize: 13, color: "#501313", lineHeight: 1.7 }}>
+              <div style={{ padding: "10px 14px", borderLeft: "3px solid var(--trap-border-red)", background: "var(--trap-bg-red-soft)", borderRadius: "0 6px 6px 0", marginBottom: 10 }}>
+                <div style={{ fontSize: 13, color: "var(--trap-text-red-darker)", lineHeight: 1.7 }}>
                   This is the outer derivative only. The inner function is NOT just x — it's a function of x — so the chain rule multiplier is missing.
                   By writing only the outer derivative and calling it done, you have completed half of the chain rule and abandoned the other half.
                 </div>
@@ -360,8 +428,8 @@ export default function ProductRuleChainTrap({ params = {} }) {
           </div>
 
           {/* Resulting wrong answer */}
-          <div style={{ ...card, borderLeft: "3px solid #ef4444", borderRadius: 0, background: "#FCEBEB" }}>
-            <div style={{ fontSize: 11, fontWeight: 600, color: "#791F1F", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>Result of the trap</div>
+          <div style={{ ...card, borderLeft: "3px solid var(--trap-border-red)", borderRadius: 0, background: "var(--trap-bg-red-soft)" }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: "var(--trap-text-red-dark)", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>Result of the trap</div>
             <M t={"h'(x) = " + p.wrongAnswer + " \\quad \\color{red}{\\text{WRONG}}"} display ready={ready} />
           </div>
         </div>
@@ -370,8 +438,8 @@ export default function ProductRuleChainTrap({ params = {} }) {
       {/* ── SECTION: SHOPPING LIST ── */}
       {section === "list" && (
         <div style={{ animation: "sd .2s ease-out" }}>
-          <div style={{ ...card, borderLeft: "3px solid #7F77DD", borderRadius: 0, background: "#EEEDFE", marginBottom: 14 }}>
-            <div style={{ fontSize: 14, fontWeight: 500, color: "#26215C", lineHeight: 1.7 }}>
+          <div style={{ ...card, borderLeft: "3px solid var(--trap-border-indigo)", borderRadius: 0, background: "var(--trap-bg-indigo-soft)", marginBottom: 14 }}>
+            <div style={{ fontSize: 14, fontWeight: 500, color: "var(--trap-text-indigo-darker)", lineHeight: 1.7 }}>
               The mental model that prevents the trap: think of the product rule as a shopping list.
               You need four ingredients. If one of them is complicated, you compute it fully before writing it down.
               You do not write a half-finished ingredient and come back to it.
@@ -402,21 +470,21 @@ export default function ProductRuleChainTrap({ params = {} }) {
           </div>
 
           {/* The key insight */}
-          <div style={{ ...card, borderLeft: "3px solid #7F77DD", borderRadius: 0, background: "#EEEDFE", marginBottom: 10 }}>
-            <div style={{ fontSize: 13, fontWeight: 500, color: "#26215C", marginBottom: 8 }}>The Russian Doll rule:</div>
-            <div style={{ fontSize: 13, color: "#3C3489", lineHeight: 1.7 }}>
+          <div style={{ ...card, borderLeft: "3px solid var(--trap-border-indigo)", borderRadius: 0, background: "var(--trap-bg-indigo-soft)", marginBottom: 10 }}>
+            <div style={{ fontSize: 13, fontWeight: 500, color: "var(--trap-text-indigo-darker)", marginBottom: 8 }}>The Russian Doll rule:</div>
+            <div style={{ fontSize: 13, color: "var(--trap-text-indigo-dark)", lineHeight: 1.7 }}>
               When you reach Ingredient 4 (v′) and v is a "Russian Doll" — a function of a function — you must fully unpack it with chain rule <em>right there</em>, before writing it on your list.
               Once it is on the list, you stop differentiating. You plug it into the blueprint and do algebra.
             </div>
           </div>
 
           {/* Assembly */}
-          <div style={{ ...card, borderLeft: "3px solid #1D9E75", borderRadius: 0, background: "#E1F5EE" }}>
-            <div style={{ fontSize: 11, fontWeight: 600, color: "#085041", marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>
+          <div style={{ ...card, borderLeft: "3px solid var(--trap-border-emerald)", borderRadius: 0, background: "var(--trap-bg-emerald-soft)" }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: "var(--trap-text-emerald-darker)", marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>
               Assembly — all four ingredients plugged into blueprint
             </div>
             <M t={"h'(x) = \\underbrace{u'}_{" + p.uPrime + "} \\cdot \\underbrace{v}_{" + p.v + "} + \\underbrace{u}_{" + p.u + "} \\cdot \\underbrace{v'}_{" + p.vPrimeRight + "}"} display ready={ready} />
-            <div style={{ marginTop: 8, fontSize: 13, color: "#0F6E56" }}>
+            <div style={{ marginTop: 8, fontSize: 13, color: "var(--trap-text-emerald-dark)" }}>
               Once assembled, you are doing algebra. No more calculus. Do not differentiate again.
             </div>
           </div>
@@ -438,8 +506,8 @@ export default function ProductRuleChainTrap({ params = {} }) {
       {/* ── SECTION: PARSE TREE ── */}
       {section === "tree" && (
         <div style={{ animation: "sd .2s ease-out" }}>
-          <div style={{ ...card, borderLeft: "3px solid #1D9E75", borderRadius: 0, background: "#E1F5EE", marginBottom: 14 }}>
-            <div style={{ fontSize: 14, fontWeight: 500, color: "#085041", lineHeight: 1.6 }}>
+          <div style={{ ...card, borderLeft: "3px solid var(--trap-border-emerald)", borderRadius: 0, background: "var(--trap-bg-emerald-soft)", marginBottom: 14 }}>
+            <div style={{ fontSize: 14, fontWeight: 500, color: "var(--trap-text-emerald-darker)", lineHeight: 1.6 }}>
               A parser reads the expression as a tree. It zooms into one branch at a time, finishes it completely, then zooms back out.
               The chain rule happens inside the right branch — not after the tree is assembled.
             </div>
@@ -459,17 +527,17 @@ export default function ProductRuleChainTrap({ params = {} }) {
       {section === "compare" && (
         <div style={{ animation: "sd .2s ease-out" }}>
           <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
-            <button onClick={() => setShowWrong(w => !w)} style={{ padding: "7px 16px", borderRadius: 8, border: "1.5px solid #ef4444", background: showWrong ? "#FCEBEB" : "transparent", color: "#791F1F", cursor: "pointer", fontSize: 13, fontWeight: 500 }}>
+            <button onClick={() => setShowWrong(w => !w)} style={{ padding: "7px 16px", borderRadius: 8, border: "1.5px solid var(--trap-border-red)", background: showWrong ? "var(--trap-bg-red-soft)" : "transparent", color: "var(--trap-text-red-dark)", cursor: "pointer", fontSize: 13, fontWeight: 500 }}>
               {showWrong ? "▼" : "▶"} Show wrong working
             </button>
-            <button onClick={() => setShowRight(w => !w)} style={{ padding: "7px 16px", borderRadius: 8, border: "1.5px solid #1D9E75", background: showRight ? "#E1F5EE" : "transparent", color: "#085041", cursor: "pointer", fontSize: 13, fontWeight: 500 }}>
+            <button onClick={() => setShowRight(w => !w)} style={{ padding: "7px 16px", borderRadius: 8, border: "1.5px solid var(--trap-border-emerald)", background: showRight ? "var(--trap-bg-emerald-soft)" : "transparent", color: "var(--trap-text-emerald-darker)", cursor: "pointer", fontSize: 13, fontWeight: 500 }}>
               {showRight ? "▼" : "▶"} Show correct working
             </button>
           </div>
 
           {showWrong && (
-            <div style={{ padding: "14px 16px", border: "1.5px solid #ef4444", borderRadius: 10, background: "#FCEBEB", marginBottom: 10, animation: "sd .18s ease-out" }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "#791F1F", marginBottom: 10, textTransform: "uppercase", letterSpacing: ".06em" }}>Wrong working — missing chain multiplier</div>
+            <div style={{ padding: "14px 16px", border: "1.5px solid var(--trap-border-red)", borderRadius: 10, background: "var(--trap-bg-red-soft)", marginBottom: 10, animation: "sd .18s ease-out" }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--trap-text-red-dark)", marginBottom: 10, textTransform: "uppercase", letterSpacing: ".06em" }}>Wrong working — missing chain multiplier</div>
               {[
                 { step: "Set up", expr: "u = " + p.u + ", \\; v = " + p.v },
                 { step: "u′", expr: "u' = " + p.uPrime + " \\quad \\text{(correct)}" },
@@ -477,7 +545,7 @@ export default function ProductRuleChainTrap({ params = {} }) {
                 { step: "Assemble", expr: "h'(x) = " + p.wrongAnswer },
               ].map((row, i) => (
                 <div key={i} style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 8, padding: "8px 10px", background: "rgba(255,255,255,0.5)", borderRadius: 6 }}>
-                  <div style={{ fontSize: 11, color: "#791F1F", fontWeight: 600, minWidth: 80 }}>{row.step}</div>
+                  <div style={{ fontSize: 11, color: "var(--trap-text-red-dark)", fontWeight: 600, minWidth: 80 }}>{row.step}</div>
                   <div style={{ overflowX: "auto" }}><M t={row.expr} display ready={ready} /></div>
                 </div>
               ))}
@@ -485,8 +553,8 @@ export default function ProductRuleChainTrap({ params = {} }) {
           )}
 
           {showRight && (
-            <div style={{ padding: "14px 16px", border: "1.5px solid #1D9E75", borderRadius: 10, background: "#E1F5EE", marginBottom: 10, animation: "sd .18s ease-out" }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "#085041", marginBottom: 10, textTransform: "uppercase", letterSpacing: ".06em" }}>Correct working — chain rule inline</div>
+            <div style={{ padding: "14px 16px", border: "1.5px solid var(--trap-border-emerald)", borderRadius: 10, background: "var(--trap-bg-emerald-soft)", marginBottom: 10, animation: "sd .18s ease-out" }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--trap-text-emerald-darker)", marginBottom: 10, textTransform: "uppercase", letterSpacing: ".06em" }}>Correct working — chain rule inline</div>
               {[
                 { step: "Set up", expr: "u = " + p.u + ", \\; v = " + p.v },
                 { step: "u′", expr: "u' = " + p.uPrime },
@@ -496,7 +564,7 @@ export default function ProductRuleChainTrap({ params = {} }) {
                 { step: "Simplified", expr: p.rightFactored },
               ].map((row, i) => (
                 <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", marginBottom: 8, padding: "8px 10px", background: "rgba(255,255,255,0.5)", borderRadius: 6 }}>
-                  <div style={{ fontSize: 11, color: "#085041", fontWeight: 600, minWidth: 140, flexShrink: 0 }}>{row.step}</div>
+                  <div style={{ fontSize: 11, color: "var(--trap-text-emerald-darker)", fontWeight: 600, minWidth: 140, flexShrink: 0 }}>{row.step}</div>
                   <div style={{ overflowX: "auto" }}><M t={row.expr} display ready={ready} /></div>
                 </div>
               ))}
@@ -504,28 +572,28 @@ export default function ProductRuleChainTrap({ params = {} }) {
           )}
 
           {/* Numeric check */}
-          <button onClick={() => setShowCheck(c => !c)} style={{ padding: "5px 14px", borderRadius: 8, border: "0.5px solid #059669", background: showCheck ? "#ecfdf5" : "transparent", color: "#059669", cursor: "pointer", fontSize: 12, fontWeight: 500, marginBottom: 8 }}>
+          <button onClick={() => setShowCheck(c => !c)} style={{ padding: "5px 14px", borderRadius: 8, border: "0.5px solid var(--trap-border-emerald-solid)", background: showCheck ? "var(--trap-bg-emerald-light)" : "transparent", color: "var(--trap-text-emerald-solid)", cursor: "pointer", fontSize: 12, fontWeight: 500, marginBottom: 8 }}>
             {showCheck ? "▼" : "▶"} Numeric verification — why the wrong answer is provably wrong
           </button>
           {showCheck && (
             <div style={{ padding: "12px 14px", borderLeft: "3px solid #059669", borderRadius: "0 8px 8px 0", background: "var(--color-background-success)", animation: "sd .16s ease-out" }}>
               {p.numCheck.note && <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginBottom: 8 }}>{p.numCheck.note}</div>}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 8 }}>
-                <div style={{ padding: "8px 10px", background: "#FCEBEB", borderRadius: 6 }}>
-                  <div style={{ fontSize: 11, color: "#791F1F", fontWeight: 600, marginBottom: 4 }}>Wrong answer gives:</div>
-                  <div style={{ fontSize: 12, color: "#501313" }}>{p.numCheck.wrongX1}</div>
+                <div style={{ padding: "8px 10px", background: "var(--trap-bg-red-soft)", borderRadius: 6 }}>
+                  <div style={{ fontSize: 11, color: "var(--trap-text-red-dark)", fontWeight: 600, marginBottom: 4 }}>Wrong answer gives:</div>
+                  <div style={{ fontSize: 12, color: "var(--trap-text-red-darker)" }}>{p.numCheck.wrongX1}</div>
                 </div>
-                <div style={{ padding: "8px 10px", background: "#E1F5EE", borderRadius: 6 }}>
-                  <div style={{ fontSize: 11, color: "#085041", fontWeight: 600, marginBottom: 4 }}>Correct answer gives:</div>
-                  <div style={{ fontSize: 12, color: "#0F6E56" }}>{p.numCheck.rightX1}</div>
+                <div style={{ padding: "8px 10px", background: "var(--trap-bg-emerald-soft)", borderRadius: 6 }}>
+                  <div style={{ fontSize: 11, color: "var(--trap-text-emerald-darker)", fontWeight: 600, marginBottom: 4 }}>Correct answer gives:</div>
+                  <div style={{ fontSize: 12, color: "var(--trap-text-emerald-dark)" }}>{p.numCheck.rightX1}</div>
                 </div>
               </div>
-              <div style={{ fontSize: 12, color: "#059669", fontWeight: 500 }}>{p.numCheck.numerical}</div>
+              <div style={{ fontSize: 12, color: "var(--trap-text-emerald-solid)", fontWeight: 500 }}>{p.numCheck.numerical}</div>
             </div>
           )}
 
           {/* The final rule */}
-          <div style={{ marginTop: 12, padding: "14px 16px", borderLeft: "3px solid #BA7517", borderRadius: "0 8px 8px 0", background: "var(--color-background-warning)" }}>
+          <div style={{ marginTop: 12, padding: "14px 16px", borderLeft: "3px solid var(--trap-border-amber)", borderRadius: "0 8px 8px 0", background: "var(--color-background-warning)" }}>
             <div style={{ fontSize: 13, fontWeight: 500, color: "var(--color-text-primary)", lineHeight: 1.7 }}>
               The rule to internalise: once you write down the product rule blueprint
               (<M t={"u'v + uv'"} ready={ready} />), the calculus is over.
