@@ -139,6 +139,12 @@ export default {
         caption:
           "Comprehensive explanation of why +C is mathematically necessary. Includes the formal proof, geometric intuition, and examples showing how functions with the same derivative can only differ by vertical shifts.",
       },
+      {
+        id: "PowerRuleDerivationViz",
+        title: "Deriving the Power Rule for Antiderivatives",
+        caption:
+          "Explore how the power rule for derivatives works in reverse, and why adding a constant +C is necessary to capture all possible original functions.",
+      },
     ],
   },
 

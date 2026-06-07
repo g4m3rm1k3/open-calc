@@ -63,22 +63,16 @@ export default {
     ],
     visualizations: [
       {
-        id: "MVTIntegralExplorer",
+        id: "AverageValueExplorerMVT",
         title: "Average Value and the Equal-Area Rectangle",
         caption:
           "The blue shaded region is the area under f(x) on [a, b]. The orange rectangle has height f_avg = (1/(b−a)) ∫ₐᵇ f dx and the same base — equal area. The red dot marks c, the point where f(c) = f_avg. Drag a and b to change the interval and watch c shift.",
       },
-            {
-        id: "CounterexampleMVT",
-        title: "Average Value and the Equal-Area Rectangle",
+      {
+        id: "MeanValueIntegralViz",
+        title: "Mean Value Theorem for Integrals (Alternate Perspective)",
         caption:
-          "The blue shaded region is the area under f(x) on [a, b]. The orange rectangle has height f_avg = (1/(b−a)) ∫ₐᵇ f dx and the same base — equal area. The red dot marks c, the point where f(c) = f_avg. Drag a and b to change the interval and watch c shift.",
-      },
-                  {
-        id: "RealWorldMVT",
-        title: "Average Value and the Equal-Area Rectangle",
-        caption:
-          "The blue shaded region is the area under f(x) on [a, b]. The orange rectangle has height f_avg = (1/(b−a)) ∫ₐᵇ f dx and the same base — equal area. The red dot marks c, the point where f(c) = f_avg. Drag a and b to change the interval and watch c shift.",
+          "Another interactive perspective on how the average value is attained. Compare how the bounding area visually flattens to match the rectangle's area.",
       },
     ],
   },

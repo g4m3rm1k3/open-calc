@@ -63,6 +63,11 @@ export default {
         title: 'Sequence Explorer — Plot Any Sequence',
         caption: 'Type any formula for $a_n$ using $n$. The plot shows whether the terms settle toward a limit (convergent) or wander off (divergent). Toggle the $\\varepsilon$-band to see the formal definition of convergence in action: pick any $\\varepsilon$ and find the first $N$ after which all terms land inside the band.',
       },
+      {
+        id: 'SequenceViz',
+        title: 'Sequence Visualizer',
+        caption: 'An alternative visualization for sequences, focusing on their behavior as $n$ increases.',
+      },
     ],
   },
 

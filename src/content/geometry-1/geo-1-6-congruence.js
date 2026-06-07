@@ -53,16 +53,18 @@ Every triangle has exactly six measurements: three side lengths and three angle 
 
 The interactive below shows a triangle and all six of its measurements. Drag the vertices to see how changing one measurement forces others to change too.`,
       html: `<canvas id="cv" width="700" height="320" style="cursor:move"></canvas>
-<div id="measures" style="padding:10px 14px;font-family:Georgia,serif;background:var(--color-background-secondary, #f8fafc);border-top:1px solid var(--color-border-primary, #e2e8f0)"></div>`,
-      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc)}`,
+<div id="measures" style="padding:10px 14px;font-family:Georgia,serif;background:var(--color-background-secondary, transparent);border-top:1px solid var(--color-border-primary, #e2e8f0)"></div>`,
+      css: `body{margin:0;background:var(--color-background-secondary, transparent)}`,
       startCode: `var canvas=document.getElementById('cv');
 var ctx=canvas.getContext('2d');
 var W=canvas.width,H=canvas.height;
 
+function getCol(light, dark) { return document.documentElement.classList.contains('dark') ? dark : light; }
+
 var pts=[
-  {x:200,y:240,label:'A',color:'#1e3a5f'},
-  {x:480,y:240,label:'B',color:'#1a3a2a'},
-  {x:320,y:100,label:'C',color:'#dc2626'}
+  {x:200,y:240,label:'A',colorLight:'#1e3a5f',colorDark:'#60a5fa'},
+  {x:480,y:240,label:'B',colorLight:'#1a3a2a',colorDark:'#4ade80'},
+  {x:320,y:100,label:'C',colorLight:'#dc2626',colorDark:'#f87171'}
 ];
 
 var dragging=-1;
@@ -111,19 +113,22 @@ function angleDeg(v,p,q){
 
 function draw(){
   ctx.clearRect(0,0,W,H);
-  ctx.fillStyle='#fafaf8';ctx.fillRect(0,0,W,H);
 
   var A=pts[0],B=pts[1],C=pts[2];
   var AB=dist(A,B),BC=dist(B,C),CA=dist(C,A);
   var angA=angleDeg(A,B,C),angB=angleDeg(B,A,C),angC=angleDeg(C,A,B);
   var sumAngles=angA+angB+angC;
 
+  var colA = getCol(A.colorLight, A.colorDark);
+  var colB = getCol(B.colorLight, B.colorDark);
+  var colC = getCol(C.colorLight, C.colorDark);
+
   // Triangle fill
-  ctx.fillStyle='rgba(59,130,246,0.06)';
+  ctx.fillStyle=getCol('rgba(59,130,246,0.06)', 'rgba(96,165,250,0.15)');
   ctx.beginPath();ctx.moveTo(A.x,A.y);ctx.lineTo(B.x,B.y);ctx.lineTo(C.x,C.y);ctx.closePath();ctx.fill();
 
   // Sides with length labels
-  var sides=[[A,B,'c (AB)='+AB,'#1e3a5f'],[B,C,'a (BC)='+BC,'#1a3a2a'],[C,A,'b (CA)='+CA,'#dc2626']];
+  var sides=[[A,B,'c (AB)='+AB,colA],[B,C,'a (BC)='+BC,colB],[C,A,'b (CA)='+CA,colC]];
   sides.forEach(function(s){
     ctx.strokeStyle=s[3];ctx.lineWidth=2.5;
     ctx.beginPath();ctx.moveTo(s[0].x,s[0].y);ctx.lineTo(s[1].x,s[1].y);ctx.stroke();
@@ -139,9 +144,10 @@ function draw(){
   pts.forEach(function(p,i){
     var others=pts.filter(function(_,j){return j!==i;});
     var ang=[angA,angB,angC][i];
+    var pCol = getCol(p.colorLight, p.colorDark);
     ctx.beginPath();ctx.arc(p.x,p.y,8,0,Math.PI*2);
-    ctx.fillStyle=p.color;ctx.fill();
-    ctx.fillStyle=p.color;ctx.font='bold 13px Georgia';ctx.textAlign='center';
+    ctx.fillStyle=pCol;ctx.fill();
+    ctx.fillStyle=pCol;ctx.font='bold 13px Georgia';ctx.textAlign='center';
     var off=22;
     var dx=(others[0].x+others[1].x)/2-p.x;
     var dy=(others[0].y+others[1].y)/2-p.y;
@@ -150,24 +156,29 @@ function draw(){
   });
 
   // Sum of angles
-  ctx.fillStyle=sumAngles>=178&&sumAngles<=182?'#1a3a2a':'#dc2626';
+  ctx.fillStyle=sumAngles>=178&&sumAngles<=182?getCol('#1a3a2a', '#4ade80'):getCol('#dc2626', '#f87171');
   ctx.font='12px Georgia';ctx.textAlign='right';
   ctx.fillText('∠A + ∠B + ∠C = '+angA+'° + '+angB+'° + '+angC+'° = '+sumAngles+'°',W-14,H-10);
 
-  ctx.fillStyle='#94a3b8';ctx.font='11px Georgia';ctx.textAlign='center';
+  ctx.fillStyle=getCol('#94a3b8', '#64748b');ctx.font='11px Georgia';ctx.textAlign='center';
   ctx.fillText('drag vertices',W/2,H-10);
 
   // Measures panel
+  var tcPrimary = getCol('#1e293b', '#f8fafc');
+  var tcTertiary = getCol('#9ca3af', '#64748b');
+  document.getElementById('measures').style.color = tcPrimary;
   document.getElementById('measures').innerHTML=
     '<strong>The six measurements:</strong> '
-    +'<span style="color:#1e3a5f">AB = '+AB+'</span>, '
-    +'<span style="color:#1a3a2a">BC = '+BC+'</span>, '
-    +'<span style="color:#dc2626">CA = '+CA+'</span> | '
-    +'<span style="color:#1e3a5f">∠A = '+angA+'°</span>, '
-    +'<span style="color:#1a3a2a">∠B = '+angB+'°</span>, '
-    +'<span style="color:#dc2626">∠C = '+angC+'°</span>'
-    +'<br><span style="color:var(--color-text-tertiary, #9ca3af);font-size:11px">Angle sum = '+sumAngles+'° (should be 180°; rounding error in display). All six measurements are determined once the shape is fixed.</span>';
+    +'<span style="color:'+colA+'">AB = '+AB+'</span>, '
+    +'<span style="color:'+colB+'">BC = '+BC+'</span>, '
+    +'<span style="color:'+colC+'">CA = '+CA+'</span> | '
+    +'<span style="color:'+colA+'">∠A = '+angA+'°</span>, '
+    +'<span style="color:'+colB+'">∠B = '+angB+'°</span>, '
+    +'<span style="color:'+colC+'">∠C = '+angC+'°</span>'
+    +'<br><span style="color:'+tcTertiary+';font-size:11px">Angle sum = '+sumAngles+'° (should be 180°; rounding error in display). All six measurements are determined once the shape is fixed.</span>';
 }
+var observer = new MutationObserver(draw);
+observer.observe(document.documentElement, {attributes: true, attributeFilter: ['class']});
 draw();`,
       outputHeight: 400,
     },
@@ -453,11 +464,13 @@ Notice what happened: we couldn't directly compare ∠B and ∠C, because they'r
 
 The proof split the isosceles triangle into two congruent triangles using the median. This visual shows the split and highlights the corresponding parts used in the SSS argument. Drag the apex to change the triangle and verify the theorem holds.`,
       html: `<canvas id="cv" width="700" height="320" style="cursor:move"></canvas>
-<div id="iso-proof" style="padding:10px 14px;font-family:Georgia,serif;background:var(--color-background-secondary, #f8fafc);border-top:1px solid var(--color-border-primary, #e2e8f0);font-size:13px"></div>`,
-      css: `body{margin:0;background:var(--color-background-secondary, #f8fafc)}`,
+<div id="iso-proof" style="padding:10px 14px;font-family:Georgia,serif;background:var(--color-background-secondary, transparent);border-top:1px solid var(--color-border-primary, #e2e8f0);font-size:13px"></div>`,
+      css: `body{margin:0;background:var(--color-background-secondary, transparent)}`,
       startCode: `var canvas=document.getElementById('cv');
 var ctx=canvas.getContext('2d');
 var W=canvas.width,H=canvas.height;
+
+function getCol(light, dark) { return document.documentElement.classList.contains('dark') ? dark : light; }
 
 var apex={x:W/2,y:80};
 var BASE_Y=260,HALF_BASE=130;
@@ -491,7 +504,6 @@ function dist2(p,q){return Math.round(Math.hypot(p.x-q.x,p.y-q.y));}
 
 function draw(){
   ctx.clearRect(0,0,W,H);
-  ctx.fillStyle='#fafaf8';ctx.fillRect(0,0,W,H);
 
   var A=apex;
   var B={x:W/2-HALF_BASE,y:BASE_Y};
@@ -502,19 +514,19 @@ function draw(){
   var angB=angleDeg(B,A,C),angC=angleDeg(C,A,B);
 
   // Left triangle (ABM) - blue
-  ctx.fillStyle='rgba(30,58,95,0.1)';
+  ctx.fillStyle=getCol('rgba(30,58,95,0.1)', 'rgba(96,165,250,0.15)');
   ctx.beginPath();ctx.moveTo(A.x,A.y);ctx.lineTo(B.x,B.y);ctx.lineTo(M.x,M.y);ctx.closePath();ctx.fill();
-  ctx.strokeStyle='#1e3a5f';ctx.lineWidth=2.5;
+  ctx.strokeStyle=getCol('#1e3a5f', '#60a5fa');ctx.lineWidth=2.5;
   ctx.beginPath();ctx.moveTo(A.x,A.y);ctx.lineTo(B.x,B.y);ctx.lineTo(M.x,M.y);ctx.closePath();ctx.stroke();
 
   // Right triangle (ACM) - red
-  ctx.fillStyle='rgba(220,38,38,0.1)';
+  ctx.fillStyle=getCol('rgba(220,38,38,0.1)', 'rgba(248,113,113,0.15)');
   ctx.beginPath();ctx.moveTo(A.x,A.y);ctx.lineTo(C.x,C.y);ctx.lineTo(M.x,M.y);ctx.closePath();ctx.fill();
-  ctx.strokeStyle='#dc2626';ctx.lineWidth=2.5;
+  ctx.strokeStyle=getCol('#dc2626', '#f87171');ctx.lineWidth=2.5;
   ctx.beginPath();ctx.moveTo(A.x,A.y);ctx.lineTo(C.x,C.y);ctx.lineTo(M.x,M.y);ctx.closePath();ctx.stroke();
 
   // Median AM
-  ctx.strokeStyle='#92400e';ctx.lineWidth=2;ctx.setLineDash([6,4]);
+  ctx.strokeStyle=getCol('#92400e', '#fbbf24');ctx.lineWidth=2;ctx.setLineDash([6,4]);
   ctx.beginPath();ctx.moveTo(A.x,A.y);ctx.lineTo(M.x,M.y);ctx.stroke();ctx.setLineDash([]);
 
   // Equal side tick marks
@@ -525,36 +537,42 @@ function draw(){
     ctx.strokeStyle=color;ctx.lineWidth=2;
     ctx.beginPath();ctx.moveTo(mx+nx,my+ny);ctx.lineTo(mx-nx,my-ny);ctx.stroke();
   }
-  tick(A,B,'#1a3a2a');tick(A,C,'#1a3a2a'); // AB = AC
-  tick(B,M,'#92400e');tick(M,C,'#92400e'); // BM = MC
+  tick(A,B,getCol('#1a3a2a', '#4ade80'));tick(A,C,getCol('#1a3a2a', '#4ade80')); // AB = AC
+  tick(B,M,getCol('#92400e', '#fbbf24'));tick(M,C,getCol('#92400e', '#fbbf24')); // BM = MC
 
   // Labels
-  [[A,'A','#374151',-18,0],[B,'B','#1e3a5f',0,18],[C,'C','#dc2626',0,18],[M,'M','#92400e',0,18]].forEach(function(pt){
+  [[A,'A',getCol('#374151', '#e2e8f0'),-18,0],
+   [B,'B',getCol('#1e3a5f', '#60a5fa'),0,18],
+   [C,'C',getCol('#dc2626', '#f87171'),0,18],
+   [M,'M',getCol('#92400e', '#fbbf24'),0,18]].forEach(function(pt){
     ctx.beginPath();ctx.arc(pt[0].x,pt[0].y,5,0,Math.PI*2);ctx.fillStyle=pt[2];ctx.fill();
     ctx.fillStyle=pt[2];ctx.font='bold 13px Georgia';ctx.textAlign='center';
     ctx.fillText(pt[1],pt[0].x+pt[3],pt[0].y+pt[4]);
   });
 
   // Angle labels at B and C
-  ctx.fillStyle='#1e3a5f';ctx.font='bold 13px Georgia';ctx.textAlign='center';
+  ctx.fillStyle=getCol('#1e3a5f', '#60a5fa');ctx.font='bold 13px Georgia';ctx.textAlign='center';
   ctx.fillText('∠B='+angB+'°',B.x-18,B.y-20);
-  ctx.fillStyle='#dc2626';
+  ctx.fillStyle=getCol('#dc2626', '#f87171');
   ctx.fillText('∠C='+angC+'°',C.x+18,C.y-20);
 
   // Equal check
   var equal=Math.abs(angB-angC)<=2;
-  ctx.fillStyle=equal?'#1a3a2a':'#dc2626';ctx.font='13px Georgia';ctx.textAlign='center';
+  ctx.fillStyle=equal?getCol('#1a3a2a', '#4ade80'):getCol('#dc2626', '#f87171');ctx.font='13px Georgia';ctx.textAlign='center';
   ctx.fillText(equal?'∠B = ∠C ✓ (Isosceles Triangle Theorem)':'Drag apex to center to restore isosceles symmetry',W/2,H-10);
 
   // Proof panel
   var pp=document.getElementById('iso-proof');
+  pp.style.color = getCol('#1e293b', '#f8fafc');
   pp.innerHTML='<strong>SSS argument:</strong> '
-    +'<span style="color:#1e3a5f">AB = AC = '+AB+'</span> (given), '
-    +'<span style="color:#92400e">BM = CM = '+BM+'</span> (M is midpoint), '
+    +'<span style="color:'+getCol('#1e3a5f', '#60a5fa')+'">AB = AC = '+AB+'</span> (given), '
+    +'<span style="color:'+getCol('#92400e', '#fbbf24')+'">BM = CM = '+BM+'</span> (M is midpoint), '
     +'AM = AM (reflexive).'
     +'<br>∴ △ABM ≅ △ACM by SSS. By CPCTC: <strong>∠B = ∠C = '+Math.round((angB+angC)/2)+'°</strong>.'
     +'<br><span style="color:var(--color-text-tertiary, #9ca3af);font-size:11px">Drag apex to change the triangle. Notice ∠B = ∠C regardless of where you place A, as long as the triangle remains isosceles.</span>';
 }
+var observer = new MutationObserver(draw);
+observer.observe(document.documentElement, {attributes: true, attributeFilter: ['class']});
 draw();`,
       outputHeight: 400,
     },

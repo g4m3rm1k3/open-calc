@@ -103,6 +103,11 @@ export default {
           "Watch one angle drive three views at once: motion on the circle, slope of sine, and value of cosine. They stay synchronized because the sine slope is exactly cosine.",
       },
       {
+        id: "SineCosineSlope",
+        title: "Sine and Cosine Slopes",
+        caption: "Explore how the tangent lines to the sine and cosine curves correspond to their derivatives.",
+      },
+      {
         id: "Ch2_1_LighthouseAngle",
         title: "Story Viz — Lighthouse Angle",
         caption:

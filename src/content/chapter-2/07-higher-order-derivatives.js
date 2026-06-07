@@ -45,7 +45,7 @@ export default {
       },
       {
         type: 'viz',
-        id: '',
+        id: 'HigherOrderDerivativesExplorer',
         title: 'Position, Velocity, Acceleration Explorer',
         mathBridge:
           'Given s(t) = t³ − 3t, the velocity is v(t) = 3t² − 3 and acceleration is a(t) = 6t. ' +

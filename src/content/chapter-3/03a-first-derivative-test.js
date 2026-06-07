@@ -49,7 +49,7 @@ export default {
       },
       {
         type: 'viz',
-        id: '',
+        id: 'SignChartViz',
         title: 'First Derivative Sign Chart',
         mathBridge:
           'The sign of f\'(x) directly tells you whether f(x) is rising (+) or falling (−). ' +
