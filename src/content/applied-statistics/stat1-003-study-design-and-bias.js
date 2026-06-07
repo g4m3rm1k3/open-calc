@@ -338,7 +338,7 @@ print(f"Randomized experiment estimate:  {random_est:.1f} points  ← close to t
       walkthrough: [
         {
           expression:
-            "\\text{1. Selection bias: fitness app users ≠ general population}",
+            "\\text{1. Selection bias: fitness app users } \\neq \\text{ general population}",
           annotation:
             "People who use a fitness app are more health-conscious and more physically active than the general adult population. The sample overrepresents active, health-seeking individuals. This pushes the estimated average exercise hours upward relative to the true population average.",
         },

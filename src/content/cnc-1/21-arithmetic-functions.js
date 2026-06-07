@@ -304,7 +304,7 @@ export default {
       'The ATAN two-argument form computes:',
       '$\\theta = \\text{ATAN}[y]/[x] = \\arctan\\left(\\frac{y}{x}\\right) \\in [0°, 360°]$',
       'Cutting speed to RPM (in a macro, so speed can change dynamically):',
-      '$\\text{#RPM} = \\frac{\\text{#Vc} \\times 1000}{3.14159 \\times \\text{#D}}$',
+      '$\\text{RPM} = \\frac{\\text{Vc} \\times 1000}{3.14159 \\times \\text{D}}$',
       'A macro can compute this for any diameter variable and set the spindle speed dynamically: `S#RPM M03`.',
     ],
   },

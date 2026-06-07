@@ -9,20 +9,23 @@ const PORT_R = 4;         // hole radius
 // ── Colors ───────────────────────────────────────────────────────────────────
 function getColors(dark) {
   return {
-    bg:       dark ? "#0f1923" : "#f8fafc",
-    board:    dark ? "#e2e8f0" : "#ffffff",
-    boardHole:dark ? "#334155" : "#94a3b8",
-    railRed:  "#ef4444",
-    railBlue: "#3b82f6",
-    text:     dark ? "#e2e8f0" : "#1e293b",
-    wire:     dark ? "#34d399" : "#059669",
-    wireHi:   dark ? "#38bdf8" : "#0284c7",
-    icBody:   dark ? "#1e293b" : "#334155",
-    icPins:   dark ? "#cbd5e1" : "#94a3b8",
-    icText:   dark ? "#94a3b8" : "#e2e8f0",
-    ledOff:   dark ? "#450a0a" : "#fef2f2",
-    ledOn:    "#ef4444",
-    sel:      "#38bdf8",
+    bg:        dark ? "#2c1a0a" : "#a0713a",   // wooden bench
+    board:     dark ? "#f0ece0" : "#f5f0e8",   // cream breadboard
+    boardHole: dark ? "#8a7055" : "#c0b09a",
+    trench:    dark ? "#1a1008" : "#7a5228",   // center divider groove
+    railRed:   "#ef4444",
+    railBlue:  "#3b82f6",
+    text:      dark ? "#e2e8f0" : "#1e293b",
+    wire:      dark ? "#34d399" : "#059669",
+    wireHi:    dark ? "#38bdf8" : "#0284c7",
+    icBody:    dark ? "#1e293b" : "#334155",
+    icPins:    dark ? "#cbd5e1" : "#94a3b8",
+    icText:    dark ? "#94a3b8" : "#e2e8f0",
+    ledOff:    dark ? "#450a0a" : "#fef2f2",
+    ledOn:     "#ef4444",
+    sel:       "#38bdf8",
+    woodGrain: dark ? "rgba(0,0,0,0.20)" : "rgba(0,0,0,0.11)",
+    woodLight: dark ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.18)",
   };
 }
 
@@ -433,9 +436,10 @@ const COMP_DEFS = {
       { id: "e", x: 7, y: 0, type: PIN_OUT }, { id: "d", x: 6, y: 0, type: PIN_OUT }, { id: "c", x: 5, y: 0, type: PIN_OUT }, { id: "b", x: 4, y: 0, type: PIN_OUT }, { id: "a", x: 3, y: 0, type: PIN_OUT }, { id: "g", x: 2, y: 0, type: PIN_OUT }, { id: "f", x: 1, y: 0, type: PIN_OUT }, { id: "VCC", x: 0, y: 0, type: PIN_PWR }
     ],
     render: (ctx, x, y, w, h, C) => {
-      ctx.fillStyle = C.ic; ctx.fillRect(x, y + CELL, w, h - CELL * 2);
-      ctx.fillStyle = C.icHole; ctx.beginPath(); ctx.arc(x + CELL/2, y + CELL + CELL/2, 3, 0, Math.PI*2); ctx.fill();
-      ctx.fillStyle = "#fff"; ctx.font = "10px monospace"; ctx.textAlign = "center"; ctx.fillText("74HC47", x + w/2, y + h/2 + 3);
+      ctx.fillStyle = C.icBody; ctx.fillRect(x - CELL/4, y + CELL/2, w + CELL/2, h - CELL);
+      ctx.fillStyle = C.bg; ctx.beginPath(); ctx.arc(x - CELL/4, y + h/2, CELL/4, -Math.PI/2, Math.PI/2); ctx.fill();
+      ctx.fillStyle = C.icText; ctx.font = "bold 11px monospace"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillText("74HC47", x + w/2, y + h/2);
     }
   },
   SEVEN_SEG: {
@@ -548,6 +552,19 @@ const DRAWERS = [
 ];
 
 // ── Prebuilt Circuits ─────────────────────────────────────────────────────────
+const COMP_LABELS = {
+  LED: 'LED', RESISTOR: 'Resistor', CAPACITOR: 'Capacitor', INDUCTOR: 'Inductor',
+  DIODE: 'Diode', ZENER_DIODE: 'Zener Diode', RGB_LED: 'RGB LED',
+  POWER_SUPPLY: 'Power Supply', SWITCH: 'Pushbutton', DIP_SWITCH: '4-Pos DIP Switch',
+  TRANSISTOR_NPN: 'NPN Transistor', TRANSISTOR_PNP: 'PNP Transistor',
+  POTENTIOMETER: 'Potentiometer', PHOTORESISTOR: 'Photoresistor',
+  '555_TIMER': '555 Timer', OP_AMP: 'LM358 Op-Amp',
+  '74HC00': 'NAND Gate (74HC00)', '74HC08': 'AND Gate (74HC08)',
+  '74HC32': 'OR Gate (74HC32)', '74HC86': 'XOR Gate (74HC86)',
+  '74HC04': 'NOT Gate (74HC04)', '74HC47': 'BCD→7-Seg Driver (74HC47)',
+  SEVEN_SEG: '7-Segment Display',
+};
+
 const PREBUILT = {
   "blank": { nodes: [], wires: [] },
   "led_basic": {
@@ -559,33 +576,25 @@ const PREBUILT = {
     wires: [
       { id: "w1", h1: "rail_t1_5", h2: "strip_t_1_5", color: "#ef4444" },
       { id: "w2", h1: "strip_t_1_7", h2: "strip_t_1_8", color: "#10b981" },
-      { id: "w3", h1: "strip_t_1_9", h2: "rail_t2_9", color: "#3b82f6" },
-      { id: "w_gnd", h1: "rail_t1_3", h2: "rail_t2_3", color: "#1e293b" }
+      { id: "w3", h1: "strip_t_1_9", h2: "rail_t2_9", color: "#3b82f6" }
     ]
   },
   "half_adder": {
     nodes: [
       { id: "n_pwr", type: "POWER_SUPPLY", x: 1, y: -2, state: {} },
       { id: "n_sw", type: "DIP_SWITCH", x: 5, y: 6, state: { switches: [false, false, false, false] } },
-      { id: "n_rA", type: "RESISTOR", x: 4, y: 11, state: { value: 10000, bands: ["#8b4513", "#000000", "#f97316"] } },
-      { id: "n_rB", type: "RESISTOR", x: 8, y: 11, state: { value: 10000, bands: ["#8b4513", "#000000", "#f97316"] } },
       { id: "n_xor", type: "74HC86", x: 14, y: 6, state: {} },
       { id: "n_and", type: "74HC08", x: 24, y: 6, state: {} },
-      { id: "n_ledS", type: "LED", x: 34, y: 7, state: {} },
-      { id: "n_ledC", type: "LED", x: 38, y: 7, state: {} },
+      { id: "n_ledS", type: "LED", x: 33, y: 10, state: {} },
+      { id: "n_ledC", type: "LED", x: 40, y: 10, state: {} },
       { id: "n_rS", type: "RESISTOR", x: 34, y: 12, state: { value: 220, bands: ["#ef4444", "#ef4444", "#8b4513"] } },
-      { id: "n_rC", type: "RESISTOR", x: 38, y: 12, state: { value: 220, bands: ["#ef4444", "#ef4444", "#8b4513"] } }
+      { id: "n_rC", type: "RESISTOR", x: 41, y: 12, state: { value: 220, bands: ["#ef4444", "#ef4444", "#8b4513"] } }
     ],
     wires: [
-      { id: "w_pwr1", h1: "rail_t1_3", h2: "rail_t2_3", color: "#3b82f6" },
       { id: "w_pwr2", h1: "rail_t1_4", h2: "rail_b1_4", color: "#ef4444" },
       { id: "w_pwr3", h1: "rail_t2_4", h2: "rail_b2_4", color: "#3b82f6" },
       { id: "w_sw_vcc1", h1: "rail_t1_5", h2: "strip_t_2_5", color: "#ef4444" },
       { id: "w_sw_vcc2", h1: "rail_t1_6", h2: "strip_t_2_6", color: "#ef4444" },
-      { id: "w_pdA_sw", h1: "strip_b_0_5", h2: "strip_b_1_6", color: "#1e293b" },
-      { id: "w_pdA_gnd", h1: "strip_b_2_4", h2: "rail_b2_4", color: "#1e293b" },
-      { id: "w_pdB_sw", h1: "strip_b_0_6", h2: "strip_b_1_8", color: "#1e293b" },
-      { id: "w_pdB_gnd", h1: "strip_b_2_10", h2: "rail_b2_10", color: "#1e293b" },
       { id: "w_xor_vcc", h1: "rail_t1_14", h2: "strip_t_2_14", color: "#ef4444" },
       { id: "w_xor_gnd", h1: "strip_b_1_20", h2: "rail_b2_20", color: "#3b82f6" },
       { id: "w_and_vcc", h1: "rail_t1_24", h2: "strip_t_2_24", color: "#ef4444" },
@@ -594,12 +603,10 @@ const PREBUILT = {
       { id: "w_a_and", h1: "strip_b_2_5", h2: "strip_b_1_24", color: "#eab308" },
       { id: "w_b_xor", h1: "strip_b_2_6", h2: "strip_b_2_15", color: "#f97316" },
       { id: "w_b_and", h1: "strip_b_3_6", h2: "strip_b_2_25", color: "#f97316" },
-      { id: "w_sum_led", h1: "strip_b_3_16", h2: "strip_t_4_34", color: "#10b981" },
-      { id: "w_carry_led", h1: "strip_b_3_26", h2: "strip_t_4_38", color: "#8b5cf6" },
-      { id: "w_led_rs", h1: "strip_t_4_35", h2: "strip_b_2_34", color: "#94a3b8" },
-      { id: "w_led_rc", h1: "strip_t_4_39", h2: "strip_b_2_38", color: "#94a3b8" },
-      { id: "w_rs_gnd", h1: "strip_b_3_36", h2: "rail_b2_36", color: "#3b82f6" },
-      { id: "w_rc_gnd", h1: "strip_b_3_40", h2: "rail_b2_40", color: "#3b82f6" }
+      { id: "w_sum_led", h1: "strip_b_3_16", h2: "strip_b_3_33", color: "#10b981" },
+      { id: "w_carry_led", h1: "strip_b_3_26", h2: "strip_b_3_40", color: "#8b5cf6" },
+      { id: "w_rs_gnd", h1: "strip_b_3_37", h2: "rail_b2_37", color: "#3b82f6" },
+      { id: "w_rc_gnd", h1: "strip_b_3_44", h2: "rail_b2_44", color: "#3b82f6" }
     ]
   },
   "555_astable": {
@@ -607,29 +614,24 @@ const PREBUILT = {
       { id: "n1", type: "POWER_SUPPLY", x: 1, y: -2, state: {} },
       { id: "n_555", type: "555_TIMER", x: 10, y: 6, state: {} },
       { id: "n_r1", type: "RESISTOR", x: 8, y: 4, state: { value: 1000, bands: ["#8b4513", "#000000", "#ef4444"] } },
-      { id: "n_r2", type: "RESISTOR", x: 12, y: 4, state: { value: 10000, bands: ["#8b4513", "#000000", "#f97316"] } },
-      { id: "n_c", type: "CAPACITOR", x: 11, y: 11, state: { value: 0.0001 } },
+      { id: "n_r2", type: "RESISTOR", x: 11, y: 3, state: { value: 10000, bands: ["#8b4513", "#000000", "#f97316"] } },
+      { id: "n_c", type: "CAPACITOR", x: 14, y: 11, state: { value: 0.0001 } },
       { id: "n_led", type: "LED", x: 16, y: 10, state: {} },
-      { id: "n_r_led", type: "RESISTOR", x: 17, y: 13, state: { value: 220, bands: ["#ef4444", "#ef4444", "#8b4513"] } }
+      { id: "n_r_led", type: "RESISTOR", x: 17, y: 12, state: { value: 220, bands: ["#ef4444", "#ef4444", "#8b4513"] } }
     ],
     wires: [
-      { id: "w_pwr1", h1: "rail_t1_3", h2: "rail_t2_3", color: "#3b82f6" },
       { id: "w_pwr2", h1: "rail_t1_4", h2: "rail_b1_4", color: "#ef4444" },
       { id: "w_pwr3", h1: "rail_t2_4", h2: "rail_b2_4", color: "#3b82f6" },
       { id: "w_555_gnd", h1: "strip_b_0_10", h2: "rail_b2_10", color: "#3b82f6" },
-      { id: "w_555_trig_c", h1: "strip_b_0_11", h2: "strip_b_1_11", color: "#eab308" },
-      { id: "w_555_out", h1: "strip_b_0_12", h2: "strip_b_2_16", color: "#a855f7" },
       { id: "w_555_rst", h1: "strip_b_0_13", h2: "rail_b1_13", color: "#ef4444" },
-      { id: "w_555_thres_c1", h1: "strip_t_2_12", h2: "strip_t_3_11", color: "#eab308" },
-      { id: "w_555_thres_c2", h1: "strip_t_3_11", h2: "strip_b_1_11", color: "#eab308" },
       { id: "w_555_vcc", h1: "strip_t_2_10", h2: "rail_t1_10", color: "#ef4444" },
       { id: "w_r1_vcc", h1: "strip_t_1_8", h2: "rail_t1_8", color: "#ef4444" },
-      { id: "w_r1_disch", h1: "strip_t_1_10", h2: "strip_t_2_11", color: "#22c55e" },
-      { id: "w_r2_disch", h1: "strip_t_1_12", h2: "strip_t_2_11", color: "#22c55e" },
-      { id: "w_r2_thres", h1: "strip_t_1_14", h2: "strip_t_2_12", color: "#eab308" },
-      { id: "w_c_gnd", h1: "strip_b_2_12", h2: "rail_b2_12", color: "#3b82f6" },
-      { id: "w_led_rc", h1: "strip_b_2_17", h2: "strip_b_4_17", color: "#94a3b8" },
-      { id: "w_rc_gnd", h1: "strip_b_4_19", h2: "rail_b2_19", color: "#3b82f6" }
+      { id: "w_r2_thres", h1: "strip_t_0_14", h2: "strip_t_0_12", color: "#eab308" },
+      { id: "w_thres_trig", h1: "strip_t_3_12", h2: "strip_b_0_11", color: "#eab308" },
+      { id: "w_cap_trig", h1: "strip_b_2_14", h2: "strip_b_0_11", color: "#eab308" },
+      { id: "w_c_gnd", h1: "strip_b_2_15", h2: "rail_b2_15", color: "#3b82f6" },
+      { id: "w_555_out", h1: "strip_b_0_12", h2: "strip_b_2_16", color: "#a855f7" },
+      { id: "w_rc_gnd", h1: "strip_b_3_20", h2: "rail_b2_20", color: "#3b82f6" }
     ]
   },
   "adder_7seg": {
@@ -645,17 +647,12 @@ const PREBUILT = {
     ],
     wires: [
       // Power Rails
-      { id: "w_pwr1", h1: "rail_t1_3", h2: "rail_t2_3", color: "#3b82f6" },
       { id: "w_pwr2", h1: "rail_t1_4", h2: "rail_b1_4", color: "#ef4444" },
       { id: "w_pwr3", h1: "rail_t2_4", h2: "rail_b2_4", color: "#3b82f6" },
       
       // Switches
       { id: "w_sw_vcc1", h1: "rail_t1_4", h2: "strip_t_2_4", color: "#ef4444" },
       { id: "w_sw_vcc2", h1: "rail_t1_5", h2: "strip_t_2_5", color: "#ef4444" },
-      { id: "w_pdA_sw", h1: "strip_b_0_4", h2: "strip_b_1_5", color: "#1e293b" },
-      { id: "w_pdA_gnd", h1: "strip_b_2_3", h2: "rail_b2_3", color: "#1e293b" },
-      { id: "w_pdB_sw", h1: "strip_b_0_5", h2: "strip_b_1_9", color: "#1e293b" },
-      { id: "w_pdB_gnd", h1: "strip_b_2_7", h2: "rail_b2_7", color: "#1e293b" },
 
       // IC Power
       { id: "w_xor_vcc", h1: "rail_t1_12", h2: "strip_t_2_12", color: "#ef4444" },
@@ -728,16 +725,18 @@ export default function LogicSim({ params = {} }) {
     nodes: [],
     wires: [],
     draggingWire: null,
+    _draggingWireEnd: null,
     selectedNode: null,
     selectedWire: null,
     mouseX: 0, mouseY: 0,
-    panX: 0, panY: 0, zoom: 1,
+    panX: 0, panY: 0,
     simState: { voltages: null },
     netlist: null,
     _clickStart: null,
   });
 
   const [boardSize, setBoardSize] = useState(60);
+  const [selLabel, setSelLabel] = useState('');
   const bb_holes = useRef(getHoles(60));
   const [openDrawer, setOpenDrawer] = useState("Power & Switches");
   const [, forceRender] = useState(0);
@@ -804,24 +803,33 @@ export default function LogicSim({ params = {} }) {
     const ctx = canvas.getContext("2d");
     const W = canvas.width, H = canvas.height;
     const st = stateRef.current;
-    const { nodes, wires, draggingWire, panX, panY, zoom, selectedNode, selectedWire, simState } = st;
+    const { nodes, wires, draggingWire, _draggingWireEnd, panX, panY, selectedNode, selectedWire, simState } = st;
     const currentBoardSize = st.boardSize || 60;
     const BB_WIDTH = currentBoardSize * CELL;
 
     ctx.clearRect(0, 0, W, H);
     ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
 
-    const tx = x => x * CELL * zoom + panX;
-    const ty = y => y * CELL * zoom + panY;
+    // Wood grain texture
+    for (let i = 0; i < H + 40; i += 9) {
+      const wx = Math.sin(i * 0.031) * 5 + Math.sin(i * 0.009) * 12;
+      const wx2 = Math.sin(i * 0.031 + W * 0.005) * 5 + Math.sin(i * 0.009 + W * 0.003) * 12;
+      ctx.strokeStyle = (i % 27 === 0) ? C.woodLight : C.woodGrain;
+      ctx.lineWidth = (i % 27 === 0) ? 0.4 : 0.7;
+      ctx.beginPath(); ctx.moveTo(0, i + wx); ctx.lineTo(W, i + wx2); ctx.stroke();
+    }
+
+    const tx = x => x * CELL + panX;
+    const ty = y => y * CELL + panY;
 
     // Breadboard Body
     ctx.fillStyle = C.board;
     ctx.shadowColor = "rgba(0,0,0,0.1)"; ctx.shadowBlur = 20;
-    ctx.fillRect(tx(-1), ty(-1), BB_WIDTH * zoom + 2*CELL*zoom, 17 * CELL * zoom + 2*CELL*zoom);
+    ctx.fillRect(tx(-1), ty(-1), BB_WIDTH + 2*CELL, 17 * CELL + 2*CELL);
     ctx.shadowBlur = 0;
 
     // Power rail lines
-    ctx.lineWidth = 3 * zoom;
+    ctx.lineWidth = 3;
     ctx.strokeStyle = C.railRed;
     ctx.beginPath(); ctx.moveTo(tx(0), ty(-0.5)); ctx.lineTo(tx(currentBoardSize-1), ty(-0.5)); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(tx(0), ty(16.5)); ctx.lineTo(tx(currentBoardSize-1), ty(16.5)); ctx.stroke();
@@ -830,49 +838,76 @@ export default function LogicSim({ params = {} }) {
     ctx.beginPath(); ctx.moveTo(tx(0), ty(14.5)); ctx.lineTo(tx(currentBoardSize-1), ty(14.5)); ctx.stroke();
 
     // Trench
-    ctx.fillStyle = C.bg;
-    ctx.fillRect(tx(0), ty(8.2), BB_WIDTH*zoom, 0.6*CELL*zoom);
+    ctx.fillStyle = C.trench;
+    ctx.fillRect(tx(0), ty(8.2), BB_WIDTH, 0.6*CELL);
 
     // Holes
     bb_holes.current.forEach(h => {
-      const px = tx(h.x) + CELL/2 * zoom;
-      const py = ty(h.y) + CELL/2 * zoom;
+      const px = tx(h.x) + CELL/2;
+      const py = ty(h.y) + CELL/2;
       ctx.fillStyle = C.boardHole;
-      ctx.beginPath(); ctx.arc(px, py, PORT_R * zoom, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(px, py, PORT_R, 0, Math.PI*2); ctx.fill();
     });
+
+    // Rail labels
+    ctx.font = `bold 8px monospace`;
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    const lx = tx(-0.5) + CELL/2;
+    ctx.fillStyle = C.railRed;
+    ctx.fillText("+5V", lx, ty(0) + CELL/2);
+    ctx.fillText("+5V", lx, ty(15) + CELL/2);
+    ctx.fillStyle = C.railBlue;
+    ctx.fillText("GND", lx, ty(1) + CELL/2);
+    ctx.fillText("GND", lx, ty(16) + CELL/2);
 
     // Wires
     wires.forEach(w => {
       const h1 = bb_holes.current.find(h => h.id === w.h1);
       const h2 = bb_holes.current.find(h => h.id === w.h2);
       if (!h1 || !h2) return;
-      const px1 = tx(h1.x) + CELL/2 * zoom, py1 = ty(h1.y) + CELL/2 * zoom;
-      const px2 = tx(h2.x) + CELL/2 * zoom, py2 = ty(h2.y) + CELL/2 * zoom;
+      const px1 = tx(h1.x) + CELL/2, py1 = ty(h1.y) + CELL/2;
+      const px2 = tx(h2.x) + CELL/2, py2 = ty(h2.y) + CELL/2;
       const isSel = selectedWire === w.id;
-      
+
       ctx.strokeStyle = isSel ? C.sel : (w.color || C.wire);
-      ctx.lineWidth = (isSel ? 5 : 3) * zoom;
+      ctx.lineWidth = isSel ? 5 : 3;
       ctx.lineCap = "round";
       ctx.beginPath(); ctx.moveTo(px1, py1);
       const dist = Math.hypot(px2-px1, py2-py1);
       ctx.quadraticCurveTo((px1+px2)/2, (py1+py2)/2 - dist/3, px2, py2);
       ctx.stroke();
-      
+
       ctx.fillStyle = ctx.strokeStyle;
-      ctx.beginPath(); ctx.arc(px1, py1, 6*zoom, 0, Math.PI*2); ctx.fill();
-      ctx.beginPath(); ctx.arc(px2, py2, 6*zoom, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(px1, py1, 6, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(px2, py2, 6, 0, Math.PI*2); ctx.fill();
     });
 
     // Dragging Wire
     if (draggingWire) {
       const h1 = bb_holes.current.find(h => h.id === draggingWire.h1);
       if (h1) {
-        const px1 = tx(h1.x) + CELL/2 * zoom, py1 = ty(h1.y) + CELL/2 * zoom;
-        ctx.strokeStyle = C.wireHi; ctx.lineWidth = 3 * zoom; ctx.setLineDash([5,5]);
+        const px1 = tx(h1.x) + CELL/2, py1 = ty(h1.y) + CELL/2;
+        ctx.strokeStyle = C.wireHi; ctx.lineWidth = 3; ctx.setLineDash([5,5]);
         ctx.beginPath(); ctx.moveTo(px1, py1);
         const dist = Math.hypot(draggingWire.mx-px1, draggingWire.my-py1);
         ctx.quadraticCurveTo((px1+draggingWire.mx)/2, (py1+draggingWire.my)/2 - dist/3, draggingWire.mx, draggingWire.my);
         ctx.stroke(); ctx.setLineDash([]);
+      }
+    }
+
+    // Dragging wire endpoint
+    if (_draggingWireEnd) {
+      const anchorId = _draggingWireEnd.endpoint === 'h1' ? _draggingWireEnd.wire.h2 : _draggingWireEnd.wire.h1;
+      const anchor = bb_holes.current.find(h => h.id === anchorId);
+      if (anchor) {
+        const ax = tx(anchor.x) + CELL/2, ay = ty(anchor.y) + CELL/2;
+        ctx.strokeStyle = C.sel; ctx.lineWidth = 3; ctx.setLineDash([5, 5]);
+        ctx.beginPath(); ctx.moveTo(ax, ay);
+        const dist = Math.hypot(_draggingWireEnd.mx - ax, _draggingWireEnd.my - ay);
+        ctx.quadraticCurveTo((ax + _draggingWireEnd.mx)/2, (ay + _draggingWireEnd.my)/2 - dist/3, _draggingWireEnd.mx, _draggingWireEnd.my);
+        ctx.stroke(); ctx.setLineDash([]);
+        ctx.fillStyle = C.sel;
+        ctx.beginPath(); ctx.arc(_draggingWireEnd.mx, _draggingWireEnd.my, 5, 0, Math.PI*2); ctx.fill();
       }
     }
 
@@ -881,8 +916,8 @@ export default function LogicSim({ params = {} }) {
       const def = COMP_DEFS[n.type];
       const px = tx(n.x);
       const py = ty(n.y);
-      const pw = def.w * CELL * zoom;
-      const ph = def.h * CELL * zoom;
+      const pw = def.w * CELL;
+      const ph = def.h * CELL;
       
       ctx.save();
       if (selectedNode === n.id) {
@@ -918,11 +953,10 @@ export default function LogicSim({ params = {} }) {
   // ── Interaction ──
   const getHoleAt = useCallback((mx, my) => {
     const st = stateRef.current;
-    const sC = CELL * st.zoom;
     for (const h of bb_holes.current) {
-      const px = h.x * sC + st.panX + sC/2;
-      const py = h.y * sC + st.panY + sC/2;
-      if (Math.hypot(mx - px, my - py) < 10 * st.zoom) return h;
+      const px = h.x * CELL + st.panX + CELL/2;
+      const py = h.y * CELL + st.panY + CELL/2;
+      if (Math.hypot(mx - px, my - py) < 10) return h;
     }
     return null;
   }, []);
@@ -931,15 +965,15 @@ export default function LogicSim({ params = {} }) {
     const st = stateRef.current;
     for (const n of [...st.nodes].reverse()) {
       const def = COMP_DEFS[n.type];
-      const nx = n.x * CELL * st.zoom + st.panX;
-      const ny = n.y * CELL * st.zoom + st.panY;
-      const nw = def.w * CELL * st.zoom;
-      const nh = def.h * CELL * st.zoom;
+      const nx = n.x * CELL + st.panX;
+      const ny = n.y * CELL + st.panY;
+      const nw = def.w * CELL;
+      const nh = def.h * CELL;
       if (mx >= nx && mx <= nx+nw && my >= ny && my <= ny+nh) {
          for (const pin of def.pins) {
-            const px = (n.x + pin.x) * CELL * st.zoom + st.panX + (CELL/2)*st.zoom;
-            const py = (n.y + pin.y) * CELL * st.zoom + st.panY + (CELL/2)*st.zoom;
-            if (Math.hypot(mx - px, my - py) < 10 * st.zoom) return { node: n, pin: pin };
+            const px = (n.x + pin.x) * CELL + st.panX + CELL/2;
+            const py = (n.y + pin.y) * CELL + st.panY + CELL/2;
+            if (Math.hypot(mx - px, my - py) < 10) return { node: n, pin: pin };
          }
          return { node: n, pin: null };
       }
@@ -955,15 +989,15 @@ export default function LogicSim({ params = {} }) {
 
     const getWireAt = (mx, my) => {
       let closest = null;
-      let minDist = 8 * st.zoom;
+      let minDist = 8;
       for (const w of st.wires) {
         const hole1 = bb_holes.current.find(h => h.id === w.h1);
         const hole2 = bb_holes.current.find(h => h.id === w.h2);
         if (!hole1 || !hole2) continue;
-        const x1 = hole1.x * CELL * st.zoom + st.panX + (CELL * st.zoom / 2);
-        const y1 = hole1.y * CELL * st.zoom + st.panY + (CELL * st.zoom / 2);
-        const x2 = hole2.x * CELL * st.zoom + st.panX + (CELL * st.zoom / 2);
-        const y2 = hole2.y * CELL * st.zoom + st.panY + (CELL * st.zoom / 2);
+        const x1 = hole1.x * CELL + st.panX + CELL/2;
+        const y1 = hole1.y * CELL + st.panY + CELL/2;
+        const x2 = hole2.x * CELL + st.panX + CELL/2;
+        const y2 = hole2.y * CELL + st.panY + CELL/2;
         
         const cx = (x1+x2)/2;
         const distSeg = Math.hypot(x2-x1, y2-y1);
@@ -1017,6 +1051,30 @@ export default function LogicSim({ params = {} }) {
       st._panning = true; st._panStartX = mx - st.panX; st._panStartY = my - st.panY; return;
     }
 
+    // Wire endpoint drag — grab an endpoint and reroute the wire
+    const epThresh = PORT_R * 3.5;
+    for (const w of st.wires) {
+      const h1 = bb_holes.current.find(h => h.id === w.h1);
+      const h2 = bb_holes.current.find(h => h.id === w.h2);
+      if (!h1 || !h2) continue;
+      const px1 = h1.x * CELL + st.panX + CELL/2;
+      const py1 = h1.y * CELL + st.panY + CELL/2;
+      const px2 = h2.x * CELL + st.panX + CELL/2;
+      const py2 = h2.y * CELL + st.panY + CELL/2;
+      if (Math.hypot(mx - px1, my - py1) < epThresh) {
+        st._draggingWireEnd = { wire: w, endpoint: 'h1', mx, my };
+        st.selectedWire = w.id;
+        setSelLabel('Wire');
+        return;
+      }
+      if (Math.hypot(mx - px2, my - py2) < epThresh) {
+        st._draggingWireEnd = { wire: w, endpoint: 'h2', mx, my };
+        st.selectedWire = w.id;
+        setSelLabel('Wire');
+        return;
+      }
+    }
+
     const nodeHit = getNodeAt(mx, my);
     if (nodeHit) {
       if (nodeHit.pin) {
@@ -1025,9 +1083,10 @@ export default function LogicSim({ params = {} }) {
       } else {
         st.selectedNode = nodeHit.node.id;
         st.selectedWire = null;
+        setSelLabel(COMP_LABELS[nodeHit.node.type] || nodeHit.node.type);
         st._dragNode = nodeHit.node;
-        st._dragOffX = mx - (nodeHit.node.x * CELL * st.zoom + st.panX);
-        st._dragOffY = my - (nodeHit.node.y * CELL * st.zoom + st.panY);
+        st._dragOffX = mx - (nodeHit.node.x * CELL + st.panX);
+        st._dragOffY = my - (nodeHit.node.y * CELL + st.panY);
         return;
       }
     }
@@ -1042,13 +1101,15 @@ export default function LogicSim({ params = {} }) {
     if (wireHit) {
       st.selectedWire = wireHit.id;
       st.selectedNode = null;
+      setSelLabel('Wire');
       return;
     }
 
     st.selectedNode = null;
     st.selectedWire = null;
+    setSelLabel('');
     st._panning = true; st._panStartX = mx - st.panX; st._panStartY = my - st.panY;
-  }, [getHoleAt, getNodeAt]);
+  }, [getHoleAt, getNodeAt, setSelLabel]);
 
   const onMouseMove = useCallback((e) => {
     const rect = canvasRef.current.getBoundingClientRect();
@@ -1056,10 +1117,11 @@ export default function LogicSim({ params = {} }) {
     const st = stateRef.current;
     
     if (st._panning) { st.panX = mx - st._panStartX; st.panY = my - st._panStartY; return; }
+    if (st._draggingWireEnd) { st._draggingWireEnd.mx = mx; st._draggingWireEnd.my = my; return; }
     if (st.draggingWire) { st.draggingWire.mx = mx; st.draggingWire.my = my; return; }
     if (st._dragNode) {
-      const gx = Math.round((mx - st._dragOffX - st.panX) / (CELL * st.zoom));
-      const gy = Math.round((my - st._dragOffY - st.panY) / (CELL * st.zoom));
+      const gx = Math.round((mx - st._dragOffX - st.panX) / CELL);
+      const gy = Math.round((my - st._dragOffY - st.panY) / CELL);
       st._dragNode.x = gx; st._dragNode.y = gy;
     }
   }, []);
@@ -1069,6 +1131,18 @@ export default function LogicSim({ params = {} }) {
     const mx = e.clientX - rect.left, my = e.clientY - rect.top;
     const st = stateRef.current;
     const isClick = Math.hypot(mx - (st._clickStart?.x || mx), my - (st._clickStart?.y || my)) < 5;
+
+    if (st._draggingWireEnd) {
+      const hole = getHoleAt(mx, my);
+      if (hole) {
+        const other = st._draggingWireEnd.endpoint === 'h1' ? st._draggingWireEnd.wire.h2 : st._draggingWireEnd.wire.h1;
+        if (hole.id !== other) {
+          st._draggingWireEnd.wire[st._draggingWireEnd.endpoint] = hole.id;
+        }
+      }
+      st._draggingWireEnd = null;
+      return;
+    }
 
     if (st.draggingWire) {
       const hole = getHoleAt(mx, my);
@@ -1082,8 +1156,8 @@ export default function LogicSim({ params = {} }) {
       if (n.type === "SWITCH") {
         n.state = { on: !n.state?.on };
       } else if (n.type === "DIP_SWITCH") {
-        const localX = mx - (n.x * CELL * st.zoom + st.panX);
-        const col = Math.floor(localX / (CELL * st.zoom));
+        const localX = mx - (n.x * CELL + st.panX);
+        const col = Math.floor(localX / CELL);
         if (col >= 0 && col < 4) {
           const sw = n.state?.switches ? [...n.state.switches] : [false,false,false,false];
           sw[col] = !sw[col];
@@ -1101,6 +1175,7 @@ export default function LogicSim({ params = {} }) {
     }
 
     st._dragNode = null;
+    st._draggingWireEnd = null;
     st._panning = false;
   }, [getHoleAt]);
 
@@ -1114,8 +1189,8 @@ export default function LogicSim({ params = {} }) {
     const st = stateRef.current;
     const def = COMP_DEFS[data.type];
     
-    const dropX = Math.round((mx - st.panX) / (CELL * st.zoom)) - Math.floor(def.w / 2);
-    const dropY = Math.round((my - st.panY) / (CELL * st.zoom)) - Math.floor(def.h / 2);
+    const dropX = Math.round((mx - st.panX) / CELL) - Math.floor(def.w / 2);
+    const dropY = Math.round((my - st.panY) / CELL) - Math.floor(def.h / 2);
 
     st.nodes.push({ id: "n" + Date.now(), type: data.type, x: dropX, y: dropY, state: data.state || {} });
   }, []);
@@ -1127,19 +1202,22 @@ export default function LogicSim({ params = {} }) {
         if (st.selectedNode) st.nodes = st.nodes.filter(n => n.id !== st.selectedNode);
         if (st.selectedWire) st.wires = st.wires.filter(w => w.id !== st.selectedWire);
         st.selectedNode = null; st.selectedWire = null;
+        setSelLabel('');
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [setSelLabel]);
 
   const loadPrebuilt = (key) => {
     const p = PREBUILT[key];
     if (p) {
-      // Deep clone to avoid mutating preset
       stateRef.current.nodes = JSON.parse(JSON.stringify(p.nodes));
       stateRef.current.wires = JSON.parse(JSON.stringify(p.wires));
       stateRef.current.simState = { voltages: null };
+      stateRef.current.selectedNode = null;
+      stateRef.current.selectedWire = null;
+      setSelLabel('');
     }
   };
 
@@ -1151,9 +1229,18 @@ export default function LogicSim({ params = {} }) {
                 onChange={e => loadPrebuilt(e.target.value)}>
           <option value="blank">Empty Board</option>
           <option value="led_basic">Basic LED Circuit</option>
+          <option value="half_adder">Half Adder (XOR + AND)</option>
+          <option value="adder_7seg">Adder → 7-Segment Display</option>
           <option value="555_astable">555 Astable Oscillator</option>
         </select>
         
+        {selLabel && (
+          <div className="text-sm text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded border border-slate-200 dark:border-slate-700 flex items-center gap-1.5">
+            <span className="text-slate-400 dark:text-slate-500">Selected:</span>
+            <span className="font-semibold">{selLabel}</span>
+          </div>
+        )}
+
         <div className="flex items-center gap-2 ml-auto">
           <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Board Size:</label>
           <select className="bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded text-sm px-3 py-1.5 outline-none text-slate-800 dark:text-slate-200" 
@@ -1206,17 +1293,7 @@ export default function LogicSim({ params = {} }) {
             onWheel={(e) => {
               e.preventDefault();
               const st = stateRef.current;
-              const mx = e.clientX - canvasRef.current.getBoundingClientRect().left;
-              const my = e.clientY - canvasRef.current.getBoundingClientRect().top;
-              if (e.ctrlKey || e.metaKey || Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-                const zoomDelta = e.deltaY > 0 ? 0.95 : 1.05;
-                const newZoom = Math.max(0.2, Math.min(3.0, st.zoom * zoomDelta));
-                st.panX = mx - (mx - st.panX) / st.zoom * newZoom;
-                st.panY = my - (my - st.panY) / st.zoom * newZoom;
-                st.zoom = newZoom;
-              } else {
-                st.panX -= e.deltaX; st.panY -= e.deltaY;
-              }
+              st.panX -= e.deltaX; st.panY -= e.deltaY;
             }}
           />
         </div>

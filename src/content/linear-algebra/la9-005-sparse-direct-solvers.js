@@ -305,7 +305,7 @@ disp('Factorized once, solved 10 RHS cheaply.')
           strategyTitle: 'Identify separator (middle column)',
         },
         {
-          expression: '\\text{Reorder: } [1,4,7,\\; 3,6,9,\\; 2,5,8] = [\\text{left}, \\text{right}, \\text{separator}]$',
+          expression: '\\text{Reorder: } [1,4,7,\\; 3,6,9,\\; 2,5,8] = [\\text{left}, \\text{right}, \\text{separator}]',
           annotation: 'Eliminate the two independent subproblems first (left and right blocks create no cross-fill), then eliminate the separator last.',
           strategyTitle: 'ND reordering: subproblems before separator',
         },
@@ -337,7 +337,7 @@ disp('Factorized once, solved 10 RHS cheaply.')
           strategyTitle: '(c) CG + AMG: optimal',
         },
         {
-          expression: '\\text{Winner: 1 RHS} \\Rightarrow \\text{CG+AMG}; \\quad k \\text{ RHS} \\Rightarrow \\text{Direct if } k > N^{1/2}/\\log N$',
+          expression: '\\text{Winner: 1 RHS} \\Rightarrow \\text{CG+AMG}; \\quad k \\text{ RHS} \\Rightarrow \\text{Direct if } k > N^{1/2}/\\log N',
           annotation: 'For many right-hand sides, the direct solver\'s cheap per-solve cost ($O(N \\log N)$) wins over AMG\'s setup cost. For a single RHS with large $N$, AMG wins. The crossover depends on problem size and number of RHS.',
           strategyTitle: 'Decision: which solver to use?',
         },

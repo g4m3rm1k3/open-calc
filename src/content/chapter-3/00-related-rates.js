@@ -1407,7 +1407,7 @@ Two quantities changing in time are locked together by a constraint equation. Di
           phase: "discovery",
           title: "Building the rate with finite slices",
           content:
-            "I break time into tiny intervals of length $\\Delta t$. In one small slice:\n\n- The crank turns an extra $\\Delta \\theta$\n- The radius grows by a tiny $\\Delta r$ (because more rope is wound on)\n\nThe extra rope length wound in that slice is approximately:\n\n$$\\Delta s \\approx r \\cdot \\Delta \\theta + \\theta \\cdot \\Delta r$$\n\n(This is the finite version of the product rule — I add the two contributions separately.)\n\nThe average speed of the anchor over that tiny interval is:\n\n$$\\frac{\\Delta s}{\\Delta t} \\approx r \\cdot \\frac{\\Delta \\theta}{\\Delta t} + \\theta \\cdot \\frac{\\Delta r}{\\Delta t}$$\n\nAs I make $\\Delta t$ smaller and smaller, the approximation gets better. The terms $\\frac{\\Delta \\theta}{\\Delta t}$ and $\\frac{\\Delta r}{\\Delta t}$ become the instantaneous rates $\\frac{d\\theta}{dt}$ and $\\frac{d r}{dt}$. So the instantaneous speed of the anchor must be:\n\n$$\\frac{ds}{dt} = r \\cdot \\frac{d\\theta}{dt} + \\theta \\cdot \frac{dr}{dt}$$\n\nThis is the exact relationship I need.",
+            "I break time into tiny intervals of length $\\Delta t$. In one small slice:\n\n- The crank turns an extra $\\Delta \\theta$\n- The radius grows by a tiny $\\Delta r$ (because more rope is wound on)\n\nThe extra rope length wound in that slice is approximately:\n\n$$\\Delta s \\approx r \\cdot \\Delta \\theta + \\theta \\cdot \\Delta r$$\n\n(This is the finite version of the product rule — I add the two contributions separately.)\n\nThe average speed of the anchor over that tiny interval is:\n\n$$\\frac{\\Delta s}{\\Delta t} \\approx r \\cdot \\frac{\\Delta \\theta}{\\Delta t} + \\theta \\cdot \\frac{\\Delta r}{\\Delta t}$$\n\nAs I make $\\Delta t$ smaller and smaller, the approximation gets better. The terms $\\frac{\\Delta \\theta}{\\Delta t}$ and $\\frac{\\Delta r}{\\Delta t}$ become the instantaneous rates $\\frac{d\\theta}{dt}$ and $\\frac{d r}{dt}$. So the instantaneous speed of the anchor must be:\n\n$$\\frac{ds}{dt} = r \\cdot \\frac{d\\theta}{dt} + \\theta \\cdot \\frac{dr}{dt}$$\n\nThis is the exact relationship I need.",
         },
         {
           phase: "discovery",
@@ -1640,7 +1640,7 @@ Decimal: $\\dfrac{10\\sqrt{3}}{3} \\approx \\dfrac{17.32}{3} \\approx 5.77$ m/s.
         },
         {
           expression:
-            "\\text{Differentiate both sides with respect to t: } \\frac{dV}{dt} = \\frac{d}{dt} \\left( \\frac{\\pi}{12} h^3 \right)",
+            "\\text{Differentiate both sides with respect to t: } \\frac{dV}{dt} = \\frac{d}{dt} \\left( \\frac{\\pi}{12} h^3 \\right)",
           annotation: "Chain rule will appear because h = h(t).",
         },
         {

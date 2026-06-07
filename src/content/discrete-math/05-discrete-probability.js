@@ -158,8 +158,8 @@ export default {
       difficulty: 'hard',
       problem: 'A card is drawn uniformly from a standard deck. Event A: card is an ace. Event B: card is red. Compute P(A|B), P(B|A), and explain why they differ.',
       walkthrough: [
-        { expression: 'P(A|B)=#(red aces)/#(red cards)=2/26=1/13', annotation: 'Conditioning on red card as denominator.' },
-        { expression: 'P(B|A)=#(red aces)/#(aces)=2/4=1/2', annotation: 'Conditioning on ace changes denominator.' },
+        { expression: 'P(A|B) = \\frac{n(\\text{red aces})}{n(\\text{red cards})} = \\frac{2}{26} = \\frac{1}{13}', annotation: 'Conditioning on red card as denominator.' },
+        { expression: 'P(B|A) = \\frac{n(\\text{red aces})}{n(\\text{aces})} = \\frac{2}{4} = \\frac{1}{2}', annotation: 'Conditioning on ace changes denominator.' },
         { expression: 'Conditionals are directional: P(A|B) and P(B|A) usually differ', annotation: 'Common Bayes confusion in interviews.' },
       ],
       answer: 'P(A|B)=1/13, P(B|A)=1/2',

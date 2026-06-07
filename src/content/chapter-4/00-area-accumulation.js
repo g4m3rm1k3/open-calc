@@ -436,12 +436,12 @@ export default {
       walkthrough: [
         {
           expression:
-            "\\text{Prerequisite: v(t) = 6t - t^2 is a quadratic (parabola opening downward)}",
+            "\\text{Prerequisite: }v(t) = 6t - t^2\\text{ is a quadratic (parabola opening downward)}",
           annotation:
             "Standard form at² + bt + c with a = -1, b = 6, c = 0. The graph starts at (0,0), rises, then falls back to zero. Since velocity is positive throughout the interval, distance traveled equals displacement = area under the curve.",
         },
         {
-          expression: "\\text{(a) Find when v = 0 by solving 6t - t^2 = 0}",
+          expression: "\\text{(a) Find when }v = 0\\text{ by solving }6t - t^2 = 0",
           annotation:
             "Factor completely so we can see the roots (where the graph crosses the t-axis). Factoring is the simplest algebraic technique here.",
         },

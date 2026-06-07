@@ -334,9 +334,9 @@ The most important equivalences to memorize:
       title: 'Proof by Cases: |xy| = |x||y|',
       problem: 'Prove that for all real numbers x and y, |xy| = |x||y|.',
       steps: [
-        { expression: '\\text{Case 1: Both x, y \\ge 0}', annotation: 'xy ≥ 0, so |xy| = xy = |x||y|. ✓' },
-        { expression: '\\text{Case 2: x < 0, y \\ge 0}', annotation: 'xy ≤ 0, so |xy| = −xy = (−x)(y) = |x||y|. ✓' },
-        { expression: '\\text{Case 3: x \\ge 0, y < 0}', annotation: 'Symmetric to Case 2. |xy| = |x||y|. ✓' },
+        { expression: '\\text{Case 1: Both }x, y \\geq 0', annotation: 'xy ≥ 0, so |xy| = xy = |x||y|. ✓' },
+        { expression: '\\text{Case 2: }x < 0, y \\geq 0', annotation: 'xy ≤ 0, so |xy| = −xy = (−x)(y) = |x||y|. ✓' },
+        { expression: '\\text{Case 3: }x \\geq 0, y < 0', annotation: 'Symmetric to Case 2. |xy| = |x||y|. ✓' },
         { expression: '\\text{Case 4: Both x, y < 0}', annotation: 'xy > 0, so |xy| = xy = (−x)(−y) = |x||y|. ✓' },
         { expression: '\\text{All four cases exhausted.} \\quad \\square', annotation: 'Every possible sign combination has been covered. The claim holds universally.' },
       ],

@@ -774,7 +774,7 @@ alpha = 0.05; n_sims = 5000;
       hint: 'For 90% power: z_β = z_{0.10} = 1.282. For α = 0.05 one-sided: z_α = 1.645. Δ = 1.8 − 1.5 = 0.3 μm.',
       walkthrough: [
         {
-          expression: 'z_\\alpha = 1.645 \\text{ (one-sided, } \\alpha = 0.05\\text{)}, \\quad z_\\beta = 1.282 \\text{ (90% power)}',
+          expression: 'z_\\alpha = 1.645 \\text{ (one-sided, } \\alpha = 0.05\\text{)}, \\quad z_\\beta = 1.282 \\text{ (90\\% power)}',
           annotation: 'Critical values from the standard normal table. One-sided α = 0.05 → z = 1.645. Power = 90% → β = 10% → z_{0.10} = 1.282.',
         },
         {

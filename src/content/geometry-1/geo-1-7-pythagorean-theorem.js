@@ -209,17 +209,17 @@ Two triangles are similar if they have the same three angle measures (same shape
 **Using the similar triangles:**
 
 Since △ABC ~ △ACD: corresponding sides are proportional.
-$$\frac{AC}{AB} = \frac{AD}{AC} \implies AC^2 = AB \cdot AD$$
+$$\\frac{AC}{AB} = \\frac{AD}{AC} \\implies AC^2 = AB \\cdot AD$$
 
-That is: $b^2 = c \cdot AD$.
+That is: $b^2 = c \\cdot AD$.
 
 Since △ABC ~ △CBD:
-$$\frac{BC}{AB} = \frac{BD}{BC} \implies BC^2 = AB \cdot BD$$
+$$\\frac{BC}{AB} = \\frac{BD}{BC} \\implies BC^2 = AB \\cdot BD$$
 
-That is: $a^2 = c \cdot BD$.
+That is: $a^2 = c \\cdot BD$.
 
 **Add the two equations:**
-$$a^2 + b^2 = c \cdot BD + c \cdot AD = c(AD + BD) = c \cdot AB = c \cdot c = c^2 \quad \square$$
+$$a^2 + b^2 = c \\cdot BD + c \\cdot AD = c(AD + BD) = c \\cdot AB = c \\cdot c = c^2 \\quad \\square$$
 
 The self-similar structure of the right triangle — the altitude creates two smaller copies of itself — is the heart of this proof.`,
     },

@@ -333,7 +333,7 @@ kappa_prec = eig_prec(end)/eig_prec(1)
           strategyTitle: '(a) No preconditioner: $k = O(n)$',
         },
         {
-          expression: '\\text{Diagonal scaling: } \\kappa(D^{-1}A) = O(n^2) \\text{ still}, \\quad k \\approx 7n$',
+          expression: '\\text{Diagonal scaling: } \\kappa(D^{-1}A) = O(n^2) \\text{ still}, \\quad k \\approx 7n',
           annotation: 'For the Poisson matrix, diagonal entries are all equal (= 4 for interior points), so diagonal scaling does nothing: $\\kappa$ is unchanged. Diagonal preconditioning helps only when the matrix is poorly scaled.',
           strategyTitle: '(b) Diagonal preconditioning: no help here',
         },

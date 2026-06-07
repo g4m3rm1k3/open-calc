@@ -114,7 +114,7 @@ Committee of 3 from 10 people: {Alice, Bob, Carol} is the same committee as {Car
 
 The formula: C(n,k) = n! / (k! × (n−k)!)
 
-This is also written as $\binom{n}{k}$, pronounced "n choose k."
+This is also written as $\\binom{n}{k}$, pronounced "n choose k."
 
 **Where does k! come from?** Start from P(n,k) — the ordered arrangements. Every unordered selection of k items corresponds to k! different ordered arrangements (all the ways to arrange those k items in order). Since we don't care about order, we divide P(n,k) by k! to collapse all those ordered duplicates into one selection.
 

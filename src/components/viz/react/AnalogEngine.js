@@ -86,10 +86,11 @@ export function solveAnalog(netlist, nodes, simState, dt = 1/60) {
     if (!n.pinNets) return;
 
     if (n.type === "POWER_SUPPLY") {
-      const p5v = n.pinNets[0];
-      const pGnd = n.pinNets[1];
-      if (p5v !== undefined) { isFixed[p5v] = 1; fixedV[p5v] = 5.0; V[p5v] = 5.0; }
-      if (pGnd !== undefined) { isFixed[pGnd] = 1; fixedV[pGnd] = 0.0; V[pGnd] = 0.0; }
+      // Always inject directly into the power rails regardless of where the component is placed
+      const vcc = holeToNetIdx["rail_t1_0"];
+      const gnd = holeToNetIdx["rail_t2_0"];
+      if (vcc !== undefined && vcc !== gnd) { isFixed[vcc] = 1; fixedV[vcc] = 5.0; V[vcc] = 5.0; }
+      if (gnd !== undefined && vcc !== gnd) { isFixed[gnd] = 1; fixedV[gnd] = 0.0; V[gnd] = 0.0; }
     }
     
     if (n.type === "RESISTOR") {
@@ -210,13 +211,16 @@ export function solveAnalog(netlist, nodes, simState, dt = 1/60) {
     }
     
     // Generic Logic Gate helper
+    // Pin layout for all 14-pin DIP quad gates (74HC00/08/32/86):
+    //   Bottom row indices 0-6: 1A,1B,1Y, 2A,2B,2Y, GND
+    //   Top row indices 7-13:   VCC, 4B,4A,4Y, 3B,3A,3Y
     const handleLogicGate = (outPin, inPins, logicFn, pinNets) => {
       const nOut = pinNets[outPin];
       if (nOut === undefined) return;
       const inputs = inPins.map(p => pinNets[p] !== undefined ? V[pinNets[p]] > 2.5 : false);
       const isHigh = logicFn(...inputs);
-      const nVcc = pinNets[13]; // Pin 14 is index 13
-      const nGnd = pinNets[6];  // Pin 7 is index 6
+      const nVcc = pinNets[7];  // VCC = index 7 (top-row first pin)
+      const nGnd = pinNets[6];  // GND = index 6 (bottom-row last pin)
       if (isHigh && nVcc !== undefined) {
         addConductance(nOut, nVcc, 1.0 / 50.0);
       } else if (!isHigh && nGnd !== undefined) {
@@ -225,40 +229,40 @@ export function solveAnalog(netlist, nodes, simState, dt = 1/60) {
     };
 
     if (n.type === "74HC00") { // NAND
-      handleLogicGate(2, [0, 1], (a, b) => !(a && b), n.pinNets);
-      handleLogicGate(5, [3, 4], (a, b) => !(a && b), n.pinNets);
-      handleLogicGate(7, [8, 9], (a, b) => !(a && b), n.pinNets);
-      handleLogicGate(10, [11, 12], (a, b) => !(a && b), n.pinNets);
+      handleLogicGate(2, [0, 1], (a, b) => !(a && b), n.pinNets);   // gate 1
+      handleLogicGate(5, [3, 4], (a, b) => !(a && b), n.pinNets);   // gate 2
+      handleLogicGate(13, [12, 11], (a, b) => !(a && b), n.pinNets); // gate 3: 3Y from 3A,3B
+      handleLogicGate(10, [9, 8], (a, b) => !(a && b), n.pinNets);  // gate 4: 4Y from 4A,4B
     }
-    if (n.type === "74HC04") { // NOT
-      handleLogicGate(1, [0], a => !a, n.pinNets);
-      handleLogicGate(3, [2], a => !a, n.pinNets);
-      handleLogicGate(5, [4], a => !a, n.pinNets);
-      handleLogicGate(7, [8], a => !a, n.pinNets);
-      handleLogicGate(9, [10], a => !a, n.pinNets);
-      handleLogicGate(11, [12], a => !a, n.pinNets);
+    if (n.type === "74HC04") { // NOT — bottom: 1A,1Y,2A,2Y,3A,3Y,GND; top: VCC,6A,6Y,5A,5Y,4A,4Y
+      handleLogicGate(1, [0], a => !a, n.pinNets);   // gate 1
+      handleLogicGate(3, [2], a => !a, n.pinNets);   // gate 2
+      handleLogicGate(5, [4], a => !a, n.pinNets);   // gate 3
+      handleLogicGate(9, [8], a => !a, n.pinNets);   // gate 6: 6Y from 6A
+      handleLogicGate(11, [10], a => !a, n.pinNets); // gate 5: 5Y from 5A
+      handleLogicGate(13, [12], a => !a, n.pinNets); // gate 4: 4Y from 4A
     }
     if (n.type === "74HC08") { // AND
       handleLogicGate(2, [0, 1], (a, b) => (a && b), n.pinNets);
       handleLogicGate(5, [3, 4], (a, b) => (a && b), n.pinNets);
-      handleLogicGate(7, [8, 9], (a, b) => (a && b), n.pinNets);
-      handleLogicGate(10, [11, 12], (a, b) => (a && b), n.pinNets);
+      handleLogicGate(13, [12, 11], (a, b) => (a && b), n.pinNets);
+      handleLogicGate(10, [9, 8], (a, b) => (a && b), n.pinNets);
     }
     if (n.type === "74HC32") { // OR
       handleLogicGate(2, [0, 1], (a, b) => (a || b), n.pinNets);
       handleLogicGate(5, [3, 4], (a, b) => (a || b), n.pinNets);
-      handleLogicGate(7, [8, 9], (a, b) => (a || b), n.pinNets);
-      handleLogicGate(10, [11, 12], (a, b) => (a || b), n.pinNets);
+      handleLogicGate(13, [12, 11], (a, b) => (a || b), n.pinNets);
+      handleLogicGate(10, [9, 8], (a, b) => (a || b), n.pinNets);
     }
     if (n.type === "74HC86") { // XOR
       handleLogicGate(2, [0, 1], (a, b) => (a !== b), n.pinNets);
       handleLogicGate(5, [3, 4], (a, b) => (a !== b), n.pinNets);
-      handleLogicGate(7, [8, 9], (a, b) => (a !== b), n.pinNets);
-      handleLogicGate(10, [11, 12], (a, b) => (a !== b), n.pinNets);
+      handleLogicGate(13, [12, 11], (a, b) => (a !== b), n.pinNets);
+      handleLogicGate(10, [9, 8], (a, b) => (a !== b), n.pinNets);
     }
     
     if (n.type === "74HC47") {
-      const pB=0, pC=1, pD=5, pA=6, pGnd=7, pE=8, pD_out=9, pC_out=10, pB_out=11, pA_out=12, pG_out=13, pF_out=14, pVcc=15;
+      const pB=0, pC=1, pD=5, pA=6, pGnd=7, pE_out=8, pD_out=9, pC_out=10, pB_out=11, pA_out=12, pG_out=13, pF_out=14, pVcc=15;
       const getIn = (idx) => n.pinNets[idx] !== undefined && V[n.pinNets[idx]] > 2.5;
       const val = (getIn(pA)?1:0) + (getIn(pB)?2:0) + (getIn(pC)?4:0) + (getIn(pD)?8:0);
       
@@ -307,7 +311,7 @@ export function solveAnalog(netlist, nodes, simState, dt = 1/60) {
     }
 
     if (n.type === "OP_AMP") {
-      const nP = n.pinNets[0], nN = n.pinNets[1], nOut = n.pinNets[2], nVcc = n.pinNets[3], nGnd = n.pinNets[4];
+      const nOut = n.pinNets[0], nN = n.pinNets[1], nP = n.pinNets[2], nGnd = n.pinNets[3], nVcc = n.pinNets[4];
       if (nOut !== undefined) {
         const vP = nP !== undefined ? V[nP] : 0;
         const vN = nN !== undefined ? V[nN] : 0;
@@ -328,10 +332,10 @@ export function solveAnalog(netlist, nodes, simState, dt = 1/60) {
     }
 
     if (n.type === "555_TIMER") {
-      // Pinout: 1=GND, 2=TRIG, 3=OUT, 4=RESET, 5=CTRL, 6=THRES, 7=DISCH, 8=VCC
+      // Pinout (index order): 0=GND, 1=TRIG, 2=OUT, 3=RST, 4=VCC, 5=DISCH, 6=THRES, 7=CTRL
       // Simplified Behavioral Model
-      const gnd = n.pinNets[0], trig = n.pinNets[1], out = n.pinNets[2], thres = n.pinNets[5], vcc = n.pinNets[7];
-      const disch = n.pinNets[6];
+      const gnd = n.pinNets[0], trig = n.pinNets[1], out = n.pinNets[2], vcc = n.pinNets[4];
+      const disch = n.pinNets[5], thres = n.pinNets[6];
       
       const v_cc = vcc !== undefined ? V[vcc] : 5.0;
       const v_trig = trig !== undefined ? V[trig] : 5.0;

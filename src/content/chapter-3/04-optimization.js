@@ -826,7 +826,7 @@ The river gives you a free side, so the optimal rectangle is **not** a square: i
         },
         {
           expression:
-            "\\text{Substitute into area: } A(x) = x \\left( \\frac{P}{2} - x \right) = \\frac{P}{2}x - x^2",
+            "\\text{Substitute into area: } A(x) = x \\left( \\frac{P}{2} - x \\right) = \\frac{P}{2}x - x^2",
           annotation:
             "Now A is a function of x only. This is a quadratic that opens downward (coefficient of x² is negative), so it has a maximum.",
         },
@@ -986,7 +986,7 @@ The river gives you a free side, so the optimal rectangle is **not** a square: i
       walkthrough: [
         {
           expression:
-            "\\text{Perimeter constraint: rectangle sides 2r (width) + h (height) + semicircle arc \\pi r = 10}",
+            "\\text{Perimeter constraint: rectangle sides }2r\\text{ (width) + }h\\text{ (height) + semicircle arc }\\pi r = 10",
           annotation:
             "The semicircle arc length is half the circumference: πr. Total perimeter: 2r + h + πr = 10.",
         },
@@ -1023,7 +1023,7 @@ The river gives you a free side, so the optimal rectangle is **not** a square: i
           annotation: "Optimal radius.",
         },
         {
-          expression: "\\text{Now compute h at r^*: } h = 10 - r^*(2 + \\pi)",
+          expression: "\\text{Now compute }h\\text{ at }r^*\\text{: }h = 10 - r^*(2 + \\pi)",
           annotation: "Substitute the optimal r.",
         },
         {

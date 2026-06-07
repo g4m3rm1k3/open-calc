@@ -292,7 +292,7 @@ print(kernel_basis.round(10))
           strategyTitle: 'Assemble matrix',
         },
         {
-          expression: '\\ker(T) = \\{p : T(p) = 0\\} = \\{$constants$\\}, \\quad \\dim(\\ker T) = 1',
+          expression: '\\ker(T) = \\{p : T(p) = 0\\} = \\{\\text{constants}\\}, \\quad \\dim(\\ker T) = 1',
           annotation: '$T(p)=0$ iff $xp\'=0$ iff $p\'=0$ iff $p$ is constant.',
           strategyTitle: 'Find kernel',
         },
