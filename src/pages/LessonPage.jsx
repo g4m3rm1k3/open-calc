@@ -105,7 +105,8 @@ export default function LessonPage() {
     lessonIndex < ALL_LESSONS.length - 1 ? ALL_LESSONS[lessonIndex + 1] : null;
 
   return (
-    <article className="mx-auto max-w-7xl pb-20 px-4 sm:px-6 md:px-8 bg-white dark:bg-slate-950 min-h-screen">
+    <div className="flex-1 min-h-screen relative overflow-x-hidden bg-white dark:bg-slate-950">
+      <article className="mx-auto max-w-[1440px] pb-24 pt-6 px-4 sm:px-8 md:px-12 min-h-screen relative">
       <TutorPanel lesson={lesson} />
 
       <div className="pointer-events-none fixed left-0 top-0 z-[10001] h-1 w-full bg-slate-200 dark:bg-slate-800">
@@ -153,8 +154,8 @@ export default function LessonPage() {
         );
       })()}
 
-      <header className="oc-shell-card mb-12 overflow-hidden shadow-2xl">
-        <div className="oc-header-gradient px-8 py-10 sm:px-12 sm:py-14">
+      <header className="-mx-4 sm:mx-0 sm:rounded-3xl mb-12 overflow-hidden shadow-2xl bg-white dark:bg-slate-900 border-y sm:border border-slate-200 dark:border-slate-800 relative">
+        <div className="oc-header-gradient px-6 py-10 sm:px-12 sm:py-14">
           <div className="mb-3 flex flex-wrap items-center gap-2">
             {(() => {
               const chapter = CURRICULUM.find(
@@ -183,7 +184,7 @@ export default function LessonPage() {
             })()}
           </div>
 
-          <h1 className="text-5xl font-black tracking-tight text-slate-950 dark:text-slate-50 sm:text-6xl lg:text-7xl !leading-[1.1]">
+          <h1 className="text-5xl font-black tracking-tight text-slate-950 dark:text-slate-200 sm:text-6xl lg:text-7xl !leading-[1.1]">
             {lesson.title}
           </h1>
           {lesson.subtitle && (
@@ -256,7 +257,9 @@ export default function LessonPage() {
 
       <div className="space-y-12">
         {isMobile ? (
-          <MobileLessonContent lesson={lesson} />
+          <div className="-mx-4 sm:mx-0">
+            <MobileLessonContent lesson={lesson} />
+          </div>
         ) : (
           <MicroCycleLesson lesson={lesson} />
         )}
@@ -323,5 +326,6 @@ export default function LessonPage() {
         )}
       </nav>
     </article>
+    </div>
   );
 }

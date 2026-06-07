@@ -1070,14 +1070,13 @@ export default function MicroCycleLesson({ lesson }) {
               </p>
             )}
             {allOpenmat.map((v, i) => (
-              <VizCard
-                key={i}
-                viz={v}
-                noteId={
-                  lesson.id ? `${lesson.id}:openmat:${v.id ?? i}` : undefined
-                }
-                borderColor="border-amber-200 dark:border-amber-900/60"
-              />
+              <div key={i} className="mb-6">
+                <VizFrame
+                  id={v.id ?? v.vizId}
+                  initialProps={v.initialProps ?? v.props ?? {}}
+                  title={v.title}
+                />
+              </div>
             ))}
           </div>
         );
@@ -1113,14 +1112,13 @@ export default function MicroCycleLesson({ lesson }) {
               </p>
             )}
             {allPython.map((v, i) => (
-              <VizCard
-                key={i}
-                viz={v}
-                noteId={
-                  lesson.id ? `${lesson.id}:python:${v.id ?? i}` : undefined
-                }
-                borderColor="border-brand-200 dark:border-brand-900/60"
-              />
+              <div key={i} className="mb-6">
+                <VizFrame
+                  id={v.id ?? v.vizId}
+                  initialProps={v.initialProps ?? v.props ?? {}}
+                  title={v.title}
+                />
+              </div>
             ))}
           </div>
         );

@@ -386,7 +386,7 @@ export default function MobileLessonContent({ lesson }) {
 
   return (
     // Solid bg so the page-bg gradient never bleeds through between cards
-    <div className="w-full bg-[var(--color-page-bg)]">
+    <div className="bg-white dark:bg-slate-950">
       {visibleTabs.length > 1 && (
         <MobileTabBar tabs={visibleTabs} activeTab={activeTab} onTabClick={handleTabClick} />
       )}

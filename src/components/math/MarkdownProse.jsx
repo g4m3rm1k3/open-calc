@@ -153,80 +153,79 @@ function preprocess(text) {
 const PROSE_COMPONENTS = {
   // Headings
   h1: ({ children }) => (
-    <h1 className="text-2xl font-black tracking-tight text-slate-950 dark:text-slate-50 mt-8 mb-4">
+    <h1 className="text-3xl sm:text-4xl font-serif font-bold tracking-tight text-slate-900 dark:text-slate-200 mt-10 mb-6 max-w-[70ch]">
       {children}
     </h1>
   ),
   h2: ({ children }) => (
-    <h2 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-slate-100 mt-8 mb-3">
+    <h2 className="text-2xl sm:text-3xl font-serif font-bold tracking-tight text-slate-800 dark:text-slate-300 mt-10 mb-4 max-w-[70ch]">
       {children}
     </h2>
   ),
   h3: ({ children }) => (
-    <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 mt-6 mb-2">
+    <h3 className="text-xl sm:text-2xl font-serif font-semibold text-slate-800 dark:text-slate-300 mt-8 mb-3 max-w-[70ch]">
       {children}
     </h3>
   ),
   h4: ({ children }) => (
-    <h4 className="text-[12px] font-black uppercase tracking-[0.18em] text-brand-600 dark:text-brand-400 mt-5 mb-2">
+    <h4 className="text-[13px] font-sans font-bold uppercase tracking-[0.2em] text-brand-600 dark:text-brand-400 mt-6 mb-2 max-w-[70ch]">
       {children}
     </h4>
   ),
   // Paragraphs
   p: ({ children }) => (
-    <p className="mb-6 last:mb-0 text-[17px] sm:text-[18px] leading-[1.75] text-slate-900 dark:text-slate-100 font-serif tracking-normal">
+    <p className="mb-6 last:mb-0 text-[18px] sm:text-[20px] leading-[1.8] text-slate-800 dark:text-slate-300 font-serif tracking-[0.01em] max-w-[75ch]">
       {children}
     </p>
   ),
-  // Bold — clearly brighter than body in both modes
+  // Bold
   strong: ({ children }) => (
-    <strong className="font-semibold text-slate-950 dark:text-white">
+    <strong className="font-bold text-slate-950 dark:text-slate-100">
       {children}
     </strong>
   ),
   // Italic
   em: ({ children }) => (
-    <em className="italic text-slate-600 dark:text-slate-300">{children}</em>
+    <em className="italic text-slate-700 dark:text-slate-400">{children}</em>
   ),
-  // Inline code — react-markdown v9+ removed the `inline` prop.
-  // Block code has className="language-*"; inline code has no className.
+  // Inline code
   code: ({ className, children }) =>
     className?.startsWith("language-") ? (
       <code className="block">{children}</code>
     ) : (
-      <code className="px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800/90 font-mono text-[0.86em] text-brand-700 dark:text-brand-300">
+      <code className="px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 font-mono text-[0.85em] text-brand-700 dark:text-brand-300 border border-slate-200 dark:border-slate-700/50">
         {children}
       </code>
     ),
   // Unordered list
   ul: ({ children }) => (
-    <ul className="list-disc pl-8 space-y-3 mb-6 text-[17px] sm:text-[18px] leading-[1.75] text-slate-900 dark:text-slate-100 font-serif tracking-normal">
+    <ul className="list-disc pl-8 space-y-3 mb-6 text-[18px] sm:text-[20px] leading-[1.8] text-slate-800 dark:text-slate-300 font-serif tracking-[0.01em] max-w-[75ch]">
       {children}
     </ul>
   ),
   // Ordered list
   ol: ({ children }) => (
-    <ol className="list-decimal pl-8 space-y-3 mb-6 text-[17px] sm:text-[18px] leading-[1.75] text-slate-900 dark:text-slate-100 font-serif tracking-normal">
+    <ol className="list-decimal pl-8 space-y-3 mb-6 text-[18px] sm:text-[20px] leading-[1.8] text-slate-800 dark:text-slate-300 font-serif tracking-[0.01em] max-w-[75ch]">
       {children}
     </ol>
   ),
-  li: ({ children }) => <li className="leading-7">{children}</li>,
+  li: ({ children }) => <li className="pl-2">{children}</li>,
   // Block quote
   blockquote: ({ children }) => (
-    <blockquote className="border-l-[3px] border-brand-400 dark:border-brand-500 pl-6 py-2 my-6 italic text-slate-800 dark:text-slate-200 font-serif text-[17px] sm:text-[18px] leading-[1.8] bg-brand-50/50 dark:bg-brand-950/20 rounded-r-xl tracking-normal">
+    <blockquote className="border-l-4 border-brand-300 dark:border-brand-600 pl-6 py-1 my-8 italic text-slate-700 dark:text-slate-400 font-serif text-[19px] sm:text-[21px] leading-[1.8] bg-slate-50 dark:bg-slate-900/50 rounded-r-2xl shadow-sm tracking-[0.01em] max-w-[70ch]">
       {children}
     </blockquote>
   ),
   // Horizontal rule
-  hr: () => <hr className="my-4 border-slate-200 dark:border-slate-700" />,
+  hr: () => <hr className="my-10 border-t border-slate-200 dark:border-slate-800 max-w-[70ch]" />,
   // Tables
   table: ({ children }) => (
-    <div className="overflow-x-auto my-6 rounded-2xl border border-slate-200 dark:border-slate-800">
-      <table className="w-full text-sm border-collapse">{children}</table>
+    <div className="overflow-x-auto my-8 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+      <table className="w-full text-[16px] border-collapse font-sans">{children}</table>
     </div>
   ),
   thead: ({ children }) => (
-    <thead className="bg-slate-100 dark:bg-slate-800">{children}</thead>
+    <thead className="bg-slate-50 dark:bg-slate-900/80">{children}</thead>
   ),
   tbody: ({ children }) => <tbody>{children}</tbody>,
   tr: ({ children }) => (
