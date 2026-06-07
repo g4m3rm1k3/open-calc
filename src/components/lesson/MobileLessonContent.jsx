@@ -197,7 +197,7 @@ function MobileVizCard({ viz, borderColor = "border-slate-200 dark:border-slate-
       {expanded && (
         <>
           {viz.mathBridge && (
-            <div className="px-4 py-3 bg-indigo-50 dark:bg-indigo-950/40 border-b border-indigo-100 dark:border-indigo-900/50 [&_p]:text-sm [&_p]:text-indigo-900 [&_p]:dark:text-indigo-200">
+            <div className="px-0 py-3 bg-indigo-50 dark:bg-indigo-950/40 border-b border-indigo-100 dark:border-indigo-900/50 [&_p]:text-sm [&_p]:text-indigo-900 [&_p]:dark:text-indigo-200">
               <MarkdownProse text={viz.mathBridge} />
             </div>
           )}
@@ -228,7 +228,7 @@ const CARD_THEMES = {
 function CardHeader({ icon, kicker, label, color, noteId, right }) {
   const t = CARD_THEMES[color] ?? CARD_THEMES.slate;
   return (
-    <div className={`flex items-center gap-3 px-4 py-3.5 ${t.header}`}>
+    <div className={`flex items-center gap-3 px-0 py-3.5 ${t.header}`}>
       <div className={`w-9 h-9 rounded-xl bg-white dark:bg-slate-900 border ${t.icon} flex items-center justify-center text-lg shadow-sm flex-shrink-0`}>
         {icon}
       </div>
@@ -248,7 +248,7 @@ function MobileCard({ id, icon, kicker, label, color = "slate", noteId, children
   return (
     <div id={id} className={`rounded-none sm:rounded-2xl border-x-0 sm:border-x border overflow-hidden bg-white dark:bg-slate-900 ${t.card} scroll-mt-24`}>
       <CardHeader icon={icon} kicker={kicker} label={label} color={color} noteId={noteId} />
-      <div className="px-4 py-5">{children}</div>
+      <div className="px-0 pb-5 pt-3">{children}</div>
     </div>
   );
 }
@@ -273,7 +273,7 @@ function MobileCollapsible({ id, icon, kicker, label, color = "slate", defaultOp
           right={toggle}
         />
       </button>
-      {open && <div className="px-4 py-5">{children}</div>}
+      {open && <div className="px-0 py-5">{children}</div>}
     </div>
   );
 }
@@ -420,7 +420,7 @@ export default function MobileLessonContent({ lesson }) {
           <p className="text-[9px] font-bold uppercase tracking-[0.3em] text-brand-600 dark:text-brand-400 pt-3 pb-2 text-center">Mental Model</p>
           <div className="divide-y divide-slate-100 dark:divide-slate-800 border-t border-slate-100 dark:border-slate-800">
             {lesson.mentalModel.map((item, i) => (
-              <div key={i} className="px-4 py-3">
+              <div key={i} className="px-0 py-3">
                 <span className="text-[9px] font-black uppercase tracking-widest text-brand-400 dark:text-brand-500 block mb-1">{String(i + 1).padStart(2, "0")}</span>
                 <MarkdownProse text={item} className="[&_p]:text-sm [&_p]:font-semibold [&_p]:leading-snug [&_p]:text-slate-800 [&_p]:dark:text-slate-300 [&_p]:mb-0" />
               </div>
@@ -503,7 +503,7 @@ export default function MobileLessonContent({ lesson }) {
         <Anchor id="practice" className="pt-2 pb-4">
           {lesson.examples?.length > 0 && (
             <>
-              <div className="px-4 mb-3 flex items-center gap-2">
+              <div className="px-0 mb-3 flex items-center gap-2">
                 <span className="text-base">📝</span>
                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-400">Worked Examples</p>
               </div>

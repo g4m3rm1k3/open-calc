@@ -1266,10 +1266,10 @@ export default function PythonNotebook({ params, onParamChange }) {
   // ── Main UI ────────────────────────────────────────────────────────────────
   return (
     <div
+      className="px-0 sm:px-3 py-3"
       style={{
         width: "100%",
         fontFamily: "sans-serif",
-        padding: "12px",
         boxSizing: "border-box",
       }}
     >

@@ -255,7 +255,7 @@ export default function ScrubbableExample({ example, number, lessonId }) {
 
       <div className="p-2 sm:p-5 lg:p-6">
         {/* Problem Statement */}
-        <div className="mb-4 sm:mb-6 p-4 sm:p-5 bg-brand-50/50 dark:bg-brand-900/10 rounded-xl sm:rounded-2xl border border-brand-100 dark:border-brand-800/50 shadow-inner">
+        <div className="mb-4 sm:mb-6 p-3 sm:p-5 bg-brand-50/50 dark:bg-brand-900/10 rounded-xl sm:rounded-2xl border border-brand-100 dark:border-brand-800/50 shadow-inner">
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-600 dark:text-brand-400 mb-4 flex items-center gap-2">
              <span className="w-1.5 h-1.5 rounded-full bg-brand-500" />
              The Challenge

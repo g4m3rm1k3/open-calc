@@ -107,7 +107,7 @@ export default function LessonPage() {
   return (
     <div className="flex-1 min-h-screen relative overflow-x-hidden bg-white dark:bg-slate-950">
       <TutorPanel lesson={lesson} />
-      <article className="mx-auto max-w-[1440px] pb-24 pt-6 px-4 sm:px-8 md:px-12 min-h-screen relative">
+      <article className="mx-auto max-w-[1440px] pb-24 pt-6 px-0 sm:px-8 md:px-12 min-h-screen relative">
 
       <div className="pointer-events-none fixed left-0 top-0 z-[10001] h-1 w-full bg-slate-200 dark:bg-slate-800">
         <div
@@ -121,7 +121,7 @@ export default function LessonPage() {
           (entry) => String(entry.number) === chapterId,
         );
         return (
-          <nav className="mb-6 px-4 md:px-0 flex flex-wrap items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+          <nav className="mb-6 px-3 md:px-0 flex flex-wrap items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
             <Link
               to="/"
               className="hover:text-brand-600 dark:hover:text-brand-400"
@@ -154,8 +154,8 @@ export default function LessonPage() {
         );
       })()}
 
-      <header className="-mx-4 sm:mx-0 sm:rounded-3xl mb-12 overflow-hidden shadow-2xl bg-white dark:bg-slate-900 border-y sm:border border-slate-200 dark:border-slate-800 relative">
-        <div className="oc-header-gradient px-6 py-10 sm:px-12 sm:py-14">
+      <header className="sm:mx-0 sm:rounded-3xl mb-12 overflow-hidden shadow-2xl bg-white dark:bg-slate-900 border-y sm:border border-slate-200 dark:border-slate-800 relative">
+        <div className="oc-header-gradient px-3 py-10 sm:px-12 sm:py-14">
           <div className="mb-3 flex flex-wrap items-center gap-2">
             {(() => {
               const chapter = CURRICULUM.find(
@@ -257,7 +257,7 @@ export default function LessonPage() {
 
       <div className="space-y-12">
         {isMobile ? (
-          <div className="-mx-4 sm:mx-0">
+          <div>
             <MobileLessonContent lesson={lesson} />
           </div>
         ) : (

@@ -46,8 +46,8 @@ export default function GlobalPythonNotebook({ isOpen, onClose }) {
           </header>
 
           {/* Scrollable Notebook Container */}
-          <div className="flex-1 overflow-y-auto p-2 custom-scrollbar bg-slate-50/30 dark:bg-slate-950/30">
-            <div className="max-w-4xl mx-auto py-4">
+          <div className="flex-1 overflow-y-auto px-0 py-2 sm:p-2 custom-scrollbar bg-slate-50/30 dark:bg-slate-950/30">
+            <div className="max-w-4xl mx-auto py-2 sm:py-4">
                <PythonNotebook />
             </div>
           </div>

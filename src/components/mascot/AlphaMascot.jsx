@@ -31,7 +31,7 @@ const CSS = `
   cursor: pointer; user-select: none;
   width: ${W}px; height: ${H}px;
 }
-@media(max-width:767px){ .monty-wrap { display:none; } }
+@media(max-width:767px){ .monty-wrap { transform: scale(0.65); transform-origin: bottom right; } }
 .ms-eye { animation: ms-eye  2.8s ease-in-out infinite; }
 .ms-tng { animation: ms-tng  4.2s linear infinite; transform-origin:30px 2px; }
 .mb1    { animation: mb1 3.3s linear infinite; }
