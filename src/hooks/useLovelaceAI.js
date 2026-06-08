@@ -3,6 +3,17 @@ import { CreateMLCEngine } from '@mlc-ai/web-llm'
 
 const MODEL_ID = 'Llama-3.2-1B-Instruct-q4f16_1-MLC'
 
+// Module-level singleton so multiple components share one engine instance
+let _engine = null
+let _enginePromise = null
+async function getSharedEngine(onProgress) {
+  if (_engine) return _engine
+  if (_enginePromise) return _enginePromise
+  _enginePromise = CreateMLCEngine(MODEL_ID, { initProgressCallback: ({ text }) => onProgress?.(text || 'Loading…') })
+    .then(e => { _engine = e; _enginePromise = null; return e })
+  return _enginePromise
+}
+
 const SYSTEM_PROMPT = `You are Lovelace, an open-source STEM tutor named after Ada Lovelace — the pioneering mathematician and first computer programmer. You help students understand mathematics, physics, chemistry, computer science, and related subjects.
 
 Rules:
@@ -27,22 +38,15 @@ export function extractQuestion(text) {
 }
 
 export function useLovelaceAI() {
-  const engineRef = useRef(null)
   const [isThinking, setIsThinking] = useState(false)
   const [isDownloading, setIsDownloading] = useState(false)
   const [downloadProgress, setDownloadProgress] = useState('')
 
   const ensureEngine = useCallback(async () => {
-    if (engineRef.current) return engineRef.current
+    if (_engine) return _engine
     setIsDownloading(true)
     try {
-      const engine = await CreateMLCEngine(MODEL_ID, {
-        initProgressCallback: ({ text }) => {
-          setDownloadProgress(text || 'Loading…')
-        },
-      })
-      engineRef.current = engine
-      return engine
+      return await getSharedEngine(p => setDownloadProgress(p))
     } finally {
       setIsDownloading(false)
       setDownloadProgress('')
@@ -94,5 +98,22 @@ export function useLovelaceAI() {
     }
   }, [ensureEngine])
 
-  return { ask, isThinking, isDownloading, downloadProgress }
+  // Streaming version — onChunk(partialText) is called as tokens arrive
+  const askStream = useCallback(async (messages, onChunk) => {
+    setIsThinking(true)
+    try {
+      const engine = await ensureEngine()
+      const stream = await engine.chat.completions.create({ messages, max_tokens: 512, temperature: 0.7, stream: true })
+      let full = ''
+      for await (const chunk of stream) {
+        full += chunk.choices[0]?.delta?.content ?? ''
+        onChunk(full)
+      }
+      return full
+    } finally {
+      setIsThinking(false)
+    }
+  }, [ensureEngine])
+
+  return { ask, askStream, isThinking, isDownloading, downloadProgress }
 }

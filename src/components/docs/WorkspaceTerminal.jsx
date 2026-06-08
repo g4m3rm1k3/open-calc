@@ -131,6 +131,114 @@ function runExpressRoutes(apps, logs) {
   }
 }
 
+// ── FastAPI / Pydantic / Uvicorn Python shim ──────────────────────────────────
+const FASTAPI_SHIM = `
+import sys, json, inspect, types, re
+
+class BaseModel:
+    def __init__(self, **data):
+        for k, v in data.items(): setattr(self, k, v)
+    def dict(self): return {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
+    def model_dump(self): return self.dict()
+    def json(self): return json.dumps(self.dict())
+
+class _P:
+    def __init__(self, default=None, **kw): self.default = default
+Query = Body = Path = Header = Form = Cookie = File = _P
+Depends = lambda f: f
+
+class HTTPException(Exception):
+    def __init__(self, status_code=400, detail="Bad Request"):
+        self.status_code = status_code; self.detail = detail
+        super().__init__(detail)
+
+class JSONResponse:
+    def __init__(self, content, status_code=200, **kw): self.content = content
+class HTMLResponse:
+    def __init__(self, content, status_code=200, **kw): self.content = content
+class PlainTextResponse(HTMLResponse): pass
+class RedirectResponse:
+    def __init__(self, url, **kw): self.url = url; self.content = f"redirect:{url}"
+
+class Request:
+    method = "GET"; headers = {}; query_params = {}; path_params = {}
+    async def json(self): return {}
+    async def body(self): return b""
+
+class _App:
+    def __init__(self, **kw):
+        self._routes = []; self.title = kw.get("title", "FastAPI")
+    def _dec(self, method, path, **kw):
+        def d(fn): self._routes.append((method, path, fn)); return fn
+        return d
+    def get(self, p, **kw): return self._dec("GET", p)
+    def post(self, p, **kw): return self._dec("POST", p)
+    def put(self, p, **kw): return self._dec("PUT", p)
+    def patch(self, p, **kw): return self._dec("PATCH", p)
+    def delete(self, p, **kw): return self._dec("DELETE", p)
+    def include_router(self, r, prefix="", **kw):
+        for m, p, f in r._routes: self._routes.append((m, prefix+p, f))
+    def on_event(self, e): return lambda f: f
+    def middleware(self, t): return lambda f: f
+    def add_middleware(self, *a, **kw): pass
+
+FastAPI = _App
+APIRouter = _App
+
+def _run(app, host="127.0.0.1", port=8000, **kw):
+    title = getattr(app, "title", "FastAPI")
+    print(f"» FastAPI '{title}' — http://{host}:{port}")
+    print(f"» Browser sandbox: no real server. Testing {len(app._routes)} route(s).")
+    print("─" * 52)
+    for method, path, fn in app._routes:
+        if method != "GET":
+            print(f"{method:<7}{path:<30} [registered]"); continue
+        try:
+            sig = inspect.signature(fn)
+            kw2 = {}
+            for name, param in sig.parameters.items():
+                ann = param.annotation
+                if name in re.findall(r"\\{(\\w+)\\}", path):
+                    kw2[name] = 1 if ann in (int, inspect.Parameter.empty) else "example"
+                elif param.default != inspect.Parameter.empty:
+                    kw2[name] = param.default.default if isinstance(param.default, _P) else param.default
+                elif ann == int: kw2[name] = 1
+                elif ann == float: kw2[name] = 1.0
+                elif ann == str: kw2[name] = "example"
+                elif ann == bool: kw2[name] = True
+            result = fn(**kw2)
+            if inspect.iscoroutine(result):
+                result.close()
+                out = "(async — works in real server)"
+            elif isinstance(result, (JSONResponse, HTMLResponse, PlainTextResponse, RedirectResponse)):
+                out = result.content
+            elif isinstance(result, BaseModel): out = result.dict()
+            else: out = result
+            print(f"GET    {path:<30} → {json.dumps(out, default=str)}")
+        except HTTPException as e:
+            print(f"GET    {path:<30} → {e.status_code} {e.detail}")
+        except Exception as e:
+            print(f"GET    {path:<30} → Error: {e}")
+    print("─" * 52)
+
+# Patch sys.modules so all 'from fastapi import ...' work
+def _mod(name, **attrs):
+    m = types.ModuleType(name)
+    for k, v in attrs.items(): setattr(m, k, v)
+    sys.modules[name] = m; return m
+
+_mod("fastapi", FastAPI=FastAPI, APIRouter=APIRouter, HTTPException=HTTPException,
+     Query=Query, Body=Body, Path=Path, Header=Header, Form=Form, Depends=Depends, Request=Request)
+_mod("fastapi.responses", JSONResponse=JSONResponse, HTMLResponse=HTMLResponse,
+     PlainTextResponse=PlainTextResponse, RedirectResponse=RedirectResponse, Response=JSONResponse)
+_mod("fastapi.middleware")
+_mod("fastapi.middleware.cors", CORSMiddleware=type("CORSMiddleware", (), {}))
+_mod("fastapi.security", OAuth2PasswordBearer=lambda **kw: None, HTTPBearer=lambda **kw: None)
+_mod("pydantic", BaseModel=BaseModel, Field=lambda default=None, **kw: default, validator=lambda *a, **kw: lambda f: f)
+_mod("pydantic.v1", BaseModel=BaseModel)
+_mod("uvicorn", run=_run)
+`
+
 // ── JS sandbox runner ─────────────────────────────────────────────────────────
 function runJS(code, files = []) {
   const src = transformESM(code)
@@ -258,6 +366,22 @@ const BANNER = [
   { text: '└─────────────────────────────────────────────────────────────┘', type: 'dim' },
 ]
 
+// ── Shell arg parser — respects single and double quotes ─────────────────────
+function parseShellArgs(cmd) {
+  const args = []
+  let cur = ''
+  let inS = false, inD = false
+  for (let i = 0; i < cmd.length; i++) {
+    const c = cmd[i]
+    if (c === "'" && !inD)      { inS = !inS }
+    else if (c === '"' && !inS) { inD = !inD }
+    else if (c === ' ' && !inS && !inD) { if (cur) { args.push(cur); cur = '' } }
+    else { cur += c }
+  }
+  if (cur) args.push(cur)
+  return args
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 const WorkspaceTerminal = forwardRef(function WorkspaceTerminal({ files = [], isDark = true, onPreview }, ref) {
   const CLR = isDark ? CLR_DARK : CLR_LIGHT
@@ -308,7 +432,7 @@ const WorkspaceTerminal = forwardRef(function WorkspaceTerminal({ files = [], is
     const allFiles = overrideFiles ?? filesRef.current
 
     try {
-      const [prog, ...args] = trimmed.split(/\s+/)
+      const [prog, ...args] = parseShellArgs(trimmed)
 
       // ── python / python3 ──────────────────────────────────────────────────
       if (prog === 'python' || prog === 'python3') {
@@ -331,6 +455,15 @@ const WorkspaceTerminal = forwardRef(function WorkspaceTerminal({ files = [], is
         // Redirect stdout/stderr line-by-line into terminal
         pyodide.setStdout({ batched: t => t.split('\n').forEach(l => { if (l) print(l, 'output') }) })
         pyodide.setStderr({ batched: t => t.split('\n').forEach(l => { if (l) print(l, 'error') }) })
+
+        // Inject sys.argv so the script sees CLI arguments
+        const argv = JSON.stringify([fname, ...args.slice(1)])
+        await pyodide.runPythonAsync(`import sys; sys.argv = ${argv}`)
+
+        // Inject FastAPI / pydantic / uvicorn shim if needed
+        if (/\bfastapi\b|\buvicorn\b|\bpydantic\b/.test(file.content)) {
+          await pyodide.runPythonAsync(FASTAPI_SHIM)
+        }
 
         try {
           await pyodide.runPythonAsync(file.content)
@@ -512,6 +645,9 @@ const WorkspaceTerminal = forwardRef(function WorkspaceTerminal({ files = [], is
 
   // ── Exposed run() for the Run button ─────────────────────────────────────
   useImperativeHandle(ref, () => ({
+    getOutput() {
+      return lines.filter(l => l.type !== 'dim').slice(-40).map(l => l.text).join('\n')
+    },
     run(activeFile, allFiles) {
       if (!activeFile) return
       const { language: lang, name } = activeFile

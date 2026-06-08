@@ -21,11 +21,13 @@ import {
   Upload,
   RefreshCcw,
   Code2,
+  Sparkles,
   PanelLeftClose,
   PanelLeftOpen,
 } from 'lucide-react'
 import { buildOptionalBackendUrl } from '../../utils/optionalBackend.js'
 import DocsCodeWorkspace from './DocsCodeWorkspace.jsx'
+import AdaPanel from './AdaPanel.jsx'
 
 const DOCS_MODULES = import.meta.glob('/src/docs/**/*.md', {
   query: '?raw',
@@ -475,7 +477,11 @@ export default function MarkdownHub() {
   const [pendingRun, setPendingRun] = useState(null)
   const [codeAlongPx, setCodeAlongPx] = useState(560)
   const [splitterDragging, setSplitterDragging] = useState(false)
+  const [adaOpen, setAdaOpen] = useState(false)
+  const [workspaceSnap, setWorkspaceSnap] = useState({ code: '', language: '', filename: '', fileList: [], getTerminalOutput: () => '' })
   const isDark = useIsDark()
+
+  const handleCodeChange = useCallback((snap) => { setWorkspaceSnap(snap) }, [])
 
   const handleSplitterDrag = useCallback((e) => {
     e.preventDefault()
@@ -908,6 +914,18 @@ export default function MarkdownHub() {
           </button>
 
           <button
+            onClick={() => setAdaOpen((v) => !v)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold border rounded-lg transition-colors ${
+              adaOpen
+                ? 'text-cyan-600 dark:text-cyan-300 bg-cyan-50 dark:bg-cyan-900/30 border-cyan-300 dark:border-cyan-700/50'
+                : 'text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
+            }`}
+            title="Ask Ada — your private AI code tutor"
+          >
+            <Sparkles className="w-3.5 h-3.5" /> Ask Ada
+          </button>
+
+          <button
             onClick={refreshDocsIndex}
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
           >
@@ -1150,13 +1168,26 @@ export default function MarkdownHub() {
                 title="Drag to resize"
               />
               <div className="hidden md:flex flex-col shrink-0 overflow-hidden" style={{ width: codeAlongPx }}>
-                <DocsCodeWorkspace activeTitle={activeTitle} pendingRun={pendingRun} />
+                <DocsCodeWorkspace activeTitle={activeTitle} pendingRun={pendingRun} onCodeChange={handleCodeChange} />
               </div>
             </>
           )}
         </div>
         </DocsCtx.Provider>
       </div>
+
+      {/* ── Ada floating panel ── */}
+      {adaOpen && (
+        <AdaPanel
+          code={workspaceSnap.code}
+          language={workspaceSnap.language}
+          filename={workspaceSnap.filename}
+          terminalOutput={workspaceSnap.getTerminalOutput()}
+          tutorialContent={content}
+          fileList={workspaceSnap.fileList}
+          isDark={isDark}
+        />
+      )}
     </>
   )
 }

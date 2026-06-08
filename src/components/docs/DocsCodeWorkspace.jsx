@@ -94,7 +94,7 @@ const _DEFAULT_FILE = makeFile('script.js', '// Welcome to Code Along!\nconsole.
 const _SAVED = loadSavedWorkspace()
 
 // ── Component ─────────────────────────────────────────────────────────────────
-export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = null }) {
+export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = null, onCodeChange = null }) {
   const [items, setItems] = useState(() => _SAVED?.items ?? [_DEFAULT_FILE])
   const [activeId, setActiveId] = useState(() => _SAVED?.activeId ?? _DEFAULT_FILE.id)
   const [treeOpen, setTreeOpen] = useState(true)
@@ -123,6 +123,19 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = n
   useEffect(() => {
     try { localStorage.setItem(LS_WS, JSON.stringify({ items, activeId })) } catch {}
   }, [items, activeId])
+
+  // ── Notify parent (Ada) when active file changes ──────────────────────────
+  useEffect(() => {
+    if (!onCodeChange) return
+    onCodeChange({
+      code: activeFile?.content ?? '',
+      language: activeFile?.language ?? '',
+      filename: activeFile?.name ?? '',
+      // Pass full file objects so Ada can read every file in the workspace
+      fileList: files.map(f => ({ name: f.name, language: f.language, content: f.content })),
+      getTerminalOutput: () => terminalRef.current?.getOutput?.() ?? '',
+    })
+  }, [activeFile?.content, activeFile?.language, activeFile?.name, files.length]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Focus add-name input ───────────────────────────────────────────────────
   useEffect(() => { if (adding) addInputRef.current?.focus() }, [adding])
@@ -562,6 +575,7 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = n
                   </div>
               }
             </div>
+
           </div>
         </div>
       </div>
