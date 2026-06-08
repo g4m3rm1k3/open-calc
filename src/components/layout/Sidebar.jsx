@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState } from 'react'
+import ReportBugButton from '../ui/ReportBugButton.jsx'
 import { Link, useLocation } from 'react-router-dom'
 import { X, Minus, Maximize2, Search, Video, ChevronRight, Play, Layout, Menu, Plus, Globe, Trash2, BookOpen, ChevronLeft, Home, Layers, Compass, Sidebar as SidebarIcon, GripVertical, Pin, PinOff } from 'lucide-react';
 import { CURRICULUM, COURSES } from '../../content/index.js'
@@ -105,12 +106,20 @@ export default function Sidebar({ onNavigate, isPinned, togglePin, isCollapsed, 
   return (
     <nav
       ref={navRef}
-      className={`h-full overflow-y-auto py-10 sidebar-scroll backdrop-blur-3xl bg-white/40 dark:bg-slate-950/60 transition-all duration-500 shadow-[0_0_50px_rgba(0,0,0,0.1)] dark:shadow-[0_0_80px_rgba(0,0,0,0.4)] ${isCollapsed ? 'opacity-0' : 'opacity-100'}`}
+      className={`h-full overflow-y-auto sidebar-scroll backdrop-blur-3xl bg-white/40 dark:bg-slate-950/60 transition-all duration-500 shadow-[0_0_50px_rgba(0,0,0,0.1)] dark:shadow-[0_0_80px_rgba(0,0,0,0.4)] ${isCollapsed ? 'opacity-0' : 'opacity-100'}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
+      {/* ── Always-visible sticky bar at top of sidebar ── */}
+      <div className={`sticky top-0 z-20 flex items-center justify-between px-5 py-2.5 bg-white/80 dark:bg-slate-950/80 backdrop-blur-sm border-b border-slate-200/60 dark:border-slate-800/60 transition-opacity duration-300 ${isCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 select-none">
+          UpSkillOS
+        </span>
+        <ReportBugButton />
+      </div>
+
       {/* Course switchers/Logic (Visible on mobile or when expanded) */}
-      <div className={`transition-opacity duration-300 ${isCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+      <div className={`pt-6 transition-opacity duration-300 ${isCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
         {/* Course switcher — mobile only */}
         <div className="lg:hidden px-3 mb-3 pb-3 border-b border-slate-200 dark:border-slate-700">
           <div className="grid grid-cols-2 gap-1.5">
