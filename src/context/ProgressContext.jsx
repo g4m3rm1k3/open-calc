@@ -1,10 +1,12 @@
 import { createContext, useCallback } from 'react'
 import { useLocalStorage } from '../hooks/useLocalStorage.js'
+import { useAuth } from './AuthContext.jsx'
 
 export const ProgressContext = createContext(null)
 
 export function ProgressProvider({ children }) {
   const [progress, setProgress] = useLocalStorage('oc-progress', {})
+  const { pushNow } = useAuth() ?? {}
 
   const markCheckpoint = useCallback((lessonId, checkpoint) => {
     setProgress((prev) => {
@@ -18,7 +20,9 @@ export function ProgressProvider({ children }) {
         },
       }
     })
-  }, [setProgress])
+    // Immediately persist to Firestore so progress is never lost on a crash
+    pushNow?.()
+  }, [setProgress, pushNow])
 
   const setActiveTab = useCallback((lessonId, tab) => {
     setProgress((prev) => ({
@@ -62,7 +66,8 @@ export function ProgressProvider({ children }) {
         quiz: { correct, attempted, total, attemptedAt: Date.now() },
       },
     }))
-  }, [setProgress])
+    pushNow?.()
+  }, [setProgress, pushNow])
 
   const getQuizScore = useCallback((lessonId) => {
     return progress[lessonId]?.quiz ?? null
