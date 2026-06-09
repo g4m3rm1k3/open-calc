@@ -567,6 +567,19 @@ export default function MarkdownHub() {
     refreshDocsIndex()
   }, [refreshDocsIndex])
 
+  // Restore the last-viewed user doc when the Studio reopens
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('mdhub_last_doc') || 'null')
+      if (!saved) return
+      if (saved.type === 'user') {
+        const docs = loadPersonal()
+        const doc = docs.find(d => d.id === saved.id)
+        if (doc) selectUserDoc(doc)
+      }
+    } catch {}
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     const readme = Object.keys(DOCS_MODULES).find((modulePath) => modulePath.endsWith('README.md'))
     if (readme) {
@@ -590,6 +603,8 @@ export default function MarkdownHub() {
     setEditorName(doc.name || 'Untitled')
     setEditorContent(doc.content || '')
     setTab('editor')
+    setPreviewMode(true)  // always render, not raw textarea — user can click Edit mode if needed
+    try { localStorage.setItem('mdhub_last_doc', JSON.stringify({ type: 'user', id: doc.id })) } catch {}
   }, [])
 
   const selectOverrideDoc = useCallback((doc) => {
