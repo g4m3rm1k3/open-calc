@@ -189,7 +189,7 @@ function PageMentalModel({C}){
     </div>
     {sel&&<div style={{background:C.surface2,borderRadius:10,padding:'12px 14px',marginBottom:10}}>
       <div style={{fontFamily:'monospace',fontSize:14,color:C.amber,fontWeight:500,marginBottom:6}}>{sel.label}</div>
-      <p style={{fontSize:13,color:C.muted,lineHeight:1.65,marginBottom:8,margin:0,marginBottom:8}}>{sel.desc}</p>
+      <p style={{fontSize:13,color:C.muted,lineHeight:1.65,margin:0,marginBottom:8}}>{sel.desc}</p>
       <div style={{display:'flex',gap:8}}>
         <div style={{background:C.bg,borderRadius:6,padding:'5px 10px',fontSize:11,color:C.hint}}>Parent: {sel.parent||'none (root)'}</div>
         {sel.id==='text'&&<div style={{background:C.redBg,borderRadius:6,padding:'5px 10px',fontSize:11,color:C.red}}>Can have children: NO</div>}

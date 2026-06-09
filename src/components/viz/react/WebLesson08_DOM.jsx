@@ -87,7 +87,7 @@ function PageQueryingDom({C}){
       <div style={{display:'flex',gap:8,alignItems:'center',marginBottom:6}}>
         <span style={{fontSize:11,padding:'2px 8px',borderRadius:5,background:C.greenBg,color:C.green,fontWeight:500}}>{m.returns}</span>
       </div>
-      <p style={{fontSize:12,color:C.muted,lineHeight:1.6,marginBottom:8,margin:0,marginBottom:8}}>{m.desc}</p>
+      <p style={{fontSize:12,color:C.muted,lineHeight:1.6,margin:0,marginBottom:8}}>{m.desc}</p>
       <div style={{fontFamily:'monospace',fontSize:12,color:C.teal,background:C.bg,padding:'6px 10px',borderRadius:6,whiteSpace:'pre-wrap'}}>{m.example}</div>
     </div>
     <ui.Callout color="amber" title="querySelector vs getElementById — when to use which" C={C}>

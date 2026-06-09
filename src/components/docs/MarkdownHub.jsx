@@ -26,6 +26,7 @@ import {
   PanelLeftOpen,
 } from 'lucide-react'
 import { buildOptionalBackendUrl } from '../../utils/optionalBackend.js'
+import { RUNNABLE_LANGS, runJSInline, runTSInline, runPythonInline, runOpenMATInline } from '../../utils/inlineRunner.js'
 import DocsCodeWorkspace from './DocsCodeWorkspace.jsx'
 import AdaPanel from './AdaPanel.jsx'
 
@@ -183,6 +184,20 @@ const MD_CSS = `
 .dark .md-resize-handle:hover, .dark .md-resize-handle.dragging { background: #2563eb; }
 .md-resize-handle::after { content: ''; width: 28px; height: 2px; border-radius: 2px; background: #94a3b8; }
 .dark .md-resize-handle::after { background: #334155; }
+/* ── Inline cell output ── */
+.md-cell-output { border-top: 1px solid #e2e8f0; background: #f8fafc; border-radius: 0 0 8px 8px; }
+.dark .md-cell-output { border-top-color: #1e293b; background: #060d18; }
+.md-cell-output-header { display: flex; align-items: center; justify-content: space-between; padding: 3px 14px; }
+.md-cell-output-header span { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; }
+.md-cell-output-clear { background: none; border: none; cursor: pointer; font-size: 10px; color: #94a3b8; padding: 0 2px; line-height: 1; }
+.md-cell-output-clear:hover { color: #ef4444; }
+.md-cell-output-pre { margin: 0; padding: 6px 14px 10px; font-size: 12px; font-family: 'JetBrains Mono', Consolas, monospace; white-space: pre-wrap; word-break: break-word; }
+.md-cell-line { line-height: 1.55; }
+.md-cell-line--output { color: #1e293b; }
+.dark .md-cell-line--output { color: #c8d3e8; }
+.md-cell-line--error { color: #dc2626; }
+.dark .md-cell-line--error { color: #f87171; }
+.md-cell-line--dim { color: #94a3b8; font-style: italic; }
 .md-splitter { width: 5px; cursor: col-resize; flex-shrink: 0; background: transparent; transition: background 0.15s; position: relative; z-index: 10; }
 .md-splitter:hover, .md-splitter.dragging { background: #3b82f6; }
 .dark .md-splitter:hover, .dark .md-splitter.dragging { background: #2563eb; }
@@ -218,8 +233,12 @@ function MdCodeBlock({ language, code }) {
   const [editorHeight, setEditorHeight] = useState(() =>
     Math.min(Math.max(code.split('\n').length * 19 + 24, 72), 540)
   )
+  const [output, setOutput]   = useState(null)   // null = never run
+  const [running, setRunning] = useState(false)
+  const editorRef = useRef(null)  // holds live Monaco instance so we run edited code
 
   const monacoLang = MONACO_LANG[language] || language
+  const runnable   = RUNNABLE_LANGS.has(language)
 
   const onResizeStart = useCallback((e) => {
     e.preventDefault()
@@ -237,14 +256,14 @@ function MdCodeBlock({ language, code }) {
   }, [editorHeight])
 
   const handleCopy = useCallback(() => {
-    navigator.clipboard.writeText(code).catch(() => {})
+    navigator.clipboard.writeText(editorRef.current?.getValue() ?? code).catch(() => {})
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }, [code])
 
   const handleDownload = useCallback(() => {
     const ext = LANG_EXT[language] || 'txt'
-    const blob = new Blob([code], { type: 'text/plain;charset=utf-8' })
+    const blob = new Blob([editorRef.current?.getValue() ?? code], { type: 'text/plain;charset=utf-8' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
@@ -253,17 +272,71 @@ function MdCodeBlock({ language, code }) {
     URL.revokeObjectURL(url)
   }, [code, language])
 
+  const handleRunInline = useCallback(async () => {
+    const src = editorRef.current?.getValue() ?? code
+    setRunning(true)
+    setOutput(null)
+    try {
+      const lang = language
+
+      if (lang === 'python' || lang === 'py') {
+        const lines = []
+        const { error } = await runPythonInline(src, (text, type) => {
+          lines.push({ text, type })
+          setOutput([...lines])
+        })
+        if (error) lines.push({ text: error, type: 'error' })
+        setOutput(lines.length ? [...lines] : [{ text: '(no output)', type: 'dim' }])
+      } else if (lang === 'typescript' || lang === 'ts') {
+        const { output: out, error } = await runTSInline(src)
+        setOutput(error
+          ? [{ text: error, type: 'error' }]
+          : [{ text: out, type: 'output' }])
+      } else if (lang === 'matlab' || lang === 'openmat') {
+        const { output: out, error } = runOpenMATInline(src)
+        setOutput(error
+          ? [{ text: error, type: 'error' }]
+          : [{ text: out, type: 'output' }])
+      } else {
+        // javascript / js
+        const { output: out, error } = runJSInline(src)
+        setOutput(error
+          ? [{ text: out || '', type: 'output' }, { text: error, type: 'error' }].filter(l => l.text)
+          : [{ text: out, type: 'output' }])
+      }
+    } catch (e) {
+      setOutput([{ text: e.message, type: 'error' }])
+    } finally {
+      setRunning(false)
+    }
+  }, [code, language])
+
+  const handleSendToWorkspace = useCallback(() => {
+    if (onRun) onRun(editorRef.current?.getValue() ?? code, monacoLang)
+  }, [code, monacoLang, onRun])
+
   return (
     <div className="md-code-block">
       <div className="md-code-header">
         <span className="md-code-lang">{monacoLang}</span>
         <div className="md-code-actions">
+          {runnable && (
+            <button
+              onClick={handleRunInline}
+              disabled={running}
+              className="md-code-btn run"
+              title="Run this code here"
+            >
+              {running ? '⏳' : '▶'} Run
+            </button>
+          )}
           {onRun && (
             <button
-              onClick={() => onRun(code, monacoLang)}
-              className="md-code-btn run"
+              onClick={handleSendToWorkspace}
+              className="md-code-btn"
+              title="Send to Code Along workspace"
             >
-              ▶ {codeAlongOpen ? 'Run' : 'Code Along →'}
+              {codeAlongOpen ? '→ Workspace' : 'Code Along →'}
             </button>
           )}
           <button onClick={handleDownload} className="md-code-btn">↓</button>
@@ -279,8 +352,9 @@ function MdCodeBlock({ language, code }) {
           defaultValue={code}
           theme={isDark ? 'open-calc-dark' : 'open-calc-light'}
           beforeMount={setupOpenCalcMonaco}
+          onMount={(editor) => { editorRef.current = editor }}
           options={{
-            readOnly: true,
+            readOnly: !runnable,
             minimap: { enabled: false },
             scrollBeyondLastLine: false,
             lineNumbers: 'on',
@@ -290,7 +364,7 @@ function MdCodeBlock({ language, code }) {
             wordWrap: 'off',
             fontSize: 13,
             fontFamily: "'JetBrains Mono', Consolas, 'Courier New', monospace",
-            renderLineHighlight: 'none',
+            renderLineHighlight: runnable ? 'line' : 'none',
             overviewRulerLanes: 0,
             hideCursorInOverviewRuler: true,
             scrollbar: { vertical: 'auto', horizontal: 'auto', alwaysConsumeMouseWheel: false, verticalScrollbarSize: 6, horizontalScrollbarSize: 6 },
@@ -306,6 +380,19 @@ function MdCodeBlock({ language, code }) {
         onMouseDown={onResizeStart}
         title="Drag to resize"
       />
+      {output !== null && (
+        <div className="md-cell-output">
+          <div className="md-cell-output-header">
+            <span>Output</span>
+            <button onClick={() => setOutput(null)} className="md-cell-output-clear" title="Clear output">✕</button>
+          </div>
+          <pre className="md-cell-output-pre">
+            {output.map((line, i) => (
+              <div key={i} className={`md-cell-line md-cell-line--${line.type}`}>{line.text}</div>
+            ))}
+          </pre>
+        </div>
+      )}
     </div>
   )
 }

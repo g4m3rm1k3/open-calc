@@ -108,6 +108,7 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = n
   const addInputRef = useRef(null)
   const terminalRef = useRef(null)
   const importFileRef = useRef(null)
+  const monacoRef = useRef(null)  // holds the live Monaco editor instance
   const isDark = useIsDark()
 
   // Stable refs so effects never go stale
@@ -169,6 +170,7 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = n
 
     if (!target.content?.trim()) {
       setItems(prev => prev.map(i => i.id === target.id ? { ...i, content: code } : i))
+      monacoRef.current?.setValue(code)  // push to editor — defaultValue is stale if activeId didn't change
       terminalRef.current?.print('Code loaded — press ▶ Run to execute.', 'info')
     } else {
       setPendingReplace({ code, fileId: target.id, fileName: target.name })
@@ -179,6 +181,7 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = n
   const confirmReplace = useCallback(() => {
     if (!pendingReplace) return
     setItems(prev => prev.map(i => i.id === pendingReplace.fileId ? { ...i, content: pendingReplace.code } : i))
+    monacoRef.current?.setValue(pendingReplace.code)  // push to editor directly
     terminalRef.current?.print('Code loaded — press ▶ Run to execute.', 'info')
     setPendingReplace(null)
   }, [pendingReplace])
@@ -515,7 +518,7 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = n
               beforeMount={setupOpenCalcMonaco}
               onChange={updateContent}
               onMount={(editor) => {
-                // Force Monaco to re-measure after the flex layout settles
+                monacoRef.current = editor
                 requestAnimationFrame(() => requestAnimationFrame(() => editor.layout()))
               }}
               options={{

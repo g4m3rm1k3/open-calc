@@ -193,7 +193,7 @@ export default function DeMorganViz() {
       <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg">
         <h3 className="font-bold mb-2">Why De Morgan's Laws Matter</h3>
         <div className="space-y-2 text-sm">
-          <p><strong>Programming:</strong> Simplifies conditional logic - <code>!(x > 0 && y > 0)</code> becomes <code>x ≤ 0 || y ≤ 0</code></p>
+          <p><strong>Programming:</strong> Simplifies conditional logic - <code>!(x &gt; 0 && y &gt; 0)</code> becomes <code>x ≤ 0 || y ≤ 0</code></p>
           <p><strong>Circuit Design:</strong> NAND and NOR gates implement these laws in hardware</p>
           <p><strong>Set Theory:</strong> Complement of intersection = union of complements</p>
           <p><strong>Proof Writing:</strong> Essential for manipulating negations in logical arguments</p>

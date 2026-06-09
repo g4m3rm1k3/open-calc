@@ -590,19 +590,40 @@ function fmtVal(v) {
   try { return JSON.stringify(v, null, 2) } catch { return String(v) }
 }
 
-// Load Babel standalone on demand for TypeScript transpilation
-async function loadBabel() {
-  if (window.Babel) return window.Babel
-  await new Promise((resolve, reject) => {
+const BABEL_URL = 'https://unpkg.com/@babel/standalone@7/babel.min.js'
+let _babelPromise = null
+function loadBabel() {
+  if (window.Babel) return Promise.resolve(window.Babel)
+  if (_babelPromise) return _babelPromise
+  _babelPromise = new Promise((resolve, reject) => {
+    if (document.querySelector(`script[src="${BABEL_URL}"]`)) {
+      // Script tag already added (by inlineRunner or a prior call) — just wait
+      let n = 0
+      const t = setInterval(() => {
+        if (window.Babel) { clearInterval(t); resolve(window.Babel) }
+        else if (++n > 150) { clearInterval(t); reject(new Error('Babel load timed out')) }
+      }, 100)
+      return
+    }
     const s = document.createElement('script')
-    s.src = 'https://unpkg.com/@babel/standalone@7/babel.min.js'
-    s.onload = resolve; s.onerror = reject
+    s.src = BABEL_URL
+    s.onload = () => {
+      if (window.Babel) { resolve(window.Babel); return }
+      let n = 0
+      const t = setInterval(() => {
+        if (window.Babel) { clearInterval(t); resolve(window.Babel) }
+        else if (++n > 50) { clearInterval(t); reject(new Error('Babel did not initialize after load')) }
+      }, 100)
+    }
+    s.onerror = () => reject(new Error('Babel CDN unreachable'))
     document.head.appendChild(s)
   })
-  return window.Babel
+  _babelPromise.catch(() => { _babelPromise = null })
+  return _babelPromise
 }
 
 function transpileTS(code, filename = 'file.ts') {
+  if (!window.Babel) throw new Error('Babel is not loaded — cannot transpile TypeScript')
   return window.Babel.transform(code, {
     // modules:'commonjs' forces require() output so our shim can intercept it
     presets: [['typescript', { allExtensions: true }], ['env', { targets: { esmodules: true }, modules: 'commonjs' }]],
