@@ -1,5 +1,5 @@
 # OpenMAT Interpreter + Visualiser — Business Requirements Document
-### Version 0.1 — MVP
+### Version 0.2 — MVP
 
 ---
 
@@ -41,9 +41,7 @@ Console output  +  Canvas renderer
 ```
 
 Each stage is a separate module with a single exported function or class.
-No stage imports from the stage after it. The lexer does not know about the parser.
-The parser does not know about the evaluator. The evaluator does not know about
-the canvas.
+No stage imports from the stage after it.
 
 ### Language
 
@@ -140,8 +138,8 @@ Acceptance criteria:
 - [ ] `npm run build` compiles without errors or warnings
 - [ ] `npm test` runs the test suite and reports results
 - [ ] `npm run dev` starts a dev server with hot reload
-- [ ] The `TokenType` const object is defined and typed so that an invalid string
-      assigned to a `TokenType` value is a compile-time error — not a runtime error
+- [ ] The `TokenType` const object is typed so that an invalid string assigned to a
+      `TokenType` value is a compile-time error — not a runtime error
 - [ ] At least one test file exists and passes
 
 ---
@@ -177,7 +175,7 @@ appears in the output.
 Acceptance criteria:
 - [ ] `'42'` parses to a `NumberLiteral` node with `value: 42`
 - [ ] `'3 + 4'` parses to `BinaryOp('+', NumberLiteral(3), NumberLiteral(4))`
-- [ ] `'3 + 4 * 2'` — multiplication binds tighter than addition: right child of `+` is `BinaryOp('*', 4, 2)`
+- [ ] `'3 + 4 * 2'` — multiplication binds tighter: right child of `+` is `BinaryOp('*', 4, 2)`
 - [ ] `'(3 + 4) * 2'` — parentheses override precedence: left child of `*` is `BinaryOp('+', 3, 4)`
 - [ ] `'x'` parses to `Identifier('x')`
 - [ ] `'-x'` parses to `UnaryOp('-', Identifier('x'))`
@@ -185,7 +183,7 @@ Acceptance criteria:
 - [ ] `'disp(x)'` parses to `FunctionCall('disp', [Identifier('x')])`
 - [ ] `'disp(x, y)'` parses to `FunctionCall('disp', [Identifier('x'), Identifier('y')])`
 - [ ] The AST is printed in the console in a readable indented format
-- [ ] `'3 +'` (incomplete expression) throws a `ParseError` with the line number
+- [ ] `'3 +'` throws a `ParseError` with the line number
 
 ---
 
@@ -212,11 +210,27 @@ Acceptance criteria:
 
 ---
 
+**US-007 — Floating Point**
+
+As a user, I can see floating point precision behaviour and control how results are displayed.
+
+Acceptance criteria:
+- [ ] `0.1 + 0.2` displays `0.30000000000000004` before precision formatting is applied
+- [ ] With display precision set to 10 significant figures, `0.1 + 0.2` displays `0.3`
+- [ ] `0.1 + 0.2 == 0.3` evaluates to `false`
+- [ ] `abs(0.1 + 0.2 - 0.3) < 1e-10` evaluates to `true` (epsilon comparison)
+- [ ] A precision setting (2, 4, 6, 8, 10 significant figures) changes how all results display
+- [ ] Changing precision re-displays the current result immediately
+- [ ] `1/3` displays as `0.3333333333` at 10 significant figures
+- [ ] The precision setting persists for the duration of the session
+
+---
+
 ### Epic 3 — Language Features
 
 ---
 
-**US-007 — Variables**
+**US-008 — Variables**
 
 As a user, I can assign a value to a variable and use it in later expressions.
 
@@ -225,15 +239,15 @@ Acceptance criteria:
 - [ ] `x = 10` then `x + 5` → `15`
 - [ ] `x = 5` then `x = x + 1` then `x` → `6`
 - [ ] `disp(x)` prints the value of `x` to the console
-- [ ] Referencing an undefined variable produces: `RuntimeError on line N: 'x' is not defined`
+- [ ] Referencing an undefined variable → `RuntimeError on line N: 'x' is not defined`
 - [ ] Variable names are case-sensitive: `x` and `X` are different
-- [ ] `a = 1`, `b = 2`, `a + b` → `3` (multiple variables persist in the same session)
+- [ ] `a = 1`, `b = 2`, `a + b` → `3`
 - [ ] `pi` is pre-defined as `3.141592653589793`
 - [ ] `e` is pre-defined as `2.718281828459045`
 
 ---
 
-**US-008 — Error Handling**
+**US-009 — Error Handling**
 
 As a user, when my code has an error I see a specific message with the line number —
 no JavaScript stack trace is ever shown.
@@ -246,11 +260,11 @@ Acceptance criteria:
 - [ ] Unexpected token → `ParseError on line N: unexpected '+', expected expression`
 - [ ] Missing `end` → `ParseError on line N: 'if' block has no matching 'end'`
 - [ ] Error messages appear in a visually distinct colour defined as a CSS custom property
-- [ ] No `TypeError`, `ReferenceError`, or stack trace from JavaScript is ever visible in the console output
+- [ ] No `TypeError`, `ReferenceError`, or JavaScript stack trace is ever visible in the output
 
 ---
 
-**US-009 — Control Flow**
+**US-010 — Control Flow**
 
 As a user, I can write if / elseif / else / end blocks and see the correct branch execute.
 
@@ -259,7 +273,7 @@ Acceptance criteria:
 - [ ] `if false \n disp(1) \n end` → outputs nothing
 - [ ] `if false \n disp(1) \n else \n disp(2) \n end` → outputs `2`
 - [ ] `x = 7 \n if x > 5 \n disp('big') \n else \n disp('small') \n end` → `big`
-- [ ] `elseif` branch executes when previous conditions are false and its condition is true
+- [ ] `elseif` branch executes when previous conditions are false and its own condition is true
 - [ ] Nested `if` blocks evaluate correctly
 - [ ] An `if` without a matching `end` → `ParseError`
 - [ ] `&&` (and), `||` (or), `!` (not) evaluate correctly
@@ -267,10 +281,10 @@ Acceptance criteria:
 
 ---
 
-**US-010 — Loops**
+**US-011 — For Loops**
 
 As a user, I can write for loops that execute a body a defined number of times,
-and a loop that draws triangles on the canvas.
+including a loop that draws triangles on the canvas.
 
 Acceptance criteria:
 - [ ] `for i = 1:3 \n disp(i) \n end` → outputs `1`, `2`, `3`
@@ -285,18 +299,77 @@ Acceptance criteria:
 
 ---
 
-**US-011 — Functions**
+**US-012 — While Loops**
 
-As a user, I can define a function and call it, including recursively.
+As a user, I can write while loops that continue until a condition becomes false.
+
+Acceptance criteria:
+- [ ] `x = 1 \n while x < 5 \n x = x + 1 \n end \n disp(x)` → `5`
+- [ ] `while false \n disp(1) \n end` → executes zero times
+- [ ] `x = 10 \n while x > 0 \n x = x - 3 \n end \n disp(x)` → `-2`
+- [ ] A `while` without a matching `end` → `ParseError`
+- [ ] An infinite loop (`while true \n end`) is terminated after 10,000 iterations with `RuntimeError: maximum iterations exceeded`
+- [ ] `break` exits a while loop immediately
+- [ ] `continue` skips to the next iteration of the while loop
+- [ ] A while loop that draws triangles stops when a condition is met — the canvas shows the correct count
+
+---
+
+**US-013 — Functions**
+
+As a user, I can define a function, call it, and see its result in the console.
 
 Acceptance criteria:
 - [ ] `function result = square(n) \n result = n * n \n end \n disp(square(7))` → `49`
-- [ ] `function result = factorial(n) \n if n <= 1 \n result = 1 \n else \n result = n * factorial(n-1) \n end \n end \n disp(factorial(5))` → `120`
 - [ ] A function that never assigns to its result variable → `RuntimeError`: function returned no value
 - [ ] Calling an undefined function → `RuntimeError on line N: 'foo' is not defined`
 - [ ] Variables defined inside a function are not visible outside it
 - [ ] Functions must be defined before they are called (no hoisting)
-- [ ] Built-in functions work: `disp(x)`, `sqrt(x)`, `abs(x)`, `mod(x, y)`
+- [ ] Multiple parameters work: `function result = add(a, b) \n result = a + b \n end \n disp(add(3, 4))` → `7`
+- [ ] A function call with the wrong number of arguments → `RuntimeError`: argument count mismatch
+
+---
+
+**US-014 — Recursion**
+
+As a user, I can write recursive functions and see the result, including a stack
+overflow error when recursion has no base case.
+
+Acceptance criteria:
+- [ ] `factorial(5)` defined recursively → `120`
+- [ ] `factorial(0)` → `1` (base case)
+- [ ] `factorial(1)` → `1` (base case)
+- [ ] A recursive function with no base case terminates with `RuntimeError: maximum call depth exceeded` after 1,000 nested calls
+- [ ] `fib(10)` defined as `fib(n-1) + fib(n-2)` with base cases `fib(0) = 0`, `fib(1) = 1` → `55`
+- [ ] Each recursive call creates a new scope — the parameter `n` inside each call is independent
+- [ ] `disp` calls inside a recursive function output on every call, showing the call sequence
+
+---
+
+**US-015 — Standard Library**
+
+As a user, I can use built-in mathematical functions in any expression.
+
+Acceptance criteria:
+- [ ] `sin(0)` → `0`
+- [ ] `sin(90)` in degree mode → `1` (approximately)
+- [ ] `sin(pi/2)` in radian mode → `1` (approximately)
+- [ ] `cos(0)` → `1`
+- [ ] `cos(180)` in degree mode → `-1` (approximately)
+- [ ] `tan(45)` in degree mode → `1` (approximately)
+- [ ] `log(100)` → `2` (base 10)
+- [ ] `log(1)` → `0`
+- [ ] `ln(e)` → `1`
+- [ ] `sqrt(9)` → `3`
+- [ ] `sqrt(-1)` → `RuntimeError on line N: domain error — sqrt requires x ≥ 0`
+- [ ] `abs(-7)` → `7`
+- [ ] `floor(3.9)` → `3`
+- [ ] `ceil(3.1)` → `4`
+- [ ] `round(3.5)` → `4`
+- [ ] `mod(10, 3)` → `1`
+- [ ] All standard library functions are stored in a dispatch table — a plain object mapping name to function
+- [ ] Adding a new built-in requires only one line change: adding to the dispatch table
+- [ ] A degree/radian mode toggle is visible on the interface and affects all trig functions
 
 ---
 
@@ -304,7 +377,7 @@ Acceptance criteria:
 
 ---
 
-**US-012 — Vectors**
+**US-016 — Vectors**
 
 As a user, I can define a vector and see it plotted as an arrow on the canvas.
 
@@ -324,10 +397,9 @@ Acceptance criteria:
 
 ---
 
-**US-013 — Matrices**
+**US-017 — Matrices**
 
-As a user, I can define a matrix and multiply two matrices together, and see the
-result displayed correctly.
+As a user, I can define a matrix and multiply two matrices together.
 
 Acceptance criteria:
 - [ ] `A = [1, 2; 3, 4]` stores a 2×2 matrix (semicolon separates rows)
@@ -342,19 +414,19 @@ Acceptance criteria:
 
 ---
 
-**US-014 — Transformations**
+**US-018 — Transformations**
 
 As a user, I can write OpenMAT code that transforms the triangle on the canvas using
-matrix operations, and see it update immediately.
+matrix operations, with `sin` and `cos` from the standard library.
 
 Acceptance criteria:
-- [ ] Multiplying a 2×2 rotation matrix by the triangle's vertex vectors produces a visibly rotated triangle
-- [ ] `rotate(45)` rotates the triangle 45 degrees (degrees, not radians)
-- [ ] `scale(2)` scales the triangle to twice its size from the origin
+- [ ] A 2×2 rotation matrix built using `sin` and `cos` multiplied by vertex vectors rotates the triangle
+- [ ] `rotate(45)` rotates the triangle 45 degrees
+- [ ] `scale(2)` scales the triangle to twice its size
 - [ ] `translate(50, 30)` moves the triangle 50 units right and 30 units down
-- [ ] Composing transforms — `translate(rotate(scale(triangle, 2), 45), 50, 30)` — applies in correct order
+- [ ] Composing transforms applies in correct order
 - [ ] The canvas updates immediately after each evaluation
-- [ ] The original triangle is drawn in one colour and the transformed triangle in another — both CSS custom properties
+- [ ] The original triangle is drawn in one colour, the transformed triangle in another — both CSS custom properties
 - [ ] The transformation matrix is printed in the console output
 - [ ] `rotate(360)` returns the triangle to within floating-point tolerance of its original position
 
@@ -365,7 +437,6 @@ Acceptance criteria:
 - Complex numbers
 - Cell arrays (`{1, 'hello', [1,2]}`)
 - Structs (`s.field = value`)
-- While loops (may be added post-MVP)
 - File I/O
 - Matrix operations beyond multiply and transpose (determinant, inverse, eigenvalues)
 - String manipulation beyond `disp`
@@ -387,18 +458,21 @@ Acceptance criteria:
 
 ## 7. Open Questions
 
-1. **Range syntax as a value:** should `1:5` produce a vector `[1, 2, 3, 4, 5]` that can
-   be assigned and passed to functions, or is `:` only valid inside a `for` loop header?
+1. **Range syntax as a value:** should `1:5` produce a vector `[1, 2, 3, 4, 5]` assignable
+   to a variable, or is `:` only valid inside a `for` loop header?
 
 2. **Canvas coordinate system:** Y-axis pointing up (maths convention) or down (screen
    convention)? Decision affects how all vectors and transformations are displayed.
 
-3. **Multi-line input:** should the console accept multi-line programs (pasted or
-   entered with Shift+Enter), or is each line evaluated independently?
+3. **Multi-line input:** should the console accept multi-line programs (pasted or entered
+   with Shift+Enter), or is each line evaluated independently?
 
-4. **Function hoisting:** must functions be defined before they are called, or can a
-   function call appear before its definition in the source? (US-011 currently requires
-   definition before use — confirm this is the right choice.)
+4. **Function hoisting:** must functions be defined before they are called, or can a call
+   appear before the definition? (US-013 requires definition before use — confirm this.)
 
-5. **Matrix row separator:** semicolon (`[1, 2; 3, 4]`) vs newline (`[1, 2\n3, 4]`)?
-   Both are valid MATLAB. Decide before the matrix tokeniser is built.
+5. **Matrix row separator:** semicolon (`[1, 2; 3, 4]`) vs newline? Decide before the
+   matrix tokeniser is built.
+
+6. **Degree/radian mode:** does mode apply globally (one setting for the session) or
+   per-expression (a prefix like `deg(sin(90))`)? Decision affects both the stdlib
+   and the standard library API design.
