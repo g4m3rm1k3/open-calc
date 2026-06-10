@@ -1,0 +1,37 @@
+.app-container{
+  display:flex;
+  flex-direction: column;
+  align-items:center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.app-title{
+  font-size: 3rem;
+  font-weight: 700;
+  letter-spacing: -0.02rem;
+  color: #ffffff;
+  margin: 0 0 0.5rem 0;
+}
+
+
+.app-subtitle{
+  font-size: 1.1rem;
+  color: #a0a0b0;
+  margin: 0;
+}
+
+.version-badge{
+  margin-top: 1.5rem;
+  font-size: 0.75rem;
+  color: #a0a0b0;
+  border: 1px solid #3a3a5c;
+  border-radius: 999px;
+  padding: 0.2rem 0.75rem;
+}
+
+.list-column{
+  display:flex;
+  flex-direction:column;
+  margin-top:10px;
+}

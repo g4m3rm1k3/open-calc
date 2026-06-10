@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>LAB 12 — IntersectionObserver</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+
+    <header class="site-header">
+      <h1>Scroll Down</h1>
+      <p>Each section animates in when it enters the viewport.</p>
+    </header>
+
+    <main class="page-content">
+
+      <section class="reveal-section">
+        <h2>Section One</h2>
+        <p>This section is visible on page load — it starts already in the viewport.</p>
+      </section>
+
+      <section class="reveal-section">
+        <h2>Section Two</h2>
+        <p>This one enters from below as you scroll.</p>
+      </section>
+
+      <section class="reveal-section">
+        <h2>Section Three</h2>
+        <p>Each section has the same entrance animation — fade up from below.</p>
+      </section>
+
+      <section class="reveal-section">
+        <h2>Section Four</h2>
+        <p>The observer watches all sections at once. You only write one observer.</p>
+      </section>
+
+      <section class="reveal-section">
+        <h2>Section Five</h2>
+        <p>Once a section animates in, the observer stops watching it — no wasted work.</p>
+      </section>
+
+    </main>
+
+    <script src="main.js"></script>
+  </body>
+</html>

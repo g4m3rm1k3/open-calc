@@ -1,0 +1,527 @@
+# CAD/CAM — Lesson 23 — Drill Operation
+
+## What You Will Build
+
+Select one or more circle centres in the sketch and click "Generate Drill." A drill
+cycle G-code program is generated for every selected point. Each cycle positions the
+tool over the hole, feeds it to the drill depth, and retracts. The cycles appear in
+the viewport as short vertical red-and-white lines — a rapid descent to the hole, a
+cut plunge to depth, and a rapid retract. The generated G-code uses the G81 **canned
+cycle** — a modal command that applies the same approach/drill/retract sequence to
+every subsequent X/Y position until cancelled.
+
+## What You Need to Know First
+
+Lessons 01–22. Lesson 22 showed the full contour pipeline: G-code generation →
+parser → simulator → viewport. The drill operation uses the same pipeline. The
+difference is in the G-code generated: G81 (drill canned cycle) instead of G0/G1
+motion blocks. Lesson 17 introduced the word-address G-code format. Lesson 19
+introduced `ToolpathSegment` and `buildToolpathLines`. All three are reused here.
+
+---
+
+## The Problem
+
+A contour toolpath traverses a profile edge-by-edge. A drill operation is conceptually
+simpler: position over each hole centre in XY, plunge to depth in Z, retract. But
+real G-code programs for drilling do not repeat the full sequence for every hole. They
+use a **canned cycle**: a modal G-code that compresses the approach/drill/retract
+sequence into a parameterised block. Once the canned cycle is active (G81), every
+subsequent X/Y position block is automatically drilled to the same depth and retracted.
+
+Canned cycles exist because they are shorter to write, easier to read, and because
+some controllers execute them with optimised motion profiles (for peck drilling, chip
+breaking, and rigid tapping). They are the first example in this curriculum of G-code
+as a **programming language with abstractions** — not just a sequence of positions.
+
+---
+
+## Step 1 — The Drill Point Type
+
+### The problem
+
+A drill operation operates on hole centres: 2D points with X and Y coordinates. We
+use `Vec2` from lesson 21 — no new type is needed. But the drill generator also needs
+the drill depth, clearance height, feed rate, and whether to use a peck cycle. These
+belong in a typed parameter interface.
+
+### Create `src/cam/drillOperation.ts`
+
+```typescript
+import type { Vec2 }        from './vec2.js'
+import type { CuttingTool } from '../tools/tool.js'
+import { parseGcode }        from '../gcode/parser.js'
+import { simulateToolpath }  from '../gcode/simulator.js'
+import type { ToolpathSegment } from '../gcode/toolpathSegment.js'
+
+export interface DrillParameters {
+  centres:         Vec2[]
+  tool:            CuttingTool
+  drillDepth:      number
+  clearanceHeight: number
+  feedRate:        number
+  peckDepth:       number | null
+}
+```
+
+**`peckDepth: number | null` — the optional peck cycle:**
+In **peck drilling** (G83), the drill plunges to a partial depth (`peckDepth`), retracts
+to clear chips, then plunges deeper — repeating until full depth is reached. This is
+required for deep holes (depth > 3× drill diameter) where chips would otherwise pack
+and break the drill. `null` means standard G81 (no peck). A number means G83 with
+that peck increment.
+
+Using `number | null` rather than an optional field (`peckDepth?: number`) makes the
+intent explicit: the caller must consciously choose between standard drilling and peck
+drilling. An optional field would silently default to `undefined`, which reads as the
+same as `null` at runtime but communicates less at the call site.
+
+---
+
+## Step 2 — G81 Canned Cycle G-code
+
+### The maths and conventions of G81
+
+**G81 — drill canned cycle:**
+```
+G81 X[x] Y[y] Z[depth] R[retract] F[feedRate]
+```
+
+- `X Y` — the XY position of the hole centre
+- `Z` — the drill depth (negative, below the work surface)
+- `R` — the **retract plane**: the Z height the tool moves to after drilling before
+  the next XY position. Must be above the work surface. Typically equals clearance height.
+- `F` — the feed rate for the drilling motion (Z descent only)
+
+When G81 is active, each subsequent `X Y` block (or `X Y Z` to change depth)
+triggers the full approach/drill/retract cycle automatically. `G80` cancels all
+canned cycles and returns the machine to standard motion mode.
+
+**G83 — peck drill canned cycle:**
+```
+G83 X[x] Y[y] Z[depth] R[retract] Q[peckDepth] F[feedRate]
+```
+Same as G81 plus `Q[peckDepth]` — the increment distance per peck. The controller
+plunges `Q`, retracts to `R`, plunges `2Q`, retracts, and so on until `Z` is reached.
+
+```typescript
+export function generateDrillGcode(params: DrillParameters): string {
+  const { centres, tool, drillDepth, clearanceHeight, feedRate, peckDepth } = params
+
+  if (centres.length === 0) {
+    throw new Error('Drill operation requires at least one hole centre')
+  }
+
+  const lines: string[] = []
+
+  function coord(value: number): string {
+    return value.toFixed(3)
+  }
+
+  lines.push('(Drill operation generated by CAM project)')
+  lines.push(`(Tool: ${tool.name}, D=${tool.diameter}mm)`)
+  lines.push('G21 G90 G17')
+  lines.push(`G0 Z${coord(clearanceHeight)}`)
+
+  const cycleCode = peckDepth !== null ? 'G83' : 'G81'
+  const firstCentre = centres[0]
+
+  if (peckDepth !== null) {
+    lines.push(
+      `${cycleCode} X${coord(firstCentre.x)} Y${coord(firstCentre.y)} ` +
+      `Z${coord(drillDepth)} R${coord(clearanceHeight)} Q${coord(peckDepth)} F${feedRate}`,
+    )
+  } else {
+    lines.push(
+      `${cycleCode} X${coord(firstCentre.x)} Y${coord(firstCentre.y)} ` +
+      `Z${coord(drillDepth)} R${coord(clearanceHeight)} F${feedRate}`,
+    )
+  }
+
+  for (let index = 1; index < centres.length; index++) {
+    const centre = centres[index]
+    lines.push(`X${coord(centre.x)} Y${coord(centre.y)}`)
+  }
+
+  lines.push('G80')
+  lines.push(`G0 Z${coord(clearanceHeight)}`)
+  lines.push('M30')
+
+  return lines.join('\n')
+}
+```
+
+**The first centre activates the canned cycle; subsequent centres are XY-only:**
+The first hole position is specified on the G81/G83 line itself — this activates the
+canned cycle and immediately executes at that position. All subsequent hole positions
+are bare `X Y` blocks. The controller interprets them as "execute the active canned
+cycle at this position." This is **modal G-code**: G81 sets the motion mode, and it
+stays active for all subsequent blocks until G80 cancels it.
+
+**`'G80'` — why cancelling the canned cycle is required:**
+Without G80, the canned cycle remains active after the last hole. Any subsequent XY
+motion (a rapid return to home, for example) would trigger a drilling cycle at the
+rapid destination — potentially drilling through the part in the wrong place. Always
+cancel canned cycles with G80 immediately after the last hole.
+
+**Walkthrough — three holes in a line:**
+```
+centres = [(10,10), (20,10), (30,10)]
+drillDepth = -15, clearance = 5, feedRate = 200, peckDepth = null
+
+Generated:
+(Drill operation generated by CAM project)
+(Tool: 8mm 4-Flute End Mill, D=8mm)
+G21 G90 G17
+G0 Z5.000
+G81 X10.000 Y10.000 Z-15.000 R5.000 F200
+X20.000 Y10.000
+X30.000 Y10.000
+G80
+G0 Z5.000
+M30
+```
+
+Lines 5-7 drill three holes. The controller, seeing lines 6 and 7 as bare X/Y during
+an active G81 cycle, automatically runs the full drill sequence (rapid to retract,
+feed to depth, rapid back to retract) at each position.
+
+**CS lens — canned cycles as abstractions:**
+G81/G83 are **abstractions over a sequence of operations**. Manually, three holes
+require 15+ blocks (3 × [rapid over, rapid to retract, feed to depth, rapid to
+retract, rapid between holes]). With G81, three holes take 3 blocks. This is the same
+value proposition as functions in a programming language: an abstraction that encodes
+a repeatable sequence with parameters. Canned cycles are the G-code language's only
+native abstraction mechanism. Macro B (the topic of the CNC course) extends this with
+variables, conditionals, and loops.
+
+**SE lens — reusing the parser and simulator:**
+The drill G-code is fed through the same `parseGcode → simulateToolpath` pipeline as
+the contour. No new rendering code exists for drilling. This is the **reuse** of
+lesson 19's vertical slice — the parser and simulator are general enough to handle any
+valid G-code, not just the specific programs the lessons generate. Adding a new CAM
+operation (thread milling, facing) requires only a new generator function; the
+parser, simulator, and renderer are already correct.
+
+---
+
+## Step 3 — Connecting to the Simulator
+
+```typescript
+export function drillToToolpathSegments(
+  params: DrillParameters,
+): { segments: ToolpathSegment[]; gcode: string } {
+  const gcode      = generateDrillGcode(params)
+  const { blocks } = parseGcode(gcode.split('\n'))
+  const segments   = simulateToolpath(blocks)
+  return { segments, gcode }
+}
+```
+
+**A limitation of the simulator with canned cycles:**
+The parser in lesson 18 does not implement G81/G83 — it treats them as unknown G-code
+values and produces a block with `motionMode: 'rapid'` (the last known motion mode).
+The canned cycle X/Y-only lines produce blocks with no motion code, just position data.
+
+This means the simulator will visualise canned cycle positions as point-to-point moves
+(rapid or linear to each hole centre) — not as the full drill cycle (down and back up).
+For the learning project, this is acceptable: the user sees that the tool visits each
+hole centre, even if the depth plunge is not shown.
+
+**How production CAM visualisers handle this:**
+Real toolpath simulators implement canned cycle semantics in the simulator, not the
+parser. The simulator recognises G81/G83 modal state and synthesises the full
+approach/drill/retract sequence as `ToolpathSegment` objects — exactly as we would do
+by adding a `case 'drill'` to the switch in `simulator.ts`. This is left as a
+challenge for the student after completing lesson 24.
+
+---
+
+## Step 4 — Tests
+
+### Create `src/cam/drillOperation.test.ts`
+
+```typescript
+import { describe, test, expect } from 'vitest'
+import { generateDrillGcode }      from './drillOperation.js'
+
+const singleHole = {
+  centres:         [{ x: 10, y: 20 }],
+  tool:            { id: 'em-8-4f', name: '8mm End Mill', diameter: 8,
+                    fluteCount: 4, material: 'carbide' as const, maxDepthOfCut: 4 },
+  drillDepth:      -15,
+  clearanceHeight:  5,
+  feedRate:         200,
+  peckDepth:        null,
+}
+
+describe('generateDrillGcode', () => {
+  test('generates G81 for standard drilling', () => {
+    const gcode = generateDrillGcode(singleHole)
+    expect(gcode).toContain('G81')
+    expect(gcode).not.toContain('G83')
+    expect(gcode).toContain('X10.000')
+    expect(gcode).toContain('Z-15.000')
+  })
+
+  test('generates G83 when peckDepth is provided', () => {
+    const gcode = generateDrillGcode({ ...singleHole, peckDepth: 5 })
+    expect(gcode).toContain('G83')
+    expect(gcode).toContain('Q5.000')
+  })
+
+  test('cancels canned cycle with G80', () => {
+    const gcode = generateDrillGcode(singleHole)
+    expect(gcode).toContain('G80')
+  })
+
+  test('subsequent holes are bare X Y blocks', () => {
+    const multiHole = {
+      ...singleHole,
+      centres: [{ x: 10, y: 20 }, { x: 30, y: 20 }],
+    }
+    const gcode  = generateDrillGcode(multiHole)
+    const lines  = gcode.split('\n')
+    const xyLine = lines.find((line) => line.startsWith('X30'))
+    expect(xyLine).toBe('X30.000 Y20.000')
+  })
+
+  test('throws when no hole centres provided', () => {
+    expect(() => generateDrillGcode({ ...singleHole, centres: [] })).toThrow()
+  })
+
+  test('includes safe start block', () => {
+    const gcode = generateDrillGcode(singleHole)
+    expect(gcode).toContain('G21 G90 G17')
+  })
+})
+```
+
+**`...singleHole` — object spread in tests:**
+`{ ...singleHole, peckDepth: 5 }` creates a copy of `singleHole` with `peckDepth`
+overridden to `5`. Object spread is the same operator as array spread (`...array`)
+but applied to objects: it copies all enumerable own properties of the source object,
+then applies the overrides. This is the standard way to create variants of a test
+fixture without mutation.
+
+**`expect(...).toThrow()` — first appearance:**
+`toThrow()` asserts that the function passed to `expect` throws an error when called.
+Note the argument: `expect(() => generateDrillGcode({ ...singleHole, centres: [] }))`.
+The function is wrapped in an arrow function — if you pass the call directly
+(`expect(generateDrillGcode(...))`), Vitest would try to evaluate the argument before
+passing it to `expect`, and the throw would propagate up to the test runner rather
+than being caught. Always wrap throwing calls in an arrow function for `toThrow`.
+
+**`'carbide' as const`:**
+TypeScript infers `material: 'carbide'` in an object literal as type `string`, not
+`'carbide'`. The `ToolMaterial` type requires the literal string `'carbide'`. `as const`
+narrows the type from `string` to `'carbide'`, making it compatible with `ToolMaterial`.
+
+Run `npm test`. All six tests pass.
+
+---
+
+## Step 5 — The Drill Panel Component
+
+### Create `src/cam/DrillPanel.tsx`
+
+```typescript
+import { useState }             from 'react'
+import type { CuttingTool }     from '../tools/tool.js'
+import type { Vec2 }            from './vec2.js'
+import type { ToolpathSegment } from '../gcode/toolpathSegment.js'
+import { drillToToolpathSegments } from './drillOperation.js'
+import './ContourPanel.css'
+
+interface DrillPanelProps {
+  selectedTool:    CuttingTool | null
+  holeCentres:     Vec2[]
+  onSegmentsReady: (segments: ToolpathSegment[]) => void
+}
+
+export function DrillPanel({
+  selectedTool,
+  holeCentres,
+  onSegmentsReady,
+}: DrillPanelProps) {
+  const [drillDepth,      setDrillDepth]      = useState(-15)
+  const [clearanceHeight, setClearanceHeight] = useState(5)
+  const [feedRate,        setFeedRate]        = useState(200)
+  const [usePeck,         setUsePeck]         = useState(false)
+  const [peckDepth,       setPeckDepth]       = useState(5)
+  const [gcodeText,       setGcodeText]       = useState('')
+  const [errorMessage,    setErrorMessage]    = useState<string | null>(null)
+
+  const canGenerate = selectedTool !== null && holeCentres.length > 0
+
+  function handleGenerate(): void {
+    if (selectedTool === null) return
+    try {
+      const { segments, gcode } = drillToToolpathSegments({
+        centres:         holeCentres,
+        tool:            selectedTool,
+        drillDepth,
+        clearanceHeight,
+        feedRate,
+        peckDepth:       usePeck ? peckDepth : null,
+      })
+      setGcodeText(gcode)
+      setErrorMessage(null)
+      onSegmentsReady(segments)
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'Unknown error')
+    }
+  }
+
+  return (
+    <div className="contour-panel">
+      <h2 className="panel-title">Drill</h2>
+
+      {selectedTool === null && (
+        <p className="panel-hint">Select a tool in the Tool Library first.</p>
+      )}
+
+      <label className="param-label">
+        Drill depth (mm)
+        <input type="number" value={drillDepth} step={1}
+          onChange={(e) => setDrillDepth(Number(e.target.value))}
+          className="param-input" />
+      </label>
+
+      <label className="param-label">
+        Clearance height (mm)
+        <input type="number" value={clearanceHeight} step={1}
+          onChange={(e) => setClearanceHeight(Number(e.target.value))}
+          className="param-input" />
+      </label>
+
+      <label className="param-label">
+        Feed rate (mm/min)
+        <input type="number" value={feedRate} step={10}
+          onChange={(e) => setFeedRate(Number(e.target.value))}
+          className="param-input" />
+      </label>
+
+      <label className="param-label" style={{ flexDirection: 'row', gap: 8 }}>
+        <input type="checkbox" checked={usePeck}
+          onChange={(e) => setUsePeck(e.target.checked)} />
+        Peck drilling (G83)
+      </label>
+
+      {usePeck && (
+        <label className="param-label">
+          Peck depth (mm)
+          <input type="number" value={peckDepth} step={1}
+            onChange={(e) => setPeckDepth(Number(e.target.value))}
+            className="param-input" />
+        </label>
+      )}
+
+      <button className="generate-btn" onClick={handleGenerate}
+        disabled={!canGenerate}>
+        Generate Drill
+      </button>
+
+      {errorMessage !== null && <p className="error-message">{errorMessage}</p>}
+      {gcodeText !== '' && <pre className="gcode-preview">{gcodeText}</pre>}
+    </div>
+  )
+}
+```
+
+**`<input type="checkbox">` — first appearance:**
+A checkbox renders as a toggleable control. `checked={usePeck}` makes it a controlled
+component — the displayed state comes from React state. `onChange={(e) => setUsePeck(e.target.checked)}`
+updates state when the user toggles the box. `e.target.checked` is the boolean value
+of the checkbox. This is the React pattern for all form inputs: `value`/`checked` from
+state, `onChange` to update state.
+
+**`{usePeck && <label>...</label>}` — conditional rendering of peck depth:**
+The peck depth input is only relevant when peck drilling is enabled. Conditionally
+rendering it avoids showing irrelevant controls and makes the UI more focused.
+Alternatively, the field could always be visible but disabled when `usePeck` is false
+— the conditional rendering approach is cleaner when the parameter is truly
+inapplicable.
+
+**`style={{ flexDirection: 'row', gap: 8 }}`:**
+Inline styles are an escape hatch when a component needs one-off style overrides that
+do not warrant a CSS class. `style` accepts a JavaScript object with camelCase CSS
+properties. Use inline styles sparingly — they bypass the cascade and make theming
+harder. Here the checkbox label is a horizontal layout (checkbox and text side by
+side) while all other labels are vertical — a legitimate one-off.
+
+---
+
+## Connect the Pieces
+
+The drill operation reuses the entire G-code pipeline unchanged:
+
+```
+Hole centres (Vec2[])
+  ──► generateDrillGcode → G-code string
+  ──► parseGcode → ParsedBlock[]
+  ──► simulateToolpath → ToolpathSegment[]
+  ──► buildToolpathLines → THREE.LineSegments in scene
+```
+
+The only new code in this lesson is `generateDrillGcode` and the `DrillPanel`
+component. Everything else — parser, simulator, renderer — handles the drill G-code
+transparently. This is the payoff of the pipeline architecture: each new CAM operation
+adds only a generator; the rest of the system already works.
+
+The `onSegmentsReady` callback follows the same pattern as in lesson 22. The
+application shell receives segments from both the contour and drill panels and calls
+`buildToolpathLines` for each. When a new operation is generated, the previous
+`LineSegments` are removed from the scene and the new ones added — the same lifecycle
+management as lesson 19.
+
+---
+
+## What Breaks Without This
+
+**Without `G80` after the last hole:**
+On a real CNC machine, any subsequent motion command (a rapid return to home, a tool
+change, or even manually jogging the machine) while G81 is active triggers a drilling
+cycle at the new position. If the operator jogs the X axis to clear the workpiece,
+the controller drills at the jog destination. `G80` is not optional — it is a
+mandatory end to any canned cycle program.
+
+**Without wrapping the throwing call in `toThrow`:**
+```typescript
+// Wrong — the throw propagates to Vitest before it can be caught:
+expect(generateDrillGcode({ ...singleHole, centres: [] })).toThrow()
+
+// Correct — the arrow function delays evaluation:
+expect(() => generateDrillGcode({ ...singleHole, centres: [] })).toThrow()
+```
+The wrong form calls `generateDrillGcode(...)` immediately, which throws before the
+`expect` even runs. Vitest catches the uncaught throw and marks the test as failed
+with an unexpected error — not with an assertion failure. The arrow function wraps the
+call so `toThrow` can control when it is invoked and catch the throw itself.
+
+---
+
+## Definition of Done
+
+- [ ] `npm test` passes all six tests in `drillOperation.test.ts`
+- [ ] The drill panel renders in the application shell with depth, clearance, and feed rate inputs
+- [ ] Generating a drill operation adds toolpath segments to the viewport
+- [ ] The peck depth input is hidden when the peck checkbox is unchecked
+- [ ] The generate button is disabled when no tool is selected or no hole centres exist
+- [ ] You can explain what G81 is and how modal G-codes reduce repetition in G-code programs
+- [ ] You can explain the difference between G81 (standard drill) and G83 (peck drill)
+- [ ] You can explain why `G80` must follow the last canned cycle position
+- [ ] You can explain why toThrow requires wrapping the call in an arrow function
+- [ ] You can explain canned cycles as an abstraction mechanism and name the equivalent concept in a programming language
+- [ ] Run:
+      ```
+      git add src/cam/
+      git commit -m "Add drill operation: G81/G83 canned cycle generation, peck drilling toggle, drill panel with conditional peck depth input"
+      ```
+
+---
+
+*Next: Lesson 24 — G-code Export. All generated toolpaths are combined into a single
+downloadable Fanuc G-code file. The export function validates its output by parsing it
+back through the lesson 18 parser — round-trip testing in production. The browser's
+File API creates a download link.*

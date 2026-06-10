@@ -1,0 +1,330 @@
+{
+  "_meta": {
+    "description": "A 35-lab course teaching CSS, JavaScript, Canvas 2D, and Three.js by building a stunning portfolio site with animated 3D scenes, scroll-driven sections, and a ribbon navigation.",
+    "note": "TWO FILES GOVERN EVERY LESSON. BOTH ARE REQUIRED. NEITHER OVERRIDES THE OTHER. (1) THIS FILE — CURRICULUM.json — is the authoritative lab index. Every tag is a teaching obligation. A concept tagged in LAB-20 that also appeared in LAB-11 gets a full concept block in both — new code, new context, new depth. (2) CREATIVE-WEB-LESSON-CONTRACT.md — contains the mandatory concept block template, the 9 laws, naming rules, lesson structure, and the self-check the AI must pass before submitting any lesson. An AI writing any lesson must read both files before writing a single word.",
+    "format": {
+      "title": "ConceptName — Brief Description of What Changes",
+      "concept": "The single primary concept this lab introduces — one sentence, no 'and'",
+      "tags": "Every concept that appears in this lab's code or explanation. Every tag is a teaching obligation — a full concept block is required in the lesson. 3–7 tags per lab.",
+      "visibleAtEnd": "Exact observable result when the lab is complete. A sentence describing what the student SEES or INTERACTS WITH. Not a goal. Not a learning objective.",
+      "file": "LAB-NN-ConceptName-Brief-Description.md",
+      "status": "planned | written | reviewed"
+    },
+    "teachingRule": "Every tag in a lab entry is a teaching obligation. The AI must write a full concept block for every tag before writing the code that uses it. No concept block may be skipped because the concept appeared in an earlier lab. The block content changes each time — new code, new context, new depth — but the full template is always required."
+  },
+
+  "LAB-00": {
+    "title": "Browser DevTools — Your First HTML File",
+    "concept": "A browser reads an HTML file and renders its structure; DevTools reveals the live model the browser built from your code.",
+    "tags": ["html-document", "browser-rendering", "devtools", "dom", "inspector"],
+    "visibleAtEnd": "An index.html file open in Chrome showing a heading and a paragraph; DevTools is open, the student has clicked the heading element, and the inspector panel shows its tag name and styles.",
+    "file": "LAB-00-DevTools-Your-First-HTML-File.md",
+    "status": "written"
+  },
+
+  "LAB-01": {
+    "title": "Live Server — Auto-Reload Workflow",
+    "concept": "VS Code's Live Server extension watches a file and refreshes the browser the moment you save, eliminating the manual reload cycle and revealing every change immediately.",
+    "tags": ["live-reload", "development-workflow", "html-document", "browser-rendering", "file-structure"],
+    "visibleAtEnd": "Edit the HTML file in VS Code, press Save, and the browser tab updates automatically — no F5 required.",
+    "file": "LAB-01-LiveServer-Auto-Reload-Workflow.md",
+    "status": "planned"
+  },
+
+  "LAB-02": {
+    "title": "Box Model — Every Element Is a Rectangle",
+    "concept": "Every HTML element occupies a rectangular box defined by four layers — content, padding, border, margin — and understanding those layers is required to control spacing.",
+    "tags": ["box-model", "padding", "margin", "border", "css-sizing", "devtools"],
+    "visibleAtEnd": "A colored box on screen with visible padding and border; DevTools shows the box model diagram with exact pixel values for each layer.",
+    "file": "LAB-02-BoxModel-Every-Element-Is-a-Rectangle.md",
+    "status": "planned"
+  },
+
+  "LAB-03": {
+    "title": "Flexbox — Aligning Things Along One Axis",
+    "concept": "Flexbox lets a parent element distribute and align its children along one axis without absolute positioning or float hacks.",
+    "tags": ["flexbox", "css-layout", "alignment", "gap", "flex-direction", "justify-content"],
+    "visibleAtEnd": "Three colored boxes centered horizontally and vertically in the viewport, with equal gap between them — achieved with five CSS properties on the parent.",
+    "file": "LAB-03-Flexbox-Aligning-Things-Along-One-Axis.md",
+    "status": "planned"
+  },
+
+  "LAB-04": {
+    "title": "CSS Custom Properties — Variables That Cascade",
+    "concept": "CSS custom properties store a value once under a name and cascade it to all descendant elements, so changing one variable changes every element that references it.",
+    "tags": ["css-custom-properties", "cascade", "design-tokens", "css-variables", "theming"],
+    "visibleAtEnd": "Change one --color-primary variable at the top of the CSS file and watch a heading, a button, and a border all update their color simultaneously.",
+    "file": "LAB-04-CSSCustomProperties-Variables-That-Cascade.md",
+    "status": "planned"
+  },
+
+  "LAB-05": {
+    "title": "CSS Transitions — Smooth State Changes",
+    "concept": "A CSS transition animates a property's change from one value to another over a defined duration and easing curve, triggered automatically by any state change like :hover.",
+    "tags": ["css-transitions", "easing", "hover-state", "transform", "opacity", "timing-function"],
+    "visibleAtEnd": "A button that smoothly grows and changes background color over 0.3 seconds when hovered, and smoothly returns when the cursor leaves — zero JavaScript.",
+    "file": "LAB-05-CSSTransitions-Smooth-State-Changes.md",
+    "status": "planned"
+  },
+
+  "LAB-06": {
+    "title": "CSS Keyframe Animations — Motion Without JavaScript",
+    "concept": "CSS @keyframes defines a named timeline of style snapshots; the animation property plays that timeline on an element continuously and independently of user interaction.",
+    "tags": ["css-animations", "keyframes", "transform", "animation-iteration", "animation-timing-function", "animation-delay"],
+    "visibleAtEnd": "A circle that floats up and down in a smooth infinite loop, and a card that fades in 0.5 seconds after the page loads — both driven by CSS alone.",
+    "file": "LAB-06-CSSKeyframes-Motion-Without-JavaScript.md",
+    "status": "planned"
+  },
+
+  "LAB-07": {
+    "title": "Modern CSS Effects — Gradients and Glassmorphism",
+    "concept": "CSS gradients, backdrop-filter, and layered box-shadow combine to produce depth and translucency effects that were previously only achievable with images.",
+    "tags": ["gradients", "backdrop-filter", "box-shadow", "rgba", "glassmorphism", "css-custom-properties"],
+    "visibleAtEnd": "A frosted-glass card floating over a colorful mesh gradient background, with visible blur effect, translucent white background, and a subtle inner border.",
+    "file": "LAB-07-ModernCSSEffects-Gradients-and-Glassmorphism.md",
+    "status": "planned"
+  },
+
+  "LAB-08": {
+    "title": "Typography Scale — Fluid Type with clamp()",
+    "concept": "clamp(min, preferred, max) lets a font size grow and shrink proportionally with the viewport width between hard limits, eliminating breakpoint-based typography overrides.",
+    "tags": ["typography", "clamp", "fluid-typography", "font-pairing", "line-height", "css-custom-properties"],
+    "visibleAtEnd": "Resize the browser window from narrow to wide and watch the heading and body text scale smoothly — no media queries, no layout breaks.",
+    "file": "LAB-08-TypographyScale-Fluid-Type-with-Clamp.md",
+    "status": "planned"
+  },
+
+  "LAB-09": {
+    "title": "DOM Selection — JavaScript Reads the Page",
+    "concept": "document.querySelector returns a live JavaScript object representing one HTML element; setting properties on that object directly changes what the browser renders.",
+    "tags": ["dom", "querySelector", "javascript-basics", "element-manipulation", "css-class-toggle"],
+    "visibleAtEnd": "Click a button and watch a paragraph's text content and color change without the page reloading.",
+    "file": "LAB-09-DOMSelection-JavaScript-Reads-the-Page.md",
+    "status": "planned"
+  },
+
+  "LAB-10": {
+    "title": "Events — JavaScript Reacts to the User",
+    "concept": "addEventListener registers a function the browser calls automatically when a specific thing happens — a click, a keypress, a mouse move — without polling or checking in a loop.",
+    "tags": ["events", "addEventListener", "event-object", "mousemove", "keyboard-events", "dom"],
+    "visibleAtEnd": "Move the mouse and see its X and Y coordinates update live on screen; press any key and see the key name appear below.",
+    "file": "LAB-10-Events-JavaScript-Reacts-to-the-User.md",
+    "status": "planned"
+  },
+
+  "LAB-11": {
+    "title": "requestAnimationFrame — The JavaScript Draw Loop",
+    "concept": "requestAnimationFrame schedules a callback to run just before the browser paints the next frame, giving JavaScript a frame-rate-synchronized loop for smooth, flicker-free animation.",
+    "tags": ["requestAnimationFrame", "animation-loop", "delta-time", "javascript-animation", "performance"],
+    "visibleAtEnd": "A square moves smoothly from left to right across the screen and wraps around — driven entirely by JavaScript, no CSS animation involved.",
+    "file": "LAB-11-RequestAnimationFrame-The-JavaScript-Draw-Loop.md",
+    "status": "planned"
+  },
+
+  "LAB-12": {
+    "title": "Intersection Observer — Animate When Visible",
+    "concept": "IntersectionObserver notifies a callback when an element enters or exits the viewport, without requiring a scroll event listener or manual bounding-rect calculations.",
+    "tags": ["IntersectionObserver", "scroll-animation", "css-class-toggle", "entrance-animation", "performance", "dom"],
+    "visibleAtEnd": "Scroll down a page with five cards and watch each card fade and slide up into place the moment it enters the viewport.",
+    "file": "LAB-12-IntersectionObserver-Animate-When-Visible.md",
+    "status": "planned"
+  },
+
+  "LAB-13": {
+    "title": "Scroll Parallax — Two Layers at Different Speeds",
+    "concept": "Applying a fraction of window.scrollY as a CSS transform on a background element makes it move slower than the foreground, creating the visual impression of depth.",
+    "tags": ["scroll-events", "parallax", "transform", "requestAnimationFrame", "layer-depth", "performance"],
+    "visibleAtEnd": "Scroll the page and watch a large background shape move at half the speed of the text content above it, creating a convincing sense of depth.",
+    "file": "LAB-13-ScrollParallax-Two-Layers-at-Different-Speeds.md",
+    "status": "planned"
+  },
+
+  "LAB-14": {
+    "title": "Canvas Setup — Drawing with the 2D Context",
+    "concept": "The HTML canvas element is a bitmap drawing surface; JavaScript gets a 2D rendering context from it and calls imperative drawing commands that paint pixels directly.",
+    "tags": ["canvas", "2d-context", "fillRect", "arc", "canvas-coordinate-system", "clearRect"],
+    "visibleAtEnd": "A canvas fills the browser window; it shows a white rectangle and a blue filled circle drawn with JavaScript — no HTML elements, no CSS colors.",
+    "file": "LAB-14-CanvasSetup-Drawing-with-the-2D-Context.md",
+    "status": "planned"
+  },
+
+  "LAB-15": {
+    "title": "Particle Field — Many Objects Moving Together",
+    "concept": "A particle system stores an array of objects each with position and velocity; the animation loop updates every position each frame and redraws the entire canvas from scratch.",
+    "tags": ["particle-system", "canvas", "animation-loop", "array-iteration", "canvas-clear-redraw", "requestAnimationFrame"],
+    "visibleAtEnd": "100 white dots drift across a dark full-screen canvas in random directions; any dot that leaves the canvas edge reappears on the opposite side.",
+    "file": "LAB-15-ParticleField-Many-Objects-Moving-Together.md",
+    "status": "planned"
+  },
+
+  "LAB-16": {
+    "title": "Mouse-Interactive Canvas — Particles Respond to the Cursor",
+    "concept": "Storing the mouse position in a variable updated by mousemove, then reading it every animation frame, lets particles steer toward the cursor without event-driven logic in the loop.",
+    "tags": ["mousemove", "canvas", "particle-system", "vector-math", "interactivity", "animation-loop"],
+    "visibleAtEnd": "Move the cursor over the canvas and watch particles steer toward it; stop moving and they drift away under their own velocity.",
+    "file": "LAB-16-MouseCanvas-Particles-Respond-to-the-Cursor.md",
+    "status": "planned"
+  },
+
+  "LAB-17": {
+    "title": "Three.js Scene — The Minimum Three Objects",
+    "concept": "Every Three.js scene requires exactly three objects to render anything: a Scene (the world container), a Camera (the viewpoint), and a WebGLRenderer (the engine that draws the scene onto a canvas).",
+    "tags": ["threejs", "scene", "camera", "renderer", "webgl", "import-map"],
+    "visibleAtEnd": "A black canvas fills the browser window with a single white wireframe cube visible and centered.",
+    "file": "LAB-17-ThreeScene-The-Minimum-Three-Objects.md",
+    "status": "planned"
+  },
+
+  "LAB-18": {
+    "title": "Geometry and Materials — Shape Plus Surface",
+    "concept": "In Three.js, a Mesh combines a BufferGeometry (the shape's vertex data) with a Material (how light interacts with the surface); neither is visible without the other.",
+    "tags": ["threejs", "geometry", "material", "mesh", "MeshStandardMaterial", "MeshBasicMaterial"],
+    "visibleAtEnd": "Three different shapes on screen — a sphere, a torus, a box — each with a different colored material and lit from a single directional light.",
+    "file": "LAB-18-GeometryMaterials-Shape-Plus-Surface.md",
+    "status": "planned"
+  },
+
+  "LAB-19": {
+    "title": "Lighting — Making 3D Look Three-Dimensional",
+    "concept": "Without lights, MeshStandardMaterial renders as pure black because it calculates color from light interaction; AmbientLight provides baseline illumination and DirectionalLight simulates a distant sun.",
+    "tags": ["threejs", "lighting", "AmbientLight", "DirectionalLight", "shading", "material-response"],
+    "visibleAtEnd": "Toggle a DirectionalLight on and off with a keypress; see the scene go from fully lit 3D objects to flat black shapes, then back.",
+    "file": "LAB-19-Lighting-Making-3D-Look-Three-Dimensional.md",
+    "status": "planned"
+  },
+
+  "LAB-20": {
+    "title": "Three.js Clock — Time-Based Animation",
+    "concept": "Three.js Clock measures wall-clock elapsed time independently of frame rate; using elapsedTime to drive rotation or position makes animation speed consistent regardless of rendering performance.",
+    "tags": ["threejs", "Clock", "animation-loop", "time-based-motion", "requestAnimationFrame", "delta-time"],
+    "visibleAtEnd": "A sphere rotates at a constant speed; throttle the browser to 10fps and the sphere still completes one rotation per second — the speed does not change with the frame rate.",
+    "file": "LAB-20-ThreeClock-Time-Based-Animation.md",
+    "status": "planned"
+  },
+
+  "LAB-21": {
+    "title": "OrbitControls — Mouse Navigation in 3D",
+    "concept": "OrbitControls is a Three.js addon that translates mouse drag, scroll, and right-click into camera orbit, zoom, and pan by mutating the camera's position and target each frame.",
+    "tags": ["threejs", "OrbitControls", "camera-control", "mouse-events", "import-map", "addon"],
+    "visibleAtEnd": "Click and drag to orbit the scene, scroll to zoom, right-click drag to pan — the camera responds to all three gestures without any custom event code.",
+    "file": "LAB-21-OrbitControls-Mouse-Navigation-in-3D.md",
+    "status": "planned"
+  },
+
+  "LAB-22": {
+    "title": "Raycasting — Mouse Selects 3D Objects",
+    "concept": "A Three.js Raycaster projects a ray from the camera through the mouse's normalized screen position into the 3D world and returns the list of meshes the ray intersects.",
+    "tags": ["threejs", "Raycaster", "mouse-interaction", "3D-picking", "NDC-coordinates", "hover-state"],
+    "visibleAtEnd": "Hover over any of three spheres; the sphere under the cursor turns yellow while the others stay their original color.",
+    "file": "LAB-22-Raycasting-Mouse-Selects-3D-Objects.md",
+    "status": "planned"
+  },
+
+  "LAB-23": {
+    "title": "Three.js Background — Canvas Behind HTML Content",
+    "concept": "Setting a Three.js renderer's canvas to position:fixed and z-index:-1 places the WebGL scene behind all HTML content so normal DOM elements float over the 3D scene.",
+    "tags": ["threejs", "webgl-background", "z-index", "css-positioning", "html-over-canvas", "resize-handler"],
+    "visibleAtEnd": "A slowly rotating 3D scene is visible behind a headline and a paragraph of text; scrolling the page does not affect the Three.js canvas.",
+    "file": "LAB-23-ThreeBackground-Canvas-Behind-HTML-Content.md",
+    "status": "planned"
+  },
+
+  "LAB-24": {
+    "title": "Color System — HSL and a Design Palette",
+    "concept": "HSL (Hue, Saturation, Lightness) expresses color in human-readable terms so a developer can reason about color relationships without memorizing hex codes.",
+    "tags": ["color-theory", "hsl", "css-custom-properties", "design-palette", "contrast", "color-scale"],
+    "visibleAtEnd": "Five related color swatches on screen generated from a single --hue variable; change the hue number once and all five swatches shift together.",
+    "file": "LAB-24-ColorSystem-HSL-and-a-Design-Palette.md",
+    "status": "planned"
+  },
+
+  "LAB-25": {
+    "title": "Micro-interactions — Hover, Press, and Focus",
+    "concept": "Micro-interactions are sub-second visual responses — a lift on hover, a compression on click, a focus ring on keyboard tab — that signal the interface is alive and responding.",
+    "tags": ["micro-interactions", "hover-state", "css-transitions", "focus-visible", "transform", "active-state"],
+    "visibleAtEnd": "Three buttons: the first lifts 4px on hover, the second compresses on :active, the third shows a visible focus ring on keyboard tab — each using only CSS.",
+    "file": "LAB-25-MicroInteractions-Hover-Press-and-Focus.md",
+    "status": "planned"
+  },
+
+  "LAB-26": {
+    "title": "Visual Hierarchy — Size, Contrast, and Spacing",
+    "concept": "Visual hierarchy uses relative size, color contrast, and spatial proximity to guide the viewer's eye from the most important element to the least without requiring them to read everything.",
+    "tags": ["visual-hierarchy", "typography", "spacing-scale", "contrast", "ui-design", "design-tokens"],
+    "visibleAtEnd": "The same content rendered twice side-by-side: a flat version with equal sizing, and a version with deliberate hierarchy that clearly leads the eye — same HTML, different CSS.",
+    "file": "LAB-26-VisualHierarchy-Size-Contrast-and-Spacing.md",
+    "status": "planned"
+  },
+
+  "LAB-27": {
+    "title": "Scroll Reveals — Sections Animate Into View",
+    "concept": "Combining IntersectionObserver with a CSS class that uses a transition creates a reveal system where each section slides in from below the moment its top edge enters the viewport.",
+    "tags": ["IntersectionObserver", "scroll-animation", "css-transitions", "css-class-toggle", "entrance-animation", "transform"],
+    "visibleAtEnd": "A page with five sections; scroll down and each section rises 40px into its final position and fades in as it enters the viewport.",
+    "file": "LAB-27-ScrollReveals-Sections-Animate-Into-View.md",
+    "status": "planned"
+  },
+
+  "LAB-28": {
+    "title": "Portfolio Shell — Full-Viewport Scroll Sections",
+    "concept": "A single-page portfolio uses full-viewport-height sections stacked vertically so the user navigates by scrolling and each section owns the entire screen while visible.",
+    "tags": ["portfolio-layout", "scroll-layout", "100vh", "section-structure", "semantic-html", "overflow"],
+    "visibleAtEnd": "Five full-viewport-height sections stacked vertically; each has a different background and a centered label; scrolling snaps the view to each section.",
+    "file": "LAB-28-PortfolioShell-Full-Viewport-Scroll-Sections.md",
+    "status": "planned"
+  },
+
+  "LAB-29": {
+    "title": "Ribbon Navigation — Fixed Sidebar Tracks Scroll",
+    "concept": "A fixed-position sidebar of dot indicators tracks which section is currently visible by using IntersectionObserver on each section and highlighting the corresponding dot.",
+    "tags": ["fixed-positioning", "scroll-tracking", "IntersectionObserver", "navigation", "active-state", "smooth-scroll"],
+    "visibleAtEnd": "A vertical ribbon of five dots on the right edge; the dot for the visible section is bright; click any dot and the page scrolls smoothly to that section.",
+    "file": "LAB-29-RibbonNav-Fixed-Sidebar-Tracks-Scroll.md",
+    "status": "planned"
+  },
+
+  "LAB-30": {
+    "title": "Hero Section — Three.js Background with Animated Text",
+    "concept": "The portfolio hero combines a Three.js canvas in the background with HTML content in the foreground and a CSS entrance animation that triggers after the page finishes loading.",
+    "tags": ["threejs", "webgl-background", "entrance-animation", "keyframes", "css-class-toggle", "load-event"],
+    "visibleAtEnd": "The hero section shows an animated Three.js particle field behind a large heading and subtitle that fade in 600ms after the page loads.",
+    "file": "LAB-30-HeroSection-ThreeJS-Background-with-Animated-Text.md",
+    "status": "planned"
+  },
+
+  "LAB-31": {
+    "title": "Section Design — Card Grid App",
+    "concept": "An app section packages a complete mini UI — its own color scheme, typography, and layout — within a 100vh scroll section so each section feels like a distinct application.",
+    "tags": ["section-design", "css-grid", "card-layout", "design-token-scope", "visual-identity", "css-custom-properties"],
+    "visibleAtEnd": "Scroll to section two and see a dark card grid with three project cards, each with a title, tag, and description — visually distinct from the hero section.",
+    "file": "LAB-31-SectionDesign-Card-Grid-App.md",
+    "status": "planned"
+  },
+
+  "LAB-32": {
+    "title": "Canvas Section — Interactive Particle Widget",
+    "concept": "Scoping a Canvas element inside a scroll section — instead of using it as a full-page background — demonstrates that canvas is a composable UI component, not just a page backdrop.",
+    "tags": ["canvas", "particle-system", "component-scoping", "ResizeObserver", "section-design", "interactivity"],
+    "visibleAtEnd": "Scroll to section three and see a framed canvas widget showing a particle field; moving the mouse inside the frame attracts nearby particles.",
+    "file": "LAB-32-CanvasSection-Interactive-Particle-Widget.md",
+    "status": "planned"
+  },
+
+  "LAB-33": {
+    "title": "Terminal Section — Typewriter Animation",
+    "concept": "A typewriter animation writes characters to the DOM one at a time using setTimeout with an incrementing index into the target string, creating the effect of text being typed live.",
+    "tags": ["typewriter-animation", "setTimeout", "section-design", "css-animations", "monospace", "identity"],
+    "visibleAtEnd": "Scroll to section four and watch code text type itself onto a dark terminal background character by character, with a blinking cursor at the insertion point.",
+    "file": "LAB-33-TerminalSection-Typewriter-Animation.md",
+    "status": "planned"
+  },
+
+  "LAB-34": {
+    "title": "Portfolio Polish — Performance and Accessibility",
+    "concept": "A finished portfolio must respect prefers-reduced-motion for users who avoid animation, handle touch events without blocking scroll, and paint in under 3 seconds on a slow connection.",
+    "tags": ["performance", "will-change", "prefers-reduced-motion", "touch-events", "viewport-meta", "accessibility"],
+    "visibleAtEnd": "The complete portfolio site works on a phone without layout breakage, respects reduced-motion preferences, and scores above 90 in Lighthouse performance.",
+    "file": "LAB-34-PortfolioPolish-Performance-and-Accessibility.md",
+    "status": "planned"
+  }
+}

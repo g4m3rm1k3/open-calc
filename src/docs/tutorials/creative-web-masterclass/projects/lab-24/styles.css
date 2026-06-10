@@ -1,0 +1,46 @@
+*, *::before, *::after { box-sizing: border-box; }
+:root {
+  --primary-900: hsl(244, 50%, 18%);
+  --primary-700: hsl(244, 70%, 40%);
+  --primary-500: hsl(244, 95%, 65%);
+  --primary-300: hsl(244, 90%, 78%);
+  --primary-100: hsl(244, 60%, 93%);
+  --accent-900: hsl(8, 50%, 18%);
+  --accent-700: hsl(8, 70%, 38%);
+  --accent-500: hsl(8, 90%, 62%);
+  --accent-300: hsl(8, 85%, 76%);
+  --accent-100: hsl(8, 60%, 93%);
+  --neutral-900: hsl(240, 20%, 8%);
+  --neutral-700: hsl(240, 14%, 22%);
+  --neutral-500: hsl(240, 8%, 42%);
+  --neutral-300: hsl(240, 6%, 72%);
+  --neutral-100: hsl(240, 5%, 94%);
+  --color-bg: var(--neutral-900);
+  --color-surface: hsl(240, 18%, 13%);
+  --color-border: hsl(240, 14%, 22%);
+  --color-text: var(--neutral-100);
+  --color-muted: var(--neutral-500);
+  --color-brand: var(--primary-500);
+  --color-accent: var(--accent-500);
+  --color-success: hsl(152, 60%, 55%);
+  --color-warning: hsl(38, 90%, 58%);
+  --color-danger: var(--accent-500);
+}
+body { margin: 0; font-family: system-ui, sans-serif; background: var(--color-bg); color: var(--color-text); }
+.swatch-page { max-width: 900px; margin: 0 auto; padding: 60px 24px; display: flex; flex-direction: column; gap: 48px; }
+.page-header h1 { margin: 0 0 8px 0; color: var(--color-brand); font-size: 2rem; }
+.page-header p { margin: 0; color: var(--color-muted); }
+.palette-group h2 { margin: 0 0 16px 0; font-size: 1rem; color: var(--color-muted); font-weight: 400; }
+.swatch-row { display: flex; gap: 8px; }
+.swatch { flex: 1; height: 80px; background: var(--swatch); border-radius: 8px; display: flex; align-items: flex-end; padding: 8px; }
+.swatch span { font-size: 0.7rem; font-family: monospace; color: rgba(255,255,255,0.6); mix-blend-mode: difference; }
+.demo-section h2 { margin: 0 0 24px 0; font-size: 1.1rem; color: var(--color-muted); font-weight: 400; }
+.demo-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 12px; padding: 32px; max-width: 400px; }
+.demo-badge { display: inline-block; background: var(--color-brand); color: white; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 10px; border-radius: 4px; margin-bottom: 16px; }
+.demo-card h3 { margin: 0 0 8px 0; font-size: 1.2rem; }
+.demo-card p { margin: 0 0 24px 0; color: var(--color-muted); font-size: 0.9rem; line-height: 1.5; }
+.demo-actions { display: flex; gap: 12px; }
+.btn { padding: 10px 20px; border-radius: 6px; font-size: 0.9rem; cursor: pointer; border: none; transition: opacity 0.15s ease, transform 0.15s ease; font-family: system-ui, sans-serif; }
+.btn:hover { opacity: 0.85; transform: translateY(-1px); }
+.btn-primary { background: var(--color-brand); color: white; }
+.btn-outline { background: transparent; color: var(--color-brand); border: 1px solid var(--color-brand); }

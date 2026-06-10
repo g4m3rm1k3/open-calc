@@ -1,0 +1,38 @@
+*, *::before, *::after { box-sizing: border-box; }
+:root {
+  --color-primary: #6c63ff;
+  --color-accent: #ff6b6b;
+  --color-bg: #0d0d1a;
+  --color-surface: #161628;
+  --color-border: #2a2a4a;
+  --color-text: #e8e8f0;
+  --color-muted: #7070a0;
+}
+
+body { margin: 0; font-family: system-ui, sans-serif; background: var(--color-bg); color: var(--color-text); }
+
+.hero { position: relative; height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+
+.parallax-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; will-change: transform; }
+
+.dot { position: absolute; border-radius: 50%; }
+
+.layer-slow .dot:nth-child(1)  { width: 80px;  height: 80px;  top: 15%;  left: 10%;  background: rgba(108, 99, 255, 0.15); }
+.layer-slow .dot:nth-child(2)  { width: 60px;  height: 60px;  top: 60%;  left: 75%;  background: rgba(108, 99, 255, 0.12); }
+.layer-slow .dot:nth-child(3)  { width: 120px; height: 120px; top: 30%;  left: 55%;  background: rgba(108, 99, 255, 0.08); }
+.layer-slow .dot:nth-child(4)  { width: 40px;  height: 40px;  top: 75%;  left: 30%;  background: rgba(108, 99, 255, 0.18); }
+.layer-slow .dot:nth-child(5)  { width: 90px;  height: 90px;  top: 50%;  left: 85%;  background: rgba(108, 99, 255, 0.10); }
+
+.layer-fast .dot:nth-child(1)  { width: 20px;  height: 20px;  top: 25%;  left: 20%;  background: rgba(255, 107, 107, 0.5); }
+.layer-fast .dot:nth-child(2)  { width: 14px;  height: 14px;  top: 70%;  left: 60%;  background: rgba(255, 107, 107, 0.6); }
+.layer-fast .dot:nth-child(3)  { width: 10px;  height: 10px;  top: 45%;  left: 40%;  background: rgba(255, 107, 107, 0.4); }
+.layer-fast .dot:nth-child(4)  { width: 18px;  height: 18px;  top: 20%;  left: 80%;  background: rgba(255, 107, 107, 0.55); }
+.layer-fast .dot:nth-child(5)  { width: 12px;  height: 12px;  top: 80%;  left: 15%;  background: rgba(255, 107, 107, 0.45); }
+
+.hero-content { position: relative; z-index: 10; text-align: center; }
+.hero-title { font-size: clamp(2.5rem, 7vw, 5rem); margin: 0 0 16px 0; color: var(--color-text); }
+.hero-sub { color: var(--color-muted); margin: 0; font-size: 1.1rem; }
+
+.content-section { max-width: 600px; margin: 0 auto; padding: 120px 24px; text-align: center; }
+.content-section h2 { color: var(--color-primary); margin-bottom: 12px; }
+.content-section p { color: var(--color-muted); line-height: 1.6; }

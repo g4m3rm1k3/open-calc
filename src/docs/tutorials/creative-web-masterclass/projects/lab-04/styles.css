@@ -1,0 +1,83 @@
+*, *::before, *::after { box-sizing: border-box; }
+
+:root {
+  --color-primary: #6c63ff;
+  --color-accent: #ff6b6b;
+  --color-bg: #ffffff;
+  --color-surface: #f8f8ff;
+  --color-text: #1a1a2e;
+  --color-text-muted: #6b6b8a;
+  --color-border: rgba(108, 99, 255, 0.2);
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 32px;
+  --spacing-xl: 64px;
+  --font-body: system-ui, sans-serif;
+  --font-size-base: 1rem;
+}
+
+body.theme-dark {
+  --color-bg: #1a1a2e;
+  --color-surface: #16213e;
+  --color-text: #e2e2f0;
+  --color-text-muted: #8080a0;
+  --color-border: rgba(108, 99, 255, 0.3);
+  --color-accent: #ff8e8e;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.page {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+}
+
+.heading {
+  color: var(--color-primary);
+  font-size: 2.5rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.subtext {
+  color: var(--color-text-muted);
+  margin-bottom: var(--spacing-lg);
+}
+
+.button {
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-base);
+  cursor: pointer;
+  margin-bottom: var(--spacing-lg);
+}
+
+.button:hover {
+  background: var(--color-accent);
+}
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.toggle-theme {
+  background: transparent;
+  border: 1px solid var(--color-text-muted);
+  border-radius: 4px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  cursor: pointer;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}

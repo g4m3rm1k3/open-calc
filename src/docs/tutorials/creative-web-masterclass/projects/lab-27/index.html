@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>LAB 27 — Scroll Reveals</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <p class="eyebrow" data-reveal="fade-up">Available for work</p>
+        <h1 class="display-title" data-reveal="fade-up" style="transition-delay:0.1s">Hi, I'm Alex.</h1>
+        <p class="hero-role" data-reveal="fade-up" style="transition-delay:0.2s">Creative Web Developer</p>
+        <p class="hero-body" data-reveal="fade-up" style="transition-delay:0.3s">I build interactive web experiences using Three.js, Canvas 2D, and modern CSS.</p>
+        <div class="hero-cta" data-reveal="fade-up" style="transition-delay:0.4s">
+          <a href="#work" class="btn btn-primary">See My Work</a>
+          <a href="#contact" class="btn btn-ghost">Get In Touch</a>
+        </div>
+      </section>
+      <section class="stats-section">
+        <div class="stats-row">
+          <div class="stat" data-reveal="scale-in">
+            <span class="stat-value">12</span><span class="stat-label">Projects</span>
+          </div>
+          <div class="stat" data-reveal="scale-in" style="transition-delay:0.15s">
+            <span class="stat-value">3</span><span class="stat-label">Years</span>
+          </div>
+          <div class="stat" data-reveal="scale-in" style="transition-delay:0.3s">
+            <span class="stat-value">5</span><span class="stat-label">Technologies</span>
+          </div>
+        </div>
+      </section>
+      <section class="work-section" id="work">
+        <div class="section-header" data-reveal="fade-up">
+          <p class="section-label">Selected Work</p>
+          <h2 class="section-title">What I've Built</h2>
+        </div>
+        <div class="work-grid" data-stagger-parent>
+          <article class="work-item work-item-featured" data-reveal="fade-left" data-stagger-child>
+            <div class="work-meta">Three.js + WebGL</div>
+            <h3 class="work-title">3D Portfolio Background</h3>
+            <p class="work-desc">Floating particle system behind HTML content.</p>
+          </article>
+          <article class="work-item" data-reveal="fade-left" data-stagger-child>
+            <div class="work-meta">Canvas 2D</div>
+            <h3 class="work-title">Particle Engine</h3>
+            <p class="work-desc">200 particles with velocity, friction, and mouse interaction.</p>
+          </article>
+          <article class="work-item" data-reveal="fade-left" data-stagger-child>
+            <div class="work-meta">CSS + JS</div>
+            <h3 class="work-title">Scroll Reveals</h3>
+            <p class="work-desc">IntersectionObserver entrance animations with stagger.</p>
+          </article>
+        </div>
+      </section>
+    </main>
+    <script src="main.js"></script>
+  </body>
+</html>

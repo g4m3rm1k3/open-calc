@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>LAB 09 — DOM Selection</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="demo-page">
+      <div class="card" id="demo-card">
+        <p class="card-status">Status: Idle</p>
+        <p class="card-desc">Edit this card using the buttons below.</p>
+      </div>
+      <div class="btn-row">
+        <button class="btn" id="btn-change">Change Text</button>
+        <button class="btn" id="btn-theme">Toggle Theme</button>
+        <button class="btn" id="btn-reset">Reset</button>
+      </div>
+      <div class="card" id="counter-card" style="margin-top:32px;">
+        <p class="counter-label">Count</p>
+        <p class="counter-value" style="font-size:2rem;font-weight:700;margin:0;">0</p>
+      </div>
+      <div class="btn-row" style="margin-top:12px;">
+        <button class="btn" id="btn-plus">+</button>
+        <button class="btn" id="btn-minus">−</button>
+      </div>
+    </div>
+    <script src="main.js"></script>
+  </body>
+</html>

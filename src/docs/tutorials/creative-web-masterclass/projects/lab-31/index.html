@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Portfolio</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+
+    <nav class="ribbon-nav" aria-label="Portfolio sections">
+      <div class="ribbon-progress"><div class="ribbon-progress-fill" id="ribbon-progress"></div></div>
+      <ul class="ribbon-list">
+        <li class="ribbon-item"><a href="#hero"     class="ribbon-link is-active" data-section="hero"><span class="ribbon-dot"></span><span class="ribbon-label">Hero</span></a></li>
+        <li class="ribbon-item"><a href="#work"     class="ribbon-link" data-section="work"><span class="ribbon-dot"></span><span class="ribbon-label">Work</span></a></li>
+        <li class="ribbon-item"><a href="#canvas"   class="ribbon-link" data-section="canvas"><span class="ribbon-dot"></span><span class="ribbon-label">Canvas</span></a></li>
+        <li class="ribbon-item"><a href="#terminal" class="ribbon-link" data-section="terminal"><span class="ribbon-dot"></span><span class="ribbon-label">Terminal</span></a></li>
+        <li class="ribbon-item"><a href="#contact"  class="ribbon-link" data-section="contact"><span class="ribbon-dot"></span><span class="ribbon-label">Contact</span></a></li>
+      </ul>
+    </nav>
+
+    <main class="portfolio">
+
+      <section id="hero" class="port-section section-hero">
+        <div class="hero-content" id="hero-content">
+          <p class="hero-eyebrow">Available for work</p>
+          <h1 class="hero-title">Hi, I'm Alex.</h1>
+          <p class="hero-role">Creative Web Developer</p>
+          <p class="hero-body">I build interactive web experiences using Three.js, Canvas 2D, and modern CSS.</p>
+          <div class="hero-cta">
+            <a href="#work" class="btn btn-primary">See My Work</a>
+            <a href="#contact" class="btn btn-ghost">Get In Touch</a>
+          </div>
+        </div>
+      </section>
+
+      <section id="work" class="port-section section-work">
+        <div class="section-inner">
+
+          <div class="section-header">
+            <p class="section-eyebrow">Selected projects</p>
+            <h2 class="section-title">Work</h2>
+          </div>
+
+          <div class="work-grid">
+
+            <article class="work-card work-card--featured" data-reveal="fade-up">
+              <div class="card-image" style="background: hsl(244, 50%, 22%);">
+                <div class="card-overlay">
+                  <a href="#" class="btn btn-primary">View Project</a>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="card-tags">
+                  <span class="tag">Three.js</span>
+                  <span class="tag">WebGL</span>
+                </div>
+                <h3 class="card-title">Immersive 3D Experience</h3>
+                <p class="card-desc">Interactive particle system with real-time audio reactivity.</p>
+              </div>
+            </article>
+
+            <article class="work-card" data-reveal="fade-up" style="--reveal-delay: 0.1s">
+              <div class="card-image" style="background: hsl(175, 50%, 18%);">
+                <div class="card-overlay"><a href="#" class="btn btn-primary">View</a></div>
+              </div>
+              <div class="card-body">
+                <div class="card-tags"><span class="tag">Canvas 2D</span></div>
+                <h3 class="card-title">Particle Widget</h3>
+                <p class="card-desc">Mouse-reactive particle field.</p>
+              </div>
+            </article>
+
+            <article class="work-card" data-reveal="fade-up" style="--reveal-delay: 0.2s">
+              <div class="card-image" style="background: hsl(28, 50%, 18%);">
+                <div class="card-overlay"><a href="#" class="btn btn-primary">View</a></div>
+              </div>
+              <div class="card-body">
+                <div class="card-tags"><span class="tag">CSS</span><span class="tag">JS</span></div>
+                <h3 class="card-title">CSS Animation Lab</h3>
+                <p class="card-desc">Scroll-driven micro-interactions.</p>
+              </div>
+            </article>
+
+            <article class="work-card" data-reveal="fade-up" style="--reveal-delay: 0.15s">
+              <div class="card-image" style="background: hsl(152, 40%, 15%);">
+                <div class="card-overlay"><a href="#" class="btn btn-primary">View</a></div>
+              </div>
+              <div class="card-body">
+                <div class="card-tags"><span class="tag">Node.js</span></div>
+                <h3 class="card-title">Data Dashboard</h3>
+                <p class="card-desc">Real-time chart with live updates.</p>
+              </div>
+            </article>
+
+            <article class="work-card" data-reveal="fade-up" style="--reveal-delay: 0.25s">
+              <div class="card-image" style="background: hsl(200, 50%, 16%);">
+                <div class="card-overlay"><a href="#" class="btn btn-primary">View</a></div>
+              </div>
+              <div class="card-body">
+                <div class="card-tags"><span class="tag">Three.js</span></div>
+                <h3 class="card-title">3D Product Viewer</h3>
+                <p class="card-desc">Orbit-controlled model showcase.</p>
+              </div>
+            </article>
+
+            <article class="work-card" data-reveal="fade-up" style="--reveal-delay: 0.35s">
+              <div class="card-image" style="background: hsl(8, 45%, 16%);">
+                <div class="card-overlay"><a href="#" class="btn btn-primary">View</a></div>
+              </div>
+              <div class="card-body">
+                <div class="card-tags"><span class="tag">CSS Grid</span></div>
+                <h3 class="card-title">Portfolio Template</h3>
+                <p class="card-desc">This site — open source.</p>
+              </div>
+            </article>
+
+          </div>
+        </div>
+      </section>
+
+      <section id="canvas" class="port-section section-canvas">
+        <div class="section-inner"><h2 class="placeholder-heading">Canvas</h2><p class="placeholder-sub">Coming in LAB-32</p></div>
+      </section>
+      <section id="terminal" class="port-section section-terminal">
+        <div class="section-inner"><h2 class="placeholder-heading">Terminal</h2><p class="placeholder-sub">Coming in LAB-33</p></div>
+      </section>
+      <section id="contact" class="port-section section-contact">
+        <div class="section-inner"><h2 class="placeholder-heading">Contact</h2></div>
+      </section>
+
+    </main>
+
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+      }
+    }
+    </script>
+    <script type="module" src="main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>LAB 26 — Visual Hierarchy</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <div class="hero-inner">
+          <p class="eyebrow">Available for work</p>
+          <h1 class="display-title">Hi, I'm Alex.</h1>
+          <p class="hero-role">Creative Web Developer</p>
+          <p class="hero-body">I build interactive web experiences using Three.js, Canvas 2D, and modern CSS. I believe the web should feel alive.</p>
+          <div class="hero-cta">
+            <a href="#work" class="btn btn-primary">See My Work</a>
+            <a href="#contact" class="btn btn-ghost">Get In Touch</a>
+          </div>
+        </div>
+      </section>
+      <section class="stats-section">
+        <div class="stats-row">
+          <div class="stat"><span class="stat-value">12</span><span class="stat-label">Projects</span></div>
+          <div class="stat"><span class="stat-value">3</span><span class="stat-label">Years</span></div>
+          <div class="stat"><span class="stat-value">5</span><span class="stat-label">Technologies</span></div>
+        </div>
+      </section>
+      <section class="work-section" id="work">
+        <div class="section-header">
+          <p class="section-label">Selected Work</p>
+          <h2 class="section-title">What I've Built</h2>
+        </div>
+        <div class="work-grid">
+          <article class="work-item work-item-featured">
+            <div class="work-meta">Three.js + WebGL</div>
+            <h3 class="work-title">3D Portfolio Background</h3>
+            <p class="work-desc">Floating particle system behind HTML content with mouse repulsion and scroll parallax.</p>
+          </article>
+          <article class="work-item">
+            <div class="work-meta">Canvas 2D</div>
+            <h3 class="work-title">Particle Engine</h3>
+            <p class="work-desc">A 200-particle field with velocity, friction, and mouse interaction.</p>
+          </article>
+          <article class="work-item">
+            <div class="work-meta">CSS + JS</div>
+            <h3 class="work-title">Scroll Reveals</h3>
+            <p class="work-desc">IntersectionObserver-powered entrance animations with stagger.</p>
+          </article>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

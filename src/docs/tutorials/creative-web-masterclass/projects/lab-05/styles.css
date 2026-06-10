@@ -1,0 +1,18 @@
+*, *::before, *::after { box-sizing: border-box; }
+:root {
+  --color-primary: #6c63ff;
+  --color-primary-dark: #5a52d4;
+  --color-surface: #f0f0f8;
+}
+body { margin: 0; font-family: system-ui, sans-serif; background: var(--color-surface); }
+.demo-page { max-width: 600px; margin: 0 auto; padding: 80px 32px; }
+.button-row { display: flex; gap: 16px; flex-wrap: wrap; }
+.btn { padding: 12px 28px; font-size: 1rem; border: none; border-radius: 6px; cursor: pointer; font-family: inherit; }
+.btn-fade { background: var(--color-primary); color: white; transition: background 0.3s ease; }
+.btn-fade:hover { background: var(--color-primary-dark); }
+.btn-lift { background: white; color: var(--color-primary); border: 2px solid var(--color-primary); box-shadow: 0 2px 8px rgba(0,0,0,.12); transition: transform 0.2s ease-out, box-shadow 0.2s ease-out; }
+.btn-lift:hover { transform: translateY(-4px); box-shadow: 0 6px 16px rgba(0,0,0,.18); }
+.btn-border { background: transparent; color: var(--color-primary); border: 2px solid transparent; box-shadow: inset 0 0 0 0 var(--color-primary); transition: box-shadow 0.25s ease, color 0.25s ease; }
+.btn-border:hover { box-shadow: inset 0 0 0 2px var(--color-primary); }
+.feature-card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,.08); transform: translateY(0); transition: transform 0.25s ease-out, box-shadow 0.25s ease-out; }
+.feature-card:hover { transform: translateY(-6px); box-shadow: 0 8px 24px rgba(0,0,0,.15); }

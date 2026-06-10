@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>LAB 23 — Three Background</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero-section">
+        <div class="hero-content">
+          <p class="hero-label">Creative Web Developer</p>
+          <h1 class="hero-title">Building the Future<br>with Code</h1>
+          <a href="#work" class="cta-btn">View My Work</a>
+        </div>
+      </section>
+      <section class="content-section" id="work">
+        <h2>Projects</h2>
+        <div class="card-grid">
+          <div class="card">
+            <h3>Portfolio Site</h3>
+            <p>Three.js background, scroll sections, and a particle system.</p>
+          </div>
+          <div class="card">
+            <h3>Canvas Engine</h3>
+            <p>A 2D particle physics engine built entirely with Canvas 2D API.</p>
+          </div>
+          <div class="card">
+            <h3>3D Visualizer</h3>
+            <p>An interactive data visualization with raycasting and orbit controls.</p>
+          </div>
+        </div>
+      </section>
+      <section class="content-section">
+        <h2>About</h2>
+        <p>I build creative web experiences using CSS, JavaScript, and Three.js.</p>
+      </section>
+    </main>
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+      }
+    }
+    </script>
+    <script type="module" src="main.js"></script>
+  </body>
+</html>

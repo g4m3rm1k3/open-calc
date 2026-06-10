@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>LAB 10 — Events</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="demo-page">
+      <section class="panel">
+        <h2>Mouse Position</h2>
+        <p>Move your mouse anywhere on the page.</p>
+        <div class="coords">X: <span id="cursor-x">—</span> &nbsp;&nbsp; Y: <span id="cursor-y">—</span></div>
+      </section>
+      <section class="panel">
+        <h2>Last Key Pressed</h2>
+        <p>Press any key.</p>
+        <div class="key-display" id="key-display">—</div>
+      </section>
+      <section class="panel">
+        <h2>JavaScript Hover</h2>
+        <div class="hover-row">
+          <div class="hover-card" data-index="1">Card 1</div>
+          <div class="hover-card" data-index="2">Card 2</div>
+          <div class="hover-card" data-index="3">Card 3</div>
+        </div>
+        <p id="hover-label" class="hover-label">Hover a card</p>
+      </section>
+    </div>
+    <script src="main.js"></script>
+  </body>
+</html>

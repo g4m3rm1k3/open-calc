@@ -1,0 +1,294 @@
+{
+  "_meta": {
+    "description": "A Lisp interpreter built in C++ from scratch — lexer, parser, evaluator, environments, closures, tail-call optimization, and mark-and-sweep garbage collection.",
+    "note": "TWO FILES GOVERN EVERY LESSON. BOTH ARE REQUIRED. NEITHER OVERRIDES THE OTHER. (1) THIS FILE — CURRICULUM.json — is the authoritative lab index. It defines what each lab teaches, what is visible at the end, and what concepts must be taught via the tags field. Every tag is a teaching obligation. (2) LISP-CPP-LESSON-CONTRACT.md — contains the mandatory concept block template, the 9 laws, the naming rules, the lesson structure, and the self-check the AI must pass before submitting any lesson. An AI writing any lesson must read both files before writing a single word.",
+    "format": {
+      "title": "ConceptName — What This Lab Adds",
+      "concept": "The single primary concept this lab introduces — one sentence",
+      "tags": "Every concept that appears in this lab's code or explanation. Every tagged concept gets a full concept block in this lab. Tags are teaching obligations, not a first-appearance registry.",
+      "visibleAtEnd": "Exact observable result when the lab is complete.",
+      "file": "The lesson markdown filename",
+      "status": "planned | written | reviewed"
+    },
+    "teachingRule": "Every tag in a lab entry is a teaching obligation. The AI must write a full concept block for every tag before writing the code that uses it. No tag may appear in a lab without a concept block. No concept block may be skipped because the concept appeared in an earlier lab."
+  },
+
+  "LAB-00": {
+    "title": "Toolchain — C++ Compiler, Build System, First Binary",
+    "concept": "A C++ program is compiled to a native binary by a toolchain: the compiler translates source to machine code, the linker assembles it into an executable.",
+    "tags": ["compilation-model", "toolchain", "g++", "cmake", "terminal", "binary-execution", "include-headers"],
+    "visibleAtEnd": "Terminal prints 'Lisp interpreter v0.1' from a compiled and linked C++ binary built with CMake.",
+    "file": "LAB-00-Toolchain-Compiler-First-Binary.md",
+    "status": "planned"
+  },
+
+  "LAB-01": {
+    "title": "Memory Model — Stack, Heap, and Pointers",
+    "concept": "C++ has two memory regions: the stack (automatic, short-lived, limited size) and the heap (manual, long-lived, unlimited) — every data structure decision flows from this.",
+    "tags": ["stack-memory", "heap-memory", "pointers", "new-delete", "null-pointer", "memory-address", "value-vs-reference"],
+    "visibleAtEnd": "Program prints the memory address of a stack variable and a heap-allocated integer, then frees it — no memory leak reported by Valgrind or AddressSanitizer.",
+    "file": "LAB-01-MemoryModel-Stack-Heap-Pointers.md",
+    "status": "planned"
+  },
+
+  "LAB-02": {
+    "title": "Structs and Enums — Modeling Data Without Classes",
+    "concept": "A struct groups related data under one name; an enum gives a finite set of named integer constants — together they are the foundation of every data model in C.",
+    "tags": ["struct", "enum", "tagged-union", "sizeof", "member-access", "data-layout", "c-style-data-modeling"],
+    "visibleAtEnd": "Program creates a Token struct with a type enum field, prints its tag and value — the exact structure the lexer will use.",
+    "file": "LAB-02-Structs-Enums-DataModeling.md",
+    "status": "planned"
+  },
+
+  "LAB-03": {
+    "title": "std::vector and std::string — The Two Containers You Need First",
+    "concept": "std::vector is a heap-allocated, resizable array that manages its own memory; std::string is a vector of chars — both abstract away manual memory management for linear sequences.",
+    "tags": ["std-vector", "std-string", "dynamic-array", "push-back", "iterator", "range-based-for", "abstraction-cost"],
+    "visibleAtEnd": "Program stores a vector of Token structs built from a hardcoded string and prints each token — the raw output of what will become the lexer.",
+    "file": "LAB-03-Vector-String-Containers.md",
+    "status": "planned"
+  },
+
+  "LAB-04": {
+    "title": "Functions — The Substitution Model in C++",
+    "concept": "A function call in C++ replaces the call site with the function body, substituting arguments for parameters — the same substitution model SICP describes, now visible at the machine level.",
+    "tags": ["functions", "substitution-model", "call-stack", "return-value", "pass-by-value", "pass-by-reference", "function-signature"],
+    "visibleAtEnd": "Program evaluates (+ 3 4) by hand using three C++ functions (add, eval_number, eval_plus) — no parsing yet, structure hardcoded — and prints 7.",
+    "file": "LAB-04-Functions-SubstitutionModel.md",
+    "status": "planned"
+  },
+
+  "LAB-05": {
+    "title": "Lexer — Turning Characters Into Tokens",
+    "concept": "A lexer (lexical analyzer) reads a stream of characters and groups them into tokens — the smallest meaningful units of the language — before any meaning is assigned.",
+    "tags": ["lexer", "tokenization", "finite-state-machine", "character-classification", "token-type-enum", "while-loop-with-state", "single-pass-scan"],
+    "visibleAtEnd": "tokenize(\"(+ 1 2)\") prints: LPAREN PLUS NUMBER(1) NUMBER(2) RPAREN — one token per line, correctly classified.",
+    "file": "LAB-05-Lexer-CharactersToTokens.md",
+    "status": "planned"
+  },
+
+  "LAB-06": {
+    "title": "Recursive Data — Building a Tree With Pointers",
+    "concept": "A tree is a recursive data structure: each node contains data and pointers to child nodes of the same type — the only way to represent nested structure in memory.",
+    "tags": ["recursive-data-structure", "tree", "linked-node", "raw-pointer-ownership", "nullptr", "node-struct", "recursive-definition"],
+    "visibleAtEnd": "Program builds the AST for (+ 1 2) manually using Node* pointers and prints it as a indented tree: (+ \\n  1 \\n  2).",
+    "file": "LAB-06-RecursiveData-TreeWithPointers.md",
+    "status": "planned"
+  },
+
+  "LAB-07": {
+    "title": "Parser — Turning Tokens Into a Tree",
+    "concept": "A recursive descent parser reads tokens left-to-right and builds a tree by calling itself recursively whenever it encounters a nested structure — the recursion in the code mirrors the recursion in the data.",
+    "tags": ["recursive-descent-parser", "parse-expression", "consume-token", "peek-vs-advance", "recursive-function", "grammar", "ast-construction"],
+    "visibleAtEnd": "parse(tokenize(\"(+ (* 2 3) 4)\")) produces a correct nested AST printed as: (+ (* 2 3) 4) — two levels of nesting correctly parsed.",
+    "file": "LAB-07-Parser-TokensToTree.md",
+    "status": "planned"
+  },
+
+  "LAB-08": {
+    "title": "Evaluator — Walking the Tree",
+    "concept": "The evaluator is a recursive function that pattern-matches on node type and computes a value — for numbers it returns the number, for lists it evaluates the operator and applies it to evaluated operands.",
+    "tags": ["tree-walk-interpreter", "pattern-matching-switch", "recursive-evaluation", "eval-apply-cycle", "primitive-operations", "integer-arithmetic", "base-case-and-recursive-case"],
+    "visibleAtEnd": "eval(parse(tokenize(\"(+ (* 2 3) (- 10 4))\"))) prints 12 — a nested arithmetic expression fully evaluated through a tree walk.",
+    "file": "LAB-08-Evaluator-WalkingTheTree.md",
+    "status": "planned"
+  },
+
+  "LAB-09": {
+    "title": "Lisp Values — The Tagged Union (Sum Type)",
+    "concept": "A Lisp value can be a number, a symbol, a boolean, nil, or a list — a tagged union (also called a sum type) represents 'one of several types' in a single C++ struct using a type tag and a union.",
+    "tags": ["tagged-union", "sum-type", "union-keyword", "variant-type", "type-erasure", "lisp-value", "dynamic-typing-in-static-language"],
+    "visibleAtEnd": "A LispVal struct represents numbers, symbols, and nil correctly — print_val(make_number(42)) prints '42', print_val(make_symbol(\"x\")) prints 'x', print_val(NIL) prints 'nil'.",
+    "file": "LAB-09-LispValues-TaggedUnion.md",
+    "status": "planned"
+  },
+
+  "LAB-10": {
+    "title": "Environment — Scope as a Linked Chain",
+    "concept": "An environment maps names to values; environments are linked in a chain — looking up a name searches the current frame, then the parent, matching exactly how lexical scope works at runtime.",
+    "tags": ["environment", "scope", "lexical-scope", "hash-map", "std-unordered-map", "linked-scope-chain", "variable-lookup", "sicp-environment-model"],
+    "visibleAtEnd": "An Environment with a parent correctly resolves x from the parent when the child has no binding: define x=10 in parent, look up x in child — prints 10.",
+    "file": "LAB-10-Environment-ScopeAsLinkedChain.md",
+    "status": "planned"
+  },
+
+  "LAB-11": {
+    "title": "Define and Lookup — Variables in the Evaluator",
+    "concept": "Extending the evaluator to handle (define x 5) stores a binding in the current environment; evaluating a symbol performs a lookup — together these make the language stateful.",
+    "tags": ["define-special-form", "symbol-lookup", "environment-mutation", "special-forms-vs-functions", "evaluator-extension", "statefulness", "name-binding"],
+    "visibleAtEnd": "eval sequence: (define x 10), (define y 20), (+ x y) — evaluator correctly resolves x and y from the environment and prints 30.",
+    "file": "LAB-11-Define-Lookup-VariablesInEvaluator.md",
+    "status": "planned"
+  },
+
+  "LAB-12": {
+    "title": "Lambda — Functions as First-Class Values",
+    "concept": "A lambda creates a function value that captures the environment it was defined in — the function is not called immediately, it is stored as a value and called later, carrying its scope with it.",
+    "tags": ["lambda", "first-class-functions", "closure-structure", "captured-environment", "function-object", "apply", "eval-apply-cycle-full"],
+    "visibleAtEnd": "((lambda (x) (* x x)) 5) evaluates to 25 — a lambda defined inline, applied immediately, parameter bound in a child environment, body evaluated.",
+    "file": "LAB-12-Lambda-FunctionsAsValues.md",
+    "status": "planned"
+  },
+
+  "LAB-13": {
+    "title": "Closures — Capturing the Environment",
+    "concept": "A closure is a function paired with the environment that was active when it was created — it can access variables from its defining scope even after that scope has returned.",
+    "tags": ["closure", "captured-environment", "lexical-vs-dynamic-scope", "higher-order-functions", "environment-pointer", "what-closures-are-in-memory", "closure-as-object"],
+    "visibleAtEnd": "(define make-adder (lambda (n) (lambda (x) (+ x n)))) — (define add5 (make-adder 5)) — (add5 3) prints 8. n is captured in add5's closure and still accessible.",
+    "file": "LAB-13-Closures-CapturingTheEnvironment.md",
+    "status": "planned"
+  },
+
+  "LAB-14": {
+    "title": "If and Conditionals — Control Flow as a Value",
+    "concept": "In Lisp, (if condition then else) is a special form that evaluates to a value — unlike C++ if statements, it is an expression, and only one branch is ever evaluated.",
+    "tags": ["if-special-form", "expression-vs-statement", "short-circuit-evaluation", "truthiness", "conditional-expression", "boolean-values", "special-form-implementation"],
+    "visibleAtEnd": "(if (= 1 1) \"yes\" \"no\") prints yes. (if (= 1 2) \"yes\" \"no\") prints no. (if #f 0 (/ 1 0)) prints error from else branch, confirming only one branch evaluated.",
+    "file": "LAB-14-If-ConditionalsAsValues.md",
+    "status": "planned"
+  },
+
+  "LAB-15": {
+    "title": "Recursion — How the Call Stack Grows",
+    "concept": "Every recursive function call pushes a new frame onto the C++ call stack — too many nested calls exhaust the stack, producing a stack overflow, which is a fundamental limit of the call-stack model.",
+    "tags": ["recursion", "call-stack-growth", "stack-overflow", "stack-frame", "base-case", "recursive-case", "factorial"],
+    "visibleAtEnd": "(define fact (lambda (n) (if (= n 0) 1 (* n (fact (- n 1)))))) — (fact 10) prints 3628800. (fact 10000) crashes with a stack overflow — the problem that motivates the next lab.",
+    "file": "LAB-15-Recursion-HowTheCallStackGrows.md",
+    "status": "planned"
+  },
+
+  "LAB-16": {
+    "title": "Tail Calls — Recursion Without Stack Growth",
+    "concept": "A tail call is a function call that is the very last operation in a function — the caller's stack frame is no longer needed, so it can be reused instead of stacked, turning recursion into iteration.",
+    "tags": ["tail-call", "tail-call-optimization", "trampolining", "tail-recursion", "stack-frame-reuse", "continuation-passing-style", "iteration-as-recursion"],
+    "visibleAtEnd": "(define fact-iter (lambda (n acc) (if (= n 0) acc (fact-iter (- n 1) (* n acc))))) — (fact-iter 100000 1) completes without stack overflow. The stack stays flat.",
+    "file": "LAB-16-TailCalls-RecursionWithoutStackGrowth.md",
+    "status": "planned"
+  },
+
+  "LAB-17": {
+    "title": "Smart Pointers — RAII and Ownership",
+    "concept": "RAII (Resource Acquisition Is Initialization) ties a resource's lifetime to a C++ object's scope — std::unique_ptr and std::shared_ptr implement RAII for heap memory, eliminating manual delete.",
+    "tags": ["raii", "smart-pointers", "unique-ptr", "shared-ptr", "ownership", "destructor", "memory-leak-prevention", "cpp-resource-management"],
+    "visibleAtEnd": "Refactored AST nodes use std::unique_ptr — AddressSanitizer reports zero memory leaks on a complete parse-and-eval cycle. The delete keyword does not appear in the codebase.",
+    "file": "LAB-17-SmartPointers-RAIIAndOwnership.md",
+    "status": "planned"
+  },
+
+  "LAB-18": {
+    "title": "Garbage Collection — Mark and Sweep",
+    "concept": "A garbage collector automatically reclaims heap memory that is no longer reachable from any live variable — mark-and-sweep works in two passes: trace all reachable objects, then free the rest.",
+    "tags": ["garbage-collection", "mark-and-sweep", "reachability", "gc-roots", "heap-as-object-pool", "tracing-gc", "memory-lifecycle"],
+    "visibleAtEnd": "The interpreter runs (define f (lambda (x) x)) in a loop 10000 times — GC fires automatically when the heap exceeds a threshold, old allocations are freed, memory stays bounded.",
+    "file": "LAB-18-GarbageCollection-MarkAndSweep.md",
+    "status": "planned"
+  },
+
+  "LAB-19": {
+    "title": "std::variant — Type-Safe Unions in Modern C++",
+    "concept": "std::variant is the modern C++ replacement for the manual tagged union — it stores one of several types safely, enforces that only the active type is accessed, and eliminates the undefined behavior of raw unions.",
+    "tags": ["std-variant", "std-visit", "type-safe-union", "modern-cpp", "visitor-pattern", "overloaded-lambda", "zero-cost-abstraction"],
+    "visibleAtEnd": "LispVal refactored from raw tagged union to std::variant<int64_t, double, bool, std::string, std::nullptr_t, std::vector<LispVal>> — all existing tests still pass.",
+    "file": "LAB-19-StdVariant-TypeSafeUnions.md",
+    "status": "planned"
+  },
+
+  "LAB-20": {
+    "title": "Classes and Encapsulation — Hiding the Mechanism",
+    "concept": "A class bundles data and the functions that operate on it into one unit, and access specifiers (public/private) enforce which parts callers can touch — encapsulation makes the internal representation changeable without breaking users.",
+    "tags": ["class", "encapsulation", "public-private", "member-functions", "constructor", "information-hiding", "interface-vs-implementation"],
+    "visibleAtEnd": "Environment refactored from a free-standing struct + functions into a class with private data — the same eval tests pass, but the hash map is inaccessible from outside the class.",
+    "file": "LAB-20-Classes-Encapsulation.md",
+    "status": "planned"
+  },
+
+  "LAB-21": {
+    "title": "Inheritance and Polymorphism — One Interface, Many Behaviors",
+    "concept": "Inheritance lets a derived class share structure from a base class; virtual functions let the caller invoke the derived class's version through a base class pointer — the mechanism behind runtime polymorphism.",
+    "tags": ["inheritance", "virtual-functions", "vtable", "runtime-polymorphism", "base-class-pointer", "override", "open-closed-principle"],
+    "visibleAtEnd": "A Callable base class with a virtual call() method is subclassed by LambdaFunc and BuiltinFunc — eval dispatches through the base pointer and the correct version runs for each type.",
+    "file": "LAB-21-Inheritance-Polymorphism.md",
+    "status": "planned"
+  },
+
+  "LAB-22": {
+    "title": "Templates — Generic Code Without Duplication",
+    "concept": "A C++ template generates code for multiple types from a single definition at compile time — the compiler stamps out a separate version for each type used, with zero runtime overhead.",
+    "tags": ["templates", "generic-programming", "type-parameters", "compile-time-generation", "template-instantiation", "code-reuse", "zero-cost-abstraction"],
+    "visibleAtEnd": "A generic Result<T, E> template wraps either a success value or an error — eval returns Result<LispVal, std::string> instead of throwing exceptions, all call sites updated.",
+    "file": "LAB-22-Templates-GenericCode.md",
+    "status": "planned"
+  },
+
+  "LAB-23": {
+    "title": "Error Handling — Exceptions vs. Result Types",
+    "concept": "Exceptions unwind the call stack to the nearest catch block; Result types make errors explicit in the return type — each is a different philosophy about whether failure is exceptional or expected.",
+    "tags": ["exceptions", "try-catch", "result-type", "error-propagation", "expected-value", "error-as-value", "exception-safety"],
+    "visibleAtEnd": "Evaluating (/ 1 0) returns a LispError value printed as 'Error: division by zero' without crashing. Evaluating (car '()) returns 'Error: car of empty list'. The REPL continues after both.",
+    "file": "LAB-23-ErrorHandling-ExceptionsVsResults.md",
+    "status": "planned"
+  },
+
+  "LAB-24": {
+    "title": "REPL — Read-Eval-Print Loop",
+    "concept": "A REPL is an interactive loop that reads one expression, evaluates it, prints the result, and loops — it is both how Lisp was originally used and a concrete demonstration of the eval/apply cycle running continuously.",
+    "tags": ["repl", "interactive-loop", "stdin-stdin-loop", "eval-apply-cycle", "persistent-environment", "line-buffering", "user-facing-error-messages"],
+    "visibleAtEnd": "Terminal shows a '> ' prompt. User types (+ 1 2) and presses Enter. Terminal prints 3 and shows a new prompt. User types (define x 5) then (+ x 3) and gets 8. Ctrl+C exits cleanly.",
+    "file": "LAB-24-REPL-ReadEvalPrintLoop.md",
+    "status": "planned"
+  },
+
+  "LAB-25": {
+    "title": "Built-in Library — list, car, cdr, cons",
+    "concept": "The core Lisp list operations (cons, car, cdr) are not syntactic — they are functions implemented in C++ and registered in the global environment, making them indistinguishable from user-defined functions at the Lisp level.",
+    "tags": ["builtin-functions", "cons-cell", "linked-list-as-pairs", "car-cdr", "list-construction", "c-plus-plus-as-implementation-language", "primitive-procedures"],
+    "visibleAtEnd": "(cons 1 (cons 2 (cons 3 '()))) prints (1 2 3). (car '(a b c)) prints a. (cdr '(a b c)) prints (b c). (list 1 2 3) prints (1 2 3).",
+    "file": "LAB-25-Builtins-ListCarCdrCons.md",
+    "status": "planned"
+  },
+
+  "LAB-26": {
+    "title": "Quasiquote — Code as Data",
+    "concept": "Quasiquote (backtick) is a macro that produces a list with selective evaluation — it is the bridge between Lisp's code-as-data nature and the ability to construct code programmatically.",
+    "tags": ["quasiquote", "unquote", "code-as-data", "homoiconicity", "macro-foundation", "list-construction-syntax", "reader-transformation"],
+    "visibleAtEnd": "(let ((x 5)) `(the value is ,x)) prints (the value is 5). The backtick form is expanded at read time into a list construction — show both the quasiquoted form and the equivalent cons expression.",
+    "file": "LAB-26-Quasiquote-CodeAsData.md",
+    "status": "planned"
+  },
+
+  "LAB-27": {
+    "title": "Macros — Transforming Code Before Evaluation",
+    "concept": "A macro receives its arguments unevaluated as raw syntax, transforms them into a new expression, and returns that expression to be evaluated — macros operate at the level of code structure, not values.",
+    "tags": ["macros", "code-transformation", "syntax-vs-value", "macro-expansion", "eval-before-apply", "define-macro", "macro-vs-function"],
+    "visibleAtEnd": "(define-macro (my-and a b) `(if ,a ,b #f)) — (my-and #t #f) prints #f. (my-and #f (/ 1 0)) prints #f without evaluating the division — proving b was not evaluated.",
+    "file": "LAB-27-Macros-TransformingCode.md",
+    "status": "planned"
+  },
+
+  "LAB-28": {
+    "title": "File I/O — Loading Lisp Source Files",
+    "concept": "Reading a file in C++ opens a stream that produces characters sequentially — feeding that stream to the lexer and parser lets the interpreter load and execute Lisp source files from disk.",
+    "tags": ["file-io", "std-ifstream", "stream-abstraction", "loading-source-files", "batch-evaluation", "multi-expression-file", "error-context-with-line-numbers"],
+    "visibleAtEnd": "stdlib.lisp contains (define (square x) (* x x)) — running ./lisp stdlib.lisp then dropping into REPL, (square 7) prints 49. Source loaded from disk, bound in global environment.",
+    "file": "LAB-28-FileIO-LoadingSourceFiles.md",
+    "status": "planned"
+  },
+
+  "LAB-29": {
+    "title": "Standard Library — Writing Lisp in Lisp",
+    "concept": "Once the interpreter has lambda, define, if, and the core list operations, you can implement higher-order functions (map, filter, fold) in Lisp itself — the language bootstraps from a small C++ core.",
+    "tags": ["standard-library", "map-filter-fold", "higher-order-functions", "self-hosting", "bootstrapping", "recursion-over-lists", "separation-of-core-and-library"],
+    "visibleAtEnd": "stdlib.lisp defines map, filter, and fold in pure Lisp. (map (lambda (x) (* x x)) '(1 2 3 4 5)) prints (1 4 9 16 25). No C++ changes needed — the library is written in the language itself.",
+    "file": "LAB-29-StdLib-WritingLispInLisp.md",
+    "status": "planned"
+  },
+
+  "LAB-30": {
+    "title": "Performance — Profiling and Measuring What Matters",
+    "concept": "Profiling finds where a program actually spends time — the 80/20 rule of performance says 80% of runtime is in 20% of the code, and optimizing the wrong 80% is wasted effort.",
+    "tags": ["profiling", "gprof", "perf", "benchmarking", "big-o-analysis", "hash-map-vs-linear-search", "premature-optimization"],
+    "visibleAtEnd": "gprof output shows environment lookup is the hottest path. Replacing linear-search env lookup with std::unordered_map cuts fib(30) benchmark from Xms to Yms — measured before and after.",
+    "file": "LAB-30-Performance-ProfilingAndMeasuring.md",
+    "status": "planned"
+  }
+}

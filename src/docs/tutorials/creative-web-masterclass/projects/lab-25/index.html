@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>LAB 25 — Micro-Interactions</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="demo-page">
+      <section class="demo-section">
+        <h2>Button Variants</h2>
+        <p>Hover, press, and tab through each button.</p>
+        <div class="btn-row">
+          <button class="btn btn-primary">Primary</button>
+          <button class="btn btn-secondary">Secondary</button>
+          <button class="btn btn-ghost">Ghost</button>
+          <button class="btn btn-danger">Danger</button>
+          <button class="btn btn-icon" aria-label="Open link">↗</button>
+        </div>
+      </section>
+      <section class="demo-section">
+        <h2>Interactive Cards</h2>
+        <div class="card-row">
+          <article class="project-card">
+            <div class="card-tag">Three.js</div>
+            <h3>3D Particle Field</h3>
+            <p>Mouse-interactive particle system with repulsion forces.</p>
+            <a href="#" class="card-link">View Project <span>→</span></a>
+          </article>
+          <article class="project-card">
+            <div class="card-tag">Canvas 2D</div>
+            <h3>Scroll Parallax</h3>
+            <p>Two-layer parallax with lerp smoothing and fade.</p>
+            <a href="#" class="card-link">View Project <span>→</span></a>
+          </article>
+          <article class="project-card">
+            <div class="card-tag">CSS</div>
+            <h3>Color System</h3>
+            <p>HSL-based design token system with live theme switching.</p>
+            <a href="#" class="card-link">View Project <span>→</span></a>
+          </article>
+        </div>
+      </section>
+      <section class="demo-section">
+        <h2>Form Inputs</h2>
+        <form class="demo-form">
+          <label class="field">
+            <span class="field-label">Your Name</span>
+            <input type="text" placeholder="Enter your name" class="input">
+          </label>
+          <label class="field">
+            <span class="field-label">Message</span>
+            <textarea placeholder="What are you building?" class="input" rows="3"></textarea>
+          </label>
+          <button type="submit" class="btn btn-primary">Send Message</button>
+        </form>
+      </section>
+    </div>
+    <script src="main.js"></script>
+  </body>
+</html>

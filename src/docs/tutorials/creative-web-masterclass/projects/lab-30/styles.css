@@ -1,0 +1,115 @@
+*, *::before, *::after { box-sizing: border-box; }
+:root {
+  --color-primary: hsl(244, 95%, 65%);
+  --color-bg: hsl(240, 20%, 8%);
+  --color-surface: hsl(240, 18%, 13%);
+  --color-border: hsl(240, 14%, 20%);
+  --color-text: hsl(240, 5%, 94%);
+  --color-muted: hsl(240, 8%, 42%);
+  --nav-width: 60px;
+}
+html { scroll-behavior: smooth; }
+body { margin: 0; font-family: system-ui, sans-serif; background: var(--color-bg); color: var(--color-text); }
+.portfolio { margin-left: var(--nav-width); }
+.port-section { min-height: 100vh; position: relative; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--color-border); }
+.section-inner { max-width: 900px; width: 100%; padding: 80px 40px; }
+.section-hero     { border-left: none; overflow: hidden; }
+.section-work     { border-left: 4px solid hsl(175, 80%, 50%); }
+.section-canvas   { border-left: 4px solid hsl(28, 95%, 58%); }
+.section-terminal { border-left: 4px solid hsl(152, 60%, 55%); }
+.section-contact  { border-left: 4px solid hsl(8, 90%, 62%); }
+.placeholder-heading { font-size: clamp(2rem, 5vw, 4rem); margin: 0 0 16px 0; font-weight: 700; color: var(--color-primary); }
+.placeholder-sub { margin: 0; color: var(--color-muted); }
+
+/* The canvas Three.js appends gets scoped inside the hero section */
+.section-hero canvas {
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 700px;
+  padding: 0 40px;
+}
+
+/* Entrance animation — all hero elements fade up from below */
+@keyframes hero-enter {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.hero-eyebrow {
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  margin: 0 0 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: hero-enter 0.6s ease both;
+  animation-delay: 0.1s;
+}
+
+/* Short line before the eyebrow text */
+.hero-eyebrow::before { content: ''; width: 28px; height: 1px; background: var(--color-primary); }
+
+.hero-title {
+  font-size: clamp(3rem, 7vw, 5.5rem);
+  font-weight: 800;
+  margin: 0 0 12px 0;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  animation: hero-enter 0.6s ease both;
+  animation-delay: 0.25s;
+}
+
+.hero-role {
+  font-size: 1.3rem;
+  color: var(--color-muted);
+  margin: 0 0 24px 0;
+  animation: hero-enter 0.6s ease both;
+  animation-delay: 0.4s;
+}
+
+.hero-body {
+  color: var(--color-muted);
+  max-width: 50ch;
+  line-height: 1.7;
+  margin: 0 0 36px 0;
+  animation: hero-enter 0.6s ease both;
+  animation-delay: 0.5s;
+}
+
+.hero-cta {
+  display: flex;
+  gap: 16px;
+  animation: hero-enter 0.6s ease both;
+  animation-delay: 0.6s;
+}
+
+.btn { display: inline-block; padding: 14px 28px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; text-decoration: none; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+.btn-primary { background: var(--color-primary); color: white; }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(108,99,255,0.35); }
+.btn-ghost { color: var(--color-primary); border: 1px solid var(--color-border); }
+.btn-ghost:hover { border-color: var(--color-primary); transform: translateY(-2px); }
+
+/* Ribbon nav */
+.ribbon-nav { position: fixed; left: 0; top: 0; width: var(--nav-width); height: 100vh; background: var(--color-surface); border-right: 1px solid var(--color-border); display: flex; align-items: center; justify-content: center; z-index: 100; }
+.ribbon-progress { position: absolute; left: 0; top: 0; width: 3px; height: 100%; background: var(--color-border); }
+.ribbon-progress-fill { width: 100%; height: 0%; background: var(--color-primary); transition: height 0.1s linear; }
+.ribbon-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 28px; }
+.ribbon-item { position: relative; }
+.ribbon-link { display: flex; align-items: center; text-decoration: none; outline: none; }
+.ribbon-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--color-border); flex-shrink: 0; transition: background 0.2s ease, transform 0.2s ease; }
+.ribbon-link:hover .ribbon-dot, .ribbon-link.is-active .ribbon-dot { background: var(--color-primary); }
+.ribbon-link.is-active .ribbon-dot { transform: scale(1.75); }
+.ribbon-label { position: absolute; left: calc(100% + 14px); top: 50%; transform: translateY(-50%) translateX(-6px); opacity: 0; pointer-events: none; transition: opacity 0.2s ease, transform 0.2s ease; white-space: nowrap; font-size: 0.78rem; font-weight: 600; color: var(--color-text); background: var(--color-surface); border: 1px solid var(--color-border); padding: 4px 10px; border-radius: 4px; }
+.ribbon-item:hover .ribbon-label { opacity: 1; transform: translateY(-50%) translateX(0); }

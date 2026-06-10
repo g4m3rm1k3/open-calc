@@ -1,0 +1,35 @@
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; overflow: hidden; }
+canvas { display: block; }
+
+.info-panel {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background: rgba(13, 13, 26, 0.85);
+  border: 1px solid #2a2a4a;
+  border-radius: 8px;
+  padding: 16px 20px;
+  color: #e8e8f0;
+  font-family: monospace;
+  font-size: 0.85rem;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.info-panel p { margin: 0 0 4px 0; }
+.info-panel p:last-child { margin: 0; }
+
+.tooltip {
+  position: fixed;
+  background: rgba(13, 13, 26, 0.9);
+  border: 1px solid #6c63ff;
+  border-radius: 4px;
+  padding: 4px 10px;
+  color: #e8e8f0;
+  font-family: monospace;
+  font-size: 0.8rem;
+  pointer-events: none;
+  display: none;
+  z-index: 20;
+}

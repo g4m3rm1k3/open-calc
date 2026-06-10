@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Portfolio</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+
+    <nav class="ribbon-nav" aria-label="Portfolio sections">
+      <div class="ribbon-progress"><div class="ribbon-progress-fill" id="ribbon-progress"></div></div>
+      <ul class="ribbon-list">
+        <li class="ribbon-item"><a href="#hero"     class="ribbon-link is-active" data-section="hero"><span class="ribbon-dot"></span><span class="ribbon-label">Hero</span></a></li>
+        <li class="ribbon-item"><a href="#work"     class="ribbon-link" data-section="work"><span class="ribbon-dot"></span><span class="ribbon-label">Work</span></a></li>
+        <li class="ribbon-item"><a href="#canvas"   class="ribbon-link" data-section="canvas"><span class="ribbon-dot"></span><span class="ribbon-label">Canvas</span></a></li>
+        <li class="ribbon-item"><a href="#terminal" class="ribbon-link" data-section="terminal"><span class="ribbon-dot"></span><span class="ribbon-label">Terminal</span></a></li>
+        <li class="ribbon-item"><a href="#contact"  class="ribbon-link" data-section="contact"><span class="ribbon-dot"></span><span class="ribbon-label">Contact</span></a></li>
+      </ul>
+    </nav>
+
+    <main class="portfolio">
+
+      <section id="hero" class="port-section section-hero">
+        <div class="hero-content" id="hero-content">
+          <p class="hero-eyebrow">Available for work</p>
+          <h1 class="hero-title">Hi, I'm Alex.</h1>
+          <p class="hero-role">Creative Web Developer</p>
+          <p class="hero-body">
+            I build interactive web experiences using Three.js, Canvas 2D, and modern CSS.
+          </p>
+          <div class="hero-cta">
+            <a href="#work" class="btn btn-primary">See My Work</a>
+            <a href="#contact" class="btn btn-ghost">Get In Touch</a>
+          </div>
+        </div>
+      </section>
+
+      <section id="work" class="port-section section-work">
+        <div class="section-inner"><h2 class="placeholder-heading">Work</h2><p class="placeholder-sub">Coming in LAB-31</p></div>
+      </section>
+      <section id="canvas" class="port-section section-canvas">
+        <div class="section-inner"><h2 class="placeholder-heading">Canvas</h2><p class="placeholder-sub">Coming in LAB-32</p></div>
+      </section>
+      <section id="terminal" class="port-section section-terminal">
+        <div class="section-inner"><h2 class="placeholder-heading">Terminal</h2><p class="placeholder-sub">Coming in LAB-33</p></div>
+      </section>
+      <section id="contact" class="port-section section-contact">
+        <div class="section-inner"><h2 class="placeholder-heading">Contact</h2></div>
+      </section>
+
+    </main>
+
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+      }
+    }
+    </script>
+    <script type="module" src="main.js"></script>
+  </body>
+</html>

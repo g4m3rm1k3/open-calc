@@ -1,0 +1,17 @@
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; overflow: hidden; }
+canvas { display: block; }
+#toggle-rotate {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  padding: 8px 16px;
+  background: #6c63ff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  z-index: 10;
+}
+#toggle-rotate:hover { background: #5550dd; }

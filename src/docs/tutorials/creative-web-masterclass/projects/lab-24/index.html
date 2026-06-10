@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>LAB 24 — Color System</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="swatch-page">
+      <header class="page-header">
+        <h1>Design Color System</h1>
+        <p>A systematic palette using HSL — adjusting lightness along a single hue.</p>
+      </header>
+      <section class="palette-group">
+        <h2>Primary (Purple — hue 244)</h2>
+        <div class="swatch-row">
+          <div class="swatch" style="--swatch: var(--primary-900)"><span>900</span></div>
+          <div class="swatch" style="--swatch: var(--primary-700)"><span>700</span></div>
+          <div class="swatch" style="--swatch: var(--primary-500)"><span>500 ← base</span></div>
+          <div class="swatch" style="--swatch: var(--primary-300)"><span>300</span></div>
+          <div class="swatch" style="--swatch: var(--primary-100)"><span>100</span></div>
+        </div>
+      </section>
+      <section class="palette-group">
+        <h2>Accent (Coral — hue 8)</h2>
+        <div class="swatch-row">
+          <div class="swatch" style="--swatch: var(--accent-900)"><span>900</span></div>
+          <div class="swatch" style="--swatch: var(--accent-700)"><span>700</span></div>
+          <div class="swatch" style="--swatch: var(--accent-500)"><span>500 ← base</span></div>
+          <div class="swatch" style="--swatch: var(--accent-300)"><span>300</span></div>
+          <div class="swatch" style="--swatch: var(--accent-100)"><span>100</span></div>
+        </div>
+      </section>
+      <section class="palette-group">
+        <h2>Neutral (Dark blue-gray — hue 240)</h2>
+        <div class="swatch-row">
+          <div class="swatch" style="--swatch: var(--neutral-900)"><span>900</span></div>
+          <div class="swatch" style="--swatch: var(--neutral-700)"><span>700</span></div>
+          <div class="swatch" style="--swatch: var(--neutral-500)"><span>500</span></div>
+          <div class="swatch" style="--swatch: var(--neutral-300)"><span>300</span></div>
+          <div class="swatch" style="--swatch: var(--neutral-100)"><span>100</span></div>
+        </div>
+      </section>
+      <section class="palette-group">
+        <h2>Semantic Tokens</h2>
+        <div class="swatch-row">
+          <div class="swatch" style="--swatch: var(--color-bg)"><span>Background</span></div>
+          <div class="swatch" style="--swatch: var(--color-surface)"><span>Surface</span></div>
+          <div class="swatch" style="--swatch: var(--color-brand)"><span>Brand</span></div>
+          <div class="swatch" style="--swatch: var(--color-success)"><span>Success</span></div>
+          <div class="swatch" style="--swatch: var(--color-danger)"><span>Danger</span></div>
+        </div>
+      </section>
+      <section class="demo-section">
+        <h2>Applied Example</h2>
+        <div class="demo-card">
+          <span class="demo-badge">New</span>
+          <h3>Interactive 3D Scene</h3>
+          <p>Built with Three.js, Canvas 2D, and CSS animations.</p>
+          <div class="demo-actions">
+            <button class="btn btn-primary">View Project</button>
+            <button class="btn btn-outline">Source Code</button>
+          </div>
+        </div>
+      </section>
+    </div>
+    <script src="main.js"></script>
+  </body>
+</html>
