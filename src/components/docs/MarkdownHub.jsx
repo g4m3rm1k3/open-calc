@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
+import rehypeRaw from 'rehype-raw'
 import 'katex/dist/katex.min.css'
 import Editor from '@monaco-editor/react'
 import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
@@ -196,7 +197,7 @@ function useIsDark() {
   return dark
 }
 
-const DocsCtx = createContext({ isDark: false, onRun: null, codeAlongOpen: false })
+const DocsCtx = createContext({ isDark: false, onRun: null, codeAlongOpen: false, activeFile: null, onDocLink: null })
 
 function MdCodeBlock({ language, code }) {
   const { isDark, monacoTheme, onRun, codeAlongOpen } = useContext(DocsCtx)
@@ -405,6 +406,58 @@ function MdInlineCode({ children }) {
   )
 }
 
+// Resolve a relative .md href against the current file path.
+// Returns the canonical DOCS_MODULES key if it exists, otherwise null.
+function resolveDocPath(currentFilePath, href) {
+  if (!currentFilePath || !href) return null
+  const hrefBase = href.split('#')[0]
+  if (!hrefBase.endsWith('.md')) return null
+  const dir = currentFilePath.split('/').slice(0, -1).join('/')
+  const parts = (dir + '/' + hrefBase).split('/')
+  const resolved = []
+  for (const part of parts) {
+    if (part === '..') resolved.pop()
+    else if (part !== '.' && part !== '') resolved.push(part)
+  }
+  const resolvedPath = '/' + resolved.join('/')
+  return resolvedPath in DOCS_MODULES ? resolvedPath : null
+}
+
+function MdLink({ href, children }) {
+  const { activeFile, onDocLink } = useContext(DocsCtx)
+  const docPath = resolveDocPath(activeFile, href)
+  if (docPath) {
+    return (
+      <a
+        href="#"
+        onClick={(e) => { e.preventDefault(); onDocLink?.(docPath) }}
+        style={{ cursor: 'pointer', textDecoration: 'underline' }}
+      >
+        {children}
+      </a>
+    )
+  }
+  const isExternal = href && (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('//'))
+  return (
+    <a href={href} target={isExternal ? '_blank' : undefined} rel={isExternal ? 'noopener noreferrer' : undefined}>
+      {children}
+    </a>
+  )
+}
+
+function MdImage({ src, alt, title }) {
+  return (
+    <img
+      src={src}
+      alt={alt || ''}
+      title={title || undefined}
+      loading="lazy"
+      className="md-img"
+      onError={(e) => { e.currentTarget.style.opacity = '0.3' }}
+    />
+  )
+}
+
 const MD_COMPONENTS = {
   pre({ node }) {
     // Read directly from the hast node to avoid losing className through custom `code` processing
@@ -425,6 +478,12 @@ const MD_COMPONENTS = {
   code({ children }) {
     // Only inline code reaches here; block code is handled entirely by `pre` via node prop
     return <MdInlineCode>{children}</MdInlineCode>
+  },
+  a({ href, children }) {
+    return <MdLink href={href}>{children}</MdLink>
+  },
+  img({ src, alt, title }) {
+    return <MdImage src={src} alt={alt} title={title} />
   },
 }
 
@@ -585,13 +644,6 @@ export default function MarkdownHub() {
     setPendingRun({ code, language: wsLang, key: Date.now() })
   }, [])
 
-  const docsCtxValue = useMemo(() => ({
-    isDark: themeStyles.isDark,
-    monacoTheme: themeStyles.monaco,
-    onRun: handleRunInCodeAlong,
-    codeAlongOpen,
-  }), [themeStyles, handleRunInCodeAlong, codeAlongOpen])
-
   const overriddenPaths = useMemo(() => new Set(overrideDocs.map((doc) => doc.path)), [overrideDocs])
   const activeUserDoc = userDocs.find((doc) => doc.id === activeUserId) || null
   const activeOverrideDoc = overrideDocs.find((doc) => doc.path === activeOverridePath) || null
@@ -641,6 +693,15 @@ export default function MarkdownHub() {
       setLoading(false)
     }
   }, [backendReady])
+
+  const docsCtxValue = useMemo(() => ({
+    isDark: themeStyles.isDark,
+    monacoTheme: themeStyles.monaco,
+    onRun: handleRunInCodeAlong,
+    codeAlongOpen,
+    activeFile: tab === 'tutorials' ? activeFile : null,
+    onDocLink: selectTutorial,
+  }), [themeStyles, handleRunInCodeAlong, codeAlongOpen, activeFile, selectTutorial, tab])
 
   useEffect(() => {
     refreshDocsIndex()
@@ -1212,7 +1273,7 @@ export default function MarkdownHub() {
                         )}
                       </div>
                     )}
-                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]} components={MD_COMPONENTS}>
+                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]} components={MD_COMPONENTS}>
                       {content}
                     </ReactMarkdown>
                   </div>
@@ -1238,7 +1299,7 @@ export default function MarkdownHub() {
                 style={{ background: isDark ? themeStyles.md.preBg + '80' : 'rgba(248,250,252,0.5)' }}>
                 <div className="md-body mx-auto p-8 rounded-xl shadow-sm border min-h-full"
                   style={{ background: isDark ? themeStyles.md.preBg : '#ffffff', borderColor: isDark ? themeStyles.md.preBorder : '#e2e8f0' }}>
-                  <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]} components={MD_COMPONENTS}>
+                  <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]} components={MD_COMPONENTS}>
                     {editorContent}
                   </ReactMarkdown>
                 </div>
@@ -1246,18 +1307,21 @@ export default function MarkdownHub() {
             )}
 
             {tab === 'editor' && activeDocType && !previewMode && (
-              <div className="flex-1 flex flex-col overflow-hidden">
-                <div className="flex items-center gap-3 px-6 py-2 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900/30">
-                  <span className="text-[10px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase">
+              <div className={`flex-1 flex flex-col overflow-hidden ${ui.bg0}`}>
+                <div className={`flex items-center gap-3 px-6 py-2 border-b ${ui.border}`}
+                  style={{ background: themeStyles.md.codeHeaderBg }}>
+                  <span className={`text-[10px] font-bold tracking-widest ${ui.txt2} uppercase`}>
                     {activeDocType === 'override' ? 'Override' : 'Document'}
                   </span>
                   <input
                     value={editorName}
                     onChange={(event) => setEditorName(event.target.value)}
                     placeholder="Document name..."
-                    className="flex-1 bg-transparent border-none text-sm font-semibold text-slate-800 dark:text-slate-200 outline-none placeholder:text-slate-300 dark:placeholder:text-slate-600 focus:ring-0"
+                    className={`flex-1 bg-transparent border-none text-sm font-semibold ${ui.txt1} outline-none focus:ring-0`}
+                    style={{ color: themeStyles.md.h1 }}
                   />
-                  <span className="text-[10px] text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded flex items-center gap-1.5">
+                  <span className={`text-[10px] ${ui.txt2} px-2 py-0.5 rounded flex items-center gap-1.5`}
+                    style={{ background: themeStyles.md.thBg }}>
                     <span className={`w-1.5 h-1.5 rounded-full ${isSaving ? 'bg-amber-500' : 'bg-emerald-500'}`}></span>
                     {isSaving ? 'Saving' : 'Saved'}
                   </span>
@@ -1266,10 +1330,13 @@ export default function MarkdownHub() {
                   value={editorContent}
                   onChange={(event) => setEditorContent(event.target.value)}
                   spellCheck={false}
-                  className="flex-1 w-full p-6 sm:p-8 text-slate-700 dark:text-slate-300 border-none outline-none resize-none font-mono text-[13px] leading-relaxed custom-scrollbar placeholder:text-slate-300 dark:placeholder:text-slate-700"
-                  style={{ background: isDark ? themeStyles.md.preBg : '#f8fafc' }}
+                  className="flex-1 w-full p-6 sm:p-8 border-none outline-none resize-none font-mono text-[13px] leading-relaxed custom-scrollbar"
+                  style={{
+                    background: themeStyles.md.preBg,
+                    color: themeStyles.md.text,
+                    tabSize: 2,
+                  }}
                   placeholder="# Begin your markdown here..."
-                  style={{ tabSize: 2 }}
                 />
               </div>
             )}
