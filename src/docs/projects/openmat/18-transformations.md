@@ -171,6 +171,29 @@ if (name === 'rotate') {
   ];
 }
 
+**Walkthrough — `rotate(pi/6)`:**
+
+`angle = Math.PI / 6`. `c = Math.cos(Math.PI / 6) = √3/2 ≈ 0.866`.
+`s = Math.sin(Math.PI / 6) = 0.5`.
+
+The returned matrix is:
+```
+[[0.866, -0.5, 0],
+ [0.5,  0.866, 0],
+ [0,    0,     1]]
+```
+
+Column 0 (`[c, s, 0]`) is where the x-axis goes after a 30° rotation. Column 1
+(`[-s, c, 0]`) is where the y-axis goes. The bottom row `[0, 0, 1]` keeps `w`
+unchanged — rotation does not translate.
+
+Verify by applying to the unit point `[1, 0, 1]`:
+- `x' = 0.866 × 1 + (-0.5) × 0 + 0 × 1 = 0.866`.
+- `y' = 0.5 × 1 + 0.866 × 0 + 0 × 1 = 0.5`.
+
+`(0.866, 0.5)` is the point 30° counterclockwise around the unit circle.
+`cos(30°) = √3/2 ≈ 0.866` and `sin(30°) = 0.5`. Correct.
+
 if (name === 'scale') {
   const sx = assertNumber(evaluate(argNodes[0], env), 'scale()', callLine);
   const sy = argNodes[1] ? assertNumber(evaluate(argNodes[1], env), 'scale()', callLine) : sx;
@@ -181,6 +204,28 @@ if (name === 'scale') {
   ];
 }
 
+**Walkthrough — `scale(1.5, 1.5)`:**
+
+`sx = 1.5`, `sy = 1.5`. The returned matrix is:
+```
+[[1.5, 0,   0],
+ [0,   1.5, 0],
+ [0,   0,   1]]
+```
+
+Apply to `BOTTOM_LEFT = [100, 400, 1]`:
+- `x' = 1.5 × 100 + 0 × 400 + 0 × 1 = 150`.
+- `y' = 0 × 100 + 1.5 × 400 + 0 × 1 = 600`.
+- `w' = 0 × 100 + 0 × 400 + 1 × 1 = 1`.
+
+The point `(100, 400)` maps to `(150, 600)` — scaled 1.5× from the origin.
+Non-uniform scale `scale(2, 0.5)` would double x and halve y, squishing the
+triangle horizontally.
+
+**`argNodes[1] ? ... : sx`:** The optional second argument allows `scale(k)`
+as a shorthand for uniform scaling. `argNodes[1]` is `undefined` if only one
+argument is provided; the ternary expression defaults `sy` to `sx`.
+
 if (name === 'translate') {
   const tx = assertNumber(evaluate(argNodes[0], env), 'translate()', callLine);
   const ty = assertNumber(evaluate(argNodes[1], env), 'translate()', callLine);
@@ -190,6 +235,33 @@ if (name === 'translate') {
     [0, 0,  1],
   ];
 }
+
+**Walkthrough — `translate(50, 0)`:**
+
+`tx = 50`, `ty = 0`. Returned matrix:
+```
+[[1, 0, 50],
+ [0, 1,  0],
+ [0, 0,  1]]
+```
+
+Apply to `APEX = [250, 100, 1]`:
+- `x' = 1×250 + 0×100 + 50×1 = 300`.
+- `y' = 0×250 + 1×100 + 0×1 = 100`.
+- `w' = 0 + 0 + 1 = 1`.
+
+The apex moves from `(250, 100)` to `(300, 100)` — 50 pixels right.
+
+**Why `w = 0` (direction) is unaffected by translation:**
+
+Apply to a direction vector `[1, 0, 0]` (`w = 0`):
+- `x' = 1×1 + 0×0 + 50×0 = 1`.
+- `y' = 0×1 + 1×0 + 0×0 = 0`.
+
+The translation column (`tx`) is multiplied by `w`. When `w = 0`, the
+translation has no effect. This is the point/direction distinction established
+in lesson 18's concept section — `w = 1` marks a point (moves with
+translation), `w = 0` marks a direction (does not move).
 
 if (name === 'transform') {
   // transform(A, B, C, ...) composes matrices: A × B × C × ...
@@ -213,6 +285,30 @@ if (name === 'transform') {
 right-to-left convention: `transform(Translate, Rotate, Scale)` means "scale
 first, then rotate, then translate."
 
+**Walkthrough — `transform(R, S)` with `R = rotate(pi/4)` and `S = scale(1.5, 1.5)`:**
+
+`mats = [R, S]` (the two matrices). `mats.reduce((acc, m) => multiplyMatrices(acc, m, callLine))` starts with `acc = R` (the first argument) and calls `multiplyMatrices(R, S, callLine)`.
+
+`R = rotate(pi/4)`: `c = cos(45°) = √2/2 ≈ 0.707`, `s = sin(45°) ≈ 0.707`.
+`S = scale(1.5, 1.5)`.
+
+`R × S` element `[0][0]`: row 0 of R dot column 0 of S:
+`0.707 × 1.5 + (-0.707) × 0 + 0 × 0 = 1.061`.
+
+The composed matrix applies scale first (stretch all points 1.5×), then
+rotation (spin 45°). The student can verify: a point at `[100, 0, 1]` after
+`S` is at `[150, 0, 1]`; after `R` it is at `[150 × 0.707, 150 × 0.707, 1] ≈
+[106, 106, 1]` — upper-right.
+
+**`Array.prototype.reduce` without initial value:**
+
+`mats.reduce((acc, m) => ...)` is called without an `initialValue`. When no
+initial value is provided, `.reduce` uses the first element as the initial
+accumulator and starts iterating from the second. This is correct here because
+`mats[0]` is the identity-like starting point for composition. If `mats` has
+only one entry, `.reduce` returns it directly without calling the callback —
+`transform(M)` is `M` itself.
+
 ---
 
 ## Step 2 — Add drawTransformedTriangle to the Canvas
@@ -228,6 +324,34 @@ const BOTTOM_RIGHT  = [400, 400, 1];
 function applyMatrix(M: number[][], p: number[]): number[] {
   return M.map(row => row.reduce((s, v, i) => s + v * p[i], 0));
 }
+
+**Walkthrough — `applyMatrix(rotate(pi/2), [250, 100, 1])`:**
+
+`M = rotate(pi/2)`: `c = 0`, `s = 1`.
+```
+M = [[0, -1, 0],
+     [1,  0, 0],
+     [0,  0, 1]]
+```
+`p = [250, 100, 1]` (APEX in homogeneous coordinates).
+
+`M.map(row => row.reduce((s, v, i) => s + v * p[i], 0))` iterates over the
+three rows of `M`:
+
+- Row 0 `[0, -1, 0]`: `0×250 + (-1)×100 + 0×1 = -100`. Result element 0: `-100`.
+- Row 1 `[1, 0, 0]`: `1×250 + 0×100 + 0×1 = 250`. Result element 1: `250`.
+- Row 2 `[0, 0, 1]`: `0×250 + 0×100 + 1×1 = 1`. Result element 2: `1`.
+
+Transformed apex: `[-100, 250, 1]`, i.e. screen position `(-100, 250)`. After a
+90° rotation around the canvas origin, the apex moves off the left edge of the
+canvas. This is correct: the triangle is rotating around the top-left corner,
+not around its own centre. To rotate around the triangle's centroid, a translate-
+rotate-translate composition (lesson 18's SAVE AND TRY section) is needed.
+
+**CS lens:** `applyMatrix` is a matrix-vector product implemented as two nested
+higher-order functions. The outer `.map` handles each row; the inner `.reduce`
+computes the dot product of that row with `p`. This is exactly the
+`sum over k of M[i][k] × p[k]` formula written as functional code.
 
 export function drawTransformedTriangle(M: number[][]): void {
   if (!ctx) return;
@@ -387,6 +511,30 @@ transformation has a matrix derived from first principles.
 
 ---
 
+## Real-World Connection
+
+This lesson implements what every real-time graphics system does. WebGL's
+`uniform mat3` and `uniform mat4` are transformation matrices sent to the GPU;
+every vertex shader multiplies each vertex by this matrix in parallel. Three.js's
+`Object3D.matrix` is a `Matrix4` composed from `.position`, `.rotation`, and
+`.scale` properties using the same translate × rotate × scale convention written
+here. Unity's `Transform` component exposes position, rotation (as quaternion),
+and scale, but internally converts them to a 4×4 matrix for the GPU.
+
+CSS's `transform` property — `rotate(45deg) scale(1.5)` — is processed by the
+browser as a 3×3 homogeneous matrix multiplication in exactly this order (right
+to left), which is why `scale` then `rotate` in CSS produces different output than
+`rotate` then `scale`. Understanding this lesson means understanding why that CSS
+behaviour is not a quirk but a mathematical necessity.
+
+Homogeneous coordinates were introduced in computer graphics in the 1960s
+(Roberts, 1965) and remain the universal standard because this lesson's insight
+is so useful: every affine transformation — rotation, scale, translation, shear —
+becomes a single matrix, and composing any sequence of them is a single matrix
+multiplication.
+
+---
+
 ## What Breaks Without This
 
 Transpose the rotation matrix (swap the off-diagonal signs):
@@ -429,6 +577,13 @@ output is generated.
 - [ ] You can explain why homogeneous coordinates are needed and what `w = 1`
       vs `w = 0` means
 - [ ] You can explain why the order of matrix composition matters
+- [ ] You can trace `applyMatrix(rotate(pi/2), [250, 100, 1])` step by step
+- [ ] You can explain why `translate(50, 0)` leaves a direction vector `[1, 0, 0]` unchanged
+
+```
+git add src/evaluator.ts src/canvas.ts src/transform.test.ts
+git commit -m "Add transformations: rotate/scale/translate as 3×3 matrices, transform() composes in homogeneous coordinates"
+```
 
 ---
 
