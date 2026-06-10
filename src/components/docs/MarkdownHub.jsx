@@ -27,7 +27,12 @@ import {
   PanelLeftOpen,
 } from 'lucide-react'
 import { buildOptionalBackendUrl } from '../../utils/optionalBackend.js'
-import { RUNNABLE_LANGS, runJSInline, runTSInline, runPythonInline, runOpenMATInline } from '../../utils/inlineRunner.js'
+import {
+  RUNNABLE_LANGS,
+  runJSInline, runTSInline, runPythonInline, runOpenMATInline,
+  runShellInline, runSQLInline, runJSONInline,
+  runLuaInline, runRubyInline, runCInline, runBrainfuckInline,
+} from '../../utils/inlineRunner.js'
 import { getThemeStyles, STUDIO_THEMES } from '../../utils/studioThemes.js'
 import DocsCodeWorkspace from './DocsCodeWorkspace.jsx'
 import AdaPanel from './AdaPanel.jsx'
@@ -40,8 +45,17 @@ const DOCS_MODULES = import.meta.glob('/src/docs/**/*.md', {
 const PREFIX = '/src/docs/'
 const LS_KEY = 'markdownhub_personal'
 
-const LANG_EXT = { javascript: 'js', js: 'js', python: 'py', py: 'py', typescript: 'ts', ts: 'ts', css: 'css', html: 'html', markup: 'html', bash: 'sh', shell: 'sh', json: 'json', text: 'txt' }
-const MONACO_LANG = { py: 'python', js: 'javascript', ts: 'typescript', sh: 'shell', xml: 'html', markup: 'html', bash: 'shell' }
+const LANG_EXT = {
+  javascript: 'js', js: 'js', python: 'py', py: 'py', typescript: 'ts', ts: 'ts',
+  css: 'css', html: 'html', markup: 'html', bash: 'sh', shell: 'sh', sh: 'sh', zsh: 'sh',
+  json: 'json', text: 'txt', sql: 'sql', sqlite: 'sql', lua: 'lua', ruby: 'rb', rb: 'rb',
+  c: 'c', cpp: 'cpp', 'c++': 'cpp', brainfuck: 'bf', bf: 'bf',
+}
+const MONACO_LANG = {
+  py: 'python', js: 'javascript', ts: 'typescript', sh: 'shell', zsh: 'shell',
+  xml: 'html', markup: 'html', bash: 'shell', rb: 'ruby', sqlite: 'sql',
+  'c++': 'cpp', bf: 'brainfuck', brainfuck: 'brainfuck',
+}
 const WORKSPACE_LANG = { python: 'python', javascript: 'javascript', typescript: 'typescript', html: 'html', css: 'javascript', shell: 'javascript', json: 'javascript', plaintext: 'javascript', matlab: 'openmat', openmat: 'openmat' }
 
 const TERM_REFS = {
@@ -263,26 +277,46 @@ function MdCodeBlock({ language, code }) {
     try {
       const lang = language
 
+      const streamLines = []
+      const onLine = (item) => { streamLines.push(item); setOutput([...streamLines]) }
+
       if (lang === 'python' || lang === 'py') {
-        const lines = []
-        const { error } = await runPythonInline(src, (item) => {
-          lines.push(item)
-          setOutput([...lines])
-        })
-        if (error) lines.push({ text: error, type: 'error' })
-        setOutput(lines.length ? [...lines] : [{ text: '(no output)', type: 'dim' }])
+        const { error } = await runPythonInline(src, onLine)
+        if (error) streamLines.push({ text: error, type: 'error' })
+        setOutput(streamLines.length ? [...streamLines] : [{ text: '(no output)', type: 'dim' }])
       } else if (lang === 'typescript' || lang === 'ts') {
         const { output: out, error } = await runTSInline(src)
-        setOutput(error
-          ? [{ text: error, type: 'error' }]
-          : [{ text: out, type: 'output' }])
+        setOutput(error ? [{ text: error, type: 'error' }] : [{ text: out, type: 'output' }])
       } else if (lang === 'matlab' || lang === 'openmat') {
         const { output: out, error } = runOpenMATInline(src)
+        setOutput(error ? [{ text: error, type: 'error' }] : [{ text: out, type: 'output' }])
+      } else if (lang === 'shell' || lang === 'bash' || lang === 'sh' || lang === 'zsh') {
+        const { output: out, error } = runShellInline(src)
         setOutput(error
-          ? [{ text: error, type: 'error' }]
+          ? [{ text: out || '', type: 'output' }, { text: error, type: 'error' }].filter(l => l.text)
           : [{ text: out, type: 'output' }])
+      } else if (lang === 'json') {
+        const { output: out, error } = runJSONInline(src)
+        setOutput(error ? [{ text: error, type: 'error' }] : [{ text: out, type: 'output' }])
+      } else if (lang === 'sql' || lang === 'sqlite') {
+        await runSQLInline(src, onLine)
+        if (!streamLines.some(l => l.type !== 'dim')) streamLines.push({ text: '(no output)', type: 'dim' })
+        setOutput([...streamLines])
+      } else if (lang === 'lua') {
+        await runLuaInline(src, onLine)
+        if (!streamLines.some(l => l.type === 'output')) streamLines.push({ text: '(no output)', type: 'dim' })
+        setOutput([...streamLines])
+      } else if (lang === 'ruby' || lang === 'rb') {
+        await runRubyInline(src, onLine)
+        setOutput([...streamLines])
+      } else if (lang === 'c' || lang === 'cpp' || lang === 'c++') {
+        await runCInline(src, onLine)
+        setOutput([...streamLines])
+      } else if (lang === 'brainfuck' || lang === 'bf') {
+        const { output: out, error } = runBrainfuckInline(src)
+        setOutput(error ? [{ text: error, type: 'error' }] : [{ text: out, type: 'output' }])
       } else {
-        // javascript / js
+        // javascript / js (fallback)
         const { output: out, error } = runJSInline(src)
         setOutput(error
           ? [{ text: out || '', type: 'output' }, { text: error, type: 'error' }].filter(l => l.text)

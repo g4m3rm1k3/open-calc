@@ -10,19 +10,31 @@ import { useIsDark } from '../../utils/useIsDark.js'
 // ── Tree item helpers ─────────────────────────────────────────────────────────
 const EXT_LANG = {
   html: 'html', css: 'css', js: 'javascript', ts: 'typescript',
-  py: 'python', json: 'json', sh: 'shell', cpp: 'cpp', c: 'c',
-  txt: 'plaintext', md: 'markdown', m: 'openmat',
+  py: 'python', json: 'json', sh: 'shell', bash: 'shell', zsh: 'shell',
+  cpp: 'cpp', c: 'c', txt: 'plaintext', md: 'markdown', m: 'openmat',
+  sql: 'sql', lua: 'lua', rb: 'ruby', r: 'r', php: 'php',
+  bf: 'brainfuck', rs: 'rust', go: 'go', java: 'java', kt: 'kotlin',
+  swift: 'swift', cs: 'csharp', scss: 'scss', yaml: 'yaml', yml: 'yaml',
+  toml: 'plaintext', xml: 'xml', csv: 'plaintext',
 }
 const LANG_DEFAULT_NAME = {
   html: 'index.html', css: 'style.css', javascript: 'script.js',
   typescript: 'main.ts', python: 'main.py', shell: 'script.sh',
-  cpp: 'main.cpp', plaintext: 'notes.txt', openmat: 'script.m',
+  cpp: 'main.cpp', c: 'main.c', plaintext: 'notes.txt', openmat: 'script.m',
+  sql: 'query.sql', lua: 'script.lua', ruby: 'script.rb', r: 'analysis.r',
+  php: 'index.php', brainfuck: 'program.bf', rust: 'main.rs', go: 'main.go',
+  java: 'Main.java', kotlin: 'Main.kt', swift: 'main.swift', csharp: 'Program.cs',
+  yaml: 'config.yaml', xml: 'data.xml',
 }
 const LANG_DOT = {
   html: '#e34c26', css: '#264de4', javascript: '#f0c000',
   typescript: '#3178c6', python: '#4B8BBE', json: '#6b7280',
   shell: '#4ade80', cpp: '#9ca3af', c: '#9ca3af',
   plaintext: '#475569', markdown: '#60a5fa', openmat: '#e04c28',
+  sql: '#f29111', lua: '#000080', ruby: '#cc342d', r: '#276dc3',
+  php: '#777bb4', brainfuck: '#9ca3af', rust: '#ce422b', go: '#00add8',
+  java: '#b07219', kotlin: '#7f52ff', swift: '#f05138', csharp: '#178600',
+  scss: '#c6538c', yaml: '#cb171e', xml: '#0060ac',
 }
 
 function extLang(name) {

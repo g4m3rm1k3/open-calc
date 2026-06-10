@@ -1,7 +1,11 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { getPyodide } from '../../utils/pyodideRuntime.js'
 import { executeScript } from '../../utils/openmatEngine.js'
-import { MATPLOTLIB_SHIM, PLOT_MARKER } from '../../utils/inlineRunner.js'
+import {
+  MATPLOTLIB_SHIM, PLOT_MARKER,
+  runShellInline, runSQLInline, runJSONInline,
+  runLuaInline, runRubyInline, runCInline, runBrainfuckInline,
+} from '../../utils/inlineRunner.js'
 
 // ── Terminal colours ──────────────────────────────────────────────────────────
 const CLR_DARK = {
@@ -702,18 +706,20 @@ function buildHtmlBundle(files) {
 
 // ── Welcome banner ────────────────────────────────────────────────────────────
 const BANNER = [
-  { text: '┌─ Workspace Terminal ────────────────────────────────────────┐', type: 'dim' },
-  { text: '│  python file.py      Run Python (numpy/pandas/sklearn/mpl)  │', type: 'dim' },
-  { text: '│  [import torch]      PyTorch shim: Tensor/nn/optim/Adam    │', type: 'dim' },
-  { text: '│  node file.js        Run JavaScript (require + Express ok)  │', type: 'dim' },
-  { text: '│  node file.ts        Run TypeScript (Babel transpiled)      │', type: 'dim' },
-  { text: '│  node file.jsx       Run React/JSX → Preview tab            │', type: 'dim' },
-  { text: '│  tsc file.ts         Compile TS → show emitted JS           │', type: 'dim' },
-  { text: '│  pip install pkg     Install Python package via micropip    │', type: 'dim' },
-  { text: '│  openmat file.m      Run OpenMAT / MATLAB script             │', type: 'dim' },
-  { text: '│  open / preview      Bundle HTML project → Preview tab      │', type: 'dim' },
-  { text: '│  ls  cat  clear  help                                       │', type: 'dim' },
-  { text: '└─────────────────────────────────────────────────────────────┘', type: 'dim' },
+  { text: '┌─ Workspace Terminal ──────────────────────────────────────────┐', type: 'dim' },
+  { text: '│  python file.py      Run Python (numpy/pandas/sklearn/mpl)   │', type: 'dim' },
+  { text: '│  [import torch]      PyTorch shim: Tensor/nn/optim/Adam      │', type: 'dim' },
+  { text: '│  node file.js/ts/jsx Run JS · TypeScript · React/JSX         │', type: 'dim' },
+  { text: '│  bash file.sh        Shell script (bash/sh interpreter)       │', type: 'dim' },
+  { text: '│  sqlite file.sql     SQLite (sql.js WASM engine)              │', type: 'dim' },
+  { text: '│  lua file.lua        Lua 5.3 (Fengari WASM)                   │', type: 'dim' },
+  { text: '│  ruby file.rb        Ruby (Opal.js transpiler)                │', type: 'dim' },
+  { text: '│  cc file.c / g++ file.cpp   C/C++ (JSCPP interpreter)        │', type: 'dim' },
+  { text: '│  bf file.bf          Brainfuck interpreter                    │', type: 'dim' },
+  { text: '│  openmat file.m      OpenMAT / MATLAB script                  │', type: 'dim' },
+  { text: '│  open / preview      Bundle HTML+CSS+JS → Preview tab         │', type: 'dim' },
+  { text: '│  pip install  tsc  ls  cat  clear  help                       │', type: 'dim' },
+  { text: '└───────────────────────────────────────────────────────────────┘', type: 'dim' },
 ]
 
 // ── Shell arg parser — respects single and double quotes ─────────────────────
@@ -981,14 +987,18 @@ const WorkspaceTerminal = forwardRef(function WorkspaceTerminal({ files = [], is
       } else if (prog === 'help') {
         print('Available commands:', 'info')
         ;[
-          ['python <file.py>',         'Run Python — stdlib + numpy/pandas/scipy auto-loaded'],
-          ['python3 <file.py>',        'Alias for python'],
+          ['python <file.py>',         'Run Python — stdlib + numpy/pandas/sklearn/mpl'],
           ['pip install <pkg>',        'Install Python package via micropip (PyPI)'],
-          ['node <file.js>',           'Run JavaScript file'],
-          ['node <file.ts>',           'Transpile TypeScript via Babel and run'],
-          ['node <file.jsx>',          'Transpile + render React/JSX app in Preview'],
+          ['node <file.js|ts|jsx>',    'Run JS · TypeScript (Babel) · React/JSX → Preview'],
           ['tsc <file.ts>',            'Compile TypeScript and show emitted JS'],
-          ['openmat <file.m>',          'Run OpenMAT / MATLAB script in terminal'],
+          ['bash <file.sh>',           'Run shell script (built-in bash/sh interpreter)'],
+          ['sqlite <file.sql>',        'Run SQL against SQLite (sql.js WASM engine)'],
+          ['lua <file.lua>',           'Run Lua 5.3 script (Fengari WASM, CDN)'],
+          ['ruby <file.rb>',           'Run Ruby script (Opal.js transpiler, CDN)'],
+          ['cc <file.c>',              'Compile and run C (JSCPP interpreter, CDN)'],
+          ['g++ <file.cpp>',           'Compile and run C++ (JSCPP interpreter, CDN)'],
+          ['bf <file.bf>',             'Run Brainfuck program'],
+          ['openmat <file.m>',         'Run OpenMAT / MATLAB script'],
           ['open [file]',              'Bundle HTML+CSS+JS project in Preview'],
           ['ls',                       'List workspace files'],
           ['cat <file>',               'Print file contents'],
@@ -996,7 +1006,62 @@ const WorkspaceTerminal = forwardRef(function WorkspaceTerminal({ files = [], is
           ['↑ / ↓',                    'Navigate command history'],
           ['Ctrl+L',                   'Clear screen'],
           ['Ctrl+C',                   'Cancel running command'],
-        ].forEach(([cmd, desc]) => print(`  ${cmd.padEnd(24)} ${desc}`, 'output'))
+        ].forEach(([cmd, desc]) => print(`  ${cmd.padEnd(26)} ${desc}`, 'output'))
+
+      // ── bash / sh ─────────────────────────────────────────────────────────
+      } else if (prog === 'bash' || prog === 'sh' || prog === 'zsh') {
+        const fname = args[0]
+        if (!fname) { print(`Usage: ${prog} <file.sh>`, 'warn'); return }
+        const file = allFiles.find(f => f.name === fname) ?? findFile(fname)
+        if (!file) { print(`${prog}: '${fname}': No such file`, 'error'); return }
+        const { output: out, error } = runShellInline(file.content)
+        if (out) printLines(out)
+        if (error) print(`Shell error: ${error}`, 'error')
+        if (!out && !error) print('(no output)', 'dim')
+
+      // ── sqlite / sql ───────────────────────────────────────────────────────
+      } else if (prog === 'sqlite' || prog === 'sqlite3' || prog === 'sql') {
+        const fname = args[0]
+        if (!fname) { print(`Usage: ${prog} <file.sql>`, 'warn'); return }
+        const file = allFiles.find(f => f.name === fname) ?? findFile(fname)
+        if (!file) { print(`${prog}: '${fname}': No such file`, 'error'); return }
+        await runSQLInline(file.content, ({ text, type }) => print(text, type))
+
+      // ── lua ────────────────────────────────────────────────────────────────
+      } else if (prog === 'lua' || prog === 'lua5.3' || prog === 'lua5.4') {
+        const fname = args[0]
+        if (!fname) { print('Usage: lua <file.lua>', 'warn'); return }
+        const file = allFiles.find(f => f.name === fname) ?? findFile(fname)
+        if (!file) { print(`lua: '${fname}': No such file`, 'error'); return }
+        await runLuaInline(file.content, ({ text, type }) => print(text, type))
+
+      // ── ruby ───────────────────────────────────────────────────────────────
+      } else if (prog === 'ruby' || prog === 'irb') {
+        const fname = args[0]
+        if (!fname) { print('Usage: ruby <file.rb>', 'warn'); return }
+        const file = allFiles.find(f => f.name === fname) ?? findFile(fname)
+        if (!file) { print(`ruby: '${fname}': No such file`, 'error'); return }
+        await runRubyInline(file.content, ({ text, type }) => print(text, type))
+
+      // ── cc / gcc / g++ / c++ ──────────────────────────────────────────────
+      } else if (prog === 'cc' || prog === 'gcc' || prog === 'g++' || prog === 'c++' || prog === 'clang' || prog === 'clang++') {
+        // strip -o outfile flags to find source
+        const src = args.find(a => !a.startsWith('-') && /\.[ch](?:pp)?$/.test(a)) ?? args.find(a => !a.startsWith('-'))
+        if (!src) { print(`Usage: ${prog} <file.c>`, 'warn'); return }
+        const file = allFiles.find(f => f.name === src) ?? findFile(src)
+        if (!file) { print(`${prog}: '${src}': No such file`, 'error'); return }
+        print(`» Compiling ${src}…`, 'dim')
+        await runCInline(file.content, ({ text, type }) => print(text, type))
+
+      // ── brainfuck / bf ─────────────────────────────────────────────────────
+      } else if (prog === 'bf' || prog === 'brainfuck') {
+        const fname = args[0]
+        if (!fname) { print(`Usage: ${prog} <file.bf>`, 'warn'); return }
+        const file = allFiles.find(f => f.name === fname) ?? findFile(fname)
+        if (!file) { print(`${prog}: '${fname}': No such file`, 'error'); return }
+        const { output: out, error } = runBrainfuckInline(file.content)
+        if (out) print(out, 'output')
+        if (error) print(error, 'error')
 
       } else if (!prog) {
         // empty — do nothing
@@ -1028,6 +1093,12 @@ const WorkspaceTerminal = forwardRef(function WorkspaceTerminal({ files = [], is
       else if (lang === 'typescript') cmd = `node ${name}`
       else if (lang === 'javascript') cmd = `node ${name}`
       else if (lang === 'openmat')    cmd = `openmat ${name}`
+      else if (lang === 'shell')      cmd = `bash ${name}`
+      else if (lang === 'sql')        cmd = `sqlite ${name}`
+      else if (lang === 'lua')        cmd = `lua ${name}`
+      else if (lang === 'ruby')       cmd = `ruby ${name}`
+      else if (lang === 'cpp' || lang === 'c') cmd = `cc ${name}`
+      else if (lang === 'brainfuck')  cmd = `bf ${name}`
       else                            cmd = null
 
       if (cmd) execute(cmd, allFiles)
