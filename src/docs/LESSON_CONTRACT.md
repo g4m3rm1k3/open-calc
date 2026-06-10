@@ -204,6 +204,17 @@ When JavaScript says `x is not defined`, it means the symbol table lookup failed
 Students who can name concepts can look them up, extend them, and transfer them to
 new contexts. Students who only recognise patterns cannot.
 
+### Nothing is assumed
+
+Every concept a lesson needs is either taught in that lesson or recapped briefly
+before it is used. No lesson may gate itself behind a prerequisite and skip the
+teaching. If a concept appears in a lesson, it is explained in that lesson —
+regardless of whether it appeared in an earlier one.
+
+A student who picks up lesson 17 without having done lesson 04 must still be able
+to follow lesson 17. The connection section may point backwards, but the explanation
+must stand on its own.
+
 ### Maths is taught, not assumed
 
 When a lesson touches mathematics, the maths is taught in the lesson.
@@ -274,6 +285,7 @@ Before a lesson is published, verify every item:
 - [ ] Every significant code block is explained through both the CS lens and the SE lens
 - [ ] No concept is left implicit — every pattern is named
 - [ ] Maths is derived, not assumed
+- [ ] No concept is assumed from a prior lesson — every concept used is explained here
 - [ ] "What breaks without this" is concrete and specific, not hypothetical
 
 **Code**
