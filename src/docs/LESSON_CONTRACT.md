@@ -6,6 +6,39 @@ A lesson that does not meet this contract is not a lesson. It is documentation.
 
 ---
 
+## The Silent Knowledge Problem
+
+Software engineering tutorials have a structural flaw: they teach the topic and skip
+everything around it. The result is a learner who can implement a binary search tree
+but does not know what `npm install` actually does, cannot read a stack trace, has
+never typed `git commit`, and does not know what XSS is — even though all of those
+things appeared in every tutorial they completed.
+
+This happens because every tutorial assumes someone else taught the surrounding knowledge.
+A learner with colleagues absorbs it through proximity over years. A learner on their
+own, with a day job and no team, never does.
+
+This curriculum treats every domain of software engineering knowledge as a teaching
+obligation. The rule is absolute:
+
+**If something appears in a lesson — regardless of what domain it comes from — it is
+taught at the moment it appears. No concept earns a pass by being considered
+"obvious," "just tooling," or "not the topic of this lesson."**
+
+A terminal command is not "just how you run things." A port number is not "just
+where the server is." A `.gitignore` entry is not "just housekeeping." These are
+concepts with precise meanings, design reasons, and real-world implications. They
+are taught the same way the lexer and the rotation matrix are taught: from first
+principles, at the moment they appear, with the why stated before the what.
+
+The "first use then assume" rule applies universally across all domains. Every concept
+is explained fully once. After that first explanation, it may be referenced by name
+without re-explanation. The checklist tracks this: if a concept from any domain
+appears for the first time in this lesson, it must be explained here. If it appeared
+in a prior lesson, a brief reference is enough.
+
+---
+
 ## The Difference Between Describing and Teaching
 
 A description tells you what something does.
@@ -252,16 +285,20 @@ not learned the lesson.
 
 ## Define at Use
 
-Every term, construct, type, or function that appears in a lesson for the first time
-must be defined at the exact point it appears. Not in a glossary at the end. Not in
-a prior lesson that may not have been read. At the moment of first contact, in the
-prose immediately surrounding the code.
+Every concept, construct, tool, command, or term that appears in a lesson for the
+first time must be defined at the exact point it appears. Not in a glossary at the
+end. Not in a prior lesson that may not have been read. At the moment of first
+contact, in the prose immediately surrounding the code.
 
 After the first definition, a term may be used without re-definition.
 
-This rule applies to four categories:
+This rule applies to every domain. Code syntax, terminal commands, configuration
+files, security concepts, git operations — none of these earn a pass.
 
-### 1. Syntax
+The following sections name the domains that most commonly pass implicitly and
+must never do so.
+
+### 1. Code syntax
 
 Any language construct the student may not know — arrow functions, generics, the
 ternary operator, destructuring, spread syntax, `as const`, `readonly`, template
@@ -337,6 +374,225 @@ if passed `Infinity` or `NaN`, it returns `NaN`."
 
 This applies to both library functions (`Math.sin`, `isFinite`, `parseFloat`) and
 functions defined in earlier lessons (`evaluateAt`, `bisect`, `formatResult`).
+
+### 5. Terminal commands and CLI
+
+Every terminal command that appears in a lesson must be explained fully:
+
+- **What program is being invoked.** `npm` is the Node Package Manager — a command-line
+  tool installed alongside Node.js. `npx` runs a package without installing it globally.
+  `tsc` is the TypeScript compiler executable.
+- **What each argument and flag means.** In `npm install --save-dev vitest`, `install`
+  is the subcommand (download and register a package), `--save-dev` means record this
+  as a development-only dependency (not needed in production), and `vitest` is the
+  package name.
+- **What successful output looks like.** If the command prints to the terminal, show the
+  output and explain what each line means.
+- **What failure looks like and how to diagnose it.** If the command fails with a common
+  error, show the error message and explain the cause and fix.
+
+A command typed without explanation is a ritual. A command explained is a tool.
+
+### 6. Tooling and build system
+
+Every tool introduced in a lesson must be explained:
+
+- **What it does.** Not "Vite is a build tool." Instead: "Vite does two things. In
+  development, it runs a local web server and compiles TypeScript files on demand as
+  the browser requests them. For production, it bundles all files into a single
+  optimised output that loads faster."
+- **What problem it solves.** What would be painful or impossible without it?
+- **What happens when it runs.** Mechanically: which files does it read, what does it
+  produce, where does the output go?
+- **What its configuration file controls.** Every field touched in `tsconfig.json`,
+  `vite.config.ts`, or `.eslintrc` must be explained at first contact.
+
+### 7. Configuration files
+
+Every configuration file that appears in a lesson must be explained:
+
+- **Its purpose.** What does this file configure? Who reads it?
+- **Its format.** JSON, TOML, TypeScript — why this format for this tool?
+- **Every field the lesson touches.** Not the whole file — only the fields that matter
+  here, but those must be explained precisely. `"strict": true` is not "enables strict
+  mode." It is: "enables a group of TypeScript checks that together prevent the most
+  common category of type errors. The checks it enables are: `noImplicitAny` (every
+  variable must have a known type), `strictNullChecks` (null and undefined are not
+  valid values unless declared), and `strictFunctionTypes` (function parameter types
+  are checked precisely)."
+
+### 8. File system and project structure
+
+Every new file and directory introduced in a lesson must be explained:
+
+- **What its responsibility is.** What does this file own? What does it not own?
+- **Why it lives where it does.** `src/lexer.ts` not `lexer.ts` — why?
+- **Why it has the name it has.** Naming communicates purpose. A file named
+  `utils.ts` communicates nothing. A file named `environment.ts` communicates that
+  it is the symbol table for the interpreter.
+- **What would happen if it were missing.** If deleting this file breaks the build,
+  the student must know why.
+
+When `.gitignore` is introduced, explain what it is, why certain directories are
+in it (`node_modules` is not committed because it can be reproduced from
+`package.json` by running `npm install` — committing it would add hundreds of
+thousands of files to the repository), and how to add entries.
+
+### 9. Package management
+
+Every `npm` operation and `package.json` concept is explained at first use:
+
+- **`dependencies` vs `devDependencies`:** Production code (shipped to users) uses
+  `dependencies`. Test runners, TypeScript compilers, and build tools go in
+  `devDependencies` — they are needed to build and test but not to run the final product.
+- **Semantic versioning:** `^5.0.0` means "any version ≥5.0.0 and <6.0.0." The `^`
+  allows automatic minor and patch updates but not major version changes, which may
+  break the API. When you install a package, the exact version installed is recorded
+  in `package-lock.json` so that everyone on the project gets the same version.
+- **`package-lock.json`:** Records the exact versions of all packages installed.
+  Committed to version control so that `npm install` on any machine produces
+  identical output. Not hand-edited.
+- **`node_modules/`:** Where npm places downloaded packages. Never committed to
+  version control. Reproduced by running `npm install`.
+
+### 10. Version control
+
+Git is introduced before the first lesson that creates code. The introduction covers:
+
+- **What version control is and why it exists.** Not "git saves your work." Instead:
+  "Version control records a history of every change made to a project. You can
+  return to any previous state. You can see who changed what and why. You can work
+  on two different changes in parallel (branches) and merge them. For a self-taught
+  learner working alone, git is not optional — it is how you recover from mistakes
+  and how you understand your own history."
+- **The three states of a file:** modified (you changed it but git doesn't know yet),
+  staged (you've told git to include this change in the next commit), committed (the
+  change is permanently recorded in the history).
+- **What a commit is:** a snapshot of all staged files at a point in time, with a
+  message explaining why this snapshot exists.
+- **What a commit message communicates:** not what files changed (git records that
+  automatically) but why the change was made. "Add lexer" is a description. "Introduce
+  the lexer as the first stage of the interpreter pipeline — now the console shows
+  tokens instead of echoing raw text" is an explanation that will be meaningful six
+  months later.
+
+Every lesson's definition of done includes a git commit with a suggested message in
+the correct format. The first lesson teaches the format; subsequent lessons require it.
+
+### 11. Browser and runtime
+
+Every browser API called for the first time is explained:
+
+- **What it does mechanically.** `document.getElementById('canvas')` searches the
+  DOM tree for an element whose `id` attribute equals `'canvas'`. It returns the
+  first match, or `null` if none exists. The DOM tree is the browser's in-memory
+  representation of the HTML document — every element in the HTML file becomes a
+  node in this tree.
+- **What it returns, including failure cases.** `getContext('2d')` returns a
+  `CanvasRenderingContext2D` object if the browser supports the canvas 2D API, or
+  `null` if not. No modern browser returns null — but TypeScript requires you to
+  acknowledge the possibility.
+- **What the browser's security model means for this call.** Not required for every
+  call — only where it is directly relevant.
+
+### 12. Security
+
+Every lesson that handles user input, renders user-provided content, or executes
+user-provided code must include a security explanation:
+
+- **Name the threat.** XSS (Cross-Site Scripting): an attacker injects malicious HTML
+  or JavaScript through a user input field, which the application then renders as
+  code rather than text. Injection: user-provided data is interpreted as a command.
+- **Show how the code prevents it.** `textContent = userInput` is safe — it treats
+  the input as plain text, no matter what HTML it contains. `innerHTML = userInput`
+  is dangerous — the browser will parse and execute any HTML in the input, including
+  `<script>` tags.
+- **State what would happen without the protection.** Be concrete. Show the attack
+  input and the resulting damage.
+
+Security is not an advanced topic. It is the first consequence of accepting input
+from outside your code. The moment a lesson accepts a character from the user, the
+security question is already open. It must be answered.
+
+### 13. Debugging and reading errors
+
+Every lesson that introduces a new class of error must explain how to find it:
+
+- **Which tool reveals this error.** TypeScript compile errors appear in the editor
+  and in the terminal where `tsc` or `npm run dev` runs. JavaScript runtime errors
+  appear in the browser console (F12 → Console). Test failures appear in the
+  terminal where Vitest runs.
+- **How to read the error message.** Error messages have structure: an error type,
+  a description, a file path, a line number, and often a stack trace. Each part
+  is explained at first encounter.
+- **What a stack trace is and how to read it.** The stack trace lists every function
+  call active at the moment the error occurred, from most recent to least recent.
+  Reading it locates the exact line that threw and the chain of calls that led there.
+- **How to use the browser debugger.** When a runtime error occurs, "Sources" tab →
+  find the file → click the line number to set a breakpoint → reload → the browser
+  pauses at that line and shows the value of every variable. This is shown at first
+  use, not assumed.
+
+### 14. Performance
+
+Any code that runs in a hot path must name the performance implication:
+
+- **What "hot path" means.** Code that runs once on startup has negligible performance
+  cost. Code called on every keypress, every animation frame, or inside a loop over
+  large data has a cost that compounds.
+- **60fps.** Browser animations run at 60 frames per second — one frame every 16.6ms.
+  If code running in an animation frame takes longer than 16.6ms, the animation
+  stutters. This is concrete: 16.6ms is the budget; exceeding it is visible.
+- **What blocks rendering.** JavaScript is single-threaded. Synchronous code running
+  on the main thread prevents the browser from rendering. A `for` loop drawing 1,000
+  triangles synchronously produces no visible frames until the loop completes. The user
+  sees nothing move, then sees the result. `requestAnimationFrame` schedules drawing
+  code to run between frames — this is explained when animation first appears.
+- **Big O as a starting point, not a conclusion.** O(n³) matrix multiplication for
+  3×3 matrices is trivially fast. O(n³) for 1000×1000 matrices is not. Always state
+  what n is in the actual use case, not just the asymptotic class.
+
+### 15. Networking and the local environment
+
+When a URL, port, or network concept appears, it is explained:
+
+- **What `localhost` is.** The loopback address — a network address that routes back
+  to the same machine. When Vite starts a dev server on `localhost:5173`, your
+  computer is both the client (your browser) and the server (Vite). No traffic leaves
+  your machine.
+- **What a port is.** A number that routes a network connection to a specific program
+  on a machine. Port 5173 is where Vite listens. Port 443 is where HTTPS traffic goes.
+  Port 80 is HTTP. Programs cannot share a port — if two programs try to listen on
+  5173, the second one fails.
+- **What the dev server does.** Vite's dev server receives HTTP requests from the
+  browser for files (e.g., `GET /src/main.ts`), compiles the TypeScript on demand,
+  and returns the compiled JavaScript. In production, there is no dev server — all
+  files are pre-compiled and served as static files by a web server like nginx.
+- **The gap between dev and production.** Hot module replacement, source maps,
+  unminified code, and detailed error messages exist in development. In production:
+  code is minified (variable names shortened to save bytes), source maps may be
+  omitted (to hide source code), and errors are caught and reported to a monitoring
+  service rather than displayed to the user.
+
+### 16. Professional practices
+
+When a professional practice appears for the first time, explain it:
+
+- **Code review.** Before code is merged into a shared codebase, another developer
+  reads it: checking for correctness, clarity, security, and adherence to the
+  project's conventions. The self-taught learner working alone does not have a
+  reviewer — but internalising the reviewer's question ("would I understand this code
+  in six months?") changes how code is written.
+- **Commit messages.** A commit message is communication to a future reader (often
+  your future self). It is not a summary of what files changed — git records that
+  automatically. It is an explanation of why this change was made. "Add tokenizer"
+  is a file summary. "Introduce the lexer as the first stage of the interpreter —
+  the console now shows tokens rather than echoing raw text" is a reason.
+- **The public/private distinction.** Not just in TypeScript (`private` keyword) but
+  as a design principle: the public surface of a module (what it exports) is a
+  promise to callers. Changing it breaks them. The private surface (internal
+  functions, internal state) can change freely. Minimising the public surface
+  minimises the cost of change.
 
 ---
 
@@ -467,7 +723,7 @@ Every lesson must have these sections, in this order:
 3. **The lesson** — code and explanation in smallest-runnable-unit steps, each with walkthrough and both lenses.
 4. **Connect the pieces** — a short section after all code is written that maps the new code to the full system.
 5. **What breaks without this** — one concrete failure mode. Show the actual error or wrong behaviour.
-6. **Definition of done** — a checklist the student verifies themselves.
+6. **Definition of done** — a checklist the student verifies themselves, including a git commit.
 
 ---
 
@@ -488,13 +744,36 @@ Before a lesson is published, verify every item:
 - [ ] No concept is assumed from a prior lesson — every concept used is explained here
 - [ ] "What breaks without this" is concrete and specific, not hypothetical
 
-**Define at Use**
+**Define at Use — Code**
 - [ ] Every syntax construct used for the first time is explained at the point of use
 - [ ] Every import statement identifies the module's responsibility, what is imported, and why
 - [ ] Every data type is named, its contents described, and the choice justified over alternatives
 - [ ] Every method, library function, or function from a prior lesson is explained at first use in this lesson
 - [ ] Every OOP concept (interface, class, inheritance, polymorphism) is explained when it appears
 - [ ] Every design pattern is named and defined when it appears
+
+**Define at Use — Environment**
+- [ ] Every terminal command is explained: what program, what arguments, what output means, what failure looks like
+- [ ] Every tool introduced (npm, Vite, tsc, Vitest) is explained: what it does, what problem it solves
+- [ ] Every configuration file field touched is explained: what it controls, why this value
+- [ ] Every new file and directory is explained: its responsibility, why it lives here, why this name
+- [ ] Every npm concept used (dependencies, devDependencies, semver, lock file) is explained at first use
+
+**Define at Use — Security**
+- [ ] Any lesson handling user input names the threat (XSS, injection) and shows how the code prevents it
+- [ ] Any lesson rendering user-provided content uses safe APIs and explains why the safe API is chosen
+- [ ] Any lesson executing user-provided code explains the trust model
+
+**Define at Use — Developer Practice**
+- [ ] Every debugging step needed to find errors in this lesson is explained, including which tool to use
+- [ ] Reading a new class of error message (compiler, runtime, test) is explained at first encounter
+- [ ] Version control: the definition of done includes a git commit with a message in the correct format
+- [ ] The first time git is used in the curriculum, the commit message format and its purpose are taught
+
+**Define at Use — Runtime and Performance**
+- [ ] Every browser API called for the first time is explained: what it does, what it returns, failure cases
+- [ ] Any code in a hot path names the performance implication and the concrete budget (e.g., 16.6ms per frame)
+- [ ] Network concepts (localhost, port, dev server vs production server) are explained at first appearance
 
 **The Aha Moment**
 - [ ] When code from a prior lesson is reused, the connection is made explicit in prose
@@ -517,16 +796,17 @@ Before a lesson is published, verify every item:
 **Connection**
 - [ ] The lesson opens by connecting to what came before
 - [ ] The lesson closes by connecting to what comes next
-- [ ] At least one connection to the real world or production codebase is made
+- [ ] At least one connection to a real production system is named explicitly
 
 **Structure**
 - [ ] All six sections are present
 - [ ] Definition of done is specific and verifiable, not vague
+- [ ] Definition of done includes a git commit with a message that explains why, not what
 
 ---
 
 *This contract applies to every lesson in this curriculum regardless of subject,
-language, or author. When in doubt, ask: could a student who has never written code
-before read this lesson and explain — in their own words — what the code does, why
-it is written that way, and where they will see this concept again? If not, the
-lesson is not finished.*
+language, or author. When in doubt, ask: could a person who has never worked as a
+software developer read this lesson and explain — in their own words — what the code
+does, why it is written that way, what it connects to in the wider discipline, and
+where they will see this concept again? If not, the lesson is not finished.*
