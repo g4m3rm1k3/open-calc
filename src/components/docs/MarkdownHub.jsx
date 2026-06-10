@@ -27,6 +27,7 @@ import {
 } from 'lucide-react'
 import { buildOptionalBackendUrl } from '../../utils/optionalBackend.js'
 import { RUNNABLE_LANGS, runJSInline, runTSInline, runPythonInline, runOpenMATInline } from '../../utils/inlineRunner.js'
+import { getThemeStyles, STUDIO_THEMES } from '../../utils/studioThemes.js'
 import DocsCodeWorkspace from './DocsCodeWorkspace.jsx'
 import AdaPanel from './AdaPanel.jsx'
 
@@ -122,93 +123,64 @@ function savePersonal(files) {
   localStorage.setItem(LS_KEY, JSON.stringify(files))
 }
 
-const MD_CSS = `
-.md-body { line-height: 1.75; font-size: 15px; max-width: 860px; color: #334155; }
-.dark .md-body { color: #e2e8f0; }
-.md-body h1 { font-size: 2em; font-weight: 700; margin: 0 0 0.5em; color: #0f172a; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.3em; }
-.dark .md-body h1 { color: #f8fafc; border-bottom-color: #334155; }
-.md-body h2 { font-size: 1.4em; font-weight: 700; margin: 1.8em 0 0.5em; color: #2563eb; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.2em; }
-.dark .md-body h2 { color: #60a5fa; border-bottom-color: #1e293b; }
-.md-body h3 { font-size: 1.15em; font-weight: 600; margin: 1.4em 0 0.4em; color: #059669; }
-.dark .md-body h3 { color: #34d399; }
-.md-body h4 { font-size: 1em; font-weight: 600; margin: 1.2em 0 0.3em; color: #d97706; }
-.dark .md-body h4 { color: #fbbf24; }
+function getMdCss(md) {
+  return `
+.md-body { line-height: 1.75; font-size: 15px; max-width: 860px; color: ${md.text}; }
+.md-body h1 { font-size: 2em; font-weight: 700; margin: 0 0 0.5em; color: ${md.h1}; border-bottom: 1px solid ${md.hr}; padding-bottom: 0.3em; }
+.md-body h2 { font-size: 1.4em; font-weight: 700; margin: 1.8em 0 0.5em; color: ${md.h2}; border-bottom: 1px solid ${md.hr}; padding-bottom: 0.2em; }
+.md-body h3 { font-size: 1.15em; font-weight: 600; margin: 1.4em 0 0.4em; color: ${md.h3}; }
+.md-body h4 { font-size: 1em; font-weight: 600; margin: 1.2em 0 0.3em; color: ${md.h4}; }
 .md-body p { margin: 0 0 1em; }
-.md-body a { color: #2563eb; text-decoration: underline; }
-.dark .md-body a { color: #60a5fa; }
-.md-body code { background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 4px; padding: 2px 6px; font-size: 0.85em; font-family: 'JetBrains Mono', monospace; color: #7c3aed; }
-.dark .md-body code { background: #1e293b; border-color: #334155; color: #c084fc; }
-.md-body pre { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px 20px; overflow-x: auto; margin: 0 0 1.2em; }
-.dark .md-body pre { background: #0f172a; border-color: #1e293b; }
-.md-body pre code { background: none; border: none; padding: 0; color: #334155; }
-.dark .md-body pre code { color: #e2e8f0; }
-.md-body blockquote { border-left: 3px solid #3b82f6; margin: 0 0 1em; padding: 8px 16px; background: rgba(59,130,246,0.05); border-radius: 0 4px 4px 0; color: #64748b; }
-.dark .md-body blockquote { border-left-color: #60a5fa; background: rgba(96,165,250,0.05); color: #94a3b8; }
+.md-body a { color: ${md.a}; text-decoration: underline; }
+.md-body code { background: ${md.codeBg}; border: 1px solid ${md.tdBorder}; border-radius: 4px; padding: 2px 6px; font-size: 0.85em; font-family: 'JetBrains Mono', monospace; color: ${md.codeText}; }
+.md-body pre { background: ${md.preBg}; border: 1px solid ${md.preBorder}; border-radius: 8px; padding: 16px 20px; overflow-x: auto; margin: 0 0 1.2em; }
+.md-body pre code { background: none; border: none; padding: 0; color: ${md.text}; }
+.md-body blockquote { border-left: 3px solid ${md.quoteBorder}; margin: 0 0 1em; padding: 8px 16px; background: ${md.quoteBg}; border-radius: 0 4px 4px 0; color: ${md.quoteText}; }
 .md-body ul, .md-body ol { margin: 0 0 1em 1.4em; }
 .md-body li { margin-bottom: 0.3em; }
 .md-body table { border-collapse: collapse; width: 100%; margin: 0 0 1.2em; font-size: 0.9em; }
-.md-body th { background: #f1f5f9; border: 1px solid #e2e8f0; padding: 8px 12px; text-align: left; color: #475569; font-weight: 600; }
-.dark .md-body th { background: #1e293b; border-color: #334155; color: #cbd5e1; }
-.md-body td { border: 1px solid #e2e8f0; padding: 7px 12px; }
-.dark .md-body td { border-color: #334155; }
-.md-body tr:nth-child(even) td { background: #f8fafc; }
-.dark .md-body tr:nth-child(even) td { background: #0f172a; }
-.md-body hr { border: none; border-top: 1px solid #e2e8f0; margin: 1.5em 0; }
-.dark .md-body hr { border-top-color: #334155; }
-.md-body img { max-width: 100%; border-radius: 8px; border: 1px solid #e2e8f0; }
-.dark .md-body img { border-color: #334155; }
+.md-body th { background: ${md.thBg}; border: 1px solid ${md.tdBorder}; padding: 8px 12px; text-align: left; color: ${md.quoteText}; font-weight: 600; }
+.md-body td { border: 1px solid ${md.tdBorder}; padding: 7px 12px; }
+.md-body tr:nth-child(even) td { background: ${md.trEven}; }
+.md-body hr { border: none; border-top: 1px solid ${md.hr}; margin: 1.5em 0; }
+.md-body img { max-width: 100%; border-radius: 8px; border: 1px solid ${md.imgBorder}; }
 .md-body .katex-display { overflow-x: auto; overflow-y: hidden; }
-/* ── Monaco code block wrapper ── */
-.md-code-block { margin: 0 0 1.2em; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; }
-.dark .md-code-block { border-color: #1e293b; }
-.md-code-header { display: flex; align-items: center; justify-content: space-between; padding: 5px 14px; background: #f1f5f9; border-bottom: 1px solid #e2e8f0; }
-.dark .md-code-header { background: #0d1526; border-bottom-color: #1e293b; }
-.md-code-lang { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; font-family: 'JetBrains Mono', monospace; }
-.dark .md-code-lang { color: #4a5568; }
+.md-code-block { margin: 0 0 1.2em; border-radius: 8px; overflow: hidden; border: 1px solid ${md.codeHeaderBorder}; }
+.md-code-header { display: flex; align-items: center; justify-content: space-between; padding: 5px 14px; background: ${md.codeHeaderBg}; border-bottom: 1px solid ${md.codeHeaderBorder}; }
+.md-code-lang { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: ${md.codeLangText}; font-family: 'JetBrains Mono', monospace; }
 .md-code-actions { display: flex; gap: 5px; }
-.md-code-btn { font-size: 10px; font-weight: 600; padding: 2px 9px; border-radius: 4px; border: 1px solid #e2e8f0; background: white; color: #475569; cursor: pointer; transition: all 0.15s; font-family: system-ui; line-height: 1.8; }
-.dark .md-code-btn { border-color: #334155; background: #1e293b; color: #94a3b8; }
-.md-code-btn:hover { background: #e2e8f0; color: #1e293b; }
-.dark .md-code-btn:hover { background: #334155; color: #e2e8f0; }
+.md-code-btn { font-size: 10px; font-weight: 600; padding: 2px 9px; border-radius: 4px; border: 1px solid ${md.codeBtnBorder}; background: ${md.codeBtnBg}; color: ${md.codeBtnText}; cursor: pointer; transition: all 0.15s; font-family: system-ui; line-height: 1.8; }
+.md-code-btn:hover { background: ${md.codeBtnHoverBg}; color: ${md.codeBtnHoverText}; }
 .md-code-btn.copied { color: #16a34a !important; border-color: #86efac !important; }
-.dark .md-code-btn.copied { color: #4ade80 !important; border-color: #166534 !important; }
 .md-code-btn.run { color: #0369a1; border-color: #bae6fd; background: #f0f9ff; }
-.dark .md-code-btn.run { color: #38bdf8; border-color: #0c4a6e; background: #082f49; }
 .md-code-btn.run:hover { background: #e0f2fe; }
-.dark .md-code-btn.run:hover { background: #0c4a6e; }
 .md-code-monaco { overflow: hidden; }
 .md-code-monaco .monaco-editor .overflow-guard { border-radius: 0; }
-.md-resize-handle { height: 6px; cursor: row-resize; background: #e2e8f0; display: flex; align-items: center; justify-content: center; transition: background 0.15s; border-radius: 0 0 8px 8px; }
-.dark .md-resize-handle { background: #1e293b; }
-.md-resize-handle:hover, .md-resize-handle.dragging { background: #3b82f6; }
-.dark .md-resize-handle:hover, .dark .md-resize-handle.dragging { background: #2563eb; }
-.md-resize-handle::after { content: ''; width: 28px; height: 2px; border-radius: 2px; background: #94a3b8; }
-.dark .md-resize-handle::after { background: #334155; }
-/* ── Inline cell output ── */
-.md-cell-output { border-top: 1px solid #e2e8f0; background: #f8fafc; border-radius: 0 0 8px 8px; }
-.dark .md-cell-output { border-top-color: #1e293b; background: #060d18; }
+.md-resize-handle { height: 6px; cursor: row-resize; background: ${md.resizeHandleBg}; display: flex; align-items: center; justify-content: center; transition: background 0.15s; border-radius: 0 0 8px 8px; }
+.md-resize-handle:hover, .md-resize-handle.dragging { background: ${md.resizeHandleHover}; }
+.md-resize-handle::after { content: ''; width: 28px; height: 2px; border-radius: 2px; background: ${md.quoteText}; }
+.md-cell-output { border-top: 1px solid ${md.preBorder}; background: ${md.preBg}; border-radius: 0 0 8px 8px; }
 .md-cell-output-header { display: flex; align-items: center; justify-content: space-between; padding: 3px 14px; }
-.md-cell-output-header span { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; }
-.md-cell-output-clear { background: none; border: none; cursor: pointer; font-size: 10px; color: #94a3b8; padding: 0 2px; line-height: 1; }
+.md-cell-output-header span { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: ${md.quoteText}; }
+.md-cell-output-clear { background: none; border: none; cursor: pointer; font-size: 10px; color: ${md.quoteText}; padding: 0 2px; line-height: 1; }
 .md-cell-output-clear:hover { color: #ef4444; }
 .md-cell-output-pre { margin: 0; padding: 6px 14px 10px; font-size: 12px; font-family: 'JetBrains Mono', Consolas, monospace; white-space: pre-wrap; word-break: break-word; }
 .md-cell-line { line-height: 1.55; }
-.md-cell-line--output { color: #1e293b; }
-.dark .md-cell-line--output { color: #c8d3e8; }
+.md-cell-line--output { color: ${md.text}; }
 .md-cell-line--error { color: #dc2626; }
-.dark .md-cell-line--error { color: #f87171; }
-.md-cell-line--dim { color: #94a3b8; font-style: italic; }
+.md-cell-line--dim { color: ${md.quoteText}; font-style: italic; }
+.md-cell-plot { display: block; max-width: 100%; height: auto; border-radius: 4px; margin: 6px 0; background: #fff; }
 .md-splitter { width: 5px; cursor: col-resize; flex-shrink: 0; background: transparent; transition: background 0.15s; position: relative; z-index: 10; }
-.md-splitter:hover, .md-splitter.dragging { background: #3b82f6; }
-.dark .md-splitter:hover, .dark .md-splitter.dragging { background: #2563eb; }
-/* ── Inline doc reference badge ── */
+.md-splitter:hover, .md-splitter.dragging { background: ${md.resizeHandleHover}; }
 .md-ref-badge { font-size: 8px; font-weight: 700; vertical-align: super; margin-left: 2px; padding: 1px 4px; border-radius: 3px; text-decoration: none; line-height: 1; white-space: nowrap; }
 .md-ref-badge.mdn { background: #dbeafe; color: #1d4ed8; border: 1px solid #bfdbfe; }
-.dark .md-ref-badge.mdn { background: #1e3a5f; color: #60a5fa; border-color: #1d4ed8; }
 .md-ref-badge.py { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
-.dark .md-ref-badge.py { background: #3b2700; color: #fbbf24; border-color: #78350f; }
 .md-ref-badge:hover { opacity: 0.75; }
 `
+}
+
+
+
 
 function useIsDark() {
   const [dark, setDark] = useState(() =>
@@ -227,7 +199,7 @@ function useIsDark() {
 const DocsCtx = createContext({ isDark: false, onRun: null, codeAlongOpen: false })
 
 function MdCodeBlock({ language, code }) {
-  const { isDark, onRun, codeAlongOpen } = useContext(DocsCtx)
+  const { isDark, monacoTheme, onRun, codeAlongOpen } = useContext(DocsCtx)
   const [copied, setCopied] = useState(false)
   const [dragging, setDragging] = useState(false)
   const [editorHeight, setEditorHeight] = useState(() =>
@@ -235,7 +207,18 @@ function MdCodeBlock({ language, code }) {
   )
   const [output, setOutput]   = useState(null)   // null = never run
   const [running, setRunning] = useState(false)
-  const editorRef = useRef(null)  // holds live Monaco instance so we run edited code
+  const editorRef    = useRef(null)   // holds live Monaco instance so we run edited code
+  const outputRef    = useRef(null)   // scroll target when output appears
+  const didScrollRef = useRef(false)  // only scroll once per output session
+
+  // Scroll into view once when output first appears; reset when output is cleared
+  useEffect(() => {
+    if (output !== null && !didScrollRef.current) {
+      didScrollRef.current = true
+      outputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }
+    if (output === null) didScrollRef.current = false
+  }, [output !== null]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const monacoLang = MONACO_LANG[language] || language
   const runnable   = RUNNABLE_LANGS.has(language)
@@ -281,8 +264,8 @@ function MdCodeBlock({ language, code }) {
 
       if (lang === 'python' || lang === 'py') {
         const lines = []
-        const { error } = await runPythonInline(src, (text, type) => {
-          lines.push({ text, type })
+        const { error } = await runPythonInline(src, (item) => {
+          lines.push(item)
           setOutput([...lines])
         })
         if (error) lines.push({ text: error, type: 'error' })
@@ -350,7 +333,7 @@ function MdCodeBlock({ language, code }) {
           height={editorHeight}
           language={monacoLang}
           defaultValue={code}
-          theme={isDark ? 'open-calc-dark' : 'open-calc-light'}
+          theme={monacoTheme || (isDark ? 'open-calc-dark' : 'open-calc-light')}
           beforeMount={setupOpenCalcMonaco}
           onMount={(editor) => { editorRef.current = editor }}
           options={{
@@ -381,15 +364,17 @@ function MdCodeBlock({ language, code }) {
         title="Drag to resize"
       />
       {output !== null && (
-        <div className="md-cell-output">
+        <div className="md-cell-output" ref={outputRef}>
           <div className="md-cell-output-header">
             <span>Output</span>
             <button onClick={() => setOutput(null)} className="md-cell-output-clear" title="Clear output">✕</button>
           </div>
           <pre className="md-cell-output-pre">
-            {output.map((line, i) => (
-              <div key={i} className={`md-cell-line md-cell-line--${line.type}`}>{line.text}</div>
-            ))}
+            {output.map((item, i) =>
+              item.type === 'image'
+                ? <img key={i} className="md-cell-plot" src={`data:image/png;base64,${item.src}`} alt="plot" />
+                : <div key={i} className={`md-cell-line md-cell-line--${item.type}`}>{item.text}</div>
+            )}
           </pre>
         </div>
       )}
@@ -443,7 +428,7 @@ const MD_COMPONENTS = {
   },
 }
 
-function TreeNode({ node, activeFile, onSelect, depth = 0, overriddenPaths = new Set() }) {
+function TreeNode({ node, activeFile, onSelect, depth = 0, overriddenPaths = new Set(), accentColor = '#0ea5e9' }) {
   const [open, setOpen] = useState(node.open !== false)
   const indent = depth * 14
 
@@ -467,6 +452,7 @@ function TreeNode({ node, activeFile, onSelect, depth = 0, overriddenPaths = new
             onSelect={onSelect}
             depth={depth + 1}
             overriddenPaths={overriddenPaths}
+            accentColor={accentColor}
           />
         ))}
       </div>
@@ -480,10 +466,10 @@ function TreeNode({ node, activeFile, onSelect, depth = 0, overriddenPaths = new
       onClick={() => onSelect(node.path)}
       className={`flex items-center gap-1.5 px-2 py-1.5 cursor-pointer text-xs transition-colors border-l-2 ${
         isActive
-          ? 'text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-900/10 border-brand-500'
+          ? 'text-slate-800 dark:text-slate-100 bg-slate-100 dark:bg-slate-800/60'
           : 'text-slate-600 dark:text-slate-400 border-transparent hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-200'
       }`}
-      style={{ paddingLeft: 12 + indent }}
+      style={{ paddingLeft: 12 + indent, ...(isActive ? { borderLeftColor: accentColor } : {}) }}
     >
       <File className={`w-3.5 h-3.5 ${isActive ? 'opacity-100' : 'opacity-70'}`} />
       <span className="truncate">{displayName(node.name)}</span>
@@ -492,16 +478,17 @@ function TreeNode({ node, activeFile, onSelect, depth = 0, overriddenPaths = new
   )
 }
 
-function DocListItem({ label, subtitle, isActive, onSelect, onDelete, kind }) {
+function DocListItem({ label, subtitle, isActive, onSelect, onDelete, kind, accentColor = '#0ea5e9' }) {
   return (
     <div className="flex items-center group">
       <div
         onClick={onSelect}
         className={`flex-1 flex items-center gap-1.5 px-2 py-1.5 cursor-pointer text-xs transition-colors border-l-2 ml-2 ${
           isActive
-            ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/10 border-indigo-500'
+            ? 'text-slate-800 dark:text-slate-100 bg-slate-100 dark:bg-slate-800/60'
             : 'text-slate-600 dark:text-slate-400 border-transparent hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-200'
         }`}
+        style={isActive ? { borderLeftColor: accentColor } : undefined}
       >
         <FilePenLine className={`w-3.5 h-3.5 ${isActive ? 'opacity-100' : 'opacity-70'}`} />
         <div className="truncate flex-1">
@@ -567,6 +554,10 @@ export default function MarkdownHub() {
   const [adaOpen, setAdaOpen] = useState(false)
   const [workspaceSnap, setWorkspaceSnap] = useState({ code: '', language: '', filename: '', fileList: [], getTerminalOutput: () => '' })
   const isDark = useIsDark()
+  const [studioTheme, setStudioTheme] = useState(() => localStorage.getItem('studio_theme') || 'default')
+  const themeStyles = useMemo(() => getThemeStyles(studioTheme, isDark), [studioTheme, isDark])
+  const ui = themeStyles.ui
+  const accentColor = STUDIO_THEMES[studioTheme]?.accentHex ?? '#0ea5e9'
 
   const handleCodeChange = useCallback((snap) => { setWorkspaceSnap(snap) }, [])
 
@@ -595,10 +586,11 @@ export default function MarkdownHub() {
   }, [])
 
   const docsCtxValue = useMemo(() => ({
-    isDark,
+    isDark: themeStyles.isDark,
+    monacoTheme: themeStyles.monaco,
     onRun: handleRunInCodeAlong,
     codeAlongOpen,
-  }), [isDark, handleRunInCodeAlong, codeAlongOpen])
+  }), [themeStyles, handleRunInCodeAlong, codeAlongOpen])
 
   const overriddenPaths = useMemo(() => new Set(overrideDocs.map((doc) => doc.path)), [overrideDocs])
   const activeUserDoc = userDocs.find((doc) => doc.id === activeUserId) || null
@@ -957,7 +949,7 @@ export default function MarkdownHub() {
 
   return (
     <>
-      <style>{MD_CSS}</style>
+      <style>{getMdCss(themeStyles.md)}</style>
       <input
         ref={fileInputRef}
         type="file"
@@ -966,30 +958,31 @@ export default function MarkdownHub() {
         onChange={onImportFile}
       />
 
-      <div className="flex flex-col h-[100vh] w-full bg-white dark:bg-[#07111e] text-slate-900 dark:text-slate-100 font-sans overflow-hidden inset-0 fixed z-[100]">
-        <div className="h-12 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3 px-4 shrink-0 shadow-sm z-10 w-full">
+      <div className={`flex flex-col h-[100vh] w-full ${ui.bg0} ${ui.txt1} font-sans overflow-hidden inset-0 fixed z-[100]`}>
+        <div className={`h-12 ${ui.bg1} border-b ${ui.border} flex items-center gap-1.5 px-3 shrink-0 z-10 w-full`}>
+
+          {/* Nav toggle */}
           <button
-            onClick={() => setDocsNavOpen((value) => !value)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-            title={docsNavOpen ? 'Hide docs navigation' : 'Show docs navigation'}
+            onClick={() => setDocsNavOpen((v) => !v)}
+            className={`p-1.5 rounded-md ${ui.txt2} ${ui.hoverBg} ${ui.hoverTx} transition-colors`}
+            title={docsNavOpen ? 'Hide navigation' : 'Show navigation'}
           >
-            {docsNavOpen ? <PanelLeftClose className="w-3.5 h-3.5" /> : <PanelLeftOpen className="w-3.5 h-3.5" />}
-            Nav
+            {docsNavOpen ? <PanelLeftClose className="w-4 h-4" /> : <PanelLeftOpen className="w-4 h-4" />}
           </button>
 
-          <span className="text-[17px] font-bold text-slate-800 dark:text-slate-100 mr-2 tracking-tight">
-            🖥️ Studio
-          </span>
+          {/* Title */}
+          <span className={`text-sm font-bold ${ui.txt1} tracking-tight mr-1`}>🖥️ Studio</span>
 
-          <div className="flex flex-wrap bg-slate-200/50 dark:bg-slate-950/50 p-1 rounded-lg gap-1 border border-slate-200/50 dark:border-slate-800/50">
+          {/* Tab switcher */}
+          <div className={`flex ${ui.bg2} p-0.5 rounded-lg gap-0.5 border ${ui.border}`}>
             {['tutorials', 'editor'].map((nextTab) => (
               <button
                 key={nextTab}
                 onClick={() => setTab(nextTab)}
-                className={`px-3 py-1 text-xs font-bold capitalize rounded-md transition-all ${
+                className={`px-2.5 py-1 text-xs font-bold capitalize rounded-md transition-all ${
                   tab === nextTab
-                    ? 'bg-white dark:bg-slate-800 text-brand-600 dark:text-brand-400 shadow-sm'
-                    : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800/50'
+                    ? `${ui.bg0} ${ui.primary} shadow-sm`
+                    : `${ui.txt2} ${ui.hoverBg} ${ui.hoverTx}`
                 }`}
               >
                 {nextTab === 'tutorials' ? '📖 Tutorials' : '✏️ Editor'}
@@ -997,116 +990,130 @@ export default function MarkdownHub() {
             ))}
           </div>
 
-          <div className="text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-500">
-            {backendLoading ? 'Checking backend...' : backendReady ? 'Backend linked' : 'Local-only mode'}
-          </div>
-
           <div className="flex-1" />
 
+          {/* Backend status */}
+          <span className={`text-[10px] uppercase tracking-widest ${ui.txt2} hidden md:block`}>
+            {backendLoading ? '…' : backendReady ? '⚡ Backend' : '⬡ Local'}
+          </span>
+
+          {/* Code Along */}
           <button
-            onClick={() => setCodeAlongOpen((value) => !value)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold border rounded-lg transition-colors ${
+            onClick={() => setCodeAlongOpen((v) => !v)}
+            className={`flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold border rounded-lg transition-colors ${
               codeAlongOpen
-                ? 'text-cyan-700 dark:text-cyan-300 bg-cyan-50 dark:bg-cyan-900/30 border-cyan-200 dark:border-cyan-800/50'
-                : 'text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
+                ? (themeStyles.isDark ? 'text-cyan-300 bg-cyan-900/30 border-cyan-700' : 'text-cyan-700 bg-cyan-50 border-cyan-200')
+                : `${ui.txt2} ${ui.bg1} ${ui.border} ${ui.hoverBg} ${ui.hoverTx}`
             }`}
-            title="Open code-along workspace"
+            title="Code-along workspace"
           >
-            <Code2 className="w-3.5 h-3.5" /> Code Along
+            <Code2 className="w-3.5 h-3.5" /><span className="hidden sm:inline">Code Along</span>
           </button>
 
+          {/* Ask Ada */}
           <button
             onClick={() => setAdaOpen((v) => !v)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold border rounded-lg transition-colors ${
+            className={`flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold border rounded-lg transition-colors ${
               adaOpen
-                ? 'text-cyan-600 dark:text-cyan-300 bg-cyan-50 dark:bg-cyan-900/30 border-cyan-300 dark:border-cyan-700/50'
-                : 'text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
+                ? (themeStyles.isDark ? 'text-violet-300 bg-violet-900/30 border-violet-700' : 'text-violet-700 bg-violet-50 border-violet-200')
+                : `${ui.txt2} ${ui.bg1} ${ui.border} ${ui.hoverBg} ${ui.hoverTx}`
             }`}
-            title="Ask Ada — your private AI code tutor"
+            title="Ask Ada — AI code tutor"
           >
-            <Sparkles className="w-3.5 h-3.5" /> Ask Ada
+            <Sparkles className="w-3.5 h-3.5" /><span className="hidden sm:inline">Ask Ada</span>
           </button>
 
-          <button
-            onClick={refreshDocsIndex}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+          {/* Theme picker */}
+          <select
+            value={studioTheme}
+            onChange={(e) => { setStudioTheme(e.target.value); localStorage.setItem('studio_theme', e.target.value) }}
+            className={`text-xs font-semibold rounded-lg px-2 py-1.5 border ${ui.border} ${ui.bg1} ${ui.txt2} cursor-pointer focus:outline-none`}
+            title="Studio theme"
           >
-            <RefreshCcw className="w-3.5 h-3.5" /> Refresh
+            {Object.entries(STUDIO_THEMES).map(([id, t]) => (
+              <option key={id} value={id}>{t.name}</option>
+            ))}
+          </select>
+
+          {/* Icon-only secondary actions */}
+          <button onClick={refreshDocsIndex} className={`p-1.5 rounded-md ${ui.txt2} ${ui.hoverBg} ${ui.hoverTx} transition-colors`} title="Refresh docs index">
+            <RefreshCcw className="w-3.5 h-3.5" />
+          </button>
+          <button onClick={() => fileInputRef.current?.click()} className={`p-1.5 rounded-md ${ui.txt2} ${ui.hoverBg} ${ui.hoverTx} transition-colors`} title="Import document">
+            <Upload className="w-3.5 h-3.5" />
           </button>
 
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-          >
-            <Upload className="w-3.5 h-3.5" /> Import
-          </button>
-
+          {/* Conditional: tutorial actions */}
           {tab === 'tutorials' && activeFile && (
             <>
               <button
                 onClick={openTutorialOverrideEditor}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800/50 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
+                className="flex items-center gap-1 px-2 py-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800/50 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
+                title={tutorialOverrideActive ? 'Edit override' : 'Edit local version'}
               >
-                <Edit2 className="w-3.5 h-3.5" /> {tutorialOverrideActive ? 'Edit override' : 'Edit local version'}
+                <Edit2 className="w-3.5 h-3.5" />
+                <span className="hidden md:inline">{tutorialOverrideActive ? 'Edit override' : 'Edit local'}</span>
               </button>
               {tutorialOverrideActive && backendReady && (
                 <button
                   onClick={() => deleteOverrideDoc(activeFile)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800/50 rounded-lg hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors"
+                  className="p-1.5 rounded-md text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/30 transition-colors"
+                  title="Restore built-in doc"
                 >
-                  <RefreshCcw className="w-3.5 h-3.5" /> Restore built-in
+                  <RefreshCcw className="w-3.5 h-3.5" />
                 </button>
               )}
             </>
           )}
 
-          {(tab === 'tutorials' && activeFile) || (tab === 'editor' && activeDocType) ? (
-            <button
-              onClick={downloadCurrentMarkdown}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-            >
-              <Download className="w-3.5 h-3.5" /> Download
+          {/* Download (conditional) */}
+          {((tab === 'tutorials' && activeFile) || (tab === 'editor' && activeDocType)) && (
+            <button onClick={downloadCurrentMarkdown} className={`p-1.5 rounded-md ${ui.txt2} ${ui.hoverBg} ${ui.hoverTx} transition-colors`} title="Download markdown">
+              <Download className="w-3.5 h-3.5" />
             </button>
-          ) : null}
+          )}
 
+          {/* Editor mode toggle + export (conditional) */}
           {tab === 'editor' && activeDocType && (
             <>
               {previewMode ? (
                 <button
                   onClick={() => setPreviewMode(false)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800/50 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
+                  className="flex items-center gap-1 px-2 py-1.5 text-xs font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800/50 rounded-lg hover:bg-indigo-100 transition-colors"
                 >
-                  <Edit2 className="w-3.5 h-3.5" /> Edit mode
+                  <Edit2 className="w-3.5 h-3.5" /><span className="hidden md:inline">Edit</span>
                 </button>
               ) : (
                 <button
                   onClick={() => setPreviewMode(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800/50 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
+                  className="flex items-center gap-1 px-2 py-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800/50 rounded-lg hover:bg-emerald-100 transition-colors"
                 >
-                  <Eye className="w-3.5 h-3.5" /> Preview mode
+                  <Eye className="w-3.5 h-3.5" /><span className="hidden md:inline">Preview</span>
                 </button>
               )}
               <button
                 onClick={exportSharePack}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-900/30 border border-sky-200 dark:border-sky-800/50 rounded-lg hover:bg-sky-100 dark:hover:bg-sky-900/50 transition-colors"
+                className="flex items-center gap-1 px-2 py-1.5 text-xs font-semibold text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-900/30 border border-sky-200 dark:border-sky-800/50 rounded-lg hover:bg-sky-100 transition-colors"
               >
-                <Download className="w-3.5 h-3.5" /> Export share pack
+                <Download className="w-3.5 h-3.5" /><span className="hidden md:inline">Export</span>
               </button>
             </>
           )}
 
+          {/* Close */}
           <button
             onClick={() => navigate(-1)}
-            className="p-1.5 rounded-md text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
-            title="Exit Docs"
+            className={`p-1.5 rounded-md ${ui.txt2} ${ui.hoverBg} ${ui.hoverTx} transition-colors`}
+            title="Exit Studio"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
+
         <DocsCtx.Provider value={docsCtxValue}>
         <div className={`flex flex-1 overflow-hidden w-full relative ${codeAlongOpen ? 'min-w-0' : ''}`}>
-          <div className={`${docsNavOpen ? 'hidden sm:flex' : 'hidden'} ${codeAlongOpen ? 'w-[240px]' : 'w-[300px]'} bg-slate-50 dark:bg-slate-900/50 border-r border-slate-200 dark:border-slate-800 flex-col shrink-0 overflow-hidden h-full`}>
+          <div className={`${docsNavOpen ? 'hidden sm:flex' : 'hidden'} ${codeAlongOpen ? 'w-[240px]' : 'w-[300px]'} ${ui.bg1} border-r ${ui.border} flex-col shrink-0 overflow-hidden h-full`}>
             <div className="flex-1 overflow-y-auto py-3 custom-scrollbar">
               {tab === 'tutorials' && (
                 tree.length === 0
@@ -1122,6 +1129,7 @@ export default function MarkdownHub() {
                       activeFile={activeFile}
                       onSelect={selectTutorial}
                       overriddenPaths={overriddenPaths}
+                      accentColor={accentColor}
                     />
                     ))
               )}
@@ -1140,6 +1148,7 @@ export default function MarkdownHub() {
                       isActive={activeDocType === 'user' && activeUserId === doc.id}
                       onSelect={() => selectUserDoc(doc)}
                       onDelete={() => deleteUserDoc(doc.id)}
+                      accentColor={accentColor}
                     />
                   ))}
                   {userDocs.length === 0 && (
@@ -1160,6 +1169,7 @@ export default function MarkdownHub() {
                       isActive={activeDocType === 'override' && activeOverridePath === doc.path}
                       onSelect={() => selectOverrideDoc(doc)}
                       onDelete={() => deleteOverrideDoc(doc.path)}
+                      accentColor={accentColor}
                     />
                   ))}
                   {overrideDocs.length === 0 && (
@@ -1172,7 +1182,7 @@ export default function MarkdownHub() {
             </div>
 
             {tab === 'editor' && (
-              <div className="p-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/80">
+              <div className={`p-3 border-t ${ui.border} ${ui.bg1}`}>
                 <button
                   onClick={createUserDoc}
                   className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-500/30 text-indigo-600 dark:text-indigo-400 font-bold text-xs rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors shadow-sm"
@@ -1183,7 +1193,7 @@ export default function MarkdownHub() {
             )}
           </div>
 
-          <div className={`flex-1 min-w-0 flex flex-col overflow-hidden bg-white dark:bg-[#0b1322]`}>
+          <div className={`flex-1 min-w-0 flex flex-col overflow-hidden ${ui.bg0}`}>
             {tab === 'tutorials' && (
               <div className="flex-1 overflow-y-auto px-6 sm:px-10 lg:px-16 py-8 custom-scrollbar">
                 {loading ? (
@@ -1224,8 +1234,10 @@ export default function MarkdownHub() {
             )}
 
             {tab === 'editor' && activeDocType && previewMode && (
-              <div className="flex-1 overflow-y-auto px-6 sm:px-10 lg:px-16 py-8 bg-slate-50/50 dark:bg-[#07111e]/50 custom-scrollbar">
-                <div className="md-body mx-auto bg-white dark:bg-[#0b1322] p-8 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 min-h-full">
+              <div className="flex-1 overflow-y-auto px-6 sm:px-10 lg:px-16 py-8 custom-scrollbar"
+                style={{ background: isDark ? themeStyles.md.preBg + '80' : 'rgba(248,250,252,0.5)' }}>
+                <div className="md-body mx-auto p-8 rounded-xl shadow-sm border min-h-full"
+                  style={{ background: isDark ? themeStyles.md.preBg : '#ffffff', borderColor: isDark ? themeStyles.md.preBorder : '#e2e8f0' }}>
                   <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]} components={MD_COMPONENTS}>
                     {editorContent}
                   </ReactMarkdown>
@@ -1254,7 +1266,8 @@ export default function MarkdownHub() {
                   value={editorContent}
                   onChange={(event) => setEditorContent(event.target.value)}
                   spellCheck={false}
-                  className="flex-1 w-full p-6 sm:p-8 bg-slate-50 dark:bg-[#07111e] text-slate-700 dark:text-slate-300 border-none outline-none resize-none font-mono text-[13px] leading-relaxed custom-scrollbar placeholder:text-slate-300 dark:placeholder:text-slate-700"
+                  className="flex-1 w-full p-6 sm:p-8 text-slate-700 dark:text-slate-300 border-none outline-none resize-none font-mono text-[13px] leading-relaxed custom-scrollbar placeholder:text-slate-300 dark:placeholder:text-slate-700"
+                  style={{ background: isDark ? themeStyles.md.preBg : '#f8fafc' }}
                   placeholder="# Begin your markdown here..."
                   style={{ tabSize: 2 }}
                 />
@@ -1270,7 +1283,7 @@ export default function MarkdownHub() {
                 title="Drag to resize"
               />
               <div className="hidden md:flex flex-col shrink-0 overflow-hidden" style={{ width: codeAlongPx }}>
-                <DocsCodeWorkspace activeTitle={activeTitle} pendingRun={pendingRun} onCodeChange={handleCodeChange} />
+                <DocsCodeWorkspace activeTitle={activeTitle} pendingRun={pendingRun} onCodeChange={handleCodeChange} accentColor={accentColor} monacoTheme={themeStyles.monaco} themeUi={themeStyles.ui} />
               </div>
             </>
           )}

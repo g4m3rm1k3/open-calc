@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { EXAMPLE_PROJECT } from '../../utils/exampleProject.js'
 import Editor from '@monaco-editor/react'
 import { ChevronDown, ChevronLeft, ChevronRight, Columns2, Download, ExternalLink, FilePlus, FolderPlus, Maximize2, Minimize2, Play, RotateCcw, Upload, X } from 'lucide-react'
 import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
@@ -36,6 +37,9 @@ function makeFolder(name, parentId = null) {
   return { id: `f${++_uid}`, type: 'folder', name, open: true, parentId }
 }
 
+// ── Error overlay injected into every Preview bundle ─────────────────────────
+const PREVIEW_ERROR_OVERLAY = `<style>#__pe{display:none;position:fixed;inset:0;background:rgba(10,10,10,.92);color:#f87171;font-family:'JetBrains Mono',monospace;padding:24px;z-index:99999;white-space:pre-wrap;font-size:12px;line-height:1.6;overflow-y:auto}</style><div id="__pe"></div><script>function __showErr(msg){var e=document.getElementById('__pe');if(e){e.style.display='block';e.textContent=msg}}window.onerror=function(m,_s,l,c,err){__showErr('\\u274c JavaScript Error\\n\\n'+(err&&err.stack||m)+'\\n\\nat line '+l+(c?':'+c:''));return true};window.addEventListener('unhandledrejection',function(e){__showErr('\\u274c Unhandled Promise Rejection\\n\\n'+(e.reason&&e.reason.stack||String(e.reason)))})<\/script>`
+
 // ── Bundle ────────────────────────────────────────────────────────────────────
 function buildHtmlBundle(files) {
   const html = files.find(f => extLang(f.name) === 'html')
@@ -47,6 +51,8 @@ function buildHtmlBundle(files) {
     doc = doc.includes('</head>') ? doc.replace('</head>', `<style>\n${css}\n</style>\n</head>`) : `<style>\n${css}\n</style>\n` + doc
   if (js)
     doc = doc.includes('</body>') ? doc.replace('</body>', `<script>\n${js}\n</script>\n</body>`) : doc + `\n<script>\n${js}\n</script>`
+  // Inject error overlay at the start of <body> so errors always surface
+  doc = doc.includes('<body') ? doc.replace(/(<body[^>]*>)/, `$1\n${PREVIEW_ERROR_OVERLAY}`) : PREVIEW_ERROR_OVERLAY + doc
   return doc
 }
 
@@ -93,10 +99,21 @@ function openInOpenMat(code, fileName) {
 const _DEFAULT_FILE = makeFile('script.js', '// Welcome to Code Along!\nconsole.log("Hello!");\n')
 const _SAVED = loadSavedWorkspace()
 
+const LS_WELCOME = 'oc-studio-welcome-seen'
+
 // ── Component ─────────────────────────────────────────────────────────────────
-export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = null, onCodeChange = null }) {
+export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = null, onCodeChange = null, accentColor = '#0ea5e9', monacoTheme = null, themeUi = null }) {
   const [items, setItems] = useState(() => _SAVED?.items ?? [_DEFAULT_FILE])
   const [activeId, setActiveId] = useState(() => _SAVED?.activeId ?? _DEFAULT_FILE.id)
+
+  // Show welcome banner when workspace has only the default file and user hasn't dismissed it
+  const [showWelcome, setShowWelcome] = useState(() => {
+    if (localStorage.getItem(LS_WELCOME)) return false
+    const saved = _SAVED
+    if (!saved) return true   // brand new workspace
+    const files = saved.items?.filter(i => i.type === 'file') ?? []
+    return files.length === 1 && !files[0].content?.trim().replace('//', '').trim()
+  })
   const [treeOpen, setTreeOpen] = useState(true)
   const [adding, setAdding] = useState(null)   // { type: 'file'|'folder', parentId }
   const [addingName, setAddingName] = useState('')
@@ -200,6 +217,22 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = n
     setAdding(null)
     setAddingName('')
   }, [adding, addingName])
+
+  const loadExampleProject = useCallback(() => {
+    const newItems = EXAMPLE_PROJECT.map(({ name, content }) => makeFile(name, content))
+    setItems(newItems)
+    // Open README first
+    const readme = newItems.find(f => f.name === 'README.md')
+    if (readme) setActiveId(readme.id)
+    setShowWelcome(false)
+    localStorage.setItem(LS_WELCOME, '1')
+    terminalRef.current?.print('Demo project loaded — try ▶ Run on game.ts, or open the Preview tab on index.html', 'success')
+  }, [])
+
+  const dismissWelcome = useCallback(() => {
+    setShowWelcome(false)
+    localStorage.setItem(LS_WELCOME, '1')
+  }, [])
 
   const deleteItem = useCallback((id) => {
     setItems(prev => {
@@ -322,7 +355,7 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = n
             onClick={() => setActiveId(item.id)}
             className={`group flex items-center gap-1.5 py-1 cursor-pointer text-xs transition-colors select-none ${
               isActive
-                ? D ? 'bg-slate-700/60 text-white' : 'bg-sky-100 text-sky-800'
+                ? D ? 'bg-slate-700/60 text-white' : 'bg-slate-200/80 text-slate-900'
                 : D ? 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200' : 'text-slate-600 hover:bg-slate-200/60 hover:text-slate-900'
             }`}
             style={{ paddingLeft: 10 + depth * 12, paddingRight: 6 }}
@@ -370,15 +403,24 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = n
   }
 
   const D = isDark
-  const border  = D ? 'border-slate-800'   : 'border-slate-200'
-  const bg0     = D ? 'bg-slate-950'       : 'bg-white'
-  const bg1     = D ? 'bg-slate-900'       : 'bg-slate-100'
-  const bg2     = D ? 'bg-[#0c1520]'       : 'bg-slate-50'
-  const txt1    = D ? 'text-slate-200'     : 'text-slate-800'
-  const txt2    = D ? 'text-slate-400'     : 'text-slate-500'
-  const hoverBg = D ? 'hover:bg-slate-800' : 'hover:bg-slate-200'
-  const hoverTx = D ? 'hover:text-slate-200' : 'hover:text-slate-900'
-  const btnBorder = D ? 'border-slate-700' : 'border-slate-300'
+  const T = themeUi  // studio theme ui object — overrides defaults when provided
+
+  // Extract hex from a Tailwind arbitrary-value class like 'bg-[#272822]' → '#272822'
+  const themeHex = (cls) => cls?.match(/\[#([0-9a-fA-F]{3,8})\]/)?.[0]?.slice(1, -1)
+    ? '#' + cls.match(/\[#([0-9a-fA-F]{3,8})\]/)[1]
+    : null
+  const termBg     = T ? (themeHex(T.bg1) ?? null) : null
+  const termInputBg = T ? (themeHex(T.bg0) ?? null) : null
+
+  const border    = T?.border    ?? (D ? 'border-slate-800'    : 'border-slate-200')
+  const bg0       = T?.bg0       ?? (D ? 'bg-slate-950'        : 'bg-white')
+  const bg1       = T?.bg1       ?? (D ? 'bg-slate-900'        : 'bg-slate-100')
+  const bg2       = T?.bg2       ?? (D ? 'bg-[#0c1520]'        : 'bg-slate-50')
+  const txt1      = T?.txt1      ?? (D ? 'text-slate-200'      : 'text-slate-800')
+  const txt2      = T?.txt2      ?? (D ? 'text-slate-400'      : 'text-slate-500')
+  const hoverBg   = T?.hoverBg   ?? (D ? 'hover:bg-slate-800'  : 'hover:bg-slate-200')
+  const hoverTx   = T?.hoverTx   ?? (D ? 'hover:text-slate-200': 'hover:text-slate-900')
+  const btnBorder = T?.btnBorder ?? (D ? 'border-slate-700'    : 'border-slate-300')
 
   return (
     <section className={`flex-1 min-h-0 flex flex-col ${bg0} ${D ? 'text-slate-100' : 'text-slate-900'} border-l ${border}`}>
@@ -411,6 +453,13 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = n
             <ExternalLink className="w-3 h-3" /> OpenMAT
           </button>
         )}
+        <button
+          onClick={loadExampleProject}
+          className={`h-7 px-2 rounded border text-[10px] font-semibold transition-colors ${btnBorder} ${txt2} ${hoverBg} ${hoverTx}`}
+          title="Load the Snake demo project"
+        >
+          Demo
+        </button>
         <button onClick={run} className="h-7 inline-flex items-center gap-1 rounded-md bg-emerald-600 hover:bg-emerald-500 px-2.5 text-xs font-bold text-white transition-colors">
           <Play className="w-3 h-3" /> Run
         </button>
@@ -424,6 +473,29 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = n
           {outputIsFull ? <Columns2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
         </button>
       </header>
+
+      {/* ── Welcome / demo banner ── */}
+      {showWelcome && (
+        <div className={`shrink-0 flex items-center gap-2 px-3 py-2 border-b text-xs ${D ? 'bg-violet-950/60 border-violet-800/40' : 'bg-violet-50 border-violet-200'}`}>
+          <span className="text-lg leading-none select-none">🐍</span>
+          <span className={`flex-1 min-w-0 ${D ? 'text-violet-200' : 'text-violet-900'}`}>
+            <span className="font-bold">First time here?</span> Load the Snake demo to see the workspace in action — TypeScript, Preview, and the terminal all wired up.
+          </span>
+          <button
+            onClick={loadExampleProject}
+            className="shrink-0 px-2.5 py-1 rounded bg-violet-600 hover:bg-violet-500 text-white font-bold transition-colors"
+          >
+            Load Demo
+          </button>
+          <button
+            onClick={dismissWelcome}
+            className={`shrink-0 px-2 py-1 rounded border ${btnBorder} ${txt2} ${hoverBg} transition-colors`}
+            title="Dismiss"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       {/* ── Replace confirmation banner ── */}
       {pendingReplace && (
@@ -496,12 +568,13 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = n
                 className={`flex items-center gap-1.5 px-3 h-8 text-[11px] font-mono shrink-0 border-r ${border} transition-colors ${
                   f.id === activeId
                     ? D
-                      ? 'bg-slate-800 text-white border-t-2 border-t-sky-500'
-                      : 'bg-white text-slate-900 border-t-2 border-t-sky-500 shadow-sm'
+                      ? 'bg-slate-800 text-white border-t-2'
+                      : 'bg-white text-slate-900 border-t-2 shadow-sm'
                     : D
                       ? 'text-slate-500 hover:bg-slate-800/50 hover:text-slate-300'
                       : 'text-slate-500 hover:bg-white/80 hover:text-slate-700'
                 }`}
+                style={f.id === activeId ? { borderTopColor: accentColor } : undefined}
               >
                 <LangDot name={f.name} size={6} />
                 {f.name}
@@ -514,7 +587,7 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = n
               key={activeId}
               defaultValue={activeFile?.content ?? ''}
               language={activeFile?.language === 'openmat' ? 'plaintext' : (activeFile?.language ?? 'plaintext')}
-              theme={isDark ? 'open-calc-dark' : 'open-calc-light'}
+              theme={monacoTheme ?? (isDark ? 'open-calc-dark' : 'open-calc-light')}
               beforeMount={setupOpenCalcMonaco}
               onChange={updateContent}
               onMount={(editor) => {
@@ -566,6 +639,8 @@ export default function DocsCodeWorkspace({ activeTitle = 'Docs', pendingRun = n
                 files={files}
                 isDark={isDark}
                 onPreview={handlePreview}
+                bgColor={termBg}
+                inputBgColor={termInputBg}
               />
             </div>
 

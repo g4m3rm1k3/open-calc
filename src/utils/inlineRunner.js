@@ -197,24 +197,72 @@ export async function runTSInline(code) {
   }
 }
 
+// Plain-text marker — no null bytes, no encoding issues across Pyodide's stdout batching.
+export const PLOT_MARKER = '###OPENCALC_PLOT###'
+
+// Injected before any Python code that imports matplotlib — intercepts plt.show()
+// and converts each figure to a base64 PNG emitted as a specially-prefixed stdout line.
+export const MATPLOTLIB_SHIM = `
+try:
+    import matplotlib as _mpl
+    _mpl.use('Agg')
+    import matplotlib.pyplot as _plt
+    import io as _io, base64 as _b64
+    def _inline_show(*_a, **_kw):
+        _nums = _plt.get_fignums()
+        if not _nums:
+            return
+        for _n in _nums:
+            _fig = _plt.figure(_n)
+            if not _fig.get_axes():
+                continue
+            _buf = _io.BytesIO()
+            _fig.savefig(_buf, format='png', bbox_inches='tight', dpi=100)
+            _buf.seek(0)
+            print('###OPENCALC_PLOT###' + _b64.b64encode(_buf.read()).decode('utf-8'))
+        _plt.close('all')
+    _plt.show = _inline_show
+except ImportError:
+    pass
+`
+
 /**
  * Run Python inline via Pyodide.
- * onLine(text, type: 'output'|'error') is called for each line of stdout/stderr.
+ * onLine({ text, type }) is called for each output line.
+ * type is 'output' | 'error' | 'image' (base64 PNG for matplotlib plots).
  */
 export async function runPythonInline(code, onLine) {
   const pyodide = await getPyodide()
   await pyodide.loadPackagesFromImports(code).catch(() => {})
-  pyodide.setStdout({ batched: t => t.split('\n').forEach(l => { if (l) onLine(l, 'output') }) })
-  pyodide.setStderr({ batched: t => t.split('\n').forEach(l => { if (l) onLine(l, 'error') }) })
+
+  const hasMpl = /\bmatplotlib\b/.test(code)
+  if (hasMpl) {
+    // Ensure matplotlib package is loaded before injecting the shim
+    await pyodide.loadPackage('matplotlib').catch(() => {})
+  }
+
+  const dispatchLine = (raw) => {
+    if (!raw) return
+    if (raw.startsWith(PLOT_MARKER)) {
+      onLine({ type: 'image', src: raw.slice(PLOT_MARKER.length) })
+    } else {
+      onLine({ type: 'output', text: raw })
+    }
+  }
+
+  pyodide.setStdout({ batched: t => t.split('\n').forEach(dispatchLine) })
+  pyodide.setStderr({ batched: t => t.split('\n').forEach(l => { if (l) onLine({ type: 'error', text: l }) }) })
   await pyodide.runPythonAsync(`import sys; sys.argv = ['cell']`).catch(() => {})
+  if (hasMpl) await pyodide.runPythonAsync(MATPLOTLIB_SHIM).catch(() => {})
+
   try {
     await pyodide.runPythonAsync(code)
     return { error: null }
   } catch (e) {
     const msg = String(e)
     if (/SystemExit/.test(msg)) {
-      const code = msg.match(/SystemExit: (\d+)/)?.[1] ?? '1'
-      if (code !== '0') onLine(`Process exited with code ${code}`, 'error')
+      const exitCode = msg.match(/SystemExit: (\d+)/)?.[1] ?? '1'
+      if (exitCode !== '0') onLine({ type: 'error', text: `Process exited with code ${exitCode}` })
       return { error: null }
     }
     return { error: msg }

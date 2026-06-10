@@ -1,6 +1,7 @@
 export const STUDIO_THEMES = {
   default: {
     name: 'Default',
+    accentHex: '#0ea5e9',
     // Monaco theme depends on global isDark, handled dynamically
     monacoLight: 'open-calc-light',
     monacoDark: 'open-calc-dark',
@@ -95,6 +96,7 @@ export const STUDIO_THEMES = {
   },
   github: {
     name: 'GitHub',
+    accentHex: '#0969da',
     monacoLight: 'github-light',
     monacoDark: 'github-dark',
     dynamic: true, // Also respects global dark mode
@@ -187,6 +189,7 @@ export const STUDIO_THEMES = {
   },
   dracula: {
     name: 'Dracula',
+    accentHex: '#bd93f9',
     monacoDark: 'dracula',
     dynamic: false, // Always dark
     uiDark: {
@@ -235,6 +238,7 @@ export const STUDIO_THEMES = {
   },
   nord: {
     name: 'Nord',
+    accentHex: '#88c0d0',
     monacoDark: 'nord-dark',
     dynamic: false,
     uiDark: {
@@ -283,6 +287,7 @@ export const STUDIO_THEMES = {
   },
   monokai: {
     name: 'Monokai',
+    accentHex: '#a6e22e',
     monacoDark: 'monokai',
     dynamic: false,
     uiDark: {

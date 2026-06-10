@@ -1,6 +1,7 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { getPyodide } from '../../utils/pyodideRuntime.js'
 import { executeScript } from '../../utils/openmatEngine.js'
+import { MATPLOTLIB_SHIM, PLOT_MARKER } from '../../utils/inlineRunner.js'
 
 // ── Terminal colours ──────────────────────────────────────────────────────────
 const CLR_DARK = {
@@ -12,8 +13,8 @@ const CLR_DARK = {
   warn:    '#e2c08d',
   dim:     '#4a5568',
   cmd:     '#c586c0',
-  bg:      '#080f1a',
-  inputBg: '#0a1220',
+  bg:      '#1a1a1a',
+  inputBg: '#111111',
 }
 const CLR_LIGHT = {
   prompt:  '#16a34a',
@@ -732,8 +733,8 @@ function parseShellArgs(cmd) {
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
-const WorkspaceTerminal = forwardRef(function WorkspaceTerminal({ files = [], isDark = true, onPreview }, ref) {
-  const CLR = isDark ? CLR_DARK : CLR_LIGHT
+const WorkspaceTerminal = forwardRef(function WorkspaceTerminal({ files = [], isDark = true, onPreview, bgColor = null, inputBgColor = null }, ref) {
+  const CLR = isDark ? { ...CLR_DARK, ...(bgColor && { bg: bgColor }), ...(inputBgColor && { inputBg: inputBgColor }) } : CLR_LIGHT
   const [lines, setLines]       = useState(BANNER)
   const [input, setInput]       = useState('')
   const [cmdHist, setCmdHist]   = useState([])
@@ -801,13 +802,26 @@ const WorkspaceTerminal = forwardRef(function WorkspaceTerminal({ files = [], is
           print(`» Package warning: ${e.message}`, 'warn')
         }
 
-        // Redirect stdout/stderr line-by-line into terminal
-        pyodide.setStdout({ batched: t => t.split('\n').forEach(l => { if (l) print(l, 'output') }) })
+        // Redirect stdout/stderr — detect matplotlib plot markers and emit image lines
+        pyodide.setStdout({ batched: t => t.split('\n').forEach(l => {
+          if (!l) return
+          if (l.startsWith(PLOT_MARKER)) {
+            setLines(prev => [...prev, { type: 'image', src: l.slice(PLOT_MARKER.length) }])
+          } else {
+            print(l, 'output')
+          }
+        }) })
         pyodide.setStderr({ batched: t => t.split('\n').forEach(l => { if (l) print(l, 'error') }) })
 
         // Inject sys.argv so the script sees CLI arguments
         const argv = JSON.stringify([fname, ...args.slice(1)])
         await pyodide.runPythonAsync(`import sys; sys.argv = ${argv}`)
+
+        // Inject matplotlib shim — intercepts plt.show() and emits base64 PNGs
+        if (/\bmatplotlib\b/.test(file.content)) {
+          await pyodide.loadPackage('matplotlib').catch(() => {})
+          await pyodide.runPythonAsync(MATPLOTLIB_SHIM).catch(() => {})
+        }
 
         // Inject FastAPI / pydantic / uvicorn shim if needed
         if (/\bfastapi\b|\buvicorn\b|\bpydantic\b/.test(file.content)) {
@@ -1062,20 +1076,14 @@ const WorkspaceTerminal = forwardRef(function WorkspaceTerminal({ files = [], is
     >
       {/* Output area */}
       <div ref={outputRef} className="flex-1 overflow-y-auto p-3 custom-scrollbar">
-        {lines.map((line, i) => (
-          <div
-            key={i}
-            style={{
-              color: CLR[line.type] ?? CLR.output,
-              lineHeight: 1.6,
-              whiteSpace: 'pre-wrap',
-              wordBreak: 'break-all',
-              minHeight: '1.6em',
-            }}
-          >
-            {line.text}
-          </div>
-        ))}
+        {lines.map((line, i) =>
+          line.type === 'image'
+            ? <img key={i} src={`data:image/png;base64,${line.src}`} alt="plot"
+                style={{ display: 'block', maxWidth: '100%', height: 'auto', borderRadius: 4, margin: '6px 0', background: '#fff' }} />
+            : <div key={i} style={{ color: CLR[line.type] ?? CLR.output, lineHeight: 1.6, whiteSpace: 'pre-wrap', wordBreak: 'break-all', minHeight: '1.6em' }}>
+                {line.text}
+              </div>
+        )}
       </div>
 
       {/* Input row */}

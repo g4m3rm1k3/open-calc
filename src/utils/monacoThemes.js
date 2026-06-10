@@ -76,7 +76,200 @@ export function setupOpenCalcMonaco(monaco) {
     },
   });
 
+  monaco.editor.defineTheme("github-light", {
+    base: "vs",
+    inherit: true,
+    rules: [
+      { token: "comment", foreground: "6e7781", fontStyle: "italic" },
+      { token: "keyword", foreground: "cf222e", fontStyle: "bold" },
+      { token: "string", foreground: "0a3069" },
+      { token: "number", foreground: "0550ae" },
+      { token: "type", foreground: "953800" },
+    ],
+    colors: {
+      "editor.background": "#ffffff",
+      "editor.foreground": "#24292f",
+      "editorLineNumber.foreground": "#8c959f",
+      "editorLineNumber.activeForeground": "#24292f",
+      "editorCursor.foreground": "#0969da",
+      "editor.selectionBackground": "#0969da33",
+      "editor.lineHighlightBackground": "#f6f8fa",
+      "editorWidget.background": "#ffffff",
+      "editorWidget.border": "#d0d7de",
+    },
+  });
+
+  monaco.editor.defineTheme("github-dark", {
+    base: "vs-dark",
+    inherit: true,
+    rules: [
+      { token: "comment", foreground: "8b949e", fontStyle: "italic" },
+      { token: "keyword", foreground: "ff7b72", fontStyle: "bold" },
+      { token: "string", foreground: "a5d6ff" },
+      { token: "number", foreground: "79c0ff" },
+      { token: "type", foreground: "ffa657" },
+    ],
+    colors: {
+      "editor.background": "#0d1117",
+      "editor.foreground": "#c9d1d9",
+      "editorLineNumber.foreground": "#6e7681",
+      "editorLineNumber.activeForeground": "#c9d1d9",
+      "editorCursor.foreground": "#58a6ff",
+      "editor.selectionBackground": "#388bfd33",
+      "editor.lineHighlightBackground": "#161b22",
+      "editorWidget.background": "#161b22",
+      "editorWidget.border": "#30363d",
+    },
+  });
+
+  monaco.editor.defineTheme("dracula", {
+    base: "vs-dark",
+    inherit: true,
+    rules: [
+      { token: "comment", foreground: "6272a4", fontStyle: "italic" },
+      { token: "keyword", foreground: "ff79c6", fontStyle: "bold" },
+      { token: "string", foreground: "f1fa8c" },
+      { token: "number", foreground: "bd93f9" },
+      { token: "type", foreground: "8be9fd" },
+      { token: "function", foreground: "50fa7b" },
+      { token: "variable", foreground: "f8f8f2" },
+    ],
+    colors: {
+      "editor.background": "#282a36",
+      "editor.foreground": "#f8f8f2",
+      "editorLineNumber.foreground": "#6272a4",
+      "editorLineNumber.activeForeground": "#f8f8f2",
+      "editorCursor.foreground": "#f8f8f2",
+      "editor.selectionBackground": "#44475a",
+      "editor.lineHighlightBackground": "#44475a66",
+      "editorWidget.background": "#21222c",
+      "editorWidget.border": "#6272a4",
+    },
+  });
+
+  monaco.editor.defineTheme("nord-dark", {
+    base: "vs-dark",
+    inherit: true,
+    rules: [
+      { token: "comment", foreground: "4c566a", fontStyle: "italic" },
+      { token: "keyword", foreground: "81a1c1", fontStyle: "bold" },
+      { token: "string", foreground: "a3be8c" },
+      { token: "number", foreground: "b48ead" },
+      { token: "type", foreground: "8fbcbb" },
+      { token: "function", foreground: "88c0d0" },
+    ],
+    colors: {
+      "editor.background": "#2e3440",
+      "editor.foreground": "#d8dee9",
+      "editorLineNumber.foreground": "#4c566a",
+      "editorLineNumber.activeForeground": "#d8dee9",
+      "editorCursor.foreground": "#88c0d0",
+      "editor.selectionBackground": "#434c5e",
+      "editor.lineHighlightBackground": "#3b4252",
+      "editorWidget.background": "#3b4252",
+      "editorWidget.border": "#434c5e",
+    },
+  });
+
+  monaco.editor.defineTheme("monokai", {
+    base: "vs-dark",
+    inherit: true,
+    rules: [
+      { token: "comment", foreground: "75715e", fontStyle: "italic" },
+      { token: "keyword", foreground: "f92672", fontStyle: "bold" },
+      { token: "string", foreground: "e6db74" },
+      { token: "number", foreground: "ae81ff" },
+      { token: "type", foreground: "66d9ef" },
+      { token: "function", foreground: "a6e22e" },
+    ],
+    colors: {
+      "editor.background": "#272822",
+      "editor.foreground": "#f8f8f2",
+      "editorLineNumber.foreground": "#75715e",
+      "editorLineNumber.activeForeground": "#f8f8f2",
+      "editorCursor.foreground": "#f8f8f2",
+      "editor.selectionBackground": "#49483e",
+      "editor.lineHighlightBackground": "#3e3d32",
+      "editorWidget.background": "#1e1f1c",
+      "editorWidget.border": "#75715e",
+    },
+  });
+
+  monaco.editor.defineTheme("tokyo-night", {
+    base: "vs-dark",
+    inherit: true,
+    rules: [
+      { token: "comment", foreground: "565f89", fontStyle: "italic" },
+      { token: "keyword", foreground: "bb9af7", fontStyle: "bold" },
+      { token: "string", foreground: "9ece6a" },
+      { token: "number", foreground: "ff9e64" },
+      { token: "type", foreground: "2ac3de" },
+      { token: "function", foreground: "7aa2f7" },
+    ],
+    colors: {
+      "editor.background": "#1a1b26",
+      "editor.foreground": "#a9b1d6",
+      "editorLineNumber.foreground": "#3b4261",
+      "editorLineNumber.activeForeground": "#737aa2",
+      "editorCursor.foreground": "#c0caf5",
+      "editor.selectionBackground": "#283457",
+      "editor.lineHighlightBackground": "#1f2335",
+      "editorWidget.background": "#1f2335",
+      "editorWidget.border": "#3b4261",
+    },
+  });
+
+  monaco.editor.defineTheme("one-dark", {
+    base: "vs-dark",
+    inherit: true,
+    rules: [
+      { token: "comment", foreground: "5c6370", fontStyle: "italic" },
+      { token: "keyword", foreground: "c678dd", fontStyle: "bold" },
+      { token: "string", foreground: "98c379" },
+      { token: "number", foreground: "d19a66" },
+      { token: "type", foreground: "56b6c2" },
+      { token: "function", foreground: "61afef" },
+    ],
+    colors: {
+      "editor.background": "#282c34",
+      "editor.foreground": "#abb2bf",
+      "editorLineNumber.foreground": "#4b5263",
+      "editorLineNumber.activeForeground": "#abb2bf",
+      "editorCursor.foreground": "#528bff",
+      "editor.selectionBackground": "#3e4451",
+      "editor.lineHighlightBackground": "#2c313a",
+      "editorWidget.background": "#21252b",
+      "editorWidget.border": "#181a1f",
+    },
+  });
+
+  monaco.editor.defineTheme("solarized-dark", {
+    base: "vs-dark",
+    inherit: true,
+    rules: [
+      { token: "comment", foreground: "586e75", fontStyle: "italic" },
+      { token: "keyword", foreground: "859900", fontStyle: "bold" },
+      { token: "string", foreground: "2aa198" },
+      { token: "number", foreground: "d33682" },
+      { token: "type", foreground: "268bd2" },
+      { token: "function", foreground: "b58900" },
+    ],
+    colors: {
+      "editor.background": "#002b36",
+      "editor.foreground": "#839496",
+      "editorLineNumber.foreground": "#586e75",
+      "editorLineNumber.activeForeground": "#839496",
+      "editorCursor.foreground": "#839496",
+      "editor.selectionBackground": "#073642",
+      "editor.lineHighlightBackground": "#073642",
+      "editorWidget.background": "#073642",
+      "editorWidget.border": "#586e75",
+    },
+  });
+
+
   monaco.editor.defineTheme("openmat-dark", {
+
     base: "vs-dark",
     inherit: true,
     rules: [
