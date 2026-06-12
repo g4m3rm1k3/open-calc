@@ -677,7 +677,7 @@ export default function AppShell({ children }) {
   const isDSAArraysLabRoute = location.pathname.startsWith("/dsa-arrays-lab");
   const isDSALinkedListsLabRoute = location.pathname.startsWith("/dsa-linked-lists-lab");
   const isCodeLensRoute = location.pathname.startsWith("/codelens");
-  const isLearnRoute = location.pathname.startsWith("/learn");
+  const isLearnRoute = location.pathname.startsWith("/learn") || location.pathname.startsWith("/web-learn");
   
   const pathParts = location.pathname.split('/').filter(Boolean);
   const isLessonRoute = pathParts[0] === 'chapter' && pathParts.length >= 3;

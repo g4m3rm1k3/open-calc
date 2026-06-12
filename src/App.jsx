@@ -48,6 +48,7 @@ const RobotArmLabPage = lazy(() => import("./pages/RobotArmLabPage.jsx"));
 const LinearAlgebraReferencePage = lazy(() => import("./pages/LinearAlgebraReferencePage.jsx"));
 const DroneLabPage = lazy(() => import("./pages/DroneLabPage.jsx"));
 const SimLabPage = lazy(() => import("./pages/SimLabPage.jsx"));
+const WebLearnPage = lazy(() => import("./pages/WebLearnPage.jsx"));
 const MatrixLabPage = lazy(() => import("./pages/MatrixLabPage.jsx"));
 const Matrix3DLabPage = lazy(() => import("./pages/Matrix3DLabPage.jsx"));
 const DecompLabPage = lazy(() => import("./pages/DecompLabPage.jsx"));
@@ -133,6 +134,11 @@ export default function App() {
                     <Route path="robot-arm-lab" element={<RobotArmLabPage />} />
                     <Route path="drone-lab" element={<DroneLabPage />} />
                     <Route path="sim-lab" element={<SimLabPage />} />
+                    
+                    {/* Web Learn Curriculums */}
+                    <Route path="web-learn/:series/:lessonId" element={<WebLearnPage />} />
+                    <Route path="web-learn/:series" element={<WebLearnPage />} />
+                    
                     <Route path="matrix-lab" element={<MatrixLabPage />} />
                     <Route path="matrix-3d-lab" element={<Matrix3DLabPage />} />
                     <Route path="decomp-lab" element={<DecompLabPage />} />

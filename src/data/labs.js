@@ -1,5 +1,15 @@
 export const LABS = [
   {
+    key: 'web-lab',
+    label: 'Web Sandbox',
+    emoji: '🌐',
+    color: 'indigo',
+    desc: 'Interactive web development sandbox. Learn React elements and state interactively, from scratch.',
+    path: '/web-learn/sandbox',
+    tags: ['Web', 'React', 'HTML'],
+    cover: { grad: 'from-indigo-600 via-purple-700 to-indigo-950', mark: '</>', sub: 'React · HTML · JS' },
+  },
+  {
     key: 'sim-lab',
     label: 'Sim Lab',
     emoji: '🔭',
