@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import Editor from '@monaco-editor/react'
 import {
   Play, Pause, ChevronRight, ChevronLeft, ChevronDown, RotateCcw,
-  ExternalLink, CheckCircle, XCircle, Terminal, Lightbulb, Check,
+  ExternalLink, CheckCircle, XCircle, Terminal, Lightbulb, Check, Code2
 } from 'lucide-react'
 import { useSpeech } from '../../utils/useSpeech.js'
 
@@ -95,42 +95,42 @@ function ProgressBar({ checkpoints, reachedCp, onJump }) {
 function OutputPanel({ logs, error, challengeResult, expectedOutput, testDetail }) {
   const borderColor = challengeResult === 'pass' ? 'border-l-2 border-l-green-500' : challengeResult === 'fail' ? 'border-l-2 border-l-red-500' : ''
   return (
-    <div className={`flex flex-col h-full bg-[#070b13] border-l border-slate-800 ${borderColor}`}>
-      <div className="flex items-center gap-2 px-3 py-2 border-b border-slate-800">
+    <div className={`flex flex-col h-full bg-[#050505] border-t border-white/10 ${borderColor}`}>
+      <div className="flex items-center gap-2 px-4 py-2 border-b border-white/5 bg-black/40">
         <Terminal size={14} className="text-slate-500" />
-        <span className="text-xs text-slate-500 font-mono">Output</span>
+        <span className="text-xs text-slate-500 font-mono tracking-wide uppercase">Output Console</span>
         {challengeResult === 'pass' && (
-          <span className="ml-auto flex items-center gap-1 text-xs text-green-400">
+          <span className="ml-auto flex items-center gap-1 text-xs text-emerald-400 font-bold">
             <CheckCircle size={12} /> Correct
           </span>
         )}
         {challengeResult === 'fail' && (
-          <span className="ml-auto flex items-center gap-1 text-xs text-red-400">
+          <span className="ml-auto flex items-center gap-1 text-xs text-red-400 font-bold">
             <XCircle size={12} /> Try again
           </span>
         )}
       </div>
-      <div className="flex-1 overflow-y-auto p-3 font-mono text-sm">
+      <div className="flex-1 overflow-y-auto p-4 font-mono text-[12px] bg-[#050505] shadow-[inset_0_10px_20px_-10px_rgba(0,0,0,0.5)]">
         {logs.map((line, i) => (
-          <div key={i} className={`leading-relaxed ${line.startsWith('[error]') || line.startsWith('[warn]') ? 'text-red-400' : 'text-green-300'}`}>
+          <div key={i} className={`leading-relaxed ${line.startsWith('[error]') || line.startsWith('[warn]') ? 'text-red-400' : 'text-emerald-300'}`}>
             {line}
           </div>
         ))}
         {error && <div className="text-red-400 mt-1">{error}</div>}
         {!logs.length && !error && <div className="text-slate-600 italic">Run code to see output</div>}
         {challengeResult === 'fail' && testDetail && (
-          <div className="mt-3 pt-3 border-t border-slate-800">
-            <div className="text-slate-500 text-xs mb-1">Test results</div>
+          <div className="mt-4 pt-4 border-t border-white/10">
+            <div className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-2">Test results</div>
             {testDetail.split('\n').map((line, i) => (
-              <div key={i} className={`font-mono text-xs leading-relaxed ${line.includes('✗') ? 'text-red-400' : 'text-green-400'}`}>
+              <div key={i} className={`font-mono text-xs leading-relaxed ${line.includes('✗') ? 'text-red-400' : 'text-emerald-400'}`}>
                 {line}
               </div>
             ))}
           </div>
         )}
         {challengeResult === 'fail' && !testDetail && expectedOutput && (
-          <div className="mt-3 pt-3 border-t border-slate-800">
-            <div className="text-slate-500 text-xs mb-1">Expected</div>
+          <div className="mt-4 pt-4 border-t border-white/10">
+            <div className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-2">Expected Output</div>
             <div className="text-cyan-300">{expectedOutput}</div>
           </div>
         )}
@@ -431,41 +431,40 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle, series
   // ── Render ────────────────────────────────────────────────────────────────────
 
   return (
-    <div className="flex flex-col h-screen bg-[#08111f] text-slate-100 overflow-hidden">
+    <div className="flex flex-col h-screen bg-[#050505] text-slate-100 overflow-hidden font-sans selection:bg-indigo-500/30">
 
-      {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-2.5 border-b border-slate-800 bg-[#080c14] shrink-0">
-        <button onClick={onBack} className="flex items-center gap-1.5 text-slate-400 hover:text-white transition-colors text-sm">
-          <ChevronLeft size={16} />
+      {/* 1. Header (Nav + Title + Progress) */}
+      <div className="flex items-center gap-4 px-4 py-2 border-b border-white/10 bg-black/50 backdrop-blur-md shrink-0 z-50">
+        <button onClick={onBack} className="flex items-center gap-1 text-slate-400 hover:text-white transition-all text-xs font-medium hover:-translate-x-0.5 shrink-0">
+          <ChevronLeft size={14} />
           <span>Labs</span>
         </button>
-        <div className="w-px h-4 bg-slate-700" />
+        <div className="w-px h-4 bg-white/10 shrink-0" />
 
-        {/* Lesson title / series dropdown */}
-        <div className="flex flex-col min-w-0 relative" ref={lessonMenuRef}>
-          <span className="text-[10px] text-slate-500 uppercase tracking-widest">{lesson.series.title}</span>
+        <div className="flex flex-col min-w-0 relative max-w-[200px]" ref={lessonMenuRef}>
+          <span className="text-[9px] text-indigo-400/80 uppercase tracking-widest font-bold mb-0.5 truncate">{lesson.series.title}</span>
           <button
             onClick={() => setLessonMenuOpen(o => !o)}
-            className="flex items-center gap-1 text-sm font-semibold text-slate-100 hover:text-cyan-300 transition-colors text-left"
+            className="flex items-center gap-1.5 text-sm font-semibold text-white hover:text-indigo-300 transition-colors text-left"
           >
-            <span className="truncate max-w-56">{lesson.title}</span>
-            {seriesLessons?.length > 1 && <ChevronDown size={12} className="shrink-0 text-slate-500" />}
+            <span className="truncate">{lesson.title}</span>
+            {seriesLessons?.length > 1 && <ChevronDown size={14} className="shrink-0 text-slate-500" />}
           </button>
 
           {lessonMenuOpen && seriesLessons?.length > 0 && (
-            <div className="absolute top-full left-0 mt-1 z-50 bg-[#0d1624] border border-slate-700 rounded-lg shadow-2xl min-w-72 py-1 max-h-80 overflow-y-auto">
+            <div className="absolute top-full left-0 mt-2 z-50 bg-[#0a0a0a] border border-white/10 rounded-xl shadow-2xl min-w-72 py-2 max-h-80 overflow-y-auto backdrop-blur-xl">
               {seriesLessons.map(l => (
                 <button
                   key={l.id}
                   onClick={() => { setLessonMenuOpen(false); onJumpToLesson?.(l.path) }}
-                  className={`w-full text-left px-3 py-2 text-sm flex items-center gap-2 transition-colors ${
+                  className={`w-full text-left px-4 py-3 text-sm flex items-center gap-3 transition-colors ${
                     l.active
-                      ? 'text-cyan-400 bg-cyan-500/10'
-                      : 'text-slate-300 hover:bg-slate-700/60'
+                      ? 'text-indigo-400 bg-indigo-500/10 font-medium'
+                      : 'text-slate-300 hover:bg-white/5'
                   }`}
                 >
-                  <span className="w-4 shrink-0">
-                    {l.active && <Check size={12} />}
+                  <span className="w-4 shrink-0 flex justify-center">
+                    {l.active && <Check size={14} />}
                   </span>
                   <span className="truncate">{l.title}</span>
                 </button>
@@ -475,213 +474,208 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle, series
         </div>
 
         <div className="flex-1" />
-        <ProgressBar checkpoints={lesson.checkpoints} reachedCp={reachedCp} onJump={jumpToCheckpoint} />
+        <div className="hidden xl:block">
+          <ProgressBar checkpoints={lesson.checkpoints} reachedCp={reachedCp} onJump={jumpToCheckpoint} />
+        </div>
         <div className="flex-1" />
-        <button onClick={handleRestart} className="text-slate-500 hover:text-slate-300 transition-colors" title="Restart lesson">
-          <RotateCcw size={15} />
+
+        <button onClick={handleRestart} className="flex items-center justify-center w-7 h-7 rounded-full hover:bg-white/10 text-slate-500 hover:text-white transition-all shrink-0" title="Restart lesson">
+          <RotateCcw size={14} />
         </button>
       </div>
 
-      {/* Editor + Output */}
-      <div className="flex flex-1 overflow-hidden">
+      {/* 2. Transport & Narration Area */}
+      <div className="flex flex-col border-b border-white/10 bg-[#080808] shrink-0">
+        
+        {/* Controls Bar */}
+        <div className="flex items-center gap-3 px-4 py-2 border-b border-white/5 bg-black/40">
+          {/* Play/Pause/Next */}
+          <div className="flex items-center gap-1.5">
+            {phase === 'playing' ? (
+              <button onClick={handlePause} className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-white transition-all shadow-md hover:scale-105 border border-white/5" title="Pause">
+                <Pause size={14} className="fill-white" />
+              </button>
+            ) : phase === 'idle' && !isChallenge && !isCodeLens ? (
+              <button onClick={handlePlay} className="flex items-center justify-center gap-2 px-4 py-1.5 rounded-full bg-white text-black hover:bg-slate-200 text-xs font-bold transition-all shadow-[0_0_15px_rgba(255,255,255,0.2)] hover:scale-105">
+                <Play size={12} className="fill-black" /> Play
+              </button>
+            ) : phase === 'paused' && !isChallenge && !isCodeLens ? (
+              <div className="flex items-center gap-1.5">
+                <button onClick={() => runFrom(segIdx)} className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-white transition-all shadow-md hover:scale-105 border border-white/5" title="Replay">
+                  <RotateCcw size={12} />
+                </button>
+                <button onClick={() => runFrom(segIdx + 1)} className="flex items-center justify-center w-8 h-8 rounded-full bg-white text-black hover:bg-slate-200 transition-all shadow-[0_0_10px_rgba(255,255,255,0.2)] hover:scale-105" title="Next">
+                  <ChevronRight size={16} />
+                </button>
+              </div>
+            ) : null}
 
-        {/* Editor pane */}
-        <div className="flex flex-col w-1/2 border-r border-slate-800">
-          <div className="flex items-center gap-2 px-3 py-2 border-b border-slate-800 bg-[#080c14]">
-            <div className="flex gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-red-500/50" />
-              <div className="w-3 h-3 rounded-full bg-yellow-500/50" />
-              <div className="w-3 h-3 rounded-full bg-green-500/50" />
-            </div>
-            <span className="text-xs text-slate-500 font-mono ml-1">script.js</span>
-            <div className="flex-1" />
-            {code.trim() && (
-              <button
-                onClick={handleOpenCodeLens}
-                title="Visualise this code step-by-step in CodeLens"
-                className="flex items-center gap-1.5 px-3 py-1 rounded-md bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition-colors shadow shadow-cyan-900/40"
-              >
-                <ExternalLink size={11} />
-                Open in CodeLens
+            {isChallenge && challengeResult === 'pass' && (
+              <button onClick={() => { setChallengeResult(null); setTestDetail(null); setHint(false); runFrom(segIdx + 1) }} className="flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-bold transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:scale-105">
+                Continue <ChevronRight size={14} />
               </button>
             )}
-            <button
-              onClick={handleRun}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-green-700/80 hover:bg-green-600 text-white text-xs font-semibold transition-colors"
-            >
-              <Play size={11} />
-              Run
-            </button>
+            {isChallenge && challengeResult !== 'pass' && (
+              <button onClick={() => { setChallengeResult(null); setTestDetail(null); setHint(false); runFrom(segIdx + 1) }} className="text-[9px] text-slate-500 hover:text-slate-300 transition-colors uppercase tracking-widest font-bold ml-2">
+                Skip
+              </button>
+            )}
+            {isCodeLens && (
+              <button onClick={() => runFrom(segIdx + 1)} className="text-[9px] text-slate-500 hover:text-slate-300 transition-colors uppercase tracking-widest font-bold ml-2">
+                Skip
+              </button>
+            )}
           </div>
-          <div className="flex-1 overflow-hidden">
-            <Editor
-              height="100%"
-              language="javascript"
-              theme="vs-dark"
-              value={code}
-              onChange={setCode}
-              onMount={(editor, monaco) => {
-                editorRef.current = editor
-                monacoRef.current = monaco
-              }}
-              options={{
-                fontSize: 13,
-                fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
-                minimap: { enabled: false },
-                lineNumbers: 'on',
-                scrollBeyondLastLine: false,
-                padding: { top: 12 },
-                folding: false,
-                contextmenu: false,
-              }}
-            />
+
+          <div className="text-[9px] text-slate-500 font-mono tracking-widest uppercase ml-2">
+            {Math.min(segIdx + 1, segments.length)} / {segments.length}
           </div>
+
+          <div className="flex-1" />
+
+          {/* Run Button */}
+          <button onClick={() => handleRun()} className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-indigo-500 hover:bg-indigo-400 text-white hover:scale-105 text-xs font-bold transition-all shadow-[0_0_15px_rgba(99,102,241,0.3)]">
+            <Play size={10} className="fill-white" />
+            Run
+          </button>
         </div>
 
-        {/* Output pane */}
-        <div className="flex flex-col w-1/2">
-          <OutputPanel
-            logs={logs}
-            error={runError}
-            challengeResult={isChallenge ? challengeResult : null}
-            expectedOutput={isChallenge && challengeResult === 'fail' ? currentSeg?.expectedOutput : null}
-            testDetail={isChallenge && challengeResult === 'fail' ? testDetail : null}
+        {/* Text Area */}
+        <div className="px-5 py-3 min-h-[60px] max-h-[25vh] overflow-y-auto">
+          {isChallenge && (
+            <div className="p-3 rounded-lg bg-amber-500/5 border border-amber-500/20 shadow-inner">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-amber-500/20 flex items-center justify-center border border-amber-500/30 shadow-[0_0_10px_rgba(245,158,11,0.2)]">
+                  <span className="text-amber-400 text-xs font-bold">C</span>
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm text-slate-200 leading-relaxed font-medium tracking-tight">{currentSeg.text.replace(/^Challenge\.\s*/i, '')}</p>
+                  {currentSeg.hint && (
+                    <div className="mt-2">
+                      <button onClick={() => setHint(h => !h)} className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-amber-500/70 hover:text-amber-400 transition-colors">
+                        <Lightbulb size={12} /> {hint ? 'Hide Hint' : 'Show Hint'}
+                      </button>
+                      {hint && <p className="mt-2 text-[11px] text-amber-300 font-mono bg-amber-950/40 p-2 rounded border border-amber-900/50 leading-relaxed">{currentSeg.hint}</p>}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {isCodeLens && (
+            <div className="p-3 rounded-lg bg-indigo-500/10 border border-indigo-500/20 shadow-inner flex flex-col gap-3">
+              <div className="flex items-center gap-3">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center border border-indigo-500/30">
+                  <ExternalLink size={14} className="text-indigo-400" />
+                </div>
+                <p className="flex-1 text-sm text-slate-200 leading-relaxed font-medium tracking-tight">{currentSeg.text}</p>
+              </div>
+              <button
+                onClick={handleOpenCodeLens}
+                className="flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-full bg-indigo-500 hover:bg-indigo-400 text-white text-xs font-bold transition-all shadow-[0_0_15px_rgba(99,102,241,0.4)] hover:scale-105 w-fit"
+              >
+                Open in CodeLens <ChevronRight size={14} />
+              </button>
+            </div>
+          )}
+
+          {(phase === 'playing' || phase === 'paused') && currentSeg?.type === 'narration' && (
+            <p className="text-[15px] text-slate-200 leading-relaxed tracking-tight font-medium">{currentSeg.text}</p>
+          )}
+
+          {phase === 'done' && (
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+                  <CheckCircle size={16} className="text-emerald-400" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-base font-bold text-emerald-400">Lesson Complete!</h3>
+                  <p className="text-slate-400 text-xs mt-0.5">Amazing work. You're ready to move on.</p>
+                </div>
+              </div>
+              {onNext && (
+                <button
+                  onClick={onNext}
+                  className="flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-white text-black hover:bg-slate-200 text-xs font-bold transition-all hover:scale-105 shadow-[0_0_15px_rgba(255,255,255,0.2)] w-fit"
+                >
+                  {nextTitle ? `Next: ${nextTitle}` : 'Next Lesson'} <ChevronRight size={14} />
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* 3. Editor Pane */}
+      <div className="flex-1 flex flex-col min-h-0 bg-[#050505]">
+        <div className="flex items-center gap-3 px-4 py-2 border-b border-white/10 bg-black/40 z-10 shrink-0">
+          <span className="text-xs text-slate-400 font-mono flex items-center gap-2">
+            <Code2 size={14} className="text-indigo-400" />
+            script.js
+          </span>
+          <div className="flex-1" />
+          {code.trim() && (
+            <button
+              onClick={handleOpenCodeLens}
+              title="Visualise this code step-by-step in CodeLens"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 text-[10px] font-bold transition-all border border-indigo-500/20"
+            >
+              <ExternalLink size={12} />
+              CodeLens
+            </button>
+          )}
+        </div>
+        <div className="flex-1 overflow-hidden relative">
+          <Editor
+            height="100%"
+            language="javascript"
+            theme="ocean"
+            value={code}
+            onChange={setCode}
+            beforeMount={(monaco) => {
+              monaco.editor.defineTheme('ocean', {
+                base: 'vs-dark',
+                inherit: true,
+                rules: [
+                  { background: '050505' }
+                ],
+                colors: {
+                  'editor.background': '#050505',
+                  'editor.lineHighlightBackground': '#111111',
+                  'editorLineNumber.foreground': '#333333',
+                  'editorIndentGuide.background': '#111111',
+                }
+              })
+            }}
+            onMount={(editor, monaco) => {
+              editorRef.current = editor
+              monacoRef.current = monaco
+            }}
+            options={{
+              fontSize: 13,
+              fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
+              minimap: { enabled: false },
+              lineNumbers: 'on',
+              scrollBeyondLastLine: false,
+              padding: { top: 12, bottom: 24 },
+              folding: false,
+              contextmenu: false,
+            }}
           />
         </div>
       </div>
 
-      {/* Bottom strip */}
-      <div className="shrink-0 border-t border-slate-800 bg-[#080c14]">
-
-        {/* Challenge prompt */}
-        {isChallenge && (
-          <div className="px-4 py-3 border-b border-slate-800">
-            <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-5 h-5 mt-0.5 rounded-full bg-amber-500/20 flex items-center justify-center">
-                <span className="text-amber-400 text-[10px] font-bold">C</span>
-              </div>
-              <p className="flex-1 text-sm text-slate-200">{currentSeg.text.replace(/^Challenge\.\s*/i, '')}</p>
-              {currentSeg.hint && (
-                <button onClick={() => setHint(h => !h)} className="flex items-center gap-1 text-xs text-slate-500 hover:text-cyan-400 transition-colors shrink-0">
-                  <Lightbulb size={13} />
-                  Hint
-                </button>
-              )}
-            </div>
-            {hint && currentSeg.hint && (
-              <p className="mt-1.5 ml-8 text-xs text-cyan-400 font-mono">{currentSeg.hint}</p>
-            )}
-          </div>
-        )}
-
-        {/* CodeLens invite */}
-        {isCodeLens && (
-          <div className="px-4 py-4 border-b border-cyan-900/40 bg-cyan-950/30">
-            <div className="flex items-center gap-4">
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center">
-                <ExternalLink size={15} className="text-cyan-400" />
-              </div>
-              <p className="flex-1 text-sm text-slate-200 leading-relaxed">{currentSeg.text}</p>
-              <button
-                onClick={handleOpenCodeLens}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-bold transition-all shadow-lg shadow-cyan-900/50 hover:shadow-cyan-700/50 shrink-0 hover:scale-105"
-              >
-                <ExternalLink size={14} />
-                Open in CodeLens →
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Narration text — stays visible while playing AND while paused on this segment */}
-        {(phase === 'playing' || phase === 'paused') && currentSeg?.type === 'narration' && (
-          <div className="px-4 py-3 border-b border-slate-800">
-            <p className="text-sm text-slate-300 leading-relaxed">{currentSeg.text}</p>
-          </div>
-        )}
-
-        {/* Done */}
-        {phase === 'done' && (
-          <div className="px-4 py-3 border-b border-slate-800 flex items-center gap-4">
-            <div className="flex items-center gap-2 text-green-400 text-sm">
-              <CheckCircle size={15} />
-              Lesson complete — great work!
-            </div>
-            {onNext && (
-              <button
-                onClick={onNext}
-                className="ml-auto flex items-center gap-2 px-3 py-1.5 rounded bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-medium transition-colors"
-              >
-                {nextTitle ? `Next: ${nextTitle}` : 'Next Lesson'}
-                <ChevronRight size={14} />
-              </button>
-            )}
-          </div>
-        )}
-
-        {/* Transport */}
-        <div className="flex items-center gap-3 px-4 py-2.5">
-
-          {phase === 'playing' ? (
-            <button onClick={handlePause} className="flex items-center gap-2 px-3 py-1.5 rounded bg-slate-700 hover:bg-slate-600 text-white text-sm transition-colors">
-              <Pause size={14} /> Pause
-            </button>
-          ) : phase === 'idle' && !isChallenge && !isCodeLens ? (
-            <button onClick={handlePlay} className="flex items-center gap-2 px-3 py-1.5 rounded bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-medium transition-colors">
-              <Play size={14} /> Play
-            </button>
-          ) : phase === 'paused' && !isChallenge && !isCodeLens ? (
-            <>
-              <button
-                onClick={() => runFrom(segIdx)}
-                className="flex items-center gap-2 px-3 py-1.5 rounded bg-slate-700 hover:bg-slate-600 text-white text-sm transition-colors"
-                title="Replay this segment from the beginning"
-              >
-                <RotateCcw size={13} /> Replay
-              </button>
-              <button
-                onClick={() => runFrom(segIdx + 1)}
-                className="flex items-center gap-2 px-3 py-1.5 rounded bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-medium transition-colors"
-                title="Move to the next segment"
-              >
-                Next <ChevronRight size={14} />
-              </button>
-            </>
-          ) : null}
-
-          {isChallenge && challengeResult === 'pass' && (
-            <button
-              onClick={() => { setChallengeResult(null); setTestDetail(null); setHint(false); runFrom(segIdx + 1) }}
-              className="flex items-center gap-2 px-3 py-1.5 rounded bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-medium transition-colors"
-            >
-              Continue <ChevronRight size={14} />
-            </button>
-          )}
-
-          {isChallenge && challengeResult !== 'pass' && (
-            <button
-              onClick={() => { setChallengeResult(null); setTestDetail(null); setHint(false); runFrom(segIdx + 1) }}
-              className="text-xs text-slate-600 hover:text-slate-400 transition-colors"
-            >
-              Skip challenge
-            </button>
-          )}
-
-          {isCodeLens && (
-            <button
-              onClick={() => runFrom(segIdx + 1)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded bg-slate-700 hover:bg-slate-600 text-white text-sm transition-colors"
-            >
-              Continue without CodeLens <ChevronRight size={14} />
-            </button>
-          )}
-
-          <div className="flex-1" />
-
-          <span className="text-xs text-slate-600 font-mono">
-            {Math.min(segIdx + 1, segments.length)} / {segments.length}
-          </span>
-        </div>
+      {/* 4. Output Pane (Bottom) */}
+      <div className="h-1/3 shrink-0 flex flex-col bg-[#050505]">
+        <OutputPanel
+          logs={logs}
+          error={runError}
+          challengeResult={isChallenge ? challengeResult : null}
+          expectedOutput={isChallenge && challengeResult === 'fail' ? currentSeg?.expectedOutput : null}
+          testDetail={isChallenge && challengeResult === 'fail' ? testDetail : null}
+        />
       </div>
     </div>
   )
