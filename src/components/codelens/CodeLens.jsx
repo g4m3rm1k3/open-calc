@@ -392,9 +392,18 @@ function StackFrame({ frame, depth }) {
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export default function CodeLens({ onBack, initialCode }) {
-  const [lang, setLang]             = useState('js')   // 'js' | 'py'
-  const [source, setSource]         = useState(initialCode ?? STARTER)
+export default function CodeLens({ onBack, initialCode, initialLang }) {
+  const [lang, setLang]             = useState(() => {
+    if (initialLang === 'ts') return 'ts'
+    if (initialLang === 'py') return 'py'
+    return 'js'
+  })
+  const [source, setSource]         = useState(() => {
+    if (initialCode) return initialCode
+    if (initialLang === 'ts') return STARTER_TS
+    if (initialLang === 'py') return STARTER_PY
+    return STARTER
+  })
   const [model, setModel]           = useState(null)
   const [execution, setExecution]   = useState(null)
   const [step, setStep]             = useState(0)

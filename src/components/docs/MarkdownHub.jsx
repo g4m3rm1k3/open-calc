@@ -211,10 +211,41 @@ function useIsDark() {
   return dark
 }
 
-const DocsCtx = createContext({ isDark: false, onRun: null, codeAlongOpen: false, activeFile: null, onDocLink: null })
+const DocsCtx = createContext({ isDark: false, onRun: null, codeAlongOpen: false, activeFile: null, onDocLink: null, onNavigate: null })
+
+// ── "Open With" helpers ───────────────────────────────────────────────────────
+
+function openInOpenMat(code, fileName) {
+  try {
+    const docs = (() => {
+      try { return JSON.parse(localStorage.getItem('openmat-documents') || '[]') } catch { return [] }
+    })()
+    const id = `doc-studio-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+    const name = fileName || 'studio-import.m'
+    const updated = Array.isArray(docs) ? [...docs, { id, name, code }] : [{ id, name, code }]
+    localStorage.setItem('openmat-documents', JSON.stringify(updated))
+    localStorage.setItem('openmat-active-document-id', JSON.stringify(id))
+    window.location.href = '/#/openmat'
+  } catch (e) {
+    console.error('Failed to hand off to OpenMAT:', e)
+  }
+}
+
+const CODELENS_LANG_MAP = { javascript: 'js', js: 'js', typescript: 'ts', ts: 'ts', python: 'py', py: 'py' }
+
+function openInCodeLens(code, language, navigateFn) {
+  try {
+    const clLang = CODELENS_LANG_MAP[language] ?? 'js'
+    const payload = { code, lang: clLang, ts: Date.now() }
+    localStorage.setItem('codelens-handoff', JSON.stringify(payload))
+    navigateFn('/codelens')
+  } catch (e) {
+    console.error('Failed to hand off to CodeLens:', e)
+  }
+}
 
 function MdCodeBlock({ language, code }) {
-  const { isDark, monacoTheme, onRun, codeAlongOpen } = useContext(DocsCtx)
+  const { isDark, monacoTheme, onRun, codeAlongOpen, onNavigate } = useContext(DocsCtx)
   const [copied, setCopied] = useState(false)
   const [dragging, setDragging] = useState(false)
   const [editorHeight, setEditorHeight] = useState(() =>
@@ -333,6 +364,18 @@ function MdCodeBlock({ language, code }) {
     if (onRun) onRun(editorRef.current?.getValue() ?? code, monacoLang)
   }, [code, monacoLang, onRun])
 
+  const isOpenMat   = language === 'matlab' || language === 'openmat'
+  const isCodeLens  = CODELENS_LANG_MAP[language] != null && !isOpenMat
+
+  const handleOpenInOpenMat = useCallback(() => {
+    openInOpenMat(editorRef.current?.getValue() ?? code, `snippet.m`)
+  }, [code])
+
+  const handleOpenInCodeLens = useCallback(() => {
+    if (!onNavigate) return
+    openInCodeLens(editorRef.current?.getValue() ?? code, language, onNavigate)
+  }, [code, language, onNavigate])
+
   return (
     <div className="md-code-block">
       <div className="md-code-header">
@@ -346,6 +389,26 @@ function MdCodeBlock({ language, code }) {
               title="Run this code here"
             >
               {running ? '⏳' : '▶'} Run
+            </button>
+          )}
+          {isOpenMat && (
+            <button
+              onClick={handleOpenInOpenMat}
+              className="md-code-btn"
+              title="Open in OpenMAT Studio"
+              style={{ color: '#c2410c', borderColor: '#fed7aa', background: '#fff7ed' }}
+            >
+              ↗ OpenMAT
+            </button>
+          )}
+          {isCodeLens && onNavigate && (
+            <button
+              onClick={handleOpenInCodeLens}
+              className="md-code-btn"
+              title="Open in CodeLens visualizer"
+              style={{ color: '#4338ca', borderColor: '#c7d2fe', background: '#eef2ff' }}
+            >
+              ↗ CodeLens
             </button>
           )}
           {onRun && (
@@ -735,7 +798,8 @@ export default function MarkdownHub() {
     codeAlongOpen,
     activeFile: tab === 'tutorials' ? activeFile : null,
     onDocLink: selectTutorial,
-  }), [themeStyles, handleRunInCodeAlong, codeAlongOpen, activeFile, selectTutorial, tab])
+    onNavigate: navigate,
+  }), [themeStyles, handleRunInCodeAlong, codeAlongOpen, activeFile, selectTutorial, tab, navigate])
 
   useEffect(() => {
     refreshDocsIndex()
