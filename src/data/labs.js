@@ -170,6 +170,16 @@ export const LABS = [
     cover: { grad: 'from-emerald-700 via-teal-800 to-cyan-950', mark: 'π e', sub: 'Universal Constants' },
   },
   {
+    key: 'codelens',
+    label: 'CodeLens',
+    emoji: '🔬',
+    color: 'indigo',
+    desc: 'Paste any JavaScript and watch it execute — token stream, AST, live heap graph, call stack, scope chain, and plain-English explanations at every step.',
+    path: '/codelens',
+    tags: ['JavaScript', 'CS Theory', 'Visualizer'],
+    cover: { grad: 'from-indigo-700 via-violet-800 to-purple-950', mark: '{ }', sub: 'AST · Heap · Execution' },
+  },
+  {
     key: 'five-axis',
     label: '5-Axis Kinematics',
     emoji: '⚙️',

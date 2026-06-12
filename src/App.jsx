@@ -57,6 +57,7 @@ const DSAArraysLabPage = lazy(() => import("./pages/DSAArraysLabPage.jsx"));
 const DSALinkedListsLabPage = lazy(() => import("./pages/DSALinkedListsLabPage.jsx"));
 const PLCLabPage = lazy(() => import("./pages/PLCLabPage.jsx"))
 const MatrixReducerPage = lazy(() => import("./pages/MatrixReducerPage.jsx"));
+const CodeLensPage = lazy(() => import("./pages/CodeLensPage.jsx"));
 
 const Fallback = () => (
   <div className="flex items-center justify-center h-64">
@@ -139,6 +140,7 @@ export default function App() {
                     <Route path="dsa-linked-lists-lab" element={<DSALinkedListsLabPage />} />
                     <Route path="plc-lab" element={<PLCLabPage />} />
                     <Route path="matrix-reducer" element={<MatrixReducerPage />} />
+                    <Route path="codelens" element={<CodeLensPage />} />
                   </Routes>
                 </Suspense>
               </AppShell>
