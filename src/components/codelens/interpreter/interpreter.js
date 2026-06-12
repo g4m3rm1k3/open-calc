@@ -967,7 +967,18 @@ class Interpreter {
       if (prop === 'slice')    return { __kind: 'native', name: 'String.slice',    fn: (t, [s, e]) => t.slice(s, e) }
       if (prop === 'toUpperCase') return { __kind: 'native', name: 'String.toUpperCase', fn: (t) => t.toUpperCase() }
       if (prop === 'toLowerCase') return { __kind: 'native', name: 'String.toLowerCase', fn: (t) => t.toLowerCase() }
-      if (prop === 'trim')     return { __kind: 'native', name: 'String.trim',     fn: (t) => t.trim() }
+      if (prop === 'trim')        return { __kind: 'native', name: 'String.trim',        fn: (t) => t.trim() }
+      if (prop === 'trimStart')   return { __kind: 'native', name: 'String.trimStart',   fn: (t) => t.trimStart() }
+      if (prop === 'trimEnd')     return { __kind: 'native', name: 'String.trimEnd',     fn: (t) => t.trimEnd() }
+      if (prop === 'padStart')    return { __kind: 'native', name: 'String.padStart',    fn: (t, [len, fill]) => t.padStart(len, fill) }
+      if (prop === 'padEnd')      return { __kind: 'native', name: 'String.padEnd',      fn: (t, [len, fill]) => t.padEnd(len, fill) }
+      if (prop === 'repeat')      return { __kind: 'native', name: 'String.repeat',      fn: (t, [n]) => t.repeat(n) }
+      if (prop === 'startsWith')  return { __kind: 'native', name: 'String.startsWith',  fn: (t, [s, p]) => t.startsWith(s, p) }
+      if (prop === 'endsWith')    return { __kind: 'native', name: 'String.endsWith',    fn: (t, [s, p]) => t.endsWith(s, p) }
+      if (prop === 'replace')     return { __kind: 'native', name: 'String.replace',     fn: (t, [s, r]) => t.replace(s, r) }
+      if (prop === 'replaceAll')  return { __kind: 'native', name: 'String.replaceAll',  fn: (t, [s, r]) => t.replaceAll(s, r) }
+      if (prop === 'localeCompare') return { __kind: 'native', name: 'String.localeCompare', fn: (t, [s]) => t.localeCompare(s) }
+      if (prop === 'match')       return { __kind: 'native', name: 'String.match',       fn: (t, [r]) => t.match(r) }
       if (prop === 'charAt')   return { __kind: 'native', name: 'String.charAt',   fn: (t, [i]) => t.charAt(i) }
       if (prop === 'charCodeAt') return { __kind: 'native', name: 'String.charCodeAt', fn: (t, [i]) => t.charCodeAt(i) }
       if (!isNaN(prop))        return value[prop]
@@ -1174,10 +1185,16 @@ class Interpreter {
       __kind: 'class', name: 'Array', __protoId: null, protoRef: null, superCls: null,
       staticMethods: {},
       isArray: native('Array.isArray', (_, [x]) => isRef(x) && self.heap.objects.get(x.objectId)?.type === 'Array'),
-      from:    native('Array.from',    (_, [x]) => {
+      from:    native('Array.from',    (_, [x, mapFn], interp) => {
         const items = self._toIterable(x)
         const ref = self.heap.allocate('Array', { length: items.length })
-        items.forEach((v, i) => self.heap.set(ref, String(i), v))
+        const callable = mapFn?.__kind === 'function' || mapFn?.__kind === 'native'
+        items.forEach((v, i) => {
+          const mapped = callable
+            ? interp._apply(mapFn, [v, i], null, null, new Environment(null))
+            : v
+          self.heap.set(ref, String(i), mapped)
+        })
         return ref
       }),
       of:      native('Array.of',      (_, args) => {
@@ -1236,6 +1253,15 @@ class Interpreter {
       __construct: native('new Set', (_, args, interp) => {
         const ref = self.heap.allocate('Set', {})
         self._installSetMethods(ref)
+        if (args.length > 0 && args[0] != null) {
+          const addFn = self.heap.get(ref, 'add')
+          const iterable = args[0]
+          const len = isRef(iterable) ? (self.heap.get(iterable, 'length') ?? 0) : 0
+          for (let i = 0; i < len; i++) {
+            const v = self.heap.get(iterable, String(i))
+            interp._apply(addFn, [v], ref, null, new Environment(null))
+          }
+        }
         return ref
       }),
     }, 'const')

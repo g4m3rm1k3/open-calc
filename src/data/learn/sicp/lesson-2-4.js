@@ -3,8 +3,9 @@ export const lesson = {
   series: { id: 'sicp', title: 'SICP — JavaScript' },
   title: '2.2.3  Sequences as Conventional Interfaces',
   checkpoints: [
-    { id: 'cp-filter-accumulate', label: 'filter & accumulate' },
-    { id: 'cp-pipeline',          label: 'Signal Pipelines' },
+    { id: 'cp-filter',            label: 'filter' },
+    { id: 'cp-accumulate',        label: 'accumulate' },
+    { id: 'cp-pipeline',          label: 'Pipelines' },
   ],
   segments: [
 
@@ -12,119 +13,112 @@ export const lesson = {
     {
       type: 'narration',
       id: 'intro',
-      text: 'Section 2.2.3 makes a subtle but powerful point. Many programs that look different are secretly the same computation expressed in different ways — they enumerate a sequence, transform elements, filter some out, and combine the results. When we recognise this pattern, we can express any such program as a pipeline of three operations: map, filter, and accumulate. This is one of the most important conceptual contributions of SICP.',
+      text: 'Here is a puzzle. Look at these two computations: "sum the squares of the odd numbers in a list" and "find all employees under 30 and compute their average salary." They look completely different. One is arithmetic, the other is HR data. But their structure is identical: pick some items from a collection, transform each one, combine the results. If you can see that structure, you can write both programs using the same three operations — filter, map, and accumulate — just with different functions plugged in. Section 2.2.3 is about recognising that shared structure and giving it a name.',
       code: null,
     },
 
-    // ── Terminology: Conventional Interfaces ──────────────────────────────────────
+    // ── The pattern ───────────────────────────────────────────────────────────────
     {
       type: 'narration',
-      id: 'conventional-interface-vocab',
-      text: 'A conventional interface is a shared data format that lets modular pieces plug together. For list processing, that format is the sequence. map produces a sequence. filter produces a sequence. accumulate consumes a sequence. Because they all speak "sequence," you can chain them freely — the output of one is the input of the next. This is the pipeline metaphor: data flows through a series of transformations, each one focused on a single job.',
-      code: null,
+      id: 'pattern-observation',
+      text: 'Look at these two functions. sum_odd_squares takes a list and returns the sum of squares of its odd elements. even_fibs takes n and returns a list of even Fibonacci numbers up to the nth. They look completely different. But try to read them as pipelines: enumerate some things, filter some, transform the rest, combine. Once you see that shape, both functions are the same skeleton with different pieces plugged in.',
+      code: 'function pair(x,y){return[x,y];}\nfunction head(p){return p[0];}\nfunction tail(p){return p[1];}\nfunction is_null(x){return x===null;}\nfunction list(...a){return a.reduceRight((acc,x)=>pair(x,acc),null);}\n\n// These look different. But are they?\nfunction sum_odd_squares(lst) {\n  if (is_null(lst)) return 0;\n  const h = head(lst);\n  const rest = sum_odd_squares(tail(lst));\n  return (h % 2 !== 0) ? h*h + rest : rest;\n}\n\nconsole.log(sum_odd_squares(list(1,2,3,4,5))); // 1+9+25 = 35',
     },
 
     // ── filter ────────────────────────────────────────────────────────────────────
     {
       type: 'narration',
-      id: 'filter-intro',
-      text: 'filter takes a predicate and a list and returns a new list containing only the elements that satisfy the predicate. Like map, it follows the base-case/recursive pattern. If the head satisfies the predicate, include it; otherwise skip it. Always recurse on the tail.',
-      code: 'function pair(x, y) { return [x, y]; }\nfunction head(p)    { return p[0]; }\nfunction tail(p)    { return p[1]; }\nfunction is_null(x) { return x === null; }\nfunction is_pair(x) { return Array.isArray(x); }\nfunction list(...a) { return a.reduceRight((acc, x) => pair(x, acc), null); }\nfunction display(x) {\n  if (x === null) return \'nil\';\n  if (!is_pair(x)) return String(x);\n  const items = []; let cur = x;\n  while (is_pair(cur)) { items.push(cur[0]); cur = cur[1]; }\n  return `(${items.join(\' \')})` ;\n}\n\nfunction filter(pred, lst) {\n  if (is_null(lst)) return null;\n  if (pred(head(lst)))                         // head passes the test\n    return pair(head(lst), filter(pred, tail(lst)));\n  return filter(pred, tail(lst));              // head fails — skip it\n}\n\nconsole.log(display(filter(x => x % 2 === 0, list(1,2,3,4,5,6)))); // (2 4 6)\nconsole.log(display(filter(x => x > 3,       list(1,2,3,4,5))));   // (4 5)',
+      id: 'filter-vocab',
+      text: 'The first pipeline stage is filter. filter takes a predicate and a list and returns a new list containing only the elements that pass the test. It does not transform values — it only selects or rejects them. The output has the same element type as the input, just possibly fewer of them. filter follows the two-case recursive pattern: if the list is null, return null; if the head passes the predicate, keep it; otherwise skip it.',
+      code: null,
+    },
+    {
+      type: 'narration',
+      id: 'filter-code',
+      text: 'Here is filter. The two branches of the predicate test give it its distinctive shape: include-head vs skip-head, both recursing on tail.',
+      code: 'function pair(x,y){return[x,y];}\nfunction head(p){return p[0];}\nfunction tail(p){return p[1];}\nfunction is_null(x){return x===null;}\nfunction is_pair(x){return Array.isArray(x);}\nfunction list(...a){return a.reduceRight((acc,x)=>pair(x,acc),null);}\nfunction display(x){if(x===null)return\'nil\';if(!is_pair(x))return String(x);const a=[];let c=x;while(is_pair(c)){a.push(c[0]);c=c[1];}return`(${a.join(\' \')})`;}\n\nfunction filter(pred, lst) {\n  if (is_null(lst)) return null;\n  if (pred(head(lst)))\n    return pair(head(lst), filter(pred, tail(lst))); // keep\n  return filter(pred, tail(lst));                    // skip\n}\n\nconsole.log(display(filter(x => x % 2 !== 0, list(1,2,3,4,5)))); // (1 3 5)\nconsole.log(display(filter(x => x > 3,       list(1,2,3,4,5)))); // (4 5)',
+    },
+    {
+      type: 'checkpoint',
+      id: 'cp-filter',
     },
 
     // ── accumulate ────────────────────────────────────────────────────────────────
     {
       type: 'narration',
       id: 'accumulate-vocab',
-      text: 'Accumulate (also called fold or reduce) combines all elements of a list into a single value using a binary function and an initial value. It is the most general of the three operations: sum, product, max, append, and counting are all instances of accumulate with different combining functions. The initial value is returned when the list is empty. Each recursive step applies the combining function to the current head and the accumulated result of the tail.',
+      text: 'accumulate (also called fold-right or reduce) combines all elements of a list into a single value. It takes three arguments: a binary combining function op, an initial value, and a list. When the list is null, it returns the initial value. Otherwise, it applies op to the current head and the accumulated result of the rest. The key insight is that sum, product, length, max, append, and string-join are all instances of accumulate with different op and initial values. It is the most general of the three pipeline operations.',
       code: null,
     },
     {
       type: 'narration',
-      id: 'accumulate-op',
-      text: 'Here is accumulate. When the list is null, return the initial value. Otherwise, combine the head with the accumulation of the tail. Run it — sum, product, and max are all one call each.',
-      code: 'function pair(x, y) { return [x, y]; }\nfunction head(p)    { return p[0]; }\nfunction tail(p)    { return p[1]; }\nfunction is_null(x) { return x === null; }\nfunction list(...a) { return a.reduceRight((acc, x) => pair(x, acc), null); }\n\nfunction accumulate(op, initial, lst) {\n  if (is_null(lst)) return initial;\n  return op(head(lst), accumulate(op, initial, tail(lst)));\n}\n\nconst nums = list(1, 2, 3, 4, 5);\n\nconsole.log(accumulate((x, y) => x + y, 0, nums));                   // 15  — sum\nconsole.log(accumulate((x, y) => x * y, 1, nums));                   // 120 — product\nconsole.log(accumulate((x, y) => x > y ? x : y, 0, nums));           // 5   — max\nconsole.log(accumulate((x, acc) => acc + 1,      0, nums));          // 5   — length!',
+      id: 'accumulate-code',
+      text: 'Here is accumulate. Notice: when the list is null, we return the initial value — that is the identity for the combining operation. Sum uses + with initial 0. Product uses * with initial 1. Append uses pair with initial null.',
+      code: 'function pair(x,y){return[x,y];}\nfunction head(p){return p[0];}\nfunction tail(p){return p[1];}\nfunction is_null(x){return x===null;}\nfunction list(...a){return a.reduceRight((acc,x)=>pair(x,acc),null);}\n\nfunction accumulate(op, initial, lst) {\n  if (is_null(lst)) return initial;\n  return op(head(lst), accumulate(op, initial, tail(lst)));\n}\n\nconst nums = list(1,2,3,4,5);\nconsole.log(accumulate((x,y) => x+y, 0, nums));      // 15 — sum\nconsole.log(accumulate((x,y) => x*y, 1, nums));      // 120 — product\nconsole.log(accumulate((x,acc) => acc+1, 0, nums));  // 5  — length\nconsole.log(accumulate((x,y) => x>y?x:y, 0, nums)); // 5  — max',
     },
     {
-      type: 'codelens',
-      id: 'codelens-accumulate',
-      text: 'Open CodeLens on accumulate with addition. Watch how the recursion bottoms out at null returning 0, then the additions happen on the way back up: 5+(4+(3+(2+(1+0)))). This right-fold structure is why accumulate is also called fold-right.',
-      code: 'function pair(x, y) { return [x, y]; }\nfunction head(p) { return p[0]; }\nfunction tail(p) { return p[1]; }\nfunction is_null(x) { return x === null; }\nfunction list(...a) { return a.reduceRight((acc, x) => pair(x, acc), null); }\n\nfunction accumulate(op, initial, lst) {\n  if (is_null(lst)) return initial;\n  return op(head(lst), accumulate(op, initial, tail(lst)));\n}\n\nconsole.log(accumulate((x, y) => x + y, 0, list(1, 2, 3, 4, 5)));',
-    },
-    {
-      type: 'challenge',
-      id: 'challenge-filter-accumulate',
-      text: 'Write sum_odd_squares(lst) that returns the sum of the squares of the odd numbers in lst. Use filter (to keep odds), then map (to square), then accumulate (to sum). sum_odd_squares(list(1,2,3,4,5)) should be 1+9+25 = 35.',
-      expectedOutput: '35\n14',
-      startCode: 'function pair(x, y) { return [x, y]; }\nfunction head(p)    { return p[0]; }\nfunction tail(p)    { return p[1]; }\nfunction is_null(x) { return x === null; }\nfunction list(...a) { return a.reduceRight((acc, x) => pair(x, acc), null); }\nfunction filter(pred, lst) {\n  if (is_null(lst)) return null;\n  return pred(head(lst)) ? pair(head(lst), filter(pred, tail(lst)))\n                         : filter(pred, tail(lst));\n}\nfunction map(f, lst) {\n  return is_null(lst) ? null : pair(f(head(lst)), map(f, tail(lst)));\n}\nfunction accumulate(op, initial, lst) {\n  return is_null(lst) ? initial : op(head(lst), accumulate(op, initial, tail(lst)));\n}\n\n// Write sum_odd_squares(lst) using filter → map → accumulate\nfunction sum_odd_squares(lst) {\n  // your code here\n}\n\nconsole.log(sum_odd_squares(list(1, 2, 3, 4, 5)));  // 35  (1+9+25)\nconsole.log(sum_odd_squares(list(1, 2, 3)));        // 10  (1+9)\n',
-      hint: 'function sum_odd_squares(lst) {\n  return accumulate(\n    (x, y) => x + y, 0,\n    map(x => x * x,\n        filter(x => x % 2 !== 0, lst)));\n}',
-      tests: [
-        { call: 'sum_odd_squares(list(1,2,3,4,5))', expected: 35 },
-        { call: 'sum_odd_squares(list(1,2,3))',      expected: 10 },
-      ],
-      validate: ({ code }) => {
-        try {
-          const fn = new Function(`"use strict";
-function pair(x,y){return[x,y];}
-function head(p){return p[0];}
-function tail(p){return p[1];}
-function is_null(x){return x===null;}
-function list(...a){return a.reduceRight((acc,x)=>pair(x,acc),null);}
-function filter(pred,lst){return is_null(lst)?null:pred(head(lst))?pair(head(lst),filter(pred,tail(lst))):filter(pred,tail(lst));}
-function map(f,lst){return is_null(lst)?null:pair(f(head(lst)),map(f,tail(lst)));}
-function accumulate(op,init,lst){return is_null(lst)?init:op(head(lst),accumulate(op,init,tail(lst)));}
-${code}
-return typeof sum_odd_squares==='function'&&sum_odd_squares(list(1,2,3,4,5))===35&&sum_odd_squares(list(1,2,3))===10`)
-          return fn() === true
-        } catch { return false }
-      },
+      type: 'narration',
+      id: 'accumulate-builds-lists',
+      text: 'accumulate can also produce lists, not just numbers. If op is pair and initial is null, accumulate reconstructs the list exactly. If op is a pair that applies a function first, accumulate becomes map. These are not separate operations — they are all fold-right with different combining functions.',
+      code: 'function pair(x,y){return[x,y];}\nfunction head(p){return p[0];}\nfunction tail(p){return p[1];}\nfunction is_null(x){return x===null;}\nfunction list(...a){return a.reduceRight((acc,x)=>pair(x,acc),null);}\nfunction accumulate(op,init,lst){return is_null(lst)?init:op(head(lst),accumulate(op,init,tail(lst)));}\n\n// map via accumulate\nconst map_via_acc = (f, lst) =>\n  accumulate((x, acc) => pair(f(x), acc), null, lst);\n\n// filter via accumulate\nconst filter_via_acc = (pred, lst) =>\n  accumulate((x, acc) => pred(x) ? pair(x, acc) : acc, null, lst);\n\nconsole.log(JSON.stringify(map_via_acc(x => x*x, list(1,2,3))));\nconsole.log(JSON.stringify(filter_via_acc(x => x%2===0, list(1,2,3,4,5))));',
     },
     {
       type: 'checkpoint',
-      id: 'cp-filter-accumulate',
+      id: 'cp-accumulate',
     },
 
-    // ── Signal pipelines ──────────────────────────────────────────────────────────
+    // ── The pipeline ──────────────────────────────────────────────────────────────
     {
       type: 'narration',
       id: 'pipeline-vocab',
-      text: 'The signal processing analogy helps clarify the pipeline idea. Think of the list as a signal — a stream of values flowing through a series of transducers. Each transducer is a function: map transforms every signal value, filter gates values on/off, accumulate collapses the stream into one value. Written in this style, the program reads like a description of the computation rather than a description of how to do it. The same problem expressed as nested loops looks nothing like what it is computing.',
+      text: 'A conventional interface is a shared data format that allows different processing stages to be plugged together. For sequences, that format is the list. map produces a list. filter produces a list. accumulate consumes a list. Because they all speak "list," you can chain them: filter the input, map the filtered result, accumulate the mapped result. This is the pipeline metaphor. Each stage has one job. No stage knows about the others. The pipes between stages carry lists.',
       code: null,
+    },
+    {
+      type: 'narration',
+      id: 'range-helper',
+      text: 'To enumerate sequences of numbers, we need range. range(a, b) produces list(a, a+1, ..., b). It is the source at the beginning of many pipelines.',
+      code: 'function pair(x,y){return[x,y];}\nfunction list(...a){return a.reduceRight((acc,x)=>pair(x,acc),null);}\n\nfunction range(a, b) {\n  return a > b ? null : pair(a, range(a+1, b));\n}\n\nconsole.log(JSON.stringify(range(1, 5))); // [1,[2,[3,[4,[5,null]]]]]',
     },
     {
       type: 'narration',
       id: 'pipeline-example',
-      text: 'Here is the same computation expressed as a pipeline versus as a loop. Both sum the squares of even numbers from 1 to 10. The pipeline version reads left-to-right as a description. The loop version forces you to mentally trace state variables. This is why functional programmers prefer pipelines.',
-      code: 'function pair(x, y) { return [x, y]; }\nfunction head(p)    { return p[0]; }\nfunction tail(p)    { return p[1]; }\nfunction is_null(x) { return x === null; }\nfunction list(...a) { return a.reduceRight((acc, x) => pair(x, acc), null); }\nfunction filter(pred, lst) {\n  return is_null(lst) ? null :\n    pred(head(lst)) ? pair(head(lst), filter(pred, tail(lst)))\n                    : filter(pred, tail(lst));\n}\nfunction map(f, lst) {\n  return is_null(lst) ? null : pair(f(head(lst)), map(f, tail(lst)));\n}\nfunction accumulate(op, init, lst) {\n  return is_null(lst) ? init : op(head(lst), accumulate(op, init, tail(lst)));\n}\n\n// Build the range 1..10\nfunction range(a, b) {\n  return a > b ? null : pair(a, range(a + 1, b));\n}\n\n// Pipeline: enumerate → filter → map → accumulate\nconst pipeline_result =\n  accumulate((x, y) => x + y, 0,\n    map(x => x * x,\n      filter(x => x % 2 === 0, range(1, 10))));\n\nconsole.log(pipeline_result); // 220  (4+16+36+64+100)',
+      text: 'Here is the pipeline for "sum the squares of the odd numbers from 1 to 10": enumerate → filter odds → map square → accumulate sum. Each stage is a single function call. The code reads left-to-right as a description of the computation. Compare this to the original hand-rolled sum_odd_squares loop — the structure was invisible there.',
+      code: 'function pair(x,y){return[x,y];}\nfunction head(p){return p[0];}\nfunction tail(p){return p[1];}\nfunction is_null(x){return x===null;}\nfunction list(...a){return a.reduceRight((acc,x)=>pair(x,acc),null);}\nfunction range(a,b){return a>b?null:pair(a,range(a+1,b));}\nfunction filter(pred,lst){return is_null(lst)?null:pred(head(lst))?pair(head(lst),filter(pred,tail(lst))):filter(pred,tail(lst));}\nfunction map(f,lst){return is_null(lst)?null:pair(f(head(lst)),map(f,tail(lst)));}\nfunction accumulate(op,init,lst){return is_null(lst)?init:op(head(lst),accumulate(op,init,tail(lst)));}\n\n// Pipeline: enumerate → filter → map → accumulate\nconst result = accumulate(\n  (x,y) => x + y, 0,         // stage 4: sum\n  map(\n    x => x * x,               // stage 3: square\n    filter(\n      x => x % 2 !== 0,       // stage 2: keep odd\n      range(1, 10)             // stage 1: enumerate\n    )\n  )\n);\n\nconsole.log(result); // 165  (1+9+25+49+81)',
     },
     {
       type: 'challenge',
-      id: 'challenge-flatmap',
-      text: 'flatmap maps a function over a list and then flattens one level of nesting. It is often used to enumerate pairs or combinations. Define flatmap(f, lst) as accumulate(append, null, map(f, lst)). Then use it to list all pairs (i, j) where 1 ≤ j < i ≤ 3: flatmap(i => map(j => list(i, j), range(1, i-1)), range(1, 3)) should give ((2 1) (3 1) (3 2)).',
-      expectedOutput: '(2 1)\n(3 1)\n(3 2)',
-      startCode: 'function pair(x, y) { return [x, y]; }\nfunction head(p)    { return p[0]; }\nfunction tail(p)    { return p[1]; }\nfunction is_null(x) { return x === null; }\nfunction is_pair(x) { return Array.isArray(x); }\nfunction list(...a) { return a.reduceRight((acc, x) => pair(x, acc), null); }\nfunction append(l1, l2) {\n  return is_null(l1) ? l2 : pair(head(l1), append(tail(l1), l2));\n}\nfunction map(f, lst) {\n  return is_null(lst) ? null : pair(f(head(lst)), map(f, tail(lst)));\n}\nfunction accumulate(op, init, lst) {\n  return is_null(lst) ? init : op(head(lst), accumulate(op, init, tail(lst)));\n}\nfunction filter(pred, lst) {\n  return is_null(lst) ? null : pred(head(lst)) ? pair(head(lst), filter(pred, tail(lst))) : filter(pred, tail(lst));\n}\nfunction range(a, b) {\n  return a > b ? null : pair(a, range(a + 1, b));\n}\nfunction display(x) {\n  if (x === null) return \'nil\';\n  if (!is_pair(x)) return String(x);\n  const items = []; let cur = x;\n  while (is_pair(cur)) { items.push(cur[0]); cur = cur[1]; }\n  return `(${items.join(\' \')})` ;\n}\n\n// flatmap: accumulate(append, null, map(f, lst))\nfunction flatmap(f, lst) {\n  // your code here\n}\n\nconst pairs = flatmap(i => map(j => list(i, j), range(1, i-1)), range(1, 3));\n\n// Print each pair on its own line\nlet cur = pairs;\nwhile (!is_null(cur)) {\n  console.log(display(head(cur)));\n  cur = tail(cur);\n}\n',
-      hint: 'function flatmap(f, lst) {\n  return accumulate(append, null, map(f, lst));\n}',
+      id: 'challenge-pipeline-products',
+      text: 'Using filter, map, accumulate, and range, write a one-expression pipeline that computes the product of the cubes of all even numbers from 1 to 6. That is: 2³ × 4³ × 6³ = 8 × 64 × 216 = 110592.',
+      expectedOutput: '110592',
+      startCode: 'function pair(x,y){return[x,y];}\nfunction head(p){return p[0];}\nfunction tail(p){return p[1];}\nfunction is_null(x){return x===null;}\nfunction range(a,b){return a>b?null:pair(a,range(a+1,b));}\nfunction filter(pred,lst){return is_null(lst)?null:pred(head(lst))?pair(head(lst),filter(pred,tail(lst))):filter(pred,tail(lst));}\nfunction map(f,lst){return is_null(lst)?null:pair(f(head(lst)),map(f,tail(lst)));}\nfunction accumulate(op,init,lst){return is_null(lst)?init:op(head(lst),accumulate(op,init,tail(lst)));}\n\n// Write a pipeline: enumerate 1-6 → filter evens → cube each → product\nconst result = null; // replace with pipeline\n\nconsole.log(result); // 110592\n',
+      hint: 'const result = accumulate(\n  (x,y) => x * y, 1,\n  map(x => x*x*x,\n      filter(x => x % 2 === 0,\n             range(1, 6))));',
       tests: [],
-      validate: ({ code }) => {
-        try {
-          const fn = new Function(`"use strict";
-function pair(x,y){return[x,y];}
-function head(p){return p[0];}
-function tail(p){return p[1];}
-function is_null(x){return x===null;}
-function list(...a){return a.reduceRight((acc,x)=>pair(x,acc),null);}
-function append(l1,l2){return is_null(l1)?l2:pair(head(l1),append(tail(l1),l2));}
-function map(f,lst){return is_null(lst)?null:pair(f(head(lst)),map(f,tail(lst)));}
-function accumulate(op,init,lst){return is_null(lst)?init:op(head(lst),accumulate(op,init,tail(lst)));}
-function range(a,b){return a>b?null:pair(a,range(a+1,b));}
-${code}
-const result = flatmap(i=>map(j=>list(i,j),range(1,i-1)),range(1,3));
-// should be ((2 1) (3 1) (3 2)) — 3 pairs
-const h1=head(result); const h2=head(tail(result)); const h3=head(tail(tail(result)));
-return typeof flatmap==='function'&&head(h1)===2&&head(tail(h1))===1&&head(h2)===3&&head(h3)===3&&head(tail(h3))===2`)
-          return fn() === true
-        } catch { return false }
-      },
+      validate: ({ logs }) => logs.some(l => l.trim() === '110592'),
+    },
+
+    // ── flatmap ───────────────────────────────────────────────────────────────────
+    {
+      type: 'narration',
+      id: 'flatmap-vocab',
+      text: 'Some pipelines need to expand rather than narrow: for each element, produce multiple outputs, then flatten the results into a single list. This operation — map followed by flatten — is called flatmap. It is used whenever we want to enumerate combinations: for each i, produce all pairs (i,j) for j less than i. Without flatmap this requires nested loops. With flatmap, it is one expression.',
+      code: null,
+    },
+    {
+      type: 'narration',
+      id: 'flatmap-code',
+      text: 'flatmap is accumulate(append, null, map(f, lst)) — apply f to each element getting a list, then append all those lists together. Run it to see all pairs (i,j) with 1 ≤ j < i ≤ 4.',
+      code: 'function pair(x,y){return[x,y];}\nfunction head(p){return p[0];}\nfunction tail(p){return p[1];}\nfunction is_null(x){return x===null;}\nfunction is_pair(x){return Array.isArray(x);}\nfunction list(...a){return a.reduceRight((acc,x)=>pair(x,acc),null);}\nfunction range(a,b){return a>b?null:pair(a,range(a+1,b));}\nfunction append(l1,l2){return is_null(l1)?l2:pair(head(l1),append(tail(l1),l2));}\nfunction map(f,lst){return is_null(lst)?null:pair(f(head(lst)),map(f,tail(lst)));}\nfunction accumulate(op,init,lst){return is_null(lst)?init:op(head(lst),accumulate(op,init,tail(lst)));}\n\nfunction flatmap(f, lst) {\n  return accumulate(append, null, map(f, lst));\n}\n\n// All pairs (i,j) where 1 <= j < i <= 4\nconst pairs = flatmap(i => map(j => list(i,j), range(1, i-1)), range(2, 4));\n\nlet cur = pairs;\nwhile (!is_null(cur)) {\n  const p = head(cur);\n  console.log(`(${head(p)},${head(tail(p))})`);  // (2,1) (3,1) (3,2)\n  cur = tail(cur);\n}',
+    },
+    {
+      type: 'challenge',
+      id: 'challenge-unique-pairs',
+      text: 'Using flatmap, produce all pairs (i,j) where 1 ≤ i < j ≤ n and i + j is prime. For n=6, the pairs whose sum is prime are: (1,2),(1,4),(1,6),(2,3),(2,5),(3,4),(5,6). Use is_prime(n): test divisibility up to sqrt(n). Count how many such pairs exist for n=6 (should be 7).',
+      expectedOutput: '7',
+      startCode: 'function pair(x,y){return[x,y];}\nfunction head(p){return p[0];}\nfunction tail(p){return p[1];}\nfunction is_null(x){return x===null;}\nfunction list(...a){return a.reduceRight((acc,x)=>pair(x,acc),null);}\nfunction range(a,b){return a>b?null:pair(a,range(a+1,b));}\nfunction append(l1,l2){return is_null(l1)?l2:pair(head(l1),append(tail(l1),l2));}\nfunction map(f,lst){return is_null(lst)?null:pair(f(head(lst)),map(f,tail(lst)));}\nfunction filter(pred,lst){return is_null(lst)?null:pred(head(lst))?pair(head(lst),filter(pred,tail(lst))):filter(pred,tail(lst));}\nfunction accumulate(op,init,lst){return is_null(lst)?init:op(head(lst),accumulate(op,init,tail(lst)));}\nfunction flatmap(f,lst){return accumulate(append,null,map(f,lst));}\n\nfunction is_prime(n) {\n  if (n < 2) return false;\n  for (let i = 2; i <= Math.sqrt(n); i++) if (n % i === 0) return false;\n  return true;\n}\n\n// Find all (i,j) pairs where i<j<=6 and i+j is prime\n// Then count them\nconst n = 6;\nconst prime_pairs = filter(\n  p => is_prime(head(p) + head(tail(p))),\n  flatmap(i => map(j => list(i,j), range(i+1, n)), range(1, n))\n);\n\nconsole.log(accumulate((x,acc) => acc+1, 0, prime_pairs)); // 7\n',
+      hint: 'The startCode already has the solution — just run it. The filter keeps only pairs where i+j is prime.',
+      tests: [],
+      validate: ({ logs }) => logs.some(l => l.trim() === '7'),
     },
     {
       type: 'checkpoint',
