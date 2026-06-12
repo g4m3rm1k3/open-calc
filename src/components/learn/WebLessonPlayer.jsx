@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import Editor from '@monaco-editor/react'
 import {
   Play, Pause, ChevronRight, ChevronLeft, ChevronDown, RotateCcw,
-  ExternalLink, CheckCircle, XCircle, Terminal, Lightbulb, Check, Code2
+  ExternalLink, CheckCircle, XCircle, Terminal, Lightbulb, Check, Code2, LayoutTemplate
 } from 'lucide-react'
 import { useSpeech } from '../../utils/useSpeech.js'
 
@@ -91,30 +91,22 @@ function ProgressBar({ checkpoints, reachedCp, onJump }) {
 
 // ── Output panel ──────────────────────────────────────────────────────────────
 
-function OutputPanel({ logs, error, challengeResult, expectedOutput, testDetail, previewDoc, language }) {
+function OutputPanel({ logs, error, challengeResult, expectedOutput, testDetail, previewDoc, language, topHeight, onDragRight, isDragging }) {
   const isWeb = language === 'html' || language === 'react'
-  const borderColor = challengeResult === 'pass' ? 'border-l-2 border-l-green-500' : challengeResult === 'fail' ? 'border-l-2 border-l-red-500' : ''
+  const borderColor = challengeResult === 'pass' ? 'border-t border-t-emerald-500' : challengeResult === 'fail' ? 'border-t border-t-red-500' : 'border-t border-white/5'
+  
   return (
-    <div className={`flex flex-col h-full bg-[#070b13] border-l border-slate-800 ${borderColor}`}>
-      <div className="flex items-center gap-2 px-3 py-2 border-b border-slate-800 shrink-0">
-        <Terminal size={14} className="text-slate-500" />
-        <span className="text-xs text-slate-500 font-mono">{isWeb ? 'Preview & Output' : 'Output'}</span>
-        {challengeResult === 'pass' && (
-          <span className="ml-auto flex items-center gap-1 text-xs text-green-400">
-            <CheckCircle size={12} /> Correct
-          </span>
-        )}
-        {challengeResult === 'fail' && (
-          <span className="ml-auto flex items-center gap-1 text-xs text-red-400">
-            <XCircle size={12} /> Try again
-          </span>
-        )}
-      </div>
-
+    <div className="flex flex-col flex-1 min-h-0 bg-[#050505]">
+      
       {isWeb && (
-        <div className="flex-1 min-h-0 flex flex-col bg-white relative">
+        <div className="flex flex-col relative shrink-0" style={{ height: topHeight }}>
+          <div className="flex items-center gap-2 px-4 py-2 border-b border-white/10 bg-black/40">
+            <LayoutTemplate size={14} className="text-indigo-400" />
+            <span className="text-xs text-slate-400 font-mono">Browser Preview</span>
+          </div>
+          
           {previewDoc ? (
-            <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="flex-1 flex flex-col overflow-hidden bg-white relative">
               <div className="flex items-center gap-3 px-4 py-2 bg-slate-100 border-b border-slate-300 shrink-0">
                 <div className="flex gap-2">
                   <div className="w-3 h-3 rounded-full bg-[#ff5f56]" />
@@ -129,12 +121,18 @@ function OutputPanel({ logs, error, challengeResult, expectedOutput, testDetail,
                 </div>
                 <div className="w-10"></div>
               </div>
-              <iframe title="preview" srcDoc={previewDoc} sandbox="allow-scripts allow-same-origin" className="flex-1 w-full bg-white border-none" />
+              <iframe 
+                title="preview" 
+                srcDoc={previewDoc} 
+                sandbox="allow-scripts allow-same-origin" 
+                className="flex-1 w-full bg-white border-none" 
+                style={{ pointerEvents: isDragging ? 'none' : 'auto' }}
+              />
             </div>
           ) : (
-            <div className="flex-1 flex flex-col items-center justify-center text-sm text-slate-400 bg-slate-50">
-              <div className="w-16 h-16 mb-4 rounded-full bg-slate-200 flex items-center justify-center">
-                <Play size={24} className="text-slate-400 ml-1" />
+            <div className="flex-1 flex flex-col items-center justify-center text-sm text-slate-400 bg-[#0a0a0a]">
+              <div className="w-16 h-16 mb-4 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
+                <Play size={24} className="text-slate-500 ml-1" />
               </div>
               Run the code to see the browser preview.
             </div>
@@ -142,7 +140,14 @@ function OutputPanel({ logs, error, challengeResult, expectedOutput, testDetail,
         </div>
       )}
 
-      <div className={`${isWeb ? 'h-32 border-t border-slate-800 shadow-[inset_0_10px_20px_-10px_rgba(0,0,0,0.5)]' : 'flex-1'} overflow-y-auto p-3 font-mono text-[12px] shrink-0 bg-[#080c14]`}>
+      {isWeb && (
+        <div 
+          className="h-1.5 hover:h-2 bg-white/5 hover:bg-indigo-500/50 cursor-row-resize shrink-0 z-30 transition-all duration-200"
+          onMouseDown={onDragRight}
+        />
+      )}
+
+      <div className="flex-1 overflow-y-auto p-3 font-mono text-[12px] shrink-0 bg-[#080c14] border-t border-slate-800 shadow-[inset_0_10px_20px_-10px_rgba(0,0,0,0.5)]">
         {logs.map((line, i) => (
           <div key={i} className={`leading-relaxed ${line.startsWith('[error]') || line.startsWith('[warn]') ? 'text-red-400' : 'text-green-300'}`}>
             {line}
@@ -219,6 +224,11 @@ export default function WebLessonPlayer({ lesson, onBack, onNext, nextTitle, ser
   const [lessonMenuOpen, setLessonMenuOpen]   = useState(false)
   const [previewDoc, setPreviewDoc]           = useState('')
 
+  // Draggable Pane States
+  const [leftWidth, setLeftWidth] = useState('40vw')
+  const [topHeight, setTopHeight] = useState('60vh')
+  const [isDragging, setIsDragging] = useState(false)
+
   const handleRunRef  = useRef(null)
   const pauseRef      = useRef(false)
   const lessonMenuRef = useRef(null)
@@ -228,6 +238,43 @@ export default function WebLessonPlayer({ lesson, onBack, onNext, nextTitle, ser
   const prevCodeRef       = useRef('')
   const pendingDiffRef    = useRef(null)
   const highlightTimerRef = useRef(null)
+  
+  // Drag refs
+  const isDraggingSplit   = useRef(false)
+  const isDraggingRight   = useRef(false)
+  const dragSplitStart    = useRef({ x: 0, w: 0 })
+  const dragRightStart    = useRef({ y: 0, h: 0 })
+
+  // Dragging event listeners
+  useEffect(() => {
+    const onMove = (e) => {
+      if (isDraggingSplit.current) {
+        e.preventDefault()
+        const delta = e.clientX - dragSplitStart.current.x
+        const newWidth = Math.max(200, dragSplitStart.current.w + delta)
+        setLeftWidth(`${newWidth}px`)
+      } else if (isDraggingRight.current) {
+        e.preventDefault()
+        const delta = e.clientY - dragRightStart.current.y
+        const newHeight = Math.max(100, dragRightStart.current.h + delta)
+        setTopHeight(`${newHeight}px`)
+      }
+    }
+    const onUp = () => {
+      if (isDraggingSplit.current || isDraggingRight.current) {
+        document.body.style.cursor = 'default'
+        setIsDragging(false)
+      }
+      isDraggingSplit.current = false
+      isDraggingRight.current = false
+    }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+    return () => {
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+    }
+  }, [])
 
   // Close lesson dropdown on outside click
   useEffect(() => {
@@ -499,7 +546,7 @@ ${codeToRun}
     <div className="flex flex-row h-screen bg-[#050505] text-slate-100 overflow-hidden font-sans selection:bg-indigo-500/30">
 
       {/* Left Pane */}
-      <div className="flex flex-col w-[40%] border-r border-white/10 shrink-0 relative z-20 shadow-[10px_0_40px_rgba(0,0,0,0.5)]">
+      <div className="flex flex-col border-r border-white/5 shrink-0 relative z-20 shadow-[10px_0_40px_rgba(0,0,0,0.5)]" style={{ width: leftWidth }}>
         
         {/* 1. Header (Nav + Title + Progress) */}
         <div className="flex items-center gap-4 px-4 py-2 border-b border-white/10 bg-black/50 backdrop-blur-md shrink-0 z-50">
@@ -736,6 +783,18 @@ ${codeToRun}
         </div>
       </div>
 
+      {/* Resize Handle (Vertical) */}
+      <div 
+        className="w-1.5 hover:w-2 bg-white/5 hover:bg-indigo-500/50 cursor-col-resize shrink-0 z-30 transition-all duration-200"
+        onMouseDown={(e) => { 
+          const prevEl = e.currentTarget.previousElementSibling;
+          dragSplitStart.current = { x: e.clientX, w: prevEl.getBoundingClientRect().width };
+          isDraggingSplit.current = true; 
+          setIsDragging(true); 
+          document.body.style.cursor = 'col-resize' 
+        }}
+      />
+
       {/* Right Pane */}
       <div className="flex flex-col flex-1 min-w-0 bg-[#050505]">
         <OutputPanel
@@ -746,6 +805,15 @@ ${codeToRun}
           testDetail={isChallenge && challengeResult === 'fail' ? testDetail : null}
           previewDoc={previewDoc}
           language={lesson.language}
+          topHeight={topHeight}
+          isDragging={isDragging}
+          onDragRight={(e) => { 
+            const prevEl = e.currentTarget.previousElementSibling;
+            dragRightStart.current = { y: e.clientY, h: prevEl.getBoundingClientRect().height };
+            isDraggingRight.current = true; 
+            setIsDragging(true); 
+            document.body.style.cursor = 'row-resize' 
+          }}
         />
       </div>
     </div>

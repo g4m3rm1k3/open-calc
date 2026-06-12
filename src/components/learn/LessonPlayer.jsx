@@ -186,6 +186,10 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle, series
   const [reachedCp, setReachedCp]             = useState(savedCp ? getReachedCpsUpTo(savedCp.cpId) : [])
   const [lessonMenuOpen, setLessonMenuOpen]   = useState(false)
 
+  // Drag state
+  const [editorHeight, setEditorHeight] = useState('65vh')
+  const [isDragging, setIsDragging] = useState(false)
+
   const pauseRef      = useRef(false)
   const lessonMenuRef = useRef(null)
   const editorRef     = useRef(null)
@@ -194,6 +198,35 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle, series
   const prevCodeRef       = useRef('')
   const pendingDiffRef    = useRef(null)
   const highlightTimerRef = useRef(null)
+  
+  // Drag refs
+  const isDraggingEditor  = useRef(false)
+  const dragEditorStart   = useRef({ y: 0, h: 0 })
+
+  // Dragging event listeners
+  useEffect(() => {
+    const onMove = (e) => {
+      if (isDraggingEditor.current) {
+        e.preventDefault()
+        const delta = e.clientY - dragEditorStart.current.y
+        const newHeight = Math.max(100, dragEditorStart.current.h + delta)
+        setEditorHeight(`${newHeight}px`)
+      }
+    }
+    const onUp = () => {
+      if (isDraggingEditor.current) {
+        document.body.style.cursor = 'default'
+        setIsDragging(false)
+      }
+      isDraggingEditor.current = false
+    }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+    return () => {
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+    }
+  }, [])
 
   // Close lesson dropdown on outside click
   useEffect(() => {
@@ -609,7 +642,7 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle, series
       </div>
 
       {/* 3. Editor Pane */}
-      <div className="flex-1 flex flex-col min-h-0 bg-[#050505]">
+      <div className="flex flex-col min-h-0 bg-[#050505] shrink-0" style={{ height: editorHeight }}>
         <div className="flex items-center gap-3 px-4 py-2 border-b border-white/10 bg-black/40 z-10 shrink-0">
           <span className="text-xs text-slate-400 font-mono flex items-center gap-2">
             <Code2 size={14} className="text-indigo-400" />
@@ -667,8 +700,20 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle, series
         </div>
       </div>
 
+      {/* Resize Handle (Horizontal) */}
+      <div 
+        className="h-1.5 hover:h-2 bg-white/5 hover:bg-indigo-500/50 cursor-row-resize shrink-0 z-30 transition-all duration-200"
+        onMouseDown={(e) => { 
+          const prevEl = e.currentTarget.previousElementSibling;
+          dragEditorStart.current = { y: e.clientY, h: prevEl.getBoundingClientRect().height };
+          isDraggingEditor.current = true; 
+          setIsDragging(true); 
+          document.body.style.cursor = 'row-resize' 
+        }}
+      />
+
       {/* 4. Output Pane (Bottom) */}
-      <div className="h-1/3 shrink-0 flex flex-col bg-[#050505]">
+      <div className="flex-1 flex flex-col min-h-0 bg-[#050505]">
         <OutputPanel
           logs={logs}
           error={runError}
