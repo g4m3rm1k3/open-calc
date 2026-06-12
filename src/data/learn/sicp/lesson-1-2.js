@@ -13,7 +13,15 @@ export const lesson = {
     {
       type: 'narration',
       id: 'intro',
-      text: 'Last lesson we built the vocabulary: expressions evaluate to values, names bind values to identifiers, and functions package operations. Everything computed in a straight line. Today we add the ability to make decisions, loop by recursion, and hide complexity behind an interface. We will build a working square root function from scratch.',
+      text: 'Last lesson we built the vocabulary: expressions evaluate to values, names bind values to identifiers, and functions package operations. Everything computed in a straight line. Today we add the ability to make decisions, refine guesses by recursion, and hide complexity behind an interface. We will build a working square root function from scratch — one helper at a time.',
+      code: null,
+    },
+
+    // ── Terminology: Predicates ──────────────────────────────────────────────────
+    {
+      type: 'narration',
+      id: 'conditional-vocab',
+      text: 'SICP uses precise vocabulary for conditionals. A predicate is any expression that evaluates to true or false — a boolean expression. In an if statement, the predicate is the test in the condition position. The consequent is the expression evaluated when the predicate is true — the then-branch. The alternative is the expression evaluated when the predicate is false — the else-branch. Knowing these three terms lets you read SICP and talk about conditional logic precisely.',
       code: null,
     },
 
@@ -21,34 +29,34 @@ export const lesson = {
     {
       type: 'narration',
       id: 'cond-1',
-      text: 'Programs need to choose between alternatives. JavaScript\'s if statement takes a condition — a boolean expression — and runs one branch when it is true and another when it is false. Here is absolute value. If x is less than zero, return negative x. Otherwise return x as-is. Run it with -5 and watch the negative branch execute.',
-      code: 'function abs(x) {\n  if (x < 0) {\n    return -x;\n  } else {\n    return x;\n  }\n}\n\nabs(-5)',
+      text: 'Programs need to choose between alternatives. The if statement takes a predicate and runs the consequent when it is true, the alternative when it is false. Here is absolute value: the predicate is x < 0. When true (consequent), return -x. Otherwise (alternative), return x as-is. Run it with -5.',
+      code: 'function abs(x) {\n  if (x < 0) {\n    return -x;   // consequent\n  } else {\n    return x;    // alternative\n  }\n}\n\nabs(-5)',
     },
     {
       type: 'narration',
       id: 'cond-2',
-      text: 'When the body of each branch is a single expression, JavaScript programmers often write the ternary operator instead — condition question-mark then-value colon else-value. It is a more compact spelling of the same idea. Both versions of abs behave identically.',
+      text: 'When each branch is a single expression, JavaScript programmers often use the ternary operator — condition ? then-value : else-value. It is a compact spelling of the same if/else idea. Both versions of abs behave identically. The ternary is itself an expression, not a statement, so it can appear anywhere a value is expected.',
       code: 'function abs(x) {\n  return x < 0 ? -x : x;\n}\n\nabs(-5)',
     },
     {
       type: 'narration',
       id: 'cond-3',
-      text: 'Conditions can be combined. The double-ampersand means AND — both sides must be true. The double-pipe means OR — at least one side must be true. Here between returns true only when x falls inside the range low to high inclusive. Test it with a few values.',
+      text: 'Predicates can be combined. The && operator (AND) is true only when both sides are true. The || operator (OR) is true when at least one side is true. The ! operator (NOT) inverts a boolean. Here, between returns true only when x falls inside the range low to high inclusive — both conditions must hold simultaneously.',
       code: 'function between(x, low, high) {\n  return x >= low && x <= high;\n}\n\nconsole.log(between(5, 1, 10));  // true\nconsole.log(between(0, 1, 10));  // false\nconsole.log(between(10, 1, 10)); // true',
     },
     {
       type: 'challenge',
       id: 'challenge-sign',
-      text: 'You just saw abs use if/else to split into two cases. Some functions need three cases. Write a function called sign that returns -1 when x is negative, 0 when x is zero, and 1 when x is positive. Use nested if/else — if the first condition fails, test a second one inside the else branch. Call sign(-5), sign(0), and sign(5) on separate lines.',
+      text: 'You saw abs use if/else to split into two cases. Some functions need three. Write sign(x) that returns -1 when x is negative, 0 when x is zero, and 1 when x is positive. Use if / else if / else — when the first predicate fails, test a second one inside the else branch.',
       expectedOutput: '-1\n0\n1',
-      startCode: '// Write sign(x) — returns -1 for negative, 0 for zero, 1 for positive\n// Hint: use if / else if / else with three return statements\n\nfunction sign(x) {\n  // your code here\n}\n\n// Run to test:\nconsole.log(sign(-5)); // -1\nconsole.log(sign(0));  // 0\nconsole.log(sign(5));  // 1\n',
+      startCode: '// Write sign(x) — returns -1, 0, or 1\nfunction sign(x) {\n  // your code here\n}\n\nconsole.log(sign(-5)); // -1\nconsole.log(sign(0));  // 0\nconsole.log(sign(5));  // 1\n',
       hint: 'function sign(x) {\n  if (x < 0) return -1;\n  else if (x === 0) return 0;\n  else return 1;\n}',
       tests: [
         { call: 'sign(-5)', expected: -1 },
         { call: 'sign(0)',  expected: 0  },
         { call: 'sign(5)',  expected: 1  },
       ],
-      validate: ({ logs, result, code }) => {
+      validate: ({ code }) => {
         try {
           const fn = new Function(`"use strict";\n${code}\n` +
             `return typeof sign === 'function' && sign(-5) === -1 && sign(0) === 0 && sign(5) === 1`)
@@ -61,41 +69,49 @@ export const lesson = {
       id: 'cp-conditionals',
     },
 
+    // ── Terminology: Declarative vs Imperative ────────────────────────────────────
+    {
+      type: 'narration',
+      id: 'declarative-vs-imperative',
+      text: 'There is a deep distinction between knowing what something is and knowing how to compute it. The mathematical definition of square root is declarative: the square root of x is the non-negative y such that y times y equals x. That tells us what a square root is. A program must be imperative — it must describe a process, a sequence of steps. The declarative definition says nothing about how to find y. We need an algorithm. Newton\'s method is that algorithm, and we will build it piece by piece.',
+      code: null,
+    },
+
     // ── 1.1.7  Square Roots by Newton's Method ──────────────────────────────────
     {
       type: 'narration',
       id: 'sqrt-problem',
-      text: 'Now we apply conditionals to a real problem: computing square roots. The mathematical definition says the square root of x is the y such that y times y equals x and y is non-negative. That definition tells us what a square root is. It does not tell us how to find one. We need an algorithm.',
-      code: null,
+      text: 'Newton\'s method for square roots works by successive improvement. Start with any guess — we will use 1. If the guess squared is not close enough to x, replace the guess with the average of the guess and x divided by the guess. That average is always a better approximation. Here is the improvement step alone — one function with one job.',
+      code: 'function improve(guess, x) {\n  return (guess + x / guess) / 2;\n}\n\nimprove(1, 2)    // One step toward sqrt(2): 1.5',
     },
     {
       type: 'narration',
       id: 'sqrt-improve',
-      text: 'Newton\'s method for square roots works by successive improvement. Start with any guess — we will use 1. If guess squared is not close enough to x, replace the guess with the average of guess and x divided by guess. That average is always closer to the true answer. Run this — improve takes a guess and the target, and one step gets us from 1 to 1.5 toward sqrt of 2.',
-      code: 'function improve(guess, x) {\n  return (guess + x / guess) / 2;\n}\n\nimprove(1, 2)    // First step toward sqrt(2)',
-    },
-    {
-      type: 'narration',
-      id: 'sqrt-good-enough',
-      text: 'We need a stopping criterion. A guess is good enough when squaring it is within 0.001 of x. We reuse abs from earlier. Run this — 1.4 squared is 1.96, which is 0.04 away from 2, so it is not yet good enough. 1.414 squared is about 1.99996, which is good enough.',
+      text: 'Now we need a stopping criterion. We define good_enough using abs and square: a guess is good enough when squaring it lands within 0.001 of x. Notice these are standalone helpers — we will put them together shortly. Run it: 1.4 squared is 1.96, which is 0.04 away from 2. Not good enough yet. 1.414 squared is about 1.99996 — good enough.',
       code: 'function square(x) { return x * x; }\nfunction abs(x)    { return x < 0 ? -x : x; }\n\nfunction good_enough(guess, x) {\n  return abs(square(guess) - x) < 0.001;\n}\n\nconsole.log(good_enough(1.4,   2));  // false — 1.4² = 1.96\nconsole.log(good_enough(1.414, 2));  // true  — 1.414² ≈ 1.9996',
     },
     {
       type: 'narration',
+      id: 'sqrt-good-enough',
+      text: 'Now we write the loop. sqrt_iter takes the current guess and the target x. If good_enough returns true, we are done — return the guess. Otherwise, improve the guess and call sqrt_iter again with the better value. This is our first example of recursion driving an iterative refinement: each call is one step closer to the answer.',
+      code: 'function square(x) { return x * x; }\nfunction abs(x)    { return x < 0 ? -x : x; }\nfunction improve(guess, x) { return (guess + x / guess) / 2; }\nfunction good_enough(guess, x) { return abs(square(guess) - x) < 0.001; }\n\nfunction sqrt_iter(guess, x) {\n  if (good_enough(guess, x)) {\n    return guess;\n  } else {\n    return sqrt_iter(improve(guess, x), x);\n  }\n}',
+    },
+    {
+      type: 'narration',
       id: 'sqrt-iter',
-      text: 'Now we put the pieces together. sqrt_iter is recursive: if the current guess is good enough, return it. Otherwise improve the guess and call sqrt_iter again with the better guess. The public function sqrt just kicks things off with a guess of 1. This is our first iterative algorithm — each call brings us closer to the answer.',
+      text: 'With sqrt_iter written, the public function sqrt simply kicks things off with an initial guess of 1. Run it — it computes the square root of 2 by calling sqrt_iter repeatedly until good_enough is satisfied.',
       code: 'function square(x) { return x * x; }\nfunction abs(x)    { return x < 0 ? -x : x; }\nfunction improve(guess, x) { return (guess + x / guess) / 2; }\nfunction good_enough(guess, x) { return abs(square(guess) - x) < 0.001; }\n\nfunction sqrt_iter(guess, x) {\n  if (good_enough(guess, x)) {\n    return guess;\n  } else {\n    return sqrt_iter(improve(guess, x), x);\n  }\n}\n\nfunction sqrt(x) {\n  return sqrt_iter(1, x);\n}\n\nsqrt(2)',
     },
     {
       type: 'codelens',
       id: 'codelens-sqrt-iter',
-      text: 'Open CodeLens on sqrt_iter. Each recursive call is a new stack frame with a better guess. Watch the call stack grow and shrink as the algorithm homes in on the answer. Step through it — you will see good_enough finally return true and the recursion unwind.',
+      text: 'Open CodeLens on sqrt_iter. Each recursive call is a new stack frame with a better guess. Watch the call stack grow as the algorithm homes in on the answer — you will see good_enough finally return true and the recursion unwind. Notice how improve and good_enough are called from inside sqrt_iter: the stack shows all three frames active at once.',
       code: 'function square(x) { return x * x; }\nfunction abs(x) { return x < 0 ? -x : x; }\nfunction improve(guess, x) { return (guess + x / guess) / 2; }\nfunction good_enough(guess, x) { return abs(square(guess) - x) < 0.001; }\n\nfunction sqrt_iter(guess, x) {\n  if (good_enough(guess, x)) {\n    return guess;\n  } else {\n    return sqrt_iter(improve(guess, x), x);\n  }\n}\n\nconsole.log(sqrt_iter(1, 2));',
     },
     {
       type: 'challenge',
       id: 'challenge-sqrt-use',
-      text: 'You have a working sqrt. The Pythagorean theorem says the hypotenuse of a right triangle equals sqrt(a squared plus b squared). Write a function called hypotenuse(a, b) that computes this. You have square and sqrt already defined above — use them. hypotenuse(3, 4) should return approximately 5.',
+      text: 'You have a working sqrt. The Pythagorean theorem says the hypotenuse of a right triangle equals sqrt(a² + b²). Write hypotenuse(a, b) using the square and sqrt functions provided. hypotenuse(3, 4) should be approximately 5, and hypotenuse(5, 12) should be approximately 13.',
       expectedOutput: '~5',
       startCode: 'function square(x) { return x * x; }\nfunction abs(x)    { return x < 0 ? -x : x; }\nfunction improve(guess, x) { return (guess + x / guess) / 2; }\nfunction good_enough(guess, x) { return abs(square(guess) - x) < 0.001; }\nfunction sqrt_iter(guess, x) {\n  return good_enough(guess, x) ? guess : sqrt_iter(improve(guess, x), x);\n}\nfunction sqrt(x) { return sqrt_iter(1, x); }\n\n// Write hypotenuse(a, b) using sqrt and square\n\n',
       hint: 'function hypotenuse(a, b) { return sqrt(square(a) + square(b)); }',
@@ -103,7 +119,7 @@ export const lesson = {
         { call: 'Math.round(hypotenuse(3, 4))', expected: 5 },
         { call: 'Math.round(hypotenuse(5, 12))', expected: 13 },
       ],
-      validate: ({ logs, result, code }) => {
+      validate: ({ code }) => {
         try {
           const fn = new Function(`"use strict";\n${code}\n` +
             `return typeof hypotenuse === 'function' && Math.abs(hypotenuse(3, 4) - 5) < 0.01`)
@@ -116,18 +132,26 @@ export const lesson = {
       id: 'cp-sqrt',
     },
 
+    // ── Terminology: Block Structure & Closure ────────────────────────────────────
+    {
+      type: 'narration',
+      id: 'block-structure-vocab',
+      text: 'Two terms before the refactored code. Block structure means defining helper functions inside the function that uses them — they become local, invisible to the outside world. A closure is a function that captures variables from the scope where it was defined. A free variable is a variable used inside a function that is not one of its own formal parameters — it is inherited from an enclosing scope. When improve uses x without x being its own parameter, x is a free variable; the closure captures the x that belongs to sqrt.',
+      code: null,
+    },
+
     // ── 1.1.8  Functions as Black Boxes ─────────────────────────────────────────
     {
       type: 'narration',
       id: 'blackbox-1',
-      text: 'The sqrt function works, but it depends on four helpers — square, abs, improve, good_enough — scattered in the global scope. Any other code could accidentally redefine them. SICP introduces block structure: define the helpers inside sqrt itself so they are invisible to the outside world.',
+      text: 'The sqrt function works, but it depends on four helpers — square, abs, improve, good_enough — scattered in the global scope. Any other code could accidentally redefine them. SICP introduces block structure: define the helpers inside sqrt so they are invisible to the outside world.',
       code: null,
     },
     {
       type: 'narration',
       id: 'blackbox-2',
-      text: 'Here is the block-structured version. Each helper is declared inside sqrt and exists only there. Notice something subtle: improve and good_enough no longer take x as a parameter — they just use x directly. That is because they are defined inside a function where x is already a parameter. The inner functions inherit x from the outer scope. This is called a closure.',
-      code: 'function sqrt(x) {\n  function square(n)       { return n * n; }\n  function abs(n)          { return n < 0 ? -n : n; }\n  function improve(guess)  { return (guess + x / guess) / 2; }\n  function good_enough(g)  { return abs(square(g) - x) < 0.001; }\n  function iter(guess)     { return good_enough(guess) ? guess : iter(improve(guess)); }\n  return iter(1);\n}\n\nsqrt(2)',
+      text: 'Here is the block-structured version. Each helper is declared inside sqrt and exists only there. Notice something subtle: improve and good_enough no longer take x as a parameter — they reference x directly. That works because they are closures defined inside a scope where x is already bound. The free variable x is captured from sqrt\'s parameter.',
+      code: 'function sqrt(x) {\n  function square(n)      { return n * n; }\n  function abs(n)         { return n < 0 ? -n : n; }\n  function improve(guess) { return (guess + x / guess) / 2; }\n  function good_enough(g) { return abs(square(g) - x) < 0.001; }\n  function iter(guess)    { return good_enough(guess) ? guess : iter(improve(guess)); }\n  return iter(1);\n}\n\nsqrt(2)',
     },
     {
       type: 'narration',
@@ -138,15 +162,15 @@ export const lesson = {
     {
       type: 'challenge',
       id: 'challenge-cube-root',
-      text: 'Newton\'s method generalizes. For cube roots, the improve step is: new_guess = (2 * guess + x / (guess * guess)) / 3. Write cube_root(x) using block structure — define improve and good_enough inside it. good_enough should check that Math.abs(guess * guess * guess - x) is less than 0.001. cube_root(27) should be approximately 3.',
+      text: 'Newton\'s method generalises. For cube roots, the improve step is (2 * guess + x / (guess * guess)) / 3. Write cube_root(x) using block structure — define improve and good_enough inside it. good_enough should check that Math.abs(guess * guess * guess - x) < 0.001. cube_root(27) should be approximately 3.',
       expectedOutput: '~3',
-      startCode: '// Write cube_root(x) with internal helpers\n// improve(guess): return (2 * guess + x / (guess * guess)) / 3\n// good_enough(guess): return Math.abs(guess*guess*guess - x) < 0.001\n\n',
+      startCode: '// Write cube_root(x) with block-structured helpers\n// improve(guess): return (2 * guess + x / (guess * guess)) / 3\n// good_enough(guess): return Math.abs(guess*guess*guess - x) < 0.001\n\n',
       hint: 'function cube_root(x) {\n  function improve(g) { return (2*g + x/(g*g)) / 3; }\n  function ok(g) { return Math.abs(g*g*g - x) < 0.001; }\n  function iter(g) { return ok(g) ? g : iter(improve(g)); }\n  return iter(1);\n}',
       tests: [
         { call: 'Math.round(cube_root(27))',  expected: 3 },
         { call: 'Math.round(cube_root(8))',   expected: 2 },
       ],
-      validate: ({ logs, result, code }) => {
+      validate: ({ code }) => {
         try {
           const fn = new Function(`"use strict";\n${code}\n` +
             `return typeof cube_root === 'function' && Math.abs(cube_root(27) - 3) < 0.01`)
@@ -157,7 +181,7 @@ export const lesson = {
     {
       type: 'codelens',
       id: 'codelens-closure',
-      text: 'Open this in CodeLens and step through sqrt. When improve is called, it references x — but x is not its parameter. CodeLens will show you that x is found in the enclosing scope of sqrt. That is lexical scoping: a function looks up names in the environment where it was defined, not where it was called.',
+      text: 'Open CodeLens on sqrt and step into improve. When improve references x, CodeLens will show you that x is not improve\'s own parameter — it is found in sqrt\'s environment, the enclosing scope. This is lexical scoping: a function looks up free variables in the environment where it was defined, not where it was called. Each call to sqrt creates a fresh closure for improve with that call\'s value of x.',
       code: 'function sqrt(x) {\n  function improve(guess) {\n    return (guess + x / guess) / 2;\n  }\n  function good_enough(g) {\n    return Math.abs(g * g - x) < 0.001;\n  }\n  function iter(guess) {\n    return good_enough(guess) ? guess : iter(improve(guess));\n  }\n  return iter(1);\n}\n\nconsole.log(sqrt(9));',
     },
     {

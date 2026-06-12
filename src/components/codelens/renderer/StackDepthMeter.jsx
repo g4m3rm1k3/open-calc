@@ -2,8 +2,9 @@
  * StackDepthMeter — thin sparkline strip showing call stack depth at every
  * execution step. Click or drag to seek. Current step = vertical cursor.
  * Color encodes depth: indigo (shallow) → amber (mid) → red (deep).
+ * Hover over any bar to see depth info and the currently running function.
  */
-import { useMemo, useRef, useCallback } from 'react'
+import { useMemo, useRef, useCallback, useState } from 'react'
 
 function depthColor(depth, maxDepth) {
   if (depth === 0 || maxDepth === 0) return '#1e293b'
@@ -15,6 +16,7 @@ function depthColor(depth, maxDepth) {
 
 export default function StackDepthMeter({ events, step, onSeek }) {
   const svgRef = useRef(null)
+  const [hover, setHover] = useState(null) // { index, x, y }
 
   const depths = useMemo(() => {
     if (!events?.length) return []
@@ -26,7 +28,7 @@ export default function StackDepthMeter({ events, step, onSeek }) {
 
   const currentDepth = depths[step] ?? 0
 
-  // ── Seek on click/drag ─────────────────────────────────────────────────────
+  // ── Seek on click/drag ─────────────────────────────────────────────────────────
 
   const seekFromEvent = useCallback((e) => {
     const rect = svgRef.current?.getBoundingClientRect()
@@ -47,10 +49,26 @@ export default function StackDepthMeter({ events, step, onSeek }) {
     document.addEventListener('mouseup', onUp)
   }, [seekFromEvent])
 
+  const onMouseMove = useCallback((e) => {
+    const rect = svgRef.current?.getBoundingClientRect()
+    if (!rect) return
+    const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width))
+    const idx = Math.round(ratio * (total - 1))
+    setHover({ index: idx, x: e.clientX, y: e.clientY })
+  }, [total])
+
   if (!events?.length || maxDepth === 0) return null
 
   // SVG viewBox units: 1 unit per step horizontally, 28 units tall
   const VH = 28
+
+  // Build tooltip data
+  const hoverData = hover !== null && depths[hover.index] > 0 ? (() => {
+    const d = depths[hover.index]
+    const evt = events[hover.index]
+    const topFrame = evt?.stackSnapshot?.[evt.stackSnapshot.length - 1]
+    return { d, fnName: topFrame?.name ?? null, color: depthColor(d, maxDepth) }
+  })() : null
 
   return (
     <div style={{
@@ -75,6 +93,8 @@ export default function StackDepthMeter({ events, step, onSeek }) {
         height={VH}
         style={{ flex: 1, cursor: 'col-resize', display: 'block' }}
         onMouseDown={onMouseDown}
+        onMouseMove={onMouseMove}
+        onMouseLeave={() => setHover(null)}
       >
         {/* Baseline */}
         <rect x={0} y={VH - 2} width={total} height={2} fill="#0f172a" />
@@ -117,6 +137,41 @@ export default function StackDepthMeter({ events, step, onSeek }) {
           <div key={i} style={{ width: 6, height: 10, background: c }} />
         ))}
       </div>
+
+      {/* Hover tooltip — fixed position so it escapes any overflow:hidden parents */}
+      {hoverData && hover && (
+        <div style={{
+          position: 'fixed',
+          left: hover.x + 14,
+          top: hover.y - 62,
+          zIndex: 9999,
+          pointerEvents: 'none',
+          background: '#0d1526',
+          border: `1px solid ${hoverData.color}55`,
+          borderRadius: 8,
+          padding: '7px 11px',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.6)',
+          minWidth: 180,
+        }}>
+          <div style={{
+            fontSize: 11, fontWeight: 700, color: hoverData.color,
+            fontFamily: 'JetBrains Mono, monospace', marginBottom: 2,
+          }}>
+            Depth {hoverData.d}/{maxDepth} — {hoverData.d === 1 ? '1 function deep' : `${hoverData.d} functions deep`}
+          </div>
+          {hoverData.fnName && (
+            <div style={{
+              fontSize: 10, color: '#7dd3fc',
+              fontFamily: 'JetBrains Mono, monospace', marginBottom: 3,
+            }}>
+              `{hoverData.fnName}` is running
+            </div>
+          )}
+          <div style={{ fontSize: 9, color: '#475569', fontFamily: 'JetBrains Mono, monospace' }}>
+            Click to jump to step {(hover.index ?? 0) + 1}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

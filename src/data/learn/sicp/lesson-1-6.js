@@ -12,7 +12,15 @@ export const lesson = {
     {
       type: 'narration',
       id: 'intro',
-      text: 'Section 1.3 is the payoff of everything so far. We have been treating numbers and booleans as first-class values — things you can name, pass around, return from functions. Now we do the same with functions themselves. A function that accepts another function as an argument is called a higher-order function, and it is one of the most powerful ideas in programming.',
+      text: 'Section 1.3 is the payoff of everything so far. We have been treating numbers and booleans as first-class values — things you can name, pass around, return from functions. Now we do the same with functions themselves. This is not a convenience feature — it is a fundamental shift in expressive power. Today we pass functions as arguments.',
+      code: null,
+    },
+
+    // ── Terminology: First-Class & Higher-Order ────────────────────────────────────
+    {
+      type: 'narration',
+      id: 'first-class-vocab',
+      text: 'In most languages, data and functions live in different worlds — you can pass a number to a function, but passing a function to a function requires special ceremony. JavaScript, following Scheme, treats functions as first-class values. First-class means a value can be named with const, passed as an argument to a function, returned as the result of a function, and stored in a data structure — exactly the same rights as a number. A function that takes another function as an argument, or returns a function as its result, is called a higher-order function.',
       code: null,
     },
 
@@ -20,34 +28,42 @@ export const lesson = {
     {
       type: 'narration',
       id: 'pattern-notice',
-      text: 'Look at these three functions. sum_integers adds 1 plus 2 plus dot dot dot plus n. sum_cubes adds cubes. pi_sum adds a specific series that approximates pi. They share the same skeleton: add up a sequence of terms from a to b, stepping through the sequence with a next function. Only the term and next parts differ.',
+      text: 'Look at these three functions. sum_integers adds 1 + 2 + ... + n. sum_cubes adds cubes. They share the same skeleton: add up a sequence of terms from a to b, advancing with a next function. Only the term computation and next step differ. This shared skeleton is a pattern waiting to be named.',
       code: 'function sum_integers(a, b) {\n  if (a > b) return 0;\n  return a + sum_integers(a + 1, b);\n}\n\nfunction sum_cubes(a, b) {\n  if (a > b) return 0;\n  return (a * a * a) + sum_cubes(a + 1, b);\n}\n\nconsole.log(sum_integers(1, 5)); // 15\nconsole.log(sum_cubes(1, 3));    // 36',
     },
+
+    // ── Abstraction ───────────────────────────────────────────────────────────────
     {
       type: 'narration',
       id: 'sum-abstraction',
-      text: 'We can capture this pattern as a single function. sum takes four arguments: term is the function applied to each element, a and b are the bounds, and next advances from one element to the next. The body is identical to all three versions above — only term and next vary.',
-      code: 'function sum(term, a, next, b) {\n  if (a > b) return 0;\n  return term(a) + sum(term, next(a), next, b);\n}\n\n// sum of integers 1..5: term is identity, next adds 1\nfunction identity(x) { return x; }\nfunction inc(x)      { return x + 1; }\n\nconsole.log(sum(identity, 1, inc, 5)); // 15\n\n// sum of cubes 1..3\nfunction cube(x) { return x * x * x; }\nconsole.log(sum(cube, 1, inc, 3)); // 36',
+      text: 'We capture the pattern as a single higher-order function. sum takes four arguments: term is the function applied to each element, a and b are the bounds, and next advances from one element to the next. The body is the same skeleton as both versions above — only term and next vary. We have abstracted over the varying parts by making them parameters.',
+      code: 'function sum(term, a, next, b) {\n  if (a > b) return 0;\n  return term(a) + sum(term, next(a), next, b);\n}\n\n// Sum of integers 1..5: term is identity, next adds 1\nfunction identity(x) { return x; }\nfunction inc(x)      { return x + 1; }\n\nconsole.log(sum(identity, 1, inc, 5)); // 15\n\n// Sum of cubes 1..3\nfunction cube(x) { return x * x * x; }\nconsole.log(sum(cube, 1, inc, 3)); // 36',
     },
 
-    // ── Lambda ────────────────────────────────────────────────────────────────────
+    // ── Terminology: Lambda ────────────────────────────────────────────────────────
+    {
+      type: 'narration',
+      id: 'lambda-vocab',
+      text: 'Defining identity and inc as standalone functions just to pass them once is noisy. Anonymous functions — also called lambdas, from the Greek letter λ used in the lambda calculus, the mathematical theory of computation underlying all functional programming — let you write a function inline without naming it. JavaScript\'s arrow function syntax is its lambda notation. The arrow x => x is the identity function. The arrow x => x + 1 is increment. Arrow functions are expressions: they can appear anywhere a value is expected.',
+      code: null,
+    },
     {
       type: 'narration',
       id: 'lambda-intro',
-      text: 'Defining identity and cube and inc as standalone functions just to pass them into sum is noisy. JavaScript has arrow functions — also called lambdas — for exactly this: anonymous inline functions. x arrow x is the identity. x arrow x times x times x is cube. We can inline them directly without naming them.',
-      code: 'function sum(term, a, next, b) {\n  if (a > b) return 0;\n  return term(a) + sum(term, next(a), next, b);\n}\n\n// Same results with inline arrow functions\nconsole.log(sum(x => x,         1, x => x + 1, 5));  // 15\nconsole.log(sum(x => x*x*x,     1, x => x + 1, 3));  // 36',
+      text: 'With arrow functions, we can inline the term and next arguments directly. No helper function definitions needed. The meaning is identical — we are just writing the function as a literal value rather than naming it first.',
+      code: 'function sum(term, a, next, b) {\n  if (a > b) return 0;\n  return term(a) + sum(term, next(a), next, b);\n}\n\n// Same results with inline arrow functions\nconsole.log(sum(x => x,       1, x => x + 1, 5));  // 15\nconsole.log(sum(x => x*x*x,   1, x => x + 1, 3));  // 36',
     },
     {
       type: 'narration',
       id: 'pi-sum',
-      text: 'The Leibniz formula says pi divided by 8 equals 1 over 1 times 3, plus 1 over 5 times 7, plus 1 over 9 times 11, and so on. Each term uses x times x plus 2 in the denominator. The next function adds 4 each time. We can express this directly with our sum abstraction and a lambda.',
+      text: 'The Leibniz formula: pi/8 = 1/(1*3) + 1/(5*7) + 1/(9*11) + ... Each term is 1/(x*(x+2)), and the sequence advances by 4 each time. We can express this directly with our sum abstraction and a lambda — no new named functions needed.',
       code: 'function sum(term, a, next, b) {\n  if (a > b) return 0;\n  return term(a) + sum(term, next(a), next, b);\n}\n\nfunction pi_sum(a, b) {\n  return sum(\n    x => 1 / (x * (x + 2)),\n    a,\n    x => x + 4,\n    b\n  );\n}\n\n// pi/8 ≈ pi_sum(1, 1000)\nconsole.log(8 * pi_sum(1, 1000));  // ≈ 3.139',
     },
     {
       type: 'codelens',
       id: 'codelens-sum',
-      text: 'Open CodeLens on sum(x => x*x, 1, x => x+1, 4). Step through it — watch how term and next are called as ordinary functions. The sum function has no idea what term or next do; it just calls them. This separation of the iteration pattern from the specific operation is what makes higher-order functions powerful.',
-      code: 'function sum(term, a, next, b) {\n  if (a > b) return 0;\n  return term(a) + sum(term, next(a), next, b);\n}\n\n// sum of squares: 1 + 4 + 9 + 16 = 30\nconsole.log(sum(x => x * x, 1, x => x + 1, 4));',
+      text: 'Open CodeLens on sum(x => x*x, 1, x => x+1, 4). Step through it — watch how term and next are called as ordinary functions. The sum function has no idea what they do; it just calls them. The iteration pattern is separated from the specific operation. This is what makes higher-order functions powerful.',
+      code: 'function sum(term, a, next, b) {\n  if (a > b) return 0;\n  return term(a) + sum(term, next(a), next, b);\n}\n\n// Sum of squares: 1 + 4 + 9 + 16 = 30\nconsole.log(sum(x => x * x, 1, x => x + 1, 4));',
     },
     {
       type: 'checkpoint',
@@ -56,7 +72,7 @@ export const lesson = {
     {
       type: 'challenge',
       id: 'challenge-sum-squares',
-      text: 'You have the sum function available. Write sum_squares(a, b) that uses it to compute the sum of squares from a to b. sum_squares(1, 4) should be 30 (1 + 4 + 9 + 16). Use a lambda for term and another for next — no helper functions needed.',
+      text: 'You have the sum function available. Write sum_squares(a, b) that uses it to compute the sum of squares from a to b. sum_squares(1, 4) should be 30 (1 + 4 + 9 + 16). Use a lambda for term and another for next — no helper function definitions needed.',
       expectedOutput: '30\n55',
       startCode: 'function sum(term, a, next, b) {\n  if (a > b) return 0;\n  return term(a) + sum(term, next(a), next, b);\n}\n\n// Write sum_squares(a, b) using sum with lambda arguments\n\n\nconsole.log(sum_squares(1, 4)); // 30  (1+4+9+16)\nconsole.log(sum_squares(1, 5)); // 55  (1+4+9+16+25)\n',
       hint: 'function sum_squares(a, b) {\n  return sum(x => x * x, a, x => x + 1, b);\n}',
@@ -72,10 +88,12 @@ export const lesson = {
         } catch { return false }
       },
     },
+
+    // ── Closures returned from functions ─────────────────────────────────────────
     {
       type: 'narration',
-      id: 'let-intro',
-      text: 'Arrow functions can also appear in let declarations, making local helper functions tidy. And they can be returned from functions — a function that returns a function. Here make_adder returns a new function that adds n to any argument. Each call to make_adder creates a fresh closure with its own n.',
+      id: 'closure-returned',
+      text: 'Arrow functions can also be returned from functions. A function that returns a function is another kind of higher-order function — it is a function factory. Each call creates a fresh closure: a new function with its own captured environment. make_adder(5) returns a closure that has captured n = 5. make_adder(10) returns a different closure with n = 10. The two closures are independent.',
       code: 'const make_adder = n => x => x + n;\n\nconst add5  = make_adder(5);\nconst add10 = make_adder(10);\n\nconsole.log(add5(3));   // 8\nconsole.log(add10(3));  // 13\nconsole.log(make_adder(100)(7)); // 107',
     },
     {

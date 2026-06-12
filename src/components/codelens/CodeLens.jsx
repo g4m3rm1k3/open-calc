@@ -4,7 +4,7 @@ import { buildProgramModel } from './parser/jsParser.js'
 import { run as runInterpreter } from './interpreter/interpreter.js'
 import { runPython } from './interpreter/pythonTracer.js'
 import { runNative } from './interpreter/nativeTracer.js'
-import { EXPLAIN } from './eventStream.js'
+import { EXPLAIN, CONCEPT_GLOSSARY } from './eventStream.js'
 import { buildHeapSnapshot } from './renderer/heapSnapshot.js'
 import HeapGraph from './renderer/HeapGraph.jsx'
 import CallGraphView from './renderer/CallGraphView.jsx'
@@ -285,6 +285,200 @@ function tokenColor(type) {
   return '#cbd5e1'
 }
 
+// ── Concept badge with glossary popover ───────────────────────────────────────
+
+function ConceptBadge({ concept, style: extraStyle }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+  const entry = CONCEPT_GLOSSARY[concept]
+
+  // Close when clicking outside
+  useEffect(() => {
+    if (!open) return
+    const handler = (e) => { if (!ref.current?.contains(e.target)) setOpen(false) }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [open])
+
+  if (!concept) return null
+
+  return (
+    <span ref={ref} style={{ position: 'relative', display: 'inline-block' }}>
+      <span
+        onClick={() => setOpen(o => !o)}
+        title={entry ? 'Click to learn more' : undefined}
+        style={{
+          fontSize: 10, padding: '2px 7px', borderRadius: 99,
+          background: '#1e1b4b', color: open ? '#a5b4fc' : '#6366f1',
+          border: `1px solid ${open ? '#6366f1' : '#6366f133'}`,
+          fontFamily: 'JetBrains Mono, monospace',
+          cursor: entry ? 'pointer' : 'default',
+          userSelect: 'none',
+          transition: 'all 0.1s',
+          ...extraStyle,
+        }}
+      >
+        {entry ? '✦ ' : ''}{concept}
+      </span>
+
+      {open && entry && (
+        <div style={{
+          position: 'fixed',
+          zIndex: 9999,
+          transform: 'translateX(-50%)',
+          left: ref.current ? ref.current.getBoundingClientRect().left + ref.current.offsetWidth / 2 : 0,
+          top: ref.current ? ref.current.getBoundingClientRect().bottom + 8 : 0,
+          background: '#0d1526',
+          border: '1px solid #6366f144',
+          borderRadius: 12,
+          padding: '14px 16px',
+          maxWidth: 320,
+          boxShadow: '0 8px 40px rgba(0,0,0,0.7)',
+          pointerEvents: 'auto',
+        }}>
+          {/* Glow strip */}
+          <div style={{
+            position: 'absolute', top: 0, left: 0, right: 0, height: 2,
+            background: 'linear-gradient(90deg, #6366f1, #818cf8, transparent)',
+            borderRadius: '12px 12px 0 0',
+          }} />
+
+          <div style={{ fontSize: 10, color: '#6366f1', fontFamily: 'JetBrains Mono, monospace',
+            fontWeight: 700, letterSpacing: '.06em', marginBottom: 6 }}>
+            {concept.toUpperCase()}
+          </div>
+
+          {/* TL;DR */}
+          <div style={{ fontSize: 12, fontWeight: 600, color: '#e2e8f0', lineHeight: 1.5, marginBottom: 8 }}>
+            {entry.tldr}
+          </div>
+
+          {/* Detail */}
+          <div style={{ fontSize: 11, color: '#64748b', lineHeight: 1.65, marginBottom: entry.analogy ? 8 : 0 }}>
+            {entry.detail}
+          </div>
+
+          {/* Analogy */}
+          {entry.analogy && (
+            <div style={{
+              borderLeft: '2px solid #f59e0b', paddingLeft: 8,
+              fontSize: 11, color: '#78716c', lineHeight: 1.6, marginBottom: 6,
+              fontStyle: 'italic',
+            }}>
+              {entry.analogy}
+            </div>
+          )}
+
+          {/* SICP ref */}
+          {entry.sicp && (
+            <div style={{ fontSize: 10, color: '#334155', fontFamily: 'JetBrains Mono, monospace' }}>
+              ↗ {entry.sicp}
+            </div>
+          )}
+        </div>
+      )}
+    </span>
+  )
+}
+
+// ── Narration bar ─────────────────────────────────────────────────────────────
+// Synthesises the current event into a plain-English tutor sentence.
+
+function buildNarration(event, prevEvent) {
+  if (!event) return null
+  const t  = event.type
+  const pt = prevEvent?.type
+
+  if (t === 'function_call') {
+    const argc = event.args?.length ?? 0
+    const argPart = argc === 0 ? '' : ` with ${event.args?.map(a => JSON.stringify(a)).join(', ')}`
+    const wasReturn = pt === 'function_return'
+    return wasReturn
+      ? `\`${prevEvent.functionName}\` just returned — now calling \`${event.functionName}\`${argPart}. A new stack frame is being pushed.`
+      : `Calling \`${event.functionName}\`${argPart}. The engine pushes a new frame onto the call stack — watch the stack depth increase.`
+  }
+
+  if (t === 'function_return') {
+    const retStr = JSON.stringify(event.returnValue)
+    const isBase = event.args?.length === 1 && (event.returnValue === event.args?.[0])
+    return isBase
+      ? `\`${event.functionName}\` hits its base case and returns ${retStr}. This frame is popped — the result travels back up the call stack.`
+      : `\`${event.functionName}\` is done and returns ${retStr}. Its frame is destroyed and execution resumes at the call site.`
+  }
+
+  if (t === 'variable_declare') {
+    return `\`${event.name}\` is declared and set to ${JSON.stringify(event.value)}. This binding lives in the current scope frame until the block closes.`
+  }
+
+  if (t === 'variable_assign') {
+    return `\`${event.name}\` just changed: ${JSON.stringify(event.oldValue)} → ${JSON.stringify(event.newValue)}. JavaScript found the binding in the scope chain and updated it there.`
+  }
+
+  if (t === 'conditional_branch') {
+    const taken = event.branch === 'then' ? 'if' : 'else'
+    return `The condition \`${event.condition}\` evaluated to ${event.result}. The ${taken} branch runs — the other branch is skipped entirely.`
+  }
+
+  if (t === 'loop_iteration') {
+    return `Iteration ${event.iteration} of the ${event.loopType} loop. The condition was re-evaluated and was truthy. Each iteration here adds to the total work done.`
+  }
+
+  if (t === 'object_create') {
+    return `A new ${event.objectType} was created on the heap (id #${event.objectId}). Variables that reference it hold an arrow to this object — not a copy.`
+  }
+
+  if (t === 'object_mutate') {
+    return `Heap object #${event.objectId} was mutated: \`.${event.property}\` changed. Every variable pointing to this object sees the update immediately.`
+  }
+
+  if (t === 'program_start') {
+    return 'The program starts. The global scope is set up and `var` declarations are hoisted. Step forward to trace execution line by line.'
+  }
+
+  if (t === 'program_end') {
+    return event.error
+      ? `Program ended with an uncaught ${event.error.type}. The error propagated all the way up the call stack without being caught.`
+      : 'All code has finished executing. Step back to review any moment in the trace.'
+  }
+
+  return null
+}
+
+function NarrationBar({ event, prevEvent }) {
+  const text = buildNarration(event, prevEvent)
+  if (!text) return null
+
+  return (
+    <div style={{
+      padding: '7px 14px',
+      background: 'linear-gradient(90deg, #0a0f1e, #080c14)',
+      borderBottom: '1px solid #1e293b',
+      fontSize: 12, color: '#94a3b8', lineHeight: 1.6,
+      flexShrink: 0,
+      display: 'flex', alignItems: 'flex-start', gap: 8,
+    }}>
+      <span style={{
+        fontSize: 10, padding: '2px 6px', borderRadius: 4, flexShrink: 0,
+        background: '#1e1b4b', color: '#818cf8',
+        fontFamily: 'JetBrains Mono, monospace', marginTop: 1,
+      }}>tutor</span>
+      <span style={{ flex: 1 }}>
+        {text.split(/(`[^`\n]+`)/g).map((part, i) =>
+          part.startsWith('`') && part.endsWith('`') ? (
+            <code key={i} style={{
+              background: '#1e293b', color: '#7dd3fc',
+              padding: '1px 5px', borderRadius: 3,
+              fontSize: '0.9em', fontFamily: 'JetBrains Mono, monospace',
+            }}>{part.slice(1, -1)}</code>
+          ) : part
+        )}
+      </span>
+    </div>
+  )
+}
+
+
+
 // ── AST viewer ────────────────────────────────────────────────────────────────
 
 function ASTNode({ node, depth = 0 }) {
@@ -352,10 +546,9 @@ function EventCard({ event, active }) {
           <span style={{ fontSize: 10, color: '#475569' }}>L{event.sourceLocation.line}</span>
         )}
         {explain.concept && (
-          <span style={{
-            marginLeft: 'auto', fontSize: 10, color: '#6366f1',
-            background: '#1e1b4b', padding: '1px 6px', borderRadius: 99,
-          }}>{explain.concept}</span>
+          <span style={{ marginLeft: 'auto' }}>
+            <ConceptBadge concept={explain.concept} />
+          </span>
         )}
       </div>
       <div style={{ fontSize: 12, color: '#e2e8f0', fontFamily: 'JetBrains Mono, monospace', marginBottom: explain.why ? 3 : 0 }}>
@@ -736,6 +929,12 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
         />
       )}
 
+      {/* ── Tutor narration bar ── */}
+      {execution && (
+        <NarrationBar event={currentEvent} prevEvent={prevEvent} />
+      )}
+
+
       {/* ── Body ── */}
       <div style={{
         flex: 1, display: 'flex', alignItems: 'stretch',
@@ -1085,13 +1284,7 @@ function ExplainHero({ event, step, total }) {
           background: `${color}22`, color, border: `1px solid ${color}55`,
           fontFamily: 'JetBrains Mono, monospace', fontWeight: 700, letterSpacing: '.04em',
         }}>{event.type}</span>
-        {explain.concept && (
-          <span style={{
-            fontSize: 10, padding: '2px 7px', borderRadius: 99,
-            background: '#1e293b', color: '#64748b', border: '1px solid #334155',
-            fontFamily: 'JetBrains Mono, monospace',
-          }}>{explain.concept}</span>
-        )}
+        {explain.concept && <ConceptBadge concept={explain.concept} />}
         {loc && (
           <span style={{
             marginLeft: 'auto', fontSize: 10,
@@ -1140,31 +1333,95 @@ function ExplainHero({ event, step, total }) {
   )
 }
 
+const IDLE_CARDS = [
+  {
+    icon: '📚',
+    color: '#818cf8',
+    title: 'Call Stack',
+    desc: 'See every function call open and close in real time. Understand how recursion builds frames — and how they unwind.',
+  },
+  {
+    icon: '🔍',
+    color: '#fbbf24',
+    title: 'Variable Watch',
+    desc: 'Track how variables change as each line runs. Spot mutations, scope boundaries, and value flow instantly.',
+  },
+  {
+    icon: '🧠',
+    color: '#86efac',
+    title: 'Heap & Objects',
+    desc: 'Watch objects get created and linked. Learn why two variables can point to the same object — and what that means.',
+  },
+]
+
 function IdleHero() {
+  const [card, setCard] = useState(0)
+
+  useEffect(() => {
+    const id = setInterval(() => setCard(c => (c + 1) % IDLE_CARDS.length), 3000)
+    return () => clearInterval(id)
+  }, [])
+
+  const c = IDLE_CARDS[card]
+
   return (
     <div style={{
-      background: '#0a0f1e', border: '1px solid #1e293b', borderRadius: 12,
-      padding: '24px 16px', display: 'flex', flexDirection: 'column',
-      alignItems: 'center', gap: 12, flexShrink: 0,
+      background: '#0a0f1e', border: `1px solid ${c.color}33`, borderRadius: 12,
+      padding: '20px 16px', display: 'flex', flexDirection: 'column',
+      alignItems: 'center', gap: 10, flexShrink: 0,
+      transition: 'border-color 0.4s',
+      position: 'relative', overflow: 'hidden',
     }}>
+      {/* Top glow accent */}
       <div style={{
-        width: 40, height: 40, borderRadius: '50%',
-        background: '#1e1b4b', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        position: 'absolute', top: 0, left: 0, right: 0, height: 2,
+        background: `linear-gradient(90deg, ${c.color}99, ${c.color}22)`,
+        borderRadius: '12px 12px 0 0',
+        transition: 'background 0.4s',
+      }} />
+
+      {/* Icon */}
+      <div style={{
+        width: 44, height: 44, borderRadius: '50%', fontSize: 22,
+        background: `${c.color}18`, border: `1px solid ${c.color}44`,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
-        <Play size={18} color="#6366f1" />
+        {c.icon}
       </div>
+
+      {/* Content */}
       <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: '#e2e8f0', marginBottom: 6 }}>
-          Ready to trace
+        <div style={{ fontSize: 13, fontWeight: 700, color: c.color, marginBottom: 5, transition: 'color 0.3s' }}>
+          {c.title}
         </div>
-        <div style={{ fontSize: 12, color: '#475569', lineHeight: 1.6 }}>
-          Press Run, then use Step or the slider<br />
-          to walk through every line as it executes.
+        <div style={{ fontSize: 11, color: '#64748b', lineHeight: 1.65, maxWidth: 220 }}>
+          {c.desc}
         </div>
+      </div>
+
+      {/* Dot indicators */}
+      <div style={{ display: 'flex', gap: 5, marginTop: 4 }}>
+        {IDLE_CARDS.map((_, i) => (
+          <div
+            key={i}
+            onClick={() => setCard(i)}
+            style={{
+              width: i === card ? 16 : 5, height: 5, borderRadius: 99,
+              background: i === card ? c.color : '#1e293b',
+              cursor: 'pointer', transition: 'all 0.25s',
+            }}
+          />
+        ))}
+      </div>
+
+      {/* CTA */}
+      <div style={{ fontSize: 11, color: '#334155', marginTop: 2 }}>
+        Press <span style={{ color: '#818cf8', fontFamily: 'JetBrains Mono, monospace' }}>Run</span> to begin
       </div>
     </div>
   )
 }
+
 
 // ── Heap panel ────────────────────────────────────────────────────────────────
 
@@ -1960,28 +2217,91 @@ function SectionLabel({ children }) {
 function TokensView({ model }) {
   const tokens = model?.files?.[0]?.tokens ?? []
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
-      {tokens.map((tok, i) => (
-        <span key={i} style={{
-          fontSize: 10, padding: '2px 6px', borderRadius: 4,
-          background: `${tokenColor(tok.type)}18`, color: tokenColor(tok.type),
-          border: `1px solid ${tokenColor(tok.type)}33`,
-          fontFamily: 'JetBrains Mono, monospace', cursor: 'default',
-        }} title={`${tok.type}  ${tok.start}–${tok.end}`}>
-          {tok.value ?? tok.type}
-        </span>
-      ))}
-      {tokens.length === 0 && <span style={{ color: '#475569', fontSize: 12 }}>No tokens.</span>}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      {/* Color legend */}
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap',
+        padding: '5px 0', borderBottom: '1px solid #1e293b',
+      }}>
+        <span style={{ fontSize: 9, color: '#334155', fontFamily: 'JetBrains Mono, monospace',
+          letterSpacing: '.08em' }}>TOKENS</span>
+        {Object.entries(TOKEN_COLORS).map(([label, color]) => (
+          <span key={label} style={{
+            display: 'flex', alignItems: 'center', gap: 3,
+            fontSize: 9, color: '#475569', fontFamily: 'JetBrains Mono, monospace',
+          }}>
+            <span style={{
+              width: 8, height: 8, borderRadius: 2, flexShrink: 0,
+              background: color + '44', border: `1px solid ${color}`,
+              display: 'inline-block',
+            }} />
+            {label}
+          </span>
+        ))}
+        <span style={{ marginLeft: 'auto', fontSize: 9, color: '#334155',
+          fontFamily: 'JetBrains Mono, monospace' }}>hover for type</span>
+      </div>
+
+      {/* Token chips */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
+        {tokens.map((tok, i) => (
+          <span key={i} style={{
+            fontSize: 10, padding: '2px 6px', borderRadius: 4,
+            background: `${tokenColor(tok.type)}18`, color: tokenColor(tok.type),
+            border: `1px solid ${tokenColor(tok.type)}33`,
+            fontFamily: 'JetBrains Mono, monospace', cursor: 'default',
+          }} title={`${tok.type}  ${tok.start}–${tok.end}`}>
+            {tok.value ?? tok.type}
+          </span>
+        ))}
+        {tokens.length === 0 && <span style={{ color: '#475569', fontSize: 12 }}>No tokens.</span>}
+      </div>
     </div>
   )
 }
 
 function AstView({ model }) {
+  const [open, setOpen] = useState(false)
   const ast = model?.files?.[0]?.ast
-  return ast
-    ? <ASTNode node={ast} depth={0} />
-    : <span style={{ color: '#475569', fontSize: 12 }}>No AST.</span>
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      {/* Collapsible intro */}
+      <div style={{ borderBottom: '1px solid #1e293b', paddingBottom: 6 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '3px 0' }}>
+          <span style={{ fontSize: 9, color: '#334155', fontFamily: 'JetBrains Mono, monospace',
+            letterSpacing: '.08em' }}>AST</span>
+          <button onClick={() => setOpen(v => !v)} style={{
+            marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer',
+            color: open ? '#818cf8' : '#334155', fontSize: 10,
+            fontFamily: 'JetBrains Mono, monospace', padding: 0,
+          }}>
+            {open ? '▲ hide' : '? what is this'}
+          </button>
+        </div>
+        {open && (
+          <div style={{
+            padding: '10px 0', fontSize: 11, color: '#64748b', lineHeight: 1.7,
+          }}>
+            <div style={{ fontWeight: 700, color: '#818cf8', marginBottom: 5 }}>
+              Abstract Syntax Tree — how the computer reads your code
+            </div>
+            The parser reads your source code and converts it into a <strong style={{ color: '#f1f5f9' }}>tree of nodes</strong> — one node per grammatical unit (a function declaration, a variable, an expression). Every node has a <em>type</em> and <em>children</em>.
+            <br /><br />
+            The interpreter then <strong style={{ color: '#f1f5f9' }}>walks this tree</strong> — visiting each node and executing what it means. That walk is what produces the event stream you see in the Events tab.
+            <br /><br />
+            <em style={{ color: '#475569' }}>Click any node to expand or collapse its children. Depth 0 (purple) = program root. Depth 1 (blue) = top-level statements.</em>
+          </div>
+        )}
+      </div>
+
+      {/* Tree */}
+      {ast
+        ? <ASTNode node={ast} depth={0} />
+        : <span style={{ color: '#475569', fontSize: 12 }}>No AST.</span>}
+    </div>
+  )
 }
+
 
 // ── Scope chain view ──────────────────────────────────────────────────────────
 
