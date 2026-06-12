@@ -1,0 +1,673 @@
+{
+  "_meta": {
+    "series": "MATHEMATICS-MASTERCLASS",
+    "description": "A full mathematics curriculum from solid algebra to PhD-level foundations. Proof-literate, intuition-first, code where it illuminates. Every formula derived, never handed down. Feynman-method throughout: you understand something when you can derive it from scratch.",
+    "audience": "Anyone with basic algebra experience. No calculus assumed. Ends at the level required to read mathematics research and first-year PhD coursework.",
+    "goal": "After completing this curriculum, the student can derive every major formula from first principles, read and write formal proofs, understand the foundational theorems of analysis and algebra, and connect abstract mathematics to computation and the real world.",
+    "codeEnvironments": "Python (pyodide — runs in browser, no install required), JavaScript canvas for geometric visualisations, Three.js for 3D linear algebra demonstrations, LaTeX math typeset via KaTeX.",
+    "governingDocuments": "MATHS_LESSON_CONTRACT.md (in this folder) — READ THIS FIRST before writing any lesson. LESSON_TEMPLATE.md (in this folder) — use as the scaffold for every new lesson. Reference lessons: M-000-Statements-Logic.md and M-001-Proof-Strategies.md.",
+    "writingStandard": "Feynman-method throughout. Story or puzzle before any notation. Every symbol earned. Code blocks ≤20 lines, one insight each. No verification loops. Student discovers before the lesson confirms. See MATHS_LESSON_CONTRACT.md.",
+    "referenceQualityLessons": ["M-000-Statements-Logic.md", "M-001-Proof-Strategies.md"],
+    "failureModes": "Reference-style lessons that list definitions without building to them, code blocks that print 20+ lines of True/True/True, notation in the opening sentence, multiple theorems dropped in rapid succession without motivation.",
+    "lessonCount": 53,
+    "weeksAtTenHoursPerWeek": 70,
+    "phases": {
+      "Phase 0": "M-000 to M-002 — Mathematical Thinking (1 week)",
+      "Phase 1": "M-003 to M-007 — Algebra Rebuilt (3 weeks)",
+      "Phase 2": "M-008 to M-010 — Functions and Their Behaviour (3 weeks)",
+      "Phase 3": "M-011 to M-012 — Polynomials and Complex Numbers (2 weeks)",
+      "Phase 4": "M-013 to M-015 — Exponentials, Logarithms, and Trigonometry (3 weeks)",
+      "Phase 5": "M-016 to M-017 — Limits and Continuity (3 weeks)",
+      "Phase 6": "M-018 to M-020 — Differential Calculus (4 weeks)",
+      "Phase 7": "M-021 to M-022 — Integral Calculus (4 weeks)",
+      "Phase 8": "M-023 to M-025 — Sequences and Series (3 weeks)",
+      "Phase 9": "M-026 to M-028 — Multivariable Calculus (4 weeks)",
+      "Phase 10": "M-029 to M-031 — Linear Algebra I (4 weeks)",
+      "Phase 11": "M-032 to M-034 — Linear Algebra II (3 weeks)",
+      "Phase 12": "M-035 to M-037 — Probability and Statistics (4 weeks)",
+      "Phase 13": "M-038 to M-040 — Combinatorics and Discrete Mathematics (3 weeks)",
+      "Phase 14": "M-041 to M-042 — Number Theory (3 weeks)",
+      "Phase 15": "M-043 — Concrete Mathematics (4 weeks)",
+      "Phase 16": "M-044 to M-046 — Real Analysis (5 weeks)",
+      "Phase 17": "M-047 to M-049 — Abstract Algebra (4 weeks)",
+      "Phase 18": "M-050 to M-051 — Topology and Metric Spaces (3 weeks)",
+      "Phase 19": "M-052 — Synthesis (2 weeks)"
+    }
+  },
+
+  "M-000": {
+    "title": "Statements, Truth, and Logic",
+    "phase": 0,
+    "phaseName": "Mathematical Thinking",
+    "concept": "A mathematical statement is a sentence that is either true or false. Logical connectives (and, or, not, implies, iff) combine statements. Quantifiers (for all, there exists) close open sentences into full statements. The asymmetry between for-all and there-exists determines what a proof must do.",
+    "pillar": "Structure",
+    "visibleAtEnd": "Python code that demonstrates the for-all/there-exists asymmetry — one counterexample kills a for-all claim; a witness proves a there-exists claim",
+    "buildsOn": [],
+    "file": "M-000-Statements-Logic.md",
+    "status": "complete"
+  },
+
+  "M-001": {
+    "title": "Proof Strategies",
+    "phase": 0,
+    "phaseName": "Mathematical Thinking",
+    "concept": "Four proof strategies: direct proof, proof by contradiction, mathematical induction, proof by contrapositive. Each is a different machine for converting assumptions into conclusions. Choosing the right strategy is half the proof.",
+    "pillar": "Structure",
+    "visibleAtEnd": "Python code that verifies the sum formula 1+2+...+n = n(n+1)/2 for n = 1 to 100, confirming the inductive proof",
+    "buildsOn": ["M-000"],
+    "file": "M-001-Proof-Strategies.md",
+    "status": "complete"
+  },
+
+  "M-002": {
+    "title": "Sets and Notation",
+    "phase": 0,
+    "phaseName": "Mathematical Thinking",
+    "concept": "Sets as the foundation of all mathematical objects. Set operations (union, intersection, difference, complement, Cartesian product). Set-builder notation. The standard number sets N, Z, Q, R, C. Functions as subsets of Cartesian products.",
+    "pillar": "Structure",
+    "visibleAtEnd": "Python code implementing set operations and printing membership, union, intersection for concrete examples",
+    "buildsOn": ["M-000", "M-001"],
+    "file": "M-002-Sets-Notation.md",
+    "status": "complete"
+  },
+
+  "M-003": {
+    "title": "The Real Numbers as a Field",
+    "phase": 1,
+    "phaseName": "Algebra Rebuilt",
+    "concept": "The nine field axioms for R. Everything in algebra is derived from these axioms — nothing is taken as given. Proof that a·0 = 0 and (-1)·a = -a directly from the axioms. Why 'negative times negative is positive' is not a rule but a theorem.",
+    "pillar": "Structure",
+    "visibleAtEnd": "Python code that verifies field axiom consequences numerically and prints a step-by-step algebraic derivation",
+    "buildsOn": ["M-000", "M-001", "M-002"],
+    "file": "M-003-Field-Axioms.md",
+    "status": "complete"
+  },
+
+  "M-004": {
+    "title": "Inequalities and the Ordered Field",
+    "phase": 1,
+    "phaseName": "Algebra Rebuilt",
+    "concept": "The two ordering axioms (trichotomy; positive closure under addition and multiplication) from which all inequality rules follow. Proof that a² ≥ 0, that multiplying by a negative flips the inequality, and that the Cauchy-Schwarz inequality holds. Why R is an ordered field but C is not.",
+    "pillar": "Structure",
+    "visibleAtEnd": "Canvas visualisation of the number line with inequalities, plus Python verifier for the triangle inequality",
+    "buildsOn": ["M-003"],
+    "file": "M-004-Inequalities-Ordered-Field.md",
+    "status": "complete"
+  },
+
+  "M-005": {
+    "title": "The Quadratic Formula — Derived, Not Memorised",
+    "phase": 1,
+    "phaseName": "Algebra Rebuilt",
+    "concept": "Completing the square as the technique that encodes the quadratic formula. The discriminant Δ = b²-4ac and its three cases. Every step of the derivation is reversible — knowing it means never needing to memorise the result.",
+    "pillar": "Structure",
+    "visibleAtEnd": "Python function that solves ax²+bx+c=0, prints the discriminant analysis, and verifies solutions by substitution",
+    "buildsOn": ["M-003", "M-004"],
+    "file": "M-005-Quadratic-Formula-Derived.md",
+    "status": "complete"
+  },
+
+  "M-006": {
+    "title": "Absolute Value, Distance, and Intervals",
+    "phase": 1,
+    "phaseName": "Algebra Rebuilt",
+    "concept": "Absolute value as distance from zero. |x-y| as the distance between x and y — the language all epsilon-delta proofs speak. The triangle inequality proved and explained. Open, closed, and half-open intervals. Why the open/closed distinction matters for continuity and compactness.",
+    "pillar": "Structure",
+    "visibleAtEnd": "Canvas visualisation of intervals and distance on the number line",
+    "buildsOn": ["M-003", "M-004"],
+    "file": "M-006-Absolute-Value-Distance-Intervals.md",
+    "status": "complete"
+  },
+
+  "M-007": {
+    "title": "Exponents and Their Laws",
+    "phase": 1,
+    "phaseName": "Algebra Rebuilt",
+    "concept": "Exponent laws derived from counting, not memorised. Extension to zero, negative, and rational exponents forced by demanding consistency. The pattern of extending structures by requiring existing laws to continue to hold — a pattern that recurs in complex exponents and matrix exponents.",
+    "pillar": "Structure",
+    "visibleAtEnd": "Python code deriving and verifying all exponent laws, plus a table showing why a^0 = 1 must be the definition",
+    "buildsOn": ["M-003"],
+    "file": "M-007-Exponents-Laws.md",
+    "status": "complete"
+  },
+
+  "M-008": {
+    "title": "Functions as Sets",
+    "phase": 2,
+    "phaseName": "Functions and Their Behaviour",
+    "concept": "The formal definition of a function as a subset of A×B. Domain, codomain, range. Injective (one-to-one), surjective (onto), bijective. Why bijections are the tool for comparing infinite set sizes. Cantor's diagonal argument previewed.",
+    "pillar": "Transformation",
+    "visibleAtEnd": "Python code that tests injectivity and surjectivity for concrete finite functions",
+    "buildsOn": ["M-002", "M-007"],
+    "file": "M-008-Functions-as-Sets.md",
+    "status": "complete"
+  },
+
+  "M-009": {
+    "title": "Inverse Functions",
+    "phase": 2,
+    "phaseName": "Functions and Their Behaviour",
+    "concept": "When inverses exist and why (bijection ↔ invertible). The graphical interpretation as reflection across y = x. Restricting domains to create invertible functions. The inverse idea as a thread: x⁻¹ in arithmetic, f⁻¹ in functions, A⁻¹ in matrices, ∫ as inverse of d/dx.",
+    "pillar": "Transformation",
+    "visibleAtEnd": "Canvas animation showing f and f⁻¹ as reflections across y=x",
+    "buildsOn": ["M-008"],
+    "file": "M-009-Inverse-Functions.md",
+    "status": "complete"
+  },
+
+  "M-010": {
+    "title": "Composition and Transformations",
+    "phase": 2,
+    "phaseName": "Functions and Their Behaviour",
+    "concept": "Composition as function application in sequence. Non-commutativity of composition. Reading graph transformations from function composition — why f(x+2) shifts left, not right. How composition encodes every graph transformation without memorisation.",
+    "pillar": "Transformation",
+    "visibleAtEnd": "Canvas showing a function and its transformations (shift, scale, reflect) with composition analysis",
+    "buildsOn": ["M-008", "M-009"],
+    "file": "M-010-Composition-Transformations.md",
+    "status": "complete"
+  },
+
+  "M-011": {
+    "title": "Polynomials — Division, Roots, and the Fundamental Theorem",
+    "phase": 3,
+    "phaseName": "Polynomials and Rational Functions",
+    "concept": "The division algorithm for polynomials (analogue of integer division). Remainder theorem and factor theorem derived. The Fundamental Theorem of Algebra stated with proof sketch. Why every odd-degree polynomial has a real root.",
+    "pillar": "Structure",
+    "visibleAtEnd": "Python polynomial division and root-finding code, verifying Factor Theorem by substitution",
+    "buildsOn": ["M-005", "M-008"],
+    "file": "M-011-Polynomials-Division-Roots.md",
+    "status": "complete"
+  },
+
+  "M-012": {
+    "title": "Complex Numbers",
+    "phase": 3,
+    "phaseName": "Polynomials and Rational Functions",
+    "concept": "Why x²+1=0 forces extending R. C as a field. The complex plane as geometry. Modulus, argument, Euler's formula (derived from Taylor series — previewed, proved in Phase 8). Multiplication as rotation and scaling. Complex conjugate and division.",
+    "pillar": "Structure",
+    "visibleAtEnd": "Canvas showing complex multiplication as rotation and scaling on the Argand plane",
+    "buildsOn": ["M-003", "M-011"],
+    "file": "M-012-Complex-Numbers.md",
+    "status": "complete"
+  },
+
+  "M-013": {
+    "title": "The Exponential Function",
+    "phase": 4,
+    "phaseName": "Exponentials, Logarithms, and Trigonometry",
+    "concept": "The exponential function defined as the unique function equal to its own derivative. Defining e via the limit (1+1/n)^n. Compound interest as the physical motivation. Exponential growth, decay, and the significance of the base e.",
+    "pillar": "Approximation",
+    "visibleAtEnd": "Python code computing e via the limit definition and showing convergence across n = 1 to 10^7",
+    "buildsOn": ["M-007", "M-009"],
+    "file": "M-013-Exponential-Function.md",
+    "status": "complete"
+  },
+
+  "M-014": {
+    "title": "Logarithms as Inverses",
+    "phase": 4,
+    "phaseName": "Exponentials, Logarithms, and Trigonometry",
+    "concept": "The natural logarithm as the inverse of the exponential. Logarithm laws derived from exponent laws (not memorised). Change of base. Why ln is the natural choice. The logarithm as measurement of multiplicative scale.",
+    "pillar": "Transformation",
+    "visibleAtEnd": "Python code deriving and verifying all log laws, plus a plot showing ln(x) as the reflection of e^x",
+    "buildsOn": ["M-007", "M-009", "M-013"],
+    "file": "M-014-Logarithms-as-Inverses.md",
+    "status": "complete"
+  },
+
+  "M-015": {
+    "title": "Trigonometry from the Unit Circle",
+    "phase": 4,
+    "phaseName": "Exponentials, Logarithms, and Trigonometry",
+    "concept": "Unit circle definition of sin and cos (not right-triangle). Why radians are essential for calculus. Pythagorean identity proved from the circle definition. Angle addition formulas derived via complex numbers (the cleanest proof). Double-angle formulas derived, not memorised.",
+    "pillar": "Transformation",
+    "visibleAtEnd": "Canvas animation of the unit circle showing sin and cos as coordinates of a rotating point",
+    "buildsOn": ["M-012", "M-013"],
+    "file": "M-015-Trigonometry-Unit-Circle.md",
+    "status": "complete"
+  },
+
+  "M-016": {
+    "title": "The Epsilon-Delta Definition of a Limit",
+    "phase": 5,
+    "phaseName": "Limits and Continuity",
+    "concept": "Why 'approaching' needs a precise definition. The epsilon-delta definition built intuitively first, then formally. The order of quantifiers (∀ε ∃δ) and why it matters. A worked limit proof with scratchwork shown. Code that verifies the definition numerically.",
+    "pillar": "Approximation",
+    "visibleAtEnd": "Canvas visualisation of epsilon-delta: a tolerance band around L with the corresponding δ-neighbourhood of a, plus Python numerical verifier",
+    "buildsOn": ["M-006", "M-008"],
+    "file": "M-016-Epsilon-Delta-Limits.md",
+    "status": "complete"
+  },
+
+  "M-017": {
+    "title": "Limit Laws, Continuity, and the IVT",
+    "phase": 5,
+    "phaseName": "Limits and Continuity",
+    "concept": "Limit laws proved from epsilon-delta. Continuity defined. The three conditions for continuity at a point. The Intermediate Value Theorem stated with proof idea and bisection as its computational consequence. Why IVT requires completeness of R.",
+    "pillar": "Approximation",
+    "visibleAtEnd": "Python bisection algorithm finding roots, showing IVT in action",
+    "buildsOn": ["M-016"],
+    "file": "M-017-Limit-Laws-Continuity-IVT.md",
+    "status": "complete"
+  },
+
+  "M-018": {
+    "title": "The Derivative as a Limit",
+    "phase": 6,
+    "phaseName": "Differential Calculus",
+    "concept": "Instantaneous rate as the resolution of 0/0. The derivative defined as the limit of the difference quotient. Geometric interpretation: secant lines converging to the tangent. Derivatives of x², sin(x), and e^x computed from the definition. Differentiability implies continuity.",
+    "pillar": "Approximation",
+    "visibleAtEnd": "Canvas showing secant lines converging to the tangent as h→0, plus Python computing derivatives from the definition",
+    "buildsOn": ["M-016", "M-015", "M-013"],
+    "file": "M-018-Derivative-as-Limit.md",
+    "status": "complete"
+  },
+
+  "M-019": {
+    "title": "Differentiation Rules",
+    "phase": 6,
+    "phaseName": "Differential Calculus",
+    "concept": "Product rule, quotient rule, and chain rule — all proved from the definition. The power rule extended to all real exponents. Each rule is a theorem, not a technique. Implicit differentiation as chain rule application.",
+    "pillar": "Approximation",
+    "visibleAtEnd": "Python symbolic-style verifier computing derivatives via rules and checking against numerical difference quotients",
+    "buildsOn": ["M-018"],
+    "file": "M-019-Differentiation-Rules.md",
+    "status": "complete"
+  },
+
+  "M-020": {
+    "title": "What the Derivative Tells You",
+    "phase": 6,
+    "phaseName": "Differential Calculus",
+    "concept": "First and second derivative tests. The Mean Value Theorem proved and applied. Concavity, inflection points, optimisation. L'Hôpital's Rule with proof via Cauchy MVT. Newton's method as repeated linearisation.",
+    "pillar": "Approximation",
+    "visibleAtEnd": "Python implementing Newton's method for root finding, showing quadratic convergence",
+    "buildsOn": ["M-019"],
+    "file": "M-020-Derivative-Tells-You.md",
+    "status": "complete"
+  },
+
+  "M-021": {
+    "title": "The Riemann Integral",
+    "phase": 7,
+    "phaseName": "Integral Calculus",
+    "concept": "Area as a limit of Riemann sums. The integral defined rigorously. Left, right, and midpoint rules. Error analysis. Why continuity on [a,b] guarantees integrability. Visualisation of rectangles converging to exact area.",
+    "pillar": "Approximation",
+    "visibleAtEnd": "Python Riemann sum implementation with convergence table and error analysis",
+    "buildsOn": ["M-016", "M-017"],
+    "file": "M-021-Riemann-Integral.md",
+    "status": "complete"
+  },
+
+  "M-022": {
+    "title": "The Fundamental Theorem of Calculus",
+    "phase": 7,
+    "phaseName": "Integral Calculus",
+    "concept": "FTC Part 1: differentiation undoes integration. FTC Part 2: antidifferentiation computes area. The connection between the two operations — the deepest result in calculus. Integration by substitution (reverse chain rule) and integration by parts (reverse product rule).",
+    "pillar": "Approximation",
+    "visibleAtEnd": "Python verifying FTC numerically: computing ∫₀ˣ f(t)dt and checking that its derivative equals f(x)",
+    "buildsOn": ["M-021", "M-019"],
+    "file": "M-022-Fundamental-Theorem-Calculus.md",
+    "status": "complete"
+  },
+
+  "M-023": {
+    "title": "Sequences and Their Convergence",
+    "phase": 8,
+    "phaseName": "Sequences and Series",
+    "concept": "The epsilon-N definition of sequence convergence (same structure as epsilon-delta). Cauchy sequences. Monotone convergence theorem. Why completeness of R is what makes sequences converge. Examples of convergent and divergent sequences with proofs.",
+    "pillar": "Approximation",
+    "visibleAtEnd": "Python code visualising sequences converging (and failing to converge), printing epsilon-N witnesses",
+    "buildsOn": ["M-016", "M-017"],
+    "file": "M-023-Sequences-Convergence.md",
+    "status": "complete"
+  },
+
+  "M-024": {
+    "title": "Series and Convergence Tests",
+    "phase": 8,
+    "phaseName": "Sequences and Series",
+    "concept": "A series as the limit of partial sums. The geometric series derived and proved. Divergence test, ratio test, integral test, comparison test, alternating series test — each with proof sketch and guidance on when to use it. The harmonic series as the canonical divergent example.",
+    "pillar": "Approximation",
+    "visibleAtEnd": "Python running all convergence tests on a battery of series, printing pass/fail with explanation",
+    "buildsOn": ["M-023", "M-022"],
+    "file": "M-024-Series-Convergence-Tests.md",
+    "status": "complete"
+  },
+
+  "M-025": {
+    "title": "Taylor Series",
+    "phase": 8,
+    "phaseName": "Sequences and Series",
+    "concept": "Approximating functions by polynomials. Deriving the Taylor coefficients from successive differentiation. Key series for e^x, sin x, cos x derived. Euler's formula e^(ix) = cos x + i sin x derived from the series. Radius of convergence.",
+    "pillar": "Approximation",
+    "visibleAtEnd": "Python showing Taylor partial sums of sin(x) converging to the true function, with error plot",
+    "buildsOn": ["M-024", "M-019", "M-015", "M-013"],
+    "file": "M-025-Taylor-Series.md",
+    "status": "complete"
+  },
+
+  "M-026": {
+    "title": "Partial Derivatives and the Gradient",
+    "phase": 9,
+    "phaseName": "Multivariable Calculus",
+    "concept": "Extending derivatives to functions of several variables. Partial derivatives as slices. The gradient ∇f as the direction of steepest ascent — this is a theorem, not a definition. Directional derivatives. The chain rule for multivariable functions.",
+    "pillar": "Approximation",
+    "visibleAtEnd": "Python computing gradients and showing that gradient descent follows the steepest-ascent direction",
+    "buildsOn": ["M-018", "M-019"],
+    "file": "M-026-Partial-Derivatives-Gradient.md",
+    "status": "complete"
+  },
+
+  "M-027": {
+    "title": "Multiple Integrals",
+    "phase": 9,
+    "phaseName": "Multivariable Calculus",
+    "concept": "Double integrals as iterated integration. Fubini's theorem: when can we swap the order? Polar coordinates for circular regions. Applications: computing volumes, areas, and averages over 2D regions.",
+    "pillar": "Approximation",
+    "visibleAtEnd": "Python computing double integrals numerically and verifying against analytic results",
+    "buildsOn": ["M-022", "M-026"],
+    "file": "M-027-Multiple-Integrals.md",
+    "status": "complete"
+  },
+
+  "M-028": {
+    "title": "The Jacobian and Change of Variables",
+    "phase": 9,
+    "phaseName": "Multivariable Calculus",
+    "concept": "The Jacobian determinant as the local scaling factor of a coordinate transformation. Change of variables formula for multiple integrals. Polar, cylindrical, and spherical coordinates as specific cases. Jacobian as the multivariable analogue of u-substitution.",
+    "pillar": "Transformation",
+    "visibleAtEnd": "Python computing a Jacobian and verifying a change-of-variables integral transformation numerically",
+    "buildsOn": ["M-027", "M-031"],
+    "file": "M-028-Jacobian-Change-Variables.md",
+    "status": "complete"
+  },
+
+  "M-029": {
+    "title": "Vectors and Vector Spaces",
+    "phase": 10,
+    "phaseName": "Linear Algebra I",
+    "concept": "The abstract definition of a vector space. Vectors are not arrows — they are elements of any set satisfying eight axioms. R^n, polynomials, matrices, and continuous functions are all vector spaces. Linear independence, span, basis, dimension. Why basis size is well-defined.",
+    "pillar": "Transformation",
+    "visibleAtEnd": "Canvas 2D visualisation of span and linear independence; Python testing the axioms",
+    "buildsOn": ["M-003", "M-008"],
+    "file": "M-029-Vectors-Vector-Spaces.md",
+    "status": "complete"
+  },
+
+  "M-030": {
+    "title": "Linear Transformations and Matrices",
+    "phase": 10,
+    "phaseName": "Linear Algebra I",
+    "concept": "Linear transformations defined by two axioms. Every linear map T:R^n→R^m corresponds to a matrix. Matrix multiplication defined as composition — not as an arbitrary rule. The four fundamental subspaces. Rank-nullity theorem.",
+    "pillar": "Transformation",
+    "visibleAtEnd": "Canvas showing geometric effect of 2×2 matrices (rotation, shear, projection) with interactive transformation",
+    "buildsOn": ["M-029"],
+    "file": "M-030-Linear-Transformations-Matrices.md",
+    "status": "complete"
+  },
+
+  "M-031": {
+    "title": "Determinants and Gaussian Elimination",
+    "phase": 10,
+    "phaseName": "Linear Algebra I",
+    "concept": "Determinant as signed scaling factor of a linear transformation. 2×2 determinant as parallelogram area. Expansion by cofactors. Gaussian elimination as sequential elementary matrix multiplication. LU decomposition. Solving Ax=b.",
+    "pillar": "Transformation",
+    "visibleAtEnd": "Python step-by-step Gaussian elimination with LU decomposition, solving a system and verifying Ax=b",
+    "buildsOn": ["M-030"],
+    "file": "M-031-Determinants-Gaussian-Elimination.md",
+    "status": "complete"
+  },
+
+  "M-032": {
+    "title": "Eigenvalues and Eigenvectors",
+    "phase": 11,
+    "phaseName": "Linear Algebra II",
+    "concept": "Eigenvectors as preferred directions of a linear transformation. The characteristic equation det(A-λI)=0. Diagonalisation A=PDP⁻¹ and why it matters. Computing A^k via eigenvalues. Applications: Markov chains, differential equations, PageRank.",
+    "pillar": "Transformation",
+    "visibleAtEnd": "Canvas 2D visualisation showing eigenvectors of a 2×2 matrix as the directions preserved under the transformation",
+    "buildsOn": ["M-031"],
+    "file": "M-032-Eigenvalues-Eigenvectors.md",
+    "status": "complete"
+  },
+
+  "M-033": {
+    "title": "The Spectral Theorem",
+    "phase": 11,
+    "phaseName": "Linear Algebra II",
+    "concept": "Real symmetric matrices have real eigenvalues and orthogonal eigenvectors. The spectral decomposition A=QΛQ^T. Principal Component Analysis as spectral theorem application. Quadratic forms and positive definiteness.",
+    "pillar": "Transformation",
+    "visibleAtEnd": "Python computing spectral decomposition and verifying A=QΛQ^T, with a PCA example",
+    "buildsOn": ["M-032"],
+    "file": "M-033-Spectral-Theorem.md",
+    "status": "complete"
+  },
+
+  "M-034": {
+    "title": "Singular Value Decomposition",
+    "phase": 11,
+    "phaseName": "Linear Algebra II",
+    "concept": "Every matrix A=UΣV^T: rotation, then scaling, then rotation. Geometric interpretation. Singular values vs eigenvalues. SVD for least squares, image compression, PCA, pseudoinverse, and dimensionality reduction.",
+    "pillar": "Transformation",
+    "visibleAtEnd": "Python SVD image compression: compress a grayscale image using the top-k singular values",
+    "buildsOn": ["M-033"],
+    "file": "M-034-SVD.md",
+    "status": "complete"
+  },
+
+  "M-035": {
+    "title": "Probability Spaces",
+    "phase": 12,
+    "phaseName": "Probability and Statistics",
+    "concept": "The measure-theoretic probability space (Ω, F, P). Discrete and continuous cases. Conditional probability. Bayes' theorem as the formula for updating beliefs. Independence. The sigma-algebra as the precise notion of 'what events are observable'.",
+    "pillar": "Counting",
+    "visibleAtEnd": "Python simulation of Bayes' theorem on a disease testing scenario, comparing intuition to correct calculation",
+    "buildsOn": ["M-002", "M-038"],
+    "file": "M-035-Probability-Spaces.md",
+    "status": "complete"
+  },
+
+  "M-036": {
+    "title": "Random Variables and Expectation",
+    "phase": 12,
+    "phaseName": "Probability and Statistics",
+    "concept": "Random variables as functions on probability spaces. Expectation as a weighted average. Linearity of expectation (proved, not assumed). Variance. Markov's and Chebyshev's inequalities. The law of large numbers.",
+    "pillar": "Counting",
+    "visibleAtEnd": "Python simulation demonstrating the law of large numbers: sample mean converging to E[X]",
+    "buildsOn": ["M-035"],
+    "file": "M-036-Random-Variables-Expectation.md",
+    "status": "complete"
+  },
+
+  "M-037": {
+    "title": "Key Distributions and the Central Limit Theorem",
+    "phase": 12,
+    "phaseName": "Probability and Statistics",
+    "concept": "Bernoulli, Binomial, Geometric, Poisson, Normal — each derived from first principles. The Central Limit Theorem: sums of independent random variables converge to Gaussian, regardless of distribution. Why the normal distribution is everywhere.",
+    "pillar": "Counting",
+    "visibleAtEnd": "Python demonstrating CLT: sum of uniform random variables converging to a normal bell curve",
+    "buildsOn": ["M-036", "M-025"],
+    "file": "M-037-Distributions-CLT.md",
+    "status": "complete"
+  },
+
+  "M-038": {
+    "title": "Counting Principles",
+    "phase": 13,
+    "phaseName": "Combinatorics and Discrete Mathematics",
+    "concept": "The multiplication principle. Permutations and combinations derived from first principles (not formulas memorised). Pascal's triangle and binomial coefficients. The binomial theorem proved by induction. Stars and bars.",
+    "pillar": "Counting",
+    "visibleAtEnd": "Python computing binomial coefficients and verifying Pascal's identity C(n,k) = C(n-1,k-1) + C(n-1,k)",
+    "buildsOn": ["M-001"],
+    "file": "M-038-Counting-Principles.md",
+    "status": "complete"
+  },
+
+  "M-039": {
+    "title": "Pigeonhole Principle and Inclusion-Exclusion",
+    "phase": 13,
+    "phaseName": "Combinatorics and Discrete Mathematics",
+    "concept": "Pigeonhole principle and its generalisations — simple to state, surprisingly powerful. Inclusion-exclusion formula for union of sets. Derangements as an application. Möbius inversion as the algebraic generalisation.",
+    "pillar": "Counting",
+    "visibleAtEnd": "Python verifying inclusion-exclusion on concrete examples, computing derangement counts",
+    "buildsOn": ["M-038"],
+    "file": "M-039-Pigeonhole-Inclusion-Exclusion.md",
+    "status": "complete"
+  },
+
+  "M-040": {
+    "title": "Graph Theory Basics",
+    "phase": 13,
+    "phaseName": "Combinatorics and Discrete Mathematics",
+    "concept": "Graphs as pairs (V,E). Paths, cycles, connectedness. Trees and the proof that a tree on n vertices has n-1 edges. Euler paths and Euler's formula V-E+F=2 for planar graphs. Bipartite graphs. Graph colouring.",
+    "pillar": "Structure",
+    "visibleAtEnd": "Python implementing BFS/DFS and testing Euler's formula on planar graphs",
+    "buildsOn": ["M-001", "M-038"],
+    "file": "M-040-Graph-Theory-Basics.md",
+    "status": "complete"
+  },
+
+  "M-041": {
+    "title": "Divisibility and the Euclidean Algorithm",
+    "phase": 14,
+    "phaseName": "Number Theory",
+    "concept": "Divisibility, GCD, LCM. The Euclidean algorithm with proof of correctness. Bézout's theorem: gcd(a,b) = ax+by. The Fundamental Theorem of Arithmetic (unique prime factorisation) proved by strong induction.",
+    "pillar": "Structure",
+    "visibleAtEnd": "Python implementing the extended Euclidean algorithm and computing Bézout coefficients",
+    "buildsOn": ["M-001", "M-003"],
+    "file": "M-041-Divisibility-Euclidean-Algorithm.md",
+    "status": "complete"
+  },
+
+  "M-042": {
+    "title": "Modular Arithmetic and Its Applications",
+    "phase": 14,
+    "phaseName": "Number Theory",
+    "concept": "Congruences. Z/nZ as a ring. Z/pZ as a field when p is prime. Fermat's Little Theorem proved via Lagrange's theorem on groups. Chinese Remainder Theorem. RSA encryption as an application — see exactly why it works.",
+    "pillar": "Structure",
+    "visibleAtEnd": "Python implementing a mini-RSA: key generation, encryption, decryption with modular exponentiation",
+    "buildsOn": ["M-041", "M-003"],
+    "file": "M-042-Modular-Arithmetic.md",
+    "status": "complete"
+  },
+
+  "M-043": {
+    "title": "Concrete Mathematics — The Bridge to Algorithm Analysis",
+    "phase": 15,
+    "phaseName": "Concrete Mathematics",
+    "concept": "Overview of Concrete Mathematics: recurrences, sums in closed form, generating functions, asymptotics, and their role in analysing algorithms. By Phase 15 you have all prerequisites. Key results: Master Theorem, Stirling's approximation, Fibonacci via generating functions.",
+    "pillar": "Counting",
+    "visibleAtEnd": "Python computing the Master Theorem case analysis and verifying against direct recursion-tree counting",
+    "buildsOn": ["M-024", "M-038", "M-041", "M-031"],
+    "file": "M-043-Concrete-Mathematics-Overview.md",
+    "status": "complete"
+  },
+
+  "M-044": {
+    "title": "Completeness and the Real Numbers",
+    "phase": 16,
+    "phaseName": "Real Analysis",
+    "concept": "The least upper bound axiom. Supremum and infimum. Why Q is not complete (√2 has no rational supremum in a certain set). Consequences: monotone convergence theorem, Bolzano-Weierstrass, Heine-Cantor, extreme value theorem — all from one axiom.",
+    "pillar": "Approximation",
+    "visibleAtEnd": "Python demonstrating that a Cauchy sequence in Q can fail to converge in Q but always converges in R",
+    "buildsOn": ["M-023", "M-003"],
+    "file": "M-044-Completeness-Real-Numbers.md",
+    "status": "complete"
+  },
+
+  "M-045": {
+    "title": "Rigorous Epsilon-Delta Proofs",
+    "phase": 16,
+    "phaseName": "Real Analysis",
+    "concept": "Returning to limits and continuity with full rigour. Proving limit laws from the definition. Uniform continuity vs pointwise continuity. The Heine-Cantor theorem: every continuous function on a closed bounded interval is uniformly continuous.",
+    "pillar": "Approximation",
+    "visibleAtEnd": "Python constructing epsilon-delta proofs numerically for a library of functions",
+    "buildsOn": ["M-016", "M-044"],
+    "file": "M-045-Rigorous-Epsilon-Delta.md",
+    "status": "complete"
+  },
+
+  "M-046": {
+    "title": "Uniform Convergence and Power Series",
+    "phase": 16,
+    "phaseName": "Real Analysis",
+    "concept": "Pointwise vs uniform convergence. Why the limit of a uniformly convergent sequence of continuous functions is continuous (but pointwise convergence does not preserve continuity). Term-by-term integration and differentiation of power series. Radius of convergence.",
+    "pillar": "Approximation",
+    "visibleAtEnd": "Python showing a sequence that converges pointwise to a discontinuous function, and another that converges uniformly to a continuous one",
+    "buildsOn": ["M-025", "M-045"],
+    "file": "M-046-Uniform-Convergence.md",
+    "status": "complete"
+  },
+
+  "M-047": {
+    "title": "Groups",
+    "phase": 17,
+    "phaseName": "Abstract Algebra",
+    "concept": "Group axioms. Examples: (Z,+), (R\\{0},×), permutations, symmetries of polygons. Subgroups. Lagrange's theorem and its proof. Fermat's Little Theorem as a corollary of Lagrange. The symmetric group S_n.",
+    "pillar": "Structure",
+    "visibleAtEnd": "Python implementing a finite group and verifying Lagrange's theorem computationally",
+    "buildsOn": ["M-001", "M-003", "M-042"],
+    "file": "M-047-Groups.md",
+    "status": "complete"
+  },
+
+  "M-048": {
+    "title": "Rings, Fields, and Polynomials",
+    "phase": 17,
+    "phaseName": "Abstract Algebra",
+    "concept": "Rings and fields as generalisations of number systems. Z is a ring but not a field. Polynomial ring R[x]. Ideals and quotient rings. Z[x]/(x²+1) ≅ C — seeing complex numbers as a quotient ring. Finite fields F_p.",
+    "pillar": "Structure",
+    "visibleAtEnd": "Python arithmetic in Z/pZ for prime p, verifying every nonzero element has a multiplicative inverse",
+    "buildsOn": ["M-047", "M-042"],
+    "file": "M-048-Rings-Fields.md",
+    "status": "complete"
+  },
+
+  "M-049": {
+    "title": "Homomorphisms, Isomorphisms, and the First Isomorphism Theorem",
+    "phase": 17,
+    "phaseName": "Abstract Algebra",
+    "concept": "Structure-preserving maps between algebraic objects. Kernel and image. The First Isomorphism Theorem G/ker(φ) ≅ Im(φ). Automorphisms. Why isomorphic groups are 'the same' structure. Applications to number theory and Galois theory preview.",
+    "pillar": "Structure",
+    "visibleAtEnd": "Python verifying the First Isomorphism Theorem for a concrete group homomorphism",
+    "buildsOn": ["M-047", "M-048"],
+    "file": "M-049-Homomorphisms-Isomorphisms.md",
+    "status": "complete"
+  },
+
+  "M-050": {
+    "title": "Metric Spaces",
+    "phase": 18,
+    "phaseName": "Topology and Metric Spaces",
+    "concept": "Metric spaces as the generalisation of distance. The three axioms of a metric. Examples: Euclidean, taxicab, discrete, function spaces. Open and closed balls. Convergence and continuity in metric spaces — same definitions, replacing |x-y| with d(x,y). Completeness.",
+    "pillar": "Approximation",
+    "visibleAtEnd": "Python implementing multiple metrics and showing how 'neighbourhood' shape changes with metric choice",
+    "buildsOn": ["M-044", "M-006"],
+    "file": "M-050-Metric-Spaces.md",
+    "status": "complete"
+  },
+
+  "M-051": {
+    "title": "Topological Spaces and Compactness",
+    "phase": 18,
+    "phaseName": "Topology and Metric Spaces",
+    "concept": "Topology as the study of continuity without distance. Open sets as the primitive notion. Continuous maps as open-set-preserving maps. Compactness: every open cover has a finite subcover. Heine-Borel in R^n. Why compactness is the right hypothesis for so many theorems.",
+    "pillar": "Approximation",
+    "visibleAtEnd": "Python demonstrating the extreme value theorem (continuous function on compact set attains its bounds) and showing it fails on open intervals",
+    "buildsOn": ["M-050"],
+    "file": "M-051-Topological-Spaces-Compactness.md",
+    "status": "complete"
+  },
+
+  "M-052": {
+    "title": "Synthesis — One Structure, Many Manifestations",
+    "phase": 19,
+    "phaseName": "Synthesis",
+    "concept": "Five recurring ideas across all 18 phases: inverse operations, completeness and convergence, linear structure, local vs global duality, algebraic structure revealed. Capstone project outlines. The curriculum as a single coherent object.",
+    "pillar": "All Four Pillars",
+    "visibleAtEnd": "An interconnection map and Python code implementing a capstone result (FFT derivation and implementation, or proof verification)",
+    "buildsOn": ["M-000 through M-051"],
+    "file": "M-052-Synthesis.md",
+    "status": "complete"
+  }
+}
