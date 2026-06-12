@@ -5,6 +5,7 @@ import { run as runInterpreter } from './interpreter/interpreter.js'
 import { EXPLAIN } from './eventStream.js'
 import { buildHeapSnapshot } from './renderer/heapSnapshot.js'
 import HeapGraph from './renderer/HeapGraph.jsx'
+import CallGraphView from './renderer/CallGraphView.jsx'
 import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
 import {
   ChevronRight, ChevronDown, Code2, Boxes, Braces, ArrowLeft,
@@ -679,7 +680,7 @@ export default function CodeLens({ onBack, initialCode }) {
                 ))}
               </div>
               <div style={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
-                {tab === 'structure' && <StructureView model={model} />}
+                {tab === 'structure' && <StructureView model={model} currentEvent={currentEvent} />}
                 {tab === 'tokens'    && <TokensView model={model} />}
                 {tab === 'ast'       && <AstView model={model} />}
               </div>
@@ -868,44 +869,53 @@ function IdleHero() {
 
 // ── Static analysis views ─────────────────────────────────────────────────────
 
-function StructureView({ model }) {
+function StructureView({ model, currentEvent }) {
   if (model?.error) return <span style={{ color: '#ef4444', fontSize: 12 }}>Parse error: {model.error.message}</span>
   if (!model) return <span style={{ color: '#475569', fontSize: 12 }}>Parsing…</span>
+
+  const hasGraph   = model.callGraph?.nodes?.length > 0
+  const hasClasses = model.classes?.length > 0
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-      {model.functions.map((fn, i) => (
-        <div key={i} style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '5px 9px', background: '#1e293b', borderRadius: 6,
-        }}>
-          <div>
-            <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#7dd3fc' }}>{fn.name}</span>
-            <span style={{ fontSize: 11, color: '#64748b' }}>({fn.params.join(', ')})</span>
-            {fn.line && <span style={{ fontSize: 10, color: '#475569', marginLeft: 6 }}>L{fn.line}</span>}
-          </div>
-          <ComplexityBadge complexity={fn.complexity} />
-        </div>
-      ))}
-      {model.classes.map((cls, i) => (
-        <div key={i} style={{ padding: '7px 9px', background: '#1e293b', borderRadius: 6 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 5 }}>
-            <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#818cf8' }}>{cls.name}</span>
-            {cls.superclass && <span style={{ fontSize: 10, color: '#64748b' }}>extends {cls.superclass}</span>}
-          </div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
-            {cls.methods.map((m, j) => (
-              <span key={j} style={{
-                fontSize: 10, padding: '1px 6px', borderRadius: 99,
-                background: m.kind === 'constructor' ? '#312e81' : '#1e3a5f',
-                color: m.kind === 'constructor' ? '#a5b4fc' : '#7dd3fc',
-                fontFamily: 'JetBrains Mono, monospace',
-              }}>{m.static ? 'static ' : ''}{m.name}</span>
-            ))}
-          </div>
-        </div>
-      ))}
-      {model.functions.length === 0 && model.classes.length === 0 && (
-        <span style={{ color: '#475569', fontSize: 12 }}>No functions or classes detected.</span>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      {/* Call graph */}
+      {hasGraph && (
+        <CallGraphView callGraph={model.callGraph} currentEvent={currentEvent} />
+      )}
+
+      {!hasGraph && (
+        <span style={{ color: '#475569', fontSize: 12 }}>No functions detected.</span>
+      )}
+
+      {/* Classes */}
+      {hasClasses && (
+        <>
+          {hasGraph && (
+            <div style={{ fontSize: 9, letterSpacing: '.08em', color: '#334155',
+              fontFamily: 'JetBrains Mono, monospace', paddingTop: 4,
+              borderTop: '1px solid #1e293b' }}>
+              CLASSES
+            </div>
+          )}
+          {model.classes.map((cls, i) => (
+            <div key={i} style={{ padding: '7px 9px', background: '#1e293b', borderRadius: 6 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 5 }}>
+                <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#818cf8' }}>{cls.name}</span>
+                {cls.superclass && <span style={{ fontSize: 10, color: '#64748b' }}>extends {cls.superclass}</span>}
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
+                {cls.methods.map((m, j) => (
+                  <span key={j} style={{
+                    fontSize: 10, padding: '1px 6px', borderRadius: 99,
+                    background: m.kind === 'constructor' ? '#312e81' : '#1e3a5f',
+                    color: m.kind === 'constructor' ? '#a5b4fc' : '#7dd3fc',
+                    fontFamily: 'JetBrains Mono, monospace',
+                  }}>{m.static ? 'static ' : ''}{m.name}</span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </>
       )}
     </div>
   )

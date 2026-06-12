@@ -104,10 +104,114 @@ export function buildProgramModel(source, filename = 'main.js') {
     functions,
     imports,
     exports,
+    callGraph: buildCallGraph(ast),
   }
 }
 
+// ── Call Graph ────────────────────────────────────────────────────────────────
+// Static analysis: which functions call which. Used by CallGraphView.
+
+export function buildCallGraph(ast) {
+  if (!ast) return { nodes: [], edges: [] }
+
+  const funcs  = []
+  const seenIds = new Set()
+
+  walkASTWithParent(ast, (node, parent, grandparent) => {
+    let name     = null
+    let kind     = 'function'
+    let funcNode = null
+
+    if (node.type === 'FunctionDeclaration') {
+      name = node.id?.name ?? null
+      kind = 'function'
+      funcNode = node
+    } else if (node.type === 'FunctionExpression' || node.type === 'ArrowFunctionExpression') {
+      funcNode = node
+      kind = node.type === 'ArrowFunctionExpression' ? 'arrow' : 'function'
+      if (parent?.type === 'VariableDeclarator' && parent.id?.type === 'Identifier') {
+        name = parent.id.name
+      } else if (parent?.type === 'MethodDefinition') {
+        const clsName = grandparent?.id?.name ?? ''
+        const mname   = parent.key?.name ?? parent.key?.value ?? '(computed)'
+        name = clsName ? `${clsName}.${mname}` : mname
+        kind = parent.kind === 'constructor' ? 'constructor' : 'method'
+      } else if (parent?.type === 'AssignmentExpression' && parent.left?.type === 'Identifier') {
+        name = parent.left.name
+      }
+    }
+
+    if (name && funcNode) {
+      const id = `${name}@${funcNode.start}`
+      if (!seenIds.has(id)) {
+        seenIds.add(id)
+        funcs.push({
+          id,
+          name,
+          kind,
+          start:      funcNode.start,
+          end:        funcNode.end,
+          line:       funcNode.loc?.start?.line ?? null,
+          params:     (funcNode.params ?? []).map(paramName),
+          complexity: estimateComplexity(funcNode),
+        })
+      }
+    }
+  })
+
+  const edges  = []
+  const edgeSet = new Set()
+
+  walkASTWithParent(ast, (node) => {
+    if (node.type !== 'CallExpression') return
+
+    let targetName = null
+    if (node.callee.type === 'Identifier') {
+      targetName = node.callee.name
+    } else if (node.callee.type === 'MemberExpression' && !node.callee.computed) {
+      const obj  = node.callee.object
+      const prop = node.callee.property?.name
+      if (obj?.type === 'Identifier' && prop) targetName = `${obj.name}.${prop}`
+    }
+    if (!targetName) return
+
+    // Innermost enclosing function: smallest source range that contains this call
+    const enclosing = funcs
+      .filter(f => f.start <= node.start && node.end <= f.end)
+      .sort((a, b) => (a.end - a.start) - (b.end - b.start))[0]
+
+    if (!enclosing) return
+
+    const target = funcs.find(f => f.name === targetName)
+    if (!target) return
+
+    const key = `${enclosing.id}→${target.id}`
+    if (!edgeSet.has(key)) {
+      edgeSet.add(key)
+      edges.push({ from: enclosing.id, to: target.id, recursive: enclosing.id === target.id })
+    }
+  })
+
+  return { nodes: funcs, edges }
+}
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
+
+function walkASTWithParent(node, visitor, parent = null, grandparent = null) {
+  if (!node || typeof node !== 'object') return
+  visitor(node, parent, grandparent)
+  for (const key of Object.keys(node)) {
+    if (key === 'type' || key === 'loc' || key === 'start' || key === 'end') continue
+    const val = node[key]
+    if (Array.isArray(val)) {
+      val.forEach(c => {
+        if (c && typeof c === 'object' && c.type) walkASTWithParent(c, visitor, node, parent)
+      })
+    } else if (val && typeof val === 'object' && val.type) {
+      walkASTWithParent(val, visitor, node, parent)
+    }
+  }
+}
 
 function walkAST(node, visitor) {
   if (!node || typeof node !== 'object') return
