@@ -5,14 +5,18 @@ import LoadingSpinner from '../components/ui/LoadingSpinner.jsx'
 
 // Lesson registry — add new lessons here
 import { lesson as sandbox1 } from '../data/learn/sandbox/lesson-01.js'
+import { lesson as sandbox2 } from '../data/learn/sandbox/lesson-02.js'
+import { lesson as sandbox3 } from '../data/learn/sandbox/lesson-03.js'
 
 const LESSONS = {
   'sandbox/1': sandbox1,
+  'sandbox/2': sandbox2,
+  'sandbox/3': sandbox3,
 }
 
 // Ordered series list — drives "Next lesson" button
 const SERIES_ORDER = {
-  sandbox: ['1'],
+  sandbox: ['1', '2', '3'],
 }
 
 // First lesson per series — used for redirect when no lessonId in URL
