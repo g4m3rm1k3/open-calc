@@ -1,10 +1,10 @@
-// DSA + Design Patterns — Lesson 02
-// Linked Lists and the Iterator Pattern
+// DSA + Design Patterns — Lesson 06
+// Linked Lists + Iterator Pattern
 
 export const lesson = {
-  id: 'dsa-patterns-02',
+  id: 'dsa-patterns-06',
   series: { id: 'dsa-patterns', title: 'DSA + Design Patterns' },
-  title: '2. Linked Lists and the Iterator Pattern',
+  title: '6. Linked Lists + Iterator',
   checkpoints: [
     { id: 'cp-nodes',    label: 'Nodes & Linking' },
     { id: 'cp-list',     label: 'Linked List' },
@@ -17,7 +17,7 @@ export const lesson = {
     {
       type: 'narration',
       id: 'intro',
-      text: 'In lesson 1 you saw that inserting into the middle of an array is O(n) — every item after the insertion point must move one slot right. For a task queue that processes hundreds of thousands of items, this cost matters. A Linked List solves it by giving up fast random access (you cannot jump to index 500 directly) in exchange for O(1) insertion and removal at any position you already have a reference to. The trade-off: arrays are fast to read, linked lists are fast to modify. The right choice depends on what you do more.',
+      text: 'In the Arrays lesson you saw that inserting into the middle of an array is O(n) — every item after the insertion point must move one slot right. For a task queue that processes hundreds of thousands of items, this cost matters. A Linked List solves it by giving up fast random access (you cannot jump to index 500 directly) in exchange for O(1) insertion and removal at any position you already have a reference to. The trade-off: arrays are fast to read, linked lists are fast to modify. The right choice depends on what you do more.',
       code: null,
     },
 
@@ -26,7 +26,7 @@ export const lesson = {
     {
       type: 'narration',
       id: 'step1-node',
-      text: 'Build a linked list one piece at a time, starting with the single unit: a Node. A node holds two things — a value, and a reference to the next node. The reference starts as null. Notice createNode is a Factory function (lesson 1) — it is the single source of truth for what a node looks like. In CodeLens, when you run this, watch the Variables panel: you will see "node" appear as an object with exactly two properties, value and next.',
+      text: 'Build a linked list one piece at a time, starting with the single unit: a Node. A node holds two things — a value, and a reference to the next node. A reference is a variable that stores a memory address pointing to another object — not the object\'s value directly (covered in the References lesson). The reference starts as null, meaning "nothing yet." Notice createNode is a Factory function (from the Arrays lesson) — it is the single source of truth for what a node looks like. In CodeLens, when you run this, watch the Variables panel: you will see "node" appear as an object with exactly two properties, value and next.',
       code: `// Step 1: A single node — the atomic unit of a linked list
 function createNode(value) {
   return {

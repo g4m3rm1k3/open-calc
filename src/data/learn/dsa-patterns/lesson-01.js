@@ -50,7 +50,7 @@ console.log('Length:', scores.length)`,
 scores[2] = 100
 console.log('After overwrite:', scores[2])
 
-// Push: add to end — O(1) amortised
+// Push: add to end — O(1) on average (amortised: the cost is averaged across many operations)
 scores.push(88)
 console.log('After push, length:', scores.length)
 
@@ -65,7 +65,7 @@ console.log('After pop, length:', scores.length)`,
     {
       type: 'narration',
       id: 'step3-slow',
-      text: 'Here is the expensive operation: inserting or removing from the middle. Because every value is packed tightly in memory, making a gap in the middle means physically moving every item after the insertion point one slot to the right. For an array of 1 million items, inserting at position 0 means 1 million memory writes. This is O(n) — the cost grows with the number of items. In CodeLens, when you step through splice() you will see the array rewritten slot by slot. This is exactly why Linked Lists (lesson 2) exist.',
+      text: 'Here is the expensive operation: inserting or removing from the middle. Because every value is packed tightly in memory, making a gap in the middle means physically moving every item after the insertion point one slot to the right. For an array of 1 million items, inserting at position 0 means 1 million memory writes. This is O(n) — the cost grows with the number of items. In CodeLens, when you step through splice() you will see the array rewritten slot by slot. This is exactly why the Linked Lists lesson exists.',
       code: `const scores = [95, 82, 78, 91, 64]
 
 // splice(index, deleteCount, newItem)
@@ -294,7 +294,7 @@ console.log('Next up:', queue.peek()?.title)`,
     {
       type: 'narration',
       id: 'step9-shift-cost',
-      text: 'Notice: queue.dequeue() uses array shift(), which is O(n) — removing from the front means every remaining item shifts left one position. For a small queue this is fine. For a queue processing millions of requests per second it is a problem. This is exactly why the Linked List (lesson 2) is a better foundation for a production queue: removing from the front of a linked list is O(1) — just move the head pointer forward. The data structure choice has real performance consequences.',
+      text: 'Notice: queue.dequeue() uses array shift(), which is O(n) — removing from the front means every remaining item shifts left one position. For a small queue this is fine. For a queue processing millions of requests per second it is a problem. This is exactly why the Linked Lists lesson introduces a better foundation for a production queue: removing from the front of a linked list is O(1) — just move the head reference forward. The data structure choice has real performance consequences.',
       code: null,
     },
 

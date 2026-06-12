@@ -1,10 +1,10 @@
-// DSA + Design Patterns — Lesson 08
-// Heaps, Priority Queues, and the Observer Pattern
+// DSA + Design Patterns — Lesson 17
+// Heaps + Observer Pattern
 
 export const lesson = {
-  id: 'dsa-patterns-08',
+  id: 'dsa-patterns-17',
   series: { id: 'dsa-patterns', title: 'DSA + Design Patterns' },
-  title: '8. Heaps, Priority Queues, and the Observer Pattern',
+  title: '17. Heaps + Observer',
   checkpoints: [
     { id: 'cp-heap',     label: 'Min-Heap' },
     { id: 'cp-pq',       label: 'Priority Queue' },
@@ -17,7 +17,7 @@ export const lesson = {
     {
       type: 'narration',
       id: 'intro',
-      text: 'Sometimes you need to always know the minimum (or maximum) value in a collection, and that minimum changes as items are added and removed. A regular array requires O(n) to find the minimum. A sorted array gives you O(1) minimum but O(n) insert. A heap gives you both: O(log n) insert AND O(1) to see the minimum. A heap is a complete binary tree with one rule: every parent is less than or equal to both its children (in a min-heap). The root is always the smallest item. Hospital triage queues, operating system task schedulers, and Dijkstra\'s shortest-path algorithm all use heaps.',
+      text: 'Sometimes you need to always know the minimum (or maximum) value in a collection, and that minimum changes as items are added and removed. A regular array requires O(n) to find the minimum — you must check every item. A sorted array gives you O(1) minimum but O(n) insert. A heap gives you both: O(log n) insert AND O(1) to see the minimum. O(log n) means cost grows by one step each time the input doubles — a tree of 1 million items needs at most 20 steps. A heap is a complete binary tree with one rule: every parent is less than or equal to both its children (in a min-heap). The root is always the smallest item. Hospital triage queues, operating system task schedulers, and Dijkstra\'s shortest-path algorithm all use heaps.',
       code: null,
     },
 
@@ -26,7 +26,7 @@ export const lesson = {
     {
       type: 'narration',
       id: 'step1-array-rep',
-      text: 'A complete binary tree is a binary tree where every level is fully filled except possibly the last, and the last level is filled from left to right. This specific shape means we can store the tree in a plain array without any node objects or pointers. The root is at index 0. For any node at index i: its left child is at 2*i + 1, its right child is at 2*i + 2, and its parent is at Math.floor((i-1)/2). These three formulas replace pointers entirely. This is the most memory-efficient tree representation possible.',
+      text: 'A complete binary tree is a binary tree where every level is fully filled except possibly the last, and the last level is filled from left to right. This specific shape means we can store the tree in a plain array without any node objects or references (variables that store memory addresses — covered in the References lesson). The root is at index 0. For any node at index i: its left child is at 2*i + 1, its right child is at 2*i + 2, and its parent is at Math.floor((i-1)/2). These three formulas replace pointers entirely. This is the most memory-efficient tree representation possible.',
       code: `// A complete binary tree stored in an array
 // Index relationships — no pointers needed
 function parent(i)     { return Math.floor((i - 1) / 2) }

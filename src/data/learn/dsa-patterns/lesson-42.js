@@ -1,10 +1,10 @@
-// DSA + Design Patterns — Lesson 05
+// DSA + Design Patterns — Lesson 42
 // Recursion
 
 export const lesson = {
-  id: 'dsa-patterns-05',
+  id: 'dsa-patterns-42',
   series: { id: 'dsa-patterns', title: 'DSA + Design Patterns' },
-  title: '5. Recursion',
+  title: '42. Recursion',
   checkpoints: [
     { id: 'cp-basics',   label: 'Recursion Basics' },
     { id: 'cp-patterns', label: 'Divide & Conquer' },
@@ -26,7 +26,7 @@ export const lesson = {
     {
       type: 'narration',
       id: 'step1-call-stack',
-      text: 'Before writing recursion, understand what happens when any function is called. The computer keeps a call stack — a LIFO structure (lesson 4) that tracks active function calls. When function A calls function B, a new entry for B is pushed onto the stack. When B returns, its entry is popped and control goes back to A. This happens for every function call, recursive or not. In recursion, the same function is pushed multiple times before any of them pop. Run this and watch the stack build and unwind.',
+      text: 'Before writing recursion, understand what happens when any function is called. The computer keeps a call stack — a LIFO (Last In, First Out) structure, like a stack of plates, that tracks active function calls. LIFO means the most recently added item is always the first one removed — this is covered fully in the Stacks lesson. When function A calls function B, a new entry for B is pushed onto the stack. When B returns, its entry is popped and control goes back to A. This happens for every function call, recursive or not. In recursion, the same function is pushed multiple times before any of them pop. Run this and watch the stack build and unwind.',
       code: `// Non-recursive first — seeing the call stack clearly
 function c() {
   console.log('  c: running')
@@ -241,7 +241,7 @@ console.log(fib(20))  // 6765
     {
       type: 'narration',
       id: 'step7-memoize',
-      text: 'The fix is memoization — store each result the first time it is computed. On the second request for the same input, return the stored value immediately. This turns the exponential tree into a single straight chain: fib(n) computes fib(n-1), then fib(n-2) is already in the cache. This connects directly to the memoize() function you wrote in lesson 3. We can use our own hash table or a plain JavaScript object as the cache. Either way, the cost drops from O(2ⁿ) to O(n).',
+      text: 'The fix is memoization — store each result the first time it is computed. On the second request for the same input, return the stored answer immediately without recomputing. This turns the exponential tree into a single straight chain: fib(n) computes fib(n-1), then fib(n-2) is already in the cache — a plain object or hash table used as a lookup store. This connects directly to the memoize() function from the Hash Tables lesson. We can use a plain JavaScript object as the cache. Either way, the cost drops from O(2ⁿ) to O(n).',
       code: `// Memoised fibonacci — O(n) instead of O(2ⁿ)
 function memoFib() {
   const cache = {}   // key: n, value: fib(n)

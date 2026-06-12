@@ -1,10 +1,10 @@
-// DSA + Design Patterns — Lesson 06
-// Binary Trees and the Composite Pattern
+// DSA + Design Patterns — Lesson 14
+// Binary Trees + Composite Pattern
 
 export const lesson = {
-  id: 'dsa-patterns-06',
+  id: 'dsa-patterns-14',
   series: { id: 'dsa-patterns', title: 'DSA + Design Patterns' },
-  title: '6. Binary Trees and the Composite Pattern',
+  title: '14. Binary Trees + Composite',
   checkpoints: [
     { id: 'cp-tree',      label: 'Tree Structure' },
     { id: 'cp-bst',       label: 'Binary Search Tree' },
@@ -26,7 +26,7 @@ export const lesson = {
     {
       type: 'narration',
       id: 'step1-node',
-      text: 'A binary tree is a tree where each node has at most two children, called left and right. Start with the node factory. A node holds a value and two child references — left and right — both starting as null. When left and right are null, the node is a leaf. This is identical in spirit to the linked list node from lesson 2, but with two next pointers instead of one.',
+      text: 'A binary tree is a tree where each node has at most two children, called left and right. Start with the node factory. A node holds a value and two child references — left and right — both starting as null. A reference is a variable holding a memory address pointing to another object (covered in the References lesson). When left and right are null, the node is a leaf — a node with no children. This is identical in spirit to the linked list node from the Linked Lists lesson, but with two forward references instead of one.',
       code: `// A binary tree node — value plus two child references
 function createTreeNode(value) {
   return {
@@ -55,7 +55,7 @@ console.log('left.left:',  left.left)    // null — left is a leaf`,
     {
       type: 'narration',
       id: 'step2-traversal',
-      text: 'To visit every node in a tree, we need traversal. There are three standard orders. In-order: left subtree, then current node, then right subtree. Pre-order: current node first, then left, then right. Post-order: left, right, then current last. Each is a natural fit for different jobs: in-order on a binary search tree gives sorted output (you will see why in a moment). Pre-order is used for copying a tree. Post-order for deleting a tree or computing directory sizes. All three use recursion — the definition of "visit left subtree" is itself a traversal.',
+      text: 'To visit every node in a tree, we need traversal — a systematic way to reach every node exactly once. There are three standard orders. In-order: left subtree, then current node, then right subtree. Pre-order: current node first, then left, then right. Post-order: left, right, then current last. Each is a natural fit for different jobs: in-order on a binary search tree gives sorted output (you will see why in a moment). Pre-order is used for copying a tree. Post-order for computing directory sizes. All three use recursion — a function that calls itself on a smaller version of the same problem (covered in the Recursion lesson).',
       code: `function createTreeNode(value) {
   return { value, left: null, right: null }
 }
@@ -138,7 +138,7 @@ console.log(countNodes(root))   // 7`,
     {
       type: 'narration',
       id: 'step3-bst-property',
-      text: 'A Binary Search Tree (BST) is a binary tree with one additional rule: for every node, all values in its left subtree are less than the node\'s value, and all values in its right subtree are greater. This ordering property is what makes search fast. When you search for a value, at each node you know immediately which half of the tree to go into — just like binary search on a sorted array. A balanced BST of n nodes has O(log n) search, insert, and delete.',
+      text: 'A Binary Search Tree (BST) is a binary tree with one additional rule: for every node, all values in its left subtree are less than the node\'s value, and all values in its right subtree are greater. This ordering property is what makes search fast. When you search for a value, at each node you know immediately which half of the tree to go into — just like binary search on a sorted array. A balanced BST of n nodes has O(log n) search, insert, and delete. O(log n) means the cost grows by one step each time the input doubles — covered fully in the Big-O lesson.',
       code: `// The BST property — left < node < right at every level
 function createTreeNode(value) {
   return { value, left: null, right: null }
