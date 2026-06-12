@@ -8,9 +8,17 @@ import HeapGraph from './renderer/HeapGraph.jsx'
 import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
 import {
   ChevronRight, ChevronDown, Code2, Boxes, Braces, ArrowLeft,
-  Zap, Play, StepForward, StepBack, SkipForward, Terminal,
-  Palette, Info, Network,
+  Zap, Play, Pause, StepForward, StepBack, SkipForward, Terminal,
+  Palette, Info, Network, Layers,
 } from 'lucide-react'
+
+const SPEED_CONFIG = {
+  '0.5x': { interval: 1200, steps: 1 },
+  '1x':   { interval: 600,  steps: 1 },
+  '2x':   { interval: 250,  steps: 1 },
+  '5x':   { interval: 100,  steps: 1 },
+  '10x':  { interval: 60,   steps: 2 },
+}
 
 // ── Theme config ──────────────────────────────────────────────────────────────
 
@@ -280,10 +288,16 @@ export default function CodeLens({ onBack, initialCode }) {
   const [rightTab, setRightTab]     = useState('execution')
   const [theme, setTheme]           = useState('monokai')
   const [showThemes, setShowThemes] = useState(false)
+  const [rightMode, setRightMode]   = useState('explain')  // 'explain' | 'analyse'
+  const [playing, setPlaying]       = useState(false)
+  const [playSpeed, setPlaySpeed]   = useState('1x')
   const eventListRef                = useRef(null)
   const editorRef                   = useRef(null)
   const decorRef                    = useRef([])
   const monaco                      = useMonaco()
+
+  const totalSteps   = execution?.events?.length ?? 0
+  const currentEvent = execution?.events?.[step] ?? null
 
   // Parse live as we type
   useEffect(() => { setModel(buildProgramModel(source)) }, [])
@@ -312,6 +326,20 @@ export default function CodeLens({ onBack, initialCode }) {
     ed.revealLineInCenterIfOutsideViewport(line)
   })
 
+  // Auto-play
+  useEffect(() => {
+    if (!playing || !execution) return
+    const { interval, steps } = SPEED_CONFIG[playSpeed] ?? SPEED_CONFIG['1x']
+    const id = setInterval(() => {
+      setStep(s => {
+        const next = s + steps
+        if (next >= totalSteps - 1) { setPlaying(false); return totalSteps - 1 }
+        return next
+      })
+    }, interval)
+    return () => clearInterval(id)
+  }, [playing, playSpeed, execution, totalSteps])
+
   // Auto-scroll event list to current step
   useEffect(() => {
     if (!eventListRef.current) return
@@ -326,15 +354,14 @@ export default function CodeLens({ onBack, initialCode }) {
         const result = runInterpreter(source)
         setExecution(result)
         setStep(0)
+        setPlaying(false)
         setRightTab('execution')
+        setRightMode('explain')
       } finally {
         setRunning(false)
       }
     }, 0)
   }, [source])
-
-  const totalSteps = execution?.events?.length ?? 0
-  const currentEvent = execution?.events?.[step] ?? null
 
   const TABS = [
     { id: 'structure', label: 'Structure', icon: Boxes },
@@ -347,8 +374,8 @@ export default function CodeLens({ onBack, initialCode }) {
 
   const RTABS = [
     { id: 'execution', label: 'Events',  icon: Play },
+    { id: 'scope',     label: 'Scope',   icon: Layers },
     { id: 'heap',      label: 'Heap',    icon: Network },
-    { id: 'stack',     label: 'Stack',   icon: Info },
     { id: 'output',    label: 'Output',  icon: Terminal },
   ]
 
@@ -426,42 +453,63 @@ export default function CodeLens({ onBack, initialCode }) {
         )}
       </div>
 
-      {/* ── Step controls (only when execution exists) ── */}
+      {/* ── Video-style playback controls ── */}
       {execution && (
         <div style={{
-          display: 'flex', alignItems: 'center', gap: 8,
-          padding: '6px 14px', borderBottom: '1px solid #1e293b',
-          background: '#080c14', flexShrink: 0,
+          display: 'flex', alignItems: 'center', gap: 6,
+          padding: '5px 12px', borderBottom: '1px solid #1e293b',
+          background: '#080c14', flexShrink: 0, flexWrap: 'wrap',
         }}>
-          <Btn onClick={() => setStep(0)} disabled={step === 0} title="Go to start">
-            <SkipForward size={12} style={{ transform: 'scaleX(-1)' }} />
+          {/* Step controls */}
+          <Btn onClick={() => { setPlaying(false); setStep(0) }} disabled={step === 0} title="Jump to start">
+            <SkipForward size={11} style={{ transform: 'scaleX(-1)' }} />
           </Btn>
-          <Btn onClick={() => setStep(s => Math.max(0, s - 1))} disabled={step === 0} title="Step back">
-            <StepBack size={12} /> Back
+          <Btn onClick={() => { setPlaying(false); setStep(s => Math.max(0, s - 1)) }} disabled={step === 0} title="Step back">
+            <StepBack size={11} /> Back
           </Btn>
-          <Btn onClick={() => setStep(s => Math.min(totalSteps - 1, s + 1))} disabled={step >= totalSteps - 1} title="Step forward">
-            <StepForward size={12} /> Step
+          <Btn onClick={() => { setPlaying(false); setStep(s => Math.min(totalSteps - 1, s + 1)) }} disabled={step >= totalSteps - 1} title="Step forward">
+            <StepForward size={11} /> Step
           </Btn>
-          <Btn onClick={() => setStep(totalSteps - 1)} disabled={step >= totalSteps - 1} title="Go to end">
-            <SkipForward size={12} />
+          <Btn onClick={() => { setPlaying(false); setStep(totalSteps - 1) }} disabled={step >= totalSteps - 1} title="Jump to end">
+            <SkipForward size={11} />
           </Btn>
 
-          <div style={{
-            flex: 1, marginLeft: 8,
-            display: 'flex', alignItems: 'center', gap: 8,
-          }}>
-            <input
-              type="range" min={0} max={totalSteps - 1} value={step}
-              onChange={e => setStep(Number(e.target.value))}
-              style={{ flex: 1, accentColor: '#6366f1' }}
-            />
-            <span style={{ fontSize: 11, color: '#64748b', whiteSpace: 'nowrap' }}>
-              {step + 1} / {totalSteps}
-            </span>
+          {/* Play / pause */}
+          <div style={{ width: 1, height: 16, background: '#1e293b', margin: '0 2px' }} />
+          <Btn
+            onClick={() => setPlaying(p => !p)}
+            disabled={step >= totalSteps - 1 && !playing}
+            active={playing}
+            title={playing ? 'Pause' : 'Play through'}
+          >
+            {playing ? <><Pause size={11} /> Pause</> : <><Play size={11} /> Play</>}
+          </Btn>
+
+          {/* Scrubber */}
+          <input
+            type="range" min={0} max={totalSteps - 1} value={step}
+            onChange={e => { setPlaying(false); setStep(Number(e.target.value)) }}
+            style={{ flex: 1, minWidth: 80, accentColor: '#6366f1' }}
+          />
+          <span style={{ fontSize: 10, color: '#475569', whiteSpace: 'nowrap', fontFamily: 'JetBrains Mono, monospace' }}>
+            {step + 1}/{totalSteps}
+          </span>
+
+          {/* Speed */}
+          <div style={{ display: 'flex', gap: 2, borderLeft: '1px solid #1e293b', paddingLeft: 6 }}>
+            {Object.keys(SPEED_CONFIG).map(sp => (
+              <button key={sp} onClick={() => setPlaySpeed(sp)} style={{
+                background: playSpeed === sp ? '#312e81' : 'transparent',
+                border: `1px solid ${playSpeed === sp ? '#6366f1' : '#1e293b'}`,
+                color: playSpeed === sp ? '#a5b4fc' : '#475569',
+                borderRadius: 4, padding: '2px 5px', cursor: 'pointer',
+                fontSize: 10, fontFamily: 'JetBrains Mono, monospace',
+              }}>{sp}</button>
+            ))}
           </div>
 
           {execution.error && (
-            <span style={{ fontSize: 11, color: '#f87171' }}>
+            <span style={{ fontSize: 10, color: '#f87171' }}>
               {execution.error.type}: {execution.error.message}
             </span>
           )}
@@ -474,11 +522,10 @@ export default function CodeLens({ onBack, initialCode }) {
         gridTemplateColumns: '1fr 320px 320px',
         gap: 10, padding: 10, minHeight: 0,
       }}>
-        {/* Left: editor + static analysis */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, minHeight: 0 }}>
-          {/* Editor */}
+        {/* Left: editor only */}
+        <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
           <div style={{
-            flex: 2, background: '#0f172a', border: '1px solid #1e293b',
+            flex: 1, background: '#0f172a', border: '1px solid #1e293b',
             borderRadius: 10, overflow: 'hidden', minHeight: 0,
           }}>
             <div style={{
@@ -511,31 +558,6 @@ export default function CodeLens({ onBack, initialCode }) {
               />
             </div>
           </div>
-
-          {/* Static analysis tabs */}
-          <div style={{ flex: 1, minHeight: 120, display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <div style={{
-              display: 'flex', gap: 4, background: '#0f172a',
-              borderRadius: 7, padding: 3, border: '1px solid #1e293b', flexShrink: 0,
-            }}>
-              {TABS.map(({ id, label, icon: Icon }) => (
-                <button key={id} onClick={() => setTab(id)} style={{
-                  flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
-                  padding: '4px 0', borderRadius: 5, border: 'none', cursor: 'pointer',
-                  fontSize: 11, fontWeight: 600,
-                  background: tab === id ? '#1e293b' : 'transparent',
-                  color: tab === id ? '#818cf8' : '#64748b',
-                }}>
-                  <Icon size={12} />{label}
-                </button>
-              ))}
-            </div>
-            <div style={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
-              {tab === 'structure' && <StructureView model={model} />}
-              {tab === 'tokens'    && <TokensView model={model} />}
-              {tab === 'ast'       && <AstView model={model} />}
-            </div>
-          </div>
         </div>
 
         {/* Middle: event stream */}
@@ -563,7 +585,12 @@ export default function CodeLens({ onBack, initialCode }) {
                 execution.events.length === 0
                   ? <span style={{ color: '#475569', fontSize: 12 }}>No events.</span>
                   : execution.events.map((evt, i) => (
-                      <div key={i} data-active={i === step ? 'true' : 'false'}>
+                      <div
+                        key={i}
+                        data-active={i === step ? 'true' : 'false'}
+                        onClick={() => setStep(i)}
+                        style={{ opacity: i > step ? 0.35 : 1, cursor: 'pointer' }}
+                      >
                         <EventCard event={evt} active={i === step} />
                       </div>
                     ))
@@ -579,21 +606,11 @@ export default function CodeLens({ onBack, initialCode }) {
                 </div>
               )
             )}
-            {rightTab === 'heap' && (
-              <HeapGraph snapshot={heapSnapshot} />
+            {rightTab === 'scope' && (
+              <ScopeChainView event={currentEvent} />
             )}
-            {rightTab === 'stack' && (
-              currentEvent ? (
-                currentEvent.stackSnapshot?.length > 0 ? (
-                  [...currentEvent.stackSnapshot].reverse().map((frame, i) => (
-                    <StackFrame key={i} frame={frame} depth={currentEvent.stackSnapshot.length - 1 - i} />
-                  ))
-                ) : (
-                  <span style={{ color: '#475569', fontSize: 12 }}>Global scope (no function frames)</span>
-                )
-              ) : (
-                <span style={{ color: '#475569', fontSize: 12 }}>Run code first.</span>
-              )
+            {rightTab === 'heap' && (
+              <HeapGraph snapshot={heapSnapshot} heapDelta={currentEvent?.heapDelta} />
             )}
             {rightTab === 'output' && (
               execution?.output?.length > 0 ? (
@@ -619,47 +636,96 @@ export default function CodeLens({ onBack, initialCode }) {
           </div>
         </div>
 
-        {/* Right: explanation hero + call stack */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, minHeight: 0, overflow: 'auto' }}>
-          {currentEvent
-            ? <ExplainHero event={currentEvent} step={step} total={totalSteps} />
-            : <IdleHero />
-          }
+        {/* Right: Analyse / Explain toggle */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, minHeight: 0 }}>
+          {/* Mode toggle */}
+          <div style={{
+            display: 'flex', gap: 4, background: '#0f172a',
+            borderRadius: 7, padding: 3, border: '1px solid #1e293b', flexShrink: 0,
+          }}>
+            {[
+              { id: 'analyse', label: 'Analyse', icon: Boxes },
+              { id: 'explain', label: 'Explain', icon: Info },
+            ].map(({ id, label, icon: Icon }) => (
+              <button key={id} onClick={() => setRightMode(id)} style={{
+                flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
+                padding: '5px 0', borderRadius: 5, border: 'none', cursor: 'pointer',
+                fontSize: 11, fontWeight: 600,
+                background: rightMode === id ? '#1e293b' : 'transparent',
+                color: rightMode === id ? '#818cf8' : '#64748b',
+              }}>
+                <Icon size={12} />{label}
+              </button>
+            ))}
+          </div>
 
-          {/* Heap deltas */}
-          {currentEvent?.heapDelta?.length > 0 && (
-            <Panel title="Heap Changes" icon={Boxes} badge={currentEvent.heapDelta.length}>
-              {currentEvent.heapDelta.map((d, i) => (
-                <div key={i} style={{
-                  padding: '5px 8px', borderRadius: 6, marginBottom: 4,
-                  background: d.op === 'create' ? '#14532d22' : '#78350f22',
-                  border: `1px solid ${d.op === 'create' ? '#14532d' : '#78350f'}`,
-                  fontFamily: 'JetBrains Mono, monospace', fontSize: 11,
-                }}>
-                  <span style={{ color: d.op === 'create' ? '#86efac' : '#fcd34d' }}>
-                    {d.op === 'create' ? `+ ${d.objectType} #${d.objectId}` : `~ #${d.objectId}.${d.property}`}
-                  </span>
-                  {d.op === 'mutate' && (
-                    <span style={{ color: '#94a3b8' }}>
-                      {' '}{JSON.stringify(d.oldValue)} → {JSON.stringify(d.newValue)}
-                    </span>
-                  )}
-                </div>
-              ))}
-            </Panel>
+          {/* Analyse mode: Structure / Tokens / AST */}
+          {rightMode === 'analyse' && (
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6, minHeight: 0 }}>
+              <div style={{
+                display: 'flex', gap: 3, background: '#0f172a',
+                borderRadius: 6, padding: 3, border: '1px solid #1e293b', flexShrink: 0,
+              }}>
+                {TABS.map(({ id, label, icon: Icon }) => (
+                  <button key={id} onClick={() => setTab(id)} style={{
+                    flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
+                    padding: '3px 0', borderRadius: 4, border: 'none', cursor: 'pointer',
+                    fontSize: 10, fontWeight: 600,
+                    background: tab === id ? '#1e293b' : 'transparent',
+                    color: tab === id ? '#818cf8' : '#64748b',
+                  }}>
+                    <Icon size={11} />{label}
+                  </button>
+                ))}
+              </div>
+              <div style={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
+                {tab === 'structure' && <StructureView model={model} />}
+                {tab === 'tokens'    && <TokensView model={model} />}
+                {tab === 'ast'       && <AstView model={model} />}
+              </div>
+            </div>
           )}
 
-          {/* Call stack */}
-          {currentEvent && (
-            <Panel title="Call Stack" icon={Code2} badge={currentEvent.stackSnapshot?.length ?? 0}>
-              {currentEvent.stackSnapshot?.length > 0 ? (
-                [...currentEvent.stackSnapshot].reverse().map((frame, i) => (
-                  <StackFrame key={i} frame={frame} depth={currentEvent.stackSnapshot.length - 1 - i} />
-                ))
-              ) : (
-                <span style={{ color: '#475569', fontSize: 12 }}>Global scope</span>
+          {/* Explain mode: hero + heap changes + call stack */}
+          {rightMode === 'explain' && (
+            <div style={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {currentEvent
+                ? <ExplainHero event={currentEvent} step={step} total={totalSteps} />
+                : <IdleHero />
+              }
+              {currentEvent?.heapDelta?.length > 0 && (
+                <Panel title="Heap Changes" icon={Boxes} badge={currentEvent.heapDelta.length}>
+                  {currentEvent.heapDelta.map((d, i) => (
+                    <div key={i} style={{
+                      padding: '5px 8px', borderRadius: 6, marginBottom: 4,
+                      background: d.op === 'create' ? '#14532d22' : '#78350f22',
+                      border: `1px solid ${d.op === 'create' ? '#14532d' : '#78350f'}`,
+                      fontFamily: 'JetBrains Mono, monospace', fontSize: 11,
+                    }}>
+                      <span style={{ color: d.op === 'create' ? '#86efac' : '#fcd34d' }}>
+                        {d.op === 'create' ? `+ ${d.objectType} #${d.objectId}` : `~ #${d.objectId}.${d.property}`}
+                      </span>
+                      {d.op === 'mutate' && (
+                        <span style={{ color: '#94a3b8' }}>
+                          {' '}{JSON.stringify(d.oldValue)} → {JSON.stringify(d.newValue)}
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </Panel>
               )}
-            </Panel>
+              {currentEvent && (
+                <Panel title="Call Stack" icon={Code2} badge={currentEvent.stackSnapshot?.length ?? 0}>
+                  {currentEvent.stackSnapshot?.length > 0 ? (
+                    [...currentEvent.stackSnapshot].reverse().map((frame, i) => (
+                      <StackFrame key={i} frame={frame} depth={currentEvent.stackSnapshot.length - 1 - i} />
+                    ))
+                  ) : (
+                    <span style={{ color: '#475569', fontSize: 12 }}>Global scope</span>
+                  )}
+                </Panel>
+              )}
+            </div>
           )}
         </div>
       </div>
@@ -869,4 +935,221 @@ function AstView({ model }) {
   return ast
     ? <ASTNode node={ast} depth={0} />
     : <span style={{ color: '#475569', fontSize: 12 }}>No AST.</span>
+}
+
+// ── Scope chain view ──────────────────────────────────────────────────────────
+
+function ScopeChainView({ event }) {
+  if (!event) {
+    return (
+      <div style={{ padding: 12 }}>
+        <div style={{ fontSize: 12, color: '#475569' }}>Run code first.</div>
+      </div>
+    )
+  }
+
+  const frames   = event.stackSnapshot ?? []
+  // Frames are ordered innermost-first; reverse so top = current
+  const ordered  = [...frames].reverse()
+  const hasFrames = ordered.length > 0
+
+  return (
+    <div style={{ padding: '0 2px' }}>
+      {/* Concept label */}
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10,
+        padding: '6px 10px', borderRadius: 7,
+        background: '#0f172a', border: '1px solid #1e293b',
+      }}>
+        <Layers size={12} color="#818cf8" />
+        <span style={{ fontSize: 10, color: '#818cf8', fontWeight: 700, letterSpacing: '.04em' }}>
+          SCOPE CHAIN
+        </span>
+        <span style={{ fontSize: 10, color: '#334155', marginLeft: 'auto' }}>
+          {hasFrames ? `${ordered.length} frame${ordered.length > 1 ? 's' : ''}` : 'global only'}
+        </span>
+      </div>
+
+      {/* Concept explanation */}
+      <div style={{
+        fontSize: 11, color: '#475569', lineHeight: 1.6,
+        padding: '0 2px', marginBottom: 12,
+      }}>
+        Every time a function is called, JavaScript creates a new <span style={{ color: '#818cf8' }}>scope frame</span> to
+        hold its variables. When the function returns, the frame is destroyed.
+        Inner frames can read variables from outer frames — that's how <span style={{ color: '#a78bfa' }}>closures</span> work.
+      </div>
+
+      {/* Stack frames as scope levels */}
+      {ordered.map((frame, i) => (
+        <ScopeFrame key={i} frame={frame} isCurrent={i === 0} isGlobal={false} />
+      ))}
+
+      {/* Global scope always at the bottom */}
+      <div style={{ position: 'relative', marginTop: ordered.length > 0 ? 0 : 4 }}>
+        {ordered.length > 0 && (
+          <div style={{
+            width: 1, height: 12, background: '#1e293b',
+            margin: '0 auto 0 19px',
+          }} />
+        )}
+        <GlobalScope event={event} />
+      </div>
+    </div>
+  )
+}
+
+function ScopeFrame({ frame, isCurrent }) {
+  const [open, setOpen] = useState(isCurrent)
+  const locals = Object.entries(frame.locals ?? {})
+
+  return (
+    <div style={{ position: 'relative', marginBottom: 0 }}>
+      {/* Connector line */}
+      <div style={{
+        position: 'absolute', left: 19, top: 0, bottom: 0,
+        width: 1, background: isCurrent ? '#4338ca' : '#1e293b',
+        zIndex: 0,
+      }} />
+
+      <div style={{ position: 'relative', zIndex: 1, marginBottom: 4 }}>
+        {/* Frame header */}
+        <div
+          onClick={() => locals.length > 0 && setOpen(o => !o)}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            padding: '6px 10px 6px 8px', borderRadius: 7,
+            background: isCurrent ? '#1e1b4b' : '#0f172a',
+            border: `1px solid ${isCurrent ? '#4338ca' : '#1e293b'}`,
+            cursor: locals.length > 0 ? 'pointer' : 'default',
+            marginLeft: 0,
+          }}
+        >
+          <div style={{
+            width: 22, height: 22, borderRadius: '50%', flexShrink: 0,
+            background: isCurrent ? '#4338ca' : '#1e293b',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            {isCurrent
+              ? <span style={{ fontSize: 8, color: '#a5b4fc', fontWeight: 700 }}>NOW</span>
+              : <span style={{ fontSize: 9, color: '#475569' }}>fn</span>
+            }
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{
+              fontSize: 12, fontWeight: 600, fontFamily: 'JetBrains Mono, monospace',
+              color: isCurrent ? '#a5b4fc' : '#7dd3fc',
+            }}>
+              {frame.name ?? '(anonymous)'}
+              {isCurrent && <span style={{ fontSize: 10, color: '#6366f1', marginLeft: 6 }}>← running</span>}
+            </div>
+            <div style={{ fontSize: 10, color: '#334155' }}>
+              {locals.length} variable{locals.length !== 1 ? 's' : ''}
+              {frame.line ? ` · L${frame.line}` : ''}
+            </div>
+          </div>
+          {locals.length > 0 && (
+            <span style={{ fontSize: 10, color: '#334155' }}>
+              {open ? '▲' : '▼'}
+            </span>
+          )}
+        </div>
+
+        {/* Variables */}
+        {open && locals.length > 0 && (
+          <div style={{
+            marginLeft: 30, marginTop: 2, marginBottom: 4,
+            padding: '6px 8px', borderRadius: 6,
+            background: '#080c14', border: '1px solid #1e293b',
+          }}>
+            {locals.map(([name, val]) => (
+              <div key={name} style={{
+                display: 'flex', gap: 8, fontSize: 11,
+                fontFamily: 'JetBrains Mono, monospace',
+                padding: '2px 0', alignItems: 'baseline',
+              }}>
+                <span style={{ color: '#7dd3fc', minWidth: 80, flexShrink: 0 }}>{name}</span>
+                <span style={{ color: '#334155', flexShrink: 0 }}>=</span>
+                <span style={{ color: valueColor(val), wordBreak: 'break-all' }}>
+                  {formatValue(val)}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function GlobalScope({ event }) {
+  const [open, setOpen] = useState(false)
+  // Collect globals from the first (oldest) stack frame if available
+  const frames  = event.stackSnapshot ?? []
+  const globals = frames.length > 0 ? Object.entries(frames[0]?.locals ?? {}) : []
+
+  return (
+    <div style={{
+      padding: '6px 10px 6px 8px', borderRadius: 7,
+      background: '#080c14', border: '1px solid #1e293b',
+      cursor: globals.length > 0 ? 'pointer' : 'default',
+    }} onClick={() => globals.length > 0 && setOpen(o => !o)}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{
+          width: 22, height: 22, borderRadius: '50%', flexShrink: 0,
+          background: '#0f172a', border: '1px solid #334155',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: 8, color: '#475569', fontWeight: 700,
+        }}>GBL</div>
+        <div>
+          <div style={{ fontSize: 12, color: '#475569', fontFamily: 'JetBrains Mono, monospace' }}>
+            global scope
+          </div>
+          <div style={{ fontSize: 10, color: '#334155' }}>
+            top-level declarations · always visible
+          </div>
+        </div>
+        {globals.length > 0 && (
+          <span style={{ fontSize: 10, color: '#334155', marginLeft: 'auto' }}>
+            {open ? '▲' : '▼'}
+          </span>
+        )}
+      </div>
+      {open && globals.length > 0 && (
+        <div style={{ marginTop: 6, paddingTop: 6, borderTop: '1px solid #1e293b' }}>
+          {globals.map(([name, val]) => (
+            <div key={name} style={{
+              display: 'flex', gap: 8, fontSize: 11,
+              fontFamily: 'JetBrains Mono, monospace', padding: '2px 0',
+            }}>
+              <span style={{ color: '#64748b', minWidth: 80 }}>{name}</span>
+              <span style={{ color: '#334155' }}>=</span>
+              <span style={{ color: valueColor(val) }}>{formatValue(val)}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function valueColor(v) {
+  if (v === null || v === undefined) return '#475569'
+  if (typeof v === 'number') return '#86efac'
+  if (typeof v === 'string') return '#fbbf24'
+  if (typeof v === 'boolean') return '#f472b6'
+  if (typeof v === 'object' && v?.__kind === 'reference') return '#818cf8'
+  if (typeof v === 'function' || (typeof v === 'object' && v?.type === 'function')) return '#a78bfa'
+  return '#94a3b8'
+}
+
+function formatValue(v) {
+  if (v === null)      return 'null'
+  if (v === undefined) return 'undefined'
+  if (typeof v === 'function') return '[Function]'
+  if (typeof v === 'object' && v?.__kind === 'reference') return `[Object #${v.objectId}]`
+  if (typeof v === 'object' && v?.type === 'function') return `[Function ${v.name ?? ''}]`
+  if (typeof v === 'object') return JSON.stringify(v).slice(0, 30)
+  if (typeof v === 'string') return `"${v.length > 20 ? v.slice(0, 20) + '…' : v}"`
+  return String(v)
 }

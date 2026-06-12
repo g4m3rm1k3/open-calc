@@ -1,5 +1,10 @@
-import { useEffect, useRef, useMemo } from 'react'
-import * as d3 from 'd3'
+/**
+ * HeapGraph — semantic heap visualizer.
+ * No force simulation. Each pattern gets a layout that matches its structure:
+ *   Arrays          → horizontal cell grid (sort/array algorithms)
+ *   Linked-list     → horizontal card chain with arrows
+ *   Everything else → scrollable card list with inline reference badges
+ */
 import { snapshotToGraph } from './heapSnapshot.js'
 
 const TYPE_COLOR = {
@@ -11,254 +16,347 @@ const TYPE_COLOR = {
   Set:        '#f472b6',
   prototype:  '#475569',
 }
-function typeColor(t) { return TYPE_COLOR[t] ?? '#94a3b8' }
+const typeColor = t => TYPE_COLOR[t] ?? '#94a3b8'
 
-// Node card dimensions
-const NW  = 148   // card width
-const NH  = 38    // header height
-const PH  = 18    // per-property row height
-const PAD = 8     // horizontal text padding
+// ── Top-level dispatcher ───────────────────────────────────────────────────────
 
-function nodeH(n) { return NH + (n.props.length ? 4 + n.props.length * PH : 0) }
+export default function HeapGraph({ snapshot, heapDelta }) {
+  if (!snapshot || snapshot.objects.size === 0) return <EmptyState />
 
-function trunc(s, max = 13) {
-  const str = String(s)
-  return str.length > max ? str.slice(0, max) + '…' : str
-}
+  const objects = [...snapshot.objects.values()]
+  const arrays  = objects.filter(o => o.type === 'Array')
+  const others  = objects.filter(o => o.type !== 'Array')
 
-export default function HeapGraph({ snapshot }) {
-  const containerRef = useRef(null)
-  const svgRef       = useRef(null)
-  const simRef       = useRef(null)
-  const posMap       = useRef(new Map())
+  const mutatedProps = buildMutatedProps(heapDelta)
 
-  const { nodes: rawNodes, links: rawLinks } = useMemo(
-    () => snapshot ? snapshotToGraph(snapshot) : { nodes: [], links: [] },
-    [snapshot]
-  )
+  // ── Pure array (sorting, array ops) → cell grid ───────────────────────────
+  if (arrays.length > 0 && others.length === 0) {
+    return (
+      <div style={{ padding: '10px 12px', overflow: 'auto', height: '100%' }}>
+        {arrays.map(arr => (
+          <ArrayCells
+            key={arr.id}
+            obj={arr}
+            isNew={snapshot.lastCreated.has(arr.id)}
+            mutated={mutatedProps[arr.id] ?? new Set()}
+          />
+        ))}
+      </div>
+    )
+  }
 
-  const nodes = useMemo(() => rawNodes.map(n => {
-    const p = posMap.current.get(n.id)
-    return { ...n, x: p?.x, y: p?.y }
-  }), [rawNodes])
-
-  const links = useMemo(() => rawLinks.map(l => ({ ...l })), [rawLinks])
-
-  useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
-
-    function draw(W, H) {
-      if (simRef.current) { simRef.current.stop(); simRef.current = null }
-
-      const svg = d3.select(svgRef.current)
-      svg.selectAll('*').remove()
-      // Only use D3 attrs for size — no CSS width/height on the SVG element itself
-      svg.attr('width', W).attr('height', H)
-
-      if (nodes.length === 0) {
-        svg.append('text')
-          .attr('x', W / 2).attr('y', H / 2)
-          .attr('text-anchor', 'middle').attr('dominant-baseline', 'middle')
-          .attr('fill', '#334155').attr('font-size', 13)
-          .text('Run code and step forward to see heap allocations.')
-        return
-      }
-
-      // Seed new nodes near center, keep positions for existing ones
-      nodes.forEach(n => {
-        if (n.x == null || n.x < 0 || n.x > W) n.x = W / 2 + (Math.random() - 0.5) * 120
-        if (n.y == null || n.y < 0 || n.y > H) n.y = H / 2 + (Math.random() - 0.5) * 120
-      })
-
-      // ── Defs ────────────────────────────────────────────────────────────────
-      const defs = svg.append('defs')
-      const marker = defs.append('marker')
-        .attr('id', 'arr').attr('viewBox', '0 -5 10 10')
-        .attr('refX', 8).attr('refY', 0)
-        .attr('markerWidth', 7).attr('markerHeight', 7)
-        .attr('orient', 'auto')
-      marker.append('path').attr('d', 'M0,-5L10,0L0,5').attr('fill', '#6366f1')
-
-      const flt = defs.append('filter').attr('id', 'glow')
-        .attr('x', '-40%').attr('y', '-40%').attr('width', '180%').attr('height', '180%')
-      flt.append('feGaussianBlur').attr('stdDeviation', 3).attr('result', 'blur')
-      const fm = flt.append('feMerge')
-      fm.append('feMergeNode').attr('in', 'blur')
-      fm.append('feMergeNode').attr('in', 'SourceGraphic')
-
-      // ── Root group (pan/zoom target) ─────────────────────────────────────────
-      const g = svg.append('g')
-      svg.call(
-        d3.zoom().scaleExtent([0.1, 4])
-          .on('zoom', e => g.attr('transform', e.transform))
-      )
-
-      // ── Links ────────────────────────────────────────────────────────────────
-      const lGrp = g.append('g')
-      const lSel = lGrp.selectAll('g').data(links, d => d.id).enter().append('g')
-
-      const lPath = lSel.append('path')
-        .attr('stroke', '#6366f1').attr('stroke-width', 1.5)
-        .attr('fill', 'none').attr('opacity', 0.8)
-        .attr('marker-end', 'url(#arr)')
-
-      const lLabel = lSel.append('text')
-        .attr('font-size', 9).attr('fill', '#818cf8')
-        .attr('font-family', 'JetBrains Mono, monospace')
-        .attr('text-anchor', 'middle').attr('dominant-baseline', 'middle')
-        .text(d => d.label)
-
-      // ── Nodes ────────────────────────────────────────────────────────────────
-      const nGrp = g.append('g')
-      const nSel = nGrp.selectAll('g').data(nodes, d => d.id).enter().append('g')
-        .attr('cursor', 'grab')
-        .call(
-          d3.drag()
-            .on('start', (e, d) => { if (!e.active) sim.alphaTarget(0.2).restart(); d.fx = d.x; d.fy = d.y })
-            .on('drag',  (e, d) => { d.fx = e.x; d.fy = e.y })
-            .on('end',   (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null })
-        )
-
-      // Card background
-      nSel.append('rect')
-        .attr('width', NW).attr('height', d => nodeH(d))
-        .attr('rx', 7).attr('ry', 7)
-        .attr('fill', '#0d1526')
-        .attr('stroke', d => d.isNew ? '#22c55e' : d.isMutated ? '#f59e0b' : typeColor(d.type) + '66')
-        .attr('stroke-width', d => d.isNew || d.isMutated ? 2 : 1)
-        .attr('filter', d => d.isNew || d.isMutated ? 'url(#glow)' : null)
-
-      // Header band
-      nSel.append('rect')
-        .attr('width', NW).attr('height', NH).attr('rx', 7).attr('ry', 7)
-        .attr('fill', d => typeColor(d.type) + '22')
-      // Square off bottom of header band (round corners only on top)
-      nSel.append('rect')
-        .attr('y', NH - 7).attr('width', NW).attr('height', 7)
-        .attr('fill', d => typeColor(d.type) + '22')
-
-      // Type label
-      nSel.append('text')
-        .attr('x', NW / 2).attr('y', 15)
-        .attr('text-anchor', 'middle')
-        .attr('font-size', 12).attr('font-weight', 700)
-        .attr('font-family', 'JetBrains Mono, monospace')
-        .attr('fill', d => typeColor(d.type))
-        .text(d => d.type)
-
-      // Object id
-      nSel.append('text')
-        .attr('x', NW / 2).attr('y', 28)
-        .attr('text-anchor', 'middle')
-        .attr('font-size', 9).attr('font-family', 'JetBrains Mono, monospace')
-        .attr('fill', '#475569')
-        .text(d => `#${d.id}`)
-
-      // Property rows
-      nSel.each(function(d) {
-        const el = d3.select(this)
-        d.props.forEach(([k, v], i) => {
-          const y = NH + 4 + i * PH + PH * 0.65
-          el.append('text')
-            .attr('x', PAD).attr('y', y)
-            .attr('font-size', 10).attr('font-family', 'JetBrains Mono, monospace')
-            .attr('dominant-baseline', 'middle')
-            .attr('fill', '#7dd3fc')
-            .text(trunc(k, 8) + ':')
-          el.append('text')
-            .attr('x', NW - PAD).attr('y', y)
-            .attr('text-anchor', 'end')
-            .attr('font-size', 10).attr('font-family', 'JetBrains Mono, monospace')
-            .attr('dominant-baseline', 'middle')
-            .attr('fill', '#86efac')
-            .text(trunc(v, 10))
-        })
-      })
-
-      // Fade-in new nodes
-      nSel.filter(d => d.isNew).attr('opacity', 0)
-        .transition().duration(300).attr('opacity', 1)
-
-      // ── Simulation ───────────────────────────────────────────────────────────
-      const sim = d3.forceSimulation(nodes)
-        .force('link',    d3.forceLink(links).id(d => d.id).distance(180).strength(0.6))
-        .force('charge',  d3.forceManyBody().strength(-600))
-        .force('x',       d3.forceX(W / 2).strength(0.12))
-        .force('y',       d3.forceY(H / 2).strength(0.12))
-        .force('collide', d3.forceCollide(80).strength(1))
-        .alphaDecay(0.025)
-        .velocityDecay(0.45)
-
-      simRef.current = sim
-
-      sim.on('tick', () => {
-        const padX = NW / 2 + 12
-        const padY = d => nodeH(d) / 2 + 12
-
-        nodes.forEach(n => {
-          n.x = Math.max(padX, Math.min(W - padX, n.x))
-          n.y = Math.max(padY(n), Math.min(H - padY(n), n.y))
-          posMap.current.set(n.id, { x: n.x, y: n.y })
-        })
-
-        nSel.attr('transform', d =>
-          `translate(${(d.x - NW / 2).toFixed(1)}, ${(d.y - nodeH(d) / 2).toFixed(1)})`
-        )
-
-        lPath.attr('d', d => edgePath(d, W, H))
-        lLabel.attr('transform', d => edgeLabelTransform(d, W, H))
-      })
-    }
-
-    // Only draw once ResizeObserver gives us real dimensions
-    const ro = new ResizeObserver(entries => {
-      const { width, height } = entries[0].contentRect
-      if (width > 4 && height > 4) draw(Math.floor(width), Math.floor(height))
-    })
-    ro.observe(container)
-
-    return () => { ro.disconnect(); simRef.current?.stop() }
-  }, [nodes, links])
+  // ── Detect linked-list chain ───────────────────────────────────────────────
+  const chain = detectChain(others, snapshot)
+  const chainSet = chain ? new Set(chain) : null
+  const containers = chain ? others.filter(o => !chainSet.has(o.id)) : []
+  const chainNodes = chain ? chain.map(id => snapshot.objects.get(id)).filter(Boolean) : []
 
   return (
-    <div
-      ref={containerRef}
-      style={{ position: 'relative', width: '100%', height: '100%', minHeight: 320 }}
-    >
-      {/* SVG sized only by D3 attrs — no CSS width/height to avoid coord-system scaling */}
-      <svg
-        ref={svgRef}
-        style={{ position: 'absolute', top: 0, left: 0, display: 'block' }}
-      />
+    <div style={{ padding: '10px 12px', overflow: 'auto', height: '100%' }}>
+      {/* Container objects (e.g. LinkedList wrapper) */}
+      {containers.map(obj => (
+        <ObjectCard key={obj.id} obj={obj} snapshot={snapshot}
+          isNew={snapshot.lastCreated.has(obj.id)}
+          isMutated={snapshot.lastMutated.has(obj.id)}
+          mutatedProps={mutatedProps[obj.id] ?? new Set()}
+        />
+      ))}
+
+      {/* Horizontal chain */}
+      {chain && (
+        <>
+          {containers.length > 0 && (
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8,
+              fontSize: 10, color: '#475569', fontFamily: 'JetBrains Mono, monospace',
+            }}>
+              <div style={{ height: 1, width: 24, background: '#1e293b' }} />
+              chain of {chainNodes.length} {chainNodes[0]?.type ?? 'nodes'}
+              <div style={{ flex: 1, height: 1, background: '#1e293b' }} />
+            </div>
+          )}
+          <div style={{ display: 'flex', alignItems: 'center', overflowX: 'auto', paddingBottom: 6 }}>
+            {chainNodes.map((obj, i) => (
+              <div key={obj.id} style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+                <ObjectCard obj={obj} snapshot={snapshot}
+                  isNew={snapshot.lastCreated.has(obj.id)}
+                  isMutated={snapshot.lastMutated.has(obj.id)}
+                  mutatedProps={mutatedProps[obj.id] ?? new Set()}
+                  compact
+                />
+                <ChainArrow />
+              </div>
+            ))}
+            <span style={{
+              fontSize: 12, color: '#475569', fontFamily: 'JetBrains Mono, monospace',
+              padding: '0 8px', flexShrink: 0,
+            }}>null</span>
+          </div>
+        </>
+      )}
+
+      {/* Card list for non-chain objects */}
+      {!chain && objects.map(obj => (
+        <ObjectCard key={obj.id} obj={obj} snapshot={snapshot}
+          isNew={snapshot.lastCreated.has(obj.id)}
+          isMutated={snapshot.lastMutated.has(obj.id)}
+          mutatedProps={mutatedProps[obj.id] ?? new Set()}
+        />
+      ))}
     </div>
   )
 }
 
-// ── Path helpers ───────────────────────────────────────────────────────────────
+// ── Object card (used for both list and chain) ─────────────────────────────────
 
-function edgePath(d, W, H) {
-  const sx = d.source.x ?? W / 2, sy = d.source.y ?? H / 2
-  const tx = d.target.x ?? W / 2, ty = d.target.y ?? H / 2
-  if (Math.abs(sx - tx) < 1 && Math.abs(sy - ty) < 1) {
-    return `M${sx},${sy} C${sx + 55},${sy - 65} ${sx + 65},${sy + 20} ${sx + 8},${sy}`
+function ObjectCard({ obj, snapshot, isNew, isMutated, mutatedProps, compact }) {
+  const color = typeColor(obj.type)
+  const prims = [], refs = []
+
+  for (const [k, v] of obj.properties) {
+    if (obj.type === 'Array' && k === 'length') continue
+    if (isRef(v)) {
+      const target = snapshot.objects.get(v.$ref)
+      refs.push({ key: k, label: target ? `${target.type} #${v.$ref}` : `#${v.$ref}`, id: v.$ref })
+    } else {
+      prims.push({ key: k, val: v })
+    }
   }
-  const dx = tx - sx, dy = ty - sy
-  const len = Math.sqrt(dx * dx + dy * dy) || 1
-  const nx = dx / len, ny = dy / len
-  const th = nodeH(d.target) / 2
-  const x1 = sx + nx * (NW / 2), y1 = sy + ny * (NH / 2)
-  const x2 = tx - nx * (NW / 2 + 8), y2 = ty - ny * (th + 8)
-  const cx = (sx + tx) / 2 - ny * 32, cy = (sy + ty) / 2 + nx * 32
-  return `M${x1.toFixed(1)},${y1.toFixed(1)} Q${cx.toFixed(1)},${cy.toFixed(1)} ${x2.toFixed(1)},${y2.toFixed(1)}`
+
+  const borderColor = isNew ? '#22c55e' : isMutated ? '#f59e0b' : color + '44'
+  const glow = (isNew || isMutated)
+    ? `0 0 12px ${isNew ? '#22c55e44' : '#f59e0b44'}`
+    : 'none'
+
+  return (
+    <div style={{
+      background: '#0d1526',
+      border: `1px solid ${borderColor}`,
+      borderRadius: 8,
+      marginBottom: compact ? 0 : 8,
+      minWidth: compact ? 130 : undefined,
+      flexShrink: 0,
+      boxShadow: glow,
+      transition: 'box-shadow 0.2s, border-color 0.2s',
+    }}>
+      {/* Header */}
+      <div style={{
+        background: color + '1a',
+        padding: '5px 10px',
+        borderRadius: '7px 7px 0 0',
+        display: 'flex', alignItems: 'center', gap: 6,
+      }}>
+        <span style={{ color, fontWeight: 700, fontSize: 11, fontFamily: 'JetBrains Mono, monospace' }}>
+          {obj.type}
+        </span>
+        <span style={{ color: '#334155', fontSize: 9, fontFamily: 'JetBrains Mono, monospace' }}>
+          #{obj.id}
+        </span>
+        {isNew && (
+          <span style={{
+            marginLeft: 'auto', fontSize: 9, padding: '1px 5px', borderRadius: 99,
+            background: '#14532d22', color: '#86efac', border: '1px solid #14532d44',
+          }}>new</span>
+        )}
+        {isMutated && !isNew && (
+          <span style={{
+            marginLeft: 'auto', fontSize: 9, padding: '1px 5px', borderRadius: 99,
+            background: '#78350f22', color: '#fcd34d', border: '1px solid #78350f44',
+          }}>changed</span>
+        )}
+      </div>
+
+      {/* Body */}
+      {(prims.length > 0 || refs.length > 0) && (
+        <div style={{ padding: '5px 10px 7px' }}>
+          {prims.map(({ key, val }) => {
+            const highlighted = mutatedProps.has(key)
+            return (
+              <div key={key} style={{
+                display: 'flex', gap: 6, alignItems: 'baseline',
+                fontSize: 11, fontFamily: 'JetBrains Mono, monospace',
+                marginBottom: 2,
+                background: highlighted ? '#78350f1a' : 'transparent',
+                borderRadius: 3, padding: highlighted ? '1px 3px' : '1px 0',
+              }}>
+                <span style={{ color: '#7dd3fc', flexShrink: 0 }}>{key}:</span>
+                <span style={{ color: valColor(val) }}>{fmtVal(val)}</span>
+              </div>
+            )
+          })}
+          {refs.map(({ key, label, id }) => (
+            <div key={key} style={{
+              display: 'flex', gap: 6, alignItems: 'center',
+              fontSize: 11, fontFamily: 'JetBrains Mono, monospace',
+              marginBottom: 2,
+            }}>
+              <span style={{ color: '#7dd3fc', flexShrink: 0 }}>{key}:</span>
+              <span style={{
+                color: '#818cf8', background: '#1e1b4b',
+                padding: '1px 6px', borderRadius: 4, fontSize: 10,
+              }}>→ {label}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
 }
 
-function edgeLabelTransform(d, W, H) {
-  const sx = d.source.x ?? W / 2, sy = d.source.y ?? H / 2
-  const tx = d.target.x ?? W / 2, ty = d.target.y ?? H / 2
-  const mx = (sx + tx) / 2, my = (sy + ty) / 2
-  const dx = tx - sx, dy = ty - sy
-  const len = Math.sqrt(dx * dx + dy * dy) || 1
-  const ox = -dy / len * 22, oy = dx / len * 22
-  return `translate(${(mx + ox).toFixed(1)}, ${(my + oy).toFixed(1)})`
+function ChainArrow() {
+  return (
+    <svg width="28" height="24" style={{ flexShrink: 0, overflow: 'visible' }}>
+      <line x1="2" y1="12" x2="22" y2="12" stroke="#6366f1" strokeWidth="1.5" />
+      <polygon points="22,8 28,12 22,16" fill="#6366f1" />
+    </svg>
+  )
+}
+
+// ── Array cells (sort / array-heavy algorithms) ────────────────────────────────
+
+function ArrayCells({ obj, isNew, mutated }) {
+  const elems = []
+  for (const [k, v] of obj.properties) {
+    const idx = parseInt(k, 10)
+    if (!isNaN(idx)) elems[idx] = v
+  }
+  const len   = elems.length
+  const cellW = len > 30 ? 24 : len > 15 ? 32 : len > 8 ? 42 : 52
+  const cellH = len > 30 ? 38 : 52
+
+  return (
+    <div style={{ marginBottom: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+        <span style={{ fontSize: 10, fontFamily: 'JetBrains Mono, monospace', color: '#7dd3fc', fontWeight: 700 }}>
+          Array #{obj.id}
+        </span>
+        <span style={{
+          fontSize: 10, padding: '1px 6px', borderRadius: 99,
+          background: '#1e293b', color: '#475569', fontFamily: 'JetBrains Mono, monospace',
+        }}>{len} elements</span>
+        {isNew && (
+          <span style={{
+            fontSize: 10, padding: '1px 6px', borderRadius: 99,
+            background: '#14532d22', color: '#86efac', border: '1px solid #14532d',
+          }}>new</span>
+        )}
+      </div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+        {elems.map((v, i) => {
+          const hit = mutated.has(String(i))
+          return (
+            <div key={i} title={`[${i}] = ${v}`} style={{
+              width: cellW, height: cellH,
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+              borderRadius: 5, cursor: 'default',
+              background: hit ? '#78350f33' : '#0f172a',
+              border: `1px solid ${hit ? '#f59e0b' : '#1e293b'}`,
+              boxShadow: hit ? '0 0 8px #f59e0b44' : 'none',
+              transition: 'all 0.15s',
+            }}>
+              <span style={{
+                fontSize: cellW < 32 ? 11 : 13, fontFamily: 'JetBrains Mono, monospace',
+                fontWeight: 600, color: hit ? '#fcd34d' : '#86efac', lineHeight: 1,
+              }}>{v === undefined ? '·' : String(v)}</span>
+              <span style={{ fontSize: 9, fontFamily: 'JetBrains Mono, monospace', color: '#334155', marginTop: 2, lineHeight: 1 }}>
+                {i}
+              </span>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+// ── Empty state ────────────────────────────────────────────────────────────────
+
+function EmptyState() {
+  return (
+    <div style={{
+      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+      width: '100%', height: '100%', minHeight: 180, padding: 24, gap: 10, textAlign: 'center',
+    }}>
+      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.06em', color: '#334155', fontFamily: 'JetBrains Mono, monospace' }}>
+        NO HEAP ALLOCATIONS
+      </div>
+      <div style={{ fontSize: 12, color: '#475569', lineHeight: 1.7, maxWidth: 260 }}>
+        This code works entirely with primitives — numbers, strings, booleans.
+        Primitives live on the <span style={{ color: '#818cf8' }}>call stack</span>, not the heap.
+      </div>
+      <div style={{
+        fontSize: 11, color: '#334155', padding: '6px 12px',
+        borderRadius: 6, background: '#0f172a', border: '1px solid #1e293b',
+      }}>
+        → Switch to <span style={{ color: '#818cf8' }}>Scope</span> to see where variables live
+      </div>
+    </div>
+  )
+}
+
+// ── Helpers ────────────────────────────────────────────────────────────────────
+
+function isRef(v) { return v !== null && typeof v === 'object' && '$ref' in v }
+
+function buildMutatedProps(heapDelta) {
+  const map = {}
+  for (const d of heapDelta ?? []) {
+    if (d.op === 'mutate') {
+      if (!map[d.objectId]) map[d.objectId] = new Set()
+      map[d.objectId].add(String(d.property))
+    }
+  }
+  return map
+}
+
+function detectChain(objects, snapshot) {
+  if (objects.length < 2) return null
+
+  // Find pairs where one object has a property pointing to another of the same type
+  const nextMap = new Map() // fromId → toId
+  for (const obj of objects) {
+    for (const [, v] of obj.properties) {
+      if (isRef(v) && snapshot.objects.has(v.$ref)) {
+        const target = snapshot.objects.get(v.$ref)
+        if (target.type === obj.type) { nextMap.set(obj.id, v.$ref); break }
+      }
+    }
+  }
+  if (nextMap.size === 0) return null
+
+  // Find chain head: in nextMap but not a target of any nextMap entry
+  const allTargets = new Set(nextMap.values())
+  let head = null
+  for (const [id] of nextMap) {
+    if (!allTargets.has(id)) { head = id; break }
+  }
+  if (!head) head = nextMap.keys().next().value
+
+  // Walk the chain
+  const order = []
+  let cur = head
+  const seen = new Set()
+  while (cur && !seen.has(cur)) {
+    order.push(cur)
+    seen.add(cur)
+    cur = nextMap.get(cur) ?? null
+  }
+
+  return order.length >= 2 ? order : null
+}
+
+function valColor(v) {
+  if (v === null || v === undefined) return '#475569'
+  if (typeof v === 'number') return '#86efac'
+  if (typeof v === 'string') return '#fbbf24'
+  if (typeof v === 'boolean') return '#f472b6'
+  return '#94a3b8'
+}
+
+function fmtVal(v) {
+  if (v === null)      return 'null'
+  if (v === undefined) return 'undefined'
+  if (typeof v === 'string') return `"${v.length > 18 ? v.slice(0, 18) + '…' : v}"`
+  if (typeof v === 'object') return '{…}'
+  return String(v)
 }
