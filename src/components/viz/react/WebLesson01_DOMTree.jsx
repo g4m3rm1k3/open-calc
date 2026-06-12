@@ -115,7 +115,7 @@ function PreviewPane({hoverId, deletedIds, C}) {
         ? <div style={{color:C.red,fontSize:12,fontFamily:'monospace'}}>{'<body> removed — page is blank'}</div>
         : <>
           {!h1Gone&&<div style={{...hStyle('h1'),fontSize:18,fontWeight:700,color:C.text,marginBottom:6,display:'block'}}>Hello</div>}
-          {!pGone&&<p style={{...hStyle('p'),fontSize:13,color:C.muted,marginBottom:8,margin:0,marginBottom:6}}>Some text</p>}
+          {!pGone&&<p style={{...hStyle('p'),fontSize:13,color:C.muted,margin:0,marginBottom:8}}>Some text</p>}
           <div style={{display:'flex',gap:8,alignItems:'center'}}>
             {!imgGone&&<div style={{...hStyle('img'),width:36,height:36,background:C.surface2,border:`0.5px solid ${C.border}`,borderRadius:4,display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,color:C.hint}}>img</div>}
             {!aGone&&<span style={{...hStyle('a'),color:C.blue,textDecoration:'underline',fontSize:13,cursor:'pointer'}}>Click me</span>}
