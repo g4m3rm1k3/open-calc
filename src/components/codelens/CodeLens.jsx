@@ -767,7 +767,7 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
       return
     }
     const explain = EXPLAIN[currentEvent?.type]?.(currentEvent)
-    const hintText = explain?.summary ? '  // ' + explain.summary.slice(0, 72) : ''
+    const hintText = explain?.summary ? '   ⟵ ' + explain.summary.slice(0, 72) : ''
     decorRef.current = ed.deltaDecorations(decorRef.current, [{
       range: new monaco.Range(line, 1, line, 1),
       options: {
@@ -878,9 +878,10 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
           border-left: 3px solid #6366f1 !important;
         }
         .cl-inline-hint {
-          color: #334155 !important;
+          color: #fbbf24 !important;
+          opacity: 0.9 !important;
           font-style: italic !important;
-          font-size: 11px !important;
+          font-size: 11.5px !important;
           font-family: JetBrains Mono, monospace !important;
           letter-spacing: 0 !important;
           user-select: none !important;
