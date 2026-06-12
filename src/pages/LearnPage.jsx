@@ -64,6 +64,7 @@ export default function LearnPage() {
       </div>
     }>
       <LessonPlayer
+        key={lesson.id}
         lesson={lesson}
         onBack={() => navigate('/labs')}
         onNext={nextPath ? () => navigate(nextPath) : null}

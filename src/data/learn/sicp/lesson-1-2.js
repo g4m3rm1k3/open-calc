@@ -41,8 +41,13 @@ export const lesson = {
       id: 'challenge-sign',
       text: 'You just saw abs use if/else to split into two cases. Some functions need three cases. Write a function called sign that returns -1 when x is negative, 0 when x is zero, and 1 when x is positive. Use nested if/else — if the first condition fails, test a second one inside the else branch. Call sign(-5), sign(0), and sign(5) on separate lines.',
       expectedOutput: '-1\n0\n1',
-      startCode: '// Write sign(x) here — returns -1, 0, or 1\n// Hint: if (x < 0) { ... } else if (x === 0) { ... } else { ... }\n\n',
+      startCode: '// Write sign(x) — returns -1 for negative, 0 for zero, 1 for positive\n// Hint: use if / else if / else with three return statements\n\nfunction sign(x) {\n  // your code here\n}\n\n// Run to test:\nconsole.log(sign(-5)); // -1\nconsole.log(sign(0));  // 0\nconsole.log(sign(5));  // 1\n',
       hint: 'function sign(x) {\n  if (x < 0) return -1;\n  else if (x === 0) return 0;\n  else return 1;\n}',
+      tests: [
+        { call: 'sign(-5)', expected: -1 },
+        { call: 'sign(0)',  expected: 0  },
+        { call: 'sign(5)',  expected: 1  },
+      ],
       validate: ({ logs, result, code }) => {
         try {
           const fn = new Function(`"use strict";\n${code}\n` +
@@ -82,12 +87,22 @@ export const lesson = {
       code: 'function square(x) { return x * x; }\nfunction abs(x)    { return x < 0 ? -x : x; }\nfunction improve(guess, x) { return (guess + x / guess) / 2; }\nfunction good_enough(guess, x) { return abs(square(guess) - x) < 0.001; }\n\nfunction sqrt_iter(guess, x) {\n  if (good_enough(guess, x)) {\n    return guess;\n  } else {\n    return sqrt_iter(improve(guess, x), x);\n  }\n}\n\nfunction sqrt(x) {\n  return sqrt_iter(1, x);\n}\n\nsqrt(2)',
     },
     {
+      type: 'codelens',
+      id: 'codelens-sqrt-iter',
+      text: 'Open CodeLens on sqrt_iter. Each recursive call is a new stack frame with a better guess. Watch the call stack grow and shrink as the algorithm homes in on the answer. Step through it — you will see good_enough finally return true and the recursion unwind.',
+      code: 'function square(x) { return x * x; }\nfunction abs(x) { return x < 0 ? -x : x; }\nfunction improve(guess, x) { return (guess + x / guess) / 2; }\nfunction good_enough(guess, x) { return abs(square(guess) - x) < 0.001; }\n\nfunction sqrt_iter(guess, x) {\n  if (good_enough(guess, x)) {\n    return guess;\n  } else {\n    return sqrt_iter(improve(guess, x), x);\n  }\n}\n\nconsole.log(sqrt_iter(1, 2));',
+    },
+    {
       type: 'challenge',
       id: 'challenge-sqrt-use',
       text: 'You have a working sqrt. The Pythagorean theorem says the hypotenuse of a right triangle equals sqrt(a squared plus b squared). Write a function called hypotenuse(a, b) that computes this. You have square and sqrt already defined above — use them. hypotenuse(3, 4) should return approximately 5.',
       expectedOutput: '~5',
       startCode: 'function square(x) { return x * x; }\nfunction abs(x)    { return x < 0 ? -x : x; }\nfunction improve(guess, x) { return (guess + x / guess) / 2; }\nfunction good_enough(guess, x) { return abs(square(guess) - x) < 0.001; }\nfunction sqrt_iter(guess, x) {\n  return good_enough(guess, x) ? guess : sqrt_iter(improve(guess, x), x);\n}\nfunction sqrt(x) { return sqrt_iter(1, x); }\n\n// Write hypotenuse(a, b) using sqrt and square\n\n',
       hint: 'function hypotenuse(a, b) { return sqrt(square(a) + square(b)); }',
+      tests: [
+        { call: 'Math.round(hypotenuse(3, 4))', expected: 5 },
+        { call: 'Math.round(hypotenuse(5, 12))', expected: 13 },
+      ],
       validate: ({ logs, result, code }) => {
         try {
           const fn = new Function(`"use strict";\n${code}\n` +
@@ -95,12 +110,6 @@ export const lesson = {
           return fn() === true
         } catch { return false }
       },
-    },
-    {
-      type: 'codelens',
-      id: 'codelens-sqrt-iter',
-      text: 'Open CodeLens on sqrt_iter. Each recursive call is a new stack frame with a better guess. Watch the call stack grow as the guess improves, then unwind once good_enough returns true. This is what SICP calls a linear iterative process — each step does constant work, but the number of steps grows with the precision required.',
-      code: 'function square(x) { return x * x; }\nfunction abs(x) { return x < 0 ? -x : x; }\nfunction improve(guess, x) { return (guess + x / guess) / 2; }\nfunction good_enough(guess, x) { return abs(square(guess) - x) < 0.001; }\n\nfunction sqrt_iter(guess, x) {\n  if (good_enough(guess, x)) {\n    return guess;\n  } else {\n    return sqrt_iter(improve(guess, x), x);\n  }\n}\n\nconsole.log(sqrt_iter(1, 2));',
     },
     {
       type: 'checkpoint',
@@ -133,6 +142,10 @@ export const lesson = {
       expectedOutput: '~3',
       startCode: '// Write cube_root(x) with internal helpers\n// improve(guess): return (2 * guess + x / (guess * guess)) / 3\n// good_enough(guess): return Math.abs(guess*guess*guess - x) < 0.001\n\n',
       hint: 'function cube_root(x) {\n  function improve(g) { return (2*g + x/(g*g)) / 3; }\n  function ok(g) { return Math.abs(g*g*g - x) < 0.001; }\n  function iter(g) { return ok(g) ? g : iter(improve(g)); }\n  return iter(1);\n}',
+      tests: [
+        { call: 'Math.round(cube_root(27))',  expected: 3 },
+        { call: 'Math.round(cube_root(8))',   expected: 2 },
+      ],
       validate: ({ logs, result, code }) => {
         try {
           const fn = new Function(`"use strict";\n${code}\n` +
