@@ -8,6 +8,7 @@ import HeapGraph from './renderer/HeapGraph.jsx'
 import CallGraphView from './renderer/CallGraphView.jsx'
 import VariableWatch from './renderer/VariableWatch.jsx'
 import CallTreeView from './renderer/CallTreeView.jsx'
+import StackDepthMeter from './renderer/StackDepthMeter.jsx'
 import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
 import {
   ChevronRight, ChevronDown, Code2, Boxes, Braces, ArrowLeft,
@@ -540,6 +541,15 @@ export default function CodeLens({ onBack, initialCode }) {
             </span>
           )}
         </div>
+      )}
+
+      {/* ── Stack depth meter ── */}
+      {execution && (
+        <StackDepthMeter
+          events={execution.events}
+          step={step}
+          onSeek={(s) => { setPlaying(false); setStep(s) }}
+        />
       )}
 
       {/* ── Body ── */}
