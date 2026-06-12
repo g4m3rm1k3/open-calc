@@ -9,153 +9,294 @@ export const lesson = {
   ],
   segments: [
 
-    // ── Introduction ─────────────────────────────────────────────────────────────
     {
       type: 'narration',
       id: 'intro',
-      text: 'Chapter 3.1 introduced mutable variables — let bindings whose values can change. Chapter 3.3 extends mutation to the data structures themselves. A pair built from const-like bindings is immutable: once created, its head and tail are fixed forever. But a pair built from let bindings can be changed in place. Mutating a pair means the change is visible to every reference to that pair — not just the variable that made the change. This in-place mutation is what makes queues, tables, and simulations efficient. It is also what makes shared mutable data dangerous.',
+      text: 'Lessons 3.1 and 3.2 introduced mutable variable bindings. Chapter 3.3 extends mutation to the data structures themselves.\n\nIn all of Chapter 2, once a pair was created its contents were fixed: head(pair(1,2)) always returns 1 forever. Mutable pairs can be changed AFTER creation — the change is visible through every reference to that pair. This makes certain algorithms dramatically more efficient (O(1) queue operations instead of O(n)), but introduces the aliasing problems that make shared mutable state hard to reason about.',
       code: null,
     },
 
-    // ── Mutable pairs ─────────────────────────────────────────────────────────────
+    // ── Mutable pairs ─────────────────────────────────────────────────────────
+
     {
       type: 'narration',
       id: 'mutable-pair-vocab',
-      text: 'An immutable pair is a snapshot: its head and tail are fixed at creation. A mutable pair has two slots that can be updated independently after creation. In Scheme, set-car! and set-cdr! (the exclamation marks signal mutation) change the head and tail slots. In JavaScript we represent a mutable pair as a plain object with head and tail properties. JavaScript objects are always mutable: assigning p.head = x changes the same object that any other reference to p sees.',
+      text: 'An immutable pair is a snapshot — fixed at creation. A mutable pair has slots that can be updated. Scheme uses set-car! and set-cdr! (the ! marks mutation). In JavaScript, we represent a mutable pair as an object with head and tail fields. Objects in JavaScript are always mutable — assigning p.head = x changes the same object that every other reference to p sees.',
       code: null,
     },
     {
       type: 'narration',
       id: 'mutable-pair-impl',
-      text: 'Here are the mutable pair operations. m_pair creates an object. set_head and set_tail mutate its slots. Run it — after set_head(p, 99), the pair that q also points to has been changed.',
-      code: 'function m_pair(h, t) { return { head: h, tail: t }; }\nfunction m_head(p) { return p.head; }\nfunction m_tail(p) { return p.tail; }\nfunction set_head(p, v) { p.head = v; }\nfunction set_tail(p, v) { p.tail = v; }\n\nconst p = m_pair(1, 2);\nconsole.log(m_head(p)); // 1\nset_head(p, 99);\nconsole.log(m_head(p)); // 99 — mutated in place',
+      text: 'Here are the mutable pair operations.',
+      code: `function m_pair(x, y)       { return { head: x, tail: y }; }
+function m_head(p)          { return p.head; }
+function m_tail(p)          { return p.tail; }
+function set_head(p, value) { p.head = value; }
+function set_tail(p, value) { p.tail = value; }`,
     },
     {
       type: 'narration',
-      id: 'aliasing-mutable',
-      text: 'Aliasing with mutable pairs is particularly consequential. If q = p, then q IS p — they point to the same object. Mutating through q changes what p sees. This is the source of many bugs: code that "reads" p gets a value that was written by code operating on q. The mutation is non-local and invisible in the source.',
-      code: 'function m_pair(h, t) { return { head: h, tail: t }; }\nfunction m_head(p) { return p.head; }\nfunction set_head(p, v) { p.head = v; }\n\nconst p = m_pair(10, 20);\nconst q = p;          // q is not a copy — it IS p\n\nset_head(q, 999);     // mutation through q\nconsole.log(m_head(p)); // 999 — p also changed — same object',
-    },
-    {
-      type: 'challenge',
-      id: 'challenge-swap',
-      text: 'Using mutable pairs, write swap(p) that swaps the head and tail of a pair in place — modifying the original pair, not creating a new one. After swap(p), p.head should hold the old p.tail value and vice versa. swap(m_pair(1, 2)).head should be 2 and .tail should be 1.',
-      expectedOutput: '2\n1',
-      startCode: 'function m_pair(h, t) { return { head: h, tail: t }; }\nfunction m_head(p) { return p.head; }\nfunction m_tail(p) { return p.tail; }\nfunction set_head(p, v) { p.head = v; }\nfunction set_tail(p, v) { p.tail = v; }\n\n// swap(p): exchanges head and tail in place\nfunction swap(p) {\n  // your code here\n}\n\nconst p = m_pair(1, 2);\nswap(p);\nconsole.log(m_head(p)); // 2\nconsole.log(m_tail(p)); // 1\n',
-      hint: 'function swap(p) {\n  const old_head = m_head(p);\n  set_head(p, m_tail(p));\n  set_tail(p, old_head);\n}',
-      tests: [],
-      validate: ({ code }) => {
-        try {
-          const fn = new Function(`"use strict";\n${code}\nconst p=m_pair(1,2);swap(p);return p.head===2&&p.tail===1`)
-          return fn() === true
-        } catch { return false }
-      },
-    },
-    {
-      type: 'checkpoint',
-      id: 'cp-mutable-pairs',
-    },
+      id: 'mutable-pair-aliasing',
+      text: 'Aliasing: two names pointing to the same pair. Setting head through one name changes what the other name sees. This is the key difference from immutable data — the "object" has an identity that persists across changes.',
+      code: `function m_pair(x, y)       { return { head: x, tail: y }; }
+function m_head(p)          { return p.head; }
+function m_tail(p)          { return p.tail; }
+function set_head(p, value) { p.head = value; }
 
-    // ── Queues ────────────────────────────────────────────────────────────────────
+const p = m_pair(1, 2);
+const q = p;            // q is an ALIAS for p — same object
+
+console.log(m_head(q)); // 1  — same as m_head(p)
+
+set_head(p, 99);        // mutate through p
+
+console.log(m_head(q)); // 99 — q sees the change!
+console.log(m_head(p)); // 99 — of course`,
+    },
+    {
+      type: 'narration',
+      id: 'mutable-append-vs-append-bang',
+      text: 'append creates a new list without touching the originals. An in-place version (append!) modifies the last pair of the first list to point to the second list. If any other name points to a pair in the first list, the change is visible through that name too.',
+      code: `function m_pair(x, y)       { return { head: x, tail: y }; }
+function m_head(p)          { return p.head; }
+function m_tail(p)          { return p.tail; }
+function set_tail(p, value) { p.tail = value; }
+function is_null(x)         { return x === null; }
+
+// Pure append (creates new structure, originals unchanged)
+function append(lst1, lst2) {
+  if (is_null(lst1)) return lst2;
+  return m_pair(m_head(lst1), append(m_tail(lst1), lst2));
+}
+
+// Destructive append! (mutates last pair of lst1)
+function append_d(lst1, lst2) {
+  if (is_null(m_tail(lst1)))
+    set_tail(lst1, lst2);           // link last node to lst2
+  else
+    append_d(m_tail(lst1), lst2);  // recurse to find last node
+}
+
+const a = m_pair(1, m_pair(2, null));
+const b = m_pair(3, m_pair(4, null));
+
+append_d(a, b);  // a now ends with → b's first pair
+
+console.log(m_head(m_tail(m_tail(a))));  // 3 — a now includes b's elements`,
+    },
+    { type: 'checkpoint', id: 'cp-mutable-pairs' },
+
+    // ── Queue ─────────────────────────────────────────────────────────────────
+
     {
       type: 'narration',
       id: 'queue-vocab',
-      text: 'A queue is a FIFO (First In, First Out) data structure. Items join at the rear and leave from the front — like a checkout line. The abstract interface is: make_queue, enqueue(q, item), dequeue(q), front_queue(q), is_empty_queue(q). The naive linked-list implementation would require scanning to the end for every enqueue — Θ(n). The O(1) trick: maintain two pointers, front-ptr and rear-ptr, directly to the first and last pairs. Enqueue adds at rear-ptr. Dequeue advances front-ptr. Both are constant time.',
+      text: 'A queue is a first-in-first-out (FIFO) sequence. Elements are added at the rear and removed from the front. With immutable lists, enqueuing is O(1) but dequeuing requires scanning to the front after building from the rear — or vice versa. With a front pointer and a rear pointer into a mutable list, BOTH operations are O(1).\n\nThe trick: maintain two pointers. The front pointer points to the first element. The rear pointer points to the last. Enqueue adds to the rear in O(1). Dequeue moves the front pointer in O(1).',
       code: null,
     },
     {
       type: 'narration',
-      id: 'queue-structure',
-      text: 'A queue is an object with two slots: front and rear. When empty, both are null. enqueue creates a new pair, links it to the current rear via set_tail, and advances rear to the new pair. If the queue was empty, the new pair becomes both front and rear.',
-      code: 'function m_pair(h, t) { return { head: h, tail: t }; }\nfunction m_head(p) { return p.head; }\nfunction m_tail(p) { return p.tail; }\nfunction set_tail(p, v) { p.tail = v; }\n\nfunction make_queue() { return { front: null, rear: null }; }\nfunction is_empty_queue(q) { return q.front === null; }\nfunction front_queue(q) { return m_head(q.front); }\n\nfunction enqueue(q, item) {\n  const new_pair = m_pair(item, null);\n  if (is_empty_queue(q)) {\n    q.front = new_pair;     // first item: front = rear = new_pair\n    q.rear  = new_pair;\n  } else {\n    set_tail(q.rear, new_pair); // link old rear to new pair\n    q.rear = new_pair;          // advance rear pointer\n  }\n}\n\nconst q = make_queue();\nenqueue(q, \'first\');\nenqueue(q, \'second\');\nconsole.log(front_queue(q)); // first',
+      id: 'queue-make',
+      text: 'A queue is a pair of pointers: [front, rear]. Initially both are null.',
+      code: `function make_queue()     { return { front: null, rear: null }; }
+function front_queue(q)   { return q.front; }
+function empty_queue(q)   { return q.front === null; }`,
     },
     {
       type: 'narration',
-      id: 'dequeue-code',
-      text: 'dequeue advances the front pointer. When the last element is removed, both front and rear are set to null so is_empty_queue is consistent.',
-      code: 'function m_pair(h, t) { return { head: h, tail: t }; }\nfunction m_head(p) { return p.head; }\nfunction m_tail(p) { return p.tail; }\nfunction set_tail(p, v) { p.tail = v; }\nfunction make_queue() { return { front: null, rear: null }; }\nfunction is_empty_queue(q) { return q.front === null; }\nfunction front_queue(q) { return m_head(q.front); }\nfunction enqueue(q,item){\n  const np=m_pair(item,null);\n  if(is_empty_queue(q)){q.front=np;q.rear=np;}\n  else{set_tail(q.rear,np);q.rear=np;}\n}\n\nfunction dequeue(q) {\n  if (is_empty_queue(q)) throw new Error(\'Queue empty\');\n  const val = front_queue(q);\n  q.front = m_tail(q.front);           // advance front pointer\n  if (q.front === null) q.rear = null; // queue is now empty\n  return val;\n}\n\nconst q = make_queue();\nenqueue(q, \'a\'); enqueue(q, \'b\'); enqueue(q, \'c\');\nconsole.log(dequeue(q)); // a\nconsole.log(dequeue(q)); // b\nenqueue(q, \'d\');\nconsole.log(dequeue(q)); // c\nconsole.log(dequeue(q)); // d',
-    },
-    {
-      type: 'challenge',
-      id: 'challenge-queue-operations',
-      text: 'Write queue_size(q) that returns the number of items currently in the queue without dequeuing any of them. Walk from front to rear and count. Then write queue_to_array(q) that returns a JavaScript array of all items, front first. Both should be non-destructive.',
-      expectedOutput: '3\n["a","b","c"]\n2\n["a","b","c"]',
-      startCode: 'function m_pair(h, t) { return { head: h, tail: t }; }\nfunction m_head(p) { return p.head; }\nfunction m_tail(p) { return p.tail; }\nfunction set_tail(p, v) { p.tail = v; }\nfunction make_queue() { return { front: null, rear: null }; }\nfunction is_empty_queue(q) { return q.front === null; }\nfunction front_queue(q) { return m_head(q.front); }\nfunction enqueue(q,item){const np=m_pair(item,null);if(is_empty_queue(q)){q.front=np;q.rear=np;}else{set_tail(q.rear,np);q.rear=np;}}\nfunction dequeue(q){const v=front_queue(q);q.front=m_tail(q.front);if(q.front===null)q.rear=null;return v;}\n\n// Write queue_size(q) and queue_to_array(q)\nfunction queue_size(q) {\n  // your code here\n}\nfunction queue_to_array(q) {\n  // your code here\n}\n\nconst q = make_queue();\nenqueue(q, \'a\'); enqueue(q, \'b\'); enqueue(q, \'c\');\nconsole.log(queue_size(q));               // 3\nconsole.log(JSON.stringify(queue_to_array(q))); // ["a","b","c"]\ndequeue(q);\nconsole.log(queue_size(q));               // 2\nconsole.log(JSON.stringify(queue_to_array(q))); // ["a","b","c"] — wait, front was removed\n',
-      hint: 'function queue_size(q) {\n  let count = 0, cur = q.front;\n  while (cur !== null) { count++; cur = m_tail(cur); }\n  return count;\n}\nfunction queue_to_array(q) {\n  const result = [];\n  let cur = q.front;\n  while (cur !== null) { result.push(m_head(cur)); cur = m_tail(cur); }\n  return result;\n}',
-      tests: [],
-      validate: ({ code }) => {
-        try {
-          const fn = new Function(`"use strict";
-function m_pair(h,t){return{head:h,tail:t};}function m_head(p){return p.head;}function m_tail(p){return p.tail;}
-function set_tail(p,v){p.tail=v;}function make_queue(){return{front:null,rear:null};}
-function is_empty_queue(q){return q.front===null;}function front_queue(q){return m_head(q.front);}
-function enqueue(q,item){const np=m_pair(item,null);if(is_empty_queue(q)){q.front=np;q.rear=np;}else{set_tail(q.rear,np);q.rear=np;}}
-function dequeue(q){const v=front_queue(q);q.front=m_tail(q.front);if(q.front===null)q.rear=null;return v;}
-${code}
-const q=make_queue();enqueue(q,'a');enqueue(q,'b');enqueue(q,'c');
-const s1=queue_size(q);const a1=queue_to_array(q);
-dequeue(q);
-const s2=queue_size(q);
-return typeof queue_size==='function'&&s1===3&&JSON.stringify(a1)==='["a","b","c"]'&&s2===2`)
-          return fn() === true
-        } catch { return false }
-      },
-    },
-    {
-      type: 'checkpoint',
-      id: 'cp-queues',
-    },
+      id: 'queue-enqueue',
+      text: 'Enqueue: add a new pair at the rear. If the queue was empty, the new pair is both front and rear.',
+      code: `function make_queue()     { return { front: null, rear: null }; }
+function front_queue(q)   { return q.front; }
+function empty_queue(q)   { return q.front === null; }
 
-    // ── Tables ────────────────────────────────────────────────────────────────────
+function enqueue(q, item) {
+  const new_pair = { head: item, tail: null };
+  if (empty_queue(q)) {
+    q.front = new_pair;
+    q.rear  = new_pair;
+  } else {
+    q.rear.tail = new_pair;   // link old rear to new node
+    q.rear = new_pair;        // advance rear pointer
+  }
+}`,
+    },
     {
       type: 'narration',
-      id: 'table-vocab',
-      text: 'A table maps keys to values. It is the programmatic equivalent of a dictionary: given a key, find its value. SICP builds a one-dimensional table as a mutable list with a special sentinel header node. The header allows mutation at the front of the list without requiring callers to update their reference to the table — the table object (the header) never moves, only the list behind it changes. lookup scans for a matching key. insert adds or updates a key-value record.',
+      id: 'queue-dequeue',
+      text: 'Dequeue: return the front item and advance the front pointer.',
+      code: `function make_queue()     { return { front: null, rear: null }; }
+function front_queue(q)   { return q.front ? q.front.head : null; }
+function empty_queue(q)   { return q.front === null; }
+function enqueue(q, item) {
+  const n = { head: item, tail: null };
+  if (empty_queue(q)) { q.front = n; q.rear = n; }
+  else { q.rear.tail = n; q.rear = n; }
+}
+
+function dequeue(q) {
+  if (empty_queue(q)) throw new Error('Empty queue');
+  const item = q.front.head;
+  q.front = q.front.tail;   // advance front pointer
+  if (q.front === null) q.rear = null;  // queue is now empty
+  return item;
+}`,
+    },
+    {
+      type: 'narration',
+      id: 'queue-test',
+      text: 'Use the queue. All operations are O(1) regardless of queue size.',
+      code: `function make_queue()     { return { front: null, rear: null }; }
+function empty_queue(q)   { return q.front === null; }
+function front_queue(q)   { return q.front ? q.front.head : null; }
+function enqueue(q, item) {
+  const n = {head:item,tail:null};
+  if(empty_queue(q)){q.front=n;q.rear=n;}else{q.rear.tail=n;q.rear=n;}
+}
+function dequeue(q) {
+  const item = q.front.head;
+  q.front = q.front.tail;
+  if(!q.front) q.rear=null;
+  return item;
+}
+
+const q = make_queue();
+enqueue(q, 'a');
+enqueue(q, 'b');
+enqueue(q, 'c');
+
+console.log(front_queue(q)); // a
+console.log(dequeue(q));     // a — removed
+console.log(front_queue(q)); // b
+console.log(dequeue(q));     // b
+console.log(dequeue(q));     // c`,
+    },
+    { type: 'checkpoint', id: 'cp-queues' },
+
+    // ── Tables ────────────────────────────────────────────────────────────────
+
+    {
+      type: 'narration',
+      id: 'table-intro',
+      text: 'A table is a mutable associative data structure: a mapping from keys to values supporting lookup and insertion. We saw tables implicitly in the data-directed programming dispatch table of Chapter 2.4. Here we build one explicitly as a mutable list of key-value pairs.',
       code: null,
     },
     {
       type: 'narration',
-      id: 'table-structure-code',
-      text: 'A table is a mutable pair chain. The head of each entry is itself a pair: (key . value). The table object is a sentinel pair whose head is the symbol "*table*" — it is never a real entry. This sentinel stays constant, so callers always hold a valid reference.',
-      code: 'function m_pair(h, t) { return { head: h, tail: t }; }\nfunction m_head(p) { return p.head; }\nfunction m_tail(p) { return p.tail; }\nfunction set_tail(p, v) { p.tail = v; }\n\nfunction make_table() {\n  return m_pair(\'*table*\', null); // sentinel — never a real entry\n}\n\n// Each record is (key . value) in the tail chain\nconst t = make_table();\nconst record = m_pair(m_pair(\'name\', \'Alice\'), null);\nset_tail(t, record);\n\nconsole.log(m_head(m_head(m_tail(t)))); // name\nconsole.log(m_tail(m_head(m_tail(t)))); // Alice',
+      id: 'table-make',
+      text: 'A table is a list of [key, value] pairs with a special header node. The header (a "dummy" pair) makes insertion O(1) by giving us a place to prepend without changing the table\'s top-level reference.',
+      code: `function make_table() { return { head: '*table*', tail: null }; }`,
     },
     {
       type: 'narration',
-      id: 'table-lookup-insert',
-      text: 'lookup scans the chain looking for a matching key. insert walks first to find an existing entry (and updates it) or adds a new entry at the front after the sentinel.',
-      code: 'function m_pair(h, t) { return { head: h, tail: t }; }\nfunction m_head(p) { return p.head; }\nfunction m_tail(p) { return p.tail; }\nfunction set_head(p, v) { p.head = v; }\nfunction set_tail(p, v) { p.tail = v; }\nfunction make_table() { return m_pair(\'*table*\', null); }\n\nfunction lookup(key, table) {\n  let record = m_tail(table);\n  while (record !== null) {\n    if (m_head(m_head(record)) === key) return m_tail(m_head(record));\n    record = m_tail(record);\n  }\n  return null;\n}\n\nfunction insert(key, value, table) {\n  let record = m_tail(table);\n  while (record !== null) {\n    if (m_head(m_head(record)) === key) {\n      set_tail(m_head(record), value); // update\n      return;\n    }\n    record = m_tail(record);\n  }\n  // not found — insert after header\n  set_tail(table, m_pair(m_pair(key, value), m_tail(table)));\n}\n\nconst t = make_table();\ninsert(\'name\',  \'Alice\', t);\ninsert(\'score\', 95, t);\nconsole.log(lookup(\'name\',  t)); // Alice\nconsole.log(lookup(\'score\', t)); // 95\nconsole.log(lookup(\'age\',   t)); // null\n\ninsert(\'score\', 100, t);         // update\nconsole.log(lookup(\'score\', t)); // 100',
+      id: 'table-lookup',
+      text: 'Lookup: scan the list for a matching key. Return the value or null if not found.',
+      code: `function make_table()   { return { head: '*table*', tail: null }; }
+
+function lookup(key, table) {
+  let record = table.tail;
+  while (record !== null) {
+    if (record.head.key === key) return record.head.value;
+    record = record.tail;
+  }
+  return null;
+}`,
     },
     {
+      type: 'narration',
+      id: 'table-insert',
+      text: 'Insert: scan for an existing key — if found, update; if not found, prepend a new record.',
+      code: `function make_table()   { return { head: '*table*', tail: null }; }
+function lookup(key, table) {
+  let r = table.tail;
+  while (r) { if (r.head.key === key) return r.head.value; r = r.tail; }
+  return null;
+}
+
+function insert(key, value, table) {
+  let r = table.tail;
+  while (r) {
+    if (r.head.key === key) { r.head.value = value; return; }  // update
+    r = r.tail;
+  }
+  table.tail = { head: { key, value }, tail: table.tail };     // prepend new
+}`,
+    },
+    {
+      type: 'narration',
+      id: 'table-test',
+      text: 'Test the table. A memoization cache is the natural first application.',
+      code: `function make_table()   { return { head: '*table*', tail: null }; }
+function lookup(key, table) {
+  let r = table.tail;
+  while (r) { if (r.head.key === key) return r.head.value; r = r.tail; }
+  return null;
+}
+function insert(key, value, table) {
+  let r = table.tail;
+  while (r) { if (r.head.key === key) { r.head.value = value; return; } r = r.tail; }
+  table.tail = { head: { key, value }, tail: table.tail };
+}
+
+const t = make_table();
+insert('x', 42, t);
+insert('y', 99, t);
+
+console.log(lookup('x', t));   // 42
+console.log(lookup('y', t));   // 99
+console.log(lookup('z', t));   // null
+
+insert('x', 100, t);           // update existing key
+console.log(lookup('x', t));   // 100`,
+    },
+    {
+      type: 'codelens',
+      id: 'codelens-table',
+      text: 'Open CodeLens on a table with several inserts followed by a lookup. Watch the heap — the table is a linked list of {key, value} records. Each insert prepends a new record. Lookup traverses the chain. The table is a mutable data structure: you can see the tail pointers change with each insertion.',
+      code: `function make_table() { return { head: '*table*', tail: null }; }
+function lookup(key, t) { let r=t.tail; while(r){if(r.head.key===key)return r.head.value;r=r.tail;} return null; }
+function insert(key, val, t) { t.tail = { head:{key,value:val}, tail:t.tail }; }
+const t = make_table();
+insert('a', 1, t);
+insert('b', 2, t);
+console.log(lookup('a', t));`,
+    },
+    { type: 'checkpoint', id: 'cp-tables' },
+
+    {
       type: 'challenge',
-      id: 'challenge-2d-table',
-      text: 'A 2D table maps (key1, key2) pairs to values — a table of tables. lookup_2d(k1, k2, t) first finds the inner table for k1, then looks up k2 in it. insert_2d(k1, k2, val, t) gets or creates the inner table for k1, then inserts k2→val. insert_2d("math","score",95,t) then lookup_2d("math","score",t) should return 95.',
-      expectedOutput: '95\nnull\n100',
-      startCode: 'function m_pair(h, t) { return { head: h, tail: t }; }\nfunction m_head(p) { return p.head; }\nfunction m_tail(p) { return p.tail; }\nfunction set_head(p, v) { p.head = v; }\nfunction set_tail(p, v) { p.tail = v; }\nfunction make_table() { return m_pair(\'*table*\', null); }\nfunction lookup(key, t) {\n  let r = m_tail(t);\n  while (r !== null) { if (m_head(m_head(r)) === key) return m_tail(m_head(r)); r = m_tail(r); }\n  return null;\n}\nfunction insert(key, val, t) {\n  let r = m_tail(t);\n  while (r !== null) { if (m_head(m_head(r)) === key) { set_tail(m_head(r), val); return; } r = m_tail(r); }\n  set_tail(t, m_pair(m_pair(key, val), m_tail(t)));\n}\n\n// Write lookup_2d and insert_2d\nfunction lookup_2d(k1, k2, t) {\n  // your code here\n}\nfunction insert_2d(k1, k2, val, t) {\n  // your code here\n}\n\nconst t = make_table();\ninsert_2d(\'math\', \'score\', 95, t);\nconsole.log(lookup_2d(\'math\', \'score\', t)); // 95\nconsole.log(lookup_2d(\'eng\',  \'score\', t)); // null\ninsert_2d(\'math\', \'score\', 100, t);          // update\nconsole.log(lookup_2d(\'math\', \'score\', t)); // 100\n',
-      hint: 'function lookup_2d(k1, k2, t) {\n  const inner = lookup(k1, t);\n  return inner ? lookup(k2, inner) : null;\n}\nfunction insert_2d(k1, k2, val, t) {\n  let inner = lookup(k1, t);\n  if (!inner) { inner = make_table(); insert(k1, inner, t); }\n  insert(k2, val, inner);\n}',
-      tests: [],
+      id: 'challenge-memoize',
+      text: 'Write memoize(f) using a table. The first time f is called with argument x, compute and cache the result. Subsequent calls with the same x return the cached value. Use a call counter to verify that the underlying function is only called once per unique argument.',
+      expectedOutput: '25\n25\ncalls to sqrt: 1',
+      startCode: `function make_table() { return { head: '*table*', tail: null }; }
+function lookup(key, t) { let r=t.tail; while(r){if(r.head.key===key)return r.head.value;r=r.tail;} return null; }
+function insert(key, val, t) { t.tail = { head:{key,value:val}, tail:t.tail }; }
+
+function memoize(f) {
+  const cache = make_table();
+  return function(x) {
+    const cached = lookup(x, cache);
+    if (cached !== null) return cached;
+    // call f(x), cache the result, return it
+  };
+}
+
+let sqrt_calls = 0;
+function tracked_sqrt(x) { sqrt_calls++; return Math.sqrt(x); }
+
+const mem_sqrt = memoize(tracked_sqrt);
+
+console.log(mem_sqrt(625));  // 25 — calls tracked_sqrt
+console.log(mem_sqrt(625));  // 25 — from cache
+console.log('calls to sqrt: ' + sqrt_calls);  // 1
+`,
+      hint: 'const result = f(x);\ninsert(x, result, cache);\nreturn result;',
       validate: ({ code }) => {
         try {
-          const fn = new Function(`"use strict";
-function m_pair(h,t){return{head:h,tail:t};}function m_head(p){return p.head;}function m_tail(p){return p.tail;}
-function set_head(p,v){p.head=v;}function set_tail(p,v){p.tail=v;}
-function make_table(){return m_pair('*table*',null);}
-function lookup(key,t){let r=m_tail(t);while(r!==null){if(m_head(m_head(r))===key)return m_tail(m_head(r));r=m_tail(r);}return null;}
-function insert(key,val,t){let r=m_tail(t);while(r!==null){if(m_head(m_head(r))===key){set_tail(m_head(r),val);return;}r=m_tail(r);}set_tail(t,m_pair(m_pair(key,val),m_tail(t)));}
-${code}
-const t=make_table();
-insert_2d('math','score',95,t);
-const r1=lookup_2d('math','score',t);
-const r2=lookup_2d('eng','score',t);
-insert_2d('math','score',100,t);
-const r3=lookup_2d('math','score',t);
-return typeof lookup_2d==='function'&&r1===95&&r2===null&&r3===100`)
+          const fn = new Function(`"use strict";\n${code}\nreturn sqrt_calls === 1`)
           return fn() === true
         } catch { return false }
       },
-    },
-    {
-      type: 'checkpoint',
-      id: 'cp-tables',
     },
   ],
 }

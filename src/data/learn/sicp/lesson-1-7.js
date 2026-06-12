@@ -3,150 +3,346 @@ export const lesson = {
   series: { id: 'sicp', title: 'SICP — JavaScript' },
   title: '1.3.3–1.3.4  Functions as Returned Values',
   checkpoints: [
-    { id: 'cp-fixed-point',  label: 'Fixed Point' },
-    { id: 'cp-composition',  label: 'Composition' },
+    { id: 'cp-half-interval', label: 'Bisection Search' },
+    { id: 'cp-fixed-point',   label: 'Fixed Points' },
+    { id: 'cp-composition',   label: 'Composition' },
   ],
   segments: [
 
-    // ── Introduction ─────────────────────────────────────────────────────────────
+    // ══════════════════════════════════════════════════════════════════════════
+    // Introduction
+    // ══════════════════════════════════════════════════════════════════════════
+
     {
       type: 'narration',
       id: 'intro',
-      text: 'Last lesson we passed functions in. Now we return them out. A function that produces a new function gives us a way to describe transformations of behaviour — not just transformations of data. Section 1.3.3 and 1.3.4 show this through two ideas: fixed-point search and average damping. Together they reveal that Newton\'s method, which we wrote by hand in lesson 1-2, is an instance of a general pattern expressible in a few lines.',
+      text: 'Last lesson we passed functions in. Now we return them out. A function that produces a new function is a transformer of behaviour — not just a transformer of data. Section 1.3.3 introduces two general methods for finding function values: bisection search and fixed-point iteration. Section 1.3.4 shows how average damping, Newton\'s method, and square roots are all instances of the same abstract pattern, separated only by which functions you compose together.',
       code: null,
     },
 
-    // ── Terminology: Fixed Point ──────────────────────────────────────────────────
+    // ══════════════════════════════════════════════════════════════════════════
+    // SECTION 1.3.3a — Half-Interval Method
+    // ══════════════════════════════════════════════════════════════════════════
+
     {
       type: 'narration',
-      id: 'fixed-point-math-vocab',
-      text: 'A fixed point of a function f is a value x where f(x) equals x — the function maps x back to itself. For example, the cosine function has a fixed point near 0.739 because cos(0.739) ≈ 0.739. To find a fixed point numerically, start with an initial guess, apply f to get a new value, apply f again to that result, and repeat. If the sequence of guesses converges, it converges to a fixed point. The method works when f is a contraction — each application brings the guess closer to the answer.',
+      id: 'half-interval-vocab',
+      text: 'The half-interval method (bisection search) finds a root of a function — a value x where f(x) = 0. The mathematical foundation: the Intermediate Value Theorem says that if f(a) < 0 and f(b) > 0 and f is continuous, then somewhere between a and b there must be a root.\n\nAlgorithm: evaluate f at the midpoint. If the midpoint value has the same sign as f(a), the root is in the upper half — replace a. Otherwise the root is in the lower half — replace b. Repeat. Each step halves the interval. After log₂((b-a)/tolerance) steps, you have the root to the desired precision.',
       code: null,
     },
-
-    // ── Fixed point ───────────────────────────────────────────────────────────────
     {
       type: 'narration',
-      id: 'fixed-point-intro',
-      text: 'Here is the fixed_point search function. It takes a function f and a starting guess. try_it applies f, checks whether the new value is close enough to the old one, and if not recurses with the new value. The tolerance is 0.00001. Run it — it finds the cosine fixed point near 0.739.',
-      code: 'function fixed_point(f, first_guess) {\n  const tolerance = 0.00001;\n  function close_enough(a, b) {\n    return Math.abs(a - b) < tolerance;\n  }\n  function try_it(guess) {\n    const next = f(guess);\n    if (close_enough(guess, next)) return next;\n    return try_it(next);\n  }\n  return try_it(first_guess);\n}\n\n// cos(x) = x — cosine has a fixed point near 0.739\nconsole.log(fixed_point(Math.cos, 1.0));',
+      id: 'half-interval-search',
+      text: 'Build the search function. It takes f and the current negative/positive brackets. When the interval is small enough (< tolerance), return the midpoint.',
+      code: `function half_interval_search(f, neg, pos) {
+  const mid = (neg + pos) / 2;
+  if (Math.abs(pos - neg) < 0.001) return mid;
+  // check midpoint and recurse
+}`,
+    },
+    {
+      type: 'narration',
+      id: 'half-interval-recurse',
+      text: 'Evaluate f at the midpoint. If f(mid) < 0, mid becomes the new negative bracket. If f(mid) > 0, mid becomes the new positive bracket. If f(mid) = 0 exactly, we are done.',
+      code: `function half_interval_search(f, neg, pos) {
+  const mid = (neg + pos) / 2;
+  if (Math.abs(pos - neg) < 0.001) return mid;
+  const f_mid = f(mid);
+  if (f_mid < 0) return half_interval_search(f, mid, pos);
+  if (f_mid > 0) return half_interval_search(f, neg, mid);
+  return mid;  // exactly zero
+}`,
+    },
+    {
+      type: 'narration',
+      id: 'half-interval-wrapper',
+      text: 'A wrapper handles the initial setup: sort the endpoints and verify they bracket a root.',
+      code: `function half_interval_search(f, neg, pos) {
+  const mid = (neg + pos) / 2;
+  if (Math.abs(pos - neg) < 0.001) return mid;
+  const f_mid = f(mid);
+  if (f_mid < 0) return half_interval_search(f, mid, pos);
+  if (f_mid > 0) return half_interval_search(f, neg, mid);
+  return mid;
+}
+
+function half_interval_method(f, a, b) {
+  const fa = f(a), fb = f(b);
+  if (fa < 0 && fb > 0) return half_interval_search(f, a, b);
+  if (fa > 0 && fb < 0) return half_interval_search(f, b, a);
+  throw new Error('f(a) and f(b) do not have opposite signs');
+}`,
+    },
+    {
+      type: 'narration',
+      id: 'half-interval-demo',
+      text: 'Find a root of x³ − 2x − 3. Also find π by finding where sin(x) = 0 between 2 and 4.',
+      code: `function half_interval_search(f, neg, pos) {
+  const mid = (neg + pos) / 2;
+  if (Math.abs(pos - neg) < 0.001) return mid;
+  const fm = f(mid);
+  if (fm < 0) return half_interval_search(f, mid, pos);
+  if (fm > 0) return half_interval_search(f, neg, mid);
+  return mid;
+}
+function half_interval_method(f, a, b) {
+  const fa = f(a), fb = f(b);
+  if (fa < 0 && fb > 0) return half_interval_search(f, a, b);
+  if (fa > 0 && fb < 0) return half_interval_search(f, b, a);
+}
+
+// Root of x³ - 2x - 3 = 0 between 1 and 3
+console.log(half_interval_method(x => x*x*x - 2*x - 3, 1, 3)); // ≈ 1.893
+
+// sin(x) = 0 between 2 and 4 — that root is π
+console.log(half_interval_method(Math.sin, 2, 4));  // ≈ 3.14159`,
+    },
+    { type: 'checkpoint', id: 'cp-half-interval' },
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // SECTION 1.3.3b — Fixed Points
+    // ══════════════════════════════════════════════════════════════════════════
+
+    {
+      type: 'narration',
+      id: 'fixed-point-vocab',
+      text: 'A fixed point of a function f is a value x where f(x) = x — the function maps x back to itself. For example, cos(x) has a fixed point near 0.739 because cos(0.739) ≈ 0.739.\n\nTo find a fixed point numerically: start with a guess, apply f to get a new value, apply f again, repeat. If the sequence converges, it converges to a fixed point. This works when the function does not overshoot too badly — formally, when f is a contraction.',
+      code: null,
+    },
+    {
+      type: 'narration',
+      id: 'fixed-point-try',
+      text: 'Build the inner loop. try_it applies f and checks whether the new value is close enough to the old one.',
+      code: `function fixed_point(f, first_guess) {
+  const tolerance = 0.00001;
+
+  function close_enough(a, b) {
+    return Math.abs(a - b) < tolerance;
+  }
+
+  function try_it(guess) {
+    const next = f(guess);
+    if (close_enough(guess, next)) return next;
+    return try_it(next);
+  }
+
+  return try_it(first_guess);
+}`,
+    },
+    {
+      type: 'narration',
+      id: 'fixed-point-cosine',
+      text: 'Find the cosine fixed point. Starting from 1.0, the sequence converges to ≈ 0.739.',
+      code: `function fixed_point(f, first_guess) {
+  const tol = 0.00001;
+  function try_it(g) {
+    const next = f(g);
+    return Math.abs(g - next) < tol ? next : try_it(next);
+  }
+  return try_it(first_guess);
+}
+
+// cos(x) = x — the fixed point of cosine
+console.log(fixed_point(Math.cos, 1.0));  // ≈ 0.7390851`,
+    },
+    {
+      type: 'narration',
+      id: 'fixed-point-oscillation',
+      text: 'Not every function converges. Searching for √2 by finding the fixed point of y → 2/y oscillates forever: starting from 1, the sequence goes 1 → 2 → 1 → 2 → ... The function overshoots the fixed point every time.\n\nThe fix is average damping: instead of jumping to f(x), move to the average of x and f(x). This halves each step and prevents overshoot.',
+      code: null,
+    },
+    {
+      type: 'narration',
+      id: 'fixed-point-sqrt',
+      text: '√2 is the fixed point of y → 2/y. With average damping: use y → (y + 2/y)/2. This is exactly the improve step from Newton\'s square root in lesson 1-2.',
+      code: `function fixed_point(f, first_guess) {
+  const tol = 0.00001;
+  function try_it(g) {
+    const next = f(g);
+    return Math.abs(g - next) < tol ? next : try_it(next);
+  }
+  return try_it(first_guess);
+}
+
+// Oscillates — do NOT run this (infinite loop):
+// fixed_point(y => 2 / y, 1.0)
+
+// With average damping: converges to √2
+console.log(fixed_point(y => (y + 2/y) / 2, 1.0));  // 1.41421...
+console.log(fixed_point(y => (y + 9/y) / 2, 1.0));  // 3.0000...`,
+    },
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // SECTION 1.3.4 — Functions as Returned Values
+    // ══════════════════════════════════════════════════════════════════════════
+
+    {
+      type: 'narration',
+      id: 'average-damp-motivation',
+      text: 'The average-damping trick appears in multiple problems: square roots, cube roots, higher roots. Instead of hardcoding the damping every time, package it as a function transformer. average_damp takes a function f and returns a new function that averages x with f(x).',
+      code: null,
+    },
+    {
+      type: 'narration',
+      id: 'average-damp-build',
+      text: 'average_damp is a function that returns a function. The returned function captures f from the outer scope — a closure.',
+      code: `function average_damp(f) {
+  return x => (x + f(x)) / 2;
+}`,
+    },
+    {
+      type: 'narration',
+      id: 'average-damp-use',
+      text: 'average_damp(y => 2/y) returns a new function that, given y, computes (y + 2/y)/2 — exactly our damped sqrt target. Now sqrt is a composition of two general ideas.',
+      code: `function fixed_point(f, first_guess) {
+  const tol = 0.00001;
+  function try_it(g) { const n = f(g); return Math.abs(g-n)<tol ? n : try_it(n); }
+  return try_it(first_guess);
+}
+
+function average_damp(f) {
+  return x => (x + f(x)) / 2;
+}
+
+function sqrt(x) {
+  return fixed_point(average_damp(y => x / y), 1.0);
+}
+
+console.log(sqrt(2));    // 1.41421...
+console.log(sqrt(9));    // 3.00000...
+console.log(sqrt(144));  // 12.0000...`,
+    },
+    {
+      type: 'narration',
+      id: 'cube-root-as-fp',
+      text: 'Cube root of x is a fixed point of y → x/y² — with average damping to prevent oscillation. Same pattern, different function passed in.',
+      code: `function fixed_point(f, first_guess) {
+  const tol = 0.00001;
+  function try_it(g) { const n = f(g); return Math.abs(g-n)<tol ? n : try_it(n); }
+  return try_it(first_guess);
+}
+function average_damp(f) { return x => (x + f(x)) / 2; }
+
+function cube_root(x) {
+  return fixed_point(average_damp(y => x / (y * y)), 1.0);
+}
+
+console.log(cube_root(8));    // ≈ 2.0
+console.log(cube_root(27));   // ≈ 3.0`,
     },
     {
       type: 'codelens',
       id: 'codelens-fixed-point',
-      text: 'Open CodeLens on fixed_point with cosine. Watch the guess converge iteration by iteration — each call to try_it brings the estimate closer. The function has no idea it is finding a cosine fixed point; it just applies f and checks the gap. Step through several iterations to see the convergence and notice how the difference between successive guesses shrinks.',
-      code: 'function fixed_point(f, first_guess) {\n  const tolerance = 0.00001;\n  function close_enough(a, b) { return Math.abs(a - b) < tolerance; }\n  function try_it(guess) {\n    const next = f(guess);\n    if (close_enough(guess, next)) return next;\n    return try_it(next);\n  }\n  return try_it(first_guess);\n}\n\nconsole.log(fixed_point(Math.cos, 1.0));',
-    },
+      text: 'Open CodeLens on sqrt(2) expressed as fixed_point(average_damp(y => 2/y), 1.0). Watch the heap — average_damp returns a closure object, and that closure is passed to fixed_point. Step through try_it and watch each iteration bring the guess closer to 1.41421. Functions-returning-functions are visible as objects on the heap with closure pointers.',
+      code: `function fixed_point(f, first_guess) {
+  const tol = 0.00001;
+  function try_it(g) { const n = f(g); return Math.abs(g-n)<tol ? n : try_it(n); }
+  return try_it(first_guess);
+}
+function average_damp(f) { return x => (x + f(x)) / 2; }
+function sqrt(x) { return fixed_point(average_damp(y => x / y), 1.0); }
 
-    // ── Half-interval method (1.3.3) ─────────────────────────────────────────────
-    {
-      type: 'narration',
-      id: 'half-interval-vocab',
-      text: 'Section 1.3.3 introduces two techniques for finding values where a function produces a target output. The first is the half-interval method (bisection search): if f(a) < 0 < f(b), then f must cross zero somewhere between a and b (by the intermediate value theorem). Repeatedly evaluate f at the midpoint and discard the half that does not contain the sign change. Each step halves the interval — this is a Θ(log((b-a)/tolerance)) algorithm.',
-      code: null,
+console.log(sqrt(2));`,
     },
-    {
-      type: 'narration',
-      id: 'half-interval-code',
-      text: 'Here is the half-interval search for roots. search takes f, a negative point, and a positive point. It checks the midpoint sign each time. half_interval_search takes care of ordering the initial endpoints correctly.',
-      code: 'function half_interval_search(f, a, b) {\n  const tol = 0.001;\n  function search(neg, pos) {\n    const mid = (neg + pos) / 2;\n    if (Math.abs(pos - neg) < tol) return mid;\n    const test = f(mid);\n    if (test < 0) return search(mid, pos);\n    if (test > 0) return search(neg, mid);\n    return mid;\n  }\n  const fa = f(a), fb = f(b);\n  if (fa < 0 && fb > 0) return search(a, b);\n  if (fa > 0 && fb < 0) return search(b, a);\n  throw new Error("values do not bracket a root");\n}\n\n// Root of x³ - 2x - 3 = 0 between 1 and 3\nconsole.log(half_interval_search(x => x*x*x - 2*x - 3, 1, 3)); // ≈ 1.893\n\n// sin(x) = 0 between 2 and 4 (the root is π ≈ 3.14159)\nconsole.log(half_interval_search(Math.sin, 2, 4)); // ≈ 3.14159',
-    },
+    { type: 'checkpoint', id: 'cp-fixed-point' },
 
-    // ── Average damping ───────────────────────────────────────────────────────────
-    {
-      type: 'narration',
-      id: 'oscillation-vocab',
-      text: 'Not every function converges when you apply it repeatedly. If f(x) overshoots the fixed point each time — bouncing above and below without settling — the search oscillates and never converges. This happens with the function y → x/y when searching for sqrt(x): starting at 1, it jumps to x, then to 1 again, repeating forever. The fix is average damping: instead of jumping to f(x) directly, move to the average of x and f(x). This halves the step size and prevents overshoot.',
-      code: null,
-    },
-    {
-      type: 'narration',
-      id: 'sqrt-as-fixed-point',
-      text: 'Square root of x is the value y where y = x/y — a fixed point of y → x/y. But applying that function directly oscillates. Averaging the current guess with the next value damps the oscillation. With average damping, the search converges smoothly.',
-      code: 'function fixed_point(f, first_guess) {\n  const tolerance = 0.00001;\n  function close_enough(a, b) { return Math.abs(a - b) < tolerance; }\n  function try_it(guess) {\n    const next = f(guess);\n    if (close_enough(guess, next)) return next;\n    return try_it(next);\n  }\n  return try_it(first_guess);\n}\n\n// This oscillates — do not run it in an infinite loop:\n// fixed_point(y => 2 / y, 1.0)\n\n// With damping: average the guess with the next value\nconsole.log(fixed_point(y => (y + 2 / y) / 2, 1.0));  // sqrt(2) ≈ 1.41421',
-    },
-    {
-      type: 'narration',
-      id: 'average-damp',
-      text: 'We can package average damping as a higher-order function. average_damp takes a function f and returns a new function that averages x with f(x). Now we can express sqrt by composing fixed_point with average_damp applied to the target function y → x/y. Each concept — fixed-point search, damping, the specific function — is expressed separately and composed.',
-      code: 'function fixed_point(f, first_guess) {\n  const tolerance = 0.00001;\n  function close_enough(a, b) { return Math.abs(a - b) < tolerance; }\n  function try_it(guess) {\n    const next = f(guess);\n    if (close_enough(guess, next)) return next;\n    return try_it(next);\n  }\n  return try_it(first_guess);\n}\n\nfunction average_damp(f) {\n  return x => (x + f(x)) / 2;\n}\n\nfunction sqrt(x) {\n  return fixed_point(average_damp(y => x / y), 1.0);\n}\n\nconsole.log(sqrt(2));    // 1.41421...\nconsole.log(sqrt(9));    // 3.00000...\nconsole.log(sqrt(144));  // 12.0000...',
-    },
-    {
-      type: 'checkpoint',
-      id: 'cp-fixed-point',
-    },
-    {
-      type: 'challenge',
-      id: 'challenge-cube-root-fp',
-      text: 'Newton\'s method generalises: cube root of x is a fixed point of y → (x/y² + 2y)/3. Write cube_root(x) using fixed_point and average_damp. The function to damp is y => (x / (y*y) + 2*y) / 3. cube_root(27) should be approximately 3.',
-      expectedOutput: '~3\n~2',
-      startCode: 'function fixed_point(f, first_guess) {\n  const tolerance = 0.00001;\n  function close_enough(a, b) { return Math.abs(a - b) < tolerance; }\n  function try_it(guess) {\n    const next = f(guess);\n    if (close_enough(guess, next)) return next;\n    return try_it(next);\n  }\n  return try_it(first_guess);\n}\n\nfunction average_damp(f) {\n  return x => (x + f(x)) / 2;\n}\n\n// Write cube_root(x) using fixed_point and average_damp\n// Hint: y => (x / (y * y) + 2 * y) / 3\n\n\nconsole.log(Math.round(cube_root(27))); // 3\nconsole.log(Math.round(cube_root(8)));  // 2\n',
-      hint: 'function cube_root(x) {\n  return fixed_point(average_damp(y => (x / (y * y) + 2 * y) / 3), 1.0);\n}',
-      tests: [
-        { call: 'Math.round(cube_root(27))', expected: 3 },
-        { call: 'Math.round(cube_root(8))',  expected: 2 },
-      ],
-      validate: ({ code }) => {
-        try {
-          const fn = new Function(`"use strict";\n${code}\n` +
-            `return typeof cube_root === 'function' && Math.abs(cube_root(27) - 3) < 0.01 && Math.abs(cube_root(8) - 2) < 0.01`)
-          return fn() === true
-        } catch { return false }
-      },
-    },
+    // ── Compose and repeat ────────────────────────────────────────────────────
 
-    // ── Function composition ──────────────────────────────────────────────────────
+    {
+      type: 'narration',
+      id: 'compose-vocab',
+      text: 'Mathematical composition: (f ∘ g)(x) = f(g(x)). Apply g first, then apply f to the result. In code: compose(f, g) returns a new function that applies g then f.',
+      code: `function compose(f, g) {
+  return x => f(g(x));
+}`,
+    },
+    {
+      type: 'narration',
+      id: 'compose-demo',
+      text: 'Compose two functions. Note the order: in compose(f, g), g runs first.',
+      code: `function compose(f, g) {
+  return x => f(g(x));
+}
 
-    // ── Terminology: Composition ──────────────────────────────────────────────────
-    {
-      type: 'narration',
-      id: 'composition-vocab',
-      text: 'Mathematical function composition writes f ∘ g to mean the function that first applies g, then applies f to the result: (f ∘ g)(x) = f(g(x)). In programming we represent this directly: compose(f, g) returns a new function x => f(g(x)). The order matters — f ∘ g is not the same as g ∘ f. Composition is how we build complex behaviours by chaining simpler functions, and it is the programming analogue of the mathematical concept you will use throughout linear algebra and analysis.',
-      code: null,
+const double   = x => x * 2;
+const add1     = x => x + 1;
+const square   = x => x * x;
+
+const double_then_add1   = compose(add1, double);
+const square_then_double = compose(double, square);
+
+console.log(double_then_add1(5));    // 11  — 5*2=10, +1=11
+console.log(square_then_double(3));  // 18  — 3²=9, 9*2=18`,
     },
     {
       type: 'narration',
-      id: 'newtons-method-general',
-      text: 'What we built with average_damp is actually Newton\'s method in disguise. Newton\'s general method for finding zeros of a function g uses the transform x → x - g(x)/g\'(x). When g(y) = y² - x, the zero of g is sqrt(x). Substituting and simplifying yields exactly the average-damp formula. The same fixed_point + average_damp machinery works for cube roots, fourth roots, logarithms — we described the algorithm once and used it for many problems.',
-      code: 'function newton_transform(g) {\n  const dx = 0.00001;\n  return x => x - g(x) / ((g(x + dx) - g(x)) / dx);\n}\n\nfunction fixed_point(f, first_guess) {\n  const tol = 0.00001;\n  function try_it(g) {\n    const next = f(g);\n    return Math.abs(g - next) < tol ? next : try_it(next);\n  }\n  return try_it(first_guess);\n}\n\nfunction newtons_method(g, guess) {\n  return fixed_point(newton_transform(g), guess);\n}\n\n// sqrt(2): find y where y² - 2 = 0\nconsole.log(newtons_method(y => y * y - 2, 1.0)); // 1.41421...',
+      id: 'repeated-build',
+      text: 'repeated(f, n) applies f n times. Base case: repeated(f, 1) is just f. Recursive case: compose f with repeated(f, n-1).',
+      code: `function compose(f, g) { return x => f(g(x)); }
+
+function repeated(f, n) {
+  if (n === 1) return f;
+  return compose(f, repeated(f, n - 1));
+}`,
     },
     {
       type: 'narration',
-      id: 'compose-intro',
-      text: 'Here is compose as a function. It takes two functions f and g and returns a new function that applies them in sequence — g first, then f. It is the direct representation of f ∘ g.',
-      code: 'function compose(f, g) {\n  return x => f(g(x));\n}\n\nconst double    = x => x * 2;\nconst add1      = x => x + 1;\nconst square    = x => x * x;\n\nconst double_then_add1   = compose(add1, double);\nconst square_then_double = compose(double, square);\n\nconsole.log(double_then_add1(5));    // 11  — (5*2) + 1\nconsole.log(square_then_double(3));  // 18  — (3*3) * 2',
-    },
-    {
-      type: 'narration',
-      id: 'repeated-intro',
-      text: 'compose applies a function once. repeated applies it n times. repeated(f, 1) is just f; repeated(f, n) is f composed with repeated(f, n-1). This is a recursive definition of a function that builds functions — a higher-order function whose output grows with each level of recursion.',
-      code: 'function compose(f, g) {\n  return x => f(g(x));\n}\n\nfunction repeated(f, n) {\n  if (n === 1) return f;\n  return compose(f, repeated(f, n - 1));\n}\n\nconst double = x => x * 2;\n\nconsole.log(repeated(double, 1)(3));  // 6   (double once)\nconsole.log(repeated(double, 3)(3));  // 24  (double three times: 3→6→12→24)\nconsole.log(repeated(double, 4)(1));  // 16  (2⁴)',
+      id: 'repeated-demo',
+      text: 'Apply double three times: 3 → 6 → 12 → 24.',
+      code: `function compose(f, g) { return x => f(g(x)); }
+function repeated(f, n) {
+  if (n === 1) return f;
+  return compose(f, repeated(f, n - 1));
+}
+
+const double = x => x * 2;
+
+console.log(repeated(double, 1)(3));  // 6   (double once)
+console.log(repeated(double, 3)(3));  // 24  (double three times)
+console.log(repeated(double, 4)(1));  // 16  (2⁴)`,
     },
     {
       type: 'codelens',
       id: 'codelens-repeated',
-      text: 'Open CodeLens on repeated(double, 3)(5). Step through it — repeated builds a chain of compose calls: compose(double, compose(double, double)). Then that composed function is applied to 5. Watch how the chain unfolds: double is called three times, each time wrapping the result of the previous.',
-      code: 'function compose(f, g) {\n  return x => f(g(x));\n}\n\nfunction repeated(f, n) {\n  if (n === 1) return f;\n  return compose(f, repeated(f, n - 1));\n}\n\nconst double = x => x * 2;\nconsole.log(repeated(double, 3)(5));',
+      text: 'Open CodeLens on repeated(double, 3)(5). Step through it — repeated builds a chain of compose calls: compose(double, compose(double, double)). Then the composed function is applied to 5. Watch the heap fill up with closure objects, each pointing to the next.',
+      code: `function compose(f, g) { return x => f(g(x)); }
+function repeated(f, n) {
+  if (n === 1) return f;
+  return compose(f, repeated(f, n - 1));
+}
+const double = x => x * 2;
+console.log(repeated(double, 3)(5));`,
     },
-    {
-      type: 'checkpoint',
-      id: 'cp-composition',
-    },
+    { type: 'checkpoint', id: 'cp-composition' },
+
     {
       type: 'challenge',
       id: 'challenge-smooth',
-      text: 'The smoothed version of a function f averages the values just below, at, and just above x: (f(x-dx) + f(x) + f(x+dx)) / 3. Write smooth(f) that returns this smoothed function. Use dx = 0.00001. smooth(x => x*x)(2) should be approximately 4.',
-      expectedOutput: '~4\n~9',
-      startCode: 'const dx = 0.00001;\n\n// smooth(f) returns x => (f(x-dx) + f(x) + f(x+dx)) / 3\n\nfunction smooth(f) {\n  // your code here\n}\n\nconst square = x => x * x;\nconsole.log(Math.round(smooth(square)(2)));  // 4\nconsole.log(Math.round(smooth(square)(3)));  // 9\n',
-      hint: 'function smooth(f) {\n  return x => (f(x - dx) + f(x) + f(x + dx)) / 3;\n}',
-      tests: [
-        { call: 'Math.round(smooth(x => x * x)(2))', expected: 4 },
-        { call: 'Math.round(smooth(x => x * x)(3))', expected: 9 },
-      ],
+      text: 'The smoothed version of a function f averages three nearby values: (f(x−dx) + f(x) + f(x+dx)) / 3. Write smooth(f) that returns this smoothed function. Use dx = 0.00001. Then write n_fold_smooth(f, n) that applies smooth n times using repeated. n_fold_smooth(x => x*x, 1)(2) ≈ 4.',
+      expectedOutput: '4\n4',
+      startCode: `const dx = 0.00001;
+
+function compose(f, g) { return x => f(g(x)); }
+function repeated(f, n) { return n === 1 ? f : compose(f, repeated(f, n-1)); }
+
+// smooth(f) returns x => (f(x-dx) + f(x) + f(x+dx)) / 3
+function smooth(f) {
+  // your code
+}
+
+// n_fold_smooth(f, n) applies smooth n times using repeated
+function n_fold_smooth(f, n) {
+  // your code
+}
+
+const sq = x => x * x;
+console.log(Math.round(smooth(sq)(2)));             // 4
+console.log(Math.round(n_fold_smooth(sq, 3)(2)));   // 4
+`,
+      hint: 'function smooth(f) {\n  return x => (f(x-dx) + f(x) + f(x+dx)) / 3;\n}\nfunction n_fold_smooth(f, n) {\n  return repeated(smooth, n)(f);\n}',
       validate: ({ code }) => {
         try {
-          const fn = new Function(`"use strict";\n${code}\n` +
-            `return typeof smooth === 'function' && Math.abs(smooth(x => x*x)(2) - 4) < 0.01 && Math.abs(smooth(x => x*x)(3) - 9) < 0.01`)
+          const fn = new Function(`"use strict";\n${code}\nreturn typeof smooth === 'function' && Math.abs(smooth(x => x*x)(2) - 4) < 0.01`)
           return fn() === true
         } catch { return false }
       },

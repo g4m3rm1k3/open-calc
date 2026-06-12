@@ -11,6 +11,7 @@ import CallGraphView from './renderer/CallGraphView.jsx'
 import VariableWatch from './renderer/VariableWatch.jsx'
 import CallTreeView from './renderer/CallTreeView.jsx'
 import StackDepthMeter from './renderer/StackDepthMeter.jsx'
+import { SNIPPET_CATEGORIES } from './snippets.js'
 import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
 import {
   ChevronRight, ChevronDown, Code2, Boxes, Braces, ArrowLeft,
@@ -207,77 +208,14 @@ const result = nums.filter(x => x > 3).map(x => x * 2)
 console.log('Result:', result)
 `
 
-const TEACHING_SNIPPETS = [
-  {
-    name: 'Fibonacci Recursion',
-    code: `function fib(n) {
-  if (n <= 1) return n
-  return fib(n - 1) + fib(n - 2)
-}
-
-fib(4)`
-  },
-  {
-    name: 'Bubble Sort (Arrays)',
-    code: `function bubbleSort(arr) {
-  let n = arr.length
-  for (let i = 0; i < n - 1; i++) {
-    for (let j = 0; j < n - i - 1; j++) {
-      if (arr[j] > arr[j + 1]) {
-        let temp = arr[j]
-        arr[j] = arr[j + 1]
-        arr[j + 1] = temp
-      }
-    }
-  }
-  return arr
-}
-
-bubbleSort([5, 3, 8, 4, 2])`
-  },
-  {
-    name: 'Linked List',
-    code: `class Node {
-  constructor(val) {
-    this.val = val
-    this.next = null
-  }
-}
-
-let head = new Node(1)
-head.next = new Node(2)
-head.next.next = new Node(3)
-
-let curr = head
-while (curr !== null) {
-  console.log(curr.val)
-  curr = curr.next
-}`
-  },
-  {
-    name: 'Closures',
-    code: `function makeCounter() {
-  let count = 0
-  return function() {
-    count++
-    return count
-  }
-}
-
-const counter = makeCounter()
-counter()
-counter()
-counter()`
-  }
-]
-
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function Panel({ title, icon: Icon, children, badge, style }) {
+function Panel({ title, icon: Icon, children, badge, style, accent = '#1e293b' }) {
   return (
     <div style={{
       background: '#0f172a', border: '1px solid #1e293b', borderRadius: 10,
       display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0,
+      borderTop: `2px solid ${accent}`,
       ...style,
     }}>
       <div style={{
@@ -317,6 +255,34 @@ function Btn({ onClick, disabled, title, children, active }) {
         fontSize: 12, fontWeight: 600,
         display: 'flex', alignItems: 'center', gap: 5,
         transition: 'all 0.12s',
+      }}
+    >
+      {children}
+    </button>
+  )
+}
+
+function PrimaryRunBtn({ onClick, disabled, children }) {
+  const [hover, setHover] = useState(false)
+  return (
+    <button
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      onClick={onClick}
+      disabled={disabled}
+      title="Run code (⌘↵)"
+      style={{
+        background: disabled ? '#1e293b' : 'linear-gradient(135deg, #4f46e5, #9333ea)',
+        border: `1px solid ${disabled ? '#334155' : 'transparent'}`,
+        color: disabled ? '#475569' : '#ffffff',
+        boxShadow: disabled ? 'none' : (hover ? '0 0 15px rgba(147, 51, 234, 0.6)' : '0 0 8px rgba(79, 70, 229, 0.4)'),
+        borderRadius: 6, padding: '5px 14px',
+        cursor: disabled ? 'default' : 'pointer',
+        fontSize: 13, fontWeight: 700,
+        display: 'flex', alignItems: 'center', gap: 6,
+        transform: hover && !disabled ? 'scale(1.03)' : 'scale(1)',
+        transition: 'all 0.15s ease-out',
+        textShadow: disabled ? 'none' : '0 1px 2px rgba(0,0,0,0.4)',
       }}
     >
       {children}
@@ -948,7 +914,8 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
           }}
           onChange={(e) => {
             if (!e.target.value) return
-            const snippet = TEACHING_SNIPPETS[e.target.value]
+            const [catIdx, itemIdx] = e.target.value.split('-')
+            const snippet = SNIPPET_CATEGORIES[catIdx].items[itemIdx]
             setLang('js')
             setSource(snippet.code)
             setExecution(null)
@@ -958,8 +925,14 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
           }}
         >
           <option value="">📚 Load Example...</option>
-          {TEACHING_SNIPPETS.map((s, i) => (
-            <option key={i} value={i}>{s.name}</option>
+          {SNIPPET_CATEGORIES.map((cat, i) => (
+            <optgroup key={i} label={cat.group} style={{ color: '#818cf8', fontStyle: 'italic', background: '#0a0f1e' }}>
+              {cat.items.map((s, j) => (
+                <option key={j} value={`${i}-${j}`} style={{ color: '#cbd5e1', fontStyle: 'normal' }}>
+                  {s.name}
+                </option>
+              ))}
+            </optgroup>
           ))}
         </select>
 
@@ -994,10 +967,10 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
           </div>
 
           {/* Run button */}
-          <Btn onClick={handleRun} disabled={running} title="Run code (⌘↵)">
-            <Play size={12} />
+          <PrimaryRunBtn onClick={handleRun} disabled={running}>
+            <Play size={14} fill="currentColor" />
             {running ? (lang === 'py' ? 'Loading Python…' : lang === 'go' ? 'Building Go…' : 'Running…') : 'Run'}
-          </Btn>
+          </PrimaryRunBtn>
         </div>
 
         {model?.error && (

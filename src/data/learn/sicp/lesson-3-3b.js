@@ -17,6 +17,14 @@ export const lesson = {
       code: null,
     },
 
+    // ── What is event-driven simulation? ─────────────────────────────────────────
+    {
+      type: 'narration',
+      id: 'event-driven-vocab',
+      text: 'A digital circuit simulator models hardware execution. Real hardware is parallel: all gates operate simultaneously, and signal changes propagate through the circuit based on physical delays. Our simulator captures this with an event-driven model:\n\n  1. Components (gates) register callbacks on their input wires.\n  2. When an input changes, the gate schedules its output change AFTER its propagation delay.\n  3. All scheduled changes are stored in the agenda — an ordered queue by simulated time.\n  4. propagate runs events in time order, advancing the simulated clock.\n\nThis is how real hardware simulators (SPICE, Verilog simulators) work. Chapter 3\'s mutable data, queues, and the observer pattern from lesson 3-1 all come together here.',
+      code: null,
+    },
+
     // ── Wires ─────────────────────────────────────────────────────────────────────
     {
       type: 'narration',

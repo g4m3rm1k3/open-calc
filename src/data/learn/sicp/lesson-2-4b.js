@@ -17,6 +17,14 @@ export const lesson = {
       code: null,
     },
 
+    // ── Why this section matters ──────────────────────────────────────────────────
+    {
+      type: 'narration',
+      id: 'dsl-vocab',
+      text: 'This section demonstrates how to build a domain-specific language (DSL) — a small programming language designed for one purpose. The picture language is a DSL for geometric images. Its "programs" are painter expressions; its "operations" are beside, below, flip_vert. The DSL is embedded in JavaScript: you use regular functions and closures.\n\nThe critical insight: if a combinator returns a painter, and a painter is a valid argument to a combinator, then the system is closed under composition. You can always combine further. This is the closure property from Section 2.2.1 applied to functions instead of data. It is what makes the language expressive from a small number of primitives.',
+      code: null,
+    },
+
     // ── Terminology: Painters and Frames ─────────────────────────────────────────
     {
       type: 'narration',

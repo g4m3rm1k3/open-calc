@@ -30,6 +30,36 @@ export const lesson = {
       code: 'function eq_sym(a, b) { return a === b; }\n\nconst x = "x";          // the symbol x\nconst y = "y";          // the symbol y\nconst also_x = "x";     // also the symbol x\n\nconsole.log(eq_sym(x, also_x));  // true — same name\nconsole.log(eq_sym(x, y));       // false — different names\n\n// Note: "x" is the symbol, not the variable x\n// If we had: const x = 42;\n// Then x would be 42, but "x" would still be the symbol\nconst num_x = 42;\nconsole.log(num_x);  // 42 — the value\nconsole.log("x");    // x  — the symbol (just the name)',
     },
 
+    // ── Variable vs symbol: the critical distinction ─────────────────────────────
+    {
+      type: 'narration',
+      id: 'variable-vs-symbol',
+      text: 'The distinction between a variable and a symbol is the most important concept in Section 2.3.1. Run this code and predict each output before you see it. Some outputs will surprise you.',
+      code: `// What is the difference?
+const apple = "banana";   // variable 'apple' is bound to the string "banana"
+
+console.log(apple);      // "banana" — the VALUE the variable holds
+console.log("apple");    // "apple" — the SYMBOL apple (the name itself)
+
+// When you say: apple — you get the value (banana)
+// When you say: "apple" — you get the label (apple)
+// This is quotation: "apple" means "the name apple", not "whatever apple is bound to"`,
+    },
+    {
+      type: 'narration',
+      id: 'atom-vocab',
+      text: 'New vocabulary: an atom is a primitive, non-decomposable value. In our system:\n  Numbers are atoms: 5, 3.14, -7\n  Symbols are atoms: "x", "plus", "cat"\n  Null is a special atom: the empty list\n\nA pair is NOT an atom — it can be decomposed into head and tail. When processing symbolic expressions, is_pair tells you whether you have a decomposable structure or an atom.',
+      code: `function is_pair(x) { return Array.isArray(x); }
+
+function is_atom(x)   { return !is_pair(x) && x !== null; }
+function is_number(x) { return typeof x === 'number'; }
+function is_symbol(x) { return typeof x === 'string'; }
+
+console.log(is_atom(5));       // true — number atom
+console.log(is_atom("x"));     // true — symbol atom
+console.log(is_atom([1,[2,null]])); // false — it's a pair`,
+    },
+
     // ── Lists of symbols ──────────────────────────────────────────────────────────
     {
       type: 'narration',
