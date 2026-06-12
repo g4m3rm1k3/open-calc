@@ -170,6 +170,16 @@ export const LABS = [
     cover: { grad: 'from-emerald-700 via-teal-800 to-cyan-950', mark: 'π e', sub: 'Universal Constants' },
   },
   {
+    key: 'sicp-js',
+    label: 'SICP — JavaScript',
+    emoji: '📖',
+    color: 'cyan',
+    desc: 'Structure and Interpretation of Computer Programs, condensed as an interactive lesson. Narrated checkpoints, live code challenges, and CodeLens deep-dives — Chapter 1 first.',
+    path: '/learn/sicp/1-1',
+    tags: ['JavaScript', 'CS Theory', 'Interactive'],
+    cover: { grad: 'from-cyan-700 via-sky-800 to-indigo-950', mark: 'λ', sub: 'SICP · JS · Checkpoints' },
+  },
+  {
     key: 'codelens',
     label: 'CodeLens',
     emoji: '🔬',

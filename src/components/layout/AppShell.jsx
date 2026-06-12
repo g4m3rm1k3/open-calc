@@ -666,6 +666,7 @@ export default function AppShell({ children }) {
   const isDSAArraysLabRoute = location.pathname.startsWith("/dsa-arrays-lab");
   const isDSALinkedListsLabRoute = location.pathname.startsWith("/dsa-linked-lists-lab");
   const isCodeLensRoute = location.pathname.startsWith("/codelens");
+  const isLearnRoute = location.pathname.startsWith("/learn");
   
   const pathParts = location.pathname.split('/').filter(Boolean);
   const isLessonRoute = pathParts[0] === 'chapter' && pathParts.length >= 3;
@@ -840,12 +841,13 @@ export default function AppShell({ children }) {
     isFiveAxisRoute ||
     isDSAArraysLabRoute ||
     isDSALinkedListsLabRoute ||
-    isCodeLensRoute
+    isCodeLensRoute ||
+    isLearnRoute
   ) {
     return (
       <GrapherContext.Provider value={{ openGrapher }}>
         <div
-          className={`h-screen overflow-hidden ${isArkanoidLearnRoute || isRealityRunnerRoute || isCadProRoute || isOpenCraftRoute || isStemQuestRoute || isAsteroidsRoute || isVectorCommandRoute || isStemTetrisRoute || isCardAcademyRoute || isCardQuestRoute || isRubiksCubeRoute || isMatrixGameRoute || isRobotArmLabRoute || isSimLabRoute || isDroneLabRoute || isMatrixLabRoute || isMatrix3DLabRoute || isDecompLabRoute || isCmmLabRoute || isFiveAxisRoute || isDSAArraysLabRoute || isDSALinkedListsLabRoute || isCodeLensRoute ? "bg-[#08111f]" : "bg-white dark:bg-slate-950"}`}
+          className={`h-screen overflow-hidden ${isArkanoidLearnRoute || isRealityRunnerRoute || isCadProRoute || isOpenCraftRoute || isStemQuestRoute || isAsteroidsRoute || isVectorCommandRoute || isStemTetrisRoute || isCardAcademyRoute || isCardQuestRoute || isRubiksCubeRoute || isMatrixGameRoute || isRobotArmLabRoute || isSimLabRoute || isDroneLabRoute || isMatrixLabRoute || isMatrix3DLabRoute || isDecompLabRoute || isCmmLabRoute || isFiveAxisRoute || isDSAArraysLabRoute || isDSALinkedListsLabRoute || isCodeLensRoute || isLearnRoute ? "bg-[#08111f]" : "bg-white dark:bg-slate-950"}`}
         >
           <div className="h-full w-full overflow-hidden">
             {children ?? <Outlet />}

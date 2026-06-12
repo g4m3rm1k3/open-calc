@@ -392,7 +392,7 @@ function StackFrame({ frame, depth }) {
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export default function CodeLens({ onBack, initialCode, initialLang }) {
+export default function CodeLens({ onBack, initialCode, initialLang, backLabel }) {
   const [lang, setLang]             = useState(() => {
     if (initialLang === 'ts') return 'ts'
     if (initialLang === 'py') return 'py'
@@ -558,7 +558,7 @@ export default function CodeLens({ onBack, initialCode, initialLang }) {
           fontSize: 12, fontWeight: 500,
         }}>
           <ArrowLeft size={14} />
-          UpSkillOS
+          {backLabel || 'UpSkillOS'}
         </button>
         <Code2 size={17} color="#818cf8" />
         <span style={{ fontWeight: 700, fontSize: 14 }}>CodeLens</span>

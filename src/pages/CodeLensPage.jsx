@@ -2,8 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import CodeLens from '../components/codelens/CodeLens.jsx'
 
-// Read the handoff payload without deleting it — the initializer must be pure
-// (StrictMode calls it twice in dev; deleting inside would wipe it on the first call).
 function peekHandoff() {
   try {
     const raw = localStorage.getItem('codelens-handoff')
@@ -14,13 +12,21 @@ function peekHandoff() {
   }
 }
 
+function peekLessonReturn() {
+  try {
+    return {
+      path:  sessionStorage.getItem('codelens_return_path')  || null,
+      label: sessionStorage.getItem('codelens_return_label') || null,
+    }
+  } catch { return { path: null, label: null } }
+}
+
 export default function CodeLensPage() {
   const navigate = useNavigate()
-  // useState initializer is pure — only reads, never deletes
   const [handoff] = useState(peekHandoff)
+  const [lessonReturn] = useState(peekLessonReturn)
   const cleanedUp = useRef(false)
 
-  // Delete the item exactly once after the component has truly mounted
   useEffect(() => {
     if (!cleanedUp.current) {
       cleanedUp.current = true
@@ -33,6 +39,18 @@ export default function CodeLensPage() {
     return () => { document.title = 'UpSkillOS' }
   }, [])
 
+  function handleBack() {
+    if (lessonReturn?.path) {
+      try {
+        sessionStorage.removeItem('codelens_return_path')
+        sessionStorage.removeItem('codelens_return_label')
+      } catch {}
+      window.location.hash = lessonReturn.path.replace(/^#/, '')
+    } else {
+      navigate(-1)
+    }
+  }
+
   return (
     <div style={{
       position: 'fixed',
@@ -42,9 +60,10 @@ export default function CodeLensPage() {
       zIndex: 50,
     }}>
       <CodeLens
-        onBack={() => navigate(-1)}
+        onBack={handleBack}
         initialCode={handoff?.code}
         initialLang={handoff?.lang}
+        backLabel={lessonReturn?.label || undefined}
       />
     </div>
   )

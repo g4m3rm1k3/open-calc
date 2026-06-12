@@ -520,7 +520,7 @@ function useDragResize() {
 }
 
 // ─── SettingsView ─────────────────────────────────────────────────────────────
-function SettingsView({ settings, onChange }) {
+function SettingsView({ settings, onChange, voices = [], voiceURI, onVoiceChange, onPreviewVoice }) {
   const [showKey, setShowKey] = useState(false)
   const provider = getProvider(settings.provider)
 
@@ -607,9 +607,65 @@ function SettingsView({ settings, onChange }) {
           </div>
         </div>
       )}
+
+      {/* ── Voice / TTS ── */}
+      <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
+        <p className="text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 px-1 mb-2">
+          Read-Aloud Voice
+        </p>
+        {voices.length === 0 ? (
+          <p className="text-xs text-slate-400 dark:text-slate-500 px-1">
+            No voices found — check your browser / OS voice settings.
+          </p>
+        ) : (
+          <div className="space-y-1">
+            {voices.map((v) => {
+              const quality = (() => {
+                const n = v.name.toLowerCase()
+                if (n.includes('natural'))  return { label: 'Neural',   cls: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400' }
+                if (n.includes('enhanced')) return { label: 'Enhanced', cls: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400' }
+                if (n.includes('premium'))  return { label: 'Premium',  cls: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400' }
+                if (n.includes('siri'))     return { label: 'Siri',     cls: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-400' }
+                if (n.includes('google'))   return { label: 'Google',   cls: 'bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-400' }
+                return null
+              })()
+              const active = voiceURI === v.voiceURI
+              return (
+                <div
+                  key={v.voiceURI}
+                  onClick={() => onVoiceChange(v.voiceURI)}
+                  className={`flex items-center gap-2 px-2.5 py-2 rounded-xl border cursor-pointer transition-colors ${
+                    active
+                      ? 'border-brand-400 bg-brand-50 dark:bg-brand-900/20 dark:border-brand-600'
+                      : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                  }`}
+                >
+                  <Volume2 className={`w-3.5 h-3.5 shrink-0 ${active ? 'text-brand-500' : 'text-slate-400'}`} />
+                  <span className="text-xs text-slate-700 dark:text-slate-300 flex-1 truncate">{v.name}</span>
+                  {quality && (
+                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full shrink-0 ${quality.cls}`}>
+                      {quality.label}
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    onMouseDown={(e) => { e.stopPropagation(); onPreviewVoice(v.voiceURI) }}
+                    className="text-[10px] text-slate-400 hover:text-brand-500 dark:hover:text-brand-400 shrink-0 transition-colors"
+                    title="Preview this voice"
+                  >
+                    ▶
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
+
+import { useSpeech } from '../../utils/useSpeech.js'
 
 // Icons
 import {
@@ -618,7 +674,9 @@ import {
   Send,
   GraduationCap,
   Sparkles,
-  Maximize2
+  Maximize2,
+  Volume2,
+  Square,
 } from "lucide-react"
 
 // ─── TutorPanel ───────────────────────────────────────────────────────────────
@@ -645,6 +703,25 @@ export default function TutorPanel({ lesson, context = null, onApplyCode = null 
   const [loadProgress, setLoadProgress] = useState(0)
   const [streamContent, setStreamContent] = useState('')
   const [errorMsg, setErrorMsg] = useState('')
+
+  const { speak, stop: stopSpeech, isSpeaking, supported: ttsSupported,
+          englishVoices, voiceURI, setVoiceURI } = useSpeech()
+  const [speakingIdx, setSpeakingIdx] = useState(null)
+
+  // Clear speaking highlight when audio ends naturally
+  useEffect(() => { if (!isSpeaking) setSpeakingIdx(null) }, [isSpeaking])
+
+  // Stop audio when panel is closed
+  useEffect(() => { if (!open) stopSpeech() }, [open, stopSpeech])
+
+  const handleSpeak = useCallback((content, idx) => {
+    if (speakingIdx === idx && isSpeaking) {
+      stopSpeech()
+    } else {
+      setSpeakingIdx(idx)
+      speak(content)
+    }
+  }, [speakingIdx, isSpeaking, stopSpeech, speak])
 
   const accRef = useRef('')
   const bottomRef = useRef(null)
@@ -824,7 +901,9 @@ export default function TutorPanel({ lesson, context = null, onApplyCode = null 
 
           {/* ── Content ── */}
           {view === 'settings' ? (
-            <SettingsView settings={settings} onChange={updateSettings} />
+            <SettingsView settings={settings} onChange={updateSettings}
+              voices={englishVoices} voiceURI={voiceURI} onVoiceChange={setVoiceURI}
+              onPreviewVoice={(uri) => { setVoiceURI(uri); speak('Hello! This is how I sound.') }} />
           ) : (
             <div className="flex flex-col flex-1 min-h-0">
               {/* Status banners */}
@@ -886,6 +965,25 @@ export default function TutorPanel({ lesson, context = null, onApplyCode = null 
                         : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-2xl rounded-bl-sm'
                     }`}>
                       <TutorMessage content={msg.content} isUser={msg.role === 'user'} onApplyCode={msg.role === 'user' ? null : onApplyCode} />
+                      {msg.role === 'assistant' && (
+                        <div className="flex justify-end mt-1.5 -mb-0.5">
+                          <button
+                            onClick={() => handleSpeak(msg.content, i)}
+                            disabled={!ttsSupported}
+                            title={speakingIdx === i && isSpeaking ? 'Stop reading' : 'Read aloud'}
+                            className={`flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-lg transition-colors disabled:opacity-30 ${
+                              speakingIdx === i && isSpeaking
+                                ? 'text-violet-600 dark:text-violet-400 bg-violet-100 dark:bg-violet-900/40'
+                                : 'text-slate-400 dark:text-slate-600 hover:text-slate-600 dark:hover:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                            }`}
+                          >
+                            {speakingIdx === i && isSpeaking
+                              ? <><Square className="w-2.5 h-2.5 fill-current" /><span>Stop</span></>
+                              : <><Volume2 className="w-2.5 h-2.5" /><span>Listen</span></>
+                            }
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
