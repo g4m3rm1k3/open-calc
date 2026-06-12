@@ -15,7 +15,7 @@ import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
 import {
   ChevronRight, ChevronDown, Code2, Boxes, Braces, ArrowLeft,
   Zap, Play, Pause, StepForward, StepBack, SkipForward, Terminal,
-  Palette, Info, Network, Layers, GitBranch,
+  Palette, Info, Network, Layers, GitBranch, Maximize2, X,
 } from 'lucide-react'
 
 // ── TypeScript → JS type stripper ─────────────────────────────────────────────
@@ -481,14 +481,17 @@ function NarrationBar({ event, prevEvent }) {
 
 // ── AST viewer ────────────────────────────────────────────────────────────────
 
-function ASTNode({ node, depth = 0 }) {
-  const [open, setOpen] = useState(depth < 2)
+function ASTNode({ node, depth = 0, startOpen = false, interactive = false }) {
+  const [open, setOpen] = useState(startOpen || depth < 2)
+  const [hover, setHover] = useState(false)
   if (!node || typeof node !== 'object') return null
+  
   const children = Object.entries(node).filter(([k, v]) => {
     if (['type','start','end','loc','sourceType'].includes(k)) return false
     if (Array.isArray(v)) return v.some(c => c && typeof c.type === 'string')
     return v && typeof v.type === 'string'
   })
+  
   const label = [
     node.type,
     node.name ? ` ${node.name}` : '',
@@ -497,27 +500,64 @@ function ASTNode({ node, depth = 0 }) {
     node.kind ? ` (${node.kind})` : '',
     node.raw != null ? ` = ${node.raw}` : '',
   ].join('')
+  
   const hasChildren = children.length > 0
+  
+  // A tiny glossary mapping common node types to plain English for the hover tooltip
+  const NODE_GLOSSARY = {
+    Identifier: "A named reference (variable, property, or function name).",
+    CallExpression: "A function being invoked.",
+    BinaryExpression: "Two values combined with an operator (like + or ===).",
+    Literal: "A hardcoded value (string, number, boolean).",
+    BlockStatement: "A block of code wrapped in { } braces.",
+    FunctionDeclaration: "Defining a new named function.",
+    VariableDeclaration: "Declaring one or more variables using let, const, or var.",
+    ExpressionStatement: "A statement consisting of a single expression (like a function call on its own line).",
+    ReturnStatement: "Exiting a function and returning a value to the caller.",
+    IfStatement: "Conditional branch control flow.",
+    MemberExpression: "Accessing a property on an object (like console.log)."
+  }
+
   return (
-    <div style={{ marginLeft: depth * 12, fontFamily: 'JetBrains Mono, monospace', fontSize: 11 }}>
+    <div style={{ marginLeft: depth * 14, fontFamily: 'JetBrains Mono, monospace', fontSize: interactive ? 12 : 11 }}>
       <div
         onClick={() => hasChildren && setOpen(o => !o)}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
         style={{
-          display: 'flex', alignItems: 'center', gap: 3,
+          display: 'inline-flex', alignItems: 'center', gap: 4,
           cursor: hasChildren ? 'pointer' : 'default',
-          padding: '1px 3px', borderRadius: 3,
+          padding: '2px 4px', borderRadius: 4,
+          background: hover && interactive ? 'rgba(255,255,255,0.05)' : 'transparent',
           color: depth === 0 ? '#818cf8' : depth === 1 ? '#7dd3fc' : depth === 2 ? '#86efac' : '#e2e8f0',
+          position: 'relative',
         }}
       >
         {hasChildren ? (open ? <ChevronDown size={10} /> : <ChevronRight size={10} />) : <span style={{ width: 10 }} />}
         <span>{label}</span>
+
+        {/* Hover Tooltip (only when interactive) */}
+        {hover && interactive && NODE_GLOSSARY[node.type] && (
+          <div style={{
+            position: 'absolute', left: '100%', top: '50%', transform: 'translate(10px, -50%)',
+            background: '#1e293b', border: '1px solid #334155', color: '#e2e8f0',
+            padding: '4px 8px', borderRadius: 4, fontSize: 10, whiteSpace: 'nowrap',
+            zIndex: 10, pointerEvents: 'none', boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
+            display: 'flex', gap: 6, alignItems: 'center',
+          }}>
+            <div style={{ width: 0, height: 0, borderTop: '4px solid transparent', borderBottom: '4px solid transparent', borderRight: '4px solid #1e293b', position: 'absolute', left: -4 }} />
+            <span style={{ color: '#818cf8', fontWeight: 600 }}>{node.type}</span>
+            <span style={{ color: '#94a3b8' }}>{NODE_GLOSSARY[node.type]}</span>
+          </div>
+        )}
       </div>
+
       {open && hasChildren && children.map(([key, val]) => {
         const items = Array.isArray(val) ? val.filter(c => c?.type) : [val]
         return (
           <div key={key}>
-            <div style={{ marginLeft: (depth+1)*12+13, fontSize: 10, color: '#475569', padding: '1px 0' }}>{key}</div>
-            {items.map((child, i) => <ASTNode key={i} node={child} depth={depth + 2} />)}
+            <div style={{ marginLeft: (depth+1)*14+13, fontSize: interactive ? 11 : 10, color: '#475569', padding: '2px 0' }}>{key}</div>
+            {items.map((child, i) => <ASTNode key={i} node={child} depth={depth + 2} startOpen={startOpen} interactive={interactive} />)}
           </div>
         )
       })}
@@ -662,12 +702,20 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
       decorRef.current = ed.deltaDecorations(decorRef.current, [])
       return
     }
+    const explain = EXPLAIN[currentEvent?.type]?.(currentEvent)
+    const hintText = explain?.summary ? '  // ' + explain.summary.slice(0, 72) : ''
     decorRef.current = ed.deltaDecorations(decorRef.current, [{
       range: new monaco.Range(line, 1, line, 1),
       options: {
         isWholeLine: true,
         className: 'cl-exec-line',
         overviewRulerColor: '#6366f1',
+        ...(hintText ? {
+          after: {
+            content: hintText,
+            inlineClassName: 'cl-inline-hint',
+          }
+        } : {}),
       }
     }])
     ed.revealLineInCenterIfOutsideViewport(line)
@@ -764,6 +812,15 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
         .cl-exec-line {
           background: rgba(99,102,241,0.14) !important;
           border-left: 3px solid #6366f1 !important;
+        }
+        .cl-inline-hint {
+          color: #334155 !important;
+          font-style: italic !important;
+          font-size: 11px !important;
+          font-family: JetBrains Mono, monospace !important;
+          letter-spacing: 0 !important;
+          user-select: none !important;
+          pointer-events: none !important;
         }
       `}</style>
       {/* ── Header ── */}
@@ -1154,7 +1211,7 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
                   ? <PyStructureView source={source} execution={execution} />
                   : <StructureView model={model} currentEvent={currentEvent} onNodeClick={node => setFnModal({ node, callGraph: model.callGraph })} />
                 )}
-                {tab === 'tokens'    && <TokensView model={model} />}
+                {tab === 'tokens'    && <TokensView model={model} source={source} />}
                 {tab === 'ast'       && <AstView model={model} />}
               </div>
             </div>
@@ -2214,90 +2271,209 @@ function SectionLabel({ children }) {
   )
 }
 
-function TokensView({ model }) {
+function TokensView({ model, source }) {
+  const [selected, setSelected] = useState(null)
   const tokens = model?.files?.[0]?.tokens ?? []
+  
+  // Lexer explanation mapping
+  const TOKEN_GLOSSARY = {
+    keyword: { desc: 'A reserved word built into the language (e.g., if, function, let).', bg: '#ec4899' },
+    name: { desc: 'An identifier chosen by the programmer for a variable, function, or property.', bg: '#60a5fa' },
+    number: { desc: 'A numeric literal value.', bg: '#f59e0b' },
+    string: { desc: 'A text literal value enclosed in quotes.', bg: '#22c55e' },
+    punctuation: { desc: 'Symbols that structure the code or represent operators (+, -, {, }, etc).', bg: '#94a3b8' },
+  }
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-      {/* Color legend */}
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap',
-        padding: '5px 0', borderBottom: '1px solid #1e293b',
-      }}>
-        <span style={{ fontSize: 9, color: '#334155', fontFamily: 'JetBrains Mono, monospace',
-          letterSpacing: '.08em' }}>TOKENS</span>
-        {Object.entries(TOKEN_COLORS).map(([label, color]) => (
-          <span key={label} style={{
-            display: 'flex', alignItems: 'center', gap: 3,
-            fontSize: 9, color: '#475569', fontFamily: 'JetBrains Mono, monospace',
-          }}>
-            <span style={{
-              width: 8, height: 8, borderRadius: 2, flexShrink: 0,
-              background: color + '44', border: `1px solid ${color}`,
-              display: 'inline-block',
-            }} />
-            {label}
-          </span>
-        ))}
-        <span style={{ marginLeft: 'auto', fontSize: 9, color: '#334155',
-          fontFamily: 'JetBrains Mono, monospace' }}>hover for type</span>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      {/* Educational intro */}
+      <div style={{ padding: '8px 10px', background: '#0a0f1e', borderBottom: '1px solid #1e293b' }}>
+        <div style={{ fontSize: 11, fontWeight: 600, color: '#818cf8', marginBottom: 4 }}>
+          Lexical Analysis (Tokenization)
+        </div>
+        <div style={{ fontSize: 11, color: '#64748b', lineHeight: 1.5 }}>
+          Before the computer can understand your code, the <strong>Lexer</strong> reads the raw text character-by-character and groups them into <strong>Tokens</strong> — the smallest meaningful words of a programming language.
+        </div>
       </div>
 
-      {/* Token chips */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
-        {tokens.map((tok, i) => (
-          <span key={i} style={{
-            fontSize: 10, padding: '2px 6px', borderRadius: 4,
-            background: `${tokenColor(tok.type)}18`, color: tokenColor(tok.type),
-            border: `1px solid ${tokenColor(tok.type)}33`,
-            fontFamily: 'JetBrains Mono, monospace', cursor: 'default',
-          }} title={`${tok.type}  ${tok.start}–${tok.end}`}>
-            {tok.value ?? tok.type}
-          </span>
-        ))}
-        {tokens.length === 0 && <span style={{ color: '#475569', fontSize: 12 }}>No tokens.</span>}
+      <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
+        {/* Left: Annotated Source */}
+        <div style={{ flex: 1, overflow: 'auto', padding: 10, borderRight: '1px solid #1e293b' }}>
+          <div style={{ fontSize: 10, color: '#334155', fontFamily: 'JetBrains Mono, monospace', marginBottom: 8, letterSpacing: '.08em' }}>
+            ANNOTATED SOURCE
+          </div>
+          <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
+            {source ? (
+              <AnnotatedSource source={source} tokens={tokens} selected={selected} onSelect={setSelected} />
+            ) : (
+              <span style={{ color: '#475569' }}>No source available.</span>
+            )}
+          </div>
+        </div>
+
+        {/* Right: Inspector */}
+        <div style={{ width: 180, background: '#0a0f1e', padding: 10, display: 'flex', flexDirection: 'column' }}>
+          <div style={{ fontSize: 10, color: '#334155', fontFamily: 'JetBrains Mono, monospace', marginBottom: 12, letterSpacing: '.08em' }}>
+            INSPECTOR
+          </div>
+          {selected ? (
+            <div>
+              <div style={{
+                fontSize: 11, padding: '2px 6px', borderRadius: 4, display: 'inline-block',
+                background: `${TOKEN_GLOSSARY[selected.type]?.bg || '#94a3b8'}22`,
+                color: TOKEN_GLOSSARY[selected.type]?.bg || '#94a3b8',
+                border: `1px solid ${TOKEN_GLOSSARY[selected.type]?.bg || '#94a3b8'}44`,
+                fontFamily: 'JetBrains Mono, monospace', marginBottom: 10,
+              }}>
+                {selected.type}
+              </div>
+              <div style={{
+                fontSize: 14, color: '#e2e8f0', fontFamily: 'JetBrains Mono, monospace',
+                background: '#0f172a', padding: '6px 8px', borderRadius: 4, border: '1px solid #1e293b',
+                marginBottom: 12, wordBreak: 'break-all'
+              }}>
+                {selected.value ?? selected.type}
+              </div>
+              <div style={{ fontSize: 11, color: '#64748b', lineHeight: 1.5 }}>
+                {TOKEN_GLOSSARY[selected.type]?.desc ?? 'A grammatical token.'}
+                <br /><br />
+                <span style={{ color: '#475569' }}>Offsets: {selected.start} – {selected.end}</span>
+              </div>
+            </div>
+          ) : (
+            <div style={{ fontSize: 11, color: '#475569', fontStyle: 'italic', textAlign: 'center', marginTop: 20 }}>
+              Click any highlighted token in the source code to inspect it.
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
 }
 
+function AnnotatedSource({ source, tokens, selected, onSelect }) {
+  if (!tokens || tokens.length === 0) return source
+
+  const elements = []
+  let lastPos = 0
+
+  tokens.forEach((tok, i) => {
+    // Add plain text before token
+    if (tok.start > lastPos) {
+      elements.push(<span key={`text-${i}`}>{source.slice(lastPos, tok.start)}</span>)
+    }
+    // Add token
+    const isSel = selected === tok
+    const color = tokenColor(tok.type)
+    elements.push(
+      <span
+        key={`tok-${i}`}
+        onClick={() => onSelect(tok)}
+        style={{
+          cursor: 'pointer',
+          borderRadius: 3,
+          padding: '0 1px',
+          background: isSel ? `${color}33` : 'transparent',
+          color: color,
+          borderBottom: `1px solid ${isSel ? color : `${color}44`}`,
+          transition: 'all 0.1s',
+        }}
+        onMouseEnter={(e) => { if (!isSel) e.currentTarget.style.background = `${color}18` }}
+        onMouseLeave={(e) => { if (!isSel) e.currentTarget.style.background = 'transparent' }}
+      >
+        {source.slice(tok.start, tok.end)}
+      </span>
+    )
+    lastPos = tok.end
+  })
+  // Add remaining plain text
+  if (lastPos < source.length) {
+    elements.push(<span key="text-end">{source.slice(lastPos)}</span>)
+  }
+  return elements
+}
+
 function AstView({ model }) {
-  const [open, setOpen] = useState(false)
+  const [openIntro, setOpenIntro] = useState(false)
+  const [modalOpen, setModalOpen] = useState(false)
   const ast = model?.files?.[0]?.ast
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, position: 'relative' }}>
       {/* Collapsible intro */}
       <div style={{ borderBottom: '1px solid #1e293b', paddingBottom: 6 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '3px 0' }}>
-          <span style={{ fontSize: 9, color: '#334155', fontFamily: 'JetBrains Mono, monospace',
-            letterSpacing: '.08em' }}>AST</span>
-          <button onClick={() => setOpen(v => !v)} style={{
+          <span style={{ fontSize: 9, color: '#334155', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '.08em' }}>AST</span>
+          <button onClick={() => setOpenIntro(v => !v)} style={{
             marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer',
-            color: open ? '#818cf8' : '#334155', fontSize: 10,
+            color: openIntro ? '#818cf8' : '#334155', fontSize: 10,
             fontFamily: 'JetBrains Mono, monospace', padding: 0,
           }}>
-            {open ? '▲ hide' : '? what is this'}
+            {openIntro ? '▲ hide' : '? what is this'}
           </button>
         </div>
-        {open && (
-          <div style={{
-            padding: '10px 0', fontSize: 11, color: '#64748b', lineHeight: 1.7,
-          }}>
+        {openIntro && (
+          <div style={{ padding: '10px 0', fontSize: 11, color: '#64748b', lineHeight: 1.7 }}>
             <div style={{ fontWeight: 700, color: '#818cf8', marginBottom: 5 }}>
               Abstract Syntax Tree — how the computer reads your code
             </div>
-            The parser reads your source code and converts it into a <strong style={{ color: '#f1f5f9' }}>tree of nodes</strong> — one node per grammatical unit (a function declaration, a variable, an expression). Every node has a <em>type</em> and <em>children</em>.
+            The parser reads the token stream and converts it into a <strong style={{ color: '#f1f5f9' }}>tree of nodes</strong> — one node per grammatical unit (a function declaration, a variable, an expression).
             <br /><br />
-            The interpreter then <strong style={{ color: '#f1f5f9' }}>walks this tree</strong> — visiting each node and executing what it means. That walk is what produces the event stream you see in the Events tab.
-            <br /><br />
-            <em style={{ color: '#475569' }}>Click any node to expand or collapse its children. Depth 0 (purple) = program root. Depth 1 (blue) = top-level statements.</em>
+            The interpreter then <strong style={{ color: '#f1f5f9' }}>walks this tree</strong>, executing what each node means. That walk produces the event stream you see in the Events tab.
           </div>
         )}
       </div>
 
-      {/* Tree */}
-      {ast
-        ? <ASTNode node={ast} depth={0} />
-        : <span style={{ color: '#475569', fontSize: 12 }}>No AST.</span>}
+      <button
+        onClick={() => setModalOpen(true)}
+        style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+          padding: '6px', background: '#1e293b', color: '#818cf8', borderRadius: 4,
+          border: '1px solid #334155', cursor: 'pointer', fontSize: 11, fontWeight: 600,
+        }}
+      >
+        <Maximize2 size={12} /> View Full AST
+      </button>
+
+      {/* Tree Preview */}
+      <div style={{ opacity: 0.6, pointerEvents: 'none', maxHeight: 300, overflow: 'hidden', maskImage: 'linear-gradient(to bottom, black 50%, transparent 100%)' }}>
+        {ast ? <ASTNode node={ast} depth={0} /> : <span style={{ color: '#475569', fontSize: 12 }}>No AST.</span>}
+      </div>
+
+      {/* Fullscreen Modal Overlay */}
+      {modalOpen && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 100,
+          background: 'rgba(2,6,23,0.85)', backdropFilter: 'blur(4px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 40,
+        }}>
+          <div style={{
+            background: '#0f172a', border: '1px solid #1e293b', borderRadius: 12,
+            width: '100%', maxWidth: 1000, height: '100%', display: 'flex', flexDirection: 'column',
+            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)', overflow: 'hidden'
+          }}>
+            <div style={{
+              padding: '12px 20px', borderBottom: '1px solid #1e293b', background: '#0a0f1e',
+              display: 'flex', alignItems: 'center', gap: 10
+            }}>
+              <Braces size={16} color="#818cf8" />
+              <span style={{ fontWeight: 600, color: '#e2e8f0' }}>Abstract Syntax Tree Explorer</span>
+              <button onClick={() => setModalOpen(false)} style={{
+                marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: '#64748b'
+              }}><X size={18} /></button>
+            </div>
+            
+            <div style={{ flex: 1, overflow: 'auto', padding: 20, background: '#080c14' }}>
+              <div style={{ 
+                minWidth: 'max-content', // Forces container to be wide enough for deep nesting
+                paddingRight: 40 
+              }}>
+                {ast && <ASTNode node={ast} depth={0} startOpen={true} interactive={true} />}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
