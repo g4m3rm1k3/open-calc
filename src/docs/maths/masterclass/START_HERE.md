@@ -18,13 +18,13 @@ Do not stop to plan. Do not build reference documents. Do not ask for clarificat
 M-004 through M-029, skipping M-015 (already done).
 
 - [x] M-004 — Inequalities and the Ordered Field *(rewritten — trichotomy and closure now taught properly, geometric diagram fixed)*
-- [ ] M-005 — The Quadratic Formula, Derived
-- [ ] M-006 — Absolute Value, Distance, and Intervals
-- [ ] M-007 — Exponents and Their Laws
-- [ ] M-008 — Functions as Sets
-- [ ] M-009 — Inverse Functions
-- [ ] M-010 — Composition and Transformations
-- [ ] M-011 — Polynomials, Division, and Roots
+- [x] M-005 — The Quadratic Formula, Derived
+- [x] M-006 — Absolute Value, Distance, and Intervals
+- [x] M-007 — Exponents and Their Laws
+- [x] M-008 — Functions as Sets
+- [x] M-009 — Inverse Functions
+- [x] M-010 — Composition and Transformations
+- [x] M-011 — Polynomials, Division, and Roots
 - [ ] M-012 — Complex Numbers
 - [ ] M-013 — The Exponential Function
 - [ ] M-014 — Logarithms as Inverses

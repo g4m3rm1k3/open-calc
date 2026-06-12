@@ -1,274 +1,183 @@
 # M-009 — Inverse Functions
 
 **Phase 2 · Functions and Their Behaviour · Lesson 2 of 3**
-**Pillar: Transformation** · *The recurring idea of undoing — from arithmetic to calculus to linear algebra*
 
 ---
 
-## What You Will Build
+You have been "undoing" operations your whole mathematical life. Subtract to undo addition. Divide to undo multiplication. Take the square root to undo squaring. This idea — that operations come with opposites — is so natural it feels obvious.
 
-A Canvas animation showing a function and its inverse as reflections across $y = x$. A Python program verifying that $f^{-1}(f(x)) = x$ numerically for several function pairs. And a systematic view of when inverses exist and why.
-
----
-
-## What You Need to Know First
-
-- M-008: the formal definition of function, injectivity, surjectivity, bijectivity.
+But does squaring always have an opposite? Can you always undo a function? And when you can, what is the relationship between the original and the "undo" version?
 
 ---
 
-> **Quick Check — try to answer before reading:**
->
-> 1. What is the inverse of $f(x) = 2x + 3$? How do you find it?
-> 2. Does $f(x) = x^2$ have an inverse? If you restrict the domain, can it?
-> 3. What is the inverse of the inverse? That is, what is $(f^{-1})^{-1}$?
->
-> *(Answers at the end of this lesson)*
+## Stop and Think: Does f(x) = x² Have an Inverse?
+
+Try to "undo" $f(x) = x^2$. Given an output $y$, find the input $x$ that produced it.
+
+For $y = 9$: $x$ could be $3$ or $-3$. Both square to $9$.
+
+For $y = -1$: no real $x$ at all.
+
+Two problems: one output can come from two different inputs, and some outputs have no input at all. The "undo" operation — if we tried to define it — would either give two answers for the same question (not a function) or be undefined at some inputs.
+
+The name for both problems: $f(x) = x^2$ on $\mathbb{R}$ is not bijective.
 
 ---
 
-## The Lesson
+## When Does an Inverse Exist?
 
-### When Does an Inverse Exist?
+The **inverse** of $f: A \to B$ is a function $f^{-1}: B \to A$ that undoes $f$ in both directions:
 
-The **inverse** of $f: A \to B$ is a function $f^{-1}: B \to A$ satisfying:
-$$f^{-1}(f(x)) = x \quad \forall x \in A \qquad \text{and} \qquad f(f^{-1}(y)) = y \quad \forall y \in B$$
+$$f^{-1}(f(x)) = x \text{ for every } x \in A \qquad \text{and} \qquad f(f^{-1}(y)) = y \text{ for every } y \in B$$
 
-In words: applying $f$ then $f^{-1}$ gets you back to where you started (in $A$), and applying $f^{-1}$ then $f$ gets you back to where you started (in $B$).
+**Theorem:** An inverse exists if and only if $f$ is bijective.
 
-**Theorem:** $f$ has an inverse if and only if $f$ is bijective.
+The proof has two directions.
 
-**Proof:**
+**If $f^{-1}$ exists, then $f$ is bijective.**
 
-($\Rightarrow$ If $f^{-1}$ exists, then $f$ is bijective):
+*Injective:* suppose $f(x_1) = f(x_2)$. Apply $f^{-1}$ to both sides: $x_1 = f^{-1}(f(x_1)) = f^{-1}(f(x_2)) = x_2$. So different inputs cannot give the same output.
 
-*Injective:* Suppose $f(x_1) = f(x_2)$. Apply $f^{-1}$ to both sides: $f^{-1}(f(x_1)) = f^{-1}(f(x_2))$, so $x_1 = x_2$. So $f$ is injective.
+*Surjective:* for any $y \in B$, the element $x = f^{-1}(y)$ satisfies $f(x) = f(f^{-1}(y)) = y$. So every output is achieved.
 
-*Surjective:* For any $y \in B$: $f(f^{-1}(y)) = y$, so $y$ is in the image of $f$. So $f$ is surjective.
+**If $f$ is bijective, then $f^{-1}$ exists.**
 
-($\Leftarrow$ If $f$ is bijective, then $f^{-1}$ exists):
+For each $y \in B$: surjectivity guarantees at least one $x$ with $f(x) = y$. Injectivity guarantees it is unique. Define $f^{-1}(y)$ to be that unique $x$. This defines a function (one output per input) satisfying both inverse conditions. $\square$
 
-For each $y \in B$: since $f$ is surjective, there exists $x \in A$ with $f(x) = y$. Since $f$ is injective, this $x$ is unique. Define $f^{-1}(y) = x$. This defines a function (unique value for each input) and satisfies both inverse conditions. $\square$
+---
 
-**What this tells you:** To check whether a function has an inverse, check bijectivity. If it fails injectivity (two inputs give the same output), the inverse would need to send that output to two inputs — which makes it not a function. If it fails surjectivity, the inverse would be undefined at elements of $B$ not in the image of $f$.
+## Finding the Inverse Algebraically
 
-### Restricting Domains
+The method: write $y = f(x)$, solve for $x$, then relabel $x$ as $f^{-1}(y)$.
 
-$f(x) = x^2$ is not injective on $\mathbb{R}$ (both $2$ and $-2$ give $4$). But if we restrict the domain to $[0, \infty)$, the function becomes injective and surjective onto $[0, \infty)$. Its inverse on this restricted domain is $f^{-1}(x) = \sqrt{x}$.
+**Example:** $f(x) = 2x + 3$.
 
-This domain restriction is how we define $\sin^{-1}$, $\cos^{-1}$, and $\tan^{-1}$ in Phase 4: the trig functions are not injective on all of $\mathbb{R}$, so we restrict to a principal branch where they are bijective.
+Write $y = 2x + 3$. Solve: $x = (y - 3)/2$. So $f^{-1}(y) = (y-3)/2$.
 
-### The Graphical Interpretation
+Check: $f^{-1}(f(x)) = f^{-1}(2x+3) = (2x+3-3)/2 = x$ ✓
 
-If $(a, b)$ is a point on the graph of $f$ (meaning $f(a) = b$), then $(b, a)$ is on the graph of $f^{-1}$ (meaning $f^{-1}(b) = a$).
+**Example:** $f(x) = x^2$ restricted to $[0, \infty)$.
 
-Swapping coordinates $(a, b) \to (b, a)$ corresponds geometrically to reflecting across the line $y = x$.
+Write $y = x^2$ with $x \geq 0$. Solve: $x = \sqrt{y}$ (taking the positive root because $x \geq 0$). So $f^{-1}(y) = \sqrt{y}$.
 
-Therefore: **the graph of $f^{-1}$ is the reflection of the graph of $f$ across $y = x$.**
-
-```javascript
-// Canvas: f(x) = 2^x and its inverse ln(x), reflected across y = x
-const canvas = document.createElement('canvas');
-canvas.width = 500;
-canvas.height = 500;
-document.body.appendChild(canvas);
-const ctx = canvas.getContext('2d');
-
-ctx.fillStyle = '#0d1117';
-ctx.fillRect(0, 0, 500, 500);
-
-// Coordinate transform: math coords to canvas pixels
-// Math: x in [-1.5, 4], y in [-1.5, 4]
-const mathToPixel = (mx, my) => ({
-    x: (mx + 1.5) / 5.5 * 480 + 10,
-    y: 490 - (my + 1.5) / 5.5 * 480
-});
-
-// Axes
-ctx.strokeStyle = '#444';
-ctx.lineWidth = 1;
-const origin = mathToPixel(0, 0);
-ctx.beginPath();
-ctx.moveTo(10, origin.y);
-ctx.lineTo(490, origin.y);
-ctx.moveTo(origin.x, 10);
-ctx.lineTo(origin.x, 490);
-ctx.stroke();
-
-// y = x line (reflection axis)
-ctx.strokeStyle = '#444';
-ctx.setLineDash([5, 5]);
-ctx.lineWidth = 1;
-ctx.beginPath();
-let p = mathToPixel(-1.5, -1.5);
-ctx.moveTo(p.x, p.y);
-p = mathToPixel(4, 4);
-ctx.lineTo(p.x, p.y);
-ctx.stroke();
-ctx.setLineDash([]);
-
-function drawCurve(fn, xMin, xMax, color, steps = 400) {
-    ctx.beginPath();
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2.5;
-    let first = true;
-    for (let i = 0; i <= steps; i++) {
-        const mx = xMin + (xMax - xMin) * i / steps;
-        const my = fn(mx);
-        if (!isFinite(my) || my < -1.5 || my > 4.5) { first = true; continue; }
-        const {x, y} = mathToPixel(mx, my);
-        if (first) { ctx.moveTo(x, y); first = false; }
-        else ctx.lineTo(x, y);
-    }
-    ctx.stroke();
-}
-
-// f(x) = 2^x
-drawCurve(x => Math.pow(2, x), -1.5, 4, '#4fc3f7');
-// f^{-1}(x) = log_2(x) = ln(x)/ln(2)
-drawCurve(x => Math.log(x) / Math.log(2), 0.001, 4, '#ff9800');
-
-// Label axes and curves
-ctx.fillStyle = '#4fc3f7';
-ctx.font = '14px serif';
-ctx.fillText('f(x) = 2ˣ', ...Object.values(mathToPixel(2.5, 3.5)));
-
-ctx.fillStyle = '#ff9800';
-ctx.fillText('f⁻¹(x) = log₂(x)', ...Object.values(mathToPixel(1.8, 0.2)));
-
-ctx.fillStyle = '#666';
-ctx.font = '12px serif';
-ctx.fillText('y = x', ...Object.values(mathToPixel(3.4, 3.0)));
-
-// Show a point and its reflection: (1, 2) on f, (2, 1) on f^{-1}
-const pt1 = mathToPixel(1, 2);
-const pt2 = mathToPixel(2, 1);
-ctx.fillStyle = '#fff';
-[pt1, pt2].forEach(p => {
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, 5, 0, 2 * Math.PI);
-    ctx.fill();
-});
-ctx.strokeStyle = '#888';
-ctx.setLineDash([3, 3]);
-ctx.beginPath();
-ctx.moveTo(pt1.x, pt1.y);
-ctx.lineTo(pt2.x, pt2.y);
-ctx.stroke();
-ctx.setLineDash([]);
-ctx.fillStyle = '#ccc';
-ctx.font = '11px monospace';
-ctx.fillText('(1, 2)', pt1.x + 7, pt1.y - 5);
-ctx.fillText('(2, 1)', pt2.x + 7, pt2.y + 14);
-```
-
-**Walkthrough:** The canvas draws $f(x) = 2^x$ in blue and its inverse $f^{-1}(x) = \log_2 x$ in orange, both on the same axes. The dashed line $y = x$ is the mirror. A white dot marks the point $(1, 2)$ on $f$ (since $2^1 = 2$) and its reflection $(2, 1)$ on $f^{-1}$ (since $\log_2 2 = 1$). The dashed connecting line confirms they are reflections. The `drawCurve` helper samples the function at 400 points and connects them — this is the basic technique for rendering continuous curves on a canvas, used throughout the curriculum.
+The domain restriction is what makes the inverse single-valued. Without it, we would need to decide between $+\sqrt{y}$ and $-\sqrt{y}$ — and there is no "right" choice. The restriction is what makes $f$ bijective and the inverse well-defined.
 
 ```python
 import math
 
-# Verify f^{-1}(f(x)) = x for several function pairs
-
-def verify_inverse_pair(f, f_inv, name_f, name_inv, domain_samples):
-    """
-    Numerically verify that f_inv(f(x)) = x for all sample points.
-    """
-    max_error = 0
-    for x in domain_samples:
-        roundtrip = f_inv(f(x))
-        error = abs(roundtrip - x)
-        max_error = max(max_error, error)
-    return max_error
-
-print("Verifying f⁻¹(f(x)) = x for inverse function pairs")
-print()
-
-sample_positive = [0.1, 0.5, 1.0, 2.0, 5.0, 10.0]
-sample_real     = [-2.0, -1.0, 0.0, 1.0, 2.0, 3.0]
-
+# Verify f^{-1}(f(x)) = x for several pairs
 pairs = [
-    (lambda x: x**2, math.sqrt, "x²", "√x", sample_positive),
-    (math.exp, math.log, "eˣ", "ln(x)", sample_real),
-    (lambda x: 2*x + 3, lambda y: (y - 3)/2, "2x+3", "(y-3)/2", sample_real),
-    (lambda x: x**3, lambda y: y**(1/3) if y >= 0 else -((-y)**(1/3)), "x³", "∛x", sample_real),
+    (lambda x: 2*x + 3,   lambda y: (y-3)/2,         "2x+3",      "(y-3)/2",  [-2,0,1,3]),
+    (lambda x: x**2,       math.sqrt,                  "x²",        "√x",       [0,1,2,4,9]),
+    (lambda x: math.exp(x),math.log,                   "eˣ",        "ln(x)",    [-1,0,1,2]),
+    (lambda x: x**3,       lambda y: y**(1/3),         "x³",        "∛x",       [0,1,2,8]),
 ]
 
-for (f, f_inv, name_f, name_inv, samples) in pairs:
-    error = verify_inverse_pair(f, f_inv, name_f, name_inv, samples)
-    print(f"  f = {name_f:12s},  f⁻¹ = {name_inv:12s},  max |f⁻¹(f(x))-x| = {error:.2e}  {'✓' if error < 1e-10 else '✗'}")
-
-print()
-print("Note: errors are floating-point rounding (~1e-15), not mathematical errors.")
-print("The inverse relationship f⁻¹(f(x)) = x is exact.")
+for (f, finv, fname, iname, xs) in pairs:
+    errors = [abs(finv(f(x)) - x) for x in xs]
+    ok = all(e < 1e-10 for e in errors)
+    print(f"f={fname:8s}, f⁻¹={iname:8s}: f⁻¹(f(x))=x for all test points? {'✓' if ok else '✗'}")
 ```
 
 ---
 
-### The Inverse Is Unique
+## The Graphical Picture
 
-**Theorem:** If $f: A \to B$ is bijective, its inverse is unique.
+> Why does reflecting across $y = x$ give the graph of $f^{-1}$?
 
-**Proof:** Suppose $g$ and $h$ are both inverses of $f$. Then for any $y \in B$:
+Think about what reflection across $y = x$ does: it swaps coordinates. The point $(a, b)$ becomes $(b, a)$.
 
-$$g(y) = g(f(f^{-1}(y))) = (g \circ f)(f^{-1}(y)) = \text{id}_A(f^{-1}(y)) = f^{-1}(y)$$
+Now: the point $(a, b)$ is on the graph of $f$ exactly when $f(a) = b$. And the point $(b, a)$ is on the graph of $f^{-1}$ exactly when $f^{-1}(b) = a$ — which is exactly what $f(a) = b$ means. So reflecting every point of $f$'s graph across $y = x$ gives exactly the graph of $f^{-1}$.
 
-Wait — this just says $g = f^{-1}$ using $f^{-1}$ itself. Let's do it properly without assuming one inverse:
+```python
+import matplotlib.pyplot as plt
+import numpy as np
 
-For any $y \in B$: $g(y) = g(f(h(y))) = h(y)$, using $g(f(x)) = x$ and the fact that $f(h(y)) = y$. Since $g(y) = h(y)$ for all $y \in B$, we have $g = h$. $\square$
+fig, ax = plt.subplots(figsize=(7, 7))
+ax.set_facecolor('#0f1117')
+fig.patch.set_facecolor('#0f1117')
+ax.set_xlim(-0.5, 4)
+ax.set_ylim(-0.5, 4)
+ax.set_aspect('equal')
+
+# y = x line (reflection axis)
+t = np.linspace(-0.5, 4, 100)
+ax.plot(t, t, color='#3a4060', lw=1, linestyle='--', label='y = x')
+
+# f(x) = 2^x
+x1 = np.linspace(-0.5, 2, 300)
+ax.plot(x1, 2**x1, color='#4fc3f7', lw=2.5, label=r'$f(x) = 2^x$')
+
+# f^{-1}(x) = log_2(x)
+x2 = np.linspace(0.05, 4, 300)
+ax.plot(x2, np.log2(x2), color='#ff9800', lw=2.5, label=r'$f^{-1}(x) = \log_2 x$')
+
+# Show reflected point pair: (1, 2) and (2, 1)
+ax.plot(1, 2, 'o', color='white', ms=8, zorder=5)
+ax.plot(2, 1, 'o', color='white', ms=8, zorder=5)
+ax.plot([1, 2], [2, 1], '--', color='#888', lw=1)
+ax.text(1.05, 2.15, '(1, 2)', color='white', fontsize=9)
+ax.text(2.05, 0.85, '(2, 1)', color='white', fontsize=9)
+
+ax.axhline(0, color='#3a4060', lw=1)
+ax.axvline(0, color='#3a4060', lw=1)
+
+legend = ax.legend(facecolor='#0f1117', edgecolor='#3a4060', labelcolor='white', fontsize=10)
+ax.set_title(r'$f^{-1}$ is the reflection of $f$ across $y = x$',
+             color='#5a7a90', fontsize=11, style='italic')
+ax.tick_params(colors='#555')
+for sp in ax.spines.values():
+    sp.set_color('#2a3050')
+plt.tight_layout()
+plt.show()
+```
+
+The point $(1, 2)$ is on $f$ because $2^1 = 2$. Its reflection $(2, 1)$ is on $f^{-1}$ because $\log_2 2 = 1$. Every point and its reflection confirm the relationship.
 
 ---
 
-### The Inverse Theme
+## The Inverse Theme
 
-This is one of the most important threads in the curriculum:
+The "undo" idea appears everywhere. The same pattern — an operation paired with its reverse — recurs across all of mathematics:
 
-| Context | Object | Inverse | Condition |
+| Object | Operation | Inverse | When it exists |
 |---|---|---|---|
-| Arithmetic | $a \neq 0$ | $a^{-1} = 1/a$ | $a \neq 0$ |
-| Functions | $f: A \to B$ | $f^{-1}: B \to A$ | $f$ bijective |
-| Matrices | $A: \mathbb{R}^n \to \mathbb{R}^n$ | $A^{-1}$ | $\det A \neq 0$ |
-| Calculus | $\frac{d}{dx}$ | $\int \cdot\, dx$ | (FTC, Phase 7) |
-| Logs & exp | $e^x$ | $\ln x$ | (Phase 4) |
-| Groups | $a \in G$ | $a^{-1}$ with $a \cdot a^{-1} = e$ | Always (axiom M4) |
+| Numbers | $\times a$ | $\times a^{-1} = \div a$ | $a \neq 0$ |
+| Functions | apply $f$ | apply $f^{-1}$ | $f$ bijective |
+| Matrices | multiply by $A$ | multiply by $A^{-1}$ | $\det A \neq 0$ |
+| Exponential | $e^x$ | $\ln x$ | (always, on $\mathbb{R}$) |
+| Differentiation | $\frac{d}{dx}$ | $\int \cdot\, dx$ | (Fundamental Theorem) |
 
-Each row is a different manifestation of the same idea. When you see "inverse" in any context, you are seeing the same concept.
-
----
-
-## Connect the Pieces
-
-**Backwards:** M-008 defined bijective functions — the prerequisite for inverses. M-003 introduced multiplicative inverses in the field axioms — the original instance of the inverse idea.
-
-**Forwards:**
-- M-010 (Composition): The composition $f \circ f^{-1} = \text{id}$ is a composition of functions.
-- M-014 (Logarithms): $\ln = \exp^{-1}$ — the logarithm is defined as the inverse of the exponential.
-- M-031 (Matrix inverse): $A^{-1}$ is the matrix inverse, defined by $AA^{-1} = I$.
-- M-022 (FTC): integration inverts differentiation — the deepest inverse in calculus.
+Each row is the same idea in a different context. When you learn matrix inverses or logarithms later, you are not learning something new — you are seeing the same structure you learned here.
 
 ---
 
-## What Breaks Without This
+## Restricting Domains for Trig Functions
 
-Without the precise inverse condition:
-- Students compute $f^{-1}$ by "swapping $x$ and $y$" without understanding when this is valid. For $f(x) = x^2$ on $\mathbb{R}$, swapping gives $x = y^2$, then $y = \pm\sqrt{x}$ — but which sign? The answer is: it depends on which restriction you impose to make $f$ bijective.
-- The derivative of $f^{-1}$ (the inverse function theorem, Phase 6) requires the inverse to exist. Without knowing the bijection condition, you cannot state when the theorem applies.
+$\sin x$ is not injective on $\mathbb{R}$ — it oscillates up and down, hitting every value in $[-1, 1]$ infinitely many times. So $\sin^{-1}$ (arcsine) cannot be defined on all of $\mathbb{R}$.
 
----
+The fix: restrict $\sin$ to $[-\pi/2, \pi/2]$, where it is strictly increasing and therefore injective. On this domain, $\sin: [-\pi/2, \pi/2] \to [-1, 1]$ is bijective, and $\sin^{-1}: [-1, 1] \to [-\pi/2, \pi/2]$ is well-defined.
 
-## Definition of Done
-
-- [ ] You can state the definition of the inverse of a function, including both conditions
-- [ ] You can prove that an inverse exists if and only if the function is bijective
-- [ ] You can explain geometrically why the graph of $f^{-1}$ is the reflection of $f$ across $y = x$
-- [ ] You can give three examples of the inverse concept in different mathematical contexts
-- [ ] You ran both the canvas and Python code and can explain what each demonstrates
-
-**Proof reconstruction (Sunday):** Prove that if $f$ is bijective then its inverse is unique. (Do not use "the inverse" in the proof — prove that any two left-inverses must be equal.)
+The same story applies to $\cos$ (restricted to $[0, \pi]$) and $\tan$ (restricted to $(-\pi/2, \pi/2)$). These restrictions are called **principal branches** — you will see this phrase in Phase 4.
 
 ---
 
-## Answers to Quick Check
+## Try It Yourself
 
-1. $f^{-1}(y) = (y - 3)/2$. Found by solving $y = 2x + 3$ for $x$.
-2. $f(x) = x^2$ does not have an inverse on $\mathbb{R}$ (not injective: $f(2) = f(-2) = 4$). Restricted to $[0, \infty) \to [0, \infty)$, it is bijective and $f^{-1}(y) = \sqrt{y}$.
-3. $(f^{-1})^{-1} = f$. The inverse of the inverse is the original function.
+**Challenge 1.** Find the inverse of each function, stating the domain restriction you need:
+
+- $f(x) = x^2 - 4$ on $[0, \infty)$
+- $g(x) = \frac{x+1}{x-1}$ for $x \neq 1$
+- $h(x) = \sqrt{x + 3}$ on $[-3, \infty)$
+
+**Challenge 2.** Prove that the inverse of a bijection is itself a bijection, and that $(f^{-1})^{-1} = f$.
+
+**Challenge 3.** Prove that the inverse is unique: if $g$ and $h$ are both inverses of $f$, then $g = h$.
+
+*Hint: start with $g(y) = g(f(h(y)))$ and apply the inverse conditions one step at a time.*
+
+---
+
+## What Comes Next
+
+You now know what a function is and when it can be undone. The natural next question: what happens when you apply two functions in sequence — first $f$, then $g$? This is **composition**, and it turns out to be the operation that connects all functions into a structure. M-010 builds composition and shows how it connects to the transformations — rotations, reflections, scalings — that you will see throughout linear algebra and geometry.

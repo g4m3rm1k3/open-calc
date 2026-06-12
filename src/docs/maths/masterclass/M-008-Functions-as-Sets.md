@@ -1,216 +1,187 @@
-# M-008 — Functions as Sets
+# M-008 — Functions
 
 **Phase 2 · Functions and Their Behaviour · Lesson 1 of 3**
-**Pillar: Transformation** · *The most fundamental object in all mathematics beyond sets*
 
 ---
 
-## What You Will Build
+You have been using functions since you were about thirteen. $f(x) = x^2$. $g(x) = \sin x$. The square root. The absolute value. You know how to evaluate them, graph them, compose them.
 
-A Python program that tests whether a given relation is a function, then classifies functions as injective, surjective, or bijective. You will also see a concrete demonstration of Cantor's diagonal argument sketch — why $|\mathbb{R}| > |\mathbb{N}|$ depends entirely on the precise set-theoretic definition of function.
+But here is a question you have almost certainly never been asked: what *is* a function? Not "a rule that assigns outputs to inputs" — that is a description, not a definition. What is the mathematical *object* called a function? Where does it live?
 
----
-
-## What You Need to Know First
-
-- M-002: sets, Cartesian products, set-builder notation
-- M-007: basic algebraic operations on real numbers
+The answer connects functions to sets, makes precise why $y = \pm\sqrt{x}$ is not a function, and — most surprisingly — gives us the only consistent way to compare the sizes of infinite sets.
 
 ---
 
-> **Quick Check — try to answer before reading:**
->
-> 1. Is "the square root function" $f(x) = \sqrt{x}$ a function from $\mathbb{R}$ to $\mathbb{R}$? Why or why not?
-> 2. Is $f(x) = x^2$ from $\mathbb{R}$ to $\mathbb{R}$ injective? Surjective?
-> 3. What does it mean for two infinite sets to have "the same size"?
->
-> *(Answers at the end of this lesson)*
+## The Problem with the Informal Description
+
+"A function assigns to each input exactly one output." This is the right idea, but it does not tell you what kind of *thing* a function is. Is it a formula? A graph? A table? A machine?
+
+The answer that works for all of mathematics: **a function is a set of ordered pairs.**
+
+Specifically, the function $f(x) = x^2$ (from the reals to the reals) is the set:
+
+$$\{(x, x^2) : x \in \mathbb{R}\} = \{(0, 0), (1, 1), (-1, 1), (2, 4), (-2, 4), \ldots\}$$
+
+Every input $x$ appears paired with exactly one output $x^2$. That "exactly one" is the condition that makes something a function and not just a relation.
 
 ---
 
-## The Lesson
+## The Formal Definition
 
-### The Formal Definition
+A **function** $f: A \to B$ is a subset of $A \times B$ (the set of all ordered pairs $(a, b)$ with $a \in A, b \in B$) satisfying two conditions:
 
-A **function** $f: A \to B$ is a **rule** that assigns to each element $x \in A$ (the *domain*) exactly one element $f(x) \in B$ (the *codomain*). Formally: $f$ is a subset of $A \times B$ such that:
+1. **Totality:** every element of $A$ appears as a first entry in some pair. (Every input has at least one output.)
+2. **Uniqueness:** no element of $A$ appears as the first entry of two different pairs. (Every input has at most one output.)
 
-1. For every $a \in A$, there exists $b \in B$ with $(a, b) \in f$.
-2. If $(a, b_1) \in f$ and $(a, b_2) \in f$, then $b_1 = b_2$.
-
-Condition 1: every input has at least one output (totality).
-Condition 2: every input has at most one output (uniqueness).
-
-Together: exactly one output per input.
-
-**The range** (or *image*) of $f$ is $\text{Im}(f) = \{f(x) : x \in A\} \subseteq B$. The range may be a proper subset of the codomain — not every element of $B$ need be achieved.
-
-**Why the formal definition matters:**
-
-- Is $f(x) = \sqrt{x}$ a function from $\mathbb{R}$ to $\mathbb{R}$? No — $\sqrt{-1}$ is undefined in $\mathbb{R}$, so condition 1 fails. The domain must be $[0, \infty)$.
-- Is $g(x) = \pm\sqrt{x}$ a function? No — it assigns two values to every $x > 0$, violating condition 2.
-- The formal definition makes these questions answerable with precision.
-
-**Math lens:** Functions as subsets of Cartesian products is not just formalism — it is the foundation of category theory, the language in which much of modern mathematics is written (Phase 17). Every function is a morphism, and the entire subject is the study of structure-preserving maps.
-
-**CS lens:** A function in the mathematical sense is exactly what a **pure function** is in programming — no side effects, deterministic, same input always gives same output. A random number generator is not a function in this sense. A hash function is (it is deterministic).
+Together: every input has **exactly one** output. The set $A$ is called the **domain**. The set $B$ is called the **codomain** — the set of all *possible* outputs, whether or not they are all achieved. The **range** (or **image**) is the subset of $B$ actually achieved: $\{f(x) : x \in A\}$.
 
 ---
 
-### Injective, Surjective, Bijective
+## Stop and Think
 
-These three words precisely describe how a function relates its domain and codomain.
+> Is $y = \pm\sqrt{x}$ a function from $\mathbb{R}$ to $\mathbb{R}$?
 
-**Injective (one-to-one):** $f: A \to B$ is injective if different inputs give different outputs:
-$$f(x_1) = f(x_2) \implies x_1 = x_2$$
+Think about it using the two conditions before reading on.
 
-Equivalently: no two elements of $A$ map to the same element of $B$.
+---
 
-**Surjective (onto):** $f: A \to B$ is surjective if every element of $B$ is achieved:
-$$\forall b \in B,\, \exists a \in A \text{ such that } f(a) = b$$
+It fails Condition 2. For $x = 4$, both $(4, 2)$ and $(4, -2)$ would be in the set — one input, two outputs. The uniqueness condition is violated. So $y = \pm\sqrt{x}$ is not a function.
 
-Equivalently: $\text{Im}(f) = B$ (the range equals the codomain).
+What about $f(x) = \sqrt{x}$ (taking only the positive root)? It fails Condition 1 — $(-1, ?)$ has no valid pair because $\sqrt{-1}$ is not real. So $f(x) = \sqrt{x}$ is not a function *from* $\mathbb{R}$. It becomes a function once the domain is restricted to $[0, \infty)$.
 
-**Bijective:** Both injective and surjective. A perfect pairing: every input maps to a unique output, and every output is hit by exactly one input.
-
-**Why bijections matter:** A bijection $f: A \to B$ witnesses that $A$ and $B$ have "the same number of elements" — even when $A$ and $B$ are infinite. This is Cantor's definition of set size (*cardinality*): $|A| = |B|$ if and only if there exists a bijection from $A$ to $B$.
-
-Using this definition:
-- $|\mathbb{N}| = |\mathbb{Z}|$: the map $n \mapsto (-1)^n \lceil n/2 \rceil$ is a bijection $\mathbb{N} \to \mathbb{Z}$.
-- $|\mathbb{N}| = |\mathbb{Q}|$: the rationals can be listed in a sequence (proved by Cantor's diagonal enumeration of $\mathbb{Z} \times \mathbb{Z}$).
-- $|\mathbb{N}| < |\mathbb{R}|$: Cantor's diagonal argument shows no bijection $\mathbb{N} \to \mathbb{R}$ exists — $\mathbb{R}$ is **uncountable**. Proved in Phase 16.
+This is why the domain is part of the function's definition, not an afterthought.
 
 ```python
-# Function classification for finite functions (given as dictionaries a -> b)
+# The "exactly one output" test — does this relation define a function?
 
-def is_function(domain, codomain, mapping):
-    """
-    Check if mapping defines a valid function from domain to codomain.
-    mapping: dict {a: b} or list of pairs [(a, b), ...]
-    """
-    if isinstance(mapping, dict):
-        pairs = list(mapping.items())
-    else:
-        pairs = mapping
+def is_function(pairs, domain):
+    outputs = {}
+    for (x, y) in pairs:
+        if x in outputs and outputs[x] != y:
+            print(f"  Not a function: {x} maps to both {outputs[x]} and {y}")
+            return False
+        outputs[x] = y
+    missing = [a for a in domain if a not in outputs]
+    if missing:
+        print(f"  Not a function: no output for {missing}")
+        return False
+    print(f"  Valid function. Outputs: {outputs}")
+    return True
 
-    # Check totality: every element of domain has a value
-    keys = [a for (a, b) in pairs]
-    for a in domain:
-        if a not in keys:
-            return False, f"No image for element {a} (totality fails)"
+print("f(x) = x^2 on {-2,-1,0,1,2}:")
+is_function([(-2,4),(-1,1),(0,0),(1,1),(2,4)], [-2,-1,0,1,2])
 
-    # Check uniqueness: no element has two different images
-    seen = {}
-    for (a, b) in pairs:
-        if a in seen and seen[a] != b:
-            return False, f"{a} maps to both {seen[a]} and {b} (uniqueness fails)"
-        seen[a] = b
-
-    return True, "Valid function"
-
-def is_injective(mapping_dict, codomain):
-    """Injective: no two inputs map to the same output."""
-    images = list(mapping_dict.values())
-    return len(images) == len(set(images)), "injective" if len(images) == len(set(images)) else "not injective (two inputs share an output)"
-
-def is_surjective(mapping_dict, codomain):
-    """Surjective: every element of codomain is hit."""
-    image_set = set(mapping_dict.values())
-    missing = [b for b in codomain if b not in image_set]
-    if not missing:
-        return True, "surjective"
-    return False, f"not surjective (elements {missing} not in image)"
-
-
-# --- Tests ---
-domain   = [1, 2, 3, 4]
-codomain = ['a', 'b', 'c', 'd']
-
-# Valid bijection
-f_bij = {1: 'a', 2: 'b', 3: 'c', 4: 'd'}
-# Injective but not surjective (codomain has 5 elements)
-codomain5 = ['a', 'b', 'c', 'd', 'e']
-f_inj = {1: 'a', 2: 'b', 3: 'c', 4: 'd'}
-# Surjective but not injective (two inputs → same output)
-f_sur = {1: 'a', 2: 'a', 3: 'b', 4: 'c'}
-codomain3 = ['a', 'b', 'c']
-# Not a function (two images for one input)
-f_bad = [(1, 'a'), (1, 'b'), (2, 'c'), (3, 'd'), (4, 'e')]
-
-tests = [
-    ("Bijection", domain, codomain, f_bij),
-    ("Injective only", domain, codomain5, f_inj),
-    ("Surjective only", domain, codomain3, f_sur),
-]
-
-for (name, dom, cod, mapping) in tests:
-    valid, msg = is_function(dom, cod, mapping)
-    if valid:
-        inj, inj_msg = is_injective(mapping, cod)
-        sur, sur_msg = is_surjective(mapping, cod)
-        bij = inj and sur
-        print(f"{name}: injective={inj_msg}, surjective={sur_msg}, bijective={bij}")
-    else:
-        print(f"{name}: NOT a function — {msg}")
-
-print()
-valid, msg = is_function([1,2,3,4,5], ['a','b','c','d','e'], f_bad)
-print(f"Non-function test: {msg}")
+print("y = ±sqrt(x) on {0,1,4}:")
+is_function([(0,0),(1,1),(1,-1),(4,2),(4,-2)], [0,1,4])
 ```
 
 ---
 
-### Cantor's Diagonal Argument (Preview)
+## Injective, Surjective, Bijective
 
-**Theorem:** There is no surjection $\mathbb{N} \to \mathbb{R}$ — the real numbers are uncountable.
+These three words describe how a function relates its domain and codomain. Each one captures a property that will matter repeatedly from here forward.
 
-**Proof sketch:** Suppose $f: \mathbb{N} \to [0,1]$ is any function. We construct a real number $x \in [0,1]$ not in the image of $f$.
+**Injective** (also called one-to-one): different inputs give different outputs.
 
-Write each $f(n)$ as an infinite decimal: $f(n) = 0.d_{n,1} d_{n,2} d_{n,3} \ldots$
+$$f(a) = f(b) \implies a = b$$
 
-Define $x = 0.x_1 x_2 x_3 \ldots$ where $x_n = 5$ if $d_{n,n} \neq 5$, and $x_n = 6$ if $d_{n,n} = 5$.
+Think of it as "no collisions" — no two inputs land on the same output. $f(x) = x^2$ on $\mathbb{R}$ is *not* injective: both $2$ and $-2$ map to $4$.
 
-Then $x \neq f(n)$ for every $n$ (they differ in the $n$th decimal place). So $x \notin \text{Im}(f)$. Since $f$ was arbitrary, no function $\mathbb{N} \to [0,1]$ is surjective. $\square$
+**Surjective** (also called onto): every element of the codomain is achieved by some input.
 
-This proof uses the precise set-theoretic definition of function — the diagonalisation specifically exploits the indexing of function values. Without the formal definition, the argument cannot be made rigorous.
+$$\text{for every } b \in B, \text{ there exists } a \in A \text{ with } f(a) = b$$
 
----
+The range equals the entire codomain. $f(x) = x^2$ with codomain $\mathbb{R}$ is *not* surjective: no real number squares to $-1$.
 
-## Connect the Pieces
+**Bijective**: both injective and surjective. A perfect pairing — every output comes from exactly one input, and every element of the codomain is reached.
 
-Functions connect forward to every major concept:
-- **Phase 2 (this phase):** Inverse functions, composition — built on today's definitions.
-- **Phase 4:** Exponential, logarithm, trigonometric functions — each is a precisely defined map with a specific domain and codomain.
-- **Phase 5–7:** Limits and continuity are properties of functions.
-- **Phase 10:** Linear transformations are functions between vector spaces with extra structure.
-- **Phase 17:** Homomorphisms are functions between algebraic structures that preserve structure.
-- **Phase 18:** Continuous maps between topological spaces are functions with the preimage condition.
+```python
+def classify(f_dict, domain, codomain):
+    outputs = list(f_dict.values())
+    injective  = len(outputs) == len(set(outputs))
+    surjective = set(codomain).issubset(set(outputs))
+    print(f"  injective:  {injective}")
+    print(f"  surjective: {surjective}")
+    print(f"  bijective:  {injective and surjective}")
 
----
+print("f(x) = x^2 from {-2,-1,0,1,2} to {0,1,2,3,4}:")
+classify({-2:4, -1:1, 0:0, 1:1, 2:4}, [-2,-1,0,1,2], [0,1,2,3,4])
+```
 
-## What Breaks Without This
-
-Without the precise definition:
-- You cannot answer "Is $f(x) = \sqrt{x}$ a function from $\mathbb{R}$ to $\mathbb{R}$?" — only that it "works for non-negative inputs."
-- You cannot understand why $f(x) = \pm\sqrt{x}$ is not a function — "but it gives a value for every $x$."
-- Cantor's diagonal argument is a hand-wave, not a proof.
-- The inverse function (next lesson) cannot be defined precisely — you need bijectivity.
+The output shows $f(x) = x^2$ is neither: $-1$ and $1$ both map to $1$ (not injective), and $2, 3$ are never achieved (not surjective).
 
 ---
 
-## Definition of Done
+## Stop and Think: Infinite Sets
 
-- [ ] You can state the two conditions (totality and uniqueness) that make a relation a function
-- [ ] You can determine whether a given rule is a function, and if so, whether it is injective, surjective, or bijective
-- [ ] You can explain why $f(x) = \sqrt{x}$ is not a function $\mathbb{R} \to \mathbb{R}$
-- [ ] You can state what a bijection witnesses about set sizes, including for infinite sets
-- [ ] You can sketch the diagonal argument and explain what it proves
+> Are there "more" natural numbers than even natural numbers?
 
-**Proof reconstruction (Sunday):** Prove that $f: \mathbb{Z} \to \mathbb{N}$ defined by $f(n) = 2|n|$ if $n \leq 0$ and $f(n) = 2n-1$ if $n > 0$ is a bijection (showing $|\mathbb{Z}| = |\mathbb{N}|$). Hint: check totality, uniqueness, injectivity, surjectivity.
+The evens — $2, 4, 6, 8, \ldots$ — seem like "half" of the naturals. Surely $|\mathbb{N}| > |\{2, 4, 6, \ldots\}|$?
+
+Think about it: can you build a perfect pairing between them?
 
 ---
 
-## Answers to Quick Check
+Yes: pair each $n$ with $2n$.
 
-1. No — $f(x) = \sqrt{x}$ is not a function from $\mathbb{R}$ to $\mathbb{R}$ because $\sqrt{-1}$ is undefined in $\mathbb{R}$ (totality fails). It is a function from $[0, \infty)$ to $[0, \infty)$.
-2. $f(x) = x^2$ is not injective (both $2$ and $-2$ map to $4$). It is not surjective either (no real $x$ has $x^2 = -1$). As a function $\mathbb{R} \to [0, \infty)$ it becomes surjective but still not injective.
-3. Two sets have the same size if and only if there exists a bijection between them. For finite sets this matches counting. For infinite sets it is the definition — there is no other consistent way to compare infinities.
+$$1 \leftrightarrow 2, \quad 2 \leftrightarrow 4, \quad 3 \leftrightarrow 6, \quad 4 \leftrightarrow 8, \quad \ldots$$
+
+This pairing is a bijection from $\mathbb{N}$ to the even numbers. By Cantor's definition, the two sets have the *same* size. The intuition that "half as many" cannot apply to infinite sets — infinite sets break that intuition entirely.
+
+This is not a trick or a paradox. It is what happens when you take the definition of "same size" seriously and apply it to infinite sets. Cantor's insight was to use bijections as the definition of equal size, because it is the only definition that works consistently for all sets.
+
+Using bijections:
+- $|\mathbb{N}| = |\mathbb{Z}|$: the integers can be paired with the naturals (list them as $0, 1, -1, 2, -2, \ldots$).
+- $|\mathbb{N}| = |\mathbb{Q}|$: the rationals can be listed in a sequence (harder to prove, but true).
+- $|\mathbb{N}| < |\mathbb{R}|$: no bijection from $\mathbb{N}$ to $\mathbb{R}$ exists. We prove this in Phase 16 via Cantor's diagonal argument — a proof that uses the precise definition of function in an essential way.
+
+```python
+# Bijection from N to even numbers: n -> 2n
+print("Bijection  N -> evens: n maps to 2n")
+for n in range(1, 8):
+    print(f"  {n} -> {2*n}")
+
+print()
+print("Bijection  N -> Z: list integers as 0,1,-1,2,-2,...")
+def nat_to_int(n):
+    if n == 0: return 0
+    if n % 2 == 1: return (n + 1) // 2
+    return -(n // 2)
+
+for n in range(8):
+    print(f"  {n} -> {nat_to_int(n)}")
+```
+
+---
+
+## Domain and Codomain Are Part of the Function
+
+The same formula can define different functions depending on domain and codomain. $f(x) = x^2$ is:
+
+- Not surjective as $\mathbb{R} \to \mathbb{R}$ (negative numbers not achieved)
+- Surjective as $\mathbb{R} \to [0, \infty)$ (every non-negative number is achieved)
+- Not injective in either case on all of $\mathbb{R}$
+- Bijective as $[0, \infty) \to [0, \infty)$ (restricted to non-negatives, one-to-one and onto)
+
+The function is not just the formula. It is the formula *plus* the domain *plus* the codomain. Changing any of the three can change its properties fundamentally.
+
+---
+
+## Try It Yourself
+
+**Challenge 1.** For each of the following, state whether it is a valid function (and if so, whether it is injective, surjective, or bijective). Give a reason for each answer.
+
+- $f: \mathbb{R} \to \mathbb{R}$, $f(x) = x^3$
+- $g: \mathbb{R} \to \mathbb{R}$, $g(x) = x^2 - 1$
+- $h: [0, \pi] \to [-1, 1]$, $h(x) = \cos x$
+- $k: \{1, 2, 3\} \to \{a, b\}$, $k(1) = a, k(2) = a, k(3) = b$
+
+**Challenge 2.** Prove that the composition of two injective functions is injective. (If $f: A \to B$ and $g: B \to C$ are injective, is $g \circ f: A \to C$ injective?)
+
+**Challenge 3.** Build an explicit bijection between $(0, 1)$ (the open interval) and $\mathbb{R}$. This shows these two sets have the same size even though one is "bounded" and the other is not. *(Hint: $\tan$ restricted to $(-\pi/2, \pi/2)$ is a bijection to $\mathbb{R}$. Can you use it?)*
+
+---
+
+## What Comes Next
+
+If $f: A \to B$ is a bijection, then every element of $B$ comes from exactly one element of $A$. This means we can "reverse" $f$ — send each $b$ back to the unique $a$ that mapped to it. This reverse map is the **inverse function** $f^{-1}: B \to A$, and it only exists when $f$ is bijective. M-009 builds the inverse function and shows why the domain-codomain pair must be chosen carefully to make it work.

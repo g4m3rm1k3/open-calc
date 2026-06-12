@@ -1,289 +1,188 @@
 # M-010 — Composition and Graph Transformations
 
 **Phase 2 · Functions and Their Behaviour · Lesson 3 of 3**
-**Pillar: Transformation** · *How function composition encodes every graph transformation without memorisation*
 
 ---
 
-## What You Will Build
+Here is something that trips up almost every algebra student: if $f$ has a peak at $x = 3$, where is the peak of $f(x + 2)$?
 
-A Canvas showing a base function and its transformations (shifts, stretches, reflections) side by side. A Python program verifying that every graph transformation is just function composition — so you can read a formula like $f(2x - 3) + 4$ and immediately know what it does to the graph of $f$ without computing anything.
+Most students say $x = 5$. The answer is $x = 1$.
 
----
-
-## What You Need to Know First
-
-- M-008: functions as sets (domain, codomain, rule)
-- M-009: inverse functions
+Adding to $x$ shifts the graph *left*, not right. Subtracting shifts it right. Every student is told this rule; almost nobody is told why. Today we derive the reason — and discover that it follows from understanding **composition**, which is how all function transformations are built.
 
 ---
 
-> **Quick Check — try to answer before reading:**
->
-> 1. Does $f(g(x)) = g(f(x))$ in general? Give a counterexample.
-> 2. If $f(x)$ has a maximum at $x = 2$, where does $f(x - 3)$ have its maximum?
-> 3. If you know $g(x)$ is the graph of $f(x)$ shifted right by 2, what is $g$ in terms of $f$?
->
-> *(Answers at the end of this lesson)*
+## Composition: One Function After Another
 
----
+The **composition** of $f: B \to C$ and $g: A \to B$ is the function:
 
-## The Lesson
-
-### Composition
-
-The **composition** of $f: B \to C$ and $g: A \to B$ is:
 $$(f \circ g)(x) = f(g(x))$$
 
-Apply $g$ first, then $f$. The domain of $f \circ g$ is $A$; the codomain is $C$.
+Apply $g$ first, then feed the result into $f$. The notation $f \circ g$ is read "$f$ of $g$" — and like reading, you evaluate it right to left.
 
-**Why the order**: $f \circ g$ means "$f$ of $g$" — $g$ acts first. The notation reads right to left, just as $(f \circ g)(x) = f(g(x))$ — you evaluate right to left.
+**Example.** $f(x) = x^2$ and $g(x) = x + 1$.
 
-**Composition is not commutative** in general. $f \circ g \neq g \circ f$.
-
-Example: $f(x) = x^2$, $g(x) = x + 1$.
-
-$(f \circ g)(x) = f(g(x)) = f(x+1) = (x+1)^2 = x^2 + 2x + 1$
+$(f \circ g)(x) = f(g(x)) = f(x+1) = (x+1)^2$
 
 $(g \circ f)(x) = g(f(x)) = g(x^2) = x^2 + 1$
 
-These are different functions.
-
-**Composition is associative**: $(f \circ g) \circ h = f \circ (g \circ h)$. (The order of evaluation is determined by the order of composition, not the grouping.)
-
-**Identity function**: $\text{id}_A: A \to A$ defined by $\text{id}_A(x) = x$ satisfies $f \circ \text{id}_A = f$ and $\text{id}_B \circ f = f$. The identity is the neutral element for composition.
-
-**CS lens:** Function composition is exactly how pipelines work in functional programming. In Haskell, `(f . g) x = f (g x)`. In Unix, `cmd1 | cmd2 | cmd3` composes three programs. Understanding composition as a mathematical operation makes you understand why pipelines compose — and why they don't commute.
-
----
-
-### Graph Transformations from Composition
-
-Every standard graph transformation is a composition. Once you understand this, you need to memorise **nothing**.
-
-**The key principle:** $y = f(g(x))$ is the graph of $f$ with the variable replaced by $g(x)$. The graph of $f$ is moved/scaled in whatever way makes the new formula true.
-
-**Vertical shift:** $y = f(x) + c$
-
-This is the composition $(T_c \circ f)(x)$ where $T_c(y) = y + c$ is translation by $c$. The whole curve shifts up by $c$.
-
-*Why up?* Because we are adding $c$ to the output. The point $(x, f(x))$ on the original curve becomes $(x, f(x) + c)$ — same $x$, output increased by $c$.
-
-**Horizontal shift:** $y = f(x + c)$
-
-This is $f(S_c(x))$ where $S_c(x) = x + c$. The curve shifts **left** by $c$.
-
-*Why left when we add $c$?* This is the one that always confuses. Think: the original graph has a special feature at $x = a$ (a maximum, a zero, whatever). For $f(x+c)$: the feature appears at the new $x$ where $x + c = a$, i.e. $x = a - c$. If $c > 0$, the feature moved to $x = a - c < a$ — it moved left.
-
-*Algebraically:* The point $(a, f(a))$ on the original graph satisfies $y = f(x)$ at $x = a$. On the shifted graph $y = f(x+c)$: the same $y$-value appears at $x = a - c$ (since $f((a-c)+c) = f(a)$). The $x$-coordinate decreased by $c$.
-
-**Horizontal scaling:** $y = f(cx)$ for $c > 1$
-
-The graph is compressed horizontally by a factor of $c$. The original feature at $x = a$ is now at $x = a/c < a$.
-
-*Why compressed when $c > 1$?* The feature appears where $cx = a$, i.e. $x = a/c$. Since $c > 1$, $a/c < a$ — the feature is closer to the origin.
-
-**Reflection:** $y = f(-x)$ reflects the graph across the $y$-axis. $y = -f(x)$ reflects across the $x$-axis.
-
-**Reading a complicated formula:** $y = 2f(3x - 6) + 1$. Rewrite $3x - 6 = 3(x - 2)$.
-
-- $f(3(x-2))$: horizontal compression by 3, then horizontal shift right by 2.
-- $2f(\ldots)$: vertical stretch by 2.
-- $2f(\ldots) + 1$: vertical shift up by 1.
-
-You can read off the transformation without computing. This is the power of understanding composition.
-
-```javascript
-// Canvas: base function and four transformations
-const canvas = document.createElement('canvas');
-canvas.width = 700;
-canvas.height = 500;
-document.body.appendChild(canvas);
-const ctx = canvas.getContext('2d');
-ctx.fillStyle = '#0d1117';
-ctx.fillRect(0, 0, 700, 500);
-
-// Draw a single plot panel
-function drawPanel(panelX, panelY, width, height, title, fn, color) {
-    const margin = 30;
-    const plotW = width - 2*margin;
-    const plotH = height - 2*margin - 20;
-
-    // Background
-    ctx.fillStyle = '#111827';
-    ctx.fillRect(panelX, panelY, width, height);
-
-    // Title
-    ctx.fillStyle = '#ddd';
-    ctx.font = '11px monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText(title, panelX + width/2, panelY + 15);
-
-    // Axes
-    const axX = panelX + margin;
-    const axY = panelY + margin + 20 + plotH / 2;
-    ctx.strokeStyle = '#333';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(panelX + margin, axY);
-    ctx.lineTo(panelX + margin + plotW, axY);
-    ctx.moveTo(panelX + margin + plotW/2, panelY + margin + 20);
-    ctx.lineTo(panelX + margin + plotW/2, panelY + margin + 20 + plotH);
-    ctx.stroke();
-
-    // Plot function: x in [-3, 3], y in [-2, 2]
-    const toCanvasX = mx => panelX + margin + (mx + 3) / 6 * plotW;
-    const toCanvasY = my => axY - my / 2 * plotH;
-
-    ctx.beginPath();
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2;
-    let first = true;
-    for (let i = 0; i <= 300; i++) {
-        const mx = -3 + i * 6 / 300;
-        let my;
-        try { my = fn(mx); } catch { first = true; continue; }
-        if (!isFinite(my) || Math.abs(my) > 2.5) { first = true; continue; }
-        const cx = toCanvasX(mx);
-        const cy = toCanvasY(my);
-        if (first) { ctx.moveTo(cx, cy); first = false; }
-        else ctx.lineTo(cx, cy);
-    }
-    ctx.stroke();
-}
-
-// Base function: a parabola-like shape
-const baseF = x => x < 0 ? Math.cos(Math.PI * x / 2) * 1.5 : Math.exp(-x) * 1.5;
-
-const panels = [
-    { title: 'f(x)  [original]',   fn: x => baseF(x),        color: '#4fc3f7' },
-    { title: 'f(x) + 1  [up 1]',   fn: x => baseF(x) + 1,    color: '#66bb6a' },
-    { title: 'f(x-1)  [right 1]',  fn: x => baseF(x - 1),    color: '#ff9800' },
-    { title: 'f(2x)  [compressed]',fn: x => baseF(2 * x),     color: '#ce93d8' },
-    { title: '-f(x)  [flipped]',   fn: x => -baseF(x),        color: '#ef5350' },
-    { title: 'f(-x)  [mirrored]',  fn: x => baseF(-x),        color: '#ffb74d' },
-];
-
-const cols = 3, rows = 2;
-const pw = 700 / cols, ph = 240 / rows;
-panels.forEach((p, i) => {
-    const col = i % cols, row = Math.floor(i / cols);
-    drawPanel(col * pw, row * ph + 20, pw - 4, ph - 4, p.title, p.fn, p.color);
-});
-
-ctx.fillStyle = '#aaa';
-ctx.font = '11px serif';
-ctx.textAlign = 'center';
-ctx.fillText('Each panel shows the same base function under a different transformation', 350, 490);
-```
+These are different functions. **Composition is not commutative** — the order matters.
 
 ```python
-# Verify graph transformation rules numerically
-
-import math
-
-def base_f(x):
-    """A specific function: sin(x) + 0.3 * x"""
-    return math.sin(x) + 0.3 * x
-
-# Transformation rules:
-# f(x) + c  →  shift up by c
-# f(x - c)  →  shift right by c (note the sign!)
-# f(c*x)    →  horizontal compression by c (c > 1)
-# c * f(x)  →  vertical stretch by c
-
-test_x = [0.5, 1.0, 2.0, -1.0]
-
-print("Transformation verification: checking where features move")
-print()
-
-# Vertical shift by c = 2: point (x, f(x)) becomes (x, f(x)+2)
-c = 2
-print(f"Vertical shift by {c}: f(x) + {c}")
-for x in test_x:
-    original = base_f(x)
-    shifted  = base_f(x) + c
-    print(f"  x={x}: f(x)={original:.4f}, f(x)+{c}={shifted:.4f} (y moved by {c})")
-print()
-
-# Horizontal shift right by 1: f(x-1) — feature at x=a is now at x=a+1
-print("Horizontal shift right by 1: f(x - 1)")
-print("  Feature that was at x=a is now at x=a+1")
-for x in test_x:
-    original_at_x     = base_f(x)           # f(x): value of original at x
-    shifted_at_x_plus_1 = base_f((x+1) - 1) # f((x+1)-1) = f(x)
-    print(f"  f({x}) = {original_at_x:.4f}  and  f({x+1} - 1) = {shifted_at_x_plus_1:.4f}  [same value, different x-location]")
-print()
-
-# Why f(x+1) shifts LEFT (not right)
-print("Why f(x+1) shifts LEFT by 1:")
-print("  f(x+1) at x=a-1 equals f(a) -- the feature that was at x=a is now at x=a-1")
-for a in [1.0, 2.0]:
-    print(f"  f({a}) = {base_f(a):.4f},  f({a-1}+1) = f({a}) = {base_f(a):.4f}  [feature moved left to x={a-1}]")
-print()
-
-# Composition view: f(g(x)) where g(x) = x + 1
-print("Same thing as composition: f(g(x)) where g(x) = x + 1")
+# Composition is not commutative
+f = lambda x: x**2
 g = lambda x: x + 1
-fog = lambda x: base_f(g(x))
-for x in test_x:
-    print(f"  (f∘g)({x}) = f(g({x})) = f({g(x)}) = {fog(x):.4f}")
+
+x = 3
+fog = f(g(x))   # f(g(3)) = f(4) = 16
+gof = g(f(x))   # g(f(3)) = g(9) = 10
+
+print(f"(f∘g)(3) = f(g(3)) = f({g(x)}) = {fog}")
+print(f"(g∘f)(3) = g(f(3)) = g({f(x)}) = {gof}")
+print(f"Equal? {fog == gof}")
 ```
 
 ---
 
-### Decomposing Functions
+## Stop and Think: The Mystery of Horizontal Shifts
 
-When you see a complicated function, you can often decompose it as a composition of simpler ones. This is how you understand what it does.
+> $f$ has a peak at $x = 3$. Where is the peak of $f(x + 2)$?
 
-Example: $h(x) = \sqrt{x^2 + 1}$.
-
-Let $g(x) = x^2 + 1$ and $f(x) = \sqrt{x}$. Then $h = f \circ g$.
-
-$g$ shifts the parabola up by 1 (so it is always $\geq 1$). $f$ takes the square root. The composition: first square-and-shift, then take the root.
-
-This decomposition matters because:
-- The derivative of $h$ is $(f \circ g)'(x) = f'(g(x)) \cdot g'(x)$ — the chain rule from Phase 6.
-- The integral of $h$ uses $u$-substitution, which is the reverse chain rule (Phase 7).
-
-Understanding composition now means the chain rule will feel natural, not like another formula to memorise.
+Try to answer this before reading on. Be careful.
 
 ---
 
-## Connect the Pieces
+The peak of $f$ occurs where the input equals $3$. In $f(x + 2)$, the input to $f$ is $x + 2$. So the peak of $f(x+2)$ occurs when $x + 2 = 3$, which means $x = 1$.
 
-**Backwards:** M-008 defined functions. M-009 defined inverses. This lesson defines composition — the three core operations on functions.
+The peak moved from $3$ to $1$ — it moved **left** by 2, even though we added 2.
 
-**Forwards:**
-- The chain rule (Phase 6) is $\frac{d}{dx}[f(g(x))] = f'(g(x)) \cdot g'(x)$ — a theorem about derivatives of compositions.
-- $u$-substitution in integration (Phase 7) is the reverse chain rule: recognising $\int f(g(x)) g'(x) dx$ as $\int f(u) du$.
-- Matrix multiplication is composition of linear maps (Phase 10) — the definition is forced by requiring $(AB)(x) = A(Bx)$.
-- Homomorphisms in group theory (Phase 17) are functions that preserve composition: $\phi(f \circ g) = \phi(f) \circ \phi(g)$.
+The reason: adding 2 inside the argument means we reach the "peak input" sooner. We need $x = 1$ now to deliver $x + 2 = 3$ to $f$. The whole graph shifts left.
+
+This is not a rule to memorize. It is the definition of composition.
 
 ---
 
-## What Breaks Without This
+## Every Graph Transformation is a Composition
 
-Without understanding composition:
-- Students apply the chain rule without understanding what they are differentiating — they fail to identify the "inner function" $g$ and "outer function" $f$ in $f(g(x))$.
-- The notation $f^{-1}$ (inverse) is confused with $1/f(x)$ (reciprocal). The inverse is the function that composes with $f$ to give the identity; the reciprocal is $1/f(x)$. These are completely different.
+The key principle: $y = f(g(x))$ applies the function $f$ to a modified input $g(x)$ instead of $x$. The modification $g$ transforms the graph.
+
+**Vertical shift up by $c$:** $y = f(x) + c$
+
+This is $T_c(f(x))$ where $T_c(y) = y + c$. The output is shifted up by $c$.
+
+**Horizontal shift right by $c$:** $y = f(x - c)$
+
+The input $x - c$ equals $a$ when $x = a + c$. Features that were at $x = a$ are now at $x = a + c$. Right shift uses *subtraction*.
+
+**Vertical stretch by $c$:** $y = c \cdot f(x)$ — outputs scaled by $c$.
+
+**Horizontal compression by $c$:** $y = f(cx)$ for $c > 1$ — the feature at $x = a$ moves to $x = a/c$, closer to the origin.
+
+**Reflection across $x$-axis:** $y = -f(x)$ — all outputs negated.
+
+**Reflection across $y$-axis:** $y = f(-x)$ — input negated.
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Base function: a recognisable shape with a clear peak
+def base(x):
+    return np.exp(-0.5 * x**2) * np.cos(x)
+
+x = np.linspace(-4, 4, 400)
+fig, axes = plt.subplots(2, 3, figsize=(12, 7))
+fig.patch.set_facecolor('#0f1117')
+
+configs = [
+    (base(x),          '#4fc3f7', 'f(x)  —  original'),
+    (base(x) + 1,      '#66bb6a', 'f(x) + 1  —  shift up 1'),
+    (base(x - 1.5),    '#ff9800', 'f(x − 1.5)  —  shift right 1.5'),
+    (base(2 * x),      '#ce93d8', 'f(2x)  —  compress horizontally'),
+    (-base(x),         '#ef5350', '−f(x)  —  flip vertical'),
+    (base(-x),         '#ffb74d', 'f(−x)  —  flip horizontal'),
+]
+
+for ax, (y, color, title) in zip(axes.flat, configs):
+    ax.set_facecolor('#0f1117')
+    ax.plot(x, base(x), color='#2a3a50', lw=1, linestyle='--', alpha=0.5)
+    ax.plot(x, y, color=color, lw=2.5)
+    ax.axhline(0, color='#3a4060', lw=0.8)
+    ax.axvline(0, color='#3a4060', lw=0.8)
+    ax.set_ylim(-2.2, 2.2)
+    ax.set_title(title, color=color, fontsize=10, pad=4)
+    ax.tick_params(colors='#555')
+    for sp in ax.spines.values():
+        sp.set_color('#2a3050')
+
+plt.suptitle('All six transformations — dashed grey is always the original f(x)',
+             color='#5a7a90', fontsize=11, style='italic')
+plt.tight_layout()
+plt.show()
+```
+
+The dashed grey line in each panel is the original $f$. You can see the shift, compression, and reflections directly — and in every case the transformation is a composition with a simple inner or outer function.
 
 ---
 
-## Definition of Done
+## Reading a Complex Formula
 
-- [ ] You can give a counterexample showing $f \circ g \neq g \circ f$ in general
-- [ ] You can explain why $f(x+2)$ shifts the graph left (not right), deriving the direction from the definition
-- [ ] You can describe the transformation applied by $y = 3f(2x - 4) - 1$ without computing
-- [ ] You can decompose $h(x) = \sin(x^2 + 1)$ as a composition and name each part
-- [ ] You ran both code blocks and can explain what the canvas shows and what the Python verifies
+$y = 2f(3x - 6) + 1$. What transformation is this?
 
-**Proof reconstruction (Sunday):** Show that composition is associative: $(f \circ g) \circ h = f \circ (g \circ h)$. Then identify the inner and outer functions for: $\sin(3x+1)$, $e^{x^2}$, $\sqrt{\ln x}$.
+Rewrite: $3x - 6 = 3(x - 2)$.
+
+- $f(3(x - 2))$: horizontal compression by $3$, then shift right by $2$
+- $2f(\ldots)$: vertical stretch by $2$
+- $2f(\ldots) + 1$: shift up by $1$
+
+You can read the transformation directly from the formula. No computing, no table-lookup.
+
+> **Always rewrite** the inner function in the form $c(x - h)$ to separate the stretch ($c$) from the shift ($h$).
 
 ---
 
-## Answers to Quick Check
+## Decomposing Functions into Parts
 
-1. No. $f(x) = x+1$, $g(x) = x^2$: $(f \circ g)(x) = x^2 + 1$ but $(g \circ f)(x) = (x+1)^2 = x^2 + 2x + 1$. Different.
-2. $f(x - 3)$ shifts the graph right by 3. So the maximum moves from $x = 2$ to $x = 2 + 3 = 5$.
-3. $g(x) = f(x - 2)$ — the rule for a rightward shift is subtracting the shift amount from the argument.
+Any complicated function can be written as a composition of simpler ones. This decomposition reveals the structure of the function.
+
+$h(x) = \sqrt{x^2 + 1}$: let $g(x) = x^2 + 1$ and $f(u) = \sqrt{u}$. Then $h = f \circ g$.
+
+$h(x) = \sin(e^x)$: let $g(x) = e^x$ and $f(u) = \sin u$.
+
+$h(x) = (3x + 1)^5$: let $g(x) = 3x + 1$ and $f(u) = u^5$.
+
+This decomposition is not just organisational. It is exactly what the **chain rule** uses: when you differentiate $f(g(x))$, you need to know which part is the "outer" function $f$ and which is the "inner" function $g$. Understanding composition now means the chain rule in Phase 6 will feel like a natural next step, not a new formula.
+
+---
+
+## Stop and Think: Associativity
+
+> Is composition associative? That is, does $(f \circ g) \circ h$ always equal $f \circ (g \circ h)$?
+
+Think about what both sides mean: both say "apply $h$, then $g$, then $f$." The grouping only determines which composition you compute first — but the order of applying the functions is fixed by the notation. So yes, composition is always associative.
+
+This means for any three functions $f$, $g$, $h$:
+$$((f \circ g) \circ h)(x) = f(g(h(x))) = (f \circ (g \circ h))(x)$$
+
+---
+
+## Try It Yourself
+
+**Challenge 1.** For each function, identify the inner function $g$ and outer function $f$ such that $h = f \circ g$:
+
+- $h(x) = (x^2 + 1)^3$
+- $h(x) = \sin(2x - \pi)$
+- $h(x) = e^{-x^2}$
+- $h(x) = \ln(\cos x)$
+
+**Challenge 2.** The function $y = f(x)$ has: a zero at $x = -1$, a maximum at $x = 2$, a minimum at $x = 5$. Without knowing the formula, state the zeros, maxima, and minima of $y = f(2x - 4)$.
+
+**Challenge 3.** Prove that composition is associative directly from the definition: show that $((f \circ g) \circ h)(x) = (f \circ (g \circ h))(x)$ for every $x$.
+
+---
+
+## What Comes Next
+
+Phase 2 is complete. We have defined functions (M-008), their inverses (M-009), and how they compose (M-010).
+
+Phase 3 begins with polynomials. You have been computing with polynomials for years — expanding, factoring, solving. M-011 reveals what polynomials *are* algebraically, why every polynomial over $\mathbb{R}$ factors into linear and quadratic pieces, and why the connection between roots and factors is not a coincidence but a theorem.

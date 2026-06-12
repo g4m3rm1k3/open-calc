@@ -437,11 +437,11 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle, series
             {code.trim() && (
               <button
                 onClick={handleOpenCodeLens}
-                title="Open in CodeLens"
-                className="flex items-center gap-1 px-2 py-1 rounded text-slate-400 hover:text-cyan-400 hover:bg-slate-700 text-xs transition-colors"
+                title="Visualise this code step-by-step in CodeLens"
+                className="flex items-center gap-1.5 px-3 py-1 rounded-md bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition-colors shadow shadow-cyan-900/40"
               >
                 <ExternalLink size={11} />
-                CodeLens
+                Open in CodeLens
               </button>
             )}
             <button
@@ -511,15 +511,18 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle, series
 
         {/* CodeLens invite */}
         {isCodeLens && (
-          <div className="px-4 py-3 border-b border-slate-800">
-            <div className="flex items-center gap-3">
-              <p className="flex-1 text-sm text-slate-300">{currentSeg.text}</p>
+          <div className="px-4 py-4 border-b border-cyan-900/40 bg-cyan-950/30">
+            <div className="flex items-center gap-4">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center">
+                <ExternalLink size={15} className="text-cyan-400" />
+              </div>
+              <p className="flex-1 text-sm text-slate-200 leading-relaxed">{currentSeg.text}</p>
               <button
                 onClick={handleOpenCodeLens}
-                className="flex items-center gap-2 px-3 py-1.5 rounded bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-medium transition-colors shrink-0"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-bold transition-all shadow-lg shadow-cyan-900/50 hover:shadow-cyan-700/50 shrink-0 hover:scale-105"
               >
                 <ExternalLink size={14} />
-                Open in CodeLens
+                Open in CodeLens →
               </button>
             </div>
           </div>
