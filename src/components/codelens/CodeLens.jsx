@@ -1,13 +1,15 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
-import Editor from '@monaco-editor/react'
+import Editor, { useMonaco } from '@monaco-editor/react'
 import { buildProgramModel } from './parser/jsParser.js'
 import { run as runInterpreter } from './interpreter/interpreter.js'
 import { EXPLAIN } from './eventStream.js'
+import { buildHeapSnapshot } from './renderer/heapSnapshot.js'
+import HeapGraph from './renderer/HeapGraph.jsx'
 import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
 import {
   ChevronRight, ChevronDown, Code2, Boxes, Braces, ArrowLeft,
   Zap, Play, StepForward, StepBack, SkipForward, Terminal,
-  Palette, Info,
+  Palette, Info, Network,
 } from 'lucide-react'
 
 // ── Theme config ──────────────────────────────────────────────────────────────
@@ -271,14 +273,17 @@ function StackFrame({ frame, depth }) {
 export default function CodeLens({ onBack, initialCode }) {
   const [source, setSource]         = useState(initialCode ?? STARTER)
   const [model, setModel]           = useState(null)
-  const [execution, setExecution]   = useState(null)   // { events, output, error }
+  const [execution, setExecution]   = useState(null)
   const [step, setStep]             = useState(0)
   const [running, setRunning]       = useState(false)
-  const [tab, setTab]               = useState('structure') // structure | tokens | ast
-  const [rightTab, setRightTab]     = useState('execution') // execution | stack | output
+  const [tab, setTab]               = useState('structure')
+  const [rightTab, setRightTab]     = useState('execution')
   const [theme, setTheme]           = useState('monokai')
   const [showThemes, setShowThemes] = useState(false)
   const eventListRef                = useRef(null)
+  const editorRef                   = useRef(null)
+  const decorRef                    = useRef([])
+  const monaco                      = useMonaco()
 
   // Parse live as we type
   useEffect(() => { setModel(buildProgramModel(source)) }, [])
@@ -286,6 +291,26 @@ export default function CodeLens({ onBack, initialCode }) {
     const id = setTimeout(() => setModel(buildProgramModel(source)), 400)
     return () => clearTimeout(id)
   }, [source])
+
+  // Source line highlighting — update Monaco decoration on every step
+  useEffect(() => {
+    const ed = editorRef.current
+    if (!ed || !monaco) return
+    const line = currentEvent?.sourceLocation?.line
+    if (!line) {
+      decorRef.current = ed.deltaDecorations(decorRef.current, [])
+      return
+    }
+    decorRef.current = ed.deltaDecorations(decorRef.current, [{
+      range: new monaco.Range(line, 1, line, 1),
+      options: {
+        isWholeLine: true,
+        className: 'cl-exec-line',
+        overviewRulerColor: '#6366f1',
+      }
+    }])
+    ed.revealLineInCenterIfOutsideViewport(line)
+  })
 
   // Auto-scroll event list to current step
   useEffect(() => {
@@ -316,10 +341,15 @@ export default function CodeLens({ onBack, initialCode }) {
     { id: 'tokens',    label: 'Tokens',    icon: Zap },
     { id: 'ast',       label: 'AST',       icon: Braces },
   ]
+  const heapSnapshot = execution
+    ? buildHeapSnapshot(execution.events, step)
+    : null
+
   const RTABS = [
-    { id: 'execution', label: 'Execution', icon: Play },
-    { id: 'stack',     label: 'Stack',     icon: Info },
-    { id: 'output',    label: 'Output',    icon: Terminal },
+    { id: 'execution', label: 'Events',  icon: Play },
+    { id: 'heap',      label: 'Heap',    icon: Network },
+    { id: 'stack',     label: 'Stack',   icon: Info },
+    { id: 'output',    label: 'Output',  icon: Terminal },
   ]
 
   return (
@@ -327,6 +357,12 @@ export default function CodeLens({ onBack, initialCode }) {
       display: 'flex', flexDirection: 'column', height: '100%',
       background: '#080c14', color: '#e2e8f0',
     }}>
+      <style>{`
+        .cl-exec-line {
+          background: rgba(99,102,241,0.14) !important;
+          border-left: 3px solid #6366f1 !important;
+        }
+      `}</style>
       {/* ── Header ── */}
       <div style={{
         display: 'flex', alignItems: 'center', gap: 10,
@@ -462,6 +498,7 @@ export default function CodeLens({ onBack, initialCode }) {
                 onChange={v => setSource(v ?? '')}
                 theme={THEMES.find(t => t.id === theme)?.monaco ?? 'monokai'}
                 beforeMount={setupOpenCalcMonaco}
+                onMount={ed => { editorRef.current = ed }}
                 options={{
                   fontSize: 13,
                   minimap: { enabled: false },
@@ -520,7 +557,7 @@ export default function CodeLens({ onBack, initialCode }) {
             ))}
           </div>
 
-          <div style={{ flex: 1, minHeight: 0, overflow: 'auto' }} ref={eventListRef}>
+          <div style={{ flex: 1, minHeight: 0, overflow: rightTab === 'heap' ? 'hidden' : 'auto' }} ref={eventListRef}>
             {rightTab === 'execution' && (
               execution ? (
                 execution.events.length === 0
@@ -541,6 +578,9 @@ export default function CodeLens({ onBack, initialCode }) {
                   </span>
                 </div>
               )
+            )}
+            {rightTab === 'heap' && (
+              <HeapGraph snapshot={heapSnapshot} />
             )}
             {rightTab === 'stack' && (
               currentEvent ? (
@@ -579,61 +619,181 @@ export default function CodeLens({ onBack, initialCode }) {
           </div>
         </div>
 
-        {/* Right: current event detail */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, minHeight: 0 }}>
-          {currentEvent ? (
-            <>
-              {/* Event explanation */}
-              <Panel title="Current Step" icon={Info} style={{ flexShrink: 0 }}>
-                <EventCard event={currentEvent} active={false} />
-                {currentEvent.sourceLocation && (
-                  <div style={{ fontSize: 11, color: '#475569', marginTop: 6, fontFamily: 'JetBrains Mono, monospace' }}>
-                    Line {currentEvent.sourceLocation.line}, Col {currentEvent.sourceLocation.column}
-                  </div>
-                )}
-              </Panel>
+        {/* Right: explanation hero + call stack */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, minHeight: 0, overflow: 'auto' }}>
+          {currentEvent
+            ? <ExplainHero event={currentEvent} step={step} total={totalSteps} />
+            : <IdleHero />
+          }
 
-              {/* Heap deltas */}
-              {currentEvent.heapDelta?.length > 0 && (
-                <Panel title="Heap Changes" icon={Boxes} badge={currentEvent.heapDelta.length}>
-                  {currentEvent.heapDelta.map((d, i) => (
-                    <div key={i} style={{
-                      padding: '5px 8px', borderRadius: 6, marginBottom: 4,
-                      background: d.op === 'create' ? '#14532d22' : '#78350f22',
-                      border: `1px solid ${d.op === 'create' ? '#14532d' : '#78350f'}`,
-                      fontFamily: 'JetBrains Mono, monospace', fontSize: 11,
-                    }}>
-                      <span style={{ color: d.op === 'create' ? '#86efac' : '#fcd34d' }}>
-                        {d.op === 'create' ? `+ ${d.objectType} #${d.objectId}` : `~ #${d.objectId}.${d.property}`}
-                      </span>
-                      {d.op === 'mutate' && (
-                        <span style={{ color: '#94a3b8' }}>
-                          {' '}{JSON.stringify(d.oldValue)} → {JSON.stringify(d.newValue)}
-                        </span>
-                      )}
-                    </div>
-                  ))}
-                </Panel>
-              )}
-
-              {/* Call stack summary */}
-              <Panel title="Call Stack" icon={Code2} badge={currentEvent.stackSnapshot?.length ?? 0} style={{ flex: 1 }}>
-                {currentEvent.stackSnapshot?.length > 0 ? (
-                  [...currentEvent.stackSnapshot].reverse().map((frame, i) => (
-                    <StackFrame key={i} frame={frame} depth={currentEvent.stackSnapshot.length - 1 - i} />
-                  ))
-                ) : (
-                  <span style={{ color: '#475569', fontSize: 12 }}>Global scope</span>
-                )}
-              </Panel>
-            </>
-          ) : (
-            <Panel title="Step Details" icon={Info} style={{ flex: 1 }}>
-              <span style={{ color: '#475569', fontSize: 12 }}>
-                Run code and use the step controls to inspect each execution event.
-              </span>
+          {/* Heap deltas */}
+          {currentEvent?.heapDelta?.length > 0 && (
+            <Panel title="Heap Changes" icon={Boxes} badge={currentEvent.heapDelta.length}>
+              {currentEvent.heapDelta.map((d, i) => (
+                <div key={i} style={{
+                  padding: '5px 8px', borderRadius: 6, marginBottom: 4,
+                  background: d.op === 'create' ? '#14532d22' : '#78350f22',
+                  border: `1px solid ${d.op === 'create' ? '#14532d' : '#78350f'}`,
+                  fontFamily: 'JetBrains Mono, monospace', fontSize: 11,
+                }}>
+                  <span style={{ color: d.op === 'create' ? '#86efac' : '#fcd34d' }}>
+                    {d.op === 'create' ? `+ ${d.objectType} #${d.objectId}` : `~ #${d.objectId}.${d.property}`}
+                  </span>
+                  {d.op === 'mutate' && (
+                    <span style={{ color: '#94a3b8' }}>
+                      {' '}{JSON.stringify(d.oldValue)} → {JSON.stringify(d.newValue)}
+                    </span>
+                  )}
+                </div>
+              ))}
             </Panel>
           )}
+
+          {/* Call stack */}
+          {currentEvent && (
+            <Panel title="Call Stack" icon={Code2} badge={currentEvent.stackSnapshot?.length ?? 0}>
+              {currentEvent.stackSnapshot?.length > 0 ? (
+                [...currentEvent.stackSnapshot].reverse().map((frame, i) => (
+                  <StackFrame key={i} frame={frame} depth={currentEvent.stackSnapshot.length - 1 - i} />
+                ))
+              ) : (
+                <span style={{ color: '#475569', fontSize: 12 }}>Global scope</span>
+              )}
+            </Panel>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── Explain hero ─────────────────────────────────────────────────────────────
+
+const EVENT_COLOR = {
+  CALL:        '#818cf8',
+  RETURN:      '#86efac',
+  DECLARE:     '#7dd3fc',
+  ASSIGN:      '#fbbf24',
+  BRANCH:      '#f472b6',
+  LOOP:        '#fb923c',
+  OBJECT_CREATE: '#a78bfa',
+  OBJECT_MUTATE: '#f59e0b',
+  THROW:       '#f87171',
+  CATCH:       '#34d399',
+  BUILTIN:     '#94a3b8',
+}
+function eventColor(type) {
+  for (const [k, v] of Object.entries(EVENT_COLOR)) {
+    if (type.startsWith(k)) return v
+  }
+  return '#94a3b8'
+}
+
+function ExplainHero({ event, step, total }) {
+  const explain = EXPLAIN[event.type]?.(event) ?? { summary: event.type, why: '', concept: '' }
+  const color   = eventColor(event.type)
+  const loc     = event.sourceLocation
+
+  return (
+    <div style={{
+      background: '#0a0f1e',
+      border: `1px solid ${color}33`,
+      borderRadius: 12,
+      padding: '16px 16px 14px',
+      flexShrink: 0,
+      position: 'relative',
+      overflow: 'hidden',
+    }}>
+      {/* Subtle glow band at top */}
+      <div style={{
+        position: 'absolute', top: 0, left: 0, right: 0, height: 3,
+        background: `linear-gradient(90deg, ${color}88, ${color}22)`,
+        borderRadius: '12px 12px 0 0',
+      }} />
+
+      {/* Type + concept row */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+        <span style={{
+          fontSize: 10, padding: '2px 7px', borderRadius: 99,
+          background: `${color}22`, color, border: `1px solid ${color}55`,
+          fontFamily: 'JetBrains Mono, monospace', fontWeight: 700, letterSpacing: '.04em',
+        }}>{event.type}</span>
+        {explain.concept && (
+          <span style={{
+            fontSize: 10, padding: '2px 7px', borderRadius: 99,
+            background: '#1e293b', color: '#64748b', border: '1px solid #334155',
+            fontFamily: 'JetBrains Mono, monospace',
+          }}>{explain.concept}</span>
+        )}
+        {loc && (
+          <span style={{
+            marginLeft: 'auto', fontSize: 10,
+            color: '#334155', fontFamily: 'JetBrains Mono, monospace',
+          }}>L{loc.line}</span>
+        )}
+      </div>
+
+      {/* Summary — the hero text */}
+      <div style={{
+        fontSize: 15, fontWeight: 600, color: '#f1f5f9',
+        lineHeight: 1.45, marginBottom: explain.why ? 12 : 0,
+        fontFamily: 'JetBrains Mono, monospace',
+      }}>
+        {explain.summary}
+      </div>
+
+      {/* Why — the explanation */}
+      {explain.why && (
+        <div style={{
+          fontSize: 12, color: '#64748b', lineHeight: 1.65,
+          borderTop: '1px solid #1e293b', paddingTop: 10,
+        }}>
+          {explain.why}
+        </div>
+      )}
+
+      {/* Step counter */}
+      <div style={{
+        marginTop: 12, display: 'flex', alignItems: 'center', gap: 8,
+      }}>
+        <div style={{
+          flex: 1, height: 2, background: '#1e293b', borderRadius: 2, overflow: 'hidden',
+        }}>
+          <div style={{
+            height: '100%', width: `${((step + 1) / total) * 100}%`,
+            background: color, borderRadius: 2,
+            transition: 'width 0.15s',
+          }} />
+        </div>
+        <span style={{
+          fontSize: 10, color: '#334155', fontFamily: 'JetBrains Mono, monospace',
+          whiteSpace: 'nowrap',
+        }}>{step + 1} / {total}</span>
+      </div>
+    </div>
+  )
+}
+
+function IdleHero() {
+  return (
+    <div style={{
+      background: '#0a0f1e', border: '1px solid #1e293b', borderRadius: 12,
+      padding: '24px 16px', display: 'flex', flexDirection: 'column',
+      alignItems: 'center', gap: 12, flexShrink: 0,
+    }}>
+      <div style={{
+        width: 40, height: 40, borderRadius: '50%',
+        background: '#1e1b4b', display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}>
+        <Play size={18} color="#6366f1" />
+      </div>
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: '#e2e8f0', marginBottom: 6 }}>
+          Ready to trace
+        </div>
+        <div style={{ fontSize: 12, color: '#475569', lineHeight: 1.6 }}>
+          Press Run, then use Step or the slider<br />
+          to walk through every line as it executes.
         </div>
       </div>
     </div>
