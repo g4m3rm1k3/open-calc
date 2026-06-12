@@ -18,8 +18,11 @@ function addImplicitReturn(code) {
   }
   if (lastIdx === -1) return code
   const last = lines[lastIdx].trim()
-  if (/^(const|let|var|function|class|if|for|while|do|switch|try|throw|return|{|})/.test(last)) return code
-  const expr = last.replace(/;$/, '')
+  // Strip inline comment (e.g. "foo(); // note") before analyzing
+  const withoutComment = last.replace(/\/\/.*$/, '').trim()
+  if (!withoutComment) return code
+  if (/^(const|let|var|function|class|if|for|while|do|switch|try|throw|return|{|})/.test(withoutComment)) return code
+  const expr = withoutComment.replace(/;$/, '')
   lines[lastIdx] = lines[lastIdx].replace(last, `return (${expr})`)
   return lines.join('\n')
 }
@@ -85,7 +88,7 @@ function ProgressBar({ checkpoints, reachedCp }) {
 
 // ── Output panel ──────────────────────────────────────────────────────────────
 
-function OutputPanel({ logs, error, challengeResult, expectedOutput }) {
+function OutputPanel({ logs, error, challengeResult, expectedOutput, testDetail }) {
   const borderColor = challengeResult === 'pass' ? 'border-l-2 border-l-green-500' : challengeResult === 'fail' ? 'border-l-2 border-l-red-500' : ''
   return (
     <div className={`flex flex-col h-full bg-[#070b13] border-l border-slate-800 ${borderColor}`}>
@@ -111,7 +114,17 @@ function OutputPanel({ logs, error, challengeResult, expectedOutput }) {
         ))}
         {error && <div className="text-red-400 mt-1">{error}</div>}
         {!logs.length && !error && <div className="text-slate-600 italic">Run code to see output</div>}
-        {challengeResult === 'fail' && expectedOutput && (
+        {challengeResult === 'fail' && testDetail && (
+          <div className="mt-3 pt-3 border-t border-slate-800">
+            <div className="text-slate-500 text-xs mb-1">Test results</div>
+            {testDetail.split('\n').map((line, i) => (
+              <div key={i} className={`font-mono text-xs leading-relaxed ${line.includes('✗') ? 'text-red-400' : 'text-green-400'}`}>
+                {line}
+              </div>
+            ))}
+          </div>
+        )}
+        {challengeResult === 'fail' && !testDetail && expectedOutput && (
           <div className="mt-3 pt-3 border-t border-slate-800">
             <div className="text-slate-500 text-xs mb-1">Expected</div>
             <div className="text-cyan-300">{expectedOutput}</div>
@@ -151,6 +164,7 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle }) {
   const [logs, setLogs]                       = useState([])
   const [runError, setRunError]               = useState(null)
   const [challengeResult, setChallengeResult] = useState(null)
+  const [testDetail, setTestDetail]           = useState(null)
   const [hint, setHint]                       = useState(false)
   const [reachedCp, setReachedCp]             = useState(savedCp ? getReachedCpsUpTo(savedCp.cpId) : [])
 
@@ -178,9 +192,21 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle }) {
           setLogs([])
           setRunError(null)
           setChallengeResult(null)
+          setTestDetail(null)
         }
         if (seg.text) await speak(seg.text)
         if (pauseRef.current) return
+
+        // If this segment has code, auto-run it so the output is visible,
+        // then pause so the user can experiment before moving on.
+        if (seg.code !== null && seg.code !== undefined) {
+          const { logs: autoLogs, error: autoErr } = runCode(seg.code)
+          setLogs(autoLogs)
+          setRunError(autoErr)
+          setPhase('paused')
+          return
+        }
+
         await sleep(300)
 
       } else if (seg.type === 'checkpoint') {
@@ -193,6 +219,7 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle }) {
         setLogs([])
         setRunError(null)
         setChallengeResult(null)
+        setTestDetail(null)
         setHint(false)
         if (seg.text) await speak(seg.text)
         return
@@ -211,7 +238,8 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle }) {
   }, [segments, speak, lesson.id])
 
   function handlePlay() {
-    if (phase === 'paused' || phase === 'idle') runFrom(segIdx)
+    if (phase === 'idle')   runFrom(segIdx)
+    if (phase === 'paused') runFrom(segIdx + 1)
   }
 
   function handlePause() {
@@ -230,6 +258,7 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle }) {
     setLogs([])
     setRunError(null)
     setChallengeResult(null)
+    setTestDetail(null)
     setReachedCp([])
     setHint(false)
   }
@@ -241,8 +270,33 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle }) {
     setLogs(newLogs)
     setRunError(error)
     if (isChallenge && currentSeg?.validate) {
-      const passed = currentSeg.validate({ logs: newLogs, result, error, code })
+      const { passed, detail } = runValidate(currentSeg, { logs: newLogs, result, error, code })
       setChallengeResult(passed ? 'pass' : 'fail')
+      setTestDetail(passed ? null : (detail ?? null))
+    }
+  }
+
+  function runValidate(seg, ctx) {
+    try {
+      const passed = seg.validate(ctx)
+      if (passed) return { passed: true }
+      // Run the test cases from the segment to generate a diff
+      if (seg.tests) {
+        const lines = seg.tests.map(({ call, expected }) => {
+          try {
+            const fn = new Function('console', `"use strict";\n${ctx.code}\nreturn (${call})`)
+            const got = fn({ log: () => {}, error: () => {}, warn: () => {} })
+            const ok = got === expected
+            return `${call} → ${JSON.stringify(got)} (expected ${JSON.stringify(expected)})${ok ? ' ✓' : ' ✗'}`
+          } catch (e) {
+            return `${call} → error: ${e.message} (expected ${JSON.stringify(expected)}) ✗`
+          }
+        })
+        return { passed: false, detail: lines.join('\n') }
+      }
+      return { passed: false }
+    } catch {
+      return { passed: false }
     }
   }
 
@@ -300,6 +354,16 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle }) {
             </div>
             <span className="text-xs text-slate-500 font-mono ml-1">script.js</span>
             <div className="flex-1" />
+            {code.trim() && (
+              <button
+                onClick={handleOpenCodeLens}
+                title="Open in CodeLens"
+                className="flex items-center gap-1 px-2 py-1 rounded text-slate-400 hover:text-cyan-400 hover:bg-slate-700 text-xs transition-colors"
+              >
+                <ExternalLink size={11} />
+                CodeLens
+              </button>
+            )}
             <button
               onClick={handleRun}
               className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-green-700/80 hover:bg-green-600 text-white text-xs font-semibold transition-colors"
@@ -336,6 +400,7 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle }) {
             error={runError}
             challengeResult={isChallenge ? challengeResult : null}
             expectedOutput={isChallenge && challengeResult === 'fail' ? currentSeg?.expectedOutput : null}
+            testDetail={isChallenge && challengeResult === 'fail' ? testDetail : null}
           />
         </div>
       </div>
@@ -416,13 +481,13 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle }) {
           ) : (phase === 'idle' || phase === 'paused') && !isChallenge && !isCodeLens ? (
             <button onClick={handlePlay} className="flex items-center gap-2 px-3 py-1.5 rounded bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-medium transition-colors">
               <Play size={14} />
-              {phase === 'idle' ? 'Play' : 'Resume'}
+              {phase === 'idle' ? 'Play' : 'Next'}
             </button>
           ) : null}
 
           {isChallenge && challengeResult === 'pass' && (
             <button
-              onClick={() => { setChallengeResult(null); setHint(false); runFrom(segIdx + 1) }}
+              onClick={() => { setChallengeResult(null); setTestDetail(null); setHint(false); runFrom(segIdx + 1) }}
               className="flex items-center gap-2 px-3 py-1.5 rounded bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-medium transition-colors"
             >
               Continue <ChevronRight size={14} />
@@ -431,7 +496,7 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle }) {
 
           {isChallenge && challengeResult !== 'pass' && (
             <button
-              onClick={() => { setChallengeResult(null); setHint(false); runFrom(segIdx + 1) }}
+              onClick={() => { setChallengeResult(null); setTestDetail(null); setHint(false); runFrom(segIdx + 1) }}
               className="text-xs text-slate-600 hover:text-slate-400 transition-colors"
             >
               Skip challenge
