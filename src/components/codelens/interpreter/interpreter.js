@@ -36,6 +36,7 @@ class Interpreter {
     this.stepId   = 0
     this.heap     = new Heap()
     this.callStack= []   // [{ name, env, returnLine }]
+    this.globalEnv= null // set during execute(), included in every stackSnapshot
     this.output   = []   // console.log lines
     this.labels   = new Map()
   }
@@ -44,6 +45,7 @@ class Interpreter {
 
   execute() {
     const globalEnv = new Environment(null, 'global')
+    this.globalEnv = globalEnv
     this._installGlobals(globalEnv)
 
     this._emit(EventType.PROGRAM_START, null, globalEnv, {

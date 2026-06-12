@@ -561,11 +561,27 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle, series
             <button onClick={handlePause} className="flex items-center gap-2 px-3 py-1.5 rounded bg-slate-700 hover:bg-slate-600 text-white text-sm transition-colors">
               <Pause size={14} /> Pause
             </button>
-          ) : (phase === 'idle' || phase === 'paused') && !isChallenge && !isCodeLens ? (
+          ) : phase === 'idle' && !isChallenge && !isCodeLens ? (
             <button onClick={handlePlay} className="flex items-center gap-2 px-3 py-1.5 rounded bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-medium transition-colors">
-              <Play size={14} />
-              {phase === 'idle' ? 'Play' : 'Next'}
+              <Play size={14} /> Play
             </button>
+          ) : phase === 'paused' && !isChallenge && !isCodeLens ? (
+            <>
+              <button
+                onClick={() => runFrom(segIdx)}
+                className="flex items-center gap-2 px-3 py-1.5 rounded bg-slate-700 hover:bg-slate-600 text-white text-sm transition-colors"
+                title="Replay this segment from the beginning"
+              >
+                <RotateCcw size={13} /> Replay
+              </button>
+              <button
+                onClick={() => runFrom(segIdx + 1)}
+                className="flex items-center gap-2 px-3 py-1.5 rounded bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-medium transition-colors"
+                title="Move to the next segment"
+              >
+                Next <ChevronRight size={14} />
+              </button>
+            </>
           ) : null}
 
           {isChallenge && challengeResult === 'pass' && (
