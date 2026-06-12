@@ -33,6 +33,7 @@
     "@trystero-p2p/nostr": "^0.23.1",
     "@trystero-p2p/torrent": "^0.23.1",
     "@webcontainer/api": "^1.6.4",
+    "@babel/parser": "^7.29.2",
     "acorn": "^8.17.0",
     "d3": "^7.9.0",
     "d3-selection": "^3.0.0",
