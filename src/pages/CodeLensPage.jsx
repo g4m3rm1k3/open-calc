@@ -18,7 +18,7 @@ export default function CodeLensPage() {
       overflow: 'hidden',
       zIndex: 50,
     }}>
-      <CodeLens onBack={() => navigate(-1)} />
+      <CodeLens onBack={() => navigate('/labs')} />
     </div>
   )
 }

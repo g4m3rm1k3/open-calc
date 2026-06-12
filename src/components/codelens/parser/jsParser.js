@@ -46,12 +46,27 @@ export function buildProgramModel(source, filename = 'main.js') {
   const { ast, error: parseError } = parse(source)
 
   const error = tokenError || parseError
-  if (error) return { error, files: [], classes: [], functions: [], imports: [], exports: [] }
+  if (error) return { error, files: [], classes: [], functions: [], variables: [], imports: [], exports: [] }
 
   const classes   = []
   const functions = []
   const imports   = []
   const exports   = []
+
+  // Top-level variable declarations (direct children of Program body only)
+  const variables = []
+  for (const node of ast.body ?? []) {
+    if (node.type === 'VariableDeclaration') {
+      for (const decl of node.declarations) {
+        variables.push({
+          name:     decl.id?.name ?? '?',
+          kind:     node.kind,
+          initType: inferInitType(decl.init),
+          line:     node.loc?.start?.line ?? null,
+        })
+      }
+    }
+  }
 
   walkAST(ast, (node) => {
     if (node.type === 'ClassDeclaration' || node.type === 'ClassExpression') {
@@ -102,6 +117,7 @@ export function buildProgramModel(source, filename = 'main.js') {
     files: [{ path: filename, source, tokens, ast }],
     classes,
     functions,
+    variables,
     imports,
     exports,
     callGraph: buildCallGraph(ast),
@@ -255,6 +271,24 @@ function estimateComplexity(fnNode) {
   if (maxDepth === 2) return 'O(n²)'
   if (maxDepth >= 3) return `O(n^${maxDepth})`
   return 'O(n log n)?'
+}
+
+function inferInitType(init) {
+  if (!init) return null
+  if (init.type === 'Literal')           return typeof init.value   // 'number', 'string', 'boolean'
+  if (init.type === 'ArrayExpression')   return 'array'
+  if (init.type === 'ObjectExpression')  return 'object'
+  if (init.type === 'NewExpression')     return init.callee?.name ? `new ${init.callee.name}` : 'new'
+  if (init.type === 'ArrowFunctionExpression' || init.type === 'FunctionExpression') return 'function'
+  if (init.type === 'CallExpression') {
+    const callee = init.callee
+    if (callee.type === 'Identifier') return `${callee.name}()`
+    if (callee.type === 'MemberExpression') return `${callee.object?.name ?? '?'}.${callee.property?.name ?? '?'}()`
+    return 'call'
+  }
+  if (init.type === 'TemplateLiteral')   return 'string'
+  if (init.type === 'BinaryExpression')  return 'expr'
+  return null
 }
 
 function formatParseError(err) {

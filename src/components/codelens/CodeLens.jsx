@@ -1163,15 +1163,38 @@ function FunctionModal({ node, callGraph, onClose }) {
           </div>
         </ModalSection>
 
-        {/* ── SICP connection ── */}
+        {/* ── Concepts ── */}
         {sicp && (
-          <ModalSection title="SICP Connection">
-            <div style={{
-              borderLeft: '2px solid #6366f1', paddingLeft: 12,
-              fontSize: 13, color: '#64748b', lineHeight: 1.7,
-            }}>
-              <InlineText text={sicp} />
-            </div>
+          <ModalSection title="Concepts">
+            {sicp.pattern && (
+              <span style={{
+                display: 'inline-block', marginBottom: 10,
+                fontSize: 10, padding: '2px 9px', borderRadius: 99,
+                background: '#1e293b', color: '#a5b4fc',
+                border: '1px solid #6366f155',
+                fontFamily: 'JetBrains Mono, monospace',
+              }}>
+                {sicp.pattern}
+              </span>
+            )}
+            <p style={{ margin: '0 0 10px', fontSize: 13, color: '#94a3b8', lineHeight: 1.7 }}>
+              <InlineText text={sicp.body} />
+            </p>
+            {sicp.practice && (
+              <div style={{
+                borderLeft: '2px solid #f59e0b', paddingLeft: 10,
+                fontSize: 12, color: '#78716c', lineHeight: 1.65, marginBottom: 10,
+              }}>
+                <span style={{ color: '#f59e0b', fontWeight: 700, fontFamily: 'JetBrains Mono, monospace',
+                  fontSize: 10 }}>IN PRACTICE  </span>
+                <InlineText text={sicp.practice} />
+              </div>
+            )}
+            {sicp.sicp && (
+              <div style={{ fontSize: 11, color: '#334155', fontFamily: 'JetBrains Mono, monospace' }}>
+                ↗ <InlineText text={sicp.sicp} />
+              </div>
+            )}
           </ModalSection>
         )}
       </div>
@@ -1231,7 +1254,7 @@ function explainComplexity(c) {
   const map = {
     'O(1)':           'Constant time — the same amount of work is done regardless of input size. This is the gold standard. Adding one more element changes nothing.',
     'O(n)':           'Linear time — work grows proportionally with n. Double the input, double the work. A single loop over n elements is typically O(n).',
-    'O(n) recursive': 'Linear recursion — proportional to n but uses the call stack. Each recursive call adds a frame. For very large n this can cause a stack overflow. An iterative version avoids this (SICP §1.2.1).',
+    'O(n) recursive': 'Linear recursion — proportional to n but uses the call stack. Each recursive call adds a frame. For very large n this can cause a stack overflow. An iterative version with an explicit loop avoids this entirely.',
     'O(n²)':          'Quadratic time — double the input, 4× the work. Common in naive sorts (bubble, selection) and nested loops. Fine for small n, expensive for large n.',
     'O(n log n)?':    'Near-linear time — the sweet spot for comparison-based sorting (merge sort, quicksort on average). Much better than O(n²) for large inputs.',
   }
@@ -1239,28 +1262,104 @@ function explainComplexity(c) {
 }
 
 function getSICPNote(node, isRecursive, callsNames, isLeaf, calledByNames) {
+  const isEntryPoint = calledByNames.length === 0
+  const name = node.name
+  const nameLower = name.toLowerCase()
+
   if (isRecursive) {
-    return 'SICP §1.2 distinguishes between a recursive *procedure* (the code calls itself) and a recursive *process* (the shape of the computation). This function creates a recursive process — work accumulates and is resolved on the way back up the call stack. See §1.2.1 for linear recursion and §1.2.2 for tree recursion (like `fib`).'
+    const isBranching = callsNames.filter(n => n === name).length > 1
+      || nameLower.includes('fib') || nameLower.includes('tree')
+    return {
+      pattern: isBranching ? 'Tree Recursion' : 'Divide & Conquer',
+      body: `\`${name}\` breaks the problem into a smaller version of itself, solving the simplest case directly (the base case) and combining sub-results on the way back up. This pattern underlies merge sort, binary search, and tree traversal.`,
+      practice: isBranching
+        ? 'Tree recursion re-computes the same sub-problems exponentially — `fib(50)` makes billions of calls. The fix is memoization: cache results by input so each sub-problem is solved only once. This turns O(2ⁿ) → O(n).'
+        : 'Deep recursion can hit the JS call stack limit (~10k frames). For large inputs, consider memoization to cache repeated sub-problems, or rewrite iteratively using an explicit stack.',
+      sicp: 'SICP §1.2.1 (linear recursion) and §1.2.2 (tree recursion, fibonacci)',
+    }
   }
-  if (node.name.toLowerCase().includes('sort')) {
-    return 'SICP §2.2 covers sequence operations and §2.3.3 covers sets — sorting underpins both. Higher-order functions like `map`, `filter`, and `fold` are the SICP way to express sorted transformations without explicit loops.'
-  }
+
   if (node.kind === 'constructor') {
-    return 'SICP §3.1 introduces mutable state via `set!`. Constructors in OOP encapsulate state in closures — the object is a dispatch procedure that holds variables in its environment. This is message-passing style, introduced in §3.1.2.'
+    return {
+      pattern: 'Encapsulation',
+      body: `A constructor bundles state and behavior into a single unit. Callers interact through the public interface — they don't need to know how \`${name}\` stores or manages its data. This is the core OOP principle: hide what changes, expose what's stable.`,
+      practice: 'Favor immutable objects when possible — it eliminates a whole class of bugs. When state must be mutable, minimize the surface area (Law of Demeter: only talk to your immediate neighbors). Consider factory functions over `new` when you need flexible initialization.',
+      sicp: 'SICP §3.1 — local state, message-passing objects, and the environment model',
+    }
   }
+
   if (node.kind === 'method') {
-    return 'SICP §3.1 shows that objects are really procedures with local state. A method is a message handler — `(account \'withdraw)` returns a procedure that closes over the account\'s balance. The same pattern you\'re using here.'
+    return {
+      pattern: 'Behavioral Abstraction',
+      body: `A method defines how an object responds to a message. The caller doesn't know *how* it works — only *what* it does. This separation (interface vs implementation) lets you change the internals without breaking callers, as long as the contract is preserved.`,
+      practice: 'Keep methods focused — a method that does multiple things is a signal to decompose (Single Responsibility Principle). Methods under ~10 lines are almost always easier to test and reason about than longer ones.',
+      sicp: 'SICP §3.1.2 — objects as procedures with local state',
+    }
   }
-  if (isLeaf && node.params.length >= 2) {
-    return 'SICP §1.1.4 — "Compound Procedures." This is a black box that maps inputs to an output. The key abstraction: the *what* (specification) is separate from the *how* (implementation). Callers should not need to know how `' + node.name + '` works internally.'
+
+  if (node.kind === 'arrow') {
+    return {
+      pattern: 'First-Class Functions',
+      body: 'Arrow functions are values — they can be passed as arguments, returned from other functions, and stored in variables. This enables higher-order patterns: `map`, `filter`, `reduce`, event handlers, and middleware chains.',
+      practice: 'Arrow functions capture `this` lexically — unlike regular functions, they inherit the `this` of their surrounding scope. This makes them safe for callbacks but wrong for methods that need their own `this`.',
+      sicp: 'SICP §1.3 — higher-order procedures; functions as first-class values',
+    }
   }
-  if (isEntryPoint && callsNames && callsNames.length > 1) {
-    return 'This looks like a coordination function — it knows the steps but delegates the work. SICP §1.3 covers higher-order procedures that capture this exact pattern: procedures that take procedures as arguments or return them.'
+
+  if (nameLower.includes('sort') || nameLower.includes('compare')) {
+    return {
+      pattern: 'Algorithmic Complexity',
+      body: 'All comparison-based sorts have a theoretical lower bound of O(n log n) — a mathematical proof from information theory. Algorithms faster than this must avoid comparisons entirely (radix sort, counting sort). The practical choice between quicksort, merge sort, and timsort depends on memory constraints, stability requirements, and cache behavior.',
+      practice: 'JavaScript\'s built-in `Array.sort()` uses timsort — O(n log n) worst-case, stable, and fast in practice for nearly-sorted arrays. Implementing your own sort is rarely necessary unless you need a custom comparator.',
+      sicp: 'SICP §2.2.3 — sequences as conventional interfaces; §2.3.3 — sets and sorting',
+    }
   }
+
+  if (isLeaf) {
+    return {
+      pattern: 'Single Responsibility',
+      body: `\`${name}\` does one thing and delegates nothing — the ideal unit of code. Small, focused functions are easy to test (no mocks needed), easy to name, and easy to compose into larger behavior.`,
+      practice: node.params.length === 0
+        ? 'A function with no parameters that changes behavior must depend on external state or closures. If this is intentional (a thunk or effect), make it explicit. If not, consider accepting the data it needs as a parameter.'
+        : 'If this function can compute the same output from the same inputs with no side effects, it\'s a *pure function* — safe to memoize, safe to parallelize, and trivial to unit test.',
+      sicp: 'SICP §1.1.4 — compound procedures as black-box abstractions',
+    }
+  }
+
+  if (isEntryPoint && callsNames.length > 1) {
+    return {
+      pattern: 'Orchestration / Facade',
+      body: `\`${name}\` coordinates the overall flow — it knows the steps but delegates the work to ${callsNames.map(n => `\`${n}\``).join(', ')}. This separation keeps the entry point readable and the helpers independently reusable and testable.`,
+      practice: 'Keep orchestrators thin. If this function grows beyond ~20 lines, the steps should probably be named and extracted. The ideal orchestrator reads like a series of English sentences: "get the data, validate it, transform it, save it."',
+      sicp: 'SICP §1.3 — abstraction with higher-order procedures',
+    }
+  }
+
+  if (callsNames.length > 0 && calledByNames.length > 0) {
+    return {
+      pattern: 'Layered Architecture',
+      body: `\`${name}\` sits in the middle of the call graph — it translates between levels of abstraction. Called by higher-level code (${calledByNames.map(n => `\`${n}\``).join(', ')}), it handles details that the caller shouldn't need to know about.`,
+      practice: `Middle-layer functions are where abstraction leaks most often. If a caller has to know what \`${name}\` does internally to use it correctly, the interface needs work.`,
+      sicp: null,
+    }
+  }
+
   return null
 }
 
 // ── Static analysis views ─────────────────────────────────────────────────────
+
+const VAR_KIND_COLOR = { const: '#86efac', let: '#fbbf24', var: '#f472b6' }
+const INIT_TYPE_COLOR = {
+  number: '#86efac', string: '#fbbf24', boolean: '#f472b6',
+  array: '#7dd3fc', object: '#818cf8', function: '#a78bfa', expr: '#94a3b8',
+}
+function initColor(t) {
+  if (!t) return '#334155'
+  if (t.startsWith('new ')) return '#a78bfa'
+  if (t.endsWith('()'))     return '#7dd3fc'
+  return INIT_TYPE_COLOR[t] ?? '#475569'
+}
 
 function StructureView({ model, currentEvent, onNodeClick }) {
   if (model?.error) return <span style={{ color: '#ef4444', fontSize: 12 }}>Parse error: {model.error.message}</span>
@@ -1268,33 +1367,78 @@ function StructureView({ model, currentEvent, onNodeClick }) {
 
   const hasGraph   = model.callGraph?.nodes?.length > 0
   const hasClasses = model.classes?.length > 0
+  const hasVars    = model.variables?.length > 0
+  const hasImports = model.imports?.length > 0
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-      {/* Call graph */}
-      {hasGraph && (
-        <CallGraphView callGraph={model.callGraph} currentEvent={currentEvent} onNodeClick={onNodeClick} />
+
+      {/* ── Call graph ── */}
+      {hasGraph
+        ? <CallGraphView callGraph={model.callGraph} currentEvent={currentEvent} onNodeClick={onNodeClick} />
+        : <span style={{ color: '#475569', fontSize: 12 }}>No functions detected.</span>
+      }
+
+      {/* ── Variables ── */}
+      {hasVars && (
+        <>
+          <SectionLabel>VARIABLES</SectionLabel>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {model.variables.map((v, i) => {
+              const kindColor = VAR_KIND_COLOR[v.kind] ?? '#94a3b8'
+              const iColor    = initColor(v.initType)
+              return (
+                <div key={i} style={{
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  padding: '3px 8px', borderRadius: 5, background: '#0d1526',
+                  border: '1px solid #1e293b',
+                }}>
+                  {/* kind badge */}
+                  <span style={{
+                    fontSize: 8, padding: '1px 5px', borderRadius: 3, flexShrink: 0,
+                    background: kindColor + '18', color: kindColor,
+                    border: `1px solid ${kindColor}33`,
+                    fontFamily: 'JetBrains Mono, monospace',
+                  }}>{v.kind}</span>
+
+                  {/* name */}
+                  <span style={{
+                    flex: 1, fontSize: 11, fontFamily: 'JetBrains Mono, monospace',
+                    color: '#e2e8f0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  }}>{v.name}</span>
+
+                  {/* init type */}
+                  {v.initType && (
+                    <span style={{
+                      fontSize: 9, color: iColor, fontFamily: 'JetBrains Mono, monospace',
+                      flexShrink: 0, opacity: 0.8,
+                    }}>{v.initType}</span>
+                  )}
+
+                  {/* line */}
+                  {v.line && (
+                    <span style={{
+                      fontSize: 8, color: '#334155', flexShrink: 0,
+                      fontFamily: 'JetBrains Mono, monospace',
+                    }}>L{v.line}</span>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </>
       )}
 
-      {!hasGraph && (
-        <span style={{ color: '#475569', fontSize: 12 }}>No functions detected.</span>
-      )}
-
-      {/* Classes */}
+      {/* ── Classes ── */}
       {hasClasses && (
         <>
-          {hasGraph && (
-            <div style={{ fontSize: 9, letterSpacing: '.08em', color: '#334155',
-              fontFamily: 'JetBrains Mono, monospace', paddingTop: 4,
-              borderTop: '1px solid #1e293b' }}>
-              CLASSES
-            </div>
-          )}
+          <SectionLabel>CLASSES</SectionLabel>
           {model.classes.map((cls, i) => (
             <div key={i} style={{ padding: '7px 9px', background: '#1e293b', borderRadius: 6 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 5 }}>
                 <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#818cf8' }}>{cls.name}</span>
                 {cls.superclass && <span style={{ fontSize: 10, color: '#64748b' }}>extends {cls.superclass}</span>}
+                {cls.line && <span style={{ marginLeft: 'auto', fontSize: 8, color: '#334155', fontFamily: 'JetBrains Mono, monospace' }}>L{cls.line}</span>}
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
                 {cls.methods.map((m, j) => (
@@ -1310,6 +1454,46 @@ function StructureView({ model, currentEvent, onNodeClick }) {
           ))}
         </>
       )}
+
+      {/* ── Imports ── */}
+      {hasImports && (
+        <>
+          <SectionLabel>IMPORTS</SectionLabel>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {model.imports.map((imp, i) => (
+              <div key={i} style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: '3px 8px', borderRadius: 5,
+                background: '#0d1526', border: '1px solid #1e293b',
+              }}>
+                <span style={{ fontSize: 9, color: '#475569', fontFamily: 'JetBrains Mono, monospace', flexShrink: 0 }}>
+                  from
+                </span>
+                <span style={{ flex: 1, fontSize: 10, color: '#fbbf24', fontFamily: 'JetBrains Mono, monospace',
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {imp.source}
+                </span>
+                <span style={{ fontSize: 9, color: '#475569', fontFamily: 'JetBrains Mono, monospace', flexShrink: 0 }}>
+                  {imp.specifiers.join(', ')}
+                </span>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+    </div>
+  )
+}
+
+function SectionLabel({ children }) {
+  return (
+    <div style={{
+      fontSize: 9, letterSpacing: '.08em', color: '#334155',
+      fontFamily: 'JetBrains Mono, monospace',
+      paddingTop: 4, borderTop: '1px solid #1e293b',
+    }}>
+      {children}
     </div>
   )
 }
