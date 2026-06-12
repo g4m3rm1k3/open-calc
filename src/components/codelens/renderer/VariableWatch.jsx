@@ -1,13 +1,10 @@
 /**
- * VariableWatch — debugger-style variable inspector.
- *
- * Shows every in-scope binding at the current step, grouped by call frame
- * (innermost first) or flattened. Changed variables are highlighted with a
- * struck-through old value and the new value in amber — like a real debugger.
+ * VariableWatch — debugger-style variable inspector with optional per-variable
+ * sparkline timelines showing how each value changes across all execution steps.
  */
-import { useState } from 'react'
+import { useState, useMemo, useCallback, useRef } from 'react'
 
-// ── Type system ───────────────────────────────────────────────────────────────
+// ── Type helpers ──────────────────────────────────────────────────────────────
 
 function getType(v) {
   if (v === null)      return 'null'
@@ -26,9 +23,8 @@ function fmtVal(v, heap) {
     return `"${s}"`
   }
   if (typeof v === 'object' && '$ref' in v) {
-    const obj = heap?.objects?.get(v.$ref)
+    const obj  = heap?.objects?.get(v.$ref)
     const type = obj?.type ?? 'Object'
-    // For arrays, show length hint
     if (type === 'Array') {
       const len = obj?.properties?.get('length')
       return `→ Array[${len ?? '?'}] #${v.$ref}`
@@ -48,8 +44,30 @@ const TYPE_META = {
 }
 const typeMeta = t => TYPE_META[t] ?? TYPE_META['undefined']
 
+// ── Timeline builder ──────────────────────────────────────────────────────────
+// For each "frameName:varName" key, records the variable's value at every step
+// where it exists — taking the innermost frame when the function is recursive.
+
+function buildTimelines(events) {
+  const map = new Map()
+  events.forEach((evt, i) => {
+    const frames = [...(evt.stackSnapshot ?? [])].reverse() // innermost first
+    const seenNames = new Set()
+    for (const frame of frames) {
+      const fname = frame.name ?? '__global__'
+      if (seenNames.has(fname)) continue   // only innermost instance per step
+      seenNames.add(fname)
+      for (const [vname, value] of Object.entries(frame.locals ?? {})) {
+        const key = `${fname}:${vname}`
+        if (!map.has(key)) map.set(key, [])
+        map.get(key).push({ step: i, value })
+      }
+    }
+  })
+  return map
+}
+
 // ── Diff builder ──────────────────────────────────────────────────────────────
-// Returns { [frameIndex]: { [varName]: { old, new } } }
 
 function buildDiffs(frames, prevFrames) {
   const result = {}
@@ -68,67 +86,240 @@ function buildDiffs(frames, prevFrames) {
   return result
 }
 
-// ── Sub-components ────────────────────────────────────────────────────────────
+// ── VarTimeline ───────────────────────────────────────────────────────────────
 
-function VarRow({ name, value, diff, heap, indent = 20 }) {
+const TL_H      = 18
+const TL_PAD    = 3
+
+function numericSparkline(points, totalSteps, step) {
+  const vals   = points.map(p => p.value)
+  const minV   = Math.min(...vals)
+  const maxV   = Math.max(...vals)
+  const range  = maxV - minV || 1
+
+  // Build polyline points in viewBox coordinates
+  const ptStr = points
+    .map(p => {
+      const x = p.step + 0.5
+      const y = TL_H - TL_PAD - ((p.value - minV) / range) * (TL_H - TL_PAD * 2)
+      return `${x},${y}`
+    })
+    .join(' ')
+
+  // Find nearest point to current step for the cursor dot
+  const nearest = points.reduce((best, p) =>
+    Math.abs(p.step - step) < Math.abs(best.step - step) ? p : best
+  , points[0])
+  const dotY = nearest
+    ? TL_H - TL_PAD - ((nearest.value - minV) / range) * (TL_H - TL_PAD * 2)
+    : TL_H / 2
+
+  return (
+    <>
+      <polyline points={ptStr} fill="none" stroke="#6366f1" strokeWidth={1} opacity={0.8} />
+      {/* min/max baselines */}
+      <line x1={0} y1={TL_H - TL_PAD} x2={totalSteps} y2={TL_H - TL_PAD}
+        stroke="#1e293b" strokeWidth={0.5} />
+      {/* cursor */}
+      <line x1={step + 0.5} y1={0} x2={step + 0.5} y2={TL_H}
+        stroke="white" strokeWidth={0.8} opacity={0.45} />
+      {/* active dot */}
+      {nearest && (
+        <circle cx={nearest.step + 0.5} cy={dotY} r={1.8} fill="#fbbf24" />
+      )}
+    </>
+  )
+}
+
+function booleanTimeline(points, totalSteps, step) {
+  const segments = []
+  for (let i = 0; i < points.length; i++) {
+    const start = points[i].step
+    const end   = i + 1 < points.length ? points[i + 1].step : totalSteps
+    segments.push({ start, end, val: points[i].value })
+  }
+  return (
+    <>
+      {segments.map((seg, i) => (
+        <rect key={i}
+          x={seg.start} y={TL_PAD}
+          width={seg.end - seg.start} height={TL_H - TL_PAD * 2}
+          fill={seg.val ? '#4ade8044' : '#f8717144'}
+          stroke={seg.val ? '#4ade80' : '#f87171'}
+          strokeWidth={0.4}
+        />
+      ))}
+      <line x1={step + 0.5} y1={0} x2={step + 0.5} y2={TL_H}
+        stroke="white" strokeWidth={0.8} opacity={0.45} />
+    </>
+  )
+}
+
+function stringTimeline(points, totalSteps, step) {
+  // Assign a stable color to each unique string value
+  const unique = [...new Set(points.map(p => p.value))]
+  const palette = ['#818cf8','#34d399','#fbbf24','#f472b6','#60a5fa','#a78bfa','#fb923c']
+  const colorOf = v => palette[unique.indexOf(v) % palette.length]
+
+  const segments = []
+  for (let i = 0; i < points.length; i++) {
+    const start = points[i].step
+    const end   = i + 1 < points.length ? points[i + 1].step : totalSteps
+    segments.push({ start, end, val: points[i].value })
+  }
+  return (
+    <>
+      {segments.map((seg, i) => (
+        <rect key={i}
+          x={seg.start} y={TL_PAD}
+          width={seg.end - seg.start} height={TL_H - TL_PAD * 2}
+          fill={colorOf(seg.val) + '55'}
+          stroke={colorOf(seg.val)}
+          strokeWidth={0.4}
+        />
+      ))}
+      <line x1={step + 0.5} y1={0} x2={step + 0.5} y2={TL_H}
+        stroke="white" strokeWidth={0.8} opacity={0.45} />
+    </>
+  )
+}
+
+function VarTimeline({ points, totalSteps, step, onSeek, typeColor }) {
+  const svgRef = useRef(null)
+
+  const seekAt = useCallback((e) => {
+    const rect = svgRef.current?.getBoundingClientRect()
+    if (!rect || totalSteps === 0) return
+    const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width))
+    onSeek(Math.round(ratio * (totalSteps - 1)))
+  }, [totalSteps, onSeek])
+
+  const onMouseDown = useCallback((e) => {
+    e.preventDefault()
+    seekAt(e)
+    const onMove = ev => seekAt(ev)
+    const onUp   = () => {
+      document.removeEventListener('mousemove', onMove)
+      document.removeEventListener('mouseup', onUp)
+    }
+    document.addEventListener('mousemove', onMove)
+    document.addEventListener('mouseup', onUp)
+  }, [seekAt])
+
+  if (!points?.length || totalSteps === 0) return null
+
+  const firstType = typeof points[0].value
+  let content = null
+  if (firstType === 'number') {
+    content = numericSparkline(points, totalSteps, step)
+  } else if (firstType === 'boolean') {
+    content = booleanTimeline(points, totalSteps, step)
+  } else if (firstType === 'string') {
+    content = stringTimeline(points, totalSteps, step)
+  } else {
+    // ref / null / etc — show activity blips
+    content = (
+      <>
+        {points.map((p, i) => (
+          <rect key={i} x={p.step} y={TL_PAD} width={1} height={TL_H - TL_PAD * 2}
+            fill={typeColor ?? '#818cf8'} opacity={0.6} />
+        ))}
+        <line x1={step + 0.5} y1={0} x2={step + 0.5} y2={TL_H}
+          stroke="white" strokeWidth={0.8} opacity={0.45} />
+      </>
+    )
+  }
+
+  return (
+    <svg
+      ref={svgRef}
+      viewBox={`0 0 ${totalSteps} ${TL_H}`}
+      preserveAspectRatio="none"
+      width="100%"
+      height={TL_H}
+      style={{ display: 'block', cursor: 'col-resize', background: '#0a0f1e' }}
+      onMouseDown={onMouseDown}
+    >
+      {content}
+    </svg>
+  )
+}
+
+// ── VarRow ────────────────────────────────────────────────────────────────────
+
+function VarRow({ name, value, diff, heap, indent = 20, timeline, step, onSeek, totalSteps, showTimeline }) {
   const type    = getType(value)
   const meta    = typeMeta(type)
   const display = fmtVal(value, heap)
   const changed = !!diff
 
   return (
-    <div style={{
-      display:    'flex',
-      alignItems: 'center',
-      gap:        6,
-      padding:    `2px ${indent + 6}px 2px ${indent}px`,
-      background: changed ? 'rgba(245,158,11,0.07)' : 'transparent',
-      borderLeft: `2px solid ${changed ? '#f59e0b' : 'transparent'}`,
-      transition: 'background 0.15s',
-      minWidth:   0,
-    }}>
-      {/* Name */}
-      <span style={{
-        fontSize: 11, fontFamily: 'JetBrains Mono, monospace',
-        color: '#7dd3fc', flexShrink: 0, minWidth: 72,
-        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+    <div>
+      <div style={{
+        display:    'flex',
+        alignItems: 'center',
+        gap:        6,
+        padding:    `2px ${indent + 6}px 2px ${indent}px`,
+        background: changed ? 'rgba(245,158,11,0.07)' : 'transparent',
+        borderLeft: `2px solid ${changed ? '#f59e0b' : 'transparent'}`,
+        transition: 'background 0.15s',
+        minWidth:   0,
       }}>
-        {name}
-      </span>
+        <span style={{
+          fontSize: 11, fontFamily: 'JetBrains Mono, monospace',
+          color: '#7dd3fc', flexShrink: 0, minWidth: 72,
+          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+        }}>
+          {name}
+        </span>
 
-      {/* Value — with old→new diff when changed */}
-      {changed ? (
-        <span style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 4,
-          fontSize: 11, fontFamily: 'JetBrains Mono, monospace' }}>
-          <span style={{ color: '#334155', textDecoration: 'line-through', fontSize: 10, flexShrink: 0 }}>
-            {fmtVal(diff.old, heap)}
+        {changed ? (
+          <span style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 4,
+            fontSize: 11, fontFamily: 'JetBrains Mono, monospace' }}>
+            <span style={{ color: '#334155', textDecoration: 'line-through', fontSize: 10, flexShrink: 0 }}>
+              {fmtVal(diff.old, heap)}
+            </span>
+            <span style={{ color: '#475569', flexShrink: 0 }}>→</span>
+            <span style={{ color: '#f59e0b', fontWeight: 600, overflow: 'hidden',
+              textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {display}
+            </span>
           </span>
-          <span style={{ color: '#475569', flexShrink: 0 }}>→</span>
-          <span style={{ color: '#f59e0b', fontWeight: 600, overflow: 'hidden',
-            textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        ) : (
+          <span style={{
+            flex: 1, minWidth: 0, fontSize: 11, fontFamily: 'JetBrains Mono, monospace',
+            color: meta.color, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          }}>
             {display}
           </span>
-        </span>
-      ) : (
-        <span style={{
-          flex: 1, minWidth: 0, fontSize: 11, fontFamily: 'JetBrains Mono, monospace',
-          color: meta.color, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-        }}>
-          {display}
-        </span>
-      )}
+        )}
 
-      {/* Type badge */}
-      <span style={{
-        fontSize: 8, padding: '1px 5px', borderRadius: 99, flexShrink: 0,
-        background: meta.color + '18', color: meta.color, border: `1px solid ${meta.color}33`,
-        fontFamily: 'JetBrains Mono, monospace',
-      }}>
-        {meta.label}
-      </span>
+        <span style={{
+          fontSize: 8, padding: '1px 5px', borderRadius: 99, flexShrink: 0,
+          background: meta.color + '18', color: meta.color, border: `1px solid ${meta.color}33`,
+          fontFamily: 'JetBrains Mono, monospace',
+        }}>
+          {meta.label}
+        </span>
+      </div>
+
+      {/* Sparkline */}
+      {showTimeline && timeline?.length > 1 && (
+        <div style={{ paddingLeft: indent, paddingRight: indent + 6, paddingBottom: 3 }}>
+          <VarTimeline
+            points={timeline}
+            totalSteps={totalSteps}
+            step={step}
+            onSeek={onSeek}
+            typeColor={meta.color}
+          />
+        </div>
+      )}
     </div>
   )
 }
+
+// ── FrameHeader ───────────────────────────────────────────────────────────────
 
 function FrameHeader({ frame, isActive }) {
   return (
@@ -169,10 +360,22 @@ function FrameHeader({ frame, isActive }) {
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export default function VariableWatch({ currentEvent, prevEvent, heapSnapshot, onShowEnvModel }) {
-  const [flat, setFlat] = useState(false)
+export default function VariableWatch({
+  currentEvent, prevEvent, heapSnapshot,
+  events, step, onSeek,
+  onShowEnvModel,
+}) {
+  const [flat,          setFlat]          = useState(false)
+  const [showTimelines, setShowTimelines] = useState(false)
 
-  // No execution yet
+  // Pre-compute timelines for all variables across all steps
+  const timelines = useMemo(
+    () => events?.length ? buildTimelines(events) : new Map(),
+    [events],
+  )
+
+  const totalSteps = events?.length ?? 0
+
   if (!currentEvent) {
     return (
       <div style={{ padding: '16px 12px', color: '#475569', fontSize: 12 }}>
@@ -185,12 +388,10 @@ export default function VariableWatch({ currentEvent, prevEvent, heapSnapshot, o
   const prevFrames = [...(prevEvent?.stackSnapshot   ?? [])].reverse()
   const diffs      = buildDiffs(frames, prevFrames)
 
-  // Count total changed variables this step
   const changedNames = [...new Set(
     Object.values(diffs).flatMap(d => Object.keys(d))
   )]
 
-  // Flat view: all vars, innermost scope wins for duplicate names
   const flatVars = (() => {
     const seen   = new Set()
     const result = []
@@ -198,7 +399,8 @@ export default function VariableWatch({ currentEvent, prevEvent, heapSnapshot, o
       for (const [name, value] of Object.entries(frame.locals ?? {})) {
         if (!seen.has(name)) {
           seen.add(name)
-          result.push({ name, value, diff: diffs[fi]?.[name] })
+          const fname = frame.name ?? '__global__'
+          result.push({ name, value, diff: diffs[fi]?.[name], fname })
         }
       }
     })
@@ -218,7 +420,6 @@ export default function VariableWatch({ currentEvent, prevEvent, heapSnapshot, o
           fontFamily: 'JetBrains Mono, monospace',
         }}>VARIABLES</span>
 
-        {/* Changed this step pill */}
         {changedNames.length > 0 && (
           <span style={{
             fontSize: 9, padding: '1px 7px', borderRadius: 99,
@@ -228,6 +429,21 @@ export default function VariableWatch({ currentEvent, prevEvent, heapSnapshot, o
             {changedNames.length} changed
           </span>
         )}
+
+        {/* Timeline toggle */}
+        <button
+          onClick={() => setShowTimelines(t => !t)}
+          title="Toggle variable timelines"
+          style={{
+            background: showTimelines ? '#1e293b' : 'transparent',
+            border: `1px solid ${showTimelines ? '#6366f1' : '#1e293b'}`,
+            borderRadius: 4, padding: '2px 6px', cursor: 'pointer',
+            color: showTimelines ? '#a5b4fc' : '#475569',
+            fontSize: 9, fontFamily: 'JetBrains Mono, monospace',
+          }}
+        >
+          ∿ timeline
+        </button>
 
         {/* Grouped / Flat toggle */}
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 2, background: '#0f172a',
@@ -251,21 +467,24 @@ export default function VariableWatch({ currentEvent, prevEvent, heapSnapshot, o
             Global scope — no function frames active.
           </div>
         ) : flat ? (
-          /* ── Flat view ── */
           flatVars.length === 0 ? (
             <div style={{ padding: '12px 12px', fontSize: 11, color: '#475569',
               fontFamily: 'JetBrains Mono, monospace' }}>
               No local variables yet.
             </div>
           ) : (
-            flatVars.map(({ name, value, diff }) => (
+            flatVars.map(({ name, value, diff, fname }) => (
               <VarRow key={name} name={name} value={value} diff={diff}
-                heap={heapSnapshot} indent={12} />
+                heap={heapSnapshot} indent={12}
+                timeline={timelines.get(`${fname}:${name}`)}
+                step={step} onSeek={onSeek} totalSteps={totalSteps}
+                showTimeline={showTimelines}
+              />
             ))
           )
         ) : (
-          /* ── Grouped view ── */
           frames.map((frame, fi) => {
+            const fname  = frame.name ?? '__global__'
             const locals = Object.entries(frame.locals ?? {})
             return (
               <div key={fi}>
@@ -279,7 +498,11 @@ export default function VariableWatch({ currentEvent, prevEvent, heapSnapshot, o
                 ) : (
                   locals.map(([name, value]) => (
                     <VarRow key={name} name={name} value={value}
-                      diff={diffs[fi]?.[name]} heap={heapSnapshot} indent={22} />
+                      diff={diffs[fi]?.[name]} heap={heapSnapshot} indent={22}
+                      timeline={timelines.get(`${fname}:${name}`)}
+                      step={step} onSeek={onSeek} totalSteps={totalSteps}
+                      showTimeline={showTimelines}
+                    />
                   ))
                 )}
               </div>

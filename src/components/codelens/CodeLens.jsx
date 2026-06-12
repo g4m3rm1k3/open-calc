@@ -668,6 +668,9 @@ export default function CodeLens({ onBack, initialCode }) {
                 currentEvent={currentEvent}
                 prevEvent={prevEvent}
                 heapSnapshot={heapSnapshot}
+                events={execution?.events}
+                step={step}
+                onSeek={(s) => { setPlaying(false); setStep(s) }}
                 onShowEnvModel={() => setRightTab('scope')}
               />
             )}
