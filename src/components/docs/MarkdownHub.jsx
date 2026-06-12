@@ -25,8 +25,11 @@ import {
   Sparkles,
   PanelLeftClose,
   PanelLeftOpen,
+  Volume2,
+  Square,
 } from 'lucide-react'
 import { buildOptionalBackendUrl } from '../../utils/optionalBackend.js'
+import { useSpeech, cleanForSpeech } from '../../utils/useSpeech.js'
 import {
   RUNNABLE_LANGS,
   runJSInline, runTSInline, runPythonInline, runOpenMATInline,
@@ -689,6 +692,91 @@ function createLocalDoc() {
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   }
+}
+
+// ── TTS reader helpers ────────────────────────────────────────────────────────
+
+function splitMarkdownSections(markdown) {
+  const sections = []
+  const fenceRe = /^```[^\n]*\n[\s\S]*?^```[ \t]*$/gm
+  let lastIdx = 0
+  let match
+  while ((match = fenceRe.exec(markdown)) !== null) {
+    const before = markdown.slice(lastIdx, match.index)
+    if (before.trim()) sections.push({ type: 'prose', content: before })
+    sections.push({ type: 'code', content: match[0] })
+    lastIdx = match.index + match[0].length
+  }
+  const after = markdown.slice(lastIdx)
+  if (after.trim()) sections.push({ type: 'prose', content: after })
+  return sections
+}
+
+function SectionedMarkdown({ content }) {
+  const { speak, stop } = useSpeech()
+  const [playingIdx, setPlayingIdx] = useState(null)
+  const playingIdxRef = useRef(null)
+  const sections = useMemo(() => splitMarkdownSections(content), [content])
+
+  useEffect(() => () => { stop() }, [content, stop]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handlePlay = useCallback(async (idx, text) => {
+    if (playingIdxRef.current === idx) {
+      stop()
+      playingIdxRef.current = null
+      setPlayingIdx(null)
+      return
+    }
+    stop()
+    playingIdxRef.current = idx
+    setPlayingIdx(idx)
+    await speak(cleanForSpeech(text))
+    if (playingIdxRef.current === idx) {
+      playingIdxRef.current = null
+      setPlayingIdx(null)
+    }
+  }, [speak, stop])
+
+  return sections.map((section, idx) => {
+    if (section.type === 'code') {
+      return (
+        <ReactMarkdown
+          key={idx}
+          remarkPlugins={[remarkGfm, remarkMath]}
+          rehypePlugins={[rehypeRaw, rehypeKatex]}
+          components={MD_COMPONENTS}
+        >
+          {section.content}
+        </ReactMarkdown>
+      )
+    }
+    const isPlaying = playingIdx === idx
+    return (
+      <div key={idx} className="relative group">
+        <button
+          onClick={() => handlePlay(idx, section.content)}
+          title={isPlaying ? 'Stop reading' : 'Read aloud'}
+          className={`absolute top-0 right-0 z-10 flex items-center gap-1 px-1.5 py-0.5 text-[11px] font-medium rounded border transition-all ${
+            isPlaying
+              ? 'opacity-100 text-cyan-600 border-cyan-300 bg-cyan-50 dark:text-cyan-300 dark:border-cyan-700/60 dark:bg-cyan-900/20'
+              : 'opacity-0 group-hover:opacity-100 text-slate-400 border-slate-200 bg-white/90 dark:bg-slate-800/90 dark:border-slate-700 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
+          }`}
+        >
+          {isPlaying
+            ? <><Square className="w-2.5 h-2.5 fill-current" />&nbsp;Stop</>
+            : <><Volume2 className="w-2.5 h-2.5" />&nbsp;Read</>
+          }
+        </button>
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm, remarkMath]}
+          rehypePlugins={[rehypeRaw, rehypeKatex]}
+          components={MD_COMPONENTS}
+        >
+          {section.content}
+        </ReactMarkdown>
+      </div>
+    )
+  })
 }
 
 export default function MarkdownHub() {
@@ -1385,9 +1473,7 @@ export default function MarkdownHub() {
                         )}
                       </div>
                     )}
-                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]} components={MD_COMPONENTS}>
-                      {content}
-                    </ReactMarkdown>
+                    <SectionedMarkdown content={content} />
                   </div>
                 )}
               </div>
@@ -1411,9 +1497,7 @@ export default function MarkdownHub() {
                 style={{ background: isDark ? themeStyles.md.preBg + '80' : 'rgba(248,250,252,0.5)' }}>
                 <div className="md-body mx-auto p-8 rounded-xl shadow-sm border min-h-full"
                   style={{ background: isDark ? themeStyles.md.preBg : '#ffffff', borderColor: isDark ? themeStyles.md.preBorder : '#e2e8f0' }}>
-                  <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]} components={MD_COMPONENTS}>
-                    {editorContent}
-                  </ReactMarkdown>
+                  <SectionedMarkdown content={editorContent} />
                 </div>
               </div>
             )}
