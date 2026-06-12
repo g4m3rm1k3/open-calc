@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect, useRef } from 'react'
 import Editor, { useMonaco } from '@monaco-editor/react'
 import { buildProgramModel } from './parser/jsParser.js'
 import { run as runInterpreter } from './interpreter/interpreter.js'
+import { runPython } from './interpreter/pythonTracer.js'
 import { EXPLAIN } from './eventStream.js'
 import { buildHeapSnapshot } from './renderer/heapSnapshot.js'
 import HeapGraph from './renderer/HeapGraph.jsx'
@@ -34,6 +35,36 @@ const THEMES = [
   { id: 'tokyo-night',    label: 'Tokyo Night',  monaco: 'tokyo-night' },
   { id: 'one-dark',       label: 'One Dark',     monaco: 'one-dark' },
 ]
+
+const STARTER_PY = `def fibonacci(n):
+    if n <= 1:
+        return n
+    return fibonacci(n - 1) + fibonacci(n - 2)
+
+
+class Stack:
+    def __init__(self):
+        self.items = []
+
+    def push(self, item):
+        self.items.append(item)
+
+    def pop(self):
+        return self.items.pop()
+
+    def size(self):
+        return len(self.items)
+
+
+print('fib(6):', fibonacci(6))
+
+s = Stack()
+s.push(10)
+s.push(20)
+s.push(30)
+print('Stack size:', s.size())
+print('Popped:', s.pop())
+`
 
 const STARTER = `function fibonacci(n) {
   if (n <= 1) return n
@@ -283,6 +314,7 @@ function StackFrame({ frame, depth }) {
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function CodeLens({ onBack, initialCode }) {
+  const [lang, setLang]             = useState('js')   // 'js' | 'py'
   const [source, setSource]         = useState(initialCode ?? STARTER)
   const [model, setModel]           = useState(null)
   const [execution, setExecution]   = useState(null)
@@ -307,12 +339,13 @@ export default function CodeLens({ onBack, initialCode }) {
   const currentEvent = execution?.events?.[step]      ?? null
   const prevEvent    = execution?.events?.[step - 1]  ?? null
 
-  // Parse live as we type
-  useEffect(() => { setModel(buildProgramModel(source)) }, [])
+  // Parse live as we type (JS only)
+  useEffect(() => { if (lang === 'js') setModel(buildProgramModel(source)) }, [])
   useEffect(() => {
+    if (lang !== 'js') { setModel(null); return }
     const id = setTimeout(() => setModel(buildProgramModel(source)), 400)
     return () => clearTimeout(id)
-  }, [source])
+  }, [source, lang])
 
   // Source line highlighting — update Monaco decoration on every step
   useEffect(() => {
@@ -371,28 +404,36 @@ export default function CodeLens({ onBack, initialCode }) {
     document.addEventListener('mouseup', onUp)
   }, [])
 
-  const handleRun = useCallback(() => {
+  const handleRun = useCallback(async () => {
     setRunning(true)
-    setTimeout(() => {
-      try {
-        const result = runInterpreter(source)
-        setExecution(result)
-        setStep(0)
-        setPlaying(false)
-        setRightTab('execution')
-        setRightMode('explain')
-      } finally {
-        setRunning(false)
+    try {
+      let result
+      if (lang === 'py') {
+        result = await runPython(source)
+      } else {
+        result = await new Promise((resolve) => {
+          setTimeout(() => resolve(runInterpreter(source)), 0)
+        })
       }
-    }, 0)
-  }, [source])
+      setExecution(result)
+      setStep(0)
+      setPlaying(false)
+      setRightTab('execution')
+      setRightMode('explain')
+    } finally {
+      setRunning(false)
+    }
+  }, [source, lang])
 
-  const TABS = [
-    { id: 'structure', label: 'Structure', icon: Boxes },
-    { id: 'tokens',    label: 'Tokens',    icon: Zap },
-    { id: 'ast',       label: 'AST',       icon: Braces },
-  ]
-  const heapSnapshot = execution
+  const TABS = lang === 'py'
+    ? [{ id: 'structure', label: 'Structure', icon: Boxes }]
+    : [
+        { id: 'structure', label: 'Structure', icon: Boxes },
+        { id: 'tokens',    label: 'Tokens',    icon: Zap },
+        { id: 'ast',       label: 'AST',       icon: Braces },
+      ]
+
+  const heapSnapshot = (lang === 'js' && execution)
     ? buildHeapSnapshot(execution.events, step)
     : null
 
@@ -400,7 +441,7 @@ export default function CodeLens({ onBack, initialCode }) {
     { id: 'execution', label: 'Events',    icon: Play },
     { id: 'variables', label: 'Variables', icon: Layers },
     { id: 'calltree',  label: 'Tree',      icon: GitBranch },
-    { id: 'heap',      label: 'Heap',      icon: Network },
+    ...(lang === 'js' ? [{ id: 'heap', label: 'Heap', icon: Network }] : []),
     { id: 'output',    label: 'Output',    icon: Terminal },
   ]
 
@@ -432,6 +473,26 @@ export default function CodeLens({ onBack, initialCode }) {
         <Code2 size={17} color="#818cf8" />
         <span style={{ fontWeight: 700, fontSize: 14 }}>CodeLens</span>
         <span style={{ fontSize: 12, color: '#475569' }}>· Execution Visualizer</span>
+
+        {/* Language toggle */}
+        <div style={{ display: 'flex', gap: 2, background: '#0f172a',
+          borderRadius: 6, padding: 2, border: '1px solid #1e293b' }}>
+          {[{ id: 'js', label: 'JS' }, { id: 'py', label: 'Python' }].map(l => (
+            <button key={l.id} onClick={() => {
+              if (l.id === lang) return
+              setLang(l.id)
+              setSource(l.id === 'py' ? STARTER_PY : STARTER)
+              setExecution(null)
+              setStep(0)
+              setModel(null)
+            }} style={{
+              padding: '3px 10px', borderRadius: 4, border: 'none', cursor: 'pointer',
+              fontSize: 11, fontFamily: 'JetBrains Mono, monospace', fontWeight: 600,
+              background: lang === l.id ? '#312e81' : 'transparent',
+              color:      lang === l.id ? '#a5b4fc'  : '#475569',
+            }}>{l.label}</button>
+          ))}
+        </div>
 
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
           {/* Theme picker */}
@@ -466,7 +527,7 @@ export default function CodeLens({ onBack, initialCode }) {
           {/* Run button */}
           <Btn onClick={handleRun} disabled={running} title="Run code (⌘↵)">
             <Play size={12} />
-            {running ? 'Running…' : 'Run'}
+            {running ? (lang === 'py' ? 'Loading Python…' : 'Running…') : 'Run'}
           </Btn>
         </div>
 
@@ -581,7 +642,7 @@ export default function CodeLens({ onBack, initialCode }) {
             <div style={{ height: 'calc(100% - 33px)' }}>
               <Editor
                 height="100%"
-                language="javascript"
+                language={lang === 'py' ? 'python' : 'javascript'}
                 value={source}
                 onChange={v => setSource(v ?? '')}
                 theme={THEMES.find(t => t.id === theme)?.monaco ?? 'monokai'}
@@ -766,7 +827,10 @@ export default function CodeLens({ onBack, initialCode }) {
                 ))}
               </div>
               <div style={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
-                {tab === 'structure' && <StructureView model={model} currentEvent={currentEvent} onNodeClick={node => setFnModal({ node, callGraph: model.callGraph })} />}
+                {tab === 'structure' && (lang === 'py'
+                  ? <PyStructureView source={source} execution={execution} />
+                  : <StructureView model={model} currentEvent={currentEvent} onNodeClick={node => setFnModal({ node, callGraph: model.callGraph })} />
+                )}
                 {tab === 'tokens'    && <TokensView model={model} />}
                 {tab === 'ast'       && <AstView model={model} />}
               </div>
@@ -1345,6 +1409,193 @@ function getSICPNote(node, isRecursive, callsNames, isLeaf, calledByNames) {
   }
 
   return null
+}
+
+// ── Python structure view (regex-based, no Pyodide needed) ───────────────────
+
+function parsePyStructure(source) {
+  const lines   = source.split('\n')
+  const fns     = []
+  const classes = []
+  const vars    = []
+
+  let currentClass = null
+  let classBodyIndent = null
+
+  lines.forEach((raw, i) => {
+    const line   = i + 1
+    const indent = raw.length - raw.trimStart().length
+    const t      = raw.trim()
+
+    // Class declaration at column 0
+    const clsM = t.match(/^class\s+(\w+)(?:\(([^)]*)\))?\s*:/)
+    if (clsM && indent === 0) {
+      currentClass     = clsM[1]
+      classBodyIndent  = null          // reset — will be set by first body line
+      classes.push({ name: clsM[1], superclass: clsM[2]?.trim() || null, line, methods: [] })
+      return
+    }
+
+    // Track class body indent
+    if (currentClass && classBodyIndent === null && t && !t.startsWith('#')) {
+      classBodyIndent = indent
+    }
+    // Exited class body
+    if (currentClass && t && !t.startsWith('#') && indent === 0 && !clsM) {
+      currentClass    = null
+      classBodyIndent = null
+    }
+
+    // def — could be top-level or method
+    const fnM = t.match(/^def\s+(\w+)\s*\(([^)]*)\)\s*:/)
+    if (fnM) {
+      const params = fnM[2]
+        .split(',')
+        .map(p => p.trim().replace(/=.*$/, '').replace(/^\*+/, '').trim())
+        .filter(Boolean)
+        .filter(p => p !== 'self' && p !== 'cls')
+      if (currentClass && indent > 0) {
+        const cls = classes.find(c => c.name === currentClass)
+        if (cls) cls.methods.push({ name: fnM[1], params, line })
+      } else {
+        fns.push({ name: fnM[1], params, line })
+      }
+      return
+    }
+
+    // Top-level variable assignment
+    const varM = t.match(/^([A-Za-z_]\w*)\s*=\s*(.+)$/)
+    if (varM && indent === 0 && !t.startsWith('#')) {
+      const initStr = varM[2].trim()
+      let initType = null
+      if (initStr.startsWith('['))  initType = 'list'
+      else if (initStr.startsWith('{')) initType = initStr.includes(':') ? 'dict' : 'set'
+      else if (initStr.startsWith('('))  initType = 'tuple'
+      else if (/^\d/.test(initStr) || initStr.startsWith('-')) initType = 'number'
+      else if (initStr.startsWith('"') || initStr.startsWith("'")) initType = 'string'
+      else if (initStr.startsWith('True') || initStr.startsWith('False')) initType = 'bool'
+      else { const nm = initStr.match(/^(\w+)\s*\(/); if (nm) initType = `${nm[1]}()` }
+      vars.push({ name: varM[1], initType, line })
+    }
+  })
+
+  return { fns, classes, vars }
+}
+
+function PyStructureView({ source, execution }) {
+  const { fns, classes, vars } = parsePyStructure(source)
+
+  // Build call set from execution events for live highlighting
+  const activeFns = new Set(
+    (execution?.events ?? [])
+      .filter(e => e.type === 'function_call')
+      .map(e => e.functionName)
+  )
+
+  const hasRun = !!execution
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+
+      {/* Functions */}
+      {fns.length > 0 && (
+        <>
+          <SectionLabel>FUNCTIONS</SectionLabel>
+          {fns.map((fn, i) => {
+            const wasCalled = hasRun && activeFns.has(fn.name)
+            return (
+              <div key={i} style={{
+                display: 'flex', alignItems: 'center', gap: 7,
+                padding: '4px 9px', background: '#0d1526',
+                borderRadius: 6, border: `1px solid ${wasCalled ? '#6366f155' : '#1e293b'}`,
+              }}>
+                <span style={{ width: 3, height: 20, borderRadius: 2, flexShrink: 0,
+                  background: wasCalled ? '#818cf8' : '#334155' }} />
+                <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11,
+                  color: wasCalled ? '#818cf8' : '#7dd3fc', fontWeight: 700 }}>
+                  {fn.name}
+                </span>
+                <span style={{ fontSize: 10, color: '#475569',
+                  fontFamily: 'JetBrains Mono, monospace' }}>
+                  ({fn.params.join(', ')})
+                </span>
+                <span style={{ marginLeft: 'auto', fontSize: 8, color: '#334155',
+                  fontFamily: 'JetBrains Mono, monospace' }}>L{fn.line}</span>
+              </div>
+            )
+          })}
+        </>
+      )}
+
+      {/* Classes */}
+      {classes.length > 0 && (
+        <>
+          <SectionLabel>CLASSES</SectionLabel>
+          {classes.map((cls, i) => (
+            <div key={i} style={{ padding: '7px 9px', background: '#1e293b', borderRadius: 6 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: cls.methods.length ? 5 : 0 }}>
+                <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#818cf8' }}>
+                  {cls.name}
+                </span>
+                {cls.superclass && (
+                  <span style={{ fontSize: 10, color: '#64748b' }}>({cls.superclass})</span>
+                )}
+                <span style={{ marginLeft: 'auto', fontSize: 8, color: '#334155',
+                  fontFamily: 'JetBrains Mono, monospace' }}>L{cls.line}</span>
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
+                {cls.methods.map((m, j) => (
+                  <span key={j} style={{
+                    fontSize: 10, padding: '1px 6px', borderRadius: 99,
+                    background: m.name === '__init__' ? '#312e81' : '#1e3a5f',
+                    color: m.name === '__init__' ? '#a5b4fc' : '#7dd3fc',
+                    fontFamily: 'JetBrains Mono, monospace',
+                  }}>{m.name}</span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </>
+      )}
+
+      {/* Variables */}
+      {vars.length > 0 && (
+        <>
+          <SectionLabel>VARIABLES</SectionLabel>
+          {vars.map((v, i) => (
+            <div key={i} style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              padding: '3px 8px', borderRadius: 5,
+              background: '#0d1526', border: '1px solid #1e293b',
+            }}>
+              <span style={{ fontSize: 8, padding: '1px 5px', borderRadius: 3, flexShrink: 0,
+                background: '#86efac18', color: '#86efac', border: '1px solid #86efac33',
+                fontFamily: 'JetBrains Mono, monospace' }}>var</span>
+              <span style={{ flex: 1, fontSize: 11, fontFamily: 'JetBrains Mono, monospace',
+                color: '#e2e8f0' }}>{v.name}</span>
+              {v.initType && (
+                <span style={{ fontSize: 9, color: '#475569',
+                  fontFamily: 'JetBrains Mono, monospace' }}>{v.initType}</span>
+              )}
+              <span style={{ fontSize: 8, color: '#334155',
+                fontFamily: 'JetBrains Mono, monospace' }}>L{v.line}</span>
+            </div>
+          ))}
+        </>
+      )}
+
+      {fns.length === 0 && classes.length === 0 && vars.length === 0 && (
+        <span style={{ color: '#475569', fontSize: 12 }}>No definitions detected.</span>
+      )}
+
+      {!hasRun && (fns.length > 0 || classes.length > 0) && (
+        <div style={{ fontSize: 10, color: '#334155', fontFamily: 'JetBrains Mono, monospace',
+          borderTop: '1px solid #1e293b', paddingTop: 6, marginTop: 2 }}>
+          Run to see which functions are called (highlighted in indigo)
+        </div>
+      )}
+    </div>
+  )
 }
 
 // ── Static analysis views ─────────────────────────────────────────────────────
