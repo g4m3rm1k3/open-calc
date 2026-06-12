@@ -15,6 +15,7 @@ import { lesson as sicp21 } from '../data/learn/sicp/lesson-2-1.js'
 
 import { lesson as dsa01 } from '../data/learn/dsa-patterns/lesson-01.js'
 import { lesson as dsa02 } from '../data/learn/dsa-patterns/lesson-02.js'
+import { lesson as dsa03 } from '../data/learn/dsa-patterns/lesson-03.js'
 
 const LESSONS = {
   'sicp/1-1': sicp11,
@@ -28,12 +29,13 @@ const LESSONS = {
 
   'dsa-patterns/01': dsa01,
   'dsa-patterns/02': dsa02,
+  'dsa-patterns/03': dsa03,
 }
 
 // Ordered series list — drives "Next lesson" button
 const SERIES_ORDER = {
   sicp: ['1-1', '1-2', '1-3', '1-4', '1-5', '1-6', '1-7', '2-1'],
-  'dsa-patterns': ['01', '02'],
+  'dsa-patterns': ['01', '02', '03'],
 }
 
 // First lesson per series — used for redirect when no lessonId in URL

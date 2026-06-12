@@ -2,7 +2,7 @@
 // Linked Lists and the Iterator Pattern
 
 export const lesson = {
-  id: 'dsa-02',
+  id: 'dsa-patterns-02',
   series: { id: 'dsa-patterns', title: 'DSA + Design Patterns' },
   title: '2. Linked Lists and the Iterator Pattern',
   checkpoints: [

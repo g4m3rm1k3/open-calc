@@ -2,7 +2,7 @@
 // Arrays and the Factory Pattern
 
 export const lesson = {
-  id: 'dsa-01',
+  id: 'dsa-patterns-01',
   series: { id: 'dsa-patterns', title: 'DSA + Design Patterns' },
   title: '1. Arrays and the Factory Pattern',
   checkpoints: [

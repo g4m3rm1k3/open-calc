@@ -139,6 +139,20 @@ function OutputPanel({ logs, error, challengeResult, expectedOutput, testDetail 
   )
 }
 
+// ── New-line diff ─────────────────────────────────────────────────────────────
+
+function diffNewLines(prevCode, nextCode) {
+  if (!prevCode) return []
+  const prevSet = new Set(prevCode.split('\n').map(l => l.trimEnd()))
+  const nextLines = nextCode.split('\n')
+  const newNums = []
+  nextLines.forEach((line, i) => {
+    const t = line.trimEnd()
+    if (t.trim() && !prevSet.has(t)) newNums.push(i + 1)
+  })
+  return newNums
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 
@@ -172,8 +186,14 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle, series
   const [reachedCp, setReachedCp]             = useState(savedCp ? getReachedCpsUpTo(savedCp.cpId) : [])
   const [lessonMenuOpen, setLessonMenuOpen]   = useState(false)
 
-  const pauseRef    = useRef(false)
+  const pauseRef      = useRef(false)
   const lessonMenuRef = useRef(null)
+  const editorRef     = useRef(null)
+  const monacoRef     = useRef(null)
+  const decorationCollRef = useRef(null)
+  const prevCodeRef       = useRef('')
+  const pendingDiffRef    = useRef(null)
+  const highlightTimerRef = useRef(null)
 
   // Close lesson dropdown on outside click
   useEffect(() => {
@@ -205,6 +225,7 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle, series
       if (seg.type === 'narration') {
         setPhase('playing')
         if (seg.code !== null && seg.code !== undefined) {
+          highlightNewLines(seg.code)
           setCode(seg.code)
           setLogs([])
           setRunError(null)
@@ -270,6 +291,8 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle, series
     pauseRef.current = true
     stopSpeech()
     clearCheckpoint(lesson.id)
+    prevCodeRef.current = ''
+    decorationCollRef.current?.clear()
     setSegIdx(0)
     setPhase('idle')
     setCode('')
@@ -303,6 +326,8 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle, series
     }
 
     const targetSeg = segments[targetIdx]
+    prevCodeRef.current = ''
+    decorationCollRef.current?.clear()
     setSegIdx(targetIdx)
     setCode(targetSeg?.startCode ?? targetSeg?.code ?? '')
     setLogs([])
@@ -362,6 +387,42 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle, series
     } catch {}
     navigate('/codelens')
   }
+
+  // ── New-line highlight ────────────────────────────────────────────────────────
+
+  // Stage a highlight diff — the useEffect below applies it after Monaco updates
+  function highlightNewLines(newCode) {
+    pendingDiffRef.current = { prev: prevCodeRef.current, next: newCode }
+    prevCodeRef.current = newCode
+  }
+
+  // Apply staged decorations after Monaco has received the new value
+  useEffect(() => {
+    const pending = pendingDiffRef.current
+    if (!pending) return
+    pendingDiffRef.current = null
+
+    const editor = editorRef.current
+    const monaco = monacoRef.current
+    if (!editor || !monaco) return
+
+    const newNums = diffNewLines(pending.prev, pending.next)
+    clearTimeout(highlightTimerRef.current)
+    decorationCollRef.current?.clear()
+    if (!newNums.length) return
+
+    decorationCollRef.current = editor.createDecorationsCollection(
+      newNums.map(line => ({
+        range: new monaco.Range(line, 1, line, 1),
+        options: { isWholeLine: true, className: 'lesson-new-line' },
+      }))
+    )
+
+    highlightTimerRef.current = setTimeout(() => {
+      decorationCollRef.current?.clear()
+    }, 3000)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [code])
 
   // ── Cleanup ───────────────────────────────────────────────────────────────────
 
@@ -459,6 +520,10 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle, series
               theme="vs-dark"
               value={code}
               onChange={setCode}
+              onMount={(editor, monaco) => {
+                editorRef.current = editor
+                monacoRef.current = monaco
+              }}
               options={{
                 fontSize: 13,
                 fontFamily: "'JetBrains Mono', 'Fira Code', monospace",

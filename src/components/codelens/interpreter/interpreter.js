@@ -807,6 +807,15 @@ class Interpreter {
   _construct(cls, args, callNode, callerEnv) {
     if (cls?.__kind !== 'class') throw new TypeError(`${cls?.name ?? 'Value'} is not a constructor`)
 
+    // Native constructors (Array, Map, Set, etc.) provide their own __construct
+    if (cls.__construct?.__kind === 'native') {
+      const result = cls.__construct.fn(null, args, this)
+      this._emit(EventType.OBJECT_CREATE, callNode, callerEnv, {
+        objectId: result?.objectId, objectType: cls.name,
+      })
+      return result
+    }
+
     const instance = this.heap.allocate(cls.name, {}, cls.__protoId)
     this._emit(EventType.OBJECT_CREATE, callNode, callerEnv, {
       objectId: instance.objectId, objectType: cls.name,
@@ -1162,7 +1171,8 @@ class Interpreter {
     }, 'const')
 
     env.define('Array', {
-      __kind: 'native', name: 'Array',
+      __kind: 'class', name: 'Array', __protoId: null, protoRef: null, superCls: null,
+      staticMethods: {},
       isArray: native('Array.isArray', (_, [x]) => isRef(x) && self.heap.objects.get(x.objectId)?.type === 'Array'),
       from:    native('Array.from',    (_, [x]) => {
         const items = self._toIterable(x)
@@ -1171,6 +1181,19 @@ class Interpreter {
         return ref
       }),
       of:      native('Array.of',      (_, args) => {
+        const ref = self.heap.allocate('Array', { length: args.length })
+        args.forEach((v, i) => self.heap.set(ref, String(i), v))
+        return ref
+      }),
+      __construct: native('new Array', (_, args) => {
+        // new Array(size) — create sparse array of given length
+        if (args.length === 1 && typeof args[0] === 'number') {
+          const size = args[0]
+          const ref = self.heap.allocate('Array', { length: size })
+          for (let i = 0; i < size; i++) self.heap.set(ref, String(i), undefined)
+          return ref
+        }
+        // new Array(a, b, c, ...) — array literal shorthand
         const ref = self.heap.allocate('Array', { length: args.length })
         args.forEach((v, i) => self.heap.set(ref, String(i), v))
         return ref
