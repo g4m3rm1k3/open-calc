@@ -584,9 +584,19 @@ const MD_COMPONENTS = {
   },
 }
 
+function nodeContainsFile(node, filePath) {
+  if (!filePath) return false
+  if (node.type === 'file') return node.path === filePath
+  return (node.children ?? []).some(child => nodeContainsFile(child, filePath))
+}
+
 function TreeNode({ node, activeFile, onSelect, depth = 0, overriddenPaths = new Set(), accentColor = '#0ea5e9' }) {
-  const [open, setOpen] = useState(node.open !== false)
+  const [open, setOpen] = useState(() => node.open !== false || nodeContainsFile(node, activeFile))
   const indent = depth * 14
+
+  useEffect(() => {
+    if (nodeContainsFile(node, activeFile)) setOpen(true)
+  }, [activeFile]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (node.type === 'dir') {
     return (
