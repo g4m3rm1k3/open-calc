@@ -47,8 +47,12 @@ function stripTypeScript(src) {
   // Return type annotations: ): Type {  or  ): Type;
   s = s.replace(/\)\s*:\s*[\w.<>|&\[\] ]+(?=\s*[\{;,])/g, ')')
 
-  // Variable/param type annotations: x: Type  (not inside strings)
-  s = s.replace(/(\w)\s*\??\s*:\s*[\w.<>|&\[\] ]+(?=\s*[,)=;!?\n])/g, '$1')
+  // Variable/param type annotations: x: Type — only when annotation looks like a TS type
+  // (uppercase class name or known primitive keyword), to avoid stripping object property values like x: 3
+  s = s.replace(
+    /(\w)\s*\??\s*:\s*(?=[A-Z]|string\b|number\b|boolean\b|void\b|any\b|never\b|unknown\b|null\b|undefined\b|object\b)[\w.<>|&\[\] ]+(?=\s*[,)=;!?\n])/g,
+    '$1'
+  )
 
   // `as Type` casts
   s = s.replace(/\s+as\s+[\w.<>|&\[\] ]+/g, '')
