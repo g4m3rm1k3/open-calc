@@ -3,8 +3,9 @@ export const lesson = {
   series: { id: 'sicp', title: 'SICP — JavaScript' },
   title: '2.2.2  Hierarchical Structures and Trees',
   checkpoints: [
-    { id: 'cp-trees',       label: 'Trees' },
-    { id: 'cp-tree-ops',    label: 'Tree Operations' },
+    { id: 'cp-tree-structure',  label: 'Trees' },
+    { id: 'cp-count-leaves',    label: 'Tree Recursion' },
+    { id: 'cp-tree-operations', label: 'Tree Operations' },
   ],
   segments: [
 
@@ -12,118 +13,110 @@ export const lesson = {
     {
       type: 'narration',
       id: 'intro',
-      text: 'A list whose elements can themselves be lists forms a tree. Trees are everywhere in computer science: file systems, expression parsers, HTML documents, decision trees, and the call trees we saw in tree recursion. The pair structure of SICP lists naturally represents trees — a pair can hold either a leaf value or a sub-list (sub-tree) in any position.',
+      text: 'In the previous lesson, a list was a chain of pairs where every element was a simple value — a number or string. Hierarchical structures break that restriction: an element can itself be a list. A list of lists is a tree. Trees are not a special data structure — they are just the pair structure we already have, interpreted differently. This reinterpretation unlocks a huge amount: file systems are trees, HTML documents are trees, algebraic expressions are trees, and the call graphs we saw in tree recursion are trees. The pair-chain model handles all of them without any new syntax.',
       code: null,
     },
 
-    // ── Terminology: Trees ─────────────────────────────────────────────────────────
+    // ── What a tree looks like ────────────────────────────────────────────────────
     {
       type: 'narration',
-      id: 'tree-vocab',
-      text: 'In a tree built from lists: a leaf is any element that is not itself a pair — a number, string, or null. A branch (or internal node) is a pair whose head or tail may themselves be pairs. The depth of a node is how many levels down it sits from the root. A tree with only leaves at the bottom and pairs everywhere else is also called a deeply nested list. The function is_pair tests whether a value is a branch.',
+      id: 'tree-structure-vocab',
+      text: 'In a tree built from lists, every node is either a leaf or a branch. A leaf is any element that is not itself a pair — a number, a string, null. A branch is a pair whose head or tail may themselves be pairs. The depth of a node is the number of levels above it. The root is the outermost pair; leaves are at the bottom. The function is_pair distinguishes branches from leaves. The function is_null marks the end of a chain.',
       code: null,
     },
-
-    // ── 2.2.2  Trees ─────────────────────────────────────────────────────────────
     {
       type: 'narration',
       id: 'tree-build',
-      text: 'Here is a tree built from nested lists. The structure list(list(1, 2), list(3, 4)) represents a tree with two sub-lists at the top level. Running JSON.stringify shows the raw pair structure — pairs of pairs, all the way down.',
-      code: 'function pair(x, y) { return [x, y]; }\nfunction head(p)    { return p[0]; }\nfunction tail(p)    { return p[1]; }\nfunction is_null(x) { return x === null; }\nfunction is_pair(x) { return Array.isArray(x); }\nfunction list(...a) { return a.reduceRight((acc, x) => pair(x, acc), null); }\n\nconst tree = list(list(1, 2), list(3, 4));\n\nconsole.log(is_pair(tree));          // true — it is a branch\nconsole.log(is_pair(head(tree)));    // true — first element is also a branch\nconsole.log(is_pair(head(head(tree)))); // false — 1 is a leaf',
+      text: 'Here is a tree as nested lists. list(list(1,2), list(3,4)) has two branches at the top level, each containing two leaves. Run it and look at the raw pair structure — every branch is [element, [element, ...]], every leaf is a plain number.',
+      code: 'function pair(x,y){return[x,y];}\nfunction head(p){return p[0];}\nfunction tail(p){return p[1];}\nfunction is_null(x){return x===null;}\nfunction is_pair(x){return Array.isArray(x);}\nfunction list(...a){return a.reduceRight((acc,x)=>pair(x,acc),null);}\n\nconst tree = list(list(1,2), list(3,4));\n\nconsole.log(is_pair(tree));             // true — root is a branch\nconsole.log(is_pair(head(tree)));       // true — first child is a branch\nconsole.log(is_pair(head(head(tree)))); // false — 1 is a leaf\nconsole.log(head(head(tree)));          // 1',
     },
-
-    // ── count_leaves ──────────────────────────────────────────────────────────────
     {
       type: 'narration',
-      id: 'count-leaves-vocab',
-      text: 'Processing trees requires a different recursive pattern from lists. For lists, there was one base case (null) and one recursive call (on the tail). For trees, there are two base cases and two recursive cases. Base case 1: null is zero leaves. Base case 2: a non-pair (a leaf) is one leaf. Recursive case 1: if the head is a pair (a sub-tree), count its leaves recursively. Recursive case 2: always recurse on the tail. This double recursion mirrors the branching structure of the tree.',
+      id: 'tree-navigation',
+      text: 'To navigate a tree you still use head and tail. But now you must also check whether each element is a pair before treating it as a sub-list. This check — is_pair — is what separates tree processing from list processing.',
+      code: 'function pair(x,y){return[x,y];}\nfunction head(p){return p[0];}\nfunction tail(p){return p[1];}\nfunction is_null(x){return x===null;}\nfunction is_pair(x){return Array.isArray(x);}\nfunction list(...a){return a.reduceRight((acc,x)=>pair(x,acc),null);}\n\n// Deeply nested: list(1, list(2, list(3, 4)), 5)\nconst t = list(1, list(2, list(3,4)), 5);\n\nconsole.log(head(t));                          // 1 — first leaf\nconsole.log(head(head(tail(t))));              // 2 — first leaf of branch\nconsole.log(head(head(tail(head(tail(t)))))); // 3 — nested two levels',
+    },
+    {
+      type: 'checkpoint',
+      id: 'cp-tree-structure',
+    },
+
+    // ── The four-case pattern ─────────────────────────────────────────────────────
+    {
+      type: 'narration',
+      id: 'four-case-vocab',
+      text: 'Processing lists needed two cases: null (empty list) and non-null (one element plus the rest). Processing trees needs four cases. Null is still zero contributions. But now a non-null element has two sub-cases: is it a leaf (not a pair) or a branch (a pair that is a sub-tree)? And there is still the "rest of the list" case. The complete pattern: (1) null → base case, (2) non-pair → leaf case, (3) pair at head → recurse into head, (4) always → recurse on tail. Every tree operation follows this structure.',
       code: null,
     },
     {
       type: 'narration',
-      id: 'count-leaves',
-      text: 'count_leaves implements the four-case pattern. Run it — the tree list(list(1,2), list(3,4)) has 4 leaves, and the nested list(list(1, list(2, 3)), list(4, 5)) has 5.',
-      code: 'function pair(x, y) { return [x, y]; }\nfunction head(p)    { return p[0]; }\nfunction tail(p)    { return p[1]; }\nfunction is_null(x) { return x === null; }\nfunction is_pair(x) { return Array.isArray(x); }\nfunction list(...a) { return a.reduceRight((acc, x) => pair(x, acc), null); }\n\nfunction count_leaves(x) {\n  if (is_null(x))  return 0;                          // base: empty\n  if (!is_pair(x)) return 1;                          // base: leaf\n  return count_leaves(head(x)) +                      // recurse into sub-tree at head\n         count_leaves(tail(x));                       // recurse on rest of list\n}\n\nconsole.log(count_leaves(list(list(1,2), list(3,4)))); // 4\nconsole.log(count_leaves(list(1, list(2, list(3, 4)), 5))); // 5',
+      id: 'count-leaves-code',
+      text: 'count_leaves is the simplest example of the four-case pattern. An empty list has 0 leaves. A non-pair element IS a leaf — count 1. A branch means: count the leaves under the head, then add the count from the tail. Run it — note that list(list(1,2),list(3,4)) has 4 leaves and the more deeply nested example has 5.',
+      code: 'function pair(x,y){return[x,y];}\nfunction head(p){return p[0];}\nfunction tail(p){return p[1];}\nfunction is_null(x){return x===null;}\nfunction is_pair(x){return Array.isArray(x);}\nfunction list(...a){return a.reduceRight((acc,x)=>pair(x,acc),null);}\n\nfunction count_leaves(x) {\n  if (is_null(x))  return 0;  // end of chain\n  if (!is_pair(x)) return 1;  // a leaf\n  return count_leaves(head(x)) + count_leaves(tail(x)); // branch\n}\n\nconsole.log(count_leaves(list(list(1,2), list(3,4)))); // 4\nconsole.log(count_leaves(list(1, list(2, list(3,4)), 5))); // 5',
     },
     {
       type: 'codelens',
       id: 'codelens-count-leaves',
-      text: 'Open CodeLens on count_leaves of a small nested list. Watch the double recursion: when the head is a pair, count_leaves dives into it; it always also recurses on the tail. The call tree mirrors the data tree — that is the essential insight of tree processing.',
-      code: 'function pair(x, y) { return [x, y]; }\nfunction head(p) { return p[0]; }\nfunction tail(p) { return p[1]; }\nfunction is_null(x) { return x === null; }\nfunction is_pair(x) { return Array.isArray(x); }\nfunction list(...a) { return a.reduceRight((acc, x) => pair(x, acc), null); }\n\nfunction count_leaves(x) {\n  if (is_null(x))  return 0;\n  if (!is_pair(x)) return 1;\n  return count_leaves(head(x)) + count_leaves(tail(x));\n}\n\nconsole.log(count_leaves(list(list(1, 2), 3)));',
+      text: 'Open CodeLens on count_leaves of list(list(1,2), 3). Watch the double recursion unfold: the call visits the outer pair\'s head (list(1,2) — a sub-tree) and recurses into it, then visits the outer pair\'s tail (pair(3,null)) and recurses into that. When it hits a non-pair element, it returns 1. When it hits null, it returns 0. The call tree mirrors the data tree exactly.',
+      code: 'function pair(x,y){return[x,y];}\nfunction head(p){return p[0];}\nfunction tail(p){return p[1];}\nfunction is_null(x){return x===null;}\nfunction is_pair(x){return Array.isArray(x);}\nfunction list(...a){return a.reduceRight((acc,x)=>pair(x,acc),null);}\n\nfunction count_leaves(x) {\n  if (is_null(x))  return 0;\n  if (!is_pair(x)) return 1;\n  return count_leaves(head(x)) + count_leaves(tail(x));\n}\n\nconsole.log(count_leaves(list(list(1,2), 3)));',
     },
     {
       type: 'checkpoint',
-      id: 'cp-trees',
+      id: 'cp-count-leaves',
     },
     {
       type: 'challenge',
-      id: 'challenge-tree-sum',
-      text: 'Using the same four-case pattern as count_leaves, write sum_tree(x) that adds up all the leaf numbers in a tree. Base case null: return 0. Base case non-pair: return x (it is a number). Recursive case: sum_tree(head) + sum_tree(tail). sum_tree(list(1, list(2, 3), 4)) should return 10.',
+      id: 'challenge-sum-tree',
+      text: 'Using the four-case pattern, write sum_tree(x) that adds all leaf numbers in a tree. Null contributes 0. A non-pair x is a leaf — return x. A pair recurses on both head and tail. sum_tree(list(1, list(2,3), 4)) should be 10.',
       expectedOutput: '10\n15',
-      startCode: 'function pair(x, y) { return [x, y]; }\nfunction head(p)    { return p[0]; }\nfunction tail(p)    { return p[1]; }\nfunction is_null(x) { return x === null; }\nfunction is_pair(x) { return Array.isArray(x); }\nfunction list(...a) { return a.reduceRight((acc, x) => pair(x, acc), null); }\n\n// sum_tree: same four-case pattern as count_leaves\nfunction sum_tree(x) {\n  // your code here\n}\n\nconsole.log(sum_tree(list(1, list(2, 3), 4)));      // 10\nconsole.log(sum_tree(list(list(1,2), list(3,4), 5))); // 15\n',
+      startCode: 'function pair(x,y){return[x,y];}\nfunction head(p){return p[0];}\nfunction tail(p){return p[1];}\nfunction is_null(x){return x===null;}\nfunction is_pair(x){return Array.isArray(x);}\nfunction list(...a){return a.reduceRight((acc,x)=>pair(x,acc),null);}\n\nfunction sum_tree(x) {\n  // your code here — four cases: null, non-pair, is_pair\n}\n\nconsole.log(sum_tree(list(1, list(2,3), 4)));        // 10\nconsole.log(sum_tree(list(list(1,2), list(3,4), 5))); // 15\n',
       hint: 'function sum_tree(x) {\n  if (is_null(x))  return 0;\n  if (!is_pair(x)) return x;\n  return sum_tree(head(x)) + sum_tree(tail(x));\n}',
-      tests: [
-        { call: 'sum_tree(list(1, list(2,3), 4))',         expected: 10 },
-        { call: 'sum_tree(list(list(1,2), list(3,4), 5))', expected: 15 },
-      ],
+      tests: [],
       validate: ({ code }) => {
         try {
           const fn = new Function(`"use strict";
-function pair(x,y){return[x,y];}
-function head(p){return p[0];}
-function tail(p){return p[1];}
-function is_null(x){return x===null;}
-function is_pair(x){return Array.isArray(x);}
+function pair(x,y){return[x,y];}function head(p){return p[0];}function tail(p){return p[1];}
+function is_null(x){return x===null;}function is_pair(x){return Array.isArray(x);}
 function list(...a){return a.reduceRight((acc,x)=>pair(x,acc),null);}
 ${code}
-return typeof sum_tree==='function'&&sum_tree(list(1,list(2,3),4))===10&&sum_tree(list(list(1,2),list(3,4),5))===15`)
+return sum_tree(list(1,list(2,3),4))===10&&sum_tree(list(list(1,2),list(3,4),5))===15`)
           return fn() === true
         } catch { return false }
       },
     },
 
-    // ── tree_map ─────────────────────────────────────────────────────────────────
+    // ── Tree operations ───────────────────────────────────────────────────────────
     {
       type: 'narration',
-      id: 'scale-tree',
-      text: 'scale_tree multiplies every leaf of a tree by a factor, preserving the tree structure. It uses the same four-case pattern: null maps to null, a leaf multiplies by factor, a branch applies scale_tree recursively to both head and tail.',
-      code: 'function pair(x, y) { return [x, y]; }\nfunction head(p)    { return p[0]; }\nfunction tail(p)    { return p[1]; }\nfunction is_null(x) { return x === null; }\nfunction is_pair(x) { return Array.isArray(x); }\nfunction list(...a) { return a.reduceRight((acc, x) => pair(x, acc), null); }\n\nfunction scale_tree(tree, factor) {\n  if (is_null(tree))   return null;\n  if (!is_pair(tree))  return tree * factor;\n  return pair(scale_tree(head(tree), factor),\n              scale_tree(tail(tree), factor));\n}\n\nconsole.log(JSON.stringify(\n  scale_tree(list(1, list(2, list(3, 4), 5)), 10)\n)); // [10, [[20, [[30, [40, null]], [50, null]]], null]]',
+      id: 'tree-map-vocab',
+      text: 'map applied to a flat list transformed each element independently. tree_map applies a function to every leaf of a tree, leaving the structure unchanged. The four-case pattern applies: null maps to null, a leaf maps to f(leaf), a branch recurses into both head and tail and reassembles. The resulting tree has the same shape as the input but every leaf value is f(old_value). This is the tree analogue of flat map.',
+      code: null,
     },
     {
       type: 'narration',
-      id: 'tree-map-intro',
-      text: 'Just as we abstracted list map from scale_list, we can abstract tree_map from scale_tree. tree_map takes a function f and applies it to every leaf, preserving structure. The pattern is the same — what varies is the leaf transformation.',
-      code: 'function pair(x, y) { return [x, y]; }\nfunction head(p)    { return p[0]; }\nfunction tail(p)    { return p[1]; }\nfunction is_null(x) { return x === null; }\nfunction is_pair(x) { return Array.isArray(x); }\nfunction list(...a) { return a.reduceRight((acc, x) => pair(x, acc), null); }\n\nfunction tree_map(f, tree) {\n  if (is_null(tree))  return null;\n  if (!is_pair(tree)) return f(tree);           // leaf: apply f\n  return pair(tree_map(f, head(tree)),\n              tree_map(f, tail(tree)));\n}\n\n// scale_tree is now just tree_map with multiplication\nconst t = list(1, list(2, 3), 4);\nconsole.log(JSON.stringify(tree_map(x => x * 10, t)));\nconsole.log(JSON.stringify(tree_map(x => x * x,  t)));',
+      id: 'tree-map-code',
+      text: 'Here is tree_map. Run it — every leaf is squared, but the nesting structure is preserved.',
+      code: 'function pair(x,y){return[x,y];}\nfunction head(p){return p[0];}\nfunction tail(p){return p[1];}\nfunction is_null(x){return x===null;}\nfunction is_pair(x){return Array.isArray(x);}\nfunction list(...a){return a.reduceRight((acc,x)=>pair(x,acc),null);}\n\nfunction tree_map(f, x) {\n  if (is_null(x))  return null;\n  if (!is_pair(x)) return f(x);\n  return pair(tree_map(f, head(x)), tree_map(f, tail(x)));\n}\n\nconst t = list(1, list(2,3), list(4, list(5,6)));\nconsole.log(JSON.stringify(tree_map(x => x*x, t)));',
+    },
+    {
+      type: 'narration',
+      id: 'flatten-intro',
+      text: 'flatten takes a tree and produces a flat list of all its leaves in left-to-right order. The structure is discarded; only the leaf values survive. flatten uses append to combine sub-results: the flattened head is appended to the flattened tail. For leaves, it produces a singleton list. This is perhaps the most useful tree operation — it undoes the nesting without losing any data.',
+      code: 'function pair(x,y){return[x,y];}\nfunction head(p){return p[0];}\nfunction tail(p){return p[1];}\nfunction is_null(x){return x===null;}\nfunction is_pair(x){return Array.isArray(x);}\nfunction list(...a){return a.reduceRight((acc,x)=>pair(x,acc),null);}\nfunction append(l1,l2){return is_null(l1)?l2:pair(head(l1),append(tail(l1),l2));}\n\nfunction flatten(x) {\n  if (is_null(x))  return null;\n  if (!is_pair(x)) return list(x);            // leaf → singleton list\n  return append(flatten(head(x)),\n                flatten(tail(x)));            // combine sub-results\n}\n\nconst t = list(1, list(2,3), list(4, list(5,6)));\n// Flat: (1 2 3 4 5 6)\nconst flat = flatten(t);\nlet cur = flat, out = [];\nwhile (cur !== null) { out.push(cur[0]); cur = cur[1]; }\nconsole.log(out.join(\', \')); // 1, 2, 3, 4, 5, 6',
     },
     {
       type: 'challenge',
-      id: 'challenge-flatten',
-      text: 'Write flatten(tree) that returns a flat list of all the leaves of a tree in left-to-right order, discarding the structure. Use append to combine sub-results. Base case null: return null (empty list). Base case non-pair: return list(x) (a singleton list). Recursive case: append(flatten(head), flatten(tail)). flatten(list(1, list(2, 3), list(4, list(5, 6)))) should give (1 2 3 4 5 6).',
-      expectedOutput: '(1 2 3 4 5 6)',
-      startCode: 'function pair(x, y) { return [x, y]; }\nfunction head(p)    { return p[0]; }\nfunction tail(p)    { return p[1]; }\nfunction is_null(x) { return x === null; }\nfunction is_pair(x) { return Array.isArray(x); }\nfunction list(...a) { return a.reduceRight((acc, x) => pair(x, acc), null); }\nfunction append(l1, l2) {\n  return is_null(l1) ? l2 : pair(head(l1), append(tail(l1), l2));\n}\nfunction display(x) {\n  if (x === null) return \'nil\';\n  if (!is_pair(x)) return String(x);\n  const items = []; let cur = x;\n  while (is_pair(cur)) { items.push(cur[0]); cur = cur[1]; }\n  return `(${items.join(\' \')})` ;\n}\n\n// flatten: append(flatten(head), flatten(tail)), singleton list for leaves\nfunction flatten(tree) {\n  // your code here\n}\n\nconsole.log(display(flatten(list(1, list(2, 3), list(4, list(5, 6)))))); // (1 2 3 4 5 6)\n',
-      hint: 'function flatten(tree) {\n  if (is_null(tree))  return null;\n  if (!is_pair(tree)) return list(tree);\n  return append(flatten(head(tree)), flatten(tail(tree)));\n}',
+      id: 'challenge-deep-reverse',
+      text: 'Write deep_reverse(tree) that reverses a list at every level of nesting simultaneously. deep_reverse(list(1, list(2,3), list(4,5))) should give (list(list(5,4), list(3,2), 1)). Hint: null maps to null, a non-pair is returned unchanged, a branch reverses the head recursively and then appends the reversed tail to a singleton list of the reversed head. Actually: deep_reverse(pair(h,t)) = append(deep_reverse(t), list(deep_reverse(h))).',
+      expectedOutput: 'reversed',
+      startCode: 'function pair(x,y){return[x,y];}\nfunction head(p){return p[0];}\nfunction tail(p){return p[1];}\nfunction is_null(x){return x===null;}\nfunction is_pair(x){return Array.isArray(x);}\nfunction list(...a){return a.reduceRight((acc,x)=>pair(x,acc),null);}\nfunction append(l1,l2){return is_null(l1)?l2:pair(head(l1),append(tail(l1),l2));}\n\nfunction deep_reverse(tree) {\n  // your code here\n}\n\nconst t = list(1, list(2,3));\nconst r = deep_reverse(t);\n// Should be: (list(3,2), 1)\n// Check: head is list(3,2), tail head is 1\nconst ok = is_pair(head(r)) && head(head(r))===3 && head(tail(r))===1;\nconsole.log(ok ? \'reversed\' : \'wrong\');\n',
+      hint: 'function deep_reverse(tree) {\n  if (is_null(tree))  return null;\n  if (!is_pair(tree)) return tree;\n  return append(deep_reverse(tail(tree)),\n                list(deep_reverse(head(tree))));\n}',
       tests: [],
-      validate: ({ code }) => {
-        try {
-          const fn = new Function(`"use strict";
-function pair(x,y){return[x,y];}
-function head(p){return p[0];}
-function tail(p){return p[1];}
-function is_null(x){return x===null;}
-function is_pair(x){return Array.isArray(x);}
-function list(...a){return a.reduceRight((acc,x)=>pair(x,acc),null);}
-function append(l1,l2){return is_null(l1)?l2:pair(head(l1),append(tail(l1),l2));}
-${code}
-const t = list(1,list(2,3),list(4,list(5,6)));
-const f = flatten(t);
-return typeof flatten==='function'&&head(f)===1&&head(tail(f))===2&&head(tail(tail(tail(tail(tail(f))))))===6`)
-          return fn() === true
-        } catch { return false }
-      },
+      validate: ({ logs }) => logs.some(l => l.includes('reversed')),
     },
     {
       type: 'checkpoint',
-      id: 'cp-tree-ops',
+      id: 'cp-tree-operations',
     },
   ],
 }

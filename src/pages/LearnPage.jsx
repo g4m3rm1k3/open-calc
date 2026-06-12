@@ -12,6 +12,16 @@ import { lesson as sicp15 } from '../data/learn/sicp/lesson-1-5.js'
 import { lesson as sicp16 } from '../data/learn/sicp/lesson-1-6.js'
 import { lesson as sicp17 } from '../data/learn/sicp/lesson-1-7.js'
 import { lesson as sicp21 } from '../data/learn/sicp/lesson-2-1.js'
+import { lesson as sicp22 } from '../data/learn/sicp/lesson-2-2.js'
+import { lesson as sicp23 } from '../data/learn/sicp/lesson-2-3.js'
+import { lesson as sicp24 } from '../data/learn/sicp/lesson-2-4.js'
+import { lesson as sicp25 } from '../data/learn/sicp/lesson-2-5.js'
+import { lesson as sicp26 } from '../data/learn/sicp/lesson-2-6.js'
+import { lesson as sicp27 } from '../data/learn/sicp/lesson-2-7.js'
+import { lesson as sicp31 } from '../data/learn/sicp/lesson-3-1.js'
+import { lesson as sicp32 } from '../data/learn/sicp/lesson-3-2.js'
+import { lesson as sicp33 } from '../data/learn/sicp/lesson-3-3.js'
+import { lesson as sicp41 } from '../data/learn/sicp/lesson-4-1.js'
 
 import { lesson as dsa01 } from '../data/learn/dsa-patterns/lesson-01.js'
 import { lesson as dsa02 } from '../data/learn/dsa-patterns/lesson-02.js'
@@ -26,6 +36,16 @@ const LESSONS = {
   'sicp/1-6': sicp16,
   'sicp/1-7': sicp17,
   'sicp/2-1': sicp21,
+  'sicp/2-2': sicp22,
+  'sicp/2-3': sicp23,
+  'sicp/2-4': sicp24,
+  'sicp/2-5': sicp25,
+  'sicp/2-6': sicp26,
+  'sicp/2-7': sicp27,
+  'sicp/3-1': sicp31,
+  'sicp/3-2': sicp32,
+  'sicp/3-3': sicp33,
+  'sicp/4-1': sicp41,
 
   'dsa-patterns/01': dsa01,
   'dsa-patterns/02': dsa02,
@@ -34,7 +54,10 @@ const LESSONS = {
 
 // Ordered series list — drives "Next lesson" button
 const SERIES_ORDER = {
-  sicp: ['1-1', '1-2', '1-3', '1-4', '1-5', '1-6', '1-7', '2-1'],
+  sicp: ['1-1', '1-2', '1-3', '1-4', '1-5', '1-6', '1-7',
+         '2-1', '2-2', '2-3', '2-4', '2-5', '2-6', '2-7',
+         '3-1', '3-2', '3-3',
+         '4-1'],
   'dsa-patterns': ['01', '02', '03'],
 }
 
