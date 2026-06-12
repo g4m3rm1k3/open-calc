@@ -98,6 +98,14 @@ export const lesson = {
       code: 'function gcd(a, b) {\n  return b === 0 ? a : gcd(b, a % b);\n}\n\nconsole.log(gcd(48, 18));',
     },
 
+    // ── LCM via GCD ──────────────────────────────────────────────────────────────
+    {
+      type: 'narration',
+      id: 'lcm-via-gcd',
+      text: 'The least common multiple (LCM) of a and b is the smallest integer divisible by both. It is related to the GCD by the identity: lcm(a, b) = a * b / gcd(a, b). If you know the GCD you get the LCM for free.',
+      code: 'function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }\n\nfunction lcm(a, b) {\n  return (a * b) / gcd(a, b);\n}\n\nconsole.log(lcm(4, 6));   // 12\nconsole.log(lcm(12, 18)); // 36',
+    },
+
     // ── Primality ─────────────────────────────────────────────────────────────────
     {
       type: 'narration',
@@ -111,6 +119,20 @@ export const lesson = {
       text: 'The strategy: find the smallest divisor of n starting from 2. If the smallest divisor is n itself, n is prime. We stop testing at √n because of the argument above — if no divisor is found up to that point, there are none. find_divisor uses recursion to test each candidate.',
       code: 'function square(x) { return x * x; }\n\nfunction find_divisor(n, test) {\n  if (square(test) > n) return n;\n  if (n % test === 0) return test;\n  return find_divisor(n, test + 1);\n}\n\nfunction smallest_divisor(n) {\n  return find_divisor(n, 2);\n}\n\nfunction is_prime(n) {\n  return n > 1 && smallest_divisor(n) === n;\n}\n\nconsole.log(is_prime(7));    // true\nconsole.log(is_prime(12));   // false\nconsole.log(is_prime(997));  // true',
     },
+    // ── Fermat test (1.2.6) ───────────────────────────────────────────────────────
+    {
+      type: 'narration',
+      id: 'fermat-vocab',
+      text: 'Section 1.2.6 introduces the first probabilistic algorithm in the book. Fermat\'s Little Theorem: if n is prime and a is any positive integer less than n, then a to the n mod n equals a. This gives us a test: pick a random a, compute a^n mod n using fast modular exponentiation, and check whether you get a back. If the test fails, n is definitely not prime. If it succeeds, n is probably prime. Running the test k times with different random a values makes the probability of error as small as we like.\n\nModular fast exponentiation uses the same successive squaring idea but reduces mod n at each step to keep the numbers from exploding.',
+      code: null,
+    },
+    {
+      type: 'narration',
+      id: 'fermat-code',
+      text: 'Here is the Fermat test. expmod computes base^exp mod m using successive squaring. fermat_test picks a random a and checks the theorem. Run it on a prime (97) and a composite (100) — primes pass consistently, composites usually fail.',
+      code: 'function square(x) { return x * x; }\n\nfunction expmod(base, exp, m) {\n  if (exp === 0) return 1;\n  if (exp % 2 === 0) return square(expmod(base, exp / 2, m)) % m;\n  return (base * expmod(base, exp - 1, m)) % m;\n}\n\nfunction fermat_test(n) {\n  const a = 2 + Math.floor(Math.random() * (n - 2)); // random a in [2, n-1]\n  return expmod(a, n, n) === a;\n}\n\nfunction fast_prime(n, times) {\n  if (times === 0) return true;\n  if (fermat_test(n)) return fast_prime(n, times - 1);\n  return false;\n}\n\nconsole.log(fast_prime(97,  100)); // true  — 97 is prime\nconsole.log(fast_prime(100, 100)); // false — 100 is composite',
+    },
+
     {
       type: 'narration',
       id: 'primality-primes',

@@ -89,6 +89,14 @@ export const lesson = {
       },
     },
 
+    // ── Product — the natural complement to sum ───────────────────────────────────
+    {
+      type: 'narration',
+      id: 'product-abstraction',
+      text: 'sum adds terms. product multiplies them. Both share the same skeleton — only the base value (0 for sum, 1 for product) and the combining operation (+ vs ×) differ. SICP 1.3.1 asks you to write product in the same style as sum. With product you can define factorial as a product from 1 to n, and approximate π/4 using the Wallis formula: 2/3 × 4/3 × 4/5 × 6/5 × 6/7 × ...',
+      code: 'function product(term, a, next, b) {\n  if (a > b) return 1;               // base: identity for ×\n  return term(a) * product(term, next(a), next, b);\n}\n\n// Factorial via product\nfunction factorial(n) {\n  return product(x => x, 1, x => x + 1, n);\n}\n\n// Wallis π approximation: π/4 ≈ ∏ (2k/(2k-1)) × (2k/(2k+1)) for k=1..n\nfunction wallis_pi(n) {\n  return product(\n    k => (2*k / (2*k - 1)) * (2*k / (2*k + 1)),\n    1, k => k + 1, n\n  );\n}\n\nconsole.log(factorial(5));          // 120\nconsole.log(4 * wallis_pi(1000));   // ≈ 3.14136...',
+    },
+
     // ── Closures returned from functions ─────────────────────────────────────────
     {
       type: 'narration',

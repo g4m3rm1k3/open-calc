@@ -38,6 +38,20 @@ export const lesson = {
       code: 'function fixed_point(f, first_guess) {\n  const tolerance = 0.00001;\n  function close_enough(a, b) { return Math.abs(a - b) < tolerance; }\n  function try_it(guess) {\n    const next = f(guess);\n    if (close_enough(guess, next)) return next;\n    return try_it(next);\n  }\n  return try_it(first_guess);\n}\n\nconsole.log(fixed_point(Math.cos, 1.0));',
     },
 
+    // ── Half-interval method (1.3.3) ─────────────────────────────────────────────
+    {
+      type: 'narration',
+      id: 'half-interval-vocab',
+      text: 'Section 1.3.3 introduces two techniques for finding values where a function produces a target output. The first is the half-interval method (bisection search): if f(a) < 0 < f(b), then f must cross zero somewhere between a and b (by the intermediate value theorem). Repeatedly evaluate f at the midpoint and discard the half that does not contain the sign change. Each step halves the interval — this is a Θ(log((b-a)/tolerance)) algorithm.',
+      code: null,
+    },
+    {
+      type: 'narration',
+      id: 'half-interval-code',
+      text: 'Here is the half-interval search for roots. search takes f, a negative point, and a positive point. It checks the midpoint sign each time. half_interval_search takes care of ordering the initial endpoints correctly.',
+      code: 'function half_interval_search(f, a, b) {\n  const tol = 0.001;\n  function search(neg, pos) {\n    const mid = (neg + pos) / 2;\n    if (Math.abs(pos - neg) < tol) return mid;\n    const test = f(mid);\n    if (test < 0) return search(mid, pos);\n    if (test > 0) return search(neg, mid);\n    return mid;\n  }\n  const fa = f(a), fb = f(b);\n  if (fa < 0 && fb > 0) return search(a, b);\n  if (fa > 0 && fb < 0) return search(b, a);\n  throw new Error("values do not bracket a root");\n}\n\n// Root of x³ - 2x - 3 = 0 between 1 and 3\nconsole.log(half_interval_search(x => x*x*x - 2*x - 3, 1, 3)); // ≈ 1.893\n\n// sin(x) = 0 between 2 and 4 (the root is π ≈ 3.14159)\nconsole.log(half_interval_search(Math.sin, 2, 4)); // ≈ 3.14159',
+    },
+
     // ── Average damping ───────────────────────────────────────────────────────────
     {
       type: 'narration',

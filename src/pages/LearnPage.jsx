@@ -8,6 +8,7 @@ import { lesson as sicp11 } from '../data/learn/sicp/lesson-1-1.js'
 import { lesson as sicp12 } from '../data/learn/sicp/lesson-1-2.js'
 import { lesson as sicp13 } from '../data/learn/sicp/lesson-1-3.js'
 import { lesson as sicp14 } from '../data/learn/sicp/lesson-1-4.js'
+import { lesson as sicp14b } from '../data/learn/sicp/lesson-1-4b.js'
 import { lesson as sicp15 } from '../data/learn/sicp/lesson-1-5.js'
 import { lesson as sicp16 } from '../data/learn/sicp/lesson-1-6.js'
 import { lesson as sicp17 } from '../data/learn/sicp/lesson-1-7.js'
@@ -15,12 +16,16 @@ import { lesson as sicp21 } from '../data/learn/sicp/lesson-2-1.js'
 import { lesson as sicp22 } from '../data/learn/sicp/lesson-2-2.js'
 import { lesson as sicp23 } from '../data/learn/sicp/lesson-2-3.js'
 import { lesson as sicp24 } from '../data/learn/sicp/lesson-2-4.js'
+import { lesson as sicp24b } from '../data/learn/sicp/lesson-2-4b.js'
+import { lesson as sicp24c } from '../data/learn/sicp/lesson-2-4c.js'
 import { lesson as sicp25 } from '../data/learn/sicp/lesson-2-5.js'
 import { lesson as sicp26 } from '../data/learn/sicp/lesson-2-6.js'
 import { lesson as sicp27 } from '../data/learn/sicp/lesson-2-7.js'
+import { lesson as sicp27b } from '../data/learn/sicp/lesson-2-7b.js'
 import { lesson as sicp31 } from '../data/learn/sicp/lesson-3-1.js'
 import { lesson as sicp32 } from '../data/learn/sicp/lesson-3-2.js'
 import { lesson as sicp33 } from '../data/learn/sicp/lesson-3-3.js'
+import { lesson as sicp33b } from '../data/learn/sicp/lesson-3-3b.js'
 import { lesson as sicp41 } from '../data/learn/sicp/lesson-4-1.js'
 
 import { lesson as dsa01 } from '../data/learn/dsa-patterns/lesson-01.js'
@@ -39,6 +44,7 @@ const LESSONS = {
   'sicp/1-2': sicp12,
   'sicp/1-3': sicp13,
   'sicp/1-4': sicp14,
+  'sicp/1-4b': sicp14b,
   'sicp/1-5': sicp15,
   'sicp/1-6': sicp16,
   'sicp/1-7': sicp17,
@@ -46,12 +52,16 @@ const LESSONS = {
   'sicp/2-2': sicp22,
   'sicp/2-3': sicp23,
   'sicp/2-4': sicp24,
+  'sicp/2-4b': sicp24b,
+  'sicp/2-4c': sicp24c,
   'sicp/2-5': sicp25,
   'sicp/2-6': sicp26,
   'sicp/2-7': sicp27,
+  'sicp/2-7b': sicp27b,
   'sicp/3-1': sicp31,
   'sicp/3-2': sicp32,
   'sicp/3-3': sicp33,
+  'sicp/3-3b': sicp33b,
   'sicp/4-1': sicp41,
 
   'dsa-patterns/01': dsa01,
@@ -69,9 +79,9 @@ const LESSONS = {
 // Ordered series list — drives "Next lesson" button
 const SERIES_ORDER = {
   sicp: [
-    '1-1', '1-2', '1-3', '1-4', '1-5', '1-6', '1-7',
-    '2-1', '2-2', '2-3', '2-4', '2-5', '2-6', '2-7',
-    '3-1', '3-2', '3-3',
+    '1-1', '1-2', '1-3', '1-4', '1-4b', '1-5', '1-6', '1-7',
+    '2-1', '2-2', '2-3', '2-4', '2-4b', '2-4c', '2-5', '2-6', '2-7', '2-7b',
+    '3-1', '3-2', '3-3', '3-3b',
     '4-1',
   ],
   'dsa-patterns': ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10'],

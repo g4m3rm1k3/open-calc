@@ -69,6 +69,14 @@ export const lesson = {
       id: 'cp-conditionals',
     },
 
+    // ── Special forms: if does not evaluate both branches ────────────────────────
+    {
+      type: 'narration',
+      id: 'special-forms-vocab',
+      text: 'Conditionals are special forms — they are exceptions to the evaluation rule from section 1.1.3. The normal rule says: evaluate ALL sub-expressions first. But if does NOT evaluate both branches. Only the predicate is evaluated first. If the predicate is true, only the consequent is evaluated; the alternative is never touched. If the predicate is false, only the alternative runs.\n\nWhy does this matter? Because one branch might have a side effect or error that only makes sense in one case. If both branches always evaluated, you could never safely write if (x !== 0) { return 1/x; } — dividing by zero would always run. The same applies to && and ||: JavaScript short-circuits them. In a && b, if a is false, b is never evaluated.',
+      code: null,
+    },
+
     // ── Terminology: Declarative vs Imperative ────────────────────────────────────
     {
       type: 'narration',
@@ -89,6 +97,12 @@ export const lesson = {
       id: 'sqrt-improve',
       text: 'Now we need a stopping criterion. We define good_enough using abs and square: a guess is good enough when squaring it lands within 0.001 of x. Notice these are standalone helpers — we will put them together shortly. Run it: 1.4 squared is 1.96, which is 0.04 away from 2. Not good enough yet. 1.414 squared is about 1.99996 — good enough.',
       code: 'function square(x) { return x * x; }\nfunction abs(x)    { return x < 0 ? -x : x; }\n\nfunction good_enough(guess, x) {\n  return abs(square(guess) - x) < 0.001;\n}\n\nconsole.log(good_enough(1.4,   2));  // false — 1.4² = 1.96\nconsole.log(good_enough(1.414, 2));  // true  — 1.414² ≈ 1.9996',
+    },
+    {
+      type: 'narration',
+      id: 'sqrt-convergence',
+      text: 'Before writing the loop, see WHY Newton\'s method works. Start with a guess of 1 for √2. Repeatedly apply improve: average the guess with x divided by the guess. The sequence converges fast.',
+      code: 'function improve(guess, x) { return (guess + x / guess) / 2; }\n\n// Watch the convergence toward √2 = 1.41421356...\nlet g = 1;\nconsole.log(`guess: ${g}`);\ng = improve(g, 2); console.log(`guess: ${g}`);   // 1.5\ng = improve(g, 2); console.log(`guess: ${g}`);   // 1.4166...\ng = improve(g, 2); console.log(`guess: ${g}`);   // 1.41421...\ng = improve(g, 2); console.log(`guess: ${g}`);   // already perfect',
     },
     {
       type: 'narration',

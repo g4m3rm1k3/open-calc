@@ -14,6 +14,14 @@ function depthColor(depth, maxDepth) {
   return '#ef4444'
 }
 
+function tickColor(type) {
+  if (type === 'error_thrown') return '#ef4444' // red
+  if (type === 'function_call') return '#3b82f6' // blue
+  if (type === 'conditional_branch' || type === 'loop_iteration') return '#eab308' // yellow
+  if (type === 'variable_assign' || type === 'object_mutate') return '#22c55e' // green
+  return null
+}
+
 export default function StackDepthMeter({ events, step, onSeek }) {
   const svgRef = useRef(null)
   const [hover, setHover] = useState(null) // { index, x, y }
@@ -110,6 +118,20 @@ export default function StackDepthMeter({ events, step, onSeek }) {
               width={1} height={barH}
               fill={depthColor(d, maxDepth)}
               opacity={i === step ? 1 : 0.55}
+            />
+          )
+        })}
+
+        {/* Semantic Ticks */}
+        {events.map((e, i) => {
+          const tc = tickColor(e.type)
+          if (!tc) return null
+          return (
+            <rect
+              key={`tick-${i}`}
+              x={i} y={VH - 2} width={1} height={2}
+              fill={tc}
+              opacity={i === step ? 1 : 0.8}
             />
           )
         })}

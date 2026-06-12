@@ -97,6 +97,14 @@ export const lesson = {
       code: 'function fib(n) {\n  function iter(a, b, count) {\n    if (count === 0) return b;\n    return iter(a + b, a, count - 1);\n  }\n  return iter(1, 0, n);\n}\n\nconsole.log(fib(10));',
     },
 
+    // ── Tree vs Iterative side-by-side ────────────────────────────────────────────
+    {
+      type: 'narration',
+      id: 'fib-comparison',
+      text: 'The difference between exponential and linear is not just abstract. This code measures it directly. Run it — the call counts tell the whole story.',
+      code: 'let tree_calls = 0, iter_calls = 0;\n\nfunction fib_tree(n) {\n  tree_calls++;\n  if (n <= 1) return n;\n  return fib_tree(n-1) + fib_tree(n-2);\n}\n\nfunction fib_iter(n) {\n  function step(a, b, count) {\n    iter_calls++;\n    return count === 0 ? b : step(a+b, a, count-1);\n  }\n  return step(1, 0, n);\n}\n\nfor (const n of [10, 20, 30]) {\n  tree_calls = 0; iter_calls = 0;\n  fib_tree(n); fib_iter(n);\n  console.log(`fib(${n}): tree=${tree_calls} calls, iter=${iter_calls} calls`);\n}',
+    },
+
     // ── Memoization ───────────────────────────────────────────────────────────────
     {
       type: 'narration',

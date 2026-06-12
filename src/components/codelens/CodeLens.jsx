@@ -207,6 +207,70 @@ const result = nums.filter(x => x > 3).map(x => x * 2)
 console.log('Result:', result)
 `
 
+const TEACHING_SNIPPETS = [
+  {
+    name: 'Fibonacci Recursion',
+    code: `function fib(n) {
+  if (n <= 1) return n
+  return fib(n - 1) + fib(n - 2)
+}
+
+fib(4)`
+  },
+  {
+    name: 'Bubble Sort (Arrays)',
+    code: `function bubbleSort(arr) {
+  let n = arr.length
+  for (let i = 0; i < n - 1; i++) {
+    for (let j = 0; j < n - i - 1; j++) {
+      if (arr[j] > arr[j + 1]) {
+        let temp = arr[j]
+        arr[j] = arr[j + 1]
+        arr[j + 1] = temp
+      }
+    }
+  }
+  return arr
+}
+
+bubbleSort([5, 3, 8, 4, 2])`
+  },
+  {
+    name: 'Linked List',
+    code: `class Node {
+  constructor(val) {
+    this.val = val
+    this.next = null
+  }
+}
+
+let head = new Node(1)
+head.next = new Node(2)
+head.next.next = new Node(3)
+
+let curr = head
+while (curr !== null) {
+  console.log(curr.val)
+  curr = curr.next
+}`
+  },
+  {
+    name: 'Closures',
+    code: `function makeCounter() {
+  let count = 0
+  return function() {
+    count++
+    return count
+  }
+}
+
+const counter = makeCounter()
+counter()
+counter()
+counter()`
+  }
+]
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function Panel({ title, icon: Icon, children, badge, style }) {
@@ -866,6 +930,37 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
             }}>{l.label}</button>
           ))}
         </div>
+
+        {/* Teaching Snippets */}
+        <select
+          style={{
+            marginLeft: 12,
+            background: '#0f172a',
+            border: '1px solid #1e293b',
+            color: '#cbd5e1',
+            padding: '4px 8px',
+            borderRadius: 6,
+            fontSize: 11,
+            fontFamily: 'JetBrains Mono, monospace',
+            cursor: 'pointer',
+            outline: 'none',
+          }}
+          onChange={(e) => {
+            if (!e.target.value) return
+            const snippet = TEACHING_SNIPPETS[e.target.value]
+            setLang('js')
+            setSource(snippet.code)
+            setExecution(null)
+            setStep(0)
+            setModel(null)
+            e.target.value = ""
+          }}
+        >
+          <option value="">📚 Load Example...</option>
+          {TEACHING_SNIPPETS.map((s, i) => (
+            <option key={i} value={i}>{s.name}</option>
+          ))}
+        </select>
 
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
           {/* Theme picker */}
