@@ -1,227 +1,260 @@
-# M-005 — The Quadratic Formula, Derived from Scratch
+# M-005 — The Quadratic Formula, Derived From Scratch
 
 **Phase 1 · Algebra Rebuilt · Lesson 3 of 5**
 
 ---
 
-The quadratic formula is one of the most memorised things in all of school mathematics. It is also one of the most forgotten — students spend years writing it down and lose it within weeks of the exam.
+You almost certainly know the quadratic formula. If $ax^2 + bx + c = 0$ and $a \neq 0$, then:
 
-Here is the thing: you don't need to memorise it. If you understand the *technique* behind it, you can rederive it in two minutes from scratch. Forever.
+$$x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$$
 
-The technique is called **completing the square**, and it is more important than the formula it produces.
+You may have memorised it with a song, or drilled it until it was automatic. But here is something worth asking: where did it come from? Is it a formula someone discovered by intuition, or is it one that any sufficiently patient person could derive from scratch, using nothing but the algebra we have already built?
 
----
-
-## The Problem
-
-We want to solve $ax^2 + bx + c = 0$ for $x$, where $a \neq 0$.
-
-We cannot factor it in general — not without already knowing the roots. We cannot isolate $x$ directly — the $x^2$ and $x$ terms are mixed together. We need a new move.
+The answer is the latter — and the derivation reveals something the formula hides: there is a *geometric idea* at its heart. Once you see that idea, the formula stops feeling like a mystery and starts feeling inevitable.
 
 ---
 
-## The Observation
+## Two Equations, One Hard
 
-A perfect square $( x + d )^2 = x^2 + 2dx + d^2$ has one special property: the coefficient of $x$ is exactly *twice* the square root of the constant term. Check: $2d = 2 \cdot \sqrt{d^2}$.
+Start with two quadratic equations:
 
-This gives us a target. If we could rewrite $ax^2 + bx + c$ as $(x + d)^2 + \text{something}$, we could solve by taking a square root.
+$$x^2 + 6x + 5 = 0 \qquad \text{and} \qquad x^2 + 6x + 7 = 0$$
 
----
+The first one is easy. Factor it: $(x+1)(x+5) = 0$, so $x = -1$ or $x = -5$. Done.
 
-## The Derivation
+The second one resists factoring. Can you find two numbers that multiply to $7$ and add to $6$? Try: $1 \times 7 = 7$, but $1 + 7 = 8 \neq 6$. Try other pairs: nothing works cleanly. The equation *is* solvable — the solutions exist — but factoring does not reach them easily.
 
-**Step 1.** Divide by $a$ (valid since $a \neq 0$ — axiom M4):
-
-$$x^2 + \frac{b}{a}x + \frac{c}{a} = 0$$
-
-**Step 2.** Identify $d$. We want $(x + d)^2 = x^2 + 2dx + d^2$. For the $x$-coefficients to match: $2d = b/a$, so $d = b/(2a)$.
-
-**Step 3.** Add and subtract $d^2 = b^2/(4a^2)$:
-
-$$x^2 + \frac{b}{a}x + \frac{b^2}{4a^2} - \frac{b^2}{4a^2} + \frac{c}{a} = 0$$
-
-$$\left(x + \frac{b}{2a}\right)^2 - \frac{b^2}{4a^2} + \frac{c}{a} = 0$$
-
-**Step 4.** Combine the constants on the right:
-
-$$\left(x + \frac{b}{2a}\right)^2 = \frac{b^2}{4a^2} - \frac{c}{a} = \frac{b^2 - 4ac}{4a^2}$$
-
-**Step 5.** Take square roots. Since $(r)^2 = (-r)^2$, both signs are valid:
-
-$$x + \frac{b}{2a} = \pm\frac{\sqrt{b^2 - 4ac}}{2a}$$
-
-**Step 6.** Subtract $b/(2a)$:
-
-$$\boxed{x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}}$$
-
-You derived it. Every symbol has a story. The $-b$ came from subtracting $d = b/(2a)$. The $\pm$ came from taking the square root of both sides. The $2a$ came from dividing out $a$ in step 1 and the squaring in step 3.
+Why does the first equation yield to factoring while the second doesn't? And how would you solve the second one if factoring fails?
 
 ---
 
-## The Discriminant Tells Everything
+## Stop and Think: What Do You Wish Were True?
 
-The expression $\Delta = b^2 - 4ac$ (the discriminant) lives inside the square root. It determines the entire character of the solutions before you compute them.
+Before reading on, stare at the second equation: $x^2 + 6x + 7 = 0$.
+
+The problem is the constant $7$. If it were $9$ instead, something nice would happen: $x^2 + 6x + 9 = (x+3)^2$. You'd have $(x+3)^2 = 0$, so $x = -3$. Easy.
+
+If it were $0$: $x^2 + 6x = 0$, so $x(x+6) = 0$, giving $x = 0$ or $x = -6$. Also easy.
+
+But $7$ isn't $9$. What if you could *turn* the $7$ into a $9$ — at the cost of adjusting the right-hand side to compensate?
+
+---
+
+## The Geometric Idea: Completing the Square
+
+Here is where the geometry comes in. Think of $x^2$ as the area of a square with side length $x$. Think of $6x$ as the area of a rectangle with sides $x$ and $6$.
+
+Place them together: a square of area $x^2$, and a rectangle of area $6x$. The rectangle is long and thin — it doesn't fit neatly against the square. But if you *cut the rectangle in half* and attach one half to the right side of the square and one half to the top, you get an L-shape that is almost a larger square. It is an $(x+3) \times (x+3)$ square with one small corner — a $3 \times 3$ square — missing from the top right.
 
 ```python
 import matplotlib.pyplot as plt
-import numpy as np
+import matplotlib.patches as patches
 
-fig, axes = plt.subplots(1, 3, figsize=(12, 5))
+fig, ax = plt.subplots(figsize=(6, 6))
+ax.set_facecolor('#0f1117')
 fig.patch.set_facecolor('#0f1117')
+ax.set_xlim(-0.3, 5.8)
+ax.set_ylim(-0.3, 5.8)
+ax.set_aspect('equal')
+ax.axis('off')
 
-cases = [
-    ('Δ > 0\nTwo real roots', 1, -5, 6, '#4fc3f7'),
-    ('Δ = 0\nOne repeated root', 1, -4, 4, '#ff9800'),
-    ('Δ < 0\nNo real roots', 1, 2, 5,  '#e05060'),
-]
+x_val, h = 2.5, 3.0
 
-x = np.linspace(-1, 6, 400)
+# x^2 square (bottom left)
+ax.add_patch(patches.Rectangle((0,0), x_val, x_val,
+    lw=2, edgecolor='#4fc3f7', facecolor='#0d2535'))
+ax.text(x_val/2, x_val/2, '$x^2$', color='#4fc3f7',
+        fontsize=14, ha='center', va='center', fontweight='bold')
 
-for ax, (title, a, b, c, color) in zip(axes, cases):
-    ax.set_facecolor('#0f1117')
-    y = a*x**2 + b*x + c
+# Right rectangle: x tall, 3 wide
+ax.add_patch(patches.Rectangle((x_val,0), h, x_val,
+    lw=2, edgecolor='#ff9800', facecolor='#2a1800'))
+ax.text(x_val + h/2, x_val/2, '$3x$', color='#ff9800',
+        fontsize=12, ha='center', va='center')
 
-    # shaded region below/above x-axis
-    ax.fill_between(x, y, 0, where=(y < 0), alpha=0.12, color=color)
-    ax.fill_between(x, y, 0, where=(y >= 0), alpha=0.06, color='#fff')
+# Top rectangle: 3 tall, x wide
+ax.add_patch(patches.Rectangle((0, x_val), x_val, h,
+    lw=2, edgecolor='#ff9800', facecolor='#2a1800'))
+ax.text(x_val/2, x_val + h/2, '$3x$', color='#ff9800',
+        fontsize=12, ha='center', va='center')
 
-    ax.plot(x, y, color=color, lw=2.5)
-    ax.axhline(0, color='#444', lw=1)
-    ax.axvline(0, color='#333', lw=1)
+# Missing corner: 3 by 3
+ax.add_patch(patches.Rectangle((x_val, x_val), h, h,
+    lw=2, edgecolor='#8a6aaa', facecolor='#1a0a2a', linestyle='--'))
+ax.text(x_val + h/2, x_val + h/2, '$9$\n(add this)', color='#8a6aaa',
+        fontsize=10, ha='center', va='center')
 
-    disc = b**2 - 4*a*c
-    ax.text(0.05, 0.95, f'a={a}, b={b}, c={c}', transform=ax.transAxes,
-            color='#8a9ab0', fontsize=8.5, va='top', fontfamily='monospace')
-    ax.text(0.05, 0.85, f'Δ = b²-4ac = {disc}', transform=ax.transAxes,
-            color=color, fontsize=9, va='top', fontfamily='monospace')
+ax.text(x_val/2, -0.2, '$x$', color='#4fc3f7', fontsize=12, ha='center')
+ax.text(x_val + h/2, -0.2, '$3$', color='#ff9800', fontsize=12, ha='center')
+ax.text(-0.2, x_val/2, '$x$', color='#4fc3f7', fontsize=12, ha='center', va='center')
+ax.text(-0.2, x_val + h/2, '$3$', color='#ff9800', fontsize=12, ha='center', va='center')
 
-    # Mark roots if real
-    if disc > 0:
-        r1 = (-b + disc**0.5)/(2*a)
-        r2 = (-b - disc**0.5)/(2*a)
-        ax.plot([r1, r2], [0, 0], 'o', color=color, ms=8)
-        ax.text(r1, -0.7, f'x={r1:.2f}', color=color, fontsize=8, ha='center')
-        ax.text(r2, -0.7, f'x={r2:.2f}', color=color, fontsize=8, ha='center')
-    elif disc == 0:
-        r = -b/(2*a)
-        ax.plot(r, 0, 'o', color=color, ms=8)
-        ax.text(r, -0.7, f'x={r:.2f}', color=color, fontsize=8, ha='center')
-
-    ax.set_title(title, color=color, fontsize=11, style='italic', pad=6)
-    ax.set_ylim(-2, 8)
-    for s in ax.spines.values():
-        s.set_color('#2a3050')
-    ax.tick_params(colors='#555')
-
-plt.suptitle('The discriminant Δ = b²-4ac determines the nature of the roots',
-             color='#4a6a80', fontsize=11, style='italic')
+ax.set_title(r'$x^2 + 6x + 9 = (x+3)^2$ — adding the missing corner completes the square',
+             color='#5a7a90', fontsize=10, style='italic', pad=10)
 plt.tight_layout()
 plt.show()
 ```
 
-| Discriminant | Shape | Solutions |
-|---|---|---|
-| $\Delta > 0$ | Parabola crosses x-axis twice | Two distinct real roots |
-| $\Delta = 0$ | Parabola just touches x-axis | One repeated real root |
-| $\Delta < 0$ | Parabola misses x-axis entirely | No real roots (two complex ones — Phase 3) |
+The diagram makes the algebra visible. The full $(x+3)^2$ square has area $x^2 + 3x + 3x + 9 = x^2 + 6x + 9$. The L-shape alone has area $x^2 + 6x$. The difference is the missing $3 \times 3 = 9$ corner. So:
+
+$$x^2 + 6x = (x+3)^2 - 9$$
+
+This is **completing the square** — we literally found the missing piece that turns the L-shape into a complete square. The name is geometric, not metaphorical.
 
 ---
 
-## Verification by Substitution
+## Solving the Hard Equation
 
-The formula means nothing if we don't check it. A real solution $r$ to $ax^2 + bx + c = 0$ must satisfy: substituting $x = r$ gives exactly zero.
+Now go back to $x^2 + 6x + 7 = 0$. Replace $x^2 + 6x$ with $(x+3)^2 - 9$:
+
+$$(x+3)^2 - 9 + 7 = 0$$
+$$(x+3)^2 = 2$$
+
+Take the square root of both sides. Both $+\sqrt{2}$ and $-\sqrt{2}$ are valid, since $(\sqrt{2})^2 = (-\sqrt{2})^2 = 2$:
+
+$$x + 3 = \pm\sqrt{2}$$
+$$x = -3 \pm \sqrt{2}$$
+
+Two solutions: $x = -3 + \sqrt{2} \approx -1.586$ and $x = -3 - \sqrt{2} \approx -4.414$.
 
 ```python
 import math
-
-def quadratic_roots(a, b, c):
-    disc = b**2 - 4*a*c
-    print(f"Solving {a}x² + ({b})x + ({c}) = 0")
-    print(f"  Discriminant Δ = {b}² - 4·{a}·{c} = {disc}")
-
-    if disc > 0:
-        r1 = (-b + math.sqrt(disc)) / (2*a)
-        r2 = (-b - math.sqrt(disc)) / (2*a)
-        print(f"  Two roots: x = {r1:.6f}  and  x = {r2:.6f}")
-        for r in [r1, r2]:
-            check = a*r**2 + b*r + c
-            print(f"    Verify: {a}·({r:.4f})² + {b}·({r:.4f}) + {c} = {check:.2e}  {'✓' if abs(check) < 1e-8 else '✗'}")
-    elif disc == 0:
-        r = -b / (2*a)
-        print(f"  One repeated root: x = {r:.6f}")
-        check = a*r**2 + b*r + c
-        print(f"  Verify: = {check:.2e}  {'✓' if abs(check) < 1e-8 else '✗'}")
-    else:
-        print(f"  No real roots (Δ < 0)")
-        re_part = -b / (2*a)
-        im_part = math.sqrt(-disc) / (2*a)
-        print(f"  Complex roots: x = {re_part:.4f} ± {im_part:.4f}i  (Phase 3)")
-    print()
-
-quadratic_roots(1, -5, 6)    # roots 2 and 3
-quadratic_roots(1, -4, 4)    # repeated root 2
-quadratic_roots(1, 2, 5)     # no real roots
-quadratic_roots(2, -3, -5)   # two real roots
+for sign in [+1, -1]:
+    x = -3 + sign * math.sqrt(2)
+    check = x**2 + 6*x + 7
+    print(f"x = -3 {'+' if sign>0 else '-'} √2 ≈ {x:.6f}:   x²+6x+7 = {check:.2e}")
 ```
 
----
-
-## Completing the Square Beyond the Formula
-
-Completing the square is not just for deriving the quadratic formula. The same technique appears in:
-
-- **Phase 10 (Linear Algebra):** Completing the square in a quadratic form $\mathbf{x}^T A \mathbf{x}$ is how you diagonalise a symmetric matrix.
-- **Phase 12 (Probability):** The integral of the Gaussian $e^{-x^2/2}$ is computed by completing the square in the exponent.
-- **Phase 5 (Limits):** $\lim_{x \to -b/2a} \frac{ax^2+bx+c}{x+b/2a}$ is handled by writing the numerator as $(x + b/2a)^2 - \Delta/4a^2$.
-
-The technique is worth knowing. The formula is just a consequence.
+Both give (essentially) zero. The method works.
 
 ---
 
-## Vieta's Formulas
+## Stop and Think: Generalising to Any Quadratic
 
-If $r_1$ and $r_2$ are the two roots of $ax^2 + bx + c = 0$:
+You just completed the square for $x^2 + 6x$, where the coefficient of $x$ was $6$. Half of $6$ is $3$, and you added $3^2 = 9$.
 
-$$r_1 + r_2 = \frac{-b + \sqrt{\Delta}}{2a} + \frac{-b - \sqrt{\Delta}}{2a} = \frac{-2b}{2a} = -\frac{b}{a}$$
+Now try this before reading on. Suppose the coefficient of $x$ is $p$ instead of $6$. What would you add to $x^2 + px$ to complete the square? What perfect square would you get? And if you add that piece to both sides of an equation, what do you subtract to compensate?
 
-$$r_1 \cdot r_2 = \frac{(-b)^2 - (\sqrt{\Delta})^2}{4a^2} = \frac{b^2 - (b^2 - 4ac)}{4a^2} = \frac{c}{a}$$
+Work it out for $p = 10$, then for $p = 1$, then for a general $p$. The pattern is short.
 
-So without solving the equation, you immediately know:
+---
 
-**Sum of roots = $-b/a$**, **Product of roots = $c/a$**.
+## Deriving the General Formula
 
-For $x^2 - 5x + 6 = 0$: sum $= 5$, product $= 6$. The roots must be 2 and 3. Check: $2 + 3 = 5$, $2 \times 3 = 6$. ✓
+Take the general quadratic $ax^2 + bx + c = 0$ with $a \neq 0$.
 
-These are called **Vieta's formulas**, and they generalise to polynomials of any degree (Phase 11 — the connection to the characteristic polynomial of a matrix).
+**Step 1. Divide through by $a$.**
+
+$$x^2 + \frac{b}{a}x + \frac{c}{a} = 0$$
+
+We can divide by $a$ because $a \neq 0$ (axiom M4 from M-003 gives every nonzero number a reciprocal).
+
+**Step 2. Move the constant to the right.**
+
+$$x^2 + \frac{b}{a}x = -\frac{c}{a}$$
+
+**Step 3. Complete the square.**
+
+The coefficient of $x$ is $\frac{b}{a}$, so we add $\left(\frac{b}{2a}\right)^2$ to both sides:
+
+$$x^2 + \frac{b}{a}x + \left(\frac{b}{2a}\right)^2 = -\frac{c}{a} + \frac{b^2}{4a^2}$$
+
+The left side is now a perfect square. The right side simplifies (putting both fractions over $4a^2$):
+
+$$\left(x + \frac{b}{2a}\right)^2 = \frac{b^2 - 4ac}{4a^2}$$
+
+**Step 4. Take the square root.**
+
+The denominator $4a^2 = (2a)^2$ is always positive (M-004: every square is non-negative, and $2a \neq 0$). So:
+
+$$x + \frac{b}{2a} = \pm\frac{\sqrt{b^2 - 4ac}}{2a} \qquad \text{(provided } b^2 - 4ac \geq 0\text{)}$$
+
+**Step 5. Solve for $x$.**
+
+$$\boxed{x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}}$$
+
+Every step was a consequence of axioms and theorems already proved. The formula did not arrive from nowhere — it was forced.
+
+---
+
+## The Discriminant: One Number, Three Destinies
+
+The expression $b^2 - 4ac$ beneath the square root is called the **discriminant** — from the Latin *discriminare*, to distinguish or separate. You can hear the same root in "discrimination" (making distinctions) or "discerning" (seeing differences clearly). Mathematicians borrowed it because this single number *distinguishes* the three fundamentally different behaviours a quadratic can have:
+
+M-004 proved that every square of a real number is non-negative. So $\sqrt{b^2 - 4ac}$ is only real when $b^2 - 4ac \geq 0$. Three cases:
+
+**$b^2 - 4ac > 0$:** the square root is a positive real number. Adding and subtracting it give two distinct values — two distinct real roots.
+
+**$b^2 - 4ac = 0$:** the square root is zero, so $\pm 0 = 0$. One value: $x = -b/2a$, called a **repeated root**.
+
+**$b^2 - 4ac < 0$:** we would need the square root of a negative number. M-004's theorem ($a^2 \geq 0$ for all real $a$) makes this impossible in $\mathbb{R}$. No real solutions exist. (They do exist in $\mathbb{C}$ — M-012 will show that they come as a conjugate pair $-b/2a \pm i\sqrt{4ac-b^2}/2a$.)
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+fig, axes = plt.subplots(1, 3, figsize=(12, 4))
+fig.patch.set_facecolor('#0f1117')
+
+cases = [
+    (1, -3, 1,  'Two real roots\n$b^2-4ac = 5$',    '#4fc3f7'),
+    (1, -2, 1,  'One repeated root\n$b^2-4ac = 0$',  '#ff9800'),
+    (1, -1, 2,  'No real roots\n$b^2-4ac = -7$',     '#e05060'),
+]
+x = np.linspace(-1, 4, 400)
+
+for ax, (a, b, c, title, color) in zip(axes, cases):
+    ax.set_facecolor('#0f1117')
+    ax.plot(x, a*x**2 + b*x + c, color=color, lw=2.5)
+    ax.axhline(0, color='#3a4060', lw=1)
+    disc = b**2 - 4*a*c
+    if disc > 0:
+        for s in [+1, -1]:
+            ax.plot((-b + s*np.sqrt(disc))/(2*a), 0, 'o', color=color, ms=8)
+    elif disc == 0:
+        ax.plot(-b/(2*a), 0, 'o', color=color, ms=8)
+    ax.set_ylim(-2, 5)
+    ax.set_title(title, color=color, fontsize=9, pad=6)
+    for sp in ax.spines.values():
+        sp.set_color('#2a3050')
+    ax.tick_params(colors='#555')
+
+fig.suptitle('The discriminant determines how many times the parabola crosses the $x$-axis',
+             color='#5a7a90', fontsize=11, style='italic')
+plt.tight_layout()
+plt.show()
+```
+
+The three parabolas make it concrete. The connection to M-004 is worth pausing on: the "no real roots" parabola never touches the $x$-axis because its minimum value is positive. That minimum is positive because of how $a$, $b$, $c$ combine — and the discriminant is precisely the algebraic expression that captures whether the parabola has room to dip below zero or not.
+
+---
+
+## Vieta's Formulas: What the Roots Know About the Coefficients
+
+If $r$ and $s$ are the two roots of $ax^2 + bx + c = 0$, then from the quadratic formula:
+
+$$r + s = \frac{-b + \sqrt{b^2-4ac}}{2a} + \frac{-b - \sqrt{b^2-4ac}}{2a} = \frac{-2b}{2a} = -\frac{b}{a}$$
+
+$$r \cdot s = \frac{-b + \sqrt{b^2-4ac}}{2a} \cdot \frac{-b - \sqrt{b^2-4ac}}{2a} = \frac{(-b)^2 - (b^2-4ac)}{4a^2} = \frac{4ac}{4a^2} = \frac{c}{a}$$
+
+These are called **Vieta's formulas**, after François Viète, a 16th-century French mathematician who developed much of the modern notation for algebra. The formulas say something elegant: you don't need to know the roots individually to know their sum and product. The coefficients carry that information directly.
+
+This has a useful consequence. If you are told $x^2 - 5x + 6 = 0$, you know without solving that the roots sum to $5$ and multiply to $6$. A quick search for two numbers with sum $5$ and product $6$ gives $2$ and $3$. Factoring and the quadratic formula are two different routes to the same information.
 
 ---
 
 ## Try It Yourself
 
-1. **Derive** the quadratic formula from scratch for $3x^2 - 7x + 2 = 0$, showing all six steps. Do not use the memorised formula — use completing the square.
+**Challenge 1.** Derive the solutions to $3x^2 - 7x + 2 = 0$ by completing the square — not by plugging into the formula. Show each step.
 
-2. **Without solving:** for $x^2 + px + q = 0$, find a condition on $p$ and $q$ that guarantees both roots are positive.
+**Challenge 2.** For what values of $k$ does $x^2 + kx + 4 = 0$ have exactly one real solution? Solve for $k$.
 
-3. A rectangular garden has perimeter 20m and area 21m². Set up the quadratic equation and find the dimensions.
+**Challenge 3.** The formula divides by $2a$. What happens if $a = 0$? Is $0 \cdot x^2 + bx + c = 0$ still a quadratic? What is it, and how is it solved?
 
-```python
-import math
-# Garden problem: length l, width w
-# l + w = 10 (half the perimeter)
-# l * w = 21
-# So l and w are roots of x^2 - 10x + 21 = 0
-
-a, b, c = 1, -10, 21
-disc = b**2 - 4*a*c
-l = (-b + math.sqrt(disc)) / (2*a)
-w = (-b - math.sqrt(disc)) / (2*a)
-print(f"Dimensions: {l}m × {w}m")
-print(f"Check perimeter: 2({l}+{w}) = {2*(l+w)}m ✓")
-print(f"Check area: {l} × {w} = {l*w}m² ✓")
-```
+**Challenge 4.** Without solving explicitly, find the sum and product of the roots of $2x^2 + 3x - 5 = 0$ using Vieta's formulas. Then verify by solving the equation.
 
 ---
 
 ## What Comes Next
 
-We have been talking about specific numbers all through Phase 1. In M-006 we look at absolute value — the language of distance on the number line. This is not just notation. The epsilon-delta definition of a limit (Phase 5) is written entirely in absolute values. Setting up that language now means the central definition of calculus will not look foreign when we reach it.
+M-006 introduces absolute value — not as a definition involving cases ("if $x \geq 0$, then $|x| = x$; otherwise $|x| = -x$"), but as a concept: the *distance* from a number to zero on the number line. Distance turns out to be a more powerful way to think about it, because it immediately generalises — to the distance between two numbers, to intervals, and eventually to the core language of limits and continuity in Phase 5.

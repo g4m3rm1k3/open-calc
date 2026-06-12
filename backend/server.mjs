@@ -2,6 +2,10 @@ import { createServer } from 'node:http'
 import { promises as fs } from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
+import crypto from 'node:crypto'
+import { DAPSession } from './codelens/DAPBridge.mjs'
+import { GoAdapter } from './codelens/adapters/GoAdapter.mjs'
+import { checkTools } from './codelens/toolcheck.mjs'
 
 const args = new Set(process.argv.slice(2))
 const host = args.has('--host-lan') ? '0.0.0.0' : (readOption('--host') ?? process.env.OPEN_CALC_BACKEND_HOST ?? '127.0.0.1')
@@ -91,6 +95,11 @@ const server = createServer(async (request, response) => {
       return handleUpdateCheck(response)
     }
 
+    if (request.method === 'GET' && url.pathname === '/api/codelens/tools') {
+      const tools = await checkTools()
+      return json(response, 200, tools)
+    }
+
     if (request.method === 'GET') {
       const staticServed = await tryServeStatic(url.pathname, response)
       if (staticServed) {
@@ -106,6 +115,148 @@ const server = createServer(async (request, response) => {
     })
   }
 })
+
+// ── WebSocket upgrade handler for /api/codelens ───────────────────────────────
+
+const LANG_ADAPTERS = {
+  go: GoAdapter,
+  // cpp and rust added in Phase 2
+}
+
+server.on('upgrade', (request, socket, head) => {
+  const url = new URL(request.url ?? '/', `http://${request.headers.host ?? `${host}:${port}`}`)
+  if (url.pathname !== '/api/codelens') {
+    socket.destroy()
+    return
+  }
+
+  // RFC 6455 WebSocket handshake
+  const key = request.headers['sec-websocket-key']
+  if (!key) { socket.destroy(); return }
+  const accept = crypto
+    .createHash('sha1')
+    .update(key + '258EAFA5-E914-47DA-95CA-C5AB0DC85B11')
+    .digest('base64')
+
+  socket.write(
+    'HTTP/1.1 101 Switching Protocols\r\n' +
+    'Upgrade: websocket\r\n' +
+    'Connection: Upgrade\r\n' +
+    `Sec-WebSocket-Accept: ${accept}\r\n\r\n`
+  )
+
+  // Minimal WebSocket frame parser/writer
+  const ws = createWSSocket(socket)
+
+  let session = null
+
+  ws.on('message', async (data) => {
+    let msg
+    try { msg = JSON.parse(data) } catch { return }
+    const { lang, code } = msg
+    if (!lang || !code) return
+
+    const adapter = LANG_ADAPTERS[lang]
+    if (!adapter) {
+      ws.send(JSON.stringify({ type: 'error', message: `Language '${lang}' is not supported yet` }))
+      return
+    }
+
+    if (session) session.cancel()
+    session = new DAPSession({ ws, adapter, lang })
+    session.run(code).catch(err => {
+      ws.send(JSON.stringify({ type: 'error', message: String(err.message ?? err) }))
+    })
+  })
+
+  ws.on('close', () => {
+    if (session) { session.cancel(); session = null }
+  })
+})
+
+/**
+ * Minimal RFC-6455 WebSocket frame parser/emitter built on a raw TCP socket.
+ * Handles text frames only — sufficient for our JSON event stream.
+ */
+function createWSSocket(socket) {
+  const emitter = { _listeners: {} }
+  emitter.on = (event, fn) => {
+    emitter._listeners[event] = emitter._listeners[event] ?? []
+    emitter._listeners[event].push(fn)
+  }
+  emitter.emit = (event, ...args) => {
+    for (const fn of emitter._listeners[event] ?? []) fn(...args)
+  }
+  emitter.readyState = 1 // OPEN
+  emitter.send = (text) => {
+    if (emitter.readyState !== 1) return
+    try {
+      const payload = Buffer.from(text, 'utf8')
+      const len = payload.length
+      let header
+      if (len < 126) {
+        header = Buffer.from([0x81, len])
+      } else if (len < 65536) {
+        header = Buffer.allocUnsafe(4)
+        header[0] = 0x81; header[1] = 126
+        header.writeUInt16BE(len, 2)
+      } else {
+        header = Buffer.allocUnsafe(10)
+        header[0] = 0x81; header[1] = 127
+        header.writeBigUInt64BE(BigInt(len), 2)
+      }
+      socket.write(Buffer.concat([header, payload]))
+    } catch { /* ignore closed socket errors */ }
+  }
+
+  let buf = Buffer.alloc(0)
+  socket.on('data', (chunk) => {
+    buf = Buffer.concat([buf, chunk])
+    while (buf.length >= 2) {
+      const fin  = (buf[0] & 0x80) !== 0
+      const opcode = buf[0] & 0x0f
+      const masked = (buf[1] & 0x80) !== 0
+      let payloadLen = buf[1] & 0x7f
+      let offset = 2
+      if (payloadLen === 126) {
+        if (buf.length < 4) break
+        payloadLen = buf.readUInt16BE(2); offset = 4
+      } else if (payloadLen === 127) {
+        if (buf.length < 10) break
+        payloadLen = Number(buf.readBigUInt64BE(2)); offset = 10
+      }
+      const maskBytes = masked ? 4 : 0
+      if (buf.length < offset + maskBytes + payloadLen) break
+      let payload = buf.slice(offset + maskBytes, offset + maskBytes + payloadLen)
+      if (masked) {
+        const mask = buf.slice(offset, offset + 4)
+        payload = Buffer.from(payload)
+        for (let i = 0; i < payload.length; i++) payload[i] ^= mask[i % 4]
+      }
+      buf = buf.slice(offset + maskBytes + payloadLen)
+      if (opcode === 0x8) { // close
+        emitter.readyState = 3
+        socket.destroy()
+        emitter.emit('close')
+        break
+      } else if (opcode === 0x9) { // ping
+        const pong = Buffer.from([0x8a, 0])
+        socket.write(pong)
+      } else if ((opcode === 0x1 || opcode === 0x0) && fin) { // text or continuation
+        emitter.emit('message', payload.toString('utf8'))
+      }
+    }
+  })
+  socket.on('close', () => {
+    emitter.readyState = 3
+    emitter.emit('close')
+  })
+  socket.on('error', () => {
+    emitter.readyState = 3
+    emitter.emit('close')
+  })
+  return emitter
+}
 
 server.listen(port, host, () => {
   console.log(`[open-calc backend] listening on http://${host}:${port}`)

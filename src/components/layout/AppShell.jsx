@@ -45,6 +45,7 @@ import {
   Heart,
   Brain,
   Swords,
+  Sigma,
 } from "lucide-react";
 import TICalc from "../calculator/TICalc.jsx";
 import SigmaCalc from "../calculator/SigmaCalc.jsx";
@@ -369,6 +370,16 @@ function TopBar({
             }
           >
             <Grid3x3 className="w-5 h-5" />
+          </NavLink>
+          <NavLink
+            to="/linear-algebra"
+            title="Linear Algebra"
+            aria-label="Linear Algebra Reference"
+            className={({ isActive }) =>
+              `p-2 rounded-lg transition-all ${isActive ? "bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 border border-violet-300 dark:border-violet-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`
+            }
+          >
+            <Sigma className="w-5 h-5" />
           </NavLink>
           <NavLink
             to="/reference"

@@ -45,6 +45,7 @@ const BrainPage = lazy(() => import('./pages/BrainPage.jsx'));
 const RubiksCubePage = lazy(() => import("./pages/RubiksCubePage.jsx"));
 const MatrixGamePage = lazy(() => import("./pages/MatrixGamePage.jsx"));
 const RobotArmLabPage = lazy(() => import("./pages/RobotArmLabPage.jsx"));
+const LinearAlgebraReferencePage = lazy(() => import("./pages/LinearAlgebraReferencePage.jsx"));
 const DroneLabPage = lazy(() => import("./pages/DroneLabPage.jsx"));
 const SimLabPage = lazy(() => import("./pages/SimLabPage.jsx"));
 const MatrixLabPage = lazy(() => import("./pages/MatrixLabPage.jsx"));
@@ -98,6 +99,7 @@ export default function App() {
                     <Route path="paths" element={<LearningPathsPage />} />
                     <Route path="about" element={<AboutPage />} />
                     <Route path="reference" element={<ReferencePage />} />
+                    <Route path="linear-algebra" element={<LinearAlgebraReferencePage />} />
                     <Route
                       path="universal-calc"
                       element={<UniversalCalcPage />}

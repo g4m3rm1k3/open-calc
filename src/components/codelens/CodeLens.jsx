@@ -3,6 +3,7 @@ import Editor, { useMonaco } from '@monaco-editor/react'
 import { buildProgramModel } from './parser/jsParser.js'
 import { run as runInterpreter } from './interpreter/interpreter.js'
 import { runPython } from './interpreter/pythonTracer.js'
+import { runNative } from './interpreter/nativeTracer.js'
 import { EXPLAIN } from './eventStream.js'
 import { buildHeapSnapshot } from './renderer/heapSnapshot.js'
 import HeapGraph from './renderer/HeapGraph.jsx'
@@ -143,6 +144,28 @@ s.push(20)
 s.push(30)
 print('Stack size:', s.size())
 print('Popped:', s.pop())
+`
+
+const STARTER_GO = `package main
+
+import "fmt"
+
+func fibonacci(n int) int {
+\tif n <= 1 {
+\t\treturn n
+\t}
+\treturn fibonacci(n-1) + fibonacci(n-2)
+}
+
+func main() {
+\tnums := []int{1, 2, 3, 4, 5}
+\tsum := 0
+\tfor _, n := range nums {
+\t\tsum += n
+\t}
+\tfmt.Println("Sum:", sum)
+\tfmt.Println("fib(6):", fibonacci(6))
+}
 `
 
 const STARTER = `function fibonacci(n) {
@@ -396,12 +419,14 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
   const [lang, setLang]             = useState(() => {
     if (initialLang === 'ts') return 'ts'
     if (initialLang === 'py') return 'py'
+    if (initialLang === 'go') return 'go'
     return 'js'
   })
   const [source, setSource]         = useState(() => {
     if (initialCode) return initialCode
     if (initialLang === 'ts') return STARTER_TS
     if (initialLang === 'py') return STARTER_PY
+    if (initialLang === 'go') return STARTER_GO
     return STARTER
   })
   const [model, setModel]           = useState(null)
@@ -498,6 +523,8 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
       let result
       if (lang === 'py') {
         result = await runPython(source)
+      } else if (lang === 'go') {
+        result = await runNative(source, 'go')
       } else {
         const jsSource = lang === 'ts' ? stripTypeScript(source) : source
         result = await new Promise((resolve) => {
@@ -514,7 +541,7 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
     }
   }, [source, lang])
 
-  const TABS = lang === 'py'
+  const TABS = (lang === 'py' || lang === 'go')
     ? [{ id: 'structure', label: 'Structure', icon: Boxes }]
     : [
         { id: 'structure', label: 'Structure', icon: Boxes },
@@ -571,11 +598,13 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
             { id: 'js',  label: 'JS' },
             { id: 'ts',  label: 'TS' },
             { id: 'py',  label: 'Python' },
+            { id: 'go',  label: 'Go' },
           ].map(l => (
             <button key={l.id} onClick={() => {
               if (l.id === lang) return
               setLang(l.id)
-              setSource(l.id === 'py' ? STARTER_PY : l.id === 'ts' ? STARTER_TS : STARTER)
+              const starters = { py: STARTER_PY, ts: STARTER_TS, go: STARTER_GO }
+              setSource(starters[l.id] ?? STARTER)
               setExecution(null)
               setStep(0)
               setModel(null)
@@ -621,7 +650,7 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
           {/* Run button */}
           <Btn onClick={handleRun} disabled={running} title="Run code (⌘↵)">
             <Play size={12} />
-            {running ? (lang === 'py' ? 'Loading Python…' : 'Running…') : 'Run'}
+            {running ? (lang === 'py' ? 'Loading Python…' : lang === 'go' ? 'Building Go…' : 'Running…') : 'Run'}
           </Btn>
         </div>
 
@@ -736,7 +765,7 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
             <div style={{ height: 'calc(100% - 33px)' }}>
               <Editor
                 height="100%"
-                language={lang === 'py' ? 'python' : lang === 'ts' ? 'typescript' : 'javascript'}
+                language={lang === 'py' ? 'python' : lang === 'ts' ? 'typescript' : lang === 'go' ? 'go' : 'javascript'}
                 value={source}
                 onChange={v => setSource(v ?? '')}
                 theme={THEMES.find(t => t.id === theme)?.monaco ?? 'monokai'}

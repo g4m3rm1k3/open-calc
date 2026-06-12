@@ -231,7 +231,7 @@ function openInOpenMat(code, fileName) {
   }
 }
 
-const CODELENS_LANG_MAP = { javascript: 'js', js: 'js', typescript: 'ts', ts: 'ts', python: 'py', py: 'py' }
+const CODELENS_LANG_MAP = { javascript: 'js', js: 'js', typescript: 'ts', ts: 'ts', python: 'py', py: 'py', go: 'go' }
 
 function openInCodeLens(code, language, navigateFn) {
   try {
@@ -770,6 +770,7 @@ export default function MarkdownHub() {
     setActiveFile(modulePath)
     setLoading(true)
     setTutorialOverrideActive(false)
+    try { localStorage.setItem('mdhub_last_tutorial', modulePath) } catch {}
     try {
       const bundled = await DOCS_MODULES[modulePath]()
       let resolvedContent = bundled
@@ -819,10 +820,13 @@ export default function MarkdownHub() {
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    const readme = Object.keys(DOCS_MODULES).find((modulePath) => modulePath.endsWith('README.md'))
-    if (readme) {
-      selectTutorial(readme)
+    const lastTutorial = (() => { try { return localStorage.getItem('mdhub_last_tutorial') } catch { return null } })()
+    if (lastTutorial && DOCS_MODULES[lastTutorial]) {
+      selectTutorial(lastTutorial)
+      return
     }
+    const readme = Object.keys(DOCS_MODULES).find((modulePath) => modulePath.endsWith('README.md'))
+    if (readme) selectTutorial(readme)
   }, [selectTutorial])
 
   // When code-along opens, Monaco measures its container before the flex layout
