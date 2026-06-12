@@ -29,15 +29,15 @@ import { lesson as sicp33b } from '../data/learn/sicp/lesson-3-3b.js'
 import { lesson as sicp41 } from '../data/learn/sicp/lesson-4-1.js'
 
 import { lesson as dsa01 } from '../data/learn/dsa-patterns/lesson-01.js'
-import { lesson as dsa02 } from '../data/learn/dsa-patterns/lesson-02.js'
-import { lesson as dsa03 } from '../data/learn/dsa-patterns/lesson-03.js'
-import { lesson as dsa04 } from '../data/learn/dsa-patterns/lesson-04.js'
-import { lesson as dsa05 } from '../data/learn/dsa-patterns/lesson-05.js'
 import { lesson as dsa06 } from '../data/learn/dsa-patterns/lesson-06.js'
-import { lesson as dsa07 } from '../data/learn/dsa-patterns/lesson-07.js'
-import { lesson as dsa08 } from '../data/learn/dsa-patterns/lesson-08.js'
-import { lesson as dsa09 } from '../data/learn/dsa-patterns/lesson-09.js'
-import { lesson as dsa10 } from '../data/learn/dsa-patterns/lesson-10.js'
+import { lesson as dsa11 } from '../data/learn/dsa-patterns/lesson-11.js'
+import { lesson as dsa14 } from '../data/learn/dsa-patterns/lesson-14.js'
+import { lesson as dsa17 } from '../data/learn/dsa-patterns/lesson-17.js'
+import { lesson as dsa21 } from '../data/learn/dsa-patterns/lesson-21.js'
+import { lesson as dsa26 } from '../data/learn/dsa-patterns/lesson-26.js'
+import { lesson as dsa27 } from '../data/learn/dsa-patterns/lesson-27.js'
+import { lesson as dsa41 } from '../data/learn/dsa-patterns/lesson-41.js'
+import { lesson as dsa42 } from '../data/learn/dsa-patterns/lesson-42.js'
 
 const LESSONS = {
   'sicp/1-1': sicp11,
@@ -65,15 +65,15 @@ const LESSONS = {
   'sicp/4-1': sicp41,
 
   'dsa-patterns/01': dsa01,
-  'dsa-patterns/02': dsa02,
-  'dsa-patterns/03': dsa03,
-  'dsa-patterns/04': dsa04,
-  'dsa-patterns/05': dsa05,
   'dsa-patterns/06': dsa06,
-  'dsa-patterns/07': dsa07,
-  'dsa-patterns/08': dsa08,
-  'dsa-patterns/09': dsa09,
-  'dsa-patterns/10': dsa10,
+  'dsa-patterns/11': dsa11,
+  'dsa-patterns/14': dsa14,
+  'dsa-patterns/17': dsa17,
+  'dsa-patterns/21': dsa21,
+  'dsa-patterns/26': dsa26,
+  'dsa-patterns/27': dsa27,
+  'dsa-patterns/41': dsa41,
+  'dsa-patterns/42': dsa42,
 }
 
 // Ordered series list — drives "Next lesson" button
@@ -84,7 +84,7 @@ const SERIES_ORDER = {
     '3-1', '3-2', '3-3', '3-3b',
     '4-1',
   ],
-  'dsa-patterns': ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10'],
+  'dsa-patterns': ['01', '41', '06', '11', '42', '14', '17', '21', '26', '27'],
 }
 
 // First lesson per series — used for redirect when no lessonId in URL

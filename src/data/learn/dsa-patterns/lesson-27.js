@@ -1,10 +1,10 @@
-// DSA + Design Patterns — Lesson 10
-// Dynamic Programming
+// DSA + Design Patterns — Lesson 27
+// Dynamic Programming + Proxy
 
 export const lesson = {
-  id: 'dsa-patterns-10',
+  id: 'dsa-patterns-27',
   series: { id: 'dsa-patterns', title: 'DSA + Design Patterns' },
-  title: '10. Dynamic Programming',
+  title: '27. Dynamic Programming + Proxy',
   checkpoints: [
     { id: 'cp-overlapping', label: 'Overlapping Subproblems' },
     { id: 'cp-dp',          label: 'DP Approaches' },
@@ -17,7 +17,7 @@ export const lesson = {
     {
       type: 'narration',
       id: 'intro',
-      text: 'Dynamic programming is a technique for solving problems that have two properties. First: optimal substructure — the best solution to the big problem can be built from the best solutions to smaller sub-problems. Second: overlapping subproblems — the same smaller problems appear over and over. If both properties hold, you can solve each sub-problem once, store the result, and reuse it. This transforms exponential algorithms into polynomial ones. You have already seen one example: memoised Fibonacci in lesson 5. This lesson generalises the technique and applies it to classic problems.',
+      text: 'Dynamic programming is a technique for solving problems that have two properties. First: optimal substructure — the best solution to the big problem can be built from the best solutions to smaller sub-problems. Second: overlapping subproblems — the same smaller problems appear over and over. If both properties hold, you can solve each sub-problem once, store the result, and reuse it. This transforms exponential algorithms into polynomial ones. You have already seen one example: memoised Fibonacci in the Recursion lesson. This lesson generalises the technique and applies it to classic problems.',
       code: null,
     },
 
@@ -49,7 +49,7 @@ calls = 0; fib(30); console.log('fib(30) calls:', calls)    // 2692537
     {
       type: 'narration',
       id: 'step2-top-down',
-      text: 'Top-down dynamic programming is memoization: write the recursive solution, add a cache, check the cache before computing. The "top-down" name refers to the direction of solving: you start at the big problem (the top) and recursively break it down. The cache intercepts repeated sub-problems before they recurse further. Each sub-problem is solved at most once. The call count drops from O(2ⁿ) to O(n).',
+      text: 'Top-down dynamic programming is memoization — the first time you compute a sub-problem, store the result in a cache (a place where you save the result of expensive work so you do not have to redo it); on every later call with the same input, return the cached result instead of recursing again. Write the recursive solution, add a cache object, check the cache before computing. The "top-down" name refers to the direction of solving: you start at the big problem (the top) and recursively break it down. The cache intercepts repeated sub-problems before they recurse further. Each sub-problem is solved at most once. The call count drops from O(2ⁿ) to O(n).',
       code: `// Top-down DP: recursive + cache
 let calls = 0
 
@@ -73,7 +73,7 @@ calls = 0; console.log(fibMemo(40)); console.log('fib(40) calls:', calls)    // 
     {
       type: 'narration',
       id: 'step3-bottom-up',
-      text: 'Bottom-up dynamic programming is tabulation: start at the smallest sub-problems and work upward, filling in a table. No recursion. No call stack. You identify which sub-problems you need, fill them in order, and read the final answer from the table. This is often more efficient in practice because there is no function call overhead. "Bottom-up" refers to solving smallest first and working toward the big problem.',
+      text: 'Bottom-up dynamic programming is tabulation: start at the smallest sub-problems and work upward, filling in a table. No recursion. No call stack (the internal structure the computer uses to track which function called which — each recursive call adds a frame that costs memory). You identify which sub-problems you need, fill them in order, and read the final answer from the table. This is often more efficient in practice because there is no function call overhead. "Bottom-up" refers to solving smallest first and working toward the big problem.',
       code: `// Bottom-up DP: fill a table from the smallest sub-problem upward
 function fibTable(n) {
   if (n <= 1) return n

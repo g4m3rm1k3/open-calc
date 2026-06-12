@@ -1,10 +1,10 @@
-// DSA + Design Patterns — Lesson 07
-// Graphs and the Strategy Pattern
+// DSA + Design Patterns — Lesson 21
+// Graphs + DFS + Visitor Pattern
 
 export const lesson = {
-  id: 'dsa-patterns-07',
+  id: 'dsa-patterns-21',
   series: { id: 'dsa-patterns', title: 'DSA + Design Patterns' },
-  title: '7. Graphs and the Strategy Pattern',
+  title: '21. Graphs + Strategy',
   checkpoints: [
     { id: 'cp-graph',    label: 'Graph Structure' },
     { id: 'cp-traverse', label: 'BFS and DFS' },
@@ -123,7 +123,7 @@ const g = createGraph()
     {
       type: 'narration',
       id: 'step3-dfs',
-      text: 'Depth-First Search (DFS) explores as far as possible along one path before backtracking. Think of navigating a maze: go straight until you hit a wall, then backtrack and try another direction. DFS uses a stack — or recursion, which uses the call stack. A visited set tracks which vertices have been seen so that cycles do not cause infinite loops. A visited set is a Set (lesson pre-5): add() puts something in, has() checks if it is there.',
+      text: 'Depth-First Search (DFS) explores as far as possible along one path before backtracking. Think of navigating a maze: go straight until you hit a wall, then backtrack and try another direction. DFS uses a stack — or recursion, which uses the call stack (the internal LIFO structure the computer uses to track function calls). A visited set tracks which vertices have been seen so that cycles do not cause infinite loops. A Set is a collection that stores unique values: add() puts a value in, has() checks if it is there.',
       code: `function createGraph() {
   const adj = new Map()
   return {

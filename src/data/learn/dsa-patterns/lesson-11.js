@@ -1,10 +1,10 @@
-// DSA + Design Patterns — Lesson 03
-// Hash Tables and the Builder Pattern
+// DSA + Design Patterns — Lesson 11
+// Hash Tables + Registry
 
 export const lesson = {
-  id: 'dsa-patterns-03',
+  id: 'dsa-patterns-11',
   series: { id: 'dsa-patterns', title: 'DSA + Design Patterns' },
-  title: '3. Hash Tables and the Builder Pattern',
+  title: '11. Hash Tables + Registry',
   checkpoints: [
     { id: 'cp-hash',    label: 'Hash Table' },
     { id: 'cp-builder', label: 'Builder Pattern' },
@@ -17,7 +17,7 @@ export const lesson = {
     {
       type: 'narration',
       id: 'intro',
-      text: 'In lesson 1 you saw that reading an array by index is O(1). But what if you don\'t have an index — you only have a name, a username, an email? Finding someone by name in an unsorted array means checking every item: O(n). In a list of a million users, that is a million comparisons every time. The Hash Table solves this: it turns any key — a string, a number, anything — into an index, then stores the value there. Look up by that same key later and it jumps straight to it. O(1). No searching.',
+      text: 'In the Arrays lesson you saw that reading an array by index is O(1). But what if you don\'t have an index — you only have a name, a username, an email? Finding someone by name in an unsorted array means checking every item: O(n). In a list of a million users, that is a million comparisons every time. The Hash Table solves this: it turns any key — a string, a number, anything — into an index, then stores the value there. Look up by that same key later and it jumps straight to it. O(1). No searching.',
       code: null,
     },
 
@@ -346,7 +346,7 @@ for (const k of keys) {
     {
       type: 'narration',
       id: 'step9-rehash',
-      text: 'When the load factor crosses 0.75, the hash table needs to rebuild itself. This is called rehashing. The process is: create a new array of buckets that is double the size, then take every existing entry and re-insert it into the new array. Re-inserting is necessary because the hash function uses the size — hash("alice", 8) is a different index than hash("alice", 4). The old array is discarded. Rehash costs O(n) for that one operation, but it happens so rarely that the amortised cost per put stays close to O(1). This is the same reasoning as dynamic array growth.',
+      text: 'When the load factor crosses 0.75, the hash table needs to rebuild itself. This is called rehashing. The process is: create a new array of buckets that is double the size, then take every existing entry and re-insert it into the new array. Re-inserting is necessary because the hash function uses the size — hash("alice", 8) is a different index than hash("alice", 4). The old array is discarded. Rehash costs O(n) for that one operation, but it happens so rarely that the amortised cost — the average cost per operation across many operations — stays close to O(1). Amortised cost is covered in depth in the Amortized Analysis lesson; the short version is: rare expensive operations averaged over many cheap ones produce a low average cost.',
       code: `function hash(key, size) {
   let total = 0
   for (let i = 0; i < key.length; i++) total += key.charCodeAt(i)
@@ -631,7 +631,7 @@ console.log(q)`,
     {
       type: 'narration',
       id: 'step13-together',
-      text: 'Combine hash table and builder into a query cache. The cache stores query results so the same query is never run twice. The key in the hash table is the SQL string produced by the builder — identical queries always produce the same string, so they always hit the same cache slot. This is exactly how production database connection pools and API caches work: hash the query string to check if the result is already cached before hitting the database.',
+      text: 'Combine hash table and builder into a query cache. A cache is a place where you store the result of expensive work so you do not have to redo it — the next time the same request arrives, you return the stored answer instantly. Here the cache stores query results so the same query is never run twice. The key in the hash table is the SQL string produced by the builder — identical queries always produce the same string, so they always hit the same cache slot. This is exactly how production database connection pools and API caches work: hash the query string to check if the result is already cached before hitting the database.',
       code: `function hash(key, size) {
   let total = 0; for (let i = 0; i < key.length; i++) total += key.charCodeAt(i)
   return total % size
@@ -681,7 +681,7 @@ executeQuery(q1)   // CACHE HIT — again`,
     {
       type: 'challenge',
       id: 'ch-together',
-      text: 'Build a function called memoize(fn) that wraps any function and caches its results in a hash table, using the string representation of the arguments as the cache key. Then use it to memoize an expensive fibonacci function. Call fib(10) twice — it should only compute once.',
+      text: 'Build a function called memoize(fn) that wraps any function and stores its results in a hash table. Memoization means: the first time a function is called with a given input, compute and store the result; every subsequent call with the same input returns the stored result without recomputing. Use the string representation of the arguments as the cache key. Then use it to memoize an expensive fibonacci function. Call fib(10) twice — it should only compute once.',
       expectedOutput: null,
       startCode: `function hash(key, size) {
   let total = 0; for (let i=0; i<key.length; i++) total += key.charCodeAt(i)

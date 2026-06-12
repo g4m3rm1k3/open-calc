@@ -1,10 +1,10 @@
-// DSA + Design Patterns — Lesson 09
-// Sorting Algorithms and the Template Method Pattern
+// DSA + Design Patterns — Lesson 26
+// Divide & Conquer Sorting + Template Method
 
 export const lesson = {
-  id: 'dsa-patterns-09',
+  id: 'dsa-patterns-26',
   series: { id: 'dsa-patterns', title: 'DSA + Design Patterns' },
-  title: '9. Sorting Algorithms and the Template Method',
+  title: '26. Sorting + Template Method',
   checkpoints: [
     { id: 'cp-slow',     label: 'O(n²) Sorts' },
     { id: 'cp-fast',     label: 'O(n log n) Sorts' },
@@ -120,7 +120,7 @@ console.log(selectionSort([64, 25, 12, 22, 11]))`,
     {
       type: 'narration',
       id: 'step3-merge',
-      text: 'Merge sort is a divide-and-conquer algorithm (recursion from lesson 5). Split the array in half, recursively sort each half, then merge the two sorted halves together. Merging two sorted arrays is O(n) and always possible: compare the fronts of both halves, take the smaller one, repeat. The recursion has O(log n) levels. Each level does O(n) work. Total: O(n log n). For 1 million items: 20 million operations instead of a trillion. This is a fundamental improvement.',
+      text: 'Merge sort is a divide-and-conquer algorithm that uses recursion — functions that call themselves on smaller versions of the same problem (covered in the Recursion lesson). Split the array in half, recursively sort each half, then merge the two sorted halves together. Merging two sorted arrays is O(n) and always possible: compare the fronts of both halves, take the smaller one, repeat. The recursion has O(log n) levels. Each level does O(n) work. Total: O(n log n). For 1 million items: 20 million operations instead of a trillion. This is a fundamental improvement.',
       code: `// Merge sort — O(n log n) using divide and conquer
 function mergeSort(arr) {
   // Base case: an array of 0 or 1 items is already sorted

@@ -1,10 +1,10 @@
-// DSA + Design Patterns — Lesson 04
-// Stacks and the Command Pattern
+// DSA + Design Patterns — Lesson 41
+// Stacks + Command Pattern
 
 export const lesson = {
-  id: 'dsa-patterns-04',
+  id: 'dsa-patterns-41',
   series: { id: 'dsa-patterns', title: 'DSA + Design Patterns' },
-  title: '4. Stacks and the Command Pattern',
+  title: '41. Stacks + Command',
   checkpoints: [
     { id: 'cp-stack',   label: 'Stack' },
     { id: 'cp-command', label: 'Command Pattern' },
@@ -17,7 +17,7 @@ export const lesson = {
     {
       type: 'narration',
       id: 'intro',
-      text: 'In lesson 1 you met the queue: first in, first out — like a line at a coffee shop. This lesson introduces the stack: last in, first out. Like a stack of plates — you always take from the top and add to the top. Stacks are everywhere: your browser\'s back button is a stack of visited pages. The call stack you saw during recursion (lesson 5 preview) is a stack. The undo history in every application you have ever used is a stack. We will build a stack from scratch, then use it to implement undo and redo using the Command pattern.',
+      text: 'In the Arrays lesson you met the queue: first in, first out — like a line at a coffee shop. This lesson introduces the stack: last in, first out. Like a stack of plates — you always take from the top and add to the top. Stacks are everywhere: your browser\'s back button is a stack of visited pages. The call stack — the internal structure the computer uses to track which function called which — is a stack. The undo history in every application you have ever used is a stack. We will build a stack from scratch, then use it to implement undo and redo using the Command pattern.',
       code: null,
     },
 
@@ -205,7 +205,7 @@ undo()      // broken — same lastValue, doesn't go further back`,
     {
       type: 'narration',
       id: 'step5-command-object',
-      text: 'The Command pattern wraps each operation in an object that knows both how to do the operation AND how to undo it. The object has two functions: execute() and undo(). Execute runs the operation. Undo reverses it exactly — because the command object captured the operation type and the value at the time it was created. This is a closure: the inner functions close over "n" and "calc".',
+      text: 'The Command pattern wraps each operation in an object that knows both how to do the operation AND how to undo it. The object has two functions: execute() and undo(). Execute runs the operation. Undo reverses it exactly — because the command object captured the operation type and the value at the time it was created. This is a closure: a closure is a function that remembers the variables from the scope where it was created, even after that scope has finished. The inner functions here close over "n" and "calc" — they carry those values with them.',
       code: `// A Command object: knows execute AND undo
 function createAddCommand(calc, n) {
   return {

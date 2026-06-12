@@ -1,511 +1,584 @@
 // DSA + Design Patterns — Lesson 06
-// Binary Trees and the Composite Pattern
+// Linked Lists + Iterator Pattern
 
 export const lesson = {
   id: 'dsa-patterns-06',
   series: { id: 'dsa-patterns', title: 'DSA + Design Patterns' },
-  title: '6. Binary Trees and the Composite Pattern',
+  title: '6. Linked Lists + Iterator',
   checkpoints: [
-    { id: 'cp-tree',      label: 'Tree Structure' },
-    { id: 'cp-bst',       label: 'Binary Search Tree' },
-    { id: 'cp-composite', label: 'Composite Pattern' },
+    { id: 'cp-nodes',    label: 'Nodes & Linking' },
+    { id: 'cp-list',     label: 'Linked List' },
+    { id: 'cp-iterator', label: 'Iterator Pattern' },
   ],
   segments: [
 
-    // ── Introduction ──────────────────────────────────────────────────────────
+    // ── Why we need a linked list ─────────────────────────────────────────────
 
     {
       type: 'narration',
       id: 'intro',
-      text: 'A tree is a data structure that organises items hierarchically — one item at the top, branching downward. Every item in a tree is called a node. The topmost node is the root. Nodes below a node are its children. A node above is the parent. A node with no children is a leaf. Unlike arrays and linked lists where items form a single chain, trees branch. A file system is a tree: a folder can contain other folders and files. An organisation chart is a tree. HTML is a tree. JSON is a tree. Once you see trees, you see them everywhere.',
+      text: 'In the Arrays lesson you saw that inserting into the middle of an array is O(n) — every item after the insertion point must move one slot right. For a task queue that processes hundreds of thousands of items, this cost matters. A Linked List solves it by giving up fast random access (you cannot jump to index 500 directly) in exchange for O(1) insertion and removal at any position you already have a reference to. The trade-off: arrays are fast to read, linked lists are fast to modify. The right choice depends on what you do more.',
       code: null,
     },
 
-    // ── Step 1: TreeNode ──────────────────────────────────────────────────────
+    // ── Step 1: The Node — the single unit ────────────────────────────────────
 
     {
       type: 'narration',
       id: 'step1-node',
-      text: 'A binary tree is a tree where each node has at most two children, called left and right. Start with the node factory. A node holds a value and two child references — left and right — both starting as null. When left and right are null, the node is a leaf. This is identical in spirit to the linked list node from lesson 2, but with two next pointers instead of one.',
-      code: `// A binary tree node — value plus two child references
-function createTreeNode(value) {
+      text: 'Build a linked list one piece at a time, starting with the single unit: a Node. A node holds two things — a value, and a reference to the next node. A reference is a variable that stores a memory address pointing to another object — not the object\'s value directly (covered in the References lesson). The reference starts as null, meaning "nothing yet." Notice createNode is a Factory function (from the Arrays lesson) — it is the single source of truth for what a node looks like. In CodeLens, when you run this, watch the Variables panel: you will see "node" appear as an object with exactly two properties, value and next.',
+      code: `// Step 1: A single node — the atomic unit of a linked list
+function createNode(value) {
   return {
     value,
-    left:  null,   // left child (null = no child)
-    right: null,   // right child
+    next: null,   // will point to another node once linked
   }
 }
 
-const root  = createTreeNode(10)
-const left  = createTreeNode(5)
-const right = createTreeNode(15)
-
-// Connect them manually — root is the parent of both
-root.left  = left
-root.right = right
-
-console.log('root:',       root.value)
-console.log('root.left:',  root.left.value)
-console.log('root.right:', root.right.value)
-console.log('left.left:',  left.left)    // null — left is a leaf`,
+const node = createNode('apple')
+console.log('value:', node.value)
+console.log('next:', node.next)    // null — not linked yet`,
     },
 
-    // ── Step 2: Tree traversal ────────────────────────────────────────────────
+    // ── Step 2: Linking two nodes ─────────────────────────────────────────────
 
     {
       type: 'narration',
-      id: 'step2-traversal',
-      text: 'To visit every node in a tree, we need traversal. There are three standard orders. In-order: left subtree, then current node, then right subtree. Pre-order: current node first, then left, then right. Post-order: left, right, then current last. Each is a natural fit for different jobs: in-order on a binary search tree gives sorted output (you will see why in a moment). Pre-order is used for copying a tree. Post-order for deleting a tree or computing directory sizes. All three use recursion — the definition of "visit left subtree" is itself a traversal.',
-      code: `function createTreeNode(value) {
-  return { value, left: null, right: null }
+      id: 'step2-linking',
+      text: 'Link two nodes by setting next. This is all a linked list is: nodes that know where the next node lives. In memory, nodes do NOT have to be next to each other — each node can be anywhere in memory. The "link" is just an address stored in the next property. In CodeLens, step through this line by line. When you reach "nodeA.next = nodeB", watch nodeA in the Variables panel — its next property changes from null to a reference to nodeB.',
+      code: `function createNode(value) {
+  return { value, next: null }
 }
 
-// Three traversal orders — all recursive
-function inOrder(node) {
-  if (node === null) return   // base case: empty subtree
-  inOrder(node.left)
-  console.log(node.value)
-  inOrder(node.right)
+// Step 2: link two nodes manually
+const nodeA = createNode('apple')
+const nodeB = createNode('banana')
+
+nodeA.next = nodeB   // A now points to B
+// nodeB.next is still null — end of the chain
+
+console.log('A value:',      nodeA.value)
+console.log('A.next value:', nodeA.next.value)  // follows the link to B
+console.log('B.next:',       nodeB.next)        // null — chain ends here`,
+    },
+
+    // ── Step 3: Building and walking a chain ──────────────────────────────────
+
+    {
+      type: 'narration',
+      id: 'step3-chain',
+      text: 'Build a three-node chain and walk it with a while loop. The walk is the fundamental linked list operation: start at the head, follow next until you reach null. Every other operation — find, append, count — is a variation of this walk. In CodeLens, watch the "current" variable change with each iteration — it will show you the object it currently points to, and you will see it advance through the chain.',
+      code: `function createNode(value) {
+  return { value, next: null }
 }
 
-function preOrder(node) {
-  if (node === null) return
-  console.log(node.value)
-  preOrder(node.left)
-  preOrder(node.right)
-}
+// Step 3: a three-node chain and the walk
+const nodeA = createNode('apple')
+const nodeB = createNode('banana')
+const nodeC = createNode('cherry')
 
-function postOrder(node) {
-  if (node === null) return
-  postOrder(node.left)
-  postOrder(node.right)
-  console.log(node.value)
-}
+nodeA.next = nodeB
+nodeB.next = nodeC
+// nodeC.next stays null
 
-//        10
-//       /  \\
-//      5    15
-//     / \\
-//    3   7
-
-const root = createTreeNode(10)
-root.left  = createTreeNode(5)
-root.right = createTreeNode(15)
-root.left.left  = createTreeNode(3)
-root.left.right = createTreeNode(7)
-
-console.log('in-order (left → root → right):')
-inOrder(root)      // 3 5 7 10 15
-
-console.log('pre-order (root → left → right):')
-preOrder(root)     // 10 5 3 7 15
-
-console.log('post-order (left → right → root):')
-postOrder(root)    // 3 7 5 15 10`,
+// Walk: start at the head, follow next until null
+let current = nodeA
+while (current !== null) {
+  console.log(current.value)
+  current = current.next   // advance to the next node
+}`,
     },
 
     {
       type: 'challenge',
-      id: 'ch-tree',
-      text: 'Write a countNodes(node) function that recursively counts every node in a tree. Build a tree with 7 nodes (root 1, children 2 and 3, each with two children). Log the count. Expected: 7.',
-      expectedOutput: '7',
-      startCode: `function createTreeNode(value) {
-  return { value, left: null, right: null }
+      id: 'ch-nodes',
+      text: 'Create three nodes with values 10, 20, 30. Link them in order. Walk the chain and log the sum of all values. Expected output: 60.',
+      expectedOutput: '60',
+      startCode: `function createNode(value) {
+  return { value, next: null }
 }
 
-function countNodes(node) {
-  // base case: null means no node here
-  // recursive case: 1 + count left + count right
-}
-
-const root = createTreeNode(1)
-root.left  = createTreeNode(2)
-root.right = createTreeNode(3)
-root.left.left   = createTreeNode(4)
-root.left.right  = createTreeNode(5)
-root.right.left  = createTreeNode(6)
-root.right.right = createTreeNode(7)
-
-console.log(countNodes(root))   // 7`,
-      hint: 'if (node === null) return 0. return 1 + countNodes(node.left) + countNodes(node.right).',
-      validate: ({ logs }) => logs.some(l => String(l).trim() === '7'),
+// create and link three nodes
+// walk the chain and sum the values
+// console.log(sum)`,
+      hint: 'Create n1=10, n2=20, n3=30. Set n1.next=n2 and n2.next=n3. Then let sum=0; let c=n1; while(c!==null){ sum+=c.value; c=c.next } console.log(sum)',
+      validate: ({ logs }) => logs.some(l => String(l).trim() === '60' || String(l).includes('60')),
     },
 
-    { type: 'checkpoint', id: 'cp-tree' },
+    { type: 'checkpoint', id: 'cp-nodes' },
 
-    // ── Step 3: BST property ──────────────────────────────────────────────────
+    // ── Step 4: Encapsulate into a LinkedList ─────────────────────────────────
 
     {
       type: 'narration',
-      id: 'step3-bst-property',
-      text: 'A Binary Search Tree (BST) is a binary tree with one additional rule: for every node, all values in its left subtree are less than the node\'s value, and all values in its right subtree are greater. This ordering property is what makes search fast. When you search for a value, at each node you know immediately which half of the tree to go into — just like binary search on a sorted array. A balanced BST of n nodes has O(log n) search, insert, and delete.',
-      code: `// The BST property — left < node < right at every level
-function createTreeNode(value) {
-  return { value, left: null, right: null }
+      id: 'step4-encapsulate',
+      text: 'Managing nodes by hand would make your code chaotic. Wrap the chain in a LinkedList object that owns the head pointer and exposes clean operations. Callers never touch the nodes directly — they call the methods. This is encapsulation: hiding the internal structure (nodes and next pointers) behind a clean interface. If you later change how nodes are represented, none of the calling code breaks.',
+      code: `function createNode(value) {
+  return { value, next: null }
 }
 
-//        8
-//       / \\
-//      3   10
-//     / \\    \\
-//    1   6    14
-//       / \\
-//      4   7
+// Step 4: the LinkedList wrapper — encapsulates the node chain
+function createLinkedList() {
+  let head = null   // the first node; null means empty list
 
-const root = createTreeNode(8)
-root.left  = createTreeNode(3)
-root.right = createTreeNode(10)
-root.left.left   = createTreeNode(1)
-root.left.right  = createTreeNode(6)
-root.left.right.left  = createTreeNode(4)
-root.left.right.right = createTreeNode(7)
-root.right.right = createTreeNode(14)
-
-// In-order traversal of a BST always gives sorted output
-function inOrder(node) {
-  if (node === null) return
-  inOrder(node.left)
-  console.log(node.value)
-}
-
-// Verify BST property: every left child < parent, every right child > parent
-console.log('root:', root.value)           // 8
-console.log('root.left:', root.left.value) // 3 — less than 8 ✓
-console.log('root.right:', root.right.value) // 10 — greater than 8 ✓`,
+  return {
+    // Is the list empty?
+    isEmpty() {
+      return head === null
     },
 
-    // ── Step 4: BST insert ────────────────────────────────────────────────────
-
-    {
-      type: 'narration',
-      id: 'step4-insert',
-      text: 'BST insert follows the property: compare the value to insert with the current node. If smaller, go left. If larger, go right. Keep going until you reach null — that is where the new node belongs. Use recursion: insert into the left subtree returns the updated left subtree; the current node then points to it. This style of "return the updated subtree" is a common recursive tree pattern.',
-      code: `function createTreeNode(value) {
-  return { value, left: null, right: null }
-}
-
-// Recursive insert — returns the (possibly new) root of the subtree
-function insert(node, value) {
-  // Base case: empty spot found — create the node here
-  if (node === null) return createTreeNode(value)
-
-  if (value < node.value) {
-    node.left  = insert(node.left,  value)   // go left
-  } else if (value > node.value) {
-    node.right = insert(node.right, value)   // go right
+    // How many nodes?
+    size() {
+      let count = 0
+      let current = head
+      while (current !== null) { count++; current = current.next }
+      return count
+    },
   }
-  // If value === node.value: duplicate, ignore
-
-  return node   // return the (unchanged) current node
 }
 
-function inOrder(node, result = []) {
-  if (!node) return result
-  inOrder(node.left, result)
-  result.push(node.value)
-  inOrder(node.right, result)
-  return result
-}
-
-let root = null
-for (const v of [8, 3, 10, 1, 6, 14, 4, 7]) {
-  root = insert(root, v)
-}
-
-console.log('sorted:', inOrder(root))   // [1, 3, 4, 6, 7, 8, 10, 14]`,
+const list = createLinkedList()
+console.log('Empty:', list.isEmpty())   // true
+console.log('Size:', list.size())       // 0`,
     },
 
-    // ── Step 5: BST search ────────────────────────────────────────────────────
+    // ── Step 5: prepend — O(1) ────────────────────────────────────────────────
 
     {
       type: 'narration',
-      id: 'step5-search',
-      text: 'Search follows the same logic as insert: at each node, compare and go left or right. The recursion eliminates half the remaining tree at every step — that is O(log n) for a balanced tree. The worst case is a degenerate tree where every value was inserted in sorted order, making it a linked list: O(n). This is why self-balancing trees (like AVL trees) exist, but they are beyond this lesson. For now, appreciate the best-case: in-order insertion always gives O(log n).',
-      code: `function createTreeNode(v) { return { value: v, left: null, right: null } }
+      id: 'step5-prepend',
+      text: 'Add the prepend operation — adding to the front of the list. This is where linked lists shine: O(1) regardless of list size. The two-line operation: point the new node\'s next at the current head, then make the new node the new head. No items move. No memory reorganisation. In CodeLens watch this carefully: the Variables panel will show "head" update to the new node, and the new node\'s next will point to what used to be the head.',
+      code: `function createNode(value) { return { value, next: null } }
 
-function insert(node, value) {
-  if (!node) return createTreeNode(value)
-  if (value < node.value) node.left  = insert(node.left,  value)
-  else if (value > node.value) node.right = insert(node.right, value)
-  return node
+function createLinkedList() {
+  let head = null
+
+  return {
+    isEmpty() { return head === null },
+    size() { let c=0,n=head; while(n){c++;n=n.next} return c },
+
+    // Step 5: prepend — add to the FRONT — O(1)
+    prepend(value) {
+      const node = createNode(value)
+      node.next = head   // new node points to what was the head
+      head = node        // new node IS the head now
+      // Two pointer assignments. That's it. O(1).
+    },
+
+    toArray() {
+      const result = []; let n = head
+      while (n) { result.push(n.value); n = n.next }
+      return result
+    },
+  }
 }
 
-// Search — O(log n) for balanced tree
-function search(node, target) {
-  // Base case 1: null — not found
-  if (node === null) return null
+const list = createLinkedList()
+list.prepend('cherry')
+list.prepend('banana')   // becomes new head
+list.prepend('apple')    // becomes new head
 
-  // Base case 2: found
-  if (node.value === target) return node
+console.log(list.toArray())   // ['apple', 'banana', 'cherry']
+console.log('Size:', list.size())`,
+    },
 
-  // Recursive case: go left or right based on comparison
-  if (target < node.value) return search(node.left, target)
-  else                     return search(node.right, target)
+    // ── Step 6: append — O(n) ────────────────────────────────────────────────
+
+    {
+      type: 'narration',
+      id: 'step6-append',
+      text: 'Add the append operation — adding to the back. Without any extra bookkeeping this requires walking the entire chain to find the last node, so it is O(n). We will fix that immediately after removeFirst. For now see the walk: "current" advances through every node until it finds the one with next === null. This is the cost we are about to eliminate.',
+      code: `function createNode(value) { return { value, next: null } }
+
+function createLinkedList() {
+  let head = null
+
+  return {
+    prepend(value) { const n=createNode(value); n.next=head; head=n },
+
+    // Step 6: append — add to the BACK — O(n) without a tail pointer
+    append(value) {
+      const node = createNode(value)
+      if (head === null) { head = node; return }   // empty list edge case
+
+      // Walk to the last node
+      let current = head
+      while (current.next !== null) {
+        current = current.next
+      }
+      current.next = node   // attach to the end
+    },
+
+    toArray() { const r=[]; let n=head; while(n){r.push(n.value);n=n.next} return r },
+  }
 }
 
-let root = null
-for (const v of [8, 3, 10, 1, 6, 14, 4, 7]) root = insert(root, v)
+const list = createLinkedList()
+list.append('first')
+list.append('second')
+list.prepend('zero')   // O(1) — goes to front
 
-console.log(search(root, 6)?.value)    // 6 — found
-console.log(search(root, 14)?.value)   // 14 — found
-console.log(search(root, 9))           // null — not found`,
+console.log(list.toArray())   // ['zero', 'first', 'second']`,
+    },
+
+    // ── Step 7: removeFirst — O(1) ───────────────────────────────────────────
+
+    {
+      type: 'narration',
+      id: 'step7-remove',
+      text: 'Removing from the front is O(1) — the reason a linked list makes a better queue than an array. Simply advance the head pointer to the second node. The first node is no longer reachable and JavaScript will garbage collect it. Compare this to array shift() which moves every remaining item. In CodeLens, watch head change from pointing to the first node to pointing to the second — that is the entire operation.',
+      code: `function createNode(value) { return { value, next: null } }
+
+function createLinkedList() {
+  let head = null
+
+  return {
+    prepend(v) { const n=createNode(v); n.next=head; head=n },
+    append(v) { const n=createNode(v); if(!head){head=n;return} let c=head; while(c.next)c=c.next; c.next=n },
+
+    // Step 7: removeFirst — O(1). This is why linked lists beat arrays for queues
+    removeFirst() {
+      if (head === null) return null
+      const value = head.value
+      head = head.next   // advance head — the old first node is gone
+      return value
+    },
+
+    toArray() { const r=[]; let n=head; while(n){r.push(n.value);n=n.next} return r },
+    size() { let c=0,n=head; while(n){c++;n=n.next} return c },
+  }
+}
+
+const list = createLinkedList()
+list.append('first')
+list.append('second')
+list.append('third')
+
+const removed = list.removeFirst()   // O(1) — just moves the head pointer
+console.log('Removed:', removed)
+console.log('Remaining:', list.toArray())
+console.log('Size:', list.size())`,
+    },
+
+    // ── Step 8: tail pointer — O(1) append ──────────────────────────────────
+
+    {
+      type: 'narration',
+      id: 'step8-tail',
+      text: 'Add a tail pointer. A tail pointer is just a second variable stored alongside head that always points to the last node. Prepend must set tail when the list was previously empty. Append uses tail directly — no walk — then advances tail to the new node. RemoveFirst must clear tail if it empties the list. Three extra lines of pointer bookkeeping, and append goes from O(n) to O(1) permanently.',
+      code: `function createNode(value) { return { value, next: null } }
+
+function createLinkedList() {
+  let head = null
+  let tail = null   // always points to the last node
+
+  return {
+    // O(1) — prepend must set tail when list was empty
+    prepend(value) {
+      const node = createNode(value)
+      node.next = head
+      head = node
+      if (tail === null) tail = node   // first ever node is both head and tail
+    },
+
+    // O(1) — tail jumps straight to the end, no walk
+    append(value) {
+      const node = createNode(value)
+      if (tail === null) {
+        head = node          // empty list: both head and tail point here
+        tail = node
+      } else {
+        tail.next = node     // attach after current last node
+        tail = node          // advance tail to the new last node
+      }
+    },
+
+    // O(1) — must clear tail if list becomes empty
+    removeFirst() {
+      if (head === null) return null
+      const value = head.value
+      head = head.next
+      if (head === null) tail = null   // list is now empty
+      return value
+    },
+
+    size() { let c=0,n=head; while(n){c++;n=n.next} return c },
+    toArray() { const r=[]; let n=head; while(n){r.push(n.value);n=n.next} return r },
+    [Symbol.iterator]() {
+      let c = head
+      return { next() { if(!c) return{done:true,value:undefined}; const v=c.value; c=c.next; return{value:v,done:false} } }
+    },
+  }
+}
+
+const list = createLinkedList()
+list.append('first')    // tail set: first === head === tail
+list.append('second')   // O(1) — tail.next = second, tail = second
+list.append('third')    // O(1) — tail.next = third,  tail = third
+list.prepend('zero')    // O(1) — head = zero, zero.next = first
+
+console.log(list.toArray())   // ['zero', 'first', 'second', 'third']
+
+list.removeFirst()            // head advances, tail untouched
+list.removeFirst()
+list.removeFirst()
+list.removeFirst()            // list is now empty, tail cleared to null
+console.log('size after clearing:', list.size())`,
     },
 
     {
       type: 'challenge',
-      id: 'ch-bst',
-      text: 'Write a findMin(node) and findMax(node) function for a BST. The minimum is always the leftmost node (keep going left until left is null). The maximum is always the rightmost node. Build a BST from [5, 3, 8, 1, 4, 7, 9]. Log min and max.',
+      id: 'ch-list',
+      text: 'Using the linked list with the tail pointer from step 8, build a queue: append three items ("red", "green", "blue"), then removeFirst twice. Log the remaining array. Expected: [\'blue\'].',
       expectedOutput: null,
-      startCode: `function createTreeNode(v) { return { value: v, left: null, right: null } }
-function insert(node, value) {
-  if (!node) return createTreeNode(value)
-  if (value < node.value) node.left  = insert(node.left,  value)
-  else if (value > node.value) node.right = insert(node.right, value)
-  return node
+      startCode: `function createNode(value) { return { value, next: null } }
+function createLinkedList() {
+  let head = null
+  return {
+    append(v) { const n=createNode(v); if(!head){head=n;return} let c=head; while(c.next)c=c.next; c.next=n },
+    removeFirst() { if(!head)return null; const v=head.value; head=head.next; return v },
+    toArray() { const r=[]; let n=head; while(n){r.push(n.value);n=n.next} return r },
+  }
 }
 
-function findMin(node) {
-  // keep going left until left is null
-}
-
-function findMax(node) {
-  // keep going right until right is null
-}
-
-let root = null
-for (const v of [5, 3, 8, 1, 4, 7, 9]) root = insert(root, v)
-
-console.log(findMin(root).value)   // 1
-console.log(findMax(root).value)   // 9`,
-      hint: 'findMin: if (!node.left) return node; return findMin(node.left). findMax: same but going right.',
+const queue = createLinkedList()
+// append red, green, blue
+// removeFirst twice
+console.log(queue.toArray())`,
+      hint: 'queue.append("red"); queue.append("green"); queue.append("blue"); queue.removeFirst(); queue.removeFirst();',
       validate: ({ logs }) => {
-        const nums = logs.map(l => parseInt(String(l).trim(), 10))
-        return nums.includes(1) && nums.includes(9)
+        const flat = logs.join(' ')
+        return flat.includes('blue') && !flat.includes('red') && !flat.includes('green')
       },
     },
 
-    { type: 'checkpoint', id: 'cp-bst' },
+    { type: 'checkpoint', id: 'cp-list' },
 
-    // ── Step 6: Composite Pattern ─────────────────────────────────────────────
+    // ── Step 8: The Iterator Pattern ─────────────────────────────────────────
 
     {
       type: 'narration',
-      id: 'step6-composite-problem',
-      text: 'Now the design pattern. Here is the problem: you want to calculate the total size of a directory. A directory can contain files (with a known size) and other directories (which in turn contain files and directories). You need to handle both cases. Without a pattern, you end up with type-checking code everywhere: "if this is a file, return its size; if it is a directory, loop over its children." The code gets messy and every operation (size, count, find) has to repeat this branching logic.',
-      code: `// Without Composite: type-checking everywhere
-function getTotalSize(item) {
-  if (item.type === 'file') {
-    return item.size
-  } else if (item.type === 'directory') {
-    let total = 0
-    for (const child of item.children) {
-      // Have to repeat the same type-checking logic recursively
-      if (child.type === 'file') {
-        total += child.size
-      } else if (child.type === 'directory') {
-        total += getTotalSize(child)   // had to add recursion anyway
+      id: 'step8-iterator-problem',
+      text: 'Right now the only way for external code to visit every item is toArray() — which creates a full copy of the list just to look at the values. There is a deeper problem: if someone writes code that depends on knowing the list has a "head" property, they are reaching inside the object\'s internals. If you ever rename "head" to "first", their code breaks. The Iterator pattern solves this by providing a standard "give me the next item" contract — callers never touch the internals.',
+      code: null,
+    },
+
+    {
+      type: 'narration',
+      id: 'step8-iterator-contract',
+      text: 'JavaScript has a built-in iterator protocol. If an object has a [Symbol.iterator]() method that returns an object with a next() function, that object works with for...of, the spread operator (...), Array.from(), and destructuring. Every JavaScript built-in collection (Array, Map, Set, String) implements this exact protocol. Your linked list will join that family.',
+      code: null,
+    },
+
+    {
+      type: 'narration',
+      id: 'step8-iterator-code',
+      text: 'Add [Symbol.iterator]() to the linked list. The method returns an object with a next() function. Each call to next() returns { value, done }. When done is true, iteration is finished. Notice that "current" is a local variable captured inside the iterator — each for...of loop gets its own independent cursor through the list. In CodeLens, watch "current" advance through the chain as the for...of loop runs.',
+      code: `function createNode(value) { return { value, next: null } }
+
+function createLinkedList() {
+  let head = null
+
+  return {
+    prepend(v) { const n=createNode(v); n.next=head; head=n },
+    append(v) { const n=createNode(v); if(!head){head=n;return} let c=head; while(c.next)c=c.next; c.next=n },
+    removeFirst() { if(!head)return null; const v=head.value; head=head.next; return v },
+    size() { let c=0,n=head; while(n){c++;n=n.next} return c },
+
+    // Step 8: Iterator protocol — the contract between collection and caller
+    [Symbol.iterator]() {
+      let current = head          // each iteration gets its own cursor
+      return {
+        next() {
+          if (current === null) {
+            return { value: undefined, done: true }
+          }
+          const value = current.value
+          current = current.next  // advance cursor
+          return { value, done: false }
+        }
       }
     }
-    return total
   }
 }
 
-const fileSystem = {
-  type: 'directory', name: 'root', children: [
-    { type: 'file', name: 'readme.txt', size: 1 },
-    { type: 'directory', name: 'src', children: [
-      { type: 'file', name: 'app.js', size: 10 },
-      { type: 'file', name: 'utils.js', size: 5 },
-    ]},
-  ]
+const list = createLinkedList()
+list.append(10)
+list.append(20)
+list.append(30)
+
+// for...of works because of [Symbol.iterator]
+for (const item of list) {
+  console.log(item)
 }
 
-console.log(getTotalSize(fileSystem))   // 16 — works, but type checking is everywhere`,
-    },
+// Spread works too
+const arr = [...list]
+console.log(arr)
 
-    // ── Step 7: Composite interface ───────────────────────────────────────────
+// Find the first value > 15
+for (const item of list) {
+  if (item > 15) { console.log('First > 15:', item); break }
+}`,
+    },
 
     {
       type: 'narration',
-      id: 'step7-composite-interface',
-      text: 'The Composite pattern solves this by giving files and directories the same interface. Both have a size() method. File.size() returns its own size. Directory.size() asks all its children for their size() and sums them. The caller does not need to know or check the type — it just calls size(). This is the insight: when an object represents a single thing and a collection of those things, give them the same interface so they can be treated uniformly.',
-      code: `// Composite: File and Directory share the same interface
-function createFile(name, size) {
-  return {
-    name,
-    size() { return size },     // leaf — returns its own size
-    type: 'file',
-  }
-}
-
-function createDirectory(name) {
-  const children = []
-  return {
-    name,
-    add(child)  { children.push(child); return this },
-    size() {
-      // delegate to children — no type checking needed
-      let total = 0
-      for (const child of children) total += child.size()
-      return total
-    },
-    type: 'directory',
-  }
-}
-
-const root = createDirectory('root')
-  .add(createFile('readme.txt', 1))
-  .add(
-    createDirectory('src')
-      .add(createFile('app.js', 10))
-      .add(createFile('utils.js', 5))
-  )
-  .add(
-    createDirectory('tests')
-      .add(createFile('app.test.js', 3))
-  )
-
-console.log('total size:', root.size())   // 19
-// root.size() → 1 + src.size() + tests.size()
-//             → 1 + (10 + 5) + 3 = 19`,
-    },
-
-    // ── Step 8: Full Composite with count ─────────────────────────────────────
-
-    {
-      type: 'narration',
-      id: 'step8-composite-full',
-      text: 'Add a count() method to both. File.count() returns 1. Directory.count() sums children.count(). Both operations follow the same pattern: leaf returns a single value, composite delegates to children and aggregates. The pattern works for any operation you can define recursively: total size, file count, deepest path, list of all file names. You define it once on each type and the tree structure handles the rest.',
-      code: `function createFile(name, size) {
-  return {
-    name,
-    size()  { return size },
-    count() { return 1 },        // a file is 1 item
-    list()  { return [name] },   // a file is just itself
-  }
-}
-
-function createDirectory(name) {
-  const children = []
-  return {
-    name,
-    add(child) { children.push(child); return this },
-
-    size()  { let t=0; for(const c of children) t += c.size();  return t },
-    count() { let t=0; for(const c of children) t += c.count(); return t },
-    list()  {
-      const names = []
-      for (const c of children) {
-        for (const n of c.list()) names.push(n)
-      }
-      return names
-    },
-  }
-}
-
-const root = createDirectory('root')
-  .add(createFile('readme.txt', 1))
-  .add(
-    createDirectory('src')
-      .add(createFile('app.js', 10))
-      .add(createFile('utils.js', 5))
-      .add(createDirectory('lib').add(createFile('math.js', 2)))
-  )
-  .add(createDirectory('tests').add(createFile('app.test.js', 3)))
-
-console.log('size:', root.size())     // 21
-console.log('count:', root.count())   // 5 files
-console.log('files:', root.list())    // all file names`,
+      id: 'step8-iterator-why',
+      text: 'The Iterator pattern separates "how data is stored" from "how data is traversed." The linked list stores data using node pointers — that is its private implementation. The iterator exposes "give me the next item" — that is its public contract. Any code that uses the iterator is independent of the storage. If you later changed the linked list to use an internal array for small sizes and nodes for large ones, all for...of loops would continue working unchanged. Depend on interfaces, not implementations.',
+      code: null,
     },
 
     {
       type: 'challenge',
-      id: 'ch-composite',
-      text: 'Add a find(name) method to both File and Directory. File.find(name) returns the file if its name matches, otherwise null. Directory.find(name) checks each child and returns the first non-null result. Build a tree with at least 4 files in different directories. Find a deeply nested file by name.',
+      id: 'ch-iterator',
+      text: 'Add the iterator to this linked list, then use for...of to build a new array containing only values greater than 5. Log the result. The list contains [3, 7, 1, 9, 4]. Expected: [7, 9].',
       expectedOutput: null,
-      startCode: `function createFile(name, size) {
+      startCode: `function createNode(v) { return { value: v, next: null } }
+function createLinkedList() {
+  let head = null
   return {
-    name, size() { return size },
-    find(target) { return name === target ? this : null },
+    append(v) { const n=createNode(v); if(!head){head=n;return} let c=head; while(c.next)c=c.next; c.next=n },
+    // Add [Symbol.iterator]() here
   }
 }
 
-function createDirectory(name) {
-  const children = []
-  return {
-    name,
-    add(c) { children.push(c); return this },
-    size() { let t=0; for(const c of children) t+=c.size(); return t },
-    find(target) {
-      // check each child — return first non-null result
-    },
-  }
+const list = createLinkedList()
+;[3,7,1,9,4].forEach(v => list.append(v))
+
+const result = []
+for (const item of list) {
+  if (item > 5) result.push(item)
 }
-
-const root = createDirectory('root')
-  .add(createFile('readme.md', 1))
-  .add(createDirectory('src')
-    .add(createFile('index.js', 5))
-    .add(createDirectory('util')
-      .add(createFile('helpers.js', 3))
-    )
-  )
-
-const found = root.find('helpers.js')
-console.log(found ? found.name : 'not found')   // helpers.js`,
-      hint: 'for (const child of children) { const result = child.find(target); if (result) return result } return null',
-      validate: ({ logs }) => logs.some(l => String(l).includes('helpers.js')),
+console.log(result)`,
+      hint: 'Add: [Symbol.iterator]() { let c = head; return { next() { if(!c) return {done:true,value:undefined}; const v=c.value; c=c.next; return {value:v,done:false} } } }',
+      validate: ({ logs }) => {
+        const flat = logs.join(' ')
+        return flat.includes('7') && flat.includes('9') && !flat.includes('3') && !flat.includes('1') && !flat.includes('4')
+      },
     },
 
-    { type: 'checkpoint', id: 'cp-composite' },
+    { type: 'checkpoint', id: 'cp-iterator' },
 
-    // ── CodeLens ──────────────────────────────────────────────────────────────
+    // ── Complete file + CodeLens ──────────────────────────────────────────────
 
     {
       type: 'narration',
-      id: 'codelens-setup',
-      text: 'Open this in CodeLens and step through the BST insert and search. Watch how insert navigates left and right at each node. Then watch search follow the same path without creating anything. After that, watch the recursive size() call on the directory: the Variables panel will show you the recursive descent into each subdirectory, and the return values accumulating back up.',
-      code: `function createTreeNode(v) { return { value: v, left: null, right: null } }
-function insert(node, val) {
-  if (!node) return createTreeNode(val)
-  if (val < node.value) node.left  = insert(node.left,  val)
-  else if (val > node.value) node.right = insert(node.right, val)
-  return node
-}
-function search(node, target) {
-  if (!node) return null
-  if (node.value === target) return node
-  return target < node.value ? search(node.left, target) : search(node.right, target)
+      id: 'complete-file',
+      text: 'Here is the complete linked list with every piece assembled: the Node factory, the LinkedList with O(1) prepend, O(1) append (tail pointer), O(1) removeFirst, O(n) size, and the Iterator. Read through it as a whole before opening CodeLens.',
+      code: `// The complete Linked List — O(1) prepend, O(1) append, O(1) removeFirst
+function createNode(value) {
+  return { value, next: null }
 }
 
-let root = null
-for (const v of [8, 3, 10, 1, 6]) root = insert(root, v)
+function createLinkedList() {
+  let head = null
+  let tail = null
 
-console.log(search(root, 6)?.value)   // 6
-console.log(search(root, 9))          // null`,
+  return {
+    prepend(value) {
+      const node = createNode(value)
+      node.next = head
+      head = node
+      if (tail === null) tail = node
+    },
+
+    append(value) {
+      const node = createNode(value)
+      if (tail === null) { head = node; tail = node; return }
+      tail.next = node
+      tail = node
+    },
+
+    removeFirst() {
+      if (head === null) return null
+      const value = head.value
+      head = head.next
+      if (head === null) tail = null
+      return value
+    },
+
+    size() {
+      let count = 0
+      let current = head
+      while (current) { count++; current = current.next }
+      return count
+    },
+
+    [Symbol.iterator]() {
+      let current = head
+      return {
+        next() {
+          if (!current) return { value: undefined, done: true }
+          const value = current.value
+          current = current.next
+          return { value, done: false }
+        }
+      }
+    }
+  }
+}
+
+const queue = createLinkedList()
+queue.append('first task')
+queue.append('second task')
+queue.prepend('urgent task')
+
+console.log('Queue size:', queue.size())
+for (const item of queue) console.log('-', item)
+
+const processed = queue.removeFirst()
+console.log('Processed:', processed)
+console.log('Remaining:', queue.size())`,
     },
 
     {
       type: 'codelens',
-      id: 'cl-trees',
-      text: 'Step through insert and search in CodeLens. Watch the recursive calls navigate left and right at each node. On insert, see the null check at a leaf position create the new node. On search, see the same comparisons follow the same path to find it.',
-      code: `function createTreeNode(v) { return { value: v, left: null, right: null } }
-function insert(node, val) {
-  if (!node) return createTreeNode(val)
-  if (val < node.value) node.left  = insert(node.left,  val)
-  else if (val > node.value) node.right = insert(node.right, val)
-  return node
-}
-function search(node, target) {
-  if (!node) return null
-  if (node.value === target) return node
-  return target < node.value ? search(node.left, target) : search(node.right, target)
+      id: 'cl-linked-list',
+      text: 'Open in CodeLens. Watch the Variables panel: "head" and "tail" both update on the first append. On the second and third appends, only "tail" moves — head stays fixed. Watch removeFirst: head advances, tail stays unless the list becomes empty. Pay attention to how each O(1) operation is just two or three pointer reassignments. No loop, no walk, no searching.',
+      code: `function createNode(value) {
+  return { value, next: null }
 }
 
-let root = null
-for (const v of [8, 3, 10, 1, 6]) root = insert(root, v)
-console.log(search(root, 6)?.value)
-console.log(search(root, 9))`,
+function createLinkedList() {
+  let head = null
+  let tail = null
+
+  return {
+    prepend(v) {
+      const n = createNode(v)
+      n.next = head
+      head = n
+      if (tail === null) tail = n
+    },
+    append(v) {
+      const n = createNode(v)
+      if (tail === null) { head = n; tail = n; return }
+      tail.next = n
+      tail = n
+    },
+    removeFirst() {
+      if (!head) return null
+      const v = head.value
+      head = head.next
+      if (!head) tail = null
+      return v
+    },
+    [Symbol.iterator]() {
+      let c = head
+      return { next() { if(!c) return{done:true,value:undefined}; const v=c.value; c=c.next; return{value:v,done:false} } }
+    },
+  }
+}
+
+const q = createLinkedList()
+q.append('first')
+q.append('second')
+q.append('third')
+q.prepend('urgent')
+
+for (const item of q) console.log(item)
+console.log('removed:', q.removeFirst())`,
       lang: 'js',
     },
 
