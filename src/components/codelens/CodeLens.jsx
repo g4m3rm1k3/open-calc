@@ -26,8 +26,8 @@ function stripTypeScript(src) {
   // interface Foo { ... } (handles nested braces via iteration)
   s = s.replace(/(?:export\s+)?interface\s+\w+(?:\s+extends\s+[^{]+)?\s*\{[^}]*\}/g, '')
 
-  // type Foo = ...;
-  s = s.replace(/(?:export\s+)?type\s+\w[\w<>, ]*\s*=\s*[^;]+;/g, '')
+  // type Foo = ...; or type Foo = { ... } (with or without trailing semicolon)
+  s = s.replace(/(?:export\s+)?type\s+[\w<>, ]+\s*=\s*(?:\{[^}]*\}|[^\n;]+)[;\n]?/g, '')
 
   // enum Foo { A, B, C } → const Foo = { A: 0, B: 1, ... }
   s = s.replace(/(?:export\s+)?enum\s+(\w+)\s*\{([^}]*)\}/g, (_, name, body) => {
