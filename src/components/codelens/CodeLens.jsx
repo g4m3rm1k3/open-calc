@@ -6,11 +6,13 @@ import { EXPLAIN } from './eventStream.js'
 import { buildHeapSnapshot } from './renderer/heapSnapshot.js'
 import HeapGraph from './renderer/HeapGraph.jsx'
 import CallGraphView from './renderer/CallGraphView.jsx'
+import VariableWatch from './renderer/VariableWatch.jsx'
+import CallTreeView from './renderer/CallTreeView.jsx'
 import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
 import {
   ChevronRight, ChevronDown, Code2, Boxes, Braces, ArrowLeft,
   Zap, Play, Pause, StepForward, StepBack, SkipForward, Terminal,
-  Palette, Info, Network, Layers,
+  Palette, Info, Network, Layers, GitBranch,
 } from 'lucide-react'
 
 const SPEED_CONFIG = {
@@ -287,18 +289,22 @@ export default function CodeLens({ onBack, initialCode }) {
   const [running, setRunning]       = useState(false)
   const [tab, setTab]               = useState('structure')
   const [rightTab, setRightTab]     = useState('execution')
-  const [theme, setTheme]           = useState('monokai')
+  const [theme, setTheme]           = useState('open-calc-dark')
   const [showThemes, setShowThemes] = useState(false)
   const [rightMode, setRightMode]   = useState('explain')  // 'explain' | 'analyse'
   const [playing, setPlaying]       = useState(false)
   const [playSpeed, setPlaySpeed]   = useState('1x')
+  const [fnModal, setFnModal]       = useState(null)
+  const [editorW, setEditorW]       = useState(null)  // null = auto flex-grow
   const eventListRef                = useRef(null)
   const editorRef                   = useRef(null)
   const decorRef                    = useRef([])
+  const editorColRef                = useRef(null)
   const monaco                      = useMonaco()
 
   const totalSteps   = execution?.events?.length ?? 0
-  const currentEvent = execution?.events?.[step] ?? null
+  const currentEvent = execution?.events?.[step]      ?? null
+  const prevEvent    = execution?.events?.[step - 1]  ?? null
 
   // Parse live as we type
   useEffect(() => { setModel(buildProgramModel(source)) }, [])
@@ -348,6 +354,22 @@ export default function CodeLens({ onBack, initialCode }) {
     active?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
   }, [step])
 
+  const startEditorResize = useCallback((e) => {
+    e.preventDefault()
+    const startX = e.clientX
+    const startW = editorColRef.current?.getBoundingClientRect().width ?? 400
+    const onMove = (ev) => {
+      const w = Math.max(160, Math.min(startW + (ev.clientX - startX), window.innerWidth - 700))
+      setEditorW(w)
+    }
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove)
+      document.removeEventListener('mouseup', onUp)
+    }
+    document.addEventListener('mousemove', onMove)
+    document.addEventListener('mouseup', onUp)
+  }, [])
+
   const handleRun = useCallback(() => {
     setRunning(true)
     setTimeout(() => {
@@ -374,10 +396,11 @@ export default function CodeLens({ onBack, initialCode }) {
     : null
 
   const RTABS = [
-    { id: 'execution', label: 'Events',  icon: Play },
-    { id: 'scope',     label: 'Scope',   icon: Layers },
-    { id: 'heap',      label: 'Heap',    icon: Network },
-    { id: 'output',    label: 'Output',  icon: Terminal },
+    { id: 'execution', label: 'Events',    icon: Play },
+    { id: 'variables', label: 'Variables', icon: Layers },
+    { id: 'calltree',  label: 'Tree',      icon: GitBranch },
+    { id: 'heap',      label: 'Heap',      icon: Network },
+    { id: 'output',    label: 'Output',    icon: Terminal },
   ]
 
   return (
@@ -399,9 +422,11 @@ export default function CodeLens({ onBack, initialCode }) {
       }}>
         <button onClick={onBack} style={{
           background: 'none', border: 'none', cursor: 'pointer',
-          color: '#475569', display: 'flex', alignItems: 'center',
+          color: '#475569', display: 'flex', alignItems: 'center', gap: 5,
+          fontSize: 12, fontWeight: 500,
         }}>
-          <ArrowLeft size={16} />
+          <ArrowLeft size={14} />
+          UpSkillOS
         </button>
         <Code2 size={17} color="#818cf8" />
         <span style={{ fontWeight: 700, fontSize: 14 }}>CodeLens</span>
@@ -519,12 +544,17 @@ export default function CodeLens({ onBack, initialCode }) {
 
       {/* ── Body ── */}
       <div style={{
-        flex: 1, display: 'grid',
-        gridTemplateColumns: '1fr 320px 320px',
-        gap: 10, padding: 10, minHeight: 0,
+        flex: 1, display: 'flex', alignItems: 'stretch',
+        gap: 0, padding: 10, minHeight: 0, overflow: 'hidden',
       }}>
-        {/* Left: editor only */}
-        <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+        {/* Left: editor — flex-grow unless manually resized */}
+        <div
+          ref={editorColRef}
+          style={{
+            flex: editorW ? `0 0 ${editorW}px` : '1 1 0',
+            minWidth: 160, display: 'flex', flexDirection: 'column', minHeight: 0,
+          }}
+        >
           <div style={{
             flex: 1, background: '#0f172a', border: '1px solid #1e293b',
             borderRadius: 10, overflow: 'hidden', minHeight: 0,
@@ -561,8 +591,24 @@ export default function CodeLens({ onBack, initialCode }) {
           </div>
         </div>
 
+        {/* ── Drag handle ── */}
+        <div
+          onMouseDown={startEditorResize}
+          title="Drag to resize editor"
+          style={{
+            width: 9, flexShrink: 0, cursor: 'col-resize', alignSelf: 'stretch',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 2px',
+          }}
+        >
+          <div style={{
+            width: 2, height: 36, borderRadius: 1,
+            background: '#1e293b', pointerEvents: 'none',
+          }} />
+        </div>
+
         {/* Middle: event stream */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, minHeight: 0 }}>
+        <div style={{ flex: editorW ? '1 1 320px' : '0 0 320px', minWidth: 280, display: 'flex', flexDirection: 'column', gap: 6, minHeight: 0 }}>
           <div style={{
             display: 'flex', gap: 4, background: '#0f172a',
             borderRadius: 7, padding: 3, border: '1px solid #1e293b', flexShrink: 0,
@@ -580,7 +626,7 @@ export default function CodeLens({ onBack, initialCode }) {
             ))}
           </div>
 
-          <div style={{ flex: 1, minHeight: 0, overflow: rightTab === 'heap' ? 'hidden' : 'auto' }} ref={eventListRef}>
+          <div style={{ flex: 1, minHeight: 0, overflow: (rightTab === 'heap' || rightTab === 'variables' || rightTab === 'scope' || rightTab === 'calltree') ? 'hidden' : 'auto' }} ref={eventListRef}>
             {rightTab === 'execution' && (
               execution ? (
                 execution.events.length === 0
@@ -607,11 +653,38 @@ export default function CodeLens({ onBack, initialCode }) {
                 </div>
               )
             )}
+            {rightTab === 'variables' && (
+              <VariableWatch
+                currentEvent={currentEvent}
+                prevEvent={prevEvent}
+                heapSnapshot={heapSnapshot}
+                onShowEnvModel={() => setRightTab('scope')}
+              />
+            )}
             {rightTab === 'scope' && (
-              <ScopeChainView event={currentEvent} />
+              <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                <button
+                  onClick={() => setRightTab('variables')}
+                  style={{ background: 'none', border: 'none', borderBottom: '1px solid #1e293b',
+                    cursor: 'pointer', padding: '6px 10px', textAlign: 'left',
+                    color: '#334155', fontSize: 10, fontFamily: 'JetBrains Mono, monospace',
+                    flexShrink: 0 }}
+                >
+                  ← Back to Variables
+                </button>
+                <div style={{ flex: 1, overflow: 'auto' }}>
+                  <ScopeChainView event={currentEvent} />
+                </div>
+              </div>
+            )}
+            {rightTab === 'calltree' && (
+              <CallTreeView
+                events={execution?.events ?? []}
+                step={step}
+              />
             )}
             {rightTab === 'heap' && (
-              <HeapGraph snapshot={heapSnapshot} heapDelta={currentEvent?.heapDelta} />
+              <HeapPanel snapshot={heapSnapshot} heapDelta={currentEvent?.heapDelta} />
             )}
             {rightTab === 'output' && (
               execution?.output?.length > 0 ? (
@@ -638,7 +711,7 @@ export default function CodeLens({ onBack, initialCode }) {
         </div>
 
         {/* Right: Analyse / Explain toggle */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, minHeight: 0 }}>
+        <div style={{ width: 320, flexShrink: 0, marginLeft: 10, display: 'flex', flexDirection: 'column', gap: 6, minHeight: 0 }}>
           {/* Mode toggle */}
           <div style={{
             display: 'flex', gap: 4, background: '#0f172a',
@@ -680,7 +753,7 @@ export default function CodeLens({ onBack, initialCode }) {
                 ))}
               </div>
               <div style={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
-                {tab === 'structure' && <StructureView model={model} currentEvent={currentEvent} />}
+                {tab === 'structure' && <StructureView model={model} currentEvent={currentEvent} onNodeClick={node => setFnModal({ node, callGraph: model.callGraph })} />}
                 {tab === 'tokens'    && <TokensView model={model} />}
                 {tab === 'ast'       && <AstView model={model} />}
               </div>
@@ -730,7 +803,33 @@ export default function CodeLens({ onBack, initialCode }) {
           )}
         </div>
       </div>
+
+      {/* ── Function detail modal ── */}
+      {fnModal && (
+        <FunctionModal
+          node={fnModal.node}
+          callGraph={fnModal.callGraph}
+          onClose={() => setFnModal(null)}
+        />
+      )}
     </div>
+  )
+}
+
+// ── Inline code renderer ─────────────────────────────────────────────────────
+// Converts `backtick-wrapped` segments in explanation strings to styled <code>.
+
+function InlineText({ text }) {
+  if (!text) return null
+  const parts = String(text).split(/(`[^`\n]+`)/)
+  return parts.map((part, i) =>
+    part.startsWith('`') && part.endsWith('`') ? (
+      <code key={i} style={{
+        background: '#1e293b', color: '#7dd3fc',
+        padding: '1px 5px', borderRadius: 3,
+        fontSize: '0.88em', fontFamily: 'JetBrains Mono, monospace',
+      }}>{part.slice(1, -1)}</code>
+    ) : part
   )
 }
 
@@ -802,20 +901,19 @@ function ExplainHero({ event, step, total }) {
 
       {/* Summary — the hero text */}
       <div style={{
-        fontSize: 15, fontWeight: 600, color: '#f1f5f9',
-        lineHeight: 1.45, marginBottom: explain.why ? 12 : 0,
-        fontFamily: 'JetBrains Mono, monospace',
+        fontSize: 14, fontWeight: 600, color: '#f1f5f9',
+        lineHeight: 1.5, marginBottom: explain.why ? 12 : 0,
       }}>
-        {explain.summary}
+        <InlineText text={explain.summary} />
       </div>
 
       {/* Why — the explanation */}
       {explain.why && (
         <div style={{
-          fontSize: 12, color: '#64748b', lineHeight: 1.65,
+          fontSize: 12, color: '#64748b', lineHeight: 1.7,
           borderTop: '1px solid #1e293b', paddingTop: 10,
         }}>
-          {explain.why}
+          <InlineText text={explain.why} />
         </div>
       )}
 
@@ -867,9 +965,291 @@ function IdleHero() {
   )
 }
 
+// ── Heap panel ────────────────────────────────────────────────────────────────
+
+function HeapPanel({ snapshot, heapDelta }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      {/* Legend bar */}
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 8, padding: '5px 10px',
+        borderBottom: '1px solid #1e293b', flexShrink: 0, flexWrap: 'wrap',
+      }}>
+        <span style={{ fontSize: 9, color: '#334155', fontFamily: 'JetBrains Mono, monospace',
+          letterSpacing: '.08em' }}>HEAP</span>
+        <HeapDot color="#22c55e" label="new object" />
+        <HeapDot color="#f59e0b" label="mutated" />
+        <HeapDot color="#818cf8" label="existing" />
+        <button onClick={() => setOpen(v => !v)} style={{
+          marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer',
+          color: open ? '#818cf8' : '#334155', fontSize: 10,
+          fontFamily: 'JetBrains Mono, monospace', padding: 0,
+        }}>
+          {open ? '▲ hide' : '? what is this'}
+        </button>
+      </div>
+
+      {/* Collapsible explanation */}
+      {open && (
+        <div style={{
+          padding: '12px 14px', background: '#080c14', borderBottom: '1px solid #1e293b',
+          fontSize: 12, color: '#64748b', lineHeight: 1.7, flexShrink: 0,
+        }}>
+          <div style={{ fontWeight: 700, color: '#818cf8', marginBottom: 6 }}>The Heap — long-term memory</div>
+          When you write <code style={IC}>new Node()</code>, <code style={IC}>[]</code>, or <code style={IC}>{'{}'}</code>,
+          JavaScript allocates memory on the <em>heap</em> and gives your variable a <strong style={{ color: '#f1f5f9' }}>reference</strong> — an arrow pointing to that memory, not a copy of the value.
+          <br /><br />
+          Unlike the <strong style={{ color: '#f1f5f9' }}>call stack</strong> — which is destroyed when a function returns — heap objects
+          persist until nothing holds a reference to them. At that point the garbage collector reclaims the memory.
+          <br /><br />
+          <strong>This is why mutation is powerful and dangerous.</strong> Multiple variables can hold references to the same object.
+          Changing the object through any one of them changes it for all — there is only one copy.
+          <br /><br />
+          <em style={{ color: '#475569' }}>SICP Chapter 3.3: "Modeling with Mutable Data" — the environment model depends on understanding this distinction.</em>
+        </div>
+      )}
+
+      <div style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
+        <HeapGraph snapshot={snapshot} heapDelta={heapDelta} />
+      </div>
+    </div>
+  )
+}
+
+const IC = {
+  background: '#1e293b', color: '#7dd3fc',
+  padding: '1px 5px', borderRadius: 3,
+  fontSize: '0.9em', fontFamily: 'JetBrains Mono, monospace',
+}
+
+function HeapDot({ color, label }) {
+  return (
+    <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 9,
+      color: '#475569', fontFamily: 'JetBrains Mono, monospace' }}>
+      <span style={{ width: 8, height: 8, borderRadius: 2, border: `2px solid ${color}`,
+        display: 'inline-block', flexShrink: 0 }} />
+      {label}
+    </span>
+  )
+}
+
+// ── Function detail modal ─────────────────────────────────────────────────────
+
+const KIND_COLOR_MAP = {
+  function:    '#7dd3fc',
+  arrow:       '#86efac',
+  method:      '#818cf8',
+  constructor: '#a78bfa',
+}
+const kColor = k => KIND_COLOR_MAP[k] ?? '#94a3b8'
+
+function FunctionModal({ node, callGraph, onClose }) {
+  const { nodes, edges } = callGraph ?? { nodes: [], edges: [] }
+
+  const callsEdges   = edges.filter(e => e.from === node.id && !e.recursive)
+  const calledByEdges = edges.filter(e => e.to === node.id && !e.recursive)
+  const isRecursive  = edges.some(e => e.recursive && e.from === node.id)
+
+  const callsNames    = callsEdges.map(e => nodes.find(n => n.id === e.to)?.name).filter(Boolean)
+  const calledByNames = calledByEdges.map(e => nodes.find(n => n.id === e.from)?.name).filter(Boolean)
+  const isEntryPoint  = calledByNames.length === 0
+  const isLeaf        = callsNames.length === 0 && !isRecursive
+  const color         = kColor(node.kind)
+
+  const sicp = getSICPNote(node, isRecursive, callsNames, isLeaf, calledByNames)
+
+  return (
+    <div
+      style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(0,0,0,.75)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
+      onClick={onClose}
+    >
+      <div
+        style={{ background: '#0d1526', border: '1px solid #1e293b', borderRadius: 14,
+          padding: '24px 26px', maxWidth: 500, width: '100%', maxHeight: '82vh',
+          overflow: 'auto', boxShadow: '0 30px 70px rgba(0,0,0,.7)' }}
+        onClick={e => e.stopPropagation()}
+      >
+        {/* ── Header ── */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 20 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5 }}>
+              <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 99,
+                background: color + '22', color, border: `1px solid ${color}44`,
+                fontFamily: 'JetBrains Mono, monospace', fontWeight: 700 }}>
+                {node.kind}
+              </span>
+              {isRecursive && (
+                <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 99,
+                  background: '#78350f22', color: '#f59e0b', border: '1px solid #78350f44',
+                  fontFamily: 'JetBrains Mono, monospace' }}>
+                  ↺ recursive
+                </span>
+              )}
+              {isEntryPoint && (
+                <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 99,
+                  background: '#1e3a5f', color: '#7dd3fc', border: '1px solid #1e3a5f',
+                  fontFamily: 'JetBrains Mono, monospace' }}>
+                  entry point
+                </span>
+              )}
+            </div>
+            <div style={{ fontSize: 19, fontWeight: 700, fontFamily: 'JetBrains Mono, monospace', color }}>
+              {node.name}
+            </div>
+            <div style={{ fontSize: 12, color: '#64748b', fontFamily: 'JetBrains Mono, monospace', marginTop: 3 }}>
+              ({node.params.join(', ')})
+              {node.line && <span style={{ marginLeft: 10, color: '#334155' }}>line {node.line}</span>}
+            </div>
+          </div>
+          <button onClick={onClose} style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            color: '#475569', fontSize: 22, lineHeight: 1, padding: 0,
+          }}>×</button>
+        </div>
+
+        {/* ── What it does ── */}
+        <ModalSection title="What this does">
+          <p style={{ margin: 0, fontSize: 13, color: '#94a3b8', lineHeight: 1.7 }}>
+            <InlineText text={describeFn(node, callsNames, calledByNames, isRecursive, isLeaf, isEntryPoint)} />
+          </p>
+        </ModalSection>
+
+        {/* ── Complexity ── */}
+        {node.complexity && (
+          <ModalSection title="Complexity">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+              <ComplexityBadge complexity={node.complexity} />
+            </div>
+            <p style={{ margin: 0, fontSize: 13, color: '#94a3b8', lineHeight: 1.7 }}>
+              <InlineText text={explainComplexity(node.complexity)} />
+            </p>
+          </ModalSection>
+        )}
+
+        {/* ── Relationships ── */}
+        <ModalSection title="Relationships">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 12,
+            fontFamily: 'JetBrains Mono, monospace' }}>
+            {callsNames.length > 0 && (
+              <RelRow icon="→" label="Calls" names={callsNames} color="#7dd3fc" />
+            )}
+            {calledByNames.length > 0 && (
+              <RelRow icon="←" label="Called by" names={calledByNames} color="#a78bfa" />
+            )}
+            {isRecursive && (
+              <RelRow icon="↺" label="Recursive" names={[node.name]} color="#f59e0b" />
+            )}
+            {isLeaf && (
+              <div style={{ color: '#475569' }}>Leaf function — calls nothing in this program.</div>
+            )}
+            {isEntryPoint && !isRecursive && (
+              <div style={{ color: '#475569' }}>Not called by any other function — this is an entry point.</div>
+            )}
+          </div>
+        </ModalSection>
+
+        {/* ── SICP connection ── */}
+        {sicp && (
+          <ModalSection title="SICP Connection">
+            <div style={{
+              borderLeft: '2px solid #6366f1', paddingLeft: 12,
+              fontSize: 13, color: '#64748b', lineHeight: 1.7,
+            }}>
+              <InlineText text={sicp} />
+            </div>
+          </ModalSection>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function ModalSection({ title, children }) {
+  return (
+    <div style={{ marginBottom: 18 }}>
+      <div style={{ fontSize: 9, letterSpacing: '.1em', color: '#334155',
+        fontFamily: 'JetBrains Mono, monospace', marginBottom: 8, textTransform: 'uppercase' }}>
+        {title}
+      </div>
+      {children}
+    </div>
+  )
+}
+
+function RelRow({ icon, label, names, color }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <span style={{ color: '#475569', minWidth: 16 }}>{icon}</span>
+      <span style={{ color: '#475569', minWidth: 60 }}>{label}</span>
+      <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+        {names.map(n => (
+          <span key={n} style={{ color, background: color + '18',
+            padding: '1px 7px', borderRadius: 4, border: `1px solid ${color}33` }}>
+            {n}
+          </span>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function describeFn(node, callsNames, calledByNames, isRecursive, isLeaf, isEntryPoint) {
+  const name = node.name
+  if (isRecursive) {
+    const others = callsNames.filter(n => n !== name)
+    const also   = others.length ? ` It also calls ${others.join(', ')}.` : ''
+    return `\`${name}\` is a recursive function — it calls itself with a smaller input until it reaches a base case. Each call creates a new frame on the call stack.${also} Once the base case is reached, the frames unwind and results are assembled on the way back up.`
+  }
+  if (isLeaf) {
+    return `\`${name}\` is a leaf function — it performs a focused task without calling other named functions in this program. Leaf functions are the atomic units that everything else is built from.`
+  }
+  if (isEntryPoint && callsNames.length > 0) {
+    return `\`${name}\` is an entry point that orchestrates the overall flow. It delegates to: ${callsNames.map(n => `\`${n}\``).join(', ')}.`
+  }
+  if (calledByNames.length > 0 && callsNames.length > 0) {
+    return `\`${name}\` sits in the middle of the call graph — called by ${calledByNames.map(n => `\`${n}\``).join(', ')} and in turn calls ${callsNames.map(n => `\`${n}\``).join(', ')}.`
+  }
+  return `\`${name}\` — a ${node.kind} function${node.params.length > 0 ? ` taking ${node.params.join(', ')}` : ' with no parameters'}.`
+}
+
+function explainComplexity(c) {
+  const map = {
+    'O(1)':           'Constant time — the same amount of work is done regardless of input size. This is the gold standard. Adding one more element changes nothing.',
+    'O(n)':           'Linear time — work grows proportionally with n. Double the input, double the work. A single loop over n elements is typically O(n).',
+    'O(n) recursive': 'Linear recursion — proportional to n but uses the call stack. Each recursive call adds a frame. For very large n this can cause a stack overflow. An iterative version avoids this (SICP §1.2.1).',
+    'O(n²)':          'Quadratic time — double the input, 4× the work. Common in naive sorts (bubble, selection) and nested loops. Fine for small n, expensive for large n.',
+    'O(n log n)?':    'Near-linear time — the sweet spot for comparison-based sorting (merge sort, quicksort on average). Much better than O(n²) for large inputs.',
+  }
+  return map[c] ?? `Work grows as ${c} with respect to input size.`
+}
+
+function getSICPNote(node, isRecursive, callsNames, isLeaf, calledByNames) {
+  if (isRecursive) {
+    return 'SICP §1.2 distinguishes between a recursive *procedure* (the code calls itself) and a recursive *process* (the shape of the computation). This function creates a recursive process — work accumulates and is resolved on the way back up the call stack. See §1.2.1 for linear recursion and §1.2.2 for tree recursion (like `fib`).'
+  }
+  if (node.name.toLowerCase().includes('sort')) {
+    return 'SICP §2.2 covers sequence operations and §2.3.3 covers sets — sorting underpins both. Higher-order functions like `map`, `filter`, and `fold` are the SICP way to express sorted transformations without explicit loops.'
+  }
+  if (node.kind === 'constructor') {
+    return 'SICP §3.1 introduces mutable state via `set!`. Constructors in OOP encapsulate state in closures — the object is a dispatch procedure that holds variables in its environment. This is message-passing style, introduced in §3.1.2.'
+  }
+  if (node.kind === 'method') {
+    return 'SICP §3.1 shows that objects are really procedures with local state. A method is a message handler — `(account \'withdraw)` returns a procedure that closes over the account\'s balance. The same pattern you\'re using here.'
+  }
+  if (isLeaf && node.params.length >= 2) {
+    return 'SICP §1.1.4 — "Compound Procedures." This is a black box that maps inputs to an output. The key abstraction: the *what* (specification) is separate from the *how* (implementation). Callers should not need to know how `' + node.name + '` works internally.'
+  }
+  if (isEntryPoint && callsNames && callsNames.length > 1) {
+    return 'This looks like a coordination function — it knows the steps but delegates the work. SICP §1.3 covers higher-order procedures that capture this exact pattern: procedures that take procedures as arguments or return them.'
+  }
+  return null
+}
+
 // ── Static analysis views ─────────────────────────────────────────────────────
 
-function StructureView({ model, currentEvent }) {
+function StructureView({ model, currentEvent, onNodeClick }) {
   if (model?.error) return <span style={{ color: '#ef4444', fontSize: 12 }}>Parse error: {model.error.message}</span>
   if (!model) return <span style={{ color: '#475569', fontSize: 12 }}>Parsing…</span>
 
@@ -880,7 +1260,7 @@ function StructureView({ model, currentEvent }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
       {/* Call graph */}
       {hasGraph && (
-        <CallGraphView callGraph={model.callGraph} currentEvent={currentEvent} />
+        <CallGraphView callGraph={model.callGraph} currentEvent={currentEvent} onNodeClick={onNodeClick} />
       )}
 
       {!hasGraph && (

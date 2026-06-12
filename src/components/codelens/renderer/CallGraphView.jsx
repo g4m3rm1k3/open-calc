@@ -4,12 +4,12 @@
  * Active nodes are highlighted based on the current execution stack.
  */
 
-const SVG_W    = 288
-const NODE_H   = 40
-const LAYER_H  = 74
-const PAD_TOP  = 12
+const SVG_W    = 292
+const NODE_H   = 44
+const LAYER_H  = 84
+const PAD_TOP  = 14
 const PAD_SIDE = 8
-const NODE_GAP = 6
+const NODE_GAP = 8
 
 const KIND_COLOR = {
   function:    '#7dd3fc',
@@ -98,7 +98,7 @@ function computeLayout(nodes, edges) {
 
 // ── Component ──────────────────────────────────────────────────────────────────
 
-export default function CallGraphView({ callGraph, currentEvent }) {
+export default function CallGraphView({ callGraph, currentEvent, onNodeClick }) {
   if (!callGraph?.nodes?.length) {
     return (
       <div style={{ padding: '10px 0', fontSize: 12, color: '#475569' }}>
@@ -114,7 +114,12 @@ export default function CallGraphView({ callGraph, currentEvent }) {
 
   return (
     <div style={{ overflow: 'auto', marginBottom: 10 }}>
-      <svg width={SVG_W} height={svgH} style={{ display: 'block', overflow: 'visible' }}>
+      <svg
+        width="100%"
+        viewBox={`0 0 ${SVG_W} ${svgH}`}
+        preserveAspectRatio="xMidYMin meet"
+        style={{ display: 'block', overflow: 'visible' }}
+      >
         <defs>
           <marker id="cg-arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
             <polygon points="0,0 0,6 6,3" fill="#334155" />
@@ -122,6 +127,17 @@ export default function CallGraphView({ callGraph, currentEvent }) {
           <marker id="cg-arr-a" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
             <polygon points="0,0 0,6 6,3" fill="#818cf8" />
           </marker>
+          {/* Per-node clip paths so text never escapes its card */}
+          {nodes.map(node => {
+            const pos = layout.positions[node.id]
+            if (!pos) return null
+            const clipId = `cg_clip_${node.id.replace(/[^a-zA-Z0-9]/g, '_')}`
+            return (
+              <clipPath key={clipId} id={clipId}>
+                <rect x={pos.x + 10} y={pos.y} width={pos.w - 14} height={NODE_H} />
+              </clipPath>
+            )
+          })}
         </defs>
 
         {/* ── Edges (behind nodes) ── */}
@@ -153,57 +169,77 @@ export default function CallGraphView({ callGraph, currentEvent }) {
           const isRecurse = edges.some(e => e.recursive && e.from === node.id)
           const color     = kindColor(node.kind)
           const cxColor   = complexityColor(node.complexity)
-          // chars available for name: subtract left pad (12px) + right content (~50px) / ~7px per char
-          const nameMaxLen = Math.max(6, Math.floor((w - (cxColor ? 60 : 22)) / 7))
-          const parMaxLen  = Math.max(4, Math.floor((w - 22) / 7))
+          const clipId    = `cg_clip_${node.id.replace(/[^a-zA-Z0-9]/g, '_')}`
+          const clickable = !!onNodeClick
 
           return (
-            <g key={node.id}>
-              {/* Node card */}
+            <g
+              key={node.id}
+              onClick={() => onNodeClick?.(node)}
+              style={{ cursor: clickable ? 'pointer' : 'default' }}
+            >
+              {/* Hit area + card background */}
               <rect x={x} y={y} width={w} height={NODE_H} rx={6}
                 fill="#0d1526"
                 stroke={isActive ? '#fbbf24' : color + '44'}
                 strokeWidth={isActive ? 1.5 : 1}
                 style={{ filter: isActive ? 'drop-shadow(0 0 6px rgba(251,191,36,.35))' : 'none' }}
               />
+              {/* Hover hint (ring on top of card, transparent fill) */}
+              {clickable && (
+                <rect x={x} y={y} width={w} height={NODE_H} rx={6}
+                  fill="transparent" stroke="transparent" strokeWidth={2}
+                  className="cg-node-hover"
+                />
+              )}
               {/* Left kind bar */}
               <rect x={x} y={y + 4} width={3} height={NODE_H - 8} rx={2} fill={color} />
 
-              {/* Recursive indicator */}
+              {/* Recursive indicator — outside clip path, right side */}
               {isRecurse && (
-                <text x={x + w - 5} y={y + 14}
-                  fill="#f59e0b" fontSize={13} textAnchor="end" fontFamily="monospace"
-                  title="Recursive">↺</text>
+                <text x={x + w - 5} y={y + 15}
+                  fill="#f59e0b" fontSize={12} textAnchor="end" fontFamily="monospace">↺</text>
               )}
 
-              {/* Function name */}
-              <text x={x + 10} y={y + 15}
+              {/* Function name — clipped */}
+              <text x={x + 10} y={y + 17}
                 fill={isActive ? '#fbbf24' : color}
-                fontSize={11} fontFamily="JetBrains Mono, monospace" fontWeight={700}>
-                {trunc(node.name, nameMaxLen)}
+                fontSize={11} fontFamily="JetBrains Mono, monospace" fontWeight={700}
+                clipPath={`url(#${clipId})`}>
+                {node.name}
               </text>
 
-              {/* Params */}
-              <text x={x + 10} y={y + 30}
-                fill="#475569" fontSize={9} fontFamily="JetBrains Mono, monospace">
-                ({trunc(node.params.join(', '), parMaxLen)})
+              {/* Params — clipped */}
+              <text x={x + 10} y={y + 33}
+                fill="#475569" fontSize={9} fontFamily="JetBrains Mono, monospace"
+                clipPath={`url(#${clipId})`}>
+                ({node.params.join(', ')})
               </text>
 
-              {/* Complexity badge (bottom-right) */}
+              {/* Complexity (bottom-right, outside clip) */}
               {cxColor && (
-                <text x={x + w - 5} y={y + 30}
+                <text x={x + w - 5} y={y + 33}
                   fill={cxColor} fontSize={8} fontFamily="JetBrains Mono, monospace"
                   textAnchor="end">
                   {node.complexity}
                 </text>
               )}
 
-              {/* Line number (bottom-right, only when no complexity) */}
+              {/* Line number (bottom-right when no complexity) */}
               {!cxColor && node.line && (
-                <text x={x + w - 5} y={y + 30}
+                <text x={x + w - 5} y={y + 33}
                   fill="#334155" fontSize={8} fontFamily="JetBrains Mono, monospace"
                   textAnchor="end">
                   L{node.line}
+                </text>
+              )}
+
+              {/* "click for detail" hint text */}
+              {clickable && (
+                <text x={x + w / 2} y={y + NODE_H + 11}
+                  fill="#1e293b" fontSize={8} fontFamily="JetBrains Mono, monospace"
+                  textAnchor="middle" className="cg-hint">
+                  click for details
                 </text>
               )}
             </g>
@@ -211,8 +247,8 @@ export default function CallGraphView({ callGraph, currentEvent }) {
         })}
       </svg>
 
-      {/* Legend */}
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 2 }}>
+      {/* Kind legend */}
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 4 }}>
         {Object.entries(KIND_COLOR).map(([kind, color]) => (
           nodes.some(n => n.kind === kind) && (
             <span key={kind} style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 9,
@@ -222,6 +258,9 @@ export default function CallGraphView({ callGraph, currentEvent }) {
             </span>
           )
         ))}
+        <span style={{ fontSize: 9, color: '#334155', fontFamily: 'JetBrains Mono, monospace', marginLeft: 'auto' }}>
+          click node for explanation
+        </span>
       </div>
     </div>
   )
