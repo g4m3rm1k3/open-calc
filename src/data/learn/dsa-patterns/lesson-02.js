@@ -187,7 +187,7 @@ console.log('Size:', list.size())`,
     {
       type: 'narration',
       id: 'step6-append',
-      text: 'Add the append operation — adding to the back. This requires walking the entire chain to find the last node, so it is O(n). You can make it O(1) by keeping a "tail" pointer alongside the head — the tail always knows the last node. We will add tail optimisation in lesson 3. For now, watch append walk the chain in CodeLens: you will see "current" advance through every node until it finds the one with next === null.',
+      text: 'Add the append operation — adding to the back. Without any extra bookkeeping this requires walking the entire chain to find the last node, so it is O(n). We will fix that immediately after removeFirst. For now see the walk: "current" advances through every node until it finds the one with next === null. This is the cost we are about to eliminate.',
       code: `function createNode(value) { return { value, next: null } }
 
 function createLinkedList() {
@@ -260,10 +260,76 @@ console.log('Remaining:', list.toArray())
 console.log('Size:', list.size())`,
     },
 
+    // ── Step 8: tail pointer — O(1) append ──────────────────────────────────
+
+    {
+      type: 'narration',
+      id: 'step8-tail',
+      text: 'Add a tail pointer. A tail pointer is just a second variable stored alongside head that always points to the last node. Prepend must set tail when the list was previously empty. Append uses tail directly — no walk — then advances tail to the new node. RemoveFirst must clear tail if it empties the list. Three extra lines of pointer bookkeeping, and append goes from O(n) to O(1) permanently.',
+      code: `function createNode(value) { return { value, next: null } }
+
+function createLinkedList() {
+  let head = null
+  let tail = null   // always points to the last node
+
+  return {
+    // O(1) — prepend must set tail when list was empty
+    prepend(value) {
+      const node = createNode(value)
+      node.next = head
+      head = node
+      if (tail === null) tail = node   // first ever node is both head and tail
+    },
+
+    // O(1) — tail jumps straight to the end, no walk
+    append(value) {
+      const node = createNode(value)
+      if (tail === null) {
+        head = node          // empty list: both head and tail point here
+        tail = node
+      } else {
+        tail.next = node     // attach after current last node
+        tail = node          // advance tail to the new last node
+      }
+    },
+
+    // O(1) — must clear tail if list becomes empty
+    removeFirst() {
+      if (head === null) return null
+      const value = head.value
+      head = head.next
+      if (head === null) tail = null   // list is now empty
+      return value
+    },
+
+    size() { let c=0,n=head; while(n){c++;n=n.next} return c },
+    toArray() { const r=[]; let n=head; while(n){r.push(n.value);n=n.next} return r },
+    [Symbol.iterator]() {
+      let c = head
+      return { next() { if(!c) return{done:true,value:undefined}; const v=c.value; c=c.next; return{value:v,done:false} } }
+    },
+  }
+}
+
+const list = createLinkedList()
+list.append('first')    // tail set: first === head === tail
+list.append('second')   // O(1) — tail.next = second, tail = second
+list.append('third')    // O(1) — tail.next = third,  tail = third
+list.prepend('zero')    // O(1) — head = zero, zero.next = first
+
+console.log(list.toArray())   // ['zero', 'first', 'second', 'third']
+
+list.removeFirst()            // head advances, tail untouched
+list.removeFirst()
+list.removeFirst()
+list.removeFirst()            // list is now empty, tail cleared to null
+console.log('size after clearing:', list.size())`,
+    },
+
     {
       type: 'challenge',
       id: 'ch-list',
-      text: 'Using the linked list from step 7, build a queue: append three items ("red", "green", "blue"), then removeFirst twice. Log the remaining array. Expected: [\'blue\'].',
+      text: 'Using the linked list with the tail pointer from step 8, build a queue: append three items ("red", "green", "blue"), then removeFirst twice. Log the remaining array. Expected: [\'blue\'].',
       expectedOutput: null,
       startCode: `function createNode(value) { return { value, next: null } }
 function createLinkedList() {
@@ -399,34 +465,36 @@ console.log(result)`,
     {
       type: 'narration',
       id: 'complete-file',
-      text: 'Here is the complete linked list with every piece assembled: the Node factory, the LinkedList with prepend O(1), append O(n), removeFirst O(1), size O(n), and the Iterator. Read through it as a whole to see how the pieces fit together before opening it in CodeLens.',
-      code: `// The complete Linked List implementation
+      text: 'Here is the complete linked list with every piece assembled: the Node factory, the LinkedList with O(1) prepend, O(1) append (tail pointer), O(1) removeFirst, O(n) size, and the Iterator. Read through it as a whole before opening CodeLens.',
+      code: `// The complete Linked List — O(1) prepend, O(1) append, O(1) removeFirst
 function createNode(value) {
   return { value, next: null }
 }
 
 function createLinkedList() {
   let head = null
+  let tail = null
 
   return {
     prepend(value) {
       const node = createNode(value)
       node.next = head
       head = node
+      if (tail === null) tail = node
     },
 
     append(value) {
       const node = createNode(value)
-      if (!head) { head = node; return }
-      let current = head
-      while (current.next) current = current.next
-      current.next = node
+      if (tail === null) { head = node; tail = node; return }
+      tail.next = node
+      tail = node
     },
 
     removeFirst() {
-      if (!head) return null
+      if (head === null) return null
       const value = head.value
       head = head.next
+      if (head === null) tail = null
       return value
     },
 
@@ -451,17 +519,13 @@ function createLinkedList() {
   }
 }
 
-// Use it as a queue: O(1) removeFirst beats array.shift()
 const queue = createLinkedList()
 queue.append('first task')
 queue.append('second task')
-queue.prepend('urgent task')   // jumps to front
+queue.prepend('urgent task')
 
 console.log('Queue size:', queue.size())
-
-for (const item of queue) {
-  console.log('-', item)
-}
+for (const item of queue) console.log('-', item)
 
 const processed = queue.removeFirst()
 console.log('Processed:', processed)
@@ -471,58 +535,50 @@ console.log('Remaining:', queue.size())`,
     {
       type: 'codelens',
       id: 'cl-linked-list',
-      text: 'Open in CodeLens and step through the complete linked list. Watch the Variables panel: see "head" change with each prepend and append. Watch "current" walk the chain during append and during the for...of loop. See how removeFirst simply moves the head pointer forward without touching any other node. Every O(1) operation is two pointer assignments. Every O(n) operation is a walk from head to the end.',
+      text: 'Open in CodeLens. Watch the Variables panel: "head" and "tail" both update on the first append. On the second and third appends, only "tail" moves — head stays fixed. Watch removeFirst: head advances, tail stays unless the list becomes empty. Pay attention to how each O(1) operation is just two or three pointer reassignments. No loop, no walk, no searching.',
       code: `function createNode(value) {
   return { value, next: null }
 }
 
 function createLinkedList() {
   let head = null
+  let tail = null
 
   return {
-    prepend(value) {
-      const node = createNode(value)
-      node.next = head
-      head = node
+    prepend(v) {
+      const n = createNode(v)
+      n.next = head
+      head = n
+      if (tail === null) tail = n
     },
-    append(value) {
-      const node = createNode(value)
-      if (!head) { head = node; return }
-      let current = head
-      while (current.next) current = current.next
-      current.next = node
+    append(v) {
+      const n = createNode(v)
+      if (tail === null) { head = n; tail = n; return }
+      tail.next = n
+      tail = n
     },
     removeFirst() {
       if (!head) return null
-      const value = head.value
+      const v = head.value
       head = head.next
-      return value
+      if (!head) tail = null
+      return v
     },
     [Symbol.iterator]() {
-      let current = head
-      return {
-        next() {
-          if (!current) return { value: undefined, done: true }
-          const value = current.value
-          current = current.next
-          return { value, done: false }
-        }
-      }
-    }
+      let c = head
+      return { next() { if(!c) return{done:true,value:undefined}; const v=c.value; c=c.next; return{value:v,done:false} } }
+    },
   }
 }
 
-const queue = createLinkedList()
-queue.append('first task')
-queue.append('second task')
-queue.prepend('urgent task')
+const q = createLinkedList()
+q.append('first')
+q.append('second')
+q.append('third')
+q.prepend('urgent')
 
-for (const item of queue) {
-  console.log(item)
-}
-
-const done = queue.removeFirst()
-console.log('Done:', done)`,
+for (const item of q) console.log(item)
+console.log('removed:', q.removeFirst())`,
       lang: 'js',
     },
 

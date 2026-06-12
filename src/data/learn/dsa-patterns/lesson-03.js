@@ -301,6 +301,103 @@ const freq = createHashTable()
 
     { type: 'checkpoint', id: 'cp-hash' },
 
+    // ── Load factor and rehashing ─────────────────────────────────────────────
+
+    {
+      type: 'narration',
+      id: 'step8-load-factor',
+      text: 'The hash table works well when buckets are sparse. But as you add more and more entries, the chains inside each bucket get longer. The load factor is a number that tells you how full the table is. It equals the number of stored entries divided by the number of buckets. A load factor of 1.0 means on average every bucket has one entry. Above 0.75, chains start getting long and your O(1) guarantee weakens — you are doing more and more scanning inside buckets. Run this and watch the load factor climb as entries are added.',
+      code: `function hash(key, size) {
+  let total = 0
+  for (let i = 0; i < key.length; i++) total += key.charCodeAt(i)
+  return total % size
+}
+
+function createHashTable(size = 4) {   // small table to see the problem fast
+  const buckets = []
+  for (let i = 0; i < size; i++) buckets.push([])
+  let entries = 0
+
+  return {
+    put(key, value) {
+      const idx = hash(key, size)
+      const existing = buckets[idx].find(([k]) => k === key)
+      if (existing) { existing[1] = value; return }
+      buckets[idx].push([key, value])
+      entries++
+    },
+    loadFactor() {
+      return entries / size   // 0.0 (empty) to above 1.0 (very full)
+    },
+    bucketLengths() {
+      return buckets.map(b => b.length)
+    },
+  }
+}
+
+const table = createHashTable(4)
+const keys = ['alice', 'bob', 'carol', 'dave', 'eve', 'frank']
+for (const k of keys) {
+  table.put(k, k + '@example.com')
+  console.log('load factor:', table.loadFactor().toFixed(2), '| buckets:', table.bucketLengths())
+}`,
+    },
+
+    {
+      type: 'narration',
+      id: 'step9-rehash',
+      text: 'When the load factor crosses 0.75, the hash table needs to rebuild itself. This is called rehashing. The process is: create a new array of buckets that is double the size, then take every existing entry and re-insert it into the new array. Re-inserting is necessary because the hash function uses the size — hash("alice", 8) is a different index than hash("alice", 4). The old array is discarded. Rehash costs O(n) for that one operation, but it happens so rarely that the amortised cost per put stays close to O(1). This is the same reasoning as dynamic array growth.',
+      code: `function hash(key, size) {
+  let total = 0
+  for (let i = 0; i < key.length; i++) total += key.charCodeAt(i)
+  return total % size
+}
+
+function createHashTable(initialSize = 8) {
+  let size = initialSize
+  let buckets = Array.from({ length: size }, () => [])
+  let entries = 0
+
+  function rehash() {
+    const oldBuckets = buckets
+    size = size * 2
+    buckets = Array.from({ length: size }, () => [])
+    entries = 0
+    // Re-insert every existing entry — new size means new indices
+    for (const bucket of oldBuckets) {
+      for (const [key, value] of bucket) {
+        put(key, value)
+      }
+    }
+    console.log('Rehashed to size:', size)
+  }
+
+  function put(key, value) {
+    if (entries / size > 0.75) rehash()   // trigger before adding
+    const idx = hash(key, size)
+    const existing = buckets[idx].find(([k]) => k === key)
+    if (existing) { existing[1] = value; return }
+    buckets[idx].push([key, value])
+    entries++
+  }
+
+  const get = (key) => {
+    const entry = buckets[hash(key, size)].find(([k]) => k === key)
+    return entry ? entry[1] : undefined
+  }
+
+  return { put, get, has: (k) => get(k) !== undefined, getSize: () => size }
+}
+
+const table = createHashTable(4)
+const names = ['alice','bob','carol','dave','eve','frank','grace']
+for (const n of names) table.put(n, n + '@example.com')
+
+console.log('Table size after inserts:', table.getSize())
+console.log('alice:', table.get('alice'))
+console.log('grace:', table.get('grace'))`,
+    },
+
     // ── Step 8: The Builder problem ───────────────────────────────────────────
 
     {
