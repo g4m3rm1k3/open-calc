@@ -2,8 +2,8 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Editor from '@monaco-editor/react'
 import {
-  Play, Pause, ChevronRight, ChevronLeft, RotateCcw,
-  ExternalLink, CheckCircle, XCircle, Terminal, Lightbulb,
+  Play, Pause, ChevronRight, ChevronLeft, ChevronDown, RotateCcw,
+  ExternalLink, CheckCircle, XCircle, Terminal, Lightbulb, Check,
 } from 'lucide-react'
 import { useSpeech } from '../../utils/useSpeech.js'
 
@@ -67,7 +67,7 @@ function clearCheckpoint(lessonId) {
 
 // ── Progress bar ──────────────────────────────────────────────────────────────
 
-function ProgressBar({ checkpoints, reachedCp }) {
+function ProgressBar({ checkpoints, reachedCp, onJump }) {
   return (
     <div className="flex items-center gap-2">
       {checkpoints.map((cp, i) => {
@@ -75,10 +75,14 @@ function ProgressBar({ checkpoints, reachedCp }) {
         return (
           <div key={cp.id} className="flex items-center gap-2">
             {i > 0 && <div className={`h-0.5 w-8 rounded ${reached ? 'bg-cyan-400' : 'bg-slate-700'}`} />}
-            <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => onJump?.(cp.id)}
+              title={`Jump to: ${cp.label}`}
+              className={`flex items-center gap-1.5 hover:opacity-80 transition-opacity cursor-pointer`}
+            >
               <div className={`w-2 h-2 rounded-full ${reached ? 'bg-cyan-400' : 'bg-slate-600'}`} />
               <span className={`text-xs ${reached ? 'text-cyan-400' : 'text-slate-500'}`}>{cp.label}</span>
-            </div>
+            </button>
           </div>
         )
       })}
@@ -137,9 +141,8 @@ function OutputPanel({ logs, error, challengeResult, expectedOutput, testDetail 
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-const sleep = (ms) => new Promise(r => setTimeout(r, ms))
 
-export default function LessonPlayer({ lesson, onBack, onNext, nextTitle }) {
+export default function LessonPlayer({ lesson, onBack, onNext, nextTitle, seriesLessons, onJumpToLesson }) {
   const navigate = useNavigate()
   const { speak, stop: stopSpeech } = useSpeech()
 
@@ -167,8 +170,22 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle }) {
   const [testDetail, setTestDetail]           = useState(null)
   const [hint, setHint]                       = useState(false)
   const [reachedCp, setReachedCp]             = useState(savedCp ? getReachedCpsUpTo(savedCp.cpId) : [])
+  const [lessonMenuOpen, setLessonMenuOpen]   = useState(false)
 
-  const pauseRef = useRef(false)
+  const pauseRef    = useRef(false)
+  const lessonMenuRef = useRef(null)
+
+  // Close lesson dropdown on outside click
+  useEffect(() => {
+    if (!lessonMenuOpen) return
+    function onDown(e) {
+      if (lessonMenuRef.current && !lessonMenuRef.current.contains(e.target)) {
+        setLessonMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', onDown)
+    return () => document.removeEventListener('mousedown', onDown)
+  }, [lessonMenuOpen])
 
   const currentSeg = segments[segIdx] ?? null
   const isChallenge = phase === 'challenge'
@@ -199,15 +216,16 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle }) {
 
         // If this segment has code, auto-run it so the output is visible,
         // then pause so the user can experiment before moving on.
+        // Auto-run code if present so output is visible
         if (seg.code !== null && seg.code !== undefined) {
           const { logs: autoLogs, error: autoErr } = runCode(seg.code)
           setLogs(autoLogs)
           setRunError(autoErr)
-          setPhase('paused')
-          return
         }
 
-        await sleep(300)
+        // Always pause — user clicks Next to advance at their own pace
+        setPhase('paused')
+        return
 
       } else if (seg.type === 'checkpoint') {
         saveCheckpoint(lesson.id, seg.id, i, code)
@@ -261,6 +279,38 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle }) {
     setTestDetail(null)
     setReachedCp([])
     setHint(false)
+  }
+
+  // ── Checkpoint jump ──────────────────────────────────────────────────────────
+
+  function jumpToCheckpoint(cpId) {
+    pauseRef.current = true
+    stopSpeech()
+
+    const cpIdx = segments.findIndex(s => s.id === cpId)
+    if (cpIdx === -1) return
+
+    // Find start of this section: first segment after the previous checkpoint
+    let sectionStart = 0
+    for (let i = cpIdx - 1; i >= 0; i--) {
+      if (segments[i].type === 'checkpoint') { sectionStart = i + 1; break }
+    }
+
+    // Find first non-checkpoint segment in this section (skip any back-to-back checkpoints)
+    let targetIdx = sectionStart
+    for (let i = sectionStart; i < cpIdx; i++) {
+      if (segments[i].type !== 'checkpoint') { targetIdx = i; break }
+    }
+
+    const targetSeg = segments[targetIdx]
+    setSegIdx(targetIdx)
+    setCode(targetSeg?.startCode ?? targetSeg?.code ?? '')
+    setLogs([])
+    setRunError(null)
+    setChallengeResult(null)
+    setTestDetail(null)
+    setHint(false)
+    setPhase('idle')
   }
 
   // ── Run (always available) ───────────────────────────────────────────────────
@@ -329,12 +379,42 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle }) {
           <span>Labs</span>
         </button>
         <div className="w-px h-4 bg-slate-700" />
-        <div className="flex flex-col min-w-0">
+
+        {/* Lesson title / series dropdown */}
+        <div className="flex flex-col min-w-0 relative" ref={lessonMenuRef}>
           <span className="text-[10px] text-slate-500 uppercase tracking-widest">{lesson.series.title}</span>
-          <span className="text-sm font-semibold text-slate-100 truncate">{lesson.title}</span>
+          <button
+            onClick={() => setLessonMenuOpen(o => !o)}
+            className="flex items-center gap-1 text-sm font-semibold text-slate-100 hover:text-cyan-300 transition-colors text-left"
+          >
+            <span className="truncate max-w-56">{lesson.title}</span>
+            {seriesLessons?.length > 1 && <ChevronDown size={12} className="shrink-0 text-slate-500" />}
+          </button>
+
+          {lessonMenuOpen && seriesLessons?.length > 0 && (
+            <div className="absolute top-full left-0 mt-1 z-50 bg-[#0d1624] border border-slate-700 rounded-lg shadow-2xl min-w-72 py-1 max-h-80 overflow-y-auto">
+              {seriesLessons.map(l => (
+                <button
+                  key={l.id}
+                  onClick={() => { setLessonMenuOpen(false); onJumpToLesson?.(l.path) }}
+                  className={`w-full text-left px-3 py-2 text-sm flex items-center gap-2 transition-colors ${
+                    l.active
+                      ? 'text-cyan-400 bg-cyan-500/10'
+                      : 'text-slate-300 hover:bg-slate-700/60'
+                  }`}
+                >
+                  <span className="w-4 shrink-0">
+                    {l.active && <Check size={12} />}
+                  </span>
+                  <span className="truncate">{l.title}</span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
+
         <div className="flex-1" />
-        <ProgressBar checkpoints={lesson.checkpoints} reachedCp={reachedCp} />
+        <ProgressBar checkpoints={lesson.checkpoints} reachedCp={reachedCp} onJump={jumpToCheckpoint} />
         <div className="flex-1" />
         <button onClick={handleRestart} className="text-slate-500 hover:text-slate-300 transition-colors" title="Restart lesson">
           <RotateCcw size={15} />
@@ -445,10 +525,10 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle }) {
           </div>
         )}
 
-        {/* Narration text */}
-        {phase === 'playing' && currentSeg?.type === 'narration' && (
+        {/* Narration text — stays visible while playing AND while paused on this segment */}
+        {(phase === 'playing' || phase === 'paused') && currentSeg?.type === 'narration' && (
           <div className="px-4 py-3 border-b border-slate-800">
-            <p className="text-sm text-slate-300 leading-relaxed line-clamp-2">{currentSeg.text}</p>
+            <p className="text-sm text-slate-300 leading-relaxed">{currentSeg.text}</p>
           </div>
         )}
 
