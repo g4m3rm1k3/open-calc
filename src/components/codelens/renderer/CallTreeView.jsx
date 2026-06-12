@@ -1,20 +1,21 @@
 /**
- * CallTreeView — reconstructs and renders the full function call tree from
- * the execution event stream.
+ * CallTreeView — recursive call tree with pan, zoom, and seek-on-click.
  *
- * Each node shows: call signature (name + args) and return value.
- * The current step is highlighted: amber = current call, indigo = ancestor chain.
- * Max depth is configurable so huge recursive trees stay readable.
+ * Mouse wheel = zoom · drag = pan · click node = seek to that call's first step
+ * Amber = current call · Indigo = call path · Depth selector caps visible depth
  */
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useRef, useCallback, useEffect } from 'react'
 
 const CALL = 'function_call'
 const RET  = 'function_return'
 
-const NODE_W  = 104
-const NODE_H  = 40
-const COL_GAP = 8    // horizontal space between sibling subtrees
-const ROW_H   = 72   // y-distance between node tops (node + connector)
+const NODE_W  = 108
+const NODE_H  = 42
+const COL_GAP = 10
+const ROW_H   = 76
+
+const MIN_SCALE = 0.15
+const MAX_SCALE = 2.5
 
 // ── Tree builder ──────────────────────────────────────────────────────────────
 
@@ -28,11 +29,11 @@ function buildTree(events) {
       const node = {
         id:          `n${i}`,
         name:        evt.functionName ?? '?',
-        args:        (evt.args ?? []).map(a => fmtArg(a)),
+        args:        (evt.args ?? []).map(fmtArg),
         children:    [],
         returnValue: undefined,
         stepStart:   i,
-        stepEnd:     -1,          // -1 = still open (shouldn't happen after sync run)
+        stepEnd:     -1,
       }
       stack.at(-1).children.push(node)
       stack.push(node)
@@ -68,38 +69,30 @@ function countAll(node) {
   return 1 + node.children.reduce((s, c) => s + countAll(c), 0)
 }
 
-// ── Layout ─────────────────────────────────────────────────────────────────────
-// Tidy-tree layout: each subtree gets a width = max(nodeW, sum of children widths).
-// Positions are assigned top-down after widths are computed bottom-up.
+// ── Layout ────────────────────────────────────────────────────────────────────
 
 function computeLayout(tree, maxDepth) {
-  const visRoots = tree.children   // skip synthetic root
+  const visRoots = tree.children
   if (visRoots.length === 0) return { nodeList: [], edgeList: [], svgW: 0, svgH: 0 }
 
-  // ── Pass 1: bottom-up width ──
   function calcW(node, depth) {
     if (depth >= maxDepth || node.children.length === 0) {
       node._w = NODE_W + COL_GAP
     } else {
       node.children.forEach(c => calcW(c, depth + 1))
-      node._w = Math.max(
-        NODE_W + COL_GAP,
-        node.children.reduce((s, c) => s + c._w, 0),
-      )
+      node._w = Math.max(NODE_W + COL_GAP, node.children.reduce((s, c) => s + c._w, 0))
     }
   }
   visRoots.forEach(r => calcW(r, 0))
 
   const totalW = visRoots.reduce((s, r) => s + r._w, 0)
-
-  // ── Pass 2: top-down position ──
   const nodeList = []
   const edgeList = []
 
   function place(node, cx, depth) {
-    const y          = depth * ROW_H
-    const x          = cx - NODE_W / 2
-    const hiddenKids = depth === maxDepth && node.children.length > 0
+    const y           = depth * ROW_H
+    const x           = cx - NODE_W / 2
+    const hiddenKids  = depth === maxDepth && node.children.length > 0
     const hiddenCount = hiddenKids ? node.children.reduce((s, c) => s + countAll(c), 0) : 0
 
     nodeList.push({ node, x, y, cx, depth, hiddenKids, hiddenCount })
@@ -111,8 +104,9 @@ function computeLayout(tree, maxDepth) {
         const childY = (depth + 1) * ROW_H
         const midY   = (y + NODE_H + childY) / 2
         edgeList.push({
-          d: `M${cx},${y + NODE_H} C${cx},${midY} ${childCx},${midY} ${childCx},${childY}`,
-          active: false,  // updated during render
+          d:    `M${cx},${y + NODE_H} C${cx},${midY} ${childCx},${midY} ${childCx},${childY}`,
+          from: node.id,
+          to:   child.id,
         })
         place(child, childCx, depth + 1)
         childCx += child._w
@@ -126,9 +120,82 @@ function computeLayout(tree, maxDepth) {
     cx += r._w
   }
 
-  const svgH = (maxDepth + 1) * ROW_H + NODE_H + 20
-
+  const svgH = (maxDepth + 1) * ROW_H + NODE_H + 40
   return { nodeList, edgeList, svgW: totalW, svgH }
+}
+
+// ── Pan / Zoom hook ───────────────────────────────────────────────────────────
+
+function usePanZoom(svgW, svgH) {
+  const [tx, setTx]    = useState(10)
+  const [ty, setTy]    = useState(10)
+  const [scale, setScale] = useState(1)
+  const dragRef = useRef(null)
+  const svgRef  = useRef(null)
+
+  // Center tree horizontally on first render
+  useEffect(() => {
+    if (!svgRef.current || svgW === 0) return
+    const containerW = svgRef.current.clientWidth || 300
+    setTx(Math.max(10, (containerW - svgW) / 2))
+    setTy(10)
+    setScale(1)
+  }, [svgW])
+
+  const onWheel = useCallback((e) => {
+    e.preventDefault()
+    const rect   = svgRef.current?.getBoundingClientRect()
+    if (!rect) return
+    const mouseX = e.clientX - rect.left
+    const mouseY = e.clientY - rect.top
+    const factor = e.deltaY < 0 ? 1.12 : 0.9
+    setScale(s => {
+      const next = Math.max(MIN_SCALE, Math.min(MAX_SCALE, s * factor))
+      // Zoom toward mouse pointer
+      setTx(x => mouseX - (mouseX - x) * (next / s))
+      setTy(y => mouseY - (mouseY - y) * (next / s))
+      return next
+    })
+  }, [])
+
+  const onMouseDown = useCallback((e) => {
+    if (e.button !== 0) return
+    // Don't start pan if clicking a node (handled by node onClick)
+    dragRef.current = { startX: e.clientX, startY: e.clientY, origTx: tx, origTy: ty, moved: false }
+  }, [tx, ty])
+
+  const onMouseMove = useCallback((e) => {
+    if (!dragRef.current) return
+    const dx = e.clientX - dragRef.current.startX
+    const dy = e.clientY - dragRef.current.startY
+    if (Math.abs(dx) + Math.abs(dy) > 3) dragRef.current.moved = true
+    setTx(dragRef.current.origTx + dx)
+    setTy(dragRef.current.origTy + dy)
+  }, [])
+
+  const onMouseUp = useCallback(() => {
+    dragRef.current = null
+  }, [])
+
+  const isDragging = useCallback(() => dragRef.current?.moved ?? false, [])
+
+  const resetView = useCallback(() => {
+    if (!svgRef.current || svgW === 0) return
+    const containerW = svgRef.current.clientWidth || 300
+    setTx(Math.max(10, (containerW - svgW) / 2))
+    setTy(10)
+    setScale(1)
+  }, [svgW])
+
+  // Attach wheel listener (non-passive so we can preventDefault)
+  useEffect(() => {
+    const el = svgRef.current
+    if (!el) return
+    el.addEventListener('wheel', onWheel, { passive: false })
+    return () => el.removeEventListener('wheel', onWheel)
+  }, [onWheel])
+
+  return { svgRef, tx, ty, scale, onMouseDown, onMouseMove, onMouseUp, isDragging, resetView }
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -136,7 +203,7 @@ function computeLayout(tree, maxDepth) {
 const DEPTHS = [3, 4, 5, 6, 99]
 const DEPTH_LABELS = { 3: '3', 4: '4', 5: '5', 6: '6', 99: '∞' }
 
-export default function CallTreeView({ events, step }) {
+export default function CallTreeView({ events, step, onSeek }) {
   const [maxDepth, setMaxDepth] = useState(4)
 
   const tree = useMemo(() => buildTree(events ?? []), [events])
@@ -146,13 +213,13 @@ export default function CallTreeView({ events, step }) {
     [tree, maxDepth],
   )
 
-  // ── Active path detection ──
-  // A node is "in path" if the current step falls within its call range.
-  // The deepest such node is "current".
+  const { svgRef, tx, ty, scale, onMouseDown, onMouseMove, onMouseUp, isDragging, resetView }
+    = usePanZoom(svgW, svgH)
+
+  // Active path
   const { activePath, currentId } = useMemo(() => {
     const activePath = new Set()
-    let currentId    = null
-    let maxD         = -1
+    let currentId = null, maxD = -1
     for (const { node, depth } of nodeList) {
       const inside = step >= node.stepStart && (node.stepEnd === -1 || step <= node.stepEnd)
       if (inside) {
@@ -165,20 +232,16 @@ export default function CallTreeView({ events, step }) {
 
   const totalCalls = tree.children.reduce((s, r) => s + countAll(r), 0)
 
-  if (!events?.length) {
-    return (
-      <div style={{ padding: '16px 12px', color: '#475569', fontSize: 12 }}>
-        Run code to see the call tree.
-      </div>
-    )
-  }
+  const handleNodeClick = useCallback((node) => {
+    if (isDragging()) return
+    onSeek?.(node.stepStart)
+  }, [onSeek, isDragging])
 
+  if (!events?.length) {
+    return <Empty>Run code to see the call tree.</Empty>
+  }
   if (tree.children.length === 0) {
-    return (
-      <div style={{ padding: '16px 12px', color: '#475569', fontSize: 12 }}>
-        No function calls detected.
-      </div>
-    )
+    return <Empty>No function calls detected.</Empty>
   }
 
   return (
@@ -191,25 +254,33 @@ export default function CallTreeView({ events, step }) {
       }}>
         <span style={{ fontSize: 9, color: '#334155', letterSpacing: '.08em',
           fontFamily: 'JetBrains Mono, monospace' }}>CALL TREE</span>
-
         <span style={{ fontSize: 9, color: '#475569', fontFamily: 'JetBrains Mono, monospace' }}>
           {totalCalls} calls
         </span>
 
-        {/* Depth selector */}
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4 }}>
-          <span style={{ fontSize: 9, color: '#334155', fontFamily: 'JetBrains Mono, monospace' }}>depth</span>
-          <div style={{ display: 'flex', gap: 2, background: '#0f172a',
-            borderRadius: 4, padding: 2, border: '1px solid #1e293b' }}>
-            {DEPTHS.map(d => (
-              <button key={d} onClick={() => setMaxDepth(d)} style={{
-                padding: '2px 6px', borderRadius: 3, border: 'none', cursor: 'pointer',
-                fontSize: 9, fontFamily: 'JetBrains Mono, monospace',
-                background: maxDepth === d ? '#1e293b' : 'transparent',
-                color:      maxDepth === d ? '#a5b4fc'  : '#475569',
-              }}>{DEPTH_LABELS[d]}</button>
-            ))}
-          </div>
+        {/* Zoom controls */}
+        <div style={{ display: 'flex', gap: 2 }}>
+          <ZoomBtn onClick={() => { resetView() }} title="Reset view">⊙</ZoomBtn>
+          <ZoomBtn onClick={() => setScale(s => Math.min(MAX_SCALE, s * 1.25))}>+</ZoomBtn>
+          <ZoomBtn onClick={() => setScale(s => Math.max(MIN_SCALE, s * 0.8))}>−</ZoomBtn>
+        </div>
+
+        <span style={{ fontSize: 9, color: '#334155', fontFamily: 'JetBrains Mono, monospace',
+          marginLeft: 'auto', opacity: 0.6 }}>
+          scroll=zoom · drag=pan · click=seek
+        </span>
+
+        {/* Depth */}
+        <div style={{ display: 'flex', gap: 2, background: '#0f172a',
+          borderRadius: 4, padding: 2, border: '1px solid #1e293b' }}>
+          {DEPTHS.map(d => (
+            <button key={d} onClick={() => setMaxDepth(d)} style={{
+              padding: '2px 6px', borderRadius: 3, border: 'none', cursor: 'pointer',
+              fontSize: 9, fontFamily: 'JetBrains Mono, monospace',
+              background: maxDepth === d ? '#1e293b' : 'transparent',
+              color:      maxDepth === d ? '#a5b4fc' : '#475569',
+            }}>{DEPTH_LABELS[d]}</button>
+          ))}
         </div>
       </div>
 
@@ -221,15 +292,22 @@ export default function CallTreeView({ events, step }) {
         <Legend color="#1e293b" label="completed" />
       </div>
 
-      {/* ── Tree SVG ── */}
-      <div style={{ flex: 1, overflow: 'auto', padding: '10px 6px' }}>
+      {/* ── Canvas ── */}
+      <div
+        ref={svgRef}
+        onMouseDown={onMouseDown}
+        onMouseMove={onMouseMove}
+        onMouseUp={onMouseUp}
+        onMouseLeave={onMouseUp}
+        style={{ flex: 1, overflow: 'hidden', cursor: 'grab', userSelect: 'none',
+          background: '#080c14', position: 'relative' }}
+      >
         <svg
-          width={Math.max(svgW, 200)}
-          height={svgH}
+          width="100%"
+          height="100%"
           style={{ display: 'block', overflow: 'visible' }}
         >
           <defs>
-            {/* Clip paths per node */}
             {nodeList.map(({ node, x, y }) => (
               <clipPath key={`clip_${node.id}`} id={`clt_clip_${node.id}`}>
                 <rect x={x + 4} y={y} width={NODE_W - 8} height={NODE_H} />
@@ -237,101 +315,101 @@ export default function CallTreeView({ events, step }) {
             ))}
           </defs>
 
-          {/* ── Edges ── */}
-          {edgeList.map((e, i) => {
-            // Find the source node for this edge to check if it's in the active path
-            // Edges are ordered same as nodeList placement; just use opacity
-            return (
-              <path key={i} d={e.d}
-                fill="none" stroke="#1e293b" strokeWidth={1.5}
-              />
-            )
-          })}
+          <g transform={`translate(${tx}, ${ty}) scale(${scale})`}>
 
-          {/* ── Active path edges overlay ── */}
-          {nodeList.map(({ node, cx, y, depth }) => {
-            if (!activePath.has(node.id)) return null
-            // Draw edges from this node to its active children
-            return node.children.slice(0, maxDepth > depth ? undefined : 0).map((child, ci) => {
-              if (!activePath.has(child.id)) return null
-              const childEntry = nodeList.find(n => n.node.id === child.id)
-              if (!childEntry) return null
-              const cy   = y
-              const childY = childEntry.y
-              const midY   = (cy + NODE_H + childY) / 2
+            {/* Base edges */}
+            {edgeList.map((e, i) => (
+              <path key={i} d={e.d} fill="none" stroke="#1e293b" strokeWidth={1.5} />
+            ))}
+
+            {/* Active path edges */}
+            {nodeList.map(({ node, cx, y, depth }) => {
+              if (!activePath.has(node.id)) return null
+              return node.children.map((child, ci) => {
+                if (!activePath.has(child.id)) return null
+                const childEntry = nodeList.find(n => n.node.id === child.id)
+                if (!childEntry) return null
+                const midY = (y + NODE_H + childEntry.y) / 2
+                return (
+                  <path key={`ap-${node.id}-${ci}`}
+                    d={`M${cx},${y + NODE_H} C${cx},${midY} ${childEntry.cx},${midY} ${childEntry.cx},${childEntry.y}`}
+                    fill="none" stroke="#6366f1" strokeWidth={2} opacity={0.7}
+                  />
+                )
+              })
+            })}
+
+            {/* Nodes */}
+            {nodeList.map(({ node, x, y, cx, hiddenKids, hiddenCount }) => {
+              const isCurrent = node.id === currentId
+              const isInPath  = activePath.has(node.id)
+              const retStr    = fmtReturn(node.returnValue)
+              const hasReturn = node.returnValue !== undefined
+              const argsStr   = node.args.slice(0, 3).join(', ')
+              const nameStr   = node.name.length > 11 ? node.name.slice(0, 10) + '…' : node.name
+              const callStr   = `${nameStr}(${argsStr})`
+              const clipId    = `clt_clip_${node.id}`
+
               return (
-                <path key={`active-${node.id}-${ci}`}
-                  d={`M${cx},${cy + NODE_H} C${cx},${midY} ${childEntry.cx},${midY} ${childEntry.cx},${childY}`}
-                  fill="none" stroke="#6366f1" strokeWidth={2} opacity={0.7}
-                />
-              )
-            })
-          })}
-
-          {/* ── Nodes ── */}
-          {nodeList.map(({ node, x, y, cx, depth, hiddenKids, hiddenCount }) => {
-            const isCurrent  = node.id === currentId
-            const isInPath   = activePath.has(node.id)
-            const hasReturn  = node.returnValue !== undefined
-            const retStr     = fmtReturn(node.returnValue)
-            const argsStr    = node.args.slice(0, 3).join(', ')
-            const callStr    = `${node.name.length > 11 ? node.name.slice(0, 10) + '…' : node.name}(${argsStr})`
-            const clipId     = `clt_clip_${node.id}`
-
-            return (
-              <g key={node.id}>
-                {/* Card */}
-                <rect
-                  x={x} y={y} width={NODE_W} height={NODE_H} rx={6}
-                  fill={isCurrent ? '#1a1020' : isInPath ? '#0c1428' : '#0d1526'}
-                  stroke={isCurrent ? '#fbbf24' : isInPath ? '#6366f1' : '#1e293b'}
-                  strokeWidth={isCurrent ? 2 : isInPath ? 1.5 : 1}
-                  style={{ filter: isCurrent ? 'drop-shadow(0 0 6px rgba(251,191,36,.4))' : 'none' }}
-                />
-
-                {/* Call signature */}
-                <text
-                  x={cx} y={y + 15}
-                  textAnchor="middle"
-                  fill={isCurrent ? '#fbbf24' : isInPath ? '#a5b4fc' : '#7dd3fc'}
-                  fontSize={11} fontFamily="JetBrains Mono, monospace" fontWeight={700}
-                  clipPath={`url(#${clipId})`}
+                <g
+                  key={node.id}
+                  onClick={() => handleNodeClick(node)}
+                  style={{ cursor: 'pointer' }}
                 >
-                  {callStr}
-                </text>
+                  <rect
+                    x={x} y={y} width={NODE_W} height={NODE_H} rx={6}
+                    fill={isCurrent ? '#1a1020' : isInPath ? '#0c1428' : '#0d1526'}
+                    stroke={isCurrent ? '#fbbf24' : isInPath ? '#6366f1' : '#1e293b'}
+                    strokeWidth={isCurrent ? 2 : isInPath ? 1.5 : 1}
+                    style={{ filter: isCurrent ? 'drop-shadow(0 0 6px rgba(251,191,36,.4))' : 'none' }}
+                  />
 
-                {/* Return value */}
-                {hasReturn && retStr !== null ? (
-                  <text
-                    x={cx} y={y + 30}
-                    textAnchor="middle"
-                    fill={isCurrent ? '#fcd34d' : '#86efac'}
-                    fontSize={9} fontFamily="JetBrains Mono, monospace"
-                    clipPath={`url(#${clipId})`}
-                  >
-                    → {retStr}
+                  <text x={cx} y={y + 16} textAnchor="middle"
+                    fill={isCurrent ? '#fbbf24' : isInPath ? '#a5b4fc' : '#7dd3fc'}
+                    fontSize={11} fontFamily="JetBrains Mono, monospace" fontWeight={700}
+                    clipPath={`url(#${clipId})`}>
+                    {callStr}
                   </text>
-                ) : !hasReturn ? (
-                  <text x={cx} y={y + 30} textAnchor="middle"
-                    fill="#334155" fontSize={9} fontFamily="JetBrains Mono, monospace">
-                    …
-                  </text>
-                ) : null}
 
-                {/* Hidden-children indicator */}
-                {hiddenKids && (
-                  <text x={cx} y={y + NODE_H + 13}
-                    textAnchor="middle" fill="#475569"
-                    fontSize={8} fontFamily="JetBrains Mono, monospace">
-                    +{hiddenCount} hidden
-                  </text>
-                )}
-              </g>
-            )
-          })}
+                  {hasReturn && retStr !== null ? (
+                    <text x={cx} y={y + 31} textAnchor="middle"
+                      fill={isCurrent ? '#fcd34d' : '#86efac'}
+                      fontSize={9} fontFamily="JetBrains Mono, monospace"
+                      clipPath={`url(#${clipId})`}>
+                      → {retStr}
+                    </text>
+                  ) : !hasReturn ? (
+                    <text x={cx} y={y + 31} textAnchor="middle"
+                      fill="#334155" fontSize={9} fontFamily="JetBrains Mono, monospace">
+                      …
+                    </text>
+                  ) : null}
+
+                  {hiddenKids && (
+                    <text x={cx} y={y + NODE_H + 14} textAnchor="middle"
+                      fill="#475569" fontSize={8} fontFamily="JetBrains Mono, monospace">
+                      +{hiddenCount} hidden
+                    </text>
+                  )}
+                </g>
+              )
+            })}
+
+          </g>
         </svg>
       </div>
     </div>
+  )
+}
+
+function ZoomBtn({ onClick, children, title }) {
+  return (
+    <button onClick={onClick} title={title} style={{
+      width: 20, height: 20, borderRadius: 3, border: '1px solid #1e293b',
+      background: '#0f172a', color: '#475569', cursor: 'pointer',
+      fontSize: 13, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+      fontFamily: 'JetBrains Mono, monospace', padding: 0,
+    }}>{children}</button>
   )
 }
 
@@ -343,5 +421,13 @@ function Legend({ color, label }) {
         border: `2px solid ${color}`, display: 'inline-block' }} />
       {label}
     </span>
+  )
+}
+
+function Empty({ children }) {
+  return (
+    <div style={{ padding: '16px 12px', color: '#475569', fontSize: 12 }}>
+      {children}
+    </div>
   )
 }

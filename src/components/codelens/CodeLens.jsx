@@ -17,6 +17,46 @@ import {
   Palette, Info, Network, Layers, GitBranch,
 } from 'lucide-react'
 
+// ── TypeScript → JS type stripper ─────────────────────────────────────────────
+// Best-effort for educational code: removes type annotations so the JS
+// interpreter can run the logic. Not a full transpiler.
+function stripTypeScript(src) {
+  let s = src
+
+  // interface Foo { ... } (handles nested braces via iteration)
+  s = s.replace(/(?:export\s+)?interface\s+\w+(?:\s+extends\s+[^{]+)?\s*\{[^}]*\}/g, '')
+
+  // type Foo = ...;
+  s = s.replace(/(?:export\s+)?type\s+\w[\w<>, ]*\s*=\s*[^;]+;/g, '')
+
+  // enum Foo { A, B, C } → const Foo = { A: 0, B: 1, ... }
+  s = s.replace(/(?:export\s+)?enum\s+(\w+)\s*\{([^}]*)\}/g, (_, name, body) => {
+    const members = body.split(',').map(m => m.trim().split('=')[0].trim()).filter(Boolean)
+    return `const ${name} = {\n${members.map((m, i) => `  ${m}: ${i}`).join(',\n')}\n}`
+  })
+
+  // Access modifiers in class constructors/fields
+  s = s.replace(/\b(public|private|protected|readonly|abstract|override)\s+/g, '')
+
+  // implements clause
+  s = s.replace(/\s+implements\s+[\w, .]+(?=\s*\{)/g, '')
+
+  // Generic type parameters on functions/classes: <T>, <T extends X>, <K, V>
+  s = s.replace(/<[A-Z][A-Za-z0-9_$,\s extends=|&\[\]]*>/g, '')
+
+  // Return type annotations: ): Type {  or  ): Type;
+  s = s.replace(/\)\s*:\s*[\w.<>|&\[\] ]+(?=\s*[\{;,])/g, ')')
+
+  // Variable/param type annotations: x: Type  (not inside strings)
+  s = s.replace(/(\w)\s*\??\s*:\s*[\w.<>|&\[\] ]+(?=\s*[,)=;!?\n])/g, '$1')
+
+  // `as Type` casts
+  s = s.replace(/\s+as\s+[\w.<>|&\[\] ]+/g, '')
+
+  // Leftover stray colons from partial stripping (e.g. `: {`)  — leave alone
+  return s
+}
+
 const SPEED_CONFIG = {
   '0.5x': { interval: 1200, steps: 1 },
   '1x':   { interval: 600,  steps: 1 },
@@ -35,6 +75,41 @@ const THEMES = [
   { id: 'tokyo-night',    label: 'Tokyo Night',  monaco: 'tokyo-night' },
   { id: 'one-dark',       label: 'One Dark',     monaco: 'one-dark' },
 ]
+
+const STARTER_TS = `interface Animal {
+  name: string
+  sound(): string
+}
+
+type Point = { x: number; y: number }
+
+enum Direction { Up, Down, Left, Right }
+
+class Dog implements Animal {
+  constructor(public name: string) {}
+
+  sound(): string {
+    return 'woof'
+  }
+
+  fetch(item: string): string {
+    return \`\${this.name} fetches \${item}!\`
+  }
+}
+
+function greet(animal: Animal): string {
+  return \`\${animal.name} says \${animal.sound()}\`
+}
+
+const dog = new Dog('Rex')
+console.log(greet(dog))
+console.log(dog.fetch('ball'))
+
+const pos: Point = { x: 3, y: 4 }
+const dir: Direction = Direction.Up
+console.log('Position:', pos.x, pos.y)
+console.log('Direction:', dir)
+`
 
 const STARTER_PY = `def fibonacci(n):
     if n <= 1:
@@ -339,10 +414,10 @@ export default function CodeLens({ onBack, initialCode }) {
   const currentEvent = execution?.events?.[step]      ?? null
   const prevEvent    = execution?.events?.[step - 1]  ?? null
 
-  // Parse live as we type (JS only)
-  useEffect(() => { if (lang === 'js') setModel(buildProgramModel(source)) }, [])
+  // Parse live as we type (JS + TS; not Python)
+  useEffect(() => { if (lang !== 'py') setModel(buildProgramModel(source)) }, [])
   useEffect(() => {
-    if (lang !== 'js') { setModel(null); return }
+    if (lang === 'py') { setModel(null); return }
     const id = setTimeout(() => setModel(buildProgramModel(source)), 400)
     return () => clearTimeout(id)
   }, [source, lang])
@@ -411,8 +486,9 @@ export default function CodeLens({ onBack, initialCode }) {
       if (lang === 'py') {
         result = await runPython(source)
       } else {
+        const jsSource = lang === 'ts' ? stripTypeScript(source) : source
         result = await new Promise((resolve) => {
-          setTimeout(() => resolve(runInterpreter(source)), 0)
+          setTimeout(() => resolve(runInterpreter(jsSource)), 0)
         })
       }
       setExecution(result)
@@ -432,6 +508,7 @@ export default function CodeLens({ onBack, initialCode }) {
         { id: 'tokens',    label: 'Tokens',    icon: Zap },
         { id: 'ast',       label: 'AST',       icon: Braces },
       ]
+
 
   const heapSnapshot = (lang === 'js' && execution)
     ? buildHeapSnapshot(execution.events, step)
@@ -477,11 +554,15 @@ export default function CodeLens({ onBack, initialCode }) {
         {/* Language toggle */}
         <div style={{ display: 'flex', gap: 2, background: '#0f172a',
           borderRadius: 6, padding: 2, border: '1px solid #1e293b' }}>
-          {[{ id: 'js', label: 'JS' }, { id: 'py', label: 'Python' }].map(l => (
+          {[
+            { id: 'js',  label: 'JS' },
+            { id: 'ts',  label: 'TS' },
+            { id: 'py',  label: 'Python' },
+          ].map(l => (
             <button key={l.id} onClick={() => {
               if (l.id === lang) return
               setLang(l.id)
-              setSource(l.id === 'py' ? STARTER_PY : STARTER)
+              setSource(l.id === 'py' ? STARTER_PY : l.id === 'ts' ? STARTER_TS : STARTER)
               setExecution(null)
               setStep(0)
               setModel(null)
@@ -642,7 +723,7 @@ export default function CodeLens({ onBack, initialCode }) {
             <div style={{ height: 'calc(100% - 33px)' }}>
               <Editor
                 height="100%"
-                language={lang === 'py' ? 'python' : 'javascript'}
+                language={lang === 'py' ? 'python' : lang === 'ts' ? 'typescript' : 'javascript'}
                 value={source}
                 onChange={v => setSource(v ?? '')}
                 theme={THEMES.find(t => t.id === theme)?.monaco ?? 'monokai'}
@@ -755,6 +836,7 @@ export default function CodeLens({ onBack, initialCode }) {
               <CallTreeView
                 events={execution?.events ?? []}
                 step={step}
+                onSeek={(s) => { setPlaying(false); setStep(s) }}
               />
             )}
             {rightTab === 'heap' && (
@@ -1616,10 +1698,13 @@ function StructureView({ model, currentEvent, onNodeClick }) {
   if (model?.error) return <span style={{ color: '#ef4444', fontSize: 12 }}>Parse error: {model.error.message}</span>
   if (!model) return <span style={{ color: '#475569', fontSize: 12 }}>Parsing…</span>
 
-  const hasGraph   = model.callGraph?.nodes?.length > 0
-  const hasClasses = model.classes?.length > 0
-  const hasVars    = model.variables?.length > 0
-  const hasImports = model.imports?.length > 0
+  const hasGraph      = model.callGraph?.nodes?.length > 0
+  const hasClasses    = model.classes?.length > 0
+  const hasVars       = model.variables?.length > 0
+  const hasImports    = model.imports?.length > 0
+  const hasInterfaces = model.interfaces?.length > 0
+  const hasTypes      = model.types?.length > 0
+  const hasEnums      = model.enums?.length > 0
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -1699,6 +1784,87 @@ function StructureView({ model, currentEvent, onNodeClick }) {
                     color: m.kind === 'constructor' ? '#a5b4fc' : '#7dd3fc',
                     fontFamily: 'JetBrains Mono, monospace',
                   }}>{m.static ? 'static ' : ''}{m.name}</span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </>
+      )}
+
+      {/* ── Interfaces ── */}
+      {hasInterfaces && (
+        <>
+          <SectionLabel>INTERFACES</SectionLabel>
+          {model.interfaces.map((iface, i) => (
+            <div key={i} style={{ padding: '7px 9px', background: '#0d1526', borderRadius: 6, border: '1px solid #6366f133' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: iface.members.length ? 5 : 0 }}>
+                <span style={{ fontSize: 8, padding: '1px 5px', borderRadius: 3, flexShrink: 0,
+                  background: '#6366f118', color: '#818cf8', border: '1px solid #6366f133',
+                  fontFamily: 'JetBrains Mono, monospace' }}>interface</span>
+                <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#a5b4fc' }}>{iface.name}</span>
+                {iface.extends?.length > 0 && (
+                  <span style={{ fontSize: 10, color: '#475569' }}>extends {iface.extends.join(', ')}</span>
+                )}
+                {iface.line && <span style={{ marginLeft: 'auto', fontSize: 8, color: '#334155', fontFamily: 'JetBrains Mono, monospace' }}>L{iface.line}</span>}
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
+                {iface.members.map((m, j) => (
+                  <span key={j} style={{
+                    fontSize: 10, padding: '1px 6px', borderRadius: 99,
+                    background: m.kind === 'method' ? '#1e3a5f' : '#1e293b',
+                    color: m.kind === 'method' ? '#7dd3fc' : '#94a3b8',
+                    fontFamily: 'JetBrains Mono, monospace',
+                  }}>{m.name}{m.optional ? '?' : ''}{m.kind === 'method' ? '()' : ''}</span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </>
+      )}
+
+      {/* ── Types ── */}
+      {hasTypes && (
+        <>
+          <SectionLabel>TYPES</SectionLabel>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {model.types.map((t, i) => (
+              <div key={i} style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: '3px 8px', borderRadius: 5,
+                background: '#0d1526', border: '1px solid #a78bfa33',
+              }}>
+                <span style={{ fontSize: 8, padding: '1px 5px', borderRadius: 3,
+                  background: '#a78bfa18', color: '#a78bfa', border: '1px solid #a78bfa33',
+                  fontFamily: 'JetBrains Mono, monospace', flexShrink: 0 }}>type</span>
+                <span style={{ flex: 1, fontSize: 11, fontFamily: 'JetBrains Mono, monospace', color: '#c4b5fd' }}>{t.name}</span>
+                {t.isUnion && <span style={{ fontSize: 9, color: '#475569', fontFamily: 'JetBrains Mono, monospace' }}>union</span>}
+                {t.line && <span style={{ fontSize: 8, color: '#334155', fontFamily: 'JetBrains Mono, monospace' }}>L{t.line}</span>}
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* ── Enums ── */}
+      {hasEnums && (
+        <>
+          <SectionLabel>ENUMS</SectionLabel>
+          {model.enums.map((e, i) => (
+            <div key={i} style={{ padding: '7px 9px', background: '#0d1526', borderRadius: 6, border: '1px solid #34d39933' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: e.members.length ? 5 : 0 }}>
+                <span style={{ fontSize: 8, padding: '1px 5px', borderRadius: 3,
+                  background: '#34d39918', color: '#34d399', border: '1px solid #34d39933',
+                  fontFamily: 'JetBrains Mono, monospace', flexShrink: 0 }}>enum</span>
+                <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#6ee7b7' }}>{e.name}</span>
+                {e.line && <span style={{ marginLeft: 'auto', fontSize: 8, color: '#334155', fontFamily: 'JetBrains Mono, monospace' }}>L{e.line}</span>}
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
+                {e.members.map((m, j) => (
+                  <span key={j} style={{
+                    fontSize: 10, padding: '1px 6px', borderRadius: 99,
+                    background: '#0f2920', color: '#34d399',
+                    fontFamily: 'JetBrains Mono, monospace',
+                  }}>{m}</span>
                 ))}
               </div>
             </div>

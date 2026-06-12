@@ -1,8 +1,20 @@
 import * as acorn from 'acorn'
+import { parse as babelParse } from '@babel/parser'
+
+// ── Detect TypeScript source ──────────────────────────────────────────────────
+
+export function isTypeScript(source) {
+  return /:\s*(string|number|boolean|void|any|never|unknown|null|undefined|object)\b|^(interface|type|enum)\s+\w/m.test(source)
+    || /\bReadonly\b|\bPartial\b|\bRecord<|\bPick<|\bOmit</.test(source)
+    || /<[A-Z]\w*>/.test(source)
+    || /^\s*(export\s+)?(interface|type|enum)\s/m.test(source)
+    || /:\s*[A-Z]\w+(\[\])?[,)\s=;]/.test(source)
+}
 
 // ── Token stream ──────────────────────────────────────────────────────────────
 
-export function tokenize(source) {
+export function tokenize(source, ts = false) {
+  if (ts) return tokenizeTS(source)
   const tokens = []
   try {
     const tokenizer = acorn.tokenizer(source, {
@@ -23,9 +35,36 @@ export function tokenize(source) {
   return { tokens, error: null }
 }
 
+function tokenizeTS(source) {
+  // Babel parse in TypeScript mode; extract tokens from the resulting AST walk
+  try {
+    const ast = babelParse(source, {
+      sourceType: 'module',
+      plugins: ['typescript', 'jsx'],
+      errorRecovery: true,
+    })
+    const tokens = []
+    walkAST(ast, (node) => {
+      if (node.type === 'Identifier' || node.type === 'StringLiteral' ||
+          node.type === 'NumericLiteral' || node.type === 'BooleanLiteral') {
+        tokens.push({
+          type:  node.type.replace('Literal', ''),
+          value: String(node.name ?? node.value ?? ''),
+          start: node.start ?? 0,
+          end:   node.end ?? 0,
+        })
+      }
+    })
+    return { tokens, error: null }
+  } catch (err) {
+    return { tokens: [], error: formatParseError(err) }
+  }
+}
+
 // ── AST ───────────────────────────────────────────────────────────────────────
 
-export function parse(source) {
+export function parse(source, ts = false) {
+  if (ts) return parseTS(source)
   try {
     const ast = acorn.parse(source, {
       ecmaVersion: 2022,
@@ -38,20 +77,38 @@ export function parse(source) {
   }
 }
 
+function parseTS(source) {
+  try {
+    const ast = babelParse(source, {
+      sourceType: 'module',
+      plugins: ['typescript', 'jsx'],
+      errorRecovery: true,
+    })
+    // Babel AST uses 'loc' compatible with our walker
+    return { ast: ast.program, error: null }
+  } catch (err) {
+    return { ast: null, error: formatParseError(err) }
+  }
+}
+
 // ── Program Model ─────────────────────────────────────────────────────────────
 // Produced once at parse time. Static structure — does not change during execution.
 
 export function buildProgramModel(source, filename = 'main.js') {
-  const { tokens, error: tokenError } = tokenize(source)
-  const { ast, error: parseError } = parse(source)
+  const ts = isTypeScript(source)
+  const { tokens, error: tokenError } = tokenize(source, ts)
+  const { ast, error: parseError }    = parse(source, ts)
 
   const error = tokenError || parseError
-  if (error) return { error, files: [], classes: [], functions: [], variables: [], imports: [], exports: [] }
+  if (error) return { error, files: [], classes: [], functions: [], variables: [], imports: [], exports: [], interfaces: [], types: [], enums: [], isTypeScript: ts }
 
-  const classes   = []
-  const functions = []
-  const imports   = []
-  const exports   = []
+  const classes    = []
+  const functions  = []
+  const imports    = []
+  const exports    = []
+  const interfaces = []   // TS only
+  const types      = []   // TS only
+  const enums      = []   // TS only
 
   // Top-level variable declarations (direct children of Program body only)
   const variables = []
@@ -96,6 +153,34 @@ export function buildProgramModel(source, filename = 'main.js') {
       })
     }
 
+    // ── TypeScript-specific nodes ──
+    if (node.type === 'TSInterfaceDeclaration') {
+      interfaces.push({
+        name:    node.id?.name ?? '?',
+        extends: (node.extends ?? []).map(e => e.expression?.name ?? '?').filter(Boolean),
+        members: (node.body?.body ?? []).map(m => ({
+          name:     m.key?.name ?? m.key?.value ?? '?',
+          optional: !!m.optional,
+          kind:     m.type === 'TSMethodSignature' ? 'method' : 'property',
+        })),
+        line: node.loc?.start?.line ?? null,
+      })
+    }
+    if (node.type === 'TSTypeAliasDeclaration') {
+      types.push({
+        name:    node.id?.name ?? '?',
+        line:    node.loc?.start?.line ?? null,
+        isUnion: node.typeAnnotation?.type === 'TSUnionType',
+      })
+    }
+    if (node.type === 'TSEnumDeclaration') {
+      enums.push({
+        name:    node.id?.name ?? '?',
+        members: (node.members ?? []).map(m => m.id?.name ?? '?'),
+        line:    node.loc?.start?.line ?? null,
+      })
+    }
+
     if (node.type === 'ImportDeclaration') {
       imports.push({
         source:     node.source?.value ?? '',
@@ -120,6 +205,10 @@ export function buildProgramModel(source, filename = 'main.js') {
     variables,
     imports,
     exports,
+    interfaces,
+    types,
+    enums,
+    isTypeScript: ts,
     callGraph: buildCallGraph(ast),
   }
 }
