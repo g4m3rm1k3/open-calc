@@ -299,6 +299,23 @@ export function labReducer(state, action) {
   switch (action.type) {
     case "LOAD_EXAMPLE": {
       const s = withHistory(state);
+      // Multi-page example
+      if (action.payload.pages) {
+        const first = action.payload.pages[0];
+        return {
+          ...s,
+          elements: first.elements,
+          bodyStyles: first.bodyStyles,
+          javascript: first.javascript ?? "",
+          customCss: first.customCss ?? "",
+          cdnLinks: action.payload.cdnLinks ?? s.cdnLinks,
+          mode: "multi",
+          pages: action.payload.pages,
+          activePageId: first.id,
+          selectedId: null,
+        };
+      }
+      // Single-page example
       return {
         ...s,
         elements: action.payload.elements,

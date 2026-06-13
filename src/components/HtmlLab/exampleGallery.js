@@ -4,6 +4,211 @@ function el(id, tag, parentId, styles = {}, content = "", attrs = {}) {
   return { id, tag, parentId, styles, content, attrs, mediaQueries: [] };
 }
 
+// ── Multi-page Portfolio ───────────────────────────────────────────────────────
+function generateMultiPageExample() {
+  const NAV_STYLE = {
+    display: "flex", alignItems: "center", gap: "0",
+    padding: "0 32px", height: "58px",
+    background: "#1e293b", borderBottom: "1px solid #334155",
+  };
+  const LOGO_STYLE = {
+    color: "#60a5fa", fontWeight: "700", fontSize: "18px",
+    flex: "1", letterSpacing: "-0.02em",
+  };
+  const LINK_STYLE = {
+    color: "#94a3b8", textDecoration: "none", fontSize: "14px",
+    padding: "0 16px", height: "58px", display: "flex",
+    alignItems: "center", transition: "color 0.15s",
+  };
+  const LINK_ACTIVE = { ...LINK_STYLE, color: "#f8fafc", fontWeight: "600",
+    borderBottom: "2px solid #60a5fa" };
+  const BODY = {
+    margin: "0", padding: "0", background: "#0f172a", color: "#f8fafc",
+    fontFamily: "system-ui, sans-serif",
+  };
+  const EXPORT_NOTE = {
+    display: "flex", alignItems: "center", gap: "10px",
+    padding: "10px 32px", background: "#1c2d1a", borderBottom: "1px solid #2d4a2a",
+    fontSize: "12px", color: "#4ade80",
+  };
+
+  function nav(active) {
+    const links = [
+      { id: "l-home",  text: "Home",    href: "index.html",   key: "home"    },
+      { id: "l-about", text: "About",   href: "about.html",   key: "about"   },
+      { id: "l-work",  text: "Work",    href: "work.html",    key: "work"    },
+    ];
+    return [
+      el("pg-nav", "header", null, NAV_STYLE),
+      el("pg-logo", "span", "pg-nav", LOGO_STYLE, "Portfolio"),
+      ...links.map(l => el(l.id, "a", "pg-nav", l.key === active ? LINK_ACTIVE : LINK_STYLE, l.text, { href: l.href })),
+    ];
+  }
+
+  function note() {
+    return el("export-note", "div", null, EXPORT_NOTE, "🔗 Navigation links work after ↓ Export All — open index.html in a browser to try it.");
+  }
+
+  // ── HOME PAGE ──────────────────────────────────────────────────────────────
+  const homeEls = [
+    ...nav("home"),
+    note(),
+    el("home-hero", "section", null, {
+      padding: "80px 32px 64px", background: "#0f172a", textAlign: "center",
+    }),
+    el("home-tag", "span", "home-hero", {
+      display: "inline-block", background: "#1e3a5f", color: "#60a5fa",
+      fontSize: "11px", fontWeight: "700", letterSpacing: "0.1em",
+      textTransform: "uppercase", padding: "4px 12px", borderRadius: "20px",
+      marginBottom: "24px",
+    }, "Available for hire"),
+    el("home-h1", "h1", "home-hero", {
+      fontSize: "54px", fontWeight: "800", margin: "0 0 16px",
+      lineHeight: "1.1", letterSpacing: "-0.03em",
+    }, "Hi, I'm Alex Chen"),
+    el("home-sub", "p", "home-hero", {
+      color: "#94a3b8", fontSize: "20px", maxWidth: "520px",
+      margin: "0 auto 36px", lineHeight: "1.6",
+    }, "Full-stack developer crafting fast, accessible web experiences."),
+    el("home-btns", "div", "home-hero", {
+      display: "flex", gap: "12px", justifyContent: "center",
+    }),
+    el("home-btn1", "a", "home-btns", {
+      background: "#3b82f6", color: "#fff", padding: "12px 28px",
+      borderRadius: "8px", textDecoration: "none", fontWeight: "600", fontSize: "15px",
+    }, "View Work →", { href: "work.html" }),
+    el("home-btn2", "a", "home-btns", {
+      background: "transparent", color: "#94a3b8", padding: "12px 28px",
+      borderRadius: "8px", textDecoration: "none", fontWeight: "600", fontSize: "15px",
+      border: "1px solid #334155",
+    }, "About me", { href: "about.html" }),
+    el("home-stats", "div", null, {
+      display: "flex", justifyContent: "center", gap: "0",
+      borderTop: "1px solid #1e293b", borderBottom: "1px solid #1e293b",
+    }),
+    el("stat-0", "div", "home-stats", { padding: "32px 48px", textAlign: "center", borderRight: "1px solid #1e293b" }),
+    el("stat-0-n", "div", "stat-0", { fontSize: "32px", fontWeight: "800", color: "#60a5fa" }, "5+"),
+    el("stat-0-l", "div", "stat-0", { fontSize: "13px", color: "#64748b", marginTop: "4px" }, "years experience"),
+    el("stat-1", "div", "home-stats", { padding: "32px 48px", textAlign: "center", borderRight: "1px solid #1e293b" }),
+    el("stat-1-n", "div", "stat-1", { fontSize: "32px", fontWeight: "800", color: "#60a5fa" }, "40+"),
+    el("stat-1-l", "div", "stat-1", { fontSize: "13px", color: "#64748b", marginTop: "4px" }, "projects shipped"),
+    el("stat-2", "div", "home-stats", { padding: "32px 48px", textAlign: "center" }),
+    el("stat-2-n", "div", "stat-2", { fontSize: "32px", fontWeight: "800", color: "#60a5fa" }, "12"),
+    el("stat-2-l", "div", "stat-2", { fontSize: "13px", color: "#64748b", marginTop: "4px" }, "countries · clients"),
+  ].filter(e => e !== undefined);
+
+  // ── ABOUT PAGE ─────────────────────────────────────────────────────────────
+  const aboutEls = [
+    ...nav("about"),
+    note(),
+    el("ab-hero", "section", null, {
+      padding: "64px 32px 48px", maxWidth: "720px", margin: "0 auto",
+    }),
+    el("ab-h1", "h1", "ab-hero", {
+      fontSize: "40px", fontWeight: "800", margin: "0 0 20px", letterSpacing: "-0.03em",
+    }, "About me"),
+    el("ab-p1", "p", "ab-hero", {
+      color: "#94a3b8", fontSize: "17px", lineHeight: "1.75", margin: "0 0 16px",
+    }, "I'm a full-stack developer based in Vancouver with a passion for building products that are fast, accessible, and a joy to use."),
+    el("ab-p2", "p", "ab-hero", {
+      color: "#94a3b8", fontSize: "17px", lineHeight: "1.75", margin: "0 0 36px",
+    }, "I specialize in React, Node.js, and TypeScript. When I'm not coding I'm hiking, reading, or experimenting with generative art."),
+    el("ab-skills-title", "h2", "ab-hero", {
+      fontSize: "18px", fontWeight: "700", color: "#f8fafc", margin: "0 0 16px",
+    }, "Technologies"),
+    el("ab-skills", "div", "ab-hero", {
+      display: "flex", flexWrap: "wrap", gap: "8px",
+    }),
+    ...["TypeScript", "React", "Node.js", "PostgreSQL", "Docker", "Three.js", "Figma", "AWS"].map((s, i) =>
+      el(`skill-${i}`, "span", "ab-skills", {
+        background: "#1e293b", color: "#60a5fa", fontSize: "13px",
+        padding: "6px 14px", borderRadius: "20px", border: "1px solid #334155",
+      }, s)
+    ),
+    el("ab-cta", "div", "ab-hero", {
+      marginTop: "48px", padding: "28px", background: "#1e293b",
+      borderRadius: "12px", border: "1px solid #334155",
+      display: "flex", alignItems: "center", gap: "24px",
+    }),
+    el("ab-cta-text", "p", "ab-cta", {
+      color: "#94a3b8", fontSize: "15px", margin: "0", flex: "1",
+    }, "Interested in working together? See what I've built."),
+    el("ab-cta-btn", "a", "ab-cta", {
+      background: "#3b82f6", color: "#fff", padding: "10px 22px",
+      borderRadius: "8px", textDecoration: "none", fontWeight: "600",
+      fontSize: "14px", flexShrink: "0",
+    }, "See Work →", { href: "work.html" }),
+  ];
+
+  // ── WORK PAGE ──────────────────────────────────────────────────────────────
+  const PROJECTS = [
+    { name: "Orbit Dashboard", desc: "SaaS analytics platform for e-commerce. Built with React + Node + PostgreSQL.", tags: ["React", "Node", "Postgres"], color: "#3b82f6" },
+    { name: "Pulse Design System", desc: "Component library used by 6 internal teams. 200+ components, full Storybook.", tags: ["TypeScript", "Storybook", "CSS"], color: "#8b5cf6" },
+    { name: "MapFlow", desc: "Real-time fleet tracking app. Leaflet maps + WebSocket updates. Used by 3 logistics firms.", tags: ["WebSocket", "Leaflet", "Node"], color: "#10b981" },
+    { name: "Solstice", desc: "Generative art tool using Three.js and WebGL. 5k users in launch week.", tags: ["Three.js", "WebGL", "Canvas"], color: "#f59e0b" },
+    { name: "OpenCart CLI", desc: "Developer CLI for Shopify store management. 800+ GitHub stars.", tags: ["Node", "CLI", "Open Source"], color: "#ec4899" },
+    { name: "Helio API", desc: "REST + GraphQL API for a health-tech startup. HIPAA compliant, 99.9% uptime.", tags: ["GraphQL", "AWS", "Security"], color: "#06b6d4" },
+  ];
+
+  const workEls = [
+    ...nav("work"),
+    note(),
+    el("wk-hero", "section", null, {
+      padding: "64px 32px 48px",
+    }),
+    el("wk-h1", "h1", "wk-hero", {
+      fontSize: "40px", fontWeight: "800", margin: "0 0 12px", letterSpacing: "-0.03em",
+    }, "Selected Work"),
+    el("wk-sub", "p", "wk-hero", {
+      color: "#64748b", fontSize: "16px", margin: "0 0 40px",
+    }, "A few things I've shipped recently."),
+    el("wk-grid", "div", "wk-hero", {
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+      gap: "16px",
+    }),
+    ...PROJECTS.flatMap((p, i) => [
+      el(`proj-${i}`, "div", "wk-grid", {
+        background: "#1e293b", borderRadius: "12px",
+        border: "1px solid #334155", padding: "24px",
+        display: "flex", flexDirection: "column", gap: "10px",
+      }),
+      el(`proj-${i}-dot`, "div", `proj-${i}`, {
+        width: "10px", height: "10px", borderRadius: "50%",
+        background: p.color, flexShrink: "0",
+      }),
+      el(`proj-${i}-name`, "h3", `proj-${i}`, {
+        fontSize: "16px", fontWeight: "700", color: "#f8fafc", margin: "0",
+      }, p.name),
+      el(`proj-${i}-desc`, "p", `proj-${i}`, {
+        color: "#94a3b8", fontSize: "13px", lineHeight: "1.6", margin: "0", flex: "1",
+      }, p.desc),
+      el(`proj-${i}-tags`, "div", `proj-${i}`, {
+        display: "flex", flexWrap: "wrap", gap: "6px",
+      }),
+      ...p.tags.map((t, j) => el(`proj-${i}-tag-${j}`, "span", `proj-${i}-tags`, {
+        background: "#0f172a", color: "#64748b", fontSize: "11px",
+        padding: "3px 8px", borderRadius: "4px", border: "1px solid #1e293b",
+      }, t)),
+    ]),
+    el("wk-cta", "div", "wk-hero", {
+      marginTop: "48px", textAlign: "center",
+    }),
+    el("wk-cta-link", "a", "wk-cta", {
+      color: "#3b82f6", textDecoration: "none", fontSize: "14px",
+      fontWeight: "600",
+    }, "← Back to Home", { href: "index.html" }),
+  ];
+
+  const pages = [
+    { id: "pg-home",  name: "Home",  elements: homeEls,  bodyStyles: BODY, javascript: "", customCss: "" },
+    { id: "pg-about", name: "About", elements: aboutEls, bodyStyles: BODY, javascript: "", customCss: "" },
+    { id: "pg-work",  name: "Work",  elements: workEls,  bodyStyles: BODY, javascript: "", customCss: "" },
+  ];
+
+  return { pages };
+}
+
 // ── API Dashboard ──────────────────────────────────────────────────────────────
 function generateApiExample() {
   const elements = [
@@ -406,18 +611,20 @@ function generateThreeJsExample() {
   }
 
   var container = document.querySelector('.threejs-container');
-  var W = container.offsetWidth || window.innerWidth;
-  var H = container.offsetHeight || window.innerHeight;
+  var W = window.innerWidth;
+  var H = window.innerHeight;
 
   var scene = new THREE.Scene();
   var camera = new THREE.PerspectiveCamera(55, W / H, 0.1, 2000);
+  camera.position.set(0, 28, 60);
+  camera.lookAt(0, 0, 0);
 
   var renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(W, H);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-  renderer.domElement.style.cssText = 'position:absolute;top:0;left:0;';
+  renderer.domElement.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;display:block;';
   container.appendChild(renderer.domElement);
 
   // Lights
@@ -526,7 +733,7 @@ function generateThreeJsExample() {
     orbitSpeed = orbitSpeed > 1.5 ? 0.4 : orbitSpeed < 0.6 ? 1.0 : 3.5;
   });
   window.addEventListener('resize', function() {
-    var w = container.offsetWidth, h = container.offsetHeight;
+    var w = window.innerWidth, h = window.innerHeight;
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     renderer.setSize(w, h);
@@ -578,6 +785,14 @@ function generateThreeJsExample() {
 
 // ── Gallery export ─────────────────────────────────────────────────────────────
 export const EXAMPLES = [
+  {
+    id: "multipage",
+    name: "Portfolio Site",
+    description: "3-page site (Home · About · Work) with linked navigation — export to see links work",
+    icon: "🔗",
+    generate: generateMultiPageExample,
+    badge: "Multi-page",
+  },
   {
     id: "showcase",
     name: "Interactive Showcase",

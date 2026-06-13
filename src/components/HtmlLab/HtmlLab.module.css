@@ -1795,6 +1795,16 @@
   font-size: 11px;
   line-height: 1.5;
 }
+.exPickerBadge {
+  background: #1e3a5f;
+  color: #60a5fa;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  border: 1px solid #334155;
+  margin-top: 2px;
+}
 .exPickerCdn {
   color: #fbbf24;
   font-size: 10px;

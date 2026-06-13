@@ -22,7 +22,7 @@ import styles from "./HtmlLab.module.css";
 
 export default function HtmlLab({ onBack }) {
   const [state, dispatch] = useReducer(labReducer, undefined, () => {
-    const ex = EXAMPLES[0].generate();
+    const ex = (EXAMPLES.find(e => e.id === "showcase") ?? EXAMPLES[0]).generate();
     return { ...initialState, elements: ex.elements, bodyStyles: ex.bodyStyles, javascript: ex.javascript ?? "" };
   });
   const [codePanelWidth, setCodePanelWidth] = useState(360);
