@@ -183,11 +183,14 @@ export default function HtmlLab({ onBack }) {
           javascript={state.javascript}
           width={codePanelWidth}
           selectedId={state.selectedId}
+          elements={state.elements}
           onHtmlChange={handleCodeChange}
           onCssChange={handleCssChange}
           onJavascriptChange={(value) =>
             dispatch({ type: "SET_JAVASCRIPT", payload: value })
           }
+          onSelectElement={(id) => dispatch({ type: "SELECT", payload: id })}
+          onDeleteElement={(id) => dispatch({ type: "DELETE_ELEMENT", payload: id })}
         />
 
         <div className={styles.divider} onMouseDown={handleDividerMouseDown} />
@@ -222,6 +225,7 @@ export default function HtmlLab({ onBack }) {
           element={selectedElement}
           matchedComponents={matchedComponents}
           bodyThemes={!state.selectedId ? BODY_THEMES : null}
+          onDelete={(id) => dispatch({ type: "DELETE_ELEMENT", payload: id })}
           onApplyComponentTheme={(theme) => {
             const updates = buildThemeUpdates(state.selectedId, state.elements, theme);
             dispatch({ type: "APPLY_COMPONENT_THEME", payload: { updates } });

@@ -3,9 +3,10 @@ import Editor from "@monaco-editor/react";
 import styles from "./HtmlLab.module.css";
 
 const TABS = [
-  { key: "html", label: "HTML", language: "html" },
-  { key: "css", label: "CSS", language: "css" },
+  { key: "html",       label: "HTML",       language: "html" },
+  { key: "css",        label: "CSS",        language: "css" },
   { key: "javascript", label: "JavaScript", language: "javascript" },
+  { key: "tree",       label: "Tree",       language: null },
 ];
 
 // Inject glow CSS into document head once — Monaco decorations are real DOM nodes
@@ -27,6 +28,64 @@ function injectGlowStyle() {
     }
   `;
   document.head.appendChild(el);
+}
+
+// ── Element Tree (renders in the Tree tab) ────────────────────────────────────
+
+function ElementTree({ elements, selectedId, onSelect, onDelete }) {
+  return (
+    <div className={styles.codeTreePanel}>
+      <button
+        className={`${styles.treeItem} ${!selectedId ? styles.treeItemSelected : ""}`}
+        onClick={() => onSelect(null)}
+      >
+        <span className={styles.treeTagBody}>&lt;body&gt;</span>
+        <span className={styles.treeItemLabel}>page root</span>
+      </button>
+      <TreeBranch
+        elements={elements}
+        selectedId={selectedId}
+        onSelect={onSelect}
+        onDelete={onDelete}
+        parentId={null}
+        depth={1}
+      />
+    </div>
+  );
+}
+
+function TreeBranch({ elements, selectedId, onSelect, onDelete, parentId, depth }) {
+  const children = (elements || [])
+    .filter(e => (e.parentId ?? null) === (parentId ?? null))
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+  return children.map(el => (
+    <div key={el.id}>
+      <button
+        className={`${styles.treeItem} ${el.id === selectedId ? styles.treeItemSelected : ""}`}
+        style={{ paddingLeft: `${depth * 14 + 8}px` }}
+        onClick={() => onSelect(el.id)}
+      >
+        <span className={styles.treeTag}>&lt;{el.tag}&gt;</span>
+        {el.content && (
+          <span className={styles.treeItemLabel}>{el.content.slice(0, 24)}</span>
+        )}
+        <button
+          className={styles.treeDeleteBtn}
+          onClick={(e) => { e.stopPropagation(); onDelete(el.id); }}
+          title="Delete"
+        >×</button>
+      </button>
+      <TreeBranch
+        elements={elements}
+        selectedId={selectedId}
+        onSelect={onSelect}
+        onDelete={onDelete}
+        parentId={el.id}
+        depth={depth + 1}
+      />
+    </div>
+  ));
 }
 
 // ── Range finders ─────────────────────────────────────────────────────────────
@@ -119,9 +178,12 @@ export default function CodePanel({
   javascript,
   width,
   selectedId,
+  elements,
   onHtmlChange,
   onCssChange,
   onJavascriptChange,
+  onSelectElement,
+  onDeleteElement,
 }) {
   const debounceRef    = useRef(null);
   const editorRef      = useRef(null);
@@ -197,14 +259,20 @@ export default function CodePanel({
   const switchTab = (tab) => {
     if (tab === activeTab) return;
     clearTimeout(debounceRef.current);
-    const editor = editorRef.current;
-    if (editor) handlers[activeTab]?.(editor.getValue());
+    // Save editor content only when leaving a code tab (not the tree tab)
+    if (activeTab !== "tree") {
+      const editor = editorRef.current;
+      if (editor) handlers[activeTab]?.(editor.getValue());
+    }
     isFocused.current = false;
     setActiveTab(tab);
-    requestAnimationFrame(() => {
-      const nextEditor = editorRef.current;
-      if (nextEditor) nextEditor.setValue(sources[tab] ?? "");
-    });
+    // Reload Monaco only when switching to a code tab
+    if (tab !== "tree") {
+      requestAnimationFrame(() => {
+        const nextEditor = editorRef.current;
+        if (nextEditor) nextEditor.setValue(sources[tab] ?? "");
+      });
+    }
   };
 
   const handleChange = (val) => {
@@ -230,36 +298,47 @@ export default function CodePanel({
             </button>
           ))}
         </div>
-        <span className={styles.panelHint}>Monaco · auto-syncs both ways</span>
+        <span className={styles.panelHint}>
+          {activeTab === "tree" ? "click to select · × to delete" : "Monaco · auto-syncs both ways"}
+        </span>
       </div>
       <div className={styles.monacoWrap}>
-        <Editor
-          key={activeTab}
-          defaultLanguage={activeLanguage}
-          theme="vs-dark"
-          options={{
-            fontSize: 12,
-            lineHeight: 19,
-            minimap: { enabled: false },
-            scrollBeyondLastLine: false,
-            wordWrap: "on",
-            tabSize: 2,
-            fontFamily: "'JetBrains Mono', 'Cascadia Code', Consolas, monospace",
-            fontLigatures: true,
-            renderLineHighlight: "line",
-            padding: { top: 10, bottom: 10 },
-            overviewRulerLanes: 0,
-            hideCursorInOverviewRuler: true,
-            scrollbar: {
-              vertical: "auto",
-              horizontal: "auto",
-              verticalScrollbarSize: 6,
-              horizontalScrollbarSize: 6,
-            },
-          }}
-          onMount={handleMount}
-          onChange={handleChange}
-        />
+        {activeTab === "tree" ? (
+          <ElementTree
+            elements={elements}
+            selectedId={selectedId}
+            onSelect={onSelectElement}
+            onDelete={onDeleteElement}
+          />
+        ) : (
+          <Editor
+            key={activeTab}
+            defaultLanguage={activeLanguage}
+            theme="vs-dark"
+            options={{
+              fontSize: 12,
+              lineHeight: 19,
+              minimap: { enabled: false },
+              scrollBeyondLastLine: false,
+              wordWrap: "on",
+              tabSize: 2,
+              fontFamily: "'JetBrains Mono', 'Cascadia Code', Consolas, monospace",
+              fontLigatures: true,
+              renderLineHighlight: "line",
+              padding: { top: 10, bottom: 10 },
+              overviewRulerLanes: 0,
+              hideCursorInOverviewRuler: true,
+              scrollbar: {
+                vertical: "auto",
+                horizontal: "auto",
+                verticalScrollbarSize: 6,
+                horizontalScrollbarSize: 6,
+              },
+            }}
+            onMount={handleMount}
+            onChange={handleChange}
+          />
+        )}
       </div>
     </div>
   );

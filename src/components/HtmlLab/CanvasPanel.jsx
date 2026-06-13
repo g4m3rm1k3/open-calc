@@ -31,6 +31,9 @@ export default function CanvasPanel({
   const [draggingId, setDraggingId] = useState(null);
   const canvasRef = useRef(null);
 
+  // IDs to show overlay on: selected element + its descendants (or all when body selected)
+  const overlayIds = showOverlay ? getSubtreeIds(elements, selectedId) : null;
+
   // ── Sort helper ──────────────────────────────────────────────────────────────
   const childrenOf = useCallback((parentId) =>
     elements
@@ -176,25 +179,23 @@ export default function CanvasPanel({
           handleDrop(e, el.id, children.length);
         }}
       >
-        {/* tag badge — always shown for selected (delete button), otherwise follows showLabels */}
-        {(showLabels || isSelected) && (
-          <div className={styles.elTag}>
-            &lt;{el.tag}&gt;
-            {isSelected && (
-              <button
-                className={styles.elDelete}
-                onClick={(e) => { e.stopPropagation(); onDelete(el.id); }}
-                title="Delete"
-              >×</button>
-            )}
-          </div>
-        )}
+        {/* tag badge — always rendered; hidden via CSS when labels off, revealed on hover */}
+        <div className={`${styles.elTag}${!showLabels && !isSelected ? ` ${styles.elTagHoverOnly}` : ""}`}>
+          &lt;{el.tag}&gt;
+          {isSelected && (
+            <button
+              className={styles.elDelete}
+              onClick={(e) => { e.stopPropagation(); onDelete(el.id); }}
+              title="Delete"
+            >×</button>
+          )}
+        </div>
 
         {/* render the actual element directly — no wrapper so display/flex propagates */}
         {renderTag(el, children, renderElement, renderDropZone, isContainer, isInsideTarget)}
 
-        {/* overlay badges */}
-        {showOverlay && (
+        {/* overlay badges — only on selected subtree (or all when body selected) */}
+        {overlayIds?.has(el.id) && (
           <div className={styles.boxOverlay} aria-hidden="true">
             <div className={styles.boxOverlayMargin} />
             <div className={styles.boxOverlayBorder} />
@@ -306,6 +307,19 @@ function renderTag(el, children, renderElement, renderDropZone, isContainer, isI
   // Prevent anchor tags from navigating — the canvas handles clicks for selection
   const extraProps = el.tag === "a" ? { onClick: (e) => e.preventDefault() } : {};
   return <Tag {...domAttrs} {...extraProps} style={tagStyle}>{el.content || ""}</Tag>;
+}
+
+function getSubtreeIds(elements, rootId) {
+  if (!rootId) return new Set(elements.map(e => e.id)); // body selected = show all
+  const result = new Set([rootId]);
+  const queue = [rootId];
+  while (queue.length) {
+    const cur = queue.shift();
+    for (const e of elements) {
+      if (e.parentId === cur) { result.add(e.id); queue.push(e.id); }
+    }
+  }
+  return result;
 }
 
 function attrsToReactProps(attrs = {}) {

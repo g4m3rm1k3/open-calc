@@ -216,19 +216,19 @@ export function labReducer(state, action) {
 
     case "APPLY_GLOBAL_THEME": {
       const s = withHistory(state);
-      const themeId = action.payload; // e.g., "Clean", "Dark", "Glass"
-      
-      // Update the elements (components)
+
       let newElements = [...s.elements];
       for (const update of action.payload.updates) {
-        newElements = newElements.map(el => 
+        newElements = newElements.map(el =>
           el.id === update.id ? { ...el, styles: { ...el.styles, ...update.styles } } : el
         );
       }
-      
+
       return {
         ...s,
-        bodyStyles: action.payload.bodyStyles || s.bodyStyles,
+        bodyStyles: action.payload.bodyStyles
+          ? { ...s.bodyStyles, ...action.payload.bodyStyles }
+          : s.bodyStyles,
         elements: newElements,
       };
     }

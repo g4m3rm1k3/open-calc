@@ -265,6 +265,7 @@ export default function PropertiesPanel({
   bodyThemes = null,
   onApplyComponentTheme,
   onApplyBodyTheme,
+  onDelete,
 }) {
   const [collapsed, setCollapsed] = useState({ boxmodel: false });
 
@@ -288,8 +289,13 @@ export default function PropertiesPanel({
           <span>&lt;body&gt; · page root</span>
         ) : (
           <>
-            &lt;{element.tag}&gt; · {element.id}
+            <span className={styles.panelHeaderTag}>&lt;{element.tag}&gt; · {element.id}</span>
             {element.parentId && <span className={styles.nestedBadge}>nested</span>}
+            <button
+              className={styles.propDeleteBtn}
+              onClick={() => onDelete?.(element.id)}
+              title="Delete element and its children"
+            >✕</button>
           </>
         )}
       </div>

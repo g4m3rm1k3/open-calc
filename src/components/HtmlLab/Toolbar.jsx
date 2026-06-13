@@ -90,7 +90,7 @@ export default function Toolbar({
       <button
         className={`${styles.tbBtn} ${showOverlay ? styles.tbBtnActive : ""}`}
         onClick={onToggleOverlay}
-        title="Toggle box model overlay"
+        title="Toggle box model overlay on selected element"
       >
         ⬜ Box model
       </button>
@@ -124,7 +124,12 @@ export default function Toolbar({
 
       <select
         className={styles.tbSelect}
-        onChange={(e) => onApplyGlobalTheme && onApplyGlobalTheme(e.target.value)}
+        onChange={(e) => {
+          if (onApplyGlobalTheme && e.target.value) {
+            onApplyGlobalTheme(e.target.value);
+            e.target.value = "";
+          }
+        }}
         defaultValue=""
         title="Apply a theme to all compatible components"
       >
