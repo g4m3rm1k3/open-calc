@@ -251,7 +251,7 @@ export function extractJavascriptRefs(javascript = "") {
 }
 
 // ─── Export: generate a clean standalone HTML file ───────────────────────────
-export function generateExportHtml(elements, bodyStyles, customCss, javascript) {
+export function generateExportHtml(elements, bodyStyles, customCss, javascript, cdnTags = []) {
   const VOID_TAGS = new Set(["img", "br", "hr", "input", "meta", "link"]);
 
   function renderClean(el, depth = 1) {
@@ -286,6 +286,12 @@ export function generateExportHtml(elements, bodyStyles, customCss, javascript) 
   const htmlBody = roots.map(el => renderClean(el)).join("\n");
   const css      = elementsToCss(elements, customCss, bodyStyles);
 
+  const cdnHeadTags = cdnTags.map(({ url, type }) =>
+    type === "stylesheet"
+      ? `  <link rel="stylesheet" href="${url}" />`
+      : `  <script src="${url}"></script>`
+  ).join("\n");
+
   return [
     `<!DOCTYPE html>`,
     `<html lang="en">`,
@@ -293,6 +299,7 @@ export function generateExportHtml(elements, bodyStyles, customCss, javascript) 
     `  <meta charset="UTF-8" />`,
     `  <meta name="viewport" content="width=device-width, initial-scale=1.0" />`,
     `  <title>My Page</title>`,
+    cdnHeadTags || null,
     `  <style>`,
     css.split("\n").map(l => `    ${l}`).join("\n"),
     `  </style>`,
@@ -304,7 +311,7 @@ export function generateExportHtml(elements, bodyStyles, customCss, javascript) 
     javascript?.trim() ? `<script>\n${javascript}\n</script>` : "",
     `</body>`,
     `</html>`,
-  ].filter(l => l !== "").join("\n");
+  ].filter(l => l !== null && l !== "").join("\n");
 }
 
 export function applyCssToElements(css, elements) {
@@ -372,6 +379,33 @@ function attrsFromNode(node) {
   if (!("id" in attrs)) attrs.id = "";
   if (!("class" in attrs)) attrs.class = "";
   return attrs;
+}
+
+// ─── Full HTML document → lab state ──────────────────────────────────────────
+export function parseHtmlDocument(htmlString) {
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlString, "text/html");
+
+    const styleEls = Array.from(doc.querySelectorAll("style"));
+    const css = styleEls.map((s) => s.textContent).join("\n\n");
+
+    const scriptEls = Array.from(doc.querySelectorAll("script"));
+    const javascript = scriptEls
+      .map((s) => s.textContent)
+      .filter(Boolean)
+      .join("\n\n");
+
+    const bodyStyleStr = doc.body?.getAttribute("style") || "";
+    const bodyStyles = parseStyleString(bodyStyleStr);
+
+    const elements = htmlToElements(doc.body?.innerHTML || "", [], javascript) || [];
+
+    return { elements, bodyStyles, javascript, css };
+  } catch (err) {
+    console.warn("parseHtmlDocument error:", err);
+    return { elements: [], bodyStyles: {}, javascript: "", css: "" };
+  }
 }
 
 export function parseStyleString(str) {

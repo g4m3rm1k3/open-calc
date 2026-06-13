@@ -1,4 +1,4 @@
-import { useState, useReducer, useCallback, useRef, useMemo } from "react";
+import { useState, useReducer, useCallback, useRef, useMemo, useEffect } from "react";
 import Toolbar from "./Toolbar";
 import CanvasPanel from "./CanvasPanel";
 import CodePanel from "./CodePanel";
@@ -9,12 +9,14 @@ import { EXAMPLES } from "./exampleGallery";
 import { labReducer, initialState } from "./labReducer";
 import { COMPONENTS, BODY_THEMES, detectComponents, buildThemeUpdates } from "./componentLibrary";
 import { JS_PRESETS } from "./jsPresets";
+import { CDN_LIBRARIES, resolveCdnTags } from "./cdnLibraries";
 import {
   applyCssToElements,
   elementsToCss,
   elementsToHtml,
   htmlToElements,
   generateExportHtml,
+  parseHtmlDocument,
 } from "./htmlSync";
 import styles from "./HtmlLab.module.css";
 
@@ -26,6 +28,7 @@ export default function HtmlLab({ onBack }) {
   const [codePanelWidth, setCodePanelWidth] = useState(360);
   const [propsPanelWidth, setPropsPanelWidth] = useState(280);
   const [showComponents, setShowComponents] = useState(false);
+  const [showLibraries, setShowLibraries] = useState(false);
   const [multiSelectedIds, setMultiSelectedIds] = useState([]);
   const [previewMode, setPreviewMode] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState(null);
@@ -68,6 +71,7 @@ export default function HtmlLab({ onBack }) {
   const dividerDragging = useRef(false);
   const dividerStartX = useRef(0);
   const dividerStartW = useRef(0);
+  const fileInputRef = useRef(null);
 
   const propsDividerDragging = useRef(false);
   const propsDividerStartX = useRef(0);
@@ -143,8 +147,48 @@ export default function HtmlLab({ onBack }) {
     window.addEventListener("mouseup", onUp);
   };
 
+  const handleFileImport = useCallback(async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    e.target.value = "";
+    const ext = file.name.split(".").pop().toLowerCase();
+    const reader = new FileReader();
+    reader.onload = async (ev) => {
+      const content = ev.target.result;
+      if (ext === "html") {
+        const ok = await askConfirm("import_html", `Import "${file.name}"? This replaces your current canvas.`);
+        if (!ok) return;
+        const parsed = parseHtmlDocument(content);
+        dispatch({ type: "LOAD_EXAMPLE", payload: { elements: parsed.elements, bodyStyles: { ...initialState.bodyStyles, ...parsed.bodyStyles }, javascript: parsed.javascript, customCss: parsed.css } });
+      } else if (ext === "css") {
+        dispatch({ type: "SET_FROM_CSS", payload: applyCssToElements(content, state.elements) });
+      } else if (ext === "js") {
+        dispatch({ type: "SET_JAVASCRIPT", payload: appendJavascriptSnippet(state.javascript, content) });
+      }
+    };
+    reader.readAsText(file);
+  }, [askConfirm, state.elements, state.javascript]);
+
+  const exportPage = useCallback((page) => {
+    const cdnTags = resolveCdnTags(state.cdnLinks);
+    const html = generateExportHtml(page.elements, page.bodyStyles, page.customCss || "", page.javascript, cdnTags);
+    const slug = page.name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "") || "page";
+    const blob = new Blob([html], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = `${slug}.html`; a.click();
+    URL.revokeObjectURL(url);
+  }, []);
+
   return (
     <div className={styles.app}>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".html,.css,.js"
+        style={{ display: "none" }}
+        onChange={handleFileImport}
+      />
       {confirmDialog && (
         <ConfirmDialog
           storageKey={confirmDialog.storageKey}
@@ -171,11 +215,16 @@ export default function HtmlLab({ onBack }) {
         showLabels={state.showLabels}
         showComponents={showComponents}
         previewMode={previewMode}
+        multiPageMode={state.mode === "multi"}
         onAddElement={(tag) => dispatch({ type: "ADD_ELEMENT", payload: tag })}
         onToggleOverlay={() => dispatch({ type: "TOGGLE_OVERLAY" })}
         onToggleLabels={() => dispatch({ type: "TOGGLE_LABELS" })}
-        onToggleComponents={() => setShowComponents(v => !v)}
+        onToggleComponents={() => { setShowComponents(v => !v); setShowLibraries(false); }}
+        onToggleLibraries={() => { setShowLibraries(v => !v); setShowComponents(false); }}
+        showLibraries={showLibraries}
         onTogglePreview={() => setPreviewMode(v => !v)}
+        onToggleMultiPage={() => dispatch({ type: "TOGGLE_MULTIPAGE" })}
+        onImport={() => fileInputRef.current?.click()}
         onNew={async () => {
           const ok = await askConfirm("new_project", "Start a new blank project? This will clear everything.");
           if (ok) {
@@ -190,19 +239,17 @@ export default function HtmlLab({ onBack }) {
           if (ok) dispatch({ type: "CLEAR" });
         }}
         onExport={() => {
-          const html = generateExportHtml(
-            state.elements,
-            state.bodyStyles,
-            state.customCss,
-            state.javascript,
-          );
-          const blob = new Blob([html], { type: "text/html" });
-          const url  = URL.createObjectURL(blob);
-          const a    = document.createElement("a");
-          a.href     = url;
-          a.download = "index.html";
-          a.click();
-          URL.revokeObjectURL(url);
+          if (state.mode === "multi") {
+            // Save current page then export all with short delay between
+            const pages = state.pages.map((p) =>
+              p.id === state.activePageId
+                ? { ...p, elements: state.elements, bodyStyles: state.bodyStyles, javascript: state.javascript, customCss: state.customCss }
+                : p,
+            );
+            pages.forEach((page, i) => setTimeout(() => exportPage(page), i * 200));
+          } else {
+            exportPage({ name: "index", elements: state.elements, bodyStyles: state.bodyStyles, customCss: state.customCss, javascript: state.javascript });
+          }
         }}
         canUndo={state.history.length > 0}
         onBack={onBack}
@@ -236,6 +283,17 @@ export default function HtmlLab({ onBack }) {
         }}
         onLoadExample={() => setShowExamplePicker(true)}
       />
+
+      {state.mode === "multi" && (
+        <PageTabStrip
+          pages={state.pages}
+          activePageId={state.activePageId}
+          onSwitch={(id) => dispatch({ type: "SWITCH_PAGE", payload: id })}
+          onAdd={() => dispatch({ type: "ADD_PAGE" })}
+          onDelete={(id) => dispatch({ type: "DELETE_PAGE", payload: id })}
+          onRename={(id, name) => dispatch({ type: "RENAME_PAGE", payload: { id, name } })}
+        />
+      )}
 
       {showComponents && (
         <div className={styles.compPanel}>
@@ -278,6 +336,30 @@ export default function HtmlLab({ onBack }) {
           ))}
         </div>
       )}
+      {showLibraries && (
+        <div className={styles.libPanel}>
+          {CDN_LIBRARIES.map((lib) => {
+            const active = state.cdnLinks.includes(lib.id);
+            return (
+              <button
+                key={lib.id}
+                className={`${styles.libCard} ${active ? styles.libCardActive : ""}`}
+                onClick={() => dispatch({ type: "TOGGLE_CDN", payload: lib.id })}
+                title={lib.url}
+              >
+                <span className={styles.libIcon}>{lib.icon}</span>
+                <span className={styles.libName}>{lib.label}</span>
+                <span className={styles.libCat}>{lib.category}</span>
+                <span className={styles.libDesc}>{lib.description}</span>
+                <span className={`${styles.libBadge} ${active ? styles.libBadgeOn : ""}`}>
+                  {active ? "ON" : "OFF"}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       {/* Layout: [Code] | [Canvas] | [Properties] */}
       <div className={styles.main}>
         <CodePanel
@@ -313,7 +395,7 @@ export default function HtmlLab({ onBack }) {
           <iframe
             key="preview-frame"
             className={styles.previewFrame}
-            srcDoc={generateExportHtml(state.elements, state.bodyStyles, state.customCss, state.javascript)}
+            srcDoc={generateExportHtml(state.elements, state.bodyStyles, state.customCss, state.javascript, resolveCdnTags(state.cdnLinks))}
             title="Preview"
             sandbox="allow-scripts"
           />
@@ -413,4 +495,65 @@ function appendJavascriptSnippet(current, snippet) {
   const trimmed = current.trimEnd();
   if (trimmed.includes(snippet.trim())) return current;
   return `${trimmed}${trimmed ? "\n\n" : ""}${snippet}`;
+}
+
+function PageTabStrip({ pages, activePageId, onSwitch, onAdd, onDelete, onRename }) {
+  const [editingId, setEditingId] = useState(null);
+  const [draft, setDraft] = useState("");
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (editingId && inputRef.current) inputRef.current.select();
+  }, [editingId]);
+
+  function startRename(page, e) {
+    e.stopPropagation();
+    setEditingId(page.id);
+    setDraft(page.name);
+  }
+
+  function commitRename() {
+    if (editingId && draft.trim()) onRename(editingId, draft.trim());
+    setEditingId(null);
+  }
+
+  return (
+    <div className={styles.pageTabStrip}>
+      {pages.map((page) => (
+        <div
+          key={page.id}
+          className={`${styles.pageTab} ${page.id === activePageId ? styles.pageTabActive : ""}`}
+          onClick={() => onSwitch(page.id)}
+          onDoubleClick={(e) => startRename(page, e)}
+          title="Double-click to rename"
+        >
+          {editingId === page.id ? (
+            <input
+              ref={inputRef}
+              className={styles.pageTabInput}
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              onBlur={commitRename}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") commitRename();
+                if (e.key === "Escape") setEditingId(null);
+                e.stopPropagation();
+              }}
+              onClick={(e) => e.stopPropagation()}
+            />
+          ) : (
+            <span className={styles.pageTabName}>{page.name}</span>
+          )}
+          {pages.length > 1 && (
+            <button
+              className={styles.pageTabDel}
+              onClick={(e) => { e.stopPropagation(); onDelete(page.id); }}
+              title="Delete page"
+            >✕</button>
+          )}
+        </div>
+      ))}
+      <button className={styles.pageTabAdd} onClick={onAdd} title="Add page">+ Page</button>
+    </div>
+  );
 }

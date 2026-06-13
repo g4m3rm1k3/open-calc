@@ -360,6 +360,222 @@ function generateKanbanExample() {
   return { elements, bodyStyles, javascript };
 }
 
+// ── Solar System (Three.js) ────────────────────────────────────────────────────
+function generateThreeJsExample() {
+  const elements = [
+    el("three-wrap", "div", null, {
+      position: "relative",
+      width: "100%",
+      height: "100vh",
+      overflow: "hidden",
+      background: "#000010",
+    }, "", { class: "threejs-container" }),
+    el("three-hud", "div", "three-wrap", {
+      position: "absolute",
+      top: "20px",
+      left: "24px",
+      zIndex: "10",
+      pointerEvents: "none",
+    }),
+    el("three-title", "h1", "three-hud", {
+      color: "#fff",
+      fontSize: "20px",
+      fontWeight: "700",
+      margin: "0",
+      textShadow: "0 2px 12px rgba(0,0,0,.9)",
+    }, "Solar System"),
+    el("three-hint", "p", "three-hud", {
+      color: "#94a3b8",
+      fontSize: "12px",
+      margin: "4px 0 0",
+    }, "Drag to rotate · Scroll to zoom · Click to speed up"),
+  ];
+
+  const bodyStyles = {
+    margin: "0", padding: "0",
+    background: "#000010",
+    overflow: "hidden",
+    fontFamily: "system-ui, sans-serif",
+  };
+
+  const javascript = `(function() {
+  if (typeof THREE === 'undefined') {
+    var c = document.querySelector('.threejs-container');
+    if (c) c.innerHTML = '<div style="color:#f87171;padding:60px;text-align:center;font-size:15px;">Three.js not loaded — enable it in the Libraries panel first, then hit Preview.</div>';
+    return;
+  }
+
+  var container = document.querySelector('.threejs-container');
+  var W = container.offsetWidth || window.innerWidth;
+  var H = container.offsetHeight || window.innerHeight;
+
+  var scene = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(55, W / H, 0.1, 2000);
+
+  var renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(W, H);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.domElement.style.cssText = 'position:absolute;top:0;left:0;';
+  container.appendChild(renderer.domElement);
+
+  // Lights
+  scene.add(new THREE.AmbientLight(0x0a0a22, 3));
+  var sunLight = new THREE.PointLight(0xfff0cc, 8, 300);
+  scene.add(sunLight);
+
+  // Sun
+  var sun = new THREE.Mesh(
+    new THREE.SphereGeometry(5, 48, 48),
+    new THREE.MeshStandardMaterial({ color: 0xffcc44, emissive: 0xff8800, emissiveIntensity: 1.6, roughness: 0.3 })
+  );
+  scene.add(sun);
+  // Glow halo
+  sun.add(new THREE.Mesh(
+    new THREE.SphereGeometry(5.8, 32, 32),
+    new THREE.MeshBasicMaterial({ color: 0xff6600, transparent: true, opacity: 0.07, side: THREE.BackSide })
+  ));
+
+  // Planets config
+  var PDEFS = [
+    { r: 1.1, d: 11,  speed: 1.3,  color: 0x6699ff, emissive: 0x001133, rings: false, moons: 0 },
+    { r: 1.7, d: 18,  speed: 0.75, color: 0xff7755, emissive: 0x220800, rings: false, moons: 0 },
+    { r: 1.4, d: 26,  speed: 0.48, color: 0x44ee88, emissive: 0x002211, rings: false, moons: 1 },
+    { r: 2.3, d: 37,  speed: 0.28, color: 0xddaa66, emissive: 0x1a0800, rings: true,  moons: 0 },
+  ];
+
+  var planets = PDEFS.map(function(def, idx) {
+    // Orbit line
+    var pts = [];
+    for (var j = 0; j <= 128; j++) {
+      var a = (j / 128) * Math.PI * 2;
+      pts.push(new THREE.Vector3(Math.cos(a) * def.d, 0, Math.sin(a) * def.d));
+    }
+    var orbitLine = new THREE.Line(
+      new THREE.BufferGeometry().setFromPoints(pts),
+      new THREE.LineBasicMaterial({ color: 0x334466, transparent: true, opacity: 0.45 })
+    );
+    scene.add(orbitLine);
+
+    var mesh = new THREE.Mesh(
+      new THREE.SphereGeometry(def.r, 32, 32),
+      new THREE.MeshStandardMaterial({ color: def.color, emissive: def.emissive, roughness: 0.65, metalness: 0.1 })
+    );
+    mesh.castShadow = true;
+    scene.add(mesh);
+
+    // Saturn rings
+    if (def.rings) {
+      var rm = new THREE.Mesh(
+        new THREE.RingGeometry(def.r * 1.5, def.r * 2.5, 64),
+        new THREE.MeshBasicMaterial({ color: 0xbbaa88, side: THREE.DoubleSide, transparent: true, opacity: 0.65 })
+      );
+      rm.rotation.x = Math.PI / 2.8;
+      mesh.add(rm);
+    }
+
+    // Moon
+    var moon = null;
+    if (def.moons > 0) {
+      moon = new THREE.Mesh(
+        new THREE.SphereGeometry(0.38, 16, 16),
+        new THREE.MeshStandardMaterial({ color: 0xaaaaaa, roughness: 0.9 })
+      );
+      scene.add(moon);
+    }
+
+    return { mesh, moon, d: def.d, speed: def.speed, angle: Math.random() * Math.PI * 2 };
+  });
+
+  // Stars (sphere distribution)
+  var starPos = new Float32Array(9000);
+  for (var i = 0; i < 9000; i += 3) {
+    var phi   = Math.acos(2 * Math.random() - 1);
+    var theta = 2 * Math.PI * Math.random();
+    var rad   = 300 + Math.random() * 500;
+    starPos[i]   = rad * Math.sin(phi) * Math.cos(theta);
+    starPos[i+1] = rad * Math.sin(phi) * Math.sin(theta);
+    starPos[i+2] = rad * Math.cos(phi);
+  }
+  var starGeo = new THREE.BufferGeometry();
+  starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+  scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.7, sizeAttenuation: true })));
+
+  // Camera state
+  var camAngle = 0.3;
+  var camTilt  = 0.45;
+  var camRadius = 65;
+  var orbitSpeed = 1.0;
+  var dragging = false;
+  var px = 0, py = 0;
+
+  renderer.domElement.addEventListener('mousedown', function(e) { dragging = true; px = e.clientX; py = e.clientY; });
+  window.addEventListener('mouseup',   function()  { dragging = false; });
+  window.addEventListener('mousemove', function(e) {
+    if (!dragging) return;
+    camAngle -= (e.clientX - px) * 0.006;
+    camTilt   = Math.max(0.05, Math.min(1.3, camTilt + (e.clientY - py) * 0.006));
+    px = e.clientX; py = e.clientY;
+  });
+  renderer.domElement.addEventListener('wheel', function(e) {
+    camRadius = Math.max(18, Math.min(130, camRadius + e.deltaY * 0.06));
+    e.preventDefault();
+  }, { passive: false });
+  renderer.domElement.addEventListener('click', function() {
+    orbitSpeed = orbitSpeed > 1.5 ? 0.4 : orbitSpeed < 0.6 ? 1.0 : 3.5;
+  });
+  window.addEventListener('resize', function() {
+    var w = container.offsetWidth, h = container.offsetHeight;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+  });
+
+  var t = 0;
+  function animate() {
+    requestAnimationFrame(animate);
+    t += 0.008 * orbitSpeed;
+
+    // Sun pulsing glow
+    sun.material.emissiveIntensity = 1.4 + Math.sin(t * 3.5) * 0.25;
+    sun.rotation.y = t * 0.25;
+
+    // Planets
+    planets.forEach(function(p) {
+      p.angle += p.speed * 0.005 * orbitSpeed;
+      p.mesh.position.set(
+        Math.cos(p.angle) * p.d,
+        Math.sin(p.angle * 0.3) * 1.2,
+        Math.sin(p.angle) * p.d
+      );
+      p.mesh.rotation.y += 0.02 * orbitSpeed;
+      if (p.moon) {
+        var ma = t * 2.8;
+        p.moon.position.set(
+          p.mesh.position.x + Math.cos(ma) * 2.8,
+          p.mesh.position.y + 0.4,
+          p.mesh.position.z + Math.sin(ma) * 2.8
+        );
+      }
+    });
+
+    // Camera auto-orbit + drag
+    if (!dragging) camAngle += 0.0025 * orbitSpeed;
+    camera.position.set(
+      Math.sin(camAngle) * Math.cos(camTilt) * camRadius,
+      Math.sin(camTilt) * camRadius,
+      Math.cos(camAngle) * Math.cos(camTilt) * camRadius
+    );
+    camera.lookAt(0, 0, 0);
+    renderer.render(scene, camera);
+  }
+  animate();
+})();`;
+
+  return { elements, bodyStyles, javascript, cdnLinks: ["threejs"] };
+}
+
 // ── Gallery export ─────────────────────────────────────────────────────────────
 export const EXAMPLES = [
   {
@@ -382,5 +598,13 @@ export const EXAMPLES = [
     description: "Drag-and-drop task board — add cards, move them between columns",
     icon: "📋",
     generate: generateKanbanExample,
+  },
+  {
+    id: "threejs",
+    name: "Solar System",
+    description: "Interactive 3D scene with orbiting planets, drag to rotate, scroll to zoom",
+    icon: "🪐",
+    generate: generateThreeJsExample,
+    requiresCdn: ["threejs"],
   },
 ];

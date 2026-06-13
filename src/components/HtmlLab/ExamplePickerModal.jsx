@@ -22,6 +22,11 @@ export default function ExamplePickerModal({ onSelect, onClose }) {
               <span className={styles.exPickerIcon}>{ex.icon}</span>
               <span className={styles.exPickerName}>{ex.name}</span>
               <span className={styles.exPickerDesc}>{ex.description}</span>
+              {ex.requiresCdn && (
+                <span className={styles.exPickerCdn}>
+                  requires {ex.requiresCdn.join(", ")} CDN
+                </span>
+              )}
             </button>
           ))}
         </div>

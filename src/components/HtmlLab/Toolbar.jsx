@@ -22,12 +22,17 @@ export default function Toolbar({
   showOverlay,
   showLabels,
   showComponents,
+  showLibraries,
   previewMode,
+  multiPageMode,
   onAddElement,
   onToggleOverlay,
   onToggleLabels,
   onToggleComponents,
+  onToggleLibraries,
   onTogglePreview,
+  onToggleMultiPage,
+  onImport,
   onNew,
   onUndo,
   onClear,
@@ -50,8 +55,8 @@ export default function Toolbar({
       {/* Mode toggle */}
       <div className={styles.modePill}>
         <button
-          className={`${styles.modeBtn} ${!showComponents ? styles.modeBtnActive : ""}`}
-          onClick={() => showComponents && onToggleComponents()}
+          className={`${styles.modeBtn} ${!showComponents && !showLibraries ? styles.modeBtnActive : ""}`}
+          onClick={() => (showComponents || showLibraries) && onToggleComponents()}
         >
           Elements
         </button>
@@ -61,10 +66,16 @@ export default function Toolbar({
         >
           Components
         </button>
+        <button
+          className={`${styles.modeBtn} ${showLibraries ? styles.modeBtnActive : ""}`}
+          onClick={onToggleLibraries}
+        >
+          Libraries
+        </button>
       </div>
       <div className={styles.toolbarSep} />
 
-      {!showComponents && (
+      {!showComponents && !showLibraries && (
         <>
           <span className={styles.toolbarLabel}>Add:</span>
           {ELEMENTS.map(({ tag, label, title }) => (
@@ -88,6 +99,22 @@ export default function Toolbar({
         title={previewMode ? "Back to editor (Esc)" : "Preview with live JavaScript"}
       >
         {previewMode ? "✎ Edit" : "▶ Preview"}
+      </button>
+
+      <button
+        className={`${styles.tbBtn} ${multiPageMode ? styles.tbBtnActive : ""}`}
+        onClick={onToggleMultiPage}
+        title={multiPageMode ? "Join all pages into one" : "Split into multiple pages"}
+      >
+        {multiPageMode ? "⊟ Single page" : "⊞ Multi-page"}
+      </button>
+
+      <button
+        className={styles.tbBtn}
+        onClick={onImport}
+        title="Import an HTML, CSS, or JS file"
+      >
+        ↑ Import
       </button>
 
       <button
@@ -126,9 +153,9 @@ export default function Toolbar({
       <button
         className={styles.tbBtn}
         onClick={onExport}
-        title="Download as index.html"
+        title={multiPageMode ? "Download all pages as separate HTML files" : "Download as index.html"}
       >
-        ↓ Export
+        {multiPageMode ? "↓ Export All" : "↓ Export"}
       </button>
 
       <button

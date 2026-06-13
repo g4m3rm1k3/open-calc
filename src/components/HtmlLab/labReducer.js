@@ -171,6 +171,12 @@ export const initialState = {
     margin: "0",
     padding: "0",
   },
+  // Multi-page
+  mode: "single",
+  pages: [],
+  activePageId: null,
+  // CDN libraries
+  cdnLinks: [],
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -181,6 +187,34 @@ function cloneElements(elements) {
 function withHistory(state) {
   const history = [...state.history, cloneElements(state.elements)];
   return { ...state, history: history.slice(-40) };
+}
+
+function saveActivePage(state) {
+  if (state.mode !== "multi" || !state.activePageId) return state.pages;
+  return state.pages.map((p) =>
+    p.id === state.activePageId
+      ? { ...p, elements: state.elements, bodyStyles: state.bodyStyles, javascript: state.javascript, customCss: state.customCss }
+      : p,
+  );
+}
+
+function blankPage(name, index) {
+  return {
+    id: "pg" + (Date.now() + index),
+    name,
+    elements: [],
+    bodyStyles: {
+      fontFamily: "system-ui, -apple-system, sans-serif",
+      fontSize: "16px",
+      lineHeight: "1.5",
+      color: "#1a1a18",
+      backgroundColor: "#ffffff",
+      margin: "0",
+      padding: "0",
+    },
+    javascript: "",
+    customCss: "",
+  };
 }
 
 // Get all descendant IDs of a given element
@@ -270,7 +304,22 @@ export function labReducer(state, action) {
         elements: action.payload.elements,
         bodyStyles: action.payload.bodyStyles,
         javascript: action.payload.javascript ?? "",
+        customCss: action.payload.customCss ?? "",
+        cdnLinks: action.payload.cdnLinks ?? s.cdnLinks,
         selectedId: null,
+        mode: "single",
+        pages: [],
+        activePageId: null,
+      };
+    }
+
+    case "TOGGLE_CDN": {
+      const id = action.payload;
+      return {
+        ...state,
+        cdnLinks: state.cdnLinks.includes(id)
+          ? state.cdnLinks.filter((i) => i !== id)
+          : [...state.cdnLinks, id],
       };
     }
 
@@ -684,6 +733,62 @@ export function labReducer(state, action) {
     case "CLEAR": {
       const s = withHistory(state);
       return { ...s, elements: [], selectedId: null };
+    }
+
+    // ── Multi-page ──────────────────────────────────────────────────────────────
+    case "TOGGLE_MULTIPAGE": {
+      if (state.mode === "single") {
+        const p1 = { id: "pg" + Date.now(), name: "Home", elements: state.elements, bodyStyles: state.bodyStyles, javascript: state.javascript, customCss: state.customCss };
+        const p2 = blankPage("Page 2", 1);
+        return { ...state, mode: "multi", pages: [p1, p2], activePageId: p1.id, history: [] };
+      } else {
+        const updatedPages = saveActivePage(state);
+        const mergedElements = updatedPages.flatMap((p) => p.elements);
+        const mergedJs = updatedPages.map((p) => p.javascript).filter(Boolean).join("\n\n");
+        const mergedCss = updatedPages.map((p) => p.customCss).filter(Boolean).join("\n\n");
+        const first = updatedPages[0] || {};
+        return { ...state, mode: "single", pages: [], activePageId: null, elements: mergedElements, bodyStyles: first.bodyStyles || state.bodyStyles, javascript: mergedJs, customCss: mergedCss, selectedId: null, history: [] };
+      }
+    }
+
+    case "SWITCH_PAGE": {
+      if (action.payload === state.activePageId) return state;
+      const updatedPages = saveActivePage(state);
+      const next = updatedPages.find((p) => p.id === action.payload);
+      if (!next) return state;
+      return { ...state, pages: updatedPages, activePageId: action.payload, elements: next.elements, bodyStyles: next.bodyStyles, javascript: next.javascript, customCss: next.customCss || "", selectedId: null, history: [] };
+    }
+
+    case "ADD_PAGE": {
+      const updatedPages = saveActivePage(state);
+      const page = blankPage(action.payload || `Page ${updatedPages.length + 1}`, 0);
+      return { ...state, pages: [...updatedPages, page], activePageId: page.id, elements: page.elements, bodyStyles: page.bodyStyles, javascript: page.javascript, customCss: "", selectedId: null, history: [] };
+    }
+
+    case "DELETE_PAGE": {
+      if (state.pages.length <= 1) return state;
+      const updatedPages = saveActivePage(state);
+      const idx = updatedPages.findIndex((p) => p.id === action.payload);
+      const remaining = updatedPages.filter((p) => p.id !== action.payload);
+      const needSwitch = action.payload === state.activePageId;
+      const newActive = needSwitch ? remaining[Math.max(0, idx - 1)] : null;
+      return {
+        ...state,
+        pages: remaining,
+        ...(needSwitch ? {
+          activePageId: newActive.id,
+          elements: newActive.elements,
+          bodyStyles: newActive.bodyStyles,
+          javascript: newActive.javascript,
+          customCss: newActive.customCss || "",
+          selectedId: null,
+          history: [],
+        } : {}),
+      };
+    }
+
+    case "RENAME_PAGE": {
+      return { ...state, pages: state.pages.map((p) => p.id === action.payload.id ? { ...p, name: action.payload.name } : p) };
     }
 
     default:
