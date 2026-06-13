@@ -4,8 +4,9 @@ import CanvasPanel from "./CanvasPanel";
 import CodePanel from "./CodePanel";
 import PropertiesPanel from "./PropertiesPanel";
 import ConfirmDialog, { shouldSkip } from "./ConfirmDialog";
+import ExamplePickerModal from "./ExamplePickerModal";
+import { EXAMPLES } from "./exampleGallery";
 import { labReducer, initialState } from "./labReducer";
-import { generateExampleProject } from "./exampleProject";
 import { COMPONENTS, BODY_THEMES, detectComponents, buildThemeUpdates } from "./componentLibrary";
 import { JS_PRESETS } from "./jsPresets";
 import {
@@ -19,7 +20,7 @@ import styles from "./HtmlLab.module.css";
 
 export default function HtmlLab({ onBack }) {
   const [state, dispatch] = useReducer(labReducer, undefined, () => {
-    const ex = generateExampleProject();
+    const ex = EXAMPLES[0].generate();
     return { ...initialState, elements: ex.elements, bodyStyles: ex.bodyStyles, javascript: ex.javascript ?? "" };
   });
   const [codePanelWidth, setCodePanelWidth] = useState(360);
@@ -28,6 +29,7 @@ export default function HtmlLab({ onBack }) {
   const [multiSelectedIds, setMultiSelectedIds] = useState([]);
   const [previewMode, setPreviewMode] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState(null);
+  const [showExamplePicker, setShowExamplePicker] = useState(false);
 
   // Detect which components match the selected element's direct children
   const matchedComponents = useMemo(() => {
@@ -151,6 +153,19 @@ export default function HtmlLab({ onBack }) {
           onCancel={() => { confirmDialog.resolve(false); setConfirmDialog(null); }}
         />
       )}
+      {showExamplePicker && (
+        <ExamplePickerModal
+          onSelect={async (ex) => {
+            setShowExamplePicker(false);
+            const ok = await askConfirm("load_example", `Load "${ex.name}"? This will replace your current canvas.`);
+            if (ok) {
+              const data = ex.generate();
+              dispatch({ type: "LOAD_EXAMPLE", payload: data });
+            }
+          }}
+          onClose={() => setShowExamplePicker(false)}
+        />
+      )}
       <Toolbar
         showOverlay={state.showOverlay}
         showLabels={state.showLabels}
@@ -219,10 +234,7 @@ export default function HtmlLab({ onBack }) {
             payload: { updates, bodyStyles: bodyTheme?.styles } 
           });
         }}
-        onLoadExample={async () => {
-          const ok = await askConfirm("load_example", "This will replace your current canvas. Load the example project?");
-          if (ok) dispatch({ type: "LOAD_EXAMPLE", payload: generateExampleProject() });
-        }}
+        onLoadExample={() => setShowExamplePicker(true)}
       />
 
       {showComponents && (

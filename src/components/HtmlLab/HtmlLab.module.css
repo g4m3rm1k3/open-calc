@@ -1572,6 +1572,86 @@
   background: #4a8cc4;
 }
 
+/* ── Example Picker Modal ───────────────────────────────────────────────────── */
+.exPickerOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.exPickerBox {
+  background: #1e1e1e;
+  border: 1px solid #3c3c3c;
+  border-radius: 12px;
+  width: min(680px, 92vw);
+  overflow: hidden;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7);
+}
+.exPickerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid #2a2a2a;
+  background: #252526;
+  color: #d4d4d4;
+  font-size: 14px;
+  font-weight: 600;
+}
+.exPickerClose {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 4px;
+  line-height: 1;
+  transition: color 0.15s;
+}
+.exPickerClose:hover {
+  color: #f87171;
+}
+.exPickerGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 20px;
+}
+.exPickerCard {
+  background: #252526;
+  border: 1px solid #3c3c3c;
+  border-radius: 10px;
+  padding: 22px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  text-align: center;
+}
+.exPickerCard:hover {
+  border-color: #569cd6;
+  background: #1a2535;
+}
+.exPickerIcon {
+  font-size: 30px;
+  line-height: 1;
+}
+.exPickerName {
+  color: #d4d4d4;
+  font-size: 14px;
+  font-weight: 600;
+}
+.exPickerDesc {
+  color: #666;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
 /* ── Props panel resize divider ─────────────────────────────────────────────── */
 .propsDivider {
   width: 4px;
