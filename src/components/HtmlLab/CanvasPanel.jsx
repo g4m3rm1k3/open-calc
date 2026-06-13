@@ -260,26 +260,20 @@ function renderTag(el, children, renderElement, renderDropZone, isContainer, isI
   };
 
   if (el.tag === "img") {
+    const placeholder =
+      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='160' viewBox='0 0 240 160'%3E%3Crect width='240' height='160' fill='%23e5e7eb'/%3E%3Cpath d='M28 122l46-46 34 34 28-28 76 76H28z' fill='%23cbd5e1'/%3E%3Ccircle cx='174' cy='46' r='18' fill='%2394a3b8'/%3E%3Ctext x='120' y='86' text-anchor='middle' font-family='Arial' font-size='16' fill='%2364748b'%3Eimg%3C/text%3E%3C/svg%3E";
     return (
-      <div
+      <img
         {...domAttrs}
+        src={domAttrs.src || placeholder}
+        alt={domAttrs.alt || "Image"}
         style={{
           ...tagStyle,
           width: tagStyle.width || "120px",
           height: tagStyle.height || "80px",
-          backgroundImage: "repeating-linear-gradient(45deg,#ccc 0,#ccc 1px,transparent 0,transparent 50%)",
-          backgroundSize: "10px 10px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: "11px",
-          color: "#888",
-          borderRadius: tagStyle.borderRadius,
-          border: tagStyle.border,
+          objectFit: tagStyle.objectFit || "cover",
         }}
-      >
-        img
-      </div>
+      />
     );
   }
 
@@ -311,7 +305,10 @@ function renderTag(el, children, renderElement, renderDropZone, isContainer, isI
 }
 
 function attrsToReactProps(attrs = {}) {
-  return Object.fromEntries(
-    Object.entries(attrs).filter(([, value]) => String(value || "").trim() !== "")
-  );
+  const props = {};
+  Object.entries(attrs).forEach(([key, value]) => {
+    if (String(value || "").trim() === "") return;
+    props[key === "class" ? "className" : key] = value;
+  });
+  return props;
 }

@@ -1,7 +1,21 @@
 import { useState } from "react";
 import styles from "./HtmlLab.module.css";
 
-const TAGS = ["div", "p", "h1", "h2", "h3", "h4", "button", "span", "a", "ul", "li", "section", "article", "header", "footer"];
+const TAGS = ["div", "p", "h1", "h2", "h3", "h4", "button", "span", "a", "img", "ul", "li", "section", "article", "header", "footer"];
+
+const TAG_ATTR_ROWS = {
+  a: [
+    { label: "href", prop: "_href", attr: "href", type: "attr", placeholder: "https://example.com" },
+    { label: "target", prop: "_target", attr: "target", type: "attr", placeholder: "_blank" },
+  ],
+  img: [
+    { label: "src", prop: "_src", attr: "src", type: "attr", placeholder: "https://..." },
+    { label: "alt", prop: "_alt", attr: "alt", type: "attr", placeholder: "Image description" },
+  ],
+  button: [
+    { label: "type", prop: "_type", attr: "type", type: "attr", placeholder: "button" },
+  ],
+};
 
 const SECTIONS = [
   {
@@ -11,6 +25,7 @@ const SECTIONS = [
       { label: "Text", prop: "_content", type: "text" },
       { label: "Tag",  prop: "_tag",     type: "tag"  },
       { label: "id",   prop: "_id",      type: "attr" },
+      { label: "class", prop: "_class",   attr: "class", type: "attr", placeholder: "card primary" },
     ],
   },
   {
@@ -156,7 +171,7 @@ export default function PropertiesPanel({
                     onInsertJavascript={onInsertJavascript}
                   />
                 ) : (
-                  sec.rows.map((row) => (
+                  getRowsForSection(sec, element).map((row) => (
                     <PropRow
                       key={row.prop}
                       row={row}
@@ -208,15 +223,16 @@ function PropRow({ row, element, onChange, onContentChange, onTagChange, onAttrC
     );
   }
 
-  if (row.prop === "_id") {
+  if (row.type === "attr") {
+    const attrName = row.attr || row.prop.slice(1);
     return (
       <div className={styles.propRow}>
-        <label className={styles.propLabel}>id</label>
+        <label className={styles.propLabel}>{row.label}</label>
         <input
           className={styles.propInput}
-          value={element.attrs?.id || ""}
-          placeholder="hero-title"
-          onChange={(e) => onAttrChange("id", e.target.value)}
+          value={element.attrs?.[attrName] || ""}
+          placeholder={row.placeholder || ""}
+          onChange={(e) => onAttrChange(attrName, e.target.value)}
         />
       </div>
     );
@@ -272,20 +288,26 @@ function PropRow({ row, element, onChange, onContentChange, onTagChange, onAttrC
 
 function JavascriptTools({ element, javascript = "", onInsertJavascript }) {
   const selector = getElementSelector(element);
+  const selectorLiteral = JSON.stringify(selector);
   const varName = toVarName(element.attrs?.id || element.id);
   const hasSelector = javascript.includes(selector);
+  const styleObject = stylesToJsObject(element.styles);
   const snippets = [
     {
+      label: "Select",
+      code: `const ${varName} = document.querySelector(${selectorLiteral});`,
+    },
+    {
+      label: "Apply",
+      code: `(() => {\n  const ${varName} = document.querySelector(${selectorLiteral});\n  if (!${varName}) return;\n\n  Object.assign(${varName}.style, ${styleObject});\n})();`,
+    },
+    {
+      label: "Reset",
+      code: `(() => {\n  const ${varName} = document.querySelector(${selectorLiteral});\n  if (!${varName}) return;\n\n  ${varName}.removeAttribute("style");\n})();`,
+    },
+    {
       label: "Click",
-      code: `(() => {\n  const ${varName} = document.querySelector("${selector}");\n  if (!${varName}) return;\n\n  ${varName}.addEventListener("click", () => {\n    ${varName}.classList.toggle("is-active");\n  });\n})();`,
-    },
-    {
-      label: "Hover",
-      code: `(() => {\n  const ${varName} = document.querySelector("${selector}");\n  if (!${varName}) return;\n\n  ${varName}.addEventListener("mouseenter", () => {\n    ${varName}.style.transform = "scale(1.03)";\n  });\n  ${varName}.addEventListener("mouseleave", () => {\n    ${varName}.style.transform = "";\n  });\n})();`,
-    },
-    {
-      label: "Text",
-      code: `(() => {\n  const ${varName} = document.querySelector("${selector}");\n  if (!${varName}) return;\n\n  ${varName}.textContent = "Updated from JavaScript";\n})();`,
+      code: `(() => {\n  const ${varName} = document.querySelector(${selectorLiteral});\n  if (!${varName}) return;\n\n  ${varName}.addEventListener("click", () => {\n    ${varName}.classList.toggle("is-active");\n  });\n})();`,
     },
   ];
 
@@ -314,6 +336,11 @@ function JavascriptTools({ element, javascript = "", onInsertJavascript }) {
   );
 }
 
+function getRowsForSection(section, element) {
+  if (section.key !== "content") return section.rows;
+  return [...section.rows, ...(TAG_ATTR_ROWS[element.tag] || [])];
+}
+
 function getElementSelector(element) {
   const htmlId = element.attrs?.id?.trim();
   if (htmlId) return `#${cssEscape(htmlId)}`;
@@ -332,6 +359,13 @@ function toVarName(value) {
 function cssEscape(value) {
   if (typeof CSS !== "undefined" && CSS.escape) return CSS.escape(value);
   return String(value).replace(/["\\#.;:[\],>+~*='()\s]/g, "\\$&");
+}
+
+function stylesToJsObject(styles = {}) {
+  const body = Object.entries(styles)
+    .map(([key, value]) => `\n    ${JSON.stringify(key)}: ${JSON.stringify(value)}`)
+    .join(",");
+  return `{${body ? `${body}\n  ` : ""}}`;
 }
 
 // ─── Box Model Visual ─────────────────────────────────────────────────────────

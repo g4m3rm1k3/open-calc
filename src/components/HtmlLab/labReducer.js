@@ -74,6 +74,12 @@ const TAG_CONTENT = {
   section: "", article: "", header: "", footer: "",
 };
 
+const TAG_ATTRS = {
+  a: { href: "#", target: "" },
+  img: { src: "", alt: "Image" },
+  button: { type: "button" },
+};
+
 // Tags that can contain children
 export const CONTAINER_TAGS = new Set([
   "div", "section", "article", "header", "footer", "ul", "p", "span",
@@ -130,7 +136,7 @@ export function labReducer(state, action) {
       const el = {
         id: genId(),
         tag,
-        attrs: { id: "" },
+        attrs: { id: "", class: "", ...(TAG_ATTRS[tag] || {}) },
         styles: { ...TAG_DEFAULTS[tag] || TAG_DEFAULTS.div },
         content: TAG_CONTENT[tag] ?? "",
         parentId: null,

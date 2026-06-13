@@ -132,7 +132,7 @@ export function htmlToElements(code, existingElements = [], javascript = "") {
       const styles = Object.keys(inlineStyles).length ? inlineStyles : { ...(existing?.styles || {}) };
       const attrs = {
         ...(existing?.attrs || {}),
-        id: node.getAttribute("id") || "",
+        ...attrsFromNode(node),
       };
 
       // Collect text content (only if no child elements)
@@ -230,6 +230,17 @@ function escapeAttr(value) {
     .replace(/"/g, "&quot;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
+}
+
+function attrsFromNode(node) {
+  const attrs = {};
+  Array.from(node.attributes).forEach((attr) => {
+    if (attr.name === "data-lab-id" || attr.name === "style") return;
+    attrs[attr.name] = attr.value;
+  });
+  if (!("id" in attrs)) attrs.id = "";
+  if (!("class" in attrs)) attrs.class = "";
+  return attrs;
 }
 
 export function parseStyleString(str) {
