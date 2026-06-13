@@ -6,8 +6,8 @@
   overflow: hidden;
   font-family: system-ui, -apple-system, sans-serif;
   font-size: 13px;
-  background: #f5f5f3;
-  color: #1a1a18;
+  background: #1e1e1e;
+  color: #d4d4d4;
 }
 
 /* ── Toolbar ─────────────────────────────────────────────────────────────────── */
@@ -16,8 +16,8 @@
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  background: #ffffff;
-  border-bottom: 0.5px solid rgba(0, 0, 0, 0.12);
+  background: #252526;
+  border-bottom: 1px solid #3c3c3c;
   flex-shrink: 0;
   flex-wrap: wrap;
   min-height: 42px;
@@ -25,102 +25,73 @@
 
 .backBtn {
   padding: 4px 10px;
-  border: 0.5px solid rgba(0, 0, 0, 0.2);
+  border: 1px solid #4d4d4d;
   border-radius: 5px;
   background: transparent;
-  color: #5f5e5a;
+  color: #9d9d9d;
   cursor: pointer;
   font-size: 12px;
   transition: background 0.1s, color 0.1s;
   margin-right: 4px;
   flex-shrink: 0;
 }
-
-.backBtn:hover {
-  background: rgba(0, 0, 0, 0.06);
-  color: #1a1a18;
-}
+.backBtn:hover { background: rgba(255,255,255,0.07); color: #fff; }
 
 .toolbarLogo {
   font-size: 13px;
-  font-weight: 500;
-  color: #1a1a18;
+  font-weight: 600;
+  color: #cba6f7;
   margin-right: 4px;
   letter-spacing: -0.01em;
 }
 
 .toolbarSep {
-  width: 0.5px;
+  width: 1px;
   height: 20px;
-  background: rgba(0, 0, 0, 0.12);
-  margin: 0 2px;
+  background: #3c3c3c;
+  margin: 0 4px;
   flex-shrink: 0;
 }
 
-.toolbarLabel {
-  font-size: 11px;
-  color: #888780;
-}
+.toolbarLabel { font-size: 11px; color: #777; }
 
 .elemBtn {
   padding: 3px 8px;
-  border: 0.5px dashed rgba(0, 0, 0, 0.25);
+  border: 1px dashed #555;
   border-radius: 4px;
   background: transparent;
-  color: #5f5e5a;
+  color: #9cdcfe;
   cursor: pointer;
   font-size: 11px;
-  font-family: monospace;
-  transition: border-color 0.1s, color 0.1s, background 0.1s;
+  font-family: "JetBrains Mono", Consolas, monospace;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
 }
-
 .elemBtn:hover {
-  border-color: #185fa5;
-  color: #185fa5;
-  background: #e6f1fb;
+  border-color: #569cd6;
+  color: #fff;
+  background: rgba(86,156,214,0.15);
   border-style: solid;
 }
 
 .tbBtn {
   padding: 4px 10px;
-  border: 0.5px solid rgba(0, 0, 0, 0.2);
+  border: 1px solid #4d4d4d;
   border-radius: 5px;
   background: transparent;
-  color: #1a1a18;
+  color: #ccc;
   cursor: pointer;
   font-size: 12px;
-  transition: background 0.1s;
+  transition: background 0.1s, color 0.1s;
 }
-
-.tbBtn:hover:not(:disabled) {
-  background: rgba(0, 0, 0, 0.05);
-}
-
-.tbBtn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.tbBtnActive {
-  background: #185fa5;
-  color: #fff;
-  border-color: #185fa5;
-}
-
-.tbBtnDanger:hover {
-  background: #fee2e2;
-  color: #991b1b;
-  border-color: #fca5a5;
-}
+.tbBtn:hover:not(:disabled) { background: rgba(255,255,255,0.08); color: #fff; }
+.tbBtn:disabled { opacity: 0.35; cursor: not-allowed; }
+.tbBtnActive { background: #0e639c; color: #fff; border-color: #0e639c; }
+.tbBtnDanger:hover { background: rgba(232,75,74,0.2); color: #f87171; border-color: rgba(232,75,74,0.5); }
 
 /* ── Main layout ─────────────────────────────────────────────────────────────── */
-.main {
-  display: flex;
-  flex: 1;
-  overflow: hidden;
-}
+.main { display: flex; flex: 1; overflow: hidden; }
 
-/* ── Panel shared ────────────────────────────────────────────────────────────── */
+/* ── Panel header ────────────────────────────────────────────────────────────── */
 .panelHeader {
   display: flex;
   align-items: center;
@@ -128,17 +99,13 @@
   padding: 5px 12px;
   font-size: 11px;
   font-weight: 500;
-  color: #5f5e5a;
-  background: rgba(0, 0, 0, 0.03);
-  border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
+  color: #9d9d9d;
+  background: #2d2d2d;
+  border-bottom: 1px solid #3c3c3c;
   flex-shrink: 0;
+  gap: 8px;
 }
-
-.panelHint {
-  font-size: 10px;
-  color: #888780;
-  font-weight: 400;
-}
+.panelHint { font-size: 10px; color: #555; font-weight: 400; }
 
 /* ── Canvas panel ────────────────────────────────────────────────────────────── */
 .canvasPanel {
@@ -146,202 +113,195 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: #f9f9f7;
+  background: #fff;
   min-width: 0;
+  border-left: 1px solid #3c3c3c;
+  border-right: 1px solid #3c3c3c;
 }
 
 .canvasDrop {
   flex: 1;
-  overflow: auto;
-  position: relative;
-  padding: 0;
+  overflow-y: auto;
+  padding: 16px;
+  background: #fafafa;
 }
 
 .emptyHint {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  padding: 48px 24px;
   text-align: center;
-  color: #888780;
+  color: #aaa;
   pointer-events: none;
 }
+.emptyIcon { font-size: 32px; margin-bottom: 8px; opacity: 0.4; }
+.emptyHint p { font-size: 13px; line-height: 1.7; margin: 0; }
 
-.emptyIcon {
-  font-size: 36px;
-  margin-bottom: 8px;
-  opacity: 0.5;
+/* ── Drop zones (between elements) ──────────────────────────────────────────── */
+.dropZone {
+  height: 4px;
+  border-radius: 2px;
+  margin: 2px 0;
+  background: transparent;
+  transition: height 0.12s, background 0.12s;
+}
+.dropZoneActive {
+  height: 8px;
+  background: #569cd6;
+  border-radius: 4px;
+  box-shadow: 0 0 8px rgba(86, 156, 214, 0.6);
 }
 
-.emptyHint p {
-  font-size: 13px;
-  line-height: 1.7;
-  margin: 0;
-}
-
-/* ── Canvas elements ─────────────────────────────────────────────────────────── */
-.cvWrap {
-  position: absolute;
+/* ── Element wrapper card ────────────────────────────────────────────────────── */
+.elWrap {
+  position: relative;
+  border: 1.5px solid transparent;
+  border-radius: 4px;
+  transition: border-color 0.12s, box-shadow 0.12s, opacity 0.12s;
   cursor: grab;
+}
+.elWrap:hover {
+  border-color: rgba(86, 156, 214, 0.3);
+}
+.elWrap:active { cursor: grabbing; }
+
+.elSelected {
+  border-color: #569cd6 !important;
+  box-shadow: 0 0 0 2px rgba(86, 156, 214, 0.2);
+}
+
+.elDragging {
+  opacity: 0.4;
+}
+
+/* Green glow when hovering a container to drop inside */
+.elDropInside {
+  border-color: #22c55e !important;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2), inset 0 0 12px rgba(34, 197, 94, 0.06) !important;
+}
+
+/* ── Tag badge at top of element ─────────────────────────────────────────────── */
+.elTag {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1px 6px;
+  font-size: 9px;
+  font-family: "JetBrains Mono", monospace;
+  color: #888;
+  background: rgba(0,0,0,0.04);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  border-radius: 3px 3px 0 0;
   user-select: none;
 }
-
-.cvWrap:active {
-  cursor: grabbing;
+.elSelected .elTag {
+  color: #569cd6;
+  background: rgba(86, 156, 214, 0.08);
 }
 
-.cvWrap:hover .cvTagLabel {
-  opacity: 0.6;
-}
-
-.cvSelected {
-  /* Selection ring is on the inner element via outline */
-}
-
-.cvSelected > * {
-  outline: 2px solid #185fa5 !important;
-  outline-offset: 1px;
-}
-
-.cvOverlay > * {
-  outline: 1px dashed rgba(24, 95, 165, 0.35) !important;
-}
-
-.cvTagLabel {
-  position: absolute;
-  top: -20px;
-  left: 0;
-  font-size: 9px;
-  background: #185fa5;
-  color: #fff;
-  padding: 2px 6px;
-  border-radius: 3px;
-  white-space: nowrap;
-  pointer-events: none;
-  z-index: 20;
+.elDelete {
+  background: none;
+  border: none;
+  color: #e24b4a;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
   opacity: 0;
   transition: opacity 0.1s;
 }
+.elSelected .elDelete { opacity: 1; }
+.elDelete:hover { color: #b91c1c; }
 
-.cvSelected .cvTagLabel {
-  opacity: 1 !important;
+/* ── Inner element (the actual styled tag) ───────────────────────────────────── */
+.elInner {
+  /* Let the tag's own styles render naturally */
 }
 
-.cvDelete {
-  position: absolute;
-  top: -20px;
-  right: 0;
-  width: 18px;
-  height: 18px;
-  background: #e24b4a;
-  border: none;
-  border-radius: 3px;
-  color: #fff;
-  font-size: 13px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 20;
-  line-height: 1;
-  padding: 0;
-}
-
-.cvDelete:hover {
-  background: #b91c1c;
-}
-
-.cvResize {
-  position: absolute;
-  right: -5px;
-  bottom: -5px;
-  width: 12px;
-  height: 12px;
-  background: #185fa5;
-  border: 2px solid #fff;
-  border-radius: 2px;
-  cursor: nw-resize;
-  z-index: 20;
-}
-
-.overlayLabels {
-  position: absolute;
-  bottom: -22px;
-  left: 0;
-  display: flex;
-  gap: 4px;
+/* ── Empty container hint ────────────────────────────────────────────────────── */
+.emptyContainerHint {
+  padding: 8px;
+  text-align: center;
+  font-size: 10px;
+  color: #22c55e;
+  border: 1px dashed #22c55e;
+  border-radius: 4px;
+  margin: 4px;
   pointer-events: none;
 }
 
+/* ── Overlay badges ──────────────────────────────────────────────────────────── */
+.overlayLabels {
+  display: flex;
+  gap: 4px;
+  padding: 2px 6px;
+  pointer-events: none;
+}
 .overlayMargin {
   font-size: 9px;
-  background: rgba(255, 165, 0, 0.85);
-  color: #7c4d00;
-  padding: 1px 4px;
+  font-family: monospace;
+  background: rgba(246,178,107,0.85);
+  color: #7c3d00;
+  padding: 1px 5px;
   border-radius: 2px;
 }
-
 .overlayPadding {
   font-size: 9px;
-  background: rgba(0, 180, 100, 0.85);
-  color: #064e2a;
-  padding: 1px 4px;
+  font-family: monospace;
+  background: rgba(52,211,153,0.85);
+  color: #065f46;
+  padding: 1px 5px;
   border-radius: 2px;
 }
 
 /* ── Divider ─────────────────────────────────────────────────────────────────── */
 .divider {
   width: 4px;
-  background: rgba(0, 0, 0, 0.08);
+  background: #3c3c3c;
   cursor: col-resize;
   flex-shrink: 0;
   transition: background 0.15s;
 }
+.divider:hover { background: #569cd6; }
 
-.divider:hover {
-  background: #185fa5;
-}
-
-/* ── Code panel ──────────────────────────────────────────────────────────────── */
+/* ── Code panel (Monaco) ─────────────────────────────────────────────────────── */
 .codePanel {
   display: flex;
   flex-direction: column;
   overflow: hidden;
   flex-shrink: 0;
-  border-left: 0.5px solid rgba(0, 0, 0, 0.1);
-  background: #fff;
+  background: #1e1e1e;
 }
-
-.codeEditor {
+.monacoWrap {
   flex: 1;
-  font-family: "Fira Code", "Cascadia Code", Consolas, monospace;
-  font-size: 12px;
-  line-height: 1.65;
-  padding: 12px;
-  border: none;
-  outline: none;
-  resize: none;
-  background: #fff;
-  color: #1a1a18;
-  overflow: auto;
-  tab-size: 2;
+  overflow: hidden;
+  min-height: 0;
 }
 
 /* ── Properties panel ────────────────────────────────────────────────────────── */
 .propsPanel {
-  width: 220px;
+  width: 240px;
   flex-shrink: 0;
-  border-left: 0.5px solid rgba(0, 0, 0, 0.1);
-  background: #fff;
+  border-left: 1px solid #3c3c3c;
+  background: #252526;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  color: #d4d4d4;
+}
+
+.nestedBadge {
+  font-size: 9px;
+  background: #0e639c;
+  color: #9cdcfe;
+  padding: 1px 5px;
+  border-radius: 3px;
+  margin-left: auto;
+  font-family: monospace;
 }
 
 .propsEmpty {
   padding: 24px 12px;
   text-align: center;
-  color: #888780;
+  color: #555;
   font-size: 12px;
   line-height: 1.6;
 }
@@ -351,10 +311,11 @@
   overflow-y: auto;
   overflow-x: hidden;
 }
+.propsBody::-webkit-scrollbar { width: 5px; }
+.propsBody::-webkit-scrollbar-track { background: transparent; }
+.propsBody::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
 
-.propSection {
-  border-bottom: 0.5px solid rgba(0, 0, 0, 0.08);
-}
+.propSection { border-bottom: 1px solid #333; }
 
 .propSectionTitle {
   width: 100%;
@@ -365,18 +326,15 @@
   background: transparent;
   border: none;
   font-size: 10px;
-  font-weight: 500;
-  color: #888780;
+  font-weight: 600;
+  color: #666;
   text-transform: uppercase;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.6px;
   cursor: pointer;
   text-align: left;
+  transition: color 0.1s, background 0.1s;
 }
-
-.propSectionTitle:hover {
-  color: #1a1a18;
-  background: rgba(0, 0, 0, 0.02);
-}
+.propSectionTitle:hover { color: #ccc; background: rgba(255,255,255,0.04); }
 
 .propRows {
   padding: 2px 8px 8px;
@@ -385,60 +343,53 @@
   gap: 3px;
 }
 
-.propRow {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
+.propRow { display: flex; align-items: center; gap: 5px; }
 
 .propLabel {
   width: 64px;
   font-size: 11px;
-  color: #888780;
+  color: #9cdcfe;
   text-align: right;
   flex-shrink: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-family: "JetBrains Mono", monospace;
 }
 
 .propInput {
   flex: 1;
   padding: 3px 6px;
-  border: 0.5px solid rgba(0, 0, 0, 0.18);
+  border: 1px solid #3c3c3c;
   border-radius: 4px;
   font-size: 11px;
-  background: #f9f9f7;
-  color: #1a1a18;
+  background: #1e1e1e;
+  color: #ce9178;
   outline: none;
   min-width: 0;
+  font-family: "JetBrains Mono", monospace;
+  transition: border-color 0.1s;
 }
-
-.propInput:focus {
-  border-color: #185fa5;
-  background: #fff;
-}
+.propInput:focus { border-color: #569cd6; }
 
 .propSelect {
   flex: 1;
   padding: 3px 4px;
-  border: 0.5px solid rgba(0, 0, 0, 0.18);
+  border: 1px solid #3c3c3c;
   border-radius: 4px;
   font-size: 11px;
-  background: #f9f9f7;
-  color: #1a1a18;
+  background: #1e1e1e;
+  color: #d4d4d4;
   outline: none;
   min-width: 0;
+  transition: border-color 0.1s;
 }
-
-.propSelect:focus {
-  border-color: #185fa5;
-}
+.propSelect:focus { border-color: #569cd6; }
 
 .propColor {
   width: 26px;
   height: 24px;
-  border: 0.5px solid rgba(0, 0, 0, 0.18);
+  border: 1px solid #3c3c3c;
   border-radius: 4px;
   cursor: pointer;
   padding: 1px;
@@ -447,48 +398,40 @@
 }
 
 /* ── Box model visual ────────────────────────────────────────────────────────── */
-.boxModel {
-  padding: 4px;
-}
+.boxModel { padding: 6px 4px; }
 
-.bmMargin {
-  background: rgba(255, 165, 0, 0.18);
+.bmLayer {
   border-radius: 4px;
-  padding: 6px;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
 }
-
-.bmBorder {
-  background: rgba(226, 75, 74, 0.12);
-  border-radius: 3px;
-  padding: 6px;
+.bmLayerLabel {
+  font-size: 8px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 2px 5px 0;
+  opacity: 0.8;
+  font-family: monospace;
 }
-
-.bmPadding {
-  background: rgba(0, 180, 100, 0.16);
-  border-radius: 2px;
-  padding: 6px;
-}
-
+.bmRow { display: flex; align-items: center; padding: 0 3px; flex: 1; }
+.bmTopVal { font-size: 9px; font-family: "JetBrains Mono", monospace; text-align: center; padding: 1px 0; opacity: 0.9; }
+.bmBottomVal { font-size: 9px; font-family: "JetBrains Mono", monospace; text-align: center; padding: 1px 0; opacity: 0.9; }
+.bmSideVal { font-size: 9px; font-family: "JetBrains Mono", monospace; padding: 0 3px; opacity: 0.9; flex-shrink: 0; }
 .bmContent {
-  background: rgba(24, 95, 165, 0.12);
-  border-radius: 2px;
+  flex: 1;
+  background: rgba(86,156,214,0.18);
+  border: 1px solid rgba(86,156,214,0.4);
+  border-radius: 3px;
   padding: 6px 4px;
   text-align: center;
-  font-size: 11px;
-  font-weight: 500;
-  color: #1a1a18;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin: 3px 0;
 }
-
-.bmLabel {
-  display: block;
-  font-size: 9px;
-  color: #5f5e5a;
-  margin-bottom: 2px;
-}
-
-.bmDims {
-  font-size: 9px;
-  color: #888780;
-  margin-top: 2px;
-}
+.bmContentTag { font-size: 10px; font-family: "JetBrains Mono", monospace; color: #9cdcfe; font-weight: 600; }
+.bmDims { font-size: 9px; font-family: "JetBrains Mono", monospace; color: #777; }

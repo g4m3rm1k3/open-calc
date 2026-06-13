@@ -14,15 +14,11 @@ export default function HtmlLab({ onBack }) {
   const dividerStartX = useRef(0);
   const dividerStartW = useRef(0);
 
-  // Sync: elements → code
   const generatedCode = elementsToHtml(state.elements);
 
-  // Sync: code → elements
   const handleCodeChange = useCallback((newCode) => {
     const parsed = htmlToElements(newCode, state.elements);
-    if (parsed) {
-      dispatch({ type: "SET_FROM_CODE", payload: parsed });
-    }
+    if (parsed) dispatch({ type: "SET_FROM_CODE", payload: parsed });
   }, [state.elements]);
 
   const handleDividerMouseDown = (e) => {
@@ -30,18 +26,17 @@ export default function HtmlLab({ onBack }) {
     dividerStartX.current = e.clientX;
     dividerStartW.current = codePanelWidth;
     e.preventDefault();
-
-    const onMove = (e) => {
+    const onMouseMove = (e) => {
       if (!dividerDragging.current) return;
-      const delta = dividerStartX.current - e.clientX;
+      const delta = e.clientX - dividerStartX.current;
       setCodePanelWidth(Math.max(200, Math.min(640, dividerStartW.current + delta)));
     };
     const onUp = () => {
       dividerDragging.current = false;
-      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mouseup", onUp);
     };
-    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("mouseup", onUp);
   };
 
@@ -56,25 +51,32 @@ export default function HtmlLab({ onBack }) {
         canUndo={state.history.length > 0}
         onBack={onBack}
       />
+      {/* Layout: [Code] | [Canvas] | [Properties] */}
       <div className={styles.main}>
+        <CodePanel
+          code={generatedCode}
+          width={codePanelWidth}
+          onChange={handleCodeChange}
+        />
+
+        <div className={styles.divider} onMouseDown={handleDividerMouseDown} />
+
         <CanvasPanel
           elements={state.elements}
           selectedId={state.selectedId}
           showOverlay={state.showOverlay}
           onSelect={(id) => dispatch({ type: "SELECT", payload: id })}
           onDeselect={() => dispatch({ type: "SELECT", payload: null })}
-          onMove={(id, x, y) => dispatch({ type: "MOVE_ELEMENT", payload: { id, x, y } })}
-          onResize={(id, w, h) => dispatch({ type: "RESIZE_ELEMENT", payload: { id, w, h } })}
           onDelete={(id) => dispatch({ type: "DELETE_ELEMENT", payload: id })}
-          onMoveCommit={() => dispatch({ type: "PUSH_HISTORY" })}
-        />
-
-        <div className={styles.divider} onMouseDown={handleDividerMouseDown} />
-
-        <CodePanel
-          code={generatedCode}
-          width={codePanelWidth}
-          onChange={handleCodeChange}
+          onNest={(childId, parentId, order) =>
+            dispatch({ type: "NEST_ELEMENT", payload: { childId, parentId, order } })
+          }
+          onMoveToRoot={(id, order) =>
+            dispatch({ type: "MOVE_TO_ROOT", payload: { id, order } })
+          }
+          onReorder={(id, parentId, order) =>
+            dispatch({ type: "REORDER_ELEMENT", payload: { id, parentId, order } })
+          }
         />
 
         <PropertiesPanel

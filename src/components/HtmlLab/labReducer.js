@@ -1,64 +1,86 @@
 // ─── Default styles per tag ──────────────────────────────────────────────────
 const TAG_DEFAULTS = {
   div: {
-    width: "160px", height: "80px", backgroundColor: "#dbeafe",
-    padding: "8px", margin: "8px", border: "1px solid #93c5fd",
-    borderRadius: "4px", display: "block",
+    backgroundColor: "#dbeafe",
+    padding: "12px",
+    margin: "8px",
+    border: "1px solid #93c5fd",
+    borderRadius: "4px",
+    minHeight: "60px",
+    display: "block",
   },
   p: {
-    width: "200px", fontSize: "14px", color: "#1a1a18",
-    margin: "8px", padding: "4px", display: "block",
+    fontSize: "14px", color: "#1a1a18",
+    margin: "8px 0", padding: "4px", display: "block",
   },
   h1: {
-    width: "240px", fontSize: "28px", fontWeight: "600",
-    color: "#1a1a18", margin: "8px", padding: "4px", display: "block",
+    fontSize: "28px", fontWeight: "600",
+    color: "#1a1a18", margin: "8px 0", padding: "4px", display: "block",
   },
   h2: {
-    width: "220px", fontSize: "20px", fontWeight: "500",
-    color: "#1a1a18", margin: "8px", padding: "4px", display: "block",
+    fontSize: "20px", fontWeight: "500",
+    color: "#1a1a18", margin: "8px 0", padding: "4px", display: "block",
   },
   h3: {
-    width: "200px", fontSize: "16px", fontWeight: "500",
-    color: "#1a1a18", margin: "8px", padding: "4px", display: "block",
+    fontSize: "16px", fontWeight: "500",
+    color: "#1a1a18", margin: "8px 0", padding: "4px", display: "block",
   },
   button: {
     padding: "8px 16px", backgroundColor: "#1d4ed8", color: "#ffffff",
     border: "none", borderRadius: "6px", fontSize: "13px", cursor: "pointer",
-    display: "inline-block",
+    display: "inline-block", margin: "4px",
   },
   span: {
     padding: "4px 10px", backgroundColor: "#dcfce7", color: "#166534",
-    borderRadius: "4px", fontSize: "13px", display: "inline-block",
+    borderRadius: "4px", fontSize: "13px", display: "inline-block", margin: "4px",
   },
   img: {
     width: "120px", height: "80px", backgroundColor: "#e5e7eb",
-    border: "1px solid #d1d5db", borderRadius: "4px", display: "block",
+    border: "1px solid #d1d5db", borderRadius: "4px", display: "block", margin: "8px 0",
   },
   ul: {
-    width: "180px", padding: "8px 8px 8px 24px", margin: "8px",
-    border: "1px dashed #d1d5db", display: "block",
+    padding: "8px 8px 8px 24px", margin: "8px 0",
+    border: "1px dashed #d1d5db", display: "block", minHeight: "40px",
+  },
+  li: {
+    fontSize: "14px", color: "#1a1a18", padding: "2px 0", display: "list-item",
   },
   a: {
     color: "#1d4ed8", textDecoration: "underline",
-    fontSize: "14px", display: "inline-block",
+    fontSize: "14px", display: "inline", margin: "0 2px",
+  },
+  section: {
+    padding: "16px", margin: "8px 0", border: "1px solid #e5e7eb",
+    borderRadius: "6px", display: "block", minHeight: "60px",
+  },
+  article: {
+    padding: "16px", margin: "8px 0", backgroundColor: "#fafafa",
+    border: "1px solid #e5e7eb", borderRadius: "6px", display: "block", minHeight: "60px",
+  },
+  header: {
+    padding: "16px", margin: "0 0 8px", backgroundColor: "#f1f5f9",
+    borderBottom: "2px solid #e2e8f0", display: "block", minHeight: "50px",
+  },
+  footer: {
+    padding: "12px 16px", margin: "8px 0 0", backgroundColor: "#f8fafc",
+    borderTop: "1px solid #e2e8f0", display: "block",
   },
 };
 
 const TAG_CONTENT = {
   div: "", p: "Paragraph text", h1: "Heading 1", h2: "Heading 2",
   h3: "Heading 3", button: "Click me", span: "Span text",
-  img: "", ul: "List item", a: "Link text",
+  img: "", ul: "", li: "List item", a: "Link text",
+  section: "", article: "", header: "", footer: "",
 };
+
+// Tags that can contain children
+export const CONTAINER_TAGS = new Set([
+  "div", "section", "article", "header", "footer", "ul", "p", "span",
+]);
 
 let _idCounter = 1;
 function genId() { return "el" + (_idCounter++); }
-
-function scatter(index) {
-  return {
-    left: 20 + (index % 5) * 40 + Math.floor(index / 5) * 10,
-    top: 20 + (index % 4) * 30 + Math.floor(index / 4) * 20,
-  };
-}
 
 // ─── Initial state ────────────────────────────────────────────────────────────
 export const initialState = {
@@ -78,6 +100,21 @@ function withHistory(state) {
   return { ...state, history: history.slice(-40) };
 }
 
+// Get all descendant IDs of a given element
+function getDescendants(elements, id) {
+  const result = new Set();
+  const queue = [id];
+  while (queue.length) {
+    const cur = queue.shift();
+    const children = elements.filter((e) => e.parentId === cur);
+    for (const c of children) {
+      result.add(c.id);
+      queue.push(c.id);
+    }
+  }
+  return result;
+}
+
 // ─── Reducer ──────────────────────────────────────────────────────────────────
 export function labReducer(state, action) {
   switch (action.type) {
@@ -85,24 +122,27 @@ export function labReducer(state, action) {
     case "ADD_ELEMENT": {
       const s = withHistory(state);
       const tag = action.payload;
-      const pos = scatter(s.elements.length);
+      // Find max order among root elements
+      const rootEls = s.elements.filter((e) => !e.parentId);
+      const maxOrder = rootEls.reduce((m, e) => Math.max(m, e.order ?? 0), -1);
       const el = {
         id: genId(),
         tag,
         styles: { ...TAG_DEFAULTS[tag] || TAG_DEFAULTS.div },
         content: TAG_CONTENT[tag] ?? "",
-        x: pos.left,
-        y: pos.top,
+        parentId: null,
+        order: maxOrder + 1,
       };
       return { ...s, elements: [...s.elements, el], selectedId: el.id };
     }
 
     case "DELETE_ELEMENT": {
       const s = withHistory(state);
+      const toDelete = new Set([action.payload, ...getDescendants(s.elements, action.payload)]);
       return {
         ...s,
-        elements: s.elements.filter((e) => e.id !== action.payload),
-        selectedId: state.selectedId === action.payload ? null : state.selectedId,
+        elements: s.elements.filter((e) => !toDelete.has(e.id)),
+        selectedId: toDelete.has(state.selectedId) ? null : state.selectedId,
       };
     }
 
@@ -112,13 +152,78 @@ export function labReducer(state, action) {
     case "PUSH_HISTORY":
       return withHistory(state);
 
-    case "MOVE_ELEMENT": {
-      const { id, x, y } = action.payload;
+    // Nest element inside a container, at a given position (order)
+    case "NEST_ELEMENT": {
+      const { childId, parentId, order } = action.payload;
+      if (childId === parentId) return state;
+      const descendants = getDescendants(state.elements, childId);
+      if (descendants.has(parentId)) return state; // would be circular
+      const parent = state.elements.find((e) => e.id === parentId);
+      if (!parent || !CONTAINER_TAGS.has(parent.tag)) return state;
+
+      const s = withHistory(state);
+      // Shift siblings to make room
+      const siblings = s.elements
+        .filter((e) => e.parentId === parentId && e.id !== childId)
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+      const targetOrder = order ?? siblings.length;
+      const reordered = siblings.map((e, i) => ({
+        ...e,
+        order: i >= targetOrder ? i + 1 : i,
+      }));
+
       return {
-        ...state,
-        elements: state.elements.map((e) =>
-          e.id === id ? { ...e, x, y } : e
-        ),
+        ...s,
+        elements: s.elements.map((e) => {
+          if (e.id === childId) return { ...e, parentId, order: targetOrder };
+          const r = reordered.find((r) => r.id === e.id);
+          return r || e;
+        }),
+        selectedId: childId,
+      };
+    }
+
+    // Move element to root or different parent
+    case "MOVE_TO_ROOT": {
+      const { id, order } = action.payload;
+      const s = withHistory(state);
+      const rootEls = s.elements
+        .filter((e) => !e.parentId && e.id !== id)
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+      const targetOrder = order ?? rootEls.length;
+      const reordered = rootEls.map((e, i) => ({
+        ...e,
+        order: i >= targetOrder ? i + 1 : i,
+      }));
+      return {
+        ...s,
+        elements: s.elements.map((e) => {
+          if (e.id === id) return { ...e, parentId: null, order: targetOrder };
+          const r = reordered.find((r) => r.id === e.id);
+          return r || e;
+        }),
+      };
+    }
+
+    // Reorder within same parent
+    case "REORDER_ELEMENT": {
+      const { id, parentId, order } = action.payload;
+      const s = withHistory(state);
+      const siblings = s.elements
+        .filter((e) => e.parentId === (parentId || null) && e.id !== id)
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+      const targetOrder = Math.max(0, Math.min(order, siblings.length));
+      const reordered = siblings.map((e, i) => ({
+        ...e,
+        order: i >= targetOrder ? i + 1 : i,
+      }));
+      return {
+        ...s,
+        elements: s.elements.map((e) => {
+          if (e.id === id) return { ...e, parentId: parentId || null, order: targetOrder };
+          const r = reordered.find((r) => r.id === e.id);
+          return r || e;
+        }),
       };
     }
 
@@ -140,10 +245,10 @@ export function labReducer(state, action) {
         ...state,
         elements: state.elements.map((e) => {
           if (e.id !== state.selectedId) return e;
-          const styles = { ...e.styles };
-          if (value === "") delete styles[prop];
-          else styles[prop] = value;
-          return { ...e, styles };
+          const s2 = { ...e.styles };
+          if (value === "") delete s2[prop];
+          else s2[prop] = value;
+          return { ...e, styles: s2 };
         }),
       };
     }

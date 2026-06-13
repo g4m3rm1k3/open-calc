@@ -115,6 +115,9 @@ export default function PropertiesPanel({ element, onChange, onContentChange, on
     <div className={styles.propsPanel}>
       <div className={styles.panelHeader}>
         &lt;{element.tag}&gt; · {element.id}
+        {element.parentId && (
+          <span className={styles.nestedBadge}>nested</span>
+        )}
       </div>
       <div className={styles.propsBody}>
         {SECTIONS.map((sec) => (
@@ -231,24 +234,79 @@ function PropRow({ row, element, onChange, onContentChange, onTagChange }) {
   );
 }
 
+// ─── Box Model Visual ─────────────────────────────────────────────────────────
 function BoxModelVisual({ el }) {
   const s = el.styles;
+
+  // Parse 4-sided shorthand or individual values
+  function getSides(shorthand, top, right, bottom, left) {
+    const sh = s[shorthand] || "";
+    const parts = sh.trim().split(/\s+/);
+    if (parts.length === 1) {
+      return { t: parts[0], r: parts[0], b: parts[0], l: parts[0] };
+    }
+    if (parts.length === 2) {
+      return { t: parts[0], r: parts[1], b: parts[0], l: parts[1] };
+    }
+    if (parts.length === 4) {
+      return { t: parts[0], r: parts[1], b: parts[2], l: parts[3] };
+    }
+    return {
+      t: s[top] || "0",
+      r: s[right] || "0",
+      b: s[bottom] || "0",
+      l: s[left] || "0",
+    };
+  }
+
+  const margin = getSides("margin", "marginTop", "marginRight", "marginBottom", "marginLeft");
+  const padding = getSides("padding", "paddingTop", "paddingRight", "paddingBottom", "paddingLeft");
+  const border = s.border || "0";
+  const width = s.width || "auto";
+  const height = s.height || "auto";
+
   return (
     <div className={styles.boxModel}>
-      <div className={styles.bmMargin}>
-        <span className={styles.bmLabel}>margin: {s.margin || "0"}</span>
-        <div className={styles.bmBorder}>
-          <span className={styles.bmLabel}>border: {s.border || "none"}</span>
-          <div className={styles.bmPadding}>
-            <span className={styles.bmLabel}>padding: {s.padding || "0"}</span>
-            <div className={styles.bmContent}>
-              &lt;{el.tag}&gt;
-              <div className={styles.bmDims}>
-                {s.width || "auto"} × {s.height || "auto"}
+      {/* Margin layer */}
+      <div className={styles.bmLayer} style={{ background: "rgba(246,178,107,0.25)", border: "1px solid rgba(246,178,107,0.6)" }}>
+        <div className={styles.bmLayerLabel} style={{ color: "#c47d17" }}>margin</div>
+        <div className={styles.bmTopVal} style={{ color: "#c47d17" }}>{margin.t}</div>
+        <div className={styles.bmRow}>
+          <span className={styles.bmSideVal} style={{ color: "#c47d17" }}>{margin.l}</span>
+
+          {/* Border layer */}
+          <div className={styles.bmLayer} style={{ background: "rgba(226,75,74,0.12)", border: "1px solid rgba(226,75,74,0.4)", flex: 1 }}>
+            <div className={styles.bmLayerLabel} style={{ color: "#b91c1c" }}>border</div>
+            <div className={styles.bmTopVal} style={{ color: "#b91c1c" }}>{border}</div>
+            <div className={styles.bmRow}>
+              <span className={styles.bmSideVal} style={{ color: "#b91c1c" }}>—</span>
+
+              {/* Padding layer */}
+              <div className={styles.bmLayer} style={{ background: "rgba(0,180,100,0.14)", border: "1px solid rgba(0,180,100,0.4)", flex: 1 }}>
+                <div className={styles.bmLayerLabel} style={{ color: "#166534" }}>padding</div>
+                <div className={styles.bmTopVal} style={{ color: "#166534" }}>{padding.t}</div>
+                <div className={styles.bmRow}>
+                  <span className={styles.bmSideVal} style={{ color: "#166534" }}>{padding.l}</span>
+
+                  {/* Content layer */}
+                  <div className={styles.bmContent}>
+                    <div className={styles.bmContentTag}>&lt;{el.tag}&gt;</div>
+                    <div className={styles.bmDims}>{width} × {height}</div>
+                  </div>
+
+                  <span className={styles.bmSideVal} style={{ color: "#166534" }}>{padding.r}</span>
+                </div>
+                <div className={styles.bmBottomVal} style={{ color: "#166534" }}>{padding.b}</div>
               </div>
+
+              <span className={styles.bmSideVal} style={{ color: "#b91c1c" }}>—</span>
             </div>
+            <div className={styles.bmBottomVal} style={{ color: "#b91c1c" }}>{border}</div>
           </div>
+
+          <span className={styles.bmSideVal} style={{ color: "#c47d17" }}>{margin.r}</span>
         </div>
+        <div className={styles.bmBottomVal} style={{ color: "#c47d17" }}>{margin.b}</div>
       </div>
     </div>
   );

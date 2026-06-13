@@ -1,16 +1,21 @@
 import styles from "./HtmlLab.module.css";
 
 const ELEMENTS = [
-  { tag: "div",    label: "div" },
-  { tag: "p",      label: "p" },
-  { tag: "h1",     label: "H1" },
-  { tag: "h2",     label: "H2" },
-  { tag: "h3",     label: "H3" },
-  { tag: "button", label: "button" },
-  { tag: "span",   label: "span" },
-  { tag: "img",    label: "img" },
-  { tag: "a",      label: "a" },
-  { tag: "ul",     label: "ul" },
+  { tag: "div",     label: "div",     title: "Generic container" },
+  { tag: "section", label: "section", title: "Section container" },
+  { tag: "article", label: "article", title: "Article container" },
+  { tag: "header",  label: "header",  title: "Header container" },
+  { tag: "footer",  label: "footer",  title: "Footer container" },
+  { tag: "ul",      label: "ul",      title: "Unordered list" },
+  { tag: "li",      label: "li",      title: "List item" },
+  { tag: "p",       label: "p",       title: "Paragraph" },
+  { tag: "h1",      label: "H1",      title: "Heading 1" },
+  { tag: "h2",      label: "H2",      title: "Heading 2" },
+  { tag: "h3",      label: "H3",      title: "Heading 3" },
+  { tag: "button",  label: "button",  title: "Button" },
+  { tag: "span",    label: "span",    title: "Inline container" },
+  { tag: "a",       label: "a",       title: "Anchor / link" },
+  { tag: "img",     label: "img",     title: "Image placeholder" },
 ];
 
 export default function Toolbar({
@@ -33,12 +38,12 @@ export default function Toolbar({
       <div className={styles.toolbarSep} />
 
       <span className={styles.toolbarLabel}>Add element:</span>
-      {ELEMENTS.map(({ tag, label }) => (
+      {ELEMENTS.map(({ tag, label, title }) => (
         <button
           key={tag}
           className={styles.elemBtn}
           onClick={() => onAddElement(tag)}
-          title={`Add <${tag}>`}
+          title={title}
         >
           {label}
         </button>

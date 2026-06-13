@@ -2,16 +2,29 @@
 export function elementsToHtml(elements) {
   const VOID_TAGS = new Set(["img", "br", "hr", "input", "meta", "link"]);
 
-  const lines = elements.map((el) => {
+  function renderEl(el, depth = 1) {
+    const indent = "  ".repeat(depth);
     const styleStr = stylesToString(el.styles);
-    const posStyle = `left:${el.x}px; top:${el.y}px; position:absolute;`;
-    const fullStyle = [posStyle, styleStr].filter(Boolean).join(" ");
+    const children = elements
+      .filter((c) => c.parentId === el.id)
+      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
     if (VOID_TAGS.has(el.tag)) {
-      return `  <${el.tag} style="${fullStyle}" />`;
+      return `${indent}<${el.tag}${styleStr ? ` style="${styleStr}"` : ""} />`;
     }
-    return `  <${el.tag} style="${fullStyle}">${el.content || ""}</${el.tag}>`;
-  });
+    if (children.length > 0) {
+      const childLines = children.map((c) => renderEl(c, depth + 1)).join("\n");
+      const inner = el.content
+        ? `\n${indent}  ${el.content}\n${childLines}\n${indent}`
+        : `\n${childLines}\n${indent}`;
+      return `${indent}<${el.tag}${styleStr ? ` style="${styleStr}"` : ""}>${inner}</${el.tag}>`;
+    }
+    return `${indent}<${el.tag}${styleStr ? ` style="${styleStr}"` : ""}>${el.content || ""}</${el.tag}>`;
+  }
+
+  const roots = elements
+    .filter((el) => !el.parentId)
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
   return [
     `<!DOCTYPE html>`,
@@ -19,12 +32,12 @@ export function elementsToHtml(elements) {
     `<head>`,
     `  <meta charset="UTF-8" />`,
     `  <style>`,
-    `    body { margin: 0; font-family: sans-serif; position: relative; min-height: 100vh; }`,
+    `    body { margin: 16px; font-family: sans-serif; }`,
     `  </style>`,
     `</head>`,
     `<body>`,
     ``,
-    ...lines,
+    ...roots.map((el) => renderEl(el)),
     ``,
     `</body>`,
     `</html>`,
@@ -39,38 +52,46 @@ export function htmlToElements(code, existingElements) {
     const body = doc.body;
     const SKIP = new Set(["script", "style", "meta", "link"]);
 
-    const nodes = Array.from(body.children).filter(
+    let counter = Date.now();
+    function nextId() { return "el" + (counter++); }
+
+    function parseNode(node, parentId, order) {
+      const tag = node.tagName.toLowerCase();
+      if (SKIP.has(tag)) return [];
+
+      const styleStr = node.getAttribute("style") || "";
+      const styles = parseStyleString(styleStr);
+
+      // Collect text content (only if no child elements)
+      const childEls = Array.from(node.children).filter(
+        (c) => !SKIP.has(c.tagName.toLowerCase())
+      );
+      const content = childEls.length === 0 ? (node.textContent || "").trim() : "";
+
+      const el = {
+        id: nextId(),
+        tag,
+        styles,
+        content,
+        parentId: parentId || null,
+        order,
+      };
+
+      const descendants = [];
+      childEls.forEach((child, i) => {
+        descendants.push(...parseNode(child, el.id, i));
+      });
+
+      return [el, ...descendants];
+    }
+
+    const rootNodes = Array.from(body.children).filter(
       (c) => !SKIP.has(c.tagName.toLowerCase())
     );
+    if (rootNodes.length === 0) return null;
 
-    if (nodes.length === 0) return null;
-
-    const result = nodes.map((node, i) => {
-      const tag = node.tagName.toLowerCase();
-      const styleStr = node.getAttribute("style") || "";
-      const allStyles = parseStyleString(styleStr);
-
-      // Pull position out of styles into x/y
-      const x = parseInt(allStyles.left) || 20 + i * 20;
-      const y = parseInt(allStyles.top) || 20 + i * 20;
-      delete allStyles.left;
-      delete allStyles.top;
-      delete allStyles.position;
-
-      // Preserve existing id if same slot
-      const existing = existingElements[i];
-      const id = existing?.id || "el" + (Date.now() + i);
-
-      return {
-        id,
-        tag,
-        styles: allStyles,
-        content: node.textContent || "",
-        x,
-        y,
-      };
-    });
-
+    const result = [];
+    rootNodes.forEach((node, i) => result.push(...parseNode(node, null, i)));
     return result;
   } catch (err) {
     console.warn("htmlToElements parse error:", err);
@@ -83,7 +104,7 @@ export function stylesToString(styles) {
   return Object.entries(styles)
     .map(([k, v]) => {
       const prop = k.replace(/([A-Z])/g, "-$1").toLowerCase();
-      return `${prop}:${v}`;
+      return `${prop}: ${v}`;
     })
     .join("; ");
 }
@@ -97,7 +118,6 @@ export function parseStyleString(str) {
     const key = part.slice(0, colonIdx).trim();
     const val = part.slice(colonIdx + 1).trim();
     if (!key || !val) return;
-    // Convert kebab-case to camelCase
     const camel = key.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
     result[camel] = val;
   });

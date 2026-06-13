@@ -1,191 +1,270 @@
-import { useRef, useCallback } from "react";
+import { useRef, useState, useCallback } from "react";
 import styles from "./HtmlLab.module.css";
+import { CONTAINER_TAGS } from "./labReducer";
 
 const VOID_TAGS = new Set(["img", "br", "hr", "input"]);
 
+/**
+ * CanvasPanel — document-flow HTML builder
+ *
+ * Mental model:
+ *   • Elements flow in document order (no absolute positioning)
+ *   • Dragging an element shows drop zones throughout the tree
+ *   • Dropping INSIDE a container tag nests it as a child
+ *   • Dropping BETWEEN elements reorders them
+ */
 export default function CanvasPanel({
   elements,
   selectedId,
   showOverlay,
   onSelect,
   onDeselect,
-  onMove,
-  onResize,
   onDelete,
-  onMoveCommit,
+  onNest,       // (childId, parentId, order)
+  onMoveToRoot, // (id, order)
+  onReorder,    // (id, parentId, order)
 }) {
+  // dropTarget: { parentId: string|null, order: number, type: "inside"|"before"|"after" }
+  const [dropTarget, setDropTarget] = useState(null);
+  const [draggingId, setDraggingId] = useState(null);
   const canvasRef = useRef(null);
-  const dragState = useRef(null);
-  const resizeState = useRef(null);
 
-  // ── drag start ──────────────────────────────────────────────────────────────
-  const handleWrapMouseDown = useCallback((e, el, isResizeHandle) => {
+  // ── Sort helper ──────────────────────────────────────────────────────────────
+  const childrenOf = useCallback((parentId) =>
+    elements
+      .filter((e) => (e.parentId ?? null) === (parentId ?? null))
+      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0)),
+  [elements]);
+
+  const byId = {};
+  for (const e of elements) byId[e.id] = e;
+
+  // ── Drag start ───────────────────────────────────────────────────────────────
+  const handleDragStart = (e, el) => {
     e.stopPropagation();
-    onSelect(el.id);
+    // Use a ghost image
+    const ghost = e.currentTarget.cloneNode(true);
+    ghost.style.opacity = "0.6";
+    ghost.style.position = "fixed";
+    ghost.style.top = "-9999px";
+    document.body.appendChild(ghost);
+    e.dataTransfer.setDragImage(ghost, 20, 20);
+    setTimeout(() => document.body.removeChild(ghost), 0);
 
-    if (isResizeHandle) {
-      resizeState.current = {
-        id: el.id,
-        startX: e.clientX,
-        startY: e.clientY,
-        startW: parseInt(el.styles.width) || 100,
-        startH: parseInt(el.styles.height) || 50,
-      };
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", el.id);
+    setDraggingId(el.id);
+  };
+
+  const handleDragEnd = () => {
+    setDraggingId(null);
+    setDropTarget(null);
+  };
+
+  // ── Drop zone enter/leave ────────────────────────────────────────────────────
+  const handleDropZoneEnter = (e, parentId, order) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDropTarget({ parentId: parentId ?? null, order });
+  };
+
+  const handleInsideEnter = (e, parentId) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const children = childrenOf(parentId);
+    setDropTarget({ parentId, order: children.length, type: "inside" });
+  };
+
+  // ── Drop ─────────────────────────────────────────────────────────────────────
+  const handleDrop = (e, parentId, order) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const childId = e.dataTransfer.getData("text/plain");
+    if (!childId) return;
+
+    const child = byId[childId];
+    if (!child) return;
+
+    if (parentId === null) {
+      // Drop to root
+      const sameParent = child.parentId === null;
+      if (sameParent) {
+        onReorder(childId, null, order);
+      } else {
+        onMoveToRoot(childId, order);
+      }
     } else {
-      const wrap = e.currentTarget;
-      const rect = wrap.getBoundingClientRect();
-      dragState.current = {
-        id: el.id,
-        offX: e.clientX - rect.left,
-        offY: e.clientY - rect.top,
-      };
+      // Drop into a container
+      const sameParent = child.parentId === parentId;
+      if (sameParent) {
+        onReorder(childId, parentId, order);
+      } else {
+        onNest(childId, parentId, order);
+      }
     }
+    setDropTarget(null);
+    setDraggingId(null);
+  };
 
-    const onMove2 = (moveE) => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      const canvasRect = canvas.getBoundingClientRect();
+  // ── Canvas-level drop (root, end) ────────────────────────────────────────────
+  const handleCanvasDrop = (e) => {
+    e.preventDefault();
+    const childId = e.dataTransfer.getData("text/plain");
+    if (!childId) return;
+    const roots = childrenOf(null);
+    onMoveToRoot(childId, roots.length);
+    setDropTarget(null);
+    setDraggingId(null);
+  };
 
-      if (dragState.current) {
-        const x = Math.max(0, moveE.clientX - canvasRect.left - dragState.current.offX);
-        const y = Math.max(0, moveE.clientY - canvasRect.top - dragState.current.offY);
-        onMove(dragState.current.id, Math.round(x), Math.round(y));
-      }
+  // ── Render a between-sibling drop zone ───────────────────────────────────────
+  const renderDropZone = (parentId, order, key) => {
+    const isActive =
+      dropTarget &&
+      (dropTarget.parentId ?? null) === (parentId ?? null) &&
+      dropTarget.order === order;
 
-      if (resizeState.current) {
-        const dw = moveE.clientX - resizeState.current.startX;
-        const dh = moveE.clientY - resizeState.current.startY;
-        const w = Math.max(30, resizeState.current.startW + dw);
-        const h = Math.max(20, resizeState.current.startH + dh);
-        onResize(resizeState.current.id, Math.round(w), Math.round(h));
-      }
-    };
+    return (
+      <div
+        key={key}
+        className={`${styles.dropZone} ${isActive ? styles.dropZoneActive : ""}`}
+        onDragOver={(e) => { e.preventDefault(); handleDropZoneEnter(e, parentId, order); }}
+        onDragEnter={(e) => handleDropZoneEnter(e, parentId, order)}
+        onDrop={(e) => handleDrop(e, parentId, order)}
+      />
+    );
+  };
 
-    const onUp = () => {
-      if (dragState.current || resizeState.current) onMoveCommit();
-      dragState.current = null;
-      resizeState.current = null;
-      window.removeEventListener("mousemove", onMove2);
-      window.removeEventListener("mouseup", onUp);
-    };
+  // ── Render one element ───────────────────────────────────────────────────────
+  const renderElement = (el) => {
+    const isSelected = el.id === selectedId;
+    const isDragging = el.id === draggingId;
+    const children = childrenOf(el.id);
+    const isContainer = CONTAINER_TAGS.has(el.tag);
 
-    window.addEventListener("mousemove", onMove2);
-    window.addEventListener("mouseup", onUp);
-  }, [onSelect, onMove, onResize, onMoveCommit]);
+    // "Drop inside" highlight: user is hovering inside this container
+    const isInsideTarget =
+      isContainer &&
+      dropTarget?.parentId === el.id;
+
+    return (
+      <div
+        key={el.id}
+        className={[
+          styles.elWrap,
+          isSelected ? styles.elSelected : "",
+          isDragging ? styles.elDragging : "",
+          isInsideTarget ? styles.elDropInside : "",
+        ].join(" ")}
+        draggable
+        onDragStart={(e) => handleDragStart(e, el)}
+        onDragEnd={handleDragEnd}
+        onClick={(e) => { e.stopPropagation(); onSelect(el.id); }}
+        onDragOver={(e) => {
+          if (!isContainer) return;
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+        onDrop={(e) => {
+          if (!isContainer) return;
+          const childId = e.dataTransfer.getData("text/plain");
+          if (!childId || childId === el.id) return;
+          e.stopPropagation();
+          handleDrop(e, el.id, children.length);
+        }}
+      >
+        {/* tag badge */}
+        <div className={styles.elTag}>
+          &lt;{el.tag}&gt;
+          {isSelected && (
+            <button
+              className={styles.elDelete}
+              onClick={(e) => { e.stopPropagation(); onDelete(el.id); }}
+              title="Delete"
+            >×</button>
+          )}
+        </div>
+
+        {/* render the actual element */}
+        <div className={styles.elInner}>
+          {renderTag(el, children, renderElement, renderDropZone, isContainer, isInsideTarget)}
+        </div>
+
+        {/* overlay badges */}
+        {showOverlay && (
+          <div className={styles.overlayLabels}>
+            <span className={styles.overlayMargin}>M: {el.styles.margin || "0"}</span>
+            <span className={styles.overlayPadding}>P: {el.styles.padding || "0"}</span>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const roots = childrenOf(null);
 
   return (
     <div className={styles.canvasPanel}>
       <div className={styles.panelHeader}>
         <span>Canvas</span>
         <span className={styles.panelHint}>
-          Click an element type above to add · drag to move · click to select
+          Drag to move · drop onto a container to nest · drop between elements to reorder
         </span>
       </div>
 
       <div
         ref={canvasRef}
         className={styles.canvasDrop}
-        onClick={(e) => {
-          if (e.target === e.currentTarget) onDeselect();
-        }}
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={handleCanvasDrop}
+        onClick={(e) => { if (e.target === e.currentTarget) onDeselect(); }}
       >
         {elements.length === 0 && (
           <div className={styles.emptyHint}>
             <div className={styles.emptyIcon}>↑</div>
-            <p>Add elements from the toolbar above.<br />Click an element to edit its styles.</p>
+            <p>Add elements from the toolbar above.<br />Drag to reorder or nest inside containers.</p>
           </div>
         )}
 
-        {elements.map((el) => {
-          const isSelected = el.id === selectedId;
-          const wrapClass = [
-            styles.cvWrap,
-            isSelected ? styles.cvSelected : "",
-            showOverlay ? styles.cvOverlay : "",
-          ].join(" ");
-
-          const innerStyles = { ...el.styles };
-          // Width/height on wrapping div, not inner tag (so resize works cleanly)
-          const w = innerStyles.width;
-          const h = innerStyles.height;
-          delete innerStyles.width;
-          delete innerStyles.height;
-
-          return (
-            <div
-              key={el.id}
-              className={wrapClass}
-              style={{
-                position: "absolute",
-                left: el.x,
-                top: el.y,
-                width: w || "auto",
-                height: h || "auto",
-                zIndex: isSelected ? 100 : 1,
-                cursor: "grab",
-              }}
-              onMouseDown={(e) => handleWrapMouseDown(e, el, false)}
-            >
-              {/* tag label */}
-              {isSelected && (
-                <div className={styles.cvTagLabel}>&lt;{el.tag}&gt;</div>
-              )}
-
-              {/* delete button */}
-              {isSelected && (
-                <button
-                  className={styles.cvDelete}
-                  onClick={(e) => { e.stopPropagation(); onDelete(el.id); }}
-                  title="Delete element"
-                >
-                  ×
-                </button>
-              )}
-
-              {/* the actual element */}
-              {renderInner(el, innerStyles)}
-
-              {/* resize handle */}
-              {isSelected && (
-                <div
-                  className={styles.cvResize}
-                  onMouseDown={(e) => { e.stopPropagation(); handleWrapMouseDown(e, el, true); }}
-                />
-              )}
-
-              {/* overlay badges */}
-              {showOverlay && (
-                <div className={styles.overlayLabels}>
-                  <span className={styles.overlayMargin}>M: {el.styles.margin || "0"}</span>
-                  <span className={styles.overlayPadding}>P: {el.styles.padding || "0"}</span>
-                </div>
-              )}
-            </div>
-          );
-        })}
+        {/* root-level drop zones interleaved with elements */}
+        {roots.length > 0 && renderDropZone(null, 0, "root-0")}
+        {roots.map((el, i) => (
+          <div key={el.id}>
+            {renderElement(el)}
+            {renderDropZone(null, i + 1, `root-${i + 1}`)}
+          </div>
+        ))}
       </div>
     </div>
   );
 }
 
-function renderInner(el, innerStyles) {
+// ── Render the actual HTML tag with styling applied ──────────────────────────
+function renderTag(el, children, renderElement, renderDropZone, isContainer, isInsideTarget) {
   const Tag = el.tag;
-  const shared = {
-    style: { ...innerStyles, width: "100%", height: "100%", boxSizing: "border-box", pointerEvents: "none", userSelect: "none" },
+  const tagStyle = {
+    ...el.styles,
+    boxSizing: "border-box",
+    // Containers need visible min-height so you can drop into empty ones
+    minHeight: isContainer && children.length === 0 ? "48px" : undefined,
   };
 
   if (el.tag === "img") {
     return (
       <div
         style={{
-          ...shared.style,
-          backgroundImage: "repeating-linear-gradient(45deg, #ccc 0, #ccc 1px, transparent 0, transparent 50%)",
+          ...tagStyle,
+          width: tagStyle.width || "120px",
+          height: tagStyle.height || "80px",
+          backgroundImage: "repeating-linear-gradient(45deg,#ccc 0,#ccc 1px,transparent 0,transparent 50%)",
           backgroundSize: "10px 10px",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           fontSize: "11px",
           color: "#888",
+          borderRadius: tagStyle.borderRadius,
+          border: tagStyle.border,
         }}
       >
         img
@@ -194,8 +273,28 @@ function renderInner(el, innerStyles) {
   }
 
   if (VOID_TAGS.has(el.tag)) {
-    return <Tag {...shared} />;
+    return <Tag style={tagStyle} />;
   }
 
-  return <Tag {...shared}>{el.content || ""}</Tag>;
+  if (isContainer) {
+    return (
+      <Tag style={tagStyle}>
+        {el.content && <span>{el.content}</span>}
+
+        {/* interleave children with drop zones */}
+        {children.length === 0 && isInsideTarget && (
+          <div className={styles.emptyContainerHint}>drop here</div>
+        )}
+        {children.length > 0 && renderDropZone(el.id, 0, `${el.id}-dz-0`)}
+        {children.map((child, i) => (
+          <div key={child.id}>
+            {renderElement(child)}
+            {renderDropZone(el.id, i + 1, `${el.id}-dz-${i + 1}`)}
+          </div>
+        ))}
+      </Tag>
+    );
+  }
+
+  return <Tag style={tagStyle}>{el.content || ""}</Tag>;
 }
