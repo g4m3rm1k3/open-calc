@@ -207,43 +207,51 @@ function hexLum(hex) {
   return 0.299 * r + 0.587 * g + 0.114 * b;
 }
 
-// Known default palette — only these values get swapped so user-set colors are preserved.
-const LIGHT_COLORS = new Set(["#0f172a", "#1e293b", "#475569", "#64748b", "#1a1a18"]);
-const LIGHT_BKGS   = new Set(["#ffffff", "#f8fafc", "#f1f5f9"]);
-const DARK_COLORS  = new Set(["#f8fafc", "#e2e8f0", "#94a3b8", "#cbd5e1"]);
-const DARK_BKGS    = new Set(["#0f172a", "#1e293b", "#334155"]);
+// Returns saturation (0–1) for a hex color — high saturation = brand/accent color, skip swapping
+function hexSat(hex) {
+  if (!hex || !hex.startsWith("#") || hex.length < 7) return 1;
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  const max = Math.max(r, g, b);
+  return max === 0 ? 0 : (max - Math.min(r, g, b)) / max;
+}
 
+// Cascade body theme change to all child elements.
+// Uses luminance + saturation: only swaps neutral greys/near-whites/near-blacks.
+// Brand/accent colors (blues, greens, reds — high saturation) are left untouched.
 function cascadeBodyTheme(elements, newBodyStyles) {
   const rawBg = newBodyStyles.backgroundColor || newBodyStyles.background || "";
   if (!rawBg.startsWith("#")) return elements; // gradient — skip
 
   const goingDark = hexLum(rawBg) < 0.35;
-  const textColor = newBodyStyles.color || (goingDark ? "#f8fafc" : "#0f172a");
+  const primaryText = goingDark ? "#f8fafc" : "#0f172a";
+  const secondaryText = goingDark ? "#94a3b8" : "#64748b";
 
   return elements.map((el) => {
     const s = { ...el.styles };
     let changed = false;
 
-    if (goingDark) {
-      if (s.color && LIGHT_COLORS.has(s.color)) {
-        s.color = (s.color === "#475569" || s.color === "#64748b") ? "#94a3b8" : textColor;
+    // Swap text color if it's a neutral (low-sat) color on the wrong end of the luminance scale
+    if (s.color && s.color.startsWith("#") && s.color.length >= 7 && hexSat(s.color) < 0.25) {
+      const lum = hexLum(s.color);
+      if (goingDark && lum < 0.40) {
+        s.color = lum < 0.20 ? primaryText : secondaryText;
+        changed = true;
+      } else if (!goingDark && lum > 0.60) {
+        s.color = lum > 0.85 ? primaryText : secondaryText;
         changed = true;
       }
-      if (s.backgroundColor && LIGHT_BKGS.has(s.backgroundColor)) {
-        s.backgroundColor =
-          s.backgroundColor === "#ffffff" ? "#1e293b" :
-          s.backgroundColor === "#f8fafc" ? "#0f172a" : "#334155";
+    }
+
+    // Swap background color if neutral and on the wrong end
+    if (s.backgroundColor && s.backgroundColor.startsWith("#") && s.backgroundColor.length >= 7 && hexSat(s.backgroundColor) < 0.20) {
+      const lum = hexLum(s.backgroundColor);
+      if (goingDark && lum > 0.60) {
+        s.backgroundColor = lum > 0.95 ? "#1e293b" : lum > 0.85 ? "#0f172a" : "#334155";
         changed = true;
-      }
-    } else {
-      if (s.color && DARK_COLORS.has(s.color)) {
-        s.color = (s.color === "#94a3b8" || s.color === "#cbd5e1") ? "#475569" : textColor;
-        changed = true;
-      }
-      if (s.backgroundColor && DARK_BKGS.has(s.backgroundColor)) {
-        s.backgroundColor =
-          s.backgroundColor === "#0f172a" ? "#f8fafc" :
-          s.backgroundColor === "#1e293b" ? "#ffffff" : "#f1f5f9";
+      } else if (!goingDark && lum < 0.35) {
+        s.backgroundColor = lum < 0.10 ? "#ffffff" : lum < 0.20 ? "#f8fafc" : "#f1f5f9";
         changed = true;
       }
     }
@@ -261,6 +269,7 @@ export function labReducer(state, action) {
         ...s,
         elements: action.payload.elements,
         bodyStyles: action.payload.bodyStyles,
+        javascript: action.payload.javascript ?? "",
         selectedId: null,
       };
     }

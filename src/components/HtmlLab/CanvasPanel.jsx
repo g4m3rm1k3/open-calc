@@ -179,8 +179,8 @@ export default function CanvasPanel({
           handleDrop(e, el.id, children.length);
         }}
       >
-        {/* tag badge — always rendered; hidden via CSS when labels off, revealed on hover */}
-        <div className={`${styles.elTag}${!showLabels && !isSelected ? ` ${styles.elTagHoverOnly}` : ""}`}>
+        {/* tag badge — visible when labels on or element selected; fully hidden otherwise */}
+        <div className={`${styles.elTag}${!showLabels && !isSelected ? ` ${styles.elTagHidden}` : ""}`}>
           &lt;{el.tag}&gt;
           {isSelected && (
             <button

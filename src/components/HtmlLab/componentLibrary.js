@@ -412,6 +412,136 @@ export const COMPONENTS = [
     ],
   },
 
+  // ── Alert ─────────────────────────────────────────────────────────────────────
+  {
+    id: "alert",
+    name: "Alert",
+    category: "Feedback",
+    icon: "⚠️",
+    description: "Info / warning / error banner",
+    matches: () => false,
+    themeGroups: [
+      {
+        label: "Themes",
+        themes: [
+          { id: "alert-info",    name: "Info",    parentStyles: { backgroundColor: "rgba(59,130,246,0.12)",  border: "1px solid rgba(59,130,246,0.35)",  borderLeft: "4px solid #3b82f6" }, childStylesByIndex: { 0: { color: "#60a5fa" }, 1: { color: "#93c5fd" } } },
+          { id: "alert-success", name: "Success", parentStyles: { backgroundColor: "rgba(34,197,94,0.12)",   border: "1px solid rgba(34,197,94,0.35)",   borderLeft: "4px solid #22c55e" }, childStylesByIndex: { 0: { color: "#4ade80" }, 1: { color: "#86efac" } } },
+          { id: "alert-warning", name: "Warning", parentStyles: { backgroundColor: "rgba(234,179,8,0.12)",   border: "1px solid rgba(234,179,8,0.35)",   borderLeft: "4px solid #eab308" }, childStylesByIndex: { 0: { color: "#facc15" }, 1: { color: "#fde047" } } },
+          { id: "alert-error",   name: "Error",   parentStyles: { backgroundColor: "rgba(239,68,68,0.12)",   border: "1px solid rgba(239,68,68,0.35)",   borderLeft: "4px solid #ef4444" }, childStylesByIndex: { 0: { color: "#f87171" }, 1: { color: "#fca5a5" } } },
+        ],
+      },
+    ],
+    template: [
+      el("t0", "div", null, 0, "", {}, { display: "block", padding: "16px 20px", backgroundColor: "rgba(59,130,246,0.12)", border: "1px solid rgba(59,130,246,0.35)", borderLeft: "4px solid #3b82f6", borderRadius: "8px", width: "100%", boxSizing: "border-box" }),
+      el("t1", "p",   "t0", 0, "ℹ️  Note", {}, { fontSize: "14px", fontWeight: "700", color: "#60a5fa", margin: "0 0 4px", display: "block" }),
+      el("t2", "p",   "t0", 1, "This is an informational alert. Replace this text with your message.", {}, { fontSize: "14px", color: "#93c5fd", lineHeight: "1.6", margin: "0", display: "block" }),
+    ],
+  },
+
+  // ── Stat Card ─────────────────────────────────────────────────────────────────
+  {
+    id: "stat",
+    name: "Stat Card",
+    category: "Content",
+    icon: "📊",
+    description: "Key metric with label and value",
+    matches: () => false,
+    themeGroups: [
+      {
+        label: "Themes",
+        themes: [
+          { id: "stat-clean", name: "Clean", parentStyles: { backgroundColor: "#ffffff", border: "1px solid #e2e8f0", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)" }, childStylesByIndex: { 0: { color: "#3b82f6" }, 1: { color: "#0f172a" }, 2: { color: "#64748b" } } },
+          { id: "stat-dark",  name: "Dark",  parentStyles: { backgroundColor: "#1e293b", border: "1px solid #334155" }, childStylesByIndex: { 0: { color: "#60a5fa" }, 1: { color: "#f8fafc" }, 2: { color: "#94a3b8" } } },
+          { id: "stat-accent", name: "Accent", parentStyles: { backgroundColor: "#3b82f6", border: "none" }, childStylesByIndex: { 0: { color: "rgba(255,255,255,0.7)" }, 1: { color: "#ffffff" }, 2: { color: "rgba(255,255,255,0.7)" } } },
+        ],
+      },
+    ],
+    template: [
+      el("t0", "div", null, 0, "", {}, { display: "flex", flexDirection: "column", alignItems: "flex-start", padding: "28px 32px", backgroundColor: "#ffffff", borderRadius: "16px", border: "1px solid #e2e8f0", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)", width: "fit-content", minWidth: "200px" }),
+      el("t1", "p",  "t0", 0, "📈 Total Revenue",  {}, { fontSize: "13px", fontWeight: "600", color: "#3b82f6", textTransform: "uppercase", letterSpacing: "0.08em", margin: "0 0 8px", display: "block" }),
+      el("t2", "h2", "t0", 1, "$48,250",            {}, { fontSize: "40px", fontWeight: "800", color: "#0f172a", margin: "0 0 4px", lineHeight: "1", display: "block" }),
+      el("t3", "p",  "t0", 2, "↑ 12% from last month", {}, { fontSize: "13px", color: "#64748b", margin: "0", display: "block" }),
+    ],
+  },
+
+  // ── CTA Section ──────────────────────────────────────────────────────────────
+  {
+    id: "cta",
+    name: "CTA Section",
+    category: "Layout",
+    icon: "🎯",
+    description: "Call-to-action banner with heading and buttons",
+    matches: () => false,
+    themeGroups: [
+      {
+        label: "Themes",
+        themes: [
+          { id: "cta-blue",  name: "Blue",  parentStyles: { background: "linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)", backgroundColor: "none" }, childStylesByTag: { h2: { color: "#ffffff" }, p: { color: "rgba(255,255,255,0.85)" } } },
+          { id: "cta-dark",  name: "Dark",  parentStyles: { backgroundColor: "#0f172a", background: "none", border: "1px solid #1e293b" }, childStylesByTag: { h2: { color: "#f8fafc" }, p: { color: "#94a3b8" } } },
+          { id: "cta-glass", name: "Glass", parentStyles: { backgroundColor: "rgba(255,255,255,0.1)", background: "none", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.2)" }, childStylesByTag: { h2: { color: "#ffffff" }, p: { color: "rgba(255,255,255,0.8)" } } },
+        ],
+      },
+    ],
+    template: [
+      el("t0", "div",    null, 0, "", {}, { display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "80px 48px", background: "linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)", borderRadius: "24px", width: "100%", boxSizing: "border-box" }),
+      el("t1", "h2",     "t0", 0, "Ready to get started?",                   {}, { fontSize: "40px", fontWeight: "800", color: "#ffffff", marginBottom: "16px", lineHeight: "1.15", display: "block" }),
+      el("t2", "p",      "t0", 1, "Join thousands of teams already building the future.",  {}, { fontSize: "18px", color: "rgba(255,255,255,0.85)", marginBottom: "40px", lineHeight: "1.6", display: "block", maxWidth: "520px" }),
+      el("t3", "button", "t0", 2, "Get Started Free", { type: "button" }, { padding: "16px 36px", backgroundColor: "#ffffff", color: "#1e40af", border: "none", borderRadius: "10px", fontSize: "16px", fontWeight: "700", cursor: "pointer", display: "inline-block" }),
+    ],
+  },
+
+  // ── Footer ───────────────────────────────────────────────────────────────────
+  {
+    id: "footer",
+    name: "Footer",
+    category: "Layout",
+    icon: "🔻",
+    description: "Page footer with links",
+    matches: () => false,
+    themeGroups: [
+      {
+        label: "Themes",
+        themes: [
+          { id: "footer-dark",  name: "Dark",  parentStyles: { backgroundColor: "#0f172a", borderTop: "1px solid #1e293b" }, childStylesByTag: { p: { color: "#64748b" }, a: { color: "#94a3b8" } } },
+          { id: "footer-light", name: "Light", parentStyles: { backgroundColor: "#f8fafc", borderTop: "1px solid #e2e8f0" }, childStylesByTag: { p: { color: "#64748b" }, a: { color: "#475569" } } },
+        ],
+      },
+    ],
+    template: [
+      el("t0", "footer", null, 0, "", {}, { display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "16px", padding: "32px 40px", backgroundColor: "#0f172a", borderTop: "1px solid #1e293b", width: "100%", boxSizing: "border-box" }),
+      el("t1", "p",  "t0", 0, "© 2025 HtmlLab. All rights reserved.",  {}, { fontSize: "14px", color: "#64748b", margin: "0", display: "block" }),
+      el("t2", "div", "t0", 1, "", {}, { display: "flex", gap: "24px", alignItems: "center" }),
+      el("t3", "a",  "t2", 0, "Privacy", { href: "#" }, { fontSize: "14px", color: "#94a3b8", textDecoration: "none", display: "inline" }),
+      el("t4", "a",  "t2", 1, "Terms",   { href: "#" }, { fontSize: "14px", color: "#94a3b8", textDecoration: "none", display: "inline" }),
+      el("t5", "a",  "t2", 2, "Contact", { href: "#" }, { fontSize: "14px", color: "#94a3b8", textDecoration: "none", display: "inline" }),
+    ],
+  },
+
+  // ── Form Group ───────────────────────────────────────────────────────────────
+  {
+    id: "form",
+    name: "Form",
+    category: "Content",
+    icon: "📋",
+    description: "Label, input field and submit button",
+    matches: () => false,
+    themeGroups: [
+      {
+        label: "Themes",
+        themes: [
+          { id: "form-clean", name: "Clean", parentStyles: { backgroundColor: "#ffffff", border: "1px solid #e2e8f0" }, childStylesByTag: { p: { color: "#0f172a" } } },
+          { id: "form-dark",  name: "Dark",  parentStyles: { backgroundColor: "#1e293b", border: "1px solid #334155" }, childStylesByTag: { p: { color: "#f8fafc" } } },
+        ],
+      },
+    ],
+    template: [
+      el("t0", "div",    null, 0, "", {}, { display: "flex", flexDirection: "column", gap: "12px", padding: "32px", backgroundColor: "#ffffff", borderRadius: "16px", border: "1px solid #e2e8f0", width: "100%", boxSizing: "border-box", maxWidth: "440px" }),
+      el("t1", "p",      "t0", 0, "Email address",    {}, { fontSize: "14px", fontWeight: "600", color: "#0f172a", margin: "0", display: "block" }),
+      el("t2", "input",  "t0", 1, "", { type: "email", placeholder: "you@example.com" }, { display: "block", width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "15px", outline: "none", boxSizing: "border-box", backgroundColor: "#f8fafc" }),
+      el("t3", "button", "t0", 2, "Subscribe", { type: "button" }, { display: "block", width: "100%", padding: "12px", backgroundColor: "#3b82f6", color: "#ffffff", border: "none", borderRadius: "8px", fontSize: "15px", fontWeight: "600", cursor: "pointer", boxSizing: "border-box" }),
+    ],
+  },
+
   // ── Pricing Card ────────────────────────────────────────────────────────────
   {
     id: "pricing",

@@ -5,6 +5,7 @@ import CodePanel from "./CodePanel";
 import PropertiesPanel from "./PropertiesPanel";
 import { labReducer, initialState } from "./labReducer";
 import { COMPONENTS, BODY_THEMES, detectComponents, buildThemeUpdates } from "./componentLibrary";
+import { JS_PRESETS } from "./jsPresets";
 import {
   applyCssToElements,
   elementsToCss,
@@ -174,7 +175,6 @@ export default function HtmlLab({ onBack }) {
               key={comp.id}
               className={styles.compCard}
               onClick={() => {
-                // Find dark theme variant if body is dark
                 const autoTheme = bodyIsDark
                   ? comp.themeGroups.flatMap(g => g.themes).find(t =>
                       t.name.toLowerCase() === "dark" || t.id.endsWith("-dark")
@@ -188,6 +188,23 @@ export default function HtmlLab({ onBack }) {
               <span className={styles.compIcon}>{comp.icon}</span>
               <span className={styles.compName}>{comp.name}</span>
               <span className={styles.compCat}>{comp.category}</span>
+            </button>
+          ))}
+          <div className={styles.compDivider}>⚡ Interactive (JS)</div>
+          {JS_PRESETS.filter(p => p.template).map(preset => (
+            <button
+              key={preset.id}
+              className={styles.compCard}
+              onClick={() => {
+                dispatch({ type: "INSERT_TEMPLATE", payload: { template: preset.template } });
+                dispatch({ type: "SET_JAVASCRIPT", payload: appendJavascriptSnippet(state.javascript, preset.code) });
+                setShowComponents(false);
+              }}
+              title={preset.description}
+            >
+              <span className={styles.compIcon}>{preset.icon}</span>
+              <span className={styles.compName}>{preset.label}</span>
+              <span className={styles.compCat}>JavaScript</span>
             </button>
           ))}
         </div>

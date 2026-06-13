@@ -260,12 +260,10 @@
   transition: opacity 0.12s, background 0.12s, color 0.12s, box-shadow 0.12s, top 0.12s;
 }
 
-/* Hidden when labels off — revealed on hover */
-.elTagHoverOnly {
+/* Completely hidden when labels off — NOT revealed on hover */
+.elTagHidden {
   opacity: 0;
-}
-.elWrap:hover .elTagHoverOnly {
-  opacity: 1;
+  pointer-events: none;
 }
 
 /* Brighter tag on hover */
@@ -403,6 +401,18 @@
   color: #777;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+
+.compDivider {
+  width: 100%;
+  padding: 6px 4px 2px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #56c4a0;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-top: 1px solid #3c3c3c;
+  margin-top: 4px;
 }
 
 /* ── Theme section in PropertiesPanel ─────────────────────────────────────────── */

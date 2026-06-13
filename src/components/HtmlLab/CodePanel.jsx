@@ -318,9 +318,6 @@ export default function CodePanel({
             </button>
           ))}
         </div>
-        {activeTab === "tree" && (
-          <span className={styles.panelHint}>click to select · × to delete</span>
-        )}
       </div>
       <div className={styles.monacoWrap}>
         {activeTab === "tree" ? (
