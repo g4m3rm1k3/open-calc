@@ -28,6 +28,7 @@ export default function Toolbar({
   onToggleComponents,
   onUndo,
   onClear,
+  onExport,
   canUndo,
   onBack,
 }) {
@@ -99,6 +100,14 @@ export default function Toolbar({
         title="Undo last action"
       >
         ↩ Undo
+      </button>
+
+      <button
+        className={styles.tbBtn}
+        onClick={onExport}
+        title="Download as index.html"
+      >
+        ↓ Export
       </button>
 
       <button

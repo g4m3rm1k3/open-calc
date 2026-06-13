@@ -216,16 +216,15 @@ const SECTIONS = [
     key: "background",
     title: "Background",
     rows: [
-      { label: "bg-color", prop: "backgroundColor", type: "color" },
-      { label: "bg-image", prop: "backgroundImage", type: "text" },
-      {
-        label: "bg-size",
-        prop: "backgroundSize",
-        type: "select",
-        opts: ["", "cover", "contain", "auto"],
-      },
-      { label: "opacity", prop: "opacity", type: "text" },
+      { label: "bg-color",  prop: "backgroundColor",   type: "color" },
+      { label: "bg-image",  prop: "backgroundImage",   type: "text", placeholder: "url(...)" },
+      { label: "bg-size",   prop: "backgroundSize",    type: "select", opts: ["", "cover", "contain", "auto"] },
+      { label: "bg-pos",    prop: "backgroundPosition", type: "text", placeholder: "center center" },
+      { label: "bg-repeat", prop: "backgroundRepeat",  type: "select", opts: ["", "no-repeat", "repeat", "repeat-x", "repeat-y"] },
+      { label: "tint",      prop: "_tint",             type: "tint" },
+      { label: "opacity",   prop: "opacity",           type: "text" },
     ],
+    special: "gradients",
   },
   {
     key: "border",
@@ -353,6 +352,21 @@ export default function PropertiesPanel({
                     onAddMediaQuery={onAddMediaQuery}
                     onRemoveMediaQuery={onRemoveMediaQuery}
                   />
+                ) : sec.special === "gradients" ? (
+                  <>
+                    {getRowsForSection(sec, element).map((row) => (
+                      <PropRow
+                        key={row.prop}
+                        row={row}
+                        element={element}
+                        onChange={onChange}
+                        onContentChange={onContentChange}
+                        onTagChange={onTagChange}
+                        onAttrChange={onAttrChange}
+                      />
+                    ))}
+                    <GradientPresets onChange={onChange} />
+                  </>
                 ) : (
                   getRowsForSection(sec, element).map((row) => (
                     <PropRow
@@ -445,6 +459,42 @@ function PropRow({
       )}
     </div>
   ) : null;
+
+  if (row.type === "tint") {
+    // Overlay tint using a linear-gradient layered over the background image
+    const currentBg = element.styles.background || "";
+    const tintMatch = currentBg.match(/rgba\((\d+),(\d+),(\d+),([\d.]+)\)/);
+    const tintOpacity = tintMatch ? parseFloat(tintMatch[4]) : 0;
+    const imageMatch = currentBg.match(/url\([^)]+\)/);
+    const imageUrl = imageMatch ? imageMatch[0] : (element.styles.backgroundImage || "");
+    return (
+      <div className={styles.propRow}>
+        <label className={styles.propLabel}>{row.label}</label>
+        <input
+          type="range"
+          min="0" max="0.9" step="0.05"
+          style={{ flex: 1, accentColor: "#569cd6" }}
+          value={tintOpacity}
+          title={`Tint opacity: ${Math.round(tintOpacity * 100)}%`}
+          onChange={(e) => {
+            const opacity = parseFloat(e.target.value);
+            if (opacity === 0) {
+              onChange("background", imageUrl || "");
+            } else {
+              const tint = `rgba(0,0,0,${opacity})`;
+              onChange("background", imageUrl
+                ? `linear-gradient(${tint}, ${tint}), ${imageUrl}`
+                : `linear-gradient(${tint}, ${tint})`
+              );
+            }
+          }}
+        />
+        <span style={{ fontSize: "10px", color: "#777", flexShrink: 0 }}>
+          {Math.round(tintOpacity * 100)}%
+        </span>
+      </div>
+    );
+  }
 
   if (row.prop === "_content") {
     return (
@@ -539,7 +589,7 @@ function PropRow({
       <input
         className={styles.propInput}
         value={val}
-        placeholder="e.g. 8px"
+        placeholder={row.placeholder || "e.g. 8px"}
         onChange={(e) => onChange(row.prop, e.target.value)}
       />
       {pickerBtn}
@@ -985,6 +1035,47 @@ function toHex(val) {
   if (!val) return "#000000";
   if (val.startsWith("#") && (val.length === 4 || val.length === 7)) return val;
   return "#000000";
+}
+
+// ─── Gradient presets ─────────────────────────────────────────────────────────
+const GRADIENT_PRESETS = [
+  { name: "Ocean",   value: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" },
+  { name: "Sunset",  value: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)" },
+  { name: "Sky",     value: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)" },
+  { name: "Fire",    value: "linear-gradient(135deg, #fa709a 0%, #fee140 100%)" },
+  { name: "Forest",  value: "linear-gradient(135deg, #0ba360 0%, #3cba92 100%)" },
+  { name: "Night",   value: "linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)" },
+  { name: "Gold",    value: "linear-gradient(135deg, #f6d365 0%, #fda085 100%)" },
+  { name: "Dark",    value: "linear-gradient(135deg, #1e1e2e 0%, #0f172a 100%)" },
+  { name: "Mist",    value: "linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%)" },
+  { name: "Indigo",  value: "linear-gradient(135deg, #1d4ed8 0%, #7c3aed 100%)" },
+];
+
+function GradientPresets({ onChange }) {
+  return (
+    <div className={styles.gradientPresets}>
+      <div className={styles.gradientLabel}>Gradient presets</div>
+      <div className={styles.gradientList}>
+        {GRADIENT_PRESETS.map(g => (
+          <button
+            key={g.name}
+            className={styles.gradientSwatch}
+            style={{ background: g.value }}
+            title={g.name}
+            onClick={() => onChange("background", g.value)}
+          />
+        ))}
+        <button
+          className={styles.gradientSwatch}
+          style={{ background: "transparent", border: "1px dashed #555", color: "#888", fontSize: "9px" }}
+          title="Clear gradient"
+          onClick={() => onChange("background", "")}
+        >
+          ✕
+        </button>
+      </div>
+    </div>
+  );
 }
 
 // ─── Theme Section ────────────────────────────────────────────────────────────

@@ -303,7 +303,9 @@ function renderTag(el, children, renderElement, renderDropZone, isContainer, isI
     );
   }
 
-  return <Tag {...domAttrs} style={tagStyle}>{el.content || ""}</Tag>;
+  // Prevent anchor tags from navigating — the canvas handles clicks for selection
+  const extraProps = el.tag === "a" ? { onClick: (e) => e.preventDefault() } : {};
+  return <Tag {...domAttrs} {...extraProps} style={tagStyle}>{el.content || ""}</Tag>;
 }
 
 function attrsToReactProps(attrs = {}) {

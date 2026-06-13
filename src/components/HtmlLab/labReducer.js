@@ -182,7 +182,7 @@ export const initialState = {
     color: "#1a1a18",
     backgroundColor: "#ffffff",
     margin: "0",
-    padding: "16px",
+    padding: "0",
   },
 };
 
@@ -217,16 +217,21 @@ export function labReducer(state, action) {
     case "ADD_ELEMENT": {
       const s = withHistory(state);
       const tag = action.payload;
-      // Find max order among root elements
-      const rootEls = s.elements.filter((e) => !e.parentId);
-      const maxOrder = rootEls.reduce((m, e) => Math.max(m, e.order ?? 0), -1);
+
+      // If a container element is selected, add inside it; otherwise add to root
+      const selectedEl = s.selectedId ? s.elements.find(e => e.id === s.selectedId) : null;
+      const parentId = (selectedEl && CONTAINER_TAGS.has(selectedEl.tag)) ? selectedEl.id : null;
+
+      const siblings = s.elements.filter(e => (e.parentId ?? null) === parentId);
+      const maxOrder = siblings.reduce((m, e) => Math.max(m, e.order ?? 0), -1);
+
       const el = {
         id: genId(),
         tag,
         attrs: { id: "", class: "", ...(TAG_ATTRS[tag] || {}) },
         styles: { ...(TAG_DEFAULTS[tag] || TAG_DEFAULTS.div) },
         content: TAG_CONTENT[tag] ?? "",
-        parentId: null,
+        parentId,
         order: maxOrder + 1,
         mediaQueries: [],
       };
@@ -478,26 +483,58 @@ export function labReducer(state, action) {
     case "TOGGLE_LABELS":
       return { ...state, showLabels: !state.showLabels };
 
-    // Insert a component template — remaps all template IDs to fresh ones
+    // Insert a component template — remaps all template IDs to fresh ones.
+    // Payload: { template: el[], autoTheme?: themeObject } or bare el[] (legacy)
     case "INSERT_TEMPLATE": {
       const s = withHistory(state);
-      const templateElements = action.payload;
+      const templateElements = Array.isArray(action.payload) ? action.payload : action.payload.template;
+      const autoTheme = Array.isArray(action.payload) ? null : action.payload.autoTheme;
+
+      // If a container is selected, insert inside it; otherwise insert at root
+      const selectedEl = s.selectedId ? s.elements.find(e => e.id === s.selectedId) : null;
+      const insertParentId = (selectedEl && CONTAINER_TAGS.has(selectedEl.tag)) ? selectedEl.id : null;
 
       const idMap = new Map();
       templateElements.forEach(el => idMap.set(el.id, genId()));
 
       const rootOffset = s.elements
-        .filter(e => !e.parentId)
+        .filter(e => (e.parentId ?? null) === insertParentId)
         .reduce((m, e) => Math.max(m, e.order ?? 0), -1) + 1;
 
-      const newElements = templateElements.map(el => ({
+      let newElements = templateElements.map(el => ({
         ...el,
         id: idMap.get(el.id),
-        parentId: el.parentId ? idMap.get(el.parentId) : null,
+        parentId: el.parentId ? idMap.get(el.parentId) : insertParentId,
         order: el.parentId ? el.order : el.order + rootOffset,
       }));
 
-      const firstRoot = newElements.find(e => !e.parentId);
+      // Find the root element of this template (no template-parentId)
+      const firstRoot = newElements.find(e => {
+        const orig = templateElements.find(t => idMap.get(t.id) === e.id);
+        return orig && !orig.parentId;
+      });
+
+      // Auto-apply a theme to the inserted elements (e.g. dark theme on dark body)
+      if (autoTheme && firstRoot) {
+        const children = newElements
+          .filter(e => e.parentId === firstRoot.id)
+          .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+        const styleMap = new Map();
+        if (autoTheme.parentStyles) styleMap.set(firstRoot.id, autoTheme.parentStyles);
+        children.forEach((child, i) => {
+          const indexStyles = autoTheme.childStylesByIndex?.[i];
+          const tagStyles   = autoTheme.childStylesByTag?.[child.tag];
+          const merged = { ...(tagStyles || {}), ...(indexStyles || {}) };
+          if (Object.keys(merged).length > 0) styleMap.set(child.id, merged);
+        });
+
+        newElements = newElements.map(el => {
+          const update = styleMap.get(el.id);
+          return update ? { ...el, styles: { ...el.styles, ...update } } : el;
+        });
+      }
+
       return {
         ...s,
         elements: [...s.elements, ...newElements],
@@ -533,7 +570,7 @@ export function labReducer(state, action) {
           color: "#1a1a18",
           backgroundColor: "#ffffff",
           margin: "0",
-          padding: "16px",
+          padding: "0",
         },
       };
 

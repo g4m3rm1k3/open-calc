@@ -10,6 +10,7 @@ import {
   elementsToCss,
   elementsToHtml,
   htmlToElements,
+  generateExportHtml,
 } from "./htmlSync";
 import styles from "./HtmlLab.module.css";
 
@@ -23,6 +24,19 @@ export default function HtmlLab({ onBack }) {
     if (!state.selectedId) return [];
     return detectComponents(state.selectedId, state.elements);
   }, [state.selectedId, state.elements]);
+
+  // True when the body background is dark enough to warrant dark component defaults
+  const bodyIsDark = useMemo(() => {
+    const bg = state.bodyStyles.backgroundColor || "";
+    if (bg.startsWith("#") && bg.length === 7) {
+      const r = parseInt(bg.slice(1, 3), 16);
+      const g = parseInt(bg.slice(3, 5), 16);
+      const b = parseInt(bg.slice(5, 7), 16);
+      return (0.299 * r + 0.587 * g + 0.114 * b) / 255 < 0.35;
+    }
+    const gradient = state.bodyStyles.background || "";
+    return gradient.includes("0f172a") || gradient.includes("1e293b");
+  }, [state.bodyStyles]);
   const dividerDragging = useRef(false);
   const dividerStartX = useRef(0);
   const dividerStartW = useRef(0);
@@ -83,6 +97,21 @@ export default function HtmlLab({ onBack }) {
         onToggleComponents={() => setShowComponents(v => !v)}
         onUndo={() => dispatch({ type: "UNDO" })}
         onClear={() => dispatch({ type: "CLEAR" })}
+        onExport={() => {
+          const html = generateExportHtml(
+            state.elements,
+            state.bodyStyles,
+            state.customCss,
+            state.javascript,
+          );
+          const blob = new Blob([html], { type: "text/html" });
+          const url  = URL.createObjectURL(blob);
+          const a    = document.createElement("a");
+          a.href     = url;
+          a.download = "index.html";
+          a.click();
+          URL.revokeObjectURL(url);
+        }}
         canUndo={state.history.length > 0}
         onBack={onBack}
       />
@@ -94,7 +123,13 @@ export default function HtmlLab({ onBack }) {
               key={comp.id}
               className={styles.compCard}
               onClick={() => {
-                dispatch({ type: "INSERT_TEMPLATE", payload: comp.template });
+                // Find dark theme variant if body is dark
+                const autoTheme = bodyIsDark
+                  ? comp.themeGroups.flatMap(g => g.themes).find(t =>
+                      t.name.toLowerCase() === "dark" || t.id.endsWith("-dark")
+                    ) ?? null
+                  : null;
+                dispatch({ type: "INSERT_TEMPLATE", payload: { template: comp.template, autoTheme } });
                 setShowComponents(false);
               }}
               title={comp.description}

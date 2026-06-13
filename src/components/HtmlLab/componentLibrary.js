@@ -21,6 +21,12 @@ export const BODY_THEMES = [
     description: "Restore default body styles",
     styles: {},
   },
+  {
+    id: "body-css-reset",
+    name: "CSS Reset",
+    description: "margin: 0, padding: 0 — clean base for building from scratch",
+    styles: { margin: "0", padding: "0", fontFamily: "system-ui, -apple-system, sans-serif", fontSize: "16px", lineHeight: "1.5", color: "#1a1a18", backgroundColor: "#ffffff" },
+  },
   // backgrounds
   {
     id: "body-white",
@@ -77,14 +83,134 @@ export const BODY_THEMES = [
 export const COMPONENTS = [
 
   // ── Container ────────────────────────────────────────────────────────────────
+  // Matches any generic container element (div, section, article, header, footer)
+  // so color/style themes appear whenever one is selected, regardless of children.
   {
     id: "container",
     name: "Container",
     category: "Layout",
     icon: "📦",
     description: "Styled wrapper — add anything inside",
-    matches: () => false,
-    themeGroups: [],
+    matches: (children, parentTag) =>
+      ["div", "section", "article", "header", "footer"].includes(parentTag),
+    themeGroups: [
+      {
+        label: "Colors",
+        themes: [
+          {
+            id: "container-white",
+            name: "White",
+            parentStyles: { backgroundColor: "#ffffff", background: "", border: "1px solid #e2e8f0", boxShadow: "none" },
+          },
+          {
+            id: "container-grey",
+            name: "Grey",
+            parentStyles: { backgroundColor: "#f8fafc", background: "", border: "1px solid #e2e8f0", boxShadow: "none" },
+          },
+          {
+            id: "container-dark",
+            name: "Dark",
+            parentStyles: { backgroundColor: "#1e293b", background: "", border: "none", boxShadow: "none" },
+          },
+          {
+            id: "container-blue",
+            name: "Blue",
+            parentStyles: { backgroundColor: "#eff6ff", background: "", border: "1px solid #bfdbfe", boxShadow: "none" },
+          },
+          {
+            id: "container-green",
+            name: "Green",
+            parentStyles: { backgroundColor: "#f0fdf4", background: "", border: "1px solid #bbf7d0", boxShadow: "none" },
+          },
+          {
+            id: "container-card",
+            name: "Card",
+            parentStyles: { backgroundColor: "#ffffff", background: "", border: "none", boxShadow: "0 4px 16px rgba(0,0,0,0.08)" },
+          },
+          {
+            id: "container-transparent",
+            name: "None",
+            parentStyles: { backgroundColor: "transparent", background: "", border: "none", boxShadow: "none" },
+          },
+        ],
+      },
+      {
+        label: "Shape",
+        themes: [
+          {
+            id: "container-rounded",
+            name: "Rounded",
+            parentStyles: { borderRadius: "16px" },
+          },
+          {
+            id: "container-soft",
+            name: "Soft",
+            parentStyles: { borderRadius: "8px" },
+          },
+          {
+            id: "container-square",
+            name: "Square",
+            parentStyles: { borderRadius: "0" },
+          },
+        ],
+      },
+      {
+        label: "Padding",
+        themes: [
+          { id: "container-pad-none", name: "None",     parentStyles: { padding: "0" } },
+          { id: "container-pad-sm",   name: "Tight",    parentStyles: { padding: "12px" } },
+          { id: "container-pad-md",   name: "Normal",   parentStyles: { padding: "24px" } },
+          { id: "container-pad-lg",   name: "Spacious", parentStyles: { padding: "48px" } },
+        ],
+      },
+      {
+        label: "Layout",
+        themes: [
+          {
+            id: "container-layout-block",
+            name: "Block",
+            description: "Default document flow",
+            parentStyles: { display: "block", flexDirection: "", flexWrap: "", gap: "", gridTemplateColumns: "", alignItems: "", justifyContent: "" },
+          },
+          {
+            id: "container-layout-flex-row",
+            name: "Flex Row",
+            description: "Items side by side — great for cards",
+            parentStyles: { display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "24px", alignItems: "flex-start", gridTemplateColumns: "" },
+          },
+          {
+            id: "container-layout-flex-col",
+            name: "Flex Column",
+            description: "Items stacked vertically with gap",
+            parentStyles: { display: "flex", flexDirection: "column", flexWrap: "", gap: "16px", alignItems: "stretch", gridTemplateColumns: "" },
+          },
+          {
+            id: "container-layout-flex-center",
+            name: "Flex Center",
+            description: "Everything centered horizontally and vertically",
+            parentStyles: { display: "flex", flexDirection: "column", flexWrap: "", gap: "16px", alignItems: "center", justifyContent: "center", gridTemplateColumns: "" },
+          },
+          {
+            id: "container-layout-grid-2",
+            name: "Grid 2-col",
+            description: "Two equal columns",
+            parentStyles: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "24px", flexDirection: "", flexWrap: "", alignItems: "" },
+          },
+          {
+            id: "container-layout-grid-3",
+            name: "Grid 3-col",
+            description: "Three equal columns",
+            parentStyles: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "24px", flexDirection: "", flexWrap: "", alignItems: "" },
+          },
+          {
+            id: "container-layout-grid-auto",
+            name: "Grid Auto",
+            description: "Auto-fill columns, min 200px each",
+            parentStyles: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "24px", flexDirection: "", flexWrap: "" },
+          },
+        ],
+      },
+    ],
     template: [
       el("t0", "div", null, 0, "", {}, {
         display: "block", width: "100%", boxSizing: "border-box",
@@ -679,14 +805,15 @@ export const COMPONENTS = [
 
 // ─── Detect matching components for a selected parent ─────────────────────────
 export function detectComponents(parentId, elements) {
+  const parent   = elements.find(e => e.id === parentId);
+  const parentTag = parent?.tag ?? null;
+
   const children = elements
     .filter(e => e.parentId === parentId)
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
-  if (children.length === 0) return [];
-
   return COMPONENTS.filter(comp => {
-    try { return comp.matches(children); } catch { return false; }
+    try { return comp.matches(children, parentTag); } catch { return false; }
   });
 }
 

@@ -211,15 +211,19 @@
   cursor: grab;
 }
 .elWrap:hover {
-  border-color: rgba(86, 156, 214, 0.3);
+  border-color: rgba(86, 156, 214, 0.35);
 }
 .elWrap:active {
   cursor: grabbing;
 }
 
 .elSelected {
-  border-color: #569cd6 !important;
-  box-shadow: 0 0 0 2px rgba(86, 156, 214, 0.2);
+  border-color: #2563eb !important;
+  box-shadow:
+    0 0 0 2px rgba(37, 99, 235, 0.3),
+    0 0 20px rgba(37, 99, 235, 0.15) !important;
+  position: relative;
+  z-index: 100;
 }
 
 .elDragging {
@@ -237,25 +241,37 @@
 /* ── Tag badge at top of element ─────────────────────────────────────────────── */
 .elTag {
   position: absolute;
-  top: -20px;
+  top: -22px;
   left: 0;
   z-index: 10;
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 1px 6px;
+  padding: 2px 7px;
   font-size: 9px;
   font-family: "JetBrains Mono", monospace;
-  color: #888;
-  background: rgba(30, 30, 30, 0.88);
-  border-radius: 3px;
+  color: #666;
+  background: rgba(20, 20, 20, 0.75);
+  border-radius: 4px;
   user-select: none;
   white-space: nowrap;
   pointer-events: none;
+  transition: all 0.1s;
 }
+
+/* Selected: large, vibrant, always on top */
 .elSelected .elTag {
-  color: #569cd6;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 12px;
+  letter-spacing: 0.03em;
+  border-radius: 5px;
+  box-shadow: 0 3px 12px rgba(37, 99, 235, 0.55);
+  z-index: 9999;
   pointer-events: auto;
+  top: -26px;
 }
 .elSelected .elTag {
   color: #569cd6;
@@ -265,19 +281,19 @@
 .elDelete {
   background: none;
   border: none;
-  color: #e24b4a;
+  color: rgba(255, 255, 255, 0.7);
   font-size: 14px;
   cursor: pointer;
   padding: 0 2px;
   line-height: 1;
   opacity: 0;
-  transition: opacity 0.1s;
+  transition: opacity 0.1s, color 0.1s;
 }
 .elSelected .elDelete {
   opacity: 1;
 }
 .elDelete:hover {
-  color: #b91c1c;
+  color: #fca5a5;
 }
 
 /* ── Inner element (the actual styled tag) ───────────────────────────────────── */
@@ -432,6 +448,43 @@
   background: rgba(86,156,214,0.25);
   border-color: #569cd6;
   color: #569cd6;
+}
+
+/* ── Gradient presets ────────────────────────────────────────────────────────── */
+.gradientPresets {
+  padding: 6px 8px 8px;
+}
+
+.gradientLabel {
+  font-size: 9px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 5px;
+}
+
+.gradientList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.gradientSwatch {
+  width: 26px;
+  height: 26px;
+  border-radius: 5px;
+  border: 1px solid rgba(255,255,255,0.1);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.1s, box-shadow 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gradientSwatch:hover {
+  transform: scale(1.15);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
 }
 
 /* ── Box model overlay ───────────────────────────────────────────────────────── */
