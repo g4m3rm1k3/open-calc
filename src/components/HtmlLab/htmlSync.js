@@ -260,11 +260,12 @@ export function generateExportHtml(elements, bodyStyles, customCss, javascript) 
       .filter(c => c.parentId === el.id)
       .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
-    // Build attrs without data-lab-id
-    const attrStr = Object.entries(el.attrs || {})
+    // data-lab-id must be present so the generated CSS ([data-lab-id="..."]) can match
+    const userAttrs = Object.entries(el.attrs || {})
       .filter(([, v]) => v !== undefined && v !== null && String(v).trim() !== "")
       .map(([k, v]) => ` ${k}="${String(v).replace(/"/g, "&quot;")}"`)
       .join("");
+    const attrStr = ` data-lab-id="${el.id}"${userAttrs}`;
 
     if (VOID_TAGS.has(el.tag)) return `${indent}<${el.tag}${attrStr} />`;
 
@@ -300,8 +301,8 @@ export function generateExportHtml(elements, bodyStyles, customCss, javascript) 
     ``,
     htmlBody,
     ``,
-    `</body>`,
     javascript?.trim() ? `<script>\n${javascript}\n</script>` : "",
+    `</body>`,
     `</html>`,
   ].filter(l => l !== "").join("\n");
 }

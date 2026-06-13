@@ -84,7 +84,7 @@ export function generateExampleProject() {
     display: "block", maxWidth: "780px",
   }));
   els.push(mk(id(), "p", heroId, 2,
-    "Everything below is live. Click elements in the Tree tab to inspect them — every interactive component is wired up with plain JavaScript and ready to customise.", {
+    "Hit ▶ Preview in the toolbar to see it live — every component below is wired up with vanilla JavaScript. In Edit mode, click any element to inspect and change its styles.", {
       fontSize: "18px", color: "#94a3b8", marginBottom: "44px",
       lineHeight: "1.7", display: "block", maxWidth: "580px",
   }));
@@ -271,7 +271,7 @@ export function generateExampleProject() {
     margin: "0 0 16px", display: "block",
   }));
   els.push(mk(id(), "p", boxId, 1,
-    "Every component uses CSS class selectors (.js-count, .js-modal-open, etc.) so the JavaScript still works even after elements are rearranged. Open the JavaScript tab in the editor to read the code — each block is wrapped in an IIFE so they stay independent.", {
+    "Every component uses CSS class selectors (.js-count, .js-modal-open, etc.) so the JavaScript keeps working even after elements are rearranged. Switch to the JavaScript tab in the editor to read the code — each block is an IIFE so they stay independent. Hit ▶ Preview to run it.", {
       fontSize: "15px", color: "#94a3b8", lineHeight: "1.7",
       margin: "0 0 28px", display: "block",
   }));

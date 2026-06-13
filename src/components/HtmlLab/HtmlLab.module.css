@@ -117,6 +117,23 @@
   color: #f87171;
   border-color: rgba(232, 75, 74, 0.5);
 }
+.tbBtnPreview {
+  background: #16a34a;
+  color: #fff;
+  border-color: #16a34a;
+  font-weight: 700;
+}
+.tbBtnPreview:hover {
+  background: #15803d;
+  border-color: #15803d;
+}
+
+/* Preview iframe — fills the space where canvas + properties normally live */
+.previewFrame {
+  flex: 1;
+  border: none;
+  background: #fff;
+}
 
 /* ── Main layout ─────────────────────────────────────────────────────────────── */
 .main {
@@ -609,7 +626,6 @@
 
 /* ── Properties panel ────────────────────────────────────────────────────────── */
 .propsPanel {
-  width: 240px;
   flex-shrink: 0;
   border-left: 1px solid #3c3c3c;
   background: #252526;
@@ -1348,4 +1364,224 @@
 }
 .mqRuleDel:hover {
   color: #f87171;
+}
+
+/* ── ConfirmDialog ──────────────────────────────────────────────────────────── */
+.confirmOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.confirmBox {
+  background: #1e1e1e;
+  border: 1px solid #3c3c3c;
+  border-radius: 8px;
+  padding: 20px 24px;
+  min-width: 300px;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+}
+.confirmMsg {
+  color: #d4d4d4;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+}
+.confirmSkip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #888;
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.confirmSkip input {
+  accent-color: #569cd6;
+  cursor: pointer;
+}
+.confirmBtns {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.confirmCancel {
+  background: #2a2a2a;
+  border: 1px solid #3c3c3c;
+  color: #ccc;
+  border-radius: 5px;
+  padding: 6px 16px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.confirmCancel:hover {
+  background: #333;
+}
+.confirmOk {
+  background: #569cd6;
+  border: 1px solid #4a8cc4;
+  color: #fff;
+  border-radius: 5px;
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.confirmOk:hover {
+  background: #4a8cc4;
+}
+
+/* ── Content prop row (textarea + expand) ───────────────────────────────────── */
+.propRowContent {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px 0;
+}
+.propRowContentHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.propTextarea {
+  width: 100%;
+  background: #1a1a2e;
+  border: 1px solid #3c3c3c;
+  border-radius: 4px;
+  color: #d4d4d4;
+  font-size: 12px;
+  font-family: inherit;
+  padding: 6px 8px;
+  resize: vertical;
+  min-height: 56px;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+.propTextarea:focus {
+  outline: none;
+  border-color: #569cd6;
+}
+.propExpandBtn {
+  background: none;
+  border: 1px solid #3c3c3c;
+  color: #888;
+  font-size: 10px;
+  border-radius: 3px;
+  padding: 2px 6px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+.propExpandBtn:hover {
+  color: #d4d4d4;
+  border-color: #569cd6;
+}
+
+/* ── TextEditorModal ────────────────────────────────────────────────────────── */
+.textEditorOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.textEditorBox {
+  background: #1e1e1e;
+  border: 1px solid #3c3c3c;
+  border-radius: 8px;
+  width: min(640px, 90vw);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+}
+.textEditorHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-bottom: 1px solid #2a2a2a;
+  background: #252526;
+  font-size: 12px;
+  color: #888;
+}
+.textEditorClose {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 2px 4px;
+  line-height: 1;
+  transition: color 0.15s;
+}
+.textEditorClose:hover {
+  color: #f87171;
+}
+.textEditorArea {
+  background: #1a1a2e;
+  border: none;
+  border-bottom: 1px solid #2a2a2a;
+  color: #d4d4d4;
+  font-size: 14px;
+  font-family: inherit;
+  line-height: 1.6;
+  padding: 16px;
+  resize: none;
+  min-height: 200px;
+  flex: 1;
+}
+.textEditorArea:focus {
+  outline: none;
+}
+.textEditorFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: #252526;
+}
+.textEditorHint {
+  font-size: 11px;
+  color: #555;
+}
+.textEditorDone {
+  background: #569cd6;
+  border: none;
+  color: #fff;
+  border-radius: 5px;
+  padding: 6px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.textEditorDone:hover {
+  background: #4a8cc4;
+}
+
+/* ── Props panel resize divider ─────────────────────────────────────────────── */
+.propsDivider {
+  width: 4px;
+  background: #1e1e1e;
+  cursor: col-resize;
+  flex-shrink: 0;
+  transition: background 0.15s;
+  position: relative;
+}
+.propsDivider:hover,
+.propsDivider:active {
+  background: #569cd6;
 }

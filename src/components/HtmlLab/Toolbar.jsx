@@ -22,10 +22,13 @@ export default function Toolbar({
   showOverlay,
   showLabels,
   showComponents,
+  previewMode,
   onAddElement,
   onToggleOverlay,
   onToggleLabels,
   onToggleComponents,
+  onTogglePreview,
+  onNew,
   onUndo,
   onClear,
   onExport,
@@ -80,6 +83,14 @@ export default function Toolbar({
       <div className={styles.toolbarSep} />
 
       <button
+        className={`${styles.tbBtn} ${previewMode ? styles.tbBtnPreview : ""}`}
+        onClick={onTogglePreview}
+        title={previewMode ? "Back to editor (Esc)" : "Preview with live JavaScript"}
+      >
+        {previewMode ? "✎ Edit" : "▶ Preview"}
+      </button>
+
+      <button
         className={`${styles.tbBtn} ${showLabels ? styles.tbBtnActive : ""}`}
         onClick={onToggleLabels}
         title="Show/hide element tag labels"
@@ -93,6 +104,14 @@ export default function Toolbar({
         title="Toggle box model overlay on selected element"
       >
         ⬜ Box model
+      </button>
+
+      <button
+        className={`${styles.tbBtn} ${styles.tbBtnDanger}`}
+        onClick={onNew}
+        title="Start a new blank project"
+      >
+        + New
       </button>
 
       <button
@@ -114,7 +133,7 @@ export default function Toolbar({
 
       <button
         className={`${styles.tbBtn} ${styles.tbBtnDanger}`}
-        onClick={() => { if (window.confirm("Clear all elements?")) onClear(); }}
+        onClick={onClear}
         title="Clear canvas"
       >
         ✕ Clear

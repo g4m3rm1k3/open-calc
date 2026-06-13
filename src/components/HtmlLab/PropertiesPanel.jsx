@@ -253,13 +253,13 @@ const SECTIONS = [
 
 const MULTI_SECTIONS = ["layout", "size", "spacing", "typography", "background", "border"];
 
-function MultiSelectPanel({ count, element, onChange }) {
+function MultiSelectPanel({ count, element, onChange, style }) {
   const [collapsed, setCollapsed] = useState({});
   const toggle = (key) => setCollapsed((c) => ({ ...c, [key]: !c[key] }));
   const sections = SECTIONS.filter(s => MULTI_SECTIONS.includes(s.key));
 
   return (
-    <div className={styles.propsPanel}>
+    <div className={styles.propsPanel} style={style}>
       <div className={styles.panelHeader}>
         <span className={styles.panelHeaderTag}>Multi-select · {count} elements</span>
       </div>
@@ -316,8 +316,10 @@ export default function PropertiesPanel({
   onApplyComponentTheme,
   onApplyBodyTheme,
   onDelete,
+  style,
 }) {
   const [collapsed, setCollapsed] = useState({ boxmodel: false });
+  const [textEditorOpen, setTextEditorOpen] = useState(false);
 
   const toggle = (key) => setCollapsed((c) => ({ ...c, [key]: !c[key] }));
 
@@ -327,13 +329,14 @@ export default function PropertiesPanel({
         count={multiSelectedIds.length}
         element={multiElement}
         onChange={onMultiStyleChange}
+        style={style}
       />
     );
   }
 
   if (!element) {
     return (
-      <div className={styles.propsPanel}>
+      <div className={styles.propsPanel} style={style}>
         <div className={styles.panelHeader}>Properties</div>
         <div className={styles.propsEmpty}>
           Select an element on the canvas to edit its styles.
@@ -343,7 +346,15 @@ export default function PropertiesPanel({
   }
 
   return (
-    <div className={styles.propsPanel}>
+    <div className={styles.propsPanel} style={style}>
+      {textEditorOpen && (
+        <TextEditorModal
+          value={element.content || ""}
+          onChange={onContentChange}
+          onClose={() => setTextEditorOpen(false)}
+          tag={element.tag}
+        />
+      )}
       <div className={styles.panelHeader}>
         {element.tag === "body" ? (
           <span>&lt;body&gt; · page root</span>
@@ -430,6 +441,7 @@ export default function PropertiesPanel({
                         onContentChange={onContentChange}
                         onTagChange={onTagChange}
                         onAttrChange={onAttrChange}
+                        onExpandContent={() => setTextEditorOpen(true)}
                       />
                     ))}
                     <GradientPresets onChange={onChange} />
@@ -444,6 +456,7 @@ export default function PropertiesPanel({
                       onContentChange={onContentChange}
                       onTagChange={onTagChange}
                       onAttrChange={onAttrChange}
+                      onExpandContent={() => setTextEditorOpen(true)}
                     />
                   ))
                 )}
@@ -456,6 +469,31 @@ export default function PropertiesPanel({
   );
 }
 
+function TextEditorModal({ value, onChange, onClose, tag }) {
+  const [draft, setDraft] = useState(value);
+  return (
+    <div className={styles.textEditorOverlay} onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className={styles.textEditorBox}>
+        <div className={styles.textEditorHeader}>
+          <span>Text content · &lt;{tag}&gt;</span>
+          <button className={styles.textEditorClose} onClick={onClose}>✕</button>
+        </div>
+        <textarea
+          className={styles.textEditorArea}
+          value={draft}
+          onChange={(e) => { setDraft(e.target.value); onChange(e.target.value); }}
+          autoFocus
+          placeholder="Type your content here…"
+        />
+        <div className={styles.textEditorFooter}>
+          <span className={styles.textEditorHint}>Changes apply live</span>
+          <button className={styles.textEditorDone} onClick={onClose}>Done</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function PropRow({
   row,
   element,
@@ -463,6 +501,7 @@ function PropRow({
   onContentChange,
   onTagChange,
   onAttrChange,
+  onExpandContent,
 }) {
   const val = element.styles[row.prop] || "";
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -565,12 +604,21 @@ function PropRow({
 
   if (row.prop === "_content") {
     return (
-      <div className={styles.propRow}>
-        <label className={styles.propLabel}>Text</label>
-        <input
-          className={styles.propInput}
+      <div className={styles.propRowContent}>
+        <div className={styles.propRowContentHeader}>
+          <label className={styles.propLabel}>Text</label>
+          <button
+            className={styles.propExpandBtn}
+            onClick={() => onExpandContent?.()}
+            title="Open full text editor"
+          >⤢ expand</button>
+        </div>
+        <textarea
+          className={styles.propTextarea}
           value={element.content || ""}
           onChange={(e) => onContentChange(e.target.value)}
+          rows={3}
+          placeholder="Element text content…"
         />
       </div>
     );

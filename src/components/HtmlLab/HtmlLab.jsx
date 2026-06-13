@@ -3,7 +3,9 @@ import Toolbar from "./Toolbar";
 import CanvasPanel from "./CanvasPanel";
 import CodePanel from "./CodePanel";
 import PropertiesPanel from "./PropertiesPanel";
+import ConfirmDialog, { shouldSkip } from "./ConfirmDialog";
 import { labReducer, initialState } from "./labReducer";
+import { generateExampleProject } from "./exampleProject";
 import { COMPONENTS, BODY_THEMES, detectComponents, buildThemeUpdates } from "./componentLibrary";
 import { JS_PRESETS } from "./jsPresets";
 import {
@@ -13,14 +15,19 @@ import {
   htmlToElements,
   generateExportHtml,
 } from "./htmlSync";
-import { generateExampleProject } from "./exampleProject";
 import styles from "./HtmlLab.module.css";
 
 export default function HtmlLab({ onBack }) {
-  const [state, dispatch] = useReducer(labReducer, initialState);
+  const [state, dispatch] = useReducer(labReducer, undefined, () => {
+    const ex = generateExampleProject();
+    return { ...initialState, elements: ex.elements, bodyStyles: ex.bodyStyles, javascript: ex.javascript ?? "" };
+  });
   const [codePanelWidth, setCodePanelWidth] = useState(360);
+  const [propsPanelWidth, setPropsPanelWidth] = useState(280);
   const [showComponents, setShowComponents] = useState(false);
   const [multiSelectedIds, setMultiSelectedIds] = useState([]);
+  const [previewMode, setPreviewMode] = useState(false);
+  const [confirmDialog, setConfirmDialog] = useState(null);
 
   // Detect which components match the selected element's direct children
   const matchedComponents = useMemo(() => {
@@ -59,6 +66,17 @@ export default function HtmlLab({ onBack }) {
   const dividerDragging = useRef(false);
   const dividerStartX = useRef(0);
   const dividerStartW = useRef(0);
+
+  const propsDividerDragging = useRef(false);
+  const propsDividerStartX = useRef(0);
+  const propsDividerStartW = useRef(0);
+
+  const askConfirm = useCallback((storageKey, message) => {
+    if (shouldSkip(storageKey)) return Promise.resolve(true);
+    return new Promise((resolve) => {
+      setConfirmDialog({ storageKey, message, resolve });
+    });
+  }, []);
 
   const generatedCode = elementsToHtml(state.elements);
   const generatedCss = elementsToCss(state.elements, state.customCss, state.bodyStyles);
@@ -104,18 +122,58 @@ export default function HtmlLab({ onBack }) {
     window.addEventListener("mouseup", onUp);
   };
 
+  const handlePropsDividerMouseDown = (e) => {
+    propsDividerDragging.current = true;
+    propsDividerStartX.current = e.clientX;
+    propsDividerStartW.current = propsPanelWidth;
+    e.preventDefault();
+    const onMouseMove = (e) => {
+      if (!propsDividerDragging.current) return;
+      const delta = propsDividerStartX.current - e.clientX;
+      setPropsPanelWidth(Math.max(200, Math.min(560, propsDividerStartW.current + delta)));
+    };
+    const onUp = () => {
+      propsDividerDragging.current = false;
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onUp);
+  };
+
   return (
     <div className={styles.app}>
+      {confirmDialog && (
+        <ConfirmDialog
+          storageKey={confirmDialog.storageKey}
+          message={confirmDialog.message}
+          onConfirm={() => { confirmDialog.resolve(true); setConfirmDialog(null); }}
+          onCancel={() => { confirmDialog.resolve(false); setConfirmDialog(null); }}
+        />
+      )}
       <Toolbar
         showOverlay={state.showOverlay}
         showLabels={state.showLabels}
         showComponents={showComponents}
+        previewMode={previewMode}
         onAddElement={(tag) => dispatch({ type: "ADD_ELEMENT", payload: tag })}
         onToggleOverlay={() => dispatch({ type: "TOGGLE_OVERLAY" })}
         onToggleLabels={() => dispatch({ type: "TOGGLE_LABELS" })}
         onToggleComponents={() => setShowComponents(v => !v)}
+        onTogglePreview={() => setPreviewMode(v => !v)}
+        onNew={async () => {
+          const ok = await askConfirm("new_project", "Start a new blank project? This will clear everything.");
+          if (ok) {
+            dispatch({ type: "LOAD_EXAMPLE", payload: { elements: [], bodyStyles: { ...initialState.bodyStyles }, javascript: "" } });
+            setPreviewMode(false);
+            setMultiSelectedIds([]);
+          }
+        }}
         onUndo={() => dispatch({ type: "UNDO" })}
-        onClear={() => dispatch({ type: "CLEAR" })}
+        onClear={async () => {
+          const ok = await askConfirm("clear_canvas", "Clear all elements from the canvas?");
+          if (ok) dispatch({ type: "CLEAR" });
+        }}
         onExport={() => {
           const html = generateExportHtml(
             state.elements,
@@ -161,10 +219,9 @@ export default function HtmlLab({ onBack }) {
             payload: { updates, bodyStyles: bodyTheme?.styles } 
           });
         }}
-        onLoadExample={() => {
-          if (window.confirm("This will replace your current canvas. Load example project?")) {
-            dispatch({ type: "LOAD_EXAMPLE", payload: generateExampleProject() });
-          }
+        onLoadExample={async () => {
+          const ok = await askConfirm("load_example", "This will replace your current canvas. Load the example project?");
+          if (ok) dispatch({ type: "LOAD_EXAMPLE", payload: generateExampleProject() });
         }}
       />
 
@@ -240,93 +297,101 @@ export default function HtmlLab({ onBack }) {
 
         <div className={styles.divider} onMouseDown={handleDividerMouseDown} />
 
-        <CanvasPanel
-          elements={state.elements}
-          selectedId={state.selectedId}
-          showOverlay={state.showOverlay}
-          showLabels={state.showLabels}
-          bodyStyles={state.bodyStyles}
-          onSelect={(id) => {
-            dispatch({ type: "SELECT", payload: id });
-            setMultiSelectedIds([]);
-          }}
-          onDeselect={() => {
-            dispatch({ type: "SELECT", payload: null });
-            setMultiSelectedIds([]);
-          }}
-          onDelete={(id) => dispatch({ type: "DELETE_ELEMENT", payload: id })}
-          onNest={(childId, parentId, order) =>
-            dispatch({
-              type: "NEST_ELEMENT",
-              payload: { childId, parentId, order },
-            })
-          }
-          onMoveToRoot={(id, order) =>
-            dispatch({ type: "MOVE_TO_ROOT", payload: { id, order } })
-          }
-          onReorder={(id, parentId, order) =>
-            dispatch({
-              type: "REORDER_ELEMENT",
-              payload: { id, parentId, order },
-            })
-          }
-        />
+        {previewMode ? (
+          <iframe
+            key="preview-frame"
+            className={styles.previewFrame}
+            srcDoc={generateExportHtml(state.elements, state.bodyStyles, state.customCss, state.javascript)}
+            title="Preview"
+            sandbox="allow-scripts"
+          />
+        ) : (
+          <>
+            <CanvasPanel
+              elements={state.elements}
+              selectedId={state.selectedId}
+              showOverlay={state.showOverlay}
+              showLabels={state.showLabels}
+              bodyStyles={state.bodyStyles}
+              onSelect={(id) => {
+                dispatch({ type: "SELECT", payload: id });
+                setMultiSelectedIds([]);
+              }}
+              onDeselect={() => {
+                dispatch({ type: "SELECT", payload: null });
+                setMultiSelectedIds([]);
+              }}
+              onDelete={(id) => dispatch({ type: "DELETE_ELEMENT", payload: id })}
+              onNest={(childId, parentId, order) =>
+                dispatch({ type: "NEST_ELEMENT", payload: { childId, parentId, order } })
+              }
+              onMoveToRoot={(id, order) =>
+                dispatch({ type: "MOVE_TO_ROOT", payload: { id, order } })
+              }
+              onReorder={(id, parentId, order) =>
+                dispatch({ type: "REORDER_ELEMENT", payload: { id, parentId, order } })
+              }
+            />
 
-        <PropertiesPanel
-          element={selectedElement}
-          multiSelectedIds={multiSelectedIds}
-          multiElement={multiElement}
-          matchedComponents={matchedComponents}
-          bodyThemes={!state.selectedId ? BODY_THEMES : null}
-          onDelete={(id) => dispatch({ type: "DELETE_ELEMENT", payload: id })}
-          onApplyComponentTheme={(theme) => {
-            const updates = buildThemeUpdates(state.selectedId, state.elements, theme);
-            dispatch({ type: "APPLY_COMPONENT_THEME", payload: { updates } });
-          }}
-          onApplyBodyTheme={(theme) =>
-            theme.reset
-              ? dispatch({ type: "RESET_BODY_STYLES" })
-              : dispatch({ type: "APPLY_BODY_THEME", payload: theme.styles })
-          }
-          onChange={(prop, value) =>
-            state.selectedId
-              ? dispatch({ type: "UPDATE_STYLE", payload: { prop, value } })
-              : dispatch({ type: "UPDATE_BODY_STYLE", payload: { prop, value } })
-          }
-          onMultiStyleChange={(prop, value) =>
-            dispatch({ type: "UPDATE_MULTI_STYLE", payload: { ids: multiSelectedIds, prop, value } })
-          }
-          onContentChange={(value) =>
-            dispatch({ type: "UPDATE_CONTENT", payload: value })
-          }
-          onTagChange={(tag) => dispatch({ type: "UPDATE_TAG", payload: tag })}
-          onAttrChange={(prop, value) =>
-            dispatch({ type: "UPDATE_ATTR", payload: { prop, value } })
-          }
-          javascript={state.javascript}
-          onInsertJavascript={(snippet) =>
-            dispatch({
-              type: "SET_JAVASCRIPT",
-              payload: appendJavascriptSnippet(state.javascript, snippet),
-            })
-          }
-          onInsertJsPreset={(template, code) => {
-            dispatch({ type: "INSERT_TEMPLATE", payload: { template } });
-            dispatch({
-              type: "SET_JAVASCRIPT",
-              payload: appendJavascriptSnippet(state.javascript, code),
-            });
-          }}
-          onApplyPreset={(presetStyles) =>
-            dispatch({ type: "APPLY_PRESET", payload: presetStyles })
-          }
-          onAddMediaQuery={(mq) =>
-            dispatch({ type: "ADD_MEDIA_QUERY", payload: mq })
-          }
-          onRemoveMediaQuery={(index) =>
-            dispatch({ type: "REMOVE_MEDIA_QUERY", payload: index })
-          }
-        />
+            <div className={styles.propsDivider} onMouseDown={handlePropsDividerMouseDown} />
+            <PropertiesPanel
+              style={{ width: propsPanelWidth, flexShrink: 0 }}
+              element={selectedElement}
+              multiSelectedIds={multiSelectedIds}
+              multiElement={multiElement}
+              matchedComponents={matchedComponents}
+              bodyThemes={!state.selectedId ? BODY_THEMES : null}
+              onDelete={(id) => dispatch({ type: "DELETE_ELEMENT", payload: id })}
+              onApplyComponentTheme={(theme) => {
+                const updates = buildThemeUpdates(state.selectedId, state.elements, theme);
+                dispatch({ type: "APPLY_COMPONENT_THEME", payload: { updates } });
+              }}
+              onApplyBodyTheme={(theme) =>
+                theme.reset
+                  ? dispatch({ type: "RESET_BODY_STYLES" })
+                  : dispatch({ type: "APPLY_BODY_THEME", payload: theme.styles })
+              }
+              onChange={(prop, value) =>
+                state.selectedId
+                  ? dispatch({ type: "UPDATE_STYLE", payload: { prop, value } })
+                  : dispatch({ type: "UPDATE_BODY_STYLE", payload: { prop, value } })
+              }
+              onMultiStyleChange={(prop, value) =>
+                dispatch({ type: "UPDATE_MULTI_STYLE", payload: { ids: multiSelectedIds, prop, value } })
+              }
+              onContentChange={(value) =>
+                dispatch({ type: "UPDATE_CONTENT", payload: value })
+              }
+              onTagChange={(tag) => dispatch({ type: "UPDATE_TAG", payload: tag })}
+              onAttrChange={(prop, value) =>
+                dispatch({ type: "UPDATE_ATTR", payload: { prop, value } })
+              }
+              javascript={state.javascript}
+              onInsertJavascript={(snippet) =>
+                dispatch({
+                  type: "SET_JAVASCRIPT",
+                  payload: appendJavascriptSnippet(state.javascript, snippet),
+                })
+              }
+              onInsertJsPreset={(template, code) => {
+                dispatch({ type: "INSERT_TEMPLATE", payload: { template } });
+                dispatch({
+                  type: "SET_JAVASCRIPT",
+                  payload: appendJavascriptSnippet(state.javascript, code),
+                });
+              }}
+              onApplyPreset={(presetStyles) =>
+                dispatch({ type: "APPLY_PRESET", payload: presetStyles })
+              }
+              onAddMediaQuery={(mq) =>
+                dispatch({ type: "ADD_MEDIA_QUERY", payload: mq })
+              }
+              onRemoveMediaQuery={(index) =>
+                dispatch({ type: "REMOVE_MEDIA_QUERY", payload: index })
+              }
+            />
+          </>
+        )}
       </div>
     </div>
   );
