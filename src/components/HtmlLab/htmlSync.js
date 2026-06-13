@@ -56,6 +56,36 @@ export function elementsToCss(elements, customCss = "") {
     }),
   ];
 
+  // ── Media query blocks ──────────────────────────────────────────────────────
+  // Group all element media queries by breakpoint
+  const mqByBreakpoint = new Map();
+  for (const el of elements) {
+    for (const mq of el.mediaQueries || []) {
+      const bp = mq.breakpoint;
+      if (!mqByBreakpoint.has(bp)) mqByBreakpoint.set(bp, []);
+      mqByBreakpoint.get(bp).push({ id: el.id, prop: mq.prop, value: mq.value });
+    }
+  }
+  if (mqByBreakpoint.size > 0) {
+    blocks.push("");
+    for (const [bp, rules] of mqByBreakpoint) {
+      const grouped = new Map();
+      for (const r of rules) {
+        if (!grouped.has(r.id)) grouped.set(r.id, []);
+        grouped.get(r.id).push({ prop: r.prop, value: r.value });
+      }
+      const inner = [...grouped.entries()]
+        .map(([id, propRules]) => {
+          const propLines = propRules
+            .map(({ prop, value }) => `    ${prop.replace(/([A-Z])/g, "-$1").toLowerCase()}: ${value};`)
+            .join("\n");
+          return `  [data-lab-id="${id}"] {\n${propLines}\n  }`;
+        })
+        .join("\n");
+      blocks.push(`@media (min-width: ${bp}) {\n${inner}\n}`);
+    }
+  }
+
   const trimmedCustom = customCss.trim();
   if (trimmedCustom) {
     blocks.push("", "/* Custom CSS */", trimmedCustom);
@@ -149,6 +179,7 @@ export function htmlToElements(code, existingElements = [], javascript = "") {
         content,
         parentId: parentId || null,
         order,
+        mediaQueries: existing?.mediaQueries || [],
       };
 
       const descendants = [];

@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import styles from "./HtmlLab.module.css";
+import { COMPONENT_PRESETS, PROP_PRESETS, BREAKPOINTS, CSS_PROPS_LIST } from "./styleLibrary";
 
 const TAGS = ["div", "p", "h1", "h2", "h3", "h4", "button", "span", "a", "img", "ul", "li", "section", "article", "header", "footer"];
 
@@ -18,6 +19,12 @@ const TAG_ATTR_ROWS = {
 };
 
 const SECTIONS = [
+  {
+    key: "styleLibrary",
+    title: "Style Library",
+    rows: [],
+    special: "styleLibrary",
+  },
   {
     key: "content",
     title: "Content",
@@ -115,6 +122,12 @@ const SECTIONS = [
     rows: [],
     special: "boxmodel",
   },
+  {
+    key: "mediaQueries",
+    title: "Media Queries",
+    rows: [],
+    special: "mediaQueries",
+  },
 ];
 
 export default function PropertiesPanel({
@@ -125,6 +138,9 @@ export default function PropertiesPanel({
   onAttrChange,
   javascript,
   onInsertJavascript,
+  onApplyPreset,
+  onAddMediaQuery,
+  onRemoveMediaQuery,
 }) {
   const [collapsed, setCollapsed] = useState({ boxmodel: false });
 
@@ -162,13 +178,21 @@ export default function PropertiesPanel({
 
             {!collapsed[sec.key] && (
               <div className={styles.propRows}>
-                {sec.special === "boxmodel" ? (
+                {sec.special === "styleLibrary" ? (
+                  <StyleLibrarySection onApplyPreset={onApplyPreset} />
+                ) : sec.special === "boxmodel" ? (
                   <BoxModelVisual el={element} />
                 ) : sec.special === "javascript" ? (
                   <JavascriptTools
                     element={element}
                     javascript={javascript}
                     onInsertJavascript={onInsertJavascript}
+                  />
+                ) : sec.special === "mediaQueries" ? (
+                  <MediaQueriesSection
+                    element={element}
+                    onAddMediaQuery={onAddMediaQuery}
+                    onRemoveMediaQuery={onRemoveMediaQuery}
                   />
                 ) : (
                   getRowsForSection(sec, element).map((row) => (
@@ -194,6 +218,57 @@ export default function PropertiesPanel({
 
 function PropRow({ row, element, onChange, onContentChange, onTagChange, onAttrChange }) {
   const val = element.styles[row.prop] || "";
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const pickerRef = useRef(null);
+
+  useEffect(() => {
+    if (!pickerOpen) return;
+    function handleOutside(e) {
+      if (pickerRef.current && !pickerRef.current.contains(e.target)) {
+        setPickerOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
+  }, [pickerOpen]);
+
+  const presets = PROP_PRESETS[row.prop] || null;
+
+  const pickerBtn = presets ? (
+    <div className={styles.pickerWrap} ref={pickerRef}>
+      <button
+        type="button"
+        className={styles.pickerBtn}
+        title="Show presets"
+        onClick={() => setPickerOpen((o) => !o)}
+      >
+        ▾
+      </button>
+      {pickerOpen && (
+        <div className={styles.pickerList}>
+          {presets.map((p) => (
+            <button
+              key={p}
+              type="button"
+              className={`${styles.pickerItem} ${val === p ? styles.pickerItemActive : ""}`}
+              onClick={() => {
+                onChange(row.prop, p);
+                setPickerOpen(false);
+              }}
+            >
+              {row.prop === "backgroundColor" || row.prop === "color" || row.prop === "border" ? (
+                <span
+                  className={styles.pickerSwatch}
+                  style={{ background: p === "none" || p === "transparent" ? "transparent" : (row.prop === "border" ? p.split(" ").slice(-1)[0] : p), border: "1px solid #555" }}
+                />
+              ) : null}
+              <span>{p}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  ) : null;
 
   if (row.prop === "_content") {
     return (
@@ -269,6 +344,7 @@ function PropRow({ row, element, onChange, onContentChange, onTagChange, onAttrC
           placeholder="#000000"
           onChange={(e) => onChange(row.prop, e.target.value)}
         />
+        {pickerBtn}
       </div>
     );
   }
@@ -282,6 +358,178 @@ function PropRow({ row, element, onChange, onContentChange, onTagChange, onAttrC
         placeholder="e.g. 8px"
         onChange={(e) => onChange(row.prop, e.target.value)}
       />
+      {pickerBtn}
+    </div>
+  );
+}
+
+// ─── Style Library Section ────────────────────────────────────────────────────
+function StyleLibrarySection({ onApplyPreset }) {
+  const [selected, setSelected] = useState("");
+  const [applied, setApplied] = useState(false);
+
+  const preset = COMPONENT_PRESETS.find((p) => p.key === selected);
+
+  const handleApply = () => {
+    if (!preset) return;
+    onApplyPreset(preset.styles);
+    setApplied(true);
+    setTimeout(() => setApplied(false), 800);
+  };
+
+  // Group presets by category
+  const categories = [...new Set(COMPONENT_PRESETS.map((p) => p.category))];
+
+  return (
+    <div className={styles.slibSection}>
+      <div className={styles.slibHint}>
+        Pick a component style and apply it to the selected element.
+      </div>
+      <div className={styles.slibRow}>
+        <select
+          className={styles.propSelect}
+          value={selected}
+          onChange={(e) => { setSelected(e.target.value); setApplied(false); }}
+        >
+          <option value="">— choose preset —</option>
+          {categories.map((cat) => (
+            <optgroup key={cat} label={cat}>
+              {COMPONENT_PRESETS.filter((p) => p.category === cat).map((p) => (
+                <option key={p.key} value={p.key}>{p.label}</option>
+              ))}
+            </optgroup>
+          ))}
+        </select>
+      </div>
+      {preset && (
+        <div className={styles.slibPreview}>
+          {Object.entries(preset.styles).map(([k, v]) => (
+            <div key={k} className={styles.slibPreviewRow}>
+              <span className={styles.slibPreviewProp}>{k.replace(/([A-Z])/g, "-$1").toLowerCase()}</span>
+              <span className={styles.slibPreviewVal}>{v}</span>
+            </div>
+          ))}
+        </div>
+      )}
+      <button
+        type="button"
+        className={`${styles.slibApplyBtn} ${applied ? styles.slibApplyBtnDone : ""}`}
+        disabled={!preset}
+        onClick={handleApply}
+      >
+        {applied ? "✓ Applied" : "Apply Preset"}
+      </button>
+    </div>
+  );
+}
+
+// ─── Media Queries Section ────────────────────────────────────────────────────
+function MediaQueriesSection({ element, onAddMediaQuery, onRemoveMediaQuery }) {
+  const [bp, setBp] = useState("768px");
+  const [customBp, setCustomBp] = useState("");
+  const [prop, setProp] = useState("");
+  const [value, setValue] = useState("");
+
+  const effectiveBp = bp === "" ? customBp.trim() : bp;
+  const propPresets = prop && PROP_PRESETS[prop] ? PROP_PRESETS[prop] : null;
+  const mqList = element.mediaQueries || [];
+
+  const handleAdd = () => {
+    if (!effectiveBp || !prop.trim() || !value.trim()) return;
+    onAddMediaQuery({ breakpoint: effectiveBp, prop: prop.trim(), value: value.trim() });
+    setProp("");
+    setValue("");
+  };
+
+  return (
+    <div className={styles.mqSection}>
+      <div className={styles.mqBuilderLabel}>Breakpoint (min-width)</div>
+      <div className={styles.mqRow}>
+        <select
+          className={styles.propSelect}
+          value={bp}
+          onChange={(e) => setBp(e.target.value)}
+        >
+          {BREAKPOINTS.map((b) => (
+            <option key={b.label} value={b.value}>{b.label}</option>
+          ))}
+        </select>
+        {bp === "" && (
+          <input
+            className={styles.propInput}
+            value={customBp}
+            placeholder="e.g. 900px"
+            onChange={(e) => setCustomBp(e.target.value)}
+          />
+        )}
+      </div>
+
+      <div className={styles.mqBuilderLabel}>Property</div>
+      <div className={styles.mqRow}>
+        <input
+          className={styles.propInput}
+          list="mq-css-props"
+          value={prop}
+          placeholder="e.g. flexDirection"
+          onChange={(e) => { setProp(e.target.value); setValue(""); }}
+        />
+        <datalist id="mq-css-props">
+          {CSS_PROPS_LIST.map((p) => <option key={p} value={p} />)}
+        </datalist>
+      </div>
+
+      <div className={styles.mqBuilderLabel}>Value</div>
+      <div className={styles.mqRow}>
+        {propPresets ? (
+          <select
+            className={styles.propSelect}
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+          >
+            <option value="">— pick or type below —</option>
+            {propPresets.map((v) => (
+              <option key={v} value={v}>{v}</option>
+            ))}
+          </select>
+        ) : null}
+        <input
+          className={styles.propInput}
+          value={value}
+          placeholder="e.g. column"
+          onChange={(e) => setValue(e.target.value)}
+        />
+      </div>
+
+      <button
+        type="button"
+        className={styles.mqAddBtn}
+        disabled={!effectiveBp || !prop.trim() || !value.trim()}
+        onClick={handleAdd}
+      >
+        + Add Rule
+      </button>
+
+      {mqList.length > 0 && (
+        <div className={styles.mqRuleList}>
+          {mqList.map((mq, i) => (
+            <div key={i} className={styles.mqRule}>
+              <div className={styles.mqRuleText}>
+                <span className={styles.mqRuleBp}>@{mq.breakpoint}</span>
+                <span className={styles.mqRuleProp}>{mq.prop.replace(/([A-Z])/g, "-$1").toLowerCase()}</span>
+                <span className={styles.mqRuleVal}>{mq.value}</span>
+              </div>
+              <button
+                type="button"
+                className={styles.mqRuleDel}
+                onClick={() => onRemoveMediaQuery(i)}
+                title="Remove"
+              >
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

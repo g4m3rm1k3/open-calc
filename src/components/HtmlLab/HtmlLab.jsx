@@ -112,6 +112,15 @@ export default function HtmlLab({ onBack }) {
               payload: appendJavascriptSnippet(state.javascript, snippet),
             })
           }
+          onApplyPreset={(presetStyles) =>
+            dispatch({ type: "APPLY_PRESET", payload: presetStyles })
+          }
+          onAddMediaQuery={(mq) =>
+            dispatch({ type: "ADD_MEDIA_QUERY", payload: mq })
+          }
+          onRemoveMediaQuery={(index) =>
+            dispatch({ type: "REMOVE_MEDIA_QUERY", payload: index })
+          }
         />
       </div>
     </div>

@@ -141,6 +141,7 @@ export function labReducer(state, action) {
         content: TAG_CONTENT[tag] ?? "",
         parentId: null,
         order: maxOrder + 1,
+        mediaQueries: [],
       };
       return { ...s, elements: [...s.elements, el], selectedId: el.id };
     }
@@ -258,6 +259,44 @@ export function labReducer(state, action) {
           if (value === "") delete s2[prop];
           else s2[prop] = value;
           return { ...e, styles: s2 };
+        }),
+      };
+    }
+
+    case "APPLY_PRESET": {
+      const presetStyles = action.payload;
+      return {
+        ...state,
+        elements: state.elements.map((e) =>
+          e.id === state.selectedId
+            ? { ...e, styles: { ...e.styles, ...presetStyles } }
+            : e
+        ),
+      };
+    }
+
+    case "ADD_MEDIA_QUERY": {
+      const { breakpoint, prop, value } = action.payload;
+      return {
+        ...state,
+        elements: state.elements.map((e) => {
+          if (e.id !== state.selectedId) return e;
+          return {
+            ...e,
+            mediaQueries: [...(e.mediaQueries || []), { breakpoint, prop, value }],
+          };
+        }),
+      };
+    }
+
+    case "REMOVE_MEDIA_QUERY": {
+      const index = action.payload;
+      return {
+        ...state,
+        elements: state.elements.map((e) => {
+          if (e.id !== state.selectedId) return e;
+          const mqs = (e.mediaQueries || []).filter((_, i) => i !== index);
+          return { ...e, mediaQueries: mqs };
         }),
       };
     }
