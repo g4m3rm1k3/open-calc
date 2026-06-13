@@ -148,13 +148,14 @@ class ToneEngine {
     delete this.trackParams[trackId];
   }
 
-  buildSequence(trackIds, stepCount) {
+  buildSequence(stepCount) {
     this.stepCount = stepCount;
     if (this.sequence) { this.sequence.dispose(); this.sequence = null; }
 
     const steps = [...Array(stepCount).keys()];
     this.sequence = new Tone.Sequence((time, stepIndex) => {
-      trackIds.forEach((id) => {
+      // Read instrument keys dynamically so tracks added after play() starts are heard
+      Object.keys(this.instruments).forEach((id) => {
         const inst = this.instruments[id];
         if (!inst) return;
         if (this.channels[id]?.mute) return;
@@ -197,14 +198,13 @@ class ToneEngine {
   }
 
   play(tracks, stepCount) {
-    const ids = tracks.map(t => t.id);
     tracks.forEach(t => {
       this.currentSteps[t.id] = t.steps;
       this.currentNotes[t.id] = t.notes || [];
       this.trackTypes[t.id] = t.type;
       this.trackParams[t.id] = t.instrument;
     });
-    this.buildSequence(ids, stepCount);
+    this.buildSequence(stepCount);
     Tone.Transport.start();
     this.sequence.start(0);
   }
