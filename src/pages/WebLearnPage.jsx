@@ -39,6 +39,32 @@ import { lesson as css27 } from '../content/css-mastery/css-27-inline-styles-js.
 import { lesson as css28 } from '../content/css-mastery/css-28-variables-js.js'
 import { lesson as css29 } from '../content/css-mastery/css-29-scroll-observers.js'
 
+// React Mastery lessons
+import { lesson as react01 } from '../content/react-mastery/react-01-jsx.js'
+import { lesson as react02 } from '../content/react-mastery/react-02-components.js'
+import { lesson as react03 } from '../content/react-mastery/react-03-props.js'
+import { lesson as react04 } from '../content/react-mastery/react-04-lists-keys.js'
+import { lesson as react05 } from '../content/react-mastery/react-05-usestate.js'
+import { lesson as react06 } from '../content/react-mastery/react-06-events.js'
+import { lesson as react07 } from '../content/react-mastery/react-07-controlled-inputs.js'
+import { lesson as react08 } from '../content/react-mastery/react-08-conditional-rendering.js'
+import { lesson as react09 } from '../content/react-mastery/react-09-lifting-state.js'
+import { lesson as react10 } from '../content/react-mastery/react-10-useeffect.js'
+import { lesson as react11 } from '../content/react-mastery/react-11-fetching-data.js'
+import { lesson as react12 } from '../content/react-mastery/react-12-effect-cleanup.js'
+import { lesson as react13 } from '../content/react-mastery/react-13-useref.js'
+import { lesson as react14 } from '../content/react-mastery/react-14-custom-hooks.js'
+import { lesson as react15 } from '../content/react-mastery/react-15-context.js'
+import { lesson as react16 } from '../content/react-mastery/react-16-usereducer.js'
+import { lesson as react17 } from '../content/react-mastery/react-17-memo.js'
+import { lesson as react18 } from '../content/react-mastery/react-18-usememo-callback.js'
+import { lesson as react19 } from '../content/react-mastery/react-19-reconciliation.js'
+import { lesson as react20 } from '../content/react-mastery/react-20-forms.js'
+import { lesson as react21 } from '../content/react-mastery/react-21-compound-components.js'
+import { lesson as react22 } from '../content/react-mastery/react-22-data-patterns.js'
+import { lesson as react23 } from '../content/react-mastery/react-23-context-reducer.js'
+import { lesson as react24 } from '../content/react-mastery/react-24-suspense-lazy.js'
+
 const LESSONS = {
   'sandbox/1': sandbox1,
   'sandbox/2': sandbox2,
@@ -72,6 +98,30 @@ const LESSONS = {
   'css-mastery/27': css27,
   'css-mastery/28': css28,
   'css-mastery/29': css29,
+  'react-mastery/01': react01,
+  'react-mastery/02': react02,
+  'react-mastery/03': react03,
+  'react-mastery/04': react04,
+  'react-mastery/05': react05,
+  'react-mastery/06': react06,
+  'react-mastery/07': react07,
+  'react-mastery/08': react08,
+  'react-mastery/09': react09,
+  'react-mastery/10': react10,
+  'react-mastery/11': react11,
+  'react-mastery/12': react12,
+  'react-mastery/13': react13,
+  'react-mastery/14': react14,
+  'react-mastery/15': react15,
+  'react-mastery/16': react16,
+  'react-mastery/17': react17,
+  'react-mastery/18': react18,
+  'react-mastery/19': react19,
+  'react-mastery/20': react20,
+  'react-mastery/21': react21,
+  'react-mastery/22': react22,
+  'react-mastery/23': react23,
+  'react-mastery/24': react24,
 }
 
 // Ordered series list — drives "Next lesson" button
@@ -85,12 +135,21 @@ const SERIES_ORDER = {
     '21', '22', '23', '24', '25',
     '26', '27', '28', '29',
   ],
+  'react-mastery': [
+    '01', '02', '03', '04',
+    '05', '06', '07', '08', '09',
+    '10', '11', '12',
+    '13', '14', '15', '16',
+    '17', '18', '19',
+    '20', '21', '22', '23', '24',
+  ],
 }
 
 // First lesson per series — used for redirect when no lessonId in URL
 const SERIES_FIRST = {
   sandbox: '1',
   'css-mastery': '01',
+  'react-mastery': '01',
 }
 
 export default function WebLearnPage() {

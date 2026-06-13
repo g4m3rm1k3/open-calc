@@ -127,17 +127,17 @@ function Cart() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
         {PRODUCTS.map(p => (
           <button key={p.name} onClick={() => dispatch({ type: 'ADD_ITEM', payload: p })} style={{ background: '#0f172a', color: '#94a3b8', border: '1px solid #334155', padding: '8px 14px', borderRadius: '6px', cursor: 'pointer', textAlign: 'left', fontSize: '0.85rem' }}>
-            + {p.name} (${p.price})
+            + {p.name} (\${p.price})
           </button>
         ))}
       </div>
       <div style={{ background: '#0f172a', padding: '12px 16px', borderRadius: '6px', marginBottom: '12px' }}>
         {cart.items.length === 0 ? <span style={{ color: '#64748b' }}>Cart is empty</span> : cart.items.map((item, i) => (
-          <div key={i} style={{ color: '#cbd5e1', fontSize: '0.85rem', padding: '2px 0' }}>{item.name} — ${item.price}</div>
+          <div key={i} style={{ color: '#cbd5e1', fontSize: '0.85rem', padding: '2px 0' }}>{item.name} — \${item.price}</div>
         ))}
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span style={{ color: '#38bdf8', fontWeight: 700 }}>Total: ${cart.total}</span>
+        <span style={{ color: '#38bdf8', fontWeight: 700 }}>Total: \${cart.total}</span>
         <div style={{ display: 'flex', gap: '8px' }}>
           <button onClick={() => dispatch({ type: 'REMOVE_LAST' })} style={{ background: '#334155', color: '#94a3b8', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem' }}>Undo</button>
           <button onClick={() => dispatch({ type: 'CLEAR' })} style={{ background: '#ef444420', color: '#f87171', border: '1px solid #ef444440', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem' }}>Clear</button>
@@ -371,7 +371,7 @@ function BankAccount() {
   return (
     <div style={{ background: '#1e293b', padding: '28px', borderRadius: '10px', fontFamily: 'sans-serif', maxWidth: '360px', color: '#f1f5f9' }}>
       <h2 style={{ color: '#38bdf8', marginTop: 0 }}>Bank Account</h2>
-      <p style={{ fontSize: '2.5rem', fontWeight: 700, margin: '0 0 6px', color: state.balance < 0 ? '#f87171' : '#34d399' }}>${state.balance}</p>
+      <p style={{ fontSize: '2.5rem', fontWeight: 700, margin: '0 0 6px', color: state.balance < 0 ? '#f87171' : '#34d399' }}>\${state.balance}</p>
       {/* TODO: show state.error in red if it exists */}
       <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="Amount" style={{ width: '100%', background: '#0f172a', border: '1px solid #334155', color: '#f1f5f9', padding: '8px 12px', borderRadius: '6px', fontSize: '0.9rem', boxSizing: 'border-box', marginBottom: '12px' }} />
       <div style={{ display: 'flex', gap: '8px' }}>

@@ -331,7 +331,7 @@ function App() {
         >+</button>
       </div>
       <p style={{ color: '#94a3b8', fontSize: '0.9rem', margin: 0 }}>
-        Total: <strong style={{ color: '#38bdf8' }}>${(qty * 29.99).toFixed(2)}</strong>
+        Total: <strong style={{ color: '#38bdf8' }}>\${(qty * 29.99).toFixed(2)}</strong>
       </p>
     </div>
   )
