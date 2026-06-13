@@ -27,6 +27,14 @@ import { lesson as sicp32 } from '../data/learn/sicp/lesson-3-2.js'
 import { lesson as sicp33 } from '../data/learn/sicp/lesson-3-3.js'
 import { lesson as sicp33b } from '../data/learn/sicp/lesson-3-3b.js'
 import { lesson as sicp41 } from '../data/learn/sicp/lesson-4-1.js'
+import { lesson as sicp34 } from '../data/learn/sicp/lesson-3-4.js'
+import { lesson as sicp42 } from '../data/learn/sicp/lesson-4-2.js'
+import { lesson as sicp43 } from '../data/learn/sicp/lesson-4-3.js'
+import { lesson as sicp51 } from '../data/learn/sicp/lesson-5-1.js'
+import { lesson as sicp51b } from '../data/learn/sicp/lesson-5-1b.js'
+import { lesson as sicp53 } from '../data/learn/sicp/lesson-5-3.js'
+import { lesson as sicp54 } from '../data/learn/sicp/lesson-5-4.js'
+import { lesson as sicp54b } from '../data/learn/sicp/lesson-5-4b.js'
 
 import { lesson as dsa01 } from '../data/learn/dsa-patterns/lesson-01.js'
 import { lesson as dsa02 } from '../data/learn/dsa-patterns/lesson-02.js'
@@ -94,7 +102,15 @@ const LESSONS = {
   'sicp/3-2': sicp32,
   'sicp/3-3': sicp33,
   'sicp/3-3b': sicp33b,
+  'sicp/3-4': sicp34,
   'sicp/4-1': sicp41,
+  'sicp/4-2': sicp42,
+  'sicp/4-3': sicp43,
+  'sicp/5-1': sicp51,
+  'sicp/5-1b': sicp51b,
+  'sicp/5-3': sicp53,
+  'sicp/5-4': sicp54,
+  'sicp/5-4b': sicp54b,
 
   'dsa-patterns/01': dsa01,
   'dsa-patterns/02': dsa02,
@@ -145,8 +161,9 @@ const SERIES_ORDER = {
   sicp: [
     '1-1', '1-2', '1-3', '1-4', '1-4b', '1-5', '1-6', '1-7',
     '2-1', '2-2', '2-3', '2-4', '2-4b', '2-4c', '2-5', '2-6', '2-7', '2-7b',
-    '3-1', '3-2', '3-3', '3-3b',
-    '4-1',
+    '3-1', '3-2', '3-3', '3-3b', '3-4',
+    '4-1', '4-2', '4-3',
+    '5-1', '5-1b', '5-3', '5-4', '5-4b',
   ],
   'dsa-patterns': [
     '01', '02', '03', '04', '05', '06', '07', '08', '09', '10',
