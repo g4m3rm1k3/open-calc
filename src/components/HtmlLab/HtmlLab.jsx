@@ -16,6 +16,7 @@ import {
   elementsToHtml,
   htmlToElements,
   generateExportHtml,
+  generateLinkedHtml,
   parseHtmlDocument,
 } from "./htmlSync";
 import styles from "./HtmlLab.module.css";
@@ -148,26 +149,66 @@ export default function HtmlLab({ onBack }) {
   };
 
   const handleFileImport = useCallback(async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+    const files = Array.from(e.target.files);
     e.target.value = "";
-    const ext = file.name.split(".").pop().toLowerCase();
-    const reader = new FileReader();
-    reader.onload = async (ev) => {
-      const content = ev.target.result;
-      if (ext === "html") {
-        const ok = await askConfirm("import_html", `Import "${file.name}"? This replaces your current canvas.`);
-        if (!ok) return;
-        const parsed = parseHtmlDocument(content);
-        dispatch({ type: "LOAD_EXAMPLE", payload: { elements: parsed.elements, bodyStyles: { ...initialState.bodyStyles, ...parsed.bodyStyles }, javascript: parsed.javascript, customCss: parsed.css } });
-      } else if (ext === "css") {
-        dispatch({ type: "SET_FROM_CSS", payload: applyCssToElements(content, state.elements) });
-      } else if (ext === "js") {
-        dispatch({ type: "SET_JAVASCRIPT", payload: appendJavascriptSnippet(state.javascript, content) });
-      }
-    };
-    reader.readAsText(file);
-  }, [askConfirm, state.elements, state.javascript]);
+    if (!files.length) return;
+
+    const extOrder = { html: 0, css: 1, js: 2 };
+    files.sort((a, b) => {
+      const ea = a.name.split(".").pop().toLowerCase();
+      const eb = b.name.split(".").pop().toLowerCase();
+      return (extOrder[ea] ?? 9) - (extOrder[eb] ?? 9);
+    });
+
+    const hasHtml = files.some(f => f.name.toLowerCase().endsWith(".html"));
+    if (hasHtml) {
+      const label = files.length > 1
+        ? `${files.length} files (${files.map(f => f.name).join(", ")})`
+        : `"${files[0].name}"`;
+      const ok = await askConfirm("import_html", `Import ${label}? This replaces your current canvas.`);
+      if (!ok) return;
+    }
+
+    const reads = await Promise.all(files.map(f => new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onload = ev => resolve({ name: f.name, content: ev.target.result, ext: f.name.split(".").pop().toLowerCase() });
+      reader.readAsText(f);
+    })));
+
+    let elements = state.elements;
+    let bodyStyles = { ...initialState.bodyStyles, ...state.bodyStyles };
+    let javascript = state.javascript;
+    let customCss = state.customCss ?? "";
+
+    const htmlRead = reads.find(r => r.ext === "html");
+    if (htmlRead) {
+      const parsed = parseHtmlDocument(htmlRead.content);
+      elements = parsed.elements || [];
+      bodyStyles = { ...initialState.bodyStyles, ...(parsed.bodyStyles || {}) };
+      javascript = parsed.javascript || "";
+      customCss = parsed.css || "";
+    }
+
+    const cssRead = reads.find(r => r.ext === "css");
+    if (cssRead) {
+      const applied = applyCssToElements(cssRead.content, elements);
+      elements = applied.elements ?? elements;
+      if (applied.bodyStyles) bodyStyles = { ...bodyStyles, ...applied.bodyStyles };
+      if (applied.customCss) customCss = applied.customCss;
+    }
+
+    const jsRead = reads.find(r => r.ext === "js");
+    if (jsRead) {
+      javascript = appendJavascriptSnippet(javascript, jsRead.content);
+    }
+
+    if (htmlRead) {
+      dispatch({ type: "LOAD_EXAMPLE", payload: { elements, bodyStyles, javascript, customCss } });
+    } else {
+      if (cssRead) dispatch({ type: "SET_FROM_CSS", payload: { elements, customCss, bodyStyles } });
+      if (jsRead && !cssRead) dispatch({ type: "SET_JAVASCRIPT", payload: javascript });
+    }
+  }, [askConfirm, state.elements, state.bodyStyles, state.javascript, state.customCss]);
 
   const exportPage = useCallback((page) => {
     const cdnTags = resolveCdnTags(state.cdnLinks);
@@ -180,12 +221,30 @@ export default function HtmlLab({ onBack }) {
     URL.revokeObjectURL(url);
   }, []);
 
+  const exportSplit = useCallback(() => {
+    const cdnTags = resolveCdnTags(state.cdnLinks);
+    const html = generateLinkedHtml(state.elements, cdnTags);
+    const css  = elementsToCss(state.elements, state.customCss, state.bodyStyles);
+    const js   = state.javascript?.trim() || "";
+    function dl(content, filename, mime) {
+      const blob = new Blob([content], { type: mime });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement("a");
+      a.href = url; a.download = filename; a.click();
+      URL.revokeObjectURL(url);
+    }
+    dl(html, "index.html", "text/html");
+    setTimeout(() => dl(css,  "styles.css",  "text/css"),        150);
+    setTimeout(() => dl(js || "// script.js", "script.js", "text/javascript"), 300);
+  }, [state.elements, state.bodyStyles, state.customCss, state.javascript, state.cdnLinks]);
+
   return (
     <div className={styles.app}>
       <input
         ref={fileInputRef}
         type="file"
         accept=".html,.css,.js"
+        multiple
         style={{ display: "none" }}
         onChange={handleFileImport}
       />
@@ -240,7 +299,6 @@ export default function HtmlLab({ onBack }) {
         }}
         onExport={() => {
           if (state.mode === "multi") {
-            // Save current page then export all with short delay between
             const pages = state.pages.map((p) =>
               p.id === state.activePageId
                 ? { ...p, elements: state.elements, bodyStyles: state.bodyStyles, javascript: state.javascript, customCss: state.customCss }
@@ -251,6 +309,7 @@ export default function HtmlLab({ onBack }) {
             exportPage({ name: "index", elements: state.elements, bodyStyles: state.bodyStyles, customCss: state.customCss, javascript: state.javascript });
           }
         }}
+        onExportSplit={exportSplit}
         canUndo={state.history.length > 0}
         onBack={onBack}
         onApplyGlobalTheme={(themeName) => {

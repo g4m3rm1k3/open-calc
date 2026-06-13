@@ -67,6 +67,7 @@
     "remark-gfm": "^4.0.1",
     "remark-math": "^6.0.0",
     "three": "^0.168.0",
+    "tone": "^15.1.22",
     "trystero": "^0.23.1"
   },
   "devDependencies": {

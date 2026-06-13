@@ -250,27 +250,22 @@ export function extractJavascriptRefs(javascript = "") {
   return { labIds, htmlIds };
 }
 
-// ─── Export: generate a clean standalone HTML file ───────────────────────────
-export function generateExportHtml(elements, bodyStyles, customCss, javascript, cdnTags = []) {
+// ─── Shared element renderer (used by both export functions) ──────────────────
+function buildHtmlBody(elements) {
   const VOID_TAGS = new Set(["img", "br", "hr", "input", "meta", "link"]);
-
-  function renderClean(el, depth = 1) {
+  function renderEl(el, depth = 1) {
     const indent = "  ".repeat(depth);
     const children = elements
       .filter(c => c.parentId === el.id)
       .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-
-    // data-lab-id must be present so the generated CSS ([data-lab-id="..."]) can match
     const userAttrs = Object.entries(el.attrs || {})
       .filter(([, v]) => v !== undefined && v !== null && String(v).trim() !== "")
       .map(([k, v]) => ` ${k}="${String(v).replace(/"/g, "&quot;")}"`)
       .join("");
     const attrStr = ` data-lab-id="${el.id}"${userAttrs}`;
-
     if (VOID_TAGS.has(el.tag)) return `${indent}<${el.tag}${attrStr} />`;
-
     if (children.length > 0) {
-      const childLines = children.map(c => renderClean(c, depth + 1)).join("\n");
+      const childLines = children.map(c => renderEl(c, depth + 1)).join("\n");
       const inner = el.content
         ? `\n${indent}  ${el.content}\n${childLines}\n${indent}`
         : `\n${childLines}\n${indent}`;
@@ -278,12 +273,16 @@ export function generateExportHtml(elements, bodyStyles, customCss, javascript, 
     }
     return `${indent}<${el.tag}${attrStr}>${el.content || ""}</${el.tag}>`;
   }
-
-  const roots = elements
+  return elements
     .filter(e => !e.parentId)
-    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+    .map(el => renderEl(el))
+    .join("\n");
+}
 
-  const htmlBody = roots.map(el => renderClean(el)).join("\n");
+// ─── Export: generate a clean standalone HTML file ───────────────────────────
+export function generateExportHtml(elements, bodyStyles, customCss, javascript, cdnTags = []) {
+  const htmlBody = buildHtmlBody(elements);
   const css      = elementsToCss(elements, customCss, bodyStyles);
 
   const cdnHeadTags = cdnTags.map(({ url, type }) =>
@@ -312,6 +311,35 @@ export function generateExportHtml(elements, bodyStyles, customCss, javascript, 
     `</body>`,
     `</html>`,
   ].filter(l => l !== null && l !== "").join("\n");
+}
+
+// ─── Export: generate HTML that links to separate styles.css / script.js ─────
+export function generateLinkedHtml(elements, cdnTags = []) {
+  const htmlBody = buildHtmlBody(elements);
+  const cdnHeadTags = cdnTags.map(({ url, type }) =>
+    type === "stylesheet"
+      ? `  <link rel="stylesheet" href="${url}" />`
+      : `  <script src="${url}"></script>`
+  ).join("\n");
+
+  return [
+    `<!DOCTYPE html>`,
+    `<html lang="en">`,
+    `<head>`,
+    `  <meta charset="UTF-8" />`,
+    `  <meta name="viewport" content="width=device-width, initial-scale=1.0" />`,
+    `  <title>My Page</title>`,
+    cdnHeadTags || null,
+    `  <link rel="stylesheet" href="styles.css" />`,
+    `</head>`,
+    `<body>`,
+    ``,
+    htmlBody,
+    ``,
+    `  <script src="script.js" defer></script>`,
+    `</body>`,
+    `</html>`,
+  ].filter(l => l !== null).join("\n");
 }
 
 export function applyCssToElements(css, elements) {

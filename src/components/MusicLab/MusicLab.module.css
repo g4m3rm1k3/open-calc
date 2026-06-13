@@ -1,0 +1,1027 @@
+/* ── Base ────────────────────────────────────────────────────────────────────── */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 13px;
+  background: #0d1117;
+  color: #e6edf3;
+  user-select: none;
+}
+
+/* ── Transport ───────────────────────────────────────────────────────────────── */
+.transport {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: #161b22;
+  border-bottom: 1px solid #30363d;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  min-height: 44px;
+}
+
+.logo {
+  font-size: 13px;
+  font-weight: 600;
+  color: #e6edf3;
+  letter-spacing: -0.01em;
+}
+
+.transportSep {
+  width: 1px;
+  height: 20px;
+  background: #30363d;
+  margin: 0 2px;
+  flex-shrink: 0;
+}
+
+.transportLabel {
+  font-size: 11px;
+  color: #7d8590;
+}
+
+.transportVal {
+  font-size: 11px;
+  color: #7d8590;
+  min-width: 36px;
+}
+
+.bpmInput {
+  width: 52px;
+  padding: 3px 6px;
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 4px;
+  color: #e6edf3;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
+  outline: none;
+}
+
+.bpmInput:focus { border-color: #388bfd; }
+
+.bpmSlider {
+  width: 80px;
+  accent-color: #388bfd;
+  cursor: pointer;
+}
+
+.volSlider {
+  width: 80px;
+  accent-color: #388bfd;
+  cursor: pointer;
+}
+
+.stepsSelect {
+  padding: 3px 6px;
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 4px;
+  color: #e6edf3;
+  font-size: 12px;
+  outline: none;
+  cursor: pointer;
+}
+
+.tbBtn {
+  padding: 4px 12px;
+  border: 1px solid #30363d;
+  border-radius: 5px;
+  background: #21262d;
+  color: #e6edf3;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.1s, border-color 0.1s;
+  white-space: nowrap;
+}
+
+.tbBtn:hover:not(:disabled) { background: #30363d; }
+.tbBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.tbBtnActive {
+  background: #1f6feb;
+  border-color: #388bfd;
+  color: #fff;
+}
+
+.tbBtnActive:hover { background: #388bfd; }
+
+/* ── Main layout ─────────────────────────────────────────────────────────────── */
+.main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.leftCol {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.rightCol {
+  width: 340px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid #30363d;
+  overflow: hidden;
+}
+
+/* ── Track List ──────────────────────────────────────────────────────────────── */
+.trackList {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #0d1117;
+}
+
+.trackListHeader {
+  display: flex;
+  align-items: center;
+  padding: 4px 0 4px 8px;
+  border-bottom: 1px solid #21262d;
+  flex-shrink: 0;
+  background: #161b22;
+}
+
+.trackListLabel {
+  width: 200px;
+  font-size: 10px;
+  color: #7d8590;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+.stepNumbers {
+  display: flex;
+  flex: 1;
+  padding: 0 4px;
+}
+
+.stepNum {
+  flex: 1;
+  text-align: center;
+  font-size: 9px;
+  color: #7d8590;
+  line-height: 20px;
+}
+
+.stepNumActive {
+  color: #00e5ff;
+  font-weight: 600;
+}
+
+.tracks {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* ── Track ───────────────────────────────────────────────────────────────────── */
+.track {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #21262d;
+  cursor: pointer;
+  transition: background 0.1s;
+  min-height: 44px;
+}
+
+.track:hover { background: #161b22; }
+
+.trackSelected {
+  background: #161b22;
+  box-shadow: inset 2px 0 0 var(--track-color, #388bfd);
+}
+
+.trackColorBar {
+  width: 3px;
+  align-self: stretch;
+  flex-shrink: 0;
+  border-radius: 0 2px 2px 0;
+}
+
+.trackControls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 200px;
+  flex-shrink: 0;
+  padding: 4px 6px;
+}
+
+.trackName {
+  font-size: 12px;
+  color: #e6edf3;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: default;
+}
+
+.trackNameInput {
+  flex: 1;
+  background: #0d1117;
+  border: 1px solid #388bfd;
+  border-radius: 3px;
+  color: #e6edf3;
+  font-size: 12px;
+  padding: 2px 4px;
+  outline: none;
+}
+
+.trackBtns {
+  display: flex;
+  gap: 2px;
+}
+
+.trackBtn {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #30363d;
+  border-radius: 3px;
+  background: #21262d;
+  color: #7d8590;
+  font-size: 9px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.trackBtn:hover { color: #e6edf3; border-color: #7d8590; }
+.trackBtnMuted { background: #6e4040; color: #ffa0a0; border-color: #a04040; }
+.trackBtnSolo { background: #4a5e2a; color: #b5e48c; border-color: #6a8e3a; }
+
+.trackMenuWrap { position: relative; }
+
+.trackMenuBtn {
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: transparent;
+  color: #7d8590;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.trackMenuBtn:hover { color: #e6edf3; }
+
+.trackMenuDropdown {
+  position: absolute;
+  left: 0;
+  top: 24px;
+  background: #21262d;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  z-index: 100;
+  min-width: 130px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+}
+
+.trackMenuDropdown button {
+  display: block;
+  width: 100%;
+  padding: 7px 12px;
+  background: transparent;
+  border: none;
+  color: #e6edf3;
+  font-size: 12px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.trackMenuDropdown button:hover { background: #30363d; }
+.trackMenuDanger { color: #f85149 !important; }
+
+/* ── Step Grid ───────────────────────────────────────────────────────────────── */
+.stepGrid {
+  display: flex;
+  flex: 1;
+  padding: 6px 4px;
+  gap: 2px;
+  align-items: center;
+}
+
+.step {
+  flex: 1;
+  height: 28px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background 0.08s, transform 0.05s;
+  min-width: 0;
+}
+
+.stepOff {
+  background: #21262d;
+}
+
+.stepOff:hover { background: #30363d; }
+
+.stepOn {
+  background: var(--step-color, #388bfd);
+  box-shadow: 0 0 6px var(--step-color, #388bfd);
+  opacity: calc(0.35 + var(--step-vel, 1) * 0.65);
+}
+
+.stepOn:hover { filter: brightness(1.2); }
+
+.stepCurrent {
+  transform: scaleY(1.15);
+  filter: brightness(1.4) !important;
+  outline: 2px solid rgba(255,255,255,0.6);
+}
+
+.stepGroupStart {
+  margin-left: 3px;
+}
+
+.stepMuted {
+  opacity: 0.4;
+}
+
+/* ── Add track ───────────────────────────────────────────────────────────────── */
+.addTrackRow {
+  padding: 8px 12px;
+  border-top: 1px solid #21262d;
+  background: #0d1117;
+}
+
+.addTrackMenu { position: relative; display: inline-block; }
+
+.addTrackBtn {
+  padding: 5px 14px;
+  background: transparent;
+  border: 1px dashed #30363d;
+  border-radius: 5px;
+  color: #7d8590;
+  font-size: 12px;
+  cursor: pointer;
+  transition: border-color 0.1s, color 0.1s;
+}
+
+.addTrackBtn:hover { border-color: #388bfd; color: #388bfd; }
+
+.addTrackDropdown {
+  position: absolute;
+  bottom: 32px;
+  left: 0;
+  background: #21262d;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  z-index: 100;
+  min-width: 110px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+}
+
+.addTrackOption {
+  display: block;
+  width: 100%;
+  padding: 7px 12px;
+  background: transparent;
+  border: none;
+  color: #e6edf3;
+  font-size: 12px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.addTrackOption:hover { background: #30363d; }
+
+/* ── Oscilloscope ────────────────────────────────────────────────────────────── */
+.oscilloscope {
+  flex-shrink: 0;
+  border-bottom: 1px solid #30363d;
+}
+
+.oscilloscopeHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 10px;
+  font-size: 10px;
+  color: #7d8590;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: #161b22;
+}
+
+.oscilloscopeHint {
+  font-size: 10px;
+  color: #00e5ff;
+}
+
+.oscilloscopeCanvas {
+  display: block;
+  width: 100%;
+  height: 100px;
+  background: #0d1117;
+}
+
+/* ── Bottom panel ────────────────────────────────────────────────────────────── */
+.bottomPanel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #0d1117;
+}
+
+.panelTabs {
+  display: flex;
+  border-bottom: 1px solid #30363d;
+  flex-shrink: 0;
+}
+
+.panelTab {
+  flex: 1;
+  padding: 7px 0;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #7d8590;
+  font-size: 12px;
+  cursor: pointer;
+  transition: color 0.1s, border-color 0.1s;
+}
+
+.panelTab:hover { color: #e6edf3; }
+
+.panelTabActive {
+  color: #e6edf3;
+  border-bottom-color: #388bfd;
+}
+
+.panelBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+/* ── Instrument panel ────────────────────────────────────────────────────────── */
+.instrumentPanel { display: flex; flex-direction: column; gap: 10px; }
+
+.instrHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.instrTitle {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.instrTitle em { color: #7d8590; font-style: normal; font-size: 11px; }
+
+.pianoRollBtn {
+  padding: 4px 10px;
+  background: #21262d;
+  border: 1px solid #30363d;
+  border-radius: 4px;
+  color: #e6edf3;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.pianoRollBtn:hover { background: #30363d; }
+
+.instrGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.instrField {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.instrLabel {
+  font-size: 10px;
+  color: #7d8590;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.instrSelect {
+  padding: 4px 6px;
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 4px;
+  color: #e6edf3;
+  font-size: 12px;
+  outline: none;
+  cursor: pointer;
+}
+
+.knob {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.knobLabel {
+  font-size: 10px;
+  color: #7d8590;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.knobRange {
+  width: 100%;
+  accent-color: #388bfd;
+  cursor: pointer;
+}
+
+.knobVal {
+  font-size: 10px;
+  color: #7d8590;
+  font-variant-numeric: tabular-nums;
+}
+
+.waveformPicker { grid-column: 1 / -1; }
+
+.waveformBtns {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.waveBtn {
+  padding: 3px 8px;
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 4px;
+  color: #7d8590;
+  font-size: 11px;
+  cursor: pointer;
+  font-family: monospace;
+}
+
+.waveBtn:hover { border-color: #388bfd; color: #388bfd; }
+
+.waveBtnActive {
+  background: #1f6feb;
+  border-color: #388bfd;
+  color: #fff;
+}
+
+.adsrVisual {
+  grid-column: 1 / -1;
+  border: 1px solid #21262d;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #0d1117;
+}
+
+.samplerLoad { grid-column: 1 / -1; display: flex; flex-direction: column; gap: 4px; }
+.fileInput { font-size: 11px; color: #7d8590; }
+.sampleLoaded { font-size: 11px; color: #3fb950; }
+
+/* ── FX Chain ────────────────────────────────────────────────────────────────── */
+.fxChain { display: flex; flex-direction: column; gap: 8px; }
+
+.fxRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fxLabel {
+  width: 80px;
+  font-size: 11px;
+  color: #7d8590;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.fxSlider {
+  flex: 1;
+  accent-color: #388bfd;
+  cursor: pointer;
+}
+
+.fxVal {
+  width: 36px;
+  font-size: 11px;
+  color: #7d8590;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Mixer ───────────────────────────────────────────────────────────────────── */
+.mixer {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 0;
+}
+
+.mixerChannel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 52px;
+  padding: 4px;
+  border-right: 1px solid #21262d;
+}
+
+.mixerName {
+  font-size: 10px;
+  color: #7d8590;
+  text-align: center;
+  max-width: 50px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mixerLabel {
+  font-size: 9px;
+  color: #7d8590;
+  text-transform: uppercase;
+}
+
+.mixerSlider {
+  width: 50px;
+  accent-color: #388bfd;
+  cursor: pointer;
+}
+
+.mixerVolSlider {
+  writing-mode: vertical-lr;
+  direction: rtl;
+  width: 24px;
+  height: 80px;
+}
+
+.mixerVal {
+  font-size: 9px;
+  color: #7d8590;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Piano Roll ──────────────────────────────────────────────────────────────── */
+.pianoRollOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pianoRoll {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  width: 90vw;
+  max-width: 900px;
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.pianoRollHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-bottom: 1px solid #30363d;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.pianoRollClose {
+  padding: 4px 12px;
+  background: #21262d;
+  border: 1px solid #30363d;
+  border-radius: 4px;
+  color: #e6edf3;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.pianoRollBody {
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.prRowHeader {
+  display: flex;
+  position: sticky;
+  top: 0;
+  background: #161b22;
+  z-index: 10;
+  border-bottom: 1px solid #30363d;
+}
+
+.prKeyLabel {
+  width: 50px;
+  flex-shrink: 0;
+}
+
+.prStepHeader {
+  flex: 1;
+  text-align: center;
+  font-size: 9px;
+  color: #7d8590;
+  padding: 3px 0;
+  min-width: 24px;
+}
+
+.prGroupStart {
+  border-left: 1px solid #30363d;
+}
+
+.prRows {
+  flex: 1;
+}
+
+.prRow {
+  display: flex;
+  border-bottom: 1px solid #21262d;
+}
+
+.prKey {
+  width: 50px;
+  flex-shrink: 0;
+  font-size: 10px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  border-right: 1px solid #30363d;
+  height: 20px;
+}
+
+.prKeyWhite {
+  background: #e6edf3;
+  color: #0d1117;
+}
+
+.prKeyBlack {
+  background: #21262d;
+  color: #7d8590;
+}
+
+.prCell {
+  flex: 1;
+  height: 20px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-right: 1px solid #21262d;
+  min-width: 24px;
+  transition: background 0.05s;
+}
+
+.prCell:hover { background: #30363d; }
+
+.prCellOn {
+  background: var(--track-color, #388bfd) !important;
+  box-shadow: inset 0 0 4px rgba(0,0,0,0.3);
+}
+
+.prCellSelected {
+  outline: 2px solid rgba(255,255,255,0.6) !important;
+  outline-offset: -2px;
+}
+
+/* ── Piano Roll: velocity lane ───────────────────────────────────────────────── */
+.prVelocityLane {
+  display: flex;
+  height: 48px;
+  border-top: 2px solid #30363d;
+  flex-shrink: 0;
+  background: #0d1117;
+  position: sticky;
+  bottom: 0;
+}
+
+.prVelCell {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  padding: 2px 1px;
+  min-width: 24px;
+  border-right: 1px solid #21262d;
+}
+
+.prVelBar {
+  width: 100%;
+  min-height: 2px;
+  border-radius: 2px 2px 0 0;
+  transition: height 0.1s;
+}
+
+/* ── Piano Roll: header controls ─────────────────────────────────────────────── */
+.prHeaderControls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.prDurLabel {
+  font-size: 11px;
+  color: #7d8590;
+  margin-right: 4px;
+}
+
+.prDurBtn {
+  padding: 2px 7px;
+  background: #21262d;
+  border: 1px solid #30363d;
+  border-radius: 3px;
+  color: #7d8590;
+  font-size: 10px;
+  cursor: pointer;
+  font-family: monospace;
+}
+
+.prDurBtn:hover { border-color: #388bfd; color: #388bfd; }
+
+.prDurBtnActive {
+  background: #1f6feb;
+  border-color: #388bfd;
+  color: #fff;
+}
+
+/* ── Piano Roll: inspector ───────────────────────────────────────────────────── */
+.prInspector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border-top: 1px solid #30363d;
+  background: #161b22;
+  flex-shrink: 0;
+  font-size: 11px;
+}
+
+.prInspectorLabel { color: #7d8590; }
+
+.prInspectorSlider {
+  flex: 1;
+  max-width: 160px;
+  accent-color: #388bfd;
+}
+
+.prInspectorVal {
+  color: #e6edf3;
+  width: 30px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Step velocity visual (override the base .stepOn opacity) ──────────────── */
+
+/* ── Swing slider ────────────────────────────────────────────────────────────── */
+.swingSlider {
+  width: 70px;
+  accent-color: #a78bfa;
+  cursor: pointer;
+}
+
+/* ── Pattern badge in transport ──────────────────────────────────────────────── */
+.patternBadge {
+  padding: 2px 10px;
+  background: #1f2937;
+  border: 1px solid #374151;
+  border-radius: 12px;
+  font-size: 11px;
+  color: #a78bfa;
+  white-space: nowrap;
+}
+
+/* ── Pattern Panel ───────────────────────────────────────────────────────────── */
+.patternPanel {
+  flex-shrink: 0;
+  background: #161b22;
+  border-bottom: 1px solid #30363d;
+}
+
+.patternPanelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 10px;
+  border-bottom: 1px solid #21262d;
+}
+
+.patternPanelTitle {
+  font-size: 10px;
+  color: #7d8590;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.patternPanelBtns {
+  display: flex;
+  gap: 4px;
+}
+
+.patternHeaderBtn {
+  padding: 2px 8px;
+  background: #21262d;
+  border: 1px solid #30363d;
+  border-radius: 4px;
+  color: #7d8590;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.patternHeaderBtn:hover { color: #e6edf3; border-color: #7d8590; }
+
+.patternList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 6px 10px;
+}
+
+.patternItem {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background: #21262d;
+  border: 1px solid #30363d;
+  border-radius: 4px;
+  cursor: pointer;
+  min-width: 80px;
+  transition: border-color 0.1s;
+}
+
+.patternItem:hover { border-color: #7d8590; }
+
+.patternItemActive {
+  background: #1f2937;
+  border-color: #a78bfa;
+}
+
+.patternIndex {
+  font-size: 9px;
+  color: #7d8590;
+  min-width: 12px;
+}
+
+.patternName {
+  font-size: 11px;
+  color: #e6edf3;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.patternNameInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #388bfd;
+  color: #e6edf3;
+  font-size: 11px;
+  outline: none;
+  min-width: 60px;
+}
+
+.patternDeleteBtn {
+  background: transparent;
+  border: none;
+  color: #7d8590;
+  font-size: 10px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  opacity: 0;
+  transition: opacity 0.1s;
+}
+
+.patternItem:hover .patternDeleteBtn { opacity: 1; }
+.patternDeleteBtn:hover { color: #f85149; }
+.patternDeleteBtn:disabled { display: none; }

@@ -46,6 +46,7 @@ import {
   Brain,
   Swords,
   Sigma,
+  Music,
 } from "lucide-react";
 import TICalc from "../calculator/TICalc.jsx";
 import SigmaCalc from "../calculator/SigmaCalc.jsx";
@@ -360,6 +361,16 @@ function TopBar({
             }
           >
             <FlaskConical className="w-5 h-5" />
+          </NavLink>
+          <NavLink
+            to="/music-lab"
+            title="Music Lab"
+            aria-label="Music Lab"
+            className={({ isActive }) =>
+              `p-2 rounded-lg transition-all ${isActive ? "bg-pink-100 dark:bg-pink-900/40 text-pink-700 dark:text-pink-300 border border-pink-300 dark:border-pink-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`
+            }
+          >
+            <Music className="w-5 h-5" />
           </NavLink>
           <NavLink
             to="/matrix-reducer"
@@ -679,6 +690,7 @@ export default function AppShell({ children }) {
   const isCodeLensRoute = location.pathname.startsWith("/codelens");
   const isLearnRoute = location.pathname.startsWith("/learn") || location.pathname.startsWith("/web-learn");
   const isHtmlLabRoute = location.pathname.startsWith("/html-lab");
+  const isMusicLabRoute = location.pathname.startsWith("/music-lab");
   
   const pathParts = location.pathname.split('/').filter(Boolean);
   const isLessonRoute = pathParts[0] === 'chapter' && pathParts.length >= 3;
@@ -855,7 +867,8 @@ export default function AppShell({ children }) {
     isDSALinkedListsLabRoute ||
     isCodeLensRoute ||
     isLearnRoute ||
-    isHtmlLabRoute
+    isHtmlLabRoute ||
+    isMusicLabRoute
   ) {
     return (
       <GrapherContext.Provider value={{ openGrapher }}>

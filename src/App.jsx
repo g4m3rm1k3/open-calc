@@ -62,6 +62,7 @@ const MatrixReducerPage = lazy(() => import("./pages/MatrixReducerPage.jsx"));
 const CodeLensPage = lazy(() => import("./pages/CodeLensPage.jsx"));
 const LearnPage = lazy(() => import("./pages/LearnPage.jsx"));
 const HtmlLabPage = lazy(() => import("./pages/HtmlLabPage.jsx"));
+const MusicLabPage = lazy(() => import("./pages/MusicLabPage.jsx"));
 
 const Fallback = () => (
   <div className="flex items-center justify-center h-64">
@@ -154,6 +155,7 @@ export default function App() {
                     <Route path="learn/:series/:lessonId" element={<LearnPage />} />
                     <Route path="learn/:series" element={<LearnPage />} />
                     <Route path="html-lab" element={<HtmlLabPage />} />
+                    <Route path="music-lab" element={<MusicLabPage />} />
                   </Routes>
                 </Suspense>
               </AppShell>

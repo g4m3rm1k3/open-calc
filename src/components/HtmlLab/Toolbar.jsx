@@ -37,6 +37,7 @@ export default function Toolbar({
   onUndo,
   onClear,
   onExport,
+  onExportSplit,
   canUndo,
   onBack,
   onApplyGlobalTheme,
@@ -112,7 +113,7 @@ export default function Toolbar({
       <button
         className={styles.tbBtn}
         onClick={onImport}
-        title="Import an HTML, CSS, or JS file"
+        title="Import HTML, CSS, or JS files (select multiple to batch-import)"
       >
         ↑ Import
       </button>
@@ -153,10 +154,19 @@ export default function Toolbar({
       <button
         className={styles.tbBtn}
         onClick={onExport}
-        title={multiPageMode ? "Download all pages as separate HTML files" : "Download as index.html"}
+        title={multiPageMode ? "Download all pages as separate self-contained HTML files" : "Download as single self-contained index.html"}
       >
         {multiPageMode ? "↓ Export All" : "↓ Export"}
       </button>
+      {!multiPageMode && (
+        <button
+          className={styles.tbBtn}
+          onClick={onExportSplit}
+          title="Download as 3 separate files: index.html + styles.css + script.js"
+        >
+          ↓ Split files
+        </button>
+      )}
 
       <button
         className={`${styles.tbBtn} ${styles.tbBtnDanger}`}
