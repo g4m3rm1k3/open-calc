@@ -43,12 +43,28 @@ export function elementsToHtml(elements) {
   ].join("\n");
 }
 
-export function elementsToCss(elements, customCss = "") {
+const CSS_RESET = `/* Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+img, video, svg {
+  display: block;
+  max-width: 100%;
+}
+
+input, button, textarea, select {
+  font: inherit;
+}`;
+
+export function elementsToCss(elements, customCss = "", bodyStyles = {}) {
+  const bodyRules = stylesToString(bodyStyles, "  ");
   const blocks = [
-    `body {`,
-    `  margin: 16px;`,
-    `  font-family: sans-serif;`,
-    `}`,
+    CSS_RESET,
+    ``,
+    `body {\n${bodyRules || "  margin: 0;\n  padding: 16px;\n  font-family: sans-serif;"}\n}`,
     ``,
     ...elements.map((el) => {
       const rules = stylesToString(el.styles, "  ");
@@ -236,6 +252,8 @@ export function extractJavascriptRefs(javascript = "") {
 
 export function applyCssToElements(css, elements) {
   const styleById = new Map();
+  let bodyStyles = null;
+
   const managedBlock = /\[data-lab-id=(?:"([^"]+)"|'([^']+)')\]\s*\{([^}]*)\}/g;
   let customCss = css
     .replace(/\/\*\s*Custom CSS\s*\*\//gi, "")
@@ -244,13 +262,19 @@ export function applyCssToElements(css, elements) {
       styleById.set(id, parseStyleString(body));
       return "";
     });
-  customCss = customCss.replace(/body\s*\{[^}]*\}/gi, "").trim();
+
+  // Extract body block and parse its styles
+  customCss = customCss.replace(/body\s*\{([^}]*)\}/gi, (_, body) => {
+    bodyStyles = parseStyleString(body);
+    return "";
+  }).trim();
 
   return {
     elements: elements.map((el) =>
       styleById.has(el.id) ? { ...el, styles: styleById.get(el.id) } : el,
     ),
     customCss,
+    ...(bodyStyles !== null ? { bodyStyles } : {}),
   };
 }
 

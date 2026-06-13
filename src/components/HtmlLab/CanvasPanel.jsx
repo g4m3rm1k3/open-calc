@@ -17,6 +17,8 @@ export default function CanvasPanel({
   elements,
   selectedId,
   showOverlay,
+  showLabels = true,
+  bodyStyles = {},
   onSelect,
   onDeselect,
   onDelete,
@@ -156,6 +158,7 @@ export default function CanvasPanel({
           isDragging ? styles.elDragging : "",
           isInsideTarget ? styles.elDropInside : "",
         ].join(" ")}
+        style={{ display: el.styles.display || "block" }}
         draggable
         onDragStart={(e) => handleDragStart(e, el)}
         onDragEnd={handleDragEnd}
@@ -173,38 +176,31 @@ export default function CanvasPanel({
           handleDrop(e, el.id, children.length);
         }}
       >
-        {/* tag badge */}
-        <div className={styles.elTag}>
-          &lt;{el.tag}&gt;
-          {isSelected && (
-            <button
-              className={styles.elDelete}
-              onClick={(e) => { e.stopPropagation(); onDelete(el.id); }}
-              title="Delete"
-            >×</button>
-          )}
-        </div>
+        {/* tag badge — always shown for selected (delete button), otherwise follows showLabels */}
+        {(showLabels || isSelected) && (
+          <div className={styles.elTag}>
+            &lt;{el.tag}&gt;
+            {isSelected && (
+              <button
+                className={styles.elDelete}
+                onClick={(e) => { e.stopPropagation(); onDelete(el.id); }}
+                title="Delete"
+              >×</button>
+            )}
+          </div>
+        )}
 
-        {/* render the actual element */}
-        <div className={styles.elInner}>
-          {renderTag(el, children, renderElement, renderDropZone, isContainer, isInsideTarget)}
-        </div>
+        {/* render the actual element directly — no wrapper so display/flex propagates */}
+        {renderTag(el, children, renderElement, renderDropZone, isContainer, isInsideTarget)}
 
         {/* overlay badges */}
         {showOverlay && (
-          <>
-            <div className={styles.boxOverlay} aria-hidden="true">
-              <div className={styles.boxOverlayMargin} />
-              <div className={styles.boxOverlayBorder} />
-              <div className={styles.boxOverlayPadding} />
-              <div className={styles.boxOverlayContent} />
-            </div>
-            <div className={styles.overlayLabels}>
-              <span className={styles.overlayMargin}>M: {el.styles.margin || "0"}</span>
-              <span className={styles.overlayBorder}>B: {el.styles.border || "0"}</span>
-              <span className={styles.overlayPadding}>P: {el.styles.padding || "0"}</span>
-            </div>
-          </>
+          <div className={styles.boxOverlay} aria-hidden="true">
+            <div className={styles.boxOverlayMargin} />
+            <div className={styles.boxOverlayBorder} />
+            <div className={styles.boxOverlayPadding} />
+            <div className={styles.boxOverlayContent} />
+          </div>
         )}
       </div>
     );
@@ -224,6 +220,12 @@ export default function CanvasPanel({
       <div
         ref={canvasRef}
         className={styles.canvasDrop}
+        style={{
+          ...bodyStyles,
+          // Canvas must keep these regardless of body styles
+          flex: 1,
+          overflowY: "auto",
+        }}
         onDragOver={(e) => e.preventDefault()}
         onDrop={handleCanvasDrop}
         onClick={(e) => { if (e.target === e.currentTarget) onDeselect(); }}

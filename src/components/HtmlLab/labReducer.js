@@ -169,9 +169,19 @@ export const initialState = {
   elements: [],
   selectedId: null,
   showOverlay: false,
+  showLabels: true,
   customCss: "",
   javascript: "",
   history: [],
+  bodyStyles: {
+    fontFamily: "system-ui, -apple-system, sans-serif",
+    fontSize: "16px",
+    lineHeight: "1.5",
+    color: "#1a1a18",
+    backgroundColor: "#ffffff",
+    margin: "0",
+    padding: "16px",
+  },
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -430,12 +440,21 @@ export function labReducer(state, action) {
       };
     }
 
+    case "UPDATE_BODY_STYLE": {
+      const { prop, value } = action.payload;
+      const bodyStyles = { ...state.bodyStyles };
+      if (value === "") delete bodyStyles[prop];
+      else bodyStyles[prop] = value;
+      return { ...state, bodyStyles };
+    }
+
     case "SET_FROM_CSS": {
       const s = withHistory(state);
       return {
         ...s,
         elements: action.payload.elements,
         customCss: action.payload.customCss,
+        bodyStyles: action.payload.bodyStyles ?? s.bodyStyles,
       };
     }
 
@@ -453,6 +472,9 @@ export function labReducer(state, action) {
 
     case "TOGGLE_OVERLAY":
       return { ...state, showOverlay: !state.showOverlay };
+
+    case "TOGGLE_LABELS":
+      return { ...state, showLabels: !state.showLabels };
 
     case "UNDO": {
       if (!state.history.length) return state;

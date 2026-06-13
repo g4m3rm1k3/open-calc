@@ -281,11 +281,20 @@ export default function PropertiesPanel({
   return (
     <div className={styles.propsPanel}>
       <div className={styles.panelHeader}>
-        &lt;{element.tag}&gt; · {element.id}
-        {element.parentId && <span className={styles.nestedBadge}>nested</span>}
+        {element.tag === "body" ? (
+          <span>&lt;body&gt; · page root</span>
+        ) : (
+          <>
+            &lt;{element.tag}&gt; · {element.id}
+            {element.parentId && <span className={styles.nestedBadge}>nested</span>}
+          </>
+        )}
       </div>
       <div className={styles.propsBody}>
-        {SECTIONS.map((sec) => (
+        {(element.tag === "body"
+          ? SECTIONS.filter((s) => !["content", "javascript", "styleLibrary", "mediaQueries", "boxmodel"].includes(s.key))
+          : SECTIONS
+        ).map((sec) => (
           <div key={sec.key} className={styles.propSection}>
             <button
               className={styles.propSectionTitle}

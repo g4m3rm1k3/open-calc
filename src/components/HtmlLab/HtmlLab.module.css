@@ -203,6 +203,7 @@
   position: relative;
   border: 1.5px solid transparent;
   border-radius: 4px;
+  overflow: visible;
   transition:
     border-color 0.12s,
     box-shadow 0.12s,
@@ -235,17 +236,26 @@
 
 /* ── Tag badge at top of element ─────────────────────────────────────────────── */
 .elTag {
+  position: absolute;
+  top: -20px;
+  left: 0;
+  z-index: 10;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 4px;
   padding: 1px 6px;
   font-size: 9px;
   font-family: "JetBrains Mono", monospace;
   color: #888;
-  background: rgba(0, 0, 0, 0.04);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-  border-radius: 3px 3px 0 0;
+  background: rgba(30, 30, 30, 0.88);
+  border-radius: 3px;
   user-select: none;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.elSelected .elTag {
+  color: #569cd6;
+  pointer-events: auto;
 }
 .elSelected .elTag {
   color: #569cd6;
@@ -287,39 +297,7 @@
   pointer-events: none;
 }
 
-/* ── Overlay badges ──────────────────────────────────────────────────────────── */
-.overlayLabels {
-  display: flex;
-  gap: 4px;
-  padding: 2px 6px;
-  pointer-events: none;
-  position: relative;
-  z-index: 3;
-}
-.overlayMargin {
-  font-size: 9px;
-  font-family: monospace;
-  background: rgba(246, 178, 107, 0.85);
-  color: #7c3d00;
-  padding: 1px 5px;
-  border-radius: 2px;
-}
-.overlayPadding {
-  font-size: 9px;
-  font-family: monospace;
-  background: rgba(52, 211, 153, 0.85);
-  color: #065f46;
-  padding: 1px 5px;
-  border-radius: 2px;
-}
-.overlayBorder {
-  font-size: 9px;
-  font-family: monospace;
-  background: rgba(248, 113, 113, 0.85);
-  color: #7f1d1d;
-  padding: 1px 5px;
-  border-radius: 2px;
-}
+/* ── Box model overlay ───────────────────────────────────────────────────────── */
 
 .boxOverlay {
   position: absolute;

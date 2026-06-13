@@ -20,8 +20,10 @@ const ELEMENTS = [
 
 export default function Toolbar({
   showOverlay,
+  showLabels,
   onAddElement,
   onToggleOverlay,
+  onToggleLabels,
   onUndo,
   onClear,
   canUndo,
@@ -50,6 +52,14 @@ export default function Toolbar({
       ))}
 
       <div className={styles.toolbarSep} />
+
+      <button
+        className={`${styles.tbBtn} ${showLabels ? styles.tbBtnActive : ""}`}
+        onClick={onToggleLabels}
+        title="Show/hide element tag labels"
+      >
+        &lt;/&gt; Labels
+      </button>
 
       <button
         className={`${styles.tbBtn} ${showOverlay ? styles.tbBtnActive : ""}`}

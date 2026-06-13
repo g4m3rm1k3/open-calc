@@ -20,7 +20,11 @@ export default function HtmlLab({ onBack }) {
   const dividerStartW = useRef(0);
 
   const generatedCode = elementsToHtml(state.elements);
-  const generatedCss = elementsToCss(state.elements, state.customCss);
+  const generatedCss = elementsToCss(state.elements, state.customCss, state.bodyStyles);
+
+  const selectedElement = state.selectedId
+    ? state.elements.find((e) => e.id === state.selectedId) || null
+    : { id: "__body__", tag: "body", styles: state.bodyStyles, content: "", attrs: {}, mediaQueries: [] };
 
   const handleCodeChange = useCallback(
     (newCode) => {
@@ -63,8 +67,10 @@ export default function HtmlLab({ onBack }) {
     <div className={styles.app}>
       <Toolbar
         showOverlay={state.showOverlay}
+        showLabels={state.showLabels}
         onAddElement={(tag) => dispatch({ type: "ADD_ELEMENT", payload: tag })}
         onToggleOverlay={() => dispatch({ type: "TOGGLE_OVERLAY" })}
+        onToggleLabels={() => dispatch({ type: "TOGGLE_LABELS" })}
         onUndo={() => dispatch({ type: "UNDO" })}
         onClear={() => dispatch({ type: "CLEAR" })}
         canUndo={state.history.length > 0}
@@ -91,6 +97,8 @@ export default function HtmlLab({ onBack }) {
           elements={state.elements}
           selectedId={state.selectedId}
           showOverlay={state.showOverlay}
+          showLabels={state.showLabels}
+          bodyStyles={state.bodyStyles}
           onSelect={(id) => dispatch({ type: "SELECT", payload: id })}
           onDeselect={() => dispatch({ type: "SELECT", payload: null })}
           onDelete={(id) => dispatch({ type: "DELETE_ELEMENT", payload: id })}
@@ -112,11 +120,11 @@ export default function HtmlLab({ onBack }) {
         />
 
         <PropertiesPanel
-          element={
-            state.elements.find((e) => e.id === state.selectedId) || null
-          }
+          element={selectedElement}
           onChange={(prop, value) =>
-            dispatch({ type: "UPDATE_STYLE", payload: { prop, value } })
+            state.selectedId
+              ? dispatch({ type: "UPDATE_STYLE", payload: { prop, value } })
+              : dispatch({ type: "UPDATE_BODY_STYLE", payload: { prop, value } })
           }
           onContentChange={(value) =>
             dispatch({ type: "UPDATE_CONTENT", payload: value })
