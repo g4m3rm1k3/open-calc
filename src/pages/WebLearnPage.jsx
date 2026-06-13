@@ -14,6 +14,30 @@ import { lesson as css02 } from '../content/css-mastery/css-02-box-model.js'
 import { lesson as css03 } from '../content/css-mastery/css-03-centering.js'
 import { lesson as css04 } from '../content/css-mastery/css-04-stacking-contexts.js'
 import { lesson as css05 } from '../content/css-mastery/css-05-overflow.js'
+import { lesson as css06 } from '../content/css-mastery/css-06-flex-direction.js'
+import { lesson as css07 } from '../content/css-mastery/css-07-flex-alignment.js'
+import { lesson as css08 } from '../content/css-mastery/css-08-flex-sizing.js'
+import { lesson as css09 } from '../content/css-mastery/css-09-grid-tracks.js'
+import { lesson as css10 } from '../content/css-mastery/css-10-grid-areas.js'
+import { lesson as css11 } from '../content/css-mastery/css-11-grid-vs-flex.js'
+import { lesson as css12 } from '../content/css-mastery/css-12-viewport.js'
+import { lesson as css13 } from '../content/css-mastery/css-13-media-queries.js'
+import { lesson as css14 } from '../content/css-mastery/css-14-fluid-typography.js'
+import { lesson as css15 } from '../content/css-mastery/css-15-responsive-images.js'
+import { lesson as css16 } from '../content/css-mastery/css-16-container-queries.js'
+import { lesson as css17 } from '../content/css-mastery/css-17-transitions.js'
+import { lesson as css18 } from '../content/css-mastery/css-18-animations.js'
+import { lesson as css19 } from '../content/css-mastery/css-19-animation-performance.js'
+import { lesson as css20 } from '../content/css-mastery/css-20-scroll-driven.js'
+import { lesson as css21 } from '../content/css-mastery/css-21-specificity.js'
+import { lesson as css22 } from '../content/css-mastery/css-22-variables.js'
+import { lesson as css23 } from '../content/css-mastery/css-23-cascade-layers.js'
+import { lesson as css24 } from '../content/css-mastery/css-24-selector-scope.js'
+import { lesson as css25 } from '../content/css-mastery/css-25-native-html.js'
+import { lesson as css26 } from '../content/css-mastery/css-26-class-toggling.js'
+import { lesson as css27 } from '../content/css-mastery/css-27-inline-styles-js.js'
+import { lesson as css28 } from '../content/css-mastery/css-28-variables-js.js'
+import { lesson as css29 } from '../content/css-mastery/css-29-scroll-observers.js'
 
 const LESSONS = {
   'sandbox/1': sandbox1,
@@ -24,12 +48,43 @@ const LESSONS = {
   'css-mastery/03': css03,
   'css-mastery/04': css04,
   'css-mastery/05': css05,
+  'css-mastery/06': css06,
+  'css-mastery/07': css07,
+  'css-mastery/08': css08,
+  'css-mastery/09': css09,
+  'css-mastery/10': css10,
+  'css-mastery/11': css11,
+  'css-mastery/12': css12,
+  'css-mastery/13': css13,
+  'css-mastery/14': css14,
+  'css-mastery/15': css15,
+  'css-mastery/16': css16,
+  'css-mastery/17': css17,
+  'css-mastery/18': css18,
+  'css-mastery/19': css19,
+  'css-mastery/20': css20,
+  'css-mastery/21': css21,
+  'css-mastery/22': css22,
+  'css-mastery/23': css23,
+  'css-mastery/24': css24,
+  'css-mastery/25': css25,
+  'css-mastery/26': css26,
+  'css-mastery/27': css27,
+  'css-mastery/28': css28,
+  'css-mastery/29': css29,
 }
 
 // Ordered series list — drives "Next lesson" button
 const SERIES_ORDER = {
   sandbox: ['1', '2', '3'],
-  'css-mastery': ['01', '02', '03', '04', '05'],
+  'css-mastery': [
+    '01', '02', '03', '04', '05',
+    '06', '07', '08', '09', '10', '11',
+    '12', '13', '14', '15', '16',
+    '17', '18', '19', '20',
+    '21', '22', '23', '24', '25',
+    '26', '27', '28', '29',
+  ],
 }
 
 // First lesson per series — used for redirect when no lessonId in URL

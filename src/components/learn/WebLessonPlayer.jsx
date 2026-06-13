@@ -190,6 +190,14 @@ function diffNewLines(prevCode, nextCode) {
   return newNums
 }
 
+// ── Tab auto-selection ────────────────────────────────────────────────────────
+
+function autoTab(files) {
+  if ((files?.js || '').trim()) return 'js'
+  if ((files?.css || '').trim()) return 'css'
+  return 'html'
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 
@@ -220,7 +228,7 @@ export default function WebLessonPlayer({ lesson, onBack, onNext, nextTitle, ser
 
   const [code, setCode]                       = useState(initCode)
   const [files, setFiles]                     = useState(initFiles)
-  const [activeTab, setActiveTab]             = useState('html')
+  const [activeTab, setActiveTab]             = useState(() => autoTab(initFiles))
   const [logs, setLogs]                       = useState([])
   const [runError, setRunError]               = useState(null)
   const [challengeResult, setChallengeResult] = useState(null)
@@ -317,6 +325,7 @@ export default function WebLessonPlayer({ lesson, onBack, onNext, nextTitle, ser
           highlightNewLines(newCode)
           setCode(newCode)
           setFiles(newFiles)
+          if (lesson.language === 'web') setActiveTab(seg.defaultTab ?? autoTab(newFiles))
           setLogs([])
           setRunError(null)
           setChallengeResult(null)
@@ -427,6 +436,7 @@ export default function WebLessonPlayer({ lesson, onBack, onNext, nextTitle, ser
     setCode(newCode)
     setFiles(newFiles)
     if (targetSeg?.defaultTab) setActiveTab(targetSeg.defaultTab)
+    else if (lesson.language === 'web') setActiveTab(autoTab(newFiles))
     setLogs([])
     setPreviewDoc('')
     setRunError(null)
