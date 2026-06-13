@@ -39,11 +39,35 @@ import { lesson as dsa08 } from '../data/learn/dsa-patterns/lesson-08.js'
 import { lesson as dsa09 } from '../data/learn/dsa-patterns/lesson-09.js'
 import { lesson as dsa10 } from '../data/learn/dsa-patterns/lesson-10.js'
 import { lesson as dsa11 } from '../data/learn/dsa-patterns/lesson-11.js'
+import { lesson as dsa12 } from '../data/learn/dsa-patterns/lesson-12.js'
+import { lesson as dsa13 } from '../data/learn/dsa-patterns/lesson-13.js'
 import { lesson as dsa14 } from '../data/learn/dsa-patterns/lesson-14.js'
+import { lesson as dsa15 } from '../data/learn/dsa-patterns/lesson-15.js'
+import { lesson as dsa16 } from '../data/learn/dsa-patterns/lesson-16.js'
 import { lesson as dsa17 } from '../data/learn/dsa-patterns/lesson-17.js'
+import { lesson as dsa18 } from '../data/learn/dsa-patterns/lesson-18.js'
+import { lesson as dsa19 } from '../data/learn/dsa-patterns/lesson-19.js'
+import { lesson as dsa20 } from '../data/learn/dsa-patterns/lesson-20.js'
 import { lesson as dsa21 } from '../data/learn/dsa-patterns/lesson-21.js'
+import { lesson as dsa22 } from '../data/learn/dsa-patterns/lesson-22.js'
+import { lesson as dsa23 } from '../data/learn/dsa-patterns/lesson-23.js'
+import { lesson as dsa24 } from '../data/learn/dsa-patterns/lesson-24.js'
+import { lesson as dsa25 } from '../data/learn/dsa-patterns/lesson-25.js'
 import { lesson as dsa26 } from '../data/learn/dsa-patterns/lesson-26.js'
 import { lesson as dsa27 } from '../data/learn/dsa-patterns/lesson-27.js'
+import { lesson as dsa28 } from '../data/learn/dsa-patterns/lesson-28.js'
+import { lesson as dsa29 } from '../data/learn/dsa-patterns/lesson-29.js'
+import { lesson as dsa30 } from '../data/learn/dsa-patterns/lesson-30.js'
+import { lesson as dsa31 } from '../data/learn/dsa-patterns/lesson-31.js'
+import { lesson as dsa32 } from '../data/learn/dsa-patterns/lesson-32.js'
+import { lesson as dsa33 } from '../data/learn/dsa-patterns/lesson-33.js'
+import { lesson as dsa34 } from '../data/learn/dsa-patterns/lesson-34.js'
+import { lesson as dsa35 } from '../data/learn/dsa-patterns/lesson-35.js'
+import { lesson as dsa36 } from '../data/learn/dsa-patterns/lesson-36.js'
+import { lesson as dsa37 } from '../data/learn/dsa-patterns/lesson-37.js'
+import { lesson as dsa38 } from '../data/learn/dsa-patterns/lesson-38.js'
+import { lesson as dsa39 } from '../data/learn/dsa-patterns/lesson-39.js'
+import { lesson as dsa40 } from '../data/learn/dsa-patterns/lesson-40.js'
 import { lesson as dsa41 } from '../data/learn/dsa-patterns/lesson-41.js'
 import { lesson as dsa42 } from '../data/learn/dsa-patterns/lesson-42.js'
 
@@ -83,11 +107,35 @@ const LESSONS = {
   'dsa-patterns/09': dsa09,
   'dsa-patterns/10': dsa10,
   'dsa-patterns/11': dsa11,
+  'dsa-patterns/12': dsa12,
+  'dsa-patterns/13': dsa13,
   'dsa-patterns/14': dsa14,
+  'dsa-patterns/15': dsa15,
+  'dsa-patterns/16': dsa16,
   'dsa-patterns/17': dsa17,
+  'dsa-patterns/18': dsa18,
+  'dsa-patterns/19': dsa19,
+  'dsa-patterns/20': dsa20,
   'dsa-patterns/21': dsa21,
+  'dsa-patterns/22': dsa22,
+  'dsa-patterns/23': dsa23,
+  'dsa-patterns/24': dsa24,
+  'dsa-patterns/25': dsa25,
   'dsa-patterns/26': dsa26,
   'dsa-patterns/27': dsa27,
+  'dsa-patterns/28': dsa28,
+  'dsa-patterns/29': dsa29,
+  'dsa-patterns/30': dsa30,
+  'dsa-patterns/31': dsa31,
+  'dsa-patterns/32': dsa32,
+  'dsa-patterns/33': dsa33,
+  'dsa-patterns/34': dsa34,
+  'dsa-patterns/35': dsa35,
+  'dsa-patterns/36': dsa36,
+  'dsa-patterns/37': dsa37,
+  'dsa-patterns/38': dsa38,
+  'dsa-patterns/39': dsa39,
+  'dsa-patterns/40': dsa40,
   'dsa-patterns/41': dsa41,
   'dsa-patterns/42': dsa42,
 }
@@ -100,7 +148,13 @@ const SERIES_ORDER = {
     '3-1', '3-2', '3-3', '3-3b',
     '4-1',
   ],
-  'dsa-patterns': ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '14', '17', '21', '26', '27', '41', '42'],
+  'dsa-patterns': [
+    '01', '02', '03', '04', '05', '06', '07', '08', '09', '10',
+    '11', '12', '13', '14', '15', '16', '17', '18', '19', '20',
+    '21', '22', '23', '24', '25', '26', '27', '28', '29', '30',
+    '31', '32', '33', '34', '35', '36', '37', '38', '39', '40',
+    '41', '42',
+  ],
 }
 
 // First lesson per series — used for redirect when no lessonId in URL
