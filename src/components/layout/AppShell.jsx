@@ -678,6 +678,7 @@ export default function AppShell({ children }) {
   const isDSALinkedListsLabRoute = location.pathname.startsWith("/dsa-linked-lists-lab");
   const isCodeLensRoute = location.pathname.startsWith("/codelens");
   const isLearnRoute = location.pathname.startsWith("/learn") || location.pathname.startsWith("/web-learn");
+  const isHtmlLabRoute = location.pathname.startsWith("/html-lab");
   
   const pathParts = location.pathname.split('/').filter(Boolean);
   const isLessonRoute = pathParts[0] === 'chapter' && pathParts.length >= 3;
@@ -853,7 +854,8 @@ export default function AppShell({ children }) {
     isDSAArraysLabRoute ||
     isDSALinkedListsLabRoute ||
     isCodeLensRoute ||
-    isLearnRoute
+    isLearnRoute ||
+    isHtmlLabRoute
   ) {
     return (
       <GrapherContext.Provider value={{ openGrapher }}>

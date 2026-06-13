@@ -1,5 +1,15 @@
 export const LABS = [
   {
+    key: 'html-lab',
+    label: 'HTML Lab',
+    emoji: '🏗️',
+    color: 'orange',
+    desc: 'Drag, drop, and style real HTML elements on a live canvas — div, p, h1, button, span, and more. Edit inline CSS through a properties panel, watch the code panel sync both ways, and see the box model visualized live.',
+    path: '/html-lab',
+    tags: ['HTML', 'CSS', 'Web', 'Interactive'],
+    cover: { grad: 'from-orange-600 via-amber-700 to-yellow-950', mark: '</>', sub: 'Elements · Box Model · CSS' },
+  },
+  {
     key: 'css-mastery',
     label: 'CSS 0 to Mastery',
     emoji: '🎨',

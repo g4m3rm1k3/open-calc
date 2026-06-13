@@ -1,0 +1,494 @@
+/* ── Reset ───────────────────────────────────────────────────────────────────── */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 13px;
+  background: #f5f5f3;
+  color: #1a1a18;
+}
+
+/* ── Toolbar ─────────────────────────────────────────────────────────────────── */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #ffffff;
+  border-bottom: 0.5px solid rgba(0, 0, 0, 0.12);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  min-height: 42px;
+}
+
+.backBtn {
+  padding: 4px 10px;
+  border: 0.5px solid rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  background: transparent;
+  color: #5f5e5a;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.1s, color 0.1s;
+  margin-right: 4px;
+  flex-shrink: 0;
+}
+
+.backBtn:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: #1a1a18;
+}
+
+.toolbarLogo {
+  font-size: 13px;
+  font-weight: 500;
+  color: #1a1a18;
+  margin-right: 4px;
+  letter-spacing: -0.01em;
+}
+
+.toolbarSep {
+  width: 0.5px;
+  height: 20px;
+  background: rgba(0, 0, 0, 0.12);
+  margin: 0 2px;
+  flex-shrink: 0;
+}
+
+.toolbarLabel {
+  font-size: 11px;
+  color: #888780;
+}
+
+.elemBtn {
+  padding: 3px 8px;
+  border: 0.5px dashed rgba(0, 0, 0, 0.25);
+  border-radius: 4px;
+  background: transparent;
+  color: #5f5e5a;
+  cursor: pointer;
+  font-size: 11px;
+  font-family: monospace;
+  transition: border-color 0.1s, color 0.1s, background 0.1s;
+}
+
+.elemBtn:hover {
+  border-color: #185fa5;
+  color: #185fa5;
+  background: #e6f1fb;
+  border-style: solid;
+}
+
+.tbBtn {
+  padding: 4px 10px;
+  border: 0.5px solid rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  background: transparent;
+  color: #1a1a18;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.1s;
+}
+
+.tbBtn:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.tbBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.tbBtnActive {
+  background: #185fa5;
+  color: #fff;
+  border-color: #185fa5;
+}
+
+.tbBtnDanger:hover {
+  background: #fee2e2;
+  color: #991b1b;
+  border-color: #fca5a5;
+}
+
+/* ── Main layout ─────────────────────────────────────────────────────────────── */
+.main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── Panel shared ────────────────────────────────────────────────────────────── */
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #5f5e5a;
+  background: rgba(0, 0, 0, 0.03);
+  border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.panelHint {
+  font-size: 10px;
+  color: #888780;
+  font-weight: 400;
+}
+
+/* ── Canvas panel ────────────────────────────────────────────────────────────── */
+.canvasPanel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #f9f9f7;
+  min-width: 0;
+}
+
+.canvasDrop {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+  padding: 0;
+}
+
+.emptyHint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #888780;
+  pointer-events: none;
+}
+
+.emptyIcon {
+  font-size: 36px;
+  margin-bottom: 8px;
+  opacity: 0.5;
+}
+
+.emptyHint p {
+  font-size: 13px;
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* ── Canvas elements ─────────────────────────────────────────────────────────── */
+.cvWrap {
+  position: absolute;
+  cursor: grab;
+  user-select: none;
+}
+
+.cvWrap:active {
+  cursor: grabbing;
+}
+
+.cvWrap:hover .cvTagLabel {
+  opacity: 0.6;
+}
+
+.cvSelected {
+  /* Selection ring is on the inner element via outline */
+}
+
+.cvSelected > * {
+  outline: 2px solid #185fa5 !important;
+  outline-offset: 1px;
+}
+
+.cvOverlay > * {
+  outline: 1px dashed rgba(24, 95, 165, 0.35) !important;
+}
+
+.cvTagLabel {
+  position: absolute;
+  top: -20px;
+  left: 0;
+  font-size: 9px;
+  background: #185fa5;
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 3px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 20;
+  opacity: 0;
+  transition: opacity 0.1s;
+}
+
+.cvSelected .cvTagLabel {
+  opacity: 1 !important;
+}
+
+.cvDelete {
+  position: absolute;
+  top: -20px;
+  right: 0;
+  width: 18px;
+  height: 18px;
+  background: #e24b4a;
+  border: none;
+  border-radius: 3px;
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  line-height: 1;
+  padding: 0;
+}
+
+.cvDelete:hover {
+  background: #b91c1c;
+}
+
+.cvResize {
+  position: absolute;
+  right: -5px;
+  bottom: -5px;
+  width: 12px;
+  height: 12px;
+  background: #185fa5;
+  border: 2px solid #fff;
+  border-radius: 2px;
+  cursor: nw-resize;
+  z-index: 20;
+}
+
+.overlayLabels {
+  position: absolute;
+  bottom: -22px;
+  left: 0;
+  display: flex;
+  gap: 4px;
+  pointer-events: none;
+}
+
+.overlayMargin {
+  font-size: 9px;
+  background: rgba(255, 165, 0, 0.85);
+  color: #7c4d00;
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+
+.overlayPadding {
+  font-size: 9px;
+  background: rgba(0, 180, 100, 0.85);
+  color: #064e2a;
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+
+/* ── Divider ─────────────────────────────────────────────────────────────────── */
+.divider {
+  width: 4px;
+  background: rgba(0, 0, 0, 0.08);
+  cursor: col-resize;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.divider:hover {
+  background: #185fa5;
+}
+
+/* ── Code panel ──────────────────────────────────────────────────────────────── */
+.codePanel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+  border-left: 0.5px solid rgba(0, 0, 0, 0.1);
+  background: #fff;
+}
+
+.codeEditor {
+  flex: 1;
+  font-family: "Fira Code", "Cascadia Code", Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.65;
+  padding: 12px;
+  border: none;
+  outline: none;
+  resize: none;
+  background: #fff;
+  color: #1a1a18;
+  overflow: auto;
+  tab-size: 2;
+}
+
+/* ── Properties panel ────────────────────────────────────────────────────────── */
+.propsPanel {
+  width: 220px;
+  flex-shrink: 0;
+  border-left: 0.5px solid rgba(0, 0, 0, 0.1);
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.propsEmpty {
+  padding: 24px 12px;
+  text-align: center;
+  color: #888780;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.propsBody {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.propSection {
+  border-bottom: 0.5px solid rgba(0, 0, 0, 0.08);
+}
+
+.propSectionTitle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  background: transparent;
+  border: none;
+  font-size: 10px;
+  font-weight: 500;
+  color: #888780;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.propSectionTitle:hover {
+  color: #1a1a18;
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.propRows {
+  padding: 2px 8px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.propRow {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.propLabel {
+  width: 64px;
+  font-size: 11px;
+  color: #888780;
+  text-align: right;
+  flex-shrink: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.propInput {
+  flex: 1;
+  padding: 3px 6px;
+  border: 0.5px solid rgba(0, 0, 0, 0.18);
+  border-radius: 4px;
+  font-size: 11px;
+  background: #f9f9f7;
+  color: #1a1a18;
+  outline: none;
+  min-width: 0;
+}
+
+.propInput:focus {
+  border-color: #185fa5;
+  background: #fff;
+}
+
+.propSelect {
+  flex: 1;
+  padding: 3px 4px;
+  border: 0.5px solid rgba(0, 0, 0, 0.18);
+  border-radius: 4px;
+  font-size: 11px;
+  background: #f9f9f7;
+  color: #1a1a18;
+  outline: none;
+  min-width: 0;
+}
+
+.propSelect:focus {
+  border-color: #185fa5;
+}
+
+.propColor {
+  width: 26px;
+  height: 24px;
+  border: 0.5px solid rgba(0, 0, 0, 0.18);
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 1px;
+  background: none;
+  flex-shrink: 0;
+}
+
+/* ── Box model visual ────────────────────────────────────────────────────────── */
+.boxModel {
+  padding: 4px;
+}
+
+.bmMargin {
+  background: rgba(255, 165, 0, 0.18);
+  border-radius: 4px;
+  padding: 6px;
+  position: relative;
+}
+
+.bmBorder {
+  background: rgba(226, 75, 74, 0.12);
+  border-radius: 3px;
+  padding: 6px;
+}
+
+.bmPadding {
+  background: rgba(0, 180, 100, 0.16);
+  border-radius: 2px;
+  padding: 6px;
+}
+
+.bmContent {
+  background: rgba(24, 95, 165, 0.12);
+  border-radius: 2px;
+  padding: 6px 4px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 500;
+  color: #1a1a18;
+}
+
+.bmLabel {
+  display: block;
+  font-size: 9px;
+  color: #5f5e5a;
+  margin-bottom: 2px;
+}
+
+.bmDims {
+  font-size: 9px;
+  color: #888780;
+  margin-top: 2px;
+}
