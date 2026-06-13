@@ -154,7 +154,9 @@ export const CONTAINER_TAGS = new Set([
   "article",
   "header",
   "footer",
+  "nav",
   "ul",
+  "li",
   "p",
   "span",
 ]);
@@ -475,6 +477,65 @@ export function labReducer(state, action) {
 
     case "TOGGLE_LABELS":
       return { ...state, showLabels: !state.showLabels };
+
+    // Insert a component template — remaps all template IDs to fresh ones
+    case "INSERT_TEMPLATE": {
+      const s = withHistory(state);
+      const templateElements = action.payload;
+
+      const idMap = new Map();
+      templateElements.forEach(el => idMap.set(el.id, genId()));
+
+      const rootOffset = s.elements
+        .filter(e => !e.parentId)
+        .reduce((m, e) => Math.max(m, e.order ?? 0), -1) + 1;
+
+      const newElements = templateElements.map(el => ({
+        ...el,
+        id: idMap.get(el.id),
+        parentId: el.parentId ? idMap.get(el.parentId) : null,
+        order: el.parentId ? el.order : el.order + rootOffset,
+      }));
+
+      const firstRoot = newElements.find(e => !e.parentId);
+      return {
+        ...s,
+        elements: [...s.elements, ...newElements],
+        selectedId: firstRoot?.id ?? null,
+      };
+    }
+
+    // Apply a component theme — merges styles onto matched elements
+    case "APPLY_COMPONENT_THEME": {
+      const { updates } = action.payload;
+      return {
+        ...state,
+        elements: state.elements.map(el => {
+          const update = updates.find(u => u.id === el.id);
+          if (!update) return el;
+          return { ...el, styles: { ...el.styles, ...update.styles } };
+        }),
+      };
+    }
+
+    // Apply a body theme (merges on top of existing)
+    case "APPLY_BODY_THEME":
+      return { ...state, bodyStyles: { ...state.bodyStyles, ...action.payload } };
+
+    // Hard-reset body styles back to defaults
+    case "RESET_BODY_STYLES":
+      return {
+        ...state,
+        bodyStyles: {
+          fontFamily: "system-ui, -apple-system, sans-serif",
+          fontSize: "16px",
+          lineHeight: "1.5",
+          color: "#1a1a18",
+          backgroundColor: "#ffffff",
+          margin: "0",
+          padding: "16px",
+        },
+      };
 
     case "UNDO": {
       if (!state.history.length) return state;

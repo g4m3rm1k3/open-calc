@@ -262,6 +262,10 @@ export default function PropertiesPanel({
   onApplyPreset,
   onAddMediaQuery,
   onRemoveMediaQuery,
+  matchedComponents = [],
+  bodyThemes = null,
+  onApplyComponentTheme,
+  onApplyBodyTheme,
 }) {
   const [collapsed, setCollapsed] = useState({ boxmodel: false });
 
@@ -291,6 +295,33 @@ export default function PropertiesPanel({
         )}
       </div>
       <div className={styles.propsBody}>
+        {/* Body themes — shown when body is selected */}
+        {bodyThemes && (
+          <ThemeSection
+            title="Layout Themes"
+            groups={[{ label: null, themes: bodyThemes }]}
+            onApply={(theme) => onApplyBodyTheme?.(theme)}
+          />
+        )}
+
+        {/* Component themes — groups from themeGroups, labelled by component + group */}
+        {matchedComponents.length > 0 && (
+          <ThemeSection
+            title="Component Themes"
+            groups={matchedComponents.flatMap(comp =>
+              (comp.themeGroups || [])
+                .filter(g => g.themes && g.themes.length > 0)
+                .map(group => ({
+                  label: matchedComponents.length > 1
+                    ? `${comp.name}${group.label ? ` · ${group.label}` : ''}`
+                    : (group.label || comp.name),
+                  themes: group.themes,
+                }))
+            )}
+            onApply={(theme) => onApplyComponentTheme?.(theme)}
+          />
+        )}
+
         {(element.tag === "body"
           ? SECTIONS.filter((s) => !["content", "javascript", "styleLibrary", "mediaQueries", "boxmodel"].includes(s.key))
           : SECTIONS
@@ -954,4 +985,33 @@ function toHex(val) {
   if (!val) return "#000000";
   if (val.startsWith("#") && (val.length === 4 || val.length === 7)) return val;
   return "#000000";
+}
+
+// ─── Theme Section ────────────────────────────────────────────────────────────
+// groups: [{ label: string|null, themes: [{ id, name, description?, styles? }] }]
+function ThemeSection({ title, groups, onApply }) {
+  return (
+    <div className={styles.themeSection}>
+      <div className={styles.themeSectionTitle}>{title}</div>
+      {groups.map((group, gi) => (
+        <div key={gi} className={styles.themeGroup}>
+          {group.label && (
+            <div className={styles.themeGroupLabel}>{group.label}</div>
+          )}
+          <div className={styles.themeList}>
+            {group.themes.map((theme) => (
+              <button
+                key={theme.id}
+                className={styles.themeBtn}
+                onClick={() => onApply(theme)}
+                title={theme.description || theme.name}
+              >
+                {theme.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 }

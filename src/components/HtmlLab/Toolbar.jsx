@@ -21,9 +21,11 @@ const ELEMENTS = [
 export default function Toolbar({
   showOverlay,
   showLabels,
+  showComponents,
   onAddElement,
   onToggleOverlay,
   onToggleLabels,
+  onToggleComponents,
   onUndo,
   onClear,
   canUndo,
@@ -39,17 +41,38 @@ export default function Toolbar({
       <span className={styles.toolbarLogo}>HTML Lab</span>
       <div className={styles.toolbarSep} />
 
-      <span className={styles.toolbarLabel}>Add element:</span>
-      {ELEMENTS.map(({ tag, label, title }) => (
+      {/* Mode toggle */}
+      <div className={styles.modePill}>
         <button
-          key={tag}
-          className={styles.elemBtn}
-          onClick={() => onAddElement(tag)}
-          title={title}
+          className={`${styles.modeBtn} ${!showComponents ? styles.modeBtnActive : ""}`}
+          onClick={() => showComponents && onToggleComponents()}
         >
-          {label}
+          Elements
         </button>
-      ))}
+        <button
+          className={`${styles.modeBtn} ${showComponents ? styles.modeBtnActive : ""}`}
+          onClick={() => !showComponents && onToggleComponents()}
+        >
+          Components
+        </button>
+      </div>
+      <div className={styles.toolbarSep} />
+
+      {!showComponents && (
+        <>
+          <span className={styles.toolbarLabel}>Add:</span>
+          {ELEMENTS.map(({ tag, label, title }) => (
+            <button
+              key={tag}
+              className={styles.elemBtn}
+              onClick={() => onAddElement(tag)}
+              title={title}
+            >
+              {label}
+            </button>
+          ))}
+        </>
+      )}
 
       <div className={styles.toolbarSep} />
 

@@ -1,9 +1,10 @@
-import { useState, useReducer, useCallback, useRef } from "react";
+import { useState, useReducer, useCallback, useRef, useMemo } from "react";
 import Toolbar from "./Toolbar";
 import CanvasPanel from "./CanvasPanel";
 import CodePanel from "./CodePanel";
 import PropertiesPanel from "./PropertiesPanel";
 import { labReducer, initialState } from "./labReducer";
+import { COMPONENTS, BODY_THEMES, detectComponents, buildThemeUpdates } from "./componentLibrary";
 import {
   applyCssToElements,
   elementsToCss,
@@ -15,6 +16,13 @@ import styles from "./HtmlLab.module.css";
 export default function HtmlLab({ onBack }) {
   const [state, dispatch] = useReducer(labReducer, initialState);
   const [codePanelWidth, setCodePanelWidth] = useState(360);
+  const [showComponents, setShowComponents] = useState(false);
+
+  // Detect which components match the selected element's direct children
+  const matchedComponents = useMemo(() => {
+    if (!state.selectedId) return [];
+    return detectComponents(state.selectedId, state.elements);
+  }, [state.selectedId, state.elements]);
   const dividerDragging = useRef(false);
   const dividerStartX = useRef(0);
   const dividerStartW = useRef(0);
@@ -68,14 +76,36 @@ export default function HtmlLab({ onBack }) {
       <Toolbar
         showOverlay={state.showOverlay}
         showLabels={state.showLabels}
+        showComponents={showComponents}
         onAddElement={(tag) => dispatch({ type: "ADD_ELEMENT", payload: tag })}
         onToggleOverlay={() => dispatch({ type: "TOGGLE_OVERLAY" })}
         onToggleLabels={() => dispatch({ type: "TOGGLE_LABELS" })}
+        onToggleComponents={() => setShowComponents(v => !v)}
         onUndo={() => dispatch({ type: "UNDO" })}
         onClear={() => dispatch({ type: "CLEAR" })}
         canUndo={state.history.length > 0}
         onBack={onBack}
       />
+
+      {showComponents && (
+        <div className={styles.compPanel}>
+          {COMPONENTS.map(comp => (
+            <button
+              key={comp.id}
+              className={styles.compCard}
+              onClick={() => {
+                dispatch({ type: "INSERT_TEMPLATE", payload: comp.template });
+                setShowComponents(false);
+              }}
+              title={comp.description}
+            >
+              <span className={styles.compIcon}>{comp.icon}</span>
+              <span className={styles.compName}>{comp.name}</span>
+              <span className={styles.compCat}>{comp.category}</span>
+            </button>
+          ))}
+        </div>
+      )}
       {/* Layout: [Code] | [Canvas] | [Properties] */}
       <div className={styles.main}>
         <CodePanel
@@ -121,6 +151,17 @@ export default function HtmlLab({ onBack }) {
 
         <PropertiesPanel
           element={selectedElement}
+          matchedComponents={matchedComponents}
+          bodyThemes={!state.selectedId ? BODY_THEMES : null}
+          onApplyComponentTheme={(theme) => {
+            const updates = buildThemeUpdates(state.selectedId, state.elements, theme);
+            dispatch({ type: "APPLY_COMPONENT_THEME", payload: { updates } });
+          }}
+          onApplyBodyTheme={(theme) =>
+            theme.reset
+              ? dispatch({ type: "RESET_BODY_STYLES" })
+              : dispatch({ type: "APPLY_BODY_THEME", payload: theme.styles })
+          }
           onChange={(prop, value) =>
             state.selectedId
               ? dispatch({ type: "UPDATE_STYLE", payload: { prop, value } })
