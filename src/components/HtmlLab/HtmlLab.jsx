@@ -77,6 +77,7 @@ export default function HtmlLab({ onBack }) {
           css={generatedCss}
           javascript={state.javascript}
           width={codePanelWidth}
+          selectedId={state.selectedId}
           onHtmlChange={handleCodeChange}
           onCssChange={handleCssChange}
           onJavascriptChange={(value) =>
