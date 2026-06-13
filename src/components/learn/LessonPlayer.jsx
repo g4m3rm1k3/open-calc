@@ -2,10 +2,59 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Editor from '@monaco-editor/react'
 import {
-  Play, Pause, ChevronRight, ChevronLeft, ChevronDown, RotateCcw,
+  Play, Pause, Square, ChevronRight, ChevronLeft, ChevronDown, RotateCcw,
   ExternalLink, CheckCircle, XCircle, Terminal, Lightbulb, Check, Code2
 } from 'lucide-react'
 import { useSpeech } from '../../utils/useSpeech.js'
+
+// ── Typewriter Utilities ──────────────────────────────────────────────────────
+
+function FormattedText({ text }) {
+  const parts = text.split('`')
+  return (
+    <>
+      {parts.map((part, i) => (
+        i % 2 === 1 ? (
+          <code key={i} className="font-mono bg-white/10 text-indigo-300 px-1.5 py-0.5 rounded text-[13px]">{part}</code>
+        ) : (
+          <span key={i}>{part}</span>
+        )
+      ))}
+    </>
+  )
+}
+
+function TypewriterText({ text, fastForward, onComplete }) {
+  const [displayedLen, setDisplayedLen] = useState(0)
+
+  useEffect(() => {
+    setDisplayedLen(0)
+  }, [text])
+
+  useEffect(() => {
+    if (fastForward || displayedLen >= text.length) {
+      if (displayedLen !== text.length) setDisplayedLen(text.length)
+      if (displayedLen >= text.length) onComplete?.()
+      return
+    }
+
+    const interval = setInterval(() => {
+      setDisplayedLen(prev => {
+        const next = prev + 1
+        if (next >= text.length) {
+          clearInterval(interval)
+          onComplete?.()
+        }
+        return next
+      })
+    }, 25)
+
+    return () => clearInterval(interval)
+  }, [text, fastForward, displayedLen, onComplete])
+
+  const displayedText = text.slice(0, displayedLen)
+  return <FormattedText text={displayedText} />
+}
 
 // ── Sandbox ───────────────────────────────────────────────────────────────────
 
@@ -185,6 +234,8 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle, series
   const [hint, setHint]                       = useState(false)
   const [reachedCp, setReachedCp]             = useState(savedCp ? getReachedCpsUpTo(savedCp.cpId) : [])
   const [lessonMenuOpen, setLessonMenuOpen]   = useState(false)
+  const [fastForwardText, setFastForwardText] = useState(false)
+  const [isTypingText, setIsTypingText]       = useState(false)
 
   // Drag state
   const [editorHeight, setEditorHeight] = useState('65vh')
@@ -198,6 +249,8 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle, series
   const prevCodeRef       = useRef('')
   const pendingDiffRef    = useRef(null)
   const highlightTimerRef = useRef(null)
+  const codeTypewriterRef = useRef(null)
+  const targetCodeRef     = useRef(null)
   
   // Drag refs
   const isDraggingEditor  = useRef(false)
@@ -244,6 +297,65 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle, series
   const isChallenge = phase === 'challenge'
   const isCodeLens  = phase === 'codelens'
 
+  function finishTypingCode() {
+    if (codeTypewriterRef.current) {
+      clearInterval(codeTypewriterRef.current)
+      codeTypewriterRef.current = null
+      if (targetCodeRef.current !== null) {
+        setCode(targetCodeRef.current)
+      }
+    }
+  }
+
+  function typeCode(newCode, oldCode) {
+    finishTypingCode()
+    targetCodeRef.current = newCode
+
+    const prevSet = new Set((oldCode || '').split('\n').map(l => l.trimEnd()))
+    const nextLines = newCode.split('\n')
+    
+    const newIndices = []
+    nextLines.forEach((line, i) => {
+      if (line.trimEnd().trim() && !prevSet.has(line.trimEnd())) {
+        newIndices.push(i)
+      }
+    })
+
+    if (newIndices.length === 0) {
+      setCode(newCode)
+      return
+    }
+
+    let charIdx = 0
+    const totalChars = newIndices.reduce((sum, i) => sum + nextLines[i].length, 0)
+    
+    if (totalChars === 0) {
+      setCode(newCode)
+      return
+    }
+
+    const charsPerFrame = 8
+    
+    codeTypewriterRef.current = setInterval(() => {
+      charIdx += charsPerFrame
+      if (charIdx >= totalChars) {
+        finishTypingCode()
+        return
+      }
+
+      let currentChars = 0
+      const currentLines = nextLines.map((line, i) => {
+        if (!newIndices.includes(i)) return line
+        if (currentChars >= charIdx) return ''
+        const remaining = charIdx - currentChars
+        currentChars += line.length
+        return line.slice(0, remaining)
+      })
+
+      setCode(currentLines.join('\n'))
+    }, 16)
+  }
+
   // ── Playback engine ──────────────────────────────────────────────────────────
 
   const runFrom = useCallback(async (startIdx) => {
@@ -257,21 +369,22 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle, series
 
       if (seg.type === 'narration') {
         setPhase('playing')
+        setFastForwardText(false)
+        setIsTypingText(true)
         if (seg.code !== null && seg.code !== undefined) {
           highlightNewLines(seg.code)
-          setCode(seg.code)
+          typeCode(seg.code, code)
           setLogs([])
           setRunError(null)
           setChallengeResult(null)
           setTestDetail(null)
         }
-        if (seg.text) await speak(seg.text)
+        if (seg.text) speak(seg.text) // Fire and forget speech so text types concurrently
         if (pauseRef.current) return
 
-        // If this segment has code, auto-run it so the output is visible,
-        // then pause so the user can experiment before moving on.
         // Auto-run code if present so output is visible
         if (seg.code !== null && seg.code !== undefined) {
+          // Note: The execution runs on the full code immediately, even though UI is typing it out
           const { logs: autoLogs, error: autoErr } = runCode(seg.code)
           setLogs(autoLogs)
           setRunError(autoErr)
@@ -287,6 +400,9 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle, series
 
       } else if (seg.type === 'challenge') {
         setPhase('challenge')
+        setFastForwardText(false)
+        setIsTypingText(true)
+        finishTypingCode()
         setCode(seg.startCode || '')
         setLogs([])
         setRunError(null)
@@ -298,6 +414,9 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle, series
 
       } else if (seg.type === 'codelens') {
         setPhase('codelens')
+        setFastForwardText(false)
+        setIsTypingText(true)
+        finishTypingCode()
         if (seg.code) setCode(seg.code)
         setLogs([])
         setRunError(null)
@@ -309,15 +428,37 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle, series
     setPhase('done')
   }, [segments, speak, lesson.id])
 
+  function attemptFastForward() {
+    if (isTypingText || codeTypewriterRef.current) {
+      setFastForwardText(true)
+      finishTypingCode()
+      return true
+    }
+    return false
+  }
+
   function handlePlay() {
+    if (attemptFastForward()) return
     if (phase === 'idle')   runFrom(segIdx)
     if (phase === 'paused') runFrom(segIdx + 1)
   }
 
   function handlePause() {
+    if (attemptFastForward()) return
     pauseRef.current = true
     stopSpeech()
     setPhase('paused')
+  }
+
+  function handleStop() {
+    pauseRef.current = true
+    stopSpeech()
+    finishTypingCode()
+    setFastForwardText(false)
+    setIsTypingText(false)
+    setPhase('idle')
+    const targetSeg = segments[segIdx]
+    if (targetSeg) setCode(targetSeg.startCode ?? targetSeg.code ?? '')
   }
 
   function handleRestart() {
@@ -340,6 +481,9 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle, series
   // ── Checkpoint jump ──────────────────────────────────────────────────────────
 
   function jumpToCheckpoint(cpId) {
+    if (attemptFastForward()) {
+      // Allow jump even if fast forwarded
+    }
     pauseRef.current = true
     stopSpeech()
 
@@ -362,6 +506,7 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle, series
     prevCodeRef.current = ''
     decorationCollRef.current?.clear()
     setSegIdx(targetIdx)
+    finishTypingCode()
     setCode(targetSeg?.startCode ?? targetSeg?.code ?? '')
     setLogs([])
     setRunError(null)
@@ -524,24 +669,44 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle, series
         <div className="flex items-center gap-3 px-4 py-2 border-b border-white/5 bg-black/40">
           {/* Play/Pause/Next */}
           <div className="flex items-center gap-1.5">
-            {phase === 'playing' ? (
-              <button onClick={handlePause} className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-white transition-all shadow-md hover:scale-105 border border-white/5" title="Pause">
-                <Pause size={14} className="fill-white" />
-              </button>
-            ) : phase === 'idle' && !isChallenge && !isCodeLens ? (
-              <button onClick={handlePlay} className="flex items-center justify-center gap-2 px-4 py-1.5 rounded-full bg-white text-black hover:bg-slate-200 text-xs font-bold transition-all shadow-[0_0_15px_rgba(255,255,255,0.2)] hover:scale-105">
-                <Play size={12} className="fill-black" /> Play
-              </button>
-            ) : phase === 'paused' && !isChallenge && !isCodeLens ? (
-              <div className="flex items-center gap-1.5">
-                <button onClick={() => runFrom(segIdx)} className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-white transition-all shadow-md hover:scale-105 border border-white/5" title="Replay">
-                  <RotateCcw size={12} />
+            {!isChallenge && !isCodeLens && (
+              <>
+                <button 
+                  onClick={() => {
+                    pauseRef.current = true; stopSpeech(); finishTypingCode(); setFastForwardText(false);
+                    if (segIdx > 0) runFrom(segIdx - 1)
+                  }}
+                  disabled={segIdx === 0}
+                  className={`flex items-center justify-center w-8 h-8 rounded-full transition-all shadow-md border border-white/5 ${segIdx === 0 ? 'bg-slate-900 text-slate-600 cursor-not-allowed' : 'bg-slate-800 hover:bg-slate-700 text-white hover:scale-105'}`}
+                  title="Previous Segment"
+                >
+                  <ChevronLeft size={16} />
                 </button>
-                <button onClick={() => runFrom(segIdx + 1)} className="flex items-center justify-center w-8 h-8 rounded-full bg-white text-black hover:bg-slate-200 transition-all shadow-[0_0_10px_rgba(255,255,255,0.2)] hover:scale-105" title="Next">
+
+                <button onClick={handleStop} className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-white transition-all shadow-md hover:scale-105 border border-white/5" title="Stop">
+                  <Square size={12} className="fill-white" />
+                </button>
+
+                {phase === 'playing' ? (
+                  <button onClick={handlePause} className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-white transition-all shadow-md hover:scale-105 border border-white/5" title="Pause">
+                    <Pause size={14} className="fill-white" />
+                  </button>
+                ) : (
+                  <button onClick={handlePlay} className="flex items-center justify-center gap-2 px-4 py-1.5 rounded-full bg-white text-black hover:bg-slate-200 text-xs font-bold transition-all shadow-[0_0_15px_rgba(255,255,255,0.2)] hover:scale-105" title="Play">
+                    <Play size={12} className="fill-black" /> Play
+                  </button>
+                )}
+
+                <button 
+                  onClick={() => { if (!attemptFastForward()) runFrom(segIdx + 1) }} 
+                  disabled={segIdx >= segments.length - 1 && phase === 'done'}
+                  className={`flex items-center justify-center w-8 h-8 rounded-full transition-all shadow-md border border-white/5 ${(segIdx >= segments.length - 1 && phase === 'done') ? 'bg-slate-900 text-slate-600 cursor-not-allowed' : 'bg-white text-black hover:bg-slate-200 hover:scale-105 shadow-[0_0_10px_rgba(255,255,255,0.2)]'}`}
+                  title="Next Segment"
+                >
                   <ChevronRight size={16} />
                 </button>
-              </div>
-            ) : null}
+              </>
+            )}
 
             {isChallenge && challengeResult === 'pass' && (
               <button onClick={() => { setChallengeResult(null); setTestDetail(null); setHint(false); runFrom(segIdx + 1) }} className="flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-bold transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:scale-105">
@@ -614,7 +779,13 @@ export default function LessonPlayer({ lesson, onBack, onNext, nextTitle, series
           )}
 
           {(phase === 'playing' || phase === 'paused') && currentSeg?.type === 'narration' && (
-            <p className="text-[15px] text-slate-200 leading-relaxed tracking-tight font-medium">{currentSeg.text}</p>
+            <p className="text-[15px] text-slate-200 leading-relaxed tracking-tight font-medium">
+              <TypewriterText 
+                text={currentSeg.text} 
+                fastForward={fastForwardText} 
+                onComplete={() => setIsTypingText(false)} 
+              />
+            </p>
           )}
 
           {phase === 'done' && (
