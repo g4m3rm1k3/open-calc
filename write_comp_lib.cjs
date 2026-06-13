@@ -1,4 +1,6 @@
-// ─── Template element builder ─────────────────────────────────────────────────
+const fs = require("fs");
+
+const fileContent = `// ─── Template element builder ─────────────────────────────────────────────────
 function el(id, tag, parentId, order, content, attrs, styles) {
   return {
     id, tag, parentId, order, content,
@@ -491,3 +493,6 @@ export function buildThemeUpdates(parentId, elements, theme) {
 
   return updates;
 }
+`;
+
+fs.writeFileSync("src/components/HtmlLab/componentLibrary.js", fileContent);
