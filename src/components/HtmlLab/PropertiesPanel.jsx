@@ -108,7 +108,7 @@ const SECTIONS = [
         label: "display",
         prop: "display",
         type: "select",
-        opts: ["block", "inline-block", "flex", "grid", "inline", "none"],
+        opts: ["", "block", "inline-block", "flex", "grid", "inline", "none"],
       },
       {
         label: "flex-dir",

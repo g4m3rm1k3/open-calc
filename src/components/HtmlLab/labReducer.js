@@ -435,9 +435,10 @@ export function labReducer(state, action) {
     case "UPDATE_MULTI_STYLE": {
       const { ids, prop, value } = action.payload;
       const idSet = new Set(ids);
+      const s = withHistory(state);
       return {
-        ...state,
-        elements: state.elements.map((e) => {
+        ...s,
+        elements: s.elements.map((e) => {
           if (!idSet.has(e.id)) return e;
           const s2 = { ...e.styles };
           if (value === "") delete s2[prop];

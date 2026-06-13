@@ -73,6 +73,7 @@ function TreeBranch({ elements, selectedId, onSelect, onDelete, parentId, depth,
           title={`<${el.tag}>${el.content ? ` "${el.content.slice(0, 30)}"` : ""} — Ctrl+click to multi-select`}
           onClick={(e) => {
             if ((e.ctrlKey || e.metaKey) && onToggleMultiSelect) {
+              e.preventDefault();
               onToggleMultiSelect(el.id);
             } else {
               onSelect(el.id);

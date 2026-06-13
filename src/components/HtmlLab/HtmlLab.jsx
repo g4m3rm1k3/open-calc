@@ -1,4 +1,4 @@
-import { useState, useReducer, useCallback, useRef, useMemo, useEffect } from "react";
+import { useState, useReducer, useCallback, useRef, useMemo } from "react";
 import Toolbar from "./Toolbar";
 import CanvasPanel from "./CanvasPanel";
 import CodePanel from "./CodePanel";
@@ -43,13 +43,15 @@ export default function HtmlLab({ onBack }) {
   const multiElement = useMemo(() => {
     if (multiSelectedIds.length < 2) return null;
     const els = multiSelectedIds.map(id => state.elements.find(e => e.id === id)).filter(Boolean);
-    if (els.length < 2) return null;
+    // Compute shared styles (properties where ALL found elements agree)
     const allProps = [...new Set(els.flatMap(e => Object.keys(e.styles || {})))];
     const sharedStyles = {};
-    allProps.forEach(prop => {
-      const vals = els.map(e => e.styles?.[prop]);
-      if (vals.every(v => v === vals[0] && v !== undefined)) sharedStyles[prop] = vals[0];
-    });
+    if (els.length > 0) {
+      allProps.forEach(prop => {
+        const vals = els.map(e => e.styles?.[prop]);
+        if (vals.every(v => v === vals[0] && v !== undefined)) sharedStyles[prop] = vals[0];
+      });
+    }
     return { id: "__multi__", tag: "div", styles: sharedStyles, attrs: {}, content: "", parentId: null, mediaQueries: [] };
   }, [multiSelectedIds, state.elements]);
 
