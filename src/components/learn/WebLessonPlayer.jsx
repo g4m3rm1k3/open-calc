@@ -504,8 +504,9 @@ ${codeToRun}
       setRunError(null)
 
       if (isChallenge && currentSeg?.validate) {
-        // Challenges might need custom handling for React
-        setChallengeResult('pass')
+        const { passed, detail } = runValidate(currentSeg, { code: codeToRun })
+        setChallengeResult(passed ? 'pass' : 'fail')
+        setTestDetail(passed ? null : (detail ?? null))
       }
       return
     }
