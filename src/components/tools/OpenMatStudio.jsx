@@ -172,6 +172,35 @@ L * U
 `,
   },
   {
+    id: "linear-transform-matrix",
+    label: "Transformation Matrix",
+    icon: Sigma,
+    description: "Build the matrix representation of T(p) = x²·p mapping from basis B = {1, x, x²} to B' = {1, x, x², x³, x⁴} using symbolic polynomials.",
+    matlabLike: true,
+    code: `syms x
+
+% Define your basis B (input) and B' (output)
+B  = [1, x, x^2];
+Bp = [1, x, x^2, x^3, x^4];   % B-prime
+
+% Define your transformation
+T = @(p) x^2 * p;
+
+% Build the matrix column by column
+M = zeros(length(Bp), length(B));
+
+for col = 1:length(B)
+    image = T(B(col));                          % apply T to each basis vector
+    coeffs = sym2poly(expand(image));           % get coefficients
+    % pad with leading zeros if needed
+    padded = [zeros(1, length(Bp) - length(coeffs)), coeffs];
+    M(:, col) = flip(padded)';                  % fill the column
+end
+
+disp(M)
+`,
+  },
+  {
     id: "signals",
     label: "Signals",
     icon: Waves,

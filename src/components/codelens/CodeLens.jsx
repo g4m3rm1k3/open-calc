@@ -714,9 +714,12 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
   const [playSpeed, setPlaySpeed]   = useState('1x')
   const [fnModal, setFnModal]       = useState(null)
   const [editorW, setEditorW]       = useState(null)  // null = auto flex-grow
+  const [breakpoints, setBreakpoints] = useState(() => new Set())
   const eventListRef                = useRef(null)
   const editorRef                   = useRef(null)
   const decorRef                    = useRef([])
+  const bpDecorRef                  = useRef([])
+  const shadowDecorRef              = useRef([])
   const editorColRef                = useRef(null)
   const monaco                      = useMonaco()
 
@@ -774,6 +777,46 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
     return () => clearInterval(id)
   }, [playing, playSpeed, execution, totalSteps])
 
+  // Breakpoint gutter decorations
+  useEffect(() => {
+    const ed = editorRef.current
+    if (!ed || !monaco) return
+    bpDecorRef.current = ed.deltaDecorations(bpDecorRef.current,
+      [...breakpoints].map(line => ({
+        range: new monaco.Range(line, 1, line, 1),
+        options: {
+          isWholeLine: true,
+          className: 'cl-bp-line',
+          glyphMarginClassName: 'cl-bp-glyph',
+          overviewRulerColor: '#ef4444cc',
+          overviewRulerLane: 4,
+        }
+      }))
+    )
+  }, [breakpoints, monaco])
+
+  // Code shadow — faint tint on previously-visited lines
+  useEffect(() => {
+    const ed = editorRef.current
+    if (!ed || !monaco || !execution) {
+      if (ed && monaco) shadowDecorRef.current = ed.deltaDecorations(shadowDecorRef.current, [])
+      return
+    }
+    const visited = new Set()
+    for (let i = 0; i <= step; i++) {
+      const ln = execution.events[i]?.sourceLocation?.line
+      if (ln) visited.add(ln)
+    }
+    const currentLine = execution.events[step]?.sourceLocation?.line
+    if (currentLine) visited.delete(currentLine)
+    shadowDecorRef.current = ed.deltaDecorations(shadowDecorRef.current,
+      [...visited].map(line => ({
+        range: new monaco.Range(line, 1, line, 1),
+        options: { isWholeLine: true, className: 'cl-shadow-line' }
+      }))
+    )
+  }, [step, execution, monaco])
+
   // Auto-scroll event list to current step
   useEffect(() => {
     if (!eventListRef.current) return
@@ -821,6 +864,17 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
     }
   }, [source, lang])
 
+  const handleContinue = useCallback(() => {
+    if (!execution) return
+    setPlaying(false)
+    const events = execution.events
+    for (let i = step + 1; i < events.length; i++) {
+      const line = events[i]?.sourceLocation?.line
+      if (line && breakpoints.has(line)) { setStep(i); return }
+    }
+    setStep(events.length - 1)
+  }, [step, execution, breakpoints])
+
   const TABS = (lang === 'py' || lang === 'go')
     ? [{ id: 'structure', label: 'Structure', icon: Boxes }]
     : [
@@ -862,6 +916,22 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
           user-select: none !important;
           pointer-events: none !important;
         }
+        .cl-shadow-line {
+          background: rgba(99,102,241,0.05) !important;
+        }
+        .cl-bp-line {
+          background: rgba(239,68,68,0.08) !important;
+        }
+        .cl-bp-glyph::after {
+          content: '' !important;
+          display: block !important;
+          width: 10px !important;
+          height: 10px !important;
+          border-radius: 50% !important;
+          background: radial-gradient(circle at 38% 38%, #f87171, #dc2626) !important;
+          box-shadow: 0 0 5px #ef4444aa !important;
+          margin: 3px auto !important;
+        }
       `}</style>
       {/* ── Header ── */}
       <div style={{
@@ -898,6 +968,7 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
               setExecution(null)
               setStep(0)
               setModel(null)
+              setBreakpoints(new Set())
             }} style={{
               padding: '3px 10px', borderRadius: 4, border: 'none', cursor: 'pointer',
               fontSize: 11, fontFamily: 'JetBrains Mono, monospace', fontWeight: 600,
@@ -1023,6 +1094,20 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
             <SkipForward size={11} />
           </Btn>
 
+          {/* Continue to breakpoint */}
+          {breakpoints.size > 0 && (
+            <>
+              <div style={{ width: 1, height: 16, background: '#1e293b', margin: '0 2px' }} />
+              <Btn
+                onClick={handleContinue}
+                disabled={!execution || step >= totalSteps - 1}
+                title="Continue to next breakpoint (F8)"
+              >
+                <span style={{ fontSize: 10 }}>⬤</span> Continue
+              </Btn>
+            </>
+          )}
+
           {/* Play / pause */}
           <div style={{ width: 1, height: 16, background: '#1e293b', margin: '0 2px' }} />
           <Btn
@@ -1108,11 +1193,30 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
                 onChange={v => setSource(v ?? '')}
                 theme={THEMES.find(t => t.id === theme)?.monaco ?? 'monokai'}
                 beforeMount={setupOpenCalcMonaco}
-                onMount={ed => { editorRef.current = ed }}
+                onMount={(ed, mo) => {
+                  editorRef.current = ed
+                  ed.onMouseDown((e) => {
+                    const T = mo.editor.MouseTargetType
+                    if (
+                      e.target.type === T.GUTTER_LINE_NUMBERS ||
+                      e.target.type === T.GUTTER_GLYPH_MARGIN
+                    ) {
+                      const line = e.target.position?.lineNumber
+                      if (!line) return
+                      setBreakpoints(prev => {
+                        const next = new Set(prev)
+                        if (next.has(line)) next.delete(line)
+                        else next.add(line)
+                        return next
+                      })
+                    }
+                  })
+                }}
                 options={{
                   fontSize: 13,
                   minimap: { enabled: false },
                   lineNumbers: 'on',
+                  glyphMargin: true,
                   scrollBeyondLastLine: false,
                   wordWrap: 'on',
                   fontFamily: 'JetBrains Mono, monospace',

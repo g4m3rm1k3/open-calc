@@ -7,16 +7,24 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { X, Plus, GripVertical, Eye } from 'lucide-react'
 
+// ── Sentinel for "variable not found in any scope frame" ──────────────────────
+const MISSING = Symbol('missing')
+
 // ── Value renderer (type-aware) ────────────────────────────────────────────────
 
 function renderValue(name, value, snapshot) {
-  if (value === undefined) {
+  if (value === MISSING) {
     return (
       <span style={{ color: '#475569', fontStyle: 'italic', fontSize: 11,
         fontFamily: 'JetBrains Mono, monospace' }}>
         not in scope
       </span>
     )
+  }
+
+  if (value === undefined) {
+    return <span style={{ color: '#64748b', fontFamily: 'JetBrains Mono, monospace',
+      fontSize: 12 }}>undefined</span>
   }
 
   if (value === null) return <Primitive label="null" color="#475569" />
@@ -104,20 +112,103 @@ function Primitive({ label, color }) {
   )
 }
 
-// ── Plain array → cell grid ────────────────────────────────────────────────────
+// ── Expandable heap reference ──────────────────────────────────────────────────
+// Renders "▶ Type #id" with a click-to-expand toggle. Used inside WatchObject
+// and WatchArray so any nested reference can be drilled into inline.
 
-function WatchArray({ obj, snapshot }) {
+function ExpandableRef({ id, snapshot, depth }) {
+  const [open, setOpen] = useState(false)
+  const obj = snapshot?.objects?.get(id)
+
+  if (!obj) {
+    return (
+      <span style={{ color: '#818cf8', fontFamily: 'JetBrains Mono, monospace', fontSize: 11 }}>
+        #{id}
+      </span>
+    )
+  }
+
+  const len  = obj.type === 'Array' ? parseInt(obj.properties.get('length') ?? 0, 10) : null
+  const label = obj.type === 'Array' ? `Array[${len}]` : obj.type
+
+  return (
+    <div>
+      <span
+        onClick={() => setOpen(o => !o)}
+        style={{
+          color: '#818cf8', cursor: 'pointer', fontSize: 11,
+          fontFamily: 'JetBrains Mono, monospace',
+          display: 'inline-flex', alignItems: 'center', gap: 4,
+          userSelect: 'none',
+        }}
+      >
+        <span style={{ fontSize: 9, color: '#475569' }}>{open ? '▼' : '▶'}</span>
+        {label}
+        <span style={{ color: '#334155', fontSize: 10 }}>#{id}</span>
+      </span>
+
+      {open && depth < 5 && (
+        <div style={{
+          marginLeft: 10, marginTop: 2,
+          paddingLeft: 8, borderLeft: '1px solid #1e293b',
+        }}>
+          {obj.type === 'Array'
+            ? <WatchArray obj={obj} snapshot={snapshot} depth={depth + 1} />
+            : <WatchObject obj={obj} snapshot={snapshot} depth={depth + 1} />
+          }
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Plain array → cell grid (primitives) or vertical list (refs) ───────────────
+
+function WatchArray({ obj, snapshot, depth = 0 }) {
   const len = parseInt(obj.properties.get('length') ?? 0, 10)
   const elems = []
   for (let i = 0; i < len; i++) elems.push(obj.properties.get(String(i)))
 
   if (len === 0) return <Primitive label="[]" color="#7dd3fc" />
 
+  const hasRefs = elems.some(v => isHeapRef(v))
+
+  // When any element is a reference, or we're nested inside another object,
+  // use a vertical list so each element can be expanded.
+  if (hasRefs || depth > 0) {
+    return (
+      <div style={{ marginTop: depth === 0 ? 4 : 2 }}>
+        {elems.map((v, i) => {
+          const rid = isHeapRef(v) ? refId(v) : null
+          const color = v === null || v === undefined ? '#475569'
+            : typeof v === 'number' ? '#86efac'
+            : typeof v === 'string' ? '#fbbf24'
+            : typeof v === 'boolean' ? '#f472b6' : '#818cf8'
+          return (
+            <div key={i} style={{
+              display: 'flex', gap: 6, alignItems: 'flex-start', marginBottom: 2,
+              fontFamily: 'JetBrains Mono, monospace', fontSize: 11,
+            }}>
+              <span style={{ fontSize: 9, color: '#334155', flexShrink: 0,
+                minWidth: 22, textAlign: 'right', paddingTop: 1 }}>[{i}]</span>
+              {rid !== null
+                ? <ExpandableRef id={rid} snapshot={snapshot} depth={depth + 1} />
+                : <span style={{ color }}>
+                    {v === null ? 'null' : v === undefined ? 'undef' : String(v)}
+                  </span>
+              }
+            </div>
+          )
+        })}
+      </div>
+    )
+  }
+
+  // Horizontal cell grid for flat primitive arrays
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, marginTop: 4 }}>
       {elems.map((v, i) => {
-        const str = v === null ? 'null' : v === undefined ? 'undef'
-          : isHeapRef(v) ? `#${refId(v)}` : String(v)
+        const str = v === null ? 'null' : v === undefined ? 'undef' : String(v)
         const color = v === null || v === undefined ? '#475569'
           : typeof v === 'number' ? '#86efac'
           : typeof v === 'string' ? '#fbbf24' : '#818cf8'
@@ -255,20 +346,30 @@ function WatchTree({ rootId, snapshot }) {
 
 // ── Object ─────────────────────────────────────────────────────────────────────
 
-function WatchObject({ obj, snapshot }) {
+function WatchObject({ obj, snapshot, depth = 0 }) {
   const entries = [...obj.properties].filter(([k]) =>
     k !== '__mapData__' && k !== 'length')
   if (entries.length === 0) return <Primitive label="{}" color="#818cf8" />
   return (
-    <div style={{ marginTop: 4, fontSize: 11,
+    <div style={{ marginTop: depth === 0 ? 4 : 2, fontSize: 11,
       fontFamily: 'JetBrains Mono, monospace' }}>
       {entries.map(([k, v]) => {
-        const str = v === null ? 'null' : isHeapRef(v) ? `→ #${refId(v)}` : String(v)
-        const col = typeof v === 'number' ? '#86efac' : '#94a3b8'
+        const rid = isHeapRef(v) ? refId(v) : null
+        const col = v === null ? '#475569'
+          : typeof v === 'number' ? '#86efac'
+          : typeof v === 'string' ? '#fbbf24'
+          : typeof v === 'boolean' ? '#f472b6'
+          : '#94a3b8'
         return (
-          <div key={k} style={{ display: 'flex', gap: 6 }}>
-            <span style={{ color: '#7dd3fc' }}>{k}:</span>
-            <span style={{ color: col }}>{str}</span>
+          <div key={k} style={{ display: 'flex', gap: 6, alignItems: 'flex-start', marginBottom: 2 }}>
+            <span style={{ color: '#7dd3fc', flexShrink: 0, minWidth: 52,
+              overflow: 'hidden', textOverflow: 'ellipsis' }}>{k}:</span>
+            {rid !== null
+              ? <ExpandableRef id={rid} snapshot={snapshot} depth={depth + 1} />
+              : <span style={{ color: col }}>
+                  {v === null ? 'null' : String(v)}
+                </span>
+            }
           </div>
         )
       })}
@@ -279,14 +380,16 @@ function WatchObject({ obj, snapshot }) {
 // ── Watch row ──────────────────────────────────────────────────────────────────
 
 function WatchRow({ name, snapshot, stackSnapshot, onRemove }) {
-  // Look up the value in the current scope chain
+  // Look up the value in the current scope chain.
+  // Returns MISSING (not undefined) when the variable isn't in any frame,
+  // so variables that genuinely hold undefined display correctly.
   const value = (() => {
-    if (!stackSnapshot) return undefined
+    if (!stackSnapshot?.length) return MISSING
     for (const frame of stackSnapshot) {
       const locals = frame.locals ?? {}
-      if (name in locals) return locals[name]
+      if (Object.prototype.hasOwnProperty.call(locals, name)) return locals[name]
     }
-    return undefined
+    return MISSING
   })()
 
   return (

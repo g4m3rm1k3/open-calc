@@ -24,6 +24,43 @@ math.config({ matrix: "Array", number: "number" });
   }, { override: true, wrap: false });
 }
 
+// Predicates used by symbolic-aware overrides
+function isSymObj(v)   { return v != null && typeof v === 'object' && !Array.isArray(v) && '__sym' in v; }
+function isSymArr(v)   { return Array.isArray(v) && v.length > 0 && isSymObj(v[0]); }
+function symShape(v)   { return isSymArr(v) ? [1, v.length] : (v.__shape ?? [1, 1]); }
+
+// Override size / length so that symbolic objects/arrays don't crash the engine.
+{
+  const _size = math.size.bind(math);
+  math.import({
+    size: function(x, dim) {
+      if (isSymObj(x) || isSymArr(x)) {
+        const s = symShape(x);
+        return dim !== undefined ? (s[Number(dim) - 1] ?? 1) : s;
+      }
+      return dim !== undefined ? _size(x, dim) : _size(x);
+    },
+    length: function(x) {
+      if (isSymObj(x) || isSymArr(x)) return Math.max(...symShape(x));
+      const p = x && typeof x.valueOf === 'function' ? x.valueOf() : x;
+      if (Array.isArray(p)) return Math.max(p.length, Array.isArray(p[0]) ? p[0].length : 0);
+      return 1;
+    },
+    numel: function(x) {
+      if (isSymObj(x) || isSymArr(x)) { const s = symShape(x); return s[0] * s[1]; }
+      const p = x && typeof x.valueOf === 'function' ? x.valueOf() : x;
+      if (!Array.isArray(p)) return 1;
+      return p.flat(Infinity).length;
+    },
+    isempty: function(x) {
+      if (isSymObj(x)) return 0;
+      if (isSymArr(x)) return x.length === 0 ? 1 : 0;
+      const p = x && typeof x.valueOf === 'function' ? x.valueOf() : x;
+      return (!p || (Array.isArray(p) && p.flat(Infinity).length === 0)) ? 1 : 0;
+    },
+  }, { override: true, wrap: false });
+}
+
 // ── Pure type/value helpers ───────────────────────────────────────────────────
 
 export function toPlain(value) {
@@ -592,6 +629,9 @@ export function sprintfFormat(fmt, ...args) {
 export function formatValue(value) {
   if (value == null) return "";
   if (typeof value === "string") return value;
+  if (Array.isArray(value) && value.length > 0 && isSymObj(value[0]))
+    return '[' + value.map(v => v.__sym).join(', ') + ']';
+  if (value && typeof value === "object" && "__sym" in value) return String(value.__sym);
   if (value && value.__multi) {
     return value.__multi.map((item) => formatValue(item)).join("\n\n");
   }
@@ -2055,6 +2095,14 @@ export function createExecutionEngine(options = {}) {
   parser.set("tril", (A, k = 0) => { const m = toNumericMatrix(A); if (!m) return []; const kn = Number(k) || 0; return m.map((r, i) => r.map((v, j) => j - i <= kn ? v : 0)); });
   parser.set("fliplr", (v) => { const p = toPlain(v); return isMatrix(p) ? p.map((r) => [...r].reverse()) : [...normalizeVector(v)].reverse(); });
   parser.set("flipud", (v) => { const p = toPlain(v); return isMatrix(p) ? [...p].reverse() : [...normalizeVector(v)].reverse(); });
+  parser.set("flip",   (v, dim) => {
+    const p = toPlain(v);
+    if (isMatrix(p)) {
+      const d = dim != null ? Number(dim) : 1;
+      return d === 2 ? p.map((r) => [...r].reverse()) : [...p].reverse();
+    }
+    return [...normalizeVector(v)].reverse();
+  });
   parser.set("kron", (A, B) => { const a = toNumericMatrix(A), b = toNumericMatrix(B); if (!a || !b) return []; const res = []; for (const ar of a) { res.push(...b.map((br) => ar.flatMap((av) => br.map((bv) => av * bv)))); } return res; });
   parser.set("linsolve", (A, b) => toPlain(math.lusolve(A, b)));
   parser.set("pinv", (A) => toPlain(math.pinv(toPlain(A))));
@@ -2611,6 +2659,7 @@ export function executeScript(source, options = {}) {
     initialWorkspace: options.initialWorkspace || [],
   });
   const { parser, logs, plotState, subplotState, variables, functionNames } = engine;
+  const symVars = new Set(); // variable names declared via syms
   const userFunctions = {};
 
   function isTruthy(val) {
@@ -2642,6 +2691,181 @@ export function executeScript(source, options = {}) {
       engine.clearVariables(args);
       return null;
     }
+
+    // ── syms x y z  — declare symbolic variables ──────────────────────────────
+    // OpenMAT is numeric-first but accepts syms so MATLAB/Octave scripts load
+    // without crashing. Symbolic variables are stored as string sentinels and
+    // basic CAS ops (diff, simplify, subs) are handled via mathjs.parse().
+    const symsMatch = withoutSemicolon.match(/^syms\s+([\w\s]+)$/i);
+    if (symsMatch) {
+      const names = symsMatch[1].trim().split(/\s+/).filter(n => /^[A-Za-z_]\w*$/.test(n));
+      names.forEach(name => {
+        symVars.add(name);
+        variables.add(name);
+        parser.set(name, { __sym: name, toString: () => name });
+      });
+      return hasSemicolon ? null : names.join('  ');
+    }
+
+    // Build a __sym result from a mathjs Node.
+    // 1-D ArrayNodes become a real JS array of __sym objects so that length(),
+    // size(), and indexing all work without crashing mathjs built-ins.
+    const symResult = (node) => {
+      try { node = math.simplify(node); } catch {}
+      if (node.type === 'ArrayNode') {
+        const items = node.items ?? [];
+        if (items.length > 0 && items[0].type !== 'ArrayNode') {
+          // 1-D row — return plain JS array of individual __sym objects
+          return items.map(item => {
+            try { item = math.simplify(item); } catch {}
+            const s = item.toString();
+            return { __sym: s, toString: () => s };
+          });
+        }
+      }
+      const s = node.toString();
+      return { __sym: s, __shape: [1, 1], toString: () => s };
+    };
+
+    // Resolve an expression: if it's a bare variable name holding __sym, return
+    // that string; otherwise return the string unchanged.
+    const resolveSymExpr = (str) => {
+      const s = str.trim();
+      try { const v = parser.get(s); if (isSymObj(v)) return String(v.__sym); } catch {}
+      return s;
+    };
+
+    // Recursively resolve nested sym functions (expand, etc.) to an expr string.
+    const evalSymFn = (exprStr) => {
+      const direct = resolveSymExpr(exprStr);
+      if (direct !== exprStr) return direct;
+      const expandM = exprStr.match(/^expand\((.+)\)$/i);
+      if (expandM) {
+        const inner = evalSymFn(expandM[1].trim());
+        try { let n = math.parse(inner); try { n = math.simplify(n); } catch {} return n.toString(); }
+        catch { return inner; }
+      }
+      return exprStr;
+    };
+
+    // Extract polynomial coefficients (highest degree first) via repeated
+    // differentiation at x = 0, matching MATLAB's sym2poly behaviour.
+    const extractPolyCoeffs = (exprStr, varName = 'x') => {
+      const MAX = 8;
+      const byDeg = new Array(MAX + 1).fill(0);
+      let node = math.parse(exprStr);
+      for (let n = 0; n <= MAX; n++) {
+        try {
+          const val = Number(node.compile().evaluate({ [varName]: 0 }));
+          let fact = 1; for (let i = 1; i <= n; i++) fact *= i;
+          byDeg[n] = Math.round((val / fact) * 1e10) / 1e10;
+        } catch { break; }
+        if (n < MAX) { try { node = math.derivative(node, varName); } catch { break; } }
+      }
+      let hi = MAX;
+      while (hi > 0 && Math.abs(byDeg[hi]) < 1e-9) hi--;
+      const result = [];
+      for (let i = hi; i >= 0; i--) result.push(byDeg[i]);
+      return result.length ? result : [0];
+    };
+
+    // Returns true when the expression string contains any bare syms variable.
+    const exprHasSymVars = (expr) => {
+      for (const name of symVars) if (new RegExp(`\\b${name}\\b`).test(expr)) return true;
+      return false;
+    };
+
+    // ── diff(expr, var[, order]) ──────────────────────────────────────────────
+    const diffMatch = withoutSemicolon.match(/^([A-Za-z_]\w*\s*=\s*)?diff\(\s*([^,]+?)\s*,\s*([A-Za-z_]\w*)\s*(?:,\s*(\d+))?\s*\)$/i);
+    if (diffMatch && symVars.size > 0) {
+      const [, assignLhs, rawExpr, varName] = diffMatch;
+      const order = parseInt(diffMatch[4] ?? '1', 10);
+      try {
+        let node = math.parse(evalSymFn(rawExpr));
+        for (let i = 0; i < order; i++) node = math.derivative(node, varName);
+        const result = symResult(node);
+        if (assignLhs) { const lhs = assignLhs.replace(/\s*=\s*$/, '').trim(); parser.set(lhs, result); variables.add(lhs); }
+        const display = Array.isArray(result) ? result.map(r=>r.__sym).join('  ') : result.__sym;
+        if (!hasSemicolon) logs.push(`${assignLhs ? assignLhs.replace(/\s*=\s*$/,'').trim() : 'ans'} =\n${display}`);
+        return hasSemicolon ? null : result;
+      } catch { /* fall through */ }
+    }
+
+    // ── simplify(expr) ────────────────────────────────────────────────────────
+    const simplifyMatch = withoutSemicolon.match(/^([A-Za-z_]\w*\s*=\s*)?simplify\(\s*([^)]+?)\s*\)$/i);
+    if (simplifyMatch && symVars.size > 0) {
+      const [, assignLhs, rawExpr] = simplifyMatch;
+      try {
+        const result = symResult(math.parse(evalSymFn(rawExpr)));
+        if (assignLhs) { const lhs = assignLhs.replace(/\s*=\s*$/, '').trim(); parser.set(lhs, result); variables.add(lhs); }
+        const display = Array.isArray(result) ? result.map(r=>r.__sym).join('  ') : result.__sym;
+        if (!hasSemicolon) logs.push(`${assignLhs ? assignLhs.replace(/\s*=\s*$/,'').trim() : 'ans'} =\n${display}`);
+        return hasSemicolon ? null : result;
+      } catch { /* fall through */ }
+    }
+
+    // ── expand(expr) — polynomial expansion ──────────────────────────────────
+    const expandMatch = withoutSemicolon.match(/^([A-Za-z_]\w*\s*=\s*)?expand\(\s*(.+?)\s*\)$/i);
+    if (expandMatch && symVars.size > 0) {
+      const [, assignLhs, rawExpr] = expandMatch;
+      try {
+        const result = symResult(math.parse(evalSymFn(rawExpr)));
+        if (assignLhs) { const lhs = assignLhs.replace(/\s*=\s*$/, '').trim(); parser.set(lhs, result); variables.add(lhs); }
+        const display = Array.isArray(result) ? result.map(r=>r.__sym).join('  ') : result.__sym;
+        if (!hasSemicolon) logs.push(`${assignLhs ? assignLhs.replace(/\s*=\s*$/,'').trim() : 'ans'} =\n${display}`);
+        return hasSemicolon ? null : result;
+      } catch { /* fall through */ }
+    }
+
+    // ── sym2poly(expr) ────────────────────────────────────────────────────────
+    const sym2polyMatch = withoutSemicolon.match(/^([A-Za-z_]\w*\s*=\s*)?sym2poly\(\s*(.+?)\s*\)$/i);
+    if (sym2polyMatch && symVars.size > 0) {
+      const [, assignLhs, rawExpr] = sym2polyMatch;
+      try {
+        const coeffs = extractPolyCoeffs(evalSymFn(rawExpr));
+        if (assignLhs) { const lhs = assignLhs.replace(/\s*=\s*$/, '').trim(); parser.set(lhs, coeffs); variables.add(lhs); }
+        if (!hasSemicolon) logs.push(`${assignLhs ? assignLhs.replace(/\s*=\s*$/,'').trim() : 'ans'} =\n${formatValue(coeffs)}`);
+        return hasSemicolon ? null : coeffs;
+      } catch { /* fall through */ }
+    }
+
+    // ── subs(expr, var, val) ──────────────────────────────────────────────────
+    const subsMatch = withoutSemicolon.match(/^([A-Za-z_]\w*\s*=\s*)?subs\(\s*([^,]+?)\s*,\s*([A-Za-z_]\w*)\s*,\s*([^)]+?)\s*\)$/i);
+    if (subsMatch) {
+      const [, assignLhs, rawExpr, varName, valStr] = subsMatch;
+      try {
+        const val = toPlain(parser.evaluate(preprocessLine(valStr.trim(), variables, functionNames)));
+        const evaluated = toPlain(math.parse(evalSymFn(rawExpr)).compile().evaluate({ [varName]: val }));
+        if (assignLhs) { const lhs = assignLhs.replace(/\s*=\s*$/, '').trim(); parser.set(lhs, evaluated); variables.add(lhs); }
+        if (!hasSemicolon) logs.push(`${assignLhs ? assignLhs.replace(/\s*=\s*$/,'').trim() : 'ans'} =\n${formatValue(evaluated)}`);
+        return hasSemicolon ? null : evaluated;
+      } catch { /* fall through */ }
+    }
+
+    // ── General symbolic intercept ────────────────────────────────────────────
+    // Only fires for expressions that contain a bare sym variable (x, y …).
+    // Derived variables (B, f, image…) are NOT in symVars so numeric code that
+    // references them is not incorrectly intercepted.
+    if (symVars.size > 0 && exprHasSymVars(withoutSemicolon)) {
+      const simpleAssign = withoutSemicolon.match(/^([A-Za-z_]\w*)\s*=\s*(.+)$/);
+      const rhsRaw  = simpleAssign ? simpleAssign[2].trim() : withoutSemicolon;
+      const lhsName = simpleAssign ? simpleAssign[1].trim() : null;
+      const mjsRhs  = rhsRaw.replace(/\.\^/g, '^').replace(/\.\*/g, '*').replace(/\.\//g, '/');
+      try {
+        const result = symResult(math.parse(mjsRhs));
+        if (lhsName) {
+          parser.set(lhsName, result); variables.add(lhsName);
+          // Do NOT add lhsName to symVars — only bare syms variables live there.
+          const display = Array.isArray(result) ? result.map(r=>r.__sym).join('  ') : result.__sym;
+          if (!hasSemicolon) logs.push(`${lhsName} =\n${display}`);
+        } else {
+          const display = Array.isArray(result) ? result.map(r=>r.__sym).join('  ') : result.__sym;
+          if (!hasSemicolon) logs.push(`ans =\n${display}`);
+        }
+        return hasSemicolon ? null : result;
+      } catch { /* fall through */ }
+    }
+
     const line = preprocessLine(withoutSemicolon, variables, functionNames);
     if (!line) return null;
     try {
@@ -2651,6 +2875,19 @@ export function executeScript(source, options = {}) {
         const params = paramsRaw.split(",").map((entry) => entry.trim()).filter(Boolean);
         const body = preprocessLine(bodyRaw, variables, functionNames);
         const anonymousFn = (...args) => {
+          // When any argument is symbolic, substitute into the body symbolically
+          // instead of evaluating numerically.
+          if (args.some(a => isSymObj(a) || isSymArr(a))) {
+            let exprBody = bodyRaw.replace(/\.\^/g, '^').replace(/\.\*/g, '*').replace(/\.\//g, '/');
+            params.forEach((param, idx) => {
+              const arg = args[idx];
+              const argStr = isSymObj(arg) ? `(${arg.__sym})`
+                           : isSymArr(arg) ? `[${arg.map(a=>a.__sym).join(', ')}]`
+                           : String(args[idx] ?? 0);
+              exprBody = exprBody.replace(new RegExp(`\\b${param}\\b`, 'g'), argStr);
+            });
+            try { return symResult(math.parse(exprBody)); } catch(e) { throw e; }
+          }
           const saved = new Map();
           params.forEach((param, index) => {
             try { saved.set(param, parser.get(param)); } catch { saved.set(param, undefined); }

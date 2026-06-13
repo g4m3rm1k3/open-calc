@@ -775,7 +775,10 @@ class Interpreter {
     }
 
     this.callStack.push({ name: fnName, env: fnEnv, line: callNode?.loc?.start?.line })
-    this._emit(EventType.FUNCTION_CALL, callNode, callerEnv, {
+    // Use fnEnv (not callerEnv) so the new frame's locals include bound params.
+    // callerEnv stops the walk immediately when the caller is global scope,
+    // making all params invisible at the FUNCTION_CALL event.
+    this._emit(EventType.FUNCTION_CALL, callNode, fnEnv, {
       functionName: fnName,
       args: args.map(serializeValue),
     })
@@ -837,7 +840,7 @@ class Interpreter {
       this._bindParams(fnNode.params, args, fnEnv)
       this._hoistDeclarations(fnNode.body.body, fnEnv)
       this.callStack.push({ name: `new ${cls.name}`, env: fnEnv })
-      this._emit(EventType.FUNCTION_CALL, callNode, callerEnv, {
+      this._emit(EventType.FUNCTION_CALL, callNode, fnEnv, {
         functionName: `new ${cls.name}`, args: args.map(serializeValue),
       })
       this._evalBody(fnNode.body.body, fnEnv)
