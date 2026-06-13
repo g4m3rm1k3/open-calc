@@ -792,6 +792,67 @@
   line-height: 1.4;
 }
 
+.multiSelectHint {
+  font-size: 10px;
+  color: #4ade80;
+  line-height: 1.5;
+  padding: 8px 10px;
+  background: rgba(74, 222, 128, 0.08);
+  border: 1px solid rgba(74, 222, 128, 0.2);
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.jsPresetsLabel {
+  font-size: 9px;
+  color: #777;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.jsPresetGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.jsPresetCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 4px;
+  border: 1px solid #3c3c3c;
+  border-radius: 5px;
+  background: #1e1e1e;
+  cursor: pointer;
+  transition: background 0.1s, border-color 0.1s;
+}
+
+.jsPresetCard:hover {
+  border-color: #ce9178;
+  background: rgba(206, 145, 120, 0.08);
+}
+
+.jsPresetCardActive {
+  border-color: #4ade80 !important;
+  background: rgba(74, 222, 128, 0.08) !important;
+}
+
+.jsPresetIcon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.jsPresetLabel {
+  font-size: 9px;
+  color: #ce9178;
+  text-align: center;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
 /* ── Box model visual ────────────────────────────────────────────────────────── */
 .boxModel {
   padding: 6px 4px;
@@ -1100,6 +1161,21 @@
 }
 .treeItemSelected .treeTag {
   color: #9cdcfe;
+}
+
+.treeItemMulti {
+  background: rgba(74, 222, 128, 0.12) !important;
+  color: #4ade80 !important;
+}
+.treeItemMulti .treeTag {
+  color: #4ade80;
+}
+
+.treeMultiBadge {
+  font-size: 9px;
+  color: #4ade80;
+  flex-shrink: 0;
+  margin-left: 2px;
 }
 
 .treeTag {

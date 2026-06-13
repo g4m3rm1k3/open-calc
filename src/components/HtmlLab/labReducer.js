@@ -18,7 +18,6 @@ const TAG_DEFAULTS = {
   h1: {
     fontSize: "40px",
     fontWeight: "700",
-    color: "#0f172a",
     margin: "0 0 24px 0",
     lineHeight: "1.2",
     display: "block",
@@ -26,7 +25,6 @@ const TAG_DEFAULTS = {
   h2: {
     fontSize: "32px",
     fontWeight: "600",
-    color: "#0f172a",
     margin: "0 0 16px 0",
     lineHeight: "1.3",
     display: "block",
@@ -34,7 +32,6 @@ const TAG_DEFAULTS = {
   h3: {
     fontSize: "24px",
     fontWeight: "600",
-    color: "#1e293b",
     margin: "0 0 16px 0",
     lineHeight: "1.4",
     display: "block",
@@ -199,6 +196,60 @@ function getDescendants(elements, id) {
     }
   }
   return result;
+}
+
+// ─── Dark/light cascade helpers ───────────────────────────────────────────────
+function hexLum(hex) {
+  if (!hex || !hex.startsWith("#") || hex.length < 7) return 0.5;
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+  return 0.299 * r + 0.587 * g + 0.114 * b;
+}
+
+// Known default palette — only these values get swapped so user-set colors are preserved.
+const LIGHT_COLORS = new Set(["#0f172a", "#1e293b", "#475569", "#64748b", "#1a1a18"]);
+const LIGHT_BKGS   = new Set(["#ffffff", "#f8fafc", "#f1f5f9"]);
+const DARK_COLORS  = new Set(["#f8fafc", "#e2e8f0", "#94a3b8", "#cbd5e1"]);
+const DARK_BKGS    = new Set(["#0f172a", "#1e293b", "#334155"]);
+
+function cascadeBodyTheme(elements, newBodyStyles) {
+  const rawBg = newBodyStyles.backgroundColor || newBodyStyles.background || "";
+  if (!rawBg.startsWith("#")) return elements; // gradient — skip
+
+  const goingDark = hexLum(rawBg) < 0.35;
+  const textColor = newBodyStyles.color || (goingDark ? "#f8fafc" : "#0f172a");
+
+  return elements.map((el) => {
+    const s = { ...el.styles };
+    let changed = false;
+
+    if (goingDark) {
+      if (s.color && LIGHT_COLORS.has(s.color)) {
+        s.color = (s.color === "#475569" || s.color === "#64748b") ? "#94a3b8" : textColor;
+        changed = true;
+      }
+      if (s.backgroundColor && LIGHT_BKGS.has(s.backgroundColor)) {
+        s.backgroundColor =
+          s.backgroundColor === "#ffffff" ? "#1e293b" :
+          s.backgroundColor === "#f8fafc" ? "#0f172a" : "#334155";
+        changed = true;
+      }
+    } else {
+      if (s.color && DARK_COLORS.has(s.color)) {
+        s.color = (s.color === "#94a3b8" || s.color === "#cbd5e1") ? "#475569" : textColor;
+        changed = true;
+      }
+      if (s.backgroundColor && DARK_BKGS.has(s.backgroundColor)) {
+        s.backgroundColor =
+          s.backgroundColor === "#0f172a" ? "#f8fafc" :
+          s.backgroundColor === "#1e293b" ? "#ffffff" : "#f1f5f9";
+        changed = true;
+      }
+    }
+
+    return changed ? { ...el, styles: s } : el;
+  });
 }
 
 // ─── Reducer ──────────────────────────────────────────────────────────────────
@@ -373,6 +424,21 @@ export function labReducer(state, action) {
         ...state,
         elements: state.elements.map((e) => {
           if (e.id !== state.selectedId) return e;
+          const s2 = { ...e.styles };
+          if (value === "") delete s2[prop];
+          else s2[prop] = value;
+          return { ...e, styles: s2 };
+        }),
+      };
+    }
+
+    case "UPDATE_MULTI_STYLE": {
+      const { ids, prop, value } = action.payload;
+      const idSet = new Set(ids);
+      return {
+        ...state,
+        elements: state.elements.map((e) => {
+          if (!idSet.has(e.id)) return e;
           const s2 = { ...e.styles };
           if (value === "") delete s2[prop];
           else s2[prop] = value;
@@ -574,9 +640,14 @@ export function labReducer(state, action) {
       };
     }
 
-    // Apply a body theme (merges on top of existing)
-    case "APPLY_BODY_THEME":
-      return { ...state, bodyStyles: { ...state.bodyStyles, ...action.payload } };
+    // Apply a body theme — merges on top of existing and cascades colors to elements
+    case "APPLY_BODY_THEME": {
+      const s = withHistory(state);
+      const newBodyStyles = { ...s.bodyStyles, ...action.payload };
+      const hasBgChange = "backgroundColor" in action.payload || "background" in action.payload;
+      const newElements = hasBgChange ? cascadeBodyTheme(s.elements, newBodyStyles) : s.elements;
+      return { ...s, bodyStyles: newBodyStyles, elements: newElements };
+    }
 
     // Hard-reset body styles back to defaults
     case "RESET_BODY_STYLES":

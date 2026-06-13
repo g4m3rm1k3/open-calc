@@ -32,12 +32,13 @@ function injectGlowStyle() {
 
 // ── Element Tree (renders in the Tree tab) ────────────────────────────────────
 
-function ElementTree({ elements, selectedId, onSelect, onDelete }) {
+function ElementTree({ elements, selectedId, onSelect, onDelete, multiSelectedIds, onToggleMultiSelect }) {
   return (
     <div className={styles.codeTreePanel}>
       <button
         className={`${styles.treeItem} ${!selectedId ? styles.treeItemSelected : ""}`}
         onClick={() => onSelect(null)}
+        title="<body> — page root"
       >
         <span className={styles.treeTagBody}>&lt;body&gt;</span>
         <span className={styles.treeItemLabel}>page root</span>
@@ -49,43 +50,59 @@ function ElementTree({ elements, selectedId, onSelect, onDelete }) {
         onDelete={onDelete}
         parentId={null}
         depth={1}
+        multiSelectedIds={multiSelectedIds}
+        onToggleMultiSelect={onToggleMultiSelect}
       />
     </div>
   );
 }
 
-function TreeBranch({ elements, selectedId, onSelect, onDelete, parentId, depth }) {
+function TreeBranch({ elements, selectedId, onSelect, onDelete, parentId, depth, multiSelectedIds, onToggleMultiSelect }) {
   const children = (elements || [])
     .filter(e => (e.parentId ?? null) === (parentId ?? null))
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
-  return children.map(el => (
-    <div key={el.id}>
-      <button
-        className={`${styles.treeItem} ${el.id === selectedId ? styles.treeItemSelected : ""}`}
-        style={{ paddingLeft: `${depth * 14 + 8}px` }}
-        onClick={() => onSelect(el.id)}
-      >
-        <span className={styles.treeTag}>&lt;{el.tag}&gt;</span>
-        {el.content && (
-          <span className={styles.treeItemLabel}>{el.content.slice(0, 24)}</span>
-        )}
+  return children.map(el => {
+    const isSelected = el.id === selectedId;
+    const isMulti = multiSelectedIds?.includes(el.id);
+    return (
+      <div key={el.id}>
         <button
-          className={styles.treeDeleteBtn}
-          onClick={(e) => { e.stopPropagation(); onDelete(el.id); }}
-          title="Delete"
-        >×</button>
-      </button>
-      <TreeBranch
-        elements={elements}
-        selectedId={selectedId}
-        onSelect={onSelect}
-        onDelete={onDelete}
-        parentId={el.id}
-        depth={depth + 1}
-      />
-    </div>
-  ));
+          className={`${styles.treeItem} ${isSelected ? styles.treeItemSelected : ""} ${isMulti ? styles.treeItemMulti : ""}`}
+          style={{ paddingLeft: `${depth * 14 + 8}px` }}
+          title={`<${el.tag}>${el.content ? ` "${el.content.slice(0, 30)}"` : ""} — Ctrl+click to multi-select`}
+          onClick={(e) => {
+            if ((e.ctrlKey || e.metaKey) && onToggleMultiSelect) {
+              onToggleMultiSelect(el.id);
+            } else {
+              onSelect(el.id);
+            }
+          }}
+        >
+          <span className={styles.treeTag}>&lt;{el.tag}&gt;</span>
+          {el.content && (
+            <span className={styles.treeItemLabel}>{el.content.slice(0, 24)}</span>
+          )}
+          {isMulti && <span className={styles.treeMultiBadge}>✓</span>}
+          <button
+            className={styles.treeDeleteBtn}
+            onClick={(e) => { e.stopPropagation(); onDelete(el.id); }}
+            title="Delete"
+          >×</button>
+        </button>
+        <TreeBranch
+          elements={elements}
+          selectedId={selectedId}
+          onSelect={onSelect}
+          onDelete={onDelete}
+          parentId={el.id}
+          depth={depth + 1}
+          multiSelectedIds={multiSelectedIds}
+          onToggleMultiSelect={onToggleMultiSelect}
+        />
+      </div>
+    );
+  });
 }
 
 // ── Range finders ─────────────────────────────────────────────────────────────
@@ -179,10 +196,12 @@ export default function CodePanel({
   width,
   selectedId,
   elements,
+  multiSelectedIds,
   onHtmlChange,
   onCssChange,
   onJavascriptChange,
   onSelectElement,
+  onToggleMultiSelect,
   onDeleteElement,
 }) {
   const debounceRef    = useRef(null);
@@ -298,9 +317,9 @@ export default function CodePanel({
             </button>
           ))}
         </div>
-        <span className={styles.panelHint}>
-          {activeTab === "tree" ? "click to select · × to delete" : "Monaco · auto-syncs both ways"}
-        </span>
+        {activeTab === "tree" && (
+          <span className={styles.panelHint}>click to select · × to delete</span>
+        )}
       </div>
       <div className={styles.monacoWrap}>
         {activeTab === "tree" ? (
@@ -309,6 +328,8 @@ export default function CodePanel({
             selectedId={selectedId}
             onSelect={onSelectElement}
             onDelete={onDeleteElement}
+            multiSelectedIds={multiSelectedIds}
+            onToggleMultiSelect={onToggleMultiSelect}
           />
         ) : (
           <Editor

@@ -1,4 +1,4 @@
-import { useState, useReducer, useCallback, useRef, useMemo } from "react";
+import { useState, useReducer, useCallback, useRef, useMemo, useEffect } from "react";
 import Toolbar from "./Toolbar";
 import CanvasPanel from "./CanvasPanel";
 import CodePanel from "./CodePanel";
@@ -19,6 +19,7 @@ export default function HtmlLab({ onBack }) {
   const [state, dispatch] = useReducer(labReducer, initialState);
   const [codePanelWidth, setCodePanelWidth] = useState(360);
   const [showComponents, setShowComponents] = useState(false);
+  const [multiSelectedIds, setMultiSelectedIds] = useState([]);
 
   // Detect which components match the selected element's direct children
   const matchedComponents = useMemo(() => {
@@ -38,6 +39,20 @@ export default function HtmlLab({ onBack }) {
     const gradient = state.bodyStyles.background || "";
     return gradient.includes("0f172a") || gradient.includes("1e293b");
   }, [state.bodyStyles]);
+  // Synthesise a shared-value element for multi-select property editing
+  const multiElement = useMemo(() => {
+    if (multiSelectedIds.length < 2) return null;
+    const els = multiSelectedIds.map(id => state.elements.find(e => e.id === id)).filter(Boolean);
+    if (els.length < 2) return null;
+    const allProps = [...new Set(els.flatMap(e => Object.keys(e.styles || {})))];
+    const sharedStyles = {};
+    allProps.forEach(prop => {
+      const vals = els.map(e => e.styles?.[prop]);
+      if (vals.every(v => v === vals[0] && v !== undefined)) sharedStyles[prop] = vals[0];
+    });
+    return { id: "__multi__", tag: "div", styles: sharedStyles, attrs: {}, content: "", parentId: null, mediaQueries: [] };
+  }, [multiSelectedIds, state.elements]);
+
   const dividerDragging = useRef(false);
   const dividerStartX = useRef(0);
   const dividerStartW = useRef(0);
@@ -184,12 +199,23 @@ export default function HtmlLab({ onBack }) {
           width={codePanelWidth}
           selectedId={state.selectedId}
           elements={state.elements}
+          multiSelectedIds={multiSelectedIds}
           onHtmlChange={handleCodeChange}
           onCssChange={handleCssChange}
           onJavascriptChange={(value) =>
             dispatch({ type: "SET_JAVASCRIPT", payload: value })
           }
-          onSelectElement={(id) => dispatch({ type: "SELECT", payload: id })}
+          onSelectElement={(id) => {
+            dispatch({ type: "SELECT", payload: id });
+            setMultiSelectedIds([]);
+          }}
+          onToggleMultiSelect={(id) =>
+            setMultiSelectedIds(prev => {
+              const s = new Set(prev);
+              if (s.has(id)) s.delete(id); else s.add(id);
+              return [...s];
+            })
+          }
           onDeleteElement={(id) => dispatch({ type: "DELETE_ELEMENT", payload: id })}
         />
 
@@ -201,8 +227,14 @@ export default function HtmlLab({ onBack }) {
           showOverlay={state.showOverlay}
           showLabels={state.showLabels}
           bodyStyles={state.bodyStyles}
-          onSelect={(id) => dispatch({ type: "SELECT", payload: id })}
-          onDeselect={() => dispatch({ type: "SELECT", payload: null })}
+          onSelect={(id) => {
+            dispatch({ type: "SELECT", payload: id });
+            setMultiSelectedIds([]);
+          }}
+          onDeselect={() => {
+            dispatch({ type: "SELECT", payload: null });
+            setMultiSelectedIds([]);
+          }}
           onDelete={(id) => dispatch({ type: "DELETE_ELEMENT", payload: id })}
           onNest={(childId, parentId, order) =>
             dispatch({
@@ -223,6 +255,8 @@ export default function HtmlLab({ onBack }) {
 
         <PropertiesPanel
           element={selectedElement}
+          multiSelectedIds={multiSelectedIds}
+          multiElement={multiElement}
           matchedComponents={matchedComponents}
           bodyThemes={!state.selectedId ? BODY_THEMES : null}
           onDelete={(id) => dispatch({ type: "DELETE_ELEMENT", payload: id })}
@@ -240,6 +274,9 @@ export default function HtmlLab({ onBack }) {
               ? dispatch({ type: "UPDATE_STYLE", payload: { prop, value } })
               : dispatch({ type: "UPDATE_BODY_STYLE", payload: { prop, value } })
           }
+          onMultiStyleChange={(prop, value) =>
+            dispatch({ type: "UPDATE_MULTI_STYLE", payload: { ids: multiSelectedIds, prop, value } })
+          }
           onContentChange={(value) =>
             dispatch({ type: "UPDATE_CONTENT", payload: value })
           }
@@ -254,6 +291,13 @@ export default function HtmlLab({ onBack }) {
               payload: appendJavascriptSnippet(state.javascript, snippet),
             })
           }
+          onInsertJsPreset={(template, code) => {
+            dispatch({ type: "INSERT_TEMPLATE", payload: { template } });
+            dispatch({
+              type: "SET_JAVASCRIPT",
+              payload: appendJavascriptSnippet(state.javascript, code),
+            });
+          }}
           onApplyPreset={(presetStyles) =>
             dispatch({ type: "APPLY_PRESET", payload: presetStyles })
           }

@@ -6,6 +6,7 @@ import {
   BREAKPOINTS,
   CSS_PROPS_LIST,
 } from "./styleLibrary";
+import { JS_PRESETS } from "./jsPresets";
 
 const TAGS = [
   "div",
@@ -250,14 +251,63 @@ const SECTIONS = [
   },
 ];
 
+const MULTI_SECTIONS = ["layout", "size", "spacing", "typography", "background", "border"];
+
+function MultiSelectPanel({ count, element, onChange }) {
+  const [collapsed, setCollapsed] = useState({});
+  const toggle = (key) => setCollapsed((c) => ({ ...c, [key]: !c[key] }));
+  const sections = SECTIONS.filter(s => MULTI_SECTIONS.includes(s.key));
+
+  return (
+    <div className={styles.propsPanel}>
+      <div className={styles.panelHeader}>
+        <span className={styles.panelHeaderTag}>Multi-select · {count} elements</span>
+      </div>
+      <div className={styles.propsBody}>
+        <div className={styles.multiSelectHint}>
+          Changes apply to all selected elements. Shared values are shown; blank means values differ.
+        </div>
+        {sections.map((sec) => (
+          <div key={sec.key} className={styles.propSection}>
+            <button className={styles.propSectionTitle} onClick={() => toggle(sec.key)}>
+              {sec.title}
+              <span>{collapsed[sec.key] ? "▶" : "▼"}</span>
+            </button>
+            {!collapsed[sec.key] && (
+              <div className={styles.propRows}>
+                {sec.special === "gradients" ? (
+                  <>
+                    {sec.rows.map((row) => (
+                      <PropRow key={row.prop} row={row} element={element} onChange={onChange} onContentChange={() => {}} onTagChange={() => {}} onAttrChange={() => {}} />
+                    ))}
+                    <GradientPresets onChange={onChange} />
+                  </>
+                ) : (
+                  sec.rows.map((row) => (
+                    <PropRow key={row.prop} row={row} element={element} onChange={onChange} onContentChange={() => {}} onTagChange={() => {}} onAttrChange={() => {}} />
+                  ))
+                )}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function PropertiesPanel({
   element,
+  multiSelectedIds,
+  multiElement,
+  onMultiStyleChange,
   onChange,
   onContentChange,
   onTagChange,
   onAttrChange,
   javascript,
   onInsertJavascript,
+  onInsertJsPreset,
   onApplyPreset,
   onAddMediaQuery,
   onRemoveMediaQuery,
@@ -270,6 +320,16 @@ export default function PropertiesPanel({
   const [collapsed, setCollapsed] = useState({ boxmodel: false });
 
   const toggle = (key) => setCollapsed((c) => ({ ...c, [key]: !c[key] }));
+
+  if (multiSelectedIds?.length > 1 && multiElement) {
+    return (
+      <MultiSelectPanel
+        count={multiSelectedIds.length}
+        element={multiElement}
+        onChange={onMultiStyleChange}
+      />
+    );
+  }
 
   if (!element) {
     return (
@@ -328,7 +388,7 @@ export default function PropertiesPanel({
         )}
 
         {(element.tag === "body"
-          ? SECTIONS.filter((s) => !["content", "javascript", "styleLibrary", "mediaQueries", "boxmodel"].includes(s.key))
+          ? SECTIONS.filter((s) => !["content", "styleLibrary", "mediaQueries", "boxmodel"].includes(s.key))
           : SECTIONS
         ).map((sec) => (
           <div key={sec.key} className={styles.propSection}>
@@ -351,6 +411,7 @@ export default function PropertiesPanel({
                     element={element}
                     javascript={javascript}
                     onInsertJavascript={onInsertJavascript}
+                    onInsertJsPreset={onInsertJsPreset}
                   />
                 ) : sec.special === "mediaQueries" ? (
                   <MediaQueriesSection
@@ -796,13 +857,17 @@ function MediaQueriesSection({ element, onAddMediaQuery, onRemoveMediaQuery }) {
   );
 }
 
-function JavascriptTools({ element, javascript = "", onInsertJavascript }) {
-  const selector = getElementSelector(element);
-  const selectorLiteral = JSON.stringify(selector);
-  const varName = toVarName(element.attrs?.id || element.id);
-  const hasSelector = javascript.includes(selector);
-  const styleObject = stylesToJsObject(element.styles);
-  const snippets = [
+function JavascriptTools({ element, javascript = "", onInsertJavascript, onInsertJsPreset }) {
+  const [activePreset, setActivePreset] = useState(null);
+  const isBody = element.tag === "body";
+
+  const selector = isBody ? null : getElementSelector(element);
+  const selectorLiteral = selector ? JSON.stringify(selector) : null;
+  const varName = isBody ? null : toVarName(element.attrs?.id || element.id);
+  const hasSelector = selector ? javascript.includes(selector) : false;
+  const styleObject = isBody ? null : stylesToJsObject(element.styles);
+
+  const snippets = isBody ? [] : [
     {
       label: "Select",
       code: `const ${varName} = document.querySelector(${selectorLiteral});`,
@@ -823,26 +888,55 @@ function JavascriptTools({ element, javascript = "", onInsertJavascript }) {
 
   return (
     <div className={styles.jsTools}>
-      <div className={styles.selectorBox}>
-        <span>selector</span>
-        <code>{selector}</code>
-      </div>
-      <div className={styles.jsToolButtons}>
-        {snippets.map((snippet) => (
+      <div className={styles.jsPresetsLabel}>Presets</div>
+      <div className={styles.jsPresetGrid}>
+        {JS_PRESETS.map((preset) => (
           <button
-            key={snippet.label}
+            key={preset.id}
             type="button"
-            className={styles.jsToolBtn}
-            onClick={() => onInsertJavascript(snippet.code)}
+            className={`${styles.jsPresetCard} ${activePreset === preset.id ? styles.jsPresetCardActive : ""}`}
+            title={preset.description}
+            onClick={() => {
+              if (preset.template && onInsertJsPreset) {
+                onInsertJsPreset(preset.template, preset.code);
+              } else {
+                onInsertJavascript(preset.code);
+              }
+              setActivePreset(preset.id);
+              setTimeout(() => setActivePreset(null), 1200);
+            }}
           >
-            {snippet.label}
+            <span className={styles.jsPresetIcon}>{preset.icon}</span>
+            <span className={styles.jsPresetLabel}>{preset.label}</span>
           </button>
         ))}
       </div>
-      {hasSelector && (
-        <div className={styles.jsLinked}>
-          JavaScript references this element
-        </div>
+
+      {!isBody && (
+        <>
+          <div className={styles.jsPresetsLabel} style={{ marginTop: 6 }}>Element</div>
+          <div className={styles.selectorBox}>
+            <span>selector</span>
+            <code>{selector}</code>
+          </div>
+          <div className={styles.jsToolButtons}>
+            {snippets.map((snippet) => (
+              <button
+                key={snippet.label}
+                type="button"
+                className={styles.jsToolBtn}
+                onClick={() => onInsertJavascript(snippet.code)}
+              >
+                {snippet.label}
+              </button>
+            ))}
+          </div>
+          {hasSelector && (
+            <div className={styles.jsLinked}>
+              JavaScript references this element
+            </div>
+          )}
+        </>
       )}
     </div>
   );
