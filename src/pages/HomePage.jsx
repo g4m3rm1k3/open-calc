@@ -100,7 +100,7 @@ const DOMAINS = [
     key:'cs', label:'Computer Science & Programming', icon:'⌨',
     desc:'Python, JavaScript, web systems, algorithms, data structures & computational thinking',
     headCol:'text-emerald-300 border-emerald-500/35',
-    courses:['python-1','javascript-core','web-1','cs-1','dsa-1','dp-1'],
+    courses:['python-1','javascript-core','web-1','css-mastery','cs-1','dsa-1','dp-1'],
   },
   {
     key:'engineering', label:'Engineering & Hardware', icon:'⚙',

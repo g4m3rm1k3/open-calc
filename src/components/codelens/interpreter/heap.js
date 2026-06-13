@@ -45,6 +45,15 @@ export class Heap {
     })
   }
 
+  // Delete a property and record a delta so buildHeapSnapshot can replay it.
+  deleteProperty(ref, prop) {
+    const obj = this._resolve(ref)
+    if (!obj) return
+    if (!obj.properties.has(prop)) return
+    obj.properties.delete(prop)
+    this.deltas.push({ op: 'delete', objectId: obj.id, property: prop })
+  }
+
   // Check own-property existence.
   has(ref, prop) {
     const obj = this._resolve(ref)

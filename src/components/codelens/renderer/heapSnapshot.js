@@ -25,6 +25,12 @@ export function buildHeapSnapshot(events, stepIndex) {
           obj.properties.set(delta.property, delta.newValue)
           if (i === stepIndex) lastMutated.add(delta.objectId)
         }
+      } else if (delta.op === 'delete') {
+        const obj = objects.get(delta.objectId)
+        if (obj) {
+          obj.properties.delete(delta.property)
+          if (i === stepIndex) lastMutated.add(delta.objectId)
+        }
       } else if (delta.op === 'free') {
         objects.delete(delta.objectId)
       }

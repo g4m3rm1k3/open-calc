@@ -5,7 +5,6 @@
  *   Linked-list     → horizontal card chain with arrows
  *   Everything else → scrollable card list with inline reference badges
  */
-import { snapshotToGraph } from './heapSnapshot.js'
 
 const TYPE_COLOR = {
   Object:     '#818cf8',
@@ -29,7 +28,56 @@ export default function HeapGraph({ snapshot, heapDelta }) {
 
   const mutatedProps = buildMutatedProps(heapDelta)
 
-  // ── Pure array (sorting, array ops) → cell grid ───────────────────────────
+  // ── Check for SICP-style pair structures before falling into flat grid ─────
+  // Check tree first (branching pairs), then chain (linear list).
+  const sicpTreeRoot  = arrays.length >= 3 ? detectSicpTree(arrays, snapshot) : null
+  const arraySiciChain = !sicpTreeRoot && arrays.length >= 2 ? detectSicpChain(arrays, snapshot) : null
+
+  // ── SICP pair tree → tree diagram ─────────────────────────────────────────
+  if (sicpTreeRoot) {
+    return (
+      <div style={{ padding: '10px 12px', overflow: 'auto', height: '100%' }}>
+        <div style={{ marginBottom: 6, fontSize: 10, color: '#a78bfa',
+          fontFamily: 'JetBrains Mono, monospace', letterSpacing: '.06em' }}>
+          PAIR TREE — {arrays.length} node{arrays.length !== 1 ? 's' : ''}
+        </div>
+        <div style={{ display: 'inline-block' }}>
+          <PairTreeNode id={sicpTreeRoot} snapshot={snapshot} />
+        </div>
+        <div style={{ marginTop: 10, fontSize: 10, color: '#475569',
+          fontFamily: 'JetBrains Mono, monospace' }}>
+          Each box: [head | tail] — • = pointer to child node, / = null
+        </div>
+      </div>
+    )
+  }
+
+  // ── SICP list chain → linked-list renderer ────────────────────────────────
+  if (arraySiciChain) {
+    const chainSet   = new Set(arraySiciChain)
+    const standalone = arrays.filter(o => !chainSet.has(o.id))
+    const chainNodes = arraySiciChain.map(id => snapshot.objects.get(id)).filter(Boolean)
+    return (
+      <div style={{ padding: '10px 12px', overflow: 'auto', height: '100%' }}>
+        {standalone.length > 0 && standalone.map(arr => (
+          <ArrayCells key={arr.id} obj={arr}
+            isNew={snapshot.lastCreated.has(arr.id)}
+            mutated={mutatedProps[arr.id] ?? new Set()}
+          />
+        ))}
+        <div style={{ marginBottom: 6, fontSize: 10, color: '#86efac',
+          fontFamily: 'JetBrains Mono, monospace', letterSpacing: '.06em' }}>
+          LIST CHAIN — {chainNodes.length} pair{chainNodes.length !== 1 ? 's' : ''}
+        </div>
+        <PairChain nodes={chainNodes} snapshot={snapshot}
+          lastCreated={snapshot.lastCreated} lastMutated={snapshot.lastMutated}
+          mutatedProps={mutatedProps}
+        />
+      </div>
+    )
+  }
+
+  // ── Pure flat arrays (no inter-references) → cell grid ────────────────────
   if (arrays.length > 0 && others.length === 0) {
     return (
       <div style={{ padding: '10px 12px', overflow: 'auto', height: '100%' }}>
@@ -45,7 +93,7 @@ export default function HeapGraph({ snapshot, heapDelta }) {
     )
   }
 
-  // ── Detect linked-list chain ───────────────────────────────────────────────
+  // ── Detect linked-list chain in non-array objects ──────────────────────────
   const chain = detectChain(others, snapshot)
   const chainSet = chain ? new Set(chain) : null
   const containers = chain ? others.filter(o => !chainSet.has(o.id)) : []
@@ -53,6 +101,14 @@ export default function HeapGraph({ snapshot, heapDelta }) {
 
   return (
     <div style={{ padding: '10px 12px', overflow: 'auto', height: '100%' }}>
+      {/* Flat arrays alongside objects */}
+      {arrays.map(arr => (
+        <ArrayCells key={arr.id} obj={arr}
+          isNew={snapshot.lastCreated.has(arr.id)}
+          mutated={mutatedProps[arr.id] ?? new Set()}
+        />
+      ))}
+
       {/* Container objects (e.g. LinkedList wrapper) */}
       {containers.map(obj => (
         <ObjectCard key={obj.id} obj={obj} snapshot={snapshot}
@@ -96,7 +152,7 @@ export default function HeapGraph({ snapshot, heapDelta }) {
       )}
 
       {/* Card list for non-chain objects */}
-      {!chain && objects.map(obj => (
+      {!chain && others.map(obj => (
         <ObjectCard key={obj.id} obj={obj} snapshot={snapshot}
           isNew={snapshot.lastCreated.has(obj.id)}
           isMutated={snapshot.lastMutated.has(obj.id)}
@@ -307,6 +363,244 @@ function buildMutatedProps(heapDelta) {
     }
   }
   return map
+}
+
+// ── SICP pair tree renderer ───────────────────────────────────────────────────
+// Renders nested pairs as a tree diagram when they branch (head or tail is also a pair).
+// Uses recursive divs with connecting lines.
+
+function PairTreeNode({ id, snapshot, depth = 0, visited = new Set() }) {
+  if (visited.has(id)) return <span style={{ color: '#f87171', fontSize: 10 }}>⟳</span>
+  visited = new Set([...visited, id])
+
+  const obj = snapshot.objects.get(id)
+  if (!obj) return null
+
+  const len  = parseInt(obj.properties.get('length') ?? 0, 10)
+  const head = obj.properties.get('0')
+  const tail = obj.properties.get('1')
+
+  const isHeadRef = head !== null && typeof head === 'object' && '$ref' in head && snapshot.objects.has(head.$ref)
+  const isTailRef = tail !== null && typeof tail === 'object' && '$ref' in tail && snapshot.objects.has(tail.$ref)
+  const isTailNull = tail === null
+
+  const headStr = isHeadRef ? null
+    : head === null ? 'nil' : typeof head === 'number' ? String(head)
+    : typeof head === 'string' ? `"${head}"` : String(head)
+
+  const headColor = isHeadRef ? '#818cf8'
+    : typeof head === 'number' ? '#86efac' : '#fbbf24'
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0 }}>
+      {/* This node */}
+      <div style={{
+        display: 'flex', border: '1px solid #818cf844', borderRadius: 6,
+        background: '#0d1526', overflow: 'hidden', fontSize: 11,
+        fontFamily: 'JetBrains Mono, monospace',
+      }}>
+        <div style={{ padding: '4px 8px', borderRight: '1px solid #818cf844',
+          color: headColor, minWidth: 28, textAlign: 'center' }}>
+          {isHeadRef ? '•' : headStr}
+        </div>
+        <div style={{ padding: '4px 8px', color: isTailNull ? '#475569' : '#818cf8',
+          minWidth: 28, textAlign: 'center' }}>
+          {isTailNull ? '/' : '•'}
+        </div>
+      </div>
+
+      {/* Children */}
+      {(isHeadRef || isTailRef) && (
+        <div style={{ display: 'flex', gap: 20, marginTop: 0, position: 'relative' }}>
+          {/* Connector line */}
+          <div style={{
+            position: 'absolute', top: 0, left: '50%', width: 1,
+            height: 14, background: '#818cf844', transform: 'translateX(-50%)',
+          }} />
+          {isHeadRef && (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div style={{ width: 1, height: 14, background: '#818cf844' }} />
+              <PairTreeNode id={head.$ref} snapshot={snapshot} depth={depth + 1} visited={visited} />
+            </div>
+          )}
+          {isTailRef && (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div style={{ width: 1, height: 14, background: '#818cf844' }} />
+              <PairTreeNode id={tail.$ref} snapshot={snapshot} depth={depth + 1} visited={visited} />
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// Detect if arrays form a TREE structure (both head AND tail can point to arrays)
+// Returns the root node ID if a tree with branching is detected.
+function detectSicpTree(arrays, snapshot) {
+  if (arrays.length < 3) return null
+
+  // Count how many times each array is referenced by another array
+  const refCounts = new Map()
+  const pairIds   = new Set(arrays.map(a => a.id))
+
+  for (const arr of arrays) {
+    const len = parseInt(arr.properties.get('length') ?? 0, 10)
+    if (len !== 2) continue
+    for (const prop of ['0', '1']) {
+      const v = arr.properties.get(prop)
+      if (v !== null && typeof v === 'object' && '$ref' in v && pairIds.has(v.$ref)) {
+        refCounts.set(v.$ref, (refCounts.get(v.$ref) ?? 0) + 1)
+      }
+    }
+  }
+  if (refCounts.size === 0) return null
+
+  // Check for branching: any array has BOTH head and tail pointing to arrays
+  const hasBranching = arrays.some(arr => {
+    const h = arr.properties.get('0')
+    const t = arr.properties.get('1')
+    const hIsRef = h !== null && typeof h === 'object' && '$ref' in h && pairIds.has(h.$ref)
+    const tIsRef = t !== null && typeof t === 'object' && '$ref' in t && pairIds.has(t.$ref)
+    return hIsRef && tIsRef
+  })
+  if (!hasBranching) return null
+
+  // Root = array not referenced by any other array in the set
+  for (const arr of arrays) {
+    if (!refCounts.has(arr.id)) return arr.id
+  }
+  return null
+}
+
+// ── SICP pair chain renderer ──────────────────────────────────────────────────
+// Renders list(1,2,3) = [1,[2,[3,null]]] as a horizontal pair chain.
+// Each node shows: [ head | tail→ ]
+
+function PairChain({ nodes, snapshot, lastCreated, lastMutated, mutatedProps }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', overflowX: 'auto', paddingBottom: 8, flexWrap: 'wrap', gap: '0 0' }}>
+      {nodes.map((obj, i) => {
+        const headVal = obj.properties.get('0')
+        const tailVal = obj.properties.get('1')
+        const isNew     = lastCreated.has(obj.id)
+        const isMutated = lastMutated.has(obj.id)
+        const borderColor = isNew ? '#22c55e' : isMutated ? '#f59e0b' : '#818cf844'
+
+        // Render the head value
+        const headStr = headVal === null ? 'null'
+          : headVal === undefined ? 'undef'
+          : typeof headVal === 'object' && headVal?.$ref !== undefined
+            ? `#${headVal.$ref}`
+            : String(headVal)
+
+        const headColor = headVal === null ? '#475569'
+          : typeof headVal === 'number' ? '#86efac'
+          : typeof headVal === 'string' ? '#fbbf24'
+          : typeof headVal === 'boolean' ? '#f472b6'
+          : '#818cf8'
+
+        return (
+          <div key={obj.id} style={{ display: 'flex', alignItems: 'stretch', flexShrink: 0 }}>
+            {/* Pair box: [ head | ↓ ] */}
+            <div style={{
+              display: 'flex', border: `1px solid ${borderColor}`, borderRadius: 6,
+              background: '#0d1526', overflow: 'hidden', flexShrink: 0,
+              boxShadow: isNew ? '0 0 8px #22c55e44' : isMutated ? '0 0 8px #f59e0b44' : 'none',
+            }}>
+              {/* Head cell */}
+              <div style={{
+                padding: '6px 10px', borderRight: `1px solid ${borderColor}`,
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
+              }}>
+                <span style={{ fontSize: 8, color: '#475569', fontFamily: 'JetBrains Mono, monospace' }}>
+                  head
+                </span>
+                <span style={{
+                  fontSize: 13, fontFamily: 'JetBrains Mono, monospace',
+                  fontWeight: 700, color: headColor,
+                }}>
+                  {headStr}
+                </span>
+              </div>
+              {/* Tail cell — just shows →next or null */}
+              <div style={{
+                padding: '6px 8px', display: 'flex', flexDirection: 'column',
+                alignItems: 'center', gap: 2, minWidth: 36,
+              }}>
+                <span style={{ fontSize: 8, color: '#475569', fontFamily: 'JetBrains Mono, monospace' }}>
+                  tail
+                </span>
+                <span style={{ fontSize: 11, color: '#818cf8', fontFamily: 'JetBrains Mono, monospace' }}>
+                  {tailVal === null ? 'nil' : '→'}
+                </span>
+              </div>
+            </div>
+            {/* Arrow between pairs */}
+            {i < nodes.length - 1 && (
+              <svg width="24" height="44" style={{ flexShrink: 0, alignSelf: 'center' }}>
+                <line x1="2" y1="22" x2="18" y2="22" stroke="#818cf8" strokeWidth="1.5" />
+                <polygon points="18,18 24,22 18,26" fill="#818cf8" />
+              </svg>
+            )}
+          </div>
+        )
+      })}
+      {/* Terminal null */}
+      <div style={{
+        display: 'flex', alignItems: 'center', paddingLeft: 8,
+        fontSize: 11, color: '#475569', fontFamily: 'JetBrains Mono, monospace',
+        fontStyle: 'italic',
+      }}>
+        null
+      </div>
+    </div>
+  )
+}
+
+// ── Detect SICP-style pair chain ──────────────────────────────────────────────
+// A SICP pair is [head, tail]. A list is a chain: [a,[b,[c,null]]].
+// We detect this by checking: each 2-element array whose index-1 is a $ref
+// to another 2-element array in the snapshot.
+function detectSicpChain(arrays, snapshot) {
+  // Only consider arrays with exactly 2 elements (pair structure)
+  const pairs = arrays.filter(o => {
+    const len = o.properties.get('length')
+    return len === 2
+  })
+  if (pairs.length < 2) return null
+
+  // Build a next-map: pairId → pairId via index 1
+  const nextMap = new Map()
+  const pairIds = new Set(pairs.map(p => p.id))
+  for (const p of pairs) {
+    const tail = p.properties.get('1')
+    if (isRef(tail) && pairIds.has(tail.$ref)) {
+      nextMap.set(p.id, tail.$ref)
+    }
+  }
+  if (nextMap.size === 0) return null
+
+  // Find the head of the chain (not a target of any next pointer)
+  const targets = new Set(nextMap.values())
+  let head = null
+  for (const [id] of nextMap) {
+    if (!targets.has(id)) { head = id; break }
+  }
+  if (!head) return null
+
+  // Walk the chain
+  const order = []
+  let cur = head
+  const seen = new Set()
+  while (cur && !seen.has(cur)) {
+    order.push(cur)
+    seen.add(cur)
+    cur = nextMap.get(cur) ?? null
+  }
+
+  // Require at least 2 linked pairs to treat as a list chain
+  return order.length >= 2 ? order : null
 }
 
 function detectChain(objects, snapshot) {

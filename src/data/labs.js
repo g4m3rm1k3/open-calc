@@ -1,5 +1,15 @@
 export const LABS = [
   {
+    key: 'css-mastery',
+    label: 'CSS 0 to Mastery',
+    emoji: '🎨',
+    color: 'fuchsia',
+    desc: "Deep-dive into the browser's layout engine. Learn the Box Model, Centering, Flexbox, Grid, Stacking Contexts, and more through interactive multi-tab challenges.",
+    path: '/web-learn/css-mastery',
+    tags: ['CSS', 'Web', 'Interactive'],
+    cover: { grad: 'from-fuchsia-600 via-pink-700 to-rose-950', mark: 'CSS', sub: 'Flex · Grid · Layout' },
+  },
+  {
     key: 'web-lab',
     label: 'Web Sandbox',
     emoji: '🌐',

@@ -2,7 +2,7 @@
  * VariableWatch — debugger-style variable inspector with optional per-variable
  * sparkline timelines showing how each value changes across all execution steps.
  */
-import { useState, useMemo, useCallback, useRef } from 'react'
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 
 // ── Type helpers ──────────────────────────────────────────────────────────────
 
@@ -245,29 +245,141 @@ function VarTimeline({ points, totalSteps, step, onSeek, typeColor }) {
   )
 }
 
+// ── Inline object/array expander ──────────────────────────────────────────────
+
+function InlineObjectView({ obj, heap, indent, mutatedProps }) {
+  if (!obj) return null
+
+  if (obj.type === 'Array') {
+    const len   = parseInt(obj.properties.get('length') ?? 0, 10)
+    const elems = []
+    for (const [k, v] of obj.properties) {
+      const idx = parseInt(k, 10)
+      if (!isNaN(idx) && idx < len) elems[idx] = v
+    }
+    return (
+      <div>
+        {elems.map((v, i) => {
+          const hit = mutatedProps?.has(String(i))
+          const valStr = v === null ? 'null'
+            : v === undefined ? 'undef'
+            : typeof v === 'object' && v?.$ref !== undefined
+              ? `→ #${v.$ref}`
+              : typeof v === 'string' ? `"${v}"` : String(v)
+          const valColor = v === null || v === undefined ? '#475569'
+            : typeof v === 'number' ? '#86efac'
+            : typeof v === 'string' ? '#fbbf24'
+            : typeof v === 'boolean' ? '#f472b6'
+            : '#818cf8'
+          return (
+            <div key={i} style={{
+              display: 'flex', gap: 6, alignItems: 'baseline',
+              padding: `1px ${indent + 6}px 1px ${indent}px`,
+              background: hit ? 'rgba(245,158,11,0.1)' : 'transparent',
+              borderLeft: `2px solid ${hit ? '#f59e0b' : 'transparent'}`,
+            }}>
+              <span style={{ fontSize: 10, fontFamily: 'JetBrains Mono, monospace',
+                color: '#475569', flexShrink: 0, minWidth: 32 }}>
+                [{i}]
+              </span>
+              <span style={{ fontSize: 11, fontFamily: 'JetBrains Mono, monospace',
+                color: hit ? '#f59e0b' : valColor, fontWeight: hit ? 700 : 400 }}>
+                {valStr}
+              </span>
+            </div>
+          )
+        })}
+      </div>
+    )
+  }
+
+  // Generic object — show non-length properties
+  const entries = [...obj.properties].filter(([k]) => k !== '__proto__')
+  if (entries.length === 0) return (
+    <div style={{ padding: `1px ${indent + 6}px 1px ${indent}px`,
+      fontSize: 10, color: '#334155', fontFamily: 'JetBrains Mono, monospace',
+      fontStyle: 'italic' }}>empty</div>
+  )
+  return (
+    <div>
+      {entries.map(([k, v]) => {
+        const hit = mutatedProps?.has(k)
+        const valStr = v === null ? 'null'
+          : v === undefined ? 'undef'
+          : typeof v === 'object' && v?.$ref !== undefined
+            ? `→ #${v.$ref}`
+            : typeof v === 'string' ? `"${v}"` : String(v)
+        const valColor = v === null || v === undefined ? '#475569'
+          : typeof v === 'number' ? '#86efac'
+          : typeof v === 'string' ? '#fbbf24'
+          : typeof v === 'boolean' ? '#f472b6'
+          : '#818cf8'
+        return (
+          <div key={k} style={{
+            display: 'flex', gap: 6, alignItems: 'baseline',
+            padding: `1px ${indent + 6}px 1px ${indent}px`,
+            background: hit ? 'rgba(245,158,11,0.1)' : 'transparent',
+            borderLeft: `2px solid ${hit ? '#f59e0b' : 'transparent'}`,
+          }}>
+            <span style={{ fontSize: 10, fontFamily: 'JetBrains Mono, monospace',
+              color: '#7dd3fc', flexShrink: 0 }}>{k}:</span>
+            <span style={{ fontSize: 11, fontFamily: 'JetBrains Mono, monospace',
+              color: hit ? '#f59e0b' : valColor, fontWeight: hit ? 700 : 400 }}>
+              {valStr}
+            </span>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 // ── VarRow ────────────────────────────────────────────────────────────────────
 
-function VarRow({ name, value, diff, heap, indent = 20, timeline, step, onSeek, totalSteps, showTimeline }) {
+function VarRow({ name, value, diff, heap, indent = 20, timeline, step, onSeek, totalSteps, showTimeline, mutatedByObject }) {
+  const [expanded, setExpanded] = useState(false)
   const type    = getType(value)
   const meta    = typeMeta(type)
   const display = fmtVal(value, heap)
   const changed = !!diff
+  const isRef   = type === 'ref'
+
+  // Auto-expand when the object this ref points to was mutated this step
+  const refId = isRef ? value?.$ref : null
+  const objMutatedProps = refId ? (mutatedByObject?.get(refId) ?? null) : null
+  const objWasMutated = objMutatedProps && objMutatedProps.size > 0
+
+  useEffect(() => {
+    if (objWasMutated) setExpanded(true)
+  }, [objWasMutated])
+
+  const obj = isRef ? heap?.objects?.get(refId) : null
 
   return (
     <div>
-      <div style={{
-        display:    'flex',
-        alignItems: 'center',
-        gap:        6,
-        padding:    `2px ${indent + 6}px 2px ${indent}px`,
-        background: changed ? 'rgba(245,158,11,0.07)' : 'transparent',
-        borderLeft: `2px solid ${changed ? '#f59e0b' : 'transparent'}`,
-        transition: 'background 0.15s',
-        minWidth:   0,
-      }}>
+      <div
+        onClick={isRef && obj ? () => setExpanded(e => !e) : undefined}
+        style={{
+          display:    'flex',
+          alignItems: 'center',
+          gap:        6,
+          padding:    `2px ${indent + 6}px 2px ${indent}px`,
+          background: changed ? 'rgba(245,158,11,0.07)' : 'transparent',
+          borderLeft: `2px solid ${changed ? '#f59e0b' : 'transparent'}`,
+          transition: 'background 0.15s',
+          minWidth:   0,
+          cursor:     isRef && obj ? 'pointer' : 'default',
+        }}>
+        {/* Expand toggle for refs */}
+        {isRef && obj && (
+          <span style={{ fontSize: 9, color: '#475569', flexShrink: 0, width: 10, userSelect: 'none' }}>
+            {expanded ? '▼' : '▶'}
+          </span>
+        )}
+
         <span style={{
           fontSize: 11, fontFamily: 'JetBrains Mono, monospace',
-          color: '#7dd3fc', flexShrink: 0, minWidth: 72,
+          color: '#7dd3fc', flexShrink: 0, minWidth: isRef && obj ? 62 : 72,
           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         }}>
           {name}
@@ -288,7 +400,10 @@ function VarRow({ name, value, diff, heap, indent = 20, timeline, step, onSeek, 
         ) : (
           <span style={{
             flex: 1, minWidth: 0, fontSize: 11, fontFamily: 'JetBrains Mono, monospace',
-            color: meta.color, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            // Refs that were mutated this step get a warm highlight so they look "live"
+            color: objWasMutated ? '#fcd34d' : meta.color,
+            fontWeight: objWasMutated ? 600 : 400,
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
           }}>
             {display}
           </span>
@@ -302,6 +417,16 @@ function VarRow({ name, value, diff, heap, indent = 20, timeline, step, onSeek, 
           {meta.label}
         </span>
       </div>
+
+      {/* Inline expansion */}
+      {isRef && expanded && obj && (
+        <div style={{
+          borderLeft: `2px solid ${objWasMutated ? '#f59e0b44' : '#1e293b'}`,
+          marginLeft: indent + 8, marginRight: 6, marginBottom: 2,
+        }}>
+          <InlineObjectView obj={obj} heap={heap} indent={8} mutatedProps={objMutatedProps} />
+        </div>
+      )}
 
       {/* Sparkline */}
       {showTimeline && timeline?.length > 1 && (
@@ -321,23 +446,31 @@ function VarRow({ name, value, diff, heap, indent = 20, timeline, step, onSeek, 
 
 // ── FrameHeader ───────────────────────────────────────────────────────────────
 
-function FrameHeader({ frame, isActive }) {
+function FrameHeader({ frame, isActive, isGlobal, collapsed, onToggle }) {
   return (
-    <div style={{
-      display:    'flex',
-      alignItems: 'center',
-      gap:        6,
-      padding:    '5px 10px',
-      background: isActive ? '#0f172a' : 'transparent',
-      borderLeft: `2px solid ${isActive ? '#6366f1' : '#1e293b'}`,
-      marginTop:  isActive ? 0 : 4,
-    }}>
+    <div
+      onClick={isGlobal ? onToggle : undefined}
+      style={{
+        display:    'flex',
+        alignItems: 'center',
+        gap:        6,
+        padding:    '5px 10px',
+        background: isActive ? '#0f172a' : 'transparent',
+        borderLeft: `2px solid ${isActive ? '#6366f1' : isGlobal ? '#1e293b' : '#1e293b'}`,
+        marginTop:  isActive ? 0 : 4,
+        cursor:     isGlobal ? 'pointer' : 'default',
+      }}>
+      {isGlobal && (
+        <span style={{ fontSize: 9, color: '#334155', flexShrink: 0 }}>
+          {collapsed ? '▶' : '▼'}
+        </span>
+      )}
       <span style={{
         fontSize: 10, fontFamily: 'JetBrains Mono, monospace',
-        color: isActive ? '#818cf8' : '#475569',
+        color: isActive ? '#818cf8' : isGlobal ? '#334155' : '#475569',
         fontWeight: isActive ? 700 : 400,
       }}>
-        {frame.name ?? '(anonymous)'}
+        {isGlobal ? 'global scope' : (frame.name ?? '(anonymous)')}
       </span>
       {isActive && (
         <span style={{
@@ -346,7 +479,7 @@ function FrameHeader({ frame, isActive }) {
           fontFamily: 'JetBrains Mono, monospace',
         }}>current</span>
       )}
-      {frame.line && (
+      {frame.line && !isGlobal && (
         <span style={{
           marginLeft: 'auto', fontSize: 8, color: '#334155',
           fontFamily: 'JetBrains Mono, monospace',
@@ -364,9 +497,23 @@ export default function VariableWatch({
   currentEvent, prevEvent, heapSnapshot,
   events, step, onSeek,
   onShowEnvModel,
+  heapDelta,
 }) {
-  const [flat,          setFlat]          = useState(false)
-  const [showTimelines, setShowTimelines] = useState(false)
+  const [flat,           setFlat]           = useState(false)
+  const [showTimelines,  setShowTimelines]  = useState(false)
+  const [globalExpanded, setGlobalExpanded] = useState(false)
+
+  // Build per-objectId mutated-property sets from the current step's heap delta
+  const mutatedByObject = useMemo(() => {
+    const map = new Map()
+    for (const d of heapDelta ?? []) {
+      if (d.op === 'mutate') {
+        if (!map.has(d.objectId)) map.set(d.objectId, new Set())
+        map.get(d.objectId).add(String(d.property))
+      }
+    }
+    return map
+  }, [heapDelta])
 
   // Pre-compute timelines for all variables across all steps
   const timelines = useMemo(
@@ -396,9 +543,12 @@ export default function VariableWatch({
     const seen   = new Set()
     const result = []
     frames.forEach((frame, fi) => {
+      const isGlobal = frame.name === '__global__'
       for (const [name, value] of Object.entries(frame.locals ?? {})) {
         if (!seen.has(name)) {
           seen.add(name)
+          // Exclude function-value bindings from the global frame in flat view
+          if (isGlobal && typeof value === 'string' && value.startsWith('[Function')) continue
           const fname = frame.name ?? '__global__'
           result.push({ name, value, diff: diffs[fi]?.[name], fname })
         }
@@ -479,16 +629,52 @@ export default function VariableWatch({
                 timeline={timelines.get(`${fname}:${name}`)}
                 step={step} onSeek={onSeek} totalSteps={totalSteps}
                 showTimeline={showTimelines}
+                mutatedByObject={mutatedByObject}
               />
             ))
           )
         ) : (
           frames.map((frame, fi) => {
-            const fname  = frame.name ?? '__global__'
-            const locals = Object.entries(frame.locals ?? {})
+            const fname    = frame.name ?? '__global__'
+            const isGlobal = frame.name === '__global__'
+            // Filter global frame: hide function-value bindings (they clutter the view)
+            const rawLocals = Object.entries(frame.locals ?? {})
+            const locals = isGlobal
+              ? rawLocals.filter(([, v]) =>
+                  typeof v !== 'string' || !v.startsWith('[Function'))
+              : rawLocals
+            const isActive = fi === 0 && !isGlobal
+
+            if (isGlobal) {
+              return (
+                <div key={fi} style={{ marginTop: 8, borderTop: '1px solid #0f172a' }}>
+                  <FrameHeader
+                    frame={frame} isActive={false} isGlobal
+                    collapsed={!globalExpanded}
+                    onToggle={() => setGlobalExpanded(e => !e)}
+                  />
+                  {globalExpanded && (
+                    locals.length === 0
+                      ? <div style={{ padding: '3px 12px 3px 32px', fontSize: 10,
+                          color: '#334155', fontFamily: 'JetBrains Mono, monospace',
+                          fontStyle: 'italic' }}>no globals</div>
+                      : locals.map(([name, value]) => (
+                          <VarRow key={name} name={name} value={value}
+                            diff={diffs[fi]?.[name]} heap={heapSnapshot} indent={28}
+                            timeline={timelines.get(`${fname}:${name}`)}
+                            step={step} onSeek={onSeek} totalSteps={totalSteps}
+                            showTimeline={showTimelines}
+                            mutatedByObject={mutatedByObject}
+                          />
+                        ))
+                  )}
+                </div>
+              )
+            }
+
             return (
               <div key={fi}>
-                <FrameHeader frame={frame} isActive={fi === 0} />
+                <FrameHeader frame={frame} isActive={isActive} isGlobal={false} />
                 {locals.length === 0 ? (
                   <div style={{ padding: '3px 12px 3px 24px', fontSize: 10,
                     color: '#334155', fontFamily: 'JetBrains Mono, monospace',
@@ -502,6 +688,7 @@ export default function VariableWatch({
                       timeline={timelines.get(`${fname}:${name}`)}
                       step={step} onSeek={onSeek} totalSteps={totalSteps}
                       showTimeline={showTimelines}
+                      mutatedByObject={mutatedByObject}
                     />
                   ))
                 )}

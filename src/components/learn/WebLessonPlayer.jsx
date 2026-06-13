@@ -47,9 +47,9 @@ function runCode(code) {
 
 const STORAGE_PREFIX = 'lesson_cp_'
 
-function saveCheckpoint(lessonId, cpId, segIdx, code) {
+function saveCheckpoint(lessonId, cpId, segIdx, code, files) {
   try {
-    localStorage.setItem(STORAGE_PREFIX + lessonId, JSON.stringify({ cpId, segIdx, code }))
+    localStorage.setItem(STORAGE_PREFIX + lessonId, JSON.stringify({ cpId, segIdx, code, files }))
   } catch {}
 }
 
@@ -92,7 +92,7 @@ function ProgressBar({ checkpoints, reachedCp, onJump }) {
 // ── Output panel ──────────────────────────────────────────────────────────────
 
 function OutputPanel({ logs, error, challengeResult, expectedOutput, testDetail, previewDoc, language, topHeight, onDragRight, isDragging }) {
-  const isWeb = language === 'html' || language === 'react'
+  const isWeb = language === 'html' || language === 'react' || language === 'web'
   const borderColor = challengeResult === 'pass' ? 'border-t border-t-emerald-500' : challengeResult === 'fail' ? 'border-t border-t-red-500' : 'border-t border-white/5'
   
   return (
@@ -214,7 +214,13 @@ export default function WebLessonPlayer({ lesson, onBack, onNext, nextTitle, ser
 
   const [segIdx, setSegIdx]                   = useState(pastEnd ? segments.length - 1 : initialIdx)
   const [phase, setPhase]                     = useState(pastEnd ? 'done' : 'idle')
-  const [code, setCode]                       = useState(savedCp?.code || '')
+  const initialSeg = segments[initialIdx] || {}
+  const initCode = savedCp?.code || (initialSeg.startCode ?? initialSeg.code ?? '')
+  const initFiles = savedCp?.files || (initialSeg.startFiles ?? initialSeg.files ?? { html: initCode, css: '', js: '' })
+
+  const [code, setCode]                       = useState(initCode)
+  const [files, setFiles]                     = useState(initFiles)
+  const [activeTab, setActiveTab]             = useState('html')
   const [logs, setLogs]                       = useState([])
   const [runError, setRunError]               = useState(null)
   const [challengeResult, setChallengeResult] = useState(null)
@@ -305,14 +311,17 @@ export default function WebLessonPlayer({ lesson, onBack, onNext, nextTitle, ser
 
       if (seg.type === 'narration') {
         setPhase('playing')
-        if (seg.code !== null && seg.code !== undefined) {
-          highlightNewLines(seg.code)
-          setCode(seg.code)
+        if ((seg.code !== null && seg.code !== undefined) || seg.files) {
+          const newCode = seg.code ?? ''
+          const newFiles = seg.files ?? { html: newCode, css: '', js: '' }
+          highlightNewLines(newCode)
+          setCode(newCode)
+          setFiles(newFiles)
           setLogs([])
           setRunError(null)
           setChallengeResult(null)
           setTestDetail(null)
-          handleRunRef.current?.(seg.code)
+          handleRunRef.current?.(newCode, newFiles)
         }
         if (seg.text) await speak(seg.text)
         if (pauseRef.current) return
@@ -322,12 +331,16 @@ export default function WebLessonPlayer({ lesson, onBack, onNext, nextTitle, ser
         return
 
       } else if (seg.type === 'checkpoint') {
-        saveCheckpoint(lesson.id, seg.id, i, code)
+        saveCheckpoint(lesson.id, seg.id, i, code, files)
         setReachedCp(prev => prev.includes(seg.id) ? prev : [...prev, seg.id])
 
       } else if (seg.type === 'challenge') {
         setPhase('challenge')
-        setCode(seg.startCode || '')
+        const newCode = seg.startCode || ''
+        const newFiles = seg.startFiles || { html: newCode, css: '', js: '' }
+        setCode(newCode)
+        setFiles(newFiles)
+        if (seg.defaultTab) setActiveTab(seg.defaultTab)
         setLogs([])
         setRunError(null)
         setChallengeResult(null)
@@ -338,7 +351,12 @@ export default function WebLessonPlayer({ lesson, onBack, onNext, nextTitle, ser
 
       } else if (seg.type === 'codelens') {
         setPhase('codelens')
-        if (seg.code) setCode(seg.code)
+        if (seg.code || seg.files) {
+          const newCode = seg.code ?? ''
+          const newFiles = seg.files ?? { html: newCode, css: '', js: '' }
+          setCode(newCode)
+          setFiles(newFiles)
+        }
         setLogs([])
         setRunError(null)
         if (seg.text) await speak(seg.text)
@@ -347,7 +365,7 @@ export default function WebLessonPlayer({ lesson, onBack, onNext, nextTitle, ser
     }
 
     setPhase('done')
-  }, [segments, speak, lesson.id, code])
+  }, [segments, speak, lesson.id, code, files])
 
   function handlePlay() {
     if (phase === 'idle')   runFrom(segIdx)
@@ -369,6 +387,7 @@ export default function WebLessonPlayer({ lesson, onBack, onNext, nextTitle, ser
     setSegIdx(0)
     setPhase('idle')
     setCode('')
+    setFiles({ html: '', css: '', js: '' })
     setLogs([])
     setPreviewDoc('')
     setRunError(null)
@@ -403,7 +422,11 @@ export default function WebLessonPlayer({ lesson, onBack, onNext, nextTitle, ser
     prevCodeRef.current = ''
     decorationCollRef.current?.clear()
     setSegIdx(targetIdx)
-    setCode(targetSeg?.startCode ?? targetSeg?.code ?? '')
+    const newCode = targetSeg?.startCode ?? targetSeg?.code ?? ''
+    const newFiles = targetSeg?.startFiles ?? targetSeg?.files ?? { html: newCode, css: '', js: '' }
+    setCode(newCode)
+    setFiles(newFiles)
+    if (targetSeg?.defaultTab) setActiveTab(targetSeg.defaultTab)
     setLogs([])
     setPreviewDoc('')
     setRunError(null)
@@ -415,12 +438,39 @@ export default function WebLessonPlayer({ lesson, onBack, onNext, nextTitle, ser
 
   // ── Run (always available) ───────────────────────────────────────────────────
 
-  function handleRun(overrideCode) {
+  function handleRun(overrideCode, overrideFiles) {
     const codeToRun = typeof overrideCode === 'string' ? overrideCode : code
+    const filesToRun = overrideFiles || files
     
-    // 1. Generate Web Preview if applicable
+    const isMultiTab = lesson.language === 'web'
     const isHtml = lesson.language === 'html'
     const isReact = lesson.language === 'react'
+
+    if (isMultiTab) {
+      const doc = `<!DOCTYPE html>
+<html>
+<head>
+  <style>${filesToRun.css || ''}</style>
+</head>
+<body>
+  ${filesToRun.html || ''}
+  <script type="module">
+    ${filesToRun.js || ''}
+  </script>
+</body>
+</html>`
+      setPreviewDoc(doc)
+      setLogs(['[info] Code is executing in the Preview pane.'])
+      setRunError(null)
+
+      if (isChallenge && currentSeg?.validate) {
+        const { passed, detail } = runValidate(currentSeg, { files: filesToRun })
+        setChallengeResult(passed ? 'pass' : 'fail')
+        setTestDetail(passed ? null : (detail ?? null))
+      }
+      return
+    }
+
     if (isHtml || isReact) {
       const doc = isHtml
         ? codeToRun
@@ -725,30 +775,54 @@ ${codeToRun}
 
         {/* 3. Editor Pane */}
         <div className="flex-1 flex flex-col min-h-0 bg-[#050505]">
-          <div className="flex items-center gap-3 px-4 py-3 border-b border-white/10 bg-black/40 z-10 shrink-0">
-            <span className="text-xs text-slate-400 font-mono flex items-center gap-2">
-              <Code2 size={14} className="text-indigo-400" />
-              script.jsx
-            </span>
-            <div className="flex-1" />
-            {code.trim() && (
-              <button
-                onClick={handleOpenCodeLens}
-                title="Visualise this code step-by-step in CodeLens"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 text-xs font-bold transition-all border border-indigo-500/20"
-              >
-                <ExternalLink size={12} />
-                CodeLens
-              </button>
-            )}
-          </div>
+          {lesson.language === 'web' ? (
+            <div className="flex items-center gap-1 px-2 pt-2 border-b border-white/10 bg-[#080c14] z-10 shrink-0">
+              {['html', 'css', 'js'].map(tab => (
+                <button 
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`px-6 py-2 text-[11px] font-mono font-bold uppercase tracking-wider rounded-t-lg transition-all ${activeTab === tab ? 'bg-[#050505] text-indigo-400 border-t-2 border-indigo-500' : 'text-slate-500 hover:text-slate-300 hover:bg-white/5'}`}
+                >
+                  {tab === 'js' ? 'JavaScript' : tab}
+                </button>
+              ))}
+              <div className="flex-1" />
+            </div>
+          ) : (
+            <div className="flex items-center gap-3 px-4 py-3 border-b border-white/10 bg-black/40 z-10 shrink-0">
+              <span className="text-xs text-slate-400 font-mono flex items-center gap-2">
+                <Code2 size={14} className="text-indigo-400" />
+                script.{lesson.language === 'react' ? 'jsx' : lesson.language === 'html' ? 'html' : 'js'}
+              </span>
+              <div className="flex-1" />
+              {code.trim() && (
+                <button
+                  onClick={handleOpenCodeLens}
+                  title="Visualise this code step-by-step in CodeLens"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 text-xs font-bold transition-all border border-indigo-500/20"
+                >
+                  <ExternalLink size={12} />
+                  CodeLens
+                </button>
+              )}
+            </div>
+          )}
           <div className="flex-1 overflow-hidden">
             <Editor
               height="100%"
-              language={lesson.language === 'html' ? 'html' : 'javascript'}
+              language={lesson.language === 'web' ? (activeTab === 'js' ? 'javascript' : activeTab) : (lesson.language === 'html' ? 'html' : 'javascript')}
               theme="ocean"
-              value={code}
-              onChange={setCode}
+              value={lesson.language === 'web' ? files[activeTab] : code}
+              onChange={(val) => {
+                if (lesson.language === 'web') {
+                  setFiles(prev => ({ ...prev, [activeTab]: val || '' }))
+                } else {
+                  setCode(val || '')
+                }
+                setChallengeResult(null)
+                setTestDetail(null)
+                setHint(false)
+              }}
               beforeMount={(monaco) => {
                 monaco.editor.defineTheme('ocean', {
                   base: 'vs-dark',

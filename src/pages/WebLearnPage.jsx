@@ -8,20 +8,34 @@ import { lesson as sandbox1 } from '../data/learn/sandbox/lesson-01.js'
 import { lesson as sandbox2 } from '../data/learn/sandbox/lesson-02.js'
 import { lesson as sandbox3 } from '../data/learn/sandbox/lesson-03.js'
 
+// CSS Mastery lessons
+import { lesson as css01 } from '../content/css-mastery/css-01-normal-flow.js'
+import { lesson as css02 } from '../content/css-mastery/css-02-box-model.js'
+import { lesson as css03 } from '../content/css-mastery/css-03-centering.js'
+import { lesson as css04 } from '../content/css-mastery/css-04-stacking-contexts.js'
+import { lesson as css05 } from '../content/css-mastery/css-05-overflow.js'
+
 const LESSONS = {
   'sandbox/1': sandbox1,
   'sandbox/2': sandbox2,
   'sandbox/3': sandbox3,
+  'css-mastery/01': css01,
+  'css-mastery/02': css02,
+  'css-mastery/03': css03,
+  'css-mastery/04': css04,
+  'css-mastery/05': css05,
 }
 
 // Ordered series list — drives "Next lesson" button
 const SERIES_ORDER = {
   sandbox: ['1', '2', '3'],
+  'css-mastery': ['01', '02', '03', '04', '05'],
 }
 
 // First lesson per series — used for redirect when no lessonId in URL
 const SERIES_FIRST = {
   sandbox: '1',
+  'css-mastery': '01',
 }
 
 export default function WebLearnPage() {

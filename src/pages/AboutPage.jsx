@@ -11,6 +11,7 @@ const COURSES = [
   { emoji: '📊', label: 'Data Science',        desc: 'NumPy, Pandas, visualization, ML foundations' },
   { emoji: '🌐', label: 'JavaScript Core',     desc: 'Language fundamentals and runtime mechanics' },
   { emoji: '🖥️', label: 'Web Systems',         desc: 'DOM, reactivity, APIs' },
+  { emoji: '🎨', label: 'CSS 0 to Mastery',    desc: 'Problem-First UI Design, Box Model, Layouts' },
   { emoji: '🎮', label: 'Build Tetris',        desc: 'Build a complete game from scratch — project-driven' },
 ]
 

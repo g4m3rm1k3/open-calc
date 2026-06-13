@@ -992,7 +992,8 @@ class Interpreter {
       if (prop === 'unshift') return this._arrayMethod('unshift', value)
       if (prop === 'map')     return this._arrayMethod('map', value)
       if (prop === 'filter')  return this._arrayMethod('filter', value)
-      if (prop === 'reduce')  return this._arrayMethod('reduce', value)
+      if (prop === 'reduce')       return this._arrayMethod('reduce', value)
+      if (prop === 'reduceRight')  return this._arrayMethod('reduceRight', value)
       if (prop === 'forEach') return this._arrayMethod('forEach', value)
       if (prop === 'find')    return this._arrayMethod('find', value)
       if (prop === 'findIndex') return this._arrayMethod('findIndex', value)
@@ -1031,7 +1032,7 @@ class Interpreter {
           const old = this.heap.get(arrRef, 'length') ?? 0
           for (let i = 0; i < Math.max(old, arr.length); i++) {
             if (i < arr.length) this.heap.set(arrRef, String(i), arr[i])
-            else this.heap.objects.get(arrRef.objectId)?.properties.delete(String(i))
+            else this.heap.deleteProperty(arrRef, String(i))
           }
           this.heap.set(arrRef, 'length', arr.length)
         }
@@ -1069,6 +1070,21 @@ class Interpreter {
             for (let i = start; i < cur.length; i++) acc = callCb(args[0], [acc, cur[i], i, arrRef])
             return acc
           }
+          case 'reduceRight': {
+            let acc = args.length > 1 ? args[1] : cur[cur.length - 1]
+            const end = args.length > 1 ? cur.length - 1 : cur.length - 2
+            for (let i = end; i >= 0; i--) acc = callCb(args[0], [acc, cur[i], i, arrRef])
+            return acc
+          }
+          case 'flat': {
+            const depth2 = args[0] ?? 1
+            const flatten2 = (arr, d) => d > 0 ? arr.flatMap(v => isRef(v) ? flatten2(this._toIterable(v), d - 1) : [v]) : arr
+            return mkArr(flatten2(cur, depth2))
+          }
+          case 'flatMap': return mkArr(cur.flatMap((v, i) => {
+            const res = callCb(args[0], [v, i, arrRef])
+            return isRef(res) ? this._toIterable(res) : [res]
+          }))
           case 'forEach': cur.forEach((v, i) => callCb(args[0], [v, i, arrRef])); return undefined
           case 'find':    return cur.find((v, i) => callCb(args[0], [v, i, arrRef]))
           case 'findIndex': return cur.findIndex((v, i) => callCb(args[0], [v, i, arrRef]))
@@ -1295,26 +1311,30 @@ class Interpreter {
     this.heap.set(ref, 'size', store.size)
   }
 
-  _display(v) {
+  _display(v, depth = 0) {
+    if (depth > 8) return '...'  // prevent infinite recursion on circular structures
     if (v === null)      return 'null'
     if (v === undefined) return 'undefined'
     if (typeof v !== 'object') return String(v)
     if (v?.__kind === 'function') return `[Function: ${v.name ?? 'anonymous'}]`
     if (v?.__kind === 'class')    return `[class ${v.name}]`
     if (v?.__kind === 'native')   return `[native ${v.name}]`
-    if (isRef(v)) {
-      const obj = this.heap.objects.get(v.objectId)
+
+    // Handle both live refs { __kind:'reference', objectId } and serialized { $ref }
+    const heapId = isRef(v) ? v.objectId : (v?.$ref != null ? v.$ref : null)
+    if (heapId !== null) {
+      const obj = this.heap.objects.get(heapId)
       if (!obj) return '[Object]'
       if (obj.type === 'Array') {
         const len = obj.properties.get('length') ?? 0
         const items = []
-        for (let i = 0; i < len; i++) items.push(this._display(obj.properties.get(String(i))))
+        for (let i = 0; i < len; i++) items.push(this._display(obj.properties.get(String(i)), depth + 1))
         return `[ ${items.join(', ')} ]`
       }
       const pairs = []
       for (const [k, val] of obj.properties) {
-        if (k === '__mapData__') continue
-        pairs.push(`${k}: ${this._display(val)}`)
+        if (k === '__mapData__' || k === 'length') continue
+        pairs.push(`${k}: ${this._display(val, depth + 1)}`)
       }
       return `{ ${pairs.join(', ')} }`
     }
@@ -1328,11 +1348,35 @@ class Interpreter {
       ? { line: node.loc.start.line, column: node.loc.start.column, astNodeId: node.start ?? null }
       : null
 
-    const stackSnapshot = this.callStack.map(f => ({
-      name: f.name,
-      line: f.line ?? null,
-      locals: f.env?.snapshot() ?? {},
-    }))
+    // Build stack snapshot.
+    // - Global frame is always the bottom frame so top-level names are visible.
+    // - For the innermost (top) frame, walk from the CURRENT env up to the
+    //   function boundary so block-scoped variables (inside if/for/etc.) appear.
+    const functionFrames = this.callStack.map((f, i) => {
+      const isTop = i === this.callStack.length - 1
+      let locals = {}
+      if (isTop && env) {
+        // Collect from current env up to (and including) the function scope.
+        let e = env
+        while (e && e !== this.globalEnv) {
+          for (const [k, b] of e.bindings) {
+            if (!(k in locals)) {
+              locals[k] = b.initialized ? serializeValue(b.value) : '<TDZ>'
+            }
+          }
+          if (e.name === 'function') break
+          e = e.parent
+        }
+      } else {
+        locals = f.env?.snapshot() ?? {}
+      }
+      return { name: f.name, line: f.line ?? null, locals }
+    })
+
+    const globalLocals = this.globalEnv?.snapshot() ?? {}
+    const globalFrame  = { name: '__global__', line: null, locals: globalLocals }
+
+    const stackSnapshot = [...functionFrames, globalFrame]
 
     const heapDelta = this.heap.drainDeltas()
 

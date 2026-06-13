@@ -11,12 +11,13 @@ import CallGraphView from './renderer/CallGraphView.jsx'
 import VariableWatch from './renderer/VariableWatch.jsx'
 import CallTreeView from './renderer/CallTreeView.jsx'
 import StackDepthMeter from './renderer/StackDepthMeter.jsx'
+import WatchWindow from './renderer/WatchWindow.jsx'
 import { SNIPPET_CATEGORIES } from './snippets.js'
 import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
 import {
   ChevronRight, ChevronDown, Code2, Boxes, Braces, ArrowLeft,
   Zap, Play, Pause, StepForward, StepBack, SkipForward, Terminal,
-  Palette, Info, Network, Layers, GitBranch, Maximize2, X,
+  Palette, Info, Network, Layers, GitBranch, Maximize2, X, Eye,
 } from 'lucide-react'
 
 // ── TypeScript → JS type stripper ─────────────────────────────────────────────
@@ -476,32 +477,39 @@ function buildNarration(event, prevEvent) {
 
 function NarrationBar({ event, prevEvent }) {
   const text = buildNarration(event, prevEvent)
-  if (!text) return null
 
+  // Always render the bar so it occupies space at the bottom.
+  // When there is no text, show a dim placeholder so the layout is stable.
   return (
     <div style={{
-      padding: '7px 14px',
-      background: 'linear-gradient(90deg, #0a0f1e, #080c14)',
-      borderBottom: '1px solid #1e293b',
+      padding: '8px 14px',
+      background: 'linear-gradient(90deg, #080c14, #060a12)',
+      borderTop: '1px solid #1e293b',
       fontSize: 12, color: '#94a3b8', lineHeight: 1.6,
-      flexShrink: 0,
+      flexShrink: 0, minHeight: 36,
       display: 'flex', alignItems: 'flex-start', gap: 8,
     }}>
       <span style={{
         fontSize: 10, padding: '2px 6px', borderRadius: 4, flexShrink: 0,
-        background: '#1e1b4b', color: '#818cf8',
+        background: text ? '#1e1b4b' : '#0f172a',
+        color: text ? '#818cf8' : '#334155',
         fontFamily: 'JetBrains Mono, monospace', marginTop: 1,
+        transition: 'background 0.2s, color 0.2s',
       }}>tutor</span>
-      <span style={{ flex: 1 }}>
-        {text.split(/(`[^`\n]+`)/g).map((part, i) =>
-          part.startsWith('`') && part.endsWith('`') ? (
-            <code key={i} style={{
-              background: '#1e293b', color: '#7dd3fc',
-              padding: '1px 5px', borderRadius: 3,
-              fontSize: '0.9em', fontFamily: 'JetBrains Mono, monospace',
-            }}>{part.slice(1, -1)}</code>
-          ) : part
-        )}
+      <span style={{ flex: 1, color: text ? '#94a3b8' : '#334155',
+        transition: 'color 0.2s', fontStyle: text ? 'normal' : 'italic' }}>
+        {text
+          ? text.split(/(`[^`\n]+`)/g).map((part, i) =>
+              part.startsWith('`') && part.endsWith('`') ? (
+                <code key={i} style={{
+                  background: '#1e293b', color: '#7dd3fc',
+                  padding: '1px 5px', borderRadius: 3,
+                  fontSize: '0.9em', fontFamily: 'JetBrains Mono, monospace',
+                }}>{part.slice(1, -1)}</code>
+              ) : part
+            )
+          : 'Step through your code to see explanations here.'
+        }
       </span>
     </div>
   )
@@ -701,6 +709,7 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
   const [theme, setTheme]           = useState('open-calc-dark')
   const [showThemes, setShowThemes] = useState(false)
   const [rightMode, setRightMode]   = useState('explain')  // 'explain' | 'analyse'
+  const [showWatch, setShowWatch]   = useState(false)
   const [playing, setPlaying]       = useState(false)
   const [playSpeed, setPlaySpeed]   = useState('1x')
   const [fnModal, setFnModal]       = useState(null)
@@ -937,6 +946,16 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
         </select>
 
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
+          {/* Watch window toggle */}
+          <Btn
+            onClick={() => setShowWatch(v => !v)}
+            active={showWatch}
+            title="Open floating watch window"
+          >
+            <Eye size={12} />
+            Watch
+          </Btn>
+
           {/* Theme picker */}
           <div style={{ position: 'relative' }}>
             <Btn onClick={() => setShowThemes(v => !v)} active={showThemes} title="Editor theme">
@@ -1055,12 +1074,6 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
         />
       )}
 
-      {/* ── Tutor narration bar ── */}
-      {execution && (
-        <NarrationBar event={currentEvent} prevEvent={prevEvent} />
-      )}
-
-
       {/* ── Body ── */}
       <div style={{
         flex: 1, display: 'flex', alignItems: 'stretch',
@@ -1177,6 +1190,7 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
                 currentEvent={currentEvent}
                 prevEvent={prevEvent}
                 heapSnapshot={heapSnapshot}
+                heapDelta={currentEvent?.heapDelta}
                 events={execution?.events}
                 step={step}
                 onSeek={(s) => { setPlaying(false); setStep(s) }}
@@ -1336,6 +1350,20 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
           node={fnModal.node}
           callGraph={fnModal.callGraph}
           onClose={() => setFnModal(null)}
+        />
+      )}
+
+      {/* ── Tutor narration bar — pinned at bottom ── */}
+      {execution && (
+        <NarrationBar event={currentEvent} prevEvent={prevEvent} />
+      )}
+
+      {/* ── Floating watch window ── */}
+      {showWatch && (
+        <WatchWindow
+          snapshot={heapSnapshot}
+          currentEvent={currentEvent}
+          onClose={() => setShowWatch(false)}
         />
       )}
     </div>
