@@ -5,6 +5,7 @@ import Transport from "./Transport";
 import TrackList from "./TrackList";
 import InstrumentPanel from "./InstrumentPanel";
 import PatternPanel from "./PatternPanel";
+import ArrangerPanel from "./ArrangerPanel";
 import { FXChain, Mixer, Oscilloscope, PianoRoll } from "./panels";
 import styles from "./MusicLab.module.css";
 
@@ -54,14 +55,21 @@ export default function MusicLab({ onBack }) {
   // ── Transport ──────────────────────────────────────────────────────────────
   const handlePlay = useCallback(async () => {
     await ensureEngine();
-    engine.play(state.tracks, state.stepCount);
+    if (state.songMode && state.arrangement.length > 0) {
+      engine.onBarCallback = (bar) => dispatch({ type: "SET_CURRENT_BAR", payload: bar });
+      engine.playSong(state.tracks, state.arrangement, state.patterns, state.stepCount);
+    } else {
+      engine.play(state.tracks, state.stepCount);
+    }
     dispatch({ type: "SET_PLAYING", payload: true });
-  }, [state.tracks, state.stepCount, ensureEngine]);
+  }, [state.tracks, state.stepCount, state.songMode, state.arrangement, state.patterns, ensureEngine]);
 
   const handleStop = useCallback(() => {
     engine.stop();
+    engine.onBarCallback = null;
     dispatch({ type: "SET_PLAYING", payload: false });
     dispatch({ type: "SET_STEP", payload: -1 });
+    dispatch({ type: "SET_CURRENT_BAR", payload: -1 });
   }, []);
 
   // ── Track actions ──────────────────────────────────────────────────────────
@@ -172,6 +180,8 @@ export default function MusicLab({ onBack }) {
         masterVolume={state.masterVolume}
         swing={state.swing ?? 0}
         activePatternName={activePattern?.name}
+        showArranger={state.showArranger}
+        onToggleArranger={() => dispatch({ type: "TOGGLE_ARRANGER" })}
         onPlay={handlePlay}
         onStop={handleStop}
         onBpmChange={(v) => dispatch({ type: "SET_BPM", payload: v })}
@@ -260,6 +270,20 @@ export default function MusicLab({ onBack }) {
           )}
         </div>
       </div>
+
+      {state.showArranger && (
+        <ArrangerPanel
+          patterns={state.patterns}
+          arrangement={state.arrangement}
+          activePatternId={state.activePatternId}
+          songMode={state.songMode}
+          currentBar={state.currentBar}
+          onSetBlock={(bar, patternId) => dispatch({ type: "SET_ARRANGEMENT_BLOCK", payload: { bar, patternId } })}
+          onClearBlock={(bar) => dispatch({ type: "CLEAR_ARRANGEMENT_BLOCK", payload: bar })}
+          onClear={() => dispatch({ type: "CLEAR_ARRANGEMENT" })}
+          onToggleSongMode={() => dispatch({ type: "TOGGLE_SONG_MODE" })}
+        />
+      )}
 
       {state.showPianoRoll && selectedTrack && (
         <PianoRoll

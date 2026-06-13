@@ -99,6 +99,10 @@ export function buildInitialState() {
     activePatternId: p1.id,
     patterns: [p1, p2],
     tracks,
+    showArranger: false,
+    songMode: false,
+    arrangement: [],   // [{ bar: number, patternId: string }]
+    currentBar: -1,
     history: [],
   };
 }
@@ -302,6 +306,28 @@ export function musicReducer(state, action) {
           p.id === action.payload.id ? { ...p, name: action.payload.name } : p
         ),
       };
+
+    // Arranger
+    case "TOGGLE_ARRANGER":
+      return { ...state, showArranger: !state.showArranger };
+
+    case "TOGGLE_SONG_MODE":
+      return { ...state, songMode: !state.songMode, currentBar: -1 };
+
+    case "SET_CURRENT_BAR":
+      return { ...state, currentBar: action.payload };
+
+    case "SET_ARRANGEMENT_BLOCK": {
+      const { bar, patternId } = action.payload;
+      const filtered = state.arrangement.filter(b => b.bar !== bar);
+      return { ...state, arrangement: [...filtered, { bar, patternId }].sort((a, b) => a.bar - b.bar) };
+    }
+
+    case "CLEAR_ARRANGEMENT_BLOCK":
+      return { ...state, arrangement: state.arrangement.filter(b => b.bar !== action.payload) };
+
+    case "CLEAR_ARRANGEMENT":
+      return { ...state, arrangement: [] };
 
     // Undo
     case "UNDO": {

@@ -26,6 +26,8 @@ export function voiceQualityLabel(v) {
 function pickBestVoice(voices) {
   const en = voices.filter(v => v.lang.startsWith('en'))
   const pool = en.length ? en : voices
+  const google = pool.find(v => v.name.toLowerCase().includes('google'))
+  if (google) return google
   return pool.sort((a, b) => scoreVoice(b) - scoreVoice(a))[0] ?? null
 }
 

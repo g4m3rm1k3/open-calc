@@ -9,12 +9,18 @@ class ToneEngine {
     this.analyser = null;
     this.sequence = null;
     this.onStepCallback = null;
-    this.currentSteps = {};   // trackId → number[] (velocity 0-127)
+    this.currentSteps = {};
     this.currentNotes = {};
     this.trackTypes = {};
     this.trackParams = {};
     this.stepCount = 16;
     this.initialized = false;
+    // Song mode
+    this.songMode = false;
+    this.arrangement = [];    // [{bar, patternId}]
+    this.patterns = [];       // full pattern objects
+    this.currentBar = 0;
+    this.onBarCallback = null;
   }
 
   async init() {
@@ -154,7 +160,11 @@ class ToneEngine {
 
     const steps = [...Array(stepCount).keys()];
     this.sequence = new Tone.Sequence((time, stepIndex) => {
-      // Read instrument keys dynamically so tracks added after play() starts are heard
+      // Song mode: on each new loop, advance to the next arrangement bar
+      if (this.songMode && stepIndex === 0) {
+        this._advanceSongBar(time);
+      }
+
       Object.keys(this.instruments).forEach((id) => {
         const inst = this.instruments[id];
         if (!inst) return;
@@ -213,6 +223,48 @@ class ToneEngine {
     Tone.Transport.stop();
     if (this.sequence) { this.sequence.stop(); }
     Tone.Transport.cancel();
+    this.songMode = false;
+    this.currentBar = 0;
+  }
+
+  _advanceSongBar(time) {
+    if (!this.arrangement.length) return;
+    const block = this.arrangement[this.currentBar % this.arrangement.length];
+    if (!block) return;
+    const pattern = this.patterns.find(p => p.id === block.patternId);
+    if (pattern) {
+      Object.entries(pattern.tracks).forEach(([tid, td]) => {
+        this.currentSteps[tid] = td.steps;
+        this.currentNotes[tid] = td.notes || [];
+      });
+    }
+    const nextBar = (this.currentBar + 1) % this.arrangement.length;
+    this.currentBar = nextBar;
+    Tone.getDraw().schedule(() => { this.onBarCallback?.(block.bar); }, time);
+  }
+
+  playSong(tracks, arrangement, patterns, stepCount) {
+    this.songMode = true;
+    this.arrangement = [...arrangement].sort((a, b) => a.bar - b.bar);
+    this.patterns = patterns;
+    this.currentBar = 0;
+    // Load first bar immediately
+    if (this.arrangement.length) {
+      const first = patterns.find(p => p.id === this.arrangement[0].patternId);
+      if (first) {
+        Object.entries(first.tracks).forEach(([tid, td]) => {
+          this.currentSteps[tid] = td.steps;
+          this.currentNotes[tid] = td.notes || [];
+        });
+      }
+    }
+    tracks.forEach(t => {
+      this.trackTypes[t.id] = t.type;
+      this.trackParams[t.id] = t.instrument;
+    });
+    this.buildSequence(stepCount);
+    Tone.Transport.start();
+    this.sequence.start(0);
   }
 
   updateSteps(trackId, steps) { this.currentSteps[trackId] = steps; }

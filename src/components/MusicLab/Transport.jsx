@@ -2,9 +2,9 @@ import styles from "./MusicLab.module.css";
 
 export default function Transport({
   bpm, isPlaying, stepCount, masterVolume, swing,
-  activePatternName,
+  activePatternName, showArranger,
   onPlay, onStop, onBpmChange, onStepCountChange,
-  onMasterVolumeChange, onSwingChange, onUndo, canUndo, onBack,
+  onMasterVolumeChange, onSwingChange, onToggleArranger, onUndo, canUndo, onBack,
 }) {
   return (
     <div className={styles.transport}>
@@ -83,6 +83,14 @@ export default function Transport({
       {activePatternName && (
         <span className={styles.patternBadge}>{activePatternName}</span>
       )}
+
+      <button
+        className={`${styles.tbBtn} ${showArranger ? styles.tbBtnActive : ""}`}
+        onClick={onToggleArranger}
+        title="Toggle Song Arranger"
+      >
+        ▤ Arranger
+      </button>
 
       <button className={styles.tbBtn} onClick={onUndo} disabled={!canUndo} title="Undo">
         ↩ Undo
