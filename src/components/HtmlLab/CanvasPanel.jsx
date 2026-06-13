@@ -192,10 +192,19 @@ export default function CanvasPanel({
 
         {/* overlay badges */}
         {showOverlay && (
-          <div className={styles.overlayLabels}>
-            <span className={styles.overlayMargin}>M: {el.styles.margin || "0"}</span>
-            <span className={styles.overlayPadding}>P: {el.styles.padding || "0"}</span>
-          </div>
+          <>
+            <div className={styles.boxOverlay} aria-hidden="true">
+              <div className={styles.boxOverlayMargin} />
+              <div className={styles.boxOverlayBorder} />
+              <div className={styles.boxOverlayPadding} />
+              <div className={styles.boxOverlayContent} />
+            </div>
+            <div className={styles.overlayLabels}>
+              <span className={styles.overlayMargin}>M: {el.styles.margin || "0"}</span>
+              <span className={styles.overlayBorder}>B: {el.styles.border || "0"}</span>
+              <span className={styles.overlayPadding}>P: {el.styles.padding || "0"}</span>
+            </div>
+          </>
         )}
       </div>
     );
@@ -242,6 +251,7 @@ export default function CanvasPanel({
 // ── Render the actual HTML tag with styling applied ──────────────────────────
 function renderTag(el, children, renderElement, renderDropZone, isContainer, isInsideTarget) {
   const Tag = el.tag;
+  const domAttrs = attrsToReactProps(el.attrs);
   const tagStyle = {
     ...el.styles,
     boxSizing: "border-box",
@@ -252,6 +262,7 @@ function renderTag(el, children, renderElement, renderDropZone, isContainer, isI
   if (el.tag === "img") {
     return (
       <div
+        {...domAttrs}
         style={{
           ...tagStyle,
           width: tagStyle.width || "120px",
@@ -273,12 +284,12 @@ function renderTag(el, children, renderElement, renderDropZone, isContainer, isI
   }
 
   if (VOID_TAGS.has(el.tag)) {
-    return <Tag style={tagStyle} />;
+    return <Tag {...domAttrs} style={tagStyle} />;
   }
 
   if (isContainer) {
     return (
-      <Tag style={tagStyle}>
+      <Tag {...domAttrs} style={tagStyle}>
         {el.content && <span>{el.content}</span>}
 
         {/* interleave children with drop zones */}
@@ -296,5 +307,11 @@ function renderTag(el, children, renderElement, renderDropZone, isContainer, isI
     );
   }
 
-  return <Tag style={tagStyle}>{el.content || ""}</Tag>;
+  return <Tag {...domAttrs} style={tagStyle}>{el.content || ""}</Tag>;
+}
+
+function attrsToReactProps(attrs = {}) {
+  return Object.fromEntries(
+    Object.entries(attrs).filter(([, value]) => String(value || "").trim() !== "")
+  );
 }

@@ -234,6 +234,8 @@
   gap: 4px;
   padding: 2px 6px;
   pointer-events: none;
+  position: relative;
+  z-index: 3;
 }
 .overlayMargin {
   font-size: 9px;
@@ -250,6 +252,47 @@
   color: #065f46;
   padding: 1px 5px;
   border-radius: 2px;
+}
+.overlayBorder {
+  font-size: 9px;
+  font-family: monospace;
+  background: rgba(248,113,113,0.85);
+  color: #7f1d1d;
+  padding: 1px 5px;
+  border-radius: 2px;
+}
+
+.boxOverlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+.boxOverlayMargin,
+.boxOverlayBorder,
+.boxOverlayPadding,
+.boxOverlayContent {
+  position: absolute;
+  border-radius: 4px;
+}
+.boxOverlayMargin {
+  inset: -8px;
+  border: 2px dashed rgba(246,178,107,0.95);
+  background: rgba(246,178,107,0.08);
+}
+.boxOverlayBorder {
+  inset: 0;
+  border: 2px solid rgba(248,113,113,0.95);
+}
+.boxOverlayPadding {
+  inset: 8px;
+  border: 2px dashed rgba(52,211,153,0.95);
+  background: rgba(52,211,153,0.06);
+}
+.boxOverlayContent {
+  inset: 16px;
+  border: 2px solid rgba(86,156,214,0.95);
+  background: rgba(86,156,214,0.05);
 }
 
 /* ── Divider ─────────────────────────────────────────────────────────────────── */
@@ -269,6 +312,31 @@
   overflow: hidden;
   flex-shrink: 0;
   background: #1e1e1e;
+}
+.codeTabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+.codeTab {
+  padding: 3px 8px;
+  border: 1px solid #3c3c3c;
+  border-radius: 4px;
+  background: #1f1f1f;
+  color: #858585;
+  cursor: pointer;
+  font-size: 11px;
+  line-height: 1.2;
+}
+.codeTab:hover {
+  color: #d4d4d4;
+  border-color: #555;
+}
+.codeTabActive {
+  background: #0e639c;
+  border-color: #0e639c;
+  color: #fff;
 }
 .monacoWrap {
   flex: 1;
@@ -395,6 +463,58 @@
   padding: 1px;
   background: none;
   flex-shrink: 0;
+}
+
+.jsTools {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 4px 0;
+}
+.selectorBox {
+  display: grid;
+  gap: 3px;
+  padding: 6px;
+  border: 1px solid #3c3c3c;
+  border-radius: 4px;
+  background: #1e1e1e;
+}
+.selectorBox span {
+  font-size: 9px;
+  color: #777;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.selectorBox code {
+  color: #9cdcfe;
+  font-size: 10px;
+  line-height: 1.35;
+  word-break: break-word;
+  font-family: "JetBrains Mono", monospace;
+}
+.jsToolButtons {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+}
+.jsToolBtn {
+  min-width: 0;
+  padding: 4px 5px;
+  border: 1px solid #3c3c3c;
+  border-radius: 4px;
+  background: #1e1e1e;
+  color: #ce9178;
+  cursor: pointer;
+  font-size: 10px;
+}
+.jsToolBtn:hover {
+  border-color: #ce9178;
+  background: rgba(206,145,120,0.1);
+}
+.jsLinked {
+  color: #4ade80;
+  font-size: 10px;
+  line-height: 1.4;
 }
 
 /* ── Box model visual ────────────────────────────────────────────────────────── */

@@ -4,7 +4,7 @@ import CanvasPanel from "./CanvasPanel";
 import CodePanel from "./CodePanel";
 import PropertiesPanel from "./PropertiesPanel";
 import { labReducer, initialState } from "./labReducer";
-import { elementsToHtml, htmlToElements } from "./htmlSync";
+import { applyCssToElements, elementsToCss, elementsToHtml, htmlToElements } from "./htmlSync";
 import styles from "./HtmlLab.module.css";
 
 export default function HtmlLab({ onBack }) {
@@ -15,10 +15,16 @@ export default function HtmlLab({ onBack }) {
   const dividerStartW = useRef(0);
 
   const generatedCode = elementsToHtml(state.elements);
+  const generatedCss = elementsToCss(state.elements, state.customCss);
 
   const handleCodeChange = useCallback((newCode) => {
-    const parsed = htmlToElements(newCode, state.elements);
+    const parsed = htmlToElements(newCode, state.elements, state.javascript);
     if (parsed) dispatch({ type: "SET_FROM_CODE", payload: parsed });
+  }, [state.elements, state.javascript]);
+
+  const handleCssChange = useCallback((newCss) => {
+    const parsed = applyCssToElements(newCss, state.elements);
+    dispatch({ type: "SET_FROM_CSS", payload: parsed });
   }, [state.elements]);
 
   const handleDividerMouseDown = (e) => {
@@ -54,9 +60,15 @@ export default function HtmlLab({ onBack }) {
       {/* Layout: [Code] | [Canvas] | [Properties] */}
       <div className={styles.main}>
         <CodePanel
-          code={generatedCode}
+          html={generatedCode}
+          css={generatedCss}
+          javascript={state.javascript}
           width={codePanelWidth}
-          onChange={handleCodeChange}
+          onHtmlChange={handleCodeChange}
+          onCssChange={handleCssChange}
+          onJavascriptChange={(value) =>
+            dispatch({ type: "SET_JAVASCRIPT", payload: value })
+          }
         />
 
         <div className={styles.divider} onMouseDown={handleDividerMouseDown} />
@@ -90,8 +102,24 @@ export default function HtmlLab({ onBack }) {
           onTagChange={(tag) =>
             dispatch({ type: "UPDATE_TAG", payload: tag })
           }
+          onAttrChange={(prop, value) =>
+            dispatch({ type: "UPDATE_ATTR", payload: { prop, value } })
+          }
+          javascript={state.javascript}
+          onInsertJavascript={(snippet) =>
+            dispatch({
+              type: "SET_JAVASCRIPT",
+              payload: appendJavascriptSnippet(state.javascript, snippet),
+            })
+          }
         />
       </div>
     </div>
   );
+}
+
+function appendJavascriptSnippet(current, snippet) {
+  const trimmed = current.trimEnd();
+  if (trimmed.includes(snippet.trim())) return current;
+  return `${trimmed}${trimmed ? "\n\n" : ""}${snippet}`;
 }

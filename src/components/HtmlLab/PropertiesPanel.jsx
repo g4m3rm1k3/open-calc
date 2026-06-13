@@ -10,7 +10,14 @@ const SECTIONS = [
     rows: [
       { label: "Text", prop: "_content", type: "text" },
       { label: "Tag",  prop: "_tag",     type: "tag"  },
+      { label: "id",   prop: "_id",      type: "attr" },
     ],
+  },
+  {
+    key: "javascript",
+    title: "JavaScript",
+    rows: [],
+    special: "javascript",
   },
   {
     key: "layout",
@@ -95,7 +102,15 @@ const SECTIONS = [
   },
 ];
 
-export default function PropertiesPanel({ element, onChange, onContentChange, onTagChange }) {
+export default function PropertiesPanel({
+  element,
+  onChange,
+  onContentChange,
+  onTagChange,
+  onAttrChange,
+  javascript,
+  onInsertJavascript,
+}) {
   const [collapsed, setCollapsed] = useState({ boxmodel: false });
 
   const toggle = (key) => setCollapsed((c) => ({ ...c, [key]: !c[key] }));
@@ -134,6 +149,12 @@ export default function PropertiesPanel({ element, onChange, onContentChange, on
               <div className={styles.propRows}>
                 {sec.special === "boxmodel" ? (
                   <BoxModelVisual el={element} />
+                ) : sec.special === "javascript" ? (
+                  <JavascriptTools
+                    element={element}
+                    javascript={javascript}
+                    onInsertJavascript={onInsertJavascript}
+                  />
                 ) : (
                   sec.rows.map((row) => (
                     <PropRow
@@ -143,6 +164,7 @@ export default function PropertiesPanel({ element, onChange, onContentChange, on
                       onChange={onChange}
                       onContentChange={onContentChange}
                       onTagChange={onTagChange}
+                      onAttrChange={onAttrChange}
                     />
                   ))
                 )}
@@ -155,7 +177,7 @@ export default function PropertiesPanel({ element, onChange, onContentChange, on
   );
 }
 
-function PropRow({ row, element, onChange, onContentChange, onTagChange }) {
+function PropRow({ row, element, onChange, onContentChange, onTagChange, onAttrChange }) {
   const val = element.styles[row.prop] || "";
 
   if (row.prop === "_content") {
@@ -182,6 +204,20 @@ function PropRow({ row, element, onChange, onContentChange, onTagChange }) {
         >
           {TAGS.map((t) => <option key={t} value={t}>{t}</option>)}
         </select>
+      </div>
+    );
+  }
+
+  if (row.prop === "_id") {
+    return (
+      <div className={styles.propRow}>
+        <label className={styles.propLabel}>id</label>
+        <input
+          className={styles.propInput}
+          value={element.attrs?.id || ""}
+          placeholder="hero-title"
+          onChange={(e) => onAttrChange("id", e.target.value)}
+        />
       </div>
     );
   }
@@ -232,6 +268,70 @@ function PropRow({ row, element, onChange, onContentChange, onTagChange }) {
       />
     </div>
   );
+}
+
+function JavascriptTools({ element, javascript = "", onInsertJavascript }) {
+  const selector = getElementSelector(element);
+  const varName = toVarName(element.attrs?.id || element.id);
+  const hasSelector = javascript.includes(selector);
+  const snippets = [
+    {
+      label: "Click",
+      code: `(() => {\n  const ${varName} = document.querySelector("${selector}");\n  if (!${varName}) return;\n\n  ${varName}.addEventListener("click", () => {\n    ${varName}.classList.toggle("is-active");\n  });\n})();`,
+    },
+    {
+      label: "Hover",
+      code: `(() => {\n  const ${varName} = document.querySelector("${selector}");\n  if (!${varName}) return;\n\n  ${varName}.addEventListener("mouseenter", () => {\n    ${varName}.style.transform = "scale(1.03)";\n  });\n  ${varName}.addEventListener("mouseleave", () => {\n    ${varName}.style.transform = "";\n  });\n})();`,
+    },
+    {
+      label: "Text",
+      code: `(() => {\n  const ${varName} = document.querySelector("${selector}");\n  if (!${varName}) return;\n\n  ${varName}.textContent = "Updated from JavaScript";\n})();`,
+    },
+  ];
+
+  return (
+    <div className={styles.jsTools}>
+      <div className={styles.selectorBox}>
+        <span>selector</span>
+        <code>{selector}</code>
+      </div>
+      <div className={styles.jsToolButtons}>
+        {snippets.map((snippet) => (
+          <button
+            key={snippet.label}
+            type="button"
+            className={styles.jsToolBtn}
+            onClick={() => onInsertJavascript(snippet.code)}
+          >
+            {snippet.label}
+          </button>
+        ))}
+      </div>
+      {hasSelector && (
+        <div className={styles.jsLinked}>JavaScript references this element</div>
+      )}
+    </div>
+  );
+}
+
+function getElementSelector(element) {
+  const htmlId = element.attrs?.id?.trim();
+  if (htmlId) return `#${cssEscape(htmlId)}`;
+  return `[data-lab-id="${element.id}"]`;
+}
+
+function toVarName(value) {
+  const cleaned = String(value)
+    .replace(/[^a-zA-Z0-9_$]+/g, " ")
+    .trim()
+    .replace(/\s+([a-zA-Z0-9_$])/g, (_, c) => c.toUpperCase())
+    .replace(/^[^a-zA-Z_$]+/, "");
+  return cleaned || "selectedElement";
+}
+
+function cssEscape(value) {
+  if (typeof CSS !== "undefined" && CSS.escape) return CSS.escape(value);
+  return String(value).replace(/["\\#.;:[\],>+~*='()\s]/g, "\\$&");
 }
 
 // ─── Box Model Visual ─────────────────────────────────────────────────────────

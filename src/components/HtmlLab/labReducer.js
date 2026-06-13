@@ -87,6 +87,8 @@ export const initialState = {
   elements: [],
   selectedId: null,
   showOverlay: false,
+  customCss: "",
+  javascript: "",
   history: [],
 };
 
@@ -128,6 +130,7 @@ export function labReducer(state, action) {
       const el = {
         id: genId(),
         tag,
+        attrs: { id: "" },
         styles: { ...TAG_DEFAULTS[tag] || TAG_DEFAULTS.div },
         content: TAG_CONTENT[tag] ?? "",
         parentId: null,
@@ -271,10 +274,50 @@ export function labReducer(state, action) {
       };
     }
 
+    case "UPDATE_ATTR": {
+      const { prop, value } = action.payload;
+      return {
+        ...state,
+        elements: state.elements.map((e) => {
+          if (e.id !== state.selectedId) return e;
+          const attrs = { ...(e.attrs || {}) };
+          attrs[prop] = value;
+          return { ...e, attrs };
+        }),
+      };
+    }
+
     case "SET_FROM_CODE": {
       const s = withHistory(state);
-      return { ...s, elements: action.payload, selectedId: null };
+      const nextElements = action.payload;
+      const selectedStillExists = nextElements.some((el) => el.id === state.selectedId);
+      return {
+        ...s,
+        elements: nextElements,
+        selectedId: selectedStillExists ? state.selectedId : null,
+      };
     }
+
+    case "SET_FROM_CSS": {
+      const s = withHistory(state);
+      return {
+        ...s,
+        elements: action.payload.elements,
+        customCss: action.payload.customCss,
+      };
+    }
+
+    case "SET_JAVASCRIPT":
+      return {
+        ...state,
+        javascript: action.payload,
+      };
+    
+    case "SET_CUSTOM_CSS":
+      return {
+        ...state,
+        customCss: action.payload,
+      };
 
     case "TOGGLE_OVERLAY":
       return { ...state, showOverlay: !state.showOverlay };
