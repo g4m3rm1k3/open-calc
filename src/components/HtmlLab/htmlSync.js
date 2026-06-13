@@ -63,7 +63,9 @@ export function elementsToCss(elements, customCss = "") {
     for (const mq of el.mediaQueries || []) {
       const bp = mq.breakpoint;
       if (!mqByBreakpoint.has(bp)) mqByBreakpoint.set(bp, []);
-      mqByBreakpoint.get(bp).push({ id: el.id, prop: mq.prop, value: mq.value });
+      mqByBreakpoint
+        .get(bp)
+        .push({ id: el.id, prop: mq.prop, value: mq.value });
     }
   }
   if (mqByBreakpoint.size > 0) {
@@ -77,7 +79,10 @@ export function elementsToCss(elements, customCss = "") {
       const inner = [...grouped.entries()]
         .map(([id, propRules]) => {
           const propLines = propRules
-            .map(({ prop, value }) => `    ${prop.replace(/([A-Z])/g, "-$1").toLowerCase()}: ${value};`)
+            .map(
+              ({ prop, value }) =>
+                `    ${prop.replace(/([A-Z])/g, "-$1").toLowerCase()}: ${value};`,
+            )
             .join("\n");
           return `  [data-lab-id="${id}"] {\n${propLines}\n  }`;
         })
@@ -105,7 +110,7 @@ export function htmlToElements(code, existingElements = [], javascript = "") {
     const existingByHtmlId = new Map(
       existingElements
         .filter((el) => el.attrs?.id)
-        .map((el) => [el.attrs.id, el])
+        .map((el) => [el.attrs.id, el]),
     );
     const existingByPath = new Map();
     const jsRefs = extractJavascriptRefs(javascript);
@@ -124,8 +129,8 @@ export function htmlToElements(code, existingElements = [], javascript = "") {
 
     let counter = Date.now();
     function nextId() {
-      let id = "el" + (counter++);
-      while (existingById.has(id) || usedIds.has(id)) id = "el" + (counter++);
+      let id = "el" + counter++;
+      while (existingById.has(id) || usedIds.has(id)) id = "el" + counter++;
       return id;
     }
 
@@ -157,9 +162,13 @@ export function htmlToElements(code, existingElements = [], javascript = "") {
       if (SKIP.has(tag)) return [];
 
       const styleStr = node.getAttribute("style") || "";
-      const existing = existingById.get(node.getAttribute("data-lab-id")) || existingByPath.get(path);
+      const existing =
+        existingById.get(node.getAttribute("data-lab-id")) ||
+        existingByPath.get(path);
       const inlineStyles = parseStyleString(styleStr);
-      const styles = Object.keys(inlineStyles).length ? inlineStyles : { ...(existing?.styles || {}) };
+      const styles = Object.keys(inlineStyles).length
+        ? inlineStyles
+        : { ...(existing?.styles || {}) };
       const attrs = {
         ...(existing?.attrs || {}),
         ...attrsFromNode(node),
@@ -167,9 +176,10 @@ export function htmlToElements(code, existingElements = [], javascript = "") {
 
       // Collect text content (only if no child elements)
       const childEls = Array.from(node.children).filter(
-        (c) => !SKIP.has(c.tagName.toLowerCase())
+        (c) => !SKIP.has(c.tagName.toLowerCase()),
       );
-      const content = childEls.length === 0 ? (node.textContent || "").trim() : "";
+      const content =
+        childEls.length === 0 ? (node.textContent || "").trim() : "";
 
       const el = {
         id: stableIdFor(node, path),
@@ -191,12 +201,14 @@ export function htmlToElements(code, existingElements = [], javascript = "") {
     }
 
     const rootNodes = Array.from(body.children).filter(
-      (c) => !SKIP.has(c.tagName.toLowerCase())
+      (c) => !SKIP.has(c.tagName.toLowerCase()),
     );
     if (rootNodes.length === 0) return null;
 
     const result = [];
-    rootNodes.forEach((node, i) => result.push(...parseNode(node, null, i, `${i}`)));
+    rootNodes.forEach((node, i) =>
+      result.push(...parseNode(node, null, i, `${i}`)),
+    );
     return result;
   } catch (err) {
     console.warn("htmlToElements parse error:", err);
@@ -209,11 +221,15 @@ export function extractJavascriptRefs(javascript = "") {
   const htmlIds = new Set();
   const labIdPattern = /data-lab-id\s*=\s*(?:"([^"]+)"|'([^']+)')/g;
   const getElementPattern = /getElementById\(\s*(?:"([^"]+)"|'([^']+)')\s*\)/g;
-  const queryIdPattern = /querySelector(?:All)?\(\s*(?:"#([^"]+)"|'#([^']+)')\s*\)/g;
+  const queryIdPattern =
+    /querySelector(?:All)?\(\s*(?:"#([^"]+)"|'#([^']+)')\s*\)/g;
 
-  for (const match of javascript.matchAll(labIdPattern)) labIds.add(match[1] || match[2]);
-  for (const match of javascript.matchAll(getElementPattern)) htmlIds.add(match[1] || match[2]);
-  for (const match of javascript.matchAll(queryIdPattern)) htmlIds.add(match[1] || match[2]);
+  for (const match of javascript.matchAll(labIdPattern))
+    labIds.add(match[1] || match[2]);
+  for (const match of javascript.matchAll(getElementPattern))
+    htmlIds.add(match[1] || match[2]);
+  for (const match of javascript.matchAll(queryIdPattern))
+    htmlIds.add(match[1] || match[2]);
 
   return { labIds, htmlIds };
 }
@@ -221,18 +237,18 @@ export function extractJavascriptRefs(javascript = "") {
 export function applyCssToElements(css, elements) {
   const styleById = new Map();
   const managedBlock = /\[data-lab-id=(?:"([^"]+)"|'([^']+)')\]\s*\{([^}]*)\}/g;
-  let customCss = css.replace(/\/\*\s*Custom CSS\s*\*\//gi, "").replace(managedBlock, (_, id1, id2, body) => {
-    const id = id1 || id2;
-    styleById.set(id, parseStyleString(body));
-    return "";
-  });
-  customCss = customCss
-    .replace(/body\s*\{[^}]*\}/gi, "")
-    .trim();
+  let customCss = css
+    .replace(/\/\*\s*Custom CSS\s*\*\//gi, "")
+    .replace(managedBlock, (_, id1, id2, body) => {
+      const id = id1 || id2;
+      styleById.set(id, parseStyleString(body));
+      return "";
+    });
+  customCss = customCss.replace(/body\s*\{[^}]*\}/gi, "").trim();
 
   return {
     elements: elements.map((el) =>
-      styleById.has(el.id) ? { ...el, styles: styleById.get(el.id) } : el
+      styleById.has(el.id) ? { ...el, styles: styleById.get(el.id) } : el,
     ),
     customCss,
   };
@@ -250,7 +266,10 @@ export function stylesToString(styles, linePrefix = "") {
 
 function renderAttrs(attrs = {}) {
   return Object.entries(attrs)
-    .filter(([, value]) => value !== undefined && value !== null && String(value).trim() !== "")
+    .filter(
+      ([, value]) =>
+        value !== undefined && value !== null && String(value).trim() !== "",
+    )
     .map(([key, value]) => ` ${key}="${escapeAttr(value)}"`)
     .join("");
 }

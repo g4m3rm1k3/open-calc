@@ -1,20 +1,72 @@
 import { useState, useRef, useEffect } from "react";
 import styles from "./HtmlLab.module.css";
-import { COMPONENT_PRESETS, PROP_PRESETS, BREAKPOINTS, CSS_PROPS_LIST } from "./styleLibrary";
+import {
+  COMPONENT_PRESETS,
+  PROP_PRESETS,
+  BREAKPOINTS,
+  CSS_PROPS_LIST,
+} from "./styleLibrary";
 
-const TAGS = ["div", "p", "h1", "h2", "h3", "h4", "button", "span", "a", "img", "ul", "li", "section", "article", "header", "footer"];
+const TAGS = [
+  "div",
+  "p",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "button",
+  "span",
+  "a",
+  "img",
+  "ul",
+  "li",
+  "section",
+  "article",
+  "header",
+  "footer",
+];
 
 const TAG_ATTR_ROWS = {
   a: [
-    { label: "href", prop: "_href", attr: "href", type: "attr", placeholder: "https://example.com" },
-    { label: "target", prop: "_target", attr: "target", type: "attr", placeholder: "_blank" },
+    {
+      label: "href",
+      prop: "_href",
+      attr: "href",
+      type: "attr",
+      placeholder: "https://example.com",
+    },
+    {
+      label: "target",
+      prop: "_target",
+      attr: "target",
+      type: "attr",
+      placeholder: "_blank",
+    },
   ],
   img: [
-    { label: "src", prop: "_src", attr: "src", type: "attr", placeholder: "https://..." },
-    { label: "alt", prop: "_alt", attr: "alt", type: "attr", placeholder: "Image description" },
+    {
+      label: "src",
+      prop: "_src",
+      attr: "src",
+      type: "attr",
+      placeholder: "https://...",
+    },
+    {
+      label: "alt",
+      prop: "_alt",
+      attr: "alt",
+      type: "attr",
+      placeholder: "Image description",
+    },
   ],
   button: [
-    { label: "type", prop: "_type", attr: "type", type: "attr", placeholder: "button" },
+    {
+      label: "type",
+      prop: "_type",
+      attr: "type",
+      type: "attr",
+      placeholder: "button",
+    },
   ],
 };
 
@@ -30,9 +82,15 @@ const SECTIONS = [
     title: "Content",
     rows: [
       { label: "Text", prop: "_content", type: "text" },
-      { label: "Tag",  prop: "_tag",     type: "tag"  },
-      { label: "id",   prop: "_id",      type: "attr" },
-      { label: "class", prop: "_class",   attr: "class", type: "attr", placeholder: "card primary" },
+      { label: "Tag", prop: "_tag", type: "tag" },
+      { label: "id", prop: "_id", type: "attr" },
+      {
+        label: "class",
+        prop: "_class",
+        attr: "class",
+        type: "attr",
+        placeholder: "card primary",
+      },
     ],
   },
   {
@@ -45,75 +103,138 @@ const SECTIONS = [
     key: "layout",
     title: "Layout",
     rows: [
-      { label: "display",   prop: "display",         type: "select", opts: ["block","inline-block","flex","grid","inline","none"] },
-      { label: "flex-dir",  prop: "flexDirection",   type: "select", opts: ["","row","column","row-reverse","column-reverse"] },
-      { label: "align",     prop: "alignItems",      type: "select", opts: ["","flex-start","center","flex-end","stretch","baseline"] },
-      { label: "justify",   prop: "justifyContent",  type: "select", opts: ["","flex-start","center","flex-end","space-between","space-around","space-evenly"] },
-      { label: "flex-wrap", prop: "flexWrap",        type: "select", opts: ["","nowrap","wrap","wrap-reverse"] },
-      { label: "gap",       prop: "gap",             type: "text" },
+      {
+        label: "display",
+        prop: "display",
+        type: "select",
+        opts: ["block", "inline-block", "flex", "grid", "inline", "none"],
+      },
+      {
+        label: "flex-dir",
+        prop: "flexDirection",
+        type: "select",
+        opts: ["", "row", "column", "row-reverse", "column-reverse"],
+      },
+      {
+        label: "align",
+        prop: "alignItems",
+        type: "select",
+        opts: ["", "flex-start", "center", "flex-end", "stretch", "baseline"],
+      },
+      {
+        label: "justify",
+        prop: "justifyContent",
+        type: "select",
+        opts: [
+          "",
+          "flex-start",
+          "center",
+          "flex-end",
+          "space-between",
+          "space-around",
+          "space-evenly",
+        ],
+      },
+      {
+        label: "flex-wrap",
+        prop: "flexWrap",
+        type: "select",
+        opts: ["", "nowrap", "wrap", "wrap-reverse"],
+      },
+      { label: "gap", prop: "gap", type: "text" },
     ],
   },
   {
     key: "size",
     title: "Size",
     rows: [
-      { label: "width",    prop: "width",     type: "text" },
-      { label: "height",   prop: "height",    type: "text" },
-      { label: "min-w",    prop: "minWidth",  type: "text" },
-      { label: "min-h",    prop: "minHeight", type: "text" },
-      { label: "max-w",    prop: "maxWidth",  type: "text" },
-      { label: "max-h",    prop: "maxHeight", type: "text" },
-      { label: "overflow", prop: "overflow",  type: "select", opts: ["","visible","hidden","scroll","auto"] },
+      { label: "width", prop: "width", type: "text" },
+      { label: "height", prop: "height", type: "text" },
+      { label: "min-w", prop: "minWidth", type: "text" },
+      { label: "min-h", prop: "minHeight", type: "text" },
+      { label: "max-w", prop: "maxWidth", type: "text" },
+      { label: "max-h", prop: "maxHeight", type: "text" },
+      {
+        label: "overflow",
+        prop: "overflow",
+        type: "select",
+        opts: ["", "visible", "hidden", "scroll", "auto"],
+      },
     ],
   },
   {
     key: "spacing",
     title: "Spacing",
     rows: [
-      { label: "margin",    prop: "margin",        type: "text" },
-      { label: "padding",   prop: "padding",       type: "text" },
-      { label: "margin-t",  prop: "marginTop",     type: "text" },
-      { label: "margin-r",  prop: "marginRight",   type: "text" },
-      { label: "margin-b",  prop: "marginBottom",  type: "text" },
-      { label: "margin-l",  prop: "marginLeft",    type: "text" },
-      { label: "padding-t", prop: "paddingTop",    type: "text" },
-      { label: "padding-r", prop: "paddingRight",  type: "text" },
+      { label: "margin", prop: "margin", type: "text" },
+      { label: "padding", prop: "padding", type: "text" },
+      { label: "margin-t", prop: "marginTop", type: "text" },
+      { label: "margin-r", prop: "marginRight", type: "text" },
+      { label: "margin-b", prop: "marginBottom", type: "text" },
+      { label: "margin-l", prop: "marginLeft", type: "text" },
+      { label: "padding-t", prop: "paddingTop", type: "text" },
+      { label: "padding-r", prop: "paddingRight", type: "text" },
       { label: "padding-b", prop: "paddingBottom", type: "text" },
-      { label: "padding-l", prop: "paddingLeft",   type: "text" },
+      { label: "padding-l", prop: "paddingLeft", type: "text" },
     ],
   },
   {
     key: "typography",
     title: "Typography",
     rows: [
-      { label: "font-size",   prop: "fontSize",       type: "text" },
-      { label: "color",       prop: "color",          type: "color" },
-      { label: "font-weight", prop: "fontWeight",     type: "select", opts: ["","300","400","500","600","700","bold"] },
-      { label: "text-align",  prop: "textAlign",      type: "select", opts: ["","left","center","right","justify"] },
-      { label: "line-height", prop: "lineHeight",     type: "text" },
-      { label: "letter-sp",   prop: "letterSpacing",  type: "text" },
-      { label: "decoration",  prop: "textDecoration", type: "select", opts: ["","none","underline","line-through","overline"] },
-      { label: "transform",   prop: "textTransform",  type: "select", opts: ["","none","uppercase","lowercase","capitalize"] },
+      { label: "font-size", prop: "fontSize", type: "text" },
+      { label: "color", prop: "color", type: "color" },
+      {
+        label: "font-weight",
+        prop: "fontWeight",
+        type: "select",
+        opts: ["", "300", "400", "500", "600", "700", "bold"],
+      },
+      {
+        label: "text-align",
+        prop: "textAlign",
+        type: "select",
+        opts: ["", "left", "center", "right", "justify"],
+      },
+      { label: "line-height", prop: "lineHeight", type: "text" },
+      { label: "letter-sp", prop: "letterSpacing", type: "text" },
+      {
+        label: "decoration",
+        prop: "textDecoration",
+        type: "select",
+        opts: ["", "none", "underline", "line-through", "overline"],
+      },
+      {
+        label: "transform",
+        prop: "textTransform",
+        type: "select",
+        opts: ["", "none", "uppercase", "lowercase", "capitalize"],
+      },
     ],
   },
   {
     key: "background",
     title: "Background",
     rows: [
-      { label: "bg-color",  prop: "backgroundColor", type: "color" },
-      { label: "bg-image",  prop: "backgroundImage", type: "text" },
-      { label: "bg-size",   prop: "backgroundSize",  type: "select", opts: ["","cover","contain","auto"] },
-      { label: "opacity",   prop: "opacity",         type: "text" },
+      { label: "bg-color", prop: "backgroundColor", type: "color" },
+      { label: "bg-image", prop: "backgroundImage", type: "text" },
+      {
+        label: "bg-size",
+        prop: "backgroundSize",
+        type: "select",
+        opts: ["", "cover", "contain", "auto"],
+      },
+      { label: "opacity", prop: "opacity", type: "text" },
     ],
   },
   {
     key: "border",
     title: "Border & shadow",
     rows: [
-      { label: "border",     prop: "border",       type: "text" },
-      { label: "radius",     prop: "borderRadius", type: "text" },
-      { label: "outline",    prop: "outline",      type: "text" },
-      { label: "box-shadow", prop: "boxShadow",    type: "text" },
+      { label: "border", prop: "border", type: "text" },
+      { label: "radius", prop: "borderRadius", type: "text" },
+      { label: "outline", prop: "outline", type: "text" },
+      { label: "box-shadow", prop: "boxShadow", type: "text" },
     ],
   },
   {
@@ -161,9 +282,7 @@ export default function PropertiesPanel({
     <div className={styles.propsPanel}>
       <div className={styles.panelHeader}>
         &lt;{element.tag}&gt; · {element.id}
-        {element.parentId && (
-          <span className={styles.nestedBadge}>nested</span>
-        )}
+        {element.parentId && <span className={styles.nestedBadge}>nested</span>}
       </div>
       <div className={styles.propsBody}>
         {SECTIONS.map((sec) => (
@@ -216,7 +335,14 @@ export default function PropertiesPanel({
   );
 }
 
-function PropRow({ row, element, onChange, onContentChange, onTagChange, onAttrChange }) {
+function PropRow({
+  row,
+  element,
+  onChange,
+  onContentChange,
+  onTagChange,
+  onAttrChange,
+}) {
   const val = element.styles[row.prop] || "";
   const [pickerOpen, setPickerOpen] = useState(false);
   const pickerRef = useRef(null);
@@ -256,10 +382,20 @@ function PropRow({ row, element, onChange, onContentChange, onTagChange, onAttrC
                 setPickerOpen(false);
               }}
             >
-              {row.prop === "backgroundColor" || row.prop === "color" || row.prop === "border" ? (
+              {row.prop === "backgroundColor" ||
+              row.prop === "color" ||
+              row.prop === "border" ? (
                 <span
                   className={styles.pickerSwatch}
-                  style={{ background: p === "none" || p === "transparent" ? "transparent" : (row.prop === "border" ? p.split(" ").slice(-1)[0] : p), border: "1px solid #555" }}
+                  style={{
+                    background:
+                      p === "none" || p === "transparent"
+                        ? "transparent"
+                        : row.prop === "border"
+                          ? p.split(" ").slice(-1)[0]
+                          : p,
+                    border: "1px solid #555",
+                  }}
                 />
               ) : null}
               <span>{p}</span>
@@ -292,7 +428,11 @@ function PropRow({ row, element, onChange, onContentChange, onTagChange, onAttrC
           value={element.tag}
           onChange={(e) => onTagChange(e.target.value)}
         >
-          {TAGS.map((t) => <option key={t} value={t}>{t}</option>)}
+          {TAGS.map((t) => (
+            <option key={t} value={t}>
+              {t}
+            </option>
+          ))}
         </select>
       </div>
     );
@@ -322,7 +462,11 @@ function PropRow({ row, element, onChange, onContentChange, onTagChange, onAttrC
           value={val}
           onChange={(e) => onChange(row.prop, e.target.value)}
         >
-          {row.opts.map((o) => <option key={o} value={o}>{o || "—"}</option>)}
+          {row.opts.map((o) => (
+            <option key={o} value={o}>
+              {o || "—"}
+            </option>
+          ))}
         </select>
       </div>
     );
@@ -389,13 +533,18 @@ function StyleLibrarySection({ onApplyPreset }) {
         <select
           className={styles.propSelect}
           value={selected}
-          onChange={(e) => { setSelected(e.target.value); setApplied(false); }}
+          onChange={(e) => {
+            setSelected(e.target.value);
+            setApplied(false);
+          }}
         >
           <option value="">— choose preset —</option>
           {categories.map((cat) => (
             <optgroup key={cat} label={cat}>
               {COMPONENT_PRESETS.filter((p) => p.category === cat).map((p) => (
-                <option key={p.key} value={p.key}>{p.label}</option>
+                <option key={p.key} value={p.key}>
+                  {p.label}
+                </option>
               ))}
             </optgroup>
           ))}
@@ -405,7 +554,9 @@ function StyleLibrarySection({ onApplyPreset }) {
         <div className={styles.slibPreview}>
           {Object.entries(preset.styles).map(([k, v]) => (
             <div key={k} className={styles.slibPreviewRow}>
-              <span className={styles.slibPreviewProp}>{k.replace(/([A-Z])/g, "-$1").toLowerCase()}</span>
+              <span className={styles.slibPreviewProp}>
+                {k.replace(/([A-Z])/g, "-$1").toLowerCase()}
+              </span>
               <span className={styles.slibPreviewVal}>{v}</span>
             </div>
           ))}
@@ -436,7 +587,11 @@ function MediaQueriesSection({ element, onAddMediaQuery, onRemoveMediaQuery }) {
 
   const handleAdd = () => {
     if (!effectiveBp || !prop.trim() || !value.trim()) return;
-    onAddMediaQuery({ breakpoint: effectiveBp, prop: prop.trim(), value: value.trim() });
+    onAddMediaQuery({
+      breakpoint: effectiveBp,
+      prop: prop.trim(),
+      value: value.trim(),
+    });
     setProp("");
     setValue("");
   };
@@ -451,7 +606,9 @@ function MediaQueriesSection({ element, onAddMediaQuery, onRemoveMediaQuery }) {
           onChange={(e) => setBp(e.target.value)}
         >
           {BREAKPOINTS.map((b) => (
-            <option key={b.label} value={b.value}>{b.label}</option>
+            <option key={b.label} value={b.value}>
+              {b.label}
+            </option>
           ))}
         </select>
         {bp === "" && (
@@ -471,10 +628,15 @@ function MediaQueriesSection({ element, onAddMediaQuery, onRemoveMediaQuery }) {
           list="mq-css-props"
           value={prop}
           placeholder="e.g. flexDirection"
-          onChange={(e) => { setProp(e.target.value); setValue(""); }}
+          onChange={(e) => {
+            setProp(e.target.value);
+            setValue("");
+          }}
         />
         <datalist id="mq-css-props">
-          {CSS_PROPS_LIST.map((p) => <option key={p} value={p} />)}
+          {CSS_PROPS_LIST.map((p) => (
+            <option key={p} value={p} />
+          ))}
         </datalist>
       </div>
 
@@ -488,7 +650,9 @@ function MediaQueriesSection({ element, onAddMediaQuery, onRemoveMediaQuery }) {
           >
             <option value="">— pick or type below —</option>
             {propPresets.map((v) => (
-              <option key={v} value={v}>{v}</option>
+              <option key={v} value={v}>
+                {v}
+              </option>
             ))}
           </select>
         ) : null}
@@ -515,7 +679,9 @@ function MediaQueriesSection({ element, onAddMediaQuery, onRemoveMediaQuery }) {
             <div key={i} className={styles.mqRule}>
               <div className={styles.mqRuleText}>
                 <span className={styles.mqRuleBp}>@{mq.breakpoint}</span>
-                <span className={styles.mqRuleProp}>{mq.prop.replace(/([A-Z])/g, "-$1").toLowerCase()}</span>
+                <span className={styles.mqRuleProp}>
+                  {mq.prop.replace(/([A-Z])/g, "-$1").toLowerCase()}
+                </span>
                 <span className={styles.mqRuleVal}>{mq.value}</span>
               </div>
               <button
@@ -578,7 +744,9 @@ function JavascriptTools({ element, javascript = "", onInsertJavascript }) {
         ))}
       </div>
       {hasSelector && (
-        <div className={styles.jsLinked}>JavaScript references this element</div>
+        <div className={styles.jsLinked}>
+          JavaScript references this element
+        </div>
       )}
     </div>
   );
@@ -611,7 +779,10 @@ function cssEscape(value) {
 
 function stylesToJsObject(styles = {}) {
   const body = Object.entries(styles)
-    .map(([key, value]) => `\n    ${JSON.stringify(key)}: ${JSON.stringify(value)}`)
+    .map(
+      ([key, value]) =>
+        `\n    ${JSON.stringify(key)}: ${JSON.stringify(value)}`,
+    )
     .join(",");
   return `{${body ? `${body}\n  ` : ""}}`;
 }
@@ -641,8 +812,20 @@ function BoxModelVisual({ el }) {
     };
   }
 
-  const margin = getSides("margin", "marginTop", "marginRight", "marginBottom", "marginLeft");
-  const padding = getSides("padding", "paddingTop", "paddingRight", "paddingBottom", "paddingLeft");
+  const margin = getSides(
+    "margin",
+    "marginTop",
+    "marginRight",
+    "marginBottom",
+    "marginLeft",
+  );
+  const padding = getSides(
+    "padding",
+    "paddingTop",
+    "paddingRight",
+    "paddingBottom",
+    "paddingLeft",
+  );
   const border = s.border || "0";
   const width = s.width || "auto";
   const height = s.height || "auto";
@@ -650,45 +833,109 @@ function BoxModelVisual({ el }) {
   return (
     <div className={styles.boxModel}>
       {/* Margin layer */}
-      <div className={styles.bmLayer} style={{ background: "rgba(246,178,107,0.25)", border: "1px solid rgba(246,178,107,0.6)" }}>
-        <div className={styles.bmLayerLabel} style={{ color: "#c47d17" }}>margin</div>
-        <div className={styles.bmTopVal} style={{ color: "#c47d17" }}>{margin.t}</div>
+      <div
+        className={styles.bmLayer}
+        style={{
+          background: "rgba(246,178,107,0.25)",
+          border: "1px solid rgba(246,178,107,0.6)",
+        }}
+      >
+        <div className={styles.bmLayerLabel} style={{ color: "#c47d17" }}>
+          margin
+        </div>
+        <div className={styles.bmTopVal} style={{ color: "#c47d17" }}>
+          {margin.t}
+        </div>
         <div className={styles.bmRow}>
-          <span className={styles.bmSideVal} style={{ color: "#c47d17" }}>{margin.l}</span>
+          <span className={styles.bmSideVal} style={{ color: "#c47d17" }}>
+            {margin.l}
+          </span>
 
           {/* Border layer */}
-          <div className={styles.bmLayer} style={{ background: "rgba(226,75,74,0.12)", border: "1px solid rgba(226,75,74,0.4)", flex: 1 }}>
-            <div className={styles.bmLayerLabel} style={{ color: "#b91c1c" }}>border</div>
-            <div className={styles.bmTopVal} style={{ color: "#b91c1c" }}>{border}</div>
+          <div
+            className={styles.bmLayer}
+            style={{
+              background: "rgba(226,75,74,0.12)",
+              border: "1px solid rgba(226,75,74,0.4)",
+              flex: 1,
+            }}
+          >
+            <div className={styles.bmLayerLabel} style={{ color: "#b91c1c" }}>
+              border
+            </div>
+            <div className={styles.bmTopVal} style={{ color: "#b91c1c" }}>
+              {border}
+            </div>
             <div className={styles.bmRow}>
-              <span className={styles.bmSideVal} style={{ color: "#b91c1c" }}>—</span>
+              <span className={styles.bmSideVal} style={{ color: "#b91c1c" }}>
+                —
+              </span>
 
               {/* Padding layer */}
-              <div className={styles.bmLayer} style={{ background: "rgba(0,180,100,0.14)", border: "1px solid rgba(0,180,100,0.4)", flex: 1 }}>
-                <div className={styles.bmLayerLabel} style={{ color: "#166534" }}>padding</div>
-                <div className={styles.bmTopVal} style={{ color: "#166534" }}>{padding.t}</div>
+              <div
+                className={styles.bmLayer}
+                style={{
+                  background: "rgba(0,180,100,0.14)",
+                  border: "1px solid rgba(0,180,100,0.4)",
+                  flex: 1,
+                }}
+              >
+                <div
+                  className={styles.bmLayerLabel}
+                  style={{ color: "#166534" }}
+                >
+                  padding
+                </div>
+                <div className={styles.bmTopVal} style={{ color: "#166534" }}>
+                  {padding.t}
+                </div>
                 <div className={styles.bmRow}>
-                  <span className={styles.bmSideVal} style={{ color: "#166534" }}>{padding.l}</span>
+                  <span
+                    className={styles.bmSideVal}
+                    style={{ color: "#166534" }}
+                  >
+                    {padding.l}
+                  </span>
 
                   {/* Content layer */}
                   <div className={styles.bmContent}>
                     <div className={styles.bmContentTag}>&lt;{el.tag}&gt;</div>
-                    <div className={styles.bmDims}>{width} × {height}</div>
+                    <div className={styles.bmDims}>
+                      {width} × {height}
+                    </div>
                   </div>
 
-                  <span className={styles.bmSideVal} style={{ color: "#166534" }}>{padding.r}</span>
+                  <span
+                    className={styles.bmSideVal}
+                    style={{ color: "#166534" }}
+                  >
+                    {padding.r}
+                  </span>
                 </div>
-                <div className={styles.bmBottomVal} style={{ color: "#166534" }}>{padding.b}</div>
+                <div
+                  className={styles.bmBottomVal}
+                  style={{ color: "#166534" }}
+                >
+                  {padding.b}
+                </div>
               </div>
 
-              <span className={styles.bmSideVal} style={{ color: "#b91c1c" }}>—</span>
+              <span className={styles.bmSideVal} style={{ color: "#b91c1c" }}>
+                —
+              </span>
             </div>
-            <div className={styles.bmBottomVal} style={{ color: "#b91c1c" }}>{border}</div>
+            <div className={styles.bmBottomVal} style={{ color: "#b91c1c" }}>
+              {border}
+            </div>
           </div>
 
-          <span className={styles.bmSideVal} style={{ color: "#c47d17" }}>{margin.r}</span>
+          <span className={styles.bmSideVal} style={{ color: "#c47d17" }}>
+            {margin.r}
+          </span>
         </div>
-        <div className={styles.bmBottomVal} style={{ color: "#c47d17" }}>{margin.b}</div>
+        <div className={styles.bmBottomVal} style={{ color: "#c47d17" }}>
+          {margin.b}
+        </div>
       </div>
     </div>
   );

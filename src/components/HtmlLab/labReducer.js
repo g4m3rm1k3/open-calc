@@ -10,68 +10,135 @@ const TAG_DEFAULTS = {
     display: "block",
   },
   p: {
-    fontSize: "14px", color: "#1a1a18",
-    margin: "8px 0", padding: "4px", display: "block",
+    fontSize: "14px",
+    color: "#1a1a18",
+    margin: "8px 0",
+    padding: "4px",
+    display: "block",
   },
   h1: {
-    fontSize: "28px", fontWeight: "600",
-    color: "#1a1a18", margin: "8px 0", padding: "4px", display: "block",
+    fontSize: "28px",
+    fontWeight: "600",
+    color: "#1a1a18",
+    margin: "8px 0",
+    padding: "4px",
+    display: "block",
   },
   h2: {
-    fontSize: "20px", fontWeight: "500",
-    color: "#1a1a18", margin: "8px 0", padding: "4px", display: "block",
+    fontSize: "20px",
+    fontWeight: "500",
+    color: "#1a1a18",
+    margin: "8px 0",
+    padding: "4px",
+    display: "block",
   },
   h3: {
-    fontSize: "16px", fontWeight: "500",
-    color: "#1a1a18", margin: "8px 0", padding: "4px", display: "block",
+    fontSize: "16px",
+    fontWeight: "500",
+    color: "#1a1a18",
+    margin: "8px 0",
+    padding: "4px",
+    display: "block",
   },
   button: {
-    padding: "8px 16px", backgroundColor: "#1d4ed8", color: "#ffffff",
-    border: "none", borderRadius: "6px", fontSize: "13px", cursor: "pointer",
-    display: "inline-block", margin: "4px",
+    padding: "8px 16px",
+    backgroundColor: "#1d4ed8",
+    color: "#ffffff",
+    border: "none",
+    borderRadius: "6px",
+    fontSize: "13px",
+    cursor: "pointer",
+    display: "inline-block",
+    margin: "4px",
   },
   span: {
-    padding: "4px 10px", backgroundColor: "#dcfce7", color: "#166534",
-    borderRadius: "4px", fontSize: "13px", display: "inline-block", margin: "4px",
+    padding: "4px 10px",
+    backgroundColor: "#dcfce7",
+    color: "#166534",
+    borderRadius: "4px",
+    fontSize: "13px",
+    display: "inline-block",
+    margin: "4px",
   },
   img: {
-    width: "120px", height: "80px", backgroundColor: "#e5e7eb",
-    border: "1px solid #d1d5db", borderRadius: "4px", display: "block", margin: "8px 0",
+    width: "120px",
+    height: "80px",
+    backgroundColor: "#e5e7eb",
+    border: "1px solid #d1d5db",
+    borderRadius: "4px",
+    display: "block",
+    margin: "8px 0",
   },
   ul: {
-    padding: "8px 8px 8px 24px", margin: "8px 0",
-    border: "1px dashed #d1d5db", display: "block", minHeight: "40px",
+    padding: "8px 8px 8px 24px",
+    margin: "8px 0",
+    border: "1px dashed #d1d5db",
+    display: "block",
+    minHeight: "40px",
   },
   li: {
-    fontSize: "14px", color: "#1a1a18", padding: "2px 0", display: "list-item",
+    fontSize: "14px",
+    color: "#1a1a18",
+    padding: "2px 0",
+    display: "list-item",
   },
   a: {
-    color: "#1d4ed8", textDecoration: "underline",
-    fontSize: "14px", display: "inline", margin: "0 2px",
+    color: "#1d4ed8",
+    textDecoration: "underline",
+    fontSize: "14px",
+    display: "inline",
+    margin: "0 2px",
   },
   section: {
-    padding: "16px", margin: "8px 0", border: "1px solid #e5e7eb",
-    borderRadius: "6px", display: "block", minHeight: "60px",
+    padding: "16px",
+    margin: "8px 0",
+    border: "1px solid #e5e7eb",
+    borderRadius: "6px",
+    display: "block",
+    minHeight: "60px",
   },
   article: {
-    padding: "16px", margin: "8px 0", backgroundColor: "#fafafa",
-    border: "1px solid #e5e7eb", borderRadius: "6px", display: "block", minHeight: "60px",
+    padding: "16px",
+    margin: "8px 0",
+    backgroundColor: "#fafafa",
+    border: "1px solid #e5e7eb",
+    borderRadius: "6px",
+    display: "block",
+    minHeight: "60px",
   },
   header: {
-    padding: "16px", margin: "0 0 8px", backgroundColor: "#f1f5f9",
-    borderBottom: "2px solid #e2e8f0", display: "block", minHeight: "50px",
+    padding: "16px",
+    margin: "0 0 8px",
+    backgroundColor: "#f1f5f9",
+    borderBottom: "2px solid #e2e8f0",
+    display: "block",
+    minHeight: "50px",
   },
   footer: {
-    padding: "12px 16px", margin: "8px 0 0", backgroundColor: "#f8fafc",
-    borderTop: "1px solid #e2e8f0", display: "block",
+    padding: "12px 16px",
+    margin: "8px 0 0",
+    backgroundColor: "#f8fafc",
+    borderTop: "1px solid #e2e8f0",
+    display: "block",
   },
 };
 
 const TAG_CONTENT = {
-  div: "", p: "Paragraph text", h1: "Heading 1", h2: "Heading 2",
-  h3: "Heading 3", button: "Click me", span: "Span text",
-  img: "", ul: "", li: "List item", a: "Link text",
-  section: "", article: "", header: "", footer: "",
+  div: "",
+  p: "Paragraph text",
+  h1: "Heading 1",
+  h2: "Heading 2",
+  h3: "Heading 3",
+  button: "Click me",
+  span: "Span text",
+  img: "",
+  ul: "",
+  li: "List item",
+  a: "Link text",
+  section: "",
+  article: "",
+  header: "",
+  footer: "",
 };
 
 const TAG_ATTRS = {
@@ -82,11 +149,20 @@ const TAG_ATTRS = {
 
 // Tags that can contain children
 export const CONTAINER_TAGS = new Set([
-  "div", "section", "article", "header", "footer", "ul", "p", "span",
+  "div",
+  "section",
+  "article",
+  "header",
+  "footer",
+  "ul",
+  "p",
+  "span",
 ]);
 
 let _idCounter = 1;
-function genId() { return "el" + (_idCounter++); }
+function genId() {
+  return "el" + _idCounter++;
+}
 
 // ─── Initial state ────────────────────────────────────────────────────────────
 export const initialState = {
@@ -126,7 +202,6 @@ function getDescendants(elements, id) {
 // ─── Reducer ──────────────────────────────────────────────────────────────────
 export function labReducer(state, action) {
   switch (action.type) {
-
     case "ADD_ELEMENT": {
       const s = withHistory(state);
       const tag = action.payload;
@@ -137,7 +212,7 @@ export function labReducer(state, action) {
         id: genId(),
         tag,
         attrs: { id: "", class: "", ...(TAG_ATTRS[tag] || {}) },
-        styles: { ...TAG_DEFAULTS[tag] || TAG_DEFAULTS.div },
+        styles: { ...(TAG_DEFAULTS[tag] || TAG_DEFAULTS.div) },
         content: TAG_CONTENT[tag] ?? "",
         parentId: null,
         order: maxOrder + 1,
@@ -148,7 +223,10 @@ export function labReducer(state, action) {
 
     case "DELETE_ELEMENT": {
       const s = withHistory(state);
-      const toDelete = new Set([action.payload, ...getDescendants(s.elements, action.payload)]);
+      const toDelete = new Set([
+        action.payload,
+        ...getDescendants(s.elements, action.payload),
+      ]);
       return {
         ...s,
         elements: s.elements.filter((e) => !toDelete.has(e.id)),
@@ -230,7 +308,8 @@ export function labReducer(state, action) {
       return {
         ...s,
         elements: s.elements.map((e) => {
-          if (e.id === id) return { ...e, parentId: parentId || null, order: targetOrder };
+          if (e.id === id)
+            return { ...e, parentId: parentId || null, order: targetOrder };
           const r = reordered.find((r) => r.id === e.id);
           return r || e;
         }),
@@ -243,8 +322,11 @@ export function labReducer(state, action) {
         ...state,
         elements: state.elements.map((e) =>
           e.id === id
-            ? { ...e, styles: { ...e.styles, width: w + "px", height: h + "px" } }
-            : e
+            ? {
+                ...e,
+                styles: { ...e.styles, width: w + "px", height: h + "px" },
+              }
+            : e,
         ),
       };
     }
@@ -270,7 +352,7 @@ export function labReducer(state, action) {
         elements: state.elements.map((e) =>
           e.id === state.selectedId
             ? { ...e, styles: { ...e.styles, ...presetStyles } }
-            : e
+            : e,
         ),
       };
     }
@@ -283,7 +365,10 @@ export function labReducer(state, action) {
           if (e.id !== state.selectedId) return e;
           return {
             ...e,
-            mediaQueries: [...(e.mediaQueries || []), { breakpoint, prop, value }],
+            mediaQueries: [
+              ...(e.mediaQueries || []),
+              { breakpoint, prop, value },
+            ],
           };
         }),
       };
@@ -305,7 +390,7 @@ export function labReducer(state, action) {
       return {
         ...state,
         elements: state.elements.map((e) =>
-          e.id === state.selectedId ? { ...e, content: action.payload } : e
+          e.id === state.selectedId ? { ...e, content: action.payload } : e,
         ),
       };
 
@@ -314,7 +399,7 @@ export function labReducer(state, action) {
       return {
         ...s,
         elements: s.elements.map((e) =>
-          e.id === s.selectedId ? { ...e, tag: action.payload } : e
+          e.id === s.selectedId ? { ...e, tag: action.payload } : e,
         ),
       };
     }
@@ -335,7 +420,9 @@ export function labReducer(state, action) {
     case "SET_FROM_CODE": {
       const s = withHistory(state);
       const nextElements = action.payload;
-      const selectedStillExists = nextElements.some((el) => el.id === state.selectedId);
+      const selectedStillExists = nextElements.some(
+        (el) => el.id === state.selectedId,
+      );
       return {
         ...s,
         elements: nextElements,
@@ -357,7 +444,7 @@ export function labReducer(state, action) {
         ...state,
         javascript: action.payload,
       };
-    
+
     case "SET_CUSTOM_CSS":
       return {
         ...state,

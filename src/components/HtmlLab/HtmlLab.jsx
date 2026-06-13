@@ -4,7 +4,12 @@ import CanvasPanel from "./CanvasPanel";
 import CodePanel from "./CodePanel";
 import PropertiesPanel from "./PropertiesPanel";
 import { labReducer, initialState } from "./labReducer";
-import { applyCssToElements, elementsToCss, elementsToHtml, htmlToElements } from "./htmlSync";
+import {
+  applyCssToElements,
+  elementsToCss,
+  elementsToHtml,
+  htmlToElements,
+} from "./htmlSync";
 import styles from "./HtmlLab.module.css";
 
 export default function HtmlLab({ onBack }) {
@@ -17,15 +22,21 @@ export default function HtmlLab({ onBack }) {
   const generatedCode = elementsToHtml(state.elements);
   const generatedCss = elementsToCss(state.elements, state.customCss);
 
-  const handleCodeChange = useCallback((newCode) => {
-    const parsed = htmlToElements(newCode, state.elements, state.javascript);
-    if (parsed) dispatch({ type: "SET_FROM_CODE", payload: parsed });
-  }, [state.elements, state.javascript]);
+  const handleCodeChange = useCallback(
+    (newCode) => {
+      const parsed = htmlToElements(newCode, state.elements, state.javascript);
+      if (parsed) dispatch({ type: "SET_FROM_CODE", payload: parsed });
+    },
+    [state.elements, state.javascript],
+  );
 
-  const handleCssChange = useCallback((newCss) => {
-    const parsed = applyCssToElements(newCss, state.elements);
-    dispatch({ type: "SET_FROM_CSS", payload: parsed });
-  }, [state.elements]);
+  const handleCssChange = useCallback(
+    (newCss) => {
+      const parsed = applyCssToElements(newCss, state.elements);
+      dispatch({ type: "SET_FROM_CSS", payload: parsed });
+    },
+    [state.elements],
+  );
 
   const handleDividerMouseDown = (e) => {
     dividerDragging.current = true;
@@ -35,7 +46,9 @@ export default function HtmlLab({ onBack }) {
     const onMouseMove = (e) => {
       if (!dividerDragging.current) return;
       const delta = e.clientX - dividerStartX.current;
-      setCodePanelWidth(Math.max(200, Math.min(640, dividerStartW.current + delta)));
+      setCodePanelWidth(
+        Math.max(200, Math.min(640, dividerStartW.current + delta)),
+      );
     };
     const onUp = () => {
       dividerDragging.current = false;
@@ -81,27 +94,33 @@ export default function HtmlLab({ onBack }) {
           onDeselect={() => dispatch({ type: "SELECT", payload: null })}
           onDelete={(id) => dispatch({ type: "DELETE_ELEMENT", payload: id })}
           onNest={(childId, parentId, order) =>
-            dispatch({ type: "NEST_ELEMENT", payload: { childId, parentId, order } })
+            dispatch({
+              type: "NEST_ELEMENT",
+              payload: { childId, parentId, order },
+            })
           }
           onMoveToRoot={(id, order) =>
             dispatch({ type: "MOVE_TO_ROOT", payload: { id, order } })
           }
           onReorder={(id, parentId, order) =>
-            dispatch({ type: "REORDER_ELEMENT", payload: { id, parentId, order } })
+            dispatch({
+              type: "REORDER_ELEMENT",
+              payload: { id, parentId, order },
+            })
           }
         />
 
         <PropertiesPanel
-          element={state.elements.find((e) => e.id === state.selectedId) || null}
+          element={
+            state.elements.find((e) => e.id === state.selectedId) || null
+          }
           onChange={(prop, value) =>
             dispatch({ type: "UPDATE_STYLE", payload: { prop, value } })
           }
           onContentChange={(value) =>
             dispatch({ type: "UPDATE_CONTENT", payload: value })
           }
-          onTagChange={(tag) =>
-            dispatch({ type: "UPDATE_TAG", payload: tag })
-          }
+          onTagChange={(tag) => dispatch({ type: "UPDATE_TAG", payload: tag })}
           onAttrChange={(prop, value) =>
             dispatch({ type: "UPDATE_ATTR", payload: { prop, value } })
           }
