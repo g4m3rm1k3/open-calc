@@ -31,6 +31,8 @@ export default function Toolbar({
   onExport,
   canUndo,
   onBack,
+  onApplyGlobalTheme,
+  onLoadExample,
 }) {
   return (
     <div className={styles.toolbar}>
@@ -116,6 +118,28 @@ export default function Toolbar({
         title="Clear canvas"
       >
         ✕ Clear
+      </button>
+
+      <div className={styles.toolbarSep} />
+
+      <select
+        className={styles.tbSelect}
+        onChange={(e) => onApplyGlobalTheme && onApplyGlobalTheme(e.target.value)}
+        defaultValue=""
+        title="Apply a theme to all compatible components"
+      >
+        <option value="" disabled>Global Theme</option>
+        <option value="Clean">Clean</option>
+        <option value="Dark">Dark</option>
+        <option value="Glass">Glass</option>
+      </select>
+
+      <button
+        className={styles.tbBtn}
+        onClick={onLoadExample}
+        title="Load a full example project"
+      >
+        🌟 Load Example
       </button>
     </div>
   );

@@ -204,6 +204,35 @@ function getDescendants(elements, id) {
 // ─── Reducer ──────────────────────────────────────────────────────────────────
 export function labReducer(state, action) {
   switch (action.type) {
+    case "LOAD_EXAMPLE": {
+      const s = withHistory(state);
+      return {
+        ...s,
+        elements: action.payload.elements,
+        bodyStyles: action.payload.bodyStyles,
+        selectedId: null,
+      };
+    }
+
+    case "APPLY_GLOBAL_THEME": {
+      const s = withHistory(state);
+      const themeId = action.payload; // e.g., "Clean", "Dark", "Glass"
+      
+      // Update the elements (components)
+      let newElements = [...s.elements];
+      for (const update of action.payload.updates) {
+        newElements = newElements.map(el => 
+          el.id === update.id ? { ...el, styles: { ...el.styles, ...update.styles } } : el
+        );
+      }
+      
+      return {
+        ...s,
+        bodyStyles: action.payload.bodyStyles || s.bodyStyles,
+        elements: newElements,
+      };
+    }
+
     case "ADD_ELEMENT": {
       const s = withHistory(state);
       const tag = action.payload;

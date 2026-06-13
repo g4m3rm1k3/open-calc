@@ -12,6 +12,7 @@ import {
   htmlToElements,
   generateExportHtml,
 } from "./htmlSync";
+import { generateExampleProject } from "./exampleProject";
 import styles from "./HtmlLab.module.css";
 
 export default function HtmlLab({ onBack }) {
@@ -114,6 +115,39 @@ export default function HtmlLab({ onBack }) {
         }}
         canUndo={state.history.length > 0}
         onBack={onBack}
+        onApplyGlobalTheme={(themeName) => {
+          // Find the corresponding body theme
+          const bodyTheme = BODY_THEMES.find(t => t.name.toLowerCase().includes(themeName.toLowerCase()) || t.id.toLowerCase().includes(themeName.toLowerCase()));
+          
+          const updates = [];
+          
+          // Check all potential component roots
+          for (const el of state.elements) {
+            const matched = detectComponents(el.id, state.elements);
+            if (matched.length > 0) {
+              const comp = matched[0];
+              // Find the theme in this component that matches the themeName
+              const compTheme = comp.themeGroups.flatMap(g => g.themes).find(t => 
+                t.name.toLowerCase().includes(themeName.toLowerCase()) || t.id.toLowerCase().includes(themeName.toLowerCase())
+              );
+              
+              if (compTheme) {
+                const compUpdates = buildThemeUpdates(el.id, state.elements, compTheme);
+                updates.push(...compUpdates);
+              }
+            }
+          }
+          
+          dispatch({ 
+            type: "APPLY_GLOBAL_THEME", 
+            payload: { updates, bodyStyles: bodyTheme?.styles } 
+          });
+        }}
+        onLoadExample={() => {
+          if (window.confirm("This will replace your current canvas. Load example project?")) {
+            dispatch({ type: "LOAD_EXAMPLE", payload: generateExampleProject() });
+          }
+        }}
       />
 
       {showComponents && (
