@@ -1,0 +1,483 @@
+// FILE: src/content/chapter-4/07-integration-by-parts.js
+export default {
+  id: 'ch4-007',
+  slug: 'integration-by-parts',
+  chapter: 4,
+  order: 7,
+  title: 'Integration by Parts',
+  subtitle: 'The product rule in reverse — trading one integral for an easier one',
+  tags: ['integration by parts', 'LIATE', 'tabular method', 'product rule', 'reduction formula', 'uv formula'],
+  aliases: ['when to use integration by parts', 'liate rule', 'product integral strategy'],
+
+  hook: {
+    question: 'How do you integrate x·eˣ? There is no substitution that works — the x factor is not the derivative of the exponent, and the exponent is not the derivative of x. Yet d/dx[x·eˣ] = eˣ + x·eˣ by the product rule, so x·eˣ = d/dx[x·eˣ] − eˣ. Integrating both sides: ∫x·eˣ dx = x·eˣ − eˣ + C. Integration by parts formalizes this trick for any product.',
+    realWorldContext: 'Integration by parts appears throughout engineering and physics. Fourier coefficients — the foundation of signal processing, audio compression (MP3), and image analysis (JPEG) — are computed by integrating products of functions with sines and cosines, requiring repeated by-parts. In quantum mechanics, expectation values involve integrals like ∫ψ*(x)·x·ψ(x)dx, solved by parts. Control engineers use Laplace transforms that rely on by-parts internally. Statisticians computing moments of probability distributions (mean, variance, skewness) integrate x^n times density functions — by parts is the standard method.',
+    previewVisualizationId: 'FunctionPlotter',
+  },
+
+  intuition: {
+    prose: [
+      'The product rule says $(uv)\' = u\'v + uv\'$. Rearranging: $uv\' = (uv)\' - u\'v$. Integrate both sides: $\\int u\\,v\'\\,dx = uv - \\int u\'\\,v\\,dx$. That is the integration by parts formula. It trades the integral $\\int u\\,dv$ for a (hopefully simpler) integral $\\int v\\,du$. The art is choosing $u$ and $dv$ so that the new integral is easier than the original.',
+      'Think of it as a strategic trade. You start with a product of two functions that you cannot integrate directly. You "differentiate one factor and integrate the other." If differentiating the first factor makes it simpler while integrating the second factor does not make it worse, you win: the new integral is easier. The classic example is $\\int x \\cdot e^x\\,dx$: differentiating $x$ gives 1 (simpler!), and integrating $e^x$ gives $e^x$ (no worse). So the new integral $\\int 1 \\cdot e^x\\,dx = e^x$ is trivial.',
+      'The LIATE rule gives a priority order for choosing $u$: Logarithmic, Inverse trig, Algebraic (polynomials), Trigonometric, Exponential. Choose $u$ as the function highest on the list; the remaining factor becomes $dv$. Why? Functions higher on the list simplify when differentiated (ln x → 1/x, arctan x → 1/(1+x²), x² → 2x → 2 → 0), while functions lower on the list do not get worse when integrated (e^x → e^x, sin x → −cos x).',
+      'Sometimes you need to apply by-parts more than once. For $\\int x^2 \\sin x\\,dx$, one round reduces $x^2$ to $2x$; a second round reduces $2x$ to $2$; then the remaining integral is elementary. Each round peels off one power of $x$. The tabular method (also called the "tic-tac-toe" method) organizes repeated by-parts: list successive derivatives of $u$ in one column and successive antiderivatives of $dv$ in the other, alternating signs (+, −, +, −, …). Multiply diagonally and add.',
+      'A beautiful special case is the "cycling" trick. For $\\int e^x \\sin x\\,dx$, applying by-parts twice brings you back to an integral of the same form: $\\int e^x \\sin x\\,dx = -e^x \\cos x + e^x \\sin x - \\int e^x \\sin x\\,dx$. The original integral appears on both sides! Move it to the left: $2\\int e^x \\sin x\\,dx = e^x(\\sin x - \\cos x)$. Divide by 2. This is algebra, not magic — it works whenever the same integral recurs after two rounds of by-parts.',
+      'Integration by parts also handles functions that seem to have no partner to multiply. For $\\int \\ln x\\,dx$, write it as $\\int 1 \\cdot \\ln x\\,dx$ with $u = \\ln x$ and $dv = dx$. Then $du = dx/x$ and $v = x$, giving $x \\ln x - \\int x \\cdot (1/x)\\,dx = x \\ln x - x + C$. The same trick works for $\\int \\arctan x\\,dx$ and $\\int \\arcsin x\\,dx$ — pair the inverse function with $dv = dx$.',
+      'Reduction formulas use by-parts to express $\\int f_n(x)\\,dx$ in terms of $\\int f_{n-2}(x)\\,dx$ or $\\int f_{n-1}(x)\\,dx$. For example, $\\int \\sin^n x\\,dx$ can be reduced by writing $\\sin^n x = \\sin^{n-1}x \\cdot \\sin x$, integrating by parts, and using $\\sin^2 x = 1 - \\cos^2 x$. The result is a formula linking the $n$-th integral to the $(n-2)$-th. Applied repeatedly, this reduces any $\\int \\sin^n x\\,dx$ to either $\\int \\sin x\\,dx$ or $\\int dx$.',
+    ],
+    callouts: [
+      {
+        type: 'strategy',
+        title: 'When to Use Integration by Parts',
+        body: 'Use by-parts when the integrand is a product of two different "types" of functions (e.g., polynomial × exponential, polynomial × trig, logarithm × anything) and u-substitution does not apply (no inner derivative present). The LIATE rule tells you which factor to differentiate.',
+      },
+      {
+        type: 'warning',
+        title: 'Choosing u and dv Badly',
+        body: 'Bad choices make the integral harder. In ∫x·eˣ dx, if you choose u = eˣ and dv = x dx, then du = eˣ dx and v = x²/2, giving ∫x·eˣ dx = (x²/2)eˣ − ∫(x²/2)eˣ dx — the new integral is MORE complex (x² instead of x). LIATE prevents this: x (algebraic) has higher priority than eˣ (exponential), so u = x.',
+      },
+      {
+        type: 'misconception',
+        title: 'By-Parts Is Not a Last Resort',
+        body: 'Students often try u-sub first and reach for by-parts only when stuck. But many integrals (∫x cos x dx, ∫ln x dx, ∫arctan x dx) are immediately recognizable as by-parts problems. Train yourself to spot products of different function types — that is the signal for by-parts.',
+      },
+      {
+        type: 'prior-knowledge',
+        title: 'The Product Rule Is the Foundation',
+        body: 'By-parts IS the product rule, rearranged and integrated. If you remember (uv)\' = u\'v + uv\', then ∫uv\' = uv − ∫u\'v follows immediately. Every by-parts problem is just the product rule run backwards, with a strategic choice of which factor to call u.',
+      },
+    ],
+    visualizations: [
+      {
+        id: 'IntegrationMethodLab',
+        title: 'Method Selection Trainer',
+        caption: 'Try product-style integrands and see why by-parts ranks above substitution when no inner derivative is available.',
+      },
+      {
+        id: 'FunctionPlotter',
+        title: 'Integration by Parts: Trading Integrals',
+        caption: 'The graph shows the original integrand u·v\' (shaded) and the new integrand u\'·v (lighter shade). By-parts trades the area under one curve for the area under a simpler curve, plus a boundary term uv. When the lighter region is easier to compute, the trade is profitable.',
+      },
+    ],
+  },
+
+  math: {
+    prose: [
+      'The integration by parts formula: $\\int u\\,dv = uv - \\int v\\,du$. In function notation: if $u = u(x)$ and $v = v(x)$, then $\\int u(x)v\'(x)\\,dx = u(x)v(x) - \\int u\'(x)v(x)\\,dx$. For definite integrals: $\\int_a^b u\\,dv = [uv]_a^b - \\int_a^b v\\,du$.',
+      'LIATE priority for choosing $u$: (L)ogarithmic: $\\ln x$, $\\log x$; (I)nverse trig: $\\arctan x$, $\\arcsin x$; (A)lgebraic: $x^n$, polynomials; (T)rigonometric: $\\sin x$, $\\cos x$; (E)xponential: $e^x$, $a^x$. Choose $u$ from the highest available category. The other factor (together with $dx$) is $dv$.',
+      'Tabular method for repeated by-parts: when $u$ is a polynomial of degree $n$ and $dv$ involves $e^x$, $\\sin x$, or $\\cos x$, create two columns. Left column: successive derivatives of $u$ (each row differentiates once more, ending at 0). Right column: successive antiderivatives of $dv$. Alternate signs: $+, -, +, -, \\ldots$ Multiply each left entry by the right entry one row below it, with the alternating sign. Sum all products. This gives the answer without writing intermediate integrals.',
+      'Cycling integrals: for $\\int e^{ax}\\sin(bx)\\,dx$ or $\\int e^{ax}\\cos(bx)\\,dx$, two rounds of by-parts produce the original integral $I$ on the right side: $I = (\\text{boundary terms}) - I$ or $I = (\\text{terms}) + I$. Collect $I$: $2I = (\\text{boundary terms})$, so $I = (\\text{boundary terms})/2$. Results: $\\int e^{ax}\\sin(bx)\\,dx = \\frac{e^{ax}(a\\sin bx - b\\cos bx)}{a^2+b^2}+C$ and $\\int e^{ax}\\cos(bx)\\,dx = \\frac{e^{ax}(a\\cos bx + b\\sin bx)}{a^2+b^2}+C$.',
+      'Reduction formula for $\\int x^n e^x\\,dx$: let $u = x^n$, $dv = e^x\\,dx$. Then $\\int x^n e^x\\,dx = x^n e^x - n\\int x^{n-1} e^x\\,dx$. Applied $n$ times, this reduces to $\\int e^x\\,dx = e^x + C$. The general result is $\\int x^n e^x\\,dx = e^x \\sum_{k=0}^{n} (-1)^k \\frac{n!}{(n-k)!} x^{n-k} + C$.',
+    ],
+    callouts: [
+      {
+        type: 'theorem',
+        title: 'Integration by Parts Formula',
+        body: '\\[\\int u\\,dv = uv - \\int v\\,du\\]\nDefinite integral form:\n\\[\\int_a^b u\\,dv = [uv]_a^b - \\int_a^b v\\,du\\]',
+      },
+      {
+        type: 'strategy',
+        title: 'The Tabular Method',
+        body: 'For \\(\\int x^n f(x)\\,dx\\) where \\(f\\) has a pattern of antiderivatives (e.g., \\(e^x, \\sin x, \\cos x\\)):\n1. Differentiate \\(x^n\\) repeatedly: \\(x^n, nx^{n-1}, n(n-1)x^{n-2}, \\ldots, n!, 0\\)\n2. Integrate \\(f\\) repeatedly: \\(f, F_1, F_2, \\ldots\\)\n3. Multiply diagonally with alternating signs and sum.',
+      },
+      {
+        type: 'theorem',
+        title: 'Cycling Formula',
+        body: '\\[\\int e^{ax}\\sin(bx)\\,dx = \\frac{e^{ax}(a\\sin bx - b\\cos bx)}{a^2+b^2}+C\\]\n\\[\\int e^{ax}\\cos(bx)\\,dx = \\frac{e^{ax}(a\\cos bx + b\\sin bx)}{a^2+b^2}+C\\]',
+      },
+    ],
+    visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Python Lab: Build & Verify Integration by Parts',
+        caption: 'Implement the tabular method, verify antiderivatives by differentiation, and discover the cycling trick numerically before working it algebraically.',
+        props: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Verify ∫x·eˣ dx = eˣ(x−1) + C by differentiation',
+              prose: [
+                'After computing an antiderivative, **always verify**: differentiate and check you get the integrand back.',
+                'Python can do symbolic-style checks numerically at many test points.',
+              ],
+              instructions: 'Run to verify. Then change F to verify ∫x cos x dx = x sin x + cos x + C.',
+              code: `import math
+
+# The antiderivative we claim: F(x) = e^x * (x - 1)
+F  = lambda x: math.exp(x) * (x - 1)
+f  = lambda x: x * math.exp(x)   # the original integrand
+
+# Numerical derivative check: F'(x) should equal f(x)
+h = 1e-7   # small step for finite difference
+
+print("Verifying F'(x) = f(x) = x·eˣ")
+print()
+print(f"{'x':>6}  {'F(x)':>18}  {'F\\'(x)≈':>18}  {'f(x)=x·eˣ':>18}  {'match?'}")
+print("-" * 75)
+for x in [-2, -1, 0, 1, 2, 3, 5]:
+    dF = (F(x+h) - F(x-h)) / (2*h)     # central difference derivative
+    fx = f(x)
+    ok = abs(dF - fx) < 1e-5
+    print(f"{x:>6}  {F(x):>18.10f}  {dF:>18.10f}  {fx:>18.10f}  {'✓' if ok else '✗'}")
+
+print()
+print("All match? =>", all(abs((F(x+h)-F(x-h))/(2*h) - f(x)) < 1e-5 for x in range(-5, 6)))`,
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 2,
+              cellTitle: 'Tabular method: ∫x³·eˣ dx in one shot',
+              prose: [
+                '**Tabular method**: list derivatives of $u$ down one column, antiderivatives of $dv$ down the other, alternate signs.',
+                '| D (derivatives of $x^3$) | I (antiderivatives of $e^x$) | Sign |',
+                '|---|---|---|',
+                '| $x^3$ | $e^x$ | $+$ |',
+                '| $3x^2$ | $e^x$ | $-$ |',
+                '| $6x$ | $e^x$ | $+$ |',
+                '| $6$ | $e^x$ | $-$ |',
+                '| $0$ | $e^x$ | stop |',
+                'Answer: $e^x(x^3 - 3x^2 + 6x - 6) + C$',
+              ],
+              code: `import math
+
+# Tabular method result
+F  = lambda x: math.exp(x) * (x**3 - 3*x**2 + 6*x - 6)
+f  = lambda x: x**3 * math.exp(x)
+
+h  = 1e-7
+
+print("Verifying tabular result: ∫x³·eˣ dx = eˣ(x³-3x²+6x-6) + C")
+print()
+print(f"{'x':>5}  {'F\\'(x)≈':>20}  {'f(x)=x³eˣ':>20}  {'match?'}")
+print("-" * 55)
+for x in [-2, 0, 1, 2, 3]:
+    dF = (F(x+h) - F(x-h)) / (2*h)
+    fx = f(x)
+    ok = abs(dF - fx) < 1e-4
+    print(f"{x:>5}  {dF:>20.10f}  {fx:>20.10f}  {'✓' if ok else '✗'}")
+
+print()
+print("The tabular method gave the right answer in one organized pass.")
+print()
+print("Spot check: F(1) =", F(1))
+print("Reference:  e^1*(1-3+6-6) =", math.exp(1)*(1-3+6-6))`,
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 3,
+              cellTitle: 'Cycling trick: ∫eˣ sin x dx — solve the equation',
+              prose: [
+                'Two rounds of by-parts bring the original $I$ back to the right side:',
+                '$I = e^x \\sin x - e^x \\cos x - I$',
+                '$\\Rightarrow 2I = e^x(\\sin x - \\cos x) \\Rightarrow I = \\frac{e^x(\\sin x - \\cos x)}{2}$',
+              ],
+              code: `import math
+
+F  = lambda x: math.exp(x) * (math.sin(x) - math.cos(x)) / 2
+f  = lambda x: math.exp(x) * math.sin(x)
+
+h = 1e-7
+
+print("Verifying cycling result: ∫eˣ sin x dx = eˣ(sin x − cos x)/2 + C")
+print()
+print(f"{'x':>8}  {'F\\'(x)≈':>20}  {'eˣ sin x':>20}  match?")
+print("-" * 60)
+for x in [0, 1, 2, 3.14, -1]:
+    dF = (F(x+h) - F(x-h)) / (2*h)
+    fx = f(x)
+    ok = abs(dF - fx) < 1e-4
+    print(f"{x:>8.2f}  {dF:>20.10f}  {fx:>20.10f}  {'✓' if ok else '✗'}")
+
+print()
+# Curious: also verify the cycling structure numerically
+print("Verifying definite integral: ∫₀^π eˣ sin x dx")
+# Riemann sum approximation
+n = 10000
+xs = [i/n * math.pi for i in range(n)]
+riemann = sum(f(x) * (math.pi/n) for x in xs)
+exact   = F(math.pi) - F(0)
+print(f"  Riemann sum (n={n}): {riemann:.8f}")
+print(f"  Exact [F(π)-F(0)]:  {exact:.8f}")`,
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 4,
+              challengeType: 'write',
+              challengeTitle: 'Your Turn: Verify ∫ln(x) dx and ∫arctan(x) dx',
+              difficulty: 'easy',
+              prompt: 'Two classic lone-function by-parts:\n\n∫ln(x) dx = x ln(x) − x + C\n∫arctan(x) dx = x arctan(x) − (1/2) ln(1+x²) + C\n\nTask: write numerical derivative checks for both, like Cell 1 showed.',
+              hint: 'Copy the pattern from Cell 1. Define F = the antiderivative, f = the integrand, then loop over test points computing (F(x+h)-F(x-h))/(2h) and comparing to f(x).',
+              code: `import math
+
+h = 1e-7
+
+# Part 1: ∫ln(x) dx
+F_ln = lambda x: x * math.log(x) - x
+f_ln = lambda x: math.log(x)
+
+print("Part 1: ∫ln(x) dx = x·ln(x) − x + C")
+print()
+# YOUR CODE: verify F_ln'(x) = f_ln(x) for several x > 0
+# for x in [0.5, 1, 2, 5, 10]:
+#     dF = (F_ln(x+h) - F_ln(x-h)) / (2*h)
+#     print(f"  x={x}  F'(x)={dF:.10f}  f(x)={f_ln(x):.10f}  match={abs(dF-f_ln(x))<1e-5}")
+
+# Part 2: ∫arctan(x) dx
+F_at = lambda x: x * math.atan(x) - 0.5 * math.log(1 + x**2)
+f_at = lambda x: math.atan(x)
+
+print()
+print("Part 2: ∫arctan(x) dx = x·arctan(x) − (1/2)·ln(1+x²) + C")
+print()
+# YOUR CODE: verify F_at'(x) = f_at(x)
+# for x in [-2, -1, 0, 1, 2, 5]:
+#     ...`,
+              output: '', status: 'idle', figureJson: null,
+            },
+          ]
+        }
+      },
+    ],
+  },
+
+
+  rigor: {
+    prose: [
+      'Derivation of integration by parts from the product rule. The product rule states: $d/dx[u(x)v(x)] = u\'(x)v(x) + u(x)v\'(x)$. Rearrange: $u(x)v\'(x) = d/dx[u(x)v(x)] - u\'(x)v(x)$. Integrate both sides over $[a,b]$: $\\int_a^b u(x)v\'(x)\\,dx = [u(x)v(x)]_a^b - \\int_a^b u\'(x)v(x)\\,dx$. This is exact — no approximation. The formula requires $u$ and $v$ to be differentiable, with $u\'v$ and $uv\'$ integrable. For continuously differentiable functions (the usual case), all conditions are satisfied.',
+      'The indefinite version follows by omitting the evaluation limits: $\\int u\\,dv = uv - \\int v\\,du + C$. The constant is conventionally absorbed into the final answer. Note: when computing $v = \\int dv$, we do NOT include a $+C$ at this intermediate step — any choice of antiderivative for $v$ works, and the simplest (with $C = 0$) is preferred.',
+      'Validity of the cycling method: when $\\int u\\,dv$ is computed by two rounds of by-parts and yields $I = A - I$ (where $A$ collects boundary terms), we solve algebraically: $2I = A$, so $I = A/2$. This is valid because $I$ is a NUMBER (for definite integrals) or a FUNCTION (for indefinite integrals, defined up to $+C$). The algebraic manipulation is justified by the linearity of integration.',
+      'Reduction formulas and mathematical induction. The reduction $\\int \\sin^n x\\,dx = -(1/n)\\sin^{n-1}x\\cos x + (n-1)/n \\int \\sin^{n-2}x\\,dx$ is proved by one round of by-parts with $u = \\sin^{n-1}x$ and $dv = \\sin x\\,dx$. The identity $\\cos^2 x = 1 - \\sin^2 x$ is used to eliminate $\\cos^2 x$ from the result. By induction, this gives the Wallis-type closed form for $\\int_0^{\\pi/2} \\sin^n x\\,dx$.',
+    ],
+    callouts: [
+      {
+        type: 'theorem',
+        title: 'Derivation from the Product Rule',
+        body: '\\((uv)\' = u\'v + uv\'\\) implies \\(uv\' = (uv)\' - u\'v\\). Integrating:\n\\[\\int uv\' = uv - \\int u\'v.\\]\nThis is exact, not an approximation. It holds whenever \\(u, v\\) are \\(C^1\\) (continuously differentiable).',
+      },
+    ],
+    visualizations: [],
+  },
+
+  examples: [
+    {
+      id: 'ch4-007-ex1',
+      title: 'Classic: ∫x·eˣ dx',
+      problem: '\\text{Find } \\int x e^x\\,dx.',
+      steps: [
+        { expression: '\\text{Let } u = x, \\quad dv = e^x\\,dx', annotation: 'LIATE: x is algebraic (A), eˣ is exponential (E). A has higher priority, so u = x.' },
+        { expression: 'du = dx, \\quad v = e^x', annotation: 'Differentiate u, integrate dv.' },
+        { expression: '\\int xe^x\\,dx = xe^x - \\int e^x\\,dx', annotation: 'Apply ∫u dv = uv − ∫v du.' },
+        { expression: '= xe^x - e^x + C', annotation: '∫eˣ dx = eˣ.' },
+        { expression: '= e^x(x-1) + C', annotation: 'Factor out eˣ for a clean final form.' },
+        { expression: '\\text{Verify: } \\frac{d}{dx}[e^x(x-1)] = e^x(x-1) + e^x = e^x \\cdot x \\checkmark', annotation: 'Product rule: eˣ(x−1) + eˣ·1 = xeˣ. ✓' },
+      ],
+      conclusion: '∫xeˣ dx = eˣ(x−1) + C. One round of by-parts reduces the polynomial factor from degree 1 to degree 0.',
+    },
+    {
+      id: 'ch4-007-ex2',
+      title: 'Repeated Parts: ∫x²·sin(x) dx',
+      problem: '\\text{Find } \\int x^2\\sin x\\,dx.',
+      steps: [
+        { expression: '\\text{Let } u = x^2, \\; dv = \\sin x\\,dx \\Rightarrow du = 2x\\,dx, \\; v = -\\cos x', annotation: 'First round: u = x² (algebraic), dv = sin x dx.' },
+        { expression: '\\int x^2\\sin x\\,dx = -x^2\\cos x + \\int 2x\\cos x\\,dx', annotation: 'Apply by-parts. The new integral still has a polynomial × trig — apply again.' },
+        { expression: '\\text{Second round: } u = 2x, \\; dv = \\cos x\\,dx \\Rightarrow du = 2\\,dx, \\; v = \\sin x', annotation: 'Reduce the polynomial degree by one more.' },
+        { expression: '\\int 2x\\cos x\\,dx = 2x\\sin x - \\int 2\\sin x\\,dx = 2x\\sin x + 2\\cos x + C', annotation: '∫2 sin x dx = −2 cos x.' },
+        { expression: '\\int x^2\\sin x\\,dx = -x^2\\cos x + 2x\\sin x + 2\\cos x + C', annotation: 'Combine all terms.' },
+        { expression: '\\text{Verify: differentiate } -x^2\\cos x + 2x\\sin x + 2\\cos x', annotation: 'Product rule on each term: 2x cos x + x² sin x + 2 sin x + 2x cos x − 2 sin x = x² sin x. ✓' },
+      ],
+      conclusion: '∫x²sin x dx = −x²cos x + 2x sin x + 2 cos x + C. Two rounds of by-parts reduce x² to a constant.',
+    },
+    {
+      id: 'ch4-007-ex3',
+      title: 'Lone Function: ∫ln(x) dx',
+      problem: '\\text{Find } \\int \\ln x\\,dx.',
+      steps: [
+        { expression: '\\text{Let } u = \\ln x, \\quad dv = dx', annotation: 'Pair ln x with dv = dx. LIATE: logarithmic has highest priority.' },
+        { expression: 'du = \\frac{1}{x}\\,dx, \\quad v = x', annotation: 'Differentiate u, integrate dv.' },
+        { expression: '\\int \\ln x\\,dx = x\\ln x - \\int x \\cdot \\frac{1}{x}\\,dx', annotation: 'Apply the formula: uv − ∫v du.' },
+        { expression: '= x\\ln x - \\int 1\\,dx = x\\ln x - x + C', annotation: 'The integral simplifies to ∫1 dx = x.' },
+        { expression: '\\text{Verify: } \\frac{d}{dx}[x\\ln x - x] = \\ln x + 1 - 1 = \\ln x \\checkmark', annotation: 'Product rule on x ln x gives ln x + 1. Subtract 1. ✓' },
+      ],
+      conclusion: '∫ln x dx = x ln x − x + C. The "trick" is writing ∫ln x dx as ∫1·ln x dx and choosing u = ln x.',
+    },
+    {
+      id: 'ch4-007-ex4',
+      title: 'Cycling: ∫eˣ·sin(x) dx',
+      problem: '\\text{Find } \\int e^x\\sin x\\,dx.',
+      steps: [
+        { expression: '\\text{Let } I = \\int e^x\\sin x\\,dx. \\text{ Round 1: } u = \\sin x,\\; dv = e^x\\,dx', annotation: 'Either choice of u works for cycling. We pick u = sin x.' },
+        { expression: 'I = e^x\\sin x - \\int e^x\\cos x\\,dx', annotation: 'du = cos x dx, v = eˣ. Apply formula.' },
+        { expression: '\\text{Round 2: } u = \\cos x,\\; dv = e^x\\,dx \\Rightarrow du = -\\sin x\\,dx,\\; v = e^x', annotation: 'Apply by-parts to ∫eˣ cos x dx.' },
+        { expression: '\\int e^x\\cos x\\,dx = e^x\\cos x - \\int e^x(-\\sin x)\\,dx = e^x\\cos x + I', annotation: 'The original integral I reappears!' },
+        { expression: 'I = e^x\\sin x - (e^x\\cos x + I) = e^x\\sin x - e^x\\cos x - I', annotation: 'Substitute back into the Round 1 result.' },
+        { expression: '2I = e^x(\\sin x - \\cos x) \\Rightarrow I = \\frac{e^x(\\sin x - \\cos x)}{2} + C', annotation: 'Add I to both sides and divide by 2.' },
+      ],
+      conclusion: '∫eˣ sin x dx = eˣ(sin x − cos x)/2 + C. The cycling trick: apply by-parts twice, then solve algebraically for the original integral.',
+    },
+    {
+      id: 'ch4-007-ex5',
+      title: 'Inverse Trig: ∫arctan(x) dx',
+      problem: '\\text{Find } \\int \\arctan x\\,dx.',
+      steps: [
+        { expression: '\\text{Let } u = \\arctan x, \\quad dv = dx', annotation: 'LIATE: inverse trig (I) has high priority. Pair with dv = dx.' },
+        { expression: 'du = \\frac{1}{1+x^2}\\,dx, \\quad v = x', annotation: 'Differentiate and integrate.' },
+        { expression: '\\int \\arctan x\\,dx = x\\arctan x - \\int \\frac{x}{1+x^2}\\,dx', annotation: 'Apply the formula.' },
+        { expression: '\\text{For } \\int \\frac{x}{1+x^2}\\,dx: \\text{ let } w = 1+x^2,\\; dw = 2x\\,dx', annotation: 'The remaining integral is a u-sub problem.' },
+        { expression: '\\int \\frac{x}{1+x^2}\\,dx = \\frac{1}{2}\\ln|1+x^2| + C = \\frac{1}{2}\\ln(1+x^2) + C', annotation: '1+x² > 0 always, so absolute value is unnecessary.' },
+        { expression: '\\int \\arctan x\\,dx = x\\arctan x - \\frac{1}{2}\\ln(1+x^2) + C', annotation: 'Combine the results.' },
+      ],
+      conclusion: '∫arctan x dx = x arctan x − (1/2)ln(1+x²) + C. By-parts + u-sub working together — a common combination.',
+    },
+  ],
+
+  challenges: [
+    {
+      id: 'ch4-007-ch1',
+      difficulty: 'easy',
+      problem: 'Find ∫x·cos x dx and ∫x·e^(−x) dx.',
+      hint: 'For both: u = x (algebraic), dv = the other factor. One round of by-parts each.',
+      walkthrough: [
+        { expression: '\\int x\\cos x\\,dx: u=x, dv=\\cos x\\,dx. \\; = x\\sin x - \\int \\sin x\\,dx = x\\sin x + \\cos x + C', annotation: 'du = dx, v = sin x. ∫sin x dx = −cos x.' },
+        { expression: '\\int xe^{-x}dx: u=x, dv=e^{-x}dx. \\; = -xe^{-x} - \\int -e^{-x}dx = -xe^{-x} - e^{-x} + C = -e^{-x}(x+1)+C', annotation: 'du = dx, v = −e^(−x). ∫−e^(−x) dx = e^(−x)... wait: ∫e^(−x) dx = −e^(−x). So −∫−e^(−x) dx = −e^(−x).' },
+      ],
+      answer: '\\int x\\cos x\\,dx = x\\sin x + \\cos x + C; \\quad \\int xe^{-x}dx = -e^{-x}(x+1)+C',
+    },
+    {
+      id: 'ch4-007-ch2',
+      difficulty: 'medium',
+      problem: 'Use the tabular method to find ∫x³·eˣ dx.',
+      hint: 'Derivatives of x³: x³, 3x², 6x, 6, 0. Antiderivatives of eˣ: eˣ, eˣ, eˣ, eˣ, eˣ. Alternate signs +, −, +, −.',
+      walkthrough: [
+        { expression: '\\text{Derivatives: } x^3,\\; 3x^2,\\; 6x,\\; 6,\\; 0', annotation: 'Differentiate x³ until you reach 0.' },
+        { expression: '\\text{Antiderivatives: } e^x,\\; e^x,\\; e^x,\\; e^x', annotation: 'Integrate eˣ repeatedly (it stays eˣ).' },
+        { expression: '\\text{Signs: } +,\\; -,\\; +,\\; -', annotation: 'Alternate starting with +.' },
+        { expression: '= (+)(x^3)(e^x) + (-)(3x^2)(e^x) + (+)(6x)(e^x) + (-)(6)(e^x) + C', annotation: 'Multiply each derivative by the antiderivative one row below, with alternating sign.' },
+        { expression: '= e^x(x^3 - 3x^2 + 6x - 6) + C', annotation: 'Factor out eˣ.' },
+      ],
+      answer: 'e^x(x^3-3x^2+6x-6)+C',
+    },
+    {
+      id: 'ch4-007-ch3',
+      difficulty: 'hard',
+      problem: 'Derive the reduction formula: ∫sin^n(x) dx = −(1/n)sin^(n−1)(x)cos(x) + (n−1)/n · ∫sin^(n−2)(x) dx. Then use it to compute ∫sin⁴(x) dx.',
+      hint: 'Write sin^n x = sin^(n−1) x · sin x. Let u = sin^(n−1) x, dv = sin x dx. Use cos²x = 1 − sin²x to handle the resulting integral.',
+      walkthrough: [
+        { expression: 'u = \\sin^{n-1}x,\\; dv = \\sin x\\,dx \\Rightarrow du = (n-1)\\sin^{n-2}x\\cos x\\,dx,\\; v = -\\cos x', annotation: 'Set up by-parts.' },
+        { expression: '\\int \\sin^n x\\,dx = -\\sin^{n-1}x\\cos x + (n-1)\\int \\sin^{n-2}x\\cos^2 x\\,dx', annotation: 'Apply formula. Note the cos²x factor.' },
+        { expression: '= -\\sin^{n-1}x\\cos x + (n-1)\\int \\sin^{n-2}x(1-\\sin^2 x)\\,dx', annotation: 'Replace cos²x = 1 − sin²x.' },
+        { expression: '= -\\sin^{n-1}x\\cos x + (n-1)\\int \\sin^{n-2}x\\,dx - (n-1)\\int \\sin^n x\\,dx', annotation: 'Distribute. The last term contains the original integral!' },
+        { expression: 'n\\int \\sin^n x\\,dx = -\\sin^{n-1}x\\cos x + (n-1)\\int \\sin^{n-2}x\\,dx', annotation: 'Move the sin^n integral to the left: 1 + (n−1) = n.' },
+        { expression: '\\int \\sin^4 x\\,dx = -\\frac{1}{4}\\sin^3 x\\cos x + \\frac{3}{4}\\int \\sin^2 x\\,dx', annotation: 'Apply with n=4.' },
+        { expression: '\\int \\sin^2 x\\,dx = -\\frac{1}{2}\\sin x\\cos x + \\frac{1}{2}x + C = \\frac{x}{2} - \\frac{\\sin 2x}{4} + C', annotation: 'Apply with n=2 (or use half-angle identity).' },
+        { expression: '\\int \\sin^4 x\\,dx = -\\frac{1}{4}\\sin^3 x\\cos x + \\frac{3}{8}x - \\frac{3}{16}\\sin 2x + C', annotation: 'Substitute back.' },
+      ],
+      answer: '\\int \\sin^4 x\\,dx = \\frac{3x}{8} - \\frac{\\sin 2x}{4} + \\frac{\\sin 4x}{32} + C',
+    },
+  ],
+
+  crossRefs: [
+    { lessonSlug: 'u-substitution', label: 'U-Substitution', context: 'When u-sub fails (no inner derivative present), by-parts is the next technique. Many problems combine both methods.' },
+    { lessonSlug: 'trig-integrals', label: 'Trig Integrals', context: 'Reduction formulas derived by parts are the foundation of trig integral techniques in Lesson 8.' },
+    { lessonSlug: 'indefinite-integrals', label: 'Indefinite Integrals', context: 'By-parts extends the basic antiderivative table to products of functions.' },
+    { lessonSlug: 'chain-rule', label: 'The Chain Rule', context: 'The product rule gives by-parts; the chain rule gives u-sub. Together they handle most integrals.' },
+  ],
+
+  checkpoints: [
+    'read-intuition',
+    'read-math',
+    'read-rigor',
+    'completed-example-1',
+    'completed-example-2',
+    'completed-example-3',
+    'completed-example-4',
+    'completed-example-5',
+    'attempted-challenge-easy',
+    'attempted-challenge-medium',
+    'attempted-challenge-hard',
+  ],
+
+  quiz: [
+    {
+      id: 'ibp-q1',
+      type: 'choice',
+      text: 'Integration by parts states \\(\\int u\\,dv = uv - \\int v\\,du\\). To apply it to \\(\\int x\\,e^x\\,dx\\), using LIATE, you should choose:',
+      options: ['\\(u = e^x,\\; dv = x\\,dx\\)', '\\(u = x,\\; dv = e^x\\,dx\\)', '\\(u = x\\,e^x,\\; dv = dx\\)', '\\(u = 1,\\; dv = x\\,e^x\\,dx\\)'],
+      answer: '\\(u = x,\\; dv = e^x\\,dx\\)',
+      hints: ['LIATE: Logarithm, Inverse trig, Algebraic, Trig, Exponential. Choose \\(u\\) from earlier in the list.', 'Algebraic (x) comes before Exponential (e^x), so u = x.'],
+      reviewSection: 'Math — LIATE rule',
+    },
+    {
+      id: 'ibp-q2',
+      type: 'input',
+      text: 'Evaluate \\(\\int x\\,e^x\\,dx\\) using parts with \\(u=x\\), \\(dv=e^x\\,dx\\) (omit \\(+C\\)).',
+      answer: 'x*e^x - e^x',
+      hints: ['\\(du = dx\\), \\(v = e^x\\).', '\\(\\int x\\,e^x\\,dx = x\\,e^x - \\int e^x\\,dx = x\\,e^x - e^x\\).'],
+      reviewSection: 'Math — Integration by parts',
+    },
+    {
+      id: 'ibp-q3',
+      type: 'input',
+      text: 'Evaluate \\(\\int x\\cos(x)\\,dx\\) using parts with \\(u=x\\), \\(dv=\\cos(x)\\,dx\\) (omit \\(+C\\)).',
+      answer: 'x*sin(x) + cos(x)',
+      hints: ['\\(du = dx\\), \\(v = \\sin(x)\\).', '\\(= x\\sin(x) - \\int \\sin(x)\\,dx = x\\sin(x) + \\cos(x)\\).'],
+      reviewSection: 'Math — Integration by parts (trig)',
+    },
+    {
+      id: 'ibp-q4',
+      type: 'input',
+      text: 'Evaluate \\(\\int \\ln(x)\\,dx\\) using parts with \\(u = \\ln(x)\\), \\(dv = dx\\) (omit \\(+C\\)).',
+      answer: 'x*log(x) - x',
+      hints: ['\\(du = \\frac{1}{x}\\,dx\\), \\(v = x\\).', '\\(= x\\ln(x) - \\int x \\cdot \\frac{1}{x}\\,dx = x\\ln(x) - x\\).'],
+      reviewSection: 'Math — Integration by parts (ln)',
+    },
+    {
+      id: 'ibp-q5',
+      type: 'input',
+      text: 'Evaluate \\(\\int_0^1 x\\,e^x\\,dx\\) using the result \\(x\\,e^x - e^x\\).',
+      answer: '1',
+      hints: ['\\([x\\,e^x - e^x]_0^1 = (e - e) - (0 - 1) = 0 - (-1) = 1\\).'],
+      reviewSection: 'Math — Definite integral by parts',
+    },
+    {
+      id: 'ibp-q6',
+      type: 'input',
+      text: 'Evaluate \\(\\int x\\,\\sin(x)\\,dx\\) using parts with \\(u=x\\), \\(dv=\\sin(x)\\,dx\\) (omit \\(+C\\)).',
+      answer: '-x*cos(x) + sin(x)',
+      hints: ['\\(v = -\\cos(x)\\).', '\\(= -x\\cos(x) - \\int(-\\cos x)\\,dx = -x\\cos(x) + \\sin(x)\\).'],
+      reviewSection: 'Math — Integration by parts',
+    },
+    {
+      id: 'ibp-q7',
+      type: 'choice',
+      text: 'LIATE is a mnemonic for choosing \\(u\\) in integration by parts. What does the "L" stand for?',
+      options: ['Limit', 'Logarithm', 'Linear', 'Laplace'],
+      answer: 'Logarithm',
+      hints: ['LIATE = Logarithm, Inverse trig, Algebraic, Trig, Exponential.'],
+      reviewSection: 'Math — LIATE rule',
+    },
+    {
+      id: 'ibp-q8',
+      type: 'input',
+      text: 'Evaluate \\(\\int x^2\\,e^x\\,dx\\) by applying integration by parts twice (omit \\(+C\\)).',
+      answer: 'x^2*e^x - 2*x*e^x + 2*e^x',
+      hints: ['First: \\(u=x^2\\), \\(dv=e^x\\,dx\\) gives \\(x^2 e^x - 2\\int x\\,e^x\\,dx\\).', 'Then use the result \\(\\int x\\,e^x\\,dx = x\\,e^x - e^x\\).'],
+      reviewSection: 'Math — Integration by parts applied twice',
+    },
+    {
+      id: 'ibp-q9',
+      type: 'input',
+      text: 'Evaluate \\(\\int_1^e \\ln(x)\\,dx\\) using the antiderivative \\(x\\ln(x)-x\\).',
+      answer: '1',
+      hints: ['\\([x\\ln x - x]_1^e = (e\\cdot 1 - e) - (1\\cdot 0 - 1) = 0 - (-1) = 1\\).'],
+      reviewSection: 'Math — Definite integral of ln(x)',
+    },
+    {
+      id: 'ibp-q10',
+      type: 'input',
+      text: 'Evaluate \\(\\int x^2 \\sin(x)\\,dx\\) by parts (two applications). Choose \\(u = x^2\\) first, then \\(u = 2x\\) (omit \\(+C\\)).',
+      answer: '-x^2*cos(x) + 2*x*sin(x) + 2*cos(x)',
+      hints: ['First application: \\(u=x^2\\), \\(dv=\\sin x\\,dx\\) → \\(-x^2\\cos x + 2\\int x\\cos x\\,dx\\).', 'Second: \\(\\int x\\cos x\\,dx = x\\sin x + \\cos x\\) (from an earlier problem).'],
+      reviewSection: 'Math — Integration by parts (second application)',
+    },
+  ],
+}

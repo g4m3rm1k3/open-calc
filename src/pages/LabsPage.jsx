@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { FlaskConical, Sparkles } from 'lucide-react'
 import LabWorkbenchBackground from '../components/labs/LabWorkbenchBackground.jsx'
-import LabCard from '../components/cards/LabCard.jsx'
+import AppCard from '../components/cards/AppCard.jsx'
 import { LABS } from '../data/labs.js'
 
 export default function LabsPage() {
@@ -35,7 +35,7 @@ export default function LabsPage() {
 
         <div className="grid grid-cols-1 gap-4 pb-16 sm:grid-cols-2 lg:grid-cols-3">
           {LABS.map(lab => (
-            <LabCard key={lab.key} item={lab} />
+            <AppCard key={lab.key} item={lab} variant="lab" />
           ))}
         </div>
       </div>

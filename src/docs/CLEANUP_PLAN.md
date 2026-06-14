@@ -157,21 +157,26 @@ export default {
 | proofs | ? | 7 | audit | no index.js, unregistered |
 | cpp-3/4 | ? | 20 | audit | unregistered |
 | math-1 | ? | 1 | audit | unregistered |
-| ocean-1 | ? | 3 | audit | unregistered |
+| sim-4 (was ocean-1) | 2 | 3 | **done** | migrated to lessons/sim-4/1-sim-4/ |
 
 ---
 
 ## Migration Order (one course at a time, fully done before next)
 
 **Phase 1 — Fix the foundation**
+- [x] Finalise unified schema (LESSON_EXAMPLE.md)
+- [x] Write Family B migration script (scripts/migrate-family-b.mjs)
+- [x] Fix autoLoader to read `mod?.lesson` named exports (autoLoader.js line 50)
+- [x] Wire autoLoader into content/index.js → CURRICULUM spread
+- [x] Build SectionRenderer component (src/components/lesson/SectionRenderer.jsx)
+- [x] Wire SectionRenderer into LessonPage.jsx (`lesson.sections` branch)
 - [ ] Update scanner to recognise System 3 courses (no false orphan warnings)
-- [ ] Finalise unified schema (get user sign-off)
-- [ ] Write migration script template
-- [ ] Audit `git-0` and `cli-0` — do they match the schema?
+- [ ] Audit `git-0` and `cli-0` — they're in src/content/, NOT src/content/lessons/, still old format
 
 **Phase 2 — Migrate small courses first (build confidence)**
+- [x] `sim-4` (3 files, was ocean-1) → src/content/lessons/sim-4/1-sim-4/
 - [ ] `math-1` (1 file)
-- [ ] `ocean-1` (3 files)
+- [ ] `proofs` (7 files)
 - [ ] `discrete-math`
 - [ ] `applied-statistics`
 

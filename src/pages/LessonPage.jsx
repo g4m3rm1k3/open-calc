@@ -1,7 +1,10 @@
 import { useParams, Link } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { LESSON_MAP, ALL_LESSONS, CURRICULUM } from "../content/index.js";
+import { loadLesson, getAllChapters } from "../courses/courseLoader.js";
 import { useProgress } from "../hooks/useProgress.js";
+
+const ALL_COURSE_CHAPTERS = getAllChapters()
 import MicroCycleLesson from "../components/lesson/MicroCycleLesson.jsx";
 import MobileLessonContent from "../components/lesson/MobileLessonContent.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
@@ -21,9 +24,26 @@ export default function LessonPage() {
   const slug = lessonSlug + (rest ? `/${rest}` : "");
   const key = `${chapterId}/${slug}`;
   const rawLesson = LESSON_MAP[key];
+
+  // For lessons not in the old LESSON_MAP, load dynamically from courseLoader
+  const [courseLesson, setCourseLesson] = useState(null)
+  const [loadingCourse, setLoadingCourse] = useState(!rawLesson)
+  useEffect(() => {
+    if (rawLesson) { setLoadingCourse(false); return }
+    let cancelled = false
+    setLoadingCourse(true)
+    setCourseLesson(null)
+    loadLesson(chapterId, lessonSlug).then(l => {
+      if (!cancelled) { setCourseLesson(l); setLoadingCourse(false) }
+    }).catch(() => { if (!cancelled) setLoadingCourse(false) })
+    return () => { cancelled = true }
+  }, [chapterId, lessonSlug, rawLesson])
+
+  const builtInLesson = rawLesson ?? courseLesson
+
   const { lessonSource, lessonOverride, isLoadingOverride } = useOptionalLesson(
     key,
-    rawLesson,
+    builtInLesson,
   );
   const lesson = useMemo(
     () =>
@@ -79,6 +99,14 @@ export default function LessonPage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lesson?.id, setReadingProgress]);
 
+  if (!lesson && loadingCourse) {
+    return (
+      <div className="py-20 text-center text-slate-400 dark:text-slate-500 text-sm">
+        Loading lesson…
+      </div>
+    )
+  }
+
   if (!lesson) {
     return (
       <div className="py-20 text-center">
@@ -117,9 +145,8 @@ export default function LessonPage() {
       </div>
 
       {(() => {
-        const chapter = CURRICULUM.find(
-          (entry) => String(entry.number) === chapterId,
-        );
+        const chapter = CURRICULUM.find((entry) => String(entry.number) === chapterId)
+          ?? ALL_COURSE_CHAPTERS.find((ch) => String(ch.number) === chapterId);
         return (
           <nav className="mb-6 px-3 md:px-0 flex flex-wrap items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
             <Link
@@ -158,9 +185,8 @@ export default function LessonPage() {
         <div className="oc-header-gradient px-3 py-10 sm:px-12 sm:py-14">
           <div className="mb-3 flex flex-wrap items-center gap-2">
             {(() => {
-              const chapter = CURRICULUM.find(
-                (entry) => String(entry.number) === chapterId,
-              );
+              const chapter = CURRICULUM.find((entry) => String(entry.number) === chapterId)
+                ?? ALL_COURSE_CHAPTERS.find((ch) => String(ch.number) === chapterId);
               return (
                 <>
                   <span className="rounded-full bg-brand-600 px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-white shadow-lg shadow-brand-500/30">

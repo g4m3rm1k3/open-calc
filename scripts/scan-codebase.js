@@ -320,7 +320,10 @@ const output = {
   data,
 };
 
-fs.writeFileSync(OUT, JSON.stringify(output, null, 2));
+const json = JSON.stringify(output, null, 2);
+fs.writeFileSync(OUT, json);
+// Also copy into src/ so Vite can import it at /dev/map
+fs.writeFileSync(path.join(SRC, "codebase-map.json"), json);
 
 console.log(`\nDone → codebase-map.json`);
 console.log(`  Pages:              ${summary.totalPages} (${summary.unroutedPages} unrouted)`);

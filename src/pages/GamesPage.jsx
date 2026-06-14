@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { Gamepad2, Sparkles } from 'lucide-react'
 import ArcadeMazeBackground from '../components/games/ArcadeMazeBackground.jsx'
-import GameCard from '../components/cards/GameCard.jsx'
+import AppCard from '../components/cards/AppCard.jsx'
 import { GAMES } from '../data/games.js'
 
 export default function GamesPage() {
@@ -38,7 +38,7 @@ export default function GamesPage() {
 
         <div className="grid grid-cols-1 gap-4 pb-16 sm:grid-cols-2 lg:grid-cols-3">
           {GAMES.map(g => (
-            <GameCard key={g.key} item={g} />
+            <AppCard key={g.key} item={g} variant="game" />
           ))}
         </div>
       </div>
