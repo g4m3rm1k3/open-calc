@@ -6,7 +6,7 @@ import { Search } from 'lucide-react';
 const vizReactModules = import.meta.glob('../components/viz/react/**/*.jsx');
 const vizD3Modules = import.meta.glob('../components/viz/d3/**/*.jsx');
 const vizGitModules = import.meta.glob('../components/viz/git/**/*.jsx');
-const vizCadModules = import.meta.glob('../components/viz/cad/**/*.jsx');
+const vizCadModules = import.meta.glob('../labs/cad-pro/cad/**/*.jsx');
 
 const allModules = {
   ...vizReactModules,

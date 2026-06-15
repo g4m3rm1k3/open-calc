@@ -4,20 +4,21 @@ import { useLocation } from "react-router-dom";
 import { usePins } from "../../context/PinsContext.jsx";
 
 const VIZ_REGISTRY = {
-  MiniGolfGame: lazy(() => import("./react/MiniGolfGame.jsx")),
+  MiniGolfGame: lazy(() => import("../../games/golf/MiniGolfGame.jsx")),
   VideoEmbed: lazy(() => import("./react/VideoEmbed.jsx")),
-  CNCLab: lazy(() => import("./cnc/CNCLab.jsx")),
-  ErrorAccumulationLab: lazy(() => import("./cnc/ErrorAccumulationLab.jsx")),
-  CNCBackplot: lazy(() => import("./cnc/CNCBackplot.jsx")),
-  CNCMacroLab: lazy(() => import("./cnc/CNCMacroLab.jsx")),
-  GcodeNotebook: lazy(() => import("./cnc/GcodeNotebook.jsx")),  CNCAxesExplorer: lazy(() => import("./cnc/CNCAxesExplorer.jsx")),
-  CNCChainDiagram: lazy(() => import("./cnc/CNCChainDiagram.jsx")),
-  CNCClosedLoopSim: lazy(() => import("./cnc/CNCClosedLoopSim.jsx")),
-  CNCDialectTable: lazy(() => import("./cnc/CNCDialectTable.jsx")),
-  CNCHistoryTimeline: lazy(() => import("./cnc/CNCHistoryTimeline.jsx")),
-  CNCMachineTypes: lazy(() => import("./cnc/CNCMachineTypes.jsx")),
+  CNCLab: lazy(() => import("../../labs/cnc-sim/cnc/CNCLab.jsx")),
+  ErrorAccumulationLab: lazy(() => import("../../labs/cnc-sim/cnc/ErrorAccumulationLab.jsx")),
+  CNCBackplot: lazy(() => import("../../labs/cnc-sim/cnc/CNCBackplot.jsx")),
+  CNCMacroLab: lazy(() => import("../../labs/cnc-sim/cnc/CNCMacroLab.jsx")),
+  GcodeNotebook: lazy(() => import("../../labs/cnc-sim/cnc/GcodeNotebook.jsx")),
+  CNCAxesExplorer: lazy(() => import("../../labs/cnc-sim/cnc/CNCAxesExplorer.jsx")),
+  CNCChainDiagram: lazy(() => import("../../labs/cnc-sim/cnc/CNCChainDiagram.jsx")),
+  CNCClosedLoopSim: lazy(() => import("../../labs/cnc-sim/cnc/CNCClosedLoopSim.jsx")),
+  CNCDialectTable: lazy(() => import("../../labs/cnc-sim/cnc/CNCDialectTable.jsx")),
+  CNCHistoryTimeline: lazy(() => import("../../labs/cnc-sim/cnc/CNCHistoryTimeline.jsx")),
+  CNCMachineTypes: lazy(() => import("../../labs/cnc-sim/cnc/CNCMachineTypes.jsx")),
   LinearInterpolationViz: lazy(
-    () => import("./cnc/LinearInterpolationViz.jsx"),
+    () => import("../../labs/cnc-sim/cnc/LinearInterpolationViz.jsx"),
   ),
   GitLab: lazy(() => import("./git/GitLab.jsx")),
   GitWorkspace: lazy(() => import("./git/GitWorkspace.jsx")),
@@ -30,9 +31,9 @@ const VIZ_REGISTRY = {
   ACWaveformViz: lazy(() => import("./elec/ACWaveformViz.jsx")),
   RelayLadderSim: lazy(() => import("./elec/RelayLadderSim.jsx")),
   LogicGateLab: lazy(() => import("./logic/LogicGateLab.jsx")),
-  PLCLadderSim: lazy(() => import("./plc/PLCLadderSim.jsx")),
-  PLCScanCycleViz: lazy(() => import("./plc/PLCScanCycleViz.jsx")),
-  PLCHardwareViz: lazy(() => import("./plc/PLCHardwareViz.jsx")),
+  PLCLadderSim: lazy(() => import("../../labs/plc-lab/plc/PLCLadderSim.jsx")),
+  PLCScanCycleViz: lazy(() => import("../../labs/plc-lab/plc/PLCScanCycleViz.jsx")),
+  PLCHardwareViz: lazy(() => import("../../labs/plc-lab/plc/PLCHardwareViz.jsx")),
   OhmViz: lazy(() => import("./ee/OhmViz.jsx")),
   DCCircuitViz: lazy(() => import("./ee/DCCircuitViz.jsx")),
   RelayContactorViz: lazy(() => import("./ee/RelayContactorViz.jsx")),
@@ -202,7 +203,7 @@ const VIZ_REGISTRY = {
   InclinedPlaneSim: lazy(() => import("./matter/InclinedPlaneSim.jsx")),
   AtwoodMachineSim: lazy(() => import("./matter/AtwoodMachineSim.jsx")),
   // Football Calculus Game — Integration, Optimization, Related Rates
-  FootballCalculus: lazy(() => import("./react/FootballCalculus.jsx")),
+  FootballCalculus: lazy(() => import("../../games/football/FootballCalculus.jsx")),
   // Chapter 3 — Applications of Derivatives
   NewtonsMethod: lazy(() => import("./d3/NewtonsMethod.jsx")),
   SpringOscillation: lazy(() => import("./d3/SpringOscillation.jsx")),
@@ -461,7 +462,7 @@ const VIZ_REGISTRY = {
     () => import("./react/DiscreteDependencyMap.jsx"),
   ),
   ModClockViz: lazy(() => import("./react/ModClockViz.jsx")),
-  CardDiceLab: lazy(() => import("./react/CardDiceLab.jsx")),
+  CardDiceLab: lazy(() => import("../../labs/odds-lab/CardDiceLab.jsx")),
   GraphTraversalGame: lazy(() => import("./react/GraphTraversalGame.jsx")),
   DFAChallengeGame: lazy(() => import("./react/DFAChallengeGame.jsx")),
   RecurrenceExplorer: lazy(() => import("./d3/RecurrenceExplorer.jsx")),
@@ -1099,11 +1100,11 @@ const VIZ_REGISTRY = {
   SVGDiagram: lazy(() => import("./SVGDiagram.jsx")),
 
   // ─── Computer Science ─────────────────────────────────────────────────────
-  LogicSim: lazy(() => import("./react/LogicSim.jsx")),
+  LogicSim: lazy(() => import("../../labs/logic-sim/LogicSim.jsx")),
 
   // ─── Chemistry ────────────────────────────────────────────────────────────
-  PeriodicTable: lazy(() => import("./react/PeriodicTable.jsx")),
-  MoleculeBuilder: lazy(() => import("./react/MoleculeBuilder.jsx")),
+  PeriodicTable: lazy(() => import("../../labs/chemistry/PeriodicTable.jsx")),
+  MoleculeBuilder: lazy(() => import("../../labs/chemistry/MoleculeBuilder.jsx")),
 
   // ─── Physics Chapter 3: Forces & Newton's Laws ───────────────────────────
   FBDIntuition: lazy(() => import("./react/FBDIntuition.jsx")),

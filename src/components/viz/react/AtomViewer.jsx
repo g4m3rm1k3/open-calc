@@ -8,7 +8,7 @@
 
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
-import { CATEGORY_COLORS } from './chemistry_data'
+import { CATEGORY_COLORS } from '../../../labs/chemistry/chemistry_data'
 
 export default function AtomViewer({ element, height = 380 }) {
   const mountRef = useRef(null)

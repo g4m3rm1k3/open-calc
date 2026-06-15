@@ -6,7 +6,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Editor from "@monaco-editor/react";
 import { create, all, format as mathFormat } from "mathjs";
-import { runOpenMatScript } from "../../../utils/openmatEngine.js"; // ← single source of truth
+import { runOpenMatScript } from "../../../engines/openmat/openmatEngine.js";
 import FigureRenderer from "./FigureRenderer";
 import { parseProse } from "../../math/parseProse.jsx";
 import { setupOpenCalcMonaco } from "../../../utils/monacoThemes.js";

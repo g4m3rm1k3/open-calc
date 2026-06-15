@@ -61,16 +61,16 @@ import { useChat } from "../../hooks/useChat.js";
 import ChatPanel from "../chat/ChatPanel.jsx";
 import { motion, AnimatePresence } from "framer-motion";
 import { useVideoPlayer } from "../../hooks/useVideoPlayer.js";
-import PhysicsPoolLab from "../tools/PhysicsPoolLab.jsx";
-import BasketballLab from "../tools/BasketballLab.jsx";
-import MiniGolfGame from "../tools/MiniGolfGame.jsx";
-import FootballCalculus from "../viz/react/FootballCalculus.jsx";
-import ChemistryPage from "../../pages/ChemistryPage.jsx";
-import PhysicsPage from "../../pages/PhysicsPage.jsx";
+import PhysicsPoolLab from "../../games/pool/PhysicsPoolLab.jsx";
+import BasketballLab from "../../games/basketball/BasketballLab.jsx";
+import MiniGolfGame from "../../games/golf/MiniGolfGame.jsx";
+import FootballCalculus from "../../games/football/FootballCalculus.jsx";
+import ChemistryPage from "../../labs/chemistry/ChemistryPage.jsx";
+import PhysicsPage from "../../labs/physics/PhysicsPage.jsx";
 import DynamicBackground from "../ui/DynamicBackground.jsx";
 import BackgroundPicker from "../ui/BackgroundPicker.jsx";
 import AlphaMascot from "../mascot/AlphaMascot.jsx";
-import GameRules from "../tools/GameRules.jsx";
+import GameRules from "../../games/GameRules.jsx";
 
 function MobileLocationBadge() {
   const { chapterId, lessonSlug } = useParams();

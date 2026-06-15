@@ -1,5 +1,5 @@
 import { getPyodide } from './pyodideRuntime.js'
-import { executeScript } from './openmatEngine.js'
+import { executeScript } from '../engines/openmat/openmatEngine.js'
 
 function fmtVal(v) {
   if (typeof v === 'string') return v

@@ -1,6 +1,6 @@
 import { Suspense, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import LessonPlayer from '../components/learn/LessonPlayer.jsx'
+import LessonPlayer from '../engines/lesson/LessonPlayer.jsx'
 import LoadingSpinner from '../components/ui/LoadingSpinner.jsx'
 
 // Lesson registry — add new lessons here

@@ -30,7 +30,7 @@ export default function Sidebar({ onNavigate, isPinned, togglePin, isCollapsed, 
   const activeCourseObj = ALL_COURSES.find(c => c.key === activeCourse)
 
   // Which panel to show
-  const isLabsArea  = path.startsWith('/labs')  || LABS.some(l => l.path && path === l.path)
+  const isLabsArea  = path.startsWith('/labs') || path.startsWith('/lab/') || LABS.some(l => l.path && path === l.path)
   const isGamesArea = path.startsWith('/games') || GAMES.some(g => g.path && path === g.path)
   const isCourseArea = path === '/' || path.startsWith('/course') || path.startsWith('/chapter')
   const showCourses  = isCourseArea && !activeCourse

@@ -1,6 +1,6 @@
 import Fuse from 'fuse.js'
 import { useState, useEffect, useMemo, useRef } from 'react'
-import { ALL_LESSONS } from '../content/index.js'
+import { getAllChapters } from '../courses/courseLoader.js'
 
 const QUERY_SYNONYMS = {
   'rate of change': ['derivative', 'slope', 'dy/dx'],
@@ -68,68 +68,68 @@ function expandQuery(rawQuery) {
   return Array.from(terms).join(' ')
 }
 
+const FUSE_KEYS = [
+  { name: 'title', weight: 4 },
+  { name: 'subtitle', weight: 2 },
+  { name: 'aliases', weight: 2 },
+  { name: 'tags', weight: 2 },
+  { name: 'assignment', weight: 2 },
+  { name: 'proofs', weight: 1.5 },
+  { name: 'applications', weight: 1.5 },
+  { name: 'content', weight: 1 },
+]
+
+const FUSE_OPTIONS = {
+  keys: FUSE_KEYS,
+  includeMatches: true,
+  threshold: 0.3,
+  minMatchCharLength: 2,
+  ignoreLocation: true,
+}
+
 export function useSearch() {
   const [query, setQuery] = useState('')
+  const [debouncedQuery, setDebouncedQuery] = useState('')
   const [isReady, setIsReady] = useState(false)
   const fuseRef = useRef(null)
-  const docsRef = useRef([])
+
+  // Debounce the search query — input stays responsive, Fuse only runs after pause
+  useEffect(() => {
+    const id = setTimeout(() => setDebouncedQuery(query), 200)
+    return () => clearTimeout(id)
+  }, [query])
 
   useEffect(() => {
     fetch(`${import.meta.env.BASE_URL}search-index.json`)
       .then((r) => r.json())
       .then((data) => {
-        docsRef.current = data.documents
-        fuseRef.current = new Fuse(data.documents, {
-          keys: [
-            { name: 'title', weight: 4 },
-            { name: 'subtitle', weight: 2 },
-            { name: 'aliases', weight: 2 },
-            { name: 'tags', weight: 2 },
-            { name: 'assignment', weight: 2 },
-            { name: 'proofs', weight: 1.5 },
-            { name: 'applications', weight: 1.5 },
-            { name: 'content', weight: 1 },
-          ],
-          includeMatches: true,
-          threshold: 0.3,
-          minMatchCharLength: 2,
-          ignoreLocation: true,
-        })
+        fuseRef.current = new Fuse(data.documents, FUSE_OPTIONS)
         setIsReady(true)
       })
       .catch(() => {
-        // Search index not yet built — fall back to an in-memory index from ALL_LESSONS
-        const fallbackDocs = ALL_LESSONS.map((l) => ({
-          id: l.id,
-          title: l.title ?? '',
-          subtitle: l.subtitle ?? '',
-          tags: l.tags ?? [],
-          slug: l.slug ?? '',
-          chapterNumber: l.chapterNumber ?? l.chapter,
-          aliases: l.aliases ?? [],
-          content: '',
-        }))
-        docsRef.current = fallbackDocs
-        fuseRef.current = new Fuse(fallbackDocs, {
-          keys: [
-            { name: 'title', weight: 4 },
-            { name: 'subtitle', weight: 2 },
-            { name: 'aliases', weight: 2 },
-            { name: 'tags', weight: 2 },
-          ],
-          includeMatches: true,
-          threshold: 0.3,
-          minMatchCharLength: 2,
-          ignoreLocation: true,
-        })
+        // In-memory fallback — courseLoader is the single source of truth
+        const docs = getAllChapters().flatMap((ch) =>
+          ch.lessons.map((l) => ({
+            id: `${ch.number}/${l.slug}`,
+            title: l.title ?? '',
+            subtitle: '',
+            tags: '',
+            slug: l.slug,
+            chapterNumber: ch.number,
+            aliases: '',
+            content: '',
+          }))
+        )
+
+        fuseRef.current = new Fuse(docs, FUSE_OPTIONS)
         setIsReady(true)
       })
   }, [])
 
   const results = useMemo(() => {
-    if (!fuseRef.current || query.length < 2) return []
-    return fuseRef.current.search(expandQuery(query)).slice(0, 15)
-  }, [query, isReady])
+    if (!fuseRef.current || debouncedQuery.length < 2) return []
+    return fuseRef.current.search(expandQuery(debouncedQuery)).slice(0, 15)
+  }, [debouncedQuery, isReady])
 
   return { query, setQuery, results, isReady }
 }

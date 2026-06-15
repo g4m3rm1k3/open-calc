@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { Gamepad2, Sparkles } from 'lucide-react'
-import ArcadeMazeBackground from '../components/games/ArcadeMazeBackground.jsx'
+import ArcadeMazeBackground from '../games/ArcadeMazeBackground.jsx'
 import AppCard from '../components/cards/AppCard.jsx'
 import { GAMES } from '../data/games.js'
 
