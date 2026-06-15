@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import VectorCommandGame from '../components/games/vector-command/VectorCommandGame.jsx';
+import VectorCommandGame from './VectorCommandGame.jsx';
 
 export default function VectorCommandPage() {
   useEffect(() => {

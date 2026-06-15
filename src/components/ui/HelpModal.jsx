@@ -1461,7 +1461,7 @@ export default LESSON_CHEM_1_0  // default export — for the chapter index`}</C
         </Para>
         <CodeBlock>{`// src/components/viz/react/WhyChemistry.jsx
 import ScienceNotebook from './ScienceNotebook.jsx'
-import { LESSON_CHEM_1_0 } from '../../../content/chemistry-1/lesson1-0.js'
+import { LESSON_CHEM_1_0 } from '../../../courses/chemistry/1-elements-atomic-structure/001-lesson1-0.js'
 
 export default function WhyChemistry({ params }) {
   return <ScienceNotebook lesson={LESSON_CHEM_1_0} params={params} />
