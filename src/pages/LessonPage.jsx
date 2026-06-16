@@ -66,8 +66,11 @@ export default function LessonPage() {
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
-    if (lesson?.id) setLessonId(lesson.id);
-  }, [lesson?.id, setLessonId]);
+    // key (chapterId/slug) is what ALL_LESSONS entries can actually be matched
+    // against — lesson.id is a legacy id baked into the lesson source file and
+    // has no relation to the courseLoader-derived tree used by the video panel.
+    if (key) setLessonId(key);
+  }, [key, setLessonId]);
 
   useEffect(() => {
     if (lesson) {

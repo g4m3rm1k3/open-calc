@@ -1,7 +1,7 @@
-import VIDEO_LIBRARY_RAW from '../../../reports/video-library-seed.json'
+import { getAllVideos } from '../../courses/courseLoader.js'
 
-// Filter out entries without a URL
-export const VIDEO_LIBRARY = VIDEO_LIBRARY_RAW.filter((v) => !!v.url)
+// Aggregated from every course's own videos.json (src/courses/<id>/videos.json)
+export const VIDEO_LIBRARY = getAllVideos().filter((v) => !!v.url)
 
 // O(1) lookup by video id
 export const VIDEO_MAP = Object.fromEntries(VIDEO_LIBRARY.map((v) => [v.id, v]))
@@ -34,11 +34,12 @@ export function selectVideosByKeywords({
   source = null,
   excludeSources = [],
   limit = 6,
+  pool: poolOverride = null,
 } = {}) {
   const k = normalize(Array.isArray(keywords) ? keywords.join(' ') : keywords)
   if (!k.length) return []
 
-  let pool = VIDEO_LIBRARY
+  let pool = poolOverride ?? VIDEO_LIBRARY
 
   if (source) {
     pool = pool.filter((v) => v.source === source)

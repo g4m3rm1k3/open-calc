@@ -2,6 +2,12 @@ import { useState, useCallback, useEffect } from "react";
 import { VideoPlayerContext } from "./videoPlayerContext.js";
 import { selectVideosByKeywords } from "../content/videos/videoSelector.js";
 import { ALL_LESSONS } from "../content/index.js";
+import { getVideos } from "../courses/courseLoader.js";
+
+function chapterNumOf(lesson) {
+  const m = String(lesson?.chapterNumber ?? "").match(/-(\d+)$/);
+  return m ? parseInt(m[1], 10) : null;
+}
 
 export function VideoPlayerProvider({ children }) {
   const [isOpen, setIsOpen] = useState(true);
@@ -99,12 +105,23 @@ export function VideoPlayerProvider({ children }) {
       return;
     }
 
-    const lesson = ALL_LESSONS.find((l) => l.id === lessonId);
+    const lesson = ALL_LESSONS.find((l) => `${l.chapterNumber}/${l.slug}` === lessonId);
+    const coursePool = lesson?.course ? getVideos(lesson.course) : [];
+
+    // Prefer a video that actually belongs to this chapter before falling
+    // back to fuzzy keyword search within the lesson's own course pool.
+    const chNum = chapterNumOf(lesson);
+    const fromChapter = chNum != null ? coursePool.find((v) => v.chapter === chNum) : null;
+    if (fromChapter) {
+      setCurrentVideo(fromChapter);
+      return;
+    }
+
     const tags = lesson?.tags ?? [];
-    const courseWords = (lesson?.course ?? '').replace(/-\d+$/, '').split('-').filter(Boolean);
+    const courseWords = (lesson?.course ?? '').split('-').filter(Boolean);
     const keywords = [...new Set([...tags, ...courseWords])];
-    if (keywords.length > 0) {
-      const matched = selectVideosByKeywords({ keywords, limit: 1 });
+    if (keywords.length > 0 && coursePool.length > 0) {
+      const matched = selectVideosByKeywords({ keywords, limit: 1, pool: coursePool });
       if (matched[0]) {
         setCurrentVideo(matched[0]);
         return;

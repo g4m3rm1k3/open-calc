@@ -23,6 +23,14 @@ import {
 import { useVideoPlayer } from "../../hooks/useVideoPlayer.js";
 import { selectVideosByKeywords, VIDEO_MAP, VIDEO_LIBRARY } from "../../content/videos/videoSelector.js";
 import { CURRICULUM, ALL_LESSONS } from "../../content/index.js";
+import { getVideos } from "../../courses/courseLoader.js";
+
+// lesson.chapterNumber is a composite key like "calculus-1" — pull the
+// trailing chapter number back out to compare against a video's `chapter`.
+function chapterNumOf(lesson) {
+  const m = String(lesson?.chapterNumber ?? "").match(/-(\d+)$/);
+  return m ? parseInt(m[1], 10) : null;
+}
 
 import { useNavigate } from "react-router-dom";
 
@@ -195,14 +203,28 @@ export default function FloatingVideoPlayer() {
     const categorized = {};
     if (custom.length > 0) categorized["Your Videos"] = custom;
 
-    const lesson = ALL_LESSONS.find((l) => l.id === id);
+    const lesson = ALL_LESSONS.find((l) => `${l.chapterNumber}/${l.slug}` === id);
+    const coursePool = lesson?.course ? getVideos(lesson.course) : [];
+
+    // Videos this exact chapter's source material was actually scraped
+    // from (or tag-matched into during migration) — shown first since
+    // they're the most relevant thing a learner could watch right now.
+    const chNum = chapterNumOf(lesson);
+    if (chNum != null) {
+      const fromChapter = coursePool.filter((v) => v.chapter === chNum);
+      if (fromChapter.length > 0) categorized["From this chapter"] = fromChapter;
+    }
+
+    // Fuzzy fallback, scoped to the lesson's own course pool — searching the
+    // full cross-course library let unrelated courses' videos outrank a
+    // lesson's own material just on incidental tag overlap.
     const tags = lesson?.tags ?? [];
-    // Derive subject keywords from the course slug (e.g. "python-1" → ["python"])
-    const courseWords = (lesson?.course ?? '').replace(/-\d+$/, '').split('-').filter(Boolean);
+    const courseWords = (lesson?.course ?? '').split('-').filter(Boolean);
     const keywords = [...new Set([...tags, ...courseWords])];
-    if (keywords.length > 0) {
-      const matched = selectVideosByKeywords({ keywords, limit: 20 });
-      if (matched.length > 0) categorized["Related"] = matched;
+    if (keywords.length > 0 && coursePool.length > 0) {
+      const matched = selectVideosByKeywords({ keywords, limit: 20, pool: coursePool });
+      const fresh = matched.filter((v) => !categorized["From this chapter"]?.includes(v));
+      if (fresh.length > 0) categorized["Related"] = fresh;
     }
 
     return Object.keys(categorized).length > 0 ? categorized : null;

@@ -1,0 +1,42 @@
+[
+  {
+    "id": "vid-874",
+    "title": "Exploring the Power of GitHub: Revolutionizing Collaboration",
+    "url": "https://www.youtube.com/embed/xbhQ2G7OWd4",
+    "source": "data-science-python",
+    "tags": [
+      "git",
+      "github",
+      "version-control"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-876",
+    "title": "How to Create a GitHub Account",
+    "url": "https://www.youtube.com/embed/h5cKAd94QNo",
+    "source": "data-science-python",
+    "tags": [
+      "git",
+      "github"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-904",
+    "title": "How to Undo a Pushed Commit in Git Using Visual Studio",
+    "url": "https://www.youtube.com/embed/H2vAgLmlkLs",
+    "source": "data-science-python",
+    "tags": [
+      "git",
+      "version-control"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  }
+]

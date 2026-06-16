@@ -1,0 +1,1221 @@
+[
+  {
+    "id": "discrete-intro",
+    "title": "Intro to Discrete Math - Welcome!",
+    "url": "https://www.youtube.com/embed/rdXw7Ps9vxc",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "set-intro",
+    "title": "Intro to Sets | Examples & Notation",
+    "url": "https://www.youtube.com/embed/B1v2-nGXNzs",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "02a"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "set-notation",
+    "title": "Set-Roster vs Set-Builder notation",
+    "url": "https://www.youtube.com/embed/aTlR03t1dTQ",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "02a"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "empty-set",
+    "title": "The Empty Set & Vacuous Truth",
+    "url": "https://www.youtube.com/embed/GqvX4Fi0jbM",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "02a"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "cartesian-product",
+    "title": "Cartesian Product of Two Sets A x B",
+    "url": "https://www.youtube.com/embed/ufjEv-5nmcA",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "02a"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "relations-intro",
+    "title": "Relations between two sets",
+    "url": "https://www.youtube.com/embed/0dzNlrNJYdc",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "function-intuition",
+    "title": "The intuitive idea of a function",
+    "url": "https://www.youtube.com/embed/G8qvOZ9DE3c",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "02a"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "function-formal",
+    "title": "Formal Definition of a Function",
+    "url": "https://www.youtube.com/embed/-a5FaFp87N4",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "02a"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "relation-is-function",
+    "title": "Example: Is this relation a function?",
+    "url": "https://www.youtube.com/embed/b_sxTCjruJE",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "02a"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "logic-statements",
+    "title": "Intro to Logical Statements",
+    "url": "https://www.youtube.com/embed/q2eyZZK-OIk",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "truth-tables-intro",
+    "title": "Intro to Truth Tables",
+    "url": "https://www.youtube.com/embed/7mulE-zramc",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "truth-table-ex",
+    "title": "Truth Table Example: ~p V ~q",
+    "url": "https://www.youtube.com/embed/LNSfM86I8is",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "logical-equivalence",
+    "title": "Logical Equivalence of Two Statements",
+    "url": "https://www.youtube.com/embed/U2zPxuj8mnI",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "tautology-contradiction",
+    "title": "Tautologies and Contradictions",
+    "url": "https://www.youtube.com/embed/Ji2vr-9duPI",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "demorgans-laws",
+    "title": "3 Ways to Show a Logical Equivalence",
+    "url": "https://www.youtube.com/embed/93CxSLi89Ok",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "conditional-statements",
+    "title": "Conditional Statements: if p then q",
+    "url": "https://www.youtube.com/embed/F3544ZyO-eU",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vacuously-true",
+    "title": "Vacuously True Statements",
+    "url": "https://www.youtube.com/embed/AQ0f4rsbsrQ",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "negating-conditional",
+    "title": "Negating a Conditional Statement",
+    "url": "https://www.youtube.com/embed/j7qVcc6X8g4",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "contrapositive-intro",
+    "title": "Contrapositive of a Conditional",
+    "url": "https://www.youtube.com/embed/h83bzYAfgrM",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "converse-inverse",
+    "title": "Converse and Inverse of a Conditional",
+    "url": "https://www.youtube.com/embed/BNhp6LXncI0",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "biconditional-intro",
+    "title": "Biconditional Statements | \"iff\"",
+    "url": "https://www.youtube.com/embed/oHijygNdx_8",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "modus-ponens-tollens",
+    "title": "Modus Ponens & Modus Tollens",
+    "url": "https://www.youtube.com/embed/NTSZMdGlo4g",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "01b"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "argument-forms",
+    "title": "Generalizations & Specialization",
+    "url": "https://www.youtube.com/embed/pHWaxuyfK2s",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "01b"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "argument-validity",
+    "title": "Analyzing an argument for validity",
+    "url": "https://www.youtube.com/embed/ON7yAw6W9VY",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "01b"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "predicates-truth-sets",
+    "title": "Predicates and their Truth Sets",
+    "url": "https://www.youtube.com/embed/9MPA_LUmmoo",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "01a"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "quantifiers-intro",
+    "title": "Universal and Existential Quantifiers",
+    "url": "https://www.youtube.com/embed/GJpezCUMOxA",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "01a"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "negating-quantifiers",
+    "title": "Negating Quantifiers",
+    "url": "https://www.youtube.com/embed/q1rKFGSiZE8",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "01a"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "multiple-quantifiers",
+    "title": "Multiple Quantifiers",
+    "url": "https://www.youtube.com/embed/jLVKV5LJjaw",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "01a"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "universal-conditionals",
+    "title": "Universal Conditionals",
+    "url": "https://www.youtube.com/embed/4XrfeNIGUKM",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "01a"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "necessary-sufficient",
+    "title": "Necessary and Sufficient Conditions",
+    "url": "https://www.youtube.com/embed/KCMGWRoPuMY",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "01a"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "even-odd-integers",
+    "title": "Formal Definitions: Even & Odd Integers",
+    "url": "https://www.youtube.com/embed/dlKcfGu-WpI",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "01b"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "prove-even-odd",
+    "title": "How to Prove: Even + Odd = Odd",
+    "url": "https://www.youtube.com/embed/L74bnJWdHDo",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "01b"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "prove-evens-product",
+    "title": "Proof: Product of two evens is even",
+    "url": "https://www.youtube.com/embed/oqTg3D_jZWo",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "01b"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "rational-numbers-proof",
+    "title": "Rational Numbers | Definition & Proof",
+    "url": "https://www.youtube.com/embed/JL2DXGFO8S8",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "01b"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "divisibility-transitive",
+    "title": "Proving divisibility is transitive",
+    "url": "https://www.youtube.com/embed/F78_7Lv-7vM",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "01b"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "counterexamples-implications",
+    "title": "Disproving with Counterexamples",
+    "url": "https://www.youtube.com/embed/TcfVpnRRAvk",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "01b"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "proof-by-cases",
+    "title": "Proof by Division Into Cases",
+    "url": "https://www.youtube.com/embed/2A-EaY78bwc",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "01b"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "proof-by-contradiction",
+    "title": "Proof by Contradiction Method",
+    "url": "https://www.youtube.com/embed/huGWXh4l1M0",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "01b"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "proof-by-contrapositive",
+    "title": "Proof by Contrapositive Method",
+    "url": "https://www.youtube.com/embed/0YqZIHFmVzg",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "01b"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "mod-arithmetic",
+    "title": "Quotient-Remainder & Modular Arithmetic",
+    "url": "https://www.youtube.com/embed/jCUOhbk1O_o",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "infinite-primes",
+    "title": "Proof: Infinitely many primes",
+    "url": "https://www.youtube.com/embed/inUkhh8-h-I",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "sequences-intro",
+    "title": "Introduction to sequences",
+    "url": "https://www.youtube.com/embed/VG9ft4_dK24",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "sequence-formal",
+    "title": "Formal definition of a sequence",
+    "url": "https://www.youtube.com/embed/3kezO88rEvE",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "sequence-sum-product",
+    "title": "Sum and product of finite sequences",
+    "url": "https://www.youtube.com/embed/q7jHR9ar1Fo",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "induction-intro",
+    "title": "Intro to Mathematical Induction",
+    "url": "https://www.youtube.com/embed/GdM_iA1Zek4",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "induction-inequality",
+    "title": "Induction Proofs: Inequalities",
+    "url": "https://www.youtube.com/embed/L5iCGi3dW-Y",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "strong-induction",
+    "title": "Strong Induction Intro",
+    "url": "https://www.youtube.com/embed/rfA0h9udl7E",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "recursive-sequences",
+    "title": "Recursive Sequences",
+    "url": "https://www.youtube.com/embed/0OcUAjOXmFc",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "fibonacci-sequence",
+    "title": "The Miraculous Fibonacci Sequence",
+    "url": "https://www.youtube.com/embed/qmm9GPhA1MY",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "subset-element-method",
+    "title": "Subset Proof: Element Method",
+    "url": "https://www.youtube.com/embed/3qzykhjtQzU",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "02a"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "set-equality-proof",
+    "title": "Set Equalities Proof",
+    "url": "https://www.youtube.com/embed/oSV4qwO_kNY",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "02a"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "set-union",
+    "title": "The union of two sets",
+    "url": "https://www.youtube.com/embed/EF3m9bSbtdI",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "02a"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "set-intersection",
+    "title": "The Intersection of Two Sets",
+    "url": "https://www.youtube.com/embed/zEvQTK17xzY",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "02a"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "set-complements",
+    "title": "Universes and Complements",
+    "url": "https://www.youtube.com/embed/G4NLidjwbEA",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "02a"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "subset-containment-proof",
+    "title": "Set Containment Proof w/ Modus Tollens",
+    "url": "https://www.youtube.com/embed/CKuV0WxNVUU",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "02a"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "power-sets",
+    "title": "Power Sets & Cardinality",
+    "url": "https://www.youtube.com/embed/-P1zMabaQi8",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "02a"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "inverse-relations",
+    "title": "Relations and their Inverses",
+    "url": "https://www.youtube.com/embed/cQiyDUiIcOQ",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "reflexive-symmetric-transitive",
+    "title": "Properties of Relations",
+    "url": "https://www.youtube.com/embed/q0xN_N7l_Kw",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "equivalence-relations",
+    "title": "Equivalence Relations",
+    "url": "https://www.youtube.com/embed/T6RUxvJR8i4",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "reflexivity-check",
+    "title": "Check EVERY spot for properties",
+    "url": "https://www.youtube.com/embed/TctNssYMXJE",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "probability-intro",
+    "title": "Introduction to probability",
+    "url": "https://www.youtube.com/embed/4wV9xGJXFjg",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "probability-examples",
+    "title": "Computing Probabilities Example",
+    "url": "https://www.youtube.com/embed/NBy1j5PZfjk",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "pin-code-probability",
+    "title": "4-digit pin code probability",
+    "url": "https://www.youtube.com/embed/RQPLqE2EQe4",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "triple-intersections",
+    "title": "Counting: Triple Intersections",
+    "url": "https://www.youtube.com/embed/41TcebW7-4c",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "permutations-intro",
+    "title": "Permutations: Rearranging Letters",
+    "url": "https://www.youtube.com/embed/a7X8N1h0yWg",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "summation-rule",
+    "title": "Summation Rule: Disjoint Unions",
+    "url": "https://www.youtube.com/embed/gLfpNYg9Hyk",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "inclusion-exclusion",
+    "title": "Inclusion-Exclusion Formula",
+    "url": "https://www.youtube.com/embed/U_kOuvs6zcw",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "combinations-formula",
+    "title": "Combinations Formula choosing r from n",
+    "url": "https://www.youtube.com/embed/6KYp4zjqT6s",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "mississippi-counting",
+    "title": "Counting the word MISSISSIPPI",
+    "url": "https://www.youtube.com/embed/je6xyt2UZCw",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "probability-walkthrough",
+    "title": "Counting and Probability Walkthrough",
+    "url": "https://www.youtube.com/embed/LtgT1cuUkP8",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "conditional-probability",
+    "title": "Intro to Conditional Probability",
+    "url": "https://www.youtube.com/embed/ibINrxJLvlM",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "conditional-prob-examples",
+    "title": "Two Conditional Prob Examples",
+    "url": "https://www.youtube.com/embed/OYT0AcuLXu8",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "probability-tables",
+    "title": "Conditional Probability With Tables",
+    "url": "https://www.youtube.com/embed/nz-ADHZrYxk",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "bayes-simple",
+    "title": "Bayes' Theorem - Simple Case",
+    "url": "https://www.youtube.com/embed/XQoLVl31ZfQ",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "bayes-false-positives",
+    "title": "Bayes' Theorem: False Positives",
+    "url": "https://www.youtube.com/embed/HaYbxQC61pw",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "bayes-disjoint-union",
+    "title": "Bayes' Theorem: Disjoint Union",
+    "url": "https://www.youtube.com/embed/k6Dw0on6NtM",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "chess-chance",
+    "title": "IS CHESS A GAME OF CHANCE?",
+    "url": "https://www.youtube.com/embed/dejy4PPCFHY",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "markov-chains-intro",
+    "title": "Intro to Markov Chains",
+    "url": "https://www.youtube.com/embed/rHdX3ANxofs",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "markov-matrices",
+    "title": "Markov Chains & Transition Matrices",
+    "url": "https://www.youtube.com/embed/1GKtfgwf3ig",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "graph-theory-intro",
+    "title": "Intro to Graph Theory",
+    "url": "https://www.youtube.com/embed/C7YrMRdLkqo",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "theory"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "graph-properties",
+    "title": "Properties in Graph Theory",
+    "url": "https://www.youtube.com/embed/gC0RNpD2P1Y",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "theory"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vertex-degrees",
+    "title": "Degree of Vertices",
+    "url": "https://www.youtube.com/embed/WTNBNSUhSTY",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "theory"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "euler-paths",
+    "title": "Euler Paths | Konigsberg",
+    "url": "https://www.youtube.com/embed/dSK5jTEe-AM",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic",
+      "theory"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "discrete-outro",
+    "title": "Discrete Math - Final Thoughts",
+    "url": "https://www.youtube.com/embed/L_n6zn_CRrU",
+    "source": "YouTube",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "gv-how-to-graph-the-cube-root-of-x",
+    "title": "How to Graph the Cube Root of X",
+    "url": "https://www.youtube.com/embed/ny2_Oa5tdcw",
+    "source": "Calculus Tutorial Series",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "gv-try-it-use-x-and-y-intercepts-to-graph-a-line",
+    "title": "Try It! Use x and y-Intercepts to Graph a Line",
+    "url": "https://www.youtube.com/embed/rc8PYywRykk",
+    "source": "Calculus Tutorial Series",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "gv-try-use-shifts-translations-and-reflections-to-graph-f-x",
+    "title": "Try: Use Shifts/Translations and Reflections to Graph f(x)=-|x+1|+1",
+    "url": "https://www.youtube.com/embed/x-bArQLBHeU",
+    "source": "Calculus Tutorial Series",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "gv-use-shifts-translations-and-reflections-to-graph-f-x-x-2",
+    "title": "Use Shifts/Translations and Reflections to Graph f(x)=-(x+2)^2",
+    "url": "https://www.youtube.com/embed/9VxQZ710EWs",
+    "source": "Calculus Tutorial Series",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "gv-use-shifts-translations-to-graph-f-x-sqrt-x-3",
+    "title": "Use Shifts/Translations to Graph f(x)=Sqrt(x)+3",
+    "url": "https://www.youtube.com/embed/gx0UwHdr0b0",
+    "source": "Calculus Tutorial Series",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "gv-use-translations-and-reflections-to-graph",
+    "title": "Use Translations and Reflections to Graph",
+    "url": "https://www.youtube.com/embed/ofdigkMktSw",
+    "source": "Calculus Tutorial Series",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "gv-using-intercepts-to-graph-a-line",
+    "title": "Using Intercepts to Graph a Line",
+    "url": "https://www.youtube.com/embed/4uBdhOIxbeE",
+    "source": "Calculus Tutorial Series",
+    "tags": [
+      "discrete-math",
+      "logic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  }
+]

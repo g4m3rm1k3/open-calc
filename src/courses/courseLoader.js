@@ -120,3 +120,12 @@ export function getVideos(courseId) {
   const data = mod?.default ?? mod
   return Array.isArray(data) ? data : []
 }
+
+// Every course's videos, flattened — used for global (cross-course) search.
+export function getAllVideos() {
+  return Object.keys(VIDEO_MODULES).flatMap((path) => {
+    const mod = VIDEO_MODULES[path]
+    const data = mod?.default ?? mod
+    return Array.isArray(data) ? data : []
+  })
+}

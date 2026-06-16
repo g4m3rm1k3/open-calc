@@ -1,0 +1,2605 @@
+[
+  {
+    "id": "pre-3-4",
+    "title": "Precalculus 3.4 Exponential and Logarithmic Equations",
+    "url": "https://www.youtube.com/embed/TBrfpMzLBhM",
+    "source": "Ron Larson Precalculus",
+    "tags": [
+      "exponential",
+      "log"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-450",
+    "title": "Python Tutorial 1: Install and Setup for Mac and Windows",
+    "url": "https://www.youtube.com/embed/YYXdXT2l-Gg",
+    "source": "corey-schafer",
+    "tags": [
+      "python",
+      "setup"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-451",
+    "title": "Python Tutorial 2: Strings - Working with Textual Data",
+    "url": "https://www.youtube.com/embed/k9TUPpGqYTo",
+    "source": "corey-schafer",
+    "tags": [
+      "python",
+      "strings"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-452",
+    "title": "Python Tutorial 3: Integers and Floats - Working with Numeric Data",
+    "url": "https://www.youtube.com/embed/khKv-8q7YmY",
+    "source": "corey-schafer",
+    "tags": [
+      "python",
+      "numbers",
+      "integers",
+      "floats"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-453",
+    "title": "Python Tutorial 4: Lists, Tuples, and Sets",
+    "url": "https://www.youtube.com/embed/W8KRzm-HUcc",
+    "source": "corey-schafer",
+    "tags": [
+      "python",
+      "lists",
+      "tuples",
+      "sets"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-454",
+    "title": "Python Tutorial 5: Dictionaries - Working with Key-Value Pairs",
+    "url": "https://www.youtube.com/embed/daefaLgNkw0",
+    "source": "corey-schafer",
+    "tags": [
+      "python",
+      "dictionaries"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-455",
+    "title": "Python Tutorial 6: Conditionals and Booleans - If, Else, and Elif Statements",
+    "url": "https://www.youtube.com/embed/DZwmZ8Usvnk",
+    "source": "corey-schafer",
+    "tags": [
+      "python",
+      "conditionals",
+      "booleans",
+      "control-flow"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-456",
+    "title": "Python Tutorial 7: Loops and Iterations - For/While Loops",
+    "url": "https://www.youtube.com/embed/6iF8Xb7Z3wQ",
+    "source": "corey-schafer",
+    "tags": [
+      "python",
+      "loops",
+      "iteration",
+      "for-loop",
+      "while-loop"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-457",
+    "title": "Python Tutorial 8: Functions",
+    "url": "https://www.youtube.com/embed/9Os0o3wzS_I",
+    "source": "corey-schafer",
+    "tags": [
+      "python",
+      "functions"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-458",
+    "title": "Python Tutorial 9: Import Modules and Exploring The Standard Library",
+    "url": "https://www.youtube.com/embed/CqvZ3vGoGs0",
+    "source": "corey-schafer",
+    "tags": [
+      "python",
+      "modules",
+      "imports"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-459",
+    "title": "Python Tutorial: OS Module - Use Underlying Operating System Functionality",
+    "url": "https://www.youtube.com/embed/tJxcKyFMTGo",
+    "source": "corey-schafer",
+    "tags": [
+      "python",
+      "os",
+      "modules",
+      "files"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-460",
+    "title": "Python Tutorial: File Objects - Reading and Writing to Files",
+    "url": "https://www.youtube.com/embed/Uh2ebFW8OYM",
+    "source": "corey-schafer",
+    "tags": [
+      "python",
+      "files",
+      "io"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-461",
+    "title": "Python Tutorial: How to Set the Path - Windows",
+    "url": "https://www.youtube.com/embed/OdIHeg4jj2c",
+    "source": "corey-schafer",
+    "tags": [
+      "python",
+      "setup",
+      "windows"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-462",
+    "title": "Python Tutorial: How to Set the Path - Mac and Linux",
+    "url": "https://www.youtube.com/embed/PUIE7CPANfo",
+    "source": "corey-schafer",
+    "tags": [
+      "python",
+      "setup",
+      "mac",
+      "linux"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-463",
+    "title": "Python Tutorial: Automate Parsing and Renaming of Multiple Files",
+    "url": "https://www.youtube.com/embed/ve2pmm5JqmI",
+    "source": "corey-schafer",
+    "tags": [
+      "python",
+      "automation",
+      "os",
+      "files"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-464",
+    "title": "Python Tutorial: CSV Module - How to Read, Parse, and Write CSV Files",
+    "url": "https://www.youtube.com/embed/q5uM4VKywbA",
+    "source": "corey-schafer",
+    "tags": [
+      "python",
+      "csv",
+      "files",
+      "data"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-465",
+    "title": "Python Tutorial: Real World Example - Parsing Names From a CSV to an HTML List",
+    "url": "https://www.youtube.com/embed/bkpLhQd6YQM",
+    "source": "corey-schafer",
+    "tags": [
+      "python",
+      "csv",
+      "real-world",
+      "projects"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-466",
+    "title": "Python Tutorial: Datetime Module - Dates, Times, Timedeltas, and Timezones",
+    "url": "https://www.youtube.com/embed/eirjjyP2qcQ",
+    "source": "corey-schafer",
+    "tags": [
+      "python",
+      "datetime",
+      "modules"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-467",
+    "title": "Python Tutorial: Variable Scope - Understanding the LEGB Rule",
+    "url": "https://www.youtube.com/embed/QVdf0LgmICw",
+    "source": "corey-schafer",
+    "tags": [
+      "python",
+      "scope",
+      "variables",
+      "functions"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-468",
+    "title": "Python Tutorial: Sorting Lists, Tuples, and Objects",
+    "url": "https://www.youtube.com/embed/D3JvDWO-BY4",
+    "source": "corey-schafer",
+    "tags": [
+      "python",
+      "sorting",
+      "lists",
+      "tuples"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-469",
+    "title": "Python Tutorial: Using Try/Except Blocks for Error Handling",
+    "url": "https://www.youtube.com/embed/NIWwJbo-9_8",
+    "source": "corey-schafer",
+    "tags": [
+      "python",
+      "error-handling",
+      "exceptions",
+      "try-except"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-470",
+    "title": "Python Tutorial: Unit Testing Your Code with the unittest Module",
+    "url": "https://www.youtube.com/embed/6tNS--WetLI",
+    "source": "corey-schafer",
+    "tags": [
+      "python",
+      "testing",
+      "unittest"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-471",
+    "title": "Python Tutorial: Pipenv - Easily Manage Packages and Virtual Environments",
+    "url": "https://www.youtube.com/embed/zDYL22QNiWk",
+    "source": "corey-schafer",
+    "tags": [
+      "python",
+      "setup",
+      "environments",
+      "packages"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-473",
+    "title": "Python Tutorial: VENV - Virtual Environments on Mac and Linux",
+    "url": "https://www.youtube.com/embed/Kg1Yvry_Ydk",
+    "source": "corey-schafer",
+    "tags": [
+      "python",
+      "setup",
+      "environments",
+      "mac",
+      "linux"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-474",
+    "title": "Python Tutorial: VENV - Virtual Environments on Windows",
+    "url": "https://www.youtube.com/embed/APOPm01BVrk",
+    "source": "corey-schafer",
+    "tags": [
+      "python",
+      "setup",
+      "environments",
+      "windows"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-475",
+    "title": "5 Common Python Mistakes and How to Fix Them",
+    "url": "https://www.youtube.com/embed/zdJEYhA2AZQ",
+    "source": "corey-schafer",
+    "tags": [
+      "python",
+      "best-practices",
+      "debugging"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-476",
+    "title": "Start coding with PYTHON in 5 minutes!",
+    "url": "https://www.youtube.com/embed/Sg4GMVMdOPo",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "intro",
+      "basics",
+      "beginner"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-477",
+    "title": "Learn Python VARIABLES in 10 minutes!",
+    "url": "https://www.youtube.com/embed/7IoQ5BGkTJo",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "variables",
+      "basics"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-478",
+    "title": "Learn type casting in 7 minutes!",
+    "url": "https://www.youtube.com/embed/Qtq83lAoogM",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "type casting",
+      "types",
+      "int",
+      "float",
+      "str"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-479",
+    "title": "User input in Python is easy + exercises",
+    "url": "https://www.youtube.com/embed/nMCOB8KElwo",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "input",
+      "basics"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-480",
+    "title": "Math in Python is easy!",
+    "url": "https://www.youtube.com/embed/jc7TBgMS_kw",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "math",
+      "arithmetic",
+      "operators"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-481",
+    "title": "If statements in Python are easy (if, elif, else)",
+    "url": "https://www.youtube.com/embed/FvMPfrgGeKs",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "if",
+      "conditionals",
+      "control flow"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-482",
+    "title": "Let's code a simple python calculator!",
+    "url": "https://www.youtube.com/embed/yUrYouDQZL8",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "project",
+      "math",
+      "calculator"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-483",
+    "title": "Python weight conversion exercise",
+    "url": "https://www.youtube.com/embed/80kjCBRjkmU",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "math",
+      "conversion",
+      "project"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-484",
+    "title": "Python temperature conversion program",
+    "url": "https://www.youtube.com/embed/fy5QsDJmctQ",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "math",
+      "conversion",
+      "project"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-485",
+    "title": "Logical operators in Python are easy",
+    "url": "https://www.youtube.com/embed/W7luvtXeQTA",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "operators",
+      "boolean",
+      "logic",
+      "and",
+      "or"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-486",
+    "title": "Learn conditional expressions in 5 minutes!",
+    "url": "https://www.youtube.com/embed/TYyKQBC4bwE",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "conditionals",
+      "ternary"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-487",
+    "title": "String methods in Python are easy!",
+    "url": "https://www.youtube.com/embed/tb6EYiHtcXU",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "strings",
+      "methods",
+      "str"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-488",
+    "title": "String indexing in Python is easy",
+    "url": "https://www.youtube.com/embed/7pXf1DUuaIo",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "strings",
+      "indexing",
+      "slicing",
+      "str"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-489",
+    "title": "Python email slicer program",
+    "url": "https://www.youtube.com/embed/6MAufQ6vGtI",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "strings",
+      "slicing",
+      "project"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-490",
+    "title": "Learn Python format specifiers in 5 minutes!",
+    "url": "https://www.youtube.com/embed/FrvBwdAU2dQ",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "strings",
+      "formatting",
+      "f-strings"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-491",
+    "title": "While loops in Python are easy!",
+    "url": "https://www.youtube.com/embed/rRTjPnVooxE",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "while",
+      "loops"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-492",
+    "title": "Code an interest calculator in 7 minutes!",
+    "url": "https://www.youtube.com/embed/aM5dttidg4Q",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "math",
+      "loops",
+      "project"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-493",
+    "title": "Learn Python for loops in 5 minutes!",
+    "url": "https://www.youtube.com/embed/KWgYha0clzw",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "for",
+      "loops",
+      "iteration"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-494",
+    "title": "Nested loops in Python are easy",
+    "url": "https://www.youtube.com/embed/APWy6Pc83gE",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "loops",
+      "nested",
+      "for"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-495",
+    "title": "Countdown timer program in Python",
+    "url": "https://www.youtube.com/embed/KseiSR0MCTI",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "loops",
+      "project",
+      "while"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-496",
+    "title": "Python lists, sets, and tuples explained",
+    "url": "https://www.youtube.com/embed/gOMW_n2-2Mw",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "lists",
+      "sets",
+      "tuples",
+      "data structures"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-497",
+    "title": "Python shopping cart program",
+    "url": "https://www.youtube.com/embed/kbyHLU9JqjE",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "lists",
+      "project"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-498",
+    "title": "Python 2D collections are easy!",
+    "url": "https://www.youtube.com/embed/Xy6qeQWQwFw",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "lists",
+      "2d",
+      "nested",
+      "arrays"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-499",
+    "title": "Create a QUIZ GAME with Python",
+    "url": "https://www.youtube.com/embed/zehwgTB0vV8",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "project",
+      "game",
+      "lists"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-500",
+    "title": "Python dictionaries are easy",
+    "url": "https://www.youtube.com/embed/MZZSMaEAC2g",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "dict",
+      "dictionaries",
+      "data structures"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-501",
+    "title": "Python concession stand program",
+    "url": "https://www.youtube.com/embed/PbkIzW_70EI",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "dict",
+      "project"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-502",
+    "title": "Generate random numbers in Python",
+    "url": "https://www.youtube.com/embed/piJc18hcH0Y",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "random",
+      "math"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-503",
+    "title": "Let's code a Python NUMBER GUESSING GAME!",
+    "url": "https://www.youtube.com/embed/jcKe13D6bao",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "random",
+      "project",
+      "game",
+      "while"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-504",
+    "title": "ROCK PAPER SCISSORS game in Python",
+    "url": "https://www.youtube.com/embed/fn68QNcatfo",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "project",
+      "game",
+      "random"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-505",
+    "title": "Code a dice roller program in 10 minutes!",
+    "url": "https://www.youtube.com/embed/x-Ag2_bJ40Y",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "random",
+      "project",
+      "lists"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-506",
+    "title": "Encryption program in Python",
+    "url": "https://www.youtube.com/embed/vsLBErLWBhA",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "strings",
+      "project",
+      "algorithms"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-507",
+    "title": "Functions in Python are easy",
+    "url": "https://www.youtube.com/embed/89cGQjB5R4M",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "functions",
+      "def"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-508",
+    "title": "Python default arguments are awesome!",
+    "url": "https://www.youtube.com/embed/m2uURZxex3c",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "functions",
+      "default arguments",
+      "parameters"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-509",
+    "title": "Python keyword arguments are awesome!",
+    "url": "https://www.youtube.com/embed/7QCHpAtlSMo",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "functions",
+      "kwargs",
+      "keyword arguments"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-510",
+    "title": "Python *ARGS and **KWARGS are awesome!",
+    "url": "https://www.youtube.com/embed/Vh__2V2tXUM",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "functions",
+      "args",
+      "kwargs",
+      "variadic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-511",
+    "title": "Learn Python iterables in 6 minutes!",
+    "url": "https://www.youtube.com/embed/VL_g3LjsFqs",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "iterables",
+      "loops",
+      "for"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-512",
+    "title": "Learn Python MEMBERSHIP OPERATORS in 8 minutes!",
+    "url": "https://www.youtube.com/embed/OJ5E7VLsZQM",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "operators",
+      "in",
+      "membership"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-513",
+    "title": "Learn Python LIST COMPREHENSIONS in 10 minutes!",
+    "url": "https://www.youtube.com/embed/YlY2g2xrl6Q",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "list comprehension",
+      "lists",
+      "comprehension"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-514",
+    "title": "Learn Python MATCH-CASE STATEMENTS in 5 minutes!",
+    "url": "https://www.youtube.com/embed/L7tT0NZF-Ag",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "match",
+      "switch",
+      "conditionals"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-515",
+    "title": "What are Python modules?",
+    "url": "https://www.youtube.com/embed/XcfxkHrHTVE",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "modules",
+      "imports",
+      "import"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-516",
+    "title": "What is Python scope resolution?",
+    "url": "https://www.youtube.com/embed/XN83IECAscM",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "scope",
+      "variables",
+      "namespaces"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-517",
+    "title": "if __name__ == '__main__' for Python beginners",
+    "url": "https://www.youtube.com/embed/8A0E1dSyjFM",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "modules",
+      "main",
+      "script"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-518",
+    "title": "Credit card validator in Python",
+    "url": "https://www.youtube.com/embed/LqXIJjcRmGI",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "strings",
+      "project",
+      "validation"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-519",
+    "title": "Let's code a beginners Python BANKING PROGRAM",
+    "url": "https://www.youtube.com/embed/8aW3tkIul-8",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "project",
+      "oop",
+      "classes"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-520",
+    "title": "Let's code a beginners Python SLOT MACHINE",
+    "url": "https://www.youtube.com/embed/f5J3YiZ3XX8",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "random",
+      "project",
+      "loops"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-521",
+    "title": "Let's code a HANGMAN GAME in Python!",
+    "url": "https://www.youtube.com/embed/ag8NtD1e0Kc",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "project",
+      "game",
+      "strings",
+      "lists"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-522",
+    "title": "Learn Python Object Oriented Programming!",
+    "url": "https://www.youtube.com/embed/1XE-_s4ZBT8",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "oop",
+      "classes",
+      "objects"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-523",
+    "title": "Learn class variables in 8 minutes!",
+    "url": "https://www.youtube.com/embed/bytvWg4fPB0",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "oop",
+      "classes",
+      "class variables"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-524",
+    "title": "Python INHERITANCE in 6 minutes!",
+    "url": "https://www.youtube.com/embed/u1be7Vele5o",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "oop",
+      "inheritance",
+      "classes"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-525",
+    "title": "Learn Python multiple inheritance in 8 minutes!",
+    "url": "https://www.youtube.com/embed/Q8YlYHjksLo",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "oop",
+      "inheritance",
+      "multiple inheritance"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-526",
+    "title": "Learn Python ABSTRACT CLASSES in 7 minutes!",
+    "url": "https://www.youtube.com/embed/97V7ICVeTJc",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "oop",
+      "abstract",
+      "classes",
+      "abc"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-527",
+    "title": "SUPER() in Python explained!",
+    "url": "https://www.youtube.com/embed/HzyhmZqiaE8",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "oop",
+      "super",
+      "inheritance"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-528",
+    "title": "Learn polymorphism in 8 minutes!",
+    "url": "https://www.youtube.com/embed/tHN8I_4FIt8",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "oop",
+      "polymorphism"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-529",
+    "title": "Learn Python DUCK TYPING in 4 minutes!",
+    "url": "https://www.youtube.com/embed/Qe03kCuTMoU",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "oop",
+      "duck typing",
+      "polymorphism"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-530",
+    "title": "Learn Python AGGREGATION in 6 minutes!",
+    "url": "https://www.youtube.com/embed/caXOUnQkD1o",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "oop",
+      "aggregation",
+      "classes"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-531",
+    "title": "Learn Python COMPOSITION in 7 minutes!",
+    "url": "https://www.youtube.com/embed/TPUdUkFHD5I",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "oop",
+      "composition",
+      "classes"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-532",
+    "title": "Learn Python NESTED CLASSES in 9 minutes!",
+    "url": "https://www.youtube.com/embed/zxPODCF4KEw",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "oop",
+      "classes",
+      "nested"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-533",
+    "title": "Learn Python STATIC METHODS in 5 minutes!",
+    "url": "https://www.youtube.com/embed/GZYWTm7JoWs",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "oop",
+      "static methods",
+      "classes"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-534",
+    "title": "Learn Python CLASS METHODS in 6 minutes!",
+    "url": "https://www.youtube.com/embed/g-qRKZD3FgE",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "oop",
+      "class methods",
+      "classmethod"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-535",
+    "title": "Python MAGIC METHODS are easy!",
+    "url": "https://www.youtube.com/embed/NwjSP1_WEfE",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "oop",
+      "dunder",
+      "magic methods"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-536",
+    "title": "Learn Python DECORATORS in 7 minutes!",
+    "url": "https://www.youtube.com/embed/U-G-mSd4KAE",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "decorators",
+      "functions",
+      "advanced"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-537",
+    "title": "Learn Python @property in 7 minutes!",
+    "url": "https://www.youtube.com/embed/HkbQ_NaH0Lc",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "oop",
+      "property",
+      "decorators",
+      "getters",
+      "setters"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-538",
+    "title": "Learn Python LAMBDA in 6 minutes!",
+    "url": "https://www.youtube.com/embed/IljPHDyBRog",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "lambda",
+      "functions",
+      "anonymous"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-539",
+    "title": "Python SORTING is easy (sort of)",
+    "url": "https://www.youtube.com/embed/cd-vtiO5chk",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "sorting",
+      "lists",
+      "algorithms"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-540",
+    "title": "Learn Python zip() in 3 minutes!",
+    "url": "https://www.youtube.com/embed/5WK3j2erJW4",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "zip",
+      "iterables",
+      "functions"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-541",
+    "title": "Learn RECURSION in 5 minutes!",
+    "url": "https://www.youtube.com/embed/ivl5-snqul8",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "recursion",
+      "functions",
+      "algorithms"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-542",
+    "title": "Learn Python EXCEPTION HANDLING in 5 minutes!",
+    "url": "https://www.youtube.com/embed/V_NXT2-QIlE",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "exceptions",
+      "error handling",
+      "try",
+      "except"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-543",
+    "title": "File detection in Python is easy!",
+    "url": "https://www.youtube.com/embed/EReeJSaU0Og",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "files",
+      "os",
+      "file system"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-544",
+    "title": "Write files using Python!",
+    "url": "https://www.youtube.com/embed/1IYrmTTKOoI",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "files",
+      "io",
+      "write"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-545",
+    "title": "Read files using Python!",
+    "url": "https://www.youtube.com/embed/GWBWQnWNWBI",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "files",
+      "io",
+      "read"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-546",
+    "title": "How to measure EXECUTION TIME in Python",
+    "url": "https://www.youtube.com/embed/FblABqaKz_U",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "performance",
+      "timing",
+      "optimization"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-547",
+    "title": "Learn Python DATES and TIMES in 6 minutes!",
+    "url": "https://www.youtube.com/embed/DwBDHsdX6XQ",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "datetime",
+      "dates",
+      "time"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-548",
+    "title": "Code an alarm clock using Python!",
+    "url": "https://www.youtube.com/embed/uf8DvQlWm7M",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "datetime",
+      "project",
+      "time"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-549",
+    "title": "Learn Python iterators in 7 minutes!",
+    "url": "https://www.youtube.com/embed/k0D3MQwLn7A",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "iterators",
+      "iterables",
+      "advanced"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-550",
+    "title": "Learn Python generators in 8 minutes!",
+    "url": "https://www.youtube.com/embed/G1lJeEIl05o",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "generators",
+      "yield",
+      "iterables"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-551",
+    "title": "Learn Python generator expressions in 9 minutes!",
+    "url": "https://www.youtube.com/embed/ZBlxaXMN_hU",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "generators",
+      "comprehension",
+      "iterables"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-552",
+    "title": "You'll love Python data classes!",
+    "url": "https://www.youtube.com/embed/Gsfsq2epdr8",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "dataclasses",
+      "oop",
+      "classes"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-553",
+    "title": "Learn Python multithreading in 8 minutes!",
+    "url": "https://www.youtube.com/embed/STEOavXqXkQ",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "threading",
+      "concurrency",
+      "advanced"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-554",
+    "title": "Request API data using Python in 8 minutes!",
+    "url": "https://www.youtube.com/embed/JVQNywo4AbU",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "api",
+      "requests",
+      "http",
+      "json"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-555",
+    "title": "Python PyQt5 setup a basic GUI Application!",
+    "url": "https://www.youtube.com/embed/Uvqmv3PGiXM",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "gui",
+      "pyqt5",
+      "desktop"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-556",
+    "title": "Create LABELS with Python in 8 minutes!",
+    "url": "https://www.youtube.com/embed/nFLADhwXjW4",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "gui",
+      "pyqt5",
+      "widgets"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-557",
+    "title": "Python PyQt5 IMAGES are easy!",
+    "url": "https://www.youtube.com/embed/7v5NQeIBYes",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "gui",
+      "pyqt5",
+      "images"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-558",
+    "title": "Layout managers in Python are easy!",
+    "url": "https://www.youtube.com/embed/ml-mBl77h6Q",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "gui",
+      "pyqt5",
+      "layout"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-559",
+    "title": "Create Python buttons in 7 minutes!",
+    "url": "https://www.youtube.com/embed/9pl55MxZlG4",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "gui",
+      "pyqt5",
+      "buttons"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-560",
+    "title": "Create Python checkboxes in 5 minutes!",
+    "url": "https://www.youtube.com/embed/VgnUB_vzR9I",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "gui",
+      "pyqt5",
+      "checkboxes"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-561",
+    "title": "Python PyQt5 RADIO BUTTONS are easy!",
+    "url": "https://www.youtube.com/embed/DZ3-ij_JHE0",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "gui",
+      "pyqt5",
+      "radio buttons"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-562",
+    "title": "Python PyQt5 LINE EDITS are easy!",
+    "url": "https://www.youtube.com/embed/4IUWg_wQNSc",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "gui",
+      "pyqt5",
+      "input"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-563",
+    "title": "Add CSS to Python in 10 minutes!",
+    "url": "https://www.youtube.com/embed/YJM9d0F3n-o",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "gui",
+      "css",
+      "styling",
+      "pyqt5"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-564",
+    "title": "Let's code a digital clock with Python!",
+    "url": "https://www.youtube.com/embed/543g1CurFFo",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "gui",
+      "project",
+      "datetime",
+      "pyqt5"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-565",
+    "title": "Code a stopwatch using Python!",
+    "url": "https://www.youtube.com/embed/UKs0xhxSOg0",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "gui",
+      "project",
+      "datetime",
+      "pyqt5"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-566",
+    "title": "Create a weather app with Python!",
+    "url": "https://www.youtube.com/embed/Q4377DH5Jso",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "gui",
+      "api",
+      "project",
+      "pyqt5"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-567",
+    "title": "Create QR codes with Python in 4 minutes!",
+    "url": "https://www.youtube.com/embed/pJdTyvufOdg",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "qr",
+      "project",
+      "libraries"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-568",
+    "title": "Build a music player with Python!",
+    "url": "https://www.youtube.com/embed/xf71dRBRP6o",
+    "source": "bro-code",
+    "tags": [
+      "python",
+      "gui",
+      "project",
+      "audio",
+      "pyqt5"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-569",
+    "title": "Python Tutorial for Beginners with VS Code",
+    "url": "https://www.youtube.com/embed/6i3e-j3wSf0",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "intro",
+      "basics",
+      "vscode",
+      "setup",
+      "beginner"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-570",
+    "title": "Python Basics for Beginners",
+    "url": "https://www.youtube.com/embed/fLAfa-BQtOQ",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "basics",
+      "beginner",
+      "variables",
+      "strings"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-571",
+    "title": "Python Operators for Beginners",
+    "url": "https://www.youtube.com/embed/7BxUaeROVXI",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "operators",
+      "math",
+      "arithmetic"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-572",
+    "title": "Python Data Types for Beginners",
+    "url": "https://www.youtube.com/embed/INGJh9DEaBM",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "types",
+      "data types",
+      "int",
+      "float",
+      "str"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-573",
+    "title": "Python User Input and Control Flow",
+    "url": "https://www.youtube.com/embed/N94vSNBF-EI",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "input",
+      "if",
+      "conditionals",
+      "control flow"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-574",
+    "title": "Python Lists and Tuples for Beginners",
+    "url": "https://www.youtube.com/embed/KWKWswDfAb0",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "lists",
+      "tuples",
+      "data structures"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-575",
+    "title": "Python Dictionaries and Sets for Beginners",
+    "url": "https://www.youtube.com/embed/zdVdqTLk8O0",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "dict",
+      "dictionaries",
+      "sets",
+      "data structures"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-576",
+    "title": "Python While Loops and For Loops",
+    "url": "https://www.youtube.com/embed/23vCap6iYSs",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "while",
+      "for",
+      "loops",
+      "iteration"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-577",
+    "title": "Python Functions for Beginners",
+    "url": "https://www.youtube.com/embed/NZMBVkTP3LA",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "functions",
+      "def",
+      "parameters"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-578",
+    "title": "Recursion for Python Beginners with Recursive Function Examples",
+    "url": "https://www.youtube.com/embed/72uVUU1boKo",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "recursion",
+      "functions",
+      "algorithms"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-579",
+    "title": "Python Scope tutorial for Beginners",
+    "url": "https://www.youtube.com/embed/e_UgAqOdEXY",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "scope",
+      "variables",
+      "namespaces"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-580",
+    "title": "Python Closures for Beginners",
+    "url": "https://www.youtube.com/embed/8Lu5DdTxGCU",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "closures",
+      "functions",
+      "advanced",
+      "scope"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-581",
+    "title": "Python f-Strings - Advanced String Formatting",
+    "url": "https://www.youtube.com/embed/ktOOKv6XJ7U",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "strings",
+      "f-strings",
+      "formatting"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-582",
+    "title": "Python Modules for Beginners",
+    "url": "https://www.youtube.com/embed/8ArHkS70QsQ",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "modules",
+      "imports",
+      "import"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-583",
+    "title": "Python Command Line Arguments tutorial",
+    "url": "https://www.youtube.com/embed/mZbRRQMJ7Ew",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "command line",
+      "args",
+      "sys",
+      "argparse"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-584",
+    "title": "Python Challenges for Beginners with Solutions",
+    "url": "https://www.youtube.com/embed/odBW-NClTNA",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "challenges",
+      "exercises",
+      "practice"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-585",
+    "title": "Python lambda, map, filter, and reduce - Higher Order Functions",
+    "url": "https://www.youtube.com/embed/YIOYJgLQYiY",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "lambda",
+      "map",
+      "filter",
+      "reduce",
+      "functions",
+      "higher order"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-586",
+    "title": "Python Classes, Objects, Inheritance and Polymorphism for Beginners",
+    "url": "https://www.youtube.com/embed/RpBBzci_cBk",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "oop",
+      "classes",
+      "objects",
+      "inheritance",
+      "polymorphism"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-587",
+    "title": "Python Exception Handling Tutorial for Beginners",
+    "url": "https://www.youtube.com/embed/PHzm_Iox1mE",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "exceptions",
+      "error handling",
+      "try",
+      "except"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-588",
+    "title": "Python OOP Project for Beginners",
+    "url": "https://www.youtube.com/embed/PMFd95RgIwE",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "oop",
+      "project",
+      "classes"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-589",
+    "title": "Python Virtual Environment and pip for Beginners",
+    "url": "https://www.youtube.com/embed/eDe-z2Qy9x4",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "venv",
+      "pip",
+      "setup",
+      "environments"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-590",
+    "title": "Python File Handling for Beginners",
+    "url": "https://www.youtube.com/embed/BRrem1k3904",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "files",
+      "io",
+      "read",
+      "write"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-592",
+    "title": "Python Full Course for Beginners - Complete All-in-One Tutorial",
+    "url": "https://www.youtube.com/embed/H2EJuAcrZYU",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "full course",
+      "beginner",
+      "complete",
+      "tutorial"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-864",
+    "title": "Mastering Probability and Statistics in Python - Part 1",
+    "url": "https://www.youtube.com/embed/KEhWSpdMCVk",
+    "source": "data-science-python",
+    "tags": [
+      "statistics",
+      "probability",
+      "python"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-865",
+    "title": "Mastering Probability and Statistics in Python - Part 2",
+    "url": "https://www.youtube.com/embed/Sohise7Gvvs",
+    "source": "data-science-python",
+    "tags": [
+      "statistics",
+      "probability",
+      "python"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-866",
+    "title": "Mastering Probability and Statistics in Python - Part 3",
+    "url": "https://www.youtube.com/embed/FhutZ11m7pI",
+    "source": "data-science-python",
+    "tags": [
+      "statistics",
+      "probability",
+      "python"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-867",
+    "title": "Mastering Probability and Statistics in Python - Part 4",
+    "url": "https://www.youtube.com/embed/AgYr7PR9VQs",
+    "source": "data-science-python",
+    "tags": [
+      "statistics",
+      "probability",
+      "python"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-868",
+    "title": "Mastering Probability and Statistics in Python - Part 5",
+    "url": "https://www.youtube.com/embed/O2XBkc9Z4r4",
+    "source": "data-science-python",
+    "tags": [
+      "statistics",
+      "probability",
+      "python"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-869",
+    "title": "Mastering Probability and Statistics in Python - Part 6",
+    "url": "https://www.youtube.com/embed/9Unh0dKpohA",
+    "source": "data-science-python",
+    "tags": [
+      "statistics",
+      "probability",
+      "python"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-870",
+    "title": "Mastering Probability and Statistics in Python - 1 Hour Full Course",
+    "url": "https://www.youtube.com/embed/bzpdXuRbjUY",
+    "source": "data-science-python",
+    "tags": [
+      "statistics",
+      "probability",
+      "python",
+      "full-course"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-871",
+    "title": "Mastering Probability and Statistics in Python - Full Video Series 2",
+    "url": "https://www.youtube.com/embed/lwq1zW-xhbE",
+    "source": "data-science-python",
+    "tags": [
+      "statistics",
+      "probability",
+      "python"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-878",
+    "title": "Whatsapp Automation with Python: Practical Project",
+    "url": "https://www.youtube.com/embed/Q8WB72taXig",
+    "source": "data-science-python",
+    "tags": [
+      "python",
+      "automation"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-882",
+    "title": "Email Automation using Python: Practical Project",
+    "url": "https://www.youtube.com/embed/B_ulQUuKn9A",
+    "source": "data-science-python",
+    "tags": [
+      "python",
+      "automation"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-885",
+    "title": "What is Reinforcement Learning in Python",
+    "url": "https://www.youtube.com/embed/-qL1PLIisD8",
+    "source": "data-science-python",
+    "tags": [
+      "machine-learning",
+      "reinforcement-learning",
+      "python"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-891",
+    "title": "What is Regular Expression in Python",
+    "url": "https://www.youtube.com/embed/vKg6UEP34RE",
+    "source": "data-science-python",
+    "tags": [
+      "python",
+      "regex",
+      "text-processing"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-892",
+    "title": "Email Automation in Python: A Practical Tutorial",
+    "url": "https://www.youtube.com/embed/yZZ6gRYIyGs",
+    "source": "data-science-python",
+    "tags": [
+      "python",
+      "automation"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-894",
+    "title": "Automating Hyperparameter Tuning with Optuna for Machine Learning",
+    "url": "https://www.youtube.com/embed/kR9pOvr9Urs",
+    "source": "data-science-python",
+    "tags": [
+      "machine-learning",
+      "hyperparameter-tuning",
+      "python"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-895",
+    "title": "Naive Bayes Classifier in Python From Scratch",
+    "url": "https://www.youtube.com/embed/03KoYDlJpxE",
+    "source": "data-science-python",
+    "tags": [
+      "machine-learning",
+      "classification",
+      "naive-bayes",
+      "python"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-901",
+    "title": "Facebook Automation Tutorial",
+    "url": "https://www.youtube.com/embed/PaA1IwTtQNk",
+    "source": "data-science-python",
+    "tags": [
+      "python",
+      "automation"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-906",
+    "title": "Python Face Detection & Recognition | Complete Project Guide",
+    "url": "https://www.youtube.com/embed/zlSmogeuF5k",
+    "source": "data-science-python",
+    "tags": [
+      "computer-vision",
+      "face-recognition",
+      "python"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-911",
+    "title": "Selenium Web Scraping: Automate Text Translation & File Processing",
+    "url": "https://www.youtube.com/embed/EnfH-eidNIE",
+    "source": "data-science-python",
+    "tags": [
+      "python",
+      "web-scraping",
+      "selenium"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-917",
+    "title": "Scikit-Learn for Machine Learning: Complete Guide",
+    "url": "https://www.youtube.com/embed/PESnEZ567_8",
+    "source": "data-science-python",
+    "tags": [
+      "machine-learning",
+      "scikit-learn",
+      "python"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-919",
+    "title": "Scrape Movie Titles from IMDB in Minutes! | Python Web Scraping",
+    "url": "https://www.youtube.com/embed/_l3Wt993acg",
+    "source": "data-science-python",
+    "tags": [
+      "python",
+      "web-scraping",
+      "beautifulsoup"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-920",
+    "title": "Calculator App Mini Project | ChatGPT Solution & Exception Handling",
+    "url": "https://www.youtube.com/embed/in0ezgpTDAA",
+    "source": "data-science-python",
+    "tags": [
+      "python",
+      "projects"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-925",
+    "title": "Deep Learning Implementation | Training and Testing Neural Networks",
+    "url": "https://www.youtube.com/embed/R9Dy6M6B8BE",
+    "source": "data-science-python",
+    "tags": [
+      "deep-learning",
+      "neural-networks",
+      "python"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-928",
+    "title": "Complete Web Scraping Guide Using BeautifulSoup",
+    "url": "https://www.youtube.com/embed/rl4r6AvTiQI",
+    "source": "data-science-python",
+    "tags": [
+      "python",
+      "web-scraping",
+      "beautifulsoup"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-932",
+    "title": "Build a Machine Learning Model from Scratch in Python | Linear Regression",
+    "url": "https://www.youtube.com/embed/wSt8cgSrVTo",
+    "source": "data-science-python",
+    "tags": [
+      "machine-learning",
+      "linear-regression",
+      "python"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-933",
+    "title": "Machine Learning Classifier from Scratch | Distance-Based Classification",
+    "url": "https://www.youtube.com/embed/pspoZc1-wgA",
+    "source": "data-science-python",
+    "tags": [
+      "machine-learning",
+      "classification",
+      "python"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-935",
+    "title": "Image Processing Basics in Python | RGB Channels & Grayscale",
+    "url": "https://www.youtube.com/embed/W0xadIEtgiA",
+    "source": "data-science-python",
+    "tags": [
+      "computer-vision",
+      "image-processing",
+      "python"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-936",
+    "title": "Python Bokeh Tutorial | Interactive Plots, Multiplots & Grid Layouts",
+    "url": "https://www.youtube.com/embed/fcWMTrrfcOw",
+    "source": "data-science-python",
+    "tags": [
+      "python",
+      "data-visualization",
+      "bokeh"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-942",
+    "title": "Python Data Scraping Project: IMDb Movie Data Extraction",
+    "url": "https://www.youtube.com/embed/wq5OlMjHOWs",
+    "source": "data-science-python",
+    "tags": [
+      "python",
+      "web-scraping",
+      "beautifulsoup"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-946",
+    "title": "YouTube Automation with Python | Fetch Channel & Playlist Data using YouTube API",
+    "url": "https://www.youtube.com/embed/wm5zMiDX-wA",
+    "source": "data-science-python",
+    "tags": [
+      "python",
+      "automation",
+      "api"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-947",
+    "title": "YouTube Channel Automation Project | Fetch Video Data & Generate Reports",
+    "url": "https://www.youtube.com/embed/YeaAYIb0ysw",
+    "source": "data-science-python",
+    "tags": [
+      "python",
+      "automation",
+      "api"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-951",
+    "title": "Object Oriented Programming in Python | Class, Object, Self & Encapsulation",
+    "url": "https://www.youtube.com/embed/92oeSKGSC8Y",
+    "source": "data-science-python",
+    "tags": [
+      "python",
+      "oop"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-952",
+    "title": "Python OOP | Inheritance, Polymorphism & Abstraction",
+    "url": "https://www.youtube.com/embed/X2cApJGnNzw",
+    "source": "data-science-python",
+    "tags": [
+      "python",
+      "oop"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-953",
+    "title": "Python OOP Mini Project | Build a Role-Playing Game",
+    "url": "https://www.youtube.com/embed/vL2up9CTEaE",
+    "source": "data-science-python",
+    "tags": [
+      "python",
+      "oop",
+      "projects"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  }
+]

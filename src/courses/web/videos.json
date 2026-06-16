@@ -1,0 +1,51 @@
+[
+  {
+    "id": "vid-472",
+    "title": "Python Requests Tutorial: Request Web Pages, Download Images, POST Data, Read JSON",
+    "url": "https://www.youtube.com/embed/tb8gHvYlCFs",
+    "source": "corey-schafer",
+    "tags": [
+      "python",
+      "requests",
+      "web",
+      "http",
+      "api"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-591",
+    "title": "How to Create a Web Application in Python using Flask",
+    "url": "https://www.youtube.com/embed/jQjjqEjZK58",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "flask",
+      "web",
+      "api",
+      "project"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-593",
+    "title": "Python REST API Tutorial - How to Build a Flask REST API",
+    "url": "https://www.youtube.com/embed/z3YMz-Gocmw",
+    "source": "dave-gray",
+    "tags": [
+      "python",
+      "flask",
+      "rest api",
+      "web",
+      "api",
+      "json"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  }
+]

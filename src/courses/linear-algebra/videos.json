@@ -1,0 +1,1859 @@
+[
+  {
+    "id": "vid-594",
+    "title": "Introduction to Matrices",
+    "url": "https://www.youtube.com/embed/xyAuNHPsq-g",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "matrix-operations"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-595",
+    "title": "Matrix Multiplication (Part 1)",
+    "url": "https://www.youtube.com/embed/kqWCguwz23k",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "matrix-multiplication"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-596",
+    "title": "Matrix Multiplication (Part 2)",
+    "url": "https://www.youtube.com/embed/OMA2Mwo0aZg",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "matrix-multiplication"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-597",
+    "title": "Representing Linear Systems as Matrix Equations",
+    "url": "https://www.youtube.com/embed/0oGJTQCy4cQ",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "linear-systems"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-598",
+    "title": "Solving Linear Systems with Matrices",
+    "url": "https://www.youtube.com/embed/iUQR0enP7RQ",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "linear-systems",
+      "gaussian-elimination"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-599",
+    "title": "Reduced Row Echelon Form",
+    "url": "https://www.youtube.com/embed/JVDrlTdzxiI",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "rref",
+      "gaussian-elimination"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-600",
+    "title": "Matrix from Visual Representation of Transformation",
+    "url": "https://www.youtube.com/embed/JTbZDskLk4U",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "transformations"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-601",
+    "title": "Transpose of a Matrix",
+    "url": "https://www.youtube.com/embed/kYB8IZa5AuE",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "transpose"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-602",
+    "title": "Matrix Transpose Properties",
+    "url": "https://www.youtube.com/embed/TbaltFbJ3wE",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "transpose"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-603",
+    "title": "Determinant of a 2x2 Matrix",
+    "url": "https://www.youtube.com/embed/iUQR0enP7RQ",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "determinants",
+      "matrices"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-604",
+    "title": "Vector Introduction for Linear Algebra",
+    "url": "https://www.youtube.com/embed/br7tS1t2SFE",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "introduction"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-605",
+    "title": "Real Coordinate Spaces",
+    "url": "https://www.youtube.com/embed/WNuIhXo39_k",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "coordinate-spaces"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-606",
+    "title": "Adding Vectors Algebraically and Graphically",
+    "url": "https://www.youtube.com/embed/Qm_OS-8COwU",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "vector-addition"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-607",
+    "title": "Multiplying a Vector by a Scalar",
+    "url": "https://www.youtube.com/embed/fyy1TyC59gE",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "scalar-multiplication"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-608",
+    "title": "Vector Examples",
+    "url": "https://www.youtube.com/embed/_yG3USFpGKE",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-609",
+    "title": "Parametric Representations of Lines",
+    "url": "https://www.youtube.com/embed/r4bH66iXJpI",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "parametric",
+      "lines"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-610",
+    "title": "Linear Combinations and Span",
+    "url": "https://www.youtube.com/embed/JVDrlTdzxiI",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "span",
+      "linear-combinations"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-611",
+    "title": "Linear Independence",
+    "url": "https://www.youtube.com/embed/zntNi3-ybfQ",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "linear-independence"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-612",
+    "title": "More on Linear Independence",
+    "url": "https://www.youtube.com/embed/k7RM-ot2NWY",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "linear-independence"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-613",
+    "title": "Span and Linear Independence Example",
+    "url": "https://www.youtube.com/embed/pMFv6liWK4M",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "span",
+      "linear-independence"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-614",
+    "title": "Subspaces and the Basis for a Subspace",
+    "url": "https://www.youtube.com/embed/13r9QY6cmjc",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "subspaces",
+      "basis"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-615",
+    "title": "Linear Subspaces",
+    "url": "https://www.youtube.com/embed/zntNi3-ybfQ",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "subspaces"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-616",
+    "title": "Basis of a Subspace",
+    "url": "https://www.youtube.com/embed/IgmjBEoGEjI",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "subspaces",
+      "basis"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-617",
+    "title": "Vector Dot Product and Vector Length",
+    "url": "https://www.youtube.com/embed/st6D5OdFV9M",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "dot-product"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-618",
+    "title": "Proving Vector Dot Product Properties",
+    "url": "https://www.youtube.com/embed/5AWob_z74Xs",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "dot-product"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-619",
+    "title": "Proof of the Cauchy-Schwarz Inequality",
+    "url": "https://www.youtube.com/embed/KDHuWxy53uM",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "cauchy-schwarz"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-620",
+    "title": "Vector Triangle Inequality",
+    "url": "https://www.youtube.com/embed/aKhhYguY0DQ",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "triangle-inequality"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-621",
+    "title": "Defining the Angle Between Vectors",
+    "url": "https://www.youtube.com/embed/3zC40n1HFng",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "angle"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-622",
+    "title": "Defining a Plane in R3 with a Point and Normal Vector",
+    "url": "https://www.youtube.com/embed/7Itnwg_Mus0",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "planes",
+      "r3"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-623",
+    "title": "Cross Product Introduction",
+    "url": "https://www.youtube.com/embed/tIpKfDc295M",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "cross-product"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-624",
+    "title": "Proof of Cross Product Determinant Formula",
+    "url": "https://www.youtube.com/embed/pJzmiywAgNI",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "cross-product",
+      "determinants"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-625",
+    "title": "Cross Product and the Right Hand Rule",
+    "url": "https://www.youtube.com/embed/cXxu3hRIzS0",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "cross-product"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-626",
+    "title": "Vector Triple Product (Proof)",
+    "url": "https://www.youtube.com/embed/ggcbk-MKB7A",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "cross-product"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-627",
+    "title": "Normal Vector from a Plane Equation",
+    "url": "https://www.youtube.com/embed/cJqec8fF1x4",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "planes",
+      "normal-vector"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-628",
+    "title": "Distance Between Planes",
+    "url": "https://www.youtube.com/embed/gw-4wltP5tY",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "vectors",
+      "planes",
+      "distance"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-629",
+    "title": "Matrix Vector Products",
+    "url": "https://www.youtube.com/embed/C8zOd07U3l8",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "matrix-vector-product"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-630",
+    "title": "Introduction to the Null Space of a Matrix",
+    "url": "https://www.youtube.com/embed/GIbuFRRyoHs",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "null-space",
+      "matrices"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-631",
+    "title": "Null Space 2: Calculating the Null Space of a Matrix",
+    "url": "https://www.youtube.com/embed/qvyboGryeA8",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "null-space",
+      "matrices"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-632",
+    "title": "Null Space 3: Relation to Linear Independence",
+    "url": "https://www.youtube.com/embed/BclnAO7zSGo",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "null-space",
+      "linear-independence"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-633",
+    "title": "Column Space of a Matrix",
+    "url": "https://www.youtube.com/embed/EGNlXtjYABw",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "column-space",
+      "matrices"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-634",
+    "title": "Null Space and Column Space Basis",
+    "url": "https://www.youtube.com/embed/uQhTuRlWMxw",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "null-space",
+      "column-space",
+      "basis"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-635",
+    "title": "Visualizing a Column Space as a Plane in R3",
+    "url": "https://www.youtube.com/embed/Alhcv5d_XOs",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "column-space",
+      "r3"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-636",
+    "title": "Proof: Any Subspace Basis Has Same Number of Elements",
+    "url": "https://www.youtube.com/embed/CkQOCnLWPUA",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "subspaces",
+      "basis"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-637",
+    "title": "Dimension of the Null Space or Nullity",
+    "url": "https://www.youtube.com/embed/C_VFHze3548",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "null-space",
+      "nullity",
+      "dimension"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-638",
+    "title": "Dimension of the Column Space or Rank",
+    "url": "https://www.youtube.com/embed/Lx5sFgXjgKg",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "column-space",
+      "rank",
+      "dimension"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-639",
+    "title": "Rank-Nullity Theorem",
+    "url": "https://www.youtube.com/embed/JUgrBkPteTg",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "rank",
+      "nullity",
+      "rank-nullity"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-640",
+    "title": "Showing Relation Between Basis Cols and Pivot Cols",
+    "url": "https://www.youtube.com/embed/VBTNFJnkjb4",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "basis",
+      "pivot"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-641",
+    "title": "Showing that the Candidate Basis Does Span C(A)",
+    "url": "https://www.youtube.com/embed/5x6Wsqb-CvQ",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "column-space",
+      "basis",
+      "span"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-642",
+    "title": "A More Formal Understanding of Functions",
+    "url": "https://www.youtube.com/embed/4PCktDZJH8E",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "functions",
+      "transformations"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-643",
+    "title": "Vector Transformations",
+    "url": "https://www.youtube.com/embed/wHuY97vss18",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transformations",
+      "vectors"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-644",
+    "title": "Linear Transformations",
+    "url": "https://www.youtube.com/embed/gAbadNuQEjI",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transformations",
+      "linear-transformations"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-645",
+    "title": "Matrix Vector Products as Linear Transformations",
+    "url": "https://www.youtube.com/embed/EcZIGv2v_eA",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transformations",
+      "matrices"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-646",
+    "title": "Linear Transformations as Matrix Vector Products",
+    "url": "https://www.youtube.com/embed/Il0oqMKtRu4",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transformations",
+      "matrices"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-647",
+    "title": "Image of a Subset Under a Transformation",
+    "url": "https://www.youtube.com/embed/kJIUbtSowRg",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transformations",
+      "image"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-648",
+    "title": "im(T): Image of a Transformation",
+    "url": "https://www.youtube.com/embed/BQMyeQOLvpg",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transformations",
+      "image"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-649",
+    "title": "Preimage of a Set",
+    "url": "https://www.youtube.com/embed/nBGIv3-IZRU",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transformations",
+      "preimage"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-650",
+    "title": "Preimage and Kernel Example",
+    "url": "https://www.youtube.com/embed/OzLJFqvSwj4",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transformations",
+      "preimage",
+      "kernel"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-651",
+    "title": "Sums and Scalar Multiples of Linear Transformations",
+    "url": "https://www.youtube.com/embed/r6hRJOFdHXU",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transformations",
+      "linear-combinations"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-652",
+    "title": "More on Matrix Addition and Scalar Multiplication",
+    "url": "https://www.youtube.com/embed/M4nWCEJn4B0",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "scalar-multiplication"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-653",
+    "title": "Linear Transformation Examples: Scaling and Reflections",
+    "url": "https://www.youtube.com/embed/SKhAqbNWFKo",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transformations",
+      "scaling",
+      "reflections"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-654",
+    "title": "Linear Transformation Examples: Rotations in R2",
+    "url": "https://www.youtube.com/embed/6c-7LNn5_5k",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transformations",
+      "rotations",
+      "r2"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-655",
+    "title": "Rotation in R3 around the X-axis",
+    "url": "https://www.youtube.com/embed/rHLEWRxRGiM",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transformations",
+      "rotations",
+      "r3"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-656",
+    "title": "Unit Vectors and Introduction to Projections",
+    "url": "https://www.youtube.com/embed/C2PC9185gIw",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "projections",
+      "unit-vectors"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-657",
+    "title": "Expressing a Projection on to a Line as a Matrix Vector Product",
+    "url": "https://www.youtube.com/embed/JK-8XNIoAkI",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "projections",
+      "matrices"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-658",
+    "title": "Compositions of Linear Transformations",
+    "url": "https://www.youtube.com/embed/xX7qBVa68LQ",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transformations",
+      "composition"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-659",
+    "title": "Matrix Product as Composition",
+    "url": "https://www.youtube.com/embed/YTdh3KIqrpw",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "composition",
+      "matrix-multiplication"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-660",
+    "title": "Associativity of Matrix Multiplication",
+    "url": "https://www.youtube.com/embed/LOFiCAlzYds",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "matrix-multiplication",
+      "associativity"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-661",
+    "title": "Inverse Functions and Transformations",
+    "url": "https://www.youtube.com/embed/sYlOjyPX2AM",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transformations",
+      "inverse"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-662",
+    "title": "Deriving a Method for Determining Inverses",
+    "url": "https://www.youtube.com/embed/aRXRIRCXaRI",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "inverse",
+      "matrix-inverse"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-663",
+    "title": "Example of Finding Matrix Inverse",
+    "url": "https://www.youtube.com/embed/8VSbkNSiSko",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "inverse",
+      "matrix-inverse"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-664",
+    "title": "Formula for 2x2 Inverse (Note)",
+    "url": "https://www.youtube.com/embed/iUQR0enP7RQ",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "inverse"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-665",
+    "title": "Showing that Inverses are Linear",
+    "url": "https://www.youtube.com/embed/QWTZUSbOMbs",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "inverse",
+      "transformations"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-666",
+    "title": "Determinant of a 2x2 Matrix",
+    "url": "https://www.youtube.com/embed/Ip3X9LOh2dk",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "determinants",
+      "matrices"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-667",
+    "title": "Determinant of a 3x3 Matrix",
+    "url": "https://www.youtube.com/embed/aKhhYguY0DQ",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "determinants",
+      "matrices"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-668",
+    "title": "Determinants along Other Rows/Cols",
+    "url": "https://www.youtube.com/embed/H9BWRYJNIv4",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "determinants",
+      "matrices"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-669",
+    "title": "Rule of Sarrus of Determinants",
+    "url": "https://www.youtube.com/embed/GdeEP4CoBo8",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "determinants",
+      "matrices"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-671",
+    "title": "Determinants as Scaling Factors",
+    "url": "https://www.youtube.com/embed/0o4wFCSDSrk",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "determinants",
+      "transformations"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-672",
+    "title": "Transpose of a Matrix",
+    "url": "https://www.youtube.com/embed/23LLB9mNJvc",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "transpose"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-673",
+    "title": "Determinant of Transpose",
+    "url": "https://www.youtube.com/embed/5BAThcMUEuE",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "determinants",
+      "transpose"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-674",
+    "title": "Determinants and Linear Independence",
+    "url": "https://www.youtube.com/embed/fWOGfzC3IeY",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "determinants",
+      "linear-independence"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-675",
+    "title": "Calculating Inverse Function",
+    "url": "https://www.youtube.com/embed/JUgrBkPteTg",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "matrices",
+      "inverse"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-676",
+    "title": "Upper Triangular Determinant",
+    "url": "https://www.youtube.com/embed/sjFoxLYIkF8",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "determinants",
+      "triangular"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-677",
+    "title": "Simpler 4x4 Determinant",
+    "url": "https://www.youtube.com/embed/VBMGo7WdkrU",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "determinants",
+      "matrices"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-678",
+    "title": "Determinants: Summary",
+    "url": "https://www.youtube.com/embed/H9BWRYJNIv4",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "determinants"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-679",
+    "title": "Duplicate Row Determinant",
+    "url": "https://www.youtube.com/embed/pbODXIGBSH0",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "determinants",
+      "matrices"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-680",
+    "title": "Determinants: Proof of the Product Rule",
+    "url": "https://www.youtube.com/embed/OkFen-heBbI",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "determinants",
+      "proof"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-681",
+    "title": "Determinants and Invertibility",
+    "url": "https://www.youtube.com/embed/vMnN7W9OLiQ",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "determinants",
+      "inverse"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-682",
+    "title": "Cramer's Rule One and Two",
+    "url": "https://www.youtube.com/embed/8VSbkNSiSko",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "determinants",
+      "cramers-rule"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-683",
+    "title": "Transpose of a Matrix",
+    "url": "https://www.youtube.com/embed/TbaltFbJ3wE",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transpose",
+      "matrices"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-684",
+    "title": "Transpose of Matrix Products",
+    "url": "https://www.youtube.com/embed/gABOqCOx7DQ",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transpose",
+      "matrix-multiplication"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-685",
+    "title": "Transposes of Sums and Inverses",
+    "url": "https://www.youtube.com/embed/OECp26jkvbo",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transpose",
+      "inverse"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-686",
+    "title": "Transpose of a Vector",
+    "url": "https://www.youtube.com/embed/TbaltFbJ3wE",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "transpose",
+      "vectors"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-687",
+    "title": "Rowspace and Left Nullspace",
+    "url": "https://www.youtube.com/embed/qMdM6OTQgNg",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "row-space",
+      "null-space"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-688",
+    "title": "Visualizing Left Nullspace and Rowspace",
+    "url": "https://www.youtube.com/embed/Alhcv5d_XOs",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "row-space",
+      "null-space"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-689",
+    "title": "Orthogonal Complements",
+    "url": "https://www.youtube.com/embed/zUMo6pnFS8E",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "orthogonality",
+      "complements"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-690",
+    "title": "Orthogonal Complement of the Orthogonal Complement",
+    "url": "https://www.youtube.com/embed/tXSNSkpFGkA",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "orthogonality",
+      "complements"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-691",
+    "title": "Orthogonal Complement of the Null Space",
+    "url": "https://www.youtube.com/embed/vldb9KkEiA0",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "orthogonality",
+      "null-space"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-692",
+    "title": "Unique Rowspace Solution to Ax=b",
+    "url": "https://www.youtube.com/embed/DHHMBGbaXFg",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "row-space",
+      "linear-systems"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-693",
+    "title": "Representing Vectors in Rn using Subspace Members",
+    "url": "https://www.youtube.com/embed/U4PCZF0wkD8",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "subspaces",
+      "vectors"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-694",
+    "title": "Projections onto Subspaces",
+    "url": "https://www.youtube.com/embed/MC7l96tW8V8",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "projections",
+      "subspaces"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-695",
+    "title": "Visualizing a Projection onto a Plane",
+    "url": "https://www.youtube.com/embed/QbKmzbBR1rk",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "projections",
+      "planes"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-696",
+    "title": "A Projection onto a Subspace is a Linear Transformation",
+    "url": "https://www.youtube.com/embed/o5dG0bgBimA",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "projections",
+      "transformations"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-697",
+    "title": "Subspace Projection Matrix Example",
+    "url": "https://www.youtube.com/embed/O5aQWgQnHE8",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "projections",
+      "matrices"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-698",
+    "title": "Another Example of a Projection Matrix",
+    "url": "https://www.youtube.com/embed/uWbZlJURkfA",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "projections",
+      "matrices"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-699",
+    "title": "Projection is Closest Vector in Subspace",
+    "url": "https://www.youtube.com/embed/osh80YCg_GM",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "projections",
+      "subspaces"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-700",
+    "title": "Least Squares Approximation",
+    "url": "https://www.youtube.com/embed/QGdm8ETMR5Q",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "least-squares",
+      "approximation"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-701",
+    "title": "Least Squares Examples",
+    "url": "https://www.youtube.com/embed/mclfteWlT2Y",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "least-squares",
+      "examples"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-702",
+    "title": "Another Least Squares Example",
+    "url": "https://www.youtube.com/embed/E0-0aP-5DXCI",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "least-squares",
+      "examples"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-703",
+    "title": "Least Squares Approximation with a Line",
+    "url": "https://www.youtube.com/embed/JK-8XNIoAkI",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "least-squares",
+      "regression"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-704",
+    "title": "Least Squares Fit to a Line",
+    "url": "https://www.youtube.com/embed/JK-8XNIoAkI",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "least-squares",
+      "regression"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-705",
+    "title": "Introduction to Gram-Schmidt",
+    "url": "https://www.youtube.com/embed/RDZ_2H6PxUo",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "gram-schmidt",
+      "orthogonality"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-706",
+    "title": "Gram-Schmidt Process Example",
+    "url": "https://www.youtube.com/embed/MGtHQCNF3FY",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "gram-schmidt",
+      "orthogonality"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-707",
+    "title": "Gram-Schmidt Example with 3 Basis Vectors",
+    "url": "https://www.youtube.com/embed/lTCNLbG6bQQ",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "gram-schmidt",
+      "orthogonality"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-708",
+    "title": "Orthogonal Matrix QR Decomposition (Introduction)",
+    "url": "https://www.youtube.com/embed/JK-8XNIoAkI",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "qr-decomposition",
+      "orthogonality"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-709",
+    "title": "QR Decomposition (Gram-Schmidt)",
+    "url": "https://www.youtube.com/embed/JK-8XNIoAkI",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "qr-decomposition",
+      "gram-schmidt"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-710",
+    "title": "Orthonormal Bases and the Gram-Schmidt Process",
+    "url": "https://www.youtube.com/embed/P2LTAUO1TdA",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "orthonormal",
+      "gram-schmidt"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-711",
+    "title": "Coordinates with Respect to Orthonormal Bases",
+    "url": "https://www.youtube.com/embed/oz5PUdGEnr0",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "orthonormal",
+      "coordinates"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-712",
+    "title": "Change of Basis Matrix",
+    "url": "https://www.youtube.com/embed/PiDysIOsK3M",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "change-of-basis",
+      "matrices"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-713",
+    "title": "Invertible Change of Basis Matrix",
+    "url": "https://www.youtube.com/embed/HZgatk9huGc",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "change-of-basis",
+      "inverse"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-714",
+    "title": "Transformation Matrix with Respect to a Basis",
+    "url": "https://www.youtube.com/embed/meSwXQQNaMs",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "change-of-basis",
+      "transformations"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-715",
+    "title": "Alternate Basis Transformation Matrix Example",
+    "url": "https://www.youtube.com/embed/HAoL5fPmgrw",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "change-of-basis",
+      "transformations"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-716",
+    "title": "Alternate Basis Transformation Matrix Example Part 2",
+    "url": "https://www.youtube.com/embed/a7yd4x00dew",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "change-of-basis",
+      "transformations"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-717",
+    "title": "Changing Coordinate Systems to Help Find a Transformation Matrix",
+    "url": "https://www.youtube.com/embed/QTcSBB3uVP0",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "change-of-basis",
+      "coordinate-systems"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-718",
+    "title": "Introduction to Eigenvalues and Eigenvectors",
+    "url": "https://www.youtube.com/embed/PhfbEr2btGQ",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "eigenvalues",
+      "eigenvectors"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-719",
+    "title": "Proof of Eigenvalue Formula (nxn)",
+    "url": "https://www.youtube.com/embed/D4fKn2m-Bi8",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "eigenvalues",
+      "proof"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-720",
+    "title": "Example of Finding Eigenvalues and Eigenvectors",
+    "url": "https://www.youtube.com/embed/3-xfmbdzkqc",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "eigenvalues",
+      "eigenvectors"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-721",
+    "title": "Eigenvectors and Eigenspaces for a 3x3 Matrix",
+    "url": "https://www.youtube.com/embed/aCOn0K69Gkg",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "eigenvalues",
+      "eigenvectors",
+      "eigenspace"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-722",
+    "title": "Eigenvalues of a 3x3 Matrix",
+    "url": "https://www.youtube.com/embed/eO8V0LkNIwY",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "eigenvalues",
+      "matrices"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-723",
+    "title": "Showing that an Eigenbasis Makes for Good Coordinate Systems",
+    "url": "https://www.youtube.com/embed/OAh573i_qn8",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "eigenvalues",
+      "eigenvectors",
+      "basis"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-724",
+    "title": "Introduction to Eigenvalues (Visual)",
+    "url": "https://www.youtube.com/embed/PFDu9oVAE-g",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "eigenvalues",
+      "visualization"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-725",
+    "title": "Linear Algebra: Eigenvalues and Eigenvectors",
+    "url": "https://www.youtube.com/embed/mxm1vHKbJAA",
+    "source": "khan-academy",
+    "tags": [
+      "linear-algebra",
+      "eigenvalues",
+      "eigenvectors"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  }
+]
