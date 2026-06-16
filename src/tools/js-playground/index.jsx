@@ -2,8 +2,17 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Plus, Trash2, Code2, Download } from "lucide-react";
-import FullPageIDE from "./FullPageIDE";
+import FullPageIDE from "../../components/ui/FullPageIDE.jsx";
 import { zipSync, strToU8 } from "fflate";
+
+export const meta = {
+  label: 'JS Playground',
+  group: 'engine',
+  order: 30,
+  icon: Code2,
+  colorClass: 'text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-900/30',
+  eventTool: 'javascript',
+}
 
 function slugify(str) {
   return (

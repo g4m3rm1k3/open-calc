@@ -1,7 +1,16 @@
 import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X } from 'lucide-react'
-import PythonNotebook from '../viz/react/PythonNotebook'
+import { X, Terminal } from 'lucide-react'
+import PythonNotebook from '../../courses/python/viz/PythonNotebook'
+
+export const meta = {
+  label: 'Python Notebook',
+  group: 'engine',
+  order: 20,
+  icon: Terminal,
+  colorClass: 'text-teal-500 hover:bg-teal-50 dark:hover:bg-teal-900/30',
+  eventTool: 'python',
+}
 
 /**
  * GlobalPythonNotebook Wrapper

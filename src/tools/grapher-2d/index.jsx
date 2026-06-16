@@ -1,7 +1,16 @@
 import React, { useRef, useEffect, useState } from 'react'
 import functionPlot from 'function-plot'
-import { X, Trash2, Plus, Info, Layers, Box, Settings2, ZoomIn, ZoomOut, RotateCcw, Eye, EyeOff } from 'lucide-react'
+import { X, Trash2, Plus, Info, Layers, Box, Settings2, ZoomIn, ZoomOut, RotateCcw, Eye, EyeOff, Activity } from 'lucide-react'
 import { useLocalStorage } from '../../hooks/useLocalStorage'
+
+export const meta = {
+  label: '2D Grapher',
+  group: 'math',
+  order: 1,
+  icon: Activity,
+  colorClass: 'text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/30',
+  eventTool: 'grapher',
+}
 
 const COLORS = ['#6366f1', '#ec4899', '#facc15', '#22c55e', '#ef4444', '#a855f7', '#06b6d4', '#f97316']
 

@@ -1,4 +1,4 @@
-import MiniGolfGame from '../../components/viz/react/MiniGolfGame.jsx'
+import MiniGolfGame from '../../courses/physics/viz/MiniGolfGame.jsx'
 
 export default function MiniGolfGameTool({ onClose }) {
   return <MiniGolfGame onClose={onClose} />

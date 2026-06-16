@@ -12,10 +12,11 @@ import { LESSON_MAP, CURRICULUM, COURSES } from "../../content/index.js";
 import Sidebar from "./Sidebar.jsx";
 import UtilityPanel from "../ui/UtilityPanel.jsx";
 import SearchModal from "../search/SearchModal.jsx";
-import GlobalGrapher from "../ui/GlobalGrapher.jsx";
-import GlobalGrapher3D from "../ui/GlobalGrapher3D.jsx";
-import GlobalGrapherJSX from "../ui/GlobalGrapherJSX.jsx";
-import ScratchPad from "../ui/ScratchPad.jsx";
+import GlobalGrapher from "../../tools/grapher-2d/index.jsx";
+import GlobalGrapher3D from "../../tools/grapher-3d/index.jsx";
+import GlobalGrapherJSX from "../../tools/grapher-jsx/index.jsx";
+import ScratchPad from "../../tools/scratchpad/index.jsx";
+import { TOOLS, toolsByGroup } from "../../tools/toolLoader.js";
 import { useSearchContext } from "../../context/SearchContext.jsx";
 import { useProgress } from "../../hooks/useProgress.js";
 import GrapherContext from "../../context/GrapherContext.jsx";
@@ -41,21 +42,16 @@ import {
   Gamepad2,
   Library,
   FlaskConical,
-  Grid3x3,
-  Heart,
-  Brain,
-  Swords,
   Sigma,
-  Music,
 } from "lucide-react";
-import TICalc from "../calculator/TICalc.jsx";
-import SigmaCalc from "../calculator/SigmaCalc.jsx";
-import PolyCalc from "../calculator/PolyCalc.jsx";
-import LinearAlgebraCalc from "../calculator/LinearAlgebraCalc.jsx";
+import TICalc from "../../tools/calculator/index.jsx";
+import SigmaCalc from "../../tools/sigma/index.jsx";
+import PolyCalc from "../../tools/polynomial/index.jsx";
+import LinearAlgebraCalc from "../../tools/linear-algebra/index.jsx";
 import HelpModal from "../ui/HelpModal.jsx";
 import MobileBottomNav from "./MobileBottomNav.jsx";
-import GlobalPythonNotebook from "../ui/GlobalPythonNotebook.jsx";
-import GlobalJSPlayground from "../ui/GlobalJSPlayground.jsx";
+import GlobalPythonNotebook from "../../tools/python-notebook/index.jsx";
+import GlobalJSPlayground from "../../tools/js-playground/index.jsx";
 import { ChatProvider } from "../../context/ChatContext.jsx";
 import { useChat } from "../../hooks/useChat.js";
 import ChatPanel from "../chat/ChatPanel.jsx";
@@ -254,26 +250,26 @@ function RibbonGroup({ children }) {
   );
 }
 
+function ToolButton({ tool }) {
+  const Icon = tool.icon;
+  return (
+    <button
+      onClick={() =>
+        window.dispatchEvent(
+          new CustomEvent("oc-open-tool", { detail: { tool: tool.eventTool } }),
+        )
+      }
+      className={`p-2 rounded-lg transition-all ${tool.colorClass ?? "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`}
+      title={tool.label}
+    >
+      {Icon ? <Icon className="w-5 h-5" /> : tool.glyph}
+    </button>
+  );
+}
+
 function TopBar({
   onMenuToggle,
   sidebarOpen,
-  onGraphToggle,
-  onGraph3DToggle,
-  onGraphJSXToggle,
-  onScratchToggle,
-  scratchOpen,
-  onCalcToggle,
-  calcOpen,
-  onSigmaToggle,
-  sigmaOpen,
-  onPolyToggle,
-  polyOpen,
-  onLAToggle,
-  laOpen,
-  onPythonToggle,
-  pythonOpen,
-  onJsToggle,
-  jsOpen,
   onHelpToggle,
   helpOpen,
   onPoolToggle,
@@ -363,26 +359,6 @@ function TopBar({
             <FlaskConical className="w-5 h-5" />
           </NavLink>
           <NavLink
-            to="/music-lab"
-            title="Music Lab"
-            aria-label="Music Lab"
-            className={({ isActive }) =>
-              `p-2 rounded-lg transition-all ${isActive ? "bg-pink-100 dark:bg-pink-900/40 text-pink-700 dark:text-pink-300 border border-pink-300 dark:border-pink-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`
-            }
-          >
-            <Music className="w-5 h-5" />
-          </NavLink>
-          <NavLink
-            to="/matrix-reducer"
-            title="Matrix Reducer"
-            aria-label="Matrix Reducer"
-            className={({ isActive }) =>
-              `p-2 rounded-lg transition-all ${isActive ? "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`
-            }
-          >
-            <Grid3x3 className="w-5 h-5" />
-          </NavLink>
-          <NavLink
             to="/linear-algebra"
             title="Linear Algebra"
             aria-label="Linear Algebra Reference"
@@ -401,36 +377,6 @@ function TopBar({
             }
           >
             <Library className="w-5 h-5" />
-          </NavLink>
-          <NavLink
-            to="/health"
-            title="Health Tracker"
-            aria-label="Health Tracker"
-            className={({ isActive }) =>
-              `p-2 rounded-lg transition-all ${isActive ? "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`
-            }
-          >
-            <Heart className="w-5 h-5" />
-          </NavLink>
-          <NavLink
-            to="/rpg-workout"
-            title="RPG Workout"
-            aria-label="RPG Workout"
-            className={({ isActive }) =>
-              `p-2 rounded-lg transition-all ${isActive ? "bg-fuchsia-100 dark:bg-fuchsia-900/40 text-fuchsia-700 dark:text-fuchsia-300 border border-fuchsia-300 dark:border-fuchsia-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`
-            }
-          >
-            <Swords className="w-5 h-5" />
-          </NavLink>
-          <NavLink
-            to="/brain"
-            title="Brain Training"
-            aria-label="Brain Training"
-            className={({ isActive }) =>
-              `p-2 rounded-lg transition-all ${isActive ? "bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 border border-violet-300 dark:border-violet-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`
-            }
-          >
-            <Brain className="w-5 h-5" />
           </NavLink>
           <NavLink
             to="/studio"
@@ -469,83 +415,18 @@ function TopBar({
           </button>
         </RibbonGroup>
 
-        {/* MATH BAY */}
+        {/* MATH BAY — dynamically discovered from src/tools/ */}
         <RibbonGroup>
-          <button
-            onClick={onGraphToggle}
-            className="p-2 rounded-lg text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all"
-            title="2D Grapher"
-          >
-            <Activity className="w-5 h-5" />
-          </button>
-          <button
-            onClick={onGraph3DToggle}
-            className="p-2 rounded-lg text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/30 transition-all"
-            title="3D Plotter"
-          >
-            <Box className="w-5 h-5" />
-          </button>
-          <button
-            onClick={onGraphJSXToggle}
-            className="p-2 rounded-lg text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-all"
-            title="JSXGraph Pro"
-          >
-            <Settings2 className="w-5 h-5" />
-          </button>
-          <div className="w-px h-6 bg-[var(--color-border)] mx-1" />
-          <button
-            onClick={onCalcToggle}
-            className="p-2 rounded-lg text-violet-500 hover:bg-violet-50 dark:hover:bg-violet-900/30 transition-all"
-            title="Calculator"
-          >
-            <Calculator className="w-5 h-5" />
-          </button>
-          <button
-            onClick={onSigmaToggle}
-            className="p-2 rounded-lg text-violet-500 hover:bg-violet-50 dark:hover:bg-violet-900/30 transition-all font-bold text-sm"
-            title="Sigma Σ"
-          >
-            Σ
-          </button>
-          <button
-            onClick={onPolyToggle}
-            className="p-2 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/30 transition-all font-black text-[10px]"
-            title="Polynomial Solver"
-          >
-            P(x)
-          </button>
-          <button
-            onClick={onLAToggle}
-            className="p-2 rounded-lg text-sky-500 hover:bg-sky-50 dark:hover:bg-sky-900/30 transition-all font-black text-[10px]"
-            title="Linear Algebra Calculator"
-          >
-            [A]
-          </button>
+          {toolsByGroup("math").map((tool) => (
+            <ToolButton key={tool.key} tool={tool} />
+          ))}
         </RibbonGroup>
 
-        {/* ENGINES BAY */}
+        {/* ENGINES BAY — dynamically discovered from src/tools/ */}
         <RibbonGroup>
-          <button
-            onClick={onScratchToggle}
-            className="p-2 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/30 transition-all"
-            title="Scratchpad"
-          >
-            <PenLine className="w-5 h-5" />
-          </button>
-          <button
-            onClick={onPythonToggle}
-            className="p-2 rounded-lg text-teal-500 hover:bg-teal-50 dark:hover:bg-teal-900/30 transition-all"
-            title="Python Notebook"
-          >
-            <Terminal className="w-5 h-5" />
-          </button>
-          <button
-            onClick={onJsToggle}
-            className="p-2 rounded-lg text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-900/30 transition-all"
-            title="JS Playground"
-          >
-            <Code2 className="w-5 h-5" />
-          </button>
+          {toolsByGroup("engine").map((tool) => (
+            <ToolButton key={tool.key} tool={tool} />
+          ))}
         </RibbonGroup>
       </nav>
 
@@ -957,23 +838,6 @@ export default function AppShell({ children }) {
           <TopBar
             onMenuToggle={() => setSidebarOpen((o) => !o)}
             sidebarOpen={sidebarOpen}
-            onGraphToggle={() => setGraphOpen((prev) => !prev)}
-            onGraph3DToggle={() => setGraph3DOpen((prev) => !prev)}
-            onGraphJSXToggle={() => setGraphJSXOpen((prev) => !prev)}
-            onScratchToggle={() => setScratchOpen((prev) => !prev)}
-            scratchOpen={scratchOpen}
-            onCalcToggle={() => setCalcOpen((prev) => !prev)}
-            calcOpen={calcOpen}
-            onSigmaToggle={() => setSigmaOpen((prev) => !prev)}
-            sigmaOpen={sigmaOpen}
-            onPolyToggle={() => setPolyOpen((prev) => !prev)}
-            polyOpen={polyOpen}
-            onLAToggle={() => setLAOpen((prev) => !prev)}
-            laOpen={laOpen}
-            onPythonToggle={() => setPythonOpen((prev) => !prev)}
-            pythonOpen={pythonOpen}
-            onJsToggle={() => setJsOpen((prev) => !prev)}
-            jsOpen={jsOpen}
             onHelpToggle={() => setHelpOpen((prev) => !prev)}
             helpOpen={helpOpen}
             onPoolToggle={() => setPoolOpen((prev) => !prev)}

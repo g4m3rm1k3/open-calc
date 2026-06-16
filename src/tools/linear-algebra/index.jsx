@@ -1,5 +1,14 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import KatexBlock from '../math/KatexBlock.jsx';
+import KatexBlock from '../../components/math/KatexBlock.jsx';
+
+export const meta = {
+  label: 'Linear Algebra Calculator',
+  group: 'math',
+  order: 40,
+  glyph: '[A]',
+  colorClass: 'text-sky-500 hover:bg-sky-50 dark:hover:bg-sky-900/30 font-black text-[10px]',
+  eventTool: 'linear-algebra',
+}
 
 // ─── Fraction / display helpers ──────────────────────────────────────────────
 function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { [a, b] = [b, a % b]; } return a; }

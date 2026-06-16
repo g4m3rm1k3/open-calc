@@ -1,5 +1,14 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
-import KatexBlock from '../math/KatexBlock.jsx';
+import KatexBlock from '../../components/math/KatexBlock.jsx';
+
+export const meta = {
+  label: 'Sigma Σ',
+  group: 'math',
+  order: 20,
+  glyph: 'Σ',
+  colorClass: 'text-violet-500 hover:bg-violet-50 dark:hover:bg-violet-900/30 font-bold text-sm',
+  eventTool: 'sigma',
+}
 
 // ─── safe expression evaluator ────────────────────────────────────────────────
 function safeEval(expr, vars) {

@@ -4,7 +4,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { ELEMENTS, CATEGORY_COLORS, GRID_POSITIONS } from './chemistry_data'
-import AtomViewer from '../../components/viz/react/AtomViewer.jsx'
+import AtomViewer from '../../courses/chemistry/viz/AtomViewer.jsx'
 
 // ── State at STP (298 K) ──────────────────────────────────────────────────────
 function stateAtSTP(el) {

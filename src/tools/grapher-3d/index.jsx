@@ -5,6 +5,15 @@ import * as THREE from 'three'
 import { X, Box, Layers, Settings2, Trash2, Plus, Info, Activity } from 'lucide-react'
 import { useLocalStorage } from '../../hooks/useLocalStorage'
 
+export const meta = {
+  label: '3D Plotter',
+  group: 'math',
+  order: 2,
+  icon: Box,
+  colorClass: 'text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/30',
+  eventTool: 'grapher-3d',
+}
+
 // --- 3D Grid Helper ---
 const Scene = ({ functions, settings }) => {
   return (

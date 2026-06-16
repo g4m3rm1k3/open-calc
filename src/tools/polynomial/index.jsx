@@ -1,6 +1,15 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
 import { evaluate as mathEval } from 'mathjs'
-import KatexBlock from '../math/KatexBlock.jsx'
+import KatexBlock from '../../components/math/KatexBlock.jsx'
+
+export const meta = {
+  label: 'Polynomial Solver',
+  group: 'math',
+  order: 30,
+  glyph: 'P(x)',
+  colorClass: 'text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/30 font-black text-[10px]',
+  eventTool: 'polynomial',
+}
 
 // ─── polynomial evaluation via mathjs ────────────────────────────────────────
 function evalAt(expr, x) {

@@ -1,5 +1,15 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { evaluate as mathEval, fraction as mathFraction } from 'mathjs'
+import { Calculator as CalculatorIcon } from 'lucide-react'
+
+export const meta = {
+  label: 'Calculator',
+  group: 'math',
+  order: 10,
+  icon: CalculatorIcon,
+  colorClass: 'text-violet-500 hover:bg-violet-50 dark:hover:bg-violet-900/30',
+  eventTool: 'calculator',
+}
 
 // ─── Dark mode hook ───────────────────────────────────────────────────────────
 

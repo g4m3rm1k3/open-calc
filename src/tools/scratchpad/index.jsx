@@ -3,8 +3,17 @@ import { Stage, Layer, Line, Circle as KonvaCircle, Arc, Text as KonvaText, Grou
 import {
   X, Trash2, Undo2, Pencil, Eraser, Sun, Moon, Minus, Plus,
   Check, MousePointer2, Triangle, Square, Circle, Hexagon,
-  Grid3x3, Magnet, Crosshair, Ruler,
+  Grid3x3, Magnet, Crosshair, Ruler, PenLine,
 } from 'lucide-react'
+
+export const meta = {
+  label: 'Scratchpad',
+  group: 'engine',
+  order: 10,
+  icon: PenLine,
+  colorClass: 'text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/30',
+  eventTool: 'scratchpad',
+}
 
 // ─── Constants ─────────────────────────────────────────────────────────────
 
