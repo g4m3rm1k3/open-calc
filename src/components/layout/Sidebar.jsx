@@ -39,7 +39,7 @@ export default function Sidebar({ onNavigate, isPinned, togglePin, isCollapsed, 
   // Header identity changes by context
   const headerIcon = activeCourse ? (activeCourseObj?.icon ?? '∂') : isLabsArea ? '⚗' : isGamesArea ? '⊕' : '∂'
   const headerSub  = activeCourse ? (activeCourseObj?.description ?? 'Course') : isLabsArea ? 'Labs' : isGamesArea ? 'Games' : 'Omnibus'
-  const headerPath = activeCourse ? (activeCourseObj?.path ?? '/courses') : isLabsArea ? '/labs' : isGamesArea ? '/games' : '/courses'
+  const headerPath = activeCourse ? (activeCourseObj?.path ?? '/') : isLabsArea ? '/' : isGamesArea ? '/' : '/'
 
   // Auto-scroll to active lesson
   useEffect(() => {

@@ -8,7 +8,6 @@ import {
 } from "react-router-dom";
 import { LESSON_MAP, CURRICULUM, COURSES } from "../../courses/index.js";
 import Sidebar from "./Sidebar.jsx";
-import UtilityPanel from "../ui/UtilityPanel.jsx";
 import SearchModal from "../ui/SearchModal.jsx";
 import GlobalGrapher from "../../tools/grapher-2d/index.jsx";
 import GlobalGrapher3D from "../../tools/grapher-3d/index.jsx";
@@ -56,6 +55,7 @@ import AlphaMascot from "../ui/AlphaMascot.jsx";
 import GameRules from "../../games/GameRules.jsx";
 import FullscreenButton from "../desktop/FullscreenButton.jsx";
 import NavClock from "../desktop/NavClock.jsx";
+import TutorPanel from "../tutor/TutorPanel.jsx";
 
 function MobileLocationBadge() {
   const { chapterId, lessonSlug } = useParams();
@@ -761,7 +761,6 @@ export default function AppShell({ children }) {
           {polyOpen && <PolyCalc onClose={() => setPolyOpen(false)} />}
           {laOpen && <LinearAlgebraCalc onClose={() => setLAOpen(false)} />}
           {matrixReducerOpen && <MatrixReducer onBack={() => setMatrixReducerOpen(false)} />}
-          <UtilityPanel />
           <WelcomeModal />
           <SearchModal />
           <GlobalGrapher
@@ -838,6 +837,7 @@ export default function AppShell({ children }) {
           {basketOpen && <BasketballLab onClose={() => setBasketOpen(false)} />}
           {golfOpen && <MiniGolfGame onClose={() => setGolfOpen(false)} />}
           <ChatPanel isOpen={chatOpen} onClose={() => setChatOpen(false)} />
+          <TutorPanel lesson={null} />
           {bgPickerOpen && (
             <BackgroundPicker
               config={bgConfig}

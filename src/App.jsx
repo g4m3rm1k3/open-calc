@@ -13,7 +13,6 @@ import { getGameEntry } from "./games/gameLoader.js";
 import DesktopProvider from "./components/desktop/DesktopProvider.jsx";
 
 const DesktopPage = lazy(() => import("./pages/DesktopPage.jsx"));
-const HomePage = lazy(() => import("./pages/HomePage.jsx"));
 const ChapterPage = lazy(() => import("./pages/ChapterPage.jsx"));
 const LessonPage = lazy(() => import("./pages/LessonPage.jsx"));
 const SearchPage = lazy(() => import("./pages/SearchPage.jsx"));
@@ -26,7 +25,6 @@ const CoursePage = lazy(() => import("./pages/CoursePage.jsx"));
 const LogicSimPage = lazy(() => import("./labs/logic-sim/LogicSimPage.jsx"));
 const ChemistryPage = lazy(() => import("./labs/chemistry/ChemistryPage.jsx"));
 const PhysicsPage = lazy(() => import("./labs/physics/PhysicsPage.jsx"));
-const AllCoursesPage = lazy(() => import("./pages/AllCoursesPage.jsx"));
 const CadProPage = lazy(() => import("./labs/cad-pro/CadProPage.jsx"));
 const MarkdownHub = lazy(() => import("./components/docs/MarkdownHub.jsx"));
 const HealthTrackerPage = lazy(() => import('./games/HealthTrackerPage.jsx'));
@@ -63,7 +61,6 @@ export default function App() {
                 <Suspense fallback={<Fallback />}>
                   <Routes>
                     <Route index element={<DesktopPage />} />
-                    <Route path="welcome" element={<HomePage />} />
                     <Route path="course/:courseKey" element={<CoursePage />} />
                     <Route path="chapter/:chapterId" element={<ChapterPage />} />
                     <Route path="chapter/:chapterId/:lessonSlug" element={<LessonPage />} />
@@ -78,7 +75,7 @@ export default function App() {
                     <Route path="logic-sim" element={<LogicSimPage />} />
                     <Route path="chemistry" element={<ChemistryPage />} />
                     <Route path="physics" element={<PhysicsPage />} />
-                    <Route path="courses" element={<AllCoursesPage />} />
+                    <Route path="courses" element={<Navigate to="/" replace />} />
                     <Route path="cad-pro" element={<CadProPage />} />
                     <Route path="studio" element={<MarkdownHub />} />
                     <Route path="docs" element={<Navigate to="/studio" replace />} />

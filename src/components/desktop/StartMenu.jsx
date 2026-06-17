@@ -18,10 +18,12 @@ const SECTIONS = [
 ]
 
 const NAV_LINKS = [
-  { id: 'courses', label: 'All Courses', emoji: '📚', path: '/courses' },
   { id: 'reference', label: 'Reference Library', emoji: '📐', path: '/reference' },
   { id: 'linear-algebra', label: 'Linear Algebra', emoji: '∑', path: '/linear-algebra' },
   { id: 'studio', label: 'Studio / Docs', emoji: '✏️', path: '/studio' },
+  { id: 'rpg', label: 'RPG Workout', emoji: '⚔️', path: '/rpg-workout' },
+  { id: 'brain', label: 'Brain Training', emoji: '🧠', path: '/brain' },
+  { id: 'health', label: 'Health Tracker', emoji: '❤️', path: '/health' },
   { id: 'about', label: 'About', emoji: 'ℹ️', path: '/about' },
 ]
 
@@ -92,6 +94,9 @@ export default function StartMenu({ onClose }) {
         Component: entry.component,
         backTo: '/',
       })
+    } else if (entry?.event) {
+      // Physics games (pool, basketball, golf, football) open via AppShell event
+      window.dispatchEvent(new CustomEvent('oc-open-game', { detail: { game: entry.event } }))
     }
   }
 

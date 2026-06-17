@@ -78,7 +78,7 @@ export default function ChaptersPanel({ activeCourse, activeChapter, activeSlug,
 
       <div className="px-4 pt-3 pb-4">
         <Link
-          to="/courses"
+          to="/"
           onClick={onNavigate}
           className="flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
         >
