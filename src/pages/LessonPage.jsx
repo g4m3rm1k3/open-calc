@@ -130,10 +130,14 @@ export default function LessonPage() {
     );
   }
 
-  const lessonIndex = ALL_LESSONS.findIndex((entry) => entry.id === lesson.id);
+  const lessonIndex = ALL_LESSONS.findIndex(
+    (entry) => String(entry.chapterNumber) === String(chapterId) && entry.slug === slug
+  );
   const prevLesson = lessonIndex > 0 ? ALL_LESSONS[lessonIndex - 1] : null;
   const nextLesson =
-    lessonIndex < ALL_LESSONS.length - 1 ? ALL_LESSONS[lessonIndex + 1] : null;
+    lessonIndex !== -1 && lessonIndex < ALL_LESSONS.length - 1
+      ? ALL_LESSONS[lessonIndex + 1]
+      : null;
 
   return (
     <div className="flex-1 min-h-screen relative overflow-x-hidden bg-white dark:bg-slate-950">

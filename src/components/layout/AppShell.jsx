@@ -1,11 +1,9 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import AuthButton from "../ui/AuthButton.jsx";
 import {
   Link,
-  NavLink,
   Outlet,
   useLocation,
-  useNavigate,
   useParams,
 } from "react-router-dom";
 import { LESSON_MAP, CURRICULUM, COURSES } from "../../courses/index.js";
@@ -18,7 +16,6 @@ import GlobalGrapherJSX from "../../tools/grapher-jsx/index.jsx";
 import ScratchPad from "../../tools/scratchpad/index.jsx";
 import { TOOLS, toolsByGroup } from "../../tools/toolLoader.js";
 import { useSearchContext } from "../../context/SearchContext.jsx";
-import { useProgress } from "../../hooks/useProgress.js";
 import GrapherContext from "../../context/GrapherContext.jsx";
 import {
   Activity,
@@ -28,21 +25,12 @@ import {
   Smartphone,
   Layers,
   Search,
-  BookOpen,
   Menu,
-  X,
   Calculator,
   Terminal,
   Code2,
   PlayCircle,
-  HelpCircle,
-  MessageSquare,
   Sparkles,
-  FileText,
-  Gamepad2,
-  Library,
-  FlaskConical,
-  Sigma,
 } from "lucide-react";
 import TICalc from "../../tools/calculator/index.jsx";
 import SigmaCalc from "../../tools/sigma/index.jsx";
@@ -54,10 +42,8 @@ import MobileBottomNav from "./MobileBottomNav.jsx";
 import GlobalPythonNotebook from "../../tools/python-notebook/index.jsx";
 import GlobalJSPlayground from "../../tools/js-playground/index.jsx";
 import { ChatProvider } from "../../context/ChatContext.jsx";
-import { useChat } from "../../hooks/useChat.js";
 import ChatPanel from "../tutor/ChatPanel.jsx";
 import { motion, AnimatePresence } from "framer-motion";
-import { useVideoPlayer } from "../../hooks/useVideoPlayer.js";
 import PhysicsPoolLab from "../../games/pool/PhysicsPoolLab.jsx";
 import BasketballLab from "../../games/basketball/BasketballLab.jsx";
 import MiniGolfGame from "../../games/golf/MiniGolfGame.jsx";
@@ -69,6 +55,7 @@ import BackgroundPicker from "../backgrounds/BackgroundPicker.jsx";
 import AlphaMascot from "../ui/AlphaMascot.jsx";
 import GameRules from "../../games/GameRules.jsx";
 import FullscreenButton from "../desktop/FullscreenButton.jsx";
+import NavClock from "../desktop/NavClock.jsx";
 
 function MobileLocationBadge() {
   const { chapterId, lessonSlug } = useParams();
@@ -103,155 +90,6 @@ function MobileLocationBadge() {
   );
 }
 
-function ScoreWidget() {
-  const location = useLocation();
-  const { progress } = useProgress();
-
-  // Parse chapter/lesson from URL (same approach as Sidebar — avoids useParams pitfalls)
-  const pathMatch = location.pathname.match(
-    /^\/chapter\/([^/]+)(?:\/([^/]+))?/,
-  );
-  const chapterId = pathMatch?.[1] ?? null;
-  const lessonSlug = pathMatch?.[2] ?? null;
-
-  // Current lesson quiz score
-  const lessonKey =
-    chapterId && lessonSlug ? `${chapterId}/${lessonSlug}` : null;
-  const currentLesson = lessonKey ? LESSON_MAP[lessonKey] : null;
-  const lessonQuiz = currentLesson?.id
-    ? (progress[currentLesson.id]?.quiz ?? null)
-    : null;
-
-  // Active course totals
-  const chapter = chapterId
-    ? CURRICULUM.find((c) => String(c.number) === chapterId)
-    : null;
-  const activeCourse = chapter?.course ?? null;
-  if (!activeCourse) return null;
-
-  const courseChapters = CURRICULUM.filter((c) => c.course === activeCourse);
-  const courseLessons = courseChapters
-    .flatMap((c) => c.lessons ?? [])
-    .filter((l) => l.quiz?.length > 0);
-  const courseMax = courseLessons.reduce(
-    (acc, l) => acc + (l.quiz?.length ?? 0),
-    0,
-  );
-  const courseCorrect = courseLessons.reduce(
-    (acc, l) => acc + (progress[l.id]?.quiz?.correct ?? 0),
-    0,
-  );
-
-  if (courseMax === 0) return null;
-
-  const lessonPct = lessonQuiz ? lessonQuiz.correct / lessonQuiz.total : null;
-  const lessonColor =
-    lessonPct === null
-      ? ""
-      : lessonPct >= 0.8
-        ? "text-emerald-600 dark:text-emerald-400"
-        : lessonPct >= 0.5
-          ? "text-amber-500 dark:text-amber-400"
-          : "text-red-500 dark:text-red-400";
-
-  const coursePct = courseMax > 0 ? courseCorrect / courseMax : 0;
-  const barColor =
-    coursePct >= 0.8
-      ? "bg-emerald-500"
-      : coursePct >= 0.5
-        ? "bg-amber-400"
-        : coursePct > 0
-          ? "bg-brand-500"
-          : "bg-slate-300 dark:bg-slate-600";
-
-  return (
-    <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs select-none">
-      <span className="text-yellow-400" aria-hidden>
-        ★
-      </span>
-      <div className="flex items-baseline gap-0.5">
-        <span className="font-bold text-slate-800 dark:text-slate-200">
-          {courseCorrect}
-        </span>
-        <span className="text-slate-400 dark:text-slate-500">/{courseMax}</span>
-      </div>
-      {/* Mini progress bar */}
-      <div className="w-12 h-1 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
-        <div
-          className={`h-full rounded-full transition-all ${barColor}`}
-          style={{ width: `${Math.max(2, coursePct * 100)}%` }}
-        />
-      </div>
-      {lessonQuiz && (
-        <>
-          <span className="w-px h-3 bg-slate-200 dark:bg-slate-700" />
-          <span className={`font-semibold ${lessonColor}`}>
-            {lessonQuiz.correct}
-            <span className="font-normal text-slate-400">/10</span>
-          </span>
-        </>
-      )}
-    </div>
-  );
-}
-
-function ChatToggleButton({ onClick, isOpen }) {
-  const { unreadCount } = useChat();
-  return (
-    <button
-      onClick={onClick}
-      className={`relative w-11 h-11 rounded-2xl transition-all duration-500 overflow-hidden group ${
-        isOpen
-          ? "bg-indigo-600 shadow-[0_0_30px_rgba(79,70,229,0.4)]"
-          : "bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border border-white/20 dark:border-white/10 hover:bg-white/60 hover:dark:bg-slate-800/60"
-      }`}
-      aria-label="Study chat"
-      title="Study Chat"
-    >
-      <div className="absolute inset-0 flex items-center justify-center">
-        {isOpen ? (
-          <X className="w-5 h-5 text-white" />
-        ) : (
-          <div className="relative">
-            <MessageSquare className="w-5 h-5 text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform" />
-            <div className="absolute inset-0 bg-indigo-500/10 blur-lg rounded-full animate-pulse" />
-          </div>
-        )}
-      </div>
-      {unreadCount > 0 && !isOpen && (
-        <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 border-2 border-white dark:border-slate-900 rounded-full shadow-[0_0_8px_rgba(239,68,68,0.6)]" />
-      )}
-    </button>
-  );
-}
-
-function CoursesDropdown() {
-  return (
-    <NavLink
-      to="/courses"
-      className={({ isActive }) =>
-        `p-2 rounded-lg transition-all flex items-center ${
-          isActive
-            ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700 shadow"
-            : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-        }`
-      }
-      title="Courses"
-      aria-label="Courses"
-    >
-      <BookOpen className="w-5 h-5" />
-    </NavLink>
-  );
-}
-
-function RibbonGroup({ children }) {
-  return (
-    <div className="flex items-center gap-1.5 px-2 sm:px-3 border-r border-white/5 last:border-none h-full">
-      {children}
-    </div>
-  );
-}
-
 function ToolButton({ tool }) {
   const Icon = tool.icon;
   return (
@@ -261,234 +99,92 @@ function ToolButton({ tool }) {
           new CustomEvent("oc-open-tool", { detail: { tool: tool.eventTool } }),
         )
       }
-      className={`p-2 rounded-lg transition-all ${tool.colorClass ?? "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`}
+      className={`p-1.5 rounded-md transition-all ${tool.colorClass ?? "text-slate-500 hover:bg-black/5 dark:hover:bg-white/8"}`}
       title={tool.label}
     >
-      {Icon ? <Icon className="w-5 h-5" /> : tool.glyph}
+      {Icon ? <Icon className="w-4 h-4" /> : <span className="text-sm leading-none font-medium">{tool.glyph}</span>}
     </button>
   );
 }
 
-function TopBar({
-  onMenuToggle,
-  sidebarOpen,
-  onHelpToggle,
-  helpOpen,
-  onPoolToggle,
-  poolOpen,
-  onChemToggle,
-  chemOpen,
-  onPhysicsToggle,
-  physicsOpen,
-  onBasketToggle,
-  basketOpen,
-  onGolfToggle,
-  golfOpen,
-  onFootballToggle,
-  footballOpen,
-  onChatToggle,
-  chatOpen,
-  onBgPickerToggle,
-  onGameRulesToggle,
-  dark,
-  toggleDark,
-}) {
-  const { openSearch } = useSearchContext();
-  const {
-    isOpen: videoOpen,
-    isMinimized: videoMinimized,
-    openPlayer,
-    toggleMinimize,
-  } = useVideoPlayer();
-  const navigate = useNavigate();
-  const videoActive = videoOpen && !videoMinimized;
-  const handleVideoToggle = () => (videoOpen ? toggleMinimize() : openPlayer());
-  const [gamesMenuOpen, setGamesMenuOpen] = useState(false);
-  const gamesMenuRef = useRef(null);
+function SunIcon() {
+  return (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+        d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+    </svg>
+  )
+}
 
-  useEffect(() => {
-    if (!gamesMenuOpen) return;
-    const handler = (e) => {
-      if (gamesMenuRef.current && !gamesMenuRef.current.contains(e.target))
-        setGamesMenuOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [gamesMenuOpen]);
+function MoonIcon() {
+  return (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+        d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+    </svg>
+  )
+}
+
+function NavSep() {
+  return <div className="w-px h-4 bg-black/[0.08] dark:bg-white/[0.08] mx-1.5 flex-shrink-0" />
+}
+
+function TopBar({ dark, toggleDark, onBgPickerToggle }) {
+  const { openSearch } = useSearchContext();
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[100] bg-white/95 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-200/60 dark:border-white/10 flex items-center px-2 sm:px-6 shadow-[0_20px_50px_rgba(0,0,0,0.05)] h-14 overflow-x-auto overflow-y-hidden">
-      {/* 1. BRANDING & SEARCH - Crystalline Module */}
-      <div className="flex items-center gap-2 border-r border-white/10 pr-4 h-10">
-        <Link to="/" className="relative group">
-          <span className="text-indigo-600 dark:text-white font-black tracking-tighter transition-all duration-500 group-hover:scale-110 group-hover:drop-shadow-[0_0_15px_rgba(79,70,229,0.5)] text-3xl group-hover:text-4xl">
+    <header className="fixed top-0 left-0 right-0 z-[100] h-12 flex items-center px-4 gap-3 bg-white/90 dark:bg-[#1c1c1e]/90 backdrop-blur-xl border-b border-black/[0.07] dark:border-white/[0.07]">
+
+      {/* LEFT — logo + app name + auth */}
+      <div className="flex items-center gap-2 flex-shrink-0">
+        <Link to="/" className="flex items-center gap-1.5 group select-none" aria-label="Home">
+          <span className="text-indigo-600 dark:text-indigo-400 font-black text-[22px] leading-none tracking-tight group-hover:text-indigo-500 transition-colors">
             ∂
           </span>
-          <div className="absolute inset-0 bg-indigo-500/20 blur-md rounded-full -z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <span className="text-[13px] font-semibold text-slate-700 dark:text-slate-200 hidden sm:block tracking-tight">
+            UpSkillOS
+          </span>
         </Link>
+        <NavSep />
+        <AuthButton />
+      </div>
+
+      {/* CENTER — flexible spacer */}
+      <div className="flex-1" />
+
+      {/* RIGHT — tools + utilities + clock */}
+      <div className="flex items-center gap-0.5 flex-shrink-0">
+        {toolsByGroup("math").map((tool) => <ToolButton key={tool.key} tool={tool} />)}
+        {toolsByGroup("engine").map((tool) => <ToolButton key={tool.key} tool={tool} />)}
+
+        <NavSep />
+
         <button
           onClick={openSearch}
-          className="p-2 rounded-lg bg-indigo-500/10 text-indigo-500 hover:bg-indigo-500 hover:text-white shadow-sm transition-all duration-300"
+          className="p-1.5 rounded-md text-slate-500 hover:bg-black/5 dark:hover:bg-white/[0.08] transition-colors"
           title="Search"
         >
           <Search className="w-4 h-4" />
         </button>
-      </div>
-
-      {/* 2. THE EXPANDED GRID RIBBON */}
-      <nav className="flex-1 flex flex-row h-full items-center justify-start overflow-x-auto overflow-y-hidden whitespace-nowrap">
-        {/* NAV BAY — mode switchers */}
-        <RibbonGroup>
-          <CoursesDropdown />
-          <NavLink
-            to="/games"
-            title="Games"
-            aria-label="Games"
-            className={({ isActive }) =>
-              `p-2 rounded-lg transition-all ${isActive ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`
-            }
-          >
-            <Gamepad2 className="w-5 h-5" />
-          </NavLink>
-          <NavLink
-            to="/labs"
-            title="Labs"
-            aria-label="Labs"
-            className={({ isActive }) =>
-              `p-2 rounded-lg transition-all ${isActive ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`
-            }
-          >
-            <FlaskConical className="w-5 h-5" />
-          </NavLink>
-          <NavLink
-            to="/linear-algebra"
-            title="Linear Algebra"
-            aria-label="Linear Algebra Reference"
-            className={({ isActive }) =>
-              `p-2 rounded-lg transition-all ${isActive ? "bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 border border-violet-300 dark:border-violet-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`
-            }
-          >
-            <Sigma className="w-5 h-5" />
-          </NavLink>
-          <NavLink
-            to="/reference"
-            title="Reference"
-            aria-label="Reference Library"
-            className={({ isActive }) =>
-              `p-2 rounded-lg transition-all ${isActive ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`
-            }
-          >
-            <Library className="w-5 h-5" />
-          </NavLink>
-          <NavLink
-            to="/studio"
-            title="Studio"
-            aria-label="Studio — Docs & Code"
-            className={({ isActive }) =>
-              `p-2 rounded-lg transition-all ${isActive ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`
-            }
-          >
-            <FileText className="w-5 h-5" />
-          </NavLink>
-          <NavLink
-            to="/viz-gallery"
-            title="Viz Gallery"
-            aria-label="Viz Gallery"
-            className={({ isActive }) =>
-              `p-2 rounded-lg transition-all ${isActive ? "bg-fuchsia-100 dark:bg-fuchsia-900/40 text-fuchsia-700 dark:text-fuchsia-300 border border-fuchsia-300 dark:border-fuchsia-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`
-            }
-          >
-            <Sparkles className="w-5 h-5" />
-          </NavLink>
-          <button
-            onClick={onHelpToggle}
-            className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
-            title="Help"
-          >
-            <HelpCircle className="w-5 h-5" />
-          </button>
-          <button
-            onClick={onGameRulesToggle}
-            className="p-2 rounded-lg text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/30 transition-all font-bold"
-            title="Game Rules"
-            style={{ fontSize: 15, lineHeight: 1 }}
-          >
-            ♠
-          </button>
-          <FullscreenButton />
-        </RibbonGroup>
-
-        {/* MATH BAY — dynamically discovered from src/tools/ */}
-        <RibbonGroup>
-          {toolsByGroup("math").map((tool) => (
-            <ToolButton key={tool.key} tool={tool} />
-          ))}
-        </RibbonGroup>
-
-        {/* ENGINES BAY — dynamically discovered from src/tools/ */}
-        <RibbonGroup>
-          {toolsByGroup("engine").map((tool) => (
-            <ToolButton key={tool.key} tool={tool} />
-          ))}
-        </RibbonGroup>
-      </nav>
-
-      {/* 3. ASSISTANTS & UTILS */}
-      <div className="flex items-center gap-2 border-l border-[var(--color-border)] pl-4 h-full">
-        <ScoreWidget />
-        <button
-          onClick={handleVideoToggle}
-          className={`p-2.5 rounded-xl transition-all ${videoActive ? "bg-sky-500 text-white shadow-lg shadow-sky-500/30" : "text-sky-500 hover:bg-sky-50 dark:hover:bg-sky-900/20"}`}
-          title="Video Academy"
-        >
-          <PlayCircle className="w-5 h-5" />
-        </button>
-        <ChatToggleButton onClick={onChatToggle} isOpen={chatOpen} />
-        <div className="w-px h-8 bg-[var(--color-border)] mx-1" />
         <button
           onClick={onBgPickerToggle}
-          className="p-2.5 rounded-xl text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-          title="Sky Atmosphere"
+          className="p-1.5 rounded-md text-slate-500 hover:bg-black/5 dark:hover:bg-white/[0.08] transition-colors"
+          title="Background"
         >
-          <Sparkles className="w-5 h-5" />
+          <Sparkles className="w-4 h-4" />
         </button>
         <button
           onClick={toggleDark}
-          className="p-2.5 rounded-xl text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          className="p-1.5 rounded-md text-slate-500 hover:bg-black/5 dark:hover:bg-white/[0.08] transition-colors"
+          title="Toggle theme"
         >
-          {dark ? (
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-              />
-            </svg>
-          ) : (
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-              />
-            </svg>
-          )}
+          {dark ? <SunIcon /> : <MoonIcon />}
         </button>
+        <FullscreenButton className="p-1.5 rounded-md text-slate-500 hover:bg-black/5 dark:hover:bg-white/[0.08]" />
 
-        <AuthButton />
-        <div className="w-px h-8 bg-white/10 mx-2" />
+        <NavSep />
+
+        <NavClock />
       </div>
     </header>
   );
@@ -553,6 +249,7 @@ export default function AppShell({ children }) {
   const isFiveAxisRoute = location.pathname.startsWith("/five-axis");
   const isCodeLensRoute = location.pathname.startsWith("/codelens");
   const isLearnRoute = location.pathname.startsWith("/learn") || location.pathname.startsWith("/web-learn");
+  const isDesktopRoute = location.pathname === '/';
   const pathParts = location.pathname.split('/').filter(Boolean);
   const isLessonRoute = pathParts[0] === 'chapter' && pathParts.length >= 3;
 
@@ -661,6 +358,12 @@ export default function AppShell({ children }) {
     if (mode === "2d") setGraphOpen(true);
     else if (mode === "3d") setGraph3DOpen(true);
     else setGraphJSXOpen(true); // 'pro' default
+  }, []);
+
+  useEffect(() => {
+    const handler = () => setChatOpen(c => !c);
+    window.addEventListener('oc-toggle-chat', handler);
+    return () => window.removeEventListener('oc-toggle-chat', handler);
   }, []);
 
   useEffect(() => {
@@ -797,28 +500,9 @@ export default function AppShell({ children }) {
         <div className={`min-h-screen transition-colors duration-500 relative overflow-hidden ${isLessonRoute ? "bg-white dark:bg-slate-950" : ""}`}>
           {!isLessonRoute && <DynamicBackground mode={dark ? "dark" : "light"} config={bgConfig} />}
           <TopBar
-            onMenuToggle={() => setSidebarOpen((o) => !o)}
-            sidebarOpen={sidebarOpen}
-            onHelpToggle={() => setHelpOpen((prev) => !prev)}
-            helpOpen={helpOpen}
-            onPoolToggle={() => setPoolOpen((prev) => !prev)}
-            poolOpen={poolOpen}
-            onChemToggle={() => setChemOpen((prev) => !prev)}
-            chemOpen={chemOpen}
-            onPhysicsToggle={() => setPhysicsOpen((prev) => !prev)}
-            physicsOpen={physicsOpen}
-            onBasketToggle={() => setBasketOpen((prev) => !prev)}
-            basketOpen={basketOpen}
-            onGolfToggle={() => setGolfOpen((prev) => !prev)}
-            golfOpen={golfOpen}
-            onFootballToggle={() => setFootballOpen((prev) => !prev)}
-            footballOpen={footballOpen}
-            onChatToggle={() => setChatOpen((prev) => !prev)}
-            chatOpen={chatOpen}
-            onBgPickerToggle={() => setBgPickerOpen((o) => !o)}
-            onGameRulesToggle={() => setGameRulesOpen((prev) => !prev)}
             dark={dark}
             toggleDark={toggleDark}
+            onBgPickerToggle={() => setBgPickerOpen((o) => !o)}
           />
 
           {/* Mobile sidebar/tools backdrop */}
@@ -847,7 +531,7 @@ export default function AppShell({ children }) {
             onMouseEnter={() => !sidebarPinned && setSidebarHovered(true)}
             onMouseLeave={() => setSidebarHovered(false)}
             className={`fixed left-0 bottom-0 z-50 bg-[var(--color-surface)] backdrop-blur-xl border-r border-[var(--color-border)] transition-all duration-500 ease-in-out w-[280px]
-          top-14
+          top-12
           ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
           ${isSidebarExpanded ? "lg:translate-x-0" : "lg:-translate-x-[276px]"}
           ${!sidebarPinned && isSidebarExpanded ? "shadow-2xl ring-1 ring-black/5 dark:ring-white/5" : ""}
@@ -869,7 +553,7 @@ export default function AppShell({ children }) {
 
           {/* Main content */}
           <main
-            className={`transition-[padding] duration-500 ease-in-out pb-20 lg:pb-11 ${isChemistryRoute ? "h-screen overflow-hidden" : "min-h-screen"} ${isHealthRoute || isBrainRoute ? "bg-white dark:bg-slate-950" : ""} ${sidebarPinned ? "lg:pl-[280px]" : "lg:pl-3"} ${chatOpen ? "lg:pr-[400px]" : "lg:pr-0"} pt-14`}
+            className={`transition-[padding] duration-500 ease-in-out pb-20 lg:pb-11 ${isChemistryRoute ? "h-screen overflow-hidden" : isDesktopRoute ? "h-screen" : "min-h-screen"} ${isHealthRoute || isBrainRoute ? "bg-white dark:bg-slate-950" : ""} ${sidebarPinned && !isDesktopRoute ? "lg:pl-[280px]" : "lg:pl-0"} ${chatOpen ? "lg:pr-[400px]" : "lg:pr-0"} pt-12`}
             style={{
               ...(scratchSnap === "left"
                 ? {
@@ -883,11 +567,13 @@ export default function AppShell({ children }) {
           >
             <div
               className={
-                isChemistryRoute
-                  ? "w-full h-[calc(100vh-56px)] flex flex-col overflow-hidden"
-                  : isUniversalCalcRoute
-                    ? "max-w-[min(98vw,2800px)] mx-auto px-2 sm:px-3 lg:px-4 py-8"
-                    : `max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-10 transition-all duration-500`
+                isDesktopRoute
+                  ? "w-full h-[calc(100vh-48px-44px)]"
+                  : isChemistryRoute
+                    ? "w-full h-[calc(100vh-48px)] flex flex-col overflow-hidden"
+                    : isUniversalCalcRoute
+                      ? "max-w-[min(98vw,2800px)] mx-auto px-2 sm:px-3 lg:px-4 py-8"
+                      : `max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-10 transition-all duration-500`
               }
             >
               {children ?? <Outlet />}

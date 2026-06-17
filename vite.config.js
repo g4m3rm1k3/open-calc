@@ -17,6 +17,7 @@ export default defineConfig({
   base: process.env.VITE_BASE_URL ?? (process.env.ELECTRON_BUILD ? "./" : "/"),
   build: {
     outDir: "dist",
+    reportCompressedSize: false,
     contentHash: true,
     rollupOptions: {
       output: {

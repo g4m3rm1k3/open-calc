@@ -12,6 +12,7 @@ import { getLabEntry } from "./labs/labLoader.js";
 import { getGameEntry } from "./games/gameLoader.js";
 import DesktopProvider from "./components/desktop/DesktopProvider.jsx";
 
+const DesktopPage = lazy(() => import("./pages/DesktopPage.jsx"));
 const HomePage = lazy(() => import("./pages/HomePage.jsx"));
 const ChapterPage = lazy(() => import("./pages/ChapterPage.jsx"));
 const LessonPage = lazy(() => import("./pages/LessonPage.jsx"));
@@ -28,8 +29,6 @@ const PhysicsPage = lazy(() => import("./labs/physics/PhysicsPage.jsx"));
 const AllCoursesPage = lazy(() => import("./pages/AllCoursesPage.jsx"));
 const CadProPage = lazy(() => import("./labs/cad-pro/CadProPage.jsx"));
 const MarkdownHub = lazy(() => import("./components/docs/MarkdownHub.jsx"));
-const GamesPage = lazy(() => import("./pages/GamesPage.jsx"));
-const LabsPage = lazy(() => import("./pages/LabsPage.jsx"));
 const HealthTrackerPage = lazy(() => import('./games/HealthTrackerPage.jsx'));
 const RPGWorkoutPage = lazy(() => import('./features/rpg/RPGWorkoutPage.jsx'));
 const BrainPage = lazy(() => import('./features/brain/BrainPage.jsx'));
@@ -63,7 +62,8 @@ export default function App() {
               <AppShell>
                 <Suspense fallback={<Fallback />}>
                   <Routes>
-                    <Route index element={<HomePage />} />
+                    <Route index element={<DesktopPage />} />
+                    <Route path="welcome" element={<HomePage />} />
                     <Route path="course/:courseKey" element={<CoursePage />} />
                     <Route path="chapter/:chapterId" element={<ChapterPage />} />
                     <Route path="chapter/:chapterId/:lessonSlug" element={<LessonPage />} />
@@ -82,8 +82,8 @@ export default function App() {
                     <Route path="cad-pro" element={<CadProPage />} />
                     <Route path="studio" element={<MarkdownHub />} />
                     <Route path="docs" element={<Navigate to="/studio" replace />} />
-                    <Route path="games" element={<GamesPage />} />
-                    <Route path="labs" element={<LabsPage />} />
+                    <Route path="games" element={<Navigate to="/" replace />} />
+                    <Route path="labs" element={<Navigate to="/" replace />} />
                     <Route path="health" element={<HealthTrackerPage />} />
                     <Route path="rpg-workout" element={<RPGWorkoutPage />} />
                     <Route path="brain" element={<BrainPage />} />

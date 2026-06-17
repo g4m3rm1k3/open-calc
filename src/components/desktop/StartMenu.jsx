@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import { LABS } from '../../labs/registry.js'
 import { GAMES } from '../../games/registry.js'
 import { TOOLS } from '../../tools/toolLoader.js'
+import { COURSES } from '../../courses/index.js'
 import { getLabEntry } from '../../labs/labLoader.js'
 import { getGameEntry } from '../../games/gameLoader.js'
 import { useDesktop } from './DesktopProvider.jsx'
 
 const SECTIONS = [
   { id: 'all', label: 'All' },
+  { id: 'courses', label: 'Courses' },
   { id: 'labs', label: 'Labs' },
   { id: 'games', label: 'Games' },
   { id: 'tools', label: 'Tools' },
@@ -44,6 +46,9 @@ export default function StartMenu({ onClose }) {
 
   const q = query.toLowerCase()
 
+  const filteredCourses = COURSES.filter(c =>
+    !q || c.label.toLowerCase().includes(q)
+  )
   const filteredLabs = LABS.filter(l =>
     !q || l.label.toLowerCase().includes(q) || l.tags?.some(t => t.toLowerCase().includes(q))
   )
@@ -71,7 +76,7 @@ export default function StartMenu({ onClose }) {
         label: lab.label,
         emoji: lab.emoji,
         Component: entry.component,
-        backTo: '/labs',
+        backTo: '/',
       })
     }
   }
@@ -85,7 +90,7 @@ export default function StartMenu({ onClose }) {
         label: game.label,
         emoji: game.emoji,
         Component: entry.component,
-        backTo: '/games',
+        backTo: '/',
       })
     }
   }
@@ -102,6 +107,7 @@ export default function StartMenu({ onClose }) {
     navigate(link.path)
   }
 
+  const showCourses = tab === 'all' || tab === 'courses'
   const showLabs = tab === 'all' || tab === 'labs'
   const showGames = tab === 'all' || tab === 'games'
   const showTools = tab === 'all' || tab === 'tools'
@@ -144,7 +150,25 @@ export default function StartMenu({ onClose }) {
       )}
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-4">
+      <div className="flex-1 overflow-y-auto overscroll-contain p-3 space-y-4">
+        {showCourses && filteredCourses.length > 0 && (
+          <section>
+            <h3 className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2 px-1">Courses</h3>
+            <div className="grid grid-cols-3 gap-1.5">
+              {filteredCourses.map(course => (
+                <button
+                  key={course.key}
+                  onClick={() => { onClose(); navigate(course.path) }}
+                  className="flex items-center gap-2 px-2.5 py-2 rounded-lg text-left text-xs hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                >
+                  <span className="text-base flex-shrink-0">{course.icon}</span>
+                  <span className="truncate text-slate-700 dark:text-slate-300 font-medium">{course.label}</span>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
+
         {showLabs && filteredLabs.length > 0 && (
           <section>
             <h3 className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2 px-1">Labs</h3>
@@ -217,7 +241,7 @@ export default function StartMenu({ onClose }) {
           </section>
         )}
 
-        {filteredLabs.length === 0 && filteredGames.length === 0 && filteredTools.length === 0 && filteredNav.length === 0 && (
+        {filteredCourses.length === 0 && filteredLabs.length === 0 && filteredGames.length === 0 && filteredTools.length === 0 && filteredNav.length === 0 && (
           <p className="text-center text-sm text-slate-400 py-8">No results for "{query}"</p>
         )}
       </div>
