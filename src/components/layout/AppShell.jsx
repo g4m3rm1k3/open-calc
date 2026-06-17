@@ -68,6 +68,7 @@ import DynamicBackground from "../backgrounds/DynamicBackground.jsx";
 import BackgroundPicker from "../backgrounds/BackgroundPicker.jsx";
 import AlphaMascot from "../ui/AlphaMascot.jsx";
 import GameRules from "../../games/GameRules.jsx";
+import FullscreenButton from "../desktop/FullscreenButton.jsx";
 
 function MobileLocationBadge() {
   const { chapterId, lessonSlug } = useParams();
@@ -414,6 +415,7 @@ function TopBar({
           >
             ♠
           </button>
+          <FullscreenButton />
         </RibbonGroup>
 
         {/* MATH BAY — dynamically discovered from src/tools/ */}
@@ -543,36 +545,14 @@ export default function AppShell({ children }) {
   const isUniversalCalcRoute = location.pathname.startsWith("/universal-calc");
   const isChemistryRoute = location.pathname.startsWith("/chemistry");
   const isOpenMatRoute = location.pathname.startsWith("/openmat");
-  const isArkanoidLearnRoute = location.pathname.startsWith("/arkanoid-learn");
   const isCNCSimRoute = location.pathname.startsWith("/cnc-sim");
   const isCadProRoute = location.pathname.startsWith("/cad-pro");
-  const isOpenCraftRoute = location.pathname.startsWith("/open-craft");
-  const isRealityRunnerRoute = location.pathname.startsWith("/reality-runner");
-  const isStemQuestRoute = location.pathname.startsWith("/stem-quest");
   const isDocsRoute = location.pathname.startsWith("/studio") || location.pathname.startsWith("/docs");
-  const isAsteroidsRoute = location.pathname.startsWith("/asteroids-la");
-  const isVectorCommandRoute = location.pathname.startsWith("/vector-command");
-  const isStemTetrisRoute = location.pathname.startsWith("/stem-tetris");
-  const isCardAcademyRoute = location.pathname.startsWith("/card-academy");
-  const isCardQuestRoute = location.pathname.startsWith("/card-quest");
   const isHealthRoute = location.pathname.startsWith("/health");
   const isBrainRoute = location.pathname.startsWith("/brain");
-  const isRubiksCubeRoute = location.pathname.startsWith("/rubiks-cube");
-  const isMatrixGameRoute = location.pathname.startsWith("/matrix-game");
-  const isRobotArmLabRoute = location.pathname.startsWith("/robot-arm-lab") || location.pathname.startsWith("/lab/robot-arm-sim");
-  const isSimLabRoute = location.pathname.startsWith("/sim-lab") || location.pathname.startsWith("/lab/sim-lab");
-  const isDroneLabRoute = location.pathname.startsWith("/drone-lab") || location.pathname.startsWith("/lab/drone-lab");
-  const isMatrixLabRoute = location.pathname.startsWith("/matrix-lab") || location.pathname.startsWith("/lab/matrix-lab");
-  const isMatrix3DLabRoute = location.pathname.startsWith("/matrix-3d-lab") || location.pathname.startsWith("/lab/matrix-3d-lab");
-  const isDecompLabRoute = location.pathname.startsWith("/decomp-lab") || location.pathname.startsWith("/lab/decomp-lab");
-  const isCmmLabRoute = location.pathname.startsWith("/cmm-lab") || location.pathname.startsWith("/lab/cmm-lab");
   const isFiveAxisRoute = location.pathname.startsWith("/five-axis");
-  const isDSAArraysLabRoute = location.pathname.startsWith("/lab/dsa-arrays-lab");
-  const isDSALinkedListsLabRoute = location.pathname.startsWith("/lab/dsa-linked-lists-lab");
   const isCodeLensRoute = location.pathname.startsWith("/codelens");
   const isLearnRoute = location.pathname.startsWith("/learn") || location.pathname.startsWith("/web-learn");
-  const isHtmlLabRoute = location.pathname.startsWith("/html-lab") || location.pathname.startsWith("/lab/html-lab");
-  const isMusicLabRoute = location.pathname.startsWith("/music-lab") || location.pathname.startsWith("/lab/music-lab");
   const pathParts = location.pathname.split('/').filter(Boolean);
   const isLessonRoute = pathParts[0] === 'chapter' && pathParts.length >= 3;
 
@@ -724,39 +704,17 @@ export default function AppShell({ children }) {
 
   if (
     isOpenMatRoute ||
-    isArkanoidLearnRoute ||
-    isRealityRunnerRoute ||
     isCNCSimRoute ||
     isCadProRoute ||
-    isOpenCraftRoute ||
-    isStemQuestRoute ||
     isDocsRoute ||
-    isAsteroidsRoute ||
-    isVectorCommandRoute ||
-    isStemTetrisRoute ||
-    isCardAcademyRoute ||
-    isCardQuestRoute ||
-    isRubiksCubeRoute ||
-    isMatrixGameRoute ||
-    isRobotArmLabRoute ||
-    isSimLabRoute ||
-    isDroneLabRoute ||
-    isMatrixLabRoute ||
-    isMatrix3DLabRoute ||
-    isDecompLabRoute ||
-    isCmmLabRoute ||
     isFiveAxisRoute ||
-    isDSAArraysLabRoute ||
-    isDSALinkedListsLabRoute ||
     isCodeLensRoute ||
-    isLearnRoute ||
-    isHtmlLabRoute ||
-    isMusicLabRoute
+    isLearnRoute
   ) {
     return (
       <GrapherContext.Provider value={{ openGrapher }}>
         <div
-          className={`h-screen overflow-hidden ${isArkanoidLearnRoute || isRealityRunnerRoute || isCadProRoute || isOpenCraftRoute || isStemQuestRoute || isAsteroidsRoute || isVectorCommandRoute || isStemTetrisRoute || isCardAcademyRoute || isCardQuestRoute || isRubiksCubeRoute || isMatrixGameRoute || isRobotArmLabRoute || isSimLabRoute || isDroneLabRoute || isMatrixLabRoute || isMatrix3DLabRoute || isDecompLabRoute || isCmmLabRoute || isFiveAxisRoute || isDSAArraysLabRoute || isDSALinkedListsLabRoute || isCodeLensRoute || isLearnRoute ? "bg-[#08111f]" : "bg-white dark:bg-slate-950"}`}
+          className={`h-screen overflow-hidden ${isCadProRoute || isFiveAxisRoute || isCodeLensRoute || isLearnRoute ? "bg-[#08111f]" : "bg-white dark:bg-slate-950"}`}
         >
           <div className="h-full w-full overflow-hidden">
             {children ?? <Outlet />}
@@ -911,7 +869,7 @@ export default function AppShell({ children }) {
 
           {/* Main content */}
           <main
-            className={`transition-[padding] duration-500 ease-in-out pb-20 lg:pb-0 ${isChemistryRoute || isOpenMatRoute ? "h-screen overflow-hidden" : "min-h-screen"} ${isHealthRoute || isBrainRoute ? "bg-white dark:bg-slate-950" : ""} ${sidebarPinned ? "lg:pl-[280px]" : "lg:pl-3"} ${chatOpen ? "lg:pr-[400px]" : "lg:pr-0"} pt-14`}
+            className={`transition-[padding] duration-500 ease-in-out pb-20 lg:pb-11 ${isChemistryRoute ? "h-screen overflow-hidden" : "min-h-screen"} ${isHealthRoute || isBrainRoute ? "bg-white dark:bg-slate-950" : ""} ${sidebarPinned ? "lg:pl-[280px]" : "lg:pl-3"} ${chatOpen ? "lg:pr-[400px]" : "lg:pr-0"} pt-14`}
             style={{
               ...(scratchSnap === "left"
                 ? {
@@ -926,12 +884,10 @@ export default function AppShell({ children }) {
             <div
               className={
                 isChemistryRoute
-                  ? "w-full h-[calc(100vh-60px)] flex flex-col overflow-hidden"
-                  : isOpenMatRoute
-                    ? "w-full h-[calc(100vh-60px)] flex flex-col overflow-hidden"
-                    : isUniversalCalcRoute
-                      ? "max-w-[min(98vw,2800px)] mx-auto px-2 sm:px-3 lg:px-4 py-8"
-                      : `max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-10 transition-all duration-500`
+                  ? "w-full h-[calc(100vh-56px)] flex flex-col overflow-hidden"
+                  : isUniversalCalcRoute
+                    ? "max-w-[min(98vw,2800px)] mx-auto px-2 sm:px-3 lg:px-4 py-8"
+                    : `max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-10 transition-all duration-500`
               }
             >
               {children ?? <Outlet />}

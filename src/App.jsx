@@ -10,6 +10,7 @@ import FloatingVideoPlayer from "./components/ui/FloatingVideoPlayer.jsx";
 import LoadingSpinner from "./components/ui/LoadingSpinner.jsx";
 import { getLabEntry } from "./labs/labLoader.js";
 import { getGameEntry } from "./games/gameLoader.js";
+import DesktopProvider from "./components/desktop/DesktopProvider.jsx";
 
 const HomePage = lazy(() => import("./pages/HomePage.jsx"));
 const ChapterPage = lazy(() => import("./pages/ChapterPage.jsx"));
@@ -57,6 +58,7 @@ export default function App() {
             <HashRouter
               future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
             >
+              <DesktopProvider>
               <FloatingVideoPlayer />
               <AppShell>
                 <Suspense fallback={<Fallback />}>
@@ -142,6 +144,7 @@ export default function App() {
                   </Routes>
                 </Suspense>
               </AppShell>
+              </DesktopProvider>
             </HashRouter>
           </VideoPlayerProvider>
         </PinsProvider>
