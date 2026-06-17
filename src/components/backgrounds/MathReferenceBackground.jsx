@@ -1,6 +1,44 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
+
+const THEME = {
+  dark: {
+    bg: '#080506',
+    vignette: '8,5,6',
+    vR1: 0.18, vR2: 0.86, vL1: 0.14, vL2: 0.76,
+    fogColor: '#080506',
+    ambient: '#ffdfb0',
+    ambientIntensity: 0.36,
+    dirLight: { color: '#fff0c8', intensity: 1.15 },
+    spotLight1: { color: '#ffd38c', intensity: 2.4 },
+    spotLight2: { color: '#8ecae6', intensity: 1.15 },
+    dustColor: '#ffe9b8',
+  },
+  light: {
+    bg: '#faf7f1',
+    vignette: '250,247,241',
+    vR1: 0, vR2: 0.04, vL1: 0, vL2: 0.06,
+    fogColor: '#faf7f1',
+    ambient: '#f0d8a8',
+    ambientIntensity: 1.1,
+    dirLight: { color: '#fffaee', intensity: 1.5 },
+    spotLight1: { color: '#ffe8c0', intensity: 1.8 },
+    spotLight2: { color: '#c8e8ff', intensity: 0.8 },
+    dustColor: '#c8a060',
+  },
+}
+
+function useIsDark() {
+  const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'))
+  useEffect(() => {
+    const el = document.documentElement
+    const obs = new MutationObserver(() => setDark(el.classList.contains('dark')))
+    obs.observe(el, { attributes: true, attributeFilter: ['class'] })
+    return () => obs.disconnect()
+  }, [])
+  return dark
+}
 
 const BOOK_COLORS = ['#264653', '#2a9d8f', '#e9c46a', '#f4a261', '#e76f51', '#4a4e69', '#8ecae6', '#b5838d']
 
@@ -163,7 +201,7 @@ function OpenBook({ mouseRef }) {
   )
 }
 
-function FloatingDust({ mouseRef }) {
+function FloatingDust({ mouseRef, color }) {
   const ref = useRef(null)
   const positions = useMemo(() => {
     const values = new Float32Array(330)
@@ -184,7 +222,7 @@ function FloatingDust({ mouseRef }) {
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" count={positions.length / 3} array={positions} itemSize={3} />
       </bufferGeometry>
-      <pointsMaterial color="#ffe9b8" size={0.026} transparent opacity={0.58} />
+      <pointsMaterial color={color} size={0.026} transparent opacity={0.58} />
     </points>
   )
 }
@@ -201,19 +239,19 @@ function CameraRig({ mouseRef }) {
   return null
 }
 
-function Scene({ mouseRef }) {
+function Scene({ mouseRef, T }) {
   return (
     <>
-      <color attach="background" args={['#080506']} />
-      <fog attach="fog" args={['#080506', 8, 22]} />
-      <ambientLight intensity={0.36} color="#ffdfb0" />
-      <directionalLight position={[-4, 7, 5]} intensity={1.15} color="#fff0c8" castShadow />
-      <spotLight position={[0, 6.2, 2.5]} angle={0.56} penumbra={0.7} intensity={2.4} color="#ffd38c" castShadow />
-      <spotLight position={[-5, 4.4, -1]} angle={0.45} penumbra={0.8} intensity={1.15} color="#8ecae6" />
+      <color attach="background" args={[T.fogColor]} />
+      <fog attach="fog" args={[T.fogColor, 8, 22]} />
+      <ambientLight intensity={T.ambientIntensity} color={T.ambient} />
+      <directionalLight position={[-4, 7, 5]} intensity={T.dirLight.intensity} color={T.dirLight.color} castShadow />
+      <spotLight position={[0, 6.2, 2.5]} angle={0.56} penumbra={0.7} intensity={T.spotLight1.intensity} color={T.spotLight1.color} castShadow />
+      <spotLight position={[-5, 4.4, -1]} angle={0.45} penumbra={0.8} intensity={T.spotLight2.intensity} color={T.spotLight2.color} />
       <LibraryRoom />
       <CurvedBookshelves mouseRef={mouseRef} />
       <OpenBook mouseRef={mouseRef} />
-      <FloatingDust mouseRef={mouseRef} />
+      <FloatingDust mouseRef={mouseRef} color={T.dustColor} />
       <CameraRig mouseRef={mouseRef} />
     </>
   )
@@ -221,6 +259,8 @@ function Scene({ mouseRef }) {
 
 export default function MathReferenceBackground() {
   const mouseRef = useRef({ x: 0, y: 0 })
+  const isDark = useIsDark()
+  const T = THEME[isDark ? 'dark' : 'light']
 
   useEffect(() => {
     const handlePointer = (event) => {
@@ -233,17 +273,17 @@ export default function MathReferenceBackground() {
   }, [])
 
   return (
-    <div className="fixed inset-0 z-0 overflow-hidden bg-[#080506]" aria-hidden="true">
+    <div className="fixed inset-0 z-0 overflow-hidden" style={{ background: T.bg }} aria-hidden="true">
       <Canvas
         shadows
         dpr={[1, 1.8]}
         camera={{ position: [0, 2.8, 7.2], fov: 48, near: 0.1, far: 60 }}
         gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
       >
-        <Scene mouseRef={mouseRef} />
+        <Scene mouseRef={mouseRef} T={T} />
       </Canvas>
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_56%,transparent_0%,rgba(8,5,6,0.18)_38%,rgba(8,5,6,0.86)_100%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(8,5,6,0.14),rgba(8,5,6,0.76))]" />
+      <div className="pointer-events-none absolute inset-0" style={{ background: `radial-gradient(circle at 50% 56%, transparent 0%, rgba(${T.vignette},${T.vR1}) 38%, rgba(${T.vignette},${T.vR2}) 100%)` }} />
+      <div className="pointer-events-none absolute inset-0" style={{ background: `linear-gradient(180deg, rgba(${T.vignette},${T.vL1}), rgba(${T.vignette},${T.vL2}))` }} />
     </div>
   )
 }

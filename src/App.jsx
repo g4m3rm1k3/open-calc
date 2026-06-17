@@ -16,7 +16,6 @@ const ChapterPage = lazy(() => import("./pages/ChapterPage.jsx"));
 const LessonPage = lazy(() => import("./pages/LessonPage.jsx"));
 const SearchPage = lazy(() => import("./pages/SearchPage.jsx"));
 const AboutPage = lazy(() => import("./pages/AboutPage.jsx"));
-const LearningPathsPage = lazy(() => import("./pages/LearningPathsPage.jsx"));
 const ReferencePage = lazy(() => import("./pages/ReferencePage.jsx"));
 const UniversalCalcPage = lazy(() => import("./labs/universal-calc/UniversalCalcPage.jsx"));
 const OpenMatPage = lazy(() => import("./labs/openmat/OpenMatPage.jsx"));
@@ -28,7 +27,6 @@ const PhysicsPage = lazy(() => import("./labs/physics/PhysicsPage.jsx"));
 const AllCoursesPage = lazy(() => import("./pages/AllCoursesPage.jsx"));
 const CadProPage = lazy(() => import("./labs/cad-pro/CadProPage.jsx"));
 const MarkdownHub = lazy(() => import("./components/docs/MarkdownHub.jsx"));
-const VizGalleryPage = lazy(() => import("./pages/VizGalleryPage.jsx"));
 const GamesPage = lazy(() => import("./pages/GamesPage.jsx"));
 const LabsPage = lazy(() => import("./pages/LabsPage.jsx"));
 const HealthTrackerPage = lazy(() => import('./games/HealthTrackerPage.jsx'));
@@ -69,7 +67,6 @@ export default function App() {
                     <Route path="chapter/:chapterId/:lessonSlug" element={<LessonPage />} />
                     <Route path="chapter/:chapterId/:lessonSlug/*" element={<LessonPage />} />
                     <Route path="search" element={<SearchPage />} />
-                    <Route path="paths" element={<LearningPathsPage />} />
                     <Route path="about" element={<AboutPage />} />
                     <Route path="reference" element={<ReferencePage />} />
                     <Route path="linear-algebra" element={<LinearAlgebraReferencePage />} />
@@ -83,7 +80,6 @@ export default function App() {
                     <Route path="cad-pro" element={<CadProPage />} />
                     <Route path="studio" element={<MarkdownHub />} />
                     <Route path="docs" element={<Navigate to="/studio" replace />} />
-                    <Route path="viz-gallery" element={<VizGalleryPage />} />
                     <Route path="games" element={<GamesPage />} />
                     <Route path="labs" element={<LabsPage />} />
                     <Route path="health" element={<HealthTrackerPage />} />

@@ -1,6 +1,43 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
+
+const THEME = {
+  dark: {
+    bg: '#000308',
+    vignette: '0,3,8',
+    vR: 0.60, vL1: 0.15, vL2: 0.78,
+    ambient: '#b0c8ff',
+    ambientIntensity: 0.18,
+    lights: [
+      { pos: [  0,  0,  3], intensity: 1.8,  color: '#4466ff', distance: 32 },
+      { pos: [ 10,  6, -8], intensity: 1.1,  color: '#ff44aa', distance: 38 },
+      { pos: [ -8, -4, -6], intensity: 0.9,  color: '#44ffcc', distance: 28 },
+      { pos: [  0,  9,-16], intensity: 0.7,  color: '#ffaa44', distance: 45 },
+      { pos: [ -6, -6, -4], intensity: 0.6,  color: '#ff7733', distance: 25 },
+    ],
+    orbEmissiveIntensity: 0.4,
+    starSize: 0.038,
+    starOpacity: 0.82,
+  },
+  light: {
+    bg: '#dde8ff',
+    vignette: '221,232,255',
+    vR: 0.04, vL1: 0, vL2: 0.06,
+    ambient: '#8090c0',
+    ambientIntensity: 0.5,
+    lights: [
+      { pos: [  0,  0,  3], intensity: 0.6,  color: '#4466ff', distance: 32 },
+      { pos: [ 10,  6, -8], intensity: 0.4,  color: '#ff44aa', distance: 38 },
+      { pos: [ -8, -4, -6], intensity: 0.3,  color: '#44ffcc', distance: 28 },
+      { pos: [  0,  9,-16], intensity: 0.25, color: '#ffaa44', distance: 45 },
+      { pos: [ -6, -6, -4], intensity: 0.2,  color: '#ff7733', distance: 25 },
+    ],
+    orbEmissiveIntensity: 0.15,
+    starSize: 0.03,
+    starOpacity: 0.35,
+  },
+}
 
 // Deterministic pseudo-random — same scene every render
 function rng(n) {
@@ -8,8 +45,19 @@ function rng(n) {
   return x - Math.floor(x)
 }
 
+function useIsDark() {
+  const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'))
+  useEffect(() => {
+    const el = document.documentElement
+    const obs = new MutationObserver(() => setDark(el.classList.contains('dark')))
+    obs.observe(el, { attributes: true, attributeFilter: ['class'] })
+    return () => obs.disconnect()
+  }, [])
+  return dark
+}
+
 // ── Dense colored starfield ───────────────────────────────────────────────────
-function ColoredStars() {
+function ColoredStars({ size, opacity }) {
   const { positions, colors } = useMemo(() => {
     const N = 3200
     const positions = new Float32Array(N * 3)
@@ -51,7 +99,7 @@ function ColoredStars() {
         <bufferAttribute attach="attributes-position" count={3200} array={positions} itemSize={3} />
         <bufferAttribute attach="attributes-color"    count={3200} array={colors}    itemSize={3} />
       </bufferGeometry>
-      <pointsMaterial size={0.055} vertexColors transparent opacity={0.88} sizeAttenuation />
+      <pointsMaterial size={size} vertexColors transparent opacity={opacity} sizeAttenuation />
     </points>
   )
 }
@@ -237,7 +285,7 @@ function DNAHelix() {
 }
 
 // ── Large background wireframe structures ─────────────────────────────────────
-function BackgroundOrb({ position, color, size, speed, geo }) {
+function BackgroundOrb({ position, color, size, speed, geo, emissiveIntensity }) {
   const ref = useRef(null)
   useFrame(({ clock }) => {
     const t = clock.elapsedTime
@@ -308,7 +356,7 @@ function RoboticsCluster() {
 }
 
 // ── Full cosmic scene ─────────────────────────────────────────────────────────
-function CosmicScene({ mouseRef }) {
+function CosmicScene({ mouseRef, T }) {
   const worldRef = useRef(null)
 
   useFrame(({ clock }) => {
@@ -320,16 +368,14 @@ function CosmicScene({ mouseRef }) {
 
   return (
     <>
-      <color attach="background" args={['#000308']} />
-      <ambientLight intensity={0.18} color="#b0c8ff" />
-      <pointLight position={[  0,  0,  3]} intensity={1.8} color="#4466ff" distance={32} />
-      <pointLight position={[ 10,  6, -8]} intensity={1.1} color="#ff44aa" distance={38} />
-      <pointLight position={[ -8, -4, -6]} intensity={0.9} color="#44ffcc" distance={28} />
-      <pointLight position={[  0,  9,-16]} intensity={0.7} color="#ffaa44" distance={45} />
-      <pointLight position={[ -6, -6, -4]} intensity={0.6} color="#ff7733" distance={25} />
+      <color attach="background" args={[T.bg]} />
+      <ambientLight intensity={T.ambientIntensity} color={T.ambient} />
+      {T.lights.map((l, i) => (
+        <pointLight key={i} position={l.pos} intensity={l.intensity} color={l.color} distance={l.distance} />
+      ))}
 
       <group ref={worldRef}>
-        <ColoredStars />
+        <ColoredStars size={T.starSize} opacity={T.starOpacity} />
 
         {/* Nebulae */}
         <NebulaCloud position={[  9,  5, -17]} color="#ff44aa" spread={5.8} count={300} seed={100} />
@@ -346,11 +392,11 @@ function CosmicScene({ mouseRef }) {
         <RoboticsCluster />
 
         {/* Background wireframe structures */}
-        <BackgroundOrb position={[-13,  6, -22]} color="#6366f1" size={4.8} speed={0.055} geo="icosahedron"  />
-        <BackgroundOrb position={[ 15, -7, -24]} color="#06b6d4" size={4.0} speed={0.045} geo="dodecahedron" />
-        <BackgroundOrb position={[ -3,-11, -19]} color="#a855f7" size={3.2} speed={0.080} geo="octahedron"   />
-        <BackgroundOrb position={[  7, 10, -26]} color="#f472b6" size={3.6} speed={0.038} geo="torusKnot"    />
-        <BackgroundOrb position={[ 11,  3, -18]} color="#34d399" size={2.8} speed={0.065} geo="icosahedron"  />
+        <BackgroundOrb position={[-13,  6, -22]} color="#6366f1" size={4.8} speed={0.055} geo="icosahedron"  emissiveIntensity={T.orbEmissiveIntensity} />
+        <BackgroundOrb position={[ 15, -7, -24]} color="#06b6d4" size={4.0} speed={0.045} geo="dodecahedron" emissiveIntensity={T.orbEmissiveIntensity} />
+        <BackgroundOrb position={[ -3,-11, -19]} color="#a855f7" size={3.2} speed={0.080} geo="octahedron"   emissiveIntensity={T.orbEmissiveIntensity} />
+        <BackgroundOrb position={[  7, 10, -26]} color="#f472b6" size={3.6} speed={0.038} geo="torusKnot"    emissiveIntensity={T.orbEmissiveIntensity} />
+        <BackgroundOrb position={[ 11,  3, -18]} color="#34d399" size={2.8} speed={0.065} geo="icosahedron"  emissiveIntensity={T.orbEmissiveIntensity} />
       </group>
     </>
   )
@@ -359,6 +405,8 @@ function CosmicScene({ mouseRef }) {
 // ── Export ────────────────────────────────────────────────────────────────────
 export default function UniverseBackground() {
   const mouseRef = useRef({ x: 0, y: 0 })
+  const isDark = useIsDark()
+  const T = THEME[isDark ? 'dark' : 'light']
 
   useEffect(() => {
     const handle = (e) => {
@@ -370,18 +418,24 @@ export default function UniverseBackground() {
   }, [])
 
   return (
-    <div className="fixed inset-0 z-0 bg-[#000308]" aria-hidden="true">
+    <div className="fixed inset-0 z-0" style={{ background: T.bg }} aria-hidden="true">
       <Canvas
         dpr={[1, 1.5]}
         camera={{ position: [0, 0, 16], fov: 60, near: 0.1, far: 110 }}
         gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
       >
-        <CosmicScene mouseRef={mouseRef} />
+        <CosmicScene mouseRef={mouseRef} T={T} />
       </Canvas>
       {/* Radial vignette */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_75%_65%_at_50%_42%,transparent_18%,rgba(0,3,8,0.60)_100%)]" />
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{ background: `radial-gradient(ellipse 75% 65% at 50% 42%, transparent 18%, rgba(${T.vignette},${T.vR}) 100%)` }}
+      />
       {/* Bottom fade — keeps text readable */}
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(0,3,8,0.15)_0%,rgba(0,3,8,0.78)_100%)]" />
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{ background: `linear-gradient(180deg, rgba(${T.vignette},${T.vL1}) 0%, rgba(${T.vignette},${T.vL2}) 100%)` }}
+      />
     </div>
   )
 }

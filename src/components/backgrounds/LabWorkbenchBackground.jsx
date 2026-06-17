@@ -1,8 +1,52 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
-function WorkbenchGrid() {
+const THEME = {
+  dark: {
+    bg: '#04110f',
+    vignette: '4,17,15',
+    vR1: 0.1, vR2: 0.78, vL1: 0.1, vL2: 0.72,
+    fogColor: '#04110f',
+    ambient: '#aafff0',
+    ambientIntensity: 0.34,
+    dirLight: { color: '#eafffb', intensity: 1.2 },
+    spotLight: { color: '#7fffe8', intensity: 1.9 },
+    floorColor: '#061814',
+    gridPrimary: '#5fffe0',
+    gridSecondary: '#174c45',
+    scanColor: '#72ffe7',
+    particleColor: '#cffff7',
+  },
+  light: {
+    bg: '#f0fdf8',
+    vignette: '240,253,248',
+    vR1: 0, vR2: 0.04, vL1: 0, vL2: 0.06,
+    fogColor: '#f0fdf8',
+    ambient: '#80e8d8',
+    ambientIntensity: 0.9,
+    dirLight: { color: '#d0fff8', intensity: 0.8 },
+    spotLight: { color: '#40ddc8', intensity: 1.1 },
+    floorColor: '#d0f0ea',
+    gridPrimary: '#00b89a',
+    gridSecondary: '#a0e0d4',
+    scanColor: '#00c4a8',
+    particleColor: '#008870',
+  },
+}
+
+function useIsDark() {
+  const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'))
+  useEffect(() => {
+    const el = document.documentElement
+    const obs = new MutationObserver(() => setDark(el.classList.contains('dark')))
+    obs.observe(el, { attributes: true, attributeFilter: ['class'] })
+    return () => obs.disconnect()
+  }, [])
+  return dark
+}
+
+function WorkbenchGrid({ T }) {
   const scanRef = useRef(null)
 
   useFrame(({ clock }) => {
@@ -15,12 +59,12 @@ function WorkbenchGrid() {
     <>
       <mesh rotation-x={-Math.PI / 2} receiveShadow>
         <planeGeometry args={[32, 24, 80, 80]} />
-        <meshStandardMaterial color="#061814" roughness={0.58} metalness={0.18} />
+        <meshStandardMaterial color={T.floorColor} roughness={0.58} metalness={0.18} />
       </mesh>
-      <gridHelper args={[30, 48, '#5fffe0', '#174c45']} position={[0, 0.018, 0]} />
+      <gridHelper key={T.bg} args={[30, 48, T.gridPrimary, T.gridSecondary]} position={[0, 0.018, 0]} />
       <mesh ref={scanRef} position={[0, 0.04, 0]} rotation-x={-Math.PI / 2}>
         <planeGeometry args={[30, 1.2]} />
-        <meshBasicMaterial color="#72ffe7" transparent opacity={0.12} side={THREE.DoubleSide} />
+        <meshBasicMaterial color={T.scanColor} transparent opacity={0.12} side={THREE.DoubleSide} />
       </mesh>
     </>
   )
@@ -154,7 +198,7 @@ function DataPanels() {
   )
 }
 
-function Particles({ mouseRef }) {
+function Particles({ mouseRef, color = '#cffff7' }) {
   const ref = useRef(null)
   const positions = useMemo(() => {
     const values = new Float32Array(360)
@@ -175,7 +219,7 @@ function Particles({ mouseRef }) {
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" count={positions.length / 3} array={positions} itemSize={3} />
       </bufferGeometry>
-      <pointsMaterial color="#cffff7" size={0.035} transparent opacity={0.65} />
+      <pointsMaterial color={color} size={0.035} transparent opacity={0.65} />
     </points>
   )
 }
@@ -191,21 +235,21 @@ function CameraRig({ mouseRef }) {
   return null
 }
 
-function Scene({ mouseRef }) {
+function Scene({ mouseRef, T }) {
   return (
     <>
-      <color attach="background" args={['#04110f']} />
-      <fog attach="fog" args={['#04110f', 7, 22]} />
-      <ambientLight intensity={0.34} color="#aafff0" />
-      <directionalLight position={[-4, 8, 5]} intensity={1.2} color="#eafffb" castShadow />
-      <spotLight position={[4, 7, 6]} angle={0.52} penumbra={0.6} intensity={1.9} color="#7fffe8" />
-      <WorkbenchGrid />
+      <color attach="background" args={[T.fogColor]} />
+      <fog attach="fog" args={[T.fogColor, 7, 22]} />
+      <ambientLight intensity={T.ambientIntensity} color={T.ambient} />
+      <directionalLight position={[-4, 8, 5]} intensity={T.dirLight.intensity} color={T.dirLight.color} castShadow />
+      <spotLight position={[4, 7, 6]} angle={0.52} penumbra={0.6} intensity={T.spotLight.intensity} color={T.spotLight.color} />
+      <WorkbenchGrid T={T} />
       <DataPanels />
       <ReactorCore mouseRef={mouseRef} />
       <Molecule position={[-2.4, 1.45, -0.6]} scale={0.9} speed={0.95} mouseRef={mouseRef} />
       <Molecule position={[0.6, 2.35, -3.2]} scale={0.62} speed={1.25} mouseRef={mouseRef} />
       <Molecule position={[-5.1, 2.1, 1.6]} scale={0.52} speed={0.78} mouseRef={mouseRef} />
-      <Particles mouseRef={mouseRef} />
+      <Particles mouseRef={mouseRef} color={T.particleColor} />
       <CameraRig mouseRef={mouseRef} />
     </>
   )
@@ -213,6 +257,8 @@ function Scene({ mouseRef }) {
 
 export default function LabWorkbenchBackground() {
   const mouseRef = useRef({ x: 0, y: 0 })
+  const isDark = useIsDark()
+  const T = THEME[isDark ? 'dark' : 'light']
 
   useEffect(() => {
     const handlePointer = (event) => {
@@ -225,17 +271,23 @@ export default function LabWorkbenchBackground() {
   }, [])
 
   return (
-    <div className="fixed inset-0 z-0 overflow-hidden bg-[#04110f]" aria-hidden="true">
+    <div className="fixed inset-0 z-0 overflow-hidden" style={{ background: T.bg }} aria-hidden="true">
       <Canvas
         shadows
         dpr={[1, 1.8]}
         camera={{ position: [0, 5.3, 8.8], fov: 46, near: 0.1, far: 60 }}
         gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
       >
-        <Scene mouseRef={mouseRef} />
+        <Scene mouseRef={mouseRef} T={T} />
       </Canvas>
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_62%_44%,transparent_0%,rgba(4,17,15,0.1)_35%,rgba(4,17,15,0.78)_100%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(4,17,15,0.1),rgba(4,17,15,0.72))]" />
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{ background: `radial-gradient(circle at 62% 44%, transparent 0%, rgba(${T.vignette},${T.vR1}) 35%, rgba(${T.vignette},${T.vR2}) 100%)` }}
+      />
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{ background: `linear-gradient(180deg, rgba(${T.vignette},${T.vL1}), rgba(${T.vignette},${T.vL2}))` }}
+      />
     </div>
   )
 }

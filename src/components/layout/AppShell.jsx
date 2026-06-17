@@ -55,7 +55,7 @@ import GlobalPythonNotebook from "../../tools/python-notebook/index.jsx";
 import GlobalJSPlayground from "../../tools/js-playground/index.jsx";
 import { ChatProvider } from "../../context/ChatContext.jsx";
 import { useChat } from "../../hooks/useChat.js";
-import ChatPanel from "../ui/ChatPanel.jsx";
+import ChatPanel from "../tutor/ChatPanel.jsx";
 import { motion, AnimatePresence } from "framer-motion";
 import { useVideoPlayer } from "../../hooks/useVideoPlayer.js";
 import PhysicsPoolLab from "../../games/pool/PhysicsPoolLab.jsx";
@@ -65,7 +65,7 @@ import FootballCalculus from "../../games/football/FootballCalculus.jsx";
 import ChemistryPage from "../../labs/chemistry/ChemistryPage.jsx";
 import PhysicsPage from "../../labs/physics/PhysicsPage.jsx";
 import DynamicBackground from "../backgrounds/DynamicBackground.jsx";
-import BackgroundPicker from "../ui/BackgroundPicker.jsx";
+import BackgroundPicker from "../backgrounds/BackgroundPicker.jsx";
 import AlphaMascot from "../ui/AlphaMascot.jsx";
 import GameRules from "../../games/GameRules.jsx";
 
@@ -819,11 +819,7 @@ export default function AppShell({ children }) {
           {sigmaOpen && <SigmaCalc onClose={() => setSigmaOpen(false)} />}
           {polyOpen && <PolyCalc onClose={() => setPolyOpen(false)} />}
           {laOpen && <LinearAlgebraCalc onClose={() => setLAOpen(false)} />}
-          {matrixReducerOpen && (
-            <div className="fixed inset-0 z-[1999] overflow-auto">
-              <MatrixReducer onBack={() => setMatrixReducerOpen(false)} />
-            </div>
-          )}
+          {matrixReducerOpen && <MatrixReducer onBack={() => setMatrixReducerOpen(false)} />}
           <GlobalPythonNotebook
             isOpen={pythonOpen}
             onClose={() => setPythonOpen(false)}
@@ -1122,11 +1118,7 @@ export default function AppShell({ children }) {
           {sigmaOpen && <SigmaCalc onClose={() => setSigmaOpen(false)} />}
           {polyOpen && <PolyCalc onClose={() => setPolyOpen(false)} />}
           {laOpen && <LinearAlgebraCalc onClose={() => setLAOpen(false)} />}
-          {matrixReducerOpen && (
-            <div className="fixed inset-0 z-[1999] overflow-auto">
-              <MatrixReducer onBack={() => setMatrixReducerOpen(false)} />
-            </div>
-          )}
+          {matrixReducerOpen && <MatrixReducer onBack={() => setMatrixReducerOpen(false)} />}
           <UtilityPanel />
           <WelcomeModal />
           <SearchModal />

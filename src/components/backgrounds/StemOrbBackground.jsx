@@ -1,6 +1,52 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
+
+const THEME = {
+  dark: {
+    bg: '#010818',
+    vignette: '1,8,24',
+    vR: 0.6, vL1: 0.25, vL2: 0.72,
+    ambient: '#c0ccff',
+    ambientIntensity: 0.35,
+    light1: { color: '#6366f1', intensity: 1.4 },
+    light2: { color: '#06b6d4', intensity: 0.9 },
+    light3: { color: '#8b5cf6', intensity: 0.7 },
+    starColor: '#9ba8ff',
+    starOpacity: 0.55,
+    lineColor: '#5b58ff',
+    lineOpacity: 0.13,
+    emissiveIntensity: 0.55,
+    wireOpacity: 0.09,
+  },
+  light: {
+    bg: '#f0f4ff',
+    vignette: '240,244,255',
+    vR: 0.04, vL1: 0, vL2: 0.06,
+    ambient: '#8090d0',
+    ambientIntensity: 0.9,
+    light1: { color: '#6366f1', intensity: 0.4 },
+    light2: { color: '#06b6d4', intensity: 0.25 },
+    light3: { color: '#8b5cf6', intensity: 0.2 },
+    starColor: '#4050b0',
+    starOpacity: 0.18,
+    lineColor: '#3333aa',
+    lineOpacity: 0.07,
+    emissiveIntensity: 0.12,
+    wireOpacity: 0.05,
+  },
+}
+
+function useIsDark() {
+  const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'))
+  useEffect(() => {
+    const el = document.documentElement
+    const obs = new MutationObserver(() => setDark(el.classList.contains('dark')))
+    obs.observe(el, { attributes: true, attributeFilter: ['class'] })
+    return () => obs.disconnect()
+  }, [])
+  return dark
+}
 
 const NODE_COLORS = [
   '#6366f1', // indigo
@@ -20,7 +66,7 @@ function rng(n) {
 }
 
 // ── Single spinning icosahedron node ─────────────────────────────────────────
-function SpinningNode({ pos, color, size, spinSpeed }) {
+function SpinningNode({ pos, color, size, spinSpeed, emissiveIntensity = 0.55 }) {
   const ref = useRef(null)
   useFrame(({ clock }) => {
     const t = clock.elapsedTime
@@ -34,7 +80,7 @@ function SpinningNode({ pos, color, size, spinSpeed }) {
       <meshStandardMaterial
         color={color}
         emissive={color}
-        emissiveIntensity={0.55}
+        emissiveIntensity={emissiveIntensity}
         roughness={0.15}
         metalness={0.88}
       />
@@ -43,7 +89,7 @@ function SpinningNode({ pos, color, size, spinSpeed }) {
 }
 
 // ── Large background wireframe polyhedra ─────────────────────────────────────
-function WireframePoly({ position, color, size, spinSpeed, type }) {
+function WireframePoly({ position, color, size, spinSpeed, type, wireOpacity = 0.09 }) {
   const ref = useRef(null)
   useFrame(({ clock }) => {
     const t = clock.elapsedTime
@@ -59,13 +105,13 @@ function WireframePoly({ position, color, size, spinSpeed, type }) {
       ) : (
         <icosahedronGeometry args={[size, 1]} />
       )}
-      <meshBasicMaterial color={color} wireframe transparent opacity={0.09} />
+      <meshBasicMaterial color={color} wireframe transparent opacity={wireOpacity} />
     </mesh>
   )
 }
 
 // ── Starfield ────────────────────────────────────────────────────────────────
-function Stars() {
+function Stars({ color, opacity }) {
   const positions = useMemo(() => {
     const arr = new Float32Array(600 * 3)
     for (let i = 0; i < 600; i++) {
@@ -80,13 +126,13 @@ function Stars() {
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" count={600} array={positions} itemSize={3} />
       </bufferGeometry>
-      <pointsMaterial color="#9ba8ff" size={0.055} transparent opacity={0.55} sizeAttenuation />
+      <pointsMaterial color={color} size={0.055} transparent opacity={opacity} sizeAttenuation />
     </points>
   )
 }
 
 // ── Knowledge graph (nodes + static connections) ─────────────────────────────
-function KnowledgeGraph({ mouseRef }) {
+function KnowledgeGraph({ mouseRef, T }) {
   const groupRef = useRef(null)
 
   const nodes = useMemo(() =>
@@ -138,36 +184,38 @@ function KnowledgeGraph({ mouseRef }) {
               itemSize={3}
             />
           </bufferGeometry>
-          <lineBasicMaterial color="#5b58ff" transparent opacity={0.13} />
+          <lineBasicMaterial color={T.lineColor} transparent opacity={T.lineOpacity} />
         </lineSegments>
       )}
       {nodes.map((node, i) => (
-        <SpinningNode key={i} {...node} />
+        <SpinningNode key={i} {...node} emissiveIntensity={T.emissiveIntensity} />
       ))}
     </group>
   )
 }
 
-function Scene({ mouseRef }) {
+function Scene({ mouseRef, T }) {
   return (
     <>
-      <color attach="background" args={['#010818']} />
-      <ambientLight intensity={0.35} color="#c0ccff" />
-      <pointLight position={[0, 0, 2]}   intensity={1.4} color="#6366f1" distance={28} />
-      <pointLight position={[9, -4, -6]} intensity={0.9} color="#06b6d4" distance={22} />
-      <pointLight position={[-9, 4, -8]} intensity={0.7} color="#8b5cf6" distance={20} />
-      <Stars />
-      <WireframePoly position={[-8,  4, -14]} color="#6366f1" size={3.2} spinSpeed={0.10} type="icosahedron"  />
-      <WireframePoly position={[ 9, -3, -16]} color="#06b6d4" size={2.5} spinSpeed={0.08} type="dodecahedron" />
-      <WireframePoly position={[ 2, -7, -11]} color="#8b5cf6" size={2.0} spinSpeed={0.14} type="octahedron"   />
-      <WireframePoly position={[-4,  7, -18]} color="#38bdf8" size={2.8} spinSpeed={0.07} type="icosahedron"  />
-      <KnowledgeGraph mouseRef={mouseRef} />
+      <color attach="background" args={[T.bg]} />
+      <ambientLight intensity={T.ambientIntensity} color={T.ambient} />
+      <pointLight position={[0, 0, 2]}   intensity={T.light1.intensity} color={T.light1.color} distance={28} />
+      <pointLight position={[9, -4, -6]} intensity={T.light2.intensity} color={T.light2.color} distance={22} />
+      <pointLight position={[-9, 4, -8]} intensity={T.light3.intensity} color={T.light3.color} distance={20} />
+      <Stars color={T.starColor} opacity={T.starOpacity} />
+      <WireframePoly position={[-8,  4, -14]} color="#6366f1" size={3.2} spinSpeed={0.10} type="icosahedron"  wireOpacity={T.wireOpacity} />
+      <WireframePoly position={[ 9, -3, -16]} color="#06b6d4" size={2.5} spinSpeed={0.08} type="dodecahedron" wireOpacity={T.wireOpacity} />
+      <WireframePoly position={[ 2, -7, -11]} color="#8b5cf6" size={2.0} spinSpeed={0.14} type="octahedron"   wireOpacity={T.wireOpacity} />
+      <WireframePoly position={[-4,  7, -18]} color="#38bdf8" size={2.8} spinSpeed={0.07} type="icosahedron"  wireOpacity={T.wireOpacity} />
+      <KnowledgeGraph mouseRef={mouseRef} T={T} />
     </>
   )
 }
 
 export default function StemOrbBackground() {
   const mouseRef = useRef({ x: 0, y: 0 })
+  const isDark = useIsDark()
+  const T = THEME[isDark ? 'dark' : 'light']
 
   useEffect(() => {
     const handle = (e) => {
@@ -179,17 +227,17 @@ export default function StemOrbBackground() {
   }, [])
 
   return (
-    <div className="fixed inset-0 z-0 overflow-hidden bg-[#010818]" aria-hidden="true">
+    <div className="fixed inset-0 z-0 overflow-hidden" style={{ background: T.bg }} aria-hidden="true">
       <Canvas
         dpr={[1, 1.6]}
         camera={{ position: [0, 0, 14], fov: 55, near: 0.1, far: 80 }}
         gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
       >
-        <Scene mouseRef={mouseRef} />
+        <Scene mouseRef={mouseRef} T={T} />
       </Canvas>
       {/* Vignette + depth fade */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_50%,transparent_20%,rgba(1,8,24,0.6)_100%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(1,8,24,0.25)_0%,rgba(1,8,24,0.72)_100%)]" />
+      <div className="pointer-events-none absolute inset-0" style={{ background: `radial-gradient(ellipse 80% 60% at 50% 50%, transparent 20%, rgba(${T.vignette},${T.vR}) 100%)` }} />
+      <div className="pointer-events-none absolute inset-0" style={{ background: `linear-gradient(180deg, rgba(${T.vignette},${T.vL1}) 0%, rgba(${T.vignette},${T.vL2}) 100%)` }} />
     </div>
   )
 }

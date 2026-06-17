@@ -1,6 +1,50 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
+
+const THEME = {
+  dark: {
+    bg: '#020710',
+    vignette: '2,7,16',
+    vR1: 0.08, vR2: 0.76, vL1: 0.18, vL2: 0.68,
+    fogColor: '#020710',
+    ambient: '#7be4ff',
+    ambientIntensity: 0.38,
+    dirLight: { color: '#e5fff8', intensity: 1.65 },
+    spotLight: { color: '#36ffcf', intensity: 2.2 },
+    floorColor: '#030b1a',
+    wallColor: '#0a1f3c',
+    wallEmissive: '#001428',
+    accentA: '#00f0ff',
+    accentB: '#ffcf4a',
+  },
+  light: {
+    bg: '#e8f4ff',
+    vignette: '232,244,255',
+    vR1: 0, vR2: 0.04, vL1: 0, vL2: 0.06,
+    fogColor: '#e8f4ff',
+    ambient: '#a0d8f0',
+    ambientIntensity: 0.85,
+    dirLight: { color: '#f0f8ff', intensity: 1.2 },
+    spotLight: { color: '#60d8c0', intensity: 1.4 },
+    floorColor: '#c8e8f8',
+    wallColor: '#90bcd8',
+    wallEmissive: '#6090b0',
+    accentA: '#0090c8',
+    accentB: '#e8a000',
+  },
+}
+
+function useIsDark() {
+  const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'))
+  useEffect(() => {
+    const el = document.documentElement
+    const obs = new MutationObserver(() => setDark(el.classList.contains('dark')))
+    obs.observe(el, { attributes: true, attributeFilter: ['class'] })
+    return () => obs.disconnect()
+  }, [])
+  return dark
+}
 
 const MAZE = [
   '#################',
@@ -42,7 +86,7 @@ function canMove(row, col) {
   return MAZE[row]?.[col] === '.'
 }
 
-function MazeWalls() {
+function MazeWalls({ T }) {
   const cells = useMemo(() => {
     const wallCells = []
     const pelletCells = []
@@ -96,8 +140,8 @@ function MazeWalls() {
       <instancedMesh ref={wallRef} args={[null, null, cells.wallCells.length]} castShadow receiveShadow>
         <boxGeometry args={[CELL * 0.88, 0.84, CELL * 0.88]} />
         <meshStandardMaterial
-          color="#10233a"
-          emissive="#08d7c9"
+          color={T.wallColor}
+          emissive={T.wallEmissive}
           emissiveIntensity={0.22}
           roughness={0.38}
           metalness={0.25}
@@ -107,7 +151,7 @@ function MazeWalls() {
         <sphereGeometry args={[0.095, 14, 10]} />
         <meshStandardMaterial
           color="#fff3a1"
-          emissive="#ffcf4a"
+          emissive={T.accentB}
           emissiveIntensity={1.2}
           roughness={0.18}
         />
@@ -116,12 +160,12 @@ function MazeWalls() {
   )
 }
 
-function MazeFloor() {
+function MazeFloor({ T }) {
   return (
     <>
       <mesh rotation-x={-Math.PI / 2} receiveShadow>
         <planeGeometry args={[COLS * CELL + 7, ROWS * CELL + 7, 64, 64]} />
-        <meshStandardMaterial color="#06111f" roughness={0.65} metalness={0.18} />
+        <meshStandardMaterial color={T.floorColor} roughness={0.65} metalness={0.18} />
       </mesh>
       <gridHelper
         args={[Math.max(COLS, ROWS) * CELL + 7, 42, '#18f2d0', '#164762']}
@@ -274,19 +318,19 @@ function CameraRig({ mouseRef }) {
   return null
 }
 
-function EnergyTrails() {
+function EnergyTrails({ T }) {
   const rings = useMemo(() => Array.from({ length: 7 }, (_, i) => i), [])
 
   return (
     <>
       {rings.map((index) => (
-        <TrailRing key={index} index={index} />
+        <TrailRing key={index} index={index} T={T} />
       ))}
     </>
   )
 }
 
-function TrailRing({ index }) {
+function TrailRing({ index, T }) {
   const ref = useRef(null)
 
   useFrame(({ clock }) => {
@@ -300,29 +344,29 @@ function TrailRing({ index }) {
   return (
     <mesh ref={ref} rotation-x={-Math.PI / 2}>
       <torusGeometry args={[0.24, 0.018, 8, 28]} />
-      <meshBasicMaterial color={index % 2 ? '#00f0ff' : '#ffcf4a'} transparent opacity={0.65} />
+      <meshBasicMaterial color={index % 2 ? T.accentA : T.accentB} transparent opacity={0.65} />
     </mesh>
   )
 }
 
-function Scene({ gameRef, mouseRef }) {
+function Scene({ gameRef, mouseRef, T }) {
   return (
     <>
-      <color attach="background" args={['#020710']} />
-      <fog attach="fog" args={['#020710', 8, 24]} />
-      <ambientLight intensity={0.38} color="#7be4ff" />
+      <color attach="background" args={[T.fogColor]} />
+      <fog attach="fog" args={[T.fogColor, 8, 24]} />
+      <ambientLight intensity={T.ambientIntensity} color={T.ambient} />
       <directionalLight
         position={[-4, 9, 6]}
-        intensity={1.65}
-        color="#e5fff8"
+        intensity={T.dirLight.intensity}
+        color={T.dirLight.color}
         castShadow
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
       />
-      <spotLight position={[5, 8, 6]} angle={0.55} penumbra={0.65} intensity={2.2} color="#36ffcf" />
-      <MazeFloor />
-      <MazeWalls />
-      <EnergyTrails />
+      <spotLight position={[5, 8, 6]} angle={0.55} penumbra={0.65} intensity={T.spotLight.intensity} color={T.spotLight.color} />
+      <MazeFloor T={T} />
+      <MazeWalls T={T} />
+      <EnergyTrails T={T} />
       <Player gameRef={gameRef} mouseRef={mouseRef} />
       <SentryDrones mouseRef={mouseRef} />
       <CameraRig mouseRef={mouseRef} />
@@ -331,6 +375,9 @@ function Scene({ gameRef, mouseRef }) {
 }
 
 export default function ArcadeMazeBackground() {
+  const isDark = useIsDark()
+  const T = THEME[isDark ? 'dark' : 'light']
+
   const mouseRef = useRef({ x: 0, y: 0 })
   const gameRef = useRef({
     cell: START_CELL,
@@ -362,17 +409,23 @@ export default function ArcadeMazeBackground() {
   }, [])
 
   return (
-    <div className="fixed inset-0 z-0 overflow-hidden bg-[#020710]" aria-hidden="true">
+    <div className="fixed inset-0 z-0 overflow-hidden" style={{ background: T.bg }} aria-hidden="true">
       <Canvas
         shadows
         dpr={[1, 1.8]}
         camera={{ position: [0, 10.4, 10.8], fov: 45, near: 0.1, far: 80 }}
         gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
       >
-        <Scene gameRef={gameRef} mouseRef={mouseRef} />
+        <Scene gameRef={gameRef} mouseRef={mouseRef} T={T} />
       </Canvas>
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_52%_42%,transparent_0%,rgba(2,7,16,0.08)_35%,rgba(2,7,16,0.76)_100%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(2,7,16,0.18),rgba(2,7,16,0.68))]" />
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{ background: `radial-gradient(circle at 52% 42%, transparent 0%, rgba(${T.vignette},${T.vR1}) 35%, rgba(${T.vignette},${T.vR2}) 100%)` }}
+      />
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{ background: `linear-gradient(180deg, rgba(${T.vignette},${T.vL1}), rgba(${T.vignette},${T.vL2}))` }}
+      />
     </div>
   )
 }

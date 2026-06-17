@@ -134,9 +134,9 @@ const S = {
     fontFamily: "'JetBrains Mono', 'Fira Mono', 'Courier New', monospace",
     background: "#0f1117",
     color: "#e2e8f0",
-    minHeight: "100vh",
-    padding: "24px",
+    padding: "20px 24px 24px",
     boxSizing: "border-box",
+    overflowY: "auto",
   },
   header: {
     fontSize: 13,
@@ -473,31 +473,75 @@ export default function MatrixReducer({ onBack } = {}) {
     setError("");
   }
 
+  // ── Draggable panel ────────────────────────────────────────────────────────
+  const PANEL_W = 740;
+  const isMobile = window.innerWidth < 640;
+  const [pos, setPos] = useState(() => ({
+    x: Math.max(16, Math.round((window.innerWidth - PANEL_W) / 2)),
+    y: Math.max(16, Math.round((window.innerHeight - 600) / 2)),
+  }));
+  const dragging   = useRef(false);
+  const dragOrigin = useRef({ mx: 0, my: 0, px: 0, py: 0 });
+
+  const startDrag = (e) => {
+    e.preventDefault();
+    dragging.current = true;
+    dragOrigin.current = { mx: e.clientX, my: e.clientY, px: pos.x, py: pos.y };
+  };
+
+  useEffect(() => {
+    const move = (e) => {
+      if (!dragging.current) return;
+      const dx = e.clientX - dragOrigin.current.mx;
+      const dy = e.clientY - dragOrigin.current.my;
+      setPos({
+        x: Math.max(0, Math.min(window.innerWidth - PANEL_W, dragOrigin.current.px + dx)),
+        y: Math.max(0, Math.min(window.innerHeight - 80, dragOrigin.current.py + dy)),
+      });
+    };
+    const up = () => { dragging.current = false; };
+    window.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', up);
+    return () => { window.removeEventListener('mousemove', move); window.removeEventListener('mouseup', up); };
+  }, []);
+
+  const panelStyle = isMobile
+    ? { position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%,-50%)',
+        width: Math.min(PANEL_W, window.innerWidth - 16), maxHeight: '92dvh',
+        zIndex: 2000, borderRadius: 12, overflow: 'hidden',
+        border: '1px solid #2d3144', boxShadow: '0 24px 64px #000a' }
+    : { position: 'fixed', left: pos.x, top: pos.y, width: PANEL_W, maxHeight: '92dvh',
+        zIndex: 2000, borderRadius: 12, overflow: 'hidden',
+        border: '1px solid #2d3144', boxShadow: '0 24px 64px #000a' };
+
   return (
-    <div style={S.root}>
-      {onBack && (
-        <button
-          onClick={onBack}
-          style={{
-            ...S.btn("ghost"),
-            position: "fixed",
-            top: 14,
-            left: 16,
-            zIndex: 100,
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-            fontSize: 11,
-            padding: "5px 12px",
-            border: "1px solid #2d3144",
-            borderRadius: 6,
-            background: "#1a1d27",
-          }}
-        >
-          ← Back
-        </button>
+    <>
+      {isMobile && onBack && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 1999, background: 'rgba(0,0,0,0.5)' }}
+          onClick={onBack} />
       )}
-      <div style={{ maxWidth: 800, margin: "0 auto", paddingTop: onBack ? 48 : 0 }}>
+      <div style={{ ...panelStyle, display: 'flex', flexDirection: 'column', background: '#0f1117' }}>
+        {/* Title bar */}
+        <div
+          onMouseDown={startDrag}
+          style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px',
+            background: '#1a1d27', borderBottom: '1px solid #2d3144', cursor: 'move', flexShrink: 0 }}
+        >
+          <span style={{ color: '#4ade80', fontSize: 14, fontFamily: 'monospace', fontWeight: 700, userSelect: 'none' }}>⊞</span>
+          <span style={{ fontSize: 11, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#94a3b8', fontFamily: 'monospace', flex: 1, userSelect: 'none' }}>
+            Matrix Reducer
+          </span>
+          {onBack && (
+            <button onClick={onBack}
+              style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer',
+                fontSize: 16, lineHeight: 1, padding: '2px 4px', borderRadius: 4 }}
+              onMouseEnter={e => e.currentTarget.style.color = '#f87171'}
+              onMouseLeave={e => e.currentTarget.style.color = '#64748b'}
+            >×</button>
+          )}
+        </div>
+        <div style={{ ...S.root, flex: 1, minHeight: 0 }}>
+      <div style={{ maxWidth: 800, margin: "0 auto" }}>
         <div style={S.header}>Matrix Workspace</div>
         <div style={S.subheader}>REF / RREF · Manual &amp; Solver</div>
 
@@ -713,6 +757,8 @@ export default function MatrixReducer({ onBack } = {}) {
           </div>
         )}
       </div>
-    </div>
+        </div>
+      </div>
+    </>
   );
 }
