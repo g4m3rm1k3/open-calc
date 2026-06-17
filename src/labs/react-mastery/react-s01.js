@@ -2,8 +2,8 @@
 // Raw React: Elements and State (Without JSX)
 
 export const lesson = {
-  id: 'sandbox-1',
-  series: { id: 'sandbox', title: 'Web Sandbox' },
+  id: 'react-s01',
+  series: { id: 'react-mastery', title: 'React 0 to Mastery' },
   title: '1. Raw React: Elements & State',
   language: 'react', // Tells WebLessonPlayer to render the output as a web page
   checkpoints: [

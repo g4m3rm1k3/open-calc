@@ -1303,7 +1303,7 @@ print(fig.show())`,
       type: 'lab',
       title: 'Linked Lists — Interactive Lab',
       description: 'Full hacker-workstation DSA lab: build nodes, prepend/append, delete, reverse, and cycle detection with animated pointer visualization and step tracer. JS + Python dual-language.',
-      href: '/dsa-linked-lists-lab',
+      href: '/lab/dsa-linked-lists-lab',
     },
   ],
 

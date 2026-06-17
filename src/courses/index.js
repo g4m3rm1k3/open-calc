@@ -1,4 +1,4 @@
-import { getAllChapters, getAllCourses } from '../courses/courseLoader.js'
+import { getAllChapters, getAllCourses } from './courseLoader.js'
 
 export const COURSES    = getAllCourses()
 export const CURRICULUM = getAllChapters()

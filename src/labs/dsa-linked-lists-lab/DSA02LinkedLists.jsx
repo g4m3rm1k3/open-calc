@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import Editor from "@monaco-editor/react";
-import { setupOpenCalcMonaco } from "../../../utils/monacoThemes.js";
+import { setupOpenCalcMonaco } from "../../utils/monacoThemes.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  DSA SERIES — APP 02: LINKED LISTS
@@ -1933,7 +1933,7 @@ export default function DSA02LinkedLists({ onBack }) {
     } else {
       try {
         const { getPyodide } =
-          await import("../../../utils/pyodideRuntime.js").catch(() => ({
+          await import("../../utils/pyodideRuntime.js").catch(() => ({
             getPyodide: null,
           }));
         if (!getPyodide) {

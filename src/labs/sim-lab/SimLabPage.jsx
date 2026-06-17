@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Editor from '@monaco-editor/react'
 import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
-import { SIM_TEMPLATES } from '../../data/simTemplates.js'
+import { SIM_TEMPLATES } from './simTemplates.js'
 import { Play, RotateCcw, ChevronDown, Terminal, Code2, X, Sun, Moon, ArrowLeft } from 'lucide-react'
 import { buildSandbox } from '../../utils/simSandbox.js'
 

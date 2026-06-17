@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom'
 import { getAllCourses, getChapters } from '../courses/courseLoader.js'
 import { useProgress } from '../hooks/useProgress.js'
-import UniverseBackground from '../components/home/UniverseBackground.jsx'
-import AppCard from '../components/cards/AppCard.jsx'
-import { LABS } from '../data/labs.js'
-import { GAMES } from '../data/games.js'
+import UniverseBackground from '../components/backgrounds/UniverseBackground.jsx'
+import AppCard from '../components/ui/AppCard.jsx'
+import { LABS } from '../labs/registry.js'
+import { GAMES } from '../games/registry.js'
 
 // ── Discipline pills ──────────────────────────────────────────────────────────
 const DISCIPLINES_ROW1 = [

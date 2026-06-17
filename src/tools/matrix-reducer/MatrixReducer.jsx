@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 // ── Fraction arithmetic ─────────────────────────────────────────────────────
 function gcd(a, b) {

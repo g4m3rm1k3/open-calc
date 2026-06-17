@@ -1,5 +1,5 @@
 // Used only by LabShell — lazy-loads lab components on demand.
-// Display metadata (for LabsPage / LabsPanel) lives in src/data/labs.js.
+// Display metadata (for LabsPage / LabsPanel) lives in src/labs/registry.js.
 const LOADERS = import.meta.glob('./**/index.jsx')
 
 export async function getLabEntry(key) {

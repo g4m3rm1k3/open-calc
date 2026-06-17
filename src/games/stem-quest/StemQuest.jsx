@@ -10,8 +10,8 @@ import {
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useLocalStorage } from "../../hooks/useLocalStorage.js";
-import lessonBattles from "../../data/stemQuestLessonBattles.json";
-import questData from "../../data/stemQuestQuests.json";
+import lessonBattles from "./lessonBattles.json";
+import questData from "./quests.json";
 import {
   BookOpen,
   ChevronRight,

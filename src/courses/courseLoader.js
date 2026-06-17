@@ -1,7 +1,7 @@
 // Auto-discovers courses from src/courses/{courseId}/{N}-{chapterSlug}/{NNN}-{lessonSlug}.js
 // Paths are parsed eagerly for structure; lesson content is loaded lazily on demand.
 
-import { GLASS_META } from '../constants/courseColors.js'
+import { GLASS_META } from '../styles/courseColors.js'
 
 let ALL_MODULES = {}
 try { ALL_MODULES = import.meta.glob('./**/*.js') } catch {}   // lazy — paths only at init

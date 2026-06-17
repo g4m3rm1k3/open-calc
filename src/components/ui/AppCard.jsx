@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { GLASS_META } from '../../constants/courseColors.js'
+import { GLASS_META } from '../../styles/courseColors.js'
 
 const GRID_OVL = {
   backgroundImage: [

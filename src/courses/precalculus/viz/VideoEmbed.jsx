@@ -1,4 +1,4 @@
-import { VIDEO_MAP, selectVideosByKeywords } from "../../../content/videos/videoSelector.js";
+import { VIDEO_MAP, selectVideosByKeywords } from "../../../context/videoSelector.js";
 
 export default function VideoEmbed({ params, url: rootUrl, title: rootTitle, videoId: rootVideoId }) {
   const videoId = rootVideoId || params?.videoId;

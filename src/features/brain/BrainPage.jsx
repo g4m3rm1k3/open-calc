@@ -17,11 +17,11 @@
 import { lazy, Suspense, useState } from 'react'
 import { Brain, Clock, Star, Lock, ChevronRight, Zap, RotateCcw, Hash, Grid3x3 } from 'lucide-react'
 
-const DualNBack        = lazy(() => import('../components/brain/DualNBack.jsx'))
-const StroopTask       = lazy(() => import('../components/brain/StroopTask.jsx'))
-const MentalRotation   = lazy(() => import('../components/brain/MentalRotation.jsx'))
-const ArithmeticSprint = lazy(() => import('../components/brain/ArithmeticSprint.jsx'))
-const PatternMemory    = lazy(() => import('../components/brain/PatternMemory.jsx'))
+const DualNBack        = lazy(() => import('./components/DualNBack.jsx'))
+const StroopTask       = lazy(() => import('./components/StroopTask.jsx'))
+const MentalRotation   = lazy(() => import('./components/MentalRotation.jsx'))
+const ArithmeticSprint = lazy(() => import('./components/ArithmeticSprint.jsx'))
+const PatternMemory    = lazy(() => import('./components/PatternMemory.jsx'))
 
 // ─── Puzzle Registry ──────────────────────────────────────────────────────────
 // To add a puzzle: push an entry here + create the component.

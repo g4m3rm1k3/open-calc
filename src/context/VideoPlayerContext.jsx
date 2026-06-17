@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { VideoPlayerContext } from "./videoPlayerContext.js";
-import { selectVideosByKeywords } from "../content/videos/videoSelector.js";
-import { ALL_LESSONS } from "../content/index.js";
+import { selectVideosByKeywords } from "./videoSelector.js";
+import { ALL_LESSONS } from "../courses/index.js";
 import { getVideos } from "../courses/courseLoader.js";
 
 function chapterNumOf(lesson) {

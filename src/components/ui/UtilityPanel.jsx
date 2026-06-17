@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { usePins } from "../../context/PinsContext.jsx";
-import { ALL_LESSONS } from "../../content/index.js";
-import DEFAULT_NOTES from "../../content/default-notes.json";
+import { ALL_LESSONS } from "../../courses/index.js";
+import DEFAULT_NOTES from "./default-notes.json";
 import {
   Pin,
   PenLine,

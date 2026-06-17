@@ -1,4 +1,4 @@
-import { getAllVideos } from '../../courses/courseLoader.js'
+import { getAllVideos } from '../courses/courseLoader.js'
 
 // Aggregated from every course's own videos.json (src/courses/<id>/videos.json)
 export const VIDEO_LIBRARY = getAllVideos().filter((v) => !!v.url)

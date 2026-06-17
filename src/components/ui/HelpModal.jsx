@@ -1357,7 +1357,7 @@ function SectionTypes() {
           <Cb>triangle-inequality</Cb>, <Cb>conjugate-multiplication</Cb>,{" "}
           <Cb>fraction-split</Cb>, <Cb>factoring-fractional-powers</Cb>,{" "}
           <Cb>solve-simple-quadratic</Cb>. Add new ones to{" "}
-          <Cb>src/content/algebraRegistry.js</Cb>.
+          <Cb>src/reference/algebraRegistry.js</Cb>.
         </Para>
         <H3>Typical structure</H3>
         <CodeBlock>{`hook → intuition (+ viz) → math definition

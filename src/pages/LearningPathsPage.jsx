@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
-import { CURRICULUM } from '../content/index.js'
-import { LEARNING_PATHS } from '../content/learningPaths.js'
+import { CURRICULUM } from '../courses/index.js'
+import { LEARNING_PATHS } from './learningPaths.js'
 
 const LESSON_TO_CHAPTER = Object.fromEntries(
   CURRICULUM.flatMap((ch) => ch.lessons.map((l) => [l.slug, ch.number]))

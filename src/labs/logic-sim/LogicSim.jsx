@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { ChevronDown, ChevronRight, Play, RotateCcw, Plus, Trash2 } from "lucide-react";
-import { buildNetlist, solveAnalog } from "../../components/viz/react/AnalogEngine.js";
+import { buildNetlist, solveAnalog } from "./AnalogEngine.js";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const CELL = 24;          // grid cell size px

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { EXERCISE_DATABASE, EXERCISE_TYPES } from '../../data/rpgExercises';
-import { PREBUILT_PLANS } from '../../data/rpgPrebuiltPlans';
+import { EXERCISE_DATABASE, EXERCISE_TYPES } from '../data/rpgExercises';
+import { PREBUILT_PLANS } from '../data/rpgPrebuiltPlans';
 import { Dumbbell, Activity, ShieldPlus, X, Plus, PlaySquare, Wind, Hand, Trophy } from 'lucide-react';
 
 const getIconForType = (type) => {

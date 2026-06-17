@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
-import { LABS } from '../../../data/labs.js'
-import { GLASS_META } from '../../../constants/courseColors.js'
+import { LABS } from '../../../labs/registry.js'
+import { GLASS_META } from '../../../styles/courseColors.js'
 
 const GRID_OVL = {
   backgroundImage: [

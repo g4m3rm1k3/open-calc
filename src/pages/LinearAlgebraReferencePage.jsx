@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from 'react'
 import katex from 'katex'
-import { LA_CATEGORIES, ALL_LA_CONCEPTS } from '../content/linear-algebra-data.js'
+import { LA_CATEGORIES, ALL_LA_CONCEPTS } from '../reference/linear-algebra-data.js'
 
 function openInOpenMat(code) {
   try {

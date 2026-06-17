@@ -1,6 +1,6 @@
 export const lesson = {
-  id: 'sandbox-3',
-  series: { id: 'sandbox', title: 'Web Sandbox' },
+  id: 'react-s03',
+  series: { id: 'react-mastery', title: 'React 0 to Mastery' },
   title: '3. State & Interactivity',
   language: 'react',
   checkpoints: [

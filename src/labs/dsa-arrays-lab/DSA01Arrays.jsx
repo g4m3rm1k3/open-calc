@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import Editor from "@monaco-editor/react";
-import { setupOpenCalcMonaco } from "../../../utils/monacoThemes.js";
+import { setupOpenCalcMonaco } from "../../utils/monacoThemes.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  DSA SERIES — APP 01: ARRAYS & MEMORY
@@ -1192,7 +1192,7 @@ export default function DSA01Arrays({ onBack }) {
       try {
         // Dynamic import so this file works without pyodide too
         const { getPyodide } =
-          await import("../../../utils/pyodideRuntime.js").catch(() => ({
+          await import("../../utils/pyodideRuntime.js").catch(() => ({
             getPyodide: null,
           }));
         if (!getPyodide) {

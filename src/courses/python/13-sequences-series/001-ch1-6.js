@@ -1038,6 +1038,11 @@ res
           ],
         },
       },
+      {
+        id: 'PythonGeneratorStepperViz',
+        title: 'Generator State Walkthrough',
+        mathBridge: 'A generator yields one term at a time and freezes its local state between calls — the lazy-evaluation analog of computing aₙ on demand instead of materializing the whole sequence up front.',
+      },
     ],
   },
 }

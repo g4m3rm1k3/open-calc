@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { ChevronRight } from 'lucide-react'
 import { getAllCourses } from '../../../courses/courseLoader.js'
-import { GLASS_META } from '../../../constants/courseColors.js'
+import { GLASS_META } from '../../../styles/courseColors.js'
 
 const ALL_COURSES = getAllCourses()
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { PREBUILT_PLANS } from '../../data/rpgPrebuiltPlans';
-import { EXERCISE_DATABASE } from '../../data/rpgExercises';
+import { PREBUILT_PLANS } from '../data/rpgPrebuiltPlans';
+import { EXERCISE_DATABASE } from '../data/rpgExercises';
 import { Plus, Check, Book, Save, X } from 'lucide-react';
 
 export function PlanBuilder({ rpgData, setActivePlan, saveCustomPlan }) {

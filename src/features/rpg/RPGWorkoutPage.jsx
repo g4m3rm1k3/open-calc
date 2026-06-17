@@ -1,16 +1,16 @@
 import React from 'react';
-import { useRPGData } from '../hooks/useRPGData';
-import { ClassSelector } from '../components/rpg/ClassSelector';
-import { HeroPanel } from '../components/rpg/HeroPanel';
-import { WorkoutLogger } from '../components/rpg/WorkoutLogger';
-import { QuestBoard } from '../components/rpg/QuestBoard';
-import { PlanBuilder } from '../components/rpg/PlanBuilder';
-import { RadarChart } from '../components/rpg/RadarChart';
-import { RPGFantasyBackground } from '../components/rpg/RPGFantasyBackground';
-import LoadingSpinner from '../components/ui/LoadingSpinner';
-import { PREBUILT_PLANS } from '../data/rpgPrebuiltPlans';
-import { getExerciseDetails } from '../data/rpgExercises';
-import { WorkoutHistoryChart } from '../components/rpg/WorkoutHistoryChart';
+import { useRPGData } from './hooks/useRPGData';
+import { ClassSelector } from './components/ClassSelector';
+import { HeroPanel } from './components/HeroPanel';
+import { WorkoutLogger } from './components/WorkoutLogger';
+import { QuestBoard } from './components/QuestBoard';
+import { PlanBuilder } from './components/PlanBuilder';
+import { RadarChart } from './components/RadarChart';
+import { RPGFantasyBackground } from '../../components/backgrounds/RPGFantasyBackground';
+import LoadingSpinner from '../../components/ui/LoadingSpinner';
+import { PREBUILT_PLANS } from './data/rpgPrebuiltPlans';
+import { getExerciseDetails } from './data/rpgExercises';
+import { WorkoutHistoryChart } from './components/WorkoutHistoryChart';
 
 export default function RPGWorkoutPage() {
   const { 

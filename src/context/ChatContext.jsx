@@ -2,14 +2,14 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { ChatContext } from "./chatContext.js";
 import { joinRoom } from "@trystero-p2p/nostr";
 import { useLocation } from "react-router-dom";
-import { LESSON_MAP } from "../content/index.js";
+import { LESSON_MAP } from "../courses/index.js";
 import {
   getOrCreateKeypair,
   createPool,
   publishMessage,
   subscribeHistory,
   subscribeLive,
-} from "../lib/nostrChat.js";
+} from "./nostrChat.js";
 import { getGpuScore } from "../utils/gpuScore.js";
 
 const APP_CONFIG = { appId: "open-calc-v1" };

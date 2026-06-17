@@ -6,8 +6,10 @@ import { PinsProvider } from "./context/PinsContext.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import AppShell from "./components/layout/AppShell.jsx";
 import { VideoPlayerProvider } from "./context/VideoPlayerContext.jsx";
-import FloatingVideoPlayer from "./components/videos/FloatingVideoPlayer.jsx";
+import FloatingVideoPlayer from "./components/ui/FloatingVideoPlayer.jsx";
 import LoadingSpinner from "./components/ui/LoadingSpinner.jsx";
+import { getLabEntry } from "./labs/labLoader.js";
+import { getGameEntry } from "./games/gameLoader.js";
 
 const HomePage = lazy(() => import("./pages/HomePage.jsx"));
 const ChapterPage = lazy(() => import("./pages/ChapterPage.jsx"));
@@ -25,22 +27,21 @@ const ChemistryPage = lazy(() => import("./labs/chemistry/ChemistryPage.jsx"));
 const PhysicsPage = lazy(() => import("./labs/physics/PhysicsPage.jsx"));
 const AllCoursesPage = lazy(() => import("./pages/AllCoursesPage.jsx"));
 const CadProPage = lazy(() => import("./labs/cad-pro/CadProPage.jsx"));
-const DocsPage = lazy(() => import("./pages/DocsPage.jsx"));
+const MarkdownHub = lazy(() => import("./components/docs/MarkdownHub.jsx"));
 const VizGalleryPage = lazy(() => import("./pages/VizGalleryPage.jsx"));
 const GamesPage = lazy(() => import("./pages/GamesPage.jsx"));
 const LabsPage = lazy(() => import("./pages/LabsPage.jsx"));
 const HealthTrackerPage = lazy(() => import('./games/HealthTrackerPage.jsx'));
-const RPGWorkoutPage = lazy(() => import('./games/RPGWorkoutPage.jsx'));
-const BrainPage = lazy(() => import('./games/BrainPage.jsx'));
-const GameShell = lazy(() => import("./pages/GameShell.jsx"));
+const RPGWorkoutPage = lazy(() => import('./features/rpg/RPGWorkoutPage.jsx'));
+const BrainPage = lazy(() => import('./features/brain/BrainPage.jsx'));
+const EntryShell = lazy(() => import("./pages/EntryShell.jsx"));
 const LinearAlgebraReferencePage = lazy(() => import("./pages/LinearAlgebraReferencePage.jsx"));
-const WebLabPage = lazy(() => import("./labs/web-lab/WebLabPage.jsx"));
 const CSSMasteryPage = lazy(() => import("./labs/css-mastery/CSSMasteryPage.jsx"));
+const ReactMasteryPage = lazy(() => import("./labs/react-mastery/ReactMasteryPage.jsx"));
 const FiveAxisKinematicsPage = lazy(() => import("./labs/five-axis/FiveAxisKinematicsPage.jsx"));
-const MatrixReducerPage = lazy(() => import("./labs/matrix-reducer/MatrixReducerPage.jsx"));
 const CodeLensPage = lazy(() => import("./labs/codelens/CodeLensPage.jsx"));
-const LearnPage = lazy(() => import("./pages/LearnPage.jsx"));
-const LabShell = lazy(() => import("./pages/LabShell.jsx"));
+const SICPPage = lazy(() => import("./labs/sicp-js/SICPPage.jsx"));
+const DSAPatternsPage = lazy(() => import("./labs/dsa-patterns/DSAPatternsPage.jsx"));
 
 const Fallback = () => (
   <div className="flex items-center justify-center h-64">
@@ -64,27 +65,15 @@ export default function App() {
                   <Routes>
                     <Route index element={<HomePage />} />
                     <Route path="course/:courseKey" element={<CoursePage />} />
-                    <Route
-                      path="chapter/:chapterId"
-                      element={<ChapterPage />}
-                    />
-                    <Route
-                      path="chapter/:chapterId/:lessonSlug"
-                      element={<LessonPage />}
-                    />
-                    <Route
-                      path="chapter/:chapterId/:lessonSlug/*"
-                      element={<LessonPage />}
-                    />
+                    <Route path="chapter/:chapterId" element={<ChapterPage />} />
+                    <Route path="chapter/:chapterId/:lessonSlug" element={<LessonPage />} />
+                    <Route path="chapter/:chapterId/:lessonSlug/*" element={<LessonPage />} />
                     <Route path="search" element={<SearchPage />} />
                     <Route path="paths" element={<LearningPathsPage />} />
                     <Route path="about" element={<AboutPage />} />
                     <Route path="reference" element={<ReferencePage />} />
                     <Route path="linear-algebra" element={<LinearAlgebraReferencePage />} />
-                    <Route
-                      path="universal-calc"
-                      element={<UniversalCalcPage />}
-                    />
+                    <Route path="universal-calc" element={<UniversalCalcPage />} />
                     <Route path="openmat" element={<OpenMatPage />} />
                     <Route path="cnc-sim" element={<CNCSimPage />} />
                     <Route path="logic-sim" element={<LogicSimPage />} />
@@ -92,7 +81,7 @@ export default function App() {
                     <Route path="physics" element={<PhysicsPage />} />
                     <Route path="courses" element={<AllCoursesPage />} />
                     <Route path="cad-pro" element={<CadProPage />} />
-                    <Route path="studio" element={<DocsPage />} />
+                    <Route path="studio" element={<MarkdownHub />} />
                     <Route path="docs" element={<Navigate to="/studio" replace />} />
                     <Route path="viz-gallery" element={<VizGalleryPage />} />
                     <Route path="games" element={<GamesPage />} />
@@ -101,8 +90,12 @@ export default function App() {
                     <Route path="rpg-workout" element={<RPGWorkoutPage />} />
                     <Route path="brain" element={<BrainPage />} />
 
-                    {/* Game auto-discovery — all games load via GameShell */}
-                    <Route path="game/:gameKey" element={<GameShell />} />
+                    {/* Game auto-discovery */}
+                    <Route path="game/:gameKey" element={
+                      <EntryShell paramKey="gameKey" loader={getGameEntry}
+                        notFoundEmoji="🎮" notFoundLabel="Game not found"
+                        backTo="/games" backLabel="Back to games" />
+                    } />
 
                     {/* Legacy redirects for bookmarked game URLs */}
                     <Route path="rubiks-cube" element={<Navigate to="/game/rubiks-cube" replace />} />
@@ -116,21 +109,27 @@ export default function App() {
                     <Route path="stem-quest" element={<Navigate to="/game/stem-quest" replace />} />
                     <Route path="open-craft" element={<Navigate to="/game/open-craft" replace />} />
                     <Route path="reality-runner" element={<Navigate to="/game/reality-runner" replace />} />
+
                     <Route path="five-axis" element={<FiveAxisKinematicsPage />} />
-                    <Route path="matrix-reducer" element={<MatrixReducerPage />} />
                     <Route path="codelens" element={<CodeLensPage />} />
 
                     {/* Web Learn Curriculums */}
-                    <Route path="web-learn/sandbox/:lessonId" element={<WebLabPage />} />
-                    <Route path="web-learn/sandbox" element={<WebLabPage />} />
                     <Route path="web-learn/css-mastery/:lessonId" element={<CSSMasteryPage />} />
                     <Route path="web-learn/css-mastery" element={<CSSMasteryPage />} />
+                    <Route path="web-learn/react-mastery/:lessonId" element={<ReactMasteryPage />} />
+                    <Route path="web-learn/react-mastery" element={<ReactMasteryPage />} />
 
-                    <Route path="learn/:series/:lessonId" element={<LearnPage />} />
-                    <Route path="learn/:series" element={<LearnPage />} />
+                    <Route path="learn/sicp/:lessonId" element={<SICPPage />} />
+                    <Route path="learn/sicp" element={<SICPPage />} />
+                    <Route path="learn/dsa-patterns/:lessonId" element={<DSAPatternsPage />} />
+                    <Route path="learn/dsa-patterns" element={<DSAPatternsPage />} />
 
-                    {/* Lab auto-discovery — all labs load via LabShell */}
-                    <Route path="lab/:labKey" element={<LabShell />} />
+                    {/* Lab auto-discovery */}
+                    <Route path="lab/:labKey" element={
+                      <EntryShell paramKey="labKey" loader={getLabEntry}
+                        notFoundEmoji="🔬" notFoundLabel="Lab not found"
+                        backTo="/labs" backLabel="Back to labs" />
+                    } />
 
                     {/* Legacy redirects for bookmarked lab URLs */}
                     <Route path="robot-arm-lab" element={<Navigate to="/lab/robot-arm-sim" replace />} />

@@ -21,8 +21,8 @@ import {
   GripVertical,
 } from "lucide-react";
 import { useVideoPlayer } from "../../hooks/useVideoPlayer.js";
-import { selectVideosByKeywords, VIDEO_MAP, VIDEO_LIBRARY } from "../../content/videos/videoSelector.js";
-import { CURRICULUM, ALL_LESSONS } from "../../content/index.js";
+import { selectVideosByKeywords, VIDEO_MAP, VIDEO_LIBRARY } from "../../context/videoSelector.js";
+import { CURRICULUM, ALL_LESSONS } from "../../courses/index.js";
 import { getVideos } from "../../courses/courseLoader.js";
 
 // lesson.chapterNumber is a composite key like "calculus-1" — pull the

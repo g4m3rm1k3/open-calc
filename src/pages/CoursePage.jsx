@@ -2,7 +2,7 @@ import { useParams, Link } from 'react-router-dom'
 import { useEffect } from 'react'
 import { getCourseMeta, getChapters } from '../courses/courseLoader.js'
 import { useProgress } from '../hooks/useProgress.js'
-import { GLASS_META } from '../constants/courseColors.js'
+import { GLASS_META } from '../styles/courseColors.js'
 
 export default function CoursePage() {
   const { courseKey } = useParams()

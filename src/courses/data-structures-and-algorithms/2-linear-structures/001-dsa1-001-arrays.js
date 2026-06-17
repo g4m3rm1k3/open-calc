@@ -809,7 +809,7 @@ print(da)          # DA[20, 99, 30, 40, 50]`,
       type: 'lab',
       title: 'Arrays & Memory — Interactive Lab',
       description: 'Full hacker-workstation DSA lab: implement get, insert, delete, linear search, and binary search with live memory visualization and step tracer. JS + Python dual-language.',
-      href: '/dsa-arrays-lab',
+      href: '/lab/dsa-arrays-lab',
     },
   ],
 };

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import ProofViewer from "../viz/react/ProofViewer.jsx";
+import ProofViewer from "./ProofViewer.jsx";
 
 export default function ProofModal({ entry, proof, onClose }) {
   const scrollRef = useRef(null);

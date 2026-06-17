@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Plus, Trash2, Code2, Download } from "lucide-react";
-import FullPageIDE from "../../components/ui/FullPageIDE.jsx";
+import FullPageIDE from "./FullPageIDE.jsx";
 import { zipSync, strToU8 } from "fflate";
 
 export const meta = {

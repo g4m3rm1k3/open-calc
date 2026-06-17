@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { db } from '../firebase';
+import { db } from '../../../firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../../context/AuthContext';
 import { getExerciseDetails, EXERCISE_TYPES } from '../data/rpgExercises';
 
 const DEFAULT_RPG_STATE = {

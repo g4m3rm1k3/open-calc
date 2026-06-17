@@ -1,6 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
-import { LESSON_MAP, ALL_LESSONS, CURRICULUM } from "../content/index.js";
+import { LESSON_MAP, ALL_LESSONS, CURRICULUM } from "../courses/index.js";
 import { loadLesson, getAllChapters } from "../courses/courseLoader.js";
 import { useProgress } from "../hooks/useProgress.js";
 
@@ -11,7 +11,7 @@ import { useIsMobile } from "../hooks/useIsMobile.js";
 import CrossRef from "../components/lesson/CrossRef.jsx";
 import VizFrame from "../components/viz/VizFrame.jsx";
 import MarkdownProse from "../components/math/MarkdownProse.jsx";
-import { enhanceLessonForUnifiedLearning } from "../content/enhancers/unifiedLessonEnhancer.js";
+import { enhanceLessonForUnifiedLearning } from "../engines/lesson/enhancers/unifiedLessonEnhancer.js";
 import OpenInGrapher from "../components/lesson/OpenInGrapher.jsx";
 import LessonQuizBlock from "../components/lesson/LessonQuizBlock.jsx";
 import { useVideoPlayer } from "../hooks/useVideoPlayer.js";

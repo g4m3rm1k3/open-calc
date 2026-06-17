@@ -1,3 +1,5 @@
+import DSAPatternsPage from './DSAPatternsPage.jsx'
+
 export const meta = {
   label: 'DSA + Design Patterns',
   emoji: '🧩',
@@ -6,3 +8,5 @@ export const meta = {
   tags: ['TypeScript', 'DSA', 'Design Patterns', 'Interactive'],
   cover: { grad: 'from-violet-700 via-purple-800 to-indigo-950', mark: '⬡', sub: 'DSA · Patterns · Checkpoints' },
 }
+
+export default DSAPatternsPage

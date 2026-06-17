@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
-import { GAMES } from '../../../data/games.js'
-import { GLASS_META } from '../../../constants/courseColors.js'
+import { GAMES } from '../../../games/registry.js'
+import { GLASS_META } from '../../../styles/courseColors.js'
 
 const DOTS_OVL = {
   backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px)',

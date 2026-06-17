@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Scroll, Zap, CheckCircle2, Loader2 } from 'lucide-react';
-import { useRPGCoachAI } from '../../hooks/useRPGCoachAI';
+import { useRPGCoachAI } from '../hooks/useRPGCoachAI';
 
 const MAX_ACTIVE_QUESTS = 5;
 

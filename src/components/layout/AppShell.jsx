@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import AuthButton from "../auth/AuthButton.jsx";
+import AuthButton from "../ui/AuthButton.jsx";
 import {
   Link,
   NavLink,
@@ -8,10 +8,10 @@ import {
   useNavigate,
   useParams,
 } from "react-router-dom";
-import { LESSON_MAP, CURRICULUM, COURSES } from "../../content/index.js";
+import { LESSON_MAP, CURRICULUM, COURSES } from "../../courses/index.js";
 import Sidebar from "./Sidebar.jsx";
 import UtilityPanel from "../ui/UtilityPanel.jsx";
-import SearchModal from "../search/SearchModal.jsx";
+import SearchModal from "../ui/SearchModal.jsx";
 import GlobalGrapher from "../../tools/grapher-2d/index.jsx";
 import GlobalGrapher3D from "../../tools/grapher-3d/index.jsx";
 import GlobalGrapherJSX from "../../tools/grapher-jsx/index.jsx";
@@ -48,13 +48,14 @@ import TICalc from "../../tools/calculator/index.jsx";
 import SigmaCalc from "../../tools/sigma/index.jsx";
 import PolyCalc from "../../tools/polynomial/index.jsx";
 import LinearAlgebraCalc from "../../tools/linear-algebra/index.jsx";
+import MatrixReducer from "../../tools/matrix-reducer/index.jsx";
 import HelpModal from "../ui/HelpModal.jsx";
 import MobileBottomNav from "./MobileBottomNav.jsx";
 import GlobalPythonNotebook from "../../tools/python-notebook/index.jsx";
 import GlobalJSPlayground from "../../tools/js-playground/index.jsx";
 import { ChatProvider } from "../../context/ChatContext.jsx";
 import { useChat } from "../../hooks/useChat.js";
-import ChatPanel from "../chat/ChatPanel.jsx";
+import ChatPanel from "../ui/ChatPanel.jsx";
 import { motion, AnimatePresence } from "framer-motion";
 import { useVideoPlayer } from "../../hooks/useVideoPlayer.js";
 import PhysicsPoolLab from "../../games/pool/PhysicsPoolLab.jsx";
@@ -63,9 +64,9 @@ import MiniGolfGame from "../../games/golf/MiniGolfGame.jsx";
 import FootballCalculus from "../../games/football/FootballCalculus.jsx";
 import ChemistryPage from "../../labs/chemistry/ChemistryPage.jsx";
 import PhysicsPage from "../../labs/physics/PhysicsPage.jsx";
-import DynamicBackground from "../ui/DynamicBackground.jsx";
+import DynamicBackground from "../backgrounds/DynamicBackground.jsx";
 import BackgroundPicker from "../ui/BackgroundPicker.jsx";
-import AlphaMascot from "../mascot/AlphaMascot.jsx";
+import AlphaMascot from "../ui/AlphaMascot.jsx";
 import GameRules from "../../games/GameRules.jsx";
 
 function MobileLocationBadge() {
@@ -558,21 +559,20 @@ export default function AppShell({ children }) {
   const isBrainRoute = location.pathname.startsWith("/brain");
   const isRubiksCubeRoute = location.pathname.startsWith("/rubiks-cube");
   const isMatrixGameRoute = location.pathname.startsWith("/matrix-game");
-  const isRobotArmLabRoute = location.pathname.startsWith("/robot-arm-lab");
-  const isSimLabRoute = location.pathname.startsWith("/sim-lab");
-  const isDroneLabRoute = location.pathname.startsWith("/drone-lab");
-  const isMatrixLabRoute = location.pathname.startsWith("/matrix-lab");
-  const isMatrix3DLabRoute = location.pathname.startsWith("/matrix-3d-lab");
-  const isDecompLabRoute = location.pathname.startsWith("/decomp-lab");
-  const isCmmLabRoute = location.pathname.startsWith("/cmm-lab");
+  const isRobotArmLabRoute = location.pathname.startsWith("/robot-arm-lab") || location.pathname.startsWith("/lab/robot-arm-sim");
+  const isSimLabRoute = location.pathname.startsWith("/sim-lab") || location.pathname.startsWith("/lab/sim-lab");
+  const isDroneLabRoute = location.pathname.startsWith("/drone-lab") || location.pathname.startsWith("/lab/drone-lab");
+  const isMatrixLabRoute = location.pathname.startsWith("/matrix-lab") || location.pathname.startsWith("/lab/matrix-lab");
+  const isMatrix3DLabRoute = location.pathname.startsWith("/matrix-3d-lab") || location.pathname.startsWith("/lab/matrix-3d-lab");
+  const isDecompLabRoute = location.pathname.startsWith("/decomp-lab") || location.pathname.startsWith("/lab/decomp-lab");
+  const isCmmLabRoute = location.pathname.startsWith("/cmm-lab") || location.pathname.startsWith("/lab/cmm-lab");
   const isFiveAxisRoute = location.pathname.startsWith("/five-axis");
-  const isDSAArraysLabRoute = location.pathname.startsWith("/dsa-arrays-lab");
-  const isDSALinkedListsLabRoute = location.pathname.startsWith("/dsa-linked-lists-lab");
+  const isDSAArraysLabRoute = location.pathname.startsWith("/lab/dsa-arrays-lab");
+  const isDSALinkedListsLabRoute = location.pathname.startsWith("/lab/dsa-linked-lists-lab");
   const isCodeLensRoute = location.pathname.startsWith("/codelens");
   const isLearnRoute = location.pathname.startsWith("/learn") || location.pathname.startsWith("/web-learn");
-  const isHtmlLabRoute = location.pathname.startsWith("/html-lab");
-  const isMusicLabRoute = location.pathname.startsWith("/music-lab");
-  
+  const isHtmlLabRoute = location.pathname.startsWith("/html-lab") || location.pathname.startsWith("/lab/html-lab");
+  const isMusicLabRoute = location.pathname.startsWith("/music-lab") || location.pathname.startsWith("/lab/music-lab");
   const pathParts = location.pathname.split('/').filter(Boolean);
   const isLessonRoute = pathParts[0] === 'chapter' && pathParts.length >= 3;
 
@@ -613,6 +613,7 @@ export default function AppShell({ children }) {
   const [footballOpen, setFootballOpen] = useState(false);
   const [polyOpen, setPolyOpen] = useState(false);
   const [laOpen, setLAOpen] = useState(false);
+  const [matrixReducerOpen, setMatrixReducerOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [gameRulesOpen, setGameRulesOpen] = useState(false);
   const [scratchSnap, setScratchSnap] = useState(null);
@@ -701,6 +702,7 @@ export default function AppShell({ children }) {
       else if (tool === "grapher") setGraphOpen(true);
       else if (tool === "grapher-3d") setGraph3DOpen(true);
       else if (tool === "jsxgraph") setGraphJSXOpen(true);
+      else if (tool === "matrix-reducer") setMatrixReducerOpen(true);
     };
     window.addEventListener("oc-open-tool", handler);
     return () => window.removeEventListener("oc-open-tool", handler);
@@ -817,6 +819,11 @@ export default function AppShell({ children }) {
           {sigmaOpen && <SigmaCalc onClose={() => setSigmaOpen(false)} />}
           {polyOpen && <PolyCalc onClose={() => setPolyOpen(false)} />}
           {laOpen && <LinearAlgebraCalc onClose={() => setLAOpen(false)} />}
+          {matrixReducerOpen && (
+            <div className="fixed inset-0 z-[1999] overflow-auto">
+              <MatrixReducer onBack={() => setMatrixReducerOpen(false)} />
+            </div>
+          )}
           <GlobalPythonNotebook
             isOpen={pythonOpen}
             onClose={() => setPythonOpen(false)}
@@ -1115,6 +1122,11 @@ export default function AppShell({ children }) {
           {sigmaOpen && <SigmaCalc onClose={() => setSigmaOpen(false)} />}
           {polyOpen && <PolyCalc onClose={() => setPolyOpen(false)} />}
           {laOpen && <LinearAlgebraCalc onClose={() => setLAOpen(false)} />}
+          {matrixReducerOpen && (
+            <div className="fixed inset-0 z-[1999] overflow-auto">
+              <MatrixReducer onBack={() => setMatrixReducerOpen(false)} />
+            </div>
+          )}
           <UtilityPanel />
           <WelcomeModal />
           <SearchModal />
