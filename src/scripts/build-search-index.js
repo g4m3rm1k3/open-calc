@@ -181,6 +181,16 @@ async function buildIndex() {
   if (existsSync(tmpPath)) try { unlinkSync(tmpPath) } catch {}
   writeFileSync(outPath, JSON.stringify({ documents }, null, 0))
 
+  // Write lesson title map so courseLoader can show real titles without
+  // eager-loading full lesson content.  Key: "chapterId/lessonSlug"
+  const titles = {}
+  for (const d of documents) {
+    titles[d.id] = d.title   // id is already "chapterId/lessonSlug"
+  }
+  const dataDir = resolve(root, 'src/data')
+  if (!existsSync(dataDir)) mkdirSync(dataDir, { recursive: true })
+  writeFileSync(resolve(dataDir, 'lessonTitles.json'), JSON.stringify(titles))
+
   console.log(`✓ Search index built: ${documents.length} lessons indexed`)
 }
 

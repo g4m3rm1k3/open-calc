@@ -2,6 +2,7 @@
 // Paths are parsed eagerly for structure; lesson content is loaded lazily on demand.
 
 import { GLASS_META } from '../styles/courseColors.js'
+import LESSON_TITLES from '../data/lessonTitles.json'
 
 let ALL_MODULES = {}
 try { ALL_MODULES = import.meta.glob('./**/*.js') } catch {}   // lazy — paths only at init
@@ -45,7 +46,7 @@ for (const filePath of Object.keys(ALL_MODULES)) {
     tree[courseId][chapterNum] = { number: chapterId, title: chapterTitle, lessons: [] }
   }
   tree[courseId][chapterNum].lessons.push({
-    title: slugToTitle(lessonSlug),
+    title: LESSON_TITLES[`${courseId}-${chapterNum}/${lessonSlug}`] ?? slugToTitle(lessonSlug),
     slug: lessonSlug,
     _order: lessonOrder,
     _path: filePath,
