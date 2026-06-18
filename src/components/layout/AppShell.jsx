@@ -146,18 +146,6 @@ function TopBar({ dark, toggleDark }) {
 
       {/* CENTER — nav links */}
       <div className="flex-1 flex items-center gap-1">
-        <Link
-          to="/lesson-builder"
-          className="text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 px-2.5 py-1 rounded-md hover:bg-black/5 dark:hover:bg-white/[0.08] transition-colors"
-        >
-          🔨 Lesson Builder
-        </Link>
-        <Link
-          to="/viz-builder"
-          className="text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 px-2.5 py-1 rounded-md hover:bg-black/5 dark:hover:bg-white/[0.08] transition-colors"
-        >
-          🔭 Viz Builder
-        </Link>
       </div>
 
       {/* RIGHT — tools + utilities + clock */}
@@ -257,6 +245,10 @@ export default function AppShell({ children }) {
   const isFiveAxisRoute = location.pathname.startsWith("/five-axis");
   const isCodeLensRoute = location.pathname.startsWith("/codelens");
   const isLearnRoute = location.pathname.startsWith("/learn") || location.pathname.startsWith("/web-learn");
+  const isFullPageToolRoute = location.pathname.startsWith("/notebook-lab") ||
+    location.pathname.startsWith("/lesson-builder") ||
+    location.pathname.startsWith("/viz-builder") ||
+    location.pathname.startsWith("/playground");
   const isDesktopRoute = location.pathname === '/';
   const pathParts = location.pathname.split('/').filter(Boolean);
   const isLessonRoute = pathParts[0] === 'chapter' && pathParts.length >= 3;
@@ -509,7 +501,7 @@ export default function AppShell({ children }) {
 
           {/* Main content */}
           <main
-            className={`transition-[padding] duration-500 ease-in-out pb-20 lg:pb-11 ${isChemistryRoute ? "h-screen overflow-hidden" : isDesktopRoute ? "h-screen" : "min-h-screen"} ${isHealthRoute || isBrainRoute ? "bg-white dark:bg-slate-950" : ""} lg:pl-0 pt-12`}
+            className={`transition-[padding] duration-500 ease-in-out pb-20 lg:pb-11 ${isChemistryRoute || isFullPageToolRoute ? "h-screen overflow-hidden" : isDesktopRoute ? "h-screen" : "min-h-screen"} ${isHealthRoute || isBrainRoute ? "bg-white dark:bg-slate-950" : ""} lg:pl-0 pt-12`}
             style={{
               paddingRight: chatOpen
                 ? (scratchSnap === "right" ? `${scratchSnapW}px` : "var(--chat-width, 380px)")
@@ -523,7 +515,7 @@ export default function AppShell({ children }) {
               className={
                 isDesktopRoute
                   ? "w-full h-[calc(100vh-48px-44px)]"
-                  : isChemistryRoute
+                  : isChemistryRoute || isFullPageToolRoute
                     ? "w-full h-[calc(100vh-48px)] flex flex-col overflow-hidden"
                     : isUniversalCalcRoute
                       ? "max-w-[min(98vw,2800px)] mx-auto px-2 sm:px-3 lg:px-4 py-8"

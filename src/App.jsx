@@ -40,7 +40,8 @@ const SICPPage = lazy(() => import("./labs/sicp-js/SICPPage.jsx"));
 const DSAPatternsPage = lazy(() => import("./labs/dsa-patterns/DSAPatternsPage.jsx"));
 const LessonBuilderPage = lazy(() => import("./pages/LessonBuilderPage.jsx"));
 const VizBuilderPage    = lazy(() => import("./pages/VizBuilderPage.jsx"));
-const PlaygroundPage    = lazy(() => import("./pages/PlaygroundPage.jsx"));
+const PlaygroundPage    = lazy(() => import("./pages/PlaygroundPage.jsx"))
+const NotebookLabPage   = lazy(() => import("./pages/NotebookLabPage.jsx"))
 
 const Fallback = () => (
   <div className="flex items-center justify-center h-64">
@@ -83,7 +84,6 @@ export default function App() {
                     <Route path="studio" element={<MarkdownHub />} />
                     <Route path="docs" element={<Navigate to="/studio" replace />} />
                     <Route path="games" element={<Navigate to="/" replace />} />
-                    <Route path="labs" element={<Navigate to="/" replace />} />
                     <Route path="health" element={<HealthTrackerPage />} />
                     <Route path="rpg-workout" element={<RPGWorkoutPage />} />
                     <Route path="brain" element={<BrainPage />} />
@@ -112,6 +112,7 @@ export default function App() {
                     <Route path="lesson-builder/:chapterId/:lessonSlug" element={<LessonBuilderPage />} />
                     <Route path="viz-builder" element={<VizBuilderPage />} />
                     <Route path="playground" element={<PlaygroundPage />} />
+                    <Route path="notebook-lab" element={<NotebookLabPage />} />
 
                     <Route path="five-axis" element={<FiveAxisKinematicsPage />} />
                     <Route path="codelens" element={<CodeLensPage />} />

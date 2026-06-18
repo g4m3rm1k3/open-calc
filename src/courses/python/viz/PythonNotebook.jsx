@@ -423,12 +423,15 @@ const CellComponent = React.memo(
     onClear,
     onRemove,
     onUpdate,
+    onChangeType,
     isExecuting,
     isOnlyCell,
   }) => {
     const [copied, setCopied] = useState(false);
     const [hintOpen, setHintOpen] = useState(false);
+    const [mdPreview, setMdPreview] = useState(true);
 
+    const isMarkdown = cell.cellType === 'markdown';
     const isChallenge = !!cell.challengeType;
     const isFillIn = cell.challengeType === "fill-in";
     const dc = difficultyStyle(cell.difficulty, C);
@@ -822,7 +825,9 @@ const CellComponent = React.memo(
           <span
             style={{ fontFamily: "monospace", fontSize: 11, color: C.hint }}
           >
-            {cell.status === "running" ? (
+            {isMarkdown ? (
+              <span style={{ color: C.purple }}>Markdown</span>
+            ) : cell.status === "running" ? (
               <span>
                 In [<span style={{ color: C.teal }}>*</span>]
               </span>
@@ -831,85 +836,184 @@ const CellComponent = React.memo(
             )}
           </span>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-            <button
-              onClick={() => onRun(cell.id)}
-              disabled={isExecuting}
-              style={{
-                fontSize: 11,
-                padding: "3px 10px",
-                borderRadius: 6,
-                cursor: isExecuting ? "default" : "pointer",
-                border: "none",
-                background: C.teal,
-                color: "#fff",
-                opacity: isExecuting ? 0.5 : 1,
-              }}
-            >
-              {cell.status === "running" ? "..." : "▶ Run"}
-            </button>
-            <button
-              onClick={() => onClear(cell.id)}
-              style={{
-                fontSize: 11,
-                padding: "3px 8px",
-                borderRadius: 6,
-                cursor: "pointer",
-                border: `0.5px solid ${C.border}`,
-                background: "transparent",
-                color: C.hint,
-              }}
-            >
-              Clear
-            </button>
-            <button
-              onClick={() => onRemove(cell.id)}
-              disabled={isOnlyCell}
-              style={{
-                fontSize: 11,
-                padding: "3px 8px",
-                borderRadius: 6,
-                cursor: isOnlyCell ? "default" : "pointer",
-                border: `0.5px solid ${C.border}`,
-                background: "transparent",
-                color: C.hint,
-                opacity: isOnlyCell ? 0.3 : 1,
-              }}
-            >
-              ✕
-            </button>
+            {/* Type toggle — only when no lesson/challenge context */}
+            {!isChallenge && !cell.prose && !cell.instructions && onChangeType && (
+              <button
+                onClick={() => onChangeType(cell.id, isMarkdown ? 'code' : 'markdown')}
+                style={{
+                  fontSize: 10,
+                  padding: "2px 7px",
+                  borderRadius: 6,
+                  cursor: "pointer",
+                  border: `0.5px solid ${C.border}`,
+                  background: "transparent",
+                  color: isMarkdown ? C.purple : C.muted,
+                  fontWeight: 600,
+                }}
+              >
+                {isMarkdown ? 'Py' : 'MD'}
+              </button>
+            )}
+            {isMarkdown ? (
+              <>
+                <button
+                  onClick={() => setMdPreview(p => !p)}
+                  style={{
+                    fontSize: 11,
+                    padding: "3px 10px",
+                    borderRadius: 6,
+                    cursor: "pointer",
+                    border: "none",
+                    background: C.purple,
+                    color: "#fff",
+                  }}
+                >
+                  {mdPreview ? '✎ Edit' : '👁 Preview'}
+                </button>
+                <button
+                  onClick={() => onRemove(cell.id)}
+                  disabled={isOnlyCell}
+                  style={{
+                    fontSize: 11,
+                    padding: "3px 8px",
+                    borderRadius: 6,
+                    cursor: isOnlyCell ? "default" : "pointer",
+                    border: `0.5px solid ${C.border}`,
+                    background: "transparent",
+                    color: C.hint,
+                    opacity: isOnlyCell ? 0.3 : 1,
+                  }}
+                >
+                  ✕
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => onRun(cell.id)}
+                  disabled={isExecuting}
+                  style={{
+                    fontSize: 11,
+                    padding: "3px 10px",
+                    borderRadius: 6,
+                    cursor: isExecuting ? "default" : "pointer",
+                    border: "none",
+                    background: C.teal,
+                    color: "#fff",
+                    opacity: isExecuting ? 0.5 : 1,
+                  }}
+                >
+                  {cell.status === "running" ? "..." : "▶ Run"}
+                </button>
+                <button
+                  onClick={() => onClear(cell.id)}
+                  style={{
+                    fontSize: 11,
+                    padding: "3px 8px",
+                    borderRadius: 6,
+                    cursor: "pointer",
+                    border: `0.5px solid ${C.border}`,
+                    background: "transparent",
+                    color: C.hint,
+                  }}
+                >
+                  Clear
+                </button>
+                <button
+                  onClick={() => onRemove(cell.id)}
+                  disabled={isOnlyCell}
+                  style={{
+                    fontSize: 11,
+                    padding: "3px 8px",
+                    borderRadius: 6,
+                    cursor: isOnlyCell ? "default" : "pointer",
+                    border: `0.5px solid ${C.border}`,
+                    background: "transparent",
+                    color: C.hint,
+                    opacity: isOnlyCell ? 0.3 : 1,
+                  }}
+                >
+                  ✕
+                </button>
+              </>
+            )}
           </div>
         </div>
 
-        {/* Monaco Editor */}
-        <Editor
-          height={editorHeight}
-          beforeMount={setupOpenCalcMonaco}
-          defaultLanguage="python"
-          theme={C.dark ? "open-calc-dark" : "open-calc-light"}
-          value={cell.code}
-          onChange={(val) => onUpdate(cell.id, val || "")}
-          options={{
-            minimap: { enabled: false },
-            scrollBeyondLastLine: false,
-            fontSize: 13,
-            lineNumbers: "on",
-            padding: { top: 10, bottom: 10 },
-            automaticLayout: true,
-            scrollbar: {
-              vertical: "hidden",
-              alwaysConsumeMouseWheel: false,
-            },
-          }}
-          onMount={(editor) => {
-            // monaco.KeyMod.Shift | monaco.KeyCode.Enter = 1024 | 3
-            // We use the numerical constants to avoid referencing a global 'monaco' object
-            // which might not be in scope. Shift=1024, Enter=3
-            editor.addCommand(1024 | 3, () => onRun(cell.id));
-          }}
-        />
+        {/* Markdown cell */}
+        {isMarkdown && (
+          mdPreview ? (
+            <div
+              onClick={() => setMdPreview(false)}
+              style={{
+                minHeight: 60,
+                padding: "12px 16px",
+                color: C.text,
+                fontSize: 14,
+                lineHeight: 1.7,
+                cursor: "text",
+                background: C.surface,
+              }}
+            >
+              {(cell.code || '').trim()
+                ? <div>{parseProse(cell.code)}</div>
+                : <span style={{ color: C.hint, fontStyle: 'italic' }}>Click to edit markdown…</span>
+              }
+            </div>
+          ) : (
+            <textarea
+              autoFocus
+              value={cell.code}
+              onChange={e => onUpdate(cell.id, e.target.value)}
+              onBlur={() => setMdPreview(true)}
+              placeholder="Write markdown here… (blur to preview)"
+              style={{
+                width: "100%",
+                minHeight: 120,
+                padding: "12px 16px",
+                background: C.surface,
+                color: C.text,
+                border: "none",
+                outline: "none",
+                fontFamily: "monospace",
+                fontSize: 13,
+                lineHeight: 1.65,
+                resize: "vertical",
+                boxSizing: "border-box",
+              }}
+            />
+          )
+        )}
 
-        {/* Output */}
-        <CellOutput cell={cell} C={C} />
+        {/* Monaco Editor — code cells only */}
+        {!isMarkdown && (
+          <Editor
+            height={editorHeight}
+            beforeMount={setupOpenCalcMonaco}
+            defaultLanguage="python"
+            theme={C.dark ? "open-calc-dark" : "open-calc-light"}
+            value={cell.code}
+            onChange={(val) => onUpdate(cell.id, val || "")}
+            options={{
+              minimap: { enabled: false },
+              scrollBeyondLastLine: false,
+              fontSize: 13,
+              lineNumbers: "on",
+              padding: { top: 10, bottom: 10 },
+              automaticLayout: true,
+              scrollbar: {
+                vertical: "hidden",
+                alwaysConsumeMouseWheel: false,
+              },
+            }}
+            onMount={(editor) => {
+              editor.addCommand(1024 | 3, () => onRun(cell.id));
+            }}
+          />
+        )}
+
+        {/* Output — code cells only */}
+        {!isMarkdown && <CellOutput cell={cell} C={C} />}
 
         {/* Hint toggle (challenge cells only) */}
         {isChallenge && cell.hint && (
@@ -993,7 +1097,7 @@ function fixPythonBrokenStrings(src) {
   return out.join("\n");
 }
 
-export default function PythonNotebook({ params, onParamChange }) {
+export default function PythonNotebook({ params, onParamChange, onCellsChange }) {
   const C = useColors();
   const [pyodide, setPyodide] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -1017,6 +1121,11 @@ export default function PythonNotebook({ params, onParamChange }) {
       setCells(normalizeCells(params.initialCells));
     }
   }, [params?.initialCells]);
+
+  // Notify parent of cell changes (used by NotebookLab for auto-save)
+  useEffect(() => {
+    onCellsChange?.(cells);
+  }, [cells]); // eslint-disable-line
 
   // ── Load Pyodide via Singleton ─────────────────────────────────────────────
   useEffect(() => {
@@ -1207,6 +1316,14 @@ export default function PythonNotebook({ params, onParamChange }) {
       ),
     );
 
+  const addMarkdownCell = () => {
+    const newId = cells.length > 0 ? Math.max(...cells.map((c) => c.id)) + 1 : 1;
+    setCells([...cells, { id: newId, cellType: 'markdown', code: '', output: '', status: 'idle', figureJson: null, matplotlibImages: [] }]);
+  };
+
+  const changeCellType = (id, cellType) =>
+    setCells((prev) => prev.map((c) => (c.id === id ? { ...c, cellType, output: '', figureJson: null, matplotlibImages: [] } : c)));
+
   // ── Loading screen ─────────────────────────────────────────────────────────
   if (isLoading) {
     return (
@@ -1353,6 +1470,20 @@ export default function PythonNotebook({ params, onParamChange }) {
             </button>
           )}
           <button
+            onClick={addMarkdownCell}
+            style={{
+              fontSize: 12,
+              padding: "6px 10px",
+              borderRadius: 8,
+              cursor: "pointer",
+              border: `0.5px solid ${C.border}`,
+              background: "transparent",
+              color: C.purple,
+            }}
+          >
+            + MD
+          </button>
+          <button
             onClick={addCell}
             style={{
               fontSize: 12,
@@ -1364,7 +1495,7 @@ export default function PythonNotebook({ params, onParamChange }) {
               color: C.muted,
             }}
           >
-            + Add cell
+            + Code
           </button>
         </div>
       </div>
@@ -1505,18 +1636,38 @@ fig.show()`}
             onClear={clearOutput}
             onRemove={removeCell}
             onUpdate={updateCode}
+            onChangeType={changeCellType}
             isExecuting={isExecuting}
             isOnlyCell={cells.length <= 1}
           />
         ))}
       </div>
 
-      {/* Add cell button */}
+      {/* Add cell buttons */}
+      <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+      <button
+        onClick={addMarkdownCell}
+        style={{
+          flex: 1,
+          padding: 16,
+          border: `1.5px dashed ${C.border}`,
+          borderRadius: 12,
+          background: "transparent",
+          color: C.purple,
+          fontSize: 13,
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 6,
+        }}
+      >
+        + Markdown cell
+      </button>
       <button
         onClick={addCell}
         style={{
-          width: "100%",
-          marginTop: 12,
+          flex: 1,
           padding: 16,
           border: `1.5px dashed ${C.border}`,
           borderRadius: 12,
@@ -1530,8 +1681,9 @@ fig.show()`}
           gap: 6,
         }}
       >
-        + Add cell
+        + Code cell
       </button>
+      </div>
 
       {/* Footer */}
       <div
