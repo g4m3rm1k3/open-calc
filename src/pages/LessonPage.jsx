@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { LESSON_MAP, ALL_LESSONS, CURRICULUM } from "../courses/index.js";
 import { loadLesson, getAllChapters } from "../courses/courseLoader.js";
@@ -55,6 +55,7 @@ export default function LessonPage() {
     window.dispatchEvent(new CustomEvent('oc-lesson-context', { detail: lesson ?? null }))
     return () => window.dispatchEvent(new CustomEvent('oc-lesson-context', { detail: null }))
   }, [lesson])
+  const navigate = useNavigate();
   const {
     markCheckpoint,
     getActiveTab,
@@ -188,6 +189,12 @@ export default function LessonPage() {
             <span className="text-slate-700 dark:text-slate-300">
               {lesson.title}
             </span>
+            <button
+              onClick={() => navigate(`/lesson-builder/${chapterId}/${lessonSlug}`)}
+              className="ml-auto flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1 text-[11px] font-semibold text-slate-500 dark:text-slate-400 hover:border-brand-300 hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
+            >
+              🔨 Edit in Builder
+            </button>
           </nav>
         );
       })()}
