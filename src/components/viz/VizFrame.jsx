@@ -1,7 +1,31 @@
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState, Component } from "react";
 import { createPortal } from "react-dom";
 import { useLocation } from "react-router-dom";
 import { usePins } from "../../context/PinsContext.jsx";
+
+class VizErrorBoundary extends Component {
+  state = { error: null }
+  static getDerivedStateFromError(error) { return { error } }
+  componentDidCatch(error) {
+    console.error(`[VizFrame:${this.props.vizId}]`, error.message)
+  }
+  render() {
+    if (this.state.error) {
+      return (
+        <div className="flex flex-col items-center justify-center py-10 px-4 text-center rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40">
+          <span className="text-2xl mb-2">⚠️</span>
+          <p className="text-sm font-semibold text-red-700 dark:text-red-400">
+            {this.props.vizId} failed to render
+          </p>
+          <p className="text-xs text-red-500 dark:text-red-500 mt-1 font-mono">
+            {this.state.error.message}
+          </p>
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
 
 // Auto-discover all viz files living in course packages
 const _COURSE_VIZZES = import.meta.glob('../../courses/*/viz/*.{jsx,js}')
@@ -124,9 +148,11 @@ export default function VizFrame({ id, initialProps = {}, title }) {
   }
 
   const content = (
-    <Suspense fallback={<VizSkeleton />}>
-      <VizComponent key={pinId} params={params} onParamChange={setParams} />
-    </Suspense>
+    <VizErrorBoundary vizId={id}>
+      <Suspense fallback={<VizSkeleton />}>
+        <VizComponent key={pinId} params={params} onParamChange={setParams} />
+      </Suspense>
+    </VizErrorBoundary>
   );
 
   if (isExpanded) {

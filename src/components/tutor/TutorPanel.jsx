@@ -692,8 +692,10 @@ function useChatPanelOpen() {
   return chatOpen
 }
 
-export default function TutorPanel({ lesson, context = null, onApplyCode = null }) {
+export default function TutorPanel({ lesson: lessonProp = null, context = null, onApplyCode = null }) {
   const [open, setOpen] = useState(false)
+  const [lessonFromPage, setLessonFromPage] = useState(null)
+  const lesson = lessonFromPage ?? lessonProp
   const chatPanelOpen = useChatPanelOpen()
   const [view, setView] = useState('chat')
   const [settings, setSettings] = useState(loadSettings)
@@ -740,6 +742,13 @@ export default function TutorPanel({ lesson, context = null, onApplyCode = null 
     const handler = () => setOpen(o => !o)
     window.addEventListener('oc-toggle-tutor', handler)
     return () => window.removeEventListener('oc-toggle-tutor', handler)
+  }, [])
+
+  // Receive lesson context broadcast from LessonPage
+  useEffect(() => {
+    const handler = (e) => setLessonFromPage(e.detail ?? null)
+    window.addEventListener('oc-lesson-context', handler)
+    return () => window.removeEventListener('oc-lesson-context', handler)
   }, [])
 
   // Reset chat history when navigating to a different lesson

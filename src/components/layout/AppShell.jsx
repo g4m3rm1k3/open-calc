@@ -29,7 +29,6 @@ import {
   Terminal,
   Code2,
   PlayCircle,
-  Sparkles,
 } from "lucide-react";
 import TICalc from "../../tools/calculator/index.jsx";
 import SigmaCalc from "../../tools/sigma/index.jsx";
@@ -49,8 +48,7 @@ import MiniGolfGame from "../../games/golf/MiniGolfGame.jsx";
 import FootballCalculus from "../../games/football/FootballCalculus.jsx";
 import ChemistryPage from "../../labs/chemistry/ChemistryPage.jsx";
 import PhysicsPage from "../../labs/physics/PhysicsPage.jsx";
-import DynamicBackground from "../backgrounds/DynamicBackground.jsx";
-import BackgroundPicker from "../backgrounds/BackgroundPicker.jsx";
+import CodeMapBackground from "../backgrounds/CodeMapBackground.jsx";
 import AlphaMascot from "../ui/AlphaMascot.jsx";
 import GameRules from "../../games/GameRules.jsx";
 import FullscreenButton from "../desktop/FullscreenButton.jsx";
@@ -129,7 +127,7 @@ function NavSep() {
   return <div className="w-px h-4 bg-black/[0.08] dark:bg-white/[0.08] mx-1.5 flex-shrink-0" />
 }
 
-function TopBar({ dark, toggleDark, onBgPickerToggle }) {
+function TopBar({ dark, toggleDark }) {
   const { openSearch } = useSearchContext();
 
   return (
@@ -165,13 +163,6 @@ function TopBar({ dark, toggleDark, onBgPickerToggle }) {
           title="Search"
         >
           <Search className="w-4 h-4" />
-        </button>
-        <button
-          onClick={onBgPickerToggle}
-          className="p-1.5 rounded-md text-slate-500 hover:bg-black/5 dark:hover:bg-white/[0.08] transition-colors"
-          title="Background"
-        >
-          <Sparkles className="w-4 h-4" />
         </button>
         <button
           onClick={toggleDark}
@@ -327,17 +318,6 @@ export default function AppShell({ children }) {
   const [grapherLaunchConfig, setGrapherLaunchConfig] = useState(null);
   const { openSearch } = useSearchContext();
 
-  const [bgConfig, setBgConfig] = useState(() => {
-    const saved = localStorage.getItem("oc-bg-config");
-    return saved ? JSON.parse(saved) : { type: "dynamic" };
-  });
-  const [bgPickerOpen, setBgPickerOpen] = useState(false);
-
-  const updateBgConfig = (newConfig) => {
-    setBgConfig(newConfig);
-    localStorage.setItem("oc-bg-config", JSON.stringify(newConfig));
-  };
-
   const [dark, setDark] = useState(() =>
     document.documentElement.classList.contains("dark"),
   );
@@ -364,6 +344,12 @@ export default function AppShell({ children }) {
     const handler = () => setChatOpen(c => !c);
     window.addEventListener('oc-toggle-chat', handler);
     return () => window.removeEventListener('oc-toggle-chat', handler);
+  }, []);
+
+  useEffect(() => {
+    const handler = () => setGameRulesOpen(g => !g);
+    window.addEventListener('oc-game-rules', handler);
+    return () => window.removeEventListener('oc-game-rules', handler);
   }, []);
 
   useEffect(() => {
@@ -498,12 +484,8 @@ export default function AppShell({ children }) {
     <ChatProvider>
       <GrapherContext.Provider value={{ openGrapher }}>
         <div className={`min-h-screen transition-colors duration-500 relative overflow-hidden ${isLessonRoute ? "bg-white dark:bg-slate-950" : ""}`}>
-          {!isLessonRoute && <DynamicBackground mode={dark ? "dark" : "light"} config={bgConfig} />}
-          <TopBar
-            dark={dark}
-            toggleDark={toggleDark}
-            onBgPickerToggle={() => setBgPickerOpen((o) => !o)}
-          />
+          {isDesktopRoute && <CodeMapBackground dark={dark} />}
+          <TopBar dark={dark} toggleDark={toggleDark} />
 
           {/* Mobile sidebar/tools backdrop */}
           {(sidebarOpen ||
@@ -553,15 +535,13 @@ export default function AppShell({ children }) {
 
           {/* Main content */}
           <main
-            className={`transition-[padding] duration-500 ease-in-out pb-20 lg:pb-11 ${isChemistryRoute ? "h-screen overflow-hidden" : isDesktopRoute ? "h-screen" : "min-h-screen"} ${isHealthRoute || isBrainRoute ? "bg-white dark:bg-slate-950" : ""} ${sidebarPinned && !isDesktopRoute ? "lg:pl-[280px]" : "lg:pl-0"} ${chatOpen ? "lg:pr-[400px]" : "lg:pr-0"} pt-12`}
+            className={`transition-[padding] duration-500 ease-in-out pb-20 lg:pb-11 ${isChemistryRoute ? "h-screen overflow-hidden" : isDesktopRoute ? "h-screen" : "min-h-screen"} ${isHealthRoute || isBrainRoute ? "bg-white dark:bg-slate-950" : ""} ${sidebarPinned && !isDesktopRoute ? "lg:pl-[280px]" : "lg:pl-0"} pt-12`}
             style={{
+              paddingRight: chatOpen
+                ? (scratchSnap === "right" ? `${scratchSnapW}px` : "var(--chat-width, 380px)")
+                : scratchSnap === "right" ? `${scratchSnapW}px` : undefined,
               ...(scratchSnap === "left"
-                ? {
-                    paddingLeft: `${(sidebarPinned ? 280 : 12) + scratchSnapW}px`,
-                  }
-                : {}),
-              ...(scratchSnap === "right"
-                ? { paddingRight: `${scratchSnapW}px` }
+                ? { paddingLeft: `${(sidebarPinned ? 280 : 12) + scratchSnapW}px` }
                 : {}),
             }}
           >
@@ -838,13 +818,7 @@ export default function AppShell({ children }) {
           {golfOpen && <MiniGolfGame onClose={() => setGolfOpen(false)} />}
           <ChatPanel isOpen={chatOpen} onClose={() => setChatOpen(false)} />
           <TutorPanel lesson={null} />
-          {bgPickerOpen && (
-            <BackgroundPicker
-              config={bgConfig}
-              onUpdate={updateBgConfig}
-              onClose={() => setBgPickerOpen(false)}
-            />
-          )}
+
 
           {footballOpen && (
             <div className="fixed inset-0 z-[200] flex flex-col bg-slate-950 overflow-auto">

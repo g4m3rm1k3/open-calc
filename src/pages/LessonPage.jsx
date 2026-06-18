@@ -15,7 +15,6 @@ import { enhanceLessonForUnifiedLearning } from "../engines/lesson/enhancers/uni
 import OpenInGrapher from "../components/lesson/OpenInGrapher.jsx";
 import LessonQuizBlock from "../components/lesson/LessonQuizBlock.jsx";
 import { useVideoPlayer } from "../hooks/useVideoPlayer.js";
-import TutorPanel from "../components/tutor/TutorPanel.jsx";
 import { useOptionalLesson } from "../hooks/useOptionalLesson.js";
 import WikiIntro from "../components/lesson/WikiIntro.jsx";
 import WikiDiagrams from "../components/lesson/WikiDiagrams.jsx";
@@ -50,6 +49,12 @@ export default function LessonPage() {
       lessonOverride ? enhanceLessonForUnifiedLearning(lessonOverride) : null,
     [lessonOverride],
   );
+
+  // Broadcast the active lesson to TutorPanel (mounted once in AppShell)
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent('oc-lesson-context', { detail: lesson ?? null }))
+    return () => window.dispatchEvent(new CustomEvent('oc-lesson-context', { detail: null }))
+  }, [lesson])
   const {
     markCheckpoint,
     getActiveTab,
@@ -141,7 +146,6 @@ export default function LessonPage() {
 
   return (
     <div className="flex-1 min-h-screen relative overflow-x-hidden bg-white dark:bg-slate-950">
-      <TutorPanel lesson={lesson} />
       <article className="mx-auto max-w-[1440px] pb-24 pt-6 px-0 sm:px-8 md:px-12 min-h-screen relative">
 
       <div className="pointer-events-none fixed left-0 top-0 z-[10001] h-1 w-full bg-slate-200 dark:bg-slate-800">

@@ -3,6 +3,18 @@ import { useLocation } from 'react-router-dom'
 import StartMenu from './StartMenu.jsx'
 import ChapterNavigator from './ChapterNavigator.jsx'
 import PinsNotesPopup from './PinsNotesPopup.jsx'
+import { useDesktop } from './DesktopProvider.jsx'
+
+const PINNED_APPS = [
+  {
+    id: 'rpg-workout', label: 'RPG Workout', emoji: '⚔️',
+    loader: () => import('../../features/rpg/RPGWorkoutPage.jsx').then(m => m.default),
+  },
+  {
+    id: 'brain', label: 'Brain Training', emoji: '🧠',
+    loader: () => import('../../features/brain/BrainPage.jsx').then(m => m.default),
+  },
+]
 
 function GridIcon() {
   return (
@@ -61,11 +73,17 @@ export default function Taskbar({ windows, onFocus }) {
   const [chapNavOpen, setChapNavOpen] = useState(false)
   const [pinsNotesOpen, setPinsNotesOpen] = useState(null) // 'pins' | 'notes' | null
   const location = useLocation()
+  const { openWindow } = useDesktop()
 
   const isLessonRoute = /^\/chapter\/[^/]+\/.+/.test(location.pathname)
 
   const toggleChat = () => window.dispatchEvent(new CustomEvent('oc-toggle-chat'))
   const toggleTutor = () => window.dispatchEvent(new CustomEvent('oc-toggle-tutor'))
+
+  const openPinnedApp = async (app) => {
+    const Component = await app.loader()
+    openWindow({ id: app.id, label: app.label, emoji: app.emoji, Component, backTo: '/' })
+  }
 
   return (
     <>
@@ -88,6 +106,19 @@ export default function Taskbar({ windows, onFocus }) {
         >
           <GridIcon />
         </button>
+
+        {/* Pinned apps */}
+        <div className="w-px h-5 bg-black/[0.1] dark:bg-white/[0.1] mx-0.5 flex-shrink-0" />
+        {PINNED_APPS.map(app => (
+          <button
+            key={app.id}
+            onClick={() => openPinnedApp(app)}
+            title={app.label}
+            className="flex items-center justify-center w-9 h-9 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all focus:outline-none text-base flex-shrink-0"
+          >
+            {app.emoji}
+          </button>
+        ))}
 
         {windows.length > 0 && (
           <div className="w-px h-5 bg-black/[0.1] dark:bg-white/[0.1] mx-0.5 flex-shrink-0" />

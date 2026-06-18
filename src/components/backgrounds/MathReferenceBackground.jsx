@@ -127,8 +127,8 @@ function CurvedBookshelves({ mouseRef }) {
           <meshStandardMaterial color="#4b3426" roughness={0.5} metalness={0.05} />
         </mesh>
       ))}
-      {books.map((book) => (
-        <Book key={book.key} {...book} mouseRef={mouseRef} />
+      {books.map(({ key, ...bookProps }) => (
+        <Book key={key} {...bookProps} mouseRef={mouseRef} />
       ))}
     </>
   )

@@ -21,10 +21,9 @@ const NAV_LINKS = [
   { id: 'reference', label: 'Reference Library', emoji: '📐', path: '/reference' },
   { id: 'linear-algebra', label: 'Linear Algebra', emoji: '∑', path: '/linear-algebra' },
   { id: 'studio', label: 'Studio / Docs', emoji: '✏️', path: '/studio' },
-  { id: 'rpg', label: 'RPG Workout', emoji: '⚔️', path: '/rpg-workout' },
-  { id: 'brain', label: 'Brain Training', emoji: '🧠', path: '/brain' },
   { id: 'health', label: 'Health Tracker', emoji: '❤️', path: '/health' },
   { id: 'about', label: 'About', emoji: 'ℹ️', path: '/about' },
+  { id: 'game-rules', label: 'Game Reference', emoji: '♠️', action: 'game-rules' },
 ]
 
 export default function StartMenu({ onClose }) {
@@ -66,11 +65,17 @@ export default function StartMenu({ onClose }) {
 
   const handleOpenLab = async (lab) => {
     onClose()
-    // Labs with custom paths (SICP, CSS Mastery) navigate to their own route
-    if (lab.path && !lab.path.startsWith('/lab/') && !lab.path.startsWith('/music-lab') && !lab.path.startsWith('/html-lab')) {
+    // Labs that open via AppShell event (chemistry, physics)
+    if (lab.event) {
+      window.dispatchEvent(new CustomEvent('oc-open-game', { detail: { game: lab.event } }))
+      return
+    }
+    // Full-screen web courses always navigate (css-mastery, react-mastery, sicp, dsa-patterns)
+    if (lab.path?.startsWith('/web-learn/') || lab.path?.startsWith('/learn/')) {
       navigate(lab.path)
       return
     }
+    // Try to load as a floating window — works for most labs that have index.jsx
     const entry = await getLabEntry(lab.key)
     if (entry?.component) {
       openWindow({
@@ -80,7 +85,10 @@ export default function StartMenu({ onClose }) {
         Component: entry.component,
         backTo: '/',
       })
+      return
     }
+    // Fall back to navigation for standalone pages (openmat, cnc-sim, codelens, etc.)
+    if (lab.path) navigate(lab.path)
   }
 
   const handleOpenGame = async (game) => {
@@ -109,7 +117,11 @@ export default function StartMenu({ onClose }) {
 
   const handleNav = (link) => {
     onClose()
-    navigate(link.path)
+    if (link.action === 'game-rules') {
+      window.dispatchEvent(new CustomEvent('oc-game-rules'))
+    } else {
+      navigate(link.path)
+    }
   }
 
   const showCourses = tab === 'all' || tab === 'courses'

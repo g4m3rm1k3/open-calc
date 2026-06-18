@@ -391,6 +391,11 @@ function ChatInput({ onSend, disabled, lovelaceActive }) {
   );
 }
 
+const CHAT_WIDTH_KEY = 'oc-chat-width'
+const MIN_W = 280
+const MAX_W = 780
+const DEFAULT_W = 380
+
 // ── Main panel ────────────────────────────────────────────────────────────────
 export default function ChatPanel({ isOpen, onClose }) {
   const {
@@ -415,6 +420,33 @@ export default function ChatPanel({ isOpen, onClose }) {
     resolveLovelaceQuery,
     reconnect,
   } = useChat();
+
+  const [width, setWidth] = useState(() => {
+    const saved = parseInt(localStorage.getItem(CHAT_WIDTH_KEY), 10)
+    return saved && saved >= MIN_W && saved <= MAX_W ? saved : DEFAULT_W
+  })
+
+  // Keep CSS variable in sync so AppShell can use it for content padding
+  useEffect(() => {
+    document.documentElement.style.setProperty('--chat-width', `${width}px`)
+    localStorage.setItem(CHAT_WIDTH_KEY, String(width))
+  }, [width])
+
+  const onResizeMouseDown = useCallback((e) => {
+    e.preventDefault()
+    const startX = e.clientX
+    const startW = width
+    const onMove = (e) => {
+      const delta = startX - e.clientX
+      setWidth(Math.max(MIN_W, Math.min(MAX_W, startW + delta)))
+    }
+    const onUp = () => {
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+    }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+  }, [width])
 
   const { ask, isThinking, isDownloading, downloadProgress } = useLovelaceAI();
 
@@ -553,8 +585,16 @@ export default function ChatPanel({ isOpen, onClose }) {
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: "100%", opacity: 0 }}
             transition={{ type: "spring", damping: 28, stiffness: 400 }}
-            className="fixed right-0 top-14 bottom-0 w-[400px] z-[9999] flex flex-col bg-white/80 dark:bg-slate-950/80 backdrop-blur-3xl border-l border-white/20 dark:border-white/10 shadow-[-10px_0_40px_rgba(0,0,0,0.05)] dark:shadow-[-20px_0_100px_rgba(0,0,0,0.4)]"
+            style={{ width }}
+            className="fixed right-0 top-12 bottom-11 z-[1500] flex flex-col bg-white/95 dark:bg-[#1c1c1e]/95 backdrop-blur-3xl border-l border-black/[0.08] dark:border-white/[0.1] shadow-[-10px_0_40px_rgba(0,0,0,0.08)] dark:shadow-[-20px_0_100px_rgba(0,0,0,0.4)]"
           >
+            {/* Resize handle */}
+            <div
+              className="absolute left-0 top-0 bottom-0 w-1 cursor-col-resize z-10 group hover:bg-indigo-500/20 transition-colors"
+              onMouseDown={onResizeMouseDown}
+            >
+              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-10 rounded-full bg-slate-200 dark:bg-slate-700 group-hover:bg-indigo-400 dark:group-hover:bg-indigo-500 transition-colors" />
+            </div>
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-5 border-b border-white/10 shrink-0">
               <div className="flex items-center gap-4">
