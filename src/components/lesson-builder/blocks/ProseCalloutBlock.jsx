@@ -54,7 +54,19 @@ export default function ProseCalloutBlock({ sec, label, icon, dispatch, index, t
           <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">{c.body}</p>
         </div>
       ))}
-      {!sec.prose?.length && !sec.callouts?.length && (
+      {(sec.visualizations ?? []).map((viz, i) => (
+        <div key={i} className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 px-4 py-3">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Visualization</span>
+            <span className="text-xs font-mono text-brand-500 dark:text-brand-400">{viz.id}</span>
+          </div>
+          {viz.title && <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">{viz.title}</p>}
+          {viz.props?.initialCells?.length > 0 && (
+            <p className="text-[11px] text-slate-400 mt-1">🐍 {viz.props.initialCells.length} notebook cells — preserved on export</p>
+          )}
+        </div>
+      ))}
+      {!sec.prose?.length && !sec.callouts?.length && !sec.visualizations?.length && (
         <p className="text-slate-300 dark:text-slate-600 italic text-sm">Click to add content…</p>
       )}
     </div>

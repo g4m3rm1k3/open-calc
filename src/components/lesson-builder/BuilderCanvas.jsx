@@ -7,6 +7,8 @@ import ExamplesBlock from './blocks/ExamplesBlock.jsx'
 import ChallengesBlock from './blocks/ChallengesBlock.jsx'
 import CheckpointsBlock from './blocks/CheckpointsBlock.jsx'
 import QuizBlock from './blocks/QuizBlock.jsx'
+import PythonBlock from './blocks/PythonBlock.jsx'
+import { HANDLED_SECTION_KEYS, HANDLED_META_KEYS } from './builderUtils.js'
 
 function DropZone({ onDrop, label }) {
   const [over, setOver] = useState(false)
@@ -73,6 +75,8 @@ function SectionBlock({ sec, dispatch, index, total }) {
       return <CheckpointsBlock {...common} />
     case 'quiz':
       return <QuizBlock {...common} />
+    case 'python':
+      return <PythonBlock {...common} />
     default:
       return (
         <div className="rounded-xl border-2 border-dashed border-slate-200 p-4 text-sm text-slate-400">
@@ -82,8 +86,48 @@ function SectionBlock({ sec, dispatch, index, total }) {
   }
 }
 
+// Show fields from _raw that the builder doesn't handle — confirms nothing will be dropped
+function PassthroughPanel({ raw }) {
+  const [expanded, setExpanded] = useState(false)
+  if (!raw) return null
+
+  const passKeys = Object.keys(raw).filter(k => !HANDLED_SECTION_KEYS.has(k) && !HANDLED_META_KEYS.has(k) && !['hook', 'id', 'slug', 'chapter', 'order', 'title', 'subtitle', 'tags', 'coreConcept', 'prerequisites', 'timeToComplete', 'aliases', 'nextLesson'].includes(k))
+
+  if (!passKeys.length) return null
+
+  return (
+    <div className="rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+      <button
+        onClick={() => setExpanded(e => !e)}
+        className="w-full flex items-center gap-2 px-4 py-3 bg-slate-50 dark:bg-slate-800/50 text-left hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+      >
+        <span className="text-sm">🔒</span>
+        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+          Preserved fields ({passKeys.length}) — not editable here, passed through unchanged
+        </span>
+        <span className="ml-auto text-xs text-slate-400">{expanded ? '▲' : '▼'}</span>
+      </button>
+      {expanded && (
+        <div className="px-4 py-3 space-y-1">
+          {passKeys.map(k => (
+            <div key={k} className="flex items-baseline gap-2 text-xs">
+              <span className="font-mono font-semibold text-brand-600 dark:text-brand-400 shrink-0">{k}</span>
+              <span className="text-slate-400 truncate">
+                {Array.isArray(raw[k]) ? `[${raw[k].length} items]`
+                  : typeof raw[k] === 'object' ? `{${Object.keys(raw[k]).join(', ')}}`
+                  : String(raw[k]).slice(0, 80)}
+              </span>
+            </div>
+          ))}
+          <p className="text-[10px] text-slate-400 mt-2 italic">These fields will be included verbatim in your exported .js file.</p>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function BuilderCanvas({ state, dispatch }) {
-  const { meta, hook, sections } = state
+  const { meta, hook, sections, _raw } = state
 
   return (
     <div className="flex-1 min-w-0 space-y-3">
@@ -116,6 +160,9 @@ export default function BuilderCanvas({ state, dispatch }) {
           ))}
         </>
       )}
+
+      {/* Fields from the original lesson that are preserved but not editable in the builder */}
+      <PassthroughPanel raw={_raw} />
     </div>
   )
 }

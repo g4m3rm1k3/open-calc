@@ -31,6 +31,10 @@ export default function IdentityBlock({ meta, dispatch }) {
         <span className="text-xs text-slate-400 font-mono">id: {meta.id || '—'} · slug: {meta.slug || '—'}</span>
       </div>
       {meta.coreConcept && <p className="text-sm text-slate-500 dark:text-slate-400 italic border-l-4 border-brand-200 dark:border-brand-800 pl-3">{meta.coreConcept}</p>}
+      <div className="flex flex-wrap gap-3 text-[10px] text-slate-400 font-mono pt-1">
+        {meta.nextLesson && <span>next: {meta.nextLesson}</span>}
+        {meta.aliases && <span className="truncate max-w-xs">aliases: {meta.aliases.slice(0, 60)}{meta.aliases.length > 60 ? '…' : ''}</span>}
+      </div>
     </div>
   )
 
@@ -74,12 +78,22 @@ export default function IdentityBlock({ meta, dispatch }) {
         <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Core Concept</span>
         <input value={meta.coreConcept} onChange={e => set('coreConcept', e.target.value)} placeholder="One-sentence summary of the core idea" className="field" />
       </label>
+      <div className="grid grid-cols-2 gap-3">
+        <label className="flex flex-col gap-1">
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Next lesson ID</span>
+          <input value={meta.nextLesson ?? ''} onChange={e => set('nextLesson', e.target.value)} placeholder="la1-002" className="field font-mono" />
+        </label>
+        <label className="flex flex-col gap-1">
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Aliases (search keywords)</span>
+          <input value={meta.aliases ?? ''} onChange={e => set('aliases', e.target.value)} placeholder="vector direction magnitude…" className="field text-sm" />
+        </label>
+      </div>
       <label className="flex flex-col gap-1">
-        <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Prerequisites (comma separated slugs)</span>
+        <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Prerequisites (comma separated IDs)</span>
         <input
           value={(meta.prerequisites ?? []).join(', ')}
           onChange={e => set('prerequisites', e.target.value.split(',').map(t => t.trim()).filter(Boolean))}
-          placeholder="what-is-a-vector, scalars-vs-vectors"
+          placeholder="la1-001, la1-002"
           className="field font-mono"
         />
       </label>
