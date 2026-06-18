@@ -5,7 +5,7 @@ import PythonNotebook from '../../courses/python/viz/PythonNotebook'
 
 export const meta = {
   label: 'Python Notebook',
-  group: 'engine',
+  group: 'hidden',
   order: 20,
   icon: Terminal,
   colorClass: 'text-teal-500 hover:bg-teal-50 dark:hover:bg-teal-900/30',

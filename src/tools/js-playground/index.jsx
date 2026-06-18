@@ -7,7 +7,7 @@ import { zipSync, strToU8 } from "fflate";
 
 export const meta = {
   label: 'JS Playground',
-  group: 'engine',
+  group: 'hidden',
   order: 30,
   icon: Code2,
   colorClass: 'text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-900/30',

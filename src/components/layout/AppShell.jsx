@@ -26,7 +26,6 @@ import {
   Menu,
   Calculator,
   Terminal,
-  Code2,
   PlayCircle,
 } from "lucide-react";
 import TICalc from "../../tools/calculator/index.jsx";
@@ -36,8 +35,7 @@ import LinearAlgebraCalc from "../../tools/linear-algebra/index.jsx";
 import MatrixReducer from "../../tools/matrix-reducer/index.jsx";
 import HelpModal from "../ui/HelpModal.jsx";
 import MobileBottomNav from "./MobileBottomNav.jsx";
-import GlobalPythonNotebook from "../../tools/python-notebook/index.jsx";
-import GlobalJSPlayground from "../../tools/js-playground/index.jsx";
+import TerminalHub from "../../tools/terminal-hub/TerminalHub.jsx";
 import { ChatProvider } from "../../context/ChatContext.jsx";
 import ChatPanel from "../tutor/ChatPanel.jsx";
 import { motion, AnimatePresence } from "framer-motion";
@@ -277,8 +275,7 @@ export default function AppShell({ children }) {
   const [scratchOpen, setScratchOpen] = useState(false);
   const [calcOpen, setCalcOpen] = useState(false);
   const [sigmaOpen, setSigmaOpen] = useState(false);
-  const [pythonOpen, setPythonOpen] = useState(false);
-  const [jsOpen, setJsOpen] = useState(false);
+  const [terminalOpen, setTerminalOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [poolOpen, setPoolOpen] = useState(false);
   const [chemOpen, setChemOpen] = useState(false);
@@ -313,8 +310,7 @@ export default function AppShell({ children }) {
     setSigmaOpen(false);
     setPolyOpen(false);
     setLAOpen(false);
-    setPythonOpen(false);
-    setJsOpen(false);
+    setTerminalOpen(false);
     setPoolOpen(false);
     setChemOpen(false);
     setPhysicsOpen(false);
@@ -372,8 +368,13 @@ export default function AppShell({ children }) {
       else if (tool === "sigma") setSigmaOpen(true);
       else if (tool === "polynomial") setPolyOpen(true);
       else if (tool === "linear-algebra") setLAOpen(true);
-      else if (tool === "python") setPythonOpen(true);
-      else if (tool === "javascript") setJsOpen(true);
+      else if (tool === "python" || tool === "terminal") {
+        setTerminalOpen(true);
+        if (tool === "python") {
+          window.dispatchEvent(new CustomEvent("oc-terminal-open-tab", { detail: { type: 'python' } }));
+        }
+      }
+      else if (tool === "javascript") setTerminalOpen(true);
       else if (tool === "scratchpad") setScratchOpen(true);
       else if (tool === "grapher") setGraphOpen(true);
       else if (tool === "grapher-3d") setGraph3DOpen(true);
@@ -474,13 +475,9 @@ export default function AppShell({ children }) {
           {polyOpen && <PolyCalc onClose={() => setPolyOpen(false)} />}
           {laOpen && <LinearAlgebraCalc onClose={() => setLAOpen(false)} />}
           {matrixReducerOpen && <MatrixReducer onBack={() => setMatrixReducerOpen(false)} />}
-          <GlobalPythonNotebook
-            isOpen={pythonOpen}
-            onClose={() => setPythonOpen(false)}
-          />
-          <GlobalJSPlayground
-            isOpen={jsOpen}
-            onClose={() => setJsOpen(false)}
+          <TerminalHub
+            isOpen={terminalOpen}
+            onClose={() => setTerminalOpen(false)}
           />
         </div>
       </GrapherContext.Provider>
@@ -504,7 +501,7 @@ export default function AppShell({ children }) {
                   setGraphOpen(false);
                   setGraph3DOpen(false);
                   setGraphJSXOpen(false);
-                  setPythonOpen(false);
+                  setTerminalOpen(false);
                 }
               }}
             />
@@ -650,33 +647,16 @@ export default function AppShell({ children }) {
                     whileTap={{ scale: 0.96 }}
                     onClick={() => {
                       closeAllTools();
-                      setPythonOpen(true);
+                      setTerminalOpen(true);
                       setMobileToolsOpen(false);
                     }}
-                    className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-teal-50 dark:bg-teal-900/30 text-teal-600 dark:text-teal-300 border border-teal-100 dark:border-teal-800/50 shadow-sm"
+                    className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-800/50 shadow-sm"
                   >
-                    <div className="w-10 h-10 rounded-full bg-teal-100 dark:bg-teal-800/50 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-800/50 flex items-center justify-center">
                       <Terminal className="w-5 h-5" />
                     </div>
                     <span className="text-[11px] font-bold uppercase tracking-wider">
-                      Python
-                    </span>
-                  </motion.button>
-
-                  <motion.button
-                    whileTap={{ scale: 0.96 }}
-                    onClick={() => {
-                      closeAllTools();
-                      setJsOpen(true);
-                      setMobileToolsOpen(false);
-                    }}
-                    className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-yellow-50 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-300 border border-yellow-100 dark:border-yellow-800/50 shadow-sm"
-                  >
-                    <div className="w-10 h-10 rounded-full bg-yellow-100 dark:bg-yellow-800/50 flex items-center justify-center">
-                      <Code2 className="w-5 h-5" />
-                    </div>
-                    <span className="text-[11px] font-bold uppercase tracking-wider">
-                      JS Playground
+                      Terminal
                     </span>
                   </motion.button>
 
@@ -775,13 +755,9 @@ export default function AppShell({ children }) {
             }}
             onSnap={handleScratchSnap}
           />
-          <GlobalPythonNotebook
-            isOpen={pythonOpen}
-            onClose={() => setPythonOpen(false)}
-          />
-          <GlobalJSPlayground
-            isOpen={jsOpen}
-            onClose={() => setJsOpen(false)}
+          <TerminalHub
+            isOpen={terminalOpen}
+            onClose={() => setTerminalOpen(false)}
           />
           <HelpModal isOpen={helpOpen} onClose={() => setHelpOpen(false)} />
           {gameRulesOpen && (

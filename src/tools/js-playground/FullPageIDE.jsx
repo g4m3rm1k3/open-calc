@@ -951,7 +951,7 @@ function CppPane({ output, running, stdin, onStdinChange, onRun, T }) {
 // ─────────────────────────────────────────────────────────────────────────────
 // Main Component
 // ─────────────────────────────────────────────────────────────────────────────
-export default function FullPageIDE({ cell, onChange, onClose }) {
+export default function FullPageIDE({ cell, onChange, onClose, contained = false }) {
   const T = useColors();
 
   // ── File state ────────────────────────────────────────────────────────────
@@ -1232,9 +1232,11 @@ export default function FullPageIDE({ cell, onChange, onClose }) {
       exit={{ opacity: 0, scale: 0.97 }}
       transition={{ duration: 0.15 }}
       style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 200,
+        position: contained ? "relative" : "fixed",
+        inset: contained ? undefined : 0,
+        zIndex: contained ? undefined : 200,
+        width: contained ? "100%" : undefined,
+        height: contained ? "100%" : undefined,
         display: "flex",
         flexDirection: "column",
         background: T.bg,
