@@ -154,6 +154,12 @@ function TopBar({ dark, toggleDark }) {
         >
           🔨 Lesson Builder
         </Link>
+        <Link
+          to="/viz-builder"
+          className="text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 px-2.5 py-1 rounded-md hover:bg-black/5 dark:hover:bg-white/[0.08] transition-colors"
+        >
+          🔭 Viz Builder
+        </Link>
       </div>
 
       {/* RIGHT — tools + utilities + clock */}
@@ -163,6 +169,13 @@ function TopBar({ dark, toggleDark }) {
 
         <NavSep />
 
+        <button
+          onClick={() => window.dispatchEvent(new CustomEvent("oc-toggle-video"))}
+          className="p-1.5 rounded-md text-slate-500 hover:bg-sky-500/10 hover:text-sky-600 dark:hover:text-sky-400 transition-colors"
+          title="Video Player"
+        >
+          <PlayCircle className="w-4 h-4" />
+        </button>
         <button
           onClick={openSearch}
           className="p-1.5 rounded-md text-slate-500 hover:bg-black/5 dark:hover:bg-white/[0.08] transition-colors"

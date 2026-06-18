@@ -39,6 +39,7 @@ const CodeLensPage = lazy(() => import("./labs/codelens/CodeLensPage.jsx"));
 const SICPPage = lazy(() => import("./labs/sicp-js/SICPPage.jsx"));
 const DSAPatternsPage = lazy(() => import("./labs/dsa-patterns/DSAPatternsPage.jsx"));
 const LessonBuilderPage = lazy(() => import("./pages/LessonBuilderPage.jsx"));
+const VizBuilderPage    = lazy(() => import("./pages/VizBuilderPage.jsx"));
 
 const Fallback = () => (
   <div className="flex items-center justify-center h-64">
@@ -108,6 +109,7 @@ export default function App() {
 
                     <Route path="lesson-builder" element={<LessonBuilderPage />} />
                     <Route path="lesson-builder/:chapterId/:lessonSlug" element={<LessonBuilderPage />} />
+                    <Route path="viz-builder" element={<VizBuilderPage />} />
 
                     <Route path="five-axis" element={<FiveAxisKinematicsPage />} />
                     <Route path="codelens" element={<CodeLensPage />} />
