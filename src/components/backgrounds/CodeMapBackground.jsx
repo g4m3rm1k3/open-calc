@@ -50,8 +50,22 @@ export default function CodeMapBackground({ dark }) {
 
     // Left-drag = rotate │ Shift+drag = pan
     const ISEL = 'a,button,input,select,textarea,[role="button"],[tabindex]'
+    // Returns true when the element is inside a UI panel (sidebar, topbar, modal…)
+    // that should keep its native scroll/click behaviour.
+    const isOverUI = target => {
+      let el = target
+      while (el && el !== document.documentElement) {
+        const s = getComputedStyle(el)
+        if ((s.overflowY === 'auto' || s.overflowY === 'scroll') && el.scrollHeight > el.clientHeight) return true
+        if (s.position === 'fixed' && parseInt(s.zIndex, 10) > 0) return true
+        el = el.parentElement
+      }
+      return false
+    }
+
     const onDown = e => {
       if (e.target.closest(ISEL)) return
+      if (isOverUI(e.target)) return
       st.drag = { x: e.clientX, y: e.clientY }
       st.isPan = e.shiftKey
       st.rxD = st.rx; st.ryD = st.ry
@@ -76,6 +90,7 @@ export default function CodeMapBackground({ dark }) {
     const onUp = () => { st.drag = null }
 
     const onWheel = e => {
+      if (isOverUI(e.target)) return
       e.preventDefault()
       const rect  = canvas.getBoundingClientRect()
       const mx    = (e.clientX - rect.left) * devicePixelRatio
