@@ -1,0 +1,1799 @@
+WOULD   ai-engineering/1-setup-tooling/001-ae0-01-dev-environment.js
+       → 001-dev-environment.js
+WOULD   ai-engineering/1-setup-tooling/002-ae0-02-git.js
+       → 002-git-and-collaboration.js
+WOULD   ai-engineering/1-setup-tooling/003-ae0-03-gpu-setup.js
+       → 003-gpu-setup-and-cloud.js
+WOULD   ai-engineering/1-setup-tooling/004-ae0-04-apis-keys.js
+       → 004-apis-and-keys.js
+WOULD   ai-engineering/1-setup-tooling/005-ae0-05-jupyter.js
+       → 005-jupyter-notebooks.js
+WOULD   ai-engineering/1-setup-tooling/006-ae0-06-python-environments.js
+       → 006-python-environments.js
+WOULD   ai-engineering/1-setup-tooling/007-ae0-07-docker.js
+       → 007-docker-for-ai.js
+WOULD   ai-engineering/1-setup-tooling/008-ae0-08-editor-setup.js
+       → 008-editor-setup.js
+WOULD   ai-engineering/1-setup-tooling/009-ae0-09-data-management.js
+       → 009-data-management.js
+WOULD   ai-engineering/1-setup-tooling/010-ae0-10-terminal.js
+       → 010-terminal-and-shell.js
+WOULD   ai-engineering/1-setup-tooling/011-ae0-11-linux.js
+       → 011-linux-for-ai.js
+WOULD   ai-engineering/1-setup-tooling/012-ae0-12-debugging.js
+       → 012-debugging-and-profiling.js
+WOULD   ai-engineering/2-math-foundations/001-ae1-01-linear-algebra-intuition.js
+       → 001-linear-algebra-intuition.js
+WOULD   ai-engineering/2-math-foundations/002-ae1-02-vectors-matrices-operations.js
+       → 002-vectors-matrices-operations.js
+WOULD   ai-engineering/2-math-foundations/003-ae1-03-matrix-transformations.js
+       → 003-matrix-transformations.js
+WOULD   ai-engineering/2-math-foundations/004-ae1-04-calculus-for-ml.js
+       → 004-calculus-for-ml.js
+WOULD   ai-engineering/2-math-foundations/005-ae1-05-chain-rule-autodiff.js
+       → 005-chain-rule-and-autodiff.js
+WOULD   ai-engineering/2-math-foundations/006-ae1-06-probability-distributions.js
+       → 006-probability-distributions.js
+WOULD   ai-engineering/2-math-foundations/007-ae1-07-bayes-theorem.js
+       → 007-bayes-theorem.js
+WOULD   ai-engineering/2-math-foundations/008-ae1-08-optimization.js
+       → 008-optimization.js
+WOULD   ai-engineering/2-math-foundations/009-ae1-09-information-theory.js
+       → 009-information-theory.js
+WOULD   ai-engineering/2-math-foundations/010-ae1-10-dimensionality-reduction.js
+       → 010-dimensionality-reduction.js
+WOULD   ai-engineering/2-math-foundations/011-ae1-11-svd.js
+       → 011-svd.js
+WOULD   ai-engineering/2-math-foundations/012-ae1-12-tensor-operations.js
+       → 012-tensor-operations.js
+WOULD   ai-engineering/2-math-foundations/013-ae1-13-numerical-stability.js
+       → 013-numerical-stability.js
+WOULD   ai-engineering/2-math-foundations/014-ae1-14-norms-distances.js
+       → 014-norms-distances.js
+WOULD   ai-engineering/2-math-foundations/015-ae1-15-statistics-for-ml.js
+       → 015-statistics-for-ml.js
+WOULD   ai-engineering/2-math-foundations/016-ae1-16-sampling-methods.js
+       → 016-sampling-methods.js
+WOULD   ai-engineering/2-math-foundations/017-ae1-17-linear-systems.js
+       → 017-linear-systems.js
+WOULD   ai-engineering/2-math-foundations/018-ae1-18-convex-optimization.js
+       → 018-convex-optimization.js
+WOULD   ai-engineering/2-math-foundations/019-ae1-19-complex-numbers.js
+       → 019-complex-numbers.js
+WOULD   ai-engineering/2-math-foundations/020-ae1-20-fourier-transform.js
+       → 020-fourier-transform.js
+WOULD   ai-engineering/2-math-foundations/021-ae1-21-graph-theory.js
+       → 021-graph-theory.js
+WOULD   ai-engineering/2-math-foundations/022-ae1-22-stochastic-processes.js
+       → 022-stochastic-processes.js
+WOULD   ai-engineering/3-ml-fundamentals/001-ae2-01-what-is-ml.js
+       → 001-what-is-machine-learning.js
+WOULD   ai-engineering/3-ml-fundamentals/002-ae2-02-linear-regression.js
+       → 002-linear-regression.js
+WOULD   ai-engineering/3-ml-fundamentals/003-ae2-03-logistic-regression.js
+       → 003-logistic-regression.js
+WOULD   ai-engineering/3-ml-fundamentals/004-ae2-04-decision-trees.js
+       → 004-decision-trees.js
+WOULD   ai-engineering/3-ml-fundamentals/005-ae2-05-svms.js
+       → 005-support-vector-machines.js
+WOULD   ai-engineering/3-ml-fundamentals/006-ae2-06-knn.js
+       → 006-knn-and-distances.js
+WOULD   ai-engineering/3-ml-fundamentals/007-ae2-07-unsupervised-learning.js
+       → 007-unsupervised-learning.js
+WOULD   ai-engineering/3-ml-fundamentals/008-ae2-08-feature-engineering.js
+       → 008-feature-engineering.js
+WOULD   ai-engineering/3-ml-fundamentals/009-ae2-09-model-evaluation.js
+       → 009-model-evaluation.js
+WOULD   ai-engineering/3-ml-fundamentals/010-ae2-10-bias-variance.js
+       → 010-bias-variance-tradeoff.js
+WOULD   ai-engineering/3-ml-fundamentals/011-ae2-11-ensemble-methods.js
+       → 011-ensemble-methods.js
+WOULD   ai-engineering/3-ml-fundamentals/012-ae2-12-hyperparameter-tuning.js
+       → 012-hyperparameter-tuning.js
+WOULD   ai-engineering/3-ml-fundamentals/013-ae2-13-ml-pipelines.js
+       → 013-ml-pipelines.js
+WOULD   ai-engineering/3-ml-fundamentals/014-ae2-14-naive-bayes.js
+       → 014-naive-bayes.js
+WOULD   ai-engineering/3-ml-fundamentals/015-ae2-15-time-series.js
+       → 015-time-series.js
+WOULD   ai-engineering/3-ml-fundamentals/016-ae2-16-anomaly-detection.js
+       → 016-anomaly-detection.js
+WOULD   ai-engineering/3-ml-fundamentals/017-ae2-17-imbalanced-data.js
+       → 017-imbalanced-data.js
+WOULD   ai-engineering/3-ml-fundamentals/018-ae2-18-feature-selection.js
+       → 018-feature-selection.js
+WOULD   ai-engineering/4-llm-engineering/001-ae11-01-prompt-engineering.js
+       → 001-prompt-engineering.js
+WOULD   ai-engineering/4-llm-engineering/002-ae11-02-few-shot-cot.js
+       → 002-few-shot-and-cot.js
+WOULD   ai-engineering/4-llm-engineering/003-ae11-03-structured-outputs.js
+       → 003-structured-outputs.js
+WOULD   ai-engineering/4-llm-engineering/004-ae11-04-embeddings.js
+       → 004-embeddings-and-vector-search.js
+WOULD   ai-engineering/4-llm-engineering/005-ae11-05-context-engineering.js
+       → 005-context-engineering.js
+WOULD   ai-engineering/4-llm-engineering/006-ae11-06-rag.js
+       → 006-retrieval-augmented-generation.js
+WOULD   ai-engineering/4-llm-engineering/007-ae11-07-advanced-rag.js
+       → 007-advanced-rag.js
+WOULD   ai-engineering/4-llm-engineering/008-ae11-08-fine-tuning-lora.js
+       → 008-fine-tuning-and-lora.js
+WOULD   ai-engineering/4-llm-engineering/009-ae11-09-function-calling.js
+       → 009-function-calling.js
+WOULD   ai-engineering/4-llm-engineering/010-ae11-10-evals.js
+       → 010-llm-evals.js
+WOULD   ai-engineering/4-llm-engineering/011-ae11-11-caching-cost.js
+       → 011-caching-and-cost.js
+WOULD   ai-engineering/4-llm-engineering/012-ae11-12-guardrails.js
+       → 012-guardrails-and-safety.js
+WOULD   ai-engineering/4-llm-engineering/013-ae11-13-production.js
+       → 013-production-llm-apps.js
+WOULD   ai-engineering/4-llm-engineering/014-ae11-14-mcp.js
+       → 014-model-context-protocol.js
+WOULD   ai-engineering/4-llm-engineering/015-ae11-15-prompt-caching.js
+       → 015-prompt-caching.js
+WOULD   ai-engineering/4-llm-engineering/016-ae11-16-langgraph.js
+       → 016-langgraph-state-machines.js
+WOULD   ai-engineering/4-llm-engineering/017-ae11-17-agent-frameworks.js
+       → 017-agent-framework-tradeoffs.js
+WOULD   applied-statistics/1-foundations-of-statistical-thinking/001-stat1-001-what-is-statistics.js
+       → 001-what-is-statistics.js
+WOULD   applied-statistics/1-foundations-of-statistical-thinking/002-stat1-002-sampling-methods.js
+       → 002-sampling-methods.js
+WOULD   applied-statistics/1-foundations-of-statistical-thinking/003-stat1-003-study-design-and-bias.js
+       → 003-study-design-and-bias.js
+WOULD   applied-statistics/1-foundations-of-statistical-thinking/004-stat1-004-confidence-intervals.js
+       → 004-confidence-intervals.js
+WOULD   applied-statistics/1-foundations-of-statistical-thinking/005-stat1-005-intro-to-regression.js
+       → 005-intro-to-regression.js
+WOULD   applied-statistics/2-data-visualization/001-stat2-001-what-is-data-visualization.js
+       → 001-what-is-data-visualization.js
+WOULD   applied-statistics/2-data-visualization/002-stat2-002-python-for-data-visualization.js
+       → 002-python-for-data-visualization.js
+WOULD   applied-statistics/2-data-visualization/003-stat2-003-data-frames-with-pandas.js
+       → 003-data-frames-with-pandas.js
+WOULD   applied-statistics/2-data-visualization/004-stat2-004-bar-charts-and-pie-charts.js
+       → 004-bar-charts-and-pie-charts.js
+WOULD   applied-statistics/2-data-visualization/005-stat2-005-scatter-plots-and-line-charts.js
+       → 005-scatter-plots-and-line-charts.js
+WOULD   applied-statistics/2-data-visualization/006-stat2-006-data-visualization-example.js
+       → 006-data-visualization-example.js
+WOULD   applied-statistics/3-descriptive-statistics/001-stat3-001-measures-of-center.js
+       → 001-measures-of-center.js
+WOULD   applied-statistics/3-descriptive-statistics/002-stat3-002-measures-of-spread.js
+       → 002-measures-of-spread.js
+WOULD   applied-statistics/3-descriptive-statistics/003-stat3-003-percentiles-and-quartiles.js
+       → 003-percentiles-and-quartiles.js
+WOULD   applied-statistics/3-descriptive-statistics/004-stat3-004-boxplots.js
+       → 004-boxplots.js
+WOULD   applied-statistics/3-descriptive-statistics/005-stat3-005-frequency-tables-and-distributions.js
+       → 005-frequency-tables-and-distributions.js
+WOULD   applied-statistics/3-descriptive-statistics/006-stat3-006-shape-of-a-distribution.js
+       → 006-shape-of-a-distribution.js
+WOULD   applied-statistics/4-probability-and-counting/001-stat4-001-introduction-to-probability.js
+       → 001-introduction-to-probability.js
+WOULD   applied-statistics/4-probability-and-counting/002-stat4-002-complement-union-intersection.js
+       → 002-complement-union-intersection.js
+WOULD   applied-statistics/4-probability-and-counting/003-stat4-003-conditional-probability.js
+       → 003-conditional-probability.js
+WOULD   applied-statistics/4-probability-and-counting/004-stat4-004-bayes-theorem.js
+       → 004-bayes-theorem.js
+WOULD   applied-statistics/4-probability-and-counting/005-stat4-005-counting-principles.js
+       → 005-counting-principles.js
+WOULD   applied-statistics/4-probability-and-counting/006-stat4-006-probability-rules-summary.js
+       → 006-probability-rules-summary.js
+WOULD   applied-statistics/5-probability-distributions/001-stat5-001-discrete-random-variables.js
+       → 001-discrete-random-variables.js
+WOULD   applied-statistics/5-probability-distributions/002-stat5-002-binomial-distribution.js
+       → 002-binomial-distribution.js
+WOULD   applied-statistics/5-probability-distributions/003-stat5-003-poisson-distribution.js
+       → 003-poisson-distribution.js
+WOULD   applied-statistics/5-probability-distributions/004-stat5-004-normal-distribution.js
+       → 004-normal-distribution.js
+WOULD   applied-statistics/5-probability-distributions/005-stat5-005-central-limit-theorem.js
+       → 005-central-limit-theorem.js
+WOULD   applied-statistics/6-statistical-inference/001-stat6-001-logic-of-hypothesis-testing.js
+       → 001-logic-of-hypothesis-testing.js
+WOULD   applied-statistics/6-statistical-inference/002-stat6-002-t-tests.js
+       → 002-t-tests.js
+WOULD   applied-statistics/6-statistical-inference/003-stat6-003-chi-squared-tests.js
+       → 003-chi-squared-tests.js
+WOULD   applied-statistics/6-statistical-inference/004-stat6-004-inference-for-proportions.js
+       → 004-inference-for-proportions.js
+WOULD   applied-statistics/6-statistical-inference/005-stat6-005-one-way-anova.js
+       → 005-one-way-anova.js
+WOULD   applied-statistics/7-regression-analysis/001-stat7-001-simple-linear-regression.js
+       → 001-simple-linear-regression.js
+WOULD   applied-statistics/7-regression-analysis/002-stat7-002-multiple-regression.js
+       → 002-multiple-regression.js
+WOULD   applied-statistics/7-regression-analysis/003-stat7-003-correlation.js
+       → 003-correlation.js
+WOULD   c-plus-plus/1-c-foundations/001-cpp0-001-hello-world.js
+       → 001-hello-world.js
+WOULD   c-plus-plus/1-c-foundations/002-cpp0-002-variables-and-types.js
+       → 002-variables-and-types.js
+WOULD   c-plus-plus/1-c-foundations/003-cpp0-003-input-with-cin.js
+       → 003-input-with-cin.js
+WOULD   c-plus-plus/1-c-foundations/004-cpp0-004-operators-expressions.js
+       → 004-operators-and-expressions.js
+WOULD   c-plus-plus/1-c-foundations/005-cpp0-005-branching.js
+       → 005-branching.js
+WOULD   c-plus-plus/1-c-foundations/006-cpp0-006-loops.js
+       → 006-loops.js
+WOULD   c-plus-plus/1-c-foundations/007-cpp0-007-functions.js
+       → 007-functions.js
+WOULD   c-plus-plus/1-c-foundations/008-cpp0-008-arrays-strings.js
+       → 008-arrays-and-strings.js
+WOULD   c-plus-plus/1-c-foundations/009-cpp0-009-pointers-references.js
+       → 009-pointers-and-references.js
+WOULD   c-plus-plus/1-c-foundations/010-cpp0-010-stl-basics.js
+       → 010-stl-basics.js
+WOULD   c-plus-plus/2-c-intermediate/001-cpp1-001-structs-and-classes.js
+       → 001-structs-and-classes.js
+WOULD   c-plus-plus/2-c-intermediate/002-cpp1-002-constructors-destructors-raii.js
+       → 002-constructors-destructors-raii.js
+WOULD   c-plus-plus/2-c-intermediate/003-cpp1-003-inheritance-polymorphism.js
+       → 003-inheritance-polymorphism.js
+WOULD   c-plus-plus/2-c-intermediate/004-cpp1-004-templates.js
+       → 004-templates.js
+WOULD   c-plus-plus/2-c-intermediate/005-cpp1-005-smart-pointers.js
+       → 005-smart-pointers.js
+WOULD   c-plus-plus/2-c-intermediate/006-cpp1-006-file-io.js
+       → 006-file-io.js
+WOULD   c-plus-plus/2-c-intermediate/007-cpp1-007-exceptions.js
+       → 007-exceptions.js
+WOULD   c-plus-plus/2-c-intermediate/008-cpp1-008-stl-containers.js
+       → 008-stl-containers.js
+WOULD   c-plus-plus/2-c-intermediate/009-cpp1-009-lambdas-algorithms.js
+       → 009-lambdas-algorithms.js
+WOULD   c-plus-plus/2-c-intermediate/010-cpp1-010-move-semantics.js
+       → 010-move-semantics.js
+WOULD   c-plus-plus/3-c-standard-library/001-cpp2-001-iterators.js
+       → 001-iterators.js
+WOULD   c-plus-plus/3-c-standard-library/002-cpp2-002-sequence-containers.js
+       → 002-sequence-containers.js
+WOULD   c-plus-plus/3-c-standard-library/003-cpp2-003-string-manipulation.js
+       → 003-string-manipulation.js
+WOULD   c-plus-plus/3-c-standard-library/004-cpp2-004-numeric-algorithms.js
+       → 004-numeric-algorithms.js
+WOULD   c-plus-plus/3-c-standard-library/005-cpp2-005-filesystem.js
+       → 005-filesystem.js
+WOULD   c-plus-plus/3-c-standard-library/006-cpp2-006-chrono-random.js
+       → 006-chrono-random.js
+WOULD   c-plus-plus/3-c-standard-library/007-cpp2-007-optional-variant-any.js
+       → 007-optional-variant-any.js
+WOULD   c-plus-plus/3-c-standard-library/008-cpp2-008-span-string-view.js
+       → 008-span-string-view.js
+WOULD   c-plus-plus/3-c-standard-library/009-cpp2-009-ranges.js
+       → 009-ranges.js
+WOULD   c-plus-plus/3-c-standard-library/010-cpp2-010-regex.js
+       → 010-regex.js
+WOULD   calculus/1-prerequisites/001-00-rosetta-stone.js
+       → 001-math-rosetta-stone.js
+WOULD   calculus/1-prerequisites/002-00-real-numbers.js
+       → 002-real-numbers.js
+WOULD   calculus/1-prerequisites/003-00a-sets-and-logic.js
+       → 003-sets-and-logic.js
+WOULD   calculus/1-prerequisites/004-00b-geometry-review.js
+       → 004-geometry-review.js
+WOULD   calculus/1-prerequisites/005-00d-conic-sections.js
+       → 005-conic-sections.js
+WOULD   calculus/1-prerequisites/006-00c-inequalities.js
+       → 006-inequalities.js
+WOULD   calculus/1-prerequisites/007-00e-lines-mastery.js
+       → 007-lines-mastery.js
+WOULD   calculus/1-prerequisites/008-01a-absolute-value.js
+       → 008-absolute-value.js
+WOULD   calculus/1-prerequisites/009-01b-algebraic-techniques.js
+       → 009-algebraic-techniques.js
+WOULD   calculus/1-prerequisites/010-01c-polynomial-division.js
+       → 010-polynomial-division.js
+WOULD   calculus/1-prerequisites/011-01d-completing-the-square.js
+       → 011-completing-the-square.js
+WOULD   calculus/1-prerequisites/012-01e-partial-fractions-intro.js
+       → 012-partial-fractions-intro.js
+WOULD   calculus/1-prerequisites/013-01f-binomial-theorem.js
+       → 013-binomial-theorem.js
+WOULD   calculus/1-prerequisites/014-01-functions.js
+       → 014-functions.js
+WOULD   calculus/1-prerequisites/015-02-trig-review.js
+       → 015-trig-review.js
+WOULD   calculus/1-prerequisites/016-02a-inverse-trig-functions.js
+       → 016-inverse-trig-functions.js
+WOULD   calculus/1-prerequisites/017-02b-trig-identities.js
+       → 017-trig-identities.js
+WOULD   calculus/1-prerequisites/018-03-exponentials.js
+       → 018-exponentials.js
+WOULD   calculus/1-prerequisites/019-04-integrated-review.js
+       → 019-integrated-review.js
+WOULD   calculus/1-prerequisites/020-05-assignment-playbook.js
+       → 020-assignment-playbook.js
+WOULD   calculus/1-prerequisites/021-06-algebra-geometry-master-review.js
+       → 021-algebra-geometry-master-review.js
+WOULD   calculus/1-prerequisites/022-07-algebra-tricky-parts.js
+       → 022-algebra-tricky-parts.js
+WOULD   calculus/1-prerequisites/023-08-geometry-visual-proofs.js
+       → 023-geometry-visual-proofs.js
+WOULD   calculus/2-limits-continuity/001-00a-one-sided-limits.js
+       → 001-one-sided-limits.js
+WOULD   calculus/2-limits-continuity/002-00-intro-limits.js
+       → 002-introduction.js
+WOULD   calculus/2-limits-continuity/003-01-limit-laws.js
+       → 003-limit-laws.js
+WOULD   calculus/2-limits-continuity/004-02-continuity.js
+       → 004-continuity.js
+WOULD   calculus/2-limits-continuity/005-02a-intermediate-value-theorem.js
+       → 005-intermediate-value-theorem.js
+WOULD   calculus/2-limits-continuity/006-02b-types-of-discontinuities.js
+       → 006-types-of-discontinuities.js
+WOULD   calculus/2-limits-continuity/007-03-epsilon-delta.js
+       → 007-epsilon-delta.js
+WOULD   calculus/2-limits-continuity/008-04a-visual-epsilon-delta.js
+       → 008-visual-epsilon-delta.js
+WOULD   calculus/2-limits-continuity/009-04-squeeze-theorem.js
+       → 009-squeeze-theorem.js
+WOULD   calculus/2-limits-continuity/010-04b-fundamental-trig-limits.js
+       → 010-fundamental-trig-limits.js
+WOULD   calculus/2-limits-continuity/011-05-limits-at-infinity.js
+       → 011-limits-at-infinity.js
+WOULD   calculus/2-limits-continuity/012-05a-infinite-limits-vertical-asymptotes.js
+       → 012-infinite-limits-vertical-asymptotes.js
+WOULD   calculus/2-limits-continuity/013-10-limits-and-continuity.js
+       → 013-limits-and-continuity.js
+WOULD   calculus/3-derivatives/001-10-derivatives-introduction.js
+       → 001-derivatives-introduction.js
+WOULD   calculus/3-derivatives/002-00-tangent-problem.js
+       → 002-tangent-problem.js
+WOULD   calculus/3-derivatives/003-01-differentiation-rules.js
+       → 003-differentiation-rules.js
+WOULD   calculus/3-derivatives/004-01a-differentiability-vs-continuity.js
+       → 004-differentiability-vs-continuity.js
+WOULD   calculus/3-derivatives/005-02-chain-rule.js
+       → 005-chain-rule.js
+WOULD   calculus/3-derivatives/006-04b-product-rule-chain-trap.js
+       → 006-product-rule-chain-trap.js
+WOULD   calculus/3-derivatives/007-03-trig-derivatives.js
+       → 007-trig-derivatives.js
+WOULD   calculus/3-derivatives/008-04-exp-log-derivatives.js
+       → 008-exp-log-derivatives.js
+WOULD   calculus/3-derivatives/009-02-derivatives-of-inverse-functions.js
+       → 009-derivatives-of-inverse-functions.js
+WOULD   calculus/3-derivatives/010-05-implicit-differentiation.js
+       → 010-implicit-differentiation.js
+WOULD   calculus/3-derivatives/011-06-reading-derivatives.js
+       → 011-reading-derivatives.js
+WOULD   calculus/3-derivatives/012-07-higher-order-derivatives.js
+       → 012-higher-order-derivatives.js
+WOULD   calculus/4-applications-of-derivatives/001-00a-extreme-value-theorem.js
+       → 001-extreme-value-theorem.js
+WOULD   calculus/4-applications-of-derivatives/002-02a-rolles-theorem.js
+       → 002-rolles-theorem.js
+WOULD   calculus/4-applications-of-derivatives/003-02-mean-value-theorem.js
+       → 003-mean-value-theorem.js
+WOULD   calculus/4-applications-of-derivatives/004-01-linear-approximation.js
+       → 004-linear-approximation.js
+WOULD   calculus/4-applications-of-derivatives/005-07-differentials.js
+       → 005-differentials.js
+WOULD   calculus/4-applications-of-derivatives/006-00-related-rates.js
+       → 006-related-rates.js
+WOULD   calculus/4-applications-of-derivatives/007-03a-first-derivative-test.js
+       → 007-first-derivative-test.js
+WOULD   calculus/4-applications-of-derivatives/008-03b-concavity-second-derivative-test.js
+       → 008-concavity-second-derivative-test.js
+WOULD   calculus/4-applications-of-derivatives/009-03-curve-sketching.js
+       → 009-curve-sketching.js
+WOULD   calculus/4-applications-of-derivatives/010-04-optimization.js
+       → 010-optimization.js
+WOULD   calculus/4-applications-of-derivatives/011-05-lhopital.js
+       → 011-lhopital.js
+WOULD   calculus/4-applications-of-derivatives/012-06-newtons-method.js
+       → 012-newtons-method.js
+WOULD   calculus/5-integration/001-00-antiderivatives.js
+       → 001-antiderivatives.js
+WOULD   calculus/5-integration/002-00-area-accumulation.js
+       → 002-area-accumulation.js
+WOULD   calculus/5-integration/003-00c-summation-notation.js
+       → 003-summation-notation.js
+WOULD   calculus/5-integration/004-01-riemann-sums.js
+       → 004-riemann-sums.js
+WOULD   calculus/5-integration/005-02-definite-integral.js
+       → 005-definite-integral.js
+WOULD   calculus/5-integration/006-03-fundamental-theorem.js
+       → 006-fundamental-theorem.js
+WOULD   calculus/5-integration/007-03b-mvt-integrals.js
+       → 007-mvt-integrals.js
+WOULD   calculus/5-integration/008-04-indefinite-integrals.js
+       → 008-indefinite-integrals.js
+WOULD   calculus/5-integration/009-04b-initial-value-problems.js
+       → 009-initial-value-problems.js
+WOULD   calculus/5-integration/010-05-applications.js
+       → 010-applications.js
+WOULD   calculus/5-integration/011-05b-average-value.js
+       → 011-average-value.js
+WOULD   calculus/5-integration/012-06-u-substitution.js
+       → 012-u-substitution.js
+WOULD   calculus/5-integration/013-06b-volumes-of-revolution.js
+       → 013-volumes-of-revolution.js
+WOULD   calculus/5-integration/014-07-integration-by-parts.js
+       → 014-integration-by-parts.js
+WOULD   calculus/5-integration/015-08-trig-integrals.js
+       → 015-trig-integrals.js
+WOULD   calculus/5-integration/016-09-trig-substitution.js
+       → 016-trig-substitution.js
+WOULD   calculus/5-integration/017-10-partial-fractions-integration.js
+       → 017-partial-fractions-integration.js
+WOULD   calculus/5-integration/018-11-improper-integrals.js
+       → 018-improper-integrals.js
+WOULD   calculus/5-integration/019-12-numerical-integration.js
+       → 019-numerical-integration.js
+WOULD   calculus/5-integration/020-13-volumes-disk-washer.js
+       → 020-volumes-disk-washer.js
+WOULD   calculus/5-integration/021-14-volumes-shell.js
+       → 021-volumes-shell.js
+WOULD   calculus/5-integration/022-15-arc-length.js
+       → 022-arc-length.js
+WOULD   calculus/5-integration/023-16-work-and-force.js
+       → 023-work-and-force.js
+WOULD   calculus/5-integration/024-17-centers-of-mass.js
+       → 024-centers-of-mass.js
+WOULD   calculus/6-calc-2-bridge-sequences-series-beyond/001-00-sequences.js
+       → 001-sequences.js
+WOULD   calculus/6-calc-2-bridge-sequences-series-beyond/002-01-series-intro.js
+       → 002-series-intro.js
+WOULD   calculus/6-calc-2-bridge-sequences-series-beyond/003-02-convergence-tests.js
+       → 003-convergence-tests.js
+WOULD   calculus/6-calc-2-bridge-sequences-series-beyond/004-03-power-series.js
+       → 004-power-series.js
+WOULD   calculus/6-calc-2-bridge-sequences-series-beyond/005-04-taylor-maclaurin.js
+       → 005-taylor-maclaurin.js
+WOULD   calculus/6-calc-2-bridge-sequences-series-beyond/006-05-series-applications.js
+       → 006-series-applications.js
+WOULD   calculus/7-parametric-polar-vectors/001-00-parametric-equations.js
+       → 001-parametric-equations.js
+WOULD   calculus/7-parametric-polar-vectors/002-01-polar-coordinates.js
+       → 002-polar-coordinates.js
+WOULD   calculus/7-parametric-polar-vectors/003-02-vectors.js
+       → 003-vectors.js
+WOULD   calculus/7-parametric-polar-vectors/004-03-polar-area-length.js
+       → 004-polar-area-length.js
+WOULD   calculus/7-parametric-polar-vectors/005-04-vector-calculus-preview.js
+       → 005-vector-calculus-preview.js
+WOULD   canvas/1-html-canvas-2d-graphics-from-zero/001-lesson1.js
+       → 001-canvas-what-it-is.js
+WOULD   canvas/1-html-canvas-2d-graphics-from-zero/002-lesson2.js
+       → 002-canvas-rectangles-and-paths.js
+WOULD   canvas/1-html-canvas-2d-graphics-from-zero/003-lesson3.js
+       → 003-canvas-lines-arcs-bezier.js
+WOULD   canvas/1-html-canvas-2d-graphics-from-zero/004-lesson4.js
+       → 004-canvas-colors-gradients-strokes.js
+WOULD   canvas/1-html-canvas-2d-graphics-from-zero/005-lesson5.js
+       → 005-canvas-text.js
+WOULD   canvas/1-html-canvas-2d-graphics-from-zero/006-lesson6.js
+       → 006-canvas-transformations.js
+WOULD   canvas/1-html-canvas-2d-graphics-from-zero/007-lesson7.js
+       → 007-compositing-clipping-shadows.js
+WOULD   canvas/1-html-canvas-2d-graphics-from-zero/008-lesson8.js
+       → 008-animation-loop-and-input.js
+WOULD   canvas/1-html-canvas-2d-graphics-from-zero/009-lesson9.js
+       → 009-hit-detection-and-picking.js
+WOULD   chemistry/1-elements-atomic-structure/001-lesson1-0.js
+       → 001-why-chemistry.js
+WOULD   chemistry/1-elements-atomic-structure/002-lesson1-1.js
+       → 002-what-is-an-atom.js
+WOULD   chemistry/1-elements-atomic-structure/003-lesson1-2.js
+       → 003-inside-the-atom.js
+WOULD   chemistry/1-elements-atomic-structure/004-lesson1-3.js
+       → 004-elements-and-the-periodic-table.js
+WOULD   chemistry/2-chemical-bonding/001-lesson2-0.js
+       → 001-why-atoms-bond.js
+WOULD   chemistry/2-chemical-bonding/002-lesson2-1.js
+       → 002-ionic-bonds.js
+WOULD   chemistry/2-chemical-bonding/003-lesson2-2.js
+       → 003-covalent-bonds.js
+WOULD   chemistry/2-chemical-bonding/004-lesson2-3.js
+       → 004-molecular-geometry.js
+WOULD   chemistry/2-chemical-bonding/005-lesson2-4.js
+       → 005-water.js
+WOULD   chemistry/3-matter-in-bulk/001-lesson3-0.js
+       → 001-states-of-matter.js
+WOULD   chemistry/3-matter-in-bulk/002-lesson3-1.js
+       → 002-intermolecular-forces.js
+WOULD   chemistry/3-matter-in-bulk/003-lesson3-2.js
+       → 003-solutions-and-mixtures.js
+WOULD   chemistry/3-matter-in-bulk/004-lesson3-3.js
+       → 004-concentration-and-molarity.js
+WOULD   chemistry/4-chemical-reactions/001-lesson4-0.js
+       → 001-what-is-a-chemical-reaction.js
+WOULD   chemistry/4-chemical-reactions/002-lesson4-1.js
+       → 002-energy-in-reactions.js
+WOULD   chemistry/4-chemical-reactions/003-lesson4-2.js
+       → 003-reaction-rates.js
+WOULD   chemistry/4-chemical-reactions/004-lesson4-3.js
+       → 004-equilibrium.js
+WOULD   chemistry/4-chemical-reactions/005-lesson4-4.js
+       → 005-acids-and-bases.js
+WOULD   cnc/1-cnc-macro-systems/001-00-what-is-cnc.js
+       → 001-what-is-cnc.js
+WOULD   cnc/1-cnc-macro-systems/002-01-machine-axes.js
+       → 002-machine-axes-kinematics.js
+WOULD   cnc/1-cnc-macro-systems/003-02-units-and-measurement.js
+       → 003-units-and-measurement.js
+WOULD   cnc/1-cnc-macro-systems/004-03-program-structure.js
+       → 004-program-structure.js
+WOULD   cnc/1-cnc-macro-systems/005-04-modal-groups.js
+       → 005-modal-groups.js
+WOULD   cnc/1-cnc-macro-systems/006-05-absolute-vs-incremental.js
+       → 006-absolute-vs-incremental.js
+WOULD   cnc/1-cnc-macro-systems/007-06-machine-home.js
+       → 007-machine-home.js
+WOULD   cnc/1-cnc-macro-systems/008-03-coordinate-offsets.js
+       → 008-coordinate-systems.js
+WOULD   cnc/1-cnc-macro-systems/009-08-tool-length-comp.js
+       → 009-tool-length-compensation.js
+WOULD   cnc/1-cnc-macro-systems/010-09-rapid-motion.js
+       → 010-rapid-motion.js
+WOULD   cnc/1-cnc-macro-systems/011-01-linear-motion.js
+       → 011-linear-interpolation.js
+WOULD   cnc/1-cnc-macro-systems/012-02-circular-arcs.js
+       → 012-circular-interpolation.js
+WOULD   cnc/1-cnc-macro-systems/013-12-plane-selection.js
+       → 013-plane-selection.js
+WOULD   cnc/1-cnc-macro-systems/014-13-spindle-coolant.js
+       → 014-spindle-and-coolant.js
+WOULD   cnc/1-cnc-macro-systems/015-14-tool-changes.js
+       → 015-tool-changes.js
+WOULD   cnc/1-cnc-macro-systems/016-15-dwell.js
+       → 016-dwell.js
+WOULD   cnc/1-cnc-macro-systems/017-16-canned-cycles.js
+       → 017-canned-cycles.js
+WOULD   cnc/1-cnc-macro-systems/018-17-feeds-and-speeds.js
+       → 018-feeds-and-speeds.js
+WOULD   cnc/1-cnc-macro-systems/019-18-program-format.js
+       → 019-program-format.js
+WOULD   cnc/1-cnc-macro-systems/020-06-macro-subroutines.js
+       → 020-macro-subroutines.js
+WOULD   cnc/1-cnc-macro-systems/021-20-pseudolanguage-intro.js
+       → 021-programming-pseudolanguage.js
+WOULD   cnc/1-cnc-macro-systems/022-04-macro-variables.js
+       → 022-macro-variables.js
+WOULD   cnc/1-cnc-macro-systems/023-21-arithmetic-functions.js
+       → 023-arithmetic-and-functions.js
+WOULD   cnc/1-cnc-macro-systems/024-05-logic-loops.js
+       → 024-logic-and-loops.js
+WOULD   cnc/1-cnc-macro-systems/025-07-variable-scopes.js
+       → 025-variable-scopes.js
+WOULD   cnc/1-cnc-macro-systems/026-08-system-variables.js
+       → 026-system-variables.js
+WOULD   cnc/1-cnc-macro-systems/027-25-parametric-programming.js
+       → 027-parametric-programming.js
+WOULD   cnc/1-cnc-macro-systems/028-26-lookahead-smoothing.js
+       → 028-lookahead-and-smoothing.js
+WOULD   cnc/1-cnc-macro-systems/029-09-controller-dialects.js
+       → 029-controller-dialects.js
+WOULD   cnc/1-cnc-macro-systems/030-29-tooling-fundamentals.js
+       → 030-tooling-fundamentals.js
+WOULD   cnc/1-cnc-macro-systems/031-30-workholding.js
+       → 031-workholding.js
+WOULD   cnc/1-cnc-macro-systems/032-31-setup-and-probing.js
+       → 032-setup-and-probing.js
+WOULD   command-line-interface/1-command-line/001-cli0-001-what-is-the-terminal.js
+       → 001-what-is-the-terminal.js
+WOULD   command-line-interface/1-command-line/002-cli0-002-first-commands.js
+       → 002-first-commands.js
+WOULD   command-line-interface/1-command-line/003-cli0-003-navigating-files.js
+       → 003-navigating-files.js
+WOULD   command-line-interface/1-command-line/004-cli0-004-directories.js
+       → 004-directories.js
+WOULD   command-line-interface/1-command-line/005-cli0-005-reading-files.js
+       → 005-reading-files.js
+WOULD   command-line-interface/1-command-line/006-cli0-006-writing-files.js
+       → 006-writing-files.js
+WOULD   command-line-interface/1-command-line/007-cli0-007-copy-and-move.js
+       → 007-copy-and-move.js
+WOULD   command-line-interface/1-command-line/008-cli0-008-deleting.js
+       → 008-deleting.js
+WOULD   command-line-interface/1-command-line/009-cli0-009-grep-and-find.js
+       → 009-grep-and-find.js
+WOULD   command-line-interface/1-command-line/010-cli0-010-pipes-and-redirection.js
+       → 010-pipes-and-redirection.js
+WOULD   data-science/1-computational-foundations/001-A01_WhatIsAProgram.js
+       → 001-what-is-a-program.js
+WOULD   data-science/1-computational-foundations/002-A02_ValuesAndTypes.js
+       → 002-values-and-types.js
+WOULD   data-science/1-computational-foundations/003-A03_Expressions.js
+       → 003-expressions-and-evaluation.js
+WOULD   data-science/1-computational-foundations/004-A04_Variables.js
+       → 004-variables-as-bindings.js
+WOULD   data-science/1-computational-foundations/005-A05_State.js
+       → 005-state-and-execution-flow.js
+WOULD   data-science/1-computational-foundations/006-A06_BuiltinFunctions.js
+       → 006-builtin-functions.js
+WOULD   data-science/1-computational-foundations/007-A07_Composition.js
+       → 007-function-composition.js
+WOULD   data-science/1-computational-foundations/008-A08_DefiningFunctions.js
+       → 008-defining-functions.js
+WOULD   data-science/1-computational-foundations/009-A09_BooleanLogic.js
+       → 009-boolean-logic.js
+WOULD   data-science/1-computational-foundations/010-A10_Conditionals.js
+       → 010-conditional-execution.js
+WOULD   data-science/1-computational-foundations/011-A11_ForLoops.js
+       → 011-for-loops.js
+WOULD   data-science/1-computational-foundations/012-A12_WhileLoops.js
+       → 012-while-loops.js
+WOULD   data-science/1-computational-foundations/013-A13_Lists.js
+       → 013-lists-and-sequences.js
+WOULD   data-science/1-computational-foundations/014-A14_DictsAndSets.js
+       → 014-dictionaries-and-sets.js
+WOULD   data-science/1-computational-foundations/015-A15_Debugging.js
+       → 015-debugging-and-error-types.js
+WOULD   data-science/2-mathematical-computing/001-B01_Arrays.js
+       → 001-arrays-and-vectorization.js
+WOULD   data-science/2-mathematical-computing/002-B02_Plotting.js
+       → 002-plotting-foundations.js
+WOULD   data-science/2-mathematical-computing/003-B03_LinearFunctions.js
+       → 003-linear-functions-and-slope.js
+WOULD   data-science/2-mathematical-computing/004-B04_Exponentials.js
+       → 004-exponentials-and-logarithms.js
+WOULD   data-science/2-mathematical-computing/005-B05_Vectors.js
+       → 005-vectors-from-python-to-geometry.js
+WOULD   data-science/2-mathematical-computing/006-B06_DotProduct.js
+       → 006-dot-product-and-similarity.js
+WOULD   data-science/2-mathematical-computing/007-B07_Matrices.js
+       → 007-matrices-as-transformations.js
+WOULD   data-science/2-mathematical-computing/008-B08_LinearSystems.js
+       → 008-solving-linear-systems.js
+WOULD   data-science/3-data-science-core/001-C01_TabularData.js
+       → 001-tabular-data-and-pandas.js
+WOULD   data-science/3-data-science-core/002-C02_DescriptiveStats.js
+       → 002-descriptive-statistics.js
+WOULD   data-science/3-data-science-core/003-C03_DataCleaning.js
+       → 003-data-cleaning.js
+WOULD   data-science/3-data-science-core/004-C04_Transformation.js
+       → 004-data-transformation.js
+WOULD   data-science/3-data-science-core/005-C05_Groupby.js
+       → 005-groupby-and-aggregation.js
+WOULD   data-science/3-data-science-core/006-C06_EDA.js
+       → 006-exploratory-data-analysis.js
+WOULD   data-science/4-modeling-inference/001-D01_Probability.js
+       → 001-probability-foundations.js
+WOULD   data-science/4-modeling-inference/002-D02_Distributions.js
+       → 002-distributions-and-the-normal.js
+WOULD   data-science/4-modeling-inference/003-D03_LinearRegression.js
+       → 003-linear-regression-from-scratch.js
+WOULD   data-science/4-modeling-inference/004-D04_HypothesisTesting.js
+       → 004-hypothesis-testing.js
+WOULD   data-science/4-modeling-inference/005-D05_GradientDescent.js
+       → 005-gradient-descent.js
+WOULD   data-science/4-modeling-inference/006-D06_ModelEvaluation.js
+       → 006-model-evaluation-and-overfitting.js
+WOULD   data-structures-and-algorithms/1-computational-foundations/001-dsa0-001-execution-model.js
+       → 001-execution-and-memory-model.js
+WOULD   data-structures-and-algorithms/1-computational-foundations/002-dsa0-002-big-o.js
+       → 002-time-and-space-complexity.js
+WOULD   data-structures-and-algorithms/1-computational-foundations/003-dsa0-003-algorithmic-thinking.js
+       → 003-algorithmic-thinking.js
+WOULD   data-structures-and-algorithms/2-linear-structures/001-dsa1-001-arrays.js
+       → 001-arrays.js
+WOULD   data-structures-and-algorithms/2-linear-structures/002-dsa1-002-linked-lists.js
+       → 002-linked-lists.js
+WOULD   data-structures-and-algorithms/2-linear-structures/003-dsa1-003-stacks-and-queues.js
+       → 003-stacks-and-queues.js
+WOULD   data-structures-and-algorithms/2-linear-structures/004-dsa1-004-strings.js
+       → 004-strings.js
+WOULD   data-structures-and-algorithms/3-recursion-state/001-dsa2-001-recursion-basics.js
+       → 001-recursion-basics.js
+WOULD   data-structures-and-algorithms/3-recursion-state/002-dsa2-002-recursion-trees.js
+       → 002-recursion-trees.js
+WOULD   data-structures-and-algorithms/3-recursion-state/003-dsa2-003-backtracking.js
+       → 003-backtracking.js
+WOULD   data-structures-and-algorithms/4-hashing/001-dsa3-001-hash-tables.js
+       → 001-hash-tables.js
+WOULD   data-structures-and-algorithms/4-hashing/002-dsa3-002-hashmap-applications.js
+       → 002-hashmap-applications.js
+WOULD   data-structures-and-algorithms/5-trees/001-dsa4-001-binary-trees.js
+       → 001-binary-trees.js
+WOULD   data-structures-and-algorithms/5-trees/002-dsa4-002-binary-search-trees.js
+       → 002-binary-search-trees.js
+WOULD   data-structures-and-algorithms/5-trees/003-dsa4-003-heaps.js
+       → 003-heaps.js
+WOULD   data-structures-and-algorithms/6-graphs/001-dsa5-001-graph-bfs-dfs.js
+       → 001-graph-bfs-dfs.js
+WOULD   data-structures-and-algorithms/6-graphs/002-dsa5-002-shortest-paths-topo.js
+       → 002-shortest-paths-topo.js
+WOULD   data-structures-and-algorithms/7-sorting-searching/001-dsa6-001-sorting.js
+       → 001-sorting-algorithms.js
+WOULD   data-structures-and-algorithms/7-sorting-searching/002-dsa6-002-binary-search.js
+       → 002-binary-search.js
+WOULD   data-structures-and-algorithms/8-algorithmic-paradigms/001-dsa7-001-algorithmic-paradigms.js
+       → 001-algorithmic-paradigms.js
+WOULD   design/1-interface-design-systems/001-lesson1-1.js
+       → 001-visual-hierarchy.js
+WOULD   design/1-interface-design-systems/002-lesson1-2.js
+       → 002-spacing-systems.js
+WOULD   design/1-interface-design-systems/003-lesson1-3.js
+       → 003-typography-systems.js
+WOULD   design/1-interface-design-systems/004-Lesson design 04.js
+       → 004-layout-systems.js
+WOULD   design/1-interface-design-systems/005-Lesson design 05.js
+       → 005-colour-systems.js
+WOULD   design/1-interface-design-systems/006-Lesson design 06.js
+       → 006-component-composition.js
+WOULD   design/1-interface-design-systems/007-Lesson design 07.js
+       → 007-interaction-design.js
+WOULD   design/1-interface-design-systems/008-Lesson design 08.js
+       → 008-systems-design.js
+WOULD   design/1-interface-design-systems/009-Lesson design 09.js
+       → 009-accessibility-systems.js
+WOULD   design/1-interface-design-systems/010-Lesson design 10.js
+       → 010-domain-transfer.js
+WOULD   digital-fundamentals/1-signals-binary-data/001-lesson1-0.js
+       → 001-analog-vs-digital.js
+WOULD   digital-fundamentals/1-signals-binary-data/002-lesson1-1.js
+       → 002-binary-and-waveforms.js
+WOULD   digital-fundamentals/1-signals-binary-data/003-lesson1-3.js
+       → 003-transistor-as-switch.js
+WOULD   digital-fundamentals/1-signals-binary-data/004-lesson1-4.js
+       → 004-logic-gate-intro.js
+WOULD   digital-fundamentals/2-number-representation-and-arithmetic/001-lesson2-1.js
+       → 001-binary-numbers.js
+WOULD   digital-fundamentals/2-number-representation-and-arithmetic/002-lesson1-2.js
+       → 002-hexadecimal.js
+WOULD   digital-fundamentals/2-number-representation-and-arithmetic/003-lesson2-0.js
+       → 003-binary-arithmetic.js
+WOULD   digital-fundamentals/2-number-representation-and-arithmetic/004-lesson2-2.js
+       → 004-codes-bcd-gray-ascii.js
+WOULD   digital-fundamentals/3-boolean-logic-gate-fundamentals/001-lesson3-0.js
+       → 001-and-or-not-gates.js
+WOULD   digital-fundamentals/3-boolean-logic-gate-fundamentals/002-lesson3-1.js
+       → 002-nand-nor-universal-gates.js
+WOULD   digital-fundamentals/3-boolean-logic-gate-fundamentals/003-lesson3-2.js
+       → 003-xor-xnor-difference-equality-arithmetic.js
+WOULD   digital-fundamentals/3-boolean-logic-gate-fundamentals/004-lesson3-4.js
+       → 004-reading-logic-diagrams.js
+WOULD   digital-fundamentals/3-boolean-logic-gate-fundamentals/005-lesson3-5.js
+       → 005-propagation-delay-fanout-logic-families.js
+WOULD   digital-fundamentals/4-boolean-algebra-optimization/001-df l4 1 booleanalgebra.js
+       → 001-boolean-algebra-laws-identities.js
+WOULD   digital-fundamentals/4-boolean-algebra-optimization/002-Df l4 2 harnaughmaps.js
+       → 002-karnaugh-maps.js
+WOULD   digital-fundamentals/4-boolean-algebra-optimization/003-Df l4 3 circuitconversion.js
+       → 003-circuit-conversion-bubble-pushing.js
+WOULD   digital-fundamentals/5-combinational-logic-modules/001-Df l5 1 adders.js
+       → 001-adders-half-full-ripple-cla.js
+WOULD   digital-fundamentals/5-combinational-logic-modules/002-Df l5 3 muxdemux.js
+       → 002-multiplexers-demultiplexers.js
+WOULD   digital-fundamentals/5-combinational-logic-modules/003-Df l5 4 decodersencoders.js
+       → 003-decoders-encoders.js
+WOULD   digital-fundamentals/5-combinational-logic-modules/004-Df l5 alu.js
+       → 004-arithmetic-logic-unit.js
+WOULD   digital-fundamentals/6-sequential-logic-storage/001-Df l6 1 latfchesflipflop.js
+       → 001-latches-flip-flops.js
+WOULD   digital-fundamentals/6-sequential-logic-storage/002-Df l6 2 registershiftregulators.js
+       → 002-registers-shift-registers.js
+WOULD   discrete-math/1-discrete-mathematics-foundations/001-00-logic-puzzles.js
+       → 001-pigeonhole-principle.js
+WOULD   discrete-math/1-discrete-mathematics-foundations/002-01b-logic-and-proofs.js
+       → 002-logic-and-proofs.js
+WOULD   discrete-math/1-discrete-mathematics-foundations/003-01-propositions-and-proof-techniques.js
+       → 003-propositions-and-proof-techniques.js
+WOULD   discrete-math/1-discrete-mathematics-foundations/004-01a-predicate-logic-and-quantifiers.js
+       → 004-predicate-logic-and-quantifiers.js
+WOULD   discrete-math/1-discrete-mathematics-foundations/005-02a-sets-and-functions-for-discrete.js
+       → 005-sets-and-functions-for-discrete.js
+WOULD   discrete-math/1-discrete-mathematics-foundations/006-02-relations-and-structures.js
+       → 006-relations-and-structures.js
+WOULD   discrete-math/1-discrete-mathematics-foundations/007-02-induction-and-recursion.js
+       → 007-induction-and-recursion.js
+WOULD   discrete-math/1-discrete-mathematics-foundations/008-03-counting-and-combinatorics.js
+       → 008-counting-and-combinatorics.js
+WOULD   discrete-math/1-discrete-mathematics-foundations/009-05-number-theory-and-modular-arithmetic.js
+       → 009-number-theory-and-modular-arithmetic.js
+WOULD   discrete-math/1-discrete-mathematics-foundations/010-05-discrete-probability.js
+       → 010-discrete-probability.js
+WOULD   discrete-math/1-discrete-mathematics-foundations/011-07-recurrence-relations.js
+       → 011-recurrence-relations.js
+WOULD   discrete-math/1-discrete-mathematics-foundations/012-04-graph-theory.js
+       → 012-graph-theory.js
+WOULD   discrete-math/1-discrete-mathematics-foundations/013-04a-graph-theory-intro.js
+       → 013-graph-theory-intro.js
+WOULD   discrete-math/1-discrete-mathematics-foundations/014-09-trees-and-hierarchies.js
+       → 014-trees-and-hierarchies.js
+WOULD   discrete-math/1-discrete-mathematics-foundations/015-10-boolean-algebra-and-circuits.js
+       → 015-boolean-algebra-and-circuits.js
+WOULD   discrete-math/1-discrete-mathematics-foundations/016-11-automata-theory.js
+       → 016-automata-theory.js
+WOULD   discrete-math/1-discrete-mathematics-foundations/017-12-formal-languages-and-grammars.js
+       → 017-formal-languages-and-grammars.js
+WOULD   discrete-math/1-discrete-mathematics-foundations/018-06-algorithms-and-complexity.js
+       → 018-algorithms-and-complexity.js
+WOULD   dynamic-programming/1-foundations/001-dp1-001-what-is-dp.js
+       → 001-what-is-dynamic-programming.js
+WOULD   dynamic-programming/1-foundations/002-dp1-002-1d-dp-patterns.js
+       → 002-1d-dp-patterns.js
+WOULD   dynamic-programming/1-foundations/003-dp1-003-2d-dp-grids.js
+       → 003-2d-dp-grids.js
+WOULD   dynamic-programming/1-foundations/004-dp1-004-sequence-dp.js
+       → 004-sequence-dp.js
+WOULD   dynamic-programming/1-foundations/005-dp1-005-knapsack.js
+       → 005-knapsack.js
+WOULD   dynamic-programming/1-foundations/006-dp1-006-interval-dp.js
+       → 006-interval-dp.js
+WOULD   electronics/1-electrical-fundamentals/001-elec0-001-voltage-current-resistance.js
+       → 001-voltage-current-resistance.js
+WOULD   electronics/1-electrical-fundamentals/002-elec0-002-ohms-law-and-power.js
+       → 002-ohms-law-and-power.js
+WOULD   electronics/1-electrical-fundamentals/003-elec0-003-series-and-parallel-circuits.js
+       → 003-series-and-parallel-circuits.js
+WOULD   electronics/1-electrical-fundamentals/004-elec0-004-ac-vs-dc.js
+       → 004-ac-vs-dc.js
+WOULD   electronics/1-electrical-fundamentals/005-elec0-005-switches-relays-contactors.js
+       → 005-switches-relays-contactors.js
+WOULD   electronics/1-electrical-fundamentals/006-elec0-006-sensors.js
+       → 006-sensors.js
+WOULD   electronics/1-electrical-fundamentals/007-elec0-007-wiring-diagrams.js
+       → 007-wiring-diagrams.js
+WOULD   electronics/1-electrical-fundamentals/008-elec0-008-sourcing-and-sinking.js
+       → 008-sourcing-and-sinking.js
+WOULD   electronics/1-electrical-fundamentals/009-elec0-009-motor-starters-and-drives.js
+       → 009-motor-starters-and-drives.js
+WOULD   electronics/1-electrical-fundamentals/010-elec0-010-grounding-and-safety.js
+       → 010-grounding-and-safety.js
+WOULD   electronics/2-dc-electricity/001-elec1-001-kirchhoffs-voltage-law.js
+       → 001-kirchhoffs-voltage-law.js
+WOULD   electronics/2-dc-electricity/002-elec1-002-kirchhoffs-current-law.js
+       → 002-kirchhoffs-current-law.js
+WOULD   electronics/2-dc-electricity/003-elec1-003-network-analysis.js
+       → 003-network-analysis.js
+WOULD   electronics/2-dc-electricity/004-elec1-004-thevenin-norton.js
+       → 004-thevenin-norton.js
+WOULD   electronics/2-dc-electricity/005-elec1-005-capacitors.js
+       → 005-capacitors.js
+WOULD   electronics/2-dc-electricity/006-elec1-006-rc-circuits.js
+       → 006-rc-circuits.js
+WOULD   electronics/2-dc-electricity/007-elec1-007-inductors.js
+       → 007-inductors.js
+WOULD   electronics/2-dc-electricity/008-elec1-008-rl-circuits.js
+       → 008-rl-circuits.js
+WOULD   electronics/2-dc-electricity/009-elec1-009-magnetism.js
+       → 009-magnetism-and-electromagnetism.js
+WOULD   electronics/2-dc-electricity/010-elec1-010-dc-power-sources.js
+       → 010-dc-power-sources.js
+WOULD   electronics/3-ac-electricity/001-elec2-001-ac-waveforms.js
+       → 001-ac-waveforms.js
+WOULD   electronics/3-ac-electricity/002-elec2-002-phasors.js
+       → 002-phasors.js
+WOULD   electronics/3-ac-electricity/003-elec2-003-capacitive-reactance.js
+       → 003-capacitive-reactance.js
+WOULD   electronics/3-ac-electricity/004-elec2-004-inductive-reactance.js
+       → 004-inductive-reactance.js
+WOULD   electronics/3-ac-electricity/005-elec2-005-rlc-series.js
+       → 005-rlc-series.js
+WOULD   electronics/3-ac-electricity/006-elec2-006-rlc-parallel.js
+       → 006-rlc-parallel.js
+WOULD   electronics/3-ac-electricity/007-elec2-007-resonance.js
+       → 007-resonance.js
+WOULD   electronics/3-ac-electricity/008-elec2-008-ac-power.js
+       → 008-ac-power.js
+WOULD   electronics/3-ac-electricity/009-elec2-009-transformers.js
+       → 009-transformers.js
+WOULD   electronics/3-ac-electricity/010-elec2-010-three-phase-power.js
+       → 010-three-phase-power.js
+WOULD   electronics/4-semiconductors-solid-state-devices/001-elec3-001-semiconductors-basics.js
+       → 001-semiconductors-basics.js
+WOULD   electronics/4-semiconductors-solid-state-devices/002-elec3-002-pn-junction-diode.js
+       → 002-pn-junction-diode.js
+WOULD   electronics/4-semiconductors-solid-state-devices/003-elec3-003-diode-circuits.js
+       → 003-diode-circuits.js
+WOULD   electronics/4-semiconductors-solid-state-devices/004-elec3-004-zener-and-special-diodes.js
+       → 004-zener-and-special-diodes.js
+WOULD   electronics/4-semiconductors-solid-state-devices/005-elec3-005-bipolar-transistors.js
+       → 005-bipolar-transistors.js
+WOULD   electronics/4-semiconductors-solid-state-devices/006-elec3-006-transistor-biasing.js
+       → 006-transistor-biasing.js
+WOULD   electronics/4-semiconductors-solid-state-devices/007-elec3-007-field-effect-transistors.js
+       → 007-field-effect-transistors.js
+WOULD   electronics/4-semiconductors-solid-state-devices/008-elec3-008-thyristors-and-power-devices.js
+       → 008-thyristors-and-power-devices.js
+WOULD   electronics/4-semiconductors-solid-state-devices/009-elec3-009-integrated-circuits.js
+       → 009-integrated-circuits.js
+WOULD   electronics/4-semiconductors-solid-state-devices/010-elec3-010-optoelectronics.js
+       → 010-optoelectronics.js
+WOULD   electronics/5-amplifiers-op-amps/001-elec4-001-intro-to-amplifiers.js
+       → 001-intro-to-amplifiers.js
+WOULD   electronics/5-amplifiers-op-amps/002-elec4-002-common-emitter-amplifier.js
+       → 002-common-emitter-amplifier.js
+WOULD   electronics/5-amplifiers-op-amps/003-elec4-003-amplifier-biasing.js
+       → 003-amplifier-biasing.js
+WOULD   electronics/5-amplifiers-op-amps/004-elec4-004-amplifier-classes.js
+       → 004-amplifier-classes.js
+WOULD   electronics/5-amplifiers-op-amps/005-elec4-005-op-amp-fundamentals.js
+       → 005-op-amp-fundamentals.js
+WOULD   electronics/5-amplifiers-op-amps/006-elec4-006-inverting-amplifier.js
+       → 006-inverting-amplifier.js
+WOULD   electronics/5-amplifiers-op-amps/007-elec4-007-noninverting-amplifier.js
+       → 007-noninverting-amplifier.js
+WOULD   electronics/5-amplifiers-op-amps/008-elec4-008-integrators-and-differentiators.js
+       → 008-integrators-and-differentiators.js
+WOULD   electronics/5-amplifiers-op-amps/009-elec4-009-comparators.js
+       → 009-comparators.js
+WOULD   electronics/5-amplifiers-op-amps/010-elec4-010-feedback-and-stability.js
+       → 010-feedback-and-stability.js
+WOULD   electronics/6-rf-communications/001-elec5-001-rf-fundamentals.js
+       → 001-rf-fundamentals.js
+WOULD   electronics/6-rf-communications/002-elec5-002-antennas.js
+       → 002-antennas.js
+WOULD   electronics/6-rf-communications/003-elec5-003-transmission-lines.js
+       → 003-transmission-lines.js
+WOULD   electronics/6-rf-communications/004-elec5-004-wave-propagation.js
+       → 004-wave-propagation.js
+WOULD   electronics/6-rf-communications/005-elec5-005-amplitude-modulation.js
+       → 005-amplitude-modulation.js
+WOULD   electronics/6-rf-communications/006-elec5-006-frequency-modulation.js
+       → 006-frequency-modulation.js
+WOULD   electronics/6-rf-communications/007-elec5-007-am-receivers.js
+       → 007-am-receivers.js
+WOULD   electronics/6-rf-communications/008-elec5-008-fm-receivers.js
+       → 008-fm-receivers.js
+WOULD   electronics/6-rf-communications/009-elec5-009-digital-communications.js
+       → 009-digital-communications.js
+WOULD   electronics/6-rf-communications/010-elec5-010-communications-systems.js
+       → 010-communications-systems.js
+WOULD   electronics/7-systems-integration/001-elec6-001-troubleshooting-methodology.js
+       → 001-troubleshooting-methodology.js
+WOULD   electronics/7-systems-integration/002-elec6-002-test-equipment.js
+       → 002-test-equipment.js
+WOULD   electronics/7-systems-integration/003-elec6-003-soldering-and-pcb.js
+       → 003-soldering-and-pcb.js
+WOULD   electronics/7-systems-integration/004-elec6-004-system-grounding.js
+       → 004-system-grounding.js
+WOULD   electronics/7-systems-integration/005-elec6-005-emc-and-emi.js
+       → 005-emc-and-emi.js
+WOULD   electronics/7-systems-integration/006-elec6-006-power-electronics.js
+       → 006-power-electronics.js
+WOULD   electronics/7-systems-integration/007-elec6-007-protective-devices.js
+       → 007-protective-devices.js
+WOULD   electronics/7-systems-integration/008-elec6-008-industrial-control.js
+       → 008-industrial-control.js
+WOULD   electronics/7-systems-integration/009-elec6-009-sensors-and-signal-conditioning.js
+       → 009-sensors-and-signal-conditioning.js
+WOULD   electronics/7-systems-integration/010-elec6-010-systems-design-and-commissioning.js
+       → 010-systems-design-and-commissioning.js
+WOULD   gcode-parser/1-math-geometry-foundations-for-toolpaths/001-01-coordinate-frames.js
+       → 001-coordinate-frames.js
+WOULD   gcode-parser/1-math-geometry-foundations-for-toolpaths/002-02-vectors-and-points.js
+       → 002-vectors-and-points.js
+WOULD   gcode-parser/1-math-geometry-foundations-for-toolpaths/003-03-transformations.js
+       → 003-transformations.js
+WOULD   gcode-parser/1-math-geometry-foundations-for-toolpaths/004-04-bounding-boxes.js
+       → 004-bounding-boxes.js
+WOULD   gcode-parser/1-math-geometry-foundations-for-toolpaths/005-05-lines-and-arcs.js
+       → 005-lines-and-arcs.js
+WOULD   geometry/1-geometry-1/003-geo-1-3-angles-segments.js
+       → 003-angles-segments.js
+WOULD   geometry/1-geometry-1/006-geo-1-6-congruence.js
+       → 006-congruence.js
+WOULD   geometry/2-geometry-chapter-2/002-geo-2-1-circle-theorems.js
+       → 002-circle-theorems.js
+WOULD   geometry/2-geometry-chapter-2/003-geo-2-2-constructions.js
+       → 003-constructions.js
+WOULD   geometry/2-geometry-chapter-2/005-geo-2-parallel-and-similarity.js
+       → 005-parallel-lines-applications.js
+WOULD   geometry/2-geometry-chapter-2/007-geo-2-4-areas-arcs.js
+       → 007-areas-arcs.js
+WOULD   git/1-git/001-git0-001-why-version-control.js
+       → 001-the-save-problem.js
+WOULD   git/1-git/002-git0-002-install-and-configure.js
+       → 002-commits-are-checkpoints.js
+WOULD   git/1-git/003-git0-003-git-init-and-status.js
+       → 003-the-three-zones.js
+WOULD   git/1-git/004-git0-004-staging-and-committing.js
+       → 004-commit-messages-matter.js
+WOULD   git/1-git/005-git0-005-reading-history.js
+       → 005-time-travel.js
+WOULD   git/1-git/006-git0-006-branches.js
+       → 006-parallel-timelines.js
+WOULD   git/1-git/007-git0-007-merging.js
+       → 007-bringing-it-together.js
+WOULD   git/1-git/008-git0-008-conflicts.js
+       → 008-the-conflict-zone.js
+WOULD   git/1-git/009-git0-009-remotes.js
+       → 009-beyond-your-machine.js
+WOULD   git/1-git/010-git0-010-collaboration.js
+       → 010-working-as-a-team.js
+WOULD   git/1-git/011-git0-011-fetch-pull-push.js
+       → 011-fetch-pull-push.js
+WOULD   git/1-git/012-git0-012-github-workflow.js
+       → 012-github-workflow.js
+WOULD   git/1-git/013-git0-013-rebasing.js
+       → 013-rebasing.js
+WOULD   git/1-git/014-git0-014-interactive-rebase.js
+       → 014-interactive-rebase.js
+WOULD   git/1-git/015-git0-015-stashing.js
+       → 015-stashing.js
+WOULD   git/1-git/016-git0-016-tags-and-releases.js
+       → 016-tags-and-releases.js
+WOULD   git/1-git/017-git0-017-gitignore-and-config.js
+       → 017-gitignore-and-config.js
+WOULD   git/1-git/018-git0-018-searching-history.js
+       → 018-searching-history.js
+WOULD   git/1-git/019-git0-019-git-internals.js
+       → 019-git-internals.js
+WOULD   git/1-git/020-git0-020-git-workflows.js
+       → 020-git-workflows.js
+WOULD   javascript/1-javascript-core-foundations/001-lesson0-0.js
+       → 001-how-to-use-this-notebook.js
+WOULD   javascript/1-javascript-core-foundations/002-lesson0-1.js
+       → 002-what-is-a-programming-language.js
+WOULD   javascript/1-javascript-core-foundations/003-lesson0-2.js
+       → 003-javascript-runtime-model.js
+WOULD   javascript/1-javascript-core-foundations/004-lesson0-3.js
+       → 004-values-types-identity.js
+WOULD   javascript/2-syntax-core-constructs/001-lesson1-1.js
+       → 001-variables-bindings-properly.js
+WOULD   javascript/2-syntax-core-constructs/002-lesson1-2.js
+       → 002-expressions-vs-statements.js
+WOULD   javascript/3-functions-data-and-the-dom/001-lesson2-1.js
+       → 001-functions-the-reusable-unit.js
+WOULD   javascript/3-functions-data-and-the-dom/002-lesson2-2.js
+       → 002-closures-functions-that-remember.js
+WOULD   javascript/3-functions-data-and-the-dom/003-lesson2-3.js
+       → 003-arrays-ordered-collections.js
+WOULD   javascript/3-functions-data-and-the-dom/004-lesson2-35.js
+       → 004-the-dom-and-forms.js
+WOULD   javascript/3-functions-data-and-the-dom/005-lesson2-4.js
+       → 005-objects-key-value-maps.js
+WOULD   javascript/4-async-javascript-promises-async-await-and-fetch/001-lesson3-1.js
+       → 001-event-loop-under-the-hood.js
+WOULD   javascript/4-async-javascript-promises-async-await-and-fetch/002-lesson3-2.js
+       → 002-promises-the-async-state-machine.js
+WOULD   javascript/4-async-javascript-promises-async-await-and-fetch/003-lesson3-3.js
+       → 003-async-await-promises-you-can-read.js
+WOULD   javascript/4-async-javascript-promises-async-await-and-fetch/004-lesson3-4.js
+       → 004-fetch-talking-to-servers.js
+WOULD   javascript/5-prototypes-classes-and-modules/001-lesson4-1.js
+       → 001-prototypes-the-real-inheritance-model.js
+WOULD   javascript/5-prototypes-classes-and-modules/002-lesson4-2.js
+       → 002-classes-sugar-over-prototypes.js
+WOULD   javascript/5-prototypes-classes-and-modules/003-lesson4-3.js
+       → 003-iterators-and-generators.js
+WOULD   javascript/5-prototypes-classes-and-modules/004-lesson4-4.js
+       → 004-modules-import-export-esm.js
+WOULD   javascript/6-libraries-from-cdns/001-lesson5-1.js
+       → 001-chartjs-data-visualization-from-cdn.js
+WOULD   javascript/6-libraries-from-cdns/002-lesson5-2.js
+       → 002-lodash-and-axios-utility-and-http.js
+WOULD   javascript/6-libraries-from-cdns/003-lesson5-3.js
+       → 003-animejs-animations-from-cdn.js
+WOULD   javascript/6-libraries-from-cdns/004-lesson5-4.js
+       → 004-dayjs-dates-and-times-from-cdn.js
+WOULD   javascript/7-the-browser-platform/001-lesson6-1.js
+       → 001-browser-storage-localstorage-sessionstorage-cookies.js
+WOULD   javascript/7-the-browser-platform/002-lesson6-2.js
+       → 002-web-workers-true-parallelism.js
+WOULD   javascript/8-javascript-patterns/001-lesson7-1.js
+       → 001-javascript-patterns-design-patterns-in-practice.js
+WOULD   linear-algebra/1-vectors-spaces/001-la1-001-vectors.js
+       → 001-what-is-a-vector.js
+WOULD   linear-algebra/1-vectors-spaces/002-la1-002-linear-combinations.js
+       → 002-linear-combinations.js
+WOULD   linear-algebra/1-vectors-spaces/003-la1-003-dot-and-cross-products.js
+       → 003-dot-and-cross-products.js
+WOULD   linear-algebra/1-vectors-spaces/004-la1-004-systems-of-equations.js
+       → 004-systems-of-linear-equations.js
+WOULD   linear-algebra/1-vectors-spaces/005-la1-005-lines-and-planes.js
+       → 005-lines-and-planes.js
+WOULD   linear-algebra/1-vectors-spaces/006-la1-006-gauss-jordan-rref.js
+       → 006-gauss-jordan-rref.js
+WOULD   linear-algebra/1-vectors-spaces/007-la1-007-linear-independence.js
+       → 007-linear-independence.js
+WOULD   linear-algebra/10-advanced-theory/001-la10-001-dual-spaces.js
+       → 001-dual-spaces.js
+WOULD   linear-algebra/10-advanced-theory/002-la10-002-tensor-products.js
+       → 002-tensor-products.js
+WOULD   linear-algebra/10-advanced-theory/003-la10-003-exterior-algebra.js
+       → 003-exterior-algebra.js
+WOULD   linear-algebra/10-advanced-theory/004-la10-004-operator-theory.js
+       → 004-operator-theory.js
+WOULD   linear-algebra/10-advanced-theory/005-la10-005-banach-hilbert-spaces.js
+       → 005-banach-hilbert-spaces.js
+WOULD   linear-algebra/2-matrices-transformations/001-la2-001-matrices-as-transformations.js
+       → 001-matrices-as-transformations.js
+WOULD   linear-algebra/2-matrices-transformations/002-la2-002-matrix-multiplication.js
+       → 002-matrix-multiplication.js
+WOULD   linear-algebra/2-matrices-transformations/003-la2-003-inverse-matrices.js
+       → 003-inverse-matrices.js
+WOULD   linear-algebra/2-matrices-transformations/004-la2-004-null-space-and-column-space.js
+       → 004-null-space-and-column-space.js
+WOULD   linear-algebra/2-matrices-transformations/005-la2-005-determinants-general.js
+       → 005-determinants-general.js
+WOULD   linear-algebra/2-matrices-transformations/006-la2-006-lu-decomposition.js
+       → 006-lu-decomposition.js
+WOULD   linear-algebra/2-matrices-transformations/007-la2-007-special-matrices.js
+       → 007-special-matrices.js
+WOULD   linear-algebra/2-matrices-transformations/008-la2-008-cramers-rule.js
+       → 008-cramers-rule.js
+WOULD   linear-algebra/2-matrices-transformations/009-la2-009-matrix-calculus.js
+       → 009-matrix-calculus.js
+WOULD   linear-algebra/2-matrices-transformations/010-la2-010-invertible-matrix-theorem.js
+       → 010-invertible-matrix-theorem.js
+WOULD   linear-algebra/2-matrices-transformations/011-la2-011-four-fundamental-subspaces.js
+       → 011-four-fundamental-subspaces.js
+WOULD   linear-algebra/2-matrices-transformations/012-la2-012-cofactor-expansion.js
+       → 012-cofactor-expansion.js
+WOULD   linear-algebra/3-eigenvalues-eigenvectors/001-la3-001-eigenvectors-and-eigenvalues.js
+       → 001-eigenvectors-and-eigenvalues.js
+WOULD   linear-algebra/3-eigenvalues-eigenvectors/002-la3-002-diagonalization.js
+       → 002-diagonalization.js
+WOULD   linear-algebra/3-eigenvalues-eigenvectors/003-la3-003-complex-eigenvalues.js
+       → 003-complex-eigenvalues.js
+WOULD   linear-algebra/3-eigenvalues-eigenvectors/004-la3-004-jordan-normal-form.js
+       → 004-jordan-normal-form.js
+WOULD   linear-algebra/3-eigenvalues-eigenvectors/005-la3-005-markov-chains.js
+       → 005-markov-chains.js
+WOULD   linear-algebra/3-eigenvalues-eigenvectors/006-la3-006-cayley-hamilton.js
+       → 006-cayley-hamilton.js
+WOULD   linear-algebra/3-eigenvalues-eigenvectors/007-la3-007-matrix-exponential.js
+       → 007-matrix-exponential.js
+WOULD   linear-algebra/4-orthogonality-projections-svd/001-la4-001-orthogonal-projections.js
+       → 001-orthogonal-projections.js
+WOULD   linear-algebra/4-orthogonality-projections-svd/002-la4-002-gram-schmidt.js
+       → 002-gram-schmidt.js
+WOULD   linear-algebra/4-orthogonality-projections-svd/003-la4-003-least-squares.js
+       → 003-least-squares.js
+WOULD   linear-algebra/4-orthogonality-projections-svd/004-la4-002-svd.js
+       → 004-svd.js
+WOULD   linear-algebra/4-orthogonality-projections-svd/005-la4-005-inner-product-spaces.js
+       → 005-inner-product-spaces.js
+WOULD   linear-algebra/4-orthogonality-projections-svd/006-la4-006-spectral-theorem.js
+       → 006-spectral-theorem.js
+WOULD   linear-algebra/4-orthogonality-projections-svd/007-la4-007-quadratic-forms.js
+       → 007-quadratic-forms.js
+WOULD   linear-algebra/4-orthogonality-projections-svd/008-la4-008-pseudoinverse.js
+       → 008-pseudoinverse.js
+WOULD   linear-algebra/4-orthogonality-projections-svd/009-la4-009-low-rank-approximation.js
+       → 009-low-rank-approximation.js
+WOULD   linear-algebra/5-python-in-the-browser/001-la-sandbox.js
+       → 001-numpy-scipy-intro.js
+WOULD   linear-algebra/6-abstract-vector-spaces/001-la6-001-abstract-vector-spaces.js
+       → 001-abstract-vector-spaces.js
+WOULD   linear-algebra/6-abstract-vector-spaces/002-la6-002-basis-and-dimension.js
+       → 002-basis-and-dimension.js
+WOULD   linear-algebra/6-abstract-vector-spaces/003-la6-003-linear-transformations.js
+       → 003-linear-transformations.js
+WOULD   linear-algebra/6-abstract-vector-spaces/004-la6-004-matrix-representations.js
+       → 004-matrix-representations.js
+WOULD   linear-algebra/6-abstract-vector-spaces/005-la6-005-isomorphisms.js
+       → 005-isomorphisms.js
+WOULD   linear-algebra/6-abstract-vector-spaces/006-la6-006-coordinates-change-of-basis.js
+       → 006-coordinates-change-of-basis.js
+WOULD   linear-algebra/7-numerical-linear-algebra/001-la7-001-qr-decomposition.js
+       → 001-qr-decomposition.js
+WOULD   linear-algebra/7-numerical-linear-algebra/002-la7-002-cholesky-decomposition.js
+       → 002-cholesky-decomposition.js
+WOULD   linear-algebra/7-numerical-linear-algebra/003-la7-003-matrix-norms-conditioning.js
+       → 003-matrix-norms-conditioning.js
+WOULD   linear-algebra/7-numerical-linear-algebra/004-la7-004-numerical-stability.js
+       → 004-numerical-stability.js
+WOULD   linear-algebra/7-numerical-linear-algebra/005-la7-005-sparse-matrices.js
+       → 005-sparse-matrices.js
+WOULD   linear-algebra/7-numerical-linear-algebra/006-la7-006-schur-decomposition.js
+       → 006-schur-decomposition.js
+WOULD   linear-algebra/7-numerical-linear-algebra/007-la7-007-householder-givens.js
+       → 007-householder-givens.js
+WOULD   linear-algebra/8-applications-of-linear-algebra/001-la8-001-pca-dimensionality-reduction.js
+       → 001-pca-dimensionality-reduction.js
+WOULD   linear-algebra/8-applications-of-linear-algebra/002-la8-002-markov-pagerank.js
+       → 002-markov-pagerank.js
+WOULD   linear-algebra/8-applications-of-linear-algebra/003-la8-003-odes-linear-systems.js
+       → 003-odes-and-linear-systems.js
+WOULD   linear-algebra/8-applications-of-linear-algebra/004-la8-004-computer-graphics.js
+       → 004-computer-graphics-transformations.js
+WOULD   linear-algebra/9-iterative-solvers-preconditioning/001-la9-001-jacobi-gauss-seidel.js
+       → 001-jacobi-gauss-seidel.js
+WOULD   linear-algebra/9-iterative-solvers-preconditioning/002-la9-002-conjugate-gradient.js
+       → 002-conjugate-gradient.js
+WOULD   linear-algebra/9-iterative-solvers-preconditioning/003-la9-003-gmres.js
+       → 003-gmres.js
+WOULD   linear-algebra/9-iterative-solvers-preconditioning/004-la9-004-preconditioning.js
+       → 004-preconditioning.js
+WOULD   linear-algebra/9-iterative-solvers-preconditioning/005-la9-005-sparse-direct-solvers.js
+       → 005-sparse-direct-solvers.js
+WOULD   logic/1-boolean-logic-digital-fundamentals/001-logic0-001-boolean-algebra.js
+       → 001-boolean-algebra-basics.js
+WOULD   logic/1-boolean-logic-digital-fundamentals/002-logic0-002-logic-gates-truth-tables.js
+       → 002-logic-gates-and-truth-tables.js
+WOULD   logic/1-boolean-logic-digital-fundamentals/003-logic0-003-combinational-logic.js
+       → 003-combinational-logic-circuits.js
+WOULD   logic/1-boolean-logic-digital-fundamentals/004-logic0-004-demorgans-theorem.js
+       → 004-demorgans-theorem.js
+WOULD   logic/1-boolean-logic-digital-fundamentals/005-logic0-005-boolean-simplification.js
+       → 005-boolean-simplification.js
+WOULD   logic/1-boolean-logic-digital-fundamentals/006-logic0-006-sequential-logic.js
+       → 006-sequential-logic.js
+WOULD   logic/1-boolean-logic-digital-fundamentals/007-logic0-007-state-machines.js
+       → 007-state-machines.js
+WOULD   logic/1-boolean-logic-digital-fundamentals/008-logic0-008-number-systems.js
+       → 008-number-systems.js
+WOULD   nosql/1-nosql-databases/001-nosql1-001-why-nosql.js
+       → 001-why-nosql.js
+WOULD   nosql/1-nosql-databases/002-nosql1-002-document-stores.js
+       → 002-document-stores.js
+WOULD   nosql/1-nosql-databases/003-nosql1-003-cap-theorem.js
+       → 003-cap-theorem.js
+WOULD   nosql/1-nosql-databases/004-nosql1-004-sql-vs-nosql.js
+       → 004-sql-vs-nosql.js
+WOULD   physics/1-foundations-the-language-of-physics/001-p0-001-what-is-physics.js
+       → 001-what-is-physics.js
+WOULD   physics/1-foundations-the-language-of-physics/002-p0-002-units-dimensions.js
+       → 002-units-and-dimensions.js
+WOULD   physics/1-foundations-the-language-of-physics/003-p0-003-variables-functions.js
+       → 003-variables-and-functions.js
+WOULD   physics/1-foundations-the-language-of-physics/004-p0-004-average-vs-instantaneous.js
+       → 004-average-vs-instantaneous.js
+WOULD   physics/1-foundations-the-language-of-physics/005-p0-005-graphs-as-physics.js
+       → 005-graphs-as-physics.js
+WOULD   physics/1-foundations-the-language-of-physics/006-p0-006-vectors-vs-scalars.js
+       → 006-vectors-vs-scalars.js
+WOULD   physics/1-foundations-the-language-of-physics/007-p0-007-coordinate-systems.js
+       → 007-coordinate-systems.js
+WOULD   physics/1-foundations-the-language-of-physics/008-p0-008-algebra-vs-calculus.js
+       → 008-algebra-vs-calculus.js
+WOULD   physics/2-vectors-the-language-of-physics/001-01-vectors-intro.js
+       → 001-what-is-a-vector.js
+WOULD   physics/2-vectors-the-language-of-physics/002-02-vector-notation.js
+       → 002-vector-notation.js
+WOULD   physics/2-vectors-the-language-of-physics/003-03-components-magnitudes.js
+       → 003-components-and-magnitudes.js
+WOULD   physics/2-vectors-the-language-of-physics/004-04-adding-vectors-parallelogram.js
+       → 004-adding-vectors-graphically-parallelogram.js
+WOULD   physics/2-vectors-the-language-of-physics/005-05-adding-vectors-tip-to-toe.js
+       → 005-adding-vectors-graphically-tip-to-toe.js
+WOULD   physics/2-vectors-the-language-of-physics/006-06-adding-vectors-numerically.js
+       → 006-adding-vectors-numerically.js
+WOULD   physics/2-vectors-the-language-of-physics/007-07-subtracting-vectors-graphically.js
+       → 007-subtracting-vectors-graphically.js
+WOULD   physics/2-vectors-the-language-of-physics/008-08-subtracting-vectors-numerically.js
+       → 008-subtracting-vectors-numerically.js
+WOULD   physics/2-vectors-the-language-of-physics/009-09-adding-force-vectors.js
+       → 009-adding-force-vectors-numerically.js
+WOULD   physics/2-vectors-the-language-of-physics/010-10-dot-product-intro.js
+       → 010-dot-product-intro.js
+WOULD   physics/2-vectors-the-language-of-physics/011-11-dot-product-arithmetic.js
+       → 011-dot-product-arithmetic.js
+WOULD   physics/2-vectors-the-language-of-physics/012-12-dot-product-orthogonality.js
+       → 012-dot-product-orthogonality.js
+WOULD   physics/2-vectors-the-language-of-physics/013-13-dot-product-angle.js
+       → 013-dot-product-angle.js
+WOULD   physics/2-vectors-the-language-of-physics/014-14-cross-product-vector-product.js
+       → 014-cross-product-vector-product.js
+WOULD   physics/2-vectors-the-language-of-physics/015-15-cross-product-calculator.js
+       → 015-cross-product-calculator.js
+WOULD   physics/2-vectors-the-language-of-physics/016-16-cross-product-applications.js
+       → 016-cross-product-applications.js
+WOULD   physics/2-vectors-the-language-of-physics/017-17-direction-cosines.js
+       → 017-direction-cosines.js
+WOULD   physics/3-kinematics-motion-without-forces/001-ch2-001-kinematics-definition.js
+       → 001-kinematics-definition.js
+WOULD   physics/3-kinematics-motion-without-forces/002-ch2-002-kinematic-equations.js
+       → 002-kinematic-equations.js
+WOULD   physics/3-kinematics-motion-without-forces/003-ch2-003-position-graph-analysis.js
+       → 003-position-graph-analysis.js
+WOULD   physics/3-kinematics-motion-without-forces/004-ch2-004-velocity-graph-analysis.js
+       → 004-velocity-graph-analysis.js
+WOULD   physics/3-kinematics-motion-without-forces/005-ch2-005-acceleration-graph-analysis.js
+       → 005-acceleration-graph-analysis.js
+WOULD   physics/3-kinematics-motion-without-forces/006-ch2-006-linked-motion-graphs.js
+       → 006-linked-motion-graphs.js
+WOULD   physics/3-kinematics-motion-without-forces/007-ch2-007-definition-of-dx-dt.js
+       → 007-definition-of-dx-dt.js
+WOULD   physics/3-kinematics-motion-without-forces/008-ch2-008-kinematics-worked-example-i.js
+       → 008-kinematics-worked-example-i.js
+WOULD   physics/3-kinematics-motion-without-forces/009-ch2-009-displacement-from-velocity-area.js
+       → 009-displacement-from-velocity-area.js
+WOULD   physics/3-kinematics-motion-without-forces/010-ch2-010-kinematics-worked-example-ii.js
+       → 010-kinematics-worked-example-ii.js
+WOULD   physics/3-kinematics-motion-without-forces/011-ch2-011-two-phase-motion.js
+       → 011-two-phase-motion.js
+WOULD   physics/3-kinematics-motion-without-forces/012-ch2-012-free-fall-basics.js
+       → 012-free-fall-basics.js
+WOULD   physics/3-kinematics-motion-without-forces/013-ch2-013-free-fall-symmetry.js
+       → 013-free-fall-symmetry.js
+WOULD   physics/3-kinematics-motion-without-forces/014-ch2-014-free-fall-sign-convention.js
+       → 014-free-fall-sign-convention.js
+WOULD   physics/3-kinematics-motion-without-forces/015-ch2-015-free-fall-upward-launch.js
+       → 015-free-fall-upward-launch.js
+WOULD   physics/3-kinematics-motion-without-forces/016-ch2-016-free-fall-downward-throw.js
+       → 016-free-fall-downward-throw.js
+WOULD   physics/3-kinematics-motion-without-forces/017-ch2-017-free-fall-from-rest.js
+       → 017-free-fall-from-rest.js
+WOULD   physics/3-kinematics-motion-without-forces/018-ch2-018-free-fall-patterns.js
+       → 018-free-fall-patterns.js
+WOULD   physics/3-kinematics-motion-without-forces/019-ch2-019-mixed-kinematics-problems.js
+       → 019-mixed-kinematics-problems.js
+WOULD   physics/3-kinematics-motion-without-forces/020-ch2-020-two-objects-1.js
+       → 020-two-objects-1.js
+WOULD   physics/3-kinematics-motion-without-forces/021-ch2-021-two-objects-meeting-problems.js
+       → 021-two-objects-meeting-problems.js
+WOULD   physics/3-kinematics-motion-without-forces/022-ch2-022-non-constant-acceleration.js
+       → 022-non-constant-acceleration.js
+WOULD   physics/4-motion-in-2-d/001-p3-001-independence-x-y.js
+       → 001-independence-x-y.js
+WOULD   physics/4-motion-in-2-d/002-p3-002-projectile-basics.js
+       → 002-projectile-basics.js
+WOULD   physics/4-motion-in-2-d/003-p3-005-projectile-range.js
+       → 003-projectile-range.js
+WOULD   physics/4-motion-in-2-d/004-p3-010-projectile-height.js
+       → 004-projectile-height.js
+WOULD   physics/4-motion-in-2-d/005-p3-100-projectile-examples.js
+       → 005-projectile-examples.js
+WOULD   physics/4-motion-in-2-d/006-p3-016-circular-motion.js
+       → 006-circular-motion.js
+WOULD   physics/4-motion-in-2-d/007-p3-018-centripetal-accel.js
+       → 007-centripetal-accel.js
+WOULD   physics/5-newton-s-laws-of-motion/001-p4-001-newtons-first-law.js
+       → 001-newtons-first-law.js
+WOULD   physics/5-newton-s-laws-of-motion/002-p4-002-newtons-second-law.js
+       → 002-newtons-second-law.js
+WOULD   physics/5-newton-s-laws-of-motion/003-p4-003-newtons-third-law.js
+       → 003-newtons-third-law.js
+WOULD   physics/5-newton-s-laws-of-motion/004-p4-004-free-body-diagrams.js
+       → 004-free-body-diagrams.js
+WOULD   physics/5-newton-s-laws-of-motion/005-p4-005-friction.js
+       → 005-friction.js
+WOULD   physics/5-newton-s-laws-of-motion/006-p4-006-statics.js
+       → 006-static-equilibrium.js
+WOULD   physics/5-newton-s-laws-of-motion/007-p4-007-inclined-planes.js
+       → 007-inclined-planes.js
+WOULD   physics/5-newton-s-laws-of-motion/008-p4-008-pulley-systems.js
+       → 008-pulley-systems.js
+WOULD   physics/5-newton-s-laws-of-motion/009-p4-009-circular-dynamics.js
+       → 009-circular-dynamics.js
+WOULD   physics/6-work-energy/001-p5-001-work-definition.js
+       → 001-work-definition.js
+WOULD   physics/6-work-energy/002-p5-002-kinetic-energy.js
+       → 002-kinetic-energy.js
+WOULD   physics/6-work-energy/003-p5-003-potential-energy.js
+       → 003-potential-energy.js
+WOULD   physics/6-work-energy/004-p5-004-conservation-of-energy.js
+       → 004-energy-conservation.js
+WOULD   physics/6-work-energy/005-p5-005-power.js
+       → 005-power.js
+WOULD   physics/6-work-energy/006-p5-006-energy-examples.js
+       → 006-energy-examples.js
+WOULD   physics/7-momentum-collisions/001-p6-001-momentum-definition.js
+       → 001-momentum-definition.js
+WOULD   physics/7-momentum-collisions/002-p6-002-impulse.js
+       → 002-impulse.js
+WOULD   physics/7-momentum-collisions/003-p6-003-conservation-of-momentum.js
+       → 003-momentum-conservation.js
+WOULD   physics/8-rotational-motion/001-p7-001-angular-kinematics.js
+       → 001-angular-kinematics.js
+WOULD   physics/8-rotational-motion/002-p7-002-torque.js
+       → 002-torque.js
+WOULD   physics/8-rotational-motion/003-p7-003-rotational-dynamics.js
+       → 003-rotational-dynamics.js
+WOULD   physics/8-rotational-motion/004-p7-004-moment-of-inertia.js
+       → 004-moment-of-inertia.js
+WOULD   physics/9-oscillations-waves/001-p8-001-hookes-law.js
+       → 001-hookes-law.js
+WOULD   physics/9-oscillations-waves/002-p8-002-shm.js
+       → 002-simple-harmonic-motion.js
+WOULD   physics/9-oscillations-waves/003-p8-003-wave-properties.js
+       → 003-wave-properties.js
+WOULD   physics/9-oscillations-waves/004-p8-004-wave-equation.js
+       → 004-wave-equation.js
+WOULD   precalculus/1-functions-graphs/001-01-graphs-foundations.js
+       → 001-graphs-foundations.js
+WOULD   precalculus/1-functions-graphs/002-02-function-transformations.js
+       → 002-function-transformations.js
+WOULD   precalculus/1-functions-graphs/003-03-function-behaviour.js
+       → 003-function-behaviour.js
+WOULD   precalculus/1-functions-graphs/004-04-function-families.js
+       → 004-function-families.js
+WOULD   precalculus/1-functions-graphs/005-05-beyond-cartesian.js
+       → 005-beyond-cartesian.js
+WOULD   precalculus/2-algebra/001-01-expressions-structure.js
+       → 001-expressions-and-structure.js
+WOULD   precalculus/2-algebra/002-02-factoring.js
+       → 002-factoring-every-method.js
+WOULD   precalculus/2-algebra/003-03-quadratics.js
+       → 003-quadratics-completing-the-square.js
+WOULD   precalculus/2-algebra/004-04-rational-partial-fractions.js
+       → 004-rational-expressions-partial-fractions.js
+WOULD   precalculus/2-algebra/005-05-systems.js
+       → 005-systems-of-equations.js
+WOULD   precalculus/2-algebra/006-06-complex-numbers.js
+       → 006-complex-numbers.js
+WOULD   precalculus/2-algebra/007-07-inequalities.js
+       → 007-inequalities-sign-analysis.js
+WOULD   precalculus/2-algebra/008-08-linear-programming.js
+       → 008-linear-programming.js
+WOULD   precalculus/3-trigonometry-transcendental-functions/008-08-polar-coordinates.js
+       → 008-polar-coordinates.js
+WOULD   programmable-logic-controllers/1-plc-programming-fundamentals/001-plc0-001-what-is-a-plc.js
+       → 001-what-is-a-plc.js
+WOULD   programmable-logic-controllers/1-plc-programming-fundamentals/002-plc0-002-plc-hardware.js
+       → 002-plc-hardware.js
+WOULD   programmable-logic-controllers/1-plc-programming-fundamentals/003-plc0-003-scan-cycle.js
+       → 003-scan-cycle.js
+WOULD   programmable-logic-controllers/1-plc-programming-fundamentals/004-plc0-004-first-rung.js
+       → 004-first-rung.js
+WOULD   programmable-logic-controllers/1-plc-programming-fundamentals/005-plc0-005-series-parallel.js
+       → 005-series-parallel.js
+WOULD   programmable-logic-controllers/1-plc-programming-fundamentals/006-plc0-006-otl-otu.js
+       → 006-otl-otu.js
+WOULD   programmable-logic-controllers/1-plc-programming-fundamentals/007-plc0-007-timers.js
+       → 007-timers.js
+WOULD   programmable-logic-controllers/1-plc-programming-fundamentals/008-plc0-008-counters.js
+       → 008-counters.js
+WOULD   programmable-logic-controllers/1-plc-programming-fundamentals/009-plc0-009-comparison-instructions.js
+       → 009-comparison-instructions.js
+WOULD   programmable-logic-controllers/1-plc-programming-fundamentals/010-plc0-010-math-mov.js
+       → 010-math-mov.js
+WOULD   python/1-computational-foundations/001-lesson0-1.js
+       → 001-notebook-basics.js
+WOULD   python/10-linear-relationships/001-ch1-3.js
+       → 001-linear-relationships.js
+WOULD   python/11-exponentials-logarithms/001-ch1-4.js
+       → 001-exponentials-and-logarithms.js
+WOULD   python/12-trigonometry-applied/001-ch1-5.js
+       → 001-trigonometry-applied.js
+WOULD   python/13-sequences-series/001-ch1-6.js
+       → 001-sequences-and-series.js
+WOULD   python/14-arrays-vectorization/001-ch2-1.js
+       → 001-arrays-and-vectorization.js
+WOULD   python/15-linear-algebra-computational/001-ch2-2.js
+       → 001-linear-algebra-computational.js
+WOULD   python/16-systems-geometry/001-ch2-3.js
+       → 001-systems-and-geometry.js
+WOULD   python/17-performance-thinking/001-ch2-4.js
+       → 001-performance-thinking.js
+WOULD   python/18-tabular-data-model/001-ch3-1.js
+       → 001-tabular-data-model.js
+WOULD   python/19-data-cleaning/001-ch3-2.js
+       → 001-data-cleaning.js
+WOULD   python/2-python-core-syntax/001-lesson1.js
+       → 001-values.js
+WOULD   python/2-python-core-syntax/002-lesson2.js
+       → 002-expressions.js
+WOULD   python/2-python-core-syntax/003-lesson3.js
+       → 003-types.js
+WOULD   python/2-python-core-syntax/004-lesson4.js
+       → 004-variables.js
+WOULD   python/2-python-core-syntax/005-lesson5.js
+       → 005-state-flow.js
+WOULD   python/20-object-oriented-programming/001-ch4-1.js
+       → 001-oop-intro.js
+WOULD   python/20-object-oriented-programming/002-ch4-2.js
+       → 002-oop-methods.js
+WOULD   python/20-object-oriented-programming/003-ch4-3.js
+       → 003-oop-inheritance.js
+WOULD   python/20-object-oriented-programming/004-ch4-4.js
+       → 004-oop-encapsulation.js
+WOULD   python/20-object-oriented-programming/005-ch4-5.js
+       → 005-oop-polymorphism.js
+WOULD   python/20-object-oriented-programming/006-ch4-6.js
+       → 006-oop-dataclasses.js
+WOULD   python/20-object-oriented-programming/007-ch4-7.js
+       → 007-oop-mixins-descriptors.js
+WOULD   python/20-object-oriented-programming/008-ch4-8.js
+       → 008-oop-metaclasses.js
+WOULD   python/20-object-oriented-programming/009-ch4-9.js
+       → 009-oop-design-patterns.js
+WOULD   python/20-object-oriented-programming/010-ch4-10.js
+       → 010-oop-solid.js
+WOULD   python/20-object-oriented-programming/011-ch4-11.js
+       → 011-oop-advanced-projects.js
+WOULD   python/20-object-oriented-programming/012-ch4-12.js
+       → 012-oop-mega-challenge.js
+WOULD   python/3-computational-methods/001-lesson7.js
+       → 001-built-in-functions.js
+WOULD   python/3-computational-methods/002-lesson8.js
+       → 002-function-composition.js
+WOULD   python/3-computational-methods/003-lesson9.js
+       → 003-writing-functions.js
+WOULD   python/4-logic-control-flow/001-lesson10.js
+       → 001-boolean-logic.js
+WOULD   python/4-logic-control-flow/002-lesson11.js
+       → 002-conditional-execution.js
+WOULD   python/5-iteration/001-lesson12.js
+       → 001-for-loops.js
+WOULD   python/5-iteration/002-lesson13.js
+       → 002-iterating-sequences.js
+WOULD   python/5-iteration/003-lesson14.js
+       → 003-while-loops.js
+WOULD   python/6-data-structures/001-lesson15.js
+       → 001-lists.js
+WOULD   python/6-data-structures/002-lesson16.js
+       → 002-dictionaries.js
+WOULD   python/6-data-structures/003-lesson17.js
+       → 003-mutability.js
+WOULD   python/7-abstraction-design/001-lesson18.js
+       → 001-decomposition.js
+WOULD   python/8-numbers-structure/001-ch1-1.js
+       → 001-numbers-and-structure.js
+WOULD   python/9-functions-as-mappings/001-ch1-2.js
+       → 001-functions-as-mappings.js
+WOULD   simulation/1-getting-started-the-sim-loop/001-sim1-001-how-the-lab-works.js
+       → 001-how-the-sim-lab-works.js
+WOULD   simulation/1-getting-started-the-sim-loop/002-sim1-002-variables-and-scope.js
+       → 002-variables-and-scope.js
+WOULD   simulation/1-getting-started-the-sim-loop/003-sim1-003-functions-and-math.js
+       → 003-functions-and-math.js
+WOULD   simulation/1-getting-started-the-sim-loop/004-sim1-004-loops-and-arrays.js
+       → 004-loops-and-arrays.js
+WOULD   simulation/1-getting-started-the-sim-loop/005-sim1-005-building-blocks.js
+       → 005-building-blocks-objects-and-techniques.js
+WOULD   simulation/1-getting-started-the-sim-loop/006-sim1-006-motion-physics.js
+       → 006-building-blocks-part-2-motion-physics.js
+WOULD   simulation/1-getting-started-the-sim-loop/007-sim1-007-advanced-techniques.js
+       → 007-building-blocks-part-3-advanced-techniques.js
+WOULD   simulation/1-getting-started-the-sim-loop/008-sim1-008-physics-geometry-interaction.js
+       → 008-building-blocks-part-4-physics-geometry-interaction.js
+WOULD   simulation/1-getting-started-the-sim-loop/009-sim1-009-lighting-effects-performance.js
+       → 009-building-blocks-part-5-lighting-effects-performance.js
+WOULD   simulation/2-build-a-function-plotter/001-sim2-001-your-first-app.js
+       → 001-your-first-app.js
+WOULD   simulation/2-build-a-function-plotter/002-sim2-002-evaluating-expressions.js
+       → 002-evaluating-expressions.js
+WOULD   simulation/2-build-a-function-plotter/003-sim2-003-function-plotter.js
+       → 003-function-plotter.js
+WOULD   simulation/2-build-a-function-plotter/004-sim2-004-events-and-state.js
+       → 004-events-and-state.js
+WOULD   simulation/2-build-a-function-plotter/005-sim2-005-animation-loop.js
+       → 005-animation-loop.js
+WOULD   simulation/2-build-a-function-plotter/006-sim2-006-unit-circle.js
+       → 006-unit-circle.js
+WOULD   simulation/2-build-a-function-plotter/007-sim2-007-multiple-functions.js
+       → 007-multiple-functions.js
+WOULD   simulation/2-build-a-function-plotter/008-sim2-008-axes-and-viewport.js
+       → 008-axes-and-viewport.js
+WOULD   simulation/2-build-a-function-plotter/009-sim2-009-analysis-tools.js
+       → 009-analysis-tools.js
+WOULD   simulation/2-build-a-function-plotter/010-sim2-010-capstone.js
+       → 010-capstone.js
+WOULD   simulation/3-3d-bowling-physics-simulation/001-sim3-001-the-3d-scene.js
+       → 001-the-3d-scene.js
+WOULD   simulation/3-3d-bowling-physics-simulation/002-sim3-002-camera-and-motion.js
+       → 002-camera-and-motion.js
+WOULD   simulation/3-3d-bowling-physics-simulation/003-sim3-003-vectors-and-formation.js
+       → 003-vectors-and-formation.js
+WOULD   simulation/3-3d-bowling-physics-simulation/004-sim3-004-dot-and-cross-product.js
+       → 004-dot-and-cross-product.js
+WOULD   simulation/3-3d-bowling-physics-simulation/005-sim3-005-collision-detection.js
+       → 005-collision-detection.js
+WOULD   simulation/3-3d-bowling-physics-simulation/006-sim3-006-physics-response.js
+       → 006-physics-response.js
+WOULD   simulation/3-3d-bowling-physics-simulation/007-sim3-007-full-game.js
+       → 007-full-game.js
+WOULD   sql/1-sql-zero-to-mastery/001-sql0-007-what-is-data.js
+       → 001-what-is-data.js
+WOULD   sql/1-sql-zero-to-mastery/002-sql0-001-what-is-a-database.js
+       → 002-what-is-a-database.js
+WOULD   sql/1-sql-zero-to-mastery/003-sql0-008-data-types.js
+       → 003-data-types.js
+WOULD   sql/1-sql-zero-to-mastery/004-sql0-009-create-table.js
+       → 004-create-table.js
+WOULD   sql/1-sql-zero-to-mastery/005-sql0-010-insert-data.js
+       → 005-insert-data.js
+WOULD   sql/1-sql-zero-to-mastery/006-sql0-002-select-query.js
+       → 006-select-query.js
+WOULD   sql/1-sql-zero-to-mastery/007-sql0-011-where-clause.js
+       → 007-where-clause.js
+WOULD   sql/1-sql-zero-to-mastery/008-sql0-012-order-limit.js
+       → 008-order-limit.js
+WOULD   sql/1-sql-zero-to-mastery/009-sql0-013-update-delete.js
+       → 009-update-delete.js
+WOULD   sql/1-sql-zero-to-mastery/010-sql0-014-null-handling.js
+       → 010-null-the-absent-value.js
+WOULD   sql/1-sql-zero-to-mastery/011-sql0-015-aggregate-functions.js
+       → 011-aggregate-functions.js
+WOULD   sql/1-sql-zero-to-mastery/012-sql0-003-aggregation.js
+       → 012-aggregation-grouping.js
+WOULD   sql/1-sql-zero-to-mastery/013-sql0-016-having.js
+       → 013-having.js
+WOULD   sql/1-sql-zero-to-mastery/014-sql0-017-expressions.js
+       → 014-expressions-aliases.js
+WOULD   sql/1-sql-zero-to-mastery/015-sql0-018-relational-design.js
+       → 015-relational-design.js
+WOULD   sql/1-sql-zero-to-mastery/016-sql0-004-joins.js
+       → 016-joins.js
+WOULD   sql/1-sql-zero-to-mastery/017-sql0-019-subqueries.js
+       → 017-subqueries.js
+WOULD   sql/1-sql-zero-to-mastery/018-sql0-020-cte-with.js
+       → 018-cte-with.js
+WOULD   sql/1-sql-zero-to-mastery/019-sql0-021-case-when.js
+       → 019-case-when.js
+WOULD   sql/1-sql-zero-to-mastery/020-sql0-022-string-functions.js
+       → 020-string-functions.js
+WOULD   sql/1-sql-zero-to-mastery/021-sql0-023-date-functions.js
+       → 021-date-functions.js
+WOULD   sql/1-sql-zero-to-mastery/022-sql0-024-window-functions.js
+       → 022-window-functions.js
+WOULD   sql/1-sql-zero-to-mastery/023-sql0-025-normalization.js
+       → 023-normalization.js
+WOULD   sql/1-sql-zero-to-mastery/024-sql0-026-constraints.js
+       → 024-constraints.js
+WOULD   sql/1-sql-zero-to-mastery/025-sql0-005-indexes.js
+       → 025-indexes-query-performance.js
+WOULD   sql/1-sql-zero-to-mastery/026-sql0-006-acid.js
+       → 026-acid-transactions.js
+WOULD   sql/1-sql-zero-to-mastery/027-sql0-027-views.js
+       → 027-views.js
+WOULD   sql/1-sql-zero-to-mastery/028-sql0-028-common-patterns.js
+       → 028-common-patterns.js
+WOULD   sql/2-python-sql/001-sql1-001-what-is-a-database.js
+       → 001-what-is-a-database.js
+WOULD   sql/2-python-sql/002-sql1-002-select-query.js
+       → 002-select-your-first-query.js
+WOULD   sql/2-python-sql/003-sql1-003-aggregation.js
+       → 003-aggregation-and-grouping.js
+WOULD   sql/2-python-sql/004-sql1-004-joins.js
+       → 004-joins-relational-data.js
+WOULD   sql/2-python-sql/005-sql1-005-indexes.js
+       → 005-indexes-and-query-performance.js
+WOULD   sql/2-python-sql/006-sql1-006-acid.js
+       → 006-acid-transactions.js
+WOULD   tetris/1-build-tetris/001-lesson1.js
+       → 001-tetris-the-empty-stage.js
+WOULD   tetris/1-build-tetris/002-lesson2.js
+       → 002-tetris-describing-a-piece.js
+WOULD   tetris/1-build-tetris/003-lesson3.js
+       → 003-tetris-the-game-loop.js
+WOULD   tetris/1-build-tetris/004-lesson4.js
+       → 004-tetris-keyboard-control.js
+WOULD   tetris/1-build-tetris/005-lesson5.js
+       → 005-tetris-collision-detection.js
+WOULD   tetris/1-build-tetris/006-lesson6.js
+       → 006-tetris-line-clearing.js
+WOULD   tetris/1-build-tetris/007-lesson7.js
+       → 007-tetris-game-over-restart.js
+WOULD   tetris/1-build-tetris/008-lesson8.js
+       → 008-tetris-next-piece-preview.js
+WOULD   tetris/1-build-tetris/009-lesson9.js
+       → 009-tetris-polish-animation.js
+WOULD   tetris/1-build-tetris/010-lesson10.js
+       → 010-tetris-mobile-touch-controls.js
+WOULD   three-js/1-foundations/001-lesson0-0.js
+       → 001-gpu-vs-cpu.js
+WOULD   three-js/1-foundations/002-lesson0-1.js
+       → 002-rendering-pipeline.js
+WOULD   three-js/1-foundations/003-lesson0-2.js
+       → 003-vectors-for-graphics.js
+WOULD   three-js/1-foundations/004-lesson0-3.js
+       → 004-matrices-and-transformations.js
+WOULD   three-js/1-foundations/005-lesson0-4.js
+       → 005-coordinate-spaces.js
+WOULD   three-js/10-transforms-the-scene-graph/001-lesson2-0.js
+       → 001-transforms-position-rotation-scale.js
+WOULD   three-js/10-transforms-the-scene-graph/002-lesson2-1.js
+       → 002-scene-graph.js
+WOULD   three-js/11-lighting-animation/001-lesson3-0.js
+       → 001-lighting-shadow-maps.js
+WOULD   three-js/11-lighting-animation/002-lesson3-1.js
+       → 002-animation-loop-delta-time.js
+WOULD   three-js/12-math-vectors-interaction/001-lesson4-0.js
+       → 001-vector3-matrix4.js
+WOULD   three-js/12-math-vectors-interaction/002-lesson4-1.js
+       → 002-quaternions-practical-math.js
+WOULD   three-js/12-math-vectors-interaction/003-lesson4-2.js
+       → 003-raycasting-mouse-interaction.js
+WOULD   three-js/13-curves-surfaces-project/001-lesson5-0.js
+       → 001-curves-parametric-paths.js
+WOULD   three-js/13-curves-surfaces-project/002-lesson5-1.js
+       → 002-parametric-surfaces.js
+WOULD   three-js/13-curves-surfaces-project/003-lesson5-2.js
+       → 003-project-surface-explorer.js
+WOULD   three-js/2-webgl-core/001-lesson1-0.js
+       → 001-window-and-context.js
+WOULD   three-js/2-webgl-core/002-lesson1-1.js
+       → 002-first-triangle.js
+WOULD   three-js/2-webgl-core/003-lesson1-2.js
+       → 003-vertex-buffers.js
+WOULD   three-js/2-webgl-core/004-lesson1-3.js
+       → 004-shader-basics.js
+WOULD   three-js/2-webgl-core/005-lesson1-4.js
+       → 005-attributes-and-uniforms.js
+WOULD   three-js/2-webgl-core/006-lesson1-5.js
+       → 006-mvp-matrix.js
+WOULD   three-js/3-rendering-fundamentals/001-lesson2-0.js
+       → 001-textures-and-uv-mapping.js
+WOULD   three-js/3-rendering-fundamentals/002-lesson2-1.js
+       → 002-multiple-textures.js
+WOULD   three-js/3-rendering-fundamentals/003-lesson2-2.js
+       → 003-coordinate-systems-deep-dive.js
+WOULD   three-js/3-rendering-fundamentals/004-lesson2-3.js
+       → 004-fps-camera.js
+WOULD   three-js/3-rendering-fundamentals/005-lesson2-4.js
+       → 005-colors-and-materials.js
+WOULD   three-js/4-lighting/001-lesson3-0.js
+       → 001-the-lighting-equation.js
+WOULD   three-js/4-lighting/002-lesson3-1.js
+       → 002-phong-blinn-shading.js
+WOULD   three-js/4-lighting/003-lesson3-2.js
+       → 003-material-surface-properties.js
+WOULD   three-js/4-lighting/004-lesson3-3.js
+       → 004-directional-point-spot-lights.js
+WOULD   three-js/5-intermediate-graphics/001-lesson4-0.js
+       → 001-model-loading-gltf.js
+WOULD   three-js/5-intermediate-graphics/002-lesson4-1.js
+       → 002-depth-testing-z-buffer.js
+WOULD   three-js/5-intermediate-graphics/003-lesson4-2.js
+       → 003-blending-and-transparency.js
+WOULD   three-js/5-intermediate-graphics/004-lesson4-3.js
+       → 004-framebuffers-and-render-targets.js
+WOULD   three-js/5-intermediate-graphics/005-lesson4-4.js
+       → 005-cubemaps-and-skyboxes.js
+WOULD   three-js/6-advanced-techniques/001-lesson5-0.js
+       → 001-shadow-mapping.js
+WOULD   three-js/6-advanced-techniques/002-lesson5-1.js
+       → 002-normal-mapping.js
+WOULD   three-js/6-advanced-techniques/003-lesson5-2.js
+       → 003-hdr-and-bloom.js
+WOULD   three-js/6-advanced-techniques/004-lesson5-3.js
+       → 004-deferred-rendering.js
+WOULD   three-js/6-advanced-techniques/005-lesson5-4.js
+       → 005-physically-based-rendering.js
+WOULD   three-js/7-engine-architecture/001-lesson6-0.js
+       → 001-scene-graph.js
+WOULD   three-js/7-engine-architecture/002-lesson6-1.js
+       → 002-ecs-vs-oop.js
+WOULD   three-js/7-engine-architecture/003-lesson6-2.js
+       → 003-resource-management.js
+WOULD   three-js/7-engine-architecture/004-lesson6-3.js
+       → 004-render-pipeline-abstraction.js
+WOULD   three-js/7-engine-architecture/005-lesson6-4.js
+       → 005-debugging-and-performance.js
+WOULD   three-js/8-setup-your-first-scene/001-lesson0-0.js
+       → 001-es-modules-import-maps.js
+WOULD   three-js/8-setup-your-first-scene/002-lesson0-1.js
+       → 002-your-first-scene.js
+WOULD   three-js/9-geometry-materials/001-lesson1-0.js
+       → 001-buffer-geometry.js
+WOULD   three-js/9-geometry-materials/002-lesson1-1.js
+       → 002-materials-pbr.js
+WOULD   web/1-the-web-as-a-system/001-w1-001-what-is-a-web-page.js
+       → 001-what-is-a-web-page.js
+WOULD   web/1-the-web-as-a-system/002-w1-002-html-structure.js
+       → 002-html-structure.js
+WOULD   web/1-the-web-as-a-system/003-w1-003-css-rule-engine.js
+       → 003-css-rule-engine.js
+WOULD   web/1-the-web-as-a-system/004-w1-004-layout-systems.js
+       → 004-layout-systems.js
+WOULD   web/2-javascript-as-behavior/001-w2-001-variables-and-state.js
+       → 001-variables-and-state.js
+WOULD   web/2-javascript-as-behavior/002-w2-002-functions.js
+       → 002-functions.js
+WOULD   web/2-javascript-as-behavior/003-w2-003-events.js
+       → 003-events.js
+WOULD   web/2-javascript-as-behavior/004-w2-004-dom-intro.js
+       → 004-dom-intro.js
+WOULD   web/2-javascript-as-behavior/005-w2-005-dom-manipulation.js
+       → 005-dom-manipulation.js
+WOULD   web/3-time-asynchrony/001-w3-001-event-loop.js
+       → 001-event-loop.js
+WOULD   web/3-time-asynchrony/002-w3-002-async-patterns.js
+       → 002-async-patterns.js
+WOULD   web/4-stateful-ui-systems/001-w4-001-state-drives-ui.js
+       → 001-state-drives-ui.js
+WOULD   web/4-stateful-ui-systems/002-w4-002-components.js
+       → 002-components.js
+WOULD   web/4-stateful-ui-systems/003-w4-003-reactive-thinking.js
+       → 003-reactive-thinking.js
+WOULD   web/5-data-real-systems/001-w5-001-apis-and-data.js
+       → 001-apis-and-data.js
+WOULD   web/5-data-real-systems/002-w5-002-state-async-combined.js
+       → 002-state-async-combined.js
+WOULD   web/6-advanced-engineering/001-w6-001-performance.js
+       → 001-performance.js
+WOULD   web/6-advanced-engineering/002-w6-002-abstraction-layers.js
+       → 002-abstraction-layers.js
+WOULD   web/6-advanced-engineering/003-w6-003-architecture.js
+       → 003-architecture.js
+WOULD   web/7-capstone-system/001-w7-001-build-full-app.js
+       → 001-build-app.js
+
+Would rename: 897
+Already correct: 43
+
+Run with --apply to rename for real.
