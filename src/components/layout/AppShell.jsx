@@ -7,7 +7,6 @@ import {
   useParams,
 } from "react-router-dom";
 import { LESSON_MAP, CURRICULUM, COURSES } from "../../courses/index.js";
-import Sidebar from "./Sidebar.jsx";
 import SearchModal from "../ui/SearchModal.jsx";
 import GlobalGrapher from "../../tools/grapher-2d/index.jsx";
 import GlobalGrapher3D from "../../tools/grapher-3d/index.jsx";
@@ -147,8 +146,15 @@ function TopBar({ dark, toggleDark }) {
         <AuthButton />
       </div>
 
-      {/* CENTER — flexible spacer */}
-      <div className="flex-1" />
+      {/* CENTER — nav links */}
+      <div className="flex-1 flex items-center gap-1">
+        <Link
+          to="/lesson-builder"
+          className="text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 px-2.5 py-1 rounded-md hover:bg-black/5 dark:hover:bg-white/[0.08] transition-colors"
+        >
+          🔨 Lesson Builder
+        </Link>
+      </div>
 
       {/* RIGHT — tools + utilities + clock */}
       <div className="flex items-center gap-0.5 flex-shrink-0">
@@ -244,19 +250,7 @@ export default function AppShell({ children }) {
   const pathParts = location.pathname.split('/').filter(Boolean);
   const isLessonRoute = pathParts[0] === 'chapter' && pathParts.length >= 3;
 
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarPinned, setSidebarPinned] = useState(() => {
-    const saved = localStorage.getItem("oc-sidebar-pinned");
-    return saved !== null ? saved === "true" : true;
-  });
-  const [sidebarHovered, setSidebarHovered] = useState(false);
   const [mobileToolsOpen, setMobileToolsOpen] = useState(false);
-
-  const isSidebarExpanded = sidebarPinned || (sidebarHovered && !sidebarOpen);
-
-  useEffect(() => {
-    localStorage.setItem("oc-sidebar-pinned", sidebarPinned);
-  }, [sidebarPinned]);
 
   // Restore dev mode across page refreshes
   useEffect(() => {
@@ -487,16 +481,11 @@ export default function AppShell({ children }) {
           {isDesktopRoute && <CodeMapBackground dark={dark} />}
           <TopBar dark={dark} toggleDark={toggleDark} />
 
-          {/* Mobile sidebar/tools backdrop */}
-          {(sidebarOpen ||
-            graphOpen ||
-            graph3DOpen ||
-            graphJSXOpen ||
-            mobileToolsOpen) && (
+          {/* Mobile tools backdrop */}
+          {(graphOpen || graph3DOpen || graphJSXOpen || mobileToolsOpen) && (
             <div
               className="fixed inset-0 z-[45] bg-black/30 backdrop-blur-sm lg:backdrop-blur-none lg:bg-transparent"
               onClick={() => {
-                setSidebarOpen(false);
                 setMobileToolsOpen(false);
                 if (window.innerWidth < 1024) {
                   setGraphOpen(false);
@@ -508,40 +497,15 @@ export default function AppShell({ children }) {
             />
           )}
 
-          {/* Sidebar - Desktop logic for pin/hover, Mobile logic for toggle */}
-          <aside
-            onMouseEnter={() => !sidebarPinned && setSidebarHovered(true)}
-            onMouseLeave={() => setSidebarHovered(false)}
-            className={`fixed left-0 bottom-0 z-50 bg-[var(--color-surface)] backdrop-blur-xl border-r border-[var(--color-border)] transition-all duration-500 ease-in-out w-[280px]
-          top-12
-          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
-          ${isSidebarExpanded ? "lg:translate-x-0" : "lg:-translate-x-[276px]"}
-          ${!sidebarPinned && isSidebarExpanded ? "shadow-2xl ring-1 ring-black/5 dark:ring-white/5" : ""}
-        `}
-          >
-            <Sidebar
-              onNavigate={() => setSidebarOpen(false)}
-              isPinned={sidebarPinned}
-              togglePin={() => setSidebarPinned(!sidebarPinned)}
-              isCollapsed={!isSidebarExpanded && !sidebarOpen}
-              onSearchOpen={openSearch}
-            />
-
-            {/* Hover trigger - Zen Mode Desktop ONLY */}
-            {!sidebarPinned && !isSidebarExpanded && !sidebarOpen && (
-              <div className="absolute top-0 right-0 bottom-0 w-1.5 bg-brand-500/10 dark:bg-brand-400/5 hover:bg-brand-500/20 transition-colors cursor-pointer hidden lg:block" />
-            )}
-          </aside>
-
           {/* Main content */}
           <main
-            className={`transition-[padding] duration-500 ease-in-out pb-20 lg:pb-11 ${isChemistryRoute ? "h-screen overflow-hidden" : isDesktopRoute ? "h-screen" : "min-h-screen"} ${isHealthRoute || isBrainRoute ? "bg-white dark:bg-slate-950" : ""} ${sidebarPinned && !isDesktopRoute ? "lg:pl-[280px]" : "lg:pl-0"} pt-12`}
+            className={`transition-[padding] duration-500 ease-in-out pb-20 lg:pb-11 ${isChemistryRoute ? "h-screen overflow-hidden" : isDesktopRoute ? "h-screen" : "min-h-screen"} ${isHealthRoute || isBrainRoute ? "bg-white dark:bg-slate-950" : ""} lg:pl-0 pt-12`}
             style={{
               paddingRight: chatOpen
                 ? (scratchSnap === "right" ? `${scratchSnapW}px` : "var(--chat-width, 380px)")
                 : scratchSnap === "right" ? `${scratchSnapW}px` : undefined,
               ...(scratchSnap === "left"
-                ? { paddingLeft: `${(sidebarPinned ? 280 : 12) + scratchSnapW}px` }
+                ? { paddingLeft: `${12 + scratchSnapW}px` }
                 : {}),
             }}
           >
@@ -731,7 +695,6 @@ export default function AppShell({ children }) {
           </AnimatePresence>
 
           <MobileBottomNav
-            onMenuToggle={() => setSidebarOpen((o) => !o)}
             onSearchOpen={openSearch}
             onToolsToggle={() => setMobileToolsOpen((o) => !o)}
           />
