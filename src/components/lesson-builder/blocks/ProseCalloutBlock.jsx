@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import BlockShell from '../BlockShell.jsx'
+import VisualizationBlock from './VisualizationBlock.jsx'
 
 // Shared editor for Intuition and Rigor (both have prose[] + callouts[])
 
@@ -35,7 +36,7 @@ function CalloutEditor({ callout, onChange, onRemove }) {
   )
 }
 
-export default function ProseCalloutBlock({ sec, label, icon, dispatch, index, total, onMoveUp, onMoveDown, onRemove }) {
+export default function ProseCalloutBlock({ sec, label, icon, dispatch, index, total, onMoveUp, onMoveDown, onRemove, sectionId }) {
   const [editing, setEditing] = useState(false)
 
   const updateSec = (updates) => dispatch({ type: 'UPDATE_SECTION', id: sec._id, updates })
@@ -54,19 +55,17 @@ export default function ProseCalloutBlock({ sec, label, icon, dispatch, index, t
           <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">{c.body}</p>
         </div>
       ))}
-      {(sec.visualizations ?? []).map((viz, i) => (
-        <div key={i} className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 px-4 py-3">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Visualization</span>
-            <span className="text-xs font-mono text-brand-500 dark:text-brand-400">{viz.id}</span>
-          </div>
-          {viz.title && <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">{viz.title}</p>}
-          {viz.props?.initialCells?.length > 0 && (
-            <p className="text-[11px] text-slate-400 mt-1">🐍 {viz.props.initialCells.length} notebook cells — preserved on export</p>
-          )}
-        </div>
+      {(sec.children ?? []).map((child, i) => (
+        <VisualizationBlock
+          key={child._id}
+          child={child}
+          sectionId={sectionId ?? sec._id}
+          dispatch={dispatch}
+          index={i}
+          total={(sec.children ?? []).length}
+        />
       ))}
-      {!sec.prose?.length && !sec.callouts?.length && !sec.visualizations?.length && (
+      {!sec.prose?.length && !sec.callouts?.length && !sec.children?.length && (
         <p className="text-slate-300 dark:text-slate-600 italic text-sm">Click to add content…</p>
       )}
     </div>
@@ -111,9 +110,34 @@ export default function ProseCalloutBlock({ sec, label, icon, dispatch, index, t
         ))}
       </div>
 
-      <button onClick={() => setEditing(false)} className="px-4 py-1.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold rounded-lg">
-        Done
-      </button>
+      {/* Nested visualizations */}
+      {(sec.children ?? []).length > 0 && (
+        <div className="space-y-3">
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Embedded Visualizations</span>
+          {(sec.children ?? []).map((child, i) => (
+            <VisualizationBlock
+              key={child._id}
+              child={child}
+              sectionId={sectionId ?? sec._id}
+              dispatch={dispatch}
+              index={i}
+              total={(sec.children ?? []).length}
+            />
+          ))}
+        </div>
+      )}
+
+      <div className="flex gap-3 flex-wrap">
+        <button onClick={() => setEditing(false)} className="px-4 py-1.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold rounded-lg">
+          Done
+        </button>
+        <button
+          onClick={() => dispatch({ type: 'ADD_CHILD', sectionId: sectionId ?? sec._id, vizId: 'PythonNotebook' })}
+          className="px-3 py-1.5 text-sm text-brand-600 border border-brand-300 hover:bg-brand-50 rounded-lg font-semibold"
+        >
+          + Add Notebook
+        </button>
+      </div>
     </div>
   )
 

@@ -62,11 +62,11 @@ function SectionBlock({ sec, dispatch, index, total }) {
 
   switch (sec.type) {
     case 'intuition':
-      return <ProseCalloutBlock {...common} label="Intuition" icon="🧠" />
+      return <ProseCalloutBlock {...common} label="Intuition" icon="🧠" sectionId={sec._id} />
     case 'rigor':
-      return <ProseCalloutBlock {...common} label="Rigor" icon="∴" />
+      return <ProseCalloutBlock {...common} label="Rigor" icon="∴" sectionId={sec._id} />
     case 'math':
-      return <MathBlock {...common} />
+      return <MathBlock {...common} sectionId={sec._id} />
     case 'examples':
       return <ExamplesBlock {...common} />
     case 'challenges':

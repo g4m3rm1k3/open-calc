@@ -20,14 +20,39 @@ export const PALETTE_BLOCKS = [
   { type: 'python',       label: 'Python',       icon: '🐍', desc: 'Python notebook cells with runnable code' },
 ]
 
+// Convert lesson.*.visualizations array → builder children array
+export function vizsToChildren(vizs) {
+  return (vizs ?? []).map(viz => ({
+    _id: newId(),
+    type: 'visualization',
+    vizId: viz.id ?? '',
+    title: viz.title ?? '',
+    caption: viz.caption ?? '',
+    mathBridge: viz.mathBridge ?? '',
+    props: viz.props ?? {},
+  }))
+}
+
+// Convert builder children array → lesson.*.visualizations array
+export function childrenToVizs(children) {
+  return (children ?? []).map(child => {
+    const v = { id: child.vizId }
+    if (child.title)      v.title = child.title
+    if (child.caption)    v.caption = child.caption
+    if (child.mathBridge) v.mathBridge = child.mathBridge
+    v.props = child.props ?? {}
+    return v
+  })
+}
+
 export function defaultSection(type) {
   const _id = newId()
   switch (type) {
     case 'intuition':
     case 'rigor':
-      return { _id, type, prose: [''], callouts: [] }
+      return { _id, type, prose: [''], callouts: [], children: [] }
     case 'math':
-      return { _id, type, prose: [''], equations: [] }
+      return { _id, type, prose: [''], equations: [], children: [] }
     case 'examples':
       return { _id, type, items: [{ title: 'Example 1', problem: '', steps: [''], answer: '' }] }
     case 'challenges':
@@ -47,9 +72,9 @@ export function lessonToState(lesson, chapterId, lessonSlug) {
   const sections = []
   const add = (type, extra) => sections.push({ _id: newId(), type, ...extra })
 
-  if (lesson.intuition) add('intuition', { prose: lesson.intuition.prose ?? [], callouts: lesson.intuition.callouts ?? [], visualizations: lesson.intuition.visualizations ?? [] })
-  if (lesson.math)      add('math',      { prose: lesson.math.prose ?? [],      equations: lesson.math.equations ?? [],   visualizations: lesson.math.visualizations ?? [] })
-  if (lesson.rigor)     add('rigor',     { prose: lesson.rigor.prose ?? [],     callouts: lesson.rigor.callouts ?? [],    visualizations: lesson.rigor.visualizations ?? [] })
+  if (lesson.intuition) add('intuition', { prose: lesson.intuition.prose ?? [], callouts: lesson.intuition.callouts ?? [], children: vizsToChildren(lesson.intuition.visualizations) })
+  if (lesson.math)      add('math',      { prose: lesson.math.prose ?? [],      equations: lesson.math.equations ?? [],   children: vizsToChildren(lesson.math.visualizations) })
+  if (lesson.rigor)     add('rigor',     { prose: lesson.rigor.prose ?? [],     callouts: lesson.rigor.callouts ?? [],    children: vizsToChildren(lesson.rigor.visualizations) })
   if (lesson.examples?.length)    add('examples',    { items: lesson.examples.map(ex => ({ ...ex, steps: ex.steps ?? [] })) })
   if (lesson.challenges?.length)  add('challenges',  { items: lesson.challenges })
   if (lesson.checkpoints?.length) add('checkpoints', { items: lesson.checkpoints })

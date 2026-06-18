@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import BlockShell from '../BlockShell.jsx'
+import VisualizationBlock from './VisualizationBlock.jsx'
 
 function EquationEditor({ eq, onChange, onRemove }) {
   return (
@@ -25,7 +26,7 @@ function EquationEditor({ eq, onChange, onRemove }) {
   )
 }
 
-export default function MathBlock({ sec, dispatch, index, total, onMoveUp, onMoveDown, onRemove }) {
+export default function MathBlock({ sec, dispatch, index, total, onMoveUp, onMoveDown, onRemove, sectionId }) {
   const [editing, setEditing] = useState(false)
   const update = updates => dispatch({ type: 'UPDATE_SECTION', id: sec._id, updates })
 
@@ -40,7 +41,17 @@ export default function MathBlock({ sec, dispatch, index, total, onMoveUp, onMov
           <code className="text-slate-700 dark:text-slate-200">{eq.tex}</code>
         </div>
       ))}
-      {!sec.prose?.length && !sec.equations?.length && (
+      {(sec.children ?? []).map((child, i) => (
+        <VisualizationBlock
+          key={child._id}
+          child={child}
+          sectionId={sectionId ?? sec._id}
+          dispatch={dispatch}
+          index={i}
+          total={(sec.children ?? []).length}
+        />
+      ))}
+      {!sec.prose?.length && !sec.equations?.length && !sec.children?.length && (
         <p className="text-slate-300 dark:text-slate-600 italic text-sm">Click to add math content…</p>
       )}
     </div>
@@ -82,7 +93,32 @@ export default function MathBlock({ sec, dispatch, index, total, onMoveUp, onMov
           />
         ))}
       </div>
-      <button onClick={() => setEditing(false)} className="px-4 py-1.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold rounded-lg">Done</button>
+      {/* Nested visualizations */}
+      {(sec.children ?? []).length > 0 && (
+        <div className="space-y-3">
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Embedded Visualizations</span>
+          {(sec.children ?? []).map((child, i) => (
+            <VisualizationBlock
+              key={child._id}
+              child={child}
+              sectionId={sectionId ?? sec._id}
+              dispatch={dispatch}
+              index={i}
+              total={(sec.children ?? []).length}
+            />
+          ))}
+        </div>
+      )}
+
+      <div className="flex gap-3 flex-wrap">
+        <button onClick={() => setEditing(false)} className="px-4 py-1.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold rounded-lg">Done</button>
+        <button
+          onClick={() => dispatch({ type: 'ADD_CHILD', sectionId: sectionId ?? sec._id, vizId: 'PythonNotebook' })}
+          className="px-3 py-1.5 text-sm text-brand-600 border border-brand-300 hover:bg-brand-50 rounded-lg font-semibold"
+        >
+          + Add Notebook
+        </button>
+      </div>
     </div>
   )
 

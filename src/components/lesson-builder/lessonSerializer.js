@@ -1,4 +1,4 @@
-import { HANDLED_SECTION_KEYS } from './builderUtils.js'
+import { HANDLED_SECTION_KEYS, childrenToVizs } from './builderUtils.js'
 
 function fmtValue(v, depth = 1) {
   const pad = '  '.repeat(depth)
@@ -91,9 +91,19 @@ export function serializeLesson(state) {
   // are preserved verbatim.
   for (const sec of sections) {
     if (sec.type === 'intuition' || sec.type === 'rigor') {
-      base[sec.type] = { ...(_raw?.[sec.type] ?? {}), prose: sec.prose ?? [], callouts: sec.callouts ?? [] }
+      base[sec.type] = {
+        ...(_raw?.[sec.type] ?? {}),
+        prose: sec.prose ?? [],
+        callouts: sec.callouts ?? [],
+        visualizations: childrenToVizs(sec.children),
+      }
     } else if (sec.type === 'math') {
-      base.math = { ...(_raw?.math ?? {}), prose: sec.prose ?? [], equations: sec.equations ?? [] }
+      base.math = {
+        ...(_raw?.math ?? {}),
+        prose: sec.prose ?? [],
+        equations: sec.equations ?? [],
+        visualizations: childrenToVizs(sec.children),
+      }
     } else if (sec.type === 'examples') {
       base.examples = sec.items ?? []
     } else if (sec.type === 'challenges') {
